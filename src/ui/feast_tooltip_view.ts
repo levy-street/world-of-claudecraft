@@ -5,11 +5,11 @@
 // no Hud state, so tests/feast_tooltip_view.test.ts drives it directly).
 // Every number is RESOLVED from the live records, never re-typed copy
 // (docs/design/tooltip-writing.md): servings and duration from the def's own
-// feast record, the buff numbers from the pointed-at dish's wellfed record
+// feast record, the buff numbers from the pointed-at dish's wellFed record
 // (feast.dishItemId), and the meal length from CONSUME_DURATION, the same
 // sit-restore a bagged dish runs. The finish-the-meal trigger is
 // load-bearing copy: the buff lands only when the 18s eat COMPLETES (an
-// interrupted meal forfeits it), exactly like the wellfed line. The buff
+// interrupted meal forfeits it), exactly like the well-fed line. The buff
 // NAME interpolates through the buff bar's own matcher chain in every branch
 // (the (by) rule), and the stat label comes from the wellfed view's own
 // exported map, so the feast line, the dish tooltip, and the buff bar can
@@ -37,10 +37,10 @@ export function feastTooltipLines(
     t('itemUi.tooltip.useFeast', { servings, minutes: feastMinutes }),
   )}</div>`;
   // The serving's buff, stated in the capstone dish's own resolved well-fed
-  // form. A feast whose dish carries no wellfed record states only the
+  // form. A feast whose dish carries no wellFed record states only the
   // placement line (the restore alone is the dish's own tooltip's story).
   const dishDef = items[feast.dishItemId];
-  const fed = dishDef && 'wellfed' in dishDef ? dishDef.wellfed : undefined;
+  const fed = dishDef && dishDef.kind === 'food' ? dishDef.wellFed : undefined;
   if (fed) {
     const aura = auraDisplayNameForHud(fed.aura, null);
     const minutes = formatNumber(fed.duration / 60, { maximumFractionDigits: 1 });

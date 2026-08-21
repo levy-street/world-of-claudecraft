@@ -442,7 +442,18 @@ export class FarmPatchVisuals {
    *  by snapshot with no event on this viewer's channel). The one residual
    *  ambiguity, an old feast re-entering interest scope after the viewer
    *  walked far away, is indistinguishable client-side without wire age and
-   *  is accepted (Phase 12 QA ledger). */
+   *  is accepted (Phase 12 QA ledger). A SECOND accepted residual, recorded
+   *  by the 11c design call (Masterwrought carry item 16): a renderer
+   *  prewarm pass that ran BEFORE the online mirror held its first snapshot
+   *  would consume the silent first pass over an empty entity map (that
+   *  baseline is deliberately pinned by tests/farm_patches_adapter.test.ts),
+   *  so every feast already standing in interest scope would puff on the
+   *  first live read. Today no such pass precedes the first snapshot; if an
+   *  entry-sequence change ever creates one, the fix belongs at the RENDERER
+   *  call site (hold farmPatchVisuals.sync until the mirror is synced),
+   *  never as a non-empty-map guard here, which would flip the pinned
+   *  rebuild/login silence into a burst. Cosmetic either way: both emitters
+   *  ride vfx.ts's scaled budget. */
   private applyFeasts(entities: ReadonlyMap<number, Entity>, seed: number): void {
     this.feastsSeen.clear();
     const flourish = this.feastFlourishArmed;

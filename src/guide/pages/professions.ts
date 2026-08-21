@@ -4,8 +4,8 @@
 // pages (professions_gathering.ts), and the economy/FAQ pages
 // (professions_economy.ts / professions_faq.ts) selected by the first param.
 // The overview renders the full ten-craft ring (every seat ships content
-// since the Masterwrought phase 06 inscription catalog), the four gathering
-// professions, the ten
+// since the Masterwrought phase 06 inscription catalog), every gathering
+// profession the sim ships, the ten
 // pair-named archetypes, and the shared numbers, all from GUIDE_PROF_*
 // generated data. TRANSPARENCY POLICY: professions
 // pages publish EXACT numbers; guards in tests/guide.test.ts.

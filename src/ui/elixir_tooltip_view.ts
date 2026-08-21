@@ -18,6 +18,11 @@ import { formatNumber, type TranslationKey, t } from './i18n';
 // The stat-buff kinds an elixir plausibly carries, each mapped to the item
 // tooltip's own stat label so "Stamina" reads identically here and on a gear
 // stat line. Kinds outside this map take the aura-name fallback below.
+// DELIBERATELY kept private even though it is byte-identical to
+// WELLFED_STAT_KEYS (recorded, Masterwrought 11c): two copies is what the
+// rule of three leaves alone, and the wellfed leaf is named for well-fed
+// because of the guide bundle's spoiler-containment constraint; collapsing
+// the elixir map into it would misname the module to save five lines.
 const ELIXIR_STAT_KEYS: Partial<Record<AuraKind, TranslationKey>> = {
   buff_sta: 'itemUi.stats.sta',
   buff_int: 'itemUi.stats.int',
@@ -73,31 +78,4 @@ export function elixirTooltipLines(item: ItemDef): string {
     desc(t('itemUi.tooltip.flaskUnremovable')) +
     desc(t('itemUi.tooltip.flaskThroughDeath'))
   );
-}
-
-/** The Well Fed line for a role food, or '' for any other item. Separate from
- *  the elixir line above because a food renders BOTH: its sit-down restore
- *  line, then this. Gated on the KIND first, which is also what narrows the
- *  union to the one def shape that can spell a wellFed payload at all
- *  (FoodItemDef); no other kind can carry one. */
-export function wellFedTooltipLines(item: ItemDef): string {
-  if (item.kind !== 'food') return '';
-  const fed = item.wellFed;
-  if (!fed) return '';
-  const minutes = formatNumber(fed.duration / 60, { maximumFractionDigits: 1 });
-  const statKey = ELIXIR_STAT_KEYS[fed.kind];
-  const text = statKey
-    ? t('itemUi.tooltip.wellFed', {
-        stat: t(statKey),
-        value: formatNumber(fed.value, { maximumFractionDigits: 0 }),
-        minutes,
-      })
-    : // Same unmapped-kind fallback contract as the elixir line above: a new
-      // well-fed kind outside the stat map needs its aura's sim_i18n row in
-      // the same change or this ships English inside a localized sentence.
-      t('itemUi.tooltip.wellFedAura', {
-        aura: auraDisplayNameFromSource(fed.aura),
-        minutes,
-      });
-  return desc(text);
 }

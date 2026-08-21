@@ -291,7 +291,7 @@ import { discordStatusDisplayName } from './discord_tier';
 import { dropdownKeyNav } from './dropdown_nav';
 import { DungeonFinderProposalPopup } from './dungeon_finder_proposal_popup';
 import { DungeonFinderWindow } from './dungeon_finder_window';
-import { elixirTooltipLines, wellFedTooltipLines } from './elixir_tooltip_view';
+import { elixirTooltipLines } from './elixir_tooltip_view';
 import { emoteIconUrl } from './emote_icons';
 import {
   applyEnchantResultToast,
@@ -793,7 +793,7 @@ import {
 } from './wallet_balance';
 import { type WeaponProcEffectDesc, weaponProcLines } from './weapon_proc_view';
 import { weaponTypeLabelKey } from './weapon_type_label';
-import { wellfedTooltipLines } from './wellfed_tooltip_view';
+import { wellFedTooltipLines } from './wellfed_tooltip_view';
 import { promptWikiVisit } from './wiki_link';
 import {
   installWindowDrag,
@@ -6030,9 +6030,10 @@ export class Hud {
       html += `<div class="tt-desc">${esc(t('itemUi.tooltip.useFood', { amount: itemNumber(item.foodHp), seconds: itemNumber(CONSUME_DURATION) }))}</div>`;
     if (item.drinkMana)
       html += `<div class="tt-desc">${esc(t('itemUi.tooltip.useDrink', { amount: itemNumber(item.drinkMana), seconds: itemNumber(CONSUME_DURATION) }))}</div>`;
-    // Directly under the restore line it qualifies: a role food heals while you
-    // sit AND leaves Well Fed once the meal finishes, so the two read in the
-    // order the player experiences them.
+    // Directly under the restore line it qualifies: a buff food (farm dish or
+    // apex role plate) heals while you sit AND leaves Well Fed once the meal
+    // finishes, so the two read in the order the player experiences them. The
+    // ONE well-fed line per tooltip (src/ui/wellfed_tooltip_view.ts).
     html += wellFedTooltipLines(item);
     // Gathering implements (#2343): picks/axes/sickles/rods and the simple
     // pole render their kind, requirement, use, and bonus lines from the
@@ -6086,7 +6087,6 @@ export class Hud {
     if (item.kind === 'recipe') {
       html += recipePatternTooltipLines(item, this.sim.craftingIdentity);
     }
-    html += wellfedTooltipLines(item);
     html += feastTooltipLines(item);
     // Quest story block (related quest, progress, rules, orphaned). Replaces the
     // old plain "Quest Item" desc that doubled the kind line.

@@ -118,26 +118,22 @@ const itemStringsEn = {
       flaskUnremovable: 'It cannot be dispelled, stolen, or canceled by hand.',
       flaskThroughDeath:
         'The effect remains through death, but ends when you log out; instanced matches begin and end on a clean slate.',
-      // Well Fed (elixir_tooltip_view.ts): the buff a finished meal leaves.
-      // The "after you finish eating" clause is load-bearing, not padding:
-      // standing up early grants nothing at all, so the tooltip has to say
-      // where the buff comes from. Second key is the unmapped-kind fallback,
-      // the useElixirAura pattern.
+      // Well Fed (wellfed_tooltip_view.ts), the ONE key pair for every buff
+      // food since the 11c unification (farming's useWellfed pair was retired
+      // with its overlay rows; ruling 11c-A4-KEYPAIR). Both clauses are
+      // load-bearing, not padding: "once you finish eating" because standing
+      // up early grants nothing at all, and the one-at-a-time sentence
+      // because the whole food family shares one 'well_fed' aura id, so a
+      // newer meal really does replace the last. Second key is the
+      // unmapped-kind fallback, the useElixirAura pattern; its {aura} rides
+      // the same sim_i18n matcher the buff bar reads, so one row owns the
+      // term in every locale. No 'Use:' prefix on either line: every buff
+      // food also carries foodHp, so the useFood sentence above it already
+      // owns the Use: slot and a second one would double the prefix.
       wellFed:
         'Well Fed: Increases your {stat} by {value} for {minutes} min once you finish eating. Only one Well Fed effect at a time: a newer meal replaces it.',
       wellFedAura:
         'Well Fed: Grants {aura} for {minutes} min once you finish eating. Only one Well Fed effect at a time: a newer meal replaces it.',
-      // Well-fed buff dishes (wellfed_tooltip_view.ts): the buff lands only
-      // when the 18s sit-restore COMPLETES (an interrupted meal forfeits it),
-      // so the line states the finish-eating trigger; the aura-name fallback
-      // keeps an unmapped kind from shipping a silent dish.
-      // No 'Use:' prefix on either wellfed line: every buff dish also carries
-      // foodHp, so the useFood sentence above it already owns the Use: slot
-      // and a second one would double the prefix on one tooltip. The buff
-      // NAME is interpolated ({aura}) through the same sim_i18n matcher the
-      // buff bar reads, so one row owns the term in every locale.
-      useWellfed: '{aura}: +{value} {stat} for {minutes} min, granted when you finish eating.',
-      useWellfedAura: 'Grants {aura} for {minutes} min when you finish eating.',
       // The shared feast (feast_tooltip_view.ts): what USING the item does
       // (places a feast entity others eat from; {servings} and {minutes} come
       // from the def's own feast record), then what each serving pays,
