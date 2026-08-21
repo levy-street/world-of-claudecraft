@@ -192,11 +192,20 @@ describe('shared feast: wire tokens and content', () => {
     // content is missing; this arm is what makes that bail unreachable in a
     // shipped catalog.
     const def = ITEMS[FARM_FEAST_ITEM_ID];
-    expect(def?.feast).toEqual({ charges: 10, durationTicks: 3600, dishItemId: DISH_ID });
+    expect(def && 'feast' in def ? def.feast : undefined).toEqual({
+      charges: 10,
+      durationTicks: 3600,
+      dishItemId: DISH_ID,
+    });
     const dish = ITEMS[DISH_ID];
     expect(dish.kind).toBe('food');
     expect(dish.foodHp).toBe(980);
-    expect(dish.wellfed).toEqual({ aura: 'Well Fed', kind: 'buff_sta', value: 12, duration: 900 });
+    expect('wellfed' in dish ? dish.wellfed : undefined).toEqual({
+      aura: 'Well Fed',
+      kind: 'buff_sta',
+      value: 12,
+      duration: 900,
+    });
   });
 });
 

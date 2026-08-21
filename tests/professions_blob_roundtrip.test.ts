@@ -61,7 +61,7 @@ const populatedSim = (): Sim => {
   const meta = sim.players.get(sim.playerId) as PlayerMeta;
   // Fractional proficiency on purpose: gather gains move in 0.25 steps, so a
   // serializer that rounded would pass an integer fixture.
-  meta.gatheringProficiency = { mining: 42.25, logging: 0, herbalism: 7, fishing: 150 };
+  meta.gatheringProficiency = { mining: 42.25, logging: 0, herbalism: 7, fishing: 150, farming: 0 };
   meta.toolEffectSlots = {
     logging: {
       effectId: 'gatherers_cache',

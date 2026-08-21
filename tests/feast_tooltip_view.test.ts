@@ -11,7 +11,7 @@ import { readFileSync } from 'node:fs';
 import path from 'node:path';
 import { afterEach, describe, expect, it } from 'vitest';
 import { ITEMS } from '../src/sim/data';
-import type { ItemDef } from '../src/sim/types';
+import type { FoodItemDef, ItemDef, OtherItemDef } from '../src/sim/types';
 import { feastTooltipLines } from '../src/ui/feast_tooltip_view';
 import {
   ensureLocaleLoaded,
@@ -25,11 +25,11 @@ import { stripComments } from './helpers/strip_comments';
 // (no wellfed record, an unmapped buff kind, an escaping-hostile aura name)
 // are each pinned off-data, since the one shipped feast points at a
 // small-number buff_sta dish and exercises exactly one branch.
-function feastDef(record: NonNullable<ItemDef['feast']>): ItemDef {
-  return { ...ITEMS.harvest_feast, feast: record };
+function feastDef(record: NonNullable<OtherItemDef['feast']>): ItemDef {
+  return { ...(ITEMS.harvest_feast as OtherItemDef), feast: record };
 }
-function dishDef(wellfed: NonNullable<ItemDef['wellfed']> | undefined): ItemDef {
-  return { ...ITEMS.evergarden_braised_greens, id: 'probe_dish', wellfed };
+function dishDef(wellfed: NonNullable<FoodItemDef['wellfed']> | undefined): ItemDef {
+  return { ...(ITEMS.evergarden_braised_greens as FoodItemDef), id: 'probe_dish', wellfed };
 }
 
 describe('feastTooltipLines', () => {

@@ -111,10 +111,13 @@ describe('well fed: completion timing', () => {
   });
 
   it('content rule: every wellfed carrier in the merged catalog is kind food', () => {
-    // The type allows wellfed on any BaseItemDef; the D15 contract keeps it
-    // on food. This sweep makes a future non-food carrier a deliberate,
+    // Since the 11b union port the TYPE already scopes wellfed to
+    // FoodItemDef; the sweep stays as the content-level restatement of the
+    // D15 contract, so a future widening of the union member is a deliberate,
     // visible decision instead of a silent gulp-completion mint.
-    const carriers = Object.values(ITEMS).filter((def) => def.wellfed !== undefined);
+    const carriers = Object.values(ITEMS).filter(
+      (def) => 'wellfed' in def && def.wellfed !== undefined,
+    );
     expect(carriers.length, 'the four Phase 11 buff dishes').toBeGreaterThanOrEqual(4);
     for (const def of carriers) {
       expect(def.kind, `${def.id} carries wellfed but is not food`).toBe('food');

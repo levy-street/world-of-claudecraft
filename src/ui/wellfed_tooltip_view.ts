@@ -27,7 +27,7 @@ import { WELLFED_STAT_KEYS } from './wellfed_stat_keys';
 
 /** The well-fed line for a buff dish, or '' for any other item. */
 export function wellfedTooltipLines(item: ItemDef): string {
-  const fed = item.wellfed;
+  const fed = 'wellfed' in item ? item.wellfed : undefined;
   if (!fed) return '';
   const minutes = formatNumber(fed.duration / 60, { maximumFractionDigits: 1 });
   const statKey = WELLFED_STAT_KEYS[fed.kind];

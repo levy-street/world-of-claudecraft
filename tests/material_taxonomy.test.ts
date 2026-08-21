@@ -14,6 +14,7 @@ import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { describe, expect, it } from 'vitest';
 import { ENCHANTS } from '../src/sim/content/enchants';
+import { FARM_MATERIAL_ITEM_IDS } from '../src/sim/content/farm_crops';
 import {
   HARVEST_COMPONENT_ITEMS,
   HARVEST_COMPONENT_SPECIMENS,
@@ -378,6 +379,7 @@ describe('deriveMaterialItemIds: every source table is actually consulted (injec
     salvageMaterialByQuality: SALVAGE_MATERIAL_BY_QUALITY,
     recipes: ALL_RECIPES,
     enchants: ENCHANTS,
+    farmMaterialItemIds: FARM_MATERIAL_ITEM_IDS,
     items: ITEMS,
   };
   // The probe def rides the real catalog so the junk-kind filter sees it.

@@ -125,7 +125,7 @@ export function placeFeastAction(
     }
   }
   const def = ITEMS[FARM_FEAST_ITEM_ID];
-  const info = def?.feast;
+  const info = def && 'feast' in def ? def.feast : undefined;
   if (!info) return; // content invariant; pinned in the suite
   // The named-copy resolve (tri-state, item_copy_ref.ts): a slot holds the
   // selection, `null` is an invalid selection (refuse: the family's not-held
@@ -287,7 +287,13 @@ export function consumeFeastAction(
     ctx.error(meta.entityId, 'You are already eating.');
     return;
   }
-  const dish = ITEMS[ITEMS[FARM_FEAST_ITEM_ID]?.feast?.dishItemId ?? ''];
+  const feastSourceDef = ITEMS[FARM_FEAST_ITEM_ID];
+  const dish =
+    ITEMS[
+      (feastSourceDef && 'feast' in feastSourceDef
+        ? feastSourceDef.feast?.dishItemId
+        : undefined) ?? ''
+    ];
   if (!dish) return; // content invariant; pinned in the suite
   feast.eatenBy.add(feastOwnerKey(meta));
   feast.charges -= 1;

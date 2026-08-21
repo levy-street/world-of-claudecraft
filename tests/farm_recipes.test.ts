@@ -599,13 +599,17 @@ describe('FARM_RECIPES: the shared feast, the Phase 12 placeable cooking row', (
     // ItemDef comment); the dishItemId is load-bearing: the bite pays one
     // serving of the CAPSTONE DISH, so the Well Fed mint stays the Phase 11
     // completion path.
-    expect(def.feast, `${FEAST_ITEM_ID} feast record`).toEqual({
+    const feastRecord = 'feast' in def ? def.feast : undefined;
+    expect(feastRecord, `${FEAST_ITEM_ID} feast record`).toEqual({
       charges: 10,
       durationTicks: 3600,
       dishItemId: 'evergarden_braised_greens',
     });
-    const dishDef = ITEMS[def.feast?.dishItemId ?? ''];
-    expect(dishDef?.wellfed, 'the feast dish must be a live buff dish').toBeDefined();
+    const dishDef = ITEMS[feastRecord?.dishItemId ?? ''];
+    expect(
+      dishDef && 'wellfed' in dishDef ? dishDef.wellfed : undefined,
+      'the feast dish must be a live buff dish',
+    ).toBeDefined();
     // Closed key shape, the dish-shape doctrine below applied to the feast:
     // the feast field beside the five junk keys, nothing more.
     expect(Object.keys(def).sort()).toEqual([
@@ -694,7 +698,7 @@ describe('FARM_RECIPES: the dish ItemDef shape, reopened by Phase 11 and closed 
     expect(buff, 'the buff sweep really covers the four Phase 11 dishes').toHaveLength(4);
     for (const dish of buff) {
       const def = ITEMS[dish.resultItemId];
-      const wellfed = def.wellfed;
+      const wellfed = 'wellfed' in def ? def.wellfed : undefined;
       expect(wellfed, `${dish.resultItemId} lost its wellfed field`).toBeDefined();
       if (!wellfed) continue;
       // The shared namespace: one aura name, therefore ONE aura id

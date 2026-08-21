@@ -11,7 +11,7 @@ import { readFileSync } from 'node:fs';
 import path from 'node:path';
 import { afterEach, describe, expect, it } from 'vitest';
 import { ITEMS } from '../src/sim/data';
-import type { AuraKind, ItemDef } from '../src/sim/types';
+import type { AuraKind, FoodItemDef, ItemDef } from '../src/sim/types';
 import { elixirTooltipLines } from '../src/ui/elixir_tooltip_view';
 import {
   ensureLocaleLoaded,
@@ -26,8 +26,8 @@ import { stripComments } from './helpers/strip_comments';
 // mapped-stat rows, the formatter options, and the escaping are each pinned
 // off-data (every shipped buff dish is a small-number buff_sta, which
 // exercises exactly one map row and no grouping, rounding, or escaping).
-function wellfedDef(record: NonNullable<ItemDef['wellfed']>): ItemDef {
-  return { ...ITEMS.eastbrook_glazed_carrots, wellfed: record };
+function wellfedDef(record: NonNullable<FoodItemDef['wellfed']>): ItemDef {
+  return { ...(ITEMS.eastbrook_glazed_carrots as FoodItemDef), wellfed: record };
 }
 
 describe('wellfedTooltipLines', () => {
@@ -41,8 +41,8 @@ describe('wellfedTooltipLines', () => {
 
   it('every buff dish in the game data renders a line carrying its own numbers', () => {
     const dishes = Object.values(ITEMS).filter(
-      (def): def is ItemDef & { wellfed: NonNullable<ItemDef['wellfed']> } =>
-        def.wellfed !== undefined,
+      (def): def is FoodItemDef & { wellfed: NonNullable<FoodItemDef['wellfed']> } =>
+        'wellfed' in def && def.wellfed !== undefined,
     );
     // carrots, pudding, porridge, greens: one buff dish per crop tier.
     expect(dishes.length).toBeGreaterThanOrEqual(4);
@@ -71,7 +71,7 @@ describe('wellfedTooltipLines', () => {
   });
 
   it('maps every stat-buff kind to its own stat label', () => {
-    const cases: Array<[NonNullable<ItemDef['wellfed']>['kind'], string]> = [
+    const cases: Array<[NonNullable<FoodItemDef['wellfed']>['kind'], string]> = [
       ['buff_int', 'Intellect'],
       ['buff_agi', 'Agility'],
       ['buff_armor', 'Armor'],
@@ -178,15 +178,24 @@ describe('the wellfed and elixir stat maps stay in step', () => {
         'Grants',
       );
       expect(
-        elixirTooltipLines({ ...ITEMS.eastbrook_glazed_carrots, elixir: record }),
+        // A deliberately synthetic food-plus-elixir probe (FoodItemDef bars
+        // `elixir` since the 11b union port, so the hybrid needs the cast);
+        // the view under test only reads the elixir payload.
+        elixirTooltipLines({
+          ...ITEMS.eastbrook_glazed_carrots,
+          elixir: record,
+        } as unknown as ItemDef),
         `elixir maps ${kind}`,
       ).not.toContain('Grants');
     }
     const offMap = { aura: 'Probe', kind: 'buff_spellpower' as AuraKind, value: 5, duration: 300 };
     expect(wellfedTooltipLines(wellfedDef(offMap))).toContain('Grants');
-    expect(elixirTooltipLines({ ...ITEMS.eastbrook_glazed_carrots, elixir: offMap })).toContain(
-      'Grants',
-    );
+    expect(
+      elixirTooltipLines({
+        ...ITEMS.eastbrook_glazed_carrots,
+        elixir: offMap,
+      } as unknown as ItemDef),
+    ).toContain('Grants');
   });
 });
 

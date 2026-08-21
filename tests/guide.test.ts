@@ -1828,6 +1828,7 @@ describe('Guide professions generated content accuracy', () => {
         const def = ALL_RECIPES.find((r) => r.id === row.id);
         if (!def) continue;
         const item = ITEMS[def.resultItemId];
+        const itemWellfed = 'wellfed' in item ? item.wellfed : undefined;
         if (item.foodHp) {
           foodRows++;
           expect(row.effect?.food, `${row.id} foodHp row missing`).toEqual({
@@ -1837,13 +1838,13 @@ describe('Guide professions generated content accuracy', () => {
         } else {
           expect(row.effect?.food, `${row.id} phantom food effect`).toBeUndefined();
         }
-        if (item.wellfed) {
+        if (itemWellfed) {
           wellfedRows++;
           expect(row.effect?.wellfed, `${row.id} wellfed row missing`).toEqual({
-            aura: item.wellfed.aura,
-            kind: item.wellfed.kind,
-            value: item.wellfed.value,
-            minutes: item.wellfed.duration / 60,
+            aura: itemWellfed.aura,
+            kind: itemWellfed.kind,
+            value: itemWellfed.value,
+            minutes: itemWellfed.duration / 60,
           });
           // The LIVE_OFF_SWEEP exemption for effectWellFedAura rests on this
           // precondition: every SHIPPED wellfed kind is mapped, so the
@@ -1853,11 +1854,11 @@ describe('Guide professions generated content accuracy', () => {
           expect(
             Object.keys(WELLFED_STAT_KEYS),
             `${row.id} ships an unmapped wellfed kind`,
-          ).toContain(item.wellfed.kind);
+          ).toContain(itemWellfed.kind);
         } else {
           expect(row.effect?.wellfed, `${row.id} phantom wellfed effect`).toBeUndefined();
         }
-        if (!item.foodHp && !item.wellfed) {
+        if (!item.foodHp && !itemWellfed) {
           expect(row.effect, `${row.id} effect on a non-consumable`).toBeUndefined();
         }
       }

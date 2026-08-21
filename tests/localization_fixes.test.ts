@@ -1707,7 +1707,7 @@ describe('well-fed aura names stay wired to the sim aura matcher', () => {
   it('every authored wellfed aura resolves through localizeSimAuraName', async () => {
     const { ITEMS } = await import('../src/sim/data');
     const auras = Object.values(ITEMS)
-      .map((item) => item.wellfed?.aura)
+      .map((item) => ('wellfed' in item ? item.wellfed?.aura : undefined))
       .filter((aura): aura is string => typeof aura === 'string');
     // one buff dish per crop tier
     expect(auras.length).toBeGreaterThanOrEqual(4);

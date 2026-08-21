@@ -29,7 +29,7 @@ export function feastTooltipLines(
   item: ItemDef,
   items: Record<string, ItemDef | undefined> = ITEMS,
 ): string {
-  const feast = item.feast;
+  const feast = 'feast' in item ? item.feast : undefined;
   if (!feast) return '';
   const servings = formatNumber(feast.charges, { maximumFractionDigits: 0 });
   const feastMinutes = formatNumber((feast.durationTicks * DT) / 60, { maximumFractionDigits: 1 });
@@ -39,7 +39,8 @@ export function feastTooltipLines(
   // The serving's buff, stated in the capstone dish's own resolved well-fed
   // form. A feast whose dish carries no wellfed record states only the
   // placement line (the restore alone is the dish's own tooltip's story).
-  const fed = items[feast.dishItemId]?.wellfed;
+  const dishDef = items[feast.dishItemId];
+  const fed = dishDef && 'wellfed' in dishDef ? dishDef.wellfed : undefined;
   if (fed) {
     const aura = auraDisplayNameForHud(fed.aura, null);
     const minutes = formatNumber(fed.duration / 60, { maximumFractionDigits: 1 });

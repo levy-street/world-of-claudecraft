@@ -797,8 +797,9 @@ export function useItem(
   // left for a new command to copy), so the CLICKED copy is the one spent.
   // The two arms key on different fields (def.use?.type vs def.feast), so
   // they are mutually exclusive per item and this order is behaviorally free
-  // (ours-first per the absorb's RULE 3b).
-  if (def.feast) {
+  // (ours-first per the absorb's RULE 3b). The `in` guard is the union port:
+  // `feast` lives on OtherItemDef (kind-scoped), not BaseItemDef.
+  if ('feast' in def && def.feast) {
     placeFeastAction(ctx, p, meta, slotIndex);
     return;
   }

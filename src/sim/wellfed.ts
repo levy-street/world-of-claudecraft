@@ -46,7 +46,8 @@ export function applyWellfedOnConsumeComplete(
   // with nothing having decided that. tests/wellfed.test.ts pins both the
   // guard and the content-level rule (every wellfed carrier is kind 'food').
   if (consumed.kind !== 'food') return;
-  const w = ITEMS[consumed.itemId]?.wellfed;
+  const dishDef = ITEMS[consumed.itemId];
+  const w = dishDef && 'wellfed' in dishDef ? dishDef.wellfed : undefined;
   if (!w) return;
   // Field for field the elixir arm's applyAura call (src/sim/items.ts), with
   // the wellfed_ id prefix carrying the coexistence rule above. No log emit:
