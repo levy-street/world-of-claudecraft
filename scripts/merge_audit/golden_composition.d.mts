@@ -26,6 +26,18 @@ export interface AddDiffs {
   presence: string[];
 }
 
+/** One golden a parent carries that the merged tree does not, with the parents
+ *  that carried it. */
+export interface MissingGolden {
+  file: string;
+  sides: string[];
+}
+
+export const GOLDEN_FLOOR: number;
+export function missingFromMerged(
+  mergedFiles: readonly string[],
+  parentSets: ReadonlyMap<string, ReadonlySet<string>>,
+): MissingGolden[];
 export function newCtx(): CompositionCtx;
 export function isIdPath(path: string): boolean;
 export function composeLeaf(

@@ -11,7 +11,9 @@ import {
   checkAdd,
   checkShared,
   composeLeaf,
+  GOLDEN_FLOOR,
   isIdPath,
+  missingFromMerged,
   newCtx,
 } from '../scripts/merge_audit/golden_composition.mjs';
 
@@ -106,6 +108,51 @@ describe('checkAdd', () => {
     const hpMoved = golden(undefined, [frame(0, { entities: [{ id: 963, hp: 90 }] })]);
     const { ctx } = checkAdd('fx', p, hpMoved, 'ours');
     expect(ctx.findings.some((f: string) => f.includes('non-id numeric'))).toBe(true);
+  });
+});
+
+describe('the dropped-golden class (Phase 11d QA)', () => {
+  // The composition walk is driven by the MERGED directory, so it is blind in one
+  // direction by construction: a golden a parent carries and the merge DROPPED is
+  // never visited, and the report still printed PASS over one fewer row. The 11d
+  // QA gate review proved that live (hiding farming_session.json left 68 goldens,
+  // 0 findings, exit 0). These arms pin the other side of the walk.
+  const parents = (ours: string[], theirs: string[]) =>
+    new Map([
+      ['ours', new Set(ours)],
+      ['theirs', new Set(theirs)],
+    ]);
+
+  it('reports nothing when merged carries every parent golden', () => {
+    const merged = ['a.json', 'b.json', 'c.json'];
+    expect(missingFromMerged(merged, parents(['a.json', 'b.json'], ['b.json', 'c.json']))).toEqual(
+      [],
+    );
+  });
+
+  it('names a golden the merge dropped, and which parent carried it', () => {
+    const missing = missingFromMerged(['a.json'], parents(['a.json'], ['a.json', 'farming.json']));
+    expect(missing).toEqual([{ file: 'farming.json', sides: ['theirs'] }]);
+  });
+
+  it('collapses a golden BOTH parents carried into one row naming both', () => {
+    const missing = missingFromMerged([], parents(['shared.json'], ['shared.json']));
+    expect(missing).toEqual([{ file: 'shared.json', sides: ['ours', 'theirs'] }]);
+  });
+
+  it('is not fooled by an empty merged set: every parent golden is missing', () => {
+    // The empty-input case the review found: with no lower bound the tool printed
+    // "every shared golden composes" over nothing at all.
+    const missing = missingFromMerged([], parents(['a.json', 'b.json'], ['b.json']));
+    expect(missing.map((m) => m.file)).toEqual(['a.json', 'b.json']);
+  });
+
+  it('keeps the vacuity floor under the real set but far above empty', () => {
+    // A floor at or above the live count would red on any legitimate deletion;
+    // a floor of 0 would not catch the truncation it exists for.
+    expect(GOLDEN_FLOOR).toBeGreaterThan(0);
+    expect(GOLDEN_FLOOR).toBeLessThan(69);
+    expect(GOLDEN_FLOOR).toBeGreaterThan(50);
   });
 });
 

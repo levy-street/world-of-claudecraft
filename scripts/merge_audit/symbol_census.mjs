@@ -118,6 +118,7 @@ export const GENERATED_FILE_RE = /\.generated\.[cm]?[jt]s$/;
 export const CLASSES = Object.freeze([
   'exports',
   'contentIds',
+  'contentIdRows',
   'i18nKeys',
   'simEventUnion',
   'simEventEmits',
@@ -126,6 +127,7 @@ export const CLASSES = Object.freeze([
 export const CLASS_LABELS = Object.freeze({
   exports: 'exported symbols',
   contentIds: 'content-table row ids',
+  contentIdRows: 'content-table rows, keyed file:id',
   i18nKeys: 'i18n catalog keys',
   simEventUnion: 'SimEvent union-declared types',
   simEventEmits: 'SimEvent emitted types',
@@ -148,6 +150,11 @@ export const CLASS_LABELS = Object.freeze({
 export const FLOORS = Object.freeze({
   exports: Object.freeze({ ours: 15500, theirs: 15200, release: 15400 }),
   contentIds: Object.freeze({ ours: 2650, theirs: 2600, release: 2500 }),
+  // contentIdRows is contentIds keyed file:id, so it is always >= contentIds
+  // (a name defined in two tables yields two rows). Reusing the contentIds
+  // floors is therefore conservative by construction. Observed 2026-08-21:
+  // ours 2973 / theirs 2935 / merged 3084.
+  contentIdRows: Object.freeze({ ours: 2650, theirs: 2600, release: 2500 }),
   i18nKeys: Object.freeze({ ours: 16200, theirs: 16100, release: 16000 }),
   simEventUnion: Object.freeze({ ours: 136, theirs: 143, release: 136 }),
   simEventEmits: Object.freeze({ ours: 127, theirs: 133, release: 127 }),
@@ -1325,6 +1332,7 @@ export function censusTree(files) {
   const sets = {
     exports: new Map(),
     contentIds: new Map(),
+    contentIdRows: new Map(),
     i18nKeys: new Map(),
     simEventUnion: new Map(),
     simEventEmits: new Map(),
@@ -1373,6 +1381,13 @@ export function censusTree(files) {
       if (!c.ids.length) limits.contentIds.filesWithoutIds.push(rel);
       for (const id of c.ids) {
         addName(sets.contentIds, id, rel);
+        // The SAME row, keyed by its defining file. The bare-name class above
+        // cannot see a dropped table ROW whenever the id is reused elsewhere,
+        // and this packet is full of such reuse (every farm crop id is also an
+        // item id: farm_crops.ts and items.ts both define 'bog_beet'). Dropping
+        // the crop row alone left the bare-name census at exit 0, proved by
+        // mutation in the Phase 11d QA gate review. Keyed file:id, it is MISSING.
+        addName(sets.contentIdRows, `${rel}:${id}`, rel);
         addName(contentIdsByPath, `${rel}:${id}`, rel);
       }
       limits.contentIds.nonLiteral += c.nonLiteral;

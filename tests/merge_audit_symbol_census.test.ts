@@ -160,7 +160,11 @@ describe('parseDeletionList', () => {
 
 describe('FLOORS', () => {
   it('every class floor is a positive integer for every parent', () => {
-    expect(CLASSES.length).toBe(5);
+    // Six since the Phase 11d QA gate review: contentIdRows joined the five,
+    // keyed file:id, because the bare-name contentIds class cannot see a
+    // dropped table ROW when the id is reused in another table.
+    expect(CLASSES.length).toBe(6);
+    expect(CLASSES).toContain('contentIdRows');
     for (const cls of CLASSES) {
       for (const side of ['ours', 'theirs', 'release'] as const) {
         const floor = FLOORS[cls][side];

@@ -84,6 +84,58 @@ function gitShowJson(ref, relPath) {
   }
 }
 
+/** Every `<name>.json` the golden directory holds at `ref`, read with plumbing
+ *  (no checkout). The composition walk itself is driven by the MERGED directory,
+ *  which is blind in one direction by construction: a golden a parent carries and
+ *  the merge DROPPED is simply never visited. This is the other side of that walk
+ *  (the census's MISSING class, which exists for exactly this reason). */
+function gitLsGoldens(ref) {
+  try {
+    const raw = execFileSync(
+      'git',
+      ['-C', ROOT, 'ls-tree', '--name-only', `${ref}:${GOLDEN_DIR}`],
+      {
+        encoding: 'utf8',
+        maxBuffer: 64 * 1024 * 1024,
+        stdio: ['ignore', 'pipe', 'ignore'],
+      },
+    );
+    return new Set(
+      raw
+        .split('\n')
+        .map((line) => line.trim())
+        .filter((line) => line.endsWith('.json')),
+    );
+  } catch {
+    // The directory does not exist at that ref (a parent from before the goldens
+    // moved, or a --golden-dir pointed somewhere else): an empty set, not a throw.
+    return new Set();
+  }
+}
+
+/** Vacuity floor, the sibling of the census's FLOORS. The composition report is a
+ *  PASS-shaped output with no lower bound of its own, so an empty or truncated
+ *  input set would print "every shared golden composes" over nothing at all.
+ *  Set ~10 percent under the 69 goldens observed when this was written. */
+export const GOLDEN_FLOOR = 62;
+
+/** The MISSING class as a pure set operation, so it is testable without git:
+ *  every golden a parent carries that the merged tree does not, carrying WHICH
+ *  parents had it. Sorted by name so the report is stable. */
+export function missingFromMerged(mergedFiles, parentSets) {
+  const onMerged = new Set(mergedFiles);
+  const missing = [];
+  for (const [side, set] of parentSets) {
+    for (const f of set) {
+      if (onMerged.has(f)) continue;
+      const already = missing.find((m) => m.file === f);
+      if (already) already.sides.push(side);
+      else missing.push({ file: f, sides: [side] });
+    }
+  }
+  return missing.sort((a, b) => a.file.localeCompare(b.file));
+}
+
 function isNum(v) {
   return typeof v === 'number' && Number.isFinite(v);
 }
@@ -457,6 +509,16 @@ function main() {
   const rows = [];
   let failures = 0;
   const classes = { shared: 0, oursOnly: 0, theirsOnly: 0, orphan: 0 };
+
+  // MISSING: on a parent, absent from merged. The per-file walk below cannot see
+  // these (it visits merged files only), so a resolution that DROPPED a golden
+  // would otherwise report one fewer row and still print PASS.
+  const parentGoldens = new Map([
+    ['ours', gitLsGoldens(REFS.ours)],
+    ['theirs', gitLsGoldens(REFS.theirs)],
+  ]);
+  const missing = missingFromMerged(files, parentGoldens);
+  failures += missing.length;
   for (const f of files) {
     const rel = `${GOLDEN_DIR}/${f}`;
     const name = f.replace(/\.json$/, '');
@@ -546,6 +608,17 @@ function main() {
   console.log(
     `goldens: ${files.length} (shared ${classes.shared}, ours-only ${classes.oursOnly}, theirs-only ${classes.theirsOnly}, orphan ${classes.orphan})`,
   );
+  const floorFail = files.length < GOLDEN_FLOOR;
+  if (floorFail) failures += 1;
+  console.log(
+    `floor: ${files.length} >= ${GOLDEN_FLOOR} ${floorFail ? 'FAIL (an empty or truncated set cannot pass by composing nothing)' : 'ok'}`,
+  );
+  console.log(
+    `parent goldens: ours ${parentGoldens.get('ours').size}, theirs ${parentGoldens.get('theirs').size}; MISSING from merged ${missing.length}`,
+  );
+  for (const m of missing) {
+    console.log(`  MISSING ${m.file} (on ${m.sides.join(' and ')}, absent from merged)`);
+  }
   console.log('');
   console.log(
     'name | kind | frames | draws b/o/t/m | drawDigest o?m | nextId0 b/o/t/m | numeric | other | oursMoved | theirsMoved | idShifts | state/events moved | unaligned | findings',
@@ -614,8 +687,8 @@ function main() {
   console.log('');
   console.log(
     failures === 0
-      ? 'COMPOSITION: PASS (every shared golden composes; rng unmoved; adds follow their parent)'
-      : `COMPOSITION: FAIL (${failures} findings)`,
+      ? `COMPOSITION: PASS (${files.length} goldens over the floor; none missing from a parent; every shared golden composes; rng unmoved; adds follow their parent)`
+      : `COMPOSITION: FAIL (${failures} findings${missing.length ? `, ${missing.length} golden(s) missing from merged` : ''}${floorFail ? ', under the golden floor' : ''})`,
   );
   process.exitCode = failures === 0 ? 0 : 1;
 }
