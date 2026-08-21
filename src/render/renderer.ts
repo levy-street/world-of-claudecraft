@@ -11899,6 +11899,14 @@ export class Renderer {
         if (e.mountKey !== v.lastMountKey) {
           v.lastMountKey = e.mountKey;
           if (runCharacterPresentation) this.vfx.mountSummonGlow(e.id);
+          // A mountKey change (dismount, a live mount swap, or a fresh summon
+          // reusing this entity id) must drop any engine mount's windup/loop
+          // state; otherwise the old loop node stays connected forever once
+          // logicallyMounted goes false (the entity/view-removal reset at
+          // removeView() never fires for a live swap or dismount), and a swap
+          // would carry the old moving state into the new mount, skipping its
+          // windup. Runs BEFORE the summon, which ARMS the idle gate it clears.
+          this.audioSink?.mountEngineReset(e.id);
           // Same edge as the glow, minus dismounts: a mountKey going empty is a
           // put-away, not an appearance. This branch's call carries the entity
           // id as well, which the sled's does not: the cart gates its parked
@@ -11906,14 +11914,6 @@ export class Renderer {
           if (e.mountKey !== '') {
             sink?.mountSummon(ax, ay, az, e.mountKey, e.id === this.sim.playerId, e.id);
           }
-          // A mountKey change (dismount, a live mount swap, or a fresh summon
-          // reusing this entity id) must drop any engine mount's windup/loop
-          // state; otherwise the old loop node stays connected forever once
-          // logicallyMounted goes false (the entity/view-removal reset at
-          // removeView() never fires for a live swap or dismount), and a swap
-          // would carry the old moving state into the new mount, skipping its
-          // windup.
-          this.audioSink?.mountEngineReset(e.id);
           // Warm the new mount's engine clips right away (not e.g. lazily on
           // the first movement frame): a cold first ride otherwise plays the
           // windup through playAt's cold path (silently dropped past a 0.12s
