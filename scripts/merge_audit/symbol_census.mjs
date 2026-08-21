@@ -99,6 +99,47 @@ export const SIM_EVENT_UNION_NAME = 'SimEvent';
 /** The SimEvent union discriminates on `type`, not `kind` (src/sim/types.ts). */
 export const SIM_EVENT_DISCRIMINANT = 'type';
 
+/**
+ * Repo-specific SimEvent FANOUT helpers: functions that take a builder and emit
+ * once per recipient, so the literal event kind lives in the CALLER's arrow body
+ * and never in an `emit({...})`. Named explicitly rather than inferred, so the
+ * indirection the census claims to resolve stays a short auditable list.
+ */
+export const SIM_EVENT_FANOUT_HELPERS = new Set(['emitToZonePlayers']);
+
+/**
+ * SimEvent types the union DECLARES that the emits extractor does not see, pinned
+ * so the set cannot drift silently.
+ *
+ * What is left here is ONLY the server-side set: events emitted from `server/`
+ * (the social and calendar surfaces), legitimately outside SIM_ROOT, which the sim
+ * scan was never going to see and which no sim-side merge hunk can drop.
+ *
+ * Four names that used to sit here were a REAL hole, and the Phase 11d QA closed
+ * it rather than only reporting it: attunedZone, farmReady, gatherRareEvent and
+ * masterworkZone all live in src/sim/professions/, the directory BOTH packets
+ * rewrote. The emits walk records only `emit({ type: '<literal>' })`, so an event
+ * built in a fanout callback or a ternary of two literals never reached the class,
+ * and a hunk dropping the emit CALL while leaving the union arm and the exported
+ * helper passed every class in the census. The extractor now resolves both
+ * indirections, so those four are ordinary members of the emits class and deleting
+ * one of their calls moves it.
+ *
+ * Drift in either direction FAILS the census and wants a human: a new name means a
+ * new indirection the extractor cannot follow, and a name LEAVING means either it
+ * became visible (good, drop it here) or it stopped being emitted at all, which is
+ * the regression this list exists to surface.
+ */
+export const SIM_EVENT_UNION_ONLY = Object.freeze([
+  'calendarResult',
+  'deedBroadcast',
+  'guildInvite',
+  'guildInviteCancelled',
+  'guildRenamed',
+  'motdResult',
+  'reliquaryIlluminationBroadcast',
+]);
+
 export const SOURCE_EXTENSIONS = Object.freeze(['.ts', '.mts', '.cts', '.mjs', '.js', '.cjs']);
 /** Directory segments never walked on either side. */
 export const EXCLUDED_DIR_SEGMENTS = Object.freeze(['node_modules', 'dist']);
@@ -1080,6 +1121,15 @@ export function extractSimEventEmits(src) {
       }
     } else if (tok.v === 'push' && isPunct(tokens[i - 1], '.') && isId(tokens[i - 2], 'events')) {
       helper = 'events.push(';
+    } else if (SIM_EVENT_FANOUT_HELPERS.has(tok.v)) {
+      // A repo-specific fanout helper that emits once per recipient from a
+      // caller-supplied builder: `emitToZonePlayers(ctx, zone, (pid) => ({ type:
+      // 'x', ... }))`. The emit itself is `ctx.emit(build(pid))` inside the
+      // helper, where no literal exists, so without naming the helper the event
+      // kind never reaches this class at all and a dropped CALL is invisible to
+      // the whole census (Phase 11d QA). Named, not inferred, so the set of
+      // indirections the census claims to resolve stays auditable.
+      helper = `${tok.v}(`;
     }
     if (!helper) continue;
     const first = tokens[i + 2];
@@ -1095,34 +1145,59 @@ export function extractSimEventEmits(src) {
     }
     sites++;
     helpers[helper] = (helpers[helper] ?? 0) + 1;
-    if (!isPunct(first, '{')) {
-      nonLiteral++;
+    if (isPunct(first, '{')) {
+      // The plain shape: the argument IS the event object literal.
+      const close = matchingClose(tokens, i + 2);
+      let depth = 0;
+      let found = null;
+      for (let k = i + 3; k < close; k++) {
+        const t = tokens[k];
+        if (t.t === 'punct') {
+          if (OPENERS[t.v]) depth++;
+          else if (CLOSERS.has(t.v)) depth--;
+          continue;
+        }
+        if (
+          depth === 0 &&
+          t.t === 'id' &&
+          t.v === SIM_EVENT_DISCRIMINANT &&
+          isPunct(tokens[k + 1], ':') &&
+          tokens[k + 2] &&
+          tokens[k + 2].t === 'str'
+        ) {
+          found = tokens[k + 2].v;
+          break;
+        }
+      }
+      if (found === null) nonLiteral++;
+      else kinds.push(found);
       continue;
     }
-    const close = matchingClose(tokens, i + 2);
-    let depth = 0;
-    let found = null;
-    for (let k = i + 3; k < close; k++) {
+    // The INDIRECT shapes, one level deep: the argument is a ternary of two
+    // event literals (`emit(cond ? { type: 'farmReady', ... } : { type: ... })`)
+    // or an arrow returning one (the fanout helpers above). Collect every event
+    // literal anywhere inside the call, recognising a member only where an
+    // object literal can start it, so a `type:` inside a string or a nested
+    // non-event object cannot mint a kind.
+    // Scan the whole CALL region (the parenthesis at i+1), not an object literal:
+    // in these shapes the argument list does not start with one.
+    const callClose = matchingClose(tokens, i + 1);
+    const indirect = [];
+    for (let k = i + 2; k < callClose; k++) {
       const t = tokens[k];
-      if (t.t === 'punct') {
-        if (OPENERS[t.v]) depth++;
-        else if (CLOSERS.has(t.v)) depth--;
-        continue;
-      }
       if (
-        depth === 0 &&
         t.t === 'id' &&
         t.v === SIM_EVENT_DISCRIMINANT &&
         isPunct(tokens[k + 1], ':') &&
         tokens[k + 2] &&
-        tokens[k + 2].t === 'str'
+        tokens[k + 2].t === 'str' &&
+        (isPunct(tokens[k - 1], '{') || isPunct(tokens[k - 1], ','))
       ) {
-        found = tokens[k + 2].v;
-        break;
+        indirect.push(tokens[k + 2].v);
       }
     }
-    if (found === null) nonLiteral++;
-    else kinds.push(found);
+    if (indirect.length === 0) nonLiteral++;
+    else for (const kind of new Set(indirect)) kinds.push(kind);
   }
   return { kinds, sites, nonLiteral, declarations, helpers };
 }
@@ -1741,12 +1816,22 @@ export function formatReport(r, limit = 60) {
   // src/sim/professions/, the directory both packets rewrote (Phase 11d QA).
   // Printed BY NAME so the gap is reviewable rather than a bare count.
   const unionOnly = r.simEventUnionOnly ?? [];
+  const unionOnlyDrift = r.simEventUnionOnlyDrift ?? { added: [], removed: [] };
+  const drifted = unionOnlyDrift.added.length > 0 || unionOnlyDrift.removed.length > 0;
   L.push(
     `SimEvent types DECLARED but never seen emitted by the extractor (${unionOnly.length}); ` +
       'the server-side ones are legitimately outside the sim scan root, the rest are ' +
-      'helper-emitted and are a real blind spot:',
+      `helper-emitted and are a real blind spot: ${drifted ? 'FAIL, the set DRIFTED' : 'ok, matches the pin'}`,
   );
   L.push(`  ${unionOnly.join(', ') || '-'}`);
+  if (unionOnlyDrift.added.length)
+    L.push(
+      `  FAIL new to the blind spot (a helper-emitted event the census cannot see): ${unionOnlyDrift.added.join(', ')}`,
+    );
+  if (unionOnlyDrift.removed.length)
+    L.push(
+      `  FAIL left the blind spot: ${unionOnlyDrift.removed.join(', ')} (either it became a literal emit, so drop it from SIM_EVENT_UNION_ONLY, or it stopped being emitted at all)`,
+    );
   L.push('');
   L.push('blind spots (counted, never silent):');
   for (const side of ['ours', 'theirs', 'merged']) {
@@ -1883,7 +1968,20 @@ export function runCensus(opts = {}) {
   const releases = releaseRefs.map((re) => censusTree(readRefTree(repo, re.ref)));
   const base = opts.readBase === false ? null : censusTree(readRefTree(repo, BASE_REF));
   const cmp = compareCensus({ ours, theirs, merged, deletionRows: deletion.rows, releases, base });
-  const failed = cmp.failed || deletion.defects.length > 0;
+  // The declared-but-never-emitted set, and its drift against the pin.
+  const simEventUnionOnly = [...merged.sets.simEventUnion.keys()]
+    .filter((name) => !merged.sets.simEventEmits.has(name))
+    .sort();
+  const pinnedUnionOnly = new Set(SIM_EVENT_UNION_ONLY);
+  const simEventUnionOnlyDrift = {
+    added: simEventUnionOnly.filter((n) => !pinnedUnionOnly.has(n)),
+    removed: SIM_EVENT_UNION_ONLY.filter((n) => !simEventUnionOnly.includes(n)),
+  };
+  const failed =
+    cmp.failed ||
+    deletion.defects.length > 0 ||
+    simEventUnionOnlyDrift.added.length > 0 ||
+    simEventUnionOnlyDrift.removed.length > 0;
   return {
     refs: { base: BASE_REF, ours: oursRef, theirs: theirsRef, priorSyncTip: PRIOR_SYNC_TIP },
     releaseRefs,
@@ -1895,9 +1993,8 @@ export function runCensus(opts = {}) {
     deletionDefects: deletion.defects,
     fileCounts: { ours: ours.fileCounts, theirs: theirs.fileCounts, merged: merged.fileCounts },
     /** SimEvent types the union declares that the emits extractor never sees. */
-    simEventUnionOnly: [...merged.sets.simEventUnion.keys()]
-      .filter((name) => !merged.sets.simEventEmits.has(name))
-      .sort(),
+    simEventUnionOnly,
+    simEventUnionOnlyDrift,
     limits: { ours: ours.limits, theirs: theirs.limits, merged: merged.limits },
     perClass: cmp.perClass,
     failed,
