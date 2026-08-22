@@ -6,7 +6,7 @@
     "bytes": 1510,
     "sha256": "bb0b6bacba9acb12568c3bbbe536e4442cb2964266cffef890f27ee4915dcf2a"
   },
-  "rendererFingerprint": "600c81bb2fa34ae7c136c570194e9cbc25b1cb7f2e3215fb373b2e38c5a9d16e",
+  "rendererFingerprint": "912e1f45367eded71922c79a4a223fb67dfda23ba5c8d563a4e45d8cbe5432f7",
   "renderer": {
     "trackedFiles": [
       {
@@ -16,8 +16,8 @@
       },
       {
         "path": "scripts/lib/mob_portrait_jobs.mjs",
-        "bytes": 8916,
-        "sha256": "641ff277a3bf8af96ae7ce579cd55286dd8f76f6af04d5da35bf0f42318e3aff"
+        "bytes": 10034,
+        "sha256": "cbbd9a14075018d578f9ddaf2f5c9ce573647718e4a1480fe03b29a480fbf0cf"
       },
       {
         "path": "scripts/lib/mob_portrait_background.mjs",
@@ -27,8 +27,8 @@
     ],
     "browserBundle": {
       "entry": "scripts/wiki/stills_render_entry.js",
-      "bytes": 4243678,
-      "sha256": "c6f56cd36e6104d083fe8ddf2af6bbf148e98ec850ccbd6a39ce70ae2960f353",
+      "bytes": 4249699,
+      "sha256": "9f4693cbdbf2ad22e4753d8fa8c0283ec6d648b0bf3f39f6672a4f7086b2307a",
       "esbuildVersion": "0.28.1"
     },
     "output": {
@@ -57,6 +57,7 @@
         "idle": "Idle",
         "height": 2.6,
         "yaw": null,
+        "portrait": null,
         "hover": null,
         "show": null,
         "attach": [
@@ -94,7 +95,7 @@
         "resolved": "#6b3a32",
         "strength": 0.3
       },
-      "sourceFingerprint": "7fe1561ccdfadfaed35de3b431bbe128c599f5994dcc1f27c32470d921cdf0a9",
+      "sourceFingerprint": "be92b476fff831113437214a05fa4bdd9b889b8eac732a4a164139fb717b29b7",
       "output": {
         "path": "public/ui/mobs/acolyte_tessa.webp",
         "bytes": 2200,
@@ -116,6 +117,7 @@
         "idle": "Idle",
         "height": 3.4,
         "yaw": null,
+        "portrait": null,
         "hover": null,
         "show": null,
         "attach": [],
@@ -133,7 +135,7 @@
         "resolved": "#9a94a8",
         "strength": 0.25
       },
-      "sourceFingerprint": "61c63943abb8771f49939d04bd843473169daaee2ddf436062bba4c326bdff6f",
+      "sourceFingerprint": "6b7d2f26b0e741c1948c61b892836f2e51b3cdb2490cce0df2ffaa3cc421cba0",
       "output": {
         "path": "public/ui/mobs/ancient_guardian.webp",
         "bytes": 2880,
@@ -155,6 +157,7 @@
         "idle": "Idle",
         "height": 2.6,
         "yaw": null,
+        "portrait": null,
         "hover": null,
         "show": [],
         "attach": [],
@@ -167,7 +170,7 @@
         "resolved": "#c8a2c8",
         "strength": 0.35
       },
-      "sourceFingerprint": "be03c9531956fd8977de6cbebc617f0b1b8d40ca23ff354a3f5351f33a388c8e",
+      "sourceFingerprint": "c8208081cf2866e013938fc9500e98cff90dccc9f723d919a55f844dfbfd3cea",
       "output": {
         "path": "public/ui/mobs/apprentice_wren.webp",
         "bytes": 2754,
@@ -189,6 +192,7 @@
         "idle": "Idle_Combat",
         "height": 2.5,
         "yaw": null,
+        "portrait": null,
         "hover": null,
         "show": null,
         "attach": [],
@@ -201,7 +205,7 @@
         "resolved": "#e8dcc8",
         "strength": 0.25
       },
-      "sourceFingerprint": "6312c51b16609b502839f36416fb533bb5f6dceb3395bdd6abe1485f9dc7f78c",
+      "sourceFingerprint": "889dc07e3b5af770af58e92f566a3fb11f4fc379fbf1fa67c8b59ac27fb3c2fc",
       "output": {
         "path": "public/ui/mobs/ashbone_raider.webp",
         "bytes": 2870,
@@ -223,6 +227,7 @@
         "idle": "Idle_Combat",
         "height": 2.5,
         "yaw": null,
+        "portrait": null,
         "hover": null,
         "show": null,
         "attach": [],
@@ -235,7 +240,7 @@
         "resolved": "#d8c8a8",
         "strength": 0.25
       },
-      "sourceFingerprint": "a24536a0635c75bbc3700ef06338a4420c1a5cfa5a96d5fc88233e3d98665089",
+      "sourceFingerprint": "321bc7aa7e6b66e32d339a1af5a9da72f3b9196b5a4d5e8062ae8a5d5755c053",
       "output": {
         "path": "public/ui/mobs/ashbone_warcaller.webp",
         "bytes": 2836,
@@ -257,6 +262,7 @@
         "idle": "Idle",
         "height": 2.1,
         "yaw": null,
+        "portrait": null,
         "hover": null,
         "show": null,
         "attach": [],
@@ -269,7 +275,7 @@
         "resolved": null,
         "strength": null
       },
-      "sourceFingerprint": "494e9eb9d309e6d39e62653293b1962588081fde0bf7cf9d3d45b034b771abe0",
+      "sourceFingerprint": "6874e3bb0c2e17895eb625c0f969846a519b70fad30ba9531fcb1b22304033a7",
       "output": {
         "path": "public/ui/mobs/aurelhorn.webp",
         "bytes": 2800,
@@ -291,6 +297,7 @@
         "idle": "Idle_Combat",
         "height": 2.5,
         "yaw": null,
+        "portrait": null,
         "hover": null,
         "show": null,
         "attach": [],
@@ -303,7 +310,7 @@
         "resolved": "#b8cce8",
         "strength": 0.25
       },
-      "sourceFingerprint": "594f44dfd5c475f6f0d80988683fc107d736a2462d75a57f7da67cbc23dee2cf",
+      "sourceFingerprint": "1eb68a46d43d27ed5c1ff0d0dad7acd7be65f3d52b60e8ce3f7f10251b0035c7",
       "output": {
         "path": "public/ui/mobs/barrow_king.webp",
         "bytes": 2304,
@@ -325,6 +332,7 @@
         "idle": "Idle_Combat",
         "height": 2.5,
         "yaw": null,
+        "portrait": null,
         "hover": null,
         "show": null,
         "attach": [],
@@ -337,7 +345,7 @@
         "resolved": "#9fb0c4",
         "strength": 0.25
       },
-      "sourceFingerprint": "06d23bcb1273c93990cdd3a3e8282e098835e02329e9202001882a06278e36f5",
+      "sourceFingerprint": "4f0ce4891adb2af8d6124d0faf8b3c9260defc216326d033a8f5abb36c21d18f",
       "output": {
         "path": "public/ui/mobs/barrow_wight.webp",
         "bytes": 2748,
@@ -359,6 +367,7 @@
         "idle": "Idle_Combat",
         "height": 2.5,
         "yaw": null,
+        "portrait": null,
         "hover": null,
         "show": null,
         "attach": [],
@@ -371,7 +380,7 @@
         "resolved": "#7fa8a0",
         "strength": 0.25
       },
-      "sourceFingerprint": "ca1c5b72eceff5cfb63731012d755711fd5a0ecbc793e4b6193b10ab10016421",
+      "sourceFingerprint": "f7d798a298440e510b7867aa896af3098b9c1a3ca6433e1b900eb0258e578fab",
       "output": {
         "path": "public/ui/mobs/bastion_revenant.webp",
         "bytes": 2352,
@@ -393,6 +402,7 @@
         "idle": "Idle",
         "height": 1.7,
         "yaw": null,
+        "portrait": null,
         "hover": null,
         "show": null,
         "attach": [],
@@ -405,7 +415,7 @@
         "resolved": "#6b8e23",
         "strength": 0.45
       },
-      "sourceFingerprint": "a7f20cf3c7cf6b81c469aa91c3e53b4722a3e71b6a9e06c72e420afcaf50af33",
+      "sourceFingerprint": "ab779bade6b9d689625ae3c71f2ea85baa25b21a32e829ea057ed5a978f3b35e",
       "output": {
         "path": "public/ui/mobs/bog_bloat.webp",
         "bytes": 1796,
@@ -427,6 +437,7 @@
         "idle": "Idle",
         "height": 1.7,
         "yaw": null,
+        "portrait": null,
         "hover": null,
         "show": null,
         "attach": [],
@@ -439,7 +450,7 @@
         "resolved": "#7aa848",
         "strength": 0.45
       },
-      "sourceFingerprint": "c8d5ae4af7b2c8114504643dc26919b339ddb3eec39668f495732bc4bc0d4039",
+      "sourceFingerprint": "10a5faaa293436aed2770fcce220940774f27fe012a1e73a26d8f60055acc232",
       "output": {
         "path": "public/ui/mobs/bogtoad.webp",
         "bytes": 1844,
@@ -461,6 +472,7 @@
         "idle": "Spider_Idle",
         "height": 1.4,
         "yaw": null,
+        "portrait": null,
         "hover": null,
         "show": null,
         "attach": [],
@@ -473,7 +485,7 @@
         "resolved": "#d6eaf8",
         "strength": 0.35
       },
-      "sourceFingerprint": "5157d4a1cf7d753e8a11c086625daa40acc5311928ed30db0480a1c6e0970a44",
+      "sourceFingerprint": "39650feb0b924192d4dfe8fcd319c63c8e4e30f832e828ce6ac305b58a57cd91",
       "output": {
         "path": "public/ui/mobs/bonechill_widow.webp",
         "bytes": 1752,
@@ -495,6 +507,7 @@
         "idle": "Idle_Combat",
         "height": 2.5,
         "yaw": null,
+        "portrait": null,
         "hover": null,
         "show": null,
         "attach": [],
@@ -507,7 +520,7 @@
         "resolved": "#cacfd2",
         "strength": 0.25
       },
-      "sourceFingerprint": "f52bd345882351a8db3da547280175d1fa2e6dff56fa6c49294b3b517c1efaa8",
+      "sourceFingerprint": "ea8381c06345d21253c8069ebe356dceaa2cc65253211fcfa3db3be46bcf6c40",
       "output": {
         "path": "public/ui/mobs/boneclad_revenant.webp",
         "bytes": 2310,
@@ -529,6 +542,7 @@
         "idle": "Idle_Combat",
         "height": 2.5,
         "yaw": null,
+        "portrait": null,
         "hover": null,
         "show": null,
         "attach": [],
@@ -541,7 +555,7 @@
         "resolved": "#a8b0b8",
         "strength": 0.25
       },
-      "sourceFingerprint": "ce635733b6fee3a9a0d3f869dc2cd9709138d221650da960471d62c22e332d99",
+      "sourceFingerprint": "0fb37480454f9ed7ed66a69240ee56eff504eb4c61001494ecf3433b5c66f536",
       "output": {
         "path": "public/ui/mobs/bound_guardian.webp",
         "bytes": 2772,
@@ -563,6 +577,7 @@
         "idle": "Idle",
         "height": 2.8,
         "yaw": null,
+        "portrait": null,
         "hover": null,
         "show": null,
         "attach": [],
@@ -575,7 +590,7 @@
         "resolved": "#7a5230",
         "strength": 0.12
       },
-      "sourceFingerprint": "17e6b188b1ac7d21245ff163efd5a4ca48590ebc561e22aae08db33388b9cda8",
+      "sourceFingerprint": "27d3d8df318d6b6dd0ea65d16de2e3f049ed5c5f78f34aa9a4806c042fe0eb94",
       "output": {
         "path": "public/ui/mobs/brakka_wallbreaker.webp",
         "bytes": 2430,
@@ -597,6 +612,7 @@
         "idle": "Idle",
         "height": 2.1,
         "yaw": null,
+        "portrait": null,
         "hover": null,
         "show": null,
         "attach": [],
@@ -609,7 +625,7 @@
         "resolved": "#5a4a78",
         "strength": 0.2
       },
-      "sourceFingerprint": "cb035fbe4bf0b29df950547e32fe4a0d656236ba05ed42dda1b3535f93e009db",
+      "sourceFingerprint": "d62f44c12450d6f977d3814e1251fe082ce78d990405c09253685bea304eb5b1",
       "output": {
         "path": "public/ui/mobs/breach_wretch.webp",
         "bytes": 1688,
@@ -620,17 +636,22 @@
       "id": "brutok_skullsmasher",
       "family": "ogre",
       "finderEncounter": false,
-      "visualKey": "mob_ogre",
+      "visualKey": "mob_brutok",
       "renderSpec": {
         "model": {
-          "url": "models/creatures/ogre.glb",
-          "path": "public/models/creatures/ogre.glb",
-          "bytes": 494060,
-          "sha256": "8a65d06c205289e546ba98580c62bc1f90dbc48740dfb2625338c8b1584825fc"
+          "url": "models/creatures/brutok.glb",
+          "path": "public/models/creatures/brutok.glb",
+          "bytes": 1105424,
+          "sha256": "666896865dad21e9afc93ac3b5538a68664be0cb79cbc628211367eb3142722b"
         },
         "idle": "Idle",
         "height": 2.8,
         "yaw": null,
+        "portrait": {
+          "yaw": 0.6,
+          "zoom": 2.1,
+          "focusY": 0.62
+        },
         "hover": null,
         "show": null,
         "attach": [],
@@ -643,11 +664,11 @@
         "resolved": "#6e5235",
         "strength": 0.12
       },
-      "sourceFingerprint": "b4bbcc775cb6ab33bfa1a51c1f347856fe16236cfea4391833875dddab7d7be4",
+      "sourceFingerprint": "9a0da73b02ff932ddeae22962f14e1039fa4130e86211e70241c99801c646276",
       "output": {
         "path": "public/ui/mobs/brutok_skullsmasher.webp",
-        "bytes": 2422,
-        "sha256": "ffb54ec9d2adeaa93d5d063c3529b8b6a3a0ba7550e3b395bdeb2139ab1ec8de"
+        "bytes": 2388,
+        "sha256": "63d3522aa6427583b410236256f24edc1bb3bd8d7a2e55ba962283dcbae72d77"
       }
     },
     {
@@ -665,6 +686,7 @@
         "idle": "Spider_Idle",
         "height": 1.4,
         "yaw": null,
+        "portrait": null,
         "hover": null,
         "show": null,
         "attach": [],
@@ -677,7 +699,7 @@
         "resolved": "#4e8a3c",
         "strength": 0.35
       },
-      "sourceFingerprint": "bd0feb975f11519f7177e14935a8edc003e38bc5d0f2471f685cc9bc76ed8b27",
+      "sourceFingerprint": "945205afbeb066450a8749b6ffa148199a36f0a4909c7f3229d7ba0c11bf985c",
       "output": {
         "path": "public/ui/mobs/canopy_weaver.webp",
         "bytes": 1712,
@@ -699,6 +721,7 @@
         "idle": "Idle_Combat",
         "height": 2.5,
         "yaw": null,
+        "portrait": null,
         "hover": null,
         "show": null,
         "attach": [],
@@ -711,7 +734,7 @@
         "resolved": "#3b4a5a",
         "strength": 0.25
       },
-      "sourceFingerprint": "8699c2ce4df3d71f47fc5abdfea944a5776d3f1988aca44db6eff4d29e88f58a",
+      "sourceFingerprint": "d3b2445669c1afec06f8aa4b0a04161347cae94c673665cb55a84ce31f24d1b6",
       "output": {
         "path": "public/ui/mobs/captain_verlan.webp",
         "bytes": 2756,
@@ -733,6 +756,7 @@
         "idle": "Idle",
         "height": 2.6,
         "yaw": null,
+        "portrait": null,
         "hover": null,
         "show": [],
         "attach": [],
@@ -745,7 +769,7 @@
         "resolved": "#4a7a9c",
         "strength": 0.35
       },
-      "sourceFingerprint": "41c6a493d45dce5b7d8b71128a3cc6b2b97c9e0678bde108f17f74924bc8a64d",
+      "sourceFingerprint": "e387304ff88c8cee96a4719803571c5c06fd7adef86fd0e7882c5bed95cef86f",
       "output": {
         "path": "public/ui/mobs/castaway_navigator.webp",
         "bytes": 2628,
@@ -767,6 +791,7 @@
         "idle": "Flying_Idle",
         "height": 1.6,
         "yaw": null,
+        "portrait": null,
         "hover": 0.3,
         "show": null,
         "attach": [],
@@ -779,7 +804,7 @@
         "resolved": "#7a8a86",
         "strength": 0.6
       },
-      "sourceFingerprint": "c53614e4af32ae37bdd317cc0920eca0087457aeeb038ba020134798a002ddba",
+      "sourceFingerprint": "04dc9278bf9b06f88e1e9987d5d056f50aae11280a8eafd737eb4ea334a8c2df",
       "output": {
         "path": "public/ui/mobs/choir_thrall.webp",
         "bytes": 1446,
@@ -801,6 +826,7 @@
         "idle": "Idle",
         "height": 2.6,
         "yaw": null,
+        "portrait": null,
         "hover": null,
         "show": null,
         "attach": [
@@ -838,7 +864,7 @@
         "resolved": "#6b3a32",
         "strength": 0.3
       },
-      "sourceFingerprint": "7fe1561ccdfadfaed35de3b431bbe128c599f5994dcc1f27c32470d921cdf0a9",
+      "sourceFingerprint": "be92b476fff831113437214a05fa4bdd9b889b8eac732a4a164139fb717b29b7",
       "output": {
         "path": "public/ui/mobs/choirmother_selthe.webp",
         "bytes": 2200,
@@ -860,6 +886,7 @@
         "idle": "Idle",
         "height": 2.6,
         "yaw": null,
+        "portrait": null,
         "hover": null,
         "show": null,
         "attach": [],
@@ -872,7 +899,7 @@
         "resolved": "#f0b040",
         "strength": 0.12
       },
-      "sourceFingerprint": "fbb90a118c02d617d1fd6009448f7423f2a4603d31e95cf4a079568b2823e10c",
+      "sourceFingerprint": "38489ae93a5dc7499bf93d6d424d0322db231a48379f71221201c26317d73691",
       "output": {
         "path": "public/ui/mobs/cindraleth_maw_matriarch.webp",
         "bytes": 2462,
@@ -894,6 +921,7 @@
         "idle": "Idle_Combat",
         "height": 2.5,
         "yaw": null,
+        "portrait": null,
         "hover": null,
         "show": null,
         "attach": [],
@@ -906,7 +934,7 @@
         "resolved": "#d5d0e8",
         "strength": 0.25
       },
-      "sourceFingerprint": "3f4197e07ec5856b43fb8dd24ba90af1548cbccfa426104ba5cf8aafde286489",
+      "sourceFingerprint": "2ed8c482926bb7031fdb1057c8bdcd879483ba3226b1807512bc6dfef0221319",
       "output": {
         "path": "public/ui/mobs/corrupted_priest_malric.webp",
         "bytes": 2674,
@@ -928,6 +956,7 @@
         "idle": "Flying_Idle",
         "height": 1.4,
         "yaw": null,
+        "portrait": null,
         "hover": 0.15,
         "show": null,
         "attach": [],
@@ -940,7 +969,7 @@
         "resolved": "#5e4a72",
         "strength": 0.45
       },
-      "sourceFingerprint": "aa0c50d1706fd8cde5dcd82f3c3ebd6f6a278f5a48ff5a1e3291a2fe082f47cb",
+      "sourceFingerprint": "df78ba5223d26ed35202d5d119dcb4e1aa586b072993634a7ce4ec42e779d265",
       "output": {
         "path": "public/ui/mobs/corrupted_sporeling.webp",
         "bytes": 1500,
@@ -962,6 +991,7 @@
         "idle": "Idle_Combat",
         "height": 2.5,
         "yaw": null,
+        "portrait": null,
         "hover": null,
         "show": null,
         "attach": [],
@@ -974,7 +1004,7 @@
         "resolved": "#b8c4c4",
         "strength": 0.25
       },
-      "sourceFingerprint": "354aa45ab9ce7bca8992dd812dd5eab82f8ee8c46a4ca49c7cac089a160bc3ae",
+      "sourceFingerprint": "a5ca89b30c0ce5e8718ec4255bd204d437899534d784b937100a048b037da493",
       "output": {
         "path": "public/ui/mobs/crypt_shambler.webp",
         "bytes": 2546,
@@ -996,6 +1026,7 @@
         "idle": "Idle_Combat",
         "height": 2.5,
         "yaw": null,
+        "portrait": null,
         "hover": null,
         "show": null,
         "attach": [
@@ -1021,7 +1052,7 @@
         "resolved": "#7b7d7d",
         "strength": 0.35
       },
-      "sourceFingerprint": "37f6ab61f9ae2572e9bcf8c2ccaeb89844bcad960582f549f97bc6ac4f3f10df",
+      "sourceFingerprint": "1a4cd0ac48f44ea87aa5d0b08e35ae08cceba2cf47ec71556db0f361894a482f",
       "output": {
         "path": "public/ui/mobs/deacon_varric.webp",
         "bytes": 2190,
@@ -1043,6 +1074,7 @@
         "idle": "Idle",
         "height": 2.6,
         "yaw": null,
+        "portrait": null,
         "hover": null,
         "show": [
           "Mage_Hat"
@@ -1070,7 +1102,7 @@
         "resolved": "#512e5f",
         "strength": 0.5
       },
-      "sourceFingerprint": "c5152e9c6abf5ced4589b1e2ee72050df1fa91febba28d98ced80ff4ff3f06e4",
+      "sourceFingerprint": "182c115b32ff080efa9c6ff4f31ca38c2784252104a860bc818c7e8c280878a8",
       "output": {
         "path": "public/ui/mobs/deacon_voss.webp",
         "bytes": 2122,
@@ -1092,6 +1124,7 @@
         "idle": "Idle_Combat",
         "height": 2.5,
         "yaw": null,
+        "portrait": null,
         "hover": null,
         "show": null,
         "attach": [],
@@ -1104,7 +1137,7 @@
         "resolved": "#c7c0b2",
         "strength": 0.25
       },
-      "sourceFingerprint": "20713630b86285c3433670ccf42d891245ecd2f51c7cfa2730249116a0f0d99f",
+      "sourceFingerprint": "e6753908c06bde8e0fd67842b962690601b6ea2c3745321386707eaffc31fbcc",
       "output": {
         "path": "public/ui/mobs/deathstalker_voss.webp",
         "bytes": 2542,
@@ -1126,6 +1159,7 @@
         "idle": "Idle",
         "height": 1.7,
         "yaw": null,
+        "portrait": null,
         "hover": null,
         "show": null,
         "attach": [],
@@ -1138,7 +1172,7 @@
         "resolved": "#45b39d",
         "strength": 0.45
       },
-      "sourceFingerprint": "e23f26420d9949881f7df35a07fb1e1f871233aa7af8335d2bfd39259ddf3d8f",
+      "sourceFingerprint": "c63126385c994bc11085d6d62020232aebb4e8727f8f5558d10ca49e971863b5",
       "output": {
         "path": "public/ui/mobs/deepfen_murloc.webp",
         "bytes": 1744,
@@ -1160,6 +1194,7 @@
         "idle": "Velociraptor_Idle",
         "height": 1.8,
         "yaw": null,
+        "portrait": null,
         "hover": null,
         "show": null,
         "attach": [],
@@ -1172,7 +1207,7 @@
         "resolved": "#3f5942",
         "strength": 0.3
       },
-      "sourceFingerprint": "4c60c116a7b76cdd0994dd774ebc227f528701525dec163d687f989a7b286201",
+      "sourceFingerprint": "74a9875fa458fd93cb39fcd3df1937a77f518bf78fa6b775fd0d22dd1889032d",
       "output": {
         "path": "public/ui/mobs/deepfen_spearjaw.webp",
         "bytes": 1618,
@@ -1194,6 +1229,7 @@
         "idle": "Idle",
         "height": 2.1,
         "yaw": null,
+        "portrait": null,
         "hover": null,
         "show": null,
         "attach": [],
@@ -1206,7 +1242,7 @@
         "resolved": "#9c7a3c",
         "strength": 0.2
       },
-      "sourceFingerprint": "d4079f0e6e13d7c3e941c3752d46f4ac32d71d18fe28c639b7025ed2a22011e3",
+      "sourceFingerprint": "3805ac220a83444da288116c3f62f7880cd3f321bbe9eec2b1c64744c8fbaa53",
       "output": {
         "path": "public/ui/mobs/deeprock_kobold.webp",
         "bytes": 1698,
@@ -1228,6 +1264,7 @@
         "idle": "Idle",
         "height": 2.1,
         "yaw": null,
+        "portrait": null,
         "hover": null,
         "show": null,
         "attach": [],
@@ -1240,7 +1277,7 @@
         "resolved": "#5a8a46",
         "strength": 0.2
       },
-      "sourceFingerprint": "9da432220776a23186325f6149bf94f38cce337b09cefc512424f50fcfd7d805",
+      "sourceFingerprint": "6cf8e63185e8531ca4d4076dab2bed6050e59141e82351c0d5c61062f8718f64",
       "output": {
         "path": "public/ui/mobs/downs_bandit.webp",
         "bytes": 1710,
@@ -1262,6 +1299,7 @@
         "idle": "Idle",
         "height": 2.2,
         "yaw": null,
+        "portrait": null,
         "hover": null,
         "show": null,
         "attach": [],
@@ -1274,7 +1312,7 @@
         "resolved": "#3e6b4f",
         "strength": 0.1
       },
-      "sourceFingerprint": "57830d8686808bd3ec10ec5e1f2dd004407bb058f25fc27601c74d135cd1682f",
+      "sourceFingerprint": "b039b1e3c17119b7ebed36b209efd93bca00c8918ba9234b195a7dcfdd335676",
       "output": {
         "path": "public/ui/mobs/dragonkin_broodguard.webp",
         "bytes": 1962,
@@ -1296,6 +1334,7 @@
         "idle": "Idle",
         "height": 0.95,
         "yaw": null,
+        "portrait": null,
         "hover": null,
         "show": null,
         "attach": [],
@@ -1308,7 +1347,7 @@
         "resolved": "#69a06a",
         "strength": 0.08
       },
-      "sourceFingerprint": "f0acdf88bc4605820abaef1e8cf2a7d517bbcd97a105d3cf419a1712193d6ed3",
+      "sourceFingerprint": "9be1add92a529e5876a662444fc594435ef7c581d355448438359e1ae214d746",
       "output": {
         "path": "public/ui/mobs/dragonkin_egg.webp",
         "bytes": 2102,
@@ -1330,6 +1369,7 @@
         "idle": "Idle",
         "height": 1.05,
         "yaw": null,
+        "portrait": null,
         "hover": null,
         "show": null,
         "attach": [],
@@ -1342,7 +1382,7 @@
         "resolved": "#4e8a5f",
         "strength": 0.1
       },
-      "sourceFingerprint": "cb8582a78066c7c450927d23526f02ea7bd1b16817196715d74b5328bb8db19e",
+      "sourceFingerprint": "82f95815639ede2d52d6b1fc5fc5e752dd2449e939a9ada507c338993078ccb8",
       "output": {
         "path": "public/ui/mobs/dragonkin_whelp.webp",
         "bytes": 2048,
@@ -1364,6 +1404,7 @@
         "idle": "Idle",
         "height": 2.6,
         "yaw": null,
+        "portrait": null,
         "hover": null,
         "show": null,
         "attach": [],
@@ -1376,7 +1417,7 @@
         "resolved": "#50392e",
         "strength": 0.12
       },
-      "sourceFingerprint": "1df350045541bdf3b0fa4c66ef6bf555e265f7b1fe9652eacd7727e8e86354c8",
+      "sourceFingerprint": "0f3bfdb262df1df478a430fa73e0aab752e7d6778ed7c2737262d03f66fe7395",
       "output": {
         "path": "public/ui/mobs/drakemaw_broodlord.webp",
         "bytes": 2444,
@@ -1398,6 +1439,7 @@
         "idle": "Idle",
         "height": 2.6,
         "yaw": null,
+        "portrait": null,
         "hover": null,
         "show": [
           "Mage_Hat"
@@ -1425,7 +1467,7 @@
         "resolved": "#6f8a86",
         "strength": 0.6
       },
-      "sourceFingerprint": "cd7988ce628ef30ab2969f707515f05c70bec04a874403aea5eafb9e51598dac",
+      "sourceFingerprint": "e8b2d58ba09cd76d23cc6347aaa7b339d1286e9c6d5b4218486d54254220b204",
       "output": {
         "path": "public/ui/mobs/drowned_cantor.webp",
         "bytes": 2092,
@@ -1447,6 +1489,7 @@
         "idle": "Idle_Combat",
         "height": 2.5,
         "yaw": null,
+        "portrait": null,
         "hover": null,
         "show": null,
         "attach": [],
@@ -1459,7 +1502,7 @@
         "resolved": "#7fb3d5",
         "strength": 0.25
       },
-      "sourceFingerprint": "6060337f7d2493f368665655645a66b5ef77111dcb9a75ef903e9f3b91a178a2",
+      "sourceFingerprint": "84082b1f338c9436c7a03c9d9cb149ece553d76d27cde3bbc5a51b0417c2084f",
       "output": {
         "path": "public/ui/mobs/drowned_dead.webp",
         "bytes": 2740,
@@ -1481,6 +1524,7 @@
         "idle": "Idle_Combat",
         "height": 2.5,
         "yaw": null,
+        "portrait": null,
         "hover": null,
         "show": null,
         "attach": [],
@@ -1493,7 +1537,7 @@
         "resolved": "#86988e",
         "strength": 0.25
       },
-      "sourceFingerprint": "4e84901f5e2d641bb00995baa9d6f2f1fc645e5576e8ffd43ef56ac08f81d239",
+      "sourceFingerprint": "8736f3e0ba244cb1b27365bc4dffe7f343e27d213eefea0827d753395021d33b",
       "output": {
         "path": "public/ui/mobs/drowned_deckhand.webp",
         "bytes": 2766,
@@ -1515,6 +1559,7 @@
         "idle": "Idle_Combat",
         "height": 2.5,
         "yaw": null,
+        "portrait": null,
         "hover": null,
         "show": null,
         "attach": [],
@@ -1527,7 +1572,7 @@
         "resolved": "#88a7a0",
         "strength": 0.25
       },
-      "sourceFingerprint": "02109bcdd7518c08bdaa953f3321a2edd8b33ad4b56ca8d35b843a2fa70fc9eb",
+      "sourceFingerprint": "a6ca17de34a432051663416702c24fd774006af1f3ee7310b853750c989802e8",
       "output": {
         "path": "public/ui/mobs/drowned_templeguard.webp",
         "bytes": 2774,
@@ -1549,6 +1594,7 @@
         "idle": "Idle_Combat",
         "height": 2.5,
         "yaw": null,
+        "portrait": null,
         "hover": null,
         "show": null,
         "attach": [],
@@ -1561,7 +1607,7 @@
         "resolved": "#6fae9e",
         "strength": 0.25
       },
-      "sourceFingerprint": "a703d94d5380918333fd6598b3d3de067c6c7e93c8dad03b208412303b06c5cf",
+      "sourceFingerprint": "005190b7770ff06d4e4410481e4af84bd96e91c4bbd06d5658eb94e2da64d15b",
       "output": {
         "path": "public/ui/mobs/drowned_thrall.webp",
         "bytes": 2716,
@@ -1583,6 +1629,7 @@
         "idle": "Idle_Combat",
         "height": 2.5,
         "yaw": null,
+        "portrait": null,
         "hover": null,
         "show": null,
         "attach": [],
@@ -1595,7 +1642,7 @@
         "resolved": "#6c8f8a",
         "strength": 0.25
       },
-      "sourceFingerprint": "90d70e8d52071559e127fe1d122e9cd88c0ae077f15edf3da9e7609a203f93e9",
+      "sourceFingerprint": "afd8a285fcd04df7551820fee83506aed4eced93af82c8c370a6436ac285fe2a",
       "output": {
         "path": "public/ui/mobs/drowned_votary.webp",
         "bytes": 2750,
@@ -1617,6 +1664,7 @@
         "idle": "Idle_Combat",
         "height": 2.5,
         "yaw": null,
+        "portrait": null,
         "hover": null,
         "show": null,
         "attach": [],
@@ -1629,7 +1677,7 @@
         "resolved": "#3a6ea5",
         "strength": 0.25
       },
-      "sourceFingerprint": "d6d315d94ba8c2810f3aeed5b81683778276eceae2c8cb87f5ba544e5adc49a3",
+      "sourceFingerprint": "555ac865296f9945ae807c14d5675e8d212eb10fd05ff18821a647a4fa9f49d4",
       "output": {
         "path": "public/ui/mobs/drowned_warlord.webp",
         "bytes": 2712,
@@ -1651,6 +1699,7 @@
         "idle": "Idle",
         "height": 1.7,
         "yaw": null,
+        "portrait": null,
         "hover": null,
         "show": null,
         "attach": [],
@@ -1663,7 +1712,7 @@
         "resolved": "#5a9858",
         "strength": 0.45
       },
-      "sourceFingerprint": "42ab304c431dcf9adf22cc4ba3ef2925b384aa8cd396c22393a8c9d67302ccec",
+      "sourceFingerprint": "bd9f3ae35c0525964a8ab8e757fcb37c8cd30cb376ca15b3eaf7b99d4f95faa7",
       "output": {
         "path": "public/ui/mobs/drowsy_croaker.webp",
         "bytes": 1860,
@@ -1685,6 +1734,7 @@
         "idle": "Idle",
         "height": 2.4,
         "yaw": null,
+        "portrait": null,
         "hover": null,
         "show": null,
         "attach": [],
@@ -1697,7 +1747,7 @@
         "resolved": "#b07040",
         "strength": 0.12
       },
-      "sourceFingerprint": "6309a82974d08c383504bf1c7707c0e994b652132243af69bf6620ea733a50b9",
+      "sourceFingerprint": "395030d48b93b05db16db48b35ed128fe7dbfe3a4b70f4b54c2bcb187cbfb1fb",
       "output": {
         "path": "public/ui/mobs/dune_troll.webp",
         "bytes": 2004,
@@ -1719,6 +1769,7 @@
         "idle": "Flying_Idle",
         "height": 1.6,
         "yaw": -1.5707963267948966,
+        "portrait": null,
         "hover": 0.4,
         "show": null,
         "attach": [],
@@ -1731,7 +1782,7 @@
         "resolved": null,
         "strength": null
       },
-      "sourceFingerprint": "9b720b2da2b25976b8794cbe0da0b48869a209fec6132e900c5ebf2a8167f3b9",
+      "sourceFingerprint": "28b0d2e42a9da46cf2eb72c5dd5dd3eb0c667f671cd8eaa76b7d6662f2c77e6d",
       "output": {
         "path": "public/ui/mobs/duskwisp.webp",
         "bytes": 1874,
@@ -1753,6 +1804,7 @@
         "idle": "Idle",
         "height": 2.6,
         "yaw": null,
+        "portrait": null,
         "hover": null,
         "show": null,
         "attach": [
@@ -1778,7 +1830,7 @@
         "resolved": null,
         "strength": null
       },
-      "sourceFingerprint": "f9b040c9557240d35709355f145fe3328de55a86cb06298d8e2284e6c02572de",
+      "sourceFingerprint": "43235bc473b89c9b58883fec7365cf7ac50cc9603eb4bf98b62a6e9a26b71d99",
       "output": {
         "path": "public/ui/mobs/edda_reedhand.webp",
         "bytes": 2418,
@@ -1800,6 +1852,7 @@
         "idle": "Idle",
         "height": 2.1,
         "yaw": -1.5707963267948966,
+        "portrait": null,
         "hover": null,
         "show": null,
         "attach": [],
@@ -1812,7 +1865,7 @@
         "resolved": null,
         "strength": null
       },
-      "sourceFingerprint": "37514330c6a7f8f1ae956851b4050e050b1ee8b3f827b6cd7ae1e10e955ea1de",
+      "sourceFingerprint": "691fade5d1959dcfd5f9874e40e9e4806f1646c1689af592c0bb954cbac4b5ac",
       "output": {
         "path": "public/ui/mobs/emberkin.webp",
         "bytes": 1828,
@@ -1834,6 +1887,7 @@
         "idle": "Flying_Idle",
         "height": 2.4,
         "yaw": null,
+        "portrait": null,
         "hover": 0.25,
         "show": null,
         "attach": [],
@@ -1846,7 +1900,7 @@
         "resolved": "#d84028",
         "strength": 0.2
       },
-      "sourceFingerprint": "d9767ad92fdd887dd5a6cc551f53ca556f17ff78043e94349165c16b2c147af2",
+      "sourceFingerprint": "c3625bc741cb8483675413f435e37405b60799b763395c5bf87dabeb0444bf0d",
       "output": {
         "path": "public/ui/mobs/emberwing_drake.webp",
         "bytes": 2288,
@@ -1868,6 +1922,7 @@
         "idle": "Idle_Combat",
         "height": 2.5,
         "yaw": null,
+        "portrait": null,
         "hover": null,
         "show": null,
         "attach": [],
@@ -1880,7 +1935,7 @@
         "resolved": "#bfc7ca",
         "strength": 0.25
       },
-      "sourceFingerprint": "cf8b560d359c0275a698c506228dbc73720ff589165e44474d4c06650c182038",
+      "sourceFingerprint": "b26715e7e90400d7a26c69131c1ecfd381e4ffbf0debc4a7b0ba72a16c011f75",
       "output": {
         "path": "public/ui/mobs/fallen_captain_aldren.webp",
         "bytes": 2310,
@@ -1902,6 +1957,7 @@
         "idle": "Idle",
         "height": 2.1,
         "yaw": null,
+        "portrait": null,
         "hover": null,
         "show": null,
         "attach": [],
@@ -1914,7 +1970,7 @@
         "resolved": "#cfe0ea",
         "strength": 0.2
       },
-      "sourceFingerprint": "b8befc38f702831232bf24ef301c528aa60b4d71858c4a9161a666e99ae2e881",
+      "sourceFingerprint": "11157292c1f571fc51ce7119106bab06d72d0113981796a667b9061d662c9039",
       "output": {
         "path": "public/ui/mobs/fen_sprite.webp",
         "bytes": 1700,
@@ -1936,6 +1992,7 @@
         "idle": "Idle",
         "height": 2.4,
         "yaw": null,
+        "portrait": null,
         "hover": null,
         "show": null,
         "attach": [],
@@ -1948,7 +2005,7 @@
         "resolved": "#229954",
         "strength": 0.12
       },
-      "sourceFingerprint": "697c4ddb3ece6a698d1320b319781e69f0ddbd1a417ade264b2d2ab65960e8c3",
+      "sourceFingerprint": "255f89d49fcd64beac585b89f4dfbdbcedfd5a161ab553a45b48124275ef283b",
       "output": {
         "path": "public/ui/mobs/fen_troll.webp",
         "bytes": 2102,
@@ -1970,6 +2027,7 @@
         "idle": "Idle",
         "height": 2.6,
         "yaw": null,
+        "portrait": null,
         "hover": null,
         "show": [],
         "attach": [],
@@ -1982,7 +2040,7 @@
         "resolved": "#4a6a8a",
         "strength": 0.35
       },
-      "sourceFingerprint": "8f05317f1fd7602c48f1eec1c2e4e3d20befda55a1b8091bfeb208e273b8f66f",
+      "sourceFingerprint": "4c122993bd45da8758a5a5306f8893e6468605ba937da4883334f986a874b97f",
       "output": {
         "path": "public/ui/mobs/fisher_bram.webp",
         "bytes": 2618,
@@ -2004,6 +2062,7 @@
         "idle": "Idle",
         "height": 1.6,
         "yaw": null,
+        "portrait": null,
         "hover": null,
         "show": null,
         "attach": [],
@@ -2016,7 +2075,7 @@
         "resolved": "#7f8c8d",
         "strength": 0.35
       },
-      "sourceFingerprint": "e033ddc7be001f0300ac90137fbe1b40ad0504158511205888c92c142df63264",
+      "sourceFingerprint": "2a5bd4aae5b82ddde60433ddbd0b2f35509229b95a0a7c560dc002c546be4244",
       "output": {
         "path": "public/ui/mobs/forest_wolf.webp",
         "bytes": 1838,
@@ -2038,6 +2097,7 @@
         "idle": "Idle",
         "height": 2.3,
         "yaw": null,
+        "portrait": null,
         "hover": null,
         "show": null,
         "attach": [],
@@ -2050,7 +2110,7 @@
         "resolved": "#74c476",
         "strength": 0.35
       },
-      "sourceFingerprint": "e9fa47b31ad3c092566a54dd3ecab9cd9eeac17e40fe6a397e1766577b8dbb26",
+      "sourceFingerprint": "b5162d8f944a0875971fcdbd42060a4ad7dceb93b3ee0846c84edaa9472d3598",
       "output": {
         "path": "public/ui/mobs/friendly_player_dummy.webp",
         "bytes": 1766,
@@ -2072,6 +2132,7 @@
         "idle": "Idle",
         "height": 2.5,
         "yaw": null,
+        "portrait": null,
         "hover": null,
         "show": null,
         "attach": [],
@@ -2084,7 +2145,7 @@
         "resolved": "#f2f6fa",
         "strength": 0.55
       },
-      "sourceFingerprint": "7bf76cb394cb8f09d60ec27d276b8e36314485f234b8ebe2454c49eae3fa4e75",
+      "sourceFingerprint": "f89d54a166022be90e00a35eff8029ef0e010a9652ec2f0a03bb0dded7c3f057",
       "output": {
         "path": "public/ui/mobs/frostmane_yeti.webp",
         "bytes": 2006,
@@ -2106,6 +2167,7 @@
         "idle": "Flying_Idle",
         "height": 2.2,
         "yaw": null,
+        "portrait": null,
         "hover": 0.3,
         "show": null,
         "attach": [],
@@ -2118,7 +2180,7 @@
         "resolved": "#bfe0e8",
         "strength": 0.4
       },
-      "sourceFingerprint": "abcdf0177008405a4cf5dc293bf584b1df23ea1882e8e9bfa36428f58dfe5c1b",
+      "sourceFingerprint": "5c36871155305a1a43b56fd2f66ad5a763f6c72e387c95bdf2c59bcc5daae6a5",
       "output": {
         "path": "public/ui/mobs/gale_wisp.webp",
         "bytes": 2112,
@@ -2140,6 +2202,7 @@
         "idle": "Idle",
         "height": 1.9,
         "yaw": null,
+        "portrait": null,
         "hover": null,
         "show": null,
         "attach": [],
@@ -2152,7 +2215,7 @@
         "resolved": "#d8a848",
         "strength": 0.35
       },
-      "sourceFingerprint": "ecb6209bf00702cc418404e0d6853b2edda87a60c28cabe5d375c4cf689437f5",
+      "sourceFingerprint": "4edf97e03b55227bb5edd37605a809fedceba15e075014b9ce9fb366ac5b77bc",
       "output": {
         "path": "public/ui/mobs/gilded_stag.webp",
         "bytes": 2190,
@@ -2174,6 +2237,7 @@
         "idle": "Idle",
         "height": 1.9,
         "yaw": null,
+        "portrait": null,
         "hover": null,
         "show": null,
         "attach": [],
@@ -2186,7 +2250,7 @@
         "resolved": null,
         "strength": null
       },
-      "sourceFingerprint": "e7d2f39406fd839e0a5033b7f8b58a632e53cfe6e8f45967f6f1077885c048ff",
+      "sourceFingerprint": "664b605f45ff83b407019f02a1ce67711a94df210582732b343c22782bc58233",
       "output": {
         "path": "public/ui/mobs/gleamstag.webp",
         "bytes": 2600,
@@ -2208,6 +2272,7 @@
         "idle": "Idle",
         "height": 1.7,
         "yaw": null,
+        "portrait": null,
         "hover": null,
         "show": null,
         "attach": [],
@@ -2220,7 +2285,7 @@
         "resolved": "#8fb6c4",
         "strength": 0.45
       },
-      "sourceFingerprint": "f98587ae49017dbbf19f5061ddd737f26f84fed1dcfabf33a4eb0bdf89856a37",
+      "sourceFingerprint": "5de692051cc898df01d3490cd0f2c4e53fc26f0746a8d13d79327c01e96fa82b",
       "output": {
         "path": "public/ui/mobs/glimmermere_wader.webp",
         "bytes": 1724,
@@ -2242,6 +2307,7 @@
         "idle": "Spider_Idle",
         "height": 1.4,
         "yaw": null,
+        "portrait": null,
         "hover": null,
         "show": null,
         "attach": [],
@@ -2254,7 +2320,7 @@
         "resolved": "#bfe1ec",
         "strength": 0.35
       },
-      "sourceFingerprint": "b7c2ba68bb166ffcc6b2896b3176973f67b400fd46e1af8cdcd7c0baaa0064a3",
+      "sourceFingerprint": "ee131a3dd5771dc289f976a14d84b7c7bd53d6dc20442b7389154c52fc5f2729",
       "output": {
         "path": "public/ui/mobs/glimmerscale_lurker.webp",
         "bytes": 1816,
@@ -2276,6 +2342,7 @@
         "idle": "Flying_Idle",
         "height": 1.6,
         "yaw": -1.5707963267948966,
+        "portrait": null,
         "hover": 0.4,
         "show": null,
         "attach": [],
@@ -2288,7 +2355,7 @@
         "resolved": null,
         "strength": null
       },
-      "sourceFingerprint": "664655b90882d6a00c538c49f641294ebb440276b508eb2a21dd8e800ed9528f",
+      "sourceFingerprint": "8451f65b18a865edb98cd172684e5e7fb22876f54f4481a838ba65f7661432b3",
       "output": {
         "path": "public/ui/mobs/glimmerwisp.webp",
         "bytes": 2160,
@@ -2310,6 +2377,7 @@
         "idle": "Idle",
         "height": 1,
         "yaw": null,
+        "portrait": null,
         "hover": null,
         "show": null,
         "attach": [],
@@ -2322,7 +2390,7 @@
         "resolved": "#d87838",
         "strength": 0.35
       },
-      "sourceFingerprint": "989c02070d03b9eeb8a41ed2db166e5b606254d5cdea8eb6e982d27d9cbe9917",
+      "sourceFingerprint": "5ec8fb102b4a4677625ee865a7f8c483e70cb1b3ea1ae5be41b21413dd472299",
       "output": {
         "path": "public/ui/mobs/gloam_fox.webp",
         "bytes": 1982,
@@ -2344,6 +2412,7 @@
         "idle": "Velociraptor_Idle",
         "height": 1.6,
         "yaw": null,
+        "portrait": null,
         "hover": null,
         "show": null,
         "attach": [],
@@ -2356,7 +2425,7 @@
         "resolved": "#4c4a72",
         "strength": 0.35
       },
-      "sourceFingerprint": "075333c06c5848cc4a447485aeec96e6912e8519c17293e7b9c81cad732e3c16",
+      "sourceFingerprint": "305b000638730acfd040fb0258b7a7fb128725d74972bb5dd87dbdefaa4511bf",
       "output": {
         "path": "public/ui/mobs/gloam_strider.webp",
         "bytes": 1588,
@@ -2378,6 +2447,7 @@
         "idle": "Idle",
         "height": 2.6,
         "yaw": -1.5707963267948966,
+        "portrait": null,
         "hover": null,
         "show": null,
         "attach": [],
@@ -2390,7 +2460,7 @@
         "resolved": null,
         "strength": null
       },
-      "sourceFingerprint": "ca7dd27429b29be37459c4ea0b92ee4f2adfc4a8dbad1d3edab94506d69f2fc2",
+      "sourceFingerprint": "d285c82bad683dc3a9d46903ee79d4d55e05246cd17448a7f258042d2ba4fd12",
       "output": {
         "path": "public/ui/mobs/gloomshade.webp",
         "bytes": 2556,
@@ -2412,6 +2482,7 @@
         "idle": "Idle",
         "height": 2.6,
         "yaw": null,
+        "portrait": null,
         "hover": null,
         "show": [
           "Barbarian_BearHat"
@@ -2439,7 +2510,7 @@
         "resolved": "#6c3483",
         "strength": 0.3
       },
-      "sourceFingerprint": "5680cd00806ae784399b25b7e9e99b42d9b51cac7049dad6d0c999e3fc1a3e81",
+      "sourceFingerprint": "3de17bbaaf379f92494cdcea2387eaef1481380157629763ae1be051f42b13b0",
       "output": {
         "path": "public/ui/mobs/gorrak.webp",
         "bytes": 2556,
@@ -2461,6 +2532,7 @@
         "idle": "Idle",
         "height": 2.6,
         "yaw": null,
+        "portrait": null,
         "hover": null,
         "show": [
           "Mage_Hat"
@@ -2488,7 +2560,7 @@
         "resolved": "#512e5f",
         "strength": 0.5
       },
-      "sourceFingerprint": "c5152e9c6abf5ced4589b1e2ee72050df1fa91febba28d98ced80ff4ff3f06e4",
+      "sourceFingerprint": "182c115b32ff080efa9c6ff4f31ca38c2784252104a860bc818c7e8c280878a8",
       "output": {
         "path": "public/ui/mobs/grand_necromancer_velkhar.webp",
         "bytes": 2122,
@@ -2510,6 +2582,7 @@
         "idle": "Idle",
         "height": 2.8,
         "yaw": null,
+        "portrait": null,
         "hover": null,
         "show": null,
         "attach": [],
@@ -2522,7 +2595,7 @@
         "resolved": "#564a3a",
         "strength": 0.12
       },
-      "sourceFingerprint": "3d39a2ad5e8524e9a4030a11a2df8b71c66c69931180b7a6a436704862e69b49",
+      "sourceFingerprint": "3583e6afc5e1f3b1352aa2635caa3f62f1e08ba957d3f32c94e20c0ae892f8f2",
       "output": {
         "path": "public/ui/mobs/grave_silt_bulwark.webp",
         "bytes": 2436,
@@ -2544,6 +2617,7 @@
         "idle": "Idle",
         "height": 2.6,
         "yaw": null,
+        "portrait": null,
         "hover": null,
         "show": [
           "Mage_Hat"
@@ -2571,7 +2645,7 @@
         "resolved": "#6c3483",
         "strength": 0.5
       },
-      "sourceFingerprint": "eaa3ea8b7a8e46d2ddc5b727c09429b47ab3969f33efb099c499e76dcb68212b",
+      "sourceFingerprint": "80387bd754f9a0714ed5c7cca25648ea29dcdc198fb5ffc72aa64b4d7b590d25",
       "output": {
         "path": "public/ui/mobs/gravecaller_cultist.webp",
         "bytes": 2110,
@@ -2593,6 +2667,7 @@
         "idle": "Idle",
         "height": 2.6,
         "yaw": null,
+        "portrait": null,
         "hover": null,
         "show": null,
         "attach": [
@@ -2630,7 +2705,7 @@
         "resolved": "#6b3a32",
         "strength": 0.3
       },
-      "sourceFingerprint": "7fe1561ccdfadfaed35de3b431bbe128c599f5994dcc1f27c32470d921cdf0a9",
+      "sourceFingerprint": "be92b476fff831113437214a05fa4bdd9b889b8eac732a4a164139fb717b29b7",
       "output": {
         "path": "public/ui/mobs/gravecaller_mender.webp",
         "bytes": 2200,
@@ -2652,6 +2727,7 @@
         "idle": "Idle",
         "height": 2.6,
         "yaw": null,
+        "portrait": null,
         "hover": null,
         "show": [
           "Mage_Hat"
@@ -2679,7 +2755,7 @@
         "resolved": "#884ea0",
         "strength": 0.5
       },
-      "sourceFingerprint": "54855323730d6eee59c03becaa303b333404892141ad9ef9bdbbe14e8003ccab",
+      "sourceFingerprint": "cc70bd5c487ed482612acd92c016e97f63bfd6f9ce4cca48bb462dce8793700c",
       "output": {
         "path": "public/ui/mobs/gravecaller_summoner.webp",
         "bytes": 2140,
@@ -2701,6 +2777,7 @@
         "idle": "Idle",
         "height": 2.6,
         "yaw": null,
+        "portrait": null,
         "hover": null,
         "show": [],
         "attach": [],
@@ -2713,7 +2790,7 @@
         "resolved": "#8a7a5a",
         "strength": 0.35
       },
-      "sourceFingerprint": "46fd70447b034cd4d00e066a456d2c44d5e41792b4dea8b83a1aca1fa693ab6c",
+      "sourceFingerprint": "42048a7a374c72441eb356fe8672b3d4180745861ac49f26f85b44e984f6f094",
       "output": {
         "path": "public/ui/mobs/gravedigger_mosley.webp",
         "bytes": 2716,
@@ -2735,6 +2812,7 @@
         "idle": "Idle_Combat",
         "height": 2.5,
         "yaw": null,
+        "portrait": null,
         "hover": null,
         "show": null,
         "attach": [],
@@ -2747,7 +2825,7 @@
         "resolved": "#8aa89a",
         "strength": 0.25
       },
-      "sourceFingerprint": "76dc2103e032148d6aebcee7ef2af92aa70940ff6eacb5c70d4cb0e9405c9c3d",
+      "sourceFingerprint": "aad0db38049ef16bda861c89e8c47d9bd8b9d3914ac7d8332427a708ea3e76a5",
       "output": {
         "path": "public/ui/mobs/graveguard.webp",
         "bytes": 2278,
@@ -2769,6 +2847,7 @@
         "idle": "Idle",
         "height": 2.6,
         "yaw": null,
+        "portrait": null,
         "hover": null,
         "show": null,
         "attach": [],
@@ -2781,7 +2860,7 @@
         "resolved": "#4e4a3a",
         "strength": 0.72
       },
-      "sourceFingerprint": "1d739235c146fe4a5742e01c488756225ecd6687fcf665bcfa98c5ebaa35b0b7",
+      "sourceFingerprint": "6e1ba716bc836f501ff4779b51c12d4ef88580b790348c74cc35f93c21ffeed0",
       "output": {
         "path": "public/ui/mobs/gravenbark_shambler.webp",
         "bytes": 1634,
@@ -2803,6 +2882,7 @@
         "idle": "Idle",
         "height": 2.1,
         "yaw": null,
+        "portrait": null,
         "hover": -0.07,
         "show": null,
         "attach": [],
@@ -2815,7 +2895,7 @@
         "resolved": null,
         "strength": null
       },
-      "sourceFingerprint": "567650aac78238ad2cab1193fe4b46a530e663aec185e3ca66c730639c7d6994",
+      "sourceFingerprint": "35bb11e650fe4e9d8e7e901dbf2495a6f18162e1a7918e18ac53cedf5e9a26f5",
       "output": {
         "path": "public/ui/mobs/grix_the_tunnelking.webp",
         "bytes": 2822,
@@ -2837,6 +2917,7 @@
         "idle": "Idle",
         "height": 2.9,
         "yaw": null,
+        "portrait": null,
         "hover": null,
         "show": null,
         "attach": [],
@@ -2849,7 +2930,7 @@
         "resolved": "#145a32",
         "strength": 0.04
       },
-      "sourceFingerprint": "4fafc2b9a27054ffc9474187838ad4091de525a2be9ecad696a5f850b2de75c5",
+      "sourceFingerprint": "e5f14870c59764691ee5c25a9a0457ed272c922b4be3405d370a001d84bb49ce",
       "output": {
         "path": "public/ui/mobs/grubjaw.webp",
         "bytes": 2172,
@@ -2871,6 +2952,7 @@
         "idle": "Idle",
         "height": 2.1,
         "yaw": null,
+        "portrait": null,
         "hover": null,
         "show": null,
         "attach": [],
@@ -2883,7 +2965,7 @@
         "resolved": "#e8c878",
         "strength": 0.2
       },
-      "sourceFingerprint": "957b6ae15256764a970928e8a77a099a9636965bf22db56c6971564cdd19231e",
+      "sourceFingerprint": "dca7a2e0c14eafb318bc63bdf922df56be3e99cbbe08acb1721231d87ee213b2",
       "output": {
         "path": "public/ui/mobs/harvest_sprite.webp",
         "bytes": 1738,
@@ -2905,6 +2987,7 @@
         "idle": "Idle",
         "height": 2.1,
         "yaw": null,
+        "portrait": null,
         "hover": null,
         "show": null,
         "attach": [],
@@ -2917,7 +3000,7 @@
         "resolved": "#5a8a46",
         "strength": 0.2
       },
-      "sourceFingerprint": "9da432220776a23186325f6149bf94f38cce337b09cefc512424f50fcfd7d805",
+      "sourceFingerprint": "6cf8e63185e8531ca4d4076dab2bed6050e59141e82351c0d5c61062f8718f64",
       "output": {
         "path": "public/ui/mobs/hedge_gnome.webp",
         "bytes": 1710,
@@ -2939,6 +3022,7 @@
         "idle": "Idle",
         "height": 2.6,
         "yaw": null,
+        "portrait": null,
         "hover": null,
         "show": [
           "Knight_Helmet",
@@ -2967,7 +3051,7 @@
         "resolved": null,
         "strength": null
       },
-      "sourceFingerprint": "8fcc11ed0d016fd378776558bbf057b546172a78157a9af430679a7bb15cb0b5",
+      "sourceFingerprint": "61faba113f6f64cd41360e94b47948b83c1d6e384bbf698ccc48bbe48ba54e6a",
       "output": {
         "path": "public/ui/mobs/hedge_knight.webp",
         "bytes": 2206,
@@ -2989,6 +3073,7 @@
         "idle": "Idle",
         "height": 2.3,
         "yaw": null,
+        "portrait": null,
         "hover": null,
         "show": null,
         "attach": [],
@@ -3001,7 +3086,7 @@
         "resolved": "#c8503c",
         "strength": 0.35
       },
-      "sourceFingerprint": "da1c7342d9c1815c8b3d83b1b0098b141127797d4b324e9f74ce1db12c179892",
+      "sourceFingerprint": "8359c2ce456bc69c3bc87560d06f703f4c32a2b17c0da6ac686186e92f565b00",
       "output": {
         "path": "public/ui/mobs/heroic_boss_dummy.webp",
         "bytes": 1838,
@@ -3023,6 +3108,7 @@
         "idle": "Idle_Combat",
         "height": 2.5,
         "yaw": null,
+        "portrait": null,
         "hover": null,
         "show": null,
         "attach": [
@@ -3048,7 +3134,7 @@
         "resolved": "#5b2c6f",
         "strength": 0.25
       },
-      "sourceFingerprint": "555a4eb8b64adebc47a1c69ea4fcca16eb9406bb8499d24328f3752786d9c2be",
+      "sourceFingerprint": "eb16fa44a1f293feb594679899d274dadc0bff45d9d519845925a9461ad81a7c",
       "output": {
         "path": "public/ui/mobs/hollow_acolyte.webp",
         "bytes": 2212,
@@ -3070,6 +3156,7 @@
         "idle": "Flying_Idle",
         "height": 1.6,
         "yaw": null,
+        "portrait": null,
         "hover": 0.4,
         "show": null,
         "attach": [],
@@ -3082,7 +3169,7 @@
         "resolved": "#bfe4ff",
         "strength": 0.55
       },
-      "sourceFingerprint": "b7086ce51ffe94ee6c03f73bd9a93641c59015722f68116bc5d16d277ca1612c",
+      "sourceFingerprint": "53e362bca2c4c4214696825e3b0d407bd78f55bd23627051a8b442587a680474",
       "output": {
         "path": "public/ui/mobs/ice_wisp.webp",
         "bytes": 1644,
@@ -3104,6 +3191,7 @@
         "idle": "Idle",
         "height": 3.4,
         "yaw": null,
+        "portrait": null,
         "hover": null,
         "show": null,
         "attach": [],
@@ -3121,7 +3209,7 @@
         "resolved": "#9aa87e",
         "strength": 0.25
       },
-      "sourceFingerprint": "a9f067ed819544d90b5bc5a4f463a464fb8edb6357611c80c779c3021d233ed7",
+      "sourceFingerprint": "c6be51ffe216ccdaaf226c1825098a20815116bdc31195cc83a102d4d8773f24",
       "output": {
         "path": "public/ui/mobs/idol_guardian.webp",
         "bytes": 2874,
@@ -3143,6 +3231,7 @@
         "idle": "Idle",
         "height": 2.1,
         "yaw": null,
+        "portrait": null,
         "hover": null,
         "show": null,
         "attach": [],
@@ -3155,7 +3244,7 @@
         "resolved": "#b0823a",
         "strength": 0.2
       },
-      "sourceFingerprint": "680b401700cf946d9690c5f74fb0ccd9fb74b42541a600d343bf8917d0829858",
+      "sourceFingerprint": "c31a7c9e6af6bf3c604a4d9f20879405981d8ddbe6b4e6ae42e84a77735bdb7e",
       "output": {
         "path": "public/ui/mobs/ironvein_foreman.webp",
         "bytes": 1694,
@@ -3177,6 +3266,7 @@
         "idle": "Idle",
         "height": 2.1,
         "yaw": null,
+        "portrait": null,
         "hover": null,
         "show": null,
         "attach": [],
@@ -3189,7 +3279,7 @@
         "resolved": "#8f6b34",
         "strength": 0.2
       },
-      "sourceFingerprint": "2693a4ba049f7f402c10e1a91aa6cec0f9ad6a6724066e22bfd587a29695c039",
+      "sourceFingerprint": "09903f5e921ab94b2975351d11f81a5cb353c6e35907fd1788975d1084fb5f63",
       "output": {
         "path": "public/ui/mobs/ironvein_sapper.webp",
         "bytes": 1622,
@@ -3211,6 +3301,7 @@
         "idle": "Idle_Combat",
         "height": 2.5,
         "yaw": null,
+        "portrait": null,
         "hover": null,
         "show": null,
         "attach": [],
@@ -3223,7 +3314,7 @@
         "resolved": "#95a5a6",
         "strength": 0.25
       },
-      "sourceFingerprint": "f5df3b7c1a4b21edb7b1e5088cfbafaef69d3b507b78abe7a17cdc37b23aa23f",
+      "sourceFingerprint": "10a5767bd32f3613d9d26a89f1fa5bae748a41cecb21617e5bbb1869de92f63d",
       "output": {
         "path": "public/ui/mobs/knight_commander_olen.webp",
         "bytes": 2272,
@@ -3245,6 +3336,7 @@
         "idle": "Idle",
         "height": 2.8,
         "yaw": null,
+        "portrait": null,
         "hover": null,
         "show": null,
         "attach": [],
@@ -3257,7 +3349,7 @@
         "resolved": "#8f6f46",
         "strength": 0.12
       },
-      "sourceFingerprint": "a0302554a6d323032808701d6cdbc14bd464ecefaf491ee50c9bf5ff5c207022",
+      "sourceFingerprint": "7e12369478822012397fdc1fa62ba72d428e8a769a5fb8a83dc8c22fa0b36097",
       "output": {
         "path": "public/ui/mobs/korgath_the_bound.webp",
         "bytes": 2432,
@@ -3279,6 +3371,7 @@
         "idle": "Flying_Idle",
         "height": 2.4,
         "yaw": null,
+        "portrait": null,
         "hover": 0.25,
         "show": null,
         "attach": [],
@@ -3291,7 +3384,7 @@
         "resolved": "#3d5c45",
         "strength": 0.2
       },
-      "sourceFingerprint": "fcb7f89c02987b23574ea2a1e137371ea7ca8b37696c28167b04cb7d3cdd3cd0",
+      "sourceFingerprint": "6deb5a955810f1424770098750f9be74f2477563666f74ee6cabac9a8d143b78",
       "output": {
         "path": "public/ui/mobs/korzul_the_gravewyrm.webp",
         "bytes": 2172,
@@ -3313,6 +3406,7 @@
         "idle": "Flying_Idle",
         "height": 1.6,
         "yaw": null,
+        "portrait": null,
         "hover": 0.4,
         "show": null,
         "attach": [],
@@ -3325,7 +3419,7 @@
         "resolved": "#d0f2c8",
         "strength": 0.55
       },
-      "sourceFingerprint": "48f6a19516a4afe9f269ab9a4a8e9d9e456c65bdbceb6a0cf35fd967f0bc075f",
+      "sourceFingerprint": "ff854d3e52be5b09435ea29fee43350359ee693e907658766ef1d39dc9efc6ce",
       "output": {
         "path": "public/ui/mobs/lily_wisp.webp",
         "bytes": 1730,
@@ -3347,6 +3441,7 @@
         "idle": "Idle_Combat",
         "height": 2.5,
         "yaw": null,
+        "portrait": null,
         "hover": null,
         "show": null,
         "attach": [],
@@ -3359,7 +3454,7 @@
         "resolved": "#d8d0bd",
         "strength": 0.25
       },
-      "sourceFingerprint": "0eb028160ba1181f910e1254da5525112679fed19b6044b6aafb6179fd91b03f",
+      "sourceFingerprint": "359475755ac012f4cdfa173cf6a14996e931a95d17aaa1bb9917d6bca5022951",
       "output": {
         "path": "public/ui/mobs/marrowlord_varkas.webp",
         "bytes": 2316,
@@ -3381,6 +3476,7 @@
         "idle": "Idle",
         "height": 1.7,
         "yaw": null,
+        "portrait": null,
         "hover": null,
         "show": null,
         "attach": [],
@@ -3393,7 +3489,7 @@
         "resolved": "#a8b048",
         "strength": 0.45
       },
-      "sourceFingerprint": "9c5f884b7f04a298c7b5b4b99c8bbb3bd11ce37bf86e885ba7755d53b00e116d",
+      "sourceFingerprint": "23481acbc20da23aabe2116dc59a2ab42dc0e6058c27aefddc8c8f8ae681e964",
       "output": {
         "path": "public/ui/mobs/mere_lurker.webp",
         "bytes": 1912,
@@ -3415,6 +3511,7 @@
         "idle": "Idle",
         "height": 1.6,
         "yaw": null,
+        "portrait": null,
         "hover": null,
         "show": null,
         "attach": [],
@@ -3427,7 +3524,7 @@
         "resolved": "#4d5656",
         "strength": 0.35
       },
-      "sourceFingerprint": "e1b4b7c59b4d85f358400a311e96aa69866324f6b1f2b2daa43ec50e51cdaaa3",
+      "sourceFingerprint": "0802b33d0058d74c089da3443d064ad6c39dedc066d4a3bab1c51b376b802add",
       "output": {
         "path": "public/ui/mobs/mire_prowler.webp",
         "bytes": 1820,
@@ -3449,6 +3546,7 @@
         "idle": "Spider_Idle",
         "height": 1.4,
         "yaw": null,
+        "portrait": null,
         "hover": null,
         "show": null,
         "attach": [],
@@ -3461,7 +3559,7 @@
         "resolved": "#283747",
         "strength": 0.35
       },
-      "sourceFingerprint": "1565161d6df612ac3e6e6c17fbdb6299292d200aad7689e6baee1508de845fdc",
+      "sourceFingerprint": "18b3b10db54055e96a044800a87b026941d1a2b3a7be091fb931759e5389406f",
       "output": {
         "path": "public/ui/mobs/mire_widow.webp",
         "bytes": 1558,
@@ -3483,6 +3581,7 @@
         "idle": "Spider_Idle",
         "height": 1.4,
         "yaw": null,
+        "portrait": null,
         "hover": null,
         "show": null,
         "attach": [],
@@ -3495,7 +3594,7 @@
         "resolved": "#641e16",
         "strength": 0.35
       },
-      "sourceFingerprint": "9d7bbbb78dea35e9b7b6ecb4831e8b1cea102583464051fe65d69892736d13dc",
+      "sourceFingerprint": "2ef8aef49ab0d629b72d354a144d8f386a379a7fecbfa2b31415be296ac5c103",
       "output": {
         "path": "public/ui/mobs/mirefen_broodmother.webp",
         "bytes": 1662,
@@ -3517,6 +3616,7 @@
         "idle": "Spider_Idle",
         "height": 1.4,
         "yaw": null,
+        "portrait": null,
         "hover": null,
         "show": null,
         "attach": [],
@@ -3529,7 +3629,7 @@
         "resolved": "#2e2a34",
         "strength": 0.35
       },
-      "sourceFingerprint": "669698ab3bfa546c92414ab56e10637b199735b3560bf40cea20c966ec499647",
+      "sourceFingerprint": "90fd544ead8da5cf61ed8689a98c93d968d99aec4d1aa609a4a849f04ef1b380",
       "output": {
         "path": "public/ui/mobs/mirefen_widowling.webp",
         "bytes": 1660,
@@ -3551,6 +3651,7 @@
         "idle": "Idle",
         "height": 1.7,
         "yaw": null,
+        "portrait": null,
         "hover": null,
         "show": null,
         "attach": [],
@@ -3563,7 +3664,7 @@
         "resolved": "#1abc9c",
         "strength": 0.45
       },
-      "sourceFingerprint": "6656adbd3ca8fe9b38da681d5c4364427839945c150c2f0b5b4e2ad4d15f5d88",
+      "sourceFingerprint": "61527f59c19bb42764768dbdcefe0dc7f4870a8fb8523f25b824352bb1cdf290",
       "output": {
         "path": "public/ui/mobs/mirejaw_frenzy.webp",
         "bytes": 1876,
@@ -3585,6 +3686,7 @@
         "idle": "Idle",
         "height": 1.7,
         "yaw": null,
+        "portrait": null,
         "hover": null,
         "show": null,
         "attach": [],
@@ -3597,7 +3699,7 @@
         "resolved": "#1abc9c",
         "strength": 0.45
       },
-      "sourceFingerprint": "6656adbd3ca8fe9b38da681d5c4364427839945c150c2f0b5b4e2ad4d15f5d88",
+      "sourceFingerprint": "61527f59c19bb42764768dbdcefe0dc7f4870a8fb8523f25b824352bb1cdf290",
       "output": {
         "path": "public/ui/mobs/mirejaw_the_ravenous.webp",
         "bytes": 1876,
@@ -3619,6 +3721,7 @@
         "idle": "Idle",
         "height": 2.6,
         "yaw": null,
+        "portrait": null,
         "hover": null,
         "show": [
           "Barbarian_BearHat"
@@ -3646,7 +3749,7 @@
         "resolved": "#8e5b33",
         "strength": 0.3
       },
-      "sourceFingerprint": "54b9b8b14eae4864ae83ad629ef185c37ae34a19b234297e744d8f675b08a2bc",
+      "sourceFingerprint": "8b3b9033e84e2e28ac2d89a5f703e9a9bac03534014edea56de058841463fc5f",
       "output": {
         "path": "public/ui/mobs/mogger.webp",
         "bytes": 2568,
@@ -3668,6 +3771,7 @@
         "idle": "Idle",
         "height": 2.6,
         "yaw": null,
+        "portrait": null,
         "hover": null,
         "show": null,
         "attach": [
@@ -3705,7 +3809,7 @@
         "resolved": "#6b3a32",
         "strength": 0.3
       },
-      "sourceFingerprint": "7fe1561ccdfadfaed35de3b431bbe128c599f5994dcc1f27c32470d921cdf0a9",
+      "sourceFingerprint": "be92b476fff831113437214a05fa4bdd9b889b8eac732a4a164139fb717b29b7",
       "output": {
         "path": "public/ui/mobs/mogger_lackey.webp",
         "bytes": 2200,
@@ -3727,6 +3831,7 @@
         "idle": "Idle",
         "height": 1.7,
         "yaw": null,
+        "portrait": null,
         "hover": null,
         "show": null,
         "attach": [],
@@ -3739,7 +3844,7 @@
         "resolved": "#e6e9f4",
         "strength": 0.3
       },
-      "sourceFingerprint": "afae5a12eed56e08ecbed814b6f68645772320af608b65937892e9f3a0c43483",
+      "sourceFingerprint": "0ee297bcc09d244bca57c10fbd19306179bcf51e6bd4f4a05e15bdf4f175bd33",
       "output": {
         "path": "public/ui/mobs/moonfleece_grazer.webp",
         "bytes": 1486,
@@ -3761,6 +3866,7 @@
         "idle": "Idle",
         "height": 1.7,
         "yaw": null,
+        "portrait": null,
         "hover": null,
         "show": null,
         "attach": [],
@@ -3773,7 +3879,7 @@
         "resolved": "#cfe0ff",
         "strength": 0.45
       },
-      "sourceFingerprint": "29eb0a06d999a18a5bfc6f401065454949cd6aa2cbc0a71c45ad9857d76cd611",
+      "sourceFingerprint": "a20fa4ca701d3dbb9260c4ab59f8efba819d48b072385414c313c750407dc3e6",
       "output": {
         "path": "public/ui/mobs/moonspawn.webp",
         "bytes": 1788,
@@ -3795,6 +3901,7 @@
         "idle": "Idle",
         "height": 1.7,
         "yaw": null,
+        "portrait": null,
         "hover": null,
         "show": null,
         "attach": [],
@@ -3807,7 +3914,7 @@
         "resolved": "#d8d0c0",
         "strength": 0.3
       },
-      "sourceFingerprint": "8042f655ae218f964b46cba65aefa9262276caa26e6b853eeaec13823df1a610",
+      "sourceFingerprint": "fd833ab5e54f219f3018b84558d460e9a594ab1e1af2dced2c1349f79a4f44b8",
       "output": {
         "path": "public/ui/mobs/moor_ram.webp",
         "bytes": 1408,
@@ -3829,6 +3936,7 @@
         "idle": "Idle_Combat",
         "height": 2.5,
         "yaw": null,
+        "portrait": null,
         "hover": null,
         "show": null,
         "attach": [
@@ -3854,7 +3962,7 @@
         "resolved": "#4a235a",
         "strength": 0.25
       },
-      "sourceFingerprint": "cf20a028c0fcd49d6c62f6704fcbb9b933c6c3cb58ebcc6e54e8dcf3edd0848f",
+      "sourceFingerprint": "e7f57caa05e2e4dac4edd0f5fa5565562d07da6533516bc0810a006f8a517b9b",
       "output": {
         "path": "public/ui/mobs/morthen.webp",
         "bytes": 2212,
@@ -3876,6 +3984,7 @@
         "idle": "Idle",
         "height": 1.7,
         "yaw": null,
+        "portrait": null,
         "hover": null,
         "show": null,
         "attach": [],
@@ -3888,7 +3997,7 @@
         "resolved": "#52be80",
         "strength": 0.45
       },
-      "sourceFingerprint": "551fb5de52948e20da32c0b74593cb959b6ae815684a0e31cb2243354054683b",
+      "sourceFingerprint": "518fb262f9dd8db2c3f3cc250669a755fdd5ccdf09ac184f1066c42e033ec270",
       "output": {
         "path": "public/ui/mobs/mudfin_murloc.webp",
         "bytes": 1852,
@@ -3910,6 +4019,7 @@
         "idle": "Idle",
         "height": 2.6,
         "yaw": -1.5707963267948966,
+        "portrait": null,
         "hover": null,
         "show": null,
         "attach": [],
@@ -3922,7 +4032,7 @@
         "resolved": "#d8c4f0",
         "strength": 0.2
       },
-      "sourceFingerprint": "8ae67cb4021bc80265408b580d63195847f10f7e11af3f6a936cca89e101e870",
+      "sourceFingerprint": "53ffa6bf74c9418b0f0f1f06c24a1a688b428bcb17d83171de8f462a1e9c7508",
       "output": {
         "path": "public/ui/mobs/mushroom_pixie.webp",
         "bytes": 2514,
@@ -3944,6 +4054,7 @@
         "idle": "Idle_Combat",
         "height": 2.5,
         "yaw": null,
+        "portrait": null,
         "hover": null,
         "show": null,
         "attach": [
@@ -3969,7 +4080,7 @@
         "resolved": "#9bc5b4",
         "strength": 0.25
       },
-      "sourceFingerprint": "a871b80e65654961d1204757e6926ae3d6324f813222114304118479f7456d60",
+      "sourceFingerprint": "d433706fc33df093745d560008852bc66f905f42d96fad0574803b4df974db93",
       "output": {
         "path": "public/ui/mobs/necromancy_bone_mage.webp",
         "bytes": 2228,
@@ -3991,6 +4102,7 @@
         "idle": "Idle",
         "height": 2.4,
         "yaw": -1.5707963267948966,
+        "portrait": null,
         "hover": null,
         "show": null,
         "attach": [],
@@ -4003,7 +4115,7 @@
         "resolved": null,
         "strength": null
       },
-      "sourceFingerprint": "038b3f2553d81a4373e93733fff792cd056dca01d7fd09c00c000c8fa4caaf9d",
+      "sourceFingerprint": "c960d7ba0327214d7d61ff3b7474e9002ffac4b97f6fec96f7f6f9f210925ccb",
       "output": {
         "path": "public/ui/mobs/necromancy_gravewing.webp",
         "bytes": 2630,
@@ -4025,6 +4137,7 @@
         "idle": "Idle_Combat",
         "height": 2.5,
         "yaw": null,
+        "portrait": null,
         "hover": null,
         "show": null,
         "attach": [],
@@ -4037,7 +4150,7 @@
         "resolved": "#c7d0bd",
         "strength": 0.25
       },
-      "sourceFingerprint": "bf2198d09351b19170955448e1e8f63e12abf1449bc17dcca3c3750220e0f362",
+      "sourceFingerprint": "7c103a38ca7714367b95f0d26b267e183cb765d3bc880cc0c67ee396141ce5df",
       "output": {
         "path": "public/ui/mobs/necromancy_skeletal_warrior.webp",
         "bytes": 2812,
@@ -4059,6 +4172,7 @@
         "idle": "Idle",
         "height": 2.6,
         "yaw": null,
+        "portrait": null,
         "hover": null,
         "show": null,
         "attach": [
@@ -4096,7 +4210,7 @@
         "resolved": "#6b3a32",
         "strength": 0.3
       },
-      "sourceFingerprint": "7fe1561ccdfadfaed35de3b431bbe128c599f5994dcc1f27c32470d921cdf0a9",
+      "sourceFingerprint": "be92b476fff831113437214a05fa4bdd9b889b8eac732a4a164139fb717b29b7",
       "output": {
         "path": "public/ui/mobs/nhalia_mourner.webp",
         "bytes": 2200,
@@ -4118,6 +4232,7 @@
         "idle": "Flying_Idle",
         "height": 1.9,
         "yaw": null,
+        "portrait": null,
         "hover": 0.3,
         "show": null,
         "attach": [],
@@ -4130,7 +4245,7 @@
         "resolved": "#8fa8e0",
         "strength": 0.3
       },
-      "sourceFingerprint": "5cab4fcf97eea1e185b7bea27a0d146329a344f05b0b29a7eaafea9ed9ccff70",
+      "sourceFingerprint": "d3c24980e2f0b3353c2a17bf8dae0ddb8654d0b5550f7487594c2539f6bbdcb3",
       "output": {
         "path": "public/ui/mobs/nightkin_stargazer.webp",
         "bytes": 1644,
@@ -4152,6 +4267,7 @@
         "idle": "Idle",
         "height": 2.3,
         "yaw": null,
+        "portrait": null,
         "hover": null,
         "show": null,
         "attach": [],
@@ -4164,7 +4280,7 @@
         "resolved": "#8c5ac8",
         "strength": 0.35
       },
-      "sourceFingerprint": "f812d654f4fbd72e10b9e81eea38e32c671c6a5be5d7df50e542050ac2d341e1",
+      "sourceFingerprint": "fb8e9753e4d662e7a73f01271cdcd2d97219b0ec5fa805150443af5668e057b5",
       "output": {
         "path": "public/ui/mobs/normal_boss_dummy.webp",
         "bytes": 1778,
@@ -4186,6 +4302,7 @@
         "idle": "Idle_Combat",
         "height": 2.5,
         "yaw": null,
+        "portrait": null,
         "hover": null,
         "show": null,
         "attach": [],
@@ -4198,7 +4315,7 @@
         "resolved": "#6b4a89",
         "strength": 0.25
       },
-      "sourceFingerprint": "9904ddfd327046a993e0ddc2049a082a569d9f5a85586fc4feae33c68d5a9875",
+      "sourceFingerprint": "3c5c774b94025ed8094c38cb438602ea23f4f714af855c97a99ae177c2303c6d",
       "output": {
         "path": "public/ui/mobs/nythraxis_heroic_priest_add.webp",
         "bytes": 2610,
@@ -4220,6 +4337,7 @@
         "idle": "Idle_Combat",
         "height": 2.5,
         "yaw": null,
+        "portrait": null,
         "hover": null,
         "show": null,
         "attach": [],
@@ -4232,7 +4350,7 @@
         "resolved": "#776f83",
         "strength": 0.25
       },
-      "sourceFingerprint": "79285356f8cb67bf9c79ba31a5c02de84c717211716bf7082c2a9e2a723b3a29",
+      "sourceFingerprint": "8319ac0cb94f03382fbeab5bcab7703aaf7b8292a08abc5fd8118c1db58383e4",
       "output": {
         "path": "public/ui/mobs/nythraxis_heroic_rogue_add.webp",
         "bytes": 2494,
@@ -4254,6 +4372,7 @@
         "idle": "Idle_Combat",
         "height": 2.5,
         "yaw": null,
+        "portrait": null,
         "hover": null,
         "show": null,
         "attach": [],
@@ -4266,7 +4385,7 @@
         "resolved": "#c7c0b2",
         "strength": 0.25
       },
-      "sourceFingerprint": "15a9ba1994093dfd3d4471548d0949ccd93de4a0b8785e0ea37607a738cefd51",
+      "sourceFingerprint": "a95c19ddafdeef79d56525e29167a77cf371a3d802b93ec27baf9cd40855ca7f",
       "output": {
         "path": "public/ui/mobs/nythraxis_heroic_warrior_add.webp",
         "bytes": 2282,
@@ -4288,6 +4407,7 @@
         "idle": "Idle",
         "height": 3.4,
         "yaw": null,
+        "portrait": null,
         "hover": null,
         "show": null,
         "attach": [],
@@ -4305,7 +4425,7 @@
         "resolved": "#221b2d",
         "strength": 0.25
       },
-      "sourceFingerprint": "aa8b952f12c1e72852c11ea6ef2ef9e2f90dad36ad9649eb0f7e38542f9c3ca7",
+      "sourceFingerprint": "dfb96690c0444211155fad4ae0105b5b350f6166674985125dd742bf87cf7a65",
       "output": {
         "path": "public/ui/mobs/nythraxis_scourge_of_thornpeak.webp",
         "bytes": 2778,
@@ -4327,6 +4447,7 @@
         "idle": "Idle_Combat",
         "height": 2.5,
         "yaw": null,
+        "portrait": null,
         "hover": null,
         "show": null,
         "attach": [],
@@ -4339,7 +4460,7 @@
         "resolved": "#c7c0b2",
         "strength": 0.25
       },
-      "sourceFingerprint": "15a9ba1994093dfd3d4471548d0949ccd93de4a0b8785e0ea37607a738cefd51",
+      "sourceFingerprint": "a95c19ddafdeef79d56525e29167a77cf371a3d802b93ec27baf9cd40855ca7f",
       "output": {
         "path": "public/ui/mobs/nythraxis_skeleton_warrior.webp",
         "bytes": 2282,
@@ -4361,6 +4482,7 @@
         "idle": "Idle",
         "height": 2.8,
         "yaw": null,
+        "portrait": null,
         "hover": null,
         "show": null,
         "attach": [],
@@ -4373,7 +4495,7 @@
         "resolved": "#7e5c3e",
         "strength": 0.12
       },
-      "sourceFingerprint": "784b48f069f27d00cb74bef308cb2cb6ff0e59604c24018acdc8eb8233ab2cd8",
+      "sourceFingerprint": "b5e7ade7e2ca3f81cefe1b64f902f685d97aa06b84c3df9b49a8d8d1e45de125",
       "output": {
         "path": "public/ui/mobs/ogre_crusher.webp",
         "bytes": 2394,
@@ -4395,6 +4517,7 @@
         "idle": "Idle",
         "height": 2.2,
         "yaw": null,
+        "portrait": null,
         "hover": null,
         "show": null,
         "attach": [],
@@ -4407,7 +4530,7 @@
         "resolved": "#5a4030",
         "strength": 0.5
       },
-      "sourceFingerprint": "9d9c62362e9d5d894cef31ff20e661aadb53eb987384a937bc29d47032e0e75e",
+      "sourceFingerprint": "13f32a4505e56bc5e7889d86a6d7f0cbeaf99f729556b4eea88b5072f88b1f68",
       "output": {
         "path": "public/ui/mobs/old_cragmaw.webp",
         "bytes": 1732,
@@ -4429,6 +4552,7 @@
         "idle": "Idle",
         "height": 2.2,
         "yaw": null,
+        "portrait": null,
         "hover": null,
         "show": null,
         "attach": [],
@@ -4441,7 +4565,7 @@
         "resolved": null,
         "strength": null
       },
-      "sourceFingerprint": "72c1fdff96d0f6a368720e97d0a401e43e66d9b73e14abafae21741a4c725324",
+      "sourceFingerprint": "69a9ba4edb991e40890e1658793855938d3c2892e0762a4fd6fdf99f1598ba46",
       "output": {
         "path": "public/ui/mobs/old_greyjaw.webp",
         "bytes": 2046,
@@ -4463,6 +4587,7 @@
         "idle": "Idle",
         "height": 1.7,
         "yaw": null,
+        "portrait": null,
         "hover": null,
         "show": null,
         "attach": [],
@@ -4475,7 +4600,7 @@
         "resolved": "#8fb8d8",
         "strength": 0.35
       },
-      "sourceFingerprint": "56b55e0083ddb0c25aee478c4534e5b2884ed21d8bb5662a4093ce0b5be375d7",
+      "sourceFingerprint": "5ecae715bd405debcfee4b1b4567dc601d1b3d5b5ac9fcff997cd5115bbc6d2d",
       "output": {
         "path": "public/ui/mobs/old_marrowshell.webp",
         "bytes": 2076,
@@ -4497,6 +4622,7 @@
         "idle": "Idle",
         "height": 2.6,
         "yaw": null,
+        "portrait": null,
         "hover": null,
         "show": null,
         "attach": [],
@@ -4509,7 +4635,7 @@
         "resolved": "#c89838",
         "strength": 0.72
       },
-      "sourceFingerprint": "cab66f4375f2d2a8b121a4e4723879a45694d3fb83b6fa782682c398311b7bd6",
+      "sourceFingerprint": "1d92a1c5f06a7e860850b1637abe7ddd9d989e5afc8562e1849b33fecac7c76e",
       "output": {
         "path": "public/ui/mobs/orchard_treant.webp",
         "bytes": 2096,
@@ -4531,6 +4657,7 @@
         "idle": "Idle",
         "height": 2.6,
         "yaw": null,
+        "portrait": null,
         "hover": null,
         "show": null,
         "attach": [
@@ -4568,7 +4695,7 @@
         "resolved": "#6b3a32",
         "strength": 0.3
       },
-      "sourceFingerprint": "7fe1561ccdfadfaed35de3b431bbe128c599f5994dcc1f27c32470d921cdf0a9",
+      "sourceFingerprint": "be92b476fff831113437214a05fa4bdd9b889b8eac732a4a164139fb717b29b7",
       "output": {
         "path": "public/ui/mobs/pale_choir_acolyte.webp",
         "bytes": 2200,
@@ -4590,6 +4717,7 @@
         "idle": "Idle_Combat",
         "height": 2.5,
         "yaw": null,
+        "portrait": null,
         "hover": null,
         "show": null,
         "attach": [],
@@ -4602,7 +4730,7 @@
         "resolved": "#c8d8c0",
         "strength": 0.25
       },
-      "sourceFingerprint": "71f823ff7d64b9b72328ab456a3e915abe694d7577dc59ec643917df6422e27a",
+      "sourceFingerprint": "001bb53b5f7c0f2fe72fa00a3863302c38d0dc1fb257559940e9442a0e23132f",
       "output": {
         "path": "public/ui/mobs/pale_huntsman.webp",
         "bytes": 2566,
@@ -4624,6 +4752,7 @@
         "idle": "Flying_Idle",
         "height": 2.2,
         "yaw": null,
+        "portrait": null,
         "hover": 0.3,
         "show": null,
         "attach": [],
@@ -4636,7 +4765,7 @@
         "resolved": "#9fc6e0",
         "strength": 0.4
       },
-      "sourceFingerprint": "58c764cae0ffca67adf03aaa21454e6538d4847dea0bb74c846f3099b3e68529",
+      "sourceFingerprint": "886281d3e21b76577f88a3bbfa69a3ee44904e4927c554c7c9c292f9a387a7c5",
       "output": {
         "path": "public/ui/mobs/pearlguard_sentinel.webp",
         "bytes": 2018,
@@ -4658,6 +4787,7 @@
         "idle": "Idle",
         "height": 2.5,
         "yaw": -1.5707963267948966,
+        "portrait": null,
         "hover": null,
         "show": null,
         "attach": [],
@@ -4670,7 +4800,7 @@
         "resolved": null,
         "strength": null
       },
-      "sourceFingerprint": "9543027f2d0927ff688b05dcba243ff4d1701a4105384257a2bf613e82704783",
+      "sourceFingerprint": "5b29d0140de4456fd5d5b5c1220113777a2360a5abf27bdf8456256b40752224",
       "output": {
         "path": "public/ui/mobs/pyre_colossus.webp",
         "bytes": 2252,
@@ -4692,6 +4822,7 @@
         "idle": "Idle_Combat",
         "height": 2.5,
         "yaw": null,
+        "portrait": null,
         "hover": null,
         "show": null,
         "attach": [],
@@ -4704,7 +4835,7 @@
         "resolved": "#c8cfc8",
         "strength": 0.25
       },
-      "sourceFingerprint": "f03c004f0931165a6f4b3b58ee466ed2264d3f816446f55016fa5eb9b2155cdd",
+      "sourceFingerprint": "fc1df8f97d2a7a458fef55730251c84577cabc10db3f7b931319659aefc854ee",
       "output": {
         "path": "public/ui/mobs/raised_bonewalker.webp",
         "bytes": 2792,
@@ -4726,6 +4857,7 @@
         "idle": "Idle",
         "height": 2.6,
         "yaw": null,
+        "portrait": null,
         "hover": null,
         "show": null,
         "attach": [],
@@ -4738,7 +4870,7 @@
         "resolved": "#5b6b4a",
         "strength": 0.2
       },
-      "sourceFingerprint": "4667fee0fd2eee319adeac890d411780ed7f28524506732717e1bc1e5ad06126",
+      "sourceFingerprint": "23aed799ad27c82c5b15bbd031c2aee8a0b3fe458a1d58218c0896d11a0341eb",
       "output": {
         "path": "public/ui/mobs/reedbound_acolyte.webp",
         "bytes": 2122,
@@ -4760,6 +4892,7 @@
         "idle": "Idle_Combat",
         "height": 2.5,
         "yaw": null,
+        "portrait": null,
         "hover": null,
         "show": null,
         "attach": [],
@@ -4772,7 +4905,7 @@
         "resolved": "#b9b2a4",
         "strength": 0.25
       },
-      "sourceFingerprint": "20d06d20a8ed31e84b277128dcbc551f1c9700a100c5699ce9ba895979c17b1b",
+      "sourceFingerprint": "c825bc586bcddadefb6b59a3891163a6c756f850407b0cc0439d32695062412d",
       "output": {
         "path": "public/ui/mobs/reliquary_bonewalker.webp",
         "bytes": 2800,
@@ -4794,6 +4927,7 @@
         "idle": "Idle_Combat",
         "height": 2.5,
         "yaw": null,
+        "portrait": null,
         "hover": null,
         "show": null,
         "attach": [
@@ -4819,7 +4953,7 @@
         "resolved": "#8a8070",
         "strength": 0.45
       },
-      "sourceFingerprint": "5b12bb757a84f19cc9a444ec74b10a8c5eae522003d47a7d0cb358e43f40aa08",
+      "sourceFingerprint": "9bf708219e6c13735c3c27916df7791b6016c6a037f26d9eab0c51ad31aff170",
       "output": {
         "path": "public/ui/mobs/reliquary_funeral_ringer.webp",
         "bytes": 2252,
@@ -4841,6 +4975,7 @@
         "idle": "Idle",
         "height": 2.6,
         "yaw": null,
+        "portrait": null,
         "hover": null,
         "show": [
           "Mage_Hat"
@@ -4868,7 +5003,7 @@
         "resolved": "#4a3828",
         "strength": 0.6
       },
-      "sourceFingerprint": "2df5a042979d1fa5ff1e0f9c7d44d0a07d0e31ec67b39a19248bfe12691ce1c7",
+      "sourceFingerprint": "fa1bf5a695e659b17dd8f3edca4f141ecbee6708a13c8f3dc4f43b998f726f9d",
       "output": {
         "path": "public/ui/mobs/reliquary_gravecall_acolyte.webp",
         "bytes": 2056,
@@ -4890,6 +5025,7 @@
         "idle": "Idle_Combat",
         "height": 2.5,
         "yaw": null,
+        "portrait": null,
         "hover": null,
         "show": null,
         "attach": [],
@@ -4902,7 +5038,7 @@
         "resolved": "#9ba8a0",
         "strength": 0.55
       },
-      "sourceFingerprint": "d704a1bc447e36ddcd1af412b50f89653792444aff18b586030eb4fb33e850f7",
+      "sourceFingerprint": "87c5bbd551a910b145e5f05f3489011ebd40ba983275f85a0a400d6e93a3808e",
       "output": {
         "path": "public/ui/mobs/reliquary_ledger_wraith.webp",
         "bytes": 2674,
@@ -4924,6 +5060,7 @@
         "idle": "Idle_Combat",
         "height": 2.5,
         "yaw": null,
+        "portrait": null,
         "hover": null,
         "show": null,
         "attach": [
@@ -4961,7 +5098,7 @@
         "resolved": "#c8beb0",
         "strength": 0.65
       },
-      "sourceFingerprint": "50c8e331648ce6237c79c7b8a3deee1dc94e979ea11c243d9bd86c055e87e369",
+      "sourceFingerprint": "adefca2cd841abee508547e78d2a7a4d8d3a054bb8e9978d1793a810d60839f8",
       "output": {
         "path": "public/ui/mobs/reliquary_saintless_effigy.webp",
         "bytes": 2260,
@@ -4983,6 +5120,7 @@
         "idle": "Idle_Combat",
         "height": 2.5,
         "yaw": null,
+        "portrait": null,
         "hover": null,
         "show": null,
         "attach": [],
@@ -4995,7 +5133,7 @@
         "resolved": "#d5dbdb",
         "strength": 0.25
       },
-      "sourceFingerprint": "7545d7ee4dac26300ea916a4bde2f0900bcc44d16a408dd90085cfdc939e0fe3",
+      "sourceFingerprint": "e50b31148c50e8df46dccece329b7f779940af709213bdb4cc0ad1a1e0af7de5",
       "output": {
         "path": "public/ui/mobs/restless_bones.webp",
         "bytes": 2826,
@@ -5017,6 +5155,7 @@
         "idle": "Idle",
         "height": 1.6,
         "yaw": null,
+        "portrait": null,
         "hover": null,
         "show": null,
         "attach": [],
@@ -5029,7 +5168,7 @@
         "resolved": "#8c8270",
         "strength": 0.35
       },
-      "sourceFingerprint": "8af1837aeff637d8122095d63ee7c7ce0b066a7b0ce29305fdb09a08d02e0902",
+      "sourceFingerprint": "a1a1b74dd664b8e71cad5ad371f905ee858ea2fcc64f0d6d4f1cc31a0644312c",
       "output": {
         "path": "public/ui/mobs/ridge_stalker.webp",
         "bytes": 1944,
@@ -5051,6 +5190,7 @@
         "idle": "Idle_Combat",
         "height": 2.5,
         "yaw": null,
+        "portrait": null,
         "hover": null,
         "show": null,
         "attach": [],
@@ -5063,7 +5203,7 @@
         "resolved": "#cfc8b0",
         "strength": 0.25
       },
-      "sourceFingerprint": "ed7f8839622b51a2454443b9008a355399aebe460c937d5c3605a0ed2098f987",
+      "sourceFingerprint": "8693aa23686e43a89fd0993f900f8be6f693f6b9222de688152d77d3bd9e390b",
       "output": {
         "path": "public/ui/mobs/rift_boneclad.webp",
         "bytes": 2820,
@@ -5085,6 +5225,7 @@
         "idle": "Idle_Combat",
         "height": 2.5,
         "yaw": null,
+        "portrait": null,
         "hover": null,
         "show": null,
         "attach": [],
@@ -5097,7 +5238,7 @@
         "resolved": "#c8cfc8",
         "strength": 0.25
       },
-      "sourceFingerprint": "f03c004f0931165a6f4b3b58ee466ed2264d3f816446f55016fa5eb9b2155cdd",
+      "sourceFingerprint": "fc1df8f97d2a7a458fef55730251c84577cabc10db3f7b931319659aefc854ee",
       "output": {
         "path": "public/ui/mobs/rift_bonewalker.webp",
         "bytes": 2792,
@@ -5119,6 +5260,7 @@
         "idle": "Idle",
         "height": 2.6,
         "yaw": null,
+        "portrait": null,
         "hover": null,
         "show": null,
         "attach": [
@@ -5156,7 +5298,7 @@
         "resolved": "#6b3a32",
         "strength": 0.3
       },
-      "sourceFingerprint": "7fe1561ccdfadfaed35de3b431bbe128c599f5994dcc1f27c32470d921cdf0a9",
+      "sourceFingerprint": "be92b476fff831113437214a05fa4bdd9b889b8eac732a4a164139fb717b29b7",
       "output": {
         "path": "public/ui/mobs/rift_boss_arcane.webp",
         "bytes": 2200,
@@ -5178,6 +5320,7 @@
         "idle": "Idle",
         "height": 2.8,
         "yaw": null,
+        "portrait": null,
         "hover": null,
         "show": null,
         "attach": [],
@@ -5190,7 +5333,7 @@
         "resolved": "#a07d4f",
         "strength": 0.12
       },
-      "sourceFingerprint": "90af9202386f33e3b289a569088da3c4577286ec9e784d25e78456d1896ad3f0",
+      "sourceFingerprint": "62edf60bc54308cd93845ea17944bfb8d1f8f5cb91397c3df9585cb9b55b9ce6",
       "output": {
         "path": "public/ui/mobs/rift_boss_brute.webp",
         "bytes": 2438,
@@ -5212,6 +5355,7 @@
         "idle": "Idle",
         "height": 2.1,
         "yaw": null,
+        "portrait": null,
         "hover": null,
         "show": null,
         "attach": [],
@@ -5224,7 +5368,7 @@
         "resolved": "#ff6b2c",
         "strength": 0.35
       },
-      "sourceFingerprint": "443fb08cf66c6bec41175cfef95b532b07a8a7e42db1388b49c8c4add5c98a81",
+      "sourceFingerprint": "32521b6a477d30bb785cd15fc40cfcf1874a8ea40b3f80f1cc7252fdea0e525d",
       "output": {
         "path": "public/ui/mobs/rift_boss_ember.webp",
         "bytes": 2080,
@@ -5246,6 +5390,7 @@
         "idle": "Idle_Combat",
         "height": 2.5,
         "yaw": null,
+        "portrait": null,
         "hover": null,
         "show": null,
         "attach": [],
@@ -5258,7 +5403,7 @@
         "resolved": "#d6f0ff",
         "strength": 0.25
       },
-      "sourceFingerprint": "ddaf678fbf30b1fe4ea30af022256def5f59e83b055f81d2d394439ac53aec44",
+      "sourceFingerprint": "1cbac2e8ee37877b19c633fb76e4aa2971eb042fa8b74bf45e8f3bb5e4c05e5d",
       "output": {
         "path": "public/ui/mobs/rift_boss_frost.webp",
         "bytes": 2804,
@@ -5280,6 +5425,7 @@
         "idle": "Idle_Combat",
         "height": 2.5,
         "yaw": null,
+        "portrait": null,
         "hover": null,
         "show": null,
         "attach": [],
@@ -5292,7 +5438,7 @@
         "resolved": "#b9c4a8",
         "strength": 0.25
       },
-      "sourceFingerprint": "fc6a0eb898a41d5e178efe0e55b0b5c21c5a076ea53f1e13a4960f72d60a3a6c",
+      "sourceFingerprint": "19ea028b741089c16d254da42094c0f832d7e70bed13972cc4a3e477ce968716",
       "output": {
         "path": "public/ui/mobs/rift_boss_necro.webp",
         "bytes": 2804,
@@ -5314,6 +5460,7 @@
         "idle": "Idle",
         "height": 2.1,
         "yaw": null,
+        "portrait": null,
         "hover": null,
         "show": null,
         "attach": [],
@@ -5326,7 +5473,7 @@
         "resolved": "#ff3a1a",
         "strength": 0.35
       },
-      "sourceFingerprint": "ba35837c70b66b3cd69dfb07082ccddbc03904746379f4ef2522ca7f72934e84",
+      "sourceFingerprint": "3c0e943f9d7954e30f182ce58a0b2cc72ced244148e02e10f7383d8fa0dfa329",
       "output": {
         "path": "public/ui/mobs/rift_boss_pitlord.webp",
         "bytes": 2064,
@@ -5348,6 +5495,7 @@
         "idle": "Idle_Combat",
         "height": 2.5,
         "yaw": null,
+        "portrait": null,
         "hover": null,
         "show": null,
         "attach": [],
@@ -5360,7 +5508,7 @@
         "resolved": "#8a1a1a",
         "strength": 0.8
       },
-      "sourceFingerprint": "0f0bf297f22ef5bbbee367edafbba15ec20648bd82f0f9addd5ab59b41871bd6",
+      "sourceFingerprint": "e6c8a59971f5d8024e36a2132b37ba33be75355c83cd22932a7f7ac9f9815ea4",
       "output": {
         "path": "public/ui/mobs/rift_boss_ritualist.webp",
         "bytes": 2284,
@@ -5382,6 +5530,7 @@
         "idle": "Flying_Idle",
         "height": 2.4,
         "yaw": null,
+        "portrait": null,
         "hover": 0.25,
         "show": null,
         "attach": [],
@@ -5394,7 +5543,7 @@
         "resolved": "#5dade2",
         "strength": 0.2
       },
-      "sourceFingerprint": "18882419bd7a7d33617506bf535223cbf515b58ec6d8e21a3feb3876bceec662",
+      "sourceFingerprint": "73f7625887d9741b8c4490e5a055a6c0b086df86d627c260c36e53b8284a18df",
       "output": {
         "path": "public/ui/mobs/rift_boss_storm.webp",
         "bytes": 2078,
@@ -5416,6 +5565,7 @@
         "idle": "Idle",
         "height": 1.7,
         "yaw": null,
+        "portrait": null,
         "hover": null,
         "show": null,
         "attach": [],
@@ -5428,7 +5578,7 @@
         "resolved": "#16a085",
         "strength": 0.45
       },
-      "sourceFingerprint": "87c629f1d2d946aa44ce69cc330e90cc5dc7097b85c4935ce52d263a3dcc6288",
+      "sourceFingerprint": "8bb4100eb828a807844a183d6bc223e9bb8be4a955c55eaa00d8fb113ec08517",
       "output": {
         "path": "public/ui/mobs/rift_boss_tide.webp",
         "bytes": 1830,
@@ -5450,6 +5600,7 @@
         "idle": "Spider_Idle",
         "height": 1.4,
         "yaw": null,
+        "portrait": null,
         "hover": null,
         "show": null,
         "attach": [],
@@ -5462,7 +5613,7 @@
         "resolved": "#7cb342",
         "strength": 0.35
       },
-      "sourceFingerprint": "3a8e911982e74762bf05fa2c48c2af0c90714232db3c247a4173f444911505ac",
+      "sourceFingerprint": "93171d0af2a23bbaf7eb6437ef506f8f50b71b34425c79dbac5318926644ad35",
       "output": {
         "path": "public/ui/mobs/rift_boss_venom.webp",
         "bytes": 1788,
@@ -5484,6 +5635,7 @@
         "idle": "Idle",
         "height": 2.1,
         "yaw": null,
+        "portrait": null,
         "hover": null,
         "show": null,
         "attach": [],
@@ -5496,7 +5648,7 @@
         "resolved": "#148f77",
         "strength": 0.2
       },
-      "sourceFingerprint": "9e8803aad3cf616ba65b1059896b6d0178a3394cee7742a57d8d9ba0dae8b306",
+      "sourceFingerprint": "a812eb0696baf16ece3a7c9e02e46a461e2b5ffd6f39ae37bcb51ca35971a4b7",
       "output": {
         "path": "public/ui/mobs/rift_deep_lurker.webp",
         "bytes": 1696,
@@ -5518,6 +5670,7 @@
         "idle": "Idle",
         "height": 2.1,
         "yaw": null,
+        "portrait": null,
         "hover": null,
         "show": null,
         "attach": [],
@@ -5530,7 +5683,7 @@
         "resolved": "#5b2c6f",
         "strength": 0.35
       },
-      "sourceFingerprint": "a8b03dd004ee1b4d5acd89fe057be76ca5ce71d6c60a019837c5094266f2be4c",
+      "sourceFingerprint": "e52c37580fb024348c615251b615042b0eb4d56ecdd85ff0e43fc2256e5bccaf",
       "output": {
         "path": "public/ui/mobs/rift_dread_stalker.webp",
         "bytes": 1738,
@@ -5552,6 +5705,7 @@
         "idle": "Idle",
         "height": 2.1,
         "yaw": null,
+        "portrait": null,
         "hover": null,
         "show": null,
         "attach": [],
@@ -5564,7 +5718,7 @@
         "resolved": "#ff7a3c",
         "strength": 0.35
       },
-      "sourceFingerprint": "63ca42ac9628941e457aabdb911738c90075a64db0f88b0a588e8739ae4bf6f3",
+      "sourceFingerprint": "98e788b6818eac7474cb88962fe0b20d5c66313cb1aeb7c6f7800cc9f3a9f8b9",
       "output": {
         "path": "public/ui/mobs/rift_ember_fiend.webp",
         "bytes": 2084,
@@ -5586,6 +5740,7 @@
         "idle": "Idle_Combat",
         "height": 2.5,
         "yaw": null,
+        "portrait": null,
         "hover": null,
         "show": null,
         "attach": [],
@@ -5598,7 +5753,7 @@
         "resolved": "#bfe3ff",
         "strength": 0.25
       },
-      "sourceFingerprint": "26f49890790b5da18560d38f1f95d6693f9894a97705fb3ab0c7ae9225f50fe9",
+      "sourceFingerprint": "15ca8b51299b39569e0d9d1b19e44354f3212d44d9b6881f9407c73cf4834a24",
       "output": {
         "path": "public/ui/mobs/rift_frost_revenant.webp",
         "bytes": 2806,
@@ -5620,6 +5775,7 @@
         "idle": "Idle",
         "height": 2.1,
         "yaw": null,
+        "portrait": null,
         "hover": null,
         "show": null,
         "attach": [],
@@ -5632,7 +5788,7 @@
         "resolved": "#c23a1a",
         "strength": 0.35
       },
-      "sourceFingerprint": "ee81a079ae5c2701ca81d31968feee67ac97d46ea86c234ba4f0cf5c2273825d",
+      "sourceFingerprint": "d9e8c647eb9bdf04bb06ebdfaa59e5e300f14dd3ae8b2ad695e1e28288f93120",
       "output": {
         "path": "public/ui/mobs/rift_hellguard.webp",
         "bytes": 2022,
@@ -5654,6 +5810,7 @@
         "idle": "Flying_Idle",
         "height": 2.2,
         "yaw": null,
+        "portrait": null,
         "hover": 0.3,
         "show": null,
         "attach": [],
@@ -5666,7 +5823,7 @@
         "resolved": "#d84a2a",
         "strength": 0.4
       },
-      "sourceFingerprint": "1ac861f46790e08eba1486feeb4f535cd97c2b285814f19aabcfe19c47eb110d",
+      "sourceFingerprint": "3e82c581e951e08894068ece234721b8cf0bae0977eda358aed826d76a7664de",
       "output": {
         "path": "public/ui/mobs/rift_magma_brute.webp",
         "bytes": 2240,
@@ -5688,6 +5845,7 @@
         "idle": "Idle",
         "height": 2.4,
         "yaw": null,
+        "portrait": null,
         "hover": null,
         "show": null,
         "attach": [],
@@ -5700,7 +5858,7 @@
         "resolved": "#8a9a5b",
         "strength": 0.12
       },
-      "sourceFingerprint": "989d3588d6b2dff30cef12ed4894b75659a4d87bde986eb6f942b73c2fb3a04d",
+      "sourceFingerprint": "0767ac856dcaae04b8b457b852d031be57dddfd5b40d774d8dc9d7160d17ee8c",
       "output": {
         "path": "public/ui/mobs/rift_marrow_troll.webp",
         "bytes": 2024,
@@ -5722,6 +5880,7 @@
         "idle": "Idle",
         "height": 2.6,
         "yaw": null,
+        "portrait": null,
         "hover": null,
         "show": [
           "Mage_Hat"
@@ -5749,7 +5908,7 @@
         "resolved": "#7a1020",
         "strength": 0.5
       },
-      "sourceFingerprint": "d9c724c6ae38632b6da5744c3a25aa4681028384667d3e656d03486333f66abc",
+      "sourceFingerprint": "de9cfdaae454d30056737fd7b375d396b98c009e22e5d929ee26829cad7f019c",
       "output": {
         "path": "public/ui/mobs/rift_pact_acolyte.webp",
         "bytes": 2124,
@@ -5771,6 +5930,7 @@
         "idle": "Flying_Idle",
         "height": 2.2,
         "yaw": null,
+        "portrait": null,
         "hover": 0.3,
         "show": null,
         "attach": [],
@@ -5783,7 +5943,7 @@
         "resolved": "#8fd8ff",
         "strength": 0.4
       },
-      "sourceFingerprint": "a24d147d79420a7a5e1f7694b847e11fa11a02ba2bba5fc992b0e3dcd49ab1e6",
+      "sourceFingerprint": "abee048b544a9c73305074e2435c1d1420f58458fbb0ede03db58e33b111284e",
       "output": {
         "path": "public/ui/mobs/rift_rime_elemental.webp",
         "bytes": 2108,
@@ -5805,6 +5965,7 @@
         "idle": "Idle",
         "height": 2.1,
         "yaw": null,
+        "portrait": null,
         "hover": null,
         "show": null,
         "attach": [],
@@ -5817,7 +5978,7 @@
         "resolved": "#9b59b6",
         "strength": 0.35
       },
-      "sourceFingerprint": "9fca12053d166c1fb5dc2c3c6fc870b06546619f86747c06584be7bfcd8ce5f8",
+      "sourceFingerprint": "f40b20d0b139cb7e235e8d0a93b10903fec161749273ce78e8997d9011e5d282",
       "output": {
         "path": "public/ui/mobs/rift_spawnling.webp",
         "bytes": 1788,
@@ -5839,6 +6000,7 @@
         "idle": "Idle",
         "height": 2.8,
         "yaw": null,
+        "portrait": null,
         "hover": null,
         "show": null,
         "attach": [],
@@ -5851,7 +6013,7 @@
         "resolved": "#9b8f6f",
         "strength": 0.12
       },
-      "sourceFingerprint": "0ba29760cd0032d555eae8cbc0865bf72c7e449915880cc1ab1ae1f82763c2de",
+      "sourceFingerprint": "4090e716d747f63e01ed8d245fbfcfb664388e230d1994d2e12bc78d41621d90",
       "output": {
         "path": "public/ui/mobs/rift_stone_ogre.webp",
         "bytes": 2444,
@@ -5873,6 +6035,7 @@
         "idle": "Flying_Idle",
         "height": 2.2,
         "yaw": null,
+        "portrait": null,
         "hover": 0.3,
         "show": null,
         "attach": [],
@@ -5885,7 +6048,7 @@
         "resolved": "#48d1cc",
         "strength": 0.4
       },
-      "sourceFingerprint": "33fa19ceb8ae110afd2f9631a27b028e4da9eb8e9c43e7a940b7a69ef020acd8",
+      "sourceFingerprint": "e4fb416522c5e7ab5da0b06a5c6831ee357eacd90a9b4d2c9ddbdfe7584271c2",
       "output": {
         "path": "public/ui/mobs/rift_storm_caller.webp",
         "bytes": 2070,
@@ -5907,6 +6070,7 @@
         "idle": "Flying_Idle",
         "height": 2.4,
         "yaw": null,
+        "portrait": null,
         "hover": 0.25,
         "show": null,
         "attach": [],
@@ -5919,7 +6083,7 @@
         "resolved": "#2e86c1",
         "strength": 0.2
       },
-      "sourceFingerprint": "21f130076966a8b4b20552d2621d37e1328f27e1424f3c68afd69e54aa90ec57",
+      "sourceFingerprint": "02a5917684cbe6c6a65540d0bb48a48559ead0cd7f3fb2dc6eba091da801ccbc",
       "output": {
         "path": "public/ui/mobs/rift_stormscale.webp",
         "bytes": 2130,
@@ -5941,6 +6105,7 @@
         "idle": "Idle",
         "height": 1.6,
         "yaw": null,
+        "portrait": null,
         "hover": null,
         "show": null,
         "attach": [],
@@ -5953,7 +6118,7 @@
         "resolved": "#6b8e23",
         "strength": 0.35
       },
-      "sourceFingerprint": "2f5d7e88dbc099b817d5918bf27372f499ec921e86ec0258cbcaa9f77206136e",
+      "sourceFingerprint": "55b0e49acbda6075bbf3e1189e0dd5c40079584d82daea72caf7e128fa129332",
       "output": {
         "path": "public/ui/mobs/rift_thornback.webp",
         "bytes": 1934,
@@ -5975,6 +6140,7 @@
         "idle": "Idle",
         "height": 1.7,
         "yaw": null,
+        "portrait": null,
         "hover": null,
         "show": null,
         "attach": [],
@@ -5987,7 +6153,7 @@
         "resolved": "#17a589",
         "strength": 0.45
       },
-      "sourceFingerprint": "a5301db0f411c83395d44e8f42e42e5ffe9ca629abe8d0f0a0c6c658c97cd038",
+      "sourceFingerprint": "065e03cd5cd59968bf7f20159e00f707a56b8d0492ea8e40f7894f025becf0e5",
       "output": {
         "path": "public/ui/mobs/rift_tide_thrall.webp",
         "bytes": 1876,
@@ -6009,6 +6175,7 @@
         "idle": "Spider_Idle",
         "height": 1.4,
         "yaw": null,
+        "portrait": null,
         "hover": null,
         "show": null,
         "attach": [],
@@ -6021,7 +6188,7 @@
         "resolved": "#9acd32",
         "strength": 0.35
       },
-      "sourceFingerprint": "302f479b67ff4220308f4836992b9baf96f26eec8c8fddd618132a278b7b5749",
+      "sourceFingerprint": "7e223f1c47adda7d7c8953aa59048f31821e0c89bedf02ddbfdbd34d2f95196c",
       "output": {
         "path": "public/ui/mobs/rift_venom_weaver.webp",
         "bytes": 1834,
@@ -6043,6 +6210,7 @@
         "idle": "Idle",
         "height": 2.6,
         "yaw": null,
+        "portrait": null,
         "hover": null,
         "show": null,
         "attach": [
@@ -6080,7 +6248,7 @@
         "resolved": "#6b3a32",
         "strength": 0.3
       },
-      "sourceFingerprint": "7fe1561ccdfadfaed35de3b431bbe128c599f5994dcc1f27c32470d921cdf0a9",
+      "sourceFingerprint": "be92b476fff831113437214a05fa4bdd9b889b8eac732a4a164139fb717b29b7",
       "output": {
         "path": "public/ui/mobs/rift_void_acolyte.webp",
         "bytes": 2200,
@@ -6102,6 +6270,7 @@
         "idle": "Idle",
         "height": 2.1,
         "yaw": null,
+        "portrait": null,
         "hover": null,
         "show": null,
         "attach": [],
@@ -6114,7 +6283,7 @@
         "resolved": "#7a3fb0",
         "strength": 0.35
       },
-      "sourceFingerprint": "a7dae98779a9ddee9cdc3a75a704a242a37df367973476204ad6cb96869d46d2",
+      "sourceFingerprint": "2d29d14e63b4db8d209ee47d276bbcef637db94094488609973c861efbcb6eab",
       "output": {
         "path": "public/ui/mobs/riftspawn.webp",
         "bytes": 1752,
@@ -6136,6 +6305,7 @@
         "idle": "Flying_Idle",
         "height": 2.2,
         "yaw": null,
+        "portrait": null,
         "hover": 0.3,
         "show": null,
         "attach": [],
@@ -6148,7 +6318,7 @@
         "resolved": "#9fd0f0",
         "strength": 0.4
       },
-      "sourceFingerprint": "54696fda48eadef33372f8b3ef039404481c9558987cc75ba2d8a3095cdeb4cd",
+      "sourceFingerprint": "338c47f3308bbd642ca4f8d81d289a5b2532764c061509673e5a64489ebc2fc7",
       "output": {
         "path": "public/ui/mobs/rime_elemental.webp",
         "bytes": 1964,
@@ -6170,6 +6340,7 @@
         "idle": "Idle_Combat",
         "height": 2.5,
         "yaw": null,
+        "portrait": null,
         "hover": null,
         "show": null,
         "attach": [],
@@ -6182,7 +6353,7 @@
         "resolved": "#cfc8b0",
         "strength": 0.25
       },
-      "sourceFingerprint": "00255d675d7766e83b6ea9863ad405840a8f21193e1f1bf337c21f22e6434661",
+      "sourceFingerprint": "4e1dccc978f39dac04ab27dc70ad05dd8023d6e8a0457b540d16748a5fdd20d8",
       "output": {
         "path": "public/ui/mobs/sanctum_boneguard.webp",
         "bytes": 2296,
@@ -6204,6 +6375,7 @@
         "idle": "Flying_Idle",
         "height": 2.4,
         "yaw": null,
+        "portrait": null,
         "hover": 0.25,
         "show": null,
         "attach": [],
@@ -6216,7 +6388,7 @@
         "resolved": "#567d46",
         "strength": 0.2
       },
-      "sourceFingerprint": "d203457fa8530e4fabc4c846abe4b14fe1dd1bdd59171b2b3051ef1c8a2ec9ea",
+      "sourceFingerprint": "e347ade8be6a9bbd5a8089ad7efd4d9ece81cf8c9c88c42d117f7f77c4ea3bdb",
       "output": {
         "path": "public/ui/mobs/sanctum_drakonid.webp",
         "bytes": 2182,
@@ -6238,6 +6410,7 @@
         "idle": "Flying_Idle",
         "height": 2.4,
         "yaw": null,
+        "portrait": null,
         "hover": 0.25,
         "show": null,
         "attach": [],
@@ -6250,7 +6423,7 @@
         "resolved": "#bcd2e6",
         "strength": 0.2
       },
-      "sourceFingerprint": "22eedc82ff2476286863035d3d214d1d219fc330afcadfdc78d49dbc2338be53",
+      "sourceFingerprint": "2493d34fe9eb78a4a878d2e61742bdf026132ecd6870b31ee34b046bf58d9bcd",
       "output": {
         "path": "public/ui/mobs/sethrael_palecoil.webp",
         "bytes": 2134,
@@ -6272,6 +6445,7 @@
         "idle": "Idle_Combat",
         "height": 2.5,
         "yaw": null,
+        "portrait": null,
         "hover": null,
         "show": null,
         "attach": [
@@ -6297,7 +6471,7 @@
         "resolved": "#839192",
         "strength": 0.25
       },
-      "sourceFingerprint": "0c306427584ad5b6626decd29a01d9dd6673b0c4cd5d9c45e08e563f8fb31d72",
+      "sourceFingerprint": "512f3a27869dca637b537d931a10b7b7f450b0bf778ef78baf0516600e6c6477",
       "output": {
         "path": "public/ui/mobs/sexton_marrow.webp",
         "bytes": 2230,
@@ -6319,6 +6493,7 @@
         "idle": "Flying_Idle",
         "height": 2.2,
         "yaw": null,
+        "portrait": null,
         "hover": 0.3,
         "show": null,
         "attach": [],
@@ -6331,7 +6506,7 @@
         "resolved": "#aed6f1",
         "strength": 0.4
       },
-      "sourceFingerprint": "642adec63d608a9ce149793272177044b433d330d161b6cf8d11786732e55c50",
+      "sourceFingerprint": "2fe481d1849c0e75c051852064dc13fc4ac35dd005350a87d650dca545caa790",
       "output": {
         "path": "public/ui/mobs/shardlord_kazzix.webp",
         "bytes": 1960,
@@ -6353,6 +6528,7 @@
         "idle": "Idle",
         "height": 1.7,
         "yaw": null,
+        "portrait": null,
         "hover": null,
         "show": null,
         "attach": [],
@@ -6365,7 +6541,7 @@
         "resolved": "#8898a8",
         "strength": 0.35
       },
-      "sourceFingerprint": "66cd6a9301e330fc24b9dfeb7769b177fe8b4693f9674d8474ef8c40d2b5d5aa",
+      "sourceFingerprint": "f07eea9bc1f2f4e9252643e03bac21b91cfe6c3d0e6e1bd4a5d6cc6daa4b4859",
       "output": {
         "path": "public/ui/mobs/shoal_scuttler.webp",
         "bytes": 2048,
@@ -6387,6 +6563,7 @@
         "idle": "Idle",
         "height": 2.6,
         "yaw": null,
+        "portrait": null,
         "hover": null,
         "show": [
           "Mage_Hat"
@@ -6414,7 +6591,7 @@
         "resolved": "#3b1f4a",
         "strength": 0.5
       },
-      "sourceFingerprint": "d764570adfe68afcb8a75361808ae53ed5b7bb4f0570da94069314aa0ce4aacf",
+      "sourceFingerprint": "f1f016b06d891a735beed67c1797acde7c7949f204901cbeab91ac393bacb90a",
       "output": {
         "path": "public/ui/mobs/sister_nhalia.webp",
         "bytes": 2128,
@@ -6436,6 +6613,7 @@
         "idle": "Idle",
         "height": 2.6,
         "yaw": null,
+        "portrait": null,
         "hover": null,
         "show": [
           "Mage_Hat"
@@ -6463,7 +6641,7 @@
         "resolved": "#4f6b74",
         "strength": 0.5
       },
-      "sourceFingerprint": "4fe5bc3750d4ad72e298d88f69954b289d09229f4199ea7a9905e64037876c81",
+      "sourceFingerprint": "89f22cef03cf16e68848e48e3673aa7848fd45c1793763da3ea7bf83eff2b31b",
       "output": {
         "path": "public/ui/mobs/sister_nhalia_drowned_canticle.webp",
         "bytes": 2126,
@@ -6485,6 +6663,7 @@
         "idle": "Idle",
         "height": 1.7,
         "yaw": null,
+        "portrait": null,
         "hover": null,
         "show": null,
         "attach": [],
@@ -6497,7 +6676,7 @@
         "resolved": "#2e86c1",
         "strength": 0.45
       },
-      "sourceFingerprint": "675eddac7949be307bd4ac244c9a33c5b5c3f1a212385f9e9dc12b6c9ddb69d5",
+      "sourceFingerprint": "8e4aa6173de0900b6a058974e8a264111d73736e559df4c70ecda355327ae821",
       "output": {
         "path": "public/ui/mobs/sloomtooth_the_drowned.webp",
         "bytes": 1722,
@@ -6519,6 +6698,7 @@
         "idle": "Idle",
         "height": 1.6,
         "yaw": null,
+        "portrait": null,
         "hover": null,
         "show": null,
         "attach": [],
@@ -6531,7 +6711,7 @@
         "resolved": "#eef4f8",
         "strength": 0.35
       },
-      "sourceFingerprint": "c9eebda31b0b3d2a4290e31160adf2985c52fc3a89ba2e03e98d71daad5f5f61",
+      "sourceFingerprint": "c2cc23cbb76c986918847ca5ac9da61a18c79e9e28cd048fce35c03d30511601",
       "output": {
         "path": "public/ui/mobs/snowdrift_wolf.webp",
         "bytes": 1978,
@@ -6553,6 +6733,7 @@
         "idle": "Idle",
         "height": 1.8,
         "yaw": null,
+        "portrait": null,
         "hover": null,
         "show": null,
         "attach": [],
@@ -6565,7 +6746,7 @@
         "resolved": null,
         "strength": null
       },
-      "sourceFingerprint": "d36ce145a86b1de13aaa44407e6f04f154de46ec20ff8ea917029e5bf5822ee7",
+      "sourceFingerprint": "08fb0d08ed1eef0cf1fe54cd8fb1a1cc8234dfe647fc9bc638c13548fb8f7f96",
       "output": {
         "path": "public/ui/mobs/spider_egg.webp",
         "bytes": 2268,
@@ -6587,6 +6768,7 @@
         "idle": "Idle",
         "height": 1.8,
         "yaw": null,
+        "portrait": null,
         "hover": null,
         "show": null,
         "attach": [],
@@ -6599,7 +6781,7 @@
         "resolved": null,
         "strength": null
       },
-      "sourceFingerprint": "1c79f13de45d4ee58aac797b2513ce219cc014d5b0b3d461d742fd189b31648a",
+      "sourceFingerprint": "c25babfb04c7fc8c6ca9ad274c19592172e456da30df74d68e41f87331d6fb22",
       "output": {
         "path": "public/ui/mobs/spider_egg_sac.webp",
         "bytes": 2304,
@@ -6621,6 +6803,7 @@
         "idle": "Flying_Idle",
         "height": 1.4,
         "yaw": null,
+        "portrait": null,
         "hover": 0.15,
         "show": null,
         "attach": [],
@@ -6633,7 +6816,7 @@
         "resolved": "#d8b98a",
         "strength": 0.45
       },
-      "sourceFingerprint": "c72c8e80b251026fe30ff478863d4253ca252ed16e338f531df73f4a85ca143a",
+      "sourceFingerprint": "93b5604dab28ef9a0b4bf27e4a7f9e8a6ceab83c04271c57cb311d8b7254625e",
       "output": {
         "path": "public/ui/mobs/sporeling_gatherer.webp",
         "bytes": 1660,
@@ -6655,6 +6838,7 @@
         "idle": "Idle",
         "height": 2.9,
         "yaw": null,
+        "portrait": null,
         "hover": null,
         "show": null,
         "attach": [],
@@ -6667,7 +6851,7 @@
         "resolved": null,
         "strength": null
       },
-      "sourceFingerprint": "3fe703a9c2a9787974b3df54ba1ec8407099d8e42539a624eac5c50a123f452e",
+      "sourceFingerprint": "55ce706cb5f12b8f88e107c4412a7e94598615f2ab8761aaac17aa7f46c085ca",
       "output": {
         "path": "public/ui/mobs/stable_horse.webp",
         "bytes": 1960,
@@ -6689,6 +6873,7 @@
         "idle": "Flying_Idle",
         "height": 2.2,
         "yaw": null,
+        "portrait": null,
         "hover": 0.3,
         "show": null,
         "attach": [],
@@ -6701,7 +6886,7 @@
         "resolved": "#5dade2",
         "strength": 0.4
       },
-      "sourceFingerprint": "da80b39fba2d6db10a966e201ad3b4a7b7bbd39634466554bdcfb20bdd631c0f",
+      "sourceFingerprint": "8501fcfcdb7cd43f2cdafde51cfe094bc748069f8cd099fe49baaba5a130b0cd",
       "output": {
         "path": "public/ui/mobs/stormcrag_elemental.webp",
         "bytes": 1982,
@@ -6723,6 +6908,7 @@
         "idle": "Idle",
         "height": 2.4,
         "yaw": null,
+        "portrait": null,
         "hover": null,
         "show": null,
         "attach": [],
@@ -6735,7 +6921,7 @@
         "resolved": "#4a5a3c",
         "strength": 0.12
       },
-      "sourceFingerprint": "63a41994e7e93d0f62ed3e62f3600d7bdc45d9fef8c87aca3e29d34a1dd582c4",
+      "sourceFingerprint": "85800477b3fd65c4ae858c4aec593539b2b5c783f9eb62e5fc4e05853a26680a",
       "output": {
         "path": "public/ui/mobs/sump_troll_devourer.webp",
         "bytes": 2058,
@@ -6757,6 +6943,7 @@
         "idle": "Idle",
         "height": 2.8,
         "yaw": null,
+        "portrait": null,
         "hover": null,
         "show": null,
         "attach": [],
@@ -6769,7 +6956,7 @@
         "resolved": "#8a2f6a",
         "strength": 0.12
       },
-      "sourceFingerprint": "bfd6a45fe0213b7d1ab4c7cbab84b66bb56d1b033e3c1ea1742df9d08a12daf2",
+      "sourceFingerprint": "841991fed939ac37dcf7b768148da4494663af4a75ac2ea2674a999f33790fe1",
       "output": {
         "path": "public/ui/mobs/sundered_horror.webp",
         "bytes": 2424,
@@ -6791,6 +6978,7 @@
         "idle": "Idle",
         "height": 1.6,
         "yaw": null,
+        "portrait": null,
         "hover": null,
         "show": null,
         "attach": [],
@@ -6803,7 +6991,7 @@
         "resolved": "#9db4c8",
         "strength": 0.35
       },
-      "sourceFingerprint": "81e52142fbe236eb5b6d7572fe343c48eda5b4adfc7a7e0475a626192e06bdf8",
+      "sourceFingerprint": "63f3644cd6a85e489a2bb62e45a0e06dbdb9f5e6ed7e7cdf9aeac04afe9bd113",
       "output": {
         "path": "public/ui/mobs/terrace_howler.webp",
         "bytes": 1926,
@@ -6825,6 +7013,7 @@
         "idle": "Idle",
         "height": 1.7,
         "yaw": null,
+        "portrait": null,
         "hover": null,
         "show": null,
         "attach": [],
@@ -6837,7 +7026,7 @@
         "resolved": "#5a7038",
         "strength": 0.45
       },
-      "sourceFingerprint": "d44ead74aae8c48612c3f9353768507bc1fa0c54ebb79adc2420e18070d86233",
+      "sourceFingerprint": "519ed2a08ec3d9b53dbcb4c01af6f30ce07e01236424d9d386f1e14cda9e25db",
       "output": {
         "path": "public/ui/mobs/the_meredark.webp",
         "bytes": 1838,
@@ -6859,6 +7048,7 @@
         "idle": "Eating",
         "height": 2.1,
         "yaw": null,
+        "portrait": null,
         "hover": null,
         "show": null,
         "attach": [],
@@ -6871,7 +7061,7 @@
         "resolved": "#2e6a34",
         "strength": 0.3
       },
-      "sourceFingerprint": "7031e81fb88a32ce2d57c05c8bcf8a5cd945b8239973a07106376df0543e3c5a",
+      "sourceFingerprint": "b9dd44763930c1c42f3c62f426c533abdfcf6a791b74fa95ebf9fa2d08326d37",
       "output": {
         "path": "public/ui/mobs/the_topiary_bull.webp",
         "bytes": 1536,
@@ -6893,6 +7083,7 @@
         "idle": "Idle",
         "height": 2.6,
         "yaw": null,
+        "portrait": null,
         "hover": null,
         "show": [
           "Barbarian_BearHat"
@@ -6920,7 +7111,7 @@
         "resolved": "#7a8a86",
         "strength": 0.3
       },
-      "sourceFingerprint": "b15002baa899163f99ee3cef440038aa244445c16d23b172da3c903df364ddcb",
+      "sourceFingerprint": "38dc4f687b9690e8cfe97e71c926c107a00e17f400c587a689d0ad51f88c332d",
       "output": {
         "path": "public/ui/mobs/the_wreck_warden.webp",
         "bytes": 2584,
@@ -6942,6 +7133,7 @@
         "idle": "Idle1",
         "height": 1.45,
         "yaw": null,
+        "portrait": null,
         "hover": null,
         "show": null,
         "attach": [],
@@ -6954,7 +7146,7 @@
         "resolved": "#6a4e38",
         "strength": 0.4
       },
-      "sourceFingerprint": "66f18f088572b2c9aba37e7a67ca0afb5db3351a29db17fdb0de09f0be5985da",
+      "sourceFingerprint": "139c2d7babc40f002e3b6112958deeeed7c7afb23e6410a03afd292dcffa4e7c",
       "output": {
         "path": "public/ui/mobs/thicket_boar.webp",
         "bytes": 2834,
@@ -6976,6 +7168,7 @@
         "idle": "Idle",
         "height": 2.8,
         "yaw": null,
+        "portrait": null,
         "hover": null,
         "show": null,
         "attach": [],
@@ -6988,7 +7181,7 @@
         "resolved": "#9e7b53",
         "strength": 0.12
       },
-      "sourceFingerprint": "bff7ca75c928b3dc7484d8a59f1525522d039d85b951c0309a9ff068e10adbec",
+      "sourceFingerprint": "6497d4de5462bcf1ae0624d004444acd3f797b39e6abc7330aac566a5db12e0f",
       "output": {
         "path": "public/ui/mobs/thornpeak_ogre.webp",
         "bytes": 2430,
@@ -7010,6 +7203,7 @@
         "idle": "Idle",
         "height": 2.6,
         "yaw": null,
+        "portrait": null,
         "hover": null,
         "show": null,
         "attach": [
@@ -7047,7 +7241,7 @@
         "resolved": "#6b3a32",
         "strength": 0.3
       },
-      "sourceFingerprint": "7fe1561ccdfadfaed35de3b431bbe128c599f5994dcc1f27c32470d921cdf0a9",
+      "sourceFingerprint": "be92b476fff831113437214a05fa4bdd9b889b8eac732a4a164139fb717b29b7",
       "output": {
         "path": "public/ui/mobs/threnos_first_voice.webp",
         "bytes": 2200,
@@ -7069,6 +7263,7 @@
         "idle": "Flying_Idle",
         "height": 2.2,
         "yaw": null,
+        "portrait": null,
         "hover": 0.3,
         "show": null,
         "attach": [],
@@ -7081,7 +7276,7 @@
         "resolved": "#9fb3c8",
         "strength": 0.4
       },
-      "sourceFingerprint": "a9c9c0baa8eb01297eab2ff891d4bfe064f746d29813679f2a381798fc622a15",
+      "sourceFingerprint": "aa4249483070d49f2f7b2c2e93e4ff2edf330c2e722c764ff496c095b6c22a4b",
       "output": {
         "path": "public/ui/mobs/thunzharr_stormling.webp",
         "bytes": 1972,
@@ -7103,6 +7298,7 @@
         "idle": "Flying_Idle",
         "height": 2.2,
         "yaw": null,
+        "portrait": null,
         "hover": 0.3,
         "show": null,
         "attach": [],
@@ -7115,7 +7311,7 @@
         "resolved": "#7d8a99",
         "strength": 0.4
       },
-      "sourceFingerprint": "35620a2ccdf09386916722951b8fc9ac8642ad66b585511b3335a154eac1b41d",
+      "sourceFingerprint": "49c872b0ca1f46d987afd07ba2cb5845c1b5baa85d821bdcf1147370b394c0ac",
       "output": {
         "path": "public/ui/mobs/thunzharr_waking_peak.webp",
         "bytes": 1952,
@@ -7137,6 +7333,7 @@
         "idle": "Idle",
         "height": 1.7,
         "yaw": null,
+        "portrait": null,
         "hover": null,
         "show": null,
         "attach": [],
@@ -7149,7 +7346,7 @@
         "resolved": "#e86848",
         "strength": 0.35
       },
-      "sourceFingerprint": "f0efc1346c9252a3737430ff6a22cef3a2ff6565b94a29fc5a94970df09991f9",
+      "sourceFingerprint": "2851bb2e05554ec4cc962fb0abdc9aeec13413717c971d4126c0bbbcf8486f47",
       "output": {
         "path": "public/ui/mobs/tide_scuttler.webp",
         "bytes": 2320,
@@ -7171,6 +7368,7 @@
         "idle": "Idle",
         "height": 2.6,
         "yaw": null,
+        "portrait": null,
         "hover": null,
         "show": null,
         "attach": [
@@ -7208,7 +7406,7 @@
         "resolved": "#6b3a32",
         "strength": 0.3
       },
-      "sourceFingerprint": "7fe1561ccdfadfaed35de3b431bbe128c599f5994dcc1f27c32470d921cdf0a9",
+      "sourceFingerprint": "be92b476fff831113437214a05fa4bdd9b889b8eac732a4a164139fb717b29b7",
       "output": {
         "path": "public/ui/mobs/tidebound_acolyte.webp",
         "bytes": 2200,
@@ -7230,6 +7428,7 @@
         "idle": "Idle",
         "height": 3.4,
         "yaw": null,
+        "portrait": null,
         "hover": null,
         "show": null,
         "attach": [],
@@ -7242,7 +7441,7 @@
         "resolved": "#8899aa",
         "strength": 0.15
       },
-      "sourceFingerprint": "f3d377ffdff58198a067aaff429cd0272732c2f3d13ee0b51c0bc54ee77e2433",
+      "sourceFingerprint": "4b0bbff9b908df2737b1511f869804f7d8ee5d110125d6220b63250dd2d8c137",
       "output": {
         "path": "public/ui/mobs/tolling_bell.webp",
         "bytes": 1586,
@@ -7264,6 +7463,7 @@
         "idle": "Idle",
         "height": 1.9,
         "yaw": null,
+        "portrait": null,
         "hover": null,
         "show": null,
         "attach": [],
@@ -7276,7 +7476,7 @@
         "resolved": "#3f7e3c",
         "strength": 0.35
       },
-      "sourceFingerprint": "39405ae6cd7aa314ae75a67530bbedf3524606107c1fb6fcd79d5570c86802d2",
+      "sourceFingerprint": "20fdf994d5ea88f74fe6d451fd041a4558d4fc88a0657934ceee3f2bd2748f4c",
       "output": {
         "path": "public/ui/mobs/topiary_stag.webp",
         "bytes": 1926,
@@ -7298,6 +7498,7 @@
         "idle": "Idle",
         "height": 1.6,
         "yaw": null,
+        "portrait": null,
         "hover": null,
         "show": null,
         "attach": [],
@@ -7310,7 +7511,7 @@
         "resolved": "#4a8a4e",
         "strength": 0.35
       },
-      "sourceFingerprint": "fceb8e7950b5d709ea39d5d7d0a74028701b26cd92ca06b754307ba22f379a43",
+      "sourceFingerprint": "4881d174e337aeb9f5aa287f7e55c8013a06e29861666acc17ad6217d496aadf",
       "output": {
         "path": "public/ui/mobs/topiary_wolf.webp",
         "bytes": 1902,
@@ -7332,6 +7533,7 @@
         "idle": "Idle",
         "height": 2.3,
         "yaw": null,
+        "portrait": null,
         "hover": null,
         "show": null,
         "attach": [],
@@ -7344,7 +7546,7 @@
         "resolved": "#b8924a",
         "strength": 0.35
       },
-      "sourceFingerprint": "2b45c3ab5c106f0bcda1101a6c31f56a61148e76d43ecec1fa0444b51ba64ac6",
+      "sourceFingerprint": "edb217fecb93692b7260e1f95e34a97bb1f72a98b888ccf0d9b4af6a6d2e02c0",
       "output": {
         "path": "public/ui/mobs/training_dummy.webp",
         "bytes": 1790,
@@ -7366,6 +7568,7 @@
         "idle": "Idle",
         "height": 2.6,
         "yaw": null,
+        "portrait": null,
         "hover": null,
         "show": null,
         "attach": [],
@@ -7378,7 +7581,7 @@
         "resolved": "#4f7a38",
         "strength": 0.72
       },
-      "sourceFingerprint": "2cdaae6f3c5d040ba74821b47236599703a55515a54e2e9b674cc862446183f2",
+      "sourceFingerprint": "965fceb612bebdb1528de787c217cfb63e0af3bf72bd55732ca0e2d71588f2bd",
       "output": {
         "path": "public/ui/mobs/treant_elder.webp",
         "bytes": 1834,
@@ -7400,6 +7603,7 @@
         "idle": "Idle",
         "height": 2.1,
         "yaw": null,
+        "portrait": null,
         "hover": -0.2,
         "show": null,
         "attach": [],
@@ -7412,7 +7616,7 @@
         "resolved": "#9c640c",
         "strength": 0.12
       },
-      "sourceFingerprint": "820c237cca9f63dfd62ee7459dd0a9c220558db87ee0d0cd5cde52b78e231610",
+      "sourceFingerprint": "8f0dd873a250daa8556584b4c41bb7dbb170ad140e8155c9c1e4737cc2f278f1",
       "output": {
         "path": "public/ui/mobs/tunnel_rat.webp",
         "bytes": 2568,
@@ -7434,6 +7638,7 @@
         "idle": "Idle",
         "height": 2.6,
         "yaw": null,
+        "portrait": null,
         "hover": null,
         "show": [
           "Mage_Hat"
@@ -7461,7 +7666,7 @@
         "resolved": "#48c9b0",
         "strength": 0.5
       },
-      "sourceFingerprint": "028ead47c9935a5f769ac47203123bc1b6aa2098a0f2da755b8f0c6f435a9fc7",
+      "sourceFingerprint": "010e53bb20c1faffe9b326418b66fc8a008d2198832f4f1e785b19219c2b3635",
       "output": {
         "path": "public/ui/mobs/vael_the_mistcaller.webp",
         "bytes": 2178,
@@ -7483,6 +7688,7 @@
         "idle": "Idle",
         "height": 2.6,
         "yaw": null,
+        "portrait": null,
         "hover": null,
         "show": null,
         "attach": [
@@ -7520,7 +7726,7 @@
         "resolved": "#6b3a32",
         "strength": 0.3
       },
-      "sourceFingerprint": "7fe1561ccdfadfaed35de3b431bbe128c599f5994dcc1f27c32470d921cdf0a9",
+      "sourceFingerprint": "be92b476fff831113437214a05fa4bdd9b889b8eac732a4a164139fb717b29b7",
       "output": {
         "path": "public/ui/mobs/vale_bandit.webp",
         "bytes": 2200,
@@ -7542,6 +7748,7 @@
         "idle": "Idle",
         "height": 1.6,
         "yaw": null,
+        "portrait": null,
         "hover": null,
         "show": null,
         "attach": [],
@@ -7554,7 +7761,7 @@
         "resolved": "#f4f4f4",
         "strength": 0.35
       },
-      "sourceFingerprint": "dd1d16f350606d3b9ddb4bf96c23c842b13aee182107232647f43d801bac859e",
+      "sourceFingerprint": "716a3ceb620b8b4d68b9e695a5d989f1341f8bb91cd79ddf5110aee14c92af55",
       "output": {
         "path": "public/ui/mobs/vale_cup_ball.webp",
         "bytes": 1984,
@@ -7576,6 +7783,7 @@
         "idle": "Idle_Combat",
         "height": 2.5,
         "yaw": null,
+        "portrait": null,
         "hover": null,
         "show": null,
         "attach": [],
@@ -7588,7 +7796,7 @@
         "resolved": "#c9c2b5",
         "strength": 0.25
       },
-      "sourceFingerprint": "b6c76e7ed755ae0b6548421763cac5deaf02c160a11e5bedf5a2bc85ff0d1ef4",
+      "sourceFingerprint": "fbbc9719140924da09d7ac256fcdcd230c6cda07a0edca802a72cadbf646ac1c",
       "output": {
         "path": "public/ui/mobs/varkas_boneguard.webp",
         "bytes": 2808,
@@ -7610,6 +7818,7 @@
         "idle": "Idle",
         "height": 1.6,
         "yaw": null,
+        "portrait": null,
         "hover": null,
         "show": null,
         "attach": [],
@@ -7622,7 +7831,7 @@
         "resolved": null,
         "strength": null
       },
-      "sourceFingerprint": "8de69b954423f6319a41e4a67a9a15189f16695b0de4afd408735bdb8d9b54fb",
+      "sourceFingerprint": "b7c350799fa8219eb4ae2f9e48db9e51c43cacb8c934b33a2bd9f8ad12b1ae99",
       "output": {
         "path": "public/ui/mobs/veiled_doe.webp",
         "bytes": 1822,
@@ -7644,6 +7853,7 @@
         "idle": "Idle",
         "height": 1.9,
         "yaw": null,
+        "portrait": null,
         "hover": null,
         "show": null,
         "attach": [],
@@ -7656,7 +7866,7 @@
         "resolved": null,
         "strength": null
       },
-      "sourceFingerprint": "cc21f64e4650e65594a377dd1f802797af3162061aa8aaa4b76fc60d1bdabede",
+      "sourceFingerprint": "5a03caeadaf90fcabf724cc3e4ecce681a23123c06b57a26581e70432a4ccbb1",
       "output": {
         "path": "public/ui/mobs/veiled_stag.webp",
         "bytes": 2524,
@@ -7678,6 +7888,7 @@
         "idle": "Idle",
         "height": 2.6,
         "yaw": null,
+        "portrait": null,
         "hover": null,
         "show": [
           "Knight_Helmet",
@@ -7718,7 +7929,7 @@
         "resolved": null,
         "strength": null
       },
-      "sourceFingerprint": "f55680aee104b7756292129b86a4034896c9e3ea3101d8156cf89efaff874f01",
+      "sourceFingerprint": "b356a706150247ba0451d82c225c979d8adc831e238fbd53c810cf39af4d5a37",
       "output": {
         "path": "public/ui/mobs/vision_aldren_warrior.webp",
         "bytes": 2220,
@@ -7740,6 +7951,7 @@
         "idle": "Idle",
         "height": 2.6,
         "yaw": null,
+        "portrait": null,
         "hover": null,
         "show": [
           "Rogue_Cape"
@@ -7779,7 +7991,7 @@
         "resolved": null,
         "strength": null
       },
-      "sourceFingerprint": "e62193520a3eda179301c0753d31a478cc388950553069b17553f843e26dcf8d",
+      "sourceFingerprint": "566ebed56c9316d4a7f5ea6c8f1a2077cc4ab52f48a4b559f7d132a16d75fc06",
       "output": {
         "path": "public/ui/mobs/vision_deathstalker_voss.webp",
         "bytes": 2424,
@@ -7801,6 +8013,7 @@
         "idle": "Idle",
         "height": 2.6,
         "yaw": null,
+        "portrait": null,
         "hover": null,
         "show": [
           "Mage_Cape"
@@ -7828,7 +8041,7 @@
         "resolved": null,
         "strength": null
       },
-      "sourceFingerprint": "a2d7dd6d84d60194e91c7553ce5b15ce0e0aed43b2367590752fd71c21928357",
+      "sourceFingerprint": "c63cb365a0d132b5dd23f2ac3b83fbb61c3266a1f40edb9a7fe2ca81f5adf16c",
       "output": {
         "path": "public/ui/mobs/vision_malric_mage.webp",
         "bytes": 2296,
@@ -7850,6 +8063,7 @@
         "idle": "Idle",
         "height": 1.6,
         "yaw": null,
+        "portrait": null,
         "hover": null,
         "show": null,
         "attach": [],
@@ -7862,7 +8076,7 @@
         "resolved": "#2f2a44",
         "strength": 0.35
       },
-      "sourceFingerprint": "0616ef7b82bae498a417f8ff03e723ebd214fd772bbf439b691b072de996675c",
+      "sourceFingerprint": "ad4c7bcf26359972d6378f5687c93f97387a38a0a2f79225da3fa720af5c7ed7",
       "output": {
         "path": "public/ui/mobs/void_stalker.webp",
         "bytes": 1826,
@@ -7884,6 +8098,7 @@
         "idle": "Flying_Idle",
         "height": 2.4,
         "yaw": null,
+        "portrait": null,
         "hover": 0.25,
         "show": null,
         "attach": [],
@@ -7896,7 +8111,7 @@
         "resolved": "#e8702a",
         "strength": 0.2
       },
-      "sourceFingerprint": "3540232320d8dbbab6f231493da3994db689cff8052cfed6e6e2150d59c653be",
+      "sourceFingerprint": "c1818e59ea863c7ad613fa5a7ed47b0b231ecb39ce1f465bcf6446d8f0fb675f",
       "output": {
         "path": "public/ui/mobs/voskar_emberwing.webp",
         "bytes": 2268,
@@ -7918,6 +8133,7 @@
         "idle": "Idle",
         "height": 3.4,
         "yaw": null,
+        "portrait": null,
         "hover": null,
         "show": null,
         "attach": [],
@@ -7935,7 +8151,7 @@
         "resolved": "#b08fd8",
         "strength": 0.25
       },
-      "sourceFingerprint": "dca980f6ee4d0dc0bcde6bdb8d85a9d71c9e6ca27355a3955a8096c3c3ab3b11",
+      "sourceFingerprint": "0a9e255d1eed18eab9f1521af22b0c261d6236956bf2c03b1db1175e9a257bef",
       "output": {
         "path": "public/ui/mobs/waking_warden.webp",
         "bytes": 2878,
@@ -7957,6 +8173,7 @@
         "idle": "Flying_Idle",
         "height": 1.7,
         "yaw": null,
+        "portrait": null,
         "hover": 0.35,
         "show": null,
         "attach": [],
@@ -7969,7 +8186,7 @@
         "resolved": "#ff5a2e",
         "strength": 0.25
       },
-      "sourceFingerprint": "d5faeacdef6bccff455ac71af189ce54efacb477f9da3e5518326f322f0ee49a",
+      "sourceFingerprint": "643817831dc5073b6f53a5888a651b09e27dd1a4d499d9bffd285074b6313aac",
       "output": {
         "path": "public/ui/mobs/warlock_imp.webp",
         "bytes": 2130,
@@ -7991,6 +8208,7 @@
         "idle": "Idle",
         "height": 2.1,
         "yaw": null,
+        "portrait": null,
         "hover": null,
         "show": null,
         "attach": [],
@@ -8003,7 +8221,7 @@
         "resolved": "#6b4bb5",
         "strength": 0.35
       },
-      "sourceFingerprint": "c0aa3b2901b3c3f228b4b00de3a5c78d123b40c2fc1c567f4009b0198582d7fb",
+      "sourceFingerprint": "6b0def1b037c4d112e41952a27c6b11548a986d34074243dc0e9bd05c8b88921",
       "output": {
         "path": "public/ui/mobs/warlock_voidwalker.webp",
         "bytes": 1754,
@@ -8025,6 +8243,7 @@
         "idle": "Idle",
         "height": 2.8,
         "yaw": null,
+        "portrait": null,
         "hover": null,
         "show": null,
         "attach": [],
@@ -8037,7 +8256,7 @@
         "resolved": "#8c3b2e",
         "strength": 0.12
       },
-      "sourceFingerprint": "7465be705f9f55ef649fd8238a7155a3872a2361642152caf515e55cece36934",
+      "sourceFingerprint": "3b608e7796658f6af9943f16b2d0b4cc944cec9205669cd4096af5f165c24b50",
       "output": {
         "path": "public/ui/mobs/warlord_drogmar.webp",
         "bytes": 2398,
@@ -8059,6 +8278,7 @@
         "idle": "Idle",
         "height": 2.65,
         "yaw": null,
+        "portrait": null,
         "hover": 0.12,
         "show": null,
         "attach": [],
@@ -8071,7 +8291,7 @@
         "resolved": null,
         "strength": null
       },
-      "sourceFingerprint": "2fb1fcf255a7121dfc23071eea85ef7178a54bbd0e7cae167e02284fafa873ab",
+      "sourceFingerprint": "7e3dbe54b0933de5e20fd9d8cc22cc639db82bd612edf0749b1ec204eb7225be",
       "output": {
         "path": "public/ui/mobs/water_elemental.webp",
         "bytes": 2166,
@@ -8093,6 +8313,7 @@
         "idle": "Spider_Idle",
         "height": 1.4,
         "yaw": null,
+        "portrait": null,
         "hover": null,
         "show": null,
         "attach": [],
@@ -8105,7 +8326,7 @@
         "resolved": "#4a235a",
         "strength": 0.35
       },
-      "sourceFingerprint": "6b24737f485a350bec3ab6387b6355f7baceeceff75c46431fe8b2844d3458cc",
+      "sourceFingerprint": "2c8ab27db6dbc07052d9cd3ec96b4ee4d356c598d6ec4f88e74a2af1a5401bd9",
       "output": {
         "path": "public/ui/mobs/webwood_spider.webp",
         "bytes": 1524,
@@ -8127,6 +8348,7 @@
         "idle": "Spider_Idle",
         "height": 1.4,
         "yaw": null,
+        "portrait": null,
         "hover": null,
         "show": null,
         "attach": [],
@@ -8139,7 +8361,7 @@
         "resolved": "#3a2740",
         "strength": 0.35
       },
-      "sourceFingerprint": "8b940d99c4c01769048fb2db1acbbbd095568e475507e16a2431899b3b663139",
+      "sourceFingerprint": "aea81aaaa53b5041f7da8eab8b5e3606c1f33ad74046c116363a6d8612236a51",
       "output": {
         "path": "public/ui/mobs/widow_hatchling.webp",
         "bytes": 1554,
@@ -8161,6 +8383,7 @@
         "idle": "Spider_Idle",
         "height": 1.4,
         "yaw": null,
+        "portrait": null,
         "hover": null,
         "show": null,
         "attach": [],
@@ -8173,7 +8396,7 @@
         "resolved": "#3a3440",
         "strength": 0.35
       },
-      "sourceFingerprint": "2de5548a06f6c8c5c1b9c36db8e92fbe945154c86f47399e6be84f51d55379f0",
+      "sourceFingerprint": "5347d327318df976db75c7b2ae3e7497c6283484379384f00b892f72417c010c",
       "output": {
         "path": "public/ui/mobs/widowsilk_spinner.webp",
         "bytes": 1556,
@@ -8195,6 +8418,7 @@
         "idle": "Idle1",
         "height": 1.45,
         "yaw": null,
+        "portrait": null,
         "hover": null,
         "show": null,
         "attach": [],
@@ -8207,7 +8431,7 @@
         "resolved": "#935116",
         "strength": 0.4
       },
-      "sourceFingerprint": "951d84dc27cf080fa36f5f602f8728c9fe2da070b6beb5d4fb30a6da588bfc19",
+      "sourceFingerprint": "6d98b1280b3f7d131485d995ac8ed097500ff204abe7774ac3fa6093d765df4b",
       "output": {
         "path": "public/ui/mobs/wild_boar.webp",
         "bytes": 2824,
@@ -8229,6 +8453,7 @@
         "idle": "Idle",
         "height": 3,
         "yaw": -1.5707963267948966,
+        "portrait": null,
         "hover": null,
         "show": null,
         "attach": [],
@@ -8241,7 +8466,7 @@
         "resolved": "#485b3d",
         "strength": 0.03
       },
-      "sourceFingerprint": "3c3b9c0c15aa5b1061dd6ebccde693527bd9c86c45be51cd26da658de0e0ff7e",
+      "sourceFingerprint": "207593fc69bef849958735e1d3c1a9f33ad3332e9bbb76043912d3efe158ce81",
       "output": {
         "path": "public/ui/mobs/wildheart_beastmaster.webp",
         "bytes": 3316,
@@ -8263,6 +8488,7 @@
         "idle": "Idle",
         "height": 2.5,
         "yaw": -1.5707963267948966,
+        "portrait": null,
         "hover": null,
         "show": null,
         "attach": [],
@@ -8275,7 +8501,7 @@
         "resolved": "#688057",
         "strength": 0.04
       },
-      "sourceFingerprint": "429116bbd70dc6c987264887d3677dd52cb3ed503d364ebc5da64e4b869e2360",
+      "sourceFingerprint": "eab58b7493e77582e2be8df92be8c19aecb1c3aca34eeef915a6960319dac4a7",
       "output": {
         "path": "public/ui/mobs/wildheart_hexcaller.webp",
         "bytes": 3284,
@@ -8297,6 +8523,7 @@
         "idle": "Idle",
         "height": 3.2,
         "yaw": -1.5707963267948966,
+        "portrait": null,
         "hover": null,
         "show": null,
         "attach": [],
@@ -8309,7 +8536,7 @@
         "resolved": "#566f45",
         "strength": 0.03
       },
-      "sourceFingerprint": "119fe85f7e322bd33f8a8dfe2aa8447ca8ff6a9422ed7841d286bdda21cd85dd",
+      "sourceFingerprint": "f180caba9228497cad6ea44afd6497af55787dce1aa1fa1eec8e24a32719701c",
       "output": {
         "path": "public/ui/mobs/wildheart_high_priest.webp",
         "bytes": 3542,
@@ -8331,6 +8558,7 @@
         "idle": "Idle",
         "height": 2.7,
         "yaw": -1.5707963267948966,
+        "portrait": null,
         "hover": null,
         "show": null,
         "attach": [],
@@ -8343,7 +8571,7 @@
         "resolved": "#78513f",
         "strength": 0.04
       },
-      "sourceFingerprint": "157004661e66d007f69d190081688b8b4f8a2c5934b97905e5fd1280698c6bad",
+      "sourceFingerprint": "adb15a84752318d4979cb8fe5b3c78454f1859bf8a06d83956f733271709716b",
       "output": {
         "path": "public/ui/mobs/wildheart_ravager.webp",
         "bytes": 3438,
@@ -8365,6 +8593,7 @@
         "idle": "Idle",
         "height": 2.5,
         "yaw": -1.5707963267948966,
+        "portrait": null,
         "hover": null,
         "show": null,
         "attach": [],
@@ -8377,7 +8606,7 @@
         "resolved": "#4f7651",
         "strength": 0.04
       },
-      "sourceFingerprint": "8566b5949a1b9a4f6cfe84d3f07a6d78a8bc35220e964b9080cbf5e797c1dbed",
+      "sourceFingerprint": "93bdfe72b9f09fda70baaf8bb23a6967b0f0311db5468a6f9e3eb703c18935f4",
       "output": {
         "path": "public/ui/mobs/wildheart_stalker.webp",
         "bytes": 2162,
@@ -8399,6 +8628,7 @@
         "idle": "Idle",
         "height": 2.1,
         "yaw": null,
+        "portrait": null,
         "hover": null,
         "show": null,
         "attach": [],
@@ -8411,7 +8641,7 @@
         "resolved": "#c8e0b8",
         "strength": 0.2
       },
-      "sourceFingerprint": "836bd08aac06acc5a9d1609a7b5fa13081b90ebe2e54e3dd2dbd1298881e9005",
+      "sourceFingerprint": "5a9315d2905b17e22b6aaf96304d49e71b3e912b79e002d3e79954a8bf324686",
       "output": {
         "path": "public/ui/mobs/willow_sprite.webp",
         "bytes": 1708,
@@ -8433,6 +8663,7 @@
         "idle": "Flying_Idle",
         "height": 1.6,
         "yaw": null,
+        "portrait": null,
         "hover": 0.4,
         "show": null,
         "attach": [],
@@ -8445,7 +8676,7 @@
         "resolved": "#9ab4a0",
         "strength": 0.55
       },
-      "sourceFingerprint": "d9e1e5b72c8e8b97e9e8fda201523eec2533bec8d9eb237ee78866c11727ad52",
+      "sourceFingerprint": "c690b7bfbad556d52dd926115d186acc566d8c66d1ee08159fbd187ef3cc35f1",
       "output": {
         "path": "public/ui/mobs/wood_wraith.webp",
         "bytes": 1534,
@@ -8467,6 +8698,7 @@
         "idle": "Idle_Combat",
         "height": 2.5,
         "yaw": null,
+        "portrait": null,
         "hover": null,
         "show": null,
         "attach": [],
@@ -8479,7 +8711,7 @@
         "resolved": "#6f7f8f",
         "strength": 0.25
       },
-      "sourceFingerprint": "3de4c55c6e71c1dd0d95893263b0a1ba261ef16736db495f6258d1a9fd1a2504",
+      "sourceFingerprint": "6e2fb91229701990c578e73471d047c1fe5aff4260b9c01da71b3824e10ee4b5",
       "output": {
         "path": "public/ui/mobs/wraithbinder_maldrec.webp",
         "bytes": 2734,
@@ -8501,6 +8733,7 @@
         "idle": "Idle",
         "height": 2.1,
         "yaw": null,
+        "portrait": null,
         "hover": null,
         "show": null,
         "attach": [],
@@ -8513,7 +8746,7 @@
         "resolved": "#5a8a46",
         "strength": 0.2
       },
-      "sourceFingerprint": "9da432220776a23186325f6149bf94f38cce337b09cefc512424f50fcfd7d805",
+      "sourceFingerprint": "6cf8e63185e8531ca4d4076dab2bed6050e59141e82351c0d5c61062f8718f64",
       "output": {
         "path": "public/ui/mobs/wreck_thief.webp",
         "bytes": 1710,
@@ -8535,6 +8768,7 @@
         "idle": "Idle",
         "height": 2.6,
         "yaw": null,
+        "portrait": null,
         "hover": null,
         "show": [
           "Mage_Hat"
@@ -8562,7 +8796,7 @@
         "resolved": "#533566",
         "strength": 0.5
       },
-      "sourceFingerprint": "6214edd42be9419e66beb928d4e4b3d2f6fde163ac839cb41b7f62247a92ca37",
+      "sourceFingerprint": "aeb71985dcd1ba9c5a6c114232e226681eee448a7549f58158c1e3f6d4506643",
       "output": {
         "path": "public/ui/mobs/wyrmcult_necromancer.webp",
         "bytes": 2108,
@@ -8584,6 +8818,7 @@
         "idle": "Idle",
         "height": 2.6,
         "yaw": null,
+        "portrait": null,
         "hover": null,
         "show": null,
         "attach": [
@@ -8621,7 +8856,7 @@
         "resolved": "#6b3a32",
         "strength": 0.3
       },
-      "sourceFingerprint": "7fe1561ccdfadfaed35de3b431bbe128c599f5994dcc1f27c32470d921cdf0a9",
+      "sourceFingerprint": "be92b476fff831113437214a05fa4bdd9b889b8eac732a4a164139fb717b29b7",
       "output": {
         "path": "public/ui/mobs/wyrmcult_zealot.webp",
         "bytes": 2200,
@@ -8643,6 +8878,7 @@
         "idle": "Flying_Idle",
         "height": 2.4,
         "yaw": null,
+        "portrait": null,
         "hover": 0.25,
         "show": null,
         "attach": [],
@@ -8655,7 +8891,7 @@
         "resolved": "#bcd2ec",
         "strength": 0.2
       },
-      "sourceFingerprint": "99b644f9469b359d52af3c5dd112aeae0ea378b00c0d019776e203bd62ce9e25",
+      "sourceFingerprint": "d612e4355fb42fe4c330d2bbf18e922d5f3942dde995f50cca51b82025d0eacf",
       "output": {
         "path": "public/ui/mobs/ysolei.webp",
         "bytes": 2124,
@@ -8677,6 +8913,7 @@
         "idle": "None",
         "height": 3.12,
         "yaw": null,
+        "portrait": null,
         "hover": null,
         "show": null,
         "attach": [],
@@ -8689,7 +8926,7 @@
         "resolved": null,
         "strength": null
       },
-      "sourceFingerprint": "7ac9443703bf832ca187499a6c8a6fcbee45e476903d4778faa80e7e7530ee36",
+      "sourceFingerprint": "6491675f8d04a474345cf25ca1279edcb70c4494f7606c4ba30a778148b9b7fb",
       "output": {
         "path": "public/ui/mobs/yumi_cat.webp",
         "bytes": 2994,

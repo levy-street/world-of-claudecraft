@@ -439,8 +439,25 @@ export const ZONE3_MOBS: Record<string, MobTemplate> = {
       name: 'Skull Smash',
       school: 'physical',
       fx: 'nova',
+      // Presentation only: his own authored two-handed slam instead of the
+      // plain swing rotation (mob_brutok's ClipMap.attackByAbility).
+      ability: 'brutok_skull_smash',
     },
-    enrage: { belowHpPct: 0.3, dmgMult: 1.5, hasteMult: 1.3 },
+    // The threshold reads as a moment now. At 31% he plants and roars
+    // (Battlecry, ~1.9s as played), rooted and not swinging; the 1.5x/1.3x
+    // frenzy lands as the roar ends, and every swing after it is the wider,
+    // heavier enraged arc. The multipliers themselves are untouched: what
+    // changed is that the group gets a tell before the burn phase instead of
+    // the buff flipping silently mid-swing.
+    enrage: {
+      belowHpPct: 0.3,
+      dmgMult: 1.5,
+      hasteMult: 1.3,
+      cryBelowHpPct: 0.31,
+      cryRootSeconds: 1.9,
+      cryAbility: 'brutok_battlecry',
+      swingAbility: 'brutok_enraged_swing',
+    },
     loot: [
       { copper: 320, chance: 1 },
       { itemId: 'cracked_ogre_tusk', chance: 1 },
@@ -450,7 +467,7 @@ export const ZONE3_MOBS: Record<string, MobTemplate> = {
       { itemId: 'skullsplitter_dirk', chance: 0.25, rollGroup: 'brutok_chase' },
       { itemId: 'stormroot_cowl', chance: 0.2 },
     ],
-    scale: 1.45,
+    scale: 1.9,
     color: 0x6e5235,
   },
   stormcrag_elemental: {

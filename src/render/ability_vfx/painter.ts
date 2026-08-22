@@ -1466,6 +1466,12 @@ export class AbilityVfx {
     // must never arrive late
     if (full.archetype === 'dash') return 0;
     const d = this.deps;
+    // A MOB mechanic's windup is authored to its rig's clip: the delay IS the
+    // maul falling, so it takes the spec's full value. The instant-cast gate
+    // and the caps below exist for PLAYER ability reads (a mob id is not in
+    // ABILITIES, so isInstantAbility would zero it and the boom would fire a
+    // full second before the weapon lands - the Brutok Skull Smash bug).
+    if (d.isMob?.(sourceId)) return full.windup;
     if (d.isInstantAbility && !d.isInstantAbility(abilityId)) return 0;
     if (d.castingAbilityOf?.(sourceId)) return 0;
     const arch = full.archetype;

@@ -1,6 +1,7 @@
 import type { AbilityVfxFullSpec, AbilityVfxSpec } from './ability_vfx_core';
 import { ABILITY_VFX_FULL_SPECS } from './ability_vfx_full_specs';
 import { ABILITY_VFX_SPECS } from './ability_vfx_specs';
+import { BRUTOK_SKULL_SMASH_VFX_FULL_SPEC, BRUTOK_SKULL_SMASH_VFX_SPEC } from './brutok_vfx_specs';
 import {
   BURNING_PACT_VFX_FULL_SPEC,
   BURNING_PACT_VFX_SPEC,
@@ -50,6 +51,7 @@ import { ABYSSAL_RIFT_VFX_FULL_SPEC, ABYSSAL_RIFT_VFX_SPEC } from './warlock_vfx
 // Generated gallery projections remain untouched. Class-owned bespoke
 // identities resolve through this narrow runtime seam instead.
 export function abilityVfxSpec(abilityId: string): AbilityVfxSpec | undefined {
+  if (abilityId === 'brutok_skull_smash') return BRUTOK_SKULL_SMASH_VFX_SPEC;
   if (abilityId === 'emberkin_felbolt') return EMBERKIN_FELBOLT_VFX_SPEC;
   if (abilityId === 'gloomshade_abyssal_chain') return GLOOMSHADE_ABYSSAL_CHAIN_VFX_SPEC;
   if (abilityId === 'bone_mage_shadow_bolt') return BONE_MAGE_SHADOW_BOLT_VFX_SPEC;
@@ -74,6 +76,7 @@ export function abilityVfxSpec(abilityId: string): AbilityVfxSpec | undefined {
 }
 
 export function abilityVfxFullSpec(abilityId: string): AbilityVfxFullSpec | undefined {
+  if (abilityId === 'brutok_skull_smash') return BRUTOK_SKULL_SMASH_VFX_FULL_SPEC;
   if (abilityId === 'emberkin_felbolt') return EMBERKIN_FELBOLT_VFX_FULL_SPEC;
   if (abilityId === 'gloomshade_abyssal_chain') return GLOOMSHADE_ABYSSAL_CHAIN_VFX_FULL_SPEC;
   if (abilityId === 'bone_mage_shadow_bolt') return BONE_MAGE_SHADOW_BOLT_VFX_FULL_SPEC;

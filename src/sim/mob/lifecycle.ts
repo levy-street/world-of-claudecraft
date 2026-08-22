@@ -38,6 +38,7 @@ import { clearThreat } from '../threat';
 import { dist2d, type Entity, NYTHRAXIS_BOSS_ID } from '../types';
 import { groundHeight } from '../world';
 import { resetMobCharge } from './charge';
+import { resetEnrageCry } from './enrage_cry';
 import { idleRng, wanderPause } from './idle_rng';
 import { resetMechanicSpacing } from './mechanic_spacing';
 import { resetRiftMechanicWindups } from './rift_escape_window';
@@ -135,6 +136,7 @@ export function respawnMob(ctx: SimContext, mob: Entity): void {
   mob.counterStunReadyAt = undefined;
   mob.shoutFired = undefined;
   mob.shoutIntroUntil = undefined;
+  resetEnrageCry(mob);
   mob.broodCracked = undefined;
   mob.broodHatched = undefined;
   mob.broodChainAt = undefined;

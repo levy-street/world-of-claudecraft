@@ -1,0 +1,22 @@
+{
+  "items": [
+    {
+      "src": "tmp/asset_src/_Mob_Updates/built/brutok.glb",
+      "out": "models/creatures/brutok.glb",
+      "type": "character",
+      "maxTex": 512,
+      "keepClips": [
+        "Idle",
+        "Walk",
+        "Run",
+        "Attack",
+        "Attack_Enraged",
+        "Slam",
+        "Battlecry",
+        "Hit",
+        "Death",
+        "Combat_Idle"
+      ]
+    }
+  ]
+}
