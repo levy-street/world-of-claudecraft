@@ -43,6 +43,8 @@ function setupParcel(copper = 500) {
   const sim = makeWorld();
   const alice = sim.addPlayer('warrior', 'Alice');
   const bob = sim.addPlayer('mage', 'Bob');
+  sim.setPlayerLevel(6, alice); // past the welcome gate: fixtures use the letter
+  sim.setPlayerLevel(6, bob);
   const aliceMeta = sim.meta(alice);
   if (!aliceMeta) throw new Error('no meta');
   aliceMeta.copper = 10_000;
@@ -233,6 +235,7 @@ describe('the system and npc exemption', () => {
   it('gives authored parcels no clock at all through the real send paths', () => {
     const sim = makeWorld();
     const pid = sim.addPlayer('warrior', 'Keeper');
+    sim.setPlayerLevel(6, pid); // past the welcome gate: the fixture reads the letter
     const welcome = bookOf(sim).find((m) => m.letterId === WELCOME_LETTER.letterId);
     expect(welcome.kind).toBe('system');
     expect(welcome.copper).toBeGreaterThan(0);
@@ -256,6 +259,7 @@ describe('the system and npc exemption', () => {
   it('the sweep kind filter leaves a non-player parcel alone even past a forced expiry', () => {
     const sim = makeWorld();
     const pid = sim.addPlayer('warrior', 'Keeper');
+    sim.setPlayerLevel(6, pid); // past the welcome gate: the fixture reads the letter
     sim.postOffice.mailHeroicMarks(pid, HEROIC_MARK_ITEM_ID, 3);
     tickFor(sim, 1);
     const marks = bookOf(sim).find((m) => m.letterId === HEROIC_MARK_LETTER.letterId);

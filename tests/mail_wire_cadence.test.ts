@@ -75,6 +75,8 @@ function mailboxServer(): { server: GameServer; fc: FakeClient; session: ClientS
   const server = new GameServer();
   const fc = fakeWs();
   const session = joinServer(server, fc, 71, 'Postie');
+  // Past the welcome gate (level 6): the cadence pins count the welcome letter.
+  server.sim.setPlayerLevel(6, session.pid);
   placeAtMailbox(server, session.pid);
   return { server, fc, session };
 }

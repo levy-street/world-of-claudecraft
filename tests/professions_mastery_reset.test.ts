@@ -369,6 +369,7 @@ describe('the mail-phase notice letter', () => {
   it('a new character gets no reset and no notice (construction path)', () => {
     const sim = makeSim();
     const pid = sim.addPlayer('warrior', 'Fresh');
+    sim.setPlayerLevel(6, pid); // past the welcome gate: the pin counts the welcome
     const meta = metaOf(sim, pid);
     expect(meta.pendingMasteryResetNotice).toBe(false);
     for (let i = 0; i < 40; i++) sim.tick();
