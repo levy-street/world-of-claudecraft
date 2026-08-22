@@ -1,16 +1,16 @@
 {
-  "scenario": "rift_clear_rewards",
-  "seed": 4332,
+  "scenario": "rift_clear_rewards_s",
+  "seed": 4333,
   "sampleEvery": 20,
   "ticks": 67,
   "coverage": [
     "completeRiftClear winning payout reached through the real 1 Hz updateRiftInstances sweep",
-    "addRiftClearGearLoot on the A-RANK path: draws 2, 5, and 6 in order (the phase 11 pattern draw succeeds on this seed, pinning the pick position); the C/B/S-only arms are covered by the sibling rift_clear_rewards_c/_b/_s scenarios",
+    "addRiftClearGearLoot on the S-RANK path: draws 2, 3, 4 (one INDEPENDENT roll per id in RIFT_LEGENDARY_ITEM_IDS, in array order), 5 (the epic mount tier) and 6 in order, the widest arm of the ladder and the only one reaching the legendary rolls",
     "openDescent + the walk-in descent trigger + spawnRiftFloor across all three floors",
     "openExit + rank coin bonus on the winning corpse (dev-entry claim, no race)"
   ],
-  "draws": 350,
-  "drawDigest": "b1ee68e2",
+  "draws": 395,
+  "drawDigest": "4cb06a2a",
   "frames": [
     {
       "tick": 0,
@@ -155,10 +155,10 @@
       "time": 0,
       "nextId": 987,
       "state": "8b7f584f",
-      "events": "604ec54a",
+      "events": "5f4a6da3",
       "rng": {
         "draws": 48,
-        "digest": "de38ddee"
+        "digest": "6f65de54"
       },
       "label": "entered",
       "players": [
@@ -297,18 +297,18 @@
       "events": "e4269513",
       "rng": {
         "draws": 48,
-        "digest": "de38ddee"
+        "digest": "6f65de54"
       }
     },
     {
       "tick": 21,
       "time": 1.05,
       "nextId": 1001,
-      "state": "c99b8026",
-      "events": "0da6ddf1",
+      "state": "ca11a4a6",
+      "events": "5c9ebf2a",
       "rng": {
         "draws": 108,
-        "digest": "52855ed6"
+        "digest": "f82c1cbe"
       },
       "label": "descended-to-1",
       "players": [
@@ -422,7 +422,7 @@
           "critChance": 0.0695,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.0695,
-          "fallStartY": 34.962132,
+          "fallStartY": 42.070836,
           "fiveSecondRule": 100.05,
           "gm": true,
           "hp": 50000,
@@ -473,18 +473,18 @@
       "events": "61ae8d11",
       "rng": {
         "draws": 108,
-        "digest": "52855ed6"
+        "digest": "f82c1cbe"
       }
     },
     {
       "tick": 42,
       "time": 2.1,
       "nextId": 1013,
-      "state": "c0c4ef6e",
-      "events": "8a642cae",
+      "state": "dded3cc7",
+      "events": "b7f08469",
       "rng": {
-        "draws": 182,
-        "digest": "48336b6e"
+        "draws": 178,
+        "digest": "dcd25984"
       },
       "label": "descended-to-2",
       "players": [
@@ -598,7 +598,7 @@
           "critChance": 0.0695,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.0695,
-          "fallStartY": 35.891608,
+          "fallStartY": 44.550546,
           "fiveSecondRule": 101.1,
           "gm": true,
           "hp": 50000,
@@ -645,22 +645,22 @@
       "tick": 60,
       "time": 3,
       "nextId": 1015,
-      "state": "7d57c93d",
-      "events": "7aee4571",
+      "state": "8b384a52",
+      "events": "2ca296fa",
       "rng": {
-        "draws": 310,
-        "digest": "2697859a"
+        "draws": 341,
+        "digest": "c76571ac"
       }
     },
     {
       "tick": 67,
       "time": 3.35,
       "nextId": 1015,
-      "state": "d3e05e93",
+      "state": "51fdb9e0",
       "events": "741638a5",
       "rng": {
-        "draws": 350,
-        "digest": "b1ee68e2"
+        "draws": 395,
+        "digest": "4cb06a2a"
       },
       "label": "clear-paid",
       "players": [
@@ -685,7 +685,8 @@
           "craftSkills": {},
           "deedStats": {
             "counters": {
-              "riftClears": 1
+              "riftClears": 1,
+              "riftSRankClears": 1
             },
             "dungeonClears": {},
             "itemsDiscovered": [
@@ -698,6 +699,10 @@
           "deedsEarned": [
             [
               "dgn_rift",
+              ""
+            ],
+            [
+              "dgn_rift_s_rank",
               ""
             ],
             [
@@ -750,7 +755,7 @@
             "counts": {},
             "firstFind": {}
           },
-          "renown": 60,
+          "renown": 85,
           "talents": {
             "rows": {}
           },
@@ -834,60 +839,60 @@
           "deathZoneStrikeTimer": 26,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.05,
-          "facing": -0.003574,
+          "facing": -0.080917,
           "fiveSecondRule": 99,
           "hostile": true,
           "id": 1009,
           "kind": "mob",
-          "level": 22,
+          "level": 23,
           "loot": {
-            "copper": 35000,
+            "copper": 50000,
             "items": [
               {
                 "count": 1,
-                "itemId": "mistforged_pauldrons"
+                "itemId": "gravewyrm_claws"
               },
               {
                 "count": 1,
-                "itemId": "pattern_forgefold_legguards"
+                "itemId": "pattern_sunspun_haversack"
               }
             ]
           },
           "lootFfaTimer": "Infinity",
           "lootable": true,
-          "maxHp": 41338,
-          "mechanicDamageMult": 21.4,
-          "mechanicHealMult": 9.17,
+          "maxHp": 61978,
+          "mechanicDamageMult": 22.4,
+          "mechanicHealMult": 13.34,
           "moveSpeed": 8,
           "onGround": true,
           "overpowerUntil": -1,
           "petMode": "defensive",
           "pos": {
-            "x": 108399.9995,
+            "x": 108399.988684,
             "y": 3.09629,
-            "z": -480.860001
+            "z": -480.860458
           },
           "potionCooldownUntil": -1,
           "respawnTimer": -1.25,
-          "riftMechanicLimit": 3,
+          "riftMechanicLimit": 4,
           "riftMechanicSpacing": 5,
           "spawnPos": {
             "x": 108400,
             "z": -481
           },
           "stats": {
-            "armor": 788
+            "armor": 924
           },
           "stoneskinTimer": 16,
           "templateId": "rift_boss_frost",
           "wanderTarget": {
-            "x": 108399.97873,
-            "z": -475.048919
+            "x": 108399.75277,
+            "z": -477.951319
           },
           "wanderTimer": 30,
           "weapon": {
-            "max": 3338,
-            "min": 2137,
+            "max": 3629,
+            "min": 2322,
             "speed": 2.5
           }
         }
@@ -897,11 +902,11 @@
       "tick": 67,
       "time": 3.35,
       "nextId": 1015,
-      "state": "d3e05e93",
+      "state": "51fdb9e0",
       "events": "741638a5",
       "rng": {
-        "draws": 350,
-        "digest": "b1ee68e2"
+        "draws": 395,
+        "digest": "4cb06a2a"
       },
       "label": "final",
       "players": [
@@ -926,7 +931,8 @@
           "craftSkills": {},
           "deedStats": {
             "counters": {
-              "riftClears": 1
+              "riftClears": 1,
+              "riftSRankClears": 1
             },
             "dungeonClears": {},
             "itemsDiscovered": [
@@ -939,6 +945,10 @@
           "deedsEarned": [
             [
               "dgn_rift",
+              ""
+            ],
+            [
+              "dgn_rift_s_rank",
               ""
             ],
             [
@@ -991,7 +1001,7 @@
             "counts": {},
             "firstFind": {}
           },
-          "renown": 60,
+          "renown": 85,
           "talents": {
             "rows": {}
           },
@@ -1075,60 +1085,60 @@
           "deathZoneStrikeTimer": 26,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.05,
-          "facing": -0.003574,
+          "facing": -0.080917,
           "fiveSecondRule": 99,
           "hostile": true,
           "id": 1009,
           "kind": "mob",
-          "level": 22,
+          "level": 23,
           "loot": {
-            "copper": 35000,
+            "copper": 50000,
             "items": [
               {
                 "count": 1,
-                "itemId": "mistforged_pauldrons"
+                "itemId": "gravewyrm_claws"
               },
               {
                 "count": 1,
-                "itemId": "pattern_forgefold_legguards"
+                "itemId": "pattern_sunspun_haversack"
               }
             ]
           },
           "lootFfaTimer": "Infinity",
           "lootable": true,
-          "maxHp": 41338,
-          "mechanicDamageMult": 21.4,
-          "mechanicHealMult": 9.17,
+          "maxHp": 61978,
+          "mechanicDamageMult": 22.4,
+          "mechanicHealMult": 13.34,
           "moveSpeed": 8,
           "onGround": true,
           "overpowerUntil": -1,
           "petMode": "defensive",
           "pos": {
-            "x": 108399.9995,
+            "x": 108399.988684,
             "y": 3.09629,
-            "z": -480.860001
+            "z": -480.860458
           },
           "potionCooldownUntil": -1,
           "respawnTimer": -1.25,
-          "riftMechanicLimit": 3,
+          "riftMechanicLimit": 4,
           "riftMechanicSpacing": 5,
           "spawnPos": {
             "x": 108400,
             "z": -481
           },
           "stats": {
-            "armor": 788
+            "armor": 924
           },
           "stoneskinTimer": 16,
           "templateId": "rift_boss_frost",
           "wanderTarget": {
-            "x": 108399.97873,
-            "z": -475.048919
+            "x": 108399.75277,
+            "z": -477.951319
           },
           "wanderTimer": 30,
           "weapon": {
-            "max": 3338,
-            "min": 2137,
+            "max": 3629,
+            "min": 2322,
             "speed": 2.5
           }
         }

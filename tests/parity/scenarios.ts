@@ -46,6 +46,7 @@ import {
 import { startFishing } from '../../src/sim/professions/fishing';
 import { gatherCastDurationSec, gatherNodeById } from '../../src/sim/professions/gathering';
 import { stationsOfType } from '../../src/sim/professions/stations';
+import { riftRankForBaseLevel } from '../../src/sim/rift/ranks';
 import { type ArenaMatch, type PlayerMeta, Sim } from '../../src/sim/sim';
 import { ARENA_MIN_LEVEL } from '../../src/sim/social/arena';
 import { addThreat } from '../../src/sim/threat';
@@ -6282,16 +6283,43 @@ function catFormAutoSwing(): Scenario {
 // RIFT_PATTERN_ITEM_IDS (pattern_forgefold_legguards on this seed). The boss is
 // tracked, so the corpse loot (guaranteed heroic epic + the pattern + the
 // A-rank coin bonus) is in the state digest, not just the draw digest.
-function riftClearRewards(): Scenario {
+//
+// PARAMETERISED BY RANK at masterwrought Phase 11f, which CLOSES the residual
+// the A-rank coverage line above used to record. The draw ladder is rank-gated
+// (progression.ts numbers it 0 to 6), so one rank exercises only its own arms
+// and three quarters of the ladder sat outside every golden. Phase 11f appends
+// a NEW draw after draw 6 on the same winning B/A/S path, and appending into a
+// stream no golden covers is exactly how a draw-order change ships unseen, so
+// all four ranks are recorded FIRST, as this phase's first commit.
+//
+// baseLevel picks the rank through the shipped inverse map
+// (RIFT_RANK_BASE_LEVEL: C 20, B 22, A 25, S 28), so the ranks here are derived
+// from content rather than restated. The A row keeps the original scenario NAME
+// and its original SEED, so its committed golden does not move for the rename.
+// Each rank carries its OWN seed because the pattern draw is a 0.08 chance and
+// a golden that pins the rng.int pick position is worth far more than one that
+// records a miss: the B and S seeds were hunted for an in-window pattern hit
+// (about 1 in 12 seeds). C needs no hunt because its arm RETURNS after draw 0
+// and never reaches the pattern roll at all.
+function riftClearRewards(baseLevel = 25, seed = 4332): Scenario {
+  const rank = riftRankForBaseLevel(baseLevel);
+  // Per-rank coverage: what each rank's arm actually reaches in the numbered
+  // ladder, so a reader can see the four rows tile it between them.
+  const ladder: Record<string, string> = {
+    C: 'addRiftClearGearLoot on the C-RANK path: draw 0 only (the normal-pool rng.int pick plus RIFT_COIN_BONUS_C), then the arm RETURNS, so no epic, no mount and no pattern draw is reached; this is the pin that the C early-out really exits',
+    B: 'addRiftClearGearLoot on the B-RANK path: draws 1, 5 and 6 in order (the RIFT_EPIC_CHANCE_B chance() call kept so the draw survives, the green mount tier, and the pattern roll, which SUCCEEDS on this seed so the rng.int pick position is pinned)',
+    A: 'addRiftClearGearLoot on the A-RANK path: draws 2, 5, and 6 in order (the phase 11 pattern draw succeeds on this seed, pinning the pick position); the C/B/S-only arms are covered by the sibling rift_clear_rewards_c/_b/_s scenarios',
+    S: 'addRiftClearGearLoot on the S-RANK path: draws 2, 3, 4 (one INDEPENDENT roll per id in RIFT_LEGENDARY_ITEM_IDS, in array order), 5 (the epic mount tier) and 6 in order, the widest arm of the ladder and the only one reaching the legendary rolls',
+  };
   return {
-    name: 'rift_clear_rewards',
+    name: rank === 'A' ? 'rift_clear_rewards' : `rift_clear_rewards_${rank.toLowerCase()}`,
     coverage: [
       'completeRiftClear winning payout reached through the real 1 Hz updateRiftInstances sweep',
-      'addRiftClearGearLoot on the A-RANK path: draws 2, 5, and 6 in order (the phase 11 pattern draw succeeds on this seed, pinning the pick position); the C/B/S-only arms (draws 0, 1, 3, 4) do not run at A and stay outside every golden, a recorded residual',
+      ladder[rank],
       'openDescent + the walk-in descent trigger + spawnRiftFloor across all three floors',
       'openExit + rank coin bonus on the winning corpse (dev-entry claim, no race)',
     ],
-    build: () => new Sim({ seed: 4332, playerClass: 'warrior', autoEquip: true }),
+    build: () => new Sim({ seed, playerClass: 'warrior', autoEquip: true }),
     drive(rec: Recorder) {
       const sim = rec.sim;
       sim.setPlayerLevel(20);
@@ -6302,7 +6330,7 @@ function riftClearRewards(): Scenario {
       // it via riftFloorCount; seed 3 yields 3 floors), second the baseLevel
       // (25 = A rank): changing the 3 changes the generated rift, not a
       // floor-count knob.
-      sim.enterRift(3, 25, sim.playerId);
+      sim.enterRift(3, baseLevel, sim.playerId);
       const inst = requireValue(
         sim.riftInstances.find((i) => i.partyKey !== null),
         'rift_clear_rewards instance',
@@ -6421,4 +6449,14 @@ export const SCENARIOS: Scenario[] = [
   grixRespawnWindow(),
   catFormAutoSwing(),
   riftClearRewards(),
+  // The three sibling ranks (masterwrought Phase 11f, closing the residual the
+  // A row used to record). Seeds: C keeps 4332 because its arm returns after
+  // draw 0 and has no chance() to land in-window; B 4353 and S 4333 were HUNTED
+  // for an in-window pattern hit on draw 6, so all three of the ranks that
+  // reach that draw pin the rng.int pick position rather than recording a miss.
+  // The hunt measured 3 B hits and 4 S hits in 40 consecutive seeds, which is
+  // the 0.08 rate showing up where it should.
+  riftClearRewards(20, 4332),
+  riftClearRewards(22, 4353),
+  riftClearRewards(28, 4333),
 ];

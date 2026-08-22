@@ -1,16 +1,16 @@
 {
-  "scenario": "rift_clear_rewards",
+  "scenario": "rift_clear_rewards_c",
   "seed": 4332,
   "sampleEvery": 20,
   "ticks": 67,
   "coverage": [
     "completeRiftClear winning payout reached through the real 1 Hz updateRiftInstances sweep",
-    "addRiftClearGearLoot on the A-RANK path: draws 2, 5, and 6 in order (the phase 11 pattern draw succeeds on this seed, pinning the pick position); the C/B/S-only arms are covered by the sibling rift_clear_rewards_c/_b/_s scenarios",
+    "addRiftClearGearLoot on the C-RANK path: draw 0 only (the normal-pool rng.int pick plus RIFT_COIN_BONUS_C), then the arm RETURNS, so no epic, no mount and no pattern draw is reached; this is the pin that the C early-out really exits",
     "openDescent + the walk-in descent trigger + spawnRiftFloor across all three floors",
     "openExit + rank coin bonus on the winning corpse (dev-entry claim, no race)"
   ],
-  "draws": 350,
-  "drawDigest": "b1ee68e2",
+  "draws": 347,
+  "drawDigest": "52855f0a",
   "frames": [
     {
       "tick": 0,
@@ -155,7 +155,7 @@
       "time": 0,
       "nextId": 987,
       "state": "8b7f584f",
-      "events": "604ec54a",
+      "events": "892166fb",
       "rng": {
         "draws": 48,
         "digest": "de38ddee"
@@ -305,7 +305,7 @@
       "time": 1.05,
       "nextId": 1001,
       "state": "c99b8026",
-      "events": "0da6ddf1",
+      "events": "6010e0f2",
       "rng": {
         "draws": 108,
         "digest": "52855ed6"
@@ -481,7 +481,7 @@
       "time": 2.1,
       "nextId": 1013,
       "state": "c0c4ef6e",
-      "events": "8a642cae",
+      "events": "56ef7581",
       "rng": {
         "draws": 182,
         "digest": "48336b6e"
@@ -645,22 +645,22 @@
       "tick": 60,
       "time": 3,
       "nextId": 1015,
-      "state": "7d57c93d",
+      "state": "bef05cd8",
       "events": "7aee4571",
       "rng": {
-        "draws": 310,
-        "digest": "2697859a"
+        "draws": 307,
+        "digest": "0a26726a"
       }
     },
     {
       "tick": 67,
       "time": 3.35,
       "nextId": 1015,
-      "state": "d3e05e93",
+      "state": "b289980e",
       "events": "741638a5",
       "rng": {
-        "draws": 350,
-        "digest": "b1ee68e2"
+        "draws": 347,
+        "digest": "52855f0a"
       },
       "label": "clear-paid",
       "players": [
@@ -841,42 +841,38 @@
           "kind": "mob",
           "level": 22,
           "loot": {
-            "copper": 35000,
+            "copper": 10000,
             "items": [
               {
                 "count": 1,
-                "itemId": "mistforged_pauldrons"
-              },
-              {
-                "count": 1,
-                "itemId": "pattern_forgefold_legguards"
+                "itemId": "necromancers_soulspire_mantle"
               }
             ]
           },
           "lootFfaTimer": "Infinity",
           "lootable": true,
-          "maxHp": 41338,
-          "mechanicDamageMult": 21.4,
-          "mechanicHealMult": 9.17,
-          "moveSpeed": 8,
+          "maxHp": 6311,
+          "mechanicDamageMult": 7.05,
+          "mechanicHealMult": 1.4,
+          "moveSpeed": 7,
           "onGround": true,
           "overpowerUntil": -1,
           "petMode": "defensive",
           "pos": {
-            "x": 108399.9995,
+            "x": 108399.999562,
             "y": 3.09629,
-            "z": -480.860001
+            "z": -480.877501
           },
           "potionCooldownUntil": -1,
           "respawnTimer": -1.25,
-          "riftMechanicLimit": 3,
+          "riftMechanicLimit": 1,
           "riftMechanicSpacing": 5,
           "spawnPos": {
             "x": 108400,
             "z": -481
           },
           "stats": {
-            "armor": 788
+            "armor": 630
           },
           "stoneskinTimer": 16,
           "templateId": "rift_boss_frost",
@@ -886,8 +882,8 @@
           },
           "wanderTimer": 30,
           "weapon": {
-            "max": 3338,
-            "min": 2137,
+            "max": 1100,
+            "min": 704,
             "speed": 2.5
           }
         }
@@ -897,11 +893,11 @@
       "tick": 67,
       "time": 3.35,
       "nextId": 1015,
-      "state": "d3e05e93",
+      "state": "b289980e",
       "events": "741638a5",
       "rng": {
-        "draws": 350,
-        "digest": "b1ee68e2"
+        "draws": 347,
+        "digest": "52855f0a"
       },
       "label": "final",
       "players": [
@@ -1082,42 +1078,38 @@
           "kind": "mob",
           "level": 22,
           "loot": {
-            "copper": 35000,
+            "copper": 10000,
             "items": [
               {
                 "count": 1,
-                "itemId": "mistforged_pauldrons"
-              },
-              {
-                "count": 1,
-                "itemId": "pattern_forgefold_legguards"
+                "itemId": "necromancers_soulspire_mantle"
               }
             ]
           },
           "lootFfaTimer": "Infinity",
           "lootable": true,
-          "maxHp": 41338,
-          "mechanicDamageMult": 21.4,
-          "mechanicHealMult": 9.17,
-          "moveSpeed": 8,
+          "maxHp": 6311,
+          "mechanicDamageMult": 7.05,
+          "mechanicHealMult": 1.4,
+          "moveSpeed": 7,
           "onGround": true,
           "overpowerUntil": -1,
           "petMode": "defensive",
           "pos": {
-            "x": 108399.9995,
+            "x": 108399.999562,
             "y": 3.09629,
-            "z": -480.860001
+            "z": -480.877501
           },
           "potionCooldownUntil": -1,
           "respawnTimer": -1.25,
-          "riftMechanicLimit": 3,
+          "riftMechanicLimit": 1,
           "riftMechanicSpacing": 5,
           "spawnPos": {
             "x": 108400,
             "z": -481
           },
           "stats": {
-            "armor": 788
+            "armor": 630
           },
           "stoneskinTimer": 16,
           "templateId": "rift_boss_frost",
@@ -1127,8 +1119,8 @@
           },
           "wanderTimer": 30,
           "weapon": {
-            "max": 3338,
-            "min": 2137,
+            "max": 1100,
+            "min": 704,
             "speed": 2.5
           }
         }

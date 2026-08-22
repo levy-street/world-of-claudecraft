@@ -13,7 +13,14 @@ import { describe, expect, it } from 'vitest';
 import { ITEMS, MOBS } from '../../src/sim/data';
 import { RIFT_IMPAIRED_FUSE_CAP } from '../../src/sim/mob/rift_escape_window';
 import { farmingHarvestGainAt, resolveFarmHarvest } from '../../src/sim/professions/farming';
-import { RIFT_COIN_BONUS_A, RIFT_PATTERN_ITEM_IDS } from '../../src/sim/rift/progression';
+import { riftNormalClearPool } from '../../src/sim/rift/loot_pools';
+import {
+  RIFT_COIN_BONUS_A,
+  RIFT_COIN_BONUS_B,
+  RIFT_COIN_BONUS_C,
+  RIFT_COIN_BONUS_S,
+  RIFT_PATTERN_ITEM_IDS,
+} from '../../src/sim/rift/progression';
 import { RIFT_S_ZONE_TEMPO } from '../../src/sim/rift/ranks';
 import { record } from './record';
 import { type Ev, entities, run } from './run_scenarios';
@@ -1063,5 +1070,98 @@ describe('coverage: each scenario fires its subsystem', () => {
     expect(boss?.lootable).toBe(true);
     // The A-rank clear-time coin bonus landed on top of the static boss coin.
     expect(boss?.loot?.copper ?? 0).toBeGreaterThanOrEqual(RIFT_COIN_BONUS_A);
+  });
+
+  // The three sibling ranks (masterwrought Phase 11f). addRiftClearGearLoot's
+  // ladder is rank-gated, so one rank exercises only its own arms: before these
+  // three, draws 0, 1, 3 and 4 ran in no golden at all. Phase 11f appends a new
+  // draw after draw 6 on the same winning path, so the ladder is pinned at every
+  // rank FIRST and the append lands in a stream these goldens cover.
+  //
+  // Each arm asserts what its rank's arm REACHES, not merely that a clear paid:
+  // an assertion that passes at every rank would not tell the four apart, which
+  // is the whole point of recording them separately.
+  it('rift_clear_rewards_c: the C arm pays draw 0 and RETURNS before every other draw', () => {
+    const rec = run('rift_clear_rewards_c');
+    const inst = rec.sim.riftInstances.find((i) => i.partyKey !== null);
+    expect(inst?.outcome).toBe('won');
+    expect(inst?.rewarded).toBe(true);
+    const boss = rec.sim.entities.get(rec.notes.bossId as number);
+    const items = (boss?.loot?.items ?? []).map((entry) => entry.itemId);
+    // Draw 0 landed: exactly one guaranteed pick from the normal-clear pool.
+    const normalPool = new Set(riftNormalClearPool());
+    expect(items.filter((id) => normalPool.has(id)).length).toBe(1);
+    // The EARLY RETURN is the pin: no pattern (draw 6) and no mount (draw 5)
+    // can appear at C, whatever the seed, because the arm exits after draw 0.
+    // This is the decisive half; a C run that shed either would mean the
+    // early-out stopped exiting.
+    expect(items.filter((id) => (RIFT_PATTERN_ITEM_IDS as readonly string[]).includes(id))).toEqual(
+      [],
+    );
+    expect(items.filter((id) => id.startsWith('reins_'))).toEqual([]);
+    expect(items.length).toBe(1);
+    expect(boss?.loot?.copper ?? 0).toBeGreaterThanOrEqual(RIFT_COIN_BONUS_C);
+    expect(boss?.lootable).toBe(true);
+  });
+
+  it('rift_clear_rewards_b: the B arm pays draws 1, 5 and 6, and the pattern lands in-window', () => {
+    const rec = run('rift_clear_rewards_b');
+    const inst = rec.sim.riftInstances.find((i) => i.partyKey !== null);
+    expect(inst?.outcome).toBe('won');
+    const boss = rec.sim.entities.get(rec.notes.bossId as number);
+    const items = (boss?.loot?.items ?? []).map((entry) => entry.itemId);
+    // Draw 1: RIFT_EPIC_CHANCE_B is 1.0, so B always sheds its heroic epic.
+    // Draw 6: the seed was hunted so the 8% roll SUCCEEDS, which is what makes
+    // this golden pin the rng.int pick over the sorted id list rather than a miss.
+    const patterns = items.filter((id) =>
+      (RIFT_PATTERN_ITEM_IDS as readonly string[]).includes(id),
+    );
+    expect(patterns.length).toBe(1);
+    expect(items.length).toBeGreaterThanOrEqual(2);
+    // B is NOT S: no legendary roll (draws 3 and 4) is reachable on this arm.
+    expect(items.filter((id) => id.startsWith('reins_')).length).toBeLessThanOrEqual(1);
+    expect(boss?.loot?.copper ?? 0).toBeGreaterThanOrEqual(RIFT_COIN_BONUS_B);
+    expect(boss?.lootable).toBe(true);
+  });
+
+  it('rift_clear_rewards_s: the S arm reaches the legendary rolls and the pattern draw', () => {
+    const rec = run('rift_clear_rewards_s');
+    const inst = rec.sim.riftInstances.find((i) => i.partyKey !== null);
+    expect(inst?.outcome).toBe('won');
+    const boss = rec.sim.entities.get(rec.notes.bossId as number);
+    const items = (boss?.loot?.items ?? []).map((entry) => entry.itemId);
+    const patterns = items.filter((id) =>
+      (RIFT_PATTERN_ITEM_IDS as readonly string[]).includes(id),
+    );
+    expect(patterns.length).toBe(1);
+    // The S coin bonus is the arm's own discriminator: it is the only rank
+    // paying RIFT_COIN_BONUS_S, so this fails if the scenario silently drifted
+    // to another rank (a baseLevel typo would otherwise still look like a clear).
+    expect(boss?.loot?.copper ?? 0).toBeGreaterThanOrEqual(RIFT_COIN_BONUS_S);
+    expect(items.length).toBeGreaterThanOrEqual(2);
+    expect(boss?.lootable).toBe(true);
+  });
+
+  // The four rows tile the ladder between them rather than repeating one arm:
+  // stated as a test so a future edit that points two scenarios at the same
+  // baseLevel (the cheapest way to silently lose a rank) reds here.
+  it('the four rift reward scenarios cover four DISTINCT ranks', () => {
+    const names = [
+      'rift_clear_rewards_c',
+      'rift_clear_rewards_b',
+      'rift_clear_rewards',
+      'rift_clear_rewards_s',
+    ];
+    const bonuses = new Set<number>();
+    for (const name of names) {
+      const rec = run(name);
+      const boss = rec.sim.entities.get(rec.notes.bossId as number);
+      bonuses.add(boss?.loot?.copper ?? 0);
+    }
+    // C and B share a coin bonus literal (both 10 000c), so the copper alone
+    // cannot separate all four; the C arm's item shape above is what tells
+    // those two apart. Three distinct totals is the honest claim here.
+    expect(bonuses.size).toBeGreaterThanOrEqual(3);
+    expect(SCENARIOS.filter((s) => s.name.startsWith('rift_clear_rewards')).length).toBe(4);
   });
 });
