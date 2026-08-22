@@ -7902,8 +7902,17 @@ from a doc.
 
 THE REFERENCE FARMER, the model's ONE assumption and DECISION A's subject
 (settled 2026-08-20): two check-ins a day, far enough apart that any crop of the
-tier is ready between them (the longest shipped duration is 10.5 hours, so both
-gaps of a morning-and-evening rhythm clear it), planting every TEACHING bed
+tier is ready between them (CORRECTED at the 11e QA: the longest shipped
+duration is 10.75 hours, not the 10.5 this paragraph was written against. The
+model section was drafted at STEP 0, before the roster landed, and
+evergarden_pumpkin at 645 minutes then became the longest crop in the tree, so
+this phase falsified its own stated input. The assumption still holds, since a
+morning-and-evening rhythm's twelve-hour gap clears 10.75, but the margin is
+1.25 hours rather than 1.5 and a thirteenth crop longer than twelve hours would
+break the reference farmer outright. NOTHING ASSERTS THIS: the model helper's
+header claims the gap-clears-growth premise is "asserted separately by the
+derivation test against the real durationMs literals" and no such assertion
+exists, which is why the drift was invisible), planting every TEACHING bed
 available in the band, meaning the union of the hubs whose crop tier still
 teaches at that skill. A SECOND assumption is stated rather than hidden, because
 plantCrop gate 12 enforces it: the farmer's HOE keeps pace with the tier they
@@ -7922,10 +7931,25 @@ never used to compute the days column.
 PER-BAND TABLE (reference farmer; the bed and tier columns are curve-independent)
 | band | teaching tiers | hubs | beds | attempts/day | mean survival | grants/day |
 |---|---|---|---|---|---|---|
-| 0 to 25 | 1 | Eastbrook | 4 | 8 | 0.922 | 7.38 |
-| 25 to 50 | 1, 2 | Eastbrook + Mirefen | 9 | 18 | 0.958 | 17.24 |
+| 0 to 25 | 1 | Eastbrook | 4 | 8 | 0.924 | 7.39 |
+| 25 to 50 | 1, 2 | Eastbrook + Mirefen | 9 | 18 | 0.958 | 17.25 |
 | 50 to 75 | 2, 3 | Mirefen + Thornpeak | 11 | 22 | 0.959 | 21.10 |
 | 75 to 100 | 3, 4 | Thornpeak + Evergarden | 14 | 28 | 0.957 | 26.80 |
+
+THREE CELLS OF THAT TABLE WERE WRONG and are corrected above, found at the 11e
+QA by executing the helper and diffing its output against the doc: band 1 read
+0.922 / 7.38 and band 2 read 17.24, against the helper's 0.9242 / 7.3940 and
+17.2463. The helper computes meanSurvival as the bed-weighted ARITHMETIC mean
+over the band's discrete steps and grantsPerDay as attempts times that mean
+(farming_calendar_model.ts, the survivalSum accumulation); the three wrong cells
+are what a HARMONIC reading gives, so the table was assembled from two different
+derivations without either being named. Load-bearing columns were all correct:
+beds, attempts, the days column, the totals and the family search reproduce to
+the digit. This column is the one the doc itself calls "reported for the reader,
+never used to compute the days column", and NOTHING pins it: meanSurvival and
+grantsPerDay have no consumer anywhere outside the helper, so a doc-only figure
+had no way to be caught. Recorded rather than pinned: pinning a reader column
+would be pinning a rounding.
 
 THE OLD CURVE, run through the same model, because it is the EVIDENCE for the
 re-tune rather than a claim about it:

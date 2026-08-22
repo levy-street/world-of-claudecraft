@@ -595,6 +595,30 @@ describe('the farming gain curve is DERIVED from the calendar model, not felt', 
     expect(model.bands.map((b) => b.harvests)).toEqual([100, 200, 400, 800]);
   });
 
+  it('holds the reference farmer\'s premise: a visit gap clears the longest crop', () => {
+    // ADDED at the 11e QA. The model helper's header has always claimed this
+    // premise is "asserted separately by the derivation test against the real
+    // durationMs literals", and no such assertion existed. It matters because
+    // the whole per-band attempts figure is visitsPerDay x beds, which is only
+    // true while every crop of the band is ready between two check-ins: a crop
+    // longer than the gap silently halves the attempts the model credits.
+    //
+    // The drift is not hypothetical. state.md's reference-farmer paragraph was
+    // written at STEP 0 saying "the longest shipped duration is 10.5 hours",
+    // and this very phase then added evergarden_pumpkin at 645 minutes (10.75
+    // hours), so the phase falsified its own recorded input with nothing to
+    // catch it.
+    const gapMs = (24 / REFERENCE_FARMER.visitsPerDay) * 60 * 60_000;
+    const longest = Math.max(...Object.values(FARM_CROPS).map((c) => c.durationMs));
+    expect(longest, 'the longest shipped crop must be ready between two check-ins').toBeLessThan(
+      gapMs,
+    );
+    // The literal, so a new crop that pushes the ceiling is a visible edit
+    // rather than a silently narrowing margin.
+    expect(longest).toBe(38_700_000);
+    expect(gapMs).toBe(43_200_000);
+  });
+
   it('records the maximum-dedication FLOOR, an envelope bound and never a target', () => {
     const floor = farmingCalendar(MAXIMUM_DEDICATION);
     // Same 1500 harvests, every bed in the world, so the calendar compresses

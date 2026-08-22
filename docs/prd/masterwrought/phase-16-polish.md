@@ -283,7 +283,18 @@ amended and 11d-U6-FIFTH; the ledger rows live in
 tests/monolith_budget.test.ts and state.md's Phase 11d ledger):
 - src/render/renderer.ts: raised 13546 to 13576 (+30, farming's deviation
   (an) farm-visual wiring). Payback target: extraction bringing the row
-  back to 13546 or lower, LOWERING the ceiling in the same change.
+  back to 13548 or lower, LOWERING the ceiling in the same change.
+  TARGET MOVED 13546 -> 13548 at the Phase 11e QA release sync (release tip
+  fd705304ee, PR #3531), and this is a correction rather than a concession.
+  Upstream raised its OWN renderer row by 2 for the streamed-prewarm work, so
+  the merged file and its re-pinned ceiling are 13578, of which 30 lines are
+  this packet's and 2 are upstream's. Holding the old 13546 target would make
+  Phase 16 owe payback for two lines it did not author, which contradicts both
+  ruling 11d-D-4's own scoping ("scoped to the merge-attributable growth only")
+  and the MONOLITHS header rule that upstream's code is never extracted to buy
+  back inherited growth. Paying back exactly this packet's +30 against the
+  moved upstream baseline is 13548. If a later sync moves upstream's row again,
+  move this target with it by the same arithmetic rather than re-deriving it.
 - src/net/online.ts: raised 5950 to 5967 (+17, both packets' new command
   mirrors). Payback target: 5950 or lower, same rule.
 The hud.ts Phase 14 carry (11d-U6-PAYBACK) needs nothing here: the merged
@@ -298,8 +309,9 @@ made both raises permanent, which is the exact outcome ruling 11d-D-4's
 rationale exists to prevent ("a raise with no payback number is a permanent
 raise"). Phase 14 already carries its equivalent. Both rows sit at zero slack,
 so nothing else forces the extraction.
-- [ ] src/render/renderer.ts extracted back to 13546 or lower, with the ceiling
-      in tests/monolith_budget.test.ts LOWERED in the same change.
+- [ ] src/render/renderer.ts extracted back to 13548 or lower (was 13546 before
+      the Phase 11e QA sync moved upstream's own row; see the reasoning above),
+      with the ceiling in tests/monolith_budget.test.ts LOWERED in the same change.
 - [ ] src/net/online.ts extracted back to 5950 or lower, same rule.
 Both lines are also exit criteria for this phase: it does not pass with either
 row still above its parent pin.

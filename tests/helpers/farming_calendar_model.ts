@@ -35,8 +35,13 @@ import {
 export interface FarmerProfile {
   /** Check-ins per real-world day. Each check-in harvests every ready bed and
    *  replants it, so a bed yields this many attempts a day PROVIDED the gap
-   *  between check-ins clears the crop's growth time (asserted separately by
-   *  the derivation test against the real durationMs literals). */
+   *  between check-ins clears the crop's growth time. That proviso IS asserted,
+   *  in tests/professions_farming.test.ts ("holds the reference farmer's
+   *  premise: a visit gap clears the longest crop"), against the real
+   *  durationMs literals. It was NOT until the Phase 11e QA: this comment
+   *  claimed the pin for months while none existed, and in the interval Phase
+   *  11e shipped evergarden_pumpkin at 10.75 hours against a doc that recorded
+   *  the longest crop as 10.5, with nothing to notice. */
   readonly visitsPerDay: number;
   /** Whether the farmer works every bed in the world, or only the beds at the
    *  hubs whose crop tier still TEACHES at their current skill. The reference
