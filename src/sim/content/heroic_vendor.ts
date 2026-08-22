@@ -185,4 +185,38 @@ export const HEROIC_VENDOR_STOCK: readonly HeroicVendorOffer[] = [
   { itemId: 'pattern_sageleaf_chowder', marks: 12 },
   { itemId: 'pattern_grand_cauldron', marks: 16 },
   { itemId: 'pattern_laden_hearth', marks: 16 },
+  // Masterwrought phase 11f: the farming valve. All SIX farming patterns and
+  // every tier-3 and tier-4 SEED, on the wyrmfall_core precedent above ("a
+  // bad-luck backstop ... never a farm that outpaces the boss faucet"), so
+  // nothing this phase puts in a drop table can fossilize behind bad luck.
+  // That backstop is what makes the luck-gated arms legal at all: D13 says a
+  // luck-gated trigger can never be the only faucet for a pattern.
+  //
+  // EVERY ROW AT 12, the ring point, and the price is DERIVED rather than
+  // chosen: the shipped mark family has exactly two points, 12 for the
+  // skill-100 patterns and 16 for the skill-125 capstones, and under the Phase
+  // 11f rung climb every farming pattern teaches a rung-75 or rung-100 row. NO
+  // farming row sits at 16, and minting a third point below 12 to make seeds
+  // cheap stays reserved for a maintainer decision over the whole family.
+  //
+  // The seeds are kind 'junk', so the item_level stock bump no-ops for them
+  // exactly as it does for wyrmfall_core, and the gear-shape sweep in
+  // tests/heroic_vendor.test.ts excludes them BY KIND rather than by a growing
+  // id list. They do NOT replace the copper counters: Phase 11e stocked all
+  // eight at farmer_hollis and farmer_verbena and that remains the everyday
+  // route, which is the whole point of the identity guard.
+  { itemId: 'pattern_highwatch_gourd_soup', marks: 12 },
+  { itemId: 'pattern_highwatch_barley_porridge', marks: 12 },
+  { itemId: 'pattern_evergarden_sunmelon_tart', marks: 12 },
+  { itemId: 'pattern_evergarden_harvest_platter', marks: 12 },
+  { itemId: 'pattern_evergarden_braised_greens', marks: 12 },
+  { itemId: 'pattern_harvest_feast', marks: 12 },
+  { itemId: 'highland_barley_seed', marks: 12 },
+  { itemId: 'frost_gourd_seed', marks: 12 },
+  { itemId: 'thornpeak_cabbage_seed', marks: 12 },
+  { itemId: 'frost_lentils_seed', marks: 12 },
+  { itemId: 'gilded_sunmelon_seed', marks: 12 },
+  { itemId: 'evergarden_greens_seed', marks: 12 },
+  { itemId: 'gilded_yam_seed', marks: 12 },
+  { itemId: 'evergarden_pumpkin_seed', marks: 12 },
 ];

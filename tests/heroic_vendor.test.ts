@@ -6,8 +6,9 @@
 
 import { describe, expect, it } from 'vitest';
 import { HEROIC_DUNGEON_TUNING, HEROIC_MARK_ITEM_ID } from '../src/sim/content/dungeon_difficulty';
+import { FARM_CROPS } from '../src/sim/content/farm_crops';
 import { HEROIC_VENDOR_ITEMS, HEROIC_VENDOR_STOCK } from '../src/sim/content/heroic_vendor';
-import { APEX_CONSUMABLE_RECIPES } from '../src/sim/content/recipes';
+import { APEX_CONSUMABLE_RECIPES, FARM_RECIPES } from '../src/sim/content/recipes';
 import { ITEMS, NPCS } from '../src/sim/data';
 import { enterDungeon } from '../src/sim/instances/dungeons';
 import { expectedStatBudget, itemLevel, primaryStatSum } from '../src/sim/item_level';
@@ -50,14 +51,30 @@ describe('heroic vendor stock: item-level and budget pins', () => {
   // material row gets its own pins below. Phase 11 re-cut it again: the eight
   // APEX_CONSUMABLE pattern rows joined (kind 'recipe', excluded from the
   // gear loop by KIND) and get their own describe below. The exact-count
-  // floors keep all three slices honest: a new gear, material, or pattern
-  // row moves a literal.
+  // floors keep every slice honest: a new gear, material, or pattern row
+  // moves a literal.
+  //
+  // PHASE 11f re-cut it a third time, 19 -> 33: six farming patterns (kind
+  // 'recipe', already excluded) and EIGHT SEED rows, which are kind 'junk' and
+  // would otherwise have fallen straight into the gear loop below. The
+  // exclusion is extended BY KIND, never by a growing id list: gear on this
+  // counter is kind 'armor' and nothing else, so the loop now says what it
+  // means instead of naming the rows it happens not to want.
   it('every gear offer is a real epic level-20 jewelry item at item level 26', () => {
-    expect(HEROIC_VENDOR_STOCK.length).toBe(19);
-    const gearOffers = HEROIC_VENDOR_STOCK.filter(
-      (o) => o.itemId !== 'wyrmfall_core' && ITEMS[o.itemId]?.kind !== 'recipe',
-    );
+    expect(HEROIC_VENDOR_STOCK.length).toBe(33);
+    const gearOffers = HEROIC_VENDOR_STOCK.filter((o) => ITEMS[o.itemId]?.kind === 'armor');
     expect(gearOffers.length).toBe(10);
+    // The partition is exhaustive: every row is gear, the one material, a
+    // pattern, or a seed. Without this, a row of some FOURTH kind would simply
+    // fall out of every sweep in this file and be pinned by nothing.
+    const nonGear = HEROIC_VENDOR_STOCK.filter((o) => ITEMS[o.itemId]?.kind !== 'armor');
+    for (const offer of nonGear) {
+      expect(
+        ['junk', 'recipe'],
+        `${offer.itemId} is neither gear, a material, a pattern nor a seed`,
+      ).toContain(ITEMS[offer.itemId]?.kind);
+    }
+    expect(nonGear.length, 'one core plus fourteen patterns plus eight seeds').toBe(23);
     for (const offer of gearOffers) {
       const item = ITEMS[offer.itemId];
       expect(item, offer.itemId).toBeTruthy();
@@ -100,7 +117,12 @@ describe('heroic vendor stock: item-level and budget pins', () => {
   // BY DESIGN and the vendor price is the market ceiling; the six skill-100
   // patterns sit at the ring price point, the two capstones at the neck point.
   describe('the phase 11 pattern rows (the R8 deterministic valve)', () => {
-    const PATTERN_PRICES: Record<string, number> = {
+    // Re-cut by Phase 11f, which put every FARMING pattern on the same counter
+    // at the ring point. The table is now fourteen rows across two packets, and
+    // the split is what the arms below check: the apex set spans both mark
+    // points because it reaches skill 125, the farm set is uniformly 12 because
+    // nothing farming owns reaches that rung.
+    const APEX_PATTERN_PRICES: Record<string, number> = {
       pattern_ironhusk_flask: 12,
       pattern_warboar_flask: 12,
       pattern_runewater_flask: 12,
@@ -110,8 +132,20 @@ describe('heroic vendor stock: item-level and budget pins', () => {
       pattern_grand_cauldron: 16,
       pattern_laden_hearth: 16,
     };
+    const FARM_PATTERN_PRICES: Record<string, number> = {
+      pattern_highwatch_gourd_soup: 12,
+      pattern_highwatch_barley_porridge: 12,
+      pattern_evergarden_sunmelon_tart: 12,
+      pattern_evergarden_harvest_platter: 12,
+      pattern_evergarden_braised_greens: 12,
+      pattern_harvest_feast: 12,
+    };
+    const PATTERN_PRICES: Record<string, number> = {
+      ...APEX_PATTERN_PRICES,
+      ...FARM_PATTERN_PRICES,
+    };
 
-    it('sells exactly the eight apex consumable patterns, six at 12 and two at 16', () => {
+    it('sells the eight apex patterns (six at 12, two at 16) and all six farming patterns at 12', () => {
       // The kind read, not an id prefix: a pattern row whose def vanished
       // from ITEMS must fall out of this census and red the exact-set pin.
       const patternOffers = HEROIC_VENDOR_STOCK.filter((o) => ITEMS[o.itemId]?.kind === 'recipe');
@@ -119,17 +153,49 @@ describe('heroic vendor stock: item-level and budget pins', () => {
       for (const offer of patternOffers) {
         expect(offer.marks, offer.itemId).toBe(PATTERN_PRICES[offer.itemId]);
       }
+      // The mark family has exactly TWO points and this counter uses only
+      // those: a third price appearing anywhere here is a maintainer decision
+      // over the whole family, not something a content phase takes.
+      expect([...new Set(HEROIC_VENDOR_STOCK.map((o) => o.marks))].sort((a, b) => a - b)).toEqual([
+        12, 16,
+      ]);
     });
 
-    it('every pattern row is an epic recipe def teaching an APEX_CONSUMABLE recipe', () => {
+    it('no farming row sits at the 16 (neck) point, because none reaches rung 125', () => {
+      // Derived from the recipe table rather than from the price map, so the
+      // claim is about the RUNG the row teaches and not about the literal
+      // above agreeing with itself.
+      for (const [itemId, marks] of Object.entries(FARM_PATTERN_PRICES)) {
+        const def = ITEMS[itemId];
+        if (def?.kind !== 'recipe') throw new Error(`${itemId} must be a kind-'recipe' def`);
+        const taught = FARM_RECIPES.find((r) => r.id === def.teachesRecipeId);
+        expect(taught, `${itemId} must teach a farm recipe`).toBeDefined();
+        expect(taught?.skillReq, `${itemId} rung`).toBeLessThan(125);
+        expect(marks, `${itemId} price`).toBe(12);
+      }
+    });
+
+    it('every pattern row is a recipe def whose quality tracks what it teaches', () => {
       const apexRecipeIds = new Set(APEX_CONSUMABLE_RECIPES.map((r) => r.id));
+      const farmRecipeIds = new Set(FARM_RECIPES.map((r) => r.id));
       for (const itemId of Object.keys(PATTERN_PRICES)) {
         const def = ITEMS[itemId];
         expect(def, itemId).toBeTruthy();
         if (def?.kind !== 'recipe') throw new Error(`${itemId} must be a kind-'recipe' def`);
-        expect(def.quality, itemId).toBe('epic');
-        expect(apexRecipeIds.has(def.teachesRecipeId), `${itemId} -> ${def.teachesRecipeId}`).toBe(
-          true,
+        const isApex = apexRecipeIds.has(def.teachesRecipeId);
+        expect(
+          isApex || farmRecipeIds.has(def.teachesRecipeId),
+          `${itemId} -> ${def.teachesRecipeId} belongs to neither packet's table`,
+        ).toBe(true);
+        // Quality is NOT uniform across this counter any more, and that is the
+        // ruling: recipe rarity tracks the power of what it teaches, so the
+        // apex patterns are epic and the farm patterns carry their dish's own
+        // quality. Derived from the taught output, never restated.
+        const taught = [...APEX_CONSUMABLE_RECIPES, ...FARM_RECIPES].find(
+          (r) => r.id === def.teachesRecipeId,
+        );
+        expect(def.quality, `${itemId} quality must equal its taught output's`).toBe(
+          ITEMS[taught?.resultItemId ?? '']?.quality,
         );
         // A pattern is not item-level eligible (no slot): the stock
         // source-level bump must stay a no-op for it, like wyrmfall_core.
@@ -150,6 +216,66 @@ describe('heroic vendor stock: item-level and budget pins', () => {
       // purchase (duplicates are purchasable BY DESIGN, see the stock note).
       sim.buyHeroicVendorItem('pattern_ironhusk_flask', pid);
       expect(sim.countItem('pattern_ironhusk_flask', pid)).toBe(1);
+      expect(sim.countItem(HEROIC_MARK_ITEM_ID, pid)).toBe(1);
+    });
+  });
+
+  // Masterwrought phase 11f: the eight upper-tier SEED rows. Additive reach for
+  // a raider, never the bootstrap: the copper counters at farmer_hollis and
+  // farmer_verbena are the everyday route and are untouched by this phase
+  // (pinned in tests/farmer_vendor_purchase.test.ts).
+  describe('the phase 11f seed rows (marks reach, not the bootstrap)', () => {
+    // DERIVED from the crop catalog, not listed: a new tier-3 or tier-4 crop
+    // must join this counter or red here, rather than quietly shipping a seed
+    // the marks route cannot reach.
+    const upperSeedIds = Object.values(FARM_CROPS)
+      .filter((crop) => crop.tier >= 3)
+      .map((crop) => crop.seedItemId)
+      .sort();
+
+    it('sells every tier-3 and tier-4 seed at the ring point, and nothing lower-tier', () => {
+      const seedIds = new Set(Object.values(FARM_CROPS).map((crop) => crop.seedItemId));
+      const seedOffers = HEROIC_VENDOR_STOCK.filter((o) => seedIds.has(o.itemId));
+      expect(seedOffers.map((o) => o.itemId).sort()).toEqual(upperSeedIds);
+      expect(seedOffers, 'four tier-3 plus four tier-4 seeds').toHaveLength(8);
+      for (const offer of seedOffers) expect(offer.marks, offer.itemId).toBe(12);
+      // The tier 1/2 seeds stay OFF this counter: they are the starter supply
+      // and have never needed an endgame currency route.
+      const lowerSeedIds = Object.values(FARM_CROPS)
+        .filter((crop) => crop.tier <= 2)
+        .map((crop) => crop.seedItemId);
+      expect(lowerSeedIds.length).toBeGreaterThan(0);
+      for (const id of lowerSeedIds) {
+        expect(
+          HEROIC_VENDOR_STOCK.some((o) => o.itemId === id),
+          `${id} is a starter seed and must not be on the marks counter`,
+        ).toBe(false);
+      }
+    });
+
+    it('a seed row is a kind-junk def that the stock item-level bump no-ops for', () => {
+      for (const id of upperSeedIds) {
+        const def = ITEMS[id];
+        expect(def, id).toBeTruthy();
+        expect(def.kind, id).toBe('junk');
+        // Same reason wyrmfall_core is pinned this way: junk carries no slot,
+        // so the source-level bump must not mint a phantom item-level line.
+        expect(itemLevel(def), id).toBeUndefined();
+        expect(def.soulbound, `${id} must stay tradable`).toBeUndefined();
+      }
+    });
+
+    it('a seed row BUYS: 12 marks debit, one seed lands', () => {
+      const sim = makeSim();
+      const pid = sim.addPlayer('warrior', 'SeedBuyer');
+      atQuartermaster(sim, pid);
+      sim.addItem(HEROIC_MARK_ITEM_ID, 13, pid);
+      sim.buyHeroicVendorItem(upperSeedIds[0], pid);
+      expect(sim.countItem(upperSeedIds[0], pid)).toBe(1);
+      expect(sim.countItem(HEROIC_MARK_ITEM_ID, pid)).toBe(1);
+      // Short one mark: refused, nothing granted, nothing debited.
+      sim.buyHeroicVendorItem(upperSeedIds[0], pid);
+      expect(sim.countItem(upperSeedIds[0], pid)).toBe(1);
       expect(sim.countItem(HEROIC_MARK_ITEM_ID, pid)).toBe(1);
     });
   });
@@ -246,7 +372,7 @@ describe('heroic vendor shop view (pure)', () => {
     // The literal, not HEROIC_VENDOR_STOCK.length: both sides of that compare
     // move together, so a vanished row would pass it (the unknown-id drop is
     // what this fixture proves; the row census literal is pinned above).
-    expect(view.rows.length).toBe(19);
+    expect(view.rows.length).toBe(33);
     expect(view.balance).toBe(12);
     const ring = view.rows.find((r) => r.itemId === 'seal_of_the_nine_oaths');
     const neck = view.rows.find((r) => r.itemId === 'yumis_keepsake_locket');
