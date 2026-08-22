@@ -9912,3 +9912,38 @@ draught line; produce in recipe_quickening_catalyst, any gear intermediate, or
 any Perfecting material; a new dish or a new crop; a band-literal edit; reducing
 any herb, fish, meat or salt count anywhere; minting a recipe row to hold produce
 (LADDER_RECIPES is closed at 54); and touching the three role plates.
+
+### A CROSS-PHASE FINDING this phase INTRODUCED, recorded rather than absorbed
+
+THE SUNPETAL SCROLL / SERPENT ELIXIR PARITY IS NOW BROKEN, by 15 copper.
+
+The Phase 06 QA ruling re-priced recipe_sunpetal_scroll to EXACT input parity
+with recipe_elixir_of_the_serpent (214 each, both resultCount 2) on the stated
+grounds that they grant the same buff, so neither route should undercut the
+other. That premise checks out against the live defs rather than being taken on
+trust: sunpetal_scroll and elixir_of_the_serpent both carry aura 'Might of the
+Serpent', buff_sta 12 for 900s, sellValue 20, quality rare, resultCount 2. Only
+`kind` differs.
+
+DECISION B's rung-50 alchemy row is the serpent elixir, so this phase's
+frost_gourd took that bill from 214 to 229. The scroll is untouched at 214, so
+the INSCRIPTION route is now 7 percent cheaper than the alchemy one for a
+byte-identical buff.
+
+NOT FIXED HERE, deliberately, and the alternatives were weighed rather than
+skipped. Dropping the produce off the serpent would leave alchemy with no
+rung-50 produce consumer and break this phase's core deliverable. Adding produce
+to the scroll reaches into inscription, which R17 does not name and this phase's
+scope list excludes. Re-pricing either bill reopens a settled Phase 06 QA ruling,
+which the stopping rules make a STOP rather than a session choice. So it goes
+back to the packet record as a maintainer read, with the number attached.
+
+THE MORE USEFUL HALF OF THE FINDING is how it was found. The ruling lived ONLY in
+a comment in tests/inscription_catalog.test.ts with no assertion behind it, so a
+15-copper drift introduced by a different packet passed tsc, the curated battery,
+the full suite and ci:changed without a murmur. A deliberate balance ruling
+recorded as prose is a ruling that drifts silently, and this phase is the proof.
+The comment now states the truth and names the three options; no pin was added,
+because pinning today's numbers would cement the drift as intended and pinning
+the parity would red on a decision that file does not own. Whoever picks an
+option should pin it in the same change.

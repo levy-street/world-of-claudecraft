@@ -80,7 +80,26 @@ const REAGENTS_BY_RECIPE: Record<string, Record<string, number>> = {
   },
   // Re-priced at the Phase 06 QA ruling to EXACT input parity with
   // recipe_elixir_of_the_serpent (214, both resultCount 2): same buff, same
-  // cost, so neither route undercuts the other.
+  // cost, so neither route undercuts the other. The two outputs really are the
+  // same buff, checked rather than assumed: sunpetal_scroll and
+  // elixir_of_the_serpent both carry aura 'Might of the Serpent', buff_sta 12
+  // for 900s, sellValue 20, quality rare, at resultCount 2. Only `kind` differs.
+  //
+  // THE PARITY IS BROKEN AS OF MASTERWROUGHT PHASE 11g, and it is recorded here
+  // rather than quietly re-pinned because restoring it is a maintainer call, not
+  // this file's. 11g put a frost_gourd on the elixir as its rung-50 alchemy
+  // produce consumer, taking that bill from 214 to 229, so this scroll is now
+  // 15 copper (7 percent) CHEAPER than the elixir for a byte-identical buff.
+  // The inscription route therefore undercuts the alchemy one, which is exactly
+  // what the Phase 06 ruling priced against.
+  //
+  // NOTHING REDS, and that is the more useful half of this note: the ruling was
+  // recorded ONLY as prose, with no assertion behind it, so a 15-copper drift
+  // introduced by a different packet passed every gate in the tree. No pin is
+  // added here now because pinning the CURRENT numbers would cement the drift as
+  // intended, and pinning the parity would red on a decision this file does not
+  // own. The options are to re-price the scroll, to move the elixir's produce,
+  // or to accept a 7 percent split; whoever picks one should pin it afterwards.
   recipe_sunpetal_scroll: { sunpetal_herb: 1, arcane_essence: 2, glass_vial: 1, arcane_dust: 1 },
 };
 
