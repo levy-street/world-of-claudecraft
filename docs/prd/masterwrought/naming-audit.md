@@ -371,6 +371,45 @@ Vellum.
       rather than a coined mark), per the ruling; any future trade-dress
       tightening starts here.
 
+- MINTED AT PHASE 11e (the four upper-tier crop names, web-verified 2026-08-21
+  by a proposing exact-phrase pass and an adversarial pass scoped to the major
+  game wikis, plus the in-repo neighbour grep). NO new coins: every name pairs a
+  zone word this registry already carries with a plain real-world plant noun, so
+  the whole R15 surface is the plant noun, and the plant nouns are ordinary
+  vegetables. Each crop's `_seed` and `fine_` affix forms inherit its verdict.
+  - **Thornpeak Cabbage** (tier 3, leaf) CLEAR: exact phrase zero-hit; Thornpeak
+    is already CLEAR in this registry across five shipped rows (the graveyard,
+    the chronicle deed and its title, the Nythraxis epithet, Thronebane's oath);
+    cabbage is a real vegetable and shared vocabulary. Neighbours RECORDED
+    rather than ignored: FFXIV ships **Highland Cabbage** as a crafting material
+    and RuneScape ships **Gilded cabbage**, so "cabbage" itself is well used in
+    the same ROLE; neither full name is this one, which is what the bar asks.
+    In-repo: no "cabbage" anywhere prior.
+  - **Frost Lentils** (tier 3, legume) CLEAR: exact phrase zero-hit, and the
+    searches decompose to real lentil cookery. Frost is already GENERIC in this
+    registry (rift theme noun) and ships on frost_gourd beside this crop's own
+    hub. In-repo: no "lentil" anywhere prior.
+  - **Gilded Yam** (tier 4, tuber) CLEAR with a recorded neighbour: exact phrase
+    zero-hit, and Gilded is already GENERIC here (Gilded Sap Clot) and ships on
+    gilded_sunmelon in the same tier. The neighbour is RuneScape's **Gilded
+    cabbage**, which establishes "Gilded + vegetable" in another game's food
+    space; the noun differs and the full name is unused, so it is kept and
+    written down rather than quietly passed. In-repo: no "yam" anywhere prior.
+  - **Evergarden Pumpkin** (tier 4, gourd) CLEAR, inheriting Evergarden's
+    existing KEEP-with-caveat status (flagged vs Flippfly's Evergarden, kept
+    under the bar in the audit body) rather than re-opening it: the word is the
+    zone's own name and already ships on evergarden_greens in this same tier.
+    Exact phrase zero-hit. In-repo: no "pumpkin" anywhere prior.
+  - REJECTED AT AUTHORING, recorded so they are not re-proposed:
+    **Highwatch Cabbage** and any other new Highwatch crop, because Highwatch is
+    BORDERLINE (maintainer) against TERA across nine shipped rows and a new name
+    would extend a borderline family when a CLEAR word (Thornpeak) was available
+    for the same hub. **Highland Peas** and any other new Highland vegetable,
+    because FFXIV's Highland Cabbage puts "Highland + vegetable" inside another
+    game's active naming scheme for the same crafting-material role; the shipped
+    highland_barley predates this and is not re-opened, but the family is not
+    extended.
+
 ## Recorded for the maintainer (stopping rule: no unilateral rename)
 
 STATUS 2026-08-20, SETTLED BY THE MAINTAINER, and the scope is narrow on purpose.
