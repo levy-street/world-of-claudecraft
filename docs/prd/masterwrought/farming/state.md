@@ -461,7 +461,7 @@ closed-by-X.
 
 | Item | Phase | Owner | Status |
 |---|---|---|---|
-| D11/(bo) tier 3/4 seed bootstrap; must cover the three (ca) dormant recipes (porridge, braised greens, harvest feast) | P9 QA / P11 / P12 | maintainer | open ruling-owed (GATE 1) |
+| D11/(bo) tier 3/4 seed bootstrap; must cover the three (ca) dormant recipes (porridge, braised greens, harvest feast) | P9 QA / P11 / P12 | maintainer | CLOSED 2026-08-21 by masterwrought Phase 11e (GATE 1 discharged). All eight tier 3 and 4 seeds are vendor-stocked at farmer_hollis and farmer_verbena with positive buyValues (32 / 64, DECISION D). All three (ca) dormant recipes are reagent-reachable and proven so end to end in tests/farming_gate1_faucet.test.ts, which buys, plants and harvests through the real commands rather than reading this row. prog_farming_100 and feat_book_complete are earnable; the docs/design/deeds.md dormancy waiver is closed; the (bo) honesty arm self-cleared and was INVERTED, so it now fails if the faucet is ever removed. |
 | (bs) dormant-deed waiver (prog_farming_100, feat_book_complete) plus the D12 cadence read | P10 | maintainer | open ruling-owed |
 | (a) PENDING_ART allowlist sign-off (gather_farming, self-clearing) | P1 | maintainer | open ruling-owed |
 | (w) structural affinity exemption, 27 materials (standing since Phase 4) | P4 / P5 | maintainer | open ruling-owed |
@@ -482,7 +482,7 @@ closed-by-X.
 | Crop durations (5-minute sibling gap advisory), gain schedule, survival endpoints, pick floor/cap | P3 / P5 | maintainer | open ruling-owed |
 | Crop display names lore pass (D11 ids locked) | packet | maintainer | open ruling-owed |
 | Hoe display names (Skysilver/Osmium compressed coinages) and prices | P5 | maintainer | open ruling-owed |
-| Fine-twin buyValue doctrine intersection (priced tier-4 twin above unpriced tier-4 seed) | P5 QA | maintainer | open ruling-owed |
+| Fine-twin buyValue doctrine intersection (priced tier-4 twin above unpriced tier-4 seed) | P5 QA | maintainer | CLOSED 2026-08-21 by masterwrought Phase 11e: the intersection was the tier-4 SEED being unpriced while its fine twin carried a buyValue. GATE 1 priced every tier 3 and 4 seed (DECISION D, buyValue 32 and 64), so the inversion is gone and the doctrine is uniform: seed, produce and fine twin all price on the shipped four-times-sell staple, with the seeds carrying the bootstrap premium on top. Nothing is left to rule. |
 | fine_marsh_rice / fine_highland_barley dish consumers (hoe-reagent-only today) | P6 | maintainer | open ruling-owed |
 | Farming counting toward any-profession deeds (default yes, automatic) | P1 | maintainer | open ruling-owed |
 | ONLINE_WORLD_LAYOUT_VERSION epoch bump at farming go-live | 19th absorb | maintainer | open ruling-owed |
@@ -1818,6 +1818,13 @@ visit or a punishment for lateness is violating the design, not tuning it.
 - D5: Pacing (tuning constants live in content, maintainer-adjustable): tier 1 crops
   30 to 60 min, tier 2 about 2 h, tier 3 about 4 h, tier 4 overnight. Growth continues
   while logged out.
+  - AMENDED 2026-08-21 (masterwrought Phase 11e): the bands are unchanged, but they
+    now hold FOUR crops each at tiers 3 and 4 rather than two, so "no two crops of a
+    tier share a duration" binds across four. The new values are 250 and 260 minutes at
+    tier 3 and 615 and 645 at tier 4, each inside its band and each above the tier's
+    pre-11e minimum. That FLOOR is a new constraint this amendment adds and D5 did not
+    state: a shorter upper-tier crop turns a bed over faster and accelerates the gain
+    ladder, so no future crop may undercut its tier's minimum either.
 - D6: Survival. Planting requires farming skill at or above the crop tier threshold.
   One full band above the threshold survival is 100 percent, always (out-leveling a crop
   permanently retires its risk). Inside the band, base survival ramps from roughly 85
@@ -1869,6 +1876,22 @@ visit or a punishment for lateness is violating the design, not tuning it.
   clause here is AMENDED by deviation (o): fine twins ship as ordinary items with NO
   MATERIAL_GRADES row; that table is pinned as exactly the nine node yields, and the
   fine roll lives in farming's own harvest resolver.]
+  - AMENDED 2026-08-21 (masterwrought Phase 11e, DECISION B): the roster is TWELVE,
+    shaped 2 / 2 / 4 / 4. Tier 3 gains `thornpeak_cabbage` (leaf) and `frost_lentils`
+    (legume); tier 4 gains `gilded_yam` (tuber) and `evergarden_pumpkin` (gourd). The
+    original eight ids are unchanged and none was renamed, which matters because they
+    are persisted save keys. Every new crop ships seed, produce, fine twin and a
+    same-phase consumer, so the rule this decision states is kept rather than
+    stretched. The COMPOSITION is now itself a rule and not flavor: no tier repeats a
+    plant class, and tier 3 carries a leaf, because a later phase reads that shape.
+  - AMENDED 2026-08-21 (masterwrought Phase 11e, GATE 1 / DECISION D): the seed clause
+    above is superseded in its second half. Tiers 3 and 4 are NO LONGER seed-back-only
+    market goods: all eight upper-tier seeds are vendor-stocked at the tier's own
+    farmer with a positive `buyValue` (32 at tier 3, 64 at tier 4), the same dead-row
+    rule tiers 1 and 2 already followed. Seed-back rolls and the rare event survive
+    unchanged as the thrift path; the vendor is the BOOTSTRAP, priced at twice the
+    four-times-sell convention precisely so it does not become the cheaper permanent
+    source (a tier-3 harvest expects 0.48 seeds back, a tier-4 one 0.41).
 - D12: The rare event is `golden_harvest`: a fourth flavor on the existing
   `gatherRareEvent` SimEvent shape, rolled at harvest (1/90, the shared constant),
   five-fold yield, always signed, zone-announced through `announceGatherRareEvent`'s
@@ -1934,6 +1957,16 @@ visit or a punishment for lateness is violating the design, not tuning it.
   the machine-enforced payout arithmetic (`copperReward` equals
   `floor(WORK_ORDER_PAYOUT_FRACTION * summed vendor sellValue)`, guarded by
   `tests/professions_work_orders.test.ts`; leave the arithmetic comment on every row).
+  - AMENDED 2026-08-21 (masterwrought Phase 11e, qr-DOC-DRIFT): the rotation stays at
+    the ORIGINAL EIGHT crops. Phase 11e added four and deliberately gave them NO
+    work-order rows, so D21's "farming produce rows" no longer reads as universal and
+    must not be read that way. The reason is the arithmetic this decision itself
+    names: the payout is a flat 0.5 of summed vendor sellValue, so pointing it at
+    top-of-curve produce mints copper, and it would be found later as an economy bug
+    rather than as a decision. Verified structurally rather than by omission: no
+    work-order path derives its rotation from FARM_CROPS or FARM_CROP_IDS, so the four
+    new crops are outside it by construction. A future phase that wants them in owes a
+    payout model first.
 - SUPERSEDED IN PLACE (2026-08-20, the Masterwrought 11b absorb, ruling
   11b-D-3 / masterwrought decision 3): D22 below and its addendum's arm (B)
   are superseded, never deleted (the never-renumber rule requires supersession

@@ -30,7 +30,7 @@
 | 11c QA | verify | complete | 2026-08-21 | 2026-08-21 |
 | 11d | Derived artifacts, pins, and the merge audit | complete | 2026-08-21 | 2026-08-21 |
 | 11d QA | verify | complete | 2026-08-21 | 2026-08-21 |
-| 11e | A true skill, farming's mastery curve and crop roster | pending | | |
+| 11e | A true skill, farming's mastery curve and crop roster | complete | 2026-08-21 | 2026-08-21 |
 | 11e QA | verify | pending | | |
 | 11f | Farming joins the drop economy | pending | | |
 | 11f QA | verify | pending | | |
@@ -715,6 +715,57 @@ is deliberately not copied here, it lives in the farming record.
   gathering-tool family. The stale `phase-11e-farming-apex-arm.md` is replaced by
   `phase-11e-mastery-curve.md` and deleted; its apex-feast design moves into 11h and
   11k and its GATE 1 material into 11e, so no table references the old file.
+- Phase 11e (2026-08-21): FARMING'S MASTERY CURVE AND CROP ROSTER, all five
+  deliverables built and all six 2026-08-20 decisions executed as recorded.
+  STEP 0 took the THIRD release sync (2df374a074, PR #3533's classic-era loot
+  retune), predicted before it ran: the only conflict was the two goldens both
+  parents had re-recorded, and the merge is proved EXACT rather than merely
+  conflict-free (its branch-side change lines are byte-identical to the
+  release's own delta). Both merge-audit tools were run green FIRST, so any
+  later failure is provably this phase's.
+  THE CURVE IS DERIVED, which was the point: FARMING_GAIN_SCHEDULE's gain column
+  moves to 0.25 / 0.125 / 0.0625 / 0.03125 as the OUTPUT of a calendar model
+  whose every input is read from shipped content, and the derivation test
+  SEARCHES the candidate family rather than asserting the answer. Exactness
+  rules out non-dyadic gains, the halving shape fixes a scale-independent 34
+  percent front, and DECISION A's ten-week window then admits exactly one
+  member. The defect fixed was the FRONT (9.7 percent of a 65 day climb became
+  34 percent of 74 days); total harvests FALL 1575 to 1500, so the ladder is
+  straightened rather than lengthened. The retired literals were also inexact,
+  which nothing had noticed: 0.1 taken 250 times from 50 lands on
+  74.99999999999957 and charged a 251st harvest.
+  ROSTER 2 / 2 / 4 / 4 with twelve new item ids, each with a faucet and a
+  same-phase consumer, no new price point invented, and the four names
+  web-verified and registered BEFORE they were typed (two candidates rejected at
+  authoring and recorded, one because Highwatch is BORDERLINE against TERA and a
+  CLEAR word was available, one because FFXIV's Highland Cabbage puts "Highland
+  plus vegetable" inside another game's scheme).
+  GATE 1 DISCHARGED and proven end to end by walking the real commands; the
+  (bo) honesty arm self-cleared and was INVERTED rather than deleted, so green
+  now means earnable; the deeds.md dormancy waiver is closed with its date.
+  Also: the Maker's Charm capped at +1 on a hoe in farming's OWN mapping (never
+  the catalog, so three other professions keep the full 2) with the tooltip and
+  its five non-Latin fills moved in the same change; the roster deed
+  col_farm_roster with its mark namespace registered and its save/load round
+  trip pinned WITH a control; and a dedicated anti-chore suite giving each of
+  the five audit rows a pin, whose decisive arm drives a week-late harvest
+  through the real command on two clocks.
+  EVERY new arm was mutation-proved. Removing the cap reds exactly the one arm
+  owed for it; a lateness penalty reds the decisive anti-chore pin; a second
+  gain read reds the structural companion; unregistering the deed namespace reds
+  the round trip; dropping one seed row reds three GATE 1 arms.
+  PREDICTED-THEN-OBSERVED: seventeen of nineteen rows met, including both
+  content census cells landing on 3074 and 3101, predicted before anything was
+  authored. TWO MISSES, both named rather than absorbed: the explained-extras
+  budget (the STEP 0 probe carried no catalog name, so the i18nKeys third went
+  unbudgeted; the real cost is TEN rows per crop) and the first golden
+  re-record (the gain literal turned out to be an input to a DEED threshold, so
+  prog_first_harvest left the earned list). A THIRD finding is the recorded
+  tool gap: golden_composition models three refs and no release parent, so a
+  release-side golden change reads to it as composing from neither side; proved
+  by execution, PROPOSED rather than patched, with its 16 findings held as a
+  baseline the rest of the phase measured against.
+  Full record: state.md, "Phase 11e ledger". LOCAL, never pushed.
 - Phase 11d QA (2026-08-21): THE EVIDENCE AUDITED, verdict
   PASS-WITH-FOLLOWUPS. STEP 0 took a SECOND release sync (5eade5c02e, release
   tip 35a6481825 eleven commits past the tip 11d synced), predicted before it

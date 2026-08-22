@@ -8067,3 +8067,157 @@ THE DISPOSITION: ACCEPT, and do not touch the deed. Three grounds.
 RECORDED CONSEQUENCE for the handoff: a farming-only character now reaches
 `prog_first_harvest` on their fourth crop rather than their first. Nothing else
 in the deed catalog reads farming proficiency below 100.
+
+### The five deliverables as BUILT (each against the ruling it executes)
+
+DECISION A, THE CALENDAR TARGET, EXECUTED. FARMING_GAIN_SCHEDULE's gain column
+is 0.25 / 0.125 / 0.0625 / 0.03125, DERIVED (the model section above), landing
+at 74.00 days for the reference farmer inside the settled 70-to-75 window. The
+belowProficiency column and the row count are byte-identical, and the
+tier-ceiling derivation pin is green WITHOUT being edited, which was the
+acceptance criterion. The two columns are now pinned in SEPARATE arms so a
+future tune can only move the half it meant to.
+
+DECISION B, ROSTER SCALE, EXECUTED. Twelve crops, 2 / 2 / 4 / 4, twelve new item
+ids, ITEM_ART_PENDING 44 to 56.
+| id | tier | class | duration | seed sell/buy | produce sell | fine sell/buy | consumer |
+|---|---|---|---|---|---|---|---|
+| thornpeak_cabbage | 3 | LEAF | 250 min | 4 / 32 | 15 | 30 / 120 | recipe_highwatch_barley_bannock |
+| frost_lentils | 3 | legume | 260 min | 4 / 32 | 15 | 30 / 120 | recipe_highwatch_gourd_soup |
+| gilded_yam | 4 | tuber | 615 min | 8 / 64 | 40 | 80 / 320 | recipe_evergarden_sunmelon_tart |
+| evergarden_pumpkin | 4 | gourd | 645 min | 8 / 64 | 40 | 80 / 320 | recipe_evergarden_harvest_platter |
+Composition holds: tier 3 is grain, gourd, LEAF, legume and tier 4 is melon,
+leaf, tuber, gourd, so no tier repeats a class and exactly one new tier-3 crop
+is a leaf. Both facts are pinned, and the classification table is asserted to
+span the whole catalog so a future crop cannot slip past the rule by being
+absent from it. Durations were checked against the MERGED table before any row
+was written: each is inside its D5 band, distinct from all three siblings, and
+above the tier's pre-11e minimum (240 and 600), which is the load-bearing one.
+No new price point was invented anywhere.
+
+DECISION C, THE CHARM OVERLAP, EXECUTED. FARM_EFFECT_BONUS_PICK_CAP = 1, in
+farming's own quantity-to-bonusPicks mapping beside FARM_TONIC_BONUS_PICKS, NOT
+in TOOL_EFFECTS.makers_charm.bonus. The recorded consequence: on a hoe the
+Maker's Charm and the Gatherer's Cache now pay the same bonus; the charm keeps
+its full 2 on mining, logging and herbalism. The tooltip moved in the same
+change and so did its five non-Latin fills.
+
+DECISION D, SEED PRICING, EXECUTED. All EIGHT tier 3 and 4 seeds carry buyValue,
+32 and 64, derived at the row as sellValue x 4 x 2. The arithmetic is pinned as
+a FORMULA over each row's own sellValue plus four literal spot-checks, so a
+re-priced seed moves its buyValue with it and the ruling's exact numbers still
+cannot drift silently.
+
+DECISION E, THE DEED, EXECUTED. col_farm_roster, category collection, renown 5,
+no title, no border. Mark ids GENERATED from FARM_CROP_IDS, so a thirteenth crop
+joins by existing. The farm_crop namespace is registered in
+VISITED_MARK_NAMESPACES and the save/load round trip is pinned WITH a control
+proving the pass is the registration rather than restoreDeedStats keeping
+everything. DEED_ORDER 286 to 287, renown 3270 to 3275, deed_i18n 287 * 2 + 45 =
+619, deed art pending 8 to 9, DEED_ORDER's tail off prog_farming_100.
+NOTE ON THE ID: the ruling and the forward carry both wrote this as a prog_ deed
+implicitly, but tests/deeds_content.test.ts pins id PREFIX to category, and
+'collection' is col_. The id is col_farm_roster; the category is what the ruling
+fixed, and the prefix follows it.
+
+GATE 1, CLOSED-BY-11e, DISCHARGED. Eight vendor rows across the two upper
+farmers in one edit under one convention. NEVER_STOCKED 21 to 17: the four
+shipped upper seeds LEFT the set and the four new ones did not join it, and the
+seeds are now asserted ABSENT from it rather than merely deleted. The (bo)
+honesty arm SELF-CLEARED and was INVERTED rather than removed, so green now
+means earnable; the docs/design/deeds.md waiver is closed with its date.
+prog_farming_100 and feat_book_complete are earnable. GATE 1 is proven end to
+end in tests/farming_gate1_faucet.test.ts, which walks the real commands rather
+than reading a ledger row, and is mutation-proved by dropping one seed row.
+
+### The four sweep verdicts (each sweep RUN, not assumed)
+- RELIQUARY: NO page. A crop is not conquerable unique loot. Verified against
+  tests/reliquary_content.test.ts, which stayed green with no edit.
+- BOOK OF DEEDS beyond DECISION E: NONE. A crop is not conquerable content; the
+  roster as a whole is, and that is the one deed.
+- WORK ORDERS: NO new rows, and this is the verdict with teeth.
+  WORK_ORDER_PAYOUT_FRACTION is a flat 0.5 of summed vendor sellValue, so
+  pointing it at top-of-curve produce mints copper, and it would surface later
+  as an economy bug rather than as a decision. Verified STRUCTURALLY rather than
+  by omission: no work-order path derives its rotation from FARM_CROPS or
+  FARM_CROP_IDS, so the four new crops are outside the rotation by construction
+  and could not have joined it accidentally. The consequence is that D21's
+  rotation stays at the original eight crops, so its universal claim NARROWED;
+  that is recorded as a dated AMENDED line rather than left reading as
+  universal.
+- MARKET FILTER: NO new chip. The shipped 'material' chip already covers kind
+  'junk' produce and seeds; the twelve new ids are all kind 'junk'.
+- world_entity_i18n.ts: NOTHING OWED, recorded rather than left unstated. Crops
+  are items, and item names live in the i18n catalog's positional list.
+
+### Deviations and drift found by this phase (recorded, not silent)
+1. The phase file said the advertised slot list was missing farming. It was NOT:
+   the hoe-ladder commit dc451c6ba9 had already added it. Only the module header
+   was stale, and differently than described (it reasoned solely about fishing
+   and never mentioned the Maker's Charm at all).
+2. The phase file named three release-touched content files; there were FOUR
+   (temple.ts too).
+3. The phase file called for ONE farming_session re-record; there were TWO,
+   each isolated and separately predicted, because the curve and the deed landed
+   as separate commits and each moves the golden for its own reason.
+4. STEP 0's census-cost measurement covered contentIds and contentIdRows and
+   MISSED the i18nKeys third, because the throwaway probe carried no catalog
+   name. Budget for a new crop is TEN explained-extras rows, not seven.
+5. recipe_economy did NOT move, contrary to the forward carry's expectation for
+   the packet generally. Verified rather than assumed: every widened bill keeps
+   at least one buyValue-free base produce, so no dish entered the
+   counterfactual vendor-fed set, and no seed is a reagent of any recipe. The
+   11g carry stands unchanged: re-derive WHICH literal moves before moving it.
+6. prog_first_harvest's timing changed as a consequence of the curve (a
+   farming-only character now reaches it on their fourth crop, not their first).
+   Accepted with grounds; see the re-record block above.
+
+### Phase 11e prediction table: OBSERVED
+
+Every row of the STEP 0 table, answered. Predictions were committed at
+f3893a7ed8, one commit before the first literal moved.
+
+| Pin | Predicted | Observed | |
+|---|---|---|---|
+| FARMING_GAIN_SCHEDULE gain column | 0.25 / 0.125 / 0.0625 / 0.03125 | same | MET |
+| FARMING_GAIN_SCHEDULE boundary column | unchanged | 25 / 50 / 75 / 100 | MET |
+| FARMING_GAIN_SCHEDULE row count | unchanged | 4 | MET |
+| tier-ceiling derivation arm | green, unedited | green, unedited | MET |
+| ITEM_ART_PENDING size | 56 | 56 | MET |
+| DEED_ORDER length | 287 | 287 | MET |
+| total renown | 3275 | 3275 | MET |
+| deed i18n manifest | 287 * 2 + 45 = 619 | 619 | MET |
+| census contentIds (merged) | 3074 | 3074 | MET |
+| census contentIdRows (merged) | 3101 | 3101 | MET |
+| EXPLAINED_EXTRAS rows | 36 | 49 | MISSED, see below |
+| farming_session golden | proficiency only, draws unchanged | proficiency only, draws unchanged, PLUS a deed | PARTIAL, see below |
+| every other golden | unmoved | unmoved | MET |
+| IWorld parity totals | unmoved | unmoved | MET |
+| command schema / delta keys | unmoved | unmoved | MET |
+| SimEvent union / emits | unmoved | 159 / 152, unmoved | MET |
+| monolith ceilings | all unmoved | all unmoved | MET |
+
+THE TWO MISSES, named rather than absorbed.
+
+1. EXPLAINED_EXTRAS: predicted 36 rows, landed 49. The STEP 0 measurement used a
+   throwaway crop-shaped unit and correctly measured contentIds (+3) and
+   contentIdRows (+4) per crop, but the throwaway carried NO i18n catalog name,
+   so the i18nKeys class was invisible to it and its +3 per crop went
+   unbudgeted. The real cost is TEN rows per crop, not seven. The remaining
+   three rows are the deed (one per content class) and
+   FARM_EFFECT_BONUS_PICK_CAP in exports, neither of which existed as a plan
+   when the table was written. THE LESSON for 11f to 11k: measure the probe
+   WITH its catalog name, or budget ten.
+2. THE GOLDEN: the composition prediction for the curve re-record was exact on
+   all seventeen numeric leaves and on draws, drawDigest and nextId, and missed
+   that prog_first_harvest leaves the earned list (renown and two events
+   digests). Written up in full in its own block above; the lesson recorded
+   there is that a gain literal is not a leaf, it is an input to every threshold
+   downstream of the counter it feeds. The SECOND re-record, for the deed's
+   per-crop mark, was predicted exactly.
+
+WHAT THE PREDICTIONS BOUGHT, since the point is not the score: the two content
+census cells landing on 3074 and 3101 is the evidence that twelve ids were
+authored and not thirteen or eleven, taken before anything was written. The
+misses are both places where the model of the change was incomplete, and both
+are now written down as budgets for the next phase rather than as apologies.
