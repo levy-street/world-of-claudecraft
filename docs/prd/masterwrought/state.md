@@ -8418,3 +8418,37 @@ both landing on the number predicted at STEP 0 before any authoring;
 golden_composition FAIL at its recorded 16-finding baseline and no more, which
 is the release-parent tool gap proposed above rather than a regression;
 i18n:gen, wiki:content and sfx:manifest all zero-diff after their final regen.
+
+### RELEASE-FILL OBLIGATIONS this phase adds (flagged BY KEY for the Phase 17 fill)
+
+Checked rather than assumed, and the answer is that everything here is a legal
+PR-tier state that becomes a release-tier requirement.
+
+1. THE ROSTER DEED'S NAME AND DESCRIPTION, 36 rows: col_farm_roster.name and
+   col_farm_roster.desc in all EIGHTEEN base locale chunks under
+   src/ui/deed_i18n.locales/. Deed text does NOT live in the overlays and is not
+   an M16 surface: deed_i18n.ts is its own generated channel, and
+   tests/deed_i18n.test.ts states the contract explicitly, that a contributor
+   adds a deed ENGLISH-only and the maintainer fills every table at release.
+   Its release-tier arm (I18N_RELEASE_TIER=1, "covers every manifest row in all
+   18 base locale tables") is what enforces it.
+   MEASURED: col_farm_roster is absent from all 18, so 36 rows are owed.
+2. THE MAKER'S CHARM BONUS LINE is NOT on this list, and that is the point of
+   checking. Only the five non-Latin locales carried a fill for
+   hudChrome.professions.toolEffectTooltip.bonus.makersCharm, and all five were
+   rewritten in the same change rather than deferred, because leaving them would
+   have shipped five locales stating a flat +2 that a hoe does not pay. The
+   Latin locales never carried the key and resolve to English through
+   pending.ts, so the reword created no stale row anywhere and owes nothing.
+3. THE TWELVE CROP NAMES are likewise NOT owed: M16 fills landed in all five
+   non-Latin locales in the same change, which is the rule for a new wordy
+   English value.
+
+CONTEXT FOR WHOEVER RUNS THE FILL, because 36 is the wrong number to plan
+against: the release-tier deed arm is ALREADY RED on this branch independently
+of this phase (it fails first on da_DK.prog_master_gatherer.desc), and the
+absorbed farming packet's own seven deeds are missing 126 rows across the same
+18 chunks. So the roster deed joins an existing backlog of the same shape rather
+than opening a new one, and the whole farming deed family is best filled in one
+pass. Recorded here so Phase 17 sizes it correctly instead of discovering the
+other 126 mid-fill.
