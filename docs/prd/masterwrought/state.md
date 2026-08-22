@@ -9809,10 +9809,17 @@ per key, which is why they are recorded per key:
 | guide.profPages.craftIntro.cooking | 5 (ja_JP, ko_KR, ru_RU, zh_CN, zh_TW) |
 | guide.profPages.farm.bedsBody | 5 (ja_JP, ko_KR, ru_RU, zh_CN, zh_TW) |
 
-The corroboration is in the regen itself: the five non-Latin resolved bundles did
-not move at all, while eighteen Latin ones did, because the Latin locales lack
-fills for the two keys the five carry. No src/ui/i18n.locales/ file was touched,
-and NO NEW KEY was minted.
+CORRECTED AT THE REVIEW ROUND: the per-key counts above are right, but the
+causation first written under them was inverted, and two sets of size 18 were
+being conflated. The 18 overlays carrying the materials fills INCLUDE all five
+non-Latin locales; the three WITHOUT are en_CA, es_ES and fr_CA. The 18 resolved
+bundles that MOVED are a different set of the same size: fifteen Latin
+translations plus en, en_CA and en_XA. Same cardinality, different membership.
+The five non-Latin bundles did not move because those locales carry a fill for
+EVERY one of the six reworded keys, which is exactly why they are the locales
+with the most stale English behind a translated-looking row.
+
+No src/ui/i18n.locales/ file was touched, and NO NEW KEY was minted.
 
 The alchemy materialsHeading is an ADDITION to the set the phase file named. It
 enumerated the suppliers exactly as the cooking heading did ("Herbs, glands, and
@@ -9821,10 +9828,35 @@ corrected body under a stale heading.
 
 ### VERIFIED NON-MOVERS, checked rather than asserted
 
-(a) The material taxonomy and the profession-affinity "Used by" line do not move:
-every crop was ALREADY a cooking reagent through FARM_RECIPES, so both modules
-derive the same sets before and after. tests/material_taxonomy.test.ts and
-tests/material_profession_affinity.test.ts are green and unmodified.
+(a) CORRECTED AT THE REVIEW ROUND, because as first written this row was HALF
+FALSE and the false half is player-visible. The material TAXONOMY does not move:
+every crop was already a cooking reagent through FARM_RECIPES, so
+src/sim/material_taxonomy.ts derives the same sets before and after, and
+tests/material_taxonomy.test.ts is green and unmodified.
+
+THE PROFESSION-AFFINITY "Used by" LINE DOES MOVE, on three crops. That module
+derives craft consumers by sweeping ALL_RECIPES, and before this phase NO
+alchemy recipe consumed any farm output at all, which is precisely what the old
+alchemyWithFarm zero pin recorded. The elixir line changed it:
+
+| crop | before | after |
+|---|---|---|
+| vale_wheat | ['cooking'] | ['alchemy', 'cooking'] |
+| bog_beet | ['cooking'] | ['alchemy', 'cooking'] |
+| frost_gourd | ['cooking'] | ['alchemy', 'cooking'] |
+
+materialProfessionHintText therefore renders "Used by Alchemy and Cooking." where
+those three tooltips used to read "Used by Cooking.". The behavior is correct and
+wanted; the defect was the verdict, and the reason it survived is worth keeping:
+farm materials are STRUCTURALLY EXEMPT from that suite's orphan census
+(COMMAND_CONSUMED_FARM_MATERIALS), so the file stayed green and unmodified while
+three of its subjects changed underneath it. A green untouched suite was read as
+proof of a non-mover, and it was not.
+
+Now pinned, with both halves: the three crops that gained alchemy, and the five
+that did NOT (brook_carrot, marsh_rice, highland_barley, thornpeak_cabbage,
+gilded_sunmelon stay cooking-only), because without the negative half a change
+handing alchemy every crop would pass unchanged.
 (b) The LADDER SHAPE pins do not move: no recipe row is minted, so 54 rows, nine
 per craft, three per rung all hold.
 (c) The kitchens work orders collect RAW materials, never a crafted dish, so no
@@ -9947,3 +9979,41 @@ The comment now states the truth and names the three options; no pin was added,
 because pinning today's numbers would cement the drift as intended and pinning
 the parity would red on a decision that file does not own. Whoever picks an
 option should pin it in the same change.
+
+### The obtainability cost of deviations 1 and 2, weighed at the review round
+
+Recorded because DECISION A's entire subject is obtainability and the deviations
+were first justified on RULE 2 alone, which is an incomplete account of a swap
+that changes how a player gets the reagent.
+
+brook_carrot is the ONLY produce a counter sells as PRODUCE (farmer_jessica,
+buyValue 16, farming's D9 bootstrap). For every other crop only the SEED is
+stocked. So on the two rung-0 rows the swap really does cost something:
+
+- recipe_hunters_game_skewer and recipe_elixir_of_the_boar were completable from
+  vendor stock plus a kill. With brook_carrot they would have stayed that way.
+  With vale_wheat they need a farm detour (hoe, seed, a 45-minute tier-1 grow)
+  or a World Market purchase.
+
+THE SWAP IS STILL RIGHT, and the reason is the rule doing its job rather than a
+technicality: at 16 of a 32-copper bill brook_carrot would be HALF the row's
+input value, which is the definition of the body RULE 2 exists to prevent. A
+rung-0 dish whose single most expensive ingredient is the vegetable is not a
+meat skewer with a grain binder.
+
+R18 IS NOT BREACHED by the cost: vale_wheat is a market-listable kind 'junk'
+material, exactly as sunpetal_herb already is in these same bills, so the
+requirement never falls on a profession. What is gone is the vendor route
+specifically, and that is a tradeoff worth the maintainer's eye rather than a
+defect: the alternative is a rung-0 row where the crop is the body.
+
+### One visual note owed at PR time
+
+recipe_marlows_grand_roast and recipe_seasoned_stock now carry SIX reagent
+entries each, and they are the first six-reagent bills in the game (the previous
+maximum across all 149 recipes was five). Every render path is dynamic and
+nothing caps the count, and the roast's tooltip was composed and read by hand,
+but the crafting window's reagent list and the bag action-menu cost line now draw
+one row more than anything shipped before. The repo's visual-change rule wants an
+eyeball and a before/after at PR time; this phase is LOCAL with no PR, so it is
+recorded as owed rather than captured.

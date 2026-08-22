@@ -67,6 +67,35 @@ describe('craftIdsForMaterialItem', () => {
     expect(craftIdsForMaterialItem('arcane_shard')).toEqual(['enchanting']);
   });
 
+  it('three crops gained ALCHEMY as a consumer (Masterwrought phase 11g)', () => {
+    // THE PLAYER-VISIBLE HALF OF THE PROVISIONING SUPPLY LINE, pinned here
+    // because nothing else in the tree can see it. Farm materials are
+    // structurally EXEMPT from the orphan census above
+    // (COMMAND_CONSUMED_FARM_MATERIALS), so this whole suite stayed green and
+    // unmodified while three crops changed what their tooltip says.
+    //
+    // Before phase 11g every produce id was cooking-only: farming's own dishes
+    // were the sole consumers and NO alchemy recipe consumed farm output at all
+    // (pinned at zero in tests/farm_seed_channels.test.ts until that phase gave
+    // it a floor). The elixir line changed it, so materialProfessionHintText
+    // now renders "Used by Alchemy and Cooking." on these three item tooltips
+    // where it used to read "Used by Cooking.".
+    //
+    // Order is CRAFT_RING, not first-seen, which is why alchemy leads.
+    expect(craftIdsForMaterialItem('vale_wheat')).toEqual(['alchemy', 'cooking']);
+    expect(craftIdsForMaterialItem('bog_beet')).toEqual(['alchemy', 'cooking']);
+    expect(craftIdsForMaterialItem('frost_gourd')).toEqual(['alchemy', 'cooking']);
+    // The negative half, and it is what makes the three above a real claim
+    // rather than a restatement of "produce is a reagent": the crops the elixir
+    // line did NOT take stay cooking-only. Without these a change that handed
+    // alchemy every crop would pass the arm above unchanged.
+    expect(craftIdsForMaterialItem('brook_carrot')).toEqual(['cooking']);
+    expect(craftIdsForMaterialItem('marsh_rice')).toEqual(['cooking']);
+    expect(craftIdsForMaterialItem('highland_barley')).toEqual(['cooking']);
+    expect(craftIdsForMaterialItem('thornpeak_cabbage')).toEqual(['cooking']);
+    expect(craftIdsForMaterialItem('gilded_sunmelon')).toEqual(['cooking']);
+  });
+
   it('herbs and the vial gained inscription as a consumer (Masterwrought phase 06)', () => {
     // The inscription catalog (INSCRIPTION_RECIPES) consumes the whole herb
     // ladder, the glass_vial staple, and the dust/essence ink lines. On the

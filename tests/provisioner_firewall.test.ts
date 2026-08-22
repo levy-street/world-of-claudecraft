@@ -90,6 +90,23 @@ const isConsumableIntermediate = (recipe: { id: string; professionId: string }):
   (recipe.professionId === 'cooking' || recipe.professionId === 'alchemy') &&
   recipe.id !== CATALYST_ID;
 
+/** The gear chain masterwrought R17 fences, as ONE expression both the sweep and
+ *  the carve-out scoping arm read. Hoisted rather than repeated: while the two
+ *  disagreed, the sweep applied the consumable carve-out across all four
+ *  sources and the scoping arm only measured it over INTERMEDIATE_RECIPES, so a
+ *  cooking or alchemy row arriving in APEX_GEAR_RECIPES or matching a gear word
+ *  would have been silently exempted with the scoping arm still green. */
+function gearChainRecipes() {
+  return [
+    ...INTERMEDIATE_RECIPES,
+    ...APEX_ARMOR_RECIPES,
+    ...APEX_GEAR_RECIPES,
+    ...ALL_RECIPES.filter((r) =>
+      GEAR_INTERMEDIATE_WORDS.some((word) => r.resultItemId.includes(word)),
+    ),
+  ];
+}
+
 describe('masterwrought R17: the provisioner firewall', () => {
   it('sweeps a non-empty farm family and a non-empty recipe table', () => {
     // The vacuity floor for every arm below. Both sides are derived, so a
@@ -153,14 +170,7 @@ describe('masterwrought R17: the provisioner firewall', () => {
     // The three gear-chain tables masterwrought R17 names, swept together. The hoe carve-out
     // is applied here rather than by excluding a recipe id, so it stays scoped
     // to what a gathering tool actually is.
-    const gearRecipes = [
-      ...INTERMEDIATE_RECIPES,
-      ...APEX_ARMOR_RECIPES,
-      ...APEX_GEAR_RECIPES,
-      ...ALL_RECIPES.filter((r) =>
-        GEAR_INTERMEDIATE_WORDS.some((word) => r.resultItemId.includes(word)),
-      ),
-    ];
+    const gearRecipes = gearChainRecipes();
     expect(gearRecipes.length, 'the gear-chain sweep must be non-empty').toBeGreaterThan(20);
     for (const recipe of gearRecipes) {
       if (isGatheringToolRecipe(recipe.resultItemId)) continue;
@@ -190,7 +200,10 @@ describe('masterwrought R17: the provisioner firewall', () => {
     // it today. (2) It never reaches an equippable, which is the whole reason
     // masterwrought R17 does not count a food reagent as gear. (3) It never
     // covers the pacing gate.
-    const carved = INTERMEDIATE_RECIPES.filter((r) => isConsumableIntermediate(r));
+    // Measured over the SAME list the sweep exempts from, not just over
+    // INTERMEDIATE_RECIPES: the carve-out is applied to every gear-chain source,
+    // so scoping it over one of the four would leave the other three unwatched.
+    const carved = gearChainRecipes().filter((r) => isConsumableIntermediate(r));
     expect(
       carved.map((r) => r.id),
       'the consumable intermediates',

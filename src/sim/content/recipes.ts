@@ -1266,10 +1266,18 @@ export const LADDER_RECIPES: ProfessionRecipeRecord[] = [
     // the skewer is rolled in, ADDED beside the meat and never traded for it:
     // no meat or salt count moved. vale_wheat rather than the brook_carrot the
     // plan defaulted to, and the reason is the economy basis rather than taste.
-    // brook_carrot is farming's D9 fee vegetable and the one produce row that
-    // carries a buyValue (16), which would make it the most valuable reagent on
-    // this row at 16 against game_meat's 8, so the crop becomes the body and
-    // breaks the accent rule. vale_wheat at 4 sits under it, and a vale_wheat 1
+    // brook_carrot is farming's D9 fee vegetable and the one BASE produce row
+    // that carries a buyValue (16); every FINE twin carries one too, so the
+    // claim is about the base line only. That 16 would make it the most
+    // valuable reagent on this row, against game_meat's 8, so the crop becomes
+    // the body and breaks the accent rule.
+    // THE COST OF THE SWAP, recorded because it is real: brook_carrot is the one
+    // produce a counter sells, so with it this rung-0 bill stayed buyable, and
+    // with vale_wheat it needs a farm detour or the World Market. R18 is still
+    // satisfied (vale_wheat is a market-listable kind 'junk' material, exactly
+    // as sunpetal_herb is in these same bills), so the requirement never falls
+    // on a profession, but the vendor route is genuinely gone.
+    // vale_wheat at 4 sits under the cap, and a vale_wheat 1
     // binder is the shipped shape farming's own tier-1 rows already use
     // (recipe_eastbrook_root_pottage, recipe_eastbrook_glazed_carrots) under
     // farming's (bz) binder ruling.
