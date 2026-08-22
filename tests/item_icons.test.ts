@@ -316,9 +316,14 @@ describe('item webp icons', () => {
     // economy-hooks phase added its eight farm dishes, the Phase 11
     // well-fed phase added its four buff dishes, and the Phase 12 shared
     // feast added the harvest_feast placeable, all under the same
-    // reasoning: all are dormant online (no faucet for any exists yet)
-    // and their art is scheduled as its own later phase. It must fall back to
-    // 0 as that art lands.
+    // reasoning: their art is scheduled as its own later phase, a deliberate
+    // ART PARK running Phases 11e to 11k. It must fall back to 0 as that art
+    // lands. CORRECTED at the Phase 11e QA: this used to add "all are dormant
+    // online (no faucet for any exists yet)", which was already false when it
+    // was written (farmer_jessica has stocked the Vale seeds, brook_carrot and
+    // the garden hoe since the growth engine shipped) and is doubly false now
+    // that GATE 1 stocks the tier-3 and tier-4 seeds. Live players can hold
+    // art-pending items; the park is the reason, dormancy never was.
     expect(
       [...ITEM_ART_PENDING].sort(),
       'art debt is enumerated and re-pinned deliberately, never grown quietly',

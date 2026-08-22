@@ -799,7 +799,7 @@ describe('real catalog integration', () => {
     const view = buildDeedsView(
       makeInput({ deeds: DEEDS, order: DEED_ORDER, category: 'progression' }),
     );
-    // 286 deeds - 4 feats - 9 hidden = 273 visible to a fresh character. The
+    // 287 deeds - 4 feats - 9 hidden = 274 visible to a fresh character. The
     // farming absorb (masterwrought Phase 11d) carried this branch's 279 to 286
     // with its seven deeds, none of them feat-flagged or hidden, so both
     // subtrahends are unchanged and the identity moves with the total alone.

@@ -366,9 +366,19 @@ export function restoreDeedStats(saved: SavedDeedStats | undefined): DeedStats {
       if (typeof v === 'number' && Number.isFinite(v) && v > 0) stats.counters[k] = Math.floor(v);
     }
   }
-  // Bounded on load exactly like the write sites: only real item ids enter
-  // itemsDiscovered, and only marks in an authored namespace enter visited,
-  // so a hand-edited save cannot grow either set unboundedly.
+  // Bounded on load like the write sites: only real item ids enter
+  // itemsDiscovered, and only marks in an AUTHORED NAMESPACE enter visited.
+  // Precise about which half that bounds, corrected at the Phase 11e QA: the
+  // itemsDiscovered arm really is bounded, because ITEMS is a closed table.
+  // The visited arm validates the PREFIX only, so the suffix after the colon
+  // is unbounded and a hand-edited save CAN grow that set. Harmless today (the
+  // visits evaluator counts only a deed's own authored markIds, so an invented
+  // mark satisfies nothing), and pre-existing for every namespace, but the old
+  // "cannot grow either set unboundedly" overstated it.
+  //
+  // The id gate on itemsDiscovered is also a ROLLBACK arm, and it is the one
+  // the Phase 11e deploy note first missed: a build whose ITEMS lacks an id
+  // DROPS it here and the next autosave writes the reduced set back.
   for (const id of saved.itemsDiscovered ?? []) if (ITEMS[id]) stats.itemsDiscovered.add(id);
   for (const mark of saved.visited ?? []) {
     if (typeof mark !== 'string') continue;

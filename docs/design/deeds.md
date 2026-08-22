@@ -229,6 +229,25 @@ the root `CLAUDE.md` content rule points here.
   automatically): TWO deeds sit dormant for the window, a consequence the
   program accepts.
 
+### A recorded rule-2 exception (Masterwrought Phase 11e, `col_farm_roster`)
+
+- **`col_farm_roster` ("Every Furrow Filled") carries Renown 5 with a DERIVED
+  requirement set.** Its `markIds` are generated from `FARM_CROP_IDS`, so it is
+  the catalog's first `visits` deed whose requirements grow with content, and
+  rule 2 above says ZERO Renown for exactly that shape. The exception is
+  deliberate and was ruled explicitly (masterwrought DECISION E), so the ruling
+  stands; it is recorded HERE, beside the rule, because this file is what an
+  author reads before authoring the next one.
+- **Why it does not violate rule 2's stated reason.** That reason is that the
+  account score must never be able to decrease on a content patch, and it
+  cannot here: `deedsEarned` is sticky and `character_deeds` is insert-only, so
+  a player who has closed the roster keeps the 5 when a thirteenth crop ships.
+  What widens is an UNFINISHED collection, which has scored nothing yet.
+- **The one-line change that would resolve it the other way** is dropping the
+  row's `renown` to 0. Do not take it without re-opening DECISION E.
+- **For the next author:** a growing-requirement deed is still the wrong default.
+  Take this exception only where the earn is sticky and the score cannot fall.
+
 **CLOSED 2026-08-21 by Masterwrought Phase 11e (GATE 1).** The window is over.
 Both farmer counters now stock their tier's seeds (farmer_hollis the four
 tier-3, farmer_verbena the four tier-4, each with a positive `buyValue`), so

@@ -267,7 +267,8 @@ const NON_PROFESSIONS_BLOB_FIELDS = [
 // fourth tool-effect slot: farming became slottable when the hoe phase
 // lifted its refusal arm, F1) + 368 (13-digit epoch anchors on all 23 farm
 // rows via CEILING_EPOCH_MS, F2): the 17 KiB ceiling HOLDS with 704 bytes
-// of headroom and the band re-centers on the new measurement. Two terms
+// of headroom at that measurement, 681 after Phase 11e's re-measure to
+// 16,727, and the band re-centers on the new measurement. Two terms
 // stay DELIBERATELY unmeasured and recorded instead: the rift-forged
 // equipmentInstance payload (~354 B per slot on legitimate endgame copies,
 // bounded separately by src/sim/item_instance_load.ts; measuring it is

@@ -40,9 +40,11 @@ export type FarmStageMesh = 'sprout' | 'stage2' | 'stage3' | 'stage4' | 'withere
  */
 export type FarmWetBand = 0 | 1 | 2;
 
-/** Every crop's model family. Exhaustive over FARM_CROPS by test: a ninth
- *  crop must red tests/farm_patches_core.test.ts rather than quietly take the
- *  resolver's fallback. */
+/** Every crop's model family. Exhaustive over FARM_CROPS by test: a
+ *  THIRTEENTH crop must red tests/farm_patches_core.test.ts rather than
+ *  quietly take the resolver's fallback (the roster is twelve as of Phase
+ *  11e; a missing row here does not throw, it renders the crop as identical
+ *  grey fallback art, which no sim-side test can see). */
 export const FARM_CROP_FAMILY: Readonly<Record<string, FarmCropFamily>> = Object.freeze({
   vale_wheat: 'grain',
   marsh_rice: 'grain',

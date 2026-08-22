@@ -222,15 +222,22 @@ export const FARM_HUSKS_PER_COMPOST = 2;
 // vendor-PRICED and stocked at the farmer NPCs (the go-live counters), so
 // the market pressure this exists for does not apply to them.
 //
-// TUNING, ALL PROVISIONAL, FLAGGED FOR THE MAINTAINER, and ECONOMY-SENSITIVE
-// (the state.md OPEN items): tier 3/4 seeds are market goods with NO vendor
-// faucet, so the harvest loop needs a partial seed return to stay
-// seed-positive at skill (the produce a harvest pays funds the rest of the
-// next seed) without a rate so high that seeds stop being worth crafting or
-// selling. At these rates a tier-3 harvest expects 0.48 seeds back
-// (2 x 0.08 + 1 x 0.32) and a tier-4 harvest 0.41 (2 x 0.06 + 1 x 0.29), so
-// roughly every second high-tier harvest replants itself and every other
-// plant still buys its seed from the market.
+// TUNING, ECONOMY-SENSITIVE, and RE-STATED at the Phase 11e QA because GATE 1
+// falsified the reason this block used to give. It read "tier 3/4 seeds are
+// market goods with NO vendor faucet", which was true when the rates were
+// authored and is not true now: Phase 11e stocked all eight upper-tier seeds
+// at Hollis and Verbena. The RATES are unchanged and still defensible, on a
+// reason that survives the faucet: the seed-back is what keeps a farmer who
+// is already farming from paying the counter on every single replant, and the
+// counter's price is deliberately the bootstrap premium (sell x 4 x 2, the
+// masterwrought DECISION D rung), so the return is a discount on a route that
+// exists rather than the only route there is. At these rates a tier-3 harvest
+// expects 0.48 seeds back (2 x 0.08 + 1 x 0.32) and a tier-4 harvest 0.41
+// (2 x 0.06 + 1 x 0.29), so roughly every second high-tier harvest replants
+// itself and every other plant buys its seed, now from the counter or the
+// market rather than the market alone. Whether the rates should MOVE now that
+// the faucet exists is a live tuning question for the maintainer, recorded
+// rather than answered here.
 export const FARM_SEED_BACK_MIN_TIER = 3;
 export const FARM_SEED_BACK_TWO_CHANCE: Readonly<Record<number, number>> = { 3: 0.08, 4: 0.06 };
 export const FARM_SEED_BACK_ONE_CHANCE: Readonly<Record<number, number>> = { 3: 0.4, 4: 0.35 };

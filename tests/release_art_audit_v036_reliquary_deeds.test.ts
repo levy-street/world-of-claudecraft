@@ -196,9 +196,10 @@ describe('v0.36 release-audit Reliquary deed art', () => {
     // inscription milestone deeds (phases 05 and 06) each shipped their
     // crest in the change that authored them, and the farming phase
     // committed the prog_farming_100 crest (the Reliquary title shelf
-    // forbids fallback art for title deeds), so 278 of the 286 live deeds
+    // forbids fallback art for title deeds), so 278 of the 287 live deeds
     // are painted. Deeds appended after the audit without art (the release's
-    // walk-in castle visit pair, then the six farming celebration deeds)
+    // walk-in castle visit pair, the six farming celebration deeds, then the
+    // Phase 11e roster deed, nine in all and the list below in order)
     // ride the DEED_ART_PENDING ledger until their art lands; the audit
     // holds exactly when the pending set and the artless set are the same
     // post-audit appends and every other deed is painted.

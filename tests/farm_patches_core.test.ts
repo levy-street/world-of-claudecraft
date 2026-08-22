@@ -53,7 +53,7 @@ function plot(over: Partial<FarmPlotView> = {}): FarmPlotView {
 }
 
 describe('farm crop families', () => {
-  it('gives EVERY live crop an explicit family row (a ninth crop reds this)', () => {
+  it('gives EVERY live crop an explicit family row (a thirteenth crop reds this)', () => {
     for (const id of FARM_CROP_IDS) {
       expect(
         Object.hasOwn(FARM_CROP_FAMILY, id),
@@ -67,7 +67,7 @@ describe('farm crop families', () => {
     expect(Object.keys(FARM_CROP_FAMILY).length).toBe(FARM_CROP_IDS.size);
   });
 
-  it('spreads the eight crops across all three families', () => {
+  it('spreads the twelve crops across all three families', () => {
     const families = new Set(Object.values(FARM_CROP_FAMILY));
     expect([...families].sort()).toEqual(['gourd', 'grain', 'rootleaf']);
   });

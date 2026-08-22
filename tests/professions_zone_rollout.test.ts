@@ -830,7 +830,7 @@ describe('the farming ladder: every farming zone arrives mechanically whole', ()
     expect(enNames.no_such_farming_item).toBeUndefined();
   });
 
-  it('tier 1 and 2 seeds are vendor-priced, tier 3 and 4 seeds never (both directions)', () => {
+  it('EVERY seed is vendor-priced, upper tiers at the bootstrap premium (both directions)', () => {
     // GATE 1 INVERTED THIS ARM (Phase 11e), which is why it reads the way it
     // does. Before 11e the tier 3 and 4 seeds were deliberately UNPRICED, and
     // the consequence was three trainer-visible recipes nobody could complete
