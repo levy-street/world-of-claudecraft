@@ -2008,14 +2008,14 @@ describe('Eastbrook polish performance and contact evidence', () => {
       // Parent values at the Phase 11e QA sync: ours d4aa71b9, the release
       // 9c8f6ca4. At the Phase 11f sync: ours b77a8880, the release 0d3ec7db.
       // Recomputed LAST from the swept files, per REMINT_COMMAND.
-    // Re-minted at the Phase 11g QA release sync (release tip 3e49dc11b3): both
-    // parents edited renderer.ts again, so the merged file is a third content
-    // and neither parent's literal describes it. The release's own half over
-    // this span, kept rather than dropped: it re-minted for its review-fix
-    // round (prewarm_policy.ts and renderer.ts moved) and again for its rift
-    // long-session perf merge with release/v0.40.0 (renderer.ts moved on both
-    // sides of THAT merge). Same order, the composite first, then this seal.
-    // No capture was retaken.
+      // Re-minted at the Phase 11g QA release sync (release tip 3e49dc11b3): both
+      // parents edited renderer.ts again, so the merged file is a third content
+      // and neither parent's literal describes it. The release's own half over
+      // this span, kept rather than dropped: it re-minted for its review-fix
+      // round (prewarm_policy.ts and renderer.ts moved) and again for its rift
+      // long-session perf merge with release/v0.40.0 (renderer.ts moved on both
+      // sides of THAT merge). Same order, the composite first, then this seal.
+      // No capture was retaken.
     ).toBe('fa94c388bcaf7e38c6de1d1d80b8c571a1fc99a82a9b1f89ef0e6dba1ccb9a32');
   });
 
