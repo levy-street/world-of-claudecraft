@@ -8798,6 +8798,17 @@ describe trees that no longer exist.
 
 ### Phase 11e QA: validation at close
 
+FINAL FULL SUITE GREEN AT THE TRUE TIP, 7e8b582f34: 3024 files passed / 12
+skipped, 43150 tests passed / 2 expected-fail / 115 skipped, 403.35s, EXIT=0,
+tip identical at both ends. Run deliberately AFTER the last code commit so the
+green claim sits on the actual HEAD rather than on an argument about a
+comment-only delta. (Its DIRTY_AT_END is 1: this very record was appended to
+state.md while it ran, which is docs-only, so the executable state the run
+covered is exactly the committed tip.)
+
+The earlier close-out run, kept because it is the one that covered both fix
+waves as a unit:
+
 CLOSE-OUT FULL SUITE GREEN at ecd1bfb92c, the tip carrying both fix waves:
 3024 files passed / 12 skipped, 43150 tests passed / 2 expected-fail / 115
 skipped, 412.09s, vitest EXIT=0. The tree was clean at the start AND the end of
@@ -8836,3 +8847,53 @@ OTHER GATES at the close-out tip:
 
 THE FIX ROUND ITSELF was reviewed by a FRESH reviewer over the whole
 e9d61604ab..HEAD range, per the rule that a fix round is unreviewed code.
+
+### The fix round, and how far its own review actually got
+
+The phase file requires a FRESH reviewer over the fix round, because the fixes
+are unreviewed code. TWO were dispatched and BOTH went idle without delivering,
+each after its one budgeted nudge. That is recorded rather than glossed: the
+requirement was not fully met, and what stood in for it is listed here so a
+reader can judge the gap rather than assume it was covered.
+
+WHAT WAS VERIFIED MECHANICALLY, all of it decidable and all of it clean:
+- The twenty rewritten locale rows: zero dashes INTRODUCED by the edit (measured
+  against each row's pre-edit form, so a translator's existing punctuation is not
+  miscounted), every row still a well-formed single-quoted literal, no unescaped
+  inner quote, every row actually changed, and no length swing of the scale a
+  truncation would produce.
+- The same twenty rows, per FACT: every proper noun the English names is present
+  (Hollis, Verbena, Jessica, the World Market, Harvest Feast, Every Furrow
+  Filled, Harvestmaster, Master Gatherer), the old false polarity is GONE from
+  every row (the no-shop claim, the later-patch deferral, the pair-of-crops
+  claim), and the replacement claim landed (today/now, two-and-four).
+- Zero em dashes, en dashes or emoji across the whole fix diff AND all ten commit
+  messages; every commit carries a body and a Conventional Commits scope; no
+  session-link trailer.
+- The seven src/sim/content files whose changes were claimed comment-only carry
+  ZERO non-comment changed lines, checked by filtering the diff rather than by
+  reading it.
+- All 23 resolved bundles in the second wave moved by exactly one line each, with
+  no exceptions. Uniformity at that scale is the evidence they were regenerated
+  rather than hand-edited; the first wave's five moved by exactly three rows each,
+  mirroring their five overlays 1:1.
+- The four dish input figures were RECOMPUTED from the live tables rather than
+  copied from the test: 226, 323, 848, 856, matching both the corrected comments
+  and the pins, with every dish still gold-negative.
+- The full export-surface literal is exactly the ten functions the module
+  exports, re-derived rather than trusted.
+
+WHAT REMAINS UNVERIFIED, stated plainly: whether those twenty translations read
+NATURALLY to a native speaker, and whether any sentence subtly asserts something
+the English does not. The author of the rows is the wrong reader for that, the
+mechanical and per-fact sweeps cannot see it, and no fresh reviewer delivered. It
+is the one open item on this fix round.
+
+THE SELF-CHECK EARNED ITS PLACE, which is the argument for running it even when a
+reviewer is expected. Re-running the dormancy sweep against its OWN output caught
+two defects the wave had introduced or left: the glazed-carrots block had a
+correction spliced into the middle of a sentence, stranding "D11 bootstrap
+ruling." as an orphan fragment, and the harvest_feast block was missed outright
+and still asserted the dormancy in the present tense. Both are the exact defect
+class the wave existed to remove, in the one file carrying two such blocks rather
+than one. Fixed at 7e8b582f34.
