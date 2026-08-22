@@ -12,7 +12,7 @@
 import { describe, expect, it } from 'vitest';
 import { ITEMS, MOBS } from '../../src/sim/data';
 import { RIFT_IMPAIRED_FUSE_CAP } from '../../src/sim/mob/rift_escape_window';
-import { resolveFarmHarvest } from '../../src/sim/professions/farming';
+import { farmingHarvestGainAt, resolveFarmHarvest } from '../../src/sim/professions/farming';
 import { RIFT_COIN_BONUS_A, RIFT_PATTERN_ITEM_IDS } from '../../src/sim/rift/progression';
 import { RIFT_S_ZONE_TEMPO } from '../../src/sim/rift/ranks';
 import { record } from './record';
@@ -956,15 +956,22 @@ describe('coverage: each scenario fires its subsystem', () => {
     expect(countOf('harvest_feast')).toBe(0);
     expect(meta.farmPlots.size).toBe(0);
 
-    // The gathering-grant drain across the whole session: +1 at proficiency
-    // 0 from the first harvest, +1 at 1 from the toniced harvest (drained
-    // before the drive's proficiency write of 75), then the barley harvest's
-    // 0.02 at 75 (tier 3 teaches past 75) lands on the tail ticks. The
+    // The gathering-grant drain across the whole session: the first harvest
+    // and the toniced one both grant at low proficiency and are drained before
+    // the drive's proficiency write of 75, then the barley harvest's tier-3
+    // gain at 75 (tier 3 teaches past 75) lands on the tail ticks. The
     // Phase 11 extension leaves the SAME final value by a different route:
     // its padding withers at the written skill-0 window queue nothing, the
     // win harvest at the written 75 grays on a tier-1 crop, and only the
-    // paying barley harvest adds its 0.02 on top of the final restore of 75.
-    expect(meta.gatheringProficiency.farming).toBeCloseTo(75.02, 10);
+    // paying barley harvest adds its gain on top of the final restore of 75.
+    //
+    // STRICT equality, and the gain is READ rather than restated. Both halves
+    // are deliberate: reading it means a future re-tune moves this arm with the
+    // schedule instead of reddening it, and strict equality is now available at
+    // all because every gain is exactly representable (masterwrought 11e), so a
+    // toBeCloseTo here would tolerate the very accumulation drift the re-tune
+    // removed.
+    expect(meta.gatheringProficiency.farming).toBe(75 + farmingHarvestGainAt(75, 3));
   });
 
   it('rift_boss_floor: stretched S fuse spawns, detonates, and boss death clears the pending zone', () => {
