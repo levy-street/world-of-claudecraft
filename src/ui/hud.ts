@@ -6449,7 +6449,7 @@ export class Hud {
     // edited it. Force one rebuild with fresh t(), the arena / Vale Cup
     // relocalize arm (#2500).
     if (this.townFocusOpen) this.renderTownFocus();
-    if (this.marketWindow.isOpen) this.marketWindow.render();
+    this.marketWindow.relocalize();
     if (this.bankWindow.isOpen) this.bankWindow.render();
     if (this.deedsWindow.isOpen) this.deedsWindow.render();
     if (this.reliquaryWindow.isOpen) this.reliquaryWindow.render();

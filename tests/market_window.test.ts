@@ -510,14 +510,14 @@ describe('market_window: stale tooltip on re-filter (#2456)', () => {
 describe('market_window: reconnect resync (#2416)', () => {
   // A fresh join (the server's linkdead grace expired before the socket came back)
   // resets the session-only browse query to default; the window's own filter
-  // controls live in the client and survive the drop untouched. onReconnected must
-  // detect that drift off the echoed query, not blindly re-push on every reconnect
-  // (an ordinary resume keeps the same session, so nothing changed to re-send).
+  // controls live in the client and survive the drop untouched. Localized item
+  // membership is deliberately not echoed, so a raw-query comparison cannot detect
+  // a locale change while disconnected. The first settled snapshot therefore causes
+  // one canonical re-push; an ordinary resume remains a server-side identity no-op.
   // onReconnected() fires synchronously inside the client's `hello` handler,
   // before the resent world's first snapshot has decoded: at that instant
   // marketInfo (if present at all) is still the pre-drop echo, which by
-  // construction matches currentQuery(), so comparing right there would never
-  // detect the fresh-join reset. It arms a flag instead; the drift check runs
+  // construction matches currentQuery(). It arms a flag instead and re-pushes
   // later, once refreshIfChanged() actually observes a MarketInfo.
   it('is a no-op when closed, otherwise only arms the deferred resync flag', () => {
     const method = painter.slice(
@@ -532,7 +532,7 @@ describe('market_window: reconnect resync (#2416)', () => {
     );
   });
 
-  it('resolvePendingReconnectResync compares both filter axes and the settled search box, and re-pushes only on real drift', () => {
+  it('resolvePendingReconnectResync re-pushes the complete locale-derived query exactly once', () => {
     const method = painter.slice(
       painter.indexOf('private resolvePendingReconnectResync'),
       painter.indexOf('refreshIfChanged(): void {'),
@@ -542,8 +542,6 @@ describe('market_window: reconnect resync (#2416)', () => {
     );
     expect(method).toContain('if (!this.pendingReconnectResync || !info) return;');
     expect(method).toContain('this.pendingReconnectResync = false;');
-    expect(method).toContain('queryDiffersFromEcho(query, info)');
-    expect(method).toContain('searchDiffersFromEcho(query, info)');
     expect(method).toContain('this.pushQuery();');
     // Issue 3043: the Sell tab's price-check axis resets server-side on a fresh
     // join too, independent of marketQuery, so the resync must re-arm it as
@@ -575,10 +573,9 @@ describe('market_window: reconnect resync (#2416)', () => {
     expect(refreshPriceRefIdx).toBeLessThan(sellReturnIdx);
   });
 
-  it('imports queryDiffersFromEcho and searchDiffersFromEcho from the world_api seam (the pure drift checks, not re-derived comparisons)', () => {
-    expect(painter).toContain(
-      "import {\n  type IWorld,\n  type MarketInfo,\n  type MarketListingView,\n  queryDiffersFromEcho,\n  searchDiffersFromEcho,\n} from '../world_api';",
-    );
+  it('does not pretend the MarketInfo echo can represent client-localized membership', () => {
+    expect(painter).not.toContain('queryDiffersFromEcho(');
+    expect(painter).not.toContain('searchDiffersFromEcho(');
   });
 
   it('wires the window through a hud.ts method, chained onto the ClientWorld reconnect hook in main.ts', () => {

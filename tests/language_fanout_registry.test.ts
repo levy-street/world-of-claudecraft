@@ -108,7 +108,7 @@ const FANOUT_ARMS: readonly string[] = [
   // sees refreshLocalizedDynamicUi's OWN statement-position calls.
   'this.repaintOpenServiceWindows|',
   'this.renderTownFocus|this.townFocusOpen',
-  'this.marketWindow.render|this.marketWindow.isOpen',
+  'this.marketWindow.relocalize|',
   'this.bankWindow.render|this.bankWindow.isOpen',
   'this.deedsWindow.render|this.deedsWindow.isOpen',
   'this.professionsWindow.render|this.professionsWindow.isOpen',
@@ -314,8 +314,8 @@ const ANSWERED: readonly AnsweredSurface[] = [
   {
     file: 'market_window.ts',
     memos: ['lastSig', 'lastSellPriceRefSig'],
-    answer: 'this.marketWindow.render',
-    why: 'the listing ids, prices and the active tab; render() carries no self-gate. lastSellPriceRefSig (issue 3043) is the Sell tab price reference: render() rebuilds it via renderSell -> sellPriceRefHtml with the CURRENT language, the same full-rebuild path that already answers lastSig',
+    answer: 'this.marketWindow.relocalize',
+    why: 'the listing ids, prices and the active tab; relocalize() self-gates, rebuilds visible text, and reissues a nonblank Browse query so its compact localized-name membership matches the new displayed locale. lastSellPriceRefSig (issue 3043) is rebuilt by the same render path',
   },
   {
     file: 'professions_window.ts',

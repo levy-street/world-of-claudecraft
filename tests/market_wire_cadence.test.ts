@@ -15,6 +15,7 @@ vi.mock('../server/db', () => ({
   saveMailState: vi.fn(async () => {}),
   loadMarketState: vi.fn(async () => null),
   loadMailState: vi.fn(async () => null),
+  loadAccountFlair: vi.fn(async () => ({ ai: false, streamer: false, links: {} })),
   openPlaySession: vi.fn(async () => 1),
   touchCharacterLogin: vi.fn(async () => {}),
   closePlaySession: vi.fn(async () => {}),
@@ -32,6 +33,7 @@ vi.mock('../server/db', () => ({
 }));
 
 import { type ClientSession, GameServer } from '../server/game';
+import { encodeMarketLocalizedItemMask } from '../src/sim/market_query';
 import { groundHeight } from '../src/sim/world';
 import { broadcast, type FakeClient, fakeWs, joinServer, lastSnap } from './helpers/bare_client';
 
@@ -131,6 +133,42 @@ describe('market wire cadence + rebuild-only-on-change', () => {
       server.sim.tick();
       broadcast(server);
     }
+    expect(spy).not.toHaveBeenCalled();
+    expect(marketSnaps(fc.sent, sent)).toHaveLength(0);
+  });
+
+  it('canonicalizes equivalent localized masks so they do not force rebuilds', () => {
+    const { server, fc, session } = browseServer();
+    broadcast(server);
+    const localizedItemMask = encodeMarketLocalizedItemMask(['wolf_fang']);
+    server.handleMessage(
+      session,
+      JSON.stringify({
+        t: 'cmd',
+        cmd: 'market_search',
+        q: 'colmillo',
+        localizedItemMask,
+        page: 0,
+      }),
+    );
+    broadcast(server);
+
+    const spy = vi.spyOn(server.sim, 'marketInfoFor');
+    const sent = fc.sent.length;
+    const [signature, payload] = localizedItemMask.split(':');
+    server.handleMessage(
+      session,
+      JSON.stringify({
+        t: 'cmd',
+        cmd: 'market_search',
+        q: 'colmillo',
+        localizedItemMask: `${signature}:${payload.toUpperCase()}`,
+        page: 0,
+      }),
+    );
+    server.sim.tick();
+    broadcast(server);
+
     expect(spy).not.toHaveBeenCalled();
     expect(marketSnaps(fc.sent, sent)).toHaveLength(0);
   });

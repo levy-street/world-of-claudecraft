@@ -375,6 +375,7 @@ describe('keyboard-nav: the market filter listbox (dropdownKeyNav wiring)', () =
     // toEqual, not toMatchObject: a dropped or stray sibling field must redden here too.
     expect(queries.at(-1)).toEqual({
       search: '',
+      localizedItemMask: '',
       itemType: 'all',
       subtype: 'all',
       armorClass: 'all',
@@ -462,6 +463,7 @@ describe('keyboard-nav: the market filter listbox (dropdownKeyNav wiring)', () =
     // toEqual, not toMatchObject: a dropped or stray sibling field must redden here too.
     expect(queries.at(-1)).toEqual({
       search: '',
+      localizedItemMask: '',
       itemType: 'armor',
       subtype: 'all',
       armorClass: 'mail',
@@ -477,6 +479,7 @@ describe('keyboard-nav: the market filter listbox (dropdownKeyNav wiring)', () =
     expect(root.querySelector('[data-market-filter-menu="primaryStat"]')).toBeTruthy();
     expect(queries.at(-1)).toEqual({
       search: '',
+      localizedItemMask: '',
       itemType: 'weapon',
       subtype: 'all',
       armorClass: 'all',
@@ -588,6 +591,7 @@ describe('keyboard-nav: the market filter listbox (dropdownKeyNav wiring)', () =
     // toEqual, not toMatchObject: a dropped or stray sibling field must redden here too.
     expect(queries.at(-1)).toEqual({
       search: '',
+      localizedItemMask: '',
       itemType: 'bag',
       subtype: size,
       armorClass: 'all',

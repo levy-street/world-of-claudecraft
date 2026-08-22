@@ -20,13 +20,7 @@
 
 import { audio } from '../game/audio';
 import type { ItemInstancePayload, ItemSlot } from '../sim/types';
-import {
-  type IWorld,
-  type MarketInfo,
-  type MarketListingView,
-  queryDiffersFromEcho,
-  searchDiffersFromEcho,
-} from '../world_api';
+import type { IWorld, MarketInfo, MarketListingView } from '../world_api';
 import { markDialogRoot } from './dialog_root';
 import { dropdownKeyNav } from './dropdown_nav';
 import { computeDropdownPlacement } from './dropdown_position';
@@ -44,6 +38,7 @@ import {
   MARKET_ITEM_TYPE_FILTERS,
   MARKET_PRIMARY_STAT_FILTERS,
   MARKET_RARITY_FILTERS,
+  MARKET_SEARCH_MAX_LENGTH,
   MARKET_SORT_OPTIONS,
   type MarketArmorClassFilter,
   type MarketItemTypeFilter,
@@ -54,7 +49,13 @@ import {
   type MarketSubtypeFilter,
 } from './market_filters';
 import { marketNameColor } from './market_name_color';
+import {
+  beginMarketPageRequest,
+  type MarketPageRequestState,
+  reconcileMarketPageEcho,
+} from './market_page_request_core';
 import { marketPriceHtml } from './market_price_view';
+import { marketLocalizedCatalogItemMask } from './market_search_core';
 import {
   buildMarketView,
   COPPER_PER_GOLD,
@@ -127,6 +128,11 @@ export class MarketWindow {
   private sellItemId: string | null = null;
   private sellInstance: ItemInstancePayload | null = null;
   private searchQuery = '';
+  // A filter or locale change resets Browse to page zero immediately, but an online
+  // host may still expose the previous page's MarketInfo until the command returns.
+  // Do not let that stale echo overwrite the pending page-zero intent.
+  private pendingBrowsePageRequest: MarketPageRequestState | null = null;
+  private lastRequestedBrowsePage = 0;
   private lastSig = '';
   // The Sell tab's price-reference echo signature (issue 3043), tracked SEPARATELY
   // from lastSig: the Sell tab is excluded from the general per-frame rebuild (it
@@ -140,10 +146,8 @@ export class MarketWindow {
   // synchronously inside the client's `hello` handler, before the resent
   // world's first snapshot has decoded, so at that instant marketInfo (if
   // any) is still the PRE-drop echo, which by construction matches
-  // currentQuery() (the client pushed it and the server echoed it back
-  // before the socket died): queryDiffersFromEcho would always read false
-  // there and the resync would never fire. Deferring the comparison to the
-  // next snapshot lets it see the real post-reconnect echo instead.
+  // currentQuery() (the client pushed it before the socket died). Deferring the
+  // resync to the next snapshot avoids sending before the resumed world exists.
   private pendingReconnectResync = false;
 
   constructor(private readonly deps: MarketWindowDeps) {}
@@ -170,6 +174,8 @@ export class MarketWindow {
     this.sortFilter = 'name';
     this.collapseLowest = false;
     this.browsePage = 0;
+    this.pendingBrowsePageRequest = null;
+    this.lastRequestedBrowsePage = 0;
     this.sellItemId = null;
     this.sellInstance = null;
     this.searchQuery = '';
@@ -216,6 +222,7 @@ export class MarketWindow {
   private currentQuery(): MarketQuery {
     return {
       search: this.searchQuery,
+      localizedItemMask: marketLocalizedCatalogItemMask(this.searchQuery, itemDisplayName),
       itemType: this.itemTypeFilter,
       subtype: this.subtypeFilter,
       armorClass: this.armorClassFilter,
@@ -232,7 +239,16 @@ export class MarketWindow {
   // the snapshot is up to date by the next render; online it round-trips and the
   // per-frame refreshIfChanged repaints when the new page arrives.
   private pushQuery(): void {
-    this.deps.world().marketSearch(this.currentQuery());
+    const world = this.deps.world();
+    const query = this.currentQuery();
+    this.pendingBrowsePageRequest = beginMarketPageRequest(
+      this.pendingBrowsePageRequest,
+      query.page,
+      this.lastRequestedBrowsePage,
+      world.marketInfo,
+    );
+    this.lastRequestedBrowsePage = query.page;
+    world.marketSearch(query);
   }
 
   // Push (or clear, when nothing is staged) the Sell tab's current-lowest-price
@@ -249,31 +265,27 @@ export class MarketWindow {
   // brand-new session, whose browse query starts back at default; this window's
   // own filter controls live in the client and survive the socket drop untouched,
   // so without this the buttons keep showing a query the server silently stopped
-  // running. An ordinary resume keeps the same session (the echoed query still
-  // matches), so this is a no-op then: only a real drift re-pushes.
+  // running. Localized item membership is not echoed, so an ordinary resume also
+  // receives one bounded re-push; an identical sanitized query is an identity no-op.
   onReconnected(): void {
     if (!this.opened) return;
     // The socket just re-hello'd; the resent world's first snapshot has not
     // decoded yet, so `marketInfo` here (if present at all) is still the
-    // pre-drop echo. Comparing against it now would always read "no drift"
-    // (it was pushed and echoed back before the socket died). Arm the flag
-    // instead and let refreshIfChanged() run the real comparison once a
-    // post-reconnect MarketInfo actually arrives.
+    // pre-drop echo. Arm the flag instead and let refreshIfChanged() re-push once
+    // a post-reconnect MarketInfo confirms the resumed world is ready.
     this.pendingReconnectResync = true;
   }
 
-  // Runs the deferred reconnect-drift check armed by onReconnected() above,
-  // once a MarketInfo has actually streamed in since. Checks both the five
-  // dropdown filter axes (queryDiffersFromEcho) and a settled search box
-  // (searchDiffersFromEcho): a fresh join resets `search` to '' same as the
-  // other axes, and by the time this runs no keystroke can be in flight.
+  // Runs the deferred reconnect resync armed by onReconnected() once a post-reconnect
+  // MarketInfo has streamed. By then the command has a live session to target.
   private resolvePendingReconnectResync(info: MarketInfo | null): void {
     if (!this.pendingReconnectResync || !info) return;
     this.pendingReconnectResync = false;
-    const query = this.currentQuery();
-    if (queryDiffersFromEcho(query, info) || searchDiffersFromEcho(query, info)) {
-      this.pushQuery();
-    }
+    // Localized search membership is derived from the active client locale and is
+    // intentionally not echoed in MarketInfo. Re-send once after every reconnect:
+    // an unchanged sanitized query preserves its server-side object identity, while
+    // a locale switch during the disconnect repairs the otherwise-invisible drift.
+    this.pushQuery();
     // The Sell tab's price-check axis (issue 3043) resets to null server-side on
     // a fresh join too (PlayerMeta.sellPriceItemId is session-only, same as
     // marketQuery), independent of whatever item this window still has staged
@@ -282,6 +294,19 @@ export class MarketWindow {
     // value compare), and without this a staged item's reference could never
     // resolve again post-reconnect.
     this.pushSellPriceCheck();
+  }
+
+  /** Repaint localized chrome and refresh any retained nonblank Browse search. */
+  relocalize(): void {
+    if (!this.opened) return;
+    // Render first: renderBrowse copies the last authoritative page echo back into
+    // browsePage. Reset after that stale repaint so the recomputed query starts at
+    // page zero even while the online response is still in flight.
+    this.render();
+    if (!this.searchQuery.trim()) return;
+    this.browsePage = 0;
+    this.lastSig = '';
+    this.pushQuery();
   }
 
   // Per-frame (slow divider): refresh the live lists (Browse/Collect) when they
@@ -626,8 +651,9 @@ export class MarketWindow {
   private renderContent(): void {
     const body = this.deps.root().querySelector<HTMLElement>('#market-body');
     if (!body) return;
+    const info = this.deps.world().marketInfo;
     const view = buildMarketView({
-      info: this.deps.world().marketInfo,
+      info,
       tab: this.tab,
       filters: {
         itemType: this.itemTypeFilter,
@@ -649,7 +675,8 @@ export class MarketWindow {
       return;
     }
     if (view.kind === 'browse') {
-      this.renderBrowse(body, view.body);
+      if (!info) return;
+      this.renderBrowse(body, view.body, info);
       return;
     }
     if (view.kind === 'sell') {
@@ -659,7 +686,7 @@ export class MarketWindow {
     this.renderCollect(body, view.body);
   }
 
-  private renderBrowse(body: HTMLElement, view: MarketBrowseBody): void {
+  private renderBrowse(body: HTMLElement, view: MarketBrowseBody, info: MarketInfo): void {
     // The search field lives in the `.mkt-controls` row above #market-body (see render()),
     // not inside body, so it survives untouched across a renderContent()-only refresh
     // (typing calls pushQuery + renderContent, never the full render() rebuild); reuse the
@@ -691,9 +718,28 @@ export class MarketWindow {
     if (search && document.activeElement !== search && search.value !== this.searchQuery) {
       search.value = this.searchQuery;
     }
+    const pageState = reconcileMarketPageEcho(
+      this.pendingBrowsePageRequest,
+      this.browsePage,
+      info,
+      info.filter === this.searchQuery.slice(0, MARKET_SEARCH_MAX_LENGTH) &&
+        info.itemType === this.itemTypeFilter &&
+        info.subtype === this.subtypeFilter &&
+        info.armorClass === this.armorClassFilter &&
+        info.primaryStat === this.primaryStatFilter &&
+        info.rarity === this.rarityFilter &&
+        info.sort === this.sortFilter &&
+        info.collapseLowest === this.collapseLowest,
+    );
+    this.browsePage = pageState.page;
+    this.pendingBrowsePageRequest = pageState.pending;
+    // An online host can deliver an older response after a replacement page/search
+    // request. Keep the last accepted rows, pager, and live-region announcement until
+    // the authoritative echo for the current request arrives; painting the rejected
+    // response would make the visible page disagree with the query we keep sending.
+    if (!pageState.accepted) return;
     list.innerHTML = '';
     if (view.state === 'empty') {
-      if (view.reason === 'filtered') this.browsePage = 0;
       const empty = document.createElement('div');
       empty.className = 'mkt-empty';
       empty.textContent =
@@ -707,7 +753,6 @@ export class MarketWindow {
       return;
     }
     const page = view.page;
-    this.browsePage = page.page;
     // The range note describes the paged OTHER listings; on a page with none (e.g. only
     // the viewer's own listings match) it is skipped, leaving just the rows.
     if (page.end > page.start) {

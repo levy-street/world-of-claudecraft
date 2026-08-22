@@ -11,6 +11,7 @@ import { queryDiffersFromEcho } from '../src/world_api';
 
 const baseQuery: MarketQuery = {
   search: 'robe',
+  localizedItemMask: '',
   itemType: 'armor',
   subtype: 'chest',
   armorClass: 'cloth',

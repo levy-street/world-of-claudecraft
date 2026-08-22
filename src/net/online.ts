@@ -5110,6 +5110,7 @@ export class ClientWorld implements IWorld {
     this.cmd({
       cmd: 'market_search',
       q: query.search,
+      localizedItemMask: query.localizedItemMask,
       itemType: query.itemType,
       subtype: query.subtype,
       armorClass: query.armorClass,

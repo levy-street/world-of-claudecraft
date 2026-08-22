@@ -2,8 +2,14 @@ import { describe, expect, it } from 'vitest';
 import { ITEMS } from '../src/sim/data';
 import {
   deriveBagSizeFilters,
+  encodeMarketLocalizedItemMask,
+  MARKET_LOCALIZED_ITEM_CATALOG_IDS,
+  MARKET_LOCALIZED_ITEM_CATALOG_SIGNATURE,
+  MARKET_LOCALIZED_ITEM_MASK_HEX_LENGTH,
   type MarketQuery,
   marketItemMatches,
+  marketLocalizedItemMaskHas,
+  normalizeMarketSearch,
   sanitizeMarketQuery,
 } from '../src/sim/market_query';
 import type { ItemDef } from '../src/sim/types';
@@ -25,6 +31,7 @@ const CATALOG_BAG_IDS = Object.keys(ITEMS).filter((id) => ITEMS[id]?.kind === 'b
 function q(over: Partial<MarketQuery> = {}): MarketQuery {
   return {
     search: '',
+    localizedItemMask: '',
     itemType: 'all',
     subtype: 'all',
     armorClass: 'all',
@@ -524,5 +531,103 @@ describe('World Market filters', () => {
     expect(filterIds(items, { search: 'ZZZNOMATCH' })).toEqual([]);
     // The server drops listings whose item it no longer knows, so the predicate rejects them.
     expect(marketItemMatches('not_a_real_item', q())).toBe(false);
+  });
+
+  it('encodes localized matches against one stable code-unit-sorted item catalog', () => {
+    expect(MARKET_LOCALIZED_ITEM_CATALOG_IDS).toEqual(Object.keys(ITEMS).sort());
+    expect(MARKET_LOCALIZED_ITEM_CATALOG_IDS).toHaveLength(838);
+    expect(MARKET_LOCALIZED_ITEM_CATALOG_SIGNATURE).toBe('m1-2047e4de');
+
+    const forward = encodeMarketLocalizedItemMask(['woven_robe', 'worn_sword']);
+    const reordered = encodeMarketLocalizedItemMask([
+      'not_a_real_item',
+      'worn_sword',
+      'woven_robe',
+      'worn_sword',
+    ]);
+    expect(reordered).toBe(forward);
+
+    const [signature, payload] = forward.split(':');
+    expect(signature).toBe(MARKET_LOCALIZED_ITEM_CATALOG_SIGNATURE);
+    expect(MARKET_LOCALIZED_ITEM_MASK_HEX_LENGTH).toBe(210);
+    expect(payload).toHaveLength(210);
+    expect(payload).toMatch(/^[0-9a-f]+$/);
+    expect(marketLocalizedItemMaskHas('woven_robe', forward)).toBe(true);
+    expect(marketLocalizedItemMaskHas('worn_sword', forward)).toBe(true);
+    expect(marketLocalizedItemMaskHas('keen_dirk', forward)).toBe(false);
+  });
+
+  it('sanitizes only current canonical localized masks and clears them for blank search', () => {
+    const encoded = encodeMarketLocalizedItemMask(['woven_robe']);
+    const [signature, payload] = encoded.split(':');
+
+    expect(
+      sanitizeMarketQuery({ search: 'localized robe', localizedItemMask: encoded })
+        .localizedItemMask,
+    ).toBe(encoded);
+    expect(
+      sanitizeMarketQuery({
+        search: 'localized robe',
+        localizedItemMask: `${signature}:${payload.toUpperCase()}`,
+      }).localizedItemMask,
+    ).toBe(encoded);
+    expect(
+      sanitizeMarketQuery({ search: '   ', localizedItemMask: encoded }).localizedItemMask,
+    ).toBe('');
+    expect(
+      sanitizeMarketQuery({ search: 'x', localizedItemMask: `m0-deadbeef:${payload}` })
+        .localizedItemMask,
+    ).toBe('');
+    expect(
+      sanitizeMarketQuery({ search: 'x', localizedItemMask: `${signature}:${payload.slice(1)}` })
+        .localizedItemMask,
+    ).toBe('');
+    expect(
+      sanitizeMarketQuery({ search: 'x', localizedItemMask: `${signature}:g${payload.slice(1)}` })
+        .localizedItemMask,
+    ).toBe('');
+    expect(
+      sanitizeMarketQuery({
+        search: 'x',
+        localizedItemMask: `${signature}:${payload.slice(0, -1)}f`,
+      }).localizedItemMask,
+    ).toBe('');
+
+    const lastNibbleBase = `${signature}:${'0'.repeat(209)}`;
+    expect(
+      sanitizeMarketQuery({ search: 'x', localizedItemMask: `${lastNibbleBase}3` })
+        .localizedItemMask,
+    ).toBe(`${lastNibbleBase}3`);
+    expect(
+      sanitizeMarketQuery({ search: 'x', localizedItemMask: `${lastNibbleBase}4` })
+        .localizedItemMask,
+    ).toBe('');
+  });
+
+  it('matches canonical English, item ids, or localized membership before applying filters', () => {
+    const localizedItemMask = encodeMarketLocalizedItemMask(['woven_robe']);
+    const localizedSearch = { search: 'vestimenta', localizedItemMask };
+
+    expect(filterIds(['woven_robe', 'worn_sword'], localizedSearch)).toEqual(['woven_robe']);
+    expect(filterIds(['woven_robe'], { ...localizedSearch, itemType: 'weapon' })).toEqual([]);
+    expect(filterIds(['woven_robe'], { search: 'WOVEN ROBE', localizedItemMask: '' })).toEqual([
+      'woven_robe',
+    ]);
+    expect(filterIds(['woven_robe'], { search: 'woven_ro', localizedItemMask: '' })).toEqual([
+      'woven_robe',
+    ]);
+    expect(
+      filterIds(['woven_robe'], {
+        search: 'vestimenta',
+        localizedItemMask: `${MARKET_LOCALIZED_ITEM_CATALOG_SIGNATURE}:not-hex`,
+      }),
+    ).toEqual([]);
+  });
+
+  it('normalizes the exact effective 40-character market search', () => {
+    expect(normalizeMarketSearch(`  ${'A'.repeat(38)}ignored`)).toBe('a'.repeat(38));
+    expect(sanitizeMarketQuery({ search: 'x'.repeat(40) }).search).toBe('x'.repeat(40));
+    expect(sanitizeMarketQuery({ search: 'x'.repeat(41) }).search).toBe('x'.repeat(40));
+    expect(sanitizeMarketQuery({ search: 41 }).search).toBe('');
   });
 });

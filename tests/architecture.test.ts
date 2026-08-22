@@ -202,6 +202,7 @@ describe('live graphics profile architecture', () => {
 // import), so it is registered here even though it lives in src/game. Paths are
 // repo-relative for the failure messages.
 const UI_PURE_CORES = [
+  'src/ui/market_page_request_core.ts',
   'src/ui/map_entity_disclosure_core.ts',
   'src/ui/map_navigation_landmarks_core.ts',
   'src/ui/map_marker_profile_core.ts',
@@ -314,6 +315,7 @@ const UI_PURE_CORES = [
   'src/ui/profession_identity_view.ts',
   'src/ui/profession_tutorial_view.ts',
   'src/ui/professions_view.ts',
+  'src/ui/market_search_core.ts',
   'src/ui/market_view.ts',
   'src/ui/market_price_view.ts',
   'src/ui/market_name_color.ts',

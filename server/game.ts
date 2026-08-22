@@ -7970,6 +7970,7 @@ export class GameServer {
         sim.marketSearch(
           sanitizeMarketQuery({
             search: typeof msg.q === 'string' ? msg.q : '',
+            localizedItemMask: msg.localizedItemMask,
             itemType: msg.itemType,
             subtype: msg.subtype,
             armorClass: msg.armorClass,
