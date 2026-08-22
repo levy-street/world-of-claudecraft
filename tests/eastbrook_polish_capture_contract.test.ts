@@ -265,8 +265,23 @@ interface AttributionTargetFixture {
 // farming runtime integration landed on the masterwrought renderer; the other
 // swept inputs, prewarm_policy.ts included, held their sealed bytes), the
 // seals follow the swept evidence bytes. No capture was retaken.
+// Upstream re-minted the same leaf on its own side for the shader-memory-probes
+// renderer instrumentation and VFX teardown extraction, calling both changes
+// behavior-neutral for the accepted visual evidence and retaking no capture.
+// RE-MINTED AGAIN at the Phase 11e QA release sync (release tip fd705304ee,
+// PR #3531): the third consecutive sync where BOTH parents re-minted this seal
+// since their common base, so the merged tree mints a value matching NEITHER
+// parent, and taking either side's literal would pin a tree that never existed.
+// Parent values for the record: ours 9fdb68de, the release 87e05c78. The moved
+// input is the same renderer.ts leaf both sides edited (13546 base, ours 13576,
+// theirs 13548, merged 13578); every other swept input holds its sealed bytes.
+// Minted from the merged WORKING TREE with the repo's own tool
+// (scripts/assets/eastbrook_grand_armoury/remint_polish_provenance.mjs) rather
+// than hand-edited, and committed with exactly the bytes it read. No capture
+// was retaken: the merged renderer delta is upstream's instrumentation plus
+// this branch's farm-visual wiring, neither of which moves the sealed pixels.
 const PINNED_POLISH_COMPOSITE_FINGERPRINT =
-  '9fdb68decd660145891d03bd09c6079a9591c5804cab372fdd9bc3868d2d6d70';
+  '1c3ae800c6aa3b19f531607ac46d877fc0cc6fd25013213714fe3635acaa832e';
 
 function validPolishAttributionTargets(): AttributionTargetFixture[] {
   return [

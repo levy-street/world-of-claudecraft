@@ -316,8 +316,8 @@ describe('Renderer live shader compile rejection recovery', () => {
       new URL('../src/render/dungeon.ts', import.meta.url),
       'utf8',
     );
-    expect(dungeonSource).toContain(
-      'await attachSceneGroupGated(this.scene, group, this.compileGate)',
+    expect(dungeonSource).toMatch(
+      /await attachSceneGroupGated\(\s*this\.scene,\s*group,\s*this\.compileGate,\s*\(\) => registry\.isRetired/,
     );
   });
 
@@ -338,8 +338,7 @@ describe('Renderer live shader compile rejection recovery', () => {
     expect(start).toBeGreaterThan(-1);
     const body = dungeonSource.slice(start, dungeonSource.indexOf('\n  }', start));
     const returns = body.split('return group;').length - 1;
-    const gated =
-      body.split('await attachSceneGroupGated(this.scene, group, this.compileGate)').length - 1;
+    const gated = body.split('await attachSceneGroupGated(').length - 1;
     const bareAdds = body.split('this.scene.add(group);').length - 1;
     expect(returns).toBeGreaterThanOrEqual(3);
     expect(bareAdds).toBe(1);

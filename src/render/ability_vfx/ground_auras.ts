@@ -85,6 +85,7 @@ const anchorScratch = new THREE.Vector3();
 
 export class GroundAuras {
   private slots: AuraSlot[] = [];
+  private disposed = false;
   // center-relative XZ of every disc vertex (all slots clone the same base)
   private localXZ: Float32Array;
 
@@ -174,6 +175,7 @@ export class GroundAuras {
   // overflowing onto the outermost ring) blends the band's hue toward the
   // newcomer instead of stealing the slot.
   hold(entityId: number, band: number, colorHex: number, spin: boolean, frame: number): boolean {
+    if (this.disposed) return false;
     const b = Math.min(GROUND_AURA_BANDS - 1, Math.max(0, band));
     let slot: AuraSlot | undefined;
     for (const s of this.slots) {
@@ -220,6 +222,7 @@ export class GroundAuras {
     camX?: number,
     camZ?: number,
   ): void {
+    if (this.disposed) return;
     const camKnown = camX !== undefined && camZ !== undefined;
     for (const slot of this.slots) {
       if (!slot.active) continue;
@@ -304,6 +307,17 @@ export class GroundAuras {
     for (const slot of this.slots) {
       slot.active = false;
       slot.mesh.visible = false;
+    }
+  }
+
+  dispose(): void {
+    if (this.disposed) return;
+    this.disposed = true;
+    this.clear();
+    for (const slot of this.slots) {
+      slot.mesh.removeFromParent();
+      slot.mesh.geometry.dispose();
+      slot.mat.dispose();
     }
   }
 }

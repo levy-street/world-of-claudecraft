@@ -849,10 +849,22 @@ const ACCEPTED_POLISH_V2_METADATA_PATH = path.join(REPO_ROOT, POLISH_SEAL_PATH);
 // farming runtime integration landed on the masterwrought renderer; the other
 // swept inputs, prewarm_policy.ts included, held their sealed bytes), the
 // seals follow the swept evidence bytes. No capture was retaken.
+// Upstream re-minted the same leaf on its own side for the shader-memory-probes
+// renderer instrumentation and VFX teardown extraction, calling both changes
+// behavior-neutral for the accepted visual evidence and retaking no capture.
+// RE-MINTED AGAIN at the Phase 11e QA release sync (release tip fd705304ee,
+// PR #3531): both parents re-minted since their common base, so the merged tree
+// mints values matching NEITHER parent and either side's literal would pin a
+// tree that never existed. Parent values for the record: metadata sha256 ours
+// ed4ff972 / theirs fea5b37e, composite ours 9fdb68de / theirs 87e05c78. The
+// moved input is the same renderer.ts leaf both sides edited; every other swept
+// input holds its sealed bytes. Minted from the merged WORKING TREE with
+// scripts/assets/eastbrook_grand_armoury/remint_polish_provenance.mjs and
+// committed with exactly the bytes it read. No capture was retaken.
 const ACCEPTED_POLISH_V2_METADATA_SHA256 =
-  'ed4ff972c76665118e2d9a8fccf28bddd49926f5cedd4ab31417eda2507a6298';
+  '9c048c5cd7dd5770edc0b81ffcc91e812daebbf65cbcc957b4ffd4dbb303fd8e';
 const ACCEPTED_POLISH_V2_COMPOSITE_PROVENANCE =
-  '9fdb68decd660145891d03bd09c6079a9591c5804cab372fdd9bc3868d2d6d70';
+  '1c3ae800c6aa3b19f531607ac46d877fc0cc6fd25013213714fe3635acaa832e';
 const ACCEPTED_POLISH_V2_METADATA = readJsonFile<CaptureMetadata>(ACCEPTED_POLISH_V2_METADATA_PATH);
 const ACCEPTED_POLISH_V2_PROVENANCE = ACCEPTED_POLISH_V2_METADATA.polishProvenance;
 const ACCEPTED_POLISH_V2_TOWN_CONTRACT = ACCEPTED_POLISH_V2_METADATA.records[0]?.townContract;
@@ -1930,7 +1942,9 @@ describe('Eastbrook polish performance and contact evidence', () => {
     expect(
       fingerprint.digest('hex'),
       `the second-order performance digest moved; if every input moved legitimately, re-mint with: ${REMINT_COMMAND} (it recomputes this literal LAST, from the swept files)`,
-    ).toBe('d4aa71b9b1e5bb362479c1d0b2fd091506caeea13c29036e2db2f89ea8c9a0f6');
+      // Parent values at the Phase 11e QA sync: ours d4aa71b9, the release
+      // 9c8f6ca4. Recomputed LAST from the swept files, per REMINT_COMMAND.
+    ).toBe('b77a888041d0e5155017f4f325ab08a7aa897934b85ab701cb5a14ba13f3b6f6');
   });
 
   it('binds every historical after record to its accepted source and asset provenance', () => {

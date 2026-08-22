@@ -57,7 +57,17 @@ function mountedMaterials(root: THREE.Object3D): Set<THREE.Material> {
  *  park at the idle tail), so anything unpinned must have evicted. */
 function floodIdle(assets: AssetsModule, salt: number): void {
   for (let i = 0; i < TINTED_MATERIAL_IDLE_CACHE_MAX * 2; i++) {
-    assets.tintedMaterial(new THREE.MeshStandardMaterial({ color: 0xffffff }), salt + i, 0.4);
+    assets.tintedMaterial(
+      new THREE.MeshStandardMaterial({ color: 0xffffff }),
+      salt + i,
+      0.4,
+      null,
+      null,
+      'body',
+      null,
+      'rig',
+      '',
+    );
   }
 }
 

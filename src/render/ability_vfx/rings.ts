@@ -37,6 +37,7 @@ interface RingSlot {
 export class ShockRings {
   private slots: RingSlot[] = [];
   private next = 0;
+  private disposed = false;
   // Center-relative ground-plane XZ of every vertex. The mesh lies flat via
   // rotation.x = -PI/2, which maps local (x, y, z) to world offsets
   // (x, z, -y): the plane's local X/Y span the ground (world Z = -local y)
@@ -131,6 +132,7 @@ export class ShockRings {
     intensity: number,
     vertical = false,
   ): void {
+    if (this.disposed) return;
     const slot = this.slots[this.next];
     this.next = (this.next + 1) % RING_SLOTS;
     slot.active = true;
@@ -166,6 +168,7 @@ export class ShockRings {
   }
 
   update(dt: number, camQuat: THREE.Quaternion): void {
+    if (this.disposed) return;
     for (const slot of this.slots) {
       if (!slot.active) continue;
       slot.age += dt;
@@ -183,6 +186,17 @@ export class ShockRings {
     for (const slot of this.slots) {
       slot.active = false;
       slot.mesh.visible = false;
+    }
+  }
+
+  dispose(): void {
+    if (this.disposed) return;
+    this.disposed = true;
+    this.clear();
+    for (const slot of this.slots) {
+      slot.mesh.removeFromParent();
+      slot.mesh.geometry.dispose();
+      slot.mat.dispose();
     }
   }
 }

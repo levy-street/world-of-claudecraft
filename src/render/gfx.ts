@@ -15,6 +15,7 @@ import {
   installPbrPointLightShaderPruning,
   patchPbrRimGlowFragmentShader,
 } from './pbr_fragment_shader';
+import { markSharedMaterial } from './shared_resource';
 import { isSoftwareRendererName } from './software_renderer';
 
 // Quality tiers: every tier-dependent knob keys off this module instead of
@@ -2063,6 +2064,13 @@ export function surfaceMat(opts: SurfaceMatOpts): THREE.Material {
   // on tiers without a field): props and buildings at range must haze with
   // the ground under them or the effect reads as nothing.
   attachBiomeHaze(mat);
+  // Every material handed back from this cache is SHARED by construction: one
+  // instance is reused by every caller with the same key, process-wide. Marking
+  // it here is what keeps a per-root terminal owner (the interior resource
+  // registry, a view teardown) from claiming and disposing a material the rest
+  // of the world is still drawing with, and it is marked at the source rather
+  // than per consumer so a new caller cannot forget.
+  markSharedMaterial(mat);
   matCache.set(key, mat);
   return mat;
 }

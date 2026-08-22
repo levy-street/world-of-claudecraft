@@ -28,9 +28,11 @@ interface ShellSlot {
 
 export class BuffShells {
   private slots: ShellSlot[] = [];
+  private readonly geometry: THREE.SphereGeometry;
+  private disposed = false;
 
   constructor(scene: THREE.Scene) {
-    const geo = new THREE.SphereGeometry(1, 24, 16);
+    this.geometry = new THREE.SphereGeometry(1, 24, 16);
     const proto = new THREE.ShaderMaterial({
       uniforms: {
         uColor: { value: new THREE.Color() },
@@ -69,7 +71,7 @@ export class BuffShells {
     });
     for (let i = 0; i < SHELL_SLOTS; i++) {
       const mat = proto.clone();
-      const mesh = new THREE.Mesh(geo, mat);
+      const mesh = new THREE.Mesh(this.geometry, mat);
       mesh.visible = false;
       mesh.renderOrder = 6;
       mesh.userData.renderCategory = 'vfx';
@@ -81,6 +83,7 @@ export class BuffShells {
 
   // Timed shell (buff shellDur): plays once and fades out on its own.
   flash(entityId: number, colorHex: number, dur: number): void {
+    if (this.disposed) return;
     const slot =
       this.slots.find((s) => s.active && s.entityId === entityId) ??
       this.slots.find((s) => !s.active) ??
@@ -96,6 +99,7 @@ export class BuffShells {
   // Held shell (barrier auras): refreshed every frame while the aura lives;
   // hold() marks it seen, endFrame() releases the ones that stopped arriving.
   hold(entityId: number, colorHex: number, frame: number): void {
+    if (this.disposed) return;
     let slot = this.slots.find((s) => s.active && s.entityId === entityId);
     if (!slot) {
       slot = this.slots.find((s) => !s.active);
@@ -111,6 +115,7 @@ export class BuffShells {
   }
 
   update(dt: number, time: number, frame: number, anchor: VfxAnchorResolver): void {
+    if (this.disposed) return;
     for (const slot of this.slots) {
       if (!slot.active) continue;
       slot.age += dt;
@@ -152,5 +157,16 @@ export class BuffShells {
       slot.active = false;
       slot.mesh.visible = false;
     }
+  }
+
+  dispose(): void {
+    if (this.disposed) return;
+    this.disposed = true;
+    this.clear();
+    for (const slot of this.slots) {
+      slot.mesh.removeFromParent();
+      slot.mat.dispose();
+    }
+    this.geometry.dispose();
   }
 }

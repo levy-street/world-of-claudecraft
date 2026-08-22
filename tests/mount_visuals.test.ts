@@ -56,7 +56,7 @@ describe('mount visual specs cover the sim catalog', () => {
         color: 0x8c65a7,
         vertexColors: true,
       });
-      const converted = tintedMaterial(source, null, 0);
+      const converted = tintedMaterial(source, null, 0, null, null, 'body', null, 'rig', '');
       expect(converted).toBeInstanceOf(THREE.MeshLambertMaterial);
       expect((converted as THREE.MeshLambertMaterial).vertexColors).toBe(true);
       expect((converted as THREE.MeshLambertMaterial).color.getHex()).not.toBe(0xffffff);

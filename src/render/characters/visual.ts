@@ -80,6 +80,7 @@ import {
   PALADIN_TEMPLARS_VERDICT_DURATION,
 } from './paladin_templars_verdict_clip';
 import { PaladinTemplarsVerdictFx } from './paladin_templars_verdict_fx';
+import { attachSharedDepthMaterials } from './shadow_depth_materials';
 import { SkeletonUpdateCache, type SkeletonUpdateStats } from './skeleton_update_cache';
 import {
   type OneShotKind,
@@ -446,6 +447,12 @@ export class CharacterVisual {
       );
       this.originalMaterials.set(decal, decal.material);
       decal.material = this.effectMaterial(decal.material);
+      // Against what is MOUNTED, same rule and same reason as
+      // commitVisualMaterials: applyMaterials chose this caster's shared depth
+      // material from the pre-effect material a line ago, and the effect swap
+      // can be one that getDepthMaterial would write a non-default alphaTest
+      // onto. Benign today only because no effect material sets alphaTest.
+      attachSharedDepthMaterials(decal, decal.material);
       decal.castShadow = this.shadowOn;
       decal.receiveShadow = false;
       decal.frustumCulled = false;
@@ -1930,6 +1937,16 @@ export class CharacterVisual {
   private commitVisualMaterials(): void {
     for (const [mesh, original] of this.originalMaterials) {
       mesh.material = this.effectMaterial(original);
+      // Re-evaluated against what is ACTUALLY mounted, not against the
+      // pre-effect material applyMaterials saw. attachSharedDepthMaterials
+      // excludes any caster whose material would make three's getDepthMaterial
+      // write a non-default alphaTest, because alternating values on a SHARED
+      // depth material bump its version per draw, which is the exact rebuild
+      // that module exists to remove, on a material every caster of that shape
+      // is pointed at. No effect material sets alphaTest today, so leaving the
+      // attach at applyMaterials happened to be correct; this makes it correct
+      // by construction rather than by luck.
+      attachSharedDepthMaterials(mesh, mesh.material);
     }
     if (this.farMesh && this.farMaterials) {
       this.farMesh.material = this.effectMaterial(this.farMaterials);

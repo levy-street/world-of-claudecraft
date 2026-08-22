@@ -47,6 +47,7 @@ import {
   weaponSkinModelUrl,
   weaponSkinModelUrls,
 } from './manifest';
+import { meshProgramShapeKey } from './material_program_shape_core';
 import {
   bandMaterialSpec,
   DEFAULT_LOOK,
@@ -82,6 +83,7 @@ import {
   PALADIN_TEMPLARS_VERDICT_CLIP,
 } from './paladin_templars_verdict_clip';
 import { animatedNodeNames, mergeSkinnedParts } from './rig_merge';
+import { attachSharedDepthMaterials, clearSharedDepthMaterials } from './shadow_depth_materials';
 import { weaponSkinAttachBone, weaponSkinHandling } from './skin_attack';
 import { optimizeSkinGpuLayout } from './skin_gpu_layout';
 import { primeSkinnedSortSpheres } from './skinned_sort_spheres';
@@ -1903,6 +1905,10 @@ export function tintedMaterial(
   role: MaterialRole = 'body',
   claims: TintedMaterialClaims | null = null,
   mount: TintedMount = 'rig',
+  // No default: a mounted clone is shared only among meshes of ONE program
+  // shape, and an omitted key silently restores the over-sharing this
+  // parameter exists to prevent. A single-shape caller passes '' on purpose.
+  shapeKey: string,
 ): THREE.Material {
   // A source with no color property (the weapon-skin fresnel shell's
   // ShaderMaterial) has nothing this factory can tint, lift, or polish.
@@ -1910,7 +1916,10 @@ export function tintedMaterial(
   // (its per-frame uTime/uStr writes would land on a material nothing
   // renders), and caching that clone would strand it forever.
   if (!(src as THREE.MeshStandardMaterial).color) return src;
-  const key = `${src.uuid}|${tint ?? 'n'}|${tint === null ? 0 : strength}|${GFX.standardMaterials ? 's' : 'l'}|${skinTex ? skinTex.uuid : 'n'}|${emisTex ? emisTex.uuid : 'n'}|${role}|${mount}`;
+  // shapeKey: a mounted clone is shared only among meshes of one program
+  // shape (material_program_shape_core.ts); single-shape callers (the far
+  // bake) pass nothing.
+  const key = `${src.uuid}|${tint ?? 'n'}|${tint === null ? 0 : strength}|${GFX.standardMaterials ? 's' : 'l'}|${skinTex ? skinTex.uuid : 'n'}|${emisTex ? emisTex.uuid : 'n'}|${role}|${mount}|${shapeKey}`;
   const build = () =>
     buildTintedClone(src as THREE.MeshStandardMaterial, tint, strength, skinTex, emisTex, role);
   if (claims) {
@@ -2063,13 +2072,25 @@ export function applyMaterials(
     // skin/emissive override only touches the character's own atlas meshes, not weapons
     const sk = skinTex && mesh.userData.bodyMesh ? skinTex : null;
     const em = emisTex && mesh.userData.bodyMesh ? emisTex : null;
+    const shapeKey = meshProgramShapeKey(mesh);
     if (Array.isArray(source)) {
       mesh.material = source.map((m) =>
-        tintedMaterial(m, materialTint, strength, sk, em, role, claims),
+        tintedMaterial(m, materialTint, strength, sk, em, role, claims, 'rig', shapeKey),
       );
     } else {
-      mesh.material = tintedMaterial(source, materialTint, strength, sk, em, role, claims);
+      mesh.material = tintedMaterial(
+        source,
+        materialTint,
+        strength,
+        sk,
+        em,
+        role,
+        claims,
+        'rig',
+        shapeKey,
+      );
     }
+    attachSharedDepthMaterials(mesh, mesh.material);
   });
 }
 
@@ -2100,6 +2121,9 @@ export function tintedFarMaterials(
       'body',
       claims,
       'far',
+      // One baked mesh per far LOD, so there is exactly one shape here and
+      // nothing to partition. Deliberate, not an omission.
+      '',
     ),
   );
 }
@@ -2142,6 +2166,7 @@ const prepared = new Map<string, PreparedVisual>();
 export function resetCharacterProfileCaches(): void {
   optimizedSceneCache.clear();
   matCache.reset();
+  clearSharedDepthMaterials();
   prepared.clear();
 }
 

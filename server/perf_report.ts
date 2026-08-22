@@ -414,6 +414,23 @@ function sanitizeGpuQueueUnit(unit: Record<string, unknown>): Record<string, unk
   };
 }
 
+/** The per-level budget-variant costs, rebuilt field by field, or nothing when
+ *  the entry carries none (every entry but programs.budget-variants). */
+function compactBudgetVariants(value: unknown): Record<string, unknown> {
+  if (!Array.isArray(value)) return {};
+  const variants = value
+    .slice(0, PREWARM_COMPACT_BUDGET_VARIANTS_MAX)
+    .filter(isRecord)
+    .map((variant) => ({
+      index: nullableNumberIn(variant.index, 0, 1000),
+      elapsedMs: nullableNumberIn(variant.elapsedMs, 0, 600_000),
+      syncMs: nullableNumberIn(variant.syncMs, 0, 600_000),
+      programDelta: nullableNumberIn(variant.programDelta, -10_000, 10_000),
+      passes: nullableNumberIn(variant.passes, 0, 100_000),
+    }));
+  return variants.length > 0 ? { budgetVariants: variants } : {};
+}
+
 function compactPrewarmSummary(value: unknown): Record<string, unknown> | null {
   if (!isRecord(value)) return null;
   const out: Record<string, unknown> = {};
@@ -477,9 +494,62 @@ function compactPrewarmSummary(value: unknown): Record<string, unknown> | null {
       workDone: nullableNumberIn(entry.workDone, 0, 100_000),
       workPlanned: nullableNumberIn(entry.workPlanned, 0, 100_000),
       detail: textIn(entry.detail, 160),
+      // Carried across truncation for the same reason compileUnits and the
+      // pacing transitions are: the per-level costs are the whole point of the
+      // budget-variants entry, and dropping them here loses them on exactly the
+      // overflowing reports they explain. Only one entry ever carries them, so
+      // the cost is one small list, and every field is rebuilt not copied.
+      ...compactBudgetVariants(entry.budgetVariants),
     }));
   const resume = sanitizePrewarmResume(value.resume);
   if (resume) out.resume = resume;
+  // The streamed-prewarm diagnostic, carried across truncation on a TIGHTER
+  // sample than the verbatim path. A report that overflows the byte cap is a
+  // report from a heavy session, which is exactly when "which unit stalled"
+  // and "did the pacer back off" are worth having: dropping these here would
+  // lose the signal precisely where it matters. Same shape as the verbatim
+  // path so a reader needs one parser, just fewer members.
+  const compileUnits = Array.isArray(value.compileUnits) ? value.compileUnits : null;
+  if (compileUnits) {
+    out.compileUnits = rankedCompileUnits(compileUnits, PREWARM_COMPACT_COMPILE_UNITS_MAX).map(
+      (unit) => ({
+        id: textIn(unit.id, 80),
+        lane: textIn(unit.lane, 40),
+        // The field the ranking above SELECTS on: without it a reader sees
+        // units chosen by the failure rule with no way to tell which failed.
+        failedAtMs: nullableNumberIn(unit.failedAtMs, 0, 600_000),
+        syncMs: nullableNumberIn(unit.syncMs, 0, 600_000),
+        settledDurationMs: nullableNumberIn(unit.settledDurationMs, 0, 600_000),
+        programDelta: nullableNumberIn(unit.programDelta, -10_000, 10_000),
+        statusAtReveal: textIn(unit.statusAtReveal, 16),
+      }),
+    );
+  }
+  const pacing = value.prewarmPacing;
+  if (isRecord(pacing)) {
+    const adaptive = isRecord(pacing.adaptive) ? pacing.adaptive : null;
+    const transitions = adaptive && Array.isArray(adaptive.transitions) ? adaptive.transitions : [];
+    out.prewarmPacing = {
+      mode: textIn(pacing.mode, 24),
+      source: textIn(pacing.source, 24),
+      adaptive: adaptive
+        ? {
+            state: textIn(adaptive.state, 24),
+            backoffCount: nullableNumberIn(adaptive.backoffCount, 0, 100_000),
+            noProgressCount: nullableNumberIn(adaptive.noProgressCount, 0, 100_000),
+            transitions: transitions
+              .slice(-PREWARM_COMPACT_TRANSITIONS_MAX)
+              .filter(isRecord)
+              .map((transition) => ({
+                atMs: nullableNumberIn(transition.atMs, 0, 600_000),
+                from: textIn(transition.from, 24),
+                to: textIn(transition.to, 24),
+                reason: textIn(transition.reason, 40),
+              })),
+          }
+        : null,
+    };
+  }
   return out;
 }
 
@@ -493,6 +563,101 @@ const PREWARM_RESUME_ENTRIES_MAX = 24;
 // so this is a deliberate copy, the same pattern as CROWD_BUCKET_LABELS above.
 const PREWARM_RESUME_STATUSES = ['none', 'scheduled', 'done', 'failed'] as const;
 const PREWARM_RESUME_LANES = ['debt', 'cosmetic'] as const;
+
+// The streamed-prewarm diagnostic lists, bounded on the SAME rule as the
+// resume block above and for the same reason: they ride the verbatim raw path,
+// the client caps are advisory (any token holder can post a hand-rolled
+// report), and an unbounded list reaches storage on every report that fits
+// under the body cap. Mirrors PREWARM_REPORT_COMPILE_UNITS /
+// PREWARM_REPORT_BUDGET_VARIANTS / PREWARM_REPORT_TRANSITIONS in
+// src/game/perf_reporter.ts; server/ cannot import src/game, so this is a
+// deliberate copy, the same pattern as PREWARM_RESUME_STATUSES above.
+// A length clamp, not a field rebuild: the shapes are read as opaque
+// diagnostics, and it is their UNBOUNDED length that is the defect. Individual
+// member fields stay unshaped here on purpose, so a retained member can still
+// carry a long string or a nested object; what bounds THAT is the 16 KB
+// RAW_SUMMARY_MAX_BYTES check below, which runs after these clamps and routes
+// anything over it into compactPrewarmSummary, where every field IS rebuilt
+// through textIn / nullableNumberIn. Storage is therefore bounded in bytes on
+// both paths, and in shape on the compact one.
+// The compact path's own, tighter sample: it exists to fit a report that
+// already overflowed, so it carries fewer members and fewer fields per member.
+const PREWARM_COMPACT_COMPILE_UNITS_MAX = 6;
+const PREWARM_COMPACT_TRANSITIONS_MAX = 6;
+const PREWARM_COMPACT_BUDGET_VARIANTS_MAX = 6;
+// Scanned before ranking; far above any legitimate report (the client cap is 12).
+const PREWARM_COMPILE_UNITS_SCAN_MAX = 256;
+
+/**
+ * The most diagnostic `limit` compile units, in their original order.
+ *
+ * Taking the FIRST few would keep the earliest units, which on a boot are the
+ * cheap ones, and this block exists to answer "which unit stalled" on exactly
+ * the heavy reports that overflow into the compact path. Failures rank above
+ * everything, then synchronous time. Mirrors sampleCompileUnits in
+ * src/game/perf_prewarm_lists_core.ts; server/ cannot import src/game, so this
+ * is a deliberate copy, the same pattern as PREWARM_RESUME_STATUSES above.
+ */
+function rankedCompileUnits(units: unknown[], limit: number): Record<string, unknown>[] {
+  // Bounded BEFORE the sort, the same shape as PERF_SUGGESTION_IDS_SCAN_MAX
+  // above: a legitimate payload is at most the client cap, and an unauthenticated
+  // ingest should not sort an attacker-sized array even once. The scan bound sits
+  // far above any real report, so ranking is unaffected in practice.
+  const records = units.slice(0, PREWARM_COMPILE_UNITS_SCAN_MAX).filter(isRecord);
+  if (records.length <= limit) return records;
+  return records
+    .map((unit, index) => ({ unit, index }))
+    .sort((a, b) => {
+      const failed =
+        Number(a.unit.failedAtMs === null || a.unit.failedAtMs === undefined) -
+        Number(b.unit.failedAtMs === null || b.unit.failedAtMs === undefined);
+      if (failed !== 0) return failed;
+      const sync = numberIn(b.unit.syncMs, 0, 600_000, 0) - numberIn(a.unit.syncMs, 0, 600_000, 0);
+      if (sync !== 0) return sync;
+      // The client's own tie-break, so the two copies really do rank alike.
+      const settled =
+        numberIn(b.unit.settledDurationMs, 0, 600_000, 0) -
+        numberIn(a.unit.settledDurationMs, 0, 600_000, 0);
+      if (settled !== 0) return settled;
+      return a.index - b.index;
+    })
+    .slice(0, limit)
+    .sort((a, b) => a.index - b.index)
+    .map((entry) => entry.unit);
+}
+const PREWARM_COMPILE_UNITS_MAX = 12;
+const PREWARM_BUDGET_VARIANTS_MAX = 8;
+const PREWARM_PACING_TRANSITIONS_MAX = 12;
+
+/** Bound the client-supplied prewarm diagnostic lists in place. */
+function boundPrewarmDiagnosticLists(prewarm: Record<string, unknown>): void {
+  if (Array.isArray(prewarm.compileUnits)) {
+    // Ranked, not sliced: taking the first N here would throw away the slow and
+    // failed units before the compact path (or a reader) ever sees them, which
+    // is the opposite of what this list is for. A well-behaved client already
+    // sampled the same way; a hand-rolled report has not.
+    prewarm.compileUnits = rankedCompileUnits(prewarm.compileUnits, PREWARM_COMPILE_UNITS_MAX);
+  }
+  for (const key of ['manifestEntries', 'entries']) {
+    const entries = prewarm[key];
+    if (!Array.isArray(entries)) continue;
+    for (const entry of entries) {
+      if (!isRecord(entry) || !Array.isArray(entry.budgetVariants)) continue;
+      entry.budgetVariants = entry.budgetVariants
+        .slice(0, PREWARM_BUDGET_VARIANTS_MAX)
+        .filter(isRecord);
+    }
+  }
+  const pacing = prewarm.prewarmPacing;
+  if (!isRecord(pacing)) return;
+  const adaptive = pacing.adaptive;
+  if (!isRecord(adaptive) || !Array.isArray(adaptive.transitions)) return;
+  // The MOST RECENT, matching sampleTransitions on the client: a pacer's end
+  // state is what a report is read for, and keeping the front would drop it.
+  adaptive.transitions = adaptive.transitions
+    .slice(-PREWARM_PACING_TRANSITIONS_MAX)
+    .filter(isRecord);
+}
 
 function sanitizePrewarmResume(value: unknown): Record<string, unknown> | null {
   if (!isRecord(value)) return null;
@@ -579,6 +744,7 @@ function rawSummary(value: unknown, devTraceAllowed = false): Record<string, unk
       const resume = sanitizePrewarmResume(prewarm.resume);
       if (resume) prewarm.resume = resume;
       else delete prewarm.resume;
+      boundPrewarmDiagnosticLists(prewarm);
     }
     const boundedText = JSON.stringify(parsed);
     const maxBytes = devTraceAllowed ? RAW_SUMMARY_DEV_TRACE_MAX_BYTES : RAW_SUMMARY_MAX_BYTES;
@@ -729,4 +895,7 @@ export const perfReportInternalsForTest = {
   PREWARM_RESUME_ENTRIES_MAX,
   PREWARM_RESUME_STATUSES,
   PREWARM_RESUME_LANES,
+  PREWARM_COMPILE_UNITS_MAX,
+  PREWARM_BUDGET_VARIANTS_MAX,
+  PREWARM_PACING_TRANSITIONS_MAX,
 };

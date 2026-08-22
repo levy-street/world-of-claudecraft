@@ -191,6 +191,13 @@ function baseSnapshot(): PerfSnapshot {
             imminentHolds: 0,
           },
           gates: { spiritSpawnsRefused: 0 },
+          portraits: {
+            transferCaptures: 0,
+            readbackCaptures: 0,
+            canvasCaptures: 0,
+            transferLatches: 0,
+            readbackLatches: 0,
+          },
         },
       },
       buildLedger: { kinds: {}, worstFrame: { ms: 0, count: 0, atMs: 0 }, slowest: [] },

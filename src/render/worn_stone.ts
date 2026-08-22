@@ -37,6 +37,7 @@ import { loadKtx2Texture } from './assets/loader';
 import { registerDeferredPreload } from './assets/preload';
 import { GFX, type GfxSettings, type SurfaceMatOpts, surfaceMat } from './gfx';
 import { renderLayerDisabled } from './render_dev_flags';
+import { markSharedMaterial } from './shared_resource';
 
 export type SurfaceFamily = 'stone' | 'rock' | 'wood' | 'plaster' | 'bark' | 'fabric' | 'metal';
 
@@ -1058,6 +1059,12 @@ export function detailedSurfaceMat(
   if (!mat) {
     mat = base.clone();
     applySurfaceDetail(mat as THREE.MeshStandardMaterial, family, detail);
+    // Shared for the same reason surfaceMat's own cache is: one instance per
+    // key, reused process-wide. three's Material.copy deep-copies userData, so
+    // the clone already inherits the base's marker; marking it explicitly keeps
+    // that from being a silent dependency on three's copy semantics across a
+    // version bump, which is the kind of thing a bump would break quietly.
+    markSharedMaterial(mat);
     detailedMats.set(key, mat);
   }
   return mat;

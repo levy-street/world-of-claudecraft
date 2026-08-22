@@ -20,6 +20,7 @@ export class OverlaySprites {
   private count = 0;
   private wasEmpty = true;
   private tmpColor = new THREE.Color();
+  private disposed = false;
 
   constructor(scene: THREE.Scene, tex: AbilityVfxTextures) {
     this.geo.setAttribute(
@@ -122,6 +123,7 @@ export class OverlaySprites {
   }
 
   commit(): void {
+    if (this.disposed) return;
     if (this.count === 0) {
       if (!this.wasEmpty) {
         this.wasEmpty = true;
@@ -148,5 +150,13 @@ export class OverlaySprites {
     attr.clearUpdateRanges();
     attr.addUpdateRange(0, components);
     attr.needsUpdate = true;
+  }
+
+  dispose(): void {
+    if (this.disposed) return;
+    this.disposed = true;
+    this.points.removeFromParent();
+    this.geo.dispose();
+    (this.points.material as THREE.Material).dispose();
   }
 }

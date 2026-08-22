@@ -503,18 +503,32 @@ describe('resolvePrewarmPolicy: unconstrained desktop', () => {
     // without the fourth argument the Insane arm has no stop at all (the
     // 11.8 s compile-submit entry of the 17/08 production login).
     expect(renderer).toContain(
-      'prewarmSubmitShouldStop(\n          performance.now(),\n          deadlineMs,\n          policy.finishFullManifestBeforeReveal,\n          pacing.shouldStop(performance.now()),\n        )',
+      'outOfTime: () =>\n          prewarmSubmitShouldStop(\n            performance.now(),\n            deadlineMs,\n            policy.finishFullManifestBeforeReveal,\n            pacing.shouldStop(performance.now()),\n          ),',
     );
-    expect(renderer).toContain('if (!(await pacing.awaitSlot(outOfTime))) {');
+    expect(renderer).toContain('awaitSlot: (outOfTime) => pacing.awaitSlot(outOfTime),');
     expect(renderer).toContain(
-      'submitPrewarmCompileUnit(unit, lane, {\n            lifecycle: compileLifecycle,\n            pacing,',
+      'submitPrewarmCompileUnit(unit, lane, {\n              lifecycle: compileLifecycle,\n              pacing,',
     );
+    // Pushed as each unit is submitted, never collected from the loop's return:
+    // a rejection inside the loop must not lose already-submitted units from
+    // the set the compile entry awaits.
+    expect(renderer).toContain('submit: (unit) =>\n          submittedCompileUnits.push(');
+    // The loop itself is the extracted runPrewarmCompileSubmission, which owns
+    // the between-units check and the never-drop contract; the renderer keeps
+    // only the wiring above and the deferral bookkeeping below.
+    expect(renderer).toContain('await runPrewarmCompileSubmission(pending, {');
+    const submissionCore = readFileSync(
+      new URL('../src/render/prewarm_compile_submission_core.ts', import.meta.url),
+      'utf8',
+    ).replace(/\r\n/g, '\n');
+    expect(submissionCore).toContain('if (!(await host.awaitSlot(host.outOfTime))) {');
+    expect(submissionCore).toContain('const deferred = pending.slice(i);');
     // The deferral lifecycle, pinned end to end (QA finding B3): stopped
     // units are retained, drained FIRST by the next submission (their groups
     // are already marked, so the plan cannot re-collect them), any leftover
     // is handed to the resume lane under the synthetic id, and the mid-run
     // deferral withholds warm-pool publication like the whole-entry path.
-    expect(renderer).toContain('deferredSubmitUnits.push(...pending.slice(i));');
+    expect(renderer).toContain('deferredSubmitUnits.push(...(deferred as PrewarmResumeUnit[]));');
     expect(renderer).toContain(
       'const pending = [...deferredSubmitUnits.splice(0, deferredSubmitUnits.length), ...units];',
     );
@@ -863,13 +877,43 @@ it('prewarms adaptive quality shader variants behind the desktop loading cover',
 
   expect(entryAt).toBeGreaterThan(-1);
   expect(nextEntryAt).toBeGreaterThan(entryAt);
-  expect(entry).toContain('renderBudgetShaderPrewarmLevels(originalState)');
+  expect(entry).toContain('runPrewarmBudgetVariants(');
+  expect(entry).toContain('renderBudgetShaderPrewarmLevels(');
+  expect(entry).toContain('originalState');
   expect(entry).toContain('this.renderPrewarmPass(1 / 60)');
-  expect(entry).toContain('renderPasses++');
-  expect(entry).toContain('performance.now() >= gpuSubmitDeadline');
+  // The GPU SUBMIT GUARD, never the hard deadline. Each variant runs a real
+  // prewarm pass and an already-started WebGL call cannot be cancelled, so a
+  // pass launched at hardDeadline - epsilon overshoots the wall and defers
+  // every entry behind it, the deadline-exempt debt payers included. The
+  // negative arm is the one that matters: this entry was briefly handed
+  // hardDeadline, and the pin that had guarded it was rewritten to match.
+  expect(entry).toContain('deadlineMs: gpuSubmitDeadline');
+  expect(entry).not.toContain('deadlineMs: hardDeadline');
   expect(entry).toContain('withRestoredPrewarmState(');
   expect(entry).not.toContain('compilePrewarmColorPrograms(this.scene');
   expect(entry).toContain('deadlineExempt: !constrainedPrewarm && this.asyncCompileSupported');
+});
+
+it('wires the budget-variant recorder into the manifest entry', () => {
+  // This used to grep the WHOLE of prewarm_compile_lifecycle.ts for
+  // programsBefore/programsAfter/syncMs/passes, all of which already appear in
+  // RendererPrewarmCompileUnitStats (and one of which a comment satisfied), so
+  // it stayed green with the budget-variant recorder deleted. The RECORDING
+  // behaviour is covered directly in tests/prewarm_compile_lifecycle.test.ts;
+  // what belongs here is only that the entry is wired to it and publishes the
+  // stats, bounded to the entry's own slice.
+  const renderer = readFileSync(
+    new URL('../src/render/renderer.ts', import.meta.url),
+    'utf8',
+  ).replace(/\r\n/g, '\n');
+  const entryAt = renderer.indexOf("id: 'programs.budget-variants'");
+  const entryEnd = renderer.indexOf("id: 'sky.current-zone'", entryAt);
+  expect(entryAt).toBeGreaterThan(-1);
+  expect(entryEnd).toBeGreaterThan(entryAt);
+  const entry = codeWithoutLineComments(renderer.slice(entryAt, entryEnd));
+  expect(entry).toContain('runPrewarmBudgetVariants(');
+  expect(entry).toContain('budgetVariantStats');
+  expect(entry).toContain('budgetVariants: () => budgetVariantStats');
 });
 it('settles linked desktop programs only until the independent hard deadline', () => {
   const renderer = readFileSync(

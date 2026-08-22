@@ -2897,6 +2897,15 @@ export function createWeaponVfx(
 ): WeaponVfxHandle {
   const tier = TIERS[spec.tier];
   const b = localBounds(weaponRoot);
+  // The shell is mounted on the weapon root and therefore reuses its
+  // geometry. That geometry belongs to the GLB/character owner, not this VFX
+  // handle. Retain the ownership set so terminal cleanup cannot dispose the
+  // host buffer and then dispose it again in the prewarm host wrapper.
+  const weaponOwnedGeometries = new Set<THREE.BufferGeometry>();
+  weaponRoot.traverse((object) => {
+    const geometry = (object as THREE.Mesh).geometry;
+    if (geometry) weaponOwnedGeometries.add(geometry);
+  });
   const group = new THREE.Group();
   group.name = 'weapon_vfx';
   const sceneExtras = new THREE.Group();
@@ -3019,7 +3028,12 @@ export function createWeaponVfx(
   }
   weaponRoot.add(group);
 
-  const allMats = parts.flatMap((p) => p.mats ?? []);
+  // A component can legitimately share one material with another part (for
+  // example a sprite pair reused by two authored emitters). Keep the terminal
+  // owner set-like: disposing the same Three material multiple times is not
+  // harmless for the prewarm failure path because it can release one linked
+  // program/cache entry while another part still references it.
+  const allMats = [...new Set(parts.flatMap((p) => p.mats ?? []))];
 
   // Live FX tuning: per-channel multipliers over the spec values, applied to
   // the running rig (the inspector's fx sliders drive this). Each part's
@@ -3103,11 +3117,23 @@ export function createWeaponVfx(
       rigDisposed = true;
       weaponRoot.remove(group);
       sceneExtras.parent?.remove(sceneExtras);
+      const disposedGeometries = new Set<THREE.BufferGeometry>();
       for (const p of parts) {
         p.extraDispose?.();
         if (p.node) {
           p.node.traverse?.((o) => {
-            (o as THREE.Mesh).geometry?.dispose?.();
+            // Three's SpriteGeometry is a renderer-wide singleton shared by
+            // every Sprite. It is never owned by an individual weapon rig.
+            if ((o as THREE.Sprite).isSprite) return;
+            const geometry = (o as THREE.Mesh).geometry;
+            if (
+              !geometry ||
+              weaponOwnedGeometries.has(geometry) ||
+              disposedGeometries.has(geometry)
+            )
+              return;
+            disposedGeometries.add(geometry);
+            geometry.dispose();
           });
         }
       }
@@ -3138,6 +3164,9 @@ export function weaponVfxPrewarmTextures(): THREE.Texture[] {
   return [softDiscTex(), starFlareTex(), noiseTex()];
 }
 
+/** Stable catalog order shared by the loading-screen and resume paths. */
+export const WEAPON_VFX_PREWARM_KEYS: readonly string[] = Object.freeze(Object.keys(WEAPON_VFX));
+
 /**
  * One hidden rig per REAL catalog spec, for the boot prewarm scene, built
  * through the exact worn-skin path (grounded: false) so every program cache
@@ -3150,6 +3179,7 @@ export function weaponVfxPrewarmTextures(): THREE.Texture[] {
  * material releases its linked program, which is the thing being warmed).
  */
 let prewarmHostMap: THREE.Texture | null = null;
+const prewarmSkinCleanup = new WeakMap<THREE.Group, () => void>();
 
 /**
  * A one-pixel base-colour map for the prewarm hosts, shared by every spec.
@@ -3179,18 +3209,42 @@ function weaponVfxPrewarmHostMap(): THREE.Texture {
   return prewarmHostMap;
 }
 
-export function buildWeaponVfxPrewarmGroup(): THREE.Group {
+/**
+ * Builds one deterministic, hidden prewarm unit for a real catalog skin.
+ *
+ * The unit boundary is intentionally the skin, not a component family. A
+ * component-family fixture does not cover the material/program combinations
+ * selected by each authored spec, while one group for every spec makes the
+ * resume lane hold the GPU queue for hundreds of milliseconds. The aggregate
+ * builder below uses this same function, so the loading-screen path and the
+ * resumed path cannot drift apart.
+ */
+export function buildWeaponVfxPrewarmSkinGroup(key: string): THREE.Group {
+  const spec = WEAPON_VFX[key];
+  if (!spec) throw new Error(`unknown weapon VFX prewarm skin: ${key}`);
+
   const group = new THREE.Group();
-  group.name = 'weapon-vfx-program-prewarm';
-  group.position.set(0, -1000, 0); // off-screen; compile ignores position
-  for (const [key, spec] of Object.entries(WEAPON_VFX)) {
-    const host = new THREE.Mesh(
-      new THREE.BoxGeometry(0.1, 1, 0.1),
-      new THREE.MeshStandardMaterial({ color: 0xffffff, map: weaponVfxPrewarmHostMap() }),
-    );
-    host.name = `prewarm-skin-host:${key}`;
-    host.frustumCulled = false;
-    const handle = createWeaponVfx(host, spec, { grounded: false });
+  group.name = `weapon-vfx-program-prewarm:${key}`;
+  group.userData.renderCategory = 'prewarm';
+
+  const host = new THREE.Mesh(
+    new THREE.BoxGeometry(0.1, 1, 0.1),
+    new THREE.MeshStandardMaterial({ color: 0xffffff, map: weaponVfxPrewarmHostMap() }),
+  );
+  host.name = `prewarm-skin-host:${key}`;
+  host.frustumCulled = false;
+
+  let handle: WeaponVfxHandle | null = null;
+  let disposed = false;
+  const cleanup = (): void => {
+    if (disposed) return;
+    disposed = true;
+    handle?.dispose();
+    host.geometry.dispose();
+    (host.material as THREE.Material).dispose();
+  };
+  try {
+    handle = createWeaponVfx(host, spec, { grounded: false });
     // A visible light would change the scene's light counts, and those counts
     // are part of every program cache key: one extra point light here and the
     // whole boot compile warms keys no live frame ever asks for.
@@ -3201,6 +3255,52 @@ export function buildWeaponVfxPrewarmGroup(): THREE.Group {
     handle.sceneExtras.userData.renderCategory = 'prewarm';
     group.add(host);
     group.add(handle.sceneExtras);
+    prewarmSkinCleanup.set(group, cleanup);
+    return group;
+  } catch (error) {
+    // A failed unit must not leave a partially derived emissive rig pinned in
+    // the cache. createWeaponVfx unwinds its own derivation failures; if a
+    // later attachment/tagging step fails, use the same terminal owner here.
+    cleanup();
+    throw error;
+  }
+}
+
+/**
+ * Terminally release one staged resume unit. Successful prewarm deliberately
+ * leaves these materials alive so their linked programs stay hot; a failed
+ * resume has no such contract and must release every derived emissive pair,
+ * host buffer, and VFX material it built before the failure. The closure is
+ * idempotent because a failed build can be observed by both the unit hook and
+ * the renderer's aggregate cleanup.
+ */
+export function disposeWeaponVfxPrewarmSkinGroup(group: THREE.Group): void {
+  const cleanup = prewarmSkinCleanup.get(group);
+  if (!cleanup) return;
+  prewarmSkinCleanup.delete(group);
+  cleanup();
+}
+
+/** Release a staged batch after a resume unit fails. */
+export function disposeWeaponVfxPrewarmSkinGroups(groups: Iterable<THREE.Group>): void {
+  for (const group of groups) disposeWeaponVfxPrewarmSkinGroup(group);
+}
+
+export function buildWeaponVfxPrewarmGroup(): THREE.Group {
+  const group = new THREE.Group();
+  group.name = 'weapon-vfx-program-prewarm';
+  group.position.set(0, -1000, 0); // off-screen; compile ignores position
+  try {
+    for (const key of Object.keys(WEAPON_VFX)) {
+      group.add(buildWeaponVfxPrewarmSkinGroup(key));
+    }
+  } catch (error) {
+    // A catalog or canvas failure after a few successful units must not pin
+    // their derived emissive cache entries. The successful units are normally
+    // intentionally retained after a successful prewarm, but a failed
+    // aggregate is never published, so unwind every unit before rethrowing.
+    group.traverse((object) => prewarmSkinCleanup.get(object as THREE.Group)?.());
+    throw error;
   }
   return group;
 }

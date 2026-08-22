@@ -136,6 +136,7 @@ export class DrainLifeVfx {
   private time = 0;
   private quality = 1;
   private reducedMotion = false;
+  private disposed = false;
 
   constructor(
     scene: THREE.Scene,
@@ -227,6 +228,24 @@ export class DrainLifeVfx {
 
   clear(): void {
     for (const slot of this.slots) this.release(slot, false);
+  }
+
+  /** Release the fixed channel pool at the renderer lifecycle boundary. The
+   * cylinder is shared by every slot, so it is disposed once after all slot
+   * materials and roots have been detached. */
+  dispose(): void {
+    if (this.disposed) return;
+    this.disposed = true;
+    this.clear();
+    const materials = new Set<THREE.Material>();
+    for (const slot of this.slots) {
+      slot.group.removeFromParent();
+      materials.add(slot.core.material);
+      materials.add(slot.flow.material);
+      materials.add(slot.veil.material);
+    }
+    this.geometry.dispose();
+    for (const material of materials) material.dispose();
   }
 
   update(dt: number, reducedMotion = false): void {

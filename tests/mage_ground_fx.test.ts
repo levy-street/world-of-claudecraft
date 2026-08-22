@@ -213,6 +213,30 @@ describe('Mage meteor visual', () => {
     expect((secondBoundary.material as THREE.LineBasicMaterial).opacity).toBeCloseTo(0.42, 5);
   });
 
+  it('returns repeated cast and expiry cycles to a stable scene and pool baseline', () => {
+    const scene = new THREE.Scene();
+    const fx = new MageGroundFx(scene, () => 3, vi.fn());
+    const baselineChildren = scene.children.length;
+    const pool = (fx as unknown as { materialPool: Map<string, THREE.Material[]> }).materialPool;
+    const pooledCounts: number[] = [];
+
+    for (let cast = 0; cast < 8; cast++) {
+      fx.spawnMeteor({ x: cast * 3, z: -cast, radius: 5, duration: 0.2 });
+      fx.spawnRune({ x: cast * 3, z: -cast, radius: 4, duration: 0.2, school: 'fire' });
+      fx.spawnSnow({ x: cast * 3, z: -cast, radius: 4, duration: 0.2 });
+      fx.update(0.25);
+      fx.update(2.25); // beyond the meteor's scorch linger
+
+      expect(scene.children).toHaveLength(baselineChildren);
+      pooledCounts.push(
+        [...pool.values()].reduce((total, materials) => total + materials.length, 0),
+      );
+    }
+
+    expect(pooledCounts[0]).toBeGreaterThan(0);
+    expect(pooledCounts.slice(1).every((count) => count === pooledCounts[0])).toBe(true);
+  });
+
   it('never hands a live meteor material to a second concurrent cast', () => {
     const scene = new THREE.Scene();
     const fx = new MageGroundFx(scene, () => 3, vi.fn());
@@ -416,6 +440,200 @@ describe('Mage meteor visual', () => {
     expect(color.getHex()).not.toBe(uncapped.getHex());
     // Not washed to white: at least one channel stays well below full.
     expect(Math.min(color.r, color.g, color.b)).toBeLessThan(0.85);
+  });
+
+  it('disposes active roots, owned resources, and the retired material pool exactly once', () => {
+    const scene = new THREE.Scene();
+    const fx = new MageGroundFx(scene, () => 3, vi.fn());
+
+    // Retire one school first so terminal disposal also has to drain a pooled
+    // material that is no longer reachable from the scene graph.
+    fx.spawnRune({ x: 2, z: 3, radius: 4, duration: 0.1, school: 'fire' });
+    fx.update(0.2);
+    const pool = (fx as unknown as { materialPool: Map<string, THREE.Material[]> }).materialPool;
+    expect(pool.size).toBeGreaterThan(0);
+    const pooledMaterial = [...pool.values()][0][0];
+    const pooledDispose = vi.spyOn(pooledMaterial, 'dispose');
+
+    fx.spawnMeteor({ x: 10, z: 20, radius: 6, duration: 5 });
+    fx.spawnRune({ x: -4, z: 8, radius: 4, duration: 5, school: 'frost' });
+    fx.spawnSnow({ x: 14, z: -6, radius: 5, duration: 5 });
+
+    const materials = new Set<THREE.Material>();
+    const geometries = new Set<THREE.BufferGeometry>();
+    scene.traverse((object) => {
+      const drawable = object as THREE.Mesh | THREE.Line | THREE.Points;
+      const material = drawable.material;
+      if (material) {
+        for (const entry of Array.isArray(material) ? material : [material]) materials.add(entry);
+      }
+      if (drawable.geometry) geometries.add(drawable.geometry);
+    });
+    const materialDisposals = [...materials].map((material) => vi.spyOn(material, 'dispose'));
+    const geometryDisposals = [...geometries].map((geometry) => vi.spyOn(geometry, 'dispose'));
+
+    fx.dispose();
+
+    expect(scene.children).toHaveLength(0);
+    expect((fx as unknown as { meteors: unknown[] }).meteors).toHaveLength(0);
+    expect((fx as unknown as { runes: unknown[] }).runes).toHaveLength(0);
+    expect((fx as unknown as { snows: unknown[] }).snows).toHaveLength(0);
+    expect(pool.size).toBe(0);
+    expect(pooledDispose).toHaveBeenCalledOnce();
+    for (const dispose of materialDisposals) expect(dispose).toHaveBeenCalledOnce();
+    for (const dispose of geometryDisposals) expect(dispose).toHaveBeenCalledOnce();
+
+    fx.dispose();
+    expect(pooledDispose).toHaveBeenCalledOnce();
+    for (const dispose of materialDisposals) expect(dispose).toHaveBeenCalledOnce();
+    for (const dispose of geometryDisposals) expect(dispose).toHaveBeenCalledOnce();
+  });
+
+  it('continues terminal cleanup after an owned root and geometry failure', () => {
+    const scene = new THREE.Scene();
+    const fx = new MageGroundFx(scene, () => 3, vi.fn());
+    fx.spawnMeteor({ x: 10, z: 20, radius: 6, duration: 5 });
+    fx.spawnSnow({ x: -4, z: 8, radius: 5, duration: 5 });
+
+    const firstRoot = scene.children[0];
+    const rootDetach = vi.spyOn(firstRoot, 'removeFromParent').mockImplementationOnce(() => {
+      throw new Error('root detach');
+    });
+    const geometries = new Set<THREE.BufferGeometry>();
+    scene.traverse((object) => {
+      const drawable = object as THREE.Mesh | THREE.Line | THREE.Points;
+      if (drawable.geometry) geometries.add(drawable.geometry);
+    });
+    const [firstGeometry, laterGeometry] = [...geometries];
+    expect(firstGeometry).toBeDefined();
+    expect(laterGeometry).toBeDefined();
+    const firstDispose = vi.spyOn(firstGeometry, 'dispose').mockImplementationOnce(() => {
+      throw new Error('geometry dispose');
+    });
+    const laterDispose = vi.spyOn(laterGeometry, 'dispose');
+
+    expect(() => fx.dispose()).toThrow(AggregateError);
+    expect(rootDetach).toHaveBeenCalledOnce();
+    expect(firstDispose).toHaveBeenCalledOnce();
+    expect(laterDispose).toHaveBeenCalledOnce();
+    // removeFromParent threw but the parent.remove fallback landed, so the
+    // node really is off the scene and its entry is NOT retained: retention is
+    // judged on where the node ended up, never on whether an attempt threw.
+    expect(scene.children).toHaveLength(0);
+    expect((fx as unknown as { meteors: unknown[] }).meteors).toHaveLength(0);
+    expect((fx as unknown as { snows: unknown[] }).snows).toHaveLength(0);
+
+    // The geometry whose dispose threw IS retained, so the second pass
+    // re-attempts exactly it and nothing else. Nulling it on the first pass
+    // would have dropped the last reference to live GPU memory.
+    fx.dispose();
+    expect(firstDispose).toHaveBeenCalledTimes(2);
+    expect(laterDispose).toHaveBeenCalledOnce();
+  });
+
+  it('retains a root it could not detach, so a later dispose can try again', () => {
+    // The failure that matters: a root still attached to the scene is still
+    // DRAWING. Clearing its entry would strand it with nothing holding a
+    // reference and no route to a second attempt.
+    const scene = new THREE.Scene();
+    const fx = new MageGroundFx(scene, () => 3, vi.fn());
+    fx.spawnMeteor({ x: 10, z: 20, radius: 6, duration: 5 });
+
+    const root = scene.children[0];
+    // Both detach arms fail, so the node genuinely stays in the scene.
+    const removeFromParent = vi.spyOn(root, 'removeFromParent').mockImplementationOnce(() => {
+      throw new Error('root detach');
+    });
+    const sceneRemove = vi.spyOn(scene, 'remove').mockImplementationOnce(() => {
+      throw new Error('scene remove');
+    });
+
+    expect(() => fx.dispose()).toThrow(AggregateError);
+    expect(removeFromParent).toHaveBeenCalledOnce();
+    expect(sceneRemove).toHaveBeenCalledOnce();
+    expect(scene.children).toContain(root);
+    const meteors = (fx as unknown as { meteors: unknown[] }).meteors;
+    expect(meteors).toHaveLength(1);
+
+    // The retry detaches it for real and drops the entry.
+    fx.dispose();
+    expect(scene.children).not.toContain(root);
+    expect(meteors).toHaveLength(0);
+  });
+
+  it('retains failed pooled material occupancy for a retry', () => {
+    const scene = new THREE.Scene();
+    const fx = new MageGroundFx(scene, () => 3, vi.fn());
+    fx.spawnRune({ x: 2, z: 3, radius: 4, duration: 0.1, school: 'fire' });
+    fx.update(0.2);
+
+    const pool = (fx as unknown as { materialPool: Map<string, THREE.Material[]> }).materialPool;
+    const pooledMaterial = [...pool.values()][0][0];
+    const disposal = vi.spyOn(pooledMaterial, 'dispose').mockImplementationOnce(() => {
+      throw new Error('pooled material dispose');
+    });
+    expect(() => fx.dispose()).toThrow(AggregateError);
+    expect(pool.size).toBeGreaterThan(0);
+    expect([...pool.values()].flat()).toContain(pooledMaterial);
+
+    // The retry the retention exists for: a second dispose really re-attempts
+    // the retained material and, on success, drops it from the pool.
+    fx.dispose();
+    expect(disposal).toHaveBeenCalledTimes(2);
+    expect([...pool.values()].flat()).not.toContain(pooledMaterial);
+  });
+
+  it('keeps releasing the rest after one owned resource fails to dispose', () => {
+    // Unlike the pooled materials above, owned geometries are NOT retained:
+    // dispose() clears `meteors`, so the reference is gone either way. What
+    // this pins is that the failure is aggregated rather than fatal, and that
+    // the resources after it in the sweep are still released.
+    const scene = new THREE.Scene();
+    const fx = new MageGroundFx(scene, () => 3, vi.fn());
+    fx.spawnMeteor({ x: 10, z: 20, radius: 6, duration: 5 });
+    const meteor = (
+      fx as unknown as {
+        meteors: { ownedGeometries: THREE.BufferGeometry[]; rockMat: THREE.Material }[];
+      }
+    ).meteors[0];
+    const ownedGeometry = meteor.ownedGeometries[0];
+    const laterGeometry = meteor.ownedGeometries[meteor.ownedGeometries.length - 1];
+    expect(laterGeometry).not.toBe(ownedGeometry);
+    vi.spyOn(ownedGeometry, 'dispose').mockImplementationOnce(() => {
+      throw new Error('owned geometry dispose');
+    });
+    const laterDispose = vi.spyOn(laterGeometry, 'dispose');
+    const materialDispose = vi.spyOn(meteor.rockMat, 'dispose');
+
+    expect(() => fx.dispose()).toThrow(AggregateError);
+    expect(laterDispose).toHaveBeenCalled();
+    expect(materialDispose).toHaveBeenCalled();
+    expect((fx as unknown as { meteors: unknown[] }).meteors).toHaveLength(0);
+  });
+
+  it('ignores late spawns and frame updates after terminal disposal', () => {
+    const scene = new THREE.Scene();
+    const landed = vi.fn();
+    const fx = new MageGroundFx(scene, () => 3, landed);
+    const sceneAdd = vi.spyOn(scene, 'add');
+    const ensureMeteorGeometry = vi.spyOn(
+      fx as unknown as { ensureMeteorGeometry: () => unknown },
+      'ensureMeteorGeometry',
+    );
+
+    fx.dispose();
+    fx.spawnMeteor({ x: 10, z: 20, radius: 6, duration: 0.1 });
+    fx.spawnRune({ x: -4, z: 8, radius: 4, duration: 0.1 });
+    fx.spawnSnow({ x: 14, z: -6, radius: 5, duration: 0.1 });
+    fx.update(10);
+
+    expect(scene.children).toHaveLength(0);
+    expect(sceneAdd).not.toHaveBeenCalled();
+    expect(ensureMeteorGeometry).not.toHaveBeenCalled();
+    expect(landed).not.toHaveBeenCalled();
+    expect((fx as unknown as { meteors: unknown[] }).meteors).toHaveLength(0);
+    expect((fx as unknown as { runes: unknown[] }).runes).toHaveLength(0);
+    expect((fx as unknown as { snows: unknown[] }).snows).toHaveLength(0);
   });
 });
 

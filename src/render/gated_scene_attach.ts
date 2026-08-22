@@ -17,11 +17,25 @@ import { gpuPrepNow, recordGpuPrepEvent } from './gpu_prep_events';
 
 export const GATED_ATTACH_WATCHDOG_MS = 10_000;
 
+/** Raised when a streamed root is retired while its compile gate is pending. */
+export class GatedSceneAttachCancelledError extends Error {
+  constructor() {
+    super('Gated scene attach cancelled');
+    this.name = 'GatedSceneAttachCancelledError';
+  }
+}
+
 export async function attachSceneGroupGated(
   scene: { add(object: THREE.Object3D): unknown },
   group: THREE.Object3D,
   compileGate?: (target: THREE.Object3D) => Promise<unknown>,
+  isCancelled?: () => boolean,
 ): Promise<void> {
+  // The cancellation predicate is intentionally supplied by the resource
+  // owner, rather than inferred from scene membership. A retired root may be
+  // absent from the scene while its compile promise is still alive, and a
+  // replacement build can legitimately use the same scene.
+  if (isCancelled?.()) throw new GatedSceneAttachCancelledError();
   if (!compileGate) {
     scene.add(group);
     return;
@@ -30,6 +44,7 @@ export async function attachSceneGroupGated(
   scene.add(group);
   const attachedAtMs = gpuPrepNow();
   const watchdog = setTimeout(() => {
+    if (isCancelled?.()) return;
     if (group.visible) return;
     group.visible = true;
     console.warn(
@@ -44,10 +59,14 @@ export async function attachSceneGroupGated(
   }, GATED_ATTACH_WATCHDOG_MS);
   try {
     await compileGate(group);
+    if (isCancelled?.()) throw new GatedSceneAttachCancelledError();
   } catch {
-    // Shutdown rejects queued GPU work on purpose; reveal happens either way.
+    // Shutdown rejects queued GPU work on purpose; ordinary gate failures still
+    // reveal. A retired streamed root is different: its transaction owns the
+    // detach and terminal resource release, so preserve cancellation.
+    if (isCancelled?.()) throw new GatedSceneAttachCancelledError();
   } finally {
     clearTimeout(watchdog);
-    group.visible = true;
+    if (!isCancelled?.()) group.visible = true;
   }
 }

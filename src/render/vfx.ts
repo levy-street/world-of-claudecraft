@@ -341,6 +341,7 @@ export class Vfx {
   private fwFlash = new THREE.Color();
   private quality = 1;
   private paladinSpellFx: PaladinSpellVfxController;
+  private disposed = false;
 
   constructor(
     private scene: THREE.Scene,
@@ -559,6 +560,7 @@ export class Vfx {
   }
 
   clear(): void {
+    if (this.disposed) return;
     this.projectiles.length = 0;
     this.paladinSpellFx.clear();
     for (let i = this.bubbleBeams.length - 1; i >= 0; i--) this.removeBubbleBeam(i);
@@ -572,7 +574,24 @@ export class Vfx {
     this.points.visible = !this.cloudWarmed;
   }
 
+  /** Terminal renderer cleanup. The point cloud owns its geometry, shader,
+   * and per-renderer atlas texture; Drain Life owns a separate fixed pool.
+   * No shared texture cache entry is disposed here. */
+  dispose(): void {
+    if (this.disposed) return;
+    this.clear();
+    this.disposed = true;
+    this.drainLifeVfx.dispose();
+    this.points.removeFromParent();
+    const material = this.points.material as THREE.ShaderMaterial;
+    const atlas = material.uniforms.uAtlas?.value;
+    this.points.geometry.dispose();
+    material.dispose();
+    if (atlas instanceof THREE.Texture) atlas.dispose();
+  }
+
   onContextRestored(): void {
+    if (this.disposed) return;
     this.cloudWarmed = false;
     this.points.visible = true;
   }
@@ -611,6 +630,7 @@ export class Vfx {
     sprite: number = SPR.glowSoft,
     rot: number = Math.random() * Math.PI * 2,
   ): void {
+    if (this.disposed) return;
     const i = this.head;
     this.head = (this.head + 1) % CAPACITY;
     if (this.activeSlotFlags[i] === 0) {
@@ -699,6 +719,7 @@ export class Vfx {
    * contribute no scene-target pixel for the later bloom pass to spread.
    */
   prepareDraw(camera: THREE.Camera): void {
+    if (this.disposed) return;
     this.packRenderCloud(camera);
   }
 
@@ -735,6 +756,7 @@ export class Vfx {
     onImpact?: (position: THREE.Vector3) => void,
     color?: number,
   ): void {
+    if (this.disposed) return;
     const colors = projectileSchoolColors(school, color);
     const sprites = projectileSprites(school);
     this.projectiles.push({
@@ -853,6 +875,7 @@ export class Vfx {
   /** Water Jet's sustained hose: a bright liquid core surrounded by larger
    * ring-shaped bubbles that rise as they travel between both moving anchors. */
   bubbleBeam(sourceId: number, targetId: number, duration: number): void {
+    if (this.disposed) return;
     const existing = this.bubbleBeams.find((b) => b.sourceId === sourceId);
     if (duration <= 0) {
       if (existing) {
@@ -909,22 +932,26 @@ export class Vfx {
   /** Drain Life's sustained tether: a narrow green core with life motes flowing
    * from the victim back toward the caster. */
   drainBeam(sourceId: number, targetId: number, duration: number): void {
+    if (this.disposed) return;
     this.drainLifeVfx.drain(sourceId, targetId, duration);
   }
 
   /** Possessed companion contribution to Drain Life, from the Eye beside the
    * caster to the same victim as the caster's ordinary tether. */
   demonicDrainBeam(casterId: number, targetId: number, duration: number): void {
+    if (this.disposed) return;
     this.drainLifeVfx.demonicDrain(casterId, targetId, duration);
   }
 
   /** The Affliction companion's own attack: a very brief sickly-green ray
    * wrapped in violet shadow, fired from the Eye rather than the caster. */
   evilEyeGaze(casterId: number, targetId: number, duration = 0.28): void {
+    if (this.disposed) return;
     this.drainLifeVfx.evilEyeGaze(casterId, targetId, duration);
   }
 
   drainLifeTick(casterId: number): void {
+    if (this.disposed) return;
     this.drainLifeVfx.tick(casterId);
   }
 
@@ -2023,6 +2050,7 @@ export class Vfx {
   // ---------------------------------------------------------------------
 
   update(dt: number, reducedMotion = false): void {
+    if (this.disposed) return;
     this.drainLifeVfx.update(dt, reducedMotion);
 
     for (let i = this.bubbleBeams.length - 1; i >= 0; i--) {
@@ -2128,8 +2156,13 @@ export class Vfx {
             k % 2 === 0 ? SPR.sparkle : SPR.sparkBurst,
           );
         }
-        pr.onImpact?.(target);
+        // Spliced BEFORE the callback, not after. onImpact is renderer code
+        // that can spawn (an impact commonly starts another effect), and a
+        // spawn pushes onto this same array while this loop is walking it by
+        // index. Removing the finished projectile first keeps the walk sound
+        // and keeps a re-entrant spawn from being skipped or double-visited.
         this.projectiles.splice(i, 1);
+        pr.onImpact?.(target);
         continue;
       }
       const ux = dir.x / dist; // unit travel direction (before the step scale below)

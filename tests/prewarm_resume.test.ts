@@ -598,12 +598,30 @@ describe('resumeDroppedPrewarmEntries', () => {
     expect(end).toBeGreaterThan(start);
     expect(entry).toContain("category: 'vfx'");
     expect(entry).toContain('required: false');
-    // Three explicitly bounded units, never a whole-entry rerun.
-    expect(entry).toContain("id: 'weapon-skins:group'");
-    expect(entry).toContain("id: 'weapon-skins:textures'");
-    expect(entry).toContain("id: 'weapon-skins:compile'");
-    expect(entry).toContain('await this.compilePrewarmColorPrograms(weaponVfxPrewarmGroup, false)');
-    expect(entry.match(/buildWeaponVfxPrewarmGroup\(\)/g)).toHaveLength(2); // run + resume unit
+    // One bounded build and compile unit per real catalog spec, never a
+    // whole-entry rerun that rebuilds all rigs after the loading cover drops.
+    // The PLAN now lives in weapon_vfx_prewarm.ts (its unit ids are pinned to
+    // literals in tests/weapon_vfx_rig_build.test.ts, and they double as the
+    // per-skin failure boundary), so the renderer side pins the WIRING and the
+    // module side pins the shape.
+    const prewarmModule = readFileSync(
+      new URL('../src/render/weapon_vfx_prewarm.ts', import.meta.url),
+      'utf8',
+    );
+    expect(prewarmModule).toContain(`weapon-skins:build:\${key}`);
+    expect(prewarmModule).toContain(`weapon-skins:compile:\${key}`);
+    expect(prewarmModule).toContain("id: 'weapon-skins:textures'");
+    expect(prewarmModule).toContain('stage.stage(key);');
+    expect(source).not.toContain("id: 'weapon-skins:group'");
+    // The staged seam owns per-key deduplication and partial-failure cleanup;
+    // keep the source pin on the renderer's exact factory wiring without
+    // coupling it to the helper's implementation details.
+    expect(source).toContain(
+      'const weaponVfxPrewarmSkinStage = createWeaponVfxPrewarmSkinStage(this.scene);',
+    );
+    expect(entry).toContain('weaponVfxPrewarmUnits(weaponVfxPrewarmSkinStage, {');
+    expect(entry).toContain('compile: (group) => this.compilePrewarmColorPrograms(group, false),');
+    expect(entry.match(/buildWeaponVfxPrewarmGroup\(\)/g)).toHaveLength(1); // loading-screen path only
     expect(entry).toContain('for (const texture of weaponVfxPrewarmTextures()) ');
     // The sky dome is not warmed: the world path builds none any more.
     expect(entry).not.toContain('skyTex');
@@ -636,7 +654,7 @@ describe('resumeDroppedPrewarmEntries', () => {
   it('stages resident mounts inline and resumes missing keys one unit at a time', () => {
     const source = readFileSync(new URL('../src/render/renderer.ts', import.meta.url), 'utf8');
     const helperStart = source.indexOf('const mountPrewarmResumeUnits = ');
-    const helperEnd = source.indexOf('\n\n    const textureResumeUnits =', helperStart);
+    const helperEnd = source.indexOf('const textureResumeUnits', helperStart);
     const start = source.indexOf("id: 'vfx.mount-programs'");
     const end = source.indexOf("id: 'sky.nearby-biomes'", start);
     const helperBlock = source.slice(helperStart, helperEnd);

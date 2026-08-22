@@ -12,19 +12,27 @@
 //      derivation rebuilds byte-identically on its next wearer.
 import { readFileSync } from 'node:fs';
 import * as THREE from 'three';
-import { afterAll, beforeAll, beforeEach, describe, expect, it } from 'vitest';
+import { afterAll, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest';
 import { materialProgramSignature } from '../src/render/prewarm_policy';
 import { isSharedTexture } from '../src/render/shared_resource';
 import {
   buildWeaponVfxPrewarmGroup,
+  buildWeaponVfxPrewarmSkinGroup,
   clearWeaponVfxTextureCacheForTest,
   createWeaponVfx,
   disposeWeaponEmissiveCache,
+  disposeWeaponVfxPrewarmSkinGroups,
   TIERS,
   WEAPON_VFX,
+  WEAPON_VFX_PREWARM_KEYS,
   type WeaponVfxSpec,
 } from '../src/render/weapon_vfx';
 import { WEAPON_EMISSIVE_IDLE_CACHE_MAX } from '../src/render/weapon_vfx_emissive_cache_core';
+import {
+  createWeaponVfxPrewarmSkinStage,
+  weaponVfxPrewarmSkinUnitKey,
+  weaponVfxPrewarmUnits,
+} from '../src/render/weapon_vfx_prewarm';
 import { codeWithoutLineComments } from './helpers/code_without_line_comments';
 
 interface StubCanvas {
@@ -140,6 +148,82 @@ const EPIC_SPEC: WeaponVfxSpec = {
   lore: '',
   fx: [],
 };
+
+describe('streamed weapon-skin prewarm staging', () => {
+  it('deduplicates catalog units into one hidden aggregate group', () => {
+    const scene = new THREE.Scene();
+    const stage = createWeaponVfxPrewarmSkinStage(scene);
+    const key = WEAPON_VFX_PREWARM_KEYS[0];
+
+    const first = stage.stage(key);
+    expect(stage.group).toBe(scene.children[0]);
+    expect(stage.group?.visible).toBe(false);
+    expect(stage.group?.userData.renderCategory).toBe('prewarm');
+    expect(stage.stage(key)).toBe(first);
+    expect(stage.group?.children).toEqual([first]);
+  });
+
+  it('releases only the failed unit and leaves every other staged skin linked', () => {
+    // The resume lane reports failures per unit. Disposing the whole catalog
+    // would drop the already-linked programs of every earlier skin (three
+    // releases a program with its last material) and leave the later build
+    // units to re-stage a fresh group: dispose-then-relink in live frames.
+    const scene = new THREE.Scene();
+    const stage = createWeaponVfxPrewarmSkinStage(scene);
+    const [failedKey, survivorKey] = WEAPON_VFX_PREWARM_KEYS;
+    expect(survivorKey).toBeDefined();
+
+    const failed = stage.stage(failedKey);
+    const survivor = stage.stage(survivorKey);
+    const survivorMaterials: THREE.Material[] = [];
+    survivor.traverse((object) => {
+      const material = (object as THREE.Mesh).material;
+      if (material) survivorMaterials.push(...(Array.isArray(material) ? material : [material]));
+    });
+    expect(survivorMaterials.length).toBeGreaterThan(0);
+    const survivorDisposals = survivorMaterials.map((material) => vi.spyOn(material, 'dispose'));
+    const failedGeometry = vi.fn();
+    failed.traverse((object) => {
+      const geometry = (object as THREE.Mesh).geometry;
+      if (geometry) vi.spyOn(geometry, 'dispose').mockImplementation(failedGeometry);
+    });
+
+    stage.disposeFailedUnit(`weapon-skins:compile:${failedKey}`);
+
+    expect(stage.get(failedKey)).toBeUndefined();
+    expect(failedGeometry).toHaveBeenCalled();
+    // The aggregate survives with the untouched skin still mounted, so the
+    // remaining compile units still find their groups.
+    expect(stage.get(survivorKey)).toBe(survivor);
+    expect(stage.group).toBe(scene.children[0]);
+    expect(stage.group?.children).toEqual([survivor]);
+    for (const disposal of survivorDisposals) expect(disposal).not.toHaveBeenCalled();
+  });
+
+  it('releases nothing for a unit that owns no skin group', () => {
+    // The shared-texture unit and any unrecognised id: the staged skins are
+    // still valid, so a failure there must not cost them their programs.
+    const scene = new THREE.Scene();
+    const stage = createWeaponVfxPrewarmSkinStage(scene);
+    const key = WEAPON_VFX_PREWARM_KEYS[0];
+    const staged = stage.stage(key);
+
+    stage.disposeFailedUnit('weapon-skins:textures');
+    stage.disposeFailedUnit('weapon-skins:build:no-such-skin');
+    stage.disposeFailedUnit('some-other-entry:unit');
+
+    expect(stage.get(key)).toBe(staged);
+    expect(stage.group?.children).toEqual([staged]);
+  });
+
+  it('maps only the two per-skin unit ids to a key', () => {
+    expect(weaponVfxPrewarmSkinUnitKey('weapon-skins:build:flame_sword')).toBe('flame_sword');
+    expect(weaponVfxPrewarmSkinUnitKey('weapon-skins:compile:flame_sword')).toBe('flame_sword');
+    expect(weaponVfxPrewarmSkinUnitKey('weapon-skins:textures')).toBeNull();
+    expect(weaponVfxPrewarmSkinUnitKey('weapon-skins:group')).toBeNull();
+    expect(weaponVfxPrewarmSkinUnitKey('mount:tiger')).toBeNull();
+  });
+});
 
 function weaponRoot(map: THREE.Texture | null = null): THREE.Mesh {
   const material = new THREE.MeshStandardMaterial({ color: 0xffffff });
@@ -677,5 +761,215 @@ describe('buildWeaponVfxPrewarmGroup', () => {
     // are part of every program cache key the boot compile warms.
     expect(lights).toBe(specCount);
     expect(visibleLights).toBe(0);
+  });
+
+  it('pins the resume key plan to the catalog exactly once, in catalog order', () => {
+    // WEAPON_VFX_PREWARM_KEYS is Object.freeze(Object.keys(WEAPON_VFX)), so
+    // comparing it against Object.keys(WEAPON_VFX) cannot fail and neither can
+    // a uniqueness check over Object.keys. Literals are the only thing here
+    // that notices the catalog, or the unit plan derived from it, drifting.
+    expect(WEAPON_VFX_PREWARM_KEYS).toHaveLength(23);
+    expect(WEAPON_VFX_PREWARM_KEYS[0]).toBe('ice_fang');
+    expect(WEAPON_VFX_PREWARM_KEYS[WEAPON_VFX_PREWARM_KEYS.length - 1]).toBe('cinderlatch');
+    // And the plan really is the catalog, in its own order.
+    expect(WEAPON_VFX_PREWARM_KEYS).toEqual(Object.keys(WEAPON_VFX));
+  });
+
+  it('drives the real plan: builds, then one textures unit, then compiles', () => {
+    // The previous version of this case re-derived the ids from the catalog
+    // with its own template literal and never called weaponVfxPrewarmUnits, so
+    // it proved the regex matched the TEST's strings. Reordering the three
+    // phases, which is the whole point of the streaming split, left it green.
+    const staged: string[] = [];
+    const compiled: string[] = [];
+    let textures = 0;
+    const groups = new Map<string, THREE.Group>();
+    const stage = {
+      group: null,
+      get: (key: string) => groups.get(key),
+      stage: (key: string) => {
+        staged.push(key);
+        const group = new THREE.Group();
+        groups.set(key, group);
+        return group;
+      },
+      disposeFailedUnit: () => {},
+      dispose: () => {},
+    };
+    const published: (THREE.Group | null)[] = [];
+
+    const units = weaponVfxPrewarmUnits(stage, {
+      prewarmTextures: () => {
+        textures++;
+      },
+      compile: async (group) => {
+        compiled.push([...groups].find(([, g]) => g === group)?.[0] ?? '?');
+      },
+      publishGroup: (group) => published.push(group),
+    });
+
+    const ids = units.map((unit) => unit.id);
+    expect(ids).toHaveLength(47);
+    // Phase order is the contract: every build, then the single shared-texture
+    // unit, then every compile. A compile that ran before its build would find
+    // no group and link nothing.
+    expect(ids.slice(0, 23)).toEqual(
+      WEAPON_VFX_PREWARM_KEYS.map((key) => `weapon-skins:build:${key}`),
+    );
+    expect(ids[23]).toBe('weapon-skins:textures');
+    expect(ids.slice(24)).toEqual(
+      WEAPON_VFX_PREWARM_KEYS.map((key) => `weapon-skins:compile:${key}`),
+    );
+    expect(ids[0]).toBe('weapon-skins:build:ice_fang');
+    expect(ids[46]).toBe('weapon-skins:compile:cinderlatch');
+
+    // Running the plan in order stages every skin once and compiles each one.
+    for (const unit of units.slice(0, 24)) unit.run();
+    expect(staged).toEqual([...WEAPON_VFX_PREWARM_KEYS]);
+    expect(textures).toBe(1);
+    expect(published).toHaveLength(23);
+  });
+
+  it('skips a compile whose skin was released, without throwing', () => {
+    // What the per-skin failure boundary relies on: after disposeFailedUnit
+    // drops one skin, that skin's remaining compile unit must no-op rather
+    // than throw or link a stale group.
+    const compiled: string[] = [];
+    const stage = {
+      group: null,
+      get: () => undefined,
+      stage: () => new THREE.Group(),
+      disposeFailedUnit: () => {},
+      dispose: () => {},
+    };
+    const units = weaponVfxPrewarmUnits(stage, {
+      prewarmTextures: () => {},
+      compile: async (group) => {
+        compiled.push(group.uuid);
+      },
+      publishGroup: () => {},
+    });
+
+    const compileUnit = units.find((unit) => unit.id.startsWith('weapon-skins:compile:'));
+    expect(compileUnit).toBeDefined();
+    expect(() => compileUnit?.run()).not.toThrow();
+    expect(compiled).toEqual([]);
+  });
+
+  it('plans one build and one compile unit per catalog skin, with literal ids', () => {
+    // 23 skins, 2 per-skin units each plus the one shared texture unit: what
+    // the PR claims the streamed lane replaced the single 534 ms unit with.
+    const buildIds = WEAPON_VFX_PREWARM_KEYS.map((key) => `weapon-skins:build:${key}`);
+    const compileIds = WEAPON_VFX_PREWARM_KEYS.map((key) => `weapon-skins:compile:${key}`);
+    expect(buildIds[0]).toBe('weapon-skins:build:ice_fang');
+    expect(compileIds[compileIds.length - 1]).toBe('weapon-skins:compile:cinderlatch');
+    expect(new Set([...buildIds, ...compileIds, 'weapon-skins:textures']).size).toBe(47);
+    // Every planned id round-trips through the failure-boundary key mapping,
+    // so no unit can fail into "owns nothing" by an id typo.
+    for (const id of [...buildIds, ...compileIds]) {
+      expect(weaponVfxPrewarmSkinUnitKey(id)).not.toBeNull();
+    }
+  });
+
+  it('builds exactly one deterministic skin unit with the same hidden ownership contract', () => {
+    const keys = Object.keys(WEAPON_VFX);
+    expect(keys.length).toBeGreaterThan(1);
+    const first = keys[0];
+    const second = keys[1];
+    const firstGroup = buildWeaponVfxPrewarmSkinGroup(first);
+    const secondGroup = buildWeaponVfxPrewarmSkinGroup(second);
+
+    expect(firstGroup.name).toBe(`weapon-vfx-program-prewarm:${first}`);
+    expect(secondGroup.name).toBe(`weapon-vfx-program-prewarm:${second}`);
+    expect(firstGroup.getObjectByName(`prewarm-skin-host:${first}`)).toBeTruthy();
+    expect(firstGroup.getObjectByName(`prewarm-skin-host:${second}`)).toBeUndefined();
+    expect(secondGroup.getObjectByName(`prewarm-skin-host:${second}`)).toBeTruthy();
+
+    const firstLights: THREE.Object3D[] = [];
+    firstGroup.traverse((object) => {
+      if ((object as THREE.PointLight).isPointLight) firstLights.push(object);
+    });
+    expect(firstLights).toHaveLength(1);
+    expect(firstLights[0].visible).toBe(false);
+    expect(firstGroup.userData.renderCategory).toBe('prewarm');
+    expect(firstGroup.getObjectByName('weapon_vfx_extras')).toBeTruthy();
+    expect(secondGroup.userData.renderCategory).toBe('prewarm');
+  });
+
+  it('rejects an unknown skin before publishing a partial prewarm group', () => {
+    expect(() => buildWeaponVfxPrewarmSkinGroup('__missing_skin__')).toThrow(
+      /unknown weapon VFX prewarm skin/,
+    );
+  });
+
+  it('releases each staged skin exactly once, and a second terminal pass is a no-op', () => {
+    // This case used to be an it.each over 'texture' and 'compile' titled
+    // "terminally releases every skin already staged when the %s resume unit
+    // fails". It drove neither resume unit: it threw its own error and called
+    // the disposer itself, so the two arms differed only in a message string,
+    // and the title named whole-catalog behaviour this branch deliberately
+    // replaced with a per-skin boundary. What it actually pins is the disposer's
+    // own contract, so that is what it says now. The per-skin failure boundary
+    // is covered in 'streamed weapon-skin prewarm staging' above, and the
+    // renderer's wiring to it by the source pin below.
+    const keys = Object.keys(WEAPON_VFX).slice(0, 2);
+    const staged: THREE.Group[] = [];
+    const disposals: ReturnType<typeof vi.fn>[] = [];
+    const seenGeometries = new Set<THREE.BufferGeometry>();
+    const seenMaterials = new Set<THREE.Material>();
+    for (const key of keys) {
+      const group = buildWeaponVfxPrewarmSkinGroup(key);
+      staged.push(group);
+      group.traverse((object) => {
+        const renderable = object as THREE.Mesh;
+        if (
+          renderable.geometry &&
+          !(object as THREE.Object3D & { isSprite?: boolean }).isSprite &&
+          !seenGeometries.has(renderable.geometry)
+        ) {
+          seenGeometries.add(renderable.geometry);
+          disposals.push(vi.spyOn(renderable.geometry, 'dispose'));
+        }
+        const materials = renderable.material
+          ? Array.isArray(renderable.material)
+            ? renderable.material
+            : [renderable.material]
+          : [];
+        for (const material of materials) {
+          if (seenMaterials.has(material)) continue;
+          seenMaterials.add(material);
+          disposals.push(vi.spyOn(material, 'dispose'));
+        }
+      });
+    }
+
+    disposeWeaponVfxPrewarmSkinGroups(staged);
+    expect(staged).toHaveLength(2);
+    expect(disposals.length).toBeGreaterThan(0);
+    for (const dispose of disposals) expect(dispose).toHaveBeenCalledOnce();
+
+    // The failure hook and the aggregate cleanup may both run, so the ownership
+    // seam has to make the second terminal pass a no-op.
+    disposeWeaponVfxPrewarmSkinGroups(staged);
+    for (const dispose of disposals) expect(dispose).toHaveBeenCalledOnce();
+  });
+
+  it('wires the renderer resume failure hook to the PER-SKIN release (source pin)', () => {
+    // The production call site has no behavioural test (it needs a Renderer),
+    // and it is exactly where the whole-catalog regression lived: onUnitError
+    // called disposeFailure(), which cleared all 47. Nothing else would notice
+    // it coming back.
+    const renderer = readFileSync(new URL('../src/render/renderer.ts', import.meta.url), 'utf8');
+    const hookAt = renderer.indexOf('onUnitError: (entry, unit, error) => {');
+    expect(hookAt).toBeGreaterThan(-1);
+    const hook = codeWithoutLineComments(renderer.slice(hookAt, renderer.indexOf('},', hookAt)));
+    expect(hook).toContain("if (entry.id === 'vfx.weapon-skins') {");
+    // The unit's OWN id, so the boundary is one skin.
+    expect(hook).toContain('weaponVfxPrewarmSkinStage.disposeFailedUnit(unit.id);');
+    // The aggregate is republished, never nulled: nulling it was what made the
+    // remaining compile units no-op against a missing census owner.
+    expect(hook).toContain('weaponVfxPrewarmGroup = weaponVfxPrewarmSkinStage.group;');
+    // And the whole-catalog release is gone from the renderer entirely.
+    expect(renderer).not.toContain('disposeFailure(');
   });
 });

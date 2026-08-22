@@ -71,6 +71,54 @@ afterEach(() => {
 });
 
 describe('pooled VFX cloud', () => {
+  it('disposes the generic cloud and drain channel pool exactly once', () => {
+    installCanvasStub();
+    const scene = new THREE.Scene();
+    const vfx = new Vfx(scene, () => new THREE.Vector3(0, 1, 0));
+    vfx.burst(new THREE.Vector3(0, 0, 0), 'fire', 4);
+    vfx.drainBeam(1, 2, 5);
+
+    const geometries = new Set<THREE.BufferGeometry>();
+    const materials = new Set<THREE.Material>();
+    scene.traverse((object) => {
+      const drawable = object as THREE.Mesh | THREE.Line | THREE.Points;
+      if (drawable.geometry) geometries.add(drawable.geometry);
+      const material = drawable.material;
+      if (material) {
+        for (const entry of Array.isArray(material) ? material : [material]) materials.add(entry);
+      }
+    });
+    const geometryDisposals = [...geometries].map((geometry) => vi.spyOn(geometry, 'dispose'));
+    const materialDisposals = [...materials].map((material) => vi.spyOn(material, 'dispose'));
+
+    vfx.dispose();
+
+    expect(scene.children).toHaveLength(0);
+    for (const dispose of geometryDisposals) expect(dispose).toHaveBeenCalledOnce();
+    for (const dispose of materialDisposals) expect(dispose).toHaveBeenCalledOnce();
+
+    vfx.dispose();
+    vfx.update(1);
+    expect(scene.children).toHaveLength(0);
+    for (const dispose of geometryDisposals) expect(dispose).toHaveBeenCalledOnce();
+    for (const dispose of materialDisposals) expect(dispose).toHaveBeenCalledOnce();
+  });
+
+  it('removes a projectile before a throwing impact callback can replay it', () => {
+    installCanvasStub();
+    const impact = vi.fn(() => {
+      throw new Error('projectile callback');
+    });
+    const vfx = new Vfx(new THREE.Scene(), () => new THREE.Vector3());
+
+    vfx.soulTravel(0, 0, 0, 7, impact);
+    expect(() => vfx.update(1)).toThrow('projectile callback');
+    expect(impact).toHaveBeenCalledOnce();
+
+    expect(() => vfx.update(0.1)).not.toThrow();
+    expect(impact).toHaveBeenCalledOnce();
+  });
+
   it('submits and uploads only the live ascending prefix with conservative culling', () => {
     installCanvasStub();
     const scene = new THREE.Scene();

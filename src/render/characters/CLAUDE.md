@@ -64,7 +64,53 @@ Sibling families (one line each; extraction targets, never re-grow `visual.ts`):
 - Portraits: `portrait.ts` (offscreen-WebGL headshot factory, caches data
   URLs) + `portrait_framing.ts` (pure framing math per `PortraitFraming`) +
   `portrait_prewarm_core.ts` (the async capture's step order) +
-  `portrait_capture_lane_core.ts` (one live capture per cache key). The LIVE
+  `portrait_capture_lane_core.ts` (one live capture per cache key). The CAPTURE
+  itself is `portrait_snapshot.ts`, a thin GL adapter over the pure
+  `portrait_bitmap_transfer_core.ts` and `portrait_readback_core.ts`, the
+  worker client `portrait_bitmap_encode.ts` (with
+  `portrait_encode_worker.ts`) and the DOM-only `portrait_png_encode.ts`. It
+  has THREE arms, each falling through to the next. First it draws into the
+  rig's own drawing buffer, snapshots that frame with `createImageBitmap` and
+  TRANSFERS the bitmap to the encode worker, so no portrait byte ever reaches
+  the gameplay thread: measured on a Mesa iGPU under a loaded ride, p50 0 ms of
+  main-thread blocking per capture against 116 ms for the readback arm, and not
+  one capture in 24 blocking for over 16 ms. Failing that (no `Worker`, no
+  `OffscreenCanvas`, no `createImageBitmap`, or a latched worker failure) it
+  renders into a `WebGLRenderTarget` and reads it back through three's
+  fence-backed `readRenderTargetPixelsAsync`, which still beats the last arm
+  because `canvas.toBlob` off the default framebuffer defers the PNG ENCODE but
+  does the GPU READBACK synchronously (67 to 118 ms per portrait unit, 1477 ms
+  of self time across a post-entry ride); on an integrated GPU the fence only
+  says the bytes are READY, and `getBufferSubData` still blocks 28 to 76 ms
+  pulling them across, which is what the transfer arm exists to avoid. The
+  transfer arm claims the rig's ONE default framebuffer from its draw until its
+  snapshot is in hand, so a second capture in that window takes the readback arm
+  rather than drawing over a frame still being copied; its own failure is
+  latched separately (a dead worker must not cost the rig its fence-backed
+  readback too), and a worker that cannot even be CONSTRUCTED costs only the
+  arm, not the capture, which falls to the readback with the draw closure still
+  valid. Which arm each capture took, and every latch, is counted in
+  `gpu_prep_events.ts` (`perfStats().gpuPrep.events.portraits`): a host that
+  silently loses the top arm just gets slower, and nothing else in a capture
+  would say so. The core owns the TWO software conversions that keep
+  the output the same colour toBlob's was: readPixels is bottom-up where
+  ImageData is top-down, and both buffers hold premultiplied colour where a PNG
+  holds straight alpha. The sRGB transfer is NOT one of them, it is done by the
+  GPU: the adapter gives the target texture `renderer.outputColorSpace`, so for
+  an UnsignedByte RGBA texture three allocates SRGB8_ALPHA8
+  (`getInternalFormat`, three 0.185.1) and WebGL2 converts linear to sRGB in
+  hardware as the framebuffer is written, which is why readPixels already hands
+  back encoded bytes. Both halves are load bearing and both are pinned by tests:
+  encoding a second time in software washes every portrait out, and dropping the
+  `texture.colorSpace` assignment makes every portrait dark. The target's buffers are shared
+  by every capture on the rig while the lane dedupes per cache KEY only, so a
+  second concurrent capture takes the synchronous path. That old synchronous
+  path is also the fallback for a context that cannot fence, latched after any
+  async failure (including a readback that fulfils WITHOUT handing back the
+  buffer it was given, which three does when the target has no framebuffer:
+  encoding then would cache the previous portrait's face under this key). The
+  draw MUST happen before the capture promise exists: `runPortraitPrewarm`
+  releases the subject as soon as it holds one. The LIVE
   getters never capture on the calling frame, the composed
   `modularPortraitDataUrl` included: a miss answers null, kicks the async
   capture through the lane, and fires `onPortraitUpdate` when it lands (a
@@ -79,6 +125,13 @@ Sibling families (one line each; extraction targets, never re-grow `visual.ts`):
   without changing weights, matrices, draws, or shader math),
   `skinned_sort_spheres.ts` (static sort spheres so three never brute-forces
   a missing SkinnedMesh bounding sphere), `tinted_material_cache_core.ts`,
+  `material_program_shape_core.ts` (the per-object facts three re-derives a
+  material's program parameters from; its key is a fragment of the tinted
+  cache key, so a mounted material is shared only among meshes three would
+  not re-derive between) with `shadow_depth_materials.ts` (the same split for
+  the shadow pass: one shared MeshDepthMaterial per program shape, mounted as
+  `customDepthMaterial` on alpha-free skinned casters so three's one global
+  depth material stops flipping per caster),
   `visual_pool.ts`/`visual_pool_policy.ts` (own section below).
 - Appearance decals/motion: `stubble.ts` (own section below), `makeup.ts`
   (blush/eyeshadow on the same decal machinery; lipstick is deliberately a

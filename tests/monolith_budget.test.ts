@@ -246,9 +246,37 @@ const MONOLITHS: MonolithRow[] = [
     // ours 13546, farming 13774 (base 13744), so this is +30 against ours
     // and a FALL of 198 against farming's own row; 13546 + (13774 - 13744)
     // composes to the exact merged count. Payback: Phase 16 (the packet's
-    // polish phase), scoped to the merge-attributable growth only. Exact
-    // merged count, zero slack: any further growth reds again.
-    ceiling: 13576,
+    // polish phase), scoped to the merge-attributable growth only.
+    //
+    // The release side of that same history, kept because it is the reason
+    // this row moves again below. Upstream RAISED 13546 -> 13548 (+2) on the
+    // streamed-prewarm branch, and stated it as a raise: it extracts the
+    // compile SUBMIT LOOP with its deadline rule and never-drop contract
+    // (runPrewarmCompileSubmission, src/render/prewarm_compile_submission_core.ts,
+    // beside the per-unit submit that module already owned) and the weapon-skin
+    // resume unit PLAN (weaponVfxPrewarmUnits, src/render/weapon_vfx_prewarm.ts,
+    // beside the stage whose failure boundary shares its unit ids), and those
+    // two extractions still do not quite cover what it adds. That history
+    // matters because it is the failure mode this ratchet exists to catch: an
+    // earlier revision of that branch reported a NET REDUCTION while deleting
+    // 41 lines of load-bearing comments, 11 blank lines and folding three `let`
+    // declarations into one comma statement. Every comment was restored before
+    // it landed, so upstream's +2 is what its extractions alone earn.
+    //
+    // RE-PINNED 13576 -> 13578 at the Phase 11e QA release sync (release tip
+    // fd705304ee, PR #3531's shader-memory probes; prior synced release parent
+    // 2df374a074), under the MONOLITHS header rule for a release sync that
+    // pushes a zero-slack row over. BOTH parent pins for the record: ours
+    // 13576 against a 13576 file, the release 13548 against a 13548 file, and
+    // the base 13546 both descend from. The union composes exactly, which is
+    // why this is a re-pin and not a judgement call: 13546 + 30 (ours, the
+    // farm-visual wiring) + 2 (theirs, the submit-loop residue) = 13578, and
+    // the merged file measures 13578. INHERITED growth, not authored here: the
+    // branch added nothing to renderer.ts in this sync. Per that rule upstream's
+    // code is NOT extracted to buy the two lines back and the ceiling is NOT
+    // raised for headroom. Exact merged count, zero slack: any further growth
+    // reds again.
+    ceiling: 13578,
     seam: 'a new src/render/<thing>.ts module the renderer calls (src/render/CLAUDE.md)',
   },
   {
@@ -347,6 +375,17 @@ const MONOLITHS: MonolithRow[] = [
     file: 'src/sim/colliders.ts',
     ceiling: 2660,
     seam: 'per-zone collider data beside the zone content; shared logic stays here',
+  },
+  {
+    // Newly tracked. It was already larger than several budgeted files and had
+    // no row at all, so it was drifting unwatched: this branch's interior
+    // resource-lifecycle work grew it from 2807 to the count below even after
+    // extracting src/render/interior_resource_lifecycle.ts. Pinned at the exact
+    // current count per the ratchet's rule; any further growth reds, and the
+    // fix is extraction behind the seam named here.
+    file: 'src/render/dungeon.ts',
+    ceiling: 2882,
+    seam: 'a new src/render/<thing>.ts module (src/render/CLAUDE.md)',
   },
 ];
 

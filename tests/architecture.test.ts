@@ -471,8 +471,10 @@ const RENDER_PURE_CORES = [
   'src/render/build_ledger_core.ts',
   'src/render/hitch_frame_align_core.ts',
   'src/render/initial_frame_core.ts',
+  'src/render/characters/portrait_bitmap_transfer_core.ts',
   'src/render/characters/portrait_capture_lane_core.ts',
   'src/render/characters/portrait_prewarm_core.ts',
+  'src/render/characters/portrait_readback_core.ts',
   'src/render/characters/preview_open_gate_core.ts',
   'src/render/characters/soul_rend_prewarm_core.ts',
   'src/render/characters/design_code_core.ts',
@@ -621,6 +623,7 @@ const RENDER_PURE_CORES = [
   'src/render/zone_eviction_core.ts',
   'src/render/zone_prewarm_templates_core.ts',
   'src/render/characters/skeleton_update_core.ts',
+  'src/render/characters/material_program_shape_core.ts',
   'src/render/characters/tinted_material_cache_core.ts',
   'src/render/characters/weapon_attack_style_core.ts',
 ].map((rel) => join(repoRoot, rel));

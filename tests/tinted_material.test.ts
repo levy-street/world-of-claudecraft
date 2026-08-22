@@ -29,9 +29,9 @@ describe('tinted character materials', () => {
     const src = new THREE.MeshStandardMaterial({ name: 'mod_cloth' });
     const rigClaims = new Set<string>();
     const farClaims = new Set<string>();
-    const rig = tintedMaterial(src, 0x336699, 0.5, null, null, 'body', rigClaims);
-    const rigAgain = tintedMaterial(src, 0x336699, 0.5, null, null, 'body', rigClaims, 'rig');
-    const far = tintedMaterial(src, 0x336699, 0.5, null, null, 'body', farClaims, 'far');
+    const rig = tintedMaterial(src, 0x336699, 0.5, null, null, 'body', rigClaims, 'rig', '');
+    const rigAgain = tintedMaterial(src, 0x336699, 0.5, null, null, 'body', rigClaims, 'rig', '');
+    const far = tintedMaterial(src, 0x336699, 0.5, null, null, 'body', farClaims, 'far', '');
     // same inputs: the rig clone is memoized, the far clone is a distinct object...
     expect(rigAgain).toBe(rig);
     expect(far).not.toBe(rig);
@@ -70,8 +70,12 @@ describe('tinted character materials', () => {
       // live uniform handles) and no cache entry (repeat calls keep returning
       // the source itself, never a stored copy).
       expect(shaderMesh.material).toBe(shader);
-      expect(tintedMaterial(shader, 0x336699, 0.4)).toBe(shader);
-      expect(tintedMaterial(shader, 0x336699, 0.4)).toBe(shader);
+      expect(tintedMaterial(shader, 0x336699, 0.4, null, null, 'body', null, 'rig', '')).toBe(
+        shader,
+      );
+      expect(tintedMaterial(shader, 0x336699, 0.4, null, null, 'body', null, 'rig', '')).toBe(
+        shader,
+      );
       // The colored sibling still takes the shared tinted clone.
       expect(coloredMesh.material).not.toBe(colored);
       expect((coloredMesh.material as THREE.MeshStandardMaterial).color.getHex()).not.toBe(

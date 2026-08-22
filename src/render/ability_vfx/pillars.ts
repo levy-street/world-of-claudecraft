@@ -20,12 +20,14 @@ interface PillarSlot {
 export class LightPillars {
   private slots: PillarSlot[] = [];
   private next = 0;
+  private readonly geometry: THREE.CylinderGeometry;
+  private disposed = false;
 
   constructor(scene: THREE.Scene) {
     // Slight taper reads as a beam falling from above; open-ended so the
     // camera never sees a hard cap disc.
-    const geo = new THREE.CylinderGeometry(0.55, 1, 1, 10, 1, true);
-    geo.translate(0, 0.5, 0); // pivot at the base
+    this.geometry = new THREE.CylinderGeometry(0.55, 1, 1, 10, 1, true);
+    this.geometry.translate(0, 0.5, 0); // pivot at the base
     for (let i = 0; i < PILLAR_SLOTS; i++) {
       const mat = new THREE.MeshBasicMaterial({
         color: 0xffffff,
@@ -36,7 +38,7 @@ export class LightPillars {
         side: THREE.DoubleSide,
         toneMapped: false,
       });
-      const mesh = new THREE.Mesh(geo, mat);
+      const mesh = new THREE.Mesh(this.geometry, mat);
       mesh.visible = false;
       mesh.renderOrder = 6;
       mesh.userData.renderCategory = 'vfx';
@@ -54,6 +56,7 @@ export class LightPillars {
     colorHex: number,
     dur: number,
   ): void {
+    if (this.disposed) return;
     const slot = this.slots[this.next];
     this.next = (this.next + 1) % PILLAR_SLOTS;
     slot.active = true;
@@ -68,6 +71,7 @@ export class LightPillars {
   }
 
   update(dt: number): void {
+    if (this.disposed) return;
     for (const slot of this.slots) {
       if (!slot.active) continue;
       slot.age += dt;
@@ -94,5 +98,16 @@ export class LightPillars {
       slot.active = false;
       slot.mesh.visible = false;
     }
+  }
+
+  dispose(): void {
+    if (this.disposed) return;
+    this.disposed = true;
+    this.clear();
+    for (const slot of this.slots) {
+      slot.mesh.removeFromParent();
+      slot.mat.dispose();
+    }
+    this.geometry.dispose();
   }
 }

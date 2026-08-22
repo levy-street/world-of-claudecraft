@@ -139,6 +139,31 @@ export interface GpuPrepGateCounters {
   spiritSpawnsRefused: number;
 }
 
+/**
+ * Which arm each portrait capture took (portrait_snapshot.ts), and how often
+ * the fast one was lost.
+ *
+ * The capture has three arms and picks the cheapest one its host supports, so
+ * a host that quietly loses the top arm just gets slower: the worker chunk
+ * fails to load behind a stale hashed URL or a CSP, the latch trips, and every
+ * later portrait pays the readback arm's main-thread transfer (measured at
+ * 116 ms of blocking per capture on an integrated GPU, against 0). Nothing
+ * else in a capture could say that happened, which is the whole reason these
+ * counts exist.
+ */
+export interface GpuPrepPortraitCounters {
+  /** Captures encoded from a transferred ImageBitmap, on the worker. */
+  transferCaptures: number;
+  /** Captures that fell to the fence-backed render-target readback. */
+  readbackCaptures: number;
+  /** Captures that fell all the way to the synchronous canvas encode. */
+  canvasCaptures: number;
+  /** Times the transfer arm latched off for the rest of a rig's life. */
+  transferLatches: number;
+  /** Times the readback arm latched off for the rest of a rig's life. */
+  readbackLatches: number;
+}
+
 export interface GpuPrepEventsSnapshot {
   /** Events recorded since the last reset, across every kind. */
   total: number;
@@ -149,6 +174,7 @@ export interface GpuPrepEventsSnapshot {
   events: readonly Readonly<GpuPrepEvent>[];
   reveal: Readonly<GpuPrepRevealCounters>;
   gates: Readonly<GpuPrepGateCounters>;
+  portraits: Readonly<GpuPrepPortraitCounters>;
 }
 
 const defaultNow = (): number =>
@@ -195,6 +221,14 @@ const gates: GpuPrepGateCounters = {
   spiritSpawnsRefused: 0,
 };
 
+const portraits: GpuPrepPortraitCounters = {
+  transferCaptures: 0,
+  readbackCaptures: 0,
+  canvasCaptures: 0,
+  transferLatches: 0,
+  readbackLatches: 0,
+};
+
 /** A non-negative finite count, so a caller's bad arithmetic cannot poison a
  *  lifetime total that a capture reads back as truth. */
 const countOf = (value: number | undefined): number =>
@@ -238,6 +272,20 @@ export function noteSpiritSpawnRefused(): void {
   gates.spiritSpawnsRefused++;
 }
 
+/** One portrait capture took `arm` (portrait_snapshot.ts). */
+export function notePortraitCaptureArm(arm: 'transfer' | 'readback' | 'canvas'): void {
+  if (arm === 'transfer') portraits.transferCaptures++;
+  else if (arm === 'readback') portraits.readbackCaptures++;
+  else portraits.canvasCaptures++;
+}
+
+/** One arm latched off for the rest of a rig's life, so every later capture on
+ *  that rig is slower than this host could have been. */
+export function notePortraitArmLatched(arm: 'transfer' | 'readback'): void {
+  if (arm === 'transfer') portraits.transferLatches++;
+  else portraits.readbackLatches++;
+}
+
 export function recordGpuPrepEvent(event: GpuPrepEventInput): void {
   const atMs = clock();
   const ageMs = ageOf(event.ageMs);
@@ -277,6 +325,7 @@ const snapshot: GpuPrepEventsSnapshot & { events: GpuPrepEvent[] } = {
   events: snapshotEvents,
   reveal,
   gates,
+  portraits,
 };
 
 /**
@@ -307,4 +356,9 @@ export function resetGpuPrepEventsForTest(): void {
   reveal.rootsAtWatchdog = 0;
   reveal.imminentHolds = 0;
   gates.spiritSpawnsRefused = 0;
+  portraits.transferCaptures = 0;
+  portraits.readbackCaptures = 0;
+  portraits.canvasCaptures = 0;
+  portraits.transferLatches = 0;
+  portraits.readbackLatches = 0;
 }
