@@ -1,0 +1,193 @@
+name: Xbox MSIX
+
+# Builds the Xbox console package: the UWP/WebView2 shell in xbox/ with a
+# freshly built client packaged inside it. See xbox/README.md for the design
+# and for how to sideload the result onto a dev console.
+#
+# Manual dispatch only, on purpose. The UWP workload plus the .NET Native
+# toolchain make this a slow job, and nothing else in the repository depends on
+# its output, so it costs no runner minutes until someone asks for a package.
+# Point it at a branch from the Actions tab.
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: xbox-msix-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    name: Build MSIX
+    runs-on: windows-2022
+    timeout-minutes: 90
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v6
+
+      - name: Set up pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10.34.5
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: 26
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      # bash, not pwsh: the build:native script uses ${VAR:-default} expansion,
+      # which cmd.exe does not understand and silently mangles.
+      - name: Build the client
+        shell: bash
+        run: pnpm run build:native
+
+      - name: Stage the client inside the package
+        shell: pwsh
+        run: |
+          $dest = 'xbox\WorldOfClaudecraft.Shell\web'
+          if (Test-Path $dest) { Remove-Item $dest -Recurse -Force }
+          New-Item -ItemType Directory -Path $dest | Out-Null
+          Copy-Item 'dist\*' $dest -Recurse -Force
+          $files = Get-ChildItem $dest -Recurse -File
+          $mb = [math]::Round((($files | Measure-Object Length -Sum).Sum / 1MB), 1)
+          Write-Host "client staged: $($files.Count) files, $mb MB"
+          # A package that builds without its client installs and shows nothing,
+          # which is the hardest failure to diagnose from a console.
+          if (-not (Test-Path "$dest\index.html")) { Write-Error 'index.html missing'; exit 1 }
+
+      - name: Add MSBuild to PATH
+        uses: microsoft/setup-msbuild@v2
+
+      # The UWP workload is a separate Visual Studio component. Report it before
+      # the build so a runner image that dropped it is identifiable from one
+      # failed run rather than from a wall of MSBuild target errors.
+      - name: Toolchain diagnostics
+        shell: pwsh
+        run: |
+          $vswhere = "${env:ProgramFiles(x86)}\Microsoft Visual Studio\Installer\vswhere.exe"
+          $ip = & $vswhere -products * -format value -property installationPath | Select-Object -First 1
+          $appx = Join-Path $ip 'MSBuild\Microsoft\VisualStudio\v17.0\AppxPackage'
+          if (Test-Path $appx) { Get-ChildItem $appx | Select-Object -First 8 Name }
+          else { Write-Host "MISSING: $appx  (UWP workload not present on this image)" }
+          msbuild -version
+
+      - name: Restore
+        shell: pwsh
+        run: |
+          msbuild xbox\WorldOfClaudecraft.Shell.sln /t:Restore `
+            /p:Configuration=Release /p:Platform=x64 /v:minimal
+
+      - name: Build MSIX
+        shell: pwsh
+        run: |
+          # StoreAndSideload, not StoreUpload. StoreUpload emits only the
+          # .msixupload, whose sideload sibling REFERENCES its framework
+          # packages without shipping them. Deploying that to a console installs
+          # cleanly and then dies immediately after the splash, because the app
+          # cannot start managed code without Microsoft.NET.Native.Runtime and
+          # has no XAML without Microsoft.UI.Xaml. Sideload mode emits
+          # AppPackages\..._Test\Dependencies\x64\*.appx, which is what a console
+          # actually needs.
+          msbuild xbox\WorldOfClaudecraft.Shell\WorldOfClaudecraft.Shell.csproj `
+            /p:Configuration=Release `
+            /p:Platform=x64 `
+            /p:AppxBundle=Never `
+            /p:AppxBundlePlatforms=x64 `
+            /p:UapAppxPackageBuildMode=StoreAndSideload `
+            /p:AppxPackageSigningEnabled=false `
+            /p:GenerateAppInstallerFile=false `
+            /v:minimal /consoleloggerparameters:Summary 2>&1 | Tee-Object -FilePath build.log
+
+      - name: Fail if .NET Native has no runtime directives
+        shell: pwsh
+        run: |
+          # ILT0027 means ILC compiled with NO runtime directives, which strips
+          # the reflection metadata XAML needs to activate types through COM.
+          # The app then installs, launches, and dies behind the splash. It is
+          # only a WARNING, and an rd.xml registered with the wrong item type is
+          # silently ignored, so assert on the compiler output rather than on
+          # the file existing.
+          $log = Get-Content build.log -Raw -ErrorAction SilentlyContinue
+          if ($log -and $log -match 'ILT0027') {
+            Write-Error 'ILT0027: runtime directives were not picked up'
+            exit 1
+          }
+
+      - name: Verify the sideload dependency set was emitted
+        shell: pwsh
+        run: |
+          $deps = Get-ChildItem -Recurse -Path xbox -Filter *.appx -ErrorAction SilentlyContinue |
+                  Where-Object { $_.FullName -like '*Dependencies*' }
+          if (-not $deps) { Write-Error 'no framework dependencies emitted'; exit 1 }
+          $deps | ForEach-Object { Write-Host ("  {0,12:N0}  {1}" -f $_.Length, $_.Name) }
+
+      - name: Validate package contents
+        shell: pwsh
+        run: |
+          # A package that builds but ships no polyfill installs fine and then
+          # ignores the controller entirely, which is the hardest possible thing
+          # to diagnose from a console. Assert both payloads are really inside.
+          $sdk = Get-ChildItem "${env:ProgramFiles(x86)}\Windows Kits\10\bin" -Directory |
+                 Where-Object { Test-Path (Join-Path $_.FullName 'x64\makeappx.exe') } |
+                 Sort-Object Name -Descending | Select-Object -First 1
+          $makeappx = Join-Path $sdk.FullName 'x64\makeappx.exe'
+
+          $msix = Get-ChildItem -Recurse -Filter *.msix -Path xbox |
+                  Where-Object { $_.FullName -like '*_Test*' } |
+                  Select-Object -First 1
+          if (-not $msix) { Write-Error 'no sideload msix to inspect'; exit 1 }
+
+          $dest = Join-Path $env:RUNNER_TEMP 'unpacked'
+          & $makeappx unpack /p $msix.FullName /d $dest /nv | Out-Null
+          if ($LASTEXITCODE -ne 0) { Write-Error 'unpack failed'; exit 1 }
+
+          foreach ($rel in @('Assets\gamepad-polyfill.js', 'Assets\console-memory-guard.js', 'web\index.html')) {
+            if (-not (Test-Path (Join-Path $dest $rel))) { Write-Error "$rel missing from the package"; exit 1 }
+          }
+          $webCount = (Get-ChildItem (Join-Path $dest 'web') -Recurse -File).Count
+          Write-Host ("packaged client: {0:N0} files" -f $webCount)
+
+          [xml]$m = Get-Content (Join-Path $dest 'AppxManifest.xml')
+          $id = $m.Package.Identity
+          Write-Host ("identity: {0} {1} {2}" -f $id.Name, $id.Version, $id.ProcessorArchitecture)
+          $fams = $m.Package.Dependencies.TargetDeviceFamily | ForEach-Object { $_.Name }
+          Write-Host ("device families: " + ($fams -join ', '))
+          if ($fams -notcontains 'Windows.Xbox') { Write-Error 'Xbox device family missing'; exit 1 }
+
+      - name: Stage each package on its own
+        shell: pwsh
+        run: |
+          # Separate artifacts: each package carries the whole client, so a
+          # combined artifact gets large enough to be awkward to download.
+          New-Item -ItemType Directory -Path out\sideload,out\store -Force | Out-Null
+          $side = Get-ChildItem -Recurse -Path xbox -Filter *.msix |
+                  Where-Object { $_.FullName -like '*_Test*' } | Select-Object -First 1
+          $store = Get-ChildItem -Recurse -Path xbox -Filter *.msixupload | Select-Object -First 1
+          if (-not $side) { Write-Error 'no sideload package'; exit 1 }
+          if (-not $store) { Write-Error 'no store package'; exit 1 }
+          Copy-Item $side.FullName 'out\sideload\WorldOfClaudecraft-Xbox.msix'
+          Copy-Item $store.FullName 'out\store\WorldOfClaudecraft-Xbox.msixupload'
+          Write-Host ("sideload: {0:N0} bytes" -f $side.Length)
+          Write-Host ("store:    {0:N0} bytes" -f $store.Length)
+
+      - name: Upload sideload package
+        uses: actions/upload-artifact@v4
+        with:
+          name: worldofclaudecraft-xbox-sideload
+          path: out/sideload/*.msix
+          if-no-files-found: error
+
+      - name: Upload store package
+        uses: actions/upload-artifact@v4
+        with:
+          name: worldofclaudecraft-xbox-store
+          path: out/store/*.msixupload
+          if-no-files-found: error

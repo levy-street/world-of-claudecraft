@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Identity is a PLACEHOLDER. Anyone publishing this to the Microsoft Store
+     replaces Name and Publisher with the values their own Partner Center
+     product reserves, and signs with the matching certificate. Sideloading to a
+     dev console works with any self-signed cert whose subject equals Publisher
+     (see xbox/README.md).
+
+     ProcessorArchitecture is x64, not neutral: a C# UWP app cannot be neutral.
+     Xbox is x64, so one package covers console and 64-bit desktop.
+
+     Windows.Xbox is listed FIRST but Windows.Universal is listed too: the same
+     package sideloads onto a desktop for iteration when no console is at hand. -->
+<Package
+  xmlns="http://schemas.microsoft.com/appx/manifest/foundation/windows10"
+  xmlns:mp="http://schemas.microsoft.com/appx/2014/phone/manifest"
+  xmlns:uap="http://schemas.microsoft.com/appx/manifest/uap/windows10"
+  IgnorableNamespaces="uap mp">
+
+  <Identity Name="WorldOfClaudecraft.Shell"
+            Publisher="CN=WorldOfClaudecraft"
+            Version="0.1.0.0" />
+
+  <mp:PhoneIdentity PhoneProductId="938bdd02-1323-47a8-a586-f274a79a9800"
+                    PhonePublisherId="00000000-0000-0000-0000-000000000000" />
+
+  <Properties>
+    <DisplayName>World of ClaudeCraft</DisplayName>
+    <PublisherDisplayName>World of ClaudeCraft</PublisherDisplayName>
+    <Description>A browser MMO, playable on the console with a controller.</Description>
+    <Logo>Assets\StoreLogo.png</Logo>
+  </Properties>
+
+  <Dependencies>
+    <TargetDeviceFamily Name="Windows.Xbox" MinVersion="10.0.19041.0" MaxVersionTested="10.0.26200.0" />
+    <TargetDeviceFamily Name="Windows.Universal" MinVersion="10.0.19041.0" MaxVersionTested="10.0.26200.0" />
+  </Dependencies>
+
+  <Resources>
+    <Resource Language="en-US" />
+  </Resources>
+
+  <Applications>
+    <Application Id="App"
+                 Executable="$targetnametoken$.exe"
+                 EntryPoint="WorldOfClaudecraft.Shell.App">
+      <uap:VisualElements
+        DisplayName="World of ClaudeCraft"
+        Square150x150Logo="Assets\Square150x150Logo.png"
+        Square44x44Logo="Assets\Square44x44Logo.png"
+        Description="A browser MMO, playable on the console with a controller."
+        BackgroundColor="#050509">
+        <uap:SplashScreen Image="Assets\SplashScreen.png" BackgroundColor="#050509" />
+      </uap:VisualElements>
+    </Application>
+  </Applications>
+
+  <Capabilities>
+    <!-- Online play. The client itself is packaged, so a session with no
+         network still boots and runs offline. -->
+    <Capability Name="internetClient" />
+  </Capabilities>
+</Package>

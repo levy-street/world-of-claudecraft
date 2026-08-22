@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- .NET Native runtime directives.
+
+     Release builds are compiled ahead of time by .NET Native, which strips
+     reflection metadata for anything it cannot prove is used. XAML activates
+     page and control types THROUGH COM at runtime, so without directives that
+     metadata is gone and activation throws.
+
+     The symptom on a real console is STATUS_STOWED_EXCEPTION (0xC000027B)
+     wrapping HRESULT 0x80131515 raised inside combase.dll and surfaced through
+     Windows.UI.Xaml.dll: the app starts, gets a PID, and dies behind the splash.
+
+     In a UWP csproj this file must be registered as
+     `<Content Include="Properties\Default.rd.xml" />`. Both `<None>` and
+     `<RdXmlFile>` are silently ignored, and building with no directives at all
+     is only warning ILT0027, never an error, so the workflow greps for that
+     warning rather than trusting the file to be picked up.
+
+     "Required All" keeps every member of the application assembly reflectable.
+     It costs package size, and it is the standard template default. -->
+<Directives xmlns="http://schemas.microsoft.com/netfx/2013/01/metadata">
+  <Application>
+    <Assembly Name="*Application*" Dynamic="Required All" />
+  </Application>
+</Directives>

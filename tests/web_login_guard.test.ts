@@ -5,6 +5,7 @@ import {
   isDesktopAppRequest,
   isNativeAppRequest,
   isWebClientRequest,
+  isXboxAppRequest,
   webLoginEnforced,
 } from '../server/web_login_guard';
 
@@ -56,6 +57,30 @@ describe('web login guard (anti-bot)', () => {
     expect(
       isWebClientRequest(req({ origin: 'https://localhost', host: 'worldofclaudecraft.com' })),
     ).toBe(true);
+  });
+
+  it('accepts the packaged Xbox shell origin as its own client class', () => {
+    // The console shell (xbox/) serves its packaged client from this WebView2
+    // virtual host, so every API call it makes carries this Origin. Without it
+    // no sign-in method works on console at all.
+    expect(
+      isWebClientRequest(req({ origin: 'https://app.local', host: 'worldofclaudecraft.com' })),
+    ).toBe(true);
+    expect(isXboxAppRequest(req({ origin: 'https://app.local' }))).toBe(true);
+    expect(allowedCorsOrigin('https://app.local')).toBe('https://app.local');
+
+    // It must NOT be a native-app origin. That set means "proves itself with a
+    // platform attestation", which the console shell cannot do, and it also
+    // gates the Seeker entitlement and daily-reward paths.
+    expect(isNativeAppRequest(req({ origin: 'https://app.local' }))).toBe(false);
+    expect(isDesktopAppRequest(req({ origin: 'https://app.local' }))).toBe(false);
+
+    // Exact match only: no look-alike, scheme, or path variant inherits it.
+    for (const origin of ['http://app.local', 'https://app.local.evil.invalid', 'https://app.lo']) {
+      expect(isXboxAppRequest(req({ origin }))).toBe(false);
+      expect(allowedCorsOrigin(origin)).toBeNull();
+    }
+    expect(isXboxAppRequest(req({}))).toBe(false);
   });
 
   it('identifies native app origins for Turnstile bypass', () => {
