@@ -1465,8 +1465,18 @@ export const LADDER_RECIPES: ProfessionRecipeRecord[] = [
     professionId: 'alchemy',
     resultItemId: 'elixir_of_the_boar',
     resultCount: 1,
+    // THE PROVISIONING SUPPLY LINE, alchemy rung 0. The elixir line is the
+    // hearty stamina line, so a farm base belongs in it, and after this phase
+    // the two professions supply each other: alchemy already brews farming's
+    // growth tonic from wild Sheenleaf (farming D7), and now farming feeds the
+    // elixirs back. The herb count is untouched, which is the whole point of
+    // masterwrought R18: herbalism loses nothing here.
+    // vale_wheat rather than brook_carrot for the same economy-basis reason as
+    // the rung-0 skewer: the carrot's D9 buyValue of 16 would make it worth
+    // more than this row's largest reagent (venom_gland at 12).
     reagents: [
       { itemId: 'venom_gland', count: 2 },
+      { itemId: 'vale_wheat', count: 1 },
       { itemId: 'silverleaf_herb', count: 2 },
       { itemId: 'glass_vial', count: 1 },
     ],
@@ -1512,8 +1522,12 @@ export const LADDER_RECIPES: ProfessionRecipeRecord[] = [
     professionId: 'alchemy',
     resultItemId: 'venomfire_elixir',
     resultCount: 1,
+    // THE PROVISIONING SUPPLY LINE, alchemy rung 25: the root base, at tier 2,
+    // which gates at farming 25 and lands exactly on this row. The gland count
+    // and the herb count are both untouched.
     reagents: [
       { itemId: 'venom_gland', count: 3 },
+      { itemId: 'bog_beet', count: 2 },
       { itemId: 'goldleaf_herb', count: 1 },
       { itemId: 'glass_vial', count: 1 },
     ],
@@ -1560,9 +1574,15 @@ export const LADDER_RECIPES: ProfessionRecipeRecord[] = [
     professionId: 'alchemy',
     resultItemId: 'elixir_of_the_serpent',
     resultCount: 2,
+    // THE PROVISIONING SUPPLY LINE, alchemy rung 50, and masterwrought DECISION
+    // B on the alchemy side: TIER 3 produce, gating at farming 50, on the row
+    // that unlocks at alchemy 50. ONE gourd, not the two the plan defaulted to,
+    // because this row's largest non-produce count is venom_gland at 2 and a
+    // crop must stay strictly under it. Neither herb nor gland count moved.
     reagents: [
       { itemId: 'pristine_venom_gland', count: 1 },
       { itemId: 'venom_gland', count: 2 },
+      { itemId: 'frost_gourd', count: 1 },
       { itemId: 'sunpetal_herb', count: 1 },
       { itemId: 'glass_vial', count: 1 },
     ],
