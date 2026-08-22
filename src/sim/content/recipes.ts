@@ -2769,12 +2769,24 @@ export const HOE_RECIPES: ProfessionRecipeRecord[] = [
 // every recipe surface (recipeList, the trainer, the crafting window, the
 // guide) picks these up with no further wiring.
 //
-// SHAPE: trainer-taught at whichever station the row's own craft serves (the
-// dishes at the kitchens under cook_marlow, the tonic at the apothecary under
+// SHAPE: taught at whichever station the row's own craft serves (the dishes at
+// the kitchens under cook_marlow, the tonic at the apothecary under
 // alchemist_verane), with no content edit either side, the post-freeze
 // authoring default: a trainer's list derives from the crafts its station
-// serves. Every row follows the ladder's cross-craft scaffolding convention
-// (skillReq 0 -> 10/10, 25 -> 16/15, 50 -> 20/20). The PLAIN dish outputs are
+// serves.
+//
+// TWO CHANNELS, SPLIT BY RUNG, and the split is a RULE rather than a per-row
+// choice (masterwrought Phase 11f, ruling 11f-GATE-B): every row at
+// FARM_DROP_RUNG_FLOOR or above is acquisition ['drop'], taught by a pattern
+// item off the raid, the heroic five-mans, the rift, or the Heroic
+// Quartermaster; every row below it stays ['trainer']. That is what keeps a
+// new farmer's on-ramp intact (the whole rung-0 band, the growth tonic
+// included, is still walk-up-and-learn) while farming's endgame reaches
+// players the way every other endgame recipe in the game does. Derive the
+// split from the rung, never from a row list, or it drifts row by row.
+// Every row follows the ladder's cross-craft scaffolding convention
+// (skillReq 0 -> 10/10, 25 -> 16/15, 50 -> 20/20, 75 -> 20/20,
+// 100 -> 25/25); no farm row reaches 125. The PLAIN dish outputs are
 // plain kind 'food' + foodHp ItemDefs in content/profession_items.ts with no
 // buff machinery; the four Phase 11 buff dishes add exactly the one `wellFed`
 // field (see their block below). The tonic's output is the kind 'junk' item
@@ -2801,12 +2813,28 @@ export const HOE_RECIPES: ProfessionRecipeRecord[] = [
 // the recipe-economy unitValue basis (buyValue when one exists, else
 // sellValue); on a raw sellValue basis the beet braise is exactly break-even,
 // which converts produce without minting copper and is the intended shape.
-// TRAINABLE FROM THE START, deliberately (deviation (aj)): the binding
-// Live-surface note wanted these visible in the crafting window before the
-// farm opened, and trainer acquisition is the only path there, so the rows
-// were trainable ahead of the go-live and stay so (free at rung 0, the
-// settled R8 fee curve's tier-0 point, and fee-charging at rungs 25/50;
-// pinned in tests/farm_recipes.test.ts).
+// DEVIATION (aj) IS DISCHARGED, both halves, and it is worth stating why
+// rather than deleting the paragraph. The deviation recorded that every farm
+// row shipped TRAINABLE before go-live so the crafting window could list them
+// while the farm was dormant, and its Phase 6 QA addendum recorded the FEE
+// half as a ruling owed: the rung-25 and rung-50 rows charged 2500 and 10000
+// copper for recipes nobody could yet cook. Both halves are gone now, from
+// opposite directions. Phase 11e stocked all eight upper seeds, so no farm row
+// is reagent-dormant any more, which retires the addendum's premise for the
+// held bannock (still trainer-taught at rung 50, still 10000, but now for a
+// dish a player can actually cook). And every OTHER formerly dormant row is at
+// FARM_DROP_RUNG_FLOOR or above under the channel rule above, so it is not
+// trainer-taught at all and charges no fee, in advance or otherwise. What
+// remains trainer-taught is the rung 0 to 50 on-ramp, free at rung 0 on the
+// settled R8 fee curve's tier-0 point and fee-charging at 25 and 50; pinned in
+// tests/farm_recipes.test.ts.
+
+/** The rung at which a farm recipe stops being trainer homework and becomes a
+ *  drop (masterwrought ruling 11f-GATE-B). Exported so the channel assertions
+ *  derive the split from the rung the way FARM_RECIPES does, instead of
+ *  restating a row list that goes stale the first time a row moves. */
+export const FARM_DROP_RUNG_FLOOR = 75;
+
 export const FARM_RECIPES: ProfessionRecipeRecord[] = [
   {
     id: 'recipe_vale_hearth_loaf',
@@ -2917,6 +2945,14 @@ export const FARM_RECIPES: ProfessionRecipeRecord[] = [
     // Frost gourd simmered to a soup, the fine pick carrying the sweetness
     // the base gourds lack. The tier-3 fine-twin slot. Input 323 vs output 75
     // (173 before the Phase 11e widening added frost_lentils x2 + its fine twin).
+    //
+    // RUNG 75, A DROP (Phase 11f, rulings 11f-GATE-A and 11f-GATE-B). The
+    // tier-3 dishes climb off the flat rung-50 band onto cooking's real
+    // upper ladder, and the channel follows the rung: at or above
+    // FARM_DROP_RUNG_FLOOR this is taught by pattern_highwatch_gourd_soup,
+    // which rides the heroic five-mans and the Heroic Quartermaster. Only
+    // the rung and the channel moved: reagents, resultCount, station and
+    // output power are 11c's and are untouched.
     reagents: [
       { itemId: 'frost_gourd', count: 3 },
       { itemId: 'fine_frost_gourd', count: 1 },
@@ -2924,10 +2960,10 @@ export const FARM_RECIPES: ProfessionRecipeRecord[] = [
       { itemId: 'fine_frost_lentils', count: 1 },
       { itemId: 'cooking_salt', count: 1 },
     ],
-    skillReq: 50,
+    skillReq: 75,
     itemLevelBudget: 20,
     level: 20,
-    acquisition: ['trainer'],
+    acquisition: ['drop'],
     stationType: 'kitchens',
   },
   {
@@ -2939,6 +2975,13 @@ export const FARM_RECIPES: ProfessionRecipeRecord[] = [
     // wheat crust, so the tier-1 crop still has a buyer at the tier-4 table.
     // The tier-4 fine-twin slot. Input 848 vs output 150 (448 before the Phase
     // 11e widening added gilded_yam x2 + its fine twin).
+    //
+    // RUNG 100, A DROP (Phase 11f, rulings 11f-GATE-A and 11f-GATE-B). The
+    // tier-4 dishes take cooking's top farm rung; nothing farming owns
+    // reaches 125, which is 11k's apex-feast band. Taught by
+    // pattern_evergarden_sunmelon_tart off the rift and the Heroic
+    // Quartermaster. Rung and channel only: 11c owns the power and it did
+    // not move.
     reagents: [
       { itemId: 'gilded_sunmelon', count: 3 },
       { itemId: 'fine_gilded_sunmelon', count: 1 },
@@ -2946,10 +2989,10 @@ export const FARM_RECIPES: ProfessionRecipeRecord[] = [
       { itemId: 'fine_gilded_yam', count: 1 },
       { itemId: 'vale_wheat', count: 2 },
     ],
-    skillReq: 50,
-    itemLevelBudget: 20,
-    level: 20,
-    acquisition: ['trainer'],
+    skillReq: 100,
+    itemLevelBudget: 25,
+    level: 25,
+    acquisition: ['drop'],
     stationType: 'kitchens',
   },
   {
@@ -2960,6 +3003,10 @@ export const FARM_RECIPES: ProfessionRecipeRecord[] = [
     // The capstone plate, dressed greens off the Evergarden beds. The last
     // fine-twin slot, closing the Phase 5 deferral. Input 856 vs output 150
     // (456 before the Phase 11e widening added evergarden_pumpkin x2 + its twin).
+    //
+    // RUNG 100, A DROP (Phase 11f), on the tier-4 band with its sibling
+    // above. Taught by pattern_evergarden_harvest_platter off the rift and
+    // the Heroic Quartermaster.
     reagents: [
       { itemId: 'evergarden_greens', count: 3 },
       { itemId: 'fine_evergarden_greens', count: 1 },
@@ -2967,10 +3014,10 @@ export const FARM_RECIPES: ProfessionRecipeRecord[] = [
       { itemId: 'fine_evergarden_pumpkin', count: 1 },
       { itemId: 'cooking_salt', count: 2 },
     ],
-    skillReq: 50,
-    itemLevelBudget: 20,
-    level: 20,
-    acquisition: ['trainer'],
+    skillReq: 100,
+    itemLevelBudget: 25,
+    level: 25,
+    acquisition: ['drop'],
     stationType: 'kitchens',
   },
   // --- Phase 11 buff dishes (well-fed food) --------------------------------
@@ -3042,14 +3089,18 @@ export const FARM_RECIPES: ProfessionRecipeRecord[] = [
     // (bo) while highland_barley had no seed faucet; GATE 1 (Phase 11e) stocked
     // that seed at farmer_hollis, so this row is completable today.
     // Input 68 vs output 60.
+    //
+    // RUNG 75, A DROP (Phase 11f), the tier-3 band with the gourd soup.
+    // Taught by pattern_highwatch_barley_porridge off the heroic five-mans
+    // and the Heroic Quartermaster.
     reagents: [
       { itemId: 'highland_barley', count: 4 },
       { itemId: 'cooking_salt', count: 1 },
     ],
-    skillReq: 50,
+    skillReq: 75,
     itemLevelBudget: 20,
     level: 20,
-    acquisition: ['trainer'],
+    acquisition: ['drop'],
     stationType: 'kitchens',
   },
   {
@@ -3061,14 +3112,19 @@ export const FARM_RECIPES: ProfessionRecipeRecord[] = [
     // while evergarden_greens had no seed faucet; GATE 1 (Phase 11e) stocked
     // that seed at farmer_verbena, so this row is completable today.
     // Input 168 vs output 150.
+    //
+    // RUNG 100, A DROP (Phase 11f), the tier-4 band. Taught by
+    // pattern_evergarden_braised_greens off the rift and the Heroic
+    // Quartermaster. Note the feast below serves THIS dish, so the two rows
+    // climb together and a feast host still has a plate to serve.
     reagents: [
       { itemId: 'evergarden_greens', count: 4 },
       { itemId: 'cooking_salt', count: 1 },
     ],
-    skillReq: 50,
-    itemLevelBudget: 20,
-    level: 20,
-    acquisition: ['trainer'],
+    skillReq: 100,
+    itemLevelBudget: 25,
+    level: 25,
+    acquisition: ['drop'],
     stationType: 'kitchens',
   },
   {
@@ -3097,15 +3153,24 @@ export const FARM_RECIPES: ProfessionRecipeRecord[] = [
     //
     // FLAGGED FOR THE MAINTAINER: the reagent counts (4 + 4 + 2) and the
     // 250 output sellValue are proposed tuning, like every farming constant.
+    //
+    // RUNG 100, A DROP (Phase 11f), and the rung is the ruled one: NOT 125.
+    // At 125 the party feast would collide with 11k's apex feasts and
+    // falsify their "the party-tier rung below" premise, so the feast ladder
+    // is a real two-rung climb instead (this at cooking 100, the raid feasts
+    // at 125), and NO second cooking-125 capstone exception is taken. This is
+    // the farm ladder's pinnacle, so its pattern rides the pinnacle
+    // encounter: pattern_harvest_feast drops from Nythraxis and is also on
+    // the Heroic Quartermaster.
     reagents: [
       { itemId: 'evergarden_greens', count: 4 },
       { itemId: 'gilded_sunmelon', count: 4 },
       { itemId: 'cooking_salt', count: 2 },
     ],
-    skillReq: 50,
-    itemLevelBudget: 20,
-    level: 20,
-    acquisition: ['trainer'],
+    skillReq: 100,
+    itemLevelBudget: 25,
+    level: 25,
+    acquisition: ['drop'],
     stationType: 'kitchens',
   },
   // --- alchemy -------------------------------------------------------------

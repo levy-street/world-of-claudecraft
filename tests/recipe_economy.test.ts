@@ -17,6 +17,7 @@ import {
 import {
   ALL_RECIPES,
   COMBO_RECIPES,
+  FARM_DROP_RUNG_FLOOR,
   FARM_RECIPES,
   HOE_RECIPES,
   INSCRIPTION_RECIPES,
@@ -292,9 +293,19 @@ describe('REFERENTIAL INTEGRITY', () => {
     // 'trainer', and so do the two crafted rods, the two tool-effect
     // charms, the nine jewelcrafting catalog recipes, the six inscription
     // catalog recipes, the ten Masterwrought phase 07 intermediates, the
-    // three crafted hoes, and the farm-economy set: the pre-training id
-    // list is frozen, so anything authored after that switch has to be
-    // learned.
+    // three crafted hoes, and the farm-economy set's ON-RAMP: the
+    // pre-training id list is frozen, so anything authored after that switch
+    // has to be learned.
+    //
+    // THE FARM TERM IS DERIVED FROM THE RUNG, not from FARM_RECIPES.length and
+    // not from the acquisition field (masterwrought Phase 11f): the set is
+    // split across two channels now, every row below FARM_DROP_RUNG_FLOOR
+    // trainer-taught and every row at or above it a drop. Reading the term off
+    // skillReq keeps the arm's teeth, because a farm row that silently lost
+    // 'trainer' while staying on its rung would drop the LEFT side alone and
+    // red; a term derived from `acquisition` would move both sides together
+    // and pass over the regression.
+    const farmTrainerRows = FARM_RECIPES.filter((r) => r.skillReq < FARM_DROP_RUNG_FLOOR).length;
     expect(trainerRecipes).toBe(
       LADDER_RECIPES.length +
         COMBO_RECIPES.length +
@@ -304,8 +315,15 @@ describe('REFERENTIAL INTEGRITY', () => {
         INSCRIPTION_RECIPES.length +
         INTERMEDIATE_RECIPES.length +
         HOE_RECIPES.length +
-        FARM_RECIPES.length,
+        farmTrainerRows,
     );
+    // The sibling literal for the derived term, same reason every other term
+    // has one: without it, a farm row deleted outright would shrink both sides
+    // of the equality by one and the arm would pass over a smaller world.
+    // Predicted then observed at the Phase 11f rung climb: 8 of the 14 rows
+    // sit below the floor (four at rung 0, three at 25, the held bannock at
+    // 50), and the other 6 are drops.
+    expect(farmTrainerRows, 'the farm on-ramp is eight rows').toBe(8);
     // COMBO and LADDER get the same sibling treatment as the rest (Phase 11d QA):
     // without a literal beside them, losing one combo row drops BOTH sides of the
     // equality by one and the sum stays balanced, so the arm passes over a
@@ -321,9 +339,12 @@ describe('REFERENTIAL INTEGRITY', () => {
     expect(HOE_RECIPES).toHaveLength(3);
     // The economy-hooks phase's eight farm dishes, the four Phase 11 well-fed
     // buff dishes, the growth tonic's alchemy row, and the Phase 12 shared
-    // feast (a trainer cooking row with a placeable junk output). Deliberately
+    // feast (a cooking row with a placeable junk output). Deliberately
     // re-pinned here (9 -> 13 -> 14), beside its siblings, so the trainer sum
-    // above can never absorb a silent addition to the farm set.
+    // above can never absorb a silent addition to the farm set. The COUNT did
+    // not move at the Phase 11f rung climb, which re-tiered and re-channelled
+    // rows and minted no new id; what moved is that only 8 of the 14 feed the
+    // trainer term above.
     expect(FARM_RECIPES).toHaveLength(14);
   });
 

@@ -33,7 +33,7 @@
 import { describe, expect, it } from 'vitest';
 import { FARM_CROPS } from '../src/sim/content/farm_crops';
 import { STATIONS } from '../src/sim/content/professions';
-import { FARM_RECIPES, LADDER_RECIPES } from '../src/sim/content/recipes';
+import { FARM_DROP_RUNG_FLOOR, FARM_RECIPES, LADDER_RECIPES } from '../src/sim/content/recipes';
 // ITEMS and ALL_RECIPES from data (the merged view the sim, the trainer, the
 // crafting window and the guide all read), not from content: a row authored in
 // content but never joined into the merged table would be unreachable in play,
@@ -53,15 +53,43 @@ const FEAST_ID = 'recipe_harvest_feast';
 const dishes = FARM_RECIPES.filter((r) => r.professionId === 'cooking' && r.id !== FEAST_ID);
 
 // The rung scaffolding convention, shared with every other ladder in
-// content/recipes.ts: skillReq -> [itemLevelBudget, level].
+// content/recipes.ts: skillReq -> [itemLevelBudget, level]. The 75 and 100
+// entries are the SHIPPED points those rungs already carry elsewhere in
+// ALL_RECIPES (the intermediates and the crafted hoes at 75, the apex
+// consumables at 100), reused by Phase 11f's rung climb rather than minted:
+// the derivation is asserted below, not just asserted here.
 const SCAFFOLDING_BY_RUNG: Record<number, [number, number]> = {
   0: [10, 10],
   25: [16, 15],
   50: [20, 20],
+  75: [20, 20],
+  100: [25, 25],
 };
 
 // Output quality is decided by the rung, never authored per dish.
-const QUALITY_BY_RUNG: Record<number, string> = { 0: 'common', 25: 'uncommon', 50: 'rare' };
+//
+// 75 AND 100 BOTH READ 'rare', and that is MEASURED off the shipped defs, not
+// assigned. Phase 11f moved six rows up two bands and changed NO magnitude,
+// aura, charge or quality (11c owns those and R5 is measured against them), so
+// the six arrive on their new rungs carrying the quality they already had.
+// Predicted before the climb and observed after: every one of the six is
+// 'rare'. That makes the farm ladder's top two bands read a lower quality than
+// masterwrought's rung-100 apex consumables, which is correct and recorded
+// rather than fixed: farming's dishes are not apex-flagged and the climb is
+// about ACCESS and ladder shape, never power. The two arms below stop this
+// literal from being the only thing holding the rule up.
+const QUALITY_BY_RUNG: Record<number, string> = {
+  0: 'common',
+  25: 'uncommon',
+  50: 'rare',
+  75: 'rare',
+  100: 'rare',
+};
+
+// The rungs Phase 11f's band-completeness pin expects, and the ladder's own
+// quality order for the monotonicity arm below.
+const EXPECTED_BAND_COUNTS: Record<number, number> = { 0: 4, 25: 3, 50: 1, 75: 2, 100: 4 };
+const QUALITY_ORDER = ['poor', 'common', 'uncommon', 'rare', 'epic', 'legendary'];
 
 // The points the shipped food curve already carries (content/profession_items.ts
 // crafted cooking ladder plus the vendor foods): [foodHp, sellValue]. 980 is
@@ -184,13 +212,26 @@ describe('FARM_RECIPES: the farm-economy hook set', () => {
     expect(ALL_RECIPES.length).toBeGreaterThan(FARM_RECIPES.length);
   });
 
-  it('every dish has the fixed shape (id, trainer, kitchens, single output)', () => {
+  it('every dish has the fixed shape (id, rung-derived channel, kitchens, single output)', () => {
     for (const dish of dishes) {
       expect(dish.id, `${dish.resultItemId} recipe id`).toBe(`recipe_${dish.resultItemId}`);
-      expect(dish.acquisition, `${dish.id} acquisition`).toEqual(['trainer']);
+      // THE CHANNEL IS DERIVED FROM THE RUNG, never listed per row (ruling
+      // 11f-GATE-B). Written this way so a future row cannot land on the
+      // wrong channel silently: the expectation is the RULE, and a row that
+      // climbs past the floor without flipping (or flips without climbing)
+      // reds here rather than needing someone to remember to edit a list.
+      expect(dish.acquisition, `${dish.id} acquisition at rung ${dish.skillReq}`).toEqual(
+        dish.skillReq >= FARM_DROP_RUNG_FLOOR ? ['drop'] : ['trainer'],
+      );
       expect(dish.stationType, `${dish.id} stationType`).toBe('kitchens');
       expect(dish.resultCount, `${dish.id} resultCount`).toBe(1);
     }
+    // Non-vacuity: the rule is exercised on BOTH sides. A set that drifted
+    // entirely onto one channel would still satisfy the loop above while
+    // proving nothing about the boundary that does the work.
+    const flipped = dishes.filter((d) => d.skillReq >= FARM_DROP_RUNG_FLOOR);
+    expect(flipped.length, 'dishes at or above the drop floor').toBeGreaterThan(0);
+    expect(dishes.length - flipped.length, 'dishes below the drop floor').toBeGreaterThan(0);
   });
 
   it('every dish sits on a real rung with the shared scaffolding values', () => {
@@ -198,7 +239,8 @@ describe('FARM_RECIPES: the farm-economy hook set', () => {
       const scaffolding = SCAFFOLDING_BY_RUNG[dish.skillReq];
       expect(
         scaffolding,
-        `${dish.id}: skillReq ${dish.skillReq} is not a rung (0, 25, 50)`,
+        `${dish.id}: skillReq ${dish.skillReq} is not a rung ` +
+          `(${Object.keys(SCAFFOLDING_BY_RUNG).join(', ')})`,
       ).toBeDefined();
       const [budget, level] = scaffolding;
       expect(dish.itemLevelBudget, `${dish.id} itemLevelBudget for rung ${dish.skillReq}`).toBe(
@@ -207,8 +249,94 @@ describe('FARM_RECIPES: the farm-economy hook set', () => {
       expect(dish.level, `${dish.id} level for rung ${dish.skillReq}`).toBe(level);
     }
     // Non-vacuity: the set really spans more than one rung, so the mapping
-    // above is exercised at more than a single key.
-    expect(new Set(dishes.map((d) => d.skillReq)).size).toBeGreaterThan(1);
+    // above is exercised at more than a single key. Widened by Phase 11f from
+    // three rungs to five, since the ladder it climbed onto is what makes the
+    // mapping worth having.
+    expect(new Set(dishes.map((d) => d.skillReq)).size).toBeGreaterThan(3);
+  });
+
+  it('reuses SHIPPED scaffolding tuples: the farm ladder mints no new rung point', () => {
+    // The rule Phase 11f had to obey when it moved rows onto 75 and 100:
+    // reuse the point the rung already carries somewhere in ALL_RECIPES,
+    // never author a new one. Derived from the merged table with the farm
+    // rows themselves EXCLUDED, so a farm row cannot be its own witness.
+    const nonFarmIds = new Set(FARM_RECIPES.map((r) => r.id));
+    for (const rung of Object.keys(SCAFFOLDING_BY_RUNG).map(Number)) {
+      const [budget, level] = SCAFFOLDING_BY_RUNG[rung];
+      const witnesses = ALL_RECIPES.filter(
+        (r) =>
+          !nonFarmIds.has(r.id) &&
+          r.skillReq === rung &&
+          r.itemLevelBudget === budget &&
+          r.level === level,
+      );
+      expect(
+        witnesses.length,
+        `rung ${rung} -> [${budget}, ${level}] must already ship on a NON-farm recipe`,
+      ).toBeGreaterThan(0);
+    }
+  });
+
+  it('is band-complete from 0 through 100: the exact map, and no band may empty', () => {
+    // ARM (i), the exact derived map, predicted then observed (ruling
+    // 11f-GATE-A): 0:4, 25:3, 50:1, 75:2, 100:4, with nothing at 125. Run
+    // over the WHOLE fourteen-row list, the tonic and the feast included,
+    // because the band claim is about the farm ladder, not about the dish
+    // filter.
+    const byBand: Record<number, number> = {};
+    for (const row of FARM_RECIPES) byBand[row.skillReq] = (byBand[row.skillReq] ?? 0) + 1;
+    expect(byBand).toEqual(EXPECTED_BAND_COUNTS);
+    expect(
+      Object.values(byBand).reduce((a, b) => a + b, 0),
+      'the band map must account for every farm row',
+    ).toBe(FARM_RECIPES.length);
+    expect(
+      byBand[125],
+      'nothing farming owns reaches cooking 125 (11k owns that band)',
+    ).toBeUndefined();
+
+    // ARM (ii), farming's half of masterwrought R20: every 25-point band from
+    // 0 THROUGH 100 is non-empty. This is the arm that must keep biting if a
+    // later phase adds a row at 125 and the exact map above legitimately
+    // moves: emptying a band reds immediately either way.
+    for (let rung = 0; rung <= 100; rung += 25) {
+      expect(
+        FARM_RECIPES.filter((r) => r.skillReq === rung).length,
+        `band ${rung} is empty: the farm ladder must stay band-complete from 0 through 100`,
+      ).toBeGreaterThan(0);
+    }
+  });
+
+  it('output quality is one value per band and never falls as the ladder climbs', () => {
+    // The two arms that stop QUALITY_BY_RUNG from being a bare literal. The
+    // uniformity arm says the band really decides the quality (one value per
+    // rung), and the monotone arm says the ladder never grades DOWN as it
+    // climbs, which is the property recipe rarity is pinned to across the
+    // whole catalog. Together they are why the 'rare' at 75 and 100 reads as
+    // measured rather than asserted.
+    const byBand = new Map<number, Set<string>>();
+    for (const row of FARM_RECIPES) {
+      const quality = ITEMS[row.resultItemId]?.quality as string;
+      expect(quality, `${row.resultItemId} has no quality`).toBeDefined();
+      const seen = byBand.get(row.skillReq) ?? new Set<string>();
+      seen.add(quality);
+      byBand.set(row.skillReq, seen);
+    }
+    for (const [rung, seen] of byBand) {
+      expect([...seen], `rung ${rung} must carry exactly one output quality`).toHaveLength(1);
+      expect([...seen][0], `rung ${rung} output quality`).toBe(QUALITY_BY_RUNG[rung]);
+    }
+    const rungs = [...byBand.keys()].sort((a, b) => a - b);
+    expect(
+      rungs.length,
+      'the monotone arm needs more than one band to be worth running',
+    ).toBeGreaterThan(1);
+    for (let i = 1; i < rungs.length; i++) {
+      expect(
+        QUALITY_ORDER.indexOf(QUALITY_BY_RUNG[rungs[i]]),
+        `rung ${rungs[i]} grades below rung ${rungs[i - 1]}`,
+      ).toBeGreaterThanOrEqual(QUALITY_ORDER.indexOf(QUALITY_BY_RUNG[rungs[i - 1]]));
+    }
   });
 
   it('every dish output is food: kind, foodHp, no vendor price, rung quality', () => {
@@ -561,14 +689,23 @@ describe('FARM_RECIPES: the shared feast, the Phase 12 placeable cooking row', (
     ).not.toContain(FEAST_ID);
   });
 
-  it('shares the dish scaffolding: kitchens, trainer, rung 50, one feast per craft', () => {
+  it('shares the dish scaffolding: kitchens, a drop, rung 100, one feast per craft', () => {
     const feast = requireFeast();
     expect(feast.professionId, `${FEAST_ID} professionId`).toBe('cooking');
     expect(feast.stationType, `${FEAST_ID} stationType`).toBe('kitchens');
-    expect(feast.acquisition, `${FEAST_ID} acquisition`).toEqual(['trainer']);
+    // Rung 100 and therefore a drop, by the same rule every dish obeys.
+    expect(feast.acquisition, `${FEAST_ID} acquisition at rung ${feast.skillReq}`).toEqual(
+      feast.skillReq >= FARM_DROP_RUNG_FLOOR ? ['drop'] : ['trainer'],
+    );
     expect(feast.resultItemId, `${FEAST_ID} resultItemId`).toBe(FEAST_ITEM_ID);
     expect(feast.resultCount, `${FEAST_ID} resultCount`).toBe(1);
-    expect(feast.skillReq, 'the feast is capstone content on the rung-50 band').toBe(50);
+    // Phase 11f moved the feast off the flat rung-50 band to cooking 100, and
+    // 100 rather than 125 is the ruled placement (11f-GATE-A): at 125 it would
+    // collide with 11k's apex feasts and falsify their "the party-tier rung
+    // below" premise, so the feast ladder climbs 100 -> 125 instead. No second
+    // cooking-125 capstone exception was recorded anywhere.
+    expect(feast.skillReq, 'the party feast is capstone content on the rung-100 band').toBe(100);
+    expect(feast.skillReq, 'no farm row reaches cooking 125').toBeLessThan(125);
     const [budget, level] = SCAFFOLDING_BY_RUNG[feast.skillReq];
     expect(feast.itemLevelBudget, `${FEAST_ID} itemLevelBudget for rung 50`).toBe(budget);
     expect(feast.level, `${FEAST_ID} level for rung 50`).toBe(level);
@@ -894,15 +1031,18 @@ describe('FARM_RECIPES: a dish crafts for real, and fine twins never substitute 
   });
 });
 
-describe('FARM_RECIPES: trainable at the stations on the settled R8 fee curve', () => {
-  // Deviation (aj), now historical: the rows were trainable AND fee-charging
-  // from Phase 6 on (the Live-surface note wanted them visible in the crafting
-  // window ahead of the go-live, and trainer acquisition is the only path
-  // there); the farm opened in Phase 9 and the ruling stands unchanged. This
-  // arm pins the acquisition shape so a future availability gate cannot land
-  // silently: if training is ever gated by farming skill or the intro quest,
-  // THIS test is the one that reds and names the decision to revisit.
-  it('rung-0 rows train free and the rung-25/50 dishes charge, all resolving ok at their stations', () => {
+describe('FARM_RECIPES: the trainer on-ramp on the settled R8 fee curve', () => {
+  // Deviation (aj) is DISCHARGED by Phase 11f and this describe is what proves
+  // both halves. The deviation recorded that every farm row shipped trainable
+  // before the farm opened; its Phase 6 QA addendum recorded the FEE half as a
+  // ruling owed, since the rung-25 and rung-50 rows charged 2500 and 10000
+  // copper for recipes nobody could yet cook. Phase 11e retired the dormancy
+  // (all eight upper seeds stocked), and Phase 11f moved every one of the
+  // formerly dormant priced rows off the trainer entirely. What is left below
+  // the drop floor is the on-ramp, and it is fee-charging for dishes a player
+  // can actually make. The arms still pin the acquisition shape so a future
+  // availability gate cannot land silently.
+  it('the on-ramp trains: rung-0 free, rung-25 and rung-50 charging, all resolving at their stations', () => {
     const sim = new Sim({ seed: 7, playerClass: 'warrior' });
     const meta = (sim as any).players.get(sim.playerId);
     meta.copper = 100000;
@@ -916,16 +1056,46 @@ describe('FARM_RECIPES: trainable at the stations on the settled R8 fee curve', 
       ['recipe_vale_hearth_loaf', 'kitchens', 0],
       ['recipe_growth_tonic', 'apothecary', 0],
       ['recipe_fenbridge_rice_bowl', 'kitchens', 2500],
-      ['recipe_evergarden_harvest_platter', 'kitchens', 10000],
-      // The Phase 12 shared feast joins the rung-50 fee shape: a premium
-      // trainer row like the platter, charging the tier-2 fee.
-      ['recipe_harvest_feast', 'kitchens', 10000],
+      // The held band-50 anchor, and the ONE farm row still paying the tier-2
+      // fee. Phase 11e made it non-dormant, which is what retires the (aj)
+      // addendum's premise for it: a player who pays the 10000 can cook it.
+      ['recipe_highwatch_barley_bannock', 'kitchens', 10000],
     ] as const) {
       const station = stationsOfType(STATIONS, stationType)[0];
       expect(station, `no placed ${stationType} station to train at`).toBeDefined();
       const result = resolveTrain(STATIONS, meta, station.pos, recipeId);
-      expect(result.ok, `${recipeId} must be trainable at its station (deviation (aj))`).toBe(true);
+      expect(result.ok, `${recipeId} must be trainable at its station`).toBe(true);
       expect(result.fee, `${recipeId} fee off the settled R8 curve`).toBe(fee);
+    }
+  });
+
+  it('every row at or above the drop floor is REFUSED by the trainer, at full skill', () => {
+    // The other half of the (aj) discharge, and the arm that makes the fee
+    // claim above true rather than merely unstated: a flipped row must not be
+    // learnable at a counter for copper at all. Driven at cooking 100 so the
+    // refusal is provably about the CHANNEL and not about a skill gate, and
+    // derived from the rung rule so it covers every flipped row rather than a
+    // sample.
+    const sim = new Sim({ seed: 7, playerClass: 'warrior' });
+    const meta = (sim as any).players.get(sim.playerId);
+    meta.copper = 1000000;
+    meta.craftSkills.cooking = 100;
+    meta.craftSkills.alchemy = 100;
+    const flipped = FARM_RECIPES.filter((r) => r.skillReq >= FARM_DROP_RUNG_FLOOR);
+    expect(flipped.length, 'the refusal sweep must run over a non-empty set').toBe(6);
+    for (const row of flipped) {
+      const station = stationsOfType(STATIONS, row.stationType as 'kitchens')[0];
+      const result = resolveTrain(STATIONS, meta, station.pos, row.id);
+      expect(result.ok, `${row.id} is a drop and must NOT be trainable`).toBe(false);
+    }
+    // And the mirror, so the sweep is not passing because resolveTrain refuses
+    // everything: the on-ramp rows still resolve for the same player.
+    for (const row of FARM_RECIPES.filter((r) => r.skillReq < FARM_DROP_RUNG_FLOOR)) {
+      const station = stationsOfType(STATIONS, row.stationType as 'kitchens')[0];
+      expect(
+        resolveTrain(STATIONS, meta, station.pos, row.id).ok,
+        `${row.id} is on the on-ramp and must stay trainable`,
+      ).toBe(true);
     }
   });
 });
