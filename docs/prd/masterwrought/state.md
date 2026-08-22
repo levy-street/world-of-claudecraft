@@ -8021,3 +8021,49 @@ STOPPING CONDITIONS RESTATED as the phase runs: a derived span materially under
 a month re-opens DECISION A rather than shipping; a golden other than
 farming_session moving is a STOP, not a re-record; a monolith ceiling needing a
 raise is a STOP; any deliverable appearing to need an rng draw is a STOP.
+
+### The farming_session re-record: a PREDICTION MISS, named rather than absorbed
+
+Predicted composition (written before the run, off the committed golden at tip
+8b85a7ba59): 17 changed numeric leaves and their derived state digests, namely
+`amount` 1 to 0.25 x3, `amount` 0.02 to 0.03125 x2, `farming` 1 to 0.25 x3, and
+`farming` 75.02 to 75.03125 x9, with the six written `farming: 75` values, every
+`draws`, every `drawDigest`, every `nextId` and BOTH events digests unmoved.
+
+OBSERVED: all seventeen leaves moved exactly as predicted, and draws,
+drawDigest and nextId are entirely unmoved (verified line by line: every
+`draws`/`drawDigest` hit in the diff is a context line, none is a change line).
+Only one golden moved, as required.
+
+THE MISS, and it is a real design consequence rather than a test artifact:
+- `renown` 15 to 10 in five frames, and the deed `prog_first_harvest` leaves the
+  earned list in five frames, which is what moved the TWO events digests I had
+  predicted unmoved.
+- WHY. `prog_first_harvest` ("Fruits of the Field", desc "Harvest your first
+  gathering node") triggers on `{ kind: 'gathering', amount: 1 }`, meaning ANY
+  gathering proficiency at or above 1. The old farming curve granted exactly
+  1.0 on the first harvest, so a farmer earned it on their very first crop. At
+  0.25 it now takes FOUR harvests.
+- I predicted the events digests unmoved after grepping for a SimEvent carrying
+  a grant amount and finding none. That was the right question and the wrong
+  one: no event carries the amount, but the amount decides whether a DEED grant
+  fires, and `deedUnlocked` is an event. The lesson for the remaining phases is
+  that a gain literal is not a leaf, it is an input to every threshold
+  downstream of the counter it feeds.
+
+THE DISPOSITION: ACCEPT, and do not touch the deed. Three grounds.
+1. The trigger may not be edited anyway: src/sim/content/CLAUDE.md makes DEEDS
+   append-only and forbids retro-editing a shipped trigger, because DEED_ORDER
+   derives from table order and players hold earned state against it.
+2. The deed reads MORE truthfully now, not less. Its text says "gathering
+   node", and a farm bed is not a GATHER_NODES node; the node professions still
+   grant a full 1.0 on a tier-1 harvest (gatherNodeGainMultiplier's 1 / 0.5 /
+   0.25 / 0 ladder), so the deed still fires on a player's first real node and
+   no longer fires early off a farm bed.
+3. Farming's OWN first-harvest deed is untouched and still fires immediately:
+   `chr_vale_first_harvest` stays in the earned list in every frame of the
+   re-record. A first-time farmer still gets a deed for their first crop; it is
+   just the correctly-named one.
+RECORDED CONSEQUENCE for the handoff: a farming-only character now reaches
+`prog_first_harvest` on their fourth crop rather than their first. Nothing else
+in the deed catalog reads farming proficiency below 100.
