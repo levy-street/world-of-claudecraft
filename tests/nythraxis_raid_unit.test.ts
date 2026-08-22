@@ -3,6 +3,8 @@ import { nextRaidResetMs } from '../server/raid_reset';
 import { visualKeyFor } from '../src/render/characters/manifest';
 import { dungeonDaisHasRaisedPlatform } from '../src/render/dungeon';
 import { isBlocked } from '../src/sim/colliders';
+import { FARM_CROPS } from '../src/sim/content/farm_crops';
+import { FARM_RECIPES } from '../src/sim/content/recipes';
 import { BUILTIN_WORLD, DUNGEONS, ITEMS, instanceOrigin, MOBS } from '../src/sim/data';
 import { NYTHRAXIS_LAYOUT } from '../src/sim/dungeon_layout';
 import {
@@ -20,6 +22,12 @@ import {
   type WorldContent,
 } from '../src/sim/types';
 import { groundHeight } from '../src/sim/world';
+
+// The two rollGroups APPENDED to the raid base table since it shipped, in
+// append order. Named once so the sweeps below read as "the base walk, then
+// each appended block" instead of repeating string literals, and so the next
+// appended channel extends one list rather than four assertions.
+const APPENDED_GROUPS = { apex: 'nythraxis_patterns', farm: 'nythraxis_farm' } as const;
 
 // The raid assertions run inside the Nythraxis instance band (x > 3000): the
 // boss, adds, Aldric, and wardstones are all spawned by the encounter/dungeon
@@ -323,9 +331,16 @@ describe('Nythraxis raid encounter', () => {
     // and the apex recipe patterns (kind 'recipe', Masterwrought phase 11) ride
     // their own appended 'nythraxis_patterns' group, pinned by the dedicated
     // block below and by tests/apex_pattern_items.test.ts.
+    //
+    // The Phase 11f farming group is excluded BY ITS ROLLGROUP NAME rather than
+    // by kind, deliberately: it mixes a kind 'recipe' pattern with kind 'junk'
+    // seeds, so a kind filter would have to grow a second clause and would then
+    // also wave through a seed smuggled into one of the gear groups. Naming the
+    // group excludes exactly the appended draw and nothing else.
     const loot = MOBS.nythraxis_scourge_of_thornpeak.loot.filter(
       (entry) =>
         entry.itemId &&
+        entry.rollGroup !== APPENDED_GROUPS.farm &&
         ITEMS[entry.itemId]?.kind !== 'mount' &&
         ITEMS[entry.itemId]?.kind !== 'recipe',
     );
@@ -391,19 +406,28 @@ describe('Nythraxis raid encounter', () => {
     const loot = MOBS.nythraxis_scourge_of_thornpeak.loot;
     const patterns = loot
       .map((entry, index) => ({ entry, index }))
-      .filter(({ entry }) => entry.rollGroup === 'nythraxis_patterns');
+      .filter(({ entry }) => entry.rollGroup === APPENDED_GROUPS.apex);
     expect(patterns).toHaveLength(10);
     for (const { entry } of patterns) {
       expect(entry.chance, entry.itemId).toBe(0.04);
       expect(ITEMS[entry.itemId!]?.kind, entry.itemId).toBe('recipe');
     }
     expect(patterns.reduce((sum, { entry }) => sum + entry.chance, 0)).toBeCloseTo(0.4, 10);
-    // Every pattern member is a kind 'recipe' entry, and every kind 'recipe'
-    // entry on the table is a pattern member: the group cannot leak.
+    // Every kind 'recipe' entry on the table belongs to ONE of the two appended
+    // pattern groups, so neither can leak a pattern into a gear group. Re-cut
+    // by Phase 11f, which added pattern_harvest_feast to the farm group: the
+    // old form asserted the recipe entries were exactly the apex ten, which
+    // stops being true the moment a second pattern channel lands on this table.
     const recipeEntries = loot.filter(
       (entry) => entry.itemId && ITEMS[entry.itemId]?.kind === 'recipe',
     );
-    expect(recipeEntries).toHaveLength(10);
+    expect(recipeEntries).toHaveLength(11);
+    for (const entry of recipeEntries) {
+      expect(
+        [APPENDED_GROUPS.apex, APPENDED_GROUPS.farm],
+        `${entry.itemId} is a pattern outside both appended groups`,
+      ).toContain(entry.rollGroup);
+    }
     expect([...new Set(patterns.map(({ entry }) => entry.itemId))].sort()).toEqual(
       [
         'pattern_duskforged_bulwark',
@@ -418,16 +442,64 @@ describe('Nythraxis raid encounter', () => {
         'pattern_wyrmfall_pendant',
       ].sort(),
     );
-    // TAIL pin: every pattern entry's array index sits above every non-pattern
-    // entry's index, so the group's single draw was appended, never inserted.
-    const lowestPatternIndex = Math.min(...patterns.map(({ index }) => index));
-    const highestNonPatternIndex = Math.max(
-      ...loot
-        .map((entry, index) => ({ entry, index }))
-        .filter(({ entry }) => entry.rollGroup !== 'nythraxis_patterns')
+    // TAIL pin, now stated as an ORDERED append history rather than one
+    // boundary: the base gear entries come first, then the phase 11 apex
+    // group, then the phase 11f farm group, each block strictly below the last.
+    // That is what proves each new draw landed at the END of the walk at the
+    // time it was added. Written as a general sweep so the NEXT appended group
+    // extends the list instead of rewriting the assertion.
+    const APPEND_ORDER: string[] = [APPENDED_GROUPS.apex, APPENDED_GROUPS.farm];
+    const indexed = loot.map((entry, index) => ({ entry, index }));
+    const blockBounds = APPEND_ORDER.map((group) => {
+      const rows = indexed.filter(({ entry }) => entry.rollGroup === group);
+      expect(rows.length, `${group} must be a non-empty appended block`).toBeGreaterThan(0);
+      return {
+        group,
+        lowest: Math.min(...rows.map(({ index }) => index)),
+        highest: Math.max(...rows.map(({ index }) => index)),
+      };
+    });
+    const baseHighest = Math.max(
+      ...indexed
+        .filter(({ entry }) => !APPEND_ORDER.includes(entry.rollGroup ?? ''))
         .map(({ index }) => index),
     );
-    expect(lowestPatternIndex).toBeGreaterThan(highestNonPatternIndex);
+    let floor = baseHighest;
+    for (const block of blockBounds) {
+      expect(block.lowest, `${block.group} must sit entirely below index ${floor}`).toBeGreaterThan(
+        floor,
+      );
+      floor = block.highest;
+    }
+  });
+
+  it('appends the farming group last, carrying the feast pattern and every tier-4 seed', () => {
+    // Farming's raid channel (Phase 11f): the farm ladder's pinnacle recipe on
+    // the pinnacle encounter, riding one partitioned draw with the tier-4 seeds.
+    // The membership is DERIVED from FARM_CROPS and the recipe table rather than
+    // listed, so a new tier-4 crop or a re-tiered feast reds here instead of
+    // leaving the group quietly short.
+    const entries = MOBS.nythraxis_scourge_of_thornpeak.loot.filter(
+      (entry) => entry.rollGroup === APPENDED_GROUPS.farm,
+    );
+    const tierFourSeeds = Object.values(FARM_CROPS)
+      .filter((crop) => crop.tier === 4)
+      .map((crop) => crop.seedItemId);
+    const feastRecipe = FARM_RECIPES.find((r) => r.id === 'recipe_harvest_feast');
+    expect(feastRecipe?.acquisition, 'the feast must be a drop to have a pattern').toContain(
+      'drop',
+    );
+    expect([...entries.map((entry) => entry.itemId)].sort()).toEqual(
+      [`pattern_${feastRecipe?.resultItemId}`, ...tierFourSeeds].sort(),
+    );
+    expect(entries, 'one feast pattern plus the four tier-4 seeds').toHaveLength(5);
+    // The SHIPPED per-entry point reused, never a new one: same 0.04 the apex
+    // group uses, so the group totals 0.20 and sheds at most one item per kill.
+    for (const entry of entries) expect(entry.chance, entry.itemId).toBe(0.04);
+    expect(entries.reduce((sum, entry) => sum + entry.chance, 0)).toBeCloseTo(0.2, 10);
+    // Partitioned, not compounded: a group total at or below 1 is what makes
+    // "at most one per kill" true of the resolver's single draw.
+    expect(entries.reduce((sum, entry) => sum + entry.chance, 0)).toBeLessThanOrEqual(1);
   });
 
   it('drops the offhand-slot and two-hander epics at item level 29 (raid source)', () => {

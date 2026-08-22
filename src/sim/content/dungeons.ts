@@ -771,6 +771,27 @@ export const DUNGEON_MOBS: Record<string, MobTemplate> = {
       { itemId: 'pattern_masters_field_forge', chance: 0.04, rollGroup: 'nythraxis_patterns' },
       { itemId: 'pattern_makers_charm', chance: 0.04, rollGroup: 'nythraxis_patterns' },
       { itemId: 'pattern_voidbound_grimoire', chance: 0.04, rollGroup: 'nythraxis_patterns' },
+      // Farming's raid channel (Phase 11f, R8): the farm ladder's PINNACLE
+      // rides the pinnacle encounter. ONE more partitioned rollGroup at the
+      // tail carrying pattern_harvest_feast (the party feast, now cooking 100)
+      // and every TIER-4 seed, so a raid night can hand a farmer the recipe for
+      // the feast the raid itself eats, or the seed for the crop it is made of.
+      //
+      // Appended BELOW 'nythraxis_patterns' under the same contract the block
+      // above states, and for the same reason: one more draw at the very end of
+      // the base walk, so every existing draw keeps its stream position. The
+      // heroic draws that roll after the base table in the same rollLoot call
+      // DO shift by one, which is no longer unpinned: the nythraxis_heroic_claim
+      // parity scenario records exactly that stream.
+      //
+      // RATE: 0.04 per entry, the SHIPPED per-pattern point the group above
+      // uses, reused rather than re-derived. Five entries, so 0.20 total: at
+      // most one item per kill and four kills in five shed nothing here.
+      { itemId: 'pattern_harvest_feast', chance: 0.04, rollGroup: 'nythraxis_farm' },
+      { itemId: 'gilded_sunmelon_seed', chance: 0.04, rollGroup: 'nythraxis_farm' },
+      { itemId: 'evergarden_greens_seed', chance: 0.04, rollGroup: 'nythraxis_farm' },
+      { itemId: 'gilded_yam_seed', chance: 0.04, rollGroup: 'nythraxis_farm' },
+      { itemId: 'evergarden_pumpkin_seed', chance: 0.04, rollGroup: 'nythraxis_farm' },
     ],
     scale: 3.1,
     color: 0x221b2d,

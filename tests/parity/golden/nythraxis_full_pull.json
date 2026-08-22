@@ -13,8 +13,8 @@
     "Final Stand enrage at 5% + grantNythraxisLockout (raidLockouts) + onBossDeath death dialogue",
     "class:warrior"
   ],
-  "draws": 6113,
-  "drawDigest": "52e27086",
+  "draws": 6125,
+  "drawDigest": "71718018",
   "frames": [
     {
       "tick": 0,
@@ -9606,11 +9606,11 @@
       "tick": 628,
       "time": 31.4,
       "nextId": 984,
-      "state": "99c2e7ef",
-      "events": "9efb0fc1",
+      "state": "e3e627ec",
+      "events": "f7d33c06",
       "rng": {
-        "draws": 5551,
-        "digest": "ac120f01"
+        "draws": 5552,
+        "digest": "3746b786"
       },
       "label": "death",
       "players": [
@@ -9736,7 +9736,7 @@
               "itemId": "baked_bread"
             },
             {
-              "count": 3,
+              "count": 2,
               "itemId": "wyrmfall_core"
             },
             {
@@ -9892,7 +9892,7 @@
               "itemId": "spring_water"
             },
             {
-              "count": 3,
+              "count": 2,
               "itemId": "wyrmfall_core"
             },
             {
@@ -10044,7 +10044,7 @@
               "itemId": "spring_water"
             },
             {
-              "count": 3,
+              "count": 2,
               "itemId": "wyrmfall_core"
             },
             {
@@ -10196,7 +10196,7 @@
               "itemId": "spring_water"
             },
             {
-              "count": 3,
+              "count": 2,
               "itemId": "wyrmfall_core"
             },
             {
@@ -10347,7 +10347,7 @@
               "itemId": "spring_water"
             },
             {
-              "count": 3,
+              "count": 2,
               "itemId": "wyrmfall_core"
             },
             {
@@ -11072,77 +11072,77 @@
       "tick": 630,
       "time": 31.5,
       "nextId": 984,
-      "state": "8be52be7",
+      "state": "80ec5084",
       "events": "741638a5",
       "rng": {
-        "draws": 5572,
-        "digest": "b19d3c61"
+        "draws": 5573,
+        "digest": "ba965f50"
       }
     },
     {
       "tick": 640,
       "time": 32,
       "nextId": 984,
-      "state": "dafd57ef",
+      "state": "252097ec",
       "events": "741638a5",
       "rng": {
-        "draws": 5668,
-        "digest": "db065dab"
+        "draws": 5673,
+        "digest": "dfa36c83"
       }
     },
     {
       "tick": 650,
       "time": 32.5,
       "nextId": 984,
-      "state": "0b755941",
+      "state": "abd2fa6e",
       "events": "741638a5",
       "rng": {
-        "draws": 5755,
-        "digest": "4599c020"
+        "draws": 5758,
+        "digest": "735f821a"
       }
     },
     {
       "tick": 660,
       "time": 33,
       "nextId": 984,
-      "state": "c5d80911",
+      "state": "d142f0be",
       "events": "741638a5",
       "rng": {
-        "draws": 5845,
-        "digest": "01af6bc7"
+        "draws": 5850,
+        "digest": "5067377d"
       }
     },
     {
       "tick": 670,
       "time": 33.5,
       "nextId": 984,
-      "state": "9274595b",
+      "state": "6dbca608",
       "events": "741638a5",
       "rng": {
-        "draws": 5959,
-        "digest": "4836801e"
+        "draws": 5963,
+        "digest": "f223be15"
       }
     },
     {
       "tick": 680,
       "time": 34,
       "nextId": 984,
-      "state": "27c3c6eb",
+      "state": "21e1b418",
       "events": "741638a5",
       "rng": {
-        "draws": 6039,
-        "digest": "a1038ff7"
+        "draws": 6052,
+        "digest": "1a2cbe1e"
       }
     },
     {
       "tick": 688,
       "time": 34.4,
       "nextId": 984,
-      "state": "17926b19",
+      "state": "f23cfee6",
       "events": "70fa8f1e",
       "rng": {
-        "draws": 6113,
-        "digest": "52e27086"
+        "draws": 6125,
+        "digest": "71718018"
       },
       "label": "final",
       "players": [
@@ -11268,7 +11268,7 @@
               "itemId": "baked_bread"
             },
             {
-              "count": 3,
+              "count": 2,
               "itemId": "wyrmfall_core"
             },
             {
@@ -11424,7 +11424,7 @@
               "itemId": "spring_water"
             },
             {
-              "count": 3,
+              "count": 2,
               "itemId": "wyrmfall_core"
             },
             {
@@ -11576,7 +11576,7 @@
               "itemId": "spring_water"
             },
             {
-              "count": 3,
+              "count": 2,
               "itemId": "wyrmfall_core"
             },
             {
@@ -11728,7 +11728,7 @@
               "itemId": "spring_water"
             },
             {
-              "count": 3,
+              "count": 2,
               "itemId": "wyrmfall_core"
             },
             {
@@ -11879,7 +11879,7 @@
               "itemId": "spring_water"
             },
             {
-              "count": 3,
+              "count": 2,
               "itemId": "wyrmfall_core"
             },
             {

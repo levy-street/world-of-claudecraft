@@ -16,14 +16,26 @@
 // one: the row simply disappears from the game, learnable by nobody, and every
 // suite stays green because nothing else asks the question.
 import { describe, expect, it } from 'vitest';
+import { FARM_CROPS } from '../src/sim/content/farm_crops';
 import { FARM_PATTERN_ITEMS } from '../src/sim/content/farm_patterns';
+import { HEROIC_BOSS_LOOT } from '../src/sim/content/heroic_loot';
+import { HEROIC_VENDOR_STOCK } from '../src/sim/content/heroic_vendor';
 import { STATIONS } from '../src/sim/content/professions';
 import { ALL_RECIPES, FARM_DROP_RUNG_FLOOR, FARM_RECIPES } from '../src/sim/content/recipes';
-import { ITEMS } from '../src/sim/data';
+import { ITEMS, MOBS } from '../src/sim/data';
 import { stationsOfType } from '../src/sim/professions/stations';
 import { resolveTrain } from '../src/sim/professions/training';
+import {
+  addRiftClearGearLoot,
+  FARM_RIFT_DROP_CHANCE,
+  FARM_RIFT_DROP_ITEM_IDS,
+  RIFT_PATTERN_CHANCE,
+} from '../src/sim/rift/progression';
+import { Rng } from '../src/sim/rng';
 import type { PlayerMeta } from '../src/sim/sim';
 import { Sim } from '../src/sim/sim';
+import type { SimContext } from '../src/sim/sim_context';
+import type { Entity } from '../src/sim/types';
 
 // The two sides of the referential pin, DERIVED INDEPENDENTLY: the left from
 // the recipe table's channel field, the right from the shipped pattern table.
@@ -135,6 +147,144 @@ describe('farm pattern defs', () => {
       expect(prefix, `${id}: no prefix recorded for ${taught?.professionId}`).toBeDefined();
       const output = ITEMS[taught?.resultItemId ?? ''];
       expect(def.name, id).toBe(`${prefix}: ${output.name}`);
+    }
+  });
+});
+
+describe('farm pattern channel wiring (R8: raid feast, five-man 75s, rift 100s, marks valve)', () => {
+  const raidFarmEntries = () =>
+    MOBS.nythraxis_scourge_of_thornpeak.loot.filter(
+      (entry) => entry.rollGroup === 'nythraxis_farm',
+    );
+  const fiveManPatternIds = new Set(
+    HEROIC_BOSS_LOOT.morthen
+      .filter((e) => e.rollGroup === 'heroic_farm_patterns')
+      .map((e) => e.itemId as string),
+  );
+  const riftPatternIds = new Set(
+    (FARM_RIFT_DROP_ITEM_IDS as readonly string[]).filter((id) => ITEMS[id]?.kind === 'recipe'),
+  );
+  const marksIds = new Set(HEROIC_VENDOR_STOCK.map((o) => o.itemId));
+
+  it('every pattern reaches at least one live channel, and the three drop channels partition them', () => {
+    // The reachability half of the phase: a pattern nobody can get is a recipe
+    // that left the game. Every one must appear in a real drop table or on the
+    // marks counter, and the three DROP channels must not overlap, or the same
+    // pattern would be chasing itself across two pillars.
+    // The raid group mixes the pinnacle PATTERN with the tier-4 seeds, so the
+    // pattern census filters by kind; the seed half is pinned in
+    // tests/farm_seed_channels.test.ts.
+    const raidIds = new Set(
+      raidFarmEntries()
+        .map((e) => e.itemId as string)
+        .filter((id) => ITEMS[id]?.kind === 'recipe'),
+    );
+    for (const id of PATTERN_IDS) {
+      const channels = [
+        raidIds.has(id) ? 'raid' : null,
+        fiveManPatternIds.has(id) ? 'dungeon' : null,
+        riftPatternIds.has(id) ? 'rift' : null,
+        marksIds.has(id) ? 'marks' : null,
+      ].filter(Boolean);
+      expect(channels.length, `${id} reaches no live channel`).toBeGreaterThan(0);
+      const dropChannels = channels.filter((c) => c !== 'marks');
+      expect(dropChannels, `${id} rides two drop pillars: ${dropChannels}`).toHaveLength(1);
+    }
+    // The counts, predicted then observed: one on the raid, two on the heroic
+    // five-mans, three on the rift.
+    expect(raidIds.size, 'raid: the pinnacle pattern only').toBe(1);
+    expect(fiveManPatternIds.size, 'dungeon: the two rung-75 patterns').toBe(2);
+    expect(riftPatternIds.size, 'rift: the other three rung-100 patterns').toBe(3);
+  });
+
+  it('routes each pattern to the pillar its RUNG earns, never by an id list', () => {
+    const rungOf = (patternId: string): number => {
+      const def = FARM_PATTERN_ITEMS[patternId];
+      const taught = ALL_RECIPES.find((r) => r.id === def.teachesRecipeId);
+      if (!taught) throw new Error(`${patternId} teaches nothing`);
+      return taught.skillReq;
+    };
+    // Rung 75 is the five-man band, and every rung-75 pattern is on it.
+    for (const id of PATTERN_IDS.filter((p) => rungOf(p) === 75)) {
+      expect(fiveManPatternIds.has(id), `${id} is rung 75 and belongs on the five-mans`).toBe(true);
+    }
+    // Rung 100 splits: the FEAST (the ladder's pinnacle) on the raid, the rest
+    // on the rift. Derived from the recipe table so a re-tier moves the claim.
+    const feastPattern = `pattern_${
+      ALL_RECIPES.find((r) => r.id === 'recipe_harvest_feast')?.resultItemId
+    }`;
+    for (const id of PATTERN_IDS.filter((p) => rungOf(p) === 100)) {
+      const expected = id === feastPattern ? 'raid' : 'rift';
+      const actual = raidFarmEntries().some((entry) => entry.itemId === id) ? 'raid' : 'rift';
+      expect(actual, `${id} at rung 100 belongs on the ${expected} pillar`).toBe(expected);
+    }
+  });
+
+  it('the rift list is SORTED and carries the three rung-100 patterns plus every upper seed', () => {
+    // Sorted for the same stated reason RIFT_PATTERN_ITEM_IDS is: the rng.int
+    // pick indexes this array, so its order is part of the draw contract and a
+    // re-sort is a determinism change.
+    expect([...FARM_RIFT_DROP_ITEM_IDS]).toEqual([...FARM_RIFT_DROP_ITEM_IDS].sort());
+    const upperSeeds = Object.values(FARM_CROPS)
+      .filter((crop) => crop.tier >= 3)
+      .map((crop) => crop.seedItemId);
+    expect([...FARM_RIFT_DROP_ITEM_IDS].sort()).toEqual([...riftPatternIds, ...upperSeeds].sort());
+    expect(FARM_RIFT_DROP_ITEM_IDS, 'three patterns plus eight seeds').toHaveLength(11);
+    // The rate is the SHIPPED rift point, reused rather than re-derived.
+    expect(FARM_RIFT_DROP_CHANCE).toBe(RIFT_PATTERN_CHANCE);
+  });
+
+  it('winning B/A/S rift clears shed farming rewards near 8%, and C clears never do', () => {
+    const farmIds = new Set<string>(FARM_RIFT_DROP_ITEM_IDS);
+    const farmDropsOf = (baseLevel: number, rngSeed: number): string[] => {
+      const boss = { loot: { copper: 0, items: [] }, lootable: false } as unknown as Entity;
+      const ctx = { rng: new Rng(rngSeed) } as unknown as SimContext;
+      addRiftClearGearLoot(ctx, boss, baseLevel);
+      return (boss.loot?.items ?? [])
+        .map((slot) => slot.itemId ?? '')
+        .filter((id) => farmIds.has(id));
+    };
+    const SAMPLE = 5000;
+    // C (baseLevel 20) returns after draw 0 and never reaches draw 7.
+    for (let s = 1; s <= SAMPLE; s++) expect(farmDropsOf(20, s)).toEqual([]);
+    // Deterministic sample (seeds 1..SAMPLE, a fresh Rng each), so the counts
+    // are exact and stable; they were OBSERVED, and a call-site literal near
+    // 0.08 that decoupled from the constant would move them.
+    const EXACT_HITS: Record<number, number> = { 22: 428, 25: 411, 28: 392 };
+    for (const baseLevel of [22, 25, 28]) {
+      let hits = 0;
+      const seen = new Set<string>();
+      for (let s = 1; s <= SAMPLE; s++) {
+        const dropped = farmDropsOf(baseLevel, s);
+        expect(dropped.length, `baseLevel ${baseLevel} seed ${s}`).toBeLessThanOrEqual(1);
+        for (const id of dropped) {
+          hits++;
+          seen.add(id);
+        }
+      }
+      expect(hits, `baseLevel ${baseLevel}: observed ${hits}/${SAMPLE}`).toBe(
+        EXACT_HITS[baseLevel],
+      );
+      // The band beside the exact literal, so a deliberate retune re-derives
+      // against an intent rather than adopting whatever the run printed.
+      const expectedHits = SAMPLE * FARM_RIFT_DROP_CHANCE; // 400
+      expect(hits).toBeGreaterThan(expectedHits * 0.7);
+      expect(hits).toBeLessThan(expectedHits * 1.3);
+      // Every member of the list must actually be reachable through the pick,
+      // so a sorted list nobody indexes past cannot hide a dead entry.
+      for (const id of FARM_RIFT_DROP_ITEM_IDS) {
+        expect(seen.has(id), `${id} never dropped at baseLevel ${baseLevel}`).toBe(true);
+      }
+    }
+  });
+
+  it('the marks valve reaches EVERY pattern at the ring point, so none can fossilize', () => {
+    // D13's teeth: a luck-gated trigger may never be the only faucet for a
+    // pattern, so the deterministic counter must carry all six.
+    for (const id of PATTERN_IDS) {
+      const offer = HEROIC_VENDOR_STOCK.find((o) => o.itemId === id);
+      expect(offer, `${id} has no deterministic route`).toBeDefined();
+      expect(offer?.marks, `${id} price`).toBe(12);
     }
   });
 });

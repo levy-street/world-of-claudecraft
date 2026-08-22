@@ -656,6 +656,43 @@ const HEROIC_GREEN_MOUNT_CHANCE = 0.005;
 const HEROIC_BLUE_MOUNT_CHANCE = 0.001;
 const HEROIC_RAID_BLUE_MOUNT_CHANCE = 0.001;
 
+// Farming's DUNGEON channel (masterwrought Phase 11f, R8): the two rung-75
+// farm patterns ride every heroic FIVE-MAN final boss as one appended tail
+// rollGroup. This is the pillar the packet had never used for a recipe, so it
+// takes the lowest-risk shape available.
+//
+// WHY A GROUP AND NOT TWO UNGROUPED ROWS, even though the four-reins ungrouped
+// pin in tests/dungeons.test.ts reads only the RAID table and would not have
+// moved: a group is one draw instead of two, it partitions rather than
+// compounding (at most one pattern per clear), and it keeps the ungrouped set
+// on every five-man table exactly the mount rows it has always been, which is
+// what makes a future ungrouped entry a visible decision.
+//
+// WHY IT MUST SIT LAST IN EACH TABLE, and the detail worth writing down: in
+// EVERY heroic table the ungrouped mount rows sit at the END, and loot_roll.ts
+// walks heroic entries in array order. Splicing the group in above them would
+// move each mount's chance() draw one position later and change which value it
+// compares against. Appended after them, the group adds exactly one draw at the
+// very end and every mount roll keeps its stream position.
+//
+// RATE: 0.04 per entry, the SHIPPED per-pattern point from the raid channel,
+// reused rather than re-derived. Two entries, so 0.08 total per heroic clear,
+// against five heroic five-mans; the deterministic quartermaster route at 12
+// marks is what keeps either pattern from fossilizing behind that.
+const FARM_PATTERN_HEROIC_CHANCE = 0.04;
+const heroicFarmPatternRows = (): LootEntry[] => [
+  {
+    itemId: 'pattern_highwatch_gourd_soup',
+    chance: FARM_PATTERN_HEROIC_CHANCE,
+    rollGroup: 'heroic_farm_patterns',
+  },
+  {
+    itemId: 'pattern_highwatch_barley_porridge',
+    chance: FARM_PATTERN_HEROIC_CHANCE,
+    rollGroup: 'heroic_farm_patterns',
+  },
+];
+
 export const HEROIC_BOSS_LOOT: Record<string, LootEntry[]> = {
   morthen: [
     { itemId: 'morthens_cryptforged_hauberk', chance: 0.25, rollGroup: 'morthen_heroic' },
@@ -667,6 +704,7 @@ export const HEROIC_BOSS_LOOT: Record<string, LootEntry[]> = {
     { itemId: 'bonechill_cord', chance: 0.33, rollGroup: 'morthen_heroic2' },
     // Uncommon mount (0.5%): heroic-gated only, never on a normal table.
     { itemId: 'reins_stormfeather_griffin', chance: HEROIC_GREEN_MOUNT_CHANCE },
+    ...heroicFarmPatternRows(),
   ],
   vael_the_mistcaller: [
     { itemId: 'mistcallers_fang', chance: 0.34, rollGroup: 'vael_heroic' },
@@ -678,6 +716,7 @@ export const HEROIC_BOSS_LOOT: Record<string, LootEntry[]> = {
     { itemId: 'dreamroot_boots', chance: 0.25, rollGroup: 'vael_heroic2' },
     // Uncommon mount (0.5%): heroic-gated only, never on a normal table.
     { itemId: 'reins_shadowjump_toad', chance: HEROIC_GREEN_MOUNT_CHANCE },
+    ...heroicFarmPatternRows(),
   ],
   ysolei: [
     { itemId: 'lunar_tide_greatstaff', chance: 0.25, rollGroup: 'ysolei_heroic' },
@@ -689,6 +728,7 @@ export const HEROIC_BOSS_LOOT: Record<string, LootEntry[]> = {
     { itemId: 'tideworn_warboots', chance: 0.33, rollGroup: 'ysolei_heroic2' },
     // Rare mount (0.1%): heroic-gated only, never on a normal table.
     { itemId: 'reins_grag_bear', chance: HEROIC_BLUE_MOUNT_CHANCE },
+    ...heroicFarmPatternRows(),
   ],
   korzul_the_gravewyrm: [
     { itemId: 'gravewyrm_cleaver', chance: 0.34, rollGroup: 'korzul_heroic' },
@@ -700,6 +740,7 @@ export const HEROIC_BOSS_LOOT: Record<string, LootEntry[]> = {
     { itemId: 'wildsoul_maul', chance: 0.25, rollGroup: 'korzul_heroic2' },
     // Rare mount (0.1%): heroic-gated only, never on a normal table.
     { itemId: 'reins_stalkglider_snail', chance: HEROIC_BLUE_MOUNT_CHANCE },
+    ...heroicFarmPatternRows(),
   ],
   // Heroic mid-boss table: the Fanglord Beastmaster drops the heroic twin of
   // Duskwhisper (the normal drops from his normal-mode kill in WILDHEART_ITEMS).
@@ -728,6 +769,7 @@ export const HEROIC_BOSS_LOOT: Record<string, LootEntry[]> = {
     // the gear draw order stays byte-identical.
     { itemId: 'reins_grag_bear', chance: HEROIC_BLUE_MOUNT_CHANCE },
     { itemId: 'reins_stalkglider_snail', chance: HEROIC_BLUE_MOUNT_CHANCE },
+    ...heroicFarmPatternRows(),
   ],
   nythraxis_scourge_of_thornpeak: [
     // The heroic set pieces and legendaries come free from the heroic loot swap:

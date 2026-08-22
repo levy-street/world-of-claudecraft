@@ -8,6 +8,7 @@ import { resolvePosition } from '../src/sim/colliders';
 import { HEROIC_DUNGEON_TUNING, HEROIC_MARK_ITEM_ID } from '../src/sim/content/dungeon_difficulty';
 import { HEROIC_BOSS_LOOT } from '../src/sim/content/heroic_loot';
 import { HEROIC_MARK_LETTER } from '../src/sim/content/letters';
+import { FARM_RECIPES } from '../src/sim/content/recipes';
 import {
   BUILTIN_WORLD,
   DUNGEON_X_THRESHOLD,
@@ -1473,22 +1474,30 @@ describe('dungeons: heroic boss drops', () => {
   }
 
   it('a heroic final-boss corpse carries two epics, one from each roll group', () => {
-    // Morthen has two rollGroups (morthen_heroic + morthen_heroic2), so each
-    // heroic kill drops exactly two epics, one per group. Sweep seeds so the
-    // groups land on different entries over the run.
+    // Morthen has two GEAR rollGroups (morthen_heroic + morthen_heroic2), so
+    // each heroic kill drops exactly two epics, one per group. Sweep seeds so
+    // the groups land on different entries over the run.
+    //
+    // The epic census is scoped to those two groups BY NAME, not to "any id on
+    // Morthen's heroic table". The table also carries the ungrouped mount row
+    // and, since Phase 11f, the appended farming pattern group, and a table-wide
+    // filter counted those as epics: the arm passed only while no low-rate row
+    // happened to hit inside the seed window, which is a latent flake rather
+    // than a pin. Scoping by group says what the assertion means.
     const groups = ['morthen_heroic', 'morthen_heroic2'];
     const byGroup: Record<string, string[]> = {};
     for (const e of HEROIC_BOSS_LOOT.morthen) {
-      byGroup[e.rollGroup!] ??= [];
-      byGroup[e.rollGroup!].push(e.itemId!);
+      if (!e.rollGroup) continue;
+      byGroup[e.rollGroup] ??= [];
+      byGroup[e.rollGroup].push(e.itemId!);
     }
+    const gearIds = new Set(groups.flatMap((g) => byGroup[g] ?? []));
+    expect(gearIds.size, 'the gear-group census must be non-empty').toBeGreaterThan(0);
     const dropped = new Set<string>();
     for (let seed = 1; seed <= 8; seed++) {
       const sim = makeSim(seed);
       const boss = killFinalBoss(sim, 'hollow_crypt', 'morthen');
-      const epics = ((boss.loot?.items ?? []) as any[]).filter((s) =>
-        HEROIC_BOSS_LOOT.morthen.some((e) => e.itemId === s.itemId),
-      );
+      const epics = ((boss.loot?.items ?? []) as any[]).filter((s) => gearIds.has(s.itemId));
       expect(epics.length, `seed ${seed}`).toBe(2);
       // Exactly one from each group.
       for (const g of groups) {
@@ -1527,6 +1536,108 @@ describe('dungeons: heroic boss drops', () => {
     );
     expect(((nBoss.loot?.items ?? []) as any[]).some((s) => heroicIds.has(s.itemId))).toBe(false);
   });
+
+  it('every heroic FIVE-MAN final boss carries the farming pattern group, appended last', () => {
+    // Farming's dungeon channel (masterwrought Phase 11f). The five-man final
+    // bosses each gain ONE appended rollGroup carrying the two rung-75 farm
+    // patterns; the raid table and the mid-boss table deliberately do not (the
+    // raid's farm channel rides its BASE table instead, with the feast pattern
+    // and the tier-4 seeds).
+    //
+    // The membership is DERIVED from FARM_RECIPES rather than listed, so a
+    // re-tiered row reds here instead of leaving the group stale.
+    const expectedIds = FARM_RECIPES.filter(
+      (r) => r.acquisition?.includes('drop') && r.skillReq === 75,
+    )
+      .map((r) => `pattern_${r.resultItemId}`)
+      .sort();
+    expect(expectedIds, 'the two rung-75 patterns').toHaveLength(2);
+
+    const FIVE_MAN_FINAL_BOSSES = [
+      'morthen',
+      'vael_the_mistcaller',
+      'ysolei',
+      'korzul_the_gravewyrm',
+      'wildheart_high_priest',
+    ];
+    for (const bossId of FIVE_MAN_FINAL_BOSSES) {
+      const table = HEROIC_BOSS_LOOT[bossId];
+      expect(table, bossId).toBeDefined();
+      const farmRows = table.filter((e) => e.rollGroup === 'heroic_farm_patterns');
+      expect(farmRows.map((e) => e.itemId).sort(), bossId).toEqual(expectedIds);
+      for (const row of farmRows) expect(row.chance, `${bossId} ${row.itemId}`).toBe(0.04);
+      // THE APPEND POSITION IS THE CONTRACT, and it is the detail that is easy
+      // to get wrong here: in every heroic table the ungrouped mount rows sit
+      // LAST, and loot_roll.ts walks heroic entries in array order, so a group
+      // spliced in above them would move each mount's chance() draw one
+      // position later. Appended after them it adds exactly one draw at the
+      // very end and every existing heroic draw keeps its position.
+      const lowestFarmIndex = Math.min(
+        ...table.flatMap((e, i) => (e.rollGroup === 'heroic_farm_patterns' ? [i] : [])),
+      );
+      const highestOtherIndex = Math.max(
+        ...table.flatMap((e, i) => (e.rollGroup === 'heroic_farm_patterns' ? [] : [i])),
+      );
+      expect(lowestFarmIndex, `${bossId}: the farm group must be appended last`).toBeGreaterThan(
+        highestOtherIndex,
+      );
+    }
+    // And the two tables that must NOT carry it: the raid boss (its farm
+    // channel is on the base table) and the mid-boss (not a final boss).
+    for (const bossId of ['nythraxis_scourge_of_thornpeak', 'wildheart_beastmaster']) {
+      expect(
+        HEROIC_BOSS_LOOT[bossId].some((e) => e.rollGroup === 'heroic_farm_patterns'),
+        `${bossId} must not carry the five-man farm group`,
+      ).toBe(false);
+    }
+  });
+
+  it('a heroic five-man really sheds a farm pattern, and a normal one never can', () => {
+    // The drive behind the table pin above: the group is not merely authored,
+    // it resolves through the real heroic claim. Seeds are swept until a hit
+    // lands because the rate is 0.08 per clear; the sweep is bounded and the
+    // arm states what it found, so a group that stopped resolving fails here
+    // rather than staying green on a table read alone.
+    const patternIds = new Set(
+      HEROIC_BOSS_LOOT.morthen
+        .filter((e) => e.rollGroup === 'heroic_farm_patterns')
+        .map((e) => e.itemId),
+    );
+    expect(patternIds.size).toBe(2);
+    let heroicHits = 0;
+    for (let seed = 1; seed <= 120; seed++) {
+      const sim = makeSim(seed);
+      const boss = killFinalBoss(sim, 'hollow_crypt', 'morthen');
+      const hits = ((boss.loot?.items ?? []) as any[]).filter((s) => patternIds.has(s.itemId));
+      // At most ONE per kill: the group is partitioned, never compounded.
+      expect(hits.length, `seed ${seed}`).toBeLessThanOrEqual(1);
+      heroicHits += hits.length;
+    }
+    expect(heroicHits, 'a 0.08 group over 120 heroic clears must land some hits').toBeGreaterThan(
+      0,
+    );
+    // The negative arm: the same boss on NORMAL never sheds one, because the
+    // whole heroic block only runs for a heroic claim.
+    for (let seed = 1; seed <= 30; seed++) {
+      const sim = makeSim(seed);
+      const pid = sim.addPlayer('warrior', 'Norm');
+      enterDungeon(sim.ctx, 'hollow_crypt', pid);
+      const boss = mobInInstance(sim, claimedDungeon(sim, 'hollow_crypt', 'normal'), 'morthen');
+      (sim as any).dealDamage(
+        sim.entities.get(pid),
+        boss,
+        boss.hp + 1000,
+        false,
+        'physical',
+        null,
+        'hit',
+      );
+      expect(
+        ((boss.loot?.items ?? []) as any[]).some((s) => patternIds.has(s.itemId)),
+        `normal seed ${seed}`,
+      ).toBe(false);
+    }
+  }, 60_000);
 
   it('a heroic Nythraxis kill drops raid-tier heroic set pieces plus one heroic-only weapon', () => {
     // The explicit heroic raid table carries only the heroic-ONLY extras: the

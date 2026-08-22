@@ -9,8 +9,8 @@
     "openDescent + the walk-in descent trigger + spawnRiftFloor across all three floors",
     "openExit + rank coin bonus on the winning corpse (dev-entry claim, no race)"
   ],
-  "draws": 395,
-  "drawDigest": "4cb06a2a",
+  "draws": 397,
+  "drawDigest": "835984d0",
   "frames": [
     {
       "tick": 0,
@@ -645,22 +645,22 @@
       "tick": 60,
       "time": 3,
       "nextId": 1015,
-      "state": "8b384a52",
+      "state": "fb558409",
       "events": "2ca296fa",
       "rng": {
-        "draws": 341,
-        "digest": "c76571ac"
+        "draws": 343,
+        "digest": "2f4ceb75"
       }
     },
     {
       "tick": 67,
       "time": 3.35,
       "nextId": 1015,
-      "state": "51fdb9e0",
+      "state": "b1a2f615",
       "events": "741638a5",
       "rng": {
-        "draws": 395,
-        "digest": "4cb06a2a"
+        "draws": 397,
+        "digest": "835984d0"
       },
       "label": "clear-paid",
       "players": [
@@ -855,6 +855,10 @@
               {
                 "count": 1,
                 "itemId": "pattern_sunspun_haversack"
+              },
+              {
+                "count": 1,
+                "itemId": "pattern_evergarden_harvest_platter"
               }
             ]
           },
@@ -902,11 +906,11 @@
       "tick": 67,
       "time": 3.35,
       "nextId": 1015,
-      "state": "51fdb9e0",
+      "state": "b1a2f615",
       "events": "741638a5",
       "rng": {
-        "draws": 395,
-        "digest": "4cb06a2a"
+        "draws": 397,
+        "digest": "835984d0"
       },
       "label": "final",
       "players": [
@@ -1101,6 +1105,10 @@
               {
                 "count": 1,
                 "itemId": "pattern_sunspun_haversack"
+              },
+              {
+                "count": 1,
+                "itemId": "pattern_evergarden_harvest_platter"
               }
             ]
           },
