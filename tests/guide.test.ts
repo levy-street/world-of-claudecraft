@@ -36,7 +36,7 @@ import { controls as controlsPage } from '../src/guide/pages/controls';
 import { catalogSections, deeds as deedsPage } from '../src/guide/pages/deeds';
 import { dungeons as dungeonsPage } from '../src/guide/pages/dungeons';
 import { professions as professionsPage, ringCards } from '../src/guide/pages/professions';
-import { effectLines } from '../src/guide/pages/professions_craft';
+import { craftDetailHtml, effectLines } from '../src/guide/pages/professions_craft';
 import { gatheringDetailHtml } from '../src/guide/pages/professions_gathering';
 import { reliquaryCatalogSections, reliquary as reliquaryPage } from '../src/guide/pages/reliquary';
 import { world as worldPage } from '../src/guide/pages/world';
@@ -1905,6 +1905,45 @@ describe('Guide professions generated content accuracy', () => {
     expect(html).toContain('10');
   });
 
+  it('the cooking and alchemy materials prose names the farm as a supplier (Phase 11g)', () => {
+    // THE ONLY GUARD OVER THIS HAND-AUTHORED PROSE, added by Phase 11g because
+    // that phase is what made the old text false. content.generated.ts is
+    // regenerated and diffed, but it cannot see a guide.* string at all, so
+    // without an arm here the cooking page could go back to describing a
+    // two-supplier pantry with the whole gate green. Same shape and same
+    // reasoning as the farming anchors further down this file.
+    setLanguage('en');
+    const cooking = GUIDE_PROF_CRAFTS.find((c) => c.id === 'cooking');
+    const alchemy = GUIDE_PROF_CRAFTS.find((c) => c.id === 'alchemy');
+    expect(cooking, 'the cooking craft record').toBeDefined();
+    expect(alchemy, 'the alchemy craft record').toBeDefined();
+    const cookHtml = craftDetailHtml(cooking as (typeof GUIDE_PROF_CRAFTS)[number]);
+    const alcHtml = craftDetailHtml(alchemy as (typeof GUIDE_PROF_CRAFTS)[number]);
+
+    // EVERY ANCHOR EXISTS ONLY IN THE CORRECTED PROSE. Anchoring on a clause
+    // the old text also carried is the exact trap the 11e QA blocked on and
+    // the 11f QA hit again: the correction reverts and the guard stays green.
+    // All of them are apostrophe-free, since the rendered page escapes to
+    // &#39; and a possessive anchor would never match this HTML.
+    expect(cookHtml).toContain('The third supplier is the garden bed');
+    expect(cookHtml).toContain('never held up by the pantry');
+    expect(alcHtml).toContain('The elixir line also takes a farm base');
+    expect(alcHtml).toContain('loses nothing to the change');
+    // The headings enumerated the suppliers too, so they went stale with the
+    // bodies and are pinned with them.
+    expect(cookHtml).toContain('A pantry fed by rod, knife, and furrow');
+    expect(alcHtml).toContain('Herbs, glands, glass, and the garden');
+    // The negative half: the two-supplier headings must be gone, not merely
+    // supplemented. Without this a reverted heading would sit beside a
+    // corrected body and both positive anchors above would still pass.
+    expect(cookHtml).not.toContain('A pantry fed by rod and knife');
+    expect(alcHtml).not.toContain('Herbs, glands, and glass');
+    // And the craft blurb, which opened on the catch alone.
+    expect(t('guide.profPages.craftIntro.cooking')).toContain(
+      "the day's catch and the season's harvest",
+    );
+  });
+
   it('pins the spot literals a consistently-wrong regeneration would keep wrong', () => {
     // The rare-tier warblade: trainer-taught at the forge, 1 gold to learn,
     // gain fading at 75 / 100 / 125 (tier 2 recipe, TIER_SKILL_STEP 25).
@@ -2169,6 +2208,14 @@ describe('Guide professions gathering accuracy', () => {
     }
     expect(html).toContain('Harvest Journal');
     expect(html).toContain('withered husks');
+    // farm.bedsBody's Phase 11g half, anchored on the ONE fact 11g moved: the
+    // produce now has buyers outside farming's own recipes. Same rule as the
+    // two 11f anchors above and for the same reason: the surviving clauses of
+    // this sentence all appear verbatim in the pre-11g text, so anchoring on
+    // any of them would let the correction revert with this guard green.
+    // Apostrophe-free, since the rendered page escapes it to &#39;.
+    expect(html).toContain('a buyer from the very first rung');
+    expect(html).toContain('into the apothecary');
     // The guard itself stays honest on its absent side: a toolless record
     // still renders neither section, never prose over an empty table.
     const toolless = {

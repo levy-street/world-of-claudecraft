@@ -8314,6 +8314,10 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
             "count": 2
           },
           {
+            "name": "Vale Wheat",
+            "count": 1
+          },
+          {
             "name": "Sheenleaf Herb",
             "count": 2
           },
@@ -8413,6 +8417,10 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
           {
             "name": "Venom Gland",
             "count": 3
+          },
+          {
+            "name": "Bog Beet",
+            "count": 2
           },
           {
             "name": "Goldleaf Herb",
@@ -8522,6 +8530,10 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
           {
             "name": "Venom Gland",
             "count": 2
+          },
+          {
+            "name": "Frost Gourd",
+            "count": 1
           },
           {
             "name": "Sunpetal Herb",
@@ -8887,6 +8899,10 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
             "count": 2
           },
           {
+            "name": "Vale Wheat",
+            "count": 1
+          },
+          {
             "name": "Cooking Salt",
             "count": 1
           }
@@ -9006,6 +9022,14 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
             "count": 3
           },
           {
+            "name": "Vale Wheat",
+            "count": 2
+          },
+          {
+            "name": "Bog Beet",
+            "count": 1
+          },
+          {
             "name": "Goldleaf Herb",
             "count": 1
           },
@@ -9045,6 +9069,10 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
           {
             "name": "Raw Frostgill Trout",
             "count": 2
+          },
+          {
+            "name": "Brook Carrot",
+            "count": 1
           },
           {
             "name": "Sheenleaf Herb",
@@ -9090,6 +9118,10 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
           {
             "name": "Raw Mirror Trout",
             "count": 1
+          },
+          {
+            "name": "Marsh Rice",
+            "count": 2
           },
           {
             "name": "Goldleaf Herb",
@@ -9182,6 +9214,14 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
             "count": 4
           },
           {
+            "name": "Highland Barley",
+            "count": 2
+          },
+          {
+            "name": "Frost Gourd",
+            "count": 2
+          },
+          {
             "name": "Sunpetal Herb",
             "count": 1
           },
@@ -9225,6 +9265,14 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
           {
             "name": "Game Meat",
             "count": 3
+          },
+          {
+            "name": "Marsh Rice",
+            "count": 2
+          },
+          {
+            "name": "Bog Beet",
+            "count": 2
           },
           {
             "name": "Cooking Salt",
