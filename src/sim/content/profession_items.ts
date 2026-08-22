@@ -801,11 +801,12 @@ export const PROFESSION_ITEMS: Record<string, ItemDef> = {
   // re-tune removes.
   //
   // foodHp and sellValue reuse shipped curve points; quality matches the
-  // rung. The tier 3/4 pair ships REAGENT-DORMANT under (bo): trainable
-  // and well-formed, but at the time tier 3/4 produce had no seed faucet. GATE
-  // 1 (Phase 11e) stocked all eight upper seeds, so the dormancy is over; the
-  // sentence below is kept as the record of why the rows read as they do. D11
-  // bootstrap ruling. Names are IP-safe per D17 (real culinary words plus
+  // rung. The tier 3/4 pair SHIPPED reagent-dormant under (bo): trainable and
+  // well-formed, but at the time tier 3/4 produce had no seed faucet and the
+  // D11 bootstrap ruling was still open. GATE 1 (Phase 11e) discharged that
+  // ruling and stocked all eight upper seeds, so the dormancy is over and both
+  // rows are completable today.
+  // Names are IP-safe per D17 (real culinary words plus
   // settlement flavor) and collide with none of the eight plain dishes.
   eastbrook_glazed_carrots: {
     id: 'eastbrook_glazed_carrots',
@@ -853,9 +854,10 @@ export const PROFESSION_ITEMS: Record<string, ItemDef> = {
   // the feast). kind 'junk' is the tonic precedent for a crafted
   // non-equippable usable; quality 'rare' matches the tier-4 dish set, and
   // the junk-sale sweep keys on quality 'poor' so a feast can never ride
-  // the bulk junk sale. No buyValue: never vendor-stocked, and
-  // REAGENT-DORMANT under deviation (bo) like the tier 3/4 dishes (the
-  // (ca) reconciliation: the D11 seed-bootstrap ruling owns the faucet).
+  // the bulk junk sale. No buyValue: never vendor-stocked, and it SHIPPED
+  // reagent-dormant under deviation (bo) like the tier 3/4 dishes (the (ca)
+  // reconciliation: the D11 seed-bootstrap ruling owned the faucet). GATE 1
+  // (Phase 11e) discharged it, so the feast is completable today.
   // charges 10 and durationTicks 3600 (180s at 20 Hz) are
   // maintainer-flagged tuning, like every farming constant.
   harvest_feast: {
