@@ -83,7 +83,7 @@ describe('welcome letter level gate', () => {
     expect(restored.players.get(pid)?.mailWelcomed).toBe(true);
   });
 
-  it('a restored sub-gate save books nothing on join and books on its later ding', () => {
+  it('a restored sub-gate save books nothing on join and books when it later crosses the gate', () => {
     const sim = makeWorld({ noPlayer: false, playerName: 'Sprout' });
     const state = sim.serializeCharacter(sim.playerId);
     if (!state) throw new Error('serializeCharacter returned nothing');

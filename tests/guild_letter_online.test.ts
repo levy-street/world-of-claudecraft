@@ -74,16 +74,18 @@ describe('guild letter over the live GameServer wire (session routing)', () => {
       const fcOther = fakeWs();
       const fcThird = fakeWs();
       const sc = joinServer(server, fcCross, 81, 'Crosser');
-      joinServer(server, fcOther, 82, 'Watcher');
-      joinServer(server, fcThird, 83, 'Wanderer');
+      const scOther = joinServer(server, fcOther, 82, 'Watcher');
+      const scThird = joinServer(server, fcThird, 83, 'Wanderer');
 
       // Drive the crosser past the threshold on the LIVE server sim (the
       // sweep reads meta.craftSkills; it draws no rng, so no seed hunting).
       const players = (server.sim as unknown as { players: Map<number, PlayerMeta> }).players;
-      // The welcome letter is level-gated (6): level the three humans past it
-      // on the live sim BEFORE any showcase bots stage, so the original
-      // welcome-plus-guild unread shape and the human-vs-bot contrast hold.
-      for (const pid of players.keys()) server.sim.setPlayerLevel(6, pid);
+      // The welcome letter is level-gated (6): level the three named humans
+      // past it on the live sim BEFORE any showcase bots stage, so the
+      // original welcome-plus-guild unread shape and the human-vs-bot
+      // contrast hold. Named pids, not a players.keys() sweep: setPlayerLevel
+      // clamps, so a blanket sweep would demote a seeded above-6 character.
+      for (const s of [sc, scOther, scThird]) server.sim.setPlayerLevel(6, s.pid);
       const meta = players.get(sc.pid);
       if (!meta) throw new Error('no crosser meta');
       meta.craftSkills.weaponcrafting = 13;
