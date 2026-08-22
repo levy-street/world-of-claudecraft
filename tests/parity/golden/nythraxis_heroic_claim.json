@@ -1,0 +1,2967 @@
+{
+  "scenario": "nythraxis_heroic_claim",
+  "seed": 4504,
+  "sampleEvery": 10,
+  "ticks": 1,
+  "coverage": [
+    "rollLoot HEROIC arm on the raid boss: the base-table walk, then the appended HEROIC_BOSS_LOOT draws in the SAME call (the nythraxis_heroic_weapon rollGroup, then the four ungrouped mount chances in array order), which is the stream position a base-table tail append shifts",
+    "heroicItem(): the base set-piece and legendary drops swapped IN PLACE for their raid-tier heroic variants (content/heroic_variants.ts), a swap only a heroic claim reaches",
+    "LootEntry.heroicCopper: the raised finale money base substituted on the SAME single int draw (NYTHRAXIS_HEROIC_COPPER), a value swap and never an extra draw",
+    "awardHeroicMarks on a heroic raid kill (instances/dungeons) plus the raid lockout, neither of which a normal claim grants",
+    "class:warrior"
+  ],
+  "draws": 15,
+  "drawDigest": "b9266461",
+  "frames": [
+    {
+      "tick": 0,
+      "time": 0,
+      "nextId": 971,
+      "state": "5bc471b0",
+      "events": "741638a5",
+      "rng": {
+        "draws": 0,
+        "digest": "811c9dc5"
+      },
+      "label": "init",
+      "players": [],
+      "entities": []
+    },
+    {
+      "tick": 0,
+      "time": 0,
+      "nextId": 981,
+      "state": "b18d5de6",
+      "events": "53f7bc9d",
+      "rng": {
+        "draws": 1,
+        "digest": "84017fb6"
+      },
+      "label": "claimed",
+      "players": [
+        {
+          "activeLoadout": -1,
+          "archetype": {},
+          "arena2v2Rating": 1500,
+          "arenaRating": 1500,
+          "bags": [
+            null,
+            null,
+            null,
+            null
+          ],
+          "bank": {},
+          "bgRating": 1500,
+          "cls": "warrior",
+          "companionUpgrades": {},
+          "counters": {},
+          "craftDaily": {},
+          "craftSkills": {},
+          "deedStats": {
+            "counters": {
+              "partiesJoined": 1
+            },
+            "dungeonClears": {},
+            "itemsDiscovered": [
+              "baked_bread",
+              "eastbrook_buckler",
+              "recruit_tunic",
+              "worn_sword"
+            ]
+          },
+          "delveClears": {},
+          "delveDaily": {},
+          "dungeonDifficulty": "heroic",
+          "entityId": 971,
+          "equipment": {
+            "chest": "recruit_tunic",
+            "mainhand": "worn_sword",
+            "offhand": "eastbrook_buckler"
+          },
+          "equipmentInstance": {},
+          "gatheringProficiency": {},
+          "heroicDaily": {},
+          "inventory": [
+            {
+              "count": 5,
+              "itemId": "baked_bread"
+            }
+          ],
+          "lifetimeXp": 167200,
+          "mailWelcomed": true,
+          "nodeHarvestReadyAt": {},
+          "questsDone": [
+            "q_nythraxis_bound_guardian"
+          ],
+          "recipesGrandfathered": true,
+          "reliquary": {
+            "counts": {},
+            "firstFind": {}
+          },
+          "talents": {
+            "rows": {},
+            "spec": "prot"
+          },
+          "townFocus": {},
+          "wyrmfallDaily": {}
+        },
+        {
+          "activeLoadout": -1,
+          "archetype": {},
+          "arena2v2Rating": 1500,
+          "arenaRating": 1500,
+          "bags": [
+            null,
+            null,
+            null,
+            null
+          ],
+          "bank": {},
+          "bgRating": 1500,
+          "cls": "mage",
+          "companionUpgrades": {},
+          "counters": {},
+          "craftDaily": {},
+          "craftSkills": {},
+          "deedStats": {
+            "counters": {
+              "partiesJoined": 1
+            },
+            "dungeonClears": {},
+            "itemsDiscovered": [
+              "apprentice_robe",
+              "baked_bread",
+              "gnarled_staff",
+              "spring_water"
+            ]
+          },
+          "delveClears": {},
+          "delveDaily": {},
+          "entityId": 972,
+          "equipment": {
+            "chest": "apprentice_robe",
+            "mainhand": "gnarled_staff"
+          },
+          "equipmentInstance": {},
+          "gatheringProficiency": {},
+          "heroicDaily": {},
+          "inventory": [
+            {
+              "count": 5,
+              "itemId": "baked_bread"
+            },
+            {
+              "count": 5,
+              "itemId": "spring_water"
+            }
+          ],
+          "lifetimeXp": 167200,
+          "mailWelcomed": true,
+          "nodeHarvestReadyAt": {},
+          "recipesGrandfathered": true,
+          "reliquary": {
+            "counts": {},
+            "firstFind": {}
+          },
+          "talents": {
+            "rows": {}
+          },
+          "townFocus": {},
+          "wyrmfallDaily": {}
+        },
+        {
+          "activeLoadout": -1,
+          "archetype": {},
+          "arena2v2Rating": 1500,
+          "arenaRating": 1500,
+          "bags": [
+            null,
+            null,
+            null,
+            null
+          ],
+          "bank": {},
+          "bgRating": 1500,
+          "cls": "mage",
+          "companionUpgrades": {},
+          "counters": {},
+          "craftDaily": {},
+          "craftSkills": {},
+          "deedStats": {
+            "counters": {
+              "partiesJoined": 1
+            },
+            "dungeonClears": {},
+            "itemsDiscovered": [
+              "apprentice_robe",
+              "baked_bread",
+              "gnarled_staff",
+              "spring_water"
+            ]
+          },
+          "delveClears": {},
+          "delveDaily": {},
+          "entityId": 973,
+          "equipment": {
+            "chest": "apprentice_robe",
+            "mainhand": "gnarled_staff"
+          },
+          "equipmentInstance": {},
+          "gatheringProficiency": {},
+          "heroicDaily": {},
+          "inventory": [
+            {
+              "count": 5,
+              "itemId": "baked_bread"
+            },
+            {
+              "count": 5,
+              "itemId": "spring_water"
+            }
+          ],
+          "lifetimeXp": 167200,
+          "mailWelcomed": true,
+          "nodeHarvestReadyAt": {},
+          "recipesGrandfathered": true,
+          "reliquary": {
+            "counts": {},
+            "firstFind": {}
+          },
+          "talents": {
+            "rows": {}
+          },
+          "townFocus": {},
+          "wyrmfallDaily": {}
+        },
+        {
+          "activeLoadout": -1,
+          "archetype": {},
+          "arena2v2Rating": 1500,
+          "arenaRating": 1500,
+          "bags": [
+            null,
+            null,
+            null,
+            null
+          ],
+          "bank": {},
+          "bgRating": 1500,
+          "cls": "mage",
+          "companionUpgrades": {},
+          "counters": {},
+          "craftDaily": {},
+          "craftSkills": {},
+          "deedStats": {
+            "counters": {
+              "partiesJoined": 1
+            },
+            "dungeonClears": {},
+            "itemsDiscovered": [
+              "apprentice_robe",
+              "baked_bread",
+              "gnarled_staff",
+              "spring_water"
+            ]
+          },
+          "delveClears": {},
+          "delveDaily": {},
+          "entityId": 974,
+          "equipment": {
+            "chest": "apprentice_robe",
+            "mainhand": "gnarled_staff"
+          },
+          "equipmentInstance": {},
+          "gatheringProficiency": {},
+          "heroicDaily": {},
+          "inventory": [
+            {
+              "count": 5,
+              "itemId": "baked_bread"
+            },
+            {
+              "count": 5,
+              "itemId": "spring_water"
+            }
+          ],
+          "lifetimeXp": 167200,
+          "mailWelcomed": true,
+          "nodeHarvestReadyAt": {},
+          "recipesGrandfathered": true,
+          "reliquary": {
+            "counts": {},
+            "firstFind": {}
+          },
+          "talents": {
+            "rows": {}
+          },
+          "townFocus": {},
+          "wyrmfallDaily": {}
+        },
+        {
+          "activeLoadout": -1,
+          "archetype": {},
+          "arena2v2Rating": 1500,
+          "arenaRating": 1500,
+          "bags": [
+            null,
+            null,
+            null,
+            null
+          ],
+          "bank": {},
+          "bgRating": 1500,
+          "cls": "mage",
+          "companionUpgrades": {},
+          "counters": {},
+          "craftDaily": {},
+          "craftSkills": {},
+          "deedStats": {
+            "counters": {
+              "partiesJoined": 1
+            },
+            "dungeonClears": {},
+            "itemsDiscovered": [
+              "apprentice_robe",
+              "baked_bread",
+              "gnarled_staff",
+              "spring_water"
+            ]
+          },
+          "delveClears": {},
+          "delveDaily": {},
+          "entityId": 975,
+          "equipment": {
+            "chest": "apprentice_robe",
+            "mainhand": "gnarled_staff"
+          },
+          "equipmentInstance": {},
+          "gatheringProficiency": {},
+          "heroicDaily": {},
+          "inventory": [
+            {
+              "count": 5,
+              "itemId": "baked_bread"
+            },
+            {
+              "count": 5,
+              "itemId": "spring_water"
+            }
+          ],
+          "lifetimeXp": 167200,
+          "mailWelcomed": true,
+          "nodeHarvestReadyAt": {},
+          "recipesGrandfathered": true,
+          "reliquary": {
+            "counts": {},
+            "firstFind": {}
+          },
+          "talents": {
+            "rows": {}
+          },
+          "townFocus": {},
+          "wyrmfallDaily": {}
+        }
+      ],
+      "entities": [
+        {
+          "aiState": "idle",
+          "attackPower": 122,
+          "auras": [
+            {
+              "duration": 3600,
+              "id": "battle_stance",
+              "kind": "battle_stance",
+              "name": "Battle Stance",
+              "remaining": 3600,
+              "school": "physical",
+              "sourceId": 971
+            }
+          ],
+          "blockChance": 0.05,
+          "blockValue": 6,
+          "combatTimer": 99,
+          "comboUntil": -1,
+          "critChance": 0.0695,
+          "detonateTimer": "Infinity",
+          "dodgeChance": 0.0695,
+          "fiveSecondRule": 99,
+          "hp": 1062,
+          "id": 971,
+          "kind": "player",
+          "level": 20,
+          "lootFfaTimer": "Infinity",
+          "maxHp": 1062,
+          "maxResource": 100,
+          "moveSpeed": 7,
+          "offhandItemId": "eastbrook_buckler",
+          "onGround": true,
+          "overpowerUntil": -1,
+          "petMode": "defensive",
+          "pos": {
+            "x": 103300,
+            "z": -1160
+          },
+          "potionCooldownUntil": -1,
+          "resourceType": "rage",
+          "spawnPos": {
+            "x": 2,
+            "y": 1.5,
+            "z": -2
+          },
+          "spellPower": 5,
+          "stats": {
+            "agi": 39,
+            "armor": 498,
+            "int": 10,
+            "spi": 11,
+            "sta": 85,
+            "str": 61
+          },
+          "templateId": "warrior",
+          "weapon": {
+            "max": 5,
+            "min": 2,
+            "speed": 2
+          }
+        },
+        {
+          "aiState": "idle",
+          "attackPower": 10,
+          "combatTimer": 99,
+          "comboUntil": -1,
+          "critChance": 0.056,
+          "detonateTimer": "Infinity",
+          "dodgeChance": 0.056,
+          "fiveSecondRule": 99,
+          "hp": 418,
+          "id": 972,
+          "kind": "player",
+          "level": 20,
+          "lootFfaTimer": "Infinity",
+          "maxHp": 418,
+          "maxResource": 1506,
+          "moveSpeed": 7,
+          "onGround": true,
+          "overpowerUntil": -1,
+          "petMode": "defensive",
+          "pos": {
+            "x": 103297,
+            "z": -1166
+          },
+          "potionCooldownUntil": -1,
+          "resource": 1506,
+          "resourceType": "mana",
+          "spawnPos": {
+            "x": 2,
+            "y": 1.5,
+            "z": -2
+          },
+          "spellPower": 41,
+          "stats": {
+            "agi": 12,
+            "armor": 133,
+            "int": 82,
+            "spi": 60,
+            "sta": 33,
+            "str": 10
+          },
+          "templateId": "mage",
+          "weapon": {
+            "max": 6,
+            "min": 3,
+            "speed": 2.9
+          }
+        },
+        {
+          "aiState": "idle",
+          "attackPower": 10,
+          "combatTimer": 99,
+          "comboUntil": -1,
+          "critChance": 0.056,
+          "detonateTimer": "Infinity",
+          "dodgeChance": 0.056,
+          "fiveSecondRule": 99,
+          "hp": 418,
+          "id": 973,
+          "kind": "player",
+          "level": 20,
+          "lootFfaTimer": "Infinity",
+          "maxHp": 418,
+          "maxResource": 1506,
+          "moveSpeed": 7,
+          "onGround": true,
+          "overpowerUntil": -1,
+          "petMode": "defensive",
+          "pos": {
+            "x": 103299,
+            "z": -1166
+          },
+          "potionCooldownUntil": -1,
+          "resource": 1506,
+          "resourceType": "mana",
+          "spawnPos": {
+            "x": 2,
+            "y": 1.5,
+            "z": -2
+          },
+          "spellPower": 41,
+          "stats": {
+            "agi": 12,
+            "armor": 133,
+            "int": 82,
+            "spi": 60,
+            "sta": 33,
+            "str": 10
+          },
+          "templateId": "mage",
+          "weapon": {
+            "max": 6,
+            "min": 3,
+            "speed": 2.9
+          }
+        },
+        {
+          "aiState": "idle",
+          "attackPower": 10,
+          "combatTimer": 99,
+          "comboUntil": -1,
+          "critChance": 0.056,
+          "detonateTimer": "Infinity",
+          "dodgeChance": 0.056,
+          "fiveSecondRule": 99,
+          "hp": 418,
+          "id": 974,
+          "kind": "player",
+          "level": 20,
+          "lootFfaTimer": "Infinity",
+          "maxHp": 418,
+          "maxResource": 1506,
+          "moveSpeed": 7,
+          "onGround": true,
+          "overpowerUntil": -1,
+          "petMode": "defensive",
+          "pos": {
+            "x": 103301,
+            "z": -1166
+          },
+          "potionCooldownUntil": -1,
+          "resource": 1506,
+          "resourceType": "mana",
+          "spawnPos": {
+            "x": 2,
+            "y": 1.5,
+            "z": -2
+          },
+          "spellPower": 41,
+          "stats": {
+            "agi": 12,
+            "armor": 133,
+            "int": 82,
+            "spi": 60,
+            "sta": 33,
+            "str": 10
+          },
+          "templateId": "mage",
+          "weapon": {
+            "max": 6,
+            "min": 3,
+            "speed": 2.9
+          }
+        },
+        {
+          "aiState": "idle",
+          "attackPower": 10,
+          "combatTimer": 99,
+          "comboUntil": -1,
+          "critChance": 0.056,
+          "detonateTimer": "Infinity",
+          "dodgeChance": 0.056,
+          "fiveSecondRule": 99,
+          "hp": 418,
+          "id": 975,
+          "kind": "player",
+          "level": 20,
+          "lootFfaTimer": "Infinity",
+          "maxHp": 418,
+          "maxResource": 1506,
+          "moveSpeed": 7,
+          "onGround": true,
+          "overpowerUntil": -1,
+          "petMode": "defensive",
+          "pos": {
+            "x": 103303,
+            "z": -1166
+          },
+          "potionCooldownUntil": -1,
+          "resource": 1506,
+          "resourceType": "mana",
+          "spawnPos": {
+            "x": 2,
+            "y": 1.5,
+            "z": -2
+          },
+          "spellPower": 41,
+          "stats": {
+            "agi": 12,
+            "armor": 133,
+            "int": 82,
+            "spi": 60,
+            "sta": 33,
+            "str": 10
+          },
+          "templateId": "mage",
+          "weapon": {
+            "max": 6,
+            "min": 3,
+            "speed": 2.9
+          }
+        },
+        {
+          "aiState": "idle",
+          "ccImmune": true,
+          "combatTimer": 99,
+          "comboUntil": -1,
+          "critChance": 0.05,
+          "detonateTimer": "Infinity",
+          "dodgeChance": 0.05,
+          "facing": 3.141593,
+          "fiveSecondRule": 99,
+          "hostile": true,
+          "hp": 192000,
+          "id": 976,
+          "kind": "mob",
+          "level": 22,
+          "lootFfaTimer": "Infinity",
+          "maxHp": 192000,
+          "mechanicDamageMult": 7.25,
+          "mechanicHealMult": 3.2,
+          "moveSpeed": 10.5,
+          "onGround": true,
+          "overpowerUntil": -1,
+          "petMode": "defensive",
+          "pos": {
+            "x": 103300,
+            "z": -1154
+          },
+          "potionCooldownUntil": -1,
+          "slowImmune": true,
+          "spawnPos": {
+            "x": 103300,
+            "z": -1154
+          },
+          "stats": {
+            "armor": 1058
+          },
+          "templateId": "nythraxis_scourge_of_thornpeak",
+          "weapon": {
+            "max": 3988,
+            "min": 2553,
+            "speed": 2.6
+          }
+        }
+      ]
+    },
+    {
+      "tick": 1,
+      "time": 0.05,
+      "nextId": 981,
+      "state": "04279407",
+      "events": "6d6f46c3",
+      "rng": {
+        "draws": 15,
+        "digest": "b9266461"
+      },
+      "label": "death",
+      "players": [
+        {
+          "activeLoadout": -1,
+          "archetype": {},
+          "arena2v2Rating": 1500,
+          "arenaRating": 1500,
+          "bags": [
+            null,
+            null,
+            null,
+            null
+          ],
+          "bank": {},
+          "bgRating": 1500,
+          "cls": "warrior",
+          "companionUpgrades": {},
+          "counters": {
+            "damageDealt": 193000,
+            "kills": 1,
+            "xpGained": 98
+          },
+          "craftDaily": {},
+          "craftSkills": {},
+          "deedStats": {
+            "counters": {
+              "damageDealt": 193000,
+              "dungeonFinalBossKills": 1,
+              "kills": 1,
+              "partiesJoined": 1
+            },
+            "dungeonClears": {
+              "nythraxis_boss_arena:heroic": 1
+            },
+            "itemsDiscovered": [
+              "baked_bread",
+              "eastbrook_buckler",
+              "heroic_mark",
+              "recruit_tunic",
+              "worn_sword",
+              "wyrmfall_core"
+            ],
+            "visited": [
+              "quality:rare"
+            ]
+          },
+          "deedsEarned": [
+            [
+              "cmb_first_blood",
+              ""
+            ],
+            [
+              "col_first_rare",
+              ""
+            ],
+            [
+              "dgn_nythraxis",
+              ""
+            ],
+            [
+              "dgn_nythraxis_deathless",
+              ""
+            ],
+            [
+              "dgn_nythraxis_gravebreaker",
+              ""
+            ],
+            [
+              "dgn_nythraxis_heroic",
+              ""
+            ],
+            [
+              "dgn_nythraxis_wardens",
+              ""
+            ],
+            [
+              "feat_era_cap",
+              ""
+            ],
+            [
+              "prog_double_digits",
+              ""
+            ],
+            [
+              "prog_finding_your_feet",
+              ""
+            ],
+            [
+              "prog_first_steps",
+              ""
+            ],
+            [
+              "prog_level_cap",
+              ""
+            ],
+            [
+              "prog_specialized",
+              ""
+            ],
+            [
+              "prog_the_long_middle",
+              ""
+            ],
+            [
+              "soc_first_party",
+              ""
+            ]
+          ],
+          "delveClears": {},
+          "delveDaily": {},
+          "dungeonDifficulty": "heroic",
+          "entityId": 971,
+          "equipment": {
+            "chest": "recruit_tunic",
+            "mainhand": "worn_sword",
+            "offhand": "eastbrook_buckler"
+          },
+          "equipmentInstance": {},
+          "gatheringProficiency": {},
+          "heroicDaily": {
+            "date": "reset:1",
+            "marked": [
+              "nythraxis_boss_arena"
+            ]
+          },
+          "inventory": [
+            {
+              "count": 5,
+              "itemId": "baked_bread"
+            },
+            {
+              "count": 3,
+              "itemId": "heroic_mark"
+            },
+            {
+              "count": 1,
+              "itemId": "wyrmfall_core"
+            }
+          ],
+          "lifetimeXp": 167298,
+          "mailWelcomed": true,
+          "nodeHarvestReadyAt": {},
+          "questsDone": [
+            "q_nythraxis_bound_guardian"
+          ],
+          "raidLockouts": [
+            [
+              "nythraxis_boss_arena:heroic",
+              86400000
+            ]
+          ],
+          "recipesGrandfathered": true,
+          "reliquary": {
+            "counts": {},
+            "firstFind": {}
+          },
+          "renown": 210,
+          "talents": {
+            "rows": {},
+            "spec": "prot"
+          },
+          "townFocus": {},
+          "wyrmfallDaily": {
+            "sources": [
+              "nythraxis_boss_arena:heroic"
+            ]
+          }
+        },
+        {
+          "activeLoadout": -1,
+          "archetype": {},
+          "arena2v2Rating": 1500,
+          "arenaRating": 1500,
+          "bags": [
+            null,
+            null,
+            null,
+            null
+          ],
+          "bank": {},
+          "bgRating": 1500,
+          "cls": "mage",
+          "companionUpgrades": {},
+          "counters": {
+            "xpGained": 98
+          },
+          "craftDaily": {},
+          "craftSkills": {},
+          "deedStats": {
+            "counters": {
+              "dungeonFinalBossKills": 1,
+              "kills": 1,
+              "partiesJoined": 1
+            },
+            "dungeonClears": {
+              "nythraxis_boss_arena:heroic": 1
+            },
+            "itemsDiscovered": [
+              "apprentice_robe",
+              "baked_bread",
+              "gnarled_staff",
+              "heroic_mark",
+              "spring_water",
+              "wyrmfall_core"
+            ],
+            "visited": [
+              "quality:rare"
+            ]
+          },
+          "deedsEarned": [
+            [
+              "cmb_first_blood",
+              ""
+            ],
+            [
+              "col_first_rare",
+              ""
+            ],
+            [
+              "dgn_nythraxis",
+              ""
+            ],
+            [
+              "dgn_nythraxis_deathless",
+              ""
+            ],
+            [
+              "dgn_nythraxis_gravebreaker",
+              ""
+            ],
+            [
+              "dgn_nythraxis_heroic",
+              ""
+            ],
+            [
+              "dgn_nythraxis_wardens",
+              ""
+            ],
+            [
+              "feat_era_cap",
+              ""
+            ],
+            [
+              "prog_double_digits",
+              ""
+            ],
+            [
+              "prog_finding_your_feet",
+              ""
+            ],
+            [
+              "prog_first_steps",
+              ""
+            ],
+            [
+              "prog_level_cap",
+              ""
+            ],
+            [
+              "prog_the_long_middle",
+              ""
+            ],
+            [
+              "soc_first_party",
+              ""
+            ]
+          ],
+          "delveClears": {},
+          "delveDaily": {},
+          "entityId": 972,
+          "equipment": {
+            "chest": "apprentice_robe",
+            "mainhand": "gnarled_staff"
+          },
+          "equipmentInstance": {},
+          "gatheringProficiency": {},
+          "heroicDaily": {
+            "date": "reset:1",
+            "marked": [
+              "nythraxis_boss_arena"
+            ]
+          },
+          "inventory": [
+            {
+              "count": 5,
+              "itemId": "baked_bread"
+            },
+            {
+              "count": 5,
+              "itemId": "spring_water"
+            },
+            {
+              "count": 3,
+              "itemId": "heroic_mark"
+            },
+            {
+              "count": 1,
+              "itemId": "wyrmfall_core"
+            }
+          ],
+          "lifetimeXp": 167298,
+          "mailWelcomed": true,
+          "nodeHarvestReadyAt": {},
+          "raidLockouts": [
+            [
+              "nythraxis_boss_arena:heroic",
+              86400000
+            ]
+          ],
+          "recipesGrandfathered": true,
+          "reliquary": {
+            "counts": {},
+            "firstFind": {}
+          },
+          "renown": 200,
+          "talents": {
+            "rows": {}
+          },
+          "townFocus": {},
+          "wyrmfallDaily": {
+            "sources": [
+              "nythraxis_boss_arena:heroic"
+            ]
+          }
+        },
+        {
+          "activeLoadout": -1,
+          "archetype": {},
+          "arena2v2Rating": 1500,
+          "arenaRating": 1500,
+          "bags": [
+            null,
+            null,
+            null,
+            null
+          ],
+          "bank": {},
+          "bgRating": 1500,
+          "cls": "mage",
+          "companionUpgrades": {},
+          "counters": {
+            "xpGained": 98
+          },
+          "craftDaily": {},
+          "craftSkills": {},
+          "deedStats": {
+            "counters": {
+              "dungeonFinalBossKills": 1,
+              "kills": 1,
+              "partiesJoined": 1
+            },
+            "dungeonClears": {
+              "nythraxis_boss_arena:heroic": 1
+            },
+            "itemsDiscovered": [
+              "apprentice_robe",
+              "baked_bread",
+              "gnarled_staff",
+              "heroic_mark",
+              "spring_water",
+              "wyrmfall_core"
+            ],
+            "visited": [
+              "quality:rare"
+            ]
+          },
+          "deedsEarned": [
+            [
+              "cmb_first_blood",
+              ""
+            ],
+            [
+              "col_first_rare",
+              ""
+            ],
+            [
+              "dgn_nythraxis",
+              ""
+            ],
+            [
+              "dgn_nythraxis_deathless",
+              ""
+            ],
+            [
+              "dgn_nythraxis_gravebreaker",
+              ""
+            ],
+            [
+              "dgn_nythraxis_heroic",
+              ""
+            ],
+            [
+              "dgn_nythraxis_wardens",
+              ""
+            ],
+            [
+              "feat_era_cap",
+              ""
+            ],
+            [
+              "prog_double_digits",
+              ""
+            ],
+            [
+              "prog_finding_your_feet",
+              ""
+            ],
+            [
+              "prog_first_steps",
+              ""
+            ],
+            [
+              "prog_level_cap",
+              ""
+            ],
+            [
+              "prog_the_long_middle",
+              ""
+            ],
+            [
+              "soc_first_party",
+              ""
+            ]
+          ],
+          "delveClears": {},
+          "delveDaily": {},
+          "entityId": 973,
+          "equipment": {
+            "chest": "apprentice_robe",
+            "mainhand": "gnarled_staff"
+          },
+          "equipmentInstance": {},
+          "gatheringProficiency": {},
+          "heroicDaily": {
+            "date": "reset:1",
+            "marked": [
+              "nythraxis_boss_arena"
+            ]
+          },
+          "inventory": [
+            {
+              "count": 5,
+              "itemId": "baked_bread"
+            },
+            {
+              "count": 5,
+              "itemId": "spring_water"
+            },
+            {
+              "count": 3,
+              "itemId": "heroic_mark"
+            },
+            {
+              "count": 1,
+              "itemId": "wyrmfall_core"
+            }
+          ],
+          "lifetimeXp": 167298,
+          "mailWelcomed": true,
+          "nodeHarvestReadyAt": {},
+          "raidLockouts": [
+            [
+              "nythraxis_boss_arena:heroic",
+              86400000
+            ]
+          ],
+          "recipesGrandfathered": true,
+          "reliquary": {
+            "counts": {},
+            "firstFind": {}
+          },
+          "renown": 200,
+          "talents": {
+            "rows": {}
+          },
+          "townFocus": {},
+          "wyrmfallDaily": {
+            "sources": [
+              "nythraxis_boss_arena:heroic"
+            ]
+          }
+        },
+        {
+          "activeLoadout": -1,
+          "archetype": {},
+          "arena2v2Rating": 1500,
+          "arenaRating": 1500,
+          "bags": [
+            null,
+            null,
+            null,
+            null
+          ],
+          "bank": {},
+          "bgRating": 1500,
+          "cls": "mage",
+          "companionUpgrades": {},
+          "counters": {
+            "xpGained": 98
+          },
+          "craftDaily": {},
+          "craftSkills": {},
+          "deedStats": {
+            "counters": {
+              "dungeonFinalBossKills": 1,
+              "kills": 1,
+              "partiesJoined": 1
+            },
+            "dungeonClears": {
+              "nythraxis_boss_arena:heroic": 1
+            },
+            "itemsDiscovered": [
+              "apprentice_robe",
+              "baked_bread",
+              "gnarled_staff",
+              "heroic_mark",
+              "spring_water",
+              "wyrmfall_core"
+            ],
+            "visited": [
+              "quality:rare"
+            ]
+          },
+          "deedsEarned": [
+            [
+              "cmb_first_blood",
+              ""
+            ],
+            [
+              "col_first_rare",
+              ""
+            ],
+            [
+              "dgn_nythraxis",
+              ""
+            ],
+            [
+              "dgn_nythraxis_deathless",
+              ""
+            ],
+            [
+              "dgn_nythraxis_gravebreaker",
+              ""
+            ],
+            [
+              "dgn_nythraxis_heroic",
+              ""
+            ],
+            [
+              "dgn_nythraxis_wardens",
+              ""
+            ],
+            [
+              "feat_era_cap",
+              ""
+            ],
+            [
+              "prog_double_digits",
+              ""
+            ],
+            [
+              "prog_finding_your_feet",
+              ""
+            ],
+            [
+              "prog_first_steps",
+              ""
+            ],
+            [
+              "prog_level_cap",
+              ""
+            ],
+            [
+              "prog_the_long_middle",
+              ""
+            ],
+            [
+              "soc_first_party",
+              ""
+            ]
+          ],
+          "delveClears": {},
+          "delveDaily": {},
+          "entityId": 974,
+          "equipment": {
+            "chest": "apprentice_robe",
+            "mainhand": "gnarled_staff"
+          },
+          "equipmentInstance": {},
+          "gatheringProficiency": {},
+          "heroicDaily": {
+            "date": "reset:1",
+            "marked": [
+              "nythraxis_boss_arena"
+            ]
+          },
+          "inventory": [
+            {
+              "count": 5,
+              "itemId": "baked_bread"
+            },
+            {
+              "count": 5,
+              "itemId": "spring_water"
+            },
+            {
+              "count": 3,
+              "itemId": "heroic_mark"
+            },
+            {
+              "count": 1,
+              "itemId": "wyrmfall_core"
+            }
+          ],
+          "lifetimeXp": 167298,
+          "mailWelcomed": true,
+          "nodeHarvestReadyAt": {},
+          "raidLockouts": [
+            [
+              "nythraxis_boss_arena:heroic",
+              86400000
+            ]
+          ],
+          "recipesGrandfathered": true,
+          "reliquary": {
+            "counts": {},
+            "firstFind": {}
+          },
+          "renown": 200,
+          "talents": {
+            "rows": {}
+          },
+          "townFocus": {},
+          "wyrmfallDaily": {
+            "sources": [
+              "nythraxis_boss_arena:heroic"
+            ]
+          }
+        },
+        {
+          "activeLoadout": -1,
+          "archetype": {},
+          "arena2v2Rating": 1500,
+          "arenaRating": 1500,
+          "bags": [
+            null,
+            null,
+            null,
+            null
+          ],
+          "bank": {},
+          "bgRating": 1500,
+          "cls": "mage",
+          "companionUpgrades": {},
+          "counters": {
+            "xpGained": 98
+          },
+          "craftDaily": {},
+          "craftSkills": {},
+          "deedStats": {
+            "counters": {
+              "dungeonFinalBossKills": 1,
+              "kills": 1,
+              "partiesJoined": 1
+            },
+            "dungeonClears": {
+              "nythraxis_boss_arena:heroic": 1
+            },
+            "itemsDiscovered": [
+              "apprentice_robe",
+              "baked_bread",
+              "gnarled_staff",
+              "heroic_mark",
+              "spring_water",
+              "wyrmfall_core"
+            ],
+            "visited": [
+              "quality:rare"
+            ]
+          },
+          "deedsEarned": [
+            [
+              "cmb_first_blood",
+              ""
+            ],
+            [
+              "col_first_rare",
+              ""
+            ],
+            [
+              "dgn_nythraxis",
+              ""
+            ],
+            [
+              "dgn_nythraxis_deathless",
+              ""
+            ],
+            [
+              "dgn_nythraxis_gravebreaker",
+              ""
+            ],
+            [
+              "dgn_nythraxis_heroic",
+              ""
+            ],
+            [
+              "dgn_nythraxis_wardens",
+              ""
+            ],
+            [
+              "feat_era_cap",
+              ""
+            ],
+            [
+              "prog_double_digits",
+              ""
+            ],
+            [
+              "prog_finding_your_feet",
+              ""
+            ],
+            [
+              "prog_first_steps",
+              ""
+            ],
+            [
+              "prog_level_cap",
+              ""
+            ],
+            [
+              "prog_the_long_middle",
+              ""
+            ],
+            [
+              "soc_first_party",
+              ""
+            ]
+          ],
+          "delveClears": {},
+          "delveDaily": {},
+          "entityId": 975,
+          "equipment": {
+            "chest": "apprentice_robe",
+            "mainhand": "gnarled_staff"
+          },
+          "equipmentInstance": {},
+          "gatheringProficiency": {},
+          "heroicDaily": {
+            "date": "reset:1",
+            "marked": [
+              "nythraxis_boss_arena"
+            ]
+          },
+          "inventory": [
+            {
+              "count": 5,
+              "itemId": "baked_bread"
+            },
+            {
+              "count": 5,
+              "itemId": "spring_water"
+            },
+            {
+              "count": 3,
+              "itemId": "heroic_mark"
+            },
+            {
+              "count": 1,
+              "itemId": "wyrmfall_core"
+            }
+          ],
+          "lifetimeXp": 167298,
+          "mailWelcomed": true,
+          "nodeHarvestReadyAt": {},
+          "raidLockouts": [
+            [
+              "nythraxis_boss_arena:heroic",
+              86400000
+            ]
+          ],
+          "recipesGrandfathered": true,
+          "reliquary": {
+            "counts": {},
+            "firstFind": {}
+          },
+          "renown": 200,
+          "talents": {
+            "rows": {}
+          },
+          "townFocus": {},
+          "wyrmfallDaily": {
+            "sources": [
+              "nythraxis_boss_arena:heroic"
+            ]
+          }
+        }
+      ],
+      "entities": [
+        {
+          "aiState": "idle",
+          "attackPower": 122,
+          "auras": [
+            {
+              "duration": 3600,
+              "id": "battle_stance",
+              "kind": "battle_stance",
+              "name": "Battle Stance",
+              "remaining": 3599.95,
+              "school": "physical",
+              "sourceId": 971
+            }
+          ],
+          "blockChance": 0.05,
+          "blockValue": 6,
+          "combatTimer": 0.05,
+          "comboUntil": -1,
+          "critChance": 0.0695,
+          "detonateTimer": "Infinity",
+          "dodgeChance": 0.0695,
+          "fiveSecondRule": 99.05,
+          "hp": 1062,
+          "id": 971,
+          "inCombat": true,
+          "kind": "player",
+          "level": 20,
+          "lootFfaTimer": "Infinity",
+          "maxHp": 1062,
+          "maxResource": 100,
+          "moveSpeed": 7,
+          "offhandItemId": "eastbrook_buckler",
+          "onGround": true,
+          "overpowerUntil": -1,
+          "petMode": "defensive",
+          "pos": {
+            "x": 103300,
+            "z": -1160
+          },
+          "potionCooldownUntil": -1,
+          "resourceType": "rage",
+          "spawnPos": {
+            "x": 2,
+            "y": 1.5,
+            "z": -2
+          },
+          "spellPower": 5,
+          "stats": {
+            "agi": 39,
+            "armor": 498,
+            "int": 10,
+            "spi": 11,
+            "sta": 85,
+            "str": 61
+          },
+          "templateId": "warrior",
+          "weapon": {
+            "max": 5,
+            "min": 2,
+            "speed": 2
+          }
+        },
+        {
+          "aiState": "idle",
+          "attackPower": 10,
+          "combatTimer": 99.05,
+          "comboUntil": -1,
+          "critChance": 0.056,
+          "detonateTimer": "Infinity",
+          "dodgeChance": 0.056,
+          "fiveSecondRule": 99.05,
+          "hp": 418,
+          "id": 972,
+          "kind": "player",
+          "level": 20,
+          "lootFfaTimer": "Infinity",
+          "maxHp": 418,
+          "maxResource": 1506,
+          "moveSpeed": 7,
+          "onGround": true,
+          "overpowerUntil": -1,
+          "petMode": "defensive",
+          "pos": {
+            "x": 103297,
+            "z": -1166
+          },
+          "potionCooldownUntil": -1,
+          "resource": 1506,
+          "resourceType": "mana",
+          "spawnPos": {
+            "x": 2,
+            "y": 1.5,
+            "z": -2
+          },
+          "spellPower": 41,
+          "stats": {
+            "agi": 12,
+            "armor": 133,
+            "int": 82,
+            "spi": 60,
+            "sta": 33,
+            "str": 10
+          },
+          "templateId": "mage",
+          "weapon": {
+            "max": 6,
+            "min": 3,
+            "speed": 2.9
+          }
+        },
+        {
+          "aiState": "idle",
+          "attackPower": 10,
+          "combatTimer": 99.05,
+          "comboUntil": -1,
+          "critChance": 0.056,
+          "detonateTimer": "Infinity",
+          "dodgeChance": 0.056,
+          "fiveSecondRule": 99.05,
+          "hp": 418,
+          "id": 973,
+          "kind": "player",
+          "level": 20,
+          "lootFfaTimer": "Infinity",
+          "maxHp": 418,
+          "maxResource": 1506,
+          "moveSpeed": 7,
+          "onGround": true,
+          "overpowerUntil": -1,
+          "petMode": "defensive",
+          "pos": {
+            "x": 103299,
+            "z": -1166
+          },
+          "potionCooldownUntil": -1,
+          "resource": 1506,
+          "resourceType": "mana",
+          "spawnPos": {
+            "x": 2,
+            "y": 1.5,
+            "z": -2
+          },
+          "spellPower": 41,
+          "stats": {
+            "agi": 12,
+            "armor": 133,
+            "int": 82,
+            "spi": 60,
+            "sta": 33,
+            "str": 10
+          },
+          "templateId": "mage",
+          "weapon": {
+            "max": 6,
+            "min": 3,
+            "speed": 2.9
+          }
+        },
+        {
+          "aiState": "idle",
+          "attackPower": 10,
+          "combatTimer": 99.05,
+          "comboUntil": -1,
+          "critChance": 0.056,
+          "detonateTimer": "Infinity",
+          "dodgeChance": 0.056,
+          "fiveSecondRule": 99.05,
+          "hp": 418,
+          "id": 974,
+          "kind": "player",
+          "level": 20,
+          "lootFfaTimer": "Infinity",
+          "maxHp": 418,
+          "maxResource": 1506,
+          "moveSpeed": 7,
+          "onGround": true,
+          "overpowerUntil": -1,
+          "petMode": "defensive",
+          "pos": {
+            "x": 103301,
+            "z": -1166
+          },
+          "potionCooldownUntil": -1,
+          "resource": 1506,
+          "resourceType": "mana",
+          "spawnPos": {
+            "x": 2,
+            "y": 1.5,
+            "z": -2
+          },
+          "spellPower": 41,
+          "stats": {
+            "agi": 12,
+            "armor": 133,
+            "int": 82,
+            "spi": 60,
+            "sta": 33,
+            "str": 10
+          },
+          "templateId": "mage",
+          "weapon": {
+            "max": 6,
+            "min": 3,
+            "speed": 2.9
+          }
+        },
+        {
+          "aiState": "idle",
+          "attackPower": 10,
+          "combatTimer": 99.05,
+          "comboUntil": -1,
+          "critChance": 0.056,
+          "detonateTimer": "Infinity",
+          "dodgeChance": 0.056,
+          "fiveSecondRule": 99.05,
+          "hp": 418,
+          "id": 975,
+          "kind": "player",
+          "level": 20,
+          "lootFfaTimer": "Infinity",
+          "maxHp": 418,
+          "maxResource": 1506,
+          "moveSpeed": 7,
+          "onGround": true,
+          "overpowerUntil": -1,
+          "petMode": "defensive",
+          "pos": {
+            "x": 103303,
+            "z": -1166
+          },
+          "potionCooldownUntil": -1,
+          "resource": 1506,
+          "resourceType": "mana",
+          "spawnPos": {
+            "x": 2,
+            "y": 1.5,
+            "z": -2
+          },
+          "spellPower": 41,
+          "stats": {
+            "agi": 12,
+            "armor": 133,
+            "int": 82,
+            "spi": 60,
+            "sta": 33,
+            "str": 10
+          },
+          "templateId": "mage",
+          "weapon": {
+            "max": 6,
+            "min": 3,
+            "speed": 2.9
+          }
+        },
+        {
+          "aiState": "dead",
+          "ccImmune": true,
+          "comboUntil": -1,
+          "corpseTimer": 59.95,
+          "critChance": 0.05,
+          "dead": true,
+          "detonateTimer": "Infinity",
+          "dodgeChance": 0.05,
+          "facing": 3.141593,
+          "fiveSecondRule": 99,
+          "hostile": true,
+          "id": 976,
+          "inCombat": true,
+          "kind": "mob",
+          "leashAnchor": {
+            "x": 103300,
+            "z": -1154
+          },
+          "level": 22,
+          "loot": {
+            "copper": 248208,
+            "items": [
+              {
+                "count": 1,
+                "itemId": "heroic_bonewrought_greatsword"
+              },
+              {
+                "count": 1,
+                "itemId": "heroic_crownforged_dreadhelm"
+              },
+              {
+                "count": 1,
+                "itemId": "heroic_nighttalon_crown"
+              },
+              {
+                "count": 1,
+                "itemId": "heroic_direfang_greatblade"
+              },
+              {
+                "count": 1,
+                "itemId": "pattern_wyrmfall_pendant"
+              },
+              {
+                "count": 1,
+                "itemId": "scepter_of_the_deathless_court"
+              }
+            ]
+          },
+          "lootFfaTimer": 59.95,
+          "lootRecipientIds": [
+            971,
+            972,
+            973,
+            974,
+            975
+          ],
+          "lootable": true,
+          "maxHp": 192000,
+          "mechanicDamageMult": 7.25,
+          "mechanicHealMult": 3.2,
+          "moveSpeed": 10.5,
+          "onGround": true,
+          "overpowerUntil": -1,
+          "petMode": "defensive",
+          "pos": {
+            "x": 103300,
+            "z": -1154
+          },
+          "potionCooldownUntil": -1,
+          "respawnTimer": 24.95,
+          "slowImmune": true,
+          "spawnPos": {
+            "x": 103300,
+            "z": -1154
+          },
+          "stats": {
+            "armor": 1058
+          },
+          "tappedById": 971,
+          "templateId": "nythraxis_scourge_of_thornpeak",
+          "weapon": {
+            "max": 3988,
+            "min": 2553,
+            "speed": 2.6
+          }
+        }
+      ]
+    },
+    {
+      "tick": 1,
+      "time": 0.05,
+      "nextId": 981,
+      "state": "04279407",
+      "events": "741638a5",
+      "rng": {
+        "draws": 15,
+        "digest": "b9266461"
+      },
+      "label": "final",
+      "players": [
+        {
+          "activeLoadout": -1,
+          "archetype": {},
+          "arena2v2Rating": 1500,
+          "arenaRating": 1500,
+          "bags": [
+            null,
+            null,
+            null,
+            null
+          ],
+          "bank": {},
+          "bgRating": 1500,
+          "cls": "warrior",
+          "companionUpgrades": {},
+          "counters": {
+            "damageDealt": 193000,
+            "kills": 1,
+            "xpGained": 98
+          },
+          "craftDaily": {},
+          "craftSkills": {},
+          "deedStats": {
+            "counters": {
+              "damageDealt": 193000,
+              "dungeonFinalBossKills": 1,
+              "kills": 1,
+              "partiesJoined": 1
+            },
+            "dungeonClears": {
+              "nythraxis_boss_arena:heroic": 1
+            },
+            "itemsDiscovered": [
+              "baked_bread",
+              "eastbrook_buckler",
+              "heroic_mark",
+              "recruit_tunic",
+              "worn_sword",
+              "wyrmfall_core"
+            ],
+            "visited": [
+              "quality:rare"
+            ]
+          },
+          "deedsEarned": [
+            [
+              "cmb_first_blood",
+              ""
+            ],
+            [
+              "col_first_rare",
+              ""
+            ],
+            [
+              "dgn_nythraxis",
+              ""
+            ],
+            [
+              "dgn_nythraxis_deathless",
+              ""
+            ],
+            [
+              "dgn_nythraxis_gravebreaker",
+              ""
+            ],
+            [
+              "dgn_nythraxis_heroic",
+              ""
+            ],
+            [
+              "dgn_nythraxis_wardens",
+              ""
+            ],
+            [
+              "feat_era_cap",
+              ""
+            ],
+            [
+              "prog_double_digits",
+              ""
+            ],
+            [
+              "prog_finding_your_feet",
+              ""
+            ],
+            [
+              "prog_first_steps",
+              ""
+            ],
+            [
+              "prog_level_cap",
+              ""
+            ],
+            [
+              "prog_specialized",
+              ""
+            ],
+            [
+              "prog_the_long_middle",
+              ""
+            ],
+            [
+              "soc_first_party",
+              ""
+            ]
+          ],
+          "delveClears": {},
+          "delveDaily": {},
+          "dungeonDifficulty": "heroic",
+          "entityId": 971,
+          "equipment": {
+            "chest": "recruit_tunic",
+            "mainhand": "worn_sword",
+            "offhand": "eastbrook_buckler"
+          },
+          "equipmentInstance": {},
+          "gatheringProficiency": {},
+          "heroicDaily": {
+            "date": "reset:1",
+            "marked": [
+              "nythraxis_boss_arena"
+            ]
+          },
+          "inventory": [
+            {
+              "count": 5,
+              "itemId": "baked_bread"
+            },
+            {
+              "count": 3,
+              "itemId": "heroic_mark"
+            },
+            {
+              "count": 1,
+              "itemId": "wyrmfall_core"
+            }
+          ],
+          "lifetimeXp": 167298,
+          "mailWelcomed": true,
+          "nodeHarvestReadyAt": {},
+          "questsDone": [
+            "q_nythraxis_bound_guardian"
+          ],
+          "raidLockouts": [
+            [
+              "nythraxis_boss_arena:heroic",
+              86400000
+            ]
+          ],
+          "recipesGrandfathered": true,
+          "reliquary": {
+            "counts": {},
+            "firstFind": {}
+          },
+          "renown": 210,
+          "talents": {
+            "rows": {},
+            "spec": "prot"
+          },
+          "townFocus": {},
+          "wyrmfallDaily": {
+            "sources": [
+              "nythraxis_boss_arena:heroic"
+            ]
+          }
+        },
+        {
+          "activeLoadout": -1,
+          "archetype": {},
+          "arena2v2Rating": 1500,
+          "arenaRating": 1500,
+          "bags": [
+            null,
+            null,
+            null,
+            null
+          ],
+          "bank": {},
+          "bgRating": 1500,
+          "cls": "mage",
+          "companionUpgrades": {},
+          "counters": {
+            "xpGained": 98
+          },
+          "craftDaily": {},
+          "craftSkills": {},
+          "deedStats": {
+            "counters": {
+              "dungeonFinalBossKills": 1,
+              "kills": 1,
+              "partiesJoined": 1
+            },
+            "dungeonClears": {
+              "nythraxis_boss_arena:heroic": 1
+            },
+            "itemsDiscovered": [
+              "apprentice_robe",
+              "baked_bread",
+              "gnarled_staff",
+              "heroic_mark",
+              "spring_water",
+              "wyrmfall_core"
+            ],
+            "visited": [
+              "quality:rare"
+            ]
+          },
+          "deedsEarned": [
+            [
+              "cmb_first_blood",
+              ""
+            ],
+            [
+              "col_first_rare",
+              ""
+            ],
+            [
+              "dgn_nythraxis",
+              ""
+            ],
+            [
+              "dgn_nythraxis_deathless",
+              ""
+            ],
+            [
+              "dgn_nythraxis_gravebreaker",
+              ""
+            ],
+            [
+              "dgn_nythraxis_heroic",
+              ""
+            ],
+            [
+              "dgn_nythraxis_wardens",
+              ""
+            ],
+            [
+              "feat_era_cap",
+              ""
+            ],
+            [
+              "prog_double_digits",
+              ""
+            ],
+            [
+              "prog_finding_your_feet",
+              ""
+            ],
+            [
+              "prog_first_steps",
+              ""
+            ],
+            [
+              "prog_level_cap",
+              ""
+            ],
+            [
+              "prog_the_long_middle",
+              ""
+            ],
+            [
+              "soc_first_party",
+              ""
+            ]
+          ],
+          "delveClears": {},
+          "delveDaily": {},
+          "entityId": 972,
+          "equipment": {
+            "chest": "apprentice_robe",
+            "mainhand": "gnarled_staff"
+          },
+          "equipmentInstance": {},
+          "gatheringProficiency": {},
+          "heroicDaily": {
+            "date": "reset:1",
+            "marked": [
+              "nythraxis_boss_arena"
+            ]
+          },
+          "inventory": [
+            {
+              "count": 5,
+              "itemId": "baked_bread"
+            },
+            {
+              "count": 5,
+              "itemId": "spring_water"
+            },
+            {
+              "count": 3,
+              "itemId": "heroic_mark"
+            },
+            {
+              "count": 1,
+              "itemId": "wyrmfall_core"
+            }
+          ],
+          "lifetimeXp": 167298,
+          "mailWelcomed": true,
+          "nodeHarvestReadyAt": {},
+          "raidLockouts": [
+            [
+              "nythraxis_boss_arena:heroic",
+              86400000
+            ]
+          ],
+          "recipesGrandfathered": true,
+          "reliquary": {
+            "counts": {},
+            "firstFind": {}
+          },
+          "renown": 200,
+          "talents": {
+            "rows": {}
+          },
+          "townFocus": {},
+          "wyrmfallDaily": {
+            "sources": [
+              "nythraxis_boss_arena:heroic"
+            ]
+          }
+        },
+        {
+          "activeLoadout": -1,
+          "archetype": {},
+          "arena2v2Rating": 1500,
+          "arenaRating": 1500,
+          "bags": [
+            null,
+            null,
+            null,
+            null
+          ],
+          "bank": {},
+          "bgRating": 1500,
+          "cls": "mage",
+          "companionUpgrades": {},
+          "counters": {
+            "xpGained": 98
+          },
+          "craftDaily": {},
+          "craftSkills": {},
+          "deedStats": {
+            "counters": {
+              "dungeonFinalBossKills": 1,
+              "kills": 1,
+              "partiesJoined": 1
+            },
+            "dungeonClears": {
+              "nythraxis_boss_arena:heroic": 1
+            },
+            "itemsDiscovered": [
+              "apprentice_robe",
+              "baked_bread",
+              "gnarled_staff",
+              "heroic_mark",
+              "spring_water",
+              "wyrmfall_core"
+            ],
+            "visited": [
+              "quality:rare"
+            ]
+          },
+          "deedsEarned": [
+            [
+              "cmb_first_blood",
+              ""
+            ],
+            [
+              "col_first_rare",
+              ""
+            ],
+            [
+              "dgn_nythraxis",
+              ""
+            ],
+            [
+              "dgn_nythraxis_deathless",
+              ""
+            ],
+            [
+              "dgn_nythraxis_gravebreaker",
+              ""
+            ],
+            [
+              "dgn_nythraxis_heroic",
+              ""
+            ],
+            [
+              "dgn_nythraxis_wardens",
+              ""
+            ],
+            [
+              "feat_era_cap",
+              ""
+            ],
+            [
+              "prog_double_digits",
+              ""
+            ],
+            [
+              "prog_finding_your_feet",
+              ""
+            ],
+            [
+              "prog_first_steps",
+              ""
+            ],
+            [
+              "prog_level_cap",
+              ""
+            ],
+            [
+              "prog_the_long_middle",
+              ""
+            ],
+            [
+              "soc_first_party",
+              ""
+            ]
+          ],
+          "delveClears": {},
+          "delveDaily": {},
+          "entityId": 973,
+          "equipment": {
+            "chest": "apprentice_robe",
+            "mainhand": "gnarled_staff"
+          },
+          "equipmentInstance": {},
+          "gatheringProficiency": {},
+          "heroicDaily": {
+            "date": "reset:1",
+            "marked": [
+              "nythraxis_boss_arena"
+            ]
+          },
+          "inventory": [
+            {
+              "count": 5,
+              "itemId": "baked_bread"
+            },
+            {
+              "count": 5,
+              "itemId": "spring_water"
+            },
+            {
+              "count": 3,
+              "itemId": "heroic_mark"
+            },
+            {
+              "count": 1,
+              "itemId": "wyrmfall_core"
+            }
+          ],
+          "lifetimeXp": 167298,
+          "mailWelcomed": true,
+          "nodeHarvestReadyAt": {},
+          "raidLockouts": [
+            [
+              "nythraxis_boss_arena:heroic",
+              86400000
+            ]
+          ],
+          "recipesGrandfathered": true,
+          "reliquary": {
+            "counts": {},
+            "firstFind": {}
+          },
+          "renown": 200,
+          "talents": {
+            "rows": {}
+          },
+          "townFocus": {},
+          "wyrmfallDaily": {
+            "sources": [
+              "nythraxis_boss_arena:heroic"
+            ]
+          }
+        },
+        {
+          "activeLoadout": -1,
+          "archetype": {},
+          "arena2v2Rating": 1500,
+          "arenaRating": 1500,
+          "bags": [
+            null,
+            null,
+            null,
+            null
+          ],
+          "bank": {},
+          "bgRating": 1500,
+          "cls": "mage",
+          "companionUpgrades": {},
+          "counters": {
+            "xpGained": 98
+          },
+          "craftDaily": {},
+          "craftSkills": {},
+          "deedStats": {
+            "counters": {
+              "dungeonFinalBossKills": 1,
+              "kills": 1,
+              "partiesJoined": 1
+            },
+            "dungeonClears": {
+              "nythraxis_boss_arena:heroic": 1
+            },
+            "itemsDiscovered": [
+              "apprentice_robe",
+              "baked_bread",
+              "gnarled_staff",
+              "heroic_mark",
+              "spring_water",
+              "wyrmfall_core"
+            ],
+            "visited": [
+              "quality:rare"
+            ]
+          },
+          "deedsEarned": [
+            [
+              "cmb_first_blood",
+              ""
+            ],
+            [
+              "col_first_rare",
+              ""
+            ],
+            [
+              "dgn_nythraxis",
+              ""
+            ],
+            [
+              "dgn_nythraxis_deathless",
+              ""
+            ],
+            [
+              "dgn_nythraxis_gravebreaker",
+              ""
+            ],
+            [
+              "dgn_nythraxis_heroic",
+              ""
+            ],
+            [
+              "dgn_nythraxis_wardens",
+              ""
+            ],
+            [
+              "feat_era_cap",
+              ""
+            ],
+            [
+              "prog_double_digits",
+              ""
+            ],
+            [
+              "prog_finding_your_feet",
+              ""
+            ],
+            [
+              "prog_first_steps",
+              ""
+            ],
+            [
+              "prog_level_cap",
+              ""
+            ],
+            [
+              "prog_the_long_middle",
+              ""
+            ],
+            [
+              "soc_first_party",
+              ""
+            ]
+          ],
+          "delveClears": {},
+          "delveDaily": {},
+          "entityId": 974,
+          "equipment": {
+            "chest": "apprentice_robe",
+            "mainhand": "gnarled_staff"
+          },
+          "equipmentInstance": {},
+          "gatheringProficiency": {},
+          "heroicDaily": {
+            "date": "reset:1",
+            "marked": [
+              "nythraxis_boss_arena"
+            ]
+          },
+          "inventory": [
+            {
+              "count": 5,
+              "itemId": "baked_bread"
+            },
+            {
+              "count": 5,
+              "itemId": "spring_water"
+            },
+            {
+              "count": 3,
+              "itemId": "heroic_mark"
+            },
+            {
+              "count": 1,
+              "itemId": "wyrmfall_core"
+            }
+          ],
+          "lifetimeXp": 167298,
+          "mailWelcomed": true,
+          "nodeHarvestReadyAt": {},
+          "raidLockouts": [
+            [
+              "nythraxis_boss_arena:heroic",
+              86400000
+            ]
+          ],
+          "recipesGrandfathered": true,
+          "reliquary": {
+            "counts": {},
+            "firstFind": {}
+          },
+          "renown": 200,
+          "talents": {
+            "rows": {}
+          },
+          "townFocus": {},
+          "wyrmfallDaily": {
+            "sources": [
+              "nythraxis_boss_arena:heroic"
+            ]
+          }
+        },
+        {
+          "activeLoadout": -1,
+          "archetype": {},
+          "arena2v2Rating": 1500,
+          "arenaRating": 1500,
+          "bags": [
+            null,
+            null,
+            null,
+            null
+          ],
+          "bank": {},
+          "bgRating": 1500,
+          "cls": "mage",
+          "companionUpgrades": {},
+          "counters": {
+            "xpGained": 98
+          },
+          "craftDaily": {},
+          "craftSkills": {},
+          "deedStats": {
+            "counters": {
+              "dungeonFinalBossKills": 1,
+              "kills": 1,
+              "partiesJoined": 1
+            },
+            "dungeonClears": {
+              "nythraxis_boss_arena:heroic": 1
+            },
+            "itemsDiscovered": [
+              "apprentice_robe",
+              "baked_bread",
+              "gnarled_staff",
+              "heroic_mark",
+              "spring_water",
+              "wyrmfall_core"
+            ],
+            "visited": [
+              "quality:rare"
+            ]
+          },
+          "deedsEarned": [
+            [
+              "cmb_first_blood",
+              ""
+            ],
+            [
+              "col_first_rare",
+              ""
+            ],
+            [
+              "dgn_nythraxis",
+              ""
+            ],
+            [
+              "dgn_nythraxis_deathless",
+              ""
+            ],
+            [
+              "dgn_nythraxis_gravebreaker",
+              ""
+            ],
+            [
+              "dgn_nythraxis_heroic",
+              ""
+            ],
+            [
+              "dgn_nythraxis_wardens",
+              ""
+            ],
+            [
+              "feat_era_cap",
+              ""
+            ],
+            [
+              "prog_double_digits",
+              ""
+            ],
+            [
+              "prog_finding_your_feet",
+              ""
+            ],
+            [
+              "prog_first_steps",
+              ""
+            ],
+            [
+              "prog_level_cap",
+              ""
+            ],
+            [
+              "prog_the_long_middle",
+              ""
+            ],
+            [
+              "soc_first_party",
+              ""
+            ]
+          ],
+          "delveClears": {},
+          "delveDaily": {},
+          "entityId": 975,
+          "equipment": {
+            "chest": "apprentice_robe",
+            "mainhand": "gnarled_staff"
+          },
+          "equipmentInstance": {},
+          "gatheringProficiency": {},
+          "heroicDaily": {
+            "date": "reset:1",
+            "marked": [
+              "nythraxis_boss_arena"
+            ]
+          },
+          "inventory": [
+            {
+              "count": 5,
+              "itemId": "baked_bread"
+            },
+            {
+              "count": 5,
+              "itemId": "spring_water"
+            },
+            {
+              "count": 3,
+              "itemId": "heroic_mark"
+            },
+            {
+              "count": 1,
+              "itemId": "wyrmfall_core"
+            }
+          ],
+          "lifetimeXp": 167298,
+          "mailWelcomed": true,
+          "nodeHarvestReadyAt": {},
+          "raidLockouts": [
+            [
+              "nythraxis_boss_arena:heroic",
+              86400000
+            ]
+          ],
+          "recipesGrandfathered": true,
+          "reliquary": {
+            "counts": {},
+            "firstFind": {}
+          },
+          "renown": 200,
+          "talents": {
+            "rows": {}
+          },
+          "townFocus": {},
+          "wyrmfallDaily": {
+            "sources": [
+              "nythraxis_boss_arena:heroic"
+            ]
+          }
+        }
+      ],
+      "entities": [
+        {
+          "aiState": "idle",
+          "attackPower": 122,
+          "auras": [
+            {
+              "duration": 3600,
+              "id": "battle_stance",
+              "kind": "battle_stance",
+              "name": "Battle Stance",
+              "remaining": 3599.95,
+              "school": "physical",
+              "sourceId": 971
+            }
+          ],
+          "blockChance": 0.05,
+          "blockValue": 6,
+          "combatTimer": 0.05,
+          "comboUntil": -1,
+          "critChance": 0.0695,
+          "detonateTimer": "Infinity",
+          "dodgeChance": 0.0695,
+          "fiveSecondRule": 99.05,
+          "hp": 1062,
+          "id": 971,
+          "inCombat": true,
+          "kind": "player",
+          "level": 20,
+          "lootFfaTimer": "Infinity",
+          "maxHp": 1062,
+          "maxResource": 100,
+          "moveSpeed": 7,
+          "offhandItemId": "eastbrook_buckler",
+          "onGround": true,
+          "overpowerUntil": -1,
+          "petMode": "defensive",
+          "pos": {
+            "x": 103300,
+            "z": -1160
+          },
+          "potionCooldownUntil": -1,
+          "resourceType": "rage",
+          "spawnPos": {
+            "x": 2,
+            "y": 1.5,
+            "z": -2
+          },
+          "spellPower": 5,
+          "stats": {
+            "agi": 39,
+            "armor": 498,
+            "int": 10,
+            "spi": 11,
+            "sta": 85,
+            "str": 61
+          },
+          "templateId": "warrior",
+          "weapon": {
+            "max": 5,
+            "min": 2,
+            "speed": 2
+          }
+        },
+        {
+          "aiState": "idle",
+          "attackPower": 10,
+          "combatTimer": 99.05,
+          "comboUntil": -1,
+          "critChance": 0.056,
+          "detonateTimer": "Infinity",
+          "dodgeChance": 0.056,
+          "fiveSecondRule": 99.05,
+          "hp": 418,
+          "id": 972,
+          "kind": "player",
+          "level": 20,
+          "lootFfaTimer": "Infinity",
+          "maxHp": 418,
+          "maxResource": 1506,
+          "moveSpeed": 7,
+          "onGround": true,
+          "overpowerUntil": -1,
+          "petMode": "defensive",
+          "pos": {
+            "x": 103297,
+            "z": -1166
+          },
+          "potionCooldownUntil": -1,
+          "resource": 1506,
+          "resourceType": "mana",
+          "spawnPos": {
+            "x": 2,
+            "y": 1.5,
+            "z": -2
+          },
+          "spellPower": 41,
+          "stats": {
+            "agi": 12,
+            "armor": 133,
+            "int": 82,
+            "spi": 60,
+            "sta": 33,
+            "str": 10
+          },
+          "templateId": "mage",
+          "weapon": {
+            "max": 6,
+            "min": 3,
+            "speed": 2.9
+          }
+        },
+        {
+          "aiState": "idle",
+          "attackPower": 10,
+          "combatTimer": 99.05,
+          "comboUntil": -1,
+          "critChance": 0.056,
+          "detonateTimer": "Infinity",
+          "dodgeChance": 0.056,
+          "fiveSecondRule": 99.05,
+          "hp": 418,
+          "id": 973,
+          "kind": "player",
+          "level": 20,
+          "lootFfaTimer": "Infinity",
+          "maxHp": 418,
+          "maxResource": 1506,
+          "moveSpeed": 7,
+          "onGround": true,
+          "overpowerUntil": -1,
+          "petMode": "defensive",
+          "pos": {
+            "x": 103299,
+            "z": -1166
+          },
+          "potionCooldownUntil": -1,
+          "resource": 1506,
+          "resourceType": "mana",
+          "spawnPos": {
+            "x": 2,
+            "y": 1.5,
+            "z": -2
+          },
+          "spellPower": 41,
+          "stats": {
+            "agi": 12,
+            "armor": 133,
+            "int": 82,
+            "spi": 60,
+            "sta": 33,
+            "str": 10
+          },
+          "templateId": "mage",
+          "weapon": {
+            "max": 6,
+            "min": 3,
+            "speed": 2.9
+          }
+        },
+        {
+          "aiState": "idle",
+          "attackPower": 10,
+          "combatTimer": 99.05,
+          "comboUntil": -1,
+          "critChance": 0.056,
+          "detonateTimer": "Infinity",
+          "dodgeChance": 0.056,
+          "fiveSecondRule": 99.05,
+          "hp": 418,
+          "id": 974,
+          "kind": "player",
+          "level": 20,
+          "lootFfaTimer": "Infinity",
+          "maxHp": 418,
+          "maxResource": 1506,
+          "moveSpeed": 7,
+          "onGround": true,
+          "overpowerUntil": -1,
+          "petMode": "defensive",
+          "pos": {
+            "x": 103301,
+            "z": -1166
+          },
+          "potionCooldownUntil": -1,
+          "resource": 1506,
+          "resourceType": "mana",
+          "spawnPos": {
+            "x": 2,
+            "y": 1.5,
+            "z": -2
+          },
+          "spellPower": 41,
+          "stats": {
+            "agi": 12,
+            "armor": 133,
+            "int": 82,
+            "spi": 60,
+            "sta": 33,
+            "str": 10
+          },
+          "templateId": "mage",
+          "weapon": {
+            "max": 6,
+            "min": 3,
+            "speed": 2.9
+          }
+        },
+        {
+          "aiState": "idle",
+          "attackPower": 10,
+          "combatTimer": 99.05,
+          "comboUntil": -1,
+          "critChance": 0.056,
+          "detonateTimer": "Infinity",
+          "dodgeChance": 0.056,
+          "fiveSecondRule": 99.05,
+          "hp": 418,
+          "id": 975,
+          "kind": "player",
+          "level": 20,
+          "lootFfaTimer": "Infinity",
+          "maxHp": 418,
+          "maxResource": 1506,
+          "moveSpeed": 7,
+          "onGround": true,
+          "overpowerUntil": -1,
+          "petMode": "defensive",
+          "pos": {
+            "x": 103303,
+            "z": -1166
+          },
+          "potionCooldownUntil": -1,
+          "resource": 1506,
+          "resourceType": "mana",
+          "spawnPos": {
+            "x": 2,
+            "y": 1.5,
+            "z": -2
+          },
+          "spellPower": 41,
+          "stats": {
+            "agi": 12,
+            "armor": 133,
+            "int": 82,
+            "spi": 60,
+            "sta": 33,
+            "str": 10
+          },
+          "templateId": "mage",
+          "weapon": {
+            "max": 6,
+            "min": 3,
+            "speed": 2.9
+          }
+        },
+        {
+          "aiState": "dead",
+          "ccImmune": true,
+          "comboUntil": -1,
+          "corpseTimer": 59.95,
+          "critChance": 0.05,
+          "dead": true,
+          "detonateTimer": "Infinity",
+          "dodgeChance": 0.05,
+          "facing": 3.141593,
+          "fiveSecondRule": 99,
+          "hostile": true,
+          "id": 976,
+          "inCombat": true,
+          "kind": "mob",
+          "leashAnchor": {
+            "x": 103300,
+            "z": -1154
+          },
+          "level": 22,
+          "loot": {
+            "copper": 248208,
+            "items": [
+              {
+                "count": 1,
+                "itemId": "heroic_bonewrought_greatsword"
+              },
+              {
+                "count": 1,
+                "itemId": "heroic_crownforged_dreadhelm"
+              },
+              {
+                "count": 1,
+                "itemId": "heroic_nighttalon_crown"
+              },
+              {
+                "count": 1,
+                "itemId": "heroic_direfang_greatblade"
+              },
+              {
+                "count": 1,
+                "itemId": "pattern_wyrmfall_pendant"
+              },
+              {
+                "count": 1,
+                "itemId": "scepter_of_the_deathless_court"
+              }
+            ]
+          },
+          "lootFfaTimer": 59.95,
+          "lootRecipientIds": [
+            971,
+            972,
+            973,
+            974,
+            975
+          ],
+          "lootable": true,
+          "maxHp": 192000,
+          "mechanicDamageMult": 7.25,
+          "mechanicHealMult": 3.2,
+          "moveSpeed": 10.5,
+          "onGround": true,
+          "overpowerUntil": -1,
+          "petMode": "defensive",
+          "pos": {
+            "x": 103300,
+            "z": -1154
+          },
+          "potionCooldownUntil": -1,
+          "respawnTimer": 24.95,
+          "slowImmune": true,
+          "spawnPos": {
+            "x": 103300,
+            "z": -1154
+          },
+          "stats": {
+            "armor": 1058
+          },
+          "tappedById": 971,
+          "templateId": "nythraxis_scourge_of_thornpeak",
+          "weapon": {
+            "max": 3988,
+            "min": 2553,
+            "speed": 2.6
+          }
+        }
+      ]
+    }
+  ]
+}

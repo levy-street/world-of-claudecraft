@@ -3381,6 +3381,110 @@ function nythraxisFullPull(): Scenario {
   };
 }
 
+// The HEROIC claim on the same raid boss, and it exists to close the sibling
+// residual the 'nythraxis_patterns' block in content/dungeons.ts records in
+// prose: loot/loot_roll.ts walks the base table first and THEN rolls the
+// HEROIC_BOSS_LOOT entries in the SAME call, so every heroic-only draw sits one
+// position later for each rollGroup appended at the base tail. The scenario
+// above enters with NO difficulty (a normal kill), so no golden covered a
+// heroic claim at all, and masterwrought Phase 11f appends exactly such a tail
+// group. The heroic stream is therefore recorded FIRST, as the phase's own
+// commit, the same discipline the rift rank ladder took below.
+//
+// DELIBERATELY LEAN, and not a second full pull: the residual is about the LOOT
+// stream, the encounter script is already pinned frame by frame above, and the
+// full pull is the suite's heaviest recording. The boss dies to one lethal hit
+// at the pull, which is what the heroic arm of tests/dungeons.test.ts does.
+//
+// SEED 4504 WAS MEASURED, NOT PICKED, against two conditions at once, and it is
+// the FIRST seed from 4500 satisfying both (the hunt drove this very scenario
+// body and swapped only the Sim seed):
+//   1. COPPER ABOVE THE NORMAL CEILING. A normal kill rolls
+//      rng.int(90000, 210000) off the 150 000 base and a heroic one
+//      rng.int(120000, 280000) off NYTHRAXIS_HEROIC_COPPER, and the two bands
+//      OVERLAP, so only a roll above 210 000 proves the heroicCopper
+//      substitution actually fired rather than merely being consistent with it.
+//      This seed rolls 248 208.
+//   2. THE EXISTING BASE TAIL GROUP WINNING. 'nythraxis_patterns' is the LAST
+//      group in the base walk, so a seed where it sheds a pattern pins the
+//      outcome of the draw immediately BEFORE the position Phase 11f appends
+//      into. This seed sheds pattern_wyrmfall_pendant.
+// Measured over seeds 4500 to 4513: 8 of 14 cleared the copper condition (the
+// band above 210 000 is 70 000 of the 160 001 wide heroic range, so 8 is where
+// it should land), 5 of 14 shed a pattern (the group's total is 0.40), and 4
+// cleared both.
+function nythraxisHeroicClaim(): Scenario {
+  return {
+    name: 'nythraxis_heroic_claim',
+    coverage: [
+      'rollLoot HEROIC arm on the raid boss: the base-table walk, then the appended HEROIC_BOSS_LOOT draws in the SAME call (the nythraxis_heroic_weapon rollGroup, then the four ungrouped mount chances in array order), which is the stream position a base-table tail append shifts',
+      'heroicItem(): the base set-piece and legendary drops swapped IN PLACE for their raid-tier heroic variants (content/heroic_variants.ts), a swap only a heroic claim reaches',
+      'LootEntry.heroicCopper: the raised finale money base substituted on the SAME single int draw (NYTHRAXIS_HEROIC_COPPER), a value swap and never an extra draw',
+      'awardHeroicMarks on a heroic raid kill (instances/dungeons) plus the raid lockout, neither of which a normal claim grants',
+      'class:warrior',
+    ],
+    sampleEvery: 10,
+    build: () => new Sim({ seed: 4504, playerClass: 'warrior', noPlayer: true }),
+    drive(rec: Recorder) {
+      const sim = rec.sim;
+      const tankPid = sim.addPlayer('warrior', 'HeroicTank') as number;
+      sim.setPlayerLevel(MAX_LEVEL, tankPid);
+      sim.setSpec('prot', tankPid);
+      (sim.players.get(tankPid) as PlayerMeta).questsDone.add('q_nythraxis_bound_guardian');
+      for (let i = 0; i < 4; i++) {
+        const pid = sim.addPlayer('mage', `HeroicDps${i}`) as number;
+        sim.setPlayerLevel(MAX_LEVEL, pid);
+        sim.partyInvite(pid, tankPid);
+        sim.partyAccept(pid);
+      }
+      sim.convertPartyToRaid(tankPid); // the raid gate wants five
+      // The ONE line that separates this scenario from its sibling above: the
+      // claim is heroic, so rollLoot's instances.find(difficulty === 'heroic')
+      // resolves and both heroic arms run.
+      sim.setDungeonDifficulty('heroic', tankPid);
+      sim.enterDungeon('nythraxis_boss_arena', tankPid);
+      const tank = sim.entities.get(tankPid) as AnyEntity;
+      const boss = [...sim.entities.values()].find(
+        (e: AnyEntity) => e.kind === 'mob' && e.templateId === NYTHRAXIS_BOSS_ID && !e.dead,
+      ) as AnyEntity;
+      rec.track(boss.id);
+      rec.notes.bossId = boss.id;
+      rec.notes.tankPid = tankPid;
+
+      // Stage the whole raid inside PARTY_XP_RANGE of the boss. NOT cosmetic:
+      // handleDeath builds its participation snapshot from the party members
+      // within that range, and awardHeroicMarks pays exactly that snapshot, so
+      // a raid left at the door would record a one-player mark payout and stop
+      // being a representative heroic clear. Y is pinned to the arena floor the
+      // way the full pull's floorTeleport does (the shared teleport helper
+      // snaps to OVERWORLD terrain, which floats an instanced player into
+      // lethal falling damage).
+      const stage = (e: AnyEntity, x: number, z: number) => {
+        e.pos.x = x;
+        e.pos.z = z;
+        e.pos.y = boss.pos.y;
+        e.prevPos = { ...e.pos };
+        e.fallStartY = boss.pos.y;
+        e.vy = 0;
+        e.onGround = true;
+        sim.rebucket(e);
+      };
+      stage(tank, boss.pos.x, boss.pos.z - 6);
+      const dps = [...sim.players.values()]
+        .filter((m) => m.entityId !== tankPid)
+        .map((m) => sim.entities.get(m.entityId) as AnyEntity);
+      for (let i = 0; i < dps.length; i++) {
+        stage(dps[i], boss.pos.x - 3 + i * 2, boss.pos.z - 12);
+      }
+      rec.snapshot('claimed');
+
+      sim.dealDamage(tank, boss, boss.hp + 1000, false, 'physical', null, 'hit', true);
+      rec.tick(1); // updateMob dead-branch -> handleDeath -> rollLoot + the marks award
+      rec.snapshot('death');
+    },
+  };
+}
+
 // C3 aura/regen runner: the per-tick aura/regen/timer slice that moves to
 // src/sim/combat/auras.ts. Three phases pin the pieces other scenarios miss:
 //  A. DoT-kills-mid-tick guard: a victim mob carries a buff at index 0 and a lethal
@@ -6459,4 +6563,9 @@ export const SCENARIOS: Scenario[] = [
   riftClearRewards(20, 4332),
   riftClearRewards(22, 4353),
   riftClearRewards(28, 4333),
+  // The heroic claim on the raid boss (masterwrought Phase 11f, closing the
+  // sibling residual the base table's own append comment records). Appended
+  // last, so it lands in the final shard automatically like every other
+  // addition; SHARD_BOUNDS ends at SCENARIOS.length and needs no edit.
+  nythraxisHeroicClaim(),
 ];

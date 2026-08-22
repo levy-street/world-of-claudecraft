@@ -10,6 +10,13 @@
 // entities helpers live in run_scenarios.ts.
 
 import { describe, expect, it } from 'vitest';
+import {
+  HEROIC_DUNGEON_TUNING,
+  HEROIC_MARK_ITEM_ID,
+  NYTHRAXIS_HEROIC_COPPER,
+} from '../../src/sim/content/dungeon_difficulty';
+import { HEROIC_BOSS_LOOT } from '../../src/sim/content/heroic_loot';
+import { heroicVariantId } from '../../src/sim/content/heroic_variants';
 import { ITEMS, MOBS } from '../../src/sim/data';
 import { RIFT_IMPAIRED_FUSE_CAP } from '../../src/sim/mob/rift_escape_window';
 import { farmingHarvestGainAt, resolveFarmHarvest } from '../../src/sim/professions/farming';
@@ -308,6 +315,77 @@ describe('coverage: each scenario fires its subsystem', () => {
     const tankMeta = [...sim.players.values()].find((m: any) => m.name === 'NyxTank') as any;
     expect(tankMeta.raidLockouts.has('nythraxis_boss_arena')).toBe(true);
     expect(chats.some((e) => e.text === 'Malric...')).toBe(true);
+    // The sibling-distinguishing arm (the rift ladder's fourth-arm idiom): this
+    // scenario's claim is NORMAL, which is precisely why it cannot cover a
+    // heroic loot stream and why nythraxis_heroic_claim below exists. If a
+    // future edit ever makes this pull heroic, BOTH scenarios would cover the
+    // same arm and the heroic one would silently stop being the only witness.
+    expect(
+      sim.instances.some(
+        (i: any) => i.partyKey !== null && i.mobIds.includes(n.bossId) && i.difficulty === 'heroic',
+      ),
+    ).toBe(false);
+  }, 90_000);
+
+  it('nythraxis_heroic_claim: the heroic loot arm (variant swap + heroic-only weapon + raised money base + marks)', () => {
+    const rec = run('nythraxis_heroic_claim');
+    const sim = rec.sim as any;
+    const n = rec.notes as Record<string, any>;
+    const boss = sim.entities.get(n.bossId);
+    expect(boss.dead).toBe(true);
+    // The claim really is heroic: the exact predicate rollLoot resolves.
+    expect(
+      sim.instances.some(
+        (i: any) => i.partyKey !== null && i.mobIds.includes(n.bossId) && i.difficulty === 'heroic',
+      ),
+    ).toBe(true);
+
+    const items: string[] = (boss.loot?.items ?? []).map((s: any) => s.itemId);
+    expect(items.length).toBeGreaterThan(0);
+
+    // EXACTLY ONE heroic-only weapon: the nythraxis_heroic_weapon group sums to
+    // 1.0, so a heroic kill always sheds one and a normal kill never can. The
+    // id set is DERIVED from the shipped table, never listed here, so a table
+    // re-cut moves this arm instead of leaving it green over a stale trio.
+    const heroicOnlyWeaponIds = HEROIC_BOSS_LOOT.nythraxis_scourge_of_thornpeak
+      .filter((e) => e.rollGroup !== undefined)
+      .map((e) => e.itemId as string);
+    expect(heroicOnlyWeaponIds.length).toBeGreaterThan(0);
+    expect(items.filter((id) => heroicOnlyWeaponIds.includes(id)).length).toBe(1);
+
+    // heroicItem() fired on the base table: every drop that HAS a raid-tier
+    // heroic variant came out as that variant. Asserted as a whole-list
+    // property rather than "at least one", so a swap that stopped firing for a
+    // single slot reds. The eligibility test is heroicVariantId's own index
+    // lookup, the exact question heroicItem asks, NOT a kind filter: a table
+    // that later sheds a plain junk or recipe row (the Phase 11f farming seeds
+    // and patterns are both) has no variant to swap to and must not be read as
+    // a swap that failed.
+    const missedSwap = items.filter(
+      (id) => !heroicOnlyWeaponIds.includes(id) && ITEMS[heroicVariantId(id)] !== undefined,
+    );
+    expect(
+      missedSwap,
+      `every drop with a heroic variant must BE that variant: ${missedSwap}`,
+    ).toEqual([]);
+    expect(items.filter((id) => id.startsWith('heroic_')).length).toBeGreaterThan(0);
+
+    // The heroicCopper substitution, and the reason the seed was hunted: the
+    // normal base rolls at most ceil(150000 * 1.4) = 210 000, so a roll above
+    // that could only have come off NYTHRAXIS_HEROIC_COPPER. The upper bound is
+    // pinned too, so a base re-tune cannot widen this arm into always-true.
+    expect(boss.loot.copper).toBeGreaterThan(Math.ceil(150_000 * 1.4));
+    expect(boss.loot.copper).toBeLessThanOrEqual(Math.ceil(NYTHRAXIS_HEROIC_COPPER * 1.4));
+
+    // awardHeroicMarks paid the whole raid, which only a heroic claim reaches.
+    const tuning = HEROIC_DUNGEON_TUNING.nythraxis_boss_arena;
+    const raid = [...sim.players.values()] as any[];
+    expect(raid.length).toBe(5);
+    for (const meta of raid) {
+      expect(sim.countItem(HEROIC_MARK_ITEM_ID, meta.entityId), `${meta.name} heroic marks`).toBe(
+        tuning.marksPerParticipant,
+      );
+    }
   }, 90_000);
 
   it('warrior_row_capstones: intervene, thresholded fear, victory rush heal, bladestorm ticks', () => {
