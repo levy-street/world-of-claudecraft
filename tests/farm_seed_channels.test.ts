@@ -26,6 +26,7 @@
 import { describe, expect, it } from 'vitest';
 import { FARM_CROPS } from '../src/sim/content/farm_crops';
 import { HEROIC_VENDOR_STOCK } from '../src/sim/content/heroic_vendor';
+import { ALL_RECIPES } from '../src/sim/content/recipes';
 import { ITEMS, MOBS, NPCS } from '../src/sim/data';
 import { addRiftClearGearLoot, FARM_RIFT_DROP_ITEM_IDS } from '../src/sim/rift/progression';
 import { Rng } from '../src/sim/rng';
@@ -139,6 +140,80 @@ describe('THE IDENTITY GUARD: farming never becomes conditional on raiding', () 
       expect(def.kind, seedId).toBe('junk');
       expect(def.soulbound ?? false, `${seedId} must stay tradable`).toBe(false);
       expect(def.noMarketList ?? false, `${seedId} must stay listable`).toBe(false);
+    }
+  });
+
+  it('R18: every farm PRODUCE item stays market-listable junk, never a slot tax', () => {
+    // masterwrought R18 read at its own level: professions are needed through
+    // their OUTPUT, never through a character slot, and the mechanical form of
+    // that is that a raider buys grain the way a raider already buys an herb.
+    // Produce that went soulbound or unlistable would make farming the only
+    // route to its own output, which is the compulsion this rule forbids.
+    const produce = Object.values(FARM_CROPS).flatMap((crop) => [
+      crop.produceItemId,
+      crop.fineProduceItemId,
+    ]);
+    expect(produce.length, 'the produce family').toBeGreaterThanOrEqual(24);
+    for (const id of produce) {
+      const def = ITEMS[id];
+      expect(def, id).toBeDefined();
+      expect(def.kind, id).toBe('junk');
+      expect(def.soulbound ?? false, `${id} must stay tradable`).toBe(false);
+      expect(def.noMarketList ?? false, `${id} must stay listable`).toBe(false);
+    }
+  });
+
+  it('R18: the tier 1 and 2 seeds stay vendor-stocked, so the on-ramp never needs the endgame', () => {
+    const starterSeeds = Object.values(FARM_CROPS)
+      .filter((crop) => crop.tier <= 2)
+      .map((crop) => crop.seedItemId);
+    expect(starterSeeds.length, 'the starter seeds').toBeGreaterThan(0);
+    const stocked = new Set(Object.values(NPCS).flatMap((npc) => npc.vendorItems ?? []));
+    for (const id of starterSeeds) {
+      expect(stocked.has(id), `${id} must stay on a counter`).toBe(true);
+      expect(ITEMS[id].buyValue, `${id} price`).toBeGreaterThan(0);
+    }
+  });
+
+  it('R18 and D24: farming rows are ADDED beside the herb line, never substituted for it', () => {
+    // The displacement guardrail, in the one form that actually bites: every
+    // shipped herb must still have a live consumer. A phase that "made room"
+    // for produce by pulling an herb out of a bill would strand that herb with
+    // no buyer, which is precisely what herbalism must never lose. Derived
+    // from the item catalog, so a new herb joins the claim by existing.
+    // BASE herbs only, and the exclusion is a FINDING recorded rather than a
+    // convenience: the three fine_* herb twins have no recipe consumer at all
+    // on the merged tree today, which predates this phase and is farming's
+    // own fine-twin question, not a displacement caused here. Scoping to the
+    // base line keeps the arm about what R18 protects; widening it would red
+    // on inherited state and teach the next reader to loosen it.
+    const herbIds = Object.keys(ITEMS).filter(
+      (id) => id.endsWith('_herb') && !id.startsWith('fine_'),
+    );
+    expect(herbIds.length, 'the base herb line').toBeGreaterThanOrEqual(3);
+    for (const id of herbIds) {
+      const consumers = ALL_RECIPES.filter((r) => r.reagents.some((g) => g.itemId === id));
+      expect(consumers.length, `${id} lost every consumer`).toBeGreaterThan(0);
+    }
+    // And the alchemy line specifically: every alchemy recipe that consumes
+    // farm output must ALSO still consume an herb, so produce joined the bill
+    // rather than replacing what was there.
+    const herbSet = new Set(herbIds);
+    const farmIds = new Set(
+      Object.values(FARM_CROPS).flatMap((crop) => [
+        crop.seedItemId,
+        crop.produceItemId,
+        crop.fineProduceItemId,
+      ]),
+    );
+    const alchemyWithFarm = ALL_RECIPES.filter(
+      (r) => r.professionId === 'alchemy' && r.reagents.some((g) => farmIds.has(g.itemId)),
+    );
+    for (const recipe of alchemyWithFarm) {
+      expect(
+        recipe.reagents.some((g) => herbSet.has(g.itemId)),
+        `${recipe.id} took farm output without keeping an herb`,
+      ).toBe(true);
     }
   });
 

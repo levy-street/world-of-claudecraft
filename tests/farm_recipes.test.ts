@@ -307,6 +307,53 @@ describe('FARM_RECIPES: the farm-economy hook set', () => {
     }
   });
 
+  it("R20: farming's endgame-bill count, measured here and handed forward", () => {
+    // masterwrought R20 asks whether every gathering profession reaches the
+    // endgame, and its census spans five OTHER professions this phase does not
+    // touch, so the cross-profession count is another phase's deliverable. What
+    // THIS phase owes is farming's own number, measured rather than estimated,
+    // so whoever runs that census reads something somebody computed.
+    //
+    // The measure: recipes at skillReq 75 or above, anywhere in the merged
+    // table, that name a farm reagent. Before the Phase 11f rung climb the only
+    // one was a crafted hoe, which is exactly the hole R20 exists to find:
+    // farming's whole FOOD output was trapped below cooking 50 while mining fed
+    // 21 endgame bills.
+    const farmItemIds = new Set(
+      Object.values(FARM_CROPS).flatMap((crop) => [
+        crop.seedItemId,
+        crop.produceItemId,
+        crop.fineProduceItemId,
+      ]),
+    );
+    const endgameBills = ALL_RECIPES.filter(
+      (r) => r.skillReq >= 75 && r.reagents.some((g) => farmItemIds.has(g.itemId)),
+    );
+    // Predicted then observed at the climb: the six flipped farm rows, plus the
+    // one shipped hoe rung that already consumed a fine twin at 75.
+    expect(endgameBills.map((r) => r.id).sort()).toEqual(
+      [
+        'recipe_evergarden_braised_greens',
+        'recipe_evergarden_harvest_platter',
+        'recipe_evergarden_sunmelon_tart',
+        'recipe_harvest_feast',
+        'recipe_highwatch_barley_porridge',
+        'recipe_highwatch_gourd_soup',
+        'recipe_osmium_hoe',
+      ].sort(),
+    );
+    expect(endgameBills, "farming's endgame-bill count for the R20 census").toHaveLength(7);
+    // The claim R20 actually cares about, stated separately from the literal
+    // above so a future re-tier that moves WHICH rows qualify still has to keep
+    // the property true: produce reaches a CONSUMABLE endgame bill, not only a
+    // tool. Without this clause the count could be satisfied by the hoe alone,
+    // which is the state R20 was written against.
+    const consumableEndgame = endgameBills.filter(
+      (r) => r.professionId === 'cooking' || r.professionId === 'alchemy',
+    );
+    expect(consumableEndgame.length, 'produce must feed a consumable endgame bill').toBe(6);
+  });
+
   it('output quality is one value per band and never falls as the ladder climbs', () => {
     // The two arms that stop QUALITY_BY_RUNG from being a bare literal. The
     // uniformity arm says the band really decides the quality (one value per

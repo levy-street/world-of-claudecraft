@@ -695,11 +695,17 @@ export const PROFESSION_ITEMS: Record<string, ItemDef> = {
   },
 
   // --- Farm dishes (cooking, Phase 6 economy hooks) ------------------------
-  // Trainer-taught outputs of FARM_RECIPES (content/recipes.ts), the farm
-  // half of cooking: eight dishes cooked from crop produce at the kitchens,
-  // a SIBLING of the ladder block above rather than part of it (the ladder is
-  // closed at three rungs x three recipes per craft; see the FARM_RECIPES
-  // header for why folding these in would break that shape).
+  // Outputs of FARM_RECIPES (content/recipes.ts), the farm half of cooking:
+  // eight dishes cooked from crop produce at the kitchens, a SIBLING of the
+  // ladder block above rather than part of it (the ladder is closed at three
+  // rungs x three recipes per craft; see the FARM_RECIPES header for why
+  // folding these in would break that shape).
+  //
+  // NO LONGER ALL TRAINER-TAUGHT (masterwrought Phase 11f): the farm ladder is
+  // split by rung now, so the dishes at or above FARM_DROP_RUNG_FLOOR are
+  // taught by pattern items instead. Nothing about these DEFS moved for that:
+  // the channel is a property of the recipe row, and this block's power,
+  // quality and prices are 11c's and are untouched.
   //
   // Exactly the same shape as the ladder dishes: kind 'food' + foodHp (an 18s
   // sit heal), no buff machinery and no new effect field. Every foodHp and
@@ -778,8 +784,10 @@ export const PROFESSION_ITEMS: Record<string, ItemDef> = {
   },
 
   // --- Farm buff dishes (cooking, Phase 11 well-fed food) -------------------
-  // Trainer-taught outputs of FARM_RECIPES, one BUFF dish per crop tier so
-  // the produce ladder has a well-fed consumer at every rung. Exactly the
+  // Outputs of FARM_RECIPES, one BUFF dish per crop tier so the produce
+  // ladder has a well-fed consumer at every rung. The upper two are taught by
+  // pattern items rather than a trainer since Phase 11f (see the plain-dish
+  // header above); their defs did not move for it. Exactly the
   // plain-dish shape above plus the ONE extra field: `wellFed`, the same
   // payload the apex role foods carry (types.ts), minted at the 18s
   // sit-restore's completion under the one shared 'well_fed' aura id.
