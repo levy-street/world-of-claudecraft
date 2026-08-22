@@ -298,6 +298,29 @@ export const EXPLAINED_EXTRAS = Object.freeze([
     ruling: '11c-A2-BUILDER',
     reason: 'the one Consuming build site (src/sim/consuming.ts), a new module on the merged tree',
   },
+  {
+    cls: 'exports',
+    name: 'FARM_EFFECT_BONUS_PICK_CAP',
+    phase: '11e',
+    ruling: 'masterwrought DECISION C (cap the charm in farming, never in the catalog)',
+    reason:
+      "farming's own cap on a slotted quantity tool effect (src/sim/professions/farming.ts), beside FARM_TONIC_BONUS_PICKS; deliberately NOT a change to TOOL_EFFECTS.makers_charm.bonus, which would re-tune three other professions",
+  },
+  {
+    cls: 'contentIds',
+    name: 'col_farm_roster',
+    phase: '11e',
+    ruling: 'masterwrought DECISION E (one cosmetic collection deed for the roster)',
+    reason:
+      'the roster deed: category collection, renown 5, no title, triggered on the farm_crop marks generated from FARM_CROP_IDS',
+  },
+  {
+    cls: 'contentIdRows',
+    name: 'src/sim/content/deeds.ts:col_farm_roster',
+    phase: '11e',
+    ruling: 'masterwrought DECISION E (one cosmetic collection deed for the roster)',
+    reason: 'the same deed row, in the file-scoped class',
+  },
   // Phase 11e's crop roster widening. A new content id is EXTRA in three
   // classes at once and in three different NAME FORMS: the bare id in
   // contentIds, the `file:id` key in contentIdRows (twice for a crop, because

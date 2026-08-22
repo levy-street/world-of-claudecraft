@@ -104,6 +104,9 @@ measurement missed, because the throwaway carried no catalog name.
 
 | Class | Name | Phase | Ruling | Reason |
 |---|---|---|---|---|
+| exports | `FARM_EFFECT_BONUS_PICK_CAP` | 11e | masterwrought DECISION C (cap the charm in farming, never in the catalog) | farming's own cap on a slotted quantity tool effect, beside FARM_TONIC_BONUS_PICKS; deliberately NOT a change to TOOL_EFFECTS.makers_charm.bonus, which would re-tune three other professions |
+| contentIds | `col_farm_roster` | 11e | masterwrought DECISION E (one cosmetic collection deed for the roster) | the roster deed: category collection, renown 5, no title, triggered on the farm_crop marks generated from FARM_CROP_IDS |
+| contentIdRows | `src/sim/content/deeds.ts:col_farm_roster` | 11e | masterwrought DECISION E (one cosmetic collection deed for the roster) | the same deed row, in the file-scoped class |
 | contentIds | `thornpeak_cabbage_seed` | 11e | masterwrought DECISION B (roster 2/2/4/4, one class per tier) | the seed, vendor-stocked at the tier-3 farmer under DECISION D |
 | contentIds | `thornpeak_cabbage` | 11e | masterwrought DECISION B (roster 2/2/4/4, one class per tier) | the tier-3 leaf produce, consumed by recipe_highwatch_barley_bannock |
 | contentIds | `fine_thornpeak_cabbage` | 11e | masterwrought DECISION B (roster 2/2/4/4, one class per tier) | its fine twin, consumed by recipe_highwatch_barley_bannock in the same bill |
