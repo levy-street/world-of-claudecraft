@@ -80,6 +80,10 @@ describe('guild letter over the live GameServer wire (session routing)', () => {
       // Drive the crosser past the threshold on the LIVE server sim (the
       // sweep reads meta.craftSkills; it draws no rng, so no seed hunting).
       const players = (server.sim as unknown as { players: Map<number, PlayerMeta> }).players;
+      // The welcome letter is level-gated (6): level the three humans past it
+      // on the live sim BEFORE any showcase bots stage, so the original
+      // welcome-plus-guild unread shape and the human-vs-bot contrast hold.
+      for (const pid of players.keys()) server.sim.setPlayerLevel(6, pid);
       const meta = players.get(sc.pid);
       if (!meta) throw new Error('no crosser meta');
       meta.craftSkills.weaponcrafting = 13;

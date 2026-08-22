@@ -62,6 +62,7 @@ const bookOf = (sim: Sim): any[] => (sim.postOffice as any).mail;
 
 function makeSender(sim: Sim, name = 'Alice'): number {
   const pid = sim.addPlayer('warrior', name);
+  sim.setPlayerLevel(6, pid); // past the welcome gate: these fixtures use the letter
   const meta = sim.meta(pid);
   if (!meta) throw new Error('no meta');
   meta.copper = 10_000;
@@ -73,6 +74,7 @@ describe('the mail revision signal (mailRevFor)', () => {
   it('is null away from a raven pillar and a number beside one', () => {
     const sim = makeWorld();
     const pid = sim.addPlayer('warrior', 'Postie');
+    sim.setPlayerLevel(6, pid); // past the welcome gate: these fixtures use the letter
     // The town spawn point sits within mail range of its pillar, so walk out
     // of range first: the null arm must be pinned away from every mailbox.
     moveAwayFromMailboxes(sim, pid);
@@ -86,6 +88,7 @@ describe('the mail revision signal (mailRevFor)', () => {
   it('holds steady across idle ticks while nothing changes', () => {
     const sim = makeWorld();
     const pid = sim.addPlayer('warrior', 'Postie');
+    sim.setPlayerLevel(6, pid); // past the welcome gate: these fixtures use the letter
     moveToMailbox(sim, pid);
     // Settle the welcome letter's announce sweep first (announced is a
     // runtime flag, not a view change, and must not advance the revision).
@@ -99,6 +102,7 @@ describe('the mail revision signal (mailRevFor)', () => {
     const sim = makeWorld();
     const alice = makeSender(sim);
     const bob = sim.addPlayer('mage', 'Bob');
+    sim.setPlayerLevel(6, bob); // past the welcome gate: these fixtures use the letter
     tickFor(sim, 2);
 
     // Booking: the sender pays postage, the letter enters the book in flight.
@@ -140,6 +144,7 @@ describe('the mail revision signal (mailRevFor)', () => {
     const sim = makeWorld();
     const alice = makeSender(sim);
     const bob = sim.addPlayer('mage', 'Bob');
+    sim.setPlayerLevel(6, bob); // past the welcome gate: these fixtures use the letter
     sim.mailSendResolved({ key: String(bob), name: 'Bob' }, 'Coin', 'Words.', 40, [], alice);
     tickFor(sim, MAIL_DELIVERY_SECONDS + 2);
     moveToMailbox(sim, bob);
@@ -169,6 +174,7 @@ describe('the mail revision signal (mailRevFor)', () => {
     const sim = makeWorld();
     const alice = makeSender(sim);
     const bob = sim.addPlayer('mage', 'Bob');
+    sim.setPlayerLevel(6, bob); // past the welcome gate: these fixtures use the letter
     sim.mailSendResolved({ key: String(bob), name: 'Bob' }, 'Plain', 'Words.', 0, [], alice);
     sim.mailSendResolved({ key: String(bob), name: 'Bob' }, 'Coin', 'Yours.', 300, [], alice);
     tickFor(sim, MAIL_DELIVERY_SECONDS + 2);
@@ -213,6 +219,7 @@ describe('the mail revision signal (mailRevFor)', () => {
     const sim = makeWorld();
     const alice = makeSender(sim);
     const bob = sim.addPlayer('mage', 'Bob');
+    sim.setPlayerLevel(6, bob); // past the welcome gate: these fixtures use the letter
     sim.addItem('wolf_fang', 1, alice);
     sim.mailSendResolved(
       { key: String(bob), name: 'Bob' },
@@ -271,6 +278,7 @@ describe('the mail revision signal (mailRevFor)', () => {
 
     const sim2 = makeWorld();
     const bob2 = sim2.addPlayer('mage', 'Bob');
+    sim2.setPlayerLevel(6, bob2); // past the welcome gate: these fixtures use the letter
     const rev = rawRev(sim2);
     sim2.loadMail(save);
     expect(rawRev(sim2)).toBeGreaterThan(rev);
@@ -285,6 +293,7 @@ describe('bucketed deliveredFor vs the whole-book scan', () => {
     const sim = makeWorld();
     const alice = makeSender(sim);
     const bob = sim.addPlayer('mage', 'Bob');
+    sim.setPlayerLevel(6, bob); // past the welcome gate: these fixtures use the letter
     const bobMeta = sim.meta(bob);
     if (!bobMeta) throw new Error('no meta');
     // One letter on the stable id key, one legacy letter keyed by display

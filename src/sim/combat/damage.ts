@@ -30,6 +30,7 @@ import { recalcPlayerStats } from '../entity';
 import { DAMAGE_IDLE_DESPAWN_MOB_IDS, DAMAGE_IDLE_DESPAWN_SECONDS } from '../entity_roster';
 import { weaponHand } from '../equipment_rules';
 import { lockNormalDungeonResetOnBossKill, spawnBossExitPortal } from '../instances/dungeons';
+import { maybeSendLevelWelcome } from '../mail/welcome_gate';
 import { spawnWidowHatchlingOnEggDeath } from '../mob/egg_hatchling';
 import { grantAbilityDevotion } from '../paladin_devotion';
 import { PET_AGGRESSIVE_RANGE } from '../pet/pet_ai';
@@ -1810,6 +1811,10 @@ export function grantXp(
   // Dinged to cap mid-grant: clear the leftover from the BAR. It is not lost —
   // the full award was already added to lifetimeXp above (FR-1.4).
   if (p.level >= MAX_LEVEL) meta.xp = 0;
+  // Progression-gated welcome letter: the first ding at or past the gate
+  // books it (a multi-level grant crosses the gate once; the flag makes any
+  // later call a no-op).
+  maybeSendLevelWelcome(ctx, meta, p.level);
 }
 
 // Add to the monotonic lifetime counter, emitting cosmetic virtual-level-up

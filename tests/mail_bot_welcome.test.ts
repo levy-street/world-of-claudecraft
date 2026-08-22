@@ -1,7 +1,9 @@
 // Bots must never receive mail (issue #3560): every synthetic participant the
 // sim creates (Vale Cup showcase bots, fiesta practice bots, /dev bots) is
-// created with the Ravenpost welcome suppressed, while a real new character
-// still receives exactly one welcome letter. Before this gate existed, every
+// created with the Ravenpost welcome suppressed. The human welcome is
+// level-gated at 6 (tests/mail_welcome_level_gate.test.ts owns that story);
+// here the human is leveled past the gate so every pin keeps the decisive
+// human-gets-mail vs bot-gets-nothing contrast. Before this gate existed, every
 // hourly-ish showcase minted six immortal welcome letters into the shared mail
 // book (134k letters, 85MB of the prod world_state row by 2026-08-22), and the
 // 30s autosave serialized all of it on the main thread.
@@ -23,8 +25,10 @@ function letters(sim: Sim): MailBookLetter[] {
 }
 
 describe('bot players receive no welcome mail', () => {
-  it('a real new character receives exactly one welcome letter', () => {
+  it('a new character books nothing at creation; the gate books it at level 6', () => {
     const sim = makeWorld({ noPlayer: false, playerName: 'Watcher' });
+    expect(letters(sim).length).toBe(0);
+    sim.setPlayerLevel(6);
     const book = letters(sim);
     expect(book.length).toBe(1);
     expect(book[0].letterId).toBe('ravenpost_welcome');
@@ -33,6 +37,7 @@ describe('bot players receive no welcome mail', () => {
 
   it('a 3v3 bot showcase creates zero new letters', () => {
     const sim = makeWorld({ noPlayer: false, playerName: 'Watcher' });
+    sim.setPlayerLevel(6);
     (sim as unknown as { cfg: { valeCupShowcase: boolean } }).cfg.valeCupShowcase = true;
     for (let i = 0; i < 20 * 60 + 2 && !sim.vcup.match; i++) sim.tick();
     // The showcase really staged: six bots are seated.
@@ -56,6 +61,7 @@ describe('bot players receive no welcome mail', () => {
 
   it('a /dev bot spawn creates no letters', () => {
     const sim = makeWorld({ noPlayer: false, playerName: 'Watcher' });
+    sim.setPlayerLevel(6);
     const pid = sim.spawnDevBot('Helper');
     expect(pid).toBeGreaterThan(0);
     const book = letters(sim);
@@ -65,6 +71,7 @@ describe('bot players receive no welcome mail', () => {
 
   it('a fiesta practice set creates no letters for its three bots', () => {
     const sim = makeWorld({ noPlayer: false, playerName: 'Watcher' });
+    sim.setPlayerLevel(6);
     expect(startFiestaPractice(sim)).toBe(true);
     expect(sim.fiestaBotPids.length).toBe(3);
     const book = letters(sim);

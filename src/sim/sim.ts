@@ -304,6 +304,7 @@ import {
   submitLootRoll as submitLootRollImpl,
 } from './loot/loot_roll';
 import { type MailSave, PostOffice } from './mail/post_office';
+import * as welcomeGate from './mail/welcome_gate';
 import { Market, type MarketListing, type MarketSave } from './market';
 import { defaultMarketQuery, type MarketQuery } from './market_query';
 import { accountCosmeticsWithWornMechChroma } from './mech_chroma_ownership';
@@ -3618,14 +3619,14 @@ export class Sim {
     if (savedState?.pet && petCommands.canRestorePetState(meta, savedState.pet)) {
       this.restorePet(player, savedState.pet);
     }
-    // One-time Ravenpost welcome (doubles as the service announcement for
-    // characters saved before mail existed). Flipped before the send so a
-    // re-entrant save can never double-book the letter. Bots flip WITHOUT the
-    // send: their letters would sit in the shared mail book forever.
-    if (!meta.mailWelcomed) {
-      meta.mailWelcomed = true;
-      if (!opts?.bot) this.postOffice.sendWelcome(meta);
-    }
+    // One-time Ravenpost welcome, gated on progression (level 6): a
+    // rolled-and-abandoned character never mints a letter. Bots pre-flip the
+    // flag WITHOUT ever sending; a restored save already past the gate books
+    // here on join, which keeps the letter doubling as the service
+    // announcement for characters saved before mail existed. Sub-gate
+    // characters get theirs from the ding path (combat/damage.ts grantXp).
+    if (opts?.bot) meta.mailWelcomed = true;
+    welcomeGate.maybeSendLevelWelcome(this.ctx, meta, player.level);
     // Book of Deeds retro-on-join, after the saved state is fully restored:
     // seed the discovery ledger from current holdings, apply the retro
     // fallbacks a predicate cannot express (proof inferences plus the
@@ -5939,6 +5940,8 @@ export class Sim {
     if (r.e.resourceType === 'mana') r.e.resource = r.e.maxResource;
     this.refreshKnownAbilities(r.meta, false);
     this.syncPetLevel(r.e);
+    // A dev/GM jump past the welcome gate books the letter like a live ding.
+    welcomeGate.maybeSendLevelWelcome(this.ctx, r.meta, r.e.level);
     deedsMod.markDeedsDirty(this.ctx, r.meta.entityId); // level/lifetimeXp predicates re-check
   }
 
