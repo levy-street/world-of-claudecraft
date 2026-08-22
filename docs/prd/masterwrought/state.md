@@ -8382,3 +8382,39 @@ the prior phase" has no addressee, and a red on this branch's own base is this
 branch's to clear or to knowingly ship red. What matters is that the inheritance
 is named where the next editor will see it, which is the row comment in
 scripts/lib/gate_task_cache.mjs naming b15964b1e5, not only the commit body.
+
+### Validation at close
+
+FULL SUITE GREEN at 6b65b4d89b, the tip that carries every code change of this
+phase: 3016 files passed, 12 skipped; 42953 tests passed, 2 expected-fail, 115
+skipped; vitest EXIT=0, ZERO failures. That run is the authoritative one for the
+executable state.
+
+Read the EXIT LINE, not the wrapper. The harness reported the background
+command as "completed (exit code 0)" for an EARLIER run whose vitest had
+actually exited 1: the zero was the wrapper script's status. Every result here
+is taken from the `EXIT=` line the script appends from vitest itself, and each
+run stamps the tip it ran at into a sibling file so a stale run identifies
+itself instead of being inferred. Both habits exist because this phase briefly
+had two background runs writing one log after a restart, which made a failing
+suite read as passing for a few minutes.
+
+THREE COMMITS LANDED AFTER THAT RUN and are covered separately rather than
+argued away: b239817635 and 415f45a6ad are docs-only (this file), and
+cebbb781da is comments plus one test pin plus a CLAUDE.md bullet. For the
+executable delta the touched suites were re-run green (deeds_content,
+tool_effect_tooltip, professions_farming, architecture: 275 tests), and because
+the change ADDS COMMENTS to two sim files, two hazard classes were checked
+directly rather than assumed: every suite that reads those files as SOURCE TEXT
+(guide, honor, pr_shot_targets, reliquary_state, farming_anti_chore: 300 tests)
+and the monolith line-count ratchet, since comments are lines. All green. A
+final confirming full run at the settled tip closes the gap properly.
+
+OTHER GATES: tsc --noEmit clean; npm run ci:changed EXIT 0 with zero errors and
+zero format diffs (the 2937 warnings are the repo's pre-existing, non-gating
+debt, and the 757-file scope is the known ci:changed widening on a long-lived
+branch); symbol_census RESULT PASS with contentIds 3074 and contentIdRows 3101,
+both landing on the number predicted at STEP 0 before any authoring;
+golden_composition FAIL at its recorded 16-finding baseline and no more, which
+is the release-parent tool gap proposed above rather than a regression;
+i18n:gen, wiki:content and sfx:manifest all zero-diff after their final regen.
