@@ -205,6 +205,19 @@ or pure leaves, never a `Sim` import, randomness only via `ctx.rng` (guarded by
   water gated by the WATER's zone) the cast gate and the vendor rows read;
   since R19 the SAME column also caps how far each water teaches
   (`fishingTeachingCeilingFor` in `fishing.ts` reads it at the gain site).
+- `farming.ts`: the farming GROWTH ENGINE, and the module the other `farm_*`
+  leaves orbit. Owns the plant and harvest command bodies and, above all, THE
+  DRAW CONTRACT stated in its own header: a plant costs exactly two contiguous
+  `ctx.rng` draws, a tier 1/2 harvest one, a tier 3/4 harvest two contiguous,
+  and every deny costs zero. Also owns the gain model (`FARMING_GAIN_SCHEDULE`
+  plus `farmingHarvestGain` / `farmingTeachingCeilingFor` /
+  `farmingHarvestGainAt`, the fishing R19 shape: the boundary column IS the
+  teaching-ceiling source, so it is not tuning and never moves), the
+  harvest-lives yield through a PRIVATE mulberry32 seed expansion that is not
+  `ctx.rng` (see the banner: it deliberately keeps seed 0 where `Rng` remaps
+  it), and `FARM_EFFECT_BONUS_PICK_CAP`, farming's own cap on a slotted
+  quantity tool effect, which lives here rather than in `TOOL_EFFECTS` so the
+  other three land professions keep the catalog value.
 - `farming_zones.ts`: farming's OWN per-zone tier ladder (`farmingZoneTierFor`),
   the fishing_zones-shaped pure leaf; deliberately DIVERGES from the shipped
   progression column at evergarden (farming tier 4 showcase vs the named

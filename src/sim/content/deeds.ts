@@ -3008,14 +3008,17 @@ export const DEEDS: Record<string, DeedDef> = {
   // capstone carries the program's one title the way fishing's 200-cap
   // Master Angler does at its own cap. Whether the other gathering caps gain
   // titles is a catalog-wide maintainer call, not taken here. Reaching 100
-  // requires tier 3+ crops (the
-  // tier-2 teaching ceiling grays at 75, farmingTeachingCeilingFor in
-  // professions/farming.ts) whose seeds have no faucet until the D11
-  // bootstrap ruling (state.md (bo)), so this deed and its title become
-  // earnable the day that faucet lands; the honesty arm in
-  // tests/deeds_content.test.ts pins the dependency and the recorded waiver
-  // of the visible-but-unearnable rule lives in docs/design/deeds.md
-  // (the dormancy window note).
+  // requires tier 3+ crops (the tier-2 teaching ceiling grays at 75,
+  // farmingTeachingCeilingFor in professions/farming.ts).
+  //
+  // EARNABLE since masterwrought Phase 11e (2026-08-21). This row used to say
+  // those crops had no seed faucet until the D11 bootstrap ruling, and that
+  // GATE 1 shipped: both upper farmers now stock their tier's seeds with
+  // positive buyValues, so farming teaches to the cap and this deed and its
+  // title are live. The honesty arm in tests/deeds_content.test.ts was
+  // INVERTED with the faucet (green now means earnable, and it reds if the
+  // faucet is ever removed), and the docs/design/deeds.md dormancy waiver is
+  // closed with its date.
   prog_farming_100: {
     id: 'prog_farming_100',
     name: 'Harvestmaster',

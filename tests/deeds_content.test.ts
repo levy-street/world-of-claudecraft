@@ -738,8 +738,14 @@ describe('frozen trigger + renown catalog (design rule 9: never retro-edit a tri
   // reproduce their own priors exactly; the merged hash is re-minted from
   // the suite output).
   // Re-baselined at Phase 11e for the appended roster deed col_farm_roster.
-  // An APPEND is the sanctioned reason to move this hash; no shipped trigger
-  // or renown value was touched in the same change.
+  // An APPEND is the sanctioned reason to move this hash.
+  //
+  // ONE SHIPPED TRIGGER DID GROW, and saying otherwise would mislead the next
+  // person to re-mint this: feat_book_complete's deedIds is a LIVE reference to
+  // BOOK_COMPLETE_REQUIREMENTS, which is populated after the table literal from
+  // every non-feat non-hidden deed, so appending a deed necessarily widens that
+  // capstone's trigger. That is the documented dynamic-meta design rather than
+  // a rule-9 retro-edit; no AUTHORED trigger or renown value was touched.
   const FROZEN_CATALOG_SHA256 = '0e23ee2e93c0a1bc05e9d8ff284fe4eb27506351ee17f56417bbed6391a78339';
 
   it('every shipped deed keeps its trigger and renown unchanged', () => {

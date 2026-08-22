@@ -270,6 +270,15 @@ export const FARM_SEED_BACK_ONE_CHANCE: Readonly<Record<number, number>> = { 3: 
 //     window of about ten weeks (70 to 75 days), and it is this one: 74.00
 //     days, 1500 harvests, 25.2 days to skill 50.
 //
+// NOT UNIFORMLY A SLOWDOWN, which is easy to assume from "the ladder got
+// longer" and is wrong at the top. Per band the gain moves x0.25, x0.25,
+// x0.625 and x1.5625: the last band is FASTER than before (0.02 to 0.03125),
+// because straightening the curve means taking time out of the tail as well as
+// putting it into the front. A live farmer parked in the 75-to-100 band
+// therefore progresses faster after this deploy, not slower. No migration is
+// needed (stored proficiency is untouched), but it is a release-note line
+// rather than a silent change.
+//
 // THE boundary column is NOT tuning and never moves: farmingTeachingCeilingFor
 // reads it to decide which crop tier grays out at which skill, so a moved
 // boundary silently re-maps tier to ceiling for every farmer alive. Only the

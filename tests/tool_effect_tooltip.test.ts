@@ -7,6 +7,7 @@ import path from 'node:path';
 import { describe, expect, it } from 'vitest';
 import { TOOL_EFFECTS } from '../src/sim/content/professions';
 import { ITEMS } from '../src/sim/data';
+import { FARM_EFFECT_BONUS_PICK_CAP } from '../src/sim/professions/farming';
 import { RARITY_DURABILITY_BONUS, slotToolEffectRefused } from '../src/sim/professions/tools';
 import type { ItemDef } from '../src/sim/types';
 import { itemNameColor } from '../src/ui/item_name_color';
@@ -210,7 +211,14 @@ describe('toolEffectStandaloneTooltip: professions window card', () => {
       gatherers_cache: '+1 yield per harvest',
       artisans_eye: 'Raises the harvest grade',
       quickening_charm: 'Shortens the node respawn timer',
-      makers_charm: '+2 yield per harvest',
+      // Two numbers, and BOTH are pinned back to their source constant. The
+      // +2 is TOOL_EFFECTS.makers_charm.bonus; the +1 is farming's own
+      // FARM_EFFECT_BONUS_PICK_CAP, which had no pin at all until the Phase
+      // 11e architecture review caught it. The module header claims "the
+      // numbers the English spells out are pinned back", and with only the
+      // catalog half pinned that was half true: re-tuning the cap left every
+      // test green while the copy lied.
+      makers_charm: `+${TOOL_EFFECTS.makers_charm.bonus} yield per harvest while charged, or +${FARM_EFFECT_BONUS_PICK_CAP} on a farming tool.`,
     };
     for (const id of Object.keys(TOOL_EFFECTS)) {
       const html = toolEffectStandaloneTooltip(id);
