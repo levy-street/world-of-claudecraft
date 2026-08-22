@@ -503,6 +503,20 @@ describe('FARMING_GAIN_SCHEDULE and the composed ceiling', () => {
     // A tier-2 crop keeps teaching where the tier-1 crop gave up.
     expect(farmingHarvestGainAt(50, 2)).toBe(0.0625);
     expect(farmingHarvestGainAt(75, 2)).toBe(0);
+    // THE TOP BAND, added at the 11e QA. The comment above has always claimed
+    // tier 3 and 4 crops teach to 100, and until now nothing asserted it: the
+    // only other pin on this composition, the farming_session coverage arm in
+    // tests/parity/coverage_c.test.ts, derives its expectation by CALLING
+    // farmingHarvestGainAt, so both sides moved together and it could not fail.
+    // Proved by mutation at the 11e QA: changing the tail gain 0.03125 ->
+    // 0.0625 left tests/parity/coverage_c.test.ts fully green (22 passed), so
+    // the composition that makes the upper tiers teach to 100 was pinned only
+    // by a regenerable golden. These are LITERALS on purpose.
+    expect(farmingHarvestGainAt(75, 3)).toBe(0.03125);
+    expect(farmingHarvestGainAt(75, 4)).toBe(0.03125);
+    expect(farmingHarvestGainAt(99.9, 4)).toBe(0.03125);
+    expect(farmingHarvestGainAt(100, 3)).toBe(0);
+    expect(farmingHarvestGainAt(100, 4)).toBe(0);
   });
 });
 
@@ -2059,7 +2073,12 @@ describe('harvestCrop TIER 1/2: one draw (the golden roll) on every outcome, zer
     // The gain is queued, not applied: the drain runs earlier in the tick, so
     // a command-time grant lands NEXT tick. The amount is the first schedule
     // row's gain at proficiency 0, read from the table rather than restated,
-    // so this arm follows a re-tune instead of reddening on one.
+    // so this arm follows a re-tune instead of reddening on one. That is
+    // deliberate, but on its own it makes the arm blind to the very value it
+    // reads, so the head gain is pinned to its LITERAL right here rather than
+    // only 1600 lines up in the GAIN column arm (11e QA: an uncited mitigation
+    // is one edit away from not being one).
+    expect(FARMING_GAIN_SCHEDULE[0].gain).toBe(0.25);
     expect(h.meta.pendingGatherGrants).toEqual([
       { professionId: 'farming', amount: FARMING_GAIN_SCHEDULE[0].gain },
     ]);

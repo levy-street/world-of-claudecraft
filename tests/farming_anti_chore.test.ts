@@ -107,10 +107,31 @@ describe('anti-chore row 1: two visits per cycle, and no mid-growth interaction 
   it('offers no farming command between plant and harvest', () => {
     // D8, front-loaded only. The proof is the SHAPE of the module: the only
     // exported command bodies that touch a live plot are the two visits. A
-    // third would have to be a new export, so the pin is over the export
-    // surface rather than over a list someone has to remember to update.
+    // third would have to be a new export.
     const source = farmingSourceWithoutComments();
     const exported = [...source.matchAll(/export function (\w+)/g)].map((m) => m[1]);
+    // THE WHOLE EXPORT SURFACE, pinned literally. Corrected at the 11e QA: the
+    // arm used to filter the exports through a verb prefix list
+    // (plant|harvest|water|tend|weed|fertilize|prune|check) and claim that was
+    // "over the export surface rather than over a list someone has to remember
+    // to update". It was exactly such a list, and a narrower one than it looked:
+    // of the ten functions this module exports the filter could see two, so a
+    // new applyCompostLate, refreshPlot, mendCrop or useTonicOnPlot would have
+    // been invisible to the one arm that exists to forbid it. Pinning the full
+    // list means any new export reds here and has to be justified.
+    expect(exported.sort()).toEqual([
+      'canPlantCrop',
+      'convertHusks',
+      'distToBed',
+      'farmingHarvestGain',
+      'farmingHarvestGainAt',
+      'farmingTeachingCeilingFor',
+      'harvestCrop',
+      'plantCrop',
+      'resolveFarmHarvest',
+      'updateFarming',
+    ]);
+    // The verb filter stays as the readable statement of the rule it enforces.
     const plotCommands = exported.filter((name) =>
       /^(plant|harvest|water|tend|weed|fertilize|prune|check)/.test(name),
     );
