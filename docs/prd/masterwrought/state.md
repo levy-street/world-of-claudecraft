@@ -8341,3 +8341,44 @@ state that uses it, and nothing in the code says so at the deploy boundary.
 Blob growth from the marks themselves is bounded and small: a fully collected
 farmer gains twelve visited entries, roughly 370 bytes, catalog-bounded rather
 than per-action, far under CHARACTER_BLOB_WARN_BYTES.
+
+### A phase-start ritual this phase should have had, and 11f onward owes
+
+STEP 0 ran both merge-audit tools green BEFORE any authoring, precisely so a
+later failure would be provably this phase's. That instinct was right and it
+paid: when golden_composition later reported 16 findings, the green baseline is
+what made the reading "release-parent gap" rather than "something I broke".
+
+THE GAP IS THAT THE SAME INSTINCT WAS NOT APPLIED TO THE TEST SUITE. No baseline
+run was taken at the branch point, so when the close-time full run produced nine
+reds there was no list to check them against, and one of them
+(tests/gate_task_cache.test.ts) took a merge-base investigation to classify.
+Confirmed twice, independently: `git log b15964b1e5..e3efdd1ad1 -- turbo.json
+scripts/lib/gate_task_cache.mjs` is EMPTY, so neither the turbo declaration nor
+its mirror pin moved between the 11d QA close and this phase's base. Phase 11e
+branched off a tree that was ALREADY failing that suite and nobody learned it
+until close, by which point the red was entangled with this phase's own work.
+
+THE RITUAL FOR 11f TO 11k, cheap and mechanical: run the FULL suite once against
+the base commit at STEP 0, before authoring, and record the result in the phase
+ledger as "inherited reds at branch: [list]" (or "none"). Every later red then
+self-classifies: it is on that list or it is yours. It costs one run at a moment
+when nothing is waiting on it, and it removes the whose-is-it question entirely
+rather than answering it forensically per red.
+
+WHY THIS CLASS KEEPS BITING, recorded because the two findings share a shape:
+gate_task_cache is a MIRROR pin, a hand-carried copy of a live value
+(turbo.json's inputs) compared with toEqual. So are the four content-count pins
+this phase missed, and so is the farming-asset-manifest render-identity block.
+None of them is reachable through `vitest related` from the file that changed,
+because nothing imports them from it, and none was in the phase file's curated
+list. The base-red snapshot does not find them either, but it does make the ones
+that were ALREADY broken free to identify, and the full-suite-at-close rule finds
+the rest. The two together are the coverage; neither alone is.
+
+ATTRIBUTION, settled: the gate_task_cache fix stays absorbed here rather than
+split out. The 11d QA phase that authored the drift is closed, so "leave it for
+the prior phase" has no addressee, and a red on this branch's own base is this
+branch's to clear or to knowingly ship red. What matters is that the inheritance
+is named where the next editor will see it, which is the row comment in
+scripts/lib/gate_task_cache.mjs naming b15964b1e5, not only the commit body.
