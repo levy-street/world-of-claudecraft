@@ -10017,3 +10017,78 @@ but the crafting window's reagent list and the bag action-menu cost line now dra
 one row more than anything shipped before. The repo's visual-change rule wants an
 eyeball and a before/after at PR time; this phase is LOCAL with no PR, so it is
 recorded as owed rather than captured.
+
+### The review rounds, and the four defects they found in this phase's own work
+
+Two fresh reviewers read the diff as someone else's code. Both found real
+defects, and the pattern across them is worth keeping: every one hid behind a
+suite that was GREEN and UNMODIFIED.
+
+1. A CLAIMED NON-MOVER THAT MOVED, and it was player-visible. See the corrected
+   verdict (a) above. The affinity module gained alchemy on three crops and three
+   item tooltips changed text; the suite that owns affinity stayed green because
+   farm materials are structurally exempt from its census. A green untouched
+   suite was read as proof, and it was not.
+2. THE ACCENT RULE WAS NOT A RULE. Both halves iterated the nine-row TOUCHED_ROWS
+   literal, so RULE 2 was a fact about this phase rather than a standing
+   constraint. 11h, 11i and 11k all add produce to shipped rows by the packet's
+   own ownership section, and any of them could have made a crop the body with
+   the file green. Both halves now sweep every consumable produce-consuming row
+   farming did not write, with the two exclusions stated as SCOPE rather than
+   convenience.
+3. RULE 3 WAS PINNED GLOBALLY FOR HERBS ONLY. The rule says no herb, FISH, MEAT
+   or salt count is reduced ANYWHERE; the other three were pinned only on the
+   nine touched rows, so a reduction on an untouched row passed. Closed with
+   three more totals (game_meat 28, prime_cut 12, cooking_salt 33) plus the
+   summed fishing line at 30.
+4. A PLAYER-VISIBLE MISCOUNT IN THE NEW PROSE. The cooking page said Marlow's
+   roast folds in "a Frost Gourd" against a bill of two, while using the article
+   quantitatively in the same paragraph. Fixed, and the class is now guarded:
+   the quantity words are DERIVED from the live bills, so changing a count
+   without changing the sentence reds.
+
+Smaller ones applied in the same round: the firewall carve-out was applied over
+four gear sources but scoped over one; the one-crop-family arm asserted nothing
+on a produce-free row and most fish rows are produce-free by design; the tier
+gate's reagent floor sat under its own pre-phase count; the touched-row table
+left reagent ORDER unpinned even though order is what the tooltip renders; the
+value arm's recorded story rested on prices used on both sides of its own
+comparison; and brook_carrot was called the one produce with a buyValue when
+every fine twin carries one.
+
+### The mutation record across all four rounds: 21 run, 21 dead
+
+Rounds 1 and 2 are recorded above. The prose and audit rounds:
+
+| # | mutation | verdict |
+|---|---|---|
+| P1 to P6 | revert each reworded prose row, one per key | ALL KILLED |
+| A1 | make a crop the body of an UNTOUCHED consumable row | KILLED |
+| A2 | cut a meat count on an untouched row | KILLED |
+| A3 | cut a fish count on an untouched row | KILLED |
+| A4 | move a produce entry to the end of a bill (order only) | KILLED |
+| A5 | strip produce from both produce-carrying fish rows | KILLED |
+| A6r | reprice brook_carrot so the recorded refusal evaporates | KILLED |
+| A7r | remove the slotless clause from the carve-out | SURVIVED, then fixed |
+
+THREE PROCESS LESSONS, all learned the hard way in this phase:
+
+- A CATALOG-ONLY i18n MUTATION MEANS NOTHING WITHOUT A REGEN. The first prose
+  mutation was scored SURVIVED and it was not a result at all: the guide suite
+  reads the RESOLVED bundle through t(), so a catalog edit is invisible until
+  npm run i18n:gen rewrites it. Every prose mutation now regenerates first, and
+  all six then died.
+- NEVER MUTATE A FILE THAT HAS UNCOMMITTED WORK. The A7 restore ran git checkout
+  over the slotless hardening that was still WIP and silently discarded it. The
+  fix is the rule the memory note already carries: commit first, mutate second.
+- A RED IS NOT A KILL UNTIL THE MUTANT COMPILES. A7's first form was a syntax
+  error, so "no tests ran" was about to be scored as a kill. The harness now
+  runs tsc on every mutant and reports INVALID rather than KILLED when the
+  mutation broke the build or ran nothing.
+
+A7r is the round's real finding, and it is the same shape the 11f QA recorded:
+the slotless clause in the carve-out is a FORWARD guard that the shipped table
+cannot falsify, because no consumable recipe outputs an equippable today. Rather
+than leave it as an untested intention (or delete it), the predicate is now
+driven directly with a synthetic slotted output, so R17's fence is proven to hold
+before the phase that would otherwise discover it the hard way.
