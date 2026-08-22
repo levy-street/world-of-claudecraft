@@ -33,7 +33,7 @@
 | 11e | A true skill, farming's mastery curve and crop roster | complete | 2026-08-21 | 2026-08-21 |
 | 11e QA | verify | complete | 2026-08-21 | 2026-08-21 |
 | 11f | Farming joins the drop economy | complete | 2026-08-22 | 2026-08-22 |
-| 11f QA | verify | pending (ONE BLOCKING maintainer decision open: the stale-client deploy window versus the farming dungeon channel; see the 11f BUILT ledger) | | |
+| 11f QA | verify | complete, PASS-WITH-FOLLOWUPS (the stale-client deploy-window decision stays OPEN and was RE-SCOPED: seven ids across two channels, not two across one, and only one of its two resolutions is cheap; see the 11f QA ledger) | 2026-08-22 | 2026-08-22 |
 | 11g | The provisioning supply line, leveling tier | pending | | |
 | 11g QA | verify | pending | | |
 | 11h | The provisioning supply line, apex tier | pending | | |

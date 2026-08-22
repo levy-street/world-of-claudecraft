@@ -9230,9 +9230,20 @@ distinguishable from a constant.
    commit, which is the part of the rule that carries the intent.
 7. The scenario padding count is load-bearing state, not scaffolding. The bonus
    draw made a padding cycle cost four draws instead of three, which landed the
-   golden beat on a LOSING roll; 28 to 36 restores it. Nothing in the gate says
-   so: the suite would have gone green with the golden arm silently retired in
-   the same change that put a new draw inside it.
+   golden beat on a LOSING roll; 28 to 36 restores it.
+   CORRECTED AT THE 11f QA, because the lesson as first written was wrong in
+   the direction that matters: the gate DOES say so. coverage_c asserts the
+   golden OUTCOME, not the draw count, so a retired golden beat reds there.
+   Driven rather than argued: the QA re-ran the scenario at 28 cycles with all
+   three composed literals updated to match (44 to 36 plants, 38 to 30 withers,
+   178 to 146 draws), and it still failed, on the beat itself (count 3 instead
+   of 15, fineCount 1 instead of 5, goldenBonusItemId absent). UPDATE_PARITY=1
+   would have re-recorded the golden green, but coverage_c is code, not a
+   fixture. The re-probe was still the right work and 36 is still the only
+   count in 0 to 40 that wins (re-derived independently at the QA, stream index
+   167, 0.004931 against 1/90); what is false is that nothing would have caught
+   skipping it. Left as a correction rather than a rewrite so the next phase
+   sees both the claim and why it did not survive being tested.
 8. tests/dungeons.test.ts's morthen two-epics arm counted any id on the heroic
    table, so it would have started failing the first time a 0.08 pattern landed
    inside its eight-seed window. Latent before this phase, reachable after it;
@@ -9319,10 +9330,35 @@ heroic five-man tables.
 Both precedents (the four reins, the Wildheart six) were OWNER decisions
 recorded in DEPLOY.md. This session did not make one. The ids are admitted into
 the frozen snapshot so the branch is not red on a question a phase cannot
-answer, and the finding is written at the guard itself. Two cheap resolutions:
-confirm the deploy window has closed and delete that file, or move the farming
-dungeon channel behind the window. Reverting the admission is one comment plus
-two array entries.
+answer, and the finding is written at the guard itself.
+
+RE-SCOPED AND RE-PRICED AT THE 11f QA, because as first written this offered
+the maintainer a decision on two false premises.
+
+THE EXPOSURE IS SEVEN IDS ACROSS TWO CHANNELS, not two across one. DECISION E
+also appended the 'nythraxis_farm' rollGroup to the Nythraxis BASE table
+(DUNGEON_MOBS), carrying pattern_harvest_feast plus the four tier-4 seeds. All
+five are absent at the deployed base 9d7a1a021 while the boss encounter is
+present there, so a stale bundle clearing the raid can be handed an id it
+cannot resolve at roughly one clear in five. The guard never sees it: it
+freezes HEROIC_BOSS_LOOT and sweeps MOBS only for the professions packet's own
+thirteen ids.
+NOT AN 11f REGRESSION, and this is the half that keeps the decision fair:
+Phase 11 already put ten apex pattern ids on that same base table, and they are
+absent at the deployed base too. The raid channel has been exposed since then;
+11f adds five to fifteen. What is new is that the packet now has a written
+deploy-window decision, and it names two of the fifteen.
+
+"TWO CHEAP RESOLUTIONS" IS ONE. Confirming the window has closed and deleting
+the guard file is genuinely cheap. Moving the farming DUNGEON channel behind
+the window is not: it touches five heroic tables plus the helper, six test
+files, the wiki regen and the snapshot, and it reds
+apex_pattern_channels' D13-derived "exactly one drop pillar" arm, because the
+two rung-75 patterns would then have no drop pillar at all. Deferring that
+channel therefore means re-homing them onto the raid or the rift, or relaxing
+the one-drop-pillar rule: a design change, not a window deferral. "Reverting
+the admission is one comment plus two array entries" is true only of the
+SNAPSHOT admission, which on its own just makes the guard red.
 
 ### Second finding, recorded rather than fixed
 
@@ -9353,3 +9389,120 @@ Two acceptance lines closed after that run, in their own commit:
   blank: that module indexes mobs, NPCs, quests, zones and dungeons, never
   items, and this phase places no entity. Item names live in the items catalog,
   where the six landed with their M16 fills.
+
+## Phase 11f QA ledger (2026-08-22, the evidence audited)
+
+Run FRESH: the auditor did not build 11f and read it as someone else's code.
+LOCAL, no push, no PR. Verdict PASS WITH FOLLOWUPS. Two fix commits (215cf33c0a
+source prose, aa895d41e9 the pins) plus this ledger.
+
+### STEP 0: the SIXTH release sync, and it was a no-op
+
+origin/release/v0.40.0 is at 098372138a, which the Phase 11f STEP 0 sync already
+merged, and `git log HEAD..origin/release/v0.40.0` is EMPTY. So no merge ran, no
+renderer.ts moved, and the eastbrook polish seal re-mint was NOT owed. That
+breaks the run of three consecutive syncs that needed one, and the reason is
+worth keeping: the seal is owed when a MOVED SWEPT INPUT makes the merged tree a
+third content, and with nothing to merge there is no third content. Recorded so
+the next phase does not re-mint reflexively on the strength of the streak.
+
+### The headline: the padding re-probe was right, and its recorded LESSON was wrong
+
+Both halves were driven rather than read.
+- 36 CONFIRMED as the only winning count in 0 to 40, re-derived independently by
+  rebuilding the scenario's Sim and reading the raw mulberry32 stream: the
+  golden beat sits at stream index 21 + 4n + 2, and only n = 36 lands under
+  GATHER_RARE_EVENT_CHANCE (index 167, 0.004931 against 1/90). The old 28 lands
+  on 0.114728, a loss. stream[168] = 0.260037 resolves to bog_beet_seed, exactly
+  what the re-recorded golden pins.
+- The ledger's claim that "the suite would have gone green with the golden arm
+  silently retired" is REFUTED, by running the counterfactual rather than
+  arguing it: 28 cycles with all three composed literals updated to match still
+  fails, on the golden beat itself (count 3 not 15, fineCount 1 not 5,
+  goldenBonusItemId absent). Corrected in place at correction 7 above.
+That is the round's most consequential finding, because the wrong lesson is the
+one that licenses a future phase to skip the re-probe.
+
+### The BLOCKING decision, re-scoped and re-priced
+
+The stale-client item stays OPEN and stays the maintainer's, but it was resting
+on two false premises and both are corrected above at the decision itself: the
+exposure is seven ids across TWO channels rather than two across one (the raid
+BASE table carries five more the guard never sweeps), and only one of the two
+offered resolutions is cheap. The raid channel is INHERITED from Phase 11, which
+put ten pattern ids there already, so this is a scope correction and not an 11f
+regression. The maintainer now decides against fifteen exposed ids, not two.
+
+### The mutation battery: two run, ONE SURVIVED
+
+The survivor is the finding. Taking ONE of three hoe rungs off farm output left
+the masterwrought R17 carve-out arm entirely green, because it asked only for
+"at least one" hoe consuming a fine twin. The phase's own record predicted this
+class and the arm shipped anyway. Fixed to the exact equality, which is true of
+the shipped ladder today and kills the partial mutation. The second mutation
+(removing the Reliquary heroic carve-out) killed the new vacuity arm written for
+it, plus two siblings, and the restore is green.
+
+### Two arms measured EMPTY, and why neither got a non-vacuity floor
+
+Probed against the merged catalog rather than read: ZERO recipes output a
+Perfecting material, and ZERO alchemy recipes consume farm output. Both loops
+read as live checks and neither is. Each now pins its emptiness at zero with the
+reason written, deliberately NOT a non-vacuity floor: a floor reds today, and
+the honest response to a red floor is to delete the loop, which would leave the
+rule unguarded at exactly the moment it starts mattering.
+
+### The R-qualification sweep over-reached, in the way its own rule forbids
+
+"The settled R8 fee curve" is the PROFESSIONS-TUNING R8
+(docs/design/professions-tuning-packet-review.md, cited at training.ts's
+TRAINING_FEE_BY_TIER), not masterwrought R8, which is the recipe-channel
+doctrine. The sweep prefixed it as masterwrought's in two places, attaching the
+wrong packet to a shipped ruling: the exact collision the packet's R-namespace
+rule exists to prevent. Both sites are back to bare with the owner named. The
+same sweep also mangled the ruling identifier qr-R17-SWEEP into
+"qr-masterwrought R17-SWEEP"; four docs cite that file by the exact string,
+including the two that tell Phase 11h to EXTEND it, so a grep for the ruling
+found the docs and not the file.
+
+### The prose guard could not see its own subject revert
+
+tests/guide.test.ts was re-anchored onto "leans on the mountain and parterre
+crops", which appears VERBATIM in the pre-11f false text, so the whole 11f
+disclosure could have reverted with the guard green. That is the defect class
+the 11e QA blocked on, in its quieter form. Both reworded keys now carry anchors
+that exist only in the corrected prose. The bedsBody anchors are apostrophe-free
+on purpose: the rendered page escapes it to &#39;.
+
+### Verified clean, so the next phase does not re-audit it
+
+The draw contract checks out numerically against the code on every arm. The
+bonus partition is total across tiers 0 to 5 and 99 with the drift map 1 to 2,
+2 to 3, 3 to 4, 4 held. The tail groups sit after the ungrouped mount rows in
+all five five-man tables and are correctly absent from the mid-boss and the
+raid. FARM_RIFT_DROP_ITEM_IDS really is sorted. DECISION D's acceptance is
+arithmetic over shipped constants and re-derives by hand (0.42 against 0.67).
+All four tier-gate arms drive the real dispatch and assert the pattern survives
+a refusal. The band-completeness pin has both arms and both bite. The
+recipe_economy trainer term is derived from the RUNG with its sibling literal.
+Both reworded prose keys moved in all five non-Latin overlays and the resolved
+bundles in the same change. The dropAndVendor relabel moved exactly the six farm
+rows and no apex row.
+
+### Findings: 128 raised across thirteen lanes, 24 applied
+
+The lanes over-raised and the adversarial pass over-refuted, both usefully. Two
+verifiers reached OPPOSITE verdicts on the same claim (the R18 alchemy arm), and
+the tie was broken by probing the catalog rather than by re-reading either. Two
+refutations were themselves wrong and the findings were applied anyway (the hoe
+partial mutation, which a real mutation then proved; the raid-channel scope,
+which the deployed-base grep then proved). The lesson is the one already in the
+memory note: judge the refuted list, never adopt it.
+
+### A ritual this QA adds for 11g onward
+
+When a phase records a lesson of the form "nothing in the gate would have caught
+this", RUN THE COUNTERFACTUAL before writing it down. It costs one mutation and
+one suite, and this round it flipped the recorded lesson of the phase's most
+consequential find. A lesson that says the gate is blind, when the gate is not,
+is worse than no lesson: it is a standing licence to skip the check.

@@ -126,10 +126,19 @@ describe('new release item ids stay out of loot containers (deploy window)', () 
     // DEPLOY.md, and this session did not make one. The ids are admitted
     // below so the branch is not red on a question a phase cannot answer,
     // and the decision is filed as BLOCKING in the packet's open-item record
-    // for the 11f QA and the merge. Two ways to resolve it, both cheap:
-    // confirm the deploy window has closed and delete this file, or move the
-    // farming DUNGEON channel behind the window. Reverting the admission is
-    // this comment plus two array entries.
+    // for the 11f QA and the merge.
+    //
+    // RE-SCOPED AT THE 11f QA, twice over. FIRST, the exposure is wider than
+    // this file can see: the same phase appended five more deployed-base-
+    // unknown ids to the Nythraxis BASE table (DUNGEON_MOBS, the
+    // 'nythraxis_farm' group), which this guard never sweeps, on top of the ten
+    // Phase 11 already put there. That channel is INHERITED and not 11f's, but
+    // it means a resolution scoped to HEROIC_BOSS_LOOT alone does not close the
+    // window. SECOND, of the two routes offered, only "confirm the window has
+    // closed and delete this file" is cheap; withdrawing the dungeon channel
+    // reds apex_pattern_channels' one-drop-pillar arm and is a design change.
+    // Reverting the admission below is this comment plus two array entries,
+    // but that alone only turns this file red.
     const heroicIds = [...new Set(collectItemIds(Object.values(HEROIC_BOSS_LOOT), []))].sort();
     const reins = heroicIds.filter((id) => id.startsWith('reins_'));
     expect(reins).toEqual([

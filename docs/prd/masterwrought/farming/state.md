@@ -882,6 +882,14 @@ existing row that was wrong is AMENDED IN PLACE with a dated line rather than re
     FLOOR IS NOT IN THIS PHASE. WHY: the shipped mark family has exactly two points, 12 for
     skill-100 patterns and 16 for 125 capstones, and every farming pattern now teaches a 75 or
     100 row.
+    SEED COUNTS RECONCILED AT THE 11f QA, and the code is right rather than the
+    ruling: this row was written 2026-08-20 against a roster with two tier-4 and four upper-tier
+    seeds, and 11e-D-B grew it to four and eight the next day. What shipped is four tier-4 seeds
+    on the raid group and eight on the quartermaster, because the phase derived both from
+    FARM_CROPS instead of copying the literals here, which is what the rule asks for. The pins
+    enforce the derivation (tests/farm_seed_channels.test.ts holds the raid group equal to the
+    tier-4 set and the marks rows equal to the upper-seed set, both derived), so a ninth seed
+    joins by existing. Read the RULE, not these two numbers.
 38. 11f-PAT. Pattern QUALITY derives from the taught row's OUTPUT quality, computed per
     pattern; pattern sellValue stays UNIFORM across the whole farming set at the shipped point
     of 100. WHY: sellValue on a kind 'recipe' item is a vendor floor and the shipped catalog
@@ -4267,8 +4275,14 @@ question does not arise (farming has no station).
   q_farm_intro, Jessica's teaching sentence, and the guide's "Sow with a hoe"
   prose until the verb ships (ADOPTED as Phase 9b, 2026-08-18, and CLOSED by
   its merge: the verbs ship, the go-live is player-complete, the journey and
-  reachability pins guard the class; only (bo) below remains OPEN);
-  (bo) the tier 3/4 seed bootstrap: (1) a seed-back
+  reachability pins guard the class; (bo) below is ALSO closed, see the note on
+  it);
+  (bo) CLOSED 2026-08-21 by Phase 11e (GATE 1), which took option (2): both
+  upper-tier farmers stock their own seeds. The handoff table above carries the
+  full closure record. Left in place with this stamp rather than deleted so the
+  four options stay legible, and stamped at the 11f QA, which found this entry
+  still reading OPEN one screen from the table that closed it.
+  The options as they were put: (1) a seed-back
   roll on a tier-N harvest that can return the NEXT tier's seed at low odds
   (upward drift, keeps "no counter sells them"), (2) the tier-3 and tier-4
   farmers stock their own seeds at a premium (amends D11's counter rule), (3) a
