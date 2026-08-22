@@ -35,7 +35,7 @@
 | 11f | Farming joins the drop economy | complete | 2026-08-22 | 2026-08-22 |
 | 11f QA | verify | complete, PASS-WITH-FOLLOWUPS (the stale-client deploy-window decision stays OPEN and was RE-SCOPED: seven ids across two channels, not two across one, and only one of its two resolutions is cheap; see the 11f QA ledger) | 2026-08-22 | 2026-08-22 |
 | 11g | The provisioning supply line, leveling tier | complete | 2026-08-22 | 2026-08-22 |
-| 11g QA | verify | pending | | |
+| 11g QA | verify | complete, PASS-WITH-FOLLOWUPS (the eighth release sync was the first REAL merge since 11c: the polish seal was re-minted from the merged tree and two monolith ceilings re-pinned, one of them on a row that never conflicted. Seven pin gaps fixed, 21 mutations run and 21 dead. THREE open items stay the maintainer's: the scroll/elixir parity this phase broke by 15 copper, RULE 2's value-half reading, and the inherited stale-client deploy window) | 2026-08-22 | 2026-08-22 |
 | 11h | The provisioning supply line, apex tier | pending | | |
 | 11h QA | verify | pending | | |
 | 11i | The angler's endgame | pending | | |

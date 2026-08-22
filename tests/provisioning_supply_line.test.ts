@@ -25,8 +25,11 @@ import { describe, expect, it } from 'vitest';
 import { FARM_CROPS, farmCropSkillThreshold } from '../src/sim/content/farm_crops';
 import { RAW_COOKING_CATCH_IDS } from '../src/sim/content/items';
 import { ALL_RECIPES, FARM_RECIPES } from '../src/sim/content/recipes';
-import { ITEMS } from '../src/sim/data';
+import { ITEMS, STATIONS } from '../src/sim/data';
+import { requiredReagentCountFor, resolveCraft } from '../src/sim/professions/crafting';
+import { stationsOfType } from '../src/sim/professions/stations';
 import type { ProfessionRecipeRecord } from '../src/sim/professions/types';
+import { Sim } from '../src/sim/sim';
 
 /** Every farm PRODUCE id and its fine twin, derived from the crop catalog. The
  *  seed ids are deliberately NOT here: a seed is the input side of the farming
@@ -903,4 +906,111 @@ describe('the touched rows stay gold-negative and stay off the gear chain', () =
       expect(requireRecipe(row.id).skillReq, `${row.id} rung`).toBe(expected[row.id]);
     }
   });
+});
+
+// ---------------------------------------------------------------------------
+// THE CRAFT ITSELF, DRIVEN THROUGH THE REAL SIM (qr-11G-CRAFTABLE, Phase 11g QA)
+// ---------------------------------------------------------------------------
+
+/** The one rig both arms below share. Reaching into Sim internals is the
+ *  established idiom for a craft harness in this tree (tests/professions_crafting.test.ts
+ *  does the same); it is confined here so neither arm re-hand-rolls it. */
+type CraftHarness = { sim: Sim; pid: number };
+
+function craftRig(recipe: ProfessionRecipeRecord): CraftHarness {
+  const sim = new Sim({ seed: 42, playerClass: 'warrior', autoEquip: false });
+  const pid = sim.playerId;
+  const meta = (sim as unknown as { players: Map<number, Record<string, unknown>> }).players.get(
+    pid,
+  );
+  if (!meta) throw new Error('player meta missing');
+  (meta.knownRecipes as Set<string>).add(recipe.id);
+  // The rung the row unlocks at, so the 75 intermediate is reachable too.
+  (meta.craftSkills as Record<string, number>)[recipe.professionId] = recipe.skillReq;
+  if (recipe.stationType) {
+    const station = stationsOfType(STATIONS, recipe.stationType)[0];
+    const entity = (
+      sim as unknown as { entities: Map<number, Record<string, unknown>> }
+    ).entities.get(pid);
+    if (!entity) throw new Error('player entity missing');
+    entity.pos = { ...(station.pos as Record<string, number>) };
+    entity.prevPos = { ...(entity.pos as Record<string, number>) };
+  }
+  return { sim, pid };
+}
+
+const runCraft = (rig: CraftHarness, recipe: ProfessionRecipeRecord) =>
+  resolveCraft((rig.sim as unknown as { ctx: never }).ctx, rig.pid, recipe.id);
+
+describe('every touched bill still CRAFTS, not just type-checks', () => {
+  // WHY THIS EXISTS. Every arm above reads tables. A bill can satisfy all of
+  // them and still refuse at the counter, because resolveCraft is what decides
+  // whether a reagent list is actually consumable, and this phase changed nine
+  // reagent lists. Two of the nine were already driven through the sim, and
+  // only incidentally: recipe_elixir_of_the_serpent rides the #1149 multi-copy
+  // signing regression and recipe_silvered_carp_supper rides the deeds
+  // playthrough. BOTH of those went red and needed a hand-added grant when this
+  // phase grew their bills, which is the evidence that the other seven, which
+  // no test crafts at all, were the ones worth covering.
+  //
+  // THE GRANT IS DERIVED FROM THE LIVE REAGENT LIST, which is the whole point:
+  // a hand-written grant list does not self-heal, which is exactly why those
+  // two suites had to be edited. This one grows with the bill.
+  it.each(TOUCHED_ROWS.map((row) => row.id))('%s crafts from its live bill', (recipeId) => {
+    const recipe = requireRecipe(recipeId);
+    const rig = craftRig(recipe);
+    for (const reagent of recipe.reagents) {
+      for (let i = 0; i < reagent.count; i++) rig.sim.addItem(reagent.itemId, 1, rig.pid);
+    }
+
+    const result = runCraft(rig, recipe);
+
+    expect(result.ok, `${recipe.id} must craft from its own reagent list`).toBe(true);
+    expect(rig.sim.countItem(recipe.resultItemId, rig.pid), `${recipe.id} output`).toBe(
+      recipe.resultCount,
+    );
+    // EVERY reagent is drawn on, which is the half that says the produce really
+    // entered the bill rather than sitting in it decoratively: a reagent the
+    // craft ignored would be left in the bag untouched.
+    //
+    // THE EXPECTED LEFTOVER IS NOT ZERO, and finding that out is why this arm
+    // is worth having. recipe_seasoned_stock sits at skillReq 75, so a crafter
+    // AT that rung earns the #1134 specialization discount and the craft
+    // consumes 2 of the 3 game_meat rather than all three. The expectation is
+    // therefore DERIVED through requiredReagentCountFor, the same rule the
+    // production path applies, instead of assuming a full draw. Cross-source
+    // rather than self-comparing: the required count comes from the pricing
+    // rule and the leftover from what resolveCraft actually spent.
+    const craftSkills = { [recipe.professionId]: recipe.skillReq };
+    for (const reagent of recipe.reagents) {
+      const required = requiredReagentCountFor(
+        false,
+        reagent,
+        craftSkills,
+        recipe.professionId,
+      ).count;
+      expect(required, `${recipe.id} must really need its ${reagent.itemId}`).toBeGreaterThan(0);
+      expect(
+        rig.sim.countItem(reagent.itemId, rig.pid),
+        `${recipe.id} must consume ${required} of its ${reagent.itemId}`,
+      ).toBe(reagent.count - required);
+    }
+  });
+
+  it.each(TOUCHED_ROWS.map((row) => row.id))(
+    '%s REFUSES when only its produce is missing',
+    (recipeId) => {
+      // The non-vacuity half, and it is not decoration: every arm in this file
+      // would pass if resolveCraft ignored reagents entirely, and so would the
+      // nine cases above. Granting everything EXCEPT the produce must refuse.
+      const recipe = requireRecipe(recipeId);
+      const rig = craftRig(recipe);
+      for (const reagent of recipe.reagents) {
+        if (PRODUCE_IDS.has(reagent.itemId)) continue;
+        for (let i = 0; i < reagent.count; i++) rig.sim.addItem(reagent.itemId, 1, rig.pid);
+      }
+
+      expect(runCraft(rig, recipe).ok, `${recipe.id} must REFUSE without its produce`).toBe(false);
+    },
+  );
 });
