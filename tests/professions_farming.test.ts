@@ -2289,8 +2289,8 @@ describe('harvestCrop TIER 1/2: two draws (golden roll, golden bonus) on every o
     // 0.85, so a 0.99 roll loses.
     const plot = h.meta.farmPlots.get(BED) as PlotState;
     plot.survivalRoll = 0.99;
-    // The withered path spends the golden draw too (constant count) and
-    // IGNORES its result: husks, never a celebration.
+    // The withered path spends the golden draw AND its bonus (constant count)
+    // and IGNORES both results: husks, never a celebration.
     const from = h.sim.events.length;
     const draws = countDraws(h.sim, () => harvest(h));
     expect(draws).toBe(harvestDraws(1));
@@ -2298,6 +2298,16 @@ describe('harvestCrop TIER 1/2: two draws (golden roll, golden bonus) on every o
     expect(h.sim.countItem(FARM_WITHERED_HUSK_ITEM_ID, h.pid)).toBe(FARM_WITHERED_HUSK_COUNT);
     expect(h.sim.countItem(PRODUCE_ID, h.pid)).toBe(0);
     expect(h.sim.countItem(FINE_ID, h.pid)).toBe(0);
+    // The bonus roll is SPENT above and never READ here, which is the half a
+    // draw count cannot state: the grant lives inside the golden arm, and a
+    // withered harvest never enters it. Hoisting that grant out of the arm
+    // would pay a seed on every failed crop, and only this asserts otherwise.
+    for (const id of FARM_GOLDEN_BONUS_PATTERN_IDS) {
+      expect(h.sim.countItem(id, h.pid), `${id} on a withered harvest`).toBe(0);
+    }
+    for (const id of farmSeedIdsOfTier(farmGoldenBonusSeedTier(1))) {
+      expect(h.sim.countItem(id, h.pid), `${id} on a withered harvest`).toBe(0);
+    }
     expect(eventsOf(h.sim, from, 'farmWithered')).toEqual([
       {
         type: 'farmWithered',
@@ -2333,6 +2343,10 @@ describe('harvestCrop TIER 1/2: two draws (golden roll, golden bonus) on every o
     expect(withered).toHaveLength(1);
     expect(withered[0].cropId).toBe('retired_crop');
     expect(withered[0].count).toBe(FARM_WITHERED_HUSK_COUNT);
+    // The defensive arm spends the bonus draw and never reads it either.
+    for (const id of FARM_GOLDEN_BONUS_PATTERN_IDS) {
+      expect(h.sim.countItem(id, h.pid), `${id} on the retired-crop arm`).toBe(0);
+    }
     const loots = eventsOf(h.sim, from, 'loot');
     expect(loots.length).toBeGreaterThan(0);
     for (const lev of loots) {
@@ -2841,10 +2855,10 @@ describe('the seed-back roll (tier 3/4): the FIRST of the two harvest draws, ban
     expect(countDraws(h.sim, () => harvest(h))).toBe(harvestDraws(3));
   });
 
-  it('a tier-2 harvest draws only the golden roll: the negative arm of the tier condition', () => {
-    // Same harness shape as the banded arms above, one tier down, so the
-    // single draw here (the unconditional golden roll, no seed-back) is
-    // about the TIER and nothing else (the non-vacuous negative arm the
+  it('a tier-2 harvest draws no seed-back roll: the negative arm of the tier condition', () => {
+    // Same harness shape as the banded arms above, one tier down, so the two
+    // draws here (the unconditional golden roll and its bonus, no seed-back)
+    // are about the TIER and nothing else (the non-vacuous negative arm the
     // tier-1 describe cannot supply on its own).
     const h = makeHarness(4);
     const plot = plantTier(h, 'marsh_rice', 'bronze_hoe', 40);
@@ -3983,7 +3997,7 @@ describe('the draw contract, clause by clause', () => {
     // pinned in the tier-1 describe), so the per-action draw count is a
     // constant of the crop TIER alone, never of the outcome or any knob.
     // Proven as a difference across outcomes on one stream: a survived and
-    // a withered tier-1 harvest cost the same one draw.
+    // a withered tier-1 harvest cost the same two draws.
     const h = makeHarness(2024);
     giveSeeds(h, 2);
     plant(h, BED);

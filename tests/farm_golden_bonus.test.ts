@@ -182,5 +182,13 @@ describe('DECISION D acceptance: the golden pattern arm is slower than the marks
     expect(1 - FARM_GOLDEN_BONUS_PATTERN_CHANCE).toBeGreaterThan(
       FARM_GOLDEN_BONUS_PATTERN_CHANCE * 10,
     );
+    // TUNING, PINNED TO ITS LITERAL, the wire-name-constant rule this packet
+    // already applies to the seed-back bands in tests/professions_farming.test.ts.
+    // Every other arm in this file re-derives from the constant, so without
+    // this line a retune of the phase's own new rate moves nothing and stays
+    // green everywhere, DECISION D's acceptance arm included (a smaller weight
+    // passes it more easily). 0.04 is the shipped per-pattern rollGroup point,
+    // reused rather than minted; moving it is a deliberate edit here too.
+    expect(FARM_GOLDEN_BONUS_PATTERN_CHANCE, 'the shipped per-pattern point').toBe(0.04);
   });
 });

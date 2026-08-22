@@ -2121,11 +2121,23 @@ describe('Guide professions gathering accuracy', () => {
     // per-section coverage its predecessor had rather than only its intent.
     // farmingSown:
     expect(html).toContain('Every Furrow Filled');
-    // farm.tableBody. Re-anchored at Phase 11f, which reworded this sentence:
-    // the seeds alone no longer make the top of the ladder cookable, because
-    // its recipes stopped being trainer-taught, so the anchor moves to the
-    // clause that survives the reword rather than to the one it replaced.
+    // farm.tableBody. Re-anchored at Phase 11f, which reworded this sentence.
+    // The surviving clause is kept as the section's presence anchor...
     expect(html).toContain('leans on the mountain and parterre crops');
+    // ...but it CANNOT be the disclosure anchor, and that is the 11e QA lesson
+    // restated: it appears verbatim in the pre-11f text too, so the whole
+    // correction could revert with this guard green. The anchors below are
+    // clauses that exist ONLY in the corrected prose, one per fact 11f moved:
+    // the recipes left the trainer, and they are bought with Marks instead.
+    expect(html).toContain('no longer taught at any counter');
+    expect(html).toContain('Heroic Marks');
+    // The same rule for farm.bedsBody's 11f half. Its 11e anchors below are
+    // tied to the farmers; these two are tied to the channels 11f ADDED, which
+    // nothing else on the page would keep honest if the sentence reverted.
+    // Apostrophe-free on purpose: the rendered page escapes it to &#39;, so a
+    // possessive anchor would never match the HTML this reads.
+    expect(html).toContain('turn up in endgame drops');
+    expect(html).toContain('and on the Heroic Quartermaster');
     // farm.bedsBody. THE SECTION THAT ACTUALLY WENT STALE, and until the 11e QA
     // the only section with no anchor tying it to the faucet: its two anchors
     // were Jessica alone, who has stocked the Vale pair since the growth engine
@@ -2869,6 +2881,14 @@ describe('Guide professions pages and routes', () => {
       t('guide.profPages.sourceDrop'),
     );
     expect(armorRowFor('Forgefold Legguards')).not.toContain(t('guide.profPages.sourceKnown'));
+    // ...and it is really the DROP-ONLY string, not the both-channel one. The
+    // toContain above cannot tell them apart on its own: sourceDrop is a proper
+    // PREFIX of sourceDropAndVendor, so a generator that labelled every drop row
+    // as both would satisfy it. This is the arm that says which.
+    expect(
+      armorRowFor('Forgefold Legguards'),
+      'a drop-only row must not claim the marks counter too',
+    ).not.toContain(t('guide.profPages.sourceDropAndVendor'));
     // The RENDERED source cell for the VENDOR channel (phase 11): the eight
     // APEX_CONSUMABLE patterns are sold by the Heroic Quartermaster, so the
     // generator maps their drop-acquisition rows to 'vendor' and sourceCell

@@ -802,7 +802,7 @@ describe('coverage: each scenario fires its subsystem', () => {
     // notified flag, and the closing tier-1 harvest spends exactly its own two.
     expect(drawsAt('ready-noticed')).toBe(5 * PLANT + 3 * HARVEST_LOW + HARVEST_HIGH);
     expect(drawsAt('harvested-noticed')).toBe(5 * PLANT + 4 * HARVEST_LOW + HARVEST_HIGH);
-    // The Phase 11 (bw) extension: 28 padding cycles plus the win plant put the
+    // The Phase 11 (bw) extension: the padding cycles plus the win plant put the
     // golden-WIN harvest's rolls next, then the final padding cycle plus the
     // barley plant put the paying seed-back triple last. The padding arithmetic
     // is the probe comment in the drive; these sums are what pin it.
@@ -1085,14 +1085,15 @@ describe('coverage: each scenario fires its subsystem', () => {
 
     // The bags agree with every beat: the fee spent 2 of the 5 produce held
     // (3 banked + 2 scaffolding) before the toniced harvest re-paid, the
-    // Phase 8 closing harvest banked its 7 on top (harvested[3] above), the
+    // Phase 8 closing harvest banked its own expansion on top (harvested[3]
+    // above, pinned there rather than restated here), the
     // husk batch became the compost back in the bag (1 granted - 1 paid + 1
     // converted), the tonic was consumed, and every seed pouch is empty
     // except the seed-back. Both eastbrook beds and the thornpeak bed are
     // free again (one visit takes the plot out on either outcome).
     // The Phase 11 terms: the golden win banks its five-fold base grade on
     // top (signed instances count like any stack member here), the fine
-    // grade is the win's alone, and the 29 padding withers re-fill the husk
+    // grade is the win's alone, and the padding withers re-fill the husk
     // pouch AFTER the convert beat (two per cycle, never converted again).
     // Derived from the EVENTS rather than restating their literals: the arm's
     // claim is that the two surfaces agree, and the first and closing harvest

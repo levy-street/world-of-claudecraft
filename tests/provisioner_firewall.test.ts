@@ -1,7 +1,12 @@
 // THE PROVISIONER FIREWALL (masterwrought R17, created by Phase 11f under the
-// packet ruling qr-masterwrought R17-SWEEP): farm produce feeds the CONSUMABLE professions at
-// every rung and NEVER the gear chain, the Perfecting materials, or
+// packet ruling qr-R17-SWEEP): farm produce feeds the CONSUMABLE professions
+// at every rung and NEVER the gear chain, the Perfecting materials, or
 // recipe_quickening_catalyst.
+//
+// THE RULING ID IS VERBATIM and must never take the masterwrought prefix a
+// blanket R-sweep would give it: four packet docs cite this file by the exact
+// string qr-R17-SWEEP, including the two that tell Phase 11h to EXTEND it, and
+// a prefixed copy is a grep that finds the docs and not the file.
 //
 // ONE FILE FOR ONE INVARIANT, deliberately, and this is the reason it exists as
 // its own suite rather than as arms bolted onto a phase's test: masterwrought R17 is a
@@ -97,8 +102,20 @@ describe('masterwrought R17: the provisioner firewall', () => {
     for (const id of PERFECTING_MATERIAL_IDS) {
       expect(FARM_ITEM_IDS.has(id), `${id} must not be farm output`).toBe(false);
     }
-    for (const recipe of ALL_RECIPES) {
-      if (!perfecting.has(recipe.resultItemId)) continue;
+    // THE SECOND LOOP WALKS ZERO RECIPES TODAY, measured at the 11f QA and
+    // stated so nobody reads it as a live check: no shipped recipe OUTPUTS a
+    // Perfecting material (they are drops, which is the whole point of a chase
+    // material). It is a FORWARD guard, kept because the day one becomes
+    // craftable is exactly the day this must already be watching. Deliberately
+    // given no non-vacuity floor, unlike the arms above: a floor here would red
+    // today and the honest fix would be to delete the loop, which would leave
+    // the rule unguarded at the moment it starts mattering.
+    const perfectingRecipes = ALL_RECIPES.filter((r) => perfecting.has(r.resultItemId));
+    expect(
+      perfectingRecipes.length,
+      'if this is no longer zero, give this loop a real non-vacuity floor',
+    ).toBe(0);
+    for (const recipe of perfectingRecipes) {
       for (const reagent of recipe.reagents) {
         expect(
           FARM_ITEM_IDS.has(reagent.itemId),
@@ -141,7 +158,15 @@ describe('masterwrought R17: the provisioner firewall', () => {
     const hoeRecipes = ALL_RECIPES.filter((r) => isGatheringToolRecipe(r.resultItemId));
     expect(hoeRecipes.length, 'the hoe ladder').toBeGreaterThan(0);
     const carvedOut = hoeRecipes.filter((r) => r.reagents.some((g) => FARM_ITEM_IDS.has(g.itemId)));
-    expect(carvedOut.length, 'at least one hoe really consumes farm output').toBeGreaterThan(0);
+    // EVERY hoe, not merely one. A "at least one" floor survives the mutation
+    // that matters: take a single rung of the ladder off farm output and the
+    // carve-out is silently exempting a recipe that no longer needs exempting,
+    // while two siblings keep the arm green. Measured at the 11f QA: the whole
+    // shipped ladder consumes a fine twin today, so the exact equality is the
+    // honest claim and it is what kills that partial mutation.
+    expect(carvedOut.length, 'every hoe in the ladder consumes farm output').toBe(
+      hoeRecipes.length,
+    );
     // And the carve-out never reaches an equippable: a gathering tool has no
     // slot, which is the whole reason masterwrought R17 does not count it as gear.
     for (const recipe of hoeRecipes) {

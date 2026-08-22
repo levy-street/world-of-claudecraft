@@ -280,6 +280,7 @@ describe('the no-fourth-channel sweep (R8: three pillars, no fourth)', () => {
     const mobIds = Object.keys(MOBS);
     expect(mobIds.length).toBeGreaterThanOrEqual(230);
     let entriesWalked = 0;
+    let sanctioned = 0;
     const leaks: string[] = [];
     for (const mobId of mobIds) {
       for (const entry of MOBS[mobId].loot ?? []) {
@@ -292,6 +293,7 @@ describe('the no-fourth-channel sweep (R8: three pillars, no fourth)', () => {
           entry.rollGroup !== undefined &&
           SANCTIONED_MOB_LOOT_GROUPS.has(entry.rollGroup)
         ) {
+          sanctioned++;
           continue;
         }
         if (isPatternId(entry.itemId)) leaks.push(`MOBS.${mobId}: ${entry.itemId}`);
@@ -299,6 +301,11 @@ describe('the no-fourth-channel sweep (R8: three pillars, no fourth)', () => {
     }
     expect(entriesWalked).toBeGreaterThanOrEqual(645);
     expect(leaks).toEqual([]);
+    // The skip is not a hole, the same arm its heroic sibling below carries:
+    // both sanctioned groups must really be on the table, or this sweep would
+    // be exempting a channel that has already left and would go quietly
+    // vacuous. Ten apex gear patterns plus the five farming rows.
+    expect(sanctioned, 'both sanctioned raid groups must really be present').toBe(15);
   });
 
   it('no HEROIC_BOSS_LOOT table carries a pattern id outside the sanctioned farm group', () => {
@@ -592,5 +599,11 @@ describe('draw-order documentation', () => {
     expect(source).toMatch(/Draw order \(APPEND-ONLY/);
     expect(source).toMatch(/6\. B\/A\/S: one apex-pattern roll \(RIFT_PATTERN_CHANCE/);
     expect(source).toMatch(/pick over the sorted RIFT_PATTERN_ITEM_IDS/);
+    // Draw 7, the masterwrought Phase 11f farming append, held to the same
+    // standard as draw 6: the ledger is append-only, so every appended draw
+    // owes a line here or the next append renumbers on top of a record nobody
+    // is guarding.
+    expect(source).toMatch(/7\. B\/A\/S: one FARMING roll \(FARM_RIFT_DROP_CHANCE/);
+    expect(source).toMatch(/pick\s+\*?\s*over the sorted FARM_RIFT_DROP_ITEM_IDS/);
   });
 });

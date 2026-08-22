@@ -827,32 +827,54 @@ describe('Reliquary heroic gear pins against HEROIC_BOSS_LOOT', () => {
     [NYTHRAXIS_RAID_BOSS_ID]: 'conquerors_nythraxis_heroic',
   };
 
-  /** The live ids a heroic page is expected to catalog, both carve-outs applied.
+  /** The live ids a heroic page is expected to catalog, all carve-outs applied.
    *
-   *  Deliberately NOT threaded here: isReliquaryCarvedOut. Today that is
-   *  vacuously fine (patterns ride the BASE Nythraxis table and mint no heroic
-   *  variants), but if a kind 'recipe' pattern ever enters a HEROIC_BOSS_LOOT
-   *  table, add isReliquaryCarvedOut to this filter too, and extend the
-   *  exactly-ten vacuity diff below to cover the heroic walk, per the Phase 11
-   *  BUILT ledger decision 2 (no Reliquary pages for patterns): otherwise the
-   *  heroic equality pin would demand a page the ledger refuses. */
+   *  THE CONDITION THIS JSDOC USED TO DEFER ON HAS ARRIVED. It said the raid
+   *  carve-out was "deliberately NOT threaded here" because patterns rode the
+   *  BASE Nythraxis table only, and that if a kind 'recipe' pattern ever
+   *  entered a HEROIC_BOSS_LOOT table, isReliquaryCarvedOut should be threaded
+   *  into this filter and the vacuity diff extended to the heroic walk.
+   *  masterwrought Phase 11f put two on every heroic five-man table, so both
+   *  are done here rather than left as an inline `kind === 'recipe'` twin of a
+   *  predicate defined 650 lines above (the second-model-of-a-walk trap: two
+   *  models of one rule drift, and the guard below can only pin the one it
+   *  calls). The verdict itself is unchanged and is both packets': a pattern
+   *  is a teaching item spent to learn, the catalog records what a player
+   *  HOLDS, so it takes no page. */
   function catalogueableHeroicIds(entries: (typeof HEROIC_BOSS_LOOT)[string]): string[] {
     const liveIds: string[] = [];
     for (const e of entries) {
       if (typeof e.itemId !== 'string') continue;
       if (isMountReinsId(e.itemId) || isHeroicVariantId(e.itemId)) continue;
-      // A recipe PATTERN is not conquerable unique loot, so it takes no
-      // Reliquary page: it is a teaching item that is spent to learn, and the
-      // catalog is a record of what a player HOLDS. That verdict was recorded
-      // for the apex set at phase 11 (the raid carve-out below) and is the same
-      // one masterwrought Phase 11f recorded for the farming set, which put a
-      // pattern group on every heroic five-man table. Carved out by KIND rather
-      // than by group name, so the reason travels with the item.
-      if (ITEMS[e.itemId]?.kind === 'recipe') continue;
+      if (isReliquaryCarvedOut(e.itemId)) continue;
       liveIds.push(e.itemId);
     }
     return [...new Set(liveIds)].sort();
   }
+
+  it('the heroic carve-out removes EXACTLY the live heroic patterns, and really fires', () => {
+    // The vacuity guard the JSDoc above prescribes, in the same diff-against-
+    // itself shape the dungeon walk uses rather than a re-implementation: run
+    // the same filter with the carve-out disabled and diff. Without it the
+    // threaded call could carve nothing, or everything, and every heroic
+    // equality pin would still pass.
+    const removed = new Set<string>();
+    for (const bossId of Object.keys(HEROIC_PAGE_BY_BOSS)) {
+      const entries = HEROIC_BOSS_LOOT[bossId] ?? [];
+      const kept = new Set(catalogueableHeroicIds(entries));
+      for (const e of entries) {
+        if (typeof e.itemId !== 'string') continue;
+        if (isMountReinsId(e.itemId) || isHeroicVariantId(e.itemId)) continue;
+        if (!kept.has(e.itemId)) removed.add(e.itemId);
+      }
+    }
+    // The two rung-75 farming patterns masterwrought Phase 11f appended, and
+    // nothing else: over-carving a real relic reds here just as loudly.
+    expect([...removed].sort()).toEqual([
+      'pattern_highwatch_barley_porridge',
+      'pattern_highwatch_gourd_soup',
+    ]);
+  });
 
   /** Bosses whose heroic table holds at least one catalogue-able unique. A boss drops out
    *  of this list ONLY when every one of its live ids is a carve-out, which the sweep below

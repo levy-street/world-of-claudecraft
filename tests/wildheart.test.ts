@@ -462,9 +462,12 @@ describe('Wildheart Basin Tier-2 loot pass', () => {
     // five-man uses: per-item rates stay at the house 0.33-0.34 (a dup-path
     // re-listing pushed re-listed chests to 0.56-0.66 per kill, above any
     // other heroic item in the game).
-    const ids = entries
-      .filter((e) => e.rollGroup !== FARM_HEROIC_PATTERN_GROUP)
-      .map((e) => e.itemId);
+    // WHOLE-TABLE uniqueness, farm rows INCLUDED: the two arms above exclude
+    // the farm group because they are about gear rates, but "no id is listed
+    // twice on this table" is true of every row and excluding any of them only
+    // narrows what the arm can catch. The farm ids are distinct here, so the
+    // unfiltered form is both correct today and stricter.
+    const ids = entries.map((e) => e.itemId);
     expect(new Set(ids).size).toBe(ids.length);
     // Per-item literals, not only group sums: 0.9/0.05/0.05 also sums to 1.0
     // but pays one item far above the house 0.33-0.34 per-item band.

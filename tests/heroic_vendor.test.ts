@@ -116,7 +116,7 @@ describe('heroic vendor stock: item-level and budget pins', () => {
   // vendor is the valve: patterns are tradable, so duplicates are purchasable
   // BY DESIGN and the vendor price is the market ceiling; the six skill-100
   // patterns sit at the ring price point, the two capstones at the neck point.
-  describe('the phase 11 pattern rows (the R8 deterministic valve)', () => {
+  describe('the pattern rows across both packets (the masterwrought R8 deterministic valve)', () => {
     // Re-cut by Phase 11f, which put every FARMING pattern on the same counter
     // at the ring point. The table is now fourteen rows across two packets, and
     // the split is what the arms below check: the apex set spans both mark
