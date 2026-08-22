@@ -1439,8 +1439,11 @@ export const ZONE3_NPCS: Record<string, NpcDef> = {
   // The farming go-live: the tier-3 farmer on the terraces below Highwatch
   // (content/farm_patches.ts patch_thornpeak), north of the beds on the flat
   // of the shelf, facing south across them (facing PI looks along -z). Stock:
-  // compost only. Tier-3 seed is seed-back and market only (D11), so his
-  // counter is the husk trade's anchor and the compost restock, nothing more.
+  // compost PLUS all four tier-3 seeds, each at buyValue 32. GATE 1 (Phase
+  // 11e) put them there; before it this header read "compost only ... seed-back
+  // and market only (D11)", and a reader trusting that would strip the faucet
+  // and re-park prog_farming_100 and col_farm_roster. His counter is the husk
+  // trade's anchor, the compost restock, AND the tier-3 seed bootstrap.
   // tests/farmer_npc_placement.test.ts pins the seat beside the beds.
   farmer_hollis: {
     id: 'farmer_hollis',

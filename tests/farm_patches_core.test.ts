@@ -140,9 +140,11 @@ describe('farm crop families', () => {
     }
     expect(pairs, 'the family sweep compared no pairs').toBeGreaterThan(10);
     expect(Math.max(...[...byFamily.values()].map((ids) => ids.length))).toBeGreaterThanOrEqual(5);
-    // The floor sits under the shipped worst pair, not at it, so an ordinary
-    // re-tint has room and only a near-duplicate reds.
-    expect(worst).toBeGreaterThan(24);
+    // The floor sits UNDER the shipped worst pair rather than at it, so an
+    // ordinary re-tint has room and only a near-duplicate reds. Asserted as
+    // headroom, which the per-pair loop above does not already imply (that
+    // loop would be satisfied by a table sitting exactly on the floor).
+    expect(worst, `tightest same-family pair is ${worst.toFixed(1)}`).toBeGreaterThan(28);
   });
 });
 

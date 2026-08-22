@@ -802,7 +802,9 @@ export const PROFESSION_ITEMS: Record<string, ItemDef> = {
   //
   // foodHp and sellValue reuse shipped curve points; quality matches the
   // rung. The tier 3/4 pair ships REAGENT-DORMANT under (bo): trainable
-  // and well-formed, but tier 3/4 produce has no seed faucet until the D11
+  // and well-formed, but at the time tier 3/4 produce had no seed faucet. GATE
+  // 1 (Phase 11e) stocked all eight upper seeds, so the dormancy is over; the
+  // sentence below is kept as the record of why the rows read as they do. D11
   // bootstrap ruling. Names are IP-safe per D17 (real culinary words plus
   // settlement flavor) and collide with none of the eight plain dishes.
   eastbrook_glazed_carrots: {

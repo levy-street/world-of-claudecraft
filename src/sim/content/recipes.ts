@@ -2893,7 +2893,10 @@ export const FARM_RECIPES: ProfessionRecipeRecord[] = [
     // The base tier-3 grain keeps its own demand at 4 per bannock; Phase 11e
     // ADDED the cabbage pair alongside it (masterwrought R18: added, never
     // substituted), so this stopped being the one rung-50 dish with no fine
-    // twin in it.
+    // twin in it. Input 226 vs output 60 (76 before the widening). The figure
+    // is restored here at the 11e QA: the widening deleted this row's Input
+    // line rather than correcting it, leaving the only one of the five dish
+    // blocks with no recorded economy figure.
     reagents: [
       { itemId: 'highland_barley', count: 4 },
       { itemId: 'thornpeak_cabbage', count: 2 },
@@ -2912,7 +2915,8 @@ export const FARM_RECIPES: ProfessionRecipeRecord[] = [
     resultItemId: 'highwatch_gourd_soup',
     resultCount: 1,
     // Frost gourd simmered to a soup, the fine pick carrying the sweetness
-    // the base gourds lack. The tier-3 fine-twin slot. Input 173 vs output 75.
+    // the base gourds lack. The tier-3 fine-twin slot. Input 323 vs output 75
+    // (173 before the Phase 11e widening added frost_lentils x2 + its fine twin).
     reagents: [
       { itemId: 'frost_gourd', count: 3 },
       { itemId: 'fine_frost_gourd', count: 1 },
@@ -2933,7 +2937,8 @@ export const FARM_RECIPES: ProfessionRecipeRecord[] = [
     resultCount: 1,
     // The top band, and the wheat line's second life: a melon tart on a
     // wheat crust, so the tier-1 crop still has a buyer at the tier-4 table.
-    // The tier-4 fine-twin slot. Input 448 vs output 150.
+    // The tier-4 fine-twin slot. Input 848 vs output 150 (448 before the Phase
+    // 11e widening added gilded_yam x2 + its fine twin).
     reagents: [
       { itemId: 'gilded_sunmelon', count: 3 },
       { itemId: 'fine_gilded_sunmelon', count: 1 },
@@ -2953,7 +2958,8 @@ export const FARM_RECIPES: ProfessionRecipeRecord[] = [
     resultItemId: 'evergarden_harvest_platter',
     resultCount: 1,
     // The capstone plate, dressed greens off the Evergarden beds. The last
-    // fine-twin slot, closing the Phase 5 deferral. Input 456 vs output 150.
+    // fine-twin slot, closing the Phase 5 deferral. Input 856 vs output 150
+    // (456 before the Phase 11e widening added evergarden_pumpkin x2 + its twin).
     reagents: [
       { itemId: 'evergarden_greens', count: 3 },
       { itemId: 'fine_evergarden_greens', count: 1 },
@@ -2975,9 +2981,10 @@ export const FARM_RECIPES: ProfessionRecipeRecord[] = [
   // row adds the pottage-precedent vale_wheat binder, see below). NO fine
   // twins here: the fine_marsh_rice / fine_highland_barley consumer set is an
   // OPEN maintainer question, and the five dish twins above stay single-owner.
-  // The tier 3/4 pair ships REAGENT-DORMANT under deviation (bo): trainable
-  // and well-formed, but tier 3/4 produce has no seed faucet until the D11
-  // bootstrap ruling (stated again at the two rows). VALUES ARE PROPOSED AND
+  // The tier 3/4 pair SHIPPED reagent-dormant under deviation (bo), trainable
+  // and well-formed but with no tier 3/4 seed faucet. NO LONGER DORMANT: GATE 1
+  // (Phase 11e) stocked all eight upper seeds at farmer_hollis and
+  // farmer_verbena, so both rows are completable today. VALUES ARE PROPOSED AND
   // FLAGGED FOR THE MAINTAINER, reagent counts and rungs alike.
   //
   // The tier-1 row keeps the POTTAGE PRECEDENT: brook_carrot is the D9
@@ -3031,9 +3038,10 @@ export const FARM_RECIPES: ProfessionRecipeRecord[] = [
     professionId: 'cooking',
     resultItemId: 'highwatch_barley_porridge',
     resultCount: 1,
-    // The wall kitchens' buff dish. REAGENT-DORMANT under deviation (bo):
-    // trainable and well-formed today, but highland_barley has no seed
-    // faucet until the D11 bootstrap ruling. Input 68 vs output 60.
+    // The wall kitchens' buff dish. Shipped reagent-dormant under deviation
+    // (bo) while highland_barley had no seed faucet; GATE 1 (Phase 11e) stocked
+    // that seed at farmer_hollis, so this row is completable today.
+    // Input 68 vs output 60.
     reagents: [
       { itemId: 'highland_barley', count: 4 },
       { itemId: 'cooking_salt', count: 1 },
@@ -3049,9 +3057,10 @@ export const FARM_RECIPES: ProfessionRecipeRecord[] = [
     professionId: 'cooking',
     resultItemId: 'evergarden_braised_greens',
     resultCount: 1,
-    // The capstone buff dish. REAGENT-DORMANT under deviation (bo):
-    // trainable and well-formed today, but evergarden_greens has no seed
-    // faucet until the D11 bootstrap ruling. Input 168 vs output 150.
+    // The capstone buff dish. Shipped reagent-dormant under deviation (bo)
+    // while evergarden_greens had no seed faucet; GATE 1 (Phase 11e) stocked
+    // that seed at farmer_verbena, so this row is completable today.
+    // Input 168 vs output 150.
     reagents: [
       { itemId: 'evergarden_greens', count: 4 },
       { itemId: 'cooking_salt', count: 1 },
@@ -3080,10 +3089,11 @@ export const FARM_RECIPES: ProfessionRecipeRecord[] = [
     // and stays out of the counterfactual vendor-fed set in
     // tests/recipe_economy.test.ts.
     //
-    // REAGENT-DORMANT under deviation (bo), with the (ca) reconciliation:
-    // the D11 seed-bootstrap ruling owns the tier 3/4 seed faucet, so this
-    // row ships trainable and well-formed but honest-dormant, exactly like
-    // the tier 3/4 dishes above it.
+    // Shipped REAGENT-DORMANT under deviation (bo) with the (ca)
+    // reconciliation, because the D11 seed-bootstrap ruling owned the tier 3/4
+    // seed faucet. GATE 1 (Phase 11e) discharged that ruling and stocked all
+    // eight upper seeds, so this row is completable today, exactly like the
+    // tier 3/4 dishes above it.
     //
     // FLAGGED FOR THE MAINTAINER: the reagent counts (4 + 4 + 2) and the
     // 250 output sellValue are proposed tuning, like every farming constant.

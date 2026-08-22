@@ -2952,9 +2952,10 @@ export const DEEDS: Record<string, DeedDef> = {
   // (FARM_CHRONICLE_ZONES, src/sim/deeds.ts). ALL FOUR are earnable today:
   // plantCrop carries no bed-tier gate (probed live in the celebrations
   // phase), so vendor-stocked tier 1/2 seeds can be planted and harvested at
-  // every hub, Highwatch and the Evergarden included, even while tier 3/4
-  // seeds have no faucet (state.md (bo) gates the high-tier CROPS, never
-  // these marks).
+  // every hub, Highwatch and the Evergarden included. That held even while
+  // tier 3/4 seeds had no faucet, because state.md (bo) gated the high-tier
+  // CROPS and never these marks; since GATE 1 (Phase 11e) stocked all eight
+  // upper seeds the caveat is moot, and the marks were never the constraint.
   chr_vale_first_harvest: {
     id: 'chr_vale_first_harvest',
     name: 'First Fruits of the Vale',

@@ -108,7 +108,7 @@ const HIGHLAND_BARLEY_DURATION_MS = 14_400_000;
 // rung below the overnight tier-4 band.
 const FROST_GOURD_DURATION_MS = 16_200_000;
 
-// TUNING, PROVISIONAL, FLAGGED FOR THE MAINTAINER: 10 hours takes the high
+// TUNING, PROVISIONAL, FLAGGED FOR THE MAINTAINER: 10 hours took the high
 // end of the locked tier-4 overnight band (8 to 11 hours): the Evergarden
 // showcase melon is the ladder's prestige wait, so planted at the end of an
 // evening session it is ready the next evening's first check-in even for a
@@ -118,7 +118,8 @@ const FROST_GOURD_DURATION_MS = 16_200_000;
 // duration.
 const GILDED_SUNMELON_DURATION_MS = 36_000_000;
 
-// TUNING, PROVISIONAL, FLAGGED FOR THE MAINTAINER: 10.5 hours takes the
+// TUNING, PROVISIONAL, FLAGGED FOR THE MAINTAINER (no longer the tier's
+// longest, superseded by evergarden_pumpkin at 645): 10.5 hours takes the
 // HIGH end of the locked tier-4 overnight band (8 to 11 hours), half an
 // hour above the tier-4 sibling (gilded_sunmelon, 36,000,000 ms, 10 hours),
 // so the two tier-4 durations never collide. Against a plant at an evening
@@ -129,7 +130,13 @@ const GILDED_SUNMELON_DURATION_MS = 36_000_000;
 // the far end never rots, so the overshoot is pure slack.
 const EVERGARDEN_GREENS_DURATION_MS = 37_800_000;
 
-// TUNING, DERIVED, the Phase 11e roster widening. 250 minutes (4h10m) sits
+// TUNING, DERIVED but PROVISIONAL AND FLAGGED FOR THE MAINTAINER (11e-DUR
+// asks for the flag; restored at the 11e QA, which found all four new banners
+// carrying only DERIVED while the eight shipped crops carry PROVISIONAL. A
+// maintainer sweeping the provisional banners at a re-tune would have touched
+// eight of twelve and silently skipped these, and the no-duplicate-duration
+// rule inside a tier only holds if all four of a tier move together).
+// The Phase 11e roster widening. 250 minutes (4h10m) sits
 // inside the locked tier-3 band (about 4 hours) and, checked against the MERGED
 // table rather than assumed, collides with neither shipped tier-3 timer
 // (highland_barley 240, frost_gourd 270) nor its new sibling below. It also may
@@ -139,19 +146,25 @@ const EVERGARDEN_GREENS_DURATION_MS = 37_800_000;
 // roster must not do.
 const THORNPEAK_CABBAGE_DURATION_MS = 15_000_000;
 
-// TUNING, DERIVED, same rule and the same three checks: 260 minutes (4h20m) is
+// TUNING, DERIVED, PROVISIONAL, FLAGGED FOR THE MAINTAINER (11e-DUR), same
+// rule and the same three checks: 260 minutes (4h20m) is
 // inside the tier-3 band, distinct from 240, 250 and 270, and above the tier
 // minimum of 240. The leaf comes in first and the pulse a little later, which
 // is the only ordering claim being made.
 const FROST_LENTILS_DURATION_MS = 15_600_000;
 
-// TUNING, DERIVED, the tier-4 half. 615 minutes is 10.25 hours, inside the
+// TUNING, DERIVED, PROVISIONAL, FLAGGED FOR THE MAINTAINER (11e-DUR), the
+// tier-4 half. 615 minutes is 10.25 hours, inside the
 // locked overnight band (8 to 11 hours), distinct from the shipped 600 and 630
 // and from its new sibling, and above the tier minimum of 600.
 const GILDED_YAM_DURATION_MS = 36_900_000;
 
-// TUNING, DERIVED. 645 minutes is 10.75 hours: still inside the overnight band
-// with an hour of headroom under its ceiling, distinct from 600, 615 and 630,
+// TUNING, DERIVED, PROVISIONAL, FLAGGED FOR THE MAINTAINER (11e-DUR). 645
+// minutes is 10.75 hours: still inside the overnight band, though with FIFTEEN
+// MINUTES of headroom under its 11-hour ceiling and not the hour this line
+// claimed until the 11e QA (that figure was carried over from the
+// gilded_sunmelon banner, where 600 against 660 really is an hour). Distinct
+// from 600, 615 and 630,
 // and above the tier minimum. It is the longest crop on the ladder, which suits
 // the capstone plate's gourd, and per the header the far end never rots, so the
 // overshoot past a single evening is pure slack rather than an alarm clock.
@@ -331,8 +344,10 @@ export const FARM_SUPPLY_ITEM_IDS: readonly string[] = [
 // Everything a farming cycle can put in a player's bags or take out of them:
 // the seed a plant consumes, the produce a harvest grants, its fine twin, the
 // husks a failure pays, and the two knob supplies a plant can consume. Derived
-// from the catalog, so the crop-ladder phase's seven remaining crops
-// self-register with no edit here.
+// from the catalog, so a new crop self-registers with no edit here. (That is
+// not a promise, it is the record: the Phase 11e roster widening added four
+// crops and this block needed no change. The line used to say "the crop-ladder
+// phase's seven remaining crops", a count that stopped being true at twelve.)
 //
 // This is the material taxonomy's farming source (see that module): farm
 // yields are materials for the same reason node yields are, and the seeds and

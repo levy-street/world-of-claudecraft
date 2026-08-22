@@ -315,8 +315,10 @@ export const EVERGARDEN_NPCS: Record<string, NpcDef> = {
   // beds (south of the z 872 row, the way in from Hedgewick), facing north
   // across them (facing 0 looks along +z), well clear of The Parterre Walk's
   // lane and of the hedge_knight camp at the far end of the site. Stock:
-  // compost only, the tier-3 and tier-4 seeds being seed-back and market
-  // goods (D11). tests/farmer_npc_placement.test.ts pins the seat.
+  // compost PLUS all four tier-4 seeds, each at buyValue 64, put there by
+  // GATE 1 (Phase 11e). This header read "compost only ... seed-back and
+  // market goods (D11)" until then, the same revert hazard as the Highwatch
+  // twin. tests/farmer_npc_placement.test.ts pins the seat.
   farmer_verbena: {
     id: 'farmer_verbena',
     name: 'Farmer Verbena',

@@ -11040,7 +11040,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'guide.profPages.gatherIntro.fishing':
     '钓鱼通过咬钩与收线的节奏，在每个区域的开阔水面垂钓，上限为200。',
   'guide.profPages.gatherIntro.farming':
-    '耕作是唯一以照料代替采掘的采集行业：在整治好的田畦中播下种子，人在与不在作物都按自己的钟点生长，无论何时回来都能拔起成熟的收成，因为田畦里的东西从不腐坏。从Eastbrook的份地经Fenbridge、Highwatch直到Evergarden的花圃，每处田畦旁都站着一位农夫，而Eastbrook的Farmer Jessica是这门手艺的起点：她出售Garden Hoe和最初的种子，她的差事会带新手农夫种完第一茬。阶梯的每一级都长着一对专属作物，手艺到家还能收下精良等级，起步田畦之上更难耕的土地所需的锄头则由工程师打造。熟练在专属计数上累积，上限为100。',
+    '耕作是唯一以照料代替采掘的采集行业：在整治好的田畦中播下种子，人在与不在作物都按自己的钟点生长，无论何时回来都能拔起成熟的收成，因为田畦里的东西从不腐坏。从Eastbrook的份地经Fenbridge、Highwatch直到Evergarden的花圃，每处田畦旁都站着一位农夫，而Eastbrook的Farmer Jessica是这门手艺的起点：她出售Garden Hoe和最初的种子，她的差事会带新手农夫种完第一茬。阶梯的每一级都长着专属作物，下面几级各两种，上面几级各四种，手艺到家还能收下精良等级，起步田畦之上更难耕的土地所需的锄头则由工程师打造。熟练在专属计数上累积，上限为100。',
   'guide.profPages.rhythmHeading': '采集节奏',
   'guide.profPages.rhythmBody':
     '采集是一段可见的施法：基础{base}秒，最短不低于{floor}秒；工具每高于节点一阶缩短{tool}秒，每个熟练度区间再缩短{band}秒。',

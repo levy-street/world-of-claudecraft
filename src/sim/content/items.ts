@@ -930,8 +930,13 @@ export const BASE_ITEMS: Record<string, ItemDef> = {
   // then refuses, and they are not meant to be vendor-obtainable. Tier 1 and
   // 2 seeds carry a positive buyValue per the locked pricing table and sit
   // on the farmer NPCs' counters (the go-live: farmer_jessica and
-  // farmer_teasel, where their tier is farmed); tier 3 and 4 seeds are
-  // deliberately never vendor-obtainable (seed-back and market supply only).
+  // farmer_teasel, where their tier is farmed). Tier 3 and 4 seeds ALSO carry
+  // one now: GATE 1 (Phase 11e, masterwrought DECISION D) stocked all eight at
+  // farmer_hollis and farmer_verbena at the bootstrap rung, sell x 4 x 2, so
+  // 32 at tier 3 and 64 at tier 4. This comment previously said they were
+  // "deliberately never vendor-obtainable (seed-back and market supply only)",
+  // which was the pre-GATE-1 contract and is exactly the dormancy that left
+  // three recipes uncompletable and two deeds unearnable.
   // Produce follows the node materials' convention exactly (kind junk so it
   // browses under the market's material filter, common quality so
   // sellAllJunk never vendors it).

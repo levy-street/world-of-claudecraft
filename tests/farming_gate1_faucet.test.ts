@@ -8,12 +8,26 @@
 //
 // WHY A SEPARATE SUITE, and why it drives the REAL paths. Content pins can say
 // a row is on a counter and that a recipe's reagents resolve; neither can say a
-// player can actually get from an empty bag to a cooked dish. Every step below
-// runs through the command a player runs: Sim.buyItem at the NPC, plantCrop at
-// the bed, harvestCrop at the bed, and the crafting admission for the dish.
+// player can actually get from an empty bag to a harvested reagent.
+//
+// EXACTLY WHAT IS WALKED, corrected at the 11e QA because this header used to
+// claim more than the file does. Walked through the command a player runs:
+// Sim.buyItem at the NPC for all eight upper-tier seeds, and plantCrop then
+// harvestCrop at the bed for one of them. NOT walked: the crafting admission
+// for the three dishes. That arm says "and the crafting admission for the
+// dish" no longer, because no craftItem or resolveCraft call exists in this
+// file; the dish arm below is a REACHABILITY LEDGER over the merged tables.
+//
+// Why the ledger is the right shape for THIS gate rather than a shortfall:
+// GATE 1's question is whether a player can obtain the reagents, and that is
+// what the buy and grow arms answer. Craft admission turns on cooking skill,
+// the kitchens station and a learned row, none of which GATE 1 moved and each
+// of which has its own suite. Adding three craft walks here would be new
+// coverage of an unrelated gate, so it was deliberately NOT taken at the QA.
+//
 // Downstream phases are told to prove the faucet by reading the merged
-// vendorItems arrays IN CODE rather than trusting a ledger row; this file is
-// the strongest form of that, the loop actually walked.
+// vendorItems arrays IN CODE rather than trusting a ledger row; the buy arm
+// below is the strongest form of that, the purchase actually walked.
 
 import { describe, expect, it } from 'vitest';
 import { FARM_CROPS } from '../src/sim/content/farm_crops';

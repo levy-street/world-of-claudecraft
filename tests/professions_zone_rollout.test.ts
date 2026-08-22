@@ -862,10 +862,26 @@ describe('the farming ladder: every farming zone arrives mechanically whole', ()
     }
     // ...and the two upper rungs land on the exact numbers the ruling names, so
     // a change to the formula above cannot silently re-price the faucet.
+    // ALL EIGHT anchored, not four. Widened at the 11e QA: the formula above is
+    // computed from each row's OWN sellValue, so with only four literals a
+    // COORDINATED drift on the other four (sell 4 -> 8 with buy 32 -> 64) satisfied
+    // every arm in the tree. Nothing pinned seed sellValue anywhere either, so
+    // the tier rungs are pinned here too and the formula now has something
+    // independent to be checked against.
     expect(ITEMS.highland_barley_seed?.buyValue).toBe(32);
+    expect(ITEMS.frost_gourd_seed?.buyValue).toBe(32);
     expect(ITEMS.thornpeak_cabbage_seed?.buyValue).toBe(32);
+    expect(ITEMS.frost_lentils_seed?.buyValue).toBe(32);
     expect(ITEMS.gilded_sunmelon_seed?.buyValue).toBe(64);
+    expect(ITEMS.evergarden_greens_seed?.buyValue).toBe(64);
+    expect(ITEMS.gilded_yam_seed?.buyValue).toBe(64);
     expect(ITEMS.evergarden_pumpkin_seed?.buyValue).toBe(64);
+    // The sellValue rungs the formula multiplies, pinned per tier so a
+    // coordinated sell-and-buy drift cannot pass.
+    for (const crop of Object.values(FARM_CROPS)) {
+      const expected = crop.tier === 1 ? 1 : crop.tier === 2 ? 2 : crop.tier === 3 ? 4 : 8;
+      expect(ITEMS[crop.seedItemId]?.sellValue, `${crop.seedItemId} sellValue`).toBe(expected);
+    }
   });
 
   it('brook_carrot is the one vendor-priced produce (D9), and no other family row leaks pricing', () => {

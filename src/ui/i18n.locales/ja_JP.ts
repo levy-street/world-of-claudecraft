@@ -11532,7 +11532,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'guide.profPages.gatherIntro.fishing':
     '釣りはアタリとリールの呼吸で各ゾーンの開けた水辺から獲物を釣り上げます。上限は200です。',
   'guide.profPages.gatherIntro.farming':
-    '農耕は奪うのではなく世話をして育てる唯一の採集職です。手入れした畑に種をまけば、留守の間も作物は自分の時計で育ち、いつ戻っても実りを引き抜けます。畑にあるものは決して腐らないからです。Eastbrookの割当地からFenbridge、Highwatchを経てEvergardenの花壇まで、どの畑のそばにも農夫が立ち、EastbrookのFarmer Jessicaがこの職の入口です。彼女はGarden Hoeと最初の種を売り、その使いは新米農夫に最初の作物の育て方を教えてくれます。はしごの段ごとに固有の作物が一対ずつ実り、腕が上がれば上質な等級も採れ、最初の畑より手強い土地の鍬はエンジニアが作ります。熟練度は専用のカウンターで上限100まで数えられます。',
+    '農耕は奪うのではなく世話をして育てる唯一の採集職です。手入れした畑に種をまけば、留守の間も作物は自分の時計で育ち、いつ戻っても実りを引き抜けます。畑にあるものは決して腐らないからです。Eastbrookの割当地からFenbridge、Highwatchを経てEvergardenの花壇まで、どの畑のそばにも農夫が立ち、EastbrookのFarmer Jessicaがこの職の入口です。彼女はGarden Hoeと最初の種を売り、その使いは新米農夫に最初の作物の育て方を教えてくれます。はしごの段ごとに固有の作物が実り、下の段は二種、上の段は四種で、腕が上がれば上質な等級も採れ、最初の畑より手強い土地の鍬はエンジニアが作ります。熟練度は専用のカウンターで上限100まで数えられます。',
   'guide.profPages.rhythmHeading': '採集のリズム',
   'guide.profPages.rhythmBody':
     '採集は目に見える詠唱です。基本{base}秒、最短{floor}秒で、道具がノードより1ティア高いごとに{tool}秒、熟練度バンドごとに{band}秒短くなります。',

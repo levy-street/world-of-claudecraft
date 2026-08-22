@@ -7939,11 +7939,21 @@ PER-BAND TABLE (reference farmer; the bed and tier columns are curve-independent
 THREE CELLS OF THAT TABLE WERE WRONG and are corrected above, found at the 11e
 QA by executing the helper and diffing its output against the doc: band 1 read
 0.922 / 7.38 and band 2 read 17.24, against the helper's 0.9242 / 7.3940 and
-17.2463. The helper computes meanSurvival as the bed-weighted ARITHMETIC mean
-over the band's discrete steps and grantsPerDay as attempts times that mean
-(farming_calendar_model.ts, the survivalSum accumulation); the three wrong cells
-are what a HARMONIC reading gives, so the table was assembled from two different
-derivations without either being named. Load-bearing columns were all correct:
+17.2463.
+THE CAUSE, and the first explanation offered for it was wrong. This QA initially
+read the deviation as a HARMONIC versus arithmetic mix-up; the audit's own
+model-reproducibility pass refuted that and supplied the better answer, which
+the commit clock confirms. The whole calendar-model section was committed at
+f3893a7ed8 (19:27:14) and the helper plus the re-tune landed 52 seconds later at
+8b85a7ba59 (19:28:06), so THE COLUMN IS A PRE-RE-TUNE RUN: it was computed
+against the OLD gain curve and never re-derived after the new one landed.
+Re-measured here rather than taken on either party's word: against the doc's
+printed precision the old curve's arithmetic run matches three of the four rows
+and both candidate readings of the SHIPPED curve match only two, so the stale-run
+reading is the best supported and the harmonic one is refuted. The doc and the
+code never disagreed about the METHOD (both are a bed-weighted arithmetic mean
+over the band's discrete steps); one column was simply left behind by 52 seconds.
+Load-bearing columns were all correct:
 beds, attempts, the days column, the totals and the family search reproduce to
 the digit. This column is the one the doc itself calls "reported for the reader,
 never used to compute the days column", and NOTHING pins it: meanSurvival and
@@ -8160,9 +8170,15 @@ shipped upper seeds LEFT the set and the four new ones did not join it, and the
 seeds are now asserted ABSENT from it rather than merely deleted. The (bo)
 honesty arm SELF-CLEARED and was INVERTED rather than removed, so green now
 means earnable; the docs/design/deeds.md waiver is closed with its date.
-prog_farming_100 and feat_book_complete are earnable. GATE 1 is proven end to
-end in tests/farming_gate1_faucet.test.ts, which walks the real commands rather
-than reading a ledger row, and is mutation-proved by dropping one seed row.
+prog_farming_100 and feat_book_complete are earnable. GATE 1 is proven in
+tests/farming_gate1_faucet.test.ts and is mutation-proved by dropping one seed
+row. CORRECTED AT THE 11e QA, because "walks the real commands rather than
+reading a ledger row" overstated it: the suite walks Sim.buyItem for all eight
+seeds and plantCrop plus harvestCrop for one of them, and the three-dish arm is
+a REACHABILITY LEDGER over the merged tables, not a craft. No craftItem or
+resolveCraft call exists in the file. The gate's own question, whether a player
+can obtain the reagents, is genuinely walked; craft admission turns on cooking
+skill, the station and a learned row, none of which GATE 1 moved.
 
 ### The four sweep verdicts (each sweep RUN, not assumed)
 - RELIQUARY: NO page. A crop is not conquerable unique loot. Verified against

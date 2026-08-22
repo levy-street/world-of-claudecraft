@@ -11522,7 +11522,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'guide.profPages.gatherIntro.fishing':
     '낚시는 입질과 릴 감기의 흐름으로 모든 지역의 트인 물가에서 어획물을 낚으며, 상한은 200이다.',
   'guide.profPages.gatherIntro.farming':
-    '농사는 캐내는 것이 아니라 돌보아 기르는 유일한 채집 기술이다. 손질한 밭에 씨앗을 심으면 자리를 비워도 작물은 제 시계대로 자라고, 언제 돌아오든 익은 것을 뽑으면 된다. 밭에 있는 것은 결코 상하지 않기 때문이다. Eastbrook의 텃밭에서 Fenbridge와 Highwatch를 지나 Evergarden의 화단까지, 밭터마다 농부가 곁에 서 있으며 Eastbrook의 Farmer Jessica가 이 기술의 출발점이다. 그녀는 Garden Hoe와 첫 씨앗을 팔고, 그녀의 심부름이 새내기 농부에게 첫 작물을 기르는 법을 알려 준다. 사다리의 단마다 고유한 작물이 한 쌍씩 자라고 솜씨가 늘면 상급 등급도 거두며, 첫 밭보다 거친 땅을 위한 괭이는 기술자가 만든다. 숙련은 전용 카운터로 상한 100까지 오른다.',
+    '농사는 캐내는 것이 아니라 돌보아 기르는 유일한 채집 기술이다. 손질한 밭에 씨앗을 심으면 자리를 비워도 작물은 제 시계대로 자라고, 언제 돌아오든 익은 것을 뽑으면 된다. 밭에 있는 것은 결코 상하지 않기 때문이다. Eastbrook의 텃밭에서 Fenbridge와 Highwatch를 지나 Evergarden의 화단까지, 밭터마다 농부가 곁에 서 있으며 Eastbrook의 Farmer Jessica가 이 기술의 출발점이다. 그녀는 Garden Hoe와 첫 씨앗을 팔고, 그녀의 심부름이 새내기 농부에게 첫 작물을 기르는 법을 알려 준다. 사다리의 단마다 고유한 작물이 자라는데 아래 단은 두 종, 위 단은 네 종이고 솜씨가 늘면 상급 등급도 거두며, 첫 밭보다 거친 땅을 위한 괭이는 기술자가 만든다. 숙련은 전용 카운터로 상한 100까지 오른다.',
   'guide.profPages.rhythmHeading': '채집의 리듬',
   'guide.profPages.rhythmBody':
     '채집은 눈에 보이는 시전이다. 기본 {base}초에 최소 {floor}초까지, 도구가 채집물보다 한 티어 높을 때마다 {tool}초, 숙련도 구간마다 {band}초씩 짧아진다.',

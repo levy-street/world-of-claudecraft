@@ -130,11 +130,29 @@ export function survivalAt(tier: number, skill: number): number {
   return farmSurvivalChance(skill, tier, false, false);
 }
 
-/** Beds per patch tier, measured off FARM_PATCHES. */
-export function bedsByTier(): ReadonlyMap<number, { patchId: string; beds: number }> {
-  const out = new Map<number, { patchId: string; beds: number }>();
-  for (const patch of FARM_PATCHES)
-    out.set(patch.tier, { patchId: patch.id, beds: patch.beds.length });
+/** Beds per patch tier, measured off FARM_PATCHES.
+ *
+ *  ACCUMULATES rather than overwrites, fixed at the Phase 11e QA. This used to
+ *  `set(patch.tier, ...)` per patch, so a SECOND patch at a tier the world
+ *  already has would have REPLACED the first instead of adding to it: a fifth
+ *  patch at tier 1 would have dropped Eastbrook's four beds and modelled the
+ *  new patch's count alone, quietly contradicting the file header's promise
+ *  that "a change to any of those moves the model". One patch per tier ships
+ *  today, so the bug was latent, and the derivation test's bed assertion (a
+ *  reduce over FARM_PATCHES filtered by tier) would have reddened rather than
+ *  passing silently, but it would have pointed at the shipped curve instead of
+ *  at this function. */
+export function bedsByTier(): ReadonlyMap<number, { patchIds: string[]; beds: number }> {
+  const out = new Map<number, { patchIds: string[]; beds: number }>();
+  for (const patch of FARM_PATCHES) {
+    const row = out.get(patch.tier);
+    if (row) {
+      row.patchIds.push(patch.id);
+      row.beds += patch.beds.length;
+    } else {
+      out.set(patch.tier, { patchIds: [patch.id], beds: patch.beds.length });
+    }
+  }
   return out;
 }
 
@@ -179,7 +197,7 @@ export function farmingCalendar(
     for (const tier of workedTiers) {
       const patch = patches.get(tier);
       if (!patch) continue;
-      bedsByPatch.set(patch.patchId, patch.beds);
+      for (const patchId of patch.patchIds) bedsByPatch.set(patchId, patch.beds);
       beds += patch.beds;
       const tierAt = farmer.worksEveryBed
         ? (skill: number) =>

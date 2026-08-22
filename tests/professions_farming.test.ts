@@ -25,7 +25,7 @@ import {
 } from '../src/sim/content/farm_crops';
 import { FARM_BED_IDS, FARM_PATCHES, farmBedById } from '../src/sim/content/farm_patches';
 import { DEFAULT_MOUNT } from '../src/sim/content/mounts';
-import { TOOL_EFFECTS } from '../src/sim/content/professions';
+import { GATHERING_PROFESSIONS, TOOL_EFFECTS } from '../src/sim/content/professions';
 import { ITEMS } from '../src/sim/data';
 import { setItemLocked } from '../src/sim/item_lock';
 import { FARM_MAX_GROW_MS } from '../src/sim/professions/farm_persist';
@@ -485,6 +485,13 @@ describe('FARMING_GAIN_SCHEDULE and the composed ceiling', () => {
   it('derives each tier ceiling from the schedule boundaries, never a second table', () => {
     expect(farmingTeachingCeilingFor(1)).toBe(50);
     expect(farmingTeachingCeilingFor(2)).toBe(75);
+    // Bound to the profession CAP, not to a bare literal, mirroring the fishing
+    // twin (tests/professions_fishing.test.ts). Added at the 11e QA: the whole
+    // calendar model computes a 0-to-100 ladder off this last boundary, and
+    // nothing tied it to GATHERING_PROFESSIONS.farming.maxSkill, so lowering
+    // the cap to 75 would have left the model reporting a 100-point climb with
+    // every arm green.
+    expect(farmingTeachingCeilingFor(3)).toBe(GATHERING_PROFESSIONS.farming.maxSkill);
     expect(farmingTeachingCeilingFor(3)).toBe(100);
     // Clamped at both ends: tier 4 shares tier 3's ceiling (the last row), and
     // a nonsense tier 0 falls to the first real row rather than off the table.
@@ -595,7 +602,7 @@ describe('the farming gain curve is DERIVED from the calendar model, not felt', 
     expect(model.bands.map((b) => b.harvests)).toEqual([100, 200, 400, 800]);
   });
 
-  it('holds the reference farmer\'s premise: a visit gap clears the longest crop', () => {
+  it("holds the reference farmer's premise: a visit gap clears the longest crop", () => {
     // ADDED at the 11e QA. The model helper's header has always claimed this
     // premise is "asserted separately by the derivation test against the real
     // durationMs literals", and no such assertion existed. It matters because
