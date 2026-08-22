@@ -3846,9 +3846,13 @@ const ITEM_RECIPES: Record<string, IconRecipe> = {
   // tests/item_icons.test.ts reds. The family rule is one line: the 'parchment'
   // ground plus a 'scroll' primary say RECIPE, and the bottom-right accent is
   // the PRIMARY glyph of the dish each one teaches (snowflake, potion,
-  // sunburst, leaf, tendrils, coin), so a pattern reads as the scroll for its
+  // sunburst, leaf, tendrils), so a pattern reads as the scroll for its
   // plate rather than as a generic page. Palettes follow the taught dish too,
   // which is what keeps the six apart without leaning on palette alone.
+  // ONE DELIBERATE EXCEPTION, and it is the reason the rule is written with
+  // one: the feast's own primary IS tendrils, which braised greens already
+  // took, so pattern_harvest_feast borrows the feast's SECONDARY glyph (coin)
+  // instead. Distinctness outranks the rule; the A4 sweep is what enforces it.
   pattern_highwatch_gourd_soup: r('parchment', 'ice', [
     'scroll',
     { p: 'snowflake', pal: 'ice', ...BR },

@@ -682,9 +682,13 @@ const HEROIC_RAID_BLUE_MOUNT_CHANCE = 0.001;
 const FARM_PATTERN_HEROIC_CHANCE = 0.04;
 /** The rollGroup name, EXPORTED because five suites need to exclude it from a
  *  gear census and a copied string literal in each is how one of them silently
- *  stops matching. Consumers: the dungeon channel pins, the apex no-fourth-
- *  channel registry, the wildheart gear arms, the Reliquary carve-out, and the
- *  heroic item-level sweep. */
+ *  stops matching. The IMPORTERS are four: tests/dungeons.test.ts (the channel
+ *  and append-position pins), tests/apex_pattern_channels.test.ts (the
+ *  sanctioned-host registry), tests/wildheart.test.ts (the gear arms) and
+ *  tests/farm_pattern_items.test.ts (the farm channel map). The Reliquary
+ *  carve-out and the heroic item-level sweep exclude the same rows BY KIND
+ *  instead, deliberately, so their reason travels with the item rather than
+ *  with this group name. */
 export const FARM_HEROIC_PATTERN_GROUP = 'heroic_farm_patterns';
 const heroicFarmPatternRows = (): LootEntry[] => [
   {

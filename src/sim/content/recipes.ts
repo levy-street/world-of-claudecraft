@@ -2826,8 +2826,13 @@ export const HOE_RECIPES: ProfessionRecipeRecord[] = [
 // FARM_DROP_RUNG_FLOOR or above under the channel rule above, so it is not
 // trainer-taught at all and charges no fee, in advance or otherwise. What
 // remains trainer-taught is the rung 0 to 50 on-ramp, free at rung 0 on the
-// settled masterwrought R8 fee curve's tier-0 point and fee-charging at 25 and 50; pinned in
-// tests/farm_recipes.test.ts.
+// settled R8 fee curve's tier-0 point and fee-charging at 25 and 50; pinned in
+// tests/farm_recipes.test.ts. THAT R8 IS THE PROFESSIONS-TUNING ONE (ruling R8
+// in docs/design/professions-tuning-packet-review.md, cited at
+// professions/training.ts's TRAINING_FEE_BY_TIER), NOT masterwrought R8, which
+// is the recipe-channel doctrine. Left bare on purpose: qualifying it as
+// "masterwrought" would attach the wrong packet to a shipped ruling, which is
+// exactly the collision the packet's R-namespace rule exists to prevent.
 
 /** The rung at which a farm recipe stops being trainer homework and becomes a
  *  drop (masterwrought ruling 11f-GATE-B). Exported so the channel assertions

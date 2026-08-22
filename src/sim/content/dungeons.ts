@@ -755,8 +755,10 @@ export const DUNGEON_MOBS: Record<string, MobTemplate> = {
       // member's index), so a tail append leaves every existing draw's stream
       // position byte-identical WITHIN THE BASE WALK (a heroic claim's
       // HEROIC_BOSS_LOOT draws roll after the base table in the same rollLoot
-      // call, so they sit one draw later; benign, and unpinned by any golden
-      // since the parity scenario kills normal difficulty) while an insert or
+      // call, so they sit one draw later; benign, and PINNED since Phase 11f,
+      // which recorded the nythraxis_heroic_claim parity scenario for exactly
+      // that stream, so this is no longer covered only by the normal-difficulty
+      // kill the sibling scenario drives) while an insert or
       // reorder forks the parity digest. Never insert or reorder any entry
       // above this group. kind 'recipe' defs mint no heroic variants
       // (heroic_variants.ts generator filter), so the heroic auto-upgrade

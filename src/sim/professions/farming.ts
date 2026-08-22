@@ -821,10 +821,12 @@ function insertPlotSorted(plots: Map<string, PlotState>, bedId: string, plot: Pl
  *  outcome was rolled at plant time and the yield expands deterministically
  *  from the stored seed. A resolving harvest spends its action-time rolls in
  *  the one draw block below, on EVERY resolving arm (survived, withered, and
- *  the defensive retired-crop arm): a tier 1/2 harvest draws EXACTLY ONE
- *  (the golden-harvest roll), a tier 3/4 harvest EXACTLY TWO contiguous (the
- *  seed-back roll, then the golden-harvest roll; a retired id reads tier 1,
- *  so that arm spends only the golden draw).
+ *  the defensive retired-crop arm): a tier 1/2 harvest draws EXACTLY TWO
+ *  contiguous (the golden-harvest roll, then the golden BONUS roll), a tier
+ *  3/4 harvest EXACTLY THREE contiguous (the seed-back roll, then those same
+ *  two; a retired id reads tier 1, so that arm spends the last two alone).
+ *  These counts are the file header's DRAW CONTRACT; when it moves, this
+ *  restates with it rather than being left at the previous phase's numbers.
  *
  *  NO BUSY GATE, unlike plantCrop. Harvesting is instant (there is no cast to
  *  conflict with) and it is the SECOND of the two visits a crop cycle ever
@@ -870,7 +872,8 @@ export function harvestCrop(ctx: SimContext, p: Entity, meta: PlayerMeta, bedId:
   meta.farmPlots.delete(bedId);
 
   // ---- THE ONE HARVEST DRAW BLOCK: the seed-back roll (tier 3/4 only), ----
-  // ---- then the golden-harvest roll (EVERY tier)                       ----
+  // ---- then the golden-harvest roll, then the golden BONUS roll        ----
+  // ---- (both of those on EVERY tier)                                   ----
   // REAL ctx.rng draws at harvest ACTION time, deliberately NOT seed
   // expansions: the tonic is seed-anchored because its outcome must be fixed
   // at plant time, while seed-back and the golden event are fresh rewards
@@ -881,13 +884,14 @@ export function harvestCrop(ctx: SimContext, p: Entity, meta: PlayerMeta, bedId:
   // immediately after the plot-outcome resolution gates above, BEFORE the
   // survived/withered branch and before every loop, so no draw's stream
   // position can ever depend on the outcome, the yield expansion's length, or
-  // any knob. Both rolls happen on BOTH outcomes: the withered seed-back
+  // any knob. ALL THREE rolls happen on BOTH outcomes: the withered seed-back
   // consolation is DELIBERATE (a failed high-tier crop can still hand a seed
   // back beside its husks, the same failure-is-a-smaller-reward thesis),
   // while the withered path IGNORES its golden result below (husks, never a
   // celebration; the roll still spends its draw for the constant per-action
-  // count), and an outcome-scoped draw would fork the stream by outcome
-  // besides. The seed-back roll is multi-threshold single draw: under the
+  // count) and never reads the bonus roll at all, since the bonus is read
+  // only inside the golden arm. An outcome-scoped draw would fork the stream
+  // by outcome besides. The seed-back roll is multi-threshold single draw: under the
   // two-chance it pays 2 seeds, else under the one-chance 1, else 0. Tier
   // 1/2 crops reach the seed-back arm and draw NOTHING there: the tier is an
   // INPUT read from content, never an outcome, so conditioning on it cannot

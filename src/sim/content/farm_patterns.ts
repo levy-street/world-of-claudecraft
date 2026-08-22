@@ -47,8 +47,11 @@
 // noMarketList; patterns are ordinary tradable drops that bind by CONSUMPTION
 // at learn time (professions/pattern_items.ts).
 //
-// QUALITY DERIVES from the taught row's OUTPUT quality, computed per pattern
-// against the merged catalog and never assigned (ruling 11f-PAT): recipe
+// QUALITY DERIVES from the taught row's OUTPUT quality (ruling 11f-PAT). The
+// literal below is the RESULT of that derivation, not an independent choice:
+// each value was computed per pattern against the merged catalog, and
+// tests/farm_pattern_items.test.ts re-derives it row by row, so a taught row
+// whose output quality moved reds here instead of leaving a stale rarity. Recipe
 // rarity is pinned monotone to the power of what it teaches. On this set that
 // lands uniformly on 'rare', which was PREDICTED before the rung climb and
 // OBSERVED after, and is a fact about the six flipped rows rather than a rule:

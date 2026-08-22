@@ -1103,7 +1103,11 @@ describe('FARM_RECIPES: a dish crafts for real, and fine twins never substitute 
   });
 });
 
-describe('FARM_RECIPES: the trainer on-ramp on the settled masterwrought R8 fee curve', () => {
+// The R8 named across this describe is the PROFESSIONS-TUNING one (ruling R8 in
+// docs/design/professions-tuning-packet-review.md, cited at
+// professions/training.ts's TRAINING_FEE_BY_TIER), never masterwrought R8, which
+// is the recipe-channel doctrine. It stays bare for that reason.
+describe('FARM_RECIPES: the trainer on-ramp on the settled R8 fee curve', () => {
   // Deviation (aj) is DISCHARGED by Phase 11f and this describe is what proves
   // both halves. The deviation recorded that every farm row shipped trainable
   // before the farm opened; its Phase 6 QA addendum recorded the FEE half as a
