@@ -288,9 +288,22 @@ const TOUCHED_ROWS: ReadonlyArray<{
    *  Totals alone can be gamed by moving a reagent between rows; this closes it
    *  for the herb, fish, meat and salt lines at once. */
   readonly untouched: ReadonlyArray<readonly [string, number]>;
+  /** The EXACT shipped reagent sequence, produce interleaved where it was
+   *  authored. Added at the Phase 11g QA (qr-11G-ORDER) because the arm below
+   *  claimed this coverage and did not have it: it pinned the produce entries
+   *  and the non-produce entries as two separate ordered lists, which leaves
+   *  the INTERLEAVING free, and then spelled the full order out for two rows
+   *  only. A mutation moving vale_wheat to the end of the skewer, the exact
+   *  example that arm's own comment names, passed this whole file. (It reddened
+   *  the wiki-regen freshness diff in tests/guide.test.ts, because
+   *  content.generated.ts carries the arrays verbatim, so the tree caught it;
+   *  but that is an incidental guard in another file over a surface a row can
+   *  leave, not the pin this file says it holds.) */
+  readonly order: ReadonlyArray<string>;
 }> = [
   {
     id: 'recipe_hunters_game_skewer',
+    order: ['game_meat', 'vale_wheat', 'cooking_salt'],
     produce: [['vale_wheat', 1]],
     untouched: [
       ['game_meat', 2],
@@ -299,6 +312,7 @@ const TOUCHED_ROWS: ReadonlyArray<{
   },
   {
     id: 'recipe_goldleaf_game_stew',
+    order: ['game_meat', 'vale_wheat', 'bog_beet', 'goldleaf_herb', 'cooking_salt'],
     produce: [
       ['vale_wheat', 2],
       ['bog_beet', 1],
@@ -311,6 +325,7 @@ const TOUCHED_ROWS: ReadonlyArray<{
   },
   {
     id: 'recipe_frostgill_chowder',
+    order: ['raw_frostgill_trout', 'brook_carrot', 'silverleaf_herb', 'cooking_salt'],
     produce: [['brook_carrot', 1]],
     untouched: [
       ['raw_frostgill_trout', 2],
@@ -320,6 +335,13 @@ const TOUCHED_ROWS: ReadonlyArray<{
   },
   {
     id: 'recipe_silvered_carp_supper',
+    order: [
+      'raw_stonescale_carp',
+      'raw_mirror_trout',
+      'marsh_rice',
+      'goldleaf_herb',
+      'cooking_salt',
+    ],
     produce: [['marsh_rice', 2]],
     untouched: [
       ['raw_stonescale_carp', 3],
@@ -330,6 +352,14 @@ const TOUCHED_ROWS: ReadonlyArray<{
   },
   {
     id: 'recipe_marlows_grand_roast',
+    order: [
+      'prime_cut',
+      'game_meat',
+      'highland_barley',
+      'frost_gourd',
+      'sunpetal_herb',
+      'cooking_salt',
+    ],
     produce: [
       ['highland_barley', 2],
       ['frost_gourd', 2],
@@ -343,6 +373,7 @@ const TOUCHED_ROWS: ReadonlyArray<{
   },
   {
     id: 'recipe_elixir_of_the_boar',
+    order: ['venom_gland', 'vale_wheat', 'silverleaf_herb', 'glass_vial'],
     produce: [['vale_wheat', 1]],
     untouched: [
       ['venom_gland', 2],
@@ -352,6 +383,7 @@ const TOUCHED_ROWS: ReadonlyArray<{
   },
   {
     id: 'recipe_venomfire_elixir',
+    order: ['venom_gland', 'bog_beet', 'goldleaf_herb', 'glass_vial'],
     produce: [['bog_beet', 2]],
     untouched: [
       ['venom_gland', 3],
@@ -361,6 +393,7 @@ const TOUCHED_ROWS: ReadonlyArray<{
   },
   {
     id: 'recipe_elixir_of_the_serpent',
+    order: ['pristine_venom_gland', 'venom_gland', 'frost_gourd', 'sunpetal_herb', 'glass_vial'],
     produce: [['frost_gourd', 1]],
     untouched: [
       ['pristine_venom_gland', 1],
@@ -371,6 +404,14 @@ const TOUCHED_ROWS: ReadonlyArray<{
   },
   {
     id: 'recipe_seasoned_stock',
+    order: [
+      'prime_cut',
+      'game_meat',
+      'marsh_rice',
+      'bog_beet',
+      'cooking_salt',
+      'quickening_catalyst',
+    ],
     produce: [
       ['marsh_rice', 2],
       ['bog_beet', 2],
@@ -410,6 +451,46 @@ function accentGovernedRows(): ProfessionRecipeRecord[] {
   );
 }
 
+/** RULE 2 AS ONE EXPRESSION, read by BOTH sweeps below and by the positive
+ *  control (qr-11G-ACCENT, Phase 11g QA). It used to be written out three
+ *  times: inline in the COUNT sweep, inline in the VALUE sweep, and a third
+ *  time as a local `accentOk` helper inside the control. A control that drives
+ *  its own copy of a rule proves the copy can say no, never the enforcer, so an
+ *  edit to either sweep's operator would have left the control green. Now the
+ *  control drives exactly what ships.
+ *
+ *  THE TWO HALVES USE DIFFERENT OPERATORS ON PURPOSE, and the asymmetry is the
+ *  packet's rather than an oversight: RULE 2 says the crop's count stays
+ *  "strictly below" the row's largest non-produce COUNT, but its share of
+ *  inputValue stays "at or below" the reference reagent's share.
+ *
+ *  THE VALUE HALF'S REFERENCE IS THE DOMINANT NON-PRODUCE REAGENT BY
+ *  CONTRIBUTION, which is what "the body" means when a bill is priced, and it
+ *  is a RECORDED READING rather than the only possible one. See the VALUE arm
+ *  below for what the alternative reading would refuse. */
+function accentVerdict(
+  nonProduce: ReadonlyArray<readonly [string, number]>,
+  produceId: string,
+  produceCount: number,
+): { countOk: boolean; valueOk: boolean; largestCount: number; dominant: number; value: number } {
+  const largestCount = Math.max(...nonProduce.map(([, n]) => n));
+  const dominant = Math.max(...nonProduce.map(([id, n]) => n * reagentUnitValue(id)));
+  const value = produceCount * reagentUnitValue(produceId);
+  return {
+    countOk: produceCount < largestCount,
+    valueOk: value <= dominant,
+    largestCount,
+    dominant,
+    value,
+  };
+}
+
+/** The non-produce bill of a live row, in the shape accentVerdict reads. */
+const nonProduceBill = (recipe: ProfessionRecipeRecord): ReadonlyArray<readonly [string, number]> =>
+  recipe.reagents
+    .filter((g) => !PRODUCE_IDS.has(g.itemId))
+    .map((g) => [g.itemId, g.count] as const);
+
 describe('masterwrought R17 RULE 2: the accent rule', () => {
   it('every touched row carries exactly the produce entries this phase authored', () => {
     expect(TOUCHED_ROWS.length, 'the touched-row table').toBe(9);
@@ -443,25 +524,38 @@ describe('masterwrought R17 RULE 2: the accent rule', () => {
     // that happens to satisfy them: nothing would prove the predicate can ever
     // say no. The synthetic row is the exact substitution this phase refused,
     // brook_carrot 1 on the rung-0 skewer's real non-produce bill.
-    const accentOk = (
-      nonProduce: ReadonlyArray<readonly [string, number]>,
-      produceId: string,
-      produceCount: number,
-    ): boolean => {
-      const largestCount = Math.max(...nonProduce.map(([, n]) => n));
-      const dominant = Math.max(...nonProduce.map(([id, n]) => n * reagentUnitValue(id)));
-      return produceCount < largestCount && produceCount * reagentUnitValue(produceId) <= dominant;
-    };
-    const skewerBill = [
-      ['game_meat', 2],
-      ['cooking_salt', 1],
-    ] as const;
+    // DRIVEN THROUGH accentVerdict, the same expression both sweeps below read,
+    // rather than a local re-implementation of it (qr-11G-ACCENT).
+    //
+    // The bill is derived from the LIVE skewer rather than typed out, so a
+    // future re-price of game_meat or cooking_salt moves this control with the
+    // row instead of leaving it asserting against a bill that stopped shipping.
+    const skewerBill = nonProduceBill(requireRecipe('recipe_hunters_game_skewer'));
+    expect(
+      skewerBill.map(([id]) => id),
+      'the control drives the live rung-0 bill',
+    ).toEqual(['game_meat', 'cooking_salt']);
     // REJECTED on value: brook_carrot contributes 16 against a dominant of 8.
-    expect(accentOk(skewerBill, 'brook_carrot', 1)).toBe(false);
+    const carrot = accentVerdict(skewerBill, 'brook_carrot', 1);
+    expect(carrot.valueOk, `carrot ${carrot.value} against dominant ${carrot.dominant}`).toBe(
+      false,
+    );
     // ACCEPTED: the binder the phase used instead, 4 against 8.
-    expect(accentOk(skewerBill, 'vale_wheat', 1)).toBe(true);
+    const wheat = accentVerdict(skewerBill, 'vale_wheat', 1);
+    expect(wheat.countOk && wheat.valueOk).toBe(true);
     // REJECTED on count: two wheat ties game_meat's 2 rather than staying under.
-    expect(accentOk(skewerBill, 'vale_wheat', 2)).toBe(false);
+    const twoWheat = accentVerdict(skewerBill, 'vale_wheat', 2);
+    expect(twoWheat.countOk, `two wheat against largest count ${twoWheat.largestCount}`).toBe(
+      false,
+    );
+    // BOTH HALVES REJECT INDEPENDENTLY, asserted per dimension rather than
+    // through one combined boolean: without this a predicate that had lost its
+    // value half entirely would still fail the carrot case on count and look
+    // healthy. The carrot passes on COUNT (1 is under 2) and fails only on
+    // value; the two wheat pass on VALUE (8 is at the dominant 8) and fail only
+    // on count. So each case isolates exactly one half.
+    expect(carrot.countOk, 'the carrot case must isolate the VALUE half').toBe(true);
+    expect(twoWheat.valueOk, 'the two-wheat case must isolate the COUNT half').toBe(true);
   });
 
   it('a crop is a seasoning and never the body, by COUNT', () => {
@@ -474,15 +568,14 @@ describe('masterwrought R17 RULE 2: the accent rule', () => {
     // all add produce to shipped rows by the packet's own ownership section, and
     // every one of them could have made a crop the body with this file green.
     for (const recipe of accentGovernedRows()) {
-      const largest = Math.max(
-        ...recipe.reagents.filter((g) => !PRODUCE_IDS.has(g.itemId)).map((g) => g.count),
-      );
+      const bill = nonProduceBill(recipe);
       for (const reagent of recipe.reagents) {
         if (!PRODUCE_IDS.has(reagent.itemId)) continue;
+        const verdict = accentVerdict(bill, reagent.itemId, reagent.count);
         expect(
-          reagent.count,
-          `${recipe.id}: ${reagent.itemId} at ${reagent.count} must stay under the row's largest non-produce count ${largest}`,
-        ).toBeLessThan(largest);
+          verdict.countOk,
+          `${recipe.id}: ${reagent.itemId} at ${reagent.count} must stay under the row's largest non-produce count ${verdict.largestCount}`,
+        ).toBe(true);
         expect(reagent.count, `${recipe.id}: ${reagent.itemId} is an accent`).toBeLessThanOrEqual(
           2,
         );
@@ -520,21 +613,73 @@ describe('masterwrought R17 RULE 2: the accent rule', () => {
     // still is not the body, so tightening this to strictly-below would enforce
     // something the packet never ruled. No row ties today; the closest is the
     // chowder at 16 against 20.
-    // Swept, not listed, for the same reason as the COUNT arm above.
+    // Swept, not listed, for the same reason as the COUNT arm above, and routed
+    // through accentVerdict so the control above drives this exact expression.
     for (const recipe of accentGovernedRows()) {
-      const dominant = Math.max(
-        ...recipe.reagents
-          .filter((g) => !PRODUCE_IDS.has(g.itemId))
+      const bill = nonProduceBill(recipe);
+      for (const reagent of recipe.reagents) {
+        if (!PRODUCE_IDS.has(reagent.itemId)) continue;
+        const verdict = accentVerdict(bill, reagent.itemId, reagent.count);
+        expect(
+          verdict.valueOk,
+          `${recipe.id}: ${reagent.itemId} contributes ${verdict.value} and must not exceed the row's dominant non-produce reagent at ${verdict.dominant}`,
+        ).toBe(true);
+      }
+    }
+  });
+
+  it('THE VALUE HALF IS A RECORDED READING, and this is what the other one refuses', () => {
+    // THE READING IS OPEN AND IT IS THE MAINTAINER'S (qr-11G-RULE2, surfaced at
+    // the Phase 11g QA). The packet text reads "its share of inputValue stays at
+    // or below THAT REAGENT'S share", where "that reagent" grammatically names
+    // the row's largest non-produce reagent BY COUNT, the same reference the
+    // count half uses. The shipped arm above instead measures against the
+    // DOMINANT non-produce reagent by contribution.
+    //
+    // The phase recorded that the count reading makes settled DECISION C
+    // unexecutable. That is true and it is NOT the whole blast radius, which is
+    // why this arm exists rather than a sentence in a doc: the count reading
+    // refuses FIVE produce entries across THREE shipped rows, and two of those
+    // rows are DECISION B's, not DECISION C's. Measured here so the maintainer's
+    // choice is costed rather than argued, and so that adopting the other
+    // reading is a known edit to a known list instead of a discovery.
+    const refusedUnderCountReading: string[] = [];
+    for (const recipe of accentGovernedRows()) {
+      const nonProduce = recipe.reagents.filter((g) => !PRODUCE_IDS.has(g.itemId));
+      const largestCount = Math.max(...nonProduce.map((g) => g.count));
+      // The count reading is ambiguous when several reagents TIE on count, so
+      // take the most permissive tied reference: a row refused even under the
+      // kindest tie-break is refused under every reading of it.
+      const countReference = Math.max(
+        ...nonProduce
+          .filter((g) => g.count === largestCount)
           .map((g) => g.count * reagentUnitValue(g.itemId)),
       );
       for (const reagent of recipe.reagents) {
         if (!PRODUCE_IDS.has(reagent.itemId)) continue;
-        const value = reagent.count * reagentUnitValue(reagent.itemId);
-        expect(
-          value,
-          `${recipe.id}: ${reagent.itemId} contributes ${value} and must not exceed the row's dominant non-produce reagent at ${dominant}`,
-        ).toBeLessThanOrEqual(dominant);
+        if (reagent.count * reagentUnitValue(reagent.itemId) > countReference) {
+          refusedUnderCountReading.push(`${recipe.id}/${reagent.itemId}`);
+        }
       }
+    }
+    expect(refusedUnderCountReading.sort()).toEqual([
+      'recipe_elixir_of_the_serpent/frost_gourd',
+      'recipe_marlows_grand_roast/frost_gourd',
+      'recipe_marlows_grand_roast/highland_barley',
+      'recipe_seasoned_stock/bog_beet',
+      'recipe_seasoned_stock/marsh_rice',
+    ]);
+    // And the shipped reading accepts every one of them, so the two really do
+    // disagree rather than this list being an artifact of how it was computed.
+    for (const key of refusedUnderCountReading) {
+      const [recipeId, itemId] = key.split('/');
+      const recipe = requireRecipe(recipeId);
+      const entry = recipe.reagents.find((g) => g.itemId === itemId);
+      expect(entry, `${key} must exist`).toBeDefined();
+      expect(
+        accentVerdict(nonProduceBill(recipe), itemId, entry?.count ?? 0).valueOk,
+        `${key} must be accepted by the SHIPPED reading`,
+      ).toBe(true);
     }
   });
 });
@@ -596,38 +741,35 @@ describe('masterwrought R18 and farming D24: the displacement guard', () => {
 
   it('and the reagent ORDER on every touched row, which is what a player reads', () => {
     // The two halves above pin the produce entries and the non-produce entries
-    // separately, so the INTERLEAVING between them was unpinned: moving
-    // vale_wheat to the end of the skewer satisfied both. Reagent order is the
-    // order the crafting window and the wiki render, and every bill here was
-    // deliberately composed to read body, then vegetables, then salt.
+    // separately, so the INTERLEAVING between them is unpinned by both: moving
+    // vale_wheat to the end of the skewer satisfies each of them. Reagent order
+    // is the order the crafting window and the wiki render, and every bill here
+    // was deliberately composed to read body, then vegetables, then salt.
+    //
+    // PINNED ON ALL NINE ROWS (qr-11G-ORDER, Phase 11g QA). This arm previously
+    // asserted only the SORTED id set and the length here, then spelled the full
+    // order out for two rows, so seven rows kept the interleaving free and the
+    // skewer that the paragraph above names as the motivating example was one of
+    // them. A mutation moving vale_wheat to the end of that bill passed this
+    // whole file. The two spelled-out rows are gone rather than kept beside the
+    // table: the per-row `order` field asserts strictly more than they did, and
+    // a duplicated pin is one more thing to update in two places.
     for (const row of TOUCHED_ROWS) {
       const recipe = requireRecipe(row.id);
+      expect(
+        recipe.reagents.map((g) => g.itemId),
+        `${row.id} reagent ORDER`,
+      ).toEqual([...row.order]);
+      // The order table and the two count tables must describe the same bill, so
+      // a row whose `order` was updated without its counts (or the reverse)
+      // cannot pass by having the halves disagree.
       const merged = new Map<string, number>();
       for (const [id, n] of [...row.untouched, ...row.produce]) merged.set(id, n);
-      expect(recipe.reagents.map((g) => g.itemId).sort(), `${row.id} reagent id set`).toEqual(
+      expect([...row.order].sort(), `${row.id} order table vs count tables`).toEqual(
         [...merged.keys()].sort(),
       );
-      expect(recipe.reagents.length, `${row.id} reagent count`).toBe(merged.size);
+      expect(row.order.length, `${row.id} reagent count`).toBe(merged.size);
     }
-    // The composed order, spelled out for the two rows the phase reasoned about
-    // explicitly, so the "meat, then vegetables, then salt" claim in the
-    // seasoned stock's own comment is a pin rather than prose.
-    expect(requireRecipe('recipe_seasoned_stock').reagents.map((g) => g.itemId)).toEqual([
-      'prime_cut',
-      'game_meat',
-      'marsh_rice',
-      'bog_beet',
-      'cooking_salt',
-      'quickening_catalyst',
-    ]);
-    expect(requireRecipe('recipe_marlows_grand_roast').reagents.map((g) => g.itemId)).toEqual([
-      'prime_cut',
-      'game_meat',
-      'highland_barley',
-      'frost_gourd',
-      'sunpetal_herb',
-      'cooking_salt',
-    ]);
   });
 });
 

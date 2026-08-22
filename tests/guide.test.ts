@@ -1975,6 +1975,35 @@ describe('Guide professions generated content accuracy', () => {
     expect(body, `the chowder takes ${carrots} brook carrot(s)`).toContain(
       `${countWord[carrots]} Brook Carrot${carrots === 1 ? '' : 's'}`,
     );
+
+    // THE ALCHEMY BODY CARRIES THE SAME HAZARD and was left without the guard
+    // (qr-11G-ALCPROSE, Phase 11g QA). It writes "a Frost Gourd in the Elixir of
+    // the Serpent", the article used quantitatively exactly as the cooking body
+    // uses it, against a bill of one. That is the identical shape as the defect
+    // this arm was built for: the cooking page shipped "a Frost Gourd" against a
+    // bill of TWO and every clause anchor stayed green, because an anchor tests
+    // WHICH clause is present and never whether its number is true. Nothing above
+    // reads the alchemy body's counts, so a later phase re-tiering the serpent's
+    // gourd would leave the page quietly lying about a number a player can count.
+    const alcBody = t('guide.profPages.craftProse.alchemy.materialsBody');
+    const serpentGourds = reagentCount('recipe_elixir_of_the_serpent', 'frost_gourd');
+    expect(serpentGourds, 'the serpent gourd count must have a word for it').toBeLessThanOrEqual(4);
+    expect(alcBody, `the serpent takes ${serpentGourds} frost gourd(s)`).toContain(
+      `${countWord[serpentGourds]} Frost Gourd${serpentGourds === 1 ? '' : 's'}`,
+    );
+    // The two unquantified alchemy crops are named without a number on purpose,
+    // so pin the NAMES rather than a count: a re-tier that dropped either crop
+    // off its bill would leave the sentence claiming a supplier it lost.
+    expect(reagentCount('recipe_elixir_of_the_boar', 'vale_wheat')).toBeGreaterThan(0);
+    expect(reagentCount('recipe_venomfire_elixir', 'bog_beet')).toBeGreaterThan(0);
+    expect(alcBody).toContain('Vale Wheat in the Elixir of the Boar');
+    expect(alcBody).toContain('Bog Beet in the Vipersear');
+
+    // The same bound the gourd arm carries, stated for the other two cooking
+    // counts as well: countWord only spells 1 to 4, and an unbounded count would
+    // fail on an undefined lookup rather than on the claim under test.
+    expect(barley, 'the roast barley count must have a word for it').toBeLessThanOrEqual(4);
+    expect(carrots, 'the chowder carrot count must have a word for it').toBeLessThanOrEqual(4);
   });
 
   it('pins the spot literals a consistently-wrong regeneration would keep wrong', () => {
