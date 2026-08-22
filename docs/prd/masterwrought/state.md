@@ -8897,3 +8897,203 @@ ruling." as an orphan fragment, and the harvest_feast block was missed outright
 and still asserted the dormancy in the present tense. Both are the exact defect
 class the wave existed to remove, in the one file carrying two such blocks rather
 than one. Fixed at 7e8b582f34.
+
+## Phase 11f STEP 0 ledger (2026-08-22, pre-flight only; authoring NOT started)
+
+This phase was STOPPED after STEP 0 and its first commit, deliberately, to be
+resumed with fresh context. Nothing in deliverables 1 to 7 has been authored.
+RESUME AT: the rung climb (DECISION A) and the channel flip (DECISION B).
+DO NOT re-run the sync, the baseline suite, or the rift residual: all three are
+done and recorded below.
+
+### The branch-baseline ritual, run and clean
+
+FULL SUITE AT THE BASE COMMIT f5fcb6a12f before anything was touched: EXIT=0
+(vitest's own line, not the wrapper's), 3024 files passed / 12 skipped, 43150
+passed / 2 expected-fail / 115 skipped, 848.07s, tip identical at both ends and
+DIRTY 0 at both ends. **inherited reds at branch: NONE.** The figures match the
+11e QA close-out exactly, which is the corroboration that nothing drifted
+between phases. Every red from here self-classifies.
+
+### STEP 0: the FIFTH release sync (merge 52bfe34a91)
+
+origin/release/v0.40.0 moved to 098372138a (PR #3232, fast loading screens),
+EIGHT commits and 47 files past the branch. Same minor version, so it ran inline
+rather than as its own phase.
+- INERTNESS VERIFIED BY DIFF before the merge ran, all four classes: ZERO files
+  under src/sim/, ZERO under src/ui/i18n.catalog/, ZERO parity goldens, no
+  pnpm-lock.yaml and no patches/. So no census content class could move, no
+  golden could conflict, and release-merge-gate-surprises #1 and #5 did not
+  apply.
+- SEVEN CONFLICTS, every one predicted: the four polish seal JSONs, the two
+  polish test files, and the monolith ceiling table. NONE of the five STOP files
+  (recipes.ts, dungeons.ts, rift/progression.ts, farming.ts,
+  recipe_economy.test.ts) was touched by the release at all.
+- TWO CEILINGS re-pinned at exact merged counts, both predicted BEFORE the merge
+  and both observed on the prediction: renderer.ts 13578 -> 13603 (13548 base +
+  30 ours + 25 theirs) and src/main.ts 11480 -> 11498 (11516 base - 36 ours + 18
+  theirs). main.ts was NOT on the phase brief's list of expected movers. The
+  release's own main.ts pin of 11534 was deliberately refused: it sits 36 lines
+  above the merged file and would have granted free slack. Both are inherited
+  growth, so no upstream code was extracted and no ceiling was raised for
+  headroom. hud.ts 19235, sim.ts 12341, online.ts 5967 and server/db.ts 4865 all
+  KEEP ours (the release never touches those files); dungeon.ts 2882 is
+  identical on both sides.
+- THE POLISH SEALS were re-minted from the merged working tree with the repo's
+  own remint_polish_provenance.mjs. THE CAUSE DIFFERS from the previous three
+  syncs and the difference is the durable lesson: this time OURS did not re-mint
+  since the merge base (the four JSONs are byte-identical to fd705304ee) and
+  only the RELEASE did. The re-mint is owed anyway, because the seal fingerprints
+  renderer.ts and BOTH parents edited it, so the merged file is a third content
+  and the release's fresh seal describes a tree that stops existing at the merge.
+  THE TRIGGER IS A MOVED SWEPT INPUT, NOT A CONFLICTING SEAL.
+- THE TOOL PRINTS THREE LITERALS and ACCEPTED_POLISH_V2_TOWN_SOURCE_FINGERPRINT
+  is NOT one of them: composite 6b9ee410, metadata sha256 fe37c37c, second-order
+  performance digest d3fc845b. The tool explicitly warns that the town source
+  fingerprint is the FROZEN identity of the tree the captures were taken against
+  and moves only if the captures are retaken. It was left alone.
+- Both parents' comment history was kept in all three test files.
+- POST-SYNC FULL SUITE GREEN at 52bfe34a91: EXIT=0, 3028 files, 43174 tests, tip
+  stable both ends, clean both ends. The +4 files and +24 tests are the release's
+  own new suites arriving (loading_backdrop, post_entry_warmups,
+  character_asset_ready), which its diff predicts.
+- BOTH MERGE-AUDIT TOOLS were run BEFORE the merge so a later failure is provably
+  this phase's, and again after: symbol_census RESULT PASS with contentIds 3074
+  and contentIdRows 3101 UNMOVED and zero unexplained extras in all five classes
+  (release-parent column auto-derived from four refs to FIVE);
+  golden_composition FAIL at exactly its recorded 16-finding baseline, same two
+  leaf paths, NO seventeenth. tsc --noEmit clean.
+
+### The rift rank residual, CLOSED as the phase's first commit (1f052fda9e)
+
+Verified open rather than assumed: riftClearRewards took no rank parameter and
+had exactly ONE call site, and its own coverage line recorded the residual.
+RIFT_RANK_BASE_LEVEL (C 20, B 22, A 25, S 28) makes the 20/22/28 appends exactly
+C, B and S. Goldens are keyed by scenario.name and SHARD_BOUNDS ends at
+SCENARIOS.length, so three appended scenarios mint three new goldens and need no
+shard edit.
+- SEEDS ARE MEASURED, NOT PICKED: 40 consecutive seeds from 4332 were driven
+  through the REAL scenario body (the probe cloned the committed scenario and
+  swapped only the Sim seed). Pattern hits B at 4353/4362/4367 (3 of 40), S at
+  4333/4334/4339/4349 (4 of 40), which is where a 0.08 rate should land. First
+  hit taken each time. C needs no hunt: its arm returns after draw 0.
+- THE MINT WAS PREDICTED IN WRITING FIRST and observed exactly: three new
+  goldens plus EXACTLY ONE moved leaf in rift_clear_rewards.json, the coverage
+  string the recorder writes into the trace (record.ts:175). That file's draws,
+  drawDigest, nextId, state and events digests are byte-identical; the whole
+  diff is one insertion and one deletion. No fifth golden moved.
+- AN UNPREDICTED CORROBORATION worth keeping: draw counts ascend 347 (C), 361
+  (B), 395 (S), the rank ladder widening exactly as the arm gating implies.
+- THREE MUTATIONS RUN, ALL KILLED, each asserting a clean tree first, proving
+  the edit applied by a non-empty diff, and verifying the revert: pointing S at
+  rank A (killed by 2 arms), pointing C at rank B (killed by 3), and disabling
+  the C early-out IN PRODUCTION (killed by the C arm). The third is the one that
+  matters: it proves the arms catch a real behavior change, not only fixture
+  drift.
+- A benign side effect, recorded rather than absorbed: tests/parity's skipped
+  count moved 1 -> 2. rename_state_proof.test.ts is env-gated on RENAME_PROOF
+  and registers one skipped test per golden that DIFFERS from its baseline ref,
+  so new goldens register more skipped rows. Skipped-only, no behavior.
+
+### FOUR CORRECTIONS to the phase file's premises, each verified against code
+
+1. RECIPE_ECONOMY NAMES THE WRONG PIN, in both directions. Both sorted literals
+   STAY: EXPECTED_LEGACY_SORTED is an empty array (line 80) asserted empty (line
+   244), and the one live sorted literal, the counterfactually-vendor-fed
+   membership list (line 162, seven ids, >= 7 floor at 174), keys on every
+   reagent carrying buyValue > 0, which this phase never touches (no reagent
+   changes, no buyValue added, and patterns are nobody's reagent; marks are not
+   a copper basis). WHAT ACTUALLY REDS is the TRAINER SUM at line 298, which
+   adds FARM_RECIPES.length as a whole term on the claim that the entire farm
+   set is trainer-taught. After DECISION B only 8 of 14 are, so it fails by 6.
+   FIX BY DERIVING that term from the rung rule, never by swapping 14 for a
+   literal 8. The sibling toHaveLength(14) stays correct and its comment goes
+   stale.
+2. 11f-DUNG's "the four-reins pin WILL move" is WRONG for the placement
+   DECISION E actually rules. That pin (tests/dungeons.test.ts:1552) and its
+   sibling groups.size === 1 read ONLY
+   HEROIC_BOSS_LOOT.nythraxis_scourge_of_thornpeak, the heroic RAID table, while
+   DECISION E puts the two rung-75 patterns on the heroic FIVE-MANS. It moves
+   only if the raid table is touched. The tail group is still the right shape,
+   with a placement detail the phase file misses: in EVERY HEROIC_BOSS_LOOT
+   table the ungrouped mount rows sit LAST, so a new tail group must append
+   AFTER them or the mount draws shift.
+3. THE SEAL RE-MINT prints three literals and the town source fingerprint is not
+   among them (above).
+4. src/main.ts was a SECOND moving ceiling, not on the brief's list of four.
+
+### Discovery already done (so it is not re-derived)
+
+- THE PHASE THESIS HOLDS, proved from the code: resolvePatternLearn's four reads
+  are all craft-agnostic (an acquisition.includes('drop') content check,
+  isRecipeKnown, a flat craftSkills[recipe.professionId] <= 0 read, and the
+  shared teachTierMet band math). The file's own comment states there is no
+  profession-membership concept in this codebase, only a flat skill per craft.
+  So cooking and alchemy rows work on the shipped machinery unchanged and
+  pattern_items.ts, training.ts, wheel.ts and crafting.ts stay byte-identical.
+  Tier gates, derived: rung 75 -> tier 3, rung 100 -> tier 4, so cooking 50
+  refuses a 75 pattern and cooking 75 refuses a 100 pattern.
+- THE MERGED FARM_RECIPES TABLE is 14 rows in the expected 4 / 3 / 7 shape, and
+  DECISION A's target bands are 0:4, 25:3, 50:1, 75:2, 100:4, 125:0. The six
+  that flip are gourd soup and barley porridge (to 75, [20,20]) and sunmelon
+  tart, harvest platter, braised greens and harvest feast (to 100, [25,25]).
+- EVERY FLIPPED ROW'S OUTPUT IS quality 'rare' on the merged catalog. 11f-PAT's
+  derived quality therefore lands UNIFORMLY on 'rare' for this set. The rule is
+  unchanged and must still be COMPUTED per pattern, but the phase file's premise
+  that farming's outputs are "common, uncommon and rare, unlike the apex set's
+  uniform epic" is true of the whole 14-row ladder and NOT of the flipped six.
+  Record it predicted-then-observed so it does not read as a hardcoded uniform.
+- GATE 1 VERIFIED AND PASSING, by grep rather than by trusting the record: all
+  four tier-3 seeds at farmer_hollis (zone3.ts:1463-1468), all four tier-4 at
+  farmer_verbena (evergarden.ts:336-342), ZERO loot hits for any of the eight,
+  positive buyValue 32 / 64, kind 'junk', sellValue 4 / 8. So this phase authors
+  no vendor row and no copper floor row.
+- THE QUARTERMASTER has 19 stock rows and exactly two price points (12 and 16).
+  This phase appends 14 rows (6 patterns + 8 seeds) all at 12, taking it to 33.
+  Its gear-shape loop excludes wyrmfall_core BY ID and recipes BY KIND; the
+  eight seed rows are kind 'junk' and would fall INTO it, so extend the
+  exclusion BY KIND (gear is kind 'armor'), never by a growing id list.
+- LOOT DETERMINISM, proved from the resolver rather than the comment
+  (src/sim/loot/loot_roll.ts): entries are walked IN ARRAY ORDER with exactly
+  ONE ctx.rng.next() per rollGroup, so a tail-appended group adds one draw at the
+  END and every existing draw keeps its position.
+- THE SIBLING HEROIC-CLAIM NYTHRAXIS RESIDUAL IS ALSO OPEN and was NOT closed
+  here. loot_roll.ts states heroic HEROIC_BOSS_LOOT draws roll AFTER the base
+  table in the same call, so this phase's raid tail group shifts them by one;
+  and nythraxisFullPull calls enterDungeon with NO difficulty, i.e. a normal
+  kill, so no golden covers a heroic claim. Same hazard class as the rift
+  residual. CLOSE IT BEFORE THE RAID APPEND.
+- THE UNIVERSE PIN (tests/apex_pattern_items.test.ts:56) gets its non-vacuity
+  from deriving its two sides INDEPENDENTLY (ITEMS on one side, the
+  APEX_*_RECIPES tables on the other). The union re-cut MUST preserve that by
+  deriving the farm half from FARM_RECIPES filtered on acquisition, never from
+  the new pattern table.
+
+### The prose staleness hit list, built BEFORE authoring
+
+The 11e QA's one BLOCKING defect was reworded English guide prose whose filled
+non-Latin rows went stale, and nothing in the gate can catch it. Two
+hand-authored keys WILL be falsified by this phase, and BOTH are already filled
+in all five non-Latin locales (measured with grep over src/ui/i18n.locales/):
+- farm.tableBody (guide.ts:3042): its golden-harvest sentence stops being the
+  whole truth under DECISION D, AND it tells players the top three dishes come
+  from the farmers beside the beds, which DECISION B makes false.
+- farm.bedsBody (guide.ts:3033): its seed-source enumeration goes two channels
+  short once the seeds drop and sell for Marks.
+Reword only the sentences whose FACT moved, move the matching sentence in all
+five non-Latin rows in the SAME commit, and prove it by grepping the overlay AND
+the resolved bundle.
+SOURCE COMMENTS this phase will falsify: the FARM_RECIPES block header
+(recipes.ts, its "trainer-taught" shape sentence, its scaffolding convention
+list, and the (aj) TRAINABLE FROM THE START paragraph the phase must DISCHARGE),
+plus both farm block headers in profession_items.ts (lines 698 and 781), which
+each open "Trainer-taught outputs of FARM_RECIPES".
+NOT on the list, verified: the 11e dormancy prose is correctly historical
+everywhere in src/sim/content/, so there is nothing to re-fix there.
+
+### A process note for the resumed session
+
+All SIX read-only discovery agents dispatched at STEP 1 went idle WITHOUT
+delivering, each after its one budgeted nudge, so their ground was covered in
+the main loop instead. Budget for that: the fan-out bought nothing here and the
+direct reads were what produced every correction above.

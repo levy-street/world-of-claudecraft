@@ -32,7 +32,7 @@
 | 11d QA | verify | complete | 2026-08-21 | 2026-08-21 |
 | 11e | A true skill, farming's mastery curve and crop roster | complete | 2026-08-21 | 2026-08-21 |
 | 11e QA | verify | complete | 2026-08-21 | 2026-08-21 |
-| 11f | Farming joins the drop economy | pending | | |
+| 11f | Farming joins the drop economy | STEP 0 done, authoring not started | 2026-08-22 | |
 | 11f QA | verify | pending | | |
 | 11g | The provisioning supply line, leveling tier | pending | | |
 | 11g QA | verify | pending | | |
