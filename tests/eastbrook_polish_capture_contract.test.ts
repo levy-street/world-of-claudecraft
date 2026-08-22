@@ -280,8 +280,31 @@ interface AttributionTargetFixture {
 // than hand-edited, and committed with exactly the bytes it read. No capture
 // was retaken: the merged renderer delta is upstream's instrumentation plus
 // this branch's farm-visual wiring, neither of which moves the sealed pixels.
+//
+// UPSTREAM'S OWN RE-MINT HISTORY over the same span, kept rather than dropped:
+// for the shader-memory-probes renderer instrumentation and VFX teardown
+// extraction; for the fast-loading-screen-variety merge with release/v0.40.0,
+// where the renderer runtime leaf moved on both sides of THAT merge (its
+// character asset-ready wiring, the release's shader-memory probes); and for
+// its review-fix round (the nearby-view floor in prewarm_policy.ts, the
+// weapon-skin early-out wiring in renderer.ts). No capture retaken in any.
+//
+// RE-MINTED AGAIN at the Phase 11f release sync (release tip 098372138a, PR
+// #3232). The FOURTH consecutive sync to re-mint this seal, but the first
+// where only ONE parent re-minted it: the four seal JSONs on this branch are
+// byte-identical to the merge base, and only the release moved them. The
+// re-mint is owed anyway, because the seal is a fingerprint OF renderer.ts and
+// BOTH parents edited that file, so the merged renderer is a third content
+// (13548 base, ours 13578, theirs 13573, merged 13603) and the release's fresh
+// seal describes a tree that stops existing the moment this merge lands. That
+// is the durable lesson: the trigger is a moved SWEPT INPUT, not a conflicting
+// seal. Parent values for the record: ours 1c3ae800, the release e922918a.
+// Minted from the merged WORKING TREE with the repo's own tool and committed
+// with exactly the bytes it read. No capture was retaken: the merged renderer
+// delta is upstream's loading-screen wiring plus this branch's farm-visual
+// wiring, neither of which moves the sealed pixels.
 const PINNED_POLISH_COMPOSITE_FINGERPRINT =
-  '1c3ae800c6aa3b19f531607ac46d877fc0cc6fd25013213714fe3635acaa832e';
+  '6b9ee41045a876453ff7b7df23e52303c0f5f9d8f19df1039becb613e8126405';
 
 function validPolishAttributionTargets(): AttributionTargetFixture[] {
   return [

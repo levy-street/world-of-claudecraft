@@ -214,10 +214,15 @@ describe('startGame wiring', () => {
     const beginCriticalAt = mainSource.indexOf('beginDeferredPreloads()');
     const awaitAssetsAt = mainSource.indexOf('await assetsReady(');
     const firstPaintAt = mainSource.indexOf("checkpoint('first-paint')");
-    const beginBackgroundAt = mainSource.indexOf('beginBackgroundPreloads()');
+    const schedulerAt = mainSource.indexOf('void runPostEntryWarmups({', firstPaintAt);
+    const beginBackgroundAt = mainSource.indexOf(
+      'startBackgroundPreloads: beginBackgroundPreloads,',
+      schedulerAt,
+    );
     expect(beginCriticalAt).toBeGreaterThan(-1);
     expect(awaitAssetsAt).toBeGreaterThan(-1);
     expect(firstPaintAt).toBeGreaterThan(-1);
+    expect(schedulerAt).toBeGreaterThan(firstPaintAt);
     expect(beginBackgroundAt).toBeGreaterThan(-1);
     expect(beginBackgroundAt).toBeGreaterThan(beginCriticalAt);
     expect(beginBackgroundAt).toBeGreaterThan(awaitAssetsAt);

@@ -21,7 +21,9 @@ no procedural-rig path here anymore. Reads the world; never mutates the sim.
   `manifest.ts`). `prepareVisual(key)` memoizes normalize transform, resolved
   clips, click-capsule radius, and a baked idle-pose geo (far-LOD/shadow
   proxy). `charactersReady()` is deliberately NARROWER than the site-wide
-  `assetsReady()`: only this file's boot GLBs + skin atlases, with its own
+  `assetsReady()`: only this file's boot GLBs (the skin atlases defer on every
+  host and rejoin this gate only if the eagerSkinAtlases kill-switch in
+  `assets.ts` is ever flipped back), with its own
   delayed, backed-off retry loop, so a transient failure anywhere else on the
   site can never permanently blank the landing character-creation preview
   (`src/main.ts` awaits it there instead of `assetsReady()`;

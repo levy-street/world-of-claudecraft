@@ -9,12 +9,15 @@ import {
   mandatoryLandmarkViewsReady,
   materialProgramSignature,
   NEARBY_LANDMARK_STREAM_RADIUS,
+  NEARBY_VIEW_PREWARM_FLOOR,
+  nearbyPrewarmViewBudget,
   orderedPrewarmIds,
   orderPrewarmResumeEntries,
   type PrewarmPolicyInput,
   partitionMandatoryLandmarkCandidates,
   partitionResidentSkyBiomes,
   planCompileSubmission,
+  portalPrewarmViewBudget,
   prewarmBuildDeadline,
   prewarmCompileAwaitDeadline,
   prewarmEntryResumesAfterSkip,
@@ -39,12 +42,12 @@ const BASE: PrewarmPolicyInput = {
   asyncCompileSupported: true,
   lowGfx: false,
   finishFullManifestBeforeReveal: false,
-  defaultMaxMs: 12000,
-  constrainedMaxMs: 5000,
-  defaultCompileMaxMs: 10000,
-  constrainedCompileMaxMs: 2500,
-  maxViewsLow: 48,
-  maxViewsHigh: 72,
+  defaultMaxMs: 3000,
+  constrainedMaxMs: 3000,
+  defaultCompileMaxMs: 1500,
+  constrainedCompileMaxMs: 1500,
+  maxViewsLow: 12,
+  maxViewsHigh: 16,
   maxViewsConstrained: 2,
 };
 
@@ -55,6 +58,39 @@ const BASE: PrewarmPolicyInput = {
 const MAIN_SOURCE = codeWithoutLineComments(
   readFileSync(new URL('../src/main.ts', import.meta.url), 'utf8').replace(/\r\n/g, '\n'),
 );
+
+it('pins the production soft, compile, hard, and view budgets plus their policy wiring', () => {
+  const renderer = readFileSync(
+    new URL('../src/render/renderer.ts', import.meta.url),
+    'utf8',
+  ).replace(/\r\n/g, '\n');
+  for (const literal of [
+    'const VIEW_PREWARM_MAX_MS = 3000;',
+    'const VIEW_PREWARM_MAX_MS_CONSTRAINED = 3000;',
+    'const PREWARM_COMPILE_MAX_MS = 1500;',
+    'const PREWARM_COMPILE_MAX_MS_CONSTRAINED = 1500;',
+    'const VIEW_PREWARM_HARD_MAX_MS = 5000;',
+    'const VIEW_PREWARM_HARD_MAX_MS_CONSTRAINED = 5000;',
+    'const PREWARM_BUILD_RESERVE_MS = 1000;',
+    'const VIEW_PREWARM_MAX_VIEWS_LOW = 12;',
+    'const VIEW_PREWARM_MAX_VIEWS_HIGH = 16;',
+  ]) {
+    expect(renderer).toContain(literal);
+  }
+  for (const wiring of [
+    'defaultMaxMs: VIEW_PREWARM_MAX_MS,',
+    'constrainedMaxMs: VIEW_PREWARM_MAX_MS_CONSTRAINED,',
+    'defaultCompileMaxMs: PREWARM_COMPILE_MAX_MS,',
+    'constrainedCompileMaxMs: PREWARM_COMPILE_MAX_MS_CONSTRAINED,',
+    'maxViewsLow: VIEW_PREWARM_MAX_VIEWS_LOW,',
+    'maxViewsHigh: VIEW_PREWARM_MAX_VIEWS_HIGH,',
+    '? VIEW_PREWARM_HARD_MAX_MS_CONSTRAINED\n      : (pacing.knobs.hardMaxMs ?? VIEW_PREWARM_HARD_MAX_MS);',
+    'const maxMs = Math.max(0, options.maxMs ?? policy.maxMs);',
+    'const hardMaxMs = Math.max(maxMs, options.hardMaxMs ?? defaultHardMaxMs);',
+  ]) {
+    expect(renderer).toContain(wiring);
+  }
+});
 
 // The full manifest id order the renderer builds, for the reorder tests.
 // Kept in lockstep with the renderer by the "matches the renderer's real
@@ -150,13 +186,14 @@ function parsedManifestEntries(): { id: string; required: boolean; deadlineExemp
 }
 
 describe('resolvePrewarmPolicy: unconstrained desktop', () => {
-  it('runs the full manifest with generous budgets and no reordering', () => {
+  it('runs the full manifest inside a short responsive budget', () => {
     const p = resolvePrewarmPolicy(BASE);
     expect(p.minimalManifest).toBe(false);
-    expect(p.maxMs).toBe(12000);
-    expect(p.compileMaxMs).toBe(10000);
-    expect(p.maxViews).toBe(72);
-    expect(p.yieldBetweenEntries).toBe(false);
+    expect(p.maxMs).toBe(3000);
+    expect(p.compileMaxMs).toBe(1500);
+    expect(p.maxViews).toBe(16);
+    expect(p.nearbyViewFloor).toBe(NEARBY_VIEW_PREWARM_FLOOR);
+    expect(p.yieldBetweenEntries).toBe(true);
     expect(p.linkPassPerEntry).toBe(false);
     expect(p.compileBeforeFirstFrame).toBe(true);
     expect(p.skipMonolithCompile).toBe(false);
@@ -185,7 +222,7 @@ describe('resolvePrewarmPolicy: unconstrained desktop', () => {
       'this.createPersistentPortalViews(\n            createdViewTypes,\n            buildDeadline,',
     );
     expect(renderer).toContain(
-      'this.createCandidateViews(\n            remainingPrewarmViewBudget(policy.maxViews, createdViews),\n            createdViewTypes,\n            buildDeadline,',
+      'this.createCandidateViews(\n            nearbyPrewarmViewBudget(policy.maxViews, createdViews, policy.nearbyViewFloor),\n            createdViewTypes,\n            buildDeadline,',
     );
   });
 
@@ -202,6 +239,9 @@ describe('resolvePrewarmPolicy: unconstrained desktop', () => {
     expect(prewarmEntryShouldDefer(12_000, 12_000, 15_000, true, false)).toBe(false);
     expect(prewarmEntryShouldDefer(15_000, 12_000, 15_000, true, false)).toBe(true);
     expect(prewarmBuildDeadline(12_000, 15_000, 3_000, false)).toBe(9_000);
+    // The production 3 s soft budget must leave a real build slice before the
+    // 1 s reserve; otherwise nearby/persistent views all spill into gameplay.
+    expect(prewarmBuildDeadline(3_000, 5_000, 1_000, false)).toBe(2_000);
   });
 
   it('stops the compile-submit loop at the GPU submit deadline, except on the Insane arm', () => {
@@ -424,7 +464,7 @@ describe('resolvePrewarmPolicy: unconstrained desktop', () => {
   });
 
   it('uses the low view cap on the low tier', () => {
-    expect(resolvePrewarmPolicy({ ...BASE, lowGfx: true }).maxViews).toBe(48);
+    expect(resolvePrewarmPolicy({ ...BASE, lowGfx: true }).maxViews).toBe(12);
   });
 
   it('keeps the full manifest and compiles before the first full-scene frame', () => {
@@ -942,11 +982,14 @@ describe('resolvePrewarmPolicy: constrained with parallel compile (the iPhone pa
   });
 
   it('caps budget, compile budget, and nearby views hard', () => {
-    expect(p.maxMs).toBe(5000);
-    expect(p.compileMaxMs).toBe(2500);
+    expect(p.maxMs).toBe(3000);
+    expect(p.compileMaxMs).toBe(1500);
     // The production-hub fix: only self plus one required/nearby view may build
     // synchronously at entry, never a crowd that reveals on the first live submit.
     expect(p.maxViews).toBe(2);
+    // No nearby floor on top of the constrained cap: 2 is a process-survival
+    // ceiling, and the deferred mob-body stream covers nearby entities.
+    expect(p.nearbyViewFloor).toBe(0);
     expect(p.finishFullManifestBeforeReveal).toBe(false);
   });
 
@@ -983,7 +1026,12 @@ describe('resolvePrewarmPolicy: constrained with parallel compile (the iPhone pa
       'utf8',
     ).replace(/\r\n/g, '\n');
     expect(renderer).toContain('const VIEW_PREWARM_MAX_VIEWS_CONSTRAINED = 2;');
-    expect(renderer).toContain('remainingPrewarmViewBudget(policy.maxViews, createdViews)');
+    expect(renderer).toContain(
+      'portalPrewarmViewBudget(policy.maxViews, createdViews, policy.nearbyViewFloor)',
+    );
+    expect(renderer).toContain(
+      'nearbyPrewarmViewBudget(policy.maxViews, createdViews, policy.nearbyViewFloor)',
+    );
   });
 
   it('moves programs.compile to just before world.initial-frame', () => {
@@ -1002,7 +1050,7 @@ describe('resolvePrewarmPolicy: constrained with parallel compile (the iPhone pa
       constrainedMemory: true,
       maxViewsConstrained: 999,
     });
-    expect(highCap.maxViews).toBe(72); // tier cap still wins when it is lower
+    expect(highCap.maxViews).toBe(16); // tier cap still wins when it is lower
   });
 });
 
@@ -1017,6 +1065,50 @@ describe('remainingPrewarmViewBudget', () => {
   it('normalizes fractional and invalid budgets', () => {
     expect(remainingPrewarmViewBudget(2.9, 1.2)).toBe(1);
     expect(remainingPrewarmViewBudget(-1, 0)).toBe(0);
+  });
+});
+
+describe('the nearby view floor on the shared budget (review should-fix)', () => {
+  // The reported starvation: required and landmark views drain the shared
+  // counter while bypassing the cap, and portals draw before nearby, so with
+  // the 12/16 budgets a landmark-plus-portal-heavy spawn left zero slots for
+  // the nearby entity views, the most actionable entry on the shared cap.
+  it('portals may only draw what remains past the floor', () => {
+    expect(portalPrewarmViewBudget(12, 0, 4)).toBe(8);
+    expect(portalPrewarmViewBudget(12, 5, 4)).toBe(3);
+    expect(portalPrewarmViewBudget(12, 8, 4)).toBe(0);
+    expect(portalPrewarmViewBudget(12, 20, 4)).toBe(0);
+  });
+
+  it('nearby always keeps at least the floor, even with the counter drained', () => {
+    expect(nearbyPrewarmViewBudget(12, 0, 4)).toBe(12);
+    expect(nearbyPrewarmViewBudget(12, 10, 4)).toBe(4);
+    expect(nearbyPrewarmViewBudget(12, 12, 4)).toBe(4);
+    // Required plus landmarks alone past the cap: nearby still gets the floor,
+    // so total entry views are bounded by maxViews plus the floor.
+    expect(nearbyPrewarmViewBudget(12, 20, 4)).toBe(4);
+  });
+
+  it('a zero floor reproduces the plain shared-budget draw (the constrained arm)', () => {
+    expect(portalPrewarmViewBudget(2, 2, 0)).toBe(0);
+    expect(nearbyPrewarmViewBudget(2, 2, 0)).toBe(0);
+    expect(nearbyPrewarmViewBudget(2, 1, 0)).toBe(1);
+  });
+
+  it('normalizes a fractional or negative floor', () => {
+    expect(portalPrewarmViewBudget(12, 0, 4.9)).toBe(8);
+    expect(nearbyPrewarmViewBudget(12, 12, -1)).toBe(0);
+  });
+
+  it('the unconstrained floor never exceeds the smallest tier budget', () => {
+    // resolvePrewarmPolicy clamps by min(floor, baseMaxViews); the constant
+    // itself must sit under the 12-view low tier for the clamp to be a no-op
+    // on both desktop tiers.
+    expect(NEARBY_VIEW_PREWARM_FLOOR).toBeLessThanOrEqual(12);
+    expect(NEARBY_VIEW_PREWARM_FLOOR).toBeGreaterThan(0);
+    expect(resolvePrewarmPolicy({ ...BASE, lowGfx: true }).nearbyViewFloor).toBe(
+      NEARBY_VIEW_PREWARM_FLOOR,
+    );
   });
 });
 

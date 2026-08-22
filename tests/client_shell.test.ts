@@ -1,4 +1,5 @@
 import { existsSync, readFileSync, statSync } from 'node:fs';
+import ts from 'typescript';
 import { describe, expect, it } from 'vitest';
 
 const html = readFileSync(new URL('../index.html', import.meta.url), 'utf8').replace(/\r\n/g, '\n');
@@ -292,6 +293,19 @@ describe('client HTML shell', () => {
     }
   });
 
+  it('loads a runtime-selected backdrop instead of eagerly fetching the legacy image', () => {
+    for (const entry of [html, playHtml]) {
+      expect(entry).not.toContain('<link rel="preload" as="image" href="/loading-screen.jpg" />');
+    }
+    expect(shellCss).toContain('var(--loading-backdrop-image, none)');
+    expect(shellCss).not.toContain('url("/loading-screen.jpg")');
+    expect(mainTs).toContain('loadingBackdrop.prepareInitial();');
+    expect(mainTs).toContain('if (!wasVisible) loadingBackdrop.enterNewCycle();');
+    expect(mainTs).toMatch(
+      /function hideLoadingScreen\(\): void \{[\s\S]*?loadingBackdrop\.prepareNextCycle\(\);[\s\S]*?\n\}/,
+    );
+  });
+
   it('removes loading-curtain and progress motion for reduced-motion players', () => {
     expect(shellCss).toContain('transition: opacity calc(0.35s * var(--motion-scale)) ease;');
     expect(shellCss).toContain('transition: width calc(0.2s * var(--motion-scale)) ease;');
@@ -327,6 +341,40 @@ describe('client HTML shell', () => {
     expect(prepareAt).toBeGreaterThan(buildAt);
     expect(build).toContain('new Renderer(world, recycled.canvas, nameplates, {');
     expect(mainTs).toContain('online?.neutralizeInputForClientPause();');
+  });
+
+  it('invokes the post-entry warmup scheduler only after the first world paint', () => {
+    const source = ts.createSourceFile('main.ts', mainTs, ts.ScriptTarget.Latest, true);
+    const warmupCalls: ts.CallExpression[] = [];
+    const findWarmup = (node: ts.Node): void => {
+      if (
+        ts.isCallExpression(node) &&
+        ts.isIdentifier(node.expression) &&
+        node.expression.text === 'runPostEntryWarmups'
+      ) {
+        warmupCalls.push(node);
+      }
+      ts.forEachChild(node, findWarmup);
+    };
+    findWarmup(source);
+    expect(warmupCalls).toHaveLength(1);
+    const warmupCall = warmupCalls[0];
+    if (!warmupCall) throw new Error('runPostEntryWarmups call not found');
+
+    const animationFrameCallbacks: ts.ArrowFunction[] = [];
+    for (let node: ts.Node | undefined = warmupCall.parent; node; node = node.parent) {
+      if (
+        ts.isArrowFunction(node) &&
+        ts.isCallExpression(node.parent) &&
+        node.parent.arguments.includes(node) &&
+        node.parent.expression.getText(source) === 'requestAnimationFrame'
+      ) {
+        animationFrameCallbacks.push(node);
+      }
+    }
+    expect(animationFrameCallbacks).toHaveLength(2);
+    expect(animationFrameCallbacks[0]?.body.getText(source)).toContain("checkpoint('first-paint')");
+    expect(mainTs.match(/void runPostEntryWarmups\(\{/g)).toHaveLength(1);
   });
 
   it('attempts both auxiliary graphics teardown arms before reporting reset failures', () => {

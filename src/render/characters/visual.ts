@@ -2348,6 +2348,14 @@ export class CharacterVisual {
     return payloads;
   }
 
+  /** Rebuild the current weapon-skin attachments after its on-demand GLB
+   *  arrives. The logical skin id stays unchanged; only its fail-soft base
+   *  weapon payload is replaced. */
+  refreshWeaponSkin(): THREE.Object3D[] | null {
+    if (!this.weaponSkinId) return null;
+    return this.reattachHeldWeapon();
+  }
+
   /** Re-attach BOTH held hands (gear swap / skin change), honoring an active
    *  sheathe so a weapon swapped while stowed lands on the back, not the hand. The
    *  offhand re-attaches with skin awareness: when the active skin mirrors onto a

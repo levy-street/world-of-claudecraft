@@ -146,6 +146,7 @@ import { createPadTargetPick } from './game/pad_target_pick';
 import { createPerfMonitor } from './game/perf';
 import { initPerfNudge } from './game/perf_nudge';
 import { startPerfReporter } from './game/perf_reporter';
+import { kickCharacterPreloadStream, runPostEntryWarmups } from './game/post_entry_warmups_core';
 import { newPresentationGateInput, presentationGate } from './game/presentation_gate';
 import { adaptiveSelfAlphaLead } from './game/self_alpha_lead';
 import { SelfMotionFrameBuffer } from './game/self_motion_frame_buffer';
@@ -250,6 +251,7 @@ import {
   ktx2MipsOnContextLost,
   ktx2MipsRestored,
 } from './render/assets/ktx2_mip_release';
+import { assetUrl } from './render/assets/media';
 import {
   assetsReady,
   beginBackgroundPreloads,
@@ -442,6 +444,7 @@ import {
   prewarmIconCache,
 } from './ui/icon_prewarm';
 import { iconDataUrl } from './ui/icons';
+import { LoadingBackdropController } from './ui/loading_backdrop';
 import {
   noteLoadingProgress,
   startSlowConnectionWatch,
@@ -1002,6 +1005,8 @@ const LOADING_TIP_ROTATE_MS = 5000;
 let loadingHideTimer: number | null = null;
 let loadingTipRotation: LoadingTipRotation | null = null;
 let loadingTipTimer: number | null = null;
+const loadingBackdrop = new LoadingBackdropController($('#loading-screen'), assetUrl);
+loadingBackdrop.prepareInitial();
 
 function loadingCurtainFadeDelayMs(): number {
   const osReducedMotion =
@@ -1019,6 +1024,7 @@ function showLoadingScreen(statusText: string): void {
   }
   el.classList.remove('fade');
   el.classList.add('visible');
+  if (!wasVisible) loadingBackdrop.enterNewCycle();
   if (!wasVisible) $('#ls-fill').style.width = '0%';
   setLoadingStatus(statusText);
   startLoadingTips();
@@ -1079,6 +1085,7 @@ function hideLoadingScreen(): void {
   loadingHideTimer = window.setTimeout(() => {
     el.classList.remove('visible', 'fade');
     loadingHideTimer = null;
+    loadingBackdrop.prepareNextCycle();
   }, loadingCurtainFadeDelayMs());
 }
 
@@ -4971,15 +4978,6 @@ async function startGame(
     console.warn('Renderer prewarm failed', err);
   }
   loadPhaseEnd('prewarm-initial');
-  // The entry allocation spike is over: start streaming the mob bodies the
-  // iOS WebKit boot gate deliberately excluded (Safari, other iOS browsers, and
-  // the packaged app; empty everywhere else). A mob whose GLB is still arriving
-  // renders a beat late through the fail-soft view-create path, instead of its
-  // decode competing with the scene build for the WebContent memory ceiling.
-  const streamedCount = startStreamedCharacterPreloads();
-  if (streamedCount > 0) {
-    console.info(`[entry-guard] streaming ${streamedCount} deferred character assets`);
-  }
   // The paperdoll and portrait preview prewarms no longer hold the curtain:
   // they start after the reveal (see revealWorld below) as paced background
   // GPU units. Measured on the reference desktop, awaiting the paperdoll,
@@ -4999,17 +4997,12 @@ async function startGame(
       console.warn('Character preview shell prewarm failed', err);
     }
   }
-  // The far vista has been building eagerly since the renderer was
-  // constructed, overlapping every asset wait above. Hold the curtain
-  // (bounded) until the grid can stand in for the fog, so the first visible
-  // frame carries the finished horizon; without this gate a loaded
-  // production boot starves the build and the fog lifts tens of seconds
-  // into play. On timeout the classic eased flip covers it, as before.
-  const farVistaReady = await loadSpanAsync('far-vista-wait', () => renderer.farVistaReady());
-  entryDiagnostics.checkpoint('far-vista-ready', {
-    ...renderEntryDiagnostics(),
-    farVistaReady,
-  });
+  // The mob-body stream, the far-vista settle, and the background preload lane
+  // no longer hold the curtain either. The mob-body stream starts at the
+  // first-paint checkpoint below (on iOS these are the actionable creature
+  // bodies, and the entry allocation spike has cleared by first paint), while
+  // runPostEntryWarmups (revealWorld below) starts the other two fail-soft once
+  // the revealed world is interactive.
   setLoadingPercent(100, t('loading.enteringWorld'));
   loadPhaseStart('first-frame-wait');
   await nextPaint();
@@ -5027,19 +5020,21 @@ async function startGame(
     requestAnimationFrame(() => {
       entryDiagnostics.checkpoint('first-paint');
       loadPhaseEnd('first-frame-wait');
+      // Kick the deferred creature-body fetches now, before the settle cover and
+      // the curtain fade: until a creature GLB arrives its view, nameplate, and
+      // click target do not exist, so every ms the stream waits past first paint
+      // widens the pop-in window on the tight-memory profile (desktop's stream
+      // set is empty). The allocation spike the stream was deferred past has
+      // cleared by this frame.
+      kickCharacterPreloadStream({
+        startCharacterPreloads: startStreamedCharacterPreloads,
+        onCharacterPreloadsStarted: (count) => {
+          if (count > 0) {
+            console.info(`[entry-guard] streaming ${count} deferred character assets`);
+          }
+        },
+      });
       loadPhaseStart('settle-cover');
-      // Open the background preload lane now that the first frame is actually on
-      // screen: content tagged 'background' (a lazily streamed-in proximity
-      // build that tolerates its assets arriving late) never had to share the
-      // boot gate with the launcher's own fetches; starting it here just keeps
-      // it from competing with the deferred-critical lane for bandwidth/decode
-      // slots during the loading screen either.
-      const backgroundStarted = beginBackgroundPreloads();
-      if (backgroundStarted > 0) {
-        console.info(
-          `[entry-guard] world assets: started ${backgroundStarted} background preloads`,
-        );
-      }
       const revealWorld = (): void => {
         loadPhaseEnd('settle-cover');
         loadPhaseStart('curtain-fade');
@@ -5143,6 +5138,29 @@ async function startGame(
               },
             );
           }
+          // The remaining fail-soft lanes start only after the revealed world is
+          // interactive (the mob-body stream already left at first paint above).
+          // The classic fog remains the complete fallback while the far grid
+          // finishes in parallel. Optional secondary WebGL previews stay lazy:
+          // warming them here would contend with the player's first input.
+          void runPostEntryWarmups({
+            settleFarVista: () => renderer.farVistaReady(),
+            onFarVistaSettled: (farVistaReady) => {
+              entryDiagnostics.checkpoint('far-vista-ready', {
+                ...renderEntryDiagnostics(),
+                farVistaReady,
+              });
+            },
+            startBackgroundPreloads: beginBackgroundPreloads,
+            onBackgroundPreloadsStarted: (count) => {
+              if (count > 0) {
+                console.info(`[entry-guard] world assets: started ${count} background preloads`);
+              }
+            },
+            onWarmupError: (source, error) => {
+              if (source === 'far-vista') console.warn('Far vista settlement failed', error);
+            },
+          });
         }, loadingCurtainFadeDelayMs());
       };
       settleWorldEntryCover({

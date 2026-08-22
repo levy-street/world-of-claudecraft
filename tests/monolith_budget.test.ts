@@ -274,9 +274,38 @@ const MONOLITHS: MonolithRow[] = [
     // the merged file measures 13578. INHERITED growth, not authored here: the
     // branch added nothing to renderer.ts in this sync. Per that rule upstream's
     // code is NOT extracted to buy the two lines back and the ceiling is NOT
-    // raised for headroom. Exact merged count, zero slack: any further growth
-    // reds again.
-    ceiling: 13578,
+    // raised for headroom.
+    //
+    // UPSTREAM'S OWN HISTORY over the same span, kept because this row's value
+    // is the record of who grew it and why, and the merge must not drop either
+    // parent's half. The release re-pinned 13548 -> 13563 (+15) when the
+    // fast-loading-screen-variety branch merged release/v0.40.0 (its rebase
+    // onto the release had already paid this row's zero-slack pin once, at
+    // 13561 over the pre-streamed-prewarm base): thin-consumer wiring to
+    // extracted seams, the onCharacterAssetReady subscription plus its handler,
+    // which only enqueues a re-apply for views whose weapon skin GLB just
+    // landed, with the substance in src/render/characters/assets.ts (the ready
+    // registry) and src/render/characters/visual.ts (refreshWeaponSkin). Then
+    // 13563 -> 13573 (+10) for that branch's review-fix round: the nearby-view
+    // floor on the shared prewarm budget (the decision lives in
+    // src/render/prewarm_policy.ts portalPrewarmViewBudget and
+    // nearbyPrewarmViewBudget; the renderer carries the two call sites and the
+    // rationale comment) and the weapon-skin early-out in onCharacterAssetReady
+    // (the predicate lives in src/render/characters/assets.ts).
+    //
+    // RE-PINNED AGAIN 13578 -> 13603 at the Phase 11f release sync (release tip
+    // 098372138a, PR #3232's fast loading screens; prior synced release parent
+    // fd705304ee), the FIFTH sync and the fourth consecutive one to touch this
+    // file. BOTH parent pins for the record: ours 13578 against a 13578 file,
+    // the release 13573 against a 13573 file, and the base 13548 both descend
+    // from. The union composes exactly, so this is a re-pin and not a
+    // judgement call: 13548 + 30 (ours) + 25 (theirs) = 13603, and the merged
+    // file measures 13603. PREDICTED at 13603 before the merge ran and observed
+    // at 13603. INHERITED growth on both sides: the branch added nothing to
+    // renderer.ts in this sync either. Upstream's code is NOT extracted to buy
+    // the lines back and the ceiling is NOT raised for headroom. Exact merged
+    // count, zero slack: any further growth reds again.
+    ceiling: 13603,
     seam: 'a new src/render/<thing>.ts module the renderer calls (src/render/CLAUDE.md)',
   },
   {
@@ -310,9 +339,36 @@ const MONOLITHS: MonolithRow[] = [
     // Re-pinned at the farming absorb (masterwrought Phase 11d, decision 4
     // as amended): the merged file FALLS under both parent pins (ours
     // 11516, farming 11460), composing exactly as base 11490 plus ours'
-    // +26 minus farming's -36. Exact merged count, zero slack: any further
-    // growth reds again.
-    ceiling: 11480,
+    // +26 minus farming's -36.
+    //
+    // UPSTREAM'S OWN HISTORY over the same span, kept so the merge drops
+    // neither parent's half of the record. The release re-pinned 11516 ->
+    // 11522 (+6) for the fast-loading-screen-variety rebase onto
+    // release/v0.40.0: net-extractive there, MOVING the eager mob-body stream,
+    // far-vista settle and background preload lane out of the entry path into
+    // src/game/post_entry_warmups_core.ts and the backdrop rotation into
+    // src/ui/loading_backdrop.ts, leaving main.ts the call wiring for both
+    // (the controller construction and the runPostEntryWarmups options
+    // object), which is the firewall's job. Then 11522 -> 11534 (+12) for that
+    // branch's review-fix round: the mob-body stream kick moved from the
+    // post-fade callback to the first-paint checkpoint
+    // (kickCharacterPreloadStream, the seam stays in
+    // src/game/post_entry_warmups_core.ts), costing the call wiring plus the
+    // placement rationale where the reader needs it.
+    //
+    // RE-PINNED 11480 -> 11498 at the Phase 11f release sync (release tip
+    // 098372138a, prior synced release parent fd705304ee). BOTH parent pins for
+    // the record: ours 11480 against an 11480 file, the release 11534 against
+    // an 11534 file, and the base 11516 both descend from. The union composes
+    // exactly: 11516 - 36 (ours, the arrival-chain extractions) + 18 (theirs,
+    // the loading-screen wiring) = 11498, and the merged file measures 11498.
+    // PREDICTED at 11498 before the merge ran and observed at 11498. The
+    // release's own 11534 is NOT taken: it sits 36 lines above the merged file
+    // and would hand this row free slack it never earned, which is exactly the
+    // silent-raise the ratchet exists to prevent. INHERITED growth, so
+    // upstream's code is NOT extracted to buy the lines back. Exact merged
+    // count, zero slack: any further growth reds again.
+    ceiling: 11498,
     seam: 'a src/game/ or src/ui/ sibling module; main.ts is a firewall, not a home',
   },
   {

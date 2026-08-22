@@ -1986,7 +1986,13 @@
     inset: 0;
     z-index: 150;
     display: none;
-    background: #0a0d14 url("/loading-screen.jpg") center / cover no-repeat;
+    background-color: #0a0d14;
+    background-image:
+      linear-gradient(180deg, #02040bbd 0%, #02040b26 34%, #02040b1a 58%, #02040bd9 100%),
+      var(--loading-backdrop-image, none);
+    background-position: center;
+    background-size: cover;
+    background-repeat: no-repeat;
     flex-direction: column;
     align-items: center;
     justify-content: space-between;

@@ -193,7 +193,7 @@ describe('composed looks on the live candidate path build without their decals, 
     expect(runtime).toBeGreaterThan(-1);
     // the manifest call keeps its three arguments
     expect(source).toContain(
-      'this.createCandidateViews(\n            remainingPrewarmViewBudget(policy.maxViews, createdViews),\n            createdViewTypes,\n            buildDeadline,\n          );',
+      'this.createCandidateViews(\n            nearbyPrewarmViewBudget(policy.maxViews, createdViews, policy.nearbyViewFloor),\n            createdViewTypes,\n            buildDeadline,\n          );',
     );
     // the deferring build takes the slot like any other build
     const loop = source.slice(

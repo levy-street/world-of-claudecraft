@@ -159,8 +159,10 @@ import {
 import { logAssetMissOnce } from './characters/asset_miss_log';
 import {
   characterResidencySources,
+  isWeaponSkinModelUrl,
   mechAssetsReady,
   mountAssetsReady,
+  onCharacterAssetReady,
   preloadMechAssets,
   preloadMountAssets,
   preloadTrainingDummyAssets,
@@ -175,7 +177,7 @@ import {
   requestedCharacterForm,
   resolvedCharacterForm,
 } from './characters/form_visual_selection_core';
-import { skinCount, visualKeyFor } from './characters/manifest';
+import { skinCount, visualKeyFor, weaponSkinModelUrl } from './characters/manifest';
 import { modularLookChanged } from './characters/player_look_core';
 import { PooledVisualLifecycle } from './characters/pooled_visual_lifecycle';
 import {
@@ -495,6 +497,7 @@ import {
 import {
   mandatoryLandmarkViewsReady,
   materialProgramSignature,
+  nearbyPrewarmViewBudget,
   orderedPrewarmIds,
   orderPrewarmResumeEntries,
   type PrewarmEntryProgress,
@@ -502,6 +505,7 @@ import {
   partitionMandatoryLandmarkCandidates,
   partitionResidentSkyBiomes,
   planCompileSubmission,
+  portalPrewarmViewBudget,
   prewarmBuildDeadline,
   prewarmCompileAwaitDeadline,
   prewarmEntryResumesAfterSkip,
@@ -510,7 +514,6 @@ import {
   prewarmProgramContentKeys,
   prewarmResumeIsDebt,
   prewarmSubmitShouldStop,
-  remainingPrewarmViewBudget,
   resolvePrewarmEntryStatus,
   resolvePrewarmPolicy,
   skyAssetInlineWaitMs,
@@ -742,16 +745,16 @@ const ENTITY_VIEW_DESTROY_RANGE_SQ = ENTITY_VIEW_DESTROY_RANGE * ENTITY_VIEW_DES
 // pending view.
 const VIEW_CREATE_FAIL_RETRY_MS = 2000;
 const VIEW_PREWARM_RANGE_SQ = ENTITY_VIEW_CREATE_RANGE_SQ;
-const VIEW_PREWARM_MAX_MS = 12000;
-// Memory-ceiling profile (phone WebKit): the desktop budgets here allow the prewarm to
-// occupy the main thread for 12s of view builds plus up to 10s of shader linking, with
-// only microtask yields in between. iOS kills a WebContent process that stays
-// unresponsive on that order (the same invisible kill as the memory ceiling, and RAM
-// size is irrelevant to it), so constrained devices get a much smaller budget, an
-// event-loop yield between manifest entries, and a link pass after each entry so no
-// later single pass links every program at once. Full policy: prewarm_policy.ts.
-const VIEW_PREWARM_MAX_MS_CONSTRAINED = 5000;
-const PREWARM_COMPILE_MAX_MS_CONSTRAINED = 2500;
+const VIEW_PREWARM_MAX_MS = 3000;
+// Every browser gets the same short soft budget. Richer world art made the old
+// desktop path spend more than 16 seconds warming 47 nearby rigs and shaders
+// before reveal, and Chromium could restart during the preceding allocation
+// spike. The manifest already records bounded resume units, while ordinary
+// nearby views stream through the per-frame creation budget, so holding the
+// curtain longer provides no correctness guarantee. Constrained hosts retain
+// their smaller manifest in addition to the shared wall.
+const VIEW_PREWARM_MAX_MS_CONSTRAINED = 3000;
+const PREWARM_COMPILE_MAX_MS_CONSTRAINED = 1500;
 // Shader linking is the whole point of the prewarm: if it doesn't finish, the
 // first in-world frame that needs a program compiles it synchronously, the
 // multi-hundred-ms (up to ~1.7s) freeze players feel when new model types
@@ -760,13 +763,13 @@ const PREWARM_COMPILE_MAX_MS_CONSTRAINED = 2500;
 // budget, which could starve it. This threshold is diagnostic only: an async
 // compile cannot be cancelled, so returning at the threshold would let it
 // overlap later warm units and gameplay.
-const PREWARM_COMPILE_MAX_MS = 10000;
+const PREWARM_COMPILE_MAX_MS = 1500;
 // The soft manifest budget protects ordinary entry. A second independent wall
 // deadline also bounds desktop exemptions and Insane's full-manifest policy.
 // Already-started WebGL calls cannot be cancelled, so large compiles are split
 // into roots and the queue stops launching before this deadline.
-const VIEW_PREWARM_HARD_MAX_MS = 15000;
-const VIEW_PREWARM_HARD_MAX_MS_CONSTRAINED = 7500;
+const VIEW_PREWARM_HARD_MAX_MS = 5000;
+const VIEW_PREWARM_HARD_MAX_MS_CONSTRAINED = 5000;
 // Leave room for the final already-started GPU unit to settle. WebGL driver
 // work cannot be preempted, so launching exactly at the wall can overshoot it.
 const PREWARM_GPU_SUBMIT_GUARD_MS = 1000;
@@ -792,7 +795,7 @@ const VIEW_COMPILE_GATE_MAX_MS = 1500;
 const PREWARM_TEXTURE_UNIT_BATCH = 2;
 // Reserve at the tail of the view-build budget so the compile + final-frame
 // steps always start before the prewarm deadline (runEntry skips late entries).
-const PREWARM_BUILD_RESERVE_MS = 3000;
+const PREWARM_BUILD_RESERVE_MS = 1000;
 // Reserve at the tail of the compile entry's await-all so world.initial-frame,
 // which compileBeforeFirstFrame reorders to run immediately after this entry,
 // always starts before the hard deadline: prewarmEntryShouldDefer defers ANY
@@ -806,8 +809,8 @@ const PREWARM_COMPILE_AWAIT_RESERVE_MS = 2000;
 // enough that a batch's synchronous submission prologues stay a bounded slice
 // between the yields of the early-submission loop (submitCompileUnits).
 const PREWARM_COMPILE_BATCH_ROOTS = 16;
-const VIEW_PREWARM_MAX_VIEWS_LOW = 48;
-const VIEW_PREWARM_MAX_VIEWS_HIGH = 72;
+const VIEW_PREWARM_MAX_VIEWS_LOW = 12;
+const VIEW_PREWARM_MAX_VIEWS_HIGH = 16;
 // Constrained (phone WebKit): build only self plus one required/nearby view at
 // entry. Even when twelve views fit in memory and compile asynchronously, their
 // compile gates can resolve together and reveal the whole crowd on the first live
@@ -1974,6 +1977,7 @@ export class Renderer {
   private prewarmDepthMaterials = new Map<string, THREE.MeshDepthMaterial>();
   private readonly canvas: HTMLCanvasElement;
   private unregisterWebGLContext: (() => void) | null = null;
+  private unsubscribeCharacterAssetReady: (() => void) | null = null;
   private shutdownStarted = false;
   private shutdownTask: Promise<RecycledRendererContext> | null = null;
   private lifecycleGeneration = 0;
@@ -3152,6 +3156,7 @@ export class Renderer {
     this.dprUnwatch = watchDevicePixelRatio(() => {
       if (!this.shutdownStarted) this.resizeViewport();
     });
+    this.unsubscribeCharacterAssetReady = onCharacterAssetReady(this.onCharacterAssetReady);
     } catch (error) {
       this.beginRendererShutdown();
       this.disposeRendererResources();
@@ -3203,6 +3208,8 @@ export class Renderer {
     }
     this.unregisterWebGLContext?.();
     this.unregisterWebGLContext = null;
+    this.unsubscribeCharacterAssetReady?.();
+    this.unsubscribeCharacterAssetReady = null;
   }
 
   private disposeRendererResources(): void {
@@ -6371,10 +6378,14 @@ export class Renderer {
         priority: 14,
         required: true,
         run: () => {
+          // Portals draw only what the shared budget can spare past the nearby
+          // floor: they are the least actionable views on the shared cap, and
+          // with the small 12/16 budgets an unreserved draw here could leave
+          // views.nearby below with zero slots at a landmark-heavy spawn.
           const result = this.createPersistentPortalViews(
             createdViewTypes,
             buildDeadline,
-            remainingPrewarmViewBudget(policy.maxViews, createdViews),
+            portalPrewarmViewBudget(policy.maxViews, createdViews, policy.nearbyViewFloor),
           );
           portalViewsCreated = result.created;
           createdViews += result.created;
@@ -6395,7 +6406,7 @@ export class Renderer {
           this.collectMissingViewCandidates(p, VIEW_PREWARM_RANGE_SQ, false);
           candidateViews = this.viewCandidates.length;
           const result = this.createCandidateViews(
-            remainingPrewarmViewBudget(policy.maxViews, createdViews),
+            nearbyPrewarmViewBudget(policy.maxViews, createdViews, policy.nearbyViewFloor),
             createdViewTypes,
             buildDeadline,
           );
@@ -9045,6 +9056,19 @@ export class Renderer {
   private readonly weaponSkinApplies = new WeaponSkinApplyQueue();
   private readonly weaponSkinApplyScratch: WeaponSkinApplyDecision[] = [];
 
+  private readonly onCharacterAssetReady = (url: string): void => {
+    if (this.shutdownStarted) return;
+    // This fires for EVERY character GLB arrival, including the streamed
+    // creature bodies that can never be a weapon skin, and the scan below
+    // mints a skin-url string per skinned view: drop non-skin urls first.
+    if (!isWeaponSkinModelUrl(url)) return;
+    for (const [id] of this.views) {
+      const skinId = this.sim.entities.get(id)?.weaponSkinId ?? null;
+      if (!skinId || weaponSkinModelUrl(skinId) !== url) continue;
+      this.weaponSkinApplies.enqueue(id, skinId);
+    }
+  };
+
   // Bound once, never per frame: the drain's two callbacks would otherwise mint
   // a closure pair on every drained frame.
   private readonly weaponSkinLookup = (viewId: number): string | undefined => {
@@ -9067,8 +9091,9 @@ export class Renderer {
    *  that never ran is retried by the next frame's diff. */
   private applyWeaponSkin(v: EntityView, skinId: string | null, kind: string): void {
     if (!v.visual) return;
+    const refresh = skinId !== null && skinId === v.weaponSkinId;
     v.weaponSkinId = skinId;
-    const changed = v.visual.setWeaponSkin(skinId);
+    const changed = refresh ? v.visual.refreshWeaponSkin() : v.visual.setWeaponSkin(skinId);
     if (changed) for (const node of changed) this.gateSwapOnCompile(node);
     this.reconcileViewLights(v);
     encounterPrewarm.queueLiveSoulRendPrewarm(this, v.visual, v, kind);

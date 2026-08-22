@@ -861,10 +861,36 @@ const ACCEPTED_POLISH_V2_METADATA_PATH = path.join(REPO_ROOT, POLISH_SEAL_PATH);
 // input holds its sealed bytes. Minted from the merged WORKING TREE with
 // scripts/assets/eastbrook_grand_armoury/remint_polish_provenance.mjs and
 // committed with exactly the bytes it read. No capture was retaken.
+//
+// UPSTREAM'S OWN RE-MINT HISTORY over the same span, kept because dropping
+// either parent's half would leave the record claiming a single lineage for a
+// leaf both sides moved. The release re-minted for the shader-memory-probes
+// renderer instrumentation and VFX teardown extraction; then for the
+// fast-loading-screen-variety merge with release/v0.40.0, where the renderer
+// runtime leaf moved on both sides of THAT merge (its character asset-ready
+// wiring, the release's shader-memory probes); then for its review-fix round
+// (the nearby-view floor in prewarm_policy.ts, the weapon-skin early-out
+// wiring in renderer.ts), where both runtime leaves moved. No capture was
+// retaken in any of them.
+//
+// RE-MINTED AGAIN at the Phase 11f release sync (release tip 098372138a, PR
+// #3232's fast loading screens; prior synced release parent fd705304ee). The
+// CAUSE differs from the previous three and is worth stating, because the
+// remedy is the same but the reasoning is not: this time OURS did not re-mint
+// since the merge base (the four seal JSONs are byte-identical to fd705304ee)
+// and only the release did. The re-mint is still owed, because both parents
+// edited renderer.ts and the seal is a fingerprint OF renderer.ts: the merged
+// file is a third content (13548 base + 30 ours + 25 theirs = 13603), so the
+// release's freshly minted seal describes a tree that stops existing the
+// moment this merge lands. Parent values for the record: metadata sha256 ours
+// 9c048c5c / theirs b30ad6d9, composite ours 1c3ae800 / theirs e922918a.
+// Minted from the merged WORKING TREE with
+// scripts/assets/eastbrook_grand_armoury/remint_polish_provenance.mjs and
+// committed with exactly the bytes it read. No capture was retaken.
 const ACCEPTED_POLISH_V2_METADATA_SHA256 =
-  '9c048c5cd7dd5770edc0b81ffcc91e812daebbf65cbcc957b4ffd4dbb303fd8e';
+  'fe37c37cf2465b40cc1d57b0c096bcaed8f88a8b6e17a379d0e1546fda0f30d5';
 const ACCEPTED_POLISH_V2_COMPOSITE_PROVENANCE =
-  '1c3ae800c6aa3b19f531607ac46d877fc0cc6fd25013213714fe3635acaa832e';
+  '6b9ee41045a876453ff7b7df23e52303c0f5f9d8f19df1039becb613e8126405';
 const ACCEPTED_POLISH_V2_METADATA = readJsonFile<CaptureMetadata>(ACCEPTED_POLISH_V2_METADATA_PATH);
 const ACCEPTED_POLISH_V2_PROVENANCE = ACCEPTED_POLISH_V2_METADATA.polishProvenance;
 const ACCEPTED_POLISH_V2_TOWN_CONTRACT = ACCEPTED_POLISH_V2_METADATA.records[0]?.townContract;
@@ -1939,12 +1965,24 @@ describe('Eastbrook polish performance and contact evidence', () => {
     // Re-minted for the farming absorb (Phase 11d): renderer.ts moved, the
     // seals follow the swept evidence bytes (same order, the composite first,
     // then this seal). No capture was retaken.
+    // Upstream's own re-mints over the same span, kept so neither parent's
+    // half of the lineage is lost: for the fast-loading-screen-variety merge
+    // with release/v0.40.0 (renderer.ts moved on both sides of that merge),
+    // and for its review-fix round (prewarm_policy.ts and renderer.ts moved).
+    // Same order both times, the composite first, then this seal, and no
+    // capture retaken.
+    // Re-minted at the Phase 11f release sync (release tip 098372138a): only
+    // the release re-minted since the merge base this time, but both parents
+    // edited renderer.ts, so the merged file is a third content and neither
+    // parent's literal describes it. Same order, the composite first, then
+    // this seal. No capture was retaken.
     expect(
       fingerprint.digest('hex'),
       `the second-order performance digest moved; if every input moved legitimately, re-mint with: ${REMINT_COMMAND} (it recomputes this literal LAST, from the swept files)`,
       // Parent values at the Phase 11e QA sync: ours d4aa71b9, the release
-      // 9c8f6ca4. Recomputed LAST from the swept files, per REMINT_COMMAND.
-    ).toBe('b77a888041d0e5155017f4f325ab08a7aa897934b85ab701cb5a14ba13f3b6f6');
+      // 9c8f6ca4. At the Phase 11f sync: ours b77a8880, the release 0d3ec7db.
+      // Recomputed LAST from the swept files, per REMINT_COMMAND.
+    ).toBe('d3fc845bbf8f7a1983d1f09819a0c34d64d7a91b35de1aab1f52d5ff909b85f0');
   });
 
   it('binds every historical after record to its accepted source and asset provenance', () => {
