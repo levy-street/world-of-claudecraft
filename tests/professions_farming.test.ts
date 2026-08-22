@@ -2436,6 +2436,41 @@ describe('the seed-back roll (tier 3/4): the FIRST of the two harvest draws, ban
     }
   }
 
+  it('EVERY crop in the catalog draws by TIER, so a new crop cannot change the contract', () => {
+    // The draw contract is stated per TIER, but every counted arm in this file
+    // proves it on ONE crop per tier. That was sufficient while a tier had two
+    // crops and both were shipped together; Phase 11e added four more, and a
+    // representative sample stops being a proof the moment the catalog can
+    // grow. This sweep walks all twelve, so a thirteenth crop authored with a
+    // different draw shape reds here rather than passing on a sibling's arm.
+    for (const crop of Object.values(FARM_CROPS)) {
+      const h = makeHarness(41);
+      // The hoe rung matches the crop tier exactly (the step-12 wield gate
+      // refuses a hoe below the crop's tier), so the map is per tier rather
+      // than a single grant.
+      const HOE_BY_TIER: Record<number, string> = {
+        1: HOE_ID,
+        2: 'bronze_hoe',
+        3: T3_HOE,
+        4: T4_HOE,
+      };
+      const hoe = HOE_BY_TIER[crop.tier];
+      // Enough proficiency for both the crop's band gate and the hoe's R22
+      // wield threshold, whichever is higher.
+      const plot = plantTier(h, crop.id, hoe, 100);
+      expect(plot, `${crop.id} must plant`).toBeDefined();
+      plot.survivalRoll = 0;
+      const expected = crop.tier >= FARM_SEED_BACK_MIN_TIER ? 2 : 1;
+      expect(
+        countDraws(h.sim, () => harvest(h)),
+        `${crop.id} (tier ${crop.tier}) must draw exactly ${expected}`,
+      ).toBe(expected);
+    }
+    // Non-vacuity: the sweep really covered both sides of the tier boundary.
+    const tiers = new Set(Object.values(FARM_CROPS).map((c) => c.tier));
+    expect([...tiers].sort()).toEqual([1, 2, 3, 4]);
+  });
+
   it('pins the seed-back tuning to its literals (the wire-name-constant rule)', () => {
     // TUNING, PROVISIONAL, FLAGGED FOR THE MAINTAINER (economy-sensitive):
     // one literal pin for the maps every arm below reaches through the
