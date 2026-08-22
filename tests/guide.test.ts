@@ -1942,6 +1942,39 @@ describe('Guide professions generated content accuracy', () => {
     expect(t('guide.profPages.craftIntro.cooking')).toContain(
       "the day's catch and the season's harvest",
     );
+
+    // THE QUANTITY CLAIMS, DERIVED FROM THE LIVE BILLS rather than pinned as
+    // literals, and this arm exists because a mutation proved the anchors above
+    // cannot see a miscount. The prose shipped "a Frost Gourd" against a bill of
+    // two; every anchor stayed green, because they all test WHICH clause is
+    // present and none tests whether its number is true.
+    //
+    // The prose uses the article quantitatively throughout ("a Brook Carrot" is
+    // exactly 1), so the count and the word are pinned together: change the bill
+    // without changing the sentence and this reds, which is the only way the
+    // page cannot quietly start lying about a number a player can count.
+    const countWord: Record<number, string> = { 1: 'a', 2: 'two', 3: 'three', 4: 'four' };
+    const reagentCount = (recipeId: string, itemId: string): number => {
+      const recipe = ALL_RECIPES.find((r) => r.id === recipeId);
+      expect(recipe, `${recipeId} must exist`).toBeDefined();
+      const entry = recipe?.reagents.find((g) => g.itemId === itemId);
+      expect(entry, `${recipeId} must consume ${itemId}`).toBeDefined();
+      return entry?.count ?? 0;
+    };
+    const body = t('guide.profPages.craftProse.cooking.materialsBody');
+    const gourds = reagentCount('recipe_marlows_grand_roast', 'frost_gourd');
+    const barley = reagentCount('recipe_marlows_grand_roast', 'highland_barley');
+    const carrots = reagentCount('recipe_frostgill_chowder', 'brook_carrot');
+    expect(gourds, 'the roast gourd count must have a word for it').toBeLessThanOrEqual(4);
+    expect(body, `the roast takes ${gourds} frost gourd(s)`).toContain(
+      `${countWord[gourds]} Frost Gourd${gourds === 1 ? '' : 's'}`,
+    );
+    expect(body, `the roast takes ${barley} highland barley`).toContain(
+      `${countWord[barley]} Highland Barley`,
+    );
+    expect(body, `the chowder takes ${carrots} brook carrot(s)`).toContain(
+      `${countWord[carrots]} Brook Carrot${carrots === 1 ? '' : 's'}`,
+    );
   });
 
   it('pins the spot literals a consistently-wrong regeneration would keep wrong', () => {

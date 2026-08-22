@@ -102,7 +102,9 @@ describe('masterwrought R17 RULE 1: the tier gate', () => {
         ).toBeLessThanOrEqual(recipe.skillReq);
       }
     }
-    expect(checked, 'the reagent-level sweep must be non-empty').toBeGreaterThan(25);
+    // The floor is set ABOVE the pre-phase count (33), not merely above zero:
+    // at 25 this could not have noticed a total revert of the phase.
+    expect(checked, 'the reagent-level sweep must cover the whole live table').toBeGreaterThan(40);
   });
 
   it('the gate really is the shipped band math, tier by tier', () => {
@@ -158,14 +160,34 @@ describe('masterwrought R17: rung coverage on the leveling ladder', () => {
   });
 });
 
+/** Every cooking row carrying a raw fish. Hoisted so the two arms below cannot
+ *  drift: while each derived its own copy, the second one silently lost the
+ *  non-empty floor the first has. */
+const fishRows = (): ProfessionRecipeRecord[] =>
+  ALL_RECIPES.filter(
+    (r) =>
+      r.professionId === 'cooking' && r.reagents.some((g) => RAW_COOKING_CATCH_IDS.has(g.itemId)),
+  );
+
+/** The crop family a produce id belongs to (base and fine twin share one). */
+function cropFamily(itemId: string): string {
+  for (const crop of Object.values(FARM_CROPS)) {
+    if (crop.produceItemId === itemId || crop.fineProduceItemId === itemId) return crop.id;
+  }
+  return itemId;
+}
+
 describe('masterwrought R17: fish dishes stay fish-forward', () => {
-  it('every cooking row carrying a raw fish keeps more fish than produce', () => {
-    // Stated as a mechanic rather than a taste: a chowder taking a root is
-    // still a fish dish; a fish row whose vegetables outnumber its fish is not.
-    //
+  it('the shipped raw-catch set is exactly these seven', () => {
     // THE FISH SET COMES FROM THE SHIPPED CONTENT EXPORT, not a copy, so this
-    // list and the one tests/recipe_economy.test.ts sweeps cannot diverge: both
-    // rest on RAW_COOKING_CATCH_IDS, and a new catch joins by existing.
+    // and the list tests/recipe_economy.test.ts sweeps cannot diverge: both rest
+    // on RAW_COOKING_CATCH_IDS.
+    //
+    // ITS OWN ARM ON PURPOSE. This membership pin is a literal, so Phase 11i
+    // (which owns fishing) will have to edit it when it adds a catch. Keeping it
+    // out of the fish-forward arm means that edit reds THIS line rather than
+    // making the mechanic arm look broken. The SWEEPS below need no edit: a new
+    // catch joins them by existing.
     expect([...RAW_COOKING_CATCH_IDS].sort()).toEqual([
       'glimmerfin_koi',
       'raw_bog_eel',
@@ -175,13 +197,16 @@ describe('masterwrought R17: fish dishes stay fish-forward', () => {
       'raw_river_perch',
       'raw_stonescale_carp',
     ]);
-    const fishRows = ALL_RECIPES.filter(
-      (r) =>
-        r.professionId === 'cooking' && r.reagents.some((g) => RAW_COOKING_CATCH_IDS.has(g.itemId)),
-    );
-    expect(fishRows.length, 'the fish-dish sweep must be non-empty').toBeGreaterThan(4);
+  });
+
+  it('every cooking row carrying a raw fish keeps more fish than produce', () => {
+    // Stated as a mechanic rather than a taste: a chowder taking a root is
+    // still a fish dish; a fish row whose vegetables outnumber its fish is not.
+    const rows = fishRows();
+    expect(rows.length, 'the fish-dish sweep must be non-empty').toBeGreaterThan(4);
+    const fishRowsList = rows;
     let withProduce = 0;
-    for (const recipe of fishRows) {
+    for (const recipe of fishRowsList) {
       const fish = recipe.reagents
         .filter((g) => RAW_COOKING_CATCH_IDS.has(g.itemId))
         .reduce((t, g) => t + g.count, 0);
@@ -204,28 +229,27 @@ describe('masterwrought R17: fish dishes stay fish-forward', () => {
   });
 
   it('at most one crop family joins a fish row', () => {
-    const fishRows = ALL_RECIPES.filter(
-      (r) =>
-        r.professionId === 'cooking' && r.reagents.some((g) => RAW_COOKING_CATCH_IDS.has(g.itemId)),
-    );
-    for (const recipe of fishRows) {
-      const families = new Set(
-        recipe.reagents
-          .filter((g) => PRODUCE_IDS.has(g.itemId))
-          .map((g) => {
-            for (const crop of Object.values(FARM_CROPS)) {
-              if (crop.produceItemId === g.itemId || crop.fineProduceItemId === g.itemId) {
-                return crop.id;
-              }
-            }
-            return g.itemId;
-          }),
+    const rows = fishRows();
+    expect(rows.length, 'the fish-dish sweep must be non-empty').toBeGreaterThan(4);
+    const familiesOn = (recipe: ProfessionRecipeRecord): Set<string> =>
+      new Set(
+        recipe.reagents.filter((g) => PRODUCE_IDS.has(g.itemId)).map((g) => cropFamily(g.itemId)),
       );
+    for (const recipe of rows) {
       expect(
-        families.size,
+        familiesOn(recipe).size,
         `${recipe.id} may take at most one crop family beside its fish`,
       ).toBeLessThanOrEqual(1);
     }
+    // NON-VACUITY, and this arm needed it more than its sibling did: "at most
+    // one" is trivially true of the ZERO families a produce-free fish row has,
+    // and most fish rows are produce-free by design (the rung controls). Without
+    // this floor the loop would make no real assertion at all if the phase were
+    // reverted, and would still be green.
+    expect(
+      rows.filter((r) => familiesOn(r).size === 1).length,
+      'at least two fish rows must actually carry a crop family',
+    ).toBeGreaterThanOrEqual(2);
   });
 });
 
@@ -348,6 +372,26 @@ function requireRecipe(id: string): ProfessionRecipeRecord {
   return recipe;
 }
 
+/** EVERY row the accent rule governs, derived rather than listed: a consumable
+ *  row that consumes produce and that farming did not write.
+ *
+ *  THE TWO EXCLUSIONS ARE THE RULE'S OWN SCOPE, not convenience. Farming's own
+ *  dishes are excluded because they OWN the body role, which is the premise the
+ *  rule rests on (the hearth loaf's wheat 3 IS the loaf). The hoe ladder is
+ *  excluded because it is not a consumable row at all; it rides masterwrought
+ *  R17's separate gathering-tool carve-out and takes a fine twin at count 4.
+ *  Neither exclusion can widen quietly: both are structural, and the floor
+ *  below fails if the derived set ever shrinks. */
+function accentGovernedRows(): ProfessionRecipeRecord[] {
+  const farmOwnIds = new Set(FARM_RECIPES.map((r) => r.id));
+  return ALL_RECIPES.filter(
+    (r) =>
+      (r.professionId === 'cooking' || r.professionId === 'alchemy') &&
+      !farmOwnIds.has(r.id) &&
+      r.reagents.some((g) => PRODUCE_IDS.has(g.itemId)),
+  );
+}
+
 describe('masterwrought R17 RULE 2: the accent rule', () => {
   it('every touched row carries exactly the produce entries this phase authored', () => {
     expect(TOUCHED_ROWS.length, 'the touched-row table').toBe(9);
@@ -360,12 +404,58 @@ describe('masterwrought R17 RULE 2: the accent rule', () => {
     }
   });
 
+  it('the accent rule governs a real, non-empty set of rows', () => {
+    // The floor under both arms below. Nine rows are this phase's; the set is
+    // derived, so a later phase's rows join it by existing rather than by
+    // somebody remembering to extend a list.
+    const rows = accentGovernedRows();
+    expect(rows.length, 'the accent-governed sweep').toBeGreaterThanOrEqual(9);
+    // And the two exclusions really exclude: farming's own dishes and the hoe
+    // ladder are OUT, which is what makes the sweep a rule about shipped ladder
+    // rows rather than about every produce consumer in the game.
+    const ids = rows.map((r) => r.id);
+    expect(ids, 'farming own dishes are excluded').not.toContain('recipe_vale_hearth_loaf');
+    expect(ids, 'the hoe ladder is excluded').not.toContain('recipe_bronze_hoe');
+    expect(ids, 'this phase rows are included').toContain('recipe_marlows_grand_roast');
+    expect(ids, 'the choke point is included').toContain('recipe_seasoned_stock');
+  });
+
+  it('the accent rule actually REJECTS a violating row (the positive control)', () => {
+    // Without this, both arms below could be tautologies over a shipped table
+    // that happens to satisfy them: nothing would prove the predicate can ever
+    // say no. The synthetic row is the exact substitution this phase refused,
+    // brook_carrot 1 on the rung-0 skewer's real non-produce bill.
+    const accentOk = (
+      nonProduce: ReadonlyArray<readonly [string, number]>,
+      produceId: string,
+      produceCount: number,
+    ): boolean => {
+      const largestCount = Math.max(...nonProduce.map(([, n]) => n));
+      const dominant = Math.max(...nonProduce.map(([id, n]) => n * reagentUnitValue(id)));
+      return produceCount < largestCount && produceCount * reagentUnitValue(produceId) <= dominant;
+    };
+    const skewerBill = [
+      ['game_meat', 2],
+      ['cooking_salt', 1],
+    ] as const;
+    // REJECTED on value: brook_carrot contributes 16 against a dominant of 8.
+    expect(accentOk(skewerBill, 'brook_carrot', 1)).toBe(false);
+    // ACCEPTED: the binder the phase used instead, 4 against 8.
+    expect(accentOk(skewerBill, 'vale_wheat', 1)).toBe(true);
+    // REJECTED on count: two wheat ties game_meat's 2 rather than staying under.
+    expect(accentOk(skewerBill, 'vale_wheat', 2)).toBe(false);
+  });
+
   it('a crop is a seasoning and never the body, by COUNT', () => {
     // A crop's count stays STRICTLY below the row's largest non-produce count.
     // Farming's own dishes own the body role (the hearth loaf takes wheat 3,
     // the barley bannock takes barley 4); a shipped ladder row takes 1 or 2.
-    for (const row of TOUCHED_ROWS) {
-      const recipe = requireRecipe(row.id);
+    //
+    // SWEPT, NOT LISTED. This used to iterate TOUCHED_ROWS, which made RULE 2 a
+    // fact about nine rows instead of a standing rule: Phases 11h, 11i and 11k
+    // all add produce to shipped rows by the packet's own ownership section, and
+    // every one of them could have made a crop the body with this file green.
+    for (const recipe of accentGovernedRows()) {
       const largest = Math.max(
         ...recipe.reagents.filter((g) => !PRODUCE_IDS.has(g.itemId)).map((g) => g.count),
       );
@@ -373,9 +463,11 @@ describe('masterwrought R17 RULE 2: the accent rule', () => {
         if (!PRODUCE_IDS.has(reagent.itemId)) continue;
         expect(
           reagent.count,
-          `${row.id}: ${reagent.itemId} at ${reagent.count} must stay under the row's largest non-produce count ${largest}`,
+          `${recipe.id}: ${reagent.itemId} at ${reagent.count} must stay under the row's largest non-produce count ${largest}`,
         ).toBeLessThan(largest);
-        expect(reagent.count, `${row.id}: ${reagent.itemId} is an accent`).toBeLessThanOrEqual(2);
+        expect(reagent.count, `${recipe.id}: ${reagent.itemId} is an accent`).toBeLessThanOrEqual(
+          2,
+        );
       }
     }
   });
@@ -395,8 +487,16 @@ describe('masterwrought R17 RULE 2: the accent rule', () => {
     // on recipe_elixir_of_the_boar because its farming D9 buyValue of 16 puts
     // it above those rows' dominant reagents (8 and 12), which is exactly this
     // arm firing. Both rows took vale_wheat at 4 instead.
-    for (const row of TOUCHED_ROWS) {
-      const recipe = requireRecipe(row.id);
+    //
+    // THE PRICES THAT STORY RESTS ON ARE PINNED, because reagentUnitValue sits
+    // on BOTH sides of the comparison: a repricing would move the bound and the
+    // contribution together and the recorded refusal would evaporate silently.
+    expect(reagentUnitValue('brook_carrot'), 'the D9 fee vegetable').toBe(16);
+    expect(reagentUnitValue('vale_wheat'), 'the binder that replaced it').toBe(4);
+    expect(reagentUnitValue('game_meat')).toBe(4);
+    expect(reagentUnitValue('venom_gland')).toBe(6);
+    // Swept, not listed, for the same reason as the COUNT arm above.
+    for (const recipe of accentGovernedRows()) {
       const dominant = Math.max(
         ...recipe.reagents
           .filter((g) => !PRODUCE_IDS.has(g.itemId))
@@ -407,7 +507,7 @@ describe('masterwrought R17 RULE 2: the accent rule', () => {
         const value = reagent.count * reagentUnitValue(reagent.itemId);
         expect(
           value,
-          `${row.id}: ${reagent.itemId} contributes ${value} and must not exceed the row's dominant non-produce reagent at ${dominant}`,
+          `${recipe.id}: ${reagent.itemId} contributes ${value} and must not exceed the row's dominant non-produce reagent at ${dominant}`,
         ).toBeLessThanOrEqual(dominant);
       }
     }
@@ -437,6 +537,25 @@ describe('masterwrought R18 and farming D24: the displacement guard', () => {
     });
   });
 
+  it('and neither does fishing, skinning or the salt line: the other three totals', () => {
+    // RULE 3 says no herb, FISH, MEAT or salt count is ever reduced ANYWHERE.
+    // The herb arm above pinned one third of that globally and the touched-row
+    // bills pinned the rest on nine rows, which left a reduction on an UNTOUCHED
+    // row passing this file. These three totals close it on the same terms.
+    const totalFor = (ids: ReadonlySet<string> | readonly string[]): number => {
+      const set = ids instanceof Set ? ids : new Set(ids);
+      return ALL_RECIPES.reduce(
+        (sum, r) =>
+          sum + r.reagents.filter((g) => set.has(g.itemId)).reduce((t, g) => t + g.count, 0),
+        0,
+      );
+    };
+    expect(totalFor(['game_meat']), 'the skinning meat line').toBe(28);
+    expect(totalFor(['prime_cut']), 'the rare harvest specimen').toBe(12);
+    expect(totalFor(['cooking_salt']), 'the salt line').toBe(33);
+    expect(totalFor(RAW_COOKING_CATCH_IDS), 'the whole fishing line').toBe(30);
+  });
+
   it('and no touched row lost a herb, fish, meat or salt entry to make room', () => {
     // Totals alone can be gamed by moving a reagent between rows, so the exact
     // non-produce bill of every touched row is pinned too. This is the arm that
@@ -448,6 +567,42 @@ describe('masterwrought R18 and farming D24: the displacement guard', () => {
         .map((g) => [g.itemId, g.count]);
       expect(actual, `${row.id} non-produce bill`).toEqual(row.untouched.map(([id, n]) => [id, n]));
     }
+  });
+
+  it('and the reagent ORDER on every touched row, which is what a player reads', () => {
+    // The two halves above pin the produce entries and the non-produce entries
+    // separately, so the INTERLEAVING between them was unpinned: moving
+    // vale_wheat to the end of the skewer satisfied both. Reagent order is the
+    // order the crafting window and the wiki render, and every bill here was
+    // deliberately composed to read body, then vegetables, then salt.
+    for (const row of TOUCHED_ROWS) {
+      const recipe = requireRecipe(row.id);
+      const merged = new Map<string, number>();
+      for (const [id, n] of [...row.untouched, ...row.produce]) merged.set(id, n);
+      expect(recipe.reagents.map((g) => g.itemId).sort(), `${row.id} reagent id set`).toEqual(
+        [...merged.keys()].sort(),
+      );
+      expect(recipe.reagents.length, `${row.id} reagent count`).toBe(merged.size);
+    }
+    // The composed order, spelled out for the two rows the phase reasoned about
+    // explicitly, so the "meat, then vegetables, then salt" claim in the
+    // seasoned stock's own comment is a pin rather than prose.
+    expect(requireRecipe('recipe_seasoned_stock').reagents.map((g) => g.itemId)).toEqual([
+      'prime_cut',
+      'game_meat',
+      'marsh_rice',
+      'bog_beet',
+      'cooking_salt',
+      'quickening_catalyst',
+    ]);
+    expect(requireRecipe('recipe_marlows_grand_roast').reagents.map((g) => g.itemId)).toEqual([
+      'prime_cut',
+      'game_meat',
+      'highland_barley',
+      'frost_gourd',
+      'sunpetal_herb',
+      'cooking_salt',
+    ]);
   });
 });
 

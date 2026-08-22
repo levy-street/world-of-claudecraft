@@ -225,7 +225,10 @@ describe('THE IDENTITY GUARD: farming never becomes conditional on raiding', () 
     // stops the loop below from running over an empty set.
     expect(
       alchemyWithFarm.length,
-      'the alchemy line must keep at least one produce-consuming row per leveling rung',
+      // The assertion counts ROWS, not rungs: three rows all at rung 0 would
+      // satisfy it. The rung DISTRIBUTION is pinned in
+      // tests/provisioning_supply_line.test.ts, which is where that claim lives.
+      'the alchemy line must keep at least three produce-consuming rows',
     ).toBeGreaterThanOrEqual(3);
     for (const recipe of alchemyWithFarm) {
       expect(

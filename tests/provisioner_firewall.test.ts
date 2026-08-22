@@ -86,9 +86,19 @@ const isGatheringToolRecipe = (resultItemId: string): boolean => resultItemId.en
  *  most exists to protect: the gate that paces the whole packet. It keeps its
  *  own dedicated arm above, and it stays inside this sweep too, so the
  *  protection is not resting on a single assertion. */
-const isConsumableIntermediate = (recipe: { id: string; professionId: string }): boolean =>
+const isConsumableIntermediate = (recipe: {
+  id: string;
+  professionId: string;
+  resultItemId: string;
+}): boolean =>
   (recipe.professionId === 'cooking' || recipe.professionId === 'alchemy') &&
-  recipe.id !== CATALYST_ID;
+  recipe.id !== CATALYST_ID &&
+  // THE SLOTLESS PROPERTY IS PART OF THE PREDICATE, not merely asserted about it
+  // downstream. It is the one property that makes masterwrought R17 tolerate
+  // this carve-out at all, so an equippable can never ride the exemption even
+  // for the length of a test run, exactly as the hoe carve-out is scoped by what
+  // a gathering tool IS rather than by a list of ids.
+  ITEMS[recipe.resultItemId]?.slot === undefined;
 
 /** The gear chain masterwrought R17 fences, as ONE expression both the sweep and
  *  the carve-out scoping arm read. Hoisted rather than repeated: while the two
