@@ -2331,11 +2331,11 @@ export class Sim {
       cancelCast: (p) => this.cancelCast(p),
       standUp: (p) => this.standUp(p),
       dealDamage: (source, target, amount, crit, school, ability, kind, noRage) => {
+        const wasLivingPlayerFall =
+          source === null && ability === 'Falling' && target.kind === 'player' && !target.dead;
         this.dealDamage(source, target, amount, crit, school, ability, kind, noRage);
-        // The one sim-side observer of a lethal fall (hid_fall_death): the
-        // shared pure kernel labels the hit 'Falling' with a null source, and
-        // this wrapper keeps the deed hook out of the kernel both hosts run.
-        if (source === null && ability === 'Falling' && target.kind === 'player' && target.dead) {
+        // Keep the deed observer out of the shared pure movement kernel.
+        if (wasLivingPlayerFall && target.dead) {
           deedsMod.onFallDeathForDeeds(this.ctx, target);
         }
       },

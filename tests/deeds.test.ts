@@ -49,6 +49,18 @@ function deedEvents(evs: SimEvent[]): Extract<SimEvent, { type: 'deedUnlocked' }
   });
 }
 
+function stageFallLanding(e: Entity, drop: number): void {
+  const supportY = e.pos.y;
+  e.pos.y = supportY + 0.01;
+  e.prevPos = { ...e.pos };
+  e.fallStartY = supportY + drop;
+  e.onGround = false;
+  e.jumping = false;
+  e.vx = 0;
+  e.vy = 0;
+  e.vz = 0;
+}
+
 // Seat a live 2v2 Fiesta bout (four solo-queuers, countdown run out) so the
 // fiesta-takedown arm of dealDamage can be driven directly. Mirrors the
 // startFiesta harness in tests/fiesta.test.ts.
@@ -1566,6 +1578,50 @@ describe('bounded sets on load', () => {
 });
 
 describe('site wiring (real modules, not direct bumps)', () => {
+  it('does not award Gravity Always Wins when an already-dead ghost lands', () => {
+    const sim = makeSim();
+    const { meta, e } = primary(sim);
+    e.dead = true;
+    e.hp = 0;
+    sim.releaseSpirit();
+    expect(e.dead).toBe(true);
+    expect(e.ghost).toBe(true);
+
+    stageFallLanding(e, 30);
+    const evs = sim.tick();
+
+    expect(e.onGround).toBe(true);
+    expect(meta.deedsEarned.has('hid_fall_death')).toBe(false);
+    expect(deedEvents(evs).filter((ev) => ev.deedId === 'hid_fall_death')).toHaveLength(0);
+  });
+
+  it('awards Gravity Always Wins when a fall transitions a living player to dead', () => {
+    const sim = makeSim();
+    const { meta, e } = primary(sim);
+    e.hp = 1;
+
+    stageFallLanding(e, 30);
+    const evs = sim.tick();
+
+    expect(e.dead).toBe(true);
+    expect(meta.deedsEarned.has('hid_fall_death')).toBe(true);
+    expect(deedEvents(evs).filter((ev) => ev.deedId === 'hid_fall_death')).toHaveLength(1);
+  });
+
+  it('does not award Gravity Always Wins for a damaging nonlethal fall', () => {
+    const sim = makeSim();
+    const { meta, e } = primary(sim);
+    const hpBefore = e.hp;
+
+    stageFallLanding(e, 13);
+    const evs = sim.tick();
+
+    expect(e.hp).toBeLessThan(hpBefore);
+    expect(e.dead).toBe(false);
+    expect(meta.deedsEarned.has('hid_fall_death')).toBe(false);
+    expect(deedEvents(evs).filter((ev) => ev.deedId === 'hid_fall_death')).toHaveLength(0);
+  });
+
   it('a decided duel bumps duelsWon and duelsLost through endDuel', () => {
     const sim = makeSim();
     const a = sim.playerId;
