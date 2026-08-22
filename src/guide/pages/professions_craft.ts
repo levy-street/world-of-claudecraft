@@ -61,10 +61,16 @@ function sourceCell(r: GuideProfRecipe): string {
       ? esc(t('guide.profPages.sourceTrainerFee', { fee: formatMoney(r.feeCopper) }))
       : esc(t('guide.profPages.sourceTrainerFree'));
   }
+  // BOTH channels (Masterwrought phase 11f): a pattern that drops AND sells on
+  // the marks counter. Sits FIRST because either single label below is a lie
+  // about the other channel, and the harmful direction is specific: a farming
+  // pattern labelled vendor-only would send a player to the quartermaster and
+  // they would never look in the raid it also drops from.
+  if (r.acquisition === 'dropAndVendor') return esc(t('guide.profPages.sourceDropAndVendor'));
   // Vendor-sold patterns (Masterwrought phase 11, R8's deterministic pillar):
   // the generator emits 'vendor' for a drop-acquisition recipe whose teaching
-  // pattern the Heroic Quartermaster stocks, so this arm sits BEFORE the drop
-  // arm and the row states the deterministic source.
+  // pattern the Heroic Quartermaster stocks and NO drop table carries, so this
+  // arm sits before the drop arm and the row states the deterministic source.
   if (r.acquisition === 'vendor') return esc(t('guide.profPages.sourceVendor'));
   // Drop-taught (the Masterwrought apex rows, R8): the row must never claim
   // the recipe is known from the start.

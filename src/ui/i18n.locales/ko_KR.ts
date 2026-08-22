@@ -8878,6 +8878,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.farming.witheredLine': '작물이 시들었습니다. 밭을 정리했습니다: {name}.',
   'hudChrome.farming.witheredLineQty': '작물이 시들었습니다. 밭을 정리했습니다: {name} x{qty}.',
   'hudChrome.farming.seedBackLine': '씨앗을 회수했습니다: {name}.',
+  'hudChrome.farming.goldenBonusLine': '황금 수확이 덤을 내놓았습니다: {name}.',
   'hudChrome.farming.seedBackLineQty': '씨앗을 회수했습니다: {name} x{qty}.',
   'hudChrome.farming.denied.bad_bed': '그곳에는 작물밭이 없습니다.',
   'hudChrome.farming.denied.bad_crop': '그것은 여기에 심을 수 없습니다.',
@@ -11446,6 +11447,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'guide.profPages.sourceKnown': '처음부터 습득',
   'guide.profPages.sourceDrop': '발견한 도안으로 습득',
   'guide.profPages.sourceVendor': '영웅 병참장교가 판매',
+  'guide.profPages.sourceDropAndVendor': '발견한 도안으로 습득, 또는 영웅 병참장교가 판매',
   'guide.profPages.colRecipe': '제조법',
   'guide.profPages.colSkill': '기술',
   'guide.profPages.colSource': '출처',
@@ -11661,10 +11663,10 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '농사는 이제 업적의 책에 저만의 칸을 갖는다. Sow It Begins는 처음 심은 작물을 새기고, 네 장의 연대기 페이지가 Eastbrook Vale에서 Evergarden까지 각 밭 터에서의 첫 성공적인 수확을 새긴다. 황금빛 수확은 저만의 명성 0 수집 표식을 남기고, 농사 숙련도 Master Gatherer(아무 세 채집 기술 100)에 포함된다. Every Furrow Filled는 명부 전체를 한 페이지에 모은다. 네 정원이 기르는 작물을 모두 길러 내면 그 수집이 닫힌다. 그 위의 정점은 Harvestmaster, 이 기술의 숙련 100 칭호이며, 산악과 화단의 씨앗이 이제 농부들의 판매대에 올랐으니 오늘 안에 끝낼 수 있는 오르막이다. 업적은 칭호와 명성뿐, 힘을 주지 않는다.',
   'guide.profPages.farm.tableHeading': '밭에서 식탁으로',
   'guide.profPages.farm.tableBody':
-    '주방은 한 철의 수확이 보답으로 돌아오는 곳이다. 일상적인 농가 요리 너머로, 작물의 단마다 더 풍성한 요리가 하나씩 있어 먹으면 잘 먹음 효과가 남는다. 식사를 마치면 오래가는 축복이 몸에 남으니, 일행이 던전 문 앞에서 먼저 챙겨 먹고 싶어 하는 바로 그 이점이다. 그 정점은 Harvest Feast로, 요리사가 세계 그 자체에 차려 내는 한 상이다. 곁에 있는 모두가 저마다 한 그릇씩, 한 사람당 한 번만 덜어 가고, 다 먹은 식사는 똑같은 잘 먹음 축복을 치러 주니, 농부 한 사람의 한 철이 일행 전체의 식탁을 차릴 수 있다. 그 사다리의 꼭대기, 가장 풍성한 두 요리와 잔치 그 자체는 산악과 화단의 작물에 기대는데, 그 씨앗이 이제 밭 곁의 농부들에게서 팔리니 한 벌 전체가 오늘 이미 불 위에 있다.\n\n그 식탁에는 운의 자리도 있다. 거둬들이는 모든 수확은 다른 채집 기술과 같은 횡재 확률을 굴리고, 이따금 작물이 황금빛으로 여문다. 수확량은 평범한 수확을 훌쩍 넘고, 지역 전체가 그 발견을 이름과 함께 듣게 되며, Golden Harvest가 업적의 책에 기록된다.',
+    '주방은 한 철의 수확이 보답으로 돌아오는 곳이다. 일상적인 농가 요리 너머로, 작물의 단마다 더 풍성한 요리가 하나씩 있어 먹으면 잘 먹음 효과가 남는다. 식사를 마치면 오래가는 축복이 몸에 남으니, 일행이 던전 문 앞에서 먼저 챙겨 먹고 싶어 하는 바로 그 이점이다. 그 정점은 Harvest Feast로, 요리사가 세계 그 자체에 차려 내는 한 상이다. 곁에 있는 모두가 저마다 한 그릇씩, 한 사람당 한 번만 덜어 가고, 다 먹은 식사는 똑같은 잘 먹음 축복을 치러 주니, 농부 한 사람의 한 철이 일행 전체의 식탁을 차릴 수 있다. 그 사다리의 꼭대기, 가장 풍성한 두 요리와 잔치 그 자체는 산악과 화단의 작물에 기대고, 그 씨앗은 밭 곁의 농부들에게서 팔린다. 요리법은 다른 이야기다. 농사 사다리의 위쪽 단은 이제 어느 상점에서도 가르치지 않고, 다른 최종 요리법과 마찬가지로 최종 콘텐츠에서 찾거나 영웅 징표로 사야 한다.\n\n그 식탁에는 운의 자리도 있다. 거둬들이는 모든 수확은 다른 채집 기술과 같은 횡재 확률을 굴리고, 이따금 작물이 황금빛으로 여문다. 수확량은 평범한 수확을 훌쩍 넘고, 덤이 하나 더 딸려 나오며(지금 일구는 땅보다 한 단 위의 씨앗, 또는 이따금 그 최종 요리법 가운데 하나), 지역 전체가 그 발견을 이름과 함께 듣게 되고, Golden Harvest가 업적의 책에 기록된다.',
   'guide.profPages.farm.bedsHeading': '밭 일구기',
   'guide.profPages.farm.bedsBody':
-    '순서는 짧다. 밭 곁의 농부에게서 씨앗과 퇴비를 산다. Eastbrook의 Jessica는 골짜기 두 종을, Fenbridge의 농부는 습지 두 종을, Highwatch 단구의 Hollis는 산악 작물을, Verbena는 Evergarden 화단의 작물을 갖추고 있다. 높은 단의 수확도 제 씨앗을 한두 알씩 되돌려 주고, 어떤 씨앗이든 World Market에서 오가니, 상점은 유일한 입구가 아니라 첫 입구다. 가방에 괭이를 넣고 씨를 심고, 원한다면 승산을 높여라. 상점의 퇴비와 심을 때 농작물로 치르는 농부의 관리는 둘 다 작물이 무사히 자랄 확률을 올리고, 연금술사의 성장 토닉은 수확이 늘어날 기회를 주며, 숙련이 작물의 단보다 한 구간 위로 오르면 그 작물은 다시는 실패하지 않는다. 그다음은 자리를 뜨면 된다. 로그아웃 중에도 밭은 계속 자라고, 익은 작물은 놔둔 만큼 기다리며, 수확 일지(Shift+K, 또는 전문 기술 창의 농사 행)가 심어 둔 모든 밭을 타이머와 함께 보여 준다.\n\n실패한 작물은 농작물 대신 시든 껍질을 남기고, 어느 농부든 껍질을 퇴비로 바꿔 주니 나쁜 한 철이 다음 철의 보험을 사 주는 셈이다. 거둔 것은 주방을 먹여 살린다. 농작물은 주방에서 요리가 되고, Cook Marlow의 밀과 쌀 의뢰는 Vale Wheat와 Marsh Rice를 다른 모든 작업 의뢰와 같은 시계로 사들인다.',
+    '순서는 짧다. 밭 곁의 농부에게서 씨앗과 퇴비를 산다. Eastbrook의 Jessica는 골짜기 두 종을, Fenbridge의 농부는 습지 두 종을, Highwatch 단구의 Hollis는 산악 작물을, Verbena는 Evergarden 화단의 작물을 갖추고 있다. 높은 단의 수확도 제 씨앗을 한두 알씩 되돌려 주고, 어떤 씨앗이든 World Market에서 오가며, 산악과 화단의 씨앗은 이제 최종 콘텐츠에서도 떨어지고 영웅 보급관의 상점에도 놓이니, 밭 곁의 농부는 유일한 입구가 아니라 첫 입구다. 가방에 괭이를 넣고 씨를 심고, 원한다면 승산을 높여라. 상점의 퇴비와 심을 때 농작물로 치르는 농부의 관리는 둘 다 작물이 무사히 자랄 확률을 올리고, 연금술사의 성장 토닉은 수확이 늘어날 기회를 주며, 숙련이 작물의 단보다 한 구간 위로 오르면 그 작물은 다시는 실패하지 않는다. 그다음은 자리를 뜨면 된다. 로그아웃 중에도 밭은 계속 자라고, 익은 작물은 놔둔 만큼 기다리며, 수확 일지(Shift+K, 또는 전문 기술 창의 농사 행)가 심어 둔 모든 밭을 타이머와 함께 보여 준다.\n\n실패한 작물은 농작물 대신 시든 껍질을 남기고, 어느 농부든 껍질을 퇴비로 바꿔 주니 나쁜 한 철이 다음 철의 보험을 사 주는 셈이다. 거둔 것은 주방을 먹여 살린다. 농작물은 주방에서 요리가 되고, Cook Marlow의 밀과 쌀 의뢰는 Vale Wheat와 Marsh Rice를 다른 모든 작업 의뢰와 같은 시계로 사들인다.',
   'guide.profPages.fish.startHeading': '시작하기',
   'guide.profPages.fish.startBody':
     'Simple Fishing Pole은 Eastbrook의 Fisherman Brandt가 20동에 판다(마을 동쪽 끝에서 Mirror Lake를 노려보는 노련한 낚시꾼이다). Tinker Gizzel, Fenbridge의 Provisioner Hale, Highwatch의 Quartermaster Bree도 재고가 있다. 전방 약 24야드 안의 충분히 깊은 물을 바라보고 낚싯대를 쓰면 찌가 날아간다. 전투 중, 수영 중, 사망 중에는 던질 수 없다. 물가에서 던지는 것이 정석이고, 어느 지역의 낚시 가능한 물이든 좋다.',

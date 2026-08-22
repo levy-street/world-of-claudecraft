@@ -46,6 +46,8 @@ const entrySource = `
   } from './src/sim/content/professions.ts';
   export { ALL_RECIPES } from './src/sim/content/recipes.ts';
   export { HEROIC_VENDOR_STOCK } from './src/sim/content/heroic_vendor.ts';
+  export { HEROIC_BOSS_LOOT } from './src/sim/content/heroic_loot.ts';
+  export { RIFT_PATTERN_ITEM_IDS, FARM_RIFT_DROP_ITEM_IDS } from './src/sim/rift/progression.ts';
   export { ENCHANTS } from './src/sim/content/enchants.ts';
   export { GATHER_NODES } from './src/sim/content/gather_nodes.ts';
   export { FISHING_TABLES_BY_BAND, FISHING_RARE_ID } from './src/sim/content/items.ts';
@@ -146,6 +148,9 @@ const {
   GATHERING_PROFESSION_IDS,
   ALL_RECIPES,
   HEROIC_VENDOR_STOCK,
+  HEROIC_BOSS_LOOT,
+  RIFT_PATTERN_ITEM_IDS,
+  FARM_RIFT_DROP_ITEM_IDS,
   ENCHANTS,
   GATHER_NODES,
   FISHING_TABLES_BY_BAND,
@@ -686,12 +691,39 @@ const gainBoundaries = (skillReq) => {
 // The Heroic Quartermaster's pattern rows (Masterwrought phase 11, R8's
 // deterministic pillar): a drop-acquisition recipe whose TEACHING PATTERN
 // item (pattern_<resultItemId>) sits in the quartermaster's marks stock is
-// deterministically purchasable, so the wiki says 'vendor', never 'drop'.
+// deterministically purchasable, so the wiki says so rather than only 'drop'.
 // The sim-side acquisition stays ['drop'] on purpose (the learn flow and the
 // pattern sweeps key on it); this mapping is wiki display only.
+//
+// PHASE 11f ADDED THE CASE NOBODY HAD HIT: a pattern that is in a drop table
+// AND on the quartermaster at the same time. Every farming pattern is. Left as
+// it was, the vendor arm won outright and the wiki would have told a player
+// "From the Heroic Quartermaster" about a recipe that also drops off the raid,
+// and they would never look in the raid. So the emit is now a THREE-way
+// classification and the both case gets its own value and its own rendered
+// row, because either single label is a lie about the other channel.
 const vendorPatternItemIds = new Set(HEROIC_VENDOR_STOCK.map((o) => o.itemId));
 const vendorTaughtRecipe = (r) =>
   Boolean(r.acquisition?.includes('drop')) && vendorPatternItemIds.has(`pattern_${r.resultItemId}`);
+
+// Every pattern id that appears in a LIVE drop table, derived from the tables
+// themselves rather than from a list: the normal mob loot (which carries the
+// raid channel), the heroic-only tables (the five-man channel), and both rift
+// pick lists. A pattern nobody drops is vendor-only and says so; a pattern
+// nobody sells is drop-only and says so.
+const droppedPatternItemIds = new Set([
+  ...Object.values(MOBS).flatMap((m) =>
+    (m.loot ?? []).flatMap((e) => (e.itemId ? [e.itemId] : [])),
+  ),
+  ...Object.values(HEROIC_BOSS_LOOT)
+    .flat()
+    .flatMap((e) => (e.itemId ? [e.itemId] : [])),
+  ...RIFT_PATTERN_ITEM_IDS,
+  ...FARM_RIFT_DROP_ITEM_IDS,
+]);
+const dropTaughtRecipe = (r) =>
+  Boolean(r.acquisition?.includes('drop')) &&
+  droppedPatternItemIds.has(`pattern_${r.resultItemId}`);
 
 // Consumable effect facts for a recipe's output item, straight from the live
 // def (the C10 effect-prose gap): the foodHp restore and the well-fed boon as
@@ -734,11 +766,13 @@ const profRecipeRow = (r) => {
     // misstate the acquisition.
     acquisition: r.acquisition?.includes('trainer')
       ? 'trainer'
-      : vendorTaughtRecipe(r)
-        ? 'vendor'
-        : r.acquisition?.includes('drop')
-          ? 'drop'
-          : 'known',
+      : vendorTaughtRecipe(r) && dropTaughtRecipe(r)
+        ? 'dropAndVendor'
+        : vendorTaughtRecipe(r)
+          ? 'vendor'
+          : r.acquisition?.includes('drop')
+            ? 'drop'
+            : 'known',
     feeCopper: r.acquisition?.includes('trainer') ? trainingFeeFor(r) : 0,
     materials: r.reagents.map((g) => ({ name: itemName(g.itemId), count: g.count })),
     output: {
@@ -1300,7 +1334,7 @@ export interface GuideProfRecipe {
   skillReq: number;
   tier: number;
   station: string | null;
-  acquisition: 'trainer' | 'drop' | 'vendor' | 'known';
+  acquisition: 'trainer' | 'drop' | 'vendor' | 'dropAndVendor' | 'known';
   feeCopper: number;
   materials: GuideProfMaterial[];
   output: { name: string; count: number; quality: string };

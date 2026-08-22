@@ -8503,6 +8503,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.farming.witheredLine': '作物枯萎了。你清理了田畦：{name}。',
   'hudChrome.farming.witheredLineQty': '作物枯萎了。你清理了田畦：{name} x{qty}。',
   'hudChrome.farming.seedBackLine': '你回收了种子：{name}。',
+  'hudChrome.farming.goldenBonusLine': '金色收成额外产出：{name}。',
   'hudChrome.farming.seedBackLineQty': '你回收了种子：{name} x{qty}。',
   'hudChrome.farming.denied.bad_bed': '那里没有田畦。',
   'hudChrome.farming.denied.bad_crop': '你无法在这里种植它。',
@@ -10966,6 +10967,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'guide.profPages.sourceKnown': '初始即会',
   'guide.profPages.sourceDrop': '习自寻获的图样',
   'guide.profPages.sourceVendor': '由英雄军需官出售',
+  'guide.profPages.sourceDropAndVendor': '习自寻获的图样，或由英雄军需官出售',
   'guide.profPages.colRecipe': '配方',
   'guide.profPages.colSkill': '技能',
   'guide.profPages.colSource': '来源',
@@ -11176,10 +11178,10 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
     '耕作如今在功业之书里有了自己的一栏。Sow It Begins标记你种下的第一株作物，四页编年记则标记你在每处田畦所在地的第一次成活收成，从Eastbrook Vale直到Evergarden。一次金色的丰收会记下自己的零声望收藏印记，而耕作的熟练同样计入Master Gatherer（任意三项采集行业达到100）。Every Furrow Filled把整份名录收进一页：把四座园圃所种的每一种作物都种上一轮，这项收藏便告完成。它之上的压卷之作是Harvestmaster，这门行业的100熟练头衔，而山地与花圃的种子如今已摆上各自农夫的柜台，这段攀登今天就能走完。功业只有头衔与声望，永不赋予力量。',
   'guide.profPages.farm.tableHeading': '从田畦到餐桌',
   'guide.profPages.farm.tableBody':
-    '厨房是一季收成得到回报的地方。在日常农家菜之外，每一阶作物都有一道更丰盛的菜肴，吃了能获得精神饱满：吃完这一餐，一份持久的恩泽便留在你身上，正是队伍在地下城门前想先吃下的那份底气。压轴的是Harvest Feast，厨师直接摆进世界里的一桌盛宴：在场的每个人各取一份，每人一次，而每一顿吃完的餐食都给出同样的精神饱满恩泽，于是一位农夫的一季收成能让整支队伍坐上餐桌。这架梯子的顶端，两道最丰盛的菜肴与盛宴本身，倚仗的是山地与花圃的作物，而它们的种子如今就在那些田畦旁的农夫处出售，于是整套菜色今天都已开火烹煮。\n\n这张餐桌上也留着运气的位置。你收进的每一次收成都掷出与其他采集行业相同的横财几率，作物偶尔会结出金色的一茬：产量远超寻常，整个区域都会听到这项发现连着你的名字一同宣告，Golden Harvest也会记入你的功业之书。',
+    '厨房是一季收成得到回报的地方。在日常农家菜之外，每一阶作物都有一道更丰盛的菜肴，吃了能获得精神饱满：吃完这一餐，一份持久的恩泽便留在你身上，正是队伍在地下城门前想先吃下的那份底气。压轴的是Harvest Feast，厨师直接摆进世界里的一桌盛宴：在场的每个人各取一份，每人一次，而每一顿吃完的餐食都给出同样的精神饱满恩泽，于是一位农夫的一季收成能让整支队伍坐上餐桌。这架梯子的顶端，两道最丰盛的菜肴与盛宴本身，倚仗的是山地与花圃的作物，它们的种子就在那些田畦旁的农夫处出售。菜谱则是另一回事：耕作阶梯的高阶层级已不再由任何柜台传授，而是像其他终局菜谱一样，在终局内容中寻得，或用英雄纹章购买。\n\n这张餐桌上也留着运气的位置。你收进的每一次收成都掷出与其他采集行业相同的横财几率，作物偶尔会结出金色的一茬：产量远超寻常，还会额外收获一样东西（一粒适用于比你手上更肥沃田地的种子，偶尔则是那些终局菜谱之一），整个区域都会听到这项发现连着你的名字一同宣告，Golden Harvest也会记入你的功业之书。',
   'guide.profPages.farm.bedsHeading': '打理田畦',
   'guide.profPages.farm.bedsBody':
-    '流程很短。向田畦旁的农夫购买种子和堆肥：Eastbrook的Jessica备有谷地的两种，Fenbridge的农夫备有沼泽的两种，Highwatch梯田的Hollis备有山地作物，Verbena备有Evergarden花圃的作物。高阶收成还会返还一两粒自己的种子，任何种子也都在World Market上流转，所以柜台是入门的途径，而不是唯一的途径。行囊里带着锄头播种，愿意的话再压一压胜算：柜台的堆肥和播种时用农产品支付的农夫看护都会提高作物成活的几率，炼金术士的生长滋补剂让收成有机会更丰，而一旦你的熟练比作物所在阶高出整整一档，那种作物就再也不会失败。然后走开就好。你下线时田畦照样生长，成熟的作物你放多久它等多久，收成日志（Shift+K，或专业窗口的耕作一行）列出你种下的每一畦及其计时。\n\n失败的作物留下枯萎的谷壳而非农产品，任何农夫都会用谷壳换堆肥，于是坏年景买下了下一季的保险。收上来的东西供养厨房：农产品在厨房烹成菜肴，Cook Marlow的小麦和稻米工单按与其他任何工单相同的钟点，用铜币收走你的Vale Wheat和Marsh Rice。',
+    '流程很短。向田畦旁的农夫购买种子和堆肥：Eastbrook的Jessica备有谷地的两种，Fenbridge的农夫备有沼泽的两种，Highwatch梯田的Hollis备有山地作物，Verbena备有Evergarden花圃的作物。高阶收成还会返还一两粒自己的种子，任何种子也都在World Market上流转，而山地与花圃的种子如今还会从终局内容中掉落，也在英雄军需官的柜台上出售，所以田畦旁的农夫是入门的途径，而不是唯一的途径。行囊里带着锄头播种，愿意的话再压一压胜算：柜台的堆肥和播种时用农产品支付的农夫看护都会提高作物成活的几率，炼金术士的生长滋补剂让收成有机会更丰，而一旦你的熟练比作物所在阶高出整整一档，那种作物就再也不会失败。然后走开就好。你下线时田畦照样生长，成熟的作物你放多久它等多久，收成日志（Shift+K，或专业窗口的耕作一行）列出你种下的每一畦及其计时。\n\n失败的作物留下枯萎的谷壳而非农产品，任何农夫都会用谷壳换堆肥，于是坏年景买下了下一季的保险。收上来的东西供养厨房：农产品在厨房烹成菜肴，Cook Marlow的小麦和稻米工单按与其他任何工单相同的钟点，用铜币收走你的Vale Wheat和Marsh Rice。',
   'guide.profPages.fish.startHeading': '入门',
   'guide.profPages.fish.startBody':
     '一根Simple Fishing Pole在Eastbrook的Fisherman Brandt处只卖20铜（他在镇东缘望着Mirror Lake）；Tinker Gizzel、Fenbridge的Provisioner Hale和Highwatch的Quartermaster Bree也有存货。面向前方约24码内足够深的水面使用鱼竿即可抛竿。战斗中、游泳时或死亡时无法抛竿：站在岸上钓才是正途，任何区域的可钓水域都行。',

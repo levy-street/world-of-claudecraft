@@ -138,7 +138,7 @@ export interface GuideProfRecipe {
   skillReq: number;
   tier: number;
   station: string | null;
-  acquisition: 'trainer' | 'drop' | 'vendor' | 'known';
+  acquisition: 'trainer' | 'drop' | 'vendor' | 'dropAndVendor' | 'known';
   feeCopper: number;
   materials: GuideProfMaterial[];
   output: { name: string; count: number; quality: string };
@@ -9656,11 +9656,11 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
       {
         "id": "recipe_highwatch_gourd_soup",
         "name": "Highwatch Gourd Soup",
-        "skillReq": 50,
-        "tier": 2,
+        "skillReq": 75,
+        "tier": 3,
         "station": "kitchens",
-        "acquisition": "trainer",
-        "feeCopper": 10000,
+        "acquisition": "dropAndVendor",
+        "feeCopper": 0,
         "materials": [
           {
             "name": "Frost Gourd",
@@ -9691,9 +9691,9 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
         "combo": null,
         "oncePerDay": false,
         "gain": {
-          "reducedAt": 75,
-          "minimalAt": 100,
-          "zeroAt": 125
+          "reducedAt": 100,
+          "minimalAt": 125,
+          "zeroAt": 150
         },
         "effect": {
           "food": {
@@ -9705,11 +9705,11 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
       {
         "id": "recipe_evergarden_sunmelon_tart",
         "name": "Evergarden Sunmelon Tart",
-        "skillReq": 50,
-        "tier": 2,
+        "skillReq": 100,
+        "tier": 4,
         "station": "kitchens",
-        "acquisition": "trainer",
-        "feeCopper": 10000,
+        "acquisition": "dropAndVendor",
+        "feeCopper": 0,
         "materials": [
           {
             "name": "Gilded Sunmelon",
@@ -9740,9 +9740,9 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
         "combo": null,
         "oncePerDay": false,
         "gain": {
-          "reducedAt": 75,
-          "minimalAt": 100,
-          "zeroAt": 125
+          "reducedAt": 125,
+          "minimalAt": 150,
+          "zeroAt": 175
         },
         "effect": {
           "food": {
@@ -9754,11 +9754,11 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
       {
         "id": "recipe_evergarden_harvest_platter",
         "name": "Evergarden Harvest Platter",
-        "skillReq": 50,
-        "tier": 2,
+        "skillReq": 100,
+        "tier": 4,
         "station": "kitchens",
-        "acquisition": "trainer",
-        "feeCopper": 10000,
+        "acquisition": "dropAndVendor",
+        "feeCopper": 0,
         "materials": [
           {
             "name": "Evergarden Greens",
@@ -9789,9 +9789,9 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
         "combo": null,
         "oncePerDay": false,
         "gain": {
-          "reducedAt": 75,
-          "minimalAt": 100,
-          "zeroAt": 125
+          "reducedAt": 125,
+          "minimalAt": 150,
+          "zeroAt": 175
         },
         "effect": {
           "food": {
@@ -9893,11 +9893,11 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
       {
         "id": "recipe_highwatch_barley_porridge",
         "name": "Highwatch Barley Porridge",
-        "skillReq": 50,
-        "tier": 2,
+        "skillReq": 75,
+        "tier": 3,
         "station": "kitchens",
-        "acquisition": "trainer",
-        "feeCopper": 10000,
+        "acquisition": "dropAndVendor",
+        "feeCopper": 0,
         "materials": [
           {
             "name": "Highland Barley",
@@ -9916,9 +9916,9 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
         "combo": null,
         "oncePerDay": false,
         "gain": {
-          "reducedAt": 75,
-          "minimalAt": 100,
-          "zeroAt": 125
+          "reducedAt": 100,
+          "minimalAt": 125,
+          "zeroAt": 150
         },
         "effect": {
           "food": {
@@ -9936,11 +9936,11 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
       {
         "id": "recipe_evergarden_braised_greens",
         "name": "Evergarden Braised Greens",
-        "skillReq": 50,
-        "tier": 2,
+        "skillReq": 100,
+        "tier": 4,
         "station": "kitchens",
-        "acquisition": "trainer",
-        "feeCopper": 10000,
+        "acquisition": "dropAndVendor",
+        "feeCopper": 0,
         "materials": [
           {
             "name": "Evergarden Greens",
@@ -9959,9 +9959,9 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
         "combo": null,
         "oncePerDay": false,
         "gain": {
-          "reducedAt": 75,
-          "minimalAt": 100,
-          "zeroAt": 125
+          "reducedAt": 125,
+          "minimalAt": 150,
+          "zeroAt": 175
         },
         "effect": {
           "food": {
@@ -9979,11 +9979,11 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
       {
         "id": "recipe_harvest_feast",
         "name": "Harvest Feast",
-        "skillReq": 50,
-        "tier": 2,
+        "skillReq": 100,
+        "tier": 4,
         "station": "kitchens",
-        "acquisition": "trainer",
-        "feeCopper": 10000,
+        "acquisition": "dropAndVendor",
+        "feeCopper": 0,
         "materials": [
           {
             "name": "Evergarden Greens",
@@ -10006,9 +10006,9 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
         "combo": null,
         "oncePerDay": false,
         "gain": {
-          "reducedAt": 75,
-          "minimalAt": 100,
-          "zeroAt": 125
+          "reducedAt": 125,
+          "minimalAt": 150,
+          "zeroAt": 175
         }
       }
     ]

@@ -54,6 +54,7 @@ import { DEEDS } from '../src/sim/content/deeds';
 import { DELVE_SHOPS } from '../src/sim/content/delves/shop';
 import { ENCHANTS } from '../src/sim/content/enchants';
 import { GATHER_NODES } from '../src/sim/content/gather_nodes';
+import { HEROIC_BOSS_LOOT } from '../src/sim/content/heroic_loot';
 import { HEROIC_VENDOR_STOCK } from '../src/sim/content/heroic_vendor';
 import { FISHING_TABLES_BY_BAND } from '../src/sim/content/items';
 import {
@@ -114,6 +115,7 @@ import {
   TIER5_TOOL_WIELD_PROFICIENCY,
   WIELD_REQUIREMENT_BY_TIER,
 } from '../src/sim/professions/wield_gate';
+import { FARM_RIFT_DROP_ITEM_IDS, RIFT_PATTERN_ITEM_IDS } from '../src/sim/rift/progression';
 import { CONSUME_DURATION, type DeedDef } from '../src/sim/types';
 import { DEED_IMAGE_IDS } from '../src/ui/deed_image_ids';
 import { ensureLocaleLoaded, type SupportedLanguage, setLanguage, t } from '../src/ui/i18n';
@@ -1772,20 +1774,40 @@ describe('Guide professions generated content accuracy', () => {
         expect(row.skillReq).toBe(def.skillReq);
         expect(row.tier).toBe(tierForSkill(def.skillReq));
         expect(row.station).toBe(def.stationType ?? null);
-        // The vendor arm mirrors the generator's channel split (phase 11,
-        // R8): a drop-acquisition recipe whose teaching pattern is stocked
-        // on the Heroic Quartermaster renders as the vendor channel; every
-        // other drop recipe stays the found-pattern channel.
-        const vendorTaught = HEROIC_VENDOR_STOCK.some(
-          (offer) => offer.itemId === `pattern_${def.resultItemId}`,
-        );
+        // The channel split mirrors the generator's (phase 11, R8, widened at
+        // phase 11f): a drop-acquisition recipe whose teaching pattern is
+        // stocked on the Heroic Quartermaster AND carried by a live drop table
+        // renders as BOTH; one or the other alone renders as that one. The
+        // drop side is derived from the tables themselves, the same way the
+        // generator does it, so a channel added anywhere reaches this pin by
+        // existing rather than by being listed.
+        // Every pattern id a LIVE drop table carries: the normal mob loot
+        // (which holds the raid channel), the heroic-only tables (the
+        // five-man channel), and both rift pick lists. Derived rather than
+        // listed, exactly as the generator derives it, so a channel added
+        // anywhere reaches this pin by existing.
+        const droppedPatternIds = new Set<string>([
+          ...Object.values(MOBS).flatMap((m) =>
+            (m.loot ?? []).flatMap((e) => (e.itemId ? [e.itemId] : [])),
+          ),
+          ...Object.values(HEROIC_BOSS_LOOT)
+            .flat()
+            .flatMap((e) => (e.itemId ? [e.itemId] : [])),
+          ...RIFT_PATTERN_ITEM_IDS,
+          ...FARM_RIFT_DROP_ITEM_IDS,
+        ]);
+        const patternId = `pattern_${def.resultItemId}`;
+        const vendorTaught = HEROIC_VENDOR_STOCK.some((offer) => offer.itemId === patternId);
+        const dropTaught = droppedPatternIds.has(patternId);
         expect(row.acquisition).toBe(
           def.acquisition?.includes('trainer')
             ? 'trainer'
             : def.acquisition?.includes('drop')
-              ? vendorTaught
-                ? 'vendor'
-                : 'drop'
+              ? vendorTaught && dropTaught
+                ? 'dropAndVendor'
+                : vendorTaught
+                  ? 'vendor'
+                  : 'drop'
               : 'known',
         );
         expect(row.feeCopper).toBe(def.acquisition?.includes('trainer') ? trainingFeeFor(def) : 0);
@@ -2099,8 +2121,11 @@ describe('Guide professions gathering accuracy', () => {
     // per-section coverage its predecessor had rather than only its intent.
     // farmingSown:
     expect(html).toContain('Every Furrow Filled');
-    // farm.tableBody:
-    expect(html).toContain('the whole set is cooking today');
+    // farm.tableBody. Re-anchored at Phase 11f, which reworded this sentence:
+    // the seeds alone no longer make the top of the ladder cookable, because
+    // its recipes stopped being trainer-taught, so the anchor moves to the
+    // clause that survives the reword rather than to the one it replaced.
+    expect(html).toContain('leans on the mountain and parterre crops');
     // farm.bedsBody. THE SECTION THAT ACTUALLY WENT STALE, and until the 11e QA
     // the only section with no anchor tying it to the faucet: its two anchors
     // were Jessica alone, who has stocked the Vale pair since the growth engine
@@ -2862,6 +2887,41 @@ describe('Guide professions pages and routes', () => {
     ).toContain(t('guide.profPages.sourceVendor'));
     expect(alchRowFor('Ironhusk Flask')).not.toContain(t('guide.profPages.sourceDrop'));
     expect(alchRowFor('Ironhusk Flask')).not.toContain(t('guide.profPages.sourceKnown'));
+    // The RENDERED source cell for BOTH channels at once (phase 11f), the
+    // third case and the one with a real player cost: every farming pattern
+    // is in a drop table AND on the marks counter, and until this phase the
+    // generator's vendor arm won outright, so the wiki would have told a
+    // reader "Sold by the Heroic Quartermaster" about a recipe that also
+    // drops off the raid and they would never have looked in the raid. The
+    // row must name both, and must not fall back to either single string.
+    const cooking = professionsPage.render(ctx(['cooking']));
+    const cookingRowFor = (name: string): string =>
+      cooking.match(
+        new RegExp(`<tr[^>]*>(?:(?!</tr>)[\\s\\S])*${name}(?:(?!</tr>)[\\s\\S])*</tr>`),
+      )?.[0] ?? '';
+    const feastRow = cookingRowFor('Harvest Feast');
+    expect(feastRow, 'the both-channel row must render at all').not.toBe('');
+    expect(feastRow, 'a pattern that drops AND sells names both channels').toContain(
+      t('guide.profPages.sourceDropAndVendor'),
+    );
+    expect(feastRow).not.toContain(t('guide.profPages.sourceKnown'));
+    expect(feastRow).not.toContain(t('guide.profPages.sourceTrainerFree'));
+    // And the three source strings really are distinct, so the arm above
+    // cannot be satisfied by a string that merely contains another.
+    expect(
+      new Set([
+        t('guide.profPages.sourceDrop'),
+        t('guide.profPages.sourceVendor'),
+        t('guide.profPages.sourceDropAndVendor'),
+      ]).size,
+    ).toBe(3);
+    // A held trainer row on the SAME page is the contrast: the cooking page
+    // renders both channels, so a sourceCell that collapsed every farm row to
+    // one string would fail here rather than looking consistent.
+    const bannockRow = cookingRowFor('Highwatch Barley Bannock');
+    expect(bannockRow, 'the on-ramp row must render').not.toBe('');
+    expect(bannockRow).not.toContain(t('guide.profPages.sourceDropAndVendor'));
+    expect(bannockRow).not.toContain(t('guide.profPages.sourceDrop'));
     // The enchanting route rides the craft module with its own sections.
     const ench = professionsPage.render(ctx(['enchanting']));
     expect(ench).toContain('Enchant Weapon - Runed Edge');

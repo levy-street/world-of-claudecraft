@@ -276,6 +276,7 @@ export const pending: Record<string, readonly string[]> = {
     "guide.profPages.howBody",
     "guide.profPages.oncePerDay",
     "guide.profPages.sourceDrop",
+    "guide.profPages.sourceDropAndVendor",
     "guide.profPages.sourceVendor",
     "guide.profPages.trainingBody",
     "guide.professions.deedsBody",
@@ -714,6 +715,7 @@ export const pending: Record<string, readonly string[]> = {
     "guide.profPages.howBody",
     "guide.profPages.oncePerDay",
     "guide.profPages.sourceDrop",
+    "guide.profPages.sourceDropAndVendor",
     "guide.profPages.sourceVendor",
     "guide.profPages.trainingBody",
     "guide.professions.deedsBody",
@@ -1165,6 +1167,7 @@ export const pending: Record<string, readonly string[]> = {
     "guide.profPages.howBody",
     "guide.profPages.oncePerDay",
     "guide.profPages.sourceDrop",
+    "guide.profPages.sourceDropAndVendor",
     "guide.profPages.sourceVendor",
     "guide.profPages.trainingBody",
     "guide.professions.deedsBody",
@@ -1618,6 +1621,7 @@ export const pending: Record<string, readonly string[]> = {
     "guide.profPages.howBody",
     "guide.profPages.oncePerDay",
     "guide.profPages.sourceDrop",
+    "guide.profPages.sourceDropAndVendor",
     "guide.profPages.sourceVendor",
     "guide.profPages.trainingBody",
     "guide.professions.deedsBody",
@@ -2077,6 +2081,7 @@ export const pending: Record<string, readonly string[]> = {
     "guide.profPages.howBody",
     "guide.profPages.oncePerDay",
     "guide.profPages.sourceDrop",
+    "guide.profPages.sourceDropAndVendor",
     "guide.profPages.sourceVendor",
     "guide.profPages.trainingBody",
     "guide.professions.deedsBody",
@@ -2542,6 +2547,7 @@ export const pending: Record<string, readonly string[]> = {
     "guide.profPages.howBody",
     "guide.profPages.oncePerDay",
     "guide.profPages.sourceDrop",
+    "guide.profPages.sourceDropAndVendor",
     "guide.profPages.sourceVendor",
     "guide.profPages.trainingBody",
     "guide.professions.deedsBody",
@@ -2721,8 +2727,7 @@ export const pending: Record<string, readonly string[]> = {
     "devCommand.fields.bed",
     "guide.profPages.oncePerDay",
     "hudChrome.controller.crossHotbarPosition",
-    "hudChrome.crafting.oncePerDay",
-    "hudChrome.farming.goldenBonusLine"
+    "hudChrome.crafting.oncePerDay"
   ],
   "zh_TW": [
     "devCommand.actions.farmgrow.description",
@@ -2730,8 +2735,7 @@ export const pending: Record<string, readonly string[]> = {
     "devCommand.fields.bed",
     "guide.profPages.oncePerDay",
     "hudChrome.controller.crossHotbarPosition",
-    "hudChrome.crafting.oncePerDay",
-    "hudChrome.farming.goldenBonusLine"
+    "hudChrome.crafting.oncePerDay"
   ],
   "ko_KR": [
     "devCommand.actions.farmgrow.description",
@@ -2739,8 +2743,7 @@ export const pending: Record<string, readonly string[]> = {
     "devCommand.fields.bed",
     "guide.profPages.oncePerDay",
     "hudChrome.controller.crossHotbarPosition",
-    "hudChrome.crafting.oncePerDay",
-    "hudChrome.farming.goldenBonusLine"
+    "hudChrome.crafting.oncePerDay"
   ],
   "ja_JP": [
     "devCommand.actions.farmgrow.description",
@@ -2748,8 +2751,7 @@ export const pending: Record<string, readonly string[]> = {
     "devCommand.fields.bed",
     "guide.profPages.oncePerDay",
     "hudChrome.controller.crossHotbarPosition",
-    "hudChrome.crafting.oncePerDay",
-    "hudChrome.farming.goldenBonusLine"
+    "hudChrome.crafting.oncePerDay"
   ],
   "pt_BR": [
     "abilityUi.cast.farming",
@@ -3034,6 +3036,7 @@ export const pending: Record<string, readonly string[]> = {
     "guide.profPages.howBody",
     "guide.profPages.oncePerDay",
     "guide.profPages.sourceDrop",
+    "guide.profPages.sourceDropAndVendor",
     "guide.profPages.sourceVendor",
     "guide.profPages.trainingBody",
     "guide.professions.deedsBody",
@@ -3212,8 +3215,7 @@ export const pending: Record<string, readonly string[]> = {
     "devCommand.fields.bed",
     "guide.profPages.oncePerDay",
     "hudChrome.controller.crossHotbarPosition",
-    "hudChrome.crafting.oncePerDay",
-    "hudChrome.farming.goldenBonusLine"
+    "hudChrome.crafting.oncePerDay"
   ],
   "cs_CZ": [
     "abilityUi.cast.farming",
@@ -3502,6 +3504,7 @@ export const pending: Record<string, readonly string[]> = {
     "guide.profPages.howBody",
     "guide.profPages.oncePerDay",
     "guide.profPages.sourceDrop",
+    "guide.profPages.sourceDropAndVendor",
     "guide.profPages.sourceVendor",
     "guide.profPages.trainingBody",
     "guide.professions.deedsBody",
@@ -3969,6 +3972,7 @@ export const pending: Record<string, readonly string[]> = {
     "guide.profPages.howBody",
     "guide.profPages.oncePerDay",
     "guide.profPages.sourceDrop",
+    "guide.profPages.sourceDropAndVendor",
     "guide.profPages.sourceVendor",
     "guide.profPages.trainingBody",
     "guide.professions.deedsBody",
@@ -4426,6 +4430,7 @@ export const pending: Record<string, readonly string[]> = {
     "guide.profPages.howBody",
     "guide.profPages.oncePerDay",
     "guide.profPages.sourceDrop",
+    "guide.profPages.sourceDropAndVendor",
     "guide.profPages.sourceVendor",
     "guide.profPages.trainingBody",
     "guide.professions.deedsBody",
@@ -4869,6 +4874,7 @@ export const pending: Record<string, readonly string[]> = {
     "guide.profPages.howBody",
     "guide.profPages.oncePerDay",
     "guide.profPages.sourceDrop",
+    "guide.profPages.sourceDropAndVendor",
     "guide.profPages.sourceVendor",
     "guide.profPages.trainingBody",
     "guide.professions.deedsBody",
@@ -5317,6 +5323,7 @@ export const pending: Record<string, readonly string[]> = {
     "guide.profPages.howBody",
     "guide.profPages.oncePerDay",
     "guide.profPages.sourceDrop",
+    "guide.profPages.sourceDropAndVendor",
     "guide.profPages.sourceVendor",
     "guide.profPages.trainingBody",
     "guide.professions.deedsBody",
@@ -5777,6 +5784,7 @@ export const pending: Record<string, readonly string[]> = {
     "guide.profPages.howBody",
     "guide.profPages.oncePerDay",
     "guide.profPages.sourceDrop",
+    "guide.profPages.sourceDropAndVendor",
     "guide.profPages.sourceVendor",
     "guide.profPages.trainingBody",
     "guide.professions.deedsBody",
@@ -6229,6 +6237,7 @@ export const pending: Record<string, readonly string[]> = {
     "guide.profPages.howBody",
     "guide.profPages.oncePerDay",
     "guide.profPages.sourceDrop",
+    "guide.profPages.sourceDropAndVendor",
     "guide.profPages.sourceVendor",
     "guide.profPages.trainingBody",
     "guide.professions.deedsBody",
@@ -6695,6 +6704,7 @@ export const pending: Record<string, readonly string[]> = {
     "guide.profPages.howBody",
     "guide.profPages.oncePerDay",
     "guide.profPages.sourceDrop",
+    "guide.profPages.sourceDropAndVendor",
     "guide.profPages.sourceVendor",
     "guide.profPages.trainingBody",
     "guide.professions.deedsBody",

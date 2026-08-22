@@ -6234,6 +6234,7 @@ export type TranslationKeyFlat =
   | 'guide.profPages.rhythmBody'
   | 'guide.profPages.rhythmHeading'
   | 'guide.profPages.sourceDrop'
+  | 'guide.profPages.sourceDropAndVendor'
   | 'guide.profPages.sourceKnown'
   | 'guide.profPages.sourceTrainerFee'
   | 'guide.profPages.sourceTrainerFree'
