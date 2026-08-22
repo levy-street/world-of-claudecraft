@@ -871,9 +871,11 @@ describe('the save round trip through a real Sim', () => {
       'bed_thornpeak_5',
       'bed_thornpeak_6',
     ]);
-    // The crop allowlist is a save-key roster too. The crop-ladder phase
-    // shipped the full eight-crop catalog (D11 ids, tier order), so the
-    // roster pins all eight; a dropped or renamed id is a destroyed save row.
+    // The crop allowlist is a save-key roster too, and the SAME destroy-on-load
+    // rule applies: the crop-ladder phase shipped eight (D11 ids, tier order)
+    // and Phase 11e widened the upper tiers to four each, so the roster pins
+    // all twelve. A dropped or renamed id is a destroyed save row, which is
+    // exactly why this is a literal list and not a count.
     expect([...FARM_CROP_IDS]).toEqual([
       'vale_wheat',
       'brook_carrot',
@@ -881,8 +883,12 @@ describe('the save round trip through a real Sim', () => {
       'bog_beet',
       'highland_barley',
       'frost_gourd',
+      'thornpeak_cabbage',
+      'frost_lentils',
       'gilded_sunmelon',
       'evergarden_greens',
+      'gilded_yam',
+      'evergarden_pumpkin',
     ]);
   });
 
