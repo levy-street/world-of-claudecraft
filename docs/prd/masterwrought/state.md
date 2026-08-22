@@ -9331,3 +9331,25 @@ tree. It predates this phase and is farming's own fine-twin question (already
 on the OPEN list as "fine_marsh_rice / fine_highland_barley dish consumers"),
 so the R18 displacement arm scopes to the base herb line and says why. Widening
 it would red on inherited state and teach the next reader to loosen it.
+
+### Validation, as run
+
+- `npx tsc --noEmit` clean throughout.
+- `npm run ci:changed` clean on the touched files (warnings only, no errors).
+- FULL SUITE at tip e848afe738: **vitest's own EXIT=0**, 3032 files passed / 12
+  skipped, 43237 passed / 2 expected-fail / 115 skipped, 911s. Tip stamped
+  IDENTICAL at both ends and DIRTY 0 at both ends. The file delta against the
+  post-sync baseline (3028 passed) is exactly +4, the phase's four new suites,
+  so nothing left the suite while this ran.
+- The FIRST full run, before the tail was fixed, is recorded above: 19 failures
+  across 13 files, none in the phase file's curated battery.
+
+Two acceptance lines closed after that run, in their own commit:
+- The item-level question is ASSERTED rather than assumed. The rung climb moved
+  itemLevelBudget 20 to 25 on four rows, and the new arm proves that moves no
+  budget pin: every farm output carries NO slot, so itemLevel() is undefined
+  for all fourteen, with a non-vacuity probe on an item that IS eligible.
+- Nothing is owed in src/ui/world_entity_i18n.ts, stated rather than left
+  blank: that module indexes mobs, NPCs, quests, zones and dungeons, never
+  items, and this phase places no entity. Item names live in the items catalog,
+  where the six landed with their M16 fills.

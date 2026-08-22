@@ -39,6 +39,7 @@ import { FARM_DROP_RUNG_FLOOR, FARM_RECIPES, LADDER_RECIPES } from '../src/sim/c
 // content but never joined into the merged table would be unreachable in play,
 // and this suite would still pass reading content directly.
 import { ALL_RECIPES, ITEMS } from '../src/sim/data';
+import { itemLevel } from '../src/sim/item_level';
 import { stationsOfType } from '../src/sim/professions/stations';
 import { resolveTrain } from '../src/sim/professions/training';
 import { Sim } from '../src/sim/sim';
@@ -355,6 +356,27 @@ describe('FARM_RECIPES: the farm-economy hook set', () => {
       (r) => r.professionId === 'cooking' || r.professionId === 'alchemy',
     );
     expect(consumableEndgame.length, 'produce must feed a consumable endgame bill').toBe(6);
+  });
+
+  it('no farm output is item-level ELIGIBLE, so the scaffolding climb moves no budget pin', () => {
+    // The rung climb raised itemLevelBudget from 20 to 25 on four rows, and
+    // itemLevelBudget is an input to the item-level system. This asserts the
+    // reason that is harmless rather than assuming it: item level is only
+    // defined for equippable combat gear, every farm output is a kind 'food'
+    // or kind 'junk' item with NO slot, so itemLevel() is undefined for all of
+    // them and no budget pin anywhere can read the moved number. If a farm row
+    // ever outputs something slotted, this reds and the climb has to be
+    // re-checked against tests/item_level.test.ts.
+    for (const row of FARM_RECIPES) {
+      const def = ITEMS[row.resultItemId];
+      expect(def, `${row.id}: output ${row.resultItemId}`).toBeDefined();
+      expect(def.slot, `${row.resultItemId} must carry no equip slot`).toBeUndefined();
+      expect(itemLevel(def), `${row.resultItemId} must not be item-level eligible`).toBeUndefined();
+    }
+    // Non-vacuity: itemLevel really does answer for something, so the sweep
+    // above is not passing because the function returns undefined for all
+    // input.
+    expect(itemLevel(ITEMS.thorium_warblade), 'the probe item IS eligible').toBeGreaterThan(0);
   });
 
   it('output quality is one value per band and never falls as the ladder climbs', () => {
