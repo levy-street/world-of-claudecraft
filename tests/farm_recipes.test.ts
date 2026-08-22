@@ -332,6 +332,12 @@ describe('FARM_RECIPES: the farm-economy hook set', () => {
     );
     // Predicted then observed at the climb: the six flipped farm rows, plus the
     // one shipped hoe rung that already consumed a fine twin at 75.
+    // PHASE 11g ADDS THE EIGHTH, recipe_seasoned_stock, and it is the most
+    // load-bearing member of the list even though it arrived last: every other
+    // consumable row here is one of farming's OWN dishes, so before it the
+    // census could be read as farming buying from itself at the endgame. The
+    // stock is a shipped cooking intermediate that farming did not write, and
+    // the whole cooking apex flows through it.
     expect(endgameBills.map((r) => r.id).sort()).toEqual(
       [
         'recipe_evergarden_braised_greens',
@@ -341,12 +347,13 @@ describe('FARM_RECIPES: the farm-economy hook set', () => {
         'recipe_highwatch_barley_porridge',
         'recipe_highwatch_gourd_soup',
         'recipe_osmium_hoe',
+        'recipe_seasoned_stock',
       ].sort(),
     );
     expect(
       endgameBills,
       "farming's endgame-bill count for the masterwrought R20 census",
-    ).toHaveLength(7);
+    ).toHaveLength(8);
     // The claim masterwrought R20 actually cares about, stated separately from the literal
     // above so a future re-tier that moves WHICH rows qualify still has to keep
     // the property true: produce reaches a CONSUMABLE endgame bill, not only a
@@ -355,7 +362,17 @@ describe('FARM_RECIPES: the farm-economy hook set', () => {
     const consumableEndgame = endgameBills.filter(
       (r) => r.professionId === 'cooking' || r.professionId === 'alchemy',
     );
-    expect(consumableEndgame.length, 'produce must feed a consumable endgame bill').toBe(6);
+    expect(consumableEndgame.length, 'produce must feed a consumable endgame bill').toBe(7);
+    // AND THE CLAUSE PHASE 11g MAKES CHECKABLE, kept separate for the same
+    // reason the one above is: a consumable endgame bill that is not one of
+    // farming's own dishes. Satisfying masterwrought R20 entirely out of
+    // FARM_RECIPES would mean farming feeds only itself at 75 and above, which
+    // is the self-referential reading the supply line exists to end.
+    const farmOwnIds = new Set(FARM_RECIPES.map((r) => r.id));
+    expect(
+      consumableEndgame.filter((r) => !farmOwnIds.has(r.id)).map((r) => r.id),
+      'produce must reach an endgame consumable bill farming did not write',
+    ).toEqual(['recipe_seasoned_stock']);
   });
 
   it('no farm output is item-level ELIGIBLE, so the scaffolding climb moves no budget pin', () => {

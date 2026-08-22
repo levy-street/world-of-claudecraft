@@ -66,6 +66,30 @@ const CATALYST_ID = 'recipe_quickening_catalyst';
  *  hoe ladder. Never an id list. */
 const isGatheringToolRecipe = (resultItemId: string): boolean => resultItemId.endsWith('_hoe');
 
+/** THE SECOND CARVE-OUT, added by Phase 11g and scoped exactly like the first:
+ *  a CONSUMABLE-profession intermediate is not a gear intermediate.
+ *
+ *  WHY IT IS NEEDED RATHER THAN A HOLE IN masterwrought R17. R17 fences produce
+ *  out of the GEAR chain, and INTERMEDIATE_RECIPES is a MIXED table: nine of
+ *  its ten rows feed gear (billet, plating, cording, bolt, setting, chassis,
+ *  lucent reagent, sablewax vellum, and the pacing gate), and one is
+ *  recipe_seasoned_stock, a cooking intermediate whose output is a food reagent
+ *  that every apex DISH flows through. Sweeping the whole table treated that
+ *  cooking row as gear, so the sweep was broader than the rule it enforces.
+ *  Phase 11g's masterwrought DECISION C puts marsh_rice and bog_beet in that
+ *  bill, which is R17-COMPLIANT by R17's own text: produce feeds the consumable
+ *  professions.
+ *
+ *  THE PACING GATE IS DELIBERATELY EXCLUDED FROM THE CARVE-OUT, and this is the
+ *  load-bearing half. recipe_quickening_catalyst carries professionId 'alchemy',
+ *  so a bare consumable predicate would exempt the one row masterwrought R17
+ *  most exists to protect: the gate that paces the whole packet. It keeps its
+ *  own dedicated arm above, and it stays inside this sweep too, so the
+ *  protection is not resting on a single assertion. */
+const isConsumableIntermediate = (recipe: { id: string; professionId: string }): boolean =>
+  (recipe.professionId === 'cooking' || recipe.professionId === 'alchemy') &&
+  recipe.id !== CATALYST_ID;
+
 describe('masterwrought R17: the provisioner firewall', () => {
   it('sweeps a non-empty farm family and a non-empty recipe table', () => {
     // The vacuity floor for every arm below. Both sides are derived, so a
@@ -140,6 +164,7 @@ describe('masterwrought R17: the provisioner firewall', () => {
     expect(gearRecipes.length, 'the gear-chain sweep must be non-empty').toBeGreaterThan(20);
     for (const recipe of gearRecipes) {
       if (isGatheringToolRecipe(recipe.resultItemId)) continue;
+      if (isConsumableIntermediate(recipe)) continue;
       for (const reagent of recipe.reagents) {
         expect(
           FARM_ITEM_IDS.has(reagent.itemId),
@@ -147,6 +172,51 @@ describe('masterwrought R17: the provisioner firewall', () => {
         ).toBe(false);
       }
     }
+    // THE PACING GATE IS STILL SWEPT HERE, stated as its own assertion rather
+    // than left to be inferred from the predicate: recipe_quickening_catalyst
+    // is professionId 'alchemy', so if the carve-out above ever loses its
+    // CATALYST_ID clause this arm stops covering it and only the dedicated
+    // catalyst arm remains. Proving the gate survives BOTH carve-outs is what
+    // keeps the second one from quietly becoming the hole it is not.
+    const sweptIds = gearRecipes
+      .filter((r) => !isGatheringToolRecipe(r.resultItemId) && !isConsumableIntermediate(r))
+      .map((r) => r.id);
+    expect(sweptIds, 'the pacing gate must stay inside the gear sweep').toContain(CATALYST_ID);
+  });
+
+  it('the consumable-intermediate carve-out is REAL and stays scoped to slotless food reagents', () => {
+    // The same three-part proof the hoe carve-out carries, because a carve-out
+    // nobody tests is prose. (1) It is load-bearing: a recipe really does ride
+    // it today. (2) It never reaches an equippable, which is the whole reason
+    // masterwrought R17 does not count a food reagent as gear. (3) It never
+    // covers the pacing gate.
+    const carved = INTERMEDIATE_RECIPES.filter((r) => isConsumableIntermediate(r));
+    expect(
+      carved.map((r) => r.id),
+      'the consumable intermediates',
+    ).toEqual(['recipe_seasoned_stock']);
+    const riding = carved.filter((r) => r.reagents.some((g) => FARM_ITEM_IDS.has(g.itemId)));
+    expect(
+      riding.map((r) => r.id),
+      'the carve-out must be load-bearing, not a standing exemption over nothing',
+    ).toEqual(['recipe_seasoned_stock']);
+    for (const recipe of carved) {
+      expect(
+        ITEMS[recipe.resultItemId]?.slot,
+        `${recipe.resultItemId} must have no equip slot`,
+      ).toBeUndefined();
+    }
+    expect(
+      carved.map((r) => r.id),
+      'the pacing gate must never ride the consumable carve-out',
+    ).not.toContain(CATALYST_ID);
+    // And the gate really is consumable-professioned, which is the fact that
+    // makes the exclusion above necessary rather than decorative. If this ever
+    // flips, the CATALYST_ID clause can be retired instead of left standing.
+    expect(
+      ALL_RECIPES.find((r) => r.id === CATALYST_ID)?.professionId,
+      'the pacing gate is alchemy, which is why the carve-out excludes it by id',
+    ).toBe('alchemy');
   });
 
   it('the hoe carve-out is REAL and stays scoped to gathering tools', () => {

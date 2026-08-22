@@ -416,9 +416,17 @@ describe('REFERENTIAL INTEGRITY', () => {
         { itemId: 'thorium_ore', count: 2 },
         { itemId: 'quickening_catalyst', count: 1 },
       ],
+      // THE ONE INTERMEDIATE THAT IS NOT A GEAR INTERMEDIATE, and Phase 11g's
+      // choke point (masterwrought DECISION C). The two tier-2 vegetables enter
+      // at the salt's count of 2, one below the meat count of 3, so the bill
+      // reads meat, then vegetables, then salt. Recomputed from the merged
+      // ALL_RECIPES rather than patched to match: input 98 to 130 against an
+      // output of 30, so the row stays gold-negative and widens.
       recipe_seasoned_stock: [
         { itemId: 'prime_cut', count: 1 },
         { itemId: 'game_meat', count: 3 },
+        { itemId: 'marsh_rice', count: 2 },
+        { itemId: 'bog_beet', count: 2 },
         { itemId: 'cooking_salt', count: 2 },
         { itemId: 'quickening_catalyst', count: 1 },
       ],

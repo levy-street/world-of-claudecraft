@@ -1097,6 +1097,10 @@ describe('rare-quality signing composes with multi-copy outputs (#1149 regressio
     placeAtStationFor(sim, pid, recipe.id);
     grantItem(sim, 'pristine_venom_gland', 1, pid);
     grantItem(sim, 'venom_gland', 2, pid);
+    // The provisioning supply line (Phase 11g) put a tier-3 farm base on this
+    // bill. A hand-granted reagent list does not self-heal, so the grant moves
+    // with the recipe or the craft refuses on a missing reagent.
+    grantItem(sim, 'frost_gourd', 1, pid);
     grantItem(sim, 'sunpetal_herb', 1, pid);
     grantItem(sim, 'glass_vial', 1, pid);
 

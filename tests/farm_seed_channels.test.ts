@@ -209,17 +209,24 @@ describe('THE IDENTITY GUARD: farming never becomes conditional on raiding', () 
     const alchemyWithFarm = ALL_RECIPES.filter(
       (r) => r.professionId === 'alchemy' && r.reagents.some((g) => farmIds.has(g.itemId)),
     );
-    // THIS FILTER MATCHES ZERO RECIPES TODAY, measured at the 11f QA and stated
-    // rather than left for a reader to discover: farming's only alchemy row is
-    // the growth tonic, which takes silverleaf and a vial and no farm output.
-    // So the loop below is a FORWARD guard on the day produce joins an alchemy
-    // bill, not a live check, and the herb sweep ABOVE is what carries
-    // masterwrought R18 today. Pinned at zero so the day it stops being zero
-    // this arm has to be re-read rather than quietly becoming load-bearing.
+    // THE FORWARD GUARD IS NOW LIVE, and this is the re-read the 11f QA asked
+    // for when it pinned this filter at zero. That zero was correct at the time
+    // and its own message said what to do the day it stopped being zero: give
+    // the loop a real non-vacuity floor. Phase 11g is the phase that made it
+    // live, putting produce into three shipped alchemy bills at rungs 0, 25 and
+    // 50 (recipe_elixir_of_the_boar, recipe_venomfire_elixir,
+    // recipe_elixir_of_the_serpent).
+    //
+    // THE FLOOR IS THREE, not "greater than zero", and the count is the point:
+    // a floor of one would survive the mutation that matters, which is a later
+    // phase quietly walking two of the three rungs back and leaving the elixir
+    // line half-supplied while this arm stayed green. The rung coverage itself
+    // is pinned in tests/provisioning_supply_line.test.ts; this floor is what
+    // stops the loop below from running over an empty set.
     expect(
       alchemyWithFarm.length,
-      'if this is no longer zero, this loop became a live check and needs a floor',
-    ).toBe(0);
+      'the alchemy line must keep at least one produce-consuming row per leveling rung',
+    ).toBeGreaterThanOrEqual(3);
     for (const recipe of alchemyWithFarm) {
       expect(
         recipe.reagents.some((g) => herbSet.has(g.itemId)),
