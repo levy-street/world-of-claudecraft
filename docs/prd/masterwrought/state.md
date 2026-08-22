@@ -8407,8 +8407,14 @@ tool_effect_tooltip, professions_farming, architecture: 275 tests), and because
 the change ADDS COMMENTS to two sim files, two hazard classes were checked
 directly rather than assumed: every suite that reads those files as SOURCE TEXT
 (guide, honor, pr_shot_targets, reliquary_state, farming_anti_chore: 300 tests)
-and the monolith line-count ratchet, since comments are lines. All green. A
-final confirming full run at the settled tip closes the gap properly.
+and the monolith line-count ratchet, since comments are lines. All green.
+
+THE CONFIRMING RUN THEN RAN AND IS GREEN, at tip 415f45a6ad: 3016 files passed,
+42953 tests passed, 2 expected-fail, EXIT=0, the same figures as the first. Only
+docs-only commits followed it (this file), verified with `git diff
+415f45a6ad..HEAD --stat`, so the full suite covers the phase's entire executable
+state rather than a tip three commits behind it. Two full green runs at two
+different tips, each stamped with the tree it ran on.
 
 OTHER GATES: tsc --noEmit clean; npm run ci:changed EXIT 0 with zero errors and
 zero format diffs (the 2937 warnings are the repo's pre-existing, non-gating
