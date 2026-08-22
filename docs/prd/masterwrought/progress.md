@@ -31,7 +31,7 @@
 | 11d | Derived artifacts, pins, and the merge audit | complete | 2026-08-21 | 2026-08-21 |
 | 11d QA | verify | complete | 2026-08-21 | 2026-08-21 |
 | 11e | A true skill, farming's mastery curve and crop roster | complete | 2026-08-21 | 2026-08-21 |
-| 11e QA | verify | pending | | |
+| 11e QA | verify | complete | 2026-08-21 | 2026-08-21 |
 | 11f | Farming joins the drop economy | pending | | |
 | 11f QA | verify | pending | | |
 | 11g | The provisioning supply line, leveling tier | pending | | |
@@ -766,6 +766,45 @@ is deliberately not copied here, it lives in the farming record.
   by execution, PROPOSED rather than patched, with its 16 findings held as a
   baseline the rest of the phase measured against.
   Full record: state.md, "Phase 11e ledger". LOCAL, never pushed.
+- Phase 11e QA (2026-08-21): THE EVIDENCE AUDITED, verdict
+  PASS-WITH-FOLLOWUPS. Sixteen findings, all applied; nothing re-opened a
+  decision. The BRANCH-BASELINE RITUAL 11e recommended was adopted and paid at
+  once: a full suite at the base commit before anything was touched came back
+  EXIT=0 with NO inherited reds, so every later red self-classified.
+  THE HEADLINE CLAIM WAS REBUILT, not read: working from state.md alone with no
+  source file open, the calendar model reproduced every load-bearing figure
+  exactly, including both curves' day columns, the 34 percent front, the family
+  search admitting only head 0.25, both rejected shapes, the envelope floor and
+  the exactness measurements to the last digit. The curve is derived and the doc
+  is sufficient to re-derive it. But the model FALSIFIED ITS OWN STATED INPUT
+  (the reference farmer's "longest shipped duration is 10.5 hours" became 10.75
+  when this same phase added evergarden_pumpkin), and nothing asserted the
+  premise even though the helper's header claimed a pin that did not exist.
+  Both fixed, the pin now real.
+  ONE BLOCKING DEFECT: three guide prose keys were reworded in English and their
+  already-filled non-Latin translations were left stale, so FIVE locales were
+  still telling players that no counter sells the Highwatch or Evergarden seeds,
+  the exact falsehood GATE 1 discharged. Fifteen rows. Nothing could have caught
+  it (the guide suite renders English only, the release tier fails on pending
+  rather than stale rows, and the staleness registry is untracked); two
+  independent reviewers found it, which is the argument for the fan-out.
+  A TEST THAT COULD NOT FAIL, found by mutation rather than by reading: the
+  parity farming arm had been changed to derive its expectation from the
+  function under test, so mutating the tail gain left it fully green at 22
+  passed. Combined with a composition arm whose comment claimed more than its
+  body asserted, the composition that makes tier 3 and 4 crops teach to 100 was
+  pinned only by a regenerable golden. Closed with literals and re-proved.
+  ELEVEN MUTATIONS RUN, ten killed and one deliberate survivor that WAS the
+  finding, each asserting a clean tree, proving the edit applied, proving the
+  tests ran, and verifying the revert. That also discharges 11e's own
+  "EVERY new arm was mutation-proved" claim, which had carried no evidence.
+  Also: the rollback deploy note had a THIRD id-gated arm in the function it
+  already cited; the FOURTH release sync (fd705304ee, 20 commits, 79 files) went
+  in with every monolith count landing on its prediction, hud.ts deliberately
+  keeping this branch's lower pin rather than the release's; and the eastbrook
+  polish seals needed a third consecutive re-mint, now recorded as the standing
+  shape of any sync touching renderer.ts rather than a surprise.
+  Full record: state.md, "Phase 11e QA ledger". LOCAL, never pushed.
 - Phase 11d QA (2026-08-21): THE EVIDENCE AUDITED, verdict
   PASS-WITH-FOLLOWUPS. STEP 0 took a SECOND release sync (5eade5c02e, release
   tip 35a6481825 eleven commits past the tip 11d synced), predicted before it

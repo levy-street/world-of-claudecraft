@@ -8511,3 +8511,270 @@ absorbed farming packet's own seven deeds are missing 126 rows across the same
 than opening a new one, and the whole farming deed family is best filled in one
 pass. Recorded here so Phase 17 sizes it correctly instead of discovering the
 other 126 mid-fill.
+
+## Phase 11e QA ledger (2026-08-21, the evidence audited)
+
+VERDICT: PASS-WITH-FOLLOWUPS. The phase's headline claim holds under an
+independent rebuild, every ruling shipped as recorded, and eleven mutations
+prove the pins. One BLOCKING defect was found and fixed, plus fifteen smaller
+ones. Nothing was found that re-opens a decision.
+
+### The branch-baseline ritual, adopted, and it paid immediately
+
+FULL SUITE AT THE BASE COMMIT BEFORE ANYTHING WAS TOUCHED, which is the ritual
+11e recommended and did not have: db0821635f, EXIT=0, 3016 files passed, 42953
+passed, 2 expected-fail, 115 skipped, 419.07s. **inherited reds at branch: NONE.**
+That single run is what let every later red self-classify, and one did: the fix
+round's own new pin is the only thing that ever went red on this branch.
+
+### STEP 0: the FOURTH release sync, and the largest
+
+origin/release/v0.40.0 moved to fd705304ee (PR #3531, shader-memory probes),
+TWENTY commits and 79 files past 11e's sync, +8973/-648. Merge e9d61604ab.
+- INERTNESS VERIFIED BY DIFF, not assumed: ZERO files under src/sim/, ZERO under
+  src/ui/i18n.catalog/, ZERO parity goldens, and no pnpm-lock.yaml or patches/
+  movement. So the census content classes could not move, no golden could
+  conflict, and release-merge-gate-surprises #1 (reinstall) and #5 (lockfile
+  fingerprint remint) did not apply. All four predicted before the merge ran.
+- SEVEN CONFLICTS, all predicted. The census after the merge is RESULT PASS with
+  contentIds 3074 and contentIdRows 3101, both unmoved exactly as predicted, and
+  the release-parent column auto-derived to FOUR refs.
+- THE MONOLITH RATCHET was the hazard with teeth, because both parents edited
+  its table. Every merged count landed on its prediction:
+    hud.ts      base 19476, ours 19235, theirs 19476 (untouched), merged 19235.
+                KEPT ours. Taking the release's row would have granted 241 lines
+                of free slack on a file the release never touched.
+    renderer.ts base 13546, ours +30, theirs +2, merged 13578. RE-PINNED to the
+                exact merged count with both parent pins named at the row, per
+                the MONOLITHS header rule 11d QA added. The growth is INHERITED:
+                no upstream code was extracted to buy it back and no ceiling was
+                raised for headroom.
+    dungeon.ts  the release's NEW row arrives at 2882 and the merged file
+                measures 2882, so it is taken as-is.
+  Every other row is untouched by the release and keeps this branch's pin.
+- THE EASTBROOK POLISH SEALS were the unpredicted six. This is the THIRD
+  consecutive sync where BOTH parents re-minted them since their common base, so
+  the merged renderer.ts is a third content and either parent's literal would
+  have pinned a tree that never existed. Re-minted from the merged working tree
+  with the repo's own remint_polish_provenance.mjs and committed with exactly
+  the bytes it read. RECORDED AS A STANDING PATTERN: any sync touching
+  renderer.ts reproduces it, so budget the re-mint rather than rediscovering it.
+- POST-SYNC FULL SUITE GREEN at e9d61604ab: EXIT=0, 3024 files, 43148 tests.
+- golden_composition FAIL at exactly its recorded 16-finding baseline, same two
+  leaf paths (loot.items x8, loot.items.length x8). No seventeenth. The tool gap
+  stands as PROPOSED, unpatched, per the 11e record.
+- ci:changed EXIT 0, zero errors, zero format diffs; tsc --noEmit clean.
+
+### The headline claim, REBUILT rather than read
+
+The calendar model was rebuilt from state.md ALONE, with no source file open,
+and every load-bearing figure reproduced EXACTLY: per-band beds 4/9/11/14 and
+attempts 8/18/22/28; the old curve 3.40/2.90/11.86/46.67, total 64.83, 1575
+harvests, 9.7 percent front; the shipped curve 13.55/11.60/18.97/29.87, total
+74.00, 1500 harvests, 34.0 percent front; the halving family admitting exactly
+head 0.25 in the 70-to-75 window (1 -> 18.51, 0.5 -> 37.01, 0.25 -> 74.00,
+0.125 -> 147.99); both rejected shapes (flat 0.0625 -> 111.30 days / 69.5
+percent, quartering off 0.5 -> 175.81 / 10.5 percent); the envelope floor 32.79
+days; and the exactness measurements on the retired literals to the last digit
+(0.1 x250 from 50 -> 74.99999999999957, the old ladder ending 99.9999999999946,
+the shipped ladder landing exactly 100). **The curve is derived, and the doc is
+sufficient to re-derive it.** That was the deliverable and it holds.
+
+Three things around it did not, all fixed:
+1. THE MODEL FALSIFIED ITS OWN STATED INPUT. The reference-farmer paragraph says
+   "the longest shipped duration is 10.5 hours". It is 10.75: this phase added
+   evergarden_pumpkin at 645 minutes, after the model section was drafted at
+   STEP 0. The assumption survives (a twelve-hour gap clears 10.75) but the
+   margin is 1.25 hours, not 1.5.
+2. AND NOTHING ASSERTED IT. The model helper's header claimed the premise was
+   "asserted separately by the derivation test against the real durationMs
+   literals" and no such assertion existed, which is exactly why the drift was
+   invisible. The assertion now exists with both literals.
+3. THREE CELLS of the per-band reader column were wrong, found by executing the
+   helper and diffing its output against the doc: band 1 read 0.922 / 7.38 and
+   band 2 read 17.24, against the helper's 0.9242 / 7.3940 and 17.2463. The
+   helper uses a bed-weighted ARITHMETIC mean; the wrong cells are what a
+   HARMONIC reading gives, so the table mixed two derivations without naming
+   either. Nothing pins that column (meanSurvival and grantsPerDay have no
+   consumer outside the helper), which is why a doc-only figure could drift.
+
+### THE ONE BLOCKING DEFECT: five locales published the falsehood GATE 1 removed
+
+Three hand-authored guide prose keys were reworded in English in this phase, and
+all three were already FILLED in the five non-Latin overlays. The reword sweep
+that correctly caught the Maker's Charm line and the two farmer greetings missed
+these. FIFTEEN rows, and they were not cosmetic:
+- ja_JP bedsBody read "HighwatchとEvergardenの種はどこの店にもありません", and
+  ru_RU "семена Highwatch и Evergarden не продает ни один прилавок": no counter
+  anywhere sells the upper-tier seeds. That is precisely the dormancy GATE 1
+  discharged, and it sent a Japanese, Chinese, Korean or Russian player to the
+  World Market instead of to Hollis and Verbena.
+- tableBody and farmingSown still deferred the top dishes, the feast and
+  Harvestmaster to "a later patch" and never named Every Furrow Filled.
+NOTHING COULD HAVE CAUGHT IT, which is the part worth carrying: tests/guide.test.ts
+renders and asserts ENGLISH html only; the release-tier gate hard-fails on
+`pending` rows and these rows are `translated`, merely wrong; and
+i18n.status.json's enHash/srcHash staleness registry is UNTRACKED, so no gate
+reads it. Two independent reviewers found it, which is the argument for the
+fan-out. Fixed surgically (only the sentences whose fact moved), bundles
+regenerated rather than hand-edited, and the result proved by grep in both the
+overlay and the resolved bundle. The Latin overlays owe nothing: they never
+carried these keys and resolve to English through pending.ts.
+
+### THE ROLLBACK NOTE HAD A THIRD ARM, in the function it already cited
+
+11e's deploy note ends "So the two arms above are the whole exposure". There are
+three: restoreDeedStats has TWO id-gated loops, and the note named only the
+visited one. The itemsDiscovered loop gates on ITEMS[id] a single line above, so
+a pre-11e realm drops all twelve new item ids and the next autosave writes the
+reduced set back. Smaller than the farmPlots arm (up to twelve entries off the
+col_discovery meter, nothing earned revoked) and the only self-healing one
+(seedItemDiscovery re-credits on every join what the character still holds), so
+it ranks below the other two rather than beside them. Corrected with its size
+and its healing arm stated. The blob figure was also a guess: "roughly 370
+bytes" is measured at 312, and the full per-farmer delta including the third arm
+is about 562.
+
+### THE TEST THAT COULD NOT FAIL, found by mutation rather than by reading
+
+tests/parity/coverage_c.test.ts's farming arm was changed in this phase from
+`toBeCloseTo(75.02, 10)` to `toBe(75 + farmingHarvestGainAt(75, 3))`, with a
+commit message saying it now reads the gain instead of restating it. Production
+grants THROUGH farmingHarvestGainAt, so both sides moved together. PROVED BY
+EXECUTION: mutating the tail gain 0.03125 -> 0.0625 left that suite fully green,
+22 passed, EXIT 0. And the composition arm's comment had always claimed tier 3
+and 4 crops teach to 100 while its body stopped at tier 2, so the composition
+that makes the upper tiers teach at all was pinned ONLY by a regenerable golden.
+Five literals close it, and the same mutation now reds seven arms.
+
+### The mutation battery: ELEVEN run, ten killed, one deliberate survivor
+
+Every run asserted a CLEAN TREE first (so the revert is unambiguous), proved the
+edit APPLIED (a non-empty diff, or a green would be a false pass on an edit that
+never landed), proved the tests RAN (a nonzero Tests summary), ran a whole named
+FILE rather than `vitest -t` (which is a regex and silently selects nothing on a
+stray paren), and verified the tree clean again afterwards.
+
+| mutation | verdict |
+|---|---|
+| a gain literal | KILLED, 7 reds incl. the derivation search |
+| a crop tier | KILLED, 3 reds incl. the 11h GATE B composition arm |
+| a tier-3 seed buyValue | KILLED, the derived-formula arm |
+| FARM_EFFECT_BONUS_PICK_CAP | KILLED, incl. "the cap bites" |
+| drop a seed vendor row | KILLED, the end-to-end BUY walk AND the inverted honesty arm |
+| make the grant read elapsed time | KILLED, "THE DECISIVE PIN ... never elapsed time" |
+| a second schedule read in a command body | KILLED, the structural companion |
+| unregister the farm_crop namespace | KILLED, the save/load round trip |
+| delete the per-crop mark WRITER | KILLED, the writer arm |
+| the tail gain, BEFORE the fix | **SURVIVED**, and that was the finding |
+| the tail gain, AFTER the fix | KILLED |
+| drop a hoe recipe's fine twin | KILLED, only because the list is now derived |
+| a near-duplicate same-family accent | KILLED, and the old distinctness arm passes it |
+
+So every arm 11e claimed mutation-proved IS decisive, verified by execution
+rather than by its own prose. That also discharges the "EVERY new arm was
+mutation-proved" claim in progress.md, which had no recorded evidence behind it.
+
+### The six rulings against what shipped
+
+| ruling | settled | shipped | |
+|---|---|---|---|
+| 11e-D-A calendar target | 70 to 75 days, boundaries FROZEN | 74.00 days derived, 25/50/75/100 byte-identical, ceiling pin green unedited | MET |
+| 11e-D-B roster scale | +4 crops, 12 ids, one tier-3 LEAF, no repeated class | 2/2/4/4, twelve ids, cabbage the tier-3 leaf, no tier repeats | MET |
+| 11e-D-C charm cap | +1 in FARMING's own mapping, never the catalog | FARM_EFFECT_BONUS_PICK_CAP = 1; TOOL_EFFECTS.makers_charm.bonus unchanged at 2 | MET |
+| 11e-D-D seed pricing | 32 / 64 on all eight upper seeds | 32 / 64, derived per row as sell x 4 x 2 plus four literal spot-checks | MET |
+| 11e-D-E the deed | collection, renown 5, no title, namespace registered | col_farm_roster exactly so, registered, round trip pinned WITH a control | MET |
+| 11e-D-F R-number citations | "masterwrought R<n>" in full, docs/design/ in scope | swept all five scopes | MET, see below |
+
+DECISION F, swept properly and PASSING. The phase's added lines carry three
+citations that LOOK bare (one "fishing R19", two "R22"). Each was traced to its
+authoring commit and each is an ancestor of origin/release/v0.40.0, so all three
+are legitimate references to the SHIPPED professions-tuning series rather than
+bare packet numbers. Verified rather than assumed, which matters because this is
+exactly the ambiguity the ruling exists to prevent. Zero em dashes, zero en
+dashes and zero emoji in the whole phase diff AND its commit messages; every
+commit carries a body; no session-link trailers; decisions-index.md untouched.
+
+### Determinism and the downstream sweep, both verified independently
+
+ZERO rng or clock lines added or removed in farming.ts, and the only two `+`
+lines mentioning ctx.rng anywhere under src/sim in the whole phase diff are
+COMMENT lines documenting the draw contract. The phase added no draws.
+
+state.md claims "Nothing else in the deed catalog reads farming proficiency
+below 100". VERIFIED rather than trusted: the only deed naming farming is
+prog_farming_100 at 100; the only sub-100 generic gathering trigger is the
+`amount: 1` prog_first_harvest the phase already accounted for; Master Gatherer
+is at 100. The two non-deed readers (farm_ready's login notice and the plant
+gate) are threshold-free, reading current skill. So the slower curve strands
+nothing.
+
+### The sixteen findings, all applied
+
+BLOCKING (1): the fifteen stale non-Latin guide rows.
+SHOULD-FIX (8): the rollback note's third arm; the unfalsifiable coverage_c
+farming pin plus the unasserted top band; the anti-chore export arm that filtered
+ten exports down to two while claiming to be "over the export surface"; the
+missing reference-farmer premise pin; the ITEM_ART_PENDING dormancy premise
+(false when written, doubly false after GATE 1) and its mirror in the test; the
+seed-back rationale GATE 1 falsified; the guide guard leaving bedsBody, the one
+section that went stale, unanchored; the hand-written hoe-twin list.
+NIT (7): the mean-survival column; three stale deed counts; the release art
+audit count and enumeration; two stale crop counts; the seed-pricing test still
+TITLED with the pre-GATE-1 contract; the restoreDeedStats comment overstating
+what it bounds; the never-stocked arm's false justification; the redundant
+ceiling assertion; the tautological partition; deeds.md missing the rule-2
+exception col_farm_roster takes.
+
+CUT, with reasons, not carried as future-PR items:
+- The three render-perf SHOULD-FIX items (a prewarm home for the farm crop and
+  feast variants, the shared depth material outside the settle census, the
+  orphaned FarmPatchVisuals.dispose) are all on code OUTSIDE this phase's diff:
+  two are pre-existing branch farm-render work and one is the release's own new
+  module. Fixing them is a real render change needing its own measurement, and
+  the reviewer rates the practical impact low (zero texture uploads on all
+  sixteen farm GLBs; the dispose orphan is symmetry hygiene because the graphics
+  rebuild drops the GL context anyway). CUT from this QA, and they belong to
+  Phase 16's polish scope where the renderer work already lives.
+- The farming_asset_manifest selection gap (the suite is unreachable from a
+  JSON-only edit) is a gate-selection change, which is gate-integrity territory
+  and not this phase's to make mid-QA. CUT and named here.
+- F16, the deed arm trading an explicit id-set for a derivation plus a count:
+  CONSIDERED AND KEPT. The derivation is the stronger direction (a future tier-3
+  crop is covered without being listed), the count is a real floor, and the ids
+  are pinned in two other suites.
+
+### Two maintainer decisions that stay OPEN, unchanged by this audit
+
+Neither is mine to take and neither was taken:
+1. Whether prog_first_harvest taking a farming-first character FOUR crops
+   instead of one is accepted as shipped, or gets a bootstrap deed later. Rule 9
+   forbids editing the trigger, so the only lever is a new deed.
+2. Whether golden_composition gets the release-parent model symbol_census
+   already builds. The tool now exits 1 for the rest of this branch's life, and
+   every remaining phase takes a sync, so every sync touching a golden
+   reproduces it.
+
+### What Phase 11f inherits, exactly
+
+- ROSTER IDS: thornpeak_cabbage, frost_lentils (tier 3), gilded_yam,
+  evergarden_pumpkin (tier 4), each with its _seed and fine_ twin.
+- SEED PRICES: 32 at tier 3, 64 at tier 4, on all eight upper rows.
+- GAIN CURVE: 0.25 / 0.125 / 0.0625 / 0.03125, boundaries 25/50/75/100 FROZEN.
+- DURATIONS: 250 and 260 minutes at tier 3, 615 and 645 at tier 4, and the
+  reference farmer now has 1.25 hours of margin rather than 1.5, so a crop
+  longer than twelve hours breaks the model outright and reds the new pin.
+- 11g still owes the re-derivation of WHICH recipe_economy literal moves.
+- 36 release-fill rows for the deed, joining an existing 126-row farming backlog.
+- Phase 16's renderer payback target moved 13546 -> 13548 (the sync raised
+  upstream's own row by 2, and paying that back is not this packet's debt).
+
+### The ritual this QA adds for 11f onward
+
+11e's ledger asks for a base-commit suite run, and this session did it. Add the
+second half: **a sync that touches src/render/renderer.ts re-mints the eastbrook
+polish seals, and that has now happened three consecutive times.** It is not a
+surprise any more, it is the shape. Budget the re-mint in the sync step, run the
+repo's own tool against the MERGED working tree, and never take either parent's
+literal, because the merged file is a third content and both parents' seals
+describe trees that no longer exist.

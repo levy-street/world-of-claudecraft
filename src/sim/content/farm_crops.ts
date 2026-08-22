@@ -155,6 +155,16 @@ const GILDED_YAM_DURATION_MS = 36_900_000;
 // and above the tier minimum. It is the longest crop on the ladder, which suits
 // the capstone plate's gourd, and per the header the far end never rots, so the
 // overshoot past a single evening is pure slack rather than an alarm clock.
+//
+// IT IS ALSO THE CALENDAR MODEL'S BINDING CONSTRAINT, recorded here at the 11e
+// QA because nothing said so and the model silently depends on it. The
+// reference farmer (masterwrought DECISION A) checks in twice a day, so every
+// per-band attempts figure assumes each crop is ready inside a twelve-hour gap.
+// At 10.75 hours this row leaves 1.25 hours of margin, and it is the row that
+// sets it: a future crop longer than twelve hours would halve the attempts the
+// model credits for its band without changing a single gain literal. The
+// premise is pinned in tests/professions_farming.test.ts ("holds the reference
+// farmer's premise"), so a crop that eats the margin reds rather than drifting.
 const EVERGARDEN_PUMPKIN_DURATION_MS = 38_700_000;
 
 const FARM_CROP_ROWS: readonly FarmCropDef[] = [
