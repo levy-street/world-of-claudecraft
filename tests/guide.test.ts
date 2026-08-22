@@ -2130,7 +2130,7 @@ describe('Guide professions gathering accuracy', () => {
     // clauses that exist ONLY in the corrected prose, one per fact 11f moved:
     // the recipes left the trainer, and they are bought with Marks instead.
     expect(html).toContain('no longer taught at any counter');
-    expect(html).toContain('Heroic Marks');
+    expect(html).toContain('bought with Heroic Marks');
     // The same rule for farm.bedsBody's 11f half. Its 11e anchors below are
     // tied to the farmers; these two are tied to the channels 11f ADDED, which
     // nothing else on the page would keep honest if the sentence reverted.

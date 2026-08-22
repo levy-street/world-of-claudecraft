@@ -1,4 +1,4 @@
-// Masterwrought apex pattern CHANNELS (Phase 11, R8): the referential contract
+// Masterwrought apex pattern CHANNELS (Phase 11, masterwrought R8): the referential contract
 // in the recipe-to-channel direction, plus the no-fourth-channel sweep.
 //
 // tests/apex_pattern_items.test.ts pins the channel-to-content direction (the
@@ -212,7 +212,7 @@ describe('the hosting surfaces are live content', () => {
       .map((dungeon) => dungeon.id);
     expect(hosts).toEqual(['nythraxis_boss_arena']);
     // The raid pillar, not a five-man: the ten-player format is what makes
-    // this channel the chase pillar R8 assigns the gear patterns to.
+    // this channel the chase pillar masterwrought R8 assigns the gear patterns to.
     expect(DUNGEONS.nythraxis_boss_arena.suggestedPlayers).toBe(10);
   });
 
@@ -273,14 +273,14 @@ describe('the hosting surfaces are live content', () => {
   });
 });
 
-describe('the no-fourth-channel sweep (R8: three pillars, no fourth)', () => {
+describe('the no-fourth-channel sweep (masterwrought R8: three pillars, no fourth)', () => {
   it('no other mob loot table carries a pattern id (the raid group is the sole loot host)', () => {
     // Non-vacuity floors near the real counts, so a refactor that emptied the
     // walked surface cannot leave the sweep green over nothing.
     const mobIds = Object.keys(MOBS);
     expect(mobIds.length).toBeGreaterThanOrEqual(230);
     let entriesWalked = 0;
-    let sanctioned = 0;
+    const sanctionedByGroup = new Map<string, number>();
     const leaks: string[] = [];
     for (const mobId of mobIds) {
       for (const entry of MOBS[mobId].loot ?? []) {
@@ -293,7 +293,7 @@ describe('the no-fourth-channel sweep (R8: three pillars, no fourth)', () => {
           entry.rollGroup !== undefined &&
           SANCTIONED_MOB_LOOT_GROUPS.has(entry.rollGroup)
         ) {
-          sanctioned++;
+          sanctionedByGroup.set(entry.rollGroup, (sanctionedByGroup.get(entry.rollGroup) ?? 0) + 1);
           continue;
         }
         if (isPatternId(entry.itemId)) leaks.push(`MOBS.${mobId}: ${entry.itemId}`);
@@ -304,8 +304,11 @@ describe('the no-fourth-channel sweep (R8: three pillars, no fourth)', () => {
     // The skip is not a hole, the same arm its heroic sibling below carries:
     // both sanctioned groups must really be on the table, or this sweep would
     // be exempting a channel that has already left and would go quietly
-    // vacuous. Ten apex gear patterns plus the five farming rows.
-    expect(sanctioned, 'both sanctioned raid groups must really be present').toBe(15);
+    // vacuous. PER GROUP, not a total: a single sum of 15 is satisfied by
+    // fifteen apex rows and zero farm rows, which is the exact state the arm
+    // exists to catch.
+    expect(sanctionedByGroup.get(RAID_GROUP), 'the apex gear group').toBe(10);
+    expect(sanctionedByGroup.get(FARM_RAID_GROUP), 'the farming raid group').toBe(5);
   });
 
   it('no HEROIC_BOSS_LOOT table carries a pattern id outside the sanctioned farm group', () => {

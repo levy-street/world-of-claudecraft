@@ -213,9 +213,9 @@ describe('THE IDENTITY GUARD: farming never becomes conditional on raiding', () 
     // rather than left for a reader to discover: farming's only alchemy row is
     // the growth tonic, which takes silverleaf and a vial and no farm output.
     // So the loop below is a FORWARD guard on the day produce joins an alchemy
-    // bill, not a live check, and the herb sweep ABOVE is what carries masterwrought
-    // R18 today. Pinned at zero so the day it stops being zero this arm has to
-    // be re-read rather than quietly becoming load-bearing unnoticed.
+    // bill, not a live check, and the herb sweep ABOVE is what carries
+    // masterwrought R18 today. Pinned at zero so the day it stops being zero
+    // this arm has to be re-read rather than quietly becoming load-bearing.
     expect(
       alchemyWithFarm.length,
       'if this is no longer zero, this loop became a live check and needs a floor',

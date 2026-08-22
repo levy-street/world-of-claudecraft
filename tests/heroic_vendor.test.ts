@@ -46,7 +46,7 @@ function errorTexts(sim: AnySim): string[] {
 
 describe('heroic vendor stock: item-level and budget pins', () => {
   // Masterwrought phase 04 re-cut this pin deliberately: the stock gained the
-  // wyrmfall_core material row (the ruling R8 catch-up valve), so the
+  // wyrmfall_core material row (the masterwrought R8 catch-up valve), so the
   // gear-shape assertions now run over the stock MINUS that row, and the
   // material row gets its own pins below. Phase 11 re-cut it again: the eight
   // APEX_CONSUMABLE pattern rows joined (kind 'recipe', excluded from the
@@ -111,7 +111,7 @@ describe('heroic vendor stock: item-level and budget pins', () => {
     expect(sim.countItem(HEROIC_MARK_ITEM_ID, pid)).toBe(1);
   });
 
-  // Masterwrought phase 11 (ruling R8's deterministic pillar): the eight
+  // Masterwrought phase 11 (masterwrought R8's deterministic pillar): the eight
   // APEX_CONSUMABLE patterns are SOLD here for Heroic Marks, day one. The
   // vendor is the valve: patterns are tradable, so duplicates are purchasable
   // BY DESIGN and the vendor price is the market ceiling; the six skill-100

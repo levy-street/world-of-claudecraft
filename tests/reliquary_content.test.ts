@@ -841,12 +841,20 @@ describe('Reliquary heroic gear pins against HEROIC_BOSS_LOOT', () => {
    *  calls). The verdict itself is unchanged and is both packets': a pattern
    *  is a teaching item spent to learn, the catalog records what a player
    *  HOLDS, so it takes no page. */
-  function catalogueableHeroicIds(entries: (typeof HEROIC_BOSS_LOOT)[string]): string[] {
+  function catalogueableHeroicIds(
+    entries: (typeof HEROIC_BOSS_LOOT)[string],
+    opts?: { includeCarvedOut?: boolean },
+  ): string[] {
+    // The includeCarvedOut arm exists ONLY for the vacuity guard below, and it
+    // is a FLAG on this one walk rather than a second walk beside it, exactly
+    // as dungeonRarePlusLootIds does it: a future fourth pre-filter added here
+    // is then covered by the guard automatically, with no twin to update.
+    const include = opts?.includeCarvedOut === true;
     const liveIds: string[] = [];
     for (const e of entries) {
       if (typeof e.itemId !== 'string') continue;
       if (isMountReinsId(e.itemId) || isHeroicVariantId(e.itemId)) continue;
-      if (isReliquaryCarvedOut(e.itemId)) continue;
+      if (!include && isReliquaryCarvedOut(e.itemId)) continue;
       liveIds.push(e.itemId);
     }
     return [...new Set(liveIds)].sort();
@@ -862,10 +870,8 @@ describe('Reliquary heroic gear pins against HEROIC_BOSS_LOOT', () => {
     for (const bossId of Object.keys(HEROIC_PAGE_BY_BOSS)) {
       const entries = HEROIC_BOSS_LOOT[bossId] ?? [];
       const kept = new Set(catalogueableHeroicIds(entries));
-      for (const e of entries) {
-        if (typeof e.itemId !== 'string') continue;
-        if (isMountReinsId(e.itemId) || isHeroicVariantId(e.itemId)) continue;
-        if (!kept.has(e.itemId)) removed.add(e.itemId);
+      for (const id of catalogueableHeroicIds(entries, { includeCarvedOut: true })) {
+        if (!kept.has(id)) removed.add(id);
       }
     }
     // The two rung-75 farming patterns masterwrought Phase 11f appended, and

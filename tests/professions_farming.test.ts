@@ -2343,8 +2343,14 @@ describe('harvestCrop TIER 1/2: two draws (golden roll, golden bonus) on every o
     expect(withered).toHaveLength(1);
     expect(withered[0].cropId).toBe('retired_crop');
     expect(withered[0].count).toBe(FARM_WITHERED_HUSK_COUNT);
-    // The defensive arm spends the bonus draw and never reads it either.
+    // The defensive arm spends the bonus draw and never reads it either. BOTH
+    // bands, the seed one included: it is the 96% arm, so it is the likelier
+    // payout of a grant hoisted out of the golden branch, and asserting only
+    // the pattern band would miss the common case.
     for (const id of FARM_GOLDEN_BONUS_PATTERN_IDS) {
+      expect(h.sim.countItem(id, h.pid), `${id} on the retired-crop arm`).toBe(0);
+    }
+    for (const id of farmSeedIdsOfTier(farmGoldenBonusSeedTier(1))) {
       expect(h.sim.countItem(id, h.pid), `${id} on the retired-crop arm`).toBe(0);
     }
     const loots = eventsOf(h.sim, from, 'loot');
