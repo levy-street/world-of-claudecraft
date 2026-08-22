@@ -7759,3 +7759,265 @@ hoisting it to a named boolean would have blinded the census to farmReady.
   and the rift-payload and craftDaily-clamp terms already carried.
 - Shard coverage headroom is 18 files at the QA close tip. Re-measure it, do not
   cite it.
+
+## Phase 11e ledger (2026-08-21, farming's mastery curve and crop roster)
+
+Predictions in this block are written BEFORE the literals they predict, in
+their own commit, per the ordering rule the 11d QA made binding (11d ledger,
+record correction 11).
+
+### STEP 0: the THIRD release sync (chance-only, and the first with a release
+### golden move)
+
+origin/release/v0.40.0 moved to 2df374a074 (PR #3533, one squashed content
+commit dropping normal-mob green and blue loot to classic-era rates). Merge
+e3efdd1ad1, golden re-record 255e97898f. BOTH merge-audit tools were run GREEN
+at the pre-merge tip 906c7dab8d first, so any later failure is provably this
+phase's, and every prediction below was written to disk before the merge ran.
+
+- BLAST RADIUS, verified by diff --stat before predicting: 7 files. FOUR content
+  files, not the three the phase brief named: temple.ts is touched too
+  (drowned_votary's tidehymn_slippers 0.1 to 0.02). Plus a new suite
+  tests/loot_quality_rates.test.ts and the two goldens. Every content hunk is a
+  numeric `chance` leaf; no content id is added or removed.
+- CONFLICTS, predicted and observed exactly: only the two goldens, because both
+  parents had re-recorded the same nextId/state/events triples. The loot-array
+  removals AUTO-MERGED, so the conflict was narrower than the file diff looked:
+  6 hunks in mob_lifecycle, 2 in targeting_markers, all digest triples. All four
+  content files auto-merged, and the branch's own zone3 renames (Broodsworn
+  Zealot, Broodsworn Necromancer, Wintergnaw) survived intact.
+- THE MERGE IS PROVABLY EXACT, not merely conflict-free: the change lines the
+  merge added on the branch side are BYTE-IDENTICAL to the release's own content
+  delta (diff of the two normalized change-line sets is empty). Nothing was
+  dropped from either side.
+- THE RE-RECORD. The resolution kept ours' triples over theirs' auto-merged loot
+  arrays, which is merge output and not a state the merged sim produces, so both
+  files were knowingly stale at the merge commit and the parity suite reds on
+  exactly those two and no others (2 failed, 217 passed). A third would have
+  been a STOP. UPDATE_PARITY=1 over parity_g with DATABASE_URL confirmed absent
+  from the environment moved exactly 2 files and 8 lines, every one a `state`
+  digest; nextId, events, rng.draws and drawDigest are byte-identical to ours,
+  because a lowered chance still consumes its roll and only fails. Each new
+  digest is a THIRD value: frame 1 is ours 02653ede, theirs d0ec8a93, merged
+  654ac30b.
+- CENSUS after the sync: predicted cell for cell and observed cell for cell,
+  every class inert (tests/ is outside EXPORT_ROOTS, so the new suite is
+  invisible to it, and the content diff moves no id). The release-parent column
+  grew to THREE, auto-derived off the first-parent chain: f50b30de29,
+  2df374a074 (via e3efdd1ad1), 35a6481825 (via 5eade5c02e).
+    exports        17329 / 16921 / 17221,17234,17234 / union 17595 / merged 17596 / missing 0 / extra 6 explained
+    contentIds     2958 / 2913 / 2810,2810,2810 / union 3061 / merged 3061 / 0 / 0
+    contentIdRows  2973 / 2935 / 2824,2824,2824 / union 3084 / merged 3084 / 0 / 0
+    i18nKeys       18008 / 17984 / 17866,17866,17866 / union 18161 / merged 18158 / missing 0
+    simEventUnion  152 / 159 / 152,152,152 / union 159 / merged 159
+    simEventEmits  145 / 152 / 145,145,145 / union 152 / merged 152
+  RESULT PASS. Files scanned merged 2965, unchanged.
+- REGEN AND CEILINGS, all predicted and observed: i18n:gen, wiki:content and
+  sfx:manifest ZERO DIFF; monolith_budget green (no ceiling moved, and the
+  release touches no file that has one); world_api_parity and architecture
+  green; tsc clean. wiki:content was predicted zero-diff from the SOURCE rather
+  than assumed: the mob loop in scripts/wiki/build_content.mjs emits
+  name/level/rare/model/tint and never reads `m.loot`.
+- THE RELEASE'S NEW SUITE is green over the MERGED table (363 tests). Predicted
+  green on measured grounds: the branch adds no MobTemplate and no `loot:` table
+  anywhere under src/sim/content/, and changes no existing item's `quality`
+  (zero `- quality:` lines in the branch diff). Its retuned-drop list pins mob
+  IDs, which the branch renamed only by display name.
+
+### golden_composition has no release-parent model: a TOOL GAP, recorded not patched
+
+COMPOSITION: FAIL, 16 findings, exit 1. This was PREDICTED, and it is not a
+defect in the tree. All three benign-reading conditions were checked leaf by
+leaf rather than assumed, and all three hold:
+1. The flagged leaf paths are ONLY `loot.items` (8) and `loot.items.length`
+   (8), the 8 frames milepost_boots left. Nothing else is flagged.
+2. Per the tool's own table both files compose everywhere else: draws b/o/t/m
+   equal (20/20/20/20 and 5/5/5/5), drawDigest ours==merged (eacecc62,
+   763c21d0), nextId0 967/967/971/971, the same uniform +4 the whole table
+   shows. The `state/events moved` column is one EVERY row carries.
+3. FINDINGS blocks: exactly two.
+
+ATTRIBUTION, proved by execution rather than argument. milepost_boots
+occurrences in mob_lifecycle.json: ours d5304a78c4 SIX, theirs 8cd964d599 SIX,
+release 2df374a074 ZERO, merged ZERO. The merged golden follows the RELEASE
+parent on a leaf where BOTH modelled parents agree on the other value. The
+tool's header prints three refs and no release ref, so "base 2, ours 2,
+theirs 2, merged 1" is a correct verdict from an incomplete model.
+
+WHY THIS IS NOT A ONE-OFF, and the PROPOSAL. The census got its release-parent
+model at 11d QA; goldens never did. The finding is baked into the committed
+goldens, so golden_composition now exits 1 for the rest of this branch's life,
+and every remaining phase (11f to 11k) takes its own release sync, so any sync
+touching a golden reproduces it. The deliverable is to give golden_composition
+the same auto-derived release-parent set symbol_census already builds
+(deriveSyncRefs off the first-parent merge chain) and to treat a leaf that
+matches a release parent as composing. PROPOSED to the maintainer, deliberately
+NOT edited in this phase and deliberately NOT filtered at the call site.
+
+INTERIM DISCIPLINE for the rest of 11e, so the tool keeps its value unedited:
+the 16 findings above are the recorded post-sync BASELINE. Any finding beyond
+these 16, or any change to their leaf paths, is this phase's and is a red.
+
+### The census cost of a new content id, MEASURED at STEP 0
+
+Measured rather than discovered later, by authoring one throwaway crop-shaped
+unit (3 items.ts rows plus 1 farm_crops.ts row) and running the census:
+- contentIds     merged 3061 to 3064, EXTRA 3, keyed by the BARE id. Three, not
+  four, because the farm_crops row's id is the produce item's id.
+- contentIdRows  merged 3084 to 3088, EXTRA 4, keyed `file:id`. Four, because
+  the farm_crops.ts row is its own key even though the id collides.
+So ONE crop costs contentIds +3 and contentIdRows +4.
+
+THE OBLIGATION THIS EXPOSES, which no phase plan states. Both classes reported
+the new ids as EXTRA **unexplained** and the census exited 1. Explained-extras
+rows are keyed by CLASS plus NAME, so each crop needs 3 contentIds rows plus 4
+contentIdRows rows, in the EXPLAINED_EXTRAS constant in
+scripts/merge_audit/symbol_census.mjs AND mirrored in the "Explained extras"
+table of merge-deletion-list.md. This is the FIRST phase to add a content id
+since the absorb, which is why EXPLAINED_EXTRAS carries only `exports` rows
+today. Budget: 4 crops = 28 rows, plus 2 for the roster deed, 30 in all, in two
+places each. The throwaway was reverted and the census re-verified PASS before
+any authoring began.
+
+### The farming calendar model (masterwrought R19; the METHOD is the deliverable)
+
+R19 forbids tuning a gathering curve from feel, so FARMING_GAIN_SCHEDULE's four
+gain literals are the OUTPUT of this model rather than an input to it. The model
+is executable at tests/helpers/farming_calendar_model.ts and re-derived by
+tests/professions_farming.test.ts, but it is recorded here in full so a later
+reader can move DECISION A's span and re-derive the curve WITHOUT opening a
+source file.
+
+INPUTS, each with the symbol it was read from. Nothing here is a number typed
+from a doc.
+| Input | Value | Read from |
+|---|---|---|
+| band width, four bands | 25, at 25/50/75/100 | `FARMING_GAIN_SCHEDULE[].belowProficiency` |
+| crop plant gate | `(tier - 1) * 25` | `farmCropSkillThreshold` (farm_crops.ts) |
+| teaching ceiling by tier | t1 50, t2 75, t3 and t4 100 | `farmingTeachingCeilingFor`, which indexes the schedule's OWN boundary column at `min(tier, rows - 1)` |
+| beds per hub | Eastbrook 4, Mirefen 5, Thornpeak 6, Evergarden 8; 23 total | `FARM_PATCHES[].beds.length` |
+| survival ramp | 0.85 at the crop's own gate, linear to 1.0 one full band above | `farmSurvivalChance`, `FARM_SURVIVAL_AT_GATE`, `FARM_SURVIVAL_BAND_SPAN` |
+| withered pays no skill | so survival multiplies the grant rate directly | `harvestCrop`'s failure arm |
+| grants accumulate by plain float addition, no rounding | | `applyGrantClamped` (gathering.ts) |
+
+THE REFERENCE FARMER, the model's ONE assumption and DECISION A's subject
+(settled 2026-08-20): two check-ins a day, far enough apart that any crop of the
+tier is ready between them (the longest shipped duration is 10.5 hours, so both
+gaps of a morning-and-evening rhythm clear it), planting every TEACHING bed
+available in the band, meaning the union of the hubs whose crop tier still
+teaches at that skill. A SECOND assumption is stated rather than hidden, because
+plantCrop gate 12 enforces it: the farmer's HOE keeps pace with the tier they
+plant. The hoe ladder is engineering-gated (farming D10), so a farmer whose hoe
+lags plants a lower tier and the band runs longer. The hoe is not free.
+
+THE ARITHMETIC, so a reader can redo it by hand. At skill s the farmer gets
+G(s) = visits x SUM over worked beds of survival(that bed's tier, s) successful
+harvests a day. One grant advances skill by `gain`, so one step costs 1/G(s)
+days and a band costs the SUM over its steps of 1/G(s_i) with s_i = from +
+i*gain. That is the exact expectation, not a mean-survival approximation:
+averaging survival first and dividing once UNDERSTATES the cost, because 1/E[p]
+sits below E[1/p]. The mean-survival column below is reported for the reader,
+never used to compute the days column.
+
+PER-BAND TABLE (reference farmer; the bed and tier columns are curve-independent)
+| band | teaching tiers | hubs | beds | attempts/day | mean survival | grants/day |
+|---|---|---|---|---|---|---|
+| 0 to 25 | 1 | Eastbrook | 4 | 8 | 0.922 | 7.38 |
+| 25 to 50 | 1, 2 | Eastbrook + Mirefen | 9 | 18 | 0.958 | 17.24 |
+| 50 to 75 | 2, 3 | Mirefen + Thornpeak | 11 | 22 | 0.959 | 21.10 |
+| 75 to 100 | 3, 4 | Thornpeak + Evergarden | 14 | 28 | 0.957 | 26.80 |
+
+THE OLD CURVE, run through the same model, because it is the EVIDENCE for the
+re-tune rather than a claim about it:
+| band | gain | harvests | days |
+|---|---|---|---|
+| 0 to 25 | 1 | 25 | 3.40 |
+| 25 to 50 | 0.5 | 50 | 2.90 |
+| 50 to 75 | 0.1 | 250 | 11.86 |
+| 75 to 100 | 0.02 | 1250 | 46.67 |
+| TOTAL | | 1575 | 64.83 |
+First fifty points: 6.30 days, NINE POINT SEVEN PERCENT of the calendar. That is
+the defect. The total was never the problem.
+
+THE SHIPPED CURVE, the model's output:
+| band | gain | harvests | days |
+|---|---|---|---|
+| 0 to 25 | 0.25 | 100 | 13.55 |
+| 25 to 50 | 0.125 | 200 | 11.60 |
+| 50 to 75 | 0.0625 | 400 | 18.97 |
+| 75 to 100 | 0.03125 | 800 | 29.87 |
+| TOTAL | | 1500 | 74.00 |
+First fifty points: 25.16 days, THIRTY-FOUR PERCENT of the calendar. Total
+harvests move 1575 to 1500: the ladder is not lengthened, it is STRAIGHTENED.
+Band 2 reads slightly FASTER in days than band 1 because the second hub more
+than doubles the bed count; that is a reward for progress, while the harvest
+ladder itself is strictly doubling (100 / 200 / 400 / 800).
+
+HOW THE FOUR LITERALS ARE FORCED, in three steps, each measured:
+1. EXACTNESS. A gain that is not a short dyadic rational drifts under plain
+   float addition. MEASURED on the retired literals: 0.1 accumulated 250 times
+   from 50 lands on 74.99999999999957 and charges a 251st harvest; 0.02
+   accumulated 1250 times from 75 charges a 1251st; the full old ladder ends at
+   99.9999999999946, never 100. Every new gain is a negative power of two and
+   every band lands on its boundary EXACTLY, proven with strict equality.
+2. SHAPE. A strict halving ladder spends a scale-INDEPENDENT 34.0 percent of the
+   calendar on the first fifty points, whatever the head gain is. The old curve
+   halved once and then took fifths, which is exactly why its front was 9.7
+   percent. Two non-halving dyadic alternatives were measured and rejected for
+   the record: flat 0.0625 gives 111.30 days with a 69.5 percent front
+   (front-heavy, the opposite defect), and a quartering ladder off 0.5 gives
+   175.81 days with a 10.5 percent front (the shipped curve's defect at twice
+   the length).
+3. SCALE. With the shape fixed, halving the head DOUBLES the calendar, so the
+   family is monotonic: head 1 gives 18.51 days, 0.5 gives 37.01, 0.25 gives
+   74.00, 0.125 gives 147.99. Exactly ONE member lands inside DECISION A's
+   settled window of about ten weeks (70 to 75 days). The curve is derived, not
+   chosen, and the derivation test SEARCHES the family rather than asserting the
+   answer.
+
+THE ENVELOPE FLOOR, recorded because DECISION A fixes one. At maximum dedication
+(all 23 beds, same two visits, growing the best-surviving teaching tier in every
+bed since there is no bed-tier gate) the same 1500 harvests take 32.79 days,
+about 4.7 weeks. That is a BOUND to state, never a target to design against; a
+player who returns as often as the timers allow compresses it further. The
+phase file's estimate of "about 34 days" came from a max-dedication farmer who
+does not optimise the planted tier; the derived 32.79 is the true floor and
+supersedes it.
+
+THE BOUNDARY COLUMN IS NOT TUNING. farmingTeachingCeilingFor reads
+FARMING_GAIN_SCHEDULE[min(tier, length - 1)].belowProficiency, so moving a
+boundary, adding a row or removing one silently re-maps tier to ceiling and
+changes when a crop grays out for every farmer alive. Only the gain column
+moved, and the two columns are now pinned SEPARATELY so a future tune can only
+move the half it meant to.
+
+### Phase 11e prediction table (written BEFORE the literals, per the 11d QA rule)
+
+Every literal read at the source in this session, at the post-sync tip
+255e97898f, with the file it was read from. OBSERVED columns are appended as
+each unit lands, never pasted alongside.
+
+| Pin | File | Current | Predicted | Why it moves |
+|---|---|---|---|---|
+| FARMING_GAIN_SCHEDULE gain column | src/sim/professions/farming.ts | 1 / 0.5 / 0.1 / 0.02 | 0.25 / 0.125 / 0.0625 / 0.03125 | the calendar model's output (DECISION A) |
+| FARMING_GAIN_SCHEDULE boundary column | same | 25 / 50 / 75 / 100 | UNCHANGED | it is the teaching-ceiling source; DECISION A freezes it |
+| FARMING_GAIN_SCHEDULE row count | same | 4 | UNCHANGED | a row change re-maps tier to ceiling |
+| tier-ceiling derivation arm | tests/professions_farming.test.ts | green | GREEN, UNEDITED | the acceptance criterion; it must survive the tune untouched |
+| ITEM_ART_PENDING size | src/ui/icons.ts | 44 | 56 | 12 new item ids (4 crops x seed + produce + fine twin) |
+| DEED_ORDER length | tests/deeds_content.test.ts:92 | 286 | 287 | the roster deed (DECISION E) |
+| total renown | tests/deeds_content.test.ts:93 | 3270 | 3275 | renown 5, the shipped gathering first-rung point |
+| deed i18n manifest | tests/deed_i18n.test.ts:69 | 286 * 2 + 45 = 617 | 287 * 2 + 45 = 619 | one deed, name plus description |
+| census contentIds (merged) | scripts/merge_audit/symbol_census.mjs | 3061 | 3074 | 12 crop ids + 1 deed id, MEASURED at 3 per crop |
+| census contentIdRows (merged) | same | 3084 | 3101 | 4 per crop + 1 deed row, MEASURED |
+| EXPLAINED_EXTRAS rows | same + merge-deletion-list.md | 6 (all `exports`) | 36 | 30 new content rows, in both places |
+| farming_session golden | tests/parity/golden/farming_session.json | - | ONLY the sampled farming proficiency moves, by the new gain; draws and drawDigest UNCHANGED | the phase adds zero draws |
+| every other golden | tests/parity/golden/ | - | UNMOVED | nothing here shifts entity-id allocation or the rng stream; a second mover is a STOP |
+| IWorld parity totals | tests/world_api_parity.test.ts | 11d's re-derived totals | UNMOVED | no facet member is added |
+| command schema / delta keys | tests/snapshots.test.ts | - | UNMOVED | no new command, no new delta |
+| SimEvent union / emits | census | 159 / 152 | UNMOVED | no SimEvent is added |
+| monolith ceilings | tests/monolith_budget.test.ts | hud.ts 19235, server/game.ts 10761, server/db.ts 4865 | ALL UNMOVED | this phase adds content rows and data, never coordinator lines |
+
+STOPPING CONDITIONS RESTATED as the phase runs: a derived span materially under
+a month re-opens DECISION A rather than shipping; a golden other than
+farming_session moving is a STOP, not a re-record; a monolith ceiling needing a
+raise is a STOP; any deliverable appearing to need an rng draw is a STOP.
