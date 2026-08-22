@@ -8312,3 +8312,32 @@ TWO FINDINGS DECLINED, with reasons:
   tier-4 seed they cannot plant. Left as is: vendor_row_gates.ts is scoped by
   its own banner to land TOOLS, and tier 1 and 2 seeds have always shipped this
   way, so an advisory here would be a new convention rather than consistency.
+
+### A DEPLOY NOTE this phase creates (raised by the migration review)
+
+Phase 11e adds four crop ids to the load-side allowlist and one namespace to the
+mark allowlist, and BOTH are id-gated on load. That makes a rollback across this
+change destructive rather than merely lossy, in two places, and each re-saves
+the loss:
+- a pre-11e realm loading a character saved by an 11e realm DROPS every
+  farmPlots row naming thornpeak_cabbage, frost_lentils, gilded_yam or
+  evergarden_pumpkin, because normalizeFarmPlots gates on that build's
+  validCropIds;
+- the same load DROPS every farm_crop:* visited mark, because the namespace is
+  unregistered there.
+In both cases the next autosave writes the reduced blob back, so the loss is
+PERMANENT, not transient.
+
+What survives, checked rather than assumed: bags (no known-item filter on the
+inventory load path) and deedsEarned (loaded verbatim, with recomputeRenown
+hasOwn-guarding unknown ids). So the two arms above are the whole exposure.
+
+THE NOTE: do not roll a realm back across this change with live farmers, and do
+not run a mixed fleet during the deploy. This is inherent to the id-allowlist
+model rather than a defect introduced here, which is exactly why it is worth
+writing down: the model makes every content-id addition a one-way door for the
+state that uses it, and nothing in the code says so at the deploy boundary.
+
+Blob growth from the marks themselves is bounded and small: a fully collected
+farmer gains twelve visited entries, roughly 370 bytes, catalog-bounded rather
+than per-action, far under CHARACTER_BLOB_WARN_BYTES.
