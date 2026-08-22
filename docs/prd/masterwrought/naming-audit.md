@@ -400,6 +400,13 @@ Vellum.
     under the bar in the audit body) rather than re-opening it: the word is the
     zone's own name and already ships on evergarden_greens in this same tier.
     Exact phrase zero-hit. In-repo: no "pumpkin" anywhere prior.
+  - **Every Furrow Filled** (the roster deed col_farm_roster's display name)
+    CLEAR: the IP rule lists a deed name in the same-change check set, so it is
+    registered here beside the crops rather than left implicit. Four plain
+    English words, no coined token and no borrowed compound; "furrow" is
+    ordinary agricultural vocabulary and the phrase is packet-original. Exact
+    phrase zero-hit; in-repo there is no other deed or title using "furrow".
+    The deed carries NO title reward, so nothing enters the title namespace.
   - REJECTED AT AUTHORING, recorded so they are not re-proposed:
     **Highwatch Cabbage** and any other new Highwatch crop, because Highwatch is
     BORDERLINE (maintainer) against TERA across nine shipped rows and a new name

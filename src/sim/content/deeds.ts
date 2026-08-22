@@ -3036,6 +3036,21 @@ export const DEEDS: Record<string, DeedDef> = {
   // thirteenth crop joins the collection by existing. That is deliberate: a
   // hand list would let a new crop ship outside the set silently, which is the
   // opposite of what a completion deed is for.
+  //
+  // RENOWN 5 VERSUS deeds.md RULE 2, recorded rather than passed over (raised
+  // by the Phase 11e content review). Rule 2 says ZERO Renown for "dynamic
+  // metas whose requirements grow with content", and this is the catalog's
+  // FIRST visits deed whose markIds are derived from a live table rather than
+  // hand-listed, so its requirement really does grow. masterwrought DECISION E
+  // ruled renown 5 explicitly (the shipped gathering first-rung point), and
+  // that ruling stands here rather than being re-decided in passing.
+  // Why the two can coexist: rule 2's stated reason is that "the account score
+  // must never be able to decrease on any content patch", and it cannot here.
+  // deedsEarned is sticky (src/sim/deeds.ts skips any id already earned) and
+  // character_deeds is insert-only, so a farmer who completes the roster keeps
+  // the 5 when a thirteenth crop ships; only an UNFINISHED collection widens.
+  // If a maintainer prefers the letter of the rule to its rationale, the change
+  // is renown 5 to 0 here plus the totals in tests/deeds_content.test.ts.
   col_farm_roster: {
     id: 'col_farm_roster',
     name: 'Every Furrow Filled',

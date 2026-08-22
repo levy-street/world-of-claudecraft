@@ -8093,7 +8093,17 @@ span the whole catalog so a future crop cannot slip past the rule by being
 absent from it. Durations were checked against the MERGED table before any row
 was written: each is inside its D5 band, distinct from all three siblings, and
 above the tier's pre-11e minimum (240 and 600), which is the load-bearing one.
-No new price point was invented anywhere.
+
+CORRECTION, raised by the content reviewer and accepted: the phase reported "no
+new price point anywhere" and that is FALSE of one column. Produce (15 and 40)
+and fine twins (30/120 and 80/320) do reuse their tier's exact shipped values,
+but the SEED buyValue does not: shipped tier 1 and 2 seeds run four times sell
+(1/4, 2/8) while every tier 3 and 4 seed now runs EIGHT times sell (4/32, 8/64).
+That multiplier is exactly DECISION D's authorised bootstrap premium and it is
+stated with its arithmetic at each row, so it is ratified rather than
+accidental, but the summary sentence was wrong and a maintainer signing off the
+economy should read the true statement: one column deviates from the shipped
+convention, deliberately, by a factor of two.
 
 DECISION C, THE CHARM OVERLAP, EXECUTED. FARM_EFFECT_BONUS_PICK_CAP = 1, in
 farming's own quantity-to-bonusPicks mapping beside FARM_TONIC_BONUS_PICKS, NOT
@@ -8221,3 +8231,84 @@ census cells landing on 3074 and 3101 is the evidence that twelve ids were
 authored and not thirteen or eleven, taken before anything was written. The
 misses are both places where the model of the change was incomplete, and both
 are now written down as budgets for the next phase rather than as apologies.
+
+### The review round (three fresh reviewers, every finding applied or recorded)
+
+The reviewers were dispatched at STEP 3, went idle without delivering, were
+concluded dead, and delivered LATE, after the phase had been called built. That
+timing is the finding worth keeping: the work had already been validated against
+a curated battery taken from the phase file's own list, and the reviewers found
+FOUR RED SUITES that battery never ran. A phase file's validation list is a
+starting point, not a coverage claim.
+
+FOUR REDS, all same-change obligations the roster created, all now fixed and
+green:
+1. src/render/farm_patches_core.ts carried no FARM_CROP_FAMILY and no
+   FARM_CROP_ACCENT row for the four new crops, so every one would have
+   rendered as identical grey fallback wheat. Both tables are documented
+   exhaustive over FARM_CROPS and their guard reddened exactly as deviation (au)
+   promised. This is the most serious of the four: it is player-visible and no
+   sim-side test could see it.
+2. tests/professions_blob_growth.test.ts's widest-crop-id tripwire threw in
+   eight tests, because evergarden_pumpkin is one character wider than
+   evergarden_greens and the fixture plants the widest id in all 23 beds.
+   Re-pointed and RE-MEASURED: 16,727 bytes against the recorded 16,704, exactly
+   the predicted +1 x 23. The tracking band (16544, 16864) did not move, and the
+   narrative is trued to the new figure.
+3. tests/farmer_npc_placement.test.ts still pinned both upper farmers at compost
+   only. It is the SPAWNED-ENTITY twin of the def-level table that WAS updated,
+   so the pair is only meaningful if both move together.
+4. tests/deeds_view.test.ts's fresh-character completion denominator, 273 to 274
+   and the bucket sum 277 to 278.
+
+THREE PLAYER-FACING STRINGS the faucet falsified, none of them guarded by any
+test, because tests/guide.test.ts regenerates and diffs content.generated.ts
+while these are hand-authored guide.* keys:
+- farm.bedsBody stated "no counter anywhere sells the Highwatch or Evergarden
+  seeds", the exact opposite of what GATE 1 shipped.
+- gatherDeeds.farmingSown and farm.tableBody both still deferred the upper
+  fields to "a later patch".
+- TEN filled non-Latin greeting rows still had both farmers selling compost
+  only, after their English greetings were reworded to "seed and compost". The
+  same reword-staleness sweep the charm line received, missed here.
+The guide's own dormancy guard required BOTH sections to carry the later-patch
+idiom; it is INVERTED rather than deleted, on the deed honesty arm's precedent,
+so it now fails if any section still discloses dormancy and asserts the
+replacement prose instead. It remains the only guard over hand-authored guide
+prose.
+
+ONE COVERAGE HOLE, named by the migration reviewer and closed: nothing pinned
+that the per-crop mark WRITER runs. The save/load trap hand-adds marks and
+proves the load half, the content pin proves the deed's markIds, so deleting the
+write left the entire farming and deeds suite green while making the roster deed
+permanently unearnable, the same failure class the trap exists for one layer up.
+Proven both ways: before the new arm the deletion was silent, after it exactly
+that arm reds.
+
+TWO RECORD CORRECTIONS accepted:
+- The phase reported "no new price point anywhere" and that is false of the seed
+  buyValue column (eight times sell, against the shipped four). Corrected at the
+  DECISION D entry above; the multiplier is DECISION D's authorised premium, so
+  it is ratified rather than accidental, but the summary was wrong.
+- The deed's display name was not registered in naming-audit.md, though the IP
+  rule lists deed names in the same-change check set. Registered.
+
+ONE TENSION RECORDED, NOT RE-DECIDED: col_farm_roster is the catalog's first
+`visits` deed with a DERIVED requirement set, and deeds.md rule 2 says zero
+Renown for "dynamic metas whose requirements grow with content". DECISION E
+ruled renown 5 explicitly, so the ruling stands. Rule 2's stated reason is that
+the account score can never decrease, and it cannot here: deedsEarned is sticky
+and character_deeds is insert-only, so a completed roster keeps its 5 when a
+thirteenth crop ships. The tension and the one-line change that would resolve it
+the other way are written on the deed row for the maintainer.
+
+TWO FINDINGS DECLINED, with reasons:
+- The per-crop mark is written inside the `zoneId !== undefined` guard, so a
+  bed that failed to resolve a zone would drop the crop mark too. Left as is:
+  the guard is documented impossible-today defense-in-depth, both marks come
+  from the same hook, and splitting them would add a second belief for a case
+  that cannot occur.
+- Seed vendor rows carry no proficiency advisory, so a skill-1 farmer can buy a
+  tier-4 seed they cannot plant. Left as is: vendor_row_gates.ts is scoped by
+  its own banner to land TOOLS, and tier 1 and 2 seeds have always shipped this
+  way, so an advisory here would be a new convention rather than consistency.
