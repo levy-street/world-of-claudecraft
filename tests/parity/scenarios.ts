@@ -5743,6 +5743,21 @@ export const FARM_TONIC_WINNER_YIELD_SEED = 4;
 // coverage suite's in-arm non-vacuity guard (tests/parity/coverage_c.test.ts).
 export const FARM_GOLDEN_WIN_YIELD_SEED = 7;
 
+/** How many real plant-plus-withered-harvest cycles walk the shared stream to
+ *  the probed golden winner. RE-PROBED at masterwrought Phase 11f, 28 -> 36,
+ *  because the golden BONUS draw made a harvest cost one more and so a padding
+ *  cycle four draws instead of three: the old count landed the golden beat on a
+ *  LOSING roll, which would have quietly retired this scenario's whole golden
+ *  arm and left the new bonus draw covered by no golden at all.
+ *
+ *  Named rather than inlined so the next appended draw re-probes ONE constant,
+ *  and so the coverage ledger can compose against the same number instead of
+ *  restating it. The probe method is the same one the comment inside the drive
+ *  describes: re-align a fresh Rng on the observed drive stream, then solve for
+ *  the padding count whose golden beat lands under GATHER_RARE_EVENT_CHANCE.
+ *  36 is the ONLY count in 0 to 40 that does. */
+export const FARM_GOLDEN_PADDING_CYCLES = 36;
+
 function professionsFarmingSession(seed = 1): Scenario {
   // The two northern beds of the Eastbrook allotments (content/farm_patches.ts
   // bed_eastbrook_1 at 16,30 and bed_eastbrook_2 at 21,30). Beds sit on a 5
@@ -5764,19 +5779,20 @@ function professionsFarmingSession(seed = 1): Scenario {
       'plant consumes the seed and starts the flavor cast (FARMING_CAST_ID)',
       'busy gate: the second plant waits out the first plant cast',
       'growth window: readyAtMs reached with ZERO rng draws and zero events',
-      'harvestCrop survived path: ONE draw at tier 1 (the golden roll, a recorded loss), produce granted from the stored yield seed',
-      'harvestCrop withered path: ONE draw at tier 1 (the golden roll, spent and ignored), withered husks paid instead of produce',
+      'harvestCrop survived path: TWO draws at tier 1 (the golden roll, a recorded loss, then the golden BONUS roll, spent and unread), produce granted from the stored yield seed',
+      'harvestCrop withered path: TWO draws at tier 1 (the golden roll and the golden bonus roll, both spent and ignored), withered husks paid instead of produce',
       'both harvests free their bed (farmPlots empty at the end)',
       'gathering grant drain: the queued farming proficiency lands on the next tick',
       'knobbed plant (compost + watch + tonic): payments consumed, still exactly two draws',
-      'toniced harvest on a probed WINNING yieldSeed: one draw (the golden roll; the tonic itself stays draw-free seed expansion), bonus picks at base grade',
+      'toniced harvest on a probed WINNING yieldSeed: two draws (the golden roll and its bonus; the tonic itself stays draw-free seed expansion), bonus picks at base grade',
       'convertHusks: the withered payout batch trades into compost, zero draws',
-      'tier-3 harvest (highland_barley at Thornpeak): EXACTLY two contiguous draws, the seed-back roll then the golden roll',
+      'tier-3 harvest (highland_barley at Thornpeak): EXACTLY three contiguous draws, the seed-back roll, then the golden roll, then the golden bonus roll',
       'ready-notice sweep (Phase 8): a plot left ready across the 1 Hz boundary emits ONE farmReady, zero draws',
       'notified flag: the noticed plot samples notified true in fplot before its closing harvest',
-      'padding cycles (Phase 11): real plant-plus-withered-harvest cycles walk the shared stream to the probed positions, exactly three draws each, no produce, no gains, no notices',
-      'golden-WIN harvest (Phase 11, (bw)): the tier-1 golden roll WINS at the searched position; the five-fold signed grants at both grades, the crop-source announce fanout, and the gather_event:golden_harvest mark reach the golden digest',
-      'tier-3 seed-back PAYING band (Phase 11, (bw)): the re-seated Thornpeak harvest pays exactly one highland_barley_seed (the one-seed band), upgrading the Phase 10 zero-band grant proof',
+      'padding cycles (Phase 11, re-probed at 11f): real plant-plus-withered-harvest cycles walk the shared stream to the probed positions, exactly four draws each, no produce, no gains, no notices',
+      'golden-WIN harvest (Phase 11, (bw), re-probed at 11f): the tier-1 golden roll WINS at the searched position; the five-fold signed grants at both grades, the crop-source announce fanout, and the gather_event:golden_harvest mark reach the golden digest',
+      'golden BONUS payout (Phase 11f): the win READS its bonus roll and grants exactly one extra item, an upward-drift tier-2 seed off a tier-1 crop, named on farmHarvested as goldenBonusItemId; this is the only beat in the suite that reaches the bonus arm',
+      'tier-3 seed-back PAYING band (Phase 11, (bw), re-seated again at 11f): the Thornpeak harvest lands in a paying band and really grants highland_barley_seed, upgrading the Phase 10 zero-band grant proof',
       'wellfed tick-phase mint (Phase 12, beat P; unified in 11c): a REAL consume completion through ticks (addItem + useItem + the full 18s sit-restore) mints the one well_fed aura at the updateRegen completion arm, zero draws',
       'shared feast loop (Phase 12): placeFeast spends the bag item and spawns the farm_feast entity on the normal roster; the placer bites the own feast (a charge spent at START) and rides the same completion to a last-eaten-wins refresh of the buff, zero draws',
       'feast expiry despawn (Phase 12): the draw-free expiresAtTick write plus the 1 Hz updateFarming sweep drop the entity and the FeastState together (the one despawn site)',
@@ -5955,18 +5971,21 @@ function professionsFarmingSession(seed = 1): Scenario {
       // .test.ts, transplanted to the scenario): the shared rng is
       // mulberry32, so every appended roll is a pure function of how many
       // draws precede it. Probed by sampling sim.rng right after the beat
-      // above: of the next values on the stream, index 86 (zero-based) is
-      // the first golden winner (0.003351 < 1/90), and index 92 is the
-      // first ONE-SEED band value past it (0.155753, in [0.08, 0.4)). The
+      // above. RE-PROBED at masterwrought Phase 11f (see
+      // FARM_GOLDEN_PADDING_CYCLES): the golden bonus draw made each cycle
+      // cost FOUR draws instead of three, so the old 28 landed the golden
+      // beat on a loser. At 36 cycles the golden beat's own roll is the
+      // winner at stream index 167 (0.004931 < 1/90). The
       // padding below is REAL play only (this scenario's charter: the real
       // command bodies, never bare rng draws): each cycle is a real plant
-      // (two draws) plus a real WITHERED harvest (one draw, spent and
+      // (two draws) plus a real WITHERED harvest (two draws, both spent and
       // ignored per the contract above), advancing the stream by exactly
-      // three while minting no CROP produce, no skill gains, no golden win,
+      // four while minting no CROP produce, no skill gains, no golden win,
       // and no farmReady (the plot is planted, ripened, and harvested inside
       // one drive step, so the 1 Hz sweep never observes it). The wither
       // payout's two husks per cycle ARE minted and expected: coverage_c
-      // pins all 29 padding farmWithered events and the husk pouch total.
+      // pins every padding farmWithered event and the husk pouch total,
+      // composed against FARM_GOLDEN_PADDING_CYCLES rather than a literal.
       // Withering NEEDS
       // low skill: crops die only at low proficiency (the keep chance
       // saturates at 1 by 75, where a stored 0.99 roll SURVIVES), so the
@@ -5974,7 +5993,7 @@ function professionsFarmingSession(seed = 1): Scenario {
       // at-gate 0.85 window for the cycles and restoring 75 for the real
       // beats. The writes are draw-free state, exactly like readyAtMs. ----
       meta.gatheringProficiency.farming = 0;
-      for (let cycle = 0; cycle < 28; cycle++) {
+      for (let cycle = 0; cycle < FARM_GOLDEN_PADDING_CYCLES; cycle++) {
         sim.addItem('vale_wheat_seed', 1, pid);
         // Clear the previous plant's flavor-cast busy gate (draw-free).
         rec.tick(Math.ceil(FARM_PLANT_CAST_SEC / DT) + 1);
@@ -5985,8 +6004,9 @@ function professionsFarmingSession(seed = 1): Scenario {
         harvestCrop(sim.ctx, p, meta, BED_WITHERED);
       }
 
-      // THE GOLDEN-WIN BEAT: the plant spends stream indexes 84 and 85, so
-      // the harvest's one golden roll is the probed winner at index 86. The
+      // THE GOLDEN-WIN BEAT: the plant spends stream indexes 165 and 166, so
+      // the harvest's golden roll is the probed winner at index 167 and its
+      // BONUS roll rides at 168 (Phase 11f). The
       // stored yieldSeed is OVERWRITTEN with the probed BOTH-GRADES winner
       // at the live skill (FARM_GOLDEN_WIN_YIELD_SEED above, the
       // FARM_TONIC_WINNER_YIELD_SEED idiom), so the five-fold applies to a
@@ -6007,11 +6027,12 @@ function professionsFarmingSession(seed = 1): Scenario {
       rec.tick(8);
 
       // THE PAYING-BAND TIER-3 SEED-BACK BEAT: one more padding cycle walks
-      // the stream so the Thornpeak barley harvest's seed-back roll lands on
-      // the probed ONE-SEED band value at index 92 (0.155753) and really
-      // pays a highland_barley_seed: the re-seat of the Phase 10 zero-band
-      // beat, upgrading the scenario-level grant proof from 0 === 0 to a
-      // real grant. Its golden roll (index 93, 0.279179) is a recorded loss.
+      // the stream so the Thornpeak barley harvest's seed-back roll lands in a
+      // PAYING band and really grants a highland_barley_seed, which is what
+      // upgrades the scenario-level grant proof from 0 === 0 to a real grant.
+      // The exact band is the recorded truth of the golden and moves with any
+      // appended draw; coverage_c states which one it landed in. Its golden
+      // roll is a recorded loss, so no bonus rides this beat.
       meta.gatheringProficiency.farming = 0; // the padding wither window again
       sim.addItem('vale_wheat_seed', 1, pid);
       rec.tick(Math.ceil(FARM_PLANT_CAST_SEC / DT) + 1);

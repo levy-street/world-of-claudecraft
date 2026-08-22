@@ -8865,6 +8865,7 @@ export type TranslationKeyFlat =
   | 'hudChrome.farming.denied.tool'
   | 'hudChrome.farming.feastPlacedLine'
   | 'hudChrome.farming.feastTitle'
+  | 'hudChrome.farming.goldenBonusLine'
   | 'hudChrome.farming.harvestFineLine'
   | 'hudChrome.farming.harvestFineLineQty'
   | 'hudChrome.farming.harvestLine'

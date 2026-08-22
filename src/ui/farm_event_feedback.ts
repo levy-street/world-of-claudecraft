@@ -122,6 +122,21 @@ export function handleFarmEvent(ev: FarmEvent, host: FarmFeedbackHost): void {
           '#7fdc4f',
         );
       }
+      // The golden-harvest BONUS line (Phase 11f). Rendered only when the
+      // event names an item, which only a golden win does, and it is the
+      // ONLY feedback for that grant: the bonus is force-added silently like
+      // every other leg of the harvest, so without this line a player would
+      // receive an item with nothing said about it. Green, the grant
+      // register, and no second celebration beat: the golden windfall's own
+      // zone announce already fired above.
+      if (ev.goldenBonusItemId !== undefined) {
+        host.log(
+          t('hudChrome.farming.goldenBonusLine', {
+            name: grantItemToken(ev.goldenBonusItemId),
+          }),
+          '#7fdc4f',
+        );
+      }
       // The last-charge signal (the gatherResult arm's farming twin):
       // the harvest that spent the slotted effect's final charge
       // announces it as an FCT self-note. ONE surface on purpose: the

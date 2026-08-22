@@ -13,18 +13,22 @@
 // tests/professions_farming.test.ts).
 //
 // DRAW CONTRACT (the D4 determinism contract, stated here and pinned in
-// tests/professions_farming.test.ts):
+// tests/professions_farming.test.ts). RESTATED WHOLE at masterwrought Phase
+// 11f, which added the golden BONUS draw; the discipline is that this header is
+// re-stated in full rather than amended one line at a time, so it can never be
+// edited into incoherence:
 //   plant, success ............ EXACTLY 2 ctx.rng draws, one contiguous block,
 //                               IDENTICAL UNDER EVERY KNOB COMBINATION
 //   plant, every deny arm ..... 0 (the knob-payment denies included)
-//   harvest, tier 1/2 crop .... EXACTLY 1 draw, the golden-harvest roll, on
-//                               EVERY resolving arm (survived, withered, AND
-//                               the defensive retired-crop arm; toniced
-//                               included)
-//   harvest, tier 3/4 crop .... EXACTLY 2 contiguous draws, the seed-back
-//                               roll then the golden-harvest roll, on EVERY
-//                               resolving arm (a retired id reads tier 1, so
-//                               that arm spends the golden draw alone)
+//   harvest, tier 1/2 crop .... EXACTLY 2 contiguous draws, the golden-harvest
+//                               roll then the golden BONUS roll, on EVERY
+//                               resolving arm (survived, withered, AND the
+//                               defensive retired-crop arm; toniced included)
+//   harvest, tier 3/4 crop .... EXACTLY 3 contiguous draws, the seed-back roll,
+//                               then the golden-harvest roll, then the golden
+//                               BONUS roll, on EVERY resolving arm (a retired
+//                               id reads tier 1, so that arm spends the last
+//                               two alone)
 //   harvest, every deny arm ... 0
 //   convert_husks ............. 0 (both outcomes)
 //   the farm objective credit . 0 (quests/quest_credit.ts, pure state and
@@ -39,16 +43,28 @@
 // NEVER through ctx.rng and never through Math.random: seed expansion of an
 // already-drawn value is not a new draw, which is what keeps the yield itself
 // draw-free no matter when, or on which host, the harvest happens. The draws
-// a harvest DOES spend are its two action-time rolls (harvestCrop below): the
-// seed-back roll (tier 3/4 only) and then the golden-harvest rare-event roll
-// (EVERY tier, the shared gather_events roll). Both are REAL ctx.rng draws at
-// harvest ACTION time, deliberately NOT expansions of the stored script, and
-// D4-legal for the same reason the plant pre-roll is, because a harvest is a
-// player action. The crop tier deciding whether the seed-back draw happens is
-// an INPUT read from content, never an outcome, so conditioning on it can
-// never fork the stream; the golden roll is unconditional, and a WITHERED
-// harvest spends it too and ignores the result (constant draw count per
+// a harvest DOES spend are its action-time rolls (harvestCrop below): the
+// seed-back roll (tier 3/4 only), then the golden-harvest rare-event roll
+// (EVERY tier, the shared gather_events roll), then the golden bonus roll
+// (EVERY tier). All are REAL ctx.rng draws at harvest ACTION time,
+// deliberately NOT expansions of the stored script, and D4-legal for the same
+// reason the plant pre-roll is, because a harvest is a player action. The crop
+// tier deciding whether the seed-back draw happens is an INPUT read from
+// content, never an outcome, so conditioning on it can never fork the stream;
+// the golden roll and the bonus roll are BOTH unconditional, and a WITHERED
+// harvest spends them too and ignores the results (constant draw count per
 // action: husks, never a celebration).
+//
+// WHY THE BONUS IS A REAL DRAW and not a further read into the mulberry32
+// expansion of yieldSeed, which would have been cheaper and would have left
+// this header and the farming_session golden untouched: that seed is already
+// carrying four dependent reads (growth, yield, the fine-pick grade, the tonic
+// arm), and stacking a fifth independent structure on one 32-bit value asks it
+// to carry more than it was sized for. Rejected deliberately at decision C, and
+// recorded so it is not re-proposed as an economy. The bonus draw is
+// UNCONDITIONAL and READ ONLY WHEN THE GOLDEN ROLL WON, which is the shipped
+// idiom for keeping stream position stable whichever arm resolves: spending a
+// draw and ignoring it is exactly what the withered golden roll already does.
 //
 // THE KNOBS RULE, the phase's one hard law: KNOB EFFECTS NEVER CHANGE THE
 // NUMBER OF RNG DRAWS. THEY CHANGE THRESHOLDS APPLIED TO ALREADY-DRAWN VALUES
@@ -85,6 +101,7 @@ import { onCropFarmedForQuests } from '../quests/quest_credit';
 import type { PlayerMeta } from '../sim';
 import type { SimContext } from '../sim_context';
 import { type Entity, FARMING_CAST_ID, INTERACT_RANGE, isConsuming } from '../types';
+import { resolveFarmGoldenBonus } from './farm_golden_bonus';
 import { type FarmPlantKnobs, farmPlotSurvived, type PlotState } from './farm_projection';
 import { notifyFarmReady } from './farm_ready';
 import { planWatchFee, type WatchFeeLeg } from './farm_watch_fee';
@@ -106,6 +123,20 @@ import {
 } from './tools';
 import { bestWieldableGatherToolTierOrNone } from './wield_gate';
 
+// The golden BONUS table lives in its own pure leaf for the same reason the
+// survival ramp does: it is a partition over one already-drawn value, with no
+// SimContext and no rng of its own, so a Vitest can drive the whole [0, 1)
+// interval directly instead of hunting seeds through a Sim. Re-exported here on
+// the same precedent, because farming's engine surface is what callers and
+// tests reach for.
+export {
+  FARM_GOLDEN_BONUS_PATTERN_CHANCE,
+  FARM_GOLDEN_BONUS_PATTERN_IDS,
+  FARM_TOP_CROP_TIER,
+  farmGoldenBonusSeedTier,
+  farmSeedIdsOfTier,
+  resolveFarmGoldenBonus,
+} from './farm_golden_bonus';
 // The survival ramp lives with the STATUS it decides (farm_projection.ts, the
 // pure leaf the wire projection is built from), so the projection can read it
 // without importing this module and its SimContext seam. Re-exported here
@@ -877,6 +908,17 @@ export function harvestCrop(ctx: SimContext, p: Entity, meta: PlayerMeta, bedId:
   // probed seed-back band keeps its stream position, and inside this block
   // for every reason stated above.
   const goldenFlavor = rollGatherRareEvent(ctx.rng, 'crop');
+  // The golden BONUS roll (Phase 11f, decisions C and D): ONE draw on EVERY
+  // harvest of EVERY tier, spent here and READ only if the golden roll above
+  // won and the win survives the gates below. Unconditional for the same
+  // reason the golden roll itself is: a draw whose EXISTENCE depended on an
+  // outcome would fork the stream by outcome. Sits immediately after the
+  // golden roll so both existing probed bands keep their stream positions, and
+  // inside this block for every reason stated above. What the value BUYS is
+  // resolved by a pure partition (professions/farm_golden_bonus.ts), so this
+  // single value decides both which arm pays and which item it pays; a second
+  // draw for "which one" would have broken the contract in the header.
+  const goldenBonusRoll = ctx.rng.next();
   // ------------------------- END OF THE DRAW BLOCK -------------------------
 
   // The seed-back grant, ONE call site shared by both outcomes (the branch
@@ -1026,6 +1068,11 @@ export function harvestCrop(ctx: SimContext, p: Entity, meta: PlayerMeta, bedId:
   // farmHarvested emit below): computed here because the golden zone
   // announce must name the same collapsed item id the event names.
   const allFine = count === 0 && fine > 0;
+  // The golden bonus item, assigned only inside the golden arm below and read
+  // by the farmHarvested emit at the bottom. Declared here because the emit
+  // sits outside that arm; an ordinary harvest leaves it undefined and the
+  // field is omitted from the wire entirely (the only-when-set rule).
+  let goldenBonusItemId: string | undefined;
   // Deliberately NOT capacity-gated. A crop the player already grew must not
   // be destroyed by full bags (nothing rots, and a refusal here would BE a
   // rot), so the grant force-adds over capacity exactly like the quest-catch
@@ -1075,6 +1122,22 @@ export function harvestCrop(ctx: SimContext, p: Entity, meta: PlayerMeta, bedId:
     if (signatureTruncated) {
       ctx.emit({ type: 'gatherDowngrade', pid: meta.entityId, surface: 'crop', lost: 'mark' });
     }
+    // THE GOLDEN BONUS (Phase 11f, decision D): exactly ONE extra item, off
+    // the draw the block above already spent. This is the ONLY place that
+    // roll is read, which is what makes it a constant-count draw rather than
+    // a conditional one. PLAIN, not signed, and deliberately: the signature
+    // marks the WINDFALL of the crop the farmer grew, while the bonus is a
+    // seed or a recipe that came out of the moment, not out of the bed.
+    //
+    // Force-added over capacity like every grant above, for the same reason:
+    // farming's nothing-rots rule. silent + callerLogs so the farmHarvested
+    // event below still owns the whole visit's feedback in one line, and NO
+    // second celebration beat is minted here: the golden windfall's existing
+    // zone announce and its gather_event:golden_harvest visit mark are the
+    // shared celebration family and Phase 13 has to live beside them.
+    const bonusItemId = resolveFarmGoldenBonus(goldenBonusRoll, cropTier);
+    ctx.addItem(bonusItemId, 1, meta.entityId, { silent: true, callerLogs: true });
+    goldenBonusItemId = bonusItemId;
   } else {
     if (count > 0)
       ctx.addItem(crop.produceItemId, count, meta.entityId, { silent: true, callerLogs: true });
@@ -1157,6 +1220,11 @@ export function harvestCrop(ctx: SimContext, p: Entity, meta: PlayerMeta, bedId:
     // only-when-true wire precedent): every tier 1/2 harvest and every
     // zero-band tier 3/4 harvest keeps the pre-field frame byte-identical.
     ...(seedBackCount > 0 ? { seedBackCount } : {}),
+    // The golden bonus item, same only-when-set rule: present exactly on a
+    // golden win, so every ordinary harvest's frame is byte-identical to the
+    // pre-field wire. This is the ONLY feedback surface for the bonus grant,
+    // which is force-added silently like every other leg of this harvest.
+    ...(goldenBonusItemId !== undefined ? { goldenBonusItemId } : {}),
     // The last-charge signal, same only-when-true rule (the gatherResult
     // precedent): present exactly when the settle above emptied the slot.
     ...(effectDepleted ? { effectDepleted: true as const } : {}),

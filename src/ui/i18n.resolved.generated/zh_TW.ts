@@ -3127,6 +3127,7 @@ export const zh_TW: EnTranslations = {
       "witheredLineQty": "作物枯萎了。你清理了田畦：{name} x{qty}。",
       "seedBackLine": "你回收了種子：{name}。",
       "seedBackLineQty": "你回收了種子：{name} x{qty}。",
+      "goldenBonusLine": "The golden harvest yields: {name}.",
       "denied": {
         "bad_bed": "那裡沒有田畦。",
         "bad_crop": "你無法在這裡種植它。",

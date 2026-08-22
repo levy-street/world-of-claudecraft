@@ -3926,6 +3926,13 @@ export const hudChromeStrings = {
     // quantity split.
     seedBackLine: 'You recover seed: {name}.',
     seedBackLineQty: 'You recover seed: {name} x{qty}.',
+    // The golden-harvest BONUS sentence (Phase 11f): a golden harvest pays one
+    // extra item beside its five-fold windfall, a seed of the next tier up or,
+    // far more rarely, a farming recipe. ONE key, no quantity split, because
+    // the bonus is always exactly one item; the item resolves as a spliced
+    // token like every other grant line. Rendered only when the event carries
+    // goldenBonusItemId, which only a golden win sets.
+    goldenBonusLine: 'The golden harvest yields: {name}.',
     // Refusal toasts, one per farmDenied reason, keyed by the reason id
     // itself so gathering_view.ts resolves them by template literal and no
     // second map can drift. Error toasts only: no line, no cue, no other

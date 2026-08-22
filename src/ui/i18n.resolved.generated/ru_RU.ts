@@ -3127,6 +3127,7 @@ export const ru_RU: EnTranslations = {
       "witheredLineQty": "Урожай засох. Вы расчищаете грядку: {name} x{qty}.",
       "seedBackLine": "Вы сохраняете семена на посадку: {name}.",
       "seedBackLineQty": "Вы сохраняете семена на посадку: {name} x{qty}.",
+      "goldenBonusLine": "The golden harvest yields: {name}.",
       "denied": {
         "bad_bed": "Там нет грядки.",
         "bad_crop": "Это здесь посадить нельзя.",

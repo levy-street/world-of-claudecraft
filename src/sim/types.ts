@@ -6870,7 +6870,14 @@ export type SimEvent = { pid?: number } & (
   // slotted tool effect's final charge, so the client can announce the break
   // instead of the charm dying silently. Only farmHarvested can carry it:
   // the withered return sits above the effect block, so a failed crop never
-  // applies, spends, or depletes. Text-free (the gatherResult idiom).
+  // applies, spends, or depletes. `goldenBonusItemId` (masterwrought Phase
+  // 11f) is the ONE extra item a GOLDEN harvest's bonus draw paid, a seed of
+  // the next tier up or, far more rarely, a farming pattern; present only on a
+  // golden win, the same only-when-set rule as the fields above, so an
+  // ordinary harvest's frame stays byte-identical. It is named on the event
+  // rather than logged by the grant because the farmHarvested line owns the
+  // whole visit's feedback (the #2430 one-line-per-grant rule), exactly as
+  // seedBackCount does. Text-free (the gatherResult idiom).
   | {
       type: 'farmHarvested';
       pid: number;
@@ -6881,6 +6888,7 @@ export type SimEvent = { pid?: number } & (
       fineItemId?: string;
       fineCount?: number;
       seedBackCount?: number;
+      goldenBonusItemId?: string;
       effectDepleted?: true;
     }
   // Farming: a plot that lost its survival pre-roll was cleared, paying

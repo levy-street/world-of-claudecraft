@@ -3127,6 +3127,7 @@ export const ko_KR: EnTranslations = {
       "witheredLineQty": "작물이 시들었습니다. 밭을 정리했습니다: {name} x{qty}.",
       "seedBackLine": "씨앗을 회수했습니다: {name}.",
       "seedBackLineQty": "씨앗을 회수했습니다: {name} x{qty}.",
+      "goldenBonusLine": "The golden harvest yields: {name}.",
       "denied": {
         "bad_bed": "그곳에는 작물밭이 없습니다.",
         "bad_crop": "그것은 여기에 심을 수 없습니다.",

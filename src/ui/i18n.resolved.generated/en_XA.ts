@@ -3127,6 +3127,7 @@ export const en_XA: EnTranslations = {
       "witheredLineQty": "[Ţĥé çŕóþ ŵíţĥéŕéð. Ýóú çļéáŕ ţĥé ƀéð: {name} ẋ{qty}.]",
       "seedBackLine": "[Ýóú ŕéçóʋéŕ šééð: {name}.]",
       "seedBackLineQty": "[Ýóú ŕéçóʋéŕ šééð: {name} ẋ{qty}.]",
+      "goldenBonusLine": "[Ţĥé ĝóļðéñ ĥáŕʋéšţ ýíéļðš: {name}.]",
       "denied": {
         "bad_bed": "[Ţĥéŕé íš ñó çŕóþ ƀéð ţĥéŕé.]",
         "bad_crop": "[Ýóú çáññóţ þļáñţ ţĥáţ ĥéŕé.]",

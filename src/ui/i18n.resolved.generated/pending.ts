@@ -345,6 +345,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.farming.denied.tool",
     "hudChrome.farming.feastPlacedLine",
     "hudChrome.farming.feastTitle",
+    "hudChrome.farming.goldenBonusLine",
     "hudChrome.farming.harvestFineLine",
     "hudChrome.farming.harvestFineLineQty",
     "hudChrome.farming.harvestLine",
@@ -782,6 +783,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.farming.denied.tool",
     "hudChrome.farming.feastPlacedLine",
     "hudChrome.farming.feastTitle",
+    "hudChrome.farming.goldenBonusLine",
     "hudChrome.farming.harvestFineLine",
     "hudChrome.farming.harvestFineLineQty",
     "hudChrome.farming.harvestLine",
@@ -1233,6 +1235,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.farming.denied.tool",
     "hudChrome.farming.feastPlacedLine",
     "hudChrome.farming.feastTitle",
+    "hudChrome.farming.goldenBonusLine",
     "hudChrome.farming.harvestFineLine",
     "hudChrome.farming.harvestFineLineQty",
     "hudChrome.farming.harvestLine",
@@ -1685,6 +1688,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.farming.denied.tool",
     "hudChrome.farming.feastPlacedLine",
     "hudChrome.farming.feastTitle",
+    "hudChrome.farming.goldenBonusLine",
     "hudChrome.farming.harvestFineLine",
     "hudChrome.farming.harvestFineLineQty",
     "hudChrome.farming.harvestLine",
@@ -2142,6 +2146,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.farming.denied.tool",
     "hudChrome.farming.feastPlacedLine",
     "hudChrome.farming.feastTitle",
+    "hudChrome.farming.goldenBonusLine",
     "hudChrome.farming.harvestFineLine",
     "hudChrome.farming.harvestFineLineQty",
     "hudChrome.farming.harvestLine",
@@ -2607,6 +2612,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.farming.denied.tool",
     "hudChrome.farming.feastPlacedLine",
     "hudChrome.farming.feastTitle",
+    "hudChrome.farming.goldenBonusLine",
     "hudChrome.farming.harvestFineLine",
     "hudChrome.farming.harvestFineLineQty",
     "hudChrome.farming.harvestLine",
@@ -2715,7 +2721,8 @@ export const pending: Record<string, readonly string[]> = {
     "devCommand.fields.bed",
     "guide.profPages.oncePerDay",
     "hudChrome.controller.crossHotbarPosition",
-    "hudChrome.crafting.oncePerDay"
+    "hudChrome.crafting.oncePerDay",
+    "hudChrome.farming.goldenBonusLine"
   ],
   "zh_TW": [
     "devCommand.actions.farmgrow.description",
@@ -2723,7 +2730,8 @@ export const pending: Record<string, readonly string[]> = {
     "devCommand.fields.bed",
     "guide.profPages.oncePerDay",
     "hudChrome.controller.crossHotbarPosition",
-    "hudChrome.crafting.oncePerDay"
+    "hudChrome.crafting.oncePerDay",
+    "hudChrome.farming.goldenBonusLine"
   ],
   "ko_KR": [
     "devCommand.actions.farmgrow.description",
@@ -2731,7 +2739,8 @@ export const pending: Record<string, readonly string[]> = {
     "devCommand.fields.bed",
     "guide.profPages.oncePerDay",
     "hudChrome.controller.crossHotbarPosition",
-    "hudChrome.crafting.oncePerDay"
+    "hudChrome.crafting.oncePerDay",
+    "hudChrome.farming.goldenBonusLine"
   ],
   "ja_JP": [
     "devCommand.actions.farmgrow.description",
@@ -2739,7 +2748,8 @@ export const pending: Record<string, readonly string[]> = {
     "devCommand.fields.bed",
     "guide.profPages.oncePerDay",
     "hudChrome.controller.crossHotbarPosition",
-    "hudChrome.crafting.oncePerDay"
+    "hudChrome.crafting.oncePerDay",
+    "hudChrome.farming.goldenBonusLine"
   ],
   "pt_BR": [
     "abilityUi.cast.farming",
@@ -3093,6 +3103,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.farming.denied.tool",
     "hudChrome.farming.feastPlacedLine",
     "hudChrome.farming.feastTitle",
+    "hudChrome.farming.goldenBonusLine",
     "hudChrome.farming.harvestFineLine",
     "hudChrome.farming.harvestFineLineQty",
     "hudChrome.farming.harvestLine",
@@ -3201,7 +3212,8 @@ export const pending: Record<string, readonly string[]> = {
     "devCommand.fields.bed",
     "guide.profPages.oncePerDay",
     "hudChrome.controller.crossHotbarPosition",
-    "hudChrome.crafting.oncePerDay"
+    "hudChrome.crafting.oncePerDay",
+    "hudChrome.farming.goldenBonusLine"
   ],
   "cs_CZ": [
     "abilityUi.cast.farming",
@@ -3565,6 +3577,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.farming.denied.tool",
     "hudChrome.farming.feastPlacedLine",
     "hudChrome.farming.feastTitle",
+    "hudChrome.farming.goldenBonusLine",
     "hudChrome.farming.harvestFineLine",
     "hudChrome.farming.harvestFineLineQty",
     "hudChrome.farming.harvestLine",
@@ -4031,6 +4044,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.farming.denied.tool",
     "hudChrome.farming.feastPlacedLine",
     "hudChrome.farming.feastTitle",
+    "hudChrome.farming.goldenBonusLine",
     "hudChrome.farming.harvestFineLine",
     "hudChrome.farming.harvestFineLineQty",
     "hudChrome.farming.harvestLine",
@@ -4481,6 +4495,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.farming.denied.tool",
     "hudChrome.farming.feastPlacedLine",
     "hudChrome.farming.feastTitle",
+    "hudChrome.farming.goldenBonusLine",
     "hudChrome.farming.harvestFineLine",
     "hudChrome.farming.harvestFineLineQty",
     "hudChrome.farming.harvestLine",
@@ -4922,6 +4937,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.farming.denied.tool",
     "hudChrome.farming.feastPlacedLine",
     "hudChrome.farming.feastTitle",
+    "hudChrome.farming.goldenBonusLine",
     "hudChrome.farming.harvestFineLine",
     "hudChrome.farming.harvestFineLineQty",
     "hudChrome.farming.harvestLine",
@@ -5370,6 +5386,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.farming.denied.tool",
     "hudChrome.farming.feastPlacedLine",
     "hudChrome.farming.feastTitle",
+    "hudChrome.farming.goldenBonusLine",
     "hudChrome.farming.harvestFineLine",
     "hudChrome.farming.harvestFineLineQty",
     "hudChrome.farming.harvestLine",
@@ -5834,6 +5851,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.farming.denied.tool",
     "hudChrome.farming.feastPlacedLine",
     "hudChrome.farming.feastTitle",
+    "hudChrome.farming.goldenBonusLine",
     "hudChrome.farming.harvestFineLine",
     "hudChrome.farming.harvestFineLineQty",
     "hudChrome.farming.harvestLine",
@@ -6279,6 +6297,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.farming.denied.tool",
     "hudChrome.farming.feastPlacedLine",
     "hudChrome.farming.feastTitle",
+    "hudChrome.farming.goldenBonusLine",
     "hudChrome.farming.harvestFineLine",
     "hudChrome.farming.harvestFineLineQty",
     "hudChrome.farming.harvestLine",
@@ -6751,6 +6770,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.farming.denied.tool",
     "hudChrome.farming.feastPlacedLine",
     "hudChrome.farming.feastTitle",
+    "hudChrome.farming.goldenBonusLine",
     "hudChrome.farming.harvestFineLine",
     "hudChrome.farming.harvestFineLineQty",
     "hudChrome.farming.harvestLine",

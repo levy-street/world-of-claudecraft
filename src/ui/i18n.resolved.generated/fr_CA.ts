@@ -3127,6 +3127,7 @@ export const fr_CA: EnTranslations = {
       "witheredLineQty": "The crop withered. You clear the bed: {name} x{qty}.",
       "seedBackLine": "You recover seed: {name}.",
       "seedBackLineQty": "You recover seed: {name} x{qty}.",
+      "goldenBonusLine": "The golden harvest yields: {name}.",
       "denied": {
         "bad_bed": "There is no crop bed there.",
         "bad_crop": "You cannot plant that here.",

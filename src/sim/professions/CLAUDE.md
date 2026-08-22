@@ -208,8 +208,10 @@ or pure leaves, never a `Sim` import, randomness only via `ctx.rng` (guarded by
 - `farming.ts`: the farming GROWTH ENGINE, and the module the other `farm_*`
   leaves orbit. Owns the plant and harvest command bodies and, above all, THE
   DRAW CONTRACT stated in its own header: a plant costs exactly two contiguous
-  `ctx.rng` draws, a tier 1/2 harvest one, a tier 3/4 harvest two contiguous,
-  and every deny costs zero. Also owns the gain model (`FARMING_GAIN_SCHEDULE`
+  `ctx.rng` draws, a tier 1/2 harvest two contiguous (the golden-harvest roll
+  then the golden BONUS roll), a tier 3/4 harvest three (the seed-back roll
+  first), and every deny costs zero. The header is RESTATED WHOLE whenever a
+  draw moves, never amended one line at a time. Also owns the gain model (`FARMING_GAIN_SCHEDULE`
   plus `farmingHarvestGain` / `farmingTeachingCeilingFor` /
   `farmingHarvestGainAt`, the fishing R19 shape: the boundary column IS the
   teaching-ceiling source, so it is not tuning and never moves), the
@@ -218,6 +220,13 @@ or pure leaves, never a `Sim` import, randomness only via `ctx.rng` (guarded by
   it), and `FARM_EFFECT_BONUS_PICK_CAP`, farming's own cap on a slotted
   quantity tool effect, which lives here rather than in `TOOL_EFFECTS` so the
   other three land professions keep the catalog value.
+- `farm_golden_bonus.ts`: pure leaf owning what a GOLDEN harvest's bonus draw
+  pays (masterwrought Phase 11f): a seed of the next tier up, or at a much
+  lower weight one farming pattern. One roll decides both the arm and the item
+  through a partition, which is what keeps the harvest at one new draw;
+  `farming.ts` re-exports the surface on the `farm_projection.ts` precedent.
+  Zero new item ids, and the pattern weight is the shipped per-pattern drop
+  point, held slower than the quartermaster marks route by ruling.
 - `farming_zones.ts`: farming's OWN per-zone tier ladder (`farmingZoneTierFor`),
   the fishing_zones-shaped pure leaf; deliberately DIVERGES from the shipped
   progression column at evergarden (farming tier 4 showcase vs the named
