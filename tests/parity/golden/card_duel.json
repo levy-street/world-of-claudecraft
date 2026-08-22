@@ -29,7 +29,7 @@
       "tick": 5,
       "time": 0.25,
       "nextId": 969,
-      "state": "a037f703",
+      "state": "593e7f25",
       "events": "84056da1",
       "rng": {
         "draws": 38,
@@ -40,7 +40,7 @@
       "tick": 10,
       "time": 0.5,
       "nextId": 969,
-      "state": "591e80c8",
+      "state": "05c23b4a",
       "events": "741638a5",
       "rng": {
         "draws": 38,
@@ -51,7 +51,7 @@
       "tick": 15,
       "time": 0.75,
       "nextId": 969,
-      "state": "4828d07e",
+      "state": "19ad6bc8",
       "events": "741638a5",
       "rng": {
         "draws": 38,
@@ -62,8 +62,8 @@
       "tick": 20,
       "time": 1,
       "nextId": 969,
-      "state": "ecfc2a31",
-      "events": "d595937a",
+      "state": "34214345",
+      "events": "741638a5",
       "rng": {
         "draws": 38,
         "digest": "ef472e1d"
@@ -73,7 +73,7 @@
       "tick": 25,
       "time": 1.25,
       "nextId": 969,
-      "state": "b4ff4b36",
+      "state": "7baba40a",
       "events": "741638a5",
       "rng": {
         "draws": 38,
@@ -84,7 +84,7 @@
       "tick": 30,
       "time": 1.5,
       "nextId": 969,
-      "state": "7fe657d7",
+      "state": "651ff41b",
       "events": "741638a5",
       "rng": {
         "draws": 38,
@@ -95,7 +95,7 @@
       "tick": 35,
       "time": 1.75,
       "nextId": 969,
-      "state": "69868b5f",
+      "state": "1f1f9663",
       "events": "741638a5",
       "rng": {
         "draws": 38,
@@ -106,7 +106,7 @@
       "tick": 40,
       "time": 2,
       "nextId": 969,
-      "state": "89dd5842",
+      "state": "68c44016",
       "events": "741638a5",
       "rng": {
         "draws": 38,
@@ -117,7 +117,7 @@
       "tick": 41,
       "time": 2.05,
       "nextId": 969,
-      "state": "a8fbb24f",
+      "state": "3c1e7e93",
       "events": "741638a5",
       "rng": {
         "draws": 44,
@@ -172,7 +172,6 @@
               "itemId": "baked_bread"
             }
           ],
-          "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
           "recipesGrandfathered": true,
           "reliquary": {
@@ -234,7 +233,6 @@
               "itemId": "spring_water"
             }
           ],
-          "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
           "recipesGrandfathered": true,
           "reliquary": {

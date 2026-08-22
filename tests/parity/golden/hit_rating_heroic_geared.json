@@ -14,7 +14,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 968,
-      "state": "75c894bb",
+      "state": "0611e738",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -69,7 +69,6 @@
               "itemId": "spring_water"
             }
           ],
-          "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
           "recipesGrandfathered": true,
           "reliquary": {

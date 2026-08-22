@@ -18,7 +18,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 968,
-      "state": "f3a1d8c8",
+      "state": "35f9b8f7",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -71,7 +71,6 @@
               "itemId": "baked_bread"
             }
           ],
-          "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
           "recipesGrandfathered": true,
           "reliquary": {
@@ -154,8 +153,8 @@
       "tick": 51,
       "time": 2.55,
       "nextId": 968,
-      "state": "e8a78289",
-      "events": "0fab9a55",
+      "state": "aa51acea",
+      "events": "1f9b9a1b",
       "rng": {
         "draws": 2,
         "digest": "00a2a78c"
@@ -245,7 +244,6 @@
             }
           ],
           "lifetimeXp": 36,
-          "mailWelcomed": true,
           "nodeHarvestReadyAt": {
             "ore_mirefen_t2": 242.1
           },
@@ -333,7 +331,7 @@
       "tick": 104,
       "time": 5.2,
       "nextId": 968,
-      "state": "49eaff14",
+      "state": "50657e39",
       "events": "ee3f94ed",
       "rng": {
         "draws": 4,
@@ -432,7 +430,6 @@
             }
           ],
           "lifetimeXp": 72,
-          "mailWelcomed": true,
           "nodeHarvestReadyAt": {
             "ore_mirefen_1": 244.35,
             "ore_mirefen_t2": 242.1
@@ -521,7 +518,7 @@
       "tick": 157,
       "time": 7.85,
       "nextId": 968,
-      "state": "7b8b1a8b",
+      "state": "c29a971c",
       "events": "76f683cf",
       "rng": {
         "draws": 6,
@@ -629,7 +626,6 @@
             }
           ],
           "lifetimeXp": 108,
-          "mailWelcomed": true,
           "nodeHarvestReadyAt": {
             "herb_mirefen_t2": 247.8,
             "ore_mirefen_1": 244.35,
@@ -719,7 +715,7 @@
       "tick": 159,
       "time": 7.95,
       "nextId": 968,
-      "state": "8f30dc86",
+      "state": "e1030b0d",
       "events": "741638a5",
       "rng": {
         "draws": 6,
@@ -827,7 +823,6 @@
             }
           ],
           "lifetimeXp": 108,
-          "mailWelcomed": true,
           "nodeHarvestReadyAt": {
             "herb_mirefen_t2": 247.8,
             "ore_mirefen_1": 244.35,

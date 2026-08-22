@@ -16,7 +16,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 968,
-      "state": "78dd8755",
+      "state": "3ce3b2b6",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -68,7 +68,6 @@
               "itemId": "baked_bread"
             }
           ],
-          "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
           "recipesGrandfathered": true,
           "reliquary": {
@@ -151,7 +150,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 970,
-      "state": "53c01360",
+      "state": "de9c9c0f",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -203,7 +202,6 @@
               "itemId": "baked_bread"
             }
           ],
-          "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
           "recipesGrandfathered": true,
           "reliquary": {
@@ -363,8 +361,8 @@
       "tick": 20,
       "time": 1,
       "nextId": 970,
-      "state": "31f9953d",
-      "events": "155f3705",
+      "state": "63090b1e",
+      "events": "741638a5",
       "rng": {
         "draws": 0,
         "digest": "811c9dc5"
@@ -374,7 +372,7 @@
       "tick": 40,
       "time": 2,
       "nextId": 970,
-      "state": "0c1101f0",
+      "state": "ca4580ff",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -385,7 +383,7 @@
       "tick": 60,
       "time": 3,
       "nextId": 970,
-      "state": "827ba0cb",
+      "state": "9a7e3e68",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -396,7 +394,7 @@
       "tick": 80,
       "time": 4,
       "nextId": 970,
-      "state": "6a8ad132",
+      "state": "2eacea3d",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -407,7 +405,7 @@
       "tick": 80,
       "time": 4,
       "nextId": 970,
-      "state": "6a8ad132",
+      "state": "2eacea3d",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -462,7 +460,6 @@
               "itemId": "baked_bread"
             }
           ],
-          "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
           "recipesGrandfathered": true,
           "reliquary": {
@@ -625,7 +622,7 @@
       "tick": 80,
       "time": 4,
       "nextId": 970,
-      "state": "6a8ad132",
+      "state": "2eacea3d",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -680,7 +677,6 @@
               "itemId": "baked_bread"
             }
           ],
-          "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
           "recipesGrandfathered": true,
           "reliquary": {

@@ -28,7 +28,7 @@
       "tick": 3,
       "time": 0.15,
       "nextId": 970,
-      "state": "4269fbd5",
+      "state": "bb1caf1b",
       "events": "e9632ef4",
       "rng": {
         "draws": 2,
@@ -88,7 +88,6 @@
               "itemId": "baked_bread"
             }
           ],
-          "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
           "recipesGrandfathered": true,
           "reliquary": {
@@ -161,7 +160,6 @@
               "itemId": "greyjaw_hide_boots"
             }
           ],
-          "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
           "recipesGrandfathered": true,
           "reliquary": {
