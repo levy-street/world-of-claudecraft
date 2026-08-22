@@ -329,7 +329,11 @@ import {
 import { updateDragonkinBrood } from './mob/dragonkin_brood';
 import { wanderPause } from './mob/idle_rng';
 import * as lifecycle from './mob/lifecycle';
-import { resetEvadingMob as resetEvadingMobFn, updateMob as updateMobFn } from './mob/locomotion';
+import {
+  isInertInstanceCorpse,
+  resetEvadingMob as resetEvadingMobFn,
+  updateMob as updateMobFn,
+} from './mob/locomotion';
 import { runMobSwingAffixes } from './mob/mob_swing';
 import { applyPlayerDummyVitals } from './mob/practice_dummies';
 import { questGateBlocksAggro, questGateBlocksCombat } from './mob/quest_gated_aggro';
@@ -2918,6 +2922,11 @@ export class Sim {
       // never re-emits it). Stamped onto the entity so it rides the identity
       // wire (`app`) to every client in view. Opaque to the sim.
       appearance?: Record<string, unknown> | null;
+      // A synthetic participant (Vale Cup showcase/backfill, fiesta practice,
+      // /dev bots): created pre-welcomed so no mail is ever minted for it. Bot
+      // metas are session-only, but their letters would outlive them in the
+      // shared mail book forever (issue #3560).
+      bot?: boolean;
     },
   ): number {
     const savedState = opts?.state
@@ -3726,10 +3735,11 @@ export class Sim {
     }
     // One-time Ravenpost welcome (doubles as the service announcement for
     // characters saved before mail existed). Flipped before the send so a
-    // re-entrant save can never double-book the letter.
+    // re-entrant save can never double-book the letter. Bots flip WITHOUT the
+    // send: their letters would sit in the shared mail book forever.
     if (!meta.mailWelcomed) {
       meta.mailWelcomed = true;
-      this.postOffice.sendWelcome(meta);
+      if (!opts?.bot) this.postOffice.sendWelcome(meta);
     }
     // Book of Deeds retro-on-join, after the saved state is fully restored:
     // seed the discovery ledger from current holdings, apply the retro
@@ -3760,7 +3770,7 @@ export class Sim {
     if (!clean) return -1;
     for (const m of this.players.values())
       if (m.name.toLowerCase() === clean.toLowerCase()) return -1;
-    const pid = this.addPlayer('mage', clean);
+    const pid = this.addPlayer('mage', clean, { bot: true });
     const meta = this.players.get(pid);
     if (meta) meta.isDevBot = true;
     const me = this.entities.get(this.primaryId);
@@ -3787,7 +3797,7 @@ export class Sim {
   // A friendly stationary ally bot for the Cascada playtest scenario, dropped at an
   // exact spot (no name-uniqueness gate, so /dev cascade can be re-run). Dev only.
   private spawnScenarioAlly(name: string, x: number, z: number, cls: PlayerClass = 'mage'): number {
-    const id = this.addPlayer(cls, name);
+    const id = this.addPlayer(cls, name, { bot: true });
     const meta = this.players.get(id);
     if (meta) meta.isDevBot = true;
     // Level 20 like the mage: a level-1 ally has so little health that a single Echo
@@ -6536,14 +6546,25 @@ export class Sim {
   private shouldSkipIdleMobTick(mob: Entity): boolean {
     const radius = this.cfg.idleMobTickRadius ?? 0;
     if (radius <= 0) return false;
-    if (
-      mob.dead ||
+    if (mob.dead) {
+      // Instance corpse fields (a cleared rift floor's packs) never decay or
+      // respawn, so once every dead-branch effect is provably spent the corpse
+      // stops paying updateMob. Radius-gated like the live cull: the radius is
+      // the interest-drop radius, so a skipped corpse is outside every
+      // player's replicated view EXCEPT a viewer's own target (targets get
+      // NPC_DROP_RADIUS, slightly wider); that is safe today because the only
+      // frozen fields are two timers nothing serializes, and any change to
+      // that must re-check this exception. Dead mobs draw no rng, so the skip
+      // cannot shift the shared draw order.
+      if (!isInertInstanceCorpse(mob)) return false;
+    } else if (
       mob.ownerId !== null ||
       mob.aiState !== 'idle' ||
       mob.inCombat ||
       mob.auras.length > 0
-    )
+    ) {
       return false;
+    }
     if (this.players.size === 0) return true;
     return !this.playerGrid.hasInRadius(mob.pos.x, mob.pos.z, radius);
   }
@@ -7115,11 +7136,19 @@ export class Sim {
   }
 
   private hasLineOfSight(source: Entity, target: Entity): boolean {
-    const run =
-      this.delveRunForMob(source.id) ??
-      this.delveRunForMob(target.id) ??
-      this.delveRunForPlayer(source.id) ??
-      this.delveRunForPlayer(target.id);
+    // The delve-run lookup is O(active runs x mobs per run) and allocates a
+    // party key per call, and this method sits on every ranged auto-attack,
+    // AoE pulse, and LOS-gated cast. Only a sight line with an endpoint
+    // inside the delve band can ever consume run.modules (lineOfSightClear's
+    // delve arm keys off from.x), so every other combat sight check skips
+    // all four lookups. Mirrors the movement path's isDelvePos guard.
+    const inDelve = isDelvePos(source.pos.x) || isDelvePos(target.pos.x);
+    const run = inDelve
+      ? (this.delveRunForMob(source.id) ??
+        this.delveRunForMob(target.id) ??
+        this.delveRunForPlayer(source.id) ??
+        this.delveRunForPlayer(target.id))
+      : undefined;
     return lineOfSightClear(
       this.cfg.seed,
       source.pos,
@@ -10080,7 +10109,7 @@ export class Sim {
         if (!taken) break;
         name = `${baseName}${n}`;
       }
-      const botPid = this.addPlayer(cls, name);
+      const botPid = this.addPlayer(cls, name, { bot: true });
       const meta = this.players.get(botPid);
       if (meta) meta.isDevBot = true;
       spawnSeq++;

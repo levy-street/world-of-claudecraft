@@ -305,7 +305,33 @@ const MONOLITHS: MonolithRow[] = [
     // renderer.ts in this sync either. Upstream's code is NOT extracted to buy
     // the lines back and the ceiling is NOT raised for headroom. Exact merged
     // count, zero slack: any further growth reds again.
-    ceiling: 13603,
+    //
+    // RE-PINNED AGAIN 13603 -> 13614 at the Phase 11g QA release sync (release
+    // tip 3e49dc11b3, PR #3566's rift long-session perf work; prior synced
+    // release parent 098372138a), the SIXTH sync and the fifth consecutive one
+    // to touch this file. BOTH parent pins for the record: ours 13603 against a
+    // 13603 file, the release 13584 against a 13584 file, and the base 13573
+    // both descend from. The union composes exactly, so this is a re-pin and
+    // not a judgement call: 13573 + 30 (ours) + 11 (theirs) = 13614, and the
+    // merged file measures 13614. INHERITED growth on both sides again: Phase
+    // 11g is a content-table phase and added nothing to renderer.ts. Upstream's
+    // code is NOT extracted to buy the lines back and the ceiling is NOT raised
+    // for headroom. Exact merged count, zero slack: any further growth reds
+    // again.
+    //
+    // UPSTREAM'S OWN HISTORY over this span, kept so the merge drops neither
+    // parent's half. The release re-pinned 13548 -> 13551 when its rift
+    // long-session perf branch merged this base (both parents grew the file
+    // independently: the base's interior resource registry wiring, that
+    // branch's object-view material disposal, sparkle tags and rift build-key
+    // cooldown, all thin consumers of extracted modules), then +8 in its own
+    // review round when the rift build-failure cooldown swapped an untracked
+    // setTimeout (a handle that outlives teardown and can fire into a recycled
+    // renderer) for a timestamp gate, the gate logic living in
+    // src/render/build_retry_gate.ts and the renderer keeping only the
+    // coordinator's thin wiring. It then re-pinned to the exact count of its
+    // own merged file at 13584.
+    ceiling: 13614,
     seam: 'a new src/render/<thing>.ts module the renderer calls (src/render/CLAUDE.md)',
   },
   {
@@ -326,7 +352,23 @@ const MONOLITHS: MonolithRow[] = [
     // 12232, and the release 12660 against a 12518 file at both f50b30de29 and
     // 35a6481825. 12341 lands under all three. Exact merged count, zero slack:
     // any further growth reds again.
-    ceiling: 12341,
+    //
+    // RE-PINNED 12341 -> 12370 at the Phase 11g QA release sync (release tip
+    // 3e49dc11b3). This row did not CONFLICT, which is exactly why it needed
+    // measuring rather than reading: the release grew src/sim/sim.ts by 29
+    // lines (the rift long-session work, whose substance lives in
+    // src/sim/collider_cells.ts and src/sim/mob/locomotion.ts) while never
+    // touching this row, because its own ceiling still sat at 12660 over a
+    // 12518 file. Ours had ratcheted the ceiling down to the extracted file's
+    // exact 12341, so the merged file lands 29 over a pin neither parent's
+    // diff mentions. BOTH parent pins for the record: ours 12341 against a
+    // 12341 file, the release 12660 against a 12547 file, base 12518. The
+    // union composes exactly: 12341 + 29 (theirs) = 12370, and the merged file
+    // measures 12370. INHERITED growth: Phase 11g is a content-table phase and
+    // added nothing to sim.ts. Upstream's code is NOT extracted to buy the
+    // lines back and the ceiling is NOT raised for headroom. Exact merged
+    // count, zero slack: any further growth reds again.
+    ceiling: 12370,
     seam: 'a sim system module behind SimContext (src/sim/CLAUDE.md)',
   },
   {
@@ -429,7 +471,9 @@ const MONOLITHS: MonolithRow[] = [
   },
   {
     file: 'src/sim/colliders.ts',
-    ceiling: 2660,
+    // Lowered from 2660 after the cell-index math moved out to
+    // collider_cells.ts (the ratchet rule: extraction lowers the ceiling).
+    ceiling: 2630,
     seam: 'per-zone collider data beside the zone content; shared logic stays here',
   },
   {

@@ -13,7 +13,7 @@ import { describe, expect, it } from 'vitest';
 import {
   makeWriterFacet,
   type PainterHostWriters,
-  type SingleSlotCache,
+  type SingleSlotEntry,
 } from '../src/ui/painter_host';
 
 // A DOM-free element that records every write the facet performs: textContent, the
@@ -47,7 +47,9 @@ function fakeEl() {
 }
 
 function fakeFacet() {
-  const cache: SingleSlotCache = new Map();
+  // A real Map (assignable to the WeakMap-typed SingleSlotCache) so the test
+  // can spy on set() and assert entry counts, which WeakMap cannot expose.
+  const cache = new Map<HTMLElement, SingleSlotEntry>();
   const stylePropCache = new Map<HTMLElement, Map<string, string>>();
   const classCache = new Map<HTMLElement, Map<string, string>>();
   const attrCache = new Map<HTMLElement, Map<string, string>>();
@@ -216,7 +218,9 @@ describe('makeWriterFacet: shared caches keep one skip-rate (HUD + painter coher
     // Hud keeps its own writers AND hands painters a facet built from the SAME
     // caches; the second writer must see the first writer's cache entry so a repeat
     // is elided whichever path wrote it last (one skip-rate across HUD + painters).
-    const cache: SingleSlotCache = new Map();
+    // A real Map (assignable to the WeakMap-typed SingleSlotCache) so the test
+    // can spy on set() and assert entry counts, which WeakMap cannot expose.
+    const cache = new Map<HTMLElement, SingleSlotEntry>();
     const stylePropCache = new Map<HTMLElement, Map<string, string>>();
     const classCache = new Map<HTMLElement, Map<string, string>>();
     const attrCache = new Map<HTMLElement, Map<string, string>>();

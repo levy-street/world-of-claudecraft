@@ -131,6 +131,41 @@ const NYTHRAXIS_HEROIC_ADD_IDS = new Set([
   'nythraxis_heroic_rogue_add',
 ]);
 
+/**
+ * Is this dead mob an INSTANCE corpse whose per-tick dead-branch has become a
+ * provable no-op? Instance mobs (dungeon/rift/delve bands) never corpse-decay
+ * or respawn in place (the `!isInstanceMob` gates in updateMob's dead branch),
+ * so once the detonate fuse is spent and the FFA loot window has lapsed, the
+ * only thing the dead branch does is decrement two timers nothing reads. The
+ * Sim idle-cull uses this to stop far-from-player corpse fields (a cleared
+ * rift floor's packs) from paying updateMob every tick for the rest of the
+ * run. Exclusions, each load-bearing:
+ * - owned corpses: pets/demons unravel via their corpseTimer;
+ * - detonate fuses: Death Throes must still burst;
+ * - FFA windows: the owner-lock lapse must still count down;
+ * - auras: the caller would also skip updateAuras (whose dead arm still
+ *   recomputes `stealthed`), and unbreakable-control auras survive death, so
+ *   such corpses simply keep ticking rather than risk frozen aura state;
+ * - a stealth-flagged corpse: the dead updateAuras arm is what clears the
+ *   flag, so it must run at least until the flag settles;
+ * - Nythraxis: onBossDeath drives its death dialogue from the dead branch;
+ * - worldBoss templates: the world-boss scheduler reads boss.corpseTimer to
+ *   reclaim the corpse (none spawn in an instance band today; insurance).
+ */
+export function isInertInstanceCorpse(mob: Entity): boolean {
+  return (
+    mob.dead &&
+    mob.spawnPos.x > DUNGEON_X_THRESHOLD &&
+    mob.ownerId === null &&
+    mob.detonateTimer === Infinity &&
+    mob.lootFfaTimer <= 0 &&
+    mob.auras.length === 0 &&
+    !mob.stealthed &&
+    !mob.nythraxis &&
+    MOBS[mob.templateId]?.worldBoss !== true
+  );
+}
+
 export function updateMob(ctx: SimContext, mob: Entity): void {
   // Summoned quest add (widow hatchling): cancel its out-of-combat despawn while it
   // is fighting; resetEvadingMob (re)starts the countdown when it leashes home.

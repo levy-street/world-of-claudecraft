@@ -114,9 +114,18 @@ describe('guild letter over the live GameServer wire (session routing)', () => {
       // (server/game.ts maybe('mailU', sim.mailUnreadFor(pid))).
       const unreadFor = (pid: number) =>
         (server.sim as unknown as { mailUnreadFor(pid: number): number }).mailUnreadFor(pid);
-      const otherPids = [...players.keys()].filter((pid) => pid !== sc.pid);
+      // The live GameServer keeps valeCupShowcase on, so an idle bot
+      // exhibition stages itself mid-window and its bots land in `players`.
+      // The bystander sweep names the humans; bots carry no mail at all
+      // (issue #3560), which the trailing loop pins on the server path.
+      const botPids = new Set(
+        (server.sim as unknown as { vcup: { botPids: number[] } }).vcup.botPids,
+      );
+      const otherPids = [...players.keys()].filter((pid) => pid !== sc.pid && !botPids.has(pid));
+      expect(otherPids.length).toBe(2);
       expect(unreadFor(sc.pid)).toBe(2);
       for (const pid of otherPids) expect(unreadFor(pid)).toBe(1);
+      for (const pid of botPids) expect(unreadFor(pid)).toBe(0);
 
       // One-shot at the booking level over the server path: a second
       // qualifying pair never re-books (asserted against the PostOffice store

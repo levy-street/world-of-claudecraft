@@ -6,6 +6,7 @@ import {
   DUNGEONS,
   delveOrigin,
   instanceOrigin,
+  riftInstanceOrigin,
   YUMI_BAND_X_MAX,
   YUMI_BAND_X_MIN,
 } from '../src/sim/data';
@@ -36,6 +37,16 @@ describe('telemetry zone id', () => {
   it('reports the fixed arena and yumi ids for their bands', () => {
     expect(telemetryZoneId(ARENA_X_MIN + 10, 0)).toBe('arena');
     expect(telemetryZoneId(YUMI_BAND_X_MIN + 10, 0)).toBe('yumi_maze');
+  });
+
+  it('reports the fixed rift id inside the rift band, never the instance fallback', () => {
+    // Rift sessions must not fold into the generic 'instance' bucket: the fleet
+    // perf dimension needs rifts separable to correlate degradation reports.
+    const first = riftInstanceOrigin(0, 0);
+    expect(telemetryZoneId(first.x, first.z)).toBe('rift');
+    // A deeper floor of a later slot stays on the same bounded id.
+    const deep = riftInstanceOrigin(5, 3);
+    expect(telemetryZoneId(deep.x, deep.z)).toBe('rift');
   });
 
   it('keeps the defensive fallbacks bounded for unmapped instance coordinates', () => {

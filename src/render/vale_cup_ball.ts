@@ -12,6 +12,7 @@ import * as THREE from 'three';
 import { VALE_CUP_BALL_MOB, VALE_CUP_BALL_TEMPLATE_ID } from '../sim/content/vale_cup';
 import { VC_BALL_RADIUS } from '../sim/vale_cup_ball';
 import { GFX } from './gfx';
+import { markSharedMaterial } from './shared_resource';
 
 export const VALE_CUP_BALL_TEMPLATE = VALE_CUP_BALL_TEMPLATE_ID;
 // Base (unscaled) radius derived from the SIM's physics radius and the mob
@@ -170,20 +171,27 @@ export function resetValeCupBallProfileCaches(): void {
 
 function sharedBallMaterial(): THREE.Material {
   if (!ballMat) {
-    ballMat = GFX.standardMaterials
-      ? new THREE.MeshStandardMaterial({ map: soccerTexture(), roughness: 0.55, metalness: 0 })
-      : new THREE.MeshLambertMaterial({ map: soccerTexture() });
+    // Shared-tagged: every ball view references this singleton, and the
+    // renderer's per-view disposal would otherwise brick the material for the
+    // session the first time a ball left interest.
+    ballMat = markSharedMaterial(
+      GFX.standardMaterials
+        ? new THREE.MeshStandardMaterial({ map: soccerTexture(), roughness: 0.55, metalness: 0 })
+        : new THREE.MeshLambertMaterial({ map: soccerTexture() }),
+    );
   }
   return ballMat;
 }
 
 function sharedShadowMaterial(): THREE.MeshBasicMaterial {
   if (!shadowMat) {
-    shadowMat = new THREE.MeshBasicMaterial({
-      map: shadowTexture(),
-      transparent: true,
-      depthWrite: false,
-    });
+    shadowMat = markSharedMaterial(
+      new THREE.MeshBasicMaterial({
+        map: shadowTexture(),
+        transparent: true,
+        depthWrite: false,
+      }),
+    );
   }
   return shadowMat;
 }

@@ -1198,7 +1198,11 @@ class Sfx {
       if (isDynamicRiftId(id) && !activeIds.has(id)) this.unloop(id, 0.7);
     }
     for (const id of this.pendingLoops.keys()) {
-      if (isDynamicRiftId(id) && !activeIds.has(id)) this.pendingLoops.delete(id);
+      // unloop drops all three pending maps together, and delegating keeps
+      // that contract in ONE place: hand-deleting only pendingLoops here is
+      // the exact drift that once stranded a load/variant pair for every rift
+      // source that vanished mid-load, for the rest of the session.
+      if (isDynamicRiftId(id) && !activeIds.has(id)) this.unloop(id, 0.7);
     }
   }
 

@@ -887,10 +887,36 @@ const ACCEPTED_POLISH_V2_METADATA_PATH = path.join(REPO_ROOT, POLISH_SEAL_PATH);
 // Minted from the merged WORKING TREE with
 // scripts/assets/eastbrook_grand_armoury/remint_polish_provenance.mjs and
 // committed with exactly the bytes it read. No capture was retaken.
+//
+// RE-MINTED AGAIN at the Phase 11g QA release sync (release tip 3e49dc11b3,
+// PR #3566's rift long-session perf work; prior synced release parent
+// 098372138a). The SIXTH consecutive sync to re-mint this seal, and the
+// trigger is the one it has always been: a MOVED SWEPT INPUT, never a
+// conflicting seal. BOTH parents edited src/render/renderer.ts since the
+// common base (base 13573, ours 13603, theirs 13584, merged 13614), so the
+// merged renderer is a third content and NEITHER parent's literal describes
+// it. Parent values for the record: composite ours 6b9ee410 / theirs
+// 0ae18f49; metadata sha256 ours fe37c37c / theirs 1cd098ab; second-order
+// performance digest ours d3fc845b / theirs cfd7bd7e. Every other swept input
+// holds its sealed bytes.
+//
+// UPSTREAM'S NEW HALF over this span, kept rather than dropped: the release
+// re-minted for its own rift long-session perf merge with release/v0.40.0,
+// where renderer.ts moved on both sides of THAT merge (its object-view
+// material disposal and build-retry-gate wiring, the release's
+// loading-screen-variety work), and again for that branch's review round. No
+// capture was retaken in either.
+//
+// Minted from the merged WORKING TREE with the repo's own tool
+// (scripts/assets/eastbrook_grand_armoury/remint_polish_provenance.mjs) rather
+// than hand-edited, and committed with exactly the bytes it read. No capture
+// was retaken: the merged renderer delta is upstream's rift collision and
+// view-resource-disposal work plus this branch's farm-visual wiring, neither
+// of which moves the sealed pixels.
 const ACCEPTED_POLISH_V2_METADATA_SHA256 =
-  'fe37c37cf2465b40cc1d57b0c096bcaed8f88a8b6e17a379d0e1546fda0f30d5';
+  'bb2148e4a8da483067ccbd51b032dd504877add764eb4898d6382d13629249db';
 const ACCEPTED_POLISH_V2_COMPOSITE_PROVENANCE =
-  '6b9ee41045a876453ff7b7df23e52303c0f5f9d8f19df1039becb613e8126405';
+  '18bcb51434c7dc8dd1cd1dc57fb4feed0013143adffcb4f80a57553fdde61c51';
 const ACCEPTED_POLISH_V2_METADATA = readJsonFile<CaptureMetadata>(ACCEPTED_POLISH_V2_METADATA_PATH);
 const ACCEPTED_POLISH_V2_PROVENANCE = ACCEPTED_POLISH_V2_METADATA.polishProvenance;
 const ACCEPTED_POLISH_V2_TOWN_CONTRACT = ACCEPTED_POLISH_V2_METADATA.records[0]?.townContract;
@@ -1982,7 +2008,15 @@ describe('Eastbrook polish performance and contact evidence', () => {
       // Parent values at the Phase 11e QA sync: ours d4aa71b9, the release
       // 9c8f6ca4. At the Phase 11f sync: ours b77a8880, the release 0d3ec7db.
       // Recomputed LAST from the swept files, per REMINT_COMMAND.
-    ).toBe('d3fc845bbf8f7a1983d1f09819a0c34d64d7a91b35de1aab1f52d5ff909b85f0');
+    // Re-minted at the Phase 11g QA release sync (release tip 3e49dc11b3): both
+    // parents edited renderer.ts again, so the merged file is a third content
+    // and neither parent's literal describes it. The release's own half over
+    // this span, kept rather than dropped: it re-minted for its review-fix
+    // round (prewarm_policy.ts and renderer.ts moved) and again for its rift
+    // long-session perf merge with release/v0.40.0 (renderer.ts moved on both
+    // sides of THAT merge). Same order, the composite first, then this seal.
+    // No capture was retaken.
+    ).toBe('fa94c388bcaf7e38c6de1d1d80b8c571a1fc99a82a9b1f89ef0e6dba1ccb9a32');
   });
 
   it('binds every historical after record to its accepted source and asset provenance', () => {

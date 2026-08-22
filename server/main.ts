@@ -4,6 +4,7 @@ import './env';
 import * as fs from 'node:fs';
 import * as http from 'node:http';
 import * as path from 'node:path';
+import { pipeline } from 'node:stream';
 import { WebSocketServer } from 'ws';
 import { DEEDS } from '../src/sim/content/deeds';
 import {
@@ -1264,6 +1265,19 @@ const MIME: Record<string, string> = {
   '.webp': 'image/webp',
   '.mp3': 'audio/mpeg',
 };
+// Stream a static file into a response with full teardown: bare pipe() never
+// destroys the SOURCE stream when the response side closes first, so every
+// client-aborted transfer leaked its file descriptor for the life of the
+// process (issue #3562). pipeline() destroys both ends on either side's
+// close. A premature close IS the normal client-abort case, so only real
+// read errors are logged.
+function streamStaticFile(file: string, res: http.ServerResponse): void {
+  pipeline(fs.createReadStream(file), res, (err) => {
+    if (err && (err as NodeJS.ErrnoException).code !== 'ERR_STREAM_PREMATURE_CLOSE') {
+      console.error(`[static] stream failed for ${file}:`, err);
+    }
+  });
+}
 // The admin dashboard is reached via the admin.* subdomain (Caddy proxies it
 // to this same port) or /admin for local dev. The hostname only picks which
 // HTML shell is served, the admin API itself is gated by admin tokens.
@@ -1333,7 +1347,7 @@ function serveStatic(req: http.IncomingMessage, res: http.ServerResponse): void 
     const index = path.join(STATIC_DIR, shell);
     if (fs.existsSync(index)) {
       res.writeHead(200, { 'Content-Type': 'text/html', 'Cache-Control': 'no-cache' });
-      fs.createReadStream(index).pipe(res);
+      streamStaticFile(index, res);
     } else {
       res.writeHead(404);
       res.end('not found (run `npm run build` to serve the client from the game server)');
@@ -1372,7 +1386,7 @@ function serveStatic(req: http.IncomingMessage, res: http.ServerResponse): void 
     res.end(verifiedSfx.bytes);
     return;
   }
-  fs.createReadStream(file).pipe(res);
+  streamStaticFile(file, res);
 }
 
 // ---------------------------------------------------------------------------

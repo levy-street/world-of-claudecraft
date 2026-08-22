@@ -303,8 +303,34 @@ interface AttributionTargetFixture {
 // with exactly the bytes it read. No capture was retaken: the merged renderer
 // delta is upstream's loading-screen wiring plus this branch's farm-visual
 // wiring, neither of which moves the sealed pixels.
+//
+// RE-MINTED AGAIN at the Phase 11g QA release sync (release tip 3e49dc11b3,
+// PR #3566's rift long-session perf work; prior synced release parent
+// 098372138a). The SIXTH consecutive sync to re-mint this seal, and the
+// trigger is the one it has always been: a MOVED SWEPT INPUT, never a
+// conflicting seal. BOTH parents edited src/render/renderer.ts since the
+// common base (base 13573, ours 13603, theirs 13584, merged 13614), so the
+// merged renderer is a third content and NEITHER parent's literal describes
+// it. Parent values for the record: composite ours 6b9ee410 / theirs
+// 0ae18f49; metadata sha256 ours fe37c37c / theirs 1cd098ab; second-order
+// performance digest ours d3fc845b / theirs cfd7bd7e. Every other swept input
+// holds its sealed bytes.
+//
+// UPSTREAM'S NEW HALF over this span, kept rather than dropped: the release
+// re-minted for its own rift long-session perf merge with release/v0.40.0,
+// where renderer.ts moved on both sides of THAT merge (its object-view
+// material disposal and build-retry-gate wiring, the release's
+// loading-screen-variety work), and again for that branch's review round. No
+// capture was retaken in either.
+//
+// Minted from the merged WORKING TREE with the repo's own tool
+// (scripts/assets/eastbrook_grand_armoury/remint_polish_provenance.mjs) rather
+// than hand-edited, and committed with exactly the bytes it read. No capture
+// was retaken: the merged renderer delta is upstream's rift collision and
+// view-resource-disposal work plus this branch's farm-visual wiring, neither
+// of which moves the sealed pixels.
 const PINNED_POLISH_COMPOSITE_FINGERPRINT =
-  '6b9ee41045a876453ff7b7df23e52303c0f5f9d8f19df1039becb613e8126405';
+  '18bcb51434c7dc8dd1cd1dc57fb4feed0013143adffcb4f80a57553fdde61c51';
 
 function validPolishAttributionTargets(): AttributionTargetFixture[] {
   return [

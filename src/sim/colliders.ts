@@ -14,6 +14,16 @@ import {
   isEastbrookGrandArmoury,
 } from './building_layout';
 import { CASTLE_WALL_LEDGES, castleParapetSegments, PARAPET_HALF } from './castle_layout';
+import {
+  buildColliderCellIndex,
+  type ColliderCellIndex,
+  cellKey,
+  cellKeyAt,
+  colliderBounds,
+  colliderCellAt,
+  GRID_CELL,
+  MAX_BODY_RADIUS,
+} from './collider_cells';
 import { MOUNT_RACE_JUMP_FIXTURES, raceGateSegment } from './content/mounts';
 import {
   arenaOriginAt,
@@ -39,10 +49,16 @@ import {
   PORTALS,
   RIFT_REGION_HALF_X,
   RIFT_REGION_HALF_Z,
+  riftNearestFloorOriginZ,
   STRIP_MAX_X,
   STRIP_MIN_X,
   yumiMazeOriginAt,
 } from './data';
+
+// Re-exported from the extracted cell-index module so existing importers keep
+// their './colliders' path.
+export { MAX_BODY_RADIUS } from './collider_cells';
+
 import { DAWNHOLD_WALL_LEDGES, dawnholdParapetSegments } from './dawnhold_layout';
 import {
   decorationHasCollider,
@@ -1450,12 +1466,8 @@ function interiorCollidersFor(dungeonId: string | null, interior: string): Colli
 // Spatial grid + movement resolution
 // ---------------------------------------------------------------------------
 
-const GRID_CELL = 16;
-/** Largest mover we resolve for. Doubles as the grid's registration margin:
- *  every collider is inserted into all cells its bounds inflated by this
- *  touch, which is what makes the single-cell support and glue reads below
- *  complete (their reach beyond a collider's bounds never exceeds it). */
-export const MAX_BODY_RADIUS = 0.8;
+// GRID_CELL / MAX_BODY_RADIUS moved to collider_cells.ts (shared with the
+// rift region indexes); imported above.
 /** Fence/blocker wall half-thickness (yards); the editor's blocker overlay
  * reuses it so the drawn wall matches the collider exactly. */
 export const FENCE_HALF_DEPTH = 0.35;
@@ -1496,23 +1508,8 @@ interface ColliderGrid {
   gen: number;
 }
 
-// Grid cells are keyed by a packed integer rather than a `gx,gz` template
-// string. The key is built on every lookup in the movement and line-of-sight
-// hot paths, and a string key allocated there was the single
-// largest source of per-tick garbage in the physics solver (it dominated even
-// on empty ground, where there is no collider work to do at all). The bias
-// keeps negative cells positive; the span covers any world the editor can
-// author (cell 16 yd, so +/- 32768 cells is +/- 524288 yd).
-const CELL_KEY_BIAS = 32768;
-const CELL_KEY_SPAN = 65536;
-function cellKey(gx: number, gz: number): number {
-  return (gx + CELL_KEY_BIAS) * CELL_KEY_SPAN + (gz + CELL_KEY_BIAS);
-}
-/** The grid key covering a WORLD position, for the reads that start from one
- *  (the battleground band's sight test) rather than from a cell range. */
-function cellKeyAt(x: number, z: number): number {
-  return cellKey(Math.floor(x / GRID_CELL), Math.floor(z / GRID_CELL));
-}
+// cellKey / cellKeyAt moved to collider_cells.ts (shared with the rift
+// region indexes); imported above.
 
 // Grids are cached per (active world content, seed). The WeakMap keeps the
 // built-in world's grid warm forever and lets swapped-out custom maps be
@@ -1525,13 +1522,7 @@ export function invalidateStaticColliders(): void {
   gridCaches.delete(getActiveWorldContent());
 }
 
-function colliderBounds(c: Collider): { minX: number; maxX: number; minZ: number; maxZ: number } {
-  if (c.type === 'circle') {
-    return { minX: c.x - c.r, maxX: c.x + c.r, minZ: c.z - c.r, maxZ: c.z + c.r };
-  }
-  const ext = Math.hypot(c.hw, c.hd);
-  return { minX: c.x - ext, maxX: c.x + ext, minZ: c.z - ext, maxZ: c.z + ext };
-}
+// colliderBounds moved to collider_cells.ts; imported above.
 
 function gridFor(seed: number): ColliderGrid {
   const content = getActiveWorldContent();
@@ -1888,41 +1879,73 @@ interface RiftRegion {
   ox: number;
   oz: number;
   colliders: Collider[];
+  /** Cell index over `colliders`, built once at publish. Movement and sight
+   *  read the sample point's cell instead of scanning the whole floor's list;
+   *  the MAX_BODY_RADIUS registration margin (collider_cells.ts) keeps the
+   *  single-cell read complete for every live resolve radius. */
+  cells: ColliderCellIndex;
 }
-const RIFT_REGIONS = new Map<number, RiftRegion[]>();
+// token -> floor origin z -> region. Every region shares RIFT_X_MIN as its ox
+// and floor origins are RIFT_FLOOR_SPACING (340) apart while regions span
+// +/- RIFT_REGION_HALF_Z (160), so origins never collide and oz is a unique
+// key. riftNearestFloorOriginZ derives the only candidate origin for a
+// position, making the lookup O(1) instead of a scan over every occupied
+// slot (NEVER riftOriginAt here: its slot clamp maps the south half of a
+// floor 0 into the previous slot's top floor).
+const RIFT_REGIONS = new Map<number, Map<number, RiftRegion>>();
 let NEXT_RIFT_TOKEN = 1;
 
 export function allocRiftCollisionToken(): number {
   return NEXT_RIFT_TOKEN++;
 }
 
-export function setRiftRegion(token: number, ox: number, oz: number, colliders: Collider[]): void {
-  let list = RIFT_REGIONS.get(token);
-  if (!list) {
-    list = [];
-    RIFT_REGIONS.set(token, list);
+/** Publish a rift floor's generated collider set. `cellSize` is a test seam:
+ *  the equivalence suite publishes a reference region with cellSize Infinity,
+ *  one all-covering cell that reproduces the pre-index full-list scan (see
+ *  collider_cells.ts: a finite size quadrants at the local origin instead). */
+export function setRiftRegion(
+  token: number,
+  ox: number,
+  oz: number,
+  colliders: Collider[],
+  cellSize?: number,
+): void {
+  let byOz = RIFT_REGIONS.get(token);
+  if (!byOz) {
+    byOz = new Map();
+    RIFT_REGIONS.set(token, byOz);
   }
-  const i = list.findIndex((r) => r.ox === ox && r.oz === oz);
-  if (i >= 0) list[i] = { ox, oz, colliders };
-  else list.push({ ox, oz, colliders });
+  // The seam may only WIDEN cells (the reference token's one giant cell): a
+  // smaller-than-GRID_CELL cell would break the registration-margin
+  // completeness argument, so clamp.
+  const size = cellSize === undefined ? undefined : Math.max(cellSize, GRID_CELL);
+  byOz.set(oz, { ox, oz, colliders, cells: buildColliderCellIndex(colliders, size) });
 }
 
 export function clearRiftRegion(token: number, ox: number, oz: number): void {
-  const list = RIFT_REGIONS.get(token);
-  if (!list) return;
-  const i = list.findIndex((r) => r.ox === ox && r.oz === oz);
-  if (i >= 0) list.splice(i, 1);
+  const byOz = RIFT_REGIONS.get(token);
+  if (!byOz) return;
+  // oz is the key (every origin shares RIFT_X_MIN as its ox); the ox guard
+  // keeps a mismatched clear from deleting someone else's region if that
+  // invariant ever breaks. Drop the emptied inner map so throwaway Sims
+  // (character creation constructs one per call) leave nothing behind.
+  if (byOz.get(oz)?.ox === ox) byOz.delete(oz);
+  if (byOz.size === 0) RIFT_REGIONS.delete(token);
 }
 
 function riftRegionAt(token: number, x: number, z: number): RiftRegion | null {
-  const list = RIFT_REGIONS.get(token);
-  if (!list) return null;
-  for (const r of list) {
-    if (Math.abs(x - r.ox) <= RIFT_REGION_HALF_X && Math.abs(z - r.oz) <= RIFT_REGION_HALF_Z) {
-      return r;
-    }
-  }
-  return null;
+  const byOz = RIFT_REGIONS.get(token);
+  if (!byOz) return null;
+  // The nearest floor origin is the only region that can contain (x, z):
+  // regions are 320 deep on 340 spacing, so they never overlap. MUST be the
+  // true nearest-origin derivation (riftNearestFloorOriginZ, allocation-free,
+  // once per movement resolve and per 0.5 yd sight sample), never
+  // riftOriginAt: see the map comment above.
+  const region = byOz.get(riftNearestFloorOriginZ(z));
+  if (!region) return null;
+  if (Math.abs(x - region.ox) > RIFT_REGION_HALF_X || Math.abs(z - region.oz) > RIFT_REGION_HALF_Z)
+    return null;
+  return region;
 }
 
 function instanceLocal(
@@ -1993,7 +2016,16 @@ export function resolvePosition(
   if (isRiftPos(x)) {
     const region = riftRegionAt(riftToken, x, z);
     if (!region) return { x, z };
-    const local = resolveAgainst(region.colliders, x - region.ox, z - region.oz, r, ignoreFences);
+    const lx = x - region.ox;
+    const lz = z - region.oz;
+    // Single-cell read by the ORIGINAL point, the same contract as the
+    // open-world arm below: complete for r <= MAX_BODY_RADIUS via the
+    // registration margin (collider_cells.ts). A wider body (the boulder
+    // push resolves at r = 1.0) falls back to the full floor list, which is
+    // exactly the pre-index scan: rare, per-interaction, and byte-identical.
+    const list = r <= MAX_BODY_RADIUS ? colliderCellAt(region.cells, lx, lz) : region.colliders;
+    if (!list) return { x, z };
+    const local = resolveAgainst(list, lx, lz, r, ignoreFences);
     return { x: local.x + region.ox, z: local.z + region.oz };
   }
   if (x > DUNGEON_X_THRESHOLD && !isBgPos(x)) {
@@ -2518,7 +2550,13 @@ function sightBlockedAt(
   }
   if (isRiftPos(x)) {
     const region = riftRegionAt(riftToken, x, z);
-    return region ? overlapsAny(region.colliders, x - region.ox, z - region.oz, false) : false;
+    if (!region) return false;
+    // Cell read per 0.5 yd sight sample: r is lineOfSightClear's 0.05, an
+    // order of magnitude inside the MAX_BODY_RADIUS registration pad, so the
+    // single cell is complete (the battleground arm above documents the same
+    // R-BOUND ASSUMPTION).
+    const list = colliderCellAt(region.cells, x - region.ox, z - region.oz);
+    return list ? overlapsAny(list, x - region.ox, z - region.oz, false) : false;
   }
   if (x > DUNGEON_X_THRESHOLD) {
     const { ox, oz, interior, dungeonId } = instanceLocal(x, z);

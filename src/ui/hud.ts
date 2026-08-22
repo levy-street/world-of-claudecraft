@@ -1582,15 +1582,15 @@ export class Hud {
   private resurrectHealerBtnEl = $('#resurrect-healer-btn');
   // Cached once (was re-queried every frame): the near-death screen-edge overlay.
   private lowHealthVignetteEl = document.getElementById('low-health-vignette');
-  private hotWriteCache: SingleSlotCache = new Map();
+  private hotWriteCache: SingleSlotCache = new WeakMap(); // WeakMap rationale: painter_host.ts
   // Multi-slot caches for the per-frame writers: one element holds many
   // custom properties / toggled classes, so these key per (element, prop) and
   // (element, class) instead of the single slot per element hotWriteCache uses.
-  private hotStylePropCache = new Map<HTMLElement, Map<string, string>>();
-  private hotClassCache = new Map<HTMLElement, Map<string, string>>();
+  private hotStylePropCache = new WeakMap<HTMLElement, Map<string, string>>();
+  private hotClassCache = new WeakMap<HTMLElement, Map<string, string>>();
   // Multi-slot cache for the action-bar setAttr writer: the action-bar
   // aria-label is a per-frame attribute write, keyed per (element, attr name).
-  private hotAttrCache = new Map<HTMLElement, Map<string, string>>();
+  private hotAttrCache = new WeakMap<HTMLElement, Map<string, string>>();
   private hotDomWrites = 0;
   private hotDomSkippedWrites = 0;
   private subzoneTimer: number | undefined;

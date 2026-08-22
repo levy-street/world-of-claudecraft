@@ -14,6 +14,7 @@ import {
   isArenaPos,
   isBgPos,
   isDelvePos,
+  isRiftPos,
   isYumiMazePos,
   zoneAt,
 } from '../sim/data';
@@ -29,6 +30,11 @@ export function telemetryZoneId(x: number, z: number): string {
   if (isArenaPos(x)) return 'arena';
   if (isYumiMazePos(x)) return 'yumi_maze';
   if (isBgPos(x)) return 'battleground';
+  // One bounded id for every rift slot/floor (tier and seed vary per run, so a
+  // finer split would blow the fleet dimension's cardinality). Without this arm
+  // rift sessions fold into the generic 'instance' bucket and degradation
+  // reports cannot be correlated with rift play.
+  if (isRiftPos(x)) return 'rift';
   const dungeon = dungeonAt(x);
   return dungeon ? `dungeon:${dungeon.id}` : 'instance';
 }

@@ -84,6 +84,7 @@ import {
 } from './blob_shadow_core';
 import { BlobShadows } from './blob_shadows';
 import { createBuildLedger } from './build_ledger_core';
+import { BuildRetryGate } from './build_retry_gate';
 import { setBuildSpanSink } from './build_spans';
 import { type BulwarkFeaturesView, buildBulwarkFeatures } from './bulwark_features';
 import { BurningPactMarkers } from './burning_pact_markers';
@@ -602,7 +603,7 @@ import {
   shadowTexelWorldSize,
   snapShadowAnchor,
 } from './shadow_texel_snap_core';
-import { isSharedGeometry, isSharedMaterial } from './shared_resource';
+import { disposeUnsharedMeshResources, markSharedMaterial } from './shared_resource';
 import {
   buildSky,
   ensureSkyAssetsAt,
@@ -8531,11 +8532,13 @@ export class Renderer {
         e.templateId !== 'delve_destructible_wall'
       ) {
         if (!this.sparkleMat) {
-          this.sparkleMat = new THREE.SpriteMaterial({
-            map: sparkleTexture(),
-            transparent: true,
-            depthWrite: false,
-          });
+          this.sparkleMat = markSharedMaterial(
+            new THREE.SpriteMaterial({
+              map: sparkleTexture(),
+              transparent: true,
+              depthWrite: false,
+            }),
+          );
           if (!this.lowGfx) this.sparkleMat.color.setScalar(SPARKLE_BOOST);
         }
         sparkle = new THREE.Sprite(this.sparkleMat);
@@ -8579,11 +8582,13 @@ export class Renderer {
       if (result.reused) body.rotation.y = (e.id % 7) * 0.45;
       objectMesh = body;
       if (!this.sparkleMat) {
-        this.sparkleMat = new THREE.SpriteMaterial({
-          map: sparkleTexture(),
-          transparent: true,
-          depthWrite: false,
-        });
+        this.sparkleMat = markSharedMaterial(
+          new THREE.SpriteMaterial({
+            map: sparkleTexture(),
+            transparent: true,
+            depthWrite: false,
+          }),
+        );
         if (!this.lowGfx) this.sparkleMat.color.setScalar(SPARKLE_BOOST); // gold glint via bloom
       }
       sparkle = new THREE.Sprite(this.sparkleMat);
@@ -9213,6 +9218,10 @@ export class Renderer {
   // ---------------------------------------------------------------------
 
   private builtInteriors = new Set<string>();
+  // A hard rift build failure releases its builtInteriors key behind this
+  // cooldown, so the retry is neither per-frame nor never (build_retry_gate.ts
+  // explains why it is a timestamp, not a timer).
+  private readonly riftBuildRetry = new BuildRetryGate(15000);
   // Rift interiors are the one interior class whose world origin is REUSED: an
   // empty slot frees after 60s and the next run rebuilds at the same z-stacked
   // origin, so a stale group would overlap the new build and its torch lights
@@ -9731,7 +9740,10 @@ export class Renderer {
       if (rf) {
         void ensureDungeonAssets().catch(() => undefined);
         const key = `rift:${rf.instanceId}:${rf.contentHash}:${rf.floorIndex}`;
-        if (!this.builtInteriors.has(key)) {
+        if (
+          !this.builtInteriors.has(key) &&
+          this.riftBuildRetry.shouldAttempt(key, performance.now())
+        ) {
           const o = rf.origin;
           if (Math.abs(px - o.x) < 200 && Math.abs(pz - o.z) < 250) {
             this.builtInteriors.add(key);
@@ -9755,6 +9767,8 @@ export class Renderer {
                 this.riftInteriorGroups.set(key, group);
               })
               .catch((err) => {
+                this.builtInteriors.delete(key);
+                this.riftBuildRetry.markFailed(key, performance.now());
                 console.error('Failed to build rift interior:', err);
               });
           }
@@ -10323,6 +10337,7 @@ export class Renderer {
     this.nameplatePainter.remove(id);
     const idx = this.clickTargets.indexOf(v.clickTarget);
     if (idx >= 0) this.clickTargets.splice(idx, 1);
+    let disposeObjectResources = false;
     if (v.visual) {
       // Character geometry/materials are shared per-asset caches and must
       // survive interest churn, dispose only per-instance mixer bindings.
@@ -10342,15 +10357,9 @@ export class Renderer {
           height: v.height,
         });
       } else {
-        // Object views usually own their geometries. Door portal resources are
-        // shared and prewarmed, so they must survive interest churn.
+        // Unshared object-view resources dispose BELOW the state-visual disposes.
         if (v.objectMesh) disposeSoulwellVisual(v.objectMesh);
-        v.group.traverse((o) => {
-          const mesh = o as THREE.Mesh;
-          if (mesh.isMesh && !isSharedGeometry(mesh.geometry)) mesh.geometry.dispose();
-        });
-        if (v.portal && !isSharedMaterial(v.portal.material as THREE.Material))
-          (v.portal.material as THREE.Material).dispose();
+        disposeObjectResources = true;
       }
     }
     v.iceBlockVisual?.dispose();
@@ -10362,6 +10371,8 @@ export class Renderer {
     v.paladinOathChainVisual?.dispose();
     v.paladinAegisVisual?.dispose();
     v.paladinSunVerdictVisual?.dispose();
+    if (disposeObjectResources)
+      disposeUnsharedMeshResources(v.group, { geometries: true, materials: true });
     this.audioSink?.mountEngineReset(id);
     this.views.delete(id);
   }
