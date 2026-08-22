@@ -10535,3 +10535,104 @@ firewall carve-out's scoping arm, so an edit to it reds in four places.
 - THE THREE ROLE PLATES are untouched and byte-identical (each takes
   seasoned_stock 1; recipe_laden_hearth takes 3), and differentiating them is
   11h's.
+
+### THE FULL SUITE, AND THE TWO REDS IT FOUND
+
+Both runs are stamped with tip AND dirty at both ends, and both pairs are
+identical, so both runs are valid readings of a frozen tree.
+
+PRE-MERGE BASELINE, tip ac8729cfe3, taken before anything was touched so a later
+red could be classified rather than argued about:
+  EXIT=0, 3033 files passed / 12 skipped (3045),
+  43263 passed / 2 expected fail / 115 skipped (43380).
+That reproduces the 11g ledger's recorded baseline exactly.
+
+FIRST POST-MERGE RUN, tip 0fc6874c08: EXIT=1, TWO failures out of 3053 files.
+Neither was an 11g defect and neither was noise, and the classification is the
+useful part:
+
+1. tests/i18n_status_registry.test.ts, "each enHash == contentHash(...)", failing
+   on exactly `guide.profPages.craftProse.alchemy.materialsBody`. SELF-INFLICTED,
+   BY THIS QA, THROUGH A HOLE IN THE MUTATION-RESTORE RULE. The recorded rule is
+   "commit first, mutate second, git checkout to restore", and it is INCOMPLETE:
+   `git checkout -- .` restores TRACKED files only. Two prose mutations
+   (X13, X17) ran `npm run i18n:gen` to be meaningful at all, and that regen
+   rewrites src/ui/i18n.status.json, which is GITIGNORED. The restore left it
+   holding an enHash computed from the MUTATED catalog, and `git status` showed
+   a clean tree the whole time because an ignored file is invisible to it. The
+   failing key is the one X17 edited, which is the fingerprint of the cause.
+   Fixed by re-running npm run i18n:gen; the suite is green and no tracked file
+   moved. THE RULE NEEDS ITS SECOND HALF, recorded here for the next phase: a
+   mutation that runs a REGEN must re-run that regen on restore, because the
+   tree-clean check cannot see the artifact it poisoned.
+2. tests/ci_shard_partition.test.ts, measured-coverage 0.9483 against a 0.95
+   floor. A MERGE CONSEQUENCE, and the exact "shard-weight union" hazard the
+   packet record already warns about. The release brought EIGHT new test files
+   that no harvest this table descends from has measured, so they raised the
+   ratio's denominator without raising its covered count. Recomputed at all
+   three points to prove the merge is the whole mechanism: pre-merge tree and
+   table 2879/3028 = 0.9508 PASS, post-merge tree with the unchanged table
+   2879/3036 = 0.9483 FAIL, post-carry 2887/3036 = 0.9509 PASS. The merge added
+   exactly 8 test files and removed none.
+   Fixed the way the table's own provenance already records for the 11d key
+   union and the 11f four rows: per-file medians of three consecutive local
+   runs, read from the same reporter line the harvester parses, no CI-harvested
+   weight touched, the reason written into the provenance, and the next
+   full-mode harvest supersedes all eight. ALL EIGHT were carried rather than
+   the three that would have cleared the bar, because clearing a bar is not the
+   point. Lowering the floor was considered and REFUSED: it is the only signal
+   that says the table still describes the tree, and below it the LPT balance
+   bar grades the planner's own assumption instead of reality.
+
+FINAL RUN, tip aee9fb289c, frozen and committed:
+  EXIT=0, 3041 files passed / 12 skipped (3053),
+  43329 passed / 2 expected fail / 115 skipped (43446).
+  START TIP == END TIP == aee9fb289c, START DIRTY == END DIRTY == [].
+The deltas against the baseline are accounted for: +8 test files are the merge's,
+and the +66 tests are those files' cases plus this QA's 18 new craft cases.
+
+The parity suite was run on its own post-merge as well: 232 passed, 1 skipped,
+zero movement, matching what 11g recorded pre-merge.
+
+### THE MUTATION BATTERY, FINAL COUNT: 21 RUN, 21 DEAD
+
+Nineteen against the phase as it stood, two more against the arms the fix rounds
+added (X20 the compensating fish swap, X21 a fourth alchemy crop), plus X1 and
+X12 re-run against their fixes. Every mutant compiled before its red was scored
+a kill; none was INVALID. Every restore left the tracked tree clean, verified by
+a stamp at both ends of each run, and the one time the tree was NOT clean at the
+start the harness REFUSED rather than running (an uncommitted biome reformat of
+the polish seal file), which is the "never mutate over uncommitted work" rule
+firing rather than being remembered.
+
+### ONE FINDING CUT RATHER THAN FIXED, with the reason
+
+The gate reviewer raised that NOTHING MACHINE-CHECKS THAT A CARRIED WEIGHT IS A
+REAL MEASUREMENT: the provenance is prose, and the shape pin only checks that
+`files` matches the row count and that each value is a plausible duration. A
+future contributor hitting this same red after a sync could append rows valued
+at the fallback median and take the coverage ratio, the row count and the
+balance bar green while the table learned nothing.
+
+The finding is against the PRECEDENT rather than this change (the eight values
+are real, were independently reproduced by the reviewer, and none equals the
+33 ms fallback median), and its concrete fix is gate TOOLING: a machine-readable
+`carried` map in the provenance, a pin that reads it, and a `--carry-local` mode
+on scripts/ci_shard_weights_harvest.mjs that writes both. CUT from this phase,
+deliberately, because the three pieces only work together: adding the `carried`
+field alone would put an unchecked field beside the unchecked prose, which is
+the same defect in JSON. It belongs to whoever next opens the gate tooling, and
+the design above is written down so it is not re-derived.
+
+### WHAT THIS QA WOULD TELL THE NEXT PHASE, in one line each
+
+- A GREEN UNTOUCHED SUITE STILL PROVES NOTHING, and this round found three more
+  instances after 11g's own rounds found two: the order arm, the fishing
+  aggregate, and the affinity partial list were all green over gaps.
+- AN ARM'S COMMENT IS NOT AN ARM. Three of the seven gaps were arms whose
+  comments described coverage the assertions did not have, and one of them named
+  the exact mutation that would beat it.
+- MEASURE THE RATCHET ROWS A RELEASE SYNC TOUCHED, not the ones git marked. The
+  sim.ts ceiling broke without conflicting.
+- A REGEN-BEARING MUTATION NEEDS A REGEN-BEARING RESTORE. `git status` cannot
+  see the gitignored artifact it left behind.
