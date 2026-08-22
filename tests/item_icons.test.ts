@@ -314,8 +314,9 @@ describe('item webp icons', () => {
     // phase added its seven crop families (21 ids: seed, produce, fine twin
     // per crop), the hoe phase added its four ladder rungs, the Phase 6
     // economy-hooks phase added its eight farm dishes, the Phase 11
-    // well-fed phase added its four buff dishes, and the Phase 12 shared
-    // feast added the harvest_feast placeable, all under the same
+    // well-fed phase added its four buff dishes, the Phase 12 shared
+    // feast added the harvest_feast placeable, and Phase 11f added the six
+    // farming PATTERNS its rung climb minted (56 -> 62), all under the same
     // reasoning: their art is scheduled as its own later phase, a deliberate
     // ART PARK running Phases 11e to 11k. It must fall back to 0 as that art
     // lands. CORRECTED at the Phase 11e QA: this used to add "all are dormant
@@ -377,6 +378,12 @@ describe('item webp icons', () => {
       'marsh_rice',
       'marsh_rice_seed',
       'osmium_hoe',
+      'pattern_evergarden_braised_greens',
+      'pattern_evergarden_harvest_platter',
+      'pattern_evergarden_sunmelon_tart',
+      'pattern_harvest_feast',
+      'pattern_highwatch_barley_porridge',
+      'pattern_highwatch_gourd_soup',
       'skysilver_hoe',
       'thornpeak_cabbage',
       'thornpeak_cabbage_seed',

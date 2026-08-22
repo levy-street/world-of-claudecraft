@@ -13023,6 +13023,24 @@ export const ko_KR: EnTranslations = {
       "harvest_feast": {
         "name": "수확의 잔치"
       },
+      "pattern_highwatch_gourd_soup": {
+        "name": "요리법: 하이워치 서리 박 수프"
+      },
+      "pattern_highwatch_barley_porridge": {
+        "name": "요리법: 하이워치 보리죽"
+      },
+      "pattern_evergarden_sunmelon_tart": {
+        "name": "요리법: 상록 정원 태양멜론 타르트"
+      },
+      "pattern_evergarden_harvest_platter": {
+        "name": "요리법: 상록 정원 수확 접시"
+      },
+      "pattern_evergarden_braised_greens": {
+        "name": "요리법: 상록 정원 잎채소 조림"
+      },
+      "pattern_harvest_feast": {
+        "name": "요리법: 수확의 잔치"
+      },
       "conjured_water4": {
         "name": "창조된 샘물"
       },

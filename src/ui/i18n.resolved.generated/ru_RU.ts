@@ -13023,6 +13023,24 @@ export const ru_RU: EnTranslations = {
       "harvest_feast": {
         "name": "Пир урожая"
       },
+      "pattern_highwatch_gourd_soup": {
+        "name": "Рецепт: Хайвотчский суп из морозной тыквы"
+      },
+      "pattern_highwatch_barley_porridge": {
+        "name": "Рецепт: Хайвотчская ячменная каша"
+      },
+      "pattern_evergarden_sunmelon_tart": {
+        "name": "Рецепт: Тарт с солнечной дыней из Вечного Сада"
+      },
+      "pattern_evergarden_harvest_platter": {
+        "name": "Рецепт: Блюдо урожая Вечного Сада"
+      },
+      "pattern_evergarden_braised_greens": {
+        "name": "Рецепт: Тушёная зелень Вечного Сада"
+      },
+      "pattern_harvest_feast": {
+        "name": "Рецепт: Пир урожая"
+      },
       "conjured_water4": {
         "name": "Сотворённая родниковая вода"
       },

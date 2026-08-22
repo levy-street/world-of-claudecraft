@@ -2654,6 +2654,12 @@ const ITEM_ENTITY_IDS = [
   'highwatch_barley_porridge',
   'evergarden_braised_greens',
   'harvest_feast',
+  'pattern_highwatch_gourd_soup',
+  'pattern_highwatch_barley_porridge',
+  'pattern_evergarden_sunmelon_tart',
+  'pattern_evergarden_harvest_platter',
+  'pattern_evergarden_braised_greens',
+  'pattern_harvest_feast',
 ] as const;
 
 type ItemEntityId = (typeof ITEM_ENTITY_IDS)[number];
@@ -2977,6 +2983,17 @@ const APPENDED_ITEM_NAMES: Partial<Record<ItemEntityId, string>> = {
   evergarden_braised_greens: 'Evergarden Braised Greens',
   // The shared feast (Phase 12). IP-safe per D17: two plain cooking words.
   harvest_feast: 'Harvest Feast',
+  // The six farming patterns (Phase 11f, content/farm_patterns.ts). NO NEW
+  // COINAGE: every name is the registered cooking prefix "Recipe:" plus a dish
+  // name already shipped above, so R15 and D17 are satisfied by construction
+  // and the verdict is recorded in docs/prd/masterwrought/naming-audit.md.
+  // Several are wordy in English, so M16 non-Latin fills land with them.
+  pattern_highwatch_gourd_soup: 'Recipe: Highwatch Gourd Soup',
+  pattern_highwatch_barley_porridge: 'Recipe: Highwatch Barley Porridge',
+  pattern_evergarden_sunmelon_tart: 'Recipe: Evergarden Sunmelon Tart',
+  pattern_evergarden_harvest_platter: 'Recipe: Evergarden Harvest Platter',
+  pattern_evergarden_braised_greens: 'Recipe: Evergarden Braised Greens',
+  pattern_harvest_feast: 'Recipe: Harvest Feast',
 };
 
 function itemTranslations(names: readonly string[]): ItemEntityTranslations {

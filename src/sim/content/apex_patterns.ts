@@ -29,6 +29,13 @@
 // (src/sim/professions/pattern_items.ts). quality 'epic' on all 28 (they teach
 // the epic tier; recipe rarity stays monotone to power); uniform modest
 // sellValue 100.
+//
+// NOT THE ONLY PATTERN TABLE any more: content/farm_patterns.ts is its sibling
+// (masterwrought Phase 11f), holding the six patterns that teach farming's
+// upper rungs. It is separate so every statement above about "the 28" stays
+// literally true, and it reuses this table's id contract, def shape and
+// sellValue point rather than inventing its own. The kind:'recipe' universe
+// pin in tests/apex_pattern_items.test.ts spans BOTH.
 import type { ItemDef } from '../types';
 
 export const APEX_PATTERN_ITEMS: Record<string, ItemDef> = {

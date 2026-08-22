@@ -16,6 +16,7 @@ import {
   APEX_ARMOR_RECIPES,
   APEX_CONSUMABLE_RECIPES,
   APEX_GEAR_RECIPES,
+  FARM_RECIPES,
   recipeById,
 } from '../src/sim/content/recipes';
 import { ITEMS, MOBS } from '../src/sim/data';
@@ -43,18 +44,44 @@ const GEAR_PATTERN_IDS = APEX_GEAR_RECIPES.map((r) => `pattern_${r.resultItemId}
 const CONSUMABLE_PATTERN_IDS = APEX_CONSUMABLE_RECIPES.map((r) => `pattern_${r.resultItemId}`);
 const ALL_PATTERN_IDS = [...ARMOR_PATTERN_IDS, ...GEAR_PATTERN_IDS, ...CONSUMABLE_PATTERN_IDS];
 
+// The FARM half of the kind:'recipe' universe (masterwrought Phase 11f).
+// DERIVED FROM THE RECIPE TABLE, filtered on the acquisition channel, and
+// deliberately NOT from content/farm_patterns.ts: the union pin below compares
+// what the merged ITEMS table actually ships against what the RECIPE tables
+// say should exist, so both sides must come from independent places. Deriving
+// this half from the pattern table would make the pin compare
+// farm_patterns.ts with itself and prove nothing.
+const FARM_PATTERN_IDS = FARM_RECIPES.filter((r) => r.acquisition?.includes('drop')).map(
+  (r) => `pattern_${r.resultItemId}`,
+);
+const EVERY_PATTERN_ID = [...ALL_PATTERN_IDS, ...FARM_PATTERN_IDS];
+
 describe('apex pattern defs (the 28-id universe)', () => {
   it('covers all 28 apex recipes, one pattern_<output> def per recipe, and no strays', () => {
     expect(ARMOR_PATTERN_IDS).toHaveLength(10);
     expect(GEAR_PATTERN_IDS).toHaveLength(10);
     expect(CONSUMABLE_PATTERN_IDS).toHaveLength(8);
-    // Exactness both ways: every shipped kind:'recipe' def is one of the 28,
-    // so a stray pattern cannot ship outside the recorded universe.
+    // The farm half's own count, predicted then observed at the Phase 11f rung
+    // climb: the six rows at or above the drop floor (two at rung 75, four at
+    // rung 100). Spelled beside the apex counts so a farm row silently gaining
+    // or losing the drop channel moves a literal rather than sliding through
+    // both sides of the union below.
+    expect(FARM_PATTERN_IDS).toHaveLength(6);
+    // Exactness both ways over the UNION: every shipped kind:'recipe' def is
+    // one of the 34, and every one of the 34 ships. The left side is read off
+    // the merged ITEMS table (populated by content/apex_patterns.ts and
+    // content/farm_patterns.ts); the right side is computed from the RECIPE
+    // tables. Two independent derivations, which is what keeps the pin
+    // non-vacuous now that it spans two content modules.
     const shippedRecipeKind = Object.values(ITEMS)
       .filter((def) => def.kind === 'recipe')
       .map((def) => def.id)
       .sort();
-    expect(shippedRecipeKind).toEqual([...ALL_PATTERN_IDS].sort());
+    expect(shippedRecipeKind).toEqual([...EVERY_PATTERN_ID].sort());
+    expect(EVERY_PATTERN_ID).toHaveLength(34);
+    // No id belongs to both halves: a collision would let the union stay the
+    // right SIZE while one table quietly shadowed the other in mergeItems.
+    expect(new Set(EVERY_PATTERN_ID).size).toBe(EVERY_PATTERN_ID.length);
   });
 
   it('every pattern is an epic, tradable, sellValue-100 recipe item teaching its exact recipe', () => {

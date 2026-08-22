@@ -417,6 +417,29 @@ Vellum.
     highland_barley predates this and is not re-opened, but the family is not
     extended.
 
+- PHASE 11f (the farming drop economy), VERDICT: **NO NEW COINAGE**, and the
+  verdict is written down precisely because the sweep found nothing. Six new
+  item ids ship (content/farm_patterns.ts) and not one of them mints a proper
+  noun: every display name is the registered per-craft prefix for cooking,
+  "Recipe:", plus a dish name ALREADY SHIPPED and already audited above. The
+  six are Recipe: Highwatch Gourd Soup, Recipe: Highwatch Barley Porridge,
+  Recipe: Evergarden Sunmelon Tart, Recipe: Evergarden Harvest Platter, Recipe:
+  Evergarden Braised Greens and Recipe: Harvest Feast. R15 and D17 are
+  therefore satisfied BY CONSTRUCTION rather than by a search: there is no
+  novel token to search for, and a collision in any of them would already be a
+  collision in the shipped dish it names. The construction is asserted rather
+  than trusted, in tests/farm_pattern_items.test.ts ("mints no new proper
+  noun"), which rebuilds each name from the prefix table plus the taught row's
+  output name, so a hand-edited pattern name that DID coin something reds
+  instead of shipping. The prefix itself is the registered one: the per-craft
+  display prefix table gives cooking and alchemy "Recipe:", the same word the
+  eight apex consumable patterns already carry. This row exists so a later
+  reader knows the sweep RAN and why six new ids needed no audit, rather than
+  finding silence and having to redo it.
+  - Also swept and clear: the six ids themselves. They follow the shipped
+    pattern_<output item id> contract, so they are derived rather than coined,
+    and ids are never player-visible anyway.
+
 ## Recorded for the maintainer (stopping rule: no unilateral rename)
 
 STATUS 2026-08-20, SETTLED BY THE MAINTAINER, and the scope is narrow on purpose.

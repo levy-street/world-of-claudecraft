@@ -3839,6 +3839,42 @@ const ITEM_RECIPES: Record<string, IconRecipe> = {
     ],
     ['sparkle'],
   ),
+  // The six farming PATTERNS (Phase 11f, content/farm_patterns.ts). Explicit
+  // rows for the same reason the dishes above have them: the kind-'recipe'
+  // fallback sends every one of them to one shared scroll glyph, so a farmer
+  // holding two would see the same icon twice and the A4 distinctness sweep in
+  // tests/item_icons.test.ts reds. The family rule is one line: the 'parchment'
+  // ground plus a 'scroll' primary say RECIPE, and the bottom-right accent is
+  // the PRIMARY glyph of the dish each one teaches (snowflake, potion,
+  // sunburst, leaf, tendrils, coin), so a pattern reads as the scroll for its
+  // plate rather than as a generic page. Palettes follow the taught dish too,
+  // which is what keeps the six apart without leaning on palette alone.
+  pattern_highwatch_gourd_soup: r('parchment', 'ice', [
+    'scroll',
+    { p: 'snowflake', pal: 'ice', ...BR },
+  ]),
+  pattern_highwatch_barley_porridge: r('parchment', 'gold', [
+    'scroll',
+    { p: 'potion', pal: 'gold', ...BR },
+  ]),
+  pattern_evergarden_sunmelon_tart: r('parchment', 'gold', [
+    'scroll',
+    { p: 'sunburst', pal: 'gold', ...BR },
+  ]),
+  pattern_evergarden_harvest_platter: r('parchment', 'leafGreen', [
+    'scroll',
+    { p: 'leaf', pal: 'leafGreen', ...BR },
+  ]),
+  pattern_evergarden_braised_greens: r('parchment', 'leafGreen', [
+    'scroll',
+    { p: 'tendrils', pal: 'leafGreen', ...BR },
+  ]),
+  pattern_harvest_feast: r(
+    'parchment',
+    'gold',
+    ['scroll', { p: 'coin', pal: 'gold', ...BR }],
+    ['sparkle'],
+  ),
   // misc UI icons (not real items)
   coin_gold: r('treasure', 'gold', ['coin'], ['sparkle']),
   slot_empty: r('junk', 'silverWhite', []),
@@ -5663,6 +5699,18 @@ export const ITEM_ART_PENDING = new Set<string>([
   'marsh_rice',
   'marsh_rice_seed',
   'osmium_hoe',
+  // The six farming patterns (Phase 11f, content/farm_patterns.ts). Same
+  // scheduled park as the produce above and for the same reason: committed
+  // WebP art needs the maintainer's master SHA, which a phase session cannot
+  // produce, so parking is the packet-wide answer rather than a placeholder
+  // binary. Each serves its procedural recipe through iconDataUrl instead of
+  // pointing an <img> at a 404.
+  'pattern_evergarden_braised_greens',
+  'pattern_evergarden_harvest_platter',
+  'pattern_evergarden_sunmelon_tart',
+  'pattern_harvest_feast',
+  'pattern_highwatch_barley_porridge',
+  'pattern_highwatch_gourd_soup',
   'skysilver_hoe',
   'thornpeak_cabbage',
   'thornpeak_cabbage_seed',

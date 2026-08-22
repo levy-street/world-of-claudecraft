@@ -13023,6 +13023,24 @@ export const en_XA: EnTranslations = {
       "harvest_feast": {
         "name": "[Ĥáŕʋéšţ Ƒéášţ]"
       },
+      "pattern_highwatch_gourd_soup": {
+        "name": "[Ŕéçíþé: Ĥíĝĥŵáţçĥ Ĝóúŕð Šóúþ]"
+      },
+      "pattern_highwatch_barley_porridge": {
+        "name": "[Ŕéçíþé: Ĥíĝĥŵáţçĥ Ɓáŕļéý Þóŕŕíðĝé]"
+      },
+      "pattern_evergarden_sunmelon_tart": {
+        "name": "[Ŕéçíþé: Éʋéŕĝáŕðéñ Šúñɱéļóñ Ţáŕţ]"
+      },
+      "pattern_evergarden_harvest_platter": {
+        "name": "[Ŕéçíþé: Éʋéŕĝáŕðéñ Ĥáŕʋéšţ Þļáţţéŕ]"
+      },
+      "pattern_evergarden_braised_greens": {
+        "name": "[Ŕéçíþé: Éʋéŕĝáŕðéñ Ɓŕáíšéð Ĝŕééñš]"
+      },
+      "pattern_harvest_feast": {
+        "name": "[Ŕéçíþé: Ĥáŕʋéšţ Ƒéášţ]"
+      },
       "conjured_water4": {
         "name": "[Çóñĵúŕéð Šþŕíñĝŵáţéŕ]"
       },

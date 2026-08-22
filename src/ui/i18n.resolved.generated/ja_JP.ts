@@ -13023,6 +13023,24 @@ export const ja_JP: EnTranslations = {
       "harvest_feast": {
         "name": "収穫の宴"
       },
+      "pattern_highwatch_gourd_soup": {
+        "name": "レシピ：ハイウォッチの霜瓜スープ"
+      },
+      "pattern_highwatch_barley_porridge": {
+        "name": "レシピ：ハイウォッチの大麦粥"
+      },
+      "pattern_evergarden_sunmelon_tart": {
+        "name": "レシピ：エバーガーデンの太陽メロンタルト"
+      },
+      "pattern_evergarden_harvest_platter": {
+        "name": "レシピ：エバーガーデンの収穫プレート"
+      },
+      "pattern_evergarden_braised_greens": {
+        "name": "レシピ：エバーガーデンの青菜煮込み"
+      },
+      "pattern_harvest_feast": {
+        "name": "レシピ：収穫の宴"
+      },
       "conjured_water4": {
         "name": "魔法の湧き水"
       },

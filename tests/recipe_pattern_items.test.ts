@@ -15,7 +15,7 @@ import { afterAll, beforeAll, describe, expect, it, vi } from 'vitest';
 // sees them and no content has to exist yet for this behavior to be pinned.
 
 import { stackSizeOf } from '../src/sim/bags';
-import { ALL_RECIPES, recipeById } from '../src/sim/content/recipes';
+import { ALL_RECIPES, FARM_RECIPES, recipeById } from '../src/sim/content/recipes';
 import { ITEMS } from '../src/sim/data';
 import { isItemLocked } from '../src/sim/item_lock';
 import {
@@ -747,6 +747,123 @@ describe('shipped pattern content shape', () => {
       );
       expect(def.noMarketList ?? false, `${id}: patterns are deliberately listable`).toBe(false);
     }
+  });
+});
+
+describe('the FARMING patterns ride the shipped machinery unchanged', () => {
+  // The whole thesis of masterwrought Phase 11f: a farm recipe is a COOKING
+  // recipe, so the phase 02 machinery teaches it with no edit at all. These
+  // arms drive the REAL shipped ids (never a synthetic fixture) through the
+  // REAL useItem dispatch, which is the only way to prove the thesis rather
+  // than restate it. If any of them needed a change in pattern_items.ts,
+  // training.ts, wheel.ts or crafting.ts, the phase would have been wrong.
+  //
+  // The pair is picked by RUNG off the merged content, not hardcoded: one
+  // pattern teaching a rung-75 row and one teaching a rung-100 row, so both
+  // tier bands the climb created are exercised.
+  const farmPatterns = Object.values(ITEMS).filter(
+    (def): def is RecipeItemDef =>
+      def.kind === 'recipe' &&
+      recipeById(def.teachesRecipeId)?.professionId === 'cooking' &&
+      FARM_RECIPES.some((r) => r.id === def.teachesRecipeId),
+  );
+  const patternAtRung = (rung: number): RecipeItemDef => {
+    const found = farmPatterns.find((def) => recipeById(def.teachesRecipeId)?.skillReq === rung);
+    if (!found) throw new Error(`no shipped farming pattern teaching a rung-${rung} recipe`);
+    return found;
+  };
+
+  /** A cook with `skill` in cooking, holding one copy of `pattern`. */
+  function cook(sim: Sim, skill: number, patternId: string) {
+    const pid = sim.addPlayer('warrior', 'Cook');
+    const meta = sim.meta(pid);
+    if (!meta) throw new Error('missing meta');
+    meta.autoEquip = false;
+    meta.craftSkills.cooking = skill;
+    sim.addItem(patternId, 1, pid);
+    sim.drainEvents();
+    return { pid, meta };
+  }
+
+  it('covers both new rungs, and the set is exactly the six the rung climb flipped', () => {
+    // Non-vacuity for every arm below: they select out of THIS set, so an
+    // empty or half-populated set would make them pass over nothing.
+    expect(farmPatterns).toHaveLength(6);
+    const rungs = [...new Set(farmPatterns.map((d) => recipeById(d.teachesRecipeId)?.skillReq))];
+    expect(rungs.sort((a, b) => (a ?? 0) - (b ?? 0))).toEqual([75, 100]);
+  });
+
+  it('a farm pattern learns at tier and is spent doing it, on the shipped dispatch', () => {
+    const sim = makeWorld();
+    const pattern = patternAtRung(100);
+    const recipe = recipeById(pattern.teachesRecipeId)!;
+    const { pid, meta } = cook(sim, 100, pattern.id);
+    expect(meta.knownRecipes.has(recipe.id)).toBe(false);
+    const events = useAndCollect(sim, pattern.id, pid);
+    expect(errorTexts(events)).toEqual([]);
+    expect(trainResults(events)).toEqual([
+      { type: 'trainResult', ok: true, recipeId: recipe.id, pid },
+    ]);
+    expect(meta.knownRecipes.has(recipe.id)).toBe(true);
+    expect(sim.countItem(pattern.id, pid), 'exactly one copy consumed').toBe(0);
+    expect(sim.craftingIdentityFor(pid).knownRecipes).toContain(recipe.id);
+  });
+
+  it('the tier gate refuses a rung-75 pattern at cooking 50 and a rung-100 one at cooking 75', () => {
+    // Both bands the climb created, and the refusal must NOT eat the copy: a
+    // pattern a player cannot use yet is still theirs.
+    for (const [rung, skill] of [
+      [75, 50],
+      [100, 75],
+    ] as const) {
+      const sim = makeWorld();
+      const pattern = patternAtRung(rung);
+      const recipe = recipeById(pattern.teachesRecipeId)!;
+      const { pid, meta } = cook(sim, skill, pattern.id);
+      expect(useAndCollectErrors(sim, pattern.id, pid), `rung ${rung} at cooking ${skill}`).toEqual(
+        [TIER_ERROR],
+      );
+      expect(meta.knownRecipes.has(recipe.id)).toBe(false);
+      expect(sim.countItem(pattern.id, pid), 'a refused pattern is never consumed').toBe(1);
+    }
+  });
+
+  it('refuses a player who has never cooked, and answers already-known FIRST', () => {
+    const sim = makeWorld();
+    const pattern = patternAtRung(75);
+    const recipe = recipeById(pattern.teachesRecipeId)!;
+    const { pid, meta } = cook(sim, 0, pattern.id);
+    expect(useAndCollectErrors(sim, pattern.id, pid)).toEqual([PROFESSION_ERROR]);
+    expect(sim.countItem(pattern.id, pid)).toBe(1);
+    // Deny ORDER: with the recipe known, the profession arm would still fail
+    // at skill 0, so a different message here would mean the arms reordered.
+    meta.knownRecipes.add(recipe.id);
+    expect(useAndCollectErrors(sim, pattern.id, pid)).toEqual([KNOWN_ERROR]);
+    expect(sim.countItem(pattern.id, pid)).toBe(1);
+  });
+
+  it('browses and lists on the World Market like every other pattern', () => {
+    for (const pattern of farmPatterns) {
+      const matched = MARKET_ITEM_TYPE_FILTERS.filter((itemType) =>
+        marketItemMatches(pattern.id, { ...defaultMarketQuery(), itemType }),
+      );
+      expect([...matched].sort(), `${pattern.id} browse buckets`).toEqual(['all', 'pattern']);
+      expect(pattern.noMarketList ?? false, `${pattern.id} must be listable`).toBe(false);
+      expect(stackSizeOf(pattern), `${pattern.id} stack size`).toBe(1);
+    }
+    // And one real listing through the live path, so the browse claim above is
+    // not the only thing standing between a farm pattern and the market.
+    const sim = makeWorld();
+    const pattern = patternAtRung(75);
+    const { pid } = cook(sim, 0, pattern.id);
+    standAtMerchant(sim, pid);
+    sim.drainEvents();
+    sim.marketList(pattern.id, 1, 500, pid);
+    expect(errorTexts(sim.drainEvents())).toEqual([]);
+    expect(
+      sim.marketListings.find((l) => l.sellerKey === String(pid) && l.itemId === pattern.id)?.count,
+    ).toBe(1);
+    expect(sim.countItem(pattern.id, pid), 'fully escrowed').toBe(0);
   });
 });
 

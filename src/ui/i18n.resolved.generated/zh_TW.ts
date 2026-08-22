@@ -13023,6 +13023,24 @@ export const zh_TW: EnTranslations = {
       "harvest_feast": {
         "name": "豐收盛宴"
       },
+      "pattern_highwatch_gourd_soup": {
+        "name": "配方：高望霜瓜湯"
+      },
+      "pattern_highwatch_barley_porridge": {
+        "name": "配方：高望大麥粥"
+      },
+      "pattern_evergarden_sunmelon_tart": {
+        "name": "配方：常青園太陽瓜塔"
+      },
+      "pattern_evergarden_harvest_platter": {
+        "name": "配方：常青園豐收拼盤"
+      },
+      "pattern_evergarden_braised_greens": {
+        "name": "配方：常青園燜青菜"
+      },
+      "pattern_harvest_feast": {
+        "name": "配方：豐收盛宴"
+      },
       "conjured_water4": {
         "name": "魔法泉水"
       },
