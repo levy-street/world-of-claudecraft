@@ -93,6 +93,58 @@ has seen fail is not a census. The 11d pre-run's four outcomes are recorded in t
 | export | `ConsumableDefFacts` | 11c | 11c-A2-BUILDER | the builder's structural parameter type in the new `src/sim/consuming.ts` module (satisfied by `FoodItemDef` and every drink def without an ItemDef union import) |
 | export | `buildConsuming` | 11c | 11c-A2-BUILDER | the one Consuming build site; both real writers (the items.ts food/drink arm and the feast bite) route through it |
 
+Phase 11e's crop roster adds forty rows below. A new content id is EXTRA in
+THREE classes at once and in three different name forms: the bare id in
+`contentIds`, the `file:id` key in `contentIdRows` (twice per crop, because its
+`FARM_CROPS` row and its `items.ts` produce row share an id but not a file), and
+the bare id again in `i18nKeys` for its English catalog name. The cost was
+MEASURED at STEP 0 with a throwaway id before any authoring, which is what made
+the budget a fact rather than a surprise; the i18n third of it was the part that
+measurement missed, because the throwaway carried no catalog name.
+
+| Class | Name | Phase | Ruling | Reason |
+|---|---|---|---|---|
+| contentIds | `thornpeak_cabbage_seed` | 11e | masterwrought DECISION B (roster 2/2/4/4, one class per tier) | the seed, vendor-stocked at the tier-3 farmer under DECISION D |
+| contentIds | `thornpeak_cabbage` | 11e | masterwrought DECISION B (roster 2/2/4/4, one class per tier) | the tier-3 leaf produce, consumed by recipe_highwatch_barley_bannock |
+| contentIds | `fine_thornpeak_cabbage` | 11e | masterwrought DECISION B (roster 2/2/4/4, one class per tier) | its fine twin, consumed by recipe_highwatch_barley_bannock in the same bill |
+| contentIdRows | `src/sim/content/items.ts:thornpeak_cabbage_seed` | 11e | masterwrought DECISION B (roster 2/2/4/4, one class per tier) | the seed, vendor-stocked at the tier-3 farmer under DECISION D |
+| contentIdRows | `src/sim/content/items.ts:thornpeak_cabbage` | 11e | masterwrought DECISION B (roster 2/2/4/4, one class per tier) | the tier-3 leaf produce, consumed by recipe_highwatch_barley_bannock |
+| contentIdRows | `src/sim/content/items.ts:fine_thornpeak_cabbage` | 11e | masterwrought DECISION B (roster 2/2/4/4, one class per tier) | its fine twin, consumed by recipe_highwatch_barley_bannock in the same bill |
+| contentIdRows | `src/sim/content/farm_crops.ts:thornpeak_cabbage` | 11e | masterwrought DECISION B (roster 2/2/4/4, one class per tier) | the FARM_CROPS row itself; its id equals the produce item id, so this key exists only in the file-scoped class |
+| i18nKeys | `thornpeak_cabbage_seed` | 11e | masterwrought DECISION B (roster 2/2/4/4, one class per tier) | its English catalog name (ITEM_ENTITY_IDS) |
+| i18nKeys | `thornpeak_cabbage` | 11e | masterwrought DECISION B (roster 2/2/4/4, one class per tier) | its English catalog name (ITEM_ENTITY_IDS) |
+| i18nKeys | `fine_thornpeak_cabbage` | 11e | masterwrought DECISION B (roster 2/2/4/4, one class per tier) | its English catalog name (ITEM_ENTITY_IDS) |
+| contentIds | `frost_lentils_seed` | 11e | masterwrought DECISION B (roster 2/2/4/4, one class per tier) | the seed, vendor-stocked at the tier-3 farmer under DECISION D |
+| contentIds | `frost_lentils` | 11e | masterwrought DECISION B (roster 2/2/4/4, one class per tier) | the tier-3 legume produce, consumed by recipe_highwatch_gourd_soup |
+| contentIds | `fine_frost_lentils` | 11e | masterwrought DECISION B (roster 2/2/4/4, one class per tier) | its fine twin, consumed by recipe_highwatch_gourd_soup in the same bill |
+| contentIdRows | `src/sim/content/items.ts:frost_lentils_seed` | 11e | masterwrought DECISION B (roster 2/2/4/4, one class per tier) | the seed, vendor-stocked at the tier-3 farmer under DECISION D |
+| contentIdRows | `src/sim/content/items.ts:frost_lentils` | 11e | masterwrought DECISION B (roster 2/2/4/4, one class per tier) | the tier-3 legume produce, consumed by recipe_highwatch_gourd_soup |
+| contentIdRows | `src/sim/content/items.ts:fine_frost_lentils` | 11e | masterwrought DECISION B (roster 2/2/4/4, one class per tier) | its fine twin, consumed by recipe_highwatch_gourd_soup in the same bill |
+| contentIdRows | `src/sim/content/farm_crops.ts:frost_lentils` | 11e | masterwrought DECISION B (roster 2/2/4/4, one class per tier) | the FARM_CROPS row itself; its id equals the produce item id, so this key exists only in the file-scoped class |
+| i18nKeys | `frost_lentils_seed` | 11e | masterwrought DECISION B (roster 2/2/4/4, one class per tier) | its English catalog name (ITEM_ENTITY_IDS) |
+| i18nKeys | `frost_lentils` | 11e | masterwrought DECISION B (roster 2/2/4/4, one class per tier) | its English catalog name (ITEM_ENTITY_IDS) |
+| i18nKeys | `fine_frost_lentils` | 11e | masterwrought DECISION B (roster 2/2/4/4, one class per tier) | its English catalog name (ITEM_ENTITY_IDS) |
+| contentIds | `gilded_yam_seed` | 11e | masterwrought DECISION B (roster 2/2/4/4, one class per tier) | the seed, vendor-stocked at the tier-4 farmer under DECISION D |
+| contentIds | `gilded_yam` | 11e | masterwrought DECISION B (roster 2/2/4/4, one class per tier) | the tier-4 tuber produce, consumed by recipe_evergarden_sunmelon_tart |
+| contentIds | `fine_gilded_yam` | 11e | masterwrought DECISION B (roster 2/2/4/4, one class per tier) | its fine twin, consumed by recipe_evergarden_sunmelon_tart in the same bill |
+| contentIdRows | `src/sim/content/items.ts:gilded_yam_seed` | 11e | masterwrought DECISION B (roster 2/2/4/4, one class per tier) | the seed, vendor-stocked at the tier-4 farmer under DECISION D |
+| contentIdRows | `src/sim/content/items.ts:gilded_yam` | 11e | masterwrought DECISION B (roster 2/2/4/4, one class per tier) | the tier-4 tuber produce, consumed by recipe_evergarden_sunmelon_tart |
+| contentIdRows | `src/sim/content/items.ts:fine_gilded_yam` | 11e | masterwrought DECISION B (roster 2/2/4/4, one class per tier) | its fine twin, consumed by recipe_evergarden_sunmelon_tart in the same bill |
+| contentIdRows | `src/sim/content/farm_crops.ts:gilded_yam` | 11e | masterwrought DECISION B (roster 2/2/4/4, one class per tier) | the FARM_CROPS row itself; its id equals the produce item id, so this key exists only in the file-scoped class |
+| i18nKeys | `gilded_yam_seed` | 11e | masterwrought DECISION B (roster 2/2/4/4, one class per tier) | its English catalog name (ITEM_ENTITY_IDS) |
+| i18nKeys | `gilded_yam` | 11e | masterwrought DECISION B (roster 2/2/4/4, one class per tier) | its English catalog name (ITEM_ENTITY_IDS) |
+| i18nKeys | `fine_gilded_yam` | 11e | masterwrought DECISION B (roster 2/2/4/4, one class per tier) | its English catalog name (ITEM_ENTITY_IDS) |
+| contentIds | `evergarden_pumpkin_seed` | 11e | masterwrought DECISION B (roster 2/2/4/4, one class per tier) | the seed, vendor-stocked at the tier-4 farmer under DECISION D |
+| contentIds | `evergarden_pumpkin` | 11e | masterwrought DECISION B (roster 2/2/4/4, one class per tier) | the tier-4 gourd produce, consumed by recipe_evergarden_harvest_platter |
+| contentIds | `fine_evergarden_pumpkin` | 11e | masterwrought DECISION B (roster 2/2/4/4, one class per tier) | its fine twin, consumed by recipe_evergarden_harvest_platter in the same bill |
+| contentIdRows | `src/sim/content/items.ts:evergarden_pumpkin_seed` | 11e | masterwrought DECISION B (roster 2/2/4/4, one class per tier) | the seed, vendor-stocked at the tier-4 farmer under DECISION D |
+| contentIdRows | `src/sim/content/items.ts:evergarden_pumpkin` | 11e | masterwrought DECISION B (roster 2/2/4/4, one class per tier) | the tier-4 gourd produce, consumed by recipe_evergarden_harvest_platter |
+| contentIdRows | `src/sim/content/items.ts:fine_evergarden_pumpkin` | 11e | masterwrought DECISION B (roster 2/2/4/4, one class per tier) | its fine twin, consumed by recipe_evergarden_harvest_platter in the same bill |
+| contentIdRows | `src/sim/content/farm_crops.ts:evergarden_pumpkin` | 11e | masterwrought DECISION B (roster 2/2/4/4, one class per tier) | the FARM_CROPS row itself; its id equals the produce item id, so this key exists only in the file-scoped class |
+| i18nKeys | `evergarden_pumpkin_seed` | 11e | masterwrought DECISION B (roster 2/2/4/4, one class per tier) | its English catalog name (ITEM_ENTITY_IDS) |
+| i18nKeys | `evergarden_pumpkin` | 11e | masterwrought DECISION B (roster 2/2/4/4, one class per tier) | its English catalog name (ITEM_ENTITY_IDS) |
+| i18nKeys | `fine_evergarden_pumpkin` | 11e | masterwrought DECISION B (roster 2/2/4/4, one class per tier) | its English catalog name (ITEM_ENTITY_IDS) |
+
 Names that came in through a release sync after the merge are not extras and are not
 listed here: the synced release tip is a PARENT of the census (see the refs table), so
 its names are simply present on a parent.
