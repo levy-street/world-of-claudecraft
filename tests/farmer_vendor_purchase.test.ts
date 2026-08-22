@@ -59,11 +59,13 @@ describe('the farmer counters, purchased row by row', () => {
     // from the live stock, so a dropped row would delete its own case; the
     // exact-stock table lives in tests/professions_zone_rollout.test.ts,
     // this pin keeps the purchase walk honest on its own (Phase 9 QA).
+    // The two upper counters moved by exactly FOUR each at GATE 1 (Phase 11e):
+    // their tier's two shipped seeds plus the two the roster widening minted.
     const rowCounts: Record<string, number> = {
       farmer_jessica: 5,
       farmer_teasel: 3,
-      farmer_hollis: 1,
-      farmer_verbena: 1,
+      farmer_hollis: 5,
+      farmer_verbena: 5,
     };
     for (const id of FARMER_IDS) {
       expect(NPCS[id].vendorItems?.length, `${id} row count`).toBe(rowCounts[id]);

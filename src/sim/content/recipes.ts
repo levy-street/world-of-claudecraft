@@ -2889,10 +2889,14 @@ export const FARM_RECIPES: ProfessionRecipeRecord[] = [
     resultItemId: 'highwatch_barley_bannock',
     resultCount: 1,
     // A griddle flatcake off the wall kitchens, salted hard because it is
-    // carried cold on watch. The one rung-50 dish with no fine twin in it,
-    // so the base tier-3 grain has a demand of its own. Input 76 vs output 60.
+    // carried cold on watch, with shredded cabbage worked through the batter.
+    // The base tier-3 grain keeps its own demand at 4 per bannock; Phase 11e
+    // ADDED the cabbage pair alongside it (R18: added, never substituted), so
+    // this stopped being the one rung-50 dish with no fine twin in it.
     reagents: [
       { itemId: 'highland_barley', count: 4 },
+      { itemId: 'thornpeak_cabbage', count: 2 },
+      { itemId: 'fine_thornpeak_cabbage', count: 1 },
       { itemId: 'cooking_salt', count: 2 },
     ],
     skillReq: 50,
@@ -2911,6 +2915,8 @@ export const FARM_RECIPES: ProfessionRecipeRecord[] = [
     reagents: [
       { itemId: 'frost_gourd', count: 3 },
       { itemId: 'fine_frost_gourd', count: 1 },
+      { itemId: 'frost_lentils', count: 2 },
+      { itemId: 'fine_frost_lentils', count: 1 },
       { itemId: 'cooking_salt', count: 1 },
     ],
     skillReq: 50,
@@ -2930,6 +2936,8 @@ export const FARM_RECIPES: ProfessionRecipeRecord[] = [
     reagents: [
       { itemId: 'gilded_sunmelon', count: 3 },
       { itemId: 'fine_gilded_sunmelon', count: 1 },
+      { itemId: 'gilded_yam', count: 2 },
+      { itemId: 'fine_gilded_yam', count: 1 },
       { itemId: 'vale_wheat', count: 2 },
     ],
     skillReq: 50,
@@ -2948,6 +2956,8 @@ export const FARM_RECIPES: ProfessionRecipeRecord[] = [
     reagents: [
       { itemId: 'evergarden_greens', count: 3 },
       { itemId: 'fine_evergarden_greens', count: 1 },
+      { itemId: 'evergarden_pumpkin', count: 2 },
+      { itemId: 'fine_evergarden_pumpkin', count: 1 },
       { itemId: 'cooking_salt', count: 2 },
     ],
     skillReq: 50,

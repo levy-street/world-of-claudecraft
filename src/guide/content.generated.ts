@@ -9615,6 +9615,14 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
             "count": 4
           },
           {
+            "name": "Thornpeak Cabbage",
+            "count": 2
+          },
+          {
+            "name": "Fine Thornpeak Cabbage",
+            "count": 1
+          },
+          {
             "name": "Cooking Salt",
             "count": 2
           }
@@ -9653,6 +9661,14 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
           },
           {
             "name": "Fine Frost Gourd",
+            "count": 1
+          },
+          {
+            "name": "Frost Lentils",
+            "count": 2
+          },
+          {
+            "name": "Fine Frost Lentils",
             "count": 1
           },
           {
@@ -9697,6 +9713,14 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
             "count": 1
           },
           {
+            "name": "Gilded Yam",
+            "count": 2
+          },
+          {
+            "name": "Fine Gilded Yam",
+            "count": 1
+          },
+          {
             "name": "Vale Wheat",
             "count": 2
           }
@@ -9735,6 +9759,14 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
           },
           {
             "name": "Fine Evergarden Greens",
+            "count": 1
+          },
+          {
+            "name": "Evergarden Pumpkin",
+            "count": 2
+          },
+          {
+            "name": "Fine Evergarden Pumpkin",
             "count": 1
           },
           {

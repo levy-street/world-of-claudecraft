@@ -325,10 +325,22 @@ export const EVERGARDEN_NPCS: Record<string, NpcDef> = {
     facing: 0,
     color: 0x7d9b5c,
     questIds: [],
-    vendorItems: ['compost'],
+    // GATE 1's tier-4 half, the same one edit and the same convention as
+    // farmer_hollis in zone3.ts (Phase 11e). buyValue 64 per seed on the item
+    // def (masterwrought DECISION D): the four-times-sell staple on sellValue
+    // 8, doubled as the bootstrap premium, because a tier-4 harvest expects
+    // only 0.41 seeds back and the counter must not become the cheap
+    // permanent source.
+    vendorItems: [
+      'compost',
+      'gilded_sunmelon_seed',
+      'evergarden_greens_seed',
+      'gilded_yam_seed',
+      'evergarden_pumpkin_seed',
+    ],
     farmer: true,
     greeting:
-      'Mind the edging, $N, these beds are the pride of the parterre. Compost is what I sell, and I will turn any withered husks you carry into more of it.',
+      'Mind the edging, $N, these beds are the pride of the parterre. Seed and compost are what I sell, and I will turn any withered husks you carry into more of it.',
   },
 };
 

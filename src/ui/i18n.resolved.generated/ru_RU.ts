@@ -12918,6 +12918,24 @@ export const ru_RU: EnTranslations = {
       "fine_frost_gourd": {
         "name": "Отборная морозная тыква"
       },
+      "thornpeak_cabbage_seed": {
+        "name": "Семена терновой капусты"
+      },
+      "thornpeak_cabbage": {
+        "name": "Терновая капуста"
+      },
+      "fine_thornpeak_cabbage": {
+        "name": "Отборная терновая капуста"
+      },
+      "frost_lentils_seed": {
+        "name": "Семена морозной чечевицы"
+      },
+      "frost_lentils": {
+        "name": "Морозная чечевица"
+      },
+      "fine_frost_lentils": {
+        "name": "Отборная морозная чечевица"
+      },
       "gilded_sunmelon_seed": {
         "name": "Семена золочёной солнечной дыни"
       },
@@ -12935,6 +12953,24 @@ export const ru_RU: EnTranslations = {
       },
       "fine_evergarden_greens": {
         "name": "Отборная зелень Вечного Сада"
+      },
+      "gilded_yam_seed": {
+        "name": "Семена золочёного ямса"
+      },
+      "gilded_yam": {
+        "name": "Золочёный ямс"
+      },
+      "fine_gilded_yam": {
+        "name": "Отборный золочёный ямс"
+      },
+      "evergarden_pumpkin_seed": {
+        "name": "Семена тыквы Вечного Сада"
+      },
+      "evergarden_pumpkin": {
+        "name": "Тыква Вечного Сада"
+      },
+      "fine_evergarden_pumpkin": {
+        "name": "Отборная тыква Вечного Сада"
       },
       "garden_hoe": {
         "name": "Садовая мотыга"

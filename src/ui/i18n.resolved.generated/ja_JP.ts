@@ -12918,6 +12918,24 @@ export const ja_JP: EnTranslations = {
       "fine_frost_gourd": {
         "name": "上質な霜瓜"
       },
+      "thornpeak_cabbage_seed": {
+        "name": "ソーンピークキャベツの種"
+      },
+      "thornpeak_cabbage": {
+        "name": "ソーンピークキャベツ"
+      },
+      "fine_thornpeak_cabbage": {
+        "name": "上質なソーンピークキャベツ"
+      },
+      "frost_lentils_seed": {
+        "name": "霜レンズ豆の種"
+      },
+      "frost_lentils": {
+        "name": "霜レンズ豆"
+      },
+      "fine_frost_lentils": {
+        "name": "上質な霜レンズ豆"
+      },
       "gilded_sunmelon_seed": {
         "name": "黄金の太陽メロンの種"
       },
@@ -12935,6 +12953,24 @@ export const ja_JP: EnTranslations = {
       },
       "fine_evergarden_greens": {
         "name": "上質なエバーガーデン青菜"
+      },
+      "gilded_yam_seed": {
+        "name": "黄金のヤムイモの種"
+      },
+      "gilded_yam": {
+        "name": "黄金のヤムイモ"
+      },
+      "fine_gilded_yam": {
+        "name": "上質な黄金のヤムイモ"
+      },
+      "evergarden_pumpkin_seed": {
+        "name": "エバーガーデンカボチャの種"
+      },
+      "evergarden_pumpkin": {
+        "name": "エバーガーデンカボチャ"
+      },
+      "fine_evergarden_pumpkin": {
+        "name": "上質なエバーガーデンカボチャ"
       },
       "garden_hoe": {
         "name": "菜園の鍬"

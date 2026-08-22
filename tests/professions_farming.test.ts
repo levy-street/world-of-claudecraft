@@ -290,11 +290,11 @@ describe('the crop catalog and the cast sentinel', () => {
     expect(isNonSpellCast('fireball')).toBe(false);
   });
 
-  it('ships the full eight-crop ladder, two per tier, with vale_wheat inside its locked band', () => {
-    // The crop-ladder phase's catalog width pin: the packet-locked eight-crop
-    // ladder (D11 ids), authored in tier order. Retiring or renaming any of
-    // these destroys player plots at load (the save-key banner), so the list
-    // moves only deliberately.
+  it('ships the full twelve-crop ladder, shaped 2 / 2 / 4 / 4, vale_wheat in its locked band', () => {
+    // The catalog width pin: the D11 ids, authored in tier order. Retiring or
+    // renaming any of these destroys player plots at load (the save-key
+    // banner), so the list moves only deliberately. Phase 11e widened the two
+    // UPPER tiers to four crops each, which is where a leveled farmer lives.
     expect(Object.keys(FARM_CROPS)).toEqual([
       'vale_wheat',
       'brook_carrot',
@@ -302,10 +302,16 @@ describe('the crop catalog and the cast sentinel', () => {
       'bog_beet',
       'highland_barley',
       'frost_gourd',
+      'thornpeak_cabbage',
+      'frost_lentils',
       'gilded_sunmelon',
       'evergarden_greens',
+      'gilded_yam',
+      'evergarden_pumpkin',
     ]);
-    expect(Object.values(FARM_CROPS).map((c) => c.tier)).toEqual([1, 1, 2, 2, 3, 3, 4, 4]);
+    expect(Object.values(FARM_CROPS).map((c) => c.tier)).toEqual([
+      1, 1, 2, 2, 3, 3, 3, 3, 4, 4, 4, 4,
+    ]);
     expect(CROP.tier).toBe(1);
     expect(CROP.seedItemId).toBe(SEED_ID);
     expect(CROP.produceItemId).toBe(PRODUCE_ID);
@@ -317,9 +323,10 @@ describe('the crop catalog and the cast sentinel', () => {
   });
 
   it('pins every crop duration to its authored literal, all distinct, none shared within a tier', () => {
-    // The tuning surface of the whole ladder, pinned once: the two crops of a
-    // tier must never share a duration (the flag comments in farm_crops.ts
-    // state each choice), and the pin keeps a re-tune deliberate.
+    // The tuning surface of the whole ladder, pinned once: no two crops of a
+    // tier may share a duration (the flag comments in farm_crops.ts state each
+    // choice), and the pin keeps a re-tune deliberate. With four crops in the
+    // upper tiers the rule binds across all four, not just a pair.
     expect(Object.values(FARM_CROPS).map((c) => [c.id, c.durationMs])).toEqual([
       ['vale_wheat', 2_700_000],
       ['brook_carrot', 2_100_000],
@@ -327,11 +334,77 @@ describe('the crop catalog and the cast sentinel', () => {
       ['bog_beet', 8_100_000],
       ['highland_barley', 14_400_000],
       ['frost_gourd', 16_200_000],
+      ['thornpeak_cabbage', 15_000_000],
+      ['frost_lentils', 15_600_000],
       ['gilded_sunmelon', 36_000_000],
       ['evergarden_greens', 37_800_000],
+      ['gilded_yam', 36_900_000],
+      ['evergarden_pumpkin', 38_700_000],
     ]);
     const durations = Object.values(FARM_CROPS).map((c) => c.durationMs);
     expect(new Set(durations).size).toBe(durations.length);
+  });
+
+  it('holds every tier-3 and tier-4 duration inside its D5 band and above the tier floor', () => {
+    // The three constraints Phase 11e had to satisfy to widen the upper tiers,
+    // asserted rather than argued, and derived from the merged table so a later
+    // crop inherits them. The FLOOR is the load-bearing one: a shorter
+    // upper-tier crop would turn a bed over faster and quietly accelerate the
+    // gain ladder masterwrought DECISION A tuned.
+    const BANDS: Record<number, readonly [number, number]> = {
+      // D5, in minutes: tier 3 is about four hours, tier 4 the overnight band.
+      3: [4 * 60, 5 * 60],
+      4: [8 * 60, 11 * 60],
+    };
+    // The SHIPPED floor per tier, the value that predates this phase.
+    const PRE_11E_MIN: Record<number, number> = { 3: 14_400_000, 4: 36_000_000 };
+    for (const tier of [3, 4]) {
+      const rows = Object.values(FARM_CROPS).filter((c) => c.tier === tier);
+      expect(rows).toHaveLength(4);
+      const [lo, hi] = BANDS[tier];
+      for (const crop of rows) {
+        expect(crop.durationMs).toBeGreaterThanOrEqual(lo * 60_000);
+        expect(crop.durationMs).toBeLessThanOrEqual(hi * 60_000);
+        expect(crop.durationMs).toBeGreaterThanOrEqual(PRE_11E_MIN[tier]);
+      }
+      const within = rows.map((c) => c.durationMs);
+      expect(new Set(within).size).toBe(4);
+    }
+  });
+
+  it('gives each tier a roster of DISTINCT plant classes, with a leaf at tier 3', () => {
+    // masterwrought DECISION B's composition rule, which a downstream phase
+    // READS to assign one tier-3 crop per apex role plate: no tier repeats a
+    // plant class, and tier 3 carries a leaf so the cost-equal branch exists.
+    // The classification lives here because it is a naming fact about the
+    // shipped roster, not a field on the record.
+    const CLASS_OF: Record<string, string> = {
+      vale_wheat: 'grain',
+      brook_carrot: 'root',
+      marsh_rice: 'grain',
+      bog_beet: 'root',
+      highland_barley: 'grain',
+      frost_gourd: 'gourd',
+      thornpeak_cabbage: 'leaf',
+      frost_lentils: 'legume',
+      gilded_sunmelon: 'melon',
+      evergarden_greens: 'leaf',
+      gilded_yam: 'tuber',
+      evergarden_pumpkin: 'gourd',
+    };
+    // Every shipped crop is classified: a new crop cannot slip past this rule
+    // by being absent from the table.
+    expect(Object.keys(CLASS_OF).sort()).toEqual(Object.keys(FARM_CROPS).sort());
+    for (const tier of [1, 2, 3, 4]) {
+      const classes = Object.values(FARM_CROPS)
+        .filter((c) => c.tier === tier)
+        .map((c) => CLASS_OF[c.id]);
+      expect(new Set(classes).size, `tier ${tier} repeats a plant class`).toBe(classes.length);
+    }
+    const tier3 = Object.values(FARM_CROPS)
+      .filter((c) => c.tier === 3)
+      .map((c) => CLASS_OF[c.id]);
+    expect(tier3.filter((k) => k === 'leaf')).toHaveLength(1);
   });
 
   it('pins the plant cast length to its wire-visible literal', () => {

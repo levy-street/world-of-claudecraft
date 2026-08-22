@@ -755,24 +755,26 @@ describe('the farming ladder: every farming zone arrives mechanically whole', ()
     expect(FARM_PATCHES).toHaveLength(4);
   });
 
-  it('each farming tier grows exactly its two D11 crops', () => {
+  it('each farming tier grows exactly its D11 crops, 2 / 2 / 4 / 4 after 11e', () => {
     const CROPS_BY_TIER: Readonly<Record<number, readonly string[]>> = {
       1: ['brook_carrot', 'vale_wheat'],
       2: ['bog_beet', 'marsh_rice'],
-      3: ['frost_gourd', 'highland_barley'],
-      4: ['evergarden_greens', 'gilded_sunmelon'],
+      3: ['frost_gourd', 'frost_lentils', 'highland_barley', 'thornpeak_cabbage'],
+      4: ['evergarden_greens', 'evergarden_pumpkin', 'gilded_sunmelon', 'gilded_yam'],
     };
     for (const tier of Object.values(FARMING_ZONE_TIERS)) {
       const ofTier = Object.values(FARM_CROPS)
         .filter((c) => c.tier === tier)
         .map((c) => c.id)
         .sort();
-      expect(ofTier, `tier ${tier} crop pair (D11)`).toEqual([...CROPS_BY_TIER[tier]]);
+      expect(ofTier, `tier ${tier} crop set (D11, amended by 11e)`).toEqual([
+        ...CROPS_BY_TIER[tier],
+      ]);
     }
-    // The four pairs are the whole catalog: a ninth crop cannot ship without
-    // joining a pair above, and a dropped crop cannot hide behind the pairs
-    // that remain.
-    expect(Object.keys(FARM_CROPS)).toHaveLength(8);
+    // The four sets are the whole catalog: a thirteenth crop cannot ship
+    // without joining a set above, and a dropped crop cannot hide behind the
+    // sets that remain.
+    expect(Object.keys(FARM_CROPS)).toHaveLength(12);
   });
 
   it('every crop family is whole: defs, junk produce, the 2x/4x fine pricing, icon and name rows', () => {
@@ -829,36 +831,41 @@ describe('the farming ladder: every farming zone arrives mechanically whole', ()
   });
 
   it('tier 1 and 2 seeds are vendor-priced, tier 3 and 4 seeds never (both directions)', () => {
-    // Literal id lists on both sides (the locked pricing table): the priced
-    // four sit on the farmer counters (the go-live arm below), seed-back and
-    // market supply only for the high four (D11).
-    const PRICED_SEEDS = [
-      'bog_beet_seed',
-      'brook_carrot_seed',
-      'marsh_rice_seed',
-      'vale_wheat_seed',
-    ];
-    const UNPRICED_SEEDS = [
-      'evergarden_greens_seed',
-      'frost_gourd_seed',
-      'gilded_sunmelon_seed',
-      'highland_barley_seed',
-    ];
-    // The two lists really partition the catalog's whole seed column, so
-    // neither loop below can pass over a seed the lists forgot.
-    expect([...PRICED_SEEDS, ...UNPRICED_SEEDS].sort()).toEqual(
-      Object.values(FARM_CROPS)
-        .map((c) => c.seedItemId)
-        .sort(),
-    );
-    for (const itemId of PRICED_SEEDS) {
-      expect(ITEMS[itemId]?.buyValue ?? 0, `${itemId} needs a positive buyValue`).toBeGreaterThan(
-        0,
+    // GATE 1 INVERTED THIS ARM (Phase 11e), which is why it reads the way it
+    // does. Before 11e the tier 3 and 4 seeds were deliberately UNPRICED, and
+    // the consequence was three trainer-visible recipes nobody could complete
+    // and two parked deeds. Now EVERY seed is vendor-priced, and the direction
+    // that still bites is the D11 dead-row trap: a stocked row with no positive
+    // buyValue renders and then refuses at the counter.
+    const seeds = Object.values(FARM_CROPS).map((c) => ({
+      id: c.seedItemId,
+      tier: c.tier,
+    }));
+    expect(seeds).toHaveLength(12);
+    for (const seed of seeds) {
+      expect(
+        ITEMS[seed.id]?.buyValue ?? 0,
+        `${seed.id} needs a positive buyValue or it is a dead vendor row`,
+      ).toBeGreaterThan(0);
+    }
+    // The price is DERIVED, not invented: sellValue times the shipped
+    // four-times-sell staple, and for the upper tiers times two again, the
+    // masterwrought DECISION D bootstrap premium. Computed from each row's own
+    // sellValue so a re-priced seed moves its buyValue with it.
+    for (const seed of seeds) {
+      const sell = ITEMS[seed.id]?.sellValue ?? 0;
+      expect(sell, `${seed.id} sellValue`).toBeGreaterThan(0);
+      const premium = seed.tier >= 3 ? 2 : 1;
+      expect(ITEMS[seed.id]?.buyValue, `${seed.id} buyValue = ${sell} x 4 x ${premium}`).toBe(
+        sell * 4 * premium,
       );
     }
-    for (const itemId of UNPRICED_SEEDS) {
-      expect(ITEMS[itemId]?.buyValue, `${itemId} must never be vendor-obtainable`).toBe(undefined);
-    }
+    // ...and the two upper rungs land on the exact numbers the ruling names, so
+    // a change to the formula above cannot silently re-price the faucet.
+    expect(ITEMS.highland_barley_seed?.buyValue).toBe(32);
+    expect(ITEMS.thornpeak_cabbage_seed?.buyValue).toBe(32);
+    expect(ITEMS.gilded_sunmelon_seed?.buyValue).toBe(64);
+    expect(ITEMS.evergarden_pumpkin_seed?.buyValue).toBe(64);
   });
 
   it('brook_carrot is the one vendor-priced produce (D9), and no other family row leaks pricing', () => {
@@ -881,15 +888,14 @@ describe('the farming ladder: every farming zone arrives mechanically whole', ()
           `${crop.produceItemId} produce must carry no vendor price`,
         ).toBe(undefined);
       }
-      if (crop.tier >= 3) {
-        expect(
-          ITEMS[crop.seedItemId]?.buyValue,
-          `${crop.seedItemId} is a tier ${crop.tier} seed and must carry no vendor price`,
-        ).toBe(undefined);
-      }
     }
-    // Seven produce rows really swept, so the exception loop was not vacuous.
-    expect(produceSwept).toBe(7);
+    // Eleven produce rows really swept, so the exception loop was not vacuous.
+    expect(produceSwept).toBe(11);
+    // The SEED half of this arm moved to the pricing arm above when GATE 1
+    // stocked the upper tiers (Phase 11e). What survives here is the rule that
+    // did NOT change: PRODUCE is never vendor-stocked, which is what keeps the
+    // "no farm recipe is craftable from vendor stock alone" arm true. The
+    // faucet is seeds, and only seeds.
     // The D9 exception is scoped to brook_carrot ALONE within its own tier-1
     // family: vale_wheat is the other tier-1 produce and carries none.
     expect(
@@ -963,11 +969,12 @@ describe('the farming ladder: every farming zone arrives mechanically whole', ()
     ]);
     const unaccounted = FARM_MATERIAL_ITEM_IDS.filter((itemId) => !liveConsumed.has(itemId));
     expect(unaccounted, 'every farming material needs a live consumer').toEqual([]);
-    // Non-vacuity, both terms: the taxonomy really carries all 27 materials
-    // and each one is covered, and the RECIPE half alone is non-empty, so a
-    // broken import or an emptied FARM_RECIPES cannot leave the command terms
+    // Non-vacuity, both terms: the taxonomy really carries all 39 materials
+    // (27 before Phase 11e, plus that phase's four crop families at three ids
+    // each) and each one is covered, and the RECIPE half alone is non-empty, so
+    // a broken import or an emptied FARM_RECIPES cannot leave the command terms
     // silently carrying the whole arm.
-    expect(FARM_MATERIAL_ITEM_IDS.length).toBe(27);
+    expect(FARM_MATERIAL_ITEM_IDS.length).toBe(39);
     expect(FARM_MATERIAL_ITEM_IDS.every((itemId) => liveConsumed.has(itemId))).toBe(true);
     expect(
       FARM_MATERIAL_ITEM_IDS.filter((itemId) => recipeConsumed.has(itemId)).length,
@@ -1044,8 +1051,24 @@ describe('the farming ladder: every farming zone arrives mechanically whole', ()
         'garden_hoe',
       ],
       farmer_teasel: ['marsh_rice_seed', 'bog_beet_seed', 'compost'],
-      farmer_hollis: ['compost'],
-      farmer_verbena: ['compost'],
+      // GATE 1 (Phase 11e): the upper two counters gained their tier's seeds,
+      // four rows each, in one edit under one convention. Before this the
+      // tier-3 and tier-4 seeds had no faucet anywhere, so a farmer could see
+      // the crops and never plant a first one.
+      farmer_hollis: [
+        'compost',
+        'highland_barley_seed',
+        'frost_gourd_seed',
+        'thornpeak_cabbage_seed',
+        'frost_lentils_seed',
+      ],
+      farmer_verbena: [
+        'compost',
+        'gilded_sunmelon_seed',
+        'evergarden_greens_seed',
+        'gilded_yam_seed',
+        'evergarden_pumpkin_seed',
+      ],
     };
     for (const [npcId, stock] of Object.entries(FARMER_STOCK)) {
       const npc = NPCS[npcId];
@@ -1071,12 +1094,12 @@ describe('the farming ladder: every farming zone arrives mechanically whole', ()
         .map((npc) => npc.id)
         .sort(),
     ).toEqual(Object.keys(FARMER_STOCK).sort());
-    // The needle set for the sweeps below: 27 materials plus the four hoes.
+    // The needle set for the sweeps below: 39 materials plus the four hoes.
     const farmingItemIds = new Set<string>([
       ...FARM_MATERIAL_ITEM_IDS,
       ...farmingTools.map(([itemId]) => itemId),
     ]);
-    expect(farmingItemIds.size).toBe(31);
+    expect(farmingItemIds.size).toBe(43);
     // NO OTHER NPC vendors a farming item: the four farmers are the whole
     // surface, so a seed or a hoe drifting onto a station master's counter
     // reds here rather than sliding through the narrowed hub sweep above.
@@ -1109,22 +1132,39 @@ describe('the farming ladder: every farming zone arrives mechanically whole', ()
     // purchase surfaces, so a non-purchase faucet reaches the prose ONLY
     // through this reminder and the D11 phase's own checklist.
     const NEVER_STOCKED = new Set<string>([
-      'highland_barley_seed',
-      'frost_gourd_seed',
-      'gilded_sunmelon_seed',
-      'evergarden_greens_seed',
       'growth_tonic',
       'bronze_hoe',
       'skysilver_hoe',
       'osmium_hoe',
       ...FARM_RECIPES.map((recipe) => recipe.resultItemId),
     ]);
-    // Non-vacuity of the needle set: fourteen recipe outputs plus the eight
+    // Non-vacuity of the needle set: fourteen recipe outputs plus the four
     // literals above, growth_tonic counted once (it is both). Re-pinned
     // 9/16 -> 13/20 by Phase 11 (the four well-fed buff dishes), then
-    // 13/20 -> 14/21 by Phase 12 (the shared feast, never stocked either).
+    // 13/20 -> 14/21 by Phase 12 (the shared feast, never stocked either),
+    // then 14/21 -> 14/17 by Phase 11e, which STOCKED the four upper-tier
+    // seeds this set used to forbid (GATE 1) and added none of its own four:
+    // the seeds left this set rather than joining it, which is the whole
+    // point of the gate and the one direction that must never be reversed
+    // silently. The set now carries only outputs and supplies, and the
+    // arithmetic still holds: 14 outputs + 4 literals - 1 overlap = 17.
     expect(FARM_RECIPES).toHaveLength(14);
-    expect(NEVER_STOCKED.size).toBe(21);
+    expect(NEVER_STOCKED.size).toBe(17);
+    // The four upper-tier seeds are DELIBERATELY absent, asserted rather than
+    // implied by the deletion above: without this arm a future edit could put
+    // them back and only a distant purchase test would notice.
+    for (const seedId of [
+      'highland_barley_seed',
+      'frost_gourd_seed',
+      'gilded_sunmelon_seed',
+      'evergarden_greens_seed',
+      'thornpeak_cabbage_seed',
+      'frost_lentils_seed',
+      'gilded_yam_seed',
+      'evergarden_pumpkin_seed',
+    ]) {
+      expect(NEVER_STOCKED.has(seedId), `${seedId} is GATE 1 stock, not never-stocked`).toBe(false);
+    }
     for (const [npcId, npc] of Object.entries(NPCS)) {
       for (const itemId of npc.vendorItems ?? []) {
         expect(NEVER_STOCKED.has(itemId), `${npcId} stocks never-stocked ${itemId}`).toBe(false);

@@ -12918,6 +12918,24 @@ export const zh_CN: EnTranslations = {
       "fine_frost_gourd": {
         "name": "优质霜瓜"
       },
+      "thornpeak_cabbage_seed": {
+        "name": "荆峰卷心菜种子"
+      },
+      "thornpeak_cabbage": {
+        "name": "荆峰卷心菜"
+      },
+      "fine_thornpeak_cabbage": {
+        "name": "优质荆峰卷心菜"
+      },
+      "frost_lentils_seed": {
+        "name": "霜扁豆种子"
+      },
+      "frost_lentils": {
+        "name": "霜扁豆"
+      },
+      "fine_frost_lentils": {
+        "name": "优质霜扁豆"
+      },
       "gilded_sunmelon_seed": {
         "name": "鎏金太阳瓜种子"
       },
@@ -12935,6 +12953,24 @@ export const zh_CN: EnTranslations = {
       },
       "fine_evergarden_greens": {
         "name": "优质常青园青菜"
+      },
+      "gilded_yam_seed": {
+        "name": "鎏金山药种子"
+      },
+      "gilded_yam": {
+        "name": "鎏金山药"
+      },
+      "fine_gilded_yam": {
+        "name": "优质鎏金山药"
+      },
+      "evergarden_pumpkin_seed": {
+        "name": "常青园南瓜种子"
+      },
+      "evergarden_pumpkin": {
+        "name": "常青园南瓜"
+      },
+      "fine_evergarden_pumpkin": {
+        "name": "优质常青园南瓜"
       },
       "garden_hoe": {
         "name": "菜园锄"

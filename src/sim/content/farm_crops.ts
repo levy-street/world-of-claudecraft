@@ -12,13 +12,23 @@
 // load. Never rename, never reuse; retiring one is a deliberate
 // destroy-on-load decision.
 //
-// The full eight-crop ladder (two per tier) is packet-locked and ships here:
-// the growth-engine phase landed exactly the tier-1 vale_wheat row so the
-// engine was testable end to end, and the crop-ladder phase adds the other
-// seven with their fine twins (the hoe gates land with the tool ladder in the
-// same phase). The skill threshold is NOT a column: it derives from the tier
-// through the shared 25-point band math (farmCropSkillThreshold below), so a
-// crop can never disagree with the profession's own ladder.
+// The ladder is TWELVE crops, shaped 2 / 2 / 4 / 4. The growth-engine phase
+// landed exactly the tier-1 vale_wheat row so the engine was testable end to
+// end, the crop-ladder phase added the other seven of the original eight with
+// their fine twins (the hoe gates land with the tool ladder in the same phase),
+// and Phase 11e widened the two UPPER tiers to four crops each, which are the
+// bands a leveled farmer actually lives in.
+//
+// THE ROSTER'S COMPOSITION IS RULED, not flavor (masterwrought DECISION B), and
+// a downstream phase reads it: no tier repeats a plant class, and tier 3 in
+// particular carries a LEAF. Tier 1 is grain and root; tier 2 grain and root;
+// tier 3 grain, gourd, leaf and legume; tier 4 melon, leaf, tuber and gourd.
+//
+// The skill threshold is NOT a column: it derives from the tier through the
+// shared 25-point band math (farmCropSkillThreshold below), so a crop can never
+// disagree with the profession's own ladder. That is also why there is no
+// prestige crop at some hand-set skill: farmSurvivalChance re-derives the same
+// threshold independently, and a pin binds the two.
 
 export interface FarmCropDef {
   readonly id: string;
@@ -119,6 +129,34 @@ const GILDED_SUNMELON_DURATION_MS = 36_000_000;
 // the far end never rots, so the overshoot is pure slack.
 const EVERGARDEN_GREENS_DURATION_MS = 37_800_000;
 
+// TUNING, DERIVED, the Phase 11e roster widening. 250 minutes (4h10m) sits
+// inside the locked tier-3 band (about 4 hours) and, checked against the MERGED
+// table rather than assumed, collides with neither shipped tier-3 timer
+// (highland_barley 240, frost_gourd 270) nor its new sibling below. It also may
+// not undercut the tier's current minimum of 240, and does not: a shorter
+// upper-tier crop would turn a bed over faster and quietly accelerate the very
+// gain ladder masterwrought DECISION A just tuned, which is the one thing the
+// roster must not do.
+const THORNPEAK_CABBAGE_DURATION_MS = 15_000_000;
+
+// TUNING, DERIVED, same rule and the same three checks: 260 minutes (4h20m) is
+// inside the tier-3 band, distinct from 240, 250 and 270, and above the tier
+// minimum of 240. The leaf comes in first and the pulse a little later, which
+// is the only ordering claim being made.
+const FROST_LENTILS_DURATION_MS = 15_600_000;
+
+// TUNING, DERIVED, the tier-4 half. 615 minutes is 10.25 hours, inside the
+// locked overnight band (8 to 11 hours), distinct from the shipped 600 and 630
+// and from its new sibling, and above the tier minimum of 600.
+const GILDED_YAM_DURATION_MS = 36_900_000;
+
+// TUNING, DERIVED. 645 minutes is 10.75 hours: still inside the overnight band
+// with an hour of headroom under its ceiling, distinct from 600, 615 and 630,
+// and above the tier minimum. It is the longest crop on the ladder, which suits
+// the capstone plate's gourd, and per the header the far end never rots, so the
+// overshoot past a single evening is pure slack rather than an alarm clock.
+const EVERGARDEN_PUMPKIN_DURATION_MS = 38_700_000;
+
 const FARM_CROP_ROWS: readonly FarmCropDef[] = [
   {
     id: 'vale_wheat',
@@ -169,6 +207,22 @@ const FARM_CROP_ROWS: readonly FarmCropDef[] = [
     fineProduceItemId: 'fine_frost_gourd',
   },
   {
+    id: 'thornpeak_cabbage',
+    tier: 3,
+    durationMs: THORNPEAK_CABBAGE_DURATION_MS,
+    seedItemId: 'thornpeak_cabbage_seed',
+    produceItemId: 'thornpeak_cabbage',
+    fineProduceItemId: 'fine_thornpeak_cabbage',
+  },
+  {
+    id: 'frost_lentils',
+    tier: 3,
+    durationMs: FROST_LENTILS_DURATION_MS,
+    seedItemId: 'frost_lentils_seed',
+    produceItemId: 'frost_lentils',
+    fineProduceItemId: 'fine_frost_lentils',
+  },
+  {
     id: 'gilded_sunmelon',
     tier: 4,
     durationMs: GILDED_SUNMELON_DURATION_MS,
@@ -183,6 +237,22 @@ const FARM_CROP_ROWS: readonly FarmCropDef[] = [
     seedItemId: 'evergarden_greens_seed',
     produceItemId: 'evergarden_greens',
     fineProduceItemId: 'fine_evergarden_greens',
+  },
+  {
+    id: 'gilded_yam',
+    tier: 4,
+    durationMs: GILDED_YAM_DURATION_MS,
+    seedItemId: 'gilded_yam_seed',
+    produceItemId: 'gilded_yam',
+    fineProduceItemId: 'fine_gilded_yam',
+  },
+  {
+    id: 'evergarden_pumpkin',
+    tier: 4,
+    durationMs: EVERGARDEN_PUMPKIN_DURATION_MS,
+    seedItemId: 'evergarden_pumpkin_seed',
+    produceItemId: 'evergarden_pumpkin',
+    fineProduceItemId: 'fine_evergarden_pumpkin',
   },
 ];
 

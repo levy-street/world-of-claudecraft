@@ -115,10 +115,18 @@ describe('eligibleWatchFeeItemIds', () => {
       'fine_bog_beet',
       'marsh_rice',
       'fine_marsh_rice',
+      // Phase 11e's two tier-3 crops join by the SAME rule, so the tier-3
+      // block re-sorts rather than appending: frost_lentils sorts between
+      // frost_gourd and highland_barley, and thornpeak_cabbage takes the tail.
+      // Written out from the rule, never regenerated to match the code.
       'frost_gourd',
       'fine_frost_gourd',
+      'frost_lentils',
+      'fine_frost_lentils',
       'highland_barley',
       'fine_highland_barley',
+      'thornpeak_cabbage',
+      'fine_thornpeak_cabbage',
     ]);
     expect(eligibleWatchFeeItemIds(4)).toEqual([
       'brook_carrot',
@@ -131,12 +139,22 @@ describe('eligibleWatchFeeItemIds', () => {
       'fine_marsh_rice',
       'frost_gourd',
       'fine_frost_gourd',
+      'frost_lentils',
+      'fine_frost_lentils',
       'highland_barley',
       'fine_highland_barley',
+      'thornpeak_cabbage',
+      'fine_thornpeak_cabbage',
+      // ...and the tier-4 block likewise: evergarden_pumpkin sorts after
+      // evergarden_greens, gilded_yam after gilded_sunmelon.
       'evergarden_greens',
       'fine_evergarden_greens',
+      'evergarden_pumpkin',
+      'fine_evergarden_pumpkin',
       'gilded_sunmelon',
       'fine_gilded_sunmelon',
+      'gilded_yam',
+      'fine_gilded_yam',
     ]);
   });
 

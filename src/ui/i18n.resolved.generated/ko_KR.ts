@@ -12918,6 +12918,24 @@ export const ko_KR: EnTranslations = {
       "fine_frost_gourd": {
         "name": "상급 서리 박"
       },
+      "thornpeak_cabbage_seed": {
+        "name": "쏜피크 양배추 씨앗"
+      },
+      "thornpeak_cabbage": {
+        "name": "쏜피크 양배추"
+      },
+      "fine_thornpeak_cabbage": {
+        "name": "상급 쏜피크 양배추"
+      },
+      "frost_lentils_seed": {
+        "name": "서리 렌틸콩 씨앗"
+      },
+      "frost_lentils": {
+        "name": "서리 렌틸콩"
+      },
+      "fine_frost_lentils": {
+        "name": "상급 서리 렌틸콩"
+      },
       "gilded_sunmelon_seed": {
         "name": "금빛 태양멜론 씨앗"
       },
@@ -12935,6 +12953,24 @@ export const ko_KR: EnTranslations = {
       },
       "fine_evergarden_greens": {
         "name": "상급 상록 정원 잎채소"
+      },
+      "gilded_yam_seed": {
+        "name": "금빛 마 씨앗"
+      },
+      "gilded_yam": {
+        "name": "금빛 마"
+      },
+      "fine_gilded_yam": {
+        "name": "상급 금빛 마"
+      },
+      "evergarden_pumpkin_seed": {
+        "name": "상록 정원 호박 씨앗"
+      },
+      "evergarden_pumpkin": {
+        "name": "상록 정원 호박"
+      },
+      "fine_evergarden_pumpkin": {
+        "name": "상급 상록 정원 호박"
       },
       "garden_hoe": {
         "name": "텃밭 괭이"

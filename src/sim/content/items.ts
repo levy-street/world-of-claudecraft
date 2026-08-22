@@ -1146,10 +1146,12 @@ export const BASE_ITEMS: Record<string, ItemDef> = {
     kind: 'junk',
     quality: 'common',
     sellValue: 4,
+    buyValue: 32,
   },
-  // Watch-fee sink, and the grain of recipe_highwatch_barley_bannock: the one
-  // dish with no fine twin in it, so the base tier-3 grain carries a demand of
-  // its own (4 per bannock).
+  // Watch-fee sink, and the grain of recipe_highwatch_barley_bannock, where the
+  // base tier-3 grain carries a demand of its own at 4 per bannock. It used to
+  // be the one dish with no fine twin in it; Phase 11e added the cabbage pair
+  // alongside, which changed the bill but not this row's 4.
   highland_barley: {
     id: 'highland_barley',
     name: 'Highland Barley',
@@ -1175,6 +1177,7 @@ export const BASE_ITEMS: Record<string, ItemDef> = {
     kind: 'junk',
     quality: 'common',
     sellValue: 4,
+    buyValue: 32,
   },
   // Watch-fee sink, and the body of recipe_highwatch_gourd_soup (3 simmered
   // down per pot).
@@ -1197,12 +1200,80 @@ export const BASE_ITEMS: Record<string, ItemDef> = {
     sellValue: 30,
     buyValue: 120,
   },
+  // The two crops Phase 11e added to tier 3, taking the tier from two crops to
+  // four so a farmer living in the 50-to-75 band has real variety. NO new price
+  // point: every row below takes the value its tier already uses (seed 4,
+  // produce 15, fine twin exactly twice the base at 30, and the fine twin's
+  // buyValue the same four-times-sell staple its siblings carry).
+  //
+  // The seed buyValue is the go-live faucet (masterwrought DECISION D): 32 is
+  // the shipped four-times-sell convention on sellValue 4, doubled as a
+  // bootstrap premium, because the vendor is the bootstrap and not the
+  // steady-state supply. A tier-3 harvest expects only 0.48 seeds back, so an
+  // at-convention 16 would make the counter the cheaper permanent source and
+  // kill the seed-back loop the thrift path exists for.
+  thornpeak_cabbage_seed: {
+    id: 'thornpeak_cabbage_seed',
+    name: 'Thornpeak Cabbage Seed',
+    kind: 'junk',
+    quality: 'common',
+    sellValue: 4,
+    buyValue: 32,
+  },
+  // Watch-fee sink, and the leaf folded into recipe_highwatch_barley_bannock
+  // (2 per bannock), which is what gives the tier's LEAF a demand of its own.
+  thornpeak_cabbage: {
+    id: 'thornpeak_cabbage',
+    name: 'Thornpeak Cabbage',
+    kind: 'junk',
+    quality: 'common',
+    sellValue: 15,
+  },
+  // Consumed by recipe_highwatch_barley_bannock, the dish that until Phase 11e
+  // was the one rung-50 plate with no fine twin in it. Not a hoe reagent: the
+  // tier-3 hoe slot belongs to fine_highland_barley (deviation (ad)).
+  fine_thornpeak_cabbage: {
+    id: 'fine_thornpeak_cabbage',
+    name: 'Fine Thornpeak Cabbage',
+    kind: 'junk',
+    quality: 'common',
+    sellValue: 30,
+    buyValue: 120,
+  },
+  frost_lentils_seed: {
+    id: 'frost_lentils_seed',
+    name: 'Frost Lentils Seed',
+    kind: 'junk',
+    quality: 'common',
+    sellValue: 4,
+    buyValue: 32,
+  },
+  // Watch-fee sink, and the pulse simmered into recipe_highwatch_gourd_soup
+  // (2 per pot) to give the tier's LEGUME its own buyer.
+  frost_lentils: {
+    id: 'frost_lentils',
+    name: 'Frost Lentils',
+    kind: 'junk',
+    quality: 'common',
+    sellValue: 15,
+  },
+  // Consumed by recipe_highwatch_gourd_soup alongside the fine gourd already
+  // in that bill. Not a hoe reagent, same reason as its cabbage sibling.
+  fine_frost_lentils: {
+    id: 'fine_frost_lentils',
+    name: 'Fine Frost Lentils',
+    kind: 'junk',
+    quality: 'common',
+    sellValue: 30,
+    buyValue: 120,
+  },
   gilded_sunmelon_seed: {
     id: 'gilded_sunmelon_seed',
     name: 'Gilded Sunmelon Seed',
     kind: 'junk',
     quality: 'common',
     sellValue: 8,
+    buyValue: 64,
   },
   // Watch-fee sink, and the fruit of recipe_evergarden_sunmelon_tart, the
   // tier-4 dish line (3 per tart).
@@ -1231,6 +1302,7 @@ export const BASE_ITEMS: Record<string, ItemDef> = {
     kind: 'junk',
     quality: 'common',
     sellValue: 8,
+    buyValue: 64,
   },
   // Watch-fee sink, and the greens dressed into
   // recipe_evergarden_harvest_platter, the capstone plate of the dish set
@@ -1250,6 +1322,74 @@ export const BASE_ITEMS: Record<string, ItemDef> = {
   fine_evergarden_greens: {
     id: 'fine_evergarden_greens',
     name: 'Fine Evergarden Greens',
+    kind: 'junk',
+    quality: 'common',
+    sellValue: 80,
+    buyValue: 320,
+  },
+  // The two crops Phase 11e added to tier 4, the same widening the tier-3 block
+  // above got and for the same reason. NO new price point: seed 8, produce 40,
+  // fine twin 80 with the four-times-sell buyValue of 320, every one of them a
+  // value this tier already uses.
+  //
+  // The seed buyValue is masterwrought DECISION D's tier-4 rung: 8 x 4 is the
+  // shipped convention's 32, doubled to 64 as the bootstrap premium. The
+  // premium is measured, not felt: a tier-4 harvest expects only 0.41 seeds
+  // back, the thinnest return on the ladder, so the counter must stay the
+  // expensive way in.
+  gilded_yam_seed: {
+    id: 'gilded_yam_seed',
+    name: 'Gilded Yam Seed',
+    kind: 'junk',
+    quality: 'common',
+    sellValue: 8,
+    buyValue: 64,
+  },
+  // Watch-fee sink, and the root roasted under recipe_evergarden_sunmelon_tart
+  // (2 per tart), which gives the tier's TUBER a buyer of its own.
+  gilded_yam: {
+    id: 'gilded_yam',
+    name: 'Gilded Yam',
+    kind: 'junk',
+    quality: 'common',
+    sellValue: 40,
+  },
+  // Consumed by recipe_evergarden_sunmelon_tart beside the fine sunmelon
+  // already in that bill. STRUCTURALLY never a hoe reagent, like every tier-4
+  // twin: each rung consumes the twin one tier below it (deviation (ad)), so
+  // this would need a tier-5 hoe and the ladder tops at 4.
+  fine_gilded_yam: {
+    id: 'fine_gilded_yam',
+    name: 'Fine Gilded Yam',
+    kind: 'junk',
+    quality: 'common',
+    sellValue: 80,
+    buyValue: 320,
+  },
+  evergarden_pumpkin_seed: {
+    id: 'evergarden_pumpkin_seed',
+    name: 'Evergarden Pumpkin Seed',
+    kind: 'junk',
+    quality: 'common',
+    sellValue: 8,
+    buyValue: 64,
+  },
+  // Watch-fee sink, and the gourd cut onto
+  // recipe_evergarden_harvest_platter (2 per platter), the tier's second
+  // GOURD-class crop and the capstone plate's new body.
+  evergarden_pumpkin: {
+    id: 'evergarden_pumpkin',
+    name: 'Evergarden Pumpkin',
+    kind: 'junk',
+    quality: 'common',
+    sellValue: 40,
+  },
+  // Consumed by recipe_evergarden_harvest_platter beside the fine greens
+  // already in that bill. Never a hoe reagent, same tier-5 argument as the
+  // fine yam above.
+  fine_evergarden_pumpkin: {
+    id: 'fine_evergarden_pumpkin',
+    name: 'Fine Evergarden Pumpkin',
     kind: 'junk',
     quality: 'common',
     sellValue: 80,

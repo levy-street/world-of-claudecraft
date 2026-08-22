@@ -31,6 +31,7 @@
 // the second describe below: it shares the list, not the dish contract (a
 // different craft, a different station, a kind 'junk' output rather than food).
 import { describe, expect, it } from 'vitest';
+import { FARM_CROPS } from '../src/sim/content/farm_crops';
 import { STATIONS } from '../src/sim/content/professions';
 import { FARM_RECIPES, LADDER_RECIPES } from '../src/sim/content/recipes';
 // ITEMS and ALL_RECIPES from data (the merged view the sim, the trainer, the
@@ -76,30 +77,20 @@ const ALLOWED_FOOD_CURVE_POINTS: readonly (readonly [number, number])[] = [
   [980, 150],
 ];
 
-// The five fine twins the hoe ladder did NOT take. Each must gain a dedicated
+// The fine twins the hoe ladder did NOT take. Each must gain a dedicated
 // reagent slot here or it has no consumer at all (no downward substitution).
-// fine_vale_wheat, fine_marsh_rice and fine_highland_barley are deliberately
-// absent: those three are hoe reagents already (HOE_RECIPES).
-const FINE_TWINS_CLOSED_HERE = [
-  'fine_brook_carrot',
-  'fine_bog_beet',
-  'fine_frost_gourd',
-  'fine_gilded_sunmelon',
-  'fine_evergarden_greens',
-];
+// DERIVED from the live catalog minus the hoe reagents, not listed: a hand
+// list stops spanning its own domain the moment a crop is added, and then this
+// suite passes over a twin with no consumer while still claiming to cover
+// every one. Phase 11e is exactly that case (five twins became nine).
+const HOE_REAGENT_TWINS = ['fine_vale_wheat', 'fine_marsh_rice', 'fine_highland_barley'];
+const FINE_TWINS_CLOSED_HERE = Object.values(FARM_CROPS)
+  .map((c) => c.fineProduceItemId)
+  .filter((id) => !HOE_REAGENT_TWINS.includes(id));
 
-// All eight base produce rows. Every one must have a dish consumer, so no crop
-// on the ladder grows into a vendor-sell-only good.
-const BASE_PRODUCE = [
-  'vale_wheat',
-  'brook_carrot',
-  'marsh_rice',
-  'bog_beet',
-  'highland_barley',
-  'frost_gourd',
-  'gilded_sunmelon',
-  'evergarden_greens',
-];
+// Every base produce row. Each must have a dish consumer, so no crop on the
+// ladder grows into a vendor-sell-only good. Derived for the same reason.
+const BASE_PRODUCE = Object.values(FARM_CROPS).map((c) => c.produceItemId);
 
 // The economy rule, re-derived here rather than imported, on purpose: this
 // suite must red on a REAGENT retune (a produce price moving) as well as on a
@@ -137,10 +128,20 @@ const EXPECTED_INPUT_VALUE: Record<string, number> = {
   recipe_eastbrook_root_pottage: 68,
   recipe_fenbridge_rice_bowl: 40,
   recipe_fenbridge_beet_braise: 88,
-  recipe_highwatch_barley_bannock: 76,
-  recipe_highwatch_gourd_soup: 173,
-  recipe_evergarden_sunmelon_tart: 448,
-  recipe_evergarden_harvest_platter: 456,
+  // The four bills Phase 11e widened with a base-plus-fine pair each. Every
+  // value below is the OLD one plus the pair's own cost, computed from the
+  // merged items table rather than read off a run:
+  //   bannock  76 + (15 x2) + 120 = 226
+  //   soup    173 + (15 x2) + 120 = 323
+  //   tart    448 + (40 x2) + 320 = 848
+  //   platter 456 + (40 x2) + 320 = 856
+  // The fine twin dominates each pair because reagentUnitValue prefers
+  // buyValue, and a fine twin carries the four-times-sell staple. Input rises,
+  // output is untouched, so every dish stays gold-negative by MORE than before.
+  recipe_highwatch_barley_bannock: 226,
+  recipe_highwatch_gourd_soup: 323,
+  recipe_evergarden_sunmelon_tart: 848,
+  recipe_evergarden_harvest_platter: 856,
   // The four Phase 11 buff dishes (produce x4 plus one salt each; the tier-1
   // row also carries the pottage-precedent vale_wheat binder, see its row).
   recipe_eastbrook_glazed_carrots: 76,
@@ -305,7 +306,7 @@ describe('FARM_RECIPES: the farm-economy hook set', () => {
     expect(dishes.map((d) => d.id)).toContain('recipe_eastbrook_glazed_carrots');
   });
 
-  it('closes the five fine twins the hoe ladder left without a consumer', () => {
+  it('closes every fine twin the hoe ladder left without a consumer', () => {
     const dishReagents = new Set(dishes.flatMap((d) => d.reagents.map((r) => r.itemId)));
     for (const twin of FINE_TWINS_CLOSED_HERE) {
       expect(
@@ -316,20 +317,29 @@ describe('FARM_RECIPES: the farm-economy hook set', () => {
     }
     // The three the hoe ladder already consumes must NOT have quietly been
     // folded in here as well: this pin states which list owns which twin.
-    for (const hoeTwin of ['fine_vale_wheat', 'fine_marsh_rice', 'fine_highland_barley']) {
+    for (const hoeTwin of HOE_REAGENT_TWINS) {
       expect(
         dishReagents.has(hoeTwin),
         `${hoeTwin} is a hoe reagent; a dish slot for it would double-book the twin`,
       ).toBe(false);
     }
+    // Non-vacuity, and the reason the list is derived: the two halves must
+    // partition the catalog's whole twin column, so neither loop can pass over
+    // a twin the lists forgot. Nine dish-closed plus three hoe reagents.
+    expect(FINE_TWINS_CLOSED_HERE).toHaveLength(9);
+    expect([...FINE_TWINS_CLOSED_HERE, ...HOE_REAGENT_TWINS].sort()).toEqual(
+      Object.values(FARM_CROPS)
+        .map((c) => c.fineProduceItemId)
+        .sort(),
+    );
   });
 
-  it('gives all eight base produce rows a dish consumer', () => {
+  it('gives every base produce row a dish consumer', () => {
     const dishReagents = new Set(dishes.flatMap((d) => d.reagents.map((r) => r.itemId)));
     for (const produce of BASE_PRODUCE) {
       expect(dishReagents.has(produce), `${produce} is never cooked into any dish`).toBe(true);
     }
-    expect(BASE_PRODUCE).toHaveLength(8);
+    expect(BASE_PRODUCE).toHaveLength(12);
   });
 
   it('resolves every reagent to a real ItemDef', () => {

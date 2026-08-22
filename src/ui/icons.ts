@@ -3662,12 +3662,49 @@ const ITEM_RECIPES: Record<string, IconRecipe> = {
   frost_gourd_seed: r('frost', 'earthBrown', [{ p: 'sack', pal: 'ice' }]),
   frost_gourd: r('frost', 'ice', [{ p: 'waterskin', pal: 'ice' }]),
   fine_frost_gourd: r('frost', 'ice', [{ p: 'waterskin', pal: 'ice' }], ['sparkle']),
+  // The two tier-3 crops Phase 11e added. Same family rules as the rows above:
+  // the fine recipe is exactly its produce recipe plus 'sparkle', and every new
+  // family takes a DIFFERENT primary glyph so no pair is separated by palette
+  // alone (the frost_gourd_seed lesson, pinned as the A4 arm). Each seed also
+  // carries its produce glyph as a corner accent, the brook_carrot_seed
+  // precedent, because the shipped seeds lean on radial and sack palette alone
+  // and four more of them would crowd that space.
+  thornpeak_cabbage_seed: r('frost', 'leafGreen', [
+    { p: 'sack', pal: 'leafGreen' },
+    { p: 'tendrils', pal: 'leafGreen', ...TR },
+  ]),
+  thornpeak_cabbage: r('frost', 'leafGreen', [{ p: 'tendrils', pal: 'leafGreen' }]),
+  fine_thornpeak_cabbage: r(
+    'frost',
+    'leafGreen',
+    [{ p: 'tendrils', pal: 'leafGreen' }],
+    ['sparkle'],
+  ),
+  frost_lentils_seed: r('earth', 'earthBrown', [
+    { p: 'sack', pal: 'earthBrown' },
+    { p: 'gem', pal: 'earthBrown', ...TR },
+  ]),
+  frost_lentils: r('earth', 'earthBrown', [{ p: 'gem', pal: 'earthBrown' }]),
+  fine_frost_lentils: r('earth', 'earthBrown', [{ p: 'gem', pal: 'earthBrown' }], ['sparkle']),
   gilded_sunmelon_seed: r('nature', 'gold', [{ p: 'sack', pal: 'gold' }]),
   gilded_sunmelon: r('nature', 'gold', [{ p: 'sunburst', pal: 'gold' }]),
   fine_gilded_sunmelon: r('nature', 'gold', [{ p: 'sunburst', pal: 'gold' }], ['sparkle']),
   evergarden_greens_seed: r('nature', 'leafGreen', [{ p: 'sack', pal: 'leafGreen' }]),
   evergarden_greens: r('nature', 'leafGreen', [{ p: 'leaf', pal: 'leafGreen' }]),
   fine_evergarden_greens: r('nature', 'leafGreen', [{ p: 'leaf', pal: 'leafGreen' }], ['sparkle']),
+  // The two tier-4 crops Phase 11e added, under the same three rules.
+  gilded_yam_seed: r('earth', 'gold', [
+    { p: 'sack', pal: 'gold' },
+    { p: 'droplet', pal: 'gold', ...TR },
+  ]),
+  gilded_yam: r('earth', 'gold', [{ p: 'droplet', pal: 'gold' }]),
+  fine_gilded_yam: r('earth', 'gold', [{ p: 'droplet', pal: 'gold' }], ['sparkle']),
+  evergarden_pumpkin_seed: r('earth', 'ember', [
+    { p: 'sack', pal: 'ember' },
+    { p: 'moon', pal: 'ember', ...TR },
+  ]),
+  evergarden_pumpkin: r('earth', 'ember', [{ p: 'moon', pal: 'ember' }]),
+  fine_evergarden_pumpkin: r('earth', 'ember', [{ p: 'moon', pal: 'ember' }], ['sparkle']),
   // The hoe ladder (the crop-ladder phase's tool half), same ART_PENDING
   // drawn stand-in treatment and the same A4 pairwise-distinctness demand: a
   // staff haft plus an angled blade up the material palettes, glow on the
@@ -5569,71 +5606,62 @@ export const UI_ITEM_IMAGE_IDS = new Set<string>(['backpack']);
 // 404, and A2/A3 in tests/item_icons.test.ts keep the debt from outliving the art: A2 reds the
 // moment a .webp lands, and A3's size pin reds if this set grows without a deliberate re-pin.
 export const ITEM_ART_PENDING = new Set<string>([
-  'fine_vale_wheat',
-  'vale_wheat',
-  'vale_wheat_seed',
-  'withered_husks',
-  // The knobs phase's two supplies, the same dormant-online reasoning as the
-  // four above (no faucet for either exists until go-live) and the same
-  // scheduled art phase.
-  'compost',
-  'growth_tonic',
-  // The crop-ladder phase's seven crop families (seed, produce, fine twin),
-  // the same dormant-online reasoning as everything above and the same
-  // scheduled art phase.
   'bog_beet',
   'bog_beet_seed',
+  'bronze_hoe',
   'brook_carrot',
   'brook_carrot_seed',
+  'compost',
+  'eastbrook_glazed_carrots',
+  'eastbrook_root_pottage',
+  'evergarden_braised_greens',
   'evergarden_greens',
   'evergarden_greens_seed',
-  'fine_bog_beet',
-  'fine_brook_carrot',
-  'fine_evergarden_greens',
-  'fine_frost_gourd',
-  'fine_gilded_sunmelon',
-  'fine_highland_barley',
-  'fine_marsh_rice',
-  'frost_gourd',
-  'frost_gourd_seed',
-  'gilded_sunmelon',
-  'gilded_sunmelon_seed',
-  'highland_barley',
-  'highland_barley_seed',
-  'marsh_rice',
-  'marsh_rice_seed',
-  // The hoe ladder (the crop-ladder phase's tool half), the same
-  // dormant-online reasoning (rungs 2 to 4 are craft-only behind farming fine
-  // twins no live faucet mints, and the vendor rung is stocked at go-live)
-  // and the same scheduled art phase.
-  'bronze_hoe',
-  'garden_hoe',
-  'osmium_hoe',
-  'skysilver_hoe',
-  // The economy-hooks phase's eight farm dishes. Same dormant-online reasoning
-  // as everything above (they are cooked from produce no live faucet mints
-  // yet) and the same scheduled art phase; committed art is the site norm and
-  // these have none, so they ride the pending set as honest, enumerated debt.
-  'eastbrook_root_pottage',
   'evergarden_harvest_platter',
+  'evergarden_pumpkin',
+  'evergarden_pumpkin_seed',
   'evergarden_sunmelon_tart',
   'fenbridge_beet_braise',
   'fenbridge_rice_bowl',
-  'highwatch_barley_bannock',
-  'highwatch_gourd_soup',
-  'vale_hearth_loaf',
-  // The well-fed phase's four buff dishes, one per crop tier. Same
-  // dormant-online reasoning as the eight plain dishes above (cooked from
-  // produce whose live faucet is the same farm) and the same scheduled art
-  // phase; each serves a distinct procedural recipe through iconDataUrl.
-  'eastbrook_glazed_carrots',
-  'evergarden_braised_greens',
   'fenbridge_rice_pudding',
-  'highwatch_barley_porridge',
-  // The shared feast (Phase 12): same dormant-online reasoning (cooked from
-  // tier-4 produce under the (bo) faucet hole) and the same scheduled art
-  // phase; serves its own distinct procedural recipe through iconDataUrl.
+  'fine_bog_beet',
+  'fine_brook_carrot',
+  'fine_evergarden_greens',
+  'fine_evergarden_pumpkin',
+  'fine_frost_gourd',
+  'fine_frost_lentils',
+  'fine_gilded_sunmelon',
+  'fine_gilded_yam',
+  'fine_highland_barley',
+  'fine_marsh_rice',
+  'fine_thornpeak_cabbage',
+  'fine_vale_wheat',
+  'frost_gourd',
+  'frost_gourd_seed',
+  'frost_lentils',
+  'frost_lentils_seed',
+  'garden_hoe',
+  'gilded_sunmelon',
+  'gilded_sunmelon_seed',
+  'gilded_yam',
+  'gilded_yam_seed',
+  'growth_tonic',
   'harvest_feast',
+  'highland_barley',
+  'highland_barley_seed',
+  'highwatch_barley_bannock',
+  'highwatch_barley_porridge',
+  'highwatch_gourd_soup',
+  'marsh_rice',
+  'marsh_rice_seed',
+  'osmium_hoe',
+  'skysilver_hoe',
+  'thornpeak_cabbage',
+  'thornpeak_cabbage_seed',
+  'vale_hearth_loaf',
+  'vale_wheat',
+  'vale_wheat_seed',
+  'withered_husks',
 ]);
 
 /** Static URL of an item's (or a UI pseudo-item's) image icon, or null if it uses a recipe. */

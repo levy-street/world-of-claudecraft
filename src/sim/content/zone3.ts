@@ -1450,10 +1450,22 @@ export const ZONE3_NPCS: Record<string, NpcDef> = {
     facing: Math.PI,
     color: 0x8c6a4a,
     questIds: [],
-    vendorItems: ['compost'],
+    // GATE 1, the tier-3 seed faucet (Phase 11e). Before this the tier-3 seeds
+    // had NO vendor anywhere, which left three trainer-visible recipes
+    // uncompletable and two deeds parked: a farmer could see the crops and
+    // never plant a first one. Every row carries a positive buyValue on its
+    // item def (32 at this tier, masterwrought DECISION D), because a stocked
+    // row without one renders and then refuses, which is farming's D11 trap.
+    vendorItems: [
+      'compost',
+      'highland_barley_seed',
+      'frost_gourd_seed',
+      'thornpeak_cabbage_seed',
+      'frost_lentils_seed',
+    ],
     farmer: true,
     greeting:
-      'The terraces give what the mountain allows, $C. I sell compost, and if a crop of yours comes up withered I will work the husks back into good soil for you.',
+      'The terraces give what the mountain allows, $C. I sell seed and compost, and if a crop of yours comes up withered I will work the husks back into good soil for you.',
   },
 };
 
