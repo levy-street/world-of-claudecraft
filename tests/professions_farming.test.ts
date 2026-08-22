@@ -23,7 +23,7 @@ import {
   farmCropSkillThreshold,
   farmCropTier,
 } from '../src/sim/content/farm_crops';
-import { FARM_BED_IDS, farmBedById } from '../src/sim/content/farm_patches';
+import { FARM_BED_IDS, FARM_PATCHES, farmBedById } from '../src/sim/content/farm_patches';
 import { DEFAULT_MOUNT } from '../src/sim/content/mounts';
 import { TOOL_EFFECTS } from '../src/sim/content/professions';
 import { ITEMS } from '../src/sim/data';
@@ -89,6 +89,14 @@ import {
   type SimEvent,
 } from '../src/sim/types';
 import { terrainHeight } from '../src/sim/world';
+import {
+  accumulateGain,
+  farmingCalendar,
+  harvestsToCross,
+  isDyadic,
+  MAXIMUM_DEDICATION,
+  REFERENCE_FARMER,
+} from './helpers/farming_calendar_model';
 
 const CROP_ID = 'vale_wheat';
 const SEED_ID = 'vale_wheat_seed';
@@ -374,22 +382,27 @@ describe('the crop catalog and the cast sentinel', () => {
 });
 
 describe('FARMING_GAIN_SCHEDULE and the composed ceiling', () => {
-  it('pins the schedule rows to their literals', () => {
-    expect(FARMING_GAIN_SCHEDULE.map((r) => [r.belowProficiency, r.gain])).toEqual([
-      [25, 1],
-      [50, 0.5],
-      [75, 0.1],
-      [100, 0.02],
-    ]);
+  // The GAIN column and the BOUNDARY column are pinned SEPARATELY, on purpose.
+  // The boundaries are the teaching-ceiling source (farmingTeachingCeilingFor
+  // indexes this very column), so a future re-tune that moved one would
+  // silently change which crop tier grays out at which skill. Splitting the
+  // pins means a tune can only ever move the half it meant to move.
+  it('pins the schedule BOUNDARY column, the teaching-ceiling source', () => {
+    expect(FARMING_GAIN_SCHEDULE.map((r) => r.belowProficiency)).toEqual([25, 50, 75, 100]);
+    expect(FARMING_GAIN_SCHEDULE).toHaveLength(4);
+  });
+
+  it('pins the schedule GAIN column to its literals', () => {
+    expect(FARMING_GAIN_SCHEDULE.map((r) => r.gain)).toEqual([0.25, 0.125, 0.0625, 0.03125]);
   });
 
   it('takes the first row the proficiency sits below, and zero past the last', () => {
-    expect(farmingHarvestGain(0)).toBe(1);
-    expect(farmingHarvestGain(24.9)).toBe(1);
-    expect(farmingHarvestGain(25)).toBe(0.5);
-    expect(farmingHarvestGain(49)).toBe(0.5);
-    expect(farmingHarvestGain(50)).toBe(0.1);
-    expect(farmingHarvestGain(75)).toBe(0.02);
+    expect(farmingHarvestGain(0)).toBe(0.25);
+    expect(farmingHarvestGain(24.9)).toBe(0.25);
+    expect(farmingHarvestGain(25)).toBe(0.125);
+    expect(farmingHarvestGain(49)).toBe(0.125);
+    expect(farmingHarvestGain(50)).toBe(0.0625);
+    expect(farmingHarvestGain(75)).toBe(0.03125);
     expect(farmingHarvestGain(100)).toBe(0);
     expect(farmingHarvestGain(1_000)).toBe(0);
   });
@@ -404,17 +417,140 @@ describe('FARMING_GAIN_SCHEDULE and the composed ceiling', () => {
     expect(farmingTeachingCeilingFor(0)).toBe(50);
   });
 
-  it('zeroes the gain at or past the crop tier ceiling, the R19 composition', () => {
+  it('zeroes the gain at or past the crop tier ceiling, the masterwrought R19 composition', () => {
     // The schedule truth, live now that the crop ladder ships all four tiers:
     // a tier-1 crop teaches to 50, a tier-2 crop to 75, and tier 3 and 4
     // crops to 100 (the composed ceiling above).
-    expect(farmingHarvestGainAt(0, 1)).toBe(1);
-    expect(farmingHarvestGainAt(25, 1)).toBe(0.5);
-    expect(farmingHarvestGainAt(49.9, 1)).toBe(0.5);
+    expect(farmingHarvestGainAt(0, 1)).toBe(0.25);
+    expect(farmingHarvestGainAt(25, 1)).toBe(0.125);
+    expect(farmingHarvestGainAt(49.9, 1)).toBe(0.125);
     expect(farmingHarvestGainAt(50, 1)).toBe(0);
     // A tier-2 crop keeps teaching where the tier-1 crop gave up.
-    expect(farmingHarvestGainAt(50, 2)).toBe(0.1);
+    expect(farmingHarvestGainAt(50, 2)).toBe(0.0625);
     expect(farmingHarvestGainAt(75, 2)).toBe(0);
+  });
+});
+
+// The masterwrought R19 derivation. FARMING_GAIN_SCHEDULE's gain column is the
+// OUTPUT of the calendar model in tests/helpers/farming_calendar_model.ts, so
+// these arms re-derive it rather than restating it: if the model's inputs move
+// (a bed is added, a gate moves, the survival ramp changes) the shipped curve
+// has to move with them or this reds.
+describe('the farming gain curve is DERIVED from the calendar model, not felt', () => {
+  // masterwrought DECISION A, settled 2026-08-20: about ten weeks for the
+  // reference farmer. Stated here as the window the derivation searches, so
+  // moving the design target is a one-line edit whose consequence is visible.
+  const DECISION_A_MIN_DAYS = 70;
+  const DECISION_A_MAX_DAYS = 75;
+
+  /** The candidate family: a strict halving ladder off one head gain. */
+  function halvingLadder(head: number): typeof FARMING_GAIN_SCHEDULE {
+    return [
+      { belowProficiency: 25, gain: head },
+      { belowProficiency: 50, gain: head / 2 },
+      { belowProficiency: 75, gain: head / 4 },
+      { belowProficiency: 100, gain: head / 8 },
+    ] as unknown as typeof FARMING_GAIN_SCHEDULE;
+  }
+
+  it('reproduces the SHIPPED curve as the unique dyadic halving ladder in DECISION A window', () => {
+    // Halving the head doubles the calendar, so the family is monotonic and
+    // the window admits at most one member. Search it rather than assert it.
+    const inWindow: number[] = [];
+    for (let n = 0; n <= 8; n++) {
+      const head = 2 ** -n;
+      const ladder = halvingLadder(head);
+      expect(ladder.every((row) => isDyadic(row.gain))).toBe(true);
+      const days = farmingCalendar(REFERENCE_FARMER, ladder).totalDays;
+      if (days >= DECISION_A_MIN_DAYS && days <= DECISION_A_MAX_DAYS) inWindow.push(head);
+    }
+    expect(inWindow).toEqual([0.25]);
+    // ...and the tree ships exactly that ladder.
+    expect(FARMING_GAIN_SCHEDULE.map((r) => r.gain)).toEqual(
+      halvingLadder(inWindow[0]).map((r) => r.gain),
+    );
+  });
+
+  it('puts the shipped curve inside the settled calendar window for the reference farmer', () => {
+    const model = farmingCalendar(REFERENCE_FARMER);
+    expect(model.totalHarvests).toBe(1500);
+    expect(model.totalDays).toBeGreaterThanOrEqual(DECISION_A_MIN_DAYS);
+    expect(model.totalDays).toBeLessThanOrEqual(DECISION_A_MAX_DAYS);
+    // The re-tune's actual purpose: the FRONT of the ladder, which the shipped
+    // curve spent under a tenth of the calendar on. A derived span materially
+    // under a month re-opens DECISION A rather than shipping, so pin the floor.
+    expect(model.daysToFifty / model.totalDays).toBeGreaterThan(0.3);
+    expect(model.totalDays).toBeGreaterThan(30);
+  });
+
+  it('reads its inputs from shipped content, so a content change moves the model', () => {
+    const model = farmingCalendar(REFERENCE_FARMER);
+    // The per-band bed counts are the union of the hubs whose crop tier still
+    // teaches; they come from FARM_PATCHES, never from a literal here.
+    expect(model.bands.map((b) => b.teachingTiers)).toEqual([[1], [1, 2], [2, 3], [3, 4]]);
+    expect(model.bands.map((b) => b.beds)).toEqual([
+      FARM_PATCHES.filter((p) => p.tier === 1).reduce((n, p) => n + p.beds.length, 0),
+      FARM_PATCHES.filter((p) => p.tier <= 2).reduce((n, p) => n + p.beds.length, 0),
+      FARM_PATCHES.filter((p) => p.tier === 2 || p.tier === 3).reduce(
+        (n, p) => n + p.beds.length,
+        0,
+      ),
+      FARM_PATCHES.filter((p) => p.tier >= 3).reduce((n, p) => n + p.beds.length, 0),
+    ]);
+    // Each band's harvest count is exactly the band width over its own gain.
+    for (const band of model.bands) {
+      expect(band.harvests).toBe((band.to - band.from) / band.gain);
+    }
+    // The harvest ladder strictly doubles, which is the SHAPE half of the
+    // derivation (the scale half is the window above).
+    expect(model.bands.map((b) => b.harvests)).toEqual([100, 200, 400, 800]);
+  });
+
+  it('records the maximum-dedication FLOOR, an envelope bound and never a target', () => {
+    const floor = farmingCalendar(MAXIMUM_DEDICATION);
+    // Same 1500 harvests, every bed in the world, so the calendar compresses
+    // but never collapses.
+    expect(floor.totalHarvests).toBe(1500);
+    expect(floor.totalDays).toBeLessThan(farmingCalendar(REFERENCE_FARMER).totalDays);
+    expect(floor.totalDays).toBeGreaterThan(30);
+  });
+
+  // The EXACTNESS arm, and the reason the literals are negative powers of two.
+  // Grants accumulate by plain float addition in applyGrantClamped with no
+  // rounding, so a non-dyadic gain drifts and a band boundary is missed by one
+  // harvest. Strict equality throughout: toBeCloseTo would pass on the very
+  // drift this exists to forbid.
+  describe('every gain is exactly representable, so a band lands on its boundary', () => {
+    it('holds each gain to a dyadic rational', () => {
+      for (const row of FARMING_GAIN_SCHEDULE) expect(isDyadic(row.gain)).toBe(true);
+    });
+
+    it('accumulates each band exactly N times and lands on the boundary EXACTLY', () => {
+      let skill = 0;
+      for (const row of FARMING_GAIN_SCHEDULE) {
+        const harvests = (row.belowProficiency - skill) / row.gain;
+        expect(Number.isInteger(harvests)).toBe(true);
+        skill = accumulateGain(skill, row.gain, harvests);
+        expect(skill).toBe(row.belowProficiency);
+      }
+      expect(skill).toBe(100);
+    });
+
+    it('needs no extra harvest to cross any boundary, which the old curve did', () => {
+      let skill = 0;
+      for (const row of FARMING_GAIN_SCHEDULE) {
+        const nominal = (row.belowProficiency - skill) / row.gain;
+        expect(harvestsToCross(skill, row.gain, row.belowProficiency)).toBe(nominal);
+        skill = row.belowProficiency;
+      }
+      // The control, so the arm above cannot pass vacuously: the retired
+      // literals really were inexact and really did cost an extra harvest.
+      expect(isDyadic(0.1)).toBe(false);
+      expect(isDyadic(0.02)).toBe(false);
+      expect(harvestsToCross(50, 0.1, 75)).toBe(251);
+      expect(harvestsToCross(75, 0.02, 100)).toBe(1251);
+      expect(accumulateGain(50, 0.1, 250)).not.toBe(75);
+    });
   });
 });
 
@@ -1806,11 +1942,15 @@ describe('harvestCrop TIER 1/2: one draw (the golden roll) on every outcome, zer
     expect(harvested[0].itemId).toBe(PRODUCE_ID);
     expect(harvested[0].count).toBe(expected.count);
     // The gain is queued, not applied: the drain runs earlier in the tick, so
-    // a command-time grant lands NEXT tick.
-    expect(h.meta.pendingGatherGrants).toEqual([{ professionId: 'farming', amount: 1 }]);
+    // a command-time grant lands NEXT tick. The amount is the first schedule
+    // row's gain at proficiency 0, read from the table rather than restated,
+    // so this arm follows a re-tune instead of reddening on one.
+    expect(h.meta.pendingGatherGrants).toEqual([
+      { professionId: 'farming', amount: FARMING_GAIN_SCHEDULE[0].gain },
+    ]);
     expect(h.meta.gatheringProficiency.farming).toBe(0);
     h.sim.tick();
-    expect(h.meta.gatheringProficiency.farming).toBe(1);
+    expect(h.meta.gatheringProficiency.farming).toBe(FARMING_GAIN_SCHEDULE[0].gain);
   });
 
   it('omits the fine fields entirely when no pick upgraded', () => {

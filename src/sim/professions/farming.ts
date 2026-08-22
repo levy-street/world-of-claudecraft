@@ -219,13 +219,48 @@ export const FARM_SEED_BACK_ONE_CHANCE: Readonly<Record<number, number>> = { 3: 
 
 // Per-harvest proficiency gain schedule, the fishing FISHING_GAIN_SCHEDULE
 // shape scaled to farming's cap of 100: the breakpoints are the band
-// boundaries, halving then tapering the gain each step. TUNING, PROVISIONAL,
-// FLAGGED FOR THE MAINTAINER.
+// boundaries and the gain halves at each one.
+//
+// TUNING, DERIVED, NOT FELT. masterwrought R19 forbids tuning a gathering
+// curve from feel, so these four literals are the OUTPUT of a measured
+// calendar model, not an input to one. The model lives in
+// tests/helpers/farming_calendar_model.ts, its inputs are read from shipped
+// content (FARM_PATCHES bed counts, farmCropSkillThreshold gates,
+// farmingTeachingCeilingFor ceilings, farmSurvivalChance), and
+// tests/professions_farming.test.ts re-derives this table from it, so the
+// doc and the code cannot drift. The full record, including the per-band
+// table and the arithmetic for both the old curve and this one, is in
+// docs/prd/masterwrought/state.md, "The farming calendar model".
+//
+// HOW THESE FOUR NUMBERS ARE FORCED, in three steps a reader can redo:
+//  1. EXACTNESS. Grants accumulate by plain float addition in
+//     applyGrantClamped with no rounding anywhere, so a gain that is not a
+//     dyadic rational drifts and a band boundary is missed. The shipped
+//     0.1 and 0.02 were both inexact and the ladder proved it: 0.1 x250 from
+//     50 lands on 74.99999999999957 and cost a 251st harvest, 0.02 x1250 from
+//     75 cost a 1251st, and the full ladder ended at 99.9999999999946 rather
+//     than 100. Every gain here is a negative power of two, so every band
+//     lands on its boundary exactly.
+//  2. SHAPE. A strict halving ladder spends a scale-INDEPENDENT 34 percent of
+//     the calendar on the first fifty points, whatever the head gain is. The
+//     shipped curve halved once and then took fifths, which is why its front
+//     fifty points were 9.7 percent of a 65 day climb: the defect was the
+//     FRONT, never the total.
+//  3. SCALE. With the shape fixed, halving the head doubles the calendar, so
+//     the family is 18.5, 37.0, 74.0, 148.0 days for the reference farmer.
+//     Exactly ONE member lands inside masterwrought DECISION A's settled
+//     window of about ten weeks (70 to 75 days), and it is this one: 74.00
+//     days, 1500 harvests, 25.2 days to skill 50.
+//
+// THE boundary column is NOT tuning and never moves: farmingTeachingCeilingFor
+// reads it to decide which crop tier grays out at which skill, so a moved
+// boundary silently re-maps tier to ceiling for every farmer alive. Only the
+// gain column is tunable here.
 export const FARMING_GAIN_SCHEDULE = [
-  { belowProficiency: 25, gain: 1 },
-  { belowProficiency: 50, gain: 0.5 },
-  { belowProficiency: 75, gain: 0.1 },
-  { belowProficiency: 100, gain: 0.02 },
+  { belowProficiency: 25, gain: 0.25 },
+  { belowProficiency: 50, gain: 0.125 },
+  { belowProficiency: 75, gain: 0.0625 },
+  { belowProficiency: 100, gain: 0.03125 },
 ] as const;
 
 // The schedule half of the gain model, with no crop ceiling. Deterministic
