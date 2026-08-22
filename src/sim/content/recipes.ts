@@ -2093,9 +2093,38 @@ export const INTERMEDIATE_RECIPES: ProfessionRecipeRecord[] = [
     professionId: 'cooking',
     resultItemId: 'seasoned_stock',
     resultCount: 1,
+    // THE CHOKE POINT (masterwrought DECISION C, settled 2026-08-20, authored
+    // HERE because Phase 11g reaches this row first; Phase 11h takes this bill
+    // AS GIVEN and re-derives its own arithmetic from it rather than editing
+    // the row). The result is meat plus vegetables plus salt, which is what a
+    // stock is.
+    //
+    // THE COUNTS ARE DERIVED FROM THE ROW'S OWN SHAPE, not picked: the shipped
+    // bill was prime_cut 1, game_meat 3, cooking_salt 2, quickening_catalyst 1,
+    // so the vegetables enter at the salt's count of 2, one below the meat
+    // count of 3, and the bill still reads meat, then vegetables, then salt.
+    //
+    // THE TIER IS DELIBERATELY 2 AT BOTH, and it is grain AND root rather than
+    // one crop. Everything in the cooking apex flows through this single row
+    // (the three role plates take seasoned_stock 1, recipe_laden_hearth takes
+    // 3, and Phase 11k's apex feasts take it too), so coupling it to two
+    // vendor-seeded, market-fed supply lines spreads the choke point instead of
+    // making the whole apex kitchen ride one paddy. Tier 3 or 4 would put it
+    // behind farming's deliberately slow upper supply, so the choke point would
+    // actually choke.
+    //
+    // masterwrought R17 IS NOT BREACHED HERE, and the distinction is the point:
+    // R17 fences produce out of the GEAR chain, and this is a cooking
+    // intermediate whose output is a food reagent with no equip slot. The
+    // firewall sweep in tests/provisioner_firewall.test.ts reads
+    // INTERMEDIATE_RECIPES, a mixed table holding both gear intermediates and
+    // this one, so that sweep gains a consumable-profession carve-out proved by
+    // the same no-equip-slot test the hoe carve-out already uses.
     reagents: [
       { itemId: 'prime_cut', count: 1 },
       { itemId: 'game_meat', count: 3 },
+      { itemId: 'marsh_rice', count: 2 },
+      { itemId: 'bog_beet', count: 2 },
       { itemId: 'cooking_salt', count: 2 },
       { itemId: 'quickening_catalyst', count: 1 },
     ],
