@@ -9097,3 +9097,237 @@ All SIX read-only discovery agents dispatched at STEP 1 went idle WITHOUT
 delivering, each after its one budgeted nudge, so their ground was covered in
 the main loop instead. Budget for that: the fan-out bought nothing here and the
 direct reads were what produced every correction above.
+
+## Phase 11f BUILT ledger (2026-08-22, farming joins the drop economy)
+
+STEP 0 and its two pre-flight commits are recorded in the section above; this
+records the authoring. Commits, in order: 3a818291aa (the heroic residual),
+65688d702e (the rung climb), 7521238cb8 (the pattern table), fc14c63453 (raid,
+dungeon and rift), 66799eb1a0 (the quartermaster valve), b6287dd032 (the seed
+identity guard), c7a97eb400 (the golden bonus), cbd1294385 (the wiki source
+label), eed4112503 (the R17/R18/R20 sweeps), a19a8a2864 (the isolated
+farming_session re-record). LOCAL, no push, no PR.
+
+### The five settled decisions, EXECUTED as written
+
+- DECISION A, the rung climb. Band table now 0:4, 25:3, 50:1, 75:2, 100:4,
+  125:0, still fourteen rows, no new recipe id. Gourd soup and barley porridge
+  to 75 [20, 20]; sunmelon tart, harvest platter, braised greens and the
+  harvest feast to 100 [25, 25]; barley bannock HELD at 50. NO second
+  cooking-125 capstone exception was recorded anywhere, and the feast at 100
+  keeps 11k's "the party-tier rung below" true. Both scaffolding tuples are
+  SHIPPED points, and the suite proves it by finding a NON-farm witness recipe
+  for each rung rather than trusting the table.
+- DECISION B, the channel flip. Six rows to ['drop'], eight to ['trainer'],
+  derived from FARM_DROP_RUNG_FLOOR = 75 rather than listed. The alchemy
+  sub-arm is N/A on the merged tree, as ruled: no alchemy row above rung 50
+  outputs a farming knob, and none was minted.
+- DECISION C, the golden draw. ONE unconditional contiguous ctx.rng draw
+  immediately after the golden-harvest roll, spent on every resolving arm and
+  read only on a win. The DRAW CONTRACT header was restated WHOLE. Harvest
+  counts are now tier 1/2 two draws, tier 3/4 three, deny arms zero, plant two,
+  tick sweep zero.
+- DECISION D, what the bonus pays. One extra item: a seed of the next tier up
+  (same tier at the top), or at the pattern weight one farming pattern. Zero new
+  ids. Rates below.
+- DECISION E, placement and prices. Raid: one tail rollGroup 'nythraxis_farm' on
+  the Nythraxis base table with pattern_harvest_feast plus the four tier-4
+  seeds. Dungeon: one tail rollGroup 'heroic_farm_patterns' on all five heroic
+  five-man final bosses with the two rung-75 patterns, appended AFTER the
+  ungrouped mount rows. Rift: draw 7 after draw 6 over the sorted
+  FARM_RIFT_DROP_ITEM_IDS (three rung-100 patterns plus all eight upper seeds).
+  Quartermaster: fourteen rows at 12 marks, stock 19 to 33. The copper floor was
+  not touched.
+
+### Rates and prices as wired, with the derivation
+
+- 0.04 per rollGroup entry, raid and dungeon alike: the SHIPPED per-pattern
+  point the phase 11 'nythraxis_patterns' group uses. The raid group totals 0.20
+  over five entries, the dungeon group 0.08 over two. Both partition, so at most
+  one item per kill.
+- The rift gate is RIFT_PATTERN_CHANCE itself, not a copy of 0.08 at the call
+  site, so the rate cannot decouple from the constant. Measured over 5000
+  deterministic clears: 428 hits at B, 411 at A, 392 at S, against an expected
+  400.
+- 12 marks for all fourteen quartermaster rows, the ring point. Derived: the
+  mark family has exactly two points, 12 for skill-100 patterns and 16 for
+  skill-125 capstones, and every farming pattern teaches a rung-75 or rung-100
+  row. No farming row sits at 16 and no third point was minted.
+- FARM_GOLDEN_BONUS_PATTERN_CHANCE = 0.04, the same shipped point again.
+
+### The R19 inputs, handed forward (computed, not estimated)
+
+Harvest cadences, with survival 1.0 (the conservative direction, since a
+withered harvest spends its golden draw and ignores it):
+
+| cadence | harvests/day | golden/day | seeds/day | patterns/day | days/pattern |
+|---|---|---|---|---|---|
+| reference farmer (two sessions over 23 beds) | 46 | 0.51 | 0.49 | 0.020 | ~49 |
+| dedicated grinder (one 6-bed patch, 35-min cycles, 24h) | 246 | 2.7 | 2.6 | 0.11 | ~9 |
+| impossible ceiling (all 23 beds, four zones, no travel, 24h) | 946 | 10.5 | 10.1 | 0.42 | ~2.4 |
+
+The quartermaster route: five heroic five-mans at 1 mark plus the heroic raid at
+3, each on its own realm-reset lockout, is 8 marks a day against a 12-mark
+pattern, so 0.67 patterns/day, one every 1.5 days.
+
+DECISION D's BINDING ACCEPTANCE therefore holds under every model INCLUDING the
+physically impossible one: 0.42 < 0.67. It is asserted as arithmetic over
+shipped constants in tests/farm_golden_bonus.test.ts, not recorded as prose, so
+a retune of the mark prices, the lockout rewards or the weight re-runs the check
+instead of stale-ing this table.
+
+Seeds-per-clear: the raid group pays a tier-4 seed on 4 of 25 kills (four
+entries at 0.04); the rift pays one of eleven farm rewards on 8% of winning
+B/A/S clears, so a specific seed lands about 1 clear in 138. Seeds-per-copper is
+unchanged by this phase: 32 at tier 3 and 64 at tier 4, 11e's floor, untouched.
+
+### The pattern table
+
+Six kind:'recipe' defs in a NEW src/sim/content/farm_patterns.ts, merged by
+data.ts beside apex_patterns.ts, whose header gains a pointer so its "the 28"
+statements stay literally true. Every def: quality DERIVED from the taught row's
+output quality, sellValue the shipped uniform 100, tradable, no use arm, no
+stackSize. Typed as the narrow RecipeItemDef rather than the ItemDef union, so
+tsc enforces the shape.
+
+| pattern | teaches | rung | derived quality | sellValue | channel |
+|---|---|---|---|---|---|
+| pattern_highwatch_gourd_soup | recipe_highwatch_gourd_soup | 75 | rare | 100 | five-mans + marks |
+| pattern_highwatch_barley_porridge | recipe_highwatch_barley_porridge | 75 | rare | 100 | five-mans + marks |
+| pattern_evergarden_sunmelon_tart | recipe_evergarden_sunmelon_tart | 100 | rare | 100 | rift + marks |
+| pattern_evergarden_harvest_platter | recipe_evergarden_harvest_platter | 100 | rare | 100 | rift + marks |
+| pattern_evergarden_braised_greens | recipe_evergarden_braised_greens | 100 | rare | 100 | rift + marks |
+| pattern_harvest_feast | recipe_harvest_feast | 100 | rare | 100 | raid + marks |
+
+The uniform 'rare' was PREDICTED before the climb and OBSERVED after, and it is
+a fact about these six rather than a rule: the whole fourteen-row ladder spans
+common, uncommon and rare, which the suite asserts so the derivation stays
+distinguishable from a constant.
+
+### Verdicts, all four written because a sweep whose verdict is unwritten is a
+### sweep nobody can audit
+
+- NAMING: no new coinage. Every name is the registered cooking prefix "Recipe:"
+  plus a dish name already shipped and already audited. Written into
+  naming-audit.md, and asserted by construction in the suite.
+- DEEDS: none. Re-channelled content is not new conquerable content.
+- RELIQUARY: no page. A recipe pattern is not conquerable unique loot.
+- ART: all six PARKED on ITEM_ART_PENDING, 56 to 62, with the A3 literal
+  re-pinned and six DISTINCT procedural icon recipes added (the kind fallback
+  sends every pattern to one scroll glyph, which A4 catches).
+
+### Corrections to the phase brief, found in code (in addition to STEP 0's four)
+
+5. NO mapping.json owner is owed for a PARKED id, and adding one would RED the
+   art gate. That file is provenance for COMMITTED art and its guard F asserts
+   both directions against the webp files on disk. The "exactly one mapping.json
+   owner" instruction is the rule for art that LANDS.
+6. The acceptance line "no golden moved except the deliberate farming_session
+   re-record, and that one moved alone" cannot hold as written, and was never
+   achievable: closing the rift residual and this phase's own rift append both
+   move rift goldens by design. Five goldens moved with the loot commit, all
+   predicted in writing first, and farming_session moved alone in its own last
+   commit, which is the part of the rule that carries the intent.
+7. The scenario padding count is load-bearing state, not scaffolding. The bonus
+   draw made a padding cycle cost four draws instead of three, which landed the
+   golden beat on a LOSING roll; 28 to 36 restores it. Nothing in the gate says
+   so: the suite would have gone green with the golden arm silently retired in
+   the same change that put a new draw inside it.
+8. tests/dungeons.test.ts's morthen two-epics arm counted any id on the heroic
+   table, so it would have started failing the first time a 0.08 pattern landed
+   inside its eight-seed window. Latent before this phase, reachable after it;
+   scoped to the two gear groups by name.
+
+### Findings recorded rather than fixed
+
+- The three fine_*_herb twins have NO recipe consumer anywhere on the merged
+  tree. Predates this phase, farming's own fine-twin question, so the R18
+  displacement arm scopes to the base herb line and says why.
+- No parity golden covers a heroic FIVE-MAN clear, before or after this phase.
+  The dungeon append is the lowest-risk possible position (a tail group after
+  the ungrouped rows, shifting nothing), and it is covered instead by a table
+  pin plus a drive over 120 real heroic clears. Recorded as a coverage boundary,
+  not hidden.
+- The nythraxis_heroic_claim golden's ITEM composition did not change under the
+  raid append on its hunted seed: the shifted weapon draw landed on the same
+  weapon. The draw digest moving is the proof, and the wyrmfall core count
+  moving 1 to 2 per raider is the visible corroboration.
+
+### Pins moved, predicted versus observed
+
+Every one matched its prediction on the first run.
+
+| pin | before | after |
+|---|---|---|
+| recipe_economy trainer sum | FARM_RECIPES.length | rung-derived, 8 |
+| farm_recipes SCAFFOLDING_BY_RUNG | 3 rungs | 5 rungs |
+| farm_recipes QUALITY_BY_RUNG | 3 rungs | 5 rungs, both new ones 'rare' |
+| apex_pattern_items universe | 28 | 34, as a two-source union |
+| ITEM_ART_PENDING | 56 | 62 |
+| heroic_vendor stock length | 19 | 33 |
+| heroic_vendor shop view rows | 19 | 33 |
+| nythraxis recipe entries | 10 | 11 |
+| farming harvest draws (tier 1/2, 3/4) | 1, 2 | 2, 3 |
+| farming_session draws | 110 | 178 |
+| farming_session padding cycles | 28 | 36 |
+| goldens moved | n/a | 6 total, all predicted |
+
+### The rejection list, as recorded design
+
+Not re-proposed: flipping the low rungs; a farming-only pattern kind or learn
+path; making the golden roll the only faucet for a pattern; a daily or weekly
+seed grant; raising farming's maxSkill; re-qualitying the dish outputs; a farm
+reagent in recipe_quickening_catalyst or any gear intermediate; a third mark
+price point; any farming row at 16 marks; the feast at cooking 125; and reading
+further into the mulberry32 yieldSeed expansion instead of taking a real draw.
+The last one is recorded at the draw site itself, not only here.
+
+### The full-suite tail, and why the curated battery could not have caught it
+
+Nineteen failures across thirteen files, none of them in the phase file's
+validation list. That is the "content ids ripple past the phase battery" shape
+exactly, and the split is worth recording so 11g to 11k budget for it:
+
+- SIX suites modelled HEROIC_BOSS_LOOT as gear plus mount reins and nothing
+  else, because until this phase that was true. The dungeon channel is what
+  broke them, and the fix in each is to scope the census to the GEAR it was
+  always about rather than to widen it.
+- FIVE were Phase 11's own apex-channel contract, whose no-fourth-channel
+  sweeps hardcoded "the raid group is the sole loot host". They now read a
+  sanctioned-host REGISTRY, so adding a channel is a visible row.
+- FOUR were draw-count or grant-count mirrors of this phase's own sim change.
+- THREE were counted literals a new id moves anywhere in the tree: the art
+  debt, the bag All-only census, and the CI shard weight table's coverage
+  floor.
+
+The lesson for the remaining phases, and it is the one the memory note already
+carries: a new CONTENT ID ripples into standalone audits and mirror tables that
+no diff-driven selection reaches, so the full suite is the only bar that sees
+them. The curated battery was green for all thirteen.
+
+### The one BLOCKING maintainer decision this phase opens
+
+THE STALE-CLIENT DEPLOY WINDOW versus the farming DUNGEON channel.
+tests/stale_client_rollout.test.ts freezes the HEROIC_BOSS_LOOT id set for the
+deploy window, and its own rule is that ANY new id there while stale bundles
+live is a new deployed-bundle throw arm needing a recorded owner decision: the
+deployed bundle predates the unknown-item guards and THROWS in its loot popup
+on an id it cannot resolve. DECISION E's dungeon channel adds two
+(pattern_highwatch_gourd_soup, pattern_highwatch_barley_porridge) to all five
+heroic five-man tables.
+
+Both precedents (the four reins, the Wildheart six) were OWNER decisions
+recorded in DEPLOY.md. This session did not make one. The ids are admitted into
+the frozen snapshot so the branch is not red on a question a phase cannot
+answer, and the finding is written at the guard itself. Two cheap resolutions:
+confirm the deploy window has closed and delete that file, or move the farming
+dungeon channel behind the window. Reverting the admission is one comment plus
+two array entries.
+
+### Second finding, recorded rather than fixed
+
+The three fine_*_herb twins have NO recipe consumer anywhere on the merged
+tree. It predates this phase and is farming's own fine-twin question (already
+on the OPEN list as "fine_marsh_rice / fine_highland_barley dish consumers"),
+so the R18 displacement arm scopes to the base herb line and says why. Widening
+it would red on inherited state and teach the next reader to loosen it.
