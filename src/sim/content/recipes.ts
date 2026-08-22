@@ -1262,8 +1262,20 @@ export const LADDER_RECIPES: ProfessionRecipeRecord[] = [
     professionId: 'cooking',
     resultItemId: 'hunters_game_skewer',
     resultCount: 1,
+    // THE PROVISIONING SUPPLY LINE, rung 0 (masterwrought R17/R18). The grain
+    // the skewer is rolled in, ADDED beside the meat and never traded for it:
+    // no meat or salt count moved. vale_wheat rather than the brook_carrot the
+    // plan defaulted to, and the reason is the economy basis rather than taste.
+    // brook_carrot is farming's D9 fee vegetable and the one produce row that
+    // carries a buyValue (16), which would make it the most valuable reagent on
+    // this row at 16 against game_meat's 8, so the crop becomes the body and
+    // breaks the accent rule. vale_wheat at 4 sits under it, and a vale_wheat 1
+    // binder is the shipped shape farming's own tier-1 rows already use
+    // (recipe_eastbrook_root_pottage, recipe_eastbrook_glazed_carrots) under
+    // farming's (bz) binder ruling.
     reagents: [
       { itemId: 'game_meat', count: 2 },
+      { itemId: 'vale_wheat', count: 1 },
       { itemId: 'cooking_salt', count: 1 },
     ],
     skillReq: 0,
@@ -1309,8 +1321,17 @@ export const LADDER_RECIPES: ProfessionRecipeRecord[] = [
     professionId: 'cooking',
     resultItemId: 'goldleaf_game_stew',
     resultCount: 2,
+    // THE PROVISIONING SUPPLY LINE, rung 25, and the flagship row: a stew is
+    // the dish the missing vegetable class was most obviously short of, and it
+    // is the one place grain AND root both belong. The grain that thickens it
+    // and the root that bodies it, both ADDED: the meat stays at 3, the herb at
+    // 1 and the salt at 1. vale_wheat gates at farming 0 and bog_beet at 25,
+    // both at or under this row's skillReq 25, so a cook levelling both skills
+    // together is never blocked.
     reagents: [
       { itemId: 'game_meat', count: 3 },
+      { itemId: 'vale_wheat', count: 2 },
+      { itemId: 'bog_beet', count: 1 },
       { itemId: 'goldleaf_herb', count: 1 },
       { itemId: 'cooking_salt', count: 1 },
     ],
@@ -1325,8 +1346,16 @@ export const LADDER_RECIPES: ProfessionRecipeRecord[] = [
     professionId: 'cooking',
     resultItemId: 'frostgill_chowder',
     resultCount: 1,
+    // THE PROVISIONING SUPPLY LINE, rung 25: a chowder's root, ADDED beside the
+    // fish and the herb with neither count reduced. ONE carrot, not the two the
+    // plan defaulted to, and the count is derived rather than picked: this row's
+    // largest non-produce count is 2 (trout, herb and salt all sit there), and
+    // a crop at 2 would tie it instead of staying strictly under it. Two would
+    // also tie the summed fish count, and a fish row whose vegetables match its
+    // fish is no longer a fish dish. At 1 the row stays fish-forward 2 to 1.
     reagents: [
       { itemId: 'raw_frostgill_trout', count: 2 },
+      { itemId: 'brook_carrot', count: 1 },
       { itemId: 'silverleaf_herb', count: 2 },
       { itemId: 'cooking_salt', count: 2 },
     ],
@@ -1341,9 +1370,13 @@ export const LADDER_RECIPES: ProfessionRecipeRecord[] = [
     professionId: 'cooking',
     resultItemId: 'silvered_carp_supper',
     resultCount: 1,
+    // THE PROVISIONING SUPPLY LINE, rung 50: the bed the supper is served on.
+    // The carp stays the headline at 3 and nothing else moved. Fish-forward
+    // holds 4 to 2, and exactly one crop family joins a fish row.
     reagents: [
       { itemId: 'raw_stonescale_carp', count: 3 },
       { itemId: 'raw_mirror_trout', count: 1 },
+      { itemId: 'marsh_rice', count: 2 },
       { itemId: 'goldleaf_herb', count: 1 },
       { itemId: 'cooking_salt', count: 1 },
     ],
@@ -1375,9 +1408,18 @@ export const LADDER_RECIPES: ProfessionRecipeRecord[] = [
     professionId: 'cooking',
     resultItemId: 'marlows_grand_roast',
     resultCount: 1,
+    // THE PROVISIONING SUPPLY LINE, rung 50, and the row that exercises
+    // masterwrought DECISION B on the cooking side: a roast's grain and gourd,
+    // at TIER 3, which gates at farming 50 and so lands exactly on this row's
+    // skillReq. The tier-3 seed faucet is real and was read from the code
+    // rather than a plan doc: farmer_hollis stocks all four tier-3 seeds at
+    // buyValue 32 (src/sim/content/zone3.ts). Both meats, the herb and the salt
+    // are untouched.
     reagents: [
       { itemId: 'prime_cut', count: 1 },
       { itemId: 'game_meat', count: 4 },
+      { itemId: 'highland_barley', count: 2 },
+      { itemId: 'frost_gourd', count: 2 },
       { itemId: 'sunpetal_herb', count: 1 },
       { itemId: 'cooking_salt', count: 2 },
     ],
