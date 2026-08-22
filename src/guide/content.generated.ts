@@ -5692,6 +5692,13 @@ export const GUIDE_DEEDS: GuideDeed[] = [
     "feat": false,
     "rewardTitle": "Harvestmaster",
     "crest": "/ui/deeds/prog_farming_100.webp"
+  },
+  {
+    "id": "col_farm_roster",
+    "name": "Every Furrow Filled",
+    "category": "collection",
+    "renown": 5,
+    "feat": false
   }
 ];
 

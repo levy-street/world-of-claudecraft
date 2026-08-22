@@ -29,8 +29,7 @@ import {
   harvestCrop,
   plantCrop,
 } from '../src/sim/professions/farming';
-import { Sim } from '../src/sim/sim';
-import type { PlayerMeta } from '../src/sim/types';
+import { type PlayerMeta, Sim } from '../src/sim/sim';
 import { terrainHeight } from '../src/sim/world';
 
 const CROP_ID = 'vale_wheat';

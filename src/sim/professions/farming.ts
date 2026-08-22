@@ -1152,7 +1152,7 @@ export function harvestCrop(ctx: SimContext, p: Entity, meta: PlayerMeta, bedId:
   // zero rng, draw-order neutral. The guard is defense-in-depth like the
   // golden one above: a bed that passed the bad_bed gate always resolves a
   // zone (impossible-today, same belief).
-  if (zoneId !== undefined) onCropHarvestedForDeeds(ctx, meta, zoneId);
+  if (zoneId !== undefined) onCropHarvestedForDeeds(ctx, meta, zoneId, plot.cropId);
   // Proficiency through the shared gathering-grant queue, draining on the tick
   // path exactly like a node harvest. The gain is PURE STATE computed after
   // everything above (zero draws, zero draw reordering), and a 0 gain queues

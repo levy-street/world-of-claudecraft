@@ -27,6 +27,7 @@
 // in Node, the browser, and the headless RL env.
 
 import { DEED_ORDER, DEEDS, DEEDS_ERA } from './content/deeds';
+import { FARM_CROP_IDS } from './content/farm_crops';
 import { GATHERING_PROFESSION_IDS } from './content/professions';
 import { pointsSpent } from './content/talents';
 import { VC_ALLROUNDER_ONLY_MAX_BRACKET } from './content/vale_cup';
@@ -2046,8 +2047,20 @@ export function onFishCaughtForDeeds(
  *  not count). Writes the farm:<zone> mark the chr_ first-harvest chronicle
  *  deeds read. Marks only, zero rng, draw-order neutral (the deed-credit
  *  line in src/sim/professions/CLAUDE.md). */
-export function onCropHarvestedForDeeds(ctx: SimContext, meta: PlayerMeta, zoneId: string): void {
+export function onCropHarvestedForDeeds(
+  ctx: SimContext,
+  meta: PlayerMeta,
+  zoneId: string,
+  cropId?: string,
+): void {
   if (FARM_CHRONICLE_ZONES.includes(zoneId)) markVisited(ctx, meta, `farm:${zoneId}`);
+  // The per-crop collection mark (masterwrought DECISION E). Gated on the
+  // catalog so a crop id that is not a shipped crop can never mint a mark: the
+  // namespace has to stay bounded, which is the same rule the zone list above
+  // follows and what the namespace assertion in the deeds tests exists for.
+  if (cropId !== undefined && FARM_CROP_IDS.has(cropId)) {
+    markVisited(ctx, meta, `farm_crop:${cropId}`);
+  }
 }
 
 /** A plain /roll (classic 1-100 bounds) landed exactly 100. */
@@ -2116,4 +2129,17 @@ export const VISITED_MARK_NAMESPACES = [
   // written from professions/farming.ts. Registered so restoreDeedStats
   // keeps them across saves (the gather_event lesson above).
   'farm',
+  // Per-CROP first-harvest marks, farm_crop:<cropId>, the collection behind
+  // prog_farm_roster (masterwrought DECISION E). A separate namespace from
+  // 'farm' above on purpose: that one is zone-keyed and closed at four, this
+  // one is crop-keyed and grows with the catalog, so keeping them apart is
+  // what lets each be reasoned about on its own.
+  //
+  // REGISTERING IT IS THE WHOLE POINT, not bookkeeping. An unregistered
+  // namespace serializes fine and is silently DROPPED by restoreDeedStats on
+  // load, so the collection could never refill and the deed would be
+  // unearnable for anyone who logs out mid-roster. That is the gather_event
+  // and masterwork bug twice over; tests/deeds_content.test.ts pins the round
+  // trip rather than trusting this comment.
+  'farm_crop',
 ] as const;

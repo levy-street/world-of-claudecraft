@@ -729,7 +729,7 @@
       "tick": 61,
       "time": 3.05,
       "nextId": 972,
-      "state": "7387bc3a",
+      "state": "955203a5",
       "events": "08316203",
       "rng": {
         "draws": 6,
@@ -771,7 +771,8 @@
             ],
             "visited": [
               "farm:eastbrook_vale",
-              "farm:planted"
+              "farm:planted",
+              "farm_crop:vale_wheat"
             ]
           },
           "deedsEarned": [
@@ -903,7 +904,7 @@
       "tick": 80,
       "time": 4,
       "nextId": 972,
-      "state": "dcf5008b",
+      "state": "41f24974",
       "events": "9f1aa1bd",
       "rng": {
         "draws": 6,
@@ -914,7 +915,7 @@
       "tick": 100,
       "time": 5,
       "nextId": 972,
-      "state": "376ec807",
+      "state": "3c08c0f8",
       "events": "bdab63e5",
       "rng": {
         "draws": 6,
@@ -925,7 +926,7 @@
       "tick": 110,
       "time": 5.5,
       "nextId": 972,
-      "state": "f4175b7e",
+      "state": "37f2ba05",
       "events": "e1884589",
       "rng": {
         "draws": 8,
@@ -969,7 +970,8 @@
             ],
             "visited": [
               "farm:eastbrook_vale",
-              "farm:planted"
+              "farm:planted",
+              "farm_crop:vale_wheat"
             ]
           },
           "deedsEarned": [
@@ -1116,7 +1118,7 @@
       "tick": 110,
       "time": 5.5,
       "nextId": 972,
-      "state": "56602959",
+      "state": "d16914a8",
       "events": "742e9e54",
       "rng": {
         "draws": 9,
@@ -1160,7 +1162,8 @@
             ],
             "visited": [
               "farm:eastbrook_vale",
-              "farm:planted"
+              "farm:planted",
+              "farm_crop:vale_wheat"
             ]
           },
           "deedsEarned": [
@@ -1298,7 +1301,7 @@
       "tick": 110,
       "time": 5.5,
       "nextId": 972,
-      "state": "89dd69e4",
+      "state": "c902bbd7",
       "events": "013df3f4",
       "rng": {
         "draws": 9,
@@ -1342,7 +1345,8 @@
             ],
             "visited": [
               "farm:eastbrook_vale",
-              "farm:planted"
+              "farm:planted",
+              "farm_crop:vale_wheat"
             ]
           },
           "deedsEarned": [
@@ -1480,7 +1484,7 @@
       "tick": 120,
       "time": 6,
       "nextId": 972,
-      "state": "7fac62f2",
+      "state": "bba4dce7",
       "events": "741638a5",
       "rng": {
         "draws": 9,
@@ -1491,7 +1495,7 @@
       "tick": 140,
       "time": 7,
       "nextId": 972,
-      "state": "6ebd4110",
+      "state": "5b245381",
       "events": "741638a5",
       "rng": {
         "draws": 9,
@@ -1502,7 +1506,7 @@
       "tick": 151,
       "time": 7.55,
       "nextId": 972,
-      "state": "2952e400",
+      "state": "0d81de73",
       "events": "7f52c039",
       "rng": {
         "draws": 11,
@@ -1548,7 +1552,8 @@
             ],
             "visited": [
               "farm:eastbrook_vale",
-              "farm:planted"
+              "farm:planted",
+              "farm_crop:vale_wheat"
             ]
           },
           "deedsEarned": [
@@ -1696,7 +1701,7 @@
       "tick": 151,
       "time": 7.55,
       "nextId": 972,
-      "state": "eb682b37",
+      "state": "6ff21234",
       "events": "2023a137",
       "rng": {
         "draws": 13,
@@ -1744,7 +1749,9 @@
             "visited": [
               "farm:eastbrook_vale",
               "farm:planted",
-              "farm:thornpeak_heights"
+              "farm:thornpeak_heights",
+              "farm_crop:highland_barley",
+              "farm_crop:vale_wheat"
             ]
           },
           "deedsEarned": [
@@ -1890,7 +1897,7 @@
       "tick": 160,
       "time": 8,
       "nextId": 972,
-      "state": "d5c7064e",
+      "state": "a8b6ffad",
       "events": "36ff6749",
       "rng": {
         "draws": 13,
@@ -1901,7 +1908,7 @@
       "tick": 180,
       "time": 9,
       "nextId": 972,
-      "state": "b4fcb220",
+      "state": "d9c2d89b",
       "events": "741638a5",
       "rng": {
         "draws": 13,
@@ -1912,7 +1919,7 @@
       "tick": 200,
       "time": 10,
       "nextId": 972,
-      "state": "12bb30c5",
+      "state": "76d90298",
       "events": "bdab63e5",
       "rng": {
         "draws": 13,
@@ -1923,7 +1930,7 @@
       "tick": 220,
       "time": 11,
       "nextId": 972,
-      "state": "a8911948",
+      "state": "f6a8e559",
       "events": "e1884589",
       "rng": {
         "draws": 15,
@@ -1934,7 +1941,7 @@
       "tick": 240,
       "time": 12,
       "nextId": 972,
-      "state": "c2a4d58e",
+      "state": "21673133",
       "events": "bdab63e5",
       "rng": {
         "draws": 15,
@@ -1945,7 +1952,7 @@
       "tick": 260,
       "time": 13,
       "nextId": 972,
-      "state": "d628ec06",
+      "state": "8b8b1a7d",
       "events": "a4182909",
       "rng": {
         "draws": 15,
@@ -1956,7 +1963,7 @@
       "tick": 280,
       "time": 14,
       "nextId": 972,
-      "state": "65464543",
+      "state": "39b32ebe",
       "events": "741638a5",
       "rng": {
         "draws": 15,
@@ -1967,7 +1974,7 @@
       "tick": 282,
       "time": 14.1,
       "nextId": 972,
-      "state": "506cc051",
+      "state": "ca6a7518",
       "events": "741638a5",
       "rng": {
         "draws": 15,
@@ -2015,7 +2022,9 @@
             "visited": [
               "farm:eastbrook_vale",
               "farm:planted",
-              "farm:thornpeak_heights"
+              "farm:thornpeak_heights",
+              "farm_crop:highland_barley",
+              "farm_crop:vale_wheat"
             ]
           },
           "deedsEarned": [
@@ -2174,7 +2183,7 @@
       "tick": 282,
       "time": 14.1,
       "nextId": 972,
-      "state": "c511dd64",
+      "state": "0e0c62bb",
       "events": "86e12c14",
       "rng": {
         "draws": 16,
@@ -2222,7 +2231,9 @@
             "visited": [
               "farm:eastbrook_vale",
               "farm:planted",
-              "farm:thornpeak_heights"
+              "farm:thornpeak_heights",
+              "farm_crop:highland_barley",
+              "farm_crop:vale_wheat"
             ]
           },
           "deedsEarned": [
@@ -2368,7 +2379,7 @@
       "tick": 300,
       "time": 15,
       "nextId": 972,
-      "state": "6c75d678",
+      "state": "20f9b3d3",
       "events": "3ef536a5",
       "rng": {
         "draws": 16,
@@ -2379,7 +2390,7 @@
       "tick": 320,
       "time": 16,
       "nextId": 972,
-      "state": "2b0d247d",
+      "state": "480efaa4",
       "events": "741638a5",
       "rng": {
         "draws": 16,
@@ -2390,7 +2401,7 @@
       "tick": 340,
       "time": 17,
       "nextId": 972,
-      "state": "5e15ab77",
+      "state": "5df393a6",
       "events": "10a84667",
       "rng": {
         "draws": 19,
@@ -2401,7 +2412,7 @@
       "tick": 360,
       "time": 18,
       "nextId": 972,
-      "state": "0fa53963",
+      "state": "7591e32a",
       "events": "741638a5",
       "rng": {
         "draws": 19,
@@ -2412,7 +2423,7 @@
       "tick": 380,
       "time": 19,
       "nextId": 972,
-      "state": "349d1e03",
+      "state": "fafd9746",
       "events": "e5d758df",
       "rng": {
         "draws": 22,
@@ -2423,7 +2434,7 @@
       "tick": 400,
       "time": 20,
       "nextId": 972,
-      "state": "9ef35a63",
+      "state": "041e7026",
       "events": "741638a5",
       "rng": {
         "draws": 22,
@@ -2434,7 +2445,7 @@
       "tick": 420,
       "time": 21,
       "nextId": 972,
-      "state": "89630c97",
+      "state": "aff4452e",
       "events": "e5d758df",
       "rng": {
         "draws": 25,
@@ -2445,7 +2456,7 @@
       "tick": 440,
       "time": 22,
       "nextId": 972,
-      "state": "d8cd0bd7",
+      "state": "35c6466e",
       "events": "741638a5",
       "rng": {
         "draws": 25,
@@ -2456,7 +2467,7 @@
       "tick": 460,
       "time": 23,
       "nextId": 972,
-      "state": "5c5bbaa9",
+      "state": "b1e413d0",
       "events": "e5d758df",
       "rng": {
         "draws": 28,
@@ -2467,7 +2478,7 @@
       "tick": 480,
       "time": 24,
       "nextId": 972,
-      "state": "f228afa1",
+      "state": "7b306508",
       "events": "741638a5",
       "rng": {
         "draws": 28,
@@ -2478,7 +2489,7 @@
       "tick": 500,
       "time": 25,
       "nextId": 972,
-      "state": "6b533049",
+      "state": "24bd9c6c",
       "events": "e5d758df",
       "rng": {
         "draws": 31,
@@ -2489,7 +2500,7 @@
       "tick": 520,
       "time": 26,
       "nextId": 972,
-      "state": "938da055",
+      "state": "0c812610",
       "events": "741638a5",
       "rng": {
         "draws": 31,
@@ -2500,7 +2511,7 @@
       "tick": 540,
       "time": 27,
       "nextId": 972,
-      "state": "017939df",
+      "state": "0dd79cba",
       "events": "e5d758df",
       "rng": {
         "draws": 34,
@@ -2511,7 +2522,7 @@
       "tick": 560,
       "time": 28,
       "nextId": 972,
-      "state": "37379ecf",
+      "state": "07728cea",
       "events": "741638a5",
       "rng": {
         "draws": 34,
@@ -2522,7 +2533,7 @@
       "tick": 580,
       "time": 29,
       "nextId": 972,
-      "state": "b21b89a4",
+      "state": "f6f55a23",
       "events": "e5d758df",
       "rng": {
         "draws": 37,
@@ -2533,7 +2544,7 @@
       "tick": 600,
       "time": 30,
       "nextId": 972,
-      "state": "317df4f0",
+      "state": "c4132007",
       "events": "741638a5",
       "rng": {
         "draws": 37,
@@ -2544,7 +2555,7 @@
       "tick": 620,
       "time": 31,
       "nextId": 972,
-      "state": "b9a062cb",
+      "state": "6309efce",
       "events": "e5d758df",
       "rng": {
         "draws": 40,
@@ -2555,7 +2566,7 @@
       "tick": 640,
       "time": 32,
       "nextId": 972,
-      "state": "8531e5ab",
+      "state": "ec2d062e",
       "events": "741638a5",
       "rng": {
         "draws": 40,
@@ -2566,7 +2577,7 @@
       "tick": 660,
       "time": 33,
       "nextId": 972,
-      "state": "b9572088",
+      "state": "0961032f",
       "events": "e5d758df",
       "rng": {
         "draws": 43,
@@ -2577,7 +2588,7 @@
       "tick": 680,
       "time": 34,
       "nextId": 972,
-      "state": "f310e234",
+      "state": "cf143d23",
       "events": "741638a5",
       "rng": {
         "draws": 43,
@@ -2588,7 +2599,7 @@
       "tick": 700,
       "time": 35,
       "nextId": 972,
-      "state": "3e947793",
+      "state": "7d84049a",
       "events": "bdab63e5",
       "rng": {
         "draws": 43,
@@ -2599,7 +2610,7 @@
       "tick": 720,
       "time": 36,
       "nextId": 972,
-      "state": "595f3e76",
+      "state": "441a2cc7",
       "events": "10a84667",
       "rng": {
         "draws": 46,
@@ -2610,7 +2621,7 @@
       "tick": 740,
       "time": 37,
       "nextId": 972,
-      "state": "51592418",
+      "state": "5b248aed",
       "events": "bdab63e5",
       "rng": {
         "draws": 46,
@@ -2621,7 +2632,7 @@
       "tick": 760,
       "time": 38,
       "nextId": 972,
-      "state": "f92fd057",
+      "state": "739ae48c",
       "events": "10a84667",
       "rng": {
         "draws": 49,
@@ -2632,7 +2643,7 @@
       "tick": 780,
       "time": 39,
       "nextId": 972,
-      "state": "a05619e1",
+      "state": "7645fd6a",
       "events": "741638a5",
       "rng": {
         "draws": 49,
@@ -2643,7 +2654,7 @@
       "tick": 800,
       "time": 40,
       "nextId": 972,
-      "state": "843d49e9",
+      "state": "0ea26bf2",
       "events": "e5d758df",
       "rng": {
         "draws": 52,
@@ -2654,7 +2665,7 @@
       "tick": 820,
       "time": 41,
       "nextId": 972,
-      "state": "8438d758",
+      "state": "32300155",
       "events": "741638a5",
       "rng": {
         "draws": 52,
@@ -2665,7 +2676,7 @@
       "tick": 840,
       "time": 42,
       "nextId": 972,
-      "state": "3d80d669",
+      "state": "e4e5fd7a",
       "events": "e5d758df",
       "rng": {
         "draws": 55,
@@ -2676,7 +2687,7 @@
       "tick": 860,
       "time": 43,
       "nextId": 972,
-      "state": "57d9f31b",
+      "state": "39527860",
       "events": "741638a5",
       "rng": {
         "draws": 55,
@@ -2687,7 +2698,7 @@
       "tick": 880,
       "time": 44,
       "nextId": 972,
-      "state": "31c8e759",
+      "state": "cad92dda",
       "events": "e5d758df",
       "rng": {
         "draws": 58,
@@ -2698,7 +2709,7 @@
       "tick": 900,
       "time": 45,
       "nextId": 972,
-      "state": "8e953d4b",
+      "state": "2eee3670",
       "events": "741638a5",
       "rng": {
         "draws": 58,
@@ -2709,7 +2720,7 @@
       "tick": 920,
       "time": 46,
       "nextId": 972,
-      "state": "8c7c9aab",
+      "state": "5ab41270",
       "events": "e5d758df",
       "rng": {
         "draws": 61,
@@ -2720,7 +2731,7 @@
       "tick": 940,
       "time": 47,
       "nextId": 972,
-      "state": "0087a195",
+      "state": "1481683e",
       "events": "741638a5",
       "rng": {
         "draws": 61,
@@ -2731,7 +2742,7 @@
       "tick": 960,
       "time": 48,
       "nextId": 972,
-      "state": "59d16073",
+      "state": "29545c20",
       "events": "e5d758df",
       "rng": {
         "draws": 64,
@@ -2742,7 +2753,7 @@
       "tick": 980,
       "time": 49,
       "nextId": 972,
-      "state": "394bb9b5",
+      "state": "a05b1b26",
       "events": "741638a5",
       "rng": {
         "draws": 64,
@@ -2753,7 +2764,7 @@
       "tick": 1000,
       "time": 50,
       "nextId": 972,
-      "state": "d329a69e",
+      "state": "ef6ecc5f",
       "events": "e5d758df",
       "rng": {
         "draws": 67,
@@ -2764,7 +2775,7 @@
       "tick": 1020,
       "time": 51,
       "nextId": 972,
-      "state": "f3ba15b9",
+      "state": "3b0263a2",
       "events": "741638a5",
       "rng": {
         "draws": 67,
@@ -2775,7 +2786,7 @@
       "tick": 1040,
       "time": 52,
       "nextId": 972,
-      "state": "e1cbf261",
+      "state": "ac5397d2",
       "events": "e5d758df",
       "rng": {
         "draws": 70,
@@ -2786,7 +2797,7 @@
       "tick": 1060,
       "time": 53,
       "nextId": 972,
-      "state": "da07813f",
+      "state": "a3da7fdc",
       "events": "741638a5",
       "rng": {
         "draws": 70,
@@ -2797,7 +2808,7 @@
       "tick": 1080,
       "time": 54,
       "nextId": 972,
-      "state": "280a8738",
+      "state": "e1228a35",
       "events": "e5d758df",
       "rng": {
         "draws": 73,
@@ -2808,7 +2819,7 @@
       "tick": 1100,
       "time": 55,
       "nextId": 972,
-      "state": "99401296",
+      "state": "70161def",
       "events": "741638a5",
       "rng": {
         "draws": 73,
@@ -2819,7 +2830,7 @@
       "tick": 1120,
       "time": 56,
       "nextId": 972,
-      "state": "8d61b665",
+      "state": "dda32c88",
       "events": "e5d758df",
       "rng": {
         "draws": 76,
@@ -2830,7 +2841,7 @@
       "tick": 1140,
       "time": 57,
       "nextId": 972,
-      "state": "19798c03",
+      "state": "402633c2",
       "events": "741638a5",
       "rng": {
         "draws": 76,
@@ -2841,7 +2852,7 @@
       "tick": 1160,
       "time": 58,
       "nextId": 972,
-      "state": "27b1ecc2",
+      "state": "e60675e5",
       "events": "e5d758df",
       "rng": {
         "draws": 79,
@@ -2852,7 +2863,7 @@
       "tick": 1180,
       "time": 59,
       "nextId": 972,
-      "state": "4e4d11d0",
+      "state": "d625fd37",
       "events": "741638a5",
       "rng": {
         "draws": 79,
@@ -2863,7 +2874,7 @@
       "tick": 1200,
       "time": 60,
       "nextId": 972,
-      "state": "5efbc964",
+      "state": "e6149913",
       "events": "e5d758df",
       "rng": {
         "draws": 82,
@@ -2874,7 +2885,7 @@
       "tick": 1220,
       "time": 61,
       "nextId": 972,
-      "state": "54291c4b",
+      "state": "5e22722a",
       "events": "741638a5",
       "rng": {
         "draws": 82,
@@ -2885,7 +2896,7 @@
       "tick": 1240,
       "time": 62,
       "nextId": 972,
-      "state": "a4785afa",
+      "state": "113d287d",
       "events": "e5d758df",
       "rng": {
         "draws": 85,
@@ -2896,7 +2907,7 @@
       "tick": 1260,
       "time": 63,
       "nextId": 972,
-      "state": "dbe8ad50",
+      "state": "e7a59e87",
       "events": "741638a5",
       "rng": {
         "draws": 85,
@@ -2907,7 +2918,7 @@
       "tick": 1280,
       "time": 64,
       "nextId": 972,
-      "state": "37d31e76",
+      "state": "9cb8f9e1",
       "events": "e5d758df",
       "rng": {
         "draws": 88,
@@ -2918,7 +2929,7 @@
       "tick": 1300,
       "time": 65,
       "nextId": 972,
-      "state": "7fd94674",
+      "state": "1fcd0ee3",
       "events": "741638a5",
       "rng": {
         "draws": 88,
@@ -2929,7 +2940,7 @@
       "tick": 1320,
       "time": 66,
       "nextId": 972,
-      "state": "6e7ba582",
+      "state": "3d52e8b9",
       "events": "e5d758df",
       "rng": {
         "draws": 91,
@@ -2940,7 +2951,7 @@
       "tick": 1340,
       "time": 67,
       "nextId": 972,
-      "state": "a961bdf0",
+      "state": "2c09d0c3",
       "events": "741638a5",
       "rng": {
         "draws": 91,
@@ -2951,7 +2962,7 @@
       "tick": 1360,
       "time": 68,
       "nextId": 972,
-      "state": "5f318106",
+      "state": "cf8868ad",
       "events": "e5d758df",
       "rng": {
         "draws": 94,
@@ -2962,7 +2973,7 @@
       "tick": 1380,
       "time": 69,
       "nextId": 972,
-      "state": "cde1e0dc",
+      "state": "7b1c290f",
       "events": "741638a5",
       "rng": {
         "draws": 94,
@@ -2973,7 +2984,7 @@
       "tick": 1400,
       "time": 70,
       "nextId": 972,
-      "state": "87c4ad2f",
+      "state": "b4b4fa62",
       "events": "e5d758df",
       "rng": {
         "draws": 97,
@@ -2984,7 +2995,7 @@
       "tick": 1420,
       "time": 71,
       "nextId": 972,
-      "state": "8e646a2a",
+      "state": "75c901e9",
       "events": "741638a5",
       "rng": {
         "draws": 97,
@@ -2995,7 +3006,7 @@
       "tick": 1440,
       "time": 72,
       "nextId": 972,
-      "state": "9ac56e94",
+      "state": "1c97e897",
       "events": "e5d758df",
       "rng": {
         "draws": 100,
@@ -3006,7 +3017,7 @@
       "tick": 1460,
       "time": 73,
       "nextId": 972,
-      "state": "0b672096",
+      "state": "d4292df5",
       "events": "741638a5",
       "rng": {
         "draws": 100,
@@ -3017,7 +3028,7 @@
       "tick": 1479,
       "time": 73.95,
       "nextId": 972,
-      "state": "cd069973",
+      "state": "64ea13a2",
       "events": "83c141d1",
       "rng": {
         "draws": 102,
@@ -3065,7 +3076,9 @@
             "visited": [
               "farm:eastbrook_vale",
               "farm:planted",
-              "farm:thornpeak_heights"
+              "farm:thornpeak_heights",
+              "farm_crop:highland_barley",
+              "farm_crop:vale_wheat"
             ]
           },
           "deedsEarned": [
@@ -3237,7 +3250,7 @@
       "tick": 1479,
       "time": 73.95,
       "nextId": 972,
-      "state": "cdc2f15d",
+      "state": "0b2336a0",
       "events": "2c18bd23",
       "rng": {
         "draws": 103,
@@ -3287,6 +3300,8 @@
               "farm:eastbrook_vale",
               "farm:planted",
               "farm:thornpeak_heights",
+              "farm_crop:highland_barley",
+              "farm_crop:vale_wheat",
               "gather_event:golden_harvest"
             ]
           },
@@ -3461,7 +3476,7 @@
       "tick": 1480,
       "time": 74,
       "nextId": 972,
-      "state": "fa0150b5",
+      "state": "3948166c",
       "events": "e2593f9c",
       "rng": {
         "draws": 103,
@@ -3472,7 +3487,7 @@
       "tick": 1500,
       "time": 75,
       "nextId": 972,
-      "state": "dcb46dd7",
+      "state": "879b3da8",
       "events": "3ef536a5",
       "rng": {
         "draws": 103,
@@ -3483,7 +3498,7 @@
       "tick": 1520,
       "time": 76,
       "nextId": 972,
-      "state": "54b5a2c2",
+      "state": "5473b4ab",
       "events": "bdab63e5",
       "rng": {
         "draws": 103,
@@ -3494,7 +3509,7 @@
       "tick": 1540,
       "time": 77,
       "nextId": 972,
-      "state": "fb6787b3",
+      "state": "3104698c",
       "events": "8487eee8",
       "rng": {
         "draws": 106,
@@ -3505,7 +3520,7 @@
       "tick": 1560,
       "time": 78,
       "nextId": 972,
-      "state": "f3c39703",
+      "state": "0173cc9c",
       "events": "741638a5",
       "rng": {
         "draws": 106,
@@ -3516,7 +3531,7 @@
       "tick": 1569,
       "time": 78.45,
       "nextId": 972,
-      "state": "e4f98ee6",
+      "state": "c2fae6ff",
       "events": "111e11ce",
       "rng": {
         "draws": 108,
@@ -3566,6 +3581,8 @@
               "farm:eastbrook_vale",
               "farm:planted",
               "farm:thornpeak_heights",
+              "farm_crop:highland_barley",
+              "farm_crop:vale_wheat",
               "gather_event:golden_harvest"
             ]
           },
@@ -3756,7 +3773,7 @@
       "tick": 1569,
       "time": 78.45,
       "nextId": 972,
-      "state": "553b2ec9",
+      "state": "61fa6020",
       "events": "1029cce2",
       "rng": {
         "draws": 110,
@@ -3807,6 +3824,8 @@
               "farm:eastbrook_vale",
               "farm:planted",
               "farm:thornpeak_heights",
+              "farm_crop:highland_barley",
+              "farm_crop:vale_wheat",
               "gather_event:golden_harvest"
             ]
           },
@@ -3999,7 +4018,7 @@
       "tick": 1580,
       "time": 79,
       "nextId": 972,
-      "state": "cc22438d",
+      "state": "b58e69d8",
       "events": "741638a5",
       "rng": {
         "draws": 110,
@@ -4010,7 +4029,7 @@
       "tick": 1600,
       "time": 80,
       "nextId": 972,
-      "state": "2dcee7d9",
+      "state": "224c03ac",
       "events": "741638a5",
       "rng": {
         "draws": 110,
@@ -4021,7 +4040,7 @@
       "tick": 1618,
       "time": 80.9,
       "nextId": 972,
-      "state": "528d3692",
+      "state": "2941e1c9",
       "events": "264ce8b8",
       "rng": {
         "draws": 110,
@@ -4073,6 +4092,8 @@
               "farm:eastbrook_vale",
               "farm:planted",
               "farm:thornpeak_heights",
+              "farm_crop:highland_barley",
+              "farm_crop:vale_wheat",
               "gather_event:golden_harvest",
               "quality:rare"
             ]
@@ -4271,7 +4292,7 @@
       "tick": 1620,
       "time": 81,
       "nextId": 972,
-      "state": "3c1660bd",
+      "state": "44a26534",
       "events": "f42d07e8",
       "rng": {
         "draws": 110,
@@ -4282,7 +4303,7 @@
       "tick": 1640,
       "time": 82,
       "nextId": 972,
-      "state": "a6f87599",
+      "state": "232918e8",
       "events": "741638a5",
       "rng": {
         "draws": 110,
@@ -4293,7 +4314,7 @@
       "tick": 1660,
       "time": 83,
       "nextId": 972,
-      "state": "b4ee9398",
+      "state": "6ec7782b",
       "events": "741638a5",
       "rng": {
         "draws": 110,
@@ -4304,7 +4325,7 @@
       "tick": 1680,
       "time": 84,
       "nextId": 972,
-      "state": "a9e66acc",
+      "state": "03b56e87",
       "events": "741638a5",
       "rng": {
         "draws": 110,
@@ -4315,7 +4336,7 @@
       "tick": 1700,
       "time": 85,
       "nextId": 972,
-      "state": "4b796f29",
+      "state": "a5d30e78",
       "events": "741638a5",
       "rng": {
         "draws": 110,
@@ -4326,7 +4347,7 @@
       "tick": 1720,
       "time": 86,
       "nextId": 972,
-      "state": "089cb24f",
+      "state": "9223d52a",
       "events": "e5ef9ed0",
       "rng": {
         "draws": 110,
@@ -4337,7 +4358,7 @@
       "tick": 1740,
       "time": 87,
       "nextId": 972,
-      "state": "ecf777ee",
+      "state": "fb0457d5",
       "events": "741638a5",
       "rng": {
         "draws": 110,
@@ -4348,7 +4369,7 @@
       "tick": 1760,
       "time": 88,
       "nextId": 972,
-      "state": "8590fa42",
+      "state": "ed1ed251",
       "events": "741638a5",
       "rng": {
         "draws": 110,
@@ -4359,7 +4380,7 @@
       "tick": 1780,
       "time": 89,
       "nextId": 972,
-      "state": "811f21ff",
+      "state": "5c6e749a",
       "events": "741638a5",
       "rng": {
         "draws": 110,
@@ -4370,7 +4391,7 @@
       "tick": 1800,
       "time": 90,
       "nextId": 972,
-      "state": "b873ee6c",
+      "state": "c754ee27",
       "events": "741638a5",
       "rng": {
         "draws": 110,
@@ -4381,7 +4402,7 @@
       "tick": 1820,
       "time": 91,
       "nextId": 972,
-      "state": "06780402",
+      "state": "a28b6511",
       "events": "741638a5",
       "rng": {
         "draws": 110,
@@ -4392,7 +4413,7 @@
       "tick": 1840,
       "time": 92,
       "nextId": 972,
-      "state": "366f8f32",
+      "state": "12cb5fc1",
       "events": "e5ef9ed0",
       "rng": {
         "draws": 110,
@@ -4403,7 +4424,7 @@
       "tick": 1860,
       "time": 93,
       "nextId": 972,
-      "state": "b2158df7",
+      "state": "0b0bbe72",
       "events": "741638a5",
       "rng": {
         "draws": 110,
@@ -4414,7 +4435,7 @@
       "tick": 1880,
       "time": 94,
       "nextId": 972,
-      "state": "3f68a865",
+      "state": "b71d8e1c",
       "events": "741638a5",
       "rng": {
         "draws": 110,
@@ -4425,7 +4446,7 @@
       "tick": 1900,
       "time": 95,
       "nextId": 972,
-      "state": "6cf96734",
+      "state": "1fc334ef",
       "events": "741638a5",
       "rng": {
         "draws": 110,
@@ -4436,7 +4457,7 @@
       "tick": 1920,
       "time": 96,
       "nextId": 972,
-      "state": "d03445bc",
+      "state": "d5da3377",
       "events": "741638a5",
       "rng": {
         "draws": 110,
@@ -4447,7 +4468,7 @@
       "tick": 1940,
       "time": 97,
       "nextId": 972,
-      "state": "eb560c29",
+      "state": "ba454d78",
       "events": "741638a5",
       "rng": {
         "draws": 110,
@@ -4458,7 +4479,7 @@
       "tick": 1960,
       "time": 98,
       "nextId": 972,
-      "state": "eb1902ca",
+      "state": "35c654f9",
       "events": "33b18520",
       "rng": {
         "draws": 110,
@@ -4469,7 +4490,7 @@
       "tick": 1980,
       "time": 99,
       "nextId": 972,
-      "state": "b8ad29b6",
+      "state": "646a983d",
       "events": "741638a5",
       "rng": {
         "draws": 110,
@@ -4480,7 +4501,7 @@
       "tick": 2000,
       "time": 100,
       "nextId": 972,
-      "state": "c8956d1a",
+      "state": "b53fd109",
       "events": "741638a5",
       "rng": {
         "draws": 110,
@@ -4491,7 +4512,7 @@
       "tick": 2018,
       "time": 100.9,
       "nextId": 972,
-      "state": "1644dfbb",
+      "state": "d2dadb5e",
       "events": "741638a5",
       "rng": {
         "draws": 110,
@@ -4543,6 +4564,8 @@
               "farm:eastbrook_vale",
               "farm:planted",
               "farm:thornpeak_heights",
+              "farm_crop:highland_barley",
+              "farm_crop:vale_wheat",
               "gather_event:golden_harvest",
               "quality:rare"
             ]
@@ -4743,7 +4766,7 @@
       "tick": 2018,
       "time": 100.9,
       "nextId": 973,
-      "state": "d51d6a86",
+      "state": "2aa71e0d",
       "events": "ddd24784",
       "rng": {
         "draws": 110,
@@ -4796,6 +4819,8 @@
               "farm:eastbrook_vale",
               "farm:planted",
               "farm:thornpeak_heights",
+              "farm_crop:highland_barley",
+              "farm_crop:vale_wheat",
               "gather_event:golden_harvest",
               "quality:rare"
             ]
@@ -4996,7 +5021,7 @@
       "tick": 2018,
       "time": 100.9,
       "nextId": 973,
-      "state": "50c3bd5f",
+      "state": "89e5b17a",
       "events": "340f6919",
       "rng": {
         "draws": 110,
@@ -5049,6 +5074,8 @@
               "farm:eastbrook_vale",
               "farm:planted",
               "farm:thornpeak_heights",
+              "farm_crop:highland_barley",
+              "farm_crop:vale_wheat",
               "gather_event:golden_harvest",
               "quality:rare"
             ]
@@ -5261,7 +5288,7 @@
       "tick": 2020,
       "time": 101,
       "nextId": 973,
-      "state": "d1ddfa5a",
+      "state": "0d67f049",
       "events": "741638a5",
       "rng": {
         "draws": 110,
@@ -5272,7 +5299,7 @@
       "tick": 2040,
       "time": 102,
       "nextId": 973,
-      "state": "343f9fc3",
+      "state": "2f94bba6",
       "events": "741638a5",
       "rng": {
         "draws": 110,
@@ -5283,7 +5310,7 @@
       "tick": 2060,
       "time": 103,
       "nextId": 973,
-      "state": "3549f9f9",
+      "state": "64101948",
       "events": "741638a5",
       "rng": {
         "draws": 110,
@@ -5294,7 +5321,7 @@
       "tick": 2080,
       "time": 104,
       "nextId": 973,
-      "state": "29570630",
+      "state": "fa8c1563",
       "events": "741638a5",
       "rng": {
         "draws": 110,
@@ -5305,7 +5332,7 @@
       "tick": 2100,
       "time": 105,
       "nextId": 973,
-      "state": "317f02c6",
+      "state": "1b56ea4d",
       "events": "741638a5",
       "rng": {
         "draws": 110,
@@ -5316,7 +5343,7 @@
       "tick": 2120,
       "time": 106,
       "nextId": 973,
-      "state": "78ecfc5d",
+      "state": "adfcb6d4",
       "events": "e5ef9ed0",
       "rng": {
         "draws": 110,
@@ -5327,7 +5354,7 @@
       "tick": 2140,
       "time": 107,
       "nextId": 973,
-      "state": "02fc05e3",
+      "state": "be3eb446",
       "events": "741638a5",
       "rng": {
         "draws": 110,
@@ -5338,7 +5365,7 @@
       "tick": 2160,
       "time": 108,
       "nextId": 973,
-      "state": "07f6a2db",
+      "state": "846566fe",
       "events": "741638a5",
       "rng": {
         "draws": 110,
@@ -5349,7 +5376,7 @@
       "tick": 2180,
       "time": 109,
       "nextId": 973,
-      "state": "8dd5a311",
+      "state": "628a11e0",
       "events": "741638a5",
       "rng": {
         "draws": 110,
@@ -5360,7 +5387,7 @@
       "tick": 2200,
       "time": 110,
       "nextId": 973,
-      "state": "7d113373",
+      "state": "b7fbdb16",
       "events": "741638a5",
       "rng": {
         "draws": 110,
@@ -5371,7 +5398,7 @@
       "tick": 2220,
       "time": 111,
       "nextId": 973,
-      "state": "a056c052",
+      "state": "ec9d4861",
       "events": "741638a5",
       "rng": {
         "draws": 110,
@@ -5382,7 +5409,7 @@
       "tick": 2240,
       "time": 112,
       "nextId": 973,
-      "state": "36cc4dd9",
+      "state": "c0ff1d28",
       "events": "e5ef9ed0",
       "rng": {
         "draws": 110,
@@ -5393,7 +5420,7 @@
       "tick": 2260,
       "time": 113,
       "nextId": 973,
-      "state": "55034779",
+      "state": "c504adc8",
       "events": "741638a5",
       "rng": {
         "draws": 110,
@@ -5404,7 +5431,7 @@
       "tick": 2280,
       "time": 114,
       "nextId": 973,
-      "state": "b8bd00d4",
+      "state": "8c0e160f",
       "events": "741638a5",
       "rng": {
         "draws": 110,
@@ -5415,7 +5442,7 @@
       "tick": 2300,
       "time": 115,
       "nextId": 973,
-      "state": "b6b5f24c",
+      "state": "180d8107",
       "events": "741638a5",
       "rng": {
         "draws": 110,
@@ -5426,7 +5453,7 @@
       "tick": 2320,
       "time": 116,
       "nextId": 973,
-      "state": "e04ca83b",
+      "state": "f77b38de",
       "events": "741638a5",
       "rng": {
         "draws": 110,
@@ -5437,7 +5464,7 @@
       "tick": 2340,
       "time": 117,
       "nextId": 973,
-      "state": "836cfc17",
+      "state": "40d1f012",
       "events": "741638a5",
       "rng": {
         "draws": 110,
@@ -5448,7 +5475,7 @@
       "tick": 2360,
       "time": 118,
       "nextId": 973,
-      "state": "cebfea22",
+      "state": "8a8c7ab1",
       "events": "f81d2a13",
       "rng": {
         "draws": 110,
@@ -5459,7 +5486,7 @@
       "tick": 2380,
       "time": 119,
       "nextId": 973,
-      "state": "6dfd0182",
+      "state": "04088991",
       "events": "741638a5",
       "rng": {
         "draws": 110,
@@ -5470,7 +5497,7 @@
       "tick": 2400,
       "time": 120,
       "nextId": 973,
-      "state": "4173b1ca",
+      "state": "d57659f9",
       "events": "741638a5",
       "rng": {
         "draws": 110,
@@ -5481,7 +5508,7 @@
       "tick": 2418,
       "time": 120.9,
       "nextId": 973,
-      "state": "b1fc485a",
+      "state": "c3f24a49",
       "events": "741638a5",
       "rng": {
         "draws": 110,
@@ -5534,6 +5561,8 @@
               "farm:eastbrook_vale",
               "farm:planted",
               "farm:thornpeak_heights",
+              "farm_crop:highland_barley",
+              "farm_crop:vale_wheat",
               "gather_event:golden_harvest",
               "quality:rare"
             ]
@@ -5734,7 +5763,7 @@
       "tick": 2420,
       "time": 121,
       "nextId": 973,
-      "state": "d832fc0d",
+      "state": "e944c344",
       "events": "741638a5",
       "rng": {
         "draws": 110,
@@ -5745,7 +5774,7 @@
       "tick": 2439,
       "time": 121.95,
       "nextId": 973,
-      "state": "40883f3f",
+      "state": "0a0394da",
       "events": "741638a5",
       "rng": {
         "draws": 110,
@@ -5798,6 +5827,8 @@
               "farm:eastbrook_vale",
               "farm:planted",
               "farm:thornpeak_heights",
+              "farm_crop:highland_barley",
+              "farm_crop:vale_wheat",
               "gather_event:golden_harvest",
               "quality:rare"
             ]
@@ -5998,7 +6029,7 @@
       "tick": 2439,
       "time": 121.95,
       "nextId": 973,
-      "state": "40883f3f",
+      "state": "0a0394da",
       "events": "741638a5",
       "rng": {
         "draws": 110,
@@ -6051,6 +6082,8 @@
               "farm:eastbrook_vale",
               "farm:planted",
               "farm:thornpeak_heights",
+              "farm_crop:highland_barley",
+              "farm_crop:vale_wheat",
               "gather_event:golden_harvest",
               "quality:rare"
             ]

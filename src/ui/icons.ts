@@ -5706,6 +5706,11 @@ export const DEED_ART_PENDING: ReadonlySet<string> = new Set([
   'chr_peaks_first_harvest',
   'chr_evergarden_first_harvest',
   'col_golden_harvest',
+  // Phase 11e's roster deed, falling back to deed_cat_collection until its
+  // commissioned art lands. It carries NO title, so the Reliquary title-shelf
+  // rule that forced prog_farming_100's crest to ship committed does not apply
+  // here, and the pending row is the honest place for it.
+  'col_farm_roster',
 ]);
 /** Static URL of a deed crest's painted art, or null when the crest id has no committed image. */
 export function deedImageUrl(crestId: string): string | null {

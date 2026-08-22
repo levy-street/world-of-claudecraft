@@ -11,7 +11,7 @@ import { DEED_ORDER, DEEDS, DEEDS_ERA } from '../src/sim/content/deeds';
 import { DELVE_MOBS } from '../src/sim/content/delves/mobs';
 import { DELVE_SHOPS } from '../src/sim/content/delves/shop';
 import { HEROIC_DUNGEON_TUNING } from '../src/sim/content/dungeon_difficulty';
-import { FARM_CROPS } from '../src/sim/content/farm_crops';
+import { FARM_CROP_IDS, FARM_CROPS } from '../src/sim/content/farm_crops';
 import { FARM_PATCHES } from '../src/sim/content/farm_patches';
 import { HEROIC_VENDOR_STOCK } from '../src/sim/content/heroic_vendor';
 import { FISHING_TABLES_BY_BAND } from '../src/sim/content/items';
@@ -44,6 +44,8 @@ import {
   MILESTONE_DEED_TO_LEGACY,
   onFishCaughtForDeeds,
   RARE_SLAIN_TEMPLATES,
+  restoreDeedStats,
+  serializeDeedStats,
   VISITED_MARK_NAMESPACES,
   ZONE_FISH,
 } from '../src/sim/deeds';
@@ -88,9 +90,11 @@ describe('audited launch totals (literals: update deliberately with the catalog)
     // deeds of the absorbed packet (D13: prog_first_planting and the four
     // first-harvest chronicles at renown 5, col_golden_harvest at 0 per the
     // luck rule, prog_farming_100 at the profession-100 family value of 10,
-    // so +35 Renown in all).
-    expect(DEED_ORDER.length).toBe(286);
-    expect(ALL.reduce((sum, d) => sum + d.renown, 0)).toBe(3270);
+    // so +35 Renown in all), plus Phase 11e's roster deed col_farm_roster
+    // (renown 5, the gathering ladder's first-rung point), which is what takes
+    // this to 287 / 3275.
+    expect(DEED_ORDER.length).toBe(287);
+    expect(ALL.reduce((sum, d) => sum + d.renown, 0)).toBe(3275);
   });
 
   it('ships the audited per-category counts', () => {
@@ -112,7 +116,7 @@ describe('audited launch totals (literals: update deliberately with the catalog)
       chronicle: 53,
       // +4 Reliquary Curator rank bridges and +5 Phase 18 completion ladder
       // deeds on top of the release collection set, +1 col_golden_harvest.
-      collection: 38,
+      collection: 39,
       // Release's Thornhollow battlegrounds plus the WARFARE honor ladder.
       pvp: 35,
       social: 18,
@@ -272,6 +276,8 @@ describe('audited launch totals (literals: update deliberately with the catalog)
       'chr_evergarden_first_harvest',
       'col_golden_harvest',
       'prog_farming_100',
+      // Phase 11e's roster deed, the tail today.
+      'col_farm_roster',
     ]);
     expect(DEEDS.dgn_wildheart_basin.renown).toBe(10);
     expect(DEEDS.dgn_wildheart_basin_heroic.renown).toBe(10);
@@ -731,7 +737,10 @@ describe('frozen trigger + renown catalog (design rule 9: never retro-edit a tri
   // parent literal; no shipped trigger or renown changed (both parents
   // reproduce their own priors exactly; the merged hash is re-minted from
   // the suite output).
-  const FROZEN_CATALOG_SHA256 = '560f0e188136f8e636419f97d55c5c8d641ff9a57707083c6c88392c837bd525';
+  // Re-baselined at Phase 11e for the appended roster deed col_farm_roster.
+  // An APPEND is the sanctioned reason to move this hash; no shipped trigger
+  // or renown value was touched in the same change.
+  const FROZEN_CATALOG_SHA256 = '0e23ee2e93c0a1bc05e9d8ff284fe4eb27506351ee17f56417bbed6391a78339';
 
   it('every shipped deed keeps its trigger and renown unchanged', () => {
     const canonical = JSON.stringify(
@@ -935,7 +944,7 @@ describe('table shape', () => {
     // append behind it, and the absorbed farming celebration block closes
     // the catalog per the 11b three-tier ordering rule; the Farming 100
     // milestone is the tail.
-    expect(DEED_ORDER[DEED_ORDER.length - 1]).toBe('prog_farming_100');
+    expect(DEED_ORDER[DEED_ORDER.length - 1]).toBe('col_farm_roster');
   });
 
   it('every entry key matches its id and its prefix matches its category', () => {
@@ -1046,39 +1055,30 @@ describe('count-form gathering deeds stay earnable', () => {
     expect(farmingTriggers).toBeGreaterThanOrEqual(1);
   });
 
-  it('honesty arm ((bo)): no vendor stocks a tier 3/4 seed, so prog_farming_100 waits on D11', () => {
-    // The tier 3/4 seed faucet is still an open D11 ruling (state.md (bo)):
-    // while NO purchase surface stocks these four seeds, tier 3/4 crops
-    // cannot be planted, farming gains gray at the tier-2 ceiling of 75, and
-    // prog_farming_100 (with its Harvestmaster title) is unreachable. The
-    // deed ships anyway by the D13 mandate, documented as dormant in its row
-    // comment and waived in docs/design/deeds.md (the dormancy window note).
-    // This arm is SELF-CLEARING for the three PURCHASE surfaces it walks
-    // (NPC vendorItems, HEROIC_VENDOR_STOCK, DELVE_SHOPS): a vendor-shaped
-    // faucet reds it and the sweep that fixes it must also sweep the
-    // dormancy notes here, on the deed row, in the design doc, and in the
-    // guide prose (guide.profPages.gatherDeeds.farmingSown and
-    // guide.profPages.farm.tableBody carry the later-patch phrasing). A faucet
-    // arriving as a quest reward, loot drop, or profession output is OUTSIDE
-    // this walk; the NEVER_STOCKED pin in
-    // tests/professions_zone_rollout.test.ts remains the authoritative
-    // acquisition-surface sweep, and the D11 phase that lands any faucet
-    // owns re-earnability-auditing this deed either way.
-    // DERIVED from the crop catalog (the QA hardening: a hand literal would
-    // let a future fifth tier-3 crop's seed gain a faucet with this arm still
-    // green), with the shipped four pinned as the non-vacuity floor.
+  it('GATE 1 discharged: every tier 3/4 seed is vendor-stocked, so prog_farming_100 is earnable', () => {
+    // THE (bo) HONESTY ARM, SELF-CLEARED at Phase 11e rather than deleted.
+    //
+    // It used to assert the opposite: that NO purchase surface stocked these
+    // seeds, which made tier 3/4 crops unplantable, capped farming gains at the
+    // tier-2 ceiling of 75, and left prog_farming_100 and its Harvestmaster
+    // title unreachable. The deed shipped anyway under the D13 mandate, with
+    // the dormancy waived in docs/design/deeds.md. GATE 1 stocked the faucet,
+    // so the arm reddened exactly as it was built to, and it is INVERTED here
+    // rather than removed: the surfaces it walks are unchanged, the direction
+    // of the claim is not.
+    //
+    // Green now means EARNABLE. That distinction is the point: an arm that had
+    // simply been deleted would leave nothing saying the faucet exists, and an
+    // arm left asserting absence would have to be weakened to pass. Every
+    // assertion below fails if the faucet is removed again.
+    //
+    // DERIVED from the crop catalog, so Phase 11e's four new upper-tier crops
+    // are covered without being listed; a hand literal would let a future
+    // tier-3 crop ship with no faucet and this arm still green.
     const tier34Seeds = Object.values(FARM_CROPS)
       .filter((crop) => crop.tier >= 3)
       .map((crop) => crop.seedItemId);
-    expect(tier34Seeds.length).toBeGreaterThanOrEqual(4);
-    expect(new Set(tier34Seeds)).toEqual(
-      new Set([
-        'highland_barley_seed',
-        'frost_gourd_seed',
-        'gilded_sunmelon_seed',
-        'evergarden_greens_seed',
-      ]),
-    );
+    expect(tier34Seeds.length).toBe(8);
     const stocked = new Set<string>();
     for (const npc of Object.values(NPCS)) {
       for (const itemId of npc.vendorItems ?? []) stocked.add(itemId);
@@ -1091,9 +1091,35 @@ describe('count-form gathering deeds stay earnable', () => {
     expect(stocked.size).toBeGreaterThan(0);
     for (const seedId of tier34Seeds) {
       expect(ITEMS[seedId], seedId).toBeDefined();
-      expect(stocked.has(seedId), `${seedId} gained a faucet: sweep the (bo) dormancy notes`).toBe(
-        false,
-      );
+      expect(stocked.has(seedId), `${seedId} has no faucet: GATE 1 has regressed`).toBe(true);
+      // A stocked row without a positive buyValue renders and then refuses
+      // (D11's dead-row trap), which would leave the deed just as unreachable
+      // while this arm read green on presence alone.
+      expect(ITEMS[seedId]?.buyValue ?? 0, `${seedId} is a dead vendor row`).toBeGreaterThan(0);
+    }
+    // The consequence the arm exists for, stated rather than implied: the
+    // teaching ceiling a farmer can now actually reach is the profession cap,
+    // because tier 3 and 4 crops are plantable, and that is exactly what
+    // prog_farming_100 demands.
+    const reachableCeiling = Math.max(
+      ...Object.values(FARM_CROPS).map((crop) => farmingTeachingCeilingFor(crop.tier)),
+    );
+    expect(reachableCeiling).toBe(100);
+    const farming100 = DEEDS.prog_farming_100;
+    expect(farming100.trigger).toEqual({
+      kind: 'gathering',
+      professionId: 'farming',
+      amount: 100,
+    });
+    expect(reachableCeiling).toBeGreaterThanOrEqual(100);
+    // ...and the transitively parked capstone unparks with it. Read off the
+    // capstone's LIVE trigger rather than the private list it is built from, so
+    // this cannot drift from what the evaluator actually requires.
+    const capstone = DEEDS.feat_book_complete.trigger;
+    expect(capstone.kind).toBe('meta');
+    if (capstone.kind === 'meta') {
+      expect(capstone.deedIds).toContain('prog_farming_100');
+      expect(capstone.deedIds).toContain('col_farm_roster');
     }
   });
 });
@@ -1158,6 +1184,38 @@ describe('trigger references resolve against the real content tables', () => {
       done.add(id);
     };
     for (const id of DEED_ORDER) visit(id);
+  });
+
+  it('the farm_crop namespace SURVIVES a save/load round trip, so the roster deed can refill', () => {
+    // THE MANDATORY TRAP for masterwrought DECISION E, and it is not a
+    // formality: an UNREGISTERED namespace serializes fine and is silently
+    // dropped by restoreDeedStats on load, so a player who logs out mid-roster
+    // would come back with an empty collection and the deed could never
+    // complete. That exact bug has shipped twice here (gather_event, then
+    // masterwork), which is why this is a round trip and not a list check.
+    const marks = [...FARM_CROP_IDS].sort().map((cropId) => `farm_crop:${cropId}`);
+    expect(marks).toHaveLength(12);
+    const stats = restoreDeedStats(undefined);
+    for (const mark of marks) stats.visited.add(mark);
+    const saved = serializeDeedStats(stats);
+    expect(saved, 'the marks must serialize at all').toBeDefined();
+    const restored = restoreDeedStats(saved);
+    for (const mark of marks) {
+      expect(restored.visited.has(mark), `${mark} was dropped on load`).toBe(true);
+    }
+    // The control that makes the arm mean something: a mark in an UNREGISTERED
+    // namespace really is dropped by the same round trip, so the pass above is
+    // the registration working rather than restoreDeedStats keeping everything.
+    const bogus = restoreDeedStats(undefined);
+    bogus.visited.add('farm_crop_typo:vale_wheat');
+    expect(
+      restoreDeedStats(serializeDeedStats(bogus)).visited.has('farm_crop_typo:vale_wheat'),
+    ).toBe(false);
+    // ...and the deed's own trigger really names these marks, so the round trip
+    // above is over the set the evaluator reads.
+    const trigger = DEEDS.col_farm_roster.trigger;
+    expect(trigger.kind).toBe('visits');
+    if (trigger.kind === 'visits') expect(trigger.markIds.sort()).toEqual(marks);
   });
 
   it('every visited mark belongs to an authored namespace and resolves to real content', () => {

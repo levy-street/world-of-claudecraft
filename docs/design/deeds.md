@@ -209,7 +209,7 @@ the root `CLAUDE.md` content rule points here.
 - **`pvp_vcup_bet_flex`**: cut; no betting-adjacent deeds ship, even at 0
   Renown.
 
-### A recorded dormancy-window waiver (shipped, not deferred)
+### A recorded dormancy-window waiver (CLOSED 2026-08-21, Masterwrought Phase 11e)
 
 - **`prog_farming_100` (the Harvestmaster title)** shipped with the farming
   celebrations phase per the farming program's locked D13 scope
@@ -228,6 +228,17 @@ the root `CLAUDE.md` content rule points here.
   every non-feat non-hidden deed, so the dormant capstone joins it
   automatically): TWO deeds sit dormant for the window, a consequence the
   program accepts.
+
+**CLOSED 2026-08-21 by Masterwrought Phase 11e (GATE 1).** The window is over.
+Both farmer counters now stock their tier's seeds (farmer_hollis the four
+tier-3, farmer_verbena the four tier-4, each with a positive `buyValue`), so
+tier 3 and 4 crops are plantable, farming teaches to the profession cap of 100,
+and `prog_farming_100` is earnable. `feat_book_complete` unparks with it, so the
+two dormant deeds are one and zero. The self-clearing honesty arm in
+`tests/deeds_content.test.ts` did exactly what it was built to do: it reddened
+the moment the faucet landed, and it was INVERTED rather than deleted, so it now
+fails if the faucet is ever removed again and green means earnable rather than
+"the arm went vacuous". Nothing needed a retro-edit, as this waiver predicted.
 
 The reviewed design blocks for all of these live in the deed catalog's
 authoring history; a deferred deed stays out of `DEED_ORDER` and off Steam

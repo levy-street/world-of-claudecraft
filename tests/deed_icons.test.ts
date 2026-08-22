@@ -364,18 +364,21 @@ describe('Book of Deeds webp icons', () => {
     expect(artless, 'only the pinned art-pending deeds may lack painted art').toEqual([
       ...DEED_ART_PENDING_IDS,
     ]);
-    // The chain, extended at the farming absorb (masterwrought Phase 11d) so it
-    // matches the literals below rather than stopping at this branch's 279.
+    // The chain, extended at the farming absorb (masterwrought Phase 11d) and
+    // again at Phase 11e, so it matches the literals below rather than stopping
+    // at this branch's 279.
     // LIVE: 279 = the branch's 277 (the 271 the v0.36 audit closed at, plus the
     // six Masterwrought jewelcrafting and inscription milestone deeds, each
     // crest shipped in the change that authored it) + the release's walk-in
     // castle visit pair, which ships art-pending by upstream design; then
-    // 279 + farming's SEVEN deeds = 286.
-    // PAINTED: 277 + farming's one painted crest = 278.
-    // PENDING: 2 (the castle pair) + farming's remaining 6 = 8, which is also
-    // the 286 - 278 cross-check.
-    expect(DEED_ORDER, 'the merged live deed catalog').toHaveLength(286);
+    // 279 + farming's SEVEN deeds = 286, + Phase 11e's roster deed = 287.
+    // PAINTED: 277 + farming's one painted crest = 278, UNMOVED by 11e, which
+    // ships no crest (the packet's art park runs 11e to 11k).
+    // PENDING: 2 (the castle pair) + farming's remaining 6 + the roster deed
+    // = 9, which is also the 287 - 278 cross-check.
+    expect(DEED_ORDER, 'the merged live deed catalog').toHaveLength(287);
     expect(DEED_IMAGE_IDS.size, 'every live deed but the pending set is painted').toBe(278);
+    expect(DEED_ORDER.length - DEED_IMAGE_IDS.size).toBe(DEED_ART_PENDING_IDS.length);
     for (const id of artless) {
       const catCrestId = deedCrestId(id, DEEDS[id].category);
       expect(catCrestId, `${id} must fall back to a category base crest`).toMatch(/^deed_cat_/);

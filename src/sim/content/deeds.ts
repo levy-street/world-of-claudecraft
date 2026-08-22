@@ -9,6 +9,7 @@
 // stable forever).
 
 import type { DeedDef } from '../types';
+import { FARM_CROP_IDS } from './farm_crops';
 
 // The current content era. Bumped ONLY by the maintainer at era boundaries;
 // feats gated on an era stay visible afterward as history markers and a
@@ -3023,6 +3024,28 @@ export const DEEDS: Record<string, DeedDef> = {
     renown: 10,
     trigger: { kind: 'gathering', professionId: 'farming', amount: 100 },
     reward: { kind: 'title', text: 'Harvestmaster' },
+  },
+  // The roster deed (masterwrought DECISION E). A single crop is not
+  // conquerable content, but the ROSTER is a collection, and 'collection' is
+  // the shipped category for exactly that; renown 5 is the gathering ladder's
+  // first-rung point (prog_first_harvest, prog_first_mine and their siblings
+  // all sit there). NO title and no border: it is what makes twelve crops read
+  // as a set rather than a longer list, and deeds are cosmetic-only.
+  //
+  // The mark ids are generated from FARM_CROP_IDS rather than listed, so a
+  // thirteenth crop joins the collection by existing. That is deliberate: a
+  // hand list would let a new crop ship outside the set silently, which is the
+  // opposite of what a completion deed is for.
+  col_farm_roster: {
+    id: 'col_farm_roster',
+    name: 'Every Furrow Filled',
+    desc: 'Harvest every crop the four gardens grow.',
+    category: 'collection',
+    renown: 5,
+    trigger: {
+      kind: 'visits',
+      markIds: [...FARM_CROP_IDS].sort().map((cropId) => `farm_crop:${cropId}`),
+    },
   },
 };
 
