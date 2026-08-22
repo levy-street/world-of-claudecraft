@@ -8794,3 +8794,45 @@ surprise any more, it is the shape. Budget the re-mint in the sync step, run the
 repo's own tool against the MERGED working tree, and never take either parent's
 literal, because the merged file is a third content and both parents' seals
 describe trees that no longer exist.
+
+
+### Phase 11e QA: validation at close
+
+CLOSE-OUT FULL SUITE GREEN at ecd1bfb92c, the tip carrying both fix waves:
+3024 files passed / 12 skipped, 43150 tests passed / 2 expected-fail / 115
+skipped, 412.09s, vitest EXIT=0. The tree was clean at the start AND the end of
+the run and the tip stamp is identical at both ends, so the run covers exactly
+this commit rather than a moving target. Two earlier full runs were started and
+deliberately TaskStopped when HEAD moved under them; they are not cited as
+evidence, which is the point of stamping the tip at both ends.
+
+THE THREE RUNS, and what each is for:
+- db0821635f EXIT=0, the BRANCH BASELINE taken before anything was touched.
+  inherited reds at branch: NONE. This is the run that made every later red
+  self-classifying, and it is the ritual 11e recommended and lacked.
+- e9d61604ab EXIT=0, immediately after the release sync and before any fix, so
+  the sync is proved green on its own rather than inside the fix round.
+- ecd1bfb92c EXIT=0, the close-out above.
+
+OTHER GATES at the close-out tip:
+- tsc --noEmit clean.
+- npm run ci:changed EXIT 0, zero errors and zero format diffs, re-run AFTER the
+  last commit rather than before it (a biome --write pass does not organize
+  imports, so the check has to follow the final edit). The 2936 warnings are the
+  repo's known non-gating debt and the 758-file scope is the known ci:changed
+  widening on a long-lived branch.
+- symbol_census RESULT PASS, contentIds 3074 and contentIdRows 3101, both
+  unmoved from the phase's own numbers and zero unexplained extras in all five
+  classes.
+- golden_composition FAIL at exactly its recorded 16-finding baseline, the same
+  two leaf paths, no seventeenth. The release-parent tool gap is unchanged and
+  still PROPOSED rather than patched.
+- i18n:gen run twice during the fix round (once per prose wave) and the result
+  proved by grepping the resolved bundles, not assumed. The second wave moved
+  all 21 bundles by exactly one line each, which is correct: the English source
+  key changed, so every Latin locale's English fill moved with it.
+- Eleven mutations, ten killed plus the one deliberate survivor that was the
+  finding and is killed after its fix.
+
+THE FIX ROUND ITSELF was reviewed by a FRESH reviewer over the whole
+e9d61604ab..HEAD range, per the rule that a fix round is unreviewed code.
