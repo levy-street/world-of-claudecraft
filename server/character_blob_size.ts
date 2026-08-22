@@ -31,9 +31,13 @@
 // on the pre-merge masterwrought literal, whose fixture plants no farm bed;
 // Phase 11d restored the farming branch's every-bed worst-case fixture and
 // re-derived the merged bound, which is what this sentence now records:
-//   professions block, merged tree: 16,704 bytes measured, two-sided tracking
+//   professions block, merged tree: 16,727 bytes measured, two-sided tracking
 //   band 16,544..16,864, ceiling 17,408.
-// The 16,704 includes the two production-shape corrections the 11d review round
+// Phase 11e re-measured that block from 16,704 to 16,727: the whole +23 is
+// evergarden_pumpkin being one character wider than the previous widest crop id
+// across all 23 farm rows. The band and the ceiling did not move.
+// The 16,704 it re-measured FROM includes the two production-shape corrections
+// the 11d review round
 // applied (the fourth tool-effect slot, farming having become slottable, and a
 // fixed production-width epoch anchor across the measure arm's three sims).
 //

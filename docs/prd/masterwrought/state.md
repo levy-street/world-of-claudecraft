@@ -8328,9 +8328,30 @@ the loss:
 In both cases the next autosave writes the reduced blob back, so the loss is
 PERMANENT, not transient.
 
+CORRECTED AT THE 11e QA: THERE IS A THIRD ARM, and it sits in the same function
+the note already cites, which is why it was missed. restoreDeedStats has TWO
+id-gated loops, not one: the visited-namespace loop named above, and
+`for (const id of saved.itemsDiscovered ?? []) if (ITEMS[id])` one line above it
+(src/sim/deeds.ts:372). All twelve new item ids enter deedStats.itemsDiscovered
+the first time they reach a player's bags, so a pre-11e realm DROPS all twelve
+and the next autosave writes the reduced set back, the same re-saves-the-loss
+shape as the other two.
+- SIZED HONESTLY, because it ranks below the farmPlots arm rather than beside it:
+  the loss is up to twelve entries off the itemsDiscoveredCount meter behind the
+  col_discovery_25/75/150 ladder. No collectItems deed names a farm item and
+  earned deeds are sticky, so nothing already earned is revoked; only progress
+  toward an unearned rung regresses.
+- AND IT PARTLY SELF-HEALS on roll-forward: seedItemDiscovery (src/sim/deeds.ts,
+  the RETRO_SEED pass) runs on EVERY join and re-credits any id the character
+  still holds in bags, bank, equipment, bag slots or vendor buyback. So the loss
+  is permanent only for produce consumed, sold or mailed away in the interval.
+
 What survives, checked rather than assumed: bags (no known-item filter on the
 inventory load path) and deedsEarned (loaded verbatim, with recomputeRenown
-hasOwn-guarding unknown ids). So the two arms above are the whole exposure.
+hasOwn-guarding unknown ids). Everything else that could carry the twelve new ids
+KEEPS unknown ids deliberately, each with a comment saying so: the bank, the guild
+bank, vendor buyback, market listings and mail parcels. So the exposure is those
+THREE arms, and the third is the smallest and the only self-healing one.
 
 THE NOTE: do not roll a realm back across this change with live farmers, and do
 not run a mixed fleet during the deploy. This is inherent to the id-allowlist
@@ -8339,8 +8360,16 @@ writing down: the model makes every content-id addition a one-way door for the
 state that uses it, and nothing in the code says so at the deploy boundary.
 
 Blob growth from the marks themselves is bounded and small: a fully collected
-farmer gains twelve visited entries, roughly 370 bytes, catalog-bounded rather
-than per-action, far under CHARACTER_BLOB_WARN_BYTES.
+farmer gains twelve visited entries, catalog-bounded rather than per-action, far
+under CHARACTER_BLOB_WARN_BYTES. MEASURED at the 11e QA rather than estimated,
+because the phase's "roughly 370 bytes" was a guess and the real figure is lower:
+the twelve crop ids are 156 characters, each entry costs its id plus the ten of
+"farm_crop:" plus two quotes and a comma, so 312 bytes appended into a non-empty
+array and 313 as a standalone one. Counting the third rollback arm above, the
+FULL per-farmer delta this phase adds to the blob is about 562 bytes (312 of
+marks plus roughly 250 of new itemsDiscovered ids), which is 0.43 percent of the
+131,072-byte warn bound. Bounded because markVisited is idempotent and the write
+is gated on FARM_CROP_IDS, so the namespace can never exceed the catalog.
 
 ### A phase-start ritual this phase should have had, and 11f onward owes
 
