@@ -242,6 +242,54 @@ describe('masterwrought R17: the provisioner firewall', () => {
     ).toBe('alchemy');
   });
 
+  it('the carve-out REFUSES an equippable and the pacing gate (the positive control)', () => {
+    // THE PREDICATE'S OWN TEST, and it exists because a mutation proved the
+    // shipped table cannot supply one. Removing the slotless clause entirely
+    // left this suite green: no cooking or alchemy recipe outputs a slotted item
+    // today, so that clause is a FORWARD guard, and every arm above measures it
+    // over a set the clause does not currently change.
+    //
+    // Driving the predicate directly is what makes it a tested rule rather than
+    // an untested intention. If a later phase ever lets a consumable craft
+    // output an equippable, R17's fence is already proven to hold.
+    const slottedItemId = Object.keys(ITEMS).find((id) => ITEMS[id]?.slot !== undefined);
+    expect(slottedItemId, 'the catalog must contain an equippable for this control').toBeDefined();
+
+    // REFUSED: a cooking row that outputs an equippable is NOT a consumable
+    // intermediate, whatever its professionId says.
+    expect(
+      isConsumableIntermediate({
+        id: 'recipe_synthetic_equippable',
+        professionId: 'cooking',
+        resultItemId: slottedItemId as string,
+      }),
+    ).toBe(false);
+    // REFUSED: the pacing gate, by id, even though it is alchemy and slotless.
+    expect(
+      isConsumableIntermediate({
+        id: CATALYST_ID,
+        professionId: 'alchemy',
+        resultItemId: 'quickening_catalyst',
+      }),
+    ).toBe(false);
+    // REFUSED: a gear craft, which the profession clause turns away.
+    expect(
+      isConsumableIntermediate({
+        id: 'recipe_duskforged_billet',
+        professionId: 'weaponcrafting',
+        resultItemId: 'duskforged_billet',
+      }),
+    ).toBe(false);
+    // ACCEPTED: the one row that legitimately rides it.
+    expect(
+      isConsumableIntermediate({
+        id: 'recipe_seasoned_stock',
+        professionId: 'cooking',
+        resultItemId: 'seasoned_stock',
+      }),
+    ).toBe(true);
+  });
+
   it('the hoe carve-out is REAL and stays scoped to gathering tools', () => {
     // Without this the exclusion above would be untestable prose: the arm has
     // to prove the carve-out is actually load-bearing (a hoe really does
