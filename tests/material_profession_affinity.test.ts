@@ -4,7 +4,7 @@
 
 import { describe, expect, it } from 'vitest';
 import { ENCHANTS } from '../src/sim/content/enchants';
-import { FARM_MATERIAL_ITEM_IDS } from '../src/sim/content/farm_crops';
+import { FARM_CROPS, FARM_MATERIAL_ITEM_IDS } from '../src/sim/content/farm_crops';
 import { CRAFT_RING } from '../src/sim/content/professions';
 import { ALL_RECIPES } from '../src/sim/content/recipes';
 import { ALL_RECIPES as ALL_RECIPES_VIA_DATA } from '../src/sim/data';
@@ -94,6 +94,22 @@ describe('craftIdsForMaterialItem', () => {
     expect(craftIdsForMaterialItem('highland_barley')).toEqual(['cooking']);
     expect(craftIdsForMaterialItem('thornpeak_cabbage')).toEqual(['cooking']);
     expect(craftIdsForMaterialItem('gilded_sunmelon')).toEqual(['cooking']);
+    // SWEPT, NOT LISTED (qr-11G-AFFINITY, Phase 11g QA). The five ids above are
+    // five of the NINE crops that must stay cooking-only, so a change handing
+    // alchemy one of the other four passed this arm. The sweep closes it over
+    // whatever roster ships and needs no edit when Phase 11e's twelve becomes
+    // thirteen: exactly three base produce ids may name alchemy, and they are
+    // the three the elixir line took.
+    const GAINED_ALCHEMY = new Set(['vale_wheat', 'bog_beet', 'frost_gourd']);
+    const alchemyCrops = Object.values(FARM_CROPS)
+      .map((crop) => crop.produceItemId)
+      .filter((id) => craftIdsForMaterialItem(id).includes('alchemy'));
+    expect(alchemyCrops.sort(), 'exactly these base crops feed alchemy').toEqual(
+      [...GAINED_ALCHEMY].sort(),
+    );
+    // Vacuity floor: the sweep must run over the whole roster, so a catalog
+    // rename that emptied it cannot make the toEqual above pass over nothing.
+    expect(Object.keys(FARM_CROPS).length, 'the crop roster').toBeGreaterThanOrEqual(12);
   });
 
   it('herbs and the vial gained inscription as a consumer (Masterwrought phase 06)', () => {

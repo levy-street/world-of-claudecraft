@@ -472,13 +472,28 @@ function accentVerdict(
   nonProduce: ReadonlyArray<readonly [string, number]>,
   produceId: string,
   produceCount: number,
-): { countOk: boolean; valueOk: boolean; largestCount: number; dominant: number; value: number } {
+): {
+  countOk: boolean;
+  valueOk: boolean;
+  capOk: boolean;
+  largestCount: number;
+  dominant: number;
+  value: number;
+} {
   const largestCount = Math.max(...nonProduce.map(([, n]) => n));
   const dominant = Math.max(...nonProduce.map(([id, n]) => n * reagentUnitValue(id)));
   const value = produceCount * reagentUnitValue(produceId);
   return {
     countOk: produceCount < largestCount,
     valueOk: value <= dominant,
+    // THE ABSOLUTE ACCENT CAP, folded in at the Phase 11g QA (qr-11G-CAP). It
+    // used to sit inline in the COUNT sweep, outside this expression, so the
+    // control below could not exercise it and it had no rejection proof at all.
+    // It is an INDEPENDENT bound rather than a restatement of countOk: on a row
+    // whose largest non-produce count is 5, a crop at 4 clears countOk and is
+    // stopped only here. "A shipped ladder row takes 1 or 2" is the packet's
+    // own wording, so 2 is the number.
+    capOk: produceCount <= 2,
     largestCount,
     dominant,
     value,
@@ -556,6 +571,37 @@ describe('masterwrought R17 RULE 2: the accent rule', () => {
     // on count. So each case isolates exactly one half.
     expect(carrot.countOk, 'the carrot case must isolate the VALUE half').toBe(true);
     expect(twoWheat.valueOk, 'the two-wheat case must isolate the COUNT half').toBe(true);
+
+    // THE SECOND AUTHORED REFUSAL, driven rather than left as prose
+    // (qr-11G-BOAR, Phase 11g QA). The comment on the VALUE arm below records
+    // that brook_carrot was refused on TWO rows, the rung-0 skewer and
+    // recipe_elixir_of_the_boar, but only the skewer was ever driven. The boar
+    // is the sharper of the two: its dominant reagent is 12, not 8, so it is
+    // the row that says the refusal is not an artifact of one unusually cheap
+    // bill. Derived from the live row for the same reason as the skewer.
+    const boarBill = nonProduceBill(requireRecipe('recipe_elixir_of_the_boar'));
+    const boarCarrot = accentVerdict(boarBill, 'brook_carrot', 1);
+    expect(
+      boarCarrot.valueOk,
+      `boar carrot ${boarCarrot.value} against dominant ${boarCarrot.dominant}`,
+    ).toBe(false);
+    expect(boarCarrot.dominant, 'the boar is the dearer of the two refusals').toBe(12);
+    expect(accentVerdict(boarBill, 'vale_wheat', 1).valueOk, 'the binder it took instead').toBe(
+      true,
+    );
+
+    // THE CAP HALF, which had no rejection proof at all until it moved into
+    // accentVerdict (qr-11G-CAP). Driven on a synthetic bill whose largest
+    // non-produce count is 5, because that is the only shape where the cap and
+    // the count half disagree: a crop at 3 clears countOk and must still be
+    // refused as a body-sized helping.
+    const roomyBill = [['game_meat', 5]] as const;
+    const three = accentVerdict(roomyBill, 'vale_wheat', 3);
+    expect(three.countOk, 'three under a largest count of five clears the COUNT half').toBe(true);
+    expect(three.capOk, 'but the absolute accent cap must still refuse it').toBe(false);
+    expect(accentVerdict(roomyBill, 'vale_wheat', 2).capOk, 'two is the cap, not over it').toBe(
+      true,
+    );
   });
 
   it('a crop is a seasoning and never the body, by COUNT', () => {
@@ -576,9 +622,7 @@ describe('masterwrought R17 RULE 2: the accent rule', () => {
           verdict.countOk,
           `${recipe.id}: ${reagent.itemId} at ${reagent.count} must stay under the row's largest non-produce count ${verdict.largestCount}`,
         ).toBe(true);
-        expect(reagent.count, `${recipe.id}: ${reagent.itemId} is an accent`).toBeLessThanOrEqual(
-          2,
-        );
+        expect(verdict.capOk, `${recipe.id}: ${reagent.itemId} is an accent`).toBe(true);
       }
     }
   });
@@ -724,6 +768,35 @@ describe('masterwrought R18 and farming D24: the displacement guard', () => {
     expect(totalFor(['prime_cut']), 'the rare harvest specimen').toBe(12);
     expect(totalFor(['cooking_salt']), 'the salt line').toBe(33);
     expect(totalFor(RAW_COOKING_CATCH_IDS), 'the whole fishing line').toBe(30);
+    // PER CATCH, NOT ONLY THE SUM (qr-11G-FISH, Phase 11g QA). The other three
+    // lines above are single ids, so their totals ARE per-id and a reduction
+    // cannot hide inside them. The fishing line is seven ids under one number,
+    // which is the same gameability the per-row bills were added to close one
+    // level down: cutting the marsh pike and adding a river perch keeps 30.
+    // Phase 11i owns fishing and will edit this map when it adds a catch, which
+    // is the wanted behavior and the reason RAW_COOKING_CATCH_IDS keeps its own
+    // membership arm rather than being folded in here.
+    const perCatch: Record<string, number> = {
+      glimmerfin_koi: 6,
+      raw_bog_eel: 4,
+      raw_frostgill_trout: 4,
+      raw_marsh_pike: 2,
+      raw_mirror_trout: 1,
+      raw_river_perch: 2,
+      raw_stonescale_carp: 11,
+    };
+    for (const [id, count] of Object.entries(perCatch)) {
+      expect(totalFor([id]), `${id} demand across the merged table`).toBe(count);
+    }
+    // The two halves check each other: the per-id map must account for the whole
+    // pinned line and for every shipped catch, so neither can drift alone.
+    expect(
+      Object.values(perCatch).reduce((t, n) => t + n, 0),
+      'the per-catch map must account for the whole fishing line',
+    ).toBe(30);
+    expect(Object.keys(perCatch).sort(), 'every shipped catch is accounted for').toEqual(
+      [...RAW_COOKING_CATCH_IDS].sort(),
+    );
   });
 
   it('and no touched row lost a herb, fish, meat or salt entry to make room', () => {
@@ -806,10 +879,15 @@ describe('the touched rows stay gold-negative and stay off the gear chain', () =
     }
   });
 
-  it('this phase minted no recipe row and no rung moved', () => {
-    // masterwrought R13 and the closed LADDER_RECIPES shape, restated where the
-    // phase that could have broken them is pinned. Every touched row keeps the
-    // skillReq it shipped with.
+  it('no rung moved: every touched row keeps the skillReq it shipped with', () => {
+    // RETITLED at the Phase 11g QA (qr-11G-TITLE). It read "this phase minted no
+    // recipe row and no rung moved" and asserted only the rungs, so half the
+    // title was a claim this arm does not make. The row-count half IS covered,
+    // and deliberately elsewhere under the one-file-for-one-invariant rule:
+    // tests/ladder_crafting.test.ts pins LADDER_RECIPES at 54 with its per-craft
+    // and per-rung shape, and tests/recipe_economy.test.ts pins the ten
+    // INTERMEDIATE_RECIPES ids exactly. Duplicating either here would give the
+    // shape two homes; naming them gives the reader the same certainty.
     const expected: Record<string, number> = {
       recipe_hunters_game_skewer: 0,
       recipe_goldleaf_game_stew: 25,
