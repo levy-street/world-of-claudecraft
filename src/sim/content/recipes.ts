@@ -1269,8 +1269,9 @@ export const LADDER_RECIPES: ProfessionRecipeRecord[] = [
     // brook_carrot is farming's D9 fee vegetable and the one BASE produce row
     // that carries a buyValue (16); every FINE twin carries one too, so the
     // claim is about the base line only. That 16 would make it the most
-    // valuable reagent on this row, against game_meat's 8, so the crop becomes
-    // the body and breaks the accent rule.
+    // valuable reagent on this row: the comparison is CONTRIBUTION, not the
+    // per-unit basis, so it is one carrot at 16 against game_meat's two at 4
+    // for 8. The crop becomes the body and breaks the accent rule.
     // THE COST OF THE SWAP, recorded because it is real: brook_carrot is the one
     // produce a counter sells, so with it this rung-0 bill stayed buyable, and
     // with vale_wheat it needs a farm detour or the World Market. R18 is still

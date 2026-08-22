@@ -70,8 +70,18 @@ describe('the provisioning supply line: derivation floors', () => {
     expect(ALL_RECIPES.length, 'the merged recipe table').toBeGreaterThan(100);
     for (const id of PRODUCE_IDS) {
       expect(ITEMS[id], `${id} must be a real ItemDef`).toBeDefined();
-      expect(produceTier(id), `${id} must resolve a tier`).toBeDefined();
+      // The TIER is knowable, so pin the band rather than mere definedness: a
+      // resolver that returned a constant would satisfy toBeDefined for every
+      // id while making the tier gate below meaningless.
+      expect(produceTier(id), `${id} tier`).toBeGreaterThanOrEqual(1);
+      expect(produceTier(id), `${id} tier`).toBeLessThanOrEqual(4);
     }
+    // And the roster really spans all four tiers, so the gate arm is exercised
+    // across the whole band rather than over one repeated value.
+    expect(
+      new Set(Object.values(FARM_CROPS).map((c) => c.tier)),
+      'the roster must span every tier',
+    ).toEqual(new Set([1, 2, 3, 4]));
   });
 });
 
@@ -119,6 +129,14 @@ describe('masterwrought R17 RULE 1: the tier gate', () => {
 });
 
 describe('masterwrought R17: rung coverage on the leveling ladder', () => {
+  // THE FIRST ARM IS SUBSUMED BY THE SECOND, deliberately and with the reason
+  // recorded: `outside` is a subset of all produce consumers, so the thesis arm
+  // below can only pass if this one does, and this one can never fail alone.
+  // It is kept because the phase's acceptance list states the two claims
+  // SEPARATELY (coverage at every rung, and a consumer outside FARM_RECIPES at
+  // every rung), and a reader checking the weaker claim should find it asserted
+  // rather than inferred. It costs one cheap sweep and gives the simpler failure
+  // message when both break together.
   it('cooking and alchemy each consume produce at skillReq 0, 25 and 50', () => {
     for (const craft of ['cooking', 'alchemy'] as const) {
       for (const rung of LEVELING_RUNGS) {
@@ -495,6 +513,13 @@ describe('masterwrought R17 RULE 2: the accent rule', () => {
     expect(reagentUnitValue('vale_wheat'), 'the binder that replaced it').toBe(4);
     expect(reagentUnitValue('game_meat')).toBe(4);
     expect(reagentUnitValue('venom_gland')).toBe(6);
+    // THE OPERATOR IS at-or-below ON PURPOSE, and the difference from the COUNT
+    // arm's strictly-below is the contract's, not an oversight: RULE 2 says the
+    // crop's count stays "strictly below" but its share of inputValue stays "at
+    // or below". A crop that exactly ties the dominant reagent's contribution
+    // still is not the body, so tightening this to strictly-below would enforce
+    // something the packet never ruled. No row ties today; the closest is the
+    // chowder at 16 against 20.
     // Swept, not listed, for the same reason as the COUNT arm above.
     for (const recipe of accentGovernedRows()) {
       const dominant = Math.max(
