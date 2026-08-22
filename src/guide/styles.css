@@ -3094,6 +3094,23 @@ a.guide-poi:hover {
   font-size: 0.85em;
   white-space: nowrap;
 }
+/* The recipe-cell MATERIAL entries, and the same defect one row up rather than
+   a new one: materialsCell joins its spans with NO separator, so with no rule
+   here the cell renders glued, exactly as the combo badge did ("Quickening
+   CatalystOnce per day"). Marlow's Grand Roast read "Prime Cut x1Game Meat
+   x4Highland Barley x2Frost Gourd x2Sunpetal Herb x1Cooking Salt x2".
+   Long-standing, and masterwrought Phase 11g is what made it the worst run on
+   the page by taking two bills to six entries, the longest in the game.
+   Separated by the ADJACENT-SIBLING rule rather than a trailing margin on every
+   entry, so a one-material cell gains no phantom gap; nowrap keeps an entry
+   from breaking between its name and its count. */
+.guide-prof-mat {
+  display: inline-block;
+  white-space: nowrap;
+}
+.guide-prof-mat + .guide-prof-mat {
+  margin-inline-start: var(--g-xs);
+}
 .guide-set-impact {
   white-space: nowrap;
 }

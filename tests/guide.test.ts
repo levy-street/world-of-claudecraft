@@ -1942,6 +1942,15 @@ describe('Guide professions generated content accuracy', () => {
     expect(t('guide.profPages.craftIntro.cooking')).toContain(
       "the day's catch and the season's harvest",
     );
+    // ...and the RENDERED half of it (qr-11G-INTRO, Phase 11g QA). The five
+    // anchors above read the rendered HTML; this one alone read t(), so the one
+    // string on this page whose render or escaping could regress was the one not
+    // covered against it. craftDetailHtml puts it in the lead paragraph through
+    // esc(), so the apostrophes arrive as &#39; and the anchor is written that
+    // way rather than avoided.
+    expect(cookHtml, 'the craft blurb renders, not just resolves').toContain(
+      'the day&#39;s catch and the season&#39;s harvest',
+    );
 
     // THE QUANTITY CLAIMS, DERIVED FROM THE LIVE BILLS rather than pinned as
     // literals, and this arm exists because a mutation proved the anchors above
@@ -2278,6 +2287,16 @@ describe('Guide professions gathering accuracy', () => {
     // Apostrophe-free, since the rendered page escapes it to &#39;.
     expect(html).toContain('a buyer from the very first rung');
     expect(html).toContain('into the apothecary');
+    // THE NEGATIVE HALF, which the two 11g anchors above lacked (qr-11G-BEDS,
+    // Phase 11g QA). A full revert reds on them, but a "supplement rather than
+    // replace" edit that re-adds the pre-11g clause beside the new one keeps
+    // them green while the page tells a player both that produce only cooks
+    // into dishes and that it feeds two trainer ladders. The cooking and
+    // alchemy headings already carry their stale forms pinned ABSENT for
+    // exactly this reason; this is the same treatment for the farm page.
+    expect(html, 'the pre-11g clause must be gone, not merely supplemented').not.toContain(
+      'the produce cooks into dishes at the kitchens',
+    );
     // The guard itself stays honest on its absent side: a toolless record
     // still renders neither section, never prose over an empty table.
     const toolless = {
@@ -2974,6 +2993,18 @@ describe('Guide professions pages and routes', () => {
     expect(weapon).toContain('Osmium Warblade');
     expect((weapon.match(/class="guide-prof-recipe/g) ?? []).length).toBe(
       GUIDE_PROF_CRAFTS.find((c) => c.id === 'weaponcrafting')?.recipes.length,
+    );
+    // The MATERIAL entries carry the same two-sided contract as the tools table
+    // above, and for a sharper reason (qr-11G-MATCELL, Phase 11g QA):
+    // materialsCell joins its spans with NO separator at all, so the cell reads
+    // glued unless the stylesheet separates them. That is the defect the
+    // .guide-prof-combo comment in src/guide/styles.css records having shipped
+    // once already, and this sheet sits outside every src/styles CSS guard, so
+    // this is its only pin. Both sides asserted: the markup emits the scoped
+    // class, and the sheet declares the adjacent-sibling separation.
+    expect(weapon, 'recipe rows carry the scoped material class').toContain('guide-prof-mat');
+    expect(guideCss, 'the joined material entries must be separated by the stylesheet').toMatch(
+      /\.guide-prof-mat\s*\+\s*\.guide-prof-mat\s*\{[^}]*margin-inline-start:/,
     );
     // The RENDERED source cell for a drop-taught apex row (phase 08): the
     // data-level mirror pins 'drop' in the corpus, but only a render pin can

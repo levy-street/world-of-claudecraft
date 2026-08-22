@@ -9793,7 +9793,15 @@ unwritten is a sweep nobody can audit.
   edited, with tests/guide.test.ts freshness green.
 - THE ONE LIVE OBLIGATION is the reword worklist below.
 
-### The reworded i18n keys, for the Phase 17 release-tier fill worklist
+### RELEASE-FILL OBLIGATIONS this phase adds (reword-staleness, flagged BY KEY for the Phase 17 fill)
+
+(Retitled at the 11g QA. The list below was originally headed "The reworded
+i18n keys, for the Phase 17 release-tier fill worklist", which says the same
+thing and is invisible to the grep a Phase 17 session actually runs: the two
+earlier phases that owe reword fills both use the RELEASE-FILL OBLIGATIONS
+heading, and phase-17-final-qa.md points at "its Phase 11 reword obligations"
+by prose rather than by key. An obligation nobody can enumerate is the failure
+mode this section exists against.)
 
 This is the obligation that would otherwise vanish: an edited English value whose
 locales are FILLED still reads as filled, and only a worklist entry catches it.
@@ -9818,6 +9826,25 @@ translations plus en, en_CA and en_XA. Same cardinality, different membership.
 The five non-Latin bundles did not move because those locales carry a fill for
 EVERY one of the six reworded keys, which is exactly why they are the locales
 with the most stale English behind a translated-looking row.
+
+CORRECTED AGAIN AT THE 11g QA, because the sentence above is true as a
+TRANSLATOR WORKLIST and misleading as an EXPOSURE count, and a later reader
+auditing what players actually see would take the wrong number off it. 18 is the
+number of overlay FILES to edit. The number of locales RENDERING stale text for
+the four materials keys is 20: es_ES and fr_CA carry no fill of their own, so
+naming them beside en_CA reads as "unaffected", but they resolve through
+DIALECT_BASE (es_ES to es, fr_CA to fr_FR) and inherit the stale Spanish and
+French. Only en_CA falls through to English and so moved. Verified in the
+generated tree rather than reasoned about: es_ES renders "Una despensa
+alimentada por la caña y el cuchillo" (a pantry fed by rod and knife) today.
+The WORKLIST is still complete and still 18 rows, because fixing the 18 files
+fixes all 20 rendered locales; only the exposure sentence was wrong.
+
+THE TWO HEADINGS ARE THE SHARP HALF OF THE 20, and worth the Phase 17 session's
+attention ahead of the bodies: both are CLOSED ENUMERATIONS ("A pantry fed by
+rod and knife", "Herbs, glands, and glass"), so in those 20 locales they do not
+merely omit the garden, they name a supplier set that is now wrong. The four
+bodies and craftIntro.cooking are omissions rather than false statements.
 
 No src/ui/i18n.locales/ file was touched, and NO NEW KEY was minted.
 
