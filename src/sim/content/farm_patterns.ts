@@ -1,4 +1,4 @@
-// Farming recipe patterns (masterwrought Phase 11f, R8): the physical
+// Farming recipe patterns (Phase 11f, masterwrought R8): the physical
 // kind:'recipe' drops that teach the farm recipes at or above
 // FARM_DROP_RUNG_FLOOR (recipes.ts, FARM_RECIPES). Merged into ITEMS by
 // data.ts (mergeItems), beside APEX_PATTERN_ITEMS.
@@ -20,7 +20,7 @@
 // never asks which craft owns it. pattern_items.ts, training.ts, wheel.ts and
 // crafting.ts are byte-identical across this phase.
 //
-// R8 channel doctrine as wired (the recorded rates live in
+// masterwrought R8 channel doctrine as wired (the recorded rates live in
 // docs/prd/masterwrought/state.md at this phase's ledger row):
 //   RAID: pattern_harvest_feast rides the Nythraxis base loot table as the
 //     appended 'nythraxis_farm' rollGroup, with the tier-4 seeds. The farm

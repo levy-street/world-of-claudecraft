@@ -143,7 +143,7 @@ describe('THE IDENTITY GUARD: farming never becomes conditional on raiding', () 
     }
   });
 
-  it('R18: every farm PRODUCE item stays market-listable junk, never a slot tax', () => {
+  it('masterwrought R18: every farm PRODUCE item stays market-listable junk, never a slot tax', () => {
     // masterwrought R18 read at its own level: professions are needed through
     // their OUTPUT, never through a character slot, and the mechanical form of
     // that is that a raider buys grain the way a raider already buys an herb.
@@ -163,7 +163,7 @@ describe('THE IDENTITY GUARD: farming never becomes conditional on raiding', () 
     }
   });
 
-  it('R18: the tier 1 and 2 seeds stay vendor-stocked, so the on-ramp never needs the endgame', () => {
+  it('masterwrought R18: the tier 1 and 2 seeds stay vendor-stocked, so the on-ramp never needs the endgame', () => {
     const starterSeeds = Object.values(FARM_CROPS)
       .filter((crop) => crop.tier <= 2)
       .map((crop) => crop.seedItemId);
@@ -175,7 +175,7 @@ describe('THE IDENTITY GUARD: farming never becomes conditional on raiding', () 
     }
   });
 
-  it('R18 and D24: farming rows are ADDED beside the herb line, never substituted for it', () => {
+  it('masterwrought R18 and D24: farming rows are ADDED beside the herb line, never substituted for it', () => {
     // The displacement guardrail, in the one form that actually bites: every
     // shipped herb must still have a live consumer. A phase that "made room"
     // for produce by pulling an herb out of a bill would strand that herb with
@@ -185,7 +185,7 @@ describe('THE IDENTITY GUARD: farming never becomes conditional on raiding', () 
     // convenience: the three fine_* herb twins have no recipe consumer at all
     // on the merged tree today, which predates this phase and is farming's
     // own fine-twin question, not a displacement caused here. Scoping to the
-    // base line keeps the arm about what R18 protects; widening it would red
+    // base line keeps the arm about what masterwrought R18 protects; widening it would red
     // on inherited state and teach the next reader to loosen it.
     const herbIds = Object.keys(ITEMS).filter(
       (id) => id.endsWith('_herb') && !id.startsWith('fine_'),

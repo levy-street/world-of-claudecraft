@@ -841,6 +841,14 @@ describe('Reliquary heroic gear pins against HEROIC_BOSS_LOOT', () => {
     for (const e of entries) {
       if (typeof e.itemId !== 'string') continue;
       if (isMountReinsId(e.itemId) || isHeroicVariantId(e.itemId)) continue;
+      // A recipe PATTERN is not conquerable unique loot, so it takes no
+      // Reliquary page: it is a teaching item that is spent to learn, and the
+      // catalog is a record of what a player HOLDS. That verdict was recorded
+      // for the apex set at phase 11 (the raid carve-out below) and is the same
+      // one masterwrought Phase 11f recorded for the farming set, which put a
+      // pattern group on every heroic five-man table. Carved out by KIND rather
+      // than by group name, so the reason travels with the item.
+      if (ITEMS[e.itemId]?.kind === 'recipe') continue;
       liveIds.push(e.itemId);
     }
     return [...new Set(liveIds)].sort();
@@ -1544,12 +1552,15 @@ describe('Reliquary dungeon and raid pages derive from live mob loot', () => {
     // The vacuity guard for isReliquaryCarvedOut: run THE SAME derivation
     // walk with the carve-out disabled and diff it against the protected
     // form (never a re-implemented twin: the second-model trap). The
-    // removed set must be exactly the ten phase 11 gear patterns on the
-    // Nythraxis table (kind 'recipe', epic, repeatable tradable
-    // consumed-on-learn drops: not conquerable unique loot per the ledger
-    // decision), so the carve-out can neither over-carve a real relic nor
-    // go silently dead, and a future third loot source in the walk is
-    // covered automatically.
+    // removed set must be exactly the live patterns reachable through the
+    // walked dungeon loot (kind 'recipe': repeatable tradable
+    // consumed-on-learn teaching drops, not conquerable unique loot, per the
+    // recorded verdict of both packets), so the carve-out can neither
+    // over-carve a real relic nor go silently dead, and a future loot source
+    // in the walk is covered automatically. Grew by one at masterwrought
+    // Phase 11f, which put pattern_harvest_feast on the Nythraxis base table;
+    // its five siblings ride the heroic five-man tables and the rift, neither
+    // of which this dungeon-loot walk reaches.
     const removed = new Set<string>();
     for (const dungeonId of Object.keys(EQUALITY_PAGES)) {
       const protectedSet = new Set(dungeonRarePlusLootIds(dungeonId));
@@ -1561,6 +1572,7 @@ describe('Reliquary dungeon and raid pages derive from live mob loot', () => {
       'pattern_duskforged_bulwark',
       'pattern_duskforged_warblade',
       'pattern_gyrelens_array',
+      'pattern_harvest_feast',
       'pattern_makers_charm',
       'pattern_masters_field_forge',
       'pattern_prismglass_loop',

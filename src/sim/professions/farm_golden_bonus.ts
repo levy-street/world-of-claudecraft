@@ -46,7 +46,7 @@
 //     0.42 patterns/day, one every ~2.4 days. Still slower than 0.67.
 //
 // Seeds per day for the same three: 0.49, 2.6 and 10.1. Recorded here so
-// Phase 15 and the R19 calendar model read numbers somebody computed. The
+// Phase 15 and the masterwrought R19 calendar model read numbers somebody computed. The
 // harvest cadence uses survival 1.0, which is the CONSERVATIVE direction for
 // this check: survival below 1 only reduces golden events, since a withered
 // harvest spends its golden draw and ignores the result.

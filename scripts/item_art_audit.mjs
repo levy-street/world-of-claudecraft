@@ -117,8 +117,11 @@ const build = await buildItemArtAudit({
     // Phase 11 well-fed phase's four buff dishes plus the Phase 12 shared
     // feast, carried unchanged through the farming absorb; Phase 11e's four
     // upper-tier crops add twelve ids (seed, produce and fine twin each) under
-    // the packet's declared art park for 11e to 11k, taking it to 56.
-    pendingArtCount: 56,
+    // the packet's declared art park for 11e to 11k, taking it to 56; Phase
+    // 11f's six farming PATTERNS park under the same declaration, taking it to
+    // 62. liveItemCount is unmoved by that, which is the point of the split:
+    // a new artless def that joins the park moves the debt term alone.
+    pendingArtCount: 62,
     generatedHeroicDefinitions: 64,
     heroicDefinitionsWithOwnWebp: 48,
     heroicWeaponArtAliases: 16,

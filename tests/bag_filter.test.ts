@@ -494,6 +494,10 @@ describe('chip reachability census: the All-only set, pinned', () => {
   // of here in the same change as its ALLOWED_UNCLASSIFIED_JUNK row in
   // material_taxonomy). The Quickening Catalyst is deliberately absent: its
   // nine in-phase consumers already classify it as a material.
+  // masterwrought Phase 11f's six farming patterns join the 28 apex ones for
+  // the same reason the apex set is here: a kind 'recipe' teaching item is not
+  // gear, a consumable, or a material, so it matches no chip and reaching it
+  // through All is the settled behavior rather than a gap.
   const ALL_ONLY = [
     'amber_hide',
     'bandit_bandana',
@@ -532,10 +536,16 @@ describe('chip reachability census: the All-only set, pinned', () => {
     'pattern_briarstep_jerkin',
     'pattern_duskforged_bulwark',
     'pattern_duskforged_warblade',
+    'pattern_evergarden_braised_greens',
+    'pattern_evergarden_harvest_platter',
+    'pattern_evergarden_sunmelon_tart',
     'pattern_fenbloom_breeches',
     'pattern_forgefold_legguards',
     'pattern_grand_cauldron',
     'pattern_gyrelens_array',
+    'pattern_harvest_feast',
+    'pattern_highwatch_barley_porridge',
+    'pattern_highwatch_gourd_soup',
     'pattern_ironhusk_flask',
     'pattern_laden_hearth',
     'pattern_makers_charm',

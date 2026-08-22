@@ -2,28 +2,39 @@
 // in the recipe-to-channel direction, plus the no-fourth-channel sweep.
 //
 // tests/apex_pattern_items.test.ts pins the channel-to-content direction (the
-// 28-id universe both ways, the def contract, the raid group at 0.04, the
+// pattern universe both ways, the def contract, the raid group at 0.04, the
 // sorted rift list, consumables-in-neither-drop-channel, and the behavioral
 // rift draw sample); tests/nythraxis_raid_unit.test.ts pins the raid group's
-// TAIL position. This file pins what neither does:
+// TAIL position; tests/farm_pattern_items.test.ts pins the FARM set's own
+// channel map (masterwrought Phase 11f). This file pins what none of them do:
 //   1. every apex drop recipe is reachable through EXACTLY its assigned
 //      channel (no orphan, no double-channel), derived from the live surfaces;
 //   2. the three hosting surfaces are live content (the boss spawns in a
 //      registered dungeon, the rift draw's exported constants drive the live
 //      function, the quartermaster is a registered NPC with resolvable stock);
-//   3. NO other acquisition surface in live content carries a pattern id (R8:
-//      three pillars, no fourth), one sweep per surface so a failure names the
-//      leaking surface;
-//   4. the phase 02 sweep floor: EXACTLY 28 shipped kind:'recipe' defs, each
+//   3. NO acquisition surface in live content OUTSIDE the sanctioned host
+//      registry carries a pattern id (masterwrought R8: three pillars, no
+//      fourth), one sweep per surface so a failure names the leaking surface;
+//   4. the phase 02 sweep floor: EXACTLY 34 shipped kind:'recipe' defs, each
 //      teaching a drop-acquirable recipe (recipe_pattern_items.test.ts sweeps
 //      the shape but is floorless; the literal here is the floor);
 //   5. the draw-order documentation pin for the rift ledger comment.
+//
+// RE-CUT AT PHASE 11f, and the reason is worth stating because the file reads
+// as an apex-only contract otherwise. Every sweep here was written when the 28
+// were the only patterns in the game, so "the raid group is the sole loot host"
+// and "no HEROIC_BOSS_LOOT table carries a pattern id" were true by accident of
+// there being one set. Farming's channels include the heroic five-mans, which
+// Phase 11 had deliberately left empty. Rather than loosen the sweeps, the
+// sanctioned hosts are now an explicit REGISTRY below: each sweep skips exactly
+// those and nothing else, a pattern anywhere else is still a leak, and adding a
+// channel means adding a row a reader can see.
 import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 import { DELVE_SHOPS } from '../src/sim/content/delves';
 import { drownedLitanyChestItemsForTier } from '../src/sim/content/delves/drowned_litany_loot';
 import { delveChestItemsForTier } from '../src/sim/content/delves/lockpick_tiers';
-import { HEROIC_BOSS_LOOT } from '../src/sim/content/heroic_loot';
+import { FARM_HEROIC_PATTERN_GROUP, HEROIC_BOSS_LOOT } from '../src/sim/content/heroic_loot';
 import { HEROIC_VENDOR_NPC_ID, HEROIC_VENDOR_STOCK } from '../src/sim/content/heroic_vendor';
 import { FISHING_TABLES_BY_BAND } from '../src/sim/content/items';
 import { authoredLettersById } from '../src/sim/content/letters';
@@ -33,6 +44,7 @@ import {
   APEX_ARMOR_RECIPES,
   APEX_CONSUMABLE_RECIPES,
   APEX_GEAR_RECIPES,
+  FARM_RECIPES,
   recipeById,
 } from '../src/sim/content/recipes';
 import {
@@ -56,6 +68,7 @@ import { riftHeroicClearPool, riftNormalClearPool } from '../src/sim/rift/loot_p
 import {
   addRiftClearGearLoot,
   createRiftGearInstance,
+  FARM_RIFT_DROP_ITEM_IDS,
   RIFT_BLUE_MOUNT_REINS,
   RIFT_EPIC_MOUNT_REINS,
   RIFT_GREEN_MOUNT_REINS,
@@ -68,6 +81,24 @@ import type { Entity, PlayerClass } from '../src/sim/types';
 
 const NYTHRAXIS_BOSS_ID = 'nythraxis_scourge_of_thornpeak';
 const RAID_GROUP = 'nythraxis_patterns';
+
+// THE SANCTIONED HOST REGISTRY. Every place in live content a pattern id is
+// allowed to appear, one row per recorded channel decision. The no-fourth-
+// channel sweeps below skip exactly these; everything else is a leak.
+//
+//   nythraxis_patterns  the phase 11 apex GEAR raid group
+//   nythraxis_farm      the phase 11f farming raid group (the feast pattern
+//                       plus the tier-4 seeds; only its pattern member is a
+//                       pattern id, the seeds sweep as ordinary junk)
+//   heroic_farm_patterns  the phase 11f farming DUNGEON group, on every heroic
+//                       five-man final boss. Phase 11 left HEROIC_BOSS_LOOT
+//                       pattern-free on purpose; 11f's DECISION E is what puts
+//                       a pattern there, so the exception is named rather than
+//                       the sweep being dropped.
+const FARM_RAID_GROUP = 'nythraxis_farm';
+const FARM_HEROIC_GROUP = FARM_HEROIC_PATTERN_GROUP;
+const SANCTIONED_MOB_LOOT_GROUPS = new Set([RAID_GROUP, FARM_RAID_GROUP]);
+const SANCTIONED_HEROIC_GROUPS = new Set([FARM_HEROIC_GROUP]);
 
 // The 28 shipped pattern ids, derived from the def table (the universe pin in
 // apex_pattern_items.test.ts holds this equal to the recipe-derived set). The
@@ -92,40 +123,80 @@ const RAID_CHANNEL_IDS = new Set(
 const RIFT_CHANNEL_IDS = new Set<string>(RIFT_PATTERN_ITEM_IDS);
 const VENDOR_CHANNEL_IDS = new Set(HEROIC_VENDOR_STOCK.map((offer) => offer.itemId));
 
-describe('R8 referential contract: every apex recipe reaches exactly its channel', () => {
-  // The drop-acquisition set in ALL_RECIPES is the recipe-side universe; 28 is
-  // a LITERAL floor (the recorded phase decision), never re-derived.
+// The farm set's three surfaces, read live the same way. Each is filtered to
+// PATTERN ids: the raid and rift channels carry seeds too, which are ordinary
+// junk and sweep as such everywhere else in this file.
+const FARM_RAID_CHANNEL_IDS = new Set(
+  MOBS[NYTHRAXIS_BOSS_ID].loot
+    .filter((entry) => entry.rollGroup === FARM_RAID_GROUP)
+    .flatMap((entry) => (entry.itemId && isPatternId(entry.itemId) ? [entry.itemId] : [])),
+);
+const FARM_DUNGEON_CHANNEL_IDS = new Set(
+  Object.values(HEROIC_BOSS_LOOT)
+    .flat()
+    .filter((entry) => entry.rollGroup === FARM_HEROIC_GROUP)
+    .flatMap((entry) => (entry.itemId ? [entry.itemId] : [])),
+);
+const FARM_RIFT_CHANNEL_IDS = new Set(
+  (FARM_RIFT_DROP_ITEM_IDS as readonly string[]).filter((id) => isPatternId(id)),
+);
+
+describe('masterwrought R8 referential contract: every drop recipe reaches exactly its channel', () => {
+  // The drop-acquisition set in ALL_RECIPES is the recipe-side universe. The
+  // counts are LITERAL floors (the recorded phase decisions), never re-derived.
   const apexDropRecipes = ALL_RECIPES.filter((recipe) => recipe.acquisition?.includes('drop'));
 
-  it('the drop-acquisition recipe set partitions 10 gear / 10 armor / 8 consumable', () => {
-    expect(apexDropRecipes).toHaveLength(28);
+  it('the drop-acquisition recipe set partitions 10 gear / 10 armor / 8 consumable / 6 farm', () => {
+    expect(apexDropRecipes).toHaveLength(34);
     const gear = apexDropRecipes.filter((r) => APEX_GEAR_RECIPES.includes(r));
     const armor = apexDropRecipes.filter((r) => APEX_ARMOR_RECIPES.includes(r));
     const consumable = apexDropRecipes.filter((r) => APEX_CONSUMABLE_RECIPES.includes(r));
+    const farm = apexDropRecipes.filter((r) => FARM_RECIPES.includes(r));
     expect(gear).toHaveLength(10);
     expect(armor).toHaveLength(10);
     expect(consumable).toHaveLength(8);
-    // No drop recipe outside the three families: a 29th drop recipe with no
-    // assigned channel would slip every family loop, so it fails here.
-    expect(gear.length + armor.length + consumable.length).toBe(apexDropRecipes.length);
+    expect(farm).toHaveLength(6);
+    // No drop recipe outside the four families: one with no assigned channel
+    // would slip every family loop, so it fails here.
+    expect(gear.length + armor.length + consumable.length + farm.length).toBe(
+      apexDropRecipes.length,
+    );
   });
 
-  it('every recipe teaching pattern appears in EXACTLY the channel its family assigns', () => {
+  it('every recipe teaching pattern appears in EXACTLY the channels its family assigns', () => {
+    // The apex families each get ONE channel. The FARM family deliberately
+    // gets two: a drop pillar AND the marks valve, because masterwrought D13
+    // forbids a luck-gated trigger being the only faucet for a pattern, so the
+    // deterministic route is what makes the drop arms legal. The expectation
+    // is therefore a SET per family rather than a single name, and the farm
+    // rows are still pinned to exactly one DROP pillar apiece.
     for (const recipe of apexDropRecipes) {
       const patternId = `pattern_${recipe.resultItemId}`;
-      const assigned = APEX_GEAR_RECIPES.includes(recipe)
-        ? 'raid'
-        : APEX_ARMOR_RECIPES.includes(recipe)
-          ? 'rift'
-          : 'vendor';
+      const isFarm = FARM_RECIPES.includes(recipe);
       const channels: string[] = [];
       if (RAID_CHANNEL_IDS.has(patternId)) channels.push('raid');
+      if (FARM_RAID_CHANNEL_IDS.has(patternId)) channels.push('raid');
+      if (FARM_DUNGEON_CHANNEL_IDS.has(patternId)) channels.push('dungeon');
       if (RIFT_CHANNEL_IDS.has(patternId)) channels.push('rift');
+      if (FARM_RIFT_CHANNEL_IDS.has(patternId)) channels.push('rift');
       if (VENDOR_CHANNEL_IDS.has(patternId)) channels.push('vendor');
-      // Size exactly 1 AND the right one: an orphan recipe reads [], a
-      // double-channel reads two entries, a mis-channeled one reads the wrong
-      // name; all three red with the recipe and pattern named.
-      expect(channels, `${recipe.id} via ${patternId}`).toEqual([assigned]);
+      if (!isFarm) {
+        const assigned = APEX_GEAR_RECIPES.includes(recipe)
+          ? 'raid'
+          : APEX_ARMOR_RECIPES.includes(recipe)
+            ? 'rift'
+            : 'vendor';
+        // Size exactly 1 AND the right one: an orphan recipe reads [], a
+        // double-channel reads two entries, a mis-channeled one reads the
+        // wrong name; all three red with the recipe and pattern named.
+        expect(channels, `${recipe.id} via ${patternId}`).toEqual([assigned]);
+        continue;
+      }
+      const dropChannels = channels.filter((c) => c !== 'vendor');
+      expect(dropChannels, `${recipe.id} must ride exactly one drop pillar`).toHaveLength(1);
+      expect(channels.includes('vendor'), `${recipe.id} needs the deterministic valve (D13)`).toBe(
+        true,
+      );
     }
   });
 });
@@ -162,11 +233,26 @@ describe('the hosting surfaces are live content', () => {
       }
     }
     expect(hits.length).toBeGreaterThan(0);
+    // TWO rift pattern lists now feed this function (draw 6 apex, draw 7 farm),
+    // so a pattern the live draw sheds must belong to one of them. Kept as a
+    // union rather than widened to "any pattern": a pattern from the RAID or
+    // DUNGEON channel appearing here would still be a mis-wired draw.
     for (const id of hits) {
-      expect(RIFT_CHANNEL_IDS.has(id), `${id} shed by the live draw but not in the list`).toBe(
-        true,
-      );
+      expect(
+        RIFT_CHANNEL_IDS.has(id) || FARM_RIFT_CHANNEL_IDS.has(id),
+        `${id} shed by the live draw but in neither rift list`,
+      ).toBe(true);
     }
+    // Both lists are really reachable through the live function, so neither
+    // draw can be dead while the other carries the arm.
+    expect(
+      hits.some((id) => RIFT_CHANNEL_IDS.has(id)),
+      'the apex draw fires',
+    ).toBe(true);
+    expect(
+      hits.some((id) => FARM_RIFT_CHANNEL_IDS.has(id)),
+      'the farm draw fires',
+    ).toBe(true);
   });
 
   it('the vendor channel host is live: stock resolves and the quartermaster is registered', () => {
@@ -198,9 +284,16 @@ describe('the no-fourth-channel sweep (R8: three pillars, no fourth)', () => {
     for (const mobId of mobIds) {
       for (const entry of MOBS[mobId].loot ?? []) {
         entriesWalked++;
-        // The one sanctioned host: the nythraxis_patterns group on the
-        // nythraxis base table. Everything else on that table sweeps too.
-        if (mobId === NYTHRAXIS_BOSS_ID && entry.rollGroup === RAID_GROUP) continue;
+        // The sanctioned hosts: the two appended pattern groups on the
+        // nythraxis base table (registry above). Everything else on that
+        // table, and every other mob, sweeps.
+        if (
+          mobId === NYTHRAXIS_BOSS_ID &&
+          entry.rollGroup !== undefined &&
+          SANCTIONED_MOB_LOOT_GROUPS.has(entry.rollGroup)
+        ) {
+          continue;
+        }
         if (isPatternId(entry.itemId)) leaks.push(`MOBS.${mobId}: ${entry.itemId}`);
       }
     }
@@ -208,19 +301,30 @@ describe('the no-fourth-channel sweep (R8: three pillars, no fourth)', () => {
     expect(leaks).toEqual([]);
   });
 
-  it('no HEROIC_BOSS_LOOT table carries a pattern id', () => {
+  it('no HEROIC_BOSS_LOOT table carries a pattern id outside the sanctioned farm group', () => {
+    // Phase 11 kept these tables pattern-free outright. Phase 11f's DECISION E
+    // opens exactly ONE group on them, so the sweep skips that group by name
+    // and still fails on a pattern anywhere else in any heroic table.
     const tables = Object.keys(HEROIC_BOSS_LOOT);
     expect(tables.length).toBeGreaterThanOrEqual(7);
     let entriesWalked = 0;
+    let sanctioned = 0;
     const leaks: string[] = [];
     for (const bossId of tables) {
       for (const entry of HEROIC_BOSS_LOOT[bossId]) {
         entriesWalked++;
+        if (entry.rollGroup !== undefined && SANCTIONED_HEROIC_GROUPS.has(entry.rollGroup)) {
+          sanctioned++;
+          continue;
+        }
         if (isPatternId(entry.itemId)) leaks.push(`HEROIC_BOSS_LOOT.${bossId}: ${entry.itemId}`);
       }
     }
-    expect(entriesWalked).toBeGreaterThanOrEqual(48);
+    expect(entriesWalked).toBeGreaterThanOrEqual(58);
     expect(leaks).toEqual([]);
+    // The skip is not a hole: the sanctioned group must actually be present,
+    // or this arm would be sweeping a surface the channel silently left.
+    expect(sanctioned, 'the sanctioned farm group must really be on these tables').toBe(10);
   });
 
   it('the rift clear pools carry no pattern id (patterns have no slot, so they cannot enter)', () => {
@@ -453,13 +557,14 @@ describe('the no-fourth-channel sweep (R8: three pillars, no fourth)', () => {
 });
 
 describe('the phase 02 sweep floor', () => {
-  it('EXACTLY 28 shipped kind:recipe defs, each teaching a drop-acquirable recipe', () => {
+  it('EXACTLY 34 shipped kind:recipe defs, each teaching a drop-acquirable recipe', () => {
     // recipe_pattern_items.test.ts sweeps every kind:'recipe' def for this
     // shape but is deliberately floorless (it predates shipped content); the
-    // literal 28 here is the floor, and the referential arms above make it
-    // un-gameable (a 29th def would also have to seat a channel to pass them).
+    // literal here is the floor, and the referential arms above make it
+    // un-gameable (a 35th def would also have to seat a channel to pass them).
+    // 28 apex plus the 6 farming patterns Phase 11f added.
     const recipeDefs = Object.values(ITEMS).filter((def) => def.kind === 'recipe');
-    expect(recipeDefs).toHaveLength(28);
+    expect(recipeDefs).toHaveLength(34);
     for (const def of recipeDefs) {
       if (def.kind !== 'recipe') continue; // narrow for teachesRecipeId
       const recipe = recipeById(def.teachesRecipeId);

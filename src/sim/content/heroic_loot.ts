@@ -656,7 +656,7 @@ const HEROIC_GREEN_MOUNT_CHANCE = 0.005;
 const HEROIC_BLUE_MOUNT_CHANCE = 0.001;
 const HEROIC_RAID_BLUE_MOUNT_CHANCE = 0.001;
 
-// Farming's DUNGEON channel (masterwrought Phase 11f, R8): the two rung-75
+// Farming's DUNGEON channel (Phase 11f, masterwrought R8): the two rung-75
 // farm patterns ride every heroic FIVE-MAN final boss as one appended tail
 // rollGroup. This is the pillar the packet had never used for a recipe, so it
 // takes the lowest-risk shape available.
@@ -680,16 +680,22 @@ const HEROIC_RAID_BLUE_MOUNT_CHANCE = 0.001;
 // against five heroic five-mans; the deterministic quartermaster route at 12
 // marks is what keeps either pattern from fossilizing behind that.
 const FARM_PATTERN_HEROIC_CHANCE = 0.04;
+/** The rollGroup name, EXPORTED because five suites need to exclude it from a
+ *  gear census and a copied string literal in each is how one of them silently
+ *  stops matching. Consumers: the dungeon channel pins, the apex no-fourth-
+ *  channel registry, the wildheart gear arms, the Reliquary carve-out, and the
+ *  heroic item-level sweep. */
+export const FARM_HEROIC_PATTERN_GROUP = 'heroic_farm_patterns';
 const heroicFarmPatternRows = (): LootEntry[] => [
   {
     itemId: 'pattern_highwatch_gourd_soup',
     chance: FARM_PATTERN_HEROIC_CHANCE,
-    rollGroup: 'heroic_farm_patterns',
+    rollGroup: FARM_HEROIC_PATTERN_GROUP,
   },
   {
     itemId: 'pattern_highwatch_barley_porridge',
     chance: FARM_PATTERN_HEROIC_CHANCE,
-    rollGroup: 'heroic_farm_patterns',
+    rollGroup: FARM_HEROIC_PATTERN_GROUP,
   },
 ];
 

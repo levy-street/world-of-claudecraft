@@ -2,8 +2,8 @@
   "__provenance": {
     "run": "32190441549",
     "harvested": "2026-08-18",
-    "files": 2879,
-    "localMerge": "2026-08-21 farming absorb (masterwrought Phase 11d, ruling 11d-U1-SHARD): KEY UNION of the two parent harvests; the newer CI harvest (run 32190441549, 2851 rows) wins on every shared key and 28 rows only the other parent's table carried keep that table's measured weight, sourced from the older table (run 32103940330), whose own provenance reads: \"2026-08-20 v0.40.0 sync: 49 branch-only rows carried from the 2026-08-19 local measurement, CI-harvested weights untouched; files counts the merged table (2830 CI-harvested + 49 carried)\"; no weight is hand-written; files counts the merged table (2851 harvested + 28 carried)"
+    "files": 2883,
+    "localMerge": "2026-08-21 farming absorb (masterwrought Phase 11d, ruling 11d-U1-SHARD): KEY UNION of the two parent harvests; the newer CI harvest (run 32190441549, 2851 rows) wins on every shared key and 28 rows only the other parent's table carried keep that table's measured weight, sourced from the older table (run 32103940330), whose own provenance reads: \"2026-08-20 v0.40.0 sync: 49 branch-only rows carried from the 2026-08-19 local measurement, CI-harvested weights untouched; files counts the merged table (2830 CI-harvested + 49 carried)\"; no weight is hand-written; files counts the merged table (2851 harvested + 28 carried); 2026-08-22 masterwrought Phase 11f: FOUR branch-only rows carried from a local measurement (the median of three consecutive single-file runs each), for suites that do not exist on CI yet and so cannot be harvested: farm_golden_bonus 667, farm_pattern_items 1510, farm_seed_channels 1430, provisioner_firewall 332. Carried because without them the suite-completeness guard measured-coverage floor (95%) drops under the bar and the LPT balance claim stops being measured; no CI-harvested weight is touched"
   },
   "tests/abilities_command.test.ts": 1933,
   "tests/ability_audio_defers_to_recordings.test.ts": 171,
@@ -915,6 +915,9 @@
   "tests/far_terrain_detail.test.ts": 7,
   "tests/far_terrain_night.test.ts": 10,
   "tests/far_terrain_view.test.ts": 3865,
+  "tests/farm_golden_bonus.test.ts": 667,
+  "tests/farm_pattern_items.test.ts": 1510,
+  "tests/farm_seed_channels.test.ts": 1430,
   "tests/farshore.test.ts": 143,
   "tests/fct_core.test.ts": 15,
   "tests/fct_event.test.ts": 16,
@@ -2037,6 +2040,7 @@
   "tests/props_material_cutout.test.ts": 14,
   "tests/props_static_merge.test.ts": 25,
   "tests/provider_usage.test.ts": 21,
+  "tests/provisioner_firewall.test.ts": 332,
   "tests/ptr_dev_vendor.test.ts": 1920,
   "tests/pvp_honor_gear.test.ts": 29,
   "tests/pvp_record_core.test.ts": 19,

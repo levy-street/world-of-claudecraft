@@ -12,6 +12,7 @@ import { riftHeroicClearPool, riftNormalClearPool } from '../src/sim/rift/loot_p
 import { RIFT_TIER_INFO } from '../src/sim/rift/portals';
 import {
   addRiftClearGearLoot,
+  FARM_RIFT_DROP_ITEM_IDS,
   RIFT_BLUE_MOUNT_CHANCE,
   RIFT_BLUE_MOUNT_REINS,
   RIFT_COIN_BONUS_A,
@@ -956,17 +957,19 @@ describe('rift ranks: clear-time epic and legendary payout', () => {
     const epicIds = new Set<string>(riftHeroicClearPool());
     const normalIds = new Set<string>(riftNormalClearPool());
     const legendaryIds = new Set<string>(RIFT_LEGENDARY_ITEM_IDS);
-    // The mount ladder (draw 5) and the apex-pattern roll (draw 6, phase 11)
-    // are independent bonus draws layered over the gear payout this block
-    // pins, so both are filtered out of the gear view; the pattern draw has
-    // its own pins in tests/apex_pattern_items.test.ts.
+    // The mount ladder (draw 5), the apex-pattern roll (draw 6, phase 11) and
+    // the FARMING roll (draw 7, masterwrought Phase 11f) are independent bonus
+    // draws layered over the gear payout this block pins, so all three are
+    // filtered out of the gear view; each has its own pins
+    // (tests/apex_pattern_items.test.ts and tests/farm_pattern_items.test.ts).
     const bonusDrawIds = new Set<string>([
       ...RIFT_GREEN_MOUNT_REINS,
       ...RIFT_BLUE_MOUNT_REINS,
       ...RIFT_EPIC_MOUNT_REINS,
       ...RIFT_PATTERN_ITEM_IDS,
+      ...FARM_RIFT_DROP_ITEM_IDS,
     ]);
-    // Returns only the gear (non-mount, non-pattern) items from a clear.
+    // Returns only the gear (non-mount, non-pattern, non-farm) items.
     const run = (baseLevel: number, rngSeed: number) => {
       const boss = { loot: { copper: 0, items: [] }, lootable: false } as unknown as Entity;
       const ctx = { rng: new Rng(rngSeed) } as unknown as SimContext;
@@ -1051,13 +1054,15 @@ describe('rift ranks: clear-time epic and legendary payout', () => {
   });
 
   it('each rift legendary drops at its own declared 0.3% rate on S, and never below S', () => {
-    // Same bonus-draw filter as the gear block above: mounts (draw 5) and apex
-    // patterns (draw 6, phase 11) are independent rolls outside this claim.
+    // Same bonus-draw filter as the gear block above: mounts (draw 5), apex
+    // patterns (draw 6, phase 11) and the farming roll (draw 7, masterwrought
+    // Phase 11f) are independent rolls outside this claim.
     const bonusDrawIds = new Set<string>([
       ...RIFT_GREEN_MOUNT_REINS,
       ...RIFT_BLUE_MOUNT_REINS,
       ...RIFT_EPIC_MOUNT_REINS,
       ...RIFT_PATTERN_ITEM_IDS,
+      ...FARM_RIFT_DROP_ITEM_IDS,
     ]);
     const run = (baseLevel: number, rngSeed: number) => {
       const boss = { loot: { copper: 0, items: [] }, lootable: false } as unknown as Entity;

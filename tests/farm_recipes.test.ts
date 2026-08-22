@@ -70,7 +70,7 @@ const SCAFFOLDING_BY_RUNG: Record<number, [number, number]> = {
 //
 // 75 AND 100 BOTH READ 'rare', and that is MEASURED off the shipped defs, not
 // assigned. Phase 11f moved six rows up two bands and changed NO magnitude,
-// aura, charge or quality (11c owns those and R5 is measured against them), so
+// aura, charge or quality (11c owns those and masterwrought R5 is measured against them), so
 // the six arrive on their new rungs carrying the quality they already had.
 // Predicted before the climb and observed after: every one of the six is
 // 'rare'. That makes the farm ladder's top two bands read a lower quality than
@@ -307,7 +307,7 @@ describe('FARM_RECIPES: the farm-economy hook set', () => {
     }
   });
 
-  it("R20: farming's endgame-bill count, measured here and handed forward", () => {
+  it("masterwrought R20: farming's endgame-bill count, measured here and handed forward", () => {
     // masterwrought R20 asks whether every gathering profession reaches the
     // endgame, and its census spans five OTHER professions this phase does not
     // touch, so the cross-profession count is another phase's deliverable. What
@@ -316,7 +316,7 @@ describe('FARM_RECIPES: the farm-economy hook set', () => {
     //
     // The measure: recipes at skillReq 75 or above, anywhere in the merged
     // table, that name a farm reagent. Before the Phase 11f rung climb the only
-    // one was a crafted hoe, which is exactly the hole R20 exists to find:
+    // one was a crafted hoe, which is exactly the hole masterwrought R20 exists to find:
     // farming's whole FOOD output was trapped below cooking 50 while mining fed
     // 21 endgame bills.
     const farmItemIds = new Set(
@@ -342,12 +342,15 @@ describe('FARM_RECIPES: the farm-economy hook set', () => {
         'recipe_osmium_hoe',
       ].sort(),
     );
-    expect(endgameBills, "farming's endgame-bill count for the R20 census").toHaveLength(7);
-    // The claim R20 actually cares about, stated separately from the literal
+    expect(
+      endgameBills,
+      "farming's endgame-bill count for the masterwrought R20 census",
+    ).toHaveLength(7);
+    // The claim masterwrought R20 actually cares about, stated separately from the literal
     // above so a future re-tier that moves WHICH rows qualify still has to keep
     // the property true: produce reaches a CONSUMABLE endgame bill, not only a
     // tool. Without this clause the count could be satisfied by the hoe alone,
-    // which is the state R20 was written against.
+    // which is the state masterwrought R20 was written against.
     const consumableEndgame = endgameBills.filter(
       (r) => r.professionId === 'cooking' || r.professionId === 'alchemy',
     );
@@ -1078,7 +1081,7 @@ describe('FARM_RECIPES: a dish crafts for real, and fine twins never substitute 
   });
 });
 
-describe('FARM_RECIPES: the trainer on-ramp on the settled R8 fee curve', () => {
+describe('FARM_RECIPES: the trainer on-ramp on the settled masterwrought R8 fee curve', () => {
   // Deviation (aj) is DISCHARGED by Phase 11f and this describe is what proves
   // both halves. The deviation recorded that every farm row shipped trainable
   // before the farm opened; its Phase 6 QA addendum recorded the FEE half as a

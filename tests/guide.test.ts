@@ -1774,7 +1774,7 @@ describe('Guide professions generated content accuracy', () => {
         expect(row.skillReq).toBe(def.skillReq);
         expect(row.tier).toBe(tierForSkill(def.skillReq));
         expect(row.station).toBe(def.stationType ?? null);
-        // The channel split mirrors the generator's (phase 11, R8, widened at
+        // The channel split mirrors the generator's (phase 11, masterwrought R8, widened at
         // phase 11f): a drop-acquisition recipe whose teaching pattern is
         // stocked on the Heroic Quartermaster AND carried by a live drop table
         // renders as BOTH; one or the other alone renders as that one. The

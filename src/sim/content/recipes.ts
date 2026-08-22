@@ -2826,7 +2826,7 @@ export const HOE_RECIPES: ProfessionRecipeRecord[] = [
 // FARM_DROP_RUNG_FLOOR or above under the channel rule above, so it is not
 // trainer-taught at all and charges no fee, in advance or otherwise. What
 // remains trainer-taught is the rung 0 to 50 on-ramp, free at rung 0 on the
-// settled R8 fee curve's tier-0 point and fee-charging at 25 and 50; pinned in
+// settled masterwrought R8 fee curve's tier-0 point and fee-charging at 25 and 50; pinned in
 // tests/farm_recipes.test.ts.
 
 /** The rung at which a farm recipe stops being trainer homework and becomes a

@@ -6,7 +6,7 @@
 import { describe, expect, it } from 'vitest';
 import { resolvePosition } from '../src/sim/colliders';
 import { HEROIC_DUNGEON_TUNING, HEROIC_MARK_ITEM_ID } from '../src/sim/content/dungeon_difficulty';
-import { HEROIC_BOSS_LOOT } from '../src/sim/content/heroic_loot';
+import { FARM_HEROIC_PATTERN_GROUP, HEROIC_BOSS_LOOT } from '../src/sim/content/heroic_loot';
 import { HEROIC_MARK_LETTER } from '../src/sim/content/letters';
 import { FARM_RECIPES } from '../src/sim/content/recipes';
 import {
@@ -1563,7 +1563,7 @@ describe('dungeons: heroic boss drops', () => {
     for (const bossId of FIVE_MAN_FINAL_BOSSES) {
       const table = HEROIC_BOSS_LOOT[bossId];
       expect(table, bossId).toBeDefined();
-      const farmRows = table.filter((e) => e.rollGroup === 'heroic_farm_patterns');
+      const farmRows = table.filter((e) => e.rollGroup === FARM_HEROIC_PATTERN_GROUP);
       expect(farmRows.map((e) => e.itemId).sort(), bossId).toEqual(expectedIds);
       for (const row of farmRows) expect(row.chance, `${bossId} ${row.itemId}`).toBe(0.04);
       // THE APPEND POSITION IS THE CONTRACT, and it is the detail that is easy
@@ -1573,10 +1573,10 @@ describe('dungeons: heroic boss drops', () => {
       // position later. Appended after them it adds exactly one draw at the
       // very end and every existing heroic draw keeps its position.
       const lowestFarmIndex = Math.min(
-        ...table.flatMap((e, i) => (e.rollGroup === 'heroic_farm_patterns' ? [i] : [])),
+        ...table.flatMap((e, i) => (e.rollGroup === FARM_HEROIC_PATTERN_GROUP ? [i] : [])),
       );
       const highestOtherIndex = Math.max(
-        ...table.flatMap((e, i) => (e.rollGroup === 'heroic_farm_patterns' ? [] : [i])),
+        ...table.flatMap((e, i) => (e.rollGroup === FARM_HEROIC_PATTERN_GROUP ? [] : [i])),
       );
       expect(lowestFarmIndex, `${bossId}: the farm group must be appended last`).toBeGreaterThan(
         highestOtherIndex,
@@ -1586,7 +1586,7 @@ describe('dungeons: heroic boss drops', () => {
     // channel is on the base table) and the mid-boss (not a final boss).
     for (const bossId of ['nythraxis_scourge_of_thornpeak', 'wildheart_beastmaster']) {
       expect(
-        HEROIC_BOSS_LOOT[bossId].some((e) => e.rollGroup === 'heroic_farm_patterns'),
+        HEROIC_BOSS_LOOT[bossId].some((e) => e.rollGroup === FARM_HEROIC_PATTERN_GROUP),
         `${bossId} must not carry the five-man farm group`,
       ).toBe(false);
     }
@@ -1600,7 +1600,7 @@ describe('dungeons: heroic boss drops', () => {
     // rather than staying green on a table read alone.
     const patternIds = new Set(
       HEROIC_BOSS_LOOT.morthen
-        .filter((e) => e.rollGroup === 'heroic_farm_patterns')
+        .filter((e) => e.rollGroup === FARM_HEROIC_PATTERN_GROUP)
         .map((e) => e.itemId),
     );
     expect(patternIds.size).toBe(2);

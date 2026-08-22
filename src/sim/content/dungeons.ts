@@ -771,7 +771,7 @@ export const DUNGEON_MOBS: Record<string, MobTemplate> = {
       { itemId: 'pattern_masters_field_forge', chance: 0.04, rollGroup: 'nythraxis_patterns' },
       { itemId: 'pattern_makers_charm', chance: 0.04, rollGroup: 'nythraxis_patterns' },
       { itemId: 'pattern_voidbound_grimoire', chance: 0.04, rollGroup: 'nythraxis_patterns' },
-      // Farming's raid channel (Phase 11f, R8): the farm ladder's PINNACLE
+      // Farming's raid channel (Phase 11f, masterwrought R8): the farm ladder's PINNACLE
       // rides the pinnacle encounter. ONE more partitioned rollGroup at the
       // tail carrying pattern_harvest_feast (the party feast, now cooking 100)
       // and every TIER-4 seed, so a raid night can hand a farmer the recipe for

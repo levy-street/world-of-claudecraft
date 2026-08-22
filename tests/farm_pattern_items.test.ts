@@ -18,7 +18,7 @@
 import { describe, expect, it } from 'vitest';
 import { FARM_CROPS } from '../src/sim/content/farm_crops';
 import { FARM_PATTERN_ITEMS } from '../src/sim/content/farm_patterns';
-import { HEROIC_BOSS_LOOT } from '../src/sim/content/heroic_loot';
+import { FARM_HEROIC_PATTERN_GROUP, HEROIC_BOSS_LOOT } from '../src/sim/content/heroic_loot';
 import { HEROIC_VENDOR_STOCK } from '../src/sim/content/heroic_vendor';
 import { STATIONS } from '../src/sim/content/professions';
 import { ALL_RECIPES, FARM_DROP_RUNG_FLOOR, FARM_RECIPES } from '../src/sim/content/recipes';
@@ -139,7 +139,7 @@ describe('farm pattern defs', () => {
   it('mints no new proper noun: every name is the craft prefix plus a shipped dish name', () => {
     // The recorded naming verdict, asserted rather than trusted. Because each
     // name is built from an ALREADY SHIPPED output name behind a registered
-    // prefix, R15 and D17 are satisfied by construction and there is nothing
+    // prefix, masterwrought R15 and D17 are satisfied by construction and there is nothing
     // for a collision audit to check.
     for (const [id, def] of Object.entries(FARM_PATTERN_ITEMS)) {
       const taught = ALL_RECIPES.find((r) => r.id === def.teachesRecipeId);
@@ -151,14 +151,14 @@ describe('farm pattern defs', () => {
   });
 });
 
-describe('farm pattern channel wiring (R8: raid feast, five-man 75s, rift 100s, marks valve)', () => {
+describe('farm pattern channel wiring (masterwrought R8: raid feast, five-man 75s, rift 100s, marks valve)', () => {
   const raidFarmEntries = () =>
     MOBS.nythraxis_scourge_of_thornpeak.loot.filter(
       (entry) => entry.rollGroup === 'nythraxis_farm',
     );
   const fiveManPatternIds = new Set(
     HEROIC_BOSS_LOOT.morthen
-      .filter((e) => e.rollGroup === 'heroic_farm_patterns')
+      .filter((e) => e.rollGroup === FARM_HEROIC_PATTERN_GROUP)
       .map((e) => e.itemId as string),
   );
   const riftPatternIds = new Set(

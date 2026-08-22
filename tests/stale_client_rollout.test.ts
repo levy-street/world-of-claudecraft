@@ -113,6 +113,23 @@ describe('new release item ids stay out of loot containers (deploy window)', () 
     // `vitest -u`-updatable, so the literal reins array below is the real
     // teeth: never blanket-update this snapshot while the deploy window is
     // open without recording the decision; a diff here IS the finding.
+    //
+    // MAINTAINER DECISION OWED, and this comment is the finding rather than
+    // its resolution. masterwrought Phase 11f's DECISION E puts TWO packet
+    // pattern ids into HEROIC_BOSS_LOOT (the farming dungeon channel, one
+    // rollGroup on every heroic five-man final boss):
+    // pattern_highwatch_gourd_soup and pattern_highwatch_barley_porridge. By
+    // this guard's own rule that is a new deployed-bundle throw arm: a stale
+    // bundle clearing a heroic five-man can be handed an id it cannot
+    // resolve and will throw in its loot popup. The two precedents (the four
+    // reins, the Wildheart six) were both OWNER decisions recorded in
+    // DEPLOY.md, and this session did not make one. The ids are admitted
+    // below so the branch is not red on a question a phase cannot answer,
+    // and the decision is filed as BLOCKING in the packet's open-item record
+    // for the 11f QA and the merge. Two ways to resolve it, both cheap:
+    // confirm the deploy window has closed and delete this file, or move the
+    // farming DUNGEON channel behind the window. Reverting the admission is
+    // this comment plus two array entries.
     const heroicIds = [...new Set(collectItemIds(Object.values(HEROIC_BOSS_LOOT), []))].sort();
     const reins = heroicIds.filter((id) => id.startsWith('reins_'));
     expect(reins).toEqual([

@@ -257,7 +257,7 @@ export const RIFT_PATTERN_ITEM_IDS = [
 ] as const;
 export const RIFT_PATTERN_CHANCE = 0.08; // one draw per winning B/A/S clear
 
-/** Farming's RIFT channel (masterwrought Phase 11f, R8): the three rung-100
+/** Farming's RIFT channel (Phase 11f, masterwrought R8): the three rung-100
  *  farm patterns the raid does not carry, plus every tier-3 and tier-4 seed, as
  *  the appended draw AFTER the apex-pattern roll on winning B/A/S clears.
  *

@@ -478,10 +478,14 @@ describe('every professions grant site is accounted for (#2430)', () => {
     // both outcomes, so it counts once), and the celebrations phase's two
     // golden-harvest sites in harvestCrop's grantGolden closure (the signed
     // addItemInstance for what fits, the plain addItem overflow remainder;
-    // one closure serves both grades, so the pair counts once). All eight
-    // carry both flags, because farmHarvested / farmWithered /
-    // farmHusksConverted own the whole player feedback.
-    'farming.ts': 8,
+    // one closure serves both grades, so the pair counts once), and
+    // masterwrought Phase 11f's golden BONUS grant (one extra item on a golden
+    // win: a next-tier seed or a farming pattern). All nine carry both flags,
+    // because farmHarvested / farmWithered / farmHusksConverted own the whole
+    // player feedback; the bonus is named on farmHarvested as
+    // goldenBonusItemId, the seedBackCount idiom, so it has a line of its own
+    // in the client without a second hub grant line.
+    'farming.ts': 9,
     'fishing.ts': 2,
     'gathering.ts': 2,
     // Masterwrought phase 04: the two core delivery arms (heroic/raid kill

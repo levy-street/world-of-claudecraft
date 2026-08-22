@@ -27,6 +27,7 @@ import {
   FARM_WITHERED_HUSK_ITEM_ID,
 } from '../src/sim/content/farm_crops';
 import { FARM_PATCHES } from '../src/sim/content/farm_patches';
+import { FARM_PATTERN_ITEMS } from '../src/sim/content/farm_patterns';
 import { HEROIC_VENDOR_STOCK } from '../src/sim/content/heroic_vendor';
 import { FISHING_TABLES_BY_BAND } from '../src/sim/content/items';
 import { GATHERING_PROFESSIONS, STATIONS } from '../src/sim/content/professions';
@@ -1196,16 +1197,43 @@ describe('the farming ladder: every farming zone arrives mechanically whole', ()
       }
     }
     // The two NON-NPC purchase counters (the Marks route) are acquisition
-    // surfaces too: a heroic or delve row naming ANY farming item would open
-    // a faucet the NPC walk cannot see, so both tables stay farming-free
-    // entirely, never-stocked set included, with per-table non-vacuity.
+    // surfaces too: a row naming a farming item there opens a faucet the NPC
+    // walk cannot see. The DELVE shops stay farming-free entirely; the HEROIC
+    // quartermaster no longer does, and the exception is named rather than the
+    // sweep being dropped.
+    //
+    // masterwrought Phase 11f's DECISION E put exactly two families on that
+    // counter at the 12-mark ring point: the eight tier-3 and tier-4 SEEDS
+    // (additive reach beside 11e's copper floor, never a replacement for it,
+    // pinned in tests/farm_seed_channels.test.ts) and the six farming
+    // PATTERNS (the D13 valve that makes the luck-gated drop arms legal). The
+    // allowlist below is derived from the crop catalog and the pattern table,
+    // so it cannot quietly widen to a tier-1 seed, a hoe, produce, a fine
+    // twin, or a dish: every one of those still reds here.
+    const MARKS_ALLOWED = new Set<string>([
+      ...Object.values(FARM_CROPS)
+        .filter((crop) => crop.tier >= 3)
+        .map((crop) => crop.seedItemId),
+      ...Object.keys(FARM_PATTERN_ITEMS),
+    ]);
+    expect(MARKS_ALLOWED.size, 'eight upper seeds plus six patterns').toBe(14);
     expect(HEROIC_VENDOR_STOCK.length).toBeGreaterThan(0);
+    let marksFarmingRows = 0;
     for (const offer of HEROIC_VENDOR_STOCK) {
+      if (MARKS_ALLOWED.has(offer.itemId)) {
+        marksFarmingRows += 1;
+        continue;
+      }
       expect(
         farmingItemIds.has(offer.itemId) || NEVER_STOCKED.has(offer.itemId),
         `heroic vendor stocks farming item ${offer.itemId}`,
       ).toBe(false);
     }
+    // The allowance is not a hole: every allowed row must ACTUALLY be on the
+    // counter, so the exception cannot outlive the channel it was written for.
+    expect(marksFarmingRows, 'the ruled marks rows must really be stocked').toBe(
+      MARKS_ALLOWED.size,
+    );
     let delveRowsSeen = 0;
     for (const [delveId, entries] of Object.entries(DELVE_SHOPS)) {
       for (const entry of entries) {

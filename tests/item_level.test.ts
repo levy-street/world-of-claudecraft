@@ -236,10 +236,15 @@ describe('item level: heroic boss drops are budget-exact (five-mans 31, raid 33/
     // its explicit table lists the three heroic-only weapons (item level 33) plus
     // the two blue mount reins secondary paths (excluded from budget sweep below).
     // Mount reins (kind 'mount') have no item level; only armor/weapon entries are
-    // budget-enforced.
+    // budget-enforced. The same is true of the farming PATTERNS masterwrought
+    // Phase 11f appended to every five-man table (kind 'recipe'): a pattern
+    // carries no slot, so itemLevel() is undefined for it and the budget sweep
+    // would be asking a meaningless question. Excluded by KIND, like the
+    // reins, rather than by naming its group, because the reason is the same
+    // one: it is not gear.
     const isGearEntry = (itemId: string): boolean => {
       const item = ITEMS[itemId];
-      return !!item && item.kind !== 'mount';
+      return !!item && item.kind !== 'mount' && item.kind !== 'recipe';
     };
     const raidIds = new Set(
       (HEROIC_BOSS_LOOT.nythraxis_scourge_of_thornpeak ?? []).flatMap((e) =>

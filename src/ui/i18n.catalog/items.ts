@@ -2985,7 +2985,7 @@ const APPENDED_ITEM_NAMES: Partial<Record<ItemEntityId, string>> = {
   harvest_feast: 'Harvest Feast',
   // The six farming patterns (Phase 11f, content/farm_patterns.ts). NO NEW
   // COINAGE: every name is the registered cooking prefix "Recipe:" plus a dish
-  // name already shipped above, so R15 and D17 are satisfied by construction
+  // name already shipped above, so masterwrought R15 and D17 are satisfied by construction
   // and the verdict is recorded in docs/prd/masterwrought/naming-audit.md.
   // Several are wordy in English, so M16 non-Latin fills land with them.
   pattern_highwatch_gourd_soup: 'Recipe: Highwatch Gourd Soup',
