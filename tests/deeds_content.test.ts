@@ -1215,7 +1215,7 @@ describe('trigger references resolve against the real content tables', () => {
     // above is over the set the evaluator reads.
     const trigger = DEEDS.col_farm_roster.trigger;
     expect(trigger.kind).toBe('visits');
-    if (trigger.kind === 'visits') expect(trigger.markIds.sort()).toEqual(marks);
+    if (trigger.kind === 'visits') expect([...trigger.markIds].sort()).toEqual(marks);
   });
 
   it('every visited mark belongs to an authored namespace and resolves to real content', () => {
@@ -1307,6 +1307,14 @@ describe('trigger references resolve against the real content tables', () => {
           rest === 'planted' || FARM_CHRONICLE_ZONES.includes(rest),
           `${deedId}: ${mark}`,
         ).toBe(true);
+      } else if (ns === 'farm_crop') {
+        // Per-crop first-harvest collection marks (masterwrought DECISION E),
+        // written by the same onCropHarvestedForDeeds hook. Resolved against
+        // the live catalog like its siblings: the ids are generated today, so
+        // a stray mark is impossible by construction, but this is what catches
+        // a HAND-AUTHORED one later, which is the only way the namespace could
+        // grow past the catalog it is supposed to mirror.
+        expect(FARM_CROP_IDS.has(mark.slice('farm_crop:'.length)), `${deedId}: ${mark}`).toBe(true);
       } else if (ns === 'craft_rare') {
         // Written by professions/crafting.ts craftItem the first time a
         // player crafts a rare-or-better output in that craft (#2055).

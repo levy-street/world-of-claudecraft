@@ -492,7 +492,7 @@ describe('FARMING_GAIN_SCHEDULE and the composed ceiling', () => {
     expect(farmingTeachingCeilingFor(0)).toBe(50);
   });
 
-  it('zeroes the gain at or past the crop tier ceiling, the masterwrought R19 composition', () => {
+  it('zeroes the gain at or past the crop tier ceiling, the R19 composition', () => {
     // The schedule truth, live now that the crop ladder ships all four tiers:
     // a tier-1 crop teaches to 50, a tier-2 crop to 75, and tier 3 and 4
     // crops to 100 (the composed ceiling above).
@@ -3280,6 +3280,44 @@ describe('the celebration marks: farm:planted and the farm:<zone> chronicle', ()
       harvestCrop(h.sim.ctx, h.sim.player, h.meta, bedId);
       expect(h.meta.deedStats.visited.has(`farm:${zone}`), zone).toBe(true);
     }
+  });
+
+  it('WRITES the per-crop farm_crop mark on a survived harvest, per crop', () => {
+    // The roster deed's collection is only reachable if this mark is actually
+    // written, and nothing else in the suite proves the WRITER runs: the
+    // save/load trap in tests/deeds_content.test.ts hand-adds the marks and
+    // proves the load half, and the content pin proves the deed's markIds, so
+    // deleting the write would leave both green and the deed permanently
+    // unearnable. That is the same failure class the namespace trap exists
+    // for, one layer up, which is why this arm drives a real harvest.
+    for (const cropId of ['vale_wheat', 'brook_carrot']) {
+      const crop = FARM_CROPS[cropId] as FarmCropDef;
+      const h = makeHarness();
+      h.sim.addItem(crop.seedItemId, 1, h.pid);
+      plantCrop(h.sim.ctx, h.sim.player, h.meta, BED, cropId);
+      clearCast(h.sim);
+      h.advance(crop.durationMs);
+      (h.meta.farmPlots.get(BED) as PlotState).survivalRoll = 0;
+      harvestCrop(h.sim.ctx, h.sim.player, h.meta, BED);
+      expect(h.meta.deedStats.visited.has(`farm_crop:${cropId}`), cropId).toBe(true);
+      // Scoped to the crop actually grown: harvesting one does not mark the
+      // whole roster, which is what makes the collection a collection.
+      for (const other of Object.keys(FARM_CROPS)) {
+        if (other === cropId) continue;
+        expect(h.meta.deedStats.visited.has(`farm_crop:${other}`), other).toBe(false);
+      }
+    }
+  });
+
+  it('never writes a farm_crop mark for a WITHERED harvest', () => {
+    const h = makeHarness();
+    giveSeeds(h);
+    plant(h);
+    clearCast(h.sim);
+    h.advance(CROP.durationMs);
+    (h.meta.farmPlots.get(BED) as PlotState).survivalRoll = 0.99;
+    harvest(h);
+    expect(h.meta.deedStats.visited.has(`farm_crop:${CROP_ID}`)).toBe(false);
   });
 
   it('never chronicles a WITHERED harvest (weeds and boots do not count)', () => {

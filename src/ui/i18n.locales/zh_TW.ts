@@ -9904,11 +9904,11 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'entities.npcs.farmer_teasel.greeting': '沼澤稻米和沼澤甜菜的種子，{className}，還有餵養它們的堆肥。稻田排水慢，腳下留神。',
   'entities.npcs.farmer_hollis.name': '農夫霍利斯',
   'entities.npcs.farmer_hollis.title': '高望梯田農夫',
-  'entities.npcs.farmer_hollis.greeting': '梯田只給山肯給的那麼多，{className}。我賣堆肥，要是你的莊稼枯萎了，我可以把穀殼重新漚成好土給你。',
+  'entities.npcs.farmer_hollis.greeting': '梯田只給山肯給的那麼多，{className}。我賣種子和堆肥，要是你的莊稼枯萎了，我可以把穀殼重新漚成好土給你。',
   'entities.npcs.farmer_verbena.name': '農婦維貝娜',
   'entities.npcs.farmer_verbena.title': '花壇園丁',
   'entities.npcs.farmer_verbena.greeting':
-    '當心鑲邊，{playerName}，這些田畦可是花壇的驕傲。我賣的是堆肥，你帶來的枯萎穀殼，我都能給你變成更多堆肥。',
+    '當心鑲邊，{playerName}，這些田畦可是花壇的驕傲。我賣的是種子和堆肥，你帶來的枯萎穀殼，我都能給你變成更多堆肥。',
   'entities.npcs.weaver_ottilie.name': '奧蒂莉織工',
   'entities.npcs.weaver_ottilie.title': '織機大師',
   'entities.npcs.weaver_ottilie.greeting': '當心絲線，{className}。在織機前，穩的手勝過有力的手。',

@@ -14975,12 +14975,12 @@ export const ko_KR: EnTranslations = {
       "farmer_hollis": {
         "name": "농부 홀리스",
         "title": "하이워치 계단밭 농부",
-        "greeting": "계단밭은 산이 허락하는 만큼만 내주지, {className}. 퇴비를 팔고 있고, 그대의 작물이 시들어 올라오면 그 껍질을 다시 좋은 흙으로 만들어 주겠소."
+        "greeting": "계단밭은 산이 허락하는 만큼만 내주지, {className}. 씨앗과 퇴비를 팔고 있고, 그대의 작물이 시들어 올라오면 그 껍질을 다시 좋은 흙으로 만들어 주겠소."
       },
       "farmer_verbena": {
         "name": "농부 버베나",
         "title": "파르테르 정원사",
-        "greeting": "가장자리를 조심하세요, {playerName}, 이 밭들은 파르테르의 자랑이니까요. 파는 건 퇴비이고, 가져오신 시든 껍질은 무엇이든 퇴비로 바꿔 드리겠어요."
+        "greeting": "가장자리를 조심하세요, {playerName}, 이 밭들은 파르테르의 자랑이니까요. 파는 건 씨앗과 퇴비이고, 가져오신 시든 껍질은 무엇이든 퇴비로 바꿔 드리겠어요."
       },
       "tidewatcher_ondrel": {
         "name": "온드렐 베인",

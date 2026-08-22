@@ -10348,11 +10348,11 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.npcs.farmer_hollis.name': '農夫ホリス',
   'entities.npcs.farmer_hollis.title': 'ハイウォッチの段々畑農夫',
   'entities.npcs.farmer_hollis.greeting':
-    '段々畑は山が許すぶんだけ実る、{className}。堆肥を売っているし、あんたの作物が枯れて上がってきたら、その籾殻を良い土に戻してやろう。',
+    '段々畑は山が許すぶんだけ実る、{className}。種と堆肥を売っているし、あんたの作物が枯れて上がってきたら、その籾殻を良い土に戻してやろう。',
   'entities.npcs.farmer_verbena.name': '農婦ヴァーベナ',
   'entities.npcs.farmer_verbena.title': 'パルテールの庭師',
   'entities.npcs.farmer_verbena.greeting':
-    '縁取りに気をつけて、{playerName}、この畑はパルテールの誇りなんだから。売っているのは堆肥、それと持ってきた枯れた籾殻はどれも堆肥に変えてあげる。',
+    '縁取りに気をつけて、{playerName}、この畑はパルテールの誇りなんだから。売っているのは種と堆肥、それと持ってきた枯れた籾殻はどれも堆肥に変えてあげる。',
   'entities.npcs.weaver_ottilie.name': '織り手オッティリー',
   'entities.npcs.weaver_ottilie.title': '機織り場の主',
   'entities.npcs.weaver_ottilie.greeting':

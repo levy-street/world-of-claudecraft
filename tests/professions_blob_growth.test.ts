@@ -410,7 +410,7 @@ function ceilingSim(nowMs?: number): Sim {
   // WIDEST id the catalog carries. Derived, with the winner pinned, so a
   // future longer id moves the fixture and forces this ceiling re-read.
   const widestCropId = Object.keys(FARM_CROPS).reduce((a, b) => (b.length > a.length ? b : a));
-  if (widestCropId !== 'evergarden_greens')
+  if (widestCropId !== 'evergarden_pumpkin')
     throw new Error('widest crop id changed; re-measure and re-mint the ceiling');
   const plantAnchorMs = nowMs ?? 1_000;
   for (const bedId of FARM_BED_IDS) {
@@ -608,12 +608,20 @@ describe('the professions blob growth bound (phase 16)', () => {
     expect(Object.keys(s2.farmPlots ?? {})).toHaveLength(FARM_BED_IDS.size);
 
     // The byte bound itself, on the settled state: the two-sided tracking
-    // band around the production-shape measurement (16,704 settled bytes:
-    // every bed planted full-width at epoch anchor width beside every
-    // masterwrought field and all four tool-effect slots; the authoritative
-    // narrative lives at the bound's note above). A re-measure obligation,
-    // not the structural ceiling: drift past either edge reds here and
-    // forces the note to be re-read.
+    // band around the production-shape measurement (every bed planted
+    // full-width at epoch anchor width beside every masterwrought field and
+    // all four tool-effect slots; the authoritative narrative lives at the
+    // bound's note above). A re-measure obligation, not the structural
+    // ceiling: drift past either edge reds here and forces the note to be
+    // re-read.
+    //
+    // RE-MEASURED at Phase 11e: 16,727 bytes, up from 16,704. The whole delta
+    // is the crop-id column: evergarden_pumpkin is one character wider than
+    // evergarden_greens and the fixture plants it in all 23 beds, so +1 x 23.
+    // The BAND ITSELF DID NOT MOVE, because the widening landed inside it;
+    // recorded here rather than left at the old figure, since a narrative
+    // naming a number the tree no longer holds is what makes a stale bound
+    // look corroborated.
     const bytes = professionsBytes(s2);
     expect(bytes).toBeGreaterThan(16544);
     expect(bytes).toBeLessThan(16864);

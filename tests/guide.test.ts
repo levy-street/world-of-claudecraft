@@ -2075,18 +2075,26 @@ describe('Guide professions gathering accuracy', () => {
     // never the retired no-deeds-yet leaf.
     expect(html).toContain('its own shelf in the Book of Deeds');
     expect(html).not.toContain('keeps no deeds of its own yet');
-    // The (bo) dormancy disclosure: while the tier 3/4 seed faucet is absent
-    // (the D11 ruling), BOTH farming prose sections must keep the later-patch
-    // idiom (gatherDeeds.farmingSown for Harvestmaster, farm.tableBody for the
-    // top dishes and the feast). A reword that drops either disclosure would
-    // advertise dormant content as live, which the purchase-surface sweeps in
-    // tests/deeds_content.test.ts and tests/professions_zone_rollout.test.ts
-    // cannot see (they red only on vendor-shaped faucets). The D11 phase
-    // retires these two pins WITH its prose revisit.
+    // THE (bo) DORMANCY DISCLOSURE, INVERTED at Phase 11e rather than deleted.
+    // It used to require BOTH farming prose sections to carry the later-patch
+    // idiom, because the tier 3/4 seed faucet was absent and advertising that
+    // content as live would have been a lie no purchase-surface sweep could
+    // see. GATE 1 shipped the faucet, so the disclosure became the lie, and
+    // this pin now guards the other direction: neither section may still tell
+    // a player the upper fields are a later patch.
+    //
+    // Kept as an assertion rather than dropped, for the same reason the deed
+    // honesty arm was inverted rather than removed: deleting it would leave
+    // nothing saying the prose has to track the faucet, and this is the ONLY
+    // guard over hand-authored guide.* prose (tests regenerate and diff
+    // content.generated.ts, which cannot see these strings at all).
     expect(
       html.split('comes within reach with a later patch').length - 1,
-      'both farming sections must carry the later-patch dormancy disclosure',
-    ).toBe(2);
+      'the faucet shipped: no farming section may still disclose dormancy',
+    ).toBe(0);
+    // ...and the positive half, so the sections did not simply lose their
+    // prose: both still describe what a player can now actually do.
+    expect(html).toContain('Every Furrow Filled');
     expect(html).toContain('Farmer Jessica');
     // Tied to the live NPC name so a rename cannot leave the page lying.
     expect(html).toContain(NPCS.farmer_jessica.name);

@@ -2130,7 +2130,7 @@ export const VISITED_MARK_NAMESPACES = [
   // keeps them across saves (the gather_event lesson above).
   'farm',
   // Per-CROP first-harvest marks, farm_crop:<cropId>, the collection behind
-  // prog_farm_roster (masterwrought DECISION E). A separate namespace from
+  // col_farm_roster (masterwrought DECISION E). A separate namespace from
   // 'farm' above on purpose: that one is zone-keyed and closed at four, this
   // one is crop-keyed and grows with the catalog, so keeping them apart is
   // what lets each be reasoned about on its own.

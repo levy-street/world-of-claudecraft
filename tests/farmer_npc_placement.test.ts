@@ -223,8 +223,25 @@ describe('the farmer NPCs: seated beside their beds in the real world', () => {
         'garden_hoe',
       ],
       farmer_teasel: ['marsh_rice_seed', 'bog_beet_seed', 'compost'],
-      farmer_hollis: ['compost'],
-      farmer_verbena: ['compost'],
+      // GATE 1 (Phase 11e) stocked the upper two counters. This arm is the
+      // SPAWNED-entity twin of the def-level table in
+      // tests/professions_zone_rollout.test.ts: that one proves the content
+      // record, this one proves the entity a player actually walks up to
+      // carries it, so both move together or the pair stops meaning anything.
+      farmer_hollis: [
+        'compost',
+        'highland_barley_seed',
+        'frost_gourd_seed',
+        'thornpeak_cabbage_seed',
+        'frost_lentils_seed',
+      ],
+      farmer_verbena: [
+        'compost',
+        'gilded_sunmelon_seed',
+        'evergarden_greens_seed',
+        'gilded_yam_seed',
+        'evergarden_pumpkin_seed',
+      ],
     };
     for (const { id } of FARMERS) {
       expect(spawned(sim, id).vendorItems, id).toEqual(stock[id]);

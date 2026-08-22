@@ -814,11 +814,13 @@ describe('real catalog integration', () => {
     // the five Phase 18 Reliquary completion-ladder deeds, and the release's
     // walk-in castle visit pair; col_reliquary_complete is the catalog's one
     // off-prefix feat, so it sits outside the completion denominator like the
-    // three feat_ deeds).
-    expect(view.summary.visibleTotal).toBe(273);
+    // three feat_ deeds). Phase 11e appends col_farm_roster, an ordinary
+    // non-feat collection deed, so it joins BOTH counts: 273 to 274 and 277
+    // to 278.
+    expect(view.summary.visibleTotal).toBe(274);
     // The bucket sum adds the feat-flagged rows back on top (3 on the Feats
     // shelf plus the off-prefix capstone on Collection).
-    expect(view.categories.reduce((n, c) => n + c.visible, 0)).toBe(277);
+    expect(view.categories.reduce((n, c) => n + c.visible, 0)).toBe(278);
   });
 
   it('offers exactly the live catalog border deeds once they are earned', () => {

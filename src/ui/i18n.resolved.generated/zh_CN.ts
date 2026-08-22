@@ -14975,12 +14975,12 @@ export const zh_CN: EnTranslations = {
       "farmer_hollis": {
         "name": "农夫霍利斯",
         "title": "高望梯田农夫",
-        "greeting": "梯田只给山肯给的那么多，{className}。我卖堆肥，要是你的庄稼枯萎了，我可以把谷壳重新沤成好土给你。"
+        "greeting": "梯田只给山肯给的那么多，{className}。我卖种子和堆肥，要是你的庄稼枯萎了，我可以把谷壳重新沤成好土给你。"
       },
       "farmer_verbena": {
         "name": "农妇维贝娜",
         "title": "花坛园丁",
-        "greeting": "当心镶边，{playerName}，这些田畦可是花坛的骄傲。我卖的是堆肥，你带来的枯萎谷壳，我都能给你变成更多堆肥。"
+        "greeting": "当心镶边，{playerName}，这些田畦可是花坛的骄傲。我卖的是种子和堆肥，你带来的枯萎谷壳，我都能给你变成更多堆肥。"
       },
       "tidewatcher_ondrel": {
         "name": "翁德雷尔·凡恩",

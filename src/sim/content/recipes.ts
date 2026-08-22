@@ -2891,8 +2891,9 @@ export const FARM_RECIPES: ProfessionRecipeRecord[] = [
     // A griddle flatcake off the wall kitchens, salted hard because it is
     // carried cold on watch, with shredded cabbage worked through the batter.
     // The base tier-3 grain keeps its own demand at 4 per bannock; Phase 11e
-    // ADDED the cabbage pair alongside it (R18: added, never substituted), so
-    // this stopped being the one rung-50 dish with no fine twin in it.
+    // ADDED the cabbage pair alongside it (masterwrought R18: added, never
+    // substituted), so this stopped being the one rung-50 dish with no fine
+    // twin in it.
     reagents: [
       { itemId: 'highland_barley', count: 4 },
       { itemId: 'thornpeak_cabbage', count: 2 },

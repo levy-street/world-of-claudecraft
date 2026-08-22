@@ -10528,11 +10528,11 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.npcs.farmer_hollis.name': 'Фермер Холлис',
   'entities.npcs.farmer_hollis.title': 'Террасник Хайвотча',
   'entities.npcs.farmer_hollis.greeting':
-    'Террасы дают столько, сколько позволяет гора, {className}. Я продаю компост, а если твой урожай засохнет, я переработаю шелуху обратно в добрую землю.',
+    'Террасы дают столько, сколько позволяет гора, {className}. Я продаю семена и компост, а если твой урожай засохнет, я переработаю шелуху обратно в добрую землю.',
   'entities.npcs.farmer_verbena.name': 'Фермер Вербена',
   'entities.npcs.farmer_verbena.title': 'Садовница партера',
   'entities.npcs.farmer_verbena.greeting':
-    'Осторожнее с бордюром, {playerName}, эти грядки гордость партера. Я продаю компост, а любую засохшую шелуху, что ты принесёшь, превращу в новый.',
+    'Осторожнее с бордюром, {playerName}, эти грядки гордость партера. Я продаю семена и компост, а любую засохшую шелуху, что ты принесёшь, превращу в новый.',
   'entities.npcs.weaver_ottilie.name': 'Ткачиха Оттилия',
   'entities.npcs.weaver_ottilie.title': 'Хозяйка ткацкого стана',
   'entities.npcs.weaver_ottilie.greeting':

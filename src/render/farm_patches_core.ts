@@ -21,10 +21,11 @@ import { farmGrowthStage } from '../sim/professions/farm_projection';
 import type { FarmPatchDef, FarmPlotStatus, FarmPlotView } from '../world_api/farming';
 
 /**
- * The three crop silhouettes the art carries. Eight crops share three model
- * families rather than shipping eight sets of stage meshes: a stalk crop, a
+ * The three crop silhouettes the art carries. TWELVE crops share three model
+ * families rather than shipping twelve sets of stage meshes: a stalk crop, a
  * leafy or root crop, and a fruiting vine. Per-crop identity comes from the
- * accent tint below, not from geometry.
+ * accent tint below, not from geometry, which is why the roster can widen
+ * without the art doing so.
  */
 export type FarmCropFamily = 'grain' | 'rootleaf' | 'gourd';
 
@@ -51,6 +52,15 @@ export const FARM_CROP_FAMILY: Readonly<Record<string, FarmCropFamily>> = Object
   evergarden_greens: 'rootleaf',
   frost_gourd: 'gourd',
   gilded_sunmelon: 'gourd',
+  // Phase 11e's four. The family is a SILHOUETTE, not the plant class the
+  // content rule tracks, which is why a leaf, a legume and a tuber can share
+  // one: cabbage, lentils and yam all read as low leafy or root mass at
+  // gameplay camera range, and the accent tint below is what tells them apart.
+  // The pumpkin is a fruiting vine like its gourd siblings.
+  thornpeak_cabbage: 'rootleaf',
+  frost_lentils: 'rootleaf',
+  gilded_yam: 'rootleaf',
+  evergarden_pumpkin: 'gourd',
 });
 
 /** The tint multiplied into the stage mesh's `crop_accent` material, which is
@@ -65,6 +75,17 @@ export const FARM_CROP_ACCENT: Readonly<Record<string, number>> = Object.freeze(
   frost_gourd: 0x9ec8e4, // ice blue
   gilded_sunmelon: 0xf0a83c, // gold-orange
   evergarden_greens: 0x2f6b34, // deep green
+  // Phase 11e's four, each chosen against the SIBLINGS IT SHARES A FAMILY
+  // WITH, since that is the pair the tint has to separate. The three new
+  // rootleaf crops sit well away from brook_carrot's orange and
+  // evergarden_greens' deep green; the pumpkin is deliberately a dark russet
+  // rather than another bright orange, because gilded_sunmelon is already a
+  // gold-orange gourd and two bright orange vines would be the exact
+  // indistinguishability this table exists to prevent.
+  thornpeak_cabbage: 0x8fbf7a, // sage green
+  frost_lentils: 0x6b7f52, // olive
+  gilded_yam: 0x8a5a3c, // warm brown
+  evergarden_pumpkin: 0x9c3d10, // dark russet
 });
 
 /** The fallback family a crop id with no row takes. Reachable only from a
