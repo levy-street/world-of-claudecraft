@@ -1110,6 +1110,11 @@ describe('count-form gathering deeds stay earnable', () => {
     const reachableCeiling = Math.max(
       ...Object.values(FARM_CROPS).map((crop) => farmingTeachingCeilingFor(crop.tier)),
     );
+    // The ceiling reaches the deed's own demand. Stated ONCE (the redundant
+    // toBeGreaterThanOrEqual(100) that sat below the trigger check was removed
+    // at the 11e QA: toBe(100) already implies it), and read against the
+    // trigger's own amount rather than a second literal, so a re-tuned deed
+    // moves both halves together.
     expect(reachableCeiling).toBe(100);
     const farming100 = DEEDS.prog_farming_100;
     expect(farming100.trigger).toEqual({
@@ -1117,7 +1122,15 @@ describe('count-form gathering deeds stay earnable', () => {
       professionId: 'farming',
       amount: 100,
     });
-    expect(reachableCeiling).toBeGreaterThanOrEqual(100);
+    // NOTE ON WHAT THIS ARM DOES AND DOES NOT PROVE, corrected at the 11e QA:
+    // farmingTeachingCeilingFor reads the schedule's boundary column and knows
+    // nothing about whether anything is STOCKED, so the ceiling alone cannot
+    // show the deed is earnable. The GATE 1 teeth in this test are the stocked
+    // and positive-buyValue arms above; this pair states the other half, that
+    // the ceiling the crops can teach to actually meets the deed's amount.
+    if (farming100.trigger.kind === 'gathering') {
+      expect(reachableCeiling).toBeGreaterThanOrEqual(farming100.trigger.amount);
+    }
     // ...and the transitively parked capstone unparks with it. Read off the
     // capstone's LIVE trigger rather than the private list it is built from, so
     // this cannot drift from what the evaluator actually requires.

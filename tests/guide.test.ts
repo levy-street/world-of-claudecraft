@@ -2101,9 +2101,35 @@ describe('Guide professions gathering accuracy', () => {
     expect(html).toContain('Every Furrow Filled');
     // farm.tableBody:
     expect(html).toContain('the whole set is cooking today');
+    // farm.bedsBody. THE SECTION THAT ACTUALLY WENT STALE, and until the 11e QA
+    // the only section with no anchor tying it to the faucet: its two anchors
+    // were Jessica alone, who has stocked the Vale pair since the growth engine
+    // shipped, so the sentence GATE 1 rewrote (the one that used to say no
+    // counter sells the Highwatch or Evergarden seeds) could have reverted with
+    // this guard fully green. Anchored on both upper farmers now, by LIVE name.
     expect(html).toContain('Farmer Jessica');
     // Tied to the live NPC name so a rename cannot leave the page lying.
     expect(html).toContain(NPCS.farmer_jessica.name);
+    // The prose names these two by bare first name (Jessica alone gets the
+    // "Farmer" form), so tie the bare name to the live NPC name rather than
+    // matching the full string: a rename that moves the word still reds.
+    for (const [npcId, spoken] of [
+      ['farmer_hollis', 'Hollis'],
+      ['farmer_verbena', 'Verbena'],
+    ] as const) {
+      expect(NPCS[npcId].name, `${npcId} name must contain the word the prose uses`).toContain(
+        spoken,
+      );
+      expect(html).toContain(spoken);
+    }
+    // ...and the prose is tied to the MECHANIC, not just to the names: both
+    // counters must really stock the seeds the sentence sends a player to. This
+    // is the half a name check cannot give, and the half that was missing.
+    for (const npcId of ['farmer_hollis', 'farmer_verbena'] as const) {
+      const stocked = NPCS[npcId].vendorItems ?? [];
+      const seeds = stocked.filter((id) => id.endsWith('_seed'));
+      expect(seeds.length, `${npcId} must stock the seeds bedsBody promises`).toBe(4);
+    }
     expect(html).toContain('Harvest Journal');
     expect(html).toContain('withered husks');
     // The guard itself stays honest on its absent side: a toolless record

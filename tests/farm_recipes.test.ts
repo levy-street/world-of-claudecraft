@@ -83,7 +83,18 @@ const ALLOWED_FOOD_CURVE_POINTS: readonly (readonly [number, number])[] = [
 // list stops spanning its own domain the moment a crop is added, and then this
 // suite passes over a twin with no consumer while still claiming to cover
 // every one. Phase 11e is exactly that case (five twins became nine).
-const HOE_REAGENT_TWINS = ['fine_vale_wheat', 'fine_marsh_rice', 'fine_highland_barley'];
+// DERIVED from the hoe recipes, not hand-listed (corrected at the 11e QA: as a
+// hand list of three, a hoe recipe that stopped consuming fine_vale_wheat would
+// have left the twin with no consumer anywhere while both arms below stayed
+// green, because each only ever checked the list against itself). The literal
+// stays as a pin beneath it, so the derivation moving is a visible edit.
+const HOE_REAGENT_TWINS = [
+  ...new Set(
+    ALL_RECIPES.filter((r) => r.resultItemId.endsWith('_hoe'))
+      .flatMap((r) => r.reagents.map((g) => g.itemId))
+      .filter((id) => id.startsWith('fine_')),
+  ),
+].sort();
 const FINE_TWINS_CLOSED_HERE = Object.values(FARM_CROPS)
   .map((c) => c.fineProduceItemId)
   .filter((id) => !HOE_REAGENT_TWINS.includes(id));
@@ -323,10 +334,19 @@ describe('FARM_RECIPES: the farm-economy hook set', () => {
         `${hoeTwin} is a hoe reagent; a dish slot for it would double-book the twin`,
       ).toBe(false);
     }
-    // Non-vacuity, and the reason the list is derived: the two halves must
-    // partition the catalog's whole twin column, so neither loop can pass over
-    // a twin the lists forgot. Nine dish-closed plus three hoe reagents.
+    // Non-vacuity. Nine dish-closed plus three hoe reagents, and BOTH counts
+    // are the teeth: the union assertion below is a tautology by construction
+    // (FINE_TWINS_CLOSED_HERE is defined as the twin column MINUS the hoe
+    // list), noted at the 11e QA so it is not mistaken for coverage, and kept
+    // only because it states the partition the two loops rely on. What
+    // actually catches a forgotten twin is the pair of lengths, now that the
+    // hoe half is derived from the recipes rather than hand-written.
     expect(FINE_TWINS_CLOSED_HERE).toHaveLength(9);
+    expect(HOE_REAGENT_TWINS).toEqual([
+      'fine_highland_barley',
+      'fine_marsh_rice',
+      'fine_vale_wheat',
+    ]);
     expect([...FINE_TWINS_CLOSED_HERE, ...HOE_REAGENT_TWINS].sort()).toEqual(
       Object.values(FARM_CROPS)
         .map((c) => c.fineProduceItemId)

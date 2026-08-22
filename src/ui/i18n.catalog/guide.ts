@@ -3023,8 +3023,11 @@ export const guideStrings = {
     },
     // The farming page's own section (the fishing sections' precedent): the
     // planting loop as a player works it, from the counter to the kitchens.
-    // Names only Farmer Jessica; the other farmers stay "the Fenbridge
-    // farmer" and so on so a title change never strands this prose.
+    // Names Farmer Jessica in full; Hollis and Verbena are named by bare first
+    // name (added at Phase 11e, when GATE 1 gave them seeds to sell), and the
+    // Fenbridge farmer stays "the Fenbridge farmer", so a TITLE change never
+    // strands this prose. tests/guide.test.ts ties each spoken name back to the
+    // live NPC record, so a rename that moves the word still reds.
     farm: {
       bedsHeading: 'Working the beds',
       bedsBody:

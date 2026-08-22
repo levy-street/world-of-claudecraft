@@ -1150,9 +1150,18 @@ describe('the farming ladder: every farming zone arrives mechanically whole', ()
     // arithmetic still holds: 14 outputs + 4 literals - 1 overlap = 17.
     expect(FARM_RECIPES).toHaveLength(14);
     expect(NEVER_STOCKED.size).toBe(17);
-    // The four upper-tier seeds are DELIBERATELY absent, asserted rather than
-    // implied by the deletion above: without this arm a future edit could put
-    // them back and only a distant purchase test would notice.
+    // All eight upper-tier seeds are DELIBERATELY absent from the set, asserted
+    // rather than implied by the deletion above. HONEST ABOUT ITS REACH,
+    // corrected at the 11e QA: NEVER_STOCKED is built from a literal a few
+    // lines up in this same test, so this loop checks the FIXTURE, not the
+    // tree, and its old justification ("without this arm a future edit could
+    // put them back and only a distant purchase test would notice") was wrong
+    // on both halves. Re-adding a seed to that literal reds the NEXT loop five
+    // lines down, which sweeps every NPC's real vendorItems against the same
+    // set and where Hollis and Verbena now stock all eight. Kept anyway,
+    // because a named per-seed failure message localises the break instantly
+    // where the sweep only says "some NPC stocks a never-stocked item", but
+    // kept as a readability arm rather than as coverage.
     for (const seedId of [
       'highland_barley_seed',
       'frost_gourd_seed',

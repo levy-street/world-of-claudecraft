@@ -99,6 +99,51 @@ describe('farm crop families', () => {
     }
     expect(farmCropAccent('no_such_crop')).toBe(FARM_FALLBACK_ACCENT);
   });
+
+  it('keeps same-family accents far enough apart to read as different crops', () => {
+    // ADDED at the 11e QA. Exact-integer distinctness above is the only
+    // separation the table had, and the roster growing to twelve made that
+    // materially weaker: `rootleaf` now carries six crops told apart by tint
+    // alone, so two accents one unit apart in one channel would have passed
+    // while rendering as the same plant. Distinctness is a correctness floor;
+    // this is the legibility one.
+    const rgb = (hex: number) => [(hex >> 16) & 0xff, (hex >> 8) & 0xff, hex & 0xff] as const;
+    // Plain Euclidean distance in sRGB. Crude next to a real perceptual metric,
+    // but it needs no colour library and the shipped table clears the floor
+    // comfortably, which is what a guard against a NEAR-DUPLICATE needs.
+    const dist = (a: number, b: number) => {
+      const [ar, ag, ab] = rgb(a);
+      const [br, bg, bb] = rgb(b);
+      return Math.hypot(ar - br, ag - bg, ab - bb);
+    };
+    const byFamily = new Map<string, string[]>();
+    for (const id of FARM_CROP_IDS) {
+      const fam = farmCropFamily(id);
+      byFamily.set(fam, [...(byFamily.get(fam) ?? []), id]);
+    }
+    // Non-vacuity: the sweep must actually compare pairs, and must see the
+    // crowded family rather than only the two-crop ones.
+    let pairs = 0;
+    let worst = Number.POSITIVE_INFINITY;
+    for (const [fam, ids] of byFamily) {
+      for (let i = 0; i < ids.length; i++) {
+        for (let j = i + 1; j < ids.length; j++) {
+          pairs++;
+          const d = dist(FARM_CROP_ACCENT[ids[i]], FARM_CROP_ACCENT[ids[j]]);
+          worst = Math.min(worst, d);
+          expect(
+            d,
+            `${ids[i]} and ${ids[j]} are both ${fam} and their accents are ${d.toFixed(1)} apart`,
+          ).toBeGreaterThan(24);
+        }
+      }
+    }
+    expect(pairs, 'the family sweep compared no pairs').toBeGreaterThan(10);
+    expect(Math.max(...[...byFamily.values()].map((ids) => ids.length))).toBeGreaterThanOrEqual(5);
+    // The floor sits under the shipped worst pair, not at it, so an ordinary
+    // re-tint has room and only a near-duplicate reds.
+    expect(worst).toBeGreaterThan(24);
+  });
 });
 
 describe('farm biome palettes', () => {
