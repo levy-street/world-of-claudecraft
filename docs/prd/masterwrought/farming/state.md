@@ -4374,3 +4374,39 @@ the Phase 6 sign-off block including the fine_marsh_rice / fine_highland_barley
 dish-consumer question all stand exactly as they were. 11g touched no vendor row,
 no price, no growth timer, no daily and no decay, so it creates demand without
 touching a single one of those decisions.
+
+## Phase 11g QA note (2026-08-22): D24's guardrail is now pinned PER LINE, not per total
+
+The 11g note above stands and is correct. One thing it recorded is now stronger,
+and one thing it said is now measurably true rather than argued.
+
+STRONGER: the RULE 3 displacement pins were three herb totals plus three more
+(game_meat 28, prime_cut 12, cooking_salt 33) plus the summed fishing line at 30.
+The five single-id totals are per-id by construction. THE FISHING ONE WAS NOT: it
+was seven catch ids under one number, so cutting the marsh pike and paying for it
+with a river perch kept 30 and passed every arm in the tree. The fishing line is
+now pinned PER CATCH (glimmerfin_koi 6, raw_bog_eel 4, raw_frostgill_trout 4,
+raw_marsh_pike 2, raw_mirror_trout 1, raw_river_perch 2, raw_stonescale_carp 11),
+with the map and the total checking each other so neither drifts alone, and a
+compensating swap now reds. Phase 11i owns fishing and will edit that map when it
+adds a catch, which is the wanted behavior.
+
+MEASURED: every one of the six displacement totals was re-derived against the
+MERGED tree after the release sync, not re-read from the 11g record, and every one
+holds at the value 11g predicted. The release moved nothing in this surface.
+
+ALSO PINNED, and it is the arm D24 will care about most when Wave 2 arrives: the
+crops that did NOT gain alchemy are now a SWEEP over the live FARM_CROPS roster
+rather than a list of five ids. Exactly three base crops may name alchemy
+(vale_wheat, bog_beet, frost_gourd) and the sweep says so over whatever roster
+ships, so a later phase quietly handing alchemy a fourth crop reds rather than
+passing. The old arm named five of the nine that must stay cooking-only, so four
+were unguarded.
+
+NO OPEN ITEM IS CLOSED BY THE 11g QA EITHER. The list was read row by row a second
+time against the merged tree, and the 11g note's own row-by-row verdict stands
+unchanged: 11g touched no vendor row, no price, no growth timer, no daily and no
+decay, and its QA touched none of those either. The three fine_*_herb twins still
+have no recipe consumer anywhere on the merged tree, so the displacement arms stay
+scoped to the BASE herb line for the same reason recorded before: widening would
+red on inherited state and teach the next reader to loosen the arm.
