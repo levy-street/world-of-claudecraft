@@ -25,11 +25,13 @@ describe('material_taxonomy as the first-evaluated sim module', () => {
     // cooking reagent (APEX_CONSUMABLE_RECIPES). 66 -> 93 at the farming
     // absorb (masterwrought Phase 11d): farming's 27 junk-kind ids derive IN
     // (eight crop trios of seed, produce, and fine twin, plus withered_husks,
-    // compost, and growth_tonic). The count is a literal because this file
-    // may not import the tables to derive it: importing anything else from
-    // src/sim is exactly what the premise arm below forbids, so the number
-    // is re-pinned by hand whenever the set moves.
-    expect(MATERIAL_ITEM_IDS.size).toBe(93);
+    // compost, and growth_tonic). 93 -> 105 at Phase 11e, which widens the
+    // upper tiers to four crops each: four more trios, twelve more ids. The
+    // count is a literal because this file may not import the tables to
+    // derive it: importing anything else from src/sim is exactly what the
+    // premise arm below forbids, so the number is re-pinned by hand whenever
+    // the set moves.
+    expect(MATERIAL_ITEM_IDS.size).toBe(105);
     expect(MATERIAL_ITEM_IDS.has('iron_ore')).toBe(true);
     expect(MATERIAL_ITEM_IDS.has('arcanite_bar')).toBe(true);
     // The farming source specifically, because it is the newest and the one

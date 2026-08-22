@@ -113,10 +113,12 @@ const build = await buildItemArtAudit({
     // when it runs standalone (the vitest exact-set pin in
     // tests/item_icons.test.ts names the ids; this counts them). Total live
     // defs = liveItemCount + pendingArtCount, so both growth directions are
-    // visible, deliberate edits. 44 is the farming Phase 6 39 plus the
+    // visible, deliberate edits. 44 was the farming Phase 6 39 plus the
     // Phase 11 well-fed phase's four buff dishes plus the Phase 12 shared
-    // feast, carried unchanged through the farming absorb.
-    pendingArtCount: 44,
+    // feast, carried unchanged through the farming absorb; Phase 11e's four
+    // upper-tier crops add twelve ids (seed, produce and fine twin each) under
+    // the packet's declared art park for 11e to 11k, taking it to 56.
+    pendingArtCount: 56,
     generatedHeroicDefinitions: 64,
     heroicDefinitionsWithOwnWebp: 48,
     heroicWeaponArtAliases: 16,

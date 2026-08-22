@@ -65,6 +65,14 @@ export const GATE_CACHE_TASK_INVENTORY = Object.freeze({
       'src/sim/**',
       'src/render/characters/manifest.ts',
       'src/ui/deed_image_ids.ts',
+      // Declared by the 11d QA close (b15964b1e5, "declare the catalog modules
+      // wiki:content actually reads"): the generator imports the i18n catalog,
+      // so a catalog edit must bust the cache. turbo.json gained the path then
+      // and this inventory did not, which left the pin red on the branch until
+      // Phase 11e's full-suite run surfaced it. The direction is
+      // inventory-follows-turbo: the declaration is correct and it is the pin
+      // that was stale, so removing the path would re-open a real cache hole.
+      'src/ui/i18n.catalog/**',
       'scripts/wiki/**',
       'package.json',
     ],

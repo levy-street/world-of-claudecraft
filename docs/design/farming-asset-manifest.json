@@ -355,7 +355,11 @@
       "bog_beet": "rootleaf",
       "evergarden_greens": "rootleaf",
       "frost_gourd": "gourd",
-      "gilded_sunmelon": "gourd"
+      "gilded_sunmelon": "gourd",
+      "thornpeak_cabbage": "rootleaf",
+      "frost_lentils": "rootleaf",
+      "gilded_yam": "rootleaf",
+      "evergarden_pumpkin": "gourd"
     },
     "cropAccents": {
       "vale_wheat": "0xe8c66a",
@@ -365,7 +369,11 @@
       "highland_barley": "0xd9a441",
       "frost_gourd": "0x9ec8e4",
       "gilded_sunmelon": "0xf0a83c",
-      "evergarden_greens": "0x2f6b34"
+      "evergarden_greens": "0x2f6b34",
+      "thornpeak_cabbage": "0x8fbf7a",
+      "frost_lentils": "0x6b7f52",
+      "gilded_yam": "0x8a5a3c",
+      "evergarden_pumpkin": "0x9c3d10"
     },
     "fallbackFamily": "grain",
     "fallbackAccent": "0xcfcfcf",

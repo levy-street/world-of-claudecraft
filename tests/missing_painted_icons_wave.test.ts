@@ -645,8 +645,10 @@ describe('missing painted deed and Heroic weapon integration', () => {
     // Exhaustive: an unenumerated artless deed still reds here.
     // 286 at the farming absorb (Phase 11d): the base 273 plus the six
     // Masterwrought milestone deeds plus farming's seven (six pending
-    // celebration deeds and the painted prog_farming_100 crest).
-    expect(DEED_ORDER).toHaveLength(286);
+    // celebration deeds and the painted prog_farming_100 crest). 287 at Phase
+    // 11e, whose roster deed joins the PENDING side: that phase ships no crest
+    // under the packet's declared art park for 11e to 11k.
+    expect(DEED_ORDER).toHaveLength(287);
     expect(DEED_ORDER.filter((id) => !DEED_IMAGE_IDS.has(id))).toEqual([...DEED_ART_PENDING]);
     const credits = readFileSync(path.join(repoRoot, 'CREDITS.md'), 'utf8');
     const provenance = readFileSync(

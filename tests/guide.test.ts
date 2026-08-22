@@ -2092,9 +2092,15 @@ describe('Guide professions gathering accuracy', () => {
       html.split('comes within reach with a later patch').length - 1,
       'the faucet shipped: no farming section may still disclose dormancy',
     ).toBe(0);
-    // ...and the positive half, so the sections did not simply lose their
-    // prose: both still describe what a player can now actually do.
+    // ...and the positive half, ONE ANCHOR PER SECTION. The retired pin
+    // counted the idiom .toBe(2), which implicitly required BOTH sections to
+    // still carry prose; a single anchor would have let the table section be
+    // gutted with both assertions still green, so the inversion keeps the
+    // per-section coverage its predecessor had rather than only its intent.
+    // farmingSown:
     expect(html).toContain('Every Furrow Filled');
+    // farm.tableBody:
+    expect(html).toContain('the whole set is cooking today');
     expect(html).toContain('Farmer Jessica');
     // Tied to the live NPC name so a rename cannot leave the page lying.
     expect(html).toContain(NPCS.farmer_jessica.name);
