@@ -4334,3 +4334,43 @@ question does not arise (farming has no station).
   dish consumers: the Phase 5 deferred literal named exactly five twins, so the
   closure left those two hoe-reagent-only (documented honestly at their items.ts
   rows; adding dishes for them is a content decision, not a gap in the closure pin).
+
+## Phase 11g note (2026-08-22): D24's displacement guardrail is now PINNED
+
+D24's Wave 2 entry approves cultivated herbs for alchemy only WITH a displacement
+guardrail ("complement wild herbalism, never a second faucet of the identical
+item"). That guardrail was honored by intention up to now, since nothing had put
+produce beside an herb on a shipped bill. Phase 11g is the first phase to do it,
+across nine rows, so the guardrail is now asserted rather than promised:
+
+- tests/provisioning_supply_line.test.ts pins the TOTAL demand across the merged
+  ALL_RECIPES for all three base herbs as three integers (silverleaf_herb 28,
+  goldleaf_herb 27, sunpetal_herb 39), predicted before the edits and observed
+  unchanged after them.
+- The same suite pins the EXACT non-produce reagent bill of every one of the nine
+  touched rows as a literal. Totals alone can be gamed by moving a reagent
+  between rows; the per-row literals close that, and they cover the fish, meat
+  and salt lines too rather than only the herbs.
+- tests/farm_seed_channels.test.ts's alchemy arm went from a zero pin to a live
+  check with a floor of three, and its loop now really asserts that every alchemy
+  row consuming farm output ALSO still consumes an herb.
+- A mutation reducing silverleaf_herb from 2 to 1 on recipe_frostgill_chowder
+  (the exact "make room" move D24 bans) reds both suites.
+
+NOTE ON SCOPE, so this is not read as more than it is: 11g adds no cultivated
+herb and no second faucet of any herb. It adds produce BESIDE the herb line. D24
+itself stays in the Wave 2 parking lot, explicitly out of the packet; what
+changed is that its guardrail now has teeth for the day Wave 2 arrives.
+
+The three fine_*_herb twins still have no recipe consumer anywhere on the merged
+tree, so the displacement arms stay scoped to the BASE herb line, unchanged from
+the scope 11f recorded and for the same reason: widening would red on inherited
+state and teach the next reader to loosen the arm.
+
+NO OPEN ITEM IS CLOSED BY 11g. The list was read row by row: the crop display
+name lore pass, the Phase 9 reads, the (bn)/(bo) block, ONLINE_WORLD_LAYOUT_VERSION,
+the tuning constants, the any-profession deed question, the seed-back rates, and
+the Phase 6 sign-off block including the fine_marsh_rice / fine_highland_barley
+dish-consumer question all stand exactly as they were. 11g touched no vendor row,
+no price, no growth timer, no daily and no decay, so it creates demand without
+touching a single one of those decisions.

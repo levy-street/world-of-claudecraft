@@ -9506,3 +9506,409 @@ this", RUN THE COUNTERFACTUAL before writing it down. It costs one mutation and
 one suite, and this round it flipped the recorded lesson of the phase's most
 consequential find. A lesson that says the gate is blind, when the gate is not,
 is worse than no lesson: it is a standing licence to skip the check.
+
+## Phase 11g BUILT ledger (2026-08-22, the provisioning supply line, leveling tier)
+
+Base tip 1379c4b760 (the 11f QA close), clean. Commits, in order: daeaef97e6
+(the cooking ladder), d891f19c72 (the elixir line), e40914f5b0 (the seasoned
+stock), 3b3d4727a0 (the invariants and the recomputed pins), b5ecdcfce8 (the
+guide prose and the regen). LOCAL, no push, no PR.
+
+### STEP 0: the SEVENTH release sync, and it was a no-op AGAIN
+
+origin/release/v0.40.0 is at 098372138a and `git rev-list --count
+HEAD..origin/release/v0.40.0` is 0, so the merge-base IS the release tip. No
+merge ran, no swept input moved, and the eastbrook polish seal re-mint was NOT
+owed. That is the same verdict the 11f QA reached and for the same stated
+reason: the seal is owed when a MOVED SWEPT INPUT makes the merged tree a third
+content, never on the strength of a streak. Recorded so the next phase does not
+re-mint reflexively in either direction.
+
+### THE GROUNDING FACT, restated because it is what made this phase additive
+
+Before this phase the entire cooking tree used 17 distinct reagents and NOT ONE
+was a vegetable or a grain: spider_leg, cooking_salt, game_meat, prime_cut, the
+three herbs, ashwood_log, the six raw fish, seasoned_stock, quickening_catalyst
+and wyrmfall_core. Farming was not competing for a slot in a full pantry, it was
+filling a class that had never existed, which is what made "add, never
+substitute" cheap to honor: nothing had to move over, and nothing did.
+
+### The three settled decisions, EXECUTED as written
+
+- DECISION A, the seeds reading. This phase adds ZERO vendor rows and ZERO
+  buyValues. The counterfactually-vendor-fed membership was PREDICTED unchanged
+  and OBSERVED unchanged, and the prediction was provable a priori rather than
+  hopeful: every one of the nine touched rows already carried at least one
+  reagent with no buyValue (game_meat, a raw fish, venom_gland, prime_cut,
+  silverleaf_herb), so no touched row could enter or leave the set whatever crop
+  went in.
+  THE PHASE FILE'S "SIX IDS" IS STALE AND WAS NOT ADOPTED. The literal is SEVEN
+  today (recipe_ashwood_axe, recipe_bronze_hoe, recipe_goldleaf_mana_draught,
+  recipe_goldleaf_sickle, recipe_sootscale_mantle, recipe_sunpetal_mana_draught,
+  recipe_thorium_mining_pick) with a >= 7 non-vacuity floor beneath it. Farming's
+  own (bz) binder ruling says "stays seven" in the packet record, so six was
+  stale in the phase file rather than a movement to stop on.
+- DECISION B, may rung 50 reach tier-3 produce: YES, and the conditional code
+  read PASSES. Read from src/sim/content/zone3.ts, not from a plan doc:
+  farmer_hollis's vendorItems array is ['compost', 'highland_barley_seed',
+  'frost_gourd_seed', 'thornpeak_cabbage_seed', 'frost_lentils_seed'], and all
+  four seed defs carry buyValue 32 in items.ts. GATE 1 landed. The tier-2
+  fallback was NOT authored and is not owed. The YES branch is exercised on BOTH
+  crafts: recipe_marlows_grand_roast takes highland_barley and frost_gourd, and
+  recipe_elixir_of_the_serpent takes frost_gourd.
+- DECISION C, who owns recipe_seasoned_stock: IT LANDED HERE. The pre-check
+  PASSED (the row was still the shipped meat bill prime_cut 1, game_meat 3,
+  cooking_salt 2, quickening_catalyst 1, carrying no produce), so 11h had not
+  landed first. Authored with grain AND root at marsh_rice 2 plus bog_beet 2,
+  exactly as settled.
+  **PHASE 11h READS THIS LINE:** the bill is now prime_cut 1, game_meat 3,
+  marsh_rice 2, bog_beet 2, cooking_salt 2, quickening_catalyst 1, inputValue
+  130 against outputValue 30. Take it AS GIVEN, re-derive the gold-negative
+  arithmetic from it, and edit the row for nothing. Its GATE F stays dropped.
+
+### The final per-row table, with every count derived rather than picked
+
+| row | craft | rung | added | crop tier / gate | input before to after | output |
+|---|---|---|---|---|---|---|
+| recipe_hunters_game_skewer | cooking | 0 | vale_wheat 1 | T1 / 0 | 16 to 20 | 12 |
+| recipe_goldleaf_game_stew | cooking | 25 | vale_wheat 2, bog_beet 1 | T1 / 0, T2 / 25 | 80 to 96 | 50 |
+| recipe_frostgill_chowder | cooking | 25 | brook_carrot 1 | T1 / 0 | 44 to 60 | 40 |
+| recipe_silvered_carp_supper | cooking | 50 | marsh_rice 2 | T2 / 25 | 101 to 117 | 75 |
+| recipe_marlows_grand_roast | cooking | 50 | highland_barley 2, frost_gourd 2 | T3 / 50 | 212 to 272 | 150 |
+| recipe_elixir_of_the_boar | alchemy | 0 | vale_wheat 1 | T1 / 0 | 32 to 36 | 10 |
+| recipe_venomfire_elixir | alchemy | 25 | bog_beet 2 | T2 / 25 | 90 to 106 | 15 |
+| recipe_elixir_of_the_serpent | alchemy | 50 | frost_gourd 1 | T3 / 50 | 214 to 229 | 40 |
+| recipe_seasoned_stock | cooking | 75 | marsh_rice 2, bog_beet 2 | T2 / 25 | 98 to 130 | 30 |
+
+Every input was PREDICTED in writing before the run and every one matched on the
+first observation. Untouched by design and named so nobody improves them:
+recipe_pan_seared_perch and recipe_herbed_marsh_pike (the rung-0 fish controls),
+recipe_ashwood_smoked_eel (rung-25 fish control), recipe_anglers_feast_platter
+(rung-50 fish control, deliberately left alone to keep two suites out of the
+diff), recipe_tough_jerky (the tightest margin in the game), and the whole
+draught line.
+
+Six of the twelve crops gained a buyer outside farming: vale_wheat, brook_carrot,
+marsh_rice, bog_beet, highland_barley, frost_gourd. Tier 4 gained none, correctly:
+its gate is 75 and the apex tier is 11h's.
+
+### FOUR DEVIATIONS FROM THE PHASE FILE'S DEFAULT TABLE, each forced by a RULE
+
+The phase file states outright that the table is a planning-time default and the
+three RULES bind. Its default table does not satisfy its own rules, so four rows
+moved. Each deviation is a rule firing, not a preference:
+
+1. recipe_hunters_game_skewer: brook_carrot 1 became vale_wheat 1. brook_carrot
+   carries farming's D9 buyValue of 16, which would make it the most valuable
+   reagent on a row whose largest others are worth 8, so the crop becomes the
+   body and RULE 2's value half refuses it. vale_wheat at 4 sits under it, and a
+   vale_wheat 1 binder is the shipped shape farming's own tier-1 rows already
+   use under the (bz) binder ruling.
+2. recipe_elixir_of_the_boar: brook_carrot 1 became vale_wheat 1, same rule, same
+   arithmetic (16 against venom_gland's 12).
+3. recipe_frostgill_chowder: brook_carrot 2 became brook_carrot 1. At 2 it TIED
+   the row's largest non-produce count (trout, herb and salt all sit at 2) and
+   RULE 2's count half is strictly-below; at 2 it also TIED the summed fish count
+   and fish-forward is strictly-greater. One carrot satisfies all three and the
+   row reads 2 fish to 1 root.
+4. recipe_elixir_of_the_serpent: frost_gourd 2 became frost_gourd 1, because
+   venom_gland sits at count 2 and a crop must stay strictly under it. THIS IS
+   NOT DECISION B'S FALLBACK. The fallback triggers only on a failed code read,
+   the read passed, and the row keeps TIER 3. Only the count moved.
+
+### RULE 2's value half: the reading, and why it is this one
+
+RULE 2 says a crop's "share of inputValue stays at or below that reagent's
+share", where the reagent is "the row's largest non-produce reagent". A row can
+have several reagents tied on count, so the reference is ambiguous, and the
+ambiguity is load-bearing: read as the largest-by-COUNT reagent, DECISION C
+becomes unexecutable as settled, because the stock's rice and beet (16 each)
+would be measured against game_meat's 12 and refused, while the decision's own
+derivation authors them at 2 each.
+
+So the value half is evaluated against the row's DOMINANT non-produce reagent by
+share of inputValue, which is what "the body" means when a bill is priced, and
+the count half against the largest COUNT. That reading is the only one under
+which all three settled decisions execute as written, and it is recorded at the
+arm in tests/provisioning_supply_line.test.ts with this reasoning.
+
+IT STILL HAS TEETH, proven in authoring rather than asserted: it is the arm that
+refused brook_carrot on two rows, and a mutation putting brook_carrot back on the
+skewer reds it.
+
+### The draught-line refusal, recorded so it is not re-proposed as an oversight
+
+recipe_goldleaf_mana_draught and recipe_sunpetal_mana_draught are two of the
+SEVEN members of the counterfactually-vendor-fed set. Adding any reagent without
+a buyValue drops them OUT, shrinking the sorted membership literal to five and
+pushing the count under its own floor of seven. That is not a pin to update; it
+is the silent removal of two loops from the tighter of the two economy bounds. A
+later phase wanting produce in a draught uses a crop that carries a buyValue
+(today only brook_carrot) and re-derives the membership deliberately.
+
+### The seasoned stock: tier 2, and grain plus root
+
+The counts come from the row's own shape. The shipped bill was prime_cut 1,
+game_meat 3, cooking_salt 2, quickening_catalyst 1, so the vegetables enter at
+the salt's count of 2, one below the meat count of 3, and the bill still reads
+meat, then vegetables, then salt.
+
+Tier 2 at both, deliberately, and two crops rather than one. Everything in the
+cooking apex flows through this single row: the three role plates take
+seasoned_stock 1, recipe_laden_hearth takes 3, and 11k's apex feasts take it too.
+Coupling it to two vendor-seeded, market-fed supply lines spreads the choke point
+instead of making the whole apex kitchen ride one paddy, and tier 3 or 4 would
+put the apex kitchen behind farming's deliberately slow upper supply (R19), so
+the choke point would actually choke.
+
+### THE THIRD TRIPWIRE, which the phase file said did not exist
+
+The phase file asserts that "11h's own exclusion pin already carves
+recipe_seasoned_stock out of the no-produce-in-intermediates sweep". THAT IS
+FALSE at this tip, and DECISION C reds on it.
+
+tests/provisioner_firewall.test.ts builds its gear sweep from
+[...INTERMEDIATE_RECIPES, ...APEX_ARMOR_RECIPES, ...APEX_GEAR_RECIPES, ...word
+matches] and sweeps every reagent for farm items, with ONE carve-out,
+isGatheringToolRecipe. recipe_seasoned_stock is in INTERMEDIATE_RECIPES, so the
+settled decision breaks the standing R17 sweep.
+
+THE FIX IS A SCOPE CORRECTION, NOT A HOLE, and the distinction is written at the
+carve-out. R17 fences produce out of the GEAR chain. INTERMEDIATE_RECIPES is a
+MIXED table: nine of its ten rows feed gear and one is a cooking intermediate
+whose output is a food reagent with no equip slot. The sweep was broader than the
+rule it enforces. The carve-out is a predicate, proved by the same
+no-equip-slot test the hoe carve-out already uses, plus an arm that the carve-out
+is load-bearing (exactly one row rides it, and it really consumes produce).
+
+THE PACING GATE IS EXCLUDED FROM THE CARVE-OUT BY ID, and this is the half that
+keeps it honest: recipe_quickening_catalyst carries professionId 'alchemy', so a
+bare consumable predicate would have exempted the one row R17 most exists to
+protect. It stays inside the sweep, asserted directly, and a mutation removing
+the CATALYST_ID clause reds two arms.
+
+### The armed alchemy tripwire, fired and re-read rather than narrowed
+
+tests/farm_seed_channels.test.ts pinned alchemyWithFarm.length at 0 with the
+message "if this is no longer zero, this loop became a live check and needs a
+floor". The 11f QA wrote that zero deliberately, refusing a floor because a floor
+would have red then. This phase is what makes it live, so it takes the floor its
+own message asked for: >= 3, one per leveling rung, with the loop beneath it now
+actually running over three recipes and asserting each kept its herb. The filter
+was NOT narrowed and the loop was NOT deleted.
+
+### Pins moved, PREDICTED versus OBSERVED
+
+| pin | predicted | observed | verdict |
+|---|---|---|---|
+| the nine bills' inputValue | 20 / 96 / 60 / 117 / 272 / 36 / 106 / 229 / 130 | identical | MATCH |
+| counterfactually-vendor-fed membership | UNCHANGED at 7 | unchanged at 7 | MATCH |
+| its non-vacuity floor | >= 7, untouched | untouched | MATCH |
+| live-stock vendor-fed set | stays empty | empty | MATCH |
+| silverleaf_herb total demand | 28, unchanged | 28 | MATCH |
+| goldleaf_herb total demand | 27, unchanged | 27 | MATCH |
+| sunpetal_herb total demand | 39, unchanged | 39 | MATCH |
+| ALL_RECIPES / LADDER / INTERMEDIATE / FARM | 149 / 54 / 10 / 14, unchanged | identical | MATCH |
+| recipe_economy INTERMEDIATE bill literal | recipe_seasoned_stock grows by two rows | as predicted | MATCH |
+| parity goldens | NO movement | zero movement, no golden in the diff | MATCH |
+| farm_recipes R20 endgame census | NOT PREDICTED | 7 to 8 | **MISS** |
+
+ONE MISS, named rather than smoothed over. The R20 endgame-bill census in
+tests/farm_recipes.test.ts counts recipes at skillReq >= 75 naming a farm
+reagent. recipe_seasoned_stock is skillReq 75, so DECISION C put it in the census
+and moved the literal from 7 to 8. The prediction set covered the economy pins,
+the herb totals, the membership and the shapes, and did not enumerate this one.
+It is a correct and welcome move (the eighth member is the first consumable
+endgame bill farming did not write, so the census stops being farming buying from
+itself), and the arm gained a clause asserting exactly that. But it was not
+predicted, and a pin table that only records the hits is the failure mode the
+rule exists against.
+
+### THE BAND-LITERAL VERDICT: LOW_BAND, MID_BAND and RARE_BAND untouched
+
+Produce joins none of them, as settled: adding produce ids to a band list would
+change a pin's meaning without changing what it catches.
+
+THE WEAKENED-BUT-STILL-TOOTHED READING WAS MEASURED, not asserted, because that
+is the difference between a pin that was checked and one that was assumed. The
+arm is "every rung-50 ladder recipe consumes at least one non-rare-band
+material", so its margin on a row is the COUNT of that row's non-RARE_BAND
+reagents, and it bites where that count is 1. Across all 18 rung-50 ladder rows:
+
+| non-rare-band reagents | rows | touched by 11g |
+|---|---|---|
+| 2 (the binding minimum) | 12 | none |
+| 3 | 4 | recipe_elixir_of_the_serpent (was 2) |
+| 4 | 1 | recipe_marlows_grand_roast (was 2) |
+| 5 | 1 | recipe_silvered_carp_supper (was 4) |
+
+The verdict that follows is sharper than the phase file's framing. NO ROW SITS AT
+1 OR 0, before or after, so the arm was not biting on the touched rows even
+before the edit. Its teeth live entirely in the twelve rows at the binding
+minimum of 2, and this phase touched NONE of them. All three touched rung-50 rows
+moved AWAY from the boundary and nothing moved toward it, so the arm catches
+exactly what it caught before.
+
+(The phase file says "the two rung-50 rows this phase touches". It is THREE:
+recipe_silvered_carp_supper and recipe_marlows_grand_roast on the cooking side,
+plus recipe_elixir_of_the_serpent on the alchemy side, which the file's own
+Agent 2 slice adds and its Agent 4 note then forgets.)
+
+### The gold-negative property, stated as the argument rather than nine margins
+
+Adding a reagent raises inputValue and cannot touch outputValue, which is
+resultCount times the output def's sellValue, and this phase changed no output
+def and no resultCount. Every touched margin therefore widened monotonically. The
+invariant was re-run anyway and its checked count still equals ALL_RECIPES.length.
+
+ADDING REAGENTS CHANGES INPUT COST ONLY, NEVER OUTPUT POWER. No foodHp, no
+wellFed payload, no elixir value, no duration, no resultCount, no output
+sellValue, and no ItemDef of any kind moved in this phase. R5 and Phase 15 are
+untouched by it, and 11c's settled Well Fed ladder is not reopened.
+
+### THE NIL OBLIGATION LIST, PROVEN FROM THE DIFF rather than assumed
+
+Every verdict below was run as a check, because a sweep whose verdict is
+unwritten is a sweep nobody can audit.
+
+- NEW ITEM IDS: ZERO. NEW RECIPE IDS: ZERO. The diff adds no `id:` line to any
+  content table; it grows nine `reagents` arrays and nothing else.
+  tests/shipped_item_ids.test.ts is green and unmodified.
+- ITEM ART: nothing owed. Art is owed per NEW item id and there are none.
+  ITEM_ART_PENDING is untouched and its A3 literal did not move.
+- mapping.json ownership: nothing to arbitrate, no art landed.
+- M16 NON-LATIN NAME FILLS: nothing owed. M16 attaches to a new wordy English
+  item NAME and no name is minted.
+- BOOK OF DEEDS: NO deed. A reagent change is not conquerable content, and
+  prog_field_to_feast belongs to 11k. Swept and verified: the diff touches
+  src/sim/content/deeds.ts not at all.
+- RELIQUARY: NO page. Nothing unique or conquerable is minted. Swept: the diff
+  touches src/sim/content/reliquary.ts not at all.
+- src/ui/world_entity_i18n.ts: nothing owed, and the reason is structural rather
+  than incidental (the 11f QA's phrasing, restated): that module indexes mobs,
+  NPCs, quests, zones and dungeons, never items, and this phase places no entity.
+- IP-SAFE NAMING (R15, D17): nothing to verify. No proper noun is minted. That IS
+  the verdict, recorded rather than left blank.
+- WIKI REGEN: done through the generator (npm run wiki:content), never hand
+  edited, with tests/guide.test.ts freshness green.
+- THE ONE LIVE OBLIGATION is the reword worklist below.
+
+### The reworded i18n keys, for the Phase 17 release-tier fill worklist
+
+This is the obligation that would otherwise vanish: an edited English value whose
+locales are FILLED still reads as filled, and only a worklist entry catches it.
+Verified against src/ui/i18n.locales/ rather than assumed, and the counts differ
+per key, which is why they are recorded per key:
+
+| key | locales carrying a fill whose English moved |
+|---|---|
+| guide.profPages.craftProse.cooking.materialsHeading | 18 |
+| guide.profPages.craftProse.cooking.materialsBody | 18 |
+| guide.profPages.craftProse.alchemy.materialsHeading | 18 |
+| guide.profPages.craftProse.alchemy.materialsBody | 18 |
+| guide.profPages.craftIntro.cooking | 5 (ja_JP, ko_KR, ru_RU, zh_CN, zh_TW) |
+| guide.profPages.farm.bedsBody | 5 (ja_JP, ko_KR, ru_RU, zh_CN, zh_TW) |
+
+The corroboration is in the regen itself: the five non-Latin resolved bundles did
+not move at all, while eighteen Latin ones did, because the Latin locales lack
+fills for the two keys the five carry. No src/ui/i18n.locales/ file was touched,
+and NO NEW KEY was minted.
+
+The alchemy materialsHeading is an ADDITION to the set the phase file named. It
+enumerated the suppliers exactly as the cooking heading did ("Herbs, glands, and
+glass"), so it went stale on the same fact; leaving it would have shipped a
+corrected body under a stale heading.
+
+### VERIFIED NON-MOVERS, checked rather than asserted
+
+(a) The material taxonomy and the profession-affinity "Used by" line do not move:
+every crop was ALREADY a cooking reagent through FARM_RECIPES, so both modules
+derive the same sets before and after. tests/material_taxonomy.test.ts and
+tests/material_profession_affinity.test.ts are green and unmodified.
+(b) The LADDER SHAPE pins do not move: no recipe row is minted, so 54 rows, nine
+per craft, three per rung all hold.
+(c) The kitchens work orders collect RAW materials, never a crafted dish, so no
+work-order payout arithmetic moves.
+(d) No wire field, no SimEvent, no server file, no sim LOGIC, and no rng draw is
+touched. The diff is content tables, tests, guide prose, and generated artifacts.
+architecture-reviewer was therefore NOT dispatched: nothing under src/sim outside
+content/ changed.
+(e) The parity goldens do not move. The professions_craft scenario crafts
+recipe_minor_healing_potion, recipe_eastbrook_ritual_vestments and
+recipe_quickening_catalyst, none of them touched. The suite was run anyway: 232
+passed, 1 skipped, zero movement, and no golden file appears in the phase diff.
+
+### Collateral suites: what actually red, versus what the phase file predicted
+
+The phase file named three likely collateral suites and got one of them right.
+- tests/professions_deeds_playthrough.test.ts DID need the grant, as predicted
+  (recipe_silvered_carp_supper, hand-granted as literal sim.addItem calls).
+- tests/mobile_station_party.test.ts self-healed as predicted (its grant derives
+  from the live reagent list).
+- tests/ladder_crafting.test.ts stayed green as predicted.
+- tests/professions_crafting.test.ts DID red, and the phase file said it would
+  not. Its prediction was that the suite only crafts
+  recipe_anglers_feast_platter, which this phase leaves alone. It also crafts
+  recipe_elixir_of_the_serpent, in the #1149 multi-copy signing regression, with
+  a hand-granted literal bill. Found by running the battery, not by reading the
+  brief.
+
+### The mutation battery: EIGHT run, ZERO survived
+
+Run on a committed tree, each mutation restored with git checkout, tip identical
+at both ends.
+
+| # | mutation | verdict |
+|---|---|---|
+| M1 | a TIER-4 crop (gate 75) onto the rung-50 roast | KILLED, 2 arms |
+| M2 | strip the produce from the only rung-0 alchemy consumer | KILLED, 4 arms |
+| M3 | brook_carrot back onto the skewer (the refused substitution) | KILLED, 2 arms |
+| M4 | chowder carrot 1 to 2 (ties the count AND the fish count) | KILLED, 4 arms |
+| M5 | reduce silverleaf_herb 2 to 1 to "make room" | KILLED, 2 arms |
+| M6 | drop the CATALYST_ID clause from the new carve-out | KILLED, 2 arms |
+| M7 | strip produce from ONE of the two rung-50 cooking rows | KILLED, 2 arms |
+| M8 | strip DECISION C's vegetables from the stock | KILLED, 4 arms |
+
+M7 is the one worth keeping: it is the PARTIAL walk-back class that survived at
+the 11f QA (an "at least one" floor that a sibling keeps green). Here the other
+rung-50 row still covers the rung, so every derived arm stays green and only the
+touched-row literal table sees it. That table is why the class is dead here.
+M6 is the second: it proves the new carve-out's pacing-gate exclusion is
+load-bearing rather than decorative.
+
+### The guide prose gained its FIRST guard
+
+tests/guide.test.ts had NO arm over craftProse at all, and content.generated.ts
+cannot see a guide.* string, so the cooking page could have reverted to a
+two-supplier pantry with the whole gate green. That is the defect class the 11e
+QA blocked on and the 11f QA hit again. Every new anchor is a clause that exists
+ONLY in the corrected prose, apostrophe-free because the page escapes to &#39;,
+and the stale headings are pinned ABSENT as well as the new ones present, so a
+reverted heading beside a corrected body reds rather than passing.
+
+### The tooltip read, composed and READ rather than inferred
+
+What a player actually sees for recipe_marlows_grand_roast: "Marlow's Grand Roast
+(x1), Requires Cooking 50, Prime Cut x1, Game Meat x4, Highland Barley x2, Frost
+Gourd x2, Sunpetal Herb x1, Cooking Salt x2". Highland Barley's own tooltip is
+unchanged and correctly plain (kind junk, quality common, sellValue 15, no
+buyValue). The crafting window and the wiki both render a bill from live data, so
+the reagent rows appear with no code change; the regenerated content.generated.ts
+carries the new materials arrays verbatim.
+
+### Ownership boundaries honored
+
+The three role plates were not touched (differentiating them is 11h's, even
+though this phase's stock edit flows into all three). No fish was added anywhere
+(11i's). The tier-4 fine twins' missing consumer is still 11h's. The rung-coverage
+pin is farming-only and written as a shape 11j can WIDEN across five gathering
+professions rather than replace. Nothing in the OPEN list of farming/state.md is
+closed by this phase.
+
+### The rejection list, as recorded design
+
+Not re-proposed: a produce buyValue or a vendor row of any kind; produce in the
+draught line; produce in recipe_quickening_catalyst, any gear intermediate, or
+any Perfecting material; a new dish or a new crop; a band-literal edit; reducing
+any herb, fish, meat or salt count anywhere; minting a recipe row to hold produce
+(LADDER_RECIPES is closed at 54); and touching the three role plates.
