@@ -3310,7 +3310,7 @@ export const fr_FR: EnTranslations = {
           "gatherersCache": "+1 rendement par récolte tant que l'effet est chargé.",
           "artisansEye": "Augmente la qualité de récolte d'un palier d'outil tant que l'effet est chargé.",
           "quickeningCharm": "Raccourcit le délai de réapparition du nœud qu'il déclenche.",
-          "makersCharm": "+2 yield per harvest while charged."
+          "makersCharm": "+2 yield per harvest while charged, or +1 on a farming tool."
         },
         "howToSlot": "Sertissez-le sur un outil de Minage, de Bûcheronnage, d'Herboristerie ou d'Agriculture depuis la fenêtre Métiers. Consommé une fois serti.",
         "charges": "Commence avec {base} charges sur un outil commun (+{bonus} par échelon de rareté).",

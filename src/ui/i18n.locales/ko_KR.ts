@@ -10812,7 +10812,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.professions.toolEffectName.makersCharm': '장인의 부적',
   'hudChrome.professions.toolEffectTooltip.kind': '도구 부적',
   'hudChrome.professions.toolEffectTooltip.bonus.gatherersCache': '충전된 동안 채집당 획득량 +1.',
-  'hudChrome.professions.toolEffectTooltip.bonus.makersCharm': '충전된 동안 채집당 획득량 +2.',
+  'hudChrome.professions.toolEffectTooltip.bonus.makersCharm': '충전된 동안 채집당 획득량 +2, 농기구에서는 +1.',
   'hudChrome.professions.toolEffectTooltip.bonus.artisansEye':
     '충전된 동안 수확 등급이 도구 1단계만큼 올라갑니다.',
   'hudChrome.professions.toolEffectTooltip.bonus.quickeningCharm':

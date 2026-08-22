@@ -3310,7 +3310,7 @@ export const sv_SE: EnTranslations = {
           "gatherersCache": "+1 utbyte per skörd medan den är laddad.",
           "artisansEye": "Höjer skördegraden med en verktygsnivå medan den är laddad.",
           "quickeningCharm": "Förkortar återspawningstiden för noden den utlöses på.",
-          "makersCharm": "+2 yield per harvest while charged."
+          "makersCharm": "+2 yield per harvest while charged, or +1 on a farming tool."
         },
         "howToSlot": "Montera på ett gruv-, skogsavverknings-, örtinsamlings- eller jordbruksverktyg från Yrkesfönstret. Förbrukas när den monteras.",
         "charges": "Börjar med {base} laddningar på ett vanligt verktyg (+{bonus} per sällsynthetssteg).",

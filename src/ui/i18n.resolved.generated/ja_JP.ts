@@ -3310,7 +3310,7 @@ export const ja_JP: EnTranslations = {
           "gatherersCache": "充填中は採集ごとに産出+1。",
           "artisansEye": "充填中は収穫の品質がツール1段階ぶん上がる。",
           "quickeningCharm": "発動した資源ノードの再生タイマーを短縮する。",
-          "makersCharm": "充填中は採集ごとに産出+2。"
+          "makersCharm": "充填中は採集ごとに産出+2、農具では+1。"
         },
         "howToSlot": "専門技能ウィンドウから採掘・伐採・薬草学・農耕のツールに装着する。装着すると消費される。",
         "charges": "コモン品質のツールでは{base}回の充填から始まる（レア度が1段階上がるごとに+{bonus}回）。",

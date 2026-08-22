@@ -167,6 +167,24 @@ export const FARM_FINE_CHANCE_EFFECT_BONUS = 0.1;
 // floor of 3, an expected value of one pick per tonic.
 export const FARM_TONIC_BONUS_CHANCE = 0.5;
 export const FARM_TONIC_BONUS_PICKS = 2;
+// The cap FARMING puts on a slotted quantity tool effect, and it lives HERE
+// rather than in the catalog on purpose (masterwrought DECISION C).
+//
+// WHY A CAP AT ALL. The Maker's Charm is a quantity effect with a catalog bonus
+// of 2, which is exactly FARM_TONIC_BONUS_PICKS, and the two STACK. Uncapped
+// that is +4 picks on a guaranteed floor of 3, more than doubling yield per
+// harvest against a fixed demand, and it also leaves the alchemy growth tonic
+// with no reason to exist. This is a SUPPLY control, not a power nerf.
+//
+// WHY HERE AND NOT IN TOOL_EFFECTS. Lowering makers_charm.bonus would silently
+// re-tune mining, logging and herbalism, where the charm is correctly worth its
+// full 2, and it would break the pin tying the "+2" prose back to the catalog.
+// Capping in farming's own mapping is what keeps the other three untouched.
+//
+// THE HONEST CONSEQUENCE, recorded rather than buried: on a hoe the Maker's
+// Charm and the Gatherer's Cache now pay the SAME bonus, because the cache's
+// catalog bonus is already 1. The charm keeps its full 2 everywhere else.
+export const FARM_EFFECT_BONUS_PICK_CAP = 1;
 // The skill the scales above are expressed against: the farming proficiency
 // cap (GATHERING_PROFESSIONS.farming maxSkill), so "at the cap" reads
 // literally in the formulas.
@@ -936,8 +954,13 @@ export function harvestCrop(ctx: SimContext, p: Entity, meta: PlayerMeta, bedId:
   // charge), the stale-client fail-safe direction. The kinds map
   // farming-natively, both halves draw-free and position-independent (the
   // tonic lesson: nothing anchors to a skill-varying loop position):
-  //   quantity (Gatherer's Cache): flat bonus picks at base grade, added
-  //     outside the lives loop exactly the way FARM_TONIC_BONUS_PICKS is;
+  //   quantity (Gatherer's Cache, Maker's Charm): flat bonus picks at base
+  //     grade, added outside the lives loop exactly the way
+  //     FARM_TONIC_BONUS_PICKS is, and CAPPED at
+  //     FARM_EFFECT_BONUS_PICK_CAP by farming alone (see the
+  //     constant's banner: the charm's catalog 2 stacks with the tonic's 2 for
+  //     +4 on a floor of 3, which is a supply problem, and the cap belongs in
+  //     farming's mapping so mining, logging and herbalism keep the full 2);
   //   quality (Artisan's Eye): a flat fine-chance bump
   //     (FARM_FINE_CHANCE_EFFECT_BONUS per bonus point), which only raises
   //     the threshold already-expanded rolls are compared against.
@@ -951,7 +974,7 @@ export function harvestCrop(ctx: SimContext, p: Entity, meta: PlayerMeta, bedId:
   const base = resolveFarmHarvest(yieldSeed, skill, plot.tonic === true);
   const armed = effectUse.applied
     ? resolveFarmHarvest(yieldSeed, skill, plot.tonic === true, {
-        bonusPicks: effectUse.outcome.quantity,
+        bonusPicks: Math.min(effectUse.outcome.quantity, FARM_EFFECT_BONUS_PICK_CAP),
         fineChanceBonus: effectUse.outcome.gradeToolTier * FARM_FINE_CHANCE_EFFECT_BONUS,
       })
     : base;

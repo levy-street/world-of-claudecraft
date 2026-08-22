@@ -3310,7 +3310,7 @@ export const pl_PL: EnTranslations = {
           "gatherersCache": "+1 do uzysku za zbiór, gdy naładowane.",
           "artisansEye": "Podnosi gatunek zbioru o 1 poziom narzędzia, gdy naładowane.",
           "quickeningCharm": "Skraca czas odnowienia węzła, który uruchamia.",
-          "makersCharm": "+2 yield per harvest while charged."
+          "makersCharm": "+2 yield per harvest while charged, or +1 on a farming tool."
         },
         "howToSlot": "Osadź na narzędziu górniczym, drwalskim, zielarskim lub rolniczym w oknie Profesji. Zużywa się przy osadzeniu.",
         "charges": "Zaczyna z {base} ładunkami na pospolitym narzędziu (+{bonus} za każdy stopień rzadkości).",

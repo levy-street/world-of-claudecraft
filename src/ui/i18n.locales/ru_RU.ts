@@ -11004,7 +11004,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.professions.toolEffectTooltip.bonus.gatherersCache':
     'Пока есть заряды, каждый сбор приносит +1 к добыче.',
   'hudChrome.professions.toolEffectTooltip.bonus.makersCharm':
-    'Пока есть заряды, каждый сбор приносит +2 к добыче.',
+    'Пока есть заряды, каждый сбор приносит +2 к добыче, а на садовом инструменте +1.',
   'hudChrome.professions.toolEffectTooltip.bonus.artisansEye':
     'Пока есть заряды, повышает класс добычи на 1 уровень инструмента.',
   'hudChrome.professions.toolEffectTooltip.bonus.quickeningCharm':

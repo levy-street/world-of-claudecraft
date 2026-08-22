@@ -3310,7 +3310,7 @@ export const de_DE: EnTranslations = {
           "gatherersCache": "+1 Ertrag pro Ernte, solange aufgeladen.",
           "artisansEye": "Erhöht die Erntegüte um eine Werkzeugstufe, solange aufgeladen.",
           "quickeningCharm": "Verkürzt die Zeit, bis der ausgelöste Knoten nachwächst.",
-          "makersCharm": "+2 yield per harvest while charged."
+          "makersCharm": "+2 yield per harvest while charged, or +1 on a farming tool."
         },
         "howToSlot": "Auf ein Bergbau-, Holzfäller-, Kräuterkunde- oder Landwirtschafts-Werkzeug im Berufe-Fenster einsetzen. Wird beim Einsetzen verbraucht.",
         "charges": "Startet mit {base} Ladungen auf einem gewöhnlichen Werkzeug (+{bonus} pro Seltenheitsstufe).",

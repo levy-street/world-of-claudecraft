@@ -3310,7 +3310,7 @@ export const es_ES: EnTranslations = {
           "gatherersCache": "+1 de rendimiento por recolección mientras está cargado.",
           "artisansEye": "Aumenta la calidad de recolección en 1 nivel de herramienta mientras está cargado.",
           "quickeningCharm": "Acorta el tiempo de reaparición del nodo que provoca.",
-          "makersCharm": "+2 yield per harvest while charged."
+          "makersCharm": "+2 yield per harvest while charged, or +1 on a farming tool."
         },
         "howToSlot": "Colócalo en una herramienta de minería, tala, herboristería o agricultura desde la ventana de Profesiones. Se consume al colocarlo.",
         "charges": "Empieza con {base} cargas en una herramienta común (+{bonus} por nivel de rareza).",

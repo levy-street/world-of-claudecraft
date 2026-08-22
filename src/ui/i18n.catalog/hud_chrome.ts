@@ -4273,7 +4273,11 @@ export const hudChromeStrings = {
         // effect until the arm is wired. The name still appears on hand-sent
         // refusal lines, so the bonus copy stays honest about the catalog claim.
         quickeningCharm: 'Shortens the node respawn timer it triggers.',
-        makersCharm: '+2 yield per harvest while charged.',
+        // Profession-dependent, and the tooltip says so because the player
+        // chooses the tool AFTER reading it. Farming caps a quantity effect
+        // at +1 (FARM_EFFECT_BONUS_PICK_CAP, masterwrought DECISION C);
+        // mining, logging and herbalism pay the catalog's full 2.
+        makersCharm: '+2 yield per harvest while charged, or +1 on a farming tool.',
       },
       howToSlot:
         'Slot onto a mining, logging, herbalism, or farming tool from the Professions window. Consumed when slotted.',

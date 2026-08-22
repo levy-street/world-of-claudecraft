@@ -3310,7 +3310,7 @@ export const vi_VN: EnTranslations = {
           "gatherersCache": "+1 sản lượng mỗi lần thu hoạch trong khi còn nạp.",
           "artisansEye": "Nâng bậc thu hoạch thêm 1 bậc công cụ trong khi còn nạp.",
           "quickeningCharm": "Rút ngắn thời gian hồi sinh của điểm tài nguyên mà nó kích hoạt.",
-          "makersCharm": "+2 yield per harvest while charged."
+          "makersCharm": "+2 yield per harvest while charged, or +1 on a farming tool."
         },
         "howToSlot": "Gắn vào công cụ khai khoáng, đốn gỗ, thảo dược, hoặc nông nghiệp từ cửa sổ Nghề Nghiệp. Bị tiêu hao khi gắn.",
         "charges": "Bắt đầu với {base} lượt nạp trên một công cụ phổ thông (+{bonus} mỗi bậc hiếm).",

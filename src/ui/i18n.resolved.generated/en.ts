@@ -3310,7 +3310,7 @@ export const en: EnTranslations = {
           "gatherersCache": "+1 yield per harvest while charged.",
           "artisansEye": "Raises the harvest grade by 1 tool tier while charged.",
           "quickeningCharm": "Shortens the node respawn timer it triggers.",
-          "makersCharm": "+2 yield per harvest while charged."
+          "makersCharm": "+2 yield per harvest while charged, or +1 on a farming tool."
         },
         "howToSlot": "Slot onto a mining, logging, herbalism, or farming tool from the Professions window. Consumed when slotted.",
         "charges": "Starts with {base} charges on a common tool (+{bonus} per rarity rung).",

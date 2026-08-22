@@ -3310,7 +3310,7 @@ export const id_ID: EnTranslations = {
           "gatherersCache": "+1 hasil per panen selama masih memiliki muatan.",
           "artisansEye": "Meningkatkan mutu panen sebesar 1 tingkat alat selama masih memiliki muatan.",
           "quickeningCharm": "Mempersingkat penghitung waktu munculnya kembali simpul yang dipicunya.",
-          "makersCharm": "+2 yield per harvest while charged."
+          "makersCharm": "+2 yield per harvest while charged, or +1 on a farming tool."
         },
         "howToSlot": "Pasangkan pada alat Penambangan, Penebangan, Herbalisme, atau Pertanian dari jendela Profesi. Habis terpakai saat dipasang.",
         "charges": "Dimulai dengan {base} muatan pada alat umum (+{bonus} per anak tangga kelangkaan).",

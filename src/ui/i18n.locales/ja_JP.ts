@@ -10820,7 +10820,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.professions.toolEffectName.makersCharm': '匠のお守り',
   'hudChrome.professions.toolEffectTooltip.kind': '道具用の護符',
   'hudChrome.professions.toolEffectTooltip.bonus.gatherersCache': '充填中は採集ごとに産出+1。',
-  'hudChrome.professions.toolEffectTooltip.bonus.makersCharm': '充填中は採集ごとに産出+2。',
+  'hudChrome.professions.toolEffectTooltip.bonus.makersCharm': '充填中は採集ごとに産出+2、農具では+1。',
   'hudChrome.professions.toolEffectTooltip.bonus.artisansEye':
     '充填中は収穫の品質がツール1段階ぶん上がる。',
   'hudChrome.professions.toolEffectTooltip.bonus.quickeningCharm':

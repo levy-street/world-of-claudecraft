@@ -39,6 +39,7 @@ import {
   canPlantCrop,
   convertHusks,
   FARM_COMPOST_ITEM_ID,
+  FARM_EFFECT_BONUS_PICK_CAP,
   FARM_FINE_CHANCE_BASE,
   FARM_FINE_CHANCE_EFFECT_BONUS,
   FARM_GROWTH_TONIC_ITEM_ID,
@@ -75,6 +76,7 @@ import {
 import {
   resolveSlotToolEffect,
   slotEffect,
+  slotToolEffectRefused,
   startingDurabilityFor,
 } from '../src/sim/professions/tools';
 import { wieldRequirementForTier } from '../src/sim/professions/wield_gate';
@@ -1751,6 +1753,46 @@ describe('the slotted farming tool effect at harvest (the hoe phase C3 wiring)',
     // Exactly one charge: the R42 settle spends only when the bonus changed
     // the granted outcome, which the non-vacuity guard proved it did.
     expect(slot.durability).toBe(before - 1);
+  });
+
+  it("the Maker's Charm is admitted on a hoe but CAPPED, and the cap bites", () => {
+    // The charm-on-a-hoe path had NO arm before Phase 11e, which is how the
+    // overlap survived two packets: the charm slots on farming for real, its
+    // catalog bonus is 2, and 2 is exactly FARM_TONIC_BONUS_PICKS, so uncapped
+    // the pair paid +4 picks on a guaranteed floor of 3.
+    //
+    // This arm is owed BECAUSE the cap is invisible to every other arm in this
+    // file: they all use the Gatherer's Cache, whose catalog bonus is already
+    // 1, so a cap of 1 leaves them green by construction and proves nothing.
+    // Here the catalog bonus and the capped bonus DIFFER, which is the only
+    // shape that can fail if the cap is removed.
+    expect(TOOL_EFFECTS.makers_charm.bonus).toBe(2);
+    expect(FARM_EFFECT_BONUS_PICK_CAP).toBe(1);
+    expect(TOOL_EFFECTS.makers_charm.bonus).toBeGreaterThan(FARM_EFFECT_BONUS_PICK_CAP);
+    // The catalog is UNTOUCHED, which is the other half of the ruling: the cap
+    // lives in farming's mapping so the other three professions keep the full 2.
+    expect(slotToolEffectRefused('farming', 'makers_charm')).toBe(false);
+
+    const plot = ripen();
+    const slot = slotEffect('makers_charm');
+    h.meta.toolEffectSlots = { farming: slot };
+    const seed = plot.yieldSeed as number;
+    const unarmed = resolveFarmHarvest(seed, 0);
+    const capped = resolveFarmHarvest(seed, 0, false, {
+      bonusPicks: FARM_EFFECT_BONUS_PICK_CAP,
+    });
+    const uncapped = resolveFarmHarvest(seed, 0, false, {
+      bonusPicks: TOOL_EFFECTS.makers_charm.bonus,
+    });
+    // The two outcomes really differ on this seed, so the grant below
+    // discriminates between them rather than passing either way.
+    expect(uncapped.picks).toBe(capped.picks + 1);
+    expect(capped.picks).toBe(unarmed.picks + FARM_EFFECT_BONUS_PICK_CAP);
+
+    harvest(h);
+    const granted = h.sim.countItem(PRODUCE_ID, h.pid) + h.sim.countItem(FINE_ID, h.pid);
+    expect(granted, 'the harvest must pay the CAPPED bonus').toBe(capped.picks);
+    expect(granted, 'the harvest must NOT pay the catalog bonus').not.toBe(uncapped.picks);
   });
 
   it("auto-mode Artisan's Eye upgrades the fine outcome on a probed winner seed", () => {

@@ -3310,7 +3310,7 @@ export const nl_NL: EnTranslations = {
           "gatherersCache": "+1 opbrengst per oogst zolang het geladen is.",
           "artisansEye": "Verhoogt de oogstgraad met 1 gereedschapsrang zolang het geladen is.",
           "quickeningCharm": "Verkort de hergroeitijd van het grondstoffenpunt dat het activeert.",
-          "makersCharm": "+2 yield per harvest while charged."
+          "makersCharm": "+2 yield per harvest while charged, or +1 on a farming tool."
         },
         "howToSlot": "Plaats op een mijnbouw-, houtkap-, kruidenkunde- of landbouwgereedschap vanuit het venster Beroepen. Wordt verbruikt bij plaatsing.",
         "charges": "Begint met {base} ladingen op een gewoon gereedschap (+{bonus} per zeldzaamheidsrang).",

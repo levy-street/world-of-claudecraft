@@ -82,6 +82,32 @@ describe('toolEffectTooltipLines: live charms', () => {
     // mining proves it fires away from farming entirely.
     expect(slotToolEffectRefused('farming', 'quickening_charm')).toBe(true);
     expect(slotToolEffectRefused('mining', 'quickening_charm')).toBe(true);
+    // The Maker's Charm is a quantity effect too, so the SAME admission holds
+    // for it, and it is pinned against the predicate rather than against the
+    // sentence: the howToSlot copy names farming, and this is what makes that
+    // claim true rather than merely written. It was unpinned until 11e, which
+    // is how the charm-on-a-hoe path survived two packets unexamined.
+    expect(slotToolEffectRefused('farming', 'makers_charm')).toBe(false);
+    expect(slotToolEffectRefused('fishing', 'makers_charm')).toBe(true);
+    // The copy and the policy in BOTH directions: every profession the
+    // sentence advertises really admits a live quantity charm, and every one it
+    // omits really refuses. Derived from the sentence, so a reword that adds or
+    // drops a profession without moving the policy reds here.
+    // Scoped to the ADVERTISED sentence, not the whole tooltip: the tooltip
+    // also carries the landOnly line, which names fishing precisely because it
+    // is refused, so a whole-tooltip search would find the word for the
+    // opposite reason and the negative arm would be meaningless.
+    const rendered = toolEffectTooltipLines(ITEMS.makers_charm);
+    const advertised = /<div class="tt-desc">(Slot onto [^<]*)<\/div>/.exec(rendered)?.[1];
+    expect(advertised, 'the how-to-slot sentence must render').toBeTruthy();
+    for (const professionId of ['mining', 'logging', 'herbalism', 'farming'] as const) {
+      expect(advertised, `${professionId} must be advertised`).toContain(professionId);
+      expect(slotToolEffectRefused(professionId, 'makers_charm')).toBe(false);
+    }
+    // ...and the one it omits really is refused, which is what the separate
+    // landOnly line tells the player.
+    expect(advertised).not.toContain('fishing');
+    expect(rendered).toContain('Does not slot on fishing rods.');
     // The farming gatherTool roster, once the self-clearing empty tripwire of
     // the shipless era, is now the exact four-rung hoe ladder, in ITEMS
     // insertion order (which is how Object.values returns them).

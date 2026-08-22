@@ -3310,7 +3310,7 @@ export const cs_CZ: EnTranslations = {
           "gatherersCache": "+1 výnos za sklizeň, dokud je nabito.",
           "artisansEye": "Dokud je nabito, zvyšuje jakost sklizně o 1 stupeň nástroje.",
           "quickeningCharm": "Zkracuje časovač obnovy naleziště, který spustí.",
-          "makersCharm": "+2 yield per harvest while charged."
+          "makersCharm": "+2 yield per harvest while charged, or +1 on a farming tool."
         },
         "howToSlot": "Vlož do hornického, dřevorubeckého, bylinkářského nebo zemědělského nástroje z okna Profese. Při vložení se spotřebuje.",
         "charges": "Na běžném nástroji začíná s {base} nabitími (+{bonus} za každý stupeň vzácnosti).",

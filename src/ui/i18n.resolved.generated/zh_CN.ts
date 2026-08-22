@@ -3310,7 +3310,7 @@ export const zh_CN: EnTranslations = {
           "gatherersCache": "充能期间每次采集产出+1。",
           "artisansEye": "充能期间将收获品级提升1个工具等级。",
           "quickeningCharm": "缩短其触发的资源节点重生计时。",
-          "makersCharm": "充能期间每次采集产出+2。"
+          "makersCharm": "充能期间每次采集产出+2，在农具上为+1。"
         },
         "howToSlot": "在专业窗口中将其镶嵌到采矿、伐木、草药学或耕作工具上。镶嵌后即消耗。",
         "charges": "普通品质工具初始有{base}次充能（稀有度每升一级+{bonus}次）。",

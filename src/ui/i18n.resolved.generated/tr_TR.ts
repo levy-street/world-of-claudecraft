@@ -3310,7 +3310,7 @@ export const tr_TR: EnTranslations = {
           "gatherersCache": "Şarjlıyken hasat başına +1 verim.",
           "artisansEye": "Şarjlıyken hasat derecesini 1 alet kademesi yükseltir.",
           "quickeningCharm": "Tetiklediği düğüm yeniden oluşma süresini kısaltır.",
-          "makersCharm": "+2 yield per harvest while charged."
+          "makersCharm": "+2 yield per harvest while charged, or +1 on a farming tool."
         },
         "howToSlot": "Meslekler penceresinden bir madencilik, ağaç kesme, bitkicilik ya da çiftçilik aletine yuvala. Yuvalandığında tüketilir.",
         "charges": "Sıradan bir alette {base} şarjla başlar (her nadirlik kademesinde +{bonus}).",

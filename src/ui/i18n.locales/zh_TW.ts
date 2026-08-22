@@ -10354,7 +10354,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.professions.toolEffectName.makersCharm': '匠人護符',
   'hudChrome.professions.toolEffectTooltip.kind': '工具符咒',
   'hudChrome.professions.toolEffectTooltip.bonus.gatherersCache': '充能期間每次採集產出+1。',
-  'hudChrome.professions.toolEffectTooltip.bonus.makersCharm': '充能期間每次採集產出+2。',
+  'hudChrome.professions.toolEffectTooltip.bonus.makersCharm': '充能期間每次採集產出+2，在農具上為+1。',
   'hudChrome.professions.toolEffectTooltip.bonus.artisansEye':
     '充能期間將收穫品級提升1個工具等級。',
   'hudChrome.professions.toolEffectTooltip.bonus.quickeningCharm': '縮短其觸發的資源節點重生計時。',

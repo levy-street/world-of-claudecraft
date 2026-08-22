@@ -3310,7 +3310,7 @@ export const da_DK: EnTranslations = {
           "gatherersCache": "+1 udbytte pr. høst, mens den er opladet.",
           "artisansEye": "Hæver høstkvaliteten med 1 værktøjsniveau, mens den er opladet.",
           "quickeningCharm": "Forkorter genskabelsestiden for den ressourcekilde, effekten udløses på.",
-          "makersCharm": "+2 yield per harvest while charged."
+          "makersCharm": "+2 yield per harvest while charged, or +1 on a farming tool."
         },
         "howToSlot": "Sæt den i et minedrifts-, skovhugst-, urtekundskabs- eller landbrugsværktøj fra Erhverv-vinduet. Forbruges, når den sættes i.",
         "charges": "Starter med {base} ladninger på et almindeligt værktøj (+{bonus} pr. sjældenhedstrin).",
