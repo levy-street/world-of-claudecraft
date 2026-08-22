@@ -1063,6 +1063,12 @@ export const BASE_ITEMS: Record<string, ItemDef> = {
   // 4x-sell convention so the watch fee is payable from vendor stock before
   // a player's first harvest. Consumed by the watch fee AND by
   // recipe_eastbrook_root_pottage, which takes it as the pottage's body.
+  // NOT AN EXHAUSTIVE CONSUMER LIST, and deliberately not one: the live set
+  // is derived (craftIdsForMaterialItem sweeps ALL_RECIPES, and the tooltip
+  // renders from that), so an enumeration here only records what was true the
+  // day it was written. masterwrought Phase 11g is the proof: it put this crop
+  // on shipped cooking and alchemy ladder rows and every one of these comments
+  // silently became a subset. Read the sweep, not the sentence.
   brook_carrot: {
     id: 'brook_carrot',
     name: 'Brook Carrot',
@@ -1097,6 +1103,12 @@ export const BASE_ITEMS: Record<string, ItemDef> = {
   // recipe_fenbridge_rice_bowl (4 per bowl, the heaviest single-reagent count
   // in the dish set). No buyValue (the brook_carrot D9 exception does not
   // apply here).
+  // NOT AN EXHAUSTIVE CONSUMER LIST, and deliberately not one: the live set
+  // is derived (craftIdsForMaterialItem sweeps ALL_RECIPES, and the tooltip
+  // renders from that), so an enumeration here only records what was true the
+  // day it was written. masterwrought Phase 11g is the proof: it put this crop
+  // on shipped cooking and alchemy ladder rows and every one of these comments
+  // silently became a subset. Read the sweep, not the sentence.
   marsh_rice: {
     id: 'marsh_rice',
     name: 'Marsh Rice',
@@ -1127,6 +1139,12 @@ export const BASE_ITEMS: Record<string, ItemDef> = {
   },
   // Watch-fee sink, and the base of recipe_fenbridge_beet_braise (3 braised
   // down per plate). No buyValue per the produce rule.
+  // NOT AN EXHAUSTIVE CONSUMER LIST, and deliberately not one: the live set
+  // is derived (craftIdsForMaterialItem sweeps ALL_RECIPES, and the tooltip
+  // renders from that), so an enumeration here only records what was true the
+  // day it was written. masterwrought Phase 11g is the proof: it put this crop
+  // on shipped cooking and alchemy ladder rows and every one of these comments
+  // silently became a subset. Read the sweep, not the sentence.
   bog_beet: {
     id: 'bog_beet',
     name: 'Bog Beet',
@@ -1157,6 +1175,12 @@ export const BASE_ITEMS: Record<string, ItemDef> = {
   // base tier-3 grain carries a demand of its own at 4 per bannock. It used to
   // be the one dish with no fine twin in it; Phase 11e added the cabbage pair
   // alongside, which changed the bill but not this row's 4.
+  // NOT AN EXHAUSTIVE CONSUMER LIST, and deliberately not one: the live set
+  // is derived (craftIdsForMaterialItem sweeps ALL_RECIPES, and the tooltip
+  // renders from that), so an enumeration here only records what was true the
+  // day it was written. masterwrought Phase 11g is the proof: it put this crop
+  // on shipped cooking and alchemy ladder rows and every one of these comments
+  // silently became a subset. Read the sweep, not the sentence.
   highland_barley: {
     id: 'highland_barley',
     name: 'Highland Barley',
@@ -1186,6 +1210,12 @@ export const BASE_ITEMS: Record<string, ItemDef> = {
   },
   // Watch-fee sink, and the body of recipe_highwatch_gourd_soup (3 simmered
   // down per pot).
+  // NOT AN EXHAUSTIVE CONSUMER LIST, and deliberately not one: the live set
+  // is derived (craftIdsForMaterialItem sweeps ALL_RECIPES, and the tooltip
+  // renders from that), so an enumeration here only records what was true the
+  // day it was written. masterwrought Phase 11g is the proof: it put this crop
+  // on shipped cooking and alchemy ladder rows and every one of these comments
+  // silently became a subset. Read the sweep, not the sentence.
   frost_gourd: {
     id: 'frost_gourd',
     name: 'Frost Gourd',

@@ -306,9 +306,16 @@ interface AttributionTargetFixture {
 //
 // RE-MINTED AGAIN at the Phase 11g QA release sync (release tip 3e49dc11b3,
 // PR #3566's rift long-session perf work; prior synced release parent
-// 098372138a). The SIXTH consecutive sync to re-mint this seal, and the
+// 098372138a). The FIFTH consecutive sync to re-mint this seal, and the
 // trigger is the one it has always been: a MOVED SWEPT INPUT, never a
-// conflicting seal. BOTH parents edited src/render/renderer.ts since the
+// conflicting seal.
+//
+// TWO COUNTERS RUN THROUGH THIS PACKET AND THEY COUNT DIFFERENT THINGS, said
+// here because a reader using either as evidence will otherwise trip: this one
+// counts SYNCS THAT RE-MINTED THIS SEAL (the entry above is the fourth), while
+// the packet record counts RELEASE SYNCS ATTEMPTED, of which this is the
+// eighth and only the ones that actually merged could re-mint anything. The
+// two agree; they measure different events. BOTH parents edited src/render/renderer.ts since the
 // common base (base 13573, ours 13603, theirs 13584, merged 13614), so the
 // merged renderer is a third content and NEITHER parent's literal describes
 // it. Parent values for the record: composite ours 6b9ee410 / theirs
