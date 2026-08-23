@@ -11808,7 +11808,7 @@ audit re-derived and confirms: 160 + 140 + 1 = 301 against 300), and
 
 ### THE SUITE, ON A FROZEN TREE, BOTH ENDS STAMPED
 
-Committed clean tree at **a64126238b**, `git status` empty before and after, and
+Committed clean tree at **ba37787cb6**, `git status` empty before and after, and
 NOTHING else running: the audit's twelve lanes, its five reviewers and its three
 translation workflows were all finished and idle first, because a suite number
 is only evidence about the tree AND THE LOAD it ran under.
@@ -11816,6 +11816,9 @@ is only evidence about the tree AND THE LOAD it ran under.
 | measure | pre-merge baseline (3aba114abd) | after (a64126238b) |
 |---|---|---|
 | vitest | EXIT=0, 3049 files / 12 skipped (3061); 43436 passed / 2 expected fail / 115 skipped (43553) | **EXIT=0**, 3068 files / 12 skipped (3080); 43940 passed / 2 expected fail / 115 skipped (44057) |
+
+RUN TWICE, at a64126238b and again at the final tip ba37787cb6 after the late
+review round moved 48 files, with identical numbers both times.
 | `npm run ci:changed` | EXIT=0, 793 files, 3094 warnings, 0 errors | **EXIT=0**, 796 files, 3094 warnings, 0 errors |
 | `npx tsc --noEmit` | clean | **clean** |
 
