@@ -46,6 +46,7 @@ import { FISHING_TABLES_BY_BAND, RAW_COOKING_CATCH_IDS } from '../src/sim/conten
 import { GATHERING_PROFESSIONS } from '../src/sim/content/professions';
 import { ALL_RECIPES } from '../src/sim/content/recipes';
 import { ITEMS } from '../src/sim/data';
+import { farmingTeachingCeilingFor } from '../src/sim/professions/farming';
 import { NODE_MATERIAL_TABLE, NODE_TYPE_BY_PROFESSION } from '../src/sim/professions/gathering';
 import { baseMaterialFor, gatherMaterialTier } from '../src/sim/professions/material_grades';
 import { canGatherTier } from '../src/sim/professions/tools';
@@ -462,6 +463,32 @@ describe('every gathering tool is wieldable by the profession that owns it', () 
     // tools could have left this sweep with the arm still green. Exact, so a
     // tool joining or leaving the roster is a deliberate edit here.
     expect(checked, 'every shipped gatherTool def, fishing included').toBe(25);
+  });
+
+  it("the apex hoe's cap is REACHABLE on the ground the rung below already works", () => {
+    // The other half of "no table change was needed", and the half that had no
+    // test. tests/professions_tool_gate.test.ts proves the knife-edge rule for
+    // the wield ladder against the NODE professions' teaching ceilings, and
+    // farming has no nodes: its ceilings come from the crop tier through
+    // farmingTeachingCeilingFor. So the wield row reading 100 is only safe if
+    // farming can actually REACH 100, and it can only reach it by working
+    // ground the tier-4 hoe opens, since the tier-5 hoe is what 100 unlocks.
+    //
+    // A ceiling below the cap here would be the same dead-content shape as a
+    // recipe above its craft's cap: the apex rung would exist, be craftable,
+    // and never be swingable by anyone.
+    const cap = GATHERING_PROFESSIONS.farming.maxSkill;
+    const topCropTier = Math.max(...Object.values(FARM_CROPS).map((crop) => crop.tier));
+    expect(
+      farmingTeachingCeilingFor(topCropTier),
+      `tier-${topCropTier} crops must teach all the way to farming's cap, or the ` +
+        `tier-5 hoe's wield requirement is unreachable and the rung is dead`,
+    ).toBe(cap);
+    expect(wieldRequirementForTier(5), 'and that cap IS the requirement').toBe(cap);
+    // The rung below really does open that ground, so the climb is not circular:
+    // planting a tier-N crop needs a tier-N hoe, and the tier-4 hoe is the rung
+    // this recipe consumes.
+    expect(canGatherTier(4, topCropTier), 'the tier-4 hoe plants the top crop tier').toBe(true);
   });
 
   it('the apex land rungs sit exactly ON their cap, which is the knife edge', () => {
