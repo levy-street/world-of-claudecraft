@@ -331,7 +331,34 @@ const MONOLITHS: MonolithRow[] = [
     // src/render/build_retry_gate.ts and the renderer keeping only the
     // coordinator's thin wiring. It then re-pinned to the exact count of its
     // own merged file at 13584.
-    ceiling: 13614,
+    //
+    // RE-PINNED AGAIN 13614 -> 13571 at the Phase 11h release sync (release tip
+    // 50462dda83, PR #3582's entry-admission perf work; prior synced release
+    // parent 3e49dc11b3), the SEVENTH sync and the sixth consecutive one to
+    // touch this file. IT LOWERS, which is the first time this row has moved
+    // DOWN at a sync, and the ratchet takes the lower number without argument.
+    // BOTH parent pins for the record: ours 13614 against a 13614 file, the
+    // release 13541 against a 13541 file, and the base 13584 both descend from.
+    // The union composes exactly, so this is a re-pin and not a judgement call:
+    // 13584 + 30 (ours) - 43 (theirs) = 13571, and the merged file measures
+    // 13571. PREDICTED at 13571 before the merge ran and observed at 13571.
+    // Phase 11h is a content-table phase and added nothing to renderer.ts.
+    // Exact merged count, zero slack: any further growth reds again.
+    //
+    // UPSTREAM'S OWN HISTORY over this span, kept so the merge drops neither
+    // parent's half, and it is why the number fell: entry-detail admission
+    // moved the settle step ahead of compile and texture collection while
+    // deleting the old reveal-time arm; the initial-scene texture collection
+    // and shared admission cursor were extracted into
+    // src/render/initial_scene_texture_admission.ts; the compile-root
+    // collection, near-first ordering and program-content dedupe were extracted
+    // into src/render/initial_scene_compile_units.ts; the release's rift
+    // lifecycle wiring landed on top of that; and its review hardening restored
+    // the measured residency rationale at its live call site and added only
+    // thin wiring for rebuild reveal-gate installation, entry-barrier cleanup
+    // and observed display pacing, with the policy and timer ownership left in
+    // sibling modules. The release re-pinned to its own exact 13541.
+    ceiling: 13571,
     seam: 'a new src/render/<thing>.ts module the renderer calls (src/render/CLAUDE.md)',
   },
   {
@@ -410,7 +437,29 @@ const MONOLITHS: MonolithRow[] = [
     // silent-raise the ratchet exists to prevent. INHERITED growth, so
     // upstream's code is NOT extracted to buy the lines back. Exact merged
     // count, zero slack: any further growth reds again.
-    ceiling: 11498,
+    //
+    // RE-PINNED 11498 -> 11500 at the Phase 11h release sync (release tip
+    // 50462dda83, prior synced release parent 3e49dc11b3). THIS ROW DID NOT
+    // CONFLICT IN src/main.ts ITSELF: the file auto-merged cleanly and only
+    // this ceiling broke, which is the exact class the Phase 11g QA recorded
+    // against src/sim/sim.ts and the reason a release sync MEASURES every
+    // ceiling whose file the release touched rather than only the ones git
+    // marked. A conflict marks disagreement about TEXT; the ratchet is about
+    // SIZE. BOTH parent pins for the record: ours 11498 against an 11498 file,
+    // the release 11536 against an 11536 file, and the base 11534 both descend
+    // from. The union composes exactly: 11534 - 36 (ours, the arrival-chain
+    // extractions, already banked) + 2 (theirs) = 11500, and the merged file
+    // measures 11500. The release's own 11536 is NOT taken: it sits 36 lines
+    // above the merged file and would hand this row free slack it never
+    // earned. INHERITED growth, so upstream's code is NOT extracted to buy the
+    // two lines back and the ceiling is NOT raised for headroom.
+    //
+    // UPSTREAM'S OWN HALF of this span, kept so the merge drops neither
+    // parent's record: the bounded first-paint gate is now owned per startGame
+    // invocation rather than by a mutable render-core singleton, its browser
+    // timer living in the sibling adapter, so main pays only factory and arm
+    // wiring. Exact merged count, zero slack: any further growth reds again.
+    ceiling: 11500,
     seam: 'a src/game/ or src/ui/ sibling module; main.ts is a firewall, not a home',
   },
   {

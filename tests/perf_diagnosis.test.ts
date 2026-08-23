@@ -118,6 +118,16 @@ function baseSnapshot(): PerfSnapshot {
       renderDiagnostics: {} as never,
       nightAmount: 0,
       prewarm: null,
+      entryDetailHorizon: {
+        active: false,
+        cap: 700,
+        targetFar: 700,
+        nextCap: null,
+        stableFrames: 0,
+        armedAtMs: null,
+        holdReason: 'inactive',
+        transitions: [],
+      },
       gpuQueue: {
         units: 0,
         totalSyncMs: 0,

@@ -8,6 +8,7 @@ import type { BiomeId } from '../sim/types';
 import type { BackgroundGpuQueueStats } from './background_gpu_queue';
 import type { BuildLedgerSnapshot } from './build_ledger_core';
 import type { LookPiecesStats } from './characters/look_pieces';
+import type { EntryDetailHorizonSnapshot } from './entry_detail_horizon';
 import type { FoliagePerfStats } from './foliage';
 import type { GfxBucketBands, GfxBucketLevels, GfxRuntimeBudget } from './gfx';
 import type { GpuPrepBudgetSnapshot } from './gpu_prep_budget_core';
@@ -108,6 +109,7 @@ export interface RendererPerfStats {
   renderDiagnostics: RenderDiagnosticsSnapshot;
   lastFrame?: RendererFrameStats;
   prewarm: RendererPrewarmStats | null;
+  entryDetailHorizon: EntryDetailHorizonSnapshot;
   gpuQueue: BackgroundGpuQueueStats;
   gpuPrep: RendererGpuPrepStats;
   /** Main-thread construction ms by kind (view builds by class, zone feature

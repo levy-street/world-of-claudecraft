@@ -1,6 +1,8 @@
 import { readFileSync } from 'node:fs';
 import * as THREE from 'three';
 import { describe, expect, it } from 'vitest';
+import { initialFrameDeferral } from '../src/render/initial_frame_core';
+import { createPrewarmCompileLifecycle } from '../src/render/prewarm_compile_lifecycle';
 import {
   CONSTRAINED_PREWARM_KEEP,
   CONSTRAINED_PREWARM_RESUME,
@@ -14,6 +16,7 @@ import {
   orderRootsByDistanceSq,
   type PrewarmResumeEntry,
   resumeDroppedPrewarmEntries,
+  runPrewarmCompileResumeUnit,
   runPrewarmPiecesSerially,
   settlePrewarmBeforePublish,
   trackPrefetch,
@@ -28,6 +31,41 @@ function entry(id: string, unitIds: readonly string[]): PrewarmResumeEntry {
 }
 
 describe('resumeDroppedPrewarmEntries', () => {
+  it('closes a deferred compile lifecycle record when its resume unit settles', async () => {
+    let now = 10;
+    const unit = { id: 'scene:deferred', run: async () => {} };
+    const lifecycle = createPrewarmCompileLifecycle(() => now++);
+    const record = lifecycle.recordFor(unit, 'programs.compile-submit');
+    lifecycle.markReveal();
+    expect(initialFrameDeferral(lifecycle.records)).not.toBeNull();
+
+    await runPrewarmCompileResumeUnit(unit, lifecycle, 'programs.compile-resume', () => unit.run());
+
+    expect(initialFrameDeferral(lifecycle.records)).toBeNull();
+    expect(record.statusAtReveal).toBe('deferred');
+    expect(record.lane).toBe('programs.compile-resume');
+    expect(record.submittedAtMs).not.toBeNull();
+    expect(record.settledAtMs).not.toBeNull();
+    expect(record.failedAtMs).toBeNull();
+  });
+
+  it('marks a resumed compile lifecycle record failed before rethrowing', async () => {
+    let now = 20;
+    const unit = { id: 'scene:failed', run: async () => {} };
+    const lifecycle = createPrewarmCompileLifecycle(() => now++);
+    const record = lifecycle.recordFor(unit, 'programs.compile');
+
+    await expect(
+      runPrewarmCompileResumeUnit(unit, lifecycle, 'programs.compile-resume', async () => {
+        throw new Error('resume failed');
+      }),
+    ).rejects.toThrow('resume failed');
+
+    expect(record.submittedAtMs).not.toBeNull();
+    expect(record.settledAtMs).toBeNull();
+    expect(record.failedAtMs).not.toBeNull();
+  });
+
   it('resumes bounded units in manifest order with an idle slot before every unit', async () => {
     const events: string[] = [];
     const dropped: PrewarmResumeEntry[] = [
@@ -436,8 +474,36 @@ describe('resumeDroppedPrewarmEntries', () => {
     expect(publications).toBe(1);
   });
 
+  it('releases deferred compile, texture and sky work only after first paint', () => {
+    const renderer = readFileSync(new URL('../src/render/renderer.ts', import.meta.url), 'utf8');
+    const main = readFileSync(new URL('../src/main.ts', import.meta.url), 'utf8');
+    const resumeStart = renderer.indexOf('void settlePrewarmBeforePublish(');
+    const resumeEnd = renderer.indexOf(
+      '// Sky uploads deferred behind a slow prefetch',
+      resumeStart,
+    );
+    const skyEnd = renderer.indexOf('const elapsed = performance.now() - started;', resumeEnd);
+    const resumeBlock = renderer.slice(resumeStart, resumeEnd);
+    const skyBlock = renderer.slice(resumeEnd, skyEnd);
+    const prewarmAt = main.indexOf('const prewarm = await renderer.prewarmInitialScene({');
+    const firstPaintAt = main.indexOf("entryDiagnostics.checkpoint('first-paint');", prewarmAt);
+    const releaseAt = main.indexOf('initialPrewarmResumeStartGate.release();', firstPaintAt);
+
+    expect(main.slice(prewarmAt, firstPaintAt)).toContain(
+      'resumeAfterFirstPaint: initialPrewarmResumeStartGate.wait,',
+    );
+    expect(firstPaintAt).toBeGreaterThan(prewarmAt);
+    expect(releaseAt).toBeGreaterThan(firstPaintAt);
+    expect(resumeBlock).toContain('await options.resumeAfterFirstPaint;');
+    expect(skyBlock).toContain('await options.resumeAfterFirstPaint;');
+  });
+
   it('wires the production compile resume lane to bounded units', () => {
     const source = readFileSync(new URL('../src/render/renderer.ts', import.meta.url), 'utf8');
+    const compileUnitsSource = readFileSync(
+      new URL('../src/render/initial_scene_compile_units.ts', import.meta.url),
+      'utf8',
+    );
     const unitsStart = source.indexOf('const compileEntryUnits =');
     const unitsEnd = source.indexOf('const runEntry =', unitsStart);
     const unitsSlice = source.slice(unitsStart, unitsEnd);
@@ -452,7 +518,8 @@ describe('resumeDroppedPrewarmEntries', () => {
     expect(compileEntryEnd).toBeGreaterThan(compileEntryStart);
     expect(resumeStart).toBeGreaterThan(-1);
     expect(runStart).toBeGreaterThan(resumeStart);
-    expect(unitsSlice.match(/buildPrewarmCompileUnits\(/g)).toHaveLength(1);
+    expect(unitsSlice).toContain('buildInitialSceneCompileUnits({');
+    expect(compileUnitsSource.match(/buildPrewarmCompileUnits\(/g)).toHaveLength(1);
     // The resume lane must exclude groups whose units were already submitted
     // off-thread (resuming them would double-submit every unit).
     expect(resumeSlice).toContain(
@@ -460,14 +527,18 @@ describe('resumeDroppedPrewarmEntries', () => {
     );
     expect(unitsStart).toBeGreaterThan(-1);
     expect(unitsEnd).toBeGreaterThan(unitsStart);
-    expect(unitsSlice).toContain('if (visibleOnly) root.traverseVisible(collect)');
-    expect(unitsSlice).toContain('else root.traverse(collect)');
-    expect(unitsSlice).toContain('roots: compileRoots(group.children, false)');
+    expect(compileUnitsSource).toContain('if (visibleOnly) root.traverseVisible(collect)');
+    expect(compileUnitsSource).toContain('else root.traverse(collect)');
+    expect(compileUnitsSource).toContain('roots: compileRoots(group.children, false)');
     // The mass-submission callback compiles against the lights-only proxy
     // scene (identical program keys, ~10-node prologue walk instead of the
     // whole world per call; the live gates keep the live-scene default).
-    expect(unitsSlice).toContain('await this.compilePrewarmColorPrograms(root, false)');
-    expect(unitsSlice).toContain('await this.compileShadowPrograms(root)');
+    expect(unitsSlice).toContain(
+      'compileColor: (root) => this.compilePrewarmColorPrograms(root, false)',
+    );
+    expect(unitsSlice).toContain('compileShadow: (root) => this.compileShadowPrograms(root)');
+    expect(compileUnitsSource).toContain('await options.compileColor(root)');
+    expect(compileUnitsSource).toContain('await options.compileShadow(root)');
     expect(compileEntry).not.toContain('compileAsync(this.scene');
     // The resume lane specifically must never race a scene-wide compileAsync
     // call away (the old bug this pin guards): resuming already-submitted
@@ -498,15 +569,18 @@ describe('resumeDroppedPrewarmEntries', () => {
     // PIECES one root per queue unit (PrewarmResumeUnit.pieces): the world is
     // live here, the together arm's second-arm continuations fired as one
     // 3 s task, and a batch-held unit starved the reveal gates behind it.
+    expect(source).toContain('const run = () => {');
     expect(source).toContain(
-      'if (debt && unit.pieces) {\n                return runPrewarmPiecesSerially(unit.pieces, (piece) =>\n                  this.backgroundGpuWork.run(piece.run, priority, piece.id, {\n                    releaseTail: true,\n                  }),\n                );\n              }',
+      'if (debt && unit.pieces) {\n                  return runPrewarmPiecesSerially(unit.pieces, (piece) =>\n                    this.backgroundGpuWork.run(piece.run, priority, piece.id, {\n                      releaseTail: true,\n                    }),\n                  );\n                }',
     );
     // A debt ROOT piece is one link: released under the tail cap, never a
     // held queue head (batch 18). The batch fallback and the cosmetic resume
     // keep the class-driven tail.
     expect(source).toContain(
-      'return this.backgroundGpuWork.run(unit.run, priority, unit.id, {\n                releaseTail: !debt,\n              });',
+      'return this.backgroundGpuWork.run(unit.run, priority, unit.id, {\n                  releaseTail: !debt,\n                });',
     );
+    expect(source).toContain("return entry.id.startsWith('programs.compile')");
+    expect(source).toContain("'programs.compile-resume'");
     // The old bare `releaseTail: true,` pin drifted: after the debt-class
     // split the only remaining literal `true` belongs to the preview lane,
     // an unrelated call site. The resume lane's contract is the class-driven
@@ -515,6 +589,7 @@ describe('resumeDroppedPrewarmEntries', () => {
     expect(source).toContain('const resume = orderPrewarmResumeEntries(droppedEntries);');
     expect(source).toContain('const units = entry.resumeUnits?.() ?? [];');
     expect(source).toContain('droppedEntries.push({ id: entry.id, units })');
+    expect(source).toContain("if (status === 'partial' || status === 'failed') {");
     expect(source).toContain('const partialUnits = entry.resumePartialUnits?.() ?? [];');
     expect(source).toContain(
       'if (partialUnits.length > 0) droppedEntries.push({ id: entry.id, units: partialUnits });',
@@ -568,6 +643,10 @@ describe('resumeDroppedPrewarmEntries', () => {
 
   it('retains dropped texture uploads as one explicit idle unit per unique texture', () => {
     const source = readFileSync(new URL('../src/render/renderer.ts', import.meta.url), 'utf8');
+    const admission = readFileSync(
+      new URL('../src/render/initial_scene_texture_admission.ts', import.meta.url),
+      'utf8',
+    );
     const helperStart = source.indexOf('const textureResumeUnits = (');
     const helperEnd = source.indexOf('\n\n    const manifest:', helperStart);
     const helper = source.slice(helperStart, helperEnd);
@@ -578,10 +657,17 @@ describe('resumeDroppedPrewarmEntries', () => {
     const sceneEnd = source.indexOf("id: 'vfx.atlas'", sceneStart);
     const scene = source.slice(sceneStart, sceneEnd);
 
-    expect(helper).toContain('new Set(textures)');
-    expect(helper).toContain('run: () => this.prewarmTexture(texture)');
+    expect(helper).toContain('initialSceneTextureResumeUnits(idPrefix, textures');
+    expect(admission).toContain('new Set(textures)');
+    expect(admission).toContain('run: () => upload(texture)');
+    expect(admission).toContain('id: texturePieceLabel(`upload:$' + '{idPrefix}`, texture)');
     expect(surface).toContain("textureResumeUnits('surface-detail'");
-    expect(scene).toContain("textureResumeUnits('scene', this.collectInitialSceneTextures())");
+    expect(scene).toContain(
+      "resumeUnits: () => textureResumeUnits('scene', sceneTextureRemainder())",
+    );
+    expect(scene).toContain(
+      "resumePartialUnits: () => textureResumeUnits('scene', sceneTextureRemainder())",
+    );
     expect(surface).not.toContain('renderPrewarmPass');
     expect(scene).not.toContain('renderPrewarmPass');
   });
@@ -931,22 +1017,22 @@ describe('orderRootsByDistanceSq: the compile debt pays near-first (hitch-hunt P
   });
 
   it('is wired to the live-scene compile collection anchored on the player', () => {
-    const rendererSource = readFileSync(
-      new URL('../src/render/renderer.ts', import.meta.url),
+    const compileUnitsSource = readFileSync(
+      new URL('../src/render/initial_scene_compile_units.ts', import.meta.url),
       'utf8',
     );
     // The 'scene' group is the world-content collection the resume lane
     // drains in order; the staged prewarm groups sit next to the player and
     // gain nothing from sorting. Player-anchored on purpose: the early
     // submit runs before the first updateCamera positions the camera.
-    const sceneAt = rendererSource.indexOf("id: 'scene',");
-    const stagedAt = rendererSource.indexOf('...stagedGroups.flatMap');
+    const sceneAt = compileUnitsSource.indexOf("id: 'scene',");
+    const stagedAt = compileUnitsSource.indexOf('...options.stagedGroups.flatMap');
     expect(sceneAt).toBeGreaterThan(-1);
     expect(stagedAt).toBeGreaterThan(sceneAt);
-    const sceneCollection = rendererSource.slice(sceneAt, stagedAt);
+    const sceneCollection = compileUnitsSource.slice(sceneAt, stagedAt);
     expect(sceneCollection).toContain('roots: orderRootsByDistanceSq(');
     expect(sceneCollection).toContain(
-      'compileRootDistanceSq(root, this.sim.player.pos.x, this.sim.player.pos.z)',
+      'compileRootDistanceSq(root, options.playerX, options.playerZ)',
     );
   });
 });

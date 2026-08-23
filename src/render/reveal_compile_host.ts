@@ -64,6 +64,9 @@ export interface RevealCompileHostDeps {
    *  future work. Harmless either way: the soft deadline is telemetry and
    *  never reveals anything. */
   predictRevealMs(): number;
+  /** Read lazily: the renderer creates these gates before entry prewarm owns
+   * the first-paint promise. Direct graphics rebuilds return null. */
+  startAfterInitialPaint?: () => Promise<void> | null | undefined;
 }
 
 export function createRevealCompileHost(deps: RevealCompileHostDeps): RevealCompileHost {
@@ -72,6 +75,7 @@ export function createRevealCompileHost(deps: RevealCompileHostDeps): RevealComp
   // in the deciding frame.
   const submittedPieces = new WeakMap<object, number>();
   return {
+    startAfterInitialPaint: deps.startAfterInitialPaint,
     compile(root: object, imminent: boolean): Promise<unknown> {
       const target = root as THREE.Object3D;
       const priority = imminent ? GPU_WORK_PRIORITY.LIVE_VIEW : GPU_WORK_PRIORITY.VISIBLE_PREWARM;

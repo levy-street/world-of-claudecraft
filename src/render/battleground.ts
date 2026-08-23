@@ -19,7 +19,10 @@
 import * as THREE from 'three';
 import { TH_PLACEMENTS } from '../sim/thornhollow_field.generated';
 import { loadGltf, loadTexture } from './assets/loader';
-import { registerDeferredPreload } from './assets/preload';
+import {
+  type BattlegroundAssetPrewarmUnit,
+  createBattlegroundAssetPrewarm,
+} from './battleground_asset_prewarm';
 import {
   BG_FLOOR_Y,
   BG_TEXTURE_DIR,
@@ -36,6 +39,7 @@ import { type BgTerrainView, buildBattlegroundTerrain } from './battleground_ter
 import { type BgWardState, type BgWardView, buildBgWards } from './battleground_ward';
 import { ensureDungeonAssets } from './dungeon';
 import { GFX } from './gfx';
+import { idleSlot } from './idle_queue';
 import { freezeStaticMatrices } from './static_matrix';
 
 export * from './battleground_core';
@@ -68,31 +72,49 @@ export function battlegroundPreloadAssetPaths(): BattlegroundPreloadAssetPaths {
   };
 }
 
-let battlegroundAssetsPromise: Promise<void> | null = null;
+const BG_PREWARM_IDLE_TIMEOUT_MS = 120;
+const BG_PREWARM_BATCH_SIZE = 2;
 
-export function ensureBattlegroundAssets(): Promise<void> {
-  battlegroundAssetsPromise ??= (() => {
-    const assets = battlegroundPreloadAssetPaths();
-    return Promise.all([
-      ensureDungeonAssets(),
-      ...assets.models.map((path) => loadGltf(path)),
-      ...assets.textures.map(({ path, srgb }) => loadTexture(path, { srgb })),
-    ]).then(() => undefined);
-  })();
-  return battlegroundAssetsPromise;
+const structuralModel = (path: string): boolean =>
+  /\/(?:wall|barrier|fence|pillar|tower|arch|gate|banner)/.test(path);
+
+/** Lazily materialized so players who never show PvP intent do not even decode
+ * the generated placement table to build this ordering. Ground comes first,
+ * then collision-readable structures, ordinary props, foliage, and decals. */
+function battlegroundAssetPrewarmUnits(): BattlegroundAssetPrewarmUnit[] {
+  const assets = battlegroundPreloadAssetPaths();
+  const paint = assets.textures.filter((texture) => !texture.srgb);
+  const decals = assets.textures.filter((texture) => texture.srgb);
+  const structures = assets.models.filter(structuralModel);
+  const props = assets.models.filter(
+    (path) => !structuralModel(path) && !path.includes('/foliage/'),
+  );
+  const foliage = assets.models.filter((path) => path.includes('/foliage/'));
+  return [
+    { id: 'shared:dungeon-kit', run: ensureDungeonAssets },
+    ...paint.map(({ path, srgb }) => ({
+      id: `texture:${path}`,
+      run: () => loadTexture(path, { srgb }),
+    })),
+    ...[...structures, ...props, ...foliage].map((path) => ({
+      id: `model:${path}`,
+      run: () => loadGltf(path),
+    })),
+    ...decals.map(({ path, srgb }) => ({
+      id: `texture:${path}`,
+      run: () => loadTexture(path, { srgb }),
+    })),
+  ];
 }
 
-// The BACKGROUND lane, not just deferred: the field's art is only ever needed
-// by a player who enters the band, and buildBattleground() (below) already
-// streams its own pieces in as they resolve rather than reading the cache
-// synchronously (a player who arrives mid-stream sees the field fill in
-// rather than nothing at all), so it tolerates its preload finishing after
-// first frame too. Boot must not spend time on tens of MB of match art most
-// sessions never load into, on top of not competing with the launcher's own
-// fetches.
-if (typeof window !== 'undefined') {
-  registerDeferredPreload(() => ensureBattlegroundAssets(), 'background');
-}
+export const battlegroundAssetPrewarm = createBattlegroundAssetPrewarm(
+  battlegroundAssetPrewarmUnits,
+  {
+    idle: () =>
+      idleSlot(BG_PREWARM_IDLE_TIMEOUT_MS, { maxTimeoutDeferrals: 2 }).then(() => undefined),
+    batchSize: BG_PREWARM_BATCH_SIZE,
+  },
+);
 
 /** The renderer-owned hooks the field plugs into (the yumi signature shape). */
 export interface BattlegroundLightHooks {
@@ -305,6 +327,8 @@ export function buildBattleground(
   // (the paint texture array, one GLB per asset group), and the renderer's
   // build call is synchronous. Everything lands in the same group, so a player
   // who arrives mid-stream sees the field fill in rather than nothing at all.
+  // Queue intent normally commits the prewarm first; reconnecting directly
+  // into an active match deliberately takes this fail-soft streaming path.
   void (async () => {
     try {
       const { bgFieldHeightLocal } = await import('../sim/battleground_field');

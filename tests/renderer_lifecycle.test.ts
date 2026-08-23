@@ -185,7 +185,7 @@ describe('Renderer lifecycle wiring', () => {
     // entering interest range mid-ride and an already-mounted login both have
     // no edge to detect and would otherwise always hit the cold path.
     const createView = slice(
-      'private createView(e: Entity, opts?: AssembleOptions): void {',
+      'private createView(e: Entity, opts?: AssembleOptions, requiredForEntry = false): void {',
       '\n  }\n\n  // Shared core',
     );
     expect(createView).toContain("if (e.mountKey !== '') this.audioSink?.preloadMountEngine(");

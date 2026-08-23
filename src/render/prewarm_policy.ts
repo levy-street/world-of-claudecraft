@@ -338,6 +338,7 @@ export function prewarmSubmitShouldStop(
  */
 const PREWARM_DEBT_RESUME_IDS: ReadonlySet<string> = new Set([
   'programs.compile',
+  'programs.compile-post-paint',
   'programs.compile-submit',
   'textures.scene',
   'surface-detail.textures',
@@ -347,6 +348,13 @@ const PREWARM_DEBT_RESUME_IDS: ReadonlySet<string> = new Set([
 /** True when a dropped entry's resume units are hitch-causing debt. */
 export function prewarmResumeIsDebt(entryId: string): boolean {
   return PREWARM_DEBT_RESUME_IDS.has(entryId);
+}
+
+/** Only roots in the settled, visible scene are presentation-critical before
+ * first paint. Hidden archetype/material catalogs retain their stand-ins and
+ * enter the bounded debt lane after the curtain has produced one frame. */
+export function compileGroupRunsBeforeInitialPaint(groupId: string): boolean {
+  return groupId === 'scene';
 }
 
 /**

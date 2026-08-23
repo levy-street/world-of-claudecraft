@@ -8,8 +8,6 @@ export interface CharacterStreamKickDependencies {
 export interface PostEntryWarmupDependencies {
   settleFarVista: () => Promise<boolean>;
   onFarVistaSettled: (ready: boolean) => void;
-  startBackgroundPreloads: () => number;
-  onBackgroundPreloadsStarted: (count: number) => void;
   onWarmupError: (source: PostEntryWarmupErrorSource, error: unknown) => void;
 }
 
@@ -24,7 +22,8 @@ export function kickCharacterPreloadStream(deps: CharacterStreamKickDependencies
   deps.onCharacterPreloadsStarted(deps.startCharacterPreloads());
 }
 
-/** Starts the remaining optional work once the revealed world is interactive. */
+/** Settles the far-vista stand-in once the revealed world is interactive.
+ * Secondary-context assets are intent-driven by their own UI seams. */
 export function runPostEntryWarmups(deps: PostEntryWarmupDependencies): void {
   try {
     void deps
@@ -34,6 +33,4 @@ export function runPostEntryWarmups(deps: PostEntryWarmupDependencies): void {
   } catch (error) {
     deps.onWarmupError('far-vista', error);
   }
-
-  deps.onBackgroundPreloadsStarted(deps.startBackgroundPreloads());
 }

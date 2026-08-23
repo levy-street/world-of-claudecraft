@@ -336,8 +336,34 @@ interface AttributionTargetFixture {
 // was retaken: the merged renderer delta is upstream's rift collision and
 // view-resource-disposal work plus this branch's farm-visual wiring, neither
 // of which moves the sealed pixels.
+//
+// RE-MINTED AGAIN at the Phase 11h release sync (release tip 50462dda83, PR
+// #3582's entry-admission perf work; prior synced release parent 3e49dc11b3).
+// The SIXTH consecutive sync to re-mint this seal, and the trigger is the one
+// it has always been: a MOVED SWEPT INPUT, never a conflicting seal. BOTH
+// parents edited src/render/renderer.ts since the common base (base 13584,
+// ours 13614, theirs 13541, merged 13571), and the release also moved
+// src/render/prewarm_policy.ts, so the merged tree is a third content and
+// NEITHER parent's literal describes it. Parent values for the record:
+// composite ours 18bcb514 / theirs 9c27fa70; metadata sha256 ours bb2148e4 /
+// theirs af5eef8b; second-order performance digest ours fa94c388 / theirs
+// f06481ca. The merged mint matches neither on any of the three.
+//
+// UPSTREAM'S NEW HALF over this span, kept rather than dropped: the release
+// re-minted after merging release/v0.40.0 into its loading-hitch branch, where
+// renderer.ts combined mandatory entry admission with the rift long-session
+// resource lifecycle changes, and again for that branch's loading review fixes
+// (rebuild reveal gates, the inactive horizon fast path, display-pacing
+// admission and the restored rationale). No capture was retaken in either.
+//
+// Minted from the merged WORKING TREE with the repo's own tool
+// (scripts/assets/eastbrook_grand_armoury/remint_polish_provenance.mjs) rather
+// than hand-edited, and committed with exactly the bytes it read. No capture
+// was retaken: the merged renderer delta is upstream's entry-admission and
+// texture/compile extraction work plus this branch's farm-visual wiring,
+// neither of which moves the sealed pixels.
 const PINNED_POLISH_COMPOSITE_FINGERPRINT =
-  '18bcb51434c7dc8dd1cd1dc57fb4feed0013143adffcb4f80a57553fdde61c51';
+  '6c733d4138b79075328129c5badcf93d5f8c458e608cc4464724f9c76f22dbef';
 
 function validPolishAttributionTargets(): AttributionTargetFixture[] {
   return [

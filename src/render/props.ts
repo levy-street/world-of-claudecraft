@@ -110,11 +110,11 @@ export interface PropsResult {
   /**
    * The same gate for the merged and instanced BANDS: a band's first fog
    * reveal on a walking approach is held hidden until the gate warms its key
-   * (prop_cull_core). Armed separately, at world entry: under the curtain
-   * the bands beyond half the fog would otherwise queue their compiles
-   * beside the manifest's near-first units, while the initial frame links
-   * whatever is visible anyway; unarmed, a band keeps the historical
-   * immediate cull and latches as revealed.
+   * (prop_cull_core). Installed at the start of every scene prewarm, including
+   * graphics rebuilds. The initial-entry first-paint barrier keeps its work
+   * behind the manifest; rebuild prewarms have no barrier and preserve the
+   * historical immediate compile start. Without a gate, a band keeps the
+   * historical immediate cull and latches as revealed.
    */
   setBandRevealGate(gate: RevealGateCore | null): void;
   /** The compile roots behind a gate key: a far cell's bake meshes, its

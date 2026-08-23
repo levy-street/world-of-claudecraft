@@ -920,10 +920,23 @@ const ACCEPTED_POLISH_V2_METADATA_PATH = path.join(REPO_ROOT, POLISH_SEAL_PATH);
 // was retaken: the merged renderer delta is upstream's rift collision and
 // view-resource-disposal work plus this branch's farm-visual wiring, neither
 // of which moves the sealed pixels.
+//
+// RE-MINTED AGAIN at the Phase 11h release sync (release tip 50462dda83, PR
+// #3582). BOTH parents edited src/render/renderer.ts since the common base
+// (base 13584, ours 13614, theirs 13541, merged 13571) and the release also
+// moved src/render/prewarm_policy.ts, so the merged tree is a third content
+// and neither parent's literal describes it. Parent values for the record:
+// metadata sha256 ours bb2148e4 / theirs af5eef8b, composite ours 18bcb514 /
+// theirs 9c27fa70. Upstream's own half over this span, kept rather than
+// dropped: it re-minted after merging release/v0.40.0 into its loading-hitch
+// branch (renderer.ts combining mandatory entry admission with the rift
+// long-session resource lifecycle) and again for that branch's loading review
+// fixes. Minted from the merged WORKING TREE with the repo's own tool and
+// committed with exactly the bytes it read. No capture was retaken.
 const ACCEPTED_POLISH_V2_METADATA_SHA256 =
-  'bb2148e4a8da483067ccbd51b032dd504877add764eb4898d6382d13629249db';
+  '07ad4712a9d78b7f44e9058049c58376604d04de9ca80fcf9de2da74a4c9a70c';
 const ACCEPTED_POLISH_V2_COMPOSITE_PROVENANCE =
-  '18bcb51434c7dc8dd1cd1dc57fb4feed0013143adffcb4f80a57553fdde61c51';
+  '6c733d4138b79075328129c5badcf93d5f8c458e608cc4464724f9c76f22dbef';
 const ACCEPTED_POLISH_V2_METADATA = readJsonFile<CaptureMetadata>(ACCEPTED_POLISH_V2_METADATA_PATH);
 const ACCEPTED_POLISH_V2_PROVENANCE = ACCEPTED_POLISH_V2_METADATA.polishProvenance;
 const ACCEPTED_POLISH_V2_TOWN_CONTRACT = ACCEPTED_POLISH_V2_METADATA.records[0]?.townContract;
@@ -2023,7 +2036,16 @@ describe('Eastbrook polish performance and contact evidence', () => {
       // long-session perf merge with release/v0.40.0 (renderer.ts moved on both
       // sides of THAT merge). Same order, the composite first, then this seal.
       // No capture was retaken.
-    ).toBe('fa94c388bcaf7e38c6de1d1d80b8c571a1fc99a82a9b1f89ef0e6dba1ccb9a32');
+      // Re-minted at the Phase 11h release sync (release tip 50462dda83): both
+      // parents edited renderer.ts again and the release also moved
+      // prewarm_policy.ts, so the merged tree is a third content. Parent values
+      // for the record: ours fa94c388, the release f06481ca. The release's own
+      // half over this span, kept rather than dropped: it re-minted after
+      // merging release/v0.40.0 into its loading-hitch branch (renderer.ts
+      // moved on both sides of THAT merge) and again for its loading review
+      // fixes. Same order, the composite first, then this seal. No capture was
+      // retaken.
+    ).toBe('2519fee9b5602d3797a43c28bbc33274a6fa72f5b513daa32c70f3b618ca3c0c');
   });
 
   it('binds every historical after record to its accepted source and asset provenance', () => {

@@ -123,12 +123,13 @@ describe('reveal gate wiring (source pins)', () => {
     expect(wiring).toContain(
       'predictRevealMs: () => this.gpuPrepBudget.predictMs(REVEAL_GATE_PREP_KIND),',
     );
+    expect(wiring).toContain('startAfterInitialPaint: () => this.initialGpuWorkStart,');
     expect(wiring).toContain(
       'this.propsRevealGate = createRevealGate(revealHost, (key) => this.propsView.revealRoots(key));',
     );
     expect(wiring).toContain('this.propsView.setRevealGate(this.propsRevealGate);');
-    // The band arm of the props gate arms at WORLD ENTRY (the tail of the
-    // boot prewarm), never in the constructor: armed under the curtain, the
+    // The band arm of the props gate installs at the start of EVERY scene
+    // prewarm, never in the constructor: armed under the curtain, the
     // bands beyond half the fog would queue their compiles beside the
     // manifest's near-first units for content the initial frame links
     // anyway. The negative scans the WHOLE constructor, bounded on its
@@ -143,12 +144,24 @@ describe('reveal gate wiring (source pins)', () => {
     // bucket past half the fog would queue a compile beside the manifest's
     // near-first units for content the initial frame links anyway.
     expect(constructorBody).not.toContain('this.foliage.setRevealGate');
-    const entryTail = rendererSource.slice(
-      anchor(rendererSource, 'this.prewarmedZonePrograms.add(activeZone.id);'),
-      anchor(rendererSource, '[entry-guard] prewarm done:'),
+    const prewarm = rendererSource.slice(
+      anchor(rendererSource, 'async prewarmInitialScene('),
+      anchor(rendererSource, 'const policy: PrewarmPolicy = resolvePrewarmPolicy'),
     );
-    expect(entryTail).toContain('this.propsView.setBandRevealGate(this.propsRevealGate);');
-    expect(entryTail).toContain('this.foliage.setRevealGate(this.foliageRevealGate);');
+    expect(prewarm).toContain('this.installSceneryRevealGates();');
+    expect(prewarm).toContain('this.initialGpuWorkStart = null;');
+    const install = rendererSource.slice(
+      anchor(rendererSource, 'private installSceneryRevealGates(): void {'),
+      anchor(rendererSource, 'armEntryDetailHorizon(): void {'),
+    );
+    expect(install).toContain('this.propsView.setBandRevealGate(this.propsRevealGate);');
+    expect(install).toContain('this.foliage.setRevealGate(this.foliageRevealGate);');
+    const entryArm = rendererSource.slice(
+      anchor(rendererSource, 'armEntryDetailHorizon(): void {'),
+      anchor(rendererSource, 'setHitchLogEnabled(enabled: boolean)'),
+    );
+    expect(entryArm).not.toContain('setBandRevealGate');
+    expect(entryArm).not.toContain('this.foliage.setRevealGate');
     expect(wiring).toContain('this.eastbrookTownView.setRevealGate(');
     expect(wiring).toContain('this.fenbridgeTownView.setRevealGate(');
     // The foliage buckets ride the SAME host and the same queue: one more
@@ -160,6 +173,32 @@ describe('reveal gate wiring (source pins)', () => {
     expect(
       rendererSource.match(/const revealHost = createRevealCompileHost\(/g) ?? [],
     ).toHaveLength(1);
+  });
+
+  it('covers graphics rebuild prewarm and bounds the entry-only first-paint barrier', () => {
+    const main = readFileSync(new URL('../src/main.ts', import.meta.url), 'utf8');
+    const rebuild = main.slice(
+      anchor(main, 'prewarmRenderer: async (next) => {'),
+      anchor(main, 'validateRenderer: (next) => {'),
+    );
+    expect(rebuild).toContain('await next.prewarmInitialScene();');
+
+    const entry = main.slice(
+      anchor(main, 'const initialPrewarmResumeStartGate = createInitialPrewarmResumeStartGate();'),
+      anchor(main, "entryDiagnostics.checkpoint('first-paint');"),
+    );
+    expect(entry).toContain('resumeAfterFirstPaint: initialPrewarmResumeStartGate.wait,');
+    expect(entry.indexOf('initialPrewarmResumeStartGate.armBackstop();')).toBeLessThan(
+      entry.indexOf('await nextPaint();'),
+    );
+  });
+
+  it("lets the detail horizon inherit the governor's observed external display pacing", () => {
+    const demandAt = anchor(rendererSource, 'const detailHorizonDemandFar =');
+    const vistaAt = rendererSource.indexOf('if (vista) {', demandAt);
+    expect(vistaAt).toBeGreaterThan(demandAt);
+    const ambience = rendererSource.slice(demandAt, vistaAt);
+    expect(ambience).toContain('this.renderBudgetState.externalFrameCap,');
   });
 
   it('props threads the gate into the per-frame far-cell and band updates', () => {
@@ -313,14 +352,15 @@ describe('reveal gate wiring (source pins)', () => {
     // the hard deadline (13.8 s instead of stalling after one unit), and the
     // whole manifest behind it (settle-state, textures, the initial frame)
     // times out. Hidden decor is the reveal gates' job, not the sweep's.
-    const sweep = rendererSource.slice(
-      anchor(rendererSource, "id: 'scene',"),
-      anchor(rendererSource, 'compileRootDistanceSq(root, this.sim.player.pos.x'),
+    const compileUnits = read('../src/render/initial_scene_compile_units.ts');
+    const sweep = compileUnits.slice(
+      anchor(compileUnits, "id: 'scene',"),
+      anchor(compileUnits, 'compileRootDistanceSq(root, options.playerX'),
     );
     // The scene unit's collector call, whitespace-agnostic: the visible-only
     // flag is the literal `true` second argument.
     expect(sweep).toMatch(
-      /compileRoots\(\s*this\.scene\.children\.filter\(\(root\) => !stagedRoots\.has\(root\)\),\s*true,\s*\)/,
+      /compileRoots\(\s*options\.scene\.children\.filter\(\(root\) => !stagedRoots\.has\(root\)\),\s*true,\s*\)/,
     );
     // The background (idle) zone prepare compiles the shadow-pass depth
     // variant AFTER the colour one, inside the same queue unit.
