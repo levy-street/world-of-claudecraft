@@ -925,8 +925,14 @@ describe('the farming ladder: every farming zone arrives mechanically whole', ()
   });
 
   it('exactly one hoe per tier; rung 1 is the only priced rung and the top rung routes through content', () => {
-    // Non-vacuity for the per-tier loop: the ladder really has four members.
-    expect(farmingTools).toHaveLength(4);
+    // Non-vacuity for the per-tier loop: the ladder really has five members
+    // since masterwrought Phase 11j added the apex rung. The loop below still
+    // walks FARMING_ZONE_TIERS, which tops out at 4, and that mismatch is the
+    // POINT rather than a gap: there is no tier-5 crop zone, so the apex hoe
+    // opens no new crop tier and buys the epic rarity rung on the tool-effect
+    // economy instead. A tier-5 zone arriving later would pull it into the
+    // loop with no edit here.
+    expect(farmingTools).toHaveLength(5);
     for (const tier of Object.values(FARMING_ZONE_TIERS)) {
       const ofTier = farmingTools.filter(
         ([, def]) => def.use?.type === 'gatherTool' && def.use.tier === tier,
@@ -956,6 +962,10 @@ describe('the farming ladder: every farming zone arrives mechanically whole', ()
       bronze_hoe: 'common',
       skysilver_hoe: 'uncommon',
       osmium_hoe: 'rare',
+      // The apex rung's epic is load-bearing rather than decorative: rarity is
+      // exactly what this rung buys, through startingDurabilityFor's per-rung
+      // charge bonus and ratchetCeilingForUse's refill ceiling.
+      evergarden_hoe: 'epic',
     });
   });
 
@@ -1111,12 +1121,14 @@ describe('the farming ladder: every farming zone arrives mechanically whole', ()
         .map((npc) => npc.id)
         .sort(),
     ).toEqual(Object.keys(FARMER_STOCK).sort());
-    // The needle set for the sweeps below: 39 materials plus the four hoes.
+    // The needle set for the sweeps below: 39 materials plus the FIVE hoes
+    // (four until masterwrought Phase 11j added the apex rung; the material
+    // half did not move, because an apex tool is not a material).
     const farmingItemIds = new Set<string>([
       ...FARM_MATERIAL_ITEM_IDS,
       ...farmingTools.map(([itemId]) => itemId),
     ]);
-    expect(farmingItemIds.size).toBe(43);
+    expect(farmingItemIds.size).toBe(44);
     // NO OTHER NPC vendors a farming item: the four farmers are the whole
     // surface, so a seed or a hoe drifting onto a station master's counter
     // reds here rather than sliding through the narrowed hub sweep above.
@@ -1148,11 +1160,18 @@ describe('the farming ladder: every farming zone arrives mechanically whole', ()
     // is real. This sweep and tests/deeds_content.test.ts red only on the
     // purchase surfaces, so a non-purchase faucet reaches the prose ONLY
     // through this reminder and the D11 phase's own checklist.
+    // OSMIUM_HOE LEFT THIS SET at masterwrought Phase 11j (decision B), and
+    // the apex evergarden_hoe never joined it: both crafted top rungs now have
+    // a delve Marks route, so "never stocked on any purchase surface" has
+    // stopped being true of them. What remains is the claim that survived:
+    // rungs 2 and 3 have no purchase surface at all. The seeds left this set
+    // the same way at 11e and that direction, out rather than in, is the one
+    // that must never reverse silently, so both hoe rungs are pinned as
+    // ACTUALLY stocked further down rather than just dropped from here.
     const NEVER_STOCKED = new Set<string>([
       'growth_tonic',
       'bronze_hoe',
       'skysilver_hoe',
-      'osmium_hoe',
       ...FARM_RECIPES.map((recipe) => recipe.resultItemId),
     ]);
     // Non-vacuity of the needle set: fourteen recipe outputs plus the four
@@ -1164,9 +1183,10 @@ describe('the farming ladder: every farming zone arrives mechanically whole', ()
     // the seeds left this set rather than joining it, which is the whole
     // point of the gate and the one direction that must never be reversed
     // silently. The set now carries only outputs and supplies, and the
-    // arithmetic still holds: 14 outputs + 4 literals - 1 overlap = 17.
+    // arithmetic still holds: 14 outputs + 3 literals - 1 overlap = 16, having
+    // been 17 before 11j took osmium_hoe out.
     expect(FARM_RECIPES).toHaveLength(14);
-    expect(NEVER_STOCKED.size).toBe(17);
+    expect(NEVER_STOCKED.size).toBe(16);
     // All eight upper-tier seeds are DELIBERATELY absent from the set, asserted
     // rather than implied by the deletion above. HONEST ABOUT ITS REACH,
     // corrected at the 11e QA: NEVER_STOCKED is built from a literal a few
@@ -1234,10 +1254,32 @@ describe('the farming ladder: every farming zone arrives mechanically whole', ()
     expect(marksFarmingRows, 'the ruled marks rows must really be stocked').toBe(
       MARKS_ALLOWED.size,
     );
+    // THE DELVE COUNTERS ARE NO LONGER FARMING-FREE, and the exception is
+    // named the same way the heroic quartermaster's was rather than the sweep
+    // being dropped (masterwrought Phase 11j, decision B). Exactly the two
+    // CRAFTED TOP RUNGS may appear, because masterwrought R18 says nobody must
+    // have TAKEN a profession to get a thing and this counter is the gathering
+    // family's one non-crafter route. The allowance is DERIVED from the hoe
+    // ladder's own tiers, so it cannot quietly widen to a seed, a tier-1 or
+    // tier-2 hoe, produce, a fine twin or a dish: every one of those still
+    // reds here.
+    const DELVE_ALLOWED = new Set(
+      farmingTools
+        .filter(([, def]) => def.use?.type === 'gatherTool' && def.use.tier >= 4)
+        .map(([itemId]) => itemId),
+    );
+    expect(DELVE_ALLOWED, 'the two crafted top rungs').toEqual(
+      new Set(['osmium_hoe', 'evergarden_hoe']),
+    );
     let delveRowsSeen = 0;
+    let delveFarmingRows = 0;
     for (const [delveId, entries] of Object.entries(DELVE_SHOPS)) {
       for (const entry of entries) {
         delveRowsSeen += 1;
+        if (DELVE_ALLOWED.has(entry.itemId)) {
+          delveFarmingRows += 1;
+          continue;
+        }
         expect(
           farmingItemIds.has(entry.itemId) || NEVER_STOCKED.has(entry.itemId),
           `${delveId} delve shop stocks farming item ${entry.itemId}`,
@@ -1245,6 +1287,12 @@ describe('the farming ladder: every farming zone arrives mechanically whole', ()
       }
     }
     expect(delveRowsSeen).toBeGreaterThan(0);
+    // Same shape as the marks allowance above: the exception cannot outlive
+    // the channel it was written for, so every allowed rung must really be on
+    // a counter.
+    expect(delveFarmingRows, 'both ruled hoe rungs must really be stocked').toBe(
+      DELVE_ALLOWED.size,
+    );
   });
 
   it('no farm recipe is craftable from vendor stock alone', () => {

@@ -2501,7 +2501,8 @@ describe('Guide professions gathering accuracy', () => {
         // beds are patch content, never nodes), so the node aggregation stays
         // EMPTY on purpose and no respawn number ever publishes. The tool
         // ladder is the aggregation's real farming output since the Phase 5
-        // hoes: the four rungs, rung 1 the only priced one (seated on the
+        // hoes: the five rungs since masterwrought Phase 11j, rung 1 the only
+        // priced one (seated on the
         // tier-1 farmer NPC since the go-live; the row-by-row mirror below
         // owns the rest of the fields).
         expect(g.nodes).toEqual([]);
@@ -2510,6 +2511,7 @@ describe('Guide professions gathering accuracy', () => {
           ['Bronze Hoe', 2, null],
           ['Skysilver Hoe', 3, null],
           ['Osmium Hoe', 4, null],
+          ['Evergarden Hoe', 5, null],
         ]);
         expect(g.respawnSeconds).toBeUndefined();
         continue;

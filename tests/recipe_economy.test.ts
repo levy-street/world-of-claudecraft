@@ -359,7 +359,10 @@ describe('REFERENTIAL INTEGRITY', () => {
     expect(INTERMEDIATE_RECIPES).toHaveLength(10);
     expect(ROD_RECIPES).toHaveLength(3);
     expect(TOOL_EFFECT_RECIPES).toHaveLength(2);
-    expect(HOE_RECIPES).toHaveLength(3);
+    // FOUR since masterwrought Phase 11j added the apex rung. All four stay
+    // trainer-taught, so unlike the rod and farm sets the hoe term needs no
+    // channel split: the whole list still feeds the sum above.
+    expect(HOE_RECIPES).toHaveLength(4);
     // The economy-hooks phase's eight farm dishes, the four Phase 11 well-fed
     // buff dishes, the growth tonic's alchemy row, and the Phase 12 shared
     // feast (a cooking row with a placeable junk output). Deliberately

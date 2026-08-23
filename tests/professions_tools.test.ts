@@ -749,9 +749,11 @@ describe('crafted higher-tier base tools and monster-material gating (#1135)', (
       ITEMS.tidewrought_fishing_rod,
       ITEMS.clockreel_fishing_rod,
     ];
-    // The hoe phase: farming's ladder tops out at the crafted tier-4
-    // osmium_hoe (HOE_RECIPES work; no tier-5 hoe ships this phase).
-    const farming = [ITEMS.osmium_hoe];
+    // TWO since masterwrought Phase 11j: the hoe phase left farming's ladder
+    // topping out at the crafted tier-4 osmium_hoe, and 11j added the tier-5
+    // rung that made farming the fifth member of the apex base-tool family
+    // rather than the one gathering profession stopping a rung short.
+    const farming = [ITEMS.osmium_hoe, ITEMS.evergarden_hoe];
     // DERIVED, not hand-listed: every gatherTool above tier 3, whatever its
     // profession. The four lists are the readable statement of what that set
     // is today, and the cross-check is what makes a future crafted tool land
@@ -793,14 +795,15 @@ describe('crafted higher-tier base tools and monster-material gating (#1135)', (
       Object.values(DELVE_SHOPS).flatMap((entries) => entries.map((e) => e.itemId)),
     );
     for (const id of craftedIds) {
-      // osmium_hoe is the DELIBERATE exception to the Marks route: the hoe
-      // phase ships no delve Marks fallback row (the hoe block in
-      // content/items.ts, flagged for the maintainer), so craft is its only
-      // mint above rung 1 and the absence is pinned rather than assumed.
-      if (id === 'osmium_hoe') {
-        expect(delveStocked.has(id)).toBe(false);
-        continue;
-      }
+      // OSMIUM_HOE IS NO LONGER AN EXCEPTION (masterwrought Phase 11j,
+      // decision B). It used to be pinned ABSENT from the Marks route because
+      // the hoe phase shipped no fallback row and flagged the question for the
+      // maintainer; that question is answered, both crafted hoe rungs now sit
+      // on the Drowned Litany counter beside their land and rod siblings, and
+      // farming is no longer the only gathering profession without a
+      // non-crafter route at the tier-4 rung (masterwrought R18). It therefore
+      // falls through to the ordinary sweep below and is asserted PRESENT like
+      // every other crafted tool, which is a stronger pin than the waiver was.
       // clockreel_fishing_rod is the SECOND deliberate exception (masterwrought
       // Phase 11i), and it is a different argument from the hoe's rather than
       // the same waiver twice. The Marks route exists so a tool ladder is never
@@ -844,10 +847,13 @@ describe('crafted higher-tier base tools and monster-material gating (#1135)', (
       // future counter row cannot quietly price one.
       for (const item of tools) expect(item.buyValue).toBeUndefined();
     }
-    // Farming's single crafted rung, outside the [4, 5] pair loop above
-    // because no tier-5 hoe ships: tier 4 only, and never priced in copper.
+    // Farming's crafted rungs. Kept OUTSIDE the pair loop above even now that
+    // it reads [4, 5] like the land ladders, because the loop walks the
+    // professions whose ladders that phase shipped and this list is the one
+    // masterwrought Phase 11j completed; folding it in would hide which change
+    // made the pair true. Never priced in copper, same as every rung above 1.
     expect(farming.every(Boolean)).toBe(true);
-    expect(farming.map((item) => gatherToolTier(item, 'farming'))).toEqual([4]);
+    expect(farming.map((item) => gatherToolTier(item, 'farming'))).toEqual([4, 5]);
     for (const item of farming) expect(item.buyValue).toBeUndefined();
   });
 

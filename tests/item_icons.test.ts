@@ -319,7 +319,8 @@ describe('item webp icons', () => {
     // feast added the harvest_feast placeable, and Phase 11f added the six
     // farming PATTERNS its rung climb minted (56 -> 62), and Phase 11i added
     // the angler's endgame's eleven (62 -> 73: three high-band catches, the
-    // apex rod, two dishes, the capstone feast and four patterns), all under
+    // apex rod, two dishes, the capstone feast and four patterns), and Phase
+    // 11j added the apex hoe (73 -> 74), all under
     // the same reasoning: their art is scheduled as its own later phase, a
     // deliberate ART PARK running Phases 11e to 11k. It must fall back to 0 as
     // that art lands. CORRECTED at the Phase 11e QA: this used to add "all are dormant
@@ -346,6 +347,7 @@ describe('item webp icons', () => {
       'evergarden_greens',
       'evergarden_greens_seed',
       'evergarden_harvest_platter',
+      'evergarden_hoe',
       'evergarden_pumpkin',
       'evergarden_pumpkin_seed',
       'evergarden_sunmelon_tart',

@@ -34,10 +34,13 @@ const cropOfFineTwin = (itemId: string) =>
   Object.values(FARM_CROPS).find((crop) => crop.fineProduceItemId === itemId);
 
 describe('the crafted hoe ladder', () => {
-  it('is exactly the three rungs above the vendor hoe, each producing the next tier up', () => {
-    expect(HOE_RECIPES).toHaveLength(3);
+  it('is exactly the four rungs above the vendor hoe, each producing the next tier up', () => {
+    // FOUR since masterwrought Phase 11j added the apex rung, which made
+    // farming the fifth member of the shipped tier-5 base-tool family rather
+    // than the one gathering profession whose ladder stopped at 4.
+    expect(HOE_RECIPES).toHaveLength(4);
     const producedTiers = HOE_RECIPES.map((r) => hoeTierOf(r.resultItemId));
-    expect(producedTiers).toEqual([2, 3, 4]);
+    expect(producedTiers).toEqual([2, 3, 4, 5]);
     for (const recipe of HOE_RECIPES) {
       expect(recipe.professionId).toBe('engineering');
       expect(recipe.stationType).toBe('toolworks');
@@ -55,7 +58,7 @@ describe('the crafted hoe ladder', () => {
       expect(hoeReagents[0].count).toBe(1);
       checked += 1;
     }
-    expect(checked).toBe(3);
+    expect(checked).toBe(4);
   });
 
   it('every rung consumes the fine twin of a crop ONE TIER BELOW its result, and no node grade', () => {
@@ -80,10 +83,10 @@ describe('the crafted hoe ladder', () => {
         ).toBeUndefined();
       }
     }
-    expect(fineTwins).toBe(3);
+    expect(fineTwins).toBe(4);
   });
 
-  it('all three rungs are trainer-taught, at a skill a learner can actually reach', () => {
+  it('all four rungs are trainer-taught, at a skill a learner can actually reach', () => {
     // The ROD_RECIPES lesson restated for the hoes: the pre-training id list
     // is frozen, so anything authored after that switch has to be learned,
     // and a trainer only teaches a recipe whose TIER the learner has
@@ -96,7 +99,7 @@ describe('the crafted hoe ladder', () => {
         `${recipe.id} skillReq ${recipe.skillReq} is above the reachable tier`,
       ).toBeLessThanOrEqual(tierForSkill(cap));
     }
-    expect(HOE_RECIPES.map((r) => r.skillReq)).toEqual([25, 50, 75]);
+    expect(HOE_RECIPES.map((r) => r.skillReq)).toEqual([25, 50, 75, 125]);
   });
 
   it('rides ALL_RECIPES, and stays out of TOOL_RECIPES', () => {
@@ -114,17 +117,12 @@ describe('the crafted hoe ladder', () => {
     expect(TOOL_RECIPES).toHaveLength(6);
   });
 
-  it('rungs 2 to 4 are CRAFT-ONLY: no copper price, no counter, and deliberately no Marks row', () => {
-    // The divergence from the rod ladder, pinned so it cannot be mistaken
-    // for an oversight: the rods leave rungs 2 and 3 vendor-priced and keep
-    // a delve Marks fallback for the crafted pair, but the hoe pricing table
-    // locks buyValue OFF rungs 2 to 4 and the phase ships NO Marks row (the
-    // hoe block in content/items.ts, flagged for the maintainer), so craft
-    // is the only mint above rung 1 and a non-engineer farmer buys from
-    // players via market or trade.
-    const delveStocked = new Set(
-      Object.values(DELVE_SHOPS).flatMap((entries) => entries.map((e) => e.itemId)),
-    );
+  it('no hoe rung is ever sold for COPPER above the entry rung', () => {
+    // The half of the old craft-only pin that did NOT narrow, kept whole: no
+    // copper price and no NPC counter, at every crafted rung. This is the
+    // claim the hoe pricing table actually makes, and Marks are a delve
+    // currency rather than copper, so the two Marks rows below leave it
+    // untouched.
     for (const recipe of HOE_RECIPES) {
       expect(ITEMS[recipe.resultItemId].buyValue).toBeUndefined();
       for (const npc of Object.values(NPCS)) {
@@ -136,14 +134,49 @@ describe('the crafted hoe ladder', () => {
         HEROIC_VENDOR_STOCK.map((o) => o.itemId),
         `the heroic counter stocks ${recipe.resultItemId}`,
       ).not.toContain(recipe.resultItemId);
-      expect(
-        delveStocked.has(recipe.resultItemId),
-        `${recipe.resultItemId} gained a Marks row: re-pin this arm deliberately`,
-      ).toBe(false);
     }
     // The entry rung stays the 20-copper vendor purchase, which is what
-    // gives the craft-only ladder its entry point (the acquisition-coverage
-    // note in content/recipes.ts).
+    // gives the ladder its entry point (the acquisition-coverage note in
+    // content/recipes.ts).
     expect(ITEMS.garden_hoe.buyValue).toBe(20);
+  });
+
+  it('the no-Marks rule NARROWED to hoe rungs 1 to 3, and rungs 4 and 5 carry their rows', () => {
+    // THE TRIPWIRE WAS DISCHARGED BY RE-DECIDING, NOT BY WIDENING
+    // (masterwrought Phase 11j, decision B). The old arm asserted no hoe rung
+    // anywhere had a Marks row, and carried a deliberate self-clearing message
+    // telling whoever added one to re-pin the arm rather than delete it. That
+    // is what happened: farming was the only gathering profession with no
+    // non-crafter route at the tier-4 rung, which masterwrought R18 forbids,
+    // so BOTH the tier-4 and tier-5 hoes joined the Drowned Litany counter
+    // beside their land and rod siblings.
+    //
+    // What survives is the rule for rungs 1 to 3, which really are craft-only
+    // (rung 1 is the copper entry purchase, rungs 2 and 3 have no route but
+    // the toolworks or another player). Asserted BOTH ways so neither half can
+    // rot: the low rungs must stay off the counter, and the top two must stay
+    // on it at the price and gate their tier earns.
+    const delveStocked = new Map(
+      Object.values(DELVE_SHOPS).flatMap((entries) => entries.map((e) => [e.itemId, e] as const)),
+    );
+    for (const recipe of HOE_RECIPES) {
+      const tier = hoeTierOf(recipe.resultItemId) as number;
+      if (tier <= 3) {
+        expect(
+          delveStocked.has(recipe.resultItemId),
+          `${recipe.resultItemId} is a rung-1-to-3 hoe and gained a Marks row: re-decide this arm deliberately, never widen it`,
+        ).toBe(false);
+      }
+    }
+    expect(delveStocked.get('garden_hoe')).toBeUndefined();
+    expect(delveStocked.get('bronze_hoe')).toBeUndefined();
+    expect(delveStocked.get('skysilver_hoe')).toBeUndefined();
+    // The two that DID join, on the counter's own existing rungs: no new price
+    // point and no new gate was invented for either.
+    expect(delveStocked.get('osmium_hoe')).toMatchObject({ marks: 24, gate: 'clears:3' });
+    expect(delveStocked.get('evergarden_hoe')).toMatchObject({
+      marks: 56,
+      gate: 'heroicClear',
+    });
   });
 });

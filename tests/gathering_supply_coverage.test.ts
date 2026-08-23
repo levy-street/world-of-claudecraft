@@ -46,10 +46,10 @@
 // literals stay untouched by it.
 
 import { describe, expect, it } from 'vitest';
-import { ITEMS } from '../src/sim/data';
 import { ENCHANTS } from '../src/sim/content/enchants';
 import { FARM_CROPS } from '../src/sim/content/farm_crops';
 import { FISHING_TABLES_BY_BAND } from '../src/sim/content/items';
+import type { GatheringProfessionId } from '../src/sim/content/professions';
 import {
   GATHERING_PROFESSION_IDS,
   GATHERING_PROFESSIONS,
@@ -57,11 +57,12 @@ import {
   HARVEST_COMPONENT_SPECIMENS,
 } from '../src/sim/content/professions';
 import { ALL_RECIPES } from '../src/sim/content/recipes';
+import { ITEMS } from '../src/sim/data';
 import { NODE_HARVEST_TABLE, NODE_MATERIAL_TABLE } from '../src/sim/professions/gathering';
 import { MATERIAL_GRADES } from '../src/sim/professions/material_grades';
 import { gatherToolTier } from '../src/sim/professions/tools';
 import { tierForSkill } from '../src/sim/professions/wheel';
-import type { GatheringProfessionId } from '../src/sim/content/professions';
+import type { GatherNodeType } from '../src/sim/types';
 
 // The sixth family. Corpse harvesting is a gathering FAMILY without being a
 // gathering PROFESSION: it has no id in GATHERING_PROFESSION_IDS, no counter
@@ -106,9 +107,9 @@ const LEVELLING_BANDS = Array.from({ length: ENDGAME_BAND }, (_, i) => i);
  */
 function nodeSupplyFor(professionId: GatheringProfessionId): Set<string> {
   const ids = new Set<string>();
-  for (const [nodeType, row] of Object.entries(NODE_HARVEST_TABLE)) {
-    if (row.professionId !== professionId) continue;
-    for (const cell of Object.values(NODE_MATERIAL_TABLE[nodeType as never])) {
+  for (const nodeType of Object.keys(NODE_HARVEST_TABLE) as GatherNodeType[]) {
+    if (NODE_HARVEST_TABLE[nodeType].professionId !== professionId) continue;
+    for (const cell of Object.values(NODE_MATERIAL_TABLE[nodeType])) {
       ids.add(cell.itemId);
       const fine = MATERIAL_GRADES[cell.itemId]?.fineItemId;
       if (fine !== undefined) ids.add(fine);
