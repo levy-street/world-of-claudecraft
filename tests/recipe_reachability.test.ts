@@ -41,6 +41,7 @@
 // at the fixpoint is either a real deadlock or a faucet the model does not know
 // about, and the failure message says which reagent so the reader can tell.
 import { describe, expect, it } from 'vitest';
+import { FARM_CROPS } from '../src/sim/content/farm_crops';
 import { FISHING_TABLES_BY_BAND, RAW_COOKING_CATCH_IDS } from '../src/sim/content/items';
 import { ALL_RECIPES } from '../src/sim/content/recipes';
 import { ITEMS } from '../src/sim/data';
@@ -113,6 +114,34 @@ function toolGateFor(itemId: string): { professionId: string; nodeTier: number }
           return { professionId, nodeTier: Math.max(1, gatherMaterialTier(base) ?? 1) + 1 };
         }
       }
+    }
+  }
+  // THE FARMING LADDER, the fourth gathering family and the last one this model
+  // did not track (added by the Phase 11i QA). It matters for the same reason
+  // the fine grades did: every hoe above the vendor rung is CRAFTED and its bill
+  // consumes a crop, so the family has exactly the shape that can close a
+  // circuit, and before this branch every crop and every fine crop twin was
+  // seeded FREE.
+  //
+  // THE GATE IS THE PATCH TIER, and it is the one place farming differs from the
+  // land trades in a way worth stating. Planting is what needs the tool: the
+  // plant path drops any hoe below the bed's own tier, so a tier-N crop needs a
+  // tier-N hoe. The FINE twin is NOT separately tool-gated the way a fine ORE is:
+  // farming's fine grade is a skill-scaled roll per pick
+  // (FARM_FINE_CHANCE_BASE plus the skill scale in professions/farming.ts), not
+  // a yieldsFineGrade tool comparison, so the twin costs exactly what its base
+  // crop costs and takes the SAME tier rather than tier + 1. Gating it a tier
+  // high here would invent a requirement the engine does not have and could red
+  // on content that really is reachable.
+  //
+  // The live ladder is legitimately OPEN and this branch proves it rather than
+  // assuming it: garden_hoe is vendor stock at tier 1, the bronze hoe takes the
+  // tier-1 fine wheat, the skysilver takes the tier-2 fine rice, and the osmium
+  // takes a tier-3 twin, so each rung consumes the tier BELOW it exactly as the
+  // rod ladder does.
+  for (const crop of Object.values(FARM_CROPS)) {
+    if (crop.produceItemId === itemId || crop.fineProduceItemId === itemId) {
+      return { professionId: 'farming', nodeTier: crop.tier };
     }
   }
   for (const [professionId, nodeType] of Object.entries(NODE_TYPE_BY_PROFESSION)) {
@@ -287,6 +316,20 @@ describe('the crafting economy bootstraps from an empty realm', () => {
     // mining special case.
     expect(toolGateFor('fine_elderwood_log')?.professionId).toBe('logging');
     expect(toolGateFor('fine_sunpetal_herb')?.professionId).toBe('herbalism');
+    // AND THE FARMING LADDER, the fourth family. A crop and its fine twin take
+    // the SAME tier, because farming's fine grade is a skill roll rather than a
+    // tool comparison; that asymmetry with the land grades above is the whole
+    // reason this branch is separate, so it is pinned rather than left implicit.
+    expect(toolGateFor('vale_wheat')).toEqual({ professionId: 'farming', nodeTier: 1 });
+    expect(toolGateFor('fine_vale_wheat')).toEqual({ professionId: 'farming', nodeTier: 1 });
+    expect(toolGateFor('marsh_rice')).toEqual({ professionId: 'farming', nodeTier: 2 });
+    expect(toolGateFor('fine_highland_barley')).toEqual({ professionId: 'farming', nodeTier: 3 });
+    // The ladder really is climbed: the top hoe is only reachable because the
+    // rungs below it are crafted first, which is the ordering a circuit inverts.
+    const farmOwned = reachableItems().owned;
+    for (const id of ['bronze_hoe', 'skysilver_hoe', 'osmium_hoe']) {
+      expect(farmOwned.has(id), `${id} must be reachable`).toBe(true);
+    }
     // And the ladder really is climbed rather than assumed: the top catch is
     // only obtainable in the fixpoint because the tier-6 rod becomes craftable
     // first, which is the ordering the deadlock inverted.
