@@ -615,9 +615,15 @@ describe('FARM_RECIPES: the farm-economy hook set', () => {
     // WHAT THE ARM ACTUALLY GUARDED IS KEPT AND MADE STRONGER. The load-
     // bearing claim was never exclusivity, it was that no twin is left with
     // NOTHING: a farming fine twin gets no downward grade substitution, so a
-    // twin that is neither cooked nor forged is dead content. That is now
-    // asserted over the WHOLE twin column by either route, which is a
-    // superset of what the two partitioned loops proved between them.
+    // twin that is neither cooked nor forged is dead content. The whole-column
+    // sweep below states that directly.
+    //
+    // IT IS NOT A SUPERSET OF THE LOOPS AROUND IT, and saying so would invite
+    // someone to trim them: for the four hoe twins its filter is false by
+    // construction, and for the other eight the dish-only loop above is
+    // STRICTER (those eight owe a DISH, not merely some route). It is kept as
+    // the plain statement of the rule; the teeth are the dish loop above and
+    // the exact double-booking pin below.
     const hoeTwins = new Set(HOE_REAGENT_TWINS);
     const orphans = Object.values(FARM_CROPS)
       .map((c) => c.fineProduceItemId)

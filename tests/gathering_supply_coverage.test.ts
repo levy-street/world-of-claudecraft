@@ -42,6 +42,21 @@
 // there would report the eastbrook fine grades as dead content when they are
 // spendable on every recipe naming their base.
 //
+// WHAT THE DEMAND ARM UNIQUELY COVERS, stated honestly because the credit
+// narrows it. For the nine fine NODE grades the arm is now structurally
+// subsumed: it can only red in a state where tests/recipe_economy.test.ts has
+// already redded, since that file asserts every one of the nine BASE yields
+// has a consumer and anti-rot pins its list against NODE_MATERIAL_TABLE. The
+// same goes for the corpse components and the farm ids, which farm_recipes
+// covers. What is left over, and the reason this arm earns its place rather
+// than restating a neighbour, is the CATCHES: recipe_economy's RAW_FISH needle
+// list is the one list in that file with no anti-rot pin against its live
+// table, so the four catches added since it was written (glimmerfin_koi,
+// raw_deepbarb_catfish, raw_hollowgill_sturgeon, raw_stillmere_salmon) are
+// covered HERE and nowhere else. Pinning RAW_FISH against
+// FISHING_TABLES_BY_BAND would be the durable fix and belongs to whoever owns
+// that file.
+//
 // EVERYTHING IS DERIVED FROM LIVE TABLES. There is no hand-written id list and
 // no literal 25 in this file: the subject list comes from
 // GATHERING_PROFESSION_IDS, the supply sets come from the content tables the
