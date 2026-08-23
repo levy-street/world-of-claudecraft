@@ -566,6 +566,13 @@ describe('item webp icons', () => {
       seen.set(JSON.stringify(itemIconRecipe(id).prims), id);
     }
     // The seed really carried something, so the ordering above is not decoration.
+    //
+    // AND THIS FLOOR IS DELIBERATELY THE WEAK FORM. Do not tighten it to
+    // `toBe(PRE_DATED_FOOD_RADIAL.length)`: that would only hold if the
+    // pre-dating dishes were pairwise distinct from each other, which is
+    // exactly the claim this split exists NOT to make, so tightening it
+    // re-imposes the requirement the exemption was created to lift. A
+    // greater-than-zero floor is all this line is for.
     expect(seen.size).toBeGreaterThan(0);
     for (const id of DISH_ICON_IDS) {
       const recipe = itemIconRecipe(id);
