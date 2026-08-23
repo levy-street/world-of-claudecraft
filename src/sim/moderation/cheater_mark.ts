@@ -105,10 +105,12 @@ export function cheaterMarkAfterPlayed(
  *    applySickness in ../spirit.ts): a penalty a dispel, a cleanse, or a
  *    right-click could shed is not a penalty.
  *  - the PHYSICAL school, which isDispellableAura (../aura_classify.ts) refuses
- *    outright, whatever the flag says. This is what the repo's other inert
- *    markers ride ('flag_carried', 'internal_cd'), and it is the reason the
- *    mark is not on 'shadow': a shadow-school debuff protected by one boolean
- *    is one careless edit away from being a warlock's Voidfeast snack.
+ *    outright, whatever the flag says. The 'flag_carried' marker rides it for
+ *    the same reason ('internal_cd' instead earned a kind-level guard,
+ *    LOCKOUT_AURA_KINDS, because its sites span every school), and it is the
+ *    reason the mark is not on 'shadow': a shadow-school debuff protected by
+ *    one boolean is one careless edit away from being a warlock's Voidfeast
+ *    snack.
  * Only its own timer, an operator lift, or the served sanction clears it.
  */
 export function cheaterMarkAura(mark: CheaterMark, entityId: number): Aura {

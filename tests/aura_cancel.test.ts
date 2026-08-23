@@ -76,6 +76,14 @@ describe('isDebuffAura', () => {
 
     expect(isCancelableAura(scriptedStasis)).toBe(false);
   });
+
+  it('never exposes an internal_cd lockout as player-cancelable', () => {
+    // A proc gate re-arms on the lockout aura's presence, so cancelling it
+    // would be a free cooldown reset. Not a debuff either: it stays on the
+    // buff bar so the player can watch it tick down.
+    expect(isCancelableAura(aura('hunter_guise_mastery_icd', 'internal_cd'))).toBe(false);
+    expect(isDebuffAura(aura('hunter_guise_mastery_icd', 'internal_cd'))).toBe(false);
+  });
 });
 
 describe('auraAffectsStats', () => {
@@ -106,6 +114,20 @@ describe('removeCancelableAura', () => {
     const auras = [aura('hemorrhage_bleed_vuln', 'bleed_vuln', 0.4)];
     expect(removeCancelableAura(auras, 'hemorrhage_bleed_vuln')).toBeNull();
     expect(auras).toHaveLength(1);
+  });
+
+  it('refuses to cancel an internal_cd lockout but still removes an ordinary buff', () => {
+    const auras = [aura('hunter_guise_mastery_icd', 'internal_cd'), aura('might', 'buff_ap', 50)];
+    expect(removeCancelableAura(auras, 'hunter_guise_mastery_icd')).toBeNull();
+    expect(auras).toHaveLength(2);
+    expect(removeCancelableAura(auras, 'might')?.id).toBe('might');
+    expect(auras.map((a) => a.id)).toEqual(['hunter_guise_mastery_icd']);
+  });
+
+  it('still removes Divine Ascension, the one voluntarily cancelable internal_cd', () => {
+    const auras = [aura('divine_ascension', 'internal_cd')];
+    expect(removeCancelableAura(auras, 'divine_ascension')?.id).toBe('divine_ascension');
+    expect(auras).toHaveLength(0);
   });
 
   it('returns null when nothing matches', () => {
