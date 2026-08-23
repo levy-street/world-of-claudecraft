@@ -24,7 +24,7 @@ services:
     runtime: docker
     plan: free
     healthCheckPath: /livez
-    autoDeploy: false
+    autoDeploy: true
     envVars:
       - key: DATABASE_URL
         sync: false
