@@ -427,6 +427,67 @@ describe('World Market localized search query construction', () => {
     },
   );
 
+  it('releases provisional rows when the matching online filter response arrives', () => {
+    const h = harness();
+    h.world.marketInfo = info({
+      listings: [
+        {
+          id: 1,
+          sellerName: 'Current Results',
+          itemId: 'wolf_fang',
+          count: 1,
+          price: 100,
+          mine: false,
+          house: false,
+        },
+      ],
+      totalCount: 1,
+    });
+    h.window.open();
+    const priorStatus = h.root.querySelector('.mkt-status')?.textContent;
+
+    chooseMarketFilter(h.root, 'itemType', 'weapon');
+    expect(h.root.querySelector('.mkt-list')?.textContent).toContain('Current Results');
+    const status = h.root.querySelector<HTMLElement>('.mkt-status');
+    expect(status?.textContent).toBe(priorStatus);
+
+    h.world.marketInfo = info({
+      listings: [
+        {
+          id: 2,
+          sellerName: 'Authoritative Sword',
+          itemId: 'worn_sword',
+          count: 1,
+          price: 200,
+          mine: false,
+          house: false,
+        },
+        {
+          id: 3,
+          sellerName: 'Authoritative Dagger',
+          itemId: 'rusty_dagger',
+          count: 1,
+          price: 300,
+          mine: false,
+          house: false,
+        },
+      ],
+      totalCount: 2,
+      itemType: 'weapon',
+    });
+    h.window.refreshIfChanged();
+
+    const listText = h.root.querySelector('.mkt-list')?.textContent;
+    expect(listText).toContain('Authoritative Sword');
+    expect(listText).toContain('Authoritative Dagger');
+    expect(listText).not.toContain('Current Results');
+    expect(h.root.querySelector('.mkt-status')).toBe(status);
+    expect(status?.getAttribute('role')).toBe('status');
+    expect(status?.getAttribute('aria-live')).toBe('polite');
+    expect(status?.textContent).toBe(h.root.querySelector('.mkt-note')?.textContent);
+    expect(status?.textContent).not.toBe(priorStatus);
+  });
+
   it('re-pushes once after reconnect even when the raw echo still matches', () => {
     const h = harness();
     setLanguage(OTHER);
