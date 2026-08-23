@@ -327,12 +327,17 @@ on purpose, per this file's anchor rule.
 |---|---|---|
 | mining | `COMMON_RECIPES`, `LADDER_RECIPES` and `JEWELCRAFTING_RECIPES` across the lower bands; `COMBO_RECIPES`; then `TOOL_RECIPES`, `INTERMEDIATE_RECIPES` and `CASTER_HUB_RECIPES` at the top levelling band | `APEX_ARMOR_RECIPES` and `APEX_GEAR_RECIPES` |
 | logging | `LADDER_RECIPES` across the lower bands, then `TOOL_RECIPES` and `INTERMEDIATE_RECIPES` at the top levelling band | `APEX_GEAR_RECIPES` |
-| herbalism | `COMMON_RECIPES`, `LADDER_RECIPES` and `INSCRIPTION_RECIPES` across the lower bands, plus a `FARM_RECIPES` row; then `TOOL_RECIPES`, `INTERMEDIATE_RECIPES` and `CASTER_HUB_RECIPES` at the top | `APEX_CONSUMABLE_RECIPES` and `APEX_GEAR_RECIPES` |
-| fishing | `LADDER_RECIPES` across the lower bands, then `ROD_RECIPES` at the top levelling band | `APEX_CONSUMABLE_RECIPES` |
+| herbalism | `COMMON_RECIPES`, `LADDER_RECIPES` and `INSCRIPTION_RECIPES` across the lower bands, plus a `FARM_RECIPES` row; then `TOOL_RECIPES`, `INTERMEDIATE_RECIPES`, `CASTER_HUB_RECIPES` and one `APEX_CONSUMABLE_RECIPES` row at the top | `APEX_CONSUMABLE_RECIPES` and `APEX_GEAR_RECIPES` |
+| fishing | `LADDER_RECIPES` across the lower bands, then `ROD_RECIPES` and one `APEX_CONSUMABLE_RECIPES` row at the top levelling band | `APEX_CONSUMABLE_RECIPES` |
 | farming | `FARM_RECIPES` across every levelling band and `HOE_RECIPES` from the second, plus `LADDER_RECIPES` low and `INTERMEDIATE_RECIPES` at the top | `APEX_CONSUMABLE_RECIPES` and `FARM_RECIPES` |
 | corpse harvesting | `COMMON_RECIPES` and `LADDER_RECIPES` across the lower bands; `COMBO_RECIPES`; then `INTERMEDIATE_RECIPES` and `CASTER_HUB_RECIPES` at the top | `APEX_ARMOR_RECIPES` and `APEX_CONSUMABLE_RECIPES` |
 
-Two readings the table is worth pausing on. The apex tool ladders
+One cell is worth naming because it looks like a mistake: `APEX_CONSUMABLE_RECIPES`
+appears in a LEVELLING band as well as the endgame one, because that family
+is not uniformly endgame. Its rungs run 75, 100 and 125, and the row at 75
+falls in the top levelling band.
+
+Two more readings the table is worth pausing on. The apex tool ladders
 (`TOOL_RECIPES`, `ROD_RECIPES`, `HOE_RECIPES`) sit in each family's TOP
 levelling band rather than its endgame cell, because a gathering tool a
 family feeds only ITSELF is not evidence that the family feeds the crafts,

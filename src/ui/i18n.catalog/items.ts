@@ -2978,7 +2978,8 @@ const APPENDED_ITEM_NAMES: Partial<Record<ItemEntityId, string>> = {
   // rung consumes, which is the tier-5 land convention exactly (Highpine Axe
   // from fine_elderwood_log, Sunpetal Sickle from fine_sunpetal_herb). It
   // mints NO new proper noun: Evergarden is already a registered coinage in
-  // this packet, carried at KEEP under the R15 bar, and this row inherits that
+  // this packet, carried at KEEP under the masterwrought R15 bar, and this row
+  // inherits that
   // verdict the same way Evergarden Pumpkin did.
   evergarden_hoe: 'Evergarden Hoe',
   // The economy-hooks phase's eight farm dishes (FARM_RECIPES), listed in
