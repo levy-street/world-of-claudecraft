@@ -11253,3 +11253,48 @@ WHAT THE QA SHOULD READ FIRST, in this order:
   numbers.
 - THE THREE ROLE PLATES ARE NO LONGER BYTE-IDENTICAL. That is 11h's deliverable
   and 11k must not "restore" it.
+
+### THE HEADER AMENDMENT'S OWN REWORD VERDICT: NONE, written rather than inferred
+
+11h-GATE-A's amendment lands in the APEX_CONSUMABLE_RECIPES header, which is a
+CODE COMMENT in src/sim/content/recipes.ts and not a t() key, so the amendment
+itself moves NO player-visible string and owes no fill. The acceptance box allows
+exactly this verdict and it is recorded rather than left inferred.
+
+The reword obligation this phase does owe comes from somewhere else and is the
+one above: the two craftProse materialsBody keys, which enumerate the garden's
+buyers and stopped at rung 50, so the apex tier made both stale. That is a
+correction to the phase file's expectation rather than to its rule: it predicted
+the header amendment would be the reword and predicted no guide prose was owed,
+and the truth is the reverse on both halves.
+
+### THE FULL SUITE, FINAL RUN, FROZEN AND STAMPED
+
+FINAL RUN, tip 11f8e5fb2c:
+  EXIT=0, 3048 files passed / 12 skipped (3060),
+  43408 passed / 2 expected fail / 115 skipped (43525).
+  START TIP == END TIP == 11f8e5fb2c, START DIRTY == END DIRTY == [].
+
+THE DELTAS AGAINST THE PRE-MERGE BASELINE ARE ACCOUNTED FOR rather than noted.
+Files 3053 to 3060 is +7: the release's SIX new test files plus this phase's one.
+Tests 43446 to 43525 is +79: 24 from those six release files and 42 from this
+phase's suite, both measured directly, and the remaining 13 by difference from
+the release's edits to existing suites (it grew prewarm_policy, prewarm_resume,
+renderer_compile_gate, reveal_gate, reveal_gate_wiring, initial_frame_core and
+defer_launcher_preloads). NOTHING in the delta is this phase's own except the 42.
+
+The parity suite was run on its own against this same tip and MEASURED here
+rather than carried from the 11g record: 232 passed, 1 skipped, zero movement.
+Independently, no parity scenario names any of this phase's eight recipe ids, and
+no golden file appears in the phase diff.
+
+npm run ci:changed: EXIT=0, and the LOG was read rather than only the exit code.
+It reports 2958 warnings and 25 infos and ZERO errors across 771 files, which is
+the expected shape: CI and the pre-push floor fail on errors and format diffs,
+never on lint warnings. The 771 is the release-merge scope-widening the packet
+record already warns about, not this phase's own file count, which is fourteen.
+
+npx tsc --noEmit: clean. It caught one real defect vitest could not, which is
+worth recording because the two checks are not redundant: an ItemDef union read
+(`ITEMS[id].wellFed`) type-errors while passing at runtime, so the arm was green
+and the build was red.
