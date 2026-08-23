@@ -1551,8 +1551,8 @@ export const BASE_ITEMS: Record<string, ItemDef> = {
   // all four tier-4 tools at 24 and all four tier-5 at 56, masterwrought R18
   // says nobody must have TAKEN a profession to get a thing, and leaving
   // farming half-in made it the only gathering profession with no non-crafter
-  // route at the tier-4 rung. A hoe carries no combat power, so there is no R5
-  // interaction to weigh, and five-and-five is a more drift-resistant pin than
+  // route at the tier-4 rung. A hoe carries no combat power, so there is no
+  // masterwrought R5 interaction to weigh, and five-and-five is a more drift-resistant pin than
   // four-and-five.
   //
   // garden_hoe carries BOTH noVendorSell and noMarketList since the farming

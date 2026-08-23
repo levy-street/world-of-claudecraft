@@ -483,7 +483,7 @@ closed-by-X.
 | Crop display names lore pass (D11 ids locked) | packet | maintainer | open ruling-owed |
 | Hoe display names (Skysilver/Osmium compressed coinages) and prices | P5 | maintainer | open ruling-owed |
 | Fine-twin buyValue doctrine intersection (priced tier-4 twin above unpriced tier-4 seed) | P5 QA | maintainer | CLOSED 2026-08-21 by masterwrought Phase 11e: the intersection was the tier-4 SEED being unpriced while its fine twin carried a buyValue. GATE 1 priced every tier 3 and 4 seed (DECISION D, buyValue 32 and 64), so the inversion is gone and the doctrine is uniform: seed, produce and fine twin all price on the shipped four-times-sell staple, with the seeds carrying the bootstrap premium on top. Nothing is left to rule. |
-| fine_marsh_rice / fine_highland_barley dish consumers (hoe-reagent-only today) | P6 | maintainer | open ruling-owed |
+| fine_marsh_rice / fine_highland_barley dish consumers (hoe-reagent-only today) | P6 | maintainer | open ruling-owed. STILL OPEN and unchanged after masterwrought Phase 11j, recorded so the apex rung is not mistaken for having closed it: 11j added a THIRD hoe-reagent twin, `fine_evergarden_greens`, and that one is NOT hoe-reagent-only (it already carried two dish consumers, so it is deliberately double-booked). These two remain the only twins whose sole consumer is a hoe rung. What 11j DID change is the partition that used to be asserted around them: `tests/farm_recipes.test.ts` no longer claims a hoe twin has no dish slot, because the apex rung consumes a tier-4 twin and Phase 11h had already given every tier-4 twin a dish, so exclusivity became impossible rather than merely untrue. The load-bearing half is kept and widened: every twin must have a consumer by SOME route, asserted over the whole twin column |
 | Farming counting toward any-profession deeds (default yes, automatic) | P1 | maintainer | open ruling-owed |
 | ONLINE_WORLD_LAYOUT_VERSION epoch bump at farming go-live | 19th absorb | maintainer | open ruling-owed |
 | renderer.ts exact-count ceiling re-pin (13774) prepared for feature review | 19th absorb | maintainer | open ruling-owed |
@@ -1872,6 +1872,23 @@ visit or a punishment for lateness is violating the design, not tuning it.
   `TOOL_RECIPES` pattern; the top rung is unpriced and craftable (the R23 arm). Hoes
   accept the three existing tool effects (unlike fishing rods; the policy gate in
   `slotToolEffectRefused` admits farming).
+  - **AMENDED 2026-08-23 (masterwrought Phase 11j, qr-DOC-DRIFT): THE LADDER IS
+    FIVE RUNGS.** The four-rung reading above is superseded, and the maintainer's
+    OVERTURN is the reason rather than a drift: an earlier draft rejected a
+    rung-5 hoe on the ground that the Maker's Charm already covered the gap, and
+    that was overturned because the charm is an EFFECT SLOT and not a tool. The
+    two are complements, and the code says so: `startingDurabilityFor` reads the
+    BASE TOOL's rarity and pays `RARITY_DURABILITY_BONUS` extra charges per
+    rarity rung, and `ratchetCeilingForUse` prices the refill ceiling off the
+    same rarity, so a farmer capped at the rare `osmium_hoe` ran the same charm
+    at a strictly lower charge ceiling than a miner running it on an epic pick.
+    Every other gathering profession had BOTH a tier-5 base tool and the slot;
+    farming had only the slot. The fifth rung is `evergarden_hoe` (epic,
+    use.tier 5, sellValue 150), minted by `recipe_evergarden_hoe` at engineering
+    125 on `['trainer']`, and it satisfies this decision's own ladder shape and
+    the one-tier-below invariant with neither amended. The frozen wield-gate
+    thresholds still ride for free: the tier-5 row reads 100 and farming's cap
+    is 100, so the rung wields AT the cap and nowhere below it.
 - D11: Crops, two per tier, eight total (ids locked, display names get a maintainer
   lore pass): tier 1 `vale_wheat`, `brook_carrot`; tier 2 `marsh_rice`, `bog_beet`;
   tier 3 `highland_barley`, `frost_gourd`; tier 4 `gilded_sunmelon`,

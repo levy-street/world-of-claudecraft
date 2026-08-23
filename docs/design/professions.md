@@ -260,11 +260,17 @@ and the reason is recorded at `TOOL_RECIPES`: the tier-4 pick is re-pointed
 onto the Mirefen fine ore because the Thornpeak grade would have needed the
 pick that recipe produces, and the tier-5 pick keeps its refined
 `arcanite_bar` (re-pointing off it would strand the bar and its vendor rows)
-while gaining the Thornpeak fine grade. Each tier-4 rung also consumes the
-EASTBROOK fine grade beside its own, which is what gives the tier-1 twins a
-consumer: the fine ladder has three tiers where the crafted-tool ladder has
-two rungs, so the "tier N takes the fine grade of tier N minus 2" rule
-reached the middle grades and left the starter ones with no buyer at all.
+while gaining the Thornpeak fine grade.
+
+The EASTBROOK fine grades are the ones no tool recipe names, and that is a
+consequence of the ladder's shape rather than a gap. The fine ladder has three
+tiers where the crafted-tool ladder has two rungs, because the tier-2 and
+tier-3 land tools stay vendor-priced, so "tier N takes the fine grade of tier
+N minus 2" reaches the Mirefen and Thornpeak grades and stops. The starter
+grades are not stranded by that: downward substitution below is what pays
+them, along with the doubled sell price, and between them those ARE the reward
+the fine axis pays. Read them as an over-tooled starter harvest paying better,
+never as a reagent looking for a recipe.
 
 **THE APEX TOOL FAMILY IS COMPLETE.** Every gathering profession now has a
 tier-5 base tool at epic rarity and the same price register: a pick, an axe

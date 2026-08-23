@@ -11450,6 +11450,449 @@ worth recording because the two checks are not redundant: an ItemDef union read
 (`ITEMS[id].wellFed`) type-errors while passing at runtime, so the arm was green
 and the build was red.
 
+## Phase 11j ledger (2026-08-23, the gathering completion pass)
+
+VERDICT: **PASS-WITH-FOLLOWUPS**. Base tip 566b0dcf51, merge at 6bdb4bcf18,
+LOCAL, no push, no PR. Seven commits, `git log --oneline 6bdb4bcf18..HEAD`:
+the coverage invariant, a demand fill, the apex hoe, the pin re-derivations,
+the wield-gate closure, the design doc, and the fix round that RETIRED the
+fill along with the claim behind it.
+
+THE PHASE IN ONE LINE: masterwrought R20 was ALREADY WHOLE on the merged tree
+(zero empty bands, six families, five bands each) and so was R21 once the
+demand arm learned to count spendability rather than naming, so what this
+phase actually ships is the GUARD that keeps both true, the apex hoe that
+completes the tool family, and one corrected claim of its own.
+
+### THE DECISION-A CONTRADICTION, WHICH IS A RECORDS DEFECT AND IS HANDED BACK
+
+The phase file's decision A and the 11i QA handoff DISAGREE, on two axes, and
+the disagreement is real rather than a misreading. Both are settled records.
+
+- The phase file (2026-08-20): author the apex hoe at engineering 125,
+  acquisition `['trainer']`, "on the recipe_tidewrought_fishing_rod
+  precedent", tier 5, epic, sellValue 150.
+- The 11i QA handoff (2026-08-23, state.md, "THE APEX TOOL FAMILY NOW HAS A
+  SHAPE 11j SHOULD COPY"): "Copy: tier 6, quality epic, engineering 125,
+  acquisition ['drop'], stationType 'toolworks', the schematic on the Heroic
+  Quartermaster at the neck point (16), the item market-listable."
+
+WHAT THE SHIPPED CODE ACTUALLY SAYS, checked rather than taken from either
+record. `recipe_tidewrought_fishing_rod` really is `['trainer']` at
+engineering 125, so the phase file's citation is ACCURATE. The handoff's
+"shape to copy" describes a different row, `recipe_clockreel_fishing_rod`,
+which is tier 6 at sellValue 375 and one rung ABOVE the tier-5 family the
+phase file names. The two records are each true about a different rung.
+
+EXECUTED AS DECISION A, and the reasons are structural rather than a
+preference between two records:
+
+1. The tier-5 family is the one with the hole. `arcanite_mining_pick`,
+   `elderwood_axe`, `sunpetal_sickle` and `tidewrought_fishing_rod` are all
+   use.tier 5, epic, sellValue 150. That is the family the deliverable names,
+   and farming is its only missing member.
+2. A tier-6 hoe would ship UNGATED. `WIELD_REQUIREMENT_BY_TIER` has no tier-6
+   row and `wieldRequirementForTier` fails OPEN at 0 for an unknown tier.
+   Fishing escapes that only because rods are the structural R22 exemption
+   (`professionId !== 'fishing'` in the filter); farming is not exempt. The
+   phase file's own REJECTION LIST names this exact hazard.
+3. There is no tier-5 crop, and the type forbids one: `FARM_CROPS`' tier field
+   is `1 | 2 | 3 | 4`. The hoe ladder's one-tier-below invariant therefore has
+   no twin for a tier-6 result to consume without new crop content, which is
+   11e's scope and explicitly out of this phase's.
+4. Decision B's two Marks rows at 24/clears:3 and 56/heroicClear are the
+   counter's tier-4 and tier-5 rungs. A tier-6 tool has no sibling row at any
+   price (the clockreel deliberately has none).
+
+HANDED BACK, NOT CLOSED. The maintainer owns which record is authoritative.
+Flipping to the handoff's shape is not a one-line change: it needs a pattern
+item (a second new id, its art park row and its M16 check), a
+HEROIC_VENDOR_STOCK row at the neck point, the pattern universe and
+ITEM_ART_PENDING counts re-derived, a wield-table tier-6 row authored before
+anything else, and Decision B re-opened. Flipping the ACQUISITION alone, at
+tier 5, is genuinely one line plus its pin.
+
+### THE SIX SETTLED DECISIONS, AS EXECUTED
+
+- **A (the apex hoe's rung).** Executed at engineering 125, `['trainer']`,
+  `toolworks`, tier 5, epic, sellValue 150. See the contradiction above. The
+  family reading is recorded in docs/design/professions.md: three
+  grandfathered rows at 150 that are HISTORY, two authored rows at 125 that
+  are REACHABLE, and 150 is not a target. 11o's re-tier is NOT pre-applied.
+  `PRE_TRAINING_RECIPE_IDS` untouched.
+- **B (the non-crafter route).** Executed. BOTH hoe rungs joined
+  `DELVE_SHOPS.drowned_litany` on the counter's existing price points:
+  `osmium_hoe` 24 / `clears:3`, `evergarden_hoe` 56 / `heroicClear`. No new
+  price rung and no new gate minted. Five things moved with them and all five
+  were re-derived, not hand-edited (table below).
+  ITS PREMISE WAS CHECKED RATHER THAN COPIED, because 11i recorded that the
+  two ROD prices on this counter are now stale: the shop's own re-check
+  trigger prices tier-4/5 tools on the premise that they "open no content",
+  and the rods now open catch bands 3 and 4, so both rod rows are ACCESS items
+  priced as comfort items. THAT INVALIDATION DOES NOT REACH THE HOES. Four
+  crop tiers exist and the tier-4 hoe already reaches the last one, so a hoe
+  opens no content at either rung and the comfort premise is exactly true of
+  it. The hoe prices are therefore defensible on the premise as written, and
+  the rod prices remain the maintainer's open item, untouched here.
+- **C (the R20 subject list).** Executed. All SIX families bound, with the
+  subject list DERIVED from `GATHERING_PROFESSION_IDS` plus corpse harvesting
+  appended, never hand-listed, and pinned as such.
+- **D (the self-feeding arm).** Executed, and the phase file's PREDICTION IS
+  FALSIFIED. It said the refusal "should bite NOTHING on this tree". It bites
+  FIVE rows across four families: `recipe_arcanite_mining_pick` (mining),
+  `recipe_elderwood_axe` (logging), `recipe_sunpetal_sickle` (herbalism), and
+  BOTH `recipe_tidewrought_fishing_rod` and `recipe_clockreel_fishing_rod`
+  (fishing). The substantive claim still holds, and it is the one decision D
+  actually cares about: no family is left with an empty endgame cell by the
+  refusal, so no profession's endgame contribution is still self-feeding. The
+  refusal is load-bearing rather than decorative, which the mutation proof
+  shows directly: stripping logging's three real endgame rows reds the arm,
+  and without the refusal `recipe_elderwood_axe` would have covered logging
+  falsely.
+- **E (thin ladders).** Executed. PRESENCE ONLY, on both arms, with no numeric
+  floor anywhere in the file. The per-family per-band counts are the matrix
+  below; the per-material counts are the ratio table below. No thin-ladder
+  top-up was owed, because no band was thin enough to be empty and presence is
+  the only floor the ruling allows.
+- **F (the R17 gathering-tool carve-out).** Stands, scoped by TEXT to the hoe
+  ladder alone. The apex hoe consumes produce (`fine_evergarden_greens`) under
+  it, exactly as `recipe_osmium_hoe` already consumes `fine_highland_barley`.
+  R17's own text is unamended. Every other exclusion is still asserted by the
+  same sweep, and the phase added no produce to any gear intermediate, apex
+  gear bill, Perfecting material, or `recipe_quickening_catalyst`.
+
+### THE BAND AUDIT MATRIX
+
+Measured with a temporary reporter driving the SHIPPED derivation (Agent 1's
+own functions), not a second hand-rolled scan, then the reporter deleted. The
+AFTER column is this phase's measurement on the merged tree.
+
+Bands are `tierForSkill` buckets: b0 = skillReq 0-24, b1 = 25-49, b2 = 50-74,
+b3 = 75-99, b4 = 100 and above (the endgame cell, self-feeding refused).
+
+| family | b0 | b1 | b2 | b3 | b4 |
+|---|---|---|---|---|---|
+| mining | 11 | 11 | 12 | 7 | 12 |
+| logging | 2 | 2 | 1 | 2 | 3 |
+| herbalism | 9 | 10 | 11 | 6 | 11 |
+| fishing | 2 | 2 | 2 | 2 | 6 |
+| farming | 5 | 7 | 5 | 4 | 12 |
+| corpse harvesting | 15 | 13 | 10 | 7 | 14 |
+
+**ZERO EMPTY CELLS.** The supply invariant passes on the merged tree with no
+fill required, so deliverable 2's fill list is empty. The demand side's three
+candidates were withdrawn with the false claim behind them (below), so no fill
+was owed there either. That is the honest shape of this phase: the ladders
+were already whole, and what was missing was the enforcement.
+
+PREDICTED THEN OBSERVED, with the predictions stated before the run:
+
+| prediction | outcome |
+|---|---|
+| farming and fishing are already full because 11f to 11i filled them | HELD. farming 5/7/5/4/12, fishing 2/2/2/2/6 |
+| logging is the one at risk; if no endgame row sits at 100+, it is a live R20 violation | PARTIALLY HELD. Logging IS the thinnest family at every band, but it has THREE endgame rows (recipe_gyrelens_array, recipe_masters_field_forge, recipe_makers_charm, all at 100), so the violation did not materialise and no top-up was owed |
+
+THE BEFORE COLUMN RECONCILES ONCE THE INSTRUMENT IS NAMED, which matters
+because it looks like a mismatch until you do. The maintainer's authoring
+census (mining 21, herbalism 15, skinning 11, logging 6, fishing 1, farming 0)
+counted endgame bills at skillReq >= 75, which is b3 + b4 here, on the
+PRE-11e tree and WITHOUT the self-feeding refusal. Re-measured that way on the
+merged tree: mining 20 and logging 6, which match qr-CENSUS's recorded 20 and
+the maintainer's 6 EXACTLY. The apparent one-row gap on mining is the
+self-feeding refusal removing `recipe_arcanite_mining_pick`, which is
+decision D working as designed rather than a lost row. fishing, farming,
+herbalism and the corpse family all moved because 11f to 11i is exactly what
+moved them.
+
+### THE DEMAND RATIO TABLE (masterwrought R21)
+
+Consumers and unit demand per material, counted over ALL_RECIPES AND
+ENCHANTS. Outliers are called against their own family's median, never a
+cross-family number.
+
+| family | material | consumers | units |
+|---|---|---|---|
+| mining (median 6) | thorium_ore | 32 | 109 |
+| | iron_ore | 23 | 65 |
+| | copper_ore | 11 | 41 |
+| | fine_iron_ore | 1 | 4 |
+| | fine_thorium_ore | 1 | 2 |
+| | fine_copper_ore | **0 before, 3 after** | **0 before, 6 after** |
+| logging (median 1) | ashwood_log | 6 | 16 |
+| | ironbark_log | 2 | 5 |
+| | fine_ashwood_log | 1 | 4 |
+| | fine_elderwood_log | 1 | 2 |
+| | elderwood_log | 1 | 1 |
+| | fine_ironbark_log | **0 before, 1 after** | **0 before, 2 after** |
+| herbalism (median 6.5) | sunpetal_herb | 25 | 42 |
+| | goldleaf_herb | 17 | 29 |
+| | silverleaf_herb | 12 | 28 |
+| | fine_goldleaf_herb | 1 | 4 |
+| | fine_sunpetal_herb | 1 | 2 |
+| | fine_silverleaf_herb | **0 before, 1 after** | **0 before, 2 after** |
+| fishing (median 2) | raw_deepbarb_catfish | 7 | 26 |
+| | glimmerfin_koi | 3 | 8 |
+| | raw_hollowgill_sturgeon | 3 | 17 |
+| | raw_stonescale_carp | 2 | 11 |
+| | raw_bog_eel, raw_frostgill_trout | 2 each | 4 each |
+| | raw_marsh_pike, raw_river_perch | 1 each | 2 each |
+| | raw_mirror_trout | 1 | 1 |
+| | raw_stillmere_salmon | 1 | 2 |
+| farming (median 1) | highland_barley, vale_wheat | 7 each | 15, 11 |
+| | bog_beet, evergarden_greens, frost_gourd, marsh_rice | 4 each | 8 to 13 |
+| | brook_carrot, gilded_sunmelon | 3 each | 7, 9 |
+| | thornpeak_cabbage | 2 | 4 |
+| | fine_evergarden_greens, fine_gilded_sunmelon | 2 each | 2 each |
+| | the other ten fine twins and three produce | 1 each | 1 to 4 |
+| corpse (median 6) | rough_hide | 24 | 70 |
+| | spider_silk | 13 | 47 |
+| | game_meat, venom_gland | 8 each | 28, 17 |
+| | homespun_cloth, pristine_silk | 7 each | 23, 8 |
+| | prime_cut, pristine_hide | 6 each | 12, 8 |
+| | pristine_venom_gland | 4 | 4 |
+| | wolf_fang | 2 | 6 |
+| | curved_tusk, sharp_claw, pristine_claw | 1 each | 1 to 2 |
+
+THE READING THAT MATTERS, and it is a correction to this phase's own first
+answer rather than a finding about someone else's work.
+
+**THE THREE EASTBROOK FINE GRADES ARE NOT DEAD CONTENT, AND THIS PHASE BRIEFLY
+CLAIMED THEY WERE.** `fine_copper_ore`, `fine_ironbark_log` and
+`fine_silverleaf_herb` are named by NO recipe anywhere, which is true and is
+what the first version of the demand arm measured. The arm then reported them
+as having "no consumer", and this phase shipped a fill giving each a direct
+consumer on its family's tier-4 tool rung. Both the claim and the fill are
+retired.
+
+The rule they missed is shipped, load-bearing and stated in two places:
+`material_grades.ts` and `planGradeRemoval` implement DOWNWARD SUBSTITUTION, so
+a fine grade satisfies any requirement for its base. The eastbrook grades are
+therefore spendable on every recipe that names `copper_ore`, `ironbark_log` or
+`silverleaf_herb`, and they vendor at twice the base besides, which together
+are exactly the reward the fine axis pays everywhere.
+
+THE TELL WAS A TEST THAT WAS NEVER RUN.
+`tests/material_profession_hint_view.test.ts` asserts that
+`fine_ironbark_log` renders "Used by Weaponcrafting" and calls it a material
+with "exactly one consumer", flatly contradicting the zero-consumer finding.
+`craftIdsForMaterialItem` (src/sim/material_profession_affinity.ts) credits a
+fine grade with its base's crafts for precisely this reason, so the
+player-facing surface had the rule right the whole time. Only the FULL SUITE
+surfaced the contradiction; every targeted battery this phase ran was green
+while the claim was false.
+
+THAT IS THE SAME DEFECT THE ARM EXISTS TO PREVENT, committed by the arm. The
+worked example masterwrought R21 cites is a census scoped to one FILE, reported
+as a whole-tree result. This was a census scoped to one WAY OF CONSUMING,
+reported as consumption in general. The remedy is the same in both cases: the
+arm now credits substitution through the shipped `baseMaterialFor`, and the
+asymmetry with the supply arm (which still refuses transitive credit) is stated
+where the rule lives, because the two rules look contradictory until the reason
+is written down.
+
+Re-proven by mutation on a material substitution cannot rescue: stripping
+`raw_mirror_trout`'s only consumer reds the arm, naming the material and
+stating that no base grade could absorb it either.
+
+**`raw_stillmere_salmon` sits at ONE consumer and that consumer is
+`recipe_deepwater_feast`**, the unresolved 11i QA item. It passes the presence
+arm because the recipe exists, and this phase did not fix, cut or re-decide
+it. Recorded, per instruction, and moved past. A CUT would take the salmon to
+zero consumers and red this arm, and the salmon has no fine grade to substitute
+through, so the red would be real. Worth knowing before the remedy is chosen:
+the arm makes the cut's cost visible instead of silent.
+
+### THE FILLS: NONE WERE OWED
+
+The supply audit found zero empty bands, so no supply fill was owed. The demand
+audit's three candidates were withdrawn with the false claim above, so no
+demand fill is owed either. R18 and R17 therefore hold trivially: this phase
+deletes no reagent anywhere, and adds produce only to the apex hoe under
+decision F's carve-out.
+
+### THE APEX HOE
+
+| field | value | derivation |
+|---|---|---|
+| id | `evergarden_hoe` | new, append-only |
+| tier | 5 | the family's rung |
+| quality | epic | matches all four siblings |
+| sellValue | 150 | matches all four siblings; no buyValue |
+| skillReq | 125 | engineering's cap; 150 is unlearnable |
+| acquisition | `['trainer']` | decision A, and the HOE_RECIPES family doctrine |
+| stationType | `toolworks` | Tinker Gizzel teaches it with no content edit |
+| bill | fine_evergarden_greens x2 + osmium_hoe x1 | one-tier-below invariant, unchanged |
+| input vs output | 220 vs 150 | gold-negative like every rung below |
+
+NO `noVendorSell`, NO `noMarketList`: those two belong to the tier-1
+quest-granted rung alone, and R18 wants the tool tradable.
+
+**THE NAMING VERDICT: CLEAR.** "Evergarden Hoe" mints NO new coin.
+"Evergarden" is already a registered proper noun in this packet carried at
+KEEP-with-caveat (flagged against Flippfly's Evergarden, kept under the R15
+bar), and this row inherits that verdict exactly as "Evergarden Pumpkin" did
+before it. Web-verified at authoring: an exact-phrase search returns the
+puzzle game and no item of this name, and a wiki-scoped search across the
+major game wikis returns no "Evergarden Hoe" or "Evergarden Sickle" at all.
+"Hoe" is generic farming English and cannot be a coined token. The name also
+follows the tier-5 land convention exactly, which is what picked the bill's
+twin: each tier-5 tool is named for the fine reagent its rung consumes
+(Highpine Axe from fine_elderwood_log, Sunpetal Sickle from
+fine_sunpetal_herb, Evergarden Hoe from fine_evergarden_greens). No flip to
+`fine_gilded_sunmelon` was forced.
+
+**THE WIELD GATE NEEDED NO TABLE CHANGE, verified rather than assumed.**
+`WIELD_REQUIREMENT_BY_TIER` already carries tier 5 at
+`TIER5_TOOL_WIELD_PROFICIENCY` (100) and farming's `maxSkill` is 100, so the
+rung wields AT the cap and one point below it fails. That is the same knife
+edge the other three land apex tools already sit on, so the hoe is not a
+special case.
+
+**THE STALE items.ts COMMENT: 11h MISSED HALF OF IT, and this phase corrected
+what its own rung falsified.** The phase file said to VERIFY 11h's correction
+and, if still stale, fix it here and record that 11h missed it. What was
+actually on the merged tree: 11h (11h-GATE-D, packet row N15) corrected the
+SCOPE misreading on `fine_gilded_sunmelon` and `fine_evergarden_greens`,
+leaving the hoe-ladder claim itself, which was TRUE at 11h's runtime. It never
+touched `fine_gilded_yam` or `fine_evergarden_pumpkin`, which still carried
+the claim in full. This rung falsified the PREMISE ("the ladder tops at 4")
+for all four, and made the CONCLUSION false for the greens outright, since
+that twin is now the apex bill's reagent. All four are re-reasoned here:
+11h's scope correction is kept verbatim and untouched, and only the premise
+underneath it moved. This is not a second pass at a sentence 11h fixed; it is
+the sentence 11h's fix left standing, which this phase is the first to
+falsify.
+
+### THE TWO DELVE MARKS ROWS, AND BOTH TRIPWIRES DISCHARGED
+
+Two self-clearing tripwires fired on the first run, exactly as designed, each
+with a message telling the reader to re-decide rather than widen. Both were
+discharged by re-deciding, in the open, and each is replaced by a positive
+claim at least as strong as the one it retired.
+
+- `tests/delve_shop.test.ts` "stocks every crafted tier-4/5 tool": the farming
+  exclusion asserted NO farming gatherTool had a Marks row anywhere. Retired;
+  the filter no longer excludes the profession, and the replacement pins the
+  exact set on the counter (`['evergarden_hoe', 'osmium_hoe']`), so a third
+  farming row or a missing one both red.
+- `tests/professions_hoe_recipes.test.ts` "rungs 2 to 4 are CRAFT-ONLY": split
+  in two. The never-for-COPPER half is kept WHOLE at every rung, which is the
+  claim the hoe pricing table actually makes. The no-MARKS half narrowed to
+  hoe rungs 1 to 3 and the top two rungs are pinned present at their exact
+  price and gate.
+
+### PREDICTED THEN OBSERVED: EVERY RE-DERIVED PIN
+
+Each predicted from the change before it was run, then observed.
+
+| pin | before | predicted | observed |
+|---|---|---|---|
+| HOE_RECIPES length (three sites) | 3 | 4 | 4 |
+| HOE_RECIPES produced tiers | [2,3,4] | [2,3,4,5] | [2,3,4,5] |
+| HOE_RECIPES skillReqs | [25,50,75] | [25,50,75,125] | [25,50,75,125] |
+| hoe-rung checked / fineTwins counters | 3 | 4 | 4 |
+| delve stock literal rows | 17 | 19 | 19 |
+| delve per-tier arm, tier 4 | 4 | 5 | 5 |
+| delve per-tier arm, tier 5 | 4 | 5 | 5 |
+| craftedTools at-least floor | 8 | 10 | 10 |
+| professions_tools farming tiers | [4] | [4,5] | [4,5] |
+| farmingTools length | 4 | 5 | 5 |
+| farmingItemIds size | 43 | 44 | 44 |
+| NEVER_STOCKED size | 17 | 16 | 16 |
+| ITEM_ART_PENDING size (vitest arm) | 73 | 74 | 74 |
+| pendingArtCount (scripts/item_art_audit.mjs) | 73 | 74 | 74 |
+| gradedReagentsChecked | 6 | 9 | 9 |
+| guide hoe table rows | 4 | 5 | 5 |
+| ALL_RECIPES | 153 | 154 | 154 |
+
+THE SECOND ART-DEBT PIN IS THE ONE WORTH KEEPING. `pendingArtCount` lives in
+`scripts/item_art_audit.mjs`, not in `tests/`, and NO targeted battery
+selected it: every curated run in this phase was green while it was red. Only
+the full suite found it. That is the "a targeted battery is not the suite"
+lesson landing again, one phase after the workflow-cone red that taught it.
+
+### THE MUTATION PROOFS
+
+Four mutations, four dead, each restored by FILE COPY and verified with
+`diff -q` rather than `git checkout`.
+
+| mutation | arm proven | outcome |
+|---|---|---|
+| drop `fine_vale_wheat` from recipe_bronze_hoe | demand arm | RED, names `fine_vale_wheat (farming)` |
+| drop `fine_copper_ore` from the tier-4 pick | demand arm, same run | RED, names `fine_copper_ore (mining)`, both reported together |
+| re-point logging's only band-2 row | band arm | RED, names `logging`, `band 2`, `skillReq 50 to 74`, and the ids logging supplies |
+| strip logging's three endgame rows | endgame arm | RED, and it proves the self-feeding refusal is load-bearing: without it `recipe_elderwood_axe` covers logging falsely |
+| `TIER5_TOOL_WIELD_PROFICIENCY` 100 to 101 | the new wield arm | RED, names all four apex tools and the cap each cannot reach |
+
+The first two ran in ONE invocation, which is what proves the "reports every
+hole at once" property rather than asserting it.
+
+### THE WIELD-GATE HOLE, CLOSED
+
+`tests/recipe_reachability.test.ts`'s `bestToolTiers` counts any tool the
+realm OWNS, while every land gathering gate in the engine resolves through
+`bestWieldableGatherToolTierOrNone` and drops what the player's proficiency
+cannot wield. The model is therefore strictly MORE PERMISSIVE than the game.
+Benign today, and one edit from a deadlock the model would sail past.
+
+Making `bestToolTiers` wield-aware would need a proficiency to be wield-aware
+ABOUT, and a realm has no single one, so the fixpoint's semantics are
+deliberately unchanged. What the new arm asserts instead is the claim that
+actually bites: every gathering tool must wield at its own profession's cap,
+because a maxed player is the most capable wielder the game admits. A tool
+above its cap is dead content, which is the unlearnable-at-150 finding one
+axis over. It CALLS the shipped `canWieldGatherToolTier` and
+`wieldRequirementForTier` rather than re-deriving the thresholds, so the
+fishing exemption is not restated either.
+
+### THE SCOPE BOUNDARY
+
+This phase amends `docs/design/professions.md` for the GATHERING half only.
+The apex CRAFTING tier's own amendment belongs to Phase 16's content surface
+sweep, which is inside this packet, so pointing there is a sequencing
+statement and not a deferral.
+
+### DEVIATIONS FROM THE PHASE FILE, each recorded rather than silent
+
+1. **The shipped-id golden was NOT re-minted**, against the acceptance
+   checklist. Reason: the golden's own header says re-mint "after new items
+   ship in a RELEASE", the pin is a SUBSET check that passes untouched, and a
+   re-mint here would add 103 ids of which only ONE is this phase's, pinning
+   102 unshipped branch-only ids as permanent API on a branch that has not
+   merged. Phases 11e through 11i all declined for the same reason (none of
+   their ids are in the golden). Ratify or overrule.
+2. **Deliverable 2's fill list is empty on the supply side**, because the
+   audit found zero empty bands. The fills this phase shipped are on the
+   DEMAND side instead, which the phase file did not anticipate because it
+   expected logging to be a live R20 violation.
+3. **Decision A executed over the 11i handoff**, handed back above.
+
+### OPEN ITEMS, ALL THE MAINTAINER'S
+
+The eight inherited are unchanged and NOT re-decided here: the three inherited
+(scroll/elixir 15c parity, RULE 2's value-half reading, the inherited
+stale-client window), 11h's two deviations, 11i's session cap 15 s to 16 s,
+`prog_first_harvest` taking 13 catches for a fishing-only character, and the
+`deepwater_feast` FIX-or-CUT. This phase adds:
+
+(9) **THE DECISION-A CONTRADICTION**, costed above.
+(10) **THE SHIPPED-ID GOLDEN POLICY**, deviation 1 above: per-phase re-mint or
+     release-time re-mint. Five phases have now assumed release-time.
+
+### THE REJECTION LIST, AS RECORDED DESIGN
+
+- A tier-6 tool rung for anyone. The wield table has no tier-6 row and the
+  resolver fails OPEN, so it would ship ungated; recorded in brainstorm.md as
+  future-tier intent instead.
+- A numeric floor on bills per band, on either arm.
+- The apex hoe at engineering 150. Unlearnable through every shipped channel.
+- Leaving `osmium_hoe` off the Marks counter while the apex hoe joins it.
+- An exemption list inside the coverage test. The three orphans were FILLED,
+  not exempted, which is what the rejection actually demands.
+- A second coverage test re-deriving the same supply map.
+- Raising farming's maxSkill to make the apex hoe fit.
+- Growing `PRE_TRAINING_RECIPE_IDS`.
+
 ## Phase 11i QA ledger (2026-08-23, verify the angler's endgame)
 
 VERDICT: **FAIL**, on one deliverable, with everything else PASS. Base tip

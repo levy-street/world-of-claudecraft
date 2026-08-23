@@ -3123,7 +3123,8 @@ export const APEX_CONSUMABLE_RECIPES: ProfessionRecipeRecord[] = [
 //
 // THE APEX RUNG STAYS TRAINER-TAUGHT, and that is a decision rather than an
 // omission, because the rod ladder's apex went the other way. ROD_RECIPES says
-// its apex is drop-taught under R8 on the ground that an apex rung reaches
+// its apex is drop-taught under masterwrought R8 on the ground that an apex
+// rung reaches
 // players through the pillars, and the rod's own argument is that it GATES
 // CATCH BAND 5: a band nothing else opens. The hoe gates nothing. Four crop
 // tiers exist, the tier-4 hoe already reaches the last one, and this rung buys
@@ -3132,7 +3133,7 @@ export const APEX_CONSUMABLE_RECIPES: ProfessionRecipeRecord[] = [
 // instead is its OWN family: the tier-5 base-tool family it completes, whose
 // fishing member (recipe_tidewrought_fishing_rod, engineering 125) is
 // `['trainer']` at exactly this rung. The non-crafter route is the Marks
-// counter above, so R18 is satisfied without a schematic.
+// counter above, so masterwrought R18 is satisfied without a schematic.
 export const HOE_RECIPES: ProfessionRecipeRecord[] = [
   {
     id: 'recipe_bronze_hoe',

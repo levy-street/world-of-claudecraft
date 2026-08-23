@@ -88,8 +88,8 @@ const DROWNED_LITANY_SHOP: DelveShopEntry[] = [
   // gathering profession with no non-crafter route at the tier-4 rung, which
   // masterwrought R18 forbids: nobody must have TAKEN a profession to get a
   // thing. Five and five is also a more drift-resistant shape than four and
-  // five, and a hoe carries no combat power, so there is no R5 interaction to
-  // weigh against it.
+  // five, and a hoe carries no combat power, so there is no masterwrought R5
+  // interaction to weigh against it.
   //
   // NO NEW PRICE RUNGS AND NO NEW GATES. Both rows reuse this shop's existing
   // top two: tier 4 sits on the helm's rung (24 Marks behind three clears, the
