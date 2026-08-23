@@ -1216,11 +1216,17 @@ describe('client HTML shell', () => {
   });
 
   it('ships no community tray on the operator fork (donations ride #mm-donate)', () => {
-    for (const entry of [html, playHtml]) {
+    for (const [name, entry] of [
+      ['index.html', html],
+      ['play.html', playHtml],
+    ] as const) {
       expect(entry).not.toContain('id="community-hud"');
       expect(entry).not.toContain('<a class="community-link github"');
       expect(entry).not.toContain('<a class="community-link donate"');
       expect(entry).not.toContain('<a class="community-link discord"');
+      expect(entry.match(/<details(?:\s|>)/g) ?? [], name).toHaveLength(
+        (entry.match(/<\/details>/g) ?? []).length,
+      );
     }
   });
 
