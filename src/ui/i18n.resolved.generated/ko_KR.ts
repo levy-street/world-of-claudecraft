@@ -13031,6 +13031,9 @@ export const ko_KR: EnTranslations = {
       "osmium_hoe": {
         "name": "오스뮴 괭이"
       },
+      "evergarden_hoe": {
+        "name": "상록 정원 괭이"
+      },
       "vale_hearth_loaf": {
         "name": "골짜기 화덕빵"
       },

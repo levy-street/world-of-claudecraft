@@ -1390,9 +1390,12 @@ export const BASE_ITEMS: Record<string, ItemDef> = {
   // took "structurally never a reagent above the dish set" out of it: it scopes
   // to the HOE ladder only. A tier-4 twin can be any other kind of reagent, and
   // now is one.
-  // STRUCTURALLY never a HOE reagent: each hoe rung consumes the twin one tier
-  // below it (deviation (ad)), so a tier-4 twin would need a tier-5 hoe, and
-  // the ladder tops at 4.
+  // NOT A HOE REAGENT, and masterwrought Phase 11j re-reasoned this rather than
+  // re-asserting it: the ladder no longer tops at 4, so "there is no tier-5
+  // hoe" has stopped being the reason. The reason now is that the tier-5 rung
+  // takes exactly ONE tier-4 twin and it takes fine_evergarden_greens, because
+  // an apex tool is named for the reagent its rung consumes. This twin stays a
+  // dish reagent, which it already was.
   fine_gilded_sunmelon: {
     id: 'fine_gilded_sunmelon',
     name: 'Fine Gilded Sunmelon',
@@ -1439,8 +1442,14 @@ export const BASE_ITEMS: Record<string, ItemDef> = {
   // its sunmelon sibling above and for the same reason: the line below is true
   // and kept, but it scopes to the HOE ladder alone and was being read as a
   // claim that a tier-4 twin can never be a reagent at all.
-  // STRUCTURALLY never a HOE reagent: a tier-4 twin would need a tier-5 hoe
-  // under deviation (ad)'s one-tier-below invariant, and the ladder tops at 4.
+  // AND THE HOE LINE IS NOW FALSE OF THIS TWIN, corrected by masterwrought
+  // Phase 11j, which is the rung that falsified it. 11h's scope correction
+  // above still stands and is untouched; what changed is the premise under it.
+  // The ladder no longer tops at 4, and deviation (ad)'s one-tier-below
+  // invariant therefore points the tier-5 rung straight at a tier-4 twin: THIS
+  // twin is recipe_evergarden_hoe's gathered reagent, at count 2. The tool is
+  // named for it (Evergarden Hoe from fine_evergarden_greens), following the
+  // tier-5 land convention exactly.
   fine_evergarden_greens: {
     id: 'fine_evergarden_greens',
     name: 'Fine Evergarden Greens',
@@ -1477,9 +1486,10 @@ export const BASE_ITEMS: Record<string, ItemDef> = {
     sellValue: 40,
   },
   // Consumed by recipe_evergarden_sunmelon_tart beside the fine sunmelon
-  // already in that bill. STRUCTURALLY never a hoe reagent, like every tier-4
-  // twin: each rung consumes the twin one tier below it (deviation (ad)), so
-  // this would need a tier-5 hoe and the ladder tops at 4.
+  // already in that bill. Not a hoe reagent: masterwrought Phase 11j shipped
+  // the tier-5 rung, so the old reason (no tier-5 hoe exists) is retired, and
+  // the live one is that the apex rung consumes a single tier-4 twin, the
+  // greens it is named for.
   fine_gilded_yam: {
     id: 'fine_gilded_yam',
     name: 'Fine Gilded Yam',
@@ -1507,8 +1517,8 @@ export const BASE_ITEMS: Record<string, ItemDef> = {
     sellValue: 40,
   },
   // Consumed by recipe_evergarden_harvest_platter beside the fine greens
-  // already in that bill. Never a hoe reagent, same tier-5 argument as the
-  // fine yam above.
+  // already in that bill. Not a hoe reagent, on the same re-reasoned ground as
+  // the fine yam above: the tier-5 rung exists now and takes the greens.
   fine_evergarden_pumpkin: {
     id: 'fine_evergarden_pumpkin',
     name: 'Fine Evergarden Pumpkin',
@@ -1531,9 +1541,19 @@ export const BASE_ITEMS: Record<string, ItemDef> = {
   // farmer buys them from players via market or trade. osmium_hoe is
   // unpriced-for-buy AND craftable (the R23 shape), absent from every
   // vendorItems list and from HEROIC_VENDOR_STOCK like the tier-4/5 land
-  // tools above; unlike them there is deliberately NO delve Marks fallback
-  // row this phase. FLAGGED FOR THE MAINTAINER: whether the Marks shop should
-  // gain a hoe row later as the non-crafter route.
+  // tools above.
+  //
+  // THE MARKS FLAG IS CLOSED (masterwrought Phase 11j, decision B). The line
+  // here used to flag for the maintainer whether the Marks shop should gain a
+  // hoe row as the non-crafter route; it now does, at BOTH rungs, beside the
+  // land and rod siblings in content/delves/shop.ts (osmium_hoe 24 Marks on
+  // clears:3, evergarden_hoe 56 on heroicClear). The counter already carried
+  // all four tier-4 tools at 24 and all four tier-5 at 56, masterwrought R18
+  // says nobody must have TAKEN a profession to get a thing, and leaving
+  // farming half-in made it the only gathering profession with no non-crafter
+  // route at the tier-4 rung. A hoe carries no combat power, so there is no R5
+  // interaction to weigh, and five-and-five is a more drift-resistant pin than
+  // four-and-five.
   //
   // garden_hoe carries BOTH noVendorSell and noMarketList since the farming
   // go-live: q_farm_intro (zone1.ts) hands it over through requiredItems,
@@ -1577,6 +1597,38 @@ export const BASE_ITEMS: Record<string, ItemDef> = {
     quality: 'rare',
     use: { type: 'gatherTool', professionId: 'farming', tier: 4 },
     sellValue: 60,
+  },
+  // The apex rung (masterwrought Phase 11j): farming was the only gathering
+  // profession with no tier-5 base tool, so this is the fifth member of a
+  // family whose other four already ship, not a new rung invented here. It
+  // matches them exactly: epic, use.tier 5, sellValue 150, no buyValue, and
+  // neither noVendorSell nor noMarketList (those two belong to the tier-1
+  // quest-granted rung alone).
+  //
+  // WHAT IT ACTUALLY BUYS, stated plainly because a player will ask: no new
+  // crop tier. Four crop tiers exist and the tier-4 hoe already reaches the
+  // last one, exactly as the tier-5 rod opens no catch band the tier-4 rod
+  // does not. What it buys is the EPIC rung on the tool-effect economy.
+  // professions/tools.ts startingDurabilityFor pays RARITY_DURABILITY_BONUS
+  // more charges per rarity rung and ratchetCeilingForUse prices the refill
+  // ceiling off the same rarity, so rare to epic is one rung on both, and a
+  // farmer running the Maker's Charm was until now the only gatherer paying
+  // it at the rare ceiling. That is the gap this closes: the charm is an
+  // EFFECT slot and a base tool is a base tool, complements rather than
+  // substitutes.
+  //
+  // IT NEEDS NO WIELD TABLE CHANGE. WIELD_REQUIREMENT_BY_TIER already carries
+  // a tier-5 row at TIER5_TOOL_WIELD_PROFICIENCY (100) and it applies to every
+  // land profession, fishing being the one structural exemption. Farming's cap
+  // is 100, so this wields at the cap and nowhere below it, which is the same
+  // knife edge the other three land apex tools already sit on.
+  evergarden_hoe: {
+    id: 'evergarden_hoe',
+    name: 'Evergarden Hoe',
+    kind: 'tool',
+    quality: 'epic',
+    use: { type: 'gatherTool', professionId: 'farming', tier: 5 },
+    sellValue: 150,
   },
   // Fine grades of the nine node materials (D8, the fine-material axis). A
   // harvest yields one of these INSTEAD of its base id when the player's tool

@@ -13031,6 +13031,9 @@ export const ru_RU: EnTranslations = {
       "osmium_hoe": {
         "name": "Осмиевая мотыга"
       },
+      "evergarden_hoe": {
+        "name": "Мотыга Вечного Сада"
+      },
       "vale_hearth_loaf": {
         "name": "Долинный подовый хлеб"
       },

@@ -5658,6 +5658,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.items.bronze_hoe.name': 'Бронзовая мотыга',
   'entities.items.skysilver_hoe.name': 'Небосеребряная мотыга',
   'entities.items.osmium_hoe.name': 'Осмиевая мотыга',
+  'entities.items.evergarden_hoe.name': 'Мотыга Вечного Сада',
   'entities.items.vale_hearth_loaf.name': 'Долинный подовый хлеб',
   'entities.items.eastbrook_root_pottage.name': 'Истврукская похлёбка из корнеплодов',
   'entities.items.fenbridge_rice_bowl.name': 'Миска риса из Фенбриджа',

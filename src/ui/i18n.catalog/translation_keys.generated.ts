@@ -2362,6 +2362,7 @@ export type TranslationKeyFlat =
   | 'entities.items.evergarden_greens.name'
   | 'entities.items.evergarden_greens_seed.name'
   | 'entities.items.evergarden_harvest_platter.name'
+  | 'entities.items.evergarden_hoe.name'
   | 'entities.items.evergarden_pumpkin.name'
   | 'entities.items.evergarden_pumpkin_seed.name'
   | 'entities.items.evergarden_statue_rubbing.name'

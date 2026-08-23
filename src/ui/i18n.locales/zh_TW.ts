@@ -8634,6 +8634,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'entities.items.bronze_hoe.name': '青銅鋤',
   'entities.items.skysilver_hoe.name': '天銀鋤',
   'entities.items.osmium_hoe.name': '鋨金鋤',
+  'entities.items.evergarden_hoe.name': '常青園鋤',
   'entities.items.vale_hearth_loaf.name': '谷地爐烤麵包',
   'entities.items.eastbrook_root_pottage.name': '東溪根菜濃湯',
   'entities.items.fenbridge_rice_bowl.name': '芬橋稻米碗',

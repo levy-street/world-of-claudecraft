@@ -13031,6 +13031,9 @@ export const ja_JP: EnTranslations = {
       "osmium_hoe": {
         "name": "オスミウムの鍬"
       },
+      "evergarden_hoe": {
+        "name": "エバーガーデンの鍬"
+      },
       "vale_hearth_loaf": {
         "name": "渓谷の炉焼きパン"
       },

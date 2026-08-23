@@ -77,11 +77,19 @@ const DROWNED_LITANY_SHOP: DelveShopEntry[] = [
   { itemId: 'drowned_choir_fang', marks: 56, gate: 'heroicClear' },
   // -- the crafted top-tier gathering tools, as a NON-CRAFTER's route to them --
   //
-  // These eight are the tier-4 and tier-5 picks, axes, sickles and rods that
-  // otherwise only an engineer at a toolworks can produce (recipes.ts
-  // TOOL_RECIPES and ROD_RECIPES). A player who never took a crafting
-  // profession had no path to the top of the tool ladder at all; this is that
-  // path, priced in Marks rather than in a profession.
+  // These ten are the tier-4 and tier-5 picks, axes, sickles, rods and hoes
+  // that otherwise only an engineer at a toolworks can produce (recipes.ts
+  // TOOL_RECIPES, ROD_RECIPES and HOE_RECIPES). A player who never took a
+  // crafting profession had no path to the top of the tool ladder at all; this
+  // is that path, priced in Marks rather than in a profession.
+  //
+  // EIGHT UNTIL masterwrought Phase 11j, which added both HOE rungs under
+  // decision B and so closed the last gap in the family. Farming was the only
+  // gathering profession with no non-crafter route at the tier-4 rung, which
+  // masterwrought R18 forbids: nobody must have TAKEN a profession to get a
+  // thing. Five and five is also a more drift-resistant shape than four and
+  // five, and a hoe carries no combat power, so there is no R5 interaction to
+  // weigh against it.
   //
   // NO NEW PRICE RUNGS AND NO NEW GATES. Both rows reuse this shop's existing
   // top two: tier 4 sits on the helm's rung (24 Marks behind three clears, the
@@ -140,9 +148,11 @@ const DROWNED_LITANY_SHOP: DelveShopEntry[] = [
   // numbers alone rather than inventing two; flagged for the maintainer in
   // state.md.
   //
-  // THE TIER-6 APEX ROD IS DELIBERATELY ABSENT, the second such absence after
-  // osmium_hoe and on the same footing (a recorded later decision, not an
-  // oversight). Three reasons, and the first is the one that matters: pricing a
+  // THE TIER-6 APEX ROD IS DELIBERATELY ABSENT, and since masterwrought Phase
+  // 11j it is the ONLY such absence: osmium_hoe was the other one, and 11j
+  // resolved it by adding the row rather than by re-affirming the gap, so this
+  // paragraph no longer has a sibling to lean on. It stands on its own three
+  // reasons, and the first is the one that matters: pricing a
   // tier-6 rung here means inventing a Marks number and a gate above
   // heroicClear, which is the highest gate the vocabulary has, and this packet
   // does not invent balance numbers. Second, the rung needs no bad-luck
@@ -156,10 +166,12 @@ const DROWNED_LITANY_SHOP: DelveShopEntry[] = [
   { itemId: 'ashwood_axe', marks: 24, gate: 'clears:3' },
   { itemId: 'goldleaf_sickle', marks: 24, gate: 'clears:3' },
   { itemId: 'stormreel_fishing_rod', marks: 24, gate: 'clears:3' },
+  { itemId: 'osmium_hoe', marks: 24, gate: 'clears:3' },
   { itemId: 'arcanite_mining_pick', marks: 56, gate: 'heroicClear' },
   { itemId: 'elderwood_axe', marks: 56, gate: 'heroicClear' },
   { itemId: 'sunpetal_sickle', marks: 56, gate: 'heroicClear' },
   { itemId: 'tidewrought_fishing_rod', marks: 56, gate: 'heroicClear' },
+  { itemId: 'evergarden_hoe', marks: 56, gate: 'heroicClear' },
 ];
 
 // Per-delve shop stock, keyed by DelveDef.id. New delves register their stock

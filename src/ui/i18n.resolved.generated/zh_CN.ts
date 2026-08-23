@@ -13031,6 +13031,9 @@ export const zh_CN: EnTranslations = {
       "osmium_hoe": {
         "name": "锇金锄"
       },
+      "evergarden_hoe": {
+        "name": "常青园锄"
+      },
       "vale_hearth_loaf": {
         "name": "谷地炉烤面包"
       },

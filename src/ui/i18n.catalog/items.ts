@@ -2641,6 +2641,7 @@ const ITEM_ENTITY_IDS = [
   'bronze_hoe',
   'skysilver_hoe',
   'osmium_hoe',
+  'evergarden_hoe',
   'vale_hearth_loaf',
   'eastbrook_root_pottage',
   'fenbridge_rice_bowl',
@@ -2973,6 +2974,13 @@ const APPENDED_ITEM_NAMES: Partial<Record<ItemEntityId, string>> = {
   bronze_hoe: 'Bronze Hoe',
   skysilver_hoe: 'Skysilver Hoe',
   osmium_hoe: 'Osmium Hoe',
+  // The apex rung (masterwrought Phase 11j). Named for the fine reagent its
+  // rung consumes, which is the tier-5 land convention exactly (Highpine Axe
+  // from fine_elderwood_log, Sunpetal Sickle from fine_sunpetal_herb). It
+  // mints NO new proper noun: Evergarden is already a registered coinage in
+  // this packet, carried at KEEP under the R15 bar, and this row inherits that
+  // verdict the same way Evergarden Pumpkin did.
+  evergarden_hoe: 'Evergarden Hoe',
   // The economy-hooks phase's eight farm dishes (FARM_RECIPES), listed in
   // tier order, same English-appended treatment and the same stay-in-step
   // rule against the ItemDef `name` fields in

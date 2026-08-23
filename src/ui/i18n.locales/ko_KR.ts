@@ -9013,6 +9013,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.items.bronze_hoe.name': '청동 괭이',
   'entities.items.skysilver_hoe.name': '천은 괭이',
   'entities.items.osmium_hoe.name': '오스뮴 괭이',
+  'entities.items.evergarden_hoe.name': '상록 정원 괭이',
   'entities.items.vale_hearth_loaf.name': '골짜기 화덕빵',
   'entities.items.eastbrook_root_pottage.name': '이스트브룩 뿌리채소 스튜',
   'entities.items.fenbridge_rice_bowl.name': '펜브리지 쌀밥',

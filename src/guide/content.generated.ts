@@ -8195,6 +8195,37 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
           "minimalAt": 125,
           "zeroAt": 150
         }
+      },
+      {
+        "id": "recipe_evergarden_hoe",
+        "name": "Evergarden Hoe",
+        "skillReq": 125,
+        "tier": 5,
+        "station": "toolworks",
+        "acquisition": "trainer",
+        "feeCopper": 160000,
+        "materials": [
+          {
+            "name": "Fine Evergarden Greens",
+            "count": 2
+          },
+          {
+            "name": "Osmium Hoe",
+            "count": 1
+          }
+        ],
+        "output": {
+          "name": "Evergarden Hoe",
+          "count": 1,
+          "quality": "epic"
+        },
+        "combo": null,
+        "oncePerDay": false,
+        "gain": {
+          "reducedAt": 150,
+          "minimalAt": 175,
+          "zeroAt": 200
+        }
       }
     ]
   },
@@ -15232,7 +15263,20 @@ export const GUIDE_PROF_GATHERING: GuideProfGathering[] = [
         "priceCopper": null,
         "vendors": [],
         "craftedBy": "engineering",
+        "priceMarks": 24,
+        "marksClears": 3,
         "wieldProficiency": 85
+      },
+      {
+        "name": "Evergarden Hoe",
+        "tier": 5,
+        "quality": "epic",
+        "priceCopper": null,
+        "vendors": [],
+        "craftedBy": "engineering",
+        "priceMarks": 56,
+        "marksHeroicClear": true,
+        "wieldProficiency": 100
       }
     ],
     "nodes": []

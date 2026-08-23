@@ -13031,6 +13031,9 @@ export const en_CA: EnTranslations = {
       "osmium_hoe": {
         "name": "Osmium Hoe"
       },
+      "evergarden_hoe": {
+        "name": "Evergarden Hoe"
+      },
       "vale_hearth_loaf": {
         "name": "Vale Hearth Loaf"
       },

@@ -5711,6 +5711,7 @@ export const ITEM_ART_PENDING = new Set<string>([
   'evergarden_greens',
   'evergarden_greens_seed',
   'evergarden_harvest_platter',
+  'evergarden_hoe',
   'evergarden_pumpkin',
   'evergarden_pumpkin_seed',
   'evergarden_sunmelon_tart',

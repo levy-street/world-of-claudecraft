@@ -9028,6 +9028,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.items.bronze_hoe.name': '青銅の鍬',
   'entities.items.skysilver_hoe.name': 'スカイシルバーの鍬',
   'entities.items.osmium_hoe.name': 'オスミウムの鍬',
+  'entities.items.evergarden_hoe.name': 'エバーガーデンの鍬',
   'entities.items.vale_hearth_loaf.name': '渓谷の炉焼きパン',
   'entities.items.eastbrook_root_pottage.name': 'イーストブルックの根菜ポタージュ',
   'entities.items.fenbridge_rice_bowl.name': 'フェンブリッジの炊き込みご飯',

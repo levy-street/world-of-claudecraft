@@ -3109,7 +3109,8 @@ export const APEX_CONSUMABLE_RECIPES: ProfessionRecipeRecord[] = [
   },
 ];
 
-// The crafted farming hoes, tiers 2 to 4 (the crop-ladder phase's tool half).
+// The crafted farming hoes, tiers 2 to 5 (the crop-ladder phase's tool half,
+// completed at masterwrought Phase 11j).
 //
 // A SEPARATE LIST FROM TOOL_RECIPES, deliberately, for the same reason
 // ROD_RECIPES above is: TOOL_RECIPES' whole invariant is that every member
@@ -3134,23 +3135,37 @@ export const APEX_CONSUMABLE_RECIPES: ProfessionRecipeRecord[] = [
 // ACQUISITION COVERAGE, where this ladder diverges from the rods and why:
 // the rod ladder leaves rungs 2 and 3 vendor-priced and crafts 4, 5 and, since
 // masterwrought Phase 11i, 6,
-// but the hoe pricing table locks buyValue OFF rungs 2 to 4, so the vendor
-// arm cannot be mirrored; HOE_RECIPES covers rungs 2, 3, AND 4 instead,
+// but the hoe pricing table locks buyValue OFF rungs 2 to 5, so the vendor
+// arm cannot be mirrored; HOE_RECIPES covers rungs 2, 3, 4 AND 5 instead,
 // making craft the only mint above rung 1 and leaving no acquisition gap
 // WITHIN the ladder (each rung is reachable from a state the rung below
 // grants; the ladder's one entry point is rung 1's vendor stocking on the
-// tier-1 farmer NPC, the go-live counter). There is
-// also, deliberately, NO delve Marks fallback row this phase (see the hoe
-// block in content/items.ts; flagged for the maintainer).
+// tier-1 farmer NPC, the go-live counter). Since masterwrought Phase 11j the
+// non-crafter route is the delve Marks counter, which now carries BOTH the
+// tier-4 and tier-5 hoes beside their land and rod siblings
+// (content/delves/shop.ts, decision B).
 //
-// All three are `acquisition: ['trainer']` per the post-freeze authoring
+// All four are `acquisition: ['trainer']` per the post-freeze authoring
 // default: Tinker Gizzel at the Eastbrook toolworks teaches them with no
 // content edit (the trainer list derives from the station). skillReq
-// 25/50/75 resolves to trainer tiers 1/2/3, all inside engineering's
+// 25/50/75/125 resolves to trainer tiers 1/2/3/5, all inside engineering's
 // learnable band, honoring the ROD_RECIPES lesson (a trainer-taught recipe
 // above the cap band is permanently unlearnable). The rung-4 shape
 // (skillReq 75, itemLevelBudget 20, level 20, toolworks) matches every other
 // tier-4 tool recipe in TOOL_RECIPES.
+//
+// THE APEX RUNG STAYS TRAINER-TAUGHT, and that is a decision rather than an
+// omission, because the rod ladder's apex went the other way. ROD_RECIPES says
+// its apex is drop-taught under R8 on the ground that an apex rung reaches
+// players through the pillars, and the rod's own argument is that it GATES
+// CATCH BAND 5: a band nothing else opens. The hoe gates nothing. Four crop
+// tiers exist, the tier-4 hoe already reaches the last one, and this rung buys
+// only the epic rarity rung on the tool-effect economy, so the access argument
+// that makes the clockreel drop-taught is vacuous here. What this rung matches
+// instead is its OWN family: the tier-5 base-tool family it completes, whose
+// fishing member (recipe_tidewrought_fishing_rod, engineering 125) is
+// `['trainer']` at exactly this rung. The non-crafter route is the Marks
+// counter above, so R18 is satisfied without a schematic.
 export const HOE_RECIPES: ProfessionRecipeRecord[] = [
   {
     id: 'recipe_bronze_hoe',
@@ -3193,6 +3208,33 @@ export const HOE_RECIPES: ProfessionRecipeRecord[] = [
     ],
     skillReq: 75,
     itemLevelBudget: 20,
+    level: 20,
+    stationType: 'toolworks',
+    acquisition: ['trainer'],
+  },
+  {
+    id: 'recipe_evergarden_hoe',
+    professionId: 'engineering',
+    resultItemId: 'evergarden_hoe',
+    resultCount: 1,
+    // THE COUNT IS 2 AND NOT 4, and the derivation is the family's own. Every
+    // tier-4 land tool takes its fine grade at 4 (fine_iron_ore,
+    // fine_ashwood_log, fine_goldleaf_herb) and every tier-5 land tool HALVES
+    // it to 2 (fine_elderwood_log, fine_sunpetal_herb, fine_thorium_ore), so
+    // the hoe ladder's shipped 4 is the TIER-4 convention and an apex hoe at 4
+    // would be the only apex tool in the game that did not halve.
+    //
+    // WHICH TWIN follows the NAME, because a tier-5 tool is named for the fine
+    // reagent its rung consumes: Highpine Axe from fine_elderwood_log, Sunpetal
+    // Sickle from fine_sunpetal_herb, Evergarden Hoe from
+    // fine_evergarden_greens. Input 220 (fine greens 2x80 + the rung-4 hoe at
+    // 60) vs output 150: gold-negative like every rung below it.
+    reagents: [
+      { itemId: 'fine_evergarden_greens', count: 2 },
+      { itemId: 'osmium_hoe', count: 1 },
+    ],
+    skillReq: 125,
+    itemLevelBudget: 30,
     level: 20,
     stationType: 'toolworks',
     acquisition: ['trainer'],
