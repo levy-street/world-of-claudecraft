@@ -1943,7 +1943,11 @@ describe('Guide professions generated content accuracy', () => {
     // phase and is now half of one. Without this, a reverted apex paragraph
     // would leave the page telling a player the garden stops at the trainer
     // ladder while the bills say otherwise, and every anchor above would pass.
-    expect(cookHtml).toContain('the three apex role dishes');
+    // ANCHORED ON A PHRASE UNIQUE TO THE NEW PARAGRAPH. The obvious anchor,
+    // 'the three apex role dishes', also occurs in craftProse.cooking.identityBody,
+    // which this phase never touched, so it would have stayed green through a
+    // full revert of the apex paragraph. Measured, not assumed.
+    expect(cookHtml).toContain('tells the three apex role dishes apart');
     expect(alcHtml).toContain('the Grand Cauldron at the very top');
     // The headings enumerated the suppliers too, so they went stale with the
     // bodies and are pinned with them.
@@ -1991,11 +1995,17 @@ describe('Guide professions generated content accuracy', () => {
     const barley = reagentCount('recipe_marlows_grand_roast', 'highland_barley');
     const carrots = reagentCount('recipe_frostgill_chowder', 'brook_carrot');
     expect(gourds, 'the roast gourd count must have a word for it').toBeLessThanOrEqual(4);
+    // THE ROAST ANCHORS CARRY THEIR OWN TAILS TOO (masterwrought Phase 11h).
+    // They were unique phrases when Phase 11g wrote them; 11h's apex paragraph
+    // introduced a second occurrence of both into the same body, which silently
+    // weakened them: rewording the roast clause to 'three Highland Barley' while
+    // the bill still shipped 2 would have stayed green off the apex sentence.
+    // The tail restores what 11g's arm actually had.
     expect(body, `the roast takes ${gourds} frost gourd(s)`).toContain(
-      `${countWord[gourds]} Frost Gourd${gourds === 1 ? '' : 's'}`,
+      `${countWord[gourds]} Frost Gourd${gourds === 1 ? '' : 's'} off the Highwatch terraces`,
     );
     expect(body, `the roast takes ${barley} highland barley`).toContain(
-      `${countWord[barley]} Highland Barley`,
+      `${countWord[barley]} Highland Barley and`,
     );
     expect(body, `the chowder takes ${carrots} brook carrot(s)`).toContain(
       `${countWord[carrots]} Brook Carrot${carrots === 1 ? '' : 's'}`,
@@ -2036,16 +2046,37 @@ describe('Guide professions generated content accuracy', () => {
     // page has already shipped one miscount that every anchor passed. Both new
     // paragraphs use the article and the number word quantitatively, so every
     // count they state is pinned to the live bill.
-    const apexCounts: Array<[string, string, string]> = [
-      ['recipe_stonepot_stew', 'frost_gourd', 'Frost Gourd'],
-      ['recipe_warspice_skewers', 'highland_barley', 'Highland Barley'],
-      ['recipe_sageleaf_chowder', 'thornpeak_cabbage', 'Thornpeak Cabbage'],
-      ['recipe_laden_hearth', 'evergarden_greens', 'Evergarden Greens'],
+    // EACH ANCHOR CARRIES ITS CLAUSE TAIL, and that is not decoration: the bare
+    // phrases 'two Frost Gourds' and 'two Highland Barley' each occur TWICE in
+    // this one body, because the pre-existing Marlow's Grand Roast sentence
+    // already uses both. Without the tail, changing the PROSE alone ('three
+    // Frost Gourds into the Stonepot Stew') left the arm green off the roast's
+    // occurrence, which is exactly the miscount class this arm exists for.
+    const apexCounts: Array<[string, string, string, string]> = [
+      ['recipe_stonepot_stew', 'frost_gourd', 'Frost Gourd', 's into the Stonepot Stew'],
+      [
+        'recipe_warspice_skewers',
+        'highland_barley',
+        'Highland Barley',
+        ' onto the Warspice Skewers',
+      ],
+      [
+        'recipe_sageleaf_chowder',
+        'thornpeak_cabbage',
+        'Thornpeak Cabbage',
+        ' into the Sageleaf Chowder',
+      ],
+      [
+        'recipe_laden_hearth',
+        'evergarden_greens',
+        'Evergarden Greens',
+        ' and a Fine Evergarden Greens',
+      ],
     ];
-    for (const [recipeId, itemId, label] of apexCounts) {
+    for (const [recipeId, itemId, label, tail] of apexCounts) {
       const n = reagentCount(recipeId, itemId);
       expect(n, `${recipeId} ${itemId} count must have a word for it`).toBeLessThanOrEqual(4);
-      expect(body, `${recipeId} takes ${n} ${itemId}`).toContain(`${countWord[n]} ${label}`);
+      expect(body, `${recipeId} takes ${n} ${itemId}`).toContain(`${countWord[n]} ${label}${tail}`);
     }
     // The cooking page also names the hearth's FINE twin without a number, so
     // pin the name against the live bill: a re-tier that dropped it would leave

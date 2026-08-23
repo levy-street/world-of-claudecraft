@@ -414,10 +414,11 @@ describe('FARM_RECIPES: the farm-economy hook set', () => {
       'recipe_warboar_flask',
       'recipe_warspice_skewers',
     ]);
-    // BOTH CRAFTS, not one. The nine above are eight cooking rows and four
-    // alchemy rows only because the stock is cooking's; without this clause a
-    // later walk-back that left every non-farm endgame consumer in ONE craft
-    // would keep the list long and the claim hollow.
+    // BOTH CRAFTS, not one. The nine above are FIVE cooking rows (the stock,
+    // the three role plates and the hearth) and FOUR alchemy rows (the three
+    // flasks and the cauldron); without this clause a later walk-back that left
+    // every non-farm endgame consumer in ONE craft would keep the list long and
+    // the claim hollow.
     expect(
       new Set(consumableEndgame.filter((r) => !farmOwnIds.has(r.id)).map((r) => r.professionId)),
       'produce must reach the endgame of BOTH consumable crafts',

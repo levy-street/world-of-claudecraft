@@ -1180,7 +1180,10 @@ export const BASE_ITEMS: Record<string, ItemDef> = {
   // renders from that), so an enumeration here only records what was true the
   // day it was written. masterwrought Phase 11g is the proof: it put this crop
   // on shipped cooking and alchemy ladder rows and every one of these comments
-  // silently became a subset. Read the sweep, not the sentence.
+  // silently became a subset. Read the sweep, not the sentence. Phase 11h then
+  // made it the busiest crop on the roster: the physical role plate at cooking
+  // 100 takes 2, and all three apex flasks take 1 each, which is what gives the
+  // grain an alchemy consumer for the first time.
   highland_barley: {
     id: 'highland_barley',
     name: 'Highland Barley',

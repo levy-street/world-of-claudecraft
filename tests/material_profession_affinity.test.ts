@@ -146,6 +146,16 @@ describe('craftIdsForMaterialItem', () => {
       ).length,
       'every base crop must resolve at least one consuming craft',
     ).toBe(Object.keys(FARM_CROPS).length);
+    // AND THE SAME FLOOR OVER THE TWIN ROSTER, because the sweep above walks
+    // produceItemId only and the twin sweep has its own roster. Without this a
+    // resolver returning [] for every fine twin but one would satisfy the twin
+    // literal by emptying the negative half rather than by being right about it.
+    expect(
+      Object.values(FARM_CROPS).filter(
+        (crop) => craftIdsForMaterialItem(crop.fineProduceItemId).length > 0,
+      ).length,
+      'every fine twin must resolve at least one consuming craft',
+    ).toBe(Object.keys(FARM_CROPS).length);
   });
 
   it('herbs and the vial gained inscription as a consumer (Masterwrought phase 06)', () => {

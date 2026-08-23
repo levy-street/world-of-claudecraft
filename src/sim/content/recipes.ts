@@ -2649,7 +2649,8 @@ export const APEX_CONSUMABLE_RECIPES: ProfessionRecipeRecord[] = [
   // grain stands BESIDE the herb line; herbalism loses nothing.
   //
   // THE COUNT IS ONE, NOT TWO, and this is a DEVIATION from 11h-GATE-C's
-  // literal, forced by the standing accent rule rather than chosen. RULE 2's
+  // literal, forced by the standing accent rule rather than chosen. masterwrought
+  // R17 RULE 2's
   // count half (tests/provisioning_supply_line.test.ts, accentVerdict) requires
   // a crop to stay STRICTLY BELOW the row's largest non-produce count, and this
   // bill's largest is 2 (venom_gland and sunpetal_herb), so a grain at 2 TIES
@@ -2730,13 +2731,24 @@ export const APEX_CONSUMABLE_RECIPES: ProfessionRecipeRecord[] = [
   // by derivation rather than taste. Every tier-3 base crop carries sellValue
   // 15 and no buyValue, so 2 of any of them is worth exactly 30 on the
   // buyValue-else-sellValue basis the economy suite reads: the COST SPREAD
-  // ACROSS THE THREE PLATES IS ZERO, pinned in
+  // ACROSS THE THREE PLATES IS ZERO IN COPPER, pinned in
   // tests/provisioning_supply_line_apex.test.ts. And farmCropSkillThreshold
   // gates all four tier-3 crops at farming 50, so a role choice is not a
   // skill-gate choice either. The superseded alternative was the tier-4 halving
   // branch, which would have spread 30/30/40 and asked farming 75 for one
   // plate; Phase 11e's roster was composed with a tier-3 LEAF precisely to make
   // it unnecessary.
+  //
+  // IN COPPER, AND THE SCOPE IS THE HONEST HALF. 11h-GATE-A rules on summed
+  // VALUE and that is what is zero here, but the three crops do NOT share a
+  // growth timer: highland_barley 14,400,000 ms, thornpeak_cabbage 15,000,000,
+  // frost_gourd 16,200,000, because farm_crops.ts gives every crop in a tier its
+  // own duration on purpose. So a cook who grows their own pays 4h, 4h10m or
+  // 4h30m per two, a 12.5 percent wall-clock spread from cheapest to dearest,
+  // while a cook who buys pays the same either way. The spread is recorded and
+  // pinned beside the copper one rather than left for a reader to discover: it
+  // is small, it is invisible to anyone using the market, and the alternative
+  // (three crops sharing one timer) would break the crop ladder's own rule.
   //
   // The INPUT side only. foodHp, the Well Fed magnitude and duration (11c's
   // settled ladder, 6 for 900 seconds on the single well_fed aura id),
@@ -2826,7 +2838,8 @@ export const APEX_CONSUMABLE_RECIPES: ProfessionRecipeRecord[] = [
   // at BOTH 3+1 and 2+1, twice each, and no number here is invented.
   //
   // 2 + 1 IS A DEVIATION from 11h-GATE-D's literal 3 + 1, forced by the
-  // standing accent rule rather than chosen. RULE 2's absolute accent cap
+  // standing accent rule rather than chosen. masterwrought R17 RULE 2's
+  // absolute accent cap
   // (tests/provisioning_supply_line.test.ts, accentVerdict capOk) refuses any
   // produce entry above 2 on a consumable row farming did not write, so a base
   // crop at 3 reds on both capstones. 2 + 1 is the same shipped idiom one notch
@@ -2861,11 +2874,22 @@ export const APEX_CONSUMABLE_RECIPES: ProfessionRecipeRecord[] = [
     stationType: 'apothecary',
   },
   // THE LONGEST BILL IN THE GAME after this phase: seven reagent entries, where
-  // the previous maximum across all 149 recipes was six (Phase 11g's roast and
-  // seasoned stock) and five before that. Nothing in src/ or server/ slices or
-  // caps a reagent list, so the seventh row renders by existing; it is recorded
-  // because the crafting window and the bag action-menu cost line now draw one
-  // row more than anything shipped before.
+  // the previous maximum across the merged table was six (Phase 11g's roast and
+  // seasoned stock) and five before that. The claim is not left to this comment:
+  // tests/provisioning_supply_line_apex.test.ts derives the maximum over
+  // ALL_RECIPES and pins this row as the only member at seven, so a later phase
+  // that ties or beats it visits that arm rather than this sentence.
+  // Nothing in src/ or server/ slices or
+  // caps a reagent list, so the seventh row renders by existing.
+  //
+  // THE THREE SURFACES THAT ACTUALLY DRAW IT, traced rather than assumed,
+  // because Phase 11g's own record named a fourth that structurally cannot:
+  // the crafting window's reagent line (src/ui/crafting_window.ts, which wraps
+  // inside a card whose pane scrolls), that window's recipe TOOLTIP, and the
+  // wiki materials cell (src/guide/pages/professions_craft.ts, whose
+  // .guide-prof-mat rule wraps between entries). The bag action-menu cost line
+  // is NOT one of them: it reads ENCHANTS[...].reagents and has no craft-recipe
+  // path at all, so no bill length can reach it.
   {
     id: 'recipe_laden_hearth',
     professionId: 'cooking',

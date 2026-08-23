@@ -21,6 +21,7 @@
 // order, so an interleaving change is player-visible and nothing else sees it.
 import { describe, expect, it } from 'vitest';
 import { FARM_CROPS, farmCropSkillThreshold } from '../src/sim/content/farm_crops';
+import { GATHERING_PROFESSIONS } from '../src/sim/content/professions';
 import {
   ALL_RECIPES,
   APEX_ARMOR_RECIPES,
@@ -55,6 +56,22 @@ function requireRecipe(id: string): ProfessionRecipeRecord {
   return recipe;
 }
 
+/** Narrow an ItemDef to its FOOD arm, the same way tests/masterwrought_budget.test.ts
+ *  does: `wellFed`/`foodHp` live on one member of the union, so a bare read is a
+ *  type error even though the value is there at runtime. */
+function foodDef(id: string): { foodHp?: number; wellFed?: { value: number; duration: number } } {
+  const def = ITEMS[id];
+  if (!def || def.kind !== 'food') throw new Error(`${id} is not a food`);
+  return def;
+}
+
+/** The same narrowing for the FLASK arm and its elixir payload. */
+function flaskDef(id: string): { elixir?: { value: number; duration: number } } {
+  const def = ITEMS[id];
+  if (!def || def.kind !== 'flask') throw new Error(`${id} is not a flask`);
+  return def;
+}
+
 const inputValue = (recipe: ProfessionRecipeRecord): number =>
   recipe.reagents.reduce((t, g) => t + g.count * reagentUnitValue(g.itemId), 0);
 
@@ -64,7 +81,10 @@ const outputValue = (recipe: ProfessionRecipeRecord): number => {
   return def.sellValue * recipe.resultCount;
 };
 
-/** The produce this phase added to a row, summed on the economy basis. */
+/** ALL produce on a row, summed on the economy basis. Equal to "the produce
+ *  this phase added" only because none of these eight rows carried produce
+ *  before it; Phase 11i or 11k adding a second crop to any of them changes what
+ *  every `inputBefore` check means, so that phase re-reads this note. */
 const addedProduceValue = (recipe: ProfessionRecipeRecord): number =>
   recipe.reagents
     .filter((g) => PRODUCE_IDS.has(g.itemId))
@@ -111,10 +131,13 @@ const TWO_CAPSTONES = ['recipe_grand_cauldron', 'recipe_laden_hearth'];
  *  authored, because two separately ordered lists leave the interleaving free
  *  and the interleaving is what the tooltip renders.
  *
- *  `inputBefore` is the row's input value BEFORE this phase, and it is not
- *  carried from a planning doc: the arms below re-derive it as
- *  (input now - added produce) and check it against this literal, so the two
- *  cannot drift and neither is a restatement of the other. */
+ *  `inputBefore` is the row's input value BEFORE this phase. NO ARM READS GIT,
+ *  so this literal is not evidence about the pre-phase tree and the header used
+ *  to overclaim that it was. What the arms below actually pin is the DELTA: with
+ *  `inputAfter` pinned independently, checking (input now - added produce)
+ *  against `inputBefore` pins the added produce's economy value, which is the
+ *  half a later retune would move. The pre-phase values themselves were read off
+ *  the parent commit at authoring time. */
 const APEX_ROWS: ReadonlyArray<{
   readonly id: string;
   readonly craft: 'cooking' | 'alchemy';
@@ -390,12 +413,27 @@ describe('masterwrought Phase 11h: the eight rows, per row', () => {
       ALL_RECIPES.filter((r) => r.reagents.length === 7).map((r) => r.id),
       'and it is the only one',
     ).toEqual(['recipe_laden_hearth']);
-    // The previous maximum was six, and both six-entry rows are Phase 11g's, so
-    // this really is a new shape rather than a re-count of an old one.
+    // THE SIX-ENTRY TIER, pinned by id rather than counted, because a floor
+    // here was satisfied by this phase's OWN rows: seven of the nine six-entry
+    // rows are 11h's (three flasks, three plates, the alchemy capstone reached
+    // six by gaining an entry), and only two are Phase 11g's. A `>= 6` floor
+    // therefore recorded nothing about the history it claimed to record.
     expect(
-      ALL_RECIPES.filter((r) => r.reagents.length === 6).length,
-      'the six-entry rows',
-    ).toBeGreaterThanOrEqual(6);
+      ALL_RECIPES.filter((r) => r.reagents.length === 6)
+        .map((r) => r.id)
+        .sort(),
+      'the six-entry rows: two from Phase 11g, seven this phase reached',
+    ).toEqual([
+      'recipe_grand_cauldron',
+      'recipe_ironhusk_flask',
+      'recipe_marlows_grand_roast',
+      'recipe_runewater_flask',
+      'recipe_sageleaf_chowder',
+      'recipe_seasoned_stock',
+      'recipe_stonepot_stew',
+      'recipe_warboar_flask',
+      'recipe_warspice_skewers',
+    ]);
   });
 });
 
@@ -525,7 +563,7 @@ describe('masterwrought Phase 11h GATE B: which crop goes on which plate', () =>
     expect(crops).toEqual(['frost_gourd', 'highland_barley', 'thornpeak_cabbage']);
   });
 
-  it('the three crops are the tier-3 GOURD, GRAIN and LEAF, derived from the roster', () => {
+  it('the three crops are all tier 3, distinct, and leave the legume unused', () => {
     // The leaf is what 11e's roster composition existed to provide, so it is
     // resolved through the catalog rather than typed: tier 3's four crops are
     // the grain, the gourd, the leaf and the legume, and the plates take three
@@ -568,9 +606,12 @@ describe('masterwrought Phase 11h GATE B: which crop goes on which plate', () =>
     });
     expect(new Set(gates).size, 'one gate for all three plates').toBe(1);
     expect(gates[0], 'farming 50').toBe(50);
-    // And that gate is reachable: farming's own ladder runs to 100, so a
-    // cook at the apex rung is never blocked by a crop they cannot plant.
-    expect(gates[0]).toBeLessThanOrEqual(100);
+    // And the gate is reachable rather than merely small, which is the claim
+    // that matters and is NOT implied by the line above: it is the SHIPPED
+    // farming cap this is measured against, read from the profession table.
+    expect(gates[0], 'the plate gate must sit under the shipped farming cap').toBeLessThan(
+      GATHERING_PROFESSIONS.farming.maxSkill,
+    );
   });
 });
 
@@ -598,20 +639,50 @@ describe('masterwrought Phase 11h GATE C: the flask crop', () => {
     }
     // The whole herb line, not only the flasks' own rows: a reduction paid for
     // elsewhere in alchemy would keep the three counts above at 2.
-    const alchemyHerb = ALL_RECIPES.filter((r) => r.professionId === 'alchemy').reduce(
-      (sum, r) =>
-        sum +
-        r.reagents
-          .filter((g) => g.itemId.endsWith('_herb') && !g.itemId.startsWith('fine_'))
-          .reduce((t, g) => t + g.count, 0),
-      0,
-    );
+    //
+    // PER RECIPE, NOT ONE TOTAL, and this is the fishing-line lesson applied one
+    // craft over: sixteen alchemy rows under a single number is an aggregate a
+    // COMPENSATING move keeps green (cut the sunpetal draught's silverleaf by
+    // two and pay for it on the growth tonic and the sum is still 44). Eight of
+    // the sixteen are pinned per row elsewhere in this file and in the economy
+    // suite; the other eight were the exploitable half until now. The map and
+    // the total check each other so neither can drift alone.
+    const alchemyHerbPerRecipe: Record<string, number> = {
+      recipe_elixir_of_the_boar: 2,
+      recipe_elixir_of_the_serpent: 1,
+      recipe_goldleaf_healing_draught: 4,
+      recipe_goldleaf_mana_draught: 2,
+      recipe_grand_cauldron: 6,
+      recipe_growth_tonic: 2,
+      recipe_ironhusk_flask: 2,
+      recipe_minor_healing_potion: 2,
+      recipe_quickening_catalyst: 3,
+      recipe_runewater_flask: 2,
+      recipe_silverleaf_healing_draught: 4,
+      recipe_silverleaf_mana_draught: 3,
+      recipe_sunpetal_healing_draught: 5,
+      recipe_sunpetal_mana_draught: 3,
+      recipe_venomfire_elixir: 1,
+      recipe_warboar_flask: 2,
+    };
+    const liveAlchemyHerb: Record<string, number> = {};
+    for (const recipe of ALL_RECIPES) {
+      if (recipe.professionId !== 'alchemy') continue;
+      const n = recipe.reagents
+        .filter((g) => g.itemId.endsWith('_herb') && !g.itemId.startsWith('fine_'))
+        .reduce((t, g) => t + g.count, 0);
+      if (n > 0) liveAlchemyHerb[recipe.id] = n;
+    }
+    expect(liveAlchemyHerb, "alchemy's herb demand, per row").toEqual(alchemyHerbPerRecipe);
     // 44 is a MEASUREMENT of the merged table, taken here rather than predicted:
     // this phase adds no herb anywhere, so the number it pins is whatever
     // shipped, and the three global herb totals in
     // tests/provisioning_supply_line.test.ts (28 / 27 / 39, green and unmoved)
     // are the independent evidence that the phase did not change it.
-    expect(alchemyHerb, "alchemy's whole herb demand, unchanged by this phase").toBe(44);
+    expect(
+      Object.values(alchemyHerbPerRecipe).reduce((t, n) => t + n, 0),
+      "alchemy's whole herb demand, unchanged by this phase",
+    ).toBe(44);
   });
 
   it('every apex alchemy row that took a crop still consumes an herb', () => {
@@ -672,13 +743,19 @@ describe('masterwrought Phase 11h GATE D: the capstones and the tier-4 fine twin
     // The masterwrought R20 shape this gate exists to close. Before this phase
     // each twin was consumed by exactly one recipe, farming's own tier-4 dish
     // at cooking 100, so the tier-4 twins had no endgame consumer at all.
+    const capstoneOf: Record<string, string> = {
+      fine_gilded_sunmelon: 'recipe_grand_cauldron',
+      fine_evergarden_greens: 'recipe_laden_hearth',
+    };
     for (const twin of ['fine_gilded_sunmelon', 'fine_evergarden_greens']) {
       const consumers = ALL_RECIPES.filter((r) => r.reagents.some((g) => g.itemId === twin));
       expect(consumers.length, `${twin} consumers`).toBe(2);
+      // The ID, not merely the count: a length pin stays green if the two twins
+      // swap capstones, which is exactly the split this gate rules on.
       expect(
         consumers.filter((r) => r.skillReq >= 125).map((r) => r.id),
-        `${twin} must have a consumer at the 125 rung`,
-      ).toHaveLength(1);
+        `${twin} must have its own capstone consumer at the 125 rung`,
+      ).toEqual([capstoneOf[twin]]);
     }
     // The tier is derived, not assumed: both twins really are tier 4.
     for (const twin of ['fine_gilded_sunmelon', 'fine_evergarden_greens']) {
@@ -704,9 +781,13 @@ describe('masterwrought Phase 11h GATE D: the capstones and the tier-4 fine twin
       'fine_marsh_rice',
       'fine_vale_wheat',
     ]);
+    // Swept over the LIVE bills, not over this file's own produce column: a
+    // loop reading the table asserts about test data, and only the column pin
+    // above binds the table to the tree.
     for (const row of APEX_ROWS) {
-      for (const [id] of row.produce) {
-        expect(hoeTwins.has(id), `${row.id} must not consume a hoe twin`).toBe(false);
+      for (const reagent of requireRecipe(row.id).reagents) {
+        if (!PRODUCE_IDS.has(reagent.itemId)) continue;
+        expect(hoeTwins.has(reagent.itemId), `${row.id} must not consume a hoe twin`).toBe(false);
       }
     }
   });
@@ -753,8 +834,11 @@ describe('masterwrought Phase 11h: obtainability, derived rather than argued', (
       for (const id of npc.vendorItems ?? []) stocked.add(id);
     }
     expect(stocked.size, 'the live vendor surface').toBeGreaterThan(20);
+    // Live bills again, for the same reason as the hoe sweep above.
     for (const row of APEX_ROWS) {
-      for (const [produceId] of row.produce) {
+      for (const reagent of requireRecipe(row.id).reagents) {
+        if (!PRODUCE_IDS.has(reagent.itemId)) continue;
+        const produceId = reagent.itemId;
         const seed = seedFor(produceId);
         expect(
           stocked.has(seed),
@@ -787,8 +871,11 @@ describe('masterwrought Phase 11h: the arithmetic above every row', () => {
         row.output,
       );
       // The margin widened by exactly the produce this phase added, which is
-      // the whole safety argument for putting a reagent on a tight row.
-      expect(after - row.output - (before - row.output), `${row.id} margin delta`).toBe(added);
+      // the whole safety argument for putting a reagent on a tight row. Stated
+      // against the TABLE's two literals rather than against `before`, which is
+      // defined one line up as (after - added) and would make this an algebraic
+      // identity that no mutation can reach.
+      expect(row.inputAfter - row.inputBefore, `${row.id} margin delta`).toBe(added);
       expect(added, `${row.id} must actually have added something`).toBeGreaterThan(0);
     }
   });
@@ -808,14 +895,16 @@ describe('masterwrought Phase 11h: the arithmetic above every row', () => {
     // magnitude change on any one of the six is a red HERE, in the phase that
     // must not have moved it, and not only in the budget suite.
     for (const id of ['ironhusk_flask', 'warboar_flask', 'runewater_flask']) {
-      expect(ITEMS[id]?.elixir?.value, `${id} flask magnitude`).toBe(15);
-      expect(ITEMS[id]?.elixir?.duration, `${id} flask duration`).toBe(1200);
+      const flask = flaskDef(id);
+      expect(flask.elixir?.value, `${id} flask magnitude`).toBe(15);
+      expect(flask.elixir?.duration, `${id} flask duration`).toBe(1200);
     }
     for (const id of ['stonepot_stew', 'warspice_skewers', 'sageleaf_chowder']) {
+      const food = foodDef(id);
       expect(ITEMS[id]?.sellValue, `${id} sellValue`).toBe(90);
-      expect(ITEMS[id]?.foodHp, `${id} foodHp`).toBe(1392);
-      expect(ITEMS[id]?.wellFed?.value, `${id} Well Fed magnitude`).toBe(6);
-      expect(ITEMS[id]?.wellFed?.duration, `${id} Well Fed duration`).toBe(900);
+      expect(food.foodHp, `${id} foodHp`).toBe(1392);
+      expect(food.wellFed?.value, `${id} Well Fed magnitude`).toBe(6);
+      expect(food.wellFed?.duration, `${id} Well Fed duration`).toBe(900);
     }
     for (const id of ['grand_cauldron', 'laden_hearth']) {
       expect(ITEMS[id]?.sellValue, `${id} sellValue`).toBe(380);
@@ -896,6 +985,22 @@ describe('masterwrought Phase 11h: what it did NOT touch', () => {
       ].map((r) => r.id),
     );
     expect(gearChain.size, 'the gear-chain sweep must be non-empty').toBeGreaterThan(20);
+    // THE POSITIVE CONTROL, because APEX_CONSUMABLE_RECIPES is a disjoint array
+    // and the negative sweep below is structurally satisfiable by a matcher that
+    // recognizes nothing. These four cover one source each: an intermediate, an
+    // armor row, a gear row, and a word match.
+    expect(gearChain.has('recipe_duskforged_billet'), 'an intermediate').toBe(true);
+    expect(gearChain.has('recipe_prismglass_setting'), 'a word match and an intermediate').toBe(
+      true,
+    );
+    expect(
+      [...gearChain].some((id) => APEX_ARMOR_RECIPES.some((r) => r.id === id)),
+      'an apex armor row',
+    ).toBe(true);
+    expect(
+      [...gearChain].some((id) => APEX_GEAR_RECIPES.some((r) => r.id === id)),
+      'an apex gear row',
+    ).toBe(true);
     for (const row of APEX_ROWS) {
       expect(gearChain.has(row.id), `${row.id} must not be a gear-chain row`).toBe(false);
     }
@@ -1007,12 +1112,25 @@ describe('masterwrought Phase 11h: every apex bill still CRAFTS', () => {
         craftSkills,
         recipe.professionId,
       ).count;
-      expect(required, `${recipe.id} must really need its ${reagent.itemId}`).toBeGreaterThan(0);
       expect(
         rig.sim.countItem(reagent.itemId, rig.pid),
         `${recipe.id} must consume ${required} of its ${reagent.itemId}`,
       ).toBe(reagent.count - required);
     }
+    // AND ONE LEFTOVER PER ROW AGAINST A LITERAL, because the loop above shares
+    // requiredReagentCountFor with the production path and would stay green if
+    // the #1134 discount itself moved (both sides shift together). Every row
+    // here sits at skillReq 100 or 125, past the 75 specialization threshold, so
+    // the shipped discount is 20 percent and the draw is floor(count * 0.8),
+    // minimum 1. The literal is the crop entry, which is the one this phase
+    // authored: a plate's 2 draws 1 and leaves 1; a flask's 1 draws 1 and leaves
+    // 0. Move the discount and this reds while the derived loop does not.
+    const crop = recipe.reagents.find((g) => PRODUCE_IDS.has(g.itemId));
+    if (!crop) throw new Error(`${recipe.id} lost its produce`);
+    expect(
+      rig.sim.countItem(crop.itemId, rig.pid),
+      `${recipe.id} leftover ${crop.itemId} at the shipped 20 percent discount`,
+    ).toBe(crop.count - Math.max(1, Math.floor(crop.count * 0.8)));
   });
 
   it.each(APEX_ROWS.map((row) => row.id))(

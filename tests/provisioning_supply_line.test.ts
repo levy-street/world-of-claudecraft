@@ -33,8 +33,11 @@ import { Sim } from '../src/sim/sim';
 
 /** Every farm PRODUCE id and its fine twin, derived from the crop catalog. The
  *  seed ids are deliberately NOT here: a seed is the input side of the farming
- *  loop and is vendor-stocked at tiers 1 to 3, so folding it in would let a
- *  recipe satisfy "consumes produce" by consuming a vendor good. */
+ *  loop and is vendor-stocked at EVERY tier, so folding it in would let a
+ *  recipe satisfy "consumes produce" by consuming a vendor good. (This read
+ *  "tiers 1 to 3" until masterwrought Phase 11h checked it: Phase 11e's GATE 1
+ *  stocked all four tier-4 seeds at farmer_verbena too, so the exclusion is
+ *  broader than the note claimed, never narrower.) */
 const PRODUCE_IDS: ReadonlySet<string> = new Set(
   Object.values(FARM_CROPS).flatMap((crop) => [crop.produceItemId, crop.fineProduceItemId]),
 );
@@ -739,7 +742,9 @@ describe('masterwrought R17 RULE 2: the accent rule', () => {
     // The ROW count is stated separately from the entry list, because the cost
     // of the open decision is "how many shipped bills would have to be edited",
     // and five entries across three rows is a very different bill from nine
-    // across six.
+    // across SEVEN. (Nine entries over seven rows rather than nine:
+    // recipe_marlows_grand_roast and recipe_seasoned_stock contribute two
+    // entries each.)
     expect(
       new Set(refusedUnderCountReading.map((k) => k.split('/')[0])).size,
       'shipped rows the count reading would force an edit to',
