@@ -533,6 +533,74 @@ describe('the catch tables follow the shortfall schedule', () => {
     expect(firstBandOf('raw_deepbarb_catfish')).toBe(3);
     expect(firstBandOf('raw_hollowgill_sturgeon')).toBe(4);
     expect(firstBandOf('raw_stillmere_salmon')).toBe(5);
+    // THE WHOLE CELL'S ORDER, not just the food subsequence (Phase 11i QA).
+    //
+    // The pairs above are ordered, and that closed the mutation the battery
+    // ran: swapping two FOOD rows reds. What it does not close is the rest of
+    // the row list. A draw walks a RUNNING WEIGHT TOTAL down the cell, so the
+    // position of the koi row, either grey-junk row and the null row is draw
+    // behaviour exactly as much as the fish rows are, and the filter above
+    // deletes all four before comparing. Move the null row to the front of a
+    // cell and every arm in this file still passes.
+    //
+    // So pin the cell's SHAPE as an ordered id list. Weights stay the
+    // schedule's job; this is only about the order the roll walks them in, and
+    // it is READ OFF the shipped table rather than assumed: the first draft of
+    // this arm asserted the koi sits directly above the null row, which is true
+    // of bands 0 to 2 and false from band 3 up, because the new catches are
+    // APPENDED after the koi rather than inserted beside their fish.
+    const cellIds = (zoneId: string, band: number): (string | null)[] =>
+      FISHING_TABLES_BY_BAND[band][zoneId].map((r) => r.itemId);
+    const NEW_CATCHES = ['raw_deepbarb_catfish', 'raw_hollowgill_sturgeon', 'raw_stillmere_salmon'];
+    let ordered = 0;
+    for (const zoneId of ZONE_IDS) {
+      for (let band = 0; band <= MAX_BAND; band++) {
+        const ids = cellIds(zoneId, band);
+        const at = (id: string | null) => ids.indexOf(id);
+        // ONE null row, and it is LAST: the roll's remainder arm depends on it.
+        expect(
+          ids.filter((id) => id === null),
+          `${zoneId} band ${band}: exactly one null row`,
+        ).toHaveLength(1);
+        expect(at(null), `${zoneId} band ${band}: the null row is last`).toBe(ids.length - 1);
+        const junkAt = JUNK_ROWS[zoneId].map((id) => at(id)).filter((i) => i >= 0);
+        const shippedFishAt = ids
+          .map((id, i) =>
+            id !== null &&
+            id !== KOI &&
+            !JUNK_ROWS[zoneId].includes(id) &&
+            !NEW_CATCHES.includes(id)
+              ? i
+              : -1,
+          )
+          .filter((i) => i >= 0);
+        // The shipped composition: the zone's own fish, then its junk, then the
+        // koi, then whatever new catches its band has earned, then the null row.
+        expect(
+          Math.max(...shippedFishAt) < Math.min(...junkAt),
+          `${zoneId} band ${band}: the zone's own fish precede its junk`,
+        ).toBe(true);
+        expect(
+          Math.max(...junkAt) < at(KOI),
+          `${zoneId} band ${band}: the junk rows precede the koi`,
+        ).toBe(true);
+        const newAt = NEW_CATCHES.map((id) => at(id)).filter((i) => i >= 0);
+        for (const i of newAt) {
+          expect(i, `${zoneId} band ${band}: a new catch sits after the koi`).toBeGreaterThan(
+            at(KOI),
+          );
+        }
+        // And they are appended in the order their bands opened them, which is
+        // what makes a cell readable as its own history.
+        expect(
+          [...newAt].sort((a, b) => a - b),
+          `${zoneId} band ${band}: new catches in band-introduction order`,
+        ).toEqual(newAt);
+        expect(newAt).toHaveLength(Math.max(0, band - 2));
+        ordered += 1;
+      }
+    }
+    expect(ordered, 'every cell had its row order pinned').toBe(18);
     // And once a catch enters it never leaves, in any zone: a cell that dropped
     // a row a lower band paid would be a table going BACKWARDS for the angler
     // who climbed to it.
