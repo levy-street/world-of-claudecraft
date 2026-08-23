@@ -951,18 +951,33 @@ describe('masterwrought Phase 11h: obtainability, derived rather than argued', (
     // player-facing wiki prose saying the plate crops "ask Farming 50 and
     // nothing more". That sentence is corrected in the same change; this arm is
     // what stops the next one being written.
+    // EVERY NUMBER HERE IS A LITERAL, and that is the whole design of the arm.
+    // The first version read `expect(wieldRequirementForTier(3)).toBe(
+    // TIER3_TOOL_WIELD_PROFICIENCY)`, which is the constant compared against
+    // itself: the resolver RETURNS that constant, so editing it moved both
+    // sides and the arm survived its own mutation (proven, not assumed: the
+    // Phase 11h QA ran 70 to 50 and the file stayed green). The literals are
+    // what make a retune visit this file, and the exported constants are
+    // asserted against the same literals so a renamed or re-pointed resolver
+    // cannot drift away from them either.
+    expect(TIER3_TOOL_WIELD_PROFICIENCY, 'the tier-3 hoe wield rung').toBe(70);
+    expect(TIER4_TOOL_WIELD_PROFICIENCY, 'the tier-4 hoe wield rung').toBe(85);
     for (const [tier, threshold, wield] of [
-      [3, 50, TIER3_TOOL_WIELD_PROFICIENCY],
-      [4, 75, TIER4_TOOL_WIELD_PROFICIENCY],
+      [3, 50, 70],
+      [4, 75, 85],
     ] as const) {
       expect(farmCropSkillThreshold(tier), `tier ${tier} plant threshold`).toBe(threshold);
       expect(wieldRequirementForTier(tier), `tier ${tier} hoe wield requirement`).toBe(wield);
       // The gate that actually binds is the LARGER of the two, and on both
-      // tiers this phase reaches it is the hoe rather than the threshold.
+      // tiers this phase reaches it is the hoe rather than the threshold. Both
+      // sides literal, for the reason above.
       expect(
-        Math.max(threshold, wieldRequirementForTier(tier)),
+        Math.max(farmCropSkillThreshold(tier), wieldRequirementForTier(tier)),
         `tier ${tier} effective plant floor`,
-      ).toBe(wieldRequirementForTier(tier));
+      ).toBe(wield);
+      expect(wield, `the hoe is what binds tier ${tier}, not the threshold`).toBeGreaterThan(
+        threshold,
+      );
     }
     // And both floors still sit under the shipped farming cap, so the crops
     // this phase names stay reachable rather than merely dearer.
