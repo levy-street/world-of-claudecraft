@@ -658,8 +658,13 @@ describe('masterwrought R17 RULE 2: the accent rule', () => {
     // crop's count stays "strictly below" but its share of inputValue stays "at
     // or below". A crop that exactly ties the dominant reagent's contribution
     // still is not the body, so tightening this to strictly-below would enforce
-    // something the packet never ruled. No row ties today; the closest is the
-    // chowder at 16 against 20.
+    // something the packet never ruled. ONE ROW TIES SINCE masterwrought Phase
+    // 11h and it is the reason the operator matters rather than a curiosity:
+    // recipe_laden_hearth's fine_evergarden_greens contributes 1 x 320 against
+    // a dominant of 2 x sunpetal_herb = 320, exactly equal, so it ships only
+    // because the contract says at-or-below. (Before 11h the closest was the
+    // chowder at 16 against 20.) A phase that tightened this to strictly-below
+    // would now refuse a settled capstone bill.
     // Swept, not listed, for the same reason as the COUNT arm above, and routed
     // through accentVerdict so the control above drives this exact expression.
     for (const recipe of accentGovernedRows()) {
@@ -690,6 +695,17 @@ describe('masterwrought R17 RULE 2: the accent rule', () => {
     // rows are DECISION B's, not DECISION C's. Measured here so the maintainer's
     // choice is costed rather than argued, and so that adopting the other
     // reading is a known edit to a known list instead of a discovery.
+    //
+    // THE COST GREW AT masterwrought Phase 11h, from FIVE entries across THREE
+    // shipped rows to NINE across SEVEN, and the phase surfaced that rather than
+    // quietly re-pinning it. The four new ones are all APEX rows: each of the
+    // three role plates takes a tier-3 crop worth 30 against a count reference
+    // of 16 (game_meat 4), and recipe_laden_hearth's fine_evergarden_greens is
+    // worth 320 against a reference of 80 (prime_cut 4). Everything the flasks
+    // and the alchemy capstone added clears BOTH readings, because those bills
+    // are priced by sunpetal_herb at the same count that carries the reference.
+    // So the open decision is now a known edit to seven shipped rows, four of
+    // them settled by 11h-GATE-A, -B and -D.
     const refusedUnderCountReading: string[] = [];
     for (const recipe of accentGovernedRows()) {
       const nonProduce = recipe.reagents.filter((g) => !PRODUCE_IDS.has(g.itemId));
@@ -711,11 +727,23 @@ describe('masterwrought R17 RULE 2: the accent rule', () => {
     }
     expect(refusedUnderCountReading.sort()).toEqual([
       'recipe_elixir_of_the_serpent/frost_gourd',
+      'recipe_laden_hearth/fine_evergarden_greens',
       'recipe_marlows_grand_roast/frost_gourd',
       'recipe_marlows_grand_roast/highland_barley',
+      'recipe_sageleaf_chowder/thornpeak_cabbage',
       'recipe_seasoned_stock/bog_beet',
       'recipe_seasoned_stock/marsh_rice',
+      'recipe_stonepot_stew/frost_gourd',
+      'recipe_warspice_skewers/highland_barley',
     ]);
+    // The ROW count is stated separately from the entry list, because the cost
+    // of the open decision is "how many shipped bills would have to be edited",
+    // and five entries across three rows is a very different bill from nine
+    // across six.
+    expect(
+      new Set(refusedUnderCountReading.map((k) => k.split('/')[0])).size,
+      'shipped rows the count reading would force an edit to',
+    ).toBe(7);
     // And the shipped reading accepts every one of them, so the two really do
     // disagree rather than this list being an artifact of how it was computed.
     for (const key of refusedUnderCountReading) {

@@ -347,21 +347,35 @@ const APEX_HELD: Record<
   },
 };
 
-// The two uniform phase 10 consumable bills, one per craft: the consumable
-// idiom is a BATCH output off ONE of the craft's intermediate, where the gear
-// rungs take three for a single piece. Shared by all three rows of each family,
-// so a role choice is never also an economy choice.
+// The two phase 10 consumable bills, one per craft: the consumable idiom is a
+// BATCH output off ONE of the craft's intermediate, where the gear rungs take
+// three for a single piece.
+//
+// THE TWO FAMILIES NO LONGER SHARE THEIR SHAPE, and this pin is where the
+// amended uniform-bill rule is expressed rather than described (masterwrought
+// Phase 11h, 11h-GATE-A). The flask family stays BYTE-IDENTICAL, so one shared
+// constant still serves all three rows. The FOOD family differs by EXACTLY ONE
+// CROP ROW, so its shared constant is now a BASE that each plate appends its
+// own crop to. Written this way on purpose: a fourth plate, or a second
+// difference on any of the three, cannot be expressed without editing the
+// helper, which is the amendment's scope made structural instead of trusted.
 const FLASK_BILL: { itemId: string; count: number }[] = [
   { itemId: 'quickening_catalyst', count: 1 },
   { itemId: 'pristine_venom_gland', count: 1 },
   { itemId: 'venom_gland', count: 2 },
   { itemId: 'sunpetal_herb', count: 2 },
+  // masterwrought Phase 11h's tier-3 grain, identical on all three flasks.
+  { itemId: 'highland_barley', count: 1 },
   { itemId: 'glass_vial', count: 1 },
 ];
-const ROLE_FOOD_BILL: { itemId: string; count: number }[] = [
+/** The four reagents every role plate shares, in shipped order, with the ONE
+ *  crop row spliced in at the position the bills author it (after the meats,
+ *  before the herb). Every plate is this list plus exactly one entry. */
+const roleFoodBill = (cropId: string, count: number): { itemId: string; count: number }[] => [
   { itemId: 'seasoned_stock', count: 1 },
   { itemId: 'prime_cut', count: 2 },
   { itemId: 'game_meat', count: 4 },
+  { itemId: cropId, count },
   { itemId: 'sunpetal_herb', count: 2 },
   { itemId: 'cooking_salt', count: 2 },
 ];
@@ -426,6 +440,9 @@ const APEX_TOOLS: Record<
     reagents: [
       { itemId: 'quickening_catalyst', count: 3 },
       { itemId: 'wyrmfall_core', count: 2 },
+      // masterwrought Phase 11h's tier-4 showcase pair (11h-GATE-D).
+      { itemId: 'gilded_sunmelon', count: 2 },
+      { itemId: 'fine_gilded_sunmelon', count: 1 },
       { itemId: 'sunpetal_herb', count: 4 },
       { itemId: 'goldleaf_herb', count: 2 },
     ],
@@ -437,11 +454,14 @@ const APEX_TOOLS: Record<
     recipes: APEX_CONSUMABLE_RECIPES,
     skillReq: 125,
     stationType: 'kitchens',
+    // SEVEN entries, the longest bill in the game (masterwrought Phase 11h).
     reagents: [
       { itemId: 'seasoned_stock', count: 3 },
       { itemId: 'wyrmfall_core', count: 2 },
       { itemId: 'prime_cut', count: 4 },
       { itemId: 'game_meat', count: 4 },
+      { itemId: 'evergarden_greens', count: 2 },
+      { itemId: 'fine_evergarden_greens', count: 1 },
       { itemId: 'sunpetal_herb', count: 2 },
     ],
   },
@@ -500,7 +520,8 @@ const APEX_CONSUMABLES: Record<
     sellValue: 90,
     effect: { aura: 'Well Fed', kind: 'buff_sta', value: 6, duration: 900 },
     foodHp: 1392,
-    reagents: ROLE_FOOD_BILL,
+    // The TANK plate's own crop (masterwrought Phase 11h, 11h-GATE-B).
+    reagents: roleFoodBill('frost_gourd', 2),
   },
   warspice_skewers: {
     craft: 'cooking',
@@ -510,7 +531,8 @@ const APEX_CONSUMABLES: Record<
     sellValue: 90,
     effect: { aura: 'Well Fed', kind: 'buff_ap', value: 6, duration: 900 },
     foodHp: 1392,
-    reagents: ROLE_FOOD_BILL,
+    // The PHYSICAL plate's own crop.
+    reagents: roleFoodBill('highland_barley', 2),
   },
   sageleaf_chowder: {
     craft: 'cooking',
@@ -520,7 +542,8 @@ const APEX_CONSUMABLES: Record<
     sellValue: 90,
     effect: { aura: 'Well Fed', kind: 'buff_int', value: 6, duration: 900 },
     foodHp: 1392,
-    reagents: ROLE_FOOD_BILL,
+    // The CASTER plate's own crop, the tier-3 leaf.
+    reagents: roleFoodBill('thornpeak_cabbage', 2),
   },
 };
 

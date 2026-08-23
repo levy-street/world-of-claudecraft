@@ -338,22 +338,45 @@ describe('FARM_RECIPES: the farm-economy hook set', () => {
     // census could be read as farming buying from itself at the endgame. The
     // stock is a shipped cooking intermediate that farming did not write, and
     // the whole cooking apex flows through it.
+    //
+    // PHASE 11h DOUBLES IT, 8 TO 16, and this is the number masterwrought R20
+    // was written to move. The eight it adds are the whole apex consumable
+    // tier: the three role plates and the three flasks at rung 100, and both
+    // skill-125 capstones, which are the top of the entire catalog. Every one
+    // of them is a row farming did not write, so the half of this census that
+    // is not farming buying from itself goes from ONE member to NINE.
     expect(endgameBills.map((r) => r.id).sort()).toEqual(
       [
         'recipe_evergarden_braised_greens',
         'recipe_evergarden_harvest_platter',
         'recipe_evergarden_sunmelon_tart',
+        'recipe_grand_cauldron',
         'recipe_harvest_feast',
         'recipe_highwatch_barley_porridge',
         'recipe_highwatch_gourd_soup',
+        'recipe_ironhusk_flask',
+        'recipe_laden_hearth',
         'recipe_osmium_hoe',
+        'recipe_runewater_flask',
+        'recipe_sageleaf_chowder',
         'recipe_seasoned_stock',
+        'recipe_stonepot_stew',
+        'recipe_warboar_flask',
+        'recipe_warspice_skewers',
       ].sort(),
     );
     expect(
       endgameBills,
       "farming's endgame-bill count for the masterwrought R20 census",
-    ).toHaveLength(8);
+    ).toHaveLength(16);
+    // THE TOP RUNG SPECIFICALLY, kept as its own clause because the count above
+    // can be satisfied entirely at 75 and 100. masterwrought R13 puts the
+    // catalog's ceiling at 125 and until Phase 11h nothing farming grows
+    // reached it, so a census that stops at 100 leaves the exact hole R20 names.
+    expect(
+      endgameBills.filter((r) => r.skillReq >= 125).map((r) => r.id).sort(),
+      'produce must reach the 125 rung, the top of the catalog',
+    ).toEqual(['recipe_grand_cauldron', 'recipe_laden_hearth']);
     // The claim masterwrought R20 actually cares about, stated separately from the literal
     // above so a future re-tier that moves WHICH rows qualify still has to keep
     // the property true: produce reaches a CONSUMABLE endgame bill, not only a
@@ -362,17 +385,42 @@ describe('FARM_RECIPES: the farm-economy hook set', () => {
     const consumableEndgame = endgameBills.filter(
       (r) => r.professionId === 'cooking' || r.professionId === 'alchemy',
     );
-    expect(consumableEndgame.length, 'produce must feed a consumable endgame bill').toBe(7);
+    expect(consumableEndgame.length, 'produce must feed a consumable endgame bill').toBe(15);
     // AND THE CLAUSE PHASE 11g MAKES CHECKABLE, kept separate for the same
     // reason the one above is: a consumable endgame bill that is not one of
     // farming's own dishes. Satisfying masterwrought R20 entirely out of
     // FARM_RECIPES would mean farming feeds only itself at 75 and above, which
-    // is the self-referential reading the supply line exists to end.
+    // is the self-referential reading the supply line exists to end. 11g put
+    // ONE row here; 11h took it to nine, which is the whole apex consumable
+    // tier.
     const farmOwnIds = new Set(FARM_RECIPES.map((r) => r.id));
     expect(
-      consumableEndgame.filter((r) => !farmOwnIds.has(r.id)).map((r) => r.id),
+      consumableEndgame
+        .filter((r) => !farmOwnIds.has(r.id))
+        .map((r) => r.id)
+        .sort(),
       'produce must reach an endgame consumable bill farming did not write',
-    ).toEqual(['recipe_seasoned_stock']);
+    ).toEqual([
+      'recipe_grand_cauldron',
+      'recipe_ironhusk_flask',
+      'recipe_laden_hearth',
+      'recipe_runewater_flask',
+      'recipe_sageleaf_chowder',
+      'recipe_seasoned_stock',
+      'recipe_stonepot_stew',
+      'recipe_warboar_flask',
+      'recipe_warspice_skewers',
+    ]);
+    // BOTH CRAFTS, not one. The nine above are eight cooking rows and four
+    // alchemy rows only because the stock is cooking's; without this clause a
+    // later walk-back that left every non-farm endgame consumer in ONE craft
+    // would keep the list long and the claim hollow.
+    expect(
+      new Set(
+        consumableEndgame.filter((r) => !farmOwnIds.has(r.id)).map((r) => r.professionId),
+      ),
+      'produce must reach the endgame of BOTH consumable crafts',
+    ).toEqual(new Set(['alchemy', 'cooking']));
   });
 
   it('no farm output is item-level ELIGIBLE, so the scaffolding climb moves no budget pin', () => {

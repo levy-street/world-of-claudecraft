@@ -8622,6 +8622,10 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
             "count": 2
           },
           {
+            "name": "Highland Barley",
+            "count": 1
+          },
+          {
             "name": "Glass Vial",
             "count": 1
           }
@@ -8663,6 +8667,10 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
           {
             "name": "Sunpetal Herb",
             "count": 2
+          },
+          {
+            "name": "Highland Barley",
+            "count": 1
           },
           {
             "name": "Glass Vial",
@@ -8708,6 +8716,10 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
             "count": 2
           },
           {
+            "name": "Highland Barley",
+            "count": 1
+          },
+          {
             "name": "Glass Vial",
             "count": 1
           }
@@ -8741,6 +8753,14 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
           {
             "name": "Wyrmfall Core",
             "count": 2
+          },
+          {
+            "name": "Gilded Sunmelon",
+            "count": 2
+          },
+          {
+            "name": "Fine Gilded Sunmelon",
+            "count": 1
           },
           {
             "name": "Sunpetal Herb",
@@ -9318,6 +9338,10 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
             "count": 4
           },
           {
+            "name": "Frost Gourd",
+            "count": 2
+          },
+          {
             "name": "Sunpetal Herb",
             "count": 2
           },
@@ -9373,6 +9397,10 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
             "count": 4
           },
           {
+            "name": "Highland Barley",
+            "count": 2
+          },
+          {
             "name": "Sunpetal Herb",
             "count": 2
           },
@@ -9426,6 +9454,10 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
           {
             "name": "Game Meat",
             "count": 4
+          },
+          {
+            "name": "Thornpeak Cabbage",
+            "count": 2
           },
           {
             "name": "Sunpetal Herb",
@@ -9485,6 +9517,14 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
           {
             "name": "Game Meat",
             "count": 4
+          },
+          {
+            "name": "Evergarden Greens",
+            "count": 2
+          },
+          {
+            "name": "Fine Evergarden Greens",
+            "count": 1
           },
           {
             "name": "Sunpetal Herb",

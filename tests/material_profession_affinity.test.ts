@@ -67,7 +67,7 @@ describe('craftIdsForMaterialItem', () => {
     expect(craftIdsForMaterialItem('arcane_shard')).toEqual(['enchanting']);
   });
 
-  it('three crops gained ALCHEMY as a consumer (Masterwrought phase 11g)', () => {
+  it('five crops name ALCHEMY as a consumer (Masterwrought phases 11g and 11h)', () => {
     // THE PLAYER-VISIBLE HALF OF THE PROVISIONING SUPPLY LINE, pinned here
     // because nothing else in the tree can see it. Farm materials are
     // structurally EXEMPT from the orphan census above
@@ -81,35 +81,71 @@ describe('craftIdsForMaterialItem', () => {
     // now renders "Used by Alchemy and Cooking." on these three item tooltips
     // where it used to read "Used by Cooking.".
     //
+    // PHASE 11h ADDED TWO MORE, and they arrive from the APEX tier rather than
+    // the elixir ladder: highland_barley is the grain in all three apex flasks
+    // (11h-GATE-C) and gilded_sunmelon is the alchemy capstone's showcase crop
+    // in recipe_grand_cauldron (11h-GATE-D). Both tooltips move from
+    // "Used by Cooking." to "Used by Alchemy and Cooking." the same way the
+    // three below did.
+    //
     // Order is CRAFT_RING, not first-seen, which is why alchemy leads.
     expect(craftIdsForMaterialItem('vale_wheat')).toEqual(['alchemy', 'cooking']);
     expect(craftIdsForMaterialItem('bog_beet')).toEqual(['alchemy', 'cooking']);
     expect(craftIdsForMaterialItem('frost_gourd')).toEqual(['alchemy', 'cooking']);
-    // The negative half, and it is what makes the three above a real claim
-    // rather than a restatement of "produce is a reagent": the crops the elixir
-    // line did NOT take stay cooking-only. Without these a change that handed
-    // alchemy every crop would pass the arm above unchanged.
+    expect(craftIdsForMaterialItem('highland_barley')).toEqual(['alchemy', 'cooking']);
+    expect(craftIdsForMaterialItem('gilded_sunmelon')).toEqual(['alchemy', 'cooking']);
+    // The negative half, and it is what makes the five above a real claim
+    // rather than a restatement of "produce is a reagent": the crops neither
+    // phase took stay cooking-only. Without these a change that handed alchemy
+    // every crop would pass the arm above unchanged.
     expect(craftIdsForMaterialItem('brook_carrot')).toEqual(['cooking']);
     expect(craftIdsForMaterialItem('marsh_rice')).toEqual(['cooking']);
-    expect(craftIdsForMaterialItem('highland_barley')).toEqual(['cooking']);
     expect(craftIdsForMaterialItem('thornpeak_cabbage')).toEqual(['cooking']);
-    expect(craftIdsForMaterialItem('gilded_sunmelon')).toEqual(['cooking']);
-    // SWEPT, NOT LISTED (qr-11G-AFFINITY, Phase 11g QA). The five ids above are
-    // five of the NINE crops that must stay cooking-only, so a change handing
-    // alchemy one of the other four passed this arm. The sweep closes it over
+    expect(craftIdsForMaterialItem('evergarden_greens')).toEqual(['cooking']);
+    // SWEPT, NOT LISTED (qr-11G-AFFINITY, Phase 11g QA). The ids above are a
+    // subset of the crops that must stay cooking-only, so a change handing
+    // alchemy one of the rest passed this arm. The sweep closes it over
     // whatever roster ships and needs no edit when Phase 11e's twelve becomes
-    // thirteen: exactly three base produce ids may name alchemy, and they are
-    // the three the elixir line took.
-    const GAINED_ALCHEMY = new Set(['vale_wheat', 'bog_beet', 'frost_gourd']);
+    // thirteen.
+    const GAINED_ALCHEMY = new Set([
+      'vale_wheat',
+      'bog_beet',
+      'frost_gourd',
+      'highland_barley',
+      'gilded_sunmelon',
+    ]);
     const alchemyCrops = Object.values(FARM_CROPS)
       .map((crop) => crop.produceItemId)
       .filter((id) => craftIdsForMaterialItem(id).includes('alchemy'));
     expect(alchemyCrops.sort(), 'exactly these base crops feed alchemy').toEqual(
       [...GAINED_ALCHEMY].sort(),
     );
+    // THE FINE TWINS ARE SWEPT TOO (masterwrought Phase 11h), and the gap was
+    // real rather than theoretical: the sweep above maps produceItemId only, so
+    // until this phase nothing anywhere could see a fine twin gaining a craft.
+    // 11h is the first phase to put one in an alchemy bill
+    // (fine_gilded_sunmelon in recipe_grand_cauldron), which is exactly when
+    // the blind spot would have shipped unnoticed. Same shape, its own literal,
+    // so the base and twin sets cannot drift into each other.
+    const TWINS_NAMING_ALCHEMY = new Set(['fine_gilded_sunmelon']);
+    const alchemyTwins = Object.values(FARM_CROPS)
+      .map((crop) => crop.fineProduceItemId)
+      .filter((id) => craftIdsForMaterialItem(id).includes('alchemy'));
+    expect(alchemyTwins.sort(), 'exactly these fine twins feed alchemy').toEqual(
+      [...TWINS_NAMING_ALCHEMY].sort(),
+    );
     // Vacuity floor: the sweep must run over the whole roster, so a catalog
     // rename that emptied it cannot make the toEqual above pass over nothing.
     expect(Object.keys(FARM_CROPS).length, 'the crop roster').toBeGreaterThanOrEqual(12);
+    // And both sweeps must actually SEE a consumer set, or a resolver returning
+    // [] for everything would satisfy both literals by emptying them. Measured
+    // over the same rosters the two sweeps walk.
+    expect(
+      Object.values(FARM_CROPS).filter(
+        (crop) => craftIdsForMaterialItem(crop.produceItemId).length > 0,
+      ).length,
+      'every base crop must resolve at least one consuming craft',
+    ).toBe(Object.keys(FARM_CROPS).length);
   });
 
   it('herbs and the vial gained inscription as a consumer (Masterwrought phase 06)', () => {

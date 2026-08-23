@@ -1929,6 +1929,22 @@ describe('Guide professions generated content accuracy', () => {
     expect(cookHtml).toContain('never held up by the pantry');
     expect(alcHtml).toContain('The elixir line also takes a farm base');
     expect(alcHtml).toContain('loses nothing to the change');
+    // THE APEX HALF (masterwrought Phase 11h). Both bodies enumerated the
+    // garden's buyers and both enumerations stopped at rung 50, so both went
+    // stale the moment produce reached 100 and 125. Same anchor rule as above:
+    // every clause exists ONLY in the corrected prose and is apostrophe-free,
+    // since the page escapes to &#39;.
+    expect(cookHtml).toContain('The garden reaches the top of the kitchen too');
+    expect(cookHtml).toContain('the longest bill in the game');
+    expect(alcHtml).toContain('The bench above the ladder asks for the garden too');
+    expect(alcHtml).toContain('stand beside the herbs rather than in place of them');
+    // The negative half for the claim 11h retires: the cooking page said the
+    // crops sit in the TRAINER dishes, which was the whole story until this
+    // phase and is now half of one. Without this, a reverted apex paragraph
+    // would leave the page telling a player the garden stops at the trainer
+    // ladder while the bills say otherwise, and every anchor above would pass.
+    expect(cookHtml).toContain('the three apex role dishes');
+    expect(alcHtml).toContain('the Grand Cauldron at the very top');
     // The headings enumerated the suppliers too, so they went stale with the
     // bodies and are pinned with them.
     expect(cookHtml).toContain('A pantry fed by rod, knife, and furrow');
@@ -2013,6 +2029,47 @@ describe('Guide professions generated content accuracy', () => {
     // fail on an undefined lookup rather than on the claim under test.
     expect(barley, 'the roast barley count must have a word for it').toBeLessThanOrEqual(4);
     expect(carrots, 'the chowder carrot count must have a word for it').toBeLessThanOrEqual(4);
+
+    // THE APEX QUANTITY CLAIMS (masterwrought Phase 11h), derived exactly like
+    // the leveling ones above and for the same recorded reason: an anchor tests
+    // WHICH clause is present and never whether its number is true, and this
+    // page has already shipped one miscount that every anchor passed. Both new
+    // paragraphs use the article and the number word quantitatively, so every
+    // count they state is pinned to the live bill.
+    const apexCounts: Array<[string, string, string]> = [
+      ['recipe_stonepot_stew', 'frost_gourd', 'Frost Gourd'],
+      ['recipe_warspice_skewers', 'highland_barley', 'Highland Barley'],
+      ['recipe_sageleaf_chowder', 'thornpeak_cabbage', 'Thornpeak Cabbage'],
+      ['recipe_laden_hearth', 'evergarden_greens', 'Evergarden Greens'],
+    ];
+    for (const [recipeId, itemId, label] of apexCounts) {
+      const n = reagentCount(recipeId, itemId);
+      expect(n, `${recipeId} ${itemId} count must have a word for it`).toBeLessThanOrEqual(4);
+      expect(body, `${recipeId} takes ${n} ${itemId}`).toContain(`${countWord[n]} ${label}`);
+    }
+    // The cooking page also names the hearth's FINE twin without a number, so
+    // pin the name against the live bill: a re-tier that dropped it would leave
+    // the sentence claiming an ingredient the recipe lost.
+    expect(reagentCount('recipe_laden_hearth', 'fine_evergarden_greens')).toBe(1);
+    expect(body).toContain('a Fine Evergarden Greens');
+    // The alchemy body's apex counts, same rule. The barley is stated once for
+    // all three flasks, so the pin is that all three really agree.
+    const flaskBarley = [
+      'recipe_ironhusk_flask',
+      'recipe_warboar_flask',
+      'recipe_runewater_flask',
+    ].map((id) => reagentCount(id, 'highland_barley'));
+    expect(new Set(flaskBarley).size, 'the three flasks must agree, as the sentence says').toBe(1);
+    expect(alcBody, `each flask steeps ${flaskBarley[0]} highland barley`).toContain(
+      `steep ${countWord[flaskBarley[0]]} Highland Barley`,
+    );
+    const melons = reagentCount('recipe_grand_cauldron', 'gilded_sunmelon');
+    expect(melons, 'the cauldron melon count must have a word for it').toBeLessThanOrEqual(4);
+    expect(alcBody, `the cauldron takes ${melons} gilded sunmelon`).toContain(
+      `${countWord[melons]} Gilded Sunmelon`,
+    );
+    expect(reagentCount('recipe_grand_cauldron', 'fine_gilded_sunmelon')).toBe(1);
+    expect(alcBody).toContain('a Fine Gilded Sunmelon');
   });
 
   it('pins the spot literals a consistently-wrong regeneration would keep wrong', () => {
