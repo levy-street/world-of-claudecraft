@@ -934,15 +934,24 @@ existing row that was wrong is AMENDED IN PLACE with a dated line rather than re
     near-equal summed value across the three plates, and amend the APEX_CONSUMABLE_RECIPES
     header in the SAME change with this exact scope: the food family's bills differ by exactly
     one crop row and are identical in every other reagent, and the flask family stays
-    byte-identical. Pin the resulting cost spread. Deliverable 2 is NOT cut. WHY: no test pins
-    the plates identical so the change is available, but the header states the rule and amending
-    a written rule is deliberate; the precise scope keeps 11i's identical fish row legal and
+    byte-identical. Pin the resulting cost spread. Deliverable 2 is NOT cut. WHY: the header
+    states the rule and amending a written rule is deliberate;
+    (CORRECTED at the Phase 11h QA: this WHY also read "no test pins the plates identical
+    so the change is available", which was false when it was written. tests/masterwrought_
+    budget.test.ts pinned all three role plates to ONE shared ROLE_FOOD_BILL constant, and
+    11h had to rewrite that pin into roleFoodBill(cropId, count) to land the deliverable.
+    The phase file's "must come back UNCHANGED" list names the same suite and is the
+    downstream symptom of the same wrong belief.) the precise scope keeps 11i's identical fish row legal and
     stops a future contributor reading the amendment as open season.
 47. 11h-GATE-B. Gourd to recipe_stonepot_stew, grain to recipe_warspice_skewers, the new tier-3
     leaf to recipe_sageleaf_chowder, all three at count 2; the tier-4 fallback branch is
     recorded as superseded; every crop's obtainability at the tier its recipe unlocks is
     ASSERTED by test. WHY: 11e-D-B was composed for exactly this, so all three plates ask
-    farming 50 and nothing else, and a role choice is never also an economy or skill-gate choice.
+    the SAME of a farmer, and a role choice is never also an economy or skill-gate choice.
+    (SCOPED at the Phase 11h QA. The comparative claim is what this ruling rests on and it
+    holds. The absolute one does not: farmCropSkillThreshold(3) is 50, but the plant path
+    also wants a tier-3 hoe, which wields at farming 70, so the effective floor is 70 for
+    all three. The player-facing copy that stated 50 as a floor is corrected there.)
 48. 11h-GATE-C. ONE tier-3 grain at count 2, added IDENTICALLY to all three apex flask bills,
     standing beside sunpetal_herb at that reagent's own count and replacing none of it; the
     flask family stays byte-identical; assert the sunpetal_herb counts before and after. WHY:
@@ -4468,3 +4477,51 @@ their own pays a 12.5 percent spread from cheapest to dearest; a cook who buys
 pays the same either way. Recorded here rather than only in the packet, because
 the numbers are farming's and a later re-tune of them changes an apex bill's real
 cost without touching an apex bill.
+
+## Phase 11h QA note (2026-08-22): the tool gate is the third plant gate, and no ruling names it
+
+The 11h audit closed nothing on the OPEN list and opened nothing on it either.
+What it found that belongs to FARMING rather than to the masterwrought packet is
+one thing, and it is worth reading before the next phase writes copy about a crop.
+
+THE PLANT PATH RUNS THREE GATES, NOT TWO. `src/sim/professions/farming.ts` step
+12 calls `bestWieldableGatherToolTierOrNone(inventory, 'farming', skill, ITEMS)`
+and then `canGatherTier(hoeTier, crop.tier)`, and that scan DROPS any hoe whose
+wield requirement exceeds the player's own farming counter
+(`wield_gate.ts`: `if (professionId !== 'fishing' && held < wieldRequirementForTier(tier)) continue`).
+So the floor for planting a crop is `max(farmCropSkillThreshold(tier),
+wieldRequirementForTier(tier))`, which is the composition
+`tests/farming_plant_sheet_view.test.ts` already writes out for tier 2. The
+numbers that matters here: tier 3 is max(50, 70) = 70, tier 4 is max(75, 85) = 85.
+The hoe is the binding half on BOTH tiers this packet reaches.
+
+WHY IT SURFACED IN A CRAFTING PHASE. Phase 11h shipped a wiki paragraph telling a
+player the three apex role crops "ask Farming 50 and nothing more". A farmer at 50
+who read that, bought Highland Barley Seed from Hollis and walked to a bed was
+denied with reason 'tool'. The sentence is corrected and the arm that would have
+caught it now sits beside the obtainability sweep in
+`tests/provisioning_supply_line_apex.test.ts`, pinned to LITERALS after the first
+version of it turned out to be the constant compared against itself.
+
+WHAT IS NOT BROKEN, checked rather than assumed: nothing about the crop ladder or
+the hoe ladder. The chain closes and it is self-bootstrapping, which is farming's
+own design: a tier-3 hoe wields at 70, its crops yield the fine twin that the
+tier-4 hoe recipe consumes, and the tier-4 hoe wields at 85 against a tier-4 plant
+threshold of 75. Both floors sit under farming's cap of 100. Every plate crop and
+both capstone crops are reachable; they are dearer than the threshold alone says.
+
+FOR THE MAINTAINER, surfaced not decided (packet open item 6): 11h-GATE-B's
+acceptance reads "every crop obtainable at the tier its recipe unlocks, derived
+through farmCropSkillThreshold", and that is one of the three gates. Phases 11i,
+11j and 11k inherit the same wording. Whether an obtainability ruling should name
+the wield rung as well is farming's call, not a QA session's; the arm measures
+both either way.
+
+ONE THING THE AUDIT CONFIRMED FOR FARMING. The fine twins really did have exactly
+one consumer each before 11h, counted off the parent commit rather than off the
+ledger: `fine_gilded_sunmelon` in `recipe_evergarden_sunmelon_tart` and
+`fine_evergarden_greens` in `recipe_evergarden_harvest_platter`, both at cooking
+100. The BASE crops did not: `gilded_sunmelon` had two consumers and
+`evergarden_greens` three, so 11h's items.ts comments claiming it "added the
+second consumer" were wrong on the ordinal and right on the half that matters,
+which is that it added the first consumer outside farming. Corrected in place.

@@ -10040,8 +10040,12 @@ recipe_marlows_grand_roast and recipe_seasoned_stock now carry SIX reagent
 entries each, and they are the first six-reagent bills in the game (the previous
 maximum across all 149 recipes was five). Every render path is dynamic and
 nothing caps the count, and the roast's tooltip was composed and read by hand,
-but the crafting window's reagent list and the bag action-menu cost line now draw
-one row more than anything shipped before. The repo's visual-change rule wants an
+but the crafting window's reagent list now draws one row more than anything
+shipped before. (CORRECTED at the Phase 11h QA: this sentence also named the
+bag action-menu cost line, which structurally cannot draw a craft bill. It
+reads ENCHANTS[...].reagents and has no craft-recipe path at all. Phase 11h
+found it, fixed its own source comment, and named this record as wrong in the
+same way without correcting it; corrected here.) The repo's visual-change rule wants an
 eyeball and a before/after at PR time; this phase is LOCAL with no PR, so it is
 recorded as owed rather than captured.
 
@@ -10478,8 +10482,10 @@ decision is costed rather than argued.
 
 11g recorded that recipe_marlows_grand_roast and recipe_seasoned_stock are the
 first SIX-reagent bills in the game (the previous maximum across all 149 recipes
-was five), and that the crafting window and the bag action-menu cost line now
-draw one row more than anything shipped before. That stands, and the read is
+was five), and that the crafting window now draws one row more than anything
+shipped before. (CORRECTED at the Phase 11h QA, same as the 11g note above:
+the bag action-menu cost line reads ENCHANTS[...].reagents and no bill length
+can reach it.) That stands, and the read is
 better than it was: nothing in src/ or server/ slices or caps a reagent list, the
 crafting view maps the full array, maxCraftBatchFit is a min over all entries,
 and the relevant CSS is auto-height flex with wrap, so a sixth entry wraps rather
@@ -10897,8 +10903,13 @@ six test files. Every verdict below was run as a check against that list.
   item NAME and no name is minted.
 - BOOK OF DEEDS: NO deed. A reagent change is not conquerable content, and
   prog_field_to_feast belongs to 11k. src/sim/content/deeds.ts is not in the diff.
+  THE SWEEP RAN (recorded at the Phase 11h QA rather than left as diff-absence):
+  tests/deeds_content.test.ts, which derives its expectations from the live
+  content tables, is green, and no half-built deed exists anywhere.
 - RELIQUARY: NO page. Nothing unique or conquerable is minted.
-  src/sim/content/reliquary.ts is not in the diff.
+  src/sim/content/reliquary.ts is not in the diff. THE SWEEP RAN (recorded at
+  the Phase 11h QA): tests/reliquary_content.test.ts, which derives from the
+  live loot and deed tables, is green.
 - src/ui/world_entity_i18n.ts and src/ui/i18n.catalog/items.ts: neither is in the
   diff, and neither is owed: this phase places no entity and mints no item name.
 - IP-SAFE NAMING (masterwrought R15, D17): nothing to verify, because no proper
@@ -10908,6 +10919,12 @@ six test files. Every verdict below was run as a check against that list.
 - NO WIRE FIELD, no SimEvent, no IWorld member, no server file, no SQL, no rng
   draw, no persisted shape. architecture-reviewer was NOT dispatched and the skip
   is justified from the diff: nothing under src/sim outside content/ changed.
+- THREE-TIER ORDERING: nothing to apply, and the verdict is written here
+  rather than only in the phase file (added at the Phase 11h QA). The rule
+  governs APPEND-ONLY tables and no row was appended to one: the ordered
+  recipe id sequence in recipes.ts is byte-identical to the parent commit
+  and the export list is unchanged, so every governed table sits exactly
+  where it sat.
 - THE ONE LIVE OBLIGATION is the reword worklist below.
 
 ### RELEASE-FILL OBLIGATIONS this phase adds (reword-staleness, flagged BY KEY for the Phase 17 fill)
@@ -10953,6 +10970,13 @@ closed enumerations, did NOT move this phase and are still correct.
 (d) The parity goldens do not move. The suite was run: 232 passed, 1 skipped, and
     no golden file appears in the phase diff.
 (e) recipe_seasoned_stock and recipe_quickening_catalyst are byte-identical.
+(e2) THE SETTLED ip-15-ACCESS READING IS RECORDED, not re-opened (written at
+    the Phase 11h QA, which found the acceptance box asked for it and the
+    ledger had left it out): masterwrought R5 measures the GEARED INDIVIDUAL
+    at full food uptime, never the raid aggregate, because ip-15-KIT already
+    fixes the premise at "always on, delivered by feast". This phase changes
+    what a craft COSTS and never what it produces, so it does not touch the
+    reading either way.
 (f) No foodHp, no Well Fed magnitude or duration, no elixir value or duration, no
     sellValue, no resultCount, no skillReq, no itemLevelBudget, no acquisition,
     no stationType moved anywhere. masterwrought R5's kit is still flask 15 plus
@@ -11137,7 +11161,10 @@ the tool ladder, which are 11j's.
 ### One visual note owed at PR time
 
 recipe_laden_hearth is now the first SEVEN-reagent bill in the game (the previous
-maximum was six, set by 11g), and six more rows reach six. THE READ IS BETTER
+maximum was six, set by 11g), and SEVEN more rows reach six (the three
+plates, the three flasks, and recipe_grand_cauldron, which reached six by
+gaining an entry). This read "six" until the Phase 11h QA; the pin table
+above and the shipped arm both already said seven. THE READ IS BETTER
 THAN A CLAIM: the crafting window maps the full array with no slice or cap, its
 card has no height and its pane scrolls with a flex-shrink:0 rule that exists
 because this exact compression bug shipped once before; the wiki materials cell
@@ -11298,3 +11325,313 @@ npx tsc --noEmit: clean. It caught one real defect vitest could not, which is
 worth recording because the two checks are not redundant: an ItemDef union read
 (`ITEMS[id].wellFed`) type-errors while passing at runtime, so the arm was green
 and the build was red.
+
+## Phase 11h QA ledger (2026-08-22, verify the provisioning supply line, apex tier)
+
+VERDICT: PASS-WITH-FOLLOWUPS. Base tip 294595e9d8, clean. LOCAL, no push, no PR.
+Fix commits, in order: 265525781a (the false claims in shipped copy), 0dafe2175f
+(the pin corrections), 859b18a02c (the repair the mutation battery forced, Z3
+below), 749cc993eb (this ledger).
+
+THE PHASE IN ONE LINE, AS AUDITED: the eight bills are right, every number in the
+record reproduces from an independent derivation, both deviations are proven
+forced, and the defects are all in what the phase SAID about its work rather than
+in the work itself.
+
+### STEP 0: NO RELEASE MERGE WAS OWED
+
+The newest origin/release/** by version sort is still release/v0.40.0 at
+50462dda83, the same tip Phase 11h merged at 1bfe47a653, and
+`git merge-base --is-ancestor` confirms it is already in this branch. So the
+ninth sync stands and there is no tenth: no seal re-mint, no ratchet re-measure
+owed by a merge, no release-merge-audit to run.
+
+ALL TWELVE RATCHET ROWS WERE MEASURED ANYWAY, with wc -l rather than by trusting
+the ledger, because the packet's own lesson is that a row can break without
+conflicting: hud.ts 19235, renderer.ts 13571, sim.ts 12370, main.ts 11500,
+server/game.ts 10761, online.ts 5967, music.ts 5270 (200 under), world.ts 5301
+(149 under), db.ts 4865, foliage.ts 4131 (16 under), colliders.ts 2628 (2 under),
+dungeon.ts 2882. Every one matches the 11h ledger exactly and nothing is over.
+
+### THE TWO DEVIATIONS: RE-RUN, NOT RE-ARGUED
+
+All three named mutations were re-run on a committed frozen tree, tsc clean on
+each, tip and dirty stamped identical at both ends.
+
+- Y9, restoring 11h-GATE-C's literal (flask grain 1 to 2 on all three flasks):
+  REDS. `recipe_ironhusk_flask: highland_barley at 2 must stay under the row's
+  largest non-produce count 2`. That is accentVerdict's COUNT half.
+- Y8, restoring 11h-GATE-D's literal (capstone base crops 2 to 3 on both rows):
+  REDS. `recipe_grand_cauldron: gilded_sunmelon is an accent`. That is the
+  absolute CAP half.
+- Y11, a farm id into recipe_duskforged_billet: REDS the gear sweep.
+
+PER-ROW VARIANTS WERE RUN TOO, because a partial mutation that leaves a sibling
+covering the rung is the walk-back class that survives: the hearth alone at 3
+reds, and the runewater flask alone at 2 reds five arms across two files. So the
+deviations are FORCED, they are the maintainer's ratify-or-revert, and they are
+NOT this audit's finding. The record describes them accurately.
+
+### WHAT REPRODUCED EXACTLY, derived independently rather than read
+
+The eight bills were re-derived from the merged item table by a throwaway parser
+importing none of the repo's own helpers, so it cannot inherit their bugs. Every
+number in the 11h per-row table reproduced on the first run: the three plates 422
+to 452 against output 360, the three flasks 424 to 439 against 50,
+recipe_grand_cauldron 1010 to 1410 against 380, recipe_laden_hearth 606 to 1006
+against 380, and recipe_seasoned_stock 130 against 30, unmoved.
+
+- R18, checked as a before-and-after NUMBER per row rather than argued: the whole
+  non-comment diff of recipes.ts is TEN ADDED REAGENT LINES and zero deletions.
+  Nothing was substituted anywhere, and no other field moved on any row.
+- ZERO NEW IDS, proven mechanically: 272 item ids and 149 recipe ids at
+  3416afeb61^ and at HEAD, sorted and diffed, both set differences EMPTY.
+- items.ts is COMMENT-ONLY: filtering its diff to non-comment lines yields
+  nothing at all, which also closes the inherited stale-client question.
+- recipe_quickening_catalyst and recipe_seasoned_stock are byte-identical to
+  their pre-phase text, compared as extracted row blocks.
+- The parity suite reproduces the recorded 232 passed / 1 skipped exactly.
+- Both spreads check out off farm_crops.ts and the item table: barley
+  14,400,000, cabbage 15,000,000, gourd 16,200,000, a ratio of exactly 1.125;
+  all three tier-3 crops sellValue 15 with no buyValue, so the copper spread is 0.
+- The counterfactually-vendor-fed set cannot have moved: the base crops carry no
+  buyValue, so neither capstone can join it however the fine twins are priced.
+- The RULE 2 refusal arithmetic was re-derived by hand for all nine entries and
+  all seven rows, including the exact 320-against-320 tie on recipe_laden_hearth.
+
+### THE FINDINGS: 41 raised, 3 refuted, 38 APPLIED
+
+Four reviewers plus an eight-lane audit with an adversarial verify pass. Every
+finding was re-verified against the code by hand before it was applied.
+
+THE ONE THAT MATTERS, and it is player-facing. The new wiki paragraph told a
+player the three role-plate crops "ask Farming 50 and nothing more". The shipped
+plant path runs a THIRD gate the phase never consulted: farming.ts step 12 calls
+bestWieldableGatherToolTierOrNone, which drops any hoe whose wield requirement
+exceeds the player's own farming counter, and TIER3_TOOL_WIELD_PROFICIENCY is 70.
+So the real floor is 70 plus a Skysilver Hoe, and a farmer at 50 who read that
+page and walked to a bed was denied with reason 'tool'. Filed BLOCKING by the
+finder, downgraded to SHOULD-FIX by the verifier because no mechanic or pin is
+broken and the wield ladder is stated correctly elsewhere in the same catalog.
+THAT DOWNGRADE IS ACCEPTED AND THE FIX IS THE SAME EITHER WAY: the clause now
+keeps the relative claim the ruling actually makes and names the hoe. The arm
+that would have caught it is added beside the obtainability sweep.
+
+FIVE SOURCE COMMENTS THE PHASE ITSELF FALSIFIED, none caught by its own "every
+source comment the phase falsified is corrected" pass:
+- gilded_sunmelon and evergarden_greens "added the second consumer". Counted from
+  the parent commit: the melon had two (the tart, recipe_harvest_feast) so the
+  cauldron is its THIRD, and the greens had three (the platter, the braise, the
+  feast) so the hearth is its FOURTH. Only the outside-farming half is a first,
+  and that is the half the comments now make.
+- "the five dish twins above stay single-owner" in the FARM_RECIPES header. Two
+  of the five stopped being single-owner in this very phase.
+- skillReq 125 called "the top of the whole catalog" in five places. ALL_RECIPES
+  ships three engineering rows at 150, and the packet's own rung census records
+  "3 at 125, 3 at 150". Scoped to the CONSUMABLE catalog everywhere, and now
+  DERIVED in a test rather than asserted in prose.
+- highland_barley "the busiest crop on the roster". Counted: seven consuming
+  recipes, LEVEL with vale_wheat. A tie, not a lead.
+- frost_gourd was the one crop of six left without its 11h consumer note, and
+  src/guide/styles.css still called six entries the longest bill in the game.
+
+A THIRD STALE PROSE KEY, found by the criterion the phase used for its own two
+and missed because nothing swept for it: guide.profPages.farm.bedsBody
+enumerates where a farmer's season goes and stopped at the trainer ladder and the
+elixir line, both rung-50 surfaces, while this phase routed produce into three
+cooking-100 plates, three alchemy-100 flasks and both 125 capstones. An apex
+sentence is APPENDED rather than folded into the 11g clause, so 11g's own anchor
+keeps biting, and both new anchors carry a clause tail.
+
+ITS WORKLIST ENTRY IS SMALLER THAN THE OTHER TWO AND THE DIFFERENCE IS THE POINT:
+farm.bedsBody is filled in only FIVE overlays (ja_JP, ko_KR, ru_RU, zh_CN,
+zh_TW), so those five go stale and the other sixteen render the new English
+correctly. That is why this edit moved EIGHTEEN resolved bundles where 11h's
+moved three: a key with sparse fills propagates English into every unfilled
+locale. Neither fingerprint is wrong; they describe different fill states.
+
+### THE PIN CORRECTIONS, and the one that bit back
+
+TWO ARMS COULD NOT FAIL, both of them 11h review-round fixes that did not land:
+- The margin delta was moved off `before` and onto the table's two literals to
+  escape an algebraic identity, and did not escape one: the two assertions three
+  lines above pin `after === inputAfter` and `after - added === inputBefore`, so
+  the delta reduces to `added` identically. Deleted rather than reworded.
+- The "literal leftover" could see the specialization discount REMOVED but not
+  RETUNED, because every produce entry on these rows is count 1 or 2 and
+  Math.max(1, Math.floor(n * m)) is 1 for n in {1,2} at every multiplier below
+  one. It sweeps every reagent now, so the five count-4 rows discriminate.
+
+TWO DERIVED-SET FLOORS SAT UNDER THE SETS THEY GUARD, both observed at their new
+values by the phase's own pin table and left at their old ones: the accent sweep
+at 9 against 17, and farm_seed_channels' alchemy floor at 3 against 7. The accent
+one matters most, because BOTH deviations are justified by that sweep governing
+those rows. Raised, and the accent arm now names one row per 11h family.
+
+Also applied: the wall-clock spread the record calls "pinned" is now actually
+pinned; the hoe twins get an occurrence bound over ALL_RECIPES rather than two
+arms scoped to farm dishes and to the apex array; the never-failing `required > 0`
+floor the review round retired from the apex file is retired from its sibling; the
+row-count checksum is computed off the literal rather than off the list the line
+above already pinned; two dead assertions removed and one floor made exact.
+
+THE INTERLOCK THIS PHASE HANDS 11i WAS WRONG, and this is the finding with the
+longest reach. The control certified a uniform fish row at count 2. That clears
+foodFamilyShape and REDS the standing fish-forward sweep, which requires fish to
+strictly outnumber produce on a fish dish and finds each plate carrying its crop
+at 2. So the recorded handoff told 11i its row was legal at a count the merged
+rule set refuses. The control drives BOTH rules now and explicitly refuses 2.
+
+### THE MUTATION BATTERY OVER THE FIX ROUND: 8 RUN, 8 DEAD, 2 REPAIRS FORCED
+
+Every pin the fix round relies on was mutated, on the same harness discipline as
+the phase's own: committed frozen tree, tip and dirty stamped and compared at
+both ends, tsc on every mutant before a red counts as a kill.
+
+| # | mutation | verdict |
+|---|---|---|
+| Z1 | retune the specialization discount (the move the old pin could not see) | KILLED, the 5 count-4 rows |
+| Z2 | strip recipe_laden_hearth's produce, so a row leaves the accent sweep | KILLED, the raised floor |
+| Z3 | tier-3 hoe wield requirement 70 to 50 | **SURVIVED**, see below |
+| Z3b | the same, against the repaired arm | KILLED |
+| Z4 | retune the cabbage timer to match barley (copper spread untouched) | KILLED, the wall-clock arm |
+| Z5 | a hoe twin into recipe_seasoned_stock, an INTERMEDIATE row | KILLED, the occurrence bound |
+| Z6 | grow a plate to EIGHT reagents | KILLED, incl. the guide superlative |
+| Z7 | walk the 11i fish row back to the count 11h certified | KILLED, the interlock |
+| Z8 | strip one flask's grain (alchemy produce rows 7 to 6) | KILLED, the raised floor |
+
+Z3 IS THE ONE WORTH KEEPING, and it is an audit finding against the audit: the
+tool-gate arm this QA added to catch the wiki defect was ITSELF a constant
+self-comparison. It asserted wieldRequirementForTier(3) against
+TIER3_TOOL_WIELD_PROFICIENCY, and the resolver returns exactly that constant, so
+editing 70 to 50 moved both sides and the file stayed green through the mutation
+the arm exists to catch. Every number is a literal now. The lesson is the
+standing rule stated the hard way: mutate the pins you ADD, not only the ones you
+inherit.
+
+Z5 IS THE SECOND. Its first run reported SURVIVED and the pin was fine: the
+mutator's search window was 20 lines, the row carries a 30-line comment between
+its id and its reagents, and nothing was inserted. The harness printed an EMPTY
+mutated diff, which is the only reason it was caught rather than banked as a
+false clean. A mutation harness must prove the MUTATION applied, not only that
+the tests ran.
+
+### REFUTED ON RE-CHECK, recorded so they are not re-raised
+
+- "The alchemy herb TOTAL is a constant self-comparison." It is the map-plus-
+  checksum idiom: the live map is toEqual'd against a 16-row literal and the
+  total is summed FROM THE LITERAL on purpose, to catch a careless edit to the
+  map. The comment says exactly that. Working as designed.
+- "Two new test titles carry regex metacharacters, so a vitest -t selection over
+  them silently matches nothing." True of the titles and true of roughly 4,967
+  test titles in this repo. Pre-existing convention, not this phase's regression.
+- "The record leaves two false premises standing in phase-11h-qa.md." Already
+  refuted by the audit's own verifier as a restatement of the corrections this QA
+  was briefed with.
+
+### CUT, with the reason, rather than left as future items
+
+- A growth-timer clause in the player-facing prose. The spread is now PINNED in
+  test, which is what 11h-GATE-A asked for; adding a new player-visible timer
+  claim is a copy decision beyond a QA fix round, and it would be a third
+  reworded value to fill.
+- Pinning "nothing in src/ or server/ slices a reagent list" with a source scan.
+  That is the source-scan blind-spot class the packet's own gotcha catalog warns
+  about, and all four render surfaces were verified by reading the real code.
+- src/ui/hud.ts:5601. The mousemove tooltip path clamps left with a bare
+  Math.min and lacks the Math.max(8, ...) floor its paintTooltipAt sibling has,
+  so a tooltip wider than the viewport gets a negative left on the move path but
+  not on the initial paint. Pre-existing, same family as the recorded bottom-clamp
+  exposure, and it belongs with that fix rather than split from it: hud.ts sits at
+  its ratchet ceiling with zero slack. RECORDED WITH THE OWED PAIR, below.
+
+### THE THREE OWED VISUAL ITEMS (was two)
+
+Unchanged from the 11h record and verified real by reading the shipped code: the
+HUD tooltip clamps horizontally and at the TOP but has no bottom clamp and no
+max-height, and .crafting-reagent lacks the white-space: nowrap its wiki twin
+.guide-prof-mat has. Both are pre-existing and both cost an hud.ts extraction or
+a maintainer ceiling decision. THE THIRD is the mousemove left-clamp asymmetry
+above. All three are one fix job, not three.
+
+What a player sees at seven reagents was traced rather than assumed and is fine:
+the crafting window maps the full array with no slice or cap, the card has no
+height, the pane scrolls under a flex-shrink:0 rule, the tooltip draws the same
+list, the wiki cell wraps between entries, and the bag action-menu cost line
+cannot be reached by a craft recipe at all. Nothing actionable is clipped; it
+wraps, and the counts also ride the Craft button's accessible name.
+
+### THE OPEN ITEMS, all still the maintainer's
+
+The five carried in are unchanged by this audit and nothing here rules on any of
+them: the TWO DEVIATIONS (ratify or revert), the SCROLL / ELIXIR PARITY still 214
+against 229, RULE 2's VALUE-HALF READING at nine entries across seven rows with
+the first exact tie, the inherited STALE-CLIENT DEPLOY WINDOW (which the
+comment-only items.ts diff closes as far as this phase is concerned), and the
+CAPSTONE INPUT JUMP. Two things this audit ADDS to that list rather than settling:
+
+(6) THE TOOL GATE IS NOT IN ANY OBTAINABILITY RULING. 11h-GATE-B's acceptance
+    says "every crop obtainable at the tier its recipe unlocks, derived through
+    farmCropSkillThreshold", and farmCropSkillThreshold is only one of the three
+    gates the plant path runs. The bills are fine (a farmer at 70 with a
+    Skysilver Hoe grows all three plate crops, and the tier-4 chain closes at 85
+    with an Osmium Hoe), but the RULING's derivation is incomplete and 11i, 11j
+    and 11k all inherit it. Whether obtainability rulings should name the wield
+    rung is the maintainer's call; the arm now measures it either way.
+(7) THE THIRD REWORD KEY. farm.bedsBody is now on the release-fill worklist at
+    FIVE overlay files rather than eighteen, for the fill-state reason above.
+
+### RELEASE-FILL OBLIGATIONS, amended
+
+| key | overlay FILES to edit | note |
+|---|---|---|
+| guide.profPages.craftProse.cooking.materialsBody | 18 | 20 rendered locales |
+| guide.profPages.craftProse.alchemy.materialsBody | 18 | 20 rendered locales |
+| guide.profPages.farm.bedsBody | 5 | added by this QA |
+
+THE 11h LEDGER'S "BOTH REWORDS ARE ADDITIVE" IS CORRECTED HERE, and the
+correction is load-bearing rather than cosmetic. The cooking key was never a pure
+append: besides the new paragraph it carries an in-sentence edit ("Each crop"
+became "Each of these crops"), and this QA has now edited its apex paragraph
+again. More importantly, MEASURED AGAINST ENGLISH, every one of the 18 overlays
+is TWO OR THREE PARAGRAPHS BEHIND on both craftProse keys (English carries four;
+the overlays carry one or two), so they were already stale before Phase 11g. A
+filler who follows "append a paragraph" leaves the locale still two behind. THE
+FILL IS A FULL REPLACEMENT OF THE VALUE, not an append.
+
+### DRIFT AGAINST THE 11h LEDGER, corrected in place
+
+- "six more rows reach six" is SEVEN, which the same ledger's own pin table
+  ("2 to 9, seven of them 11h's") and the shipped arm both already said.
+- The NIL obligation list gains a written three-tier-ordering verdict, which the
+  phase file carried and the ledger did not.
+- The Reliquary and Deeds rows record that the sweeps RAN, not only that the
+  files are absent from the diff.
+- The settled ip-15-ACCESS reading is recorded, which its acceptance box asked
+  for and the ledger left out.
+- The 11g and 11g-QA visual notes still stated the bag action-menu claim that 11h
+  corrected in source and named as wrong in its own ledger. Corrected at both.
+
+### THE HANDOFF TO PHASE 11i
+
+- THE THREE ROLE PLATES ARE STILL DIFFERENTIATED, by one crop id each, and the
+  amendment that legalises it is expressed as a predicate with an independent
+  refusal control rather than described in a comment. 11i MAY append its uniform
+  fish row to all three plates: that is exactly what the amendment was scoped for,
+  and the same-row-on-all-three shape is what makes it legal.
+- BUT THE FISH ROW MUST OUTNUMBER THE PLATE'S PRODUCE, which is 2, so the lowest
+  legal count is THREE, not the 2 this phase originally certified. The control
+  now drives both rules and refuses 2 explicitly. This is the single most
+  important line in this handoff.
+- 11i RE-DERIVES the economy arithmetic from the merged row rather than carrying
+  this file's numbers, unchanged from the 11h handoff.
+- recipe_sageleaf_chowder is the row 11i names first. It sits at input 452
+  against output 360 and carries thornpeak_cabbage 2, which is the number the
+  fish count has to clear.
+- THE TOOL GATE IS REAL AND UNRULED (open item 6). If 11i writes player-facing
+  copy about what a catch or a crop asks of a player, it consults
+  wieldRequirementForTier as well as the profession threshold.
+- WHAT 11i MAY APPEND TO THE THREE PLATES: one uniform fish row, same id and same
+  count on all three, count >= 3. What it may NOT do is give one plate a second
+  crop row, or the fish row to only two of the three; both are refused by the
+  control with the halves isolated so each case names its own reason.
