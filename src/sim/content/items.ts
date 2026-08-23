@@ -1181,9 +1181,11 @@ export const BASE_ITEMS: Record<string, ItemDef> = {
   // day it was written. masterwrought Phase 11g is the proof: it put this crop
   // on shipped cooking and alchemy ladder rows and every one of these comments
   // silently became a subset. Read the sweep, not the sentence. Phase 11h then
-  // made it the busiest crop on the roster: the physical role plate at cooking
-  // 100 takes 2, and all three apex flasks take 1 each, which is what gives the
-  // grain an alchemy consumer for the first time.
+  // took it to SEVEN consuming recipes, level with vale_wheat and ahead of every
+  // other crop: the physical role plate at cooking 100 takes 2, and all three
+  // apex flasks take 1 each, which is what gives the grain an alchemy consumer
+  // for the first time. (The line read "the busiest crop on the roster" until
+  // the Phase 11h QA counted them and found a tie rather than a lead.)
   highland_barley: {
     id: 'highland_barley',
     name: 'Highland Barley',
@@ -1218,7 +1220,10 @@ export const BASE_ITEMS: Record<string, ItemDef> = {
   // renders from that), so an enumeration here only records what was true the
   // day it was written. masterwrought Phase 11g is the proof: it put this crop
   // on shipped cooking and alchemy ladder rows and every one of these comments
-  // silently became a subset. Read the sweep, not the sentence.
+  // silently became a subset. Read the sweep, not the sentence. Phase 11h made
+  // it the TANK plate's accent: recipe_stonepot_stew at cooking 100 takes 2.
+  // (Added at the Phase 11h QA. Five of the six crops that phase put on a new
+  // bill had this note; the gourd alone was left without one.)
   frost_gourd: {
     id: 'frost_gourd',
     name: 'Frost Gourd',
@@ -1320,9 +1325,13 @@ export const BASE_ITEMS: Record<string, ItemDef> = {
     buyValue: 64,
   },
   // Watch-fee sink, and the fruit of recipe_evergarden_sunmelon_tart, the
-  // tier-4 dish line (3 per tart). masterwrought Phase 11h added the second
-  // consumer and the first outside farming: recipe_grand_cauldron, alchemy's
-  // skill-125 capstone, takes 2. NOT AN EXHAUSTIVE CONSUMER LIST; the live set
+  // tier-4 dish line (3 per tart). masterwrought Phase 11h added its FIRST
+  // consumer outside farming: recipe_grand_cauldron, alchemy's skill-125
+  // capstone, takes 2. (That is the claim worth making. This line read "the
+  // second consumer" until the Phase 11h QA counted them: the tart and
+  // recipe_harvest_feast both already took the melon, so the cauldron is its
+  // THIRD consumer and only the outside-farming half is a first.)
+  // NOT AN EXHAUSTIVE CONSUMER LIST; the live set
   // is derived through craftIdsForMaterialItem and the tooltip renders from
   // that, so read the sweep rather than this sentence.
   gilded_sunmelon: {
@@ -1335,7 +1344,10 @@ export const BASE_ITEMS: Record<string, ItemDef> = {
   // The dish set's tier-4 fine-twin slot (recipe_evergarden_sunmelon_tart), and
   // since masterwrought Phase 11h ALSO the alchemy capstone's showcase reagent:
   // recipe_grand_cauldron at skillReq 125 takes one, which is this twin's first
-  // consumer outside farming and the top rung of the whole catalog.
+  // consumer outside farming and the top rung of the CONSUMABLE catalog.
+  // (Scoped at the Phase 11h QA. 125 is where cooking and alchemy top out;
+  // the table itself tops out at 150, the apex gathering-tool family that
+  // is Phase 11j's, so "the whole catalog" was wrong by three rows.)
   //
   // CORRECTED BY masterwrought Phase 11h (11h-GATE-D, packet row N15), which
   // owns this correction because it runs before 11j and 11k. The line below is
@@ -1364,9 +1376,13 @@ export const BASE_ITEMS: Record<string, ItemDef> = {
   },
   // Watch-fee sink, and the greens dressed into
   // recipe_evergarden_harvest_platter, the capstone plate of the dish set
-  // (3 per platter). masterwrought Phase 11h added the second consumer and the
-  // first outside farming: recipe_laden_hearth, cooking's skill-125 capstone,
-  // takes 2. NOT AN EXHAUSTIVE CONSUMER LIST; the live set is derived through
+  // (3 per platter). masterwrought Phase 11h added its FIRST consumer outside
+  // farming: recipe_laden_hearth, cooking's skill-125 capstone, takes 2. (This
+  // line read "the second consumer" until the Phase 11h QA counted them: the
+  // platter, recipe_evergarden_braised_greens and recipe_harvest_feast all
+  // already took the greens, so the hearth is its FOURTH consumer and only the
+  // outside-farming half is a first.)
+  // NOT AN EXHAUSTIVE CONSUMER LIST; the live set is derived through
   // craftIdsForMaterialItem and the tooltip renders from that, so read the
   // sweep rather than this sentence.
   evergarden_greens: {
@@ -1380,7 +1396,9 @@ export const BASE_ITEMS: Record<string, ItemDef> = {
   // crop-ladder phase's deferral (recipe_evergarden_harvest_platter), and since
   // masterwrought Phase 11h ALSO the cooking capstone's showcase reagent:
   // recipe_laden_hearth at skillReq 125 takes one, this twin's first consumer
-  // outside farming and the top rung of the whole catalog.
+  // outside farming and the top rung of the CONSUMABLE catalog
+  // (125 is cooking and alchemy's ceiling, not the table's: three
+  // engineering rows ship at 150. Scoped at the Phase 11h QA).
   //
   // CORRECTED BY masterwrought Phase 11h (11h-GATE-D, packet row N15), same as
   // its sunmelon sibling above and for the same reason: the line below is true

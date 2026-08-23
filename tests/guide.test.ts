@@ -1935,6 +1935,20 @@ describe('Guide professions generated content accuracy', () => {
     // every clause exists ONLY in the corrected prose and is apostrophe-free,
     // since the page escapes to &#39;.
     expect(cookHtml).toContain('The garden reaches the top of the kitchen too');
+    // THE SUPERLATIVE IS TIED TO THE LIVE TABLE (Phase 11h QA), not just
+    // anchored as a phrase. An anchor proves the sentence is PRESENT and says
+    // nothing about whether it is TRUE, so an eighth-reagent bill would red the
+    // derived maximum in tests/provisioning_supply_line_apex.test.ts, the author
+    // would fix that arm, and this page would go on calling the hearth the
+    // longest bill in the game with every suite green. Deriving it here means
+    // the prose and the table cannot part company.
+    const longestBill = Math.max(...ALL_RECIPES.map((r) => r.reagents.length));
+    const longestRows = ALL_RECIPES.filter((r) => r.reagents.length === longestBill).map(
+      (r) => r.id,
+    );
+    expect(longestRows, 'the page names the hearth as the sole longest bill').toEqual([
+      'recipe_laden_hearth',
+    ]);
     expect(cookHtml).toContain('the longest bill in the game');
     expect(alcHtml).toContain('The bench above the ladder asks for the garden too');
     expect(alcHtml).toContain('stand beside the herbs rather than in place of them');
@@ -2375,6 +2389,16 @@ describe('Guide professions gathering accuracy', () => {
     // Apostrophe-free, since the rendered page escapes it to &#39;.
     expect(html).toContain('a buyer from the very first rung');
     expect(html).toContain('into the apothecary');
+    // AND THE PHASE 11h HALF (added at the 11h QA). The sentence above was
+    // still true after 11h and that is exactly why it needed a companion: it
+    // enumerates where a farmer's season goes and it stopped at the trainer
+    // ladder and the elixir line, both rung-50 surfaces, while 11h routed
+    // produce into three cooking-100 plates, three alchemy-100 flasks and both
+    // skill-125 capstones. A page that stops at rung 50 tells a farmer their
+    // buyers stop there. Anchored on a clause unique to the new sentence, for
+    // the reason the 11g anchor above records.
+    expect(html).toContain('the last rung of both crafts is bought from a farmer too');
+    expect(html).toContain('the Evergarden beds feed the two skill-125 capstone stations');
     // THE NEGATIVE HALF, which the two 11g anchors above lacked (qr-11G-BEDS,
     // Phase 11g QA). A full revert reds on them, but a "supplement rather than
     // replace" edit that re-adds the pre-11g clause beside the new one keeps

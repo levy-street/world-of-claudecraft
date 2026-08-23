@@ -3099,8 +3099,9 @@ a.guide-poi:hover {
    here the cell renders glued, exactly as the combo badge did ("Quickening
    CatalystOnce per day"). Marlow's Grand Roast read "Prime Cut x1Game Meat
    x4Highland Barley x2Frost Gourd x2Sunpetal Herb x1Cooking Salt x2".
-   Long-standing, and masterwrought Phase 11g is what made it the worst run on
-   the page by taking two bills to six entries, the longest in the game.
+   Long-standing, and the masterwrought supply-line phases are what made it the
+   worst run on the page: 11g took two bills to six entries, then 11h took seven
+   more to six and recipe_laden_hearth to SEVEN, the longest bill in the game.
    Separated by the ADJACENT-SIBLING rule rather than a trailing margin on every
    entry, so a one-material cell gains no phantom gap; nowrap keeps an entry
    from breaking between its name and its count. */

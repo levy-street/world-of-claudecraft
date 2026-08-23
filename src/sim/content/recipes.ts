@@ -2850,8 +2850,11 @@ export const APEX_CONSUMABLE_RECIPES: ProfessionRecipeRecord[] = [
   // fine_evergarden_greens and fine_gilded_sunmelon were consumed by exactly
   // one recipe each, both farming's own tier-4 dishes at cooking 100. This
   // phase gives both their CAPSTONE consumer at skillReq 125, the top of the
-  // whole catalog, which is the masterwrought R20 shape the packet exists to
-  // close. Neither is a hoe twin (the hoe ladder takes fine_vale_wheat,
+  // CONSUMABLE catalog, which is the masterwrought R20 shape the packet exists
+  // to close. (Scoped at the Phase 11h QA: 125 is cooking and alchemy's
+  // ceiling. ALL_RECIPES tops out at 150, the apex tool family this phase
+  // records as out of scope, and the packet census says so: "3 at 125, 3 at
+  // 150".) Neither is a hoe twin (the hoe ladder takes fine_vale_wheat,
   // fine_marsh_rice and fine_highland_barley under farming's deviation (ad)),
   // so nothing is double-booked.
   {
@@ -3281,7 +3284,11 @@ export const FARM_RECIPES: ProfessionRecipeRecord[] = [
   // plain sibling at the same rung, plus the kitchen staple salt (the tier-1
   // row adds the pottage-precedent vale_wheat binder, see below). NO fine
   // twins here: the fine_marsh_rice / fine_highland_barley consumer set is an
-  // OPEN maintainer question, and the five dish twins above stay single-owner.
+  // OPEN maintainer question, and THREE of the five dish twins above stay
+  // single-owner. (This read "the five dish twins above stay single-owner"
+  // until the Phase 11h QA corrected it: 11h gave fine_gilded_sunmelon and
+  // fine_evergarden_greens a second owner apiece, the two skill-125 capstones,
+  // so the single-owner claim now scopes to the three tier 1 to 3 twins.)
   // The tier 3/4 pair SHIPPED reagent-dormant under deviation (bo), trainable
   // and well-formed but with no tier 3/4 seed faucet. NO LONGER DORMANT: GATE 1
   // (Phase 11e) stocked all eight upper seeds at farmer_hollis and
