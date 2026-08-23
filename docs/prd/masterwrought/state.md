@@ -11567,13 +11567,31 @@ is the reword-staleness blind spot with the numbering turned into a second,
 worse failure mode: not a translation of the old wording, but the wrong answer
 under the wrong question.
 
-CLOSED THE SAME WAY, on the maintainer's ruling: the six misaligned question
-rows and the four remaining misaligned answers are RETIRED from all eighteen
-overlays (176 rows), so those rows render correct English everywhere until they
-are re-authored, and the five non-Latin locales are re-filled against the
-CURRENT questions in this change. `a6` and `a7` were already retired one pass
-earlier. Rows 1, 2, 9 and 10 keep their translations, because those four really
-do answer the questions above them.
+SCOPED, AND THE FIRST SCOPING WAS WRONG IN THE EXPENSIVE DIRECTION. The
+misalignment is NOT repo-wide: it is exactly the FIVE locales whose FAQ rows
+predate the rewrite, `zh_CN`, `zh_TW`, `ja_JP`, `ko_KR` and `ru_RU`, which are
+also the only five carrying a `q1` row. The THIRTEEN Latin overlays were filled
+AFTER 2026-07-22 and are correctly aligned; verified in de_DE, where `q3`, `q4`,
+`q5` and `q7` each match their English index word for word. The first pass
+retired the rows in all eighteen and so DESTROYED 130 rows of correct German,
+French, Spanish, Italian, Polish, Portuguese, Czech, Danish, Dutch, Swedish,
+Turkish, Vietnamese and Indonesian translation on a premise checked in one
+locale and generalised to seventeen. They are restored.
+
+THAT IS THIS AUDIT'S OWN WORST MOMENT and it belongs in the record beside the
+defects it found in others: a measurement taken in ONE place and applied
+everywhere is the same error as a grep scoped to one key and reported as a
+whole-tree result, which this same fix round had already made once. Checking a
+second locale before acting would have cost one command.
+
+CLOSED, FINALLY: the six misaligned question rows and the four remaining
+misaligned answers are retired from the FIVE non-Latin overlays only, and
+re-filled there against the CURRENT questions in this change. `a6` and `a7` stay
+retired in all eighteen, because their English genuinely changed (the toolmaker
+taught "the two crafted fishing rods", and the taper quoted 0.1 and 0.02), so
+the Latin rows for those two really were stale and false. Rows 1, 2, 9 and 10
+keep their translations everywhere, because those four really do answer the
+questions above them.
 
 THE STRUCTURAL FIX IS THE ONE THAT MATTERS. `src/guide/pages/professions_faq.ts`
 now names its ten answer keys in a `FAQ_ANSWER_KEYS` list instead of building
@@ -11583,11 +11601,12 @@ mechanic, so none can go stale the way an answer can. What they CAN do is what
 just happened, which is why the re-authoring below is the maintainer's and not a
 loose end this audit can quietly close.
 
-HANDED BACK, COSTED: six question and answer pairs across the thirteen Latin
-locales still need re-authoring against the current English (they render English
-today, which is correct but not translated). That is a whole wiki page in
-thirteen languages, it predates this packet by a month, and it is the release
-fill's work rather than a QA repair.
+NOTHING IS HANDED BACK ON THIS ONE, which is the difference the corrected
+scoping makes: the thirteen Latin locales never needed re-authoring, and the
+five that did are filled here. What IS worth carrying is the shape. Positional
+keys with no semantic anchor let an in-place English rewrite silently re-point
+every translation below it, and the only reason this was findable at all is that
+someone read a translated question and noticed it asked something else.
 
 ### STEP 0: THE TENTH RELEASE SYNC, AND IT WAS OWED
 

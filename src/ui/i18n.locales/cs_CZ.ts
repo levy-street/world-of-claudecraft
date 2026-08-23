@@ -12983,4 +12983,18 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.challenging_roar.name': 'Zlověstný řev',
   'entities.abilities.cheap_shot.descriptionNoStealth': 'Zasáhni cíl za {damage} poškození a omrač ho na 4 s. Udělí 2 combo body.',
   'gpuNotice.bodyDiscreteInactive': 'Hra nepoužívá samostatnou (herní) grafickou kartu a místo toho běží na úsporné grafické kartě, takže výkon utrpí. Aktualizuj ovladače grafiky a restartuj hru. Ve Windows navíc nastav hru na Vysoký výkon v Nastavení, Systém, Displej, Grafika.',
+  'guide.profPages.faq.q3': 'Jaký je rozdíl mezi sběrem kořisti a sklizením z těla?',
+  'guide.profPages.faq.q4': 'Proč je moje Železná kůra podepsaná?',
+  'guide.profPages.faq.q5': 'Jak zruším vazbu zakázkového kusu a co to stojí?',
+  'guide.profPages.faq.q6': 'Kde se učím recepty a co stojí?',
+  'guide.profPages.faq.q7': 'Proč mi sběr najednou zpomalil?',
+  'guide.profPages.faq.q8': 'Mohu vyrábět mimo město?',
+  'guide.profPages.faq.a3':
+    'Jedno stisknutí pokryje obojí. Vše, co tělo drží, mince a kořist plus jakékoli skliditelné součásti, se otevírá ve stejném okně: sběr kořisti se řídí normálními pravidly a sklizení je stranou profese, která strhuje materiály ze samotné mrtvoly.\n\nSklizení je první přijde první bere, pro jednoho hráče: každé tělo lze sklidit přesně jednou, tím, kdo si ho nárokuje jako první, online nevyjímaje. Tvoje Střediště zaměření určuje, co dostaneš: zatímco stojíš v uzlovém centru města, můžeš rozložit 10 bodů zaměření na typy složek, o které stojíš, a každá zaměřená složka hází za lepší stupeň (každých 5 bodů ji posune o krok výše, nejvýše o dva) a dává víc (10 procent za bod). Nezaměřené složky se nikdy nezhorší.',
+  'guide.profPages.faq.a4':
+    'Narazil jsi na nečekaný nález. Zhruba 1 sklizeň z 90 spustí vzácný sběratelský nález (prastaré jádrové dřevo na stromě, nedotčená žíla v rudě, měsíční květ mezi bylinami): pětinásobí výnos, podepíše každou jednotku tvým jménem a ohlásí nález celé zóně. Podpis přinese i vzácný nebo lepší hod na kvalitu při obyčejné sklizni.\n\nPodepsané materiály stojí za to si nechat nebo draze prodat: držení jakékoli podepsané kopie potřebné suroviny u pracovního stolu přidá 2 procentní body k šanci na mistrovské dílo. Jen pamatuj, že se skládají pouze se shodně podepsanými kopiemi, takže si drží vlastní místo v brašně.',
+  'guide.profPages.faq.a5':
+    'Jdi k jakékoli výrobní stanici s kusem v brašnách a zaplať mistrovi. Poplatek se řídí kvalitou předmětu: 25 stříbrných za neobvyklý kus, 1 zlatý za vzácný, 4 zlaté za epický; legendární platí epickou sazbu a zakázkový běžný kus sazbu neobvyklého. Musí to být skutečná stanice: mobilní stanice tuto službu nikdy nenabízí.\n\nPoplatek kupuje čistý začátek, ne trvalé vyléčení: kus zůstává zakázkový, takže se při příští výměně znovu naváže na toho, kdo ho obdrží. Pokud několik vázaných kopií sdílí stack, jedna kopie se odloupne a pouto se zruší za jeden poplatek.',
+  'guide.profPages.faq.a8':
+    'Zčásti. Devět běžných polních receptů (základní zbraň, zbroj, jídlo a lektvary) se vyrábí kdekoli a kdykoli a totéž platí pro tři kombinované recepty přísežných párů. Vše ostatní nad nimi je vázáno na typ stanice: kovárnu, kuchyně, lékárnu, koželužnu, tkalcovský stav nebo nástrojárnu, a abys výrobu dotáhl do konce, musíš být do 20 yardů od stanice.\n\nNa dovednosti 75 v řemesle se specializuješ a spolu se slevou 20 procent na materiál získáš mobilní stanici: postav ji v terénu a stojí 10 minut, obsluhuje recepty daného řemesla, jako bys stál u té pravé. Mobilní stanice slouží jen k výrobě: učení receptů a rušení pouta u zakázek vždy vyžaduje skutečnou stanici ve městě.',
 };
