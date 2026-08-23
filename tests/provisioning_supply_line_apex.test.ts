@@ -70,6 +70,29 @@ const addedProduceValue = (recipe: ProfessionRecipeRecord): number =>
     .filter((g) => PRODUCE_IDS.has(g.itemId))
     .reduce((t, g) => t + g.count * reagentUnitValue(g.itemId), 0);
 
+/** THE AMENDED UNIFORM-BILL RULE AS ONE EXPRESSION, read by the two food-family
+ *  arms below AND by their control. Written once for the reason the Phase 11g QA
+ *  recorded against the accent rule (qr-11G-ACCENT): a control that drives its
+ *  own copy of a rule proves the copy can say no, never the enforcer.
+ *
+ *  `remaindersEqual` is the "identical in every other reagent" half, measured on
+ *  each bill with its PRODUCE entries stripped; `cropRowsPerPlate` is the
+ *  "differ by exactly one crop row" half. They are separate fields rather than
+ *  one boolean so each can be refused on its own. */
+function foodFamilyShape(bills: ReadonlyArray<ReadonlyArray<{ itemId: string; count: number }>>): {
+  remaindersEqual: boolean;
+  cropRowsPerPlate: number[];
+} {
+  const remainders = bills.map((bill) =>
+    bill.filter((g) => !PRODUCE_IDS.has(g.itemId)).map((g) => [g.itemId, g.count] as const),
+  );
+  const first = JSON.stringify(remainders[0]);
+  return {
+    remaindersEqual: remainders.every((r) => JSON.stringify(r) === first),
+    cropRowsPerPlate: bills.map((bill) => bill.filter((g) => PRODUCE_IDS.has(g.itemId)).length),
+  };
+}
+
 const THREE_PLATES = ['recipe_stonepot_stew', 'recipe_warspice_skewers', 'recipe_sageleaf_chowder'];
 const THREE_FLASKS = ['recipe_ironhusk_flask', 'recipe_warboar_flask', 'recipe_runewater_flask'];
 const TWO_CAPSTONES = ['recipe_grand_cauldron', 'recipe_laden_hearth'];
@@ -379,27 +402,22 @@ describe('masterwrought Phase 11h: the eight rows, per row', () => {
 describe('masterwrought Phase 11h GATE A: the amended uniform-bill rule', () => {
   it('the three role plates differ by EXACTLY ONE crop row and in nothing else', () => {
     // The amendment's exact scope, asserted rather than trusted to the header
-    // comment that states it. Derived pairwise from the live bills: strip each
-    // plate's produce entries and the three remainders must be identical, in
-    // order and in count.
-    const remainders = THREE_PLATES.map((id) =>
-      requireRecipe(id)
-        .reagents.filter((g) => !PRODUCE_IDS.has(g.itemId))
-        .map((g) => [g.itemId, g.count]),
-    );
-    expect(remainders[1], 'skewers vs stew, produce aside').toEqual(remainders[0]);
-    expect(remainders[2], 'chowder vs stew, produce aside').toEqual(remainders[0]);
+    // comment that states it, and routed through foodFamilyShape so the control
+    // below drives exactly this expression.
+    const shape = foodFamilyShape(THREE_PLATES.map((id) => requireRecipe(id).reagents));
+    expect(shape.remaindersEqual, 'the three plates, produce aside, must be identical').toBe(true);
     // EXACTLY ONE crop ROW each, not merely "some produce": two crop rows on one
     // plate would satisfy a looser reading and break the amendment as written.
+    expect(shape.cropRowsPerPlate, 'one crop row per plate').toEqual([1, 1, 1]);
+    // And the remainder is not empty, or "identical in every other reagent"
+    // would be a claim about nothing. Also stated per plate, so a bill emptied
+    // down to its crop cannot satisfy the equality by having nothing to compare.
     for (const id of THREE_PLATES) {
       expect(
-        requireRecipe(id).reagents.filter((g) => PRODUCE_IDS.has(g.itemId)).length,
-        `${id} must carry exactly one crop row`,
-      ).toBe(1);
+        requireRecipe(id).reagents.filter((g) => !PRODUCE_IDS.has(g.itemId)).length,
+        `${id} shared bill`,
+      ).toBe(5);
     }
-    // And the remainder is not empty, or "identical in every other reagent"
-    // would be a claim about nothing.
-    expect(remainders[0].length, 'the shared bill').toBeGreaterThanOrEqual(5);
   });
 
   it('the three flask bills stay BYTE-IDENTICAL to each other', () => {
@@ -442,22 +460,58 @@ describe('masterwrought Phase 11h GATE A: the amended uniform-bill rule', () => 
     expect(inputs[0]).toBe(452);
   });
 
-  it("11i's uniform fish row is still legal under the amendment", () => {
-    // Recorded as an arm rather than a sentence because the amendment was
-    // scoped narrowly for exactly this: Phase 11i appends the SAME raw fish row
-    // to all three plates (11i DECISION D), which leaves them differing by one
-    // crop row and identical in every other reagent, still. The check is that
-    // the property this file asserts is stated over PRODUCE, so a non-produce
-    // row added uniformly to all three cannot break it: simulate that by
-    // appending an identical synthetic entry to each remainder.
-    const withFish = THREE_PLATES.map((id) => [
-      ...requireRecipe(id)
-        .reagents.filter((g) => !PRODUCE_IDS.has(g.itemId))
-        .map((g) => [g.itemId, g.count]),
-      ['raw_stonescale_carp', 2],
+  it("the amendment's predicate REFUSES the shapes it forbids, and admits 11i's fish row", () => {
+    // THE CONTROL FOR THE TWO ARMS ABOVE, and it exists because without one they
+    // are sweeps over a shipped table that happens to satisfy them: nothing
+    // would prove the shape check can ever say no. Driven through
+    // foodFamilyShape, the same expression the arms read, rather than a local
+    // re-implementation of it, so an edit to the shape check moves this control
+    // with it. (The first version of this arm appended an identical entry to
+    // three identical lists and asserted they stayed identical, which is true of
+    // any three lists and proved nothing. Kept as a note because that shape is
+    // easy to write and reads like coverage.)
+    const live = THREE_PLATES.map((id) => requireRecipe(id).reagents);
+
+    // ADMITTED: the shipped table, and the same table with Phase 11i's UNIFORM
+    // fish row on all three plates (11i DECISION D). That row is the reason the
+    // amendment was scoped to "differ by exactly one CROP row" rather than
+    // "differ by exactly one row", so admitting it is the load-bearing case.
+    const shipped = foodFamilyShape(live);
+    expect(shipped.remaindersEqual, 'the shipped plates').toBe(true);
+    expect(shipped.cropRowsPerPlate, 'the shipped plates').toEqual([1, 1, 1]);
+    const withFish = foodFamilyShape(
+      live.map((bill) => [...bill, { itemId: 'raw_stonescale_carp', count: 2 }]),
+    );
+    expect(withFish.remaindersEqual, "11i's uniform fish row stays legal").toBe(true);
+    expect(withFish.cropRowsPerPlate, 'and does not count as a crop row').toEqual([1, 1, 1]);
+
+    // REFUSED: a fish row on only TWO of the three, which is the mistake 11i
+    // could actually make.
+    const partialFish = foodFamilyShape([
+      [...live[0], { itemId: 'raw_stonescale_carp', count: 2 }],
+      [...live[1], { itemId: 'raw_stonescale_carp', count: 2 }],
+      [...live[2]],
     ]);
-    expect(withFish[1]).toEqual(withFish[0]);
-    expect(withFish[2]).toEqual(withFish[0]);
+    expect(partialFish.remaindersEqual, 'a row on two plates of three must be refused').toBe(false);
+
+    // REFUSED: a SECOND crop row on one plate, the "open season" reading the
+    // amendment was narrowed to prevent.
+    const twoCrops = foodFamilyShape([
+      [...live[0], { itemId: 'marsh_rice', count: 1 }],
+      [...live[1]],
+      [...live[2]],
+    ]);
+    expect(twoCrops.cropRowsPerPlate, 'two crop rows on one plate must be refused').toEqual([
+      2, 1, 1,
+    ]);
+    // The two halves refuse INDEPENDENTLY: the partial-fish case passes the crop
+    // count and fails only on the remainder, and the two-crop case passes the
+    // remainder (produce is stripped from it) and fails only on the count. So a
+    // shape check that had lost either half entirely cannot look healthy.
+    expect(partialFish.cropRowsPerPlate, 'the fish case isolates the REMAINDER half').toEqual([
+      1, 1, 1,
+    ]);
+    expect(twoCrops.remaindersEqual, 'the two-crop case isolates the COUNT half').toBe(true);
   });
 });
 
