@@ -1070,9 +1070,11 @@ describe('client HTML shell', () => {
     expect(hudCss).toContain('body.native-app #mobile-donate,');
     // The tap targets: the account panel with the invite as the logged-out /
     // offline fallback (discordInviteUrl() itself falls back to
-    // DEFAULT_DISCORD_INVITE_URL in discord_status.ts), and the Ko-fi page,
-    // pinned to the shells' URLs.
-    expect(mainTs).toContain("const DONATE_URL = 'https://ko-fi.com/worldofclaudecraft';");
+    // DEFAULT_DISCORD_INVITE_URL in discord_status.ts).
+    // Operator fork: the ko-fi fundraiser is gone; every donate surface points
+    // at the operator's Solana wallet via build-time VITE_DONATION_ADDRESS.
+    expect(mainTs).toContain('const DONATE_URL =');
+    expect(mainTs).not.toContain('ko-fi.com');
     expect(mainTs).toContain("window.open(discordInviteUrl(), '_blank', 'noopener,noreferrer');");
     expect(mainTs).toContain(
       "onDonate: () => window.open(DONATE_URL, '_blank', 'noopener,noreferrer'),",
@@ -1081,7 +1083,8 @@ describe('client HTML shell', () => {
       ['index.html', html],
       ['play.html', playHtml],
     ] as const) {
-      expect(entry.match(/href="https:\/\/ko-fi\.com\/worldofclaudecraft"/g), name).toHaveLength(3);
+      expect(entry, name).not.toContain('ko-fi.com/worldofclaudecraft');
+      expect(entry.match(/data-donate-sol/g), name).toHaveLength(1);
       expect(entry, name).not.toContain('https://github.com/sponsors/levy-street');
     }
   });
@@ -1096,14 +1099,15 @@ describe('client HTML shell', () => {
       ['index.html', html],
       ['play.html', playHtml],
     ] as const) {
-      expect(entry, name).toContain('id="mm-discord"');
-      expect(entry, name).toMatch(/id="mm-discord"[^>]*data-icon="discord"/);
+      // Operator fork: the rail's Discord slot is the donate button now.
+      expect(entry, name).toContain('id="mm-donate"');
+      expect(entry, name).toMatch(/id="mm-donate"[^>]*data-icon="donate"/);
       // Starts hidden; main.ts reveals it at boot on any build with Discord UI
       // enabled, mirroring #mobile-discord's own gating.
-      expect(entry, name).toMatch(/id="mm-discord"\s+hidden/);
+      expect(entry, name).toMatch(/id="mm-donate"\s+hidden/);
       // Shows the 'U' default keybind as a discoverability hint, same as every
       // other micro-menu button (#mm-social shows 'o', #mm-valecup shows 'y').
-      expect(entry, name).toMatch(/id="mm-discord"[^>]*>\s*<span class="keybind">u<\/span>/);
+      expect(entry, name).not.toContain('id="mm-discord"');
     }
     // main.ts wires the click through the Hud's discord hook (attachDiscordHook)
     // to openDiscordEntry, the SAME entry point the mobile tray uses: it opens
@@ -1211,10 +1215,11 @@ describe('client HTML shell', () => {
     expect(mainTs).toContain("classList.toggle('show-actionbar3', visibility.third)");
   });
 
-  it('carries the same community-tray links in BOTH entries, with no duplicate Discord entry', () => {
+  it('ships no community tray on the operator fork (donations ride #mm-donate)', () => {
     for (const entry of [html, playHtml]) {
-      expect(entry).toContain('<a class="community-link github"');
-      expect(entry).toContain('<a class="community-link donate"');
+      expect(entry).not.toContain('id="community-hud"');
+      expect(entry).not.toContain('<a class="community-link github"');
+      expect(entry).not.toContain('<a class="community-link donate"');
       expect(entry).not.toContain('<a class="community-link discord"');
     }
   });
@@ -1305,14 +1310,13 @@ describe('client HTML shell', () => {
     // its two-person toggle icon under the minimap masqueraded as a Friends
     // button next to the real Social button in the top-left trio.
     expect(html).toContain('<a class="donate-cta"');
-    expect(html).toContain('<details id="community-menu">');
-    expect(html).toContain('<summary class="community-toggle"');
-    expect(html).toContain('<div class="community-tray">');
-    expect(html).toContain('<a class="community-link github"');
-    expect(html).toContain('<a class="community-link donate"');
-    // No separate Discord invite link here: it duplicated the Discord (U)
-    // icon-rail button (#mm-discord), the game HUD's single Discord entry
-    // point (see the fix/inspect-camera-talent-overlap-discord-dup PR).
+    // Operator fork: the whole community rail is gone (donations ride the
+    // #mm-donate icon-rail button; GitHub/Discord were removed).
+    expect(html).not.toContain('<details id="community-menu">');
+    expect(html).not.toContain('<summary class="community-toggle"');
+    expect(html).not.toContain('<div class="community-tray">');
+    expect(html).not.toContain('<a class="community-link github"');
+    expect(html).not.toContain('<a class="community-link donate"');
     expect(html).not.toContain('<a class="community-link discord"');
     expect(hudMobileCss).toContain('body.mobile-touch.game-active #ui {\n    z-index: 80;\n  }');
     expect(hudMobileCss).toContain('body.mobile-touch #community-hud {\n    display: none;\n  }');

@@ -43,6 +43,7 @@ import { verifyCurrentSeekerEntitlement } from './seeker_entitlement';
 import { hasSeekerEntitlement } from './seeker_entitlement_db';
 import { isNativeAppRequest } from './web_login_guard';
 import { cachedWocBalance } from './woc_balance';
+import { TEST_WOC_USD_PRICE, testEconomyEnabled, testSolUsdRate } from './claudium_test_service';
 
 const DEFAULT_MIN_USD = 20;
 const DEFAULT_POOL_USD = 150;
@@ -297,13 +298,18 @@ function parseTaskPayload(payload: unknown): DailyRewardTaskSeed[] {
 }
 
 function fallbackRuntimeConfig(): DailyRewardRuntimeConfig {
+  // Test economy (WOC_TEST_ECONOMY=1, no payout service): publish the fixed
+  // test price feed so eligibility computes and the prize pool shows its SOL
+  // value, and drop the $WOC minimum to 0 — on the test cluster nobody holds
+  // the mainnet $WOC mint, so the upstream $20 gate would lock everyone out.
+  const testMode = testEconomyEnabled();
   return {
     enabled: true,
-    minUsd: DEFAULT_MIN_USD,
+    minUsd: testMode ? 0 : DEFAULT_MIN_USD,
     prizePoolUsd: DEFAULT_POOL_USD,
     prizePoolSol: null,
-    wocUsdPrice: null,
-    solUsdPrice: null,
+    wocUsdPrice: testMode ? TEST_WOC_USD_PRICE : null,
+    solUsdPrice: testMode ? testSolUsdRate() : null,
     activeSeconds: DEFAULT_ACTIVE_SECONDS,
     dayStartUtcMinutes: DEFAULT_DAY_START_UTC_MINUTES,
     tasks: DEFAULT_TASKS,

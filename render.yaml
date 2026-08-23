@@ -1,0 +1,42 @@
+# Render blueprint for a free-tier single-service deployment of the game server.
+# The server serves client + REST API + WebSocket world on one port and honors
+# the PORT env Render injects (it binds all interfaces).
+#
+# Required dashboard inputs (sync: false => set once in the Render dashboard):
+#   DATABASE_URL : Neon (or any Postgres) connection string, e.g.
+#                  postgres://user:pass@ep-xxx.neon.tech/neondb?sslmode=require
+#   PUBLIC_ORIGIN: https://<service>.onrender.com  (or your custom domain)
+#   WEB_ORIGINS  : comma-separated extra allowed client origins, e.g.
+#                  https://<project>.pages.dev (set this when the static client
+#                  is hosted on Cloudflare Pages; omit for same-origin play)
+#
+# Free tier notes:
+# - 512 MB RAM / 0.1 CPU: fine for a small private realm (a handful of players).
+#   NODE_OPTIONS below keeps the V8 heap under the container limit.
+# - Spins down after 15 min without inbound traffic; WebSocket messages count
+#   as traffic, so an active session keeps it awake. Cold start ~1 min.
+# - Use Neon free Postgres instead of Render's free Postgres (Render's expires
+#   after 30 days; Neon's does not).
+
+services:
+  - type: web
+    name: woc-game
+    runtime: docker
+    plan: free
+    healthCheckPath: /livez
+    autoDeploy: false
+    envVars:
+      - key: DATABASE_URL
+        sync: false
+      - key: NODE_ENV
+        value: production
+      - key: NODE_OPTIONS
+        value: --max-old-space-size=384
+      - key: DB_POOL_MAX_CLIENTS
+        value: "5"
+      - key: PUBLIC_ORIGIN
+        sync: false
+      - key: WEB_ORIGINS
+        sync: false
+      - key: REALM_NAME
+        sync: false

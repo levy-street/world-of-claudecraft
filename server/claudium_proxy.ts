@@ -15,6 +15,7 @@
 // The functions mirror the service SDK v1 surface; they do NOT recompute any
 // value, they only pass through what the service returns.
 
+import { callTestEconomy, testEconomyEnabled } from './claudium_test_service';
 import { DESKTOP_WALLET_HANDOFF_TTL_MS, desktopWalletHandoffs } from './desktop_wallet_handoff';
 
 const SERVICE_TIMEOUT_MS = 5000;
@@ -175,9 +176,14 @@ function serviceSecret(): string {
   return process.env.WOC_ECONOMY_INTERNAL_SECRET ?? '';
 }
 
-/** The service is reachable only when BOTH the URL and the secret are set. */
+/** The service is reachable when BOTH the URL and the secret are set, or when the built-in test economy is on. */
 export function claudiumServiceConfigured(): boolean {
   return serviceUrl() !== '' && serviceSecret() !== '';
+}
+
+/** True when either the remote service or the built-in test economy backs the store. */
+export function claudiumStoreBacked(): boolean {
+  return claudiumServiceConfigured() || testEconomyEnabled();
 }
 
 let loggedOnce = false;
@@ -205,7 +211,19 @@ interface ServiceRequest {
 async function callService<T>(req: ServiceRequest): Promise<T | null> {
   const base = serviceUrl();
   const secret = serviceSecret();
-  if (base === '' || secret === '') return null;
+  if (base === '' || secret === '') {
+    // No remote service on this deployment: fall back to the built-in test
+    // economy (WOC_TEST_ECONOMY=1) so the store can be exercised safely.
+    if (testEconomyEnabled()) {
+      try {
+        return (await callTestEconomy(req)) as T;
+      } catch (err) {
+        logFailure(err);
+        return null;
+      }
+    }
+    return null;
+  }
   try {
     const url = new URL(req.path.replace(/^\//, ''), base.endsWith('/') ? base : `${base}/`);
     const headers: Record<string, string> = { 'x-woc-economy-secret': secret };

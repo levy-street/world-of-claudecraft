@@ -448,7 +448,7 @@ import { showMobileWalletLauncher } from './ui/mobile_wallet_launcher';
 import { mobileMountAction } from './ui/mount_quick_summon';
 import { applyNativeDeviceLanguage } from './ui/native_language';
 import { scheduleNativeUpdateCheck } from './ui/native_update_prompt';
-import { loadNewsInto } from './ui/news_feed';
+import { fetchReleasesWithFallback, loadNewsInto } from './ui/news_feed';
 import { hideOtaUpdateOverlay, renderOtaUpdateOverlay } from './ui/ota_update_overlay';
 import { createMetricsSampler } from './ui/perf_metrics_sampler';
 import { applyPerfOrnamentVars } from './ui/perf_ornament_svg';
@@ -3287,6 +3287,13 @@ async function startGame(
           const refreshClaudiumLater = () => {
             void hud.refreshClaudium();
           };
+          // A native buy needs a CONNECTED wallet to sign with. The SDK would
+          // bury a missing wallet as a generic 'unavailable' refusal; checking
+          // here surfaces the actionable "connect a wallet first" error instead.
+          if (rail !== 'stripe' && !desktopWalletBrowserHandoffAvailable()) {
+            const wallet = await loadWallet();
+            if (!wallet.currentWallet()?.address) throw new Error('connect a wallet first');
+          }
           const result = await startClaudiumPurchase(economy, rail, sku, {
             nativePayer:
               desktopWalletBrowserHandoffAvailable() && linkedWalletPubkey
@@ -3326,7 +3333,20 @@ async function startGame(
                 return result.signature;
               }
               const wallet = await loadWallet();
-              return wallet.signAndSendTransactionBase64(transactionBase64);
+              try {
+                return await wallet.signAndSendTransactionBase64(transactionBase64);
+              } catch (sendErr) {
+                // The service-built transaction carries a TEST-CLUSTER blockhash;
+                // a wallet pointed at another cluster rejects it with a raw
+                // 'Blockhash not found'. Translate that into the actual fix.
+                const sendMessage = sendErr instanceof Error ? sendErr.message : String(sendErr);
+                if (/blockhash/i.test(sendMessage)) {
+                  throw new Error(
+                    'wallet cluster mismatch: switch your wallet to the devnet cluster (Phantom: Settings → Developer Settings → Testnet Mode) and try again',
+                  );
+                }
+                throw sendErr;
+              }
             },
           });
           if ('ok' in result && !result.ok) {
@@ -5832,7 +5852,10 @@ function show(el: string): void {
   // moment the player can actually read it, and the NEW-badge marker should
   // advance only then.
   if (el === '#charselect-panel') {
-    void loadCharselectNews($('#charselect-news-feed'), () => api.releases(20));
+    void loadCharselectNews(
+      $('#charselect-news-feed'),
+      () => fetchReleasesWithFallback(() => api.releases(20)),
+    );
   }
 
   // Reset currently rendered classes to force re-render/animation when opening a panel
@@ -7757,15 +7780,41 @@ async function loadHighscores(): Promise<void> {
   await loadHighscoresInto($('#hs-leaderboard'), () => api.leaderboard('global', 100));
 }
 
-// News & Updates: published GitHub releases, proxied + cached by the server.
-// Re-fetched each time the view is opened (the server caches, so it is cheap).
-// The sanitizing renderer + fetch/paint loop live in ./ui/news_feed (extracted
-// out of this firewall file); this call site just supplies the host + fetcher.
+// News & Updates: published GitHub releases, proxied + cached by the server,
+// with a direct-from-GitHub fallback when the proxy's shared-IP budget is dry
+// (see fetchReleasesWithFallback in ./ui/news_feed). The sanitizing renderer
+// + fetch/paint loop live in ./ui/news_feed; this call site just supplies the
+// host + fetcher.
 async function loadNews(): Promise<void> {
-  await loadNewsInto($('#news-feed'), () => api.releases(20));
+  await loadNewsInto($('#news-feed'), () => fetchReleasesWithFallback(() => api.releases(20)));
 }
 
 let caCopyResetTimer: number | null = null;
+
+// Donate buttons ([data-donate-sol]) ship with a %VITE_DONATION_ADDRESS%
+// placeholder in their solscan URL. With a valid operator wallet baked in at
+// build time the link opens that address on-chain; with an unset/invalid
+// placeholder the button hides instead of pointing at upstream's fundraiser.
+function wireDonateLinks(): void {
+  const address = String(import.meta.env.VITE_DONATION_ADDRESS ?? '').trim();
+  const valid = /^[1-9A-HJ-NP-Za-km-z]{32,44}$/.test(address);
+  for (const anchor of document.querySelectorAll<HTMLAnchorElement>('[data-donate-sol]')) {
+    if (!valid) {
+      anchor.hidden = true;
+      continue;
+    }
+    anchor.href = `https://solscan.io/account/${address}`;
+  }
+  // The icon-rail #mm-donate micro-button (which replaced #mm-discord on this
+  // fork) rides the same address: shown + wired when valid, hidden when not.
+  const railBtn = document.getElementById('mm-donate');
+  if (railBtn) {
+    railBtn.hidden = !valid;
+    railBtn.addEventListener('click', () => {
+      window.open(DONATE_URL, '_blank', 'noopener,noreferrer');
+    });
+  }
+}
 
 // Click-to-copy for the $WOC contract address on the landing page. Falls back to
 // a hidden-textarea copy when the async Clipboard API is unavailable (insecure
@@ -7774,6 +7823,16 @@ function wireContractAddressCopy(): void {
   const btn = document.getElementById('btn-copy-ca');
   const container = document.getElementById('token-ca');
   if (!btn || !container) return;
+
+  // The pill ships with a %VITE_DONATION_ADDRESS% placeholder that Vite replaces
+  // at build time. When the operator never set a donation wallet the raw
+  // placeholder (or empty string) survives; anything that is not a plausible
+  // Solana address hides the whole block instead of advertising a bogus address.
+  const rawCa = btn.getAttribute('data-ca') ?? '';
+  if (!/^[1-9A-HJ-NP-Za-km-z]{32,44}$/.test(rawCa)) {
+    container.hidden = true;
+    return;
+  }
 
   const showCopied = () => {
     container.classList.add('is-copied');
@@ -8514,7 +8573,13 @@ const DISCORD_BUILD_ENABLED = String(import.meta.env.VITE_DISCORD_DISABLED ?? ''
 // falls back to DEFAULT_DISCORD_INVITE_URL (discord_status.ts) when the
 // server-fed value is not known yet (logged out, offline), so every caller
 // gets the fail-open behavior for free.
-const DONATE_URL = 'https://ko-fi.com/worldofclaudecraft';
+// Operator fork: in-game donations go to the operator's Solana wallet (build-time
+// VITE_DONATION_ADDRESS), mirroring the header Donate button. Without a valid
+// address baked in, the button still opens solscan rather than upstream's page.
+const DONATE_ADDRESS = String(import.meta.env.VITE_DONATION_ADDRESS ?? '').trim();
+const DONATE_URL = /^[1-9A-HJ-NP-Za-km-z]{32,44}$/.test(DONATE_ADDRESS)
+  ? `https://solscan.io/account/${DONATE_ADDRESS}`
+  : 'https://solscan.io';
 const DISCORD_ONBOARD_KEY = 'woc_discord_onboard';
 let discordPopup: Window | null = null;
 
@@ -9640,6 +9705,7 @@ function wireStartScreens(): void {
   hydrateIcons();
   void loadProjectStats();
   wireContractAddressCopy();
+  wireDonateLinks();
   wireHomepageMusicToggle();
   void wireWallet();
   wireGithubLink();
