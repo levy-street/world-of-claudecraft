@@ -12473,10 +12473,27 @@ because its stale rows are FALSE rather than merely incomplete.
 | guide.profPages.craftIntro.engineering | 18 | 11i QA; dynamic key path, cannot be re-keyed |
 | guide.profPages.faq.a6 | 5 | 11i QA; dynamic key path (faq.a${n}), cannot be re-keyed |
 | guide.profPages.faq.a7 | 18 | 11i QA; dynamic key path (faq.a${n}), cannot be re-keyed |
+| guide.interfacePage.mobileBody | 18 | 11i QA; RELEASE-owned drift, see below |
+| guide.controlsPage.mobileBody | 18 | 11i QA; RELEASE-owned drift, see below |
 
 The seven fish and ladder keys that WERE on this list are gone from it: the QA
 retired and re-keyed them, so the release-tier gate blocks on their `pending`
 rows instead of a worklist remembering them. See below.
+
+THE LAST TWO ROWS ARE NOT THIS PACKET'S DRIFT and are scoped deliberately. The
+tenth release sync brought the touch UI rework, which falsified three statements
+in `guide.interfacePage.mobileBody` and one in `guide.controlsPage.mobileBody`:
+the ring carries FOUR action buttons beside the attack button and not five
+(`MOBILE_ACTION_BUTTONS` in hud/action_bar/mobile_action_page_view.ts), the
+consumables row is now the ring's own fifth arc seat rather than a separate
+pull-out, the five bottom-edge buttons collapsed into ONE Quick Actions control
+whose radial carries ten entries (hud/menu/menu_strip_core.ts), and the top-left
+show-hide arrow that the controls page describes is gone. All four were TRUE at
+the merge base and false at HEAD, so the merge is what made them wrong and the
+merge is where they are corrected. The ENGLISH is fixed here so the tree ships
+true text; the keys are NOT re-keyed, because they belong to the touch rework
+rather than to the fishing prose the maintainer ruled on, and re-keying another
+team's keys inside a QA pass is scope this audit does not own.
 
 THE FISH ONE IS DIFFERENT IN KIND. The other three are stale because English
 gained material they lack. This one is stale because the SHIPPED TRANSLATION
