@@ -11,3 +11,7 @@ src/ui/i18n.catalog/translation_keys.generated.ts linguist-generated
 # Windows batch scripts keep their CRLF endings: exempt from text conversion so an
 # LF-normalized checkout (core.autocrlf=input) neither flags nor rewrites them.
 *.bat -text
+
+# Radiance HDR files start with a text header but contain binary pixel data.
+# Treating them as text corrupts their payload on Windows with core.autocrlf=true.
+*.hdr -text
