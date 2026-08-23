@@ -12001,6 +12001,45 @@ The apex CRAFTING tier's own amendment belongs to Phase 16's content surface
 sweep, which is inside this packet, so pointing there is a sequencing
 statement and not a deferral.
 
+### THE SUITE, ON A FROZEN TREE, BOTH ENDS STAMPED
+
+Committed clean tree at **9300b5c36d**, `git status` empty before and after, and
+NOTHING else running: every reviewer and every context agent was idle first,
+because a suite number is only evidence about the tree AND THE LOAD it ran
+under.
+
+| measure | pre-merge baseline (566b0dcf51) | after (9300b5c36d) |
+|---|---|---|
+| vitest | EXIT=0, 3068 files / 12 skipped (3080); 43940 passed / 2 expected fail / 115 skipped (44057) | **EXIT=0**, 3069 files / 12 skipped (3081); 43956 passed / 2 expected fail / 115 skipped (44073) |
+| `npm run ci:changed` | EXIT=0, 796 files, 3094 warnings, 0 errors | **EXIT=0**, 797 files, 3094 warnings, 0 errors, no FAIL marker in the log |
+| `npx tsc --noEmit` | clean | **clean** |
+
+The drift is entirely this phase's: +1 file (the coverage guard) and +16 tests
+(its ten arms plus the six added to recipe_reachability, farm_recipes and the
+hoe suite). THE RELEASE MERGE CONTRIBUTED ZERO, which is worth stating because
+the eleventh sync landed a shaman balance pass with a conflicted golden: the
+golden was re-minted from the merged tree rather than resolved by hand, numstat
+identity holds in BOTH directions on all five both-parent files, and no rng
+draw or digest moved.
+
+FOUR EARLIER RUNS WERE DISCARDED, and the reason is a process failure worth
+recording rather than hiding. Each was started on a clean tree and then
+invalidated by a commit landing WHILE it ran, so its numbers described a tree
+that no longer existed. A frozen-tree measurement is only frozen if nobody
+touches the tree, and the discipline is the whole point of the stamp; four
+attempts were spent learning it. The run above is the first with nothing else
+in flight.
+
+THE REDS THE TARGETED BATTERIES COULD NOT HAVE FOUND, and there were TWO waves.
+The first full run was EXIT=1 with 16 files red, of which the one worth naming
+is `pendingArtCount` in `scripts/item_art_audit.mjs`: a third independent term
+over the art park, living outside `tests/` and reached through `execFileSync`,
+so no `vitest related` selection can ever point at it. The second wave is the
+sharper lesson, because it came after: the fix round that repaired the first
+left THREE more suites red (`professions_blob_growth`,
+`provisioning_supply_line_apex`, `tool_effect_tooltip`), and again only the
+full suite found them. A fix round is a content change and owes the same sweep.
+
 ### THE HANDOFF TO PHASE 11j QA, AND THROUGH IT TO 11k
 
 - **THE GUARD IS THE DELIVERABLE, AND IT SHIPPED WITH FOUR ARMS THAT COULD NOT
