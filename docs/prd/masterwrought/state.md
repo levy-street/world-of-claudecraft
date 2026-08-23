@@ -11688,6 +11688,37 @@ record demands: mutate, `npm run i18n:gen`, test, `git checkout`, then
 and `src/ui/i18n.status.json` is gitignored and would otherwise stay poisoned
 behind a clean `git status`. Stamps identical at both ends.
 
+### THE FULL SUITE, ON A FROZEN TREE, BOTH ENDS STAMPED
+
+FINAL RUN, tip a7e7f28706:
+  EXIT=0, 3048 files passed / 12 skipped (3060),
+  43410 passed / 2 expected fail / 115 skipped (43527).
+  START TIP == END TIP == a7e7f28706, START DIRTY == END DIRTY == [].
+
+THE DELTA AGAINST THE 11h RECORD IS ACCOUNTED FOR rather than noted. Files are
+IDENTICAL at 3060: this QA added no test file. Tests move 43525 to 43527, which
+is +2, and the two are the only `it` blocks the fix round added: the wall-clock
+spread arm and the plant-path tool-gate arm. Every other change in this round was
+assertion-level inside an existing block (four assertions deleted as unfalsifiable
+or implied, six added, several reworded), which is why the count moves by exactly
+two rather than by the number of findings applied.
+
+THE RUN WAS RESTARTED TWICE BEFORE THIS ONE, and the reason is worth recording
+because it is the frozen-tree rule biting its author. The first run was killed
+when a docs commit was amended mid-flight (the ledger's own commit SHAs were
+mapped wrong); the second when the cross-check against the reviewer reports found
+an applied-list entry that had not landed. A suite result is only evidence about
+the tip it ran on, so neither was recorded as one. The run at dde0728765, one
+commit back, was also green (43410 / 43527, the same numbers) and is noted here
+only as corroboration.
+
+npx tsc --noEmit: clean at every commit in the round, run after each.
+
+npm run ci:changed: EXIT=0 at the final tip, LOG READ rather than only the exit
+code: 2958 warnings, 25 infos, ZERO errors across 771 files, the same shape the
+11h record describes. The 771 is the release-merge scope-widening the packet
+record already warns about, not this round's file count, which is nine.
+
 ### THE HANDOFF TO PHASE 11i
 
 - THE THREE ROLE PLATES ARE STILL DIFFERENTIATED, by one crop id each, and the
