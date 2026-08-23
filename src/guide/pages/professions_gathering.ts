@@ -85,7 +85,7 @@ function toolsSection(g: GuideProfGathering): string {
   if (!g.tools.length) return '';
   return `<section class="guide-block" id="prof-tools">
       <h2>${esc(t('guide.profPages.toolsHeading'))}</h2>
-      ${paras('guide.profPages.toolsNote', {
+      ${paras('guide.profPages.toolsNoteThreeRods', {
         // Fed from the live gate constants, the sibling sections' idiom
         // (rhythmBody takes the cast curve, nodesNote the respawn), so a
         // retune moves the prose in all 19 languages instead of leaving a
@@ -244,7 +244,7 @@ function bandsSection(g: GuideProfGathering): string {
     .join('');
   return `<section class="guide-block" id="prof-bands">
       <h2>${esc(t('guide.profPages.bandsHeading'))}</h2>
-      ${paras('guide.profPages.bandsBody')}
+      ${paras('guide.profPages.bandsBodySplitLadder')}
       <ul class="guide-prof-bands">${bands}</ul>
     </section>`;
 }
@@ -292,7 +292,7 @@ function fishingSections(g: GuideProfGathering): string {
   return `
     <section class="guide-block" id="prof-fish-start">
       <h2>${esc(t('guide.profPages.fish.startHeading'))}</h2>
-      ${paras('guide.profPages.fish.startBody')}
+      ${paras('guide.profPages.fish.startBodyThreeRods')}
     </section>
     <section class="guide-block" id="prof-bite">
       <h2>${esc(t('guide.profPages.fish.biteHeading'))}</h2>
@@ -308,7 +308,7 @@ function fishingSections(g: GuideProfGathering): string {
     </section>
     <section class="guide-block" id="prof-fish-schedule">
       <h2>${esc(t('guide.profPages.fish.scheduleHeading'))}</h2>
-      ${paras('guide.profPages.fish.scheduleNote', { cutoff: formatNumber(f.junkCutoff) })}
+      ${paras('guide.profPages.fish.scheduleNoteRetuned', { cutoff: formatNumber(f.junkCutoff) })}
       <div class="guide-table-scroll"><table class="guide-keytable">
         <thead><tr><th scope="col">${esc(t('guide.profPages.fish.colProficiency'))}</th><th scope="col">${esc(t('guide.profPages.fish.colGain'))}</th></tr></thead>
         <tbody>${scheduleRows}</tbody>
@@ -316,12 +316,12 @@ function fishingSections(g: GuideProfGathering): string {
     </section>
     <section class="guide-block" id="prof-fish-tables">
       <h2>${esc(t('guide.profPages.fish.tablesHeading'))}</h2>
-      ${paras('guide.profPages.fish.tablesNote', { rare: f.rareCatch })}
+      ${paras('guide.profPages.fish.tablesNoteSixBands', { rare: f.rareCatch })}
       ${bandTables}
     </section>
     <section class="guide-block" id="prof-koi">
       <h2>${esc(t('guide.profPages.fish.koiHeading'))}</h2>
-      ${paras('guide.profPages.fish.koiBody')}
+      ${paras('guide.profPages.fish.koiBodyBandFlat')}
     </section>`;
 }
 

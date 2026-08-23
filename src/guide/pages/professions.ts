@@ -145,7 +145,7 @@ function overviewHtml(): string {
       </section>
       <section class="guide-block" id="prof-curve">
         <h2>${esc(t('guide.professions.curveHeading'))}</h2>
-        ${paras('guide.professions.curveBody', { step: formatNumber(GUIDE_PROF_CURVE.tierStep) })}
+        ${paras('guide.professions.curveBodyRetunedFishing', { step: formatNumber(GUIDE_PROF_CURVE.tierStep) })}
       </section>
       <section class="guide-block" id="prof-pace">
         <h2>${esc(t('guide.professions.craftMasteryTitle'))}</h2>

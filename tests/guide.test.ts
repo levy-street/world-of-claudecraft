@@ -2673,7 +2673,7 @@ describe('Guide professions gathering accuracy', () => {
     // frozen numbers, and nothing else would notice, because the value would
     // still be present and translated.
     setLanguage('en');
-    const en = t('guide.profPages.toolsNote', {
+    const en = t('guide.profPages.toolsNoteThreeRods', {
       tier2Prof: String(TIER2_TOOL_GATE_PROFICIENCY),
       tier3Prof: String(TIER3_TOOL_GATE_PROFICIENCY),
     });
