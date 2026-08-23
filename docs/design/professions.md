@@ -268,9 +268,12 @@ while gaining the Thornpeak fine grade.
 
 The EASTBROOK fine grades are the ones no tool recipe names, and that is a
 consequence of the ladder's shape rather than a gap. The fine ladder has three
-tiers where the crafted-tool ladder has two rungs, because the tier-2 and
-tier-3 land tools stay vendor-priced, so "tier N takes the fine grade of tier
-N minus 2" reaches the Mirefen and Thornpeak grades and stops. The starter
+tiers where the `TOOL_RECIPES` ladder has two rungs, because the tier-2 and
+tier-3 picks, axes and sickles stay vendor-priced, so "tier N takes the fine
+grade of tier N minus 2" reaches the Mirefen and Thornpeak grades and stops.
+(The hoe ladder is the land family that does NOT work that way: its rungs 2
+and 3 are crafted, which is exactly why farming has no orphaned starter
+grade.) The starter
 grades are not stranded by that: downward substitution below is what pays
 them, along with the doubled sell price, and between them those ARE the reward
 the fine axis pays. Read them as an over-tooled starter harvest paying better,

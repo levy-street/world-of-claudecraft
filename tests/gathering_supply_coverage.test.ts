@@ -50,8 +50,9 @@
 // same goes for the corpse components and the farm ids, which farm_recipes
 // covers. What is left over, and the reason this arm earns its place rather
 // than restating a neighbour, is the CATCHES: recipe_economy's RAW_FISH needle
-// list is the one list in that file with no anti-rot pin against its live
-// table, so the four catches added since it was written (glimmerfin_koi,
+// list has no anti-rot pin against its live table (nor does its
+// VENDOR_REAGENTS list; only NODE_YIELDS, HARVEST_MATERIALS and SPECIMENS
+// carry one), so the four catches added since it was written (glimmerfin_koi,
 // raw_deepbarb_catfish, raw_hollowgill_sturgeon, raw_stillmere_salmon) are
 // covered HERE and nowhere else. Pinning RAW_FISH against
 // FISHING_TABLES_BY_BAND would be the durable fix and belongs to whoever owns
@@ -434,11 +435,14 @@ describe('the derivation itself cannot pass by matching nothing', () => {
         .sort(),
     );
 
-    // FARMING, pinned by SIZE and by literal rather than by a loop over the
-    // same table the set is built from. The loop this replaces asked whether
-    // farmingSupply() contains what farmingSupply() put there, which held for
-    // every crop by construction and gave the arm no teeth at all: it is the
-    // farming half of the very anti-rot claim this test's title makes.
+    // FARMING, and BE HONEST ABOUT WHICH LINE HAS THE TEETH. The two derived
+    // assertions below re-express what farmingSupply() did, so like the loop
+    // they replaced they can only fail on a duplicate crop id: they state the
+    // shape for a reader, they do not guard it. The LITERAL is the guard, and
+    // it is what reds when a crop is deleted, since a derivation follows the
+    // table down. Kept all three deliberately rather than trimmed to the
+    // literal, because the shape statement is what tells the next reader what
+    // 24 is supposed to mean.
     const farming = SUPPLY.get('farming') as Set<string>;
     expect(farming.size, 'two grades for each shipped crop').toBe(
       Object.keys(FARM_CROPS).length * 2,
@@ -448,9 +452,8 @@ describe('the derivation itself cannot pass by matching nothing', () => {
         .flatMap((crop) => [crop.produceItemId, crop.fineProduceItemId])
         .sort(),
     );
-    // The literal count beside the derivation, same reason as everywhere else
-    // in this file: without it, deleting a crop shrinks both sides together.
-    expect(farming.size).toBe(24);
+    // THE ONE WITH TEETH: twelve shipped crops, two grades each.
+    expect(farming.size, 'twelve crops at two grades').toBe(24);
   });
 
   it('the recipe corpus populates every band the loop iterates', () => {
@@ -470,9 +473,11 @@ describe('the derivation itself cannot pass by matching nothing', () => {
     // masterwrought decision D, pinned by CALLING the predicate rather than by
     // observing that the corpus contains both kinds of recipe. The corpus
     // observation is kept below because it is a real precondition, but on its
-    // own it proved nothing: isSelfFeedingFor could return false
-    // unconditionally and every arm in this file would stay green, because no
-    // family depends on the refusal to be non-empty.
+    // own it proved nothing: BEFORE the assertions in this arm existed,
+    // isSelfFeedingFor could have returned false unconditionally and every arm
+    // in this file would still have been green, because no family depends on
+    // the refusal to keep a non-empty endgame cell. The outcome pin further
+    // down is what closed that, and it reds on exactly that mutation now.
     expect(
       isSelfFeedingFor('arcanite_mining_pick', 'mining'),
       'a pick IS mining self-feeding',
@@ -494,7 +499,8 @@ describe('the derivation itself cannot pass by matching nothing', () => {
     expect(farmingEndgame, 'farming must not be credited for its own hoe').not.toContain(
       'recipe_evergarden_hoe',
     );
-    expect(farmingEndgame.length, 'and it still has real endgame rows').toBeGreaterThan(0);
+    // At the real count rather than a token floor, this round's own convention.
+    expect(farmingEndgame.length, 'and it still has real endgame rows').toBe(12);
     // The precondition: both kinds of recipe exist, so neither branch of the
     // discriminator is unreachable over this corpus.
     const isTool = ALL_RECIPES.filter((r) =>
@@ -517,14 +523,17 @@ describe('the derivation itself cannot pass by matching nothing', () => {
     // Today exactly the three EASTBROOK grades pass only through their base,
     // which is the shape the fine ladder having three tiers against a two-rung
     // crafted-tool ladder produces.
+    // CALLS consumptionIdsFor rather than re-walking baseMaterialFor beside it,
+    // so deleting the credit from the shipped helper reds HERE, in the arm
+    // whose subject it is, and not only over in the orphan arm.
     const substitutionOnly: string[] = [];
     for (const family of FAMILY_IDS) {
       for (const id of SUPPLY.get(family) as Set<string>) {
-        const direct = DEMAND.get(id)?.consumers.length ?? 0;
-        if (direct > 0) continue;
-        const base = baseMaterialFor(id);
-        if (base === undefined) continue;
-        if ((DEMAND.get(base)?.consumers.length ?? 0) > 0) substitutionOnly.push(id);
+        if ((DEMAND.get(id)?.consumers.length ?? 0) > 0) continue;
+        const viaSubstitution = consumptionIdsFor(id).some(
+          (spendable) => spendable !== id && (DEMAND.get(spendable)?.consumers.length ?? 0) > 0,
+        );
+        if (viaSubstitution) substitutionOnly.push(id);
       }
     }
     expect(substitutionOnly.sort()).toEqual([
@@ -544,11 +553,14 @@ describe('the derivation itself cannot pass by matching nothing', () => {
     expect(GATHERING_ENDGAME_SKILL, 'the land gathering cap').toBe(100);
     expect(LEVELLING_BANDS).toEqual([0, 1, 2, 3]);
     expect(ENDGAME_BAND).toBe(4);
-    // And the derivation really does route through the shared helper, so a
-    // TIER_SKILL_STEP change moves this file and the game together rather than
-    // reding only the literals above.
+    // The two below are SHAPE STATEMENTS, not guards, and saying so here stops
+    // the next reader trusting them: bandOf IS tierForSkill and ENDGAME_BAND is
+    // defined as bandOf(GATHERING_ENDGAME_SKILL), so both are x === x.
     expect(ENDGAME_BAND).toBe(tierForSkill(GATHERING_ENDGAME_SKILL));
     expect(LEVELLING_BANDS.length).toBe(ENDGAME_BAND);
+    // THIS one is real: it asks the shared bucket a question whose answer is
+    // not its own definition, so a TIER_SKILL_STEP change moves this file and
+    // the game together rather than reding only the literals above.
     expect(bandOf(GATHERING_ENDGAME_SKILL - 1)).toBe(ENDGAME_BAND - 1);
   });
 });

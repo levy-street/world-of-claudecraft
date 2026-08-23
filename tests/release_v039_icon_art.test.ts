@@ -465,14 +465,20 @@ describe('release v0.39 icon-art second-pass lineage', () => {
     // eleven while THIS term grew by three.
     // 20 at Phase 11j: the apex hoe, the hoe ladder's fifth rung and a
     // gatherTool like every rung below it. It is the ONLY term the phase moved
-    // here, because artSubjectHotbarItemIds above counts PAINTED subjects and
-    // the hoe is parked rather than painted.
+    // here, because artSubjectHotbarItemIds above counts ART-SUBJECT ids (live
+    // minus the park) and the hoe is parked rather than painted.
     //
     // THIS IS THE THIRD INDEPENDENT PIN OVER THE SAME PARK, after the exact-set
     // arm in tests/item_icons.test.ts and pendingArtCount in
-    // scripts/item_art_audit.mjs. All three must move together, and none of
-    // them is selected by a targeted run aimed at the content that grows the
-    // park, so the full suite is the only thing that catches a partial update.
+    // scripts/item_art_audit.mjs, and all three must move together. TWO of the
+    // three ARE reachable by a targeted run: this file and item_icons both
+    // import ITEMS and ITEM_ART_PENDING, so `vitest related` on either source
+    // selects them. The one that is not is pendingArtCount, which lives under
+    // scripts/ and is reached out-of-graph through execFileSync, so it is
+    // invisible to selection and the full suite is the only thing that catches
+    // it. Do not read this as "targeted verification cannot help here": it
+    // helps for two of the three, and the third is the reason to run the suite
+    // anyway.
     expect(pendingHotbarItemIds, 'ITEM_ART_PENDING hotbar items').toHaveLength(20);
     expect(
       pendingHotbarItemIds.filter((id) => shippingImageExists(`/ui/items/${id}.webp`)),

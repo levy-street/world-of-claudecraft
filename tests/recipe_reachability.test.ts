@@ -477,6 +477,12 @@ describe('every gathering tool is wieldable by the profession that owns it', () 
     // A ceiling below the cap here would be the same dead-content shape as a
     // recipe above its craft's cap: the apex rung would exist, be craftable,
     // and never be swingable by anyone.
+    //
+    // SCOPE, so this is not read as covering the whole ladder: it closes the
+    // TOP rung only. The lower hoe rungs are fine today and were checked by
+    // hand rather than pinned (tier-1 crops teach to 50 against the tier-2
+    // hoe's 40, tier-2 to 75 against 70, tier-3 to 100 against 85), so there is
+    // no live hole below, but neither is there an arm.
     const cap = GATHERING_PROFESSIONS.farming.maxSkill;
     const topCropTier = Math.max(...Object.values(FARM_CROPS).map((crop) => crop.tier));
     expect(
@@ -485,10 +491,21 @@ describe('every gathering tool is wieldable by the profession that owns it', () 
         `tier-5 hoe's wield requirement is unreachable and the rung is dead`,
     ).toBe(cap);
     expect(wieldRequirementForTier(5), 'and that cap IS the requirement').toBe(cap);
-    // The rung below really does open that ground, so the climb is not circular:
-    // planting a tier-N crop needs a tier-N hoe, and the tier-4 hoe is the rung
-    // this recipe consumes.
-    expect(canGatherTier(4, topCropTier), 'the tier-4 hoe plants the top crop tier').toBe(true);
+    // The rung below really does open that ground, so the climb is not
+    // circular: planting a tier-N crop needs a tier-N hoe, and the hoe the apex
+    // bill consumes is the one that must reach the top crop tier. The tool tier
+    // is DERIVED from that bill rather than typed, so re-pointing it at a lower
+    // rung reds here instead of leaving this sentence quietly false.
+    const apexHoeBill = ALL_RECIPES.find((r) => r.id === 'recipe_evergarden_hoe');
+    const rungBelow = apexHoeBill?.reagents
+      .map((g) => ITEMS[g.itemId]?.use)
+      .find((use) => use?.type === 'gatherTool' && use.professionId === 'farming');
+    const rungBelowTier = rungBelow?.type === 'gatherTool' ? rungBelow.tier : 0;
+    expect(rungBelowTier, 'the apex bill consumes a farming tool').toBeGreaterThan(0);
+    expect(
+      canGatherTier(rungBelowTier, topCropTier),
+      'the rung this recipe consumes must plant the top crop tier',
+    ).toBe(true);
   });
 
   it('the apex land rungs sit exactly ON their cap, which is the knife edge', () => {

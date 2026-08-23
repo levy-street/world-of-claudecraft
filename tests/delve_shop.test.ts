@@ -360,8 +360,10 @@ describe('Drowned Litany shop stock (data pins)', () => {
     const farmingTools = Object.values(ITEMS).filter(
       (def) => def.use?.type === 'gatherTool' && def.use.professionId === 'farming',
     );
-    // At the real count, not a token floor: the same convention the
-    // craftedTools floor above follows, so a hoe leaving the roster reds here.
+    // At the real count rather than a token floor. NOT the same shape as the
+    // craftedTools assertion above, which is deliberately a >= floor because
+    // that set may legitimately grow with a new crafted tool; this roster is
+    // closed content, so an exact pin is right and a hoe leaving it reds here.
     expect(farmingTools.length, 'the five shipped hoe rungs').toBe(5);
     const allDelveRows = new Set(
       Object.values(DELVE_SHOPS)

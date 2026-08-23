@@ -944,13 +944,14 @@ describe('masterwrought Phase 11h GATE D: the capstones and the tier-4 fine twin
       // swap capstones, which is exactly the split this gate rules on. Scoped to
       // the CONSUMABLE crafts, because 11j's apex hoe is an engineering row at
       // the same 125 rung and would otherwise join this list.
+      // Scoped by MEMBERSHIP in the apex consumable set rather than by a
+      // hardcoded craft allowlist: the concept is "the consumable capstones",
+      // and a capstone authored under a third craft would drift out of a
+      // profession list while staying in the set it belongs to. 11j's apex hoe
+      // is an engineering TOOL at the same 125 rung, excluded for that reason.
+      const apexConsumableIds = new Set(APEX_CONSUMABLE_RECIPES.map((r) => r.id));
       expect(
-        consumers
-          .filter(
-            (r) =>
-              r.skillReq >= 125 && (r.professionId === 'cooking' || r.professionId === 'alchemy'),
-          )
-          .map((r) => r.id),
+        consumers.filter((r) => r.skillReq >= 125 && apexConsumableIds.has(r.id)).map((r) => r.id),
         `${twin} must have its own capstone consumer at the 125 rung`,
       ).toEqual([capstoneOf[twin]]);
     }
@@ -984,13 +985,17 @@ describe('masterwrought Phase 11h GATE D: the capstones and the tier-4 fine twin
     // dishes. It neither trips nor should.
     //
     // AMENDED at masterwrought Phase 11j, which added the apex hoe and so
-    // added a FOURTH hoe twin. The claim this arm makes about 11h's own rows is
-    // untouched: an APEX_CONSUMABLE row still consumes no hoe twin, which the
-    // sweep below is what actually checks. What moved is only the roster, and
-    // the exclusivity reading it used to support is retired in farm_recipes for
-    // a reason recorded there: the apex rung consumes a TIER-4 twin under the
-    // ladder's one-tier-below invariant, and 11h had already given every
-    // tier-4 twin a dish, so no unbooked twin existed for it to take.
+    // added a FOURTH hoe twin. BE PRECISE ABOUT WHAT THAT BROKE, because an
+    // earlier draft of this comment got it backwards and claimed 11h's rows
+    // were untouched: they are not. `recipe_laden_hearth` IS an
+    // APEX_CONSUMABLE row and it DOES consume fine_evergarden_greens, which
+    // the apex rung promoted into this set, so the old "no apex row consumes a
+    // hoe twin" sweep is genuinely FALSIFIED rather than merely re-scoped.
+    // That is why it is retired below rather than re-pinned, and the same
+    // collision retired the exclusivity clause in farm_recipes: the apex rung
+    // consumes a TIER-4 twin under the ladder's one-tier-below invariant, and
+    // 11h had already given every tier-4 twin a consumer, so no unbooked twin
+    // existed for it to take.
     const hoeTwins = new Set(
       ALL_RECIPES.filter((r) => r.resultItemId.endsWith('_hoe')).flatMap((r) =>
         r.reagents.filter((g) => PRODUCE_IDS.has(g.itemId)).map((g) => g.itemId),
@@ -1046,6 +1051,11 @@ describe('masterwrought Phase 11h GATE D: the capstones and the tier-4 fine twin
     const hoeTwinConsumers = ALL_RECIPES.filter((r) =>
       r.reagents.some((g) => hoeTwins.has(g.itemId)),
     ).map((r) => r.id);
+    // THE ARM'S SUBJECT MOVED, not just its expected value, and that is worth
+    // stating: recipe_evergarden_harvest_platter is a PRE-11j cooking row that
+    // became a non-hoe consumer of a hoe twin only because the apex rung grew
+    // the hoeTwins set underneath it. Neither row was edited by any phase; the
+    // set they are measured against was.
     expect(
       hoeTwinConsumers.filter((id) => !requireRecipe(id).resultItemId.endsWith('_hoe')).sort(),
       'exactly these non-hoe bills may consume a hoe twin, and no others',

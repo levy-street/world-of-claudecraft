@@ -11539,10 +11539,14 @@ tier 5, is genuinely one line plus its pin.
   appended, never hand-listed, and pinned as such.
 - **D (the self-feeding arm).** Executed, and the phase file's PREDICTION IS
   FALSIFIED. It said the refusal "should bite NOTHING on this tree". It bites
-  FIVE rows across four families: `recipe_arcanite_mining_pick` (mining),
-  `recipe_elderwood_axe` (logging), `recipe_sunpetal_sickle` (herbalism), and
-  BOTH `recipe_tidewrought_fishing_rod` and `recipe_clockreel_fishing_rod`
-  (fishing). The substantive claim still holds, and it is the one decision D
+  SIX rows across ALL FIVE gathering professions:
+  `recipe_arcanite_mining_pick` (mining), `recipe_elderwood_axe` (logging),
+  `recipe_sunpetal_sickle` (herbalism), BOTH
+  `recipe_tidewrought_fishing_rod` and `recipe_clockreel_fishing_rod`
+  (fishing), and `recipe_evergarden_hoe` (farming), which is THIS PHASE'S OWN
+  apex rung and the exact row the refusal's new pin was written to catch. An
+  earlier draft said five rows across four families and omitted the hoe, which
+  is the one row a reader of this ledger would most expect to find here. The substantive claim still holds, and it is the one decision D
   actually cares about: no family is left with an empty endgame cell by the
   refusal, so no profession's endgame contribution is still self-feeding. The
   refusal is load-bearing rather than decorative, which the mutation proof
@@ -11617,19 +11621,19 @@ cross-family number.
 | | copper_ore | 11 | 41 |
 | | fine_iron_ore | 1 | 4 |
 | | fine_thorium_ore | 1 | 2 |
-| | fine_copper_ore | **0 before, 3 after** | **0 before, 6 after** |
+| | fine_copper_ore | 0 direct (spendable via `copper_ore`, 11 consumers) | 0 |
 | logging (median 1) | ashwood_log | 6 | 16 |
 | | ironbark_log | 2 | 5 |
 | | fine_ashwood_log | 1 | 4 |
 | | fine_elderwood_log | 1 | 2 |
 | | elderwood_log | 1 | 1 |
-| | fine_ironbark_log | **0 before, 1 after** | **0 before, 2 after** |
+| | fine_ironbark_log | 0 direct (spendable via `ironbark_log`, 2 consumers) | 0 |
 | herbalism (median 6.5) | sunpetal_herb | 25 | 42 |
 | | goldleaf_herb | 17 | 29 |
 | | silverleaf_herb | 12 | 28 |
 | | fine_goldleaf_herb | 1 | 4 |
 | | fine_sunpetal_herb | 1 | 2 |
-| | fine_silverleaf_herb | **0 before, 1 after** | **0 before, 2 after** |
+| | fine_silverleaf_herb | 0 direct (spendable via `silverleaf_herb`, 12 consumers) | 0 |
 | fishing (median 2) | raw_deepbarb_catfish | 7 | 26 |
 | | glimmerfin_koi | 3 | 8 |
 | | raw_hollowgill_sturgeon | 3 | 17 |
@@ -11642,7 +11646,8 @@ cross-family number.
 | | bog_beet, evergarden_greens, frost_gourd, marsh_rice | 4 each | 8 to 13 |
 | | brook_carrot, gilded_sunmelon | 3 each | 7, 9 |
 | | thornpeak_cabbage | 2 | 4 |
-| | fine_evergarden_greens, fine_gilded_sunmelon | 2 each | 2 each |
+| | fine_gilded_sunmelon | 2 | 2 |
+| | fine_evergarden_greens | 3 | 4 |
 | | the other ten fine twins and three produce | 1 each | 1 to 4 |
 | corpse (median 6) | rough_hide | 24 | 70 |
 | | spider_silk | 13 | 47 |
@@ -11801,7 +11806,7 @@ Each predicted from the change before it was run, then observed.
 | NEVER_STOCKED size | 17 | 16 | 16 |
 | ITEM_ART_PENDING size (vitest arm) | 73 | 74 | 74 |
 | pendingArtCount (scripts/item_art_audit.mjs) | 73 | 74 | 74 |
-| gradedReagentsChecked | 6 | 9 | 9 |
+| gradedReagentsChecked | 6 | 9, then WITHDRAWN | 6 (the fill was reverted, so the pin is back at its original value) |
 | guide hoe table rows | 4 | 5 | 5 |
 | ALL_RECIPES | 153 | 154 | 154 |
 
@@ -11813,8 +11818,18 @@ lesson landing again, one phase after the workflow-cone red that taught it.
 
 ### THE MUTATION PROOFS
 
-Four mutations, four dead, each restored by FILE COPY and verified with
-`diff -q` rather than `git checkout`.
+NINE mutations across the phase, nine dead, each restored by FILE COPY and
+verified with `diff -q` rather than `git checkout`. The table below is the
+five run against the guard itself; the other four are the substitution
+re-proof, the wield threshold, the farming teaching ceiling and the blob byte
+delta, each recorded at its own section.
+
+ONE OF THESE FIVE NO LONGER REPRODUCES, recorded rather than quietly dropped:
+the `fine_copper_ore` row was run against the eastbrook fill, which this phase
+then reverted, so no recipe on the tree names that id any more. Its evidence
+stands for the state it was run in and for nothing else. The demand arm's LIVE
+proof is the `copper_ore` base-strip below, which exercises the substitution
+branch that first mutation never reached.
 
 | mutation | arm proven | outcome |
 |---|---|---|
@@ -12007,12 +12022,23 @@ statement and not a deferral.
   different. Flipping the ACQUISITION alone at tier 5 is one line plus its pin;
   flipping the TIER is a wield-table row, a pattern item, a vendor row and four
   re-derived counts, in that order.
-- **A CONTENT ID RIPPLES PAST THE PHASE'S OWN BATTERY, EVERY TIME.** One new
-  recipe id reached three art-debt pins in three files (one of them under
-  `scripts/`, outside `tests/` entirely), nine hand-listed craft fixtures, two
-  other phases' ledger suites, and a persisted-blob byte band. Every targeted
-  run was green while sixteen files were red. Run the FULL suite before
-  believing a content change is done, and run it on a tree nobody is editing.
+- **A CONTENT ID RIPPLES PAST THE PHASE'S OWN BATTERY, EVERY TIME, AND IT
+  HAPPENED TWICE IN THIS PHASE.** One new recipe id reached three art-debt pins
+  in three files, nine hand-listed craft fixtures, two other phases' ledger
+  suites, and a persisted-blob byte band. Every targeted run was green while
+  sixteen files were red.
+  THE SECOND TIME IS THE ONE WORTH READING, because it happened AFTER the
+  lesson was learned: the fix round that repaired the first wave itself left
+  three suites red (`professions_blob_growth`,
+  `provisioning_supply_line_apex`, `tool_effect_tooltip`), and again only the
+  full suite found them. A fix round is a content change too, and it owes the
+  same sweep as the change it repairs.
+  Of the three art-debt pins, note WHICH one targeted selection cannot reach:
+  the two in `tests/` both import `ITEMS` and `ITEM_ART_PENDING`, so
+  `vitest related` on either source selects them. Only `pendingArtCount`, which
+  lives under `scripts/` and is reached through `execFileSync`, is invisible to
+  selection. Run the FULL suite before believing a content change is done, and
+  run it on a tree nobody is editing.
 - **PROSE HAS NO TEST.** Three citations this phase wrote into
   docs/design/professions.md named files that do not contain the rule they
   claimed to enforce. The matrix's own closing line, that the test is the
@@ -12033,10 +12059,11 @@ statement and not a deferral.
    102 unshipped branch-only ids as permanent API on a branch that has not
    merged. Phases 11e through 11i all declined for the same reason (none of
    their ids are in the golden). Ratify or overrule.
-2. **Deliverable 2's fill list is empty on the supply side**, because the
-   audit found zero empty bands. The fills this phase shipped are on the
-   DEMAND side instead, which the phase file did not anticipate because it
-   expected logging to be a live R20 violation.
+2. **Deliverable 2 SHIPPED NO FILL AT ALL**, on either arm. The supply audit
+   found zero empty bands, and the demand side's three candidates were
+   withdrawn with the false claim behind them, so the fill this phase briefly
+   shipped was reverted in the same phase. The phase file anticipated neither,
+   because it expected logging to be a live masterwrought R20 violation.
 3. **Decision A executed over the 11i handoff**, handed back above.
 
 ### OPEN ITEMS, ALL THE MAINTAINER'S
@@ -12059,8 +12086,10 @@ stale-client window), 11h's two deviations, 11i's session cap 15 s to 16 s,
 - A numeric floor on bills per band, on either arm.
 - The apex hoe at engineering 150. Unlearnable through every shipped channel.
 - Leaving `osmium_hoe` off the Marks counter while the apex hoe joins it.
-- An exemption list inside the coverage test. The three orphans were FILLED,
-  not exempted, which is what the rejection actually demands.
+- An exemption list inside the coverage test. The three eastbrook grades were
+  never exempted: the arm was taught the SUBSTITUTION RULE it had been missing,
+  which is a correction to the guard rather than a carve-out in it, and the
+  distinction is the whole point of the rejection. No id is skipped anywhere.
 - A second coverage test re-deriving the same supply map.
 - Raising farming's maxSkill to make the apex hoe fit.
 - Growing `PRE_TRAINING_RECIPE_IDS`.

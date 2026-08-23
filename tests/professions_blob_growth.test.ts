@@ -634,7 +634,11 @@ describe('the professions blob growth bound (phase 16)', () => {
     // this note, which is the thing worth recording: a single new recipe id
     // was enough to cross it, and the failure looks like a growth regression
     // when it is one row of a content table. The edge moves by the measured
-    // delta and no further, so the band keeps its width and its teeth.
+    // delta and no further. That WIDENS the band (the lower edge is unmoved,
+    // so 320 becomes 344) and deliberately so: what a tracking band preserves
+    // is its HEADROOM above the measurement, 11 bytes before and 11 after, not
+    // its width. Keeping the tripwire hugging the measurement is what stops it
+    // becoming a budget.
     const bytes = professionsBytes(s2);
     expect(bytes).toBeGreaterThan(16544);
     expect(bytes).toBeLessThan(16888);

@@ -3708,8 +3708,10 @@ const ITEM_RECIPES: Record<string, IconRecipe> = {
   // The hoe ladder (the crop-ladder phase's tool half), same ART_PENDING
   // drawn stand-in treatment and the same A4 pairwise-distinctness demand: a
   // staff haft plus an angled blade up the material palettes, glow on the
-  // rare top rung only (the gorraks_cleaver precedent). NO sparkle on any
-  // rung: sparkle is the fine-grade marker.
+  // TOP TWO rungs (the rare osmium and the epic evergarden; the
+  // gorraks_cleaver precedent, widened at masterwrought Phase 11j when the
+  // ladder gained a rung above the rare one rather than at it). NO sparkle on
+  // any rung: sparkle is the fine-grade marker.
   garden_hoe: r('wood', 'earthBrown', [
     { p: 'staff', pal: 'earthBrown', rot: 0.7 },
     { p: 'fang', pal: 'steel', x: 12, y: -14, s: 0.5, rot: 2.4 },

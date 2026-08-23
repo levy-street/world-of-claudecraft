@@ -1288,7 +1288,8 @@ describe('the farming ladder: every farming zone arrives mechanically whole', ()
         ).toBe(false);
       }
     }
-    expect(delveRowsSeen).toBeGreaterThan(0);
+    // At the real count: the sweep must really have walked both counters.
+    expect(delveRowsSeen, 'every row across both delve shops').toBe(28);
     // Same shape as the marks allowance above: the exception cannot outlive
     // the channel it was written for, so every allowed rung must really be on
     // a counter. IDS rather than ROWS, deliberately: a row count is satisfied

@@ -2992,11 +2992,15 @@ export const DEEDS: Record<string, DeedDef> = {
   // sunpetal_sickle, tidewrought_fishing_rod) carry no deed either: the hoe
   // matching them is the symmetry, and it is the reason.
   //
-  // The rod above is NOT the counter-example it looks like. col_deepest_cast
-  // celebrates reaching the deepest CATCH BAND, which is content the rod
-  // opens and nothing else does. The apex hoe opens no crop tier at all, so
-  // the same deed written for it would celebrate owning an item rather than
-  // conquering anything, which is what the deed doctrine refuses.
+  // The rod above is NOT the counter-example it looks like, and the
+  // distinction is narrower than it first reads. BOTH deeds would be
+  // collectItems triggers: col_deepest_cast fires on obtaining the rod by any
+  // route, market purchase included, as its own note directly above says. So
+  // the difference is not owning-versus-conquering. It is WHAT THE OWNED
+  // THING OPENS: the clockreel is the only way to reach catch band 5, so
+  // holding one really does mark reaching the deepest water, while the apex
+  // hoe opens no crop tier the rung below does not already reach. A deed on
+  // the hoe would mark a purchase and nothing else.
 
   // The farming celebration deeds (D13), appended per the append-only
   // DEED_ORDER contract. All cosmetic, zero rng, no power. The farm:planted
