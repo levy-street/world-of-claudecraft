@@ -11620,9 +11620,20 @@ across the merge.
 THE SHARD WEIGHT TABLE IS A KEY UNION, not a take: the release's newer harvest
 (run 32621561241, 2960 rows) wins on all 2863 shared keys, 31 branch-only rows
 keep their measured weight, and 4 more are dropped because their test file no
-longer exists in the merged tree. The release's table alone was measured first
-and left the completeness guard at 0.9524 against its 0.95 floor; the union
-restores it to 0.9624.
+longer exists in the merged tree.
+
+THE REASON FIRST RECORDED FOR THE UNION WAS WRONG, and the fix round corrected
+both the provenance and this paragraph. It said the release table alone left the
+completeness guard at 0.9524 against its 0.95 floor. That walk counted
+tests/browser and *.test.mjs, which the guard's own walkTestFiles excludes, so
+it graded a population the guard never looks at. Re-measured the GUARD's way
+over its 3063 walked files: the release table alone is 2960/3063 = 0.9664, well
+clear of the floor, and the union is 2991/3063 = 0.9765. The union is still
+right, but not for the reason given: it is not what keeps the guard green, it is
+what keeps the 31 branch-only rows on their MEASURED durations instead of the
+median fallback, which is what the LPT packing is actually graded on. A coverage
+figure is only evidence about the set it walked, which is the same lesson the
+faq.a7 grep taught one commit later.
 
 THE RELEASE-MERGE AUDIT came back otherwise clean, and the reason is worth one
 line: the release touched NO server code at all, so the legacy-arm, new-endpoint
