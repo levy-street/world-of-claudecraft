@@ -1222,8 +1222,8 @@ export const BASE_ITEMS: Record<string, ItemDef> = {
   // on shipped cooking and alchemy ladder rows and every one of these comments
   // silently became a subset. Read the sweep, not the sentence. Phase 11h made
   // it the TANK plate's accent: recipe_stonepot_stew at cooking 100 takes 2.
-  // (Added at the Phase 11h QA. Five of the six crops that phase put on a new
-  // bill had this note; the gourd alone was left without one.)
+  // (Added at the Phase 11h QA. Six of the seven ids that phase put on a new
+  // bill carried this note already; the gourd alone was left without one.)
   frost_gourd: {
     id: 'frost_gourd',
     name: 'Frost Gourd',

@@ -33,6 +33,7 @@ import { ITEMS, NPCS, STATIONS } from '../src/sim/data';
 import { requiredReagentCountFor, resolveCraft } from '../src/sim/professions/crafting';
 import { stationsOfType } from '../src/sim/professions/stations';
 import type { ProfessionRecipeRecord } from '../src/sim/professions/types';
+import { materialCostMultiplier } from '../src/sim/professions/wheel';
 import {
   TIER3_TOOL_WIELD_PROFICIENCY,
   TIER4_TOOL_WIELD_PROFICIENCY,
@@ -530,15 +531,13 @@ describe('masterwrought Phase 11h GATE A: the amended uniform-bill rule', () => 
       [...durations].sort((a, b) => a - b),
       'the three plate crops grow at',
     ).toEqual([14_400_000, 15_000_000, 16_200_000]);
-    // The spread itself, which is the number the record states in words.
-    expect(
-      Math.max(...durations) / Math.min(...durations),
-      'a 12.5 percent wall-clock spread from cheapest to dearest',
-    ).toBeCloseTo(1.125, 10);
-    // And it really is a spread rather than three equal timers, which is the
-    // crop ladder's own composition rule and the reason the copper arm above
-    // cannot stand alone as the whole cost claim.
-    expect(new Set(durations).size, 'three distinct timers, one per plate crop').toBe(3);
+    // THE THREE LITERALS ARE THE CLAIM: 4h, 4h10m and 4h30m, a 12.5 percent
+    // spread from cheapest to dearest (16,200,000 / 14,400,000 = 1.125), and
+    // three distinct timers rather than one shared, which is the crop ladder's
+    // own composition rule. A ratio assertion and a set-size assertion used to
+    // restate both facts beneath this line; the literals fully determine them,
+    // so neither could fail independently and both are gone. The figures belong
+    // in the sentence a reader reads, not in an assertion that cannot fire.
   });
 
   it("the amendment's predicate REFUSES the shapes it forbids, and admits 11i's fish row", () => {
@@ -577,8 +576,19 @@ describe('masterwrought Phase 11h GATE A: the amended uniform-bill rule', () => 
     expect(withFish.cropRowsPerPlate, 'and does not count as a crop row').toEqual([1, 1, 1]);
     // THE SECOND RULE THE SAME ROW HAS TO CLEAR, driven here so the interlock
     // is a fact about the merged rule set rather than about one predicate.
-    // Produce per plate is read off the LIVE bill, so a later re-tune of a crop
-    // count moves the required fish count with it instead of rotting this arm.
+    //
+    // THE LOOP IS THE WHOLE GUARD, and saying so is the point: it is what reds
+    // if FISH_ROW.count is walked back to 2, because it puts the count on one
+    // side and the LIVE plate produce on the other. A companion assertion used
+    // to sit under it claiming to stop that walk-back, and it did nothing of the
+    // sort: it hardcoded 2 instead of reading FISH_ROW.count, and the toEqual
+    // below already determines the value it read, so it could not fail and
+    // would not have caught the thing it named. Deleted rather than reworded.
+    //
+    // FISH_ROW.count is a LITERAL, not derived: a crop retune reds the toEqual
+    // below and the next author raises the count by hand, which is the intended
+    // cost. An earlier comment here claimed the count moved with the crop; it
+    // does not.
     const plateProduce = live.map((bill) =>
       bill.filter((g) => PRODUCE_IDS.has(g.itemId)).reduce((t, g) => t + g.count, 0),
     );
@@ -589,14 +599,6 @@ describe('masterwrought Phase 11h GATE A: the amended uniform-bill rule', () => 
         `a uniform fish row must outnumber the plate's produce ${produce} to stay fish-forward`,
       ).toBeGreaterThan(produce);
     }
-    // And the count this control originally carried is REFUSED by that rule, so
-    // the correction cannot be quietly walked back to 2. SOME, not EVERY: the
-    // claim is that a carp at 2 clears on NO plate, and an `every` form would
-    // still pass while 2 cleared on two plates of the three.
-    expect(
-      plateProduce.some((produce) => 2 > produce),
-      'a carp at 2 must clear the fish-forward rule on NO plate',
-    ).toBe(false);
 
     // REFUSED: a fish row on only TWO of the three, which is the mistake 11i
     // could actually make.
@@ -970,16 +972,18 @@ describe('masterwrought Phase 11h: obtainability, derived rather than argued', (
     ] as const) {
       expect(farmCropSkillThreshold(tier), `tier ${tier} plant threshold`).toBe(threshold);
       expect(wieldRequirementForTier(tier), `tier ${tier} hoe wield requirement`).toBe(wield);
-      // The gate that actually binds is the LARGER of the two, and on both
-      // tiers this phase reaches it is the hoe rather than the threshold. Both
-      // sides literal, for the reason above.
+      // The gate that actually binds is the HOE, not the threshold, and that is
+      // the claim the corrected wiki copy rests on. PRODUCTION ON BOTH SIDES:
+      // the first repair of this arm put the tuple's own literals on both sides
+      // here (`expect(wield).toBeGreaterThan(threshold)` reduces to
+      // `expect(70).toBeGreaterThan(50)`), which is the second dead assertion
+      // this one arm has produced. It reads the two resolvers instead, so
+      // moving either one moves exactly one side. The redundant Math.max form
+      // that sat beside it is gone: the two pins above already determine it.
       expect(
-        Math.max(farmCropSkillThreshold(tier), wieldRequirementForTier(tier)),
-        `tier ${tier} effective plant floor`,
-      ).toBe(wield);
-      expect(wield, `the hoe is what binds tier ${tier}, not the threshold`).toBeGreaterThan(
-        threshold,
-      );
+        wieldRequirementForTier(tier),
+        `tier ${tier}: the hoe rung must bind, not the plant threshold`,
+      ).toBeGreaterThan(farmCropSkillThreshold(tier));
     }
     // And both floors still sit under the shipped farming cap, so the crops
     // this phase names stay reachable rather than merely dearer.
@@ -1314,14 +1318,35 @@ describe('masterwrought Phase 11h: every apex bill still CRAFTS', () => {
     // and the cauldron sunpetal_herb 4, so the sweep reaches a count-4 row on
     // five of the eight; the three flasks top out at 2 and are covered by the
     // removal case alone, which is stated rather than hidden.
+    // THE MULTIPLIER ITSELF, pinned to its literal, and this is what actually
+    // makes a retune visit this file. The leftover sweep below catches a
+    // discount REMOVED and a discount deepened past 25 percent, and nothing in
+    // between: with leftover(n) = n - max(1, floor(n * m)) over the counts these
+    // eight bills carry (1, 2, 3, 4), every m from 0.75 to 0.9 yields exactly
+    // the leftovers 0.8 does, so 0.2 to 0.1 or 0.2 to 0.25 would slip through
+    // the whole sweep. One line closes the entire neighbourhood.
+    // Pinned at both sides of the specialization threshold, so the constant and
+    // the threshold's position both have to move deliberately. Every row here
+    // sits at 100 or 125, well past it, which is why the leftovers below are
+    // discounted at all.
+    const craft = recipe.professionId;
+    expect(
+      materialCostMultiplier(craftSkills, craft),
+      'the shipped specialization discount is 20 percent',
+    ).toBe(0.8);
+    expect(
+      materialCostMultiplier({ [craft]: 50 }, craft),
+      'and there is no discount below the threshold',
+    ).toBe(1);
     for (const reagent of recipe.reagents) {
       expect(
         rig.sim.countItem(reagent.itemId, rig.pid),
         `${recipe.id} leftover ${reagent.itemId} at the shipped 20 percent discount`,
       ).toBe(reagent.count - Math.max(1, Math.floor(reagent.count * 0.8)));
     }
-    // And the sweep really does reach a count that can move, or the paragraph
-    // above would be describing coverage this row does not have.
+    // And the sweep reaches a count that can move under a DEEP retune, which is
+    // the second signal rather than the only one now that the multiplier above
+    // is pinned directly.
     const discriminating = recipe.reagents.filter((g) => g.count >= 4).length;
     expect(
       discriminating > 0 || THREE_FLASKS.includes(recipe.id),

@@ -29,6 +29,7 @@ import { ITEMS, STATIONS } from '../src/sim/data';
 import { requiredReagentCountFor, resolveCraft } from '../src/sim/professions/crafting';
 import { stationsOfType } from '../src/sim/professions/stations';
 import type { ProfessionRecipeRecord } from '../src/sim/professions/types';
+import { materialCostMultiplier } from '../src/sim/professions/wheel';
 import { Sim } from '../src/sim/sim';
 
 /** Every farm PRODUCE id and its fine twin, derived from the crop catalog. The
@@ -710,7 +711,7 @@ describe('masterwrought R17 RULE 2: the accent rule', () => {
     // rot the packet keeps finding in its own records. Listed by id, so the
     // maintainer decision this feeds (masterwrought R17 RULE 2's value-half
     // reading) is costed against a set rather than a count.
-    expect(ties, 'exactly one shipped row ties the dominant reagent').toEqual([
+    expect(ties.sort(), 'exactly one shipped row ties the dominant reagent').toEqual([
       'recipe_laden_hearth/fine_evergarden_greens',
     ]);
   });
@@ -1057,6 +1058,23 @@ describe('every touched bill still CRAFTS, not just type-checks', () => {
     // rather than self-comparing: the required count comes from the pricing
     // rule and the leftover from what resolveCraft actually spent.
     const craftSkills = { [recipe.professionId]: recipe.skillReq };
+    // AND THE MULTIPLIER ITSELF, pinned at BOTH SIDES OF THE THRESHOLD (Phase
+    // 11h QA fix-round review). Everything below runs requiredReagentCountFor on
+    // both sides, so a retune of the shipped discount moves the expectation and
+    // the observation together and this arm stays green through it. Pinned at
+    // two skill levels rather than one because this file sweeps the LEVELING
+    // rungs as well as the 75 one: below the specialization threshold there is
+    // no discount at all, and a single 0.8 pin here reds on every rung-0 row.
+    // The pair pins the constant AND the threshold's position.
+    const craft = recipe.professionId;
+    expect(
+      materialCostMultiplier({ [craft]: 100 }, craft),
+      'the shipped specialization discount is 20 percent at or above the threshold',
+    ).toBe(0.8);
+    expect(
+      materialCostMultiplier({ [craft]: 50 }, craft),
+      'and there is no discount below it',
+    ).toBe(1);
     for (const reagent of recipe.reagents) {
       const required = requiredReagentCountFor(
         false,

@@ -1963,6 +1963,20 @@ describe('Guide professions generated content accuracy', () => {
     // full revert of the apex paragraph. Measured, not assumed.
     expect(cookHtml).toContain('tells the three apex role dishes apart');
     expect(alcHtml).toContain('the Grand Cauldron at the very top');
+    // THE GATE CLAUSE, pinned BOTH WAYS (Phase 11h QA, fix-round review). The
+    // page shipped "all three ask Farming 50 and nothing more", which the plant
+    // path refuses: it also wants a tier-3 hoe, and that hoe wields at Farming
+    // 70, so a farmer at 50 who read this page was denied with reason 'tool'.
+    // The correction was made with no pin at all, which is the same shape as the
+    // qr-11G-BEDS hole one arm below: the surviving anchors sit in OTHER
+    // sentences of the same paragraph, so a revert of just this clause would
+    // have left every suite green. The positive half names the new clause; the
+    // negative half is what stops a "supplement rather than replace" edit from
+    // re-adding the false floor beside the true one.
+    expect(cookHtml).toContain('growing your own means a Skysilver Hoe');
+    expect(cookHtml, 'the retired Farming-50 floor must be gone, not supplemented').not.toContain(
+      'ask Farming 50 and nothing more',
+    );
     // The headings enumerated the suppliers too, so they went stale with the
     // bodies and are pinned with them.
     expect(cookHtml).toContain('A pantry fed by rod, knife, and furrow');

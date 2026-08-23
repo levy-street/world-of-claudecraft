@@ -3284,11 +3284,14 @@ export const FARM_RECIPES: ProfessionRecipeRecord[] = [
   // plain sibling at the same rung, plus the kitchen staple salt (the tier-1
   // row adds the pottage-precedent vale_wheat binder, see below). NO fine
   // twins here: the fine_marsh_rice / fine_highland_barley consumer set is an
-  // OPEN maintainer question, and THREE of the five dish twins above stay
-  // single-owner. (This read "the five dish twins above stay single-owner"
-  // until the Phase 11h QA corrected it: 11h gave fine_gilded_sunmelon and
-  // fine_evergarden_greens a second owner apiece, the two skill-125 capstones,
-  // so the single-owner claim now scopes to the three tier 1 to 3 twins.)
+  // OPEN maintainer question, and SEVEN of the NINE dish twins above stay
+  // single-owner: 11h gave fine_gilded_sunmelon and fine_evergarden_greens a
+  // second owner apiece, the two skill-125 capstones, and the other seven are
+  // untouched. (This read "the five dish twins above stay single-owner", stale
+  // since Phase 11e added the pumpkin pair. The Phase 11h QA first corrected it
+  // to "three of the five" by subtracting from the stale number instead of
+  // counting the live table, which is the exact failure it was correcting; the
+  // fix-round review counted the nine.)
   // The tier 3/4 pair SHIPPED reagent-dormant under deviation (bo), trainable
   // and well-formed but with no tier 3/4 seed faucet. NO LONGER DORMANT: GATE 1
   // (Phase 11e) stocked all eight upper seeds at farmer_hollis and
