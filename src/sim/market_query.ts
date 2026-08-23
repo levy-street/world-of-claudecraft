@@ -101,6 +101,8 @@ export const MARKET_SEARCH_MAX_LENGTH = 40;
 // Localized search stays client-owned, but the server must decide which catalog ids a
 // client matched. The wire carries one bit per item against this stable code-unit-sorted
 // catalog. Its signature rejects masks minted for an older or different item catalog.
+// During a mixed-build deploy that rejection temporarily removes localized-only matches;
+// canonical English-name and item-id matching continue through the ordinary search path.
 export const MARKET_LOCALIZED_ITEM_CATALOG_IDS: readonly string[] = Object.freeze(
   Object.keys(ITEMS).sort(),
 );

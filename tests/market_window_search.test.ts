@@ -98,6 +98,47 @@ function typeSearch(root: HTMLElement, value: string): void {
   search.dispatchEvent(new Event('input'));
 }
 
+function chooseMarketFilter(root: HTMLElement, key: string, value: string): void {
+  const option = root.querySelector<HTMLElement>(
+    `[data-market-filter-menu="${key}"] [data-market-filter-option="${value}"]`,
+  );
+  expect(option).toBeTruthy();
+  option?.click();
+}
+
+const onlineQueryRebuildCases: Array<{
+  name: string;
+  apply: (root: HTMLElement) => void;
+  expectedQuery: Partial<MarketQuery>;
+}> = [
+  {
+    name: 'item-type filter',
+    apply: (root) => chooseMarketFilter(root, 'itemType', 'weapon'),
+    expectedQuery: { itemType: 'weapon' },
+  },
+  {
+    name: 'rarity filter',
+    apply: (root) => chooseMarketFilter(root, 'rarity', 'poor'),
+    expectedQuery: { rarity: 'poor' },
+  },
+  {
+    name: 'sort order',
+    apply: (root) => chooseMarketFilter(root, 'sort', 'price'),
+    expectedQuery: { sort: 'price' },
+  },
+  {
+    name: 'lowest-price collapse',
+    apply: (root) => {
+      const checkbox = root.querySelector<HTMLInputElement>('.mkt-collapse-checkbox');
+      expect(checkbox).toBeTruthy();
+      if (!checkbox) return;
+      checkbox.checked = true;
+      checkbox.dispatchEvent(new Event('change'));
+    },
+    expectedQuery: { collapseLowest: true },
+  },
+];
+
 describe('World Market localized search query construction', () => {
   it('adds membership for the localized item name painted in the active locale', () => {
     const h = harness();
@@ -352,6 +393,39 @@ describe('World Market localized search query construction', () => {
     expect(h.root.querySelector('.mkt-status')?.textContent).toBe(priorStatus);
     expect(h.root.querySelector<HTMLInputElement>('.mkt-search')?.value).toBe('fa');
   });
+
+  it.each(onlineQueryRebuildCases)(
+    'keeps the last accepted rows visible while an online $name query is in flight',
+    ({ apply, expectedQuery }) => {
+      const h = harness();
+      h.world.marketInfo = info({
+        listings: [
+          {
+            id: 1,
+            sellerName: 'Current Results',
+            itemId: 'wolf_fang',
+            count: 1,
+            price: 100,
+            mine: false,
+            house: false,
+          },
+        ],
+        totalCount: 1,
+      });
+      h.window.open();
+      const priorStatus = h.root.querySelector('.mkt-status')?.textContent;
+      expect(h.root.querySelector('.mkt-list')?.textContent).toContain('Current Results');
+      expect(priorStatus).toBeTruthy();
+
+      // An online host records the query here but keeps the previous MarketInfo until
+      // the authoritative response completes its round trip.
+      apply(h.root);
+
+      expect(h.queries.at(-1)).toMatchObject(expectedQuery);
+      expect(h.root.querySelector('.mkt-list')?.textContent).toContain('Current Results');
+      expect(h.root.querySelector('.mkt-status')?.textContent).toBe(priorStatus);
+    },
+  );
 
   it('re-pushes once after reconnect even when the raw echo still matches', () => {
     const h = harness();

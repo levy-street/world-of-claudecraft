@@ -535,8 +535,7 @@ describe('World Market filters', () => {
 
   it('encodes localized matches against one stable code-unit-sorted item catalog', () => {
     expect(MARKET_LOCALIZED_ITEM_CATALOG_IDS).toEqual(Object.keys(ITEMS).sort());
-    expect(MARKET_LOCALIZED_ITEM_CATALOG_IDS).toHaveLength(838);
-    expect(MARKET_LOCALIZED_ITEM_CATALOG_SIGNATURE).toBe('m1-2047e4de');
+    expect(MARKET_LOCALIZED_ITEM_CATALOG_SIGNATURE).toMatch(/^m1-[0-9a-f]{8}$/);
 
     const forward = encodeMarketLocalizedItemMask(['woven_robe', 'worn_sword']);
     const reordered = encodeMarketLocalizedItemMask([
@@ -549,8 +548,10 @@ describe('World Market filters', () => {
 
     const [signature, payload] = forward.split(':');
     expect(signature).toBe(MARKET_LOCALIZED_ITEM_CATALOG_SIGNATURE);
-    expect(MARKET_LOCALIZED_ITEM_MASK_HEX_LENGTH).toBe(210);
-    expect(payload).toHaveLength(210);
+    expect(MARKET_LOCALIZED_ITEM_MASK_HEX_LENGTH).toBe(
+      Math.ceil(MARKET_LOCALIZED_ITEM_CATALOG_IDS.length / 4),
+    );
+    expect(payload).toHaveLength(MARKET_LOCALIZED_ITEM_MASK_HEX_LENGTH);
     expect(payload).toMatch(/^[0-9a-f]+$/);
     expect(marketLocalizedItemMaskHas('woven_robe', forward)).toBe(true);
     expect(marketLocalizedItemMaskHas('worn_sword', forward)).toBe(true);

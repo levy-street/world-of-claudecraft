@@ -694,6 +694,7 @@ export class MarketWindow {
     // streams back filtered results.
     const search = this.deps.root().querySelector<HTMLInputElement>('.mkt-search');
     let list = body.querySelector('.mkt-list') as HTMLElement | null;
+    const canRetainAcceptedBrowsePaint = list !== null;
     if (!list) {
       body.innerHTML = '';
       list = document.createElement('div');
@@ -737,7 +738,10 @@ export class MarketWindow {
     // request. Keep the last accepted rows, pager, and live-region announcement until
     // the authoritative echo for the current request arrives; painting the rejected
     // response would make the visible page disagree with the query we keep sending.
-    if (!pageState.accepted) return;
+    // A full render (filter, sort, or collapse change) has already discarded that
+    // accepted DOM, so paint the current mirror provisionally instead of leaving the
+    // newly created list and status empty for the whole online round trip.
+    if (!pageState.accepted && canRetainAcceptedBrowsePaint) return;
     list.innerHTML = '';
     if (view.state === 'empty') {
       const empty = document.createElement('div');

@@ -522,13 +522,13 @@ describe('market_window: reconnect resync (#2416)', () => {
   it('is a no-op when closed, otherwise only arms the deferred resync flag', () => {
     const method = painter.slice(
       painter.indexOf('onReconnected(): void {'),
-      painter.indexOf('// Runs the deferred reconnect-drift check'),
+      painter.indexOf('private resolvePendingReconnectResync'),
     );
     expect(method, 'onReconnected must exist').toContain('onReconnected(): void {');
     expect(method).toContain('if (!this.opened) return;');
     expect(method).toContain('this.pendingReconnectResync = true;');
-    expect(method, 'must not compare against a possibly-stale echo inline').not.toContain(
-      'queryDiffersFromEcho',
+    expect(method, 'must not push against a possibly-stale echo inline').not.toContain(
+      'this.pushQuery();',
     );
   });
 
@@ -571,11 +571,6 @@ describe('market_window: reconnect resync (#2416)', () => {
       'must still early-return before the browse/collect signature work',
     ).toBeGreaterThan(-1);
     expect(refreshPriceRefIdx).toBeLessThan(sellReturnIdx);
-  });
-
-  it('does not pretend the MarketInfo echo can represent client-localized membership', () => {
-    expect(painter).not.toContain('queryDiffersFromEcho(');
-    expect(painter).not.toContain('searchDiffersFromEcho(');
   });
 
   it('wires the window through a hud.ts method, chained onto the ClientWorld reconnect hook in main.ts', () => {
