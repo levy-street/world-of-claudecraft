@@ -30,6 +30,15 @@ import {
 // here; the painter only ever uses the returned string as an <img src>.
 vi.mock('../src/ui/icons', () => ({
   iconDataUrl: (kind: string, id: string) => `data:,${kind}:${id}`,
+  // reliquary_cell_art reads both committed-art pipelines to decide whether a
+  // cell's tile is opaque (masterwrought Phase 11i: a catalogued item whose
+  // painting is still parked in ITEM_ART_PENDING falls to the procedural
+  // compositor, which paints an opaque tile that must not be darkened). This
+  // mock answers "no committed art" for every id, which is the arm these
+  // suites want: they drive layout and behavior, not art resolution, and a
+  // uniform answer keeps every cell on one branch.
+  itemImageUrl: () => null,
+  weaponIconUrl: () => null,
 }));
 
 // A Conquerors page and a Professions page: the pair that makes a cross-shelf

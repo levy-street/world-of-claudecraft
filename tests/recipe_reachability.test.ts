@@ -29,6 +29,8 @@
 //   - a fishing catch that first appears in band B needs a rod whose tier
 //     satisfies the shipped band gate (canGatherTier(tier, B + 1));
 //   - a node material of tier T needs a tool of its profession at tier T;
+//   - a FINE grade needs a tool STRICTLY ABOVE its base material's tier, which
+//     is the gate the land family actually closes a circuit on (see below);
 //   - a tool is either bought/dropped (free) or crafted, and a crafted tool
 //     needs its own bill filled first.
 //
@@ -43,7 +45,7 @@ import { FISHING_TABLES_BY_BAND, RAW_COOKING_CATCH_IDS } from '../src/sim/conten
 import { ALL_RECIPES } from '../src/sim/content/recipes';
 import { ITEMS } from '../src/sim/data';
 import { NODE_MATERIAL_TABLE, NODE_TYPE_BY_PROFESSION } from '../src/sim/professions/gathering';
-import { gatherMaterialTier } from '../src/sim/professions/material_grades';
+import { baseMaterialFor, gatherMaterialTier } from '../src/sim/professions/material_grades';
 import { canGatherTier } from '../src/sim/professions/tools';
 
 /** Every item a recipe produces. Nothing here is free at the start of a realm. */
@@ -84,6 +86,32 @@ function toolGateFor(itemId: string): { professionId: string; nodeTier: number }
       if (rows.some((r) => r.itemId === itemId)) {
         // First band it appears in wins; band 0 is free water.
         return band === 0 ? null : { professionId: 'fishing', nodeTier: band + 1 };
+      }
+    }
+  }
+  // THE FINE GRADES FIRST, because they are where the LAND family can close a
+  // circuit and they are invisible to the node table. Every crafted land tool
+  // consumes one (the thorium pick takes fine_iron_ore, the arcanite pick
+  // fine_thorium_ore, the two axes and the two sickles their own), and a fine
+  // grade is deliberately NOT a node row: material_grades.ts says so in its own
+  // header, "a fine grade is not a tenth node yield, it is a second grade of an
+  // existing one". So the base-material loop below cannot see them, and before
+  // this branch existed the fixpoint seeded all six FREE, which meant the model
+  // treated the entire crafted land-tool ladder as unconditionally reachable at
+  // exactly the point that ladder could deadlock.
+  //
+  // The gate is `gatherTier + 1` rather than `gatherTier` because yieldsFineGrade
+  // requires the tool STRICTLY ABOVE the material, and canGatherTier is
+  // toolTierCovers, a `>=` comparison. Adding one expresses "strictly above"
+  // through the shipped comparator instead of re-implementing the rule here.
+  const base = baseMaterialFor(itemId);
+  if (base !== undefined) {
+    for (const [professionId, nodeType] of Object.entries(NODE_TYPE_BY_PROFESSION)) {
+      if (!nodeType) continue;
+      for (const entry of Object.values(NODE_MATERIAL_TABLE[nodeType])) {
+        if (entry.itemId === base) {
+          return { professionId, nodeTier: Math.max(1, gatherMaterialTier(base) ?? 1) + 1 };
+        }
       }
     }
   }
@@ -231,6 +259,22 @@ describe('the crafting economy bootstraps from an empty realm', () => {
     expect(toolGateFor('raw_deepbarb_catfish')).toEqual({ professionId: 'fishing', nodeTier: 4 });
     // A band-0 catch is free water, not a gate.
     expect(toolGateFor('raw_mirror_trout')).toBeNull();
+    // THE LAND HALF IS GATED TOO, and this is the arm that says so. Without the
+    // fine-grade branch every crafted land tool was reachable from an empty
+    // realm for free, so "the model tracks the tool ladder" was true of fishing
+    // and empty of mining, logging and herbalism. A fine grade asks one tier
+    // ABOVE its base, which is yieldsFineGrade's strictly-above rule read
+    // through canGatherTier's >= comparator.
+    expect(toolGateFor('fine_iron_ore')).toEqual({ professionId: 'mining', nodeTier: 3 });
+    expect(toolGateFor('fine_thorium_ore')).toEqual({ professionId: 'mining', nodeTier: 4 });
+    // The base material it upgrades from is gated one tier LOWER, so the pair
+    // really does express a step rather than two copies of one number.
+    expect(toolGateFor('iron_ore')).toEqual({ professionId: 'mining', nodeTier: 2 });
+    expect(toolGateFor('thorium_ore')).toEqual({ professionId: 'mining', nodeTier: 3 });
+    // The other two professions carry the same shape, so the branch is not a
+    // mining special case.
+    expect(toolGateFor('fine_elderwood_log')?.professionId).toBe('logging');
+    expect(toolGateFor('fine_sunpetal_herb')?.professionId).toBe('herbalism');
     // And the ladder really is climbed rather than assumed: the top catch is
     // only obtainable in the fixpoint because the tier-6 rod becomes craftable
     // first, which is the ordering the deadlock inverted.

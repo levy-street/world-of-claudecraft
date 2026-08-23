@@ -5919,6 +5919,18 @@ export function isUnknownIconRecipe(recipe: IconRecipe): boolean {
 export function hasExplicitAbilityIcon(id: string): boolean {
   return Object.hasOwn(ABILITY_RECIPES, id);
 }
+/** Whether an ITEM id has an authored recipe rather than a keyword fallback.
+ *
+ *  The twin of the two predicates around it, added because its absence was
+ *  quietly load-bearing: `isUnknownIconRecipe` is identity against the single
+ *  UNKNOWN_RECIPE sentinel, so it separates "nothing matched at all" from
+ *  everything else and does NOT separate an authored recipe from one
+ *  `itemFallback` composed out of the item's school and name keywords. A guard
+ *  that means to rule on authored art has to ask this instead.
+ */
+export function hasExplicitItemIcon(id: string): boolean {
+  return Object.hasOwn(ITEM_RECIPES, id);
+}
 export function hasExplicitAuraIcon(id: string): boolean {
   return id in AURA_RECIPES;
 }

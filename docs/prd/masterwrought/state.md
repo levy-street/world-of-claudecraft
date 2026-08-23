@@ -12109,6 +12109,55 @@ not, with the two lists disjoint and exhaustive over the radial. A new plate can
 no longer land in neither. Driven: dropping the capstone feast from the family
 reds naming it.
 
+### THE THIRD REVIEW PASS: THE REACHABILITY MODEL ONLY MODELLED HALF THE GAME
+
+Three more, and the first of them is the one that mattered, because it means the
+guard written to make a whole defect class checkable could still only check one
+family of it.
+
+**EVERY CRAFTED LAND TOOL CONSUMES A FINE GRADE, and fine grades were free.**
+The thorium pick takes fine_iron_ore, the arcanite pick fine_thorium_ore, and
+the two axes and two sickles take their own. A fine grade is deliberately NOT a
+node row (material_grades.ts states it in its own header: "a fine grade is not a
+tenth node yield, it is a second grade of an existing one"), so toolGateFor
+returned null for all six and the fixpoint SEEDED THEM FREE. The model therefore
+treated the entire crafted land-tool ladder as unconditionally reachable from an
+empty realm, at exactly the point the land family can close a circuit, since a
+fine grade is strictly harder to get than its base. No live deadlock (the chain
+is legitimately open, each tool needing the rung below), but the file's central
+claim, "what the model tracks exactly is the tool ladder", was true of fishing
+and empty of mining, logging and herbalism.
+
+The gate is `gatherMaterialTier(base) + 1`, and the plus one is the point:
+`yieldsFineGrade` wants the tool STRICTLY ABOVE the material and `canGatherTier`
+is a `>=` comparator, so adding one expresses the rule through the shipped
+comparator instead of re-implementing it. Driven: pointing the thorium pick at
+the fine grade its own output gates now reds naming both that recipe AND the
+arcanite pick above it, so the cascade works as well as the direct case.
+
+**A COMMENT CLAIMED A FILTER THAT DID NOT EXIST, and it was hiding 21 ids.**
+A4c's derivation said it filtered keyword fallbacks; the code checked only
+`isUnknownIconRecipe`, which is identity against the single UNKNOWN sentinel and
+separates "nothing matched at all" from everything else, not an authored recipe
+from one `itemFallback` composed out of an item's name keywords. `icons.ts` had
+`hasExplicitAbilityIcon` and `hasExplicitAuraIcon` and no item twin, so there
+was nothing to filter on; `hasExplicitItemIcon` is added.
+
+THE CONSEQUENCE IS WHY THIS IS NOT A NIT. With a real filter the food radial's
+authored population is NINETEEN, not forty: twenty-one of the twenty-five ids the
+first draft of PRE_DATED_FOOD_RADIAL carried reach that radial through name
+keywords and have no authored prim list to be distinct from. Classifying them
+was noise that made the escape hatch look large and legitimate. The list is FOUR
+now (baked_bread, harvest_feast, roasted_boar, tough_jerky), which is the real
+answer to "authored dishes predating this pin that were never brought into the
+family".
+
+**AND THE ESCAPE HATCH WAS THE FREE BRANCH.** The classification arm forced a
+decision but not an honest one: parking a new dish in the pre-dating set kept
+every arm green, and the list's name asserted a chronology nothing checked. Its
+length is pinned may-only-shrink now, so nothing authored after this phase can
+claim to predate it.
+
 ### RELEASE-FILL OBLIGATIONS, AMENDED AGAIN
 
 A FOURTH reword key joins the worklist, and it is the most urgent of the four

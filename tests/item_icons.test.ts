@@ -7,6 +7,7 @@ import { describe, expect, it } from 'vitest';
 import { ITEMS } from '../src/sim/data';
 import type { ItemDef } from '../src/sim/types';
 import {
+  hasExplicitItemIcon,
   ITEM_ART_PENDING,
   ITEM_IMAGE_IDS,
   iconDataUrl,
@@ -494,39 +495,29 @@ describe('item webp icons', () => {
     // three Phase 11i dishes escaped, and the decision is forced HERE rather
     // than resting on a comment nobody reads.
     //
-    // Derived from ITEMS rather than from icons.ts's private ITEM_RECIPES
-    // table (which is not exported), with keyword FALLBACKS filtered out:
-    // itemFallback answers for an unauthored id too, and a fallback landing on
-    // the food radial is not an authored dish at all.
-    const PRE_DATED_FOOD_RADIAL = [
-      'anglers_feast_platter',
-      'ashwood_smoked_eel',
-      'baked_bread',
-      'brightwood_venison',
-      'conjured_bread',
-      'conjured_bread2',
-      'conjured_bread3',
-      'conjured_bread4',
-      'fenbridge_rye',
-      'frostgill_chowder',
-      'goldleaf_game_stew',
-      'harvest_feast',
-      'herbed_marsh_pike',
-      'hunters_game_skewer',
-      'marlows_grand_roast',
-      'pan_seared_perch',
-      'roast_mountain_goat',
-      'roasted_boar',
-      'sageleaf_chowder',
-      'silvered_carp_supper',
-      'smoked_eel',
-      'stonepot_stew',
-      'tough_jerky',
-      'trail_hardtack',
-      'warspice_skewers',
-    ];
+    // Derived from ITEMS, with keyword FALLBACKS really filtered out. This
+    // comment used to claim that filter while the code only checked
+    // `isUnknownIconRecipe`, which is identity against the single UNKNOWN
+    // sentinel and therefore separates "nothing matched" from everything else,
+    // NOT an authored recipe from one itemFallback composed out of the item's
+    // name keywords. A fallback landing on the food radial would have had to be
+    // classified like an authored dish. `hasExplicitItemIcon` is the twin of
+    // the ability and aura predicates that already existed, added so the filter
+    // matches the sentence.
+    // FOUR, not the twenty-five the first draft of this list carried. That
+    // draft was written before the fallback filter above was real, so it had
+    // swept in twenty-one ids that reach the food radial through itemFallback's
+    // name keywords rather than through an authored recipe (stonepot_stew,
+    // trail_hardtack, the four conjured_bread ranks, and the rest of the
+    // leveling-tier cooked food). Those were never in scope: an id with no
+    // authored recipe has no prim list of its own to be distinct from, so
+    // classifying them was noise that made the escape hatch look large and
+    // legitimate. What remains is the four AUTHORED dishes that predate this
+    // pin and were never brought into the pairwise family.
+    const PRE_DATED_FOOD_RADIAL = ['baked_bread', 'harvest_feast', 'roasted_boar', 'tough_jerky'];
     const classified = new Set([...DISH_ICON_IDS, ...PRE_DATED_FOOD_RADIAL]);
     const onFoodRadial = Object.keys(ITEMS).filter((id) => {
+      if (!hasExplicitItemIcon(id)) return false;
       const recipe = itemIconRecipe(id);
       return recipe !== null && !isUnknownIconRecipe(recipe) && recipe.bg === 'food';
     });
@@ -542,6 +533,17 @@ describe('item webp icons', () => {
     // cannot be counted twice or the split quietly overlap.
     expect(classified.size).toBe(DISH_ICON_IDS.length + PRE_DATED_FOOD_RADIAL.length);
     expect(onFoodRadial.length).toBe(classified.size);
+    // AND THE ESCAPE HATCH MAY ONLY SHRINK. The classification above forces a
+    // decision but does not make the branches equally costly: parking a new
+    // dish in the pre-dating set keeps every arm green, so the WRONG branch was
+    // the free one and the list's name asserted a chronology nothing checked.
+    // Pinning the length closes that. It may fall (an id leaving the radial, or
+    // a re-skin earning it into the family) and it may never rise, because
+    // nothing authored after Phase 11i can honestly pre-date this pin.
+    expect(
+      PRE_DATED_FOOD_RADIAL.length,
+      'PRE_DATED_FOOD_RADIAL may only shrink; a new dish belongs in DISH_ICON_IDS',
+    ).toBeLessThanOrEqual(4);
     const seen = new Map<string, string>();
     for (const id of DISH_ICON_IDS) {
       const recipe = itemIconRecipe(id);
