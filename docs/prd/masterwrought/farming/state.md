@@ -4410,3 +4410,61 @@ decay, and its QA touched none of those either. The three fine_*_herb twins stil
 have no recipe consumer anywhere on the merged tree, so the displacement arms stay
 scoped to the BASE herb line for the same reason recorded before: widening would
 red on inherited state and teach the next reader to loosen the arm.
+
+## Phase 11h note (2026-08-22): farming's output reaches the top of the catalog
+
+Phase 11g put produce on the leveling rungs; 11h carries the same supply line to
+100 and 125, where the raid actually eats and drinks. What matters to FARMING,
+rather than to the masterwrought packet, is three things.
+
+FARMING'S ENDGAME CENSUS DOUBLES, 8 rows to 16, and the half that is not farming
+buying from itself goes from ONE member to NINE. Before 11g every endgame bill
+naming a farm reagent was one of farming's own dishes plus recipe_osmium_hoe;
+11g added recipe_seasoned_stock; 11h adds the entire apex consumable tier (the
+three role plates and the three flasks at rung 100, both capstones at 125). That
+is masterwrought R20's own measure, pinned in tests/farm_recipes.test.ts with the
+125 rung stated as its own clause, because a census that stops at 100 leaves the
+exact hole the rule names.
+
+THE TWO TIER-4 FINE TWINS FINALLY HAVE A CONSUMER OUTSIDE FARMING.
+fine_gilded_sunmelon and fine_evergarden_greens were each consumed by exactly one
+recipe, farming's own tier-4 dish at cooking 100. recipe_grand_cauldron and
+recipe_laden_hearth now take one each at skillReq 125, the top of the whole
+catalog. The stale items.ts comments beside both twins are corrected here, once,
+as the packet record assigns (row N15): the sentence they carried is TRUE and is
+kept, but it scopes to the HOE ladder alone and was being read as a claim that a
+tier-4 twin can never be a reagent at all.
+
+D24'S GUARDRAIL HOLDS AND IS ASSERTED PER BILL, not only per total. Every apex
+alchemy row that took a crop still consumes an herb, sunpetal_herb is still 2 on
+each of the three flasks and 4 on the cauldron, and alchemy's whole herb demand
+is now pinned PER RECIPE rather than as one number over sixteen rows, which is
+the fishing-line lesson applied one craft over: a compensating move keeps a total
+green. Three global herb totals (28 / 27 / 39) are unchanged and green.
+
+TWO CROPS GAINED AN ALCHEMY TOOLTIP: highland_barley (all three flasks) and
+gilded_sunmelon (the cauldron) now read "Used by Alchemy and Cooking." The 11g
+QA's roster sweep was extended from three ids to five, and a gap in it was closed
+while extending: it mapped produceItemId only, so nothing could see a FINE TWIN
+gaining a craft, and 11h is the first phase to put one in an alchemy bill.
+
+NO OPEN ITEM IS CLOSED BY 11h. The list was read row by row: the crop display
+name lore pass, the Phase 9 reads, the (bn)/(bo) block, ONLINE_WORLD_LAYOUT_VERSION,
+the tuning constants, the any-profession deed question, the seed-back rates, and
+the Phase 6 sign-off block including the fine_marsh_rice / fine_highland_barley
+dish-consumer question all stand exactly as they were. 11h touched no vendor row,
+no price, no growth timer, no daily, no decay and no crop def; it creates demand
+without touching a single one of those decisions. The three fine_*_herb twins
+still have no recipe consumer anywhere, so the displacement arms stay scoped to
+the BASE herb line for the reason recorded twice before.
+
+ONE THING FARMING SHOULD KNOW ABOUT ITS OWN TIMERS. 11h holds the three role
+plates at an equal COPPER cost (every tier-3 base crop is sellValue 15, so each
+plate's crop row is worth 30 and all three bills land on 452), which is what the
+ruling rules on. It does NOT hold them at an equal wall-clock cost, because the
+crop ladder deliberately gives every crop in a tier its own duration:
+highland_barley 4h, thornpeak_cabbage 4h10m, frost_gourd 4h30m. A cook who grows
+their own pays a 12.5 percent spread from cheapest to dearest; a cook who buys
+pays the same either way. Recorded here rather than only in the packet, because
+the numbers are farming's and a later re-tune of them changes an apex bill's real
+cost without touching an apex bill.
