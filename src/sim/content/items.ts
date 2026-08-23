@@ -1257,6 +1257,12 @@ export const BASE_ITEMS: Record<string, ItemDef> = {
   },
   // Watch-fee sink, and the leaf folded into recipe_highwatch_barley_bannock
   // (2 per bannock), which is what gives the tier's LEAF a demand of its own.
+  // NOT AN EXHAUSTIVE CONSUMER LIST, and deliberately not one: the live set
+  // is derived (craftIdsForMaterialItem sweeps ALL_RECIPES, and the tooltip
+  // renders from that), so an enumeration here only records what was true the
+  // day it was written. masterwrought Phase 11h is the proof: it made this
+  // crop the caster plate's accent in recipe_sageleaf_chowder at cooking 100.
+  // Read the sweep, not the sentence.
   thornpeak_cabbage: {
     id: 'thornpeak_cabbage',
     name: 'Thornpeak Cabbage',
@@ -1311,7 +1317,11 @@ export const BASE_ITEMS: Record<string, ItemDef> = {
     buyValue: 64,
   },
   // Watch-fee sink, and the fruit of recipe_evergarden_sunmelon_tart, the
-  // tier-4 dish line (3 per tart).
+  // tier-4 dish line (3 per tart). masterwrought Phase 11h added the second
+  // consumer and the first outside farming: recipe_grand_cauldron, alchemy's
+  // skill-125 capstone, takes 2. NOT AN EXHAUSTIVE CONSUMER LIST; the live set
+  // is derived through craftIdsForMaterialItem and the tooltip renders from
+  // that, so read the sweep rather than this sentence.
   gilded_sunmelon: {
     id: 'gilded_sunmelon',
     name: 'Gilded Sunmelon',
@@ -1319,10 +1329,20 @@ export const BASE_ITEMS: Record<string, ItemDef> = {
     quality: 'common',
     sellValue: 40,
   },
-  // Consumed by recipe_evergarden_sunmelon_tart: the dish set's tier-4
-  // fine-twin slot. STRUCTURALLY never a hoe reagent: each rung consumes the
-  // twin one tier below it (deviation (ad)), so a tier-4 twin would need a
-  // tier-5 hoe, and the ladder tops at 4.
+  // The dish set's tier-4 fine-twin slot (recipe_evergarden_sunmelon_tart), and
+  // since masterwrought Phase 11h ALSO the alchemy capstone's showcase reagent:
+  // recipe_grand_cauldron at skillReq 125 takes one, which is this twin's first
+  // consumer outside farming and the top rung of the whole catalog.
+  //
+  // CORRECTED BY masterwrought Phase 11h (11h-GATE-D, packet row N15), which
+  // owns this correction because it runs before 11j and 11k. The line below is
+  // still TRUE and is kept, but it used to be the whole story here and a reader
+  // took "structurally never a reagent above the dish set" out of it: it scopes
+  // to the HOE ladder only. A tier-4 twin can be any other kind of reagent, and
+  // now is one.
+  // STRUCTURALLY never a HOE reagent: each hoe rung consumes the twin one tier
+  // below it (deviation (ad)), so a tier-4 twin would need a tier-5 hoe, and
+  // the ladder tops at 4.
   fine_gilded_sunmelon: {
     id: 'fine_gilded_sunmelon',
     name: 'Fine Gilded Sunmelon',
@@ -1341,7 +1361,11 @@ export const BASE_ITEMS: Record<string, ItemDef> = {
   },
   // Watch-fee sink, and the greens dressed into
   // recipe_evergarden_harvest_platter, the capstone plate of the dish set
-  // (3 per platter).
+  // (3 per platter). masterwrought Phase 11h added the second consumer and the
+  // first outside farming: recipe_laden_hearth, cooking's skill-125 capstone,
+  // takes 2. NOT AN EXHAUSTIVE CONSUMER LIST; the live set is derived through
+  // craftIdsForMaterialItem and the tooltip renders from that, so read the
+  // sweep rather than this sentence.
   evergarden_greens: {
     id: 'evergarden_greens',
     name: 'Evergarden Greens',
@@ -1349,11 +1373,18 @@ export const BASE_ITEMS: Record<string, ItemDef> = {
     quality: 'common',
     sellValue: 40,
   },
-  // Consumed by recipe_evergarden_harvest_platter: the last of the five
-  // fine-twin dish slots, the one that closed the crop-ladder phase's
-  // deferral. STRUCTURALLY never a hoe reagent, like its sunmelon sibling
-  // above: a tier-4 twin would need a tier-5 hoe under deviation (ad)'s
-  // invariant.
+  // The last of the five fine-twin dish slots, the one that closed the
+  // crop-ladder phase's deferral (recipe_evergarden_harvest_platter), and since
+  // masterwrought Phase 11h ALSO the cooking capstone's showcase reagent:
+  // recipe_laden_hearth at skillReq 125 takes one, this twin's first consumer
+  // outside farming and the top rung of the whole catalog.
+  //
+  // CORRECTED BY masterwrought Phase 11h (11h-GATE-D, packet row N15), same as
+  // its sunmelon sibling above and for the same reason: the line below is true
+  // and kept, but it scopes to the HOE ladder alone and was being read as a
+  // claim that a tier-4 twin can never be a reagent at all.
+  // STRUCTURALLY never a HOE reagent: a tier-4 twin would need a tier-5 hoe
+  // under deviation (ad)'s one-tier-below invariant, and the ladder tops at 4.
   fine_evergarden_greens: {
     id: 'fine_evergarden_greens',
     name: 'Fine Evergarden Greens',

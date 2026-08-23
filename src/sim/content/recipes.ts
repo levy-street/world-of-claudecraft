@@ -1997,7 +1997,12 @@ export const INTERMEDIATE_RECIPES: ProfessionRecipeRecord[] = [
   // The nine consumers, each gold-negative on the buyValue-else-sellValue
   // basis with the Catalyst priced at its 50 sellValue: billet 246 vs 45,
   // plating 256 vs 45, cording 105 vs 40, bolt 255 vs 45, setting 206 vs 45,
-  // chassis 290 vs 45, stock 98 vs 30, reagent 128 vs 40, vellum 258 vs 45.
+  // chassis 290 vs 45, stock 130 vs 30, reagent 128 vs 40, vellum 258 vs 45.
+  // (The stock read 98 here from Phase 07 until masterwrought Phase 11g's
+  // DECISION C put marsh_rice 2 plus bog_beet 2 in that bill and left this
+  // number behind. Corrected by Phase 11h's verify pass over the same row,
+  // which re-derives 130 from the merged table; the ROW itself is 11g's and is
+  // untouched here.)
   {
     id: 'recipe_duskforged_billet',
     professionId: 'weaponcrafting',
@@ -2583,9 +2588,26 @@ export const APEX_GEAR_RECIPES: ProfessionRecipeRecord[] = [
 // The consumable idiom, which is where these rows differ from the gear ones:
 // a batch output (2 flasks, 4 plates) rather than a single piece, and ONE of
 // the craft's own intermediate rather than three, because a consumable is
-// spent and re-bought while a piece of gear is worn forever. The bills stay
-// uniform within a family, the same per-craft uniformity the gear rungs use,
-// so a role choice is never also an economy choice.
+// spent and re-bought while a piece of gear is worn forever.
+//
+// THE UNIFORM-BILL RULE, AMENDED BY masterwrought Phase 11h (11h-GATE-A) and
+// scoped exactly, because a rule silently contradicted by the rows under it is
+// worse than a rule changed on purpose:
+//   - THE FOOD FAMILY'S bills differ by EXACTLY ONE CROP ROW and are identical
+//     in every other reagent.
+//   - THE FLASK FAMILY stays BYTE-IDENTICAL.
+// The original rule (uniform within a family, so a role choice is never also an
+// economy choice) is unchanged in substance and that is what the narrow scope
+// protects. The one crop row is worth 30 copper on every plate, so the three
+// bills are cost-identical to the copper and the differentiation is FLAVOR,
+// never price: the tank plate takes the gourd, the physical plate the grain,
+// the caster plate the leaf, all tier 3, all gated at farming 50, so a role
+// choice is not an economy choice OR a skill-gate choice either.
+// The looser amendment ("the food family is exempt") is REFUSED: it would read
+// as open season, and it would not tell Phase 11i what its fish row has to
+// satisfy. That row is legal under this wording precisely because it is the
+// SAME row on all three plates (11i DECISION D), so the crop row differentiates
+// and the fish row unifies. Read the scope, not the family name.
 //
 // PACING: the flask chain is daily-gated TRANSITIVELY. recipe_quickening_
 // catalyst is oncePerDay, so a flask costs a catalyst-day even though no row
@@ -2611,8 +2633,31 @@ export const APEX_GEAR_RECIPES: ProfessionRecipeRecord[] = [
 // the counterfactually-vendor-fed set (tests/recipe_economy.test.ts).
 export const APEX_CONSUMABLE_RECIPES: ProfessionRecipeRecord[] = [
   // The three flasks share one bill: the serpent elixir's own reagent list
-  // one rung up (sunpetal doubled) plus the catalyst that paces it.
-  // Input 424 vs output 50.
+  // one rung up (sunpetal doubled) plus the catalyst that paces it, plus the
+  // tier-3 grain masterwrought Phase 11h adds IDENTICALLY to all three
+  // (11h-GATE-C). Input 424 to 439 vs output 50.
+  //
+  // THE FAMILY STAYS BYTE-IDENTICAL, and that is the amended header's other
+  // half rather than an accident: the flask chain is the DAILY-GATED one
+  // (recipe_quickening_catalyst is oncePerDay, so a flask costs a catalyst-day),
+  // so a bill difference between the three roles here would be a real gate
+  // rather than flavor. The food family can afford to differ because nothing
+  // paces it but materials.
+  //
+  // ADDED, NEVER SUBSTITUTED (masterwrought R18, farming D24): sunpetal_herb
+  // stays at 2 on every one of the three bills and no other reagent moves. The
+  // grain stands BESIDE the herb line; herbalism loses nothing.
+  //
+  // THE COUNT IS ONE, NOT TWO, and this is a DEVIATION from 11h-GATE-C's
+  // literal, forced by the standing accent rule rather than chosen. RULE 2's
+  // count half (tests/provisioning_supply_line.test.ts, accentVerdict) requires
+  // a crop to stay STRICTLY BELOW the row's largest non-produce count, and this
+  // bill's largest is 2 (venom_gland and sunpetal_herb), so a grain at 2 TIES
+  // and reds. Phase 11g hit the identical collision one rung down and resolved
+  // it the same way: recipe_elixir_of_the_serpent's frost_gourd went 2 to 1
+  // because venom_gland sits at 2, and only the count moved. This bill IS that
+  // elixir's bill one rung up. Everything else the ruling states is intact: one
+  // tier-3 grain, identical on all three, beside the herb, replacing none of it.
   {
     id: 'recipe_ironhusk_flask',
     professionId: 'alchemy',
@@ -2623,6 +2668,7 @@ export const APEX_CONSUMABLE_RECIPES: ProfessionRecipeRecord[] = [
       { itemId: 'pristine_venom_gland', count: 1 },
       { itemId: 'venom_gland', count: 2 },
       { itemId: 'sunpetal_herb', count: 2 },
+      { itemId: 'highland_barley', count: 1 },
       { itemId: 'glass_vial', count: 1 },
     ],
     skillReq: 100,
@@ -2641,6 +2687,7 @@ export const APEX_CONSUMABLE_RECIPES: ProfessionRecipeRecord[] = [
       { itemId: 'pristine_venom_gland', count: 1 },
       { itemId: 'venom_gland', count: 2 },
       { itemId: 'sunpetal_herb', count: 2 },
+      { itemId: 'highland_barley', count: 1 },
       { itemId: 'glass_vial', count: 1 },
     ],
     skillReq: 100,
@@ -2659,6 +2706,7 @@ export const APEX_CONSUMABLE_RECIPES: ProfessionRecipeRecord[] = [
       { itemId: 'pristine_venom_gland', count: 1 },
       { itemId: 'venom_gland', count: 2 },
       { itemId: 'sunpetal_herb', count: 2 },
+      { itemId: 'highland_barley', count: 1 },
       { itemId: 'glass_vial', count: 1 },
     ],
     skillReq: 100,
@@ -2667,18 +2715,46 @@ export const APEX_CONSUMABLE_RECIPES: ProfessionRecipeRecord[] = [
     acquisition: ['drop'],
     stationType: 'apothecary',
   },
-  // The three role foods share one bill: Marlow's Grand Roast scaled to the
-  // apex batch, with the seasoned stock that carries the rung.
-  // Input 422 vs output 360.
+  // The three role foods: Marlow's Grand Roast scaled to the apex batch, with
+  // the seasoned stock that carries the rung, and ONE crop row each
+  // (masterwrought Phase 11h, 11h-GATE-A and 11h-GATE-B). Input 422 to 452 vs
+  // output 360 on all three.
+  //
+  // THIS IS WHERE THREE BILLS STOP BEING BYTE-IDENTICAL. Since Phase 10 the
+  // three role plates were the same recipe with three names, and a player
+  // comparing them in the crafting window saw nothing to compare. The crop is
+  // what a cook reads off the plate now: the gourd for the tank, the grain for
+  // the fighter, the leaf for the caster.
+  //
+  // THE COUNT IS 2 ON ALL THREE AND THE CROPS ARE ALL TIER 3, deliberately and
+  // by derivation rather than taste. Every tier-3 base crop carries sellValue
+  // 15 and no buyValue, so 2 of any of them is worth exactly 30 on the
+  // buyValue-else-sellValue basis the economy suite reads: the COST SPREAD
+  // ACROSS THE THREE PLATES IS ZERO, pinned in
+  // tests/provisioning_supply_line_apex.test.ts. And farmCropSkillThreshold
+  // gates all four tier-3 crops at farming 50, so a role choice is not a
+  // skill-gate choice either. The superseded alternative was the tier-4 halving
+  // branch, which would have spread 30/30/40 and asked farming 75 for one
+  // plate; Phase 11e's roster was composed with a tier-3 LEAF precisely to make
+  // it unnecessary.
+  //
+  // The INPUT side only. foodHp, the Well Fed magnitude and duration (11c's
+  // settled ladder, 6 for 900 seconds on the single well_fed aura id),
+  // sellValue, resultCount, skillReq: none of them moves here, and a reagent
+  // changes what a craft COSTS and never what it produces.
   {
     id: 'recipe_stonepot_stew',
     professionId: 'cooking',
     resultItemId: 'stonepot_stew',
     resultCount: 4,
+    // THE TANK PLATE (buff_sta) takes the GOURD: a stew is what a gourd goes
+    // into, and Frost Gourd is the Highwatch terrace crop the roast already
+    // simmers one rung down.
     reagents: [
       { itemId: 'seasoned_stock', count: 1 },
       { itemId: 'prime_cut', count: 2 },
       { itemId: 'game_meat', count: 4 },
+      { itemId: 'frost_gourd', count: 2 },
       { itemId: 'sunpetal_herb', count: 2 },
       { itemId: 'cooking_salt', count: 2 },
     ],
@@ -2693,10 +2769,13 @@ export const APEX_CONSUMABLE_RECIPES: ProfessionRecipeRecord[] = [
     professionId: 'cooking',
     resultItemId: 'warspice_skewers',
     resultCount: 4,
+    // THE PHYSICAL PLATE (buff_ap) takes the GRAIN: skewers are served on a
+    // grain, and Highland Barley is the tier's grain.
     reagents: [
       { itemId: 'seasoned_stock', count: 1 },
       { itemId: 'prime_cut', count: 2 },
       { itemId: 'game_meat', count: 4 },
+      { itemId: 'highland_barley', count: 2 },
       { itemId: 'sunpetal_herb', count: 2 },
       { itemId: 'cooking_salt', count: 2 },
     ],
@@ -2711,10 +2790,15 @@ export const APEX_CONSUMABLE_RECIPES: ProfessionRecipeRecord[] = [
     professionId: 'cooking',
     resultItemId: 'sageleaf_chowder',
     resultCount: 4,
+    // THE CASTER PLATE (buff_int) takes the LEAF, which is the row Phase 11e's
+    // roster composition existed to make available: Thornpeak Cabbage is tier
+    // 3's leaf (frost_lentils is its legume), and a chowder named for a leaf
+    // that carried none read thin.
     reagents: [
       { itemId: 'seasoned_stock', count: 1 },
       { itemId: 'prime_cut', count: 2 },
       { itemId: 'game_meat', count: 4 },
+      { itemId: 'thornpeak_cabbage', count: 2 },
       { itemId: 'sunpetal_herb', count: 2 },
       { itemId: 'cooking_salt', count: 2 },
     ],
@@ -2724,7 +2808,39 @@ export const APEX_CONSUMABLE_RECIPES: ProfessionRecipeRecord[] = [
     acquisition: ['drop'],
     stationType: 'kitchens',
   },
-  // The skill-125 capstones. Input 1010 vs output 380.
+  // The skill-125 capstones, and the first bills in the game to consume a
+  // TIER-4 farm crop (masterwrought Phase 11h, 11h-GATE-D). Cauldron input 1010
+  // to 1410 vs output 380; hearth 606 to 1006 vs 380.
+  //
+  // ONE SHOWCASE CROP EACH, SPLIT rather than shared, so the two 125 capstones
+  // do not read off the same line: the melon to alchemy, the greens to cooking
+  // (the greens are farming's own capstone-plate crop, so the COOKING capstone
+  // is the right home for them).
+  //
+  // THE SHIPPED SHOWCASE IDIOM, CARRIED OFF THE MERGED TREE rather than off a
+  // plan doc, which is what 11h-GATE-D itself instructs. Farming's two tier-4
+  // plates each carry TWO showcase pairs: recipe_evergarden_harvest_platter
+  // takes evergarden_greens 3 + fine 1 AND evergarden_pumpkin 2 + fine 1, and
+  // recipe_evergarden_sunmelon_tart takes gilded_sunmelon 3 + fine 1 AND
+  // gilded_yam 2 + fine 1. So the merged tree carries the base-plus-fine idiom
+  // at BOTH 3+1 and 2+1, twice each, and no number here is invented.
+  //
+  // 2 + 1 IS A DEVIATION from 11h-GATE-D's literal 3 + 1, forced by the
+  // standing accent rule rather than chosen. RULE 2's absolute accent cap
+  // (tests/provisioning_supply_line.test.ts, accentVerdict capOk) refuses any
+  // produce entry above 2 on a consumable row farming did not write, so a base
+  // crop at 3 reds on both capstones. 2 + 1 is the same shipped idiom one notch
+  // down and it clears every half of the rule. The fine twin stays at 1, where
+  // the idiom puts it.
+  //
+  // THE FINE TWIN IS THE POINT, not decoration: before this phase
+  // fine_evergarden_greens and fine_gilded_sunmelon were consumed by exactly
+  // one recipe each, both farming's own tier-4 dishes at cooking 100. This
+  // phase gives both their CAPSTONE consumer at skillReq 125, the top of the
+  // whole catalog, which is the masterwrought R20 shape the packet exists to
+  // close. Neither is a hoe twin (the hoe ladder takes fine_vale_wheat,
+  // fine_marsh_rice and fine_highland_barley under farming's deviation (ad)),
+  // so nothing is double-booked.
   {
     id: 'recipe_grand_cauldron',
     professionId: 'alchemy',
@@ -2733,6 +2849,8 @@ export const APEX_CONSUMABLE_RECIPES: ProfessionRecipeRecord[] = [
     reagents: [
       { itemId: 'quickening_catalyst', count: 3 },
       { itemId: 'wyrmfall_core', count: 2 },
+      { itemId: 'gilded_sunmelon', count: 2 },
+      { itemId: 'fine_gilded_sunmelon', count: 1 },
       { itemId: 'sunpetal_herb', count: 4 },
       { itemId: 'goldleaf_herb', count: 2 },
     ],
@@ -2742,7 +2860,12 @@ export const APEX_CONSUMABLE_RECIPES: ProfessionRecipeRecord[] = [
     acquisition: ['drop'],
     stationType: 'apothecary',
   },
-  // Input 606 vs output 380.
+  // THE LONGEST BILL IN THE GAME after this phase: seven reagent entries, where
+  // the previous maximum across all 149 recipes was six (Phase 11g's roast and
+  // seasoned stock) and five before that. Nothing in src/ or server/ slices or
+  // caps a reagent list, so the seventh row renders by existing; it is recorded
+  // because the crafting window and the bag action-menu cost line now draw one
+  // row more than anything shipped before.
   {
     id: 'recipe_laden_hearth',
     professionId: 'cooking',
@@ -2753,6 +2876,8 @@ export const APEX_CONSUMABLE_RECIPES: ProfessionRecipeRecord[] = [
       { itemId: 'wyrmfall_core', count: 2 },
       { itemId: 'prime_cut', count: 4 },
       { itemId: 'game_meat', count: 4 },
+      { itemId: 'evergarden_greens', count: 2 },
+      { itemId: 'fine_evergarden_greens', count: 1 },
       { itemId: 'sunpetal_herb', count: 2 },
     ],
     skillReq: 125,
