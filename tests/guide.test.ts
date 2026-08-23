@@ -67,7 +67,7 @@ import {
   STATION_TYPE_BY_CRAFT,
   STATIONS,
 } from '../src/sim/content/professions';
-import { ALL_RECIPES } from '../src/sim/content/recipes';
+import { ALL_RECIPES, ROD_RECIPES } from '../src/sim/content/recipes';
 import { RELIQUARY_PAGES } from '../src/sim/content/reliquary';
 import {
   TIER2_TOOL_GATE_PROFICIENCY,
@@ -86,6 +86,7 @@ import {
 } from '../src/sim/professions/disenchant_reagents';
 import { DISENCHANT_MATERIAL_BY_QUALITY } from '../src/sim/professions/enchanting';
 import { FISHING_GAIN_SCHEDULE } from '../src/sim/professions/fishing';
+import { FISHING_CATCH_BAND_THRESHOLDS } from '../src/sim/professions/fishing_bands';
 import {
   GATHER_RARE_EVENT_CHANCE,
   GATHER_RARE_EVENT_YIELD_MULT,
@@ -3347,6 +3348,62 @@ describe('Guide professions pages and routes', () => {
     for (const key of FAQ_ANSWER_KEYS) {
       expect(t(key as never).length, key).toBeGreaterThan(0);
     }
+    // THE PROSE ACCURACY PIN (Phase 11i QA). tests/guide.test.ts checks that the
+    // GENERATED content is fresh and that every key RESOLVES; it has never
+    // checked that a sentence is TRUE. That gap is this packet's most expensive
+    // one: Phase 11i shipped six prose keys stating a catch ladder, a rod count
+    // and a gain schedule the same commit had just replaced, and the phase's own
+    // review round found five of them only by reading. The freshness gate cannot
+    // see it, because regenerating a table does not touch the paragraph beside
+    // it.
+    //
+    // So pin the LOAD-BEARING NUMBERS against the shipped constants rather than
+    // against a second literal. Every expectation below fails if the sim moves
+    // and the prose does not, which is the only direction that has ever gone
+    // wrong here.
+    const fishProse = [
+      t('guide.profPages.fish.tablesNoteSixBands' as never, { rare: 'Sunglint Koi' }),
+      t('guide.profPages.fish.scheduleNoteRetuned' as never, { cutoff: '100' }),
+      t('guide.profPages.fish.startBodyThreeRods' as never),
+      t('guide.profPages.bandsBodySplitLadder' as never),
+      t('guide.profPages.toolsNoteThreeRods' as never, { tier2Prof: '40', tier3Prof: '70' }),
+      t('guide.professions.curveBodyRetunedFishing' as never, { step: '25' }),
+      t('guide.profPages.faq.a7RetunedTaper' as never),
+    ].join('\n');
+
+    // The four gain values, EVERY one of them, read off the shipped schedule.
+    // The retired curve (a full point, 0.1, 0.02) is what shipped in this prose
+    // for a whole phase, so its absence is asserted too: a partial correction
+    // that leaves one old number behind is the exact failure that happened.
+    for (const row of FISHING_GAIN_SCHEDULE) {
+      expect(fishProse, `the wiki must publish the shipped gain ${row.gain}`).toContain(
+        String(row.gain),
+      );
+    }
+    for (const retired of ['0.02', '0.1 of a point', 'a full point per catch']) {
+      expect(fishProse, `the wiki still publishes the retired gain ${retired}`).not.toContain(
+        retired,
+      );
+    }
+    // The ladder's shape: how many bands there are, and the two thresholds a
+    // reader can act on. Spelled the way the prose spells them, so the pin
+    // fails on a number rather than on a phrasing choice.
+    expect(FISHING_CATCH_BAND_THRESHOLDS).toHaveLength(6);
+    expect(fishProse, 'the wiki must say SIX catch bands').toContain('six catch bands');
+    expect(fishProse, 'the wiki must not still say three').not.toContain('three catch bands');
+    expect(fishProse, 'band 2 opens at its shipped threshold').toContain(
+      `band 2 at ${FISHING_CATCH_BAND_THRESHOLDS[2]}`,
+    );
+    // The rod ladder: the shipped count of CRAFTED rods, and the claim the
+    // phase existed to falsify.
+    expect(ROD_RECIPES).toHaveLength(3);
+    expect(fishProse, 'the wiki must say THREE rods sit above the vendor ladder').toContain(
+      'Three rods sit above those',
+    );
+    expect(fishProse, 'the wiki must not still say the crafted rods buy no access').not.toContain(
+      'instead of access',
+    );
+
     // Format keys stay translator-controlled, pinned as literals.
     expect(t('guide.profPages.matFmt' as never, { name: 'Copper Ore', count: '4' })).toBe(
       'Copper Ore x4',
