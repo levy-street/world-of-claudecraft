@@ -38,9 +38,14 @@ import {
   isConsuming,
 } from '../types';
 import { groundHeight, isInWaterBody, waterLevel } from '../world';
+import {
+  FISHING_CATCH_BAND_THRESHOLDS,
+  type FishingCatchBand,
+  fishingCatchBandFor,
+  fishingRodBandFor,
+} from './fishing_bands';
 import { rodTierRequiredForZone } from './fishing_zones';
 import { queueGatheringGrant } from './gathering';
-import { PROFICIENCY_BAND_THRESHOLDS, proficiencyBandFor } from './proficiency_bands';
 import {
   bestOwnedGatherToolTier,
   canGatherTier,
@@ -57,12 +62,19 @@ const DEEPFEN_FISHING_SHORE_MARGIN = 10;
 const THE_CODFATHER_ITEM_ID = 'the_codfather';
 const THE_CODFATHER_QUEST_ID = 'q_the_codfather';
 
-// Catch rarity ladder band boundaries (Professions 2.0): the minimum
-// fishing proficiency for each of the three catch tables. The
-// ladder itself lives in proficiency_bands.ts (gathering.ts shares it for the
-// gather-cast duration); these exports delegate so every existing import and
-// test pin keeps resolving with identical values.
-export const FISHING_BAND_THRESHOLDS = PROFICIENCY_BAND_THRESHOLDS;
+// Catch rarity ladder band boundaries: the minimum fishing proficiency for
+// each of the SIX catch tables. The ladder itself lives in its own pure leaf
+// (professions/fishing_bands.ts) since masterwrought Phase 11i; these exports
+// delegate so every existing import keeps resolving.
+//
+// IT IS NO LONGER THE SHARED LADDER, and that is the point of the split.
+// Before 11i this aliased PROFICIENCY_BAND_THRESHOLDS, which gathering.ts also
+// reads for the land gather-cast duration; fishing's new bands would have
+// retuned land gathering through that alias. The shared array is untouched at
+// [0, 100, 200] and fishing's is [0, 100, 150, 200, 200, 200].
+export const FISHING_BAND_THRESHOLDS = FISHING_CATCH_BAND_THRESHOLDS;
+export type { FishingCatchBand };
+export { fishingRodBandFor };
 
 // Bite minigame timing (Professions 2.0), all in seconds. The
 // hidden bite delay is ONE seeded draw in [MIN, effMax]; a better rod (tier
@@ -162,57 +174,75 @@ export function fishReelWindowSecFor(
   );
 }
 
-/** The highest catch band a rod of this tier unlocks. Band b takes tool tier
- *  b + 1, and there are three bands, so tier 3 reaches the last one and every
- *  tier above it unlocks nothing further. The engine's own cap below reads
- *  this, so the tooltip and the table can never disagree about where the
- *  ladder ends. */
-export function fishingRodBandFor(rodTier: number): 0 | 1 | 2 {
-  let band: 0 | 1 | 2 = 0;
-  if (canGatherTier(rodTier, 2)) band = 1;
-  if (canGatherTier(rodTier, 3)) band = 2;
-  return band;
-}
-
 // Which catch table band a given fishing proficiency selects. Pure state (no
 // rng), so it never perturbs the one-draw-per-catch rng contract; NaN falls
-// to band 0 (see proficiencyBandFor).
-export const fishingBandFor = proficiencyBandFor;
+// to band 0 (see fishingCatchBandFor). fishingRodBandFor is re-exported above
+// from the same leaf.
+export const fishingBandFor = fishingCatchBandFor;
 
 // The band a session actually fishes: min(proficiency band, best band the
 // owned rod tier covers). THE one definition (completeFishing's table pick
 // and every telemetry-bearing fishing event resolve it here), pure state,
 // draw-free: a bag scan plus two ladder reads.
-export function effectiveFishingBand(meta: PlayerMeta): 0 | 1 | 2 {
+export function effectiveFishingBand(meta: PlayerMeta): FishingCatchBand {
   const rodTier = bestOwnedGatherToolTier(meta.inventory, 'fishing', ITEMS);
   return Math.min(
     fishingBandFor(meta.gatheringProficiency.fishing ?? 0),
     fishingRodBandFor(rodTier),
-  ) as 0 | 1 | 2;
+  ) as FishingCatchBand;
 }
 
-// Per-catch proficiency gain schedule (Professions 2.0): the breakpoints are
-// the half-band boundaries (50 inside band 0, 150 inside band 1),
-// halving-then-tapering the gain each step. Proficiency 200 (band 2) is a
-// thousands-of-catches journey by design: the 0.02 trickle is the climb's
-// long tail, and at or past the last row the gain is 0 (the maxSkill cap
-// clamp is the real stop, not this schedule).
+// Per-catch proficiency gain schedule. The four BOUNDARIES are frozen at
+// 50 / 100 / 150 / 200 because fishingTeachingCeilingFor below DERIVES the
+// per-zone teaching ceilings from them (R19); only the VALUES move, and they
+// move by derivation rather than by feel.
 //
-// The schedule is only HALF the model since R19: the water's ZONE TIER caps
-// how far a given water teaches (fishingTeachingCeilingFor below), the same
-// shape the land curve gets from node tiers. Before R19 fishing gain was
-// proficiency-relative alone, which made zone-1 water the mathematically
-// optimal grind spot all the way to the 200 cap; now the climb itself pulls
-// an angler to better water, while the catch tables keep paying whatever the
-// zone pays. R19 is the packet's one authorized extension of the D12
-// no-gain-changes scope, and the schedule VALUES are deliberately untouched:
-// the ceiling composes with them, so every gain a legal water grants is the
-// number this table always granted.
+// THE VALUES ARE DERIVED FROM A MEASURED CASTS-TO-200 MODEL (masterwrought
+// Phase 11i, DECISION F), the same R19 discipline the farming curve gets. The
+// model itself is recorded in docs/prd/masterwrought/state.md so the tune
+// reproduces from the doc alone, and tests/professions_fishing.test.ts
+// RE-RUNS it against these four literals rather than restating them. In one
+// paragraph, so a reader here is not sent away:
+//
+//   The reference angler always fishes the water the R19 teaching ceiling
+//   forces and carries the cheapest rod that water takes. A cast costs the
+//   mean bite delay for that rod tier plus the shipped BASE reel window
+//   (FISH_REEL_WINDOW_SEC; the extra window a better rod buys is margin, not
+//   time spent) plus one tick to re-press. A cast TEACHES when it resolves
+//   anything but the empty hook, minus the grey junk that stops teaching at
+//   FISHING_JUNK_GAIN_CUTOFF_PROFICIENCY, both read off the D9 cell tables in
+//   content/items.ts. Four segments, four coefficients in seconds-times-gain:
+//   447.22 / 447.22 / 474.03 / 389.88.
+//
+// WHAT WAS WRONG, measured rather than asserted: under the shipped values the
+// last fifty points cost 5000 casts and 9.1 reference hours, EIGHTY-FOUR
+// PERCENT of the whole climb, at 0.02 a catch with no character XP. The
+// destination this phase adds at the top of that tail would still have sat at
+// the top of an all-tail climb. These values keep the total where it already
+// was (10.79 reference hours before, 10.94 after) and redistribute it: the
+// four bands now cost 14.2 / 22.7 / 30.1 / 33.0 percent, with the tail down
+// from 9.10 hours to 3.61. The early climb is the price and it is paid
+// knowingly: 0 to 50 goes from about eight minutes to about ninety, which
+// gates nothing (fishing's first band boundary is 100) and is what a
+// one-third cap on four bands arithmetically requires.
+//
+// WHY THESE FOUR AND NOT A NEIGHBOUR: on the 0.01 grid exactly sixteen
+// non-increasing schedules land inside the settled ten-to-twelve-hour span
+// with a genuine ramp (each band costing at least the one before) and no band
+// over a third. Only THREE of the sixteen are STRICTLY decreasing, which a
+// real curve must be, and of those three this one both sits nearest the
+// span's midpoint and keeps the early climb fastest. The search is the test's,
+// not this comment's.
+//
+// UNTOUCHED BY DECISION F, listed so a reader does not go looking: the grey
+// junk cutoff, the zero-character-XP design, fishingTeachingCeilingFor's
+// derivation, and the rule that at or past the last row the gain is 0 (the
+// maxSkill cap clamp is the real stop, not this schedule).
 export const FISHING_GAIN_SCHEDULE = [
-  { belowProficiency: 50, gain: 1 },
-  { belowProficiency: 100, gain: 0.5 },
-  { belowProficiency: 150, gain: 0.1 },
-  { belowProficiency: 200, gain: 0.02 },
+  { belowProficiency: 50, gain: 0.08 },
+  { belowProficiency: 100, gain: 0.05 },
+  { belowProficiency: 150, gain: 0.04 },
+  { belowProficiency: 200, gain: 0.03 },
 ] as const;
 
 // Grey fishing junk (tangled weed, soggy boots: kind junk and NOT a raw cooking

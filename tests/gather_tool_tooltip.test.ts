@@ -100,7 +100,7 @@ describe('gatherToolTooltipLines: fishing implements', () => {
     );
   });
 
-  it('the tier-3 rod scales every bonus (3s bite, 1.75s reel, skill 200)', () => {
+  it('the tier-3 rod scales every bonus (3s bite, 1.75s reel, skill 150)', () => {
     const html = gatherToolTooltipLines(ITEMS.silverstream_fishing_rod);
     expect(html).toContain('<div class="tt-sub">Fishing rod (tier 3)</div>');
     expect(html).toContain('<div class="tt-desc">Required to fish waters up to tier 3.</div>');
@@ -109,25 +109,34 @@ describe('gatherToolTooltipLines: fishing implements', () => {
     // 0.25. A tooltip reading the tier alone would under-promise the rod its
     // owner is holding.
     expect(html).toContain('<div class="tt-desc">Extends the reel window by 1.75s.</div>');
+    // 150, not the 200 this read before masterwrought Phase 11i: band 2's
+    // gate moved down when fishing stopped sharing PROFICIENCY_BAND_THRESHOLDS
+    // and got its own six-rung ladder, which is what filled the barren
+    // 100-to-200 stretch. The number comes from the FISHING ladder now; the
+    // shared one still says 200 and reading it here was the live defect.
     expect(html).toContain(
-      '<div class="tt-desc">Unlocks richer catch tables at fishing skill 200 and above.</div>',
+      '<div class="tt-desc">Unlocks richer catch tables at fishing skill 150 and above.</div>',
     );
   });
 
-  it('the crafted rods keep scaling their bonuses and stop claiming a band they do not open', () => {
-    // There are three catch bands and a rod of tier T opens band T - 1, so
-    // tier 3 already reaches the last one. The band index used to be clamped,
-    // which made every rod above tier 3 repeat "skill 200 and above": a line
-    // that is true of the rod BELOW it and tells the owner of a crafted rod
-    // they bought something they already had. The bite and reel lines are the
-    // real gains and must still scale.
+  it('the crafted rods open bands of their own now, and still scale their other bonuses', () => {
+    // THIS ARM INVERTED AT masterwrought Phase 11i, and the inversion is the
+    // whole point of the phase. There used to be three catch bands, so tier 3
+    // already reached the last one and both crafted rods opened nothing: the
+    // file's own items.ts comment said so ("the top two rungs buy no new catch
+    // band"). The ladder is six bands now, riding the SAME
+    // band-b-takes-tier-b-plus-1 gate, so the stormreel opens band 3 and the
+    // tidewrought band 4, and the line they used to be forbidden from making
+    // is now the true one. The bite and reel lines still scale as before.
     const stormreel = gatherToolTooltipLines(ITEMS.stormreel_fishing_rod);
     expect(stormreel).toContain('<div class="tt-sub">Fishing rod (tier 4)</div>');
     expect(stormreel).toContain('<div class="tt-desc">Required to fish waters up to tier 4.</div>');
     expect(stormreel).toContain('<div class="tt-desc">Fish bite up to 4.5s sooner.</div>');
     // 2.75: three tier rungs (2.25) plus RARE, two rarity rungs (0.5).
     expect(stormreel).toContain('<div class="tt-desc">Extends the reel window by 2.75s.</div>');
-    expect(stormreel).not.toContain('Unlocks richer catch tables');
+    expect(stormreel).toContain(
+      '<div class="tt-desc">Unlocks richer catch tables at fishing skill 200 and above.</div>',
+    );
 
     const tidewrought = gatherToolTooltipLines(ITEMS.tidewrought_fishing_rod);
     expect(tidewrought).toContain('<div class="tt-sub">Fishing rod (tier 5)</div>');
@@ -148,7 +157,9 @@ describe('gatherToolTooltipLines: fishing implements', () => {
     // the bite line directly above, the reel window has no clamp, so the top
     // rung really does buy its full width and the copy may sell it.
     expect(tidewrought).toContain('<div class="tt-desc">Extends the reel window by 3.75s.</div>');
-    expect(tidewrought).not.toContain('Unlocks richer catch tables');
+    expect(tidewrought).toContain(
+      '<div class="tt-desc">Unlocks richer catch tables at fishing skill 200 and above.</div>',
+    );
     // The rarity term is what separates these two rods' reel lines by more
     // than the tier step alone, so a regression that dropped `item.quality` at
     // the call site would land both on the tier-only numbers.
@@ -157,22 +168,41 @@ describe('gatherToolTooltipLines: fishing implements', () => {
   });
 
   it('the band line appears exactly where the sim says a rod raises the ceiling', () => {
-    // The tooltip and the engine now read ONE function for where the ladder
-    // ends, so this walks every shipped rod tier and asserts they agree,
-    // rather than trusting two copies of "there are three bands".
+    // The tooltip and the engine read ONE function for where the ladder ends,
+    // so this walks every shipped rod tier and asserts they agree, rather than
+    // trusting two copies of a band count.
     let sawLine = 0;
     let sawNone = 0;
+    const gatherToolRodTiers: number[] = [];
+    const quotedSkills: number[] = [];
     for (const def of Object.values(ITEMS)) {
       const use = def.use;
       if (use?.type !== 'gatherTool' || use.professionId !== 'fishing') continue;
+      gatherToolRodTiers.push(use.tier);
       const raises = fishingRodBandFor(use.tier) > fishingRodBandFor(use.tier - 1);
       const html = gatherToolTooltipLines(def);
       expect(html.includes('Unlocks richer catch tables'), `${def.id} band line`).toBe(raises);
+      const quoted = /catch tables at fishing skill (\d+) and above/.exec(html);
+      if (quoted) quotedSkills.push(Number(quoted[1]));
       if (raises) sawLine += 1;
       else sawNone += 1;
     }
-    // Both arms are live: two rods raise the ceiling, two do not.
-    expect([sawLine, sawNone]).toEqual([2, 2]);
+    gatherToolRodTiers.sort((a, b) => a - b);
+    quotedSkills.sort((a, b) => a - b);
+    // EVERY shipped rod raises the ceiling now (masterwrought Phase 11i), so
+    // the no-line arm is empty by construction rather than by accident, and
+    // this arm's non-vacuity comes from the count instead. The tier-1 floor is
+    // not an ITEM: the simple pole is `use.type: 'fishing'` and never enters
+    // this walk, so no gatherTool rod sits at the bottom of the ladder.
+    expect(sawNone).toBe(0);
+    expect(sawLine).toBe(gatherToolRodTiers.length);
+    expect(gatherToolRodTiers).toEqual([2, 3, 4, 5]);
+    // The claim each rod makes is DISTINCT wherever the ladder makes it so:
+    // the three thresholds the shipped rods quote are 100, 150 and 200, and
+    // the repeat at the top is the ladder's own shape (bands 3, 4 and 5 all
+    // gate at fishing's 200 cap, where the ROD is the only axis left), not the
+    // clamped-index bug this arm was written to catch.
+    expect(quotedSkills).toEqual([100, 150, 200, 200]);
   });
 });
 

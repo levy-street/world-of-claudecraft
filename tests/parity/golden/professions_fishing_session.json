@@ -452,7 +452,7 @@
       "tick": 91,
       "time": 4.55,
       "nextId": 972,
-      "state": "54cd3dc3",
+      "state": "0b9d2078",
       "events": "361d6485",
       "rng": {
         "draws": 2,
@@ -523,7 +523,7 @@
           "nodeHarvestReadyAt": {},
           "pendingGatherGrants": [
             {
-              "amount": 1,
+              "amount": 0.08,
               "professionId": "fishing"
             }
           ],
@@ -610,8 +610,8 @@
       "tick": 99,
       "time": 4.95,
       "nextId": 972,
-      "state": "f8a957f0",
-      "events": "9de5b26b",
+      "state": "c31b5600",
+      "events": "1afba583",
       "rng": {
         "draws": 3,
         "digest": "1e79975d"
@@ -656,10 +656,6 @@
             [
               "chr_vale_first_cast",
               ""
-            ],
-            [
-              "prog_first_harvest",
-              ""
             ]
           ],
           "delveClears": {},
@@ -672,7 +668,7 @@
           },
           "equipmentInstance": {},
           "gatheringProficiency": {
-            "fishing": 1
+            "fishing": 0.08
           },
           "heroicDaily": {},
           "inventory": [
@@ -696,7 +692,7 @@
             "counts": {},
             "firstFind": {}
           },
-          "renown": 10,
+          "renown": 5,
           "talents": {
             "rows": {}
           },

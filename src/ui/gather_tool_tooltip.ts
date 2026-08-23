@@ -23,7 +23,7 @@ import {
   fishingRodBandFor,
   fishReelWindowSecFor,
 } from '../sim/professions/fishing';
-import { PROFICIENCY_BAND_THRESHOLDS } from '../sim/professions/proficiency_bands';
+import { FISHING_CATCH_BAND_THRESHOLDS } from '../sim/professions/fishing_bands';
 import { isGatherToolUse } from '../sim/professions/tools';
 import { wieldRequirementForTier } from '../sim/professions/wield_gate';
 import type { ItemDef } from '../sim/types';
@@ -119,11 +119,18 @@ export function gatherToolTooltipLines(item: ItemDef): string {
       // ends drift. A rod that opens no NEW band says nothing about bands;
       // clamping the index instead (which is what this did) made every rod
       // above tier 3 repeat the tier-3 rod's claim back at its owner.
+      //
+      // IT READS FISHING'S OWN LADDER, not the shared one. This line indexed
+      // PROFICIENCY_BAND_THRESHOLDS until masterwrought Phase 11i split the
+      // two, which was correct only while they were the same array: fishing's
+      // ladder now has six rungs and the shared one still has three, so the
+      // old read would have quoted 200 for a band gated at 150 and run off the
+      // end of a three-element tuple at the top rung, blanking the number.
       if (fishingRodBandFor(use.tier) > fishingRodBandFor(use.tier - 1)) {
         html += line(
           'tt-desc',
           t('hudChrome.gathering.toolTooltip.rodBand', {
-            skill: formatNumber(PROFICIENCY_BAND_THRESHOLDS[fishingRodBandFor(use.tier)], {
+            skill: formatNumber(FISHING_CATCH_BAND_THRESHOLDS[fishingRodBandFor(use.tier)], {
               maximumFractionDigits: 0,
             }),
           }),

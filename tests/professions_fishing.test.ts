@@ -44,15 +44,27 @@ import {
   completeFishing,
   FISH_BITE_DELAY_MIN_SEC,
   FISH_EARLY_REEL_GRACE_SEC,
+  FISH_REEL_WINDOW_SEC,
   FISHING_BAND_THRESHOLDS,
   FISHING_GAIN_SCHEDULE,
   FISHING_JUNK_GAIN_CUTOFF_PROFICIENCY,
+  fishBiteMaxSecFor,
   fishingBandFor,
   fishingCatchGain,
   fishingCatchGainAt,
+  fishingRodBandFor,
   fishingTeachingCeilingFor,
   startFishing,
 } from '../src/sim/professions/fishing';
+import {
+  FISHING_CATCH_BAND_THRESHOLDS,
+  fishingCatchBandFor,
+} from '../src/sim/professions/fishing_bands';
+import {
+  PROFICIENCY_BAND_THRESHOLDS,
+  proficiencyBandFor,
+} from '../src/sim/professions/proficiency_bands';
+import { canGatherTier } from '../src/sim/professions/tools';
 import { type PlayerMeta, Sim } from '../src/sim/sim';
 import { DT, type Entity, FISHING_CAST_ID, GATHER_CAST_ID, type SimEvent } from '../src/sim/types';
 import { terrainHeight } from '../src/sim/world';
@@ -556,7 +568,7 @@ describe('fishing draw contract (pin 2, the bite-and-reel shape)', () => {
 });
 
 describe('fishing proficiency accrual (pin 3)', () => {
-  it('accrues +1 per landed catch (fish AND junk), 0 on no-bite, through the tick drain', () => {
+  it('accrues the band-0 schedule amount per landed catch (fish AND junk), 0 on no-bite', () => {
     const sim = makeSim(467);
     const meta = sim.meta(sim.playerId)!;
     let landed = 0;
@@ -572,25 +584,40 @@ describe('fishing proficiency accrual (pin 3)', () => {
         expect(meta.pendingGatherGrants).toHaveLength(before + 1);
         expect(meta.pendingGatherGrants[meta.pendingGatherGrants.length - 1]).toEqual({
           professionId: 'fishing',
-          amount: 1,
+          // Read off the schedule's first row rather than restated: this arm
+          // is about the FAUCET running once per landed catch, and the value
+          // it queues is DECISION F's business, pinned as a literal in
+          // 'pins the schedule and cutoff literals' below.
+          amount: FISHING_GAIN_SCHEDULE[0].gain,
         });
       }
     }
     // Junk accrues exactly like fish: the seed 467 run lands tangled_weed.
     expect(kinds.has(WEED)).toBe(true);
     expect(landed).toBeGreaterThan(0);
+    // One landed catch, one schedule amount. Since DECISION F the amount is
+    // FRACTIONAL, so the accrued total is a float sum and must be compared
+    // with a tolerance rather than an equality: 29 catches at 0.08 is
+    // 2.3200000000000007 in IEEE754, and pinning the exact bit pattern would
+    // be pinning the summation order rather than the behavior.
+    const accrued = landed * FISHING_GAIN_SCHEDULE[0].gain;
     // Grants ride the gathering queue: nothing lands before the tick drain.
     expect(meta.gatheringProficiency.fishing).toBe(0);
     sim.tick();
-    expect(meta.gatheringProficiency.fishing).toBe(landed);
+    expect(meta.gatheringProficiency.fishing).toBeCloseTo(accrued, 10);
     // The accrual surfaces through both IWorld gathering projections.
-    expect(sim.gatheringProficiencyFor(sim.playerId).fishing).toBe(landed);
-    expect(sim.professionsStateFor(sim.playerId).skills).toContainEqual({
-      professionId: 'fishing',
-      skill: landed,
-      // The enforced fishing cap is 200.
-      maxSkill: 200,
-    });
+    expect(sim.gatheringProficiencyFor(sim.playerId).fishing).toBeCloseTo(accrued, 10);
+    // NOT toContainEqual against a value read back off meta: that would be
+    // the projection compared with its own input. Find the row by profession
+    // id, then hold its two fields against the independently computed accrual
+    // and the literal cap.
+    const fishingSkillRow = sim
+      .professionsStateFor(sim.playerId)
+      .skills.find((row) => row.professionId === 'fishing');
+    expect(fishingSkillRow).toBeDefined();
+    expect(fishingSkillRow?.skill).toBeCloseTo(accrued, 10);
+    // The enforced fishing cap is 200.
+    expect(fishingSkillRow?.maxSkill).toBe(200);
   });
 });
 
@@ -642,37 +669,37 @@ describe('fishing character XP: the deliberate zero', () => {
 
 describe('fishing catch gain schedule (Professions 2.0)', () => {
   it('fishingCatchGain walks the fractional schedule AT the half-band boundaries', () => {
-    expect(fishingCatchGain(0, false)).toBe(1);
-    expect(fishingCatchGain(49, false)).toBe(1);
-    expect(fishingCatchGain(50, false)).toBe(0.5);
-    expect(fishingCatchGain(99, false)).toBe(0.5);
-    expect(fishingCatchGain(100, false)).toBe(0.1);
-    expect(fishingCatchGain(149, false)).toBe(0.1);
-    expect(fishingCatchGain(150, false)).toBe(0.02);
-    expect(fishingCatchGain(199, false)).toBe(0.02);
+    expect(fishingCatchGain(0, false)).toBe(0.08);
+    expect(fishingCatchGain(49, false)).toBe(0.08);
+    expect(fishingCatchGain(50, false)).toBe(0.05);
+    expect(fishingCatchGain(99, false)).toBe(0.05);
+    expect(fishingCatchGain(100, false)).toBe(0.04);
+    expect(fishingCatchGain(149, false)).toBe(0.04);
+    expect(fishingCatchGain(150, false)).toBe(0.03);
+    expect(fishingCatchGain(199, false)).toBe(0.03);
     // At or past the last row the schedule returns 0: the maxSkill cap clamp
     // is the real stop, not this function.
     expect(fishingCatchGain(200, false)).toBe(0);
   });
 
   it('junk follows the schedule below the cutoff and grants 0 at or past it', () => {
-    expect(fishingCatchGain(0, true)).toBe(1);
-    expect(fishingCatchGain(99, true)).toBe(0.5);
+    expect(fishingCatchGain(0, true)).toBe(0.08);
+    expect(fishingCatchGain(99, true)).toBe(0.05);
     expect(fishingCatchGain(100, true)).toBe(0);
     expect(fishingCatchGain(150, true)).toBe(0);
   });
 
   it('pins the schedule and cutoff literals', () => {
     expect(FISHING_GAIN_SCHEDULE).toEqual([
-      { belowProficiency: 50, gain: 1 },
-      { belowProficiency: 100, gain: 0.5 },
-      { belowProficiency: 150, gain: 0.1 },
-      { belowProficiency: 200, gain: 0.02 },
+      { belowProficiency: 50, gain: 0.08 },
+      { belowProficiency: 100, gain: 0.05 },
+      { belowProficiency: 150, gain: 0.04 },
+      { belowProficiency: 200, gain: 0.03 },
     ]);
     expect(FISHING_JUNK_GAIN_CUTOFF_PROFICIENCY).toBe(100);
   });
 
-  it('live completeFishing queues the schedule amount: 0.5 per landed catch at proficiency 50', () => {
+  it('live completeFishing queues the schedule amount: 0.05 per landed catch at proficiency 50', () => {
     const sim = makeSim(467);
     const meta = sim.meta(sim.playerId)!;
     teleportToValeShore(sim);
@@ -681,7 +708,7 @@ describe('fishing catch gain schedule (Professions 2.0)', () => {
     for (let i = 0; i < 30 && caught === null; i++) caught = castOnce(sim, meta).caught;
     expect(caught).not.toBeNull();
     // Exactly one landed catch so far: one queued grant, at the 50-99 row.
-    expect(meta.pendingGatherGrants).toEqual([{ professionId: 'fishing', amount: 0.5 }]);
+    expect(meta.pendingGatherGrants).toEqual([{ professionId: 'fishing', amount: 0.05 }]);
   });
 
   it('live R19 ceiling: at proficiency 150 tier-1 water teaches NOTHING, fish and weed alike', () => {
@@ -710,7 +737,7 @@ describe('fishing catch gain schedule (Professions 2.0)', () => {
     expect(sawFish).toBe(true);
   });
 
-  it('live R19 in TIER-2 water: Mirefen still teaches 0.1 at proficiency 120', () => {
+  it('live R19 in TIER-2 water: Mirefen still teaches 0.04 at proficiency 120', () => {
     // The live evidence every drive above is blind to: they all fish tier-1
     // Vale water, so replacing the rodTierRequiredForZone(zoneId) read at
     // completeFishing's gain call with the literal 1 kept the whole suite
@@ -756,7 +783,7 @@ describe('fishing catch gain schedule (Professions 2.0)', () => {
         // the Vale rows being mistaken for tier-2 teaching.
         expect(result.zoneId).toBe('mirefen_marsh');
         expect(meta.pendingGatherGrants.slice(before)).toEqual([
-          { professionId: 'fishing', amount: 0.1 },
+          { professionId: 'fishing', amount: 0.04 },
         ]);
       }
     }
@@ -792,39 +819,365 @@ describe('fishing catch gain schedule (Professions 2.0)', () => {
   });
 
   it('below its water ceiling the composed gain IS the schedule amount (the D12 arm)', () => {
-    // R19 composes with the untouched schedule: no value changes, teaching
-    // just stops at the water's edge. Junk composition included: the cutoff
-    // still bites above 100 wherever the water itself still teaches.
-    expect(fishingCatchGainAt(0, false, 1)).toBe(1);
-    expect(fishingCatchGainAt(49, false, 1)).toBe(1);
-    expect(fishingCatchGainAt(50, false, 1)).toBe(0.5);
-    expect(fishingCatchGainAt(99, false, 1)).toBe(0.5);
-    expect(fishingCatchGainAt(100, false, 2)).toBe(0.1);
-    expect(fishingCatchGainAt(149, false, 2)).toBe(0.1);
-    expect(fishingCatchGainAt(150, false, 3)).toBe(0.02);
-    expect(fishingCatchGainAt(199, false, 3)).toBe(0.02);
+    // R19 composes with the schedule: teaching stops at the water's edge and
+    // takes nothing off the value below it. masterwrought Phase 11i retuned
+    // the four VALUES (DECISION F) and left this composition alone, which is
+    // what this arm is for: the numbers below are the schedule's, read at
+    // each row, and the ceiling only ever turns one into 0. Junk composition
+    // included: the cutoff still bites above 100 wherever the water teaches.
+    expect(fishingCatchGainAt(0, false, 1)).toBe(0.08);
+    expect(fishingCatchGainAt(49, false, 1)).toBe(0.08);
+    expect(fishingCatchGainAt(50, false, 1)).toBe(0.05);
+    expect(fishingCatchGainAt(99, false, 1)).toBe(0.05);
+    expect(fishingCatchGainAt(100, false, 2)).toBe(0.04);
+    expect(fishingCatchGainAt(149, false, 2)).toBe(0.04);
+    expect(fishingCatchGainAt(150, false, 3)).toBe(0.03);
+    expect(fishingCatchGainAt(199, false, 3)).toBe(0.03);
     // The junk cutoff survives inside higher water's teaching range.
     expect(fishingCatchGainAt(120, true, 2)).toBe(0);
-    expect(fishingCatchGainAt(120, false, 2)).toBe(0.1);
-    expect(fishingCatchGainAt(99, true, 1)).toBe(0.5);
+    expect(fishingCatchGainAt(120, false, 2)).toBe(0.04);
+    expect(fishingCatchGainAt(99, true, 1)).toBe(0.05);
   });
 });
 
 describe('fishing band function (pin 4)', () => {
-  it('FISHING_BAND_THRESHOLDS are literally [0, 100, 200]', () => {
-    expect([...FISHING_BAND_THRESHOLDS]).toEqual([0, 100, 200]);
+  // THE LADDER PIN MOVED ONTO FISHING'S OWN LEAF (masterwrought Phase 11i
+  // DECISION B). It used to read [0, 100, 200] because
+  // FISHING_BAND_THRESHOLDS aliased PROFICIENCY_BAND_THRESHOLDS; the two are
+  // separate arrays now, and pinning them apart is the whole point of the
+  // split. Both literals below are written out rather than derived from each
+  // other, so an edit to either array has to visit this file.
+  it('FISHING_CATCH_BAND_THRESHOLDS are literally [0, 100, 150, 200, 200, 200]', () => {
+    expect([...FISHING_CATCH_BAND_THRESHOLDS]).toEqual([0, 100, 150, 200, 200, 200]);
+    expect(FISHING_CATCH_BAND_THRESHOLDS).toHaveLength(6);
+    // The re-export fishing.ts keeps for its existing importers IS the leaf's
+    // array, not a copy that could drift from it.
+    expect(FISHING_BAND_THRESHOLDS).toBe(FISHING_CATCH_BAND_THRESHOLDS);
+    // One table per band, so the ladder and the tables cannot disagree about
+    // how many bands there are.
+    expect(FISHING_TABLES_BY_BAND).toHaveLength(FISHING_CATCH_BAND_THRESHOLDS.length);
   });
 
-  it('fishingBandFor maps the boundaries exactly and NaN falls to band 0', () => {
+  it('the SHARED proficiency ladder is untouched at [0, 100, 200] and still drives land gathering', () => {
+    // DECISION B's whole reason: PROFICIENCY_BAND_THRESHOLDS is read by
+    // professions/gathering.ts for the land gather-cast duration and by
+    // proficiency_display_heal.ts, so carrying fishing's new bands on it
+    // would have retuned land gathering silently.
+    expect([...PROFICIENCY_BAND_THRESHOLDS]).toEqual([0, 100, 200]);
+    expect(PROFICIENCY_BAND_THRESHOLDS).toHaveLength(3);
+    // And the two arrays really are different objects, so neither pin above
+    // is reading the other one.
+    expect(PROFICIENCY_BAND_THRESHOLDS).not.toBe(FISHING_CATCH_BAND_THRESHOLDS);
+    // The land band each proficiency resolves to, at every boundary the
+    // shared ladder names plus the two values fishing moved (150 and 200):
+    // a land gatherer sees exactly what they saw before this phase.
+    for (const [proficiency, band] of [
+      [0, 0],
+      [99, 0],
+      [100, 1],
+      [149, 1],
+      [150, 1],
+      [199, 1],
+      [200, 2],
+    ] as const) {
+      expect(proficiencyBandFor(proficiency), `land band at ${proficiency}`).toBe(band);
+    }
+    // 150 is the case that matters: fishing's ladder promotes it to band 2
+    // and the land ladder must still read band 1.
+    expect(proficiencyBandFor(150)).toBe(1);
+    expect(fishingCatchBandFor(150)).toBe(2);
+  });
+
+  it('fishingBandFor maps every boundary exactly and NaN falls to band 0', () => {
     expect(fishingBandFor(0)).toBe(0);
     expect(fishingBandFor(99)).toBe(0);
     expect(fishingBandFor(100)).toBe(1);
-    expect(fishingBandFor(199)).toBe(1);
-    expect(fishingBandFor(200)).toBe(2);
-    expect(fishingBandFor(300)).toBe(2);
+    expect(fishingBandFor(149)).toBe(1);
+    expect(fishingBandFor(150)).toBe(2);
+    expect(fishingBandFor(199)).toBe(2);
+    // Bands 3, 4 and 5 all gate at 200, so proficiency alone tops out at the
+    // LAST of them and the rod is the only axis left above the cap.
+    expect(fishingBandFor(200)).toBe(5);
+    expect(fishingBandFor(300)).toBe(5);
     expect(fishingBandFor(Number.NaN)).toBe(0);
     // A negative proficiency (malformed input) also falls to band 0.
     expect(fishingBandFor(-5)).toBe(0);
+    // fishing.ts's export IS the leaf's function, not a re-implementation.
+    expect(fishingBandFor).toBe(fishingCatchBandFor);
+  });
+
+  it('fishingRodBandFor rides the shipped band-b-takes-tier-b-plus-1 gate at every rung', () => {
+    // The gate is the shipped one, reused rather than replaced: this is what
+    // retroactively gives the two crafted rods a catch band to open.
+    for (const [rodTier, band] of [
+      [1, 0],
+      [2, 1],
+      [3, 2],
+      [4, 3],
+      [5, 4],
+      [6, 5],
+      [7, 5],
+    ] as const) {
+      expect(fishingRodBandFor(rodTier), `rod tier ${rodTier}`).toBe(band);
+    }
+    // Derived from canGatherTier rather than restated: every rung's answer is
+    // the highest band b whose required tier b + 1 the rod covers, so a change
+    // to the comparator reds here instead of quietly re-gating the tables.
+    for (let rodTier = 1; rodTier <= 7; rodTier++) {
+      let expected = 0;
+      for (let band = 1; band <= 5; band++) if (canGatherTier(rodTier, band + 1)) expected = band;
+      expect(fishingRodBandFor(rodTier), `derived rod tier ${rodTier}`).toBe(expected);
+    }
+  });
+});
+
+// The DECISION B acceptance, and it is a TEST rather than a paragraph: the
+// claim "no angler alive resolves to a lower catch band than they did before
+// Phase 11i" is only worth anything if something walks the whole domain and
+// says so.
+//
+// THE REFERENCE LADDER IS HARD-CODED HERE, NEVER IMPORTED. Importing the new
+// constants and comparing them to themselves is the constant-self-comparison
+// trap this packet has already been bitten by twice; these two functions are
+// the pre-phase source transcribed, and they are what make the walk decisive.
+const PRE_PHASE_PROFICIENCY_THRESHOLDS = [0, 100, 200] as const;
+const PRE_PHASE_BAND_COUNT = 3;
+function prePhaseProficiencyBand(proficiency: number): number {
+  if (proficiency >= PRE_PHASE_PROFICIENCY_THRESHOLDS[2]) return 2;
+  if (proficiency >= PRE_PHASE_PROFICIENCY_THRESHOLDS[1]) return 1;
+  return 0;
+}
+function prePhaseRodBand(rodTier: number): number {
+  let band = 0;
+  for (let b = 1; b < PRE_PHASE_BAND_COUNT; b++) if (canGatherTier(rodTier, b + 1)) band = b;
+  return band;
+}
+const prePhaseEffectiveBand = (proficiency: number, rodTier: number): number =>
+  Math.min(prePhaseProficiencyBand(proficiency), prePhaseRodBand(rodTier));
+
+// The DECISION F derivation (Phase 11i, qr-11i-PACE): the four
+// FISHING_GAIN_SCHEDULE values are DERIVED from a measured casts-to-200 model,
+// and this is the arm that reproduces the model rather than restating its
+// output. The 11e idiom: the model recorded in state.md is the authority, the
+// literals in fishing.ts are what it is held against.
+//
+// EVERY INPUT IS A SHIPPED CONSTANT, imported rather than transcribed, so a
+// retune of the bite ladder or the reel window reds this instead of leaving a
+// stale model behind. The one thing written out is the reference PATH (which
+// water and which rod each fifty-point segment is climbed with), because that
+// is a statement about how the game is played and cannot be read off a
+// constant.
+describe('the DECISION F casts-to-200 model (Phase 11i)', () => {
+  // Which water the R19 teaching ceiling FORCES for each fifty-point segment,
+  // and the cheapest rod that water takes (fishing_zones.ts). Deliberately the
+  // minimum rod: a better-equipped angler climbs faster, so this is the slow
+  // reference, not an optimistic one.
+  const SEGMENTS = [
+    { from: 0, zoneId: 'eastbrook_vale', rodTier: 1 },
+    { from: 50, zoneId: 'eastbrook_vale', rodTier: 1 },
+    { from: 100, zoneId: 'mirefen_marsh', rodTier: 2 },
+    { from: 150, zoneId: 'thornpeak_heights', rodTier: 3 },
+  ] as const;
+
+  /** The reference cast cycle: the mean seeded bite wait for this rod tier,
+   *  plus the shipped BASE reel window (a better rod's wider window is margin,
+   *  not time spent), plus the one tick the re-press lands on. */
+  const cycleSecFor = (rodTier: number): number =>
+    (FISH_BITE_DELAY_MIN_SEC + fishBiteMaxSecFor(rodTier)) / 2 + FISH_REEL_WINDOW_SEC + DT;
+
+  /** The share of casts that TEACH, read off the live cell table for the band
+   *  the segment fishes: everything but the empty hook, minus the grey junk
+   *  once the junk cutoff bites. */
+  const teachShareFor = (zoneId: string, band: number, proficiency: number): number => {
+    const rows = FISHING_TABLES_BY_BAND[band][zoneId];
+    const total = rows.reduce((sum, r) => sum + r.weight, 0);
+    let teaching = 0;
+    for (const row of rows) {
+      if (row.itemId === null) continue;
+      const isGreyJunk = ITEMS[row.itemId]?.kind === 'junk' && !isRawCookingCatch(row.itemId);
+      if (isGreyJunk && proficiency >= FISHING_JUNK_GAIN_CUTOFF_PROFICIENCY) continue;
+      teaching += row.weight;
+    }
+    return teaching / total;
+  };
+
+  /** Seconds the reference angler spends on one fifty-point segment. */
+  const segmentSeconds = (index: number, gain: number): number => {
+    const seg = SEGMENTS[index];
+    const band = Math.min(fishingCatchBandFor(seg.from), fishingRodBandFor(seg.rodTier));
+    const catches = 50 / gain;
+    const casts = catches / teachShareFor(seg.zoneId, band, seg.from);
+    return casts * cycleSecFor(seg.rodTier);
+  };
+
+  const evaluate = (gains: readonly number[]) => {
+    const sec = gains.map((g, i) => segmentSeconds(i, g));
+    const total = sec.reduce((a, b) => a + b, 0);
+    return { sec, total, hours: total / 3600, shares: sec.map((x) => x / total) };
+  };
+
+  const SPAN_MIN_HOURS = 10;
+  const SPAN_MAX_HOURS = 12;
+  const BAND_SHARE_CAP = 1 / 3;
+
+  it('the model reproduces the SHIPPED schedule as the chore the ruling describes', () => {
+    // Non-vacuity for everything below: the model has to be able to SEE the
+    // defect, or its verdict on the fix means nothing. Under the pre-phase
+    // values the last fifty points are the overwhelming majority of the climb.
+    const shipped = evaluate([1, 0.5, 0.1, 0.02]);
+    expect(shipped.shares[3]).toBeGreaterThan(0.75);
+    expect(shipped.sec[3] / 3600).toBeGreaterThan(5);
+  });
+
+  it('the SHIPPED literals satisfy the settled span and the one-third cap', () => {
+    const gains = FISHING_GAIN_SCHEDULE.map((row) => row.gain);
+    const r = evaluate(gains);
+    expect(r.hours).toBeGreaterThanOrEqual(SPAN_MIN_HOURS);
+    expect(r.hours).toBeLessThanOrEqual(SPAN_MAX_HOURS);
+    for (const [i, share] of r.shares.entries()) {
+      expect(share, `band ${i} share`).toBeLessThanOrEqual(BAND_SHARE_CAP);
+    }
+    // A genuine RAMP, not a flat curve: each band costs at least the one
+    // before it, which is what keeps the early climb the cheapest.
+    for (let i = 1; i < r.sec.length; i++) expect(r.sec[i]).toBeGreaterThanOrEqual(r.sec[i - 1]);
+    // Strictly decreasing gains: a real curve, not two rungs sharing a value.
+    for (let i = 1; i < gains.length; i++) expect(gains[i]).toBeLessThan(gains[i - 1]);
+    // Every value sits on the 0.01 grid the search ran over.
+    for (const g of gains) expect(Math.round(g * 100)).toBeCloseTo(g * 100, 10);
+  });
+
+  it('the four literals ARE the search result: re-run the selection and get them back', () => {
+    // THE DERIVATION, run rather than described. Among 0.01-grid
+    // non-increasing schedules inside the span, with a genuine ramp and no
+    // band over a third, take the STRICTLY decreasing ones (a real curve) and
+    // of those the one nearest the span midpoint. That is a total order, so
+    // the answer is unique and it must be what ships.
+    const grid: number[] = [];
+    for (let v = 1; v <= 100; v++) grid.push(v / 100);
+    const midpoint = (SPAN_MIN_HOURS + SPAN_MAX_HOURS) / 2;
+    let legal = 0;
+    let strict = 0;
+    let best: { gains: number[]; distance: number } | null = null;
+    for (const g0 of grid)
+      for (const g1 of grid) {
+        if (g1 > g0) continue;
+        for (const g2 of grid) {
+          if (g2 > g1) continue;
+          for (const g3 of grid) {
+            if (g3 > g2) continue;
+            const r = evaluate([g0, g1, g2, g3]);
+            if (r.hours < SPAN_MIN_HOURS || r.hours > SPAN_MAX_HOURS) continue;
+            let ramp = true;
+            for (let i = 1; i < 4; i++) if (r.sec[i] < r.sec[i - 1]) ramp = false;
+            if (!ramp) continue;
+            if (Math.max(...r.shares) > BAND_SHARE_CAP) continue;
+            legal++;
+            if (!(g1 < g0 && g2 < g1 && g3 < g2)) continue;
+            strict++;
+            const distance = Math.abs(r.hours - midpoint);
+            if (!best || distance < best.distance) best = { gains: [g0, g1, g2, g3], distance };
+          }
+        }
+      }
+    // The search space really is narrow, and it really does discriminate:
+    // sixteen schedules clear every constraint and only three of those are
+    // strictly decreasing. Pinned so a loosened constraint (which would let
+    // hundreds through and make the pick arbitrary) reds here.
+    expect(legal).toBe(16);
+    expect(strict).toBe(3);
+    expect(best).not.toBeNull();
+    expect(best?.gains).toEqual(FISHING_GAIN_SCHEDULE.map((row) => row.gain));
+  });
+
+  it('the per-band hours are what the ledger recorded, to the minute', () => {
+    // PREDICTED IN THE LEDGER BEFORE THIS RAN: 1.55 / 2.48 / 3.29 / 3.61
+    // hours, 10.94 total, shares 14.2 / 22.7 / 30.1 / 33.0 percent.
+    const r = evaluate(FISHING_GAIN_SCHEDULE.map((row) => row.gain));
+    const hours = r.sec.map((s) => Math.round((s / 3600) * 100) / 100);
+    expect(hours).toEqual([1.55, 2.48, 3.29, 3.61]);
+    expect(Math.round(r.hours * 100) / 100).toBe(10.94);
+    expect(r.shares.map((s) => Math.round(s * 1000) / 10)).toEqual([14.2, 22.7, 30.1, 33]);
+  });
+
+  it('the band BOUNDARIES did not move, and the teaching ceilings still derive from them', () => {
+    // DECISION F moves VALUES only. fishingTeachingCeilingFor reads the
+    // boundaries, so a moved one would silently re-gate which water teaches.
+    expect(FISHING_GAIN_SCHEDULE.map((row) => row.belowProficiency)).toEqual([50, 100, 150, 200]);
+    expect(fishingTeachingCeilingFor(1)).toBe(100);
+    expect(fishingTeachingCeilingFor(2)).toBe(150);
+    expect(fishingTeachingCeilingFor(3)).toBe(200);
+    // And the junk cutoff is untouched.
+    expect(FISHING_JUNK_GAIN_CUTOFF_PROFICIENCY).toBe(100);
+  });
+});
+
+describe('the DECISION B regression walk: nobody loses access (Phase 11i)', () => {
+  const MAX_ROD_TIER = 6;
+  const walk = () => {
+    const lower: string[] = [];
+    const moved: { proficiency: number; rodTier: number; from: number; to: number }[] = [];
+    let pairs = 0;
+    for (let proficiency = 0; proficiency <= 200; proficiency++) {
+      for (let rodTier = 1; rodTier <= MAX_ROD_TIER; rodTier++) {
+        pairs++;
+        const before = prePhaseEffectiveBand(proficiency, rodTier);
+        const after = Math.min(fishingCatchBandFor(proficiency), fishingRodBandFor(rodTier));
+        if (after < before) lower.push(`p${proficiency} t${rodTier}: ${before} -> ${after}`);
+        else if (after > before) moved.push({ proficiency, rodTier, from: before, to: after });
+      }
+    }
+    return { pairs, lower, moved };
+  };
+
+  it('every (proficiency, rod tier) pair resolves AT OR ABOVE its pre-phase band', () => {
+    const { pairs, lower } = walk();
+    expect(pairs).toBe(201 * MAX_ROD_TIER);
+    expect(lower).toEqual([]);
+  });
+
+  it('the pairs that MOVE are exactly the set the ledger predicted, and it is not empty', () => {
+    // PREDICTED IN THE LEDGER BEFORE THIS RAN (state.md, the Phase 11i
+    // ledger): 203 pairs move and nothing else does.
+    //   200 pairs  proficiency 150-199 x rod tier 3-6   band 1 -> 2
+    //     1 pair   proficiency 200     x rod tier 4     band 2 -> 3
+    //     1 pair   proficiency 200     x rod tier 5     band 2 -> 4
+    //     1 pair   proficiency 200     x rod tier 6     band 2 -> 5
+    const { moved } = walk();
+    expect(moved).toHaveLength(203);
+    // Non-vacuity, stated as its own assertion rather than implied by the
+    // count: a walk that moved NOTHING would make the arm above pass too.
+    expect(moved.length).toBeGreaterThan(0);
+
+    const midClimb = moved.filter((m) => m.proficiency >= 150 && m.proficiency <= 199);
+    expect(midClimb).toHaveLength(200);
+    expect(new Set(midClimb.map((m) => m.rodTier))).toEqual(new Set([3, 4, 5, 6]));
+    expect(new Set(midClimb.map((m) => `${m.from}->${m.to}`))).toEqual(new Set(['1->2']));
+
+    const atCap = moved
+      .filter((m) => m.proficiency === 200)
+      .sort((a, b) => a.rodTier - b.rodTier)
+      .map((m) => [m.rodTier, m.from, m.to]);
+    expect(atCap).toEqual([
+      [4, 2, 3],
+      [5, 2, 4],
+      [6, 2, 5],
+    ]);
+
+    // The two shipped crafted rods are the point of the whole phase: before
+    // it, tier 4 and tier 5 resolved to the SAME band a tier-3 rod did.
+    expect(prePhaseEffectiveBand(200, 3)).toBe(prePhaseEffectiveBand(200, 5));
+    expect(Math.min(fishingCatchBandFor(200), fishingRodBandFor(3))).not.toBe(
+      Math.min(fishingCatchBandFor(200), fishingRodBandFor(5)),
+    );
+  });
+
+  it('land gathering is untouched at every proficiency the walk covers', () => {
+    // The other half of DECISION B: fishing moved, the SHARED ladder did not.
+    for (let proficiency = 0; proficiency <= 200; proficiency++) {
+      expect(proficiencyBandFor(proficiency), `land band at ${proficiency}`).toBe(
+        prePhaseProficiencyBand(proficiency),
+      );
+    }
   });
 });
 
@@ -1344,21 +1697,47 @@ describe('fishing deeds through the extracted module path (pin 9)', () => {
     expect(meta.deedsEarned.has('chr_vale_first_cast')).toBe(true);
   });
 
-  it('ACCEPTED DRIFT (documented semantic): a first landed catch completes prog_first_harvest', () => {
+  it('ACCEPTED DRIFT, NARROWED BY DECISION F: fishing still completes prog_first_harvest, no longer on the first catch', () => {
     // prog_first_harvest ("Harvest your first gathering node", trigger
-    // gathering amount 1) is now also satisfied by a first landed fishing
-    // catch, without ever touching a world node: fishing is a full gathering
-    // proficiency, and the deed trigger counts any profession at 1 or more.
+    // gathering amount 1) is satisfied by fishing at all because fishing is a
+    // full gathering proficiency and the trigger counts any profession at 1
+    // or more. That was DRIFT rather than design, and 11i's gain retune
+    // narrows it without closing it: one catch used to grant a whole point,
+    // so the deed fired on the very first fish; band 0 now grants 0.08, so it
+    // takes ceil(1 / 0.08) = 13 landed catches. A first LAND node still
+    // grants it instantly (the land curve is untouched), and the deed that
+    // should fire on a first cast, chr_vale_first_cast, still does (the arm
+    // above). Both halves are asserted so the narrowing is pinned in both
+    // directions rather than described.
     const sim = makeSim(467);
     const meta = sim.meta(sim.playerId)!;
     sim.ctx.markDeedsDirty(meta.entityId);
     sim.tick();
     expect(meta.deedsEarned.has('prog_first_harvest')).toBe(false);
-    const { caught } = castOnce(sim, meta);
-    expect(caught).not.toBeNull();
-    sim.tick(); // drain the grant
+
+    // ONE catch is no longer enough, which is the half a re-tune upward would
+    // silently undo.
+    let landed = 0;
+    for (let i = 0; i < 60 && landed < 1; i++) if (castOnce(sim, meta).caught !== null) landed++;
+    expect(landed).toBe(1);
+    sim.tick();
     sim.ctx.markDeedsDirty(meta.entityId);
     sim.tick();
+    expect(meta.gatheringProficiency.fishing).toBe(FISHING_GAIN_SCHEDULE[0].gain);
+    expect(meta.deedsEarned.has('prog_first_harvest')).toBe(false);
+
+    // And the deed is still REACHABLE by fishing alone, at the catch count
+    // the schedule's first row derives.
+    const needed = Math.ceil(1 / FISHING_GAIN_SCHEDULE[0].gain);
+    expect(needed).toBe(13);
+    for (let i = 0; i < 400 && landed < needed; i++) {
+      if (castOnce(sim, meta).caught !== null) landed++;
+    }
+    expect(landed, 'the drive must land the full count').toBe(needed);
+    sim.tick();
+    sim.ctx.markDeedsDirty(meta.entityId);
+    sim.tick();
+    expect(meta.gatheringProficiency.fishing).toBeGreaterThanOrEqual(1);
     expect(meta.deedsEarned.has('prog_first_harvest')).toBe(true);
   });
 
@@ -1650,14 +2029,21 @@ describe('fishing over the live server (pin 8)', () => {
     expect(typeof mine[0].quality).toBe('string');
     expect(fishingResultsIn(deliveredEvents(fcB))).toHaveLength(0);
     expect(sb.pid).not.toBe(sa.pid);
-    expect(meta.gatheringProficiency.fishing).toBe(1);
+    // The accrual is the schedule's band-0 row, read off it rather than
+    // restated: this arm is about the value REACHING the mirror intact, and
+    // the value itself is DECISION F's, pinned as a literal in the schedule
+    // arm. A fractional amount is the interesting case for the wire, because
+    // an integer field would have truncated it to zero.
+    const bandZeroGain = FISHING_GAIN_SCHEDULE[0].gain;
+    expect(bandZeroGain).toBe(0.08);
+    expect(meta.gatheringProficiency.fishing).toBe(bandZeroGain);
 
     // The gprof delta carries the accrual to the client mirror.
     (server as any).broadcastSnapshots();
     const delta = lastSnap(fcA.sent);
     expect(delta).not.toBeNull();
     (client as any).applySnapshot(delta);
-    expect(client.gatheringProficiency.fishing).toBe(1);
+    expect(client.gatheringProficiency.fishing).toBe(bandZeroGain);
   });
 
   it('an empty-hook reel routes the personal fishingEmptyHook to the angler only', () => {

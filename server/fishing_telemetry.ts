@@ -43,49 +43,68 @@
 // so every zone the sim can put on a fishing event is a member of this list.
 //
 // CARDINALITY IS BOUNDED BY CONSTRUCTION, the same contract as
-// server/http/game_signals.ts: zones x bands is 3 x 3 per fishing family and
-// the rod-fee family is the two shipped rod recipes. Nothing per-player
+// server/http/game_signals.ts: zones x bands is 3 x 6 per fishing family
+// (masterwrought Phase 11i grew the catch ladder from three bands to six; it
+// was 3 x 3) and the rod-fee family is the three shipped rod recipes, up from
+// two with 11i's apex rung. Nothing per-player
 // (account id, character id, name, ip) is ever a label, and the exporter's
 // membership guards drop anything off these lists rather than minting a series
 // for it.
 
 import { FISHING_RARE_ID } from '../src/sim/content/items';
 import { ROD_RECIPES } from '../src/sim/content/recipes';
+import type { FishingCatchBand } from '../src/sim/professions/fishing_bands';
 import { trainingFeeFor } from '../src/sim/professions/training';
 
 /**
- * The three fishing bands, as label values. Fixed at three by the proficiency
- * ladder (FISHING_BAND_THRESHOLDS) and by the three per-band catch tables, NOT
- * derived from a content list: a band is a rung, not a record, so a fourth one
- * is a design change that should redden this pin rather than silently widen
- * every fishing series.
+ * The six fishing bands, as label values. Fixed at six by the catch-band
+ * ladder (FISHING_CATCH_BAND_THRESHOLDS in
+ * src/sim/professions/fishing_bands.ts) and by the six per-band catch tables,
+ * NOT derived from a content list: a band is a rung, not a record, so a
+ * SEVENTH one is a design change that should redden this pin rather than
+ * silently widen every fishing series.
+ *
+ * IT WAS THREE UNTIL masterwrought Phase 11i, and this pin did exactly the job
+ * the paragraph above promised: growing the ladder reddened it and the widening
+ * was a deliberate edit here rather than a series that appeared on its own.
+ * Hand-written on purpose even so, because the alternative (deriving the length
+ * from the threshold array) would make the next widening silent again.
  *
  * The band a cast is counted under is the EFFECTIVE band the sim resolved
  * (effectiveFishingBand: min of proficiency band and the owned rod's band), so
  * an over-rodded low-proficiency angler counts where they actually fished.
  */
-export const FISHING_BANDS = ['0', '1', '2'] as const;
+export const FISHING_BANDS = ['0', '1', '2', '3', '4', '5'] as const;
 
-/** One of the three fishing band label values. */
+/** One of the six fishing band label values. */
 export type FishingBandLabel = (typeof FISHING_BANDS)[number];
 
 /**
- * The label value for a sim-side band. The sim types the band 0 | 1 | 2 on
- * every fishing event, so this is total over its whole domain; a value outside
- * it can only come from a caller bug, and the exporter's membership guard drops
- * that rather than minting a series (a band is a distribution, so re-banding a
- * malformed sample would corrupt the very question R4 asks of it).
+ * The label value for a sim-side band. The sim types the band
+ * `FishingCatchBand` on every fishing event, so this is total over its whole
+ * domain; a value outside it can only come from a caller bug, and the
+ * exporter's membership guard drops that rather than minting a series (a band
+ * is a distribution, so re-banding a malformed sample would corrupt the very
+ * question R4 asks of it).
  */
-export function fishingBandLabel(band: 0 | 1 | 2): FishingBandLabel {
+export function fishingBandLabel(band: FishingCatchBand): FishingBandLabel {
   return FISHING_BANDS[band];
 }
 
 /**
  * The rod recipes whose training fee is counted, derived from the rod recipe
- * list so the label set cannot drift from the shipped rods. Exactly the two
- * trainer-taught rods today (recipe_stormreel_fishing_rod at skillReq 75 and
- * recipe_tidewrought_fishing_rod at 125); a third rod extends the label set by
- * construction and the exporter pre-seeds it to zero.
+ * list so the label set cannot drift from the shipped rods. THREE rows since
+ * masterwrought Phase 11i, and the derivation is what made that free: the two
+ * trainer-taught rods (recipe_stormreel_fishing_rod at skillReq 75 and
+ * recipe_tidewrought_fishing_rod at 125) plus the apex rung.
+ *
+ * THE APEX RUNG IS DROP-TAUGHT, so its fee series is pre-seeded and stays at
+ * zero forever: nobody trains a pattern-taught recipe, and trainingFeeFor is a
+ * pure tier lookup that answers for any recipe whether or not a trainer would
+ * ever quote it. A permanently-zero series is the honest reading here rather
+ * than a hole: the family is "what a rod rung costs at a trainer", and the
+ * answer for a drop-taught rung is nothing, which is exactly what a reader
+ * comparing the three rungs needs to see.
  */
 export const ROD_FEE_RECIPE_IDS: readonly string[] = Object.freeze(
   ROD_RECIPES.map((recipe) => recipe.id),

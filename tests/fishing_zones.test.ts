@@ -988,12 +988,12 @@ describe('the rod gate reads the WATER zone at the probe point', () => {
     expect(p.castingAbility).toBeNull();
   });
 
-  it('the cross-boundary GAIN answers to the water zone: 0.1 at proficiency 120', () => {
+  it('the cross-boundary GAIN answers to the water zone: 0.04 at proficiency 120', () => {
     // The discriminating drive the live map cannot stage: no shipped fishable
     // water lies within the 24 yd cast reach of a tier-DIFFERING zone line
     // (the nearest rim is 36 yd out, at the thornpeak/veiled_hollow border),
     // so the gain amount is discriminated here on the authored border lake.
-    // At fishing 120 the mirefen water ahead teaches 0.1 (tier 2 grays at
+    // At fishing 120 the mirefen water ahead teaches 0.04 (tier 2 grays at
     // 150) while the eastbrook ground underfoot teaches 0 (tier 1 grayed at
     // 100), so a gain call reading zoneAt(p.pos) instead of the pinned cast
     // zone zeroes this grant. 100..149 is the whole discriminating window:
@@ -1018,7 +1018,7 @@ describe('the rod gate reads the WATER zone at the probe point', () => {
       const gained = meta.pendingGatherGrants.slice(before);
       if (gained.length > 0) {
         taught++;
-        expect(gained).toEqual([{ professionId: 'fishing', amount: 0.1 }]);
+        expect(gained).toEqual([{ professionId: 'fishing', amount: 0.04 }]);
       }
     }
     expect(taught, 'the drive must land a teaching catch').toBe(1);

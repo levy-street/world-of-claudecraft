@@ -4,6 +4,7 @@ import type { ChatSenderFlair, StreamerLinks } from './account_flair';
 import type { MountKey } from './content/mounts';
 import type { CraftDef, GatheringProfessionId, ToolEffectId } from './content/professions';
 import type { LockSession, LootTier, PickAction, StepResult, VisibleCell } from './lockpick';
+import type { FishingCatchBand } from './professions/fishing_bands';
 import type { HarvestYield } from './professions/harvest_yields';
 import type { RespawnWindow } from './respawn_policy';
 
@@ -6736,7 +6737,7 @@ export type SimEvent = { pid?: number } & (
       itemId: string;
       quality: NonNullable<ItemDef['quality']>;
       zoneId: string;
-      band: 0 | 1 | 2;
+      band: FishingCatchBand;
     }
   // Fishing bite (Professions 2.0): the hidden seeded bite fired
   // for this angler's running fishing session. Personal (pid = the angler)
@@ -6756,7 +6757,7 @@ export type SimEvent = { pid?: number } & (
   // carries the reason, and this event's line records the loss. Costs
   // nothing but the ended cast; recast immediately. zoneId/band mirror
   // fishingResult, for the telemetry.
-  | { type: 'fishingGotAway'; pid: number; zoneId: string; band: 0 | 1 | 2 }
+  | { type: 'fishingGotAway'; pid: number; zoneId: string; band: FishingCatchBand }
   // Fishing early reel (the spam-click fix): the angler re-pressed the pole
   // BEFORE the bite, so the line came in empty and the session ended. Exists
   // because a free pre-bite no-op made spam-pressing a guaranteed catch (one
@@ -6766,13 +6767,13 @@ export type SimEvent = { pid?: number } & (
   // is the game costing the player; an early reel is self-inflicted, and
   // folding them would hide whether the anti-spam change burns real
   // anglers). Costs nothing but the ended cast; recast immediately.
-  | { type: 'fishingEarlyReel'; pid: number; zoneId: string; band: 0 | 1 | 2 }
+  | { type: 'fishingEarlyReel'; pid: number; zoneId: string; band: FishingCatchBand }
   // Fishing empty hook (Professions 2.0): the single table draw resolved
   // the itemId: null row (nothing was biting). Telemetry-only sibling of
   // fishingResult: the player feedback stays the existing localized log
   // line, and old clients ignore the unknown type. Emitted exactly where
   // the null row resolves, draw-free.
-  | { type: 'fishingEmptyHook'; pid: number; zoneId: string; band: 0 | 1 | 2 }
+  | { type: 'fishingEmptyHook'; pid: number; zoneId: string; band: FishingCatchBand }
   // Rare gather event (Professions 2.0): a harvest struck a pristine
   // vein / ancient heartwood / moonlit bloom, or a farm bed paid a golden
   // harvest (nodeType 'crop', the farming celebrations phase). Soft zone
