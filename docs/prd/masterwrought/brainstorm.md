@@ -76,6 +76,17 @@ recipes today). v1 is pure stats and bounded utility: no new proc effects anywhe
   crafts gaining at half and quarter rate make the cheapest path to any skill number a
   bulk spam of low recipes; Phase 15 records the measurement, and any change to
   tierProgressMultiplier is a future-tier pacing redesign, never an in-packet tune.
+- A gathering-wide APEX-TIER EXPANSION beyond what this packet ships (recorded at Phase
+  11j, which completed the tier-5 tool family and so drew the boundary): new node and
+  water tiers above the world's current deepest, the tier-6 tool rung the wield table has
+  no row for, and the maxSkill 150 climb proficiency_bands.ts already comments forward
+  room for. Each depends on the others. A tier-6 LAND tool cannot ship before the wield
+  table gains its row, because wieldRequirementForTier fails OPEN at 0 for an unknown
+  tier and the rung would ship ungated (fishing's tier-6 rod escapes only because rods
+  are the structural R22 exemption). A tier-6 tool is also pointless before a tier-4 node
+  or water exists for it to open, and the delve shop's own re-check trigger says the
+  patch shipping the first of those re-derives the Marks prices and the wield table in
+  that SAME change. This is real design intent and it is not this packet.
 
 ## OPEN items (resolved inside phases, tracked in state.md)
 - Jewelcrafting/inscription station model (phase 05/06 decision).

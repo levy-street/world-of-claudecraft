@@ -60,7 +60,7 @@ welcome; output randomness is only this proc, never a downgrade.
 
 ### Gathering, rare events, corpse harvesting
 Gathering proficiencies (mining, logging, herbalism, plus fishing as a
-fourth row) are additive counters with enforced caps
+fourth row and farming as a fifth) are additive counters with enforced caps
 (`src/sim/content/professions.ts` `maxSkill`). A harvest is a gather cast
 (`gatherCastDurationSec`, `src/sim/professions/gathering.ts`: base 2.5 s,
 minus 0.4 s per owned tool tier above the node's, minus 0.15 s per
@@ -101,6 +101,74 @@ gate is live but never fires yet). One interact press loots AND harvests an
 eligible corpse, client-composed with no new wire command
 (`src/game/corpse_loot_availability.ts` and the interact dispatch); a claimed
 harvest mirrors online via the sparse per-entity `hcb` wire key.
+
+### Farming, the fifth gathering profession
+Farming shares the gathering proficiency shape and the land cap, and it is
+the one gathering row whose pacing is WALL-CLOCK rather than swing-gated: a
+player plants a bed, leaves, and harvests on a later session, which makes it
+the game's first between-sessions mechanic. The growth engine and its draw
+contract live in `src/sim/professions/farming.ts`, the bed geography in
+`src/sim/content/farm_patches.ts`, and the crop catalog in
+`src/sim/content/farm_crops.ts`; the per-zone tier ladder is farming's own
+(`farmingZoneTierFor`, `src/sim/professions/farming_zones.ts`) and
+deliberately disagrees with the shipped progression column at one zone.
+
+Two things separate it from the node trades and both matter downstream.
+Planting is what needs the tool, so a crop of tier N needs a hoe of tier N
+and the hoe ladder gates the crop ladder rather than the harvest. And
+farming's FINE grade is a skill-scaled harvest roll rather than a tool
+comparison, so it is not a `material_grades.ts` row at all: a fine crop
+costs exactly what its base crop costs and takes the same tier, where a fine
+ORE needs a tool strictly above its material. A guard that gates a fine crop
+one tier high invents a requirement the engine does not have
+(`tests/recipe_reachability.test.ts` records the distinction at its farming
+branch).
+
+The hoe ladder (`HOE_RECIPES`, `src/sim/content/recipes.ts`) is a separate
+list from `TOOL_RECIPES` for exactly that reason: `TOOL_RECIPES`' invariant
+is that every member consumes a node fine grade, and farming has none. Its
+own invariant is that every rung consumes the fine TWIN of a crop one tier
+BELOW its result plus the hoe one rung down, at the toolworks, which is the
+closed-circuit resolution the tier-4 pick recorded first. It runs from the
+vendor-priced entry rung to the apex rung, and it is the only tool ladder
+whose rungs above the first are all craft-mint, because its pricing table
+locks the copper price off every one of them.
+
+**masterwrought R17, the provisioner rule.** Farm produce feeds the
+CONSUMABLE professions, cooking and alchemy, at every rung, and never the
+gear chain, the Perfecting materials, or `recipe_quickening_catalyst`. Grain
+and vegetables are the third gathering input family beside meat and fish.
+The one carve-out is the hoe ladder itself, which consumes produce because a
+gathering tool is not gear in that rule's sense: no equip slot, no
+item-level budget contest. Enforced by the produce sweeps in
+`tests/recipe_economy.test.ts` and `tests/material_taxonomy.test.ts`.
+
+**masterwrought R18, need the output and never the slot.** Everyone needs
+what professions make; nobody needs to have TAKEN a profession to equip,
+enter, or complete anything. Mechanically: every produce item stays
+market-listable `kind: 'junk'`, farming rows are ADDED to bills beside the
+herb and meat rows rather than substituted for them, and every crafted
+gathering tool has a non-crafter route through the delve Marks counter
+(`src/sim/content/delves/shop.ts`). Enforced by the never-substituted sweeps
+in `tests/professions_zone_rollout.test.ts` and the per-tier tool arms in
+`tests/delve_shop.test.ts`.
+
+**masterwrought R19, farming is a long-haul skill.** Its gain curve is
+deliberately slower than the other four because harvests are wall-clock
+gated, and it is tuned against a measured calendar-days-to-cap model built
+from real bed counts and real cycle times, never from feel. Slower never
+becomes punishment: no daily reset, no decay, and a late harvest costs only
+opportunity. The schedule and its teaching ceilings are
+`FARMING_GAIN_SCHEDULE` and `farmingHarvestGainAt`
+(`src/sim/professions/farming.ts`), whose boundary column IS the
+teaching-ceiling source and so is not tuning.
+
+**THE RECIPROCAL LOOP**, which is the part a reader otherwise misses.
+Herbalism feeds farming through the alchemy-crafted growth tonic; farming
+feeds cooking and alchemy back. Neither displaces the other, because every
+farming row is added beside the herb rather than in place of it, which is
+what makes the fifth gathering profession additive to the economy rather
+than a competitor for the same bills.
 
 ### Fishing
 Fishing folds into the gathering proficiency shape: no separate skill id,
@@ -192,7 +260,94 @@ and the reason is recorded at `TOOL_RECIPES`: the tier-4 pick is re-pointed
 onto the Mirefen fine ore because the Thornpeak grade would have needed the
 pick that recipe produces, and the tier-5 pick keeps its refined
 `arcanite_bar` (re-pointing off it would strand the bar and its vendor rows)
-while gaining the Thornpeak fine grade.
+while gaining the Thornpeak fine grade. Each tier-4 rung also consumes the
+EASTBROOK fine grade beside its own, which is what gives the tier-1 twins a
+consumer: the fine ladder has three tiers where the crafted-tool ladder has
+two rungs, so the "tier N takes the fine grade of tier N minus 2" rule
+reached the middle grades and left the starter ones with no buyer at all.
+
+**THE APEX TOOL FAMILY IS COMPLETE.** Every gathering profession now has a
+tier-5 base tool at epic rarity and the same price register: a pick, an axe
+and a sickle in `TOOL_RECIPES`, a rod in `ROD_RECIPES`, and a hoe in
+`HOE_RECIPES`. Farming was the family's one hole until the hoe ladder gained
+its apex rung.
+
+The rung a player can REACH is the thing to read off this family, because
+its skillReq column is not uniform and the difference is history rather than
+design. The three land rows sit at engineering 150, and 150 is above
+engineering's own cap: `tierForSkill` resolves it one tier past what the cap
+resolves to, and BOTH learning channels run the same `teachTierMet` gate
+(`src/sim/professions/training.ts` for a trainer, the `'tier'` deny arm in
+`src/sim/professions/pattern_items.ts` for a pattern), so a row authored
+there is permanently unlearnable through every shipped route. Those three
+escape only because they predate training and sit in the frozen
+`PRE_TRAINING_RECIPE_IDS`. The rod and hoe rows were authored after that
+switch and sit at the reachable top rung instead. **150 is not a target**:
+an apex tool authored there today would be dead content that ships green,
+and `tests/professions_rod_recipes.test.ts` now walks every recipe carrying
+an acquisition list against its own craft's cap so it cannot happen twice.
+
+What an apex tool BUYS is narrower than its rarity suggests, and the
+honest version is worth stating because a player will ask. It opens no node
+or crop tier that the tier-4 rung does not already reach, on any land
+profession: the world's deepest node tier is below it and there are four
+crop tiers, which the tier-4 hoe already covers. Fishing is the one
+exception, and only because its catch ladder has a band above what a tier-5
+rod opens. What the rung actually buys everywhere is the epic rarity step on
+the tool-effect economy: `startingDurabilityFor` pays
+`RARITY_DURABILITY_BONUS` more charges per rarity rung and
+`ratchetCeilingForUse` prices the refill ceiling off the same rarity, so a
+farmer running the Maker's Charm on a rare hoe was paying a strictly lower
+charge ceiling than a miner running it on an epic pick. The charm is an
+EFFECT slot and a base tool is a base tool; they are complements, which is
+why the slot never substituted for the missing rung.
+
+Every tier-5 land tool wields exactly AT its profession's cap
+(`TIER5_TOOL_WIELD_PROFICIENCY` against `maxSkill`,
+`src/sim/professions/wield_gate.ts`), which is the ladder agreeing with
+itself rather than a coincidence. It is also a knife edge in both
+directions, so `tests/recipe_reachability.test.ts` pins that no shipped tool
+demands more proficiency than its own profession can reach: a tool above its
+cap would be permanently unswingable, which the crafting reachability
+fixpoint structurally cannot see because it models a realm rather than a
+player.
+
+#### The supply matrix
+Which gathering family feeds which craft, and at which band. Cells name the
+craft, the band, and the recipe FAMILY by symbol; there are no counts here
+on purpose, per this file's anchor rule.
+
+| family | levelling bands | endgame band |
+|---|---|---|
+| mining | `COMMON_RECIPES`, `LADDER_RECIPES` and `JEWELCRAFTING_RECIPES` across the lower bands; `COMBO_RECIPES`; then `TOOL_RECIPES`, `INTERMEDIATE_RECIPES` and `CASTER_HUB_RECIPES` at the top levelling band | `APEX_ARMOR_RECIPES` and `APEX_GEAR_RECIPES` |
+| logging | `LADDER_RECIPES` across the lower bands, then `TOOL_RECIPES` and `INTERMEDIATE_RECIPES` at the top levelling band | `APEX_GEAR_RECIPES` |
+| herbalism | `COMMON_RECIPES`, `LADDER_RECIPES` and `INSCRIPTION_RECIPES` across the lower bands, plus a `FARM_RECIPES` row; then `TOOL_RECIPES`, `INTERMEDIATE_RECIPES` and `CASTER_HUB_RECIPES` at the top | `APEX_CONSUMABLE_RECIPES` and `APEX_GEAR_RECIPES` |
+| fishing | `LADDER_RECIPES` across the lower bands, then `ROD_RECIPES` at the top levelling band | `APEX_CONSUMABLE_RECIPES` |
+| farming | `FARM_RECIPES` across every levelling band and `HOE_RECIPES` from the second, plus `LADDER_RECIPES` low and `INTERMEDIATE_RECIPES` at the top | `APEX_CONSUMABLE_RECIPES` and `FARM_RECIPES` |
+| corpse harvesting | `COMMON_RECIPES` and `LADDER_RECIPES` across the lower bands; `COMBO_RECIPES`; then `INTERMEDIATE_RECIPES` and `CASTER_HUB_RECIPES` at the top | `APEX_ARMOR_RECIPES` and `APEX_CONSUMABLE_RECIPES` |
+
+Two readings the table is worth pausing on. The apex tool ladders
+(`TOOL_RECIPES`, `ROD_RECIPES`, `HOE_RECIPES`) sit in each family's TOP
+levelling band rather than its endgame cell, because a gathering tool a
+family feeds only ITSELF is not evidence that the family feeds the crafts,
+and the coverage guard refuses to count it. And the endgame column is
+narrower than the levelling ones by design: the apex sets are where the
+whole realm's demand concentrates, which is the shape masterwrought R21
+exists to keep honest.
+
+**masterwrought R20, every gathering profession reaches the endgame.** No
+gathering family may be absent from recipes at the gathering cap or above,
+nor from any 25-point band below it, and this is enforced by a TEST rather
+than by intention. **masterwrought R21** is the demand half of the same
+invariant: every id a family supplies must have at least one consumer, so a
+profession that feeds a recipe nobody buys is still caught. Both live in
+`tests/gathering_supply_coverage.test.ts`, which derives every supply set
+and every band from the live content tables and asserts PRESENCE only, never
+a count: a numeric floor would turn a correctness guard into a content quota
+that passes on padding.
+
+**That test is the live authority for this table.** When the two disagree,
+the test is the truth and this table is what gets fixed.
 
 Substitution runs DOWNWARD only: a fine grade satisfies a requirement for
 its base, the base never satisfies a requirement for the fine grade. That
