@@ -11541,6 +11541,54 @@ translation so the translator's voice survives. Five keys on dynamic key paths
 `craftIntro.engineering`) could not be re-keyed and take an English correction
 plus an explicit worklist row: that is the real boundary of the remedy.
 
+### THE THIRD FINDING, AND IT IS NOT THIS PACKET'S AT ALL
+
+**THE PROFESSIONS FAQ HAS BEEN SERVING MISMATCHED QUESTION AND ANSWER PAIRS IN
+EIGHTEEN LOCALES SINCE 2026-07-22.** Chasing the stale `faq.a7` gain number
+surfaced it, and it is larger than the thing it was found under.
+
+`guide.profPages.faq.q{n}` and `.a{n}` are POSITIONAL keys with no semantic
+anchor. Commit 6adc55b5a5 ("rewrite the professions wiki to per-skill pages")
+replaced questions 3 through 8 IN PLACE, and the overlays were never
+re-authored, so every already-translated row below q2 silently became the answer
+to a question the page no longer asks. Verified against the live tree in zh_CN:
+English `q7` asks "Why did my gathering suddenly slow down?" while the zh_CN row
+asks the Maker's Bond question and answers THAT. `q1`, `q2`, `q9` and `q10` are
+correct, and the reason is the tell: `q9` and `q10` were added later
+(9808fb52b0) and so were filled against the CURRENT English, while 3 through 8
+date from before the rewrite.
+
+NOTHING COULD SEE IT. The rows are `translated`, not `pending`, so the
+release-tier gate is silent. Every placeholder count matches. M16 only catches a
+non-Latin value byte-identical to English. `tests/guide.test.ts` renders and
+asserts ENGLISH html only. The one signal that existed, the enHash staleness
+registry in `src/ui/i18n.status.json`, is untracked, so no gate reads it. This
+is the reword-staleness blind spot with the numbering turned into a second,
+worse failure mode: not a translation of the old wording, but the wrong answer
+under the wrong question.
+
+CLOSED THE SAME WAY, on the maintainer's ruling: the six misaligned question
+rows and the four remaining misaligned answers are RETIRED from all eighteen
+overlays (176 rows), so those rows render correct English everywhere until they
+are re-authored, and the five non-Latin locales are re-filled against the
+CURRENT questions in this change. `a6` and `a7` were already retired one pass
+earlier. Rows 1, 2, 9 and 10 keep their translations, because those four really
+do answer the questions above them.
+
+THE STRUCTURAL FIX IS THE ONE THAT MATTERS. `src/guide/pages/professions_faq.ts`
+now names its ten answer keys in a `FAQ_ANSWER_KEYS` list instead of building
+`faq.a${n}`, which is what made `a6` and `a7` re-keyable at all. The QUESTION
+keys are still indexed and that is a deliberate line: none of them states a
+mechanic, so none can go stale the way an answer can. What they CAN do is what
+just happened, which is why the re-authoring below is the maintainer's and not a
+loose end this audit can quietly close.
+
+HANDED BACK, COSTED: six question and answer pairs across the thirteen Latin
+locales still need re-authoring against the current English (they render English
+today, which is correct but not translated). That is a whole wiki page in
+thirteen languages, it predates this packet by a month, and it is the release
+fill's work rather than a QA repair.
+
 ### STEP 0: THE TENTH RELEASE SYNC, AND IT WAS OWED
 
 `origin/release/v0.40.0` moved 50462dda83 to 14ab2e8630, 33 commits across 180
@@ -12471,8 +12519,8 @@ because its stale rows are FALSE rather than merely incomplete.
 | guide.profPages.craftProse.engineering.identityBody | 18 | 11i QA; dynamic key path, cannot be re-keyed |
 | guide.profPages.craftProse.engineering.ladderBody | 18 | 11i QA; dynamic key path, cannot be re-keyed |
 | guide.profPages.craftIntro.engineering | 18 | 11i QA; dynamic key path, cannot be re-keyed |
-| guide.profPages.faq.a6 | 5 | 11i QA; dynamic key path (faq.a${n}), cannot be re-keyed |
-| guide.profPages.faq.a7 | 18 | 11i QA; dynamic key path (faq.a${n}), cannot be re-keyed |
+| abilities: fire mastery burn description | 21 | RELEASE-owned; English says 30%, every non-English bundle says 40% |
+| abilities: Galeheart Echoes description | 21 | RELEASE-owned; English says 25%, every non-English bundle says 50% |
 | guide.interfacePage.mobileBody | 18 | 11i QA; RELEASE-owned drift, see below |
 | guide.controlsPage.mobileBody | 18 | 11i QA; RELEASE-owned drift, see below |
 
@@ -12562,13 +12610,42 @@ The M16 guard then made the five non-Latin fills due in the SAME change, which
 is the right outcome: those five got corrected translations instead of stale
 ones.
 
-`faq.a6`, `faq.a7` and the three `craftProse` / `craftIntro` keys could NOT be
-re-keyed and got an English correction plus a worklist row instead. Their key
-paths are built by template literal (`faq.a${n}` in the FAQ renderer,
-`craftProse.${craftId}.${slot}Body` and `craftIntro.${detailId}` in the craft
-page), so renaming one member would break the dynamic lookup for every craft and
-every FAQ row. That is the real boundary of the re-key remedy and it is worth
-carrying: a key is re-keyable only while its consumer names it statically.
+THE FAQ PAIR WAS RE-KEYED TOO, ON A SECOND PASS, and the reason it took two
+passes is the audit's own lesson turned on itself. The first pass left `faq.a6`
+and `faq.a7` on the worklist because their key path is built by template
+literal, and the fix commit then claimed "zero bundles now quote the retired
+gain". THAT MEASUREMENT WAS SCOPED TO `scheduleNote` AND THE CLAIM WAS FALSE:
+`faq.a7` still quoted the retired 0.1 and 0.02 taper in FIFTEEN bundles, which
+the parity lane caught by measuring the whole file rather than one key's
+context. A suite number is only evidence about what it measured, and so is a
+grep.
+
+The remedy was to remove the excuse rather than to accept it: the FAQ renderer
+now names its ten answer keys in a `FAQ_ANSWER_KEYS` list instead of building
+`faq.a${n}`, which costs one line per row and makes every answer on that page
+re-keyable the way the fishing prose was. The question keys stay indexed, since
+none of them states a mechanic. `a6` and `a7` are retired to `a6ThreeRods` and
+`a7RetunedTaper`, their 23 orphan overlay rows pruned, and the five non-Latin
+fills authored in the same change. Re-measured over the WHOLE resolved
+directory: zero bundles quote the retired gain.
+
+The three `craftProse` / `craftIntro` keys still could not be re-keyed and keep
+an English correction plus a worklist row: their paths are
+`craftProse.${craftId}.${slot}Body` and `craftIntro.${detailId}`, so the key
+name is shared across every craft and renaming one member is not a local edit
+the way naming ten FAQ rows was. That is the real boundary of the remedy: a key
+is re-keyable only while its consumer names it statically, and where a consumer
+does not, making it do so is sometimes cheap and sometimes not.
+
+TWO ROWS ON THE WORKLIST ARE THE RELEASE'S, not this packet's, and they are the
+sharpest of the lot because their ENGLISH is already correct. The touch-rework
+sync also brought two talent nerfs whose descriptions moved in English only:
+fire mastery 40 percent to 30, and Galeheart Echoes 50 percent to 25. All 21
+non-English bundles still publish the PRE-NERF numbers, so a German or French
+player reading their own talent tooltip is told a spell does forty percent where
+the sim does thirty. Nothing here can fix that honestly (the English needs no
+correction, only the fills do), so it is recorded for the release fill and
+flagged as arriving with the merge rather than with the phase.
 
 ### ONE MORE FOR THE MAINTAINER, raised by the review rather than by the phase
 

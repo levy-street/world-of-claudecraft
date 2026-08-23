@@ -37,6 +37,7 @@ import { catalogSections, deeds as deedsPage } from '../src/guide/pages/deeds';
 import { dungeons as dungeonsPage } from '../src/guide/pages/dungeons';
 import { professions as professionsPage, ringCards } from '../src/guide/pages/professions';
 import { craftDetailHtml, effectLines } from '../src/guide/pages/professions_craft';
+import { FAQ_ANSWER_KEYS, PROF_FAQ_COUNT } from '../src/guide/pages/professions_faq';
 import { gatheringDetailHtml } from '../src/guide/pages/professions_gathering';
 import { reliquaryCatalogSections, reliquary as reliquaryPage } from '../src/guide/pages/reliquary';
 import { world as worldPage } from '../src/guide/pages/world';
@@ -3333,9 +3334,18 @@ describe('Guide professions pages and routes', () => {
     for (const g of GUIDE_PROF_GATHERING) {
       expect(t(`guide.profPages.gatherIntro.${g.id}` as never).length).toBeGreaterThan(0);
     }
-    for (let n = 1; n <= 8; n += 1) {
+    // The QUESTIONS are still index-keyed, so they walk by index. The ANSWERS
+    // are not: the Phase 11i QA gave the renderer a named roster so a stale
+    // answer could be RETIRED AND RE-KEYED, which an index-built key can never
+    // be. Walking FAQ_ANSWER_KEYS rather than rebuilding `faq.a${n}` is what
+    // keeps this arm asserting what the page actually renders: a re-key now
+    // moves the test with the page instead of leaving it asserting a dead key.
+    for (let n = 1; n <= PROF_FAQ_COUNT; n += 1) {
       expect(t(`guide.profPages.faq.q${n}` as never).length).toBeGreaterThan(0);
-      expect(t(`guide.profPages.faq.a${n}` as never).length).toBeGreaterThan(0);
+    }
+    expect(FAQ_ANSWER_KEYS).toHaveLength(PROF_FAQ_COUNT);
+    for (const key of FAQ_ANSWER_KEYS) {
+      expect(t(key as never).length, key).toBeGreaterThan(0);
     }
     // Format keys stay translator-controlled, pinned as literals.
     expect(t('guide.profPages.matFmt' as never, { name: 'Copper Ore', count: '4' })).toBe(
