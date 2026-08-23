@@ -31,7 +31,7 @@
       "tick": 2,
       "time": 0.1,
       "nextId": 983,
-      "state": "783b8cbc",
+      "state": "dedd4e34",
       "events": "669bce9e",
       "rng": {
         "draws": 39,
@@ -91,7 +91,6 @@
               "itemId": "baked_bread"
             }
           ],
-          "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
           "recipesGrandfathered": true,
           "reliquary": {
@@ -159,7 +158,6 @@
               "itemId": "spring_water"
             }
           ],
-          "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
           "recipesGrandfathered": true,
           "reliquary": {
@@ -912,7 +910,7 @@
       "tick": 4,
       "time": 0.2,
       "nextId": 983,
-      "state": "4eed8b3c",
+      "state": "adf96002",
       "events": "f15855a9",
       "rng": {
         "draws": 42,
@@ -984,7 +982,6 @@
               "itemId": "baked_bread"
             }
           ],
-          "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
           "recipesGrandfathered": true,
           "reliquary": {
@@ -1052,7 +1049,6 @@
               "itemId": "spring_water"
             }
           ],
-          "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
           "recipesGrandfathered": true,
           "reliquary": {
@@ -1796,7 +1792,7 @@
       "tick": 5,
       "time": 0.25,
       "nextId": 983,
-      "state": "f6bb6e99",
+      "state": "f076a1d1",
       "events": "5d57ba27",
       "rng": {
         "draws": 42,
@@ -1807,7 +1803,7 @@
       "tick": 10,
       "time": 0.5,
       "nextId": 983,
-      "state": "26f7ee6b",
+      "state": "64d84703",
       "events": "741638a5",
       "rng": {
         "draws": 42,
@@ -1818,7 +1814,7 @@
       "tick": 15,
       "time": 0.75,
       "nextId": 983,
-      "state": "fcf02a05",
+      "state": "99e8cffd",
       "events": "741638a5",
       "rng": {
         "draws": 42,
@@ -1829,8 +1825,8 @@
       "tick": 20,
       "time": 1,
       "nextId": 983,
-      "state": "00259e6d",
-      "events": "d595937a",
+      "state": "39a35065",
+      "events": "741638a5",
       "rng": {
         "draws": 44,
         "digest": "8329963e"
@@ -1840,7 +1836,7 @@
       "tick": 24,
       "time": 1.2,
       "nextId": 983,
-      "state": "1d1b5b1d",
+      "state": "277649d5",
       "events": "741638a5",
       "rng": {
         "draws": 44,
@@ -1912,7 +1908,6 @@
               "itemId": "baked_bread"
             }
           ],
-          "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
           "recipesGrandfathered": true,
           "reliquary": {
@@ -1992,7 +1987,6 @@
               "itemId": "spring_water"
             }
           ],
-          "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
           "recipesGrandfathered": true,
           "reliquary": {
@@ -2115,7 +2109,7 @@
       "tick": 24,
       "time": 1.2,
       "nextId": 983,
-      "state": "1d1b5b1d",
+      "state": "277649d5",
       "events": "741638a5",
       "rng": {
         "draws": 44,
@@ -2187,7 +2181,6 @@
               "itemId": "baked_bread"
             }
           ],
-          "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
           "recipesGrandfathered": true,
           "reliquary": {
@@ -2267,7 +2260,6 @@
               "itemId": "spring_water"
             }
           ],
-          "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
           "recipesGrandfathered": true,
           "reliquary": {

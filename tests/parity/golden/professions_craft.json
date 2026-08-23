@@ -19,7 +19,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 968,
-      "state": "78dd8755",
+      "state": "3ce3b2b6",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -71,7 +71,6 @@
               "itemId": "baked_bread"
             }
           ],
-          "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
           "recipesGrandfathered": true,
           "reliquary": {
@@ -154,7 +153,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 968,
-      "state": "6bf72748",
+      "state": "6dc07f77",
       "events": "07ce633b",
       "rng": {
         "draws": 0,
@@ -210,7 +209,6 @@
             "reason": "insufficient_materials",
             "recipeId": "recipe_minor_healing_potion"
           },
-          "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
           "recipesGrandfathered": true,
           "reliquary": {
@@ -293,7 +291,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 968,
-      "state": "1fd272d8",
+      "state": "3dd87257",
       "events": "a3a70b1c",
       "rng": {
         "draws": 1,
@@ -367,7 +365,6 @@
             "recipeId": "recipe_minor_healing_potion"
           },
           "lifetimeXp": 24,
-          "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
           "recipesGrandfathered": true,
           "reliquary": {
@@ -452,7 +449,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 968,
-      "state": "6905eb7f",
+      "state": "e176f782",
       "events": "b8dabfff",
       "rng": {
         "draws": 2,
@@ -572,7 +569,6 @@
             "recipeId": "recipe_eastbrook_ritual_vestments"
           },
           "lifetimeXp": 24,
-          "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
           "recipesGrandfathered": true,
           "reliquary": {
@@ -675,7 +671,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 968,
-      "state": "457240aa",
+      "state": "67d26493",
       "events": "a3a70b1c",
       "rng": {
         "draws": 3,
@@ -793,7 +789,6 @@
             "recipeId": "recipe_eastbrook_ritual_vestments"
           },
           "lifetimeXp": 48,
-          "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
           "recipesGrandfathered": true,
           "reliquary": {
@@ -896,7 +891,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 968,
-      "state": "8f9e56fe",
+      "state": "8ce4ac1f",
       "events": "0f312f41",
       "rng": {
         "draws": 3,
@@ -1026,7 +1021,6 @@
             "recipeId": "recipe_eastbrook_ritual_vestments"
           },
           "lifetimeXp": 48,
-          "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
           "recipesGrandfathered": true,
           "reliquary": {
@@ -1134,7 +1128,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 968,
-      "state": "8f9e56fe",
+      "state": "8ce4ac1f",
       "events": "741638a5",
       "rng": {
         "draws": 3,
@@ -1264,7 +1258,6 @@
             "recipeId": "recipe_eastbrook_ritual_vestments"
           },
           "lifetimeXp": 48,
-          "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
           "recipesGrandfathered": true,
           "reliquary": {

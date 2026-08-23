@@ -31,7 +31,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 972,
-      "state": "d0ec8a93",
+      "state": "65a0460c",
       "events": "879a477a",
       "rng": {
         "draws": 5,
@@ -91,7 +91,6 @@
             }
           ],
           "lifetimeXp": 84,
-          "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
           "recipesGrandfathered": true,
           "reliquary": {
@@ -410,7 +409,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 973,
-      "state": "97d088c4",
+      "state": "2a1d4e9d",
       "events": "646f7d55",
       "rng": {
         "draws": 8,
@@ -476,7 +475,6 @@
             }
           ],
           "lifetimeXp": 198,
-          "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
           "recipesGrandfathered": true,
           "reliquary": {
@@ -849,7 +847,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 973,
-      "state": "a38c8766",
+      "state": "1f7ae13b",
       "events": "58ee48fb",
       "rng": {
         "draws": 9,
@@ -916,7 +914,6 @@
             }
           ],
           "lifetimeXp": 198,
-          "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
           "recipesGrandfathered": true,
           "reliquary": {
@@ -1290,7 +1287,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 975,
-      "state": "4b4c7f86",
+      "state": "855e8bf3",
       "events": "1b8677b6",
       "rng": {
         "draws": 15,
@@ -1357,7 +1354,6 @@
             }
           ],
           "lifetimeXp": 282,
-          "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
           "recipesGrandfathered": true,
           "reliquary": {
@@ -1774,7 +1770,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 976,
-      "state": "6effe537",
+      "state": "e41cb0f6",
       "events": "4b20f211",
       "rng": {
         "draws": 20,
@@ -1845,7 +1841,6 @@
             }
           ],
           "lifetimeXp": 366,
-          "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
           "recipesGrandfathered": true,
           "reliquary": {
@@ -2317,7 +2312,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 976,
-      "state": "6effe537",
+      "state": "e41cb0f6",
       "events": "741638a5",
       "rng": {
         "draws": 20,
@@ -2388,7 +2383,6 @@
             }
           ],
           "lifetimeXp": 366,
-          "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
           "recipesGrandfathered": true,
           "reliquary": {

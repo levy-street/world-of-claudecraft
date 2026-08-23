@@ -16,7 +16,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 968,
-      "state": "78dd8755",
+      "state": "3ce3b2b6",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -68,7 +68,6 @@
               "itemId": "baked_bread"
             }
           ],
-          "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
           "recipesGrandfathered": true,
           "reliquary": {
@@ -151,7 +150,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 968,
-      "state": "3d32c973",
+      "state": "c224bec8",
       "events": "a3656d0a",
       "rng": {
         "draws": 0,
@@ -203,7 +202,6 @@
               "itemId": "baked_bread"
             }
           ],
-          "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
           "questLog": [
             [
@@ -301,7 +299,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 968,
-      "state": "bfd2f963",
+      "state": "7b4800ea",
       "events": "6ba4e76a",
       "rng": {
         "draws": 0,
@@ -360,7 +358,6 @@
               "itemId": "boar_hide"
             }
           ],
-          "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
           "questLog": [
             [
@@ -458,7 +455,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 968,
-      "state": "073fd618",
+      "state": "1f965b1f",
       "events": "6a98d239",
       "rng": {
         "draws": 0,
@@ -517,7 +514,6 @@
               "itemId": "boar_hide"
             }
           ],
-          "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
           "questLog": [
             [
@@ -615,7 +611,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 968,
-      "state": "c7e37062",
+      "state": "12a04d5f",
       "events": "960e3146",
       "rng": {
         "draws": 0,
@@ -674,7 +670,6 @@
               "itemId": "boar_hide"
             }
           ],
-          "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
           "questLog": [
             [
@@ -772,7 +767,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 968,
-      "state": "663c0c16",
+      "state": "fb3ed605",
       "events": "b2626b99",
       "rng": {
         "draws": 0,
@@ -831,7 +826,6 @@
             }
           ],
           "lifetimeXp": 350,
-          "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
           "questsDone": [
             "q_boars"
@@ -918,7 +912,7 @@
       "tick": 2,
       "time": 0.1,
       "nextId": 968,
-      "state": "9dc7c312",
+      "state": "162b5929",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -977,7 +971,6 @@
             }
           ],
           "lifetimeXp": 350,
-          "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
           "questsDone": [
             "q_boars"

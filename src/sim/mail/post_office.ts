@@ -18,12 +18,7 @@
 
 import { bagCapacity, canGrantCopies, instancedCountCap } from '../bags';
 import { rekeySigner } from '../character_rename';
-import {
-  HEROIC_MARK_LETTER,
-  type LetterDef,
-  QUEST_LETTERS,
-  WELCOME_LETTER,
-} from '../content/letters';
+import { HEROIC_MARK_LETTER, type LetterDef, QUEST_LETTERS } from '../content/letters';
 import { ITEMS } from '../data';
 import { boundCraftedRecipeIdOnLoad, warnDroppedInstanceKeys } from '../item_instance_load';
 import { itemInstancePayloadsEqual } from '../item_instance_merge';
@@ -690,11 +685,6 @@ export class PostOffice {
       items: (letter.items ?? []).map((s) => ({ ...s })),
       delaySeconds: letter.delaySeconds ?? MAIL_NPC_DELIVERY_SECONDS,
     });
-  }
-
-  // The one-time service letter; the caller flips meta.mailWelcomed.
-  sendWelcome(meta: PlayerMeta): void {
-    this.sendLetter(this.mailKeyFor(meta), meta.name, WELCOME_LETTER, 'system');
   }
 
   // Heroic Marks reward hook (awardHeroicMarks): posts a participant's marks when

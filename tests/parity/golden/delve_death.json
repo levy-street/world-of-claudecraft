@@ -15,7 +15,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 968,
-      "state": "fae50bb5",
+      "state": "f3344ed6",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -67,7 +67,6 @@
               "itemId": "baked_bread"
             }
           ],
-          "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
           "recipesGrandfathered": true,
           "reliquary": {

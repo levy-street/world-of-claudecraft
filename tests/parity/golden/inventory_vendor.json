@@ -35,7 +35,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 968,
-      "state": "6e8c0a5c",
+      "state": "a56996d3",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -88,7 +88,6 @@
               "itemId": "baked_bread"
             }
           ],
-          "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
           "recipesGrandfathered": true,
           "reliquary": {
@@ -171,7 +170,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 968,
-      "state": "7b1598eb",
+      "state": "3e105cc8",
       "events": "c3317951",
       "rng": {
         "draws": 0,
@@ -234,7 +233,6 @@
               "itemId": "minor_healing_potion"
             }
           ],
-          "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
           "recipesGrandfathered": true,
           "reliquary": {
@@ -317,7 +315,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 968,
-      "state": "084f040f",
+      "state": "2287f046",
       "events": "49ddbae5",
       "rng": {
         "draws": 0,
@@ -387,7 +385,6 @@
               "itemId": "roadwardens_helm"
             }
           ],
-          "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
           "recipesGrandfathered": true,
           "reliquary": {
@@ -477,7 +474,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 968,
-      "state": "a27c2996",
+      "state": "8af2424b",
       "events": "102514d7",
       "rng": {
         "draws": 0,
@@ -547,7 +544,6 @@
               "itemId": "cryptbone_helm"
             }
           ],
-          "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
           "recipesGrandfathered": true,
           "reliquary": {
@@ -637,7 +633,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 968,
-      "state": "b465e102",
+      "state": "44b1a04f",
       "events": "5f9a5dce",
       "rng": {
         "draws": 0,
@@ -710,7 +706,6 @@
               "itemId": "roadwardens_helm"
             }
           ],
-          "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
           "recipesGrandfathered": true,
           "reliquary": {
@@ -800,7 +795,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 968,
-      "state": "27857612",
+      "state": "ed3fb07f",
       "events": "9bcf50f7",
       "rng": {
         "draws": 0,
@@ -873,7 +868,6 @@
               "itemId": "roadwardens_helm"
             }
           ],
-          "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
           "recipesGrandfathered": true,
           "reliquary": {
@@ -976,7 +970,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 968,
-      "state": "b13101d1",
+      "state": "21459614",
       "events": "40beaa42",
       "rng": {
         "draws": 0,
@@ -1045,7 +1039,6 @@
               "itemId": "roadwardens_helm"
             }
           ],
-          "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
           "recipesGrandfathered": true,
           "reliquary": {
@@ -1148,7 +1141,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 968,
-      "state": "02a75f2a",
+      "state": "489a6517",
       "events": "27eb8fbd",
       "rng": {
         "draws": 0,
@@ -1218,7 +1211,6 @@
               "itemId": "roadwardens_helm"
             }
           ],
-          "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
           "recipesGrandfathered": true,
           "reliquary": {
@@ -1331,7 +1323,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 968,
-      "state": "782830b9",
+      "state": "9f45d67c",
       "events": "305fdb61",
       "rng": {
         "draws": 0,
@@ -1405,7 +1397,6 @@
               "itemId": "roadwardens_helm"
             }
           ],
-          "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
           "recipesGrandfathered": true,
           "reliquary": {
@@ -1518,7 +1509,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 968,
-      "state": "7a31a2fc",
+      "state": "1adca15d",
       "events": "32424d20",
       "rng": {
         "draws": 0,
@@ -1597,7 +1588,6 @@
               "itemId": "wolf_fang"
             }
           ],
-          "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
           "recipesGrandfathered": true,
           "reliquary": {
@@ -1710,7 +1700,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 968,
-      "state": "76de62f1",
+      "state": "c326c71a",
       "events": "e0d370bc",
       "rng": {
         "draws": 0,
@@ -1789,7 +1779,6 @@
               "itemId": "wolf_fang"
             }
           ],
-          "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
           "recipesGrandfathered": true,
           "reliquary": {
@@ -1908,7 +1897,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 968,
-      "state": "e15af8c4",
+      "state": "2c97f147",
       "events": "670ccbae",
       "rng": {
         "draws": 0,
@@ -1988,7 +1977,6 @@
               "itemId": "wolf_fang"
             }
           ],
-          "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
           "recipesGrandfathered": true,
           "reliquary": {
@@ -2111,7 +2099,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 968,
-      "state": "8a9e48a7",
+      "state": "c3b1479e",
       "events": "f3111079",
       "rng": {
         "draws": 0,
@@ -2191,7 +2179,6 @@
               "itemId": "wolf_fang"
             }
           ],
-          "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
           "recipesGrandfathered": true,
           "reliquary": {
@@ -2310,7 +2297,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 968,
-      "state": "8a9e48a7",
+      "state": "c3b1479e",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -2390,7 +2377,6 @@
               "itemId": "wolf_fang"
             }
           ],
-          "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
           "recipesGrandfathered": true,
           "reliquary": {

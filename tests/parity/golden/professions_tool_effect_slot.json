@@ -23,7 +23,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 968,
-      "state": "f3a1d8c8",
+      "state": "35f9b8f7",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -76,7 +76,6 @@
               "itemId": "baked_bread"
             }
           ],
-          "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
           "recipesGrandfathered": true,
           "reliquary": {
@@ -159,7 +158,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 968,
-      "state": "06cfe796",
+      "state": "7d118bf3",
       "events": "ce7e15ee",
       "rng": {
         "draws": 0,
@@ -223,7 +222,6 @@
               "itemId": "mithril_mining_pick"
             }
           ],
-          "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
           "recipesGrandfathered": true,
           "reliquary": {
@@ -315,8 +313,8 @@
       "tick": 51,
       "time": 2.55,
       "nextId": 968,
-      "state": "a17aa159",
-      "events": "20e14929",
+      "state": "13a0762c",
+      "events": "d0936a19",
       "rng": {
         "draws": 2,
         "digest": "00a2a78c"
@@ -402,7 +400,6 @@
             }
           ],
           "lifetimeXp": 36,
-          "mailWelcomed": true,
           "nodeHarvestReadyAt": {
             "ore_mirefen_t2": 242.1
           },
@@ -499,7 +496,7 @@
       "tick": 53,
       "time": 2.65,
       "nextId": 968,
-      "state": "b6cd0c70",
+      "state": "24b6b811",
       "events": "fd57698b",
       "rng": {
         "draws": 2,
@@ -586,7 +583,6 @@
             }
           ],
           "lifetimeXp": 36,
-          "mailWelcomed": true,
           "nodeHarvestReadyAt": {
             "ore_mirefen_t2": 242.1
           },
@@ -683,7 +679,7 @@
       "tick": 55,
       "time": 2.75,
       "nextId": 968,
-      "state": "b4d03c62",
+      "state": "d0e7d7cb",
       "events": "df46ced7",
       "rng": {
         "draws": 2,
@@ -770,7 +766,6 @@
             }
           ],
           "lifetimeXp": 36,
-          "mailWelcomed": true,
           "nodeHarvestReadyAt": {
             "ore_mirefen_t2": 242.1
           },
@@ -867,7 +862,7 @@
       "tick": 106,
       "time": 5.3,
       "nextId": 968,
-      "state": "c65ba38b",
+      "state": "4bdf25f4",
       "events": "ee3f94ed",
       "rng": {
         "draws": 4,
@@ -962,7 +957,6 @@
             }
           ],
           "lifetimeXp": 72,
-          "mailWelcomed": true,
           "nodeHarvestReadyAt": {
             "ore_mirefen_1": 244.45,
             "ore_mirefen_t2": 242.1
@@ -1060,7 +1054,7 @@
       "tick": 157,
       "time": 7.85,
       "nextId": 968,
-      "state": "459356d6",
+      "state": "057d2687",
       "events": "071bc787",
       "rng": {
         "draws": 6,
@@ -1162,7 +1156,6 @@
             }
           ],
           "lifetimeXp": 108,
-          "mailWelcomed": true,
           "nodeHarvestReadyAt": {
             "ore_mirefen_1": 244.45,
             "ore_mirefen_t2": 242.1,
@@ -1261,7 +1254,7 @@
       "tick": 159,
       "time": 7.95,
       "nextId": 968,
-      "state": "81ba981d",
+      "state": "e4b0b9c4",
       "events": "741638a5",
       "rng": {
         "draws": 6,
@@ -1363,7 +1356,6 @@
             }
           ],
           "lifetimeXp": 108,
-          "mailWelcomed": true,
           "nodeHarvestReadyAt": {
             "ore_mirefen_1": 244.45,
             "ore_mirefen_t2": 242.1,

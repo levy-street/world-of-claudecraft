@@ -21,7 +21,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 968,
-      "state": "f3a1d8c8",
+      "state": "35f9b8f7",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -74,7 +74,6 @@
               "itemId": "baked_bread"
             }
           ],
-          "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
           "recipesGrandfathered": true,
           "reliquary": {
@@ -157,8 +156,8 @@
       "tick": 51,
       "time": 2.55,
       "nextId": 968,
-      "state": "33e3b8b0",
-      "events": "4f19cddf",
+      "state": "4b596715",
+      "events": "6e58772f",
       "rng": {
         "draws": 2,
         "digest": "00a2a78c"
@@ -249,7 +248,6 @@
             }
           ],
           "lifetimeXp": 21,
-          "mailWelcomed": true,
           "nodeHarvestReadyAt": {
             "ore_eastbrook_1": 242.5
           },
@@ -337,7 +335,7 @@
       "tick": 104,
       "time": 5.2,
       "nextId": 968,
-      "state": "d6ce4da2",
+      "state": "01912481",
       "events": "bf5fd9a3",
       "rng": {
         "draws": 4,
@@ -448,7 +446,6 @@
             }
           ],
           "lifetimeXp": 42,
-          "mailWelcomed": true,
           "nodeHarvestReadyAt": {
             "ore_eastbrook_1": 242.5,
             "wood_eastbrook_1": 245
@@ -537,7 +534,7 @@
       "tick": 500,
       "time": 25,
       "nextId": 968,
-      "state": "b0bba1a9",
+      "state": "03127160",
       "events": "25b740fb",
       "rng": {
         "draws": 18,
@@ -548,7 +545,7 @@
       "tick": 1000,
       "time": 50,
       "nextId": 968,
-      "state": "594792bb",
+      "state": "fcb47a3e",
       "events": "f39a9e1d",
       "rng": {
         "draws": 38,
@@ -559,7 +556,7 @@
       "tick": 1500,
       "time": 75,
       "nextId": 968,
-      "state": "8ab2af95",
+      "state": "73a572d0",
       "events": "f1cbc05a",
       "rng": {
         "draws": 58,
@@ -570,7 +567,7 @@
       "tick": 2000,
       "time": 100,
       "nextId": 968,
-      "state": "e48ffb66",
+      "state": "d0882bcf",
       "events": "73ae91c9",
       "rng": {
         "draws": 78,
@@ -581,7 +578,7 @@
       "tick": 2500,
       "time": 125,
       "nextId": 968,
-      "state": "bc25f8e9",
+      "state": "2f95ccdc",
       "events": "ec3989e3",
       "rng": {
         "draws": 96,
@@ -592,7 +589,7 @@
       "tick": 3000,
       "time": 150,
       "nextId": 968,
-      "state": "26c60cdd",
+      "state": "3933c554",
       "events": "73ae91c9",
       "rng": {
         "draws": 116,
@@ -603,7 +600,7 @@
       "tick": 3500,
       "time": 175,
       "nextId": 968,
-      "state": "23eaf444",
+      "state": "c1e96853",
       "events": "47d8a866",
       "rng": {
         "draws": 136,
@@ -614,7 +611,7 @@
       "tick": 4000,
       "time": 200,
       "nextId": 968,
-      "state": "0a4dde6b",
+      "state": "d42ccc4e",
       "events": "69e5600d",
       "rng": {
         "draws": 156,
@@ -625,7 +622,7 @@
       "tick": 4500,
       "time": 225,
       "nextId": 968,
-      "state": "cebbc64d",
+      "state": "04053ea2",
       "events": "32e1da52",
       "rng": {
         "draws": 176,
@@ -636,7 +633,7 @@
       "tick": 5000,
       "time": 250,
       "nextId": 968,
-      "state": "67ad1358",
+      "state": "0e2d5497",
       "events": "9a5a5373",
       "rng": {
         "draws": 194,
@@ -647,7 +644,7 @@
       "tick": 5206,
       "time": 260.3,
       "nextId": 968,
-      "state": "86f503ac",
+      "state": "1aac1da7",
       "events": "81f16df5",
       "rng": {
         "draws": 204,
@@ -782,7 +779,6 @@
             }
           ],
           "lifetimeXp": 2022,
-          "mailWelcomed": true,
           "nodeHarvestReadyAt": {
             "herb_eastbrook_1": 500.25,
             "ore_eastbrook_1": 242.5,
@@ -878,7 +874,7 @@
       "tick": 5208,
       "time": 260.4,
       "nextId": 968,
-      "state": "3294dd0b",
+      "state": "5b57537c",
       "events": "741638a5",
       "rng": {
         "draws": 204,
@@ -1013,7 +1009,6 @@
             }
           ],
           "lifetimeXp": 2022,
-          "mailWelcomed": true,
           "nodeHarvestReadyAt": {
             "herb_eastbrook_1": 500.25,
             "ore_eastbrook_1": 242.5,

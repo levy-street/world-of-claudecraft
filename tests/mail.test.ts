@@ -112,9 +112,13 @@ describe('mailboxes in the world', () => {
 });
 
 describe('the welcome letter', () => {
-  it('greets a new character exactly once, with the enclosed coin', () => {
+  it('greets a new character exactly once, at the level gate, with the enclosed coin', () => {
     const sim = makeWorld();
     const pid = sim.addPlayer('warrior', 'Newbie');
+    // Level-gated (welcome_gate.ts): nothing at creation, the letter on
+    // reaching the gate, and never a second one.
+    expect(sim.mailUnreadFor(pid)).toBe(0);
+    sim.setPlayerLevel(6, pid);
     expect(sim.mailUnreadFor(pid)).toBe(1);
     moveToMailbox(sim, pid);
     const info = sim.mailInfoFor(pid);
@@ -127,6 +131,7 @@ describe('the welcome letter', () => {
   it('is not re-sent to a character whose save says it was already welcomed', () => {
     const sim = makeWorld();
     const pid = sim.addPlayer('warrior', 'Veteran');
+    sim.setPlayerLevel(6, pid); // pass the gate so the save carries the flag
     const state = sim.serializeCharacter(pid);
     expect(state?.mailWelcomed).toBe(true);
     const sim2 = makeWorld();
@@ -140,6 +145,8 @@ describe('sending a letter', () => {
     const sim = makeWorld();
     const alice = sim.addPlayer('warrior', 'Alice');
     const bob = sim.addPlayer('mage', 'Bob');
+    sim.setPlayerLevel(6, alice); // past the welcome gate: the fixture
+    sim.setPlayerLevel(6, bob); // counts assume both welcomes exist
     const aliceMeta = sim.meta(alice);
     if (!aliceMeta) throw new Error('no meta');
     aliceMeta.copper = 10_000;
@@ -175,6 +182,8 @@ describe('sending a letter', () => {
     const sim = makeWorld();
     const alice = sim.addPlayer('warrior', 'Alice');
     const bob = sim.addPlayer('mage', 'Bob');
+    sim.setPlayerLevel(6, alice); // past the welcome gate: the fixture
+    sim.setPlayerLevel(6, bob); // counts assume both welcomes exist
     const aliceMeta = sim.meta(alice);
     if (!aliceMeta) throw new Error('no meta');
     aliceMeta.copper = 100_000;
@@ -656,6 +665,8 @@ describe('persistence and rename', () => {
     const sim = makeWorld();
     const alice = sim.addPlayer('warrior', 'Alice');
     const bob = sim.addPlayer('mage', 'Bob');
+    sim.setPlayerLevel(6, alice); // past the welcome gate: the fixture
+    sim.setPlayerLevel(6, bob); // counts assume both welcomes exist
     const aliceMeta = sim.meta(alice);
     if (!aliceMeta) throw new Error('no meta');
     aliceMeta.copper = 10_000;
@@ -667,6 +678,7 @@ describe('persistence and rename', () => {
     const sim2 = makeWorld();
     sim2.loadMail(JSON.parse(JSON.stringify(save)));
     const bob2 = sim2.addPlayer('mage', 'Bob');
+    sim2.setPlayerLevel(6, bob2); // past the welcome gate in this world too
     // Welcome letter arrives fresh (new character in this world) + the loaded one.
     expect(sim2.mailUnreadFor(bob2)).toBe(2);
     // The already-delivered letter never re-toasts after a load.
@@ -1122,6 +1134,7 @@ describe('purgeMailOwner - deleting a character', () => {
     // The mailbox owner is live here only so the maintained index is observable;
     // the real delete flow is gated on the character being offline.
     const doomed = sim.addPlayer('warrior', 'Doomed', { characterId: DOOMED_ID });
+    sim.setPlayerLevel(6, doomed); // past the welcome gate: the fixture expects the welcome
     const alice = makeSender(sim);
     sim.mailSendResolved({ key: DOOMED_KEY, name: 'Doomed' }, 'Note', 'Just words.', 0, [], alice);
     tickFor(sim, MAIL_DELIVERY_SECONDS + 2);

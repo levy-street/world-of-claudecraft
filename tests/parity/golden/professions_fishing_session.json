@@ -18,7 +18,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 968,
-      "state": "f3a1d8c8",
+      "state": "35f9b8f7",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -71,7 +71,6 @@
               "itemId": "baked_bread"
             }
           ],
-          "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
           "recipesGrandfathered": true,
           "reliquary": {
@@ -154,7 +153,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 968,
-      "state": "4d87330c",
+      "state": "0287ebe3",
       "events": "04788513",
       "rng": {
         "draws": 1,
@@ -212,7 +211,6 @@
               "itemId": "simple_fishing_pole"
             }
           ],
-          "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
           "recipesGrandfathered": true,
           "reliquary": {
@@ -300,8 +298,8 @@
       "tick": 91,
       "time": 4.55,
       "nextId": 968,
-      "state": "116b3e5f",
-      "events": "76f2af40",
+      "state": "b24fdb94",
+      "events": "a995e888",
       "rng": {
         "draws": 1,
         "digest": "acd1c827"
@@ -358,7 +356,6 @@
               "itemId": "simple_fishing_pole"
             }
           ],
-          "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
           "recipesGrandfathered": true,
           "reliquary": {
@@ -446,7 +443,7 @@
       "tick": 91,
       "time": 4.55,
       "nextId": 968,
-      "state": "e00bb4eb",
+      "state": "5a27349c",
       "events": "f450bad9",
       "rng": {
         "draws": 2,
@@ -512,7 +509,6 @@
               "itemId": "raw_river_perch"
             }
           ],
-          "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
           "pendingGatherGrants": [
             {
@@ -602,7 +598,7 @@
       "tick": 99,
       "time": 4.95,
       "nextId": 968,
-      "state": "09cd77ba",
+      "state": "f0ba4345",
       "events": "42fd0d47",
       "rng": {
         "draws": 3,
@@ -680,7 +676,6 @@
               "itemId": "raw_river_perch"
             }
           ],
-          "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
           "recipesGrandfathered": true,
           "reliquary": {

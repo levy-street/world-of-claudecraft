@@ -17,7 +17,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 968,
-      "state": "f3a1d8c8",
+      "state": "35f9b8f7",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -70,7 +70,6 @@
               "itemId": "baked_bread"
             }
           ],
-          "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
           "recipesGrandfathered": true,
           "reliquary": {
@@ -153,8 +152,8 @@
       "tick": 20,
       "time": 1,
       "nextId": 968,
-      "state": "96df1d0f",
-      "events": "7169815f",
+      "state": "e328f652",
+      "events": "b12edcc7",
       "rng": {
         "draws": 0,
         "digest": "811c9dc5"
@@ -164,7 +163,7 @@
       "tick": 40,
       "time": 2,
       "nextId": 968,
-      "state": "4ca5ab44",
+      "state": "002ecb4d",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -175,7 +174,7 @@
       "tick": 60,
       "time": 3,
       "nextId": 968,
-      "state": "15937063",
+      "state": "8f247c40",
       "events": "741638a5",
       "rng": {
         "draws": 149,
@@ -186,7 +185,7 @@
       "tick": 60,
       "time": 3,
       "nextId": 968,
-      "state": "15937063",
+      "state": "8f247c40",
       "events": "741638a5",
       "rng": {
         "draws": 149,
@@ -245,7 +244,6 @@
               "itemId": "baked_bread"
             }
           ],
-          "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
           "recipesGrandfathered": true,
           "reliquary": {
@@ -330,7 +328,7 @@
       "tick": 60,
       "time": 3,
       "nextId": 968,
-      "state": "f9ef06d2",
+      "state": "7ebd0e1f",
       "events": "ac69ce98",
       "rng": {
         "draws": 149,
@@ -392,7 +390,6 @@
             }
           ],
           "lifetimeXp": 160,
-          "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
           "recipesGrandfathered": true,
           "reliquary": {
@@ -478,7 +475,7 @@
       "tick": 60,
       "time": 3,
       "nextId": 968,
-      "state": "76dd532d",
+      "state": "2bd15094",
       "events": "20cbdba1",
       "rng": {
         "draws": 149,
@@ -541,7 +538,6 @@
             }
           ],
           "lifetimeXp": 610,
-          "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
           "recipesGrandfathered": true,
           "reliquary": {
