@@ -6590,6 +6590,10 @@ export const GUIDE_RELIQUARY: GuideReliquaryPage[] = [
       {
         "kind": "item",
         "name": "Tidewrought Fishing Rod"
+      },
+      {
+        "kind": "item",
+        "name": "Clockreel Fishing Rod"
       }
     ]
   },
@@ -7915,11 +7919,7 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
           },
           {
             "name": "Raw Hollowgill Sturgeon",
-            "count": 6
-          },
-          {
-            "name": "Raw Stillmere Salmon",
-            "count": 4
+            "count": 10
           },
           {
             "name": "Tidewrought Fishing Rod",

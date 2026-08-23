@@ -10,8 +10,11 @@
 // gathering. Fishing gets its own array here instead, and the shared one is
 // left literally [0, 100, 200].
 //
-// Extracted rather than grown: fishing.ts is a 675-line command coordinator
-// and a ladder is not command logic. Pure leaf, exactly the contract
+// Extracted because a ladder is not command logic: fishing.ts is a command
+// coordinator and this is a pure lookup two other layers read. It is an honest
+// EXTRACTION of the logic, not of the line count, and the arithmetic says so:
+// the logic left fishing.ts, the prose explaining the split did not, so that
+// file is longer after the move than before it. Pure leaf, exactly the contract
 // proficiency_bands.ts and tools.ts already keep: no SimContext, no
 // content-table import, no rng, explicit arguments only, so a Vitest imports
 // it directly. fishing.ts re-exports the old names so every existing importer
@@ -47,9 +50,33 @@ export type FishingCatchBand = 0 | 1 | 2 | 3 | 4 | 5;
  */
 export const FISHING_CATCH_BAND_THRESHOLDS = [0, 100, 150, 200, 200, 200] as const;
 
-/** The highest band index the ladder defines. */
-export const MAX_FISHING_CATCH_BAND = (FISHING_CATCH_BAND_THRESHOLDS.length -
-  1) as FishingCatchBand;
+/** The last index of a readonly tuple, as a LITERAL type rather than `number`.
+ *
+ *  Needed because `tuple.length - 1` is ordinary arithmetic and widens to
+ *  `number`, which is what makes the naive `satisfies` on the next declaration
+ *  fail to compile at all. Peeling one element off the tuple and reading the
+ *  remainder's length keeps the answer a literal, so it can be checked against
+ *  the band union.
+ */
+type LastIndexOf<T extends readonly unknown[]> = T extends readonly [...infer Rest, unknown]
+  ? Rest['length']
+  : never;
+
+/** The highest band index the ladder defines.
+ *
+ *  THE TYPE ANNOTATION IS LOAD-BEARING, not decoration. This module's headline
+ *  claim is that widening the ladder again is one edit, and the way that claim
+ *  fails silently is adding a seventh threshold WITHOUT widening
+ *  FishingCatchBand: an unchecked cast would then hand back 6,
+ *  fishingRodBandFor would return it, and server/fishing_telemetry.ts would
+ *  index its label array off the end and mint an `undefined` series. The value
+ *  is DERIVED from the ladder at runtime and the type is derived from the same
+ *  ladder at compile time, so a seventh threshold makes LastIndexOf resolve to
+ *  6, which is not a FishingCatchBand, and this line stops compiling instead of
+ *  becoming a metrics defect in production.
+ */
+export const MAX_FISHING_CATCH_BAND: FishingCatchBand = (FISHING_CATCH_BAND_THRESHOLDS.length -
+  1) as LastIndexOf<typeof FISHING_CATCH_BAND_THRESHOLDS>;
 
 /** Which catch band a given fishing proficiency selects. Pure state (no rng),
  *  so it never perturbs fishing's one-draw-per-catch contract. Walks DOWN the

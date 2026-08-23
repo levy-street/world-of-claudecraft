@@ -9623,22 +9623,15 @@ export class GameServer {
       if (ev.type === 'fishingEmptyHook') {
         gameMetricsCounters().fishingEmptyHook(ev.zoneId, fishingBandLabel(ev.band));
       }
-      // One rod training fee paid. The ok arm is what separates a payment from
-      // an attempt on the TRAINER path (Sim.trainRecipe debits exactly once and
-      // a duplicate resolves train_already_known), but ok alone no longer
-      // implies a fee: a pattern-item learn (src/sim/professions/pattern_items.ts)
-      // emits trainResult ok having charged nothing. So this stays a payment
-      // count only while every id it counts is TRAINER-taught, and
-      // masterwrought Phase 11i is the change that comment was written against:
-      // its apex rung is drop-taught, so a pattern can teach it and this arm
-      // would have counted those learns as fees paid. THE FEE-BEARING
-      // DISCRIMINATOR IT ASKED FOR now lives in the VOCABULARY rather than
-      // here: ROD_FEE_RECIPE_IDS filters ROD_RECIPES to the trainer-taught rows,
-      // so isRodFeeRecipe refuses the drop-taught rung by construction and a
-      // future one joins the exemption by existing. A rung that were BOTH
-      // trainer-taught and pattern-taught would still need a per-EVENT
-      // discriminator here; none is. The fee amount is static content,
-      // published as woc_rod_fee_copper.
+      // One rod training fee paid, and it is a PAYMENT count rather than a
+      // learn count only because ROD_FEE_RECIPE_IDS carries the discriminator:
+      // a pattern-item learn also emits trainResult ok having charged nothing,
+      // so the vocabulary filters ROD_RECIPES to the trainer-taught rows and
+      // isRodFeeRecipe refuses a drop-taught rung by construction. The full
+      // reasoning, and what would have to change if a rung were ever both
+      // trainer- and pattern-taught, lives beside that constant in
+      // server/fishing_telemetry.ts. Fee amount is static content
+      // (woc_rod_fee_copper).
       if (ev.type === 'trainResult' && ev.ok && isRodFeeRecipe(ev.recipeId)) {
         gameMetricsCounters().rodFeePaid(ev.recipeId);
       }

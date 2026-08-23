@@ -386,7 +386,9 @@ describe('Reliquary Conqueror catalog structure', () => {
     // authored: 342, plus the Masterwrought phase 06 inscription pair (the
     // masterwork:inscription mark and the Grandmaster Inscription title-shelf
     // slot): 344, plus the absorbed farming packet's Harvestmaster title-shelf
-    // slot: 345. Catalog growth reverts
+    // slot: 345, plus the Masterwrought phase 11i apex fishing rod, the third
+    // rung of the crafted rod ladder the specimen page already catalogues: 346.
+    // Catalog growth reverts
     // page completion for finished players, per docs/design/reliquary.md.
     // The two excludeFromCompletion pages add
     // slots and 0 to BOTH pairs: the Vault of Ages contributes four retired
@@ -394,7 +396,7 @@ describe('Reliquary Conqueror catalog structure', () => {
     // and the flag keeps each whole page out of owned AND total (the dedicated
     // vault and riftbound pins in this file and tests/reliquary_state.test.ts
     // hold both sides), so neither page moves these two literals.
-    expect(full).toEqual({ owned: 345, total: 345 });
+    expect(full).toEqual({ owned: 346, total: 346 });
     const character = catalogCharacterCompletion({
       itemsDiscovered: allOwned,
       marks: allOwned,
@@ -405,8 +407,9 @@ describe('Reliquary Conqueror catalog structure', () => {
     // pair above, including the three release-merged daggers, both craft
     // masterwork marks, and the two Grandmaster title-shelf slots; marks are
     // character-scoped, so this trails the overview by the 29 account-scoped
-    // weapon skins).
-    expect(character).toEqual({ owned: 316, total: 316 });
+    // weapon skins). The phase 11i apex rod is an ITEM, so it moves this pair
+    // by the same one as the overview: 317.
+    expect(character).toEqual({ owned: 317, total: 317 });
   });
 
   it('pins the final measured catalog shape: total slots and distinct marks', () => {
@@ -422,7 +425,8 @@ describe('Reliquary Conqueror catalog structure', () => {
     // (377), the two Masterwrought phase 06 inscription slots (the
     // masterwork:inscription mark slot and the Grandmaster Inscription title
     // slot): 379, and the absorbed farming packet's Harvestmaster title slot
-    // on horizons_titles: 380 total.
+    // on horizons_titles: 380, and the Masterwrought phase 11i apex fishing rod
+    // slot on professions_specimens: 381 total.
     // Slots, not unique relics: the seven excludeFromCompletion slots (four
     // vault, three bands) count here while adding zero to every completion
     // pair, and every duplicate ITEM slot counts again here where the overview
@@ -435,7 +439,7 @@ describe('Reliquary Conqueror catalog structure', () => {
     expect(
       slots,
       `slot total moved; per page: ${RELIQUARY_PAGES.map((p) => `${p.id}=${p.relics.length}`).join(', ')}`,
-    ).toBe(380);
+    ).toBe(381);
     // Distinct mark ids: the 10 shipped before Phase 21, the 19 rare-slain
     // proofs of conquerors_rares_of_the_realm, and the two craft masterwork
     // marks (masterwork:jewelcrafting, masterwork:inscription).
@@ -648,10 +652,11 @@ describe('Reliquary relic item ids resolve in ITEMS', () => {
     // isCataloguedRelicItem-vs-index agreement pin would be vacuous: the
     // predicate IS the index membership test.)
     // The Phase 21 measured final, hand-carried: 237 unique catalogued item
-    // ids, plus the three daggers the v0.36.0 release merge added: 240 (the
-    // sixth figure of the ledger row's "all pinned" claim; the other five are
-    // the page/overview/character/slot/mark literals nearby).
-    expect(RELIQUARY_ITEM_TO_PAGES.size).toBe(240);
+    // ids, plus the three daggers the v0.36.0 release merge added (240), plus
+    // the Masterwrought phase 11i apex fishing rod: 241 (the sixth figure of
+    // the ledger row's "all pinned" claim; the other five are the
+    // page/overview/character/slot/mark literals nearby).
+    expect(RELIQUARY_ITEM_TO_PAGES.size).toBe(241);
     for (const [id, pages] of RELIQUARY_ITEM_TO_PAGES) {
       expect(pages.length, `catalogued id ${id} maps to an empty page list`).toBeGreaterThan(0);
     }
@@ -1960,11 +1965,13 @@ describe('Reliquary Professions shelf (Phase 7)', () => {
       'glimmerfin_koi',
       'stormreel_fishing_rod',
       'tidewrought_fishing_rod',
+      'clockreel_fishing_rod',
     ]);
     expect([
       ...RELIQUARY_PROFESSION_SPECIMEN_ITEMS,
       'stormreel_fishing_rod',
       'tidewrought_fishing_rod',
+      'clockreel_fishing_rod',
     ]).toEqual(itemRelicIds(page));
     for (const id of itemRelicIds(page)) {
       expect(ITEMS[id], id).toBeDefined();
@@ -1976,7 +1983,7 @@ describe('Reliquary Professions shelf (Phase 7)', () => {
     expect((RELIQUARY_PROFESSION_SPECIMEN_ITEMS as readonly string[]).at(-1)).toBe(FISHING_RARE_ID);
   });
 
-  it('the two rods are really craftable and really on the Litany Marks counter (and only there)', () => {
+  it('all three rods are craftable; the two trainer rungs are on the Litany counter and only there', () => {
     // The rod slots' two doors, walked back to their live tables. Craft half:
     // both recipes output the rods under the engineering profession (the same
     // derivation the profession truth arm uses; this arm pins the recipe IDS
@@ -1988,8 +1995,15 @@ describe('Reliquary Professions shelf (Phase 7)', () => {
     // Collapsed Reliquary counter rod-free and the page authors no second
     // delve door (following the Marks-stock-only vendor idiom,
     // sister_nhalia_choir_plate precedent).
-    const rodIds = ['stormreel_fishing_rod', 'tidewrought_fishing_rod'];
-    for (const rodId of rodIds) {
+    //
+    // Phase 11i added a THIRD rung, and it deliberately does NOT walk this
+    // loop: the clockreel is craft-only, so the vendor half below would fail
+    // on it truthfully. It gets its own arm underneath, which pins the
+    // craft-only shape POSITIVELY rather than just leaving the rod out of the
+    // list (a rod silently missing from a two-name literal is exactly how the
+    // page comment went stale in the first place).
+    const vendoredRodIds = ['stormreel_fishing_rod', 'tidewrought_fishing_rod'];
+    for (const rodId of vendoredRodIds) {
       const recipes = ALL_RECIPES.filter((r) => r.resultItemId === rodId);
       expect(recipes.length, rodId).toBe(1);
       expect(recipes[0].id, rodId).toBe(`recipe_${rodId}`);
@@ -2002,7 +2016,7 @@ describe('Reliquary Professions shelf (Phase 7)', () => {
     expect(DELVES.drowned_litany.boardNpcId).toBe('brother_halven_marsh');
     // Both slots answer craft + keeper, byte-stable in authored order.
     const page = RELIQUARY_PAGES_BY_ID.professions_specimens;
-    for (const rodId of rodIds) {
+    for (const rodId of vendoredRodIds) {
       const relic = page.relics.find((r) => r.kind === 'item' && r.itemId === rodId);
       expect(relic, rodId).toBeDefined();
       expect(reliquaryRelicSource(page, relic!)).toEqual([
@@ -2010,6 +2024,40 @@ describe('Reliquary Professions shelf (Phase 7)', () => {
         { sourceKind: 'vendor', sourceId: 'brother_halven_marsh' },
       ]);
     }
+  });
+
+  it('the apex rod is craft-only: no counter stocks it, and the page says so', () => {
+    // The Phase 11i rung. THREE independent facts, because the interesting
+    // failure is a future content change quietly giving the rod a shop row and
+    // leaving the one-hint page behind: (1) it really is engineering-crafted,
+    // (2) NO delve counter stocks the finished rod, and (3) the authored hint
+    // list is exactly the craft, with no vendor door invented for it.
+    const rodId = 'clockreel_fishing_rod';
+    const recipes = ALL_RECIPES.filter((r) => r.resultItemId === rodId);
+    expect(recipes.length).toBe(1);
+    expect(recipes[0].id).toBe(`recipe_${rodId}`);
+    expect(recipes[0].professionId).toBe('engineering');
+    for (const [delveId, rows] of Object.entries(DELVE_SHOPS)) {
+      expect(
+        rows.find((e) => e.itemId === rodId),
+        `${rodId} must not be stocked on the ${delveId} counter`,
+      ).toBeUndefined();
+    }
+    const page = RELIQUARY_PAGES_BY_ID.professions_specimens;
+    const relic = page.relics.find((r) => r.kind === 'item' && r.itemId === rodId);
+    expect(relic).toBeDefined();
+    expect(reliquaryRelicSource(page, relic!)).toEqual([
+      { sourceKind: 'profession', sourceId: 'engineering' },
+    ]);
+    // The schematic IS sold, and the page deliberately does not name that
+    // counter (a vendor hint points at where the RELIC is bought). Pinning the
+    // stock row here is what keeps the omission readable as a decision: if the
+    // quartermaster ever stops carrying the pattern, this arm says so rather
+    // than the page quietly meaning something else.
+    const patternRow = HEROIC_VENDOR_STOCK.find(
+      (e) => e.itemId === 'pattern_clockreel_fishing_rod',
+    );
+    expect(patternRow).toBeDefined();
   });
 
   it('every corpse-harvest specimen family has its slot on the specimen page', () => {

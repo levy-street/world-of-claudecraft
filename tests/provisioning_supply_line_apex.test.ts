@@ -586,7 +586,15 @@ describe('masterwrought Phase 11h GATE A: the amended uniform-bill rule', () => 
     // red the Set size above, which is the assertion that actually carries
     // GATE A; this literal is its non-vacuity sibling.
     expect(inputs[0]).toBe(508);
-    expect(508 - 452, "and 11i's fish row is what moved it, uniformly").toBe(4 * 14);
+    // DERIVED, not two literals. `508 - 452` against `4 * 14` was 56 === 56,
+    // unfailable, and worse it would have stayed green while becoming false if
+    // the catfish sellValue ever moved. Reading the count off the live bill and
+    // the unit value off the live item makes the same claim decisively.
+    const fishRow = requireRecipe(THREE_PLATES[0]).reagents.find(
+      (g) => g.itemId === 'raw_deepbarb_catfish',
+    );
+    expect(fishRow, "11i's fish row is on the plate").toBeDefined();
+    expect(508 - fishRow!.count * reagentUnitValue(fishRow!.itemId)).toBe(452);
   });
 
   it('and the WALL-CLOCK spread is 12.5 percent, the honest half of the same gate', () => {

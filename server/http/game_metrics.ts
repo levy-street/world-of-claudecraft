@@ -31,8 +31,10 @@
 // THE `band` LABEL MEANS TWO DIFFERENT THINGS, and deliberately so: on
 // woc_gather_harvests_total it is the node's ZONE (the R3 re-key), while on
 // the woc_fishing_* family the zone rides its own `zone` label and `band` is
-// the EFFECTIVE fishing rung 0/1/2 (proficiency capped by the rod,
-// effectiveFishingBand in src/sim/professions/fishing.ts). Both vocabularies
+// the EFFECTIVE fishing rung, 0 to 5 (proficiency capped by the rod,
+// effectiveFishingBand in src/sim/professions/fishing.ts; the ladder itself is
+// FISHING_CATCH_BAND_THRESHOLDS in src/sim/professions/fishing_bands.ts, and it
+// read 0/1/2 until masterwrought Phase 11i grew it). Both vocabularies
 // ship together in this metric family's first release, so nothing live
 // depends on either yet; they still must not be renamed apart later, and the
 // label reads against its metric, never across families.

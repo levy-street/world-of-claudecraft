@@ -2815,9 +2815,13 @@ describe('Guide professions gathering accuracy', () => {
       }
     }
     // The koi odds read skill and nothing else: the same percentage in every
-    // zone at a given band, rising to its cap and then holding there (the
-    // ladder ends where its consumers do, both rod rungs that take koi sitting
-    // at or below tier 5).
+    // zone at a given band, rising to its cap and then holding there. The cap
+    // is a deliberate flat, not the top of a ladder that ran out: THREE rod
+    // rungs consume koi since masterwrought Phase 11i (content/recipes.ts, the
+    // stormreel, tidewrought and clockreel bills), so the demand does not stop
+    // at tier 5, and the row is held flat because it is already the second
+    // heaviest thing in a top-band cell and climbing further would only crowd
+    // out the catches the new bands exist to pay.
     let koiRowsChecked = 0;
     for (const [band, published] of f.bandTables.entries()) {
       for (const zone of published.zones) {

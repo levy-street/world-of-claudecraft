@@ -3652,12 +3652,58 @@ export const FISHING_TABLES: Record<string, FishingEntry[]> = FISHING_TABLES_BY_
 export const FISHING_RARE_ID = 'glimmerfin_koi';
 
 /**
+ * The rule behind FISHING_BAND_INTRODUCED_CATCH, as a pure function of a table
+ * set rather than of the shipped one.
+ *
+ * IT IS A PARAMETERIZED LEAF ON PURPOSE. The export below is a module-scope
+ * constant over the live tables, which means a test can only ever observe the
+ * ANSWER it produced for real content: the ambiguity branch (a band adding two
+ * ids, which no shipped table does) is unreachable from the outside, so a suite
+ * wanting to cover it has to build a fixture, and a fixture had nothing to
+ * drive. rv-tests proved the cost during Phase 11i: the ambiguity arm in
+ * tests/professions_fishing.test.ts had re-typed this body as a local helper
+ * and was asserting against its own copy, so deleting the `size === 1` rule
+ * here left the whole suite green. Taking the tables as a parameter is what
+ * makes that fixture decisive over the shipped code.
+ *
+ * Band 0 is null by definition (introducing the whole starter table is the
+ * normal case there, not an error). Above it, MORE THAN ONE new id is a content
+ * error and this returns null rather than papering over it by picking a winner:
+ * the tooltip then falls back to its generic line, and the pin in
+ * tests/professions_fishing.test.ts reds on the table.
+ */
+export function introducedCatchFor(
+  tables: readonly Record<string, FishingEntry[]>[],
+  band: number,
+): string | null {
+  if (band === 0) return null;
+  const below = new Set<string>();
+  for (let b = 0; b < band; b++) {
+    for (const rows of Object.values(tables[b])) {
+      for (const row of rows) if (row.itemId) below.add(row.itemId);
+    }
+  }
+  const introduced = new Set<string>();
+  for (const rows of Object.values(tables[band])) {
+    for (const row of rows) if (row.itemId && !below.has(row.itemId)) introduced.add(row.itemId);
+  }
+  return introduced.size === 1 ? [...introduced][0] : null;
+}
+
+/**
  * The catch each band INTRODUCES, or null where a band introduces none.
  *
  * DERIVED, never hand-listed: a band introduces an id when that id appears in
- * the band's cells and in none below it. Bands 0 to 2 introduce nothing (every
- * shipped catch is already on the band-0 table; the bands move WEIGHT, not
- * membership), and each of the three high bands introduces exactly one.
+ * the band's cells and in none below it, and reads null unless it introduces
+ * EXACTLY one.
+ *
+ * BAND 0 READS NULL BECAUSE IT INTRODUCES EVERYTHING, not because it introduces
+ * nothing, and the difference is worth stating because the two look identical
+ * from the outside: nothing sits below band 0, so by the rule above it
+ * introduces all nine of its rows and falls through the exactly-one arm. Bands
+ * 1 and 2 introduce nothing at all (they move WEIGHT, not membership), and each
+ * of the three high bands introduces exactly one catch, which is the only case
+ * a caller can use.
  *
  * IT EXISTS FOR THE ROD TOOLTIP (masterwrought Phase 11i). Bands 3, 4 and 5 all
  * gate at proficiency 200, so a tooltip that quotes only the skill threshold
@@ -3668,22 +3714,7 @@ export const FISHING_RARE_ID = 'glimmerfin_koi';
  * say something only that rung can say.
  */
 export const FISHING_BAND_INTRODUCED_CATCH: readonly (string | null)[] = FISHING_TABLES_BY_BAND.map(
-  (byZone, band) => {
-    const below = new Set<string>();
-    for (let b = 0; b < band; b++) {
-      for (const rows of Object.values(FISHING_TABLES_BY_BAND[b])) {
-        for (const row of rows) if (row.itemId) below.add(row.itemId);
-      }
-    }
-    const introduced = new Set<string>();
-    for (const rows of Object.values(byZone)) {
-      for (const row of rows) if (row.itemId && !below.has(row.itemId)) introduced.add(row.itemId);
-    }
-    // At most one per band by authoring rule; more than one is a content error
-    // the pin in tests/professions_fishing.test.ts reds on, and this read
-    // deliberately does not paper over it by picking a winner.
-    return introduced.size === 1 ? [...introduced][0] : null;
-  },
+  (_byZone, band) => introducedCatchFor(FISHING_TABLES_BY_BAND, band),
 );
 
 // Every raw fishing catch that is a cooking (and rod-ladder) reagent, never

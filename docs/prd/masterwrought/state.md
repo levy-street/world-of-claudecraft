@@ -11856,6 +11856,211 @@ file did not name it: it published minProficiency from
 PROFICIENCY_BAND_THRESHOLDS, so it would have quoted 200 for a band gated at 150
 and emitted `undefined` for the three new tables. Both now read fishing's ladder.
 
+### THE REVIEW ROUND, AND WHAT IT CAUGHT THAT THE PHASE DID NOT
+
+Four fresh reviewers on the finished diff: architecture, content obligations,
+wire parity, and test coverage. Between them they raised two RED tips, one
+content defect that would have stranded the phase's whole point, and five
+survived mutations. Everything below is applied; the maintainer items are in
+their own section further down.
+
+**THE TWO RED TIPS, both mine, both mechanical.**
+
+`tests/monolith_budget.test.ts` went red because `server/game.ts` grew 10761 to
+10765 lines and EVERY ADDED LINE WAS PROSE explaining the rod-fee
+discriminator. That file is a named monolith whose ceiling the Phase 11d QA
+lowered to exactly its size, so there was zero slack. Verified not inherited:
+the file is exactly 10761 at ed73c8d572. The explanation already existed in
+fuller form beside ROD_FEE_RECIPE_IDS in `server/fishing_telemetry.ts`, so the
+game.ts copy is now nine lines pointing at it (10758). THE LESSON IS THE ONE THE
+RATCHET EXISTS TO TEACH: growing a coordinator to explain a change made
+elsewhere is still growing it, and a comment costs exactly as many lines as code.
+
+`tests/apex_pattern_channels.test.ts` went red because the phase updated the
+drop-recipe TOTAL (34 to 38) and left all four per-family literals. It is worth
+recording why the fix was not "change 8 to 11": the apex rod is the first drop
+recipe in the game that belongs to NONE of the four APEX_*/FARM families, so a
+four-term partition could not have summed to the total however the consumable
+literal moved. The arm now carries a fifth `rod` term and a disjointness pin,
+which the four-term version never had.
+
+**THE CONTENT DEFECT: A BOOTSTRAP DEADLOCK, and it is the finding of the phase.**
+
+The apex rod's draft bill named `raw_stillmere_salmon` x4. The salmon exists
+only in the band-5 cells; band 5 takes a tier-6 rod; the only tier-6 rod in the
+game is that recipe's own output. A CLOSED CIRCUIT: no clockreel means no band 5
+means no salmon means no clockreel, and the rod, the whole band-5 table, the
+capstone feast and the deed attached to the rod would all have been permanently
+unreachable on every realm. My own header comment had rationalised it away ("the
+first clockreel is crafted from catches its owner cannot have farmed themselves,
+and the market carries the rest"), which is wrong, because a market cannot carry
+an item no player can produce. Keyed on `raw_hollowgill_sturgeon` x10 instead:
+band 4, reachable with the tidewrought the bill already consumes, which is the
+identical self-gate the two rungs above use.
+
+WHY NOTHING CAUGHT IT is the part worth keeping. Every recipe guard in the repo
+is LOCAL: reagents resolve, the bill costs less than the output, the pattern is
+learnable, the tiers line up. All four are TRUE of a closed circuit. The missing
+property is global and it is reachability. `tests/recipe_reachability.test.ts`
+is new and answers it: a fixpoint from an empty realm, seeded with everything
+that is not a crafted output and not a tool-gated gather product, closed under
+crafting, with the fishing band gate and the node tier gate both expressed in
+the one shipped `canGatherTier` comparison. Driven both ways: green on live
+content, and RED naming both stranded recipes when the salmon bill is put back.
+
+**THE WIKI PROSE WAS FALSE, and this is the finding that would have reached
+players.** `guide.profPages.fish.tablesNote` told a reader "your proficiency
+selects one of THREE catch bands: band 0 from the start, band 1 at 100, band 2
+at 200". After this phase both clauses are wrong (six bands; band 2 gates at
+150), and the paragraph renders directly beside the regenerated band tables,
+which `content.generated.ts` now carries with six entries. The page contradicted
+itself. `tests/guide.test.ts` checks generated FRESHNESS and never prose
+accuracy, which is exactly why nothing caught it, and it is the same shape as
+the 11h QA's headline defect one phase earlier. Five keys were corrected in all:
+`tablesNote`, `scheduleNote` and `a7` (every number in the gain schedule),
+`bandsBody` (fishing no longer rides the shared ladder), `koiBody` (incomplete
+rather than false), and `a6` (literally true but misleading now that a third rod
+is crafted and drop-taught).
+
+**THE DISPLAY HEAL HAD A REAL GAP, not just a stale comment.**
+`proficiency_display_heal.ts` justified skipping 150 with "a mid-band schedule
+breakpoint (150) has no reader". This phase gave it one: 150 is now the band-2
+catch gate. So a pre-fix blob at fishing 149.5 to 149.99, which the old sheet
+displayed as "150", would have sat one hundredth below a table the sheet had
+told the player they had earned, which is precisely the strand class that module
+was written to close. The heal now walks fishing's own ladder for fishing and
+the shared one for the land professions. Confined to pre-fix blobs; post-fix
+saves floor on the sheet.
+
+**THE RELIQUARY PAGE SAID THE LADDER WAS TWO RUNGS.** `professions_specimens`
+already catalogues the crafted rod ladder as the angler's chase and its comment
+read "the two top fishing rods close the angler's chase", which the apex rung
+falsifies. Excluding the actual top of a ladder the page exists to catalogue is
+not a defensible omission, so `clockreel_fishing_rod` joins it, with
+`fromProfession('engineering')` and NOTHING ELSE: no counter stocks the finished
+rod, and pointing a collector at the Heroic Quartermaster (who stocks the
+SCHEMATIC) would send them to a counter that has never sold the thing they are
+hunting. Four hand-carried count literals moved by exactly one each (overview
+345 to 346, character 316 to 317, slots 380 to 381, unique catalogued ids 240 to
+241), and the craft-only shape is now pinned POSITIVELY rather than by the rod's
+absence from a two-name list, which is how the page comment went stale in the
+first place.
+
+**Also applied:** the metrics label contract in `server/http/game_metrics.ts`
+still said the band is 0/1/2; `MAX_FISHING_CATCH_BAND` was an unchecked cast;
+the leaf's header carried a 675-line count that was stale in the commit that
+wrote it.
+
+The `MAX_FISHING_CATCH_BAND` repair is worth a line of its own, because the
+obvious fix does not compile. `tuple.length - 1` is ordinary arithmetic and
+widens to `number`, so `satisfies FishingCatchBand` is a type error rather than
+a guard. It now derives the literal at the TYPE level
+(`LastIndexOf<typeof FISHING_CATCH_BAND_THRESHOLDS>`) while still deriving the
+value at runtime, and the guard was driven: adding a seventh threshold fails
+with `Type '6' is not assignable to type 'FishingCatchBand'`, which is the exact
+metrics defect it exists to prevent.
+
+**TWO THINGS THE REVIEW MADE ME STATE PLAINLY RATHER THAN FIX.**
+`fishing.ts` GREW by 61 lines net: the extraction moved 10 lines of logic out
+and added about 61 of prose explaining the move, so "extracted rather than
+grown" and "stays the thin consumer" are both weakened by arithmetic. It is a
+genuine extraction of LOGIC and not of line count, and the wording now says so.
+And the fishing metrics family pre-seeds 504 series where it pre-seeded 252,
+about 84 percent of them permanent zeros; that is a doubling of an existing
+deliberate pattern rather than a new defect, but nobody had stated the cost.
+
+### THE TEST-COVERAGE AUDIT: FIVE SURVIVED MUTATIONS, ALL FIVE NOW DEAD
+
+Twelve mutations were run against the finished diff. Seven died on the phase's
+own pins; five survived, and every one of them is a case where the phase ADDED
+content and left the guard that governs it reading the OLD shape. That is the
+pattern, and it is worth naming as one: **a loop bound is the worst place for a
+claim to be scoped**, because the arm keeps passing and quietly stops meaning
+what its title says.
+
+| # | mutation | what it proved | closed by |
+|---|---|---|---|
+| 3b | band-5 Vale cell 50/34 to 49/35, sum preserved | every D9 schedule arm in `fishing_zones.test.ts` looped `band < 3`, so the NINE CELLS THE PHASE ADDED had no authoring pin at all | the schedule extended to six rungs |
+| 4 | swap the catfish and sturgeon rows inside the band-5 Vale cell | row order IS draw behavior (the roll walks a running weight total) and `FOOD_ROWS` pinned bare weights, so a reordered cell reddened nothing, parity included | `FOOD_ROWS` now pins ordered (id, weight) PAIRS |
+| 8 | give the sturgeon plate the catfish plate's prim list | three new dishes joined the shared `food` radial and none joined `DISH_ICON_IDS`, so only the palette told them apart, which is the exact hazard A4c exists for | the three ids added; A4c is fifteen dishes |
+| 9 | delete all three new catches from every `ZONE_FISH` row | the fish-mark guard checks rows-are-drawn (a subset claim) and the reverse sweep checks zone KEYS; nothing read the item lists in the drawn-to-listed direction | a third-direction arm: every zone row equals EXACTLY the catches that zone draws |
+| 11 | `introduced.size === 1` to `>= 1` | the ambiguity arm had re-typed the export's body as a local helper and asserted against its own copy | STRUCTURAL: `introducedCatchFor(tables, band)` extracted as a parameterized leaf, the constant is its thin consumer, the fixture now drives shipped code |
+
+All five re-run after the repair: each now reds, and each was restored by file
+copy with the restore verified (`diff -q` clean, signature grep zero). The 11
+repair is the one to carry forward as a lesson rather than a fix. A
+module-scope constant over live tables can only ever be observed at the ANSWER
+it produced for real content, so a branch no shipped table exercises is
+unreachable from a test, and a fixture written for it has nothing to drive.
+Parameterizing the rule is what makes the fixture decisive; adding another
+assertion could not have.
+
+**THE SCHEDULE EXTENSION IS THE BULK OF IT.** `fishing_zones.test.ts` is the D9
+authoring home, and its surplus clamp sat at 2 while the ladder grew to a
+surplus of five, which would have squashed bands 3, 4 and 5 onto the band-2
+schedule row and made every arm pass by ALIASING rather than by agreement. The
+clamp now derives from `FISHING_TABLES_BY_BAND.length`, the three schedules
+carry six rungs (empty hook 10/8/6/4/2/1 by surplus, koi flat at 6 from band 2,
+junk at the at-requirement total minus 4 per surplus band floored at one weight
+per junk row), and the junk floor is asserted as a RULE beside its literals,
+because a literal table cannot state why Mirefen's top cell sits at 2 where the
+other two sit at 1. Two new properties came out of writing it: every band ABOVE
+a zone's requirement pays strictly MORE real fish than the requirement band does
+(climbing is never a downgrade, 12 surplus cells), and a cell never drops a row
+a lower band paid.
+
+**THREE NITS, applied rather than deferred.** An assertion over two literals
+(`508 - 452` against `4 * 14`, unfailable, and false if the catfish sellValue
+ever moved) now reads the count off the live bill and the unit value off the
+live item. A comment claiming a "different route than the export uses" was
+re-typing the same algorithm, and now says what the arm actually proves. And the
+false koi-rung sentence, which `3e5aeb9b0d` corrected in `items.ts` and in
+`game_metrics.test.ts`, had a THIRD copy in `guide.test.ts`: this packet's named
+besetting defect, one more time.
+
+### RELEASE-FILL OBLIGATIONS, AMENDED AGAIN
+
+A FOURTH reword key joins the worklist, and it is the most urgent of the four
+because its stale rows are FALSE rather than merely incomplete.
+
+| key | overlay FILES to edit | note |
+|---|---|---|
+| guide.profPages.craftProse.cooking.materialsBody | 18 | 20 rendered locales |
+| guide.profPages.craftProse.alchemy.materialsBody | 18 | 20 rendered locales |
+| guide.profPages.farm.bedsBody | 5 | added by the 11h QA |
+| guide.profPages.fish.tablesNote | 18 | added here; see below |
+
+THE FISH ONE IS DIFFERENT IN KIND. The other three are stale because English
+gained material they lack. This one is stale because the SHIPPED TRANSLATION
+NOW ASSERTS A FALSE FACT: every one of the eighteen still tells its reader there
+are three catch bands and that band 2 gates at 200. A reader in those locales is
+not missing a paragraph, they are being told the wrong number, and no gate reds
+on it: M16 only catches a non-Latin value byte-identical to English, and a stale
+translation is not. The fill is a FULL REPLACEMENT of the value, as the 11h QA
+recorded for the craftProse pair.
+
+CONFIRMED EMPIRICALLY BY THE REGEN, which is worth recording because it makes
+the exposure precise rather than theoretical. After `npm run i18n:gen` the
+reworded keys moved in the FIFTEEN Latin-script slices and in NONE of
+`zh_CN`/`zh_TW`/`ja_JP`/`ko_KR`/`ru_RU`. The Latin ones were English-filled and
+so re-filled with the corrected English automatically; the five non-Latin ones
+hold real translations of the OLD text and kept them. So the locales carrying
+the false statement are exactly the five the release fill has to touch by hand,
+and the gate is silent on all five. The same reasoning applies to `scheduleNote`,
+`a7`, `bandsBody`, `koiBody` and `a6`, which is why the reword worklist is FIVE
+keys in substance even though only `tablesNote` was FALSE at the level the 11h
+QA's table was tracking.
+
+### ONE MORE FOR THE MAINTAINER, raised by the review rather than by the phase
+
+`prog_first_harvest` ("Harvest your first gathering node", trigger gathering
+amount 1) now takes THIRTEEN catches for a fishing-only character instead of
+one. The ledger above records that honestly, but records it as a missed
+PREDICTION rather than as a ratified design change, and it is a live progression
+change riding a values-only retune. Farming already pushed the same deed to its
+fourth crop in an earlier phase. The deed's own desc drifts further from what it
+does either way. RATIFY OR RETUNE.
+
 ### THE HANDOFF TO PHASE 11i QA, AND THROUGH IT TO 11j
 
 - **THE UNLEARNABLE-AT-150 FINDING IS CONFIRMED IN CODE, and 11j inherits it as

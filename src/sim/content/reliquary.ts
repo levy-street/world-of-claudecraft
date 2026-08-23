@@ -1298,14 +1298,28 @@ export const RELIQUARY_PAGES: readonly ReliquaryPageDef[] = freezePageTable([
     // harvest, which no gathering profession owns, so they name the
     // corpse_harvest activity, the same answer gather_event:perfect_specimen
     // gives (one write site, src/sim/interaction.ts, awards the mark and these
-    // five items together). The two top fishing rods close the angler's chase:
-    // engineering crafts both at the toolworks (ROD_RECIPES in
-    // content/recipes.ts, trainer-taught), and the Drowned Litany Marks
-    // counter sells both (content/delves/shop.ts, the non-crafter route), so
-    // each names the craft plus the board keeper, the Marks-stock-only vendor
-    // idiom the Litany page set (sister_nhalia_choir_plate). They are shop
-    // rows on the Litany board ONLY; the Collapsed Reliquary counter carries
-    // no tool rows, so no second delve door exists to name.
+    // five items together). The CRAFTED FISHING ROD LADDER closes the angler's
+    // chase, and since masterwrought Phase 11i that ladder is three rungs, not
+    // two. Engineering crafts all three at the toolworks (ROD_RECIPES in
+    // content/recipes.ts), so every one of them names the craft. What differs
+    // is the SECOND door, and the difference is the reason each rod's hint pair
+    // is authored rather than derived:
+    //
+    // - stormreel and tidewrought are trainer-taught, and the Drowned Litany
+    //   Marks counter sells the finished rods (content/delves/shop.ts, the
+    //   non-crafter route), so each names the craft plus the board keeper: the
+    //   Marks-stock-only vendor idiom the Litany page set
+    //   (sister_nhalia_choir_plate). They are shop rows on the Litany board
+    //   ONLY; the Collapsed Reliquary counter carries no tool rows, so no
+    //   second delve door exists to name.
+    // - clockreel, the apex rung, names the craft and NOTHING ELSE, which is a
+    //   deliberate authored answer rather than an omission. No counter stocks
+    //   the finished rod; the Heroic Quartermaster stocks its SCHEMATIC
+    //   (pattern_clockreel_fishing_rod, 16 marks, content/heroic_vendor.ts).
+    //   A vendor hint points a player at where the RELIC itself is bought, so
+    //   naming the quartermaster here would send a collector to a counter that
+    //   has never sold the thing they are hunting. The schematic is a step on
+    //   the craft route, and the craft hint already covers it.
     relics: items(
       ...withProfessions(
         RELIQUARY_PROFESSION_SPECIMEN_ITEMS,
@@ -1320,6 +1334,7 @@ export const RELIQUARY_PAGES: readonly ReliquaryPageDef[] = freezePageTable([
         'tidewrought_fishing_rod',
         [fromProfession('engineering'), fromVendor('brother_halven_marsh')],
       ],
+      ['clockreel_fishing_rod', [fromProfession('engineering')]],
     ),
   },
 

@@ -37,6 +37,7 @@ import {
   FISHING_BAND_INTRODUCED_CATCH,
   FISHING_TABLES,
   FISHING_TABLES_BY_BAND,
+  introducedCatchFor,
   isRawCookingCatch,
 } from '../src/sim/content/items';
 import { GATHERING_PROFESSIONS } from '../src/sim/content/professions';
@@ -976,9 +977,11 @@ const prePhaseEffectiveBand = (proficiency: number, rodTier: number): number =>
 describe('the catch each band introduces (Phase 11i)', () => {
   it('is one id per HIGH band and nothing at all below them', () => {
     expect(FISHING_BAND_INTRODUCED_CATCH).toHaveLength(FISHING_TABLES_BY_BAND.length);
-    // Bands 0 to 2 introduce NOTHING, and that is a real statement about the
-    // shipped design rather than a gap: those bands move WEIGHT, not
-    // membership, so every shipped catch is already on the band-0 table.
+    // Band 0 reads null because it introduces EVERYTHING (nothing sits below
+    // it), bands 1 and 2 because they introduce nothing at all: those two move
+    // WEIGHT, not membership, so every shipped catch is already on the band-0
+    // table. Same value, two different reasons, and the band-0 one is the
+    // normal case rather than the multi-id error arm.
     expect(FISHING_BAND_INTRODUCED_CATCH.slice(0, 3)).toEqual([null, null, null]);
     expect(FISHING_BAND_INTRODUCED_CATCH.slice(3)).toEqual([
       'raw_deepbarb_catfish',
@@ -988,9 +991,12 @@ describe('the catch each band introduces (Phase 11i)', () => {
   });
 
   it('is DERIVED from the tables, not a second hand-written list', () => {
-    // Recompute it here by a different route than the export uses: walk the
-    // union of every band at or below b and ask which ids band b adds. If the
-    // export were ever replaced by a literal, this reds.
+    // Recompute it here from the live tables and compare. Read this arm for
+    // exactly what it is: the recomputation walks the SAME algorithm the export
+    // does (union of the bands below, ids band b adds, single-introducer or
+    // null), so it proves the export is DERIVED rather than hand-written, and
+    // nothing more. It cannot rule on whether that algorithm is the right one.
+    // The literal-contents arm above is the decisive half.
     for (const [band, byZone] of FISHING_TABLES_BY_BAND.entries()) {
       const below = new Set<string>();
       for (let b = 0; b < band; b++) {
@@ -1026,10 +1032,19 @@ describe('the catch each band introduces (Phase 11i)', () => {
   });
 
   it('a band introducing TWO ids reads null rather than picking a winner', () => {
-    // The ambiguity arm, driven rather than described. The export refuses to
-    // choose when a band adds more than one id, so the tooltip falls back to
-    // the generic line instead of naming one of two catches arbitrarily. This
-    // is the branch no shipped table exercises, so nothing else would cover it.
+    // The ambiguity arm, driving the SHIPPED rule. This used to re-type the
+    // export's body as a local helper and assert against that, which proved
+    // only that the test's own copy behaved: rv-tests deleted the `size === 1`
+    // rule from src/sim/content/items.ts and the whole suite stayed green. The
+    // fix was structural rather than another assertion. `introducedCatchFor`
+    // is the real rule, taking the table set as a parameter, and the exported
+    // constant is now its thin consumer over the live tables, so this fixture
+    // reaches the production code the tooltip reads.
+    //
+    // The branch matters because no shipped table exercises it: every high band
+    // adds exactly one catch today, so without a fixture the refusal-to-choose
+    // rule would ship untested and a future two-catch band would silently name
+    // one of them at random in the rod tooltip.
     const twoNew = [
       { eastbrook_vale: [{ itemId: 'raw_mirror_trout', weight: 100 }] },
       {
@@ -1040,22 +1055,9 @@ describe('the catch each band introduces (Phase 11i)', () => {
         ],
       },
     ];
-    const introducedFor = (tables: typeof twoNew, band: number): string | null => {
-      const below = new Set<string>();
-      for (let b = 0; b < band; b++) {
-        for (const rows of Object.values(tables[b])) {
-          for (const row of rows) if (row.itemId) below.add(row.itemId);
-        }
-      }
-      const added = new Set<string>();
-      for (const rows of Object.values(tables[band])) {
-        for (const row of rows) if (row.itemId && !below.has(row.itemId)) added.add(row.itemId);
-      }
-      return added.size === 1 ? [...added][0] : null;
-    };
-    expect(introducedFor(twoNew, 1)).toBeNull();
+    expect(introducedCatchFor(twoNew, 1)).toBeNull();
     // And the same shape with ONE new id does resolve, so the null above is
-    // the ambiguity rule rather than the helper never resolving anything.
+    // the ambiguity rule rather than the function never resolving anything.
     const oneNew = [
       { eastbrook_vale: [{ itemId: 'raw_mirror_trout', weight: 100 }] },
       {
@@ -1065,7 +1067,17 @@ describe('the catch each band introduces (Phase 11i)', () => {
         ],
       },
     ];
-    expect(introducedFor(oneNew, 1)).toBe('raw_river_perch');
+    expect(introducedCatchFor(oneNew, 1)).toBe('raw_river_perch');
+    // Band 0 is null BY DEFINITION, not by ambiguity: a fixture whose band 0
+    // adds exactly one id still reads null there, which is the arm that keeps
+    // the early return from being mistaken for a case of the rule above.
+    expect(introducedCatchFor(oneNew, 0)).toBeNull();
+    // THE SEAM IS REAL: the shipped constant is this same function over the
+    // live tables, every band. Without this the extraction could drift into two
+    // rules, one tested and one shipped, which is the defect it exists to fix.
+    expect(
+      FISHING_TABLES_BY_BAND.map((_t, band) => introducedCatchFor(FISHING_TABLES_BY_BAND, band)),
+    ).toEqual([...FISHING_BAND_INTRODUCED_CATCH]);
   });
 });
 
@@ -1327,7 +1339,14 @@ const JUNK_ROWS: Record<string, string[]> = {
 // The rare catch is the one row that reads SKILL alone: identical in every
 // zone, rising with the band, because it is the rod ladder's reagent and the
 // angler who earned the band should be the one who farms it.
-const KOI_WEIGHT_BY_BAND = [1, 3, 6];
+// Six rungs since masterwrought Phase 11i, flat at 6 from band 2 up. The
+// authoring RULE behind these numbers (and the extended empty-hook, junk and
+// food schedules the same phase added) is enforced in tests/fishing_zones.test.ts,
+// which is the D9 authoring home; this list is the copy the liveness arms in
+// THIS file read, and it must agree with that one.
+const KOI_WEIGHT_BY_BAND = [1, 3, 6, 6, 6, 6];
+/** Every band the live ladder actually has, so a loop cannot fall short of it. */
+const ALL_BANDS = FISHING_TABLES_BY_BAND.map((_, band) => band);
 
 function weightOf(band: number, zoneId: string, itemId: string | null): number {
   const row = FISHING_TABLES_BY_BAND[band][zoneId].find((r) => r.itemId === itemId);
@@ -1347,7 +1366,11 @@ describe('fishing table structure (pin 5)', () => {
   });
 
   it('every band of every zone sums to exactly 100 and keeps the null row at weight 1 or more', () => {
-    for (let band = 0; band < 3; band++) {
+    // ALL SIX BANDS. This loop stopped at 3 through masterwrought Phase 11i's
+    // first pass, which meant the nine cells the phase ADDED were the only ones
+    // in the game whose weights summed to nothing in particular: rv-tests moved
+    // 50/34 to 49/35 in the top Vale cell and nothing anywhere reddened.
+    for (const band of ALL_BANDS) {
       expect(Object.keys(FISHING_TABLES_BY_BAND[band]).sort()).toEqual([...ZONE_IDS].sort());
       for (const zoneId of ZONE_IDS) {
         const rows = FISHING_TABLES_BY_BAND[band][zoneId];
@@ -1358,22 +1381,29 @@ describe('fishing table structure (pin 5)', () => {
     }
   });
 
-  it('glimmerfin_koi weight scales with SKILL and nothing else: literally 1/3/6 in every zone', () => {
-    for (let band = 0; band < 3; band++) {
+  it('glimmerfin_koi weight scales with SKILL and nothing else: 1/3/6 then flat, in every zone', () => {
+    for (const band of ALL_BANDS) {
       for (const zoneId of ZONE_IDS) {
         expect(weightOf(band, zoneId, KOI), `${zoneId} band ${band} koi`).toBe(
           KOI_WEIGHT_BY_BAND[band],
         );
       }
     }
-    // The row really moves, so the loop above is not three copies of one
+    // The row really moves, so the loop above is not six copies of one
     // number, and it moves UP: this is the only row a shortfall never touches.
     expect(KOI_WEIGHT_BY_BAND[0]).toBeLessThan(KOI_WEIGHT_BY_BAND[2]);
+    // The list covers the live ladder rather than a prefix of it, which is the
+    // check that would have caught this loop reading three of six bands.
+    expect(KOI_WEIGHT_BY_BAND).toHaveLength(FISHING_TABLES_BY_BAND.length);
   });
 
   it('band steps are monotonic: food fish never lose weight, junk and empty hooks never gain', () => {
+    // EVERY step, not just 0-to-1 and 1-to-2. The three steps this loop used to
+    // skip are the ones where the new catches enter, so they are exactly where
+    // a cell could have paid for a new row by quietly shaving an old one.
+    let stepsChecked = 0;
     for (const zoneId of ZONE_IDS) {
-      for (let band = 0; band < 2; band++) {
+      for (let band = 0; band < FISHING_TABLES_BY_BAND.length - 1; band++) {
         for (const id of FOOD_FISH[zoneId]) {
           expect(
             weightOf(band + 1, zoneId, id),
@@ -1390,8 +1420,12 @@ describe('fishing table structure (pin 5)', () => {
           weightOf(band + 1, zoneId, null),
           `${zoneId} empty hook band ${band} to ${band + 1}`,
         ).toBeLessThanOrEqual(weightOf(band, zoneId, null));
+        stepsChecked += 1;
       }
     }
+    // 3 zones over 5 steps. Non-vacuity: a loop bound that fell back to the old
+    // 2 would report 6 here.
+    expect(stepsChecked).toBe(15);
   });
 
   it('the three literal walks really do diverge, at the indices their comments name', () => {
@@ -1425,7 +1459,18 @@ describe('fishing table structure (pin 5)', () => {
     expect(FISHING_TABLES).toBe(FISHING_TABLES_BY_BAND[0]);
   });
 
-  it('no band introduces an item id outside the band-0 set (zero new items)', () => {
+  it('the shipped bands introduce nothing, and the new bands introduce EXACTLY the three catches', () => {
+    // This arm used to read "no band introduces an item id outside the band-0
+    // set" and loop bands 0 to 2, which was true when three bands was the whole
+    // ladder. Masterwrought Phase 11i made the title false of the game while
+    // leaving it true of the loop, and a loop bound is the worst place for a
+    // claim to be scoped: the arm keeps passing and stops meaning what it says.
+    //
+    // So it is split. The old invariant survives UNCHANGED over the bands it
+    // was written about (a shipped cell may still never introduce an id), and
+    // the new bands get the matching exact claim: they add these three ids and
+    // no others, in this order, and no zone is exempt.
+    const NEW_CATCHES = ['raw_deepbarb_catfish', 'raw_hollowgill_sturgeon', 'raw_stillmere_salmon'];
     for (const zoneId of ZONE_IDS) {
       const shipped = new Set(B0_ROWS[zoneId].map((r) => r.itemId));
       for (let band = 0; band < 3; band++) {
@@ -1433,6 +1478,28 @@ describe('fishing table structure (pin 5)', () => {
           expect(shipped.has(row.itemId), `${zoneId} band ${band} id ${row.itemId}`).toBe(true);
         }
       }
+      const introducedByBand: string[] = [];
+      const seen = new Set(shipped);
+      for (let band = 3; band < FISHING_TABLES_BY_BAND.length; band++) {
+        for (const row of FISHING_TABLES_BY_BAND[band][zoneId]) {
+          if (seen.has(row.itemId)) continue;
+          seen.add(row.itemId);
+          introducedByBand.push(row.itemId as string);
+        }
+      }
+      expect(introducedByBand, `${zoneId} high-band introductions`).toEqual(NEW_CATCHES);
+    }
+    // And the three really are new to the whole table, not just to one zone: a
+    // catch that already sat in a shipped cell somewhere would make the claim
+    // above accidental.
+    const shippedEverywhere = new Set<string | null>();
+    for (let band = 0; band < 3; band++) {
+      for (const rows of Object.values(FISHING_TABLES_BY_BAND[band])) {
+        for (const row of rows) shippedEverywhere.add(row.itemId);
+      }
+    }
+    for (const id of NEW_CATCHES) {
+      expect(shippedEverywhere.has(id), `${id} must be new to the ladder`).toBe(false);
     }
   });
 });

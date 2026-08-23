@@ -45,6 +45,7 @@ import {
   APEX_CONSUMABLE_RECIPES,
   APEX_GEAR_RECIPES,
   FARM_RECIPES,
+  ROD_RECIPES,
   recipeById,
 } from '../src/sim/content/recipes';
 import {
@@ -146,7 +147,7 @@ describe('masterwrought R8 referential contract: every drop recipe reaches exact
   // counts are LITERAL floors (the recorded phase decisions), never re-derived.
   const apexDropRecipes = ALL_RECIPES.filter((recipe) => recipe.acquisition?.includes('drop'));
 
-  it('the drop-acquisition recipe set partitions 10 gear / 10 armor / 8 consumable / 6 farm', () => {
+  it('the drop-acquisition recipe set partitions 10 gear / 10 armor / 11 consumable / 6 farm / 1 rod', () => {
     // 38 since masterwrought Phase 11i: three angler cooking rows plus the
     // apex rod's schematic, the first pattern teaching a row outside the
     // three APEX_* tables.
@@ -155,15 +156,29 @@ describe('masterwrought R8 referential contract: every drop recipe reaches exact
     const armor = apexDropRecipes.filter((r) => APEX_ARMOR_RECIPES.includes(r));
     const consumable = apexDropRecipes.filter((r) => APEX_CONSUMABLE_RECIPES.includes(r));
     const farm = apexDropRecipes.filter((r) => FARM_RECIPES.includes(r));
+    // A FIFTH family since masterwrought Phase 11i, and it is the reason the
+    // partition needed re-deriving rather than re-counting: the apex rod's
+    // rung is the first drop recipe in the game that lives OUTSIDE the three
+    // APEX_* tables and outside FARM_RECIPES. It sits in ROD_RECIPES, so a
+    // four-term sum would have come up one short against the total no matter
+    // how the consumable literal moved.
+    const rod = apexDropRecipes.filter((r) => ROD_RECIPES.includes(r));
     expect(gear).toHaveLength(10);
     expect(armor).toHaveLength(10);
-    expect(consumable).toHaveLength(8);
+    // ELEVEN: the eight phase-11 consumables plus 11i's three angler rows.
+    expect(consumable).toHaveLength(11);
     expect(farm).toHaveLength(6);
-    // No drop recipe outside the four families: one with no assigned channel
+    expect(rod).toHaveLength(1);
+    // No drop recipe outside the five families: one with no assigned channel
     // would slip every family loop, so it fails here.
-    expect(gear.length + armor.length + consumable.length + farm.length).toBe(
+    expect(gear.length + armor.length + consumable.length + farm.length + rod.length).toBe(
       apexDropRecipes.length,
     );
+    // And the families are DISJOINT, which a bare sum cannot show: a recipe
+    // counted by two filters would balance the equality above while meaning
+    // something quite different.
+    const familyIds = [...gear, ...armor, ...consumable, ...farm, ...rod].map((r) => r.id);
+    expect(new Set(familyIds).size).toBe(familyIds.length);
   });
 
   it('every recipe teaching pattern appears in EXACTLY the channels its family assigns', () => {

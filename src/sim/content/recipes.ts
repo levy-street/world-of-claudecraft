@@ -385,15 +385,23 @@ export const TOOL_RECIPES: ProfessionRecipeRecord[] = [
 // two paragraphs above describe the shipped pair; the apex rung's own self-gate
 // is the third bullet below.
 //
-// - The APEX rung is hard-gated twice over, and by its own ladder. It consumes
-//   the tier-5 rod plus the two catches bands 4 and 5 pay, and band 4 already
-//   takes a tier-5 rod, so nothing in the bill can be fished by anyone who has
-//   not already climbed to the rung below. The Stillmere Salmon goes further:
-//   it exists only in the band-5 cell, which this very rod is the gate on, so
-//   the FIRST clockreel in a realm is crafted from catches its owner cannot
-//   have farmed themselves. That is deliberate and it is why the salmon is not
-//   the only high-band reagent: the sturgeon at band 4 is reachable with the
-//   tidewrought alone, and the market carries the rest.
+// - The APEX rung is hard-gated by its own ladder and by nothing else. It
+//   consumes the tier-5 rod plus the catch BAND 4 pays, and band 4 takes that
+//   same tier-5 rod, so nothing in the bill can be fished by anyone who has not
+//   already climbed to the rung below. That is the identical shape the tier-5
+//   rung uses one step down.
+//
+//   IT DELIBERATELY DOES NOT CONSUME THE BAND-5 CATCH, and this is the one
+//   place on the ladder where the obvious bill is a bug. The Stillmere Salmon
+//   exists only in the band-5 cells; band 5 takes a tier-6 rod; the only tier-6
+//   rod in the game is this recipe's own output. A bill naming the salmon is
+//   therefore a closed circuit that nobody in a realm can ever open, and it
+//   would have stranded the rod, the whole band-5 table, the capstone feast and
+//   the deed along with it. An earlier draft of this header argued the circuit
+//   away as "the first clockreel is crafted from catches its owner cannot have
+//   farmed themselves, and the market carries the rest": that reasoning is
+//   wrong, because a market cannot carry an item no player can produce. The
+//   band-5 catch is a REWARD for owning the rod, never an input to it.
 //
 // SKILL REQUIREMENTS ARE ALL THREE INSIDE ENGINEERING'S CAP (125), unlike the
 // tier-5 land tools at 75/150. 150 resolves to tier 6 while the cap resolves
@@ -451,12 +459,22 @@ export const ROD_RECIPES: ProfessionRecipeRecord[] = [
     professionId: 'engineering',
     resultItemId: 'clockreel_fishing_rod',
     resultCount: 1,
-    // Input 496 vs output 375. recipe_tidewrought_fishing_rod above is
+    // Input 480 vs output 375. recipe_tidewrought_fishing_rod above is
     // untouched by this phase: its def and its bill both diff empty.
+    //
+    // NO STILLMERE SALMON, and its absence is the whole correctness of this
+    // row. The salmon lives ONLY in the band-5 cells, band 5 takes a tier-6
+    // rod, and this recipe's own output is the only tier-6 rod in the game, so
+    // a bill containing it is a closed circuit: no clockreel means no band 5
+    // means no salmon means no clockreel, and the rod, the band, the capstone
+    // feast and the deed attached to the rod would all have been permanently
+    // unreachable on any realm. The sturgeon is the right keystone because it
+    // is band 4's catch and band 4 takes the tier-5 tidewrought this bill
+    // already consumes, which is exactly the self-gate the two rungs above use
+    // (the carp is Thornpeak-only and Thornpeak takes the rung below it).
     reagents: [
       { itemId: 'glimmerfin_koi', count: 2 },
-      { itemId: 'raw_hollowgill_sturgeon', count: 6 },
-      { itemId: 'raw_stillmere_salmon', count: 4 },
+      { itemId: 'raw_hollowgill_sturgeon', count: 10 },
       { itemId: 'tidewrought_fishing_rod', count: 1 },
     ],
     skillReq: 125,

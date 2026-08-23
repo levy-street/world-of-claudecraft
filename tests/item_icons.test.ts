@@ -449,9 +449,10 @@ describe('item webp icons', () => {
     expect(b.prims[0]?.p).toBe('sack');
   });
 
-  it('A4c) the twelve farm dishes differ in their PRIM LISTS, never only the shared food radial', () => {
-    // The A4b lesson generalized to the dish family (the Phase 6 eight plus
-    // the Phase 11 four buff dishes): all twelve sit on the 'food' radial
+  it('A4c) the fifteen cooked dishes differ in their PRIM LISTS, never only the shared food radial', () => {
+    // The A4b lesson generalized to the dish family (the Phase 6 eight, the
+    // Phase 11 four buff dishes, and masterwrought Phase 11i's two angler
+    // plates plus its capstone feast): all fifteen sit on the 'food' radial
     // DELIBERATELY (a cooked dish must never read as raw produce), and
     // several share a palette, so A4's whole-recipe JSON identity could be
     // satisfied by the background alone, a distinction a 32px bag cell does
@@ -470,6 +471,13 @@ describe('item webp icons', () => {
       'fenbridge_rice_pudding',
       'highwatch_barley_porridge',
       'evergarden_braised_greens',
+      // Phase 11i. A NEW COOKED DISH JOINS THIS LIST, ALWAYS: the family is
+      // whatever `icons.ts` puts on the shared food radial, not a frozen
+      // twelve, and a plate left off is silently exempt from the only pin
+      // that can tell two dishes apart at 32px.
+      'peppered_deepbarb_catfish',
+      'roast_hollowgill_sturgeon',
+      'deepwater_feast',
     ];
     const seen = new Map<string, string>();
     for (const id of DISH_ICON_IDS) {

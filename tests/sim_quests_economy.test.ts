@@ -444,17 +444,20 @@ describe('food, drink, vendor', () => {
     }
     expect(draws).toBe(1);
     expect(sim.player.castingAbility).toBe(FISHING_CAST_ID);
-    // Literal 15, not the imported constant: the broadcast session cap is a
+    // Literal 16, not the imported constant: the broadcast session cap is a
     // wire-visible contract, so this pin must red if the constant moves (the
-    // packet's constant-self-comparison trap).
-    expect(sim.player.castTotal).toBe(15);
-    expect(sim.player.castRemaining).toBe(15);
+    // packet's constant-self-comparison trap). IT DID EXACTLY THAT at
+    // masterwrought Phase 11i, which took the cap 15 to 16 so the tier-6 rung's
+    // reel window cannot be truncated by the defensive timeout, and this arm is
+    // how that phase learned it had missed a literal. Re-pinned deliberately.
+    expect(sim.player.castTotal).toBe(16);
+    expect(sim.player.castRemaining).toBe(16);
     expect(sim.player.channeling).toBe(false);
     expect(sim.events).toContainEqual(
       expect.objectContaining({
         type: 'castStart',
         ability: FISHING_CAST_ID,
-        time: 15,
+        time: 16,
       }),
     );
   });

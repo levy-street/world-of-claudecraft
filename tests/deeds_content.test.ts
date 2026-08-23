@@ -14,7 +14,11 @@ import { HEROIC_DUNGEON_TUNING } from '../src/sim/content/dungeon_difficulty';
 import { FARM_CROP_IDS, FARM_CROPS } from '../src/sim/content/farm_crops';
 import { FARM_PATCHES } from '../src/sim/content/farm_patches';
 import { HEROIC_VENDOR_STOCK } from '../src/sim/content/heroic_vendor';
-import { FISHING_TABLES_BY_BAND } from '../src/sim/content/items';
+import {
+  FISHING_RARE_ID,
+  FISHING_TABLES_BY_BAND,
+  RAW_COOKING_CATCH_IDS,
+} from '../src/sim/content/items';
 import { MAGE_PET_MOBS } from '../src/sim/content/mage_pets';
 import { NECROMANCY_MOBS } from '../src/sim/content/necromancy';
 import {
@@ -1449,6 +1453,49 @@ describe('trigger references resolve against the real content tables', () => {
       }
     }
     expect([...Object.keys(ZONE_FISH)].sort()).toEqual([...deedFishZones].sort());
+  });
+
+  it('every zone row lists EXACTLY the catches that zone draws (the item dimension)', () => {
+    // THE THIRD DIRECTION, and the one that was missing. The fish-mark guard
+    // above checks rows-are-drawn (a subset claim), and the reverse sweep
+    // checks zone KEYS. Neither reads the item lists in the drawn-to-listed
+    // direction, so a new catch added to the cell tables and forgotten here
+    // reddened nothing: rv-tests deleted all three of masterwrought Phase 11i's
+    // catches from every row and the whole deeds suite stayed green.
+    //
+    // What that costs is not cosmetic. ZONE_FISH is what the first-cast deed
+    // reads to decide a zone is fished out, so a missing row makes the mark
+    // silently unearnable-by-that-catch: a player reeling in the new fish gets
+    // no credit and no error, which is the failure the phase's own SETTLED
+    // ruling ("ZONE_FISH: YES, all three join") was written to avoid.
+    //
+    // EXACT equality, not a subset either way. The set is derived the way the
+    // resolver reads the tables (own cell, else the Vale fallback) and filtered
+    // to the CATCHES: every raw cooking catch plus the rare koi. Grey junk and
+    // the empty-hook null row are deliberately out, which is why this is an
+    // authored contract worth pinning rather than a restatement of the table.
+    const catchIds = new Set<string>([...RAW_COOKING_CATCH_IDS, FISHING_RARE_ID]);
+    // Non-vacuity: the filter must actually keep the junk out, or "exactly the
+    // catches" would quietly mean "everything drawn".
+    expect(catchIds.has('tangled_weed')).toBe(false);
+    expect(catchIds.has('soggy_boot')).toBe(false);
+    expect(catchIds.has(FISHING_RARE_ID)).toBe(true);
+    let zonesChecked = 0;
+    for (const [zoneId, rows] of Object.entries(ZONE_FISH)) {
+      const drawn = new Set<string>();
+      for (const band of FISHING_TABLES_BY_BAND) {
+        for (const entry of band[zoneId] ?? band.eastbrook_vale) {
+          if (entry.itemId && catchIds.has(entry.itemId)) drawn.add(entry.itemId);
+        }
+      }
+      expect([...rows].sort(), `ZONE_FISH.${zoneId} vs the cells that zone draws`).toEqual(
+        [...drawn].sort(),
+      );
+      zonesChecked++;
+    }
+    // The loop ran over a real table, not an empty one.
+    expect(zonesChecked).toBe(Object.keys(ZONE_FISH).length);
+    expect(zonesChecked).toBeGreaterThanOrEqual(12);
   });
 
   it('FARM_CHRONICLE_ZONES is real zones and exactly the authored farm-patch zone set', () => {

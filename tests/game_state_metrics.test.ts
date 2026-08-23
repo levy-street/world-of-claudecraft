@@ -1111,7 +1111,7 @@ describe('fishing telemetry counters at their emission sites', () => {
     if (!entity) throw new Error('no entity for the joined session');
     const meta = server.sim.meta(session.pid) as unknown as Record<string, any>;
     entity.fishCastZoneId = 'mirefen_marsh';
-    // Band 2 needs BOTH halves of effectiveFishingBand: the proficiency rung
+    // Band 4 needs BOTH halves of effectiveFishingBand: the proficiency rung
     // and a rod whose tier covers it. Raise one at a time so a counter that
     // read only one of them still fails here.
     meta.gatheringProficiency.fishing = 200;
@@ -1307,9 +1307,18 @@ describe('fishing telemetry counters at their emission sites', () => {
     // would overstate the copper the fees took. A non-rod recipe trains
     // successfully and charges a fee, but it is not a ROD fee, and letting it
     // through would put an unbounded recipe vocabulary on the label.
+    //
+    // The apex rod is the THIRD control and the one the filter was actually
+    // introduced for (masterwrought Phase 11i). It IS a rod recipe and it does
+    // train successfully, so neither reason above reaches it: it is excluded
+    // because it is DROP-taught, learned from a schematic, and a trainer never
+    // quotes a fee for it. Booking one here would invent copper nobody paid.
+    // Without this line the whole ROD_FEE_RECIPE_IDS filter can be deleted and
+    // this suite stays green (rv-tests proved it by mutation).
     observe(server, [
       trainResultEvent('recipe_stormreel_fishing_rod', false),
       trainResultEvent('recipe_tidewrought_fishing_rod', false),
+      trainResultEvent('recipe_clockreel_fishing_rod', true),
       trainResultEvent('recipe_bronze_sickle', true),
       trainResultEvent('', true),
       trainResultEvent('toString', true),
