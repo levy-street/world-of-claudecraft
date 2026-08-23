@@ -132,13 +132,20 @@ export const SPEC_BASELINES: SpecBaselineTable = {
     enhancement: {
       // v0.28.x stat-identity pass: Enhancement primary is Strength, so its Int
       // stays below Elemental's; melee AP is retained.
-      stats: { int: 2, ap: 24, apPct: 0.05 },
+      // v0.40 210 softening round: the 200 convergence landed Warspirit below
+      // combat rogue and fire mage on live heroic parses, so part of the
+      // baseline revert is given back on the damage-only axes (apPct feeds
+      // only the two Attack Power lines; agiPct would also buy avoidance).
+      // Measured at 24 seeds on the 120 s Nythraxis-armor boss: epic-only
+      // best kit 209.8 to 221.1 at level 20, contract fixture 188.5 to 199.2.
+      // Echo (0.25) and the tooltip-literal knobs stay put on purpose.
+      stats: { int: 2, ap: 24, apPct: 0.15 },
       ability: [
         { ability: 'lightning_bolt', costPct: -0.2 },
         { ability: 'earth_shock', costPct: -0.2 },
         { ability: 'flame_shock', costPct: -0.2 },
         { ability: 'rockbiter_weapon', dmgPct: 0.4 },
-        { ability: 'stormstrike', dmgPct: 0.5 },
+        { ability: 'stormstrike', dmgPct: 0.6 },
       ],
     },
     restoration: {

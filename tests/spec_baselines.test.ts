@@ -109,13 +109,13 @@ const EXPECTED_BASELINES: Record<string, BaselineSnapshot> = {
     },
   },
   'shaman/enhancement': {
-    stats: { int: 2, ap: 24, apPct: 0.05 },
+    stats: { int: 2, ap: 24, apPct: 0.15 },
     abilities: {
       lightning_bolt: { costPct: -0.2 },
       earth_shock: { costPct: -0.2 },
       flame_shock: { costPct: -0.2 },
       rockbiter_weapon: { dmgPct: 0.4 },
-      stormstrike: { dmgPct: 0.5 },
+      stormstrike: { dmgPct: 0.6 },
     },
   },
   'shaman/restoration': {

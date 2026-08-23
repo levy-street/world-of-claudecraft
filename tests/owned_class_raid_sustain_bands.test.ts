@@ -42,8 +42,10 @@ describe('owned-class raid-level balance harness (sustain bands)', () => {
         // (seeds 29_930/29_931 roll Warspirit low), so the diet floor is 0.76
         // and ceiling 1.05, the same relative margins at the diet actual.
         expect(warspirit.dps).toBeGreaterThanOrEqual(vespers.dps * band(0.81, 0.76));
-        // Full-sweep ceiling kept at 1.12 (level-22 measured 1.0568 that
-        // round). Re-author the pair when the owned-class stack integrates.
+        // Full-sweep ceiling kept at 1.12 (210 softening round full-sweep
+        // actuals: level-22 1.0851, level-23 1.0860, level-24 1.0216; was
+        // 1.0568 at level 22 the round before). Re-author the pair when the
+        // owned-class stack integrates.
         expect(warspirit.dps).toBeLessThanOrEqual(vespers.dps * band(1.12, 1.05));
         // 200 DPS convergence package re-measure (echo 0.25, baseline apPct
         // 0.05, Ancestral Strike 0.5, BiS-anchored fixture with the Unleash
