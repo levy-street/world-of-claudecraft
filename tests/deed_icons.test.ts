@@ -374,8 +374,14 @@ describe('Book of Deeds webp icons', () => {
     // 279 + farming's SEVEN deeds = 286, + Phase 11e's roster deed = 287.
     // PAINTED: 277 + farming's one painted crest = 278, UNMOVED by 11e, which
     // ships no crest (the packet's art park runs 11e to 11k).
+    // Then masterwrought Phase 11i's col_deepest_cast = 288, which is the
+    // number the first assertion below actually pins.
     // PENDING: 2 (the castle pair) + farming's remaining 6 + the roster deed
-    // = 9, which is also the 287 - 278 cross-check.
+    // + col_deepest_cast = 10, which is also the 288 - 278 cross-check. The
+    // arithmetic said 9 and 287 - 278 until the Phase 11i QA re-derived it:
+    // the phase moved both assertions and left the derivation that explains
+    // them a deed behind, which is the whole hazard of writing the working
+    // out in prose beside the numbers.
     expect(DEED_ORDER, 'the merged live deed catalog').toHaveLength(288);
     expect(DEED_IMAGE_IDS.size, 'every live deed but the pending set is painted').toBe(278);
     expect(DEED_ORDER.length - DEED_IMAGE_IDS.size).toBe(DEED_ART_PENDING_IDS.length);

@@ -1245,7 +1245,14 @@ describe('the DECISION B regression walk: nobody loses access (Phase 11i)', () =
 
   it('every (proficiency, rod tier) pair resolves AT OR ABOVE its pre-phase band', () => {
     const { pairs, lower } = walk();
-    expect(pairs).toBe(201 * MAX_ROD_TIER);
+    // THE DOMAIN, AS A LITERAL. `201 * MAX_ROD_TIER` re-derives the count from
+    // the same two bounds the walk loops over, so it held whatever the walk
+    // did: shrink the walk to one rod tier and both sides fell together. The
+    // ledger's claim is that the acceptance domain is 1206 pairs, so that is
+    // the number pinned, with the composition kept beside it as the reason
+    // rather than as the assertion.
+    expect(pairs, 'proficiency 0..200 crossed with rod tier 1..6').toBe(1206);
+    expect(201 * MAX_ROD_TIER, 'and the bounds still compose to it').toBe(1206);
     expect(lower).toEqual([]);
   });
 
