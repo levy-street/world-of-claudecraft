@@ -11760,6 +11760,37 @@ audit re-derived and confirms: 160 + 140 + 1 = 301 against 300), and
 (8) **THE CAPSTONE FEAST IS UNREACHABLE.** FIX or CUT, both costed above. This
     is the one that makes the verdict FAIL rather than PASS-WITH-FOLLOWUPS.
 
+### THE SUITE, ON A FROZEN TREE, BOTH ENDS STAMPED
+
+Committed clean tree at **a64126238b**, `git status` empty before and after, and
+NOTHING else running: the audit's twelve lanes, its five reviewers and its three
+translation workflows were all finished and idle first, because a suite number
+is only evidence about the tree AND THE LOAD it ran under.
+
+| measure | pre-merge baseline (3aba114abd) | after (a64126238b) |
+|---|---|---|
+| vitest | EXIT=0, 3049 files / 12 skipped (3061); 43436 passed / 2 expected fail / 115 skipped (43553) | **EXIT=0**, 3068 files / 12 skipped (3080); 43940 passed / 2 expected fail / 115 skipped (44057) |
+| `npm run ci:changed` | EXIT=0, 793 files, 3094 warnings, 0 errors | **EXIT=0**, 796 files, 3094 warnings, 0 errors |
+| `npx tsc --noEmit` | clean | **clean** |
+
+The drift is the merge's and the audit's, in that order: +19 files and +504
+tests, of which the release brought the touch-rework suites and this audit added
+the farming reachability branch, the six-band emission walk, the
+unlearnable-above-cap arm, the whole-cell order arm and the prose accuracy arm.
+
+THE ONE RED THE TARGETED BATTERIES COULD NOT HAVE FOUND, and it is the reason
+this table exists rather than a list of green targeted runs.
+`tests/ci_workflow.test.ts` failed on the merged tree: the release added
+`docs/screenshots/touch-ui-rework/` with 19 PNGs and never touched
+`.github/workflows/ci.yml`, so the subtree was missing from all five per-job
+sparse-checkout cones and every test job would have checked out a tree without
+the screenshots it is asserted to carry. NO CONFLICT COULD HAVE SHOWN IT: the
+workflow was not a both-parent file, so the merge audit's numstat identity check
+had nothing to compare, and no targeted selection points at a workflow pin when
+the change is nineteen PNGs. A conflict marks disagreement about TEXT, a numstat
+check marks disagreement about SIZE, and neither sees a file one parent ADDED
+while the other parent held the index that had to list it.
+
 ### THE HANDOFF TO PHASE 11j
 
 - **THE APEX TOOL FAMILY SHAPE STANDS**, and 11j inherits the unlearnable-at-150
