@@ -11450,6 +11450,243 @@ worth recording because the two checks are not redundant: an ItemDef union read
 (`ITEMS[id].wellFed`) type-errors while passing at runtime, so the arm was green
 and the build was red.
 
+## Phase 11i QA ledger (2026-08-23, verify the angler's endgame)
+
+VERDICT: **FAIL**, on one deliverable, with everything else PASS. Base tip
+3aba114abd. LOCAL, no push, no PR. Fix commits, in order: 04db9d44d6 (the tenth
+release sync), ceb19f9195 (the claims the phase falsified), 5e829aa127 (the
+coverage the widened ladder left open), 117a4e90f2 (the import sort that gate
+demanded), a60aa9a4d7 (the guide prose repair, the re-key and the fills), then
+this ledger.
+
+THE PHASE IN ONE LINE, AS AUDITED: the numbers are right and reproduce
+independently, the nine shipped cells really are byte identical, the 203 moved
+pairs re-derive exactly, and both defects the audit found are the SAME SHAPE as
+the bootstrap deadlock the phase already caught: content whose consumption path
+does not exist, and a claim corrected in one copy and left standing in others.
+
+### THE BLOCKING FINDING: THE CAPSTONE FEAST IS DEAD CONTENT
+
+`deepwater_feast` cannot be placed by any player, and the phase's deliverable 5
+therefore does not ship. `src/sim/professions/feast.ts` binds the whole lifecycle
+to the module constant `FARM_FEAST_ITEM_ID = 'harvest_feast'`: the hold check,
+the two spend arms and the dish lookup at consume all read it, never the item the
+player used. `src/sim/items.ts` DOES route the use (`'feast' in def && def.feast`
+dispatches to `placeFeastAction`), so the two live outcomes are:
+
+- holding no Harvest Feast: `farmDenied` reason `no_feast`, and the Deepwater
+  Feast does nothing, forever.
+- holding one: the HARVEST FEAST is consumed and a harvest_feast is spawned. The
+  Deepwater Feast is untouched and the wrong item is destroyed.
+
+R14's claim that "eating from this feast is eating a Stonepot Stew, byte for
+byte" is false as a consequence: `dishItemId: 'stonepot_stew'` is never read.
+There is no wire or client support either. The placed entity carries one
+`templateId` and `src/ui/entity_display_name.ts` titles it off that alone, so
+even a working placement would render as a Harvest Feast.
+
+THE MODULE'S OWN HEADER RESERVED THIS DECISION: "A second placeable is
+explicitly out of scope (no general placeable-object framework)." The phase
+minted a second placeable against that line and wired nothing.
+
+WHY NOTHING CAUGHT IT is the part worth keeping, and it is the deadlock's lesson
+one layer over. `tests/recipe_reachability.test.ts`, which the phase wrote to
+make exactly this class checkable, models CRAFTING reachability: can a player
+assemble the reagents. It has no USE dimension at all, so an item that can be
+crafted and never used is invisible to it. Every other guard is local and all of
+them are true here: the item def is valid, the recipe is reachable and
+gold-negative, the pattern is stocked, the taxonomy row is classified.
+
+HANDED BACK RATHER THAN FIXED, on the maintainer's instruction, and both
+remedies are costed because neither is a QA repair:
+
+- FIX means threading the source item id through `FeastState`, spending and
+  consuming against it, minting a second `templateId` with its own title key and
+  its five non-Latin fills, and pinning both feasts. That crosses sim, wire, UI
+  and i18n, and it builds the framework the module header reserves.
+- CUT means removing the item, its recipe, its pattern and its vendor row, and
+  re-deriving five hand-carried counts (ALL_RECIPES 153 to 152,
+  APEX_CONSUMABLE_RECIPES 11 to 10, the pattern universe 38 to 37,
+  HEROIC_VENDOR_STOCK 37 to 36, ITEM_ART_PENDING 73 to 71). It is not clean
+  either: `raw_stillmere_salmon`'s ONLY consumer is that feast, at count 2, so a
+  cut strands the band-5 catch at zero consumers and needs a replacement bill
+  that no ruling covers.
+
+One consequence is already applied: `tests/material_taxonomy.test.ts` justified
+the item's allowlist row by saying "its one consumer is the place_feast
+command", which is false. The row's membership is unaffected and stays; the
+false justification is replaced with what is actually true.
+
+### THE SECOND FINDING, AND IT REACHED PLAYERS
+
+THE FISHING WIKI PAGE CONTRADICTED ITSELF IN ENGLISH, and the record had the
+translation exposure exactly inverted. Detail is in the phase ledger's
+release-fill section, corrected in place. In summary: three English keys the
+phase never touched still carried the pre-phase claims
+(`guide.professions.curveBody` the retired gain schedule,
+`guide.profPages.toolsNote` and `guide.profPages.fish.startBody` the "two rods
+that buy no access" line this phase exists to falsify), three more were wrong by
+count, and FIFTEEN shipped locale bundles still quoted the retired 0.02 gain
+while TWENTY of twenty-one lacked the corrected six-band text. The ledger had
+recorded the opposite, that the fifteen Latin slices re-filled automatically and
+only five non-Latin locales were exposed.
+
+Closed by RETIRING AND RE-KEYING the seven statically consumed keys, which is
+the one mechanism that cannot be parked (deleting a catalog key makes every
+resolved slice tsc-red). Measured after: zero bundles quote the retired gain,
+zero carry the three-band claim. M16 then made the five non-Latin fills due in
+the same change and they are applied, each corrected FROM the previous
+translation so the translator's voice survives. Five keys on dynamic key paths
+(`faq.a6`, `faq.a7`, two `craftProse.engineering.*` and
+`craftIntro.engineering`) could not be re-keyed and take an English correction
+plus an explicit worklist row: that is the real boundary of the remedy.
+
+### STEP 0: THE TENTH RELEASE SYNC, AND IT WAS OWED
+
+`origin/release/v0.40.0` moved 50462dda83 to 14ab2e8630, 33 commits across 180
+files: the touch UI rework, one shaman balance pass, and a CI shard-weight
+refresh. Merged at 04db9d44d6.
+
+TWELVE CONFLICTS. The load-bearing one is not in this packet's files: the
+release EXTRACTED hud.ts's inline mobile consumables bar while this branch had
+corrected that block's comment, and the release EXPORTED action_bar_view's
+private `inventoryCount` at the same time this branch DELETED it for the shared
+`countRawInSlots` walk. The extraction is taken, the comment correction carried
+onto it, the deletion kept and the release's new consumer repointed.
+
+BOTH RATCHET ROWS THAT BROKE ARE RE-PINNED AT THE EXACT MERGED COUNT, and both
+sets of extractions stack rather than cancel: `src/ui/hud.ts` 19476 - 241 - 445
+= 18790 plus the two lines the hand resolution costs, measured 18792, under both
+parent pins; `src/main.ts` 11536 - 36 - 17 = 11483, predicted from the deltas
+before the file was measured and observed at 11483. Neither release pin is
+taken. ALL TWELVE ROWS were measured with `wc -l` rather than trusted, which is
+the standing note's whole point.
+
+THE GOLDENS WERE RE-MINTED FROM THE MERGED TREE AND EXACTLY ONE MOVED:
+`shaman_engines.json`, by exactly the 46 value lines the release's own balance
+commit moved it by, with zero rng draw or digest drift. The other 68 are byte
+identical, which is the evidence that 33 commits of upstream work changed no sim
+behaviour this packet can see. `professions_fishing_session.json` is untouched
+across the merge.
+
+THE SHARD WEIGHT TABLE IS A KEY UNION, not a take: the release's newer harvest
+(run 32621561241, 2960 rows) wins on all 2863 shared keys, 31 branch-only rows
+keep their measured weight, and 4 more are dropped because their test file no
+longer exists in the merged tree. The release's table alone was measured first
+and left the completeness guard at 0.9524 against its 0.95 floor; the union
+restores it to 0.9624.
+
+THE RELEASE-MERGE AUDIT came back otherwise clean, and the reason is worth one
+line: the release touched NO server code at all, so the legacy-arm, new-endpoint
+and injected-helper classes are all vacuous here, and the incoming delta added no
+`vi.mock('../server/db')` site. Every one of the 57 both-parent files passes
+numstat identity in BOTH directions (merged-vs-branch equals the release delta,
+merged-vs-release equals the branch delta), with the four hand-resolved files
+differing by exactly the resolution.
+
+### WHAT REPRODUCED EXACTLY, derived independently rather than read
+
+Re-derived by a throwaway probe importing the merged catalog and none of the
+repo's cost helpers:
+
+- The nine shipped cells are BYTE IDENTICAL to the real pre-phase git bytes,
+  row ORDER and the null row's position included, parsed out of
+  `git show ed73c8d572:src/sim/content/items.ts` rather than compared to a
+  restatement.
+- All EIGHTEEN cells sum to exactly 100 by real row addition; every null row is
+  at least 1; empty hook and grey junk are non-increasing and the koi and the
+  aggregate cooking catch non-decreasing in every zone; NO shipped fish row
+  falls at any band. The new catch weights are a uniform 5 / 2 / 1 across all
+  three zones.
+- The ledger's cooking-share table reproduces to the digit once the koi is
+  counted (it is in RAW_COOKING_CATCH_IDS), which is what it meant.
+- The 203 moved (proficiency, rod tier) pairs re-derive exactly from the two
+  ladders, with the four-row table's shape confirmed and none resolving lower.
+- All six `cycle(t)` values and all four segment coefficients reproduce from the
+  shipped constants, and the per-band hours land on 1.55 / 2.48 / 3.29 / 3.61
+  for 10.94 total.
+- Seven of the eight bill rows reproduce exactly. The eighth is the correction
+  above.
+- The fishing line totals 77 with sturgeon at 17 and salmon at 2, matching the
+  POST-fix numbers.
+- Deeds 288, Renown 3285, HEROIC_VENDOR_STOCK 37, APEX_CONSUMABLE_RECIPES 11,
+  ALL_RECIPES 153, ITEM_ART_PENDING 73, all re-counted from the merged tables.
+- `recipes.ts` has ZERO non-comment deletions across the phase diff, so R18's
+  additive-only claim holds mechanically.
+- Only three recipes carry skillReq 150 and all three are the grandfathered land
+  tools.
+
+### THE FINDINGS: 88 raised across 12 lanes plus 5 domain reviewers
+
+Seven were filed blocking and adversarially verified with the file open; five
+confirmed, one downgraded, one partial. Applied in the four commits above. The
+ones worth naming beyond the two headline findings:
+
+- The ledger's TELEMETRY CARDINALITY paragraph described the design the review
+  round REJECTED: it said the rod-fee family goes from two to three with a
+  permanently-zero apex series, where `ROD_FEE_RECIPE_IDS` filters drop-taught
+  rows out so the family stays at TWO. The filter is load-bearing, because a
+  pattern learn emits `trainResult ok` having charged nothing. Same paragraph
+  put the cardinality at 3 x 6 where the shipped comment says 14 zones x 6.
+- The golden record understated the movement twice: TWO events digests moved,
+  and the second is the SESSION CAP's wake (a wire field, 15 to 16), not the
+  gain schedule's; and only the init frame is unchanged, not three frames.
+- The six-band vocabulary had NO emission-site coverage: the four fishing event
+  factories still wrote the literal union `0 | 1 | 2`, so no arm could construct
+  a band 3, 4 or 5 outcome. Closed with a walk driven off FISHING_BANDS.
+- The unlearnable-at-150 finding was SETTLED but unenforced. The existing arm
+  proved the trap exists and never that nothing had fallen into it. A new arm
+  walks every recipe with an acquisition list against its own craft cap's tier.
+  DRIVEN: putting the apex rod at 150 reds naming the row; restored by file
+  copy, `diff -q` clean, the three surviving 150 rows re-counted.
+- Two design docs were publishing retired numbers a later phase would have read
+  as current (the gain schedule, the 15 s cap, the rod-rarity collinearity the
+  tier-6 epic rod broke, the 300-tick reel budget).
+- The branch's tray screenshot variant drove `#mobile-consumables-toggle`, which
+  the release retired. It did not degrade at the sync, it THREW on every
+  capture; retired, since the release committed its own captures of the control
+  that replaced it.
+- Two measured comment corrections: fishing.ts's non-comment line count went UP
+  by one (287 to 288) where the module claimed the logic left it, and
+  fishing_bands.ts cited tools.ts as keeping a no-content-table contract that
+  tools.ts does not keep.
+
+REFUTED ON RE-CHECK, recorded so it is not re-raised: the reachability
+partition assertion (`seedSize + gatedSize === nonCrafted`) was filed as a
+tautology of the test's own seed loop. It IS inert against production changes,
+and that is exactly what its own comment already says: it names the seed-loop
+mutation it exists to catch and the numbers it caught it with. No change owed.
+
+### THE SEVEN OPEN ITEMS ARE THE MAINTAINER'S, AND THERE ARE EIGHT NOW
+
+Unchanged and NOT re-decided here: the three inherited (scroll/elixir 15c
+parity, RULE 2's value-half reading, the inherited stale-client window), 11h's
+two deviations, 11i's session cap 15 s to 16 s (whose forcing arithmetic this
+audit re-derived and confirms: 160 + 140 + 1 = 301 against 300), and
+`prog_first_harvest` taking 13 catches for a fishing-only character.
+
+(8) **THE CAPSTONE FEAST IS UNREACHABLE.** FIX or CUT, both costed above. This
+    is the one that makes the verdict FAIL rather than PASS-WITH-FOLLOWUPS.
+
+### THE HANDOFF TO PHASE 11j
+
+- **THE APEX TOOL FAMILY SHAPE STANDS**, and 11j inherits the unlearnable-at-150
+  finding ENFORCED rather than remembered: the new arm in
+  `tests/professions_rod_recipes.test.ts` will red on an apex hoe authored above
+  engineering's cap with an acquisition list, so 11j gets a gate instead of a
+  note.
+- **A REACHABILITY GUARD THAT MODELS CRAFTING DOES NOT MODEL USE.** The feast
+  finding is the deadlock class one layer over, and it is the sharpest thing
+  this QA has to hand forward: a new placeable, a new consumable kind, or any
+  item whose value is realised through a COMMAND rather than through a bill,
+  needs its command path walked by hand or pinned, because every local guard and
+  the reachability fixpoint are all true of an item nothing can use.
+- **A KEY IS RE-KEYABLE ONLY WHILE ITS CONSUMER NAMES IT STATICALLY.** Five
+  guide keys could not take the remedy that fixed the other seven, purely
+  because their paths are built by template literal.
+- **THE DELVE MARKS PRICES FOR THE TWO SHIPPED RODS ARE STILL STALE**, unchanged
+  by this audit and correctly recorded by the phase.
+
 ## Phase 11i ledger (2026-08-23, the angler's endgame)
 
 Base tip ed73c8d572, clean. LOCAL, no push, no PR. Seven deliverables, all built.
@@ -11459,9 +11696,17 @@ the SHIPPED band-b-takes-tier-b-plus-1 gate, which retroactively gives the two
 crafted rods that already shipped a table each; an apex rung completes the tool
 family; the chowder has fish in it; and the 0.02-per-catch tail is gone.
 
-### STEP 0: NO RELEASE MERGE WAS OWED
+### STEP 0: NO RELEASE MERGE WAS OWED (TRUE AT THE PHASE, FALSIFIED SINCE)
 
-`git fetch origin --prune`, then every `origin/release/*` by version sort. The
+**READ THE PHASE 11i QA LEDGER FIRST: this section describes a tree that no
+longer exists.** It was accurate when written; `origin/release/v0.40.0` has
+since moved 50462dda83 to 14ab2e8630, 33 commits, and the Phase 11i QA merged
+them (the TENTH sync). Every parent-pin figure below, and the "no ratchet
+re-measure owed" conclusion, describe the pre-merge tree only. The re-measured
+ratchet, the re-minted goldens and the shard-weight union are in the QA ledger.
+
+As it stood at the phase: `git fetch origin --prune`, then every
+`origin/release/*` by version sort. The
 newest is still `release/v0.40.0` at 50462dda83, the same tip the ninth sync
 merged, and `git merge-base --is-ancestor 50462dda83 HEAD` exits 0. So no merge
 was manufactured, no seal re-mint, no ratchet re-measure owed by a merge, and no
@@ -11697,12 +11942,27 @@ been forcing a DISH up a rarity rung to satisfy a test literal.
 | recipe_peppered_deepbarb_catfish | 75 | 192 | 150 | 42 |
 | recipe_roast_hollowgill_sturgeon | 100 | 436 | 300 | 136 |
 | recipe_deepwater_feast | 125 | 390 | 250 | 140 |
-| recipe_clockreel_fishing_rod | 125 | 496 | 375 | 121 |
+| recipe_clockreel_fishing_rod | 125 | **480** | 375 | **105** |
 
 Every row gold-negative. The three plates all move by an identical 56 (the same
 id at the same count), so GATE A's cost spread across the food family is STILL
 ZERO; it is the spread the gate rules on, not the level. recipe_laden_hearth is
 still the longest bill in the game, now at EIGHT reagents.
+
+THE APEX ROD ROW WAS CORRECTED BY THE QA, and the correction is evidence rather
+than a typo fix. It read 496 against a margin of 121, which is the DRAFT bill
+the bootstrap-deadlock fix removed: koi x2 (150) plus sturgeon x6 (108) plus
+salmon x4 (88) plus the tidewrought (150). The shipped bill is koi x2 plus
+sturgeon x10 plus the tidewrought, which is 150 + 180 + 150 = **480** against
+375, a margin of **105**. Seven of the eight rows re-derived exactly on the
+shipped recipe_economy basis (buyValue where finite and above zero, else
+sellValue) on the first run; only this one did not, and it is the one row the
+late correctness fix rewrote. The source comment beside the recipe had it right
+all along ("Input 480 vs output 375"), so the table was the only copy left
+stale. THE LESSON IS THE PACKET'S OWN: a correctness repair applied late is a
+content change, and the RECORD owes the same same-change sweep the code does.
+The driven arm in tests/recipe_reachability.test.ts independently corroborates
+the draft composition, since it feeds exactly that bill back in.
 
 R17 holds: fish feed CONSUMABLES. Fishing's own tool ladder is the recorded
 exception and already consumed fish before this phase
@@ -11761,6 +12021,26 @@ already found and handled that consequence in the fishing suite and failed to
 carry it into the golden prediction. THE LESSON: a gain-rate change is a
 DEED-TRIGGER change wherever a deed counts the quantity that rate feeds; predict
 the trigger set, not just the number.
+
+THE PHASE 11i QA RE-READ THE ARTIFACT AGAINST THIS PARAGRAPH, which is the rule
+the audit was given (check the observed change against the prediction as
+WRITTEN, never against a post-hoc re-derivation of it), and the record
+understates the movement twice.
+
+TWO events digests moved, not one. The final frame's is the one this paragraph
+already owns. The FIRST frame's moved too (09a8b9ab to c1384738), and its cause
+is not the gain schedule at all: it is the SESSION CAP, which put `castTotal`
+and `castRemaining` at 16 where they were 15. That is a WIRE FIELD change riding
+a constant this record hands back as an open ratify-or-revert, so it is the half
+a reader most needs to see: reverting the cap moves this golden again, and this
+paragraph would not have told them so.
+
+"The three early frames unchanged" is also false. Three of the five frames moved
+their `state` digest (2f35b798, 0290e391 and 54cd3dc3 all moved); only the init
+frame is untouched. What IS exactly as predicted, and what the rng claim rests
+on, is the draw side: draws 3 and drawDigest 1e79975d are identical at every
+frame, so the phase added no draw and forked no stream. That is the claim worth
+keeping, and it survives both corrections intact.
 
 ### THE ONE DEED
 
@@ -11839,10 +12119,29 @@ FISHING_BANDS widens to six labels; fishingBandLabel takes the exported
 FishingCatchBand. BOTH stale comments corrected: the "a fourth band is a design
 change that should redden this pin" paragraph (it did exactly that, and the pin
 stays hand-written so the NEXT widening is not silent) and the "zones x bands is
-3 x 3" cardinality paragraph, now 3 x 6. The rod-fee family goes from two to
-three by construction, and the apex rung's fee series is pre-seeded and stays at
-zero forever because nobody trains a drop-taught recipe: a permanently-zero
-series is the honest reading of "what a rod rung costs at a trainer". The
+3 x 3" cardinality paragraph.
+
+BOTH NUMBERS IN THIS PARAGRAPH WERE WRONG AND THE QA CORRECTED THEM against the
+shipped code, which is the class this packet keeps meeting: a paragraph
+characterising a guard that running the guard disproves.
+
+THE CARDINALITY IS NOT 3 x 6. The exporter's zone label is bounded to the
+HARVEST zone vocabulary, not to the three zones that carry catch tables, so the
+shipped comment in server/fishing_telemetry.ts states the real figure: 14 zones
+x 6 bands = 84 pre-seeded series per counter. Writing 3 x 6 here understates the
+pre-seed cost by more than four times.
+
+THE ROD-FEE FAMILY DOES NOT GO FROM TWO TO THREE, and the design described here
+is the one the review round REJECTED. `ROD_FEE_RECIPE_IDS` filters ROD_RECIPES
+to the rows a TRAINER teaches (`!acquisition.includes('drop')`), so the family
+stays at TWO after 11i added a third rung and the drop-taught apex rung mints no
+series at all. The filter is the point rather than an omission: the emission site
+counts a `trainResult ok` for any id in the list, and a PATTERN learn also emits
+`trainResult ok` having charged nothing, so an unfiltered vocabulary would have
+turned a payment count into a learn count and booked copper nobody paid. Pinned
+in three places (tests/fishing_telemetry.test.ts, tests/game_state_metrics.test.ts
+and tests/server/http/game_metrics.test.ts, the last asserting the registered
+vocabulary is exactly the two trainer-taught rod recipes). The
 membership guard that drops an off-list value is unchanged.
 
 ### WHAT THE COMPILER FOUND, WHICH IS THE POINT OF THE ONE EXPORTED TYPE
@@ -11916,7 +12215,8 @@ at 200". After this phase both clauses are wrong (six bands; band 2 gates at
 which `content.generated.ts` now carries with six entries. The page contradicted
 itself. `tests/guide.test.ts` checks generated FRESHNESS and never prose
 accuracy, which is exactly why nothing caught it, and it is the same shape as
-the 11h QA's headline defect one phase earlier. Five keys were corrected in all:
+the 11h QA's headline defect one phase earlier. SIX keys were corrected in all
+(the count read "five" until the QA re-derived it from the diff):
 `tablesNote`, `scheduleNote` and `a7` (every number in the gain schedule),
 `bandsBody` (fishing no longer rides the shared ladder), `koiBody` (incomplete
 rather than false), and `a6` (literally true but misleading now that a third rod
@@ -12168,7 +12468,15 @@ because its stale rows are FALSE rather than merely incomplete.
 | guide.profPages.craftProse.cooking.materialsBody | 18 | 20 rendered locales |
 | guide.profPages.craftProse.alchemy.materialsBody | 18 | 20 rendered locales |
 | guide.profPages.farm.bedsBody | 5 | added by the 11h QA |
-| guide.profPages.fish.tablesNote | 18 | added here; see below |
+| guide.profPages.craftProse.engineering.identityBody | 18 | 11i QA; dynamic key path, cannot be re-keyed |
+| guide.profPages.craftProse.engineering.ladderBody | 18 | 11i QA; dynamic key path, cannot be re-keyed |
+| guide.profPages.craftIntro.engineering | 18 | 11i QA; dynamic key path, cannot be re-keyed |
+| guide.profPages.faq.a6 | 5 | 11i QA; dynamic key path (faq.a${n}), cannot be re-keyed |
+| guide.profPages.faq.a7 | 18 | 11i QA; dynamic key path (faq.a${n}), cannot be re-keyed |
+
+The seven fish and ladder keys that WERE on this list are gone from it: the QA
+retired and re-keyed them, so the release-tier gate blocks on their `pending`
+rows instead of a worklist remembering them. See below.
 
 THE FISH ONE IS DIFFERENT IN KIND. The other three are stale because English
 gained material they lack. This one is stale because the SHIPPED TRANSLATION
@@ -12190,6 +12498,60 @@ and the gate is silent on all five. The same reasoning applies to `scheduleNote`
 `a7`, `bandsBody`, `koiBody` and `a6`, which is why the reword worklist is FIVE
 keys in substance even though only `tablesNote` was FALSE at the level the 11h
 QA's table was tracking.
+
+**THE PARAGRAPH ABOVE IS EXACTLY INVERTED, AND THE PHASE 11i QA MEASURED IT.
+This is the single most consequential correction of the audit.** The FIFTEEN
+Latin slices are the ones that did NOT re-fill, and the five non-Latin ones are
+the least exposed. Thirteen Latin overlays (`cs_CZ da_DK de_DE es fr_FR id_ID
+it_IT nl_NL pl_PL pt_BR sv_SE tr_TR vi_VN`) carry REAL translated prose for
+these keys rather than an English fill, so the overlay WON and the regen could
+not touch them; `es_ES` and `fr_CA` inherit from `es` and `fr_FR`. Measured on
+the merged tree before the repair: FIFTEEN shipped resolved bundles still quoted
+the retired `0.02` gain, and TWENTY of the twenty-one non-English bundles did
+not carry the corrected six-band text. A German reader was being told, live on
+the fishing page, "ein voller Punkt pro Fang unter Fertigkeit 50 ... ein
+langsames Rinnsal von 0,02 von 150 bis 200" and "eines von drei Fangbaendern ...
+Band 2 ab 200". The five non-Latin overlays carry short paraphrases that quote
+no numbers, so they read abridged rather than false.
+
+THE QA ALSO FOUND THREE MORE ENGLISH KEYS THE PHASE NEVER CORRECTED, all stating
+the claim the phase exists to falsify: `guide.professions.curveBody` still
+published the pre-retune schedule, `guide.profPages.toolsNote` still said fishing
+has its own PAIR of crafted rods that buy "speed, grade and a kinder reel window
+rather than access", and `guide.profPages.fish.startBody` still said "Two rods
+sit above those" and "No water asks for them, so they buy ... instead of
+access". Those were wrong in ENGLISH, on the same page as the corrected
+`tablesNote`, so the page contradicted itself for every reader in every locale.
+Three more were wrong by count rather than by fact
+(`craftProse.engineering.identityBody` and `.ladderBody`, `craftIntro.engineering`).
+
+HOW IT WAS CLOSED, and it is a mechanism change rather than another worklist
+row. The seven STATICALLY consumed keys were RETIRED AND RE-KEYED
+(`curveBody` to `curveBodyRetunedFishing`, `toolsNote` to `toolsNoteThreeRods`,
+`bandsBody` to `bandsBodySplitLadder`, `fish.startBody` to `startBodyThreeRods`,
+`fish.scheduleNote` to `scheduleNoteRetuned`, `fish.tablesNote` to
+`tablesNoteSixBands`, `fish.koiBody` to `koiBodyBandFlat`), which is the ONE
+mechanism the repo has that forces a `pending` row in every locale: deleting a
+catalog key makes every committed resolved slice tsc-red, so the regen cannot be
+parked, and each key re-enters the release fill's own worklist instead of
+sitting `translated` and wrong. Measured after the re-key: `pending` rose 7677
+to 7817, exactly seven keys times twenty locales. STATED PRECISELY, because the
+gate was already red at release tier before this change and it would be an
+overclaim to say the re-key made it block: what the re-key BUYS is that every
+locale now renders the CORRECT ENGLISH in the meantime, which the measurement
+confirms directly (ZERO bundles still quote the retired gain, ZERO still carry
+the three-band claim, against fifteen and twenty before).
+The M16 guard then made the five non-Latin fills due in the SAME change, which
+is the right outcome: those five got corrected translations instead of stale
+ones.
+
+`faq.a6`, `faq.a7` and the three `craftProse` / `craftIntro` keys could NOT be
+re-keyed and got an English correction plus a worklist row instead. Their key
+paths are built by template literal (`faq.a${n}` in the FAQ renderer,
+`craftProse.${craftId}.${slot}Body` and `craftIntro.${detailId}` in the craft
+page), so renaming one member would break the dynamic lookup for every craft and
+every FAQ row. That is the real boundary of the re-key remedy and it is worth
+carrying: a key is re-keyable only while its consumer names it statically.
 
 ### ONE MORE FOR THE MAINTAINER, raised by the review rather than by the phase
 
