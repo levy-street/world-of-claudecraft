@@ -689,6 +689,7 @@ describe('masterwrought R17 RULE 2: the accent rule', () => {
     // would now refuse a settled capstone bill.
     // Swept, not listed, for the same reason as the COUNT arm above, and routed
     // through accentVerdict so the control above drives this exact expression.
+    const ties: string[] = [];
     for (const recipe of accentGovernedRows()) {
       const bill = nonProduceBill(recipe);
       for (const reagent of recipe.reagents) {
@@ -698,8 +699,20 @@ describe('masterwrought R17 RULE 2: the accent rule', () => {
           verdict.valueOk,
           `${recipe.id}: ${reagent.itemId} contributes ${verdict.value} and must not exceed the row's dominant non-produce reagent at ${verdict.dominant}`,
         ).toBe(true);
+        if (verdict.value === verdict.dominant) ties.push(`${recipe.id}/${reagent.itemId}`);
       }
     }
+    // THE TIE IS ASSERTED, not only described (added at the Phase 11h QA). The
+    // paragraph above says the at-or-below operator is load-bearing rather than
+    // hypothetical BECAUSE exactly one shipped row ties, and until now nothing
+    // checked that a tie still exists. A retune that removed it would leave the
+    // operator choice untested and this comment quietly false, which is the same
+    // rot the packet keeps finding in its own records. Listed by id, so the
+    // maintainer decision this feeds (masterwrought R17 RULE 2's value-half
+    // reading) is costed against a set rather than a count.
+    expect(ties, 'exactly one shipped row ties the dominant reagent').toEqual([
+      'recipe_laden_hearth/fine_evergarden_greens',
+    ]);
   });
 
   it('THE VALUE HALF IS A RECORDED READING, and this is what the other one refuses', () => {
