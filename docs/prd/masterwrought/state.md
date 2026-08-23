@@ -11415,8 +11415,13 @@ page and walked to a bed was denied with reason 'tool'. Filed BLOCKING by the
 finder, downgraded to SHOULD-FIX by the verifier because no mechanic or pin is
 broken and the wield ladder is stated correctly elsewhere in the same catalog.
 THAT DOWNGRADE IS ACCEPTED AND THE FIX IS THE SAME EITHER WAY: the clause now
-keeps the relative claim the ruling actually makes and names the hoe. The arm
-that would have caught it is added beside the obtainability sweep.
+keeps the relative claim the ruling actually makes and names the hoe. An arm
+measuring the tool gate is added beside the obtainability sweep, and the PAGE
+itself is pinned both ways in tests/guide.test.ts. (This sentence first read
+"the arm that would have caught it is added beside the obtainability sweep",
+which was an overclaim of exactly the kind this audit spent its budget finding:
+that arm pins 70 and 85 and never reads the page. The fix-round review below
+caught it and the page anchors are its doing.)
 
 FIVE SOURCE COMMENTS THE PHASE ITSELF FALSIFIED, none caught by its own "every
 source comment the phase falsified is corrected" pass:
@@ -11615,6 +11620,73 @@ FILL IS A FULL REPLACEMENT OF THE VALUE, not an append.
   for and the ledger left out.
 - The 11g and 11g-QA visual notes still stated the bag action-menu claim that 11h
   corrected in source and named as wrong in its own ledger. Corrected at both.
+
+### THE FIX ROUND WAS ITSELF REVIEWED, and it was not clean
+
+A FRESH reviewer read the fix diff as unreviewed code, which is the standing rule
+and which earned its keep here: it returned one BLOCKING, five should-fix and six
+nits, and every one was re-verified by hand before it was applied.
+
+THE BLOCKING ONE IS THE SAME DEFECT TWICE IN ONE ARM. The tool-gate arm this QA
+added to catch the wiki claim had already produced one constant self-comparison
+(Z3). The REPAIR produced a second: `expect(wield).toBeGreaterThan(threshold)`
+took both operands from the arm's own literal tuple, so it reduced to
+`expect(70).toBeGreaterThan(50)` and no edit to any file could reach it. That is
+why the Z battery had no entry for it and could not have had one: there is no
+mutation that reds an assertion over two literals. It reads the two resolvers
+now. The lesson is narrower than "mutate your pins" and worth stating exactly:
+pinning a constant to a literal makes the LITERAL pin decisive, and it silently
+makes every OTHER assertion in the same arm that reuses that literal vacuous.
+
+THE HEADLINE FIX SHIPPED WITH NO PIN, which is the finding that would have cost
+the most. The false "ask Farming 50 and nothing more" clause was corrected and
+nothing anchored the correction: the surviving anchors sit in other sentences of
+the same paragraph, so a revert of that one clause would have left every suite
+green. Worse, this ledger claimed "the arm that would have caught it is added
+beside the obtainability sweep", and that arm pins 70 and 85 and never reads the
+page at all. THAT CLAIM WAS AN OVERCLAIM OF EXACTLY THE KIND THIS AUDIT SPENT ITS
+BUDGET FINDING, and it is corrected here. Both halves are anchored now: a
+positive anchor unique to the correction, and the retired clause pinned ABSENT,
+which is the qr-11G-BEDS shape one arm below.
+
+THE LEFTOVER SWEEP ONLY HALF DID WHAT ITS RATIONALE CLAIMED. Over the counts
+these eight bills carry, leftover(n) = n - max(1, floor(n * m)) is IDENTICAL for
+every m from 0.75 to 0.9, so a discount retune from 0.2 to 0.1 or to 0.25 passed
+the entire sweep untouched; only removal or a retune past 25 percent reddened.
+Z1 read KILLED because the mutation happened to go downward. Both files now pin
+materialCostMultiplier itself, at each side of the specialization threshold. The
+sibling file's pin RED on its first run, because the leveling rungs sit below the
+threshold and take no discount at all: the arm reading production rather than
+restating it, caught in the act.
+
+TWO OF THE CORRECTED COMMENTS WERE STILL WRONG, both in the same way. The
+dish-twin correction read "THREE of the five dish twins stay single-owner": it
+subtracted two from an inherited stale "five" instead of counting the live table,
+which is the exact failure mode it was correcting. There are NINE twins above
+that line (Phase 11e added the pumpkin pair) and SEVEN stay single-owner. The
+frost_gourd note said "five of the six crops"; six of the SEVEN ids carried an
+11h note already. Both corrected against a count run over the tree.
+
+Also applied: the wall-clock ratio and set-size assertions are gone as implied by
+the three literals they sat under, with the figures moved into the sentence; the
+misattributed carp-at-2 assertion is deleted (it hardcoded 2 rather than reading
+FISH_ROW.count, so it never guarded the walk-back it named, and the loop above it
+is what Z7 actually reds); the comment claiming the fish count moves with a crop
+retune is corrected, since it is a literal; the tie array sorts before comparison;
+and the sibling leftover arm gets the same multiplier pin.
+
+### THE BATTERY, FINAL: 11 RUN, 11 DEAD, 3 REPAIRS FORCED
+
+| # | mutation | verdict |
+|---|---|---|
+| Z10 | materialDiscountPct 0.2 to 0.25, the SHALLOW retune the sweep could not see | KILLED, 17 arms across both files |
+| Z11 | re-add the false Farming-50 floor BESIDE the correction (regen-bearing) | KILLED, the new negative anchor |
+
+Z11 is the regen-bearing one and it ran on the regen-bearing harness the packet
+record demands: mutate, `npm run i18n:gen`, test, `git checkout`, then
+`npm run i18n:gen` AGAIN, because the tracked bundles revert with the checkout
+and `src/ui/i18n.status.json` is gitignored and would otherwise stay poisoned
+behind a clean `git status`. Stamps identical at both ends.
 
 ### THE HANDOFF TO PHASE 11i
 
