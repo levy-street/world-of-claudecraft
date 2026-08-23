@@ -332,6 +332,130 @@ misread), Warhewn Legguards (CLEAR alternate, lost to the zero-coin extension).
 Wardspeaker's considered adjacency: FFXIV's two-word possessive Ward Mage's /
 Ward Knight's Sabatons, ilvl-1 starter gear sharing only generic vocabulary.
 
+- MINTED AT PHASE 11i (the angler's endgame: three raw catches, the apex rod,
+  two fish dishes, the capstone feast and one untitled deed; web-verified
+  2026-08-22 by a proposing exact-phrase pass and an adversarial second pass
+  scoped to the major game wikis, plus the in-repo neighbour grep). New coins:
+  Deepbarb, Hollowgill, Stillmere, Clockreel. The two dishes and the three
+  patterns mint NOTHING: each dish is a real cookery word plus a catch coin
+  already verified in this same block, and each pattern is the registered
+  per-craft prefix ("Recipe:", "Schematic:") plus a name verified here, the
+  phase 11f construction. Fish, rod and dish names were treated as the
+  highest-collision class in the packet, so every survivor got the phase 08
+  adversarial pass (exact phrase, the distinctive half alone, the half plus
+  wow / wowhead / item / quest, and near-homophones).
+  - **Raw Deepbarb Catfish** (band-3 catch, the workhorse prize, reagent to
+    four apex bills at count 4) CLEAR: the coin Deepbarb is zero-hit
+    EVERYWHERE, not just on the seven wikis (searched bare, plus wow /
+    wowhead / item / quest / npc, plus a fandom sweep); the only near
+    neighbour is WoW's Shadowbarb Drone, a different compound on a mount.
+    Catfish itself is well used in the same ROLE and that is RECORDED rather
+    than ignored: RuneScape ships plain "Raw catfish" and "Catfish", FFXIV
+    ships "Steamed Catfish", WoW ships "Raw Bristle Whisker Catfish",
+    "Gigantic Catfish" and "Great Sea Catfish". None of them is this name,
+    which is what the bar asks, and the species word is shared vocabulary.
+    In-repo: no "catfish" anywhere prior, and no "barb" compound.
+  - **Raw Hollowgill Sturgeon** (band-4 catch, the deeper water) CLEAR: the
+    coin Hollowgill is zero-hit in every game index searched; its only web
+    presence is Hollowgill Barn, a holiday cottage in the Yorkshire Dales
+    ("gill" is the northern English word for a ravine), which is the real
+    names and places class the bar explicitly does not count. Nearest game
+    neighbour is RuneScape: Dragonwilds' "Hollow bark", two separate words
+    for a different material. The -gill suffix is this repo's own (Frostgill
+    Trout ships), so it extends house vocabulary rather than borrowing any.
+    Sturgeon RECORDED as shared: OSRS ships "Leaping sturgeon" and "Raw
+    sturgeon"; neither full name is this one. In-repo: no "sturgeon" prior.
+  - **Raw Stillmere Salmon** (band-5 catch, the rarest fish in the game,
+    reachable only at fishing 200 with the apex rod, and the capstone
+    feast's keystone reagent) CLEAR: the coin Stillmere is zero-hit as any
+    game location, item, NPC or ability (searched bare, plus the six wikis
+    by name, plus a fantasy location sweep); its whole web presence is
+    non-game (a UK drainage consultancy, a Companies House registration, a
+    Winston-Salem street, one worldbuilding site). Nearest neighbours
+    RECORDED: Skyrim's Shadowmere and FFXII's Stilshrine of Miriam, neither
+    the same token, and "-mere" is ordinary English for a lake (Windermere,
+    Buttermere). Salmon RECORDED as shared in the same ROLE: WoW ships Raw
+    Whitescale Salmon, Raw Sunscale Salmon and Midnight Salmon, RuneScape
+    ships Raw salmon; the species word is vocabulary, the full name is
+    unused. In-repo: no "salmon" prior.
+  - **Clockreel Fishing Rod** (the apex rod, tier 6, epic, engineering 125)
+    CLEAR: the coin Clockreel is zero-hit as any game item, and the ONLY
+    thing the web knows by that name is the historical clock reel, a
+    yarn-winding tool with a striking mechanism, which is real-world
+    vocabulary rather than anyone's coin. It reads as the rod family's top
+    rung (Ironreel, Silverstream, Stormreel, Tidewrought, Clockreel) while
+    naming the engineering craft that makes it, the register this repo
+    already ships in Cogs and Sprockets, Gyrelens Array and Precision
+    Chassis. Adjacency considered and passed: Crimson Desert ships a
+    legendary "Clockwork Fish", a different token in the caught-thing role,
+    and clockwork fishing toys are a real product. ADOPTED OVER Fathomreel,
+    whose adversarial verdict downgraded it: the coin is zero-hit on the
+    wikis, but PENN ships a live "Fathom" REEL product family, a real-world
+    product in the exact category this item is, the Scrivener's Vellum
+    rejection class. In-repo: no "clock" compound on any item.
+  - **Peppered Deepbarb Catfish** (cooking 75, rare, foodHp 552) CLEAR, and
+    it mints NO new coin: a real cookery word (peppered catfish is a real
+    dish, the Sichuan salt and pepper catfish among others) plus the band-3
+    catch verified above. Full pairing zero-hit; nearest same-role
+    neighbours are FFXIV's Steamed Catfish and Peppered Popotoes, both
+    different names. The form is the shipped fish-dish register (Pan-Seared
+    River Perch, Herbed Marsh Pike, Ashwood Smoked Eel). In-repo: no
+    "peppered" anywhere prior.
+  - **Roast Hollowgill Sturgeon** (cooking 100, rare, foodHp 980) CLEAR, and
+    it mints NO new coin: the plainest cookery verb plus the band-4 catch
+    verified above. Full pairing zero-hit; no game ships a "Roast Sturgeon".
+    The "Roast <X>" form is already in this game (Roast Mountain Goat, a
+    vendor food), and the 980 rung is where Marlow's Grand Roast already
+    sits, so the noun is house vocabulary twice over.
+  - **Deepwater Feast** (cooking 125 capstone, the placeable shared feast,
+    the angler's answer to Harvest Feast) GENERIC with recorded neighbours:
+    "deepwater" is plain English (a deepwater port), the full name is
+    zero-hit, and the "<Word> Feast" construction is genre-shared and
+    already ours (Harvest Feast ships). The neighbours are RECORDED because
+    the feast slot is dense trade dress: WoW ships Fish Feast, Fisherman's
+    Feast, Seafood Magnifique Feast, Bountiful Feast and Great Feast, and
+    separately uses the word in Deepwater Lure, Deepwater Blossom and
+    Hungering Deepwater Treads. Not one of them is this name, and no game
+    pairs the two words. In-repo "deepwater" occurs once, in a Gale Harbor
+    code comment about a pier, never as a display string.
+  - **The Deepest Cast** (the untitled deed for obtaining the apex rod,
+    renown 10) CLEAR: four plain English words in the shipped deed voice
+    (Glimmer of Hope, Full Creel, The Junk Drawer, Every Furrow Filled), no
+    coined token, and the phrase is packet-original. Exact phrase zero-hit
+    across the WoW fishing achievement set (Master Angler of Azeroth, Old
+    Man Barlowned, Salty, Accomplished Angler), the FFXIV and RuneScape
+    fishing lines, and the indie fishing games that own this vocabulary.
+    Nearest WoW neighbours are the achievements A Cast Above the Rest and
+    Delve Deepest, different phrases. The deed carries NO title reward, so
+    nothing enters the title namespace, and "Master Angler" is untouched.
+  - REJECTED AT AUTHORING, recorded so none is re-proposed: **Raw Kingfin
+    Salmon** (COLLISION: WoW ships "Kingfin, the Wise Whiskerfish", a FISH
+    item, the same role; also a Super Mario Galaxy boss and a card game).
+    **Raw Silverwake Salmon** (COLLISION: Silverwake is a Dragonlance noble
+    house, Nakaro / Treyen / Berrion Silverwake, a coined surname
+    distinctive to one franchise). **Raw Goldwake Sturgeon** (COLLISION:
+    BG3's Captain Goldwake). **Raw Hoarcrown Salmon** (BORDERLINE, zero-hit
+    but declined: hoarfrost plus crown is a synonym swap of Icecrown, one
+    of WoW's most identified proper nouns, and swapping a synonym TOWARD a
+    famous name is the inverse of the Hellsteel to Pitsteel move this audit
+    made). **Raw Silttail** anything (CLEAR standalone but declined: one
+    letter from Trials of Mana's shipped Silktail enemy, a near-homophone
+    the adversarial pass is for). **Fathomreel Fishing Rod** (BORDERLINE:
+    PENN's Fathom reel family, above). **Line and Sinker** (COLLISION
+    CLASS: a truncation of "Hook, Line and Sinker", which ships as an FFXIV
+    quest, a RuneScape port voyage and an ARC Raiders achievement, the same
+    truncation class that killed Flask of the Wyrm at phase 10). **Reel and
+    Ratchet** (BORDERLINE: Ratchet is a WoW port town in Northern Barrens
+    and the title character of a Sony franchise). **Fisherman's Feast** and
+    **Fish Feast** (COLLISION: WoW items 33052 and 43015). **Angler's
+    Bounty** or any new Angler's name (in-repo: Angler's Feast Platter
+    ships, so a second Angler's food reads as its family). **Coldwater
+    Feast** (in-repo: the Coldwater Rot mob mechanic plus the deed Cold
+    Water, Colder Light). **Grand Banquet** re-checked and still refused
+    (already on the registry's Rejected for collisions row). Anything
+    containing **Master Angler** (our own shipped deed prog_master_angler)
+    or **Apex** (already on the registry's rejected row).
+
 ## Validation matrix (per change type)
 - sim-only: `npx tsc --noEmit` + affected `npx vitest run tests/<file>.ts` +
   `npx vitest run tests/architecture.test.ts`; parity suite when rng draw sites change.
@@ -11325,6 +11449,412 @@ npx tsc --noEmit: clean. It caught one real defect vitest could not, which is
 worth recording because the two checks are not redundant: an ItemDef union read
 (`ITEMS[id].wellFed`) type-errors while passing at runtime, so the arm was green
 and the build was red.
+
+## Phase 11i ledger (2026-08-23, the angler's endgame)
+
+Base tip ed73c8d572, clean. LOCAL, no push, no PR. Seven deliverables, all built.
+
+THE PHASE IN ONE LINE: fishing's back half pays now. Three new catch bands ride
+the SHIPPED band-b-takes-tier-b-plus-1 gate, which retroactively gives the two
+crafted rods that already shipped a table each; an apex rung completes the tool
+family; the chowder has fish in it; and the 0.02-per-catch tail is gone.
+
+### STEP 0: NO RELEASE MERGE WAS OWED
+
+`git fetch origin --prune`, then every `origin/release/*` by version sort. The
+newest is still `release/v0.40.0` at 50462dda83, the same tip the ninth sync
+merged, and `git merge-base --is-ancestor 50462dda83 HEAD` exits 0. So no merge
+was manufactured, no seal re-mint, no ratchet re-measure owed by a merge, and no
+release-merge-audit to run. The phase file's precondition ("Phase 11h QA
+closed") is satisfied: verdict PASS-WITH-FOLLOWUPS, 11 mutations dead, the
+economy pins re-derived, the full suite green.
+
+### THE SIX SETTLED DECISIONS, AS EXECUTED
+
+**DECISION A, the band and rod-ladder shape.** FISHING_TABLES_BY_BAND grows from
+three entries to six. The nine shipped cells are BYTE IDENTICAL, checked against
+the real pre-phase bytes pulled from `git show ed73c8d572:src/sim/content/items.ts`
+and parsed out of that text rather than against any restatement of them; all
+nine compared, all nine identical. FISHING_TABLES is still the SAME object as
+FISHING_TABLES_BY_BAND[0] (identity, not deep equality). Band 3 takes the shipped
+stormreel (tier 4), band 4 the shipped tidewrought (tier 5), band 5 the new
+tier-6 clockreel.
+
+**DECISION B, the proficiency ladder.** FISHING_CATCH_BAND_THRESHOLDS =
+[0, 100, 150, 200, 200, 200] in a new pure leaf,
+`src/sim/professions/fishing_bands.ts`. PROFICIENCY_BAND_THRESHOLDS is untouched
+at [0, 100, 200] and has its own arm, including the discriminating case: at
+proficiency 150 the land ladder still reads band 1 while fishing reads band 2.
+
+THE REGRESSION WALK, predicted BEFORE it ran and confirmed on the first run.
+Domain: integer proficiency 0 to 200 crossed with rod tier 1 to 6, 1206 pairs.
+The reference ladder is hard-coded in the test, never imported. NO pair resolves
+lower. Exactly 203 move up:
+
+| pairs | proficiency | rod tier | band |
+|---|---|---|---|
+| 200 | 150 to 199 | 3, 4, 5, 6 | 1 to 2 |
+| 1 | 200 | 4 | 2 to 3 |
+| 1 | 200 | 5 | 2 to 4 |
+| 1 | 200 | 6 | 2 to 5 |
+
+**DECISION C, the apex rod's rung.** engineering 125, acquisition ['drop'],
+stationType 'toolworks', quality epic, use tier 6.
+recipe_tidewrought_fishing_rod's def and bill both diff EMPTY. The
+unlearnable-at-150 finding was RE-VERIFIED in code rather than taken on trust:
+`tierForSkill` puts 150 at tier 6 while engineering's cap of 125 resolves to tier
+5, and BOTH learning channels run the same gate (`teachTierMet` in
+professions/training.ts and the 'tier' deny arm in professions/pattern_items.ts),
+so a row authored at 150 is unlearnable through a trainer AND through a pattern.
+The three land tools at 150 escape only via the frozen PRE_TRAINING_RECIPE_IDS.
+Written into ROD_RECIPES' header and HANDED TO 11j, whose apex hoe is settled on
+the same finding. No recipe anywhere in this diff carries skillReq 150.
+
+**DECISION D, how far the fish reach.** The same Raw Deepbarb Catfish at count 4
+into all three role plates AND recipe_laden_hearth, ADDED never substituted.
+FOUR is forced, not chosen, and this is the number the 11h QA handoff called its
+single most important line: the standing fish-forward sweep needs fish to
+strictly outnumber produce, the three plates carry produce 2 (so 3 would clear
+them) and recipe_laden_hearth carries produce 3 (evergarden_greens 2 plus
+fine_evergarden_greens 1), where 3 TIES and reds. Four is the lowest legal
+uniform count across the four rows DECISION D governs.
+
+**DECISION E, the channel.** All four new patterns are deterministic Heroic
+Marks stock, priced by the rung each teaches off the shipped two-point family
+read at authoring: 12 (the ring point) for the rung-75 and rung-100 cooking
+patterns, 16 (the neck point) for the rung-125 capstone and the engineering
+schematic. No third price point minted. HEROIC_VENDOR_STOCK 33 to 37.
+
+**DECISION F, the pacing arm.** Executed; the model is below.
+
+### THE CASTS-TO-200 MODEL (DECISION F), REPRODUCIBLE FROM THIS DOC ALONE
+
+Every input is a shipped constant. A cast costs the mean seeded bite wait for
+the rod tier, plus the shipped BASE reel window (FISH_REEL_WINDOW_SEC; the wider
+window a better rod buys is margin, not time spent), plus one tick to re-press:
+
+    cycle(t) = (FISH_BITE_DELAY_MIN_SEC + fishBiteMaxSecFor(t)) / 2
+             + FISH_REEL_WINDOW_SEC + DT
+
+    t1 8.05   t2 7.30   t3 6.55   t4 5.80   t5 5.55   t6 5.55  seconds
+
+A cast TEACHES when it resolves anything but the empty hook, minus grey junk at
+or above FISHING_JUNK_GAIN_CUTOFF_PROFICIENCY, read off the D9 cells. The
+reference angler always fishes the water the R19 teaching ceiling forces and
+carries the CHEAPEST rod that water takes (the slow reference, not an optimistic
+one):
+
+| segment | water | rod | band | teach | cycle | coefficient |
+|---|---|---|---|---|---|---|
+| 0 to 50 | eastbrook_vale | 1 | 0 | 0.90 | 8.05 | 447.22 |
+| 50 to 100 | eastbrook_vale | 1 | 0 | 0.90 | 8.05 | 447.22 |
+| 100 to 150 | mirefen_marsh | 2 | 1 | 0.77 | 7.30 | 474.03 |
+| 150 to 200 | thornpeak_heights | 3 | 2 | 0.84 | 6.55 | 389.88 |
+
+Band seconds = coefficient / gain. The extended cells contribute ZERO teaching
+casts and that is not an oversight: bands 3 to 5 all gate at proficiency 200,
+which is fishing's cap, where the schedule grants 0 anyway.
+
+WHAT WAS MEASURED WRONG BEFORE. Under the shipped values the last fifty points
+cost 5000 casts and 9.10 reference hours, 84.3 PERCENT of the whole climb, at
+0.02 a catch with zero character XP. (The record's "on the order of 5000 casts
+and 11 hours" is the same model read at its pessimistic end, a worst-legal reel
+at the close of the rod's own window: 5000 x 8.30 s = 11.53 h. The cast count
+reproduces exactly; only the reel assumption differs.)
+
+THE SEARCH, run by the test rather than described. On the 0.01 grid, over
+non-increasing schedules, inside the settled 10-to-12-hour span, with a genuine
+ramp (each band costing at least the one before) and no band above a third:
+SIXTEEN schedules are legal and only THREE are strictly decreasing, which a real
+curve must be. Of those three, this one sits nearest the span midpoint and keeps
+the early climb fastest.
+
+**FISHING_GAIN_SCHEDULE = 0.08 / 0.05 / 0.04 / 0.03** (boundaries FROZEN at
+50 / 100 / 150 / 200, because fishingTeachingCeilingFor derives the water
+teaching ceilings from them).
+
+| band | catches | casts | hours | share |
+|---|---|---|---|---|
+| 0 to 50 | 625 | 694 | 1.55 | 14.2% |
+| 50 to 100 | 1000 | 1111 | 2.48 | 22.7% |
+| 100 to 150 | 1250 | 1623 | 3.29 | 30.1% |
+| 150 to 200 | 1667 | 1984 | 3.61 | 33.0% |
+| TOTAL | 4542 | 5413 | 10.94 | |
+
+The total barely moves (10.79 to 10.94 reference hours) and the SHAPE changes
+completely: the tail falls from 9.10 hours to 3.61 and from 84% to 33%.
+
+THE PRICE, stated because it is real: 0 to 50 goes from about eight minutes to
+about ninety. It gates nothing (fishing's first band boundary is 100) and it is
+what a one-third cap over four bands arithmetically requires; a schedule keeping
+the old early gains cannot exceed 1.12 total hours under that cap.
+
+Untouched by DECISION F: the grey-junk cutoff, the zero-character-XP design,
+fishingTeachingCeilingFor's derivation, and the at-or-past-the-last-row zero.
+
+### THE EXTENDED D9 CELLS, WITH THE ARITHMETIC
+
+The surplus clamp moves off 2 to 5 (eastbrook at band 5 is five bands above its
+requirement). Every rule below is the shipped one extended, and the shipped nine
+cells REPRODUCE from it where the rule applies to them:
+
+- **empty hook** the shipped -2 per surplus step floored at the standing
+  weight-1 minimum: 10 / 8 / 6 / 4 / 2 / 1 by surplus. Shortfall rungs (35, 55)
+  untouched, because no zone can be short at band 3 or above.
+- **grey junk** the zone's at-requirement total minus 4 per surplus band (the
+  step the shipped cells already walk: eastbrook 12 / 8 / 4, mirefen 13 / 9),
+  floored at one weight per junk row the zone carries, so mirefen's two-row
+  flavor never collapses to one.
+- **rare koi** FLAT at 6 from band 2 up. Non-decreasing holds and the ladder
+  ends where its consumers do: both rod rungs that consume koi sit at or below
+  tier 5.
+- **new catches** each enters at the band its rod opens, at exactly the weight
+  eastbrook's empty-hook and junk rows GIVE UP at that band. Eastbrook's
+  empty+junk runs 22 / 16 / 10 / 5 / 3 / 2 by band, so the deltas at bands 3, 4
+  and 5 are **5, 2 and 1**, and those are the three weights. Eastbrook funds the
+  least (its cells were already the most fish-heavy shipped), which is what lets
+  the row be UNIFORM across every zone.
+- **shipped fish** the remainder, split in the zone's BAND-2 proportion by
+  largest remainder.
+
+NOT ONE SHIPPED FISH ROW MOVES DOWN, at any band, in any zone. The phase file
+allowed a proportional trim of the shipped rows as a second funding source; it
+was not needed and was not taken. Eastbrook holds 50/34 across bands 2 to 5;
+mirefen climbs 43/34 to 44/34 to 45/36 to 46/36; thornpeak climbs 44/34 to
+45/34 to 45/35 to 46/35.
+
+Cooking-catch share by band, the thing a player feels: eastbrook 78 / 84 / 90 /
+95 / 97 / 98, mirefen 40 / 77 / 83 / 89 / 94 / 96, thornpeak 17 / 50 / 84 / 90 /
+93 / 95. Every cell sums to exactly 100; every null row is at least 1; empty
+hook and junk non-increasing, koi and EVERY cooking catch non-decreasing (the
+stronger per-row rule, not just the aggregate the phase file asked for).
+
+A NOTE ON MY OWN TOOLING, because it nearly cost a cell. The first derivation
+script computed each cell's checksum as `empty + junk + koi + new + remainder`
+where `remainder` was defined as `100 - empty - junk - koi - new`, so it
+returned 100 by construction: a constant self-comparison in the very script
+meant to catch one. It printed SUM 100 for a thornpeak band-4 cell I had
+transcribed as summing 99. The independent verifier, which re-reads the merged
+table and adds the real row weights, caught it. Same lesson as Z3, one level up.
+
+### THE NEW IDS, ELEVEN OF THEM
+
+Three catches, sellValue DERIVED from the shipped raw-catch curve rather than
+chosen: that curve is keyed to the water's zone tier (eastbrook 2 and 3, mirefen
+6 and 6, thornpeak 10 and 10, a +4 step per tier above the first), these are
+keyed to the BAND and every band above 2 sits above every zone, so the same +4
+step continues off thornpeak's 10.
+
+| id | band | weight | sellValue | buyValue |
+|---|---|---|---|---|
+| raw_deepbarb_catfish | 3 | 5 | 14 | none |
+| raw_hollowgill_sturgeon | 4 | 2 | 18 | none |
+| raw_stillmere_salmon | 5 | 1 | 22 | none |
+
+All three are kind 'junk', quality common (the koi's uncommon goes with
+FISHING_RARE_ID and its Reliquary hint, and a catch with neither should not wear
+the colour), market-listable, never soulbound, never noMarketList. NO buyValue
+on any, which keeps the counterfactually-vendor-fed literal in
+tests/recipe_economy.test.ts still. All three join RAW_COOKING_CATCH_IDS and all
+three join ZONE_FISH on every one of its twelve rows.
+
+RELIQUARY VERDICT: **NO page**, written rather than skipped because
+glimmerfin_koi carries a fishing hint in SPECIMEN_PROFESSIONS and makes the
+question real. The koi is a LUCKY FIND, which is what the Reliquary catalogues
+(rare-or-better chase uniques); these three are deterministic band rewards a
+capped angler farms on purpose, common quality, and consumed by ordinary bills.
+Cataloguing them would put a routine reagent on a chase shelf.
+
+The rod: `clockreel_fishing_rod`, tier 6, epic, sellValue 375 derived from the
+rod ladder's own 2.5x step (10, 25, 60, 150, 375), which also lands it beside the
+packet's other apex tools at 380. Market-listable and NOT soulbound, asserted by
+test, because the rod gates band 5 and a bound rod would make having TAKEN
+engineering a precondition for a FISHING band (R18).
+
+Two dishes and a feast: `peppered_deepbarb_catfish` (rare, foodHp 552, sellValue
+75) and `roast_hollowgill_sturgeon` (rare, 980, 150) both REUSE a shipped
+foodHp/sellValue pair exactly and carry no wellFed at all; `deepwater_feast`
+(epic, kind 'junk', sellValue 250, harvest_feast's own point) is a FEAST on the
+shipped machinery whose `dishItemId` is stonepot_stew, so eating from it is
+eating a Stonepot Stew byte for byte. charges 10 is RAID_MAX, derived;
+durationTicks 3600 is harvest_feast's own. NO new aura id, NO new magnitude, NO
+new duration, NO new proc effect anywhere in the phase.
+
+Four patterns on the shipped contract. QUALITY IS DERIVED, not uniform: ruling
+11f-PAT says a pattern carries the rarity of what it TEACHES, so the two plain
+fish dishes take RARE and the feast and the schematic take epic. These are the
+first rows in apex_patterns.ts that are not epic, and the alternative would have
+been forcing a DISH up a rarity rung to satisfy a test literal.
+
+### THE BILLS, RE-DERIVED FROM THE MERGED ROWS
+
+| row | rung | input | output | margin |
+|---|---|---|---|---|
+| recipe_stonepot_stew | 100 | 508 | 360 | 148 |
+| recipe_warspice_skewers | 100 | 508 | 360 | 148 |
+| recipe_sageleaf_chowder | 100 | 508 | 360 | 148 |
+| recipe_laden_hearth | 125 | 1062 | 380 | 682 |
+| recipe_peppered_deepbarb_catfish | 75 | 192 | 150 | 42 |
+| recipe_roast_hollowgill_sturgeon | 100 | 436 | 300 | 136 |
+| recipe_deepwater_feast | 125 | 390 | 250 | 140 |
+| recipe_clockreel_fishing_rod | 125 | 496 | 375 | 121 |
+
+Every row gold-negative. The three plates all move by an identical 56 (the same
+id at the same count), so GATE A's cost spread across the food family is STILL
+ZERO; it is the spread the gate rules on, not the level. recipe_laden_hearth is
+still the longest bill in the game, now at EIGHT reagents.
+
+R17 holds: fish feed CONSUMABLES. Fishing's own tool ladder is the recorded
+exception and already consumed fish before this phase
+(recipe_tidewrought_fishing_rod), so the rod bill is not a firewall breach. No
+new catch appears in recipe_quickening_catalyst or any gear intermediate.
+
+R18 holds as arithmetic over the whole merged table, not just per row: every one
+of the six shipped common catches holds its exact demand, glimmerfin_koi RISES 6
+to 8, and nothing anywhere fell. Herb totals rose or held (goldleaf 27 to 29,
+sunpetal 39 to 42, silverleaf unmoved); salt 33 to 39; the whole fishing line 30
+to 77.
+
+### R20, STATED WITH ROW IDS
+
+Fishing is present in bills at every 25-point band and, at 75 and above, ON ITS
+OWN ACCOUNT rather than through a rod:
+
+- 0: recipe_pan_seared_perch, recipe_herbed_marsh_pike
+- 25: recipe_ashwood_smoked_eel, recipe_frostgill_chowder
+- 50: recipe_silvered_carp_supper, recipe_anglers_feast_platter
+- **75: recipe_peppered_deepbarb_catfish** (and recipe_stormreel_fishing_rod, a rod)
+- **100: recipe_roast_hollowgill_sturgeon**, plus the three role plates and
+  recipe_sageleaf_chowder, the chowder that had no fish in it
+- **125: recipe_deepwater_feast** and recipe_laden_hearth (and
+  recipe_tidewrought_fishing_rod and recipe_clockreel_fishing_rod, both rods)
+
+Before this phase the endgame count was 2 and BOTH were rods.
+
+### PREDICTED THEN OBSERVED
+
+| pin | predicted | observed |
+|---|---|---|
+| moved (proficiency, rod tier) pairs | 203, and the exact table above | 203, exact |
+| pairs resolving LOWER | none | none |
+| per-band hours | 1.55 / 2.48 / 3.29 / 3.61 | identical |
+| total reference hours | 10.94 | 10.94 |
+| legal 0.01-grid schedules | not predicted; searched | 16, of which 3 strictly decreasing |
+| new catch weights | 5 / 2 / 1 | 5 / 2 / 1 |
+| shipped cells identical | all nine | all nine, against the real git bytes |
+| deeds | 287 to 288, renown 3275 to 3285 | exact |
+| HEROIC_VENDOR_STOCK | 33 to 37 | 37 |
+| ITEM_ART_PENDING | 62 to 73 | 73 |
+| ALL_RECIPES | 149 to 153 | 153 |
+| APEX_CONSUMABLE_RECIPES | 8 to 11 | 11 |
+| pattern universe | 34 to 38 | 38 |
+
+THE PARITY GOLDEN, predicted before regenerating and the prediction was
+INCOMPLETE, which is recorded rather than smoothed over. Correct: only
+professions_fishing_session moved, rng untouched at every frame (draws 3,
+drawDigest 1e79975d, all five per-frame digests identical), and the three early
+frames unchanged. WRONG: I predicted every events digest unchanged. The final
+frame's moved too, because at 0.08 a catch the amount-1 gathering trigger now
+needs 13 catches, so prog_first_harvest no longer fires inside the scenario's
+99-tick window and its deedUnlocked emit and its 5 renown go with it. I had
+already found and handled that consequence in the fishing suite and failed to
+carry it into the golden prediction. THE LESSON: a gain-rate change is a
+DEED-TRIGGER change wherever a deed counts the quantity that rate feeds; predict
+the trigger set, not just the number.
+
+### THE ONE DEED
+
+`col_deepest_cast`, "The Deepest Cast", renown 10, NO title, category
+'collection', inserted BEFORE the farming block so that block stays last and
+contiguous under the three-tier ordering. No ACHIEVEMENT_MAP row (settled
+packet-wide; Phase 16 writes the single record). No mark namespace registered,
+so migration-safety is not triggered.
+
+THE TRIGGER IS A DEVIATION FROM THE PHASE FILE'S WORDING, and it is the honest
+one. The file called for "the apex rod CRAFT, on the shipped craft trigger", but
+the DeedTrigger union has no per-ITEM craft kind: the craft-shaped kinds are
+`craftSkill` (a skill milestone, already owned by prog_grandmaster_engineering)
+and the `craft_rare` / `masterwork` visit marks (per-CRAFT, not per-item). The
+shipped way to say "you got this specific thing" is `collectItems` over
+deedStats.itemsDiscovered, which col_glimmerfin and col_full_creel already use.
+That fires on ANY acquisition including a market purchase, so the desc says
+OBTAIN and not CRAFT. A per-item craft mark was the alternative and was declined
+rather than silently taken: it needs a namespace registered plus a save/load
+round-trip pin in the same change, and it makes migration-safety required. THE
+MAINTAINER'S CALL.
+
+### THE FORCED DEVIATION: THE SESSION CAP MOVED, 15 s TO 16 s
+
+DECISION C ruled the apex rod EPIC and reasoned about the RARITY axis alone. It
+never costed tier 6's own +0.75 s of reel window, and that is what broke the
+budget. The worst legal session is a bare-pole CAST (the delay is drawn against
+the rod held at the cast, so the pole's 8 s is worst) into the widest window the
+rod held at the BITE opens (the window re-scans at the bite), plus the one tick
+the miss arm fires on:
+
+    tier-6 epic window = 2.5 + 0.75 x 5 + 0.25 x 3 = 7.00 s = 140 ticks
+    160 (bite) + 140 (window) + 1 (miss) = 301 ticks, against a 300-tick cap
+
+Over by EXACTLY ONE TICK, and it is the miss arm's: the bite and the window
+alone sum to exactly 15.00 s. Left alone, a player in that state has a legal reel
+window truncated by 50 ms, which is the thing the budget exists to prevent.
+
+THREE KNOBS COULD CLOSE ONE TICK AND TWO COST MORE THAN THEY BUY. Shipping the
+rod RARE clears at 296 but puts a RARE tier-6 rod above an EPIC tier-5 one, a
+rarity inversion every player sees in their bags. Trimming
+FISH_REEL_WINDOW_ROD_BONUS_SEC retunes all five shipped rods to fit one new one.
+The cap is a DEFENSIVE timeout casting_lifecycle.ts calls unreachable in normal
+play, so a second on it costs a player nothing. RATIFY OR REVERT.
+
+### OPEN ITEMS FOR THE MAINTAINER
+
+The seven carried in are unchanged by this phase except where noted, and nothing
+here rules on any of them. THREE THINGS THIS PHASE ADDS OR MOVES:
+
+(8) **THE SESSION CAP MOVED**, 15 s to 16 s, forced by DECISION C's incomplete
+    arithmetic. Above.
+(9) **THE DEED TRIGGER**, collectItems rather than a craft mark. Above.
+(10) **RULE 2's VALUE-HALF COST SHRANK, and nobody aimed at it.** 11h costed the
+     open count-reading decision at NINE entries across SEVEN rows. It is now SIX
+     across FOUR. 11i's uniform fish row at count 4 TIES game_meat's 4 on the
+     three role plates, and the tie-break takes the most permissive tied
+     reagent, so the count reference moves from game_meat's 16 to the catfish's
+     56 and the tier-3 crops clear a reading they used to fail. No crop moved. It
+     also means THE COST IS NOT MONOTONE: a later phase adding a high-count
+     non-produce reagent can retire a refusal without touching a crop, so this
+     list must be re-measured whenever any governed bill changes, never carried.
+
+Also newly recorded: the apex rod is the SECOND deliberate exception to the
+"every crafted tool above tier 3 has a delve Marks route" rule (osmium_hoe is the
+first). Its argument is different from the hoe's: the rod's whole chain is
+already luck-free because its SCHEMATIC is deterministic marks stock, and the rod
+itself stays market-listable. Putting a tier-6 apex tool on a delve counter is a
+delve pricing and tier decision this phase has no ruling for.
+
+The three owed visual items are unchanged and untouched by this phase.
+
+### THE TELEMETRY CARDINALITY
+
+FISHING_BANDS widens to six labels; fishingBandLabel takes the exported
+FishingCatchBand. BOTH stale comments corrected: the "a fourth band is a design
+change that should redden this pin" paragraph (it did exactly that, and the pin
+stays hand-written so the NEXT widening is not silent) and the "zones x bands is
+3 x 3" cardinality paragraph, now 3 x 6. The rod-fee family goes from two to
+three by construction, and the apex rung's fee series is pre-seeded and stays at
+zero forever because nobody trains a drop-taught recipe: a permanently-zero
+series is the honest reading of "what a rod rung costs at a trainer". The
+membership guard that drops an off-list value is unchanged.
+
+### WHAT THE COMPILER FOUND, WHICH IS THE POINT OF THE ONE EXPORTED TYPE
+
+Widening `band` to FishingCatchBand at its definition reddened every site that
+had written the literal union, including the two the phase file predicted:
+`src/ui/gather_tool_tooltip.ts` indexed the SHORTER shared array with a fishing
+band, which at the top rung runs off the end of a three-element tuple. The wiki
+generator (`scripts/wiki/build_content.mjs`) had the SAME defect and the phase
+file did not name it: it published minProficiency from
+PROFICIENCY_BAND_THRESHOLDS, so it would have quoted 200 for a band gated at 150
+and emitted `undefined` for the three new tables. Both now read fishing's ladder.
 
 ## Phase 11h QA ledger (2026-08-22, verify the provisioning supply line, apex tier)
 

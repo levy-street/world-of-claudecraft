@@ -791,12 +791,21 @@ export const BASE_ITEMS: Record<string, ItemDef> = {
   // do). See ROD_RECIPES in content/recipes.ts for what each rung consumes and
   // why that is a weaker self-gate than the land ladder's.
   //
-  // What the top two rungs actually buy: no new catch band (there are three
-  // bands and tier 3 already reaches the last one) and no new zone (there are
-  // three zones and tier 3 already opens the deepest). They buy the minigame
-  // itself, a shorter worst-case wait and a wider reel window, plus the
-  // standing they read as. Tier 5 sits flat on the bite-delay floor, which is
-  // the ladder ending rather than a rounding error.
+  // WHAT THE TOP RUNGS BUY, REWRITTEN AT masterwrought Phase 11i because the
+  // paragraph here had become false. It used to say the top two rungs buy no
+  // new catch band, and that was the measured defect the phase existed to fix:
+  // there were three bands and tier 3 already reached the last one, so both
+  // crafted rods opened nothing in the catch table. The ladder is SIX bands now
+  // (professions/fishing_bands.ts), riding the same band-b-takes-tier-b-plus-1
+  // gate, so every rung above tier 1 opens a band of its own: stormreel band 3,
+  // tidewrought band 4, clockreel band 5.
+  //
+  // They still buy no new ZONE (there are three zones and tier 3 already opens
+  // the deepest), and they still buy the minigame itself, a shorter worst-case
+  // wait and a wider reel window. Tier 5 sits flat on the bite-delay floor,
+  // which is the ladder ending rather than a rounding error, and tier 6 sits on
+  // that same floor: the clockreel's gain over the tidewrought is the band and
+  // the reel window, never the wait.
   stormreel_fishing_rod: {
     id: 'stormreel_fishing_rod',
     name: 'Stormreel Fishing Rod',
@@ -812,6 +821,32 @@ export const BASE_ITEMS: Record<string, ItemDef> = {
     quality: 'epic',
     use: { type: 'gatherTool', professionId: 'fishing', tier: 5 },
     sellValue: 150,
+  },
+  // The apex rung (masterwrought Phase 11i): the tier-6 rod that opens catch
+  // band 5, the only band a proficiency-200 angler cannot reach without it.
+  //
+  // MARKET-LISTABLE, AND THAT IS A RULING RATHER THAN A DEFAULT (R18). This rod
+  // is the gate on band 5, so binding it would make having TAKEN engineering a
+  // precondition for a FISHING band. It stays a plain tradable tool with no
+  // soulbound and no noMarketList flag, exactly like the four rods above, so an
+  // angler who never touched engineering reaches band 5 by buying one.
+  //
+  // EPIC, NOT LEGENDARY, and the reason is mechanical: rod rarity feeds
+  // FISH_REEL_WINDOW_RARITY_BONUS_SEC at a quarter second per rung, so a
+  // legendary rung would be a silent throughput change and would widen the
+  // worst legal session against FISHING_SESSION_CAP_SEC. Epic also keeps the
+  // rung inside the shipped apex-tool rarity line.
+  //
+  // sellValue 375 is the rod ladder's own step, not a new number: 10, 25, 60,
+  // 150 climbs by about 2.5x a rung (2.5, 2.4, 2.5), and 150 x 2.5 is 375,
+  // which lands this rung beside the packet's other apex tools at 380.
+  clockreel_fishing_rod: {
+    id: 'clockreel_fishing_rod',
+    name: 'Clockreel Fishing Rod',
+    kind: 'tool',
+    quality: 'epic',
+    use: { type: 'gatherTool', professionId: 'fishing', tier: 6 },
+    sellValue: 375,
   },
   // Tier 4/5 crafting reagents for the tools directly above (#1135's
   // `TOOL_RECIPE_STUBS`, de-stubbed into src/sim/content/recipes.ts once
@@ -1734,6 +1769,51 @@ export const BASE_ITEMS: Record<string, ItemDef> = {
     kind: 'junk',
     quality: 'uncommon',
     sellValue: 75,
+  },
+  // The three HIGH-BAND catches (masterwrought Phase 11i). Like the koi they
+  // read SKILL alone: each is present in every zone's cell for its band at the
+  // same weight, so a recipe names one reagent id whatever water it came out
+  // of. Unlike the koi they are not lucky finds but band rewards, which is why
+  // they are common rather than uncommon: the koi's uncommon rung goes with
+  // FISHING_RARE_ID (the celebratory shout) and its Reliquary profession hint,
+  // and a catch with neither should not wear the colour.
+  //
+  // SELLVALUE IS DERIVED FROM THE SHIPPED RAW-CATCH CURVE, not chosen. That
+  // curve is keyed to the water's zone tier: eastbrook (tier 1) pays 2 and 3,
+  // mirefen (tier 2) pays 6 and 6, thornpeak (tier 3) pays 10 and 10, a step of
+  // +4 per zone tier above the first. These three are keyed to the BAND
+  // instead, and bands 3, 4 and 5 all sit above every zone, so the same +4 step
+  // continues off thornpeak's 10: 14, 18, 22.
+  //
+  // THE KOI'S 75 IS DELIBERATELY NOT THE ANCHOR. It is priced as a lucky-hook
+  // trophy and as the ROD ladder's reagent, not as a place on the food curve,
+  // so anchoring a food reagent to it would import a trophy premium into every
+  // dish these three feed.
+  //
+  // NO buyValue on any of them, which is load-bearing rather than an omission:
+  // no counter stocks a catch, so none of the three can join the
+  // counterfactually-vendor-fed set in tests/recipe_economy.test.ts and that
+  // membership literal stays still (the same property the koi has).
+  raw_deepbarb_catfish: {
+    id: 'raw_deepbarb_catfish',
+    name: 'Raw Deepbarb Catfish',
+    kind: 'junk',
+    quality: 'common',
+    sellValue: 14,
+  },
+  raw_hollowgill_sturgeon: {
+    id: 'raw_hollowgill_sturgeon',
+    name: 'Raw Hollowgill Sturgeon',
+    kind: 'junk',
+    quality: 'common',
+    sellValue: 18,
+  },
+  raw_stillmere_salmon: {
+    id: 'raw_stillmere_salmon',
+    name: 'Raw Stillmere Salmon',
+    kind: 'junk',
+    quality: 'common',
+    sellValue: 22,
   },
   roasted_boar: {
     id: 'roasted_boar',
@@ -3293,8 +3373,8 @@ export interface FishingEntry {
   weight: number;
 }
 
-// Catch rarity ladder (Professions 2.0): fishing proficiency selects
-// one of three per-zone tables (bands). As proficiency rises the weight shifts
+// Catch rarity ladder: fishing proficiency and the carried ROD together select
+// one of SIX per-zone tables (bands; three until masterwrought Phase 11i). As proficiency rises the weight shifts
 // out of the grey-junk rows (tangled_weed / soggy_boot) and the empty-hook null
 // row and into the zone's cooking-catch rows (raw fish reagents). The moves are
 // strictly monotonic per band step (each cooking catch non-decreasing, each
@@ -3304,25 +3384,29 @@ export interface FishingEntry {
 // (fishingBandFor); FISHING_TABLES_BY_BAND[band][zoneId] is the resolved table,
 // with the eastbrook_vale row as the fallback for any zone without its own.
 //
-// THE AXIS THESE NINE CELLS ARE AUTHORED AGAINST (D9). A cell is not "how good
-// is this angler", it is "how far is this angler from what this water asks".
+// THE AXIS THESE EIGHTEEN CELLS ARE AUTHORED AGAINST (D9). A cell is not "how
+// good is this angler", it is "how far is this angler from what this water
+// asks".
 // Each zone names a required band (professions/fishing_zones.ts, derived from
 // the rod tier its water takes), and a cell's whole character follows from the
 // distance between that and the band the cell is for:
 //
-//   empty hook   at the requirement 10, one band above 8, two above 6;
-//                one band SHORT 35, two short 55
-//   rare koi     1 / 3 / 6 by band, in every zone: the one row that reads
-//                skill alone, because it is the rod ladder's reagent and a
-//                seasoned angler should be the one who farms it
+//   empty hook   at the requirement 10, then -2 per band above it, floored at
+//                1: 10 / 8 / 6 / 4 / 2 / 1 by surplus; one band SHORT 35, two
+//                short 55
+//   rare koi     1 / 3 / 6 by band and then FLAT at 6, in every zone: the row
+//                that reads skill alone, because it is the rod ladder's reagent
+//                and a seasoned angler should be the one who farms it. The
+//                three high-band catches read skill alone the same way; the
+//                high-band block below carries their own derivation
 //   grey junk    carries the zone's own flavor (the marsh keeps its boots) and
 //                swells with the shortfall, roughly doubling or worse against
 //                the same zone's at-requirement cell
 //   cooking catch whatever is left, split in each zone's shipped proportion
 //
-// So Eastbrook, which asks for nothing, keeps its shipped shape, and Thornpeak
-// at band 0 pays 55 empty hooks and 28 grey junk out of 100 to a level-1 angler
-// who borrowed a rod good enough to cast there. That is the whole point: the
+// So Eastbrook, which asks for nothing, keeps its shipped shape at band 0, and
+// Thornpeak at band 0 pays 55 empty hooks and 28 grey junk out of 100 to a
+// level-1 angler who borrowed a rod good enough to cast there. That is the whole point: the
 // water is the difficulty, not the reel click. tests/fishing_zones.test.ts
 // derives every number above from the schedule and fails on a cell edited past
 // it.
@@ -3409,6 +3493,152 @@ export const FISHING_TABLES_BY_BAND: Record<string, FishingEntry[]>[] = [
       { itemId: null, weight: 10 },
     ],
   },
+  // ---- The three HIGH BANDS (masterwrought Phase 11i) ----------------------
+  //
+  // Bands 3, 4 and 5 all gate at proficiency 200
+  // (professions/fishing_bands.ts), so the ROD is the only axis that separates
+  // them: band 3 takes the shipped stormreel (tier 4), band 4 the shipped
+  // tidewrought (tier 5), band 5 the clockreel this phase mints (tier 6). That
+  // is the whole point of the phase, and it is why the two crafted rods that
+  // shipped opening nothing now open a table each.
+  //
+  // THE SCHEDULE EXTENDS, IT DOES NOT RESTART. Every number below is derived by
+  // the same D9 rules the nine shipped cells obey, with the surplus clamp moved
+  // off 2 (eastbrook at band 5 is FIVE bands above its requirement):
+  //
+  //   empty hook   the shipped -2 per surplus step, floored at the standing
+  //                weight-1 minimum: 10 / 8 / 6 / 4 / 2 / 1 by surplus
+  //   grey junk    the zone's at-requirement total minus 4 per surplus band
+  //                (the step the shipped cells already walk: eastbrook 12 / 8 /
+  //                4, mirefen 13 / 9), floored at one weight per junk row the
+  //                zone carries, so a zone never loses a flavor row entirely
+  //   rare koi     FLAT at 6 from band 2 up. Non-decreasing is satisfied, and
+  //                the ladder ends where its consumers do: both rod rungs that
+  //                consume koi sit at or below tier 5
+  //   new catches  each enters at the band its rod opens, at exactly the weight
+  //                eastbrook's empty-hook and junk rows GIVE UP at that band.
+  //                Eastbrook's empty+junk runs 22 / 16 / 10 / 5 / 3 / 2 by
+  //                band, so the deltas at bands 3, 4 and 5 are 5, 2 and 1, and
+  //                those are the three weights. Eastbrook funds the least of
+  //                the three zones (its cells were already the most fish-heavy
+  //                shipped), so sizing on it is what lets the row be UNIFORM
+  //                across every zone
+  //   shipped fish whatever is left, split in the zone's BAND-2 proportion
+  //                (the last shipped cell, the one these continue from), by
+  //                largest remainder
+  //
+  // NOT ONE SHIPPED FISH ROW MOVES DOWN ANYWHERE, at any band, and that is a
+  // consequence of the sizing rule rather than a coincidence: the new catches
+  // are funded entirely out of what the empty-hook and junk rows release, so
+  // eastbrook's pair holds at 50/34 across bands 2 to 5 while mirefen and
+  // thornpeak, which release more, climb. The phase file allowed a proportional
+  // trim of the shipped rows as a second funding source; it was not needed and
+  // was not taken.
+  //
+  // ROW ORDER IS BEHAVIOR, not formatting: the table draw walks a running
+  // weight total. The shipped prefix keeps its exact order and the three new
+  // rows sit with the koi, after the junk, because they read SKILL alone the
+  // way it does.
+  //
+  // Band 3 (proficiency 200 with a tier-4 rod): the Deepbarb Catfish arrives,
+  // and it is the workhorse of the three, the reagent four apex bills take at
+  // count 4.
+  {
+    eastbrook_vale: [
+      { itemId: 'raw_mirror_trout', weight: 50 },
+      { itemId: 'raw_river_perch', weight: 34 },
+      { itemId: 'tangled_weed', weight: 1 },
+      { itemId: 'glimmerfin_koi', weight: 6 },
+      { itemId: 'raw_deepbarb_catfish', weight: 5 },
+      { itemId: null, weight: 4 },
+    ],
+    mirefen_marsh: [
+      { itemId: 'raw_marsh_pike', weight: 44 },
+      { itemId: 'raw_bog_eel', weight: 34 },
+      { itemId: 'soggy_boot', weight: 2 },
+      { itemId: 'tangled_weed', weight: 3 },
+      { itemId: 'glimmerfin_koi', weight: 6 },
+      { itemId: 'raw_deepbarb_catfish', weight: 5 },
+      { itemId: null, weight: 6 },
+    ],
+    thornpeak_heights: [
+      { itemId: 'raw_frostgill_trout', weight: 45 },
+      { itemId: 'raw_stonescale_carp', weight: 34 },
+      { itemId: 'tangled_weed', weight: 2 },
+      { itemId: 'glimmerfin_koi', weight: 6 },
+      { itemId: 'raw_deepbarb_catfish', weight: 5 },
+      { itemId: null, weight: 8 },
+    ],
+  },
+  // Band 4 (proficiency 200 with a tier-5 rod): the Hollowgill Sturgeon joins,
+  // the keystone of the cooking-100 row.
+  {
+    eastbrook_vale: [
+      { itemId: 'raw_mirror_trout', weight: 50 },
+      { itemId: 'raw_river_perch', weight: 34 },
+      { itemId: 'tangled_weed', weight: 1 },
+      { itemId: 'glimmerfin_koi', weight: 6 },
+      { itemId: 'raw_deepbarb_catfish', weight: 5 },
+      { itemId: 'raw_hollowgill_sturgeon', weight: 2 },
+      { itemId: null, weight: 2 },
+    ],
+    mirefen_marsh: [
+      { itemId: 'raw_marsh_pike', weight: 45 },
+      { itemId: 'raw_bog_eel', weight: 36 },
+      { itemId: 'soggy_boot', weight: 1 },
+      { itemId: 'tangled_weed', weight: 1 },
+      { itemId: 'glimmerfin_koi', weight: 6 },
+      { itemId: 'raw_deepbarb_catfish', weight: 5 },
+      { itemId: 'raw_hollowgill_sturgeon', weight: 2 },
+      { itemId: null, weight: 4 },
+    ],
+    thornpeak_heights: [
+      { itemId: 'raw_frostgill_trout', weight: 45 },
+      { itemId: 'raw_stonescale_carp', weight: 35 },
+      { itemId: 'tangled_weed', weight: 1 },
+      { itemId: 'glimmerfin_koi', weight: 6 },
+      { itemId: 'raw_deepbarb_catfish', weight: 5 },
+      { itemId: 'raw_hollowgill_sturgeon', weight: 2 },
+      { itemId: null, weight: 6 },
+    ],
+  },
+  // Band 5 (proficiency 200 with the tier-6 clockreel): the Stillmere Salmon,
+  // the rarest catch in the game at one cast in a hundred, and the keystone of
+  // the cooking-125 capstone. It shares its weight with the empty hook in the
+  // Vale, which is the plainest way to say what a band-5 angler is fishing for.
+  {
+    eastbrook_vale: [
+      { itemId: 'raw_mirror_trout', weight: 50 },
+      { itemId: 'raw_river_perch', weight: 34 },
+      { itemId: 'tangled_weed', weight: 1 },
+      { itemId: 'glimmerfin_koi', weight: 6 },
+      { itemId: 'raw_deepbarb_catfish', weight: 5 },
+      { itemId: 'raw_hollowgill_sturgeon', weight: 2 },
+      { itemId: 'raw_stillmere_salmon', weight: 1 },
+      { itemId: null, weight: 1 },
+    ],
+    mirefen_marsh: [
+      { itemId: 'raw_marsh_pike', weight: 46 },
+      { itemId: 'raw_bog_eel', weight: 36 },
+      { itemId: 'soggy_boot', weight: 1 },
+      { itemId: 'tangled_weed', weight: 1 },
+      { itemId: 'glimmerfin_koi', weight: 6 },
+      { itemId: 'raw_deepbarb_catfish', weight: 5 },
+      { itemId: 'raw_hollowgill_sturgeon', weight: 2 },
+      { itemId: 'raw_stillmere_salmon', weight: 1 },
+      { itemId: null, weight: 2 },
+    ],
+    thornpeak_heights: [
+      { itemId: 'raw_frostgill_trout', weight: 46 },
+      { itemId: 'raw_stonescale_carp', weight: 35 },
+      { itemId: 'tangled_weed', weight: 1 },
+      { itemId: 'glimmerfin_koi', weight: 6 },
+      { itemId: 'raw_deepbarb_catfish', weight: 5 },
+      { itemId: 'raw_hollowgill_sturgeon', weight: 2 },
+      { itemId: 'raw_stillmere_salmon', weight: 1 },
+      { itemId: null, weight: 4 },
+    ],
+  },
 ];
 
 // The band-0 tables, kept under the original export name so existing
@@ -3418,6 +3648,41 @@ export const FISHING_TABLES: Record<string, FishingEntry[]> = FISHING_TABLES_BY_
 
 // The rare catch worth a celebratory shout in the combat log.
 export const FISHING_RARE_ID = 'glimmerfin_koi';
+
+/**
+ * The catch each band INTRODUCES, or null where a band introduces none.
+ *
+ * DERIVED, never hand-listed: a band introduces an id when that id appears in
+ * the band's cells and in none below it. Bands 0 to 2 introduce nothing (every
+ * shipped catch is already on the band-0 table; the bands move WEIGHT, not
+ * membership), and each of the three high bands introduces exactly one.
+ *
+ * IT EXISTS FOR THE ROD TOOLTIP (masterwrought Phase 11i). Bands 3, 4 and 5 all
+ * gate at proficiency 200, so a tooltip that quotes only the skill threshold
+ * says "at fishing skill 200 and above" for three different rods, which is the
+ * exact defect the rod block in this file already documents against itself: a
+ * line true of the rod BELOW telling the owner of a crafted rod they bought
+ * something they already had. Naming the catch is what makes each rung's line
+ * say something only that rung can say.
+ */
+export const FISHING_BAND_INTRODUCED_CATCH: readonly (string | null)[] = FISHING_TABLES_BY_BAND.map(
+  (byZone, band) => {
+    const below = new Set<string>();
+    for (let b = 0; b < band; b++) {
+      for (const rows of Object.values(FISHING_TABLES_BY_BAND[b])) {
+        for (const row of rows) if (row.itemId) below.add(row.itemId);
+      }
+    }
+    const introduced = new Set<string>();
+    for (const rows of Object.values(byZone)) {
+      for (const row of rows) if (row.itemId && !below.has(row.itemId)) introduced.add(row.itemId);
+    }
+    // At most one per band by authoring rule; more than one is a content error
+    // the pin in tests/professions_fishing.test.ts reds on, and this read
+    // deliberately does not paper over it by picking a winner.
+    return introduced.size === 1 ? [...introduced][0] : null;
+  },
+);
 
 // Every raw fishing catch that is a cooking (and rod-ladder) reagent, never
 // edible. Pure id set for useItem refuse, material/UI reuse (Phase 2 labels
@@ -3431,6 +3696,13 @@ export const RAW_COOKING_CATCH_IDS: ReadonlySet<string> = new Set([
   'raw_frostgill_trout',
   'raw_stonescale_carp',
   'glimmerfin_koi',
+  // The three high-band catches (masterwrought Phase 11i). Membership here is
+  // what refuses eating one raw and what makes the material labels and icons
+  // resolve; leaving one out would ship a fish the useItem path treats as
+  // ordinary junk.
+  'raw_deepbarb_catfish',
+  'raw_hollowgill_sturgeon',
+  'raw_stillmere_salmon',
 ]);
 
 /** True when `itemId` is a raw fishing catch (cooking reagent, refuse-use). */

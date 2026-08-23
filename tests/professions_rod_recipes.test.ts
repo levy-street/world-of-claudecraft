@@ -8,6 +8,7 @@
 // the fishing ladder's own invariant instead of widening that one into a
 // disjunction both could satisfy for different reasons.
 import { describe, expect, it } from 'vitest';
+import { isRodFeeRecipe } from '../server/fishing_telemetry';
 import { DELVE_SHOPS } from '../src/sim/content/delves/shop';
 import { HEROIC_VENDOR_STOCK } from '../src/sim/content/heroic_vendor';
 import {
@@ -29,10 +30,12 @@ const rodTierOf = (itemId: string): number | undefined => {
 };
 
 describe('the crafted rod ladder', () => {
-  it('is exactly the two rungs above the vendor rods, each producing the next tier up', () => {
-    expect(ROD_RECIPES).toHaveLength(2);
+  it('is exactly the three rungs above the vendor rods, each producing the next tier up', () => {
+    // THREE since masterwrought Phase 11i: the apex rung at tier 6, the only
+    // tier-6 gathering tool in the game.
+    expect(ROD_RECIPES).toHaveLength(3);
     const producedTiers = ROD_RECIPES.map((r) => rodTierOf(r.resultItemId));
-    expect(producedTiers).toEqual([4, 5]);
+    expect(producedTiers).toEqual([4, 5, 6]);
     for (const recipe of ROD_RECIPES) {
       expect(recipe.professionId).toBe('engineering');
       expect(recipe.stationType).toBe('toolworks');
@@ -50,7 +53,7 @@ describe('the crafted rod ladder', () => {
       expect(rodReagents[0].count).toBe(1);
       checked += 1;
     }
-    expect(checked).toBe(2);
+    expect(checked).toBe(3);
   });
 
   it('every rung consumes a catch, and no rung consumes a fine grade', () => {
@@ -71,7 +74,9 @@ describe('the crafted rod ladder', () => {
         ).toBeUndefined();
       }
     }
-    expect(catchReagents).toBe(3);
+    // SIX since masterwrought Phase 11i: the apex rung takes three catch rows
+    // of its own (koi, sturgeon, salmon) on top of the shipped three.
+    expect(catchReagents).toBe(6);
   });
 
   it('the tier-5 rung is HARD self-gated: its catch cannot be landed without the rung below', () => {
@@ -122,29 +127,55 @@ describe('the crafted rod ladder', () => {
       expect(row?.weight).toBeGreaterThan(0);
       bandsWhereLandable += 1;
     }
-    expect(bandsWhereLandable).toBe(3);
+    // SIX bands since masterwrought Phase 11i, and the koi is on every one of
+    // them: the claim is that the tier-4 rung is PACED rather than gated, which
+    // needs the koi landable at every band, not merely at three of them.
+    expect(bandsWhereLandable).toBe(6);
   });
 
-  it('both rungs are trainer-taught, at a skill a learner can actually reach', () => {
+  it('every rung is learnable, and the fee metric is protected by the vocabulary now', () => {
     // The pre-training id list is frozen, so anything authored after that
     // switch has to be learned. That makes the skill requirement load-bearing
-    // in a way it is not for the grandfathered land tools: a trainer only
-    // teaches a recipe whose TIER the learner has reached, so a requirement
-    // above the craft's own cap is unlearnable rather than merely expensive.
+    // in a way it is not for the grandfathered land tools: BOTH channels run
+    // the same tier gate (teachTierMet for a trainer, the 'tier' deny arm for a
+    // pattern), so a requirement above the craft's own cap is unlearnable
+    // rather than merely expensive, whichever way it is taught.
+    //
+    // THE TRAINER-ONLY CLAUSE IS RETIRED, and what replaced it is stronger.
+    // This arm used to demand acquisition ['trainer'] on every rung, naming the
+    // rodFeePaid metric as the reason: that counter fires on `trainResult ok`
+    // for any id in ROD_FEE_RECIPE_IDS, and a pattern learn also emits
+    // `trainResult ok` having charged nothing. masterwrought Phase 11i's apex
+    // rung is drop-taught by ruling (R8: an apex rung reaches players through
+    // the pillars), so the protection moved to where it belongs, the
+    // VOCABULARY: ROD_FEE_RECIPE_IDS now filters ROD_RECIPES to the
+    // trainer-taught rows, so isRodFeeRecipe refuses a drop-taught rung by
+    // construction. Pinned here as well as in tests/fishing_telemetry.ts,
+    // because this is the file that made the promise.
     const cap = craftMaxSkillFor('engineering');
     for (const recipe of ROD_RECIPES) {
-      expect(
-        recipe.acquisition,
-        `${recipe.id} acquisition: must stay trainer-only, or the rodFeePaid ` +
-          'metric in server/game.ts stops being a payment count (a drop-taught ' +
-          'rod would count pattern learns that charged no fee)',
-      ).toEqual(['trainer']);
       expect(
         tierForSkill(recipe.skillReq),
         `${recipe.id} skillReq ${recipe.skillReq} is above the reachable tier`,
       ).toBeLessThanOrEqual(tierForSkill(cap));
+      const dropTaught = (recipe.acquisition ?? []).includes('drop');
+      expect(
+        isRodFeeRecipe(recipe.id),
+        `${recipe.id}: the fee counter must count trainer rungs and refuse drop-taught ones, ` +
+          'or rodFeePaid in server/game.ts stops being a payment count',
+      ).toBe(!dropTaught);
     }
-    expect(ROD_RECIPES.map((r) => r.skillReq)).toEqual([75, 125]);
+    // Both channels are live on this ladder, so the arm above is not one branch
+    // with a dead sibling.
+    expect(ROD_RECIPES.map((r) => r.acquisition?.join('+'))).toEqual([
+      'trainer',
+      'trainer',
+      'drop',
+    ]);
+    expect(ROD_RECIPES.map((r) => r.skillReq)).toEqual([75, 125, 125]);
+    // The two rungs at 125 are the reason the fee split cannot be read off the
+    // rung: only the CHANNEL separates them.
+    expect(new Set(ROD_RECIPES.filter((r) => r.skillReq === 125).map((r) => r.id)).size).toBe(2);
     // The trap this guards, stated as the arithmetic rather than as prose:
     // the shipped land tier-5 recipes sit at 150, which resolves ABOVE the
     // cap's tier, and they only work because they predate training.
@@ -200,17 +231,50 @@ describe('the crafted rod ladder', () => {
     }
   });
 
-  it('both rods ARE reachable without engineering, priced in Marks', () => {
+  it('EVERY rod is reachable without engineering, and each names its own route', () => {
     // The other half of the restated claim. "Craft-only" stopped being true
     // when the delve counter gained a Marks route, and a guard that only ever
     // says where a thing is absent cannot notice that its one source vanished.
+    //
+    // THE ROUTES DIVERGED AT masterwrought Phase 11i, so the arm names which
+    // one each rung has rather than asserting one shape over a ladder that no
+    // longer has one. The two shipped rungs keep their delve Marks rows. The
+    // apex rung deliberately has none (content/delves/shop.ts records why:
+    // pricing a tier-6 rung means inventing a Marks number and a gate above
+    // heroicClear), and its non-crafter route is the WORLD MARKET, which R18
+    // requires of it anyway because the rod is the gate on catch band 5: a
+    // bound apex rod would make having TAKEN engineering a precondition for a
+    // FISHING band. Both routes are pinned POSITIVELY, which is the property
+    // this arm exists for.
     const delveRows = Object.values(DELVE_SHOPS).flat();
+    let marksRouted = 0;
+    let marketRouted = 0;
     for (const recipe of ROD_RECIPES) {
+      const def = ITEMS[recipe.resultItemId];
+      // No copper price on any rod def, whichever route it takes.
+      expect(def.buyValue, recipe.resultItemId).toBeUndefined();
       const row = delveRows.find((e) => e.itemId === recipe.resultItemId);
-      expect(row, `${recipe.resultItemId} needs a non-crafter route`).toBeDefined();
-      expect(row?.marks).toBeGreaterThan(0);
-      // Marks, and still no copper price on the def itself.
-      expect(ITEMS[recipe.resultItemId].buyValue).toBeUndefined();
+      if (row) {
+        expect(row.marks, recipe.resultItemId).toBeGreaterThan(0);
+        marksRouted += 1;
+        continue;
+      }
+      // The market route, asserted as the ABSENCE of the two flags that would
+      // close it plus the presence of a tradable def. This is R18 for the apex
+      // rung, so it is a rule rather than a fallback.
+      expect(def, recipe.resultItemId).toBeDefined();
+      expect(def.soulbound ?? false, `${recipe.resultItemId} must stay tradable`).toBe(false);
+      expect(def.noMarketList ?? false, `${recipe.resultItemId} must stay listable`).toBe(false);
+      marketRouted += 1;
+    }
+    // Both arms live, and the split is the one the ruling describes.
+    expect([marksRouted, marketRouted]).toEqual([2, 1]);
+    // Every rod is listable, not just the one that depends on it: a Marks-routed
+    // rung losing its tradability would be a silent R18 regression the branch
+    // above would never reach.
+    for (const recipe of ROD_RECIPES) {
+      expect(ITEMS[recipe.resultItemId].noMarketList ?? false, recipe.resultItemId).toBe(false);
+      expect(ITEMS[recipe.resultItemId].soulbound ?? false, recipe.resultItemId).toBe(false);
     }
   });
 });

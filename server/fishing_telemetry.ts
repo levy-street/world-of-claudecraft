@@ -43,10 +43,15 @@
 // so every zone the sim can put on a fishing event is a member of this list.
 //
 // CARDINALITY IS BOUNDED BY CONSTRUCTION, the same contract as
-// server/http/game_signals.ts: zones x bands is 3 x 6 per fishing family
-// (masterwrought Phase 11i grew the catch ladder from three bands to six; it
-// was 3 x 3) and the rod-fee family is the three shipped rod recipes, up from
-// two with 11i's apex rung. Nothing per-player
+// server/http/game_signals.ts: the fishing families are ZONES x BANDS, which is
+// HARVEST_BANDS (14 zones) x 6 bands = 84 pre-seeded series per counter since
+// masterwrought Phase 11i grew the catch ladder from three bands to six. The
+// old wording here said "3 x 3", which understated the zone term even before
+// 11i: only THREE zones have fishable water, but the exporter pre-seeds the
+// full zone vocabulary so a band that never fires reads as a real zero rather
+// than a gap (tests/server/http/game_metrics.test.ts derives the cross product
+// rather than restating it). The rod-fee family is the TRAINER-taught rod
+// recipes, still two after 11i added a third, drop-taught rung. Nothing per-player
 // (account id, character id, name, ip) is ever a label, and the exporter's
 // membership guards drop anything off these lists rather than minting a series
 // for it.
@@ -92,22 +97,32 @@ export function fishingBandLabel(band: FishingCatchBand): FishingBandLabel {
 }
 
 /**
- * The rod recipes whose training fee is counted, derived from the rod recipe
- * list so the label set cannot drift from the shipped rods. THREE rows since
- * masterwrought Phase 11i, and the derivation is what made that free: the two
- * trainer-taught rods (recipe_stormreel_fishing_rod at skillReq 75 and
- * recipe_tidewrought_fishing_rod at 125) plus the apex rung.
+ * The rod recipes whose training fee is counted: the rod recipe list filtered
+ * to the rows a TRAINER actually teaches. Two today
+ * (recipe_stormreel_fishing_rod at skillReq 75 and
+ * recipe_tidewrought_fishing_rod at 125), out of a three-rung ladder.
  *
- * THE APEX RUNG IS DROP-TAUGHT, so its fee series is pre-seeded and stays at
- * zero forever: nobody trains a pattern-taught recipe, and trainingFeeFor is a
- * pure tier lookup that answers for any recipe whether or not a trainer would
- * ever quote it. A permanently-zero series is the honest reading here rather
- * than a hole: the family is "what a rod rung costs at a trainer", and the
- * answer for a drop-taught rung is nothing, which is exactly what a reader
- * comparing the three rungs needs to see.
+ * THE FILTER IS THE FEE-BEARING DISCRIMINATOR the emission site in
+ * server/game.ts asks for, and masterwrought Phase 11i is what forced it. That
+ * site counts a `trainResult ok` for any id this list contains, and its own
+ * comment recorded the condition precisely: the counter is a PAYMENT count only
+ * while no rod recipe carries 'drop' acquisition, because a pattern-item learn
+ * emits `trainResult ok` having charged nothing. 11i's apex rung is
+ * drop-taught, so an unfiltered list would have counted every pattern learn of
+ * it as a fee paid and quietly turned the metric into a learn count.
+ *
+ * FILTERING THE VOCABULARY rather than adding a second check at the emit site
+ * is deliberate: it makes `isRodFeeRecipe` correct by construction, so the one
+ * predicate every consumer already calls carries the rule, and a future
+ * drop-taught rung joins the exemption by existing. A rung that is BOTH
+ * trainer-taught and pattern-taught would still need a real per-event
+ * discriminator; nothing in the ladder is, and this is the arm that would have
+ * to change if one ever were.
  */
 export const ROD_FEE_RECIPE_IDS: readonly string[] = Object.freeze(
-  ROD_RECIPES.map((recipe) => recipe.id),
+  ROD_RECIPES.filter((recipe) => !(recipe.acquisition ?? []).includes('drop')).map(
+    (recipe) => recipe.id,
+  ),
 );
 
 /** The static training fee in copper for each rod recipe, derived once from content.
@@ -116,7 +131,10 @@ export const ROD_FEE_RECIPE_IDS: readonly string[] = Object.freeze(
  *  from a client-driven command, and a plain-object lookup would resolve
  *  'toString' or 'constructor' to an inherited function. */
 const ROD_FEE_BY_RECIPE: ReadonlyMap<string, number> = new Map(
-  ROD_RECIPES.map((recipe) => [recipe.id, trainingFeeFor(recipe)]),
+  ROD_RECIPES.filter((recipe) => !(recipe.acquisition ?? []).includes('drop')).map((recipe) => [
+    recipe.id,
+    trainingFeeFor(recipe),
+  ]),
 );
 
 /** Whether a trained recipe id is one of the rod recipes the fee counter tracks. */

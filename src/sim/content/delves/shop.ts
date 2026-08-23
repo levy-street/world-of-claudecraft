@@ -126,6 +126,32 @@ const DROWNED_LITANY_SHOP: DelveShopEntry[] = [
   // ships the first tier-4 node or water (the post-level-20 zone expansion)
   // turns these into ACCESS items: re-derive both Marks prices and the wield
   // table in that SAME change, not after.
+  //
+  // THE TRIGGER'S PREMISE IS HALF-FALSE SINCE masterwrought Phase 11i, and it
+  // fired by a route the wording did not anticipate. No tier-4 node or water
+  // shipped; the zone tiers are untouched. What changed is the CATCH LADDER:
+  // it went from three bands to six on the shipped band-b-takes-tier-b-plus-1
+  // gate, so the stormreel now opens catch band 3 and the tidewrought band 4.
+  // For the two ROD rows below, "a tier-4/5 tool opens no content" is simply no
+  // longer true, and 24 and 56 Marks are now ACCESS prices rather than comfort
+  // prices. The three LAND rows at each rung are unaffected: no node tier
+  // moved. Re-deriving the two rod prices is a delve-economy decision with no
+  // ruling behind it, so this phase records the invalidation and leaves the
+  // numbers alone rather than inventing two; flagged for the maintainer in
+  // state.md.
+  //
+  // THE TIER-6 APEX ROD IS DELIBERATELY ABSENT, the second such absence after
+  // osmium_hoe and on the same footing (a recorded later decision, not an
+  // oversight). Three reasons, and the first is the one that matters: pricing a
+  // tier-6 rung here means inventing a Marks number and a gate above
+  // heroicClear, which is the highest gate the vocabulary has, and this packet
+  // does not invent balance numbers. Second, the rung needs no bad-luck
+  // backstop: its SCHEMATIC is deterministic Heroic Marks stock and the rod
+  // itself is market-listable, so nothing in its chain is luck-gated, which is
+  // what a Marks route exists to answer. Third, the rod prices above are
+  // themselves now under the re-check the paragraph above describes, so adding
+  // a third rung to a ladder whose lower rungs are pending re-derivation would
+  // bake in the same stale premise one rung higher.
   { itemId: 'thorium_mining_pick', marks: 24, gate: 'clears:3' },
   { itemId: 'ashwood_axe', marks: 24, gate: 'clears:3' },
   { itemId: 'goldleaf_sickle', marks: 24, gate: 'clears:3' },

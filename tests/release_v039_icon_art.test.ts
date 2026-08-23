@@ -459,7 +459,11 @@ describe('release v0.39 icon-art second-pass lineage', () => {
     // four-rung hoe ladder (use.type 'gatherTool'). Re-derived unchanged on
     // the merged tree at the farming absorb (Phase 11d); grows as 11e
     // through 11k park ids.
-    expect(pendingHotbarItemIds, 'ITEM_ART_PENDING hotbar items').toHaveLength(16);
+    // 19 at Phase 11i: the apex rod (use.type 'gatherTool') and the two plain
+    // fish dishes (kind 'food') join the hotbar debt. The three catches, the
+    // feast and the four patterns are not hotbar items, so the park grew by
+    // eleven while THIS term grew by three.
+    expect(pendingHotbarItemIds, 'ITEM_ART_PENDING hotbar items').toHaveLength(19);
     expect(
       pendingHotbarItemIds.filter((id) => shippingImageExists(`/ui/items/${id}.webp`)),
       'no pending hotbar item ships committed art (a stale ITEM_ART_PENDING entry)',

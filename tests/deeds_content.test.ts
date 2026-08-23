@@ -75,7 +75,7 @@ const PREFIX_CATEGORY: Record<string, DeedCategory> = {
 };
 
 describe('audited launch totals (literals: update deliberately with the catalog)', () => {
-  it('ships exactly 287 deeds worth 3275 total Renown', () => {
+  it('ships exactly 288 deeds worth 3285 total Renown', () => {
     // Release base (262 / 3145 after the WARFARE lifetime-honor ladder) plus
     // four Reliquary Curator rank bridges and the five Phase 18 completion
     // ladder deeds (all nine renown 0: catalog prestige never scores the
@@ -92,9 +92,9 @@ describe('audited launch totals (literals: update deliberately with the catalog)
     // luck rule, prog_farming_100 at the profession-100 family value of 10,
     // so +35 Renown in all), plus Phase 11e's roster deed col_farm_roster
     // (renown 5, the gathering ladder's first-rung point), which is what takes
-    // this to 287 / 3275.
-    expect(DEED_ORDER.length).toBe(287);
-    expect(ALL.reduce((sum, d) => sum + d.renown, 0)).toBe(3275);
+    // this to 288 / 3285.
+    expect(DEED_ORDER.length).toBe(288);
+    expect(ALL.reduce((sum, d) => sum + d.renown, 0)).toBe(3285);
   });
 
   it('ships the audited per-category counts', () => {
@@ -116,7 +116,7 @@ describe('audited launch totals (literals: update deliberately with the catalog)
       chronicle: 53,
       // +4 Reliquary Curator rank bridges and +5 Phase 18 completion ladder
       // deeds on top of the release collection set, +1 col_golden_harvest.
-      collection: 39,
+      collection: 40,
       // Release's Thornhollow battlegrounds plus the WARFARE honor ladder.
       pvp: 35,
       social: 18,
@@ -267,6 +267,12 @@ describe('audited launch totals (literals: update deliberately with the catalog)
       'prog_inscription_50',
       'prog_grandmaster_inscription',
       // The farming celebration deeds (D13): the first-planting proof, the
+      // masterwrought Phase 11i's one deed, ahead of the farming block because
+      // that block stays last and contiguous under the packet's three-tier
+      // ordering. The angler's endgame ships exactly ONE row, deliberately: the
+      // per-profession gathering ladder is complete at 5 / 10 / 25 and no
+      // profession has a rung at 50 or 150.
+      'col_deepest_cast',
       // four per-hub first-harvest chronicles, the golden-harvest rare find,
       // and the Farming 100 milestone with the Harvestmaster title.
       'prog_first_planting',
@@ -746,7 +752,12 @@ describe('frozen trigger + renown catalog (design rule 9: never retro-edit a tri
   // every non-feat non-hidden deed, so appending a deed necessarily widens that
   // capstone's trigger. That is the documented dynamic-meta design rather than
   // a rule-9 retro-edit; no AUTHORED trigger or renown value was touched.
-  const FROZEN_CATALOG_SHA256 = '0e23ee2e93c0a1bc05e9d8ff284fe4eb27506351ee17f56417bbed6391a78339';
+  // Re-baselined at masterwrought Phase 11i for the appended col_deepest_cast.
+  // An APPEND is the sanctioned reason to move this hash; no shipped trigger or
+  // renown value was touched, and the row was inserted ahead of the farming
+  // block rather than at the literal tail so that block stays contiguous, which
+  // moves DEED_ORDER's tail positions but no authored trigger.
+  const FROZEN_CATALOG_SHA256 = '2b6e36a45825f84c5037d8427c2e9ce0fca9300d7161278a8e05dfa61a4375be';
 
   it('every shipped deed keeps its trigger and renown unchanged', () => {
     const canonical = JSON.stringify(

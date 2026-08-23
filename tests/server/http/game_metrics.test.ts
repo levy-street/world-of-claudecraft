@@ -807,10 +807,12 @@ describe('registerGameStateMetrics: fishing telemetry counters', () => {
     // who never appears in a band must read as a real zero, not as a gap.
     const text = await registry.metrics();
 
-    expect([...FISHING_BANDS]).toEqual(['0', '1', '2']);
+    // SIX since masterwrought Phase 11i grew the catch ladder.
+    expect([...FISHING_BANDS]).toEqual(['0', '1', '2', '3', '4', '5']);
     const combos = HARVEST_BANDS.length * FISHING_BANDS.length;
-    // 14 zones x 3 bands since the v0.32.0 expansion (was 3 x 3 = 9).
-    expect(combos).toBe(42);
+    // 14 zones x 6 bands since masterwrought Phase 11i grew the catch ladder
+    // (was 14 x 3 = 42 after the v0.32.0 expansion, and 3 x 3 = 9 before it).
+    expect(combos).toBe(84);
     for (const name of FISHING_COUNTER_NAMES) {
       for (const zone of HARVEST_BANDS) {
         for (const band of FISHING_BANDS) {
@@ -961,7 +963,12 @@ describe('registerGameStateMetrics: fishing telemetry counters', () => {
     // A dropped sample must not have moved a real series on the way out: an
     // off-vocabulary BAND with a real zone is the arm most likely to leak.
     for (const name of FISHING_COUNTER_NAMES) {
-      expect(fishingSeries(text, name), name).toHaveLength(42);
+      // 14 zones x 6 bands, doubled from 42 by the ladder growing to six bands
+      // at masterwrought Phase 11i. The zone term is the whole HARVEST_BANDS
+      // vocabulary, not the three zones with fishable water: the exporter
+      // pre-seeds the full cross product so a band that never fires reads as a
+      // real zero rather than a gap.
+      expect(fishingSeries(text, name), name).toHaveLength(84);
       for (const zone of HARVEST_BANDS) {
         for (const band of FISHING_BANDS) {
           expect(fishingValue(text, name, zone, band), `${name} ${zone} ${band}`).toBe('0');

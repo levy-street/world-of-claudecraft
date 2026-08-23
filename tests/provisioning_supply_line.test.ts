@@ -203,23 +203,28 @@ function cropFamily(itemId: string): string {
 }
 
 describe('masterwrought R17: fish dishes stay fish-forward', () => {
-  it('the shipped raw-catch set is exactly these seven', () => {
+  it('the shipped raw-catch set is exactly these ten', () => {
     // THE FISH SET COMES FROM THE SHIPPED CONTENT EXPORT, not a copy, so this
     // and the list tests/recipe_economy.test.ts sweeps cannot diverge: both rest
     // on RAW_COOKING_CATCH_IDS.
     //
     // ITS OWN ARM ON PURPOSE. This membership pin is a literal, so Phase 11i
-    // (which owns fishing) will have to edit it when it adds a catch. Keeping it
-    // out of the fish-forward arm means that edit reds THIS line rather than
-    // making the mechanic arm look broken. The SWEEPS below need no edit: a new
-    // catch joins them by existing.
+    // (which owns fishing) had to edit it when it added its catches. Keeping it
+    // out of the fish-forward arm meant that edit reddened THIS line rather
+    // than making the mechanic arm look broken, and that is exactly what
+    // happened: the three high-band catches below arrived here and nowhere
+    // else. The SWEEPS below needed no edit at all; a new catch joins them by
+    // existing, which is the property this split was for.
     expect([...RAW_COOKING_CATCH_IDS].sort()).toEqual([
       'glimmerfin_koi',
       'raw_bog_eel',
+      'raw_deepbarb_catfish',
       'raw_frostgill_trout',
+      'raw_hollowgill_sturgeon',
       'raw_marsh_pike',
       'raw_mirror_trout',
       'raw_river_perch',
+      'raw_stillmere_salmon',
       'raw_stonescale_carp',
     ]);
   });
@@ -734,14 +739,31 @@ describe('masterwrought R17 RULE 2: the accent rule', () => {
     //
     // THE COST GREW AT masterwrought Phase 11h, from FIVE entries across THREE
     // shipped rows to NINE across SEVEN, and the phase surfaced that rather than
-    // quietly re-pinning it. The four new ones are all APEX rows: each of the
-    // three role plates takes a tier-3 crop worth 30 against a count reference
+    // quietly re-pinning it. The four new ones were all APEX rows: each of the
+    // three role plates took a tier-3 crop worth 30 against a count reference
     // of 16 (game_meat 4), and recipe_laden_hearth's fine_evergarden_greens is
     // worth 320 against a reference of 80 (prime_cut 4). Everything the flasks
     // and the alchemy capstone added clears BOTH readings, because those bills
     // are priced by sunpetal_herb at the same count that carries the reference.
-    // So the open decision is now a known edit to seven shipped rows, four of
-    // them settled by 11h-GATE-A, -B and -D.
+    //
+    // THEN IT SHRANK AT masterwrought Phase 11i, nine entries across seven rows
+    // back to SIX across FOUR, and the shrink was a SIDE EFFECT rather than an
+    // intent, which is exactly why it is written down here. 11i appended a
+    // uniform Raw Deepbarb Catfish row at count 4 to the three role plates.
+    // Four TIES game_meat's 4, which was the plates' count reference, and this
+    // arm's tie-break takes the most permissive tied reagent, so the reference
+    // moves from game_meat's 16 to the catfish's 56 and the tier-3 crop at 30
+    // now clears the count reading it used to fail. Nothing about the crops
+    // moved; a non-produce reagent arrived beside them and changed what they
+    // are measured against.
+    //
+    // THE OPEN DECISION IS THEREFORE CHEAPER THAN 11h COSTED IT, and that is
+    // the finding: adopting the count reading is now an edit to FOUR shipped
+    // rows, not seven, and none of the three plates 11h-GATE-A and -B settled
+    // is among them any more. It also means the cost is not monotone: a later
+    // phase adding a high-count non-produce reagent to a row can retire a
+    // refusal without touching a crop, so this list must be re-measured
+    // whenever any governed bill changes, never carried forward.
     const refusedUnderCountReading: string[] = [];
     for (const recipe of accentGovernedRows()) {
       const nonProduce = recipe.reagents.filter((g) => !PRODUCE_IDS.has(g.itemId));
@@ -781,17 +803,34 @@ describe('masterwrought R17 RULE 2: the accent rule', () => {
       'recipe_laden_hearth/fine_evergarden_greens',
       'recipe_marlows_grand_roast/frost_gourd',
       'recipe_marlows_grand_roast/highland_barley',
-      'recipe_sageleaf_chowder/thornpeak_cabbage',
       'recipe_seasoned_stock/bog_beet',
       'recipe_seasoned_stock/marsh_rice',
-      'recipe_stonepot_stew/frost_gourd',
-      'recipe_warspice_skewers/highland_barley',
     ];
     expect(refusedUnderCountReading.sort()).toEqual(REFUSED_UNDER_COUNT_READING);
     expect(
       new Set(REFUSED_UNDER_COUNT_READING.map((k) => k.split('/')[0])).size,
       'shipped rows the count reading would force an edit to',
-    ).toBe(7);
+    ).toBe(4);
+    // THE THREE PLATES ARE PINNED OUT, not merely absent. An entry leaving this
+    // list is the interesting direction (it makes the open decision look
+    // cheaper), so the mechanism that retired them is asserted rather than
+    // trusted: the catfish ties game_meat on count and beats it on value, which
+    // is the whole reason the crops now clear.
+    for (const plate of [
+      'recipe_stonepot_stew',
+      'recipe_warspice_skewers',
+      'recipe_sageleaf_chowder',
+    ]) {
+      const bill = requireRecipe(plate).reagents;
+      const meat = bill.find((g) => g.itemId === 'game_meat');
+      const fish = bill.find((g) => g.itemId === 'raw_deepbarb_catfish');
+      expect(fish?.count, `${plate} fish count ties the old reference`).toBe(meat?.count);
+      expect(
+        (fish?.count ?? 0) * reagentUnitValue('raw_deepbarb_catfish'),
+        `${plate} fish value beats the old reference`,
+      ).toBeGreaterThan((meat?.count ?? 0) * reagentUnitValue('game_meat'));
+      expect(refusedUnderCountReading.some((k) => k.startsWith(`${plate}/`))).toBe(false);
+    }
     // And the shipped reading accepts every one of them, so the two really do
     // disagree rather than this list being an artifact of how it was computed.
     for (const key of refusedUnderCountReading) {
@@ -823,10 +862,18 @@ describe('masterwrought R18 and farming D24: the displacement guard', () => {
         0,
       );
     }
+    // RE-MEASURED AT masterwrought Phase 11i, and the direction is the whole
+    // point: every total ROSE or held, none fell. 11i adds three cooking rows
+    // that consume herbs (goldleaf 2 on the rung-75 dish, sunpetal 2 on the
+    // rung-100 dish and 1 on the capstone feast) and reduces nothing anywhere,
+    // so goldleaf goes 27 to 29 and sunpetal 39 to 42 while silverleaf holds.
+    // The claim this arm makes has never been "the numbers do not move"; it is
+    // "herbalism loses nothing", and a total that only ever climbs is what says
+    // so.
     expect(totals).toEqual({
       silverleaf_herb: 28,
-      goldleaf_herb: 27,
-      sunpetal_herb: 39,
+      goldleaf_herb: 29,
+      sunpetal_herb: 42,
     });
   });
 
@@ -845,17 +892,42 @@ describe('masterwrought R18 and farming D24: the displacement guard', () => {
     };
     expect(totalFor(['game_meat']), 'the skinning meat line').toBe(28);
     expect(totalFor(['prime_cut']), 'the rare harvest specimen').toBe(12);
-    expect(totalFor(['cooking_salt']), 'the salt line').toBe(33);
-    expect(totalFor(RAW_COOKING_CATCH_IDS), 'the whole fishing line').toBe(30);
+    // 39 since masterwrought Phase 11i: its three cooking rows take salt 2 each.
+    expect(totalFor(['cooking_salt']), 'the salt line').toBe(39);
+    // 77 since 11i, which is the largest single move any line here has taken and
+    // is the phase's whole point: fishing fed only its own rod ladder before it.
+    expect(totalFor(RAW_COOKING_CATCH_IDS), 'the whole fishing line').toBe(77);
     // PER CATCH, NOT ONLY THE SUM (qr-11G-FISH, Phase 11g QA). The other three
     // lines above are single ids, so their totals ARE per-id and a reduction
     // cannot hide inside them. The fishing line is seven ids under one number,
     // which is the same gameability the per-row bills were added to close one
     // level down: cutting the marsh pike and adding a river perch keeps 30.
-    // Phase 11i owns fishing and will edit this map when it adds a catch, which
-    // is the wanted behavior and the reason RAW_COOKING_CATCH_IDS keeps its own
-    // membership arm rather than being folded in here.
+    // Phase 11i owned fishing and edited this map when it added its catches,
+    // which is the wanted behavior and the reason RAW_COOKING_CATCH_IDS keeps
+    // its own membership arm rather than being folded in here.
+    //
+    // WHAT 11i MOVED, AND THE DIRECTION IS THE CLAIM: every one of the six
+    // SHIPPED common catches holds its exact demand, glimmerfin_koi RISES from
+    // 6 to 8 (the apex rod rung takes two more), and the three new ids arrive.
+    // Not one number fell, which is R18's add-never-substitute stated as
+    // arithmetic over the whole merged table rather than per row.
     const perCatch: Record<string, number> = {
+      glimmerfin_koi: 8,
+      raw_bog_eel: 4,
+      raw_deepbarb_catfish: 26,
+      raw_frostgill_trout: 4,
+      raw_hollowgill_sturgeon: 13,
+      raw_marsh_pike: 2,
+      raw_mirror_trout: 1,
+      raw_river_perch: 2,
+      raw_stillmere_salmon: 6,
+      raw_stonescale_carp: 11,
+    };
+    // The pre-11i demands, spelled out so "nothing fell" is a checked claim
+    // rather than a reading of the map above. A later phase that trims a
+    // shipped catch to make room for a new one reds HERE, which is precisely
+    // the substitution the totals alone cannot see.
+    const DEMAND_BEFORE_11I: Record<string, number> = {
       glimmerfin_koi: 6,
       raw_bog_eel: 4,
       raw_frostgill_trout: 4,
@@ -864,6 +936,11 @@ describe('masterwrought R18 and farming D24: the displacement guard', () => {
       raw_river_perch: 2,
       raw_stonescale_carp: 11,
     };
+    for (const [id, before] of Object.entries(DEMAND_BEFORE_11I)) {
+      expect(perCatch[id], `${id} may never fall below its pre-11i demand`).toBeGreaterThanOrEqual(
+        before,
+      );
+    }
     for (const [id, count] of Object.entries(perCatch)) {
       expect(totalFor([id]), `${id} demand across the merged table`).toBe(count);
     }
@@ -872,7 +949,7 @@ describe('masterwrought R18 and farming D24: the displacement guard', () => {
     expect(
       Object.values(perCatch).reduce((t, n) => t + n, 0),
       'the per-catch map must account for the whole fishing line',
-    ).toBe(30);
+    ).toBe(77);
     expect(Object.keys(perCatch).sort(), 'every shipped catch is accounted for').toEqual(
       [...RAW_COOKING_CATCH_IDS].sort(),
     );

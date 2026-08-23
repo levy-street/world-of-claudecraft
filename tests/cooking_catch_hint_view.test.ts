@@ -24,7 +24,9 @@ function tooltipHtml(itemId: string): string {
 
 describe('cooking_catch_hint_view (pure keys)', () => {
   it('every raw cooking catch shares the one cooking-ingredient key', () => {
-    expect(RAW_COOKING_CATCH_IDS.size).toBe(7);
+    // TEN since masterwrought Phase 11i added its three high-band catches;
+    // they take the same one cooking-ingredient key by being catches.
+    expect(RAW_COOKING_CATCH_IDS.size).toBe(10);
     const keys = new Set([...RAW_COOKING_CATCH_IDS].map((id) => cookingCatchHintKey(id)));
     expect(keys.size).toBe(1);
     expect([...keys][0]).toBe(COOKING_CATCH_HINT_KEY);

@@ -707,7 +707,11 @@ describe('the session cap always outlasts a legal reel window', () => {
     const capTicks = Math.round(FISHING_SESSION_CAP_SEC / DT);
     // The cap side pinned to a literal: without it BOTH sides of the budget are
     // derived, and a trim to 14.5 s still satisfies every inequality below.
-    expect(capTicks, 'the session cap is 300 ticks').toBe(300);
+    // 320 since masterwrought Phase 11i: the tier-6 epic rung's 140-tick window
+    // on top of the pole's 160-tick worst bite plus the miss tick needs 301,
+    // one more than the old 300-tick cap gave. The derivation is in
+    // professions/fishing.ts beside FISH_REEL_WINDOW_RARITY_BONUS_SEC.
+    expect(capTicks, 'the session cap is 320 ticks').toBe(320);
     // ONE loop, over the rod held at the BITE. The bite delay is drawn against
     // the rod held at the CAST and the window is measured against the rod held
     // at the BITE, and since a better rod only ever SHORTENS the delay, the

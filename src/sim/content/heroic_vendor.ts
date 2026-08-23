@@ -185,6 +185,23 @@ export const HEROIC_VENDOR_STOCK: readonly HeroicVendorOffer[] = [
   { itemId: 'pattern_sageleaf_chowder', marks: 12 },
   { itemId: 'pattern_grand_cauldron', marks: 16 },
   { itemId: 'pattern_laden_hearth', marks: 16 },
+  // Masterwrought phase 11i: the angler's endgame patterns, on the same R8
+  // deterministic pillar as the eight above and for the same reason. The
+  // engineering schematic is here rather than in a drop table because the rod
+  // it teaches is the GATE on catch band 5: a luck-gated schematic would put a
+  // whole band of a gathering profession behind luck (R18), and
+  // docs/design/deeds.md would then also zero the Renown on the deed attached
+  // to it.
+  //
+  // PRICED BY THE RUNG EACH TEACHES, read off the two points this family
+  // already has rather than invented: 12 for the rung-75 and rung-100 cooking
+  // patterns (the ring point, where every skill-100 pattern sits) and 16 for
+  // the two rung-125 rows, the cooking capstone and the schematic (the neck
+  // point, where the skill-125 capstones sit). No third price point is minted.
+  { itemId: 'pattern_peppered_deepbarb_catfish', marks: 12 },
+  { itemId: 'pattern_roast_hollowgill_sturgeon', marks: 12 },
+  { itemId: 'pattern_deepwater_feast', marks: 16 },
+  { itemId: 'pattern_clockreel_fishing_rod', marks: 16 },
   // Masterwrought phase 11f: the farming valve. All SIX farming patterns and
   // every tier-3 and tier-4 SEED, on the wyrmfall_core precedent above ("a
   // bad-luck backstop ... never a farm that outpaces the boss faucet"), so

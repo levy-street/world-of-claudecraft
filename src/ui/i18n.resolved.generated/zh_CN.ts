@@ -3105,7 +3105,8 @@ export const zh_CN: EnTranslations = {
         "rodRequired": "钓鱼所需。",
         "rodBite": "鱼上钩最多可提前{seconds}秒。",
         "rodReel": "收线时限延长{seconds}秒。",
-        "rodBand": "钓鱼技能达到{skill}后可解锁更丰富的渔获。"
+        "rodBand": "钓鱼技能达到{skill}后可解锁更丰富的渔获。",
+        "rodBandCatch": "钓鱼技能达到{skill}后可解锁{fish}。"
       },
       "downgradeMark": "背包已满：这份收获未能留下采集者的印记。",
       "downgradeMarkCrop": "背包已满：这份收成未能留下种植者的印记。",
@@ -13042,6 +13043,39 @@ export const zh_CN: EnTranslations = {
       },
       "pattern_harvest_feast": {
         "name": "配方：丰收盛宴"
+      },
+      "raw_deepbarb_catfish": {
+        "name": "生深棘鲶鱼"
+      },
+      "raw_hollowgill_sturgeon": {
+        "name": "生空鳃鲟鱼"
+      },
+      "raw_stillmere_salmon": {
+        "name": "生静湖鲑鱼"
+      },
+      "clockreel_fishing_rod": {
+        "name": "齿轮轮钓竿"
+      },
+      "peppered_deepbarb_catfish": {
+        "name": "胡椒深棘鲶鱼"
+      },
+      "roast_hollowgill_sturgeon": {
+        "name": "烤空鳃鲟鱼"
+      },
+      "deepwater_feast": {
+        "name": "深水盛宴"
+      },
+      "pattern_peppered_deepbarb_catfish": {
+        "name": "配方：胡椒深棘鲶鱼"
+      },
+      "pattern_roast_hollowgill_sturgeon": {
+        "name": "配方：烤空鳃鲟鱼"
+      },
+      "pattern_deepwater_feast": {
+        "name": "配方：深水盛宴"
+      },
+      "pattern_clockreel_fishing_rod": {
+        "name": "图纸：齿轮轮钓竿"
       },
       "conjured_water4": {
         "name": "魔法泉水"

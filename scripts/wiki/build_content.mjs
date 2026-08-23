@@ -63,6 +63,7 @@ const entrySource = `
     CORPSE_HARVEST_RARITY_BASELINE,
   } from './src/sim/professions/gathering.ts';
   export { PROFICIENCY_BAND_THRESHOLDS } from './src/sim/professions/proficiency_bands.ts';
+  export { FISHING_CATCH_BAND_THRESHOLDS } from './src/sim/professions/fishing_bands.ts';
   export {
     FISH_BITE_DELAY_MIN_SEC, FISH_BITE_DELAY_MAX_SEC, FISH_BITE_DELAY_ROD_REDUCTION_SEC,
     FISH_REEL_WINDOW_SEC, FISH_REEL_WINDOW_ROD_BONUS_SEC, FISHING_GAIN_SCHEDULE,
@@ -172,6 +173,7 @@ const {
   MATERIAL_RARITY_SHARE,
   MATERIAL_RARITY_MAX_PROFICIENCY,
   CORPSE_HARVEST_RARITY_BASELINE,
+  FISHING_CATCH_BAND_THRESHOLDS,
   PROFICIENCY_BAND_THRESHOLDS,
   FISH_BITE_DELAY_MIN_SEC,
   FISH_BITE_DELAY_MAX_SEC,
@@ -969,9 +971,14 @@ const nodeRowsFor = (professionId) => {
   return [...byKey.values()].sort((a, b) => a.zone.localeCompare(b.zone) || a.tier - b.tier);
 };
 
+// The catch bands read FISHING's OWN ladder (masterwrought Phase 11i), never
+// the shared PROFICIENCY_BAND_THRESHOLDS. They were the same array until that
+// phase split them, and reading the shared one here would publish 200 for a
+// band gated at 150 and then run off the end of a three-element array for every
+// band above 2, emitting `undefined` into the wiki for the three new tables.
 const fishingBandTables = FISHING_TABLES_BY_BAND.map((byZone, band) => ({
   band,
-  minProficiency: PROFICIENCY_BAND_THRESHOLDS[band],
+  minProficiency: FISHING_CATCH_BAND_THRESHOLDS[band],
   rodTierRequired: band + 1,
   zones: Object.entries(byZone).map(([zoneId, rows]) => ({
     zone: zoneById(zoneId)?.name ?? zoneId,
@@ -989,7 +996,9 @@ const profGathering = GATHERING_PROFESSION_IDS.map((id) => {
     id,
     name: def.name,
     maxSkill: def.maxSkill,
-    bands: [...PROFICIENCY_BAND_THRESHOLDS],
+    // Fishing carries its own six-rung catch-band ladder since masterwrought
+    // Phase 11i; every land profession still reads the shared three-rung one.
+    bands: [...(id === 'fishing' ? FISHING_CATCH_BAND_THRESHOLDS : PROFICIENCY_BAND_THRESHOLDS)],
     tools: toolLadderFor(id),
   };
   if (id === 'fishing') {

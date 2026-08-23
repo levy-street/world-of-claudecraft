@@ -509,6 +509,10 @@ describe('chip reachability census: the All-only set, pinned', () => {
     'cracked_wyrm_scale',
     'dawnhold_posy',
     'deepfen_pearl',
+    // masterwrought Phase 11i's capstone feast, the same shape as harvest_feast
+    // below and All-only for the same reason: a placeable crafted junk-kind
+    // item whose click PLACES rather than uses or equips.
+    'deepwater_feast',
     'emberwing_cinderscale',
     'frayed_prayer_beads',
     'gleamstag_charm',
@@ -534,6 +538,10 @@ describe('chip reachability census: the All-only set, pinned', () => {
     // so bag-side All-only is a bag-window call, never lost findability.
     'pattern_barksong_handguards',
     'pattern_briarstep_jerkin',
+    // masterwrought Phase 11i's four: three angler recipes and the apex rod's
+    // schematic, All-only on the same kind-'recipe' rule as every pattern here.
+    'pattern_clockreel_fishing_rod',
+    'pattern_deepwater_feast',
     'pattern_duskforged_bulwark',
     'pattern_duskforged_warblade',
     'pattern_evergarden_braised_greens',
@@ -550,8 +558,10 @@ describe('chip reachability census: the All-only set, pinned', () => {
     'pattern_laden_hearth',
     'pattern_makers_charm',
     'pattern_masters_field_forge',
+    'pattern_peppered_deepbarb_catfish',
     'pattern_prismglass_loop',
     'pattern_ridgebreaker',
+    'pattern_roast_hollowgill_sturgeon',
     'pattern_runewater_flask',
     'pattern_sageleaf_chowder',
     'pattern_spiritweld_girdle',

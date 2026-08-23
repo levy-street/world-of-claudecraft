@@ -3105,7 +3105,8 @@ export const nl_NL: EnTranslations = {
         "rodRequired": "Vereist om te vissen.",
         "rodBite": "Vissen bijten tot {seconds} s eerder.",
         "rodReel": "Verlengt de binnenhaaltijd met {seconds} s.",
-        "rodBand": "Ontgrendelt een rijkere vangst vanaf visvaardigheid {skill}."
+        "rodBand": "Ontgrendelt een rijkere vangst vanaf visvaardigheid {skill}.",
+        "rodBandCatch": "Unlocks {fish} at fishing skill {skill} and above."
       },
       "downgradeMark": "Tassen vol: de vondst werd opgeslagen zonder verzamelderstempel.",
       "downgradeMarkCrop": "Bags full: the harvest was stored without its grower's mark.",
@@ -13042,6 +13043,39 @@ export const nl_NL: EnTranslations = {
       },
       "pattern_harvest_feast": {
         "name": "Recipe: Harvest Feast"
+      },
+      "raw_deepbarb_catfish": {
+        "name": "Raw Deepbarb Catfish"
+      },
+      "raw_hollowgill_sturgeon": {
+        "name": "Raw Hollowgill Sturgeon"
+      },
+      "raw_stillmere_salmon": {
+        "name": "Raw Stillmere Salmon"
+      },
+      "clockreel_fishing_rod": {
+        "name": "Clockreel Fishing Rod"
+      },
+      "peppered_deepbarb_catfish": {
+        "name": "Peppered Deepbarb Catfish"
+      },
+      "roast_hollowgill_sturgeon": {
+        "name": "Roast Hollowgill Sturgeon"
+      },
+      "deepwater_feast": {
+        "name": "Deepwater Feast"
+      },
+      "pattern_peppered_deepbarb_catfish": {
+        "name": "Recipe: Peppered Deepbarb Catfish"
+      },
+      "pattern_roast_hollowgill_sturgeon": {
+        "name": "Recipe: Roast Hollowgill Sturgeon"
+      },
+      "pattern_deepwater_feast": {
+        "name": "Recipe: Deepwater Feast"
+      },
+      "pattern_clockreel_fishing_rod": {
+        "name": "Schematic: Clockreel Fishing Rod"
       },
       "conjured_water4": {
         "name": "Getoverd bronwater"

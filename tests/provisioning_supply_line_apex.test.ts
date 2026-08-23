@@ -150,9 +150,19 @@ const APEX_ROWS: ReadonlyArray<{
   readonly rung: number;
   readonly produce: ReadonlyArray<readonly [string, number]>;
   readonly untouched: ReadonlyArray<readonly [string, number]>;
+  // The row masterwrought Phase 11i added to this bill, EMPTY where it added
+  // none. Kept as its own column rather than folded into `untouched`, which
+  // means "what shipped before 11h" and would stop meaning that: the arms
+  // below compose the two, so 11h's own claim about what it did not move is
+  // still readable on its own line.
+  readonly fish: ReadonlyArray<readonly [string, number]>;
   readonly order: readonly string[];
   readonly inputBefore: number;
   readonly inputAfter: number;
+  // The input after 11i's fish row, where it added one. 11h's own
+  // before-and-after pair above is untouched, so its margin claim still reads
+  // as the statement 11h made.
+  readonly inputAfter11i: number;
   readonly output: number;
 }> = [
   {
@@ -167,6 +177,7 @@ const APEX_ROWS: ReadonlyArray<{
       ['sunpetal_herb', 2],
       ['cooking_salt', 2],
     ],
+    fish: [['raw_deepbarb_catfish', 4]],
     order: [
       'seasoned_stock',
       'prime_cut',
@@ -174,9 +185,11 @@ const APEX_ROWS: ReadonlyArray<{
       'frost_gourd',
       'sunpetal_herb',
       'cooking_salt',
+      'raw_deepbarb_catfish',
     ],
     inputBefore: 422,
     inputAfter: 452,
+    inputAfter11i: 508,
     output: 360,
   },
   {
@@ -191,6 +204,7 @@ const APEX_ROWS: ReadonlyArray<{
       ['sunpetal_herb', 2],
       ['cooking_salt', 2],
     ],
+    fish: [['raw_deepbarb_catfish', 4]],
     order: [
       'seasoned_stock',
       'prime_cut',
@@ -198,9 +212,11 @@ const APEX_ROWS: ReadonlyArray<{
       'highland_barley',
       'sunpetal_herb',
       'cooking_salt',
+      'raw_deepbarb_catfish',
     ],
     inputBefore: 422,
     inputAfter: 452,
+    inputAfter11i: 508,
     output: 360,
   },
   {
@@ -215,6 +231,7 @@ const APEX_ROWS: ReadonlyArray<{
       ['sunpetal_herb', 2],
       ['cooking_salt', 2],
     ],
+    fish: [['raw_deepbarb_catfish', 4]],
     order: [
       'seasoned_stock',
       'prime_cut',
@@ -222,9 +239,11 @@ const APEX_ROWS: ReadonlyArray<{
       'thornpeak_cabbage',
       'sunpetal_herb',
       'cooking_salt',
+      'raw_deepbarb_catfish',
     ],
     inputBefore: 422,
     inputAfter: 452,
+    inputAfter11i: 508,
     output: 360,
   },
   {
@@ -239,6 +258,7 @@ const APEX_ROWS: ReadonlyArray<{
       ['sunpetal_herb', 2],
       ['glass_vial', 1],
     ],
+    fish: [],
     order: [
       'quickening_catalyst',
       'pristine_venom_gland',
@@ -249,6 +269,7 @@ const APEX_ROWS: ReadonlyArray<{
     ],
     inputBefore: 424,
     inputAfter: 439,
+    inputAfter11i: 439,
     output: 50,
   },
   {
@@ -263,6 +284,7 @@ const APEX_ROWS: ReadonlyArray<{
       ['sunpetal_herb', 2],
       ['glass_vial', 1],
     ],
+    fish: [],
     order: [
       'quickening_catalyst',
       'pristine_venom_gland',
@@ -273,6 +295,7 @@ const APEX_ROWS: ReadonlyArray<{
     ],
     inputBefore: 424,
     inputAfter: 439,
+    inputAfter11i: 439,
     output: 50,
   },
   {
@@ -287,6 +310,7 @@ const APEX_ROWS: ReadonlyArray<{
       ['sunpetal_herb', 2],
       ['glass_vial', 1],
     ],
+    fish: [],
     order: [
       'quickening_catalyst',
       'pristine_venom_gland',
@@ -297,6 +321,7 @@ const APEX_ROWS: ReadonlyArray<{
     ],
     inputBefore: 424,
     inputAfter: 439,
+    inputAfter11i: 439,
     output: 50,
   },
   {
@@ -313,6 +338,7 @@ const APEX_ROWS: ReadonlyArray<{
       ['sunpetal_herb', 4],
       ['goldleaf_herb', 2],
     ],
+    fish: [],
     order: [
       'quickening_catalyst',
       'wyrmfall_core',
@@ -323,6 +349,7 @@ const APEX_ROWS: ReadonlyArray<{
     ],
     inputBefore: 1010,
     inputAfter: 1410,
+    inputAfter11i: 1410,
     output: 380,
   },
   {
@@ -340,6 +367,7 @@ const APEX_ROWS: ReadonlyArray<{
       ['game_meat', 4],
       ['sunpetal_herb', 2],
     ],
+    fish: [['raw_deepbarb_catfish', 4]],
     order: [
       'seasoned_stock',
       'wyrmfall_core',
@@ -348,9 +376,11 @@ const APEX_ROWS: ReadonlyArray<{
       'evergarden_greens',
       'fine_evergarden_greens',
       'sunpetal_herb',
+      'raw_deepbarb_catfish',
     ],
     inputBefore: 606,
     inputAfter: 1006,
+    inputAfter11i: 1062,
     output: 380,
   },
 ];
@@ -358,10 +388,24 @@ const APEX_ROWS: ReadonlyArray<{
 describe('masterwrought Phase 11h: the eight rows, per row', () => {
   it('the table covers exactly this phase, and every row is a real merged recipe', () => {
     expect(APEX_ROWS.length, 'the touched-row table').toBe(8);
+    // THIS TABLE IS 11h's EIGHT ROWS, and since masterwrought Phase 11i that is
+    // a strict SUBSET of APEX_CONSUMABLE_RECIPES rather than the whole of it:
+    // 11i appended three angler rows to the same array. The equality is split
+    // into containment plus an exact complement so neither half can drift: a
+    // row vanishing from the live table still reds the first, and a FOURTH row
+    // appearing without a decision still reds the second.
+    const liveApexIds = APEX_CONSUMABLE_RECIPES.map((r) => r.id).sort();
+    for (const row of APEX_ROWS) {
+      expect(liveApexIds, `${row.id} must still be a live apex row`).toContain(row.id);
+    }
     expect(
-      APEX_ROWS.map((r) => r.id).sort(),
-      'the table is exactly APEX_CONSUMABLE_RECIPES',
-    ).toEqual(APEX_CONSUMABLE_RECIPES.map((r) => r.id).sort());
+      liveApexIds.filter((id) => !APEX_ROWS.some((r) => r.id === id)),
+      "the rows 11h did not touch: masterwrought Phase 11i's three angler rows",
+    ).toEqual([
+      'recipe_deepwater_feast',
+      'recipe_peppered_deepbarb_catfish',
+      'recipe_roast_hollowgill_sturgeon',
+    ]);
     for (const row of APEX_ROWS) {
       const recipe = requireRecipe(row.id);
       expect(recipe.professionId, `${row.id} craft`).toBe(row.craft);
@@ -387,7 +431,12 @@ describe('masterwrought Phase 11h: the eight rows, per row', () => {
       const actual = requireRecipe(row.id)
         .reagents.filter((g) => !PRODUCE_IDS.has(g.itemId))
         .map((g) => [g.itemId, g.count]);
-      expect(actual, `${row.id} non-produce bill`).toEqual(row.untouched.map(([id, n]) => [id, n]));
+      // untouched PLUS 11i's fish row, in that order: 11h's claim is that it
+      // moved no non-produce reagent, and 11i's is that it only ADDED one.
+      // Composing the two columns keeps both statements checkable separately.
+      expect(actual, `${row.id} non-produce bill`).toEqual(
+        [...row.untouched, ...row.fish].map(([id, n]) => [id, n]),
+      );
     }
   });
 
@@ -410,14 +459,17 @@ describe('masterwrought Phase 11h: the eight rows, per row', () => {
     }
   });
 
-  it('recipe_laden_hearth is the first SEVEN-reagent bill in the game', () => {
+  it('recipe_laden_hearth is still the longest bill in the game, now at EIGHT', () => {
     // Recorded as a fact about the merged table rather than a note, because it
     // is the one shape claim this phase makes that no other arm would notice:
-    // nothing caps a reagent list, so the seventh row renders by existing.
+    // nothing caps a reagent list, so the eighth row renders by existing.
+    // SEVEN at 11h, EIGHT since masterwrought Phase 11i put its uniform fish
+    // row on the same bill; the hearth is still the sole holder of the record,
+    // which is what keeps the render trace above meaningful.
     const longest = Math.max(...ALL_RECIPES.map((r) => r.reagents.length));
-    expect(longest, 'the longest bill in the merged table').toBe(7);
+    expect(longest, 'the longest bill in the merged table').toBe(8);
     expect(
-      ALL_RECIPES.filter((r) => r.reagents.length === 7).map((r) => r.id),
+      ALL_RECIPES.filter((r) => r.reagents.length === 8).map((r) => r.id),
       'and it is the only one',
     ).toEqual(['recipe_laden_hearth']);
     // THE SIX-ENTRY TIER, pinned by id rather than counted, because a floor
@@ -425,21 +477,30 @@ describe('masterwrought Phase 11h: the eight rows, per row', () => {
     // rows are 11h's (three flasks, three plates, the alchemy capstone reached
     // six by gaining an entry), and only two are Phase 11g's. A `>= 6` floor
     // therefore recorded nothing about the history it claimed to record.
+    // THE SEVEN-ENTRY TIER, which is where the three role plates landed once
+    // 11i's fish row joined them, plus 11i's own capstone feast at six. Pinned
+    // by id for the reason the six-entry list below is: a floor here would be
+    // satisfied by a phase's own rows and record nothing about the history it
+    // claims to record.
+    expect(
+      ALL_RECIPES.filter((r) => r.reagents.length === 7)
+        .map((r) => r.id)
+        .sort(),
+      "the seven-entry rows: the three role plates, at seven since 11i's fish row",
+    ).toEqual(['recipe_sageleaf_chowder', 'recipe_stonepot_stew', 'recipe_warspice_skewers']);
     expect(
       ALL_RECIPES.filter((r) => r.reagents.length === 6)
         .map((r) => r.id)
         .sort(),
-      'the six-entry rows: two from Phase 11g, seven this phase reached',
+      'the six-entry rows: two from Phase 11g, four 11h reached, one 11i minted',
     ).toEqual([
+      'recipe_deepwater_feast',
       'recipe_grand_cauldron',
       'recipe_ironhusk_flask',
       'recipe_marlows_grand_roast',
       'recipe_runewater_flask',
-      'recipe_sageleaf_chowder',
       'recipe_seasoned_stock',
-      'recipe_stonepot_stew',
       'recipe_warboar_flask',
-      'recipe_warspice_skewers',
     ]);
   });
 });
@@ -458,10 +519,23 @@ describe('masterwrought Phase 11h GATE A: the amended uniform-bill rule', () => 
     // would be a claim about nothing. Also stated per plate, so a bill emptied
     // down to its crop cannot satisfy the equality by having nothing to compare.
     for (const id of THREE_PLATES) {
+      // SIX since masterwrought Phase 11i, which appended the same fish row to
+      // all three. It grew the shared remainder rather than the differing part,
+      // which is exactly why remaindersEqual above still holds: the crop row
+      // differentiates, the fish row unifies.
       expect(
         requireRecipe(id).reagents.filter((g) => !PRODUCE_IDS.has(g.itemId)).length,
         `${id} shared bill`,
-      ).toBe(5);
+      ).toBe(6);
+    }
+    // And the fish really IS in the shared half rather than merely absent from
+    // the differing one: without this, emptying the fish row off all three
+    // plates together would leave every assertion above green.
+    for (const id of THREE_PLATES) {
+      expect(
+        requireRecipe(id).reagents.map((g) => [g.itemId, g.count]),
+        `${id} carries the uniform fish row`,
+      ).toContainEqual(['raw_deepbarb_catfish', 4]);
     }
   });
 
@@ -505,7 +579,14 @@ describe('masterwrought Phase 11h GATE A: the amended uniform-bill rule', () => 
     expect(Math.max(...added) - Math.min(...added), 'THE COST SPREAD').toBe(0);
     const inputs = THREE_PLATES.map((id) => inputValue(requireRecipe(id)));
     expect(new Set(inputs).size, 'so the three plates cost the same to craft').toBe(1);
-    expect(inputs[0]).toBe(452);
+    // 508 since masterwrought Phase 11i, and the SPREAD is what this gate is
+    // about rather than the level: the fish row is the SAME id at the SAME
+    // count on all three plates, so it raises every input by an identical 56
+    // and leaves the spread at zero. A fish row that differed by plate would
+    // red the Set size above, which is the assertion that actually carries
+    // GATE A; this literal is its non-vacuity sibling.
+    expect(inputs[0]).toBe(508);
+    expect(508 - 452, "and 11i's fish row is what moved it, uniformly").toBe(4 * 14);
   });
 
   it('and the WALL-CLOCK spread is 12.5 percent, the honest half of the same gate', () => {
@@ -1038,8 +1119,15 @@ describe('masterwrought Phase 11h: the arithmetic above every row', () => {
       const recipe = requireRecipe(row.id);
       const after = inputValue(recipe);
       const added = addedProduceValue(recipe);
-      const before = after - added;
-      expect(after, `${row.id} input after`).toBe(row.inputAfter);
+      // 11i's fish row is NOT produce, so addedProduceValue cannot see it and
+      // `after - added` would no longer reach 11h's before-value on the four
+      // rows it touched. Subtract the 11i column too, from the table rather
+      // than from the bill, so 11h's two literals still check each other
+      // against the live row.
+      const fishValue = row.fish.reduce((sum, [id, n]) => sum + reagentUnitValue(id) * n, 0);
+      const before = after - added - fishValue;
+      expect(after, `${row.id} input after`).toBe(row.inputAfter11i);
+      expect(row.inputAfter11i - row.inputAfter, `${row.id} 11i delta`).toBe(fishValue);
       expect(before, `${row.id} input before`).toBe(row.inputBefore);
       expect(outputValue(recipe), `${row.id} output`).toBe(row.output);
       expect(after, `${row.id}: output ${row.output} vs input ${after}`).toBeGreaterThan(
@@ -1125,8 +1213,12 @@ describe('masterwrought Phase 11h: what it did NOT touch', () => {
     const consumers = ALL_RECIPES.filter((r) =>
       r.reagents.some((g) => g.itemId === 'seasoned_stock'),
     ).map((r) => r.id);
+    // masterwrought Phase 11i's capstone feast joins the list by taking the
+    // stock too, which is the point of the stock: everything in the cooking
+    // apex flows through it, and a new apex cooking row that did NOT would be
+    // the thing worth noticing here.
     expect(consumers.sort(), 'everything in the cooking apex flows through it').toEqual(
-      [...THREE_PLATES, 'recipe_laden_hearth'].sort(),
+      [...THREE_PLATES, 'recipe_laden_hearth', 'recipe_deepwater_feast'].sort(),
     );
   });
 
@@ -1203,9 +1295,15 @@ describe('masterwrought Phase 11h: what it did NOT touch', () => {
     // The count pins the phase file asks to be ASSERTED unchanged rather than
     // expected. Each lives in its own suite too; naming them here is what makes
     // "no count pin moved" a checked claim in the phase's own file.
-    expect(APEX_CONSUMABLE_RECIPES).toHaveLength(8);
+    // ELEVEN and 153 since masterwrought Phase 11i, which DID mint rows. The
+    // claim this arm makes is 11h's and it stays 11h's: what it pins is that
+    // 11h's own eight rungs never moved (the loop below) and that every id 11h
+    // added already existed. The two table sizes are re-pinned rather than
+    // deleted because their job here is to make a later phase's mint VISIBLE in
+    // 11h's own file rather than silent, which is exactly what just happened.
+    expect(APEX_CONSUMABLE_RECIPES).toHaveLength(11);
     expect(INTERMEDIATE_RECIPES).toHaveLength(10);
-    expect(ALL_RECIPES).toHaveLength(149);
+    expect(ALL_RECIPES).toHaveLength(153);
     for (const row of APEX_ROWS) {
       expect(requireRecipe(row.id).skillReq, `${row.id} rung`).toBe(row.rung);
     }

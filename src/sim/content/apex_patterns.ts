@@ -1,7 +1,11 @@
 // Masterwrought apex recipe patterns (Phase 11, R8): the physical kind:'recipe'
-// drops that teach the 28 acquisition:['drop'] apex recipes (recipes.ts:
-// APEX_ARMOR_RECIPES, APEX_GEAR_RECIPES, APEX_CONSUMABLE_RECIPES). Merged into
-// ITEMS by data.ts (mergeItems), beside PROFESSION_ITEMS.
+// drops that teach the acquisition:['drop'] apex recipes (recipes.ts:
+// APEX_ARMOR_RECIPES, APEX_GEAR_RECIPES, APEX_CONSUMABLE_RECIPES, and since
+// masterwrought Phase 11i the apex rung of ROD_RECIPES). Merged into ITEMS by
+// data.ts (mergeItems), beside PROFESSION_ITEMS. It was 28 at phase 11 and the
+// prose below still says so where it is describing THAT wave; the live count is
+// derived in tests/apex_pattern_items.test.ts rather than restated here, since
+// a hand count is the thing that goes stale.
 //
 // R8 channel doctrine (the recorded phase decision; docs/prd/masterwrought/
 // state.md, "Phase 11 pre-fan-out ledger"): the three pillars split the 28.
@@ -11,10 +15,14 @@
 //   RIFT: the ten APEX_ARMOR patterns ride addRiftClearGearLoot
 //     (src/sim/rift/progression.ts) as the appended final draw on winning
 //     B/A/S clears (0.08, then one pick over RIFT_PATTERN_ITEM_IDS).
-//   HEROIC QUARTERMASTER: the eight APEX_CONSUMABLE patterns are deterministic
+//   HEROIC QUARTERMASTER: the APEX_CONSUMABLE patterns are deterministic
 //     day-one Heroic Marks vendor stock (content/heroic_vendor.ts), so the
 //     consumable economy functions from the first clear; their defs still live
-//     HERE so the id universe is one table.
+//     HERE so the id universe is one table. EIGHT at phase 11, TWELVE since
+//     masterwrought Phase 11i added the angler's endgame block at the bottom of
+//     this file (three cooking rows plus the apex rod's schematic, which rides
+//     this channel rather than the raid or rift tables for the R18 reason
+//     recorded there).
 //
 // The id contract: pattern_<output item id>, one per apex recipe, teaching the
 // recipe whose resultItemId is that output (pinned by
@@ -26,9 +34,12 @@
 // Def shape (types.ts RecipeItemDef): kind 'recipe' with teachesRecipeId and
 // nothing else. No use, no stackSize, no soulbound, no noMarketList: patterns
 // are ordinary tradable drops that bind by CONSUMPTION at learn time
-// (src/sim/professions/pattern_items.ts). quality 'epic' on all 28 (they teach
-// the epic tier; recipe rarity stays monotone to power); uniform modest
-// sellValue 100.
+// (src/sim/professions/pattern_items.ts). QUALITY DERIVES from the taught row's
+// OUTPUT quality (ruling 11f-PAT), so recipe rarity stays monotone to power:
+// that was 'epic' on every one of the original 28 because all 28 taught the
+// epic tier, and masterwrought Phase 11i added the first two rows here that
+// teach a RARE output and therefore carry rare. sellValue stays a uniform
+// modest 100 across every row: the pattern is a teaching token, not the power.
 //
 // NOT THE ONLY PATTERN TABLE any more: content/farm_patterns.ts is its sibling
 // (masterwrought Phase 11f), holding the six patterns that teach farming's
@@ -265,5 +276,56 @@ export const APEX_PATTERN_ITEMS: Record<string, ItemDef> = {
     quality: 'epic',
     sellValue: 100,
     teachesRecipeId: 'recipe_laden_hearth',
+  },
+  // --- The angler's endgame patterns (masterwrought Phase 11i) -------------
+  // Four more on the SAME contract as the eight above: pattern_<output item
+  // id>, kind 'recipe', quality epic, the uniform sellValue 100, and the
+  // registered per-craft display prefix ("Recipe:" for cooking, "Schematic:"
+  // for engineering). They coin no name of their own: each is a prefix plus its
+  // output's name, so the naming load for the whole group is zero.
+  //
+  // ALL FOUR RIDE THE HEROIC QUARTERMASTER as deterministic Heroic Marks stock
+  // (content/heroic_vendor.ts), the channel phase 11 gave the eight apex
+  // consumable patterns. The schematic in particular could not be a luck drop:
+  // the rod it teaches is the gate on catch band 5, so luck-gating it would put
+  // a whole band of the profession behind luck, which R18 forbids.
+  // RARE, not epic, and the two below are the first rows in THIS table that are
+  // not (ruling 11f-PAT: a pattern's quality derives from the OUTPUT quality of
+  // the row it teaches, so recipe rarity stays monotone to power). Both teach a
+  // plain rare dish that reuses a shipped foodHp and sellValue point, so an
+  // epic wrapper would promise a power rung the dish does not have. The header
+  // above carried a uniform-epic claim until this phase; it was true of the 28
+  // and is not a rule, which is what 11f-PAT already said for the farm table.
+  pattern_peppered_deepbarb_catfish: {
+    id: 'pattern_peppered_deepbarb_catfish',
+    name: 'Recipe: Peppered Deepbarb Catfish',
+    kind: 'recipe',
+    quality: 'rare',
+    sellValue: 100,
+    teachesRecipeId: 'recipe_peppered_deepbarb_catfish',
+  },
+  pattern_roast_hollowgill_sturgeon: {
+    id: 'pattern_roast_hollowgill_sturgeon',
+    name: 'Recipe: Roast Hollowgill Sturgeon',
+    kind: 'recipe',
+    quality: 'rare',
+    sellValue: 100,
+    teachesRecipeId: 'recipe_roast_hollowgill_sturgeon',
+  },
+  pattern_deepwater_feast: {
+    id: 'pattern_deepwater_feast',
+    name: 'Recipe: Deepwater Feast',
+    kind: 'recipe',
+    quality: 'epic',
+    sellValue: 100,
+    teachesRecipeId: 'recipe_deepwater_feast',
+  },
+  pattern_clockreel_fishing_rod: {
+    id: 'pattern_clockreel_fishing_rod',
+    name: 'Schematic: Clockreel Fishing Rod',
+    kind: 'recipe',
+    quality: 'epic',
+    sellValue: 100,
+    teachesRecipeId: 'recipe_clockreel_fishing_rod',
   },
 };

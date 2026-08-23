@@ -263,7 +263,7 @@ describe('toolless-state helpers (#2343)', () => {
         def.use?.type === 'fishing' ||
         (def.use?.type === 'gatherTool' && def.use.professionId === 'fishing'),
     );
-    expect(tackle.length).toBe(5); // the pole plus four tiered rods
+    expect(tackle.length).toBe(6); // the pole plus five tiered rods (11i's apex rung)
     for (const def of tackle) {
       expect(hasFishingImplement([{ itemId: def.id, count: 1 }], ITEMS), def.id).toBe(true);
     }
@@ -740,7 +740,15 @@ describe('crafted higher-tier base tools and monster-material gating (#1135)', (
     const mining = [ITEMS.thorium_mining_pick, ITEMS.arcanite_mining_pick];
     const logging = [ITEMS.ashwood_axe, ITEMS.elderwood_axe];
     const herbalism = [ITEMS.goldleaf_sickle, ITEMS.sunpetal_sickle];
-    const fishing = [ITEMS.stormreel_fishing_rod, ITEMS.tidewrought_fishing_rod];
+    // THREE since masterwrought Phase 11i: the apex rung is the game's first
+    // tier-6 gathering tool, so it is also the first member of this set above
+    // tier 5. The derivation below is `tier > 3` rather than a tier list, which
+    // is why it caught the new rod by existing.
+    const fishing = [
+      ITEMS.stormreel_fishing_rod,
+      ITEMS.tidewrought_fishing_rod,
+      ITEMS.clockreel_fishing_rod,
+    ];
     // The hoe phase: farming's ladder tops out at the crafted tier-4
     // osmium_hoe (HOE_RECIPES work; no tier-5 hoe ships this phase).
     const farming = [ITEMS.osmium_hoe];
@@ -793,6 +801,27 @@ describe('crafted higher-tier base tools and monster-material gating (#1135)', (
         expect(delveStocked.has(id)).toBe(false);
         continue;
       }
+      // clockreel_fishing_rod is the SECOND deliberate exception (masterwrought
+      // Phase 11i), and it is a different argument from the hoe's rather than
+      // the same waiver twice. The Marks route exists so a tool ladder is never
+      // gated behind one lucky crafter; this rung's whole chain is already
+      // luck-free without it, because its SCHEMATIC is deterministic Heroic
+      // Marks stock (content/heroic_vendor.ts) rather than a drop, so any
+      // engineer can learn it on a fixed price. The rod itself also stays
+      // market-listable by R18, which is the non-engineer's route. Adding a
+      // tier-6 apex tool to a delve counter would be a delve pricing and tier
+      // decision this phase has no ruling for; the absence is pinned here
+      // rather than assumed, and flagged for the maintainer in state.md.
+      if (id === 'clockreel_fishing_rod') {
+        expect(delveStocked.has(id)).toBe(false);
+        // The deterministic route the exception rests on, asserted rather than
+        // described: if the schematic ever left the marks counter, this waiver
+        // would stop being true and this arm is where that reds.
+        expect(HEROIC_VENDOR_STOCK.some((o) => o.itemId === 'pattern_clockreel_fishing_rod')).toBe(
+          true,
+        );
+        continue;
+      }
       expect(delveStocked.has(id), `${id} needs a Marks route`).toBe(true);
     }
     for (const [profession, tools] of [
@@ -803,7 +832,13 @@ describe('crafted higher-tier base tools and monster-material gating (#1135)', (
     ] as const) {
       expect(tools.every(Boolean)).toBe(true);
       const tiers = tools.map((item) => gatherToolTier(item, profession));
-      expect(tiers).toEqual([4, 5]);
+      // FISHING runs one rung deeper than the land ladders since masterwrought
+      // Phase 11i: its apex rod is the game's only tier-6 gathering tool, and
+      // it exists because fishing is the only profession whose catch table has
+      // a band above what a tier-5 tool opens. The three land ladders still
+      // stop at 5, which is why this is a per-profession expectation rather
+      // than one shared literal.
+      expect(tiers).toEqual(profession === 'fishing' ? [4, 5, 6] : [4, 5]);
       // Produced by a profession or bought with Marks, never with coin: no
       // buyValue is what makes "not for copper" true of the item itself, so a
       // future counter row cannot quietly price one.

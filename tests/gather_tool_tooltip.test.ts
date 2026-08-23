@@ -134,8 +134,12 @@ describe('gatherToolTooltipLines: fishing implements', () => {
     expect(stormreel).toContain('<div class="tt-desc">Fish bite up to 4.5s sooner.</div>');
     // 2.75: three tier rungs (2.25) plus RARE, two rarity rungs (0.5).
     expect(stormreel).toContain('<div class="tt-desc">Extends the reel window by 2.75s.</div>');
+    // NAMES THE CATCH, not just the skill. Bands 3, 4 and 5 all gate at fishing
+    // 200, so a skill-only line reads identically on all three crafted rods,
+    // which is the defect the rod block in content/items.ts documents against
+    // itself. The catch is the only thing that differs between these rungs.
     expect(stormreel).toContain(
-      '<div class="tt-desc">Unlocks richer catch tables at fishing skill 200 and above.</div>',
+      '<div class="tt-desc">Unlocks Raw Deepbarb Catfish at fishing skill 200 and above.</div>',
     );
 
     const tidewrought = gatherToolTooltipLines(ITEMS.tidewrought_fishing_rod);
@@ -158,8 +162,12 @@ describe('gatherToolTooltipLines: fishing implements', () => {
     // rung really does buy its full width and the copy may sell it.
     expect(tidewrought).toContain('<div class="tt-desc">Extends the reel window by 3.75s.</div>');
     expect(tidewrought).toContain(
-      '<div class="tt-desc">Unlocks richer catch tables at fishing skill 200 and above.</div>',
+      '<div class="tt-desc">Unlocks Raw Hollowgill Sturgeon at fishing skill 200 and above.</div>',
     );
+    // The two lines really are DIFFERENT, which is the whole point and is what
+    // a skill-only line could not deliver: same rung threshold, different catch.
+    expect(stormreel).not.toContain('Raw Hollowgill Sturgeon');
+    expect(tidewrought).not.toContain('Raw Deepbarb Catfish');
     // The rarity term is what separates these two rods' reel lines by more
     // than the tier step alone, so a regression that dropped `item.quality` at
     // the call site would land both on the tier-only numbers.
@@ -181,8 +189,12 @@ describe('gatherToolTooltipLines: fishing implements', () => {
       gatherToolRodTiers.push(use.tier);
       const raises = fishingRodBandFor(use.tier) > fishingRodBandFor(use.tier - 1);
       const html = gatherToolTooltipLines(def);
-      expect(html.includes('Unlocks richer catch tables'), `${def.id} band line`).toBe(raises);
-      const quoted = /catch tables at fishing skill (\d+) and above/.exec(html);
+      // Either shape of the band line counts: the generic one for a band that
+      // introduces no new catch, the named one where it does.
+      const quoted = /Unlocks (?:richer catch tables|.+?) at fishing skill (\d+) and above/.exec(
+        html,
+      );
+      expect(quoted !== null, `${def.id} band line`).toBe(raises);
       if (quoted) quotedSkills.push(Number(quoted[1]));
       if (raises) sawLine += 1;
       else sawNone += 1;
@@ -196,13 +208,21 @@ describe('gatherToolTooltipLines: fishing implements', () => {
     // this walk, so no gatherTool rod sits at the bottom of the ladder.
     expect(sawNone).toBe(0);
     expect(sawLine).toBe(gatherToolRodTiers.length);
-    expect(gatherToolRodTiers).toEqual([2, 3, 4, 5]);
-    // The claim each rod makes is DISTINCT wherever the ladder makes it so:
-    // the three thresholds the shipped rods quote are 100, 150 and 200, and
-    // the repeat at the top is the ladder's own shape (bands 3, 4 and 5 all
-    // gate at fishing's 200 cap, where the ROD is the only axis left), not the
-    // clamped-index bug this arm was written to catch.
-    expect(quotedSkills).toEqual([100, 150, 200, 200]);
+    expect(gatherToolRodTiers).toEqual([2, 3, 4, 5, 6]);
+    // The claim each rod makes is DISTINCT, and since masterwrought Phase 11i
+    // it is distinct even where the THRESHOLD repeats: the shipped rods quote
+    // 100, 150, 200 and 200, and the two at 200 name different catches. Both
+    // halves are asserted, because the threshold list alone would have looked
+    // exactly the same under the clamped-index bug this arm was written to
+    // catch.
+    expect(quotedSkills).toEqual([100, 150, 200, 200, 200]);
+    const bandLines = Object.values(ITEMS)
+      .filter((def) => def.use?.type === 'gatherTool' && def.use.professionId === 'fishing')
+      .map((def) => /Unlocks .+? at fishing skill \d+ and above/.exec(gatherToolTooltipLines(def)))
+      .filter((m): m is RegExpExecArray => m !== null)
+      .map((m) => m[0]);
+    expect(bandLines).toHaveLength(5);
+    expect(new Set(bandLines).size, 'every rod makes a claim only it can make').toBe(5);
   });
 });
 

@@ -3105,7 +3105,8 @@ export const vi_VN: EnTranslations = {
         "rodRequired": "Cần thiết để câu cá.",
         "rodBite": "Cá cắn câu sớm hơn tới {seconds} giây.",
         "rodReel": "Kéo dài thời gian thu dây thêm {seconds} giây.",
-        "rodBand": "Mở khóa danh sách cá phong phú hơn khi kỹ năng câu cá đạt {skill} trở lên."
+        "rodBand": "Mở khóa danh sách cá phong phú hơn khi kỹ năng câu cá đạt {skill} trở lên.",
+        "rodBandCatch": "Unlocks {fish} at fishing skill {skill} and above."
       },
       "downgradeMark": "Túi đầy: phát hiện được lưu mà không có dấu thợ thu thập.",
       "downgradeMarkCrop": "Bags full: the harvest was stored without its grower's mark.",
@@ -13042,6 +13043,39 @@ export const vi_VN: EnTranslations = {
       },
       "pattern_harvest_feast": {
         "name": "Recipe: Harvest Feast"
+      },
+      "raw_deepbarb_catfish": {
+        "name": "Raw Deepbarb Catfish"
+      },
+      "raw_hollowgill_sturgeon": {
+        "name": "Raw Hollowgill Sturgeon"
+      },
+      "raw_stillmere_salmon": {
+        "name": "Raw Stillmere Salmon"
+      },
+      "clockreel_fishing_rod": {
+        "name": "Clockreel Fishing Rod"
+      },
+      "peppered_deepbarb_catfish": {
+        "name": "Peppered Deepbarb Catfish"
+      },
+      "roast_hollowgill_sturgeon": {
+        "name": "Roast Hollowgill Sturgeon"
+      },
+      "deepwater_feast": {
+        "name": "Deepwater Feast"
+      },
+      "pattern_peppered_deepbarb_catfish": {
+        "name": "Recipe: Peppered Deepbarb Catfish"
+      },
+      "pattern_roast_hollowgill_sturgeon": {
+        "name": "Recipe: Roast Hollowgill Sturgeon"
+      },
+      "pattern_deepwater_feast": {
+        "name": "Recipe: Deepwater Feast"
+      },
+      "pattern_clockreel_fishing_rod": {
+        "name": "Schematic: Clockreel Fishing Rod"
       },
       "conjured_water4": {
         "name": "Nước Suối Được Tạo Phép"

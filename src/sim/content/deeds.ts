@@ -2935,6 +2935,55 @@ export const DEEDS: Record<string, DeedDef> = {
     reward: { kind: 'title', text: 'Grandmaster Inscription' },
   },
 
+  // The angler's endgame deed (masterwrought Phase 11i). EXACTLY ONE row, and
+  // the count is the ruling rather than restraint: the shipped per-profession
+  // gathering ladder is measured and COMPLETE at 5 / 10 / 25 (a first-gather
+  // rung, a 100 rung, the cross-profession master, and a cap rung with a title
+  // where the cap exceeds 100, which for fishing is prog_master_angler at 200).
+  // No gathering profession in the game has a rung at 50 or 150, so adding them
+  // to fishing alone would make it the only five-rung ladder there is, which is
+  // the asymmetry R20's coverage test exists to stop recurring quietly.
+  //
+  // RENOWN 10 is the shipped per-profession 100-rung point (prog_mining_100,
+  // prog_fishing_100, prog_farming_100 all sit there), which is the right rung
+  // because this is DETERMINISTIC and skill-gated rather than luck-gated:
+  // docs/design/deeds.md rule 2 zeroes the Renown on a luck-dependent deed, and
+  // nothing here is a roll. NO TITLE, because prog_master_angler already owns
+  // fishing's one title and the catalog gives a profession one.
+  //
+  // THE TRIGGER IS 'collectItems', AND THE WORDING FOLLOWS THE TRIGGER RATHER
+  // THAN THE OTHER WAY ROUND. The phase file called for "the apex rod CRAFT on
+  // the shipped craft trigger", but there is no shipped per-ITEM craft trigger
+  // in the DeedTrigger union: the craft-shaped kinds are craftSkill (a skill
+  // milestone, and prog_grandmaster_engineering above already owns that rung)
+  // and the 'craft_rare' / masterwork visit marks (per-CRAFT, not per-item).
+  // The shipped way to say "you got this specific thing" is collectItems over
+  // deedStats.itemsDiscovered, which col_glimmerfin and col_full_creel already
+  // use. That trigger fires on ANY acquisition, market purchase included, so
+  // the desc says OBTAIN and not CRAFT: a deed that claimed a craft while
+  // firing on a purchase would be a false player-facing claim, which is the
+  // defect class this packet has spent the most review budget on. It is also
+  // the R18-consistent reading, since the rod must stay buyable.
+  //
+  // A per-item craft mark WAS the alternative and was declined here rather than
+  // silently: it needs a new namespace registered in src/sim/deeds.ts plus a
+  // save/load round-trip pin in the same change (an unregistered namespace
+  // serializes fine and is DROPPED on load, which has bitten this codebase
+  // twice), and it makes migration-safety a required reviewer. That is a
+  // maintainer call, not a phase one; the discrepancy is recorded in state.md.
+  //
+  // Category 'collection' matches its trigger family (col_glimmerfin,
+  // col_full_creel), and the row sits BEFORE the farming block below so that
+  // block stays last and contiguous under the packet's three-tier ordering.
+  col_deepest_cast: {
+    id: 'col_deepest_cast',
+    name: 'The Deepest Cast',
+    desc: 'Obtain a Clockreel Fishing Rod, the only rod that reaches the deepest catches.',
+    category: 'collection',
+    renown: 10,
+    trigger: { kind: 'collectItems', itemIds: ['clockreel_fishing_rod'] },
+  },
+
   // The farming celebration deeds (D13), appended per the append-only
   // DEED_ORDER contract. All cosmetic, zero rng, no power. The farm:planted
   // mark is written at plant success and the farm:<zone> marks at surviving

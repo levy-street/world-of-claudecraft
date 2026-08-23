@@ -694,6 +694,63 @@ export const PROFESSION_ITEMS: Record<string, ItemDef> = {
     sellValue: 90,
   },
 
+  // --- Angler's endgame dishes (cooking, masterwrought Phase 11i) ----------
+  // The three drop-taught rows that put FISHING into the endgame bill census on
+  // its own account rather than through a rod (R20). All three are outputs of
+  // APEX_CONSUMABLE_RECIPES at skillReq 75 / 100 / 125, kitchens-bound.
+  //
+  // NO NEW POWER ANYWHERE IN THE BLOCK, and that is R14 rather than caution.
+  // The two plain dishes REUSE a shipped foodHp and sellValue pair exactly
+  // (552 / 75 is Highwatch Gourd Soup's, 980 / 150 is the Sunmelon Tart and
+  // Marlow's Grand Roast rung), so the fish line adds no rung to the food
+  // curve, and neither carries a wellFed payload at all. The capstone carries
+  // no payload of its own either: it SERVES a shipped plate (below).
+  peppered_deepbarb_catfish: {
+    id: 'peppered_deepbarb_catfish',
+    name: 'Peppered Deepbarb Catfish',
+    kind: 'food',
+    quality: 'rare',
+    foodHp: 552,
+    sellValue: 75,
+  },
+  roast_hollowgill_sturgeon: {
+    id: 'roast_hollowgill_sturgeon',
+    name: 'Roast Hollowgill Sturgeon',
+    kind: 'food',
+    quality: 'rare',
+    foodHp: 980,
+    sellValue: 150,
+  },
+  // THE CAPSTONE (masterwrought Phase 11i, deliverable 5): a ROLE, never a new
+  // stat. The master angler becomes the sole faucet of a good the raid wants,
+  // and every number in it is shipped:
+  //
+  // - It is a FEAST on the shipped machinery (the harvest_feast shape,
+  //   professions/feast.ts owns the lifecycle), so `dishItemId` names the dish
+  //   each bite IS and that dish's own foodHp and wellFed drive the restore and
+  //   the mint. No new aura id, no new magnitude, no new duration: eating from
+  //   this feast is eating a Stonepot Stew, byte for byte.
+  // - stonepot_stew is the plate it serves because a feast serves ONE dish and
+  //   stamina is the apex buff no role refuses, so serving it privileges no
+  //   role. A caster who wants the chowder still eats the chowder; one shared
+  //   'well_fed' aura id means last eaten wins.
+  // - charges 10 is RAID_MAX (social/party.ts), one serving each for a full
+  //   raid, so the batch size is derived rather than picked. durationTicks 3600
+  //   is harvest_feast's own 180 seconds, reused.
+  // - kind 'junk' is the placeable-usable precedent harvest_feast set (the
+  //   junk-sale sweep keys on quality 'poor', so an epic feast can never ride
+  //   the bulk sale); quality 'epic' matches the skill-125 rung. sellValue 250
+  //   is harvest_feast's own point, shared on purpose so the two feasts read as
+  //   one family.
+  deepwater_feast: {
+    id: 'deepwater_feast',
+    name: 'Deepwater Feast',
+    kind: 'junk',
+    quality: 'epic',
+    sellValue: 250,
+    feast: { charges: 10, durationTicks: 3600, dishItemId: 'stonepot_stew' },
+  },
+
   // --- Farm dishes (cooking, Phase 6 economy hooks) ------------------------
   // Outputs of FARM_RECIPES (content/recipes.ts), the farm half of cooking:
   // eight dishes cooked from crop produce at the kitchens, a SIBLING of the

@@ -9628,13 +9628,17 @@ export class GameServer {
       // a duplicate resolves train_already_known), but ok alone no longer
       // implies a fee: a pattern-item learn (src/sim/professions/pattern_items.ts)
       // emits trainResult ok having charged nothing. So this stays a payment
-      // count only while no rod recipe carries 'drop' acquisition, which is what
-      // makes a pattern able to teach it; both rod recipes are trainer-only
-      // today, and tests/professions_rod_recipes.test.ts pins each one's
-      // acquisition to exactly ['trainer'] naming this metric in its message.
-      // Give one a pattern and this arm needs a fee-bearing discriminator
-      // instead. The fee amount is static content, published as
-      // woc_rod_fee_copper.
+      // count only while every id it counts is TRAINER-taught, and
+      // masterwrought Phase 11i is the change that comment was written against:
+      // its apex rung is drop-taught, so a pattern can teach it and this arm
+      // would have counted those learns as fees paid. THE FEE-BEARING
+      // DISCRIMINATOR IT ASKED FOR now lives in the VOCABULARY rather than
+      // here: ROD_FEE_RECIPE_IDS filters ROD_RECIPES to the trainer-taught rows,
+      // so isRodFeeRecipe refuses the drop-taught rung by construction and a
+      // future one joins the exemption by existing. A rung that were BOTH
+      // trainer-taught and pattern-taught would still need a per-EVENT
+      // discriminator here; none is. The fee amount is static content,
+      // published as woc_rod_fee_copper.
       if (ev.type === 'trainResult' && ev.ok && isRodFeeRecipe(ev.recipeId)) {
         gameMetricsCounters().rodFeePaid(ev.recipeId);
       }

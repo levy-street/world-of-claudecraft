@@ -381,7 +381,24 @@ const roleFoodBill = (cropId: string, count: number): { itemId: string; count: n
   { itemId: cropId, count },
   { itemId: 'sunpetal_herb', count: 2 },
   { itemId: 'cooking_salt', count: 2 },
+  // masterwrought Phase 11i's uniform fish row, appended to all three plates
+  // (and to the hearth below). It sits in the SHARED half of the bill, not the
+  // differing half: the crop row is what tells the three plates apart, the fish
+  // row is identical on every one of them.
+  { itemId: 'raw_deepbarb_catfish', count: 4 },
 ];
+
+// masterwrought Phase 11i's three angler outputs, named as their own group.
+// They ride APEX_CONSUMABLE_RECIPES (they are drop-taught apex cooking rows)
+// but they are NOT phase-10 consumables and the arms over APEX_CONSUMABLES
+// above pin phase-10 shapes, so they are censused here instead: two plain rare
+// dishes with no payload at all and one placeable epic feast whose payload is
+// another dish's. R14 is why they carry no power of their own.
+const ANGLER_OUTPUTS = [
+  'peppered_deepbarb_catfish',
+  'roast_hollowgill_sturgeon',
+  'deepwater_feast',
+] as const;
 
 // The deliberately UNFLAGGED tool outputs: tools, never counted combat power,
 // pinned the way APEX_BAG_ID is below. The phase 09 pair came off
@@ -457,7 +474,8 @@ const APEX_TOOLS: Record<
     recipes: APEX_CONSUMABLE_RECIPES,
     skillReq: 125,
     stationType: 'kitchens',
-    // SEVEN entries, the longest bill in the game (masterwrought Phase 11h).
+    // EIGHT entries, still the longest bill in the game: seven at masterwrought
+    // Phase 11h, then 11i's uniform fish row.
     reagents: [
       { itemId: 'seasoned_stock', count: 3 },
       { itemId: 'wyrmfall_core', count: 2 },
@@ -466,6 +484,7 @@ const APEX_TOOLS: Record<
       { itemId: 'evergarden_greens', count: 2 },
       { itemId: 'fine_evergarden_greens', count: 1 },
       { itemId: 'sunpetal_herb', count: 2 },
+      { itemId: 'raw_deepbarb_catfish', count: 4 },
     ],
   },
 };
@@ -755,8 +774,15 @@ describe('masterwrought apex budget sweep', () => {
         APEX_BAG_ID,
         ...Object.keys(APEX_TOOLS),
         ...Object.keys(APEX_CONSUMABLES),
+        ...ANGLER_OUTPUTS,
       ].sort(),
     );
+    // The angler block is named apart rather than folded into APEX_CONSUMABLES,
+    // because that table is the PHASE 10 census and its per-row arms pin phase
+    // 10's shapes (epic, resultCount, the wellFed payload). Two of these three
+    // are rare plain dishes and one is a placeable, so folding them in would
+    // have meant loosening those arms for rows they were never about.
+    expect(ANGLER_OUTPUTS).toHaveLength(3);
   });
 
   it.each(Object.entries(APEX_ARMOR))('%s: budget, rating, armor, and texture', (id, row) => {
@@ -1339,10 +1365,17 @@ describe('the phase 10 apex rungs step exactly one rung off the shipped ladders'
     for (const id of CAPSTONE_IDS) expect(rungOf(id), `${id} capstone rung`).toBe(125);
     const consumableIds = Object.keys(APEX_CONSUMABLES);
     expect(consumableIds.length, 'the six phase 10 consumables').toBe(6);
-    // The array is exactly these eight rows today, so a third capstone (or a
-    // ninth row of any kind) forces a visit here instead of landing unchecked
-    // beside a hand-picked capstone list.
-    expect(APEX_CONSUMABLE_RECIPES, 'six apex rungs plus two capstones').toHaveLength(8);
+    // The array is exactly these ELEVEN rows today (six phase-10 rungs, two
+    // capstones, and masterwrought Phase 11i's three angler rows), so a third
+    // capstone or a twelfth row of any kind forces a visit here instead of
+    // landing unchecked beside a hand-picked capstone list.
+    expect(
+      APEX_CONSUMABLE_RECIPES,
+      'six apex rungs, two capstones, three angler rows',
+    ).toHaveLength(11);
+    // And the split is named, so a row moving BETWEEN the three groups cannot
+    // keep the total right while changing what the groups mean.
+    expect(consumableIds.length + CAPSTONE_IDS.length + ANGLER_OUTPUTS.length).toBe(11);
     for (const id of consumableIds) expect(rungOf(id), `${id} apex rung`).toBe(100);
     // The relation itself, so the two numbers can never be levelled without
     // this line failing even if both moved together.

@@ -3879,6 +3879,51 @@ const ITEM_RECIPES: Record<string, IconRecipe> = {
     ['scroll', { p: 'coin', pal: 'gold', ...BR }],
     ['sparkle'],
   ),
+  // The angler's endgame (masterwrought Phase 11i). Explicit rows for exactly
+  // the reason the farm block above has them: the shipped raw catches all fall
+  // through itemFallback to ONE shared drink-radial fish glyph, and the four
+  // patterns would all fall to one shared scroll, so a parked id would show the
+  // same picture as its siblings and the A4 distinctness sweep reds.
+  //
+  // THE FAMILY RULES, one line each. A CATCH is a fish on water, told apart by
+  // the radial and the palette its band reads as: the workhorse on plain water,
+  // the deep-water one in shadow, the apex one in frost with a glow, so the
+  // ladder is legible at 32px without reading a name. A DISH keeps the food
+  // radial with the fish beside its cooking glyph. The FEAST follows
+  // harvest_feast's own shape (a crate of servings) rather than a plate. The
+  // PATTERNS follow the farm rule exactly: parchment plus scroll say RECIPE and
+  // the bottom-right accent is the PRIMARY glyph of what each teaches.
+  raw_deepbarb_catfish: r('drink', 'sky', ['fish', { p: 'fang', pal: 'bone', ...BR }]),
+  raw_hollowgill_sturgeon: r('shadow', 'steel', ['fish', { p: 'droplet', pal: 'sky', ...BR }]),
+  raw_stillmere_salmon: r(
+    'frost',
+    'ice',
+    ['fish', { p: 'gem', pal: 'silverWhite', ...BR }],
+    ['glow', 'sparkle'],
+  ),
+  peppered_deepbarb_catfish: r('food', 'ember', ['fish', { p: 'flame', pal: 'ember', ...BR }]),
+  roast_hollowgill_sturgeon: r('food', 'earthBrown', ['fish', { p: 'meat', pal: 'blood', ...BR }]),
+  deepwater_feast: r('food', 'sky', ['crate', { p: 'fish', pal: 'sky', ...BR }], ['sparkle']),
+  pattern_peppered_deepbarb_catfish: r('parchment', 'ember', [
+    'scroll',
+    { p: 'fish', pal: 'ember', ...BR },
+  ]),
+  pattern_roast_hollowgill_sturgeon: r('parchment', 'earthBrown', [
+    'scroll',
+    { p: 'fish', pal: 'earthBrown', ...BR },
+  ]),
+  pattern_deepwater_feast: r('parchment', 'sky', ['scroll', { p: 'crate', pal: 'sky', ...BR }]),
+  // The one SCHEMATIC in the group, and the accent says so: the rod it teaches
+  // is a tool, so the gear glyph reads engineering rather than cookery, which
+  // is also what keeps it apart from the three Recipe scrolls above.
+  pattern_clockreel_fishing_rod: r('parchment', 'steel', [
+    'scroll',
+    { p: 'gear', pal: 'steel', ...BR },
+  ]),
+  // The apex rod itself: a tool, so it takes the steel ground the other crafted
+  // gathering tools take rather than a water radial, with the fish accent
+  // naming what it is for.
+  clockreel_fishing_rod: r('steel', 'steel', ['staff', { p: 'fish', pal: 'sky', ...BR }], ['glow']),
   // misc UI icons (not real items)
   coin_gold: r('treasure', 'gold', ['coin'], ['sparkle']),
   slot_empty: r('junk', 'silverWhite', []),
@@ -5703,6 +5748,25 @@ export const ITEM_ART_PENDING = new Set<string>([
   'marsh_rice',
   'marsh_rice_seed',
   'osmium_hoe',
+  // The angler's endgame, masterwrought Phase 11i: eleven ids on the SAME
+  // scheduled park (three high-band catches, the apex rod, two dishes, the
+  // capstone feast, and the four patterns that teach the drop-taught rows).
+  // The park is the packet-wide decision recorded above, not a way to silence
+  // A2: committed WebP art needs the maintainer's master SHA, which a phase
+  // session cannot produce. Each id serves its procedural recipe through
+  // iconDataUrl instead of pointing an <img> at a 404, and A2 reds the moment
+  // any of their art lands.
+  'clockreel_fishing_rod',
+  'deepwater_feast',
+  'pattern_clockreel_fishing_rod',
+  'pattern_deepwater_feast',
+  'pattern_peppered_deepbarb_catfish',
+  'pattern_roast_hollowgill_sturgeon',
+  'peppered_deepbarb_catfish',
+  'raw_deepbarb_catfish',
+  'raw_hollowgill_sturgeon',
+  'raw_stillmere_salmon',
+  'roast_hollowgill_sturgeon',
   // The six farming patterns (Phase 11f, content/farm_patterns.ts). Same
   // scheduled park as the produce above and for the same reason: committed
   // WebP art needs the maintainer's master SHA, which a phase session cannot
@@ -5760,6 +5824,16 @@ export const DEED_ART_PENDING: ReadonlySet<string> = new Set([
   // (tests/reliquary_cell_art.test.ts), so its wheat-sheaf medallion crest
   // shipped committed with the phase; the brief flags it for a commissioned
   // replacement.
+  // Phase 11i's one deed, falling back to deed_cat_collection on the same
+  // scheduled park. It carries NO title either (prog_master_angler already owns
+  // fishing's one title), so the Reliquary title-shelf rule that forced
+  // prog_farming_100's crest to ship committed does not apply here.
+  //
+  // ITS POSITION IN THIS SET IS LOAD-BEARING, not cosmetic: the art suites
+  // compare an artless list DERIVED from DEED_ORDER against this set spread in
+  // insertion order, so a row parked out of table order reds them. It sits
+  // ahead of the farming block here for the same reason it does in the catalog.
+  'col_deepest_cast',
   'prog_first_planting',
   'chr_vale_first_harvest',
   'chr_marsh_first_harvest',

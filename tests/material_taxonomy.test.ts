@@ -128,10 +128,15 @@ const HONEST_MATERIALS = [
   // intermediate recipes consume (INTERMEDIATE_RECIPES).
   'quickening_catalyst',
   'raw_bog_eel',
+  // The three high-band catches (masterwrought Phase 11i): recipe reagents and
+  // node-free junk, so they derive IN exactly the way the six above do.
+  'raw_deepbarb_catfish',
   'raw_frostgill_trout',
+  'raw_hollowgill_sturgeon',
   'raw_marsh_pike',
   'raw_mirror_trout',
   'raw_river_perch',
+  'raw_stillmere_salmon',
   'raw_stonescale_carp',
   'resonant_hide',
   'resonant_links',
@@ -186,6 +191,11 @@ const HONEST_MATERIALS = [
 // sign-off.
 const ALLOWED_UNCLASSIFIED_JUNK = [
   'dawnhold_posy',
+  // masterwrought Phase 11i's capstone feast, on exactly the harvest_feast
+  // footing below and for the same reason: a placeable shared feast is kind
+  // 'junk' by the tonic precedent, but nothing crafts FROM it and its one
+  // consumer is the place_feast command, so it is a deliberate non-material.
+  'deepwater_feast',
   'emberwing_cinderscale',
   'gleamstag_charm',
   'guardian_core',
@@ -313,6 +323,9 @@ describe('MATERIAL_ITEM_IDS: class exclusions, keyed on KIND against the live ca
       'raw_frostgill_trout',
       'raw_stonescale_carp',
       'glimmerfin_koi',
+      'raw_deepbarb_catfish',
+      'raw_hollowgill_sturgeon',
+      'raw_stillmere_salmon',
     ] as const;
     for (const id of catches) {
       expect(ITEMS[id], `${id} has no ITEMS def`).toBeTruthy();

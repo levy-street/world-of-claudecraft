@@ -29,6 +29,12 @@ import {
   TOOL_EFFECT_RECIPES,
 } from '../src/sim/content/recipes';
 import { ITEMS, NPCS, STATIONS } from '../src/sim/data';
+
+// The top rod tier a TRAINER teaches. The apex rung above it is drop-taught by
+// ruling (masterwrought Phase 11i, R8: an apex rung reaches players through the
+// pillars), so this is the line the channel split falls on.
+const TRAINER_TAUGHT_ROD_MAX_TIER = 5;
+
 import { requiredReagentCountFor } from '../src/sim/professions/crafting';
 import { NODE_MATERIAL_TABLE } from '../src/sim/professions/gathering';
 import { stationsOfType, stationTypeForCraft } from '../src/sim/professions/stations';
@@ -290,7 +296,8 @@ describe('REFERENTIAL INTEGRITY', () => {
       }
     }
     // The 54 ladder recipes plus the 3 grandfathered combos all carry
-    // 'trainer', and so do the two crafted rods, the two tool-effect
+    // 'trainer', and so do the two TRAINER-taught crafted rods (the apex rung
+    // masterwrought Phase 11i added is a drop, see the derived term below), the two tool-effect
     // charms, the nine jewelcrafting catalog recipes, the six inscription
     // catalog recipes, the ten Masterwrought phase 07 intermediates, the
     // three crafted hoes, and the farm-economy set's ON-RAMP: the
@@ -306,10 +313,23 @@ describe('REFERENTIAL INTEGRITY', () => {
     // red; a term derived from `acquisition` would move both sides together
     // and pass over the regression.
     const farmTrainerRows = FARM_RECIPES.filter((r) => r.skillReq < FARM_DROP_RUNG_FLOOR).length;
+    // THE ROD TERM IS DERIVED THE SAME WAY, and for the same reason
+    // (masterwrought Phase 11i): the rod ladder is split across two channels
+    // now, the two shipped rungs trainer-taught and the apex rung a drop, so
+    // ROD_RECIPES.length would over-count the left side by one. The
+    // discriminator is the rung's TIER rather than its skillReq, because both
+    // the tidewrought and the apex rod sit at engineering 125 and only the tier
+    // separates them. Reading it off the tier keeps the arm's teeth exactly as
+    // the farm term does: a shipped rod that silently lost 'trainer' while
+    // staying at tier 4 or 5 drops the LEFT side alone and reds.
+    const rodTrainerRows = ROD_RECIPES.filter((r) => {
+      const use = ITEMS[r.resultItemId]?.use;
+      return use?.type === 'gatherTool' && use.tier <= TRAINER_TAUGHT_ROD_MAX_TIER;
+    }).length;
     expect(trainerRecipes).toBe(
       LADDER_RECIPES.length +
         COMBO_RECIPES.length +
-        ROD_RECIPES.length +
+        rodTrainerRows +
         TOOL_EFFECT_RECIPES.length +
         JEWELCRAFTING_RECIPES.length +
         INSCRIPTION_RECIPES.length +
@@ -324,6 +344,9 @@ describe('REFERENTIAL INTEGRITY', () => {
     // sit below the floor (four at rung 0, three at 25, the held bannock at
     // 50), and the other 6 are drops.
     expect(farmTrainerRows, 'the farm on-ramp is eight rows').toBe(8);
+    // The rod ladder's own split, beside the farm one: three rungs, of which
+    // the two below the apex tier are trainer-taught (masterwrought Phase 11i).
+    expect(rodTrainerRows, 'two trainer-taught rod rungs').toBe(2);
     // COMBO and LADDER get the same sibling treatment as the rest (Phase 11d QA):
     // without a literal beside them, losing one combo row drops BOTH sides of the
     // equality by one and the sum stays balanced, so the arm passes over a
@@ -334,7 +357,7 @@ describe('REFERENTIAL INTEGRITY', () => {
     expect(JEWELCRAFTING_RECIPES).toHaveLength(9);
     expect(INSCRIPTION_RECIPES).toHaveLength(6);
     expect(INTERMEDIATE_RECIPES).toHaveLength(10);
-    expect(ROD_RECIPES).toHaveLength(2);
+    expect(ROD_RECIPES).toHaveLength(3);
     expect(TOOL_EFFECT_RECIPES).toHaveLength(2);
     expect(HOE_RECIPES).toHaveLength(3);
     // The economy-hooks phase's eight farm dishes, the four Phase 11 well-fed

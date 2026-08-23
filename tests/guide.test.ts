@@ -2256,8 +2256,19 @@ describe('Guide professions gathering accuracy', () => {
       expect(g.maxSkill).toBe(
         GATHERING_PROFESSIONS[g.id as keyof typeof GATHERING_PROFESSIONS].maxSkill,
       );
-      expect(g.bands).toEqual([0, 100, 200]);
+      // FISHING publishes its OWN six-rung catch-band ladder since
+      // masterwrought Phase 11i; the four land professions still publish the
+      // shared three-rung one. Split here rather than relaxed to a length
+      // check, so the wiki cannot start publishing the wrong ladder for either
+      // side without reddening.
+      expect(g.bands, `${g.id} bands`).toEqual(
+        g.id === 'fishing' ? [0, 100, 150, 200, 200, 200] : [0, 100, 200],
+      );
     }
+    // Non-vacuity for the split: both arms are exercised, so neither branch is
+    // dead and a generator that published one ladder for everyone reds.
+    expect(GUIDE_PROF_GATHERING.filter((g) => g.bands.length === 6)).toHaveLength(1);
+    expect(GUIDE_PROF_GATHERING.filter((g) => g.bands.length === 3)).toHaveLength(4);
     expect(GUIDE_PROF_GATHERING.find((g) => g.id === 'mining')?.maxSkill).toBe(100);
     expect(GUIDE_PROF_GATHERING.find((g) => g.id === 'fishing')?.maxSkill).toBe(200);
     expect(GUIDE_PROF_GATHERING.find((g) => g.id === 'farming')?.maxSkill).toBe(100);
@@ -2600,8 +2611,10 @@ describe('Guide professions gathering accuracy', () => {
       }
     }
     // The rod ladder: simple pole tier 1, Ironreel t2 at 60c, Silverstream t3
-    // at 150c, all bought; Stormreel t4 and Tidewrought t5 crafted, so they
-    // carry no price at all.
+    // at 150c, all bought; Stormreel t4, Tidewrought t5 and the Clockreel t6
+    // crafted, so they carry no price at all. SIX rungs since masterwrought
+    // Phase 11i, and the apex rung is the only tier-6 gathering tool in the
+    // game.
     const fishing = GUIDE_PROF_GATHERING.find((g) => g.id === 'fishing');
     expect(fishing?.tools.map((tool) => [tool.name, tool.tier, tool.priceCopper])).toEqual([
       ['Simple Fishing Pole', 1, 20],
@@ -2609,6 +2622,7 @@ describe('Guide professions gathering accuracy', () => {
       ['Silverstream Fishing Rod', 3, 150],
       ['Stormreel Fishing Rod', 4, null],
       ['Tidewrought Fishing Rod', 5, null],
+      ['Clockreel Fishing Rod', 6, null],
     ]);
     // Every rung says where it comes from, and the two routes are exclusive:
     // a bought rod names a counter, a crafted one names the craft that makes
@@ -2648,7 +2662,8 @@ describe('Guide professions gathering accuracy', () => {
         ).toBe(true);
       }
     }
-    expect([bought, crafted]).toEqual([3, 2]);
+    // Three bought rungs, THREE crafted since masterwrought Phase 11i.
+    expect([bought, crafted]).toEqual([3, 3]);
   });
 
   it('publishes the tool-gate thresholds through placeholders in EVERY locale', () => {
@@ -2739,7 +2754,7 @@ describe('Guide professions gathering accuracy', () => {
     expect(f.rodBiteReductionSec).toBe(1.5);
     expect(f.reelWindowSec).toBe(2.5);
     expect(f.reelRodBonusSec).toBe(0.75);
-    expect(f.sessionCapSec).toBe(15);
+    expect(f.sessionCapSec).toBe(16);
     // The biteBody prose quotes DERIVED figures (worst wait and reel window
     // per rod tier) as English literals; derive them here from the published
     // constants so a rhythm retune reds the prose too, not just the numbers
@@ -2759,11 +2774,17 @@ describe('Guide professions gathering accuracy', () => {
     expect(f.schedule).toEqual(
       FISHING_GAIN_SCHEDULE.map((row) => ({ below: row.belowProficiency, gain: row.gain })),
     );
+    // The four VALUES were re-derived at masterwrought Phase 11i (DECISION F)
+    // from a measured casts-to-200 model; the four BOUNDARIES are frozen,
+    // because fishingTeachingCeilingFor derives the water teaching ceilings
+    // from them. The derivation itself is pinned in
+    // tests/professions_fishing.test.ts; this arm only holds the wiki to
+    // whatever the sim ships.
     expect(f.schedule).toEqual([
-      { below: 50, gain: 1 },
-      { below: 100, gain: 0.5 },
-      { below: 150, gain: 0.1 },
-      { below: 200, gain: 0.02 },
+      { below: 50, gain: 0.08 },
+      { below: 100, gain: 0.05 },
+      { below: 150, gain: 0.04 },
+      { below: 200, gain: 0.03 },
     ]);
     expect(f.junkCutoff).toBe(100);
     expect(f.rareCatch).toBe('Sunglint Koi');
@@ -2774,7 +2795,11 @@ describe('Guide professions gathering accuracy', () => {
     for (const [band, byZone] of FISHING_TABLES_BY_BAND.entries()) {
       const pub = f.bandTables[band];
       expect(pub.rodTierRequired).toBe(band + 1);
-      expect(pub.minProficiency).toBe([0, 100, 200][band]);
+      // FISHING's own ladder, not the shared one: they were the same array
+      // until masterwrought Phase 11i split them, and the generator read the
+      // shared one until that phase, which would have published 200 for a band
+      // gated at 150 and `undefined` for every band above 2.
+      expect(pub.minProficiency).toBe([0, 100, 150, 200, 200, 200][band]);
       for (const [zoneId, rows] of Object.entries(byZone)) {
         const zoneName = ZONES.find((z) => z.id === zoneId)?.name ?? zoneId;
         const pubZone = pub.zones.find((z) => z.zone === zoneName);
@@ -2789,17 +2814,20 @@ describe('Guide professions gathering accuracy', () => {
         expect(pubZone?.rows.reduce((sum, r) => sum + r.pct, 0)).toBe(100);
       }
     }
-    // The koi odds are the one row that reads skill and nothing else: the same
-    // 1 / 3 / 6 percent in every zone, rising with the band.
+    // The koi odds read skill and nothing else: the same percentage in every
+    // zone at a given band, rising to its cap and then holding there (the
+    // ladder ends where its consumers do, both rod rungs that take koi sitting
+    // at or below tier 5).
     let koiRowsChecked = 0;
     for (const [band, published] of f.bandTables.entries()) {
       for (const zone of published.zones) {
         const koi = zone.rows.find((r) => r.name === 'Sunglint Koi');
-        expect(koi?.pct, `${zone.zone} band ${band}`).toBe([1, 3, 6][band]);
+        expect(koi?.pct, `${zone.zone} band ${band}`).toBe([1, 3, 6, 6, 6, 6][band]);
         koiRowsChecked += 1;
       }
     }
-    expect(koiRowsChecked).toBe(9);
+    // Eighteen since masterwrought Phase 11i: six bands times three zones.
+    expect(koiRowsChecked).toBe(18);
   });
 
   it('publishes the exact shared curve, cast, and rare-event numbers', () => {

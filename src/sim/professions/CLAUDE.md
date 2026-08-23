@@ -32,7 +32,11 @@ or pure leaves, never a `Sim` import, randomness only via `ctx.rng` (guarded by
 - `fishing.ts`: the fourth gathering row (bite delay, reel window,
   `FISHING_TABLES_BY_BAND`, and since R19 the gain model: the schedule half
   `fishingCatchGain` composed with the water's teaching ceiling in
-  `fishingCatchGainAt`, the ONLY function a grant site may call); the TWO
+  `fishingCatchGainAt`, the ONLY function a grant site may call); the catch-band
+  ladder is NOT here since masterwrought Phase 11i (see `fishing_bands.ts`
+  below), and the schedule VALUES are derived from a recorded casts-to-200
+  model while its four BOUNDARIES stay frozen, because the teaching ceilings
+  derive from them; the TWO
   sessions' hidden per-cast state lives in
   transient Entity fields (`gatherCastNodeId`, `gatherCastToolRarity`, and
   the R40 consent `gatherCastEffectConfirmed` for the gather cast;
@@ -201,6 +205,18 @@ or pure leaves, never a `Sim` import, randomness only via `ctx.rng` (guarded by
   `inRangeStationTypes` on the consumer side). Its one
   player-visible emit is the placement log line (matched by `log.placeStation`
   in `src/ui/sim_i18n.ts`); draws NO rng.
+- `fishing_bands.ts`: fishing's OWN catch-band ladder, a pure leaf
+  (masterwrought Phase 11i): `FISHING_CATCH_BAND_THRESHOLDS`
+  ([0, 100, 150, 200, 200, 200]), the exported `FishingCatchBand` type, and
+  `fishingCatchBandFor` / `fishingRodBandFor`. SEPARATE from
+  `proficiency_bands.ts` deliberately: that ladder is SHARED (gathering.ts
+  reads it for the land gather-cast duration, proficiency_display_heal.ts for
+  the display band), so carrying fishing's six bands on it would silently
+  retune land gathering. `fishing.ts` re-exports the old names and stays the
+  thin consumer. The band type is the ONE type every `0 | 1 | 2` site now
+  writes: the four fishing SimEvent variants, `effectiveFishingBand`,
+  `fishingRodBandFor`, and `server/fishing_telemetry.ts`'s label function, so
+  widening the ladder again is one edit rather than seven.
 - `fishing_zones.ts`: the per-zone rod-tier ladder (`rodTierRequiredForZone`,
   water gated by the WATER's zone) the cast gate and the vendor rows read;
   since R19 the SAME column also caps how far each water teaches

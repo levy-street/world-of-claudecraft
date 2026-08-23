@@ -817,10 +817,12 @@ describe('real catalog integration', () => {
     // three feat_ deeds). Phase 11e appends col_farm_roster, an ordinary
     // non-feat collection deed, so it joins BOTH counts: 273 to 274 and 277
     // to 278.
-    expect(view.summary.visibleTotal).toBe(274);
+    // 275 since masterwrought Phase 11i's col_deepest_cast, which is also a
+    // visible non-feat collection deed and so joins both counts again.
+    expect(view.summary.visibleTotal).toBe(275);
     // The bucket sum adds the feat-flagged rows back on top (3 on the Feats
     // shelf plus the off-prefix capstone on Collection).
-    expect(view.categories.reduce((n, c) => n + c.visible, 0)).toBe(278);
+    expect(view.categories.reduce((n, c) => n + c.visible, 0)).toBe(279);
   });
 
   it('offers exactly the live catalog border deeds once they are earned', () => {

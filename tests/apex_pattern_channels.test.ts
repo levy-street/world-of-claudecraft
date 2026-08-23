@@ -147,7 +147,10 @@ describe('masterwrought R8 referential contract: every drop recipe reaches exact
   const apexDropRecipes = ALL_RECIPES.filter((recipe) => recipe.acquisition?.includes('drop'));
 
   it('the drop-acquisition recipe set partitions 10 gear / 10 armor / 8 consumable / 6 farm', () => {
-    expect(apexDropRecipes).toHaveLength(34);
+    // 38 since masterwrought Phase 11i: three angler cooking rows plus the
+    // apex rod's schematic, the first pattern teaching a row outside the
+    // three APEX_* tables.
+    expect(apexDropRecipes).toHaveLength(38);
     const gear = apexDropRecipes.filter((r) => APEX_GEAR_RECIPES.includes(r));
     const armor = apexDropRecipes.filter((r) => APEX_ARMOR_RECIPES.includes(r));
     const consumable = apexDropRecipes.filter((r) => APEX_CONSUMABLE_RECIPES.includes(r));
@@ -574,7 +577,8 @@ describe('the phase 02 sweep floor', () => {
     // un-gameable (a 35th def would also have to seat a channel to pass them).
     // 28 apex plus the 6 farming patterns Phase 11f added.
     const recipeDefs = Object.values(ITEMS).filter((def) => def.kind === 'recipe');
-    expect(recipeDefs).toHaveLength(34);
+    // 38 since masterwrought Phase 11i (the angler's endgame block).
+    expect(recipeDefs).toHaveLength(38);
     for (const def of recipeDefs) {
       if (def.kind !== 'recipe') continue; // narrow for teachesRecipeId
       const recipe = recipeById(def.teachesRecipeId);

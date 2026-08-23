@@ -451,7 +451,9 @@ describe('gate table completeness', () => {
     const rods = Object.entries(ITEMS).filter(
       ([, def]) => def.use?.type === 'gatherTool' && def.use.professionId === 'fishing',
     );
-    expect(rods.length).toBe(4);
+    // FIVE since masterwrought Phase 11i's apex rung; none is gated, which is
+    // the claim (rods are R22-exempt and the WATER paces them).
+    expect(rods.length).toBe(5);
     for (const [itemId] of rods) expect(VENDOR_ROW_GATES[itemId], itemId).toBeUndefined();
     expect(VENDOR_ROW_GATES.simple_fishing_pole).toBeUndefined();
     // Split the claim, because the two halves are true for different reasons
@@ -465,6 +467,7 @@ describe('gate table completeness', () => {
       'silverstream_fishing_rod',
     ]);
     expect(crafted.map(([id]) => id).sort()).toEqual([
+      'clockreel_fishing_rod',
       'stormreel_fishing_rod',
       'tidewrought_fishing_rod',
     ]);

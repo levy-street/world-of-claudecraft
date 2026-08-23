@@ -3105,7 +3105,8 @@ export const ja_JP: EnTranslations = {
         "rodRequired": "釣りに必要です。",
         "rodBite": "魚が食いつくまでの時間が最大{seconds}秒短くなります。",
         "rodReel": "リールの猶予時間が{seconds}秒延びます。",
-        "rodBand": "釣りスキル{skill}以上でより豊かな釣果が解放されます。"
+        "rodBand": "釣りスキル{skill}以上でより豊かな釣果が解放されます。",
+        "rodBandCatch": "釣りスキル{skill}以上で「{fish}」が解放されます。"
       },
       "downgradeMark": "バッグが満杯です：収穫は採集者の印なしで収納されました。",
       "downgradeMarkCrop": "バッグが満杯です：収穫物は栽培者の銘なしで収納されました。",
@@ -13042,6 +13043,39 @@ export const ja_JP: EnTranslations = {
       },
       "pattern_harvest_feast": {
         "name": "レシピ：収穫の宴"
+      },
+      "raw_deepbarb_catfish": {
+        "name": "生の深棘ナマズ"
+      },
+      "raw_hollowgill_sturgeon": {
+        "name": "生の空エラチョウザメ"
+      },
+      "raw_stillmere_salmon": {
+        "name": "生の静湖サケ"
+      },
+      "clockreel_fishing_rod": {
+        "name": "歯車リールの釣り竿"
+      },
+      "peppered_deepbarb_catfish": {
+        "name": "深棘ナマズの胡椒焼き"
+      },
+      "roast_hollowgill_sturgeon": {
+        "name": "空エラチョウザメのロースト"
+      },
+      "deepwater_feast": {
+        "name": "深水の宴"
+      },
+      "pattern_peppered_deepbarb_catfish": {
+        "name": "レシピ：深棘ナマズの胡椒焼き"
+      },
+      "pattern_roast_hollowgill_sturgeon": {
+        "name": "レシピ：空エラチョウザメのロースト"
+      },
+      "pattern_deepwater_feast": {
+        "name": "レシピ：深水の宴"
+      },
+      "pattern_clockreel_fishing_rod": {
+        "name": "設計図：歯車リールの釣り竿"
       },
       "conjured_water4": {
         "name": "魔法の湧き水"

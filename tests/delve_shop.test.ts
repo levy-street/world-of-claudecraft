@@ -289,10 +289,37 @@ describe('Drowned Litany shop stock (data pins)', () => {
     // farming rollout arms in tests/professions_zone_rollout.test.ts pin the
     // craft-only acquisition positively; do not widen this exclusion to the
     // node professions or fishing.
+    //
+    // THE FISHING HALF OF THAT INSTRUCTION IS HONOURED, and this exclusion is
+    // NOT a widening of it (masterwrought Phase 11i). Both shipped crafted rods
+    // keep their Marks rows and both are still swept below; what is excluded is
+    // the ONE tier-6 apex rung 11i minted, by TIER rather than by profession,
+    // so a future crafted tier-4 or tier-5 rod still lands inside this guard.
+    // The reasoning is recorded where the prices are (content/delves/shop.ts):
+    // pricing a tier-6 rung means inventing a Marks number and a gate above
+    // heroicClear, the rung needs no bad-luck backstop because its schematic is
+    // deterministic marks stock and the rod is market-listable, and the two rod
+    // prices below are themselves pending a re-derivation. A later decision,
+    // pinned ABSENT here so it stays visible rather than becoming a hole.
+    const APEX_ROD_TIER = 6;
     const craftedTools = Object.values(ITEMS).filter(
       (def) =>
-        def.use?.type === 'gatherTool' && def.use.tier > 3 && def.use.professionId !== 'farming',
+        def.use?.type === 'gatherTool' &&
+        def.use.tier > 3 &&
+        def.use.tier < APEX_ROD_TIER &&
+        def.use.professionId !== 'farming',
     );
+    // The excluded rung is pinned by NAME and by absence, both ways, so neither
+    // the exclusion nor the rung can drift quietly: a second tier-6 tool, or
+    // this one gaining a row, reds here.
+    const apexRungs = Object.values(ITEMS).filter(
+      (def) => def.use?.type === 'gatherTool' && def.use.tier >= APEX_ROD_TIER,
+    );
+    expect(apexRungs.map((d) => d.id)).toEqual(['clockreel_fishing_rod']);
+    expect(
+      DELVE_SHOPS.drowned_litany.some((e) => e.itemId === 'clockreel_fishing_rod'),
+      'the apex rung has no Marks route by decision; see content/delves/shop.ts',
+    ).toBe(false);
     // At-least, not exactly: a ninth crafted tool added WITH its Marks row is
     // a legitimate content addition, and an exact pin would red on it with a
     // misleading message. The per-tool loop below is what actually guards the

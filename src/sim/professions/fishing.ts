@@ -114,25 +114,56 @@ export const FISH_EARLY_REEL_GRACE_SEC = 1;
 // charges on a slotted effect instead; this is the rod half of the same
 // ruling, that rarity may grant narrow bonuses which never affect access.
 //
-// SAY IT PLAINLY: for every rod that ships, this is a TIER bonus wearing
-// rarity's coat. Rod rarity is perfectly collinear with rod tier (ironreel 2
-// common, silverstream 3 uncommon, stormreel 4 rare, tidewrought 5 epic, and
-// the pole floors at tier 1 common), so nothing in the world today can move
-// one without the other, and a reader comparing this to
-// FISH_REEL_WINDOW_ROD_BONUS_SEC should understand the two as one ladder read
-// twice rather than as two independent axes. It is expressed as rarity anyway
-// because the RULING is about rarity, and because the land tools' charge bonus
-// is genuinely NOT collinear (tiers 1 and 2 are both common), so one ladder
-// serving both is what keeps them from drifting into two.
+// SAY IT PLAINLY, AND THE COLLINEARITY BROKE AT masterwrought Phase 11i. For
+// the four rods that shipped before it, this was a TIER bonus wearing rarity's
+// coat: ironreel 2 common, silverstream 3 uncommon, stormreel 4 rare,
+// tidewrought 5 epic, the pole floored at tier 1 common, so nothing could move
+// one axis without the other. The tier-6 clockreel is EPIC, the same rarity as
+// the tier-5 tidewrought, so the two axes now genuinely part: the apex rung
+// gains 0.75 s of window from its tier rung and nothing at all from rarity.
 //
-// SIZED BY THE SESSION CAP, not by feel. The cap is 300 ticks
-// (FISHING_SESSION_CAP_SEC at DT) and the worst legal session before this was
-// 271: a worst bite of 160 ticks, the tier-5 window of 110, and the one tick
-// the miss arm fires on. That left 29 ticks, so the epic rung's three steps had
-// to fit inside 1.45 s and 0.25 buys 0.75 of it, landing the worst session at
-// 286 with 14 ticks still spare. tests/fishing_zones.test.ts re-derives that
-// budget rather than restating it, so a wider rung fails there instead of
-// silently letting the cap eat a legal reel window.
+// THAT IS THE RULING WORKING, not a wrinkle in it. The rule was expressed as
+// rarity precisely so a rung could decline to raise it, and the apex rod
+// declines deliberately (a legendary rod would be a silent throughput change
+// and would widen the worst legal session against the cap). The land tools'
+// charge bonus was already non-collinear (tiers 1 and 2 are both common), so
+// one ladder serving both is still what keeps them from drifting into two.
+//
+// SIZED AGAINST THE SESSION CAP, not by feel, and the two have to be read
+// together. The worst legal session is a bare-pole CAST (the delay is drawn
+// against the rod held at the cast, so the pole's 8 s is the worst) into the
+// widest window the rod held at the BITE opens (the window re-scans at the
+// bite), plus the one tick the miss arm fires on. Before the rarity term that
+// was 271 ticks: 160 of bite, the tier-5 window's 110, and the miss tick. That
+// left 29 ticks against a 300-tick cap, so the epic rung's three steps had to
+// fit inside 1.45 s and 0.25 buys 0.75 of it, landing the worst session at 286
+// with 14 ticks still spare.
+//
+// THE CAP MOVED AT masterwrought Phase 11i, 15 s to 16 s, and it was FORCED
+// rather than chosen. The apex rung is tier 6 epic, so its window is
+// 2.5 + 0.75 x 5 + 0.25 x 3 = 7.00 s = 140 ticks, and the worst legal session
+// becomes 160 + 140 + 1 = 301 ticks against the old 300. Over by exactly ONE
+// TICK, which is the miss arm's: the bite and the window alone sum to exactly
+// 15.00 s, so the ladder fit the old cap precisely and only the miss tick spilled
+// past it. Left alone, a player in that state would have their reel window
+// truncated by 50 ms, which is the cap eating a legal reel: the thing this
+// budget exists to prevent.
+//
+// WHY THE CAP AND NOT THE ROD. Three knobs could have closed one tick and two
+// of them cost more than they buy. Shipping the rod RARE clears the budget at
+// 296, but it puts a RARE tier-6 rod above an EPIC tier-5 one, a rarity
+// inversion every player sees in their bags. Trimming
+// FISH_REEL_WINDOW_ROD_BONUS_SEC retunes all five shipped rods to fit one new
+// one. The cap is a DEFENSIVE timeout that casting_lifecycle.ts's own comment
+// calls unreachable in normal play, so a second on it costs a player nothing
+// and is what a ladder gaining a rung should take. RECORDED AS A DEVIATION for
+// the maintainer to ratify or revert: DECISION C ruled the rod epic and
+// reasoned about the rarity axis alone, never about tier 6's own +0.75, so the
+// ruling's arithmetic was incomplete rather than wrong.
+//
+// tests/fishing_zones.test.ts re-derives the whole budget rather than restating
+// it, so a wider rung fails there instead of silently letting the cap eat a
+// legal reel window.
 export const FISH_REEL_WINDOW_RARITY_BONUS_SEC = 0.25;
 
 // The three things a rod tier buys, as functions rather than as a formula

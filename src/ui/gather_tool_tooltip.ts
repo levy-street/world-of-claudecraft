@@ -16,6 +16,7 @@
 // composed right after these lines in Hud.itemTooltip), so it is deliberately
 // not described here.
 
+import { FISHING_BAND_INTRODUCED_CATCH } from '../sim/content/items';
 import type { GatheringProfessionId } from '../sim/content/professions';
 import {
   FISH_REEL_WINDOW_SEC,
@@ -27,6 +28,7 @@ import { FISHING_CATCH_BAND_THRESHOLDS } from '../sim/professions/fishing_bands'
 import { isGatherToolUse } from '../sim/professions/tools';
 import { wieldRequirementForTier } from '../sim/professions/wield_gate';
 import type { ItemDef } from '../sim/types';
+import { tEntity } from './entity_i18n';
 import { esc } from './esc';
 import { gatheringProfessionNameKey } from './gathering_profession_name';
 import { formatNumber, type TranslationKey, t } from './i18n';
@@ -127,13 +129,24 @@ export function gatherToolTooltipLines(item: ItemDef): string {
       // old read would have quoted 200 for a band gated at 150 and run off the
       // end of a three-element tuple at the top rung, blanking the number.
       if (fishingRodBandFor(use.tier) > fishingRodBandFor(use.tier - 1)) {
+        const band = fishingRodBandFor(use.tier);
+        const skill = formatNumber(FISHING_CATCH_BAND_THRESHOLDS[band], {
+          maximumFractionDigits: 0,
+        });
+        // NAME THE CATCH where the band introduces one. Bands 3, 4 and 5 all
+        // gate at fishing 200, so the skill-only line reads identically on all
+        // three crafted rods, which is the defect the rod block in
+        // content/items.ts documents against itself. The catch name is the one
+        // thing that differs, and it is also the thing an owner wants to know.
+        const introduced = FISHING_BAND_INTRODUCED_CATCH[band];
+        const fish = introduced
+          ? tEntity({ kind: 'item', id: introduced, field: 'name' })
+          : undefined;
         html += line(
           'tt-desc',
-          t('hudChrome.gathering.toolTooltip.rodBand', {
-            skill: formatNumber(FISHING_CATCH_BAND_THRESHOLDS[fishingRodBandFor(use.tier)], {
-              maximumFractionDigits: 0,
-            }),
-          }),
+          fish
+            ? t('hudChrome.gathering.toolTooltip.rodBandCatch', { fish, skill })
+            : t('hudChrome.gathering.toolTooltip.rodBand', { skill }),
         );
       }
     }

@@ -5643,6 +5643,13 @@ export const GUIDE_DEEDS: GuideDeed[] = [
     "crest": "/ui/deeds/prog_grandmaster_inscription.webp"
   },
   {
+    "id": "col_deepest_cast",
+    "name": "The Deepest Cast",
+    "category": "collection",
+    "renown": 10,
+    "feat": false
+  },
+  {
     "id": "prog_first_planting",
     "name": "Sow It Begins",
     "category": "progression",
@@ -7894,6 +7901,45 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
         }
       },
       {
+        "id": "recipe_clockreel_fishing_rod",
+        "name": "Clockreel Fishing Rod",
+        "skillReq": 125,
+        "tier": 5,
+        "station": "toolworks",
+        "acquisition": "vendor",
+        "feeCopper": 0,
+        "materials": [
+          {
+            "name": "Sunglint Koi",
+            "count": 2
+          },
+          {
+            "name": "Raw Hollowgill Sturgeon",
+            "count": 6
+          },
+          {
+            "name": "Raw Stillmere Salmon",
+            "count": 4
+          },
+          {
+            "name": "Tidewrought Fishing Rod",
+            "count": 1
+          }
+        ],
+        "output": {
+          "name": "Clockreel Fishing Rod",
+          "count": 1,
+          "quality": "epic"
+        },
+        "combo": null,
+        "oncePerDay": false,
+        "gain": {
+          "reducedAt": 150,
+          "minimalAt": 175,
+          "zeroAt": 200
+        }
+      },
+      {
         "id": "recipe_precision_chassis",
         "name": "Precision Chassis",
         "skillReq": 75,
@@ -9348,6 +9394,10 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
           {
             "name": "Cooking Salt",
             "count": 2
+          },
+          {
+            "name": "Raw Deepbarb Catfish",
+            "count": 4
           }
         ],
         "output": {
@@ -9407,6 +9457,10 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
           {
             "name": "Cooking Salt",
             "count": 2
+          },
+          {
+            "name": "Raw Deepbarb Catfish",
+            "count": 4
           }
         ],
         "output": {
@@ -9466,6 +9520,10 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
           {
             "name": "Cooking Salt",
             "count": 2
+          },
+          {
+            "name": "Raw Deepbarb Catfish",
+            "count": 4
           }
         ],
         "output": {
@@ -9529,10 +9587,147 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
           {
             "name": "Sunpetal Herb",
             "count": 2
+          },
+          {
+            "name": "Raw Deepbarb Catfish",
+            "count": 4
           }
         ],
         "output": {
           "name": "The Laden Hearth",
+          "count": 1,
+          "quality": "epic"
+        },
+        "combo": null,
+        "oncePerDay": false,
+        "gain": {
+          "reducedAt": 150,
+          "minimalAt": 175,
+          "zeroAt": 200
+        }
+      },
+      {
+        "id": "recipe_peppered_deepbarb_catfish",
+        "name": "Peppered Deepbarb Catfish",
+        "skillReq": 75,
+        "tier": 3,
+        "station": "kitchens",
+        "acquisition": "vendor",
+        "feeCopper": 0,
+        "materials": [
+          {
+            "name": "Raw Deepbarb Catfish",
+            "count": 4
+          },
+          {
+            "name": "Goldleaf Herb",
+            "count": 2
+          },
+          {
+            "name": "Cooking Salt",
+            "count": 2
+          }
+        ],
+        "output": {
+          "name": "Peppered Deepbarb Catfish",
+          "count": 2,
+          "quality": "rare"
+        },
+        "combo": null,
+        "oncePerDay": false,
+        "gain": {
+          "reducedAt": 100,
+          "minimalAt": 125,
+          "zeroAt": 150
+        },
+        "effect": {
+          "food": {
+            "amount": 552,
+            "seconds": 18
+          }
+        }
+      },
+      {
+        "id": "recipe_roast_hollowgill_sturgeon",
+        "name": "Roast Hollowgill Sturgeon",
+        "skillReq": 100,
+        "tier": 4,
+        "station": "kitchens",
+        "acquisition": "vendor",
+        "feeCopper": 0,
+        "materials": [
+          {
+            "name": "Raw Hollowgill Sturgeon",
+            "count": 4
+          },
+          {
+            "name": "Raw Deepbarb Catfish",
+            "count": 2
+          },
+          {
+            "name": "Sunpetal Herb",
+            "count": 2
+          },
+          {
+            "name": "Cooking Salt",
+            "count": 2
+          }
+        ],
+        "output": {
+          "name": "Roast Hollowgill Sturgeon",
+          "count": 2,
+          "quality": "rare"
+        },
+        "combo": null,
+        "oncePerDay": false,
+        "gain": {
+          "reducedAt": 125,
+          "minimalAt": 150,
+          "zeroAt": 175
+        },
+        "effect": {
+          "food": {
+            "amount": 980,
+            "seconds": 18
+          }
+        }
+      },
+      {
+        "id": "recipe_deepwater_feast",
+        "name": "Deepwater Feast",
+        "skillReq": 125,
+        "tier": 5,
+        "station": "kitchens",
+        "acquisition": "vendor",
+        "feeCopper": 0,
+        "materials": [
+          {
+            "name": "Raw Stillmere Salmon",
+            "count": 2
+          },
+          {
+            "name": "Raw Hollowgill Sturgeon",
+            "count": 3
+          },
+          {
+            "name": "Raw Deepbarb Catfish",
+            "count": 4
+          },
+          {
+            "name": "Seasoned Stock",
+            "count": 2
+          },
+          {
+            "name": "Sunpetal Herb",
+            "count": 1
+          },
+          {
+            "name": "Cooking Salt",
+            "count": 2
+          }
+        ],
+        "output": {
+          "name": "Deepwater Feast",
           "count": 1,
           "quality": "epic"
         },
@@ -14154,6 +14349,9 @@ export const GUIDE_PROF_GATHERING: GuideProfGathering[] = [
     "bands": [
       0,
       100,
+      150,
+      200,
+      200,
       200
     ],
     "tools": [
@@ -14232,6 +14430,14 @@ export const GUIDE_PROF_GATHERING: GuideProfGathering[] = [
         "craftedBy": "engineering",
         "priceMarks": 56,
         "marksHeroicClear": true
+      },
+      {
+        "name": "Clockreel Fishing Rod",
+        "tier": 6,
+        "quality": "epic",
+        "priceCopper": null,
+        "vendors": [],
+        "craftedBy": "engineering"
       }
     ],
     "fishing": {
@@ -14240,23 +14446,23 @@ export const GUIDE_PROF_GATHERING: GuideProfGathering[] = [
       "rodBiteReductionSec": 1.5,
       "reelWindowSec": 2.5,
       "reelRodBonusSec": 0.75,
-      "sessionCapSec": 15,
+      "sessionCapSec": 16,
       "schedule": [
         {
           "below": 50,
-          "gain": 1
+          "gain": 0.08
         },
         {
           "below": 100,
-          "gain": 0.5
+          "gain": 0.05
         },
         {
           "below": 150,
-          "gain": 0.1
+          "gain": 0.04
         },
         {
           "below": 200,
-          "gain": 0.02
+          "gain": 0.03
         }
       ],
       "junkCutoff": 100,
@@ -14468,7 +14674,7 @@ export const GUIDE_PROF_GATHERING: GuideProfGathering[] = [
         },
         {
           "band": 2,
-          "minProficiency": 200,
+          "minProficiency": 150,
           "rodTierRequired": 3,
           "zones": [
             {
@@ -14562,6 +14768,402 @@ export const GUIDE_PROF_GATHERING: GuideProfGathering[] = [
                 {
                   "name": null,
                   "pct": 10,
+                  "quality": null
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "band": 3,
+          "minProficiency": 200,
+          "rodTierRequired": 4,
+          "zones": [
+            {
+              "zone": "Eastbrook Vale",
+              "rows": [
+                {
+                  "name": "Raw Mirror Trout",
+                  "pct": 50,
+                  "quality": "common"
+                },
+                {
+                  "name": "Raw River Perch",
+                  "pct": 34,
+                  "quality": "common"
+                },
+                {
+                  "name": "Tangled Weed",
+                  "pct": 1,
+                  "quality": "poor"
+                },
+                {
+                  "name": "Sunglint Koi",
+                  "pct": 6,
+                  "quality": "uncommon"
+                },
+                {
+                  "name": "Raw Deepbarb Catfish",
+                  "pct": 5,
+                  "quality": "common"
+                },
+                {
+                  "name": null,
+                  "pct": 4,
+                  "quality": null
+                }
+              ]
+            },
+            {
+              "zone": "Mirefen Marsh",
+              "rows": [
+                {
+                  "name": "Raw Marsh Pike",
+                  "pct": 44,
+                  "quality": "common"
+                },
+                {
+                  "name": "Raw Bog Eel",
+                  "pct": 34,
+                  "quality": "common"
+                },
+                {
+                  "name": "Soggy Boot",
+                  "pct": 2,
+                  "quality": "poor"
+                },
+                {
+                  "name": "Tangled Weed",
+                  "pct": 3,
+                  "quality": "poor"
+                },
+                {
+                  "name": "Sunglint Koi",
+                  "pct": 6,
+                  "quality": "uncommon"
+                },
+                {
+                  "name": "Raw Deepbarb Catfish",
+                  "pct": 5,
+                  "quality": "common"
+                },
+                {
+                  "name": null,
+                  "pct": 6,
+                  "quality": null
+                }
+              ]
+            },
+            {
+              "zone": "Thornpeak Heights",
+              "rows": [
+                {
+                  "name": "Raw Frostgill Trout",
+                  "pct": 45,
+                  "quality": "common"
+                },
+                {
+                  "name": "Raw Slatefin Carp",
+                  "pct": 34,
+                  "quality": "common"
+                },
+                {
+                  "name": "Tangled Weed",
+                  "pct": 2,
+                  "quality": "poor"
+                },
+                {
+                  "name": "Sunglint Koi",
+                  "pct": 6,
+                  "quality": "uncommon"
+                },
+                {
+                  "name": "Raw Deepbarb Catfish",
+                  "pct": 5,
+                  "quality": "common"
+                },
+                {
+                  "name": null,
+                  "pct": 8,
+                  "quality": null
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "band": 4,
+          "minProficiency": 200,
+          "rodTierRequired": 5,
+          "zones": [
+            {
+              "zone": "Eastbrook Vale",
+              "rows": [
+                {
+                  "name": "Raw Mirror Trout",
+                  "pct": 50,
+                  "quality": "common"
+                },
+                {
+                  "name": "Raw River Perch",
+                  "pct": 34,
+                  "quality": "common"
+                },
+                {
+                  "name": "Tangled Weed",
+                  "pct": 1,
+                  "quality": "poor"
+                },
+                {
+                  "name": "Sunglint Koi",
+                  "pct": 6,
+                  "quality": "uncommon"
+                },
+                {
+                  "name": "Raw Deepbarb Catfish",
+                  "pct": 5,
+                  "quality": "common"
+                },
+                {
+                  "name": "Raw Hollowgill Sturgeon",
+                  "pct": 2,
+                  "quality": "common"
+                },
+                {
+                  "name": null,
+                  "pct": 2,
+                  "quality": null
+                }
+              ]
+            },
+            {
+              "zone": "Mirefen Marsh",
+              "rows": [
+                {
+                  "name": "Raw Marsh Pike",
+                  "pct": 45,
+                  "quality": "common"
+                },
+                {
+                  "name": "Raw Bog Eel",
+                  "pct": 36,
+                  "quality": "common"
+                },
+                {
+                  "name": "Soggy Boot",
+                  "pct": 1,
+                  "quality": "poor"
+                },
+                {
+                  "name": "Tangled Weed",
+                  "pct": 1,
+                  "quality": "poor"
+                },
+                {
+                  "name": "Sunglint Koi",
+                  "pct": 6,
+                  "quality": "uncommon"
+                },
+                {
+                  "name": "Raw Deepbarb Catfish",
+                  "pct": 5,
+                  "quality": "common"
+                },
+                {
+                  "name": "Raw Hollowgill Sturgeon",
+                  "pct": 2,
+                  "quality": "common"
+                },
+                {
+                  "name": null,
+                  "pct": 4,
+                  "quality": null
+                }
+              ]
+            },
+            {
+              "zone": "Thornpeak Heights",
+              "rows": [
+                {
+                  "name": "Raw Frostgill Trout",
+                  "pct": 45,
+                  "quality": "common"
+                },
+                {
+                  "name": "Raw Slatefin Carp",
+                  "pct": 35,
+                  "quality": "common"
+                },
+                {
+                  "name": "Tangled Weed",
+                  "pct": 1,
+                  "quality": "poor"
+                },
+                {
+                  "name": "Sunglint Koi",
+                  "pct": 6,
+                  "quality": "uncommon"
+                },
+                {
+                  "name": "Raw Deepbarb Catfish",
+                  "pct": 5,
+                  "quality": "common"
+                },
+                {
+                  "name": "Raw Hollowgill Sturgeon",
+                  "pct": 2,
+                  "quality": "common"
+                },
+                {
+                  "name": null,
+                  "pct": 6,
+                  "quality": null
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "band": 5,
+          "minProficiency": 200,
+          "rodTierRequired": 6,
+          "zones": [
+            {
+              "zone": "Eastbrook Vale",
+              "rows": [
+                {
+                  "name": "Raw Mirror Trout",
+                  "pct": 50,
+                  "quality": "common"
+                },
+                {
+                  "name": "Raw River Perch",
+                  "pct": 34,
+                  "quality": "common"
+                },
+                {
+                  "name": "Tangled Weed",
+                  "pct": 1,
+                  "quality": "poor"
+                },
+                {
+                  "name": "Sunglint Koi",
+                  "pct": 6,
+                  "quality": "uncommon"
+                },
+                {
+                  "name": "Raw Deepbarb Catfish",
+                  "pct": 5,
+                  "quality": "common"
+                },
+                {
+                  "name": "Raw Hollowgill Sturgeon",
+                  "pct": 2,
+                  "quality": "common"
+                },
+                {
+                  "name": "Raw Stillmere Salmon",
+                  "pct": 1,
+                  "quality": "common"
+                },
+                {
+                  "name": null,
+                  "pct": 1,
+                  "quality": null
+                }
+              ]
+            },
+            {
+              "zone": "Mirefen Marsh",
+              "rows": [
+                {
+                  "name": "Raw Marsh Pike",
+                  "pct": 46,
+                  "quality": "common"
+                },
+                {
+                  "name": "Raw Bog Eel",
+                  "pct": 36,
+                  "quality": "common"
+                },
+                {
+                  "name": "Soggy Boot",
+                  "pct": 1,
+                  "quality": "poor"
+                },
+                {
+                  "name": "Tangled Weed",
+                  "pct": 1,
+                  "quality": "poor"
+                },
+                {
+                  "name": "Sunglint Koi",
+                  "pct": 6,
+                  "quality": "uncommon"
+                },
+                {
+                  "name": "Raw Deepbarb Catfish",
+                  "pct": 5,
+                  "quality": "common"
+                },
+                {
+                  "name": "Raw Hollowgill Sturgeon",
+                  "pct": 2,
+                  "quality": "common"
+                },
+                {
+                  "name": "Raw Stillmere Salmon",
+                  "pct": 1,
+                  "quality": "common"
+                },
+                {
+                  "name": null,
+                  "pct": 2,
+                  "quality": null
+                }
+              ]
+            },
+            {
+              "zone": "Thornpeak Heights",
+              "rows": [
+                {
+                  "name": "Raw Frostgill Trout",
+                  "pct": 46,
+                  "quality": "common"
+                },
+                {
+                  "name": "Raw Slatefin Carp",
+                  "pct": 35,
+                  "quality": "common"
+                },
+                {
+                  "name": "Tangled Weed",
+                  "pct": 1,
+                  "quality": "poor"
+                },
+                {
+                  "name": "Sunglint Koi",
+                  "pct": 6,
+                  "quality": "uncommon"
+                },
+                {
+                  "name": "Raw Deepbarb Catfish",
+                  "pct": 5,
+                  "quality": "common"
+                },
+                {
+                  "name": "Raw Hollowgill Sturgeon",
+                  "pct": 2,
+                  "quality": "common"
+                },
+                {
+                  "name": "Raw Stillmere Salmon",
+                  "pct": 1,
+                  "quality": "common"
+                },
+                {
+                  "name": null,
+                  "pct": 4,
                   "quality": null
                 }
               ]

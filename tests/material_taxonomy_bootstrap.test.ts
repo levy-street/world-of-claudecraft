@@ -31,7 +31,10 @@ describe('material_taxonomy as the first-evaluated sim module', () => {
     // derive it: importing anything else from src/sim is exactly what the
     // premise arm below forbids, so the number is re-pinned by hand whenever
     // the set moves.
-    expect(MATERIAL_ITEM_IDS.size).toBe(105);
+    // 108 since masterwrought Phase 11i's three high-band catches, which derive
+    // IN through the recipe-reagent source table like the six catches before
+    // them. The capstone feast does NOT: it is a placeable, not a material.
+    expect(MATERIAL_ITEM_IDS.size).toBe(108);
     expect(MATERIAL_ITEM_IDS.has('iron_ore')).toBe(true);
     expect(MATERIAL_ITEM_IDS.has('arcanite_bar')).toBe(true);
     // The farming source specifically, because it is the newest and the one

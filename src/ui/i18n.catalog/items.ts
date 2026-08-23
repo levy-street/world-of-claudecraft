@@ -2660,6 +2660,21 @@ const ITEM_ENTITY_IDS = [
   'pattern_evergarden_harvest_platter',
   'pattern_evergarden_braised_greens',
   'pattern_harvest_feast',
+  // masterwrought Phase 11i, the angler's endgame. Appended at the END under
+  // the append-only contract, after the farming block, so no earlier position
+  // moves: three high-band catches, the apex rod, two dishes, the capstone
+  // feast, and the four patterns that teach the drop-taught rows.
+  'raw_deepbarb_catfish',
+  'raw_hollowgill_sturgeon',
+  'raw_stillmere_salmon',
+  'clockreel_fishing_rod',
+  'peppered_deepbarb_catfish',
+  'roast_hollowgill_sturgeon',
+  'deepwater_feast',
+  'pattern_peppered_deepbarb_catfish',
+  'pattern_roast_hollowgill_sturgeon',
+  'pattern_deepwater_feast',
+  'pattern_clockreel_fishing_rod',
 ] as const;
 
 type ItemEntityId = (typeof ITEM_ENTITY_IDS)[number];
@@ -2994,6 +3009,23 @@ const APPENDED_ITEM_NAMES: Partial<Record<ItemEntityId, string>> = {
   pattern_evergarden_harvest_platter: 'Recipe: Evergarden Harvest Platter',
   pattern_evergarden_braised_greens: 'Recipe: Evergarden Braised Greens',
   pattern_harvest_feast: 'Recipe: Harvest Feast',
+  // masterwrought Phase 11i (the angler's endgame). Every proper noun here was
+  // web-verified at authoring with an adversarial second pass and recorded in
+  // docs/prd/masterwrought/naming-audit.md; the four patterns coin nothing at
+  // all, being a registered per-craft prefix plus a name verified in the same
+  // block. All eleven are wordy in English, so M16 non-Latin fills land with
+  // them.
+  raw_deepbarb_catfish: 'Raw Deepbarb Catfish',
+  raw_hollowgill_sturgeon: 'Raw Hollowgill Sturgeon',
+  raw_stillmere_salmon: 'Raw Stillmere Salmon',
+  clockreel_fishing_rod: 'Clockreel Fishing Rod',
+  peppered_deepbarb_catfish: 'Peppered Deepbarb Catfish',
+  roast_hollowgill_sturgeon: 'Roast Hollowgill Sturgeon',
+  deepwater_feast: 'Deepwater Feast',
+  pattern_peppered_deepbarb_catfish: 'Recipe: Peppered Deepbarb Catfish',
+  pattern_roast_hollowgill_sturgeon: 'Recipe: Roast Hollowgill Sturgeon',
+  pattern_deepwater_feast: 'Recipe: Deepwater Feast',
+  pattern_clockreel_fishing_rod: 'Schematic: Clockreel Fishing Rod',
 };
 
 function itemTranslations(names: readonly string[]): ItemEntityTranslations {

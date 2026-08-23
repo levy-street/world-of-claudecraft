@@ -5466,6 +5466,17 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.items.raw_marsh_pike.name': '날 늪지 강꼬치고기',
   'entities.items.raw_river_perch.name': '날 강농어',
   'entities.items.raw_stonescale_carp.name': '날 석판지느러미 잉어',
+  'entities.items.raw_deepbarb_catfish.name': '날 심가시 메기',
+  'entities.items.raw_hollowgill_sturgeon.name': '날 빈아가미 철갑상어',
+  'entities.items.raw_stillmere_salmon.name': '날 고요호 연어',
+  'entities.items.clockreel_fishing_rod.name': '톱니릴 낚싯대',
+  'entities.items.peppered_deepbarb_catfish.name': '후추 심가시 메기',
+  'entities.items.roast_hollowgill_sturgeon.name': '빈아가미 철갑상어 구이',
+  'entities.items.deepwater_feast.name': '심해의 잔치',
+  'entities.items.pattern_peppered_deepbarb_catfish.name': '요리법: 후추 심가시 메기',
+  'entities.items.pattern_roast_hollowgill_sturgeon.name': '요리법: 빈아가미 철갑상어 구이',
+  'entities.items.pattern_deepwater_feast.name': '요리법: 심해의 잔치',
+  'entities.items.pattern_clockreel_fishing_rod.name': '설계도: 톱니릴 낚싯대',
   'entities.items.soggy_boot.name': '흠뻑 젖은 장화',
   'entities.items.elixir_of_the_bear.name': '곰의 비약',
   'entities.items.healing_potion.name': '치유 물약',
@@ -8861,6 +8872,8 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.gathering.toolTooltip.rodReel': '릴 감기 시간이 {seconds}초 늘어납니다.',
   'hudChrome.gathering.toolTooltip.rodBand':
     '낚시 기술 {skill} 이상에서 더 풍성한 어획 목록이 해금됩니다.',
+  'hudChrome.gathering.toolTooltip.rodBandCatch':
+    '낚시 기술 {skill} 이상에서 {fish}이(가) 해금됩니다.',
   'hudChrome.gathering.downgradeMark':
     '가방이 가득 찼습니다: 수확물이 채집자의 표식 없이 보관되었습니다.',
   'hudChrome.gathering.downgradeMarkCrop': '가방이 가득 찼습니다: 수확물이 재배자의 표식 없이 보관되었습니다.',

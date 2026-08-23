@@ -440,6 +440,100 @@ Vellum.
     pattern_<output item id> contract, so they are derived rather than coined,
     and ids are never player-visible anyway.
 
+### Phase 11i, the angler's endgame (web-verified 2026-08-23)
+
+ELEVEN new item ids and one deed, of which only FOUR coin a token: Deepbarb,
+Hollowgill, Stillmere and Clockreel. The two dishes pair a real cookery word
+with a catch verified in this same block; the four patterns are a registered
+per-craft prefix plus a name verified here (the phase 11f construction, and the
+same "satisfied BY CONSTRUCTION" reasoning applies, asserted by the prefix arm
+in tests/apex_pattern_items.test.ts); the deed is four plain English words.
+
+Fish, rod and dish names were treated as the highest-collision class in the
+packet, so every survivor got the phase 08 ADVERSARIAL second pass: the exact
+phrase, the distinctive half alone, that half plus wow / wowhead / item / quest,
+and near-homophones. An in-repo neighbour grep ran on every candidate too.
+
+- **Raw Deepbarb Catfish** (raw_deepbarb_catfish, the band-3 catch) CLEAR. The
+  coin Deepbarb is zero-hit everywhere searched, not only on the seven wikis;
+  the nearest neighbour is WoW's Shadowbarb Drone, a different compound on a
+  mount. Catfish is RECORDED as shared vocabulary in the same role rather than
+  ignored: RuneScape ships "Raw catfish", FFXIV "Steamed Catfish", WoW "Raw
+  Bristle Whisker Catfish", "Gigantic Catfish" and "Great Sea Catfish". None is
+  this name, which is what the bar asks. In-repo: no prior "catfish", no prior
+  "barb" compound.
+- **Raw Hollowgill Sturgeon** (raw_hollowgill_sturgeon, band 4) CLEAR. Hollowgill
+  is zero-hit in every game index searched; its only web presence is a Yorkshire
+  holiday cottage ("gill" is northern English for a ravine), the real-places
+  class the bar does not count. The -gill suffix is this repo's own (Frostgill
+  Trout ships), so it extends house vocabulary rather than borrowing. Sturgeon
+  recorded as shared: OSRS ships "Leaping sturgeon" and "Raw sturgeon".
+- **Raw Stillmere Salmon** (raw_stillmere_salmon, band 5, the rarest catch in
+  the game) CLEAR. Stillmere is zero-hit as any game location, item, NPC or
+  ability; its whole web presence is non-game. Nearest neighbours RECORDED:
+  Skyrim's Shadowmere and FFXII's Stilshrine of Miriam, neither the same token,
+  and "-mere" is ordinary English for a lake. Salmon recorded as shared in the
+  same role (WoW's Raw Whitescale / Raw Sunscale / Midnight Salmon, RuneScape's
+  Raw salmon).
+- **Clockreel Fishing Rod** (clockreel_fishing_rod, the tier-6 apex rung) CLEAR.
+  Clockreel is zero-hit as any game item; the only thing the web knows by the
+  name is the historical clock reel, a yarn-winding tool, which is real-world
+  vocabulary rather than anyone's coin. It reads as the family's top rung
+  (Ironreel, Silverstream, Stormreel, Tidewrought, Clockreel) while naming the
+  engineering craft that makes it, the register this repo already ships in Cogs
+  and Sprockets and Gyrelens Array. Adjacency considered and passed: Crimson
+  Desert's legendary "Clockwork Fish", a different token in the caught-thing
+  role. ADOPTED OVER Fathomreel after the adversarial pass downgraded that one.
+- **Peppered Deepbarb Catfish** and **Roast Hollowgill Sturgeon** (the cooking
+  75 and 100 dishes) CLEAR, and neither coins anything: a real cookery word plus
+  a catch verified above. Both full pairings zero-hit; the forms are the shipped
+  fish-dish register (Pan-Seared River Perch, Herbed Marsh Pike, Ashwood Smoked
+  Eel) and the shipped "Roast <X>" form (Roast Mountain Goat).
+- **Deepwater Feast** (deepwater_feast, the cooking-125 capstone) GENERIC with
+  recorded neighbours. "Deepwater" is plain English and the full name is
+  zero-hit, but the feast slot is dense trade dress and the neighbours are
+  written down rather than passed over: WoW ships Fish Feast, Fisherman's Feast,
+  Seafood Magnifique Feast, Bountiful Feast and Great Feast, and separately uses
+  the word in Deepwater Lure, Deepwater Blossom and Hungering Deepwater Treads.
+  Not one is this name, and no game pairs the two words. The "<Word> Feast"
+  construction is genre-shared and already ours (Harvest Feast ships).
+- **The Deepest Cast** (col_deepest_cast, the untitled deed) CLEAR. Four plain
+  English words in the shipped deed voice (Glimmer of Hope, Full Creel, The Junk
+  Drawer, Every Furrow Filled), no coined token, packet-original. Exact phrase
+  zero-hit across the WoW fishing achievement set (Master Angler of Azeroth, Old
+  Man Barlowned, Salty, Accomplished Angler), the FFXIV and RuneScape fishing
+  lines, and the indie fishing games that own this vocabulary. Nearest WoW
+  neighbours are the achievements A Cast Above the Rest and Delve Deepest. The
+  deed carries NO title reward, so nothing enters the title namespace and
+  "Master Angler" (our own prog_master_angler) is untouched.
+
+REJECTED AT AUTHORING, recorded so none is re-proposed: **Raw Kingfin Salmon**
+(COLLISION: WoW's "Kingfin, the Wise Whiskerfish" is a FISH item, the same
+role). **Raw Silverwake Salmon** (COLLISION: Silverwake is a Dragonlance noble
+house). **Raw Goldwake Sturgeon** (COLLISION: BG3's Captain Goldwake). **Raw
+Hoarcrown Salmon** (BORDERLINE, zero-hit but declined: hoarfrost plus crown is a
+synonym swap of Icecrown, and swapping a synonym TOWARD a famous name is the
+inverse of the Hellsteel-to-Pitsteel move this audit already made). **Raw
+Silttail** anything (CLEAR standalone but declined: one letter from Trials of
+Mana's Silktail, exactly the near-homophone the adversarial pass exists for).
+**Fathomreel Fishing Rod** (BORDERLINE: PENN ships a live "Fathom" REEL product
+family, a real-world product in the exact category this item is, the Scrivener's
+Vellum rejection class). **Line and Sinker** (COLLISION CLASS: a truncation of
+"Hook, Line and Sinker", which ships as an FFXIV quest, a RuneScape port voyage
+and an ARC Raiders achievement, the truncation class that killed Flask of the
+Wyrm at phase 10). **Reel and Ratchet** (BORDERLINE: Ratchet is a WoW port town
+and a Sony franchise title character). **Fisherman's Feast** / **Fish Feast**
+(COLLISION: WoW items 33052 and 43015). **Angler's Bounty** or any new Angler's
+name (in-repo: Angler's Feast Platter ships, so a second reads as its family).
+**Coldwater Feast** (in-repo: the Coldwater Rot mob mechanic plus the deed Cold
+Water, Colder Light). **Grand Banquet** (already on the registry's rejected
+row). Anything containing **Master Angler** or **Apex** (both already taken or
+rejected).
+
+- Also swept and clear: the eleven ids themselves. The three patterns and the
+  schematic follow the shipped pattern_<output item id> contract, so they are
+  derived rather than coined, and ids are never player-visible anyway.
+
 ## Recorded for the maintainer (stopping rule: no unilateral rename)
 
 STATUS 2026-08-20, SETTLED BY THE MAINTAINER, and the scope is narrow on purpose.

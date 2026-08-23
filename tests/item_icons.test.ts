@@ -316,10 +316,12 @@ describe('item webp icons', () => {
     // economy-hooks phase added its eight farm dishes, the Phase 11
     // well-fed phase added its four buff dishes, the Phase 12 shared
     // feast added the harvest_feast placeable, and Phase 11f added the six
-    // farming PATTERNS its rung climb minted (56 -> 62), all under the same
-    // reasoning: their art is scheduled as its own later phase, a deliberate
-    // ART PARK running Phases 11e to 11k. It must fall back to 0 as that art
-    // lands. CORRECTED at the Phase 11e QA: this used to add "all are dormant
+    // farming PATTERNS its rung climb minted (56 -> 62), and Phase 11i added
+    // the angler's endgame's eleven (62 -> 73: three high-band catches, the
+    // apex rod, two dishes, the capstone feast and four patterns), all under
+    // the same reasoning: their art is scheduled as its own later phase, a
+    // deliberate ART PARK running Phases 11e to 11k. It must fall back to 0 as
+    // that art lands. CORRECTED at the Phase 11e QA: this used to add "all are dormant
     // online (no faucet for any exists yet)", which was already false when it
     // was written (farmer_jessica has stocked the Vale seeds, brook_carrot and
     // the garden hoe since the growth engine shipped) and is doubly false now
@@ -334,7 +336,9 @@ describe('item webp icons', () => {
       'bronze_hoe',
       'brook_carrot',
       'brook_carrot_seed',
+      'clockreel_fishing_rod',
       'compost',
+      'deepwater_feast',
       'eastbrook_glazed_carrots',
       'eastbrook_root_pottage',
       'evergarden_braised_greens',
@@ -378,12 +382,21 @@ describe('item webp icons', () => {
       'marsh_rice',
       'marsh_rice_seed',
       'osmium_hoe',
+      'pattern_clockreel_fishing_rod',
+      'pattern_deepwater_feast',
       'pattern_evergarden_braised_greens',
       'pattern_evergarden_harvest_platter',
       'pattern_evergarden_sunmelon_tart',
       'pattern_harvest_feast',
       'pattern_highwatch_barley_porridge',
       'pattern_highwatch_gourd_soup',
+      'pattern_peppered_deepbarb_catfish',
+      'pattern_roast_hollowgill_sturgeon',
+      'peppered_deepbarb_catfish',
+      'raw_deepbarb_catfish',
+      'raw_hollowgill_sturgeon',
+      'raw_stillmere_salmon',
+      'roast_hollowgill_sturgeon',
       'skysilver_hoe',
       'thornpeak_cabbage',
       'thornpeak_cabbage_seed',

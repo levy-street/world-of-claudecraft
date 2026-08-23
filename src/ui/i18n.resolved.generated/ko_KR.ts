@@ -3105,7 +3105,8 @@ export const ko_KR: EnTranslations = {
         "rodRequired": "낚시에 필요합니다.",
         "rodBite": "물고기가 최대 {seconds}초 더 빨리 입질합니다.",
         "rodReel": "릴 감기 시간이 {seconds}초 늘어납니다.",
-        "rodBand": "낚시 기술 {skill} 이상에서 더 풍성한 어획 목록이 해금됩니다."
+        "rodBand": "낚시 기술 {skill} 이상에서 더 풍성한 어획 목록이 해금됩니다.",
+        "rodBandCatch": "낚시 기술 {skill} 이상에서 {fish}이(가) 해금됩니다."
       },
       "downgradeMark": "가방이 가득 찼습니다: 수확물이 채집자의 표식 없이 보관되었습니다.",
       "downgradeMarkCrop": "가방이 가득 찼습니다: 수확물이 재배자의 표식 없이 보관되었습니다.",
@@ -13042,6 +13043,39 @@ export const ko_KR: EnTranslations = {
       },
       "pattern_harvest_feast": {
         "name": "요리법: 수확의 잔치"
+      },
+      "raw_deepbarb_catfish": {
+        "name": "날 심가시 메기"
+      },
+      "raw_hollowgill_sturgeon": {
+        "name": "날 빈아가미 철갑상어"
+      },
+      "raw_stillmere_salmon": {
+        "name": "날 고요호 연어"
+      },
+      "clockreel_fishing_rod": {
+        "name": "톱니릴 낚싯대"
+      },
+      "peppered_deepbarb_catfish": {
+        "name": "후추 심가시 메기"
+      },
+      "roast_hollowgill_sturgeon": {
+        "name": "빈아가미 철갑상어 구이"
+      },
+      "deepwater_feast": {
+        "name": "심해의 잔치"
+      },
+      "pattern_peppered_deepbarb_catfish": {
+        "name": "요리법: 후추 심가시 메기"
+      },
+      "pattern_roast_hollowgill_sturgeon": {
+        "name": "요리법: 빈아가미 철갑상어 구이"
+      },
+      "pattern_deepwater_feast": {
+        "name": "요리법: 심해의 잔치"
+      },
+      "pattern_clockreel_fishing_rod": {
+        "name": "설계도: 톱니릴 낚싯대"
       },
       "conjured_water4": {
         "name": "창조된 샘물"

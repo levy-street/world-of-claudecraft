@@ -256,27 +256,120 @@ export const RARE_SLAIN_TEMPLATES = new Set([
 // Exported for the new-zone checklist (tests/professions_zone_rollout.test.ts):
 // a complete zone's first-cast deed is only earnable if a row here writes its
 // fish:<zone> mark, so the checklist sweeps this table too.
+// THE THREE HIGH-BAND CATCHES JOIN EVERY ROW (masterwrought Phase 11i), and
+// the verdict is written here rather than left implicit. They are uniform
+// across zones by construction (each sits in every zone's cell for its band at
+// the same weight), so every water that draws a real table or the Vale fallback
+// can land all three. Leaving them out would make the first-catch deed marks
+// silently incomplete for exactly the zones the new bands are authored against,
+// which is the harder bug to find later; the deeds_content guard intersects
+// each row against the tables its zone ACTUALLY draws, so an unearned row would
+// red there instead of sitting dormant.
 export const ZONE_FISH: Record<string, readonly string[]> = {
-  eastbrook_vale: ['raw_mirror_trout', 'raw_river_perch', 'glimmerfin_koi'],
-  mirefen_marsh: ['raw_marsh_pike', 'raw_bog_eel', 'glimmerfin_koi'],
-  thornpeak_heights: ['raw_frostgill_trout', 'raw_stonescale_carp', 'glimmerfin_koi'],
+  eastbrook_vale: [
+    'raw_mirror_trout',
+    'raw_river_perch',
+    'glimmerfin_koi',
+    'raw_deepbarb_catfish',
+    'raw_hollowgill_sturgeon',
+    'raw_stillmere_salmon',
+  ],
+  mirefen_marsh: [
+    'raw_marsh_pike',
+    'raw_bog_eel',
+    'glimmerfin_koi',
+    'raw_deepbarb_catfish',
+    'raw_hollowgill_sturgeon',
+    'raw_stillmere_salmon',
+  ],
+  thornpeak_heights: [
+    'raw_frostgill_trout',
+    'raw_stonescale_carp',
+    'glimmerfin_koi',
+    'raw_deepbarb_catfish',
+    'raw_hollowgill_sturgeon',
+    'raw_stillmere_salmon',
+  ],
   // The three bottom-map zones (the phase 20 chronicle pairs, Q26): their
   // waters draw the Vale FALLBACK tables until the zone-4 pass authors real
   // ones (professions/fishing.ts, bandTables[zoneId] ?? eastbrook_vale), so
   // the rows list the fallback's own fish and the deeds_content guard
   // intersects them against the tables each zone ACTUALLY draws.
-  willowfen: ['raw_mirror_trout', 'raw_river_perch', 'glimmerfin_koi'],
-  galecrest: ['raw_mirror_trout', 'raw_river_perch', 'glimmerfin_koi'],
-  farshore_isle: ['raw_mirror_trout', 'raw_river_perch', 'glimmerfin_koi'],
+  willowfen: [
+    'raw_mirror_trout',
+    'raw_river_perch',
+    'glimmerfin_koi',
+    'raw_deepbarb_catfish',
+    'raw_hollowgill_sturgeon',
+    'raw_stillmere_salmon',
+  ],
+  galecrest: [
+    'raw_mirror_trout',
+    'raw_river_perch',
+    'glimmerfin_koi',
+    'raw_deepbarb_catfish',
+    'raw_hollowgill_sturgeon',
+    'raw_stillmere_salmon',
+  ],
+  farshore_isle: [
+    'raw_mirror_trout',
+    'raw_river_perch',
+    'glimmerfin_koi',
+    'raw_deepbarb_catfish',
+    'raw_hollowgill_sturgeon',
+    'raw_stillmere_salmon',
+  ],
   // The remaining starter-tier zones (content/deeds.ts extends the same
   // chronicle pair to them; drakelands skipped, see the comment there) draw
   // the same Vale fallback table, so their rows list the same fish.
-  frostveil: ['raw_mirror_trout', 'raw_river_perch', 'glimmerfin_koi'],
-  amberfall: ['raw_mirror_trout', 'raw_river_perch', 'glimmerfin_koi'],
-  nightbloom: ['raw_mirror_trout', 'raw_river_perch', 'glimmerfin_koi'],
-  wraithwood: ['raw_mirror_trout', 'raw_river_perch', 'glimmerfin_koi'],
-  palmreach: ['raw_mirror_trout', 'raw_river_perch', 'glimmerfin_koi'],
-  evergarden: ['raw_mirror_trout', 'raw_river_perch', 'glimmerfin_koi'],
+  frostveil: [
+    'raw_mirror_trout',
+    'raw_river_perch',
+    'glimmerfin_koi',
+    'raw_deepbarb_catfish',
+    'raw_hollowgill_sturgeon',
+    'raw_stillmere_salmon',
+  ],
+  amberfall: [
+    'raw_mirror_trout',
+    'raw_river_perch',
+    'glimmerfin_koi',
+    'raw_deepbarb_catfish',
+    'raw_hollowgill_sturgeon',
+    'raw_stillmere_salmon',
+  ],
+  nightbloom: [
+    'raw_mirror_trout',
+    'raw_river_perch',
+    'glimmerfin_koi',
+    'raw_deepbarb_catfish',
+    'raw_hollowgill_sturgeon',
+    'raw_stillmere_salmon',
+  ],
+  wraithwood: [
+    'raw_mirror_trout',
+    'raw_river_perch',
+    'glimmerfin_koi',
+    'raw_deepbarb_catfish',
+    'raw_hollowgill_sturgeon',
+    'raw_stillmere_salmon',
+  ],
+  palmreach: [
+    'raw_mirror_trout',
+    'raw_river_perch',
+    'glimmerfin_koi',
+    'raw_deepbarb_catfish',
+    'raw_hollowgill_sturgeon',
+    'raw_stillmere_salmon',
+  ],
+  evergarden: [
+    'raw_mirror_trout',
+    'raw_river_perch',
+    'glimmerfin_koi',
+    'raw_deepbarb_catfish',
+    'raw_hollowgill_sturgeon',
+    'raw_stillmere_salmon',
+  ],
 };
 
 // Farming hub zones whose beds feed the chr_ first-harvest chronicle deeds:

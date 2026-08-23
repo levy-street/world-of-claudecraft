@@ -1121,9 +1121,13 @@ describe('fishing telemetry counters at their emission sites', () => {
 
     server.sim.addItem('tidewrought_fishing_rod', 1, session.pid);
     observe(server, [castStartEvent(session.pid, 'fishing')]);
+    // Band 4, not 2, since masterwrought Phase 11i: the tidewrought is tier 5
+    // and the ladder now runs to six bands, so at proficiency 200 the rod is
+    // the only axis left and a tier-5 rod reaches band 4. That the number MOVED
+    // with the rod is the property this arm is about.
     expect(rec.fishingCasts).toEqual([
       ['mirefen_marsh', '0'],
-      ['mirefen_marsh', '2'],
+      ['mirefen_marsh', '4'],
     ]);
     server.stop();
   });

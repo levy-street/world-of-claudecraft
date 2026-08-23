@@ -66,7 +66,9 @@ describe('deed_i18n English resolution', () => {
     // WARFARE lifetime-honor rank titles, the five Phase 18 Reliquary
     // completion-ladder titles, and the release's walk-in castle visit pair
     // (no title reward).
-    expect(manifest.length).toBe(287 * 2 + 45);
+    // 288 deeds since masterwrought Phase 11i: two rows each (name and desc)
+    // plus the 45 title rewards, which col_deepest_cast does not join.
+    expect(manifest.length).toBe(288 * 2 + 45);
     expect(manifest.filter((row) => row.field === 'title').length).toBe(45);
     expect(manifest).toContainEqual({
       id: 'prog_veteran',

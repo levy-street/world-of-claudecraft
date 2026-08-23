@@ -380,12 +380,40 @@ export const TOOL_RECIPES: ProfessionRecipeRecord[] = [
 // teaches them, without a content edit, because the trainer's list derives
 // from the crafts its station serves.
 //
-// SKILL REQUIREMENTS ARE BOTH INSIDE ENGINEERING'S CAP (125), unlike the
+// THE CRAFTED FISHING RODS ARE THREE RUNGS SINCE masterwrought Phase 11i, not
+// two: tier 4, tier 5, and the tier-6 apex rung that opens catch band 5. The
+// two paragraphs above describe the shipped pair; the apex rung's own self-gate
+// is the third bullet below.
+//
+// - The APEX rung is hard-gated twice over, and by its own ladder. It consumes
+//   the tier-5 rod plus the two catches bands 4 and 5 pay, and band 4 already
+//   takes a tier-5 rod, so nothing in the bill can be fished by anyone who has
+//   not already climbed to the rung below. The Stillmere Salmon goes further:
+//   it exists only in the band-5 cell, which this very rod is the gate on, so
+//   the FIRST clockreel in a realm is crafted from catches its owner cannot
+//   have farmed themselves. That is deliberate and it is why the salmon is not
+//   the only high-band reagent: the sturgeon at band 4 is reachable with the
+//   tidewrought alone, and the market carries the rest.
+//
+// SKILL REQUIREMENTS ARE ALL THREE INSIDE ENGINEERING'S CAP (125), unlike the
 // tier-5 land tools at 75/150. 150 resolves to tier 6 while the cap resolves
-// to tier 5, and a trainer only teaches a recipe whose tier the learner has
-// reached, so a trainer-taught recipe at 150 would be permanently unlearnable
-// rather than merely expensive. The land tools escape that only because they
-// predate training and are grandfathered known.
+// to tier 5, and BOTH learning channels run the same gate (teachTierMet in
+// professions/training.ts and the 'tier' deny arm in
+// professions/pattern_items.ts), so a recipe authored at 150 is permanently
+// unlearnable through a trainer AND through a pattern: dead content that no
+// test would red on, because there is no craft-time skillReq admission gate to
+// catch it. The land tools escape that only because they predate training and
+// are grandfathered known (PRE_TRAINING_RECIPE_IDS, frozen). 125 is the
+// reachable top rung, which is exactly where APEX_CONSUMABLE_RECIPES already
+// puts its two capstones. RE-VERIFIED IN CODE at masterwrought Phase 11i and
+// handed to Phase 11j, whose apex hoe is settled on the same finding.
+//
+// THE APEX RUNG IS DROP-TAUGHT, breaking the ['trainer'] pattern of the two
+// above, and that is R8 rather than convenience: an apex rung reaches players
+// through the pillars, and its schematic is deterministic Heroic Marks stock
+// (content/heroic_vendor.ts). It could not be a band-5 catch instead: the rod
+// gates band 5, so a luck-gated schematic would put the whole top band behind
+// luck, which is the compulsion R18 forbids.
 export const ROD_RECIPES: ProfessionRecipeRecord[] = [
   {
     id: 'recipe_stormreel_fishing_rod',
@@ -417,6 +445,25 @@ export const ROD_RECIPES: ProfessionRecipeRecord[] = [
     level: 20,
     stationType: 'toolworks',
     acquisition: ['trainer'],
+  },
+  {
+    id: 'recipe_clockreel_fishing_rod',
+    professionId: 'engineering',
+    resultItemId: 'clockreel_fishing_rod',
+    resultCount: 1,
+    // Input 496 vs output 375. recipe_tidewrought_fishing_rod above is
+    // untouched by this phase: its def and its bill both diff empty.
+    reagents: [
+      { itemId: 'glimmerfin_koi', count: 2 },
+      { itemId: 'raw_hollowgill_sturgeon', count: 6 },
+      { itemId: 'raw_stillmere_salmon', count: 4 },
+      { itemId: 'tidewrought_fishing_rod', count: 1 },
+    ],
+    skillReq: 125,
+    itemLevelBudget: 30,
+    level: 20,
+    stationType: 'toolworks',
+    acquisition: ['drop'],
   },
 ];
 
@@ -2717,9 +2764,25 @@ export const APEX_CONSUMABLE_RECIPES: ProfessionRecipeRecord[] = [
     stationType: 'apothecary',
   },
   // The three role foods: Marlow's Grand Roast scaled to the apex batch, with
-  // the seasoned stock that carries the rung, and ONE crop row each
-  // (masterwrought Phase 11h, 11h-GATE-A and 11h-GATE-B). Input 422 to 452 vs
-  // output 360 on all three.
+  // the seasoned stock that carries the rung, ONE crop row each (masterwrought
+  // Phase 11h, 11h-GATE-A and 11h-GATE-B) and ONE uniform fish row
+  // (masterwrought Phase 11i, DECISION D).
+  //
+  // THE CROP ROW DIFFERENTIATES, THE FISH ROW UNIFIES, and that is the whole
+  // shape of the family now. The same Raw Deepbarb Catfish at the same count
+  // goes into all three plates AND into recipe_laden_hearth below: fixing only
+  // the chowder (the headline defect, a chowder with no fish in it) would have
+  // left an int-role player needing fish while an ap-role player did not, and
+  // that compulsion asymmetry is exactly what R18 exists to prevent.
+  //
+  // THE COUNT IS FOUR, AND IT IS FORCED RATHER THAN CHOSEN. The standing
+  // fish-forward sweep requires fish to STRICTLY OUTNUMBER produce on any row
+  // carrying a raw catch. The three plates carry produce 2, so 3 would clear
+  // them; recipe_laden_hearth carries produce THREE (evergarden_greens 2 plus
+  // fine_evergarden_greens 1), so a uniform row at 3 TIES there and reds. Four
+  // is the lowest legal uniform count across the four rows DECISION D governs.
+  // ADDED, NEVER SUBSTITUTED: 11h's per-plate crop rows are untouched and no
+  // shipped reagent left any bill.
   //
   // THIS IS WHERE THREE BILLS STOP BEING BYTE-IDENTICAL. Since Phase 10 the
   // three role plates were the same recipe with three names, and a player
@@ -2769,6 +2832,7 @@ export const APEX_CONSUMABLE_RECIPES: ProfessionRecipeRecord[] = [
       { itemId: 'frost_gourd', count: 2 },
       { itemId: 'sunpetal_herb', count: 2 },
       { itemId: 'cooking_salt', count: 2 },
+      { itemId: 'raw_deepbarb_catfish', count: 4 },
     ],
     skillReq: 100,
     itemLevelBudget: 25,
@@ -2790,6 +2854,7 @@ export const APEX_CONSUMABLE_RECIPES: ProfessionRecipeRecord[] = [
       { itemId: 'highland_barley', count: 2 },
       { itemId: 'sunpetal_herb', count: 2 },
       { itemId: 'cooking_salt', count: 2 },
+      { itemId: 'raw_deepbarb_catfish', count: 4 },
     ],
     skillReq: 100,
     itemLevelBudget: 25,
@@ -2813,6 +2878,7 @@ export const APEX_CONSUMABLE_RECIPES: ProfessionRecipeRecord[] = [
       { itemId: 'thornpeak_cabbage', count: 2 },
       { itemId: 'sunpetal_herb', count: 2 },
       { itemId: 'cooking_salt', count: 2 },
+      { itemId: 'raw_deepbarb_catfish', count: 4 },
     ],
     skillReq: 100,
     itemLevelBudget: 25,
@@ -2906,6 +2972,82 @@ export const APEX_CONSUMABLE_RECIPES: ProfessionRecipeRecord[] = [
       { itemId: 'evergarden_greens', count: 2 },
       { itemId: 'fine_evergarden_greens', count: 1 },
       { itemId: 'sunpetal_herb', count: 2 },
+      { itemId: 'raw_deepbarb_catfish', count: 4 },
+    ],
+    skillReq: 125,
+    itemLevelBudget: 25,
+    level: 25,
+    acquisition: ['drop'],
+    stationType: 'kitchens',
+  },
+  // ---- The angler's endgame rows (masterwrought Phase 11i) ----------------
+  //
+  // Three drop-taught cooking rows at 75, 100 and 125, each keyed on the catch
+  // one high band introduces. These are what put FISHING into the endgame bill
+  // census ON ITS OWN ACCOUNT rather than through a rod, which is the R20
+  // property the completion pass will pin: before this phase every fishing bill
+  // at skillReq 75 or above was a fishing rod, so the deepest gathering
+  // profession in the game fed only itself.
+  //
+  // NO PRODUCE ON ANY OF THE THREE, so the accent rule (R17 RULE 2) has nothing
+  // to sweep here and "at most one crop family joins a fish row" is satisfied
+  // vacuously. Fish-forward holds by a wide margin on each.
+  {
+    id: 'recipe_peppered_deepbarb_catfish',
+    professionId: 'cooking',
+    resultItemId: 'peppered_deepbarb_catfish',
+    resultCount: 2,
+    // Rung 75, keyed on the band-3 catch. Input 192 vs output 150.
+    reagents: [
+      { itemId: 'raw_deepbarb_catfish', count: 4 },
+      { itemId: 'goldleaf_herb', count: 2 },
+      { itemId: 'cooking_salt', count: 2 },
+    ],
+    skillReq: 75,
+    itemLevelBudget: 20,
+    level: 20,
+    acquisition: ['drop'],
+    stationType: 'kitchens',
+  },
+  {
+    id: 'recipe_roast_hollowgill_sturgeon',
+    professionId: 'cooking',
+    resultItemId: 'roast_hollowgill_sturgeon',
+    resultCount: 2,
+    // Rung 100, keyed on the band-4 catch, with the band-3 catch under it: the
+    // rung below feeding the rung above is the ladder idiom this file already
+    // uses for the rods. Input 436 vs output 300.
+    reagents: [
+      { itemId: 'raw_hollowgill_sturgeon', count: 4 },
+      { itemId: 'raw_deepbarb_catfish', count: 2 },
+      { itemId: 'sunpetal_herb', count: 2 },
+      { itemId: 'cooking_salt', count: 2 },
+    ],
+    skillReq: 100,
+    itemLevelBudget: 25,
+    level: 25,
+    acquisition: ['drop'],
+    stationType: 'kitchens',
+  },
+  {
+    id: 'recipe_deepwater_feast',
+    professionId: 'cooking',
+    resultItemId: 'deepwater_feast',
+    resultCount: 1,
+    // THE CAPSTONE (deliverable 5). Its keystone is the band-5 catch, which
+    // takes proficiency 200 AND the tier-6 rod, so the master angler is the
+    // sole faucet: that is the ROLE the phase set out to give the profession,
+    // and it is a role rather than a stat because the output serves a SHIPPED
+    // plate's buff and mints nothing of its own (content/profession_items.ts).
+    // All three high-band catches appear, so the whole ladder feeds its own
+    // capstone. Input 390 vs output 250.
+    reagents: [
+      { itemId: 'raw_stillmere_salmon', count: 2 },
+      { itemId: 'raw_hollowgill_sturgeon', count: 3 },
+      { itemId: 'raw_deepbarb_catfish', count: 4 },
+      { itemId: 'seasoned_stock', count: 2 },
+      { itemId: 'sunpetal_herb', count: 1 },
+      { itemId: 'cooking_salt', count: 2 },
     ],
     skillReq: 125,
     itemLevelBudget: 25,

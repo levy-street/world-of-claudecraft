@@ -376,7 +376,7 @@ describe('Book of Deeds webp icons', () => {
     // ships no crest (the packet's art park runs 11e to 11k).
     // PENDING: 2 (the castle pair) + farming's remaining 6 + the roster deed
     // = 9, which is also the 287 - 278 cross-check.
-    expect(DEED_ORDER, 'the merged live deed catalog').toHaveLength(287);
+    expect(DEED_ORDER, 'the merged live deed catalog').toHaveLength(288);
     expect(DEED_IMAGE_IDS.size, 'every live deed but the pending set is painted').toBe(278);
     expect(DEED_ORDER.length - DEED_IMAGE_IDS.size).toBe(DEED_ART_PENDING_IDS.length);
     for (const id of artless) {

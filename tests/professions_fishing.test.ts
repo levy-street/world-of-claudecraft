@@ -1235,7 +1235,10 @@ function weightOf(band: number, zoneId: string, itemId: string | null): number {
 
 describe('fishing table structure (pin 5)', () => {
   it('band 0 rows for all three zones literally equal the authored rows, in order', () => {
-    expect(FISHING_TABLES_BY_BAND).toHaveLength(3);
+    // SIX bands since masterwrought Phase 11i. The band-0 image below is
+    // untouched, which is the point: growing the ladder must leave every
+    // shipped cell byte identical, and this literal walk is what says so.
+    expect(FISHING_TABLES_BY_BAND).toHaveLength(6);
     for (const zoneId of ZONE_IDS) {
       expect(FISHING_TABLES_BY_BAND[0][zoneId]).toEqual(B0_ROWS[zoneId]);
     }
@@ -1477,6 +1480,7 @@ describe('fishing band tool cap (Professions 2.0)', () => {
       .filter((def) => def.use?.type === 'gatherTool' && def.use.professionId === 'fishing')
       .map((def) => def.id);
     expect(rodIds.sort()).toEqual([
+      'clockreel_fishing_rod',
       'ironreel_fishing_rod',
       'silverstream_fishing_rod',
       'stormreel_fishing_rod',
@@ -1495,7 +1499,7 @@ describe('fishing band tool cap (Professions 2.0)', () => {
       // The visible timer is the 15 s session cap (literal on
       // purpose), which carries no bite information.
       expect(sim.events).toContainEqual(
-        expect.objectContaining({ type: 'castStart', ability: FISHING_CAST_ID, time: 15 }),
+        expect.objectContaining({ type: 'castStart', ability: FISHING_CAST_ID, time: 16 }),
       );
       // The rod is a permanent tool: never consumed by the cast.
       expect(sim.countItem(rodId)).toBe(1);
@@ -1885,10 +1889,13 @@ describe('startFishing arms through the extracted module path (pin 10)', () => {
     // constant would pin nothing) and carries zero bite information.
     expect(draws).toBe(1);
     expect(sim.player.castingAbility).toBe('fishing');
-    expect(sim.player.castTotal).toBe(15);
-    expect(sim.player.castRemaining).toBe(15);
+    // 16 since masterwrought Phase 11i: the defensive session cap took a second
+    // so the tier-6 epic rung's reel window cannot be truncated by the timeout
+    // (the derivation is in professions/fishing.ts).
+    expect(sim.player.castTotal).toBe(16);
+    expect(sim.player.castRemaining).toBe(16);
     expect(sim.events).toContainEqual(
-      expect.objectContaining({ type: 'castStart', ability: 'fishing', time: 15 }),
+      expect.objectContaining({ type: 'castStart', ability: 'fishing', time: 16 }),
     );
     // The hidden bite state armed in ticks, strictly ahead of now; the reel
     // window stays unarmed until the bite actually fires.

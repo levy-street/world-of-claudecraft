@@ -3105,7 +3105,8 @@ export const en_XA: EnTranslations = {
         "rodRequired": "[Ŕéɋúíŕéð ţó ƒíšĥ.]",
         "rodBite": "[Ƒíšĥ ƀíţé úþ ţó {seconds}š šóóñéŕ.]",
         "rodReel": "[Éẋţéñðš ţĥé ŕééļ ŵíñðóŵ ƀý {seconds}š.]",
-        "rodBand": "[Úñļóçķš ŕíçĥéŕ çáţçĥ ţáƀļéš áţ ƒíšĥíñĝ šķíļļ {skill} áñð áƀóʋé.]"
+        "rodBand": "[Úñļóçķš ŕíçĥéŕ çáţçĥ ţáƀļéš áţ ƒíšĥíñĝ šķíļļ {skill} áñð áƀóʋé.]",
+        "rodBandCatch": "[Úñļóçķš {fish} áţ ƒíšĥíñĝ šķíļļ {skill} áñð áƀóʋé.]"
       },
       "downgradeMark": "[Ɓáĝš ƒúļļ: ţĥé ƒíñð ŵáš šţóŕéð ŵíţĥóúţ íţš ĝáţĥéŕéŕ'š ɱáŕķ.]",
       "downgradeMarkCrop": "[Ɓáĝš ƒúļļ: ţĥé ĥáŕʋéšţ ŵáš šţóŕéð ŵíţĥóúţ íţš ĝŕóŵéŕ'š ɱáŕķ.]",
@@ -13042,6 +13043,39 @@ export const en_XA: EnTranslations = {
       },
       "pattern_harvest_feast": {
         "name": "[Ŕéçíþé: Ĥáŕʋéšţ Ƒéášţ]"
+      },
+      "raw_deepbarb_catfish": {
+        "name": "[Ŕáŵ Ðééþƀáŕƀ Çáţƒíšĥ]"
+      },
+      "raw_hollowgill_sturgeon": {
+        "name": "[Ŕáŵ Ĥóļļóŵĝíļļ Šţúŕĝéóñ]"
+      },
+      "raw_stillmere_salmon": {
+        "name": "[Ŕáŵ Šţíļļɱéŕé Šáļɱóñ]"
+      },
+      "clockreel_fishing_rod": {
+        "name": "[Çļóçķŕééļ Ƒíšĥíñĝ Ŕóð]"
+      },
+      "peppered_deepbarb_catfish": {
+        "name": "[Þéþþéŕéð Ðééþƀáŕƀ Çáţƒíšĥ]"
+      },
+      "roast_hollowgill_sturgeon": {
+        "name": "[Ŕóášţ Ĥóļļóŵĝíļļ Šţúŕĝéóñ]"
+      },
+      "deepwater_feast": {
+        "name": "[Ðééþŵáţéŕ Ƒéášţ]"
+      },
+      "pattern_peppered_deepbarb_catfish": {
+        "name": "[Ŕéçíþé: Þéþþéŕéð Ðééþƀáŕƀ Çáţƒíšĥ]"
+      },
+      "pattern_roast_hollowgill_sturgeon": {
+        "name": "[Ŕéçíþé: Ŕóášţ Ĥóļļóŵĝíļļ Šţúŕĝéóñ]"
+      },
+      "pattern_deepwater_feast": {
+        "name": "[Ŕéçíþé: Ðééþŵáţéŕ Ƒéášţ]"
+      },
+      "pattern_clockreel_fishing_rod": {
+        "name": "[Šçĥéɱáţíç: Çļóçķŕééļ Ƒíšĥíñĝ Ŕóð]"
       },
       "conjured_water4": {
         "name": "[Çóñĵúŕéð Šþŕíñĝŵáţéŕ]"

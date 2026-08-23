@@ -3105,7 +3105,8 @@ export const ru_RU: EnTranslations = {
         "rodRequired": "Нужна для рыбалки.",
         "rodBite": "Рыба клюет до {seconds} с быстрее.",
         "rodReel": "Продлевает окно подсечки на {seconds} с.",
-        "rodBand": "Открывает более богатый улов при навыке рыбалки от {skill}."
+        "rodBand": "Открывает более богатый улов при навыке рыбалки от {skill}.",
+        "rodBandCatch": "Открывает добычу «{fish}» при навыке рыбалки от {skill}."
       },
       "downgradeMark": "Сумки полны: добыча сохранена без метки сборщика.",
       "downgradeMarkCrop": "Сумки полны: урожай сохранен без метки садовода.",
@@ -13042,6 +13043,39 @@ export const ru_RU: EnTranslations = {
       },
       "pattern_harvest_feast": {
         "name": "Рецепт: Пир урожая"
+      },
+      "raw_deepbarb_catfish": {
+        "name": "Сырой глубокоусый сом"
+      },
+      "raw_hollowgill_sturgeon": {
+        "name": "Сырой полужаберный осётр"
+      },
+      "raw_stillmere_salmon": {
+        "name": "Сырой тихоозёрный лосось"
+      },
+      "clockreel_fishing_rod": {
+        "name": "Удочка с часовой катушкой"
+      },
+      "peppered_deepbarb_catfish": {
+        "name": "Перчёный глубокоусый сом"
+      },
+      "roast_hollowgill_sturgeon": {
+        "name": "Жареный полужаберный осётр"
+      },
+      "deepwater_feast": {
+        "name": "Глубоководный пир"
+      },
+      "pattern_peppered_deepbarb_catfish": {
+        "name": "Рецепт: Перчёный глубокоусый сом"
+      },
+      "pattern_roast_hollowgill_sturgeon": {
+        "name": "Рецепт: Жареный полужаберный осётр"
+      },
+      "pattern_deepwater_feast": {
+        "name": "Рецепт: Глубоководный пир"
+      },
+      "pattern_clockreel_fishing_rod": {
+        "name": "Чертёж: Удочка с часовой катушкой"
       },
       "conjured_water4": {
         "name": "Сотворённая родниковая вода"

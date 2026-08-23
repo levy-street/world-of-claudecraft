@@ -206,6 +206,7 @@ describe('v0.36 release-audit Reliquary deed art', () => {
     expect([...DEED_ART_PENDING]).toEqual([
       'exp_the_last_keep',
       'exp_dawnhold_castle',
+      'col_deepest_cast',
       'prog_first_planting',
       'chr_vale_first_harvest',
       'chr_marsh_first_harvest',
@@ -216,10 +217,12 @@ describe('v0.36 release-audit Reliquary deed art', () => {
     ]);
     // 286 at the farming absorb (Phase 11d): the base 273 plus the six
     // Masterwrought milestone deeds plus farming's seven; 287 at Phase 11e,
-    // which appends the roster deed. The PAINTED count is unmoved at 278,
-    // because that phase ships no crest: the packet's art park runs 11e to
-    // 11k, so the deed joins the pending ledger instead.
-    expect(DEED_ORDER).toHaveLength(287);
+    // which appends the roster deed; 288 at Phase 11i, which adds the angler's
+    // one. The PAINTED count is unmoved at 278 through both, because neither
+    // phase ships a crest: the packet's art park runs 11e to 11k, so each deed
+    // joins the pending ledger instead. The pending list above is in DEED_ORDER
+    // position, which is why 11i's row sits ahead of the farming block.
+    expect(DEED_ORDER).toHaveLength(288);
     expect(DEED_IMAGE_IDS.size).toBe(278);
     expect(DEED_ORDER.filter((id) => !DEED_IMAGE_IDS.has(id))).toEqual([...DEED_ART_PENDING]);
     expect(sorted(DEED_IMAGE_IDS)).toEqual(

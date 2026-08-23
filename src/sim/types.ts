@@ -136,7 +136,7 @@ export const FISHING_CAST_ID = 'fishing';
 // carries ZERO information about the hidden bite (max bite delay plus max
 // reel window end every real session well before it), so the broadcast cast
 // fields can never leak the bite timing to a modified client.
-export const FISHING_SESSION_CAP_SEC = 15;
+export const FISHING_SESSION_CAP_SEC = 16;
 // The gather-cast sentinel riding castingAbility (Professions 2.0),
 // beside FISHING_CAST_ID above: an activity marker, never an ability id.
 export const GATHER_CAST_ID = 'gathering';

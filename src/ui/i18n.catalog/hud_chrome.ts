@@ -3854,6 +3854,10 @@ export const hudChromeStrings = {
       rodBite: 'Fish bite up to {seconds}s sooner.',
       rodReel: 'Extends the reel window by {seconds}s.',
       rodBand: 'Unlocks richer catch tables at fishing skill {skill} and above.',
+      // The rung-specific line: names the catch this rod's band introduces.
+      // Bands 3 to 5 all gate at fishing 200, so the skill alone cannot tell
+      // three crafted rods apart and the catch name is what does.
+      rodBandCatch: 'Unlocks {fish} at fishing skill {skill} and above.',
     },
     // Full-bag signed-grant downgrade toasts, rendered from the
     // text-free personal gatherDowngrade SimEvent, one key per lost arm:
