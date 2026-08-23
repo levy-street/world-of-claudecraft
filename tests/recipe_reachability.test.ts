@@ -43,11 +43,13 @@
 import { describe, expect, it } from 'vitest';
 import { FARM_CROPS } from '../src/sim/content/farm_crops';
 import { FISHING_TABLES_BY_BAND, RAW_COOKING_CATCH_IDS } from '../src/sim/content/items';
+import { GATHERING_PROFESSIONS } from '../src/sim/content/professions';
 import { ALL_RECIPES } from '../src/sim/content/recipes';
 import { ITEMS } from '../src/sim/data';
 import { NODE_MATERIAL_TABLE, NODE_TYPE_BY_PROFESSION } from '../src/sim/professions/gathering';
 import { baseMaterialFor, gatherMaterialTier } from '../src/sim/professions/material_grades';
 import { canGatherTier } from '../src/sim/professions/tools';
+import { canWieldGatherToolTier, wieldRequirementForTier } from '../src/sim/professions/wield_gate';
 
 /** Every item a recipe produces. Nothing here is free at the start of a realm. */
 const CRAFTED_OUTPUTS = new Set(ALL_RECIPES.map((r) => r.resultItemId));
@@ -377,5 +379,85 @@ describe('the crafting economy bootstraps from an empty realm', () => {
     // than the model refusing the whole rod family.
     expect(owned.has('tidewrought_fishing_rod')).toBe(true);
     expect(owned.has('raw_hollowgill_sturgeon')).toBe(true);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// THE HOLE THE FIXPOINT ABOVE CANNOT SEE, closed at masterwrought Phase 11j
+// ---------------------------------------------------------------------------
+//
+// `bestToolTiers` counts any tool the realm OWNS. The engine does not: every
+// land gathering gate resolves through professions/wield_gate.ts
+// `bestWieldableGatherToolTierOrNone`, which drops any tool the player's
+// PROFICIENCY cannot wield. So the model is strictly more permissive than the
+// game, and a tool whose wield requirement sits above its own profession's cap
+// would be permanently unswingable in play while the fixpoint sailed past it.
+//
+// That is the unlearnable-at-150 finding one axis over. There, a recipe
+// authored above its craft's cap was permanently unlearnable and no test could
+// see it because there is no craft-time admission gate; here, a tool authored
+// above its profession's cap would be permanently unwieldable and the
+// reachability fixpoint cannot see it because the fixpoint models a REALM,
+// which collectively holds every proficiency, rather than a player.
+//
+// This arm is deliberately NOT a change to the fixpoint's semantics. Making
+// `bestToolTiers` wield-aware would need a proficiency to be wield-aware
+// ABOUT, and a realm has no single proficiency. The checkable claim is the one
+// that actually bites: every gathering tool must wield at its own profession's
+// cap, because a player who has maxed the profession is the most capable
+// wielder the game admits.
+//
+// It CALLS THE SHIPPED PREDICATES rather than re-deriving the thresholds. A
+// fixture that re-implements wieldRequirementForTier would keep passing while
+// the table under it moved, which is the defect this file's own clockreel arm
+// was rewritten to avoid.
+describe('every gathering tool is wieldable by the profession that owns it', () => {
+  it('no shipped tool demands more proficiency than its profession can reach', () => {
+    const unswingable: string[] = [];
+    let checked = 0;
+    for (const def of Object.values(ITEMS)) {
+      const use = def.use;
+      if (use?.type !== 'gatherTool') continue;
+      checked += 1;
+      const cap = GATHERING_PROFESSIONS[use.professionId].maxSkill;
+      // Fishing is the structural R22 exemption and the helper encodes it, so
+      // asking the shipped predicate is also what keeps the exemption from
+      // being restated (and drifting) here.
+      if (!canWieldGatherToolTier(use.tier, cap)) {
+        unswingable.push(
+          `${def.id} is a tier-${use.tier} ${use.professionId} tool demanding ` +
+            `${wieldRequirementForTier(use.tier)} proficiency, but ${use.professionId} ` +
+            `caps at ${cap}: no player can ever swing it. Either lower the tier's ` +
+            `wield requirement or raise the profession's cap, in the same change.`,
+        );
+      }
+    }
+    expect(unswingable).toEqual([]);
+    // Non-vacuity: the sweep really walked the shipped tools rather than an
+    // empty filter. Ten crafted rungs plus the vendor and quest rungs below
+    // them, so a floor well under the real count still catches an emptied one.
+    expect(checked).toBeGreaterThan(10);
+  });
+
+  it('the apex land rungs sit exactly ON their cap, which is the knife edge', () => {
+    // The tier-5 land tools are the tight case and the reason this arm exists:
+    // TIER5_TOOL_WIELD_PROFICIENCY is 100 and every land profession caps at
+    // 100, so they wield at the cap and nowhere below it. Benign today, and
+    // one edit to either number away from dead content, which is exactly what
+    // the sweep above is here to red on.
+    for (const id of [
+      'arcanite_mining_pick',
+      'elderwood_axe',
+      'sunpetal_sickle',
+      'evergarden_hoe',
+    ]) {
+      const use = ITEMS[id]?.use;
+      expect(use?.type, `${id} must be a gather tool`).toBe('gatherTool');
+      if (use?.type !== 'gatherTool') continue;
+      const cap = GATHERING_PROFESSIONS[use.professionId].maxSkill;
+      expect(wieldRequirementForTier(use.tier), `${id} wield requirement`).toBe(cap);
+      expect(canWieldGatherToolTier(use.tier, cap), `${id} at the cap`).toBe(true);
+      expect(canWieldGatherToolTier(use.tier, cap - 1), `${id} one below the cap`).toBe(false);
+    }
   });
 });
