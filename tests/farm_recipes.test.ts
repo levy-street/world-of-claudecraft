@@ -339,6 +339,13 @@ describe('FARM_RECIPES: the farm-economy hook set', () => {
     // stock is a shipped cooking intermediate that farming did not write, and
     // the whole cooking apex flows through it.
     //
+    // PHASE 11j ADDS THE SEVENTEENTH, recipe_evergarden_hoe, the apex rung of
+    // the hoe ladder. It is a TOOL row rather than a consumable one, so it
+    // moves the headline count and deliberately NOT the consumable clause
+    // below: that clause is the one masterwrought R20 actually cares about,
+    // and a tool must never be able to satisfy it. The top-rung clause does
+    // move, because the apex hoe sits at engineering 125.
+    //
     // PHASE 11h DOUBLES IT, 8 TO 16, and this is the number masterwrought R20
     // was written to move. The eight it adds are the whole apex consumable
     // tier: the three role plates and the three flasks at rung 100, and both
@@ -357,6 +364,7 @@ describe('FARM_RECIPES: the farm-economy hook set', () => {
         'recipe_highwatch_gourd_soup',
         'recipe_ironhusk_flask',
         'recipe_laden_hearth',
+        'recipe_evergarden_hoe',
         'recipe_osmium_hoe',
         'recipe_runewater_flask',
         'recipe_sageleaf_chowder',
@@ -369,7 +377,7 @@ describe('FARM_RECIPES: the farm-economy hook set', () => {
     expect(
       endgameBills,
       "farming's endgame-bill count for the masterwrought R20 census",
-    ).toHaveLength(16);
+    ).toHaveLength(17);
     // THE TOP RUNG SPECIFICALLY, kept as its own clause because the count above
     // can be satisfied entirely at 75 and 100. masterwrought R13 puts the
     // catalog's ceiling at 125 and until Phase 11h nothing farming grows
@@ -380,7 +388,7 @@ describe('FARM_RECIPES: the farm-economy hook set', () => {
         .map((r) => r.id)
         .sort(),
       'produce must reach the 125 rung, the top consumable rung',
-    ).toEqual(['recipe_grand_cauldron', 'recipe_laden_hearth']);
+    ).toEqual(['recipe_evergarden_hoe', 'recipe_grand_cauldron', 'recipe_laden_hearth']);
     // The claim masterwrought R20 actually cares about, stated separately from the literal
     // above so a future re-tier that moves WHICH rows qualify still has to keep
     // the property true: produce reaches a CONSUMABLE endgame bill, not only a
@@ -585,7 +593,7 @@ describe('FARM_RECIPES: the farm-economy hook set', () => {
     expect(dishes.map((d) => d.id)).toContain('recipe_eastbrook_glazed_carrots');
   });
 
-  it('closes every fine twin the hoe ladder left without a consumer', () => {
+  it('every fine twin has a consumer, by a dish or by the hoe ladder', () => {
     const dishReagents = new Set(dishes.flatMap((d) => d.reagents.map((r) => r.itemId)));
     for (const twin of FINE_TWINS_CLOSED_HERE) {
       expect(
@@ -594,27 +602,46 @@ describe('FARM_RECIPES: the farm-economy hook set', () => {
           'substitution, so it would have no consumer at all',
       ).toBe(true);
     }
-    // The three the hoe ladder already consumes must NOT have quietly been
-    // folded in here as well: this pin states which list owns which twin.
-    for (const hoeTwin of HOE_REAGENT_TWINS) {
-      expect(
-        dishReagents.has(hoeTwin),
-        `${hoeTwin} is a hoe reagent; a dish slot for it would double-book the twin`,
-      ).toBe(false);
-    }
-    // Non-vacuity. Nine dish-closed plus three hoe reagents, and BOTH counts
-    // are the teeth: the union assertion below is a tautology by construction
-    // (FINE_TWINS_CLOSED_HERE is defined as the twin column MINUS the hoe
-    // list), noted at the 11e QA so it is not mistaken for coverage, and kept
-    // only because it states the partition the two loops rely on. What
-    // actually catches a forgotten twin is the pair of lengths, now that the
-    // hoe half is derived from the recipes rather than hand-written.
-    expect(FINE_TWINS_CLOSED_HERE).toHaveLength(9);
+    // THE EXCLUSIVITY HALF IS RETIRED (masterwrought Phase 11j), and the
+    // reason is that the apex rung made it impossible rather than merely
+    // inconvenient. This used to assert that a hoe twin has NO dish slot, so
+    // the two lists partitioned the twin column. That held while the ladder
+    // topped at 4, because the hoe rungs took the tier-1 to tier-3 twins and
+    // Phase 11h could hand every TIER-4 twin a dish. The apex rung consumes a
+    // tier-4 twin under the ladder's own one-tier-below invariant, and all
+    // four of those already had dish slots, so there was no unbooked twin for
+    // it to take and the partition cannot survive any apex hoe at all.
+    //
+    // WHAT THE ARM ACTUALLY GUARDED IS KEPT AND MADE STRONGER. The load-
+    // bearing claim was never exclusivity, it was that no twin is left with
+    // NOTHING: a farming fine twin gets no downward grade substitution, so a
+    // twin that is neither cooked nor forged is dead content. That is now
+    // asserted over the WHOLE twin column by either route, which is a
+    // superset of what the two partitioned loops proved between them.
+    const hoeTwins = new Set(HOE_REAGENT_TWINS);
+    const orphans = Object.values(FARM_CROPS)
+      .map((c) => c.fineProduceItemId)
+      .filter((twin) => !dishReagents.has(twin) && !hoeTwins.has(twin));
+    expect(orphans, 'every fine twin needs a dish slot or a hoe rung').toEqual([]);
+    // Non-vacuity, and BOTH counts are the teeth. FOUR hoe twins since the
+    // apex rung, and the overlap is now expected rather than forbidden: the
+    // apex twin is deliberately in both lists.
     expect(HOE_REAGENT_TWINS).toEqual([
+      'fine_evergarden_greens',
       'fine_highland_barley',
       'fine_marsh_rice',
       'fine_vale_wheat',
     ]);
+    expect(FINE_TWINS_CLOSED_HERE).toHaveLength(8);
+    expect(
+      HOE_REAGENT_TWINS.filter((twin) => dishReagents.has(twin)),
+      'exactly the apex twin is double-booked',
+    ).toEqual(['fine_evergarden_greens']);
+    // The two lists still COVER the twin column exactly, and they still do not
+    // overlap AS LISTS: FINE_TWINS_CLOSED_HERE is derived as the column minus
+    // the hoe reagents, so the apex twin appears once, in the hoe half. What
+    // changed is only that its membership there no longer implies it has no
+    // dish, which is the clause retired above.
     expect([...FINE_TWINS_CLOSED_HERE, ...HOE_REAGENT_TWINS].sort()).toEqual(
       Object.values(FARM_CROPS)
         .map((c) => c.fineProduceItemId)

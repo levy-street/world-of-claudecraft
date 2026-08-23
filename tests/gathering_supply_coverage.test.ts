@@ -29,10 +29,18 @@
 // passes on padding. The per-band and per-material counts ARE collected, and
 // they are recorded in the phase ledger as a judgment surface instead.
 //
-// DIRECT REAGENTS ONLY, and the refusal is deliberate. Transitive credit
-// through an intermediate is NOT counted: if a band-75 row could satisfy every
-// band above it by feeding an intermediate that feeds the rest, one reagent
-// would satisfy the whole ladder and this guard would be decorative.
+// THE SUPPLY ARM COUNTS DIRECT REAGENTS ONLY, and the refusal is deliberate.
+// Transitive credit through an intermediate is NOT counted: if a band-75 row
+// could satisfy every band above it by feeding an intermediate that feeds the
+// rest, one reagent would satisfy the whole ladder and this guard would be
+// decorative.
+//
+// THE DEMAND ARM IS DIFFERENT, and the asymmetry is the point rather than an
+// inconsistency. It asks whether a material can be SPENT at all, so it credits
+// downward grade substitution, which is a shipped consumption path and not a
+// transitive chain (see consumptionIdsFor below). Counting only direct naming
+// there would report the eastbrook fine grades as dead content when they are
+// spendable on every recipe naming their base.
 //
 // EVERYTHING IS DERIVED FROM LIVE TABLES. There is no hand-written id list and
 // no literal 25 in this file: the subject list comes from
@@ -59,7 +67,7 @@ import {
 import { ALL_RECIPES } from '../src/sim/content/recipes';
 import { ITEMS } from '../src/sim/data';
 import { NODE_HARVEST_TABLE, NODE_MATERIAL_TABLE } from '../src/sim/professions/gathering';
-import { MATERIAL_GRADES } from '../src/sim/professions/material_grades';
+import { baseMaterialFor, MATERIAL_GRADES } from '../src/sim/professions/material_grades';
 import { gatherToolTier } from '../src/sim/professions/tools';
 import { tierForSkill } from '../src/sim/professions/wheel';
 import type { GatherNodeType } from '../src/sim/types';
@@ -217,6 +225,33 @@ function bandMatrix(): Map<string, Map<number, string[]>> {
   return matrix;
 }
 
+/**
+ * DOWNWARD SUBSTITUTION IS A CONSUMPTION PATH, and leaving it out is the exact
+ * error this arm exists to prevent, one mechanism over from the one the worked
+ * example records.
+ *
+ * `material_grades.ts` states the rule and `planGradeRemoval` implements it: a
+ * FINE grade satisfies any requirement for its BASE (the base never satisfies
+ * a requirement for the fine grade). So a fine grade no recipe NAMES is still
+ * spendable on every recipe that names its base, and calling it a material
+ * with no consumer would be false. `craftIdsForMaterialItem`
+ * (src/sim/material_profession_affinity.ts) credits the same substitution when
+ * it tells a player which crafts use a material, so the two surfaces agree.
+ *
+ * This matters on the shipped tree rather than hypothetically: the three
+ * EASTBROOK fine grades (fine_copper_ore, fine_ironbark_log,
+ * fine_silverleaf_herb) are named by no recipe at all, because the crafted
+ * land-tool ladder starts at rung 4 and the "tier N takes the fine grade of
+ * tier N minus 2" rule never reaches down to them. A direct-naming-only census
+ * reports them as dead content. They are not: they substitute downward into
+ * every base-consuming recipe and they vendor at twice the base, which is the
+ * whole reward the fine axis pays.
+ */
+function consumptionIdsFor(itemId: string): string[] {
+  const base = baseMaterialFor(itemId);
+  return base === undefined ? [itemId] : [itemId, base];
+}
+
 /** Consumers and unit demand per id, over ALL reagent sources on the tree. */
 function demandIndex(): Map<string, { consumers: string[]; units: number }> {
   const demand = new Map<string, { consumers: string[]; units: number }>();
@@ -294,9 +329,14 @@ describe('masterwrought R21: the world eats what the gathering families supply',
     const orphans: string[] = [];
     for (const family of FAMILY_IDS) {
       for (const id of [...(SUPPLY.get(family) as Set<string>)].sort()) {
-        if ((DEMAND.get(id)?.consumers.length ?? 0) > 0) continue;
+        const consumers = consumptionIdsFor(id).reduce(
+          (n, spendable) => n + (DEMAND.get(spendable)?.consumers.length ?? 0),
+          0,
+        );
+        if (consumers > 0) continue;
         orphans.push(
-          `${id} (${family}) has NO consumer in any recipe or enchant. ` +
+          `${id} (${family}) has NO consumer in any recipe or enchant, and no ` +
+            `base grade it could be spent on instead. ` +
             `The fix is a consumer at the rung that PRODUCES it, never tuning content ` +
             `so hard around the full kit that arriving without it means you cannot clear ` +
             `(masterwrought R21). Rule: ${WHERE_THE_RULE_LIVES}.`,

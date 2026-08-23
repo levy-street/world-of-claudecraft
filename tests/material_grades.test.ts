@@ -329,12 +329,8 @@ describe('the tool ladder the grades exist to build', () => {
     }
     // Self-standing non-vacuity: the loop skips non-graded reagents, so without
     // this it would pass on a TOOL_RECIPES that had dropped its fine reagents
-    // entirely rather than on one whose circuits are open. NINE since
-    // masterwrought Phase 11j: the six original grades (one per rung across the
-    // three families) plus the eastbrook grade each tier-4 rung gained to close
-    // the R21 demand hole. Re-derived rather than nudged, and it stays an exact
-    // equality so a DROPPED fine reagent still reds here.
-    expect(gradedReagentsChecked).toBe(9);
+    // entirely rather than on one whose circuits are open.
+    expect(gradedReagentsChecked).toBe(6);
   });
 
   it('no recipe declares a base AND its fine grade (the pools must stay disjoint)', () => {
@@ -403,11 +399,7 @@ describe('the tool ladder the grades exist to build', () => {
     // Pinned as a literal, because the general rule above would also pass on a
     // recipe that simply dropped its gathered reagent.
     const pick = TOOL_RECIPES.find((r) => r.id === 'recipe_thorium_mining_pick');
-    // fine_copper_ore joined at masterwrought Phase 11j (the eastbrook grade had
-    // no consumer anywhere); it does not re-close the circuit this arm guards,
-    // because copper is the tier-1 material and needs only a tier-2 tool.
     expect(pick?.reagents.map((r) => r.itemId).sort()).toEqual([
-      'fine_copper_ore',
       'fine_iron_ore',
       'mithril_mining_pick',
     ]);

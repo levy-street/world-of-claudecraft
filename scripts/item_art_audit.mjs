@@ -121,10 +121,11 @@ const build = await buildItemArtAudit({
     // 11f's six farming PATTERNS park under the same declaration, taking it to
     // 62; Phase 11i's angler's endgame parks eleven more under the same
     // declaration (three high-band catches, the apex rod, two dishes, the
-    // capstone feast and four patterns), taking it to 73. liveItemCount is
-    // unmoved by any of that, which is the point of the split: a new artless
-    // def that joins the park moves the debt term alone.
-    pendingArtCount: 73,
+    // capstone feast and four patterns), taking it to 73; Phase 11j's apex
+    // hoe parks one more under the same declaration, taking it to 74.
+    // liveItemCount is unmoved by any of that, which is the point of the
+    // split: a new artless def that joins the park moves the debt term alone.
+    pendingArtCount: 74,
     generatedHeroicDefinitions: 64,
     heroicDefinitionsWithOwnWebp: 48,
     heroicWeaponArtAliases: 16,
