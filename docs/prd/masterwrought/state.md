@@ -11726,10 +11726,17 @@ record already warns about, not this round's file count, which is nine.
   refusal control rather than described in a comment. 11i MAY append its uniform
   fish row to all three plates: that is exactly what the amendment was scoped for,
   and the same-row-on-all-three shape is what makes it legal.
-- BUT THE FISH ROW MUST OUTNUMBER THE PLATE'S PRODUCE, which is 2, so the lowest
-  legal count is THREE, not the 2 this phase originally certified. The control
-  now drives both rules and refuses 2 explicitly. This is the single most
-  important line in this handoff.
+- BUT THE FISH ROW MUST OUTNUMBER THE ROW'S PRODUCE, and 11i's own DECISION D
+  puts the SAME row into FOUR bills, not three. The three plates carry produce 2
+  (one crop at 2), so 3 clears them. recipe_laden_hearth carries produce THREE
+  (evergarden_greens 2 plus fine_evergarden_greens 1), so a uniform row at 3 TIES
+  there and reds the fish-forward sweep. THE LOWEST LEGAL UNIFORM COUNT ACROSS
+  DECISION D's FOUR ROWS IS FOUR. This line first read "the lowest legal count is
+  THREE", which is true of the three plates and false of the set 11i actually
+  edits: the control in this phase's suite drives the three-plate family, because
+  that is what 11h's amendment governs, and the capstone is outside it. 11i either
+  ships the uniform row at 4 or asks the maintainer to scope DECISION D to the
+  three plates. This is the single most important line in this handoff.
 - 11i RE-DERIVES the economy arithmetic from the merged row rather than carrying
   this file's numbers, unchanged from the 11h handoff.
 - recipe_sageleaf_chowder is the row 11i names first. It sits at input 452
@@ -11739,6 +11746,8 @@ record already warns about, not this round's file count, which is nine.
   copy about what a catch or a crop asks of a player, it consults
   wieldRequirementForTier as well as the profession threshold.
 - WHAT 11i MAY APPEND TO THE THREE PLATES: one uniform fish row, same id and same
-  count on all three, count >= 3. What it may NOT do is give one plate a second
-  crop row, or the fish row to only two of the three; both are refused by the
-  control with the halves isolated so each case names its own reason.
+  count on all three, count >= 3 for the plates alone and >= 4 if the same row
+  also goes into recipe_laden_hearth as DECISION D rules. What it may NOT do is
+  give one plate a second crop row, or the fish row to only two of the three;
+  both are refused by the control with the halves isolated so each case names its
+  own reason.
