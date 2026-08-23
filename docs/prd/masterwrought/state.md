@@ -11856,6 +11856,59 @@ file did not name it: it published minProficiency from
 PROFICIENCY_BAND_THRESHOLDS, so it would have quoted 200 for a band gated at 150
 and emitted `undefined` for the three new tables. Both now read fishing's ladder.
 
+### THE HANDOFF TO PHASE 11i QA, AND THROUGH IT TO 11j
+
+- **THE UNLEARNABLE-AT-150 FINDING IS CONFIRMED IN CODE, and 11j inherits it as
+  settled rather than open.** `tierForSkill(150)` resolves to tier 6 while
+  engineering's cap of 125 resolves to tier 5, and BOTH learning channels run
+  the same gate: `teachTierMet` (professions/training.ts) for a trainer and the
+  `'tier'` deny arm (professions/pattern_items.ts) for a pattern. So a recipe
+  authored at 150 is unlearnable through EITHER channel, and because there is no
+  craft-time skillReq admission gate, nothing would red on it: it is dead
+  content that ships green. The three land tools at 150 escape only because they
+  predate training and sit in the frozen PRE_TRAINING_RECIPE_IDS. 11j's apex hoe
+  is settled on this same finding, so the two phases share a confirmation rather
+  than 11j holding a question. The reachable top rung is 125.
+- **THE APEX TOOL FAMILY NOW HAS A SHAPE 11j SHOULD COPY, and one it should
+  not.** Copy: tier 6, quality epic, engineering 125, acquisition ['drop'],
+  stationType 'toolworks', the schematic on the Heroic Quartermaster at the neck
+  point (16), the item market-listable. Do NOT copy the absence of a delve Marks
+  row without re-reading the argument: the rod's exemption rests on its
+  schematic being deterministic marks stock AND the rod being listable, and on
+  the two shipped rod prices being under their own re-check. A hoe's argument
+  may differ, and osmium_hoe already has its own recorded absence.
+- **THE SESSION-CAP DEVIATION IS A RATIFY-OR-REVERT, and 11j should know why it
+  happened before it prices its own apex rung.** DECISION C ruled the rod epic
+  and costed the RARITY axis alone. It never costed tier 6's own +0.75 s of reel
+  window, which is what pushed the worst legal session to 301 ticks against a
+  300-tick cap. If 11j mints a tier-6 hoe, there is no equivalent window budget
+  to break, but the lesson generalises: a ruling that costs one axis of a
+  two-axis ladder has not costed the rung.
+- **THE DELVE MARKS PRICES FOR THE TWO SHIPPED RODS ARE NOW STALE, and this is
+  the finding with the longest reach.** content/delves/shop.ts carries a
+  RE-CHECK TRIGGER saying its 24 and 56 Marks prices assume a world where a
+  tier-4/5 tool "opens no content" and the trigger is the first tier-4 node or
+  water. No tier-4 water shipped, so the trigger did not fire by its own
+  wording, but its PREMISE is now false for the two rod rows: the stormreel
+  opens catch band 3 and the tidewrought band 4, so both are ACCESS items priced
+  as comfort items. The three land rows at each rung are unaffected. Re-deriving
+  two Marks prices is a delve-economy decision with no ruling behind it, so 11i
+  recorded the invalidation and changed no number.
+- **R20 IS SATISFIED FOR FISHING BUT NOT YET PINNED**, which is the completion
+  pass's job by design. The row ids are in the ledger above; what 11j inherits is
+  a profession that already passes, so its guard test can be written to the real
+  state rather than to a target.
+- **DO NOT RE-DERIVE THE CELL SCHEDULE.** The extended D9 rules and every new
+  cell are in the ledger with their arithmetic, and
+  tests/fishing_zones.test.ts derives all eighteen cells from the schedule. A
+  later phase that wants a new catch adds a rung to the schedule, not a weight
+  to a cell.
+- **THE FISH-FORWARD SWEEP NOW GOVERNS FOUR MORE ROWS BY EXISTING**, and the
+  three new cooking rows carry NO produce at all, so the accent rule has nothing
+  to sweep on them. A later phase putting a crop on any of them inherits the
+  same "at most one crop family joins a fish row" constraint the shipped fish
+  dishes carry.
+
 ## Phase 11h QA ledger (2026-08-22, verify the provisioning supply line, apex tier)
 
 VERDICT: PASS-WITH-FOLLOWUPS. Base tip 294595e9d8, clean. LOCAL, no push, no PR.
