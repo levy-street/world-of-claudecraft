@@ -10,6 +10,7 @@ import type {
   DailyRewardStatus,
 } from '../src/world_api';
 import { type CachedRead, createCachedRead } from './cached_read';
+import { TEST_WOC_USD_PRICE, testEconomyEnabled, testSolUsdRate } from './claudium_test_service';
 import { DailyRewardScheduleCache } from './daily_reward_schedule';
 import { DAILY_REWARD_BOARD_TTL_MS, DailyRewardBoardCache } from './daily_rewards_board_cache';
 import {
@@ -43,7 +44,6 @@ import { verifyCurrentSeekerEntitlement } from './seeker_entitlement';
 import { hasSeekerEntitlement } from './seeker_entitlement_db';
 import { isNativeAppRequest } from './web_login_guard';
 import { cachedWocBalance } from './woc_balance';
-import { TEST_WOC_USD_PRICE, testEconomyEnabled, testSolUsdRate } from './claudium_test_service';
 
 const DEFAULT_MIN_USD = 20;
 const DEFAULT_POOL_USD = 150;

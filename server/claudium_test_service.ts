@@ -95,10 +95,7 @@ const solBalanceCache = new Map<string, { lamports: string; at: number }>();
 async function cachedSolBalance(owner: string): Promise<string> {
   const hit = solBalanceCache.get(owner);
   if (hit && Date.now() - hit.at < SOL_BALANCE_CACHE_TTL_MS) return hit.lamports;
-  const result = await rpc<{ value?: number }>('getBalance', [
-    owner,
-    { commitment: 'confirmed' },
-  ]);
+  const result = await rpc<{ value?: number }>('getBalance', [owner, { commitment: 'confirmed' }]);
   const lamports = String(result?.value ?? 0);
   solBalanceCache.set(owner, { lamports, at: Date.now() });
   if (solBalanceCache.size > 512) {

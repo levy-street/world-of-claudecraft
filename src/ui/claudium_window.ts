@@ -261,9 +261,7 @@ export class ClaudiumWindow {
     // economy) must not strand the user on a fully-disabled tab: fall over to
     // the first live rail so the packs are immediately buyable.
     if (!view.rails[this.selectedRail]) {
-      const fallback = (['stripe', 'woc', 'usdc', 'sol'] as const).find(
-        (rail) => view.rails[rail],
-      );
+      const fallback = (['stripe', 'woc', 'usdc', 'sol'] as const).find((rail) => view.rails[rail]);
       if (fallback) this.selectedRail = fallback;
     }
     const walletMarkup = this.walletConnectionHtml();

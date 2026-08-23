@@ -5852,9 +5852,8 @@ function show(el: string): void {
   // moment the player can actually read it, and the NEW-badge marker should
   // advance only then.
   if (el === '#charselect-panel') {
-    void loadCharselectNews(
-      $('#charselect-news-feed'),
-      () => fetchReleasesWithFallback(() => api.releases(20)),
+    void loadCharselectNews($('#charselect-news-feed'), () =>
+      fetchReleasesWithFallback(() => api.releases(20)),
     );
   }
 
