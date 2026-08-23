@@ -672,7 +672,7 @@ const HUD_UPDATE_DRIVES: readonly DriveRow[] = [
     band: 'frame',
     gate: '',
     surface: 'chrome',
-    why: 'the stance/form bar; rebuilds its buttons behind a signature latch',
+    why: 'the stance/form bar, behind the hud/stance seam: the desktop row rebuilds its buttons behind a signature latch, and the touch shape paints the ring anchor through the shared write-elision facet with the icon RESOLVE key-diffed inside the painter',
   },
   {
     call: 'this.flushPendingProcAuraNotes',
@@ -729,11 +729,11 @@ const HUD_UPDATE_DRIVES: readonly DriveRow[] = [
     why: 'the touch action ring; desktop skips the tick and the paint entirely',
   },
   {
-    call: 'this.consumableBarPainter.paint',
+    call: 'this.mobileConsumableSeat.paint',
     band: 'frame',
-    gate: 'this.isMobileLayout() && this.consumablesOpen && this.consumableBarView && this.consumableBarPainter',
+    gate: 'this.isMobileLayout()',
     surface: 'chrome',
-    why: 'the touch consumables quick bar, only while the row is expanded',
+    why: 'the touch consumables seat (the ring arc position showing the first carried consumable) plus the row it opens; desktop skips both',
   },
   {
     call: 'this.xpBarPainter.paint',

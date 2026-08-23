@@ -147,11 +147,11 @@ const MAGE_SPECS: SpecDef[] = [
     // bypass that learnLevel gate (grants always do).
     'pyroblast',
     'Ignition',
-    'Your spell critical strikes burn the target for 40% of the damage dealt over 6 sec, stacking. Increases critical strike chance by 2%.',
+    'Your spell critical strikes burn the target for 30% of the damage dealt over 6 sec, stacking. Increases critical strike chance by 2%.',
     // The burn fraction is the scalable mastery axis (runtime: fire_mage's
     // igniteOnCrit copies the resolved crit damage); crit chance is the static
     // secondary.
-    { global: { ignitionPct: 0.4 }, stats: { crit: 0.02 } },
+    { global: { ignitionPct: 0.3 }, stats: { crit: 0.02 } },
   ),
   spec(
     'frost',

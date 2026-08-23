@@ -198,9 +198,16 @@ seats below the minimap column's measured bottom
 (`src/ui/tracker_stack_anchor.ts` over the `tracker_stack_anchor_core.ts`
 math, slow band plus coalesced resize, elided write), never a per-tier CSS
 constant; the stylesheet `top` values are only the no-JS first-paint seat.
-On the compact mobile tier the header renders as a small count chip under the
-minimap cluster, with its 40px tap floor carried by an invisible hit extension
-(DESIGN.md 10.1) rather than the chip's own box. Pinned by
+The tracker is DESKTOP ONLY: `body.mobile-touch` hides `#reliquary-tracker`
+outright, because the one line it still painted under the folded list crowded
+the band the minimap and the deed tracker share on touch. The Reliquary window
+itself stays reachable on touch from the More tray's `#mobile-reliquary`
+button, and the window's eye toggle plus the Interface options row still write
+`showReliquaryTracker` there (a cross-device setting that takes visible effect
+on desktop). The compact-tier count chip the stylesheet still declares for both
+trackers therefore renders only for `#deed-tracker` on touch: a small chip
+under the minimap cluster whose 40px tap floor is carried by an invisible hit
+extension (DESIGN.md 10.1) rather than the chip's own box. Pinned by
 `tests/reliquary_tracker_view.test.ts`, `tests/reliquary_tracker_hud.test.ts`,
 `tests/reliquary_window_behavior.test.ts`, and
 `tests/tracker_stack_anchor.test.ts`.

@@ -5153,7 +5153,14 @@
     font-size: 12px;
     line-height: 1.5;
   }
-  #tooltip .tt-title {
+  /* Named per consumer rather than left unscoped: the touch menu and
+     consumable captions reuse the tooltip's title metrics, but an unscoped
+     .tt-title rule would tie on source order with any future single-class
+     rule elsewhere. The --tooltip-scale rule below and the mob-tooltip
+     variant still out-specify this. */
+  #tooltip .tt-title,
+  #mobile-menu-caption .tt-title,
+  #mobile-consumable-caption .tt-title {
     font-family: var(--title-font);
     font-size: 13.5px;
     color: #fff;
@@ -5504,7 +5511,9 @@
   #tooltip {
     font-size: calc(12px * var(--tooltip-scale, 1));
   }
-  #tooltip .tt-title {
+  #tooltip .tt-title,
+  #mobile-menu-caption .tt-title,
+  #mobile-consumable-caption .tt-title {
     font-size: calc(13.5px * var(--tooltip-scale, 1));
   }
   #tooltip .tt-sub {

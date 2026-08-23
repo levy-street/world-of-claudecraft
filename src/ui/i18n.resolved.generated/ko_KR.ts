@@ -871,11 +871,52 @@ export const ko_KR: EnTranslations = {
       "actionRing": "전투 행동",
       "actionPageToggle": "행동 페이지 전환",
       "actionPageIndicator": "{page}페이지",
+      "actionRadial": "액션 방향",
+      "actionRadialCancel": "동작 취소",
+      "radialCenter": "가운데",
+      "radialUp": "Up",
+      "radialRight": "오른쪽",
+      "radialDown": "Down",
+      "radialLeft": "Left",
+      "consumableSeat": "소모품",
+      "menuControl": "메뉴",
+      "menuControlAria": "메뉴. 탭하면 대화창이 열리고, 길게 누른 뒤 오른쪽으로 밀면 탈것, 지도, 가방 등을 열 수 있습니다.",
+      "menuControlAriaTap": "메뉴. 탭하면 탈것, 지도, 가방 등의 메뉴 줄이 열립니다. 다시 탭하면 대화창이 열립니다.",
+      "menuLabel": "Menu",
+      "quickActions": "빠른 실행",
+      "quickActionsAria": "빠른 실행. 탭하면 탈것, 채팅, 지도, 가방 등의 실행 줄이 열리고, 길게 누른 뒤 오른쪽으로 밀면 항목을 선택할 수 있습니다.",
+      "quickActionsAriaTap": "빠른 실행. 탭하면 탈것, 채팅, 지도, 가방 등의 실행 줄이 열리며, 항목을 탭해 선택합니다. 컨트롤을 다시 탭하면 닫힙니다.",
+      "quickActionsLabel": "실행",
+      "stanceRadial": "태세",
+      "stanceAnchorAria": "태세: {stance}. 탭하여 태세 링을 열고 다른 태세를 선택하세요.",
+      "stanceAnchorEmptyAria": "태세 없음. 탭하여 태세 링을 열고 태세를 선택하세요.",
+      "questStripAria": "추적 중인 퀘스트 {total}개 중 {position}번째: {title}. 다음 퀘스트를 보려면 누르십시오.",
+      "questStripAriaSingle": "추적 중인 퀘스트: {title}",
+      "questStripCounter": "{position}/{total}",
+      "questStripMore": "외 {count}개",
       "targetCycle": "대상 전환",
       "targetCycleShort": "대상",
       "spellbookPageLabel": "페이지 {page}",
       "hideKeyboard": "키보드 숨기기",
-      "chatPlaceholder": "메시지 입력... (! 커뮤니티 명령어)"
+      "chatPlaceholder": "메시지 입력... (! 커뮤니티 명령어)",
+      "barEditor": "Edit Bars",
+      "barEditorAria": "행동 단축바 배치 편집"
+    },
+    "barEditor": {
+      "title": "행동 단축바 편집",
+      "close": "행동 단축바 편집 닫기",
+      "pages": "행동 단축바 페이지",
+      "pageTab": "Page {page}",
+      "buttonHeader": "버튼 {button}",
+      "cellAria": "버튼 {button}, {direction}: {action}",
+      "emptyCellAria": "버튼 {button}, {direction}: 비어 있음",
+      "hint": "칸을 누른 뒤 다른 칸을 누르면 서로 바뀝니다.",
+      "armed": "칸을 눌러 {name}을(를) 배치하세요.",
+      "picked": "다른 칸을 눌러 {name}과(와) 바꾸세요.",
+      "locked": "행동 단축바가 인터페이스 설정에서 잠겨 있습니다.",
+      "clear": "비우기",
+      "clearAria": "슬롯 비우기",
+      "clearArmed": "슬롯을 탭하면 비워집니다."
     },
     "tutorial": {
       "moveBodyTouch": "이동 스틱으로 이동하고 화면을 끌어 주위를 둘러보세요. 몇 걸음 움직여 시작하세요.",
@@ -1420,7 +1461,9 @@ export const ko_KR: EnTranslations = {
       "showAttackButton": "공격 버튼 표시",
       "showDailyRewardsChest": "일일 보상 보물상자 표시",
       "mobileCameraJoystick": "카메라 조이스틱",
-      "mobileLeftHanded": "왼손잡이 레이아웃"
+      "mobileLeftHanded": "왼손잡이 레이아웃",
+      "touchTapMenus": "탭 메뉴",
+      "touchTapMenusNote": "스와이프 대신 탭으로 행동, 소모품, 메뉴 컨트롤을 엽니다. 항목을 탭하면 사용하고, 컨트롤을 다시 탭하면 기본 동작을 실행하며, 바깥을 탭하면 닫힙니다."
     },
     "talentRows": {
       "tab": "선택",
@@ -2510,7 +2553,8 @@ export const ko_KR: EnTranslations = {
     },
     "spellbook": {
       "addToBarAria": "{name}을(를) 행동 단축바에 추가",
-      "removeFromBarAria": "{name}을(를) 행동 단축바에서 제거"
+      "removeFromBarAria": "{name}을(를) 행동 단축바에서 제거",
+      "assignAria": "{name}을(를) 놓을 칸 선택"
     },
     "nameplate": {
       "mobLevel": "{level}",

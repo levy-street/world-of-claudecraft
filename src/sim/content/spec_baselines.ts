@@ -132,13 +132,13 @@ export const SPEC_BASELINES: SpecBaselineTable = {
     enhancement: {
       // v0.28.x stat-identity pass: Enhancement primary is Strength, so its Int
       // stays below Elemental's; melee AP is retained.
-      stats: { int: 2, ap: 24, apPct: 0.22 },
+      stats: { int: 2, ap: 24, apPct: 0.05 },
       ability: [
         { ability: 'lightning_bolt', costPct: -0.2 },
         { ability: 'earth_shock', costPct: -0.2 },
         { ability: 'flame_shock', costPct: -0.2 },
         { ability: 'rockbiter_weapon', dmgPct: 0.4 },
-        { ability: 'stormstrike', dmgPct: 0.8 },
+        { ability: 'stormstrike', dmgPct: 0.5 },
       ],
     },
     restoration: {

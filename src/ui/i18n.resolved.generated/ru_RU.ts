@@ -871,11 +871,52 @@ export const ru_RU: EnTranslations = {
       "actionRing": "Боевые действия",
       "actionPageToggle": "Переключить страницу действий",
       "actionPageIndicator": "Стр. {page}",
+      "actionRadial": "Направления действий",
+      "actionRadialCancel": "Отменить действие",
+      "radialCenter": "Центр",
+      "radialUp": "Up",
+      "radialRight": "Вправо",
+      "radialDown": "Down",
+      "radialLeft": "Left",
+      "consumableSeat": "Расходники",
+      "menuControl": "Меню",
+      "menuControlAria": "Меню. Нажмите, чтобы открыть чат, или удерживайте и проведите вправо для транспорта, карты, сумок и других разделов.",
+      "menuControlAriaTap": "Меню. Нажмите, чтобы открыть ряд меню: транспорт, карта, сумки и другие разделы. Нажмите ещё раз, чтобы открыть чат.",
+      "menuLabel": "Menu",
+      "quickActions": "Быстрые действия",
+      "quickActionsAria": "Быстрые действия. Нажмите, чтобы открыть ряд: транспорт, чат, карта, сумки и другие разделы, либо удерживайте и проведите вправо, чтобы выбрать.",
+      "quickActionsAriaTap": "Быстрые действия. Нажмите, чтобы открыть ряд: транспорт, чат, карта, сумки и другие разделы, затем нажмите нужный значок. Нажмите на элемент управления ещё раз, чтобы закрыть.",
+      "quickActionsLabel": "Действия",
+      "stanceRadial": "Стойки",
+      "stanceAnchorAria": "Стойка: {stance}. Нажмите, чтобы открыть круг стоек, затем выберите другую стойку.",
+      "stanceAnchorEmptyAria": "Без стойки. Нажмите, чтобы открыть круг стоек, затем выберите стойку.",
+      "questStripAria": "Отслеживаемое задание {position} из {total}: {title}. Нажмите, чтобы перейти к следующему.",
+      "questStripAriaSingle": "Отслеживаемое задание: {title}",
+      "questStripCounter": "{position}/{total}",
+      "questStripMore": "ещё {count}",
       "targetCycle": "Сменить цель",
       "targetCycleShort": "Цель",
       "spellbookPageLabel": "Страница {page}",
       "hideKeyboard": "Скрыть клавиатуру",
-      "chatPlaceholder": "Напишите сообщение... (! команды сообщества)"
+      "chatPlaceholder": "Напишите сообщение... (! команды сообщества)",
+      "barEditor": "Edit Bars",
+      "barEditorAria": "Изменить раскладку панели действий"
+    },
+    "barEditor": {
+      "title": "Редактор панели действий",
+      "close": "Закрыть редактор панели",
+      "pages": "Страницы панели действий",
+      "pageTab": "Page {page}",
+      "buttonHeader": "Кнопка {button}",
+      "cellAria": "Кнопка {button}, {direction}: {action}",
+      "emptyCellAria": "Кнопка {button}, {direction}: пусто",
+      "hint": "Коснитесь одной ячейки, затем другой, чтобы поменять их местами.",
+      "armed": "Коснитесь ячейки, чтобы поместить туда {name}.",
+      "picked": "Коснитесь другой ячейки, чтобы поменять местами с {name}.",
+      "locked": "Панели действий заблокированы в настройках интерфейса.",
+      "clear": "Очистить",
+      "clearAria": "Очистить ячейку",
+      "clearArmed": "Нажмите на ячейку, чтобы очистить её."
     },
     "tutorial": {
       "moveBodyTouch": "Используйте джойстик передвижения, чтобы двигаться, и проведите по экрану, чтобы осмотреться. Сделайте несколько шагов, чтобы начать.",
@@ -1420,7 +1461,9 @@ export const ru_RU: EnTranslations = {
       "showAttackButton": "Показывать кнопку атаки",
       "showDailyRewardsChest": "Показывать сундук ежедневных наград",
       "mobileCameraJoystick": "Джойстик камеры",
-      "mobileLeftHanded": "Раскладка для левшей"
+      "mobileLeftHanded": "Раскладка для левшей",
+      "touchTapMenus": "Меню по нажатию",
+      "touchTapMenusNote": "Открывайте элементы действий, расходников и меню нажатием вместо смахивания. Нажмите на предмет, чтобы использовать его, нажмите на элемент ещё раз для обычного действия или нажмите за его пределами, чтобы закрыть."
     },
     "talentRows": {
       "tab": "Выбор",
@@ -2510,7 +2553,8 @@ export const ru_RU: EnTranslations = {
     },
     "spellbook": {
       "addToBarAria": "Добавить {name} на панель действий",
-      "removeFromBarAria": "Убрать {name} с панели действий"
+      "removeFromBarAria": "Убрать {name} с панели действий",
+      "assignAria": "Выберите ячейку для {name}"
     },
     "nameplate": {
       "mobLevel": "{level}",

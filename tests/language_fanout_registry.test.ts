@@ -88,7 +88,7 @@ const FANOUT_ARMS: readonly string[] = [
   'this.syncDailyRewardsSurfaceLabels|',
   'this.storePromoCard.relocalize|',
   'this.refreshKeybindLabels|',
-  'this.updateQuestTracker|',
+  'this.questTracker.relocalize|',
   'this.delveTracker.relocalize|',
   'this.riftTracker.relocalize|',
   'this.partyFramesPainter.relocalize|',
@@ -149,6 +149,7 @@ const FANOUT_ARMS: readonly string[] = [
   'this.socialWindow.relocalize|',
   'this.cardDuelWindow.relocalize|',
   'this.spellbookWindow.relocalize|',
+  'this.barEditorWindow.relocalize|',
   'this.lockpickController.relocalize|',
   'this.tutorial.relocalize|',
   'this.mobileActionRingPainter.relocalize|',
@@ -735,7 +736,9 @@ describe('language fan-out: half 2, every signature-gated src/ui surface is clas
         .map(([, field]) => field);
       const credited =
         fields.some((f) => armCalls.has(`this.${f}.relocalize`)) ||
-        [...armCalls].some((c) => c.endsWith('.relocalize') && wrapperOwns(c, cls));
+        [...armCalls].some(
+          (c) => c.endsWith('.relocalize') && (wrapperOwns(c, cls) || builderOwns(c, cls)),
+        );
       if (!credited) uncalled.push(`${file} (${cls || 'unnamed class'})`);
     }
     // The filter above is the whole test: an empty `uncalled` proves nothing if
@@ -761,6 +764,27 @@ describe('language fan-out: half 2, every signature-gated src/ui surface is clas
  * name, so renaming LockpickController to something else keeps working and
  * gutting its forwarding call does not.
  */
+/** The other way a Hud field gets filled: a BUILDER in a sibling module
+ *  constructs the painter and hands it back, which is how the mobile action ring
+ *  is composed now that its construction lives behind the action_bar seam. Chase
+ *  the same chain the coordinator does (field <- builder result <- builder
+ *  function <- the module that news the class) so the credit stays a proof, not
+ *  an exemption. */
+function builderOwns(armCall: string, cls: string): boolean {
+  const field = armCall.slice('this.'.length, -'.relocalize'.length);
+  const hud = stripComments(hudSource);
+  const assigned = new RegExp(`\\b${field}\\s*=\\s*(\\w+)\\.\\w+;`).exec(hud);
+  if (!assigned) return false;
+  const built = new RegExp(`\\b${assigned[1]}\\s*=\\s*(\\w+)\\(`).exec(hud);
+  if (!built) return false;
+  for (const { full } of tsFilesUnder(uiRoot)) {
+    const source = stripComments(readFileSync(full, 'utf8'));
+    if (!new RegExp(`export function ${built[1]}\\b`).test(source)) continue;
+    return new RegExp(`new ${cls}\\(`).test(source);
+  }
+  return false;
+}
+
 function wrapperOwns(armCall: string, cls: string): boolean {
   const field = armCall.slice('this.'.length, -'.relocalize'.length);
   const constructed = new RegExp(`\\b${field}\\s*=\\s*new (\\w+)\\(`).exec(

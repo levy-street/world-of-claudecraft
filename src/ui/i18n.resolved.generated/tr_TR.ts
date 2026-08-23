@@ -871,11 +871,52 @@ export const tr_TR: EnTranslations = {
       "actionRing": "Savaş eylemleri",
       "actionPageToggle": "İşlem sayfasını değiştir",
       "actionPageIndicator": "Sayfa {page}",
+      "actionRadial": "Action directions",
+      "actionRadialCancel": "Cancel action",
+      "radialCenter": "Centre",
+      "radialUp": "Up",
+      "radialRight": "Right",
+      "radialDown": "Down",
+      "radialLeft": "Left",
+      "consumableSeat": "Consumables",
+      "menuControl": "Menus",
+      "menuControlAria": "Menus. Tap to open chat, or hold and swipe right for mounts, map, bags and more.",
+      "menuControlAriaTap": "Menus. Tap to open the menu row: mounts, map, bags and more. Tap again for chat.",
+      "menuLabel": "Menu",
+      "quickActions": "Quick Actions",
+      "quickActionsAria": "Quick Actions. Tap to open the row of mount, chat, map, bags and more, or hold and swipe right to pick one.",
+      "quickActionsAriaTap": "Quick Actions. Tap to open the row of mount, chat, map, bags and more, then tap an item. Tap the control again to close.",
+      "quickActionsLabel": "Actions",
+      "stanceRadial": "Stances",
+      "stanceAnchorAria": "Stance: {stance}. Tap to open the stance ring, then pick another stance.",
+      "stanceAnchorEmptyAria": "No stance. Tap to open the stance ring, then pick a stance.",
+      "questStripAria": "Tracked quest {position} of {total}: {title}. Activate for the next quest.",
+      "questStripAriaSingle": "Tracked quest: {title}",
+      "questStripCounter": "{position}/{total}",
+      "questStripMore": "+{count} more",
       "targetCycle": "Hedefi değiştir",
       "targetCycleShort": "Hedef",
       "spellbookPageLabel": "Sayfa {page}",
       "hideKeyboard": "Klavyeyi gizle",
-      "chatPlaceholder": "Bir şey söyle..."
+      "chatPlaceholder": "Bir şey söyle...",
+      "barEditor": "Edit Bars",
+      "barEditorAria": "Edit the action bar layout"
+    },
+    "barEditor": {
+      "title": "Edit Action Bar",
+      "close": "Close bar editor",
+      "pages": "Action bar pages",
+      "pageTab": "Page {page}",
+      "buttonHeader": "Button {button}",
+      "cellAria": "Button {button}, {direction}: {action}",
+      "emptyCellAria": "Button {button}, {direction}: empty",
+      "hint": "Tap a slot, then another, to swap them.",
+      "armed": "Tap a slot to place {name}.",
+      "picked": "Tap another slot to swap with {name}.",
+      "locked": "Action bars are locked in Interface options.",
+      "clear": "Clear",
+      "clearAria": "Clear a slot",
+      "clearArmed": "Tap a slot to clear it."
     },
     "tutorial": {
       "moveBodyTouch": "Hareket etmek için hareket çubuğunu kullan ve etrafa bakmak için ekranı sürükle. Başlamak için birkaç adım at.",
@@ -1420,7 +1461,9 @@ export const tr_TR: EnTranslations = {
       "showAttackButton": "Saldırı Düğmesini Göster",
       "showDailyRewardsChest": "Günlük Ödül Sandığını Göster",
       "mobileCameraJoystick": "Kamera joystick'i",
-      "mobileLeftHanded": "Solak düzen"
+      "mobileLeftHanded": "Solak düzen",
+      "touchTapMenus": "Tap menus",
+      "touchTapMenusNote": "Open the action, consumable and menu controls with a tap instead of a swipe. Tap an item to use it, tap the control again for its usual action, or tap outside to close."
     },
     "talentRows": {
       "tab": "Seçimler",
@@ -2510,7 +2553,8 @@ export const tr_TR: EnTranslations = {
     },
     "spellbook": {
       "addToBarAria": "{name} yeteneğini eylem çubuğuna ekle",
-      "removeFromBarAria": "{name} yeteneğini eylem çubuğundan kaldır"
+      "removeFromBarAria": "{name} yeteneğini eylem çubuğundan kaldır",
+      "assignAria": "Choose a slot for {name}"
     },
     "nameplate": {
       "mobLevel": "{level}",

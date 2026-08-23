@@ -406,6 +406,7 @@ import { finderLootItemIds } from './ui/dungeon_finder_view';
 import { classDisplayName, tEntity } from './ui/entity_i18n';
 import { showEntryGuardBanner } from './ui/entry_guard_banner';
 import { refreshEpicLinkStatus, wireEpicLink } from './ui/epic_link';
+import { esc } from './ui/esc';
 import { FocusManager, type FocusTrapHandle } from './ui/focus_manager';
 import {
   attachGatherNodeHoverTooltip,
@@ -620,25 +621,6 @@ function classDetailAmountRange(min: number, max: number): string {
   return t('abilityUi.tooltip.damageRange', {
     min: formatClassDetailNumber(min),
     max: formatClassDetailNumber(max),
-  });
-}
-
-function escapeHtml(text: string): string {
-  return text.replace(/[&<>"']/g, (char) => {
-    switch (char) {
-      case '&':
-        return '&amp;';
-      case '<':
-        return '&lt;';
-      case '>':
-        return '&gt;';
-      case '"':
-        return '&quot;';
-      case "'":
-        return '&#39;';
-      default:
-        return char;
-    }
   });
 }
 
@@ -2058,6 +2040,7 @@ async function startGame(
     onBags: () => hud.toggleBags(),
     onCrafting: () => hud.toggleCrafting(),
     onSpellbook: () => hud.toggleSpellbook(),
+    onBarEditor: () => hud.toggleBarEditor(),
     onTalents: () => hud.toggleTalents(),
     onMap: () => hud.toggleMap(),
     onLeaderboard: () => hud.toggleLeaderboard(),
@@ -6449,7 +6432,7 @@ function showRealmList(dir?: import('./net/online').RealmDirectory): void {
   const listEl = $('#realm-list');
   const render = (d: import('./net/online').RealmDirectory) => {
     if (d.realms.length === 0) {
-      listEl.innerHTML = `<div class="realm-loading">${escapeHtml(t('realm.noRealms'))}</div>`;
+      listEl.innerHTML = `<div class="realm-loading">${esc(t('realm.noRealms'))}</div>`;
       return;
     }
     // recommend the lowest-population online realm (classic MMOs nudge new players there)
@@ -6464,15 +6447,15 @@ function showRealmList(dir?: import('./net/online').RealmDirectory): void {
         const chars = d.characters[r.name] ?? 0;
         const charTag =
           chars > 0
-            ? `<span class="rn-chars">${escapeHtml(tPlural('hudChrome.plurals.characterCount', chars))}</span>`
+            ? `<span class="rn-chars">${esc(tPlural('hudChrome.plurals.characterCount', chars))}</span>`
             : '';
         const typeKey = realmTypeKeys[r.type as keyof typeof realmTypeKeys];
         const typeLabel = typeKey ? t(typeKey) : r.type;
-        return `<div class="realm-row" data-name="${escapeHtml(r.name)}" data-url="${escapeHtml(r.url)}">
-        <div><div class="realm-name">${escapeHtml(r.name)}${charTag}<span class="rn-rec" data-rec hidden>${escapeHtml(t('realm.recommended'))}</span></div>
-          <div class="realm-sub" data-sub>${escapeHtml(t('realm.checkingStatus'))}</div></div>
+        return `<div class="realm-row" data-name="${esc(r.name)}" data-url="${esc(r.url)}">
+        <div><div class="realm-name">${esc(r.name)}${charTag}<span class="rn-rec" data-rec hidden>${esc(t('realm.recommended'))}</span></div>
+          <div class="realm-sub" data-sub>${esc(t('realm.checkingStatus'))}</div></div>
         <div class="realm-meta">
-          <div class="realm-type">${escapeHtml(typeLabel)}</div>
+          <div class="realm-type">${esc(typeLabel)}</div>
           <div class="realm-pop offline" data-pop>-</div>
         </div>
       </div>`;
@@ -6522,7 +6505,7 @@ function showRealmList(dir?: import('./net/online').RealmDirectory): void {
   };
   if (dir) render(dir);
   else {
-    listEl.innerHTML = `<div class="realm-loading">${escapeHtml(t('realm.loading'))}</div>`;
+    listEl.innerHTML = `<div class="realm-loading">${esc(t('realm.loading'))}</div>`;
     void api.realms().then(render);
   }
 }
@@ -6567,18 +6550,18 @@ function toggleRealmDropdown(): void {
 
 function renderRealmDropdown(): void {
   const menu = $('#cs-realm-menu');
-  menu.innerHTML = `<div class="realm-loading">${escapeHtml(t('realm.loading'))}</div>`;
+  menu.innerHTML = `<div class="realm-loading">${esc(t('realm.loading'))}</div>`;
   void api.realms().then((d) => {
     if (!realmDropdownOpen) return;
     if (d.realms.length === 0) {
-      menu.innerHTML = `<div class="realm-loading">${escapeHtml(t('realm.noRealms'))}</div>`;
+      menu.innerHTML = `<div class="realm-loading">${esc(t('realm.noRealms'))}</div>`;
       return;
     }
     menu.innerHTML = d.realms
       .map((r) => {
         const sel = r.name === api.realm ? ' sel' : '';
-        return `<div class="realm-row cs-realm-row${sel}" role="option" aria-selected="${r.name === api.realm}" data-name="${escapeHtml(r.name)}" data-url="${escapeHtml(r.url)}">
-        <div class="realm-name">${escapeHtml(r.name)}</div>
+        return `<div class="realm-row cs-realm-row${sel}" role="option" aria-selected="${r.name === api.realm}" data-name="${esc(r.name)}" data-url="${esc(r.url)}">
+        <div class="realm-name">${esc(r.name)}</div>
         <div class="realm-pop offline" data-pop>-</div>
       </div>`;
       })
@@ -6658,7 +6641,7 @@ function renderSortDropdown(): void {
   menu.innerHTML = CHAR_SORT_MODES.map((m) => {
     const sel = m === charSortMode;
     return `<div class="realm-row cs-realm-row cs-sort-row${sel ? ' sel' : ''}" role="option" aria-selected="${sel}" data-mode="${m}">
-        <div class="realm-name">${escapeHtml(t(CHAR_SORT_LABEL_KEYS[m]))}</div>
+        <div class="realm-name">${esc(t(CHAR_SORT_LABEL_KEYS[m]))}</div>
       </div>`;
   }).join('');
   menu.querySelectorAll('.cs-sort-row').forEach((row) => {
@@ -6718,7 +6701,7 @@ async function refreshCharacters(): Promise<void> {
   if (api.realm) $('#charselect-realm').textContent = api.realm;
   updateSortButtonLabel();
   const listEl = $('#char-list');
-  listEl.innerHTML = `<li class="char-list-message">${escapeHtml(t('character.loading'))}</li>`;
+  listEl.innerHTML = `<li class="char-list-message">${esc(t('character.loading'))}</li>`;
   // Drop any stale selection from a previous realm; the default first-row
   // selection below re-arms the shared Enter World button and the preview name.
   charselectSelected = null;
@@ -6758,7 +6741,7 @@ async function refreshCharacters(): Promise<void> {
     }
     if (chars.length === 0) {
       // No characters on this realm, drop straight into the create screen.
-      listEl.innerHTML = `<li class="char-list-message">${escapeHtml(t('character.noneYet'))}</li>`;
+      listEl.innerHTML = `<li class="char-list-message">${esc(t('character.noneYet'))}</li>`;
       show('#charcreate-panel');
       return;
     }
@@ -6776,12 +6759,12 @@ async function refreshCharacters(): Promise<void> {
       // Take Over button is unmissable.
       const statusText = c.online ? '' : c.forceRename ? ` (${t('character.renameRequired')})` : '';
       const inWorldHint = c.online
-        ? `<span class="char-inworld-hint">${escapeHtml(t('character.inWorldHint'))}</span>`
+        ? `<span class="char-inworld-hint">${esc(t('character.inWorldHint'))}</span>`
         : '';
       // One-shot redesign token (server-decided: pre-creator character, token
       // unspent). Rendered on every action arm; gone for good once spent.
       const rerollBtn = c.appearanceRerollAvailable
-        ? `<button type="button" class="btn reroll-char-btn" title="${escapeHtml(t('character.redesignHint'))}" aria-label="${escapeHtml(t('character.redesignTitle', { name: c.name }))}">${escapeHtml(t('character.redesign'))}</button>`
+        ? `<button type="button" class="btn reroll-char-btn" title="${esc(t('character.redesignHint'))}" aria-label="${esc(t('character.redesignTitle', { name: c.name }))}">${esc(t('character.redesign'))}</button>`
         : '';
       // The chip draws the character's REAL body: their authored modular look
       // (or the mech cosmetic), matching the 3D stage and the world.
@@ -6800,16 +6783,16 @@ async function refreshCharacters(): Promise<void> {
       if (charselectLook(c)) trackComposedChipRow(row, chipHtml, () => hydratePortraits(row));
       row.innerHTML = `${chipHtml()}
         <div class="char-id">
-          <span class="char-name">${escapeHtml(c.name)}</span>
-          <span class="char-sub">${escapeHtml(t('character.levelClass', { level: c.level, className }))}${escapeHtml(statusText)}</span>
+          <span class="char-name">${esc(c.name)}</span>
+          <span class="char-sub">${esc(t('character.levelClass', { level: c.level, className }))}${esc(statusText)}</span>
           ${inWorldHint}
         </div>
         ${
           c.forceRename
-            ? `<input class="rename-input" placeholder="${escapeHtml(t('character.newNamePlaceholder'))}" maxlength="16" /><span class="char-actions"><button class="btn rename-btn">${escapeHtml(t('character.rename'))}</button>${rerollBtn}${deleteCharButtonHtml(c.online)}</span>`
+            ? `<input class="rename-input" placeholder="${esc(t('character.newNamePlaceholder'))}" maxlength="16" /><span class="char-actions"><button class="btn rename-btn">${esc(t('character.rename'))}</button>${rerollBtn}${deleteCharButtonHtml(c.online)}</span>`
             : c.online
-              ? `<span class="char-actions"><button class="btn take-over-btn" title="${escapeHtml(t('character.takeOverConfirm'))}" aria-label="${escapeHtml(t('character.takeOverConfirm'))}">${escapeHtml(t('character.takeOver'))}</button>${rerollBtn}${deleteCharButtonHtml(true)}</span>`
-              : `<span class="char-actions"><button class="btn enter-world-btn">${escapeHtml(t('auth.enterWorld'))}</button>${rerollBtn}${deleteCharButtonHtml(false)}</span>`
+              ? `<span class="char-actions"><button class="btn take-over-btn" title="${esc(t('character.takeOverConfirm'))}" aria-label="${esc(t('character.takeOverConfirm'))}">${esc(t('character.takeOver'))}</button>${rerollBtn}${deleteCharButtonHtml(true)}</span>`
+              : `<span class="char-actions"><button class="btn enter-world-btn">${esc(t('auth.enterWorld'))}</button>${rerollBtn}${deleteCharButtonHtml(false)}</span>`
         }`;
 
       row.querySelector('.delete-char-btn')?.addEventListener('click', (e) => {
@@ -6922,7 +6905,7 @@ async function refreshCharacters(): Promise<void> {
     // armed would auto-enter the world on whatever unrelated refresh (sort,
     // realm switch, rename) happens to succeed next.
     pendingResume = null;
-    listEl.innerHTML = `<li class="char-list-message char-list-error">${escapeHtml(userFacingApiError(err))}</li>`;
+    listEl.innerHTML = `<li class="char-list-message char-list-error">${esc(userFacingApiError(err))}</li>`;
   }
 }
 
@@ -7302,8 +7285,8 @@ function renderClassDetails(
       const pct = Math.min(100, Math.round((val / 25) * 100));
       return `
       <div class="details-stat-bar-row">
-        <span class="details-stat-label">${escapeHtml(statLabel)}</span>
-        <div class="details-stat-bar-track" aria-label="${escapeHtml(t('classDetails.statBarAria', { stat: statLabel, value: val }))}">
+        <span class="details-stat-label">${esc(statLabel)}</span>
+        <div class="details-stat-bar-track" aria-label="${esc(t('classDetails.statBarAria', { stat: statLabel, value: val }))}">
           <div class="details-stat-bar-fill" style="width: 0%;" data-target-width="${pct}%"></div>
         </div>
         <span class="details-stat-val">${val}</span>
@@ -7386,10 +7369,10 @@ function renderClassDetails(
 
       return `
       <li class="details-spell-item">
-        <img class="details-spell-icon-img" src="${escapeHtml(iconUrl)}" alt="${escapeHtml(abilityName)}" width="32" height="32" />
+        <img class="details-spell-icon-img" src="${esc(iconUrl)}" alt="${esc(abilityName)}" width="32" height="32" />
         <div class="details-spell-text">
-          <strong>${escapeHtml(abilityName)}</strong>
-          ${escapeHtml(resolvedDesc)}
+          <strong>${esc(abilityName)}</strong>
+          ${esc(resolvedDesc)}
         </div>
       </li>
     `;
@@ -7404,24 +7387,24 @@ function renderClassDetails(
       <div class="class-details-content fade-out">
         <div class="class-details-header">
           <div class="class-details-header-text">
-            <h3 class="class-details-name">${escapeHtml(classLabel)}</h3>
-            <span class="class-details-role role-${details.roleType}">${escapeHtml(roleLabel)}</span>
+            <h3 class="class-details-name">${esc(classLabel)}</h3>
+            <span class="class-details-role role-${details.roleType}">${esc(roleLabel)}</span>
           </div>
         </div>
-        <p class="class-details-lore">${escapeHtml(classDisplayDescription(className))}</p>
+        <p class="class-details-lore">${esc(classDisplayDescription(className))}</p>
         <div class="class-details-grid">
           <div class="class-details-stats-col">
-            <h4 class="details-section-title">${escapeHtml(t('classDetails.sections.startingStats'))}</h4>
+            <h4 class="details-section-title">${esc(t('classDetails.sections.startingStats'))}</h4>
             ${statBarsHtml}
           </div>
           <div class="class-details-gear-col">
-            <h4 class="details-section-title">${escapeHtml(t('classDetails.sections.equipment'))}</h4>
-            <div class="details-gear-row"><strong>${escapeHtml(t('classDetails.labels.resource'))}:</strong> <span class="badge badge-resource resource-${classDef.resourceType}">${escapeHtml(resourceLabel)}</span></div>
-            <div class="details-gear-row"><strong>${escapeHtml(t('classDetails.labels.armor'))}:</strong> <span class="badge">${escapeHtml(armorLabel)}</span></div>
-            <div class="details-gear-row"><strong>${escapeHtml(t('classDetails.labels.weapons'))}:</strong> <span class="badge">${escapeHtml(weaponsLabel)}</span></div>
+            <h4 class="details-section-title">${esc(t('classDetails.sections.equipment'))}</h4>
+            <div class="details-gear-row"><strong>${esc(t('classDetails.labels.resource'))}:</strong> <span class="badge badge-resource resource-${classDef.resourceType}">${esc(resourceLabel)}</span></div>
+            <div class="details-gear-row"><strong>${esc(t('classDetails.labels.armor'))}:</strong> <span class="badge">${esc(armorLabel)}</span></div>
+            <div class="details-gear-row"><strong>${esc(t('classDetails.labels.weapons'))}:</strong> <span class="badge">${esc(weaponsLabel)}</span></div>
           </div>
           <div class="details-spells-section">
-            <h4 class="details-section-title">${escapeHtml(t('classDetails.sections.signatureAbilities'))}</h4>
+            <h4 class="details-section-title">${esc(t('classDetails.sections.signatureAbilities'))}</h4>
             <ul class="details-spells-list">
               ${spellsHtml}
             </ul>

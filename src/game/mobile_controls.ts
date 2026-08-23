@@ -1,3 +1,5 @@
+import { canTakeFocus } from '../ui/focus_manager';
+import { buildMobileMenuControl, type MobileMenuControl } from '../ui/hud/menu';
 import { t } from '../ui/i18n';
 import { bindTouchTap } from '../ui/touch_tap';
 import type { Input, TouchMoveInput } from './input';
@@ -141,6 +143,8 @@ export interface MobileControlCallbacks {
   /** Open the Crafting window, folded into the More tray on mobile. */
   onCrafting(): void;
   onSpellbook(): void;
+  /** Open the touch bar editor, the only way to bind an action slot on touch. */
+  onBarEditor(): void;
   onTalents(): void;
   onMap(): void;
   onLeaderboard(): void;
@@ -328,6 +332,8 @@ export class MobileControls {
   private chatPressTimer: ReturnType<typeof setTimeout> | null = null;
   private chatLongFired = false;
   private chromeFade: ChromeFadeHandle | null = null;
+  /** The touch menu control (the collapsed five-button row), built at start(). */
+  private menuControl: MobileMenuControl | null = null;
 
   private canvas = document.getElementById('game-canvas') as HTMLElement | null;
   private root = document.getElementById('mobile-controls') as HTMLElement | null;
@@ -435,6 +441,7 @@ export class MobileControls {
       this.releasePinch();
       this.touchOwners.releaseAll();
       this.cancelChatPress();
+      this.menuControl?.gesture.cancelDrag();
     });
     document.addEventListener('visibilitychange', () => {
       if (document.visibilityState === 'hidden') {
@@ -443,6 +450,7 @@ export class MobileControls {
         this.releasePinch();
         this.touchOwners.releaseAll();
         this.cancelChatPress();
+        this.menuControl?.gesture.cancelDrag();
       }
     });
 
@@ -500,6 +508,22 @@ export class MobileControls {
     this.bindChatButton('mobile-chat');
     this.bindButton('mobile-menu', () => this.callbacks.onMenu());
     this.bindButton('mobile-social', () => this.callbacks.onSocial());
+    // The Quick Actions strip seats REAL buttons: three moved out of the old
+    // five-button row (social, quest, settings, more, all still bound by their
+    // own lines here) and the rest promoted out of the More tray, bound below to
+    // the SAME callbacks their tray twins use. A pick activates the button, so no
+    // action is ever implemented twice.
+    this.bindButton('mobile-menu-mount', () => this.callbacks.onMountToggle());
+    // Chat's strip seat runs the plain tap toggle. It is bindButton, not
+    // bindChatButton: the press-and-hold log peek stays on the tray's
+    // #mobile-chat, because a strip pick made by a SWIPE reaches its item
+    // through a synthesized click, which no pointer-bound long press sees.
+    this.bindButton('mobile-menu-chat', () => this.tapChat());
+    this.bindButton('mobile-menu-map', () => this.callbacks.onMap());
+    this.bindButton('mobile-menu-bags', () => this.callbacks.onBags());
+    this.bindButton('mobile-menu-char', () => this.callbacks.onCharacter());
+    this.bindButton('mobile-menu-spellbook', () => this.callbacks.onSpellbook());
+    this.menuControl = buildMobileMenuControl();
     this.bindButton('mobile-discord', () => this.callbacks.onDiscord());
     this.bindButton('mobile-donate', () => this.callbacks.onDonate());
     this.bindButton('mobile-wiki', () => this.callbacks.onWiki());
@@ -512,6 +536,7 @@ export class MobileControls {
     this.bindButton('mobile-bags', () => this.callbacks.onBags());
     this.bindButton('mobile-crafting', () => this.callbacks.onCrafting());
     this.bindButton('mobile-spellbook', () => this.callbacks.onSpellbook());
+    this.bindButton('mobile-bar-editor', () => this.callbacks.onBarEditor());
     this.bindButton('mobile-talents', () => this.callbacks.onTalents());
     this.bindButton('mobile-map', () => this.callbacks.onMap());
     this.bindButton('mobile-leaderboard', () => this.callbacks.onLeaderboard());
@@ -609,12 +634,16 @@ export class MobileControls {
       triggerHaptic(HAPTIC_TAP, this.hapticsOn);
       if (button.closest('#mobile-extra-controls')) {
         this.closeMoreModal();
-        // Establish the More trigger as the destination window's return target
-        // before its synchronous callback captures focus. The body-class
-        // observer then releases the old More trap without restoring it and
-        // focuses the newly opened window, avoiding focus inside aria-hidden
-        // More content during the modal-to-modal handoff.
-        document.getElementById('mobile-more')?.focus();
+        // Establish the destination window's return target before its
+        // synchronous callback captures focus. The body-class observer then
+        // releases the old More trap without restoring it and focuses the newly
+        // opened window, avoiding focus inside aria-hidden More content during
+        // the modal-to-modal handoff. The More trigger is a Quick Actions strip
+        // item, so it is unrendered whenever that strip is closed and focusing
+        // it would silently drop to <body>; the always-visible anchor takes it
+        // then.
+        const more = document.getElementById('mobile-more');
+        (canTakeFocus(more) ? more : document.getElementById('mobile-menu-anchor'))?.focus();
       }
       cb();
     };

@@ -377,6 +377,7 @@ import {
   actionBarBindStatus,
 } from './hud/action_bar/action_bar_bind_core';
 import {
+  bindShiftClear,
   handleShiftClearContextMenu,
   handleShiftClearKeydown,
 } from './hud/action_bar/action_bar_clear';
@@ -392,7 +393,7 @@ import {
   planActionBarRestore,
 } from './hud/action_bar/action_bar_layout_sync';
 import { isActionBarEditAllowed } from './hud/action_bar/action_bar_lock';
-import { ActionBarPainter, type ActionBarSlotElements } from './hud/action_bar/action_bar_painter';
+import { ActionBarPainter } from './hud/action_bar/action_bar_painter';
 import {
   ABILITY_ICON_PREFIX,
   type ActionBarView,
@@ -408,7 +409,11 @@ import {
   hasAutoAttackTarget,
   isPvpHostileTarget,
 } from './hud/action_bar/attack_on_ability';
-import { CONSUMABLE_BAR_SLOTS, consumableBarItems } from './hud/action_bar/consumable_bar_view';
+import { BarEditorWindow } from './hud/action_bar/bar_editor';
+import {
+  buildMobileConsumableSeat,
+  type MobileConsumableSeat,
+} from './hud/action_bar/consumable_seat_controller';
 import {
   type AimPoint,
   abilityAoeRadius,
@@ -434,18 +439,21 @@ import {
   parseHotbarAction,
   placeAbilityOnSlot,
   placeItemOnSlot,
-  resolveMobileHotbarDrop,
   swapHotbarSlots,
 } from './hud/action_bar/hotbar';
+import { itemInBagsLine } from './hud/action_bar/item_bags_line_core';
 import {
   clampMobilePage,
   mobileActionSourceSlotCount,
+  mobileButtonHasSourceSlot,
   mobilePageCount,
   nextMobilePage,
   sourceSlotForMobileButton,
 } from './hud/action_bar/mobile_action_page_view';
-import { MobileActionRingPainter } from './hud/action_bar/mobile_action_ring_painter';
+import { buildMobileActionRing } from './hud/action_bar/mobile_action_ring_controller';
+import type { MobileActionRingPainter } from './hud/action_bar/mobile_action_ring_painter';
 import { playerStealthed } from './hud/action_bar/player_stealthed';
+import { RADIAL_DIRECTIONS, type RadialDirection } from './hud/action_bar/radial_action_core';
 import {
   BattlegroundKillFeed,
   BattlegroundMapPainter,
@@ -499,6 +507,8 @@ import { QuestTrackerController } from './hud/quest/quest_tracker_controller';
 import { QuestLogWindow } from './hud/quest/questlog_window';
 import { RiftMapPainter } from './hud/rift';
 import { RiftFloorTrackerController } from './hud/rift/rift_floor_tracker_controller';
+import { StanceBarController } from './hud/stance';
+import { closeOpenTouchMenu } from './hud/tap_menu';
 import { dismissBuyQuantityPrompts } from './hud/vendor/buy_quantity_prompt_window';
 import { buildHeroicVendorView } from './hud/vendor/heroic_vendor_view';
 import { renderHeroicVendorWindow } from './hud/vendor/heroic_vendor_window';
@@ -721,11 +731,7 @@ import {
 import { SocialWindow } from './social_window';
 import { SpellbookWindow } from './spellbook_window';
 import { stackSizeTooltipLine } from './stack_size_tooltip_view';
-import {
-  activeStanceBarAbilityId,
-  isStanceBarAbilityGroup,
-  stanceBarView,
-} from './stance_bar_view';
+import { isStanceBarAbilityGroup } from './stance_bar_view';
 import {
   type BuffStatSource,
   buildStatTooltip,
@@ -1190,16 +1196,6 @@ const CHAT_TEMPLATE_KEYS = {
   roll: 'hud.chat.templates.roll',
   say: 'hud.chat.templates.say',
 } satisfies Record<string, TranslationKey>;
-type MobileHotbarDrag = {
-  pointerId: number;
-  sourceIndex: number;
-  startX: number;
-  startY: number;
-  active: boolean;
-  timer: number;
-  targetIndex: number | null;
-};
-
 // world map: terrain is pre-rendered for the whole zone at this resolution
 // (cached per zone) and a sub-rect is blitted for the current zoom.
 const MAP_BG_RES = 480;
@@ -1292,18 +1288,14 @@ export class Hud {
   private mobileActionPage = 0;
   private mobileActionRingView: ActionBarView | undefined;
   private mobileActionRingPainter: MobileActionRingPainter | undefined;
+  /** The warrior/paladin choice bar in both its shapes (desktop row, touch
+   *  radial), behind the hud/stance seam. Built with the action bars. */
+  private stanceBar!: StanceBarController;
   private crossHotbar: CrossHotbarController | undefined;
-  // Consumables quick bar (touch): the auto-populated potion/elixir/food/drink
-  // row behind the chevron chip next to the top-left trio. consumableBarIds is
-  // the ONE reused array the pure core fills WHEN THE ROW OPENS and that stays
-  // FROZEN while it is open: slots must not shift under the player's thumb the
-  // frame a stack depletes (a depleted item stays in place, greyed at count 0,
-  // exactly like a desktop bar item shortcut). Reopening refreshes the list.
-  private consumableBarView: ActionBarView | undefined;
-  private consumableBarPainter: ActionBarPainter | undefined;
-  private consumableBarSlotBtns: HTMLButtonElement[] = [];
-  private readonly consumableBarIds: string[] = [];
-  private consumablesOpen = false;
+  // The consumables seat (touch): the ring's 5th arc position plus the row it
+  // opens, built behind the action_bar seam. Stays undefined on a build without
+  // the markup, exactly like the ring.
+  private mobileConsumableSeat: MobileConsumableSeat | undefined;
   /** Ring button refs so castSlot's used-flash can hit the ring too (the
    *  desktop bar is display:none under body.mobile-touch). */
   private mobileRingAttackBtn: HTMLButtonElement | null = null;
@@ -1357,7 +1349,6 @@ export class Hud {
   // The windows publish and read it through their deps; the state itself is a shared
   // module, not another cross-window field cluster on this coordinator.
   private readonly itemDragState = new ItemDragState();
-  private mobileHotbarDrag: MobileHotbarDrag | null = null;
   private suppressNextActionClick = false;
   private optionsHooks: OptionsHooks | null = null;
   private reportHooks: ReportHooks | null = null;
@@ -1420,6 +1411,7 @@ export class Hud {
   private readonly mobileMoreDialog = new MobileMoreDialogController(this.focusManager, {
     trigger: () => document.getElementById('mobile-more'),
     dialog: () => document.getElementById('mobile-extra-controls'),
+    fallback: () => document.getElementById('mobile-menu-anchor'),
   });
   // The control that opened the shared #ctx-menu (the chat "+" button), so the
   // outside-click closer can defer to that opener's own toggle click. Cleared on
@@ -1989,7 +1981,6 @@ export class Hud {
   // top-band layout reads body.mobile-pet-active to yield the top-centre line to the
   // pet bar (the sideways consumables row and the Vale Cup indicator drop a band).
   private lastPetPresent = false;
-  private lastStanceBarSig = '';
   // Proc auras whose gain event arrived before the aura itself appeared in the
   // mirrored aura list (online: the event can beat the snapshot). Retried each
   // frame until the aura shows, then flushed as an FCT self-note.
@@ -2172,6 +2163,7 @@ export class Hud {
       },
     });
     this.questTracker = new QuestTrackerController({
+      writers: this.writerFacet,
       element: $('#quest-tracker'),
       document,
       world: () => this.sim,
@@ -3386,13 +3378,12 @@ export class Hud {
       case 'dev-command-window':
         this.devCommandWindow.close();
         break;
+      // Both route through the painter so focus returns to the opener (WCAG 2.2 AA).
       case 'char-window':
-        // Route through the painter so focus returns to the opener (WCAG 2.2 AA).
         this.charWindow.close();
         this.syncCharBagsPairing();
         break;
       case 'inspect-window':
-        // Route through the painter so focus returns to the opener (WCAG 2.2 AA).
         this.inspectWindow.close();
         break;
       case 'trade-window':
@@ -3402,12 +3393,11 @@ export class Hud {
       case 'market-window':
         this.closeMarket();
         break;
+      // Both route through the painter so focus returns to the opener (WCAG 2.2 AA).
       case 'mailbox-window':
-        // Route through the painter so focus returns to the opener (WCAG 2.2 AA).
         this.mailboxWindow.close();
         break;
       case 'bank-window':
-        // Route through the painter so focus returns to the opener (WCAG 2.2 AA).
         this.closeBank();
         break;
       case 'calendar-window':
@@ -3511,9 +3501,12 @@ export class Hud {
         // returns to the opener (WCAG), consistent with the toggle/X close path.
         this.talentsWindow.close();
         break;
+      // Both route through the painter so focus returns to the opener (WCAG 2.2 AA).
       case 'spellbook':
-        // Route through the painter so focus returns to the opener (WCAG 2.2 AA).
         this.spellbookWindow.close();
+        break;
+      case 'bar-editor':
+        this.barEditorWindow.close();
         break;
       case 'quest-log-window':
         this.questlogWindow.close();
@@ -4669,9 +4662,9 @@ export class Hud {
       this.charWindow.dropOnEquipSlot(itemId, slot, target),
     dropOnActionSlot: (itemId, slot) => this.placeHotbarItemFromTouch(itemId, slot),
     dropOnActionRingSlot: (itemId, ringIndex) => {
-      // Bounded like mobileRingSlotFromPoint (the phase 14 QA): a stale
-      // data-mobile-index past the live ring must map to no seat, never to
-      // a computed bar slot past the end of the bar.
+      // Bounded (the phase 14 QA): a stale data-mobile-index past the live
+      // ring must map to no seat, never to a computed bar slot past the end
+      // of the bar.
       if (ringIndex >= this.mobileRingSlotBtns.length) return;
       this.placeHotbarItemFromTouch(itemId, this.mobileSourceSlotForButton(ringIndex));
     },
@@ -5306,6 +5299,33 @@ export class Hud {
       this.dragAction = action ? { action, sourceIndex: null } : null;
     },
     clearActionDropTargets: () => this.clearActionDropTargets(),
+    openBarEditor: (abilityId) => this.openBarEditor(abilityId),
+  });
+  // Shared so a swap or clear also refreshes the spellbook's hotbar toggles.
+  private commitHotbarActions(actions: HotbarAction[]): void {
+    this.hotbarActions = actions;
+    this.saveSlotMap();
+    this.spellbookWindow.refreshHotbarControls();
+  }
+  // The touch bar editor (hud/action_bar/bar_editor/): the ONLY binding path on
+  // touch, replacing the retired long-press rearrange. Both mutations land on the
+  // SAME helpers the desktop HTML5 drop uses, so no second write path exists.
+  private readonly barEditorWindow = new BarEditorWindow({
+    root: () => $('#bar-editor'),
+    closeOthers: () => this.closeOtherWindows('#bar-editor'),
+    ...this.windowFocus('#bar-editor'),
+    onVisibilityChange: () => this.syncAnyWindowOpenState(),
+    hideTooltip: () => this.hideTooltip(),
+    barActions: () => this.hotbarActions,
+    sourceSlotCount: () => this.mobileActionSourceSlotCount(),
+    editAllowed: () => isActionBarEditAllowed(this.actionBarsLocked(), 'drop'),
+    placeAbility: (abilityId, slot) => {
+      if (!this.actionBarController.isAssignableAction({ type: 'ability', id: abilityId })) return;
+      this.commitHotbarActions(placeAbilityOnSlot(this.hotbarActions, abilityId, slot - 1));
+    },
+    swapSlots: (slotA, slotB) =>
+      this.commitHotbarActions(swapHotbarSlots(this.hotbarActions, slotA - 1, slotB - 1)),
+    clearSlot: (slot) => this.commitHotbarActions(clearHotbarSlot(this.hotbarActions, slot - 1)),
   });
   // Quest-log window painter (questlog_view.ts core + questlog_window.ts painter).
   // It composes the presentation bag (icon/money/tooltip) for the reward row and
@@ -5541,7 +5561,6 @@ export class Hud {
       touchTimer = undefined;
     };
     const showAt = (x: number, y: number, trigger: 'touch' | 'mouse' | 'focus') => {
-      if (this.mobileHotbarDrag?.active) return;
       // Touch-only path: showing the tooltip means the held control is being
       // inspected, so the release click should peek, not fire its action.
       this.peekGuard.tooltipShown(trigger);
@@ -6430,7 +6449,7 @@ export class Hud {
     this.mountRaceStrip.relocalize();
     this.mountRaceControls.relocalize();
     this.refreshKeybindLabels();
-    this.updateQuestTracker();
+    this.questTracker.relocalize(); // the strip key cannot see a locale-only change.
     // NOT updateDelveTracker(): the tracker's own signature is ids + numbers, so
     // a plain update() early-returns here and re-emits nothing. relocalize()
     // clears it for exactly one rebuild (#2529).
@@ -6510,6 +6529,7 @@ export class Hud {
     this.socialWindow.relocalize();
     this.cardDuelWindow.relocalize();
     this.spellbookWindow.relocalize();
+    this.barEditorWindow.relocalize();
     this.lockpickController.relocalize();
     this.tutorial.relocalize(this.sim, this.keybinds);
     // The ring latches its page indicator on the page/count pair; dropping the
@@ -6712,7 +6732,6 @@ export class Hud {
   private syncActiveHotbarForm(): void {
     if (!this.actionBarController.syncActiveForm()) return;
     this.dragAction = null;
-    this.clearMobileHotbarDrag();
     this.mobileActionPage = this.currentMobileActionPage();
   }
 
@@ -7190,10 +7209,7 @@ export class Hud {
   }
 
   private mobileActionSourceSlotCount(): number {
-    return mobileActionSourceSlotCount({
-      secondary: Boolean(this.optionsHooks?.settings.get('showSecondaryActionBar')),
-      third: Boolean(this.optionsHooks?.settings.get('showThirdActionBar')),
-    });
+    return mobileActionSourceSlotCount();
   }
 
   private mobileActionPageCount(): number {
@@ -7206,8 +7222,11 @@ export class Hud {
     return page;
   }
 
-  private mobileSourceSlotForButton(buttonIndex: number): number {
-    return sourceSlotForMobileButton(this.currentMobileActionPage(), buttonIndex);
+  private mobileSourceSlotForButton(
+    buttonIndex: number,
+    direction: RadialDirection = 'center',
+  ): number {
+    return sourceSlotForMobileButton(this.currentMobileActionPage(), buttonIndex, direction);
   }
 
   // Advance the mobile action ring to its next page. Mutates mobileActionPage
@@ -7225,14 +7244,18 @@ export class Hud {
     if (btn) this.flashActionButton(btn);
     // Mirror the used-flash onto the mobile ring (the desktop bar is
     // display:none under body.mobile-touch, so without this a ring cast gave
-    // no visual acknowledgment at all). barSlot 0 is the attack toggle; the 5
-    // paged buttons show sourceSlotForMobileButton(page, i) for the CURRENT page.
+    // no visual acknowledgment at all). barSlot 0 is the attack toggle; the 4
+    // radial buttons cover 5 slots each on the CURRENT page.
     if (barSlot === 0 && this.mobileRingAttackBtn) {
       this.flashActionButton(this.mobileRingAttackBtn);
       return;
     }
     for (let i = 0; i < this.mobileRingSlotBtns.length; i++) {
-      if (this.mobileSourceSlotForButton(i) === barSlot) {
+      // Every direction, not just the centre: a flick casts a slot the resting
+      // button does not show, and without this a directional cast landed with
+      // no visual acknowledgment at all.
+      for (const direction of RADIAL_DIRECTIONS) {
+        if (this.mobileSourceSlotForButton(i, direction) !== barSlot) continue;
         this.flashActionButton(this.mobileRingSlotBtns[i]);
         return;
       }
@@ -7369,18 +7392,7 @@ export class Hud {
         if (known) return this.abilityTooltip(known) + clearHint;
         const item = this.itemForSlot(slot);
         if (item) {
-          const count = this.inventoryCount(item.id);
-          return (
-            this.itemTooltip(item) +
-            `<div class="tt-sub">${esc(
-              count > 0
-                ? t('abilityUi.actionBar.itemInBags', {
-                    count: formatNumber(count, { maximumFractionDigits: 0 }),
-                  })
-                : t('abilityUi.actionBar.itemNoneInBags'),
-            )}</div>` +
-            clearHint
-          );
+          return this.itemTooltip(item) + itemInBagsLine(this.inventoryCount(item.id)) + clearHint;
         }
         return `<div class="tt-sub">${esc(t('abilityUi.actionBar.emptySlot'))}<br>${esc(t('abilityUi.actionBar.clearHint'))}</div>`;
       });
@@ -7396,12 +7408,7 @@ export class Hud {
           btn.classList.remove('drop-target', 'oor', 'queued', 'unusable');
           this.hideTooltip();
         };
-        btn.addEventListener('contextmenu', (e) => {
-          handleShiftClearContextMenu(e, clearSlot);
-        });
-        btn.addEventListener('keydown', (e) => {
-          handleShiftClearKeydown(e, clearSlot);
-        });
+        bindShiftClear(btn, clearSlot);
         btn.addEventListener('dragstart', (e) => {
           if (!isActionBarEditAllowed(this.actionBarsLocked(), 'drag')) {
             e.preventDefault();
@@ -7474,7 +7481,6 @@ export class Hud {
           this.dragAction = null;
           this.clearActionDropTargets();
         });
-        this.bindMobileActionDrag(btn, slot);
       } else {
         // Slot 0 (Attack). Right-click removes the Attack toggle from the bar
         // (Interface option showAttackButton -> off), freeing the slot and its key
@@ -7635,306 +7641,116 @@ export class Hud {
       crossHotbarResolvers(this.sim, ITEMS, abilityDisplayName, itemDisplayName),
     );
     this.buildMobileActionRing();
-    this.buildMobileConsumableBar();
+    this.buildMobileConsumableSeat();
+    this.buildStanceBar();
   }
 
-  // Build the mobile action ring: a SECOND createActionBarView instance over a
-  // 6-slot descriptor (slot 0 the fixed attack toggle, slots 1-5 the paged action
-  // buttons) plus a MobileActionRingPainter reusing ActionBarPainter for the
-  // per-slot writes. The static container/buttons live in index.html/play.html
-  // (#mobile-action-ring); on a build that omits them (neither game entry does,
-  // but this stays defensive like an optional-row-less template case above) the
-  // ring silently stays unbuilt and update() skips painting it.
+  // The warrior/paladin choice bar behind the hud/stance seam: the module owns
+  // BOTH shapes (the desktop row and the touch radial control) and Hud keeps only
+  // the world read, the cast, the tooltip and the icon resolution.
+  private buildStanceBar(): void {
+    this.stanceBar = new StanceBarController({
+      writers: this.writerFacet,
+      bar: $('#stancebar') as HTMLElement,
+      world: () => ({
+        playerClass: this.sim.cfg.playerClass,
+        known: this.sim.known,
+        auras: this.sim.player.auras,
+        ownerId: this.sim.player.id,
+      }),
+      isMobileLayout: () => this.isMobileLayout(),
+      iconBackground: (iconKey) => iconDataUrl('ability', iconKey),
+      abilityName: (known) => abilityDisplayName(known.def),
+      anchorName: (stanceName) =>
+        stanceName === null
+          ? t('hudChrome.mobile.stanceAnchorEmptyAria')
+          : t('hudChrome.mobile.stanceAnchorAria', { stance: stanceName }),
+      abilityTooltip: (known) => this.abilityTooltip(known),
+      attachTooltip: (el, html) => this.attachTooltip(el, html),
+      hideTooltip: () => this.hideTooltip(),
+      consumePeekGuard: () => this.peekGuard.consume(),
+      clickSfx: () => audio.click(),
+      cast: (abilityId) => this.sim.castAbility(abilityId),
+    });
+  }
+
+  // Build the mobile action ring behind the action_bar seam
+  // (mobile_action_ring_controller.ts): Hud keeps the page field, the cast path
+  // and the per-frame paint, and hands the module callbacks for everything else.
+  // The module also owns the radial gesture and its petal overlay, so a held
+  // button reaches four more actions without a second per-frame call here.
   private buildMobileActionRing(): void {
-    const attackBtn = document.getElementById('mobile-action-attack') as HTMLButtonElement | null;
-    const slotBtns = Array.from(
-      document.querySelectorAll<HTMLButtonElement>('.mobile-action-slot'),
-    ).sort((a, b) => Number(a.dataset.mobileIndex ?? 0) - Number(b.dataset.mobileIndex ?? 0));
-    const pageToggle = document.getElementById('mobile-action-page-toggle');
-    const pageIndicator = pageToggle?.querySelector<HTMLElement>('.mobile-action-page-indicator');
-    if (!attackBtn || slotBtns.length !== 5 || !pageToggle || !pageIndicator) return;
-    this.mobileRingAttackBtn = attackBtn;
-    this.mobileRingSlotBtns = slotBtns;
-
-    const ringButtons = [attackBtn, ...slotBtns];
-    const ringEls: ActionBarSlotElements[] = ringButtons.map((btn) => {
-      const label = document.createElement('span');
-      label.className = 'icon-label';
-      const countEl = document.createElement('span');
-      countEl.className = 'item-count';
-      const keybindEl = document.createElement('span');
-      keybindEl.className = 'keybind';
-      const cdOverlay = document.createElement('div');
-      cdOverlay.className = 'cd-overlay';
-      const cdText = document.createElement('div');
-      cdText.className = 'cdtext';
-      const rechargeOverlay = document.createElement('div');
-      rechargeOverlay.className = 'recharge-overlay';
-      btn.append(label, countEl, keybindEl, cdOverlay, rechargeOverlay, cdText);
-      return {
-        btn,
-        label,
-        countEl,
-        keybindEl,
-        cdOverlay,
-        cdText,
-        rechargeOverlay,
-      };
-    });
-
-    // Wire clicks: attack -> the classic fixed control while the
-    // player is auto-attacking or holds a live hostile target, and the
-    // acquire-nearest fallback (the old Closest behavior, injected by main.ts
-    // as onMobileAttackNearest) otherwise, so a bare tap with nothing targeted
-    // picks the closest enemy and starts swinging instead of erroring. Slot
-    // buttons -> castSlot(the resolved source slot for the CURRENT page at
-    // click time, not a captured page). Mirrors the desktop action-btn click
-    // pattern (audio.click, blur), EXCEPT the peek guard: the ring has no
-    // tooltip of its own (see the no-tooltip note below), so a set peek flag
-    // here is always STALE cross-talk from some other control's long-press.
-    // Each handler clears it and dismisses any lingering tooltip box but never
-    // early-returns on it (an early return here ate the player's next cast).
-    // bindTouchTap, not 'click': the browser only synthesizes click for the
-    // PRIMARY pointer, so click-bound ring buttons went dead the moment the
-    // other thumb held the joystick, which is how combat is actually played.
-    bindTouchTap(attackBtn, () => {
-      this.peekGuard.consume();
-      this.hideTooltip();
-      audio.click();
-      const p = this.sim.player;
-      if (this.firstSportAbility()) {
-        this.activateFixedAttackSlot();
-        attackBtn.blur();
-        return;
-      }
-      const target = p.targetId !== null ? this.sim.entities.get(p.targetId) : null;
-      const hasLiveHostileTarget = !!target && !target.dead && target.hostile;
-      handleMobileAttackTap(
-        { autoAttack: p.autoAttack, hasLiveHostileTarget },
-        {
-          activateAttack: () => this.activateFixedAttackSlot(),
-          attackNearest: this.onMobileAttackNearest,
-        },
-      );
-      attackBtn.blur();
-    });
-    slotBtns.forEach((btn, i) => {
-      this.bindEmpoweredActionHold(btn, () => this.mobileSourceSlotForButton(i));
-      bindTouchTap(btn, () => {
-        // A tap that ends a long-press drag (even one released back on its own
-        // slot, a cancel) must not also cast: bindMobileRingDrag arms this flag
-        // on release from an active drag, same as the desktop drag's click guard.
-        if (this.suppressNextActionClick) {
-          this.suppressNextActionClick = false;
-          btn.blur();
-          return;
-        }
-        this.peekGuard.consume();
-        this.hideTooltip();
-        audio.click();
-        this.castSlot(this.mobileSourceSlotForButton(i));
-        btn.blur();
-      });
-      this.bindMobileRingDrag(btn, i);
-    });
-    bindTouchTap(pageToggle, () => {
-      this.peekGuard.consume();
-      this.hideTooltip();
-      audio.click();
-      this.cycleMobileActionPage();
-      (pageToggle as HTMLElement).blur();
-    });
-
-    // No tooltip on the mobile ring: a long-press-to-inspect wiring lived here
-    // (mirroring the desktop bar's attachTooltip), but it read as a stray
-    // popup box appearing over the world on an ordinary tap/hold rather than a
-    // deliberate inspect gesture, so it is removed entirely on touch. With
-    // nothing arming the shared peek guard FROM the ring, a long hold just
-    // casts like a normal tap, and the handlers above only ever CLEAR the
-    // guard (stale cross-talk from another control), never gate on it.
-
-    this.mobileActionRingView = createActionBarView(
-      {
-        slots: [
-          {
-            slotIndex: 0,
-            isAttack: () => this.firstSportAbility() === null,
-            hasAction: () => this.firstSportAbility() !== null,
-            ability: () => this.firstSportAbility(),
-            item: () => null,
-            keybindLabel: () => '',
-          },
-          ...Array.from({ length: 5 }, (_, i) => ({
-            slotIndex: i + 1,
-            isAttack: () => false,
-            hasAction: () => this.actionForSlot(this.mobileSourceSlotForButton(i)) !== null,
-            ability: () => this.abilityForSlot(this.mobileSourceSlotForButton(i)),
-            item: () => this.itemForSlot(this.mobileSourceSlotForButton(i)),
-            keybindLabel: () => '',
-          })),
-        ],
+    const ring = buildMobileActionRing({
+      writers: this.writerFacet,
+      iconBackground: (iconKey) => this.actionBarIconBg(iconKey),
+      sourceSlot: (i, direction) => this.mobileSourceSlotForButton(i, direction),
+      hasSourceSlot: (i, direction) =>
+        mobileButtonHasSourceSlot(
+          this.currentMobileActionPage(),
+          i,
+          this.mobileActionSourceSlotCount(),
+          direction,
+        ),
+      actionForSlot: (slot) => this.actionForSlot(slot),
+      abilityForSlot: (slot) => this.abilityForSlot(slot),
+      itemForSlot: (slot) => this.itemForSlot(slot),
+      empoweredAbilityIdForSlot: (slot) => this.empoweredAbilityIdForSlot(slot),
+      bindModeActive: () => this.actionBarBind !== null,
+      takeSuppressedClick: () => {
+        if (!this.suppressNextActionClick) return false;
+        this.suppressNextActionClick = false;
+        return true;
       },
-      {
-        t,
-        abilityName: abilityDisplayName,
-        itemName: itemDisplayName,
-        slotLabel: (i) => formatAbilityNumber(i + 1),
-        formatCount: (n) => formatNumber(n, { maximumFractionDigits: 0 }),
+      castSlot: (slot) => this.castSlot(slot),
+      cyclePage: () => this.cycleMobileActionPage(),
+      firstSportAbility: () => this.firstSportAbility(),
+      activateFixedAttackSlot: () => this.activateFixedAttackSlot(),
+      attackNearest: this.onMobileAttackNearest,
+      attackTapState: () => {
+        const p = this.sim.player;
+        const target = p.targetId !== null ? this.sim.entities.get(p.targetId) : null;
+        return {
+          autoAttack: p.autoAttack,
+          hasLiveHostileTarget: !!target && !target.dead && target.hostile,
+        };
       },
-    );
-    this.mobileActionRingPainter = new MobileActionRingPainter(
-      this.writerFacet,
-      {
-        bar: {
-          container: document.getElementById('mobile-action-ring') as HTMLElement,
-          slots: ringEls,
-        },
-        pageToggle: pageToggle as HTMLElement,
-        pageIndicator,
-      },
-      // The ring's primary attack slot shows the same crisp data-icon="attack"
-      // glyph as the (now-secondary) Target Closest button instead of the
-      // painted ability-icon background desktop's attack toggle uses: an empty
-      // background here leaves the inline SVG hydrateIcons() already inserted
-      // into #mobile-action-attack's markup visible underneath. Every other
-      // slot (abilities/items/empty) still resolves through actionBarIconBg
-      // exactly like desktop, so desktop's own attack toggle is untouched.
-      (iconKey) => (iconKey === ATTACK_ICON_KEY ? '' : this.actionBarIconBg(iconKey)),
-      t,
-    );
+      hideTooltip: () => this.hideTooltip(),
+      consumePeekGuard: () => this.peekGuard.consume(),
+      bindEmpoweredHold: (btn, resolveSlot) => this.bindEmpoweredActionHold(btn, resolveSlot),
+    });
+    if (!ring) return;
+    this.mobileRingAttackBtn = ring.attackBtn;
+    this.mobileRingSlotBtns = ring.slotBtns;
+    this.mobileActionRingView = ring.view;
+    this.mobileActionRingPainter = ring.painter;
   }
 
-  // Consumables quick bar: the chevron chip next to the top-left trio expands a
-  // row auto-populated from the carried consumables (consumable_bar_view.ts),
-  // painted by another instance of the shared bar family. Touch has no way to
-  // drag an item onto the hotbar, so unlike the ring's paged slots this bar
-  // needs no setup: tap the chip, tap the potion. Collapsed by default and
-  // session-only (no persisted state, no settings entry). Defensive against
-  // missing markup like the ring (an older cached template leaves it unbuilt).
-  private buildMobileConsumableBar(): void {
-    const toggle = document.getElementById('mobile-consumables-toggle');
-    const row = document.getElementById('mobile-consumables-row');
-    const slotBtns = Array.from(
-      document.querySelectorAll<HTMLButtonElement>('.mobile-consumable-slot'),
-    ).sort(
-      (a, b) => Number(a.dataset.consumableIndex ?? 0) - Number(b.dataset.consumableIndex ?? 0),
-    );
-    if (!toggle || !row || slotBtns.length !== CONSUMABLE_BAR_SLOTS) return;
-    this.consumableBarSlotBtns = slotBtns;
-
-    const slotEls: ActionBarSlotElements[] = slotBtns.map((btn) => {
-      const label = document.createElement('span');
-      label.className = 'icon-label';
-      const countEl = document.createElement('span');
-      countEl.className = 'item-count';
-      const keybindEl = document.createElement('span');
-      keybindEl.className = 'keybind';
-      const cdOverlay = document.createElement('div');
-      cdOverlay.className = 'cd-overlay';
-      const cdText = document.createElement('div');
-      cdText.className = 'cdtext';
-      const rechargeOverlay = document.createElement('div');
-      rechargeOverlay.className = 'recharge-overlay';
-      btn.append(label, countEl, keybindEl, cdOverlay, rechargeOverlay, cdText);
-      return {
-        btn,
-        label,
-        countEl,
-        keybindEl,
-        cdOverlay,
-        cdText,
-        rechargeOverlay,
-      };
-    });
-
-    // bindTouchTap, not 'click', for the same reason as the ring: the browser
-    // only synthesizes click for the PRIMARY pointer, so a click-bound button
-    // goes dead while the other thumb holds the joystick.
-    bindTouchTap(toggle, () => {
-      audio.click();
-      this.consumablesOpen = !this.consumablesOpen;
-      // Snapshot the consumable list at OPEN time; it stays frozen while open
-      // so slot positions are tap-stable (see the field comment). Counts and
-      // the potion-cooldown sweep still update live off the sim each frame.
-      if (this.consumablesOpen) {
-        consumableBarItems(this.sim.inventory, (id) => ITEMS[id], this.consumableBarIds);
-      }
-      document.body.classList.toggle('mobile-consumables-open', this.consumablesOpen);
-      toggle.setAttribute('aria-expanded', this.consumablesOpen ? 'true' : 'false');
-      (toggle as HTMLElement).blur();
-    });
-    slotBtns.forEach((btn, i) => {
-      bindTouchTap(btn, () => {
-        if (this.peekGuard.consume()) {
-          this.hideTooltip();
-          btn.blur();
-          return;
-        }
-        audio.click();
-        this.useConsumableSlot(i);
-        btn.blur();
-      });
-      // Long-press-to-inspect, arming the peek guard the tap handler consumes
-      // (same contract as the ring: a long press must never quaff).
-      this.attachTooltip(btn, () => {
-        const id = this.consumableBarIds[i];
-        const item = id ? (ITEMS[id] ?? null) : null;
-        if (!item) return `<div class="tt-sub">${esc(t('abilityUi.actionBar.emptySlot'))}</div>`;
-        const count = this.inventoryCount(item.id);
-        return (
-          this.itemTooltip(item) +
-          `<div class="tt-sub">${esc(
-            count > 0
-              ? t('abilityUi.actionBar.itemInBags', {
-                  count: formatNumber(count, { maximumFractionDigits: 0 }),
-                })
-              : t('abilityUi.actionBar.itemNoneInBags'),
-          )}</div>`
-        );
-      });
-    });
-
-    this.consumableBarView = createActionBarView(
-      {
-        slots: Array.from({ length: CONSUMABLE_BAR_SLOTS }, (_, i) => ({
-          slotIndex: i,
-          isAttack: () => false,
-          hasAction: () => this.consumableBarIds[i] !== undefined,
-          ability: () => null,
-          item: () => {
-            const id = this.consumableBarIds[i];
-            return id ? (ITEMS[id] ?? null) : null;
-          },
-          keybindLabel: () => '',
-        })),
-      },
-      {
-        t,
-        abilityName: abilityDisplayName,
-        itemName: itemDisplayName,
-        slotLabel: (i) => formatAbilityNumber(i + 1),
-        formatCount: (n) => formatNumber(n, { maximumFractionDigits: 0 }),
-      },
-    );
-    this.consumableBarPainter = new ActionBarPainter(
-      this.writerFacet,
-      { container: row, slots: slotEls },
-      (iconKey) => this.actionBarIconBg(iconKey),
-    );
-  }
-
-  // Tap dispatch for a consumables-bar slot: the same seam as castSlot's item
-  // arm (IWorld.useItem, so offline runs the sim directly and online sends the
-  // authoritative 'use' command), minus the hotbar-eligibility gate: the bar's
-  // ids come pre-filtered from consumable_bar_view, which deliberately INCLUDES
-  // elixirs and scrolls (usable from bags, just never hotbar-placeable).
-  private useConsumableSlot(i: number): void {
-    const id = this.consumableBarIds[i];
-    if (!id || this.tradeOpen) return;
-    this.sim.useItem(id);
-    if ($('#bags').style.display !== 'none') this.renderBags();
-    const btn = this.consumableBarSlotBtns[i];
-    if (btn) this.flashActionButton(btn);
+  // The consumables seat: the ring's 5th arc position plus the row a hold or a
+  // leftward swipe opens, built behind the action_bar seam
+  // (consumable_seat_controller.ts). Hud keeps only the item-use call, which is
+  // the SAME IWorld.useItem seam castSlot's item arm uses (offline runs the sim
+  // directly, online sends the authoritative 'use' command), minus the
+  // hotbar-eligibility gate: the ids come pre-filtered from consumable_bar_view,
+  // which deliberately INCLUDES elixirs and scrolls (usable from bags, never
+  // hotbar-placeable).
+  private buildMobileConsumableSeat(): void {
+    this.mobileConsumableSeat =
+      buildMobileConsumableSeat({
+        writers: this.writerFacet,
+        iconBackground: (iconKey) => this.actionBarIconBg(iconKey),
+        lookupItem: (id) => ITEMS[id],
+        useItem: (id) => {
+          if (this.tradeOpen) return false;
+          this.sim.useItem(id);
+          if ($('#bags').style.display !== 'none') this.renderBags();
+          return true;
+        },
+        flash: (btn) => this.flashActionButton(btn),
+        attachTooltip: (el, html) => this.attachTooltip(el, html),
+        itemTooltip: (item) => this.itemTooltip(item),
+        hideTooltip: () => this.hideTooltip(),
+        consumePeekGuard: () => this.peekGuard.consume(),
+      }) ?? undefined;
   }
 
   // Resolve a core icon key to the slot label's background-image value. Kept on the
@@ -7950,221 +7766,12 @@ export class Hud {
   }
 
   private clearActionDropTargets(): void {
-    // All desktop rows (#actionbar, #actionbar2, and #actionbar3) hold .action-btn slots; the
-    // mobile action ring's paged slots are .mobile-action-slot instead.
-    document
-      .querySelectorAll('.action-btn.drop-target, .mobile-action-slot.drop-target')
-      .forEach((el) => {
-        el.classList.remove('drop-target');
-      });
-  }
-
-  private mobileRingSlotFromPoint(x: number, y: number): number | null {
-    const el = document
-      .elementFromPoint(x, y)
-      ?.closest?.('.mobile-action-slot') as HTMLElement | null;
-    const raw = el?.dataset.mobileIndex;
-    if (!raw) return null;
-    const idx = Number(raw);
-    return Number.isInteger(idx) && idx >= 0 && idx < this.mobileRingSlotBtns.length ? idx : null;
-  }
-
-  private actionButtonSlotFromPoint(x: number, y: number): number | null {
-    const el = document
-      .elementFromPoint(x, y)
-      ?.closest?.('.action-btn') as HTMLButtonElement | null;
-    const raw = el?.dataset.hotbarSlot;
-    if (!raw) return null;
-    const slot = Number(raw);
-    return Number.isInteger(slot) && slot >= 1 ? slot : null;
-  }
-
-  private clearMobileHotbarDrag(): void {
-    const drag = this.mobileHotbarDrag;
-    if (drag) window.clearTimeout(drag.timer);
-    this.mobileHotbarDrag = null;
-    document.body.classList.remove('mobile-hotbar-dragging');
-    document
-      .querySelectorAll('.action-btn.mobile-drag-source, .mobile-action-slot.mobile-drag-source')
-      .forEach((el) => {
-        el.classList.remove('mobile-drag-source');
-        el.removeAttribute('aria-grabbed');
-      });
-    this.clearActionDropTargets();
-  }
-
-  private bindMobileActionDrag(btn: HTMLButtonElement, slot: number): void {
-    btn.addEventListener('pointerdown', (e) => {
-      if (!isActionBarEditAllowed(this.actionBarsLocked(), 'drag')) return;
-      if (!document.body.classList.contains('mobile-touch') || e.pointerType !== 'touch') return;
-      if (this.empoweredAbilityIdForSlot(slot)) return;
-      // Any populated slot (ability or item) can be picked up and swapped by
-      // touch, matching desktop drag-and-drop which does not special-case
-      // items either.
-      if (!this.actionForSlot(slot)) return;
-      this.clearMobileHotbarDrag();
-      const sourceIndex = slot - 1;
-      const drag: MobileHotbarDrag = {
-        pointerId: e.pointerId,
-        sourceIndex,
-        startX: e.clientX,
-        startY: e.clientY,
-        active: false,
-        targetIndex: null,
-        timer: window.setTimeout(() => {
-          const current = this.mobileHotbarDrag;
-          if (!current || current.pointerId !== e.pointerId) return;
-          current.active = true;
-          current.targetIndex = sourceIndex;
-          this.suppressNextActionClick = true;
-          document.body.classList.add('mobile-hotbar-dragging');
-          btn.classList.add('mobile-drag-source');
-          btn.classList.add('drop-target');
-          btn.setAttribute('aria-grabbed', 'true');
-          this.hideTooltip();
-          try {
-            btn.setPointerCapture?.(e.pointerId);
-          } catch {
-            /* pointer already released */
-          }
-        }, 320),
-      };
-      this.mobileHotbarDrag = drag;
+    // Desktop HTML5 drag-and-drop only: all three rows (#actionbar, #actionbar2,
+    // #actionbar3) hold .action-btn slots. Touch binding is the bar editor overlay,
+    // which never marks a drop target.
+    document.querySelectorAll('.action-btn.drop-target').forEach((el) => {
+      el.classList.remove('drop-target');
     });
-
-    btn.addEventListener('pointermove', (e) => {
-      const drag = this.mobileHotbarDrag;
-      if (!drag || drag.pointerId !== e.pointerId) return;
-      const moved = Math.hypot(e.clientX - drag.startX, e.clientY - drag.startY);
-      if (!drag.active && moved > 9) {
-        this.clearMobileHotbarDrag();
-        return;
-      }
-      if (!drag.active) return;
-      e.preventDefault();
-      const targetSlot = this.actionButtonSlotFromPoint(e.clientX, e.clientY);
-      const targetIndex = targetSlot !== null ? targetSlot - 1 : null;
-      drag.targetIndex = targetIndex;
-      this.clearActionDropTargets();
-      const targetBtn = targetSlot !== null ? this.abilityButtons[targetSlot]?.btn : null;
-      if (targetBtn) targetBtn.classList.add('drop-target');
-      this.abilityButtons[drag.sourceIndex + 1]?.btn.classList.add('mobile-drag-source');
-    });
-
-    const finish = (e: PointerEvent) => {
-      const drag = this.mobileHotbarDrag;
-      if (!drag || drag.pointerId !== e.pointerId) return;
-      const wasActive = drag.active;
-      const targetIndex = drag.targetIndex;
-      if (wasActive) {
-        e.preventDefault();
-        this.suppressNextActionClick = true;
-        const resolvedTarget = resolveMobileHotbarDrop(drag.sourceIndex, targetIndex);
-        if (resolvedTarget !== null) {
-          this.hotbarActions = swapHotbarSlots(
-            this.hotbarActions,
-            drag.sourceIndex,
-            resolvedTarget,
-          );
-          this.saveSlotMap();
-          // Match the desktop drop: clear the now-stale tooltip for the rearranged
-          // slot so a long-press peek resolves the new content (#1485).
-          this.hideTooltip();
-        }
-      }
-      this.clearMobileHotbarDrag();
-    };
-    btn.addEventListener('pointerup', finish);
-    btn.addEventListener('pointercancel', finish);
-  }
-
-  // Touch swap for the mobile action ring, the one bar actually visible on a
-  // touch device (the desktop #actionbar/#actionbar2/#actionbar3 rows bindMobileActionDrag
-  // wires above are display:none under body.mobile-touch, so without this the
-  // ring had no rearrange path at all). Same long-press-then-drag gesture as
-  // bindMobileActionDrag, sharing the one mobileHotbarDrag field (only one
-  // drag can be live at a time) and the pure resolveMobileHotbarDrop/
-  // swapHotbarSlots helpers; only the point-to-slot hit test differs, since
-  // ring buttons are .mobile-action-slot, not .action-btn, and a ring
-  // position's underlying bar slot depends on the current paged page.
-  private bindMobileRingDrag(btn: HTMLButtonElement, ringIndex: number): void {
-    btn.addEventListener('pointerdown', (e) => {
-      if (!isActionBarEditAllowed(this.actionBarsLocked(), 'drag')) return;
-      if (!document.body.classList.contains('mobile-touch') || e.pointerType !== 'touch') return;
-      const sourceSlot = this.mobileSourceSlotForButton(ringIndex);
-      if (this.empoweredAbilityIdForSlot(sourceSlot)) return;
-      if (!this.actionForSlot(sourceSlot)) return;
-      this.clearMobileHotbarDrag();
-      const sourceIndex = sourceSlot - 1;
-      const drag: MobileHotbarDrag = {
-        pointerId: e.pointerId,
-        sourceIndex,
-        startX: e.clientX,
-        startY: e.clientY,
-        active: false,
-        targetIndex: null,
-        timer: window.setTimeout(() => {
-          const current = this.mobileHotbarDrag;
-          if (!current || current.pointerId !== e.pointerId) return;
-          current.active = true;
-          current.targetIndex = sourceIndex;
-          document.body.classList.add('mobile-hotbar-dragging');
-          btn.classList.add('mobile-drag-source', 'drop-target');
-          btn.setAttribute('aria-grabbed', 'true');
-          this.hideTooltip();
-          try {
-            btn.setPointerCapture?.(e.pointerId);
-          } catch {
-            /* pointer already released */
-          }
-        }, 320),
-      };
-      this.mobileHotbarDrag = drag;
-    });
-
-    btn.addEventListener('pointermove', (e) => {
-      const drag = this.mobileHotbarDrag;
-      if (!drag || drag.pointerId !== e.pointerId) return;
-      const moved = Math.hypot(e.clientX - drag.startX, e.clientY - drag.startY);
-      if (!drag.active && moved > 9) {
-        this.clearMobileHotbarDrag();
-        return;
-      }
-      if (!drag.active) return;
-      e.preventDefault();
-      const targetRingIndex = this.mobileRingSlotFromPoint(e.clientX, e.clientY);
-      const targetIndex =
-        targetRingIndex !== null ? this.mobileSourceSlotForButton(targetRingIndex) - 1 : null;
-      drag.targetIndex = targetIndex;
-      this.clearActionDropTargets();
-      const targetBtn = targetRingIndex !== null ? this.mobileRingSlotBtns[targetRingIndex] : null;
-      if (targetBtn) targetBtn.classList.add('drop-target');
-      btn.classList.add('mobile-drag-source');
-    });
-
-    const finish = (e: PointerEvent) => {
-      const drag = this.mobileHotbarDrag;
-      if (!drag || drag.pointerId !== e.pointerId) return;
-      const wasActive = drag.active;
-      const targetIndex = drag.targetIndex;
-      if (wasActive) {
-        e.preventDefault();
-        this.suppressNextActionClick = true;
-        const resolvedTarget = resolveMobileHotbarDrop(drag.sourceIndex, targetIndex);
-        if (resolvedTarget !== null) {
-          this.hotbarActions = swapHotbarSlots(
-            this.hotbarActions,
-            drag.sourceIndex,
-            resolvedTarget,
-          );
-          this.saveSlotMap();
-          this.hideTooltip();
-        }
-      }
-      this.clearMobileHotbarDrag();
-    };
-    btn.addEventListener('pointerup', finish);
-    btn.addEventListener('pointercancel', finish);
   }
 
   // Repaint the side-menu button keycaps + aria labels from the current bindings.
@@ -8358,61 +7965,11 @@ export class Hud {
     return findOwnPet(this.sim.entities.values(), this.sim.playerId);
   }
 
-  // The stance-style choice bar: one shared row above the action bars for
-  // warrior stances and paladin auras. Rebuilds only when the known choice set
-  // or active choice changes (sig elision, like the pet bar).
+  // The stance-style choice bar for warrior stances and paladin auras, behind the
+  // hud/stance seam: the desktop row and the touch radial are two shapes of one
+  // model, and both cast through this same castAbility call.
   private renderStanceBar(): void {
-    const bar = $('#stancebar') as HTMLElement;
-    const playerClass = this.sim.cfg.playerClass;
-    const usesChoiceBar = playerClass === 'warrior' || playerClass === 'paladin';
-    const knownStances = usesChoiceBar
-      ? this.sim.known.filter((k) => isStanceBarAbilityGroup(k.def.exclusiveGroup))
-      : [];
-    const knownIds = knownStances.map((k) => k.def.id);
-    const activeId = activeStanceBarAbilityId(knownIds, this.sim.player.auras, this.sim.player.id);
-    const model = stanceBarView(playerClass, knownIds, activeId);
-    if (!model.visible) {
-      bar.style.display = 'none';
-      if (this.lastStanceBarSig !== '') {
-        bar.innerHTML = '';
-        this.lastStanceBarSig = '';
-      }
-      return;
-    }
-    bar.style.display = 'flex';
-    if (model.sig === this.lastStanceBarSig) return;
-    this.lastStanceBarSig = model.sig;
-    bar.innerHTML = '';
-    const group = document.createElement('div');
-    group.className = 'stancebar-group';
-    bar.appendChild(group);
-    for (const slot of model.slots) {
-      const known = knownStances.find((k) => k.def.id === slot.id);
-      if (!known) continue;
-      const name = abilityDisplayName(known.def);
-      const btn = document.createElement('button');
-      btn.type = 'button';
-      btn.className = 'stance-btn';
-      if (slot.active) btn.classList.add('active');
-      btn.setAttribute('aria-pressed', slot.active ? 'true' : 'false');
-      btn.title = name;
-      btn.setAttribute('aria-label', name);
-      const icon = document.createElement('span');
-      icon.className = 'icon-label';
-      icon.style.backgroundImage = `url(${iconDataUrl('ability', slot.iconKey)})`;
-      btn.appendChild(icon);
-      btn.addEventListener('click', () => {
-        if (this.peekGuard.consume()) {
-          this.hideTooltip();
-          btn.blur();
-          return;
-        }
-        audio.click();
-        this.sim.castAbility(slot.id);
-      });
-      this.attachTooltip(btn, () => this.abilityTooltip(known));
-      group.appendChild(btn);
-    }
+    this.stanceBar.render();
   }
 
   // `pet` is resolved ONCE per frame by update() and passed in, shared with the pet
@@ -9580,21 +9137,10 @@ export class Hud {
       );
     }
 
-    // consumables quick bar: tick+paint ONLY while the row is expanded on touch.
-    // The id list is NOT recomputed here: it was snapshotted when the row opened
-    // and stays frozen so slots never shift under the player's thumb; counts,
-    // usability, and the shared potion-cooldown sweep still derive live from the
-    // sim/inventory every tick. Skipping the closed bar entirely is safe for the
-    // same reason ring paging is: all of that state lives on the sim, not the
-    // view, so the row is correct the frame it opens.
-    if (
-      this.isMobileLayout() &&
-      this.consumablesOpen &&
-      this.consumableBarView &&
-      this.consumableBarPainter
-    ) {
-      this.consumableBarPainter.paint(this.consumableBarView.tick(actionBarWorld));
-    }
+    // consumables seat: the seat itself paints every touch frame (it shows what
+    // the player is carrying, with no interaction needed), and the row it opens
+    // rides the same call. Reuses the desktop bar's world snapshot.
+    if (this.isMobileLayout()) this.mobileConsumableSeat?.paint(actionBarWorld);
 
     // xp bar: pre-cap shows the level bar; post-cap fills toward the next virtual
     // level (Max-Level XP Overflow), with distinct prestige/gold styling. The
@@ -9735,7 +9281,7 @@ export class Hud {
         restEl.title = rest.labelKey ? t(rest.labelKey) : '';
       }
 
-      this.updateQuestTracker();
+      this.updateQuestTracker(now);
       this.updateDelveTracker();
       this.updateRiftTracker();
       // Party frames run on the ~4Hz mediumHud band (the enclosing block) for EVERY tier.
@@ -10099,8 +9645,8 @@ export class Hud {
     }
   }
 
-  private updateQuestTracker(): void {
-    this.questTracker.update();
+  private updateQuestTracker(now: number): void {
+    this.questTracker.update(now);
   }
 
   /** Flip the persisted tracker-collapsed preference (the header click/keyboard
@@ -17809,6 +17355,15 @@ export class Hud {
     this.spellbookWindow.toggle();
   }
 
+  /** Open the touch bar editor, optionally with a spell armed for the next tap. */
+  openBarEditor(abilityId: string | null = null): void {
+    this.barEditorWindow.open(abilityId);
+  }
+
+  toggleBarEditor(): void {
+    this.barEditorWindow.toggle();
+  }
+
   // -------------------------------------------------------------------------
   // Talents & Specializations panel (bound to 'N'). The interactive staged-edit
   // window (tree, spec tabs, loadout footer) lives in TalentsWindow; Hud stays the
@@ -17936,15 +17491,16 @@ export class Hud {
     // Drop the frames below the target frame only when the measured target
     // stack (frame + #tf-debuffs strip) actually overlaps their column: the
     // painter keeps --party-below-target-bottom current (measuring only when
-    // its cheap key changes), and a null bottom (no target, no overlap, e.g. a
-    // dragged-away target frame) keeps the frames at their base anchor.
+    // its cheap key changes) and reports whether the seat is in play at all (no
+    // overlap, e.g. a dragged-away target frame, keeps the frames at their base
+    // anchor; touch holds the seat with no target off the tier's fallback).
     const targetShown = !!target && target.kind !== 'object';
-    const stackBottom = this.partyBelowTargetPainter.update(
+    const belowTarget = this.partyBelowTargetPainter.update(
       targetShown,
       info?.members.length ?? 0,
       this.isMobileLayout(),
     );
-    this.partyFramesPainter.setBelowTarget(targetShown && stackBottom !== null);
+    this.partyFramesPainter.setBelowTarget(belowTarget);
     if (!info) {
       // Clear only on the transition out of a party (matching the inline `innerHTML
       // !== ''` guard), so a persistently party-less HUD does no per-frame work.
@@ -19166,6 +18722,7 @@ export class Hud {
 
   // Closes the topmost UI. Returns true if something was closed.
   closeAll(): boolean {
+    if (closeOpenTouchMenu()) return true;
     if (this.lootWindow.hasOpenChest) {
       this.closeLoot();
       return true;

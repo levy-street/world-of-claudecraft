@@ -35,11 +35,13 @@ describe('owned-class level 20 balance harness (sustained role bands)', () => {
       // 0.83 floor and puts the diet ceiling at 1.11.
       expect(thundercall.dps).toBeGreaterThanOrEqual(vespersSingle.dps * 0.83);
       expect(thundercall.dps).toBeLessThanOrEqual(vespersSingle.dps * band(1.1, 1.11));
-      // Warspirit area/single: full actual 1.1494, diet actual 1.0944 (the two
-      // retained seeds roll the single-target run high), so the diet band is
-      // 1.04 to 1.14 at the same relative margins.
-      expect(warspiritArea.dps / warspiritSingle.dps).toBeGreaterThanOrEqual(band(1.1, 1.04));
-      expect(warspiritArea.dps / warspiritSingle.dps).toBeLessThanOrEqual(band(1.2, 1.14));
+      // Warspirit area/single: re-pinned for the 200 DPS convergence package
+      // (echo 0.25, baseline apPct 0.05, Ancestral Strike 0.5) and the
+      // BiS-anchored fixture loadout. Full actual 1.0321 (5 seeds), diet
+      // actual 1.1073. Same relative margins as the prior pins: full 0.99 to
+      // 1.08, diet 1.05 to 1.15.
+      expect(warspiritArea.dps / warspiritSingle.dps).toBeGreaterThanOrEqual(band(0.99, 1.05));
+      expect(warspiritArea.dps / warspiritSingle.dps).toBeLessThanOrEqual(band(1.08, 1.15));
       // Vespers area/single: full actual 1.4041, diet actual 1.4475; the diet
       // floor rises to 1.29 with the same relative margin.
       expect(vespersArea.dps / vespersSingle.dps).toBeGreaterThanOrEqual(band(1.25, 1.29));
@@ -50,10 +52,15 @@ describe('owned-class level 20 balance harness (sustained role bands)', () => {
       // re-measure: full actual 1.1539 (5 seeds, 120 s boss), diet actual
       // 1.1775 (2 seeds, 60 s boss); same relative margins give 0.95 / 1.22.
       expect(warspiritBoss.dps / vespersBoss.dps).toBeGreaterThanOrEqual(band(0.93, 0.95));
-      // Full-sweep ceiling kept at 1.2 (measured 1.1539 that round, was 1.18
-      // on the combined tree pre-round). Re-author both sides of this pair
-      // when the owned-class stack integrates.
-      expect(warspiritBoss.dps / vespersBoss.dps).toBeLessThanOrEqual(band(1.2, 1.22));
+      // Full-sweep ceiling kept at 1.2 (200 DPS convergence package: full
+      // actual 1.0683, warspirit 187.8 / vespers 175.8 at 120 s on the
+      // BiS-anchored fixture). Diet re-pinned from its own printed actual
+      // 1.3864: the BiS kit front-loads the 60 s diet window (the Primal
+      // Exaltation opener plus the crownforged haste land whole inside it)
+      // while Vespers is still ramping; the prior diet margin gives 1.44.
+      // Re-author both sides of this pair when the owned-class stack
+      // integrates.
+      expect(warspiritBoss.dps / vespersBoss.dps).toBeLessThanOrEqual(band(1.2, 1.44));
       // Full sweep: the grown owned-class matrix ran ~180s under shard load and
       // roughly doubled in the shared lane (run 31288946173 killed it at 240s).
       // Diet: two seeds and the 60 s boss window cut the simulated time 3.2x.

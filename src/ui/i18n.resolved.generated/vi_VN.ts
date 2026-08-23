@@ -871,11 +871,52 @@ export const vi_VN: EnTranslations = {
       "actionRing": "Hành động chiến đấu",
       "actionPageToggle": "Chuyển trang hành động",
       "actionPageIndicator": "Trang {page}",
+      "actionRadial": "Action directions",
+      "actionRadialCancel": "Cancel action",
+      "radialCenter": "Centre",
+      "radialUp": "Up",
+      "radialRight": "Right",
+      "radialDown": "Down",
+      "radialLeft": "Left",
+      "consumableSeat": "Consumables",
+      "menuControl": "Menus",
+      "menuControlAria": "Menus. Tap to open chat, or hold and swipe right for mounts, map, bags and more.",
+      "menuControlAriaTap": "Menus. Tap to open the menu row: mounts, map, bags and more. Tap again for chat.",
+      "menuLabel": "Menu",
+      "quickActions": "Quick Actions",
+      "quickActionsAria": "Quick Actions. Tap to open the row of mount, chat, map, bags and more, or hold and swipe right to pick one.",
+      "quickActionsAriaTap": "Quick Actions. Tap to open the row of mount, chat, map, bags and more, then tap an item. Tap the control again to close.",
+      "quickActionsLabel": "Actions",
+      "stanceRadial": "Stances",
+      "stanceAnchorAria": "Stance: {stance}. Tap to open the stance ring, then pick another stance.",
+      "stanceAnchorEmptyAria": "No stance. Tap to open the stance ring, then pick a stance.",
+      "questStripAria": "Tracked quest {position} of {total}: {title}. Activate for the next quest.",
+      "questStripAriaSingle": "Tracked quest: {title}",
+      "questStripCounter": "{position}/{total}",
+      "questStripMore": "+{count} more",
       "targetCycle": "Hoán đổi mục tiêu",
       "targetCycleShort": "Mục tiêu",
       "spellbookPageLabel": "Trang {page}",
       "hideKeyboard": "Ẩn bàn phím",
-      "chatPlaceholder": "Nói gì đó..."
+      "chatPlaceholder": "Nói gì đó...",
+      "barEditor": "Edit Bars",
+      "barEditorAria": "Edit the action bar layout"
+    },
+    "barEditor": {
+      "title": "Edit Action Bar",
+      "close": "Close bar editor",
+      "pages": "Action bar pages",
+      "pageTab": "Page {page}",
+      "buttonHeader": "Button {button}",
+      "cellAria": "Button {button}, {direction}: {action}",
+      "emptyCellAria": "Button {button}, {direction}: empty",
+      "hint": "Tap a slot, then another, to swap them.",
+      "armed": "Tap a slot to place {name}.",
+      "picked": "Tap another slot to swap with {name}.",
+      "locked": "Action bars are locked in Interface options.",
+      "clear": "Clear",
+      "clearAria": "Clear a slot",
+      "clearArmed": "Tap a slot to clear it."
     },
     "tutorial": {
       "moveBodyTouch": "Dùng cần di chuyển để đi và kéo màn hình để nhìn quanh. Bước vài bước để bắt đầu.",
@@ -1420,7 +1461,9 @@ export const vi_VN: EnTranslations = {
       "showAttackButton": "Hiển Thị Nút Tấn Công",
       "showDailyRewardsChest": "Hiện Rương Phần Thưởng Hằng Ngày",
       "mobileCameraJoystick": "Cần điều khiển máy ảnh",
-      "mobileLeftHanded": "Bố cục thuận tay trái"
+      "mobileLeftHanded": "Bố cục thuận tay trái",
+      "touchTapMenus": "Tap menus",
+      "touchTapMenusNote": "Open the action, consumable and menu controls with a tap instead of a swipe. Tap an item to use it, tap the control again for its usual action, or tap outside to close."
     },
     "talentRows": {
       "tab": "Lựa chọn",
@@ -2510,7 +2553,8 @@ export const vi_VN: EnTranslations = {
     },
     "spellbook": {
       "addToBarAria": "Thêm {name} vào thanh kỹ năng",
-      "removeFromBarAria": "Gỡ {name} khỏi thanh kỹ năng"
+      "removeFromBarAria": "Gỡ {name} khỏi thanh kỹ năng",
+      "assignAria": "Choose a slot for {name}"
     },
     "nameplate": {
       "mobLevel": "{level}",

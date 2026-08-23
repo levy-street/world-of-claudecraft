@@ -91,7 +91,74 @@ const MONOLITHS: MonolithRow[] = [
     // and #plant-sheet-window, from the Phase 11b farming absorb); they moved
     // into CHROME_GUARDED_PANELS with the rest rather than being dropped. No
     // raise. Exact merged count, zero slack: any further growth reds again.
-    ceiling: 19235,
+    //
+    // UPSTREAM'S OWN HALF of this span, kept so the merge drops neither parent's
+    // record. The touch UI rework lowered the release's row five times by
+    // extraction and twice more in its review round, ending at a zero-slack
+    // 19031:
+    // LOWERED 19490 -> 19386 by the touch radial ring: buildMobileActionRing's
+    // whole body (the markup lookup, the slot-element minting, the attack /
+    // slot / page-toggle wiring and both view constructions) moved behind the
+    // action_bar seam into hud/action_bar/mobile_action_ring_controller.ts, and
+    // Hud kept only the page state, the callback bag and the per-frame paint.
+    // The ratchet's own rule: an extraction lowers the ceiling in the same
+    // change. Exact count, zero slack.
+    // LOWERED 19386 -> 19263 by the touch consumables seat: buildMobileConsumableBar
+    // and useConsumableSlot (the markup lookup, the slot-element minting, the
+    // toggle/slot wiring, the tooltip binding and the view construction) moved
+    // behind the action_bar seam into hud/action_bar/consumable_seat_controller.ts,
+    // and Hud kept only the item-use callback and one per-frame paint. Same rule
+    // as the ring above: an extraction lowers the ceiling in the same change.
+    // Exact count, zero slack.
+    // LOWERED 19263 -> 19078 by the touch bar editor: the mobile long-press
+    // rearrange (the MobileHotbarDrag type, the field, clearMobileHotbarDrag,
+    // bindMobileActionDrag, bindMobileRingDrag and the two point-to-slot hit
+    // tests) is DELETED, and the overlay that replaces it lives in
+    // hud/action_bar/bar_editor/. Hud kept only the window construction, its two
+    // mutation callbacks and the public opener, so the file lands 185 lines
+    // below its old pin even after the wiring. Exact count, zero slack.
+    // LOWERED 19078 -> 19076 by the bar editor's Clear control: the desktop
+    // slot's two shift-clear listeners moved behind action_bar_clear.ts's own
+    // bindShiftClear, and the editor's three mutation callbacks now share ONE
+    // tooltip hide inside the window, which pays for the new clearSlot callback
+    // with two lines to spare. Exact count, zero slack.
+    // LOWERED 19076 -> 19052 by the touch stance radial: renderStanceBar's whole
+    // body (the row's markup, its per-button tooltip and click wiring, and the
+    // signature latch) moved behind a new hud/stance seam, and Hud kept the
+    // one-line frame call plus the callback bag the module is built with. The
+    // ratchet's own rule: an extraction lowers the ceiling in the same change.
+    // Exact count, zero slack.
+    // Upstream lowered the SAME pin twice on its own arm: the Reliquary-tracker
+    // input construction moved into makeReliquaryTrackerInput
+    // (reliquary_tracker_view.ts), and the stale-focus Space fix (PR #3506)
+    // moved the chrome focus wiring (the tracker drops plus the panel key-guard
+    // loop) into src/ui/chrome_focus_wiring.ts, leaving hud.ts a one-line
+    // consumer (wireChromeFocus($)). The pin below is the MERGED reality of both
+    // arms of extraction. Exact count, zero slack: any further growth reds again.
+    // LOWERED 19038 -> 19032 by the touch review fixes: the action-bar tooltip's
+    // in-bags sub-line moved into hud/action_bar/item_bags_line_core.ts, which
+    // the consumables row's restored item tooltip shares, and paid for its own
+    // two callback lines with nine to spare. Exact count, zero slack.
+    // LOWERED 19032 -> 19031: the bar editor's swapSlots/clearSlot callbacks now
+    // share placeAbility's spellbook-refresh through one commitHotbarActions
+    // helper, fixing a stale assign toggle when a bound spell is cleared or
+    // swapped with the spellbook open behind the editor. Exact count, zero slack.
+    //
+    // RE-PINNED 19235 -> 18792 at the Phase 11i QA release sync (release tip
+    // 14ab2e8630, prior synced release parent 50462dda83). BOTH parent pins for
+    // the record: ours 19235 against a 19235 file, the release 19031 against a
+    // 19031 file, and the base 19476 both descend from. The union composes
+    // exactly: 19476 - 241 (ours) - 445 (theirs) = 18790, plus 2 for the one
+    // conflict resolved by hand in hud.ts itself (the consumables block, where
+    // the release's extracted buildMobileConsumableSeat is taken and this
+    // branch's factual comment correction, elixirs AND scrolls, is carried onto
+    // it, rewrapping one comment line into two and restoring the blank line
+    // between methods). Measured at 18792. Both parents' extractions STACK, so
+    // the merged file lands under both pins and the ratchet TIGHTENS rather than
+    // inheriting slack: the release's own 19031 is NOT taken, since it sits 239
+    // lines above the merged file. Exact merged count, zero slack: any further
+    // growth reds again.
+    ceiling: 18792,
     seam: 'pure view core + thin painter on PainterHost (src/ui/CLAUDE.md)',
   },
   {
@@ -459,7 +526,35 @@ const MONOLITHS: MonolithRow[] = [
     // invocation rather than by a mutable render-core singleton, its browser
     // timer living in the sibling adapter, so main pays only factory and arm
     // wiring. Exact merged count, zero slack: any further growth reds again.
-    ceiling: 11500,
+    //
+    // UPSTREAM'S OWN HALF of this span, kept so the merge drops neither parent's
+    // record. The touch UI rework moved this row twice on its own arm, ending at
+    // a zero-slack 11519:
+    // Raised 11516 -> 11517 (+1) for the touch bar editor: the More tray's Edit
+    // control routes through MobileControlCallbacks, whose bag is wired here and
+    // nowhere else, so the ONE line is `onBarEditor: () => hud.toggleBarEditor()`.
+    // Everything with substance (the grid model, the tap state machine, the
+    // window) lives in src/ui/hud/action_bar/bar_editor/, and the same change
+    // LOWERS hud.ts by 185. Maintainer decision, exact merged count: any further
+    // growth reds again.
+    // RESTORED and LOWERED 11517 -> 11499 by tap mode: raising a ceiling is a
+    // maintainer decision, so that +1 is paid back with an extraction rather than
+    // kept. main.ts carried a private escapeHtml duplicating src/ui/esc.ts, the
+    // canonical escaper the repo already mandates for every interpolation, so the
+    // copy is deleted and its 36 call sites use esc(). Exact count, zero slack.
+    //
+    // RE-PINNED 11500 -> 11483 at the Phase 11i QA release sync (release tip
+    // 14ab2e8630, prior synced release parent 50462dda83). BOTH parent pins for
+    // the record: ours 11500 against an 11500 file, the release 11519 against an
+    // 11519 file, and the base 11536 both descend from. The union composes
+    // exactly: 11536 - 36 (ours, the arrival-chain extractions, already banked)
+    // - 17 (theirs, the escapeHtml to esc() extraction net of the bar editor's
+    // +1) = 11483, and the merged file measures 11483. PREDICTED at 11483 from
+    // the two deltas before the file was measured, observed at 11483. The
+    // release's own 11519 is NOT taken: it sits 36 lines above the merged file
+    // and would hand this row free slack it never earned. Exact merged count,
+    // zero slack: any further growth reds again.
+    ceiling: 11483,
     seam: 'a src/game/ or src/ui/ sibling module; main.ts is a firewall, not a home',
   },
   {

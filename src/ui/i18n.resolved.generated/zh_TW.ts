@@ -871,11 +871,52 @@ export const zh_TW: EnTranslations = {
       "actionRing": "戰鬥動作",
       "actionPageToggle": "切換動作頁",
       "actionPageIndicator": "第{page}頁",
+      "actionRadial": "技能方向",
+      "actionRadialCancel": "取消動作",
+      "radialCenter": "中心",
+      "radialUp": "Up",
+      "radialRight": "右",
+      "radialDown": "Down",
+      "radialLeft": "Left",
+      "consumableSeat": "消耗品",
+      "menuControl": "選單",
+      "menuControlAria": "選單。點按開啟聊天，或按住並向右滑動以使用坐騎、地圖、背包等。",
+      "menuControlAriaTap": "選單。點按開啟選單列：坐騎、地圖、背包等。再次點按可開啟聊天。",
+      "menuLabel": "Menu",
+      "quickActions": "快捷操作",
+      "quickActionsAria": "快捷操作。點按開啟坐騎、聊天、地圖、背包等操作列，或按住並向右滑動進行選擇。",
+      "quickActionsAriaTap": "快捷操作。點按開啟坐騎、聊天、地圖、背包等操作列，然後點按其中一項。再次點按此控制項可關閉。",
+      "quickActionsLabel": "操作",
+      "stanceRadial": "姿態",
+      "stanceAnchorAria": "姿態：{stance}。點按開啟姿態環，然後選擇其他姿態。",
+      "stanceAnchorEmptyAria": "無姿態。點按開啟姿態環，然後選擇一種姿態。",
+      "questStripAria": "追蹤任務 {position}/{total}：{title}。點按可切換至下一個任務。",
+      "questStripAriaSingle": "追蹤任務：{title}",
+      "questStripCounter": "{position}/{total}",
+      "questStripMore": "還有 {count} 項",
       "targetCycle": "切換目標",
       "targetCycleShort": "目標",
       "spellbookPageLabel": "頁{page}",
       "hideKeyboard": "隱藏鍵盤",
-      "chatPlaceholder": "說點什麼...（! 顯示社群指令）"
+      "chatPlaceholder": "說點什麼...（! 顯示社群指令）",
+      "barEditor": "Edit Bars",
+      "barEditorAria": "編輯動作列配置"
+    },
+    "barEditor": {
+      "title": "編輯動作列",
+      "close": "關閉動作列編輯器",
+      "pages": "動作列頁面",
+      "pageTab": "Page {page}",
+      "buttonHeader": "按鈕 {button}",
+      "cellAria": "按鈕 {button}，{direction}：{action}",
+      "emptyCellAria": "按鈕 {button}，{direction}：空",
+      "hint": "點按一個欄位，再點按另一個即可交換。",
+      "armed": "點按一個欄位以放置 {name}。",
+      "picked": "點按另一個欄位以與 {name} 交換。",
+      "locked": "動作列已在介面選項中鎖定。",
+      "clear": "清除",
+      "clearAria": "清除一個欄位",
+      "clearArmed": "點擊一個欄位即可清除。"
     },
     "tutorial": {
       "moveBodyTouch": "使用搖桿移動，拖曳螢幕環顧四周。先走幾步開始吧。",
@@ -1420,7 +1461,9 @@ export const zh_TW: EnTranslations = {
       "showAttackButton": "顯示攻擊按鈕",
       "showDailyRewardsChest": "顯示每日獎勵寶箱",
       "mobileCameraJoystick": "攝影機搖桿",
-      "mobileLeftHanded": "左手配置"
+      "mobileLeftHanded": "左手配置",
+      "touchTapMenus": "點擊選單",
+      "touchTapMenusNote": "用點擊代替滑動來開啟動作、消耗品與選單控制項。點擊項目即可使用，再次點擊控制項執行其一般操作，點擊外部則關閉。"
     },
     "talentRows": {
       "tab": "抉擇",
@@ -2510,7 +2553,8 @@ export const zh_TW: EnTranslations = {
     },
     "spellbook": {
       "addToBarAria": "將 {name} 加入動作列",
-      "removeFromBarAria": "將 {name} 從動作列移除"
+      "removeFromBarAria": "將 {name} 從動作列移除",
+      "assignAria": "為 {name} 選擇一個欄位"
     },
     "nameplate": {
       "mobLevel": "{level}",

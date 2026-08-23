@@ -64,3 +64,37 @@ export function partyBelowTargetBottom(inputs: PartyBelowTargetInputs): number |
   if (right <= party.left || left >= party.right) return null;
   return bottom / safeScale(inputs.uiScale);
 }
+
+export interface BelowTargetSlotInput {
+  /** This frame's measure, or null when the frame is hidden or does not overlap. */
+  measured: number | null;
+  targetShown: boolean;
+  /** Whether the slot stays held while the frame is hidden (touch only). */
+  reserve: boolean;
+}
+
+export interface BelowTargetSlot {
+  /** Whether #party-frames wears .below-target, i.e. whether the slot is held. */
+  active: boolean;
+  /** The author-space bottom to write, or null to UNSET the custom property so
+   *  the tier's authored var() fallback resolves instead. */
+  bottom: number | null;
+}
+
+/**
+ * How the party frames lay out against the target frame's slot. The frame comes
+ * and goes with the player's target, and on touch the party stack hangs directly
+ * under it in the band the collapsed menu row vacated, so releasing the slot
+ * would jump the whole stack mid-combat the moment they deselect. Touch
+ * therefore KEEPS the below-target seat while the frame is hidden, but the
+ * measured bottom is dropped rather than cached: a retained measure is one taken
+ * under whatever tier, UI scale, orientation and buff count happened to be live
+ * when the last target was dropped, and nothing ever invalidates it. Unsetting
+ * hands the seat to the per-tier fallback authored beside the target frame's own
+ * static seat (hud.mobile.css), which is correct at every tier by construction.
+ * Desktop passes reserve: false and releases the seat entirely, unchanged.
+ */
+export function belowTargetSlot(input: BelowTargetSlotInput): BelowTargetSlot {
+  if (input.targetShown) return { active: input.measured !== null, bottom: input.measured };
+  return { active: input.reserve, bottom: null };
+}

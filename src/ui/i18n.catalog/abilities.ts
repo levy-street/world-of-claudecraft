@@ -830,7 +830,7 @@ const classAbilityNamesEn = {
       [
         'ignition',
         'Ignition',
-        'Passive: your spell critical strikes burn the target for 40% of the damage dealt over 6 sec, stacking. (Fire mastery)',
+        'Passive: your spell critical strikes burn the target for 30% of the damage dealt over 6 sec, stacking. (Fire mastery)',
       ],
       [
         'mass_barrier',
@@ -1804,7 +1804,7 @@ const classAbilityNamesEn = {
       [
         'warspirit_cadence',
         'Warspirit Cadence',
-        'Passive: Dual-wield attacks have no extra miss chance. Every 3rd landed weapon attack triggers 2 Galeheart Echoes for 50% Nature damage and grants Stormcast for 12 sec. Stormcast makes your next Arc Bolt, Jolt, or Mending Waters instant and cost 50% less Mana. Ancestral Strike counts as 2 attacks. (Warspirit)',
+        'Passive: Dual-wield attacks have no extra miss chance. Every 3rd landed weapon attack triggers 2 Galeheart Echoes for 25% Nature damage and grants Stormcast for 12 sec. Stormcast makes your next Arc Bolt, Jolt, or Mending Waters instant and cost 50% less Mana. Ancestral Strike counts as 2 attacks. (Warspirit)',
       ],
       [
         'stormsurge',

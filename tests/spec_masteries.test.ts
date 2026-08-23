@@ -84,7 +84,7 @@ describe('spec masteries', () => {
     // crit-triggered burn (ignitionPct) plus a static +2% crit chance, not the old
     // Afterflame crit-damage bonus.
     expect(TALENTS.mage?.specs.find((s) => s.id === 'fire')?.mastery.effect).toEqual({
-      global: { ignitionPct: 0.4 },
+      global: { ignitionPct: 0.3 },
       stats: { crit: 0.02 },
     });
     expect(TALENTS.mage?.specs.find((s) => s.id === 'frost')?.mastery.effect).toEqual({
@@ -420,7 +420,7 @@ describe('spec masteries', () => {
       mage: {
         // Mage rework: arcane is the Chronomancy healer (healing axis), fire is Ignition.
         arcane: { global: 'healPct', value: 0.15 },
-        fire: { global: 'ignitionPct', value: 0.4 },
+        fire: { global: 'ignitionPct', value: 0.3 },
         frost: { abilities: ['frostbolt', 'frost_nova'], dmgPct: 0.25 },
       },
       rogue: {

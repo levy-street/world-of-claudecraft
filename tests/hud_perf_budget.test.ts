@@ -554,6 +554,12 @@ const HOT_PAINTERS: ReadonlyArray<ScannedPainter> = [
   { file: 'paladin_devotion_painter.ts', allow: {}, reflowAllow: {} },
   { file: 'hud/action_bar/action_bar_painter.ts', allow: {}, reflowAllow: {} },
   { file: 'hud/action_bar/mobile_action_ring_painter.ts', allow: {}, reflowAllow: {} },
+  { file: 'hud/action_bar/radial_petal_painter.ts', allow: {}, reflowAllow: {} },
+  { file: 'hud/action_bar/consumable_strip_painter.ts', allow: {}, reflowAllow: {} },
+  { file: 'hud/menu/menu_strip_painter.ts', allow: {}, reflowAllow: {} },
+  { file: 'hud/strip_caption_painter.ts', allow: {}, reflowAllow: {} },
+  { file: 'hud/stance/stance_radial_painter.ts', allow: {}, reflowAllow: {} },
+  { file: 'hud/quest/quest_strip_painter.ts', allow: {}, reflowAllow: {} },
   { file: 'hud/cross_hotbar/cross_hotbar_painter.ts', allow: {}, reflowAllow: {} },
   { file: 'hud/warlock/doom_meter_painter.ts', allow: {}, reflowAllow: {} },
   { file: 'party_frames_painter.ts', allow: {}, reflowAllow: {} },
@@ -746,6 +752,45 @@ const COLD_PAINTER_ALLOWANCES: ReadonlyArray<ColdPainter> = [
   {
     file: 'bags_window.ts',
     reflowAllow: { '.getBoundingClientRect': 1, '.scrollTop': 4 },
+    driverAllow: {},
+  },
+  // The two touch gesture layers of the mobile action ring, one entry each because they
+  // are twins: ONE button/seat rect plus ONE computed-style read, taken when a press
+  // OPENS the overlay (the radial's reveal, the strip's pointerdown measure) and never
+  // again while the finger travels. Both numbers are per gesture, not per frame or per
+  // move: the painters that follow read only the cached placement.
+  {
+    file: 'hud/action_bar/radial_gesture_controller.ts',
+    reflowAllow: { '.getBoundingClientRect': 1, getComputedStyle: 1 },
+    driverAllow: {},
+  },
+  // The strip menus' SHARED gesture layer, which the consumables row and the menu
+  // control are both thin instantiations of (neither wrapper reads layout at all
+  // any more, which is why neither carries an allowance): ONE anchor rect plus
+  // ONE computed-style read taken at pointerdown, never again while the finger
+  // travels the row, and the painters that follow read only the cached placement
+  // (the menu caption included, which is why it clamps against a nominal
+  // half-width rather than measuring itself).
+  {
+    file: 'hud/strip_gesture_controller.ts',
+    reflowAllow: { '.getBoundingClientRect': 1, getComputedStyle: 1 },
+    driverAllow: {},
+  },
+  // The quest strip's width bound. Its ONE rect helper is shared by all three
+  // measures (the app-viewport container, the strip's own CSS-seated anchor,
+  // and the band's occupants). It is ENTERED on every repaint and gated inside
+  // by a cheap key built from non-layout reads: the rendered content, the
+  // viewport, the tier/scale attributes, and each band occupant's classes plus
+  // child count. On top of that key it re-measures unconditionally every
+  // SEAT_REMEASURE_TICKS tracker ticks (about once a second on the medium
+  // band), because an occupant can change WIDTH with no attribute and no child
+  // count moving (a buff's stack text, a longer zone name) and no cheap signal
+  // exists for it. So a steady HUD is bounded at roughly one measure per
+  // second, never per frame. The target frame is deliberately NOT in that key
+  // and is never measured: the anchor comes from hud.mobile.css.
+  {
+    file: 'hud/quest/quest_strip_controller.ts',
+    reflowAllow: { '.getBoundingClientRect': 1 },
     driverAllow: {},
   },
   // The gather-node hover tip (the phase 14 QA's countdown clock): pointer

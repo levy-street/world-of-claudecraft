@@ -20,6 +20,7 @@ import {
   loadoutKnownAbilityIds,
 } from '../src/ui/hud/action_bar/hotbar';
 import {
+  MOBILE_ACTION_BUTTONS,
   MOBILE_ACTION_PAGE_COUNT,
   MOBILE_ACTIONS_PER_PAGE,
   mobileButtonHasSourceSlot,
@@ -30,6 +31,7 @@ import {
   ownedDruidFormDefaultAbilityIds,
   shouldSeedOwnedSpecDefault,
 } from '../src/ui/hud/action_bar/owned_class_spec_defaults';
+import { RADIAL_DIRECTIONS } from '../src/ui/hud/action_bar/radial_action_core';
 
 const EXPECTED = {
   'hunter/beast_mastery': [
@@ -441,15 +443,23 @@ describe('owned class level 20 default action bars', () => {
         if (index < 11) {
           expect(desktopRow, `${key} visible desktop slot ${sourceSlot}`).toBe(1);
         }
+        // The touch ring reaches a slot as a (page, button, direction) triple:
+        // direction-major means a page's 20 slots are 4 buttons x 5 directions,
+        // with the direction index changing every MOBILE_ACTION_BUTTONS slots.
         const page = Math.floor(index / MOBILE_ACTIONS_PER_PAGE);
-        const button = index % MOBILE_ACTIONS_PER_PAGE;
+        const withinPage = index % MOBILE_ACTIONS_PER_PAGE;
+        const button = withinPage % MOBILE_ACTION_BUTTONS;
+        const direction = RADIAL_DIRECTIONS[Math.floor(withinPage / MOBILE_ACTION_BUTTONS)];
         expect(page, `${key} mobile slot ${sourceSlot}`).toBeLessThan(MOBILE_ACTION_PAGE_COUNT);
-        expect(mobileButtonHasSourceSlot(page, button), `${key} mobile slot ${sourceSlot}`).toBe(
-          true,
-        );
-        expect(sourceSlotForMobileButton(page, button), `${key} mobile slot ${sourceSlot}`).toBe(
-          sourceSlot,
-        );
+        expect(button, `${key} mobile slot ${sourceSlot}`).toBeLessThan(MOBILE_ACTION_BUTTONS);
+        expect(
+          mobileButtonHasSourceSlot(page, button, undefined, direction),
+          `${key} mobile slot ${sourceSlot}`,
+        ).toBe(true);
+        expect(
+          sourceSlotForMobileButton(page, button, direction),
+          `${key} mobile slot ${sourceSlot}`,
+        ).toBe(sourceSlot);
       }
     }
   });

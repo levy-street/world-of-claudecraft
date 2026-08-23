@@ -119,6 +119,10 @@ export interface SpellbookWindowDeps {
   resetFormBar(): void;
   setDragAction(action: { type: 'ability'; id: string } | null): void;
   clearActionDropTargets(): void;
+  /** Open the touch bar editor with this spell armed for the next tap. Touch has
+   *  no drag onto the bar, and the +/- toggle only reaches the FIRST free slot,
+   *  so this is how a touch player CHOOSES a slot. */
+  openBarEditor(abilityId: string): void;
 }
 
 /** The ability on a bar slot, or null for an empty slot or an item. */
@@ -640,6 +644,26 @@ export class SpellbookWindow {
           page: this.formatAbilityNumber(row.mobilePage + 1),
         });
         el.appendChild(pageLabel);
+      }
+      // Touch-only assign control (Phase 4.5). Desktop chooses a slot by dragging
+      // the row onto a visible bar; touch has no drag, and the +/- toggle beside
+      // this one only reaches the FIRST free slot, so without this the 32
+      // directional ring slots could not be bound at all.
+      if (document.body.classList.contains('mobile-touch')) {
+        const assign = document.createElement('button');
+        assign.type = 'button';
+        assign.className = 'spell-hotbar-assign';
+        assign.dataset.abilityId = known.def.id;
+        assign.innerHTML = svgIcon('swap');
+        assign.setAttribute('aria-label', t('hudChrome.spellbook.assignAria', { name }));
+        assign.addEventListener('pointerdown', (ev) => ev.stopPropagation());
+        assign.addEventListener('click', (ev) => {
+          ev.preventDefault();
+          ev.stopPropagation();
+          audio.click();
+          this.deps.openBarEditor(known.def.id);
+        });
+        el.appendChild(assign);
       }
       toggle.addEventListener('pointerdown', (ev) => ev.stopPropagation());
       toggle.addEventListener('click', (ev) => {

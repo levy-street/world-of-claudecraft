@@ -4,6 +4,8 @@ import type { IWorld } from '../../../world_api';
 import { esc } from '../../esc';
 import { formatNumber, t } from '../../i18n';
 import { ownEntry } from '../../known_item';
+import type { PainterHostWriters } from '../../painter_host';
+import { buildQuestStrip, type QuestStripController } from './quest_strip_controller';
 import { type QuestTrackerView, questTrackerView, type TrackedQuest } from './quest_tracker';
 
 export interface QuestTrackerSettingsPort {
@@ -13,6 +15,9 @@ export interface QuestTrackerSettingsPort {
 }
 
 export interface QuestTrackerControllerDeps {
+  /** Hud's shared write-elision facet, forwarded to the touch strip so its
+   *  band-driven writes elide against the same cache as every other HUD write. */
+  writers: PainterHostWriters;
   element: HTMLElement;
   document: Document;
   world(): Pick<IWorld, 'questLog'>;
@@ -22,11 +27,34 @@ export interface QuestTrackerControllerDeps {
   click(): void;
 }
 
-/** Owns quest tracker projection, collapse persistence, and elided DOM updates. */
+/** Owns quest tracker projection, collapse persistence, and elided DOM updates.
+ *  The projection has TWO presentations: this right-anchored tracker on desktop,
+ *  and the top-band strip on touch, which is handed the same TrackedQuest[]
+ *  rather than projecting the log a second time. */
 export class QuestTrackerController {
-  constructor(private readonly deps: QuestTrackerControllerDeps) {}
+  private readonly strip: QuestStripController | null;
+  /** The last frame time Hud handed down. The collapse toggle re-renders off a
+   *  user gesture rather than a frame, so it reuses it instead of minting a
+   *  clock here; the strip's grace is measured in seconds and cannot see the
+   *  one-tick staleness. */
+  private lastNow = 0;
 
-  update(): void {
+  constructor(private readonly deps: QuestTrackerControllerDeps) {
+    this.strip = buildQuestStrip({ writers: deps.writers, click: () => this.deps.click() });
+  }
+
+  /** Language switch: the desktop rows already re-resolve unconditionally in
+   *  renderHtml, but the strip is gated on a raw pre-resolve key that a locale
+   *  switch alone cannot move, so it needs its own nudge. Bumping the strip's
+   *  generation first, then rebuilding the tracked quests so their titles and
+   *  objective labels re-resolve too, covers both halves in one call. */
+  relocalize(): void {
+    this.strip?.relocalize();
+    this.update(this.lastNow);
+  }
+
+  update(now: number): void {
+    this.lastNow = now;
     let collapsed = this.deps.settings.collapsed();
     const quests: TrackedQuest[] = [];
     for (const progress of this.deps.world().questLog.values()) {
@@ -61,6 +89,13 @@ export class QuestTrackerController {
       this.deps.settings.setCollapsed(false);
       collapsed = false;
     }
+    // On touch the strip IS the tracker: the right-anchored markup is hidden in
+    // hud.mobile.css, so rendering it would be a string build a phone never sees.
+    if (this.strip?.active() === true) {
+      this.strip.update(quests, now);
+      if (this.deps.element.innerHTML !== '') this.deps.element.innerHTML = '';
+      return;
+    }
     const html = this.renderHtml(questTrackerView(quests, collapsed));
     if (this.deps.element.innerHTML !== html) this.deps.element.innerHTML = html;
   }
@@ -71,7 +106,7 @@ export class QuestTrackerController {
     const refocus = active?.classList.contains('qt-header') === true;
     this.deps.settings.setCollapsed(!this.deps.settings.collapsed());
     this.deps.click();
-    this.update();
+    this.update(this.lastNow);
     if (refocus) this.deps.element.querySelector<HTMLElement>('.qt-header')?.focus();
   }
 

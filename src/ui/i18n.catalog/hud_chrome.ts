@@ -548,6 +548,85 @@ export const hudChromeStrings = {
     // count in words. "{page}" is token-only, so it is exempt from the M16
     // non-Latin-fill requirement.
     actionPageIndicator: '{page}',
+    // The radial action gesture (Phase 2): each ring button carries a centre tap
+    // plus four flick directions, and a hold reveals the four petals. The petal
+    // overlay's accessible name, the centre cancel target's name, and the four
+    // direction names the petals' slot aria is built from ("Action slot Up:
+    // Fireball"). The direction words are the accessible label a screen reader
+    // reads for a control the player picks by direction, not by index, so they
+    // are real user-facing strings rather than dev text.
+    actionRadial: 'Action directions',
+    actionRadialCancel: 'Cancel action',
+    radialCenter: 'Centre',
+    radialUp: 'Up',
+    radialRight: 'Right',
+    radialDown: 'Down',
+    radialLeft: 'Left',
+    // The consumables seat (Phase 3): the ring's 5th arc position, showing the
+    // first carried consumable. A tap uses it; a hold or a leftward swipe opens
+    // the row of everything else being carried. One key names three things that
+    // must agree: the row overlay's accessible name, the seat's own slot label
+    // (so a screen reader reads "Consumables: Healing Potion" rather than a slot
+    // number the player never sees), and the group a sticky-mode menu belongs to.
+    // WORDY by M16, so the five non-Latin overlays carry real fills.
+    consumableSeat: 'Consumables',
+    // RETIRED in place: the same control's copy while it was named "Menus" and a
+    // bare tap opened chat. Both facts changed, so the four keys below were
+    // SUPERSEDED by the quickActions* set rather than reworded (the
+    // corpseHarvest.harvestTooltip precedent: an in-place reword leaves every
+    // locale's reviewed fill answering the old sentence). The keys stay, already
+    // filled, per the hud.core.mobileTarget retired-but-translated precedent.
+    menuControl: 'Menus',
+    menuControlAria:
+      'Menus. Tap to open chat, or hold and swipe right for mounts, map, bags and more.',
+    menuControlAriaTap:
+      'Menus. Tap to open the menu row: mounts, map, bags and more. Tap again for chat.',
+    menuLabel: 'Menu',
+    // Quick Actions: ONE seat replacing the five-button row (Chat, Social,
+    // Quests, Settings, More) that sat at top-left, further from either thumb
+    // than anything else in the HUD. quickActions names both the control and the
+    // strip it opens; quickActionsAria is the control's own accessible name,
+    // which has to TEACH the gesture because a touch device has no hover to
+    // discover it with. The ten strip items reuse the accessible names their own
+    // buttons already carry, and the live caption reuses those buttons' label
+    // keys, so no per-item key lives here. All four are WORDY by M16, so the five
+    // non-Latin overlays carry real fills.
+    quickActions: 'Quick Actions',
+    quickActionsAria:
+      'Quick Actions. Tap to open the row of mount, chat, map, bags and more, or hold and swipe right to pick one.',
+    // The SAME control under settings.touchTapMenus, where the row is opened and
+    // chosen from with separate taps rather than one gesture, so the swipe
+    // sentence above would teach something the control does not do;
+    // menu_control_controller.ts swaps the name when the setting flips.
+    quickActionsAriaTap:
+      'Quick Actions. Tap to open the row of mount, chat, map, bags and more, then tap an item. Tap the control again to close.',
+    quickActionsLabel: 'Actions',
+    // The touch stance control: ONE circle on the button row wearing the stance
+    // (or paladin devotion aura) the player is in, with every other known stance
+    // on the radial's four directions. stanceRadial names the petal overlay;
+    // the two anchor names are the control's OWN accessible name and have to
+    // teach the gesture, because a touch device has no hover to discover it
+    // with. {stance} is the worn stance's own ability name, already localized by
+    // its own key, so no stance name lives here. Both anchor names are WORDY by
+    // M16, so the five non-Latin overlays carry real fills.
+    stanceRadial: 'Stances',
+    stanceAnchorAria: 'Stance: {stance}. Tap to open the stance ring, then pick another stance.',
+    stanceAnchorEmptyAria: 'No stance. Tap to open the stance ring, then pick a stance.',
+    // The top-band quest strip (Phase 5): the touch replacement for the
+    // right-anchored quest tracker, showing ONE quest with all of its objectives
+    // instead of a list that grew into the action ring. questStripAria is the
+    // strip's accessible name and has to say what activating it DOES, because
+    // the visible chevrons are a hint rather than buttons; questStripAriaSingle
+    // drops the position when there is nothing to cycle to. The objective lines
+    // reuse questUi.detail.objectiveProgress and the "(Complete)" marker reuses
+    // questUi.tracker.complete, so no key for either lives here.
+    // questStripCounter is token-only and so exempt from the M16 non-Latin fill
+    // requirement; the two aria strings and questStripMore are WORDY, so the
+    // five non-Latin overlays carry real fills.
+    questStripAria: 'Tracked quest {position} of {total}: {title}. Activate for the next quest.',
+    questStripAriaSingle: 'Tracked quest: {title}',
+    questStripCounter: '{position}/{total}',
+    questStripMore: '+{count} more',
     // Target swap (#mobile-target-cycle, replacing the old Target Closest
     // button): a crosshair-icon secondary button that cycles the hostile
     // target via the Tab-target path (acquire-nearest now lives on the ring's
@@ -579,6 +658,41 @@ export const hudChromeStrings = {
     // consecutive-lowercase run), so the five non-Latin overlays carry real fills
     // and the Latin overlays stay pending.
     chatPlaceholder: 'Say something... (! for community commands)',
+    // The More tray's Edit control (#mobile-bar-editor), which opens the bar
+    // editor. Touch-only: desktop binds by dragging onto the visible bars, so the
+    // control never appears there. barEditor is the tiny on-button caption (the
+    // tray's buttons are narrow, so it stays two short words); barEditorAria is
+    // the spoken name. Both WORDY by M16, so the five non-Latin overlays carry
+    // real fills.
+    barEditor: 'Edit Bars',
+    barEditorAria: 'Edit the action bar layout',
+  },
+  // The touch bar editor overlay (Phase 4.5): one action-ring page exploded into
+  // a grid of 4 buttons by 5 directions, with page tabs. It is the ONLY way to
+  // bind a slot on touch, so its copy has to TEACH the two-tap language (place,
+  // then swap) that replaces the long-press drag it retires. Every value here is
+  // WORDY by M16 except pageTab (one short word plus a token), so the rest
+  // carry the five non-Latin fills.
+  barEditor: {
+    title: 'Edit Action Bar',
+    close: 'Close bar editor',
+    // The tab strip's own group name, distinct from the per-tab names below.
+    pages: 'Action bar pages',
+    pageTab: 'Page {page}',
+    buttonHeader: 'Button {button}',
+    // A cell is named by the control it belongs to and the direction the player
+    // flicks to reach it, never by a slot number touch never shows.
+    cellAria: 'Button {button}, {direction}: {action}',
+    emptyCellAria: 'Button {button}, {direction}: empty',
+    hint: 'Tap a slot, then another, to swap them.',
+    armed: 'Tap a slot to place {name}.',
+    picked: 'Tap another slot to swap with {name}.',
+    locked: 'Action bars are locked in Interface options.',
+    // The Clear toggle: touch's only way to EMPTY a slot, since the desktop
+    // clear is shift plus right-click.
+    clear: 'Clear',
+    clearAria: 'Clear a slot',
+    clearArmed: 'Tap a slot to clear it.',
   },
   // New-adventurer tutorial copy for the touch interface. The default tutorial
   // bodies (hud.tutorial.*Body) reference keyboard/mouse ("W/A/S/D", "press F"),
@@ -1466,6 +1580,11 @@ export const hudChromeStrings = {
     // for left-thumb-dominant players; the same setting as the Key Bindings
     // panel's leftHandedTouch row, surfaced again here alongside the joystick.
     mobileLeftHanded: 'Left-handed layout',
+    // Touch accessibility toggle (off by default): every gesture menu opens on a
+    // tap instead of a swipe or a hold. The note below is the row's description.
+    touchTapMenus: 'Tap menus',
+    touchTapMenusNote:
+      'Open the action, consumable and menu controls with a tap instead of a swipe. Tap an item to use it, tap the control again for its usual action, or tap outside to close.',
   },
   // Choice-row talents (the rows tab in the talents window). The row OPTION
   // names/descriptions are sim content (English source, localized with the
@@ -2953,6 +3072,12 @@ export const hudChromeStrings = {
   spellbook: {
     addToBarAria: 'Add {name} to action bar',
     removeFromBarAria: 'Remove {name} from action bar',
+    // The touch-only assign control beside the +/- toggle: the + drops a spell on
+    // the FIRST free slot, which is not a choice, and touch has no drag to make
+    // one with. This opens the bar editor with the spell already armed, so the
+    // next tap decides where it goes. WORDY by M16, so the five non-Latin
+    // overlays carry real fills.
+    assignAria: 'Choose a slot for {name}',
   },
   // Live overworld mob nameplate level badge text. Level renders in its own
   // element so con-color styling applies to the badge without recoloring the

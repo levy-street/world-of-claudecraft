@@ -871,11 +871,52 @@ export const zh_CN: EnTranslations = {
       "actionRing": "战斗动作",
       "actionPageToggle": "切换动作页",
       "actionPageIndicator": "第{page}页",
+      "actionRadial": "技能方向",
+      "actionRadialCancel": "取消动作",
+      "radialCenter": "中心",
+      "radialUp": "Up",
+      "radialRight": "右",
+      "radialDown": "Down",
+      "radialLeft": "Left",
+      "consumableSeat": "消耗品",
+      "menuControl": "菜单",
+      "menuControlAria": "菜单。点按打开聊天，或按住并向右滑动以使用坐骑、地图、背包等。",
+      "menuControlAriaTap": "菜单。点按打开菜单行：坐骑、地图、背包等。再次点按可打开聊天。",
+      "menuLabel": "Menu",
+      "quickActions": "快捷操作",
+      "quickActionsAria": "快捷操作。点按打开坐骑、聊天、地图、背包等操作行，或按住并向右滑动进行选择。",
+      "quickActionsAriaTap": "快捷操作。点按打开坐骑、聊天、地图、背包等操作行，然后点按其中一项。再次点按该控件可关闭。",
+      "quickActionsLabel": "操作",
+      "stanceRadial": "姿态",
+      "stanceAnchorAria": "姿态：{stance}。点按打开姿态环，然后选择其他姿态。",
+      "stanceAnchorEmptyAria": "无姿态。点按打开姿态环，然后选择一种姿态。",
+      "questStripAria": "追踪任务 {position}/{total}：{title}。点按可切换到下一个任务。",
+      "questStripAriaSingle": "追踪任务：{title}",
+      "questStripCounter": "{position}/{total}",
+      "questStripMore": "还有 {count} 项",
       "targetCycle": "切换目标",
       "targetCycleShort": "目标",
       "spellbookPageLabel": "页{page}",
       "hideKeyboard": "隐藏键盘",
-      "chatPlaceholder": "说点什么...（! 显示社区指令）"
+      "chatPlaceholder": "说点什么...（! 显示社区指令）",
+      "barEditor": "Edit Bars",
+      "barEditorAria": "编辑动作条布局"
+    },
+    "barEditor": {
+      "title": "编辑动作条",
+      "close": "关闭动作条编辑器",
+      "pages": "动作条页面",
+      "pageTab": "Page {page}",
+      "buttonHeader": "按钮{button}",
+      "cellAria": "按钮{button}，{direction}：{action}",
+      "emptyCellAria": "按钮{button}，{direction}：空",
+      "hint": "点按一个栏位，再点按另一个，即可交换。",
+      "armed": "点按一个栏位以放置{name}。",
+      "picked": "点按另一个栏位以与{name}交换。",
+      "locked": "动作条已在界面选项中锁定。",
+      "clear": "清除",
+      "clearAria": "清除一个槽位",
+      "clearArmed": "点击一个槽位即可清除。"
     },
     "tutorial": {
       "moveBodyTouch": "使用摇杆移动，拖动屏幕环顾四周。先走几步开始吧。",
@@ -1420,7 +1461,9 @@ export const zh_CN: EnTranslations = {
       "showAttackButton": "显示攻击按钮",
       "showDailyRewardsChest": "显示每日奖励宝箱",
       "mobileCameraJoystick": "摄像机摇杆",
-      "mobileLeftHanded": "左手布局"
+      "mobileLeftHanded": "左手布局",
+      "touchTapMenus": "点击菜单",
+      "touchTapMenusNote": "用点击代替滑动来打开动作、消耗品和菜单控件。点击条目即可使用，再次点击控件执行其常用操作，点击外部则关闭。"
     },
     "talentRows": {
       "tab": "抉择",
@@ -2510,7 +2553,8 @@ export const zh_CN: EnTranslations = {
     },
     "spellbook": {
       "addToBarAria": "将{name}添加到动作条",
-      "removeFromBarAria": "从动作条移除{name}"
+      "removeFromBarAria": "从动作条移除{name}",
+      "assignAria": "为{name}选择一个栏位"
     },
     "nameplate": {
       "mobLevel": "{level}",

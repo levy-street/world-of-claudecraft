@@ -466,6 +466,7 @@ function installMobileControlDom(): {
   donateButton: FakeElement;
   wikiButton: FakeElement;
   chatButton: FakeElement;
+  barEditorButton: FakeElement;
   windowTarget: EventTarget;
 } {
   const autorunTarget = new FakeElement();
@@ -493,6 +494,7 @@ function installMobileControlDom(): {
     ['mobile-donate', new FakeElement()],
     ['mobile-wiki', new FakeElement()],
     ['mobile-chat', new FakeElement()],
+    ['mobile-bar-editor', new FakeElement()],
     // The chat composer, so exitChatReply (value clear + blur) is exercised in the
     // fake DOM: the setActive draft-survival test reads its .value.
     ['chat-input', new FakeElement()],
@@ -534,6 +536,7 @@ function installMobileControlDom(): {
     donateButton: elements.get('mobile-donate')!,
     wikiButton: elements.get('mobile-wiki')!,
     chatButton: elements.get('mobile-chat')!,
+    barEditorButton: elements.get('mobile-bar-editor')!,
     windowTarget,
   };
 }
@@ -575,6 +578,7 @@ function mobileCallbacks() {
     onBags: noop,
     onCrafting: noop,
     onSpellbook: noop,
+    onBarEditor: noop,
     onTalents: noop,
     onMap: noop,
     onLeaderboard: noop,
@@ -1253,6 +1257,33 @@ describe('MobileControls pointer lifecycle', () => {
     emoteButton.dispatchEvent(new Event('click', { bubbles: true, cancelable: true }));
 
     expect(emotes).toBe(1);
+  });
+
+  it('fires the bar-editor callback when the More-tray Edit button is tapped', () => {
+    // The touch-only entry point into the bar editor, and the reason it lives in
+    // the More tray rather than on the ring: binding is a setup action and must
+    // leave the live combat surface entirely (the long-press rearrange it
+    // replaces armed underneath the radial and swapped slots mid-fight).
+    const { barEditorButton } = installMobileControlDom();
+    const input = {
+      setTouchMove: () => {},
+      clearTouchMove: () => {},
+      setTouchLook: () => {},
+      setTouchLookVector: () => {},
+    } as unknown as Input;
+
+    let opens = 0;
+    const callbacks = {
+      ...mobileCallbacks(),
+      onBarEditor: () => {
+        opens += 1;
+      },
+    };
+    new MobileControls(input, callbacks).start();
+
+    barEditorButton.dispatchEvent(new Event('click', { bubbles: true, cancelable: true }));
+
+    expect(opens).toBe(1);
   });
 
   it('fires the mount callback when the More-tray Mount button is tapped', () => {

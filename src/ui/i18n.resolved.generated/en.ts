@@ -871,11 +871,52 @@ export const en: EnTranslations = {
       "actionRing": "Combat actions",
       "actionPageToggle": "Switch action page",
       "actionPageIndicator": "{page}",
+      "actionRadial": "Action directions",
+      "actionRadialCancel": "Cancel action",
+      "radialCenter": "Centre",
+      "radialUp": "Up",
+      "radialRight": "Right",
+      "radialDown": "Down",
+      "radialLeft": "Left",
+      "consumableSeat": "Consumables",
+      "menuControl": "Menus",
+      "menuControlAria": "Menus. Tap to open chat, or hold and swipe right for mounts, map, bags and more.",
+      "menuControlAriaTap": "Menus. Tap to open the menu row: mounts, map, bags and more. Tap again for chat.",
+      "menuLabel": "Menu",
+      "quickActions": "Quick Actions",
+      "quickActionsAria": "Quick Actions. Tap to open the row of mount, chat, map, bags and more, or hold and swipe right to pick one.",
+      "quickActionsAriaTap": "Quick Actions. Tap to open the row of mount, chat, map, bags and more, then tap an item. Tap the control again to close.",
+      "quickActionsLabel": "Actions",
+      "stanceRadial": "Stances",
+      "stanceAnchorAria": "Stance: {stance}. Tap to open the stance ring, then pick another stance.",
+      "stanceAnchorEmptyAria": "No stance. Tap to open the stance ring, then pick a stance.",
+      "questStripAria": "Tracked quest {position} of {total}: {title}. Activate for the next quest.",
+      "questStripAriaSingle": "Tracked quest: {title}",
+      "questStripCounter": "{position}/{total}",
+      "questStripMore": "+{count} more",
       "targetCycle": "Swap target",
       "targetCycleShort": "Target",
       "spellbookPageLabel": "Page {page}",
       "hideKeyboard": "Hide keyboard",
-      "chatPlaceholder": "Say something... (! for community commands)"
+      "chatPlaceholder": "Say something... (! for community commands)",
+      "barEditor": "Edit Bars",
+      "barEditorAria": "Edit the action bar layout"
+    },
+    "barEditor": {
+      "title": "Edit Action Bar",
+      "close": "Close bar editor",
+      "pages": "Action bar pages",
+      "pageTab": "Page {page}",
+      "buttonHeader": "Button {button}",
+      "cellAria": "Button {button}, {direction}: {action}",
+      "emptyCellAria": "Button {button}, {direction}: empty",
+      "hint": "Tap a slot, then another, to swap them.",
+      "armed": "Tap a slot to place {name}.",
+      "picked": "Tap another slot to swap with {name}.",
+      "locked": "Action bars are locked in Interface options.",
+      "clear": "Clear",
+      "clearAria": "Clear a slot",
+      "clearArmed": "Tap a slot to clear it."
     },
     "tutorial": {
       "moveBodyTouch": "Use the movement stick to move and drag the screen to look around. Take a few steps to begin.",
@@ -1420,7 +1461,9 @@ export const en: EnTranslations = {
       "showAttackButton": "Show Attack Button",
       "showDailyRewardsChest": "Show Daily Rewards Chest",
       "mobileCameraJoystick": "Camera joystick",
-      "mobileLeftHanded": "Left-handed layout"
+      "mobileLeftHanded": "Left-handed layout",
+      "touchTapMenus": "Tap menus",
+      "touchTapMenusNote": "Open the action, consumable and menu controls with a tap instead of a swipe. Tap an item to use it, tap the control again for its usual action, or tap outside to close."
     },
     "talentRows": {
       "tab": "Choices",
@@ -2510,7 +2553,8 @@ export const en: EnTranslations = {
     },
     "spellbook": {
       "addToBarAria": "Add {name} to action bar",
-      "removeFromBarAria": "Remove {name} from action bar"
+      "removeFromBarAria": "Remove {name} from action bar",
+      "assignAria": "Choose a slot for {name}"
     },
     "nameplate": {
       "mobLevel": "{level}",
@@ -9592,7 +9636,7 @@ export const en: EnTranslations = {
       },
       "ignition": {
         "name": "Ignition",
-        "description": "Passive: your spell critical strikes burn the target for 40% of the damage dealt over 6 sec, stacking. (Fire mastery)"
+        "description": "Passive: your spell critical strikes burn the target for 30% of the damage dealt over 6 sec, stacking. (Fire mastery)"
       },
       "mass_barrier": {
         "name": "Mass Barrier",
@@ -10396,7 +10440,7 @@ export const en: EnTranslations = {
       },
       "warspirit_cadence": {
         "name": "Warspirit Cadence",
-        "description": "Passive: Dual-wield attacks have no extra miss chance. Every 3rd landed weapon attack triggers 2 Galeheart Echoes for 50% Nature damage and grants Stormcast for 12 sec. Stormcast makes your next Arc Bolt, Jolt, or Mending Waters instant and cost 50% less Mana. Ancestral Strike counts as 2 attacks. (Warspirit)"
+        "description": "Passive: Dual-wield attacks have no extra miss chance. Every 3rd landed weapon attack triggers 2 Galeheart Echoes for 25% Nature damage and grants Stormcast for 12 sec. Stormcast makes your next Arc Bolt, Jolt, or Mending Waters instant and cost 50% less Mana. Ancestral Strike counts as 2 attacks. (Warspirit)"
       },
       "stormsurge": {
         "name": "Stormsurge",

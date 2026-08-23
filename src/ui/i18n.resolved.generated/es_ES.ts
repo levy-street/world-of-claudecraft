@@ -871,11 +871,52 @@ export const es_ES: EnTranslations = {
       "actionRing": "Acciones de combate",
       "actionPageToggle": "Cambiar página de acción",
       "actionPageIndicator": "Pág. {page}",
+      "actionRadial": "Action directions",
+      "actionRadialCancel": "Cancel action",
+      "radialCenter": "Centre",
+      "radialUp": "Up",
+      "radialRight": "Right",
+      "radialDown": "Down",
+      "radialLeft": "Left",
+      "consumableSeat": "Consumables",
+      "menuControl": "Menus",
+      "menuControlAria": "Menus. Tap to open chat, or hold and swipe right for mounts, map, bags and more.",
+      "menuControlAriaTap": "Menus. Tap to open the menu row: mounts, map, bags and more. Tap again for chat.",
+      "menuLabel": "Menu",
+      "quickActions": "Quick Actions",
+      "quickActionsAria": "Quick Actions. Tap to open the row of mount, chat, map, bags and more, or hold and swipe right to pick one.",
+      "quickActionsAriaTap": "Quick Actions. Tap to open the row of mount, chat, map, bags and more, then tap an item. Tap the control again to close.",
+      "quickActionsLabel": "Actions",
+      "stanceRadial": "Stances",
+      "stanceAnchorAria": "Stance: {stance}. Tap to open the stance ring, then pick another stance.",
+      "stanceAnchorEmptyAria": "No stance. Tap to open the stance ring, then pick a stance.",
+      "questStripAria": "Tracked quest {position} of {total}: {title}. Activate for the next quest.",
+      "questStripAriaSingle": "Tracked quest: {title}",
+      "questStripCounter": "{position}/{total}",
+      "questStripMore": "+{count} more",
       "targetCycle": "Cambiar objetivo",
       "targetCycleShort": "Objetivo",
       "spellbookPageLabel": "Página {page}",
       "hideKeyboard": "Ocultar teclado",
-      "chatPlaceholder": "Di algo..."
+      "chatPlaceholder": "Di algo...",
+      "barEditor": "Edit Bars",
+      "barEditorAria": "Edit the action bar layout"
+    },
+    "barEditor": {
+      "title": "Edit Action Bar",
+      "close": "Close bar editor",
+      "pages": "Action bar pages",
+      "pageTab": "Page {page}",
+      "buttonHeader": "Button {button}",
+      "cellAria": "Button {button}, {direction}: {action}",
+      "emptyCellAria": "Button {button}, {direction}: empty",
+      "hint": "Tap a slot, then another, to swap them.",
+      "armed": "Tap a slot to place {name}.",
+      "picked": "Tap another slot to swap with {name}.",
+      "locked": "Action bars are locked in Interface options.",
+      "clear": "Clear",
+      "clearAria": "Clear a slot",
+      "clearArmed": "Tap a slot to clear it."
     },
     "tutorial": {
       "moveBodyTouch": "Usa el joystick de movimiento para moverte y arrastra la pantalla para mirar alrededor. Da unos pasos para empezar.",
@@ -1420,7 +1461,9 @@ export const es_ES: EnTranslations = {
       "showAttackButton": "Mostrar boton de ataque",
       "showDailyRewardsChest": "Mostrar cofre de recompensas diarias",
       "mobileCameraJoystick": "Palanca de mando de la cámara",
-      "mobileLeftHanded": "Diseño para zurdos"
+      "mobileLeftHanded": "Diseño para zurdos",
+      "touchTapMenus": "Tap menus",
+      "touchTapMenusNote": "Open the action, consumable and menu controls with a tap instead of a swipe. Tap an item to use it, tap the control again for its usual action, or tap outside to close."
     },
     "talentRows": {
       "tab": "Opciones",
@@ -2510,7 +2553,8 @@ export const es_ES: EnTranslations = {
     },
     "spellbook": {
       "addToBarAria": "Añadir {name} a la barra de acción",
-      "removeFromBarAria": "Quitar {name} de la barra de acción"
+      "removeFromBarAria": "Quitar {name} de la barra de acción",
+      "assignAria": "Choose a slot for {name}"
     },
     "nameplate": {
       "mobLevel": "{level}",
