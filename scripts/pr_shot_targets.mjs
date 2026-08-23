@@ -10264,11 +10264,23 @@ export const TARGETS = [
     // ranked clean-slate clause included), the role-food tooltip (the Well Fed
     // line with its one-effect rule), the enchant picker at Enchanting 99 (every
     // Lucent row inert with its floor line, "Requires Enchanting 100" and 125),
-    // the same picker at 125 (the three apex rows actionable, the Infusion inert
-    // behind its "Only a Perfected item" line, the honest replacement of the
-    // "No eligible item" answer), and the mobile consumable tray with all six
-    // kinds competing for its six slots (potion, elixir, flask, scroll, food,
-    // drink, the flask sitting third). Tooltips are desktop only, the
+    // and the same picker at 125 (the three apex rows actionable, the Infusion
+    // inert behind its "Only a Perfected item" line, the honest replacement of
+    // the "No eligible item" answer).
+    //
+    // THE MOBILE TRAY VARIANT IS RETIRED (Phase 11i QA, at the release/v0.40.0
+    // sync). It drove #mobile-consumables-toggle and asserted the
+    // mobile-consumables-open body class, and the touch UI rework replaced that
+    // chip with the ring's 5th-arc consumables SEAT
+    // (hud/action_bar/consumable_seat_controller.ts, #mobile-consumable-seat and
+    // #mobile-consumable-strip, opened by a hold or a leftward swipe rather than
+    // a tap). The old arm did not degrade, it THREW on every capture. It is
+    // removed rather than repointed because driving the new row means driving a
+    // gesture controller, and the release already committed its own before and
+    // after captures of that control under docs/screenshots/touch-ui-rework/.
+    // The six-kind ORDER this variant existed to show is pinned in
+    // tests/consumable_bar_view.test.ts, which is where it belongs.
+    // Tooltips are desktop only, the
     // elixir-use-tooltip rationale (the synthetic hover does not raise #tooltip
     // on the touch layout); the picker states shoot both layouts because the
     // gate lines are the only explanation of an untappable row on touch.
@@ -10305,7 +10317,6 @@ export const TARGETS = [
         mobile: true,
         beforeLoad: lowGraphicsSeed,
       },
-      { key: 'tray-mobile', tray: true, mobile: true, beforeLoad: lowGraphicsSeed },
     ],
     async capture(page, variant) {
       await page.waitForFunction(() => window.__game?.sim?.player, { timeout: 90000 });
@@ -10378,19 +10389,6 @@ export const TARGETS = [
         }
       };
       if (variant?.picker) await dismissTierTutorial();
-      if (variant?.tray) {
-        // The tray toggle is a bindTouchTap target; a plain click reaches its
-        // onTap through the click arm, the same path a synthesized tap takes.
-        const opened = await page.evaluate(() => {
-          const toggle = document.getElementById('mobile-consumables-toggle');
-          if (!toggle) return false;
-          toggle.click();
-          return document.body.classList.contains('mobile-consumables-open');
-        });
-        if (!opened) throw new Error('mobile consumable tray did not open');
-        await wait(600);
-        return { clip: '#ui' };
-      }
       // Bags for the tooltip hover and the reagent's action menu.
       await page.evaluate(() => {
         const el = document.querySelector('#bags');

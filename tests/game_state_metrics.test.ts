@@ -49,6 +49,7 @@ import {
   setGameMetricsCounters,
   type WsDropCause,
 } from '../server/http/game_signals';
+import { FISHING_BANDS } from '../server/fishing_telemetry';
 import { isLive, registerLivenessSource, resetHealthForTests } from '../server/http/health';
 import {
   MSG_LANE_CHAT_BURST,
@@ -63,6 +64,7 @@ import {
   MSG_SEQ_GAP_SANITY,
 } from '../server/msg_rate_limit';
 import { ITEMS } from '../src/sim/data';
+import type { FishingCatchBand } from '../src/sim/professions/fishing_bands';
 import type { PlayerClass, SimEvent } from '../src/sim/types';
 
 interface FakeClient {
@@ -1042,8 +1044,14 @@ function castStartEvent(entityId: number, ability: string): SimEvent {
   return event;
 }
 
+// The BAND TYPE, not the literal union these four factories used to write. A
+// local `0 | 1 | 2` here meant no arm in this file could construct a band 3, 4
+// or 5 outcome event, so the widened vocabulary the exporter publishes had no
+// emission-site coverage at all: the labels were pinned, the events that carry
+// them were not. Importing the shipped type is also what makes a SEVENTH band
+// red here rather than silently leaving these factories a band behind.
 type FishingResultEvent = Extract<SimEvent, { type: 'fishingResult' }>;
-function fishingResultEvent(zoneId: string, band: 0 | 1 | 2, itemId: string): SimEvent {
+function fishingResultEvent(zoneId: string, band: FishingCatchBand, itemId: string): SimEvent {
   const event: FishingResultEvent = {
     type: 'fishingResult',
     pid: 999,
@@ -1056,19 +1064,19 @@ function fishingResultEvent(zoneId: string, band: 0 | 1 | 2, itemId: string): Si
 }
 
 type FishingGotAwayEvent = Extract<SimEvent, { type: 'fishingGotAway' }>;
-function fishingGotAwayEvent(zoneId: string, band: 0 | 1 | 2): SimEvent {
+function fishingGotAwayEvent(zoneId: string, band: FishingCatchBand): SimEvent {
   const event: FishingGotAwayEvent = { type: 'fishingGotAway', pid: 999, zoneId, band };
   return event;
 }
 
 type FishingEarlyReelEvent = Extract<SimEvent, { type: 'fishingEarlyReel' }>;
-function fishingEarlyReelEvent(zoneId: string, band: 0 | 1 | 2): SimEvent {
+function fishingEarlyReelEvent(zoneId: string, band: FishingCatchBand): SimEvent {
   const event: FishingEarlyReelEvent = { type: 'fishingEarlyReel', pid: 999, zoneId, band };
   return event;
 }
 
 type FishingEmptyHookEvent = Extract<SimEvent, { type: 'fishingEmptyHook' }>;
-function fishingEmptyHookEvent(zoneId: string, band: 0 | 1 | 2): SimEvent {
+function fishingEmptyHookEvent(zoneId: string, band: FishingCatchBand): SimEvent {
   const event: FishingEmptyHookEvent = { type: 'fishingEmptyHook', pid: 999, zoneId, band };
   return event;
 }
@@ -1213,6 +1221,36 @@ describe('fishing telemetry counters at their emission sites', () => {
     // A catch is not a got-away and not an empty hook.
     expect(rec.fishingGotAways).toEqual([]);
     expect(rec.fishingEmptyHooks).toEqual([]);
+    server.stop();
+  });
+
+  it('carries EVERY band the ladder defines, not just the three that predate 11i', () => {
+    // THE EMISSION-SITE HALF of the widened vocabulary, added by the Phase 11i
+    // QA. tests/fishing_telemetry.test.ts pins the LABEL set at six, but until
+    // this arm the four event factories in this file wrote the literal union
+    // `0 | 1 | 2`, so nothing here could construct a band 3, 4 or 5 outcome and
+    // the three bands the phase ADDED had no emission coverage at all. A label
+    // list is a claim about what the exporter may publish; this is the claim
+    // that the events carrying those labels actually reach it.
+    //
+    // Driven off FISHING_BANDS rather than a second literal, so a seventh band
+    // widens this walk in the same edit that widens the vocabulary.
+    const server = new GameServer();
+    const rec = recordingSink();
+    setGameMetricsCounters(rec.sink);
+
+    observe(
+      server,
+      FISHING_BANDS.map((label) =>
+        fishingResultEvent('eastbrook_vale', Number(label) as FishingCatchBand, 'raw_mirror_trout'),
+      ),
+    );
+
+    expect(rec.fishingCatches).toEqual(FISHING_BANDS.map((label) => ['eastbrook_vale', label, false]));
+    // Non-vacuity: the walk really covered the deep bands, which is the half
+    // that did not exist before.
+    expect(rec.fishingCatches.map((row) => row[1])).toContain('5');
+    expect(rec.fishingCatches).toHaveLength(6);
     server.stop();
   });
 

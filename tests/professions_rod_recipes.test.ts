@@ -22,6 +22,7 @@ import { ITEMS, NPCS } from '../src/sim/data';
 import { rodTierRequiredForZone } from '../src/sim/professions/fishing_zones';
 import { baseMaterialFor } from '../src/sim/professions/material_grades';
 import { isGatherToolUse } from '../src/sim/professions/tools';
+import { PRE_TRAINING_RECIPE_IDS } from '../src/sim/professions/training';
 import { tierForSkill } from '../src/sim/professions/wheel';
 
 const rodTierOf = (itemId: string): number | undefined => {
@@ -191,6 +192,51 @@ describe('the crafted rod ladder', () => {
     // cap's tier, and they only work because they predate training.
     expect(tierForSkill(150)).toBeGreaterThan(tierForSkill(cap));
     expect(TOOL_RECIPES.some((r) => r.skillReq === 150 && !r.acquisition)).toBe(true);
+  });
+
+  it('NO recipe anywhere is authored above its craft cap AND expected to be learned', () => {
+    // THE GENERAL FORM OF THE UNLEARNABLE-AT-150 FINDING, added by the Phase 11i
+    // QA. The phase confirmed the finding in code and handed it to Phase 11j as
+    // SETTLED, but nothing enforced it: a row authored above its craft's cap
+    // with an acquisition list is dead content that ships GREEN, because there
+    // is no craft-time skillReq admission gate, so the only barrier is LEARNING
+    // and both learning channels run the same tier comparison.
+    //
+    // The arm above proves the trap EXISTS (a 150 row that escapes only by
+    // predating training). This one proves nothing has fallen into it, which is
+    // the direction that can actually regress. A recipe is learnable iff it is
+    // grandfathered (PRE_TRAINING_RECIPE_IDS, known from the start and carrying
+    // no acquisition list) or its own tier is at or below the tier its craft's
+    // cap resolves to. Anything else can be authored, costed, stocked and
+    // tested, and never learned by any player.
+    //
+    // Stated against teachTierMet's own comparison (tierForSkill of the skill
+    // versus tierForSkill of the requirement) rather than against the raw
+    // numbers, so a change to the tier step moves this pin with the gate
+    // instead of leaving it behind.
+    const grandfathered = new Set(PRE_TRAINING_RECIPE_IDS);
+    const unlearnable = ALL_RECIPES.filter((r) => {
+      if (grandfathered.has(r.id)) return false;
+      if (!r.acquisition || r.acquisition.length === 0) return false;
+      return tierForSkill(r.skillReq) > tierForSkill(craftMaxSkillFor(r.professionId));
+    }).map((r) => `${r.id} (${r.professionId} ${r.skillReq} > cap ${craftMaxSkillFor(r.professionId)})`);
+    expect(
+      unlearnable,
+      'a learned recipe authored above its craft cap is unlearnable through BOTH ' +
+        'channels (teachTierMet in professions/training.ts and the tier deny arm in ' +
+        'professions/pattern_items.ts), so it is dead content that ships green',
+    ).toEqual([]);
+    // Non-vacuity in both directions: the filter really did walk a populated
+    // catalog, and the comparison really can answer true (the grandfathered land
+    // tools at 150 are exactly the rows it would name if they were not exempt).
+    expect(ALL_RECIPES.filter((r) => (r.acquisition ?? []).length > 0).length).toBeGreaterThan(20);
+    expect(
+      ALL_RECIPES.filter(
+        (r) => tierForSkill(r.skillReq) > tierForSkill(craftMaxSkillFor(r.professionId)),
+      ).map((r) => r.id),
+      'the three land tier-5 tools are the only rows above their cap, and they ' +
+        'are learnable only because they predate training',
+    ).toEqual(['recipe_arcanite_mining_pick', 'recipe_elderwood_axe', 'recipe_sunpetal_sickle']);
   });
 
   it('rides ALL_RECIPES, and stays out of TOOL_RECIPES', () => {
