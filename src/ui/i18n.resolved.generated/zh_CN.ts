@@ -13031,9 +13031,6 @@ export const zh_CN: EnTranslations = {
       "osmium_hoe": {
         "name": "锇金锄"
       },
-      "evergarden_hoe": {
-        "name": "常青园锄"
-      },
       "vale_hearth_loaf": {
         "name": "谷地炉烤面包"
       },
@@ -13123,6 +13120,9 @@ export const zh_CN: EnTranslations = {
       },
       "pattern_clockreel_fishing_rod": {
         "name": "图纸：齿轮轮钓竿"
+      },
+      "evergarden_hoe": {
+        "name": "常青园锄"
       },
       "conjured_water4": {
         "name": "魔法泉水"

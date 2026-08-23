@@ -3120,19 +3120,34 @@ export const APEX_CONSUMABLE_RECIPES: ProfessionRecipeRecord[] = [
 // (skillReq 75, itemLevelBudget 20, level 20, toolworks) matches every other
 // tier-4 tool recipe in TOOL_RECIPES.
 //
-// THE APEX RUNG STAYS TRAINER-TAUGHT, and that is a decision rather than an
-// omission, because the rod ladder's apex went the other way. ROD_RECIPES says
-// its apex is drop-taught under masterwrought R8 on the ground that an apex
-// rung reaches
-// players through the pillars, and the rod's own argument is that it GATES
-// CATCH BAND 5: a band nothing else opens. The hoe gates nothing. Four crop
-// tiers exist, the tier-4 hoe already reaches the last one, and this rung buys
-// only the epic rarity rung on the tool-effect economy, so the access argument
-// that makes the clockreel drop-taught is vacuous here. What this rung matches
-// instead is its OWN family: the tier-5 base-tool family it completes, whose
-// fishing member (recipe_tidewrought_fishing_rod, engineering 125) is
-// `['trainer']` at exactly this rung. The non-crafter route is the Marks
-// counter above, so masterwrought R18 is satisfied without a schematic.
+// THE APEX RUNG STAYS TRAINER-TAUGHT, and the honest statement of why is that
+// this is a CHOICE BETWEEN TWO LIVE READINGS rather than a rung the rules
+// settle. Recorded plainly because an earlier draft of this comment argued it
+// badly, against a position ROD_RECIPES does not hold.
+//
+// WHAT THE ROD HEADER ACTUALLY SAYS, since that is the precedent in play: its
+// apex is drop-taught under masterwrought R8, on the ground that "an apex rung
+// reaches players through the pillars". That ground is about apex-ness itself
+// and applies to ANY apex rung, this one included. The header's band-5 clause
+// answers a DIFFERENT question, why the schematic is deterministic Marks stock
+// rather than a band-5 catch, so it is not a reason the hoe escapes R8. Do not
+// re-derive a distinction there; there is not one.
+//
+// WHAT THIS RUNG MATCHES INSTEAD is the family it completes rather than the
+// family it resembles. It is the fifth member of the shipped tier-5 base-tool
+// family (epic, use.tier 5, sellValue 150), whose fishing member,
+// recipe_tidewrought_fishing_rod at engineering 125, is `['trainer']` at
+// exactly this rung; the clockreel is a TIER-6 rung above that family, at a
+// different price register. HOE_RECIPES' own post-freeze default is trainer
+// too, and masterwrought R18 is satisfied either way by the Marks counter
+// above, so nothing here is gated behind having taken engineering.
+//
+// THE TENSION IS REAL AND IS HANDED BACK, not resolved here: the phase file
+// and the Phase 11i QA handoff disagree about this rung's tier AND its
+// channel, and both are settled records. The ledger costs both readings. What
+// is NOT arguable is the TIER: a tier-6 land tool would ship ungated, because
+// WIELD_REQUIREMENT_BY_TIER has no tier-6 row and wieldRequirementForTier
+// fails OPEN at 0, and only fishing is exempt from that gate.
 export const HOE_RECIPES: ProfessionRecipeRecord[] = [
   {
     id: 'recipe_bronze_hoe',

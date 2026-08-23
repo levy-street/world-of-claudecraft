@@ -79,8 +79,10 @@ recipes today). v1 is pure stats and bounded utility: no new proc effects anywhe
 - A gathering-wide APEX-TIER EXPANSION beyond what this packet ships (recorded at Phase
   11j, which completed the tier-5 tool family and so drew the boundary): new node and
   water tiers above the world's current deepest, the tier-6 tool rung the wield table has
-  no row for, and the maxSkill 150 climb proficiency_bands.ts already comments forward
-  room for. Each depends on the others. A tier-6 LAND tool cannot ship before the wield
+  no row for, and a maxSkill climb past the shipped land cap of 100. (That last one is
+  NOT already reserved anywhere: proficiency_bands.ts carries no 150 at all, its
+  PROFICIENCY_BAND_THRESHOLDS are [0, 100, 200], and its own comment warns off an
+  earlier speculative figure that never shipped. Any such climb is new design.) Each depends on the others. A tier-6 LAND tool cannot ship before the wield
   table gains its row, because wieldRequirementForTier fails OPEN at 0 for an unknown
   tier and the rung would ship ungated (fishing's tier-6 rod escapes only because rods
   are the structural R22 exemption). A tier-6 tool is also pointless before a tier-4 node

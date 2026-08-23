@@ -387,7 +387,7 @@ describe('FARM_RECIPES: the farm-economy hook set', () => {
         .filter((r) => r.skillReq >= 125)
         .map((r) => r.id)
         .sort(),
-      'produce must reach the 125 rung, the top consumable rung',
+      'produce must reach the 125 rung (the top CONSUMABLE rung, plus the apex hoe, a tool)',
     ).toEqual(['recipe_evergarden_hoe', 'recipe_grand_cauldron', 'recipe_laden_hearth']);
     // The claim masterwrought R20 actually cares about, stated separately from the literal
     // above so a future re-tier that moves WHICH rows qualify still has to keep

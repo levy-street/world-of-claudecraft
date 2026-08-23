@@ -13031,9 +13031,6 @@ export const ru_RU: EnTranslations = {
       "osmium_hoe": {
         "name": "Осмиевая мотыга"
       },
-      "evergarden_hoe": {
-        "name": "Мотыга Вечного Сада"
-      },
       "vale_hearth_loaf": {
         "name": "Долинный подовый хлеб"
       },
@@ -13123,6 +13120,9 @@ export const ru_RU: EnTranslations = {
       },
       "pattern_clockreel_fishing_rod": {
         "name": "Чертёж: Удочка с часовой катушкой"
+      },
+      "evergarden_hoe": {
+        "name": "Мотыга Вечного Сада"
       },
       "conjured_water4": {
         "name": "Сотворённая родниковая вода"

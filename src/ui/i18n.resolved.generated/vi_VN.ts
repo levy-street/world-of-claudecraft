@@ -13031,9 +13031,6 @@ export const vi_VN: EnTranslations = {
       "osmium_hoe": {
         "name": "Osmium Hoe"
       },
-      "evergarden_hoe": {
-        "name": "Evergarden Hoe"
-      },
       "vale_hearth_loaf": {
         "name": "Vale Hearth Loaf"
       },
@@ -13123,6 +13120,9 @@ export const vi_VN: EnTranslations = {
       },
       "pattern_clockreel_fishing_rod": {
         "name": "Schematic: Clockreel Fishing Rod"
+      },
+      "evergarden_hoe": {
+        "name": "Evergarden Hoe"
       },
       "conjured_water4": {
         "name": "Nước Suối Được Tạo Phép"

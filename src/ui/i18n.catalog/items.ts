@@ -2641,7 +2641,6 @@ const ITEM_ENTITY_IDS = [
   'bronze_hoe',
   'skysilver_hoe',
   'osmium_hoe',
-  'evergarden_hoe',
   'vale_hearth_loaf',
   'eastbrook_root_pottage',
   'fenbridge_rice_bowl',
@@ -2676,6 +2675,13 @@ const ITEM_ENTITY_IDS = [
   'pattern_roast_hollowgill_sturgeon',
   'pattern_deepwater_feast',
   'pattern_clockreel_fishing_rod',
+  // masterwrought Phase 11j, the gathering completion pass. Appended at the END
+  // under the same append-only contract as the 11i block above, rather than
+  // beside the four hoe rungs it belongs to by subject: position here is not a
+  // grouping, it is a sequence, and inserting mid-array would contradict the
+  // note directly above it. The English name is on the keyed appended map, so
+  // the reader looking for the hoe family finds it there.
+  'evergarden_hoe',
 ] as const;
 
 type ItemEntityId = (typeof ITEM_ENTITY_IDS)[number];

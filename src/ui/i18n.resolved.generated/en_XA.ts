@@ -13031,9 +13031,6 @@ export const en_XA: EnTranslations = {
       "osmium_hoe": {
         "name": "[Óšɱíúɱ Ĥóé]"
       },
-      "evergarden_hoe": {
-        "name": "[Éʋéŕĝáŕðéñ Ĥóé]"
-      },
       "vale_hearth_loaf": {
         "name": "[Ʋáļé Ĥéáŕţĥ Ļóáƒ]"
       },
@@ -13123,6 +13120,9 @@ export const en_XA: EnTranslations = {
       },
       "pattern_clockreel_fishing_rod": {
         "name": "[Šçĥéɱáţíç: Çļóçķŕééļ Ƒíšĥíñĝ Ŕóð]"
+      },
+      "evergarden_hoe": {
+        "name": "[Éʋéŕĝáŕðéñ Ĥóé]"
       },
       "conjured_water4": {
         "name": "[Çóñĵúŕéð Šþŕíñĝŵáţéŕ]"

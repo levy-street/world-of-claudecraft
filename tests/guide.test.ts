@@ -2502,9 +2502,8 @@ describe('Guide professions gathering accuracy', () => {
         // EMPTY on purpose and no respawn number ever publishes. The tool
         // ladder is the aggregation's real farming output since the Phase 5
         // hoes: the five rungs since masterwrought Phase 11j, rung 1 the only
-        // priced one (seated on the
-        // tier-1 farmer NPC since the go-live; the row-by-row mirror below
-        // owns the rest of the fields).
+        // priced one (seated on the tier-1 farmer NPC since the go-live; the
+        // row-by-row mirror below owns the rest of the fields).
         expect(g.nodes).toEqual([]);
         expect((g.tools ?? []).map((tool) => [tool.name, tool.tier, tool.priceCopper])).toEqual([
           ['Garden Hoe', 1, 20],

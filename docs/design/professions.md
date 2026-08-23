@@ -140,17 +140,21 @@ gear chain, the Perfecting materials, or `recipe_quickening_catalyst`. Grain
 and vegetables are the third gathering input family beside meat and fish.
 The one carve-out is the hoe ladder itself, which consumes produce because a
 gathering tool is not gear in that rule's sense: no equip slot, no
-item-level budget contest. Enforced by the produce sweeps in
-`tests/recipe_economy.test.ts` and `tests/material_taxonomy.test.ts`.
+item-level budget contest. Enforced by `tests/provisioner_firewall.test.ts`
+and the produce sweeps in `tests/provisioning_supply_line.test.ts` and its
+apex sibling.
 
 **masterwrought R18, need the output and never the slot.** Everyone needs
 what professions make; nobody needs to have TAKEN a profession to equip,
 enter, or complete anything. Mechanically: every produce item stays
 market-listable `kind: 'junk'`, farming rows are ADDED to bills beside the
-herb and meat rows rather than substituted for them, and every crafted
-gathering tool has a non-crafter route through the delve Marks counter
-(`src/sim/content/delves/shop.ts`). Enforced by the never-substituted sweeps
-in `tests/professions_zone_rollout.test.ts` and the per-tier tool arms in
+herb and meat rows rather than substituted for them, and every TIER-4 AND
+TIER-5 crafted gathering tool has a non-crafter route through the delve Marks
+counter (`src/sim/content/delves/shop.ts`). The tier bound is not a hedge: the
+rungs below stay craft-or-trade by design, and the one tier-6 rung
+deliberately has no Marks row, an absence `tests/delve_shop.test.ts` pins by
+name. Enforced by the displacement sweep in
+`tests/provisioning_supply_line.test.ts` and the per-tier tool arms in
 `tests/delve_shop.test.ts`.
 
 **masterwrought R19, farming is a long-haul skill.** Its gain curve is
@@ -225,8 +229,8 @@ never mine, fell, or pick; `bestOwnedGatherToolTierOrNone` +
 likewise requires a fishing implement in bags: the simple pole or any
 tiered rod (`hasFishingImplement`, the startFishing gate). Bare hands
 still resolve to effective tool tier 1 ONLY on the surfaces that keep the
-old floor: corpse harvesting (`bestOwnedAnyGatherToolTier`, spans all four
-professions) and fishing's bite/reel/band synergy math. The node gate
+old floor: corpse harvesting (`bestOwnedAnyGatherToolTier`, which spans every
+gathering profession, five of them since farming) and fishing's bite/reel/band synergy math. The node gate
 holds at cast START and is deliberately not re-checked at completion;
 completion re-validates exactly range, respawn, and capacity. Using a
 pick/axe/sickle from the bags starts the standard gather cast on the
@@ -319,9 +323,11 @@ fixpoint structurally cannot see because it models a realm rather than a
 player.
 
 #### The supply matrix
-Which gathering family feeds which craft, and at which band. Cells name the
-craft, the band, and the recipe FAMILY by symbol; there are no counts here
-on purpose, per this file's anchor rule.
+Which gathering family feeds which recipe families, and at which bands.
+Cells name the recipe FAMILY by exported symbol and the band it sits in, not
+the craft and not a count, per this file's anchor rule. (The craft is a
+property of each row inside a family rather than of the family, so naming it
+per cell would be wrong as often as right.)
 
 | family | levelling bands | endgame band |
 |---|---|---|
@@ -337,21 +343,26 @@ appears in a LEVELLING band as well as the endgame one, because that family
 is not uniformly endgame. Its rungs run 75, 100 and 125, and the row at 75
 falls in the top levelling band.
 
-Two more readings the table is worth pausing on. The apex tool ladders
-(`TOOL_RECIPES`, `ROD_RECIPES`, `HOE_RECIPES`) sit in each family's TOP
-levelling band rather than its endgame cell, because a gathering tool a
-family feeds only ITSELF is not evidence that the family feeds the crafts,
-and the coverage guard refuses to count it. And the endgame column is
-narrower than the levelling ones by design: the apex sets are where the
-whole realm's demand concentrates, which is the shape masterwrought R21
-exists to keep honest.
+Two more readings the table is worth pausing on. The tool ladders sit in
+LEVELLING bands rather than endgame cells, and that is their skillReq doing
+the work rather than any rule: `TOOL_RECIPES` and `ROD_RECIPES` craft at 75
+and above, and `HOE_RECIPES` spans several bands, so a ladder appears
+wherever its rungs sit. What the coverage guard's self-feeding refusal
+actually explains is a different absence: a rung at or above the gathering
+cap is kept OUT of its own family's endgame cell, because a gathering tool a
+family feeds only ITSELF is no evidence that the family feeds the crafts. And
+the endgame column is narrower than the levelling ones by design: the apex
+sets are where the whole realm's demand concentrates, which is the shape
+masterwrought R21 exists to keep honest.
 
 **masterwrought R20, every gathering profession reaches the endgame.** No
 gathering family may be absent from recipes at the gathering cap or above,
 nor from any 25-point band below it, and this is enforced by a TEST rather
 than by intention. **masterwrought R21** is the demand half of the same
-invariant: every id a family supplies must have at least one consumer, so a
-profession that feeds a recipe nobody buys is still caught. Both live in
+invariant, at the scope a test can actually hold: every id a family SUPPLIES
+must have at least one consumer. The wider R21 question, whether the world
+eats what the crafts MAKE, is a judgment surface recorded in the packet
+ledger's ratio table rather than something this guard asserts. Both live in
 `tests/gathering_supply_coverage.test.ts`, which derives every supply set
 and every band from the live content tables and asserts PRESENCE only, never
 a count: a numeric floor would turn a correctness guard into a content quota

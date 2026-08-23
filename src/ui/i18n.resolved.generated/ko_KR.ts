@@ -13031,9 +13031,6 @@ export const ko_KR: EnTranslations = {
       "osmium_hoe": {
         "name": "오스뮴 괭이"
       },
-      "evergarden_hoe": {
-        "name": "상록 정원 괭이"
-      },
       "vale_hearth_loaf": {
         "name": "골짜기 화덕빵"
       },
@@ -13123,6 +13120,9 @@ export const ko_KR: EnTranslations = {
       },
       "pattern_clockreel_fishing_rod": {
         "name": "설계도: 톱니릴 낚싯대"
+      },
+      "evergarden_hoe": {
+        "name": "상록 정원 괭이"
       },
       "conjured_water4": {
         "name": "창조된 샘물"

@@ -13031,9 +13031,6 @@ export const ja_JP: EnTranslations = {
       "osmium_hoe": {
         "name": "オスミウムの鍬"
       },
-      "evergarden_hoe": {
-        "name": "エバーガーデンの鍬"
-      },
       "vale_hearth_loaf": {
         "name": "渓谷の炉焼きパン"
       },
@@ -13123,6 +13120,9 @@ export const ja_JP: EnTranslations = {
       },
       "pattern_clockreel_fishing_rod": {
         "name": "設計図：歯車リールの釣り竿"
+      },
+      "evergarden_hoe": {
+        "name": "エバーガーデンの鍬"
       },
       "conjured_water4": {
         "name": "魔法の湧き水"

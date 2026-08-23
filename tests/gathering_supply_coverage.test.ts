@@ -57,6 +57,21 @@
 // FISHING_TABLES_BY_BAND would be the durable fix and belongs to whoever owns
 // that file.
 //
+// AND THE ARM SCANS TWO MECHANISMS, NOT ALL OF THEM. It walks ALL_RECIPES and
+// ENCHANTS, which is the shipped reagent union, and QUEST turn-ins are a third
+// real consumption channel it does not see: q_prof_workorder_forge collects
+// copper_ore, and quest_commands.ts routes collection through the same
+// planGradeRemoval the crafts use. Stating that here rather than leaving it
+// implied, because a census scoped to one mechanism and reported as
+// consumption in general is exactly the defect that forced this arm's own
+// substitution fix, one mechanism over.
+//
+// The omission is SAFE IN THE ONE DIRECTION THAT MATTERS: an unscanned
+// consumer can only make the arm report an orphan that is not one, a false
+// RED that a human resolves, never a false green that hides a dead material.
+// Widening it would need the quest corpus, which is a second content catalog
+// to keep in step, so the scope is a deliberate trade rather than an oversight.
+//
 // EVERYTHING IS DERIVED FROM LIVE TABLES. There is no hand-written id list and
 // no literal 25 in this file: the subject list comes from
 // GATHERING_PROFESSION_IDS, the supply sets come from the content tables the
