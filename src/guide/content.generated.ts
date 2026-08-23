@@ -7662,6 +7662,10 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
             "count": 4
           },
           {
+            "name": "Fine Copper Ore",
+            "count": 2
+          },
+          {
             "name": "Skysilver Mining Pick",
             "count": 1
           }
@@ -7728,6 +7732,10 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
             "count": 4
           },
           {
+            "name": "Fine Ironbark Log",
+            "count": 2
+          },
+          {
             "name": "Ironbark Axe",
             "count": 1
           }
@@ -7788,6 +7796,10 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
           {
             "name": "Fine Goldleaf Herb",
             "count": 4
+          },
+          {
+            "name": "Fine Sheenleaf Herb",
+            "count": 2
           },
           {
             "name": "Sheenleaf Sickle",

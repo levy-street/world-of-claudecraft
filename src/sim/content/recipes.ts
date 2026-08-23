@@ -252,14 +252,42 @@ export const COMMON_RECIPES: ProfessionRecipeRecord[] = [
 //   giving fine_thorium_ore the consumer it would otherwise lack. It is the
 //   one rung that got more expensive rather than equivalent; that is the
 //   point, since it was the one rung still buyable off a counter.
+//
+// THE TIER-4 ROWS ALSO CARRY THE EASTBROOK GRADE, added at masterwrought Phase
+// 11j and the one demand hole its R21 sweep found. The fine ladder has THREE
+// tiers (professions/material_grades.ts) while the crafted-tool ladder has only
+// TWO rungs, because the tier-2 and tier-3 land tools stay vendor-priced: the
+// rule "a tool at tier N consumes the fine grade at tier N-2" therefore gave
+// fine_iron_ore and fine_thorium_ore a consumer and left fine_copper_ore,
+// fine_ironbark_log and fine_silverleaf_herb with NONE at all, the only three
+// gathered ids in the game that nothing eats. Farming's ladder has no such hole
+// because HOE_RECIPES covers rungs 2 to 5 and so reaches its own tier-1 grade.
+// The tier-4 rung closes it: it is the ladder's step out of vendor tools and
+// into crafted ones, so building it from finely gathered material of BOTH tiers
+// the smith climbed through is the material story the grade system already
+// tells. ADDED beside the existing grade and never in place of it
+// (masterwrought R18), at COUNT 2 against the primary grade's 4, which is the
+// same halving the tier-5 rung applies one tier further down.
+//
+// IT MOVES NO BALANCE NUMBER, and that is checked rather than assumed. The
+// eastbrook grades are tier 0 in professions/material_tier.ts (they inherit
+// their base's ABSENCE from BASE_MATERIAL_TIERS), materialTierBonusForReagents
+// is a MAX and never a sum, and each of these bills already carries a tier-1
+// grade, so every masterworkProcChance here is byte-identical across this
+// change. Each row keeps its buyValue-bearing fine grade too, so no recipe
+// enters or leaves the counterfactually-vendor-fed set in
+// tests/recipe_economy.test.ts.
 export const TOOL_RECIPES: ProfessionRecipeRecord[] = [
   {
     id: 'recipe_thorium_mining_pick',
     professionId: 'engineering',
     resultItemId: 'thorium_mining_pick',
     resultCount: 1,
+    // Input 105 (fine iron 4x16 + fine copper 2x8 + the rung-3 pick at 25) vs
+    // output 60: still gold-negative, by more than before.
     reagents: [
       { itemId: 'fine_iron_ore', count: 4 },
+      { itemId: 'fine_copper_ore', count: 2 },
       { itemId: 'mithril_mining_pick', count: 1 },
     ],
     skillReq: 75,
@@ -287,8 +315,11 @@ export const TOOL_RECIPES: ProfessionRecipeRecord[] = [
     professionId: 'engineering',
     resultItemId: 'ashwood_axe',
     resultCount: 1,
+    // Input 161 (fine ashwood 4x30 + fine ironbark 2x8 + the rung-3 axe at 25)
+    // vs output 60: still gold-negative, by more than before.
     reagents: [
       { itemId: 'fine_ashwood_log', count: 4 },
+      { itemId: 'fine_ironbark_log', count: 2 },
       { itemId: 'ironbark_axe', count: 1 },
     ],
     skillReq: 75,
@@ -315,8 +346,11 @@ export const TOOL_RECIPES: ProfessionRecipeRecord[] = [
     professionId: 'engineering',
     resultItemId: 'goldleaf_sickle',
     resultCount: 1,
+    // Input 161 (fine goldleaf 4x30 + fine sheenleaf 2x8 + the rung-3 sickle at
+    // 25) vs output 60: still gold-negative, by more than before.
     reagents: [
       { itemId: 'fine_goldleaf_herb', count: 4 },
+      { itemId: 'fine_silverleaf_herb', count: 2 },
       { itemId: 'silverleaf_sickle', count: 1 },
     ],
     skillReq: 75,
