@@ -41,6 +41,7 @@ vi.mock('../server/db', () => ({
 }));
 
 import type { CopperFlowSource, HarvestBand, HarvestTier } from '../server/economy_telemetry';
+import { FISHING_BANDS } from '../server/fishing_telemetry';
 import { type ClientSession, GameServer } from '../server/game';
 import { type GameStateSource, registerGameStateMetrics } from '../server/http/game_metrics';
 import {
@@ -49,7 +50,6 @@ import {
   setGameMetricsCounters,
   type WsDropCause,
 } from '../server/http/game_signals';
-import { FISHING_BANDS } from '../server/fishing_telemetry';
 import { isLive, registerLivenessSource, resetHealthForTests } from '../server/http/health';
 import {
   MSG_LANE_CHAT_BURST,
@@ -1246,7 +1246,9 @@ describe('fishing telemetry counters at their emission sites', () => {
       ),
     );
 
-    expect(rec.fishingCatches).toEqual(FISHING_BANDS.map((label) => ['eastbrook_vale', label, false]));
+    expect(rec.fishingCatches).toEqual(
+      FISHING_BANDS.map((label) => ['eastbrook_vale', label, false]),
+    );
     // Non-vacuity: the walk really covered the deep bands, which is the half
     // that did not exist before.
     expect(rec.fishingCatches.map((row) => row[1])).toContain('5');

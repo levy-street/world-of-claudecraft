@@ -219,7 +219,9 @@ describe('the crafted rod ladder', () => {
       if (grandfathered.has(r.id)) return false;
       if (!r.acquisition || r.acquisition.length === 0) return false;
       return tierForSkill(r.skillReq) > tierForSkill(craftMaxSkillFor(r.professionId));
-    }).map((r) => `${r.id} (${r.professionId} ${r.skillReq} > cap ${craftMaxSkillFor(r.professionId)})`);
+    }).map(
+      (r) => `${r.id} (${r.professionId} ${r.skillReq} > cap ${craftMaxSkillFor(r.professionId)})`,
+    );
     expect(
       unlearnable,
       'a learned recipe authored above its craft cap is unlearnable through BOTH ' +
