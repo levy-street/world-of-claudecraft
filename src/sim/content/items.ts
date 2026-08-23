@@ -3513,8 +3513,10 @@ export const FISHING_TABLES_BY_BAND: Record<string, FishingEntry[]>[] = [
   //                4, mirefen 13 / 9), floored at one weight per junk row the
   //                zone carries, so a zone never loses a flavor row entirely
   //   rare koi     FLAT at 6 from band 2 up. Non-decreasing is satisfied, and
-  //                the ladder ends where its consumers do: both rod rungs that
-  //                consume koi sit at or below tier 5
+  //                the row has nowhere useful left to climb: it is already the
+  //                second-heaviest thing in a top-band cell, and its demand is
+  //                the rod ladder's, which is bounded at three rungs. Growing
+  //                it further would only crowd out the three new catches
   //   new catches  each enters at the band its rod opens, at exactly the weight
   //                eastbrook's empty-hook and junk rows GIVE UP at that band.
   //                Eastbrook's empty+junk runs 22 / 16 / 10 / 5 / 3 / 2 by

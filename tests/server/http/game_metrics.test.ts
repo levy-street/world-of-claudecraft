@@ -965,9 +965,10 @@ describe('registerGameStateMetrics: fishing telemetry counters', () => {
     for (const name of FISHING_COUNTER_NAMES) {
       // 14 zones x 6 bands, doubled from 42 by the ladder growing to six bands
       // at masterwrought Phase 11i. The zone term is the whole HARVEST_BANDS
-      // vocabulary, not the three zones with fishable water: the exporter
-      // pre-seeds the full cross product so a band that never fires reads as a
-      // real zero rather than a gap.
+      // vocabulary, not the three zones with a catch table of their own (every
+      // other zone's water fishes too, on the eastbrook_vale fallback): the
+      // exporter pre-seeds the full cross product so a zone-and-band pair that
+      // never fires reads as a real zero rather than a gap.
       expect(fishingSeries(text, name), name).toHaveLength(84);
       for (const zone of HARVEST_BANDS) {
         for (const band of FISHING_BANDS) {

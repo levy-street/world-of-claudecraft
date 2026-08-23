@@ -47,10 +47,12 @@
 // HARVEST_BANDS (14 zones) x 6 bands = 84 pre-seeded series per counter since
 // masterwrought Phase 11i grew the catch ladder from three bands to six. The
 // old wording here said "3 x 3", which understated the zone term even before
-// 11i: only THREE zones have fishable water, but the exporter pre-seeds the
-// full zone vocabulary so a band that never fires reads as a real zero rather
-// than a gap (tests/server/http/game_metrics.test.ts derives the cross product
-// rather than restating it). The rod-fee family is the TRAINER-taught rod
+// 11i: only THREE zones have a catch table of their OWN (every other zone's
+// water draws the eastbrook_vale fallback, so it fishes and can appear on a
+// fishing event), and the exporter pre-seeds the full zone vocabulary anyway so
+// a zone-and-band pair that never fires reads as a real zero rather than a gap
+// (tests/server/http/game_metrics.test.ts derives the cross product rather than
+// restating it). The rod-fee family is the TRAINER-taught rod
 // recipes, still two after 11i added a third, drop-taught rung. Nothing per-player
 // (account id, character id, name, ip) is ever a label, and the exporter's
 // membership guards drop anything off these lists rather than minting a series

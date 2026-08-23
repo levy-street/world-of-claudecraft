@@ -34,6 +34,7 @@ import { bagCapacity } from '../src/sim/bags';
 import { updateCasting } from '../src/sim/combat/casting_lifecycle';
 import { GATHER_NODES } from '../src/sim/content/gather_nodes';
 import {
+  FISHING_BAND_INTRODUCED_CATCH,
   FISHING_TABLES,
   FISHING_TABLES_BY_BAND,
   isRawCookingCatch,
@@ -967,6 +968,107 @@ const prePhaseEffectiveBand = (proficiency: number, rodTier: number): number =>
 // water and which rod each fifty-point segment is climbed with), because that
 // is a statement about how the game is played and cannot be read off a
 // constant.
+// FISHING_BAND_INTRODUCED_CATCH (masterwrought Phase 11i): the derived table the
+// rod tooltip reads to name what a rung unlocks. It is computed at module scope
+// over the cell tables, so it is exactly the kind of derived export that can go
+// quietly wrong; every claim it makes is pinned here rather than trusted to the
+// one consumer.
+describe('the catch each band introduces (Phase 11i)', () => {
+  it('is one id per HIGH band and nothing at all below them', () => {
+    expect(FISHING_BAND_INTRODUCED_CATCH).toHaveLength(FISHING_TABLES_BY_BAND.length);
+    // Bands 0 to 2 introduce NOTHING, and that is a real statement about the
+    // shipped design rather than a gap: those bands move WEIGHT, not
+    // membership, so every shipped catch is already on the band-0 table.
+    expect(FISHING_BAND_INTRODUCED_CATCH.slice(0, 3)).toEqual([null, null, null]);
+    expect(FISHING_BAND_INTRODUCED_CATCH.slice(3)).toEqual([
+      'raw_deepbarb_catfish',
+      'raw_hollowgill_sturgeon',
+      'raw_stillmere_salmon',
+    ]);
+  });
+
+  it('is DERIVED from the tables, not a second hand-written list', () => {
+    // Recompute it here by a different route than the export uses: walk the
+    // union of every band at or below b and ask which ids band b adds. If the
+    // export were ever replaced by a literal, this reds.
+    for (const [band, byZone] of FISHING_TABLES_BY_BAND.entries()) {
+      const below = new Set<string>();
+      for (let b = 0; b < band; b++) {
+        for (const rows of Object.values(FISHING_TABLES_BY_BAND[b])) {
+          for (const row of rows) if (row.itemId) below.add(row.itemId);
+        }
+      }
+      const added = new Set<string>();
+      for (const rows of Object.values(byZone)) {
+        for (const row of rows) if (row.itemId && !below.has(row.itemId)) added.add(row.itemId);
+      }
+      expect(FISHING_BAND_INTRODUCED_CATCH[band], `band ${band}`).toBe(
+        added.size === 1 ? [...added][0] : null,
+      );
+    }
+  });
+
+  it('every id it names is a real, market-listable raw cooking catch', () => {
+    let named = 0;
+    for (const id of FISHING_BAND_INTRODUCED_CATCH) {
+      if (id === null) continue;
+      named += 1;
+      const def = ITEMS[id];
+      expect(def, id).toBeDefined();
+      expect(def.kind, id).toBe('junk');
+      expect(isRawCookingCatch(id), id).toBe(true);
+      // R18: a catch a rod tooltip advertises must be one a player can buy.
+      expect(def.soulbound ?? false, id).toBe(false);
+      expect(def.noMarketList ?? false, id).toBe(false);
+    }
+    // Non-vacuity: the loop above must actually have run three times.
+    expect(named).toBe(3);
+  });
+
+  it('a band introducing TWO ids reads null rather than picking a winner', () => {
+    // The ambiguity arm, driven rather than described. The export refuses to
+    // choose when a band adds more than one id, so the tooltip falls back to
+    // the generic line instead of naming one of two catches arbitrarily. This
+    // is the branch no shipped table exercises, so nothing else would cover it.
+    const twoNew = [
+      { eastbrook_vale: [{ itemId: 'raw_mirror_trout', weight: 100 }] },
+      {
+        eastbrook_vale: [
+          { itemId: 'raw_mirror_trout', weight: 50 },
+          { itemId: 'raw_river_perch', weight: 25 },
+          { itemId: 'raw_marsh_pike', weight: 25 },
+        ],
+      },
+    ];
+    const introducedFor = (tables: typeof twoNew, band: number): string | null => {
+      const below = new Set<string>();
+      for (let b = 0; b < band; b++) {
+        for (const rows of Object.values(tables[b])) {
+          for (const row of rows) if (row.itemId) below.add(row.itemId);
+        }
+      }
+      const added = new Set<string>();
+      for (const rows of Object.values(tables[band])) {
+        for (const row of rows) if (row.itemId && !below.has(row.itemId)) added.add(row.itemId);
+      }
+      return added.size === 1 ? [...added][0] : null;
+    };
+    expect(introducedFor(twoNew, 1)).toBeNull();
+    // And the same shape with ONE new id does resolve, so the null above is
+    // the ambiguity rule rather than the helper never resolving anything.
+    const oneNew = [
+      { eastbrook_vale: [{ itemId: 'raw_mirror_trout', weight: 100 }] },
+      {
+        eastbrook_vale: [
+          { itemId: 'raw_mirror_trout', weight: 60 },
+          { itemId: 'raw_river_perch', weight: 40 },
+        ],
+      },
+    ];
+    expect(introducedFor(oneNew, 1)).toBe('raw_river_perch');
+  });
+});
+
 describe('the DECISION F casts-to-200 model (Phase 11i)', () => {
   // Which water the R19 teaching ceiling FORCES for each fifty-point segment,
   // and the cheapest rod that water takes (fishing_zones.ts). Deliberately the
