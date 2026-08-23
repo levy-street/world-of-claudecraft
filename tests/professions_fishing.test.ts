@@ -1665,8 +1665,10 @@ describe('fishing band tool cap (Professions 2.0)', () => {
       sim.events = [];
       sim.useItem(rodId);
       expect(sim.player.castingAbility, rodId).toBe(FISHING_CAST_ID);
-      // The visible timer is the 15 s session cap (literal on
-      // purpose), which carries no bite information.
+      // The visible timer is the 16 s session cap (literal on purpose), which
+      // carries no bite information. It moved from 15 at masterwrought Phase
+      // 11i, forced by the tier-6 rod pushing the worst legal session to 301
+      // ticks against a 300-tick cap; recorded there as a ratify-or-revert.
       expect(sim.events).toContainEqual(
         expect.objectContaining({ type: 'castStart', ability: FISHING_CAST_ID, time: 16 }),
       );

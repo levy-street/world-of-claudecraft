@@ -11,14 +11,25 @@
 // left literally [0, 100, 200].
 //
 // Extracted because a ladder is not command logic: fishing.ts is a command
-// coordinator and this is a pure lookup two other layers read. It is an honest
-// EXTRACTION of the logic, not of the line count, and the arithmetic says so:
-// the logic left fishing.ts, the prose explaining the split did not, so that
-// file is longer after the move than before it. Pure leaf, exactly the contract
-// proficiency_bands.ts and tools.ts already keep: no SimContext, no
-// content-table import, no rng, explicit arguments only, so a Vitest imports
-// it directly. fishing.ts re-exports the old names so every existing importer
-// resolves unchanged.
+// coordinator and this is a pure lookup two other layers read.
+//
+// WHAT THE EXTRACTION ACTUALLY MOVED, measured rather than characterised,
+// because the first wording here flattered it. fishing.ts went 675 to 736
+// lines, and every one of those 61 is comment: its NON-comment count went 287
+// to 288, UP by one. One function body left (the six-line fishingRodBandFor)
+// and the shim cost seven back (the import widened from one line to six, plus
+// two re-export lines). So the code footprint is flat and the file is +61 lines
+// of prose. What the move buys is not size: it is that the ladder now has ONE
+// home that server/ and src/ui/ can import without reaching through a command
+// coordinator, and that widening it again is one edit here.
+//
+// Pure leaf on the proficiency_bands.ts contract: no SimContext, no rng,
+// explicit arguments only, so a Vitest imports it directly. It is NOT
+// content-table free, and the difference is worth stating rather than
+// implying: ./tools value-imports ../content/professions, so this module
+// inherits that dependency transitively through its canGatherTier import.
+// fishing.ts re-exports the old names so every existing importer resolves
+// unchanged.
 
 import { canGatherTier } from './tools';
 

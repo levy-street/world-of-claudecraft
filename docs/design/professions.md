@@ -494,10 +494,11 @@ guards.
 | TIER2 / TIER3_TOOL_GATE_PROFICIENCY | src/sim/content/vendor_row_gates.ts | 40 / 70 |
 | vendor land-tool buyValue by tier | src/sim/content/items.ts | 20 / 120 / 400 (tiers 1 to 3) |
 | tiered rod buyValue by tier | src/sim/content/items.ts | 60 / 150 (tiers 2 and 3) |
+| FISHING_CATCH_BAND_THRESHOLDS | src/sim/professions/fishing_bands.ts | 0 / 100 / 150 / 200 / 200 / 200 (six bands; the SHARED PROFICIENCY_BAND_THRESHOLDS stays [0, 100, 200]) |
 | FISH_BITE_DELAY_MIN / MAX / ROD_REDUCTION (sec) | src/sim/professions/fishing.ts | 3 / 8 / 1.5 |
 | FISH_REEL_WINDOW_SEC / _ROD_BONUS_SEC / _RARITY_BONUS_SEC | src/sim/professions/fishing.ts | 2.5 / 0.75 / 0.25 |
-| FISHING_SESSION_CAP_SEC | src/sim/types.ts | 15 |
-| FISHING_GAIN_SCHEDULE | src/sim/professions/fishing.ts | 1 below 50, 0.5 below 100, 0.1 below 150, 0.02 below 200 |
+| FISHING_SESSION_CAP_SEC | src/sim/types.ts | 16 (moved from 15 at masterwrought Phase 11i, forced by the tier-6 rod: see the packet doc) |
+| FISHING_GAIN_SCHEDULE | src/sim/professions/fishing.ts | 0.08 below 50, 0.05 below 100, 0.04 below 150, 0.03 below 200 (retuned at masterwrought Phase 11i from a measured casts-to-200 model; the four BOUNDARIES are frozen because fishingTeachingCeilingFor derives from them) |
 | FISHING_JUNK_GAIN_CUTOFF_PROFICIENCY | src/sim/professions/fishing.ts | 100 |
 | WORK_ORDER_CADENCE_TICKS / PAYOUT_FRACTION | src/sim/professions/cadence.ts | 36000 / 0.5 |
 | NUDGE_CADENCE_TICKS | src/sim/professions/cadence.ts | 18000 |
@@ -514,7 +515,12 @@ guards.
 Time-to-master targets the constants were tuned against: first tier-up in
 15 to 20 minutes, skill 50 in an evening, craft mastery in roughly 1.5 to 5
 focused hours, gathering 100 in 8 to 12 hours, fishing 200 in 15 to 25
-hours. The craft-mastery band MOVED from the authored 10-to-20 by the
+hours. THE FISHING FIGURE IS THE AUTHORED TARGET AND THE SHIPPED CURVE NO
+LONGER MATCHES IT: masterwrought Phase 11i measured the climb rather than
+estimating it and retuned FISHING_GAIN_SCHEDULE to about 11 reference hours,
+redistributing the cost instead of lengthening it (the old values put 84
+percent of the climb in the last fifty points). The 15-to-25 band above is
+kept as the record of what was aimed at, not as a description of what ships. The craft-mastery band MOVED from the authored 10-to-20 by the
 content pass's veto-able ruling (the review worklist's ledger): the old
 figure predated the v0.32.0 expansion, whose starter zones re-grant the
 top-rung materials from ten more zones (the all-zones supply arm in

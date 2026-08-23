@@ -26,8 +26,10 @@ describe('fishing band labels', () => {
     // a deliberate edit here rather than a set of series that appeared on their
     // own.
     expect([...FISHING_BANDS]).toEqual(['0', '1', '2', '3', '4', '5']);
-    // Non-vacuity, and the reason there are exactly three: one per band of
-    // catch tables the sim actually rolls.
+    // Non-vacuity, and the reason there are exactly SIX (three until
+    // masterwrought Phase 11i): one per band of catch tables the sim actually
+    // rolls. Derived from FISHING_TABLES_BY_BAND rather than restated, so a
+    // seventh band reds here instead of minting an undefined label series.
     expect(FISHING_TABLES_BY_BAND).toHaveLength(FISHING_BANDS.length);
   });
 

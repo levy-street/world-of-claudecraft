@@ -279,10 +279,12 @@ export const APEX_PATTERN_ITEMS: Record<string, ItemDef> = {
   },
   // --- The angler's endgame patterns (masterwrought Phase 11i) -------------
   // Four more on the SAME contract as the eight above: pattern_<output item
-  // id>, kind 'recipe', quality epic, the uniform sellValue 100, and the
+  // id>, kind 'recipe', the uniform sellValue 100, and the
   // registered per-craft display prefix ("Recipe:" for cooking, "Schematic:"
   // for engineering). They coin no name of their own: each is a prefix plus its
-  // output's name, so the naming load for the whole group is zero.
+  // output's name, so the naming load for the whole group is zero. QUALITY is
+  // the one field that is NOT uniform across the four, and the paragraph below
+  // is why: it derives per row from what the row teaches.
   //
   // ALL FOUR RIDE THE HEROIC QUARTERMASTER as deterministic Heroic Marks stock
   // (content/heroic_vendor.ts), the channel phase 11 gave the eight apex

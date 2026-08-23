@@ -996,7 +996,8 @@ describe('registerGameStateMetrics: fishing telemetry counters', () => {
 
     const text = await registry.metrics();
     // The zone label is bounded to the SAME zone vocabulary the harvest counter
-    // uses (one zone list, not two), and the band to the three fishing rungs.
+    // uses (one zone list, not two), and the band to the SIX fishing rungs
+    // (three until masterwrought Phase 11i widened the catch ladder).
     const zones = new Set(
       [...text.matchAll(/^woc_fishing_\w+\{zone="([^"]+)",band="[^"]+"\}/gm)].map((m) => m[1]),
     );

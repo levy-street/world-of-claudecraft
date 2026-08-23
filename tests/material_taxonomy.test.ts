@@ -191,10 +191,18 @@ const HONEST_MATERIALS = [
 // sign-off.
 const ALLOWED_UNCLASSIFIED_JUNK = [
   'dawnhold_posy',
-  // masterwrought Phase 11i's capstone feast, on exactly the harvest_feast
-  // footing below and for the same reason: a placeable shared feast is kind
-  // 'junk' by the tonic precedent, but nothing crafts FROM it and its one
-  // consumer is the place_feast command, so it is a deliberate non-material.
+  // masterwrought Phase 11i's capstone feast: kind 'junk' by the tonic
+  // precedent and nothing crafts FROM it, so it is a deliberate non-material
+  // on the harvest_feast footing below.
+  //
+  // ITS PLACEMENT CONSUMER DOES NOT EXIST YET, and the earlier wording here
+  // ("its one consumer is the place_feast command") was false: the Phase 11i
+  // QA found that professions/feast.ts binds the whole lifecycle to the module
+  // constant FARM_FEAST_ITEM_ID ('harvest_feast'), so a use of this item either
+  // denies no_feast or spends a Harvest Feast instead. Its membership on this
+  // list is unaffected either way (it is still not a material), but nothing
+  // here should be read as evidence that the item is reachable. Open for the
+  // maintainer: docs/prd/masterwrought/state.md, the Phase 11i QA ledger.
   'deepwater_feast',
   'emberwing_cinderscale',
   'gleamstag_charm',

@@ -10,8 +10,16 @@
 // FISH_REEL_WINDOW_ROD_BONUS_SEC per tier above 1 PLUS
 // FISH_REEL_WINDOW_RARITY_BONUS_SEC per rarity rung above common (which is why
 // the reel line is handed this def's own `quality` and not just its tier), and
-// catch band b needs rod tier b + 1 (completeFishing), so band thresholds
-// index by tier - 1.
+// catch band b needs rod tier b + 1, which is fishingRodBandFor's own rule and
+// is READ FROM IT rather than restated as tier - 1.
+//
+// THE INDEX IS FISHING'S LADDER, NOT THE SHARED ONE, and the distinction is
+// the reason this file changed at masterwrought Phase 11i. It used to index
+// PROFICIENCY_BAND_THRESHOLDS with a fishing band, correct only while the two
+// arrays were the same three entries; once fishing grew its own six-rung ladder
+// the shared array was SHORTER than the index, so the top rung read off the end
+// of a three-element tuple and the line blanked or lied. It reads
+// FISHING_CATCH_BAND_THRESHOLDS now.
 // Tool-effect charm slotting has its own sibling card (tool_effect_tooltip.ts,
 // composed right after these lines in Hud.itemTooltip), so it is deliberately
 // not described here.
@@ -89,7 +97,6 @@ export function gatherToolTooltipLines(item: ItemDef): string {
     const unlocksFishing = UNLOCKS_KEYS.fishing;
     if (unlocksFishing) html += line('tt-desc', t(unlocksFishing, { tier }));
     if (use.tier > 1) {
-      const tiersAbove = use.tier - 1;
       // Both numbers come from the sim's own functions rather than from a
       // second copy of its arithmetic. The copy is what shipped a tier-5 rod
       // advertising a second the bite clamp never gives.

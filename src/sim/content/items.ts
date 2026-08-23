@@ -3377,11 +3377,16 @@ export interface FishingEntry {
 // one of SIX per-zone tables (bands; three until masterwrought Phase 11i). As proficiency rises the weight shifts
 // out of the grey-junk rows (tangled_weed / soggy_boot) and the empty-hook null
 // row and into the zone's cooking-catch rows (raw fish reagents). The moves are
-// strictly monotonic per band step (each cooking catch non-decreasing, each
-// grey junk / null row non-increasing), every band still sums to exactly 100,
+// MONOTONIC BUT NOT STRICT per band step (each cooking catch non-decreasing,
+// each grey junk / null row non-increasing) and the flat steps are authored
+// rather than incidental: the koi holds at 6 from band 2 up because both rod
+// rungs that consume it sit at or below tier 5, and a junk row floors at one
+// weight per junk row the zone carries so Mirefen's two-row flavor never
+// collapses to one. Every band still sums to exactly 100,
 // and the empty-hook null row is always present with weight >= 1. Band
-// boundaries and selection live in src/sim/professions/fishing.ts
-// (fishingBandFor); FISHING_TABLES_BY_BAND[band][zoneId] is the resolved table,
+// boundaries and selection live in src/sim/professions/fishing_bands.ts
+// (FISHING_CATCH_BAND_THRESHOLDS, fishingCatchBandFor and fishingRodBandFor;
+// fishing.ts re-exports fishingBandFor from there and is the thin consumer); FISHING_TABLES_BY_BAND[band][zoneId] is the resolved table,
 // with the eastbrook_vale row as the fallback for any zone without its own.
 //
 // THE AXIS THESE EIGHTEEN CELLS ARE AUTHORED AGAINST (D9). A cell is not "how
