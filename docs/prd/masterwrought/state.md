@@ -11845,12 +11845,184 @@ axis over. It CALLS the shipped `canWieldGatherToolTier` and
 `wieldRequirementForTier` rather than re-deriving the thresholds, so the
 fishing exemption is not restated either.
 
+### THE REVIEW ROUND, AND WHAT IT CAUGHT IN THIS PHASE'S OWN GUARD
+
+Three reviewers read the diff as unreviewed code. Every finding applied, in
+two commits, with a FRESH reviewer over the fix diff afterwards because a fix
+round is unreviewed code too.
+
+**FOUR VACUOUS ASSERTIONS, ALL OF THEM IN THE FILE THIS PHASE EXISTS TO SHIP.**
+That is the finding worth carrying forward, because the file is a guard and a
+guard that cannot fail is worse than no guard: it reports coverage it does not
+have. All four are the constant-self-comparison shape the repo's own trap index
+names, and none of them would have been caught by running the test.
+
+- The subject-list arm compared `FAMILY_IDS` to `[...GATHERING_PROFESSION_IDS,
+  CORPSE_HARVEST_FAMILY]`, which is the expression `supplyByFamily` builds the
+  keys from. True by construction; it could only fail on a duplicate id, while
+  its title claimed it pinned that the derivation reached every shipped
+  profession. Deleting a profession from the table would have moved both sides
+  together.
+- The band-math arm asserted `ENDGAME_BAND` against `tierForSkill(
+  GATHERING_ENDGAME_SKILL)`, which is its own definition, and
+  `LEVELLING_BANDS.length` against the value it is built from. Two of its three
+  assertions were `expect(x).toBe(x)`.
+- The farming supply arm asked whether `farmingSupply()` contains the two
+  fields `farmingSupply()` puts there, inside the test whose stated job is to
+  red when a table row gains no supply mapping.
+- The self-feeding arm never called `isSelfFeedingFor`. It asserted only that
+  the corpus contains a tool-producing recipe and a non-tool-producing one,
+  and the measurement that makes it damning is this: the refusal drops one
+  endgame row per land family and two for fishing, and every family keeps
+  between three and fourteen, so **`isSelfFeedingFor` returning false
+  unconditionally would have left the entire file green.** Decision D, the
+  decision the arm exists for, was unpinned.
+
+Each now carries the literal beside the derivation, and the refusal is pinned
+by calling the predicate on three cases plus the outcome it changes: farming
+must not be credited for its own hoe.
+
+**THE SUBSTITUTION CREDIT'S OWN MUTATION PROOF EXERCISED THE WRONG BRANCH.**
+The fix that retired this phase's false demand claim was justified by
+mutating `raw_mirror_trout`, which has no fine grade, so it only ever reached
+`base === undefined` and never touched the branch the change added. Re-proven
+on the branch that matters: stripping every consumer of `copper_ore`, the base
+the credit routes THROUGH, reds both `copper_ore` and `fine_copper_ore` plus
+the new load-bearing arm. A dead base rescues nothing, which is the one way
+the credit could have been wrong.
+
+**A THIRD ART-DEBT PIN EXISTED, AND A FOURTH KIND OF MISS.** The park is
+counted in three independent places: the exact-set arm in
+`tests/item_icons.test.ts`, `pendingArtCount` in `scripts/item_art_audit.mjs`,
+and `pendingHotbarItemIds` in `tests/release_v039_icon_art.test.ts`. No
+targeted run selects any of them from a content change. The first was found by
+authoring, the second by the first full suite, the third by a reviewer.
+
+**THE APEX HOE HAD NO ICON, which is the one finding a player would have
+seen.** Parking art means serving the PROCEDURAL recipe, and no recipe was
+authored, so it fell to `itemFallback`'s tool arm and resolved to a MACE on
+`garden_hoe`'s own radial and palette WITH sparkle. Three breaks of the hoe
+family's own stated rule at once: the wrong silhouette, the epic apex reading
+as the tier-1 quest hoe at 32px, and the fine-grade marker on a tool. The
+exact-set art arm passed throughout, because it checks OWNERSHIP of the park
+row and not whether anything draws. Authored to the family rule, and `tsc`
+then caught that the first attempt used a background name where a palette
+belongs while the test stayed green.
+
+**TWO RECORDED VERDICTS WERE RIGHT FOR THE WRONG REASON, OR UNRECORDED.** The
+Reliquary decline said a crafted gathering tool is not conquerable unique
+loot; that shelf catalogues three crafted rods, so the claim is false on its
+face. What actually decides it is the LAND-tool precedent: the pick, axe and
+sickle carry no relic row either, so declining the hoe is the symmetry. The
+residual is recorded rather than hidden: the Reliquary is now the one surface
+where the completed tier-5 family reads asymmetric, one of five. The deed
+decline was correct and simply unwritten, which reads as an omission next to
+`col_deepest_cast`; it is now recorded with the distinction that matters, that
+the rod's deed celebrates reaching a catch band nothing else opens while the
+hoe opens no crop tier at all.
+
+**THE WIELD SWEEP FAILED OPEN, on the exact hazard this phase records in
+brainstorm.md as prose.** `wieldRequirementForTier` returns 0 for any tier
+outside the table, so a tier-6 LAND tool would have read requirement 0 and
+passed the new arm while shipping completely ungated. It now asserts the tier
+has a row. The same arm's comment was also wrong: `canWieldGatherToolTier`
+does NOT encode the fishing exemption (it is a bare comparison; the exemption
+lives in the bag scans), and rods were passing by cap arithmetic alone, so
+lowering fishing's cap under 100 would have red the arm on a rung the engine
+never gates. And its non-vacuity floor sat at 10 against a real population of
+25, so fourteen tools could have left the sweep silently.
+
+**AND ONE ACCEPTANCE CRITERION HAD NO TEST AT ALL**, found by working the
+checklist rather than by a reviewer. "The wield gate needed no table change"
+has two halves: the tier-5 row reads 100, and farming can REACH 100. The
+knife-edge suite proves the ladder against the NODE professions' teaching
+ceilings and farming has no nodes, so the second half rested on nothing.
+`farmingTeachingCeilingFor(4)` is 100, so tier-4 crops do teach to the cap and
+the rung below opens exactly that ground; pinned now, and proven by dropping
+that ceiling to 95, which reds.
+
+REFUTED, recorded so it is not re-raised: the `orphans` arm in
+`tests/farm_recipes.test.ts` was described as a superset of the two loops it
+sits between. It is not (its filter is false by construction for the four hoe
+twins, and the dish-only loop is stricter for the other eight), and the
+comment now says so rather than the arm being removed. Nothing was trimmed.
+
+**AND A FOURTH REVIEWER FOUND THE PROSE ITSELF WAS WRONG.** After the fix
+round, a fresh read of the whole diff returned three BLOCKING findings, all of
+them false claims in the design-doc prose this phase added, and all refuted by
+this phase's own tests:
+
+- "every crafted gathering tool has a non-crafter route through the delve Marks
+  counter" is false for both low hoe rungs and for the tier-6 rod, whose
+  absence `tests/delve_shop.test.ts` pins BY NAME.
+- The masterwrought R17 enforcement citation was FABRICATED. Neither file it
+  named contains R17 at all; the guard is `tests/provisioner_firewall.test.ts`.
+- The masterwrought R18 displacement citation likewise pointed at a file with
+  no displacement sweep in it.
+
+That is worth keeping beside the vacuous-pin findings, because it is the same
+failure in a different medium: a citation nobody ran is a claim nobody checked,
+and prose carries no test to catch it. The rule this phase's own matrix ends
+with, that the test is the authority when the two disagree, is exactly what
+these three violated.
+
+**THE STRAWMAN, and it was in the reasoning this phase is proudest of.** The
+hoe header argued the apex rung stays trainer-taught because the rod's
+drop-taught ground is that it gates catch band 5, so "the access argument is
+vacuous here". ROD_RECIPES does not say that. Its stated ground is
+masterwrought R8, "an apex rung reaches players through the pillars", which
+applies to ANY apex rung including this one; the band-5 clause answers a
+different question, why the schematic is Marks stock rather than a catch. So
+the comment refuted a position nobody holds and left the real argument
+standing. THE OUTCOME SURVIVES on the ground that always carried it, the
+tier-5 family precedent, but the recorded rationale was wrong and is rewritten
+to say so, including that R8 does apply and the tension is handed back rather
+than settled.
+
 ### THE SCOPE BOUNDARY
 
 This phase amends `docs/design/professions.md` for the GATHERING half only.
 The apex CRAFTING tier's own amendment belongs to Phase 16's content surface
 sweep, which is inside this packet, so pointing there is a sequencing
 statement and not a deferral.
+
+### THE HANDOFF TO PHASE 11j QA, AND THROUGH IT TO 11k
+
+- **THE GUARD IS THE DELIVERABLE, AND IT SHIPPED WITH FOUR ARMS THAT COULD NOT
+  FAIL.** `tests/gathering_supply_coverage.test.ts` is what outlives this
+  packet, and its first version carried four constant-self-comparisons, one of
+  which meant `isSelfFeedingFor` could have returned false unconditionally with
+  the whole file green. Anyone extending it should assume the same trap is one
+  edit away: put the LITERAL beside every derivation, and pin a predicate by
+  CALLING it plus the outcome it changes, never by observing that the corpus
+  contains both kinds of input.
+- **THE LADDERS WERE ALREADY WHOLE.** Zero empty bands across six families, so
+  no fill was owed on either arm. A later gathering-content phase inherits the
+  guard for free and cannot reopen a band without reddening it, which is the
+  whole reason this phase shipped a test rather than only an audit.
+- **THE APEX HOE'S CHANNEL IS AN OPEN MAINTAINER DECISION**, not a settled one.
+  The phase file and the 11i QA handoff disagree on tier AND acquisition, both
+  are settled records, and the ledger costs both. Executed as decision A
+  because the alternative is currently unshippable rather than merely
+  different. Flipping the ACQUISITION alone at tier 5 is one line plus its pin;
+  flipping the TIER is a wield-table row, a pattern item, a vendor row and four
+  re-derived counts, in that order.
+- **A CONTENT ID RIPPLES PAST THE PHASE'S OWN BATTERY, EVERY TIME.** One new
+  recipe id reached three art-debt pins in three files (one of them under
+  `scripts/`, outside `tests/` entirely), nine hand-listed craft fixtures, two
+  other phases' ledger suites, and a persisted-blob byte band. Every targeted
+  run was green while sixteen files were red. Run the FULL suite before
+  believing a content change is done, and run it on a tree nobody is editing.
+- **PROSE HAS NO TEST.** Three citations this phase wrote into
+  docs/design/professions.md named files that do not contain the rule they
+  claimed to enforce. The matrix's own closing line, that the test is the
+  authority when the two disagree, is the rule those three broke. A citation is
+  a claim; grep it before writing it.
+- **11k INHERITS A COMPLETE TIER-5 TOOL FAMILY** and the reading that goes with
+  it: three grandfathered rows at engineering 150 that are HISTORY and
+  permanently unlearnable, two authored rows at 125 that are REACHABLE. 150 is
+  not a target, and `tests/professions_rod_recipes.test.ts` now reds on any
+  recipe authored above its craft's cap with an acquisition list.
 
 ### DEVIATIONS FROM THE PHASE FILE, each recorded rather than silent
 
