@@ -115,7 +115,14 @@ const APEX_ROWS: ReadonlyArray<{
       ['sunpetal_herb', 2],
       ['cooking_salt', 2],
     ],
-    order: ['seasoned_stock', 'prime_cut', 'game_meat', 'frost_gourd', 'sunpetal_herb', 'cooking_salt'],
+    order: [
+      'seasoned_stock',
+      'prime_cut',
+      'game_meat',
+      'frost_gourd',
+      'sunpetal_herb',
+      'cooking_salt',
+    ],
     inputBefore: 422,
     inputAfter: 452,
     output: 360,
@@ -344,10 +351,9 @@ describe('masterwrought Phase 11h: the eight rows, per row', () => {
       expect(row.order.length, `${row.id} order must cover every entry`).toBe(
         recipe.reagents.length,
       );
-      expect(
-        new Set(row.order).size,
-        `${row.id} order must name each reagent once`,
-      ).toBe(row.order.length);
+      expect(new Set(row.order).size, `${row.id} order must name each reagent once`).toBe(
+        row.order.length,
+      );
     }
   });
 
@@ -490,9 +496,10 @@ describe('masterwrought Phase 11h GATE B: which crop goes on which plate', () =>
         (id) => requireRecipe(id).reagents.find((g) => PRODUCE_IDS.has(g.itemId))?.itemId,
       ),
     );
-    expect(tierThree.filter((c) => !taken.has(c)), 'the crop left over').toEqual([
-      'frost_lentils',
-    ]);
+    expect(
+      tierThree.filter((c) => !taken.has(c)),
+      'the crop left over',
+    ).toEqual(['frost_lentils']);
   });
 
   it('all three ask farming 50 and nothing else, so a role choice is not a gate choice', () => {
@@ -601,7 +608,10 @@ describe('masterwrought Phase 11h GATE D: the capstones and the tier-4 fine twin
     const hearth = requireRecipe('recipe_laden_hearth')
       .reagents.filter((g) => PRODUCE_IDS.has(g.itemId))
       .map((g) => g.itemId);
-    expect(hearth.filter((id) => cauldron.has(id)), 'the two capstones share no crop').toEqual([]);
+    expect(
+      hearth.filter((id) => cauldron.has(id)),
+      'the two capstones share no crop',
+    ).toEqual([]);
   });
 
   it('BOTH tier-4 fine twins now have a consumer at skillReq 125, the top of the catalog', () => {
@@ -609,9 +619,7 @@ describe('masterwrought Phase 11h GATE D: the capstones and the tier-4 fine twin
     // each twin was consumed by exactly one recipe, farming's own tier-4 dish
     // at cooking 100, so the tier-4 twins had no endgame consumer at all.
     for (const twin of ['fine_gilded_sunmelon', 'fine_evergarden_greens']) {
-      const consumers = ALL_RECIPES.filter((r) =>
-        r.reagents.some((g) => g.itemId === twin),
-      );
+      const consumers = ALL_RECIPES.filter((r) => r.reagents.some((g) => g.itemId === twin));
       expect(consumers.length, `${twin} consumers`).toBe(2);
       expect(
         consumers.filter((r) => r.skillReq >= 125).map((r) => r.id),
@@ -694,9 +702,10 @@ describe('masterwrought Phase 11h: obtainability, derived rather than argued', (
     for (const row of APEX_ROWS) {
       for (const [produceId] of row.produce) {
         const seed = seedFor(produceId);
-        expect(stocked.has(seed), `${row.id} needs ${produceId}, whose seed ${seed} is unstocked`).toBe(
-          true,
-        );
+        expect(
+          stocked.has(seed),
+          `${row.id} needs ${produceId}, whose seed ${seed} is unstocked`,
+        ).toBe(true);
         // A stocked row without a positive buyValue renders and then refuses,
         // which is farming's D11 trap and would make the faucet a lie.
         expect(ITEMS[seed]?.buyValue ?? 0, `${seed} buyValue`).toBeGreaterThan(0);
@@ -720,7 +729,9 @@ describe('masterwrought Phase 11h: the arithmetic above every row', () => {
       expect(after, `${row.id} input after`).toBe(row.inputAfter);
       expect(before, `${row.id} input before`).toBe(row.inputBefore);
       expect(outputValue(recipe), `${row.id} output`).toBe(row.output);
-      expect(after, `${row.id}: output ${row.output} vs input ${after}`).toBeGreaterThan(row.output);
+      expect(after, `${row.id}: output ${row.output} vs input ${after}`).toBeGreaterThan(
+        row.output,
+      );
       // The margin widened by exactly the produce this phase added, which is
       // the whole safety argument for putting a reagent on a tight row.
       expect(after - row.output - (before - row.output), `${row.id} margin delta`).toBe(added);

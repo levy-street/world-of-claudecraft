@@ -374,7 +374,10 @@ describe('FARM_RECIPES: the farm-economy hook set', () => {
     // catalog's ceiling at 125 and until Phase 11h nothing farming grows
     // reached it, so a census that stops at 100 leaves the exact hole R20 names.
     expect(
-      endgameBills.filter((r) => r.skillReq >= 125).map((r) => r.id).sort(),
+      endgameBills
+        .filter((r) => r.skillReq >= 125)
+        .map((r) => r.id)
+        .sort(),
       'produce must reach the 125 rung, the top of the catalog',
     ).toEqual(['recipe_grand_cauldron', 'recipe_laden_hearth']);
     // The claim masterwrought R20 actually cares about, stated separately from the literal
@@ -416,9 +419,7 @@ describe('FARM_RECIPES: the farm-economy hook set', () => {
     // later walk-back that left every non-farm endgame consumer in ONE craft
     // would keep the list long and the claim hollow.
     expect(
-      new Set(
-        consumableEndgame.filter((r) => !farmOwnIds.has(r.id)).map((r) => r.professionId),
-      ),
+      new Set(consumableEndgame.filter((r) => !farmOwnIds.has(r.id)).map((r) => r.professionId)),
       'produce must reach the endgame of BOTH consumable crafts',
     ).toEqual(new Set(['alchemy', 'cooking']));
   });
