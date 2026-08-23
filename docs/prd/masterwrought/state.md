@@ -12201,6 +12201,37 @@ change riding a values-only retune. Farming already pushed the same deed to its
 fourth crop in an earlier phase. The deed's own desc drifts further from what it
 does either way. RATIFY OR RETUNE.
 
+### THE FULL SUITE, ON A FROZEN TREE, BOTH ENDS STAMPED
+
+Four runs, because the first three earned their reds. Every one on a COMMITTED
+clean tree with the tip recorded before the run, which is the only form a suite
+number is evidence in.
+
+| tip | result | what it found |
+|---|---|---|
+| 9bf6b50873 | EXIT=1, 5 files | four of them the deadlock fix's own wake, one the display heal the phase falsified |
+| a537e2910d | EXIT=1, 2 files, 98 tests, 2 unhandled | ONE import: a partial vi.mock of the module reliquary_cell_art had just gained a dependency on |
+| 6a2ba57084 | **EXIT=0** | 3049 files passed / 12 skipped (3061); 43436 passed / 2 expected fail / 115 skipped (43553) |
+| b632918d01 | **EXIT=0** | identical numbers at the final tip, after the two mocks were made additive |
+
+AGAINST THE PHASE BASELINE at ed73c8d572 (3048 files / 12 skipped, 43410 passed
+/ 2 expected fail / 115 skipped): +1 file, which is tests/recipe_reachability,
+and +26 tests. `npm run ci:changed` at the final tip is EXIT=0 over 793 files
+with 3094 warnings and zero errors; `npx tsc --noEmit` is clean.
+
+THE SECOND RUN IS THE ONE TO REMEMBER, and its lesson is repo-wide rather than
+this packet's. Adding two imports to `src/ui/reliquary_cell_art.ts` reddened
+`reliquary_window_behavior` and `reliquary_window_jump`, 98 tests, because both
+`vi.mock('../src/ui/icons')` with a BARE FACTORY listing exactly the exports
+they used. A source module gaining a dependency silently invalidates every
+partial mock of that dependency, in files the change never touches and no
+targeted run selects, so nothing short of the full suite can see it. Both are
+converted to the additive `...(await importOriginal())` form the repo already
+uses in 37 other files, and the immunity is DRIVEN (a third icons import leaves
+both green where it previously threw). SIXTY-FOUR other test files still carry
+the bare form; sweeping them is its own task, not this packet's, and it is
+recorded here so it is found rather than rediscovered.
+
 ### THE HANDOFF TO PHASE 11i QA, AND THROUGH IT TO 11j
 
 - **THE UNLEARNABLE-AT-150 FINDING IS CONFIRMED IN CODE, and 11j inherits it as
