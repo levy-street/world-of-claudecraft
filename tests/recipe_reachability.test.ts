@@ -244,6 +244,18 @@ describe('the crafting economy bootstraps from an empty realm', () => {
     expect(ALL_RECIPES.length).toBeGreaterThan(100);
     expect(gatedSize, 'the model must withhold the tool-gated products').toBeGreaterThan(0);
     expect(seedSize, 'and the seed must be a proper subset of the answer').toBeLessThan(owned.size);
+    // AND THE SEED AND THE GATED SET PARTITION THE NON-CRAFTED ITEMS, which is
+    // the claim the two lines above only look like they make. Driven: under a
+    // seed loop that withholds NOTHING (add every id unconditionally, the exact
+    // scenario the comment names) both guards above still pass, because `gated`
+    // is populated whether or not its ids were also seeded and crafted outputs
+    // grow `owned` regardless. The sum is what actually catches it: a seed that
+    // absorbs the gated ids overshoots the total.
+    const nonCrafted = Object.keys(ITEMS).filter((id) => !CRAFTED_OUTPUTS.has(id)).length;
+    expect(
+      seedSize + gatedSize,
+      'the seed and the gated set must PARTITION the non-crafted items',
+    ).toBe(nonCrafted);
     expect(owned.has('clockreel_fishing_rod')).toBe(true);
   });
 

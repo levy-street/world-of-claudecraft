@@ -12201,6 +12201,51 @@ change riding a values-only retune. Farming already pushed the same deed to its
 fourth crop in an earlier phase. The deed's own desc drifts further from what it
 does either way. RATIFY OR RETUNE.
 
+### THE MUTATION BATTERY, FINAL: 16 RUN, 16 DEAD
+
+Fourteen driven by a fresh reviewer at the finished tip, one surviving; both of
+that pass's findings closed and driven here, for 16 dead in total. Every one
+applied with the diff printed, run, restored by file copy and verified.
+
+**THE SURVIVOR IS THE SPLIT'S OWN SEAM, and it was a real defect rather than a
+theoretical one.** Dividing the food radial into a family that owes distinct
+prims and a pre-dating set that does not left the CROSS-LIST direction
+unchecked: giving `deepwater_feast` (family) the byte-identical prim list of
+`harvest_feast` (pre-dating) painted two identical 32px glyphs and the whole icon
+suite stayed green, A4 included, because A4's key is the whole recipe and the two
+radial palettes differ. The two colliding ids are also the two PLACEABLE FEASTS,
+a sibling pair one rung apart that a player can hold at once, so it is the worst
+pair in the family to let collide.
+
+The close asserts nothing false, which is the part worth keeping: the `seen` map
+is SEEDED from the pre-dating set before the family loop runs. Pre-dating dishes
+are still not required to be distinct from each other, because the seed loop
+never checks a clash, so the exemption survives exactly; what becomes impossible
+is a dish in the family colliding with any dish at all, old or new, which is the
+only direction a new plate can actually break. Driven: the collision now reds
+naming both ids.
+
+**AND R2's REPLACEMENT GUARDS DID NOT CATCH R2's OWN NAMED CASE.** The tautology
+was gone and `round < 0` reddened, but the scenario the comment named, a seed
+that withholds NOTHING, passed both new guards: `gatedSize > 0` holds because
+`gated` is populated whether or not its ids were also seeded, and
+`seedSize < owned.size` holds because crafted outputs grow `owned` regardless.
+Only the driven deadlock arm caught it, so the guards proved "the loop ran"
+while the comment claimed they proved "the model withheld something". The fix is
+the partition: `seedSize + gatedSize` must equal the non-crafted item count, and
+a seed that absorbs the gated ids overshoots it. Driven: 863 against 842.
+
+TWO THINGS THE BATTERY SETTLED THAT MY OWN ARMS ONLY APPROXIMATED. R5's logging
+and herbalism gates are pinned to exactly 4 from both sides without another run
+(the axe mutation reddening proves the gate is above 3, since a tier-3 vendor axe
+would otherwise supply it, and the unmutated suite being green proves it is at
+most 4, since the real recipe consumes it and does not strand); my own arms
+checked only the professionId. And the A4c roster of four is triangulated by
+three independent facts rather than by the `console.log` I derived it from.
+
+R7's may-only-shrink pin is NOT drivable from source (only editing the list can
+trip it) and is recorded as verified by inspection rather than claimed as driven.
+
 ### THE FULL SUITE, ON A FROZEN TREE, BOTH ENDS STAMPED
 
 Four runs, because the first three earned their reds. Every one on a COMMITTED

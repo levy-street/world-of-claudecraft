@@ -544,7 +544,29 @@ describe('item webp icons', () => {
       PRE_DATED_FOOD_RADIAL.length,
       'PRE_DATED_FOOD_RADIAL may only shrink; a new dish belongs in DISH_ICON_IDS',
     ).toBeLessThanOrEqual(4);
+    // SEEDED FROM THE PRE-DATING SET FIRST, and the ordering is the assertion.
+    //
+    // Splitting the radial into a family that owes distinct prims and a set
+    // that does not left one gap open, and it was real rather than theoretical:
+    // rv-tests gave `deepwater_feast` (family) the byte-identical prim list of
+    // `harvest_feast` (pre-dating) and the whole icon suite stayed green. Two
+    // ids painting the same 32px glyph is the exact defect A4c exists for, and
+    // A4 cannot see it either because its key is the whole recipe and the two
+    // radial palettes differ. The two ids in that collision are also the two
+    // PLACEABLE FEASTS, a sibling pair one rung apart that a player can hold at
+    // the same time, so it is the worst pair in the family to let collide.
+    //
+    // Seeding closes it while asserting nothing false. Pre-dating dishes are
+    // still NOT required to be distinct from EACH OTHER (that is the exemption,
+    // and it survives intact, because the seed loop never checks a clash). What
+    // becomes impossible is a dish in the family colliding with any dish at
+    // all, old or new, which is the direction a new plate can actually break.
     const seen = new Map<string, string>();
+    for (const id of PRE_DATED_FOOD_RADIAL) {
+      seen.set(JSON.stringify(itemIconRecipe(id).prims), id);
+    }
+    // The seed really carried something, so the ordering above is not decoration.
+    expect(seen.size).toBeGreaterThan(0);
     for (const id of DISH_ICON_IDS) {
       const recipe = itemIconRecipe(id);
       // Non-vacuity: the family really does share the food radial today,
