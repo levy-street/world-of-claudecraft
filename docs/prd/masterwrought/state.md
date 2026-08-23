@@ -11453,11 +11453,25 @@ and the build was red.
 ## Phase 11i QA ledger (2026-08-23, verify the angler's endgame)
 
 VERDICT: **FAIL**, on one deliverable, with everything else PASS. Base tip
-3aba114abd. LOCAL, no push, no PR. Fix commits, in order: 04db9d44d6 (the tenth
-release sync), ceb19f9195 (the claims the phase falsified), 5e829aa127 (the
-coverage the widened ladder left open), 117a4e90f2 (the import sort that gate
-demanded), a60aa9a4d7 (the guide prose repair, the re-key and the fills), then
-this ledger.
+3aba114abd. LOCAL, no push, no PR. Fourteen commits: 04db9d44d6 (the tenth
+release sync), then the fix round, `git log --oneline 04db9d44d6..HEAD`. In
+order: the claims the phase falsified; the coverage the widened ladder left
+open; the import sort the gate demanded; the guide prose repair with its
+seven-key re-key and five locale fills; this ledger; the touch-rework prose the
+merge falsified; the reachability model's missing farming ladder; the FAQ
+realignment; the shard union's own justification, corrected; the whole-cell row
+order; the wiki prose accuracy pin; two derivations left a step behind; and the
+restore of 130 FAQ translations this audit wrongly retired.
+
+TWO OF THIS AUDIT'S OWN CLAIMS WERE FALSIFIED BY ITS REVIEWERS AND BOTH ARE
+CORRECTED IN PLACE, which is the honest way to read the commit list above. A
+"zero bundles quote the retired gain" claim was measured over one key's context
+and was false for `faq.a7` in fifteen bundles. A coverage figure was measured
+over a population the shard guard does not walk. A third, worse, was caught by
+re-checking a premise in a second locale: the FAQ misalignment was verified in
+zh_CN and generalised to seventeen other locales, which destroyed 130 rows of
+correct Latin-script translation before they were restored. All three are the
+same defect: a measurement reported as evidence about more than it measured.
 
 THE PHASE IN ONE LINE, AS AUDITED: the numbers are right and reproduce
 independently, the nine shipped cells really are byte identical, the 203 moved
