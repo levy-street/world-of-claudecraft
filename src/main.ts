@@ -1179,6 +1179,9 @@ function mountGameUi(): void {
   // earlier, before any world entry) silently no-ops on it. Re-sync now so the
   // desktop micro-menu entry is revealed the moment the in-game HUD actually exists.
   syncDiscordEntries();
+  // #mm-donate also lives inside the lazy template. The boot-time wiring runs
+  // before this clone exists, so re-run it now to reveal and activate the rail.
+  wireDonateLinks();
 }
 
 // ---------------------------------------------------------------------------

@@ -1120,6 +1120,13 @@ describe('client HTML shell', () => {
     );
     expect(mainTs).toContain('function syncDiscordEntries(): void {');
     expect(mainTs).toContain("const desktopBtn = document.getElementById('mm-discord');");
+    const mountGameUi = mainTs.slice(
+      mainTs.indexOf('function mountGameUi(): void {'),
+      mainTs.indexOf('// Shared game wiring'),
+    );
+    expect(mountGameUi).toMatch(
+      /insertBefore\(template\.content\.cloneNode\(true\), startScreen\);[\s\S]*wireDonateLinks\(\);/,
+    );
   });
 
   it('ships the consumables quick bar in BOTH entries, collapsed by default', () => {
