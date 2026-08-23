@@ -564,6 +564,19 @@ describe('the catch tables follow the shortfall schedule', () => {
         ).toHaveLength(1);
         expect(at(null), `${zoneId} band ${band}: the null row is last`).toBe(ids.length - 1);
         const junkAt = JUNK_ROWS[zoneId].map((id) => at(id)).filter((i) => i >= 0);
+        // EVERY junk row is present, and IN ITS AUTHORED ORDER. Without the
+        // length floor, Math.min and Math.max over an empty junkAt yield
+        // Infinity and -Infinity, so a cell that lost its junk rows entirely
+        // would satisfy both order assertions below vacuously; without the sort
+        // check, Mirefen's two junk rows could swap with each other silently,
+        // which is a draw change this file otherwise pins nowhere.
+        expect(junkAt, `${zoneId} band ${band}: every junk row present`).toHaveLength(
+          JUNK_ROWS[zoneId].length,
+        );
+        expect(
+          [...junkAt].sort((a, b) => a - b),
+          `${zoneId} band ${band}: junk rows in their authored order`,
+        ).toEqual(junkAt);
         const shippedFishAt = ids
           .map((id, i) =>
             id !== null &&
@@ -601,6 +614,17 @@ describe('the catch tables follow the shortfall schedule', () => {
       }
     }
     expect(ordered, 'every cell had its row order pinned').toBe(18);
+    // AND EVERY BAND CARRIES THE SAME ZONE KEYS. ZONE_IDS is read off band 0, so
+    // without this a zone table authored only from band 3 up would never be
+    // walked by anything in this file and `ordered` would still read 18: the
+    // count is a product of the two loops, not evidence that the loops covered
+    // the table.
+    for (let band = 0; band <= MAX_BAND; band++) {
+      expect(
+        Object.keys(FISHING_TABLES_BY_BAND[band]).sort(),
+        `band ${band} carries exactly the band-0 zone keys`,
+      ).toEqual([...ZONE_IDS].sort());
+    }
     // And once a catch enters it never leaves, in any zone: a cell that dropped
     // a row a lower band paid would be a table going BACKWARDS for the angler
     // who climbed to it.

@@ -3344,6 +3344,10 @@ describe('Guide professions pages and routes', () => {
     for (let n = 1; n <= PROF_FAQ_COUNT; n += 1) {
       expect(t(`guide.profPages.faq.q${n}` as never).length).toBeGreaterThan(0);
     }
+    // The LITERAL first: FAQ_ANSWER_KEYS against PROF_FAQ_COUNT alone is two
+    // exports of one module agreeing with each other, so dropping an answer and
+    // decrementing the count would pass. The count is what the page renders.
+    expect(PROF_FAQ_COUNT, 'the professions FAQ has ten rows').toBe(10);
     expect(FAQ_ANSWER_KEYS).toHaveLength(PROF_FAQ_COUNT);
     for (const key of FAQ_ANSWER_KEYS) {
       expect(t(key as never).length, key).toBeGreaterThan(0);
@@ -3352,57 +3356,100 @@ describe('Guide professions pages and routes', () => {
     // GENERATED content is fresh and that every key RESOLVES; it has never
     // checked that a sentence is TRUE. That gap is this packet's most expensive
     // one: Phase 11i shipped six prose keys stating a catch ladder, a rod count
-    // and a gain schedule the same commit had just replaced, and the phase's own
-    // review round found five of them only by reading. The freshness gate cannot
-    // see it, because regenerating a table does not touch the paragraph beside
-    // it.
+    // and a gain schedule the same commit had just replaced, the review round
+    // found five of them by reading, and the QA found three more the same way.
+    // Regenerating a table does not touch the paragraph beside it, so no
+    // freshness gate can ever see it.
     //
-    // So pin the LOAD-BEARING NUMBERS against the shipped constants rather than
-    // against a second literal. Every expectation below fails if the sim moves
-    // and the prose does not, which is the only direction that has ever gone
-    // wrong here.
-    const fishProse = [
-      t('guide.profPages.fish.tablesNoteSixBands' as never, { rare: 'Sunglint Koi' }),
-      t('guide.profPages.fish.scheduleNoteRetuned' as never, { cutoff: '100' }),
-      t('guide.profPages.fish.startBodyThreeRods' as never),
-      t('guide.profPages.bandsBodySplitLadder' as never),
-      t('guide.profPages.toolsNoteThreeRods' as never, { tier2Prof: '40', tier3Prof: '70' }),
-      t('guide.professions.curveBodyRetunedFishing' as never, { step: '25' }),
-      t('guide.profPages.faq.a7RetunedTaper' as never),
-    ].join('\n');
+    // ASSERTED PER KEY, NEVER AGAINST A JOIN, and the first draft of this arm is
+    // why that is spelled out. It concatenated seven keys and ran toContain
+    // against the concatenation, so a value present in ANY one key satisfied the
+    // pin for ALL seven. Three of the seven carry all four gain values
+    // independently, so any one of them could have gone fully stale invisibly:
+    // the join could not see a PARTIAL correction, which is the exact failure
+    // the arm exists for.
+    const prose = (key: string, vals?: Record<string, string>) => t(key as never, vals as never);
 
-    // The four gain values, EVERY one of them, read off the shipped schedule.
-    // The retired curve (a full point, 0.1, 0.02) is what shipped in this prose
-    // for a whole phase, so its absence is asserted too: a partial correction
-    // that leaves one old number behind is the exact failure that happened.
-    for (const row of FISHING_GAIN_SCHEDULE) {
-      expect(fishProse, `the wiki must publish the shipped gain ${row.gain}`).toContain(
-        String(row.gain),
-      );
+    // Each key that quotes the gain schedule states EVERY value in it. Named
+    // one at a time so a stale sibling cannot hide behind a corrected one.
+    const gainKeys = [
+      ['guide.professions.curveBodyRetunedFishing', { step: '25' }],
+      ['guide.profPages.fish.scheduleNoteRetuned', { cutoff: '100' }],
+      ['guide.profPages.faq.a7RetunedTaper', undefined],
+    ] as const;
+    for (const [key, vals] of gainKeys) {
+      const text = prose(key, vals as never);
+      for (const row of FISHING_GAIN_SCHEDULE) {
+        expect(text, `${key} must publish the shipped gain ${row.gain}`).toContain(
+          String(row.gain),
+        );
+      }
     }
-    for (const retired of ['0.02', '0.1 of a point', 'a full point per catch']) {
-      expect(fishProse, `the wiki still publishes the retired gain ${retired}`).not.toContain(
-        retired,
-      );
-    }
-    // The ladder's shape: how many bands there are, and the two thresholds a
-    // reader can act on. Spelled the way the prose spells them, so the pin
-    // fails on a number rather than on a phrasing choice.
+
+    // The ladder's shape, on the key that states it.
     expect(FISHING_CATCH_BAND_THRESHOLDS).toHaveLength(6);
-    expect(fishProse, 'the wiki must say SIX catch bands').toContain('six catch bands');
-    expect(fishProse, 'the wiki must not still say three').not.toContain('three catch bands');
-    expect(fishProse, 'band 2 opens at its shipped threshold').toContain(
+    const tables = prose('guide.profPages.fish.tablesNoteSixBands', { rare: 'Sunglint Koi' });
+    expect(tables, 'the catch-table page must say SIX bands').toContain('six catch bands');
+    expect(tables, 'and band 2 must carry its shipped threshold').toContain(
       `band 2 at ${FISHING_CATCH_BAND_THRESHOLDS[2]}`,
     );
-    // The rod ladder: the shipped count of CRAFTED rods, and the claim the
-    // phase existed to falsify.
+
+    // THE LADDER SAYS THE GATE MOVES ONE MORE TIME. There are FOUR distinct
+    // thresholds in a six-rung ladder, so "past the third rung the skill gate
+    // stops moving" is false: the third rung is 150 and the gate moves once
+    // more, to the 200 cap. Pinned arithmetically rather than by phrase, so a
+    // reword cannot dodge it and a genuine ladder change moves it.
+    const distinctThresholds = [...new Set(FISHING_CATCH_BAND_THRESHOLDS)];
+    expect(distinctThresholds).toEqual([0, 100, 150, 200]);
+    const bands = prose('guide.profPages.bandsBodySplitLadder');
+    for (const at of distinctThresholds) {
+      expect(bands, `the bands paragraph must name the threshold ${at}`).toContain(String(at));
+    }
+    expect(bands, 'the bands paragraph must not claim the gate stops before the cap').not.toContain(
+      'past the third rung the skill gate stops moving',
+    );
+
+    // The rod ladder: the shipped count of CRAFTED rods, on the two keys that
+    // make a claim about it.
     expect(ROD_RECIPES).toHaveLength(3);
-    expect(fishProse, 'the wiki must say THREE rods sit above the vendor ladder').toContain(
-      'Three rods sit above those',
+    expect(
+      prose('guide.profPages.fish.startBodyThreeRods'),
+      'the fishing page must say THREE rods sit above the vendor ladder',
+    ).toContain('Three rods sit above those');
+    // POSITIVELY, not by absence. The first draft forbade the phrase "rather
+    // than access, and they will be the entry ticket", which the corrected page
+    // still says TRUTHFULLY about the LAND trades, whose tier 4 and 5 tools
+    // really do open no ground. The assertion fired on a true sentence, which is
+    // what absence pins do: they cannot tell which subject a phrase is about.
+    const tools = prose('guide.profPages.toolsNoteThreeRods', {
+      tier2Prof: '40',
+      tier3Prof: '70',
+    });
+    expect(tools, 'the tools page must say fishing has THREE crafted rods').toContain(
+      'Fishing has three of its own',
     );
-    expect(fishProse, 'the wiki must not still say the crafted rods buy no access').not.toContain(
-      'instead of access',
+    expect(tools, 'and that a fishing rod opens a band skill alone cannot reach').toContain(
+      'opens a catch band that skill alone can never reach',
     );
+
+    // THE KOI ROW, derived from the table rather than from the prose. It was
+    // re-keyed in this same round for an accuracy defect and had no accuracy
+    // coverage until now, which is the shape of the whole problem: the key that
+    // was JUST corrected is the one most likely to be corrected wrong.
+    const koiWeightAt = (band: number) =>
+      FISHING_TABLES_BY_BAND[band].eastbrook_vale.find((r) => r.itemId === 'glimmerfin_koi')
+        ?.weight ?? 0;
+    const koi = prose('guide.profPages.fish.koiBodyBandFlat');
+    expect(koi, 'the koi page states its band-0 odds').toContain(`a ${koiWeightAt(0)} percent row`);
+    expect(koi, 'and its band-1 odds').toContain(`${koiWeightAt(1)} at band 1`);
+    expect(koi, 'and that it is FLAT from band 2 up').toContain(
+      `${koiWeightAt(2)} from band 2 upward`,
+    );
+    // The flatness is the claim, so it is checked against the table and not
+    // taken from the sentence: every band from 2 up carries the same weight.
+    for (let b = 3; b < FISHING_TABLES_BY_BAND.length; b++) {
+      expect(koiWeightAt(b), `the koi is flat at band ${b}`).toBe(koiWeightAt(2));
+    }
 
     // Format keys stay translator-controlled, pinned as literals.
     expect(t('guide.profPages.matFmt' as never, { name: 'Copper Ore', count: '4' })).toBe(

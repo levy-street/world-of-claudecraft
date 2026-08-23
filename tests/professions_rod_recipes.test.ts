@@ -22,7 +22,7 @@ import { ITEMS, NPCS } from '../src/sim/data';
 import { rodTierRequiredForZone } from '../src/sim/professions/fishing_zones';
 import { baseMaterialFor } from '../src/sim/professions/material_grades';
 import { isGatherToolUse } from '../src/sim/professions/tools';
-import { PRE_TRAINING_RECIPE_IDS } from '../src/sim/professions/training';
+import { PRE_TRAINING_RECIPE_IDS, teachTierMet } from '../src/sim/professions/training';
 import { tierForSkill } from '../src/sim/professions/wheel';
 
 const rodTierOf = (itemId: string): number | undefined => {
@@ -215,10 +215,19 @@ describe('the crafted rod ladder', () => {
     // numbers, so a change to the tier step moves this pin with the gate
     // instead of leaving it behind.
     const grandfathered = new Set(PRE_TRAINING_RECIPE_IDS);
+    // teachTierMet ITSELF, at the craft's own cap, never a local copy of its
+    // comparison. The first draft of this arm re-implemented it as
+    // `tierForSkill(r.skillReq) > tierForSkill(craftMaxSkillFor(...))`, which is
+    // the same shape as the defect the phase's own review round closed in
+    // tests/recipe_reachability.test.ts: a fixture driving a COPY of the rule
+    // instead of the rule. It moved with tierForSkill, which is shared, and NOT
+    // with teachTierMet, so adding an arm to the shipped gate would have left
+    // this pin green while every recipe it clears became unlearnable.
+    const atCap = (professionId: string) => ({ [professionId]: craftMaxSkillFor(professionId) });
     const unlearnable = ALL_RECIPES.filter((r) => {
       if (grandfathered.has(r.id)) return false;
       if (!r.acquisition || r.acquisition.length === 0) return false;
-      return tierForSkill(r.skillReq) > tierForSkill(craftMaxSkillFor(r.professionId));
+      return !teachTierMet(r, atCap(r.professionId) as never);
     }).map(
       (r) => `${r.id} (${r.professionId} ${r.skillReq} > cap ${craftMaxSkillFor(r.professionId)})`,
     );
@@ -232,13 +241,18 @@ describe('the crafted rod ladder', () => {
     // catalog, and the comparison really can answer true (the grandfathered land
     // tools at 150 are exactly the rows it would name if they were not exempt).
     expect(ALL_RECIPES.filter((r) => (r.acquisition ?? []).length > 0).length).toBeGreaterThan(20);
+    // As a SORTED SET, not in table order: the claim is WHICH rows sit above
+    // their cap, and an ordered literal over an ALL_RECIPES filter also reds on
+    // a pure table reorder, which is not the defect this guards.
     expect(
-      ALL_RECIPES.filter(
-        (r) => tierForSkill(r.skillReq) > tierForSkill(craftMaxSkillFor(r.professionId)),
-      ).map((r) => r.id),
+      ALL_RECIPES.filter((r) => !teachTierMet(r, atCap(r.professionId) as never))
+        .map((r) => r.id)
+        .sort(),
       'the three land tier-5 tools are the only rows above their cap, and they ' +
         'are learnable only because they predate training',
-    ).toEqual(['recipe_arcanite_mining_pick', 'recipe_elderwood_axe', 'recipe_sunpetal_sickle']);
+    ).toEqual(
+      ['recipe_arcanite_mining_pick', 'recipe_elderwood_axe', 'recipe_sunpetal_sickle'].sort(),
+    );
   });
 
   it('rides ALL_RECIPES, and stays out of TOOL_RECIPES', () => {
