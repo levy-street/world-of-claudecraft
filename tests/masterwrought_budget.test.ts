@@ -368,9 +368,12 @@ const FLASK_BILL: { itemId: string; count: number }[] = [
   { itemId: 'highland_barley', count: 1 },
   { itemId: 'glass_vial', count: 1 },
 ];
-/** The four reagents every role plate shares, in shipped order, with the ONE
+/** The FIVE reagents every role plate shares, in shipped order, with the ONE
  *  crop row spliced in at the position the bills author it (after the meats,
- *  before the herb). Every plate is this list plus exactly one entry. */
+ *  before the herb). Every plate is those five plus exactly one entry.
+ *  (The count read "four" until the Phase 11h QA; the shared set is
+ *  seasoned_stock, prime_cut, game_meat, sunpetal_herb and cooking_salt, and
+ *  tests/provisioning_supply_line_apex.test.ts asserts five one file over.) */
 const roleFoodBill = (cropId: string, count: number): { itemId: string; count: number }[] => [
   { itemId: 'seasoned_stock', count: 1 },
   { itemId: 'prime_cut', count: 2 },

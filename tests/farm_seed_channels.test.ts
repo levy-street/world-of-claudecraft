@@ -217,19 +217,27 @@ describe('THE IDENTITY GUARD: farming never becomes conditional on raiding', () 
     // 50 (recipe_elixir_of_the_boar, recipe_venomfire_elixir,
     // recipe_elixir_of_the_serpent).
     //
-    // THE FLOOR IS THREE, not "greater than zero", and the count is the point:
-    // a floor of one would survive the mutation that matters, which is a later
-    // phase quietly walking two of the three rungs back and leaving the elixir
-    // line half-supplied while this arm stayed green. The rung coverage itself
-    // is pinned in tests/provisioning_supply_line.test.ts; this floor is what
-    // stops the loop below from running over an empty set.
+    // THE FLOOR IS NOT "greater than zero", and the count is the point: a floor
+    // of one would survive the mutation that matters, which is a later phase
+    // quietly walking rungs back and leaving the elixir line half-supplied
+    // while this arm stayed green. The rung coverage itself is pinned in
+    // tests/provisioning_supply_line.test.ts; this floor is what stops the loop
+    // below from running over an empty set.
+    //
+    // RAISED THREE TO SEVEN AT THE PHASE 11h QA. Phase 11g set it at three
+    // against a set of exactly three (the elixir rungs 0, 25 and 50). Phase 11h
+    // took the set to SEVEN by putting the grain in all three apex flasks and
+    // the showcase pair in recipe_grand_cauldron, OBSERVED the new value in its
+    // own pin table, and left the floor where it was, which meant its own four
+    // alchemy rows could be walked back with this arm green. A floor that sits
+    // four under the set it guards is not guarding it.
     expect(
       alchemyWithFarm.length,
-      // The assertion counts ROWS, not rungs: three rows all at rung 0 would
+      // The assertion counts ROWS, not rungs: seven rows all at rung 0 would
       // satisfy it. The rung DISTRIBUTION is pinned in
       // tests/provisioning_supply_line.test.ts, which is where that claim lives.
-      'the alchemy line must keep at least three produce-consuming rows',
-    ).toBeGreaterThanOrEqual(3);
+      'the alchemy line must keep at least seven produce-consuming rows',
+    ).toBeGreaterThanOrEqual(7);
     for (const recipe of alchemyWithFarm) {
       expect(
         recipe.reagents.some((g) => herbSet.has(g.itemId)),

@@ -342,7 +342,8 @@ describe('FARM_RECIPES: the farm-economy hook set', () => {
     // PHASE 11h DOUBLES IT, 8 TO 16, and this is the number masterwrought R20
     // was written to move. The eight it adds are the whole apex consumable
     // tier: the three role plates and the three flasks at rung 100, and both
-    // skill-125 capstones, which are the top of the entire catalog. Every one
+    // skill-125 capstones, the top of the CONSUMABLE catalog (cooking and
+    // alchemy top out at 125; the table tops out at 150, the apex tool family). Every one
     // of them is a row farming did not write, so the half of this census that
     // is not farming buying from itself goes from ONE member to NINE.
     expect(endgameBills.map((r) => r.id).sort()).toEqual(
@@ -378,7 +379,7 @@ describe('FARM_RECIPES: the farm-economy hook set', () => {
         .filter((r) => r.skillReq >= 125)
         .map((r) => r.id)
         .sort(),
-      'produce must reach the 125 rung, the top of the catalog',
+      'produce must reach the 125 rung, the top consumable rung',
     ).toEqual(['recipe_grand_cauldron', 'recipe_laden_hearth']);
     // The claim masterwrought R20 actually cares about, stated separately from the literal
     // above so a future re-tier that moves WHICH rows qualify still has to keep

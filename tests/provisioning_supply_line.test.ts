@@ -525,19 +525,38 @@ describe('masterwrought R17 RULE 2: the accent rule', () => {
   });
 
   it('the accent rule governs a real, non-empty set of rows', () => {
-    // The floor under both arms below. Nine rows are this phase's; the set is
-    // derived, so a later phase's rows join it by existing rather than by
-    // somebody remembering to extend a list.
+    // The floor under both arms below. The set is derived, so a later phase's
+    // rows join it by existing rather than by somebody remembering to extend a
+    // list.
+    //
+    // THE FLOOR MOVES WITH THE SET, and the Phase 11h QA is why it says so
+    // rather than leaving the number where 11g put it. Phase 11g wrote this
+    // floor at NINE against a set of exactly nine, so it was tight. Phase 11h
+    // nearly doubled the set to SEVENTEEN (its three role plates, its three
+    // flasks and its two capstones all joined by existing) and left the floor
+    // at nine, which meant all eight of the new rows could have dropped out of
+    // the sweep with this arm still green. That matters more here than the
+    // usual vacuity case: BOTH of Phase 11h's recorded deviations from settled
+    // rulings (the flask grain at 1, the capstones at 2 plus 1) are justified
+    // by this sweep governing those rows, so a sweep that stopped covering them
+    // would retire the justification silently.
     const rows = accentGovernedRows();
-    expect(rows.length, 'the accent-governed sweep').toBeGreaterThanOrEqual(9);
+    expect(rows.length, 'the accent-governed sweep').toBeGreaterThanOrEqual(17);
     // And the two exclusions really exclude: farming's own dishes and the hoe
     // ladder are OUT, which is what makes the sweep a rule about shipped ladder
     // rows rather than about every produce consumer in the game.
     const ids = rows.map((r) => r.id);
     expect(ids, 'farming own dishes are excluded').not.toContain('recipe_vale_hearth_loaf');
     expect(ids, 'the hoe ladder is excluded').not.toContain('recipe_bronze_hoe');
-    expect(ids, 'this phase rows are included').toContain('recipe_marlows_grand_roast');
+    expect(ids, 'the Phase 11g rows are included').toContain('recipe_marlows_grand_roast');
     expect(ids, 'the choke point is included').toContain('recipe_seasoned_stock');
+    // ONE NAMED ROW PER PHASE 11h FAMILY, because a bare count cannot say WHICH
+    // seventeen: the three families reached the sweep by three different routes
+    // (a rung-100 food row, a rung-100 daily-gated flask, a rung-125 capstone),
+    // so a walk-back that removed any one family alone is named here.
+    expect(ids, 'the Phase 11h role plates are included').toContain('recipe_stonepot_stew');
+    expect(ids, 'the Phase 11h flasks are included').toContain('recipe_ironhusk_flask');
+    expect(ids, 'the Phase 11h capstones are included').toContain('recipe_laden_hearth');
   });
 
   it('the accent rule actually REJECTS a violating row (the positive control)', () => {
@@ -728,7 +747,22 @@ describe('masterwrought R17 RULE 2: the accent rule', () => {
         }
       }
     }
-    expect(refusedUnderCountReading.sort()).toEqual([
+    // The ROW count is stated separately from the entry list, because the cost
+    // of the open decision is "how many shipped bills would have to be edited",
+    // and five entries across three rows is a very different bill from nine
+    // across SEVEN. (Nine entries over seven rows rather than nine:
+    // recipe_marlows_grand_roast and recipe_seasoned_stock contribute two
+    // entries each.)
+    //
+    // COUNTED OFF THE LITERAL ABOVE, not off the derived list (Phase 11h QA).
+    // Derived from `refusedUnderCountReading` this could not fail: the toEqual
+    // one line up has already pinned that list to the nine literal keys, whose
+    // distinct row count is seven by inspection. Counting the LITERAL instead
+    // makes it the checksum it was meant to be, in the same shape as the
+    // alchemy herb map and total in tests/provisioning_supply_line_apex.test.ts:
+    // a careless edit that adds a tenth key on a new row now has to move this
+    // number too.
+    const REFUSED_UNDER_COUNT_READING = [
       'recipe_elixir_of_the_serpent/frost_gourd',
       'recipe_laden_hearth/fine_evergarden_greens',
       'recipe_marlows_grand_roast/frost_gourd',
@@ -738,15 +772,10 @@ describe('masterwrought R17 RULE 2: the accent rule', () => {
       'recipe_seasoned_stock/marsh_rice',
       'recipe_stonepot_stew/frost_gourd',
       'recipe_warspice_skewers/highland_barley',
-    ]);
-    // The ROW count is stated separately from the entry list, because the cost
-    // of the open decision is "how many shipped bills would have to be edited",
-    // and five entries across three rows is a very different bill from nine
-    // across SEVEN. (Nine entries over seven rows rather than nine:
-    // recipe_marlows_grand_roast and recipe_seasoned_stock contribute two
-    // entries each.)
+    ];
+    expect(refusedUnderCountReading.sort()).toEqual(REFUSED_UNDER_COUNT_READING);
     expect(
-      new Set(refusedUnderCountReading.map((k) => k.split('/')[0])).size,
+      new Set(REFUSED_UNDER_COUNT_READING.map((k) => k.split('/')[0])).size,
       'shipped rows the count reading would force an edit to',
     ).toBe(7);
     // And the shipped reading accepts every one of them, so the two really do
@@ -1022,7 +1051,14 @@ describe('every touched bill still CRAFTS, not just type-checks', () => {
         craftSkills,
         recipe.professionId,
       ).count;
-      expect(required, `${recipe.id} must really need its ${reagent.itemId}`).toBeGreaterThan(0);
+      // NO `required > 0` FLOOR HERE (Phase 11h QA). One used to sit on this
+      // line and it could never fail: requiredReagentCountFor returns
+      // `count: Math.max(1, ...)` by construction, so the floor restated the
+      // implementation instead of testing it. The identical floor was retired
+      // from tests/provisioning_supply_line_apex.test.ts at this phase's own
+      // review round and this copy, in the sibling file the same phase edited,
+      // was missed. The assertion below is the one with teeth: it compares what
+      // the pricing rule REQUIRED against what resolveCraft actually SPENT.
       expect(
         rig.sim.countItem(reagent.itemId, rig.pid),
         `${recipe.id} must consume ${required} of its ${reagent.itemId}`,

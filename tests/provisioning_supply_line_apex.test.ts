@@ -33,6 +33,11 @@ import { ITEMS, NPCS, STATIONS } from '../src/sim/data';
 import { requiredReagentCountFor, resolveCraft } from '../src/sim/professions/crafting';
 import { stationsOfType } from '../src/sim/professions/stations';
 import type { ProfessionRecipeRecord } from '../src/sim/professions/types';
+import {
+  TIER3_TOOL_WIELD_PROFICIENCY,
+  TIER4_TOOL_WIELD_PROFICIENCY,
+  wieldRequirementForTier,
+} from '../src/sim/professions/wield_gate';
 import { Sim } from '../src/sim/sim';
 
 /** Every farm PRODUCE id and its fine twin, derived from the crop catalog, the
@@ -392,11 +397,12 @@ describe('masterwrought Phase 11h: the eight rows, per row', () => {
         recipe.reagents.map((g) => g.itemId),
         `${row.id} reagent order (the crafting window and the wiki render this sequence)`,
       ).toEqual(row.order);
-      // The order column must account for the WHOLE bill, so a reagent added
-      // without a table visit cannot hide past the end of the pinned sequence.
-      expect(row.order.length, `${row.id} order must cover every entry`).toBe(
-        recipe.reagents.length,
-      );
+      // The order column already accounts for the WHOLE bill: the toEqual above
+      // is array equality, which forces equal length, so the separate
+      // length check that used to sit here could never fail and was removed at
+      // the Phase 11h QA. The Set check below is NOT redundant with it: array
+      // equality is satisfied by a duplicated reagent id appearing on both
+      // sides, and this forbids the table ever describing one.
       expect(new Set(row.order).size, `${row.id} order must name each reagent once`).toBe(
         row.order.length,
       );
@@ -468,7 +474,10 @@ describe('masterwrought Phase 11h GATE A: the amended uniform-bill rule', () => 
     );
     expect(bills[1], 'warboar vs ironhusk').toEqual(bills[0]);
     expect(bills[2], 'runewater vs ironhusk').toEqual(bills[0]);
-    expect(bills[0].length, 'the shared flask bill').toBeGreaterThanOrEqual(6);
+    // EXACT, not a floor: the value is knowable and the order column one arm
+    // up already forces a table visit for any change, so a floor here only
+    // bought slack. Six entries since this phase added the grain.
+    expect(bills[0].length, 'the shared flask bill').toBe(6);
     // The daily gate really is what makes the family uniform, so pin the fact
     // the reasoning rests on rather than restating the reasoning.
     expect(
@@ -498,6 +507,40 @@ describe('masterwrought Phase 11h GATE A: the amended uniform-bill rule', () => 
     expect(inputs[0]).toBe(452);
   });
 
+  it('and the WALL-CLOCK spread is 12.5 percent, the honest half of the same gate', () => {
+    // GATE A rules on summed VALUE and the arm above is that half. The record
+    // beside it (src/sim/content/recipes.ts, and the packet ledger) also states
+    // a growth-timer spread and says it is "recorded and pinned beside the
+    // copper one" -- and until the Phase 11h QA nothing pinned it, in this file
+    // or anywhere: no arm in the phase read durationMs at all. That is the
+    // overclaim class this phase's own review round swept eight times, so the
+    // sentence is made true here rather than struck.
+    //
+    // RESOLVED BACK THROUGH THE LIVE BILL, never off a crop-id literal: the
+    // claim is about the three crops the three PLATES actually name, so
+    // swapping a plate's crop for another tier-3 one moves this arm even though
+    // the copper spread would not budge.
+    const durations = THREE_PLATES.map((id) => {
+      const entry = requireRecipe(id).reagents.find((g) => PRODUCE_IDS.has(g.itemId));
+      const crop = Object.values(FARM_CROPS).find((c) => c.produceItemId === entry?.itemId);
+      if (!crop) throw new Error(`${id} crop is not on the roster`);
+      return crop.durationMs;
+    });
+    expect(
+      [...durations].sort((a, b) => a - b),
+      'the three plate crops grow at',
+    ).toEqual([14_400_000, 15_000_000, 16_200_000]);
+    // The spread itself, which is the number the record states in words.
+    expect(
+      Math.max(...durations) / Math.min(...durations),
+      'a 12.5 percent wall-clock spread from cheapest to dearest',
+    ).toBeCloseTo(1.125, 10);
+    // And it really is a spread rather than three equal timers, which is the
+    // crop ladder's own composition rule and the reason the copper arm above
+    // cannot stand alone as the whole cost claim.
+    expect(new Set(durations).size, 'three distinct timers, one per plate crop').toBe(3);
+  });
+
   it("the amendment's predicate REFUSES the shapes it forbids, and admits 11i's fish row", () => {
     // THE CONTROL FOR THE TWO ARMS ABOVE, and it exists because without one they
     // are sweeps over a shipped table that happens to satisfy them: nothing
@@ -517,11 +560,41 @@ describe('masterwrought Phase 11h GATE A: the amended uniform-bill rule', () => 
     const shipped = foodFamilyShape(live);
     expect(shipped.remaindersEqual, 'the shipped plates').toBe(true);
     expect(shipped.cropRowsPerPlate, 'the shipped plates').toEqual([1, 1, 1]);
-    const withFish = foodFamilyShape(
-      live.map((bill) => [...bill, { itemId: 'raw_stonescale_carp', count: 2 }]),
-    );
+    // THE FISH COUNT IS 3, NOT 2, AND THAT IS THE INTERLOCK (Phase 11h QA).
+    // The first version of this control appended the carp at count 2 and
+    // certified it legal, which was true of the amendment predicate and FALSE
+    // of the merged rule set: a plate carrying a fish becomes a member of
+    // fishRows() in tests/provisioning_supply_line.test.ts, whose standing arm
+    // requires fish to STRICTLY OUTNUMBER produce on a fish dish. Each plate
+    // carries its crop at 2, so a carp at 2 ties and reds that sweep. Handing
+    // 11i a control that says "your row is legal" at a count the tree refuses
+    // is worse than having no control, so the count that ships here is the
+    // lowest one that clears BOTH rules, and the fish-forward half is asserted
+    // rather than left to the sibling file.
+    const FISH_ROW = { itemId: 'raw_stonescale_carp', count: 3 } as const;
+    const withFish = foodFamilyShape(live.map((bill) => [...bill, { ...FISH_ROW }]));
     expect(withFish.remaindersEqual, "11i's uniform fish row stays legal").toBe(true);
     expect(withFish.cropRowsPerPlate, 'and does not count as a crop row').toEqual([1, 1, 1]);
+    // THE SECOND RULE THE SAME ROW HAS TO CLEAR, driven here so the interlock
+    // is a fact about the merged rule set rather than about one predicate.
+    // Produce per plate is read off the LIVE bill, so a later re-tune of a crop
+    // count moves the required fish count with it instead of rotting this arm.
+    const plateProduce = live.map((bill) =>
+      bill.filter((g) => PRODUCE_IDS.has(g.itemId)).reduce((t, g) => t + g.count, 0),
+    );
+    expect(plateProduce, 'each plate carries its crop at 2').toEqual([2, 2, 2]);
+    for (const produce of plateProduce) {
+      expect(
+        FISH_ROW.count,
+        `a uniform fish row must outnumber the plate's produce ${produce} to stay fish-forward`,
+      ).toBeGreaterThan(produce);
+    }
+    // And the count this control originally carried is REFUSED by that rule, so
+    // the correction cannot be quietly walked back to 2.
+    expect(
+      plateProduce.every((produce) => 2 > produce),
+      'a carp at 2 must NOT clear the fish-forward rule on these plates',
+    ).toBe(false);
 
     // REFUSED: a fish row on only TWO of the three, which is the mistake 11i
     // could actually make.
@@ -739,10 +812,24 @@ describe('masterwrought Phase 11h GATE D: the capstones and the tier-4 fine twin
     ).toEqual([]);
   });
 
-  it('BOTH tier-4 fine twins now have a consumer at skillReq 125, the top of the catalog', () => {
+  it('BOTH tier-4 fine twins now have a consumer at skillReq 125, the top consumable rung', () => {
     // The masterwrought R20 shape this gate exists to close. Before this phase
     // each twin was consumed by exactly one recipe, farming's own tier-4 dish
-    // at cooking 100, so the tier-4 twins had no endgame consumer at all.
+    // at cooking 100, so every consumer the twins had was one farming wrote.
+    //
+    // STATED THAT WAY ON PURPOSE (Phase 11h QA). The earlier wording here read
+    // "the tier-4 twins had no endgame consumer at all", which is false under
+    // this repo's own definition: tests/farm_recipes.test.ts calls a bill
+    // ENDGAME at skillReq >= 75, and both tier-4 dishes sit at cooking 100, so
+    // they were endgame consumers already. What the twins lacked was a consumer
+    // OUTSIDE farming, and a consumer at the top consumable rung.
+    //
+    // AND 125 IS NOT THE CATALOG CEILING, which four comments in this phase
+    // claimed. ALL_RECIPES ships three engineering rows at skillReq 150 (the
+    // apex gathering-tool family, which the phase file itself records as Phase
+    // 11j's), and the packet's own rung census says so: "3 at 125, 3 at 150".
+    // 125 is the top of COOKING and ALCHEMY, which is the claim that matters
+    // here and the one this arm actually proves.
     const capstoneOf: Record<string, string> = {
       fine_gilded_sunmelon: 'recipe_grand_cauldron',
       fine_evergarden_greens: 'recipe_laden_hearth',
@@ -763,6 +850,20 @@ describe('masterwrought Phase 11h GATE D: the capstones and the tier-4 fine twin
       expect(def?.tier, `${twin} tier`).toBe(4);
       expect(farmCropSkillThreshold(def?.tier ?? 0), `${twin} gate`).toBe(75);
     }
+    // THE SUPERLATIVE, SCOPED AND DERIVED rather than asserted in prose, which
+    // is what the four "top of the whole catalog" comments were missing. Both
+    // halves are stated: 125 really is the ceiling for cooking and alchemy, and
+    // it really is NOT the ceiling for the table, so neither claim can rot into
+    // the other. A phase that adds a cooking or alchemy row above 125 visits
+    // the first line; Phase 11j's 150 rung is already covered by the second.
+    const rungsFor = (craft: string) =>
+      ALL_RECIPES.filter((r) => r.professionId === craft).map((r) => r.skillReq);
+    expect(Math.max(...rungsFor('cooking')), 'the top cooking rung').toBe(125);
+    expect(Math.max(...rungsFor('alchemy')), 'the top alchemy rung').toBe(125);
+    expect(
+      Math.max(...ALL_RECIPES.map((r) => r.skillReq)),
+      'and 125 is NOT the catalog ceiling: the apex tool family ships at 150',
+    ).toBe(150);
   });
 
   it('the hoe twins are NOT what this phase consumed, so nothing is double-booked', () => {
@@ -790,6 +891,22 @@ describe('masterwrought Phase 11h GATE D: the capstones and the tier-4 fine twin
         expect(hoeTwins.has(reagent.itemId), `${row.id} must not consume a hoe twin`).toBe(false);
       }
     }
+    // AND THE OCCURRENCE BOUND OVER THE WHOLE TABLE (Phase 11h QA), because the
+    // two arms that carried this claim were both scoped: farm_recipes checks
+    // FARM DISHES only and the loop above checks APEX_CONSUMABLE_RECIPES only,
+    // so INTERMEDIATE_RECIPES, the trainer ladder and every future non-apex
+    // bill sat outside both. This phase is the first to put a tier-4 twin in a
+    // bill farming did not write, which is exactly when the gap would ship.
+    const hoeTwinConsumers = ALL_RECIPES.filter((r) =>
+      r.reagents.some((g) => hoeTwins.has(g.itemId)),
+    ).map((r) => r.id);
+    expect(
+      hoeTwinConsumers.filter((id) => !requireRecipe(id).resultItemId.endsWith('_hoe')),
+      'a hoe twin may be consumed by the hoe ladder and by nothing else',
+    ).toEqual([]);
+    // Positive control: the sweep must actually SEE the ladder, or the negative
+    // above is satisfied by a matcher that finds nothing anywhere.
+    expect(hoeTwinConsumers.length, 'and the hoe ladder really is matched').toBe(3);
   });
 });
 
@@ -816,6 +933,43 @@ describe('masterwrought Phase 11h: obtainability, derived rather than argued', (
       }
     }
     expect(checked, 'this phase authored ten produce entries across eight rows').toBe(10);
+  });
+
+  it('and the plant path has a THIRD gate the threshold alone cannot see: the hoe', () => {
+    // ADDED AT THE PHASE 11h QA, because the sweep above and the seed sweep
+    // below prove two of the three gates the shipped plant path runs and the
+    // third is the binding one. src/sim/professions/farming.ts step 12 calls
+    // bestWieldableGatherToolTierOrNone(inventory, 'farming', skill, ITEMS) and
+    // then canGatherTier(hoeTier, crop.tier), and that scan DROPS any hoe whose
+    // wield requirement exceeds the player's own farming counter. So the real
+    // floor for a crop is max(farmCropSkillThreshold(tier),
+    // wieldRequirementForTier(tier)), which is the composition the repo already
+    // states in tests/farming_plant_sheet_view.test.ts.
+    //
+    // WHY IT MATTERS TO THIS PHASE rather than to farming: the numbers are 70
+    // for tier 3 and 85 for tier 4, not 50 and 75, and this phase shipped
+    // player-facing wiki prose saying the plate crops "ask Farming 50 and
+    // nothing more". That sentence is corrected in the same change; this arm is
+    // what stops the next one being written.
+    for (const [tier, threshold, wield] of [
+      [3, 50, TIER3_TOOL_WIELD_PROFICIENCY],
+      [4, 75, TIER4_TOOL_WIELD_PROFICIENCY],
+    ] as const) {
+      expect(farmCropSkillThreshold(tier), `tier ${tier} plant threshold`).toBe(threshold);
+      expect(wieldRequirementForTier(tier), `tier ${tier} hoe wield requirement`).toBe(wield);
+      // The gate that actually binds is the LARGER of the two, and on both
+      // tiers this phase reaches it is the hoe rather than the threshold.
+      expect(
+        Math.max(threshold, wieldRequirementForTier(tier)),
+        `tier ${tier} effective plant floor`,
+      ).toBe(wieldRequirementForTier(tier));
+    }
+    // And both floors still sit under the shipped farming cap, so the crops
+    // this phase names stay reachable rather than merely dearer.
+    expect(
+      wieldRequirementForTier(4),
+      'the tier-4 floor must sit under the farming cap',
+    ).toBeLessThanOrEqual(GATHERING_PROFESSIONS.farming.maxSkill);
   });
 
   it('and every seed those crops need is stocked by a live vendor row', () => {
@@ -870,12 +1024,19 @@ describe('masterwrought Phase 11h: the arithmetic above every row', () => {
       expect(after, `${row.id}: output ${row.output} vs input ${after}`).toBeGreaterThan(
         row.output,
       );
-      // The margin widened by exactly the produce this phase added, which is
-      // the whole safety argument for putting a reagent on a tight row. Stated
-      // against the TABLE's two literals rather than against `before`, which is
-      // defined one line up as (after - added) and would make this an algebraic
-      // identity that no mutation can reach.
-      expect(row.inputAfter - row.inputBefore, `${row.id} margin delta`).toBe(added);
+      // THE MARGIN DELTA IS ALREADY PINNED by the two assertions above, and
+      // saying it a third time cannot fail (Phase 11h QA). This arm used to
+      // carry `expect(row.inputAfter - row.inputBefore).toBe(added)`, moved off
+      // `before` and onto the table's two literals to escape an algebraic
+      // identity. It did not escape one: line 2 pins `after === inputAfter` and
+      // line 3 pins `after - added === inputBefore`, so inputAfter - inputBefore
+      // reduces to `added` identically whenever both pass, and vitest aborts
+      // the arm at the first failing expect so it can never run against a
+      // broken pair. What actually pins the added produce's economy value is
+      // the inputBefore assertion above: reprice a crop and `before` moves off
+      // its literal. The dead line is gone rather than reworded, because a
+      // comment explaining why an unfalsifiable assertion is really falsifiable
+      // is the exact shape this phase's own review round retired three times.
       expect(added, `${row.id} must actually have added something`).toBeGreaterThan(0);
     }
   });
@@ -1125,12 +1286,30 @@ describe('masterwrought Phase 11h: every apex bill still CRAFTS', () => {
     // minimum 1. The literal is the crop entry, which is the one this phase
     // authored: a plate's 2 draws 1 and leaves 1; a flask's 1 draws 1 and leaves
     // 0. Move the discount and this reds while the derived loop does not.
-    const crop = recipe.reagents.find((g) => PRODUCE_IDS.has(g.itemId));
-    if (!crop) throw new Error(`${recipe.id} lost its produce`);
+    // SWEPT OVER EVERY REAGENT, not just the crop (Phase 11h QA). The crop-only
+    // version could not see a discount RETUNE, only its removal, and its
+    // comment claimed otherwise: every produce entry on these eight rows is
+    // count 1 or 2, and Math.max(1, Math.floor(n * m)) is 1 for n in {1,2} at
+    // EVERY multiplier in (0,1), so 0.8 to 0.7 to 0.5 all leave the expected
+    // leftover exactly where it was. A count-4 reagent is what discriminates:
+    // floor(4 * 0.8) is 3 and floor(4 * 0.7) is 2, so the leftover moves 1 to
+    // 2. The plates and the hearth carry game_meat 4, the hearth prime_cut 4
+    // and the cauldron sunpetal_herb 4, so the sweep reaches a count-4 row on
+    // five of the eight; the three flasks top out at 2 and are covered by the
+    // removal case alone, which is stated rather than hidden.
+    for (const reagent of recipe.reagents) {
+      expect(
+        rig.sim.countItem(reagent.itemId, rig.pid),
+        `${recipe.id} leftover ${reagent.itemId} at the shipped 20 percent discount`,
+      ).toBe(reagent.count - Math.max(1, Math.floor(reagent.count * 0.8)));
+    }
+    // And the sweep really does reach a count that can move, or the paragraph
+    // above would be describing coverage this row does not have.
+    const discriminating = recipe.reagents.filter((g) => g.count >= 4).length;
     expect(
-      rig.sim.countItem(crop.itemId, rig.pid),
-      `${recipe.id} leftover ${crop.itemId} at the shipped 20 percent discount`,
-    ).toBe(crop.count - Math.max(1, Math.floor(crop.count * 0.8)));
+      discriminating > 0 || THREE_FLASKS.includes(recipe.id),
+      `${recipe.id} must carry a count-4 reagent, or be one of the three flasks`,
+    ).toBe(true);
   });
 
   it.each(APEX_ROWS.map((row) => row.id))(
