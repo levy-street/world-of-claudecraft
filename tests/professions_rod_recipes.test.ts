@@ -74,9 +74,19 @@ describe('the crafted rod ladder', () => {
         ).toBeUndefined();
       }
     }
-    // SIX since masterwrought Phase 11i: the apex rung takes three catch rows
-    // of its own (koi, sturgeon, salmon) on top of the shipped three.
-    expect(catchReagents).toBe(6);
+    // FIVE since masterwrought Phase 11i: the apex rung takes two catch rows of
+    // its own (koi and the band-4 sturgeon) on top of the shipped three.
+    //
+    // IT IS TWO RATHER THAN THREE FOR A CORRECTNESS REASON, not a balance one,
+    // and the number is worth reading as evidence of it. The obvious apex bill
+    // also took the band-5 salmon, and that bill was a closed circuit: the
+    // salmon exists only in the band-5 cells, band 5 takes a tier-6 rod, and
+    // this recipe's own output is the only tier-6 rod in the game. A rung may
+    // consume the catch of the band BELOW it (which is the self-gate all three
+    // rungs use) and may never consume the catch of the band it opens.
+    // tests/recipe_reachability.test.ts is the general guard on that; this
+    // literal is where the apex rung's own arithmetic says it.
+    expect(catchReagents).toBe(5);
   });
 
   it('the tier-5 rung is HARD self-gated: its catch cannot be landed without the rung below', () => {

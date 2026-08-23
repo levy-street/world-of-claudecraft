@@ -43,7 +43,7 @@ import { FISHING_TABLES_BY_BAND, RAW_COOKING_CATCH_IDS } from '../src/sim/conten
 import { ALL_RECIPES } from '../src/sim/content/recipes';
 import { ITEMS } from '../src/sim/data';
 import { NODE_MATERIAL_TABLE, NODE_TYPE_BY_PROFESSION } from '../src/sim/professions/gathering';
-import { materialTierForItem } from '../src/sim/professions/material_tier';
+import { gatherMaterialTier } from '../src/sim/professions/material_grades';
 import { canGatherTier } from '../src/sim/professions/tools';
 
 /** Every item a recipe produces. Nothing here is free at the start of a realm. */
@@ -91,7 +91,17 @@ function toolGateFor(itemId: string): { professionId: string; nodeTier: number }
     if (!nodeType) continue;
     for (const entry of Object.values(NODE_MATERIAL_TABLE[nodeType])) {
       if (entry.itemId === itemId) {
-        return { professionId, nodeTier: Math.max(1, materialTierForItem(itemId)) };
+        // gatherMaterialTier, NOT material_tier.ts's materialTierForItem. The
+        // two are different ladders and src/sim/professions/CLAUDE.md flags the
+        // confusion by name: material_tier is the masterwork PRICE band, which
+        // puts the Eastbrook yields at 0 and reads Mirefen's iron ore as 1 where
+        // its node really is tier 2. Gating on it ran the land half of this
+        // model a full tier loose, which is generous (no false red) but makes
+        // the file's central claim, "what the model tracks exactly is the tool
+        // ladder", true of fishing and only approximate of the land trades: a
+        // crafted-tool circuit on mining, logging or herbalism would have
+        // slipped the guard written for exactly that shape.
+        return { professionId, nodeTier: Math.max(1, gatherMaterialTier(itemId) ?? 1) };
       }
     }
   }
@@ -112,7 +122,9 @@ function bestToolTiers(owned: ReadonlySet<string>): Map<string, number> {
  * The fixpoint: everything a realm can eventually hold, starting from nothing
  * crafted and no tool-gated gather product, and closing under crafting.
  */
-function reachableItems(): Set<string> {
+function reachableItems(
+  billOverrides?: ReadonlyMap<string, readonly { itemId: string; count: number }[]>,
+): { owned: Set<string>; seedSize: number; gatedSize: number } {
   const owned = new Set<string>();
   const gated = new Map<string, { professionId: string; nodeTier: number }>();
   for (const id of Object.keys(ITEMS)) {
@@ -121,6 +133,9 @@ function reachableItems(): Set<string> {
     if (gate) gated.set(id, gate);
     else owned.add(id);
   }
+  const seedSize = owned.size;
+  const billFor = (recipe: (typeof ALL_RECIPES)[number]) =>
+    billOverrides?.get(recipe.id) ?? recipe.reagents;
   // Bare hands and the starter rod: whatever tier a profession answers with no
   // tool at all is already covered by canGatherTier's own floor, so the loop
   // below re-asks it every round rather than hard-coding a starting tier.
@@ -136,14 +151,14 @@ function reachableItems(): Set<string> {
     }
     for (const recipe of ALL_RECIPES) {
       if (owned.has(recipe.resultItemId)) continue;
-      if (recipe.reagents.every((g) => owned.has(g.itemId))) {
+      if (billFor(recipe).every((g) => owned.has(g.itemId))) {
         owned.add(recipe.resultItemId);
         grew = true;
       }
     }
     if (!grew) break;
   }
-  return owned;
+  return { owned, seedSize, gatedSize: gated.size };
 }
 
 describe('the crafting economy bootstraps from an empty realm', () => {
@@ -181,7 +196,7 @@ describe('the crafting economy bootstraps from an empty realm', () => {
     // the salmon never becomes obtainable (its only gate is the tier-6 rod), so
     // the rod's bill never fills, so the rod never becomes obtainable, and the
     // recipe reports here naming the reagent that stranded it.
-    const owned = reachableItems();
+    const { owned, seedSize, gatedSize } = reachableItems();
     const unreachable = ALL_RECIPES.filter(
       (r) => !r.reagents.every((g) => owned.has(g.itemId)),
     ).map((r) => {
@@ -189,10 +204,18 @@ describe('the crafting economy bootstraps from an empty realm', () => {
       return `${r.id} cannot be crafted: ${missing.join(', ')} unobtainable`;
     });
     expect(unreachable).toEqual([]);
-    // Non-vacuity: an empty ALL_RECIPES would satisfy the line above by having
-    // nothing to strand, and so would a fixpoint that seeded every item id.
+    // NON-VACUITY, and the first version of this got it wrong in a way worth
+    // recording: it asserted `owned.size < Object.keys(ITEMS).length + 1`,
+    // which cannot fail. Everything in `owned` comes from an ITEMS key, so the
+    // inequality holds unconditionally, and the case it claimed to catch (a
+    // fixpoint that seeded every id) is exactly the case it admits.
+    //
+    // The decisive form asks whether the fixpoint DID WORK: it must have started
+    // from a proper subset (something was withheld) and it must have GROWN
+    // (crafting and the tool ladder actually opened those gates).
     expect(ALL_RECIPES.length).toBeGreaterThan(100);
-    expect(owned.size).toBeLessThan(Object.keys(ITEMS).length + 1);
+    expect(gatedSize, 'the model must withhold the tool-gated products').toBeGreaterThan(0);
+    expect(seedSize, 'and the seed must be a proper subset of the answer').toBeLessThan(owned.size);
     expect(owned.has('clockreel_fishing_rod')).toBe(true);
   });
 
@@ -211,7 +234,7 @@ describe('the crafting economy bootstraps from an empty realm', () => {
     // And the ladder really is climbed rather than assumed: the top catch is
     // only obtainable in the fixpoint because the tier-6 rod becomes craftable
     // first, which is the ordering the deadlock inverted.
-    const owned = reachableItems();
+    const { owned } = reachableItems();
     expect(owned.has('clockreel_fishing_rod')).toBe(true);
     expect(owned.has('raw_stillmere_salmon')).toBe(true);
     for (const id of RAW_COOKING_CATCH_IDS) {
@@ -222,46 +245,31 @@ describe('the crafting economy bootstraps from an empty realm', () => {
   it('and it FAILS on the deadlock it was written for (the model, driven)', () => {
     // The decisive arm. The arms above assert a green fact about live content,
     // which is exactly the shape that can rot into a pin that cannot fail. So
-    // re-run the same fixpoint against the bill Phase 11i almost shipped, with
+    // re-run THE SAME FIXPOINT against the bill Phase 11i almost shipped, with
     // the band-5 salmon in the apex rod's own reagent list, and require that it
     // strands. If a future refactor makes the model generous enough to swallow
     // a closed circuit, this reds and the two arms above stop being trustworthy
     // at the same moment.
-    const owned = new Set<string>();
-    const gated = new Map<string, { professionId: string; nodeTier: number }>();
-    const draftReagents = new Map<string, { itemId: string; count: number }[]>();
-    for (const recipe of ALL_RECIPES) draftReagents.set(recipe.id, [...recipe.reagents]);
-    draftReagents.set('recipe_clockreel_fishing_rod', [
-      { itemId: 'glimmerfin_koi', count: 2 },
-      { itemId: 'raw_hollowgill_sturgeon', count: 6 },
-      { itemId: 'raw_stillmere_salmon', count: 4 },
-      { itemId: 'tidewrought_fishing_rod', count: 1 },
-    ]);
-    for (const id of Object.keys(ITEMS)) {
-      if (CRAFTED_OUTPUTS.has(id)) continue;
-      const gate = toolGateFor(id);
-      if (gate) gated.set(id, gate);
-      else owned.add(id);
-    }
-    for (let round = 0; round < ALL_RECIPES.length + tools().size + 2; round++) {
-      let grew = false;
-      const tiers = bestToolTiers(owned);
-      for (const [id, gate] of gated) {
-        if (owned.has(id)) continue;
-        if (canGatherTier(tiers.get(gate.professionId) ?? 0, gate.nodeTier)) {
-          owned.add(id);
-          grew = true;
-        }
-      }
-      for (const recipe of ALL_RECIPES) {
-        if (owned.has(recipe.resultItemId)) continue;
-        if ((draftReagents.get(recipe.id) ?? []).every((g) => owned.has(g.itemId))) {
-          owned.add(recipe.resultItemId);
-          grew = true;
-        }
-      }
-      if (!grew) break;
-    }
+    //
+    // "THE SAME FIXPOINT" IS LOAD-BEARING AND WAS BRIEFLY A LIE. The first draft
+    // of this arm re-implemented the loop inline, which is the F11 defect one
+    // level up: a fixture driving a copy of the rule instead of the rule, in the
+    // very arm written to stop that. It would have kept proving the OLD model
+    // strands the deadlock while the live one quietly stopped. reachableItems
+    // takes a bill override now, so both arms run one implementation.
+    const { owned } = reachableItems(
+      new Map([
+        [
+          'recipe_clockreel_fishing_rod',
+          [
+            { itemId: 'glimmerfin_koi', count: 2 },
+            { itemId: 'raw_hollowgill_sturgeon', count: 6 },
+            { itemId: 'raw_stillmere_salmon', count: 4 },
+            { itemId: 'tidewrought_fishing_rod', count: 1 },
+          ],
+        ],
+      ]),
+    );
     // Everything the circuit strands, and nothing else: the rod, the catch its
     // band pays, and the two rows that consume that catch.
     expect(owned.has('clockreel_fishing_rod')).toBe(false);

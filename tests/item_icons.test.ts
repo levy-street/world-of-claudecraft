@@ -449,7 +449,7 @@ describe('item webp icons', () => {
     expect(b.prims[0]?.p).toBe('sack');
   });
 
-  it('A4c) the fifteen cooked dishes differ in their PRIM LISTS, never only the shared food radial', () => {
+  it('A4c) the fifteen AUTHORED-FAMILY dishes differ in their PRIM LISTS, never only the shared food radial', () => {
     // The A4b lesson generalized to the dish family (the Phase 6 eight, the
     // Phase 11 four buff dishes, and masterwrought Phase 11i's two angler
     // plates plus its capstone feast): all fifteen sit on the 'food' radial
@@ -471,14 +471,77 @@ describe('item webp icons', () => {
       'fenbridge_rice_pudding',
       'highwatch_barley_porridge',
       'evergarden_braised_greens',
-      // Phase 11i. A NEW COOKED DISH JOINS THIS LIST, ALWAYS: the family is
-      // whatever `icons.ts` puts on the shared food radial, not a frozen
-      // twelve, and a plate left off is silently exempt from the only pin
-      // that can tell two dishes apart at 32px.
+      // Phase 11i. A NEW DISH IS CLASSIFIED, NEVER JUST OMITTED: the arm
+      // below derives every id on the food radial and requires it to appear
+      // in exactly one of this list or PRE_DATED_FOOD_RADIAL, so the next
+      // plate cannot go silently exempt from the only pin that can tell two
+      // dishes apart at 32px. That is what was missing when these three
+      // escaped the family, and a comment promising it was not enough.
       'peppered_deepbarb_catfish',
       'roast_hollowgill_sturgeon',
       'deepwater_feast',
     ];
+    // THE CLASSIFICATION ARM, first, and read what it does and does not claim.
+    //
+    // The food radial is WIDER than the family above. It also carries the
+    // launch-era and leveling-tier cooked food that predates this pin, and
+    // ranked conjured bread whose four variants are deliberately identical
+    // (one spell, four ranks), which is a legitimate exemption rather than a
+    // collision. So the honest guard is not "every food-radial id is in the
+    // family": it is that every food-radial id is CLASSIFIED, into the family
+    // that owes pairwise-distinct prims or into the pre-dating set that does
+    // not. A new plate then cannot land in neither, which is exactly how the
+    // three Phase 11i dishes escaped, and the decision is forced HERE rather
+    // than resting on a comment nobody reads.
+    //
+    // Derived from ITEMS rather than from icons.ts's private ITEM_RECIPES
+    // table (which is not exported), with keyword FALLBACKS filtered out:
+    // itemFallback answers for an unauthored id too, and a fallback landing on
+    // the food radial is not an authored dish at all.
+    const PRE_DATED_FOOD_RADIAL = [
+      'anglers_feast_platter',
+      'ashwood_smoked_eel',
+      'baked_bread',
+      'brightwood_venison',
+      'conjured_bread',
+      'conjured_bread2',
+      'conjured_bread3',
+      'conjured_bread4',
+      'fenbridge_rye',
+      'frostgill_chowder',
+      'goldleaf_game_stew',
+      'harvest_feast',
+      'herbed_marsh_pike',
+      'hunters_game_skewer',
+      'marlows_grand_roast',
+      'pan_seared_perch',
+      'roast_mountain_goat',
+      'roasted_boar',
+      'sageleaf_chowder',
+      'silvered_carp_supper',
+      'smoked_eel',
+      'stonepot_stew',
+      'tough_jerky',
+      'trail_hardtack',
+      'warspice_skewers',
+    ];
+    const classified = new Set([...DISH_ICON_IDS, ...PRE_DATED_FOOD_RADIAL]);
+    const onFoodRadial = Object.keys(ITEMS).filter((id) => {
+      const recipe = itemIconRecipe(id);
+      return recipe !== null && !isUnknownIconRecipe(recipe) && recipe.bg === 'food';
+    });
+    expect(
+      onFoodRadial.filter((id) => !classified.has(id)),
+      'food-radial ids in neither DISH_ICON_IDS nor PRE_DATED_FOOD_RADIAL',
+    ).toEqual([]);
+    // Neither list may drift off the radial, so a renamed or re-skinned id
+    // cannot sit here as a stale roster entry.
+    expect(DISH_ICON_IDS.filter((id) => itemIconRecipe(id)?.bg !== 'food')).toEqual([]);
+    expect(PRE_DATED_FOOD_RADIAL.filter((id) => itemIconRecipe(id)?.bg !== 'food')).toEqual([]);
+    // And the two lists are disjoint and exhaustive over the radial, so an id
+    // cannot be counted twice or the split quietly overlap.
+    expect(classified.size).toBe(DISH_ICON_IDS.length + PRE_DATED_FOOD_RADIAL.length);
+    expect(onFoodRadial.length).toBe(classified.size);
     const seen = new Map<string, string>();
     for (const id of DISH_ICON_IDS) {
       const recipe = itemIconRecipe(id);

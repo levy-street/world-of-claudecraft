@@ -911,16 +911,32 @@ describe('masterwrought R18 and farming D24: the displacement guard', () => {
     // 6 to 8 (the apex rod rung takes two more), and the three new ids arrive.
     // Not one number fell, which is R18's add-never-substitute stated as
     // arithmetic over the whole merged table rather than per row.
+    //
+    // THE SPLIT BETWEEN THE STURGEON AND THE SALMON IS THE DEADLOCK FIX, and it
+    // is the one place in this map where the shape is a correctness answer
+    // rather than a balance one. The apex rod's draft bill took sturgeon 6 plus
+    // salmon 4, and that was a closed circuit: the salmon exists only in the
+    // band-5 cells, band 5 takes the tier-6 rod, and the rod is that recipe's
+    // own output, so nobody could ever have opened it. The whole bill moved
+    // onto the band-4 sturgeon (6 to 10), which is why the sturgeon reads 17
+    // and the salmon 2.
+    //
+    // SO THE SALMON'S ONLY CONSUMER IS NOW THE CAPSTONE FEAST, at 2, and that
+    // is correct rather than thin: the band-5 catch is a REWARD for owning the
+    // apex rod, never an input to it, and the deepest table on the ladder
+    // should pay into the deepest plate on it. The WHOLE-LINE total is
+    // unchanged at 77 across the change, which is the arithmetic reason a
+    // sum-only pin could not have seen any of this and the per-catch map can.
     const perCatch: Record<string, number> = {
       glimmerfin_koi: 8,
       raw_bog_eel: 4,
       raw_deepbarb_catfish: 26,
       raw_frostgill_trout: 4,
-      raw_hollowgill_sturgeon: 13,
+      raw_hollowgill_sturgeon: 17,
       raw_marsh_pike: 2,
       raw_mirror_trout: 1,
       raw_river_perch: 2,
-      raw_stillmere_salmon: 6,
+      raw_stillmere_salmon: 2,
       raw_stonescale_carp: 11,
     };
     // The pre-11i demands, spelled out so "nothing fell" is a checked claim

@@ -12018,6 +12018,97 @@ false koi-rung sentence, which `3e5aeb9b0d` corrected in `items.ts` and in
 `game_metrics.test.ts`, had a THIRD copy in `guide.test.ts`: this packet's named
 besetting defect, one more time.
 
+### THE FULL SUITE FOUND FIVE MORE, AND FOUR OF THEM WERE THE DEADLOCK FIX'S OWN WAKE
+
+The first frozen-tree run after the review round was EXIT=1, five files red, and
+the pattern in them is worth more than the repairs. FOUR of the five were
+consequences of the deadlock fix rather than of the phase, which is the thing to
+carry: a correctness repair applied late is still a content change, and it owes
+the same same-change sweep the original edit owed. I had run the targeted suites
+around each finding and not the ones the CHANGED BILL reaches.
+
+- The apex rung's catch-row count fell 6 to 5 (`professions_rod_recipes`),
+  because the salmon row left the bill. The literal is now annotated with WHY it
+  is two rather than three, since the number is evidence of the circuit rule: a
+  rung may consume the catch of the band below it and may never consume the
+  catch of the band it opens.
+- The per-catch demand map moved (`provisioning_supply_line`): sturgeon 13 to
+  17, salmon 6 to 2. THE WHOLE-LINE TOTAL IS UNCHANGED AT 77 ACROSS THE FIX,
+  which is the arithmetic reason a sum-only pin could not have seen any of this
+  and the per-catch map could. It also records the design consequence plainly:
+  the salmon's ONLY consumer is now the capstone feast, at 2, which is correct
+  rather than thin, because the band-5 catch is a reward for owning the apex rod
+  and never an input to it.
+- The Reliquary addition moved a second hand-carried literal
+  (`profile_page`, catalogTotal 316 to 317), the same +1 the character pair
+  carries. Two files hold that number and only one of them was in the reliquary
+  battery.
+- `reliquary_cell_art` is the interesting one, because the guard PREDICTED it.
+  Its message read "the FIRST such relic reds here and must extend the predicate
+  rather than land silently on the wrong filter", and cataloguing the apex rod
+  while its painting is still parked in ITEM_ART_PENDING made this phase that
+  first relic. The item arm of `reliquaryCellArtOpaque` answered false
+  unconditionally on the premise that every catalogued item ships one of two
+  committed dark-card pipelines; a parked item falls to the procedural
+  compositor, which paints an OPAQUE tile, and darkening an opaque tile is what
+  the crest arm one line above already refuses to do. So the item arm now asks
+  the same question the crest arm does, and it self-heals: a committed webp
+  flips it back with no edit here. The test got STRONGER rather than re-pinned,
+  asserting that the predicate and the pipeline agree per relic instead of
+  requiring the procedural list to be empty.
+
+The fifth was not the fix's wake but the phase's, and it is the display heal
+again. `tests/proficiency_display_heal.test.ts` asserted "150 is not a
+threshold", with reasoning that was correct when it was written and that THIS
+PHASE FALSIFIED by making 150 the band-2 catch gate. The arm is inverted, with
+the history kept in place, and a second arm added pinning that 150 stays a
+non-threshold for the land trades, which is the reason the fix is a
+per-profession ladder rather than a new shared rung.
+
+### THE FIX ROUND WAS REVIEWED AS UNREVIEWED CODE, and it was not clean
+
+Four more findings, all applied, and two of them are the same defect class the
+round had just finished closing.
+
+**THE DEADLOCK TEST'S OWN DRIVEN ARM DROVE A COPY.** `recipe_reachability`'s
+fourth arm re-implemented the fixpoint inline instead of calling
+`reachableItems()`. Its comment said "re-run the same fixpoint", true the day it
+was written and false the moment the model gains a faucet arm: it would have
+kept proving the OLD model strands the deadlock while the live one quietly
+stopped. That is F11 one level up, a fixture driving a copy of the rule instead
+of the rule, reintroduced by copy-paste IN THE ARM WRITTEN TO AVOID IT.
+`reachableItems` takes a bill override now and both arms run one implementation.
+
+**AND ITS NON-VACUITY LINE COULD NOT FAIL.** `owned.size < ITEMS.length + 1` is
+a tautology: everything in `owned` comes from an ITEMS key, so the case it
+claimed to catch (a fixpoint that seeded every id) is exactly the case it
+admits. It asks whether the fixpoint DID WORK now: the seed must be a proper
+subset of the answer, and the gated set must be non-empty.
+
+**THE LAND HALF OF THE MODEL RAN A TIER LOOSE.** The node gate read
+`materialTierForItem`, which is the masterwork PRICE band, not the node tier;
+`src/sim/professions/CLAUDE.md` flags that exact confusion by name. It reads
+Mirefen's iron ore as 1 where its node is tier 2, and puts the Eastbrook yields
+at 0, which is why the `Math.max(1, ...)` floor was needed at all. The direction
+is generous so there was no false red, but it made the file's central claim
+("what the model tracks exactly is the tool ladder") exact for fishing and only
+approximate for the land trades, so a crafted-tool circuit on mining, logging or
+herbalism would have slipped the guard written for that shape. It reads
+`gatherMaterialTier` now.
+
+**AND A4c's PROMISE WAS STILL A PROMISE.** The comment said "a new cooked dish
+joins this list, ALWAYS" and nothing enforced it: the loop asserted the radial
+for listed ids and never the converse, so the next dish was silently exempt, one
+dish after the omission that produced the finding. The converse turned out to be
+wider than the family, which is the part worth recording: the food radial also
+carries launch-era and leveling-tier cooked food, and four ranks of conjured
+bread that are DELIBERATELY identical. So the guard is not "every food-radial id
+owes distinct prims", which would be false, but "every food-radial id is
+CLASSIFIED", into the family that owes them or into the pre-dating set that does
+not, with the two lists disjoint and exhaustive over the radial. A new plate can
+no longer land in neither. Driven: dropping the capstone feast from the family
+reds naming it.
+
 ### RELEASE-FILL OBLIGATIONS, AMENDED AGAIN
 
 A FOURTH reword key joins the worklist, and it is the most urgent of the four

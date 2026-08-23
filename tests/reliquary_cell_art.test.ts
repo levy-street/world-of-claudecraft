@@ -484,21 +484,34 @@ describe('unknown ids fall through to the caller fallback', () => {
   });
 
   it('every catalogued item relic resolves to a COMMITTED dark-card pipeline', () => {
-    // The item arm of reliquaryCellArtOpaque answers false uncondition-
-    // ally, resting on this premise: every item the catalog can show ships
-    // either a /ui/items webp (non-weapons, alpha-less but dark-card) or a
-    // /ui/weapons rendered-model jpg (weapons via ITEM_WEAPON_VARIANTS,
-    // measured dark: mean luma ~25/255), both of which stay legible under
-    // the silhouette darken. A catalogued item that falls through to the
-    // procedural compositor instead would paint an opaque radial tile, so
-    // the FIRST such relic reds here and must extend the predicate rather
-    // than land silently on the wrong filter.
+    // Nearly every item the catalog can show ships one of two committed
+    // dark-card pipelines: a /ui/items webp (non-weapons, alpha-less but
+    // dark-card) or a /ui/weapons rendered-model jpg (weapons via
+    // ITEM_WEAPON_VARIANTS, measured dark: mean luma ~25/255), both of which
+    // stay legible under the silhouette darken. A catalogued item that falls
+    // through to the procedural compositor instead paints an OPAQUE radial
+    // tile, which must not be darkened as though it were a cutout.
+    //
+    // THIS ARM USED TO REQUIRE THE PROCEDURAL LIST TO BE EMPTY and its own
+    // message said what to do when it stopped being: "the FIRST such relic reds
+    // here and must extend the predicate rather than land silently on the wrong
+    // filter." Masterwrought Phase 11i is that first relic. It catalogued the
+    // apex fishing rod while the rod's painting is still parked in
+    // ITEM_ART_PENDING with the rest of the packet's art, so the predicate was
+    // extended exactly as instructed and this arm now checks the STRONGER
+    // property: whichever pipeline an item lands in, reliquaryCellArtOpaque
+    // agrees with it. An empty procedural list would have gone back to being a
+    // weaker claim than the one now available.
     const procedural: string[] = [];
     let itemsWebp = 0;
     let weaponsJpg = 0;
     for (const slot of CATALOG_SLOTS) {
       const art = reliquaryCellArt(slot);
       if (art === null || art.kind !== 'item') continue;
+      const committed = itemImageUrl(art.itemId) !== null || weaponIconUrl(art.itemId) !== null;
+      // The pipeline and the predicate must never disagree: a committed
+      // painting is darkened, a parked one is not.
+      expect(reliquaryCellArtOpaque(art), art.itemId).toBe(!committed);
       if (itemImageUrl(art.itemId) !== null) itemsWebp += 1;
       else if (weaponIconUrl(art.itemId) !== null) weaponsJpg += 1;
       else procedural.push(art.itemId);
@@ -511,10 +524,14 @@ describe('unknown ids fall through to the caller fallback', () => {
     expect(weaponsJpg, 'anti-vacuity: the weapons-jpg pipeline really contributed').toBeGreaterThan(
       10,
     );
+    // The parked set is EXACTLY the phase's own catalogued id, spelled out
+    // rather than counted: a second parked relic arriving unnoticed is the
+    // thing this list is here to surface, and it stays a one-line edit when
+    // that art lands (the id leaves ITEM_ART_PENDING and leaves this list).
     expect(
       procedural,
-      `catalogued item relics with only procedural art (extend reliquaryCellArtOpaque):\n${procedural.join('\n')}`,
-    ).toEqual([]);
+      `catalogued item relics with only procedural art (park them here deliberately):\n${procedural.join('\n')}`,
+    ).toEqual(['clockreel_fishing_rod']);
   });
 
   it('preserves the item passthrough for a real item id (behavior unchanged)', () => {
