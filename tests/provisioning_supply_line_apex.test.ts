@@ -590,10 +590,12 @@ describe('masterwrought Phase 11h GATE A: the amended uniform-bill rule', () => 
       ).toBeGreaterThan(produce);
     }
     // And the count this control originally carried is REFUSED by that rule, so
-    // the correction cannot be quietly walked back to 2.
+    // the correction cannot be quietly walked back to 2. SOME, not EVERY: the
+    // claim is that a carp at 2 clears on NO plate, and an `every` form would
+    // still pass while 2 cleared on two plates of the three.
     expect(
-      plateProduce.every((produce) => 2 > produce),
-      'a carp at 2 must NOT clear the fish-forward rule on these plates',
+      plateProduce.some((produce) => 2 > produce),
+      'a carp at 2 must clear the fish-forward rule on NO plate',
     ).toBe(false);
 
     // REFUSED: a fish row on only TWO of the three, which is the mistake 11i
