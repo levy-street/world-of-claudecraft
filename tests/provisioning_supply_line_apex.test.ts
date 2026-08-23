@@ -927,13 +927,30 @@ describe('masterwrought Phase 11h GATE D: the capstones and the tier-4 fine twin
       fine_gilded_sunmelon: 'recipe_grand_cauldron',
       fine_evergarden_greens: 'recipe_laden_hearth',
     };
+    // THE COUNTS DIVERGED AT masterwrought Phase 11j, which is why they are per
+    // twin now rather than one shared 2. The apex hoe consumes
+    // fine_evergarden_greens, so that twin gained a THIRD consumer while the
+    // sunmelon kept its two. The claim 11h's gate actually makes is untouched:
+    // each twin still has its own capstone at the 125 rung, which is the ID pin
+    // below and the thing a count alone never proved.
+    const expectedConsumers: Record<string, number> = {
+      fine_gilded_sunmelon: 2,
+      fine_evergarden_greens: 3,
+    };
     for (const twin of ['fine_gilded_sunmelon', 'fine_evergarden_greens']) {
       const consumers = ALL_RECIPES.filter((r) => r.reagents.some((g) => g.itemId === twin));
-      expect(consumers.length, `${twin} consumers`).toBe(2);
+      expect(consumers.length, `${twin} consumers`).toBe(expectedConsumers[twin]);
       // The ID, not merely the count: a length pin stays green if the two twins
-      // swap capstones, which is exactly the split this gate rules on.
+      // swap capstones, which is exactly the split this gate rules on. Scoped to
+      // the CONSUMABLE crafts, because 11j's apex hoe is an engineering row at
+      // the same 125 rung and would otherwise join this list.
       expect(
-        consumers.filter((r) => r.skillReq >= 125).map((r) => r.id),
+        consumers
+          .filter(
+            (r) =>
+              r.skillReq >= 125 && (r.professionId === 'cooking' || r.professionId === 'alchemy'),
+          )
+          .map((r) => r.id),
         `${twin} must have its own capstone consumer at the 125 rung`,
       ).toEqual([capstoneOf[twin]]);
     }
@@ -961,45 +978,85 @@ describe('masterwrought Phase 11h GATE D: the capstones and the tier-4 fine twin
 
   it('the hoe twins are NOT what this phase consumed, so nothing is double-booked', () => {
     // The reading tests/farm_recipes.test.ts's hoe-twin arm rests on, recorded
-    // here rather than relied on by accident: that arm asserts the three HOE
-    // twins get no FARM DISH slot, and this phase puts TIER-4 twins into
+    // here rather than relied on by accident: that arm asserts the hoe twins
+    // get no FARM DISH slot, and this phase puts TIER-4 twins into
     // APEX_CONSUMABLE_RECIPES rows, which are neither hoe twins nor farm
     // dishes. It neither trips nor should.
+    //
+    // AMENDED at masterwrought Phase 11j, which added the apex hoe and so
+    // added a FOURTH hoe twin. The claim this arm makes about 11h's own rows is
+    // untouched: an APEX_CONSUMABLE row still consumes no hoe twin, which the
+    // sweep below is what actually checks. What moved is only the roster, and
+    // the exclusivity reading it used to support is retired in farm_recipes for
+    // a reason recorded there: the apex rung consumes a TIER-4 twin under the
+    // ladder's one-tier-below invariant, and 11h had already given every
+    // tier-4 twin a dish, so no unbooked twin existed for it to take.
     const hoeTwins = new Set(
       ALL_RECIPES.filter((r) => r.resultItemId.endsWith('_hoe')).flatMap((r) =>
         r.reagents.filter((g) => PRODUCE_IDS.has(g.itemId)).map((g) => g.itemId),
       ),
     );
     expect([...hoeTwins].sort(), 'the hoe ladder still takes exactly these').toEqual([
+      'fine_evergarden_greens',
       'fine_highland_barley',
       'fine_marsh_rice',
       'fine_vale_wheat',
     ]);
-    // Swept over the LIVE bills, not over this file's own produce column: a
-    // loop reading the table asserts about test data, and only the column pin
-    // above binds the table to the tree.
-    for (const row of APEX_ROWS) {
-      for (const reagent of requireRecipe(row.id).reagents) {
-        if (!PRODUCE_IDS.has(reagent.itemId)) continue;
-        expect(hoeTwins.has(reagent.itemId), `${row.id} must not consume a hoe twin`).toBe(false);
-      }
-    }
-    // AND THE OCCURRENCE BOUND OVER THE WHOLE TABLE (Phase 11h QA), because the
-    // two arms that carried this claim were both scoped: farm_recipes checks
-    // FARM DISHES only and the loop above checks APEX_CONSUMABLE_RECIPES only,
-    // so INTERMEDIATE_RECIPES, the trainer ladder and every future non-apex
-    // bill sat outside both. This phase is the first to put a tier-4 twin in a
-    // bill farming did not write, which is exactly when the gap would ship.
+    // THE NO-OVERLAP SWEEP IS RETIRED, and its reason went with the arm it was
+    // defending. It used to assert no APEX_CONSUMABLE row consumes a hoe twin,
+    // which existed only to show 11h's rows did not trip the twin-EXCLUSIVITY
+    // clause in tests/farm_recipes.test.ts. masterwrought Phase 11j retired
+    // that clause (its apex rung consumes a tier-4 twin under the hoe ladder's
+    // one-tier-below invariant, and 11h had already given every tier-4 twin a
+    // consumer, so no unbooked twin existed), and with it the overlap stopped
+    // being a hazard to defend against. Keeping the sweep would now assert that
+    // 11j may not exist.
+    //
+    // WHAT 11h ACTUALLY DID is pinned instead, which is the durable claim and
+    // is unaffected by anything 11j added: its apex rows consume exactly the
+    // two tier-4 twins it chose, one per capstone. That is the gate's real
+    // content, and it reds if a later phase re-points either capstone.
+    const apexTwins = new Set(
+      APEX_ROWS.flatMap((row) =>
+        requireRecipe(row.id)
+          .reagents.filter((g) => PRODUCE_IDS.has(g.itemId))
+          .map((g) => g.itemId),
+      ),
+    );
+    expect(
+      [...apexTwins].filter((id) => id.startsWith('fine_')).sort(),
+      "11h's capstones take exactly these two tier-4 twins",
+    ).toEqual(['fine_evergarden_greens', 'fine_gilded_sunmelon']);
+    // THE OCCURRENCE BOUND OVER THE WHOLE TABLE (Phase 11h QA), re-scoped at
+    // masterwrought Phase 11j rather than deleted. It was written because the
+    // two arms carrying the exclusivity claim were both narrow (farm_recipes
+    // checks FARM DISHES, the loop above checked APEX_CONSUMABLE_RECIPES), so
+    // the trainer ladder, the intermediates and every future bill sat outside
+    // both, and 11h was the first phase to put a tier-4 twin in a bill farming
+    // did not write.
+    //
+    // EXCLUSIVITY IS GONE AND THE BOUND SURVIVES IT. 11j's apex hoe consumes
+    // fine_evergarden_greens, which 11h had already given a capstone, so "a hoe
+    // twin is consumed by the hoe ladder and nothing else" is now false and
+    // cannot be made true without re-pointing one of the two phases' bills.
+    // What the arm still does, and what it was really for, is refuse a SILENT
+    // third consumer: the non-hoe consumers of a hoe twin are enumerated
+    // exactly, so a later bill quietly reaching for one reds here with its own
+    // id named.
     const hoeTwinConsumers = ALL_RECIPES.filter((r) =>
       r.reagents.some((g) => hoeTwins.has(g.itemId)),
     ).map((r) => r.id);
     expect(
-      hoeTwinConsumers.filter((id) => !requireRecipe(id).resultItemId.endsWith('_hoe')),
-      'a hoe twin may be consumed by the hoe ladder and by nothing else',
-    ).toEqual([]);
-    // Positive control: the sweep must actually SEE the ladder, or the negative
-    // above is satisfied by a matcher that finds nothing anywhere.
-    expect(hoeTwinConsumers.length, 'and the hoe ladder really is matched').toBe(3);
+      hoeTwinConsumers.filter((id) => !requireRecipe(id).resultItemId.endsWith('_hoe')).sort(),
+      'exactly these non-hoe bills may consume a hoe twin, and no others',
+    ).toEqual(['recipe_evergarden_harvest_platter', 'recipe_laden_hearth']);
+    // Positive control: the sweep must actually SEE the ladder, or the pin
+    // above is satisfied by a matcher that finds nothing anywhere. FOUR hoe
+    // rungs consume a twin since 11j added the apex.
+    expect(
+      hoeTwinConsumers.filter((id) => requireRecipe(id).resultItemId.endsWith('_hoe')).length,
+      'and the hoe ladder really is matched',
+    ).toBe(4);
   });
 });
 
@@ -1303,15 +1360,19 @@ describe('masterwrought Phase 11h: what it did NOT touch', () => {
     // The count pins the phase file asks to be ASSERTED unchanged rather than
     // expected. Each lives in its own suite too; naming them here is what makes
     // "no count pin moved" a checked claim in the phase's own file.
-    // ELEVEN and 153 since masterwrought Phase 11i, which DID mint rows. The
-    // claim this arm makes is 11h's and it stays 11h's: what it pins is that
-    // 11h's own eight rungs never moved (the loop below) and that every id 11h
-    // added already existed. The two table sizes are re-pinned rather than
-    // deleted because their job here is to make a later phase's mint VISIBLE in
-    // 11h's own file rather than silent, which is exactly what just happened.
+    // ELEVEN and 153 since masterwrought Phase 11i, which DID mint rows, then
+    // 154 at masterwrought Phase 11j, which minted the apex hoe. The claim this
+    // arm makes is 11h's and it stays 11h's: what it pins is that 11h's own
+    // eight rungs never moved (the loop below) and that every id 11h added
+    // already existed. The table sizes are re-pinned rather than deleted
+    // because their job here is to make a later phase's mint VISIBLE in 11h's
+    // own file rather than silent, which is exactly what has now happened
+    // twice. APEX_CONSUMABLE_RECIPES is unmoved at 11 because 11j's row is a
+    // TOOL, so the divergence between the two counts is itself the record of
+    // what kind of row each later phase added.
     expect(APEX_CONSUMABLE_RECIPES).toHaveLength(11);
     expect(INTERMEDIATE_RECIPES).toHaveLength(10);
-    expect(ALL_RECIPES).toHaveLength(153);
+    expect(ALL_RECIPES).toHaveLength(154);
     for (const row of APEX_ROWS) {
       expect(requireRecipe(row.id).skillReq, `${row.id} rung`).toBe(row.rung);
     }

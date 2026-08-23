@@ -623,9 +623,21 @@ describe('the professions blob growth bound (phase 16)', () => {
     // recorded here rather than left at the old figure, since a narrative
     // naming a number the tree no longer holds is what makes a stale bound
     // look corroborated.
+    //
+    // RE-MEASURED AGAIN at masterwrought Phase 11j: 16,877 bytes, and this
+    // time the BAND MOVED, upper edge 16,864 to 16,888. The delta is EXACTLY
+    // 24 bytes and it was measured rather than inferred: removing
+    // recipe_evergarden_hoe from the corpus and re-running gives 16,853, so
+    // the whole of it is `"recipe_evergarden_hoe",` in the knownRecipes array,
+    // one id plus its quoting and comma. The band had drifted to within 11
+    // bytes of its upper edge across 11f through 11i without anyone re-reading
+    // this note, which is the thing worth recording: a single new recipe id
+    // was enough to cross it, and the failure looks like a growth regression
+    // when it is one row of a content table. The edge moves by the measured
+    // delta and no further, so the band keeps its width and its teeth.
     const bytes = professionsBytes(s2);
     expect(bytes).toBeGreaterThan(16544);
-    expect(bytes).toBeLessThan(16864);
+    expect(bytes).toBeLessThan(16888);
     // Strictly dominated by the band's upper edge while the band holds:
     // kept as documentation that the structural ceiling also bounds this
     // state, never the live guard.

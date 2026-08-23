@@ -110,13 +110,16 @@ describe('toolEffectTooltipLines: live charms', () => {
     expect(advertised).not.toContain('fishing');
     expect(rendered).toContain('Does not slot on fishing rods.');
     // The farming gatherTool roster, once the self-clearing empty tripwire of
-    // the shipless era, is now the exact four-rung hoe ladder, in ITEMS
-    // insertion order (which is how Object.values returns them).
+    // the shipless era, is now the exact FIVE-rung hoe ladder, in ITEMS
+    // insertion order (which is how Object.values returns them). The apex rung
+    // joined at masterwrought Phase 11j and takes the three tool effects like
+    // every rung below it: rarity is what the epic rung buys on this surface,
+    // through the charge bonus and the refill ceiling.
     expect(
       Object.values(ITEMS)
         .filter((item) => item.use?.type === 'gatherTool' && item.use.professionId === 'farming')
         .map((item) => item.id),
-    ).toEqual(['garden_hoe', 'bronze_hoe', 'skysilver_hoe', 'osmium_hoe']);
+    ).toEqual(['garden_hoe', 'bronze_hoe', 'skysilver_hoe', 'osmium_hoe', 'evergarden_hoe']);
   });
 });
 
