@@ -11331,7 +11331,8 @@ and the build was red.
 VERDICT: PASS-WITH-FOLLOWUPS. Base tip 294595e9d8, clean. LOCAL, no push, no PR.
 Fix commits, in order: 265525781a (the false claims in shipped copy), 0dafe2175f
 (the pin corrections), 859b18a02c (the repair the mutation battery forced, Z3
-below), 749cc993eb (this ledger).
+below), this ledger, then one more the cross-check against the reviewer reports
+found unapplied (the exact-tie pin, Z9).
 
 THE PHASE IN ONE LINE, AS AUDITED: the eight bills are right, every number in the
 record reproduces from an independent derivation, both deviations are proven
@@ -11468,8 +11469,10 @@ at 9 against 17, and farm_seed_channels' alchemy floor at 3 against 7. The accen
 one matters most, because BOTH deviations are justified by that sweep governing
 those rows. Raised, and the accent arm now names one row per 11h family.
 
-Also applied: the wall-clock spread the record calls "pinned" is now actually
-pinned; the hoe twins get an occurrence bound over ALL_RECIPES rather than two
+Also applied: the exact 320-against-320 tie the value arm's whole rationale rests
+on is ASSERTED rather than only described, so a retune that removed it can no
+longer leave the at-or-below operator untested and the paragraph false; the
+wall-clock spread the record calls "pinned" is now actually pinned; the hoe twins get an occurrence bound over ALL_RECIPES rather than two
 arms scoped to farm dishes and to the apex array; the never-failing `required > 0`
 floor the review round retired from the apex file is retired from its sibling; the
 row-count checksum is computed off the literal rather than off the list the line
@@ -11482,7 +11485,7 @@ strictly outnumber produce on a fish dish and finds each plate carrying its crop
 at 2. So the recorded handoff told 11i its row was legal at a count the merged
 rule set refuses. The control drives BOTH rules now and explicitly refuses 2.
 
-### THE MUTATION BATTERY OVER THE FIX ROUND: 8 RUN, 8 DEAD, 2 REPAIRS FORCED
+### THE MUTATION BATTERY OVER THE FIX ROUND: 9 RUN, 9 DEAD, 2 REPAIRS FORCED
 
 Every pin the fix round relies on was mutated, on the same harness discipline as
 the phase's own: committed frozen tree, tip and dirty stamped and compared at
@@ -11499,6 +11502,7 @@ both ends, tsc on every mutant before a red counts as a kill.
 | Z6 | grow a plate to EIGHT reagents | KILLED, incl. the guide superlative |
 | Z7 | walk the 11i fish row back to the count 11h certified | KILLED, the interlock |
 | Z8 | strip one flask's grain (alchemy produce rows 7 to 6) | KILLED, the raised floor |
+| Z9 | reprice the fine twin so the exact 320-vs-320 tie disappears | KILLED, the tie pin |
 
 Z3 IS THE ONE WORTH KEEPING, and it is an audit finding against the audit: the
 tool-gate arm this QA added to catch the wiki defect was ITSELF a constant
