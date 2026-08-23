@@ -3731,6 +3731,23 @@ const ITEM_RECIPES: Record<string, IconRecipe> = {
     ],
     ['glow'],
   ),
+  // The apex rung (masterwrought Phase 11j), authored rather than left to the
+  // fallback, which is what the family's rules actually demand. Without a row
+  // here itemFallback's tool arm resolves it to a MACE on garden_hoe's own
+  // radial and palette WITH sparkle, so the epic apex would read as the tier-1
+  // quest hoe at 32px while wearing the fine-grade marker. One palette step
+  // above the rung below (arcane over steel, the family's own way of saying
+  // epic), the same staff-plus-fang silhouette every rung shares, the blade one
+  // size step up, glow like the rare rung, and NO sparkle.
+  evergarden_hoe: r(
+    'arcane',
+    'arcanePink',
+    [
+      { p: 'staff', pal: 'earthBrown', rot: 0.7 },
+      { p: 'fang', pal: 'arcanePink', x: 12, y: -14, s: 0.7, rot: 2.4 },
+    ],
+    ['glow'],
+  ),
   // The economy-hooks phase's eight farm dishes (FARM_RECIPES), the same
   // ART_PENDING drawn stand-in treatment and the same A4 pairwise-distinctness
   // demand as the crop families above. Two rules hold the family together and

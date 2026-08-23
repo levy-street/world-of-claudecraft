@@ -69,7 +69,7 @@ import { ITEMS } from '../src/sim/data';
 import { NODE_HARVEST_TABLE, NODE_MATERIAL_TABLE } from '../src/sim/professions/gathering';
 import { baseMaterialFor, MATERIAL_GRADES } from '../src/sim/professions/material_grades';
 import { gatherToolTier } from '../src/sim/professions/tools';
-import { tierForSkill } from '../src/sim/professions/wheel';
+import { TIER_SKILL_STEP, tierForSkill } from '../src/sim/professions/wheel';
 import type { GatherNodeType } from '../src/sim/types';
 
 // The sixth family. Corpse harvesting is a gathering FAMILY without being a
@@ -359,10 +359,23 @@ describe('the derivation itself cannot pass by matching nothing', () => {
   });
 
   it('binds all six families, derived from GATHERING_PROFESSION_IDS', () => {
-    // The subject list is DERIVED, so this arm pins that the derivation
-    // actually reached every shipped gathering profession plus the corpse
-    // family, rather than pinning a hand-list that would rot.
+    // The derived form FIRST, which states the shape: the subject list is the
+    // gathering professions in table order plus the corpse family appended.
     expect(FAMILY_IDS).toEqual([...GATHERING_PROFESSION_IDS, CORPSE_HARVEST_FAMILY]);
+    // AND THE LITERAL BESIDE IT, because the line above is true by
+    // construction: supplyByFamily sets one key per GATHERING_PROFESSION_IDS
+    // entry and then appends corpse, so it can only fail on a duplicate id and
+    // proves nothing about which professions actually shipped. The literal is
+    // what reds when a profession is DELETED from the table, which the
+    // derivation would follow silently.
+    expect(FAMILY_IDS).toEqual([
+      'mining',
+      'logging',
+      'herbalism',
+      'fishing',
+      'farming',
+      'corpseHarvesting',
+    ]);
   });
 
   it('pins the derived supply sets against the live tables', () => {
@@ -391,11 +404,23 @@ describe('the derivation itself cannot pass by matching nothing', () => {
         .sort(),
     );
 
-    // Both crop grades of every shipped crop are claimed.
-    for (const crop of Object.values(FARM_CROPS)) {
-      expect(SUPPLY.get('farming')).toContain(crop.produceItemId);
-      expect(SUPPLY.get('farming')).toContain(crop.fineProduceItemId);
-    }
+    // FARMING, pinned by SIZE and by literal rather than by a loop over the
+    // same table the set is built from. The loop this replaces asked whether
+    // farmingSupply() contains what farmingSupply() put there, which held for
+    // every crop by construction and gave the arm no teeth at all: it is the
+    // farming half of the very anti-rot claim this test's title makes.
+    const farming = SUPPLY.get('farming') as Set<string>;
+    expect(farming.size, 'two grades for each shipped crop').toBe(
+      Object.keys(FARM_CROPS).length * 2,
+    );
+    expect([...farming].sort()).toEqual(
+      Object.values(FARM_CROPS)
+        .flatMap((crop) => [crop.produceItemId, crop.fineProduceItemId])
+        .sort(),
+    );
+    // The literal count beside the derivation, same reason as everywhere else
+    // in this file: without it, deleting a crop shrinks both sides together.
+    expect(farming.size).toBe(24);
   });
 
   it('the recipe corpus populates every band the loop iterates', () => {
@@ -411,10 +436,37 @@ describe('the derivation itself cannot pass by matching nothing', () => {
     }
   });
 
-  it('both arms of the self-feeding discriminator are live', () => {
-    // masterwrought decision D. If every recipe result were a gathering tool,
-    // or none were, the refusal would be dead code that never changed an
-    // outcome and nobody would notice.
+  it('the self-feeding refusal discriminates, and it changes an outcome', () => {
+    // masterwrought decision D, pinned by CALLING the predicate rather than by
+    // observing that the corpus contains both kinds of recipe. The corpus
+    // observation is kept below because it is a real precondition, but on its
+    // own it proved nothing: isSelfFeedingFor could return false
+    // unconditionally and every arm in this file would stay green, because no
+    // family depends on the refusal to be non-empty.
+    expect(
+      isSelfFeedingFor('arcanite_mining_pick', 'mining'),
+      'a pick IS mining self-feeding',
+    ).toBe(true);
+    expect(
+      isSelfFeedingFor('arcanite_mining_pick', 'logging'),
+      'the same pick is NOT logging self-feeding: it discriminates by profession',
+    ).toBe(false);
+    expect(
+      isSelfFeedingFor('duskforged_warblade', 'mining'),
+      'a non-tool result is never self-feeding',
+    ).toBe(false);
+    // AND THE OUTCOME IT CHANGES, so the refusal is not merely callable: the
+    // apex hoe is farming's own tool at the endgame band, and the matrix must
+    // NOT credit farming for it.
+    const farmingEndgame = (MATRIX.get('farming') as Map<number, string[]>).get(
+      ENDGAME_BAND,
+    ) as string[];
+    expect(farmingEndgame, 'farming must not be credited for its own hoe').not.toContain(
+      'recipe_evergarden_hoe',
+    );
+    expect(farmingEndgame.length, 'and it still has real endgame rows').toBeGreaterThan(0);
+    // The precondition: both kinds of recipe exist, so neither branch of the
+    // discriminator is unreachable over this corpus.
     const isTool = ALL_RECIPES.filter((r) =>
       GATHERING_PROFESSION_IDS.some((p) => gatherToolTier(ITEMS[r.resultItemId], p) !== undefined),
     );
@@ -425,9 +477,46 @@ describe('the derivation itself cannot pass by matching nothing', () => {
     ).toBeGreaterThan(0);
   });
 
+  it('the substitution credit is load-bearing, not dead code', () => {
+    // The demand arm credits a fine grade through its BASE. That branch is
+    // only honest if something actually needs it: without this arm, a later
+    // phase giving every fine grade a direct consumer would leave the credit
+    // as dead code with nothing saying so, and a reader would not know whether
+    // it had ever mattered.
+    //
+    // Today exactly the three EASTBROOK grades pass only through their base,
+    // which is the shape the fine ladder having three tiers against a two-rung
+    // crafted-tool ladder produces.
+    const substitutionOnly: string[] = [];
+    for (const family of FAMILY_IDS) {
+      for (const id of SUPPLY.get(family) as Set<string>) {
+        const direct = DEMAND.get(id)?.consumers.length ?? 0;
+        if (direct > 0) continue;
+        const base = baseMaterialFor(id);
+        if (base === undefined) continue;
+        if ((DEMAND.get(base)?.consumers.length ?? 0) > 0) substitutionOnly.push(id);
+      }
+    }
+    expect(substitutionOnly.sort()).toEqual([
+      'fine_copper_ore',
+      'fine_ironbark_log',
+      'fine_silverleaf_herb',
+    ]);
+  });
+
   it('the band math is the shared bucket, not a local copy', () => {
-    // If TIER_SKILL_STEP moves, this file must move with the game. Deriving
-    // the boundary back out of tierForSkill is what proves it did.
+    // THE LITERALS FIRST, because the derived assertions below are true by
+    // construction and cannot fail: ENDGAME_BAND is DEFINED as
+    // bandOf(GATHERING_ENDGAME_SKILL), and LEVELLING_BANDS is built from its
+    // length. Without these, silently lowering every land cap to 50 would stop
+    // checking two whole bands with every arm in this file still green.
+    expect(TIER_SKILL_STEP, 'the shared bucket width').toBe(25);
+    expect(GATHERING_ENDGAME_SKILL, 'the land gathering cap').toBe(100);
+    expect(LEVELLING_BANDS).toEqual([0, 1, 2, 3]);
+    expect(ENDGAME_BAND).toBe(4);
+    // And the derivation really does route through the shared helper, so a
+    // TIER_SKILL_STEP change moves this file and the game together rather than
+    // reding only the literals above.
     expect(ENDGAME_BAND).toBe(tierForSkill(GATHERING_ENDGAME_SKILL));
     expect(LEVELLING_BANDS.length).toBe(ENDGAME_BAND);
     expect(bandOf(GATHERING_ENDGAME_SKILL - 1)).toBe(ENDGAME_BAND - 1);

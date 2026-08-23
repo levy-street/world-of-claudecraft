@@ -2984,6 +2984,20 @@ export const DEEDS: Record<string, DeedDef> = {
     trigger: { kind: 'collectItems', itemIds: ['clockreel_fishing_rod'] },
   },
 
+  // NO DEED FOR THE APEX HOE, recorded here beside the rod's because a
+  // decline nobody wrote down reads as an omission (masterwrought Phase 11j).
+  // docs/design/deeds.md scopes the same-change obligation to a dungeon,
+  // delve, raid, world boss, zone or rare, so a crafted item owes nothing,
+  // and the four sibling tier-5 tools (arcanite_mining_pick, elderwood_axe,
+  // sunpetal_sickle, tidewrought_fishing_rod) carry no deed either: the hoe
+  // matching them is the symmetry, and it is the reason.
+  //
+  // The rod above is NOT the counter-example it looks like. col_deepest_cast
+  // celebrates reaching the deepest CATCH BAND, which is content the rod
+  // opens and nothing else does. The apex hoe opens no crop tier at all, so
+  // the same deed written for it would celebrate owning an item rather than
+  // conquering anything, which is what the deed doctrine refuses.
+
   // The farming celebration deeds (D13), appended per the append-only
   // DEED_ORDER contract. All cosmetic, zero rng, no power. The farm:planted
   // mark is written at plant success and the farm:<zone> marks at surviving

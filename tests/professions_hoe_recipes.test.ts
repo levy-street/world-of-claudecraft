@@ -102,6 +102,28 @@ describe('the crafted hoe ladder', () => {
     expect(HOE_RECIPES.map((r) => r.skillReq)).toEqual([25, 50, 75, 125]);
   });
 
+  it('the apex rung takes the greens at COUNT 2, both of which are arguable and neither derived', () => {
+    // The general arms above cannot pin either half. "Exactly one crop fine
+    // twin one tier below the result" is satisfied by all FOUR shipped tier-4
+    // twins, so swapping fine_evergarden_greens for the yam leaves them green;
+    // and no arm reads the count at all, so 4 would pass too. Both are
+    // argued at length in the row comment (the halving the tier-5 family
+    // applies, and the naming rule that a tier-5 tool is named for the reagent
+    // its rung consumes), so both get a literal.
+    const apex = HOE_RECIPES.find((r) => r.id === 'recipe_evergarden_hoe');
+    expect(apex?.reagents).toEqual([
+      { itemId: 'fine_evergarden_greens', count: 2 },
+      { itemId: 'osmium_hoe', count: 1 },
+    ]);
+    // THE HALVING, derived rather than restated: the tier-5 rung takes half
+    // what the tier-4 rung takes of its own grade, which is the rule the count
+    // comes from and the reason 4 would have been wrong.
+    const rung4 = HOE_RECIPES.find((r) => r.id === 'recipe_osmium_hoe');
+    const twinCount = (recipe: typeof apex) =>
+      recipe?.reagents.find((r) => cropOfFineTwin(r.itemId) !== undefined)?.count;
+    expect(twinCount(apex)).toBe((twinCount(rung4) as number) / 2);
+  });
+
   it('rides ALL_RECIPES, and stays out of TOOL_RECIPES', () => {
     const hoeIds = new Set(HOE_RECIPES.map((r) => r.id));
     for (const id of hoeIds) {

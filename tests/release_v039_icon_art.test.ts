@@ -455,15 +455,25 @@ describe('release v0.39 icon-art second-pass lineage', () => {
       'production isHotbarItemId art-subject inventory (live minus ITEM_ART_PENDING)',
     ).toHaveLength(75);
     // The farming branch's declared debt on the hotbar: eight plain farm
-    // dishes plus the four Phase 11 buff dishes (kind 'food') and the
-    // four-rung hoe ladder (use.type 'gatherTool'). Re-derived unchanged on
+    // dishes plus the four Phase 11 buff dishes (kind 'food') and the hoe
+    // ladder (use.type 'gatherTool'). Re-derived unchanged on
     // the merged tree at the farming absorb (Phase 11d); grows as 11e
     // through 11k park ids.
     // 19 at Phase 11i: the apex rod (use.type 'gatherTool') and the two plain
     // fish dishes (kind 'food') join the hotbar debt. The three catches, the
     // feast and the four patterns are not hotbar items, so the park grew by
     // eleven while THIS term grew by three.
-    expect(pendingHotbarItemIds, 'ITEM_ART_PENDING hotbar items').toHaveLength(19);
+    // 20 at Phase 11j: the apex hoe, the hoe ladder's fifth rung and a
+    // gatherTool like every rung below it. It is the ONLY term the phase moved
+    // here, because artSubjectHotbarItemIds above counts PAINTED subjects and
+    // the hoe is parked rather than painted.
+    //
+    // THIS IS THE THIRD INDEPENDENT PIN OVER THE SAME PARK, after the exact-set
+    // arm in tests/item_icons.test.ts and pendingArtCount in
+    // scripts/item_art_audit.mjs. All three must move together, and none of
+    // them is selected by a targeted run aimed at the content that grows the
+    // park, so the full suite is the only thing that catches a partial update.
+    expect(pendingHotbarItemIds, 'ITEM_ART_PENDING hotbar items').toHaveLength(20);
     expect(
       pendingHotbarItemIds.filter((id) => shippingImageExists(`/ui/items/${id}.webp`)),
       'no pending hotbar item ships committed art (a stale ITEM_ART_PENDING entry)',

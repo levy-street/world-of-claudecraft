@@ -1174,8 +1174,9 @@ describe('the farming ladder: every farming zone arrives mechanically whole', ()
       'skysilver_hoe',
       ...FARM_RECIPES.map((recipe) => recipe.resultItemId),
     ]);
-    // Non-vacuity of the needle set: fourteen recipe outputs plus the four
-    // literals above, growth_tonic counted once (it is both). Re-pinned
+    // Non-vacuity of the needle set: fourteen recipe outputs plus the THREE
+    // literals above, growth_tonic counted once (it is both). Four until
+    // masterwrought Phase 11j took osmium_hoe out. Re-pinned
     // 9/16 -> 13/20 by Phase 11 (the four well-fed buff dishes), then
     // 13/20 -> 14/21 by Phase 12 (the shared feast, never stocked either),
     // then 14/21 -> 14/17 by Phase 11e, which STOCKED the four upper-tier
@@ -1218,9 +1219,10 @@ describe('the farming ladder: every farming zone arrives mechanically whole', ()
     }
     // The two NON-NPC purchase counters (the Marks route) are acquisition
     // surfaces too: a row naming a farming item there opens a faucet the NPC
-    // walk cannot see. The DELVE shops stay farming-free entirely; the HEROIC
-    // quartermaster no longer does, and the exception is named rather than the
-    // sweep being dropped.
+    // walk cannot see. NEITHER is farming-free any more: the HEROIC
+    // quartermaster stopped being so at Phase 11f, and the DELVE counters
+    // stopped at masterwrought Phase 11j. Each exception is NAMED and pinned
+    // both ways rather than the sweep being dropped.
     //
     // masterwrought Phase 11f's DECISION E put exactly two families on that
     // counter at the 12-mark ring point: the eight tier-3 and tier-4 SEEDS
@@ -1272,12 +1274,12 @@ describe('the farming ladder: every farming zone arrives mechanically whole', ()
       new Set(['osmium_hoe', 'evergarden_hoe']),
     );
     let delveRowsSeen = 0;
-    let delveFarmingRows = 0;
+    const delveFarmingIds = new Set<string>();
     for (const [delveId, entries] of Object.entries(DELVE_SHOPS)) {
       for (const entry of entries) {
         delveRowsSeen += 1;
         if (DELVE_ALLOWED.has(entry.itemId)) {
-          delveFarmingRows += 1;
+          delveFarmingIds.add(entry.itemId);
           continue;
         }
         expect(
@@ -1289,9 +1291,11 @@ describe('the farming ladder: every farming zone arrives mechanically whole', ()
     expect(delveRowsSeen).toBeGreaterThan(0);
     // Same shape as the marks allowance above: the exception cannot outlive
     // the channel it was written for, so every allowed rung must really be on
-    // a counter.
-    expect(delveFarmingRows, 'both ruled hoe rungs must really be stocked').toBe(
-      DELVE_ALLOWED.size,
+    // a counter. IDS rather than ROWS, deliberately: a row count is satisfied
+    // by two rows for ONE hoe with the other missing, which is exactly the
+    // absence this arm exists to catch.
+    expect([...delveFarmingIds].sort(), 'both ruled hoe rungs must really be stocked').toEqual(
+      [...DELVE_ALLOWED].sort(),
     );
   });
 

@@ -49,7 +49,11 @@ import { ITEMS } from '../src/sim/data';
 import { NODE_MATERIAL_TABLE, NODE_TYPE_BY_PROFESSION } from '../src/sim/professions/gathering';
 import { baseMaterialFor, gatherMaterialTier } from '../src/sim/professions/material_grades';
 import { canGatherTier } from '../src/sim/professions/tools';
-import { canWieldGatherToolTier, wieldRequirementForTier } from '../src/sim/professions/wield_gate';
+import {
+  canWieldGatherToolTier,
+  WIELD_REQUIREMENT_BY_TIER,
+  wieldRequirementForTier,
+} from '../src/sim/professions/wield_gate';
 
 /** Every item a recipe produces. Nothing here is free at the start of a realm. */
 const CRAFTED_OUTPUTS = new Set(ALL_RECIPES.map((r) => r.resultItemId));
@@ -419,10 +423,30 @@ describe('every gathering tool is wieldable by the profession that owns it', () 
       const use = def.use;
       if (use?.type !== 'gatherTool') continue;
       checked += 1;
+      // FISHING IS SKIPPED EXPLICITLY, and the comment this replaces was
+      // wrong in a way worth recording: it said canWieldGatherToolTier
+      // "encodes" the R22 rod exemption. It does not. That helper is a bare
+      // `proficiency >= wieldRequirementForTier(tier)`; the exemption lives in
+      // bestWieldableGatherToolTierOrNone and its any-profession sibling. Rods
+      // passed here by cap ARITHMETIC (fishing caps at 200 against a tier-5
+      // requirement of 100), so lowering fishing's cap under 100 would have red
+      // this arm on a rung the engine never gates.
+      if (use.professionId === 'fishing') continue;
       const cap = GATHERING_PROFESSIONS[use.professionId].maxSkill;
-      // Fishing is the structural R22 exemption and the helper encodes it, so
-      // asking the shipped predicate is also what keeps the exemption from
-      // being restated (and drifting) here.
+      // THE LADDER MUST KNOW THIS TIER. wieldRequirementForTier returns 0 for
+      // any tier outside WIELD_REQUIREMENT_BY_TIER, so it fails OPEN: a tier-6
+      // LAND tool would read requirement 0 and sail through the wieldability
+      // check below while shipping completely ungated. That is the precise
+      // hazard docs/prd/masterwrought/brainstorm.md records as the reason a
+      // gathering-wide apex-tier expansion is one change and not three, and
+      // until now it was prose with no test behind it.
+      expect(
+        Object.hasOwn(WIELD_REQUIREMENT_BY_TIER, use.tier),
+        `${def.id} is a tier-${use.tier} ${use.professionId} tool and the wield ` +
+          `table has no row for that tier, so wieldRequirementForTier fails OPEN ` +
+          `at 0 and the rung would ship UNGATED. Add the tier's row in the same ` +
+          `change that adds the tool.`,
+      ).toBe(true);
       if (!canWieldGatherToolTier(use.tier, cap)) {
         unswingable.push(
           `${def.id} is a tier-${use.tier} ${use.professionId} tool demanding ` +
@@ -433,10 +457,11 @@ describe('every gathering tool is wieldable by the profession that owns it', () 
       }
     }
     expect(unswingable).toEqual([]);
-    // Non-vacuity: the sweep really walked the shipped tools rather than an
-    // empty filter. Ten crafted rungs plus the vendor and quest rungs below
-    // them, so a floor well under the real count still catches an emptied one.
-    expect(checked).toBeGreaterThan(10);
+    // Non-vacuity, pinned AT the real count rather than under it. A floor set
+    // well below the population is the trap tests/CLAUDE.md names: fourteen
+    // tools could have left this sweep with the arm still green. Exact, so a
+    // tool joining or leaving the roster is a deliberate edit here.
+    expect(checked, 'every shipped gatherTool def, fishing included').toBe(25);
   });
 
   it('the apex land rungs sit exactly ON their cap, which is the knife edge', () => {

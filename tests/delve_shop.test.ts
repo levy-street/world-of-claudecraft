@@ -360,7 +360,9 @@ describe('Drowned Litany shop stock (data pins)', () => {
     const farmingTools = Object.values(ITEMS).filter(
       (def) => def.use?.type === 'gatherTool' && def.use.professionId === 'farming',
     );
-    expect(farmingTools.length).toBeGreaterThan(0);
+    // At the real count, not a token floor: the same convention the
+    // craftedTools floor above follows, so a hoe leaving the roster reds here.
+    expect(farmingTools.length, 'the five shipped hoe rungs').toBe(5);
     const allDelveRows = new Set(
       Object.values(DELVE_SHOPS)
         .flat()

@@ -1335,6 +1335,18 @@ export const RELIQUARY_PAGES: readonly ReliquaryPageDef[] = freezePageTable([
         [fromProfession('engineering'), fromVendor('brother_halven_marsh')],
       ],
       ['clockreel_fishing_rod', [fromProfession('engineering')]],
+      // NO HOE PAGE, and the reason is the LAND-TOOL precedent rather than the
+      // one first written down (masterwrought Phase 11j). "A crafted gathering
+      // tool is not conquerable unique loot" is contradicted by this very
+      // shelf, which catalogues three crafted rods; what actually decides it is
+      // that arcanite_mining_pick, elderwood_axe and sunpetal_sickle carry no
+      // relic row either, so the pick, axe, sickle and hoe are consistent and
+      // only the ROD family is catalogued. Known residual, recorded rather
+      // than left implicit: the reliquary is now the one surface where the
+      // completed tier-5 tool family reads asymmetric, one of five. Authoring
+      // a hoe page later also means growing the DOC_RELICS pin in
+      // tests/delve_shop.test.ts in the same change, since both hoe rungs sit
+      // on a delve counter.
     ),
   },
 

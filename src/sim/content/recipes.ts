@@ -252,7 +252,6 @@ export const COMMON_RECIPES: ProfessionRecipeRecord[] = [
 //   giving fine_thorium_ore the consumer it would otherwise lack. It is the
 //   one rung that got more expensive rather than equivalent; that is the
 //   point, since it was the one rung still buyable off a counter.
-
 export const TOOL_RECIPES: ProfessionRecipeRecord[] = [
   {
     id: 'recipe_thorium_mining_pick',

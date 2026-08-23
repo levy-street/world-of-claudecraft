@@ -478,9 +478,9 @@ describe('farming stays node-free, with the hoe ladder as its gatherTools', () =
   // placement suites.
   //
   // The no-gatherTool half INVERTED with the crop-ladder phase, exactly as
-  // the deferred-gate note here promised: the four hoes ship and plantCrop's
+  // the deferred-gate note here promised: the five hoes ship and plantCrop's
   // step-12 gate consumes them through the R22 wield-filtered scan, so the
-  // deliberate re-pin is the four-rung roster rather than the empty set.
+  // deliberate re-pin is the five-rung roster rather than the empty set.
   it('has no node type, and the gather tools it now has are the five hoes', () => {
     const nodeProfessions = Object.values(NODE_HARVEST_TABLE).map((e) => e.professionId);
     expect(nodeProfessions).not.toContain('farming');
