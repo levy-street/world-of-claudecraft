@@ -2459,6 +2459,11 @@ async function startGame(
       settings.set('startAttackOnAbilityUse', !!value);
       return;
     }
+    if (key === 'actionCombat') {
+      // Read live by Hud.castSlot; persistence is the only subsystem update.
+      settings.set('actionCombat', !!value);
+      return;
+    }
     if (key === 'stopAutoAttackOnTargetSwitch') {
       // Authoritative on the sim (issue #1358): persist locally AND mirror the
       // live value onto the player, so the very next target switch honors it.
@@ -3009,6 +3014,14 @@ async function startGame(
     },
     captureKey: (cb) => input.captureNextKey(cb),
     settings,
+    actionCombatAim: () => {
+      const cursor = input.cursorPoint();
+      if (!cursor) return null;
+      const pickedId = renderer.pick(cursor.x, cursor.y);
+      const picked = pickedId !== null ? world.entities.get(pickedId) : null;
+      if (picked) return { x: picked.pos.x, z: picked.pos.z };
+      return renderer.groundPoint(cursor.x, cursor.y, world.player.pos.y);
+    },
     onSettingChange: (key, value) => applySetting(key, value),
     graphicsApplied: () => appliedGraphicsSettings,
     applyGraphics: async (draft) => {

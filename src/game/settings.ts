@@ -215,6 +215,10 @@ export const BOOL_SETTINGS = {
   // startAutoAttack still no-ops unless a valid hostile target is in range, and
   // heals / buffs / damage-breakable CC (gouge, sap, sheep) never trigger it.
   startAttackOnAbilityUse: { def: true },
+  // off by default: GW2-style hybrid targeting. Offensive entity-targeted
+  // abilities select the hostile under a narrow cursor-facing cone; classic
+  // hard-target casting remains the default and friendly/ground casts are unchanged.
+  actionCombat: { def: false },
   // off by default (issue #1358): the classic MMO default is that switching
   // targets while auto-attacking carries the swing over to the new target
   // (Tab, click, nearest-enemy, assist, any method). Turning this on flips

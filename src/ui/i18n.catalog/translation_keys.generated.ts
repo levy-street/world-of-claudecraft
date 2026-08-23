@@ -9035,6 +9035,7 @@ export type TranslationKeyFlat =
   | 'hudChrome.nativeUpdate.title'
   | 'hudChrome.nativeUpdate.update'
   | 'hudChrome.noticeboard.empty'
+  | 'hudChrome.options.actionCombat'
   | 'hudChrome.options.aurasOnPlayerFrame'
   | 'hudChrome.options.browserEffects'
   | 'hudChrome.options.browserEffectsAuto'

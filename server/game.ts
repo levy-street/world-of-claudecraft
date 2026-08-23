@@ -6747,6 +6747,17 @@ export class GameServer {
           // the classic current-target-else-self resolution when invalid.
           if (typeof msg.target === 'number') {
             sim.castAbilityOn(msg.ability, msg.target | 0, pid);
+          } else if (msg.x !== undefined || msg.z !== undefined) {
+            // An aim-bearing cast never falls back to the current hard target:
+            // malformed/partial/non-finite coordinates are rejected outright.
+            if (
+              typeof msg.x === 'number' &&
+              typeof msg.z === 'number' &&
+              Number.isFinite(msg.x) &&
+              Number.isFinite(msg.z)
+            ) {
+              sim.castAbility(msg.ability, pid, { x: msg.x, z: msg.z });
+            }
           } else {
             sim.castAbility(msg.ability, pid);
           }

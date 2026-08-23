@@ -7012,6 +7012,12 @@ export class Sim {
     castAbilityImpl(this.ctx, abilityId, pid, aim);
   }
 
+  // IWorld action-combat cast: offline, select an authoritative hostile from
+  // the local player's world-space aim ray instead of requiring a hard target.
+  castAbilityToward(abilityId: string, aim: { x: number; z: number }): void {
+    castAbilityImpl(this.ctx, abilityId, undefined, aim);
+  }
+
   // IWorld ground-targeted cast: offline, the local player (pid undefined) casts
   // the ability aimed at the world point (x, z).
   castAbilityAt(abilityId: string, aim: { x: number; z: number }): void {

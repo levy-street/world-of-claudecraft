@@ -737,6 +737,7 @@ export function buildInterfaceControls(
     ]),
     ...tag('combat', [
       boolToggle(s, 'startAttackOnAbilityUse', 'hudChrome.options.startAttackOnAbility'),
+      boolToggle(s, 'actionCombat', 'hudChrome.options.actionCombat'),
       boolToggle(
         s,
         'stopAutoAttackOnTargetSwitch',

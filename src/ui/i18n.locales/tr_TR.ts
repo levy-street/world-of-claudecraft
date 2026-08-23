@@ -3823,6 +3823,7 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.options.showPlayerNameplates': 'Oyuncu İsim Etiketlerini Göster',
   'hudChrome.options.groundReticle': 'Yer hedefleme halkası',
   'hudChrome.options.startAttackOnAbility': 'Yetenek Kullanımında Otomatik Saldırı',
+  'hudChrome.options.actionCombat': 'Aksiyon Savaşı (Nişan Alarak Saldır)',
   'hudChrome.playerMenu.info': 'Oyuncu bilgisi',
   'hudChrome.playerMenu.block': 'Engelle',
   'hudChrome.playerMenu.unblock': 'Engeli kaldır',

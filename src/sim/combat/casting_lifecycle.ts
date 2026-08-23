@@ -77,6 +77,11 @@ import {
 import { drawWeapon } from '../weapon_stow';
 import { sharedCooldownIds } from './ability_cooldown_groups';
 import {
+  type ActionCombatAim,
+  abilityUsesActionCombatAim,
+  selectActionCombatTarget,
+} from './action_combat_targeting';
+import {
   afflictionAdjustedCastTime,
   afflictionCastError,
   afflictionConsumeThreadDoomBonus,
@@ -832,6 +837,29 @@ function nearestAttackingMob(ctx: SimContext, p: Entity): Entity | null {
   return id !== null ? (ctx.entities.get(id) ?? null) : null;
 }
 
+function aimedHostileTarget(
+  ctx: SimContext,
+  p: Entity,
+  ability: AbilityDef,
+  aim: ActionCombatAim,
+): Entity | null {
+  const maxRange = ability.range > 0 ? ability.range : MELEE_RANGE;
+  const candidates: Entity[] = [];
+  for (const entity of ctx.entities.values()) {
+    if (entity.id === p.id || entity.dead || !ctx.isHostileTo(p, entity)) continue;
+    if (hasEscapeStealth(entity) || ctx.lineOfSightBlocked(p, entity, ability)) continue;
+    candidates.push(entity);
+  }
+  return selectActionCombatTarget({
+    origin: p.pos,
+    aim,
+    fallbackFacing: p.facing,
+    minRange: ability.minRange,
+    maxRange,
+    candidates,
+  });
+}
+
 export function castAbility(
   ctx: SimContext,
   abilityId: string,
@@ -1258,10 +1286,19 @@ export function castAbility(
       }
     }
   } else if (ability.requiresTarget && ability.targetType === 'any') {
-    target = p.targetId !== null ? (ctx.entities.get(p.targetId) ?? null) : null;
+    const actionAim = aim !== undefined && abilityUsesActionCombatAim(ability) ? aim : null;
+    target = actionAim
+      ? aimedHostileTarget(ctx, p, ability, actionAim)
+      : p.targetId !== null
+        ? (ctx.entities.get(p.targetId) ?? null)
+        : null;
+    if (actionAim && target) {
+      p.targetId = target.id;
+      p.facing = Math.atan2(actionAim.x - p.pos.x, actionAim.z - p.pos.z);
+    }
     // Auto-acquire (issue #2787): only when nothing is targeted at all, never
     // overriding an existing (even stale/invalid) selection.
-    if (!target && p.targetId === null) {
+    if (!actionAim && !target && p.targetId === null) {
       target = nearestAttackingMob(ctx, p);
       if (target) p.targetId = target.id;
     }
@@ -1288,7 +1325,14 @@ export function castAbility(
       return;
     }
   } else if (ability.requiresTarget) {
-    if (p.targetId !== null) {
+    const actionAim = aim !== undefined && abilityUsesActionCombatAim(ability) ? aim : null;
+    if (actionAim) {
+      target = aimedHostileTarget(ctx, p, ability, actionAim);
+      if (target) {
+        p.targetId = target.id;
+        p.facing = Math.atan2(actionAim.x - p.pos.x, actionAim.z - p.pos.z);
+      }
+    } else if (p.targetId !== null) {
       target = ctx.entities.get(p.targetId) ?? null;
     } else {
       // The stealth ambush fallback (Kidney Shot) takes priority when it

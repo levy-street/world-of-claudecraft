@@ -41,6 +41,7 @@ import {
   normalizeStreamerLink,
   type StreamerLinks,
 } from '../sim/account_flair';
+import { abilityUsesActionCombatAim } from '../sim/combat/action_combat_targeting';
 import { resolveActionReplacement } from '../sim/combat/action_replacement';
 import { resolveColdsightAbilityForSpec } from '../sim/combat/hunter_coldsight';
 import { resolveHunterSharedAbilityForTalents } from '../sim/combat/hunter_shared';
@@ -772,6 +773,8 @@ export interface OptionsHooks {
   logout(): void;
   captureKey(cb: ((code: string | null) => void) | null): void;
   settings: Settings;
+  /** Resolve the current cursor ray to a world point for optional action combat. */
+  actionCombatAim(): { x: number; z: number } | null;
   onSettingChange(key: keyof GameSettings, value: GameSettings[keyof GameSettings]): void;
   /** Current renderer-bound profile. Options clones this into a disposable local draft. */
   graphicsApplied(): GraphicsSettingsSnapshot;
@@ -6816,7 +6819,9 @@ export class Hud {
     if (empowered) {
       if (this.empowerCharge) return;
       this.empowerCharge = { slot, abilityId: empowered };
-      this.sim.castAbility(empowered);
+      const resolved = this.sim.known.find((known) => known.def.id === empowered);
+      if (resolved) this.castActionAbility(empowered, resolved.def);
+      else this.sim.castAbility(empowered);
       return;
     }
     this.castSlot(slot);
@@ -6897,6 +6902,16 @@ export class Hud {
       document.body.classList.contains('mobile-touch'),
       this.optionsHooks?.settings.get('groundReticle') ?? true,
     );
+  }
+
+  private castActionAbility(abilityId: string, ability: AbilityDef): void {
+    const actionAim =
+      (this.optionsHooks?.settings.get('actionCombat') ?? false) &&
+      abilityUsesActionCombatAim(ability)
+        ? this.optionsHooks?.actionCombatAim()
+        : null;
+    if (actionAim) this.sim.castAbilityToward(abilityId, actionAim);
+    else this.sim.castAbility(abilityId);
   }
 
   isGroundAimActive(): boolean {
@@ -7016,7 +7031,7 @@ export class Hud {
         // A keyboard-generated button click has no pointer hold. Resolve it as
         // a minimum-charge tap so an empowered spell can never stay stuck.
         if (resolved.def.empowerStages) {
-          this.sim.castAbility(action.id);
+          this.castActionAbility(action.id, resolved.def);
           this.sim.releaseEmpoweredAbility(action.id);
           this.flashActionSlot(barSlot);
           return;
@@ -7047,7 +7062,7 @@ export class Hud {
           ) {
             this.sim.castAbilityOn(action.id, this.hoveredPartyPid);
           } else {
-            this.sim.castAbility(action.id);
+            this.castActionAbility(action.id, def);
           }
           // Optional QoL: also engage auto-attack when the ability is an offensive
           // attack, so white swings start without a separate Attack press. Gated on

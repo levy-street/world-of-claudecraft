@@ -3988,6 +3988,12 @@ export class ClientWorld implements IWorld {
     }
     this.cmd({ cmd: 'cast', ability: abilityId });
   }
+  castAbilityToward(abilityId: string, aim: { x: number; z: number }): void {
+    // Aim replaces the selected hostile, so a stale selected corpse must not
+    // trip the classic dead-target pre-validation. The server validates both
+    // coordinates and performs the real target/range/LoS selection.
+    this.cmd({ cmd: 'cast', ability: abilityId, x: aim.x, z: aim.z });
+  }
   castAbilityBySlot(slot: number): void {
     if (this.deadTargetCast(this.known[slot]?.def)) {
       this.eventQueue.push({ type: 'error', text: 'You have no target.', reason: 'target_dead' });

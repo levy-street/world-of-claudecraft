@@ -12,63 +12,84 @@ export const pending: Record<string, readonly string[]> = {
   "es": [
     "hudChrome.bg.doubleHonorLine",
     "hudChrome.calendar.events.doubleHonor.note",
-    "hudChrome.calendar.events.doubleHonor.title"
+    "hudChrome.calendar.events.doubleHonor.title",
+    "hudChrome.options.actionCombat"
   ],
   "es_ES": [
     "hudChrome.bg.doubleHonorLine",
     "hudChrome.calendar.events.doubleHonor.note",
-    "hudChrome.calendar.events.doubleHonor.title"
+    "hudChrome.calendar.events.doubleHonor.title",
+    "hudChrome.options.actionCombat"
   ],
   "fr_FR": [
     "hudChrome.bg.doubleHonorLine",
     "hudChrome.calendar.events.doubleHonor.note",
-    "hudChrome.calendar.events.doubleHonor.title"
+    "hudChrome.calendar.events.doubleHonor.title",
+    "hudChrome.options.actionCombat"
   ],
   "fr_CA": [
     "hudChrome.bg.doubleHonorLine",
     "hudChrome.calendar.events.doubleHonor.note",
-    "hudChrome.calendar.events.doubleHonor.title"
+    "hudChrome.calendar.events.doubleHonor.title",
+    "hudChrome.options.actionCombat"
   ],
   "en_CA": [],
   "it_IT": [
     "hudChrome.bg.doubleHonorLine",
     "hudChrome.calendar.events.doubleHonor.note",
-    "hudChrome.calendar.events.doubleHonor.title"
+    "hudChrome.calendar.events.doubleHonor.title",
+    "hudChrome.options.actionCombat"
   ],
   "de_DE": [
     "hudChrome.bg.doubleHonorLine",
     "hudChrome.calendar.events.doubleHonor.note",
-    "hudChrome.calendar.events.doubleHonor.title"
+    "hudChrome.calendar.events.doubleHonor.title",
+    "hudChrome.options.actionCombat"
   ],
-  "zh_CN": [],
-  "zh_TW": [],
-  "ko_KR": [],
-  "ja_JP": [],
+  "zh_CN": [
+    "hudChrome.options.actionCombat"
+  ],
+  "zh_TW": [
+    "hudChrome.options.actionCombat"
+  ],
+  "ko_KR": [
+    "hudChrome.options.actionCombat"
+  ],
+  "ja_JP": [
+    "hudChrome.options.actionCombat"
+  ],
   "pt_BR": [
     "hudChrome.bg.doubleHonorLine",
     "hudChrome.calendar.events.doubleHonor.note",
-    "hudChrome.calendar.events.doubleHonor.title"
+    "hudChrome.calendar.events.doubleHonor.title",
+    "hudChrome.options.actionCombat"
   ],
-  "ru_RU": [],
+  "ru_RU": [
+    "hudChrome.options.actionCombat"
+  ],
   "cs_CZ": [
     "hudChrome.bg.doubleHonorLine",
     "hudChrome.calendar.events.doubleHonor.note",
-    "hudChrome.calendar.events.doubleHonor.title"
+    "hudChrome.calendar.events.doubleHonor.title",
+    "hudChrome.options.actionCombat"
   ],
   "nl_NL": [
     "hudChrome.bg.doubleHonorLine",
     "hudChrome.calendar.events.doubleHonor.note",
-    "hudChrome.calendar.events.doubleHonor.title"
+    "hudChrome.calendar.events.doubleHonor.title",
+    "hudChrome.options.actionCombat"
   ],
   "pl_PL": [
     "hudChrome.bg.doubleHonorLine",
     "hudChrome.calendar.events.doubleHonor.note",
-    "hudChrome.calendar.events.doubleHonor.title"
+    "hudChrome.calendar.events.doubleHonor.title",
+    "hudChrome.options.actionCombat"
   ],
   "id_ID": [
     "hudChrome.bg.doubleHonorLine",
     "hudChrome.calendar.events.doubleHonor.note",
-    "hudChrome.calendar.events.doubleHonor.title"
+    "hudChrome.calendar.events.doubleHonor.title",
+    "hudChrome.options.actionCombat"
   ],
   "tr_TR": [
     "hudChrome.bg.doubleHonorLine",
@@ -78,16 +99,19 @@ export const pending: Record<string, readonly string[]> = {
   "sv_SE": [
     "hudChrome.bg.doubleHonorLine",
     "hudChrome.calendar.events.doubleHonor.note",
-    "hudChrome.calendar.events.doubleHonor.title"
+    "hudChrome.calendar.events.doubleHonor.title",
+    "hudChrome.options.actionCombat"
   ],
   "vi_VN": [
     "hudChrome.bg.doubleHonorLine",
     "hudChrome.calendar.events.doubleHonor.note",
-    "hudChrome.calendar.events.doubleHonor.title"
+    "hudChrome.calendar.events.doubleHonor.title",
+    "hudChrome.options.actionCombat"
   ],
   "da_DK": [
     "hudChrome.bg.doubleHonorLine",
     "hudChrome.calendar.events.doubleHonor.note",
-    "hudChrome.calendar.events.doubleHonor.title"
+    "hudChrome.calendar.events.doubleHonor.title",
+    "hudChrome.options.actionCombat"
   ]
 };

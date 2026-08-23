@@ -38,6 +38,8 @@ export interface IWorldCombat {
   /** Remaining server-authoritative lifetime of a reactive ability window. */
   reactiveAbilityWindowRemaining(abilityId: string): number;
   castAbility(abilityId: string): void;
+  /** Cast an entity-targeted offensive ability toward a world-space aim ray. */
+  castAbilityToward(abilityId: string, aim: { x: number; z: number }): void;
   castAbilityBySlot(slot: number): void;
   // Ground-targeted cast: the ability is aimed at a world point (x, z) the player
   // chose, instead of the current entity target. Cast by ability id (like
