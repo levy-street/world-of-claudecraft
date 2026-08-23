@@ -11622,6 +11622,52 @@ keys with no semantic anchor let an in-place English rewrite silently re-point
 every translation below it, and the only reason this was findable at all is that
 someone read a translated question and noticed it asked something else.
 
+### THE FIX ROUND'S OWN REVIEW, AND THE INCOMPLETE-VERSUS-FALSE LINE
+
+A late report from the first fix-round reviewer landed after the ledger was
+written, and it found six more, four of them in this audit's own work. All are
+applied.
+
+**A NEW FALSE CLAIM, WRITTEN BY THIS AUDIT.** The corrected `toolsNoteThreeRods`
+said the three rods "are the exception to EVERYTHING in this paragraph". Two of
+the paragraph's assertions hold for them: `delves/shop.ts` sells the stormreel at
+24 Marks and the tidewrought at 56, and all three rods are `stationType`
+'toolworks'. The generated tools table in the SAME section renders the Stormreel
+as "Crafted (Engineering) or 24 Delve Marks", so the sentence contradicted the
+table beneath it and this round's own `startBodyThreeRods`. The retired text had
+been narrowly scoped and true; the replacement over-reached. Scoped back.
+
+**THIS MODULE'S MEASUREMENT WAS FALSIFIED BY THE COMMIT THAT WROTE IT.**
+`fishing_bands.ts` recorded fishing.ts at 675 to 736 lines with the non-comment
+count UP by one. Those were the values at the commit's own PARENT: the same
+commit then deleted the consumerless `FishingCatchBand` re-export, a non-comment
+line. Re-measured: 675 to 746, all 71 added lines comment, non-comment 287 on
+both sides, exactly FLAT. Corrected in the module and in the directory CLAUDE.md,
+which repeated all three wrong numbers.
+
+**THE FILLS COINED A PROPER NOUN.** Three locales named the Drowned Litany with
+an invented form (`溺诵秘所`, `溺誦祕所`, `溺れた連祷`) while the tools table on the
+SAME page rendered the canonical `entities.delves.drowned_litany.name`. Replaced
+with each locale's own shipped name, and the next fill prompt was rewritten to
+require looking the entity row up first.
+
+**THE INCOMPLETE-VERSUS-FALSE LINE, drawn explicitly because this round nearly
+crossed it twice.** The three ENGINEERING keys were FALSE after 11i: eight
+recipes against a shipped nine, "the two crafted rods" against three. Their stale
+rows are retired from all eighteen overlays and the five non-Latin locales are
+refilled, so `de_DE` no longer publishes "acht Rezepten". The COOKING roster is
+merely INCOMPLETE, omitting the three skill-gated catches while stating nothing
+untrue, and it was already on this worklist for that. Its rows were pruned in the
+same pass and are RESTORED: a translation that is short of a sentence is worth
+more than an English fallback, and retiring it would have thrown away work to fix
+a defect it does not have. That is the same error as the FAQ over-retirement one
+section down, caught before it shipped rather than after.
+
+Also applied: the retired screenshot variant's five leftovers (a dead
+`wantsTray` staging block, its parameter, the always-false argument, and two
+prose sentences advertising a state that no longer exists), and `recipes.ts`'s
+"crafts only 4 and 5" against a three-rod ladder.
+
 ### STEP 0: THE TENTH RELEASE SYNC, AND IT WAS OWED
 
 `origin/release/v0.40.0` moved 50462dda83 to 14ab2e8630, 33 commits across 180
@@ -12591,9 +12637,7 @@ because its stale rows are FALSE rather than merely incomplete.
 | guide.profPages.craftProse.cooking.materialsBody | 18 | 20 rendered locales |
 | guide.profPages.craftProse.alchemy.materialsBody | 18 | 20 rendered locales |
 | guide.profPages.farm.bedsBody | 5 | added by the 11h QA |
-| guide.profPages.craftProse.engineering.identityBody | 18 | 11i QA; dynamic key path, cannot be re-keyed |
-| guide.profPages.craftProse.engineering.ladderBody | 18 | 11i QA; dynamic key path, cannot be re-keyed |
-| guide.profPages.craftIntro.engineering | 18 | 11i QA; dynamic key path, cannot be re-keyed |
+| guide.profPages.craftProse.cooking.materialsBody | 18 | INCOMPLETE, not false: omits the three skill-gated catches |
 | abilities: fire mastery burn description | 21 | RELEASE-owned; English says 30%, every non-English bundle says 40% |
 | abilities: Galeheart Echoes description | 21 | RELEASE-owned; English says 25%, every non-English bundle says 50% |
 | guide.interfacePage.mobileBody | 18 | 11i QA; RELEASE-owned drift, see below |

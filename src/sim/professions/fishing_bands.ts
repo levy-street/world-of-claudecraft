@@ -14,12 +14,16 @@
 // coordinator and this is a pure lookup two other layers read.
 //
 // WHAT THE EXTRACTION ACTUALLY MOVED, measured rather than characterised,
-// because the first wording here flattered it. fishing.ts went 675 to 736
-// lines, and every one of those 61 is comment: its NON-comment count went 287
-// to 288, UP by one. One function body left (the six-line fishingRodBandFor)
-// and the shim cost seven back (the import widened from one line to six, plus
-// two re-export lines). So the code footprint is flat and the file is +61 lines
-// of prose. What the move buys is not size: it is that the ladder now has ONE
+// because the first wording here flattered it and the SECOND wording was
+// falsified by the commit that wrote it. fishing.ts went 675 to 746 lines,
+// and every one of those 71 is comment: its NON-comment count is 287 both
+// before and after, exactly FLAT. One function body left (the six-line
+// fishingRodBandFor) and the shim cost six back (the import widened from one
+// line to six, plus one re-export line, after the QA round deleted the
+// consumerless type re-export that made it two). The numbers 736 and 288 that
+// stood here briefly were measured one commit earlier and were true then; the
+// lesson is the one this file already teaches, that a measurement written into
+// a comment is only true of the tree it was taken on. What the move buys is not size: it is that the ladder now has ONE
 // home that server/ and src/ui/ can import without reaching through a command
 // coordinator, and that widening it again is one edit here.
 //

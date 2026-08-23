@@ -10243,8 +10243,7 @@ export const TARGETS = [
   },
   {
     key: 'masterwrought-phase10-consumables',
-    label:
-      'Masterwrought phase 10: flask and role-food tooltips, the Lucent picker gates, the six-kind tray',
+    label: 'Masterwrought phase 10: flask and role-food tooltips, and the Lucent picker gates',
     when: [
       'content/profession_items',
       'hud/action_bar/consumable_bar_view',
@@ -10257,9 +10256,9 @@ export const TARGETS = [
       // change shoots the generic mobile HUD), which is a narrowing.
       'ui/bag_item_action_menu',
     ],
-    // Five states of the phase 10 consumables and enchant surface, each brought
+    // Four states of the phase 10 consumables and enchant surface, each brought
     // up through the REAL bound events (pointer hover on a bag row, contextmenu
-    // or tap on the reagent's row, a tap on the tray toggle), never a hand-built
+    // or tap on the reagent's row), never a hand-built
     // string: the flask tooltip (the shared Use line plus its three rules, the
     // ranked clean-slate clause included), the role-food tooltip (the Well Fed
     // line with its one-effect rule), the enchant picker at Enchanting 99 (every
@@ -10322,7 +10321,7 @@ export const TARGETS = [
       await page.waitForFunction(() => window.__game?.sim?.player, { timeout: 90000 });
       await dismissEntryOverlays(page);
       const staged = await page.evaluate(
-        (tooltipId, wantsPicker, skill, wantsTray) => {
+        (tooltipId, wantsPicker, skill) => {
           const game = window.__game;
           const sim = game?.sim;
           if (!game || !sim?.player) return { ok: false, reason: 'offline world unavailable' };
@@ -10347,32 +10346,11 @@ export const TARGETS = [
             meta.craftSkills.enchanting = skill;
             return { ok: true };
           }
-          if (wantsTray) {
-            // Six kinds, one of each; with the starter jerky already holding
-            // a food slot that is seven consumables for six slots, so the shot
-            // shows the tray's priority fill live: potion, elixir, flask (third,
-            // its phase 10 rank), scroll, both foods, and the drink shed off the
-            // end, exactly the recorded trade the phase 14 residual describes.
-            for (const id of [
-              'minor_healing_potion',
-              'elixir_of_the_boar',
-              'ironhusk_flask',
-              'sunpetal_scroll',
-              'stonepot_stew',
-              'spring_water',
-            ]) {
-              try {
-                sim.addItem(id, 1);
-              } catch {}
-            }
-            return { ok: true };
-          }
           return { ok: false, reason: 'unknown variant' };
         },
         variant?.tooltip ?? null,
         Boolean(variant?.picker),
         variant?.skill ?? 0,
-        Boolean(variant?.tray),
       );
       if (!staged.ok) throw new Error(staged.reason);
       // Writing the skill trips the once-ever first-tier tutorial modal

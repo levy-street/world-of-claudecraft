@@ -3098,7 +3098,8 @@ export const APEX_CONSUMABLE_RECIPES: ProfessionRecipeRecord[] = [
 // stocked on the tier-1 farmer NPC since the go-live).
 //
 // ACQUISITION COVERAGE, where this ladder diverges from the rods and why:
-// the rod ladder leaves rungs 2 and 3 vendor-priced and crafts only 4 and 5,
+// the rod ladder leaves rungs 2 and 3 vendor-priced and crafts 4, 5 and, since
+// masterwrought Phase 11i, 6,
 // but the hoe pricing table locks buyValue OFF rungs 2 to 4, so the vendor
 // arm cannot be mirrored; HOE_RECIPES covers rungs 2, 3, AND 4 instead,
 // making craft the only mint above rung 1 and leaving no acquisition gap
