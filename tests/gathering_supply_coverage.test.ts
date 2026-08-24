@@ -119,8 +119,8 @@ import {
 } from '../src/sim/professions/gathering_supply';
 import { baseMaterialFor, MATERIAL_GRADES } from '../src/sim/professions/material_grades';
 import { gatherToolTier } from '../src/sim/professions/tools';
-import type { GatherNodeType } from '../src/sim/types';
 import { TIER_SKILL_STEP, tierForSkill } from '../src/sim/professions/wheel';
+import type { GatherNodeType } from '../src/sim/types';
 
 // THE SUPPLY DERIVATION MOVED OUT AT masterwrought Phase 11k, and the move is
 // why this file no longer carries it. The provisioning wiki page became a

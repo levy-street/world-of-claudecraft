@@ -100,12 +100,7 @@ describe('the apex feast titles', () => {
     // Derived from the sim's own family so the two cannot drift, with the
     // literal beside it because a derivation alone follows the table down.
     const templates = feastTitleTemplateIds();
-    expect(templates).toEqual([
-      'farm_feast',
-      'sageleaf_feast',
-      'stonepot_feast',
-      'warspice_feast',
-    ]);
+    expect(templates).toEqual(['farm_feast', 'sageleaf_feast', 'stonepot_feast', 'warspice_feast']);
     for (const templateId of templates) {
       expect(feastTitleKeyFor(templateId), templateId).not.toBeNull();
       // And the composed title actually resolves, rather than the key merely

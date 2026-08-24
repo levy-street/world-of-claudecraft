@@ -27,7 +27,6 @@ import {
   GATHERING_PROFESSIONS,
 } from '../src/sim/content/professions';
 import { ALL_RECIPES } from '../src/sim/content/recipes';
-import { APEX_FEAST_CRAFT_MARK, isApexFeastRecipe } from '../src/sim/professions/feast';
 import { RIFT_MOBS } from '../src/sim/content/rift/mobs';
 import { WARLOCK_PET_MOBS } from '../src/sim/content/warlock_pets';
 import { YUMI_TEMPLATE_ID } from '../src/sim/content/yumi';
@@ -59,6 +58,7 @@ import {
   enchantingGainMultiplier,
 } from '../src/sim/professions/archetype';
 import { farmingTeachingCeilingFor } from '../src/sim/professions/farming';
+import { APEX_FEAST_CRAFT_MARK, isApexFeastRecipe } from '../src/sim/professions/feast';
 import { RIFT_LEVEL_CAP, RIFT_MAX_MOB_LEVEL } from '../src/sim/rift/rift_gen';
 import { type PlayerMeta, Sim } from '../src/sim/sim';
 import { DEED_STAT_KEYS, type DeedCategory, MILESTONES } from '../src/sim/types';
@@ -1278,7 +1278,6 @@ describe('trigger references resolve against the real content tables', () => {
     if (trigger.kind === 'visits') expect([...trigger.markIds].sort()).toEqual(marks);
   });
 
-
   it('the apex_feast namespace SURVIVES a save/load round trip, so the deed can refill', () => {
     // THE SAME MANDATORY TRAP one deed over (masterwrought Phase 11k), and the
     // reason it is a ROUND TRIP rather than a membership check: an unregistered
@@ -1297,9 +1296,9 @@ describe('trigger references resolve against the real content tables', () => {
     // namespace really is dropped by the same round trip.
     const bogus = restoreDeedStats(undefined);
     bogus.visited.add('apex_feast_typo:crafted');
-    expect(
-      restoreDeedStats(serializeDeedStats(bogus)).visited.has('apex_feast_typo:crafted'),
-    ).toBe(false);
+    expect(restoreDeedStats(serializeDeedStats(bogus)).visited.has('apex_feast_typo:crafted')).toBe(
+      false,
+    );
     // ...and the deed's own trigger really names THIS mark, so the round trip
     // above is over the key the evaluator reads.
     const trigger = DEEDS.prog_field_to_feast.trigger;

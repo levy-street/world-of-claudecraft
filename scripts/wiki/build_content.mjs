@@ -1223,9 +1223,7 @@ const profPages = [
 // kitchen leaves this page by itself, and the page can never disagree with the
 // guard about who supplies what.
 const cookingRecipes = ALL_RECIPES.filter((r) => r.professionId === 'cooking');
-const cookingDemand = new Set(
-  cookingRecipes.flatMap((r) => r.reagents.map((g) => g.itemId)),
-);
+const cookingDemand = new Set(cookingRecipes.flatMap((r) => r.reagents.map((g) => g.itemId)));
 const supplyByFamily = gatheringSupplyByFamily();
 const provisioningLines = [...supplyByFamily.entries()]
   .map(([id, ids]) => ({

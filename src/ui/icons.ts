@@ -3965,14 +3965,8 @@ const ITEM_RECIPES: Record<string, IconRecipe> = {
   // here is the ROLE glyph instead, which is what keeps the three scrolls
   // apart (the same deliberate exception the farm feast's pattern already
   // takes one block up, for the same reason).
-  pattern_stonepot_feast: r('parchment', 'steel', [
-    'scroll',
-    { p: 'shield', pal: 'steel', ...BR },
-  ]),
-  pattern_warspice_feast: r('parchment', 'blood', [
-    'scroll',
-    { p: 'sword', pal: 'blood', ...BR },
-  ]),
+  pattern_stonepot_feast: r('parchment', 'steel', ['scroll', { p: 'shield', pal: 'steel', ...BR }]),
+  pattern_warspice_feast: r('parchment', 'blood', ['scroll', { p: 'sword', pal: 'blood', ...BR }]),
   pattern_sageleaf_feast: r('parchment', 'arcanePink', [
     'scroll',
     { p: 'staff', pal: 'arcanePink', ...BR },

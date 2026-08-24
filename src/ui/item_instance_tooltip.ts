@@ -224,10 +224,7 @@ export function isGatheredProvenance(def: ItemDef | undefined): boolean {
  *  alone. Takes the DEF rather than the bare kind since masterwrought Phase
  *  11k, because the crafted-placeable carve-out above cannot be decided from
  *  the kind alone. */
-export function instanceMakersMarkLine(
-  instance?: ItemInstancePayload,
-  def?: ItemDef,
-): string {
+export function instanceMakersMarkLine(instance?: ItemInstancePayload, def?: ItemDef): string {
   if (!instance?.signer) return '';
   if (isGatheredProvenance(def)) {
     return `<div class="tt-sub" style="color:${QUALITY_COLOR.uncommon}">${esc(

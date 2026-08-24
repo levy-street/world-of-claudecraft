@@ -83,8 +83,8 @@ import { archetypeCeilingFor, craftSkillGainMultiplier } from './archetype';
 import { comboEligibility } from './combo_eligibility';
 import { isCommissionEligible } from './commission';
 import { craftCastDurationSec } from './craft_cast_duration';
-import { APEX_FEAST_CRAFT_MARK, isApexFeastRecipe } from './feast';
 import { isDisenchantable } from './enchanting';
+import { APEX_FEAST_CRAFT_MARK, isApexFeastRecipe } from './feast';
 import { announceMasterworkZone } from './gather_events';
 import { isSignableMaterialRarity, type MaterialRarity } from './gathering';
 import {

@@ -388,7 +388,12 @@ describe('isGatheredProvenanceKind partition over the live content', () => {
     // traded for. So the sweep below reads the DEF-level predicate and the
     // feasts are ordinary members of it, at every rung.
     const CRAFTED_JUNK_EXCEPTIONS = new Set(['growth_tonic']);
-    const PLACEABLE_FEASTS = ['harvest_feast', 'stonepot_feast', 'warspice_feast', 'sageleaf_feast'];
+    const PLACEABLE_FEASTS = [
+      'harvest_feast',
+      'stonepot_feast',
+      'warspice_feast',
+      'sageleaf_feast',
+    ];
     expect(ALL_RECIPES.length).toBeGreaterThan(0);
     for (const recipe of ALL_RECIPES) {
       expect(ITEMS[recipe.resultItemId], recipe.id).toBeDefined();

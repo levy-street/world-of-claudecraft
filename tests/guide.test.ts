@@ -23,9 +23,9 @@ import {
   GUIDE_PROF_ECONOMY,
   GUIDE_PROF_ENCHANTING,
   GUIDE_PROF_GATHERING,
-  GUIDE_PROF_PROVISIONING,
   GUIDE_PROF_MASTERWORK,
   GUIDE_PROF_PAGES,
+  GUIDE_PROF_PROVISIONING,
   GUIDE_PROF_RING,
   GUIDE_PROF_STATIONS,
   GUIDE_RELIQUARY,
@@ -3359,7 +3359,6 @@ describe('Guide professions pages and routes', () => {
     // An unknown id renders the inline not-found, never a blank page.
     expect(professionsPage.render(ctx(['nonsense']))).toContain('guide-notfound');
   });
-
 
   it('the provisioning page tells the story from real generated data', () => {
     setLanguage('en');
