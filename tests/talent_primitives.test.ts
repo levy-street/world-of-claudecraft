@@ -454,30 +454,15 @@ describe('talent primitive P3: empower next', () => {
 });
 
 describe('talent primitive P2: cast while moving', () => {
-  it('movement cancels a normal cast (baseline behavior unchanged)', () => {
+  it('keeps an ordinary hard cast active while moving', () => {
     const { sim, p } = makeSim('mage');
     spawnTarget(sim, p);
     sim.castAbility('fireball');
     expect(p.castingAbility).toBe('fireball');
     metaOf(sim, p).moveInput.forward = true;
     sim.tick();
-    expect(p.castingAbility).toBeNull();
-  });
-
-  it('a def-level castWhileMoving flag keeps the cast through movement', () => {
-    ABILITIES.fireball.castWhileMoving = true;
-    try {
-      const { sim, p } = makeSim('mage');
-      spawnTarget(sim, p);
-      sim.castAbility('fireball');
-      metaOf(sim, p).moveInput.forward = true;
-      sim.tick();
-      sim.tick();
-      expect(p.castingAbility).toBe('fireball');
-      expect(p.castRemaining).toBeGreaterThan(0);
-    } finally {
-      delete ABILITIES.fireball.castWhileMoving;
-    }
+    expect(p.castingAbility).toBe('fireball');
+    expect(p.castRemaining).toBeGreaterThan(0);
   });
 
   it('a talent castWhileMoving mod bakes onto the resolved ability', () => {
