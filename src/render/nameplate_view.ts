@@ -18,7 +18,7 @@
 // garbage on the hot path), mirroring the speedStreaksInto / cameraSpace out-param
 // idiom elsewhere in src/render.
 
-import { FARM_FEAST_TEMPLATE_ID } from '../sim/professions/feast';
+import { isFeastTemplateId } from '../sim/professions/feast';
 import type { Entity } from '../sim/types';
 import { INTERACT_RANGE } from '../sim/types';
 import { comboPipsFor } from './nameplate_combo';
@@ -149,7 +149,7 @@ export function nameplatePlanInto(
   // is already up as a player walks into eating range and never flickers at
   // the exact boundary.
   const feastNear =
-    e.templateId === FARM_FEAST_TEMPLATE_ID && d2 <= (INTERACT_RANGE + 1) * (INTERACT_RANGE + 1);
+    isFeastTemplateId(e.templateId) && d2 <= (INTERACT_RANGE + 1) * (INTERACT_RANGE + 1);
 
   out.hidden =
     (isSelf && !hasOverheadEmote && !showOwnNameplate) ||

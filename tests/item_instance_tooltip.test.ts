@@ -18,6 +18,7 @@ import {
   instanceBindingLines,
   instanceBonusStatLines,
   instanceMakersMarkLine,
+  isGatheredProvenance,
   isGatheredProvenanceKind,
   itemNumber,
   itemStatName,
@@ -208,18 +209,35 @@ describe('item_instance_tooltip', () => {
   it('a gathered-kind signed copy reads Gathered by, a crafted-kind keeps Crafted by', () => {
     // Both arms of the kind split, against real defs from each family.
     expect(ITEMS.copper_ore.kind).toBe('junk');
-    const gathered = instanceMakersMarkLine({ signer: 'Anna' }, ITEMS.copper_ore.kind);
+    const gathered = instanceMakersMarkLine({ signer: 'Anna' }, ITEMS.copper_ore);
     expect(gathered).toContain('Gathered by Anna');
     expect(gathered).not.toContain('Crafted by');
     expect(gathered).not.toContain('makers-mark');
     expect(ITEMS.ironedge_longsword.kind).toBe('weapon');
-    const crafted = instanceMakersMarkLine({ signer: 'Anna' }, ITEMS.ironedge_longsword.kind);
+    const crafted = instanceMakersMarkLine({ signer: 'Anna' }, ITEMS.ironedge_longsword);
     expect(crafted).toContain('Crafted by Anna');
     expect(crafted).not.toContain('Gathered by');
     expect(crafted).toContain('tt-makers-mark-icon');
     expect(crafted).toContain('aria-hidden="true"');
-    // No kind at all (a caller without the def) stays the crafted wording.
+    // No def at all (a caller without one) stays the crafted wording.
     expect(instanceMakersMarkLine({ signer: 'Anna' })).toContain('Crafted by Anna');
+    // THE CRAFTED-PLACEABLE CARVE-OUT (masterwrought Phase 11k), and it is a
+    // live-defect pin rather than a new-content one: a crafted Harvest Feast is
+    // kind 'junk' AND quality 'rare', so mintsSignerPayload really does stamp
+    // it, and before this carve-out the kind-only read called a cook's own
+    // feast "Gathered by". Both rungs are asserted, so a revert reds on the
+    // shipped item and not only on this phase's.
+    for (const id of ['harvest_feast', 'stonepot_feast']) {
+      const feast = instanceMakersMarkLine({ signer: 'Anna' }, ITEMS[id]);
+      expect(ITEMS[id].kind, `${id} really is the junk kind this carve-out is about`).toBe('junk');
+      expect(feast, id).toContain('Crafted by Anna');
+      expect(feast, id).not.toContain('Gathered by');
+    }
+    // And the carve-out is NARROW: an ordinary junk material still reads
+    // gathered, so it did not simply retire the other wording.
+    expect(instanceMakersMarkLine({ signer: 'Anna' }, ITEMS.copper_ore)).toContain(
+      'Gathered by Anna',
+    );
   });
 
   it("uses the exact project-owned maker's-mark stroke as a decorative currentColor glyph", () => {
@@ -352,25 +370,25 @@ describe('isGatheredProvenanceKind partition over the live content', () => {
     // crafted-kind, and every crafted junk-kind output must sit BELOW
     // signable rarity, or the "Gathered by" mislabel goes live the day a
     // retune bumps an intermediate to rare.
-    // TWO sanctioned junk-kind exceptions compose with that rule (the farming
+    // ONE sanctioned junk-kind exception composes with that rule (the farming
     // absorb, RULE 3b: the two suites' rules COMPOSE). Farming deviation
     // (ak): the growth tonic is a crafted output whose def is DELIBERATELY
     // kind 'junk' (plant_crop consumes it as the plant-time knob; there is no
     // use arm and Sell Junk must vendor it); common quality sits below the
     // signing floor and the masterwork arm needs slot+stats the def lacks.
-    // The SECOND member (farming Phase 12): the harvest feast is a crafted
-    // output deliberately kind 'junk' (using it PLACES the farm_feast
-    // entity). Its rare quality sits ABOVE the signing floor, so its
-    // never-signable proof rests on the masterwork arm alone: a stat-less,
-    // slot-less def can never proc a signed masterwork instance.
-    // The THIRD (masterwrought Phase 11i): the Deepwater Feast, the angler's
-    // capstone, is the same shape one rung up. Same placeable junk kind, same
-    // reason, and EPIC rather than rare, which is further above the signing
-    // floor and so rests on exactly the same masterwork proof. Every proof is
-    // pinned below, so each exception self-invalidates the day its premise
-    // moves.
-    const CRAFTED_JUNK_EXCEPTIONS = new Set(['growth_tonic', 'harvest_feast', 'deepwater_feast']);
-    const PLACEABLE_FEASTS = ['harvest_feast', 'deepwater_feast'];
+    //
+    // THE FEASTS WERE EXCEPTIONS HERE AND THEY SHOULD NEVER HAVE BEEN
+    // (masterwrought Phase 11k). Their entry claimed the never-signable proof
+    // "rests on the masterwork arm alone", which examined one of the TWO
+    // signing channels: mintsSignerPayload stamps any signable-rarity non-bag
+    // output, and harvest_feast is rare, so a cook's own feast really was
+    // signed and really did render "Gathered by". The fix is in the source
+    // rather than on this list: isGatheredProvenance carves out any def
+    // carrying a `feast` payload, because a feast is only ever crafted or
+    // traded for. So the sweep below reads the DEF-level predicate and the
+    // feasts are ordinary members of it, at every rung.
+    const CRAFTED_JUNK_EXCEPTIONS = new Set(['growth_tonic']);
+    const PLACEABLE_FEASTS = ['harvest_feast', 'stonepot_feast', 'warspice_feast', 'sageleaf_feast'];
     expect(ALL_RECIPES.length).toBeGreaterThan(0);
     for (const recipe of ALL_RECIPES) {
       expect(ITEMS[recipe.resultItemId], recipe.id).toBeDefined();
@@ -387,9 +405,7 @@ describe('isGatheredProvenanceKind partition over the live content', () => {
       const def = ITEMS[recipe.resultItemId];
       expect(def, recipe.resultItemId).toBeDefined();
       if (CRAFTED_JUNK_EXCEPTIONS.has(recipe.resultItemId)) continue;
-      expect(isGatheredProvenanceKind(def.kind), `${recipe.resultItemId} (${def.kind})`).toBe(
-        false,
-      );
+      expect(isGatheredProvenance(def), `${recipe.resultItemId} (${def.kind})`).toBe(false);
     }
     const craftedJunk = ALL_RECIPES.filter((r) => ITEMS[r.resultItemId].kind === 'junk');
     expect(craftedJunk.map((r) => r.resultItemId).sort()).toEqual(
@@ -406,15 +422,24 @@ describe('isGatheredProvenanceKind partition over the live content', () => {
         'sablewax_vellum',
         'growth_tonic',
         'harvest_feast',
-        'deepwater_feast',
+        // masterwrought Phase 11k's three apex role feasts, replacing 11i's
+        // retired capstone feast on the same placeable-junk footing.
+        'stonepot_feast',
+        'warspice_feast',
+        'sageleaf_feast',
       ].sort(),
     );
     for (const recipe of craftedJunk) {
       const def = ITEMS[recipe.resultItemId];
-      // The two FEASTS are the junk-kind outputs allowed above the signing
-      // floor (harvest_feast rare, deepwater_feast epic): their never-signable
-      // proof rests on the masterwork arm alone, asserted explicitly below the
-      // loop. Every other crafted junk output must stay below the floor.
+      // The FEASTS are the junk-kind outputs allowed above the signing floor
+      // (harvest_feast rare, the three apex rungs epic). They ARE signed, which
+      // is the correction masterwrought Phase 11k made: the provenance carve-out
+      // in item_instance_tooltip.ts is what keeps a signed feast reading
+      // "Crafted by", so the exception is about the wording rule and never
+      // about signability. The masterwork arm is still asserted below the loop,
+      // because a slot or stats gain would open a SECOND signing channel and
+      // change what the def is. Every other crafted junk output must stay below
+      // the floor.
       if (!PLACEABLE_FEASTS.includes(recipe.resultItemId)) {
         expect(
           signableQuality(def.quality),
@@ -461,6 +486,15 @@ describe('isGatheredProvenanceKind partition over the live content', () => {
     expect(new Set(PLACEABLE_FEASTS.map((id) => ITEMS[id].quality))).toEqual(
       new Set(['rare', 'epic']),
     );
+    // AND THE WORDING RULE ITSELF, at the def level, for every rung: a signed
+    // feast is CRAFTED provenance. Without this the carve-out could be deleted
+    // and only the composed-html arm far above would notice.
+    for (const id of PLACEABLE_FEASTS) {
+      expect(isGatheredProvenanceKind(ITEMS[id].kind), `${id} kind alone still reads junk`).toBe(
+        true,
+      );
+      expect(isGatheredProvenance(ITEMS[id]), `${id} def-level provenance is CRAFTED`).toBe(false);
+    }
   });
 });
 
@@ -477,7 +511,7 @@ describe('hud.itemTooltip composition order (source pins)', () => {
   const bonus = hud.indexOf('instanceBonusStatLines(instance)');
   // The mark line takes the def's kind too: the gathered-vs-crafted
   // wording split resolves from item.kind at the one composition site.
-  const mark = hud.indexOf('instanceMakersMarkLine(instance, item.kind)');
+  const mark = hud.indexOf('instanceMakersMarkLine(instance, item)');
   const soulbound = hud.indexOf("t('hudChrome.itemSoulbound')");
   const setBlock = hud.indexOf('this.itemSetBlock(item)');
 

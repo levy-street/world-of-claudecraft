@@ -1,9 +1,20 @@
-// The shared feast (Phase 12, D16): the tier-4 communal payoff. A placed
-// feast is a REAL world entity (kind 'object', templateId 'farm_feast', the
+// The shared feast (Phase 12, D16): the communal payoff, in TWO rungs since
+// masterwrought Phase 11k (the tier-4 party feast at cooking 100 and the three
+// apex role feasts at 125). A placed feast is a REAL world entity (kind
+// 'object', carrying the templateId its own item def names, the
 // battleground-flag precedent) riding the normal interest-scoped entity
 // snapshot, so no new wire mechanism exists anywhere in this feature. The
 // server owns every outcome: charges, the per-player consumed ledger, and
 // the tick-domain expiry all live here and are re-validated on every command.
+//
+// WHAT 11k CHANGED, and it is a widening rather than a framework. This module
+// used to name ONE item id and ONE templateId as constants, and every count,
+// selection, spend and dish lookup read them. That is what made 11i's
+// capstone feast dead content: it was a valid item def with a valid recipe
+// that no code could place and no client could label. Now the ACTION takes
+// the item id it is placing, the FeastState carries the dish that item names,
+// and the placeable family is derived from the catalog. No new command, no new
+// wire field, no new interaction surface, no rng draw.
 //
 // DRAW CONTRACT: placement and consumption draw ZERO rng (no Rng access in
 // this module at all). Placement is a bag spend plus an entity spawn;
@@ -49,11 +60,47 @@ import type { PlayerMeta } from '../sim';
 import type { SimContext } from '../sim_context';
 import { dist2d, type Entity, INTERACT_RANGE, isConsuming, isNonSpellCast } from '../types';
 
-/** The one placeable feast item (content/profession_items.ts) and the
- *  templateId its placed entity carries. A second placeable is explicitly
- *  out of scope (no general placeable-object framework). */
+/** The PARTY-tier placeable feast (content/profession_items.ts) and the
+ *  templateId its placed entity carries. It is the default of the dedicated
+ *  `place_feast` command, which carries no item id, so these two constants
+ *  stay: a bare place_feast places THIS feast and can never place another
+ *  (pinned in tests/professions_feast.test.ts). */
 export const FARM_FEAST_ITEM_ID = 'harvest_feast';
 export const FARM_FEAST_TEMPLATE_ID = 'farm_feast';
+
+/** THE PLACEABLE FEAST FAMILY, derived from the catalog and never hand-listed
+ *  (masterwrought Phase 11k). A feast is any item def carrying `feast`, and
+ *  its payload names the templateId its placed entity wears, so authoring one
+ *  def joins every site that keys on the family at once. That is the whole
+ *  point of the derivation: before this, ONE item id and ONE templateId were
+ *  module constants and SIX sites compared against them, which is exactly how
+ *  Phase 11i shipped a second feast that no code could place and no client
+ *  could label.
+ *
+ *  The six keyed sites, all of which read the helpers below rather than a
+ *  string literal: src/ui/entity_display_name.ts, src/render/entity_labels.ts
+ *  (the world title), src/render/nameplate_view.ts (the interact hysteresis
+ *  band), src/render/farm_patches.ts (the applyFeasts filter AND the
+ *  shadow-cap sweep), src/game/feast_interact.ts, and the contract comment in
+ *  src/render/quest_objects.ts. */
+const FEAST_TEMPLATE_IDS: ReadonlySet<string> = new Set(
+  Object.values(ITEMS).flatMap((def) =>
+    'feast' in def && def.feast ? [def.feast.templateId] : [],
+  ),
+);
+
+/** Is this entity templateId a placed feast of ANY tier? The one membership
+ *  question the render, ui and game sites ask. Null-and-undefined tolerant
+ *  because Entity.templateId is optional on the wire. */
+export function isFeastTemplateId(templateId: string | null | undefined): boolean {
+  return typeof templateId === 'string' && FEAST_TEMPLATE_IDS.has(templateId);
+}
+
+/** Every placed-feast templateId, for the display-name lookup that maps each
+ *  to its own title key. Sorted so a reader and a test see a stable order. */
+export function feastTemplateIds(): string[] {
+  return [...FEAST_TEMPLATE_IDS].sort();
+}
 
 /** One live placed feast. Keyed in SimContext.feasts by its entity id. */
 export interface FeastState {
@@ -67,6 +114,14 @@ export interface FeastState {
   /** Tick-domain deadline (ctx.tickCount base). Sub-second staleness
    *  between expiry and the 1 Hz sweep answers 'feast_expired'. */
   expiresAtTick: number;
+  /** The dish each bite IS, copied from the PLACED item's own feast payload
+   *  at placement (masterwrought Phase 11k). Carried on the state rather than
+   *  re-read from a module constant at the bite, because the bite has no
+   *  memory of which feast item was spent: without it every feast serves the
+   *  party feast's dish and an apex feast mints the wrong aura. This field is
+   *  transient like the rest of FeastState (no save blob, no PlayerMeta, no
+   *  wire field), so it is sim-local and adds no cross-platform surface. */
+  dishItemId: string;
   /** The per-player consumed ledger: one bite per player per feast. */
   eatenBy: Set<number>;
 }
@@ -76,8 +131,8 @@ export function feastOwnerKey(meta: PlayerMeta): number {
   return meta.characterId ?? meta.entityId;
 }
 
-/** Set out a harvest feast at the caller's feet, spending one feast item
- *  from bags. Gate order mirrors plantCrop: the family's shared ctx.error
+/** Set out a feast at the caller's feet, spending one feast item from bags.
+ *  Gate order mirrors plantCrop: the family's shared ctx.error
  *  sentences for dead/busy (deviation (bq): no new wire enum arm for a
  *  state every command family refuses the same way), then text-free
  *  id-carrying farmDenied reasons for everything feast-specific.
@@ -86,12 +141,23 @@ export function feastOwnerKey(meta: PlayerMeta): number {
  *  press NAMES the bag slot it came from and that copy is honored exactly,
  *  the consumeOneUnit thread every sibling use arm runs. Absent (the
  *  dedicated place_feast command carries no slot), the id-only lock-aware
- *  walk below stays byte-for-byte what it was. */
+ *  walk below stays byte-for-byte what it was.
+ *
+ *  `itemId` is the feast being placed (masterwrought Phase 11k). It DEFAULTS
+ *  to the party feast, which is what keeps the dedicated `place_feast`
+ *  command's meaning exactly what it was: that command carries no item id, so
+ *  a bare place_feast still places a harvest_feast and can never place an apex
+ *  feast. The apex feasts reach the ground through use_item, which already
+ *  carries the clicked slot, so the clicked copy is the one spent. This is a
+ *  WIDENING of one authored action from one id to the catalog's feast family:
+ *  no new wire arm, no new command, no new interaction surface, and no rng
+ *  draw (this module still draws zero). */
 export function placeFeastAction(
   ctx: SimContext,
   p: Entity,
   meta: PlayerMeta,
   slotIndex?: number,
+  itemId: string = FARM_FEAST_ITEM_ID,
 ): void {
   if (p.dead) {
     ctx.error(meta.entityId, "You can't do that while dead.");
@@ -118,8 +184,11 @@ export function placeFeastAction(
       return;
     }
   }
-  const def = ITEMS[FARM_FEAST_ITEM_ID];
+  const def = ITEMS[itemId];
   const info = def && 'feast' in def ? def.feast : undefined;
+  // NOT a feast item at all: the refusal, never a fall-through to the party
+  // feast. A caller naming a non-feast id is a bug in the caller, and placing
+  // something else would spend the wrong item (the exact 11i failure mode).
   if (!info) return; // content invariant; pinned in the suite
   // The named-copy resolve (tri-state, item_copy_ref.ts): a slot holds the
   // selection, `null` is an invalid selection (refuse: the family's not-held
@@ -127,7 +196,7 @@ export function placeFeastAction(
   // useItem already validated the selection before routing here; the
   // re-resolve is this arm's OWN refusal so a direct caller can never fall
   // through to a silent guess.
-  const selected = selectedInventorySlot(meta.inventory, FARM_FEAST_ITEM_ID, slotIndex);
+  const selected = selectedInventorySlot(meta.inventory, itemId, slotIndex);
   if (selected === null) {
     ctx.emit({ type: 'farmDenied', pid: meta.entityId, reason: 'no_feast' });
     return;
@@ -140,11 +209,11 @@ export function placeFeastAction(
       ctx.emit({ type: 'farmDenied', pid: meta.entityId, reason: 'locked' });
       return;
     }
-  } else if (countUnlockedInSlots(meta.inventory, FARM_FEAST_ITEM_ID) < 1) {
+  } else if (countUnlockedInSlots(meta.inventory, itemId) < 1) {
     // Lock-aware spend split (deviation (ao), the crafting.ts idiom): a raw
     // count the owner locked is invisible to the sufficiency gate, and when
     // only a lock caused the shortfall the toast says so.
-    const reason = ctx.countItem(FARM_FEAST_ITEM_ID, meta.entityId) >= 1 ? 'locked' : 'no_feast';
+    const reason = ctx.countItem(itemId, meta.entityId) >= 1 ? 'locked' : 'no_feast';
     ctx.emit({ type: 'farmDenied', pid: meta.entityId, reason });
     return;
   }
@@ -161,12 +230,12 @@ export function placeFeastAction(
     // the inventory between the resolve above and this consume today, so a
     // failed take is defensive only: refuse rather than spawn a FREE feast
     // (item duplication) if a future gate insertion breaks that invariant.
-    if (!consumeSelectedInventorySlot(meta.inventory, FARM_FEAST_ITEM_ID, slotIndex)) {
+    if (!consumeSelectedInventorySlot(meta.inventory, itemId, slotIndex)) {
       ctx.emit({ type: 'farmDenied', pid: meta.entityId, reason: 'no_feast' });
       return;
     }
   } else {
-    removeUnlockedFromSlots(meta.inventory, FARM_FEAST_ITEM_ID, 1);
+    removeUnlockedFromSlots(meta.inventory, itemId, 1);
   }
   ctx.onInventoryChangedForQuests?.(meta);
   // The entity, the battleground-flag shape: a ground object with a custom
@@ -175,7 +244,7 @@ export function placeFeastAction(
   // "{name}'s Harvest Feast" title off the templateId (i18n: the text is
   // the key, the name is a param, never sim-side English).
   const e = createGroundObject(ctx.nextId++, '', meta.name, { ...p.pos });
-  e.templateId = FARM_FEAST_TEMPLATE_ID;
+  e.templateId = info.templateId;
   e.objectItemId = null;
   e.lootable = false;
   // The object-respawn sweep in sim.ts's entity loop treats EVERY
@@ -213,6 +282,7 @@ export function placeFeastAction(
     ownerKey,
     charges: info.charges,
     expiresAtTick: ctx.tickCount + info.durationTicks,
+    dishItemId: info.dishItemId,
     eatenBy: new Set(),
   });
   ctx.emit({ type: 'farmFeastPlaced', pid: meta.entityId, feastId: e.id });
@@ -281,13 +351,10 @@ export function consumeFeastAction(
     ctx.error(meta.entityId, 'You are already eating.');
     return;
   }
-  const feastSourceDef = ITEMS[FARM_FEAST_ITEM_ID];
-  const dish =
-    ITEMS[
-      (feastSourceDef && 'feast' in feastSourceDef
-        ? feastSourceDef.feast?.dishItemId
-        : undefined) ?? ''
-    ];
+  // The dish comes off the FEAST STATE, which copied it from the item that
+  // was actually placed. Reading a module constant here is what made the
+  // capstone feast serve the party feast's plate (masterwrought Phase 11k).
+  const dish = ITEMS[feast.dishItemId];
   if (!dish) return; // content invariant; pinned in the suite
   feast.eatenBy.add(feastOwnerKey(meta));
   feast.charges -= 1;

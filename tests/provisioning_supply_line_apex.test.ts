@@ -400,11 +400,14 @@ describe('masterwrought Phase 11h: the eight rows, per row', () => {
     }
     expect(
       liveApexIds.filter((id) => !APEX_ROWS.some((r) => r.id === id)),
-      "the rows 11h did not touch: masterwrought Phase 11i's three angler rows",
+      "the rows 11h did not touch: 11i's two surviving angler rows plus 11k's " +
+        'three apex feasts',
     ).toEqual([
-      'recipe_deepwater_feast',
       'recipe_peppered_deepbarb_catfish',
       'recipe_roast_hollowgill_sturgeon',
+      'recipe_sageleaf_feast',
+      'recipe_stonepot_feast',
+      'recipe_warspice_feast',
     ]);
     for (const row of APEX_ROWS) {
       const recipe = requireRecipe(row.id);
@@ -459,19 +462,31 @@ describe('masterwrought Phase 11h: the eight rows, per row', () => {
     }
   });
 
-  it('recipe_laden_hearth is still the longest bill in the game, now at EIGHT', () => {
+  it('the longest bill in the game is EIGHT, and exactly four rows hold it', () => {
     // Recorded as a fact about the merged table rather than a note, because it
     // is the one shape claim this phase makes that no other arm would notice:
     // nothing caps a reagent list, so the eighth row renders by existing.
     // SEVEN at 11h, EIGHT since masterwrought Phase 11i put its uniform fish
-    // row on the same bill; the hearth is still the sole holder of the record,
-    // which is what keeps the render trace above meaningful.
+    // row on recipe_laden_hearth's bill, which held the record alone until
+    // masterwrought Phase 11k. The apex feast tier TIES it at eight rather than
+    // beating it, and the tie is the design statement: the consumed
+    // provisioning capstone asks for as much as the permanent station does.
+    // The title no longer names one row, because a superlative held by a set is
+    // a set claim, and the enumeration below is what keeps the render trace
+    // above meaningful for every holder rather than only the first.
     const longest = Math.max(...ALL_RECIPES.map((r) => r.reagents.length));
     expect(longest, 'the longest bill in the merged table').toBe(8);
     expect(
-      ALL_RECIPES.filter((r) => r.reagents.length === 8).map((r) => r.id),
-      'and it is the only one',
-    ).toEqual(['recipe_laden_hearth']);
+      ALL_RECIPES.filter((r) => r.reagents.length === 8)
+        .map((r) => r.id)
+        .sort(),
+      'and these are exactly the rows that hold it',
+    ).toEqual([
+      'recipe_laden_hearth',
+      'recipe_sageleaf_feast',
+      'recipe_stonepot_feast',
+      'recipe_warspice_feast',
+    ]);
     // THE SIX-ENTRY TIER, pinned by id rather than counted, because a floor
     // here was satisfied by this phase's OWN rows: seven of the nine six-entry
     // rows are 11h's (three flasks, three plates, the alchemy capstone reached
@@ -492,9 +507,9 @@ describe('masterwrought Phase 11h: the eight rows, per row', () => {
       ALL_RECIPES.filter((r) => r.reagents.length === 6)
         .map((r) => r.id)
         .sort(),
-      'the six-entry rows: two from Phase 11g, four 11h reached, one 11i minted',
+      'the six-entry rows: two from Phase 11g and four 11h reached. It briefly ' +
+        "carried 11i's capstone feast, retired at Phase 11k.",
     ).toEqual([
-      'recipe_deepwater_feast',
       'recipe_grand_cauldron',
       'recipe_ironhusk_flask',
       'recipe_marlows_grand_roast',
@@ -930,9 +945,14 @@ describe('masterwrought Phase 11h GATE D: the capstones and the tier-4 fine twin
     // THE COUNTS DIVERGED AT masterwrought Phase 11j, which is why they are per
     // twin now rather than one shared 2. The apex hoe consumes
     // fine_evergarden_greens, so that twin gained a THIRD consumer while the
-    // sunmelon kept its two. The claim 11h's gate actually makes is untouched:
-    // each twin still has its own capstone at the 125 rung, which is the ID pin
-    // below and the thing a count alone never proved.
+    // sunmelon kept its two.
+    // UNMOVED AT masterwrought Phase 11k, and that is a derived outcome rather
+    // than an omission: the apex feast tier's bill takes the BASE crop, not a
+    // fine twin, because RULE 2's value half puts a 320-buyValue twin above any
+    // plausible non-produce reference on a fish row (only recipe_laden_hearth
+    // reaches it, and it TIES). The claim 11h's gate actually makes is
+    // untouched: each twin still has its own capstone at the 125 rung, which is
+    // the ID pin below and the thing a count alone never proved.
     const expectedConsumers: Record<string, number> = {
       fine_gilded_sunmelon: 2,
       fine_evergarden_greens: 3,
@@ -958,6 +978,11 @@ describe('masterwrought Phase 11h GATE D: the capstones and the tier-4 fine twin
       // non-capstone consumer for another non-capstone consumer at the same
       // count. That is outside this gate's claim, which is about the capstones,
       // and it is recorded rather than described as covered.
+      // AND masterwrought Phase 11k's three apex feasts do NOT appear here,
+      // which is worth stating because they ARE apex-consumable rows at exactly
+      // this rung: their bill takes the BASE crop rather than a fine twin, so
+      // the station capstones remain the twins' only 125-rung consumers and
+      // this exact-id assertion still discriminates.
       const apexConsumableIds = new Set(APEX_CONSUMABLE_RECIPES.map((r) => r.id));
       expect(
         consumers.filter((r) => r.skillReq >= 125 && apexConsumableIds.has(r.id)).map((r) => r.id),
@@ -1302,7 +1327,17 @@ describe('masterwrought Phase 11h: what it did NOT touch', () => {
     // apex flows through it, and a new apex cooking row that did NOT would be
     // the thing worth noticing here.
     expect(consumers.sort(), 'everything in the cooking apex flows through it').toEqual(
-      [...THREE_PLATES, 'recipe_laden_hearth', 'recipe_deepwater_feast'].sort(),
+      [
+        ...THREE_PLATES,
+        'recipe_laden_hearth',
+        // masterwrought Phase 11k: the apex feast tier takes the capstone idiom
+        // of THREE seasoned_stock, replacing 11i's retired capstone feast (which
+        // took two). Every cooking apex row still flows through the
+        // intermediate, which is the claim, and it is now true of seven rows.
+        'recipe_sageleaf_feast',
+        'recipe_stonepot_feast',
+        'recipe_warspice_feast',
+      ].sort(),
     );
   });
 
@@ -1380,18 +1415,20 @@ describe('masterwrought Phase 11h: what it did NOT touch', () => {
     // expected. Each lives in its own suite too; naming them here is what makes
     // "no count pin moved" a checked claim in the phase's own file.
     // ELEVEN and 153 since masterwrought Phase 11i, which DID mint rows, then
-    // 154 at masterwrought Phase 11j, which minted the apex hoe. The claim this
-    // arm makes is 11h's and it stays 11h's: what it pins is that 11h's own
-    // eight rungs never moved (the loop below) and that every id 11h added
-    // already existed. The table sizes are re-pinned rather than deleted
-    // because their job here is to make a later phase's mint VISIBLE in 11h's
-    // own file rather than silent, which is exactly what has now happened
-    // twice. APEX_CONSUMABLE_RECIPES is unmoved at 11 because 11j's row is a
-    // TOOL, so the divergence between the two counts is itself the record of
-    // what kind of row each later phase added.
-    expect(APEX_CONSUMABLE_RECIPES).toHaveLength(11);
+    // 154 at masterwrought Phase 11j, which minted the apex hoe, then THIRTEEN
+    // and 156 at masterwrought Phase 11k, which retired 11i's capstone feast
+    // row and minted three apex role feasts in its place (net plus two on both
+    // counts). The claim this arm makes is 11h's and it stays 11h's: what it
+    // pins is that 11h's own eight rungs never moved (the loop below) and that
+    // every id 11h added already existed. The table sizes are re-pinned rather
+    // than deleted because their job here is to make a later phase's mint
+    // VISIBLE in 11h's own file rather than silent, which is exactly what has
+    // now happened three times. The two counts moved TOGETHER this time, where
+    // 11j moved only ALL_RECIPES: that divergence, and its absence, is itself
+    // the record of what kind of row each later phase added.
+    expect(APEX_CONSUMABLE_RECIPES).toHaveLength(13);
     expect(INTERMEDIATE_RECIPES).toHaveLength(10);
-    expect(ALL_RECIPES).toHaveLength(154);
+    expect(ALL_RECIPES).toHaveLength(156);
     for (const row of APEX_ROWS) {
       expect(requireRecipe(row.id).skillReq, `${row.id} rung`).toBe(row.rung);
     }

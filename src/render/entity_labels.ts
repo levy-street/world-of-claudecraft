@@ -4,9 +4,9 @@
 // both the renderer and the NameplatePainter can share objectDisplayName without
 // a renderer <-> painter import cycle.
 
-import { FARM_FEAST_TEMPLATE_ID } from '../sim/professions/feast';
 import type { Entity } from '../sim/types';
 import { dungeonDisplayName, tEntity } from '../ui/entity_i18n';
+import { feastTitleFor } from '../ui/feast_title';
 import { t } from '../ui/i18n';
 
 export function mobDisplayName(mobId: string): string {
@@ -80,14 +80,14 @@ export function objectDisplayName(entity: Entity): string {
       ? t('worldContent.dungeonExitName', { name: dungeonName })
       : dungeonName;
   }
-  // The placed harvest feast (Phase 12): the entity's wire name is the
-  // PLACER'S raw player name, a VALUE, and the displayed title composes it
-  // into the localized "{name}'s Harvest Feast" here on the painter side
-  // (sim and server stay language-agnostic; the key lands with the Phase 12
-  // catalog fold).
-  if (entity.templateId === FARM_FEAST_TEMPLATE_ID) {
-    return t('hudChrome.farming.feastTitle', { name: entity.name });
-  }
+  // A placed feast of ANY tier (Phase 12; widened by masterwrought Phase 11k):
+  // the entity's wire name is the PLACER'S raw player name, a VALUE, and the
+  // displayed title composes it into the localized "{name}'s <Feast>" here on
+  // the painter side (sim and server stay language-agnostic). The rule lives
+  // in the shared src/ui/feast_title.ts leaf, which src/ui/entity_display_name
+  // also reads, so the world label and the target frame cannot drift.
+  const feastTitle = feastTitleFor(entity.templateId, entity.name);
+  if (feastTitle !== null) return feastTitle;
   // Collectible/quest ground objects carry the item id they grant; localize the
   // nameplate through the item dictionary instead of the raw English name.
   if (entity.objectItemId) return tEntity({ kind: 'item', id: entity.objectItemId, field: 'name' });

@@ -3197,6 +3197,9 @@ export const ko_KR: EnTranslations = {
         "feast_eaten": "이미 그 잔치에서 먹었습니다."
       },
       "feastTitle": "{name}의 수확의 잔치",
+      "stonepotFeastTitle": "{name}의 돌솥 잔치",
+      "warspiceFeastTitle": "{name}의 전투향 잔치",
+      "sageleafFeastTitle": "{name}의 현엽 잔치",
       "feastPlacedLine": "수확의 잔치를 차렸습니다.",
       "huskTrade": "껍질을 퇴비로 교환",
       "huskTradeAria": "{name}에게 껍질을 퇴비로 교환",
@@ -13106,23 +13109,35 @@ export const ko_KR: EnTranslations = {
       "roast_hollowgill_sturgeon": {
         "name": "빈아가미 철갑상어 구이"
       },
-      "deepwater_feast": {
-        "name": "심해의 잔치"
-      },
       "pattern_peppered_deepbarb_catfish": {
         "name": "요리법: 후추 심가시 메기"
       },
       "pattern_roast_hollowgill_sturgeon": {
         "name": "요리법: 빈아가미 철갑상어 구이"
       },
-      "pattern_deepwater_feast": {
-        "name": "요리법: 심해의 잔치"
-      },
       "pattern_clockreel_fishing_rod": {
         "name": "설계도: 톱니릴 낚싯대"
       },
       "evergarden_hoe": {
         "name": "상록 정원 괭이"
+      },
+      "stonepot_feast": {
+        "name": "돌솥 잔치"
+      },
+      "warspice_feast": {
+        "name": "전투향 잔치"
+      },
+      "sageleaf_feast": {
+        "name": "현엽 잔치"
+      },
+      "pattern_stonepot_feast": {
+        "name": "요리법: 돌솥 잔치"
+      },
+      "pattern_warspice_feast": {
+        "name": "요리법: 전투향 잔치"
+      },
+      "pattern_sageleaf_feast": {
+        "name": "요리법: 현엽 잔치"
       },
       "conjured_water4": {
         "name": "창조된 샘물"

@@ -74,9 +74,11 @@ describe('apex pattern defs (the drop-taught pattern universe)', () => {
   it('covers every drop-taught apex recipe, one pattern_<output> def per recipe, and no strays', () => {
     expect(ARMOR_PATTERN_IDS).toHaveLength(10);
     expect(GEAR_PATTERN_IDS).toHaveLength(10);
-    // ELEVEN since masterwrought Phase 11i: the eight phase-11 consumables plus
-    // the angler's endgame rows at cooking 75, 100 and 125.
-    expect(CONSUMABLE_PATTERN_IDS).toHaveLength(11);
+    // THIRTEEN since masterwrought Phase 11k: the eight phase-11 consumables,
+    // the angler's two surviving endgame rows at cooking 75 and 100, and the
+    // three apex role feasts at 125. It was ELEVEN at 11i, whose own capstone
+    // feast row 11k retired along with its pattern (net plus two).
+    expect(CONSUMABLE_PATTERN_IDS).toHaveLength(13);
     // The rod half's own count, spelled beside the others for the same reason:
     // one drop-taught rung out of the ladder's three, so a shipped rod silently
     // switching channel moves a literal rather than sliding through the union.
@@ -89,7 +91,7 @@ describe('apex pattern defs (the drop-taught pattern universe)', () => {
     // both sides of the union below.
     expect(FARM_PATTERN_IDS).toHaveLength(6);
     // Exactness both ways over the UNION: every shipped kind:'recipe' def is
-    // one of the 38, and every one of the 38 ships. The left side is read off
+    // one of the 40, and every one of the 40 ships. The left side is read off
     // the merged ITEMS table (populated by content/apex_patterns.ts and
     // content/farm_patterns.ts); the right side is computed from the RECIPE
     // tables, now across FOUR of them. Two independent derivations, which is
@@ -100,7 +102,7 @@ describe('apex pattern defs (the drop-taught pattern universe)', () => {
       .map((def) => def.id)
       .sort();
     expect(shippedRecipeKind).toEqual([...EVERY_PATTERN_ID].sort());
-    expect(EVERY_PATTERN_ID).toHaveLength(38);
+    expect(EVERY_PATTERN_ID).toHaveLength(40);
     // No id belongs to both halves: a collision would let the union stay the
     // right SIZE while one table quietly shadowed the other in mergeItems.
     expect(new Set(EVERY_PATTERN_ID).size).toBe(EVERY_PATTERN_ID.length);

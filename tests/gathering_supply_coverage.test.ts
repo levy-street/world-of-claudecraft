@@ -666,7 +666,9 @@ describe('the derivation itself cannot pass by matching nothing', () => {
       'recipe_evergarden_hoe',
     );
     // At the real count rather than a token floor, this round's own convention.
-    expect(farmingEndgame.length, 'and it still has real endgame rows').toBe(12);
+    // 12 to 15 at masterwrought Phase 11k: the three apex role feasts each name
+    // both tier-4 fine twins, so all three credit farming at the endgame band.
+    expect(farmingEndgame.length, 'and it still has real endgame rows').toBe(15);
     // AND THE OUTCOME FOR EVERY OTHER FAMILY, which the two lines above do not
     // reach (masterwrought Phase 11j QA). The pin is the set the matrix
     // ACTUALLY refused, so it fails on a family-scoped narrowing of the rule

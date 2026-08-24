@@ -639,9 +639,19 @@ describe('the professions blob growth bound (phase 16)', () => {
     // is its HEADROOM above the measurement, 11 bytes before and 11 after, not
     // its width. Keeping the tripwire hugging the measurement is what stops it
     // becoming a budget.
+    //
+    // AND AGAIN AT masterwrought Phase 11k: 16,924 bytes, upper edge 16,888 to
+    // 16,935. The delta is +47 and it is measured the same way rather than
+    // inferred: that phase RETIRED one recipe id and minted three, so the
+    // arithmetic is minus `"recipe_deepwater_feast",` (25 bytes) plus
+    // `"recipe_stonepot_feast",` (24), `"recipe_warspice_feast",` (24) and
+    // `"recipe_sageleaf_feast",` (24), which is 72 - 25 = 47 exactly. The
+    // headroom above the measurement is kept at 11 bytes for the third time,
+    // which is the discipline: the edge tracks the measurement, never the other
+    // way round.
     const bytes = professionsBytes(s2);
     expect(bytes).toBeGreaterThan(16544);
-    expect(bytes).toBeLessThan(16888);
+    expect(bytes).toBeLessThan(16935);
     // Strictly dominated by the band's upper edge while the band holds:
     // kept as documentation that the structural ceiling also bounds this
     // state, never the live guard.

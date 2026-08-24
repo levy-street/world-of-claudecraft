@@ -190,17 +190,46 @@ export function isGatheredProvenanceKind(kind: ItemDef['kind'] | undefined): boo
   return kind === 'junk';
 }
 
+/** THE PLACEABLE-FEAST CARVE-OUT (masterwrought Phase 11k), and it fixes a live
+ *  mislabel rather than making room for new content. The kind-only read above
+ *  reasoned that every crafted junk-kind output sits BELOW signable rarity, and
+ *  that stopped being true the day the shared feast shipped: `harvest_feast` is
+ *  kind 'junk' AND quality 'rare', so `mintsSignerPayload` (professions/
+ *  crafting.ts: signable rarity and not a bag) really does stamp a crafted copy,
+ *  and this line has been calling a cook's own feast "Gathered by" ever since.
+ *  The sweep that was supposed to catch it had the feast on an exception list
+ *  whose stated proof covered only the MASTERWORK signing arm, so the rarity arm
+ *  went unexamined. Phase 11k's three apex feasts are the same shape one rung
+ *  up, which is what surfaced it.
+ *
+ *  A feast is never gathered: the ONLY way to hold one is to craft it or to
+ *  take a crafted copy through trade, so its provenance is a craft by
+ *  construction. Keyed on the `feast` payload rather than on an id list, so
+ *  every rung past and future is covered without an edit. */
+function isCraftedPlaceable(def: ItemDef | undefined): boolean {
+  return !!def && 'feast' in def && def.feast !== undefined;
+}
+
+/** Does this DEF read as gathered provenance? The kind-level rule above, minus
+ *  the crafted placeables. Prefer this over the kind-only predicate at any call
+ *  site that has the def in hand. */
+export function isGatheredProvenance(def: ItemDef | undefined): boolean {
+  return isGatheredProvenanceKind(def?.kind) && !isCraftedPlaceable(def);
+}
+
 /** The classic "Crafted by X" flavor line for a signed copy, or "Gathered by
- *  X" when the item's kind marks it as a gathered material. No
+ *  X" when the item reads as a gathered material. No
  *  payload change: the same eqi signer field feeds both wordings. Legacy
  *  signed instances (signer without the masterwork flag) render the mark
- *  alone. */
+ *  alone. Takes the DEF rather than the bare kind since masterwrought Phase
+ *  11k, because the crafted-placeable carve-out above cannot be decided from
+ *  the kind alone. */
 export function instanceMakersMarkLine(
   instance?: ItemInstancePayload,
-  kind?: ItemDef['kind'],
+  def?: ItemDef,
 ): string {
   if (!instance?.signer) return '';
-  if (isGatheredProvenanceKind(kind)) {
+  if (isGatheredProvenance(def)) {
     return `<div class="tt-sub" style="color:${QUALITY_COLOR.uncommon}">${esc(
       t('hudChrome.crafting.gatheredBy', { name: instance.signer }),
     )}</div>`;

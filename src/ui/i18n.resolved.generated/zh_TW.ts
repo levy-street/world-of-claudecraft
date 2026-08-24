@@ -3197,6 +3197,9 @@ export const zh_TW: EnTranslations = {
         "feast_eaten": "你已經吃過那桌盛宴了。"
       },
       "feastTitle": "{name}的豐收盛宴",
+      "stonepotFeastTitle": "{name}的石鍋盛宴",
+      "warspiceFeastTitle": "{name}的戰香盛宴",
+      "sageleafFeastTitle": "{name}的賢葉盛宴",
       "feastPlacedLine": "你擺出了豐收盛宴。",
       "huskTrade": "用穀殼換堆肥",
       "huskTradeAria": "與{name}用穀殼換堆肥",
@@ -13106,23 +13109,35 @@ export const zh_TW: EnTranslations = {
       "roast_hollowgill_sturgeon": {
         "name": "烤空鰓鱘魚"
       },
-      "deepwater_feast": {
-        "name": "深水盛宴"
-      },
       "pattern_peppered_deepbarb_catfish": {
         "name": "配方：胡椒深棘鯰魚"
       },
       "pattern_roast_hollowgill_sturgeon": {
         "name": "配方：烤空鰓鱘魚"
       },
-      "pattern_deepwater_feast": {
-        "name": "配方：深水盛宴"
-      },
       "pattern_clockreel_fishing_rod": {
         "name": "圖紙：齒輪輪釣竿"
       },
       "evergarden_hoe": {
         "name": "常青園鋤"
+      },
+      "stonepot_feast": {
+        "name": "石鍋盛宴"
+      },
+      "warspice_feast": {
+        "name": "戰香盛宴"
+      },
+      "sageleaf_feast": {
+        "name": "賢葉盛宴"
+      },
+      "pattern_stonepot_feast": {
+        "name": "配方：石鍋盛宴"
+      },
+      "pattern_warspice_feast": {
+        "name": "配方：戰香盛宴"
+      },
+      "pattern_sageleaf_feast": {
+        "name": "配方：賢葉盛宴"
       },
       "conjured_water4": {
         "name": "魔法泉水"

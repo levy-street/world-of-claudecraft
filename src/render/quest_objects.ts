@@ -643,8 +643,11 @@ export function buildGroundQuestObject(
 ): { group: THREE.Group; height: number } {
   const group = new THREE.Group();
   // A ground object that grants NO item (renderer passes objectItemId ?? '';
-  // today only the placed harvest feast, kind 'object', templateId
-  // 'farm_feast', objectItemId null). Its world prop is drawn by
+  // today only a placed feast, kind 'object', objectItemId null, carrying one
+  // of the templateIds `isFeastTemplateId` in src/sim/professions/feast.ts
+  // admits: the party feast's 'farm_feast' plus the three apex role feasts
+  // masterwrought Phase 11k added. Never key on the bare string here or
+  // anywhere; the family is derived from the catalog. Its world prop is drawn by
   // farm_patches.ts, so this generic view must not stack a supply-crate body
   // on top of it. What the view still owes the renderer is a raycastable
   // click body and an honest anchor height, so the proxy is an INVISIBLE box

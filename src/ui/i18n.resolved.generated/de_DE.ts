@@ -3197,6 +3197,9 @@ export const de_DE: EnTranslations = {
         "feast_eaten": "You have already eaten from that feast."
       },
       "feastTitle": "{name}'s Harvest Feast",
+      "stonepotFeastTitle": "{name}'s Stonepot Feast",
+      "warspiceFeastTitle": "{name}'s Warspice Feast",
+      "sageleafFeastTitle": "{name}'s Sageleaf Feast",
       "feastPlacedLine": "You set out your harvest feast.",
       "huskTrade": "Trade husks for compost",
       "huskTradeAria": "Trade husks for compost with {name}",
@@ -13106,23 +13109,35 @@ export const de_DE: EnTranslations = {
       "roast_hollowgill_sturgeon": {
         "name": "Roast Hollowgill Sturgeon"
       },
-      "deepwater_feast": {
-        "name": "Deepwater Feast"
-      },
       "pattern_peppered_deepbarb_catfish": {
         "name": "Recipe: Peppered Deepbarb Catfish"
       },
       "pattern_roast_hollowgill_sturgeon": {
         "name": "Recipe: Roast Hollowgill Sturgeon"
       },
-      "pattern_deepwater_feast": {
-        "name": "Recipe: Deepwater Feast"
-      },
       "pattern_clockreel_fishing_rod": {
         "name": "Schematic: Clockreel Fishing Rod"
       },
       "evergarden_hoe": {
         "name": "Evergarden Hoe"
+      },
+      "stonepot_feast": {
+        "name": "Stonepot Feast"
+      },
+      "warspice_feast": {
+        "name": "Warspice Feast"
+      },
+      "sageleaf_feast": {
+        "name": "Sageleaf Feast"
+      },
+      "pattern_stonepot_feast": {
+        "name": "Recipe: Stonepot Feast"
+      },
+      "pattern_warspice_feast": {
+        "name": "Recipe: Warspice Feast"
+      },
+      "pattern_sageleaf_feast": {
+        "name": "Recipe: Sageleaf Feast"
       },
       "conjured_water4": {
         "name": "Herbeigezaubertes Quellwasser"

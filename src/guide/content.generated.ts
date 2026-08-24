@@ -9724,8 +9724,8 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
         }
       },
       {
-        "id": "recipe_deepwater_feast",
-        "name": "Deepwater Feast",
+        "id": "recipe_stonepot_feast",
+        "name": "Stonepot Feast",
         "skillReq": 125,
         "tier": 5,
         "station": "kitchens",
@@ -9733,20 +9733,16 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
         "feeCopper": 0,
         "materials": [
           {
-            "name": "Raw Stillmere Salmon",
-            "count": 2
-          },
-          {
-            "name": "Raw Hollowgill Sturgeon",
+            "name": "Seasoned Stock",
             "count": 3
           },
           {
-            "name": "Raw Deepbarb Catfish",
-            "count": 4
+            "name": "Wyrmfall Core",
+            "count": 1
           },
           {
-            "name": "Seasoned Stock",
-            "count": 2
+            "name": "Evergarden Greens",
+            "count": 1
           },
           {
             "name": "Sunpetal Herb",
@@ -9755,10 +9751,132 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
           {
             "name": "Cooking Salt",
             "count": 2
+          },
+          {
+            "name": "Raw Deepbarb Catfish",
+            "count": 4
+          },
+          {
+            "name": "Raw Hollowgill Sturgeon",
+            "count": 3
+          },
+          {
+            "name": "Raw Stillmere Salmon",
+            "count": 2
           }
         ],
         "output": {
-          "name": "Deepwater Feast",
+          "name": "Stonepot Feast",
+          "count": 1,
+          "quality": "epic"
+        },
+        "combo": null,
+        "oncePerDay": false,
+        "gain": {
+          "reducedAt": 150,
+          "minimalAt": 175,
+          "zeroAt": 200
+        }
+      },
+      {
+        "id": "recipe_warspice_feast",
+        "name": "Warspice Feast",
+        "skillReq": 125,
+        "tier": 5,
+        "station": "kitchens",
+        "acquisition": "vendor",
+        "feeCopper": 0,
+        "materials": [
+          {
+            "name": "Seasoned Stock",
+            "count": 3
+          },
+          {
+            "name": "Wyrmfall Core",
+            "count": 1
+          },
+          {
+            "name": "Evergarden Greens",
+            "count": 1
+          },
+          {
+            "name": "Sunpetal Herb",
+            "count": 1
+          },
+          {
+            "name": "Cooking Salt",
+            "count": 2
+          },
+          {
+            "name": "Raw Deepbarb Catfish",
+            "count": 4
+          },
+          {
+            "name": "Raw Hollowgill Sturgeon",
+            "count": 3
+          },
+          {
+            "name": "Raw Stillmere Salmon",
+            "count": 2
+          }
+        ],
+        "output": {
+          "name": "Warspice Feast",
+          "count": 1,
+          "quality": "epic"
+        },
+        "combo": null,
+        "oncePerDay": false,
+        "gain": {
+          "reducedAt": 150,
+          "minimalAt": 175,
+          "zeroAt": 200
+        }
+      },
+      {
+        "id": "recipe_sageleaf_feast",
+        "name": "Sageleaf Feast",
+        "skillReq": 125,
+        "tier": 5,
+        "station": "kitchens",
+        "acquisition": "vendor",
+        "feeCopper": 0,
+        "materials": [
+          {
+            "name": "Seasoned Stock",
+            "count": 3
+          },
+          {
+            "name": "Wyrmfall Core",
+            "count": 1
+          },
+          {
+            "name": "Evergarden Greens",
+            "count": 1
+          },
+          {
+            "name": "Sunpetal Herb",
+            "count": 1
+          },
+          {
+            "name": "Cooking Salt",
+            "count": 2
+          },
+          {
+            "name": "Raw Deepbarb Catfish",
+            "count": 4
+          },
+          {
+            "name": "Raw Hollowgill Sturgeon",
+            "count": 3
+          },
+          {
+            "name": "Raw Stillmere Salmon",
+            "count": 2
+          }
+        ],
+        "output": {
+          "name": "Sageleaf Feast",
           "count": 1,
           "quality": "epic"
         },

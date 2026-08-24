@@ -2662,18 +2662,17 @@ const ITEM_ENTITY_IDS = [
   'pattern_harvest_feast',
   // masterwrought Phase 11i, the angler's endgame. Appended at the END under
   // the append-only contract, after the farming block, so no earlier position
-  // moves: three high-band catches, the apex rod, two dishes, the capstone
-  // feast, and the four patterns that teach the drop-taught rows.
+  // moves: three high-band catches, the apex rod, two dishes, and the four
+  // patterns that teach the drop-taught rows. The capstone feast and its
+  // pattern were here too until Phase 11k retired both ids.
   'raw_deepbarb_catfish',
   'raw_hollowgill_sturgeon',
   'raw_stillmere_salmon',
   'clockreel_fishing_rod',
   'peppered_deepbarb_catfish',
   'roast_hollowgill_sturgeon',
-  'deepwater_feast',
   'pattern_peppered_deepbarb_catfish',
   'pattern_roast_hollowgill_sturgeon',
-  'pattern_deepwater_feast',
   'pattern_clockreel_fishing_rod',
   // masterwrought Phase 11j, the gathering completion pass. Appended at the END
   // under the same append-only contract as the 11i block above, rather than
@@ -2682,6 +2681,19 @@ const ITEM_ENTITY_IDS = [
   // note directly above it. The English name is on the keyed appended map, so
   // the reader looking for the hoe family finds it there.
   'evergarden_hoe',
+  // masterwrought Phase 11k, the apex feast tier. Appended at the END under the
+  // same append-only contract. The two ids this phase RETIRED
+  // (`deepwater_feast` and `pattern_deepwater_feast`) are removed from the 11i
+  // block above rather than left behind: both were minted on this branch and
+  // never shipped in a release, which is the one case content/CLAUDE.md permits
+  // an outright delete. All six names are wordy in English, so M16 non-Latin
+  // fills land with them.
+  'stonepot_feast',
+  'warspice_feast',
+  'sageleaf_feast',
+  'pattern_stonepot_feast',
+  'pattern_warspice_feast',
+  'pattern_sageleaf_feast',
 ] as const;
 
 type ItemEntityId = (typeof ITEM_ENTITY_IDS)[number];
@@ -3036,11 +3048,22 @@ const APPENDED_ITEM_NAMES: Partial<Record<ItemEntityId, string>> = {
   clockreel_fishing_rod: 'Clockreel Fishing Rod',
   peppered_deepbarb_catfish: 'Peppered Deepbarb Catfish',
   roast_hollowgill_sturgeon: 'Roast Hollowgill Sturgeon',
-  deepwater_feast: 'Deepwater Feast',
   pattern_peppered_deepbarb_catfish: 'Recipe: Peppered Deepbarb Catfish',
   pattern_roast_hollowgill_sturgeon: 'Recipe: Roast Hollowgill Sturgeon',
-  pattern_deepwater_feast: 'Recipe: Deepwater Feast',
   pattern_clockreel_fishing_rod: 'Schematic: Clockreel Fishing Rod',
+  // masterwrought Phase 11k, the apex feast tier. Each name COMPOUNDS the
+  // shipped apex plate it serves (Stonepot Stew, Warspice Skewers, Sageleaf
+  // Chowder) with the mechanic word, so the role is legible from the placed
+  // entity's title by construction and the phase coins NO new proper noun at
+  // all: all three first words are already registered and web-verified, and
+  // "Feast" is the shipped mechanic word Harvest Feast already uses (the 11c
+  // vocabulary ruling: "feast" names only the real placed-entity mechanic).
+  stonepot_feast: 'Stonepot Feast',
+  warspice_feast: 'Warspice Feast',
+  sageleaf_feast: 'Sageleaf Feast',
+  pattern_stonepot_feast: 'Recipe: Stonepot Feast',
+  pattern_warspice_feast: 'Recipe: Warspice Feast',
+  pattern_sageleaf_feast: 'Recipe: Sageleaf Feast',
 };
 
 function itemTranslations(names: readonly string[]): ItemEntityTranslations {

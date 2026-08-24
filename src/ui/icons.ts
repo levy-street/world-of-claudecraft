@@ -3922,7 +3922,35 @@ const ITEM_RECIPES: Record<string, IconRecipe> = {
   ),
   peppered_deepbarb_catfish: r('food', 'ember', ['fish', { p: 'flame', pal: 'ember', ...BR }]),
   roast_hollowgill_sturgeon: r('food', 'earthBrown', ['fish', { p: 'meat', pal: 'blood', ...BR }]),
-  deepwater_feast: r('food', 'sky', ['crate', { p: 'fish', pal: 'sky', ...BR }], ['sparkle']),
+  // THE THREE APEX FEASTS (masterwrought Phase 11k), replacing 11i's
+  // deepwater_feast. ONE sub-family rule, and it is the PATTERN rule turned on
+  // the feasts: the 'food' ground plus a 'crate' primary say A SPREAD OF
+  // SERVINGS (harvest_feast's own reading, and the reason none of them is a
+  // plate), the bottom-right accent is the ROLE the feast serves, and the
+  // palette follows that role. So a raider holding two tells them apart at
+  // 32px by colour AND silhouette without reading a name, which is the same
+  // thing decision K1 asks of the placed title. Distinct from harvest_feast by
+  // primary set (it pairs tendrils with a coin on gold and carries no crate),
+  // and from each other on both axes, which is what the A4 sweep checks.
+  // 'glow' plus 'sparkle' is the APEX marker the band-5 catch already wears.
+  stonepot_feast: r(
+    'food',
+    'steel',
+    ['crate', { p: 'shield', pal: 'steel', ...BR }],
+    ['glow', 'sparkle'],
+  ),
+  warspice_feast: r(
+    'food',
+    'blood',
+    ['crate', { p: 'sword', pal: 'blood', ...BR }],
+    ['glow', 'sparkle'],
+  ),
+  sageleaf_feast: r(
+    'food',
+    'arcanePink',
+    ['crate', { p: 'staff', pal: 'arcanePink', ...BR }],
+    ['glow', 'sparkle'],
+  ),
   pattern_peppered_deepbarb_catfish: r('parchment', 'ember', [
     'scroll',
     { p: 'fish', pal: 'ember', ...BR },
@@ -3931,7 +3959,24 @@ const ITEM_RECIPES: Record<string, IconRecipe> = {
     'scroll',
     { p: 'fish', pal: 'earthBrown', ...BR },
   ]),
-  pattern_deepwater_feast: r('parchment', 'sky', ['scroll', { p: 'crate', pal: 'sky', ...BR }]),
+  // The three apex feast RECIPES follow the family rule exactly: parchment plus
+  // scroll say RECIPE, and the accent is the PRIMARY glyph of what each
+  // teaches. The feasts' own primary is a crate on all three, so the accent
+  // here is the ROLE glyph instead, which is what keeps the three scrolls
+  // apart (the same deliberate exception the farm feast's pattern already
+  // takes one block up, for the same reason).
+  pattern_stonepot_feast: r('parchment', 'steel', [
+    'scroll',
+    { p: 'shield', pal: 'steel', ...BR },
+  ]),
+  pattern_warspice_feast: r('parchment', 'blood', [
+    'scroll',
+    { p: 'sword', pal: 'blood', ...BR },
+  ]),
+  pattern_sageleaf_feast: r('parchment', 'arcanePink', [
+    'scroll',
+    { p: 'staff', pal: 'arcanePink', ...BR },
+  ]),
   // The one SCHEMATIC in the group, and the accent says so: the rod it teaches
   // is a tool, so the gear glyph reads engineering rather than cookery, which
   // is also what keeps it apart from the three Recipe scrolls above.
@@ -5768,18 +5813,18 @@ export const ITEM_ART_PENDING = new Set<string>([
   'marsh_rice',
   'marsh_rice_seed',
   'osmium_hoe',
-  // The angler's endgame, masterwrought Phase 11i: eleven ids on the SAME
-  // scheduled park (three high-band catches, the apex rod, two dishes, the
-  // capstone feast, and the four patterns that teach the drop-taught rows).
+  // The angler's endgame, masterwrought Phase 11i: ten ids on the SAME
+  // scheduled park (three high-band catches, the apex rod, two dishes, and the
+  // four patterns that teach the drop-taught rows). It was ELEVEN until
+  // Phase 11k retired the capstone feast and its pattern; those two ids are
+  // gone from the game, not moved.
   // The park is the packet-wide decision recorded above, not a way to silence
   // A2: committed WebP art needs the maintainer's master SHA, which a phase
   // session cannot produce. Each id serves its procedural recipe through
   // iconDataUrl instead of pointing an <img> at a 404, and A2 reds the moment
   // any of their art lands.
   'clockreel_fishing_rod',
-  'deepwater_feast',
   'pattern_clockreel_fishing_rod',
-  'pattern_deepwater_feast',
   'pattern_peppered_deepbarb_catfish',
   'pattern_roast_hollowgill_sturgeon',
   'peppered_deepbarb_catfish',
@@ -5787,6 +5832,17 @@ export const ITEM_ART_PENDING = new Set<string>([
   'raw_hollowgill_sturgeon',
   'raw_stillmere_salmon',
   'roast_hollowgill_sturgeon',
+  // The apex feast tier, masterwrought Phase 11k: six ids, three feasts and
+  // the three patterns that teach them, on the same packet-wide scheduled
+  // park. Each serves the authored procedural recipe above (a parked id with
+  // NO recipe falls to itemFallback and draws the wrong thing, which is how
+  // the apex hoe nearly shipped as a mace).
+  'pattern_sageleaf_feast',
+  'pattern_stonepot_feast',
+  'pattern_warspice_feast',
+  'sageleaf_feast',
+  'stonepot_feast',
+  'warspice_feast',
   // The six farming patterns (Phase 11f, content/farm_patterns.ts). Same
   // scheduled park as the produce above and for the same reason: committed
   // WebP art needs the maintainer's master SHA, which a phase session cannot

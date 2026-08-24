@@ -4106,11 +4106,27 @@ export const hudChromeStrings = {
       feast_range: 'You are too far from the feast.',
       feast_eaten: 'You have already eaten from that feast.',
     },
-    // The placed feast entity's title (professions/feast.ts), composed
-    // client-side off templateId 'farm_feast': {name} is the PLACER'S raw
-    // player name, carried by the entity as a VALUE and never translated
-    // (the gatherEvent.goldenHarvest finder-param precedent).
+    // THE PLACED FEAST TITLES (professions/feast.ts), composed client-side off
+    // the entity's templateId by src/ui/feast_title.ts, which is the ONE map
+    // both the target frame and the floating world label read. In every one,
+    // {name} is the PLACER'S raw player name, carried by the entity as a VALUE
+    // and never translated (the gatherEvent.goldenHarvest finder-param
+    // precedent).
+    //
+    // ONE KEY PER FEAST TIER, and that is decision K1 rather than decoration:
+    // a raider standing at the table learns WHICH plate is on it from this
+    // title, so an apex feast sharing the party feast's key would label a
+    // Stonepot Feast as a Harvest Feast. The keys are LITERAL in that map
+    // (never `...${id}Title`), so a re-key stays a local edit and the release
+    // fill can see them. feastTitle itself is NOT reworded here, so no filled
+    // locale row goes stale.
     feastTitle: "{name}'s Harvest Feast",
+    // The three apex role feasts (masterwrought Phase 11k). Each name is the
+    // shipped apex plate it serves plus the mechanic word, so the role reads
+    // off the table without inspecting the entity.
+    stonepotFeastTitle: "{name}'s Stonepot Feast",
+    warspiceFeastTitle: "{name}'s Warspice Feast",
+    sageleafFeastTitle: "{name}'s Sageleaf Feast",
     // The placer's own confirmation, rendered from the text-free
     // farmFeastPlaced SimEvent (everyone else learns of the feast by seeing
     // the entity itself, so only the placer gets a line).

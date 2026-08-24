@@ -3197,6 +3197,9 @@ export const ja_JP: EnTranslations = {
         "feast_eaten": "その宴からはすでに食べました。"
       },
       "feastTitle": "{name}の収穫の宴",
+      "stonepotFeastTitle": "{name}の石鍋の宴",
+      "warspiceFeastTitle": "{name}の戦香の宴",
+      "sageleafFeastTitle": "{name}の賢葉の宴",
       "feastPlacedLine": "収穫の宴を広げた。",
       "huskTrade": "籾殻を堆肥と交換する",
       "huskTradeAria": "{name}と籾殻を堆肥と交換する",
@@ -13106,23 +13109,35 @@ export const ja_JP: EnTranslations = {
       "roast_hollowgill_sturgeon": {
         "name": "空エラチョウザメのロースト"
       },
-      "deepwater_feast": {
-        "name": "深水の宴"
-      },
       "pattern_peppered_deepbarb_catfish": {
         "name": "レシピ：深棘ナマズの胡椒焼き"
       },
       "pattern_roast_hollowgill_sturgeon": {
         "name": "レシピ：空エラチョウザメのロースト"
       },
-      "pattern_deepwater_feast": {
-        "name": "レシピ：深水の宴"
-      },
       "pattern_clockreel_fishing_rod": {
         "name": "設計図：歯車リールの釣り竿"
       },
       "evergarden_hoe": {
         "name": "エバーガーデンの鍬"
+      },
+      "stonepot_feast": {
+        "name": "石鍋の宴"
+      },
+      "warspice_feast": {
+        "name": "戦香の宴"
+      },
+      "sageleaf_feast": {
+        "name": "賢葉の宴"
+      },
+      "pattern_stonepot_feast": {
+        "name": "レシピ：石鍋の宴"
+      },
+      "pattern_warspice_feast": {
+        "name": "レシピ：戦香の宴"
+      },
+      "pattern_sageleaf_feast": {
+        "name": "レシピ：賢葉の宴"
       },
       "conjured_water4": {
         "name": "魔法の湧き水"

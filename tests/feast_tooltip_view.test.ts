@@ -25,8 +25,18 @@ import { stripComments } from './helpers/strip_comments';
 // (no wellFed record, an unmapped buff kind, an escaping-hostile aura name)
 // are each pinned off-data, since the one shipped feast points at a
 // small-number buff_sta dish and exercises exactly one branch.
-function feastDef(record: NonNullable<OtherItemDef['feast']>): ItemDef {
-  return { ...(ITEMS.harvest_feast as OtherItemDef), feast: record };
+// `templateId` is the ONE field the tooltip never reads, so the probes default
+// it rather than restating it six times: it names the placed ENTITY's template
+// (masterwrought Phase 11k), which is a placement and labelling concern the
+// view has no business in. Every field the tooltip DOES read stays explicit at
+// each call site, which is what the resolved-values proof below rests on.
+function feastDef(
+  record: Omit<NonNullable<OtherItemDef['feast']>, 'templateId'> & { templateId?: string },
+): ItemDef {
+  return {
+    ...(ITEMS.harvest_feast as OtherItemDef),
+    feast: { templateId: 'probe_feast', ...record },
+  };
 }
 function dishDef(wellFed: NonNullable<FoodItemDef['wellFed']> | undefined): ItemDef {
   return { ...(ITEMS.evergarden_braised_greens as FoodItemDef), id: 'probe_dish', wellFed };

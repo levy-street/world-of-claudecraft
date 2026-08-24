@@ -340,7 +340,6 @@ describe('item webp icons', () => {
       'brook_carrot_seed',
       'clockreel_fishing_rod',
       'compost',
-      'deepwater_feast',
       'eastbrook_glazed_carrots',
       'eastbrook_root_pottage',
       'evergarden_braised_greens',
@@ -386,7 +385,6 @@ describe('item webp icons', () => {
       'marsh_rice_seed',
       'osmium_hoe',
       'pattern_clockreel_fishing_rod',
-      'pattern_deepwater_feast',
       'pattern_evergarden_braised_greens',
       'pattern_evergarden_harvest_platter',
       'pattern_evergarden_sunmelon_tart',
@@ -395,17 +393,23 @@ describe('item webp icons', () => {
       'pattern_highwatch_gourd_soup',
       'pattern_peppered_deepbarb_catfish',
       'pattern_roast_hollowgill_sturgeon',
+      'pattern_sageleaf_feast',
+      'pattern_stonepot_feast',
+      'pattern_warspice_feast',
       'peppered_deepbarb_catfish',
       'raw_deepbarb_catfish',
       'raw_hollowgill_sturgeon',
       'raw_stillmere_salmon',
       'roast_hollowgill_sturgeon',
+      'sageleaf_feast',
       'skysilver_hoe',
+      'stonepot_feast',
       'thornpeak_cabbage',
       'thornpeak_cabbage_seed',
       'vale_hearth_loaf',
       'vale_wheat',
       'vale_wheat_seed',
+      'warspice_feast',
       'withered_husks',
     ]);
     // And the inverse: an id with committed art must still win the static url.
@@ -514,7 +518,14 @@ describe('item webp icons', () => {
       // escaped the family, and a comment promising it was not enough.
       'peppered_deepbarb_catfish',
       'roast_hollowgill_sturgeon',
-      'deepwater_feast',
+      // masterwrought Phase 11k. The three apex role feasts replace 11i's
+      // capstone feast, which is retired with its recipe. All three sit on the
+      // food radial with a shared 'crate' primary, so the ROLE accent and the
+      // palette are what tell them apart, which is precisely the distinctness
+      // this arm exists to hold.
+      'stonepot_feast',
+      'warspice_feast',
+      'sageleaf_feast',
     ];
     // THE CLASSIFICATION ARM, first, and read what it does and does not claim.
     //
@@ -582,8 +593,11 @@ describe('item webp icons', () => {
     //
     // Splitting the radial into a family that owes distinct prims and a set
     // that does not left one gap open, and it was real rather than theoretical:
-    // rv-tests gave `deepwater_feast` (family) the byte-identical prim list of
-    // `harvest_feast` (pre-dating) and the whole icon suite stayed green. Two
+    // rv-tests gave 11i's capstone feast (family) the byte-identical prim list
+    // of `harvest_feast` (pre-dating) and the whole icon suite stayed green.
+    // That capstone id is retired now, but the shape it proved is not: Phase
+    // 11k's three apex feasts are the same sibling pair problem three times
+    // over, held by the same seeding. Two
     // ids painting the same 32px glyph is the exact defect A4c exists for, and
     // A4 cannot see it either because its key is the whole recipe and the two
     // radial palettes differ. The two ids in that collision are also the two

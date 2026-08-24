@@ -18,6 +18,8 @@ import { setItemLocked } from '../src/sim/item_lock';
 import {
   FARM_FEAST_ITEM_ID,
   FARM_FEAST_TEMPLATE_ID,
+  feastTemplateIds,
+  isFeastTemplateId,
   placeFeastAction,
 } from '../src/sim/professions/feast';
 import type { PlayerMeta } from '../src/sim/sim';
@@ -197,6 +199,7 @@ describe('shared feast: wire tokens and content', () => {
       charges: 10,
       durationTicks: 3600,
       dishItemId: DISH_ID,
+      templateId: FARM_FEAST_TEMPLATE_ID,
     });
     const dish = ITEMS[DISH_ID];
     expect(dish.kind).toBe('food');
@@ -1195,5 +1198,278 @@ describe('shared feast: instance lifecycle', () => {
     sim.placeFeast(placer.pid);
     expect(denyReason(sim, from), 'the one-active slot freed with the run').toBeNull();
     expect(eventsOf(sim, from, 'farmFeastPlaced')).toHaveLength(1);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// THE APEX FEAST TIER (masterwrought Phase 11k). Everything below is about the
+// WIDENING: the action used to name one module constant, so a second feast
+// either did nothing or spent the party feast instead (that is exactly how
+// Phase 11i's capstone shipped dead). These arms hold the generalization from
+// both ends: the family is DERIVED from the catalog, every apex feast reaches
+// the ground through the SAME code path as the party feast, and the dedicated
+// command's meaning is unchanged.
+
+/** The three apex rungs, each paired with the SHIPPED plate it serves. Written
+ *  as literals rather than derived from the defs, because the pairing is the
+ *  content claim under test: a def that re-points its dish must red here. */
+const APEX_FEASTS: readonly [item: string, dish: string, template: string][] = [
+  ['stonepot_feast', 'stonepot_stew', 'stonepot_feast'],
+  ['warspice_feast', 'warspice_skewers', 'warspice_feast'],
+  ['sageleaf_feast', 'sageleaf_chowder', 'sageleaf_feast'],
+];
+
+/** Place `itemId` through the REAL use path (useItem names the clicked slot,
+ *  which is how every apex feast reaches the ground), returning the entity. */
+function useToPlace(sim: Sim, who: Player, itemId: string): Entity | null {
+  sim.addItem(itemId, 1, who.pid);
+  const slotIndex = who.meta.inventory.findIndex((s) => s.itemId === itemId);
+  expect(slotIndex, `${itemId} reached the bags`).toBeGreaterThanOrEqual(0);
+  const from = sim.events.length;
+  sim.useItem(itemId, who.pid, slotIndex);
+  const placed = eventsOf(sim, from, 'farmFeastPlaced');
+  if (placed.length !== 1) return null;
+  return sim.entities.get(placed[0].feastId) ?? null;
+}
+
+describe('the apex feast tier: the placeable family', () => {
+  it('the family is DERIVED from the catalog and every template is unique', () => {
+    // The derivation is what makes a fifth feast impossible to half-wire: it
+    // walks ITEMS for the feast payload rather than naming ids. The LITERAL
+    // beside it is the guard (a derivation alone follows the table down and
+    // cannot fail), and the uniqueness pin is decision K1's actual content
+    // requirement: two feasts sharing a template are labelled the same.
+    const ids = feastTemplateIds();
+    expect(ids).toEqual(['farm_feast', 'sageleaf_feast', 'stonepot_feast', 'warspice_feast']);
+    const fromCatalog = Object.values(ITEMS).flatMap((def) =>
+      'feast' in def && def.feast ? [def.feast.templateId] : [],
+    );
+    expect(fromCatalog.length, 'one template per feast def, none shared').toBe(
+      new Set(fromCatalog).size,
+    );
+    expect(fromCatalog.length, 'four feasts ship: the party rung plus three roles').toBe(4);
+    // The predicate, called rather than re-implemented, on both arms.
+    for (const id of ids) expect(isFeastTemplateId(id), id).toBe(true);
+    expect(isFeastTemplateId('farm_bed')).toBe(false);
+    expect(isFeastTemplateId(undefined)).toBe(false);
+    expect(isFeastTemplateId(null)).toBe(false);
+  });
+
+  it('each apex feast serves its own SHIPPED apex plate, at the party rung tuning', () => {
+    // A serving IS the plate (decision K5 keeps charges and duration at the
+    // rung below), so re-tuning the plate re-tunes the feast and the feast can
+    // never drift from the bagged dish.
+    for (const [itemId, dishId, templateId] of APEX_FEASTS) {
+      const def = ITEMS[itemId];
+      expect(def, itemId).toBeTruthy();
+      expect(def.quality, `${itemId} stays rare-or-better for craft signing`).toBe('epic');
+      expect(def.kind).toBe('junk');
+      expect(def.sellValue).toBe(300);
+      expect('feast' in def ? def.feast : undefined).toEqual({
+        charges: 10,
+        durationTicks: 3600,
+        dishItemId: dishId,
+        templateId,
+      });
+      const dish = ITEMS[dishId];
+      expect(dish.kind, `${dishId} is a real bagged plate`).toBe('food');
+      expect(dish.kind === 'food' ? dish.wellFed?.aura : undefined).toBe('Well Fed');
+    }
+    // The three roles are DISTINCT, which is the whole reason there are three.
+    const kinds = APEX_FEASTS.map(([, dishId]) => {
+      const dish = ITEMS[dishId];
+      return dish.kind === 'food' ? dish.wellFed?.kind : undefined;
+    });
+    expect(kinds).toEqual(['buff_sta', 'buff_ap', 'buff_int']);
+  });
+
+  it('an apex feast places through use_item, carrying every inherited contract', () => {
+    const { sim, placer } = world(0);
+    const e = useToPlace(sim, placer, 'stonepot_feast');
+    expect(e, 'the apex feast reached the ground').toBeTruthy();
+    if (!e) return;
+    // Its OWN template, never the party feast's: sharing one is the decision
+    // K1 rejected alternative, and it is what would label this a Harvest Feast.
+    expect(e.templateId).toBe('stonepot_feast');
+    expect(e.name, 'the PLACER name rides as a value').toBe('Hostess');
+    // The three contracts inherited verbatim, pinned on an APEX feast rather
+    // than only on harvest_feast: without all three the object-respawn sweep
+    // re-arms the table and the generic object arm eats the interact press.
+    expect(e.respawnTimer).toBe(Infinity);
+    expect(e.lootable).toBe(false);
+    expect(e.objectItemId).toBeNull();
+    // And the state carries the plate the PLACED item names.
+    const st = sim.ctx.feasts.get(e.id);
+    expect(st?.dishItemId).toBe('stonepot_stew');
+    expect(st?.charges).toBe(10);
+    // The bag paid exactly one copy of the clicked item, and no party feast.
+    expect(sim.countItem('stonepot_feast', placer.pid)).toBe(0);
+    expect(sim.countItem(FARM_FEAST_ITEM_ID, placer.pid)).toBe(0);
+  });
+
+  it('a bite from an apex feast mints the APEX plate aura, not the party dish', () => {
+    // The bug this pins is the one that made 11i's capstone a lie: the bite
+    // used to re-read a module constant, so every feast served the party
+    // feast's dish whatever the def said.
+    const { sim, placer, eaters } = world(1);
+    const e = useToPlace(sim, placer, 'sageleaf_feast');
+    expect(e).toBeTruthy();
+    if (!e) return;
+    const guest = eaters[0];
+    sim.consumeFeast(e.id, guest.pid);
+    tickSeconds(sim, 20);
+    const auras = wellFedAuras(guest.p);
+    expect(auras, 'exactly one Well Fed').toHaveLength(1);
+    const dish = ITEMS.sageleaf_chowder;
+    const wanted = dish.kind === 'food' ? dish.wellFed : undefined;
+    expect(auras[0].value, 'the magnitude resolved off the DISH, never re-typed').toBe(
+      wanted?.value,
+    );
+    // And the discriminator, which is what makes this arm decisive: the party
+    // feast's dish is buff_sta at 5, so a bite that served the module constant
+    // instead of the placed item would land buff_sta here.
+    expect(auras[0].kind, 'the CASTER plate').toBe('buff_int');
+    expect(auras[0].kind).not.toBe('buff_sta');
+  });
+
+  it('the well-fed ladder is unchanged across tiers: last eaten wins', () => {
+    // The first time two feasts of DIFFERENT tiers can stand in one room, so
+    // the one shared aura id gets its cross-tier pin here (11c owns the rule
+    // and it is not re-opened).
+    const { sim, placer, eaters } = world(1);
+    const guest = eaters[0];
+    const apex = useToPlace(sim, placer, 'stonepot_feast');
+    expect(apex).toBeTruthy();
+    if (!apex) return;
+    sim.consumeFeast(apex.id, guest.pid);
+    tickSeconds(sim, 20);
+    expect(wellFedAuras(guest.p)).toHaveLength(1);
+    // stonepot_stew's own value, resolved through the feast rather than typed.
+    const stew = ITEMS.stonepot_stew;
+    expect(wellFedAuras(guest.p)[0].value).toBe(stew.kind === 'food' ? stew.wellFed?.value : -1);
+    expect(wellFedAuras(guest.p)[0].value, 'and the literal beside it').toBe(6);
+
+    // Now a party feast from a DIFFERENT placer (the one-per-placer rule is
+    // per placer, so this needs a second cook).
+    const cook = join(sim, 'Cook');
+    standBeside(cook, placer, -1, 0);
+    sim.tick();
+    const partyId = placeOk(sim, cook);
+    sim.consumeFeast(partyId, guest.pid);
+    tickSeconds(sim, 20);
+    const after = wellFedAuras(guest.p);
+    expect(after, 'still exactly one Well Fed: replaced, never stacked').toHaveLength(1);
+    expect(after[0].value, 'the party dish replaced the apex one').toBe(5);
+  });
+});
+
+describe('the apex feast tier: the rules that did NOT move', () => {
+  it('decision K4: one live feast per placer, TIER-AGNOSTIC, in BOTH directions', () => {
+    // feast.ts sweeps ctx.feasts by ownerKey with no tier key, so tier-agnostic
+    // is what the code already does; pinning it in both orders turns an
+    // accident into a decision.
+    const a = world(0);
+    expect(useToPlace(a.sim, a.placer, 'warspice_feast')).toBeTruthy();
+    a.sim.addItem(FARM_FEAST_ITEM_ID, 1, a.placer.pid);
+    let from = a.sim.events.length;
+    a.sim.placeFeast(a.placer.pid);
+    expect(denyReason(a.sim, from), 'apex standing, party refused').toBe('feast_active');
+    expect(a.sim.countItem(FARM_FEAST_ITEM_ID, a.placer.pid), 'and nothing was spent').toBe(1);
+
+    const b = world(0);
+    placeOk(b.sim, b.placer);
+    b.sim.addItem('warspice_feast', 1, b.placer.pid);
+    const slot = b.placer.meta.inventory.findIndex((s) => s.itemId === 'warspice_feast');
+    from = b.sim.events.length;
+    b.sim.useItem('warspice_feast', b.placer.pid, slot);
+    expect(denyReason(b.sim, from), 'party standing, apex refused').toBe('feast_active');
+    expect(b.sim.countItem('warspice_feast', b.placer.pid), 'and nothing was spent').toBe(1);
+  });
+
+  it('a bare place_feast still places the PARTY feast and can never place an apex one', () => {
+    // The dedicated command carries no item id, so its default is what keeps
+    // its meaning: no wire field moved for this tier.
+    const { sim, placer } = world(0);
+    sim.addItem('stonepot_feast', 1, placer.pid);
+    let from = sim.events.length;
+    sim.placeFeast(placer.pid);
+    expect(denyReason(sim, from), 'holding ONLY an apex feast, the bare command refuses').toBe(
+      'no_feast',
+    );
+    expect(sim.countItem('stonepot_feast', placer.pid), 'and the apex copy survives').toBe(1);
+
+    // Holding BOTH, the bare command still takes the party feast. This is the
+    // half that would silently regress if the default were dropped.
+    sim.addItem(FARM_FEAST_ITEM_ID, 1, placer.pid);
+    from = sim.events.length;
+    sim.placeFeast(placer.pid);
+    const placed = eventsOf(sim, from, 'farmFeastPlaced');
+    expect(placed).toHaveLength(1);
+    expect(sim.entities.get(placed[0].feastId)?.templateId).toBe(FARM_FEAST_TEMPLATE_ID);
+    expect(sim.countItem('stonepot_feast', placer.pid), 'the apex copy is untouched').toBe(1);
+  });
+
+  it('a non-feast id refuses outright rather than falling through to the party feast', () => {
+    // The action takes an id now, so the defensive arm matters: a caller
+    // naming a non-feast must not spend a Harvest Feast, which is precisely
+    // the destructive outcome the pre-widening code produced.
+    const { sim, placer } = world(0);
+    giveFeast(sim, placer);
+    const from = sim.events.length;
+    placeFeastAction(sim.ctx, placer.p, placer.meta, undefined, 'cooking_salt');
+    expect(eventsOf(sim, from, 'farmFeastPlaced'), 'nothing placed').toHaveLength(0);
+    expect(sim.countItem(FARM_FEAST_ITEM_ID, placer.pid), 'the party feast was NOT spent').toBe(1);
+  });
+});
+
+describe('the apex feast tier: the teardown class is INHERITED, not rewritten', () => {
+  // The highest-risk half of the widening, and the reason it is asserted BY
+  // BEHAVIOR rather than by reading the code: the placement registers the
+  // entity on TWO rosters, and it does so precisely because without them the
+  // table outlived its room and stood there, still edible, for the next
+  // claiming party. A generalization that forked the placement path would keep
+  // every arm above green and lose exactly this.
+
+  it('an apex feast placed in a claimed dungeon instance falls with the run', () => {
+    const { sim, placer } = world(0);
+    expect(enterDungeon(sim.ctx, 'dawnhold_castle', placer.pid)).toBe(true);
+    sim.tick();
+    const e = useToPlace(sim, placer, 'stonepot_feast');
+    expect(e, 'the apex feast reached the ground inside the instance').toBeTruthy();
+    if (!e) return;
+    const inst = instanceAt(sim.ctx, placer.p.pos);
+    expect(inst?.partyKey, 'the instance is claimed').not.toBeNull();
+    expect(inst?.objectIds, 'and the APEX entity joined its teardown roster').toContain(e.id);
+
+    expect(leaveDungeon(sim.ctx, placer.pid)).toBe(true);
+    if (inst) inst.emptyFor = INSTANCE_EMPTY_TIMEOUT;
+    tickSeconds(sim, 2.05);
+
+    expect(sim.entities.has(e.id), 'the entity fell with the instance').toBe(false);
+    expect(sim.ctx.feasts.has(e.id), 'the sweep reclaimed the state').toBe(false);
+    // And the one-active slot freed with it, which is the half a stranded
+    // entity would silently hold for the full 180 seconds.
+    expect(useToPlace(sim, placer, 'stonepot_feast'), 'the slot freed too').toBeTruthy();
+  });
+
+  it('an apex feast placed inside a delve run falls with the run', () => {
+    const { sim, placer } = world(0);
+    sim.setPlayerLevel(DELVES.collapsed_reliquary.minLevel, placer.pid);
+    sim.enterDelve('collapsed_reliquary', 'normal', placer.pid);
+    sim.tick();
+    const run = delveRunForPlayer(sim.ctx, placer.pid);
+    expect(run, 'the placer stands inside the claimed run').not.toBeNull();
+    if (!run) return;
+    const e = useToPlace(sim, placer, 'sageleaf_feast');
+    expect(e).toBeTruthy();
+    if (!e) return;
+    expect(run.objectIds, 'the APEX entity joined the delve roster too').toContain(e.id);
+
+    freeDelveRun(sim.ctx, run);
+    tickSeconds(sim, 2.05);
+
+    expect(sim.entities.has(e.id), 'the entity fell with the run').toBe(false);
+    expect(sim.ctx.feasts.has(e.id), 'the sweep reclaimed the state').toBe(false);
+    expect(useToPlace(sim, placer, 'sageleaf_feast'), 'the slot freed too').toBeTruthy();
   });
 });

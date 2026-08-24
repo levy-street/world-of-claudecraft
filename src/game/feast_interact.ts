@@ -1,4 +1,4 @@
-import { FARM_FEAST_TEMPLATE_ID } from '../sim/professions/feast';
+import { isFeastTemplateId } from '../sim/professions/feast';
 import { dist2d, type Entity, INTERACT_RANGE, type Vec3 } from '../sim/types';
 
 /** Nearest placed feast entity within reach of the player, by 2D distance, or
@@ -18,7 +18,7 @@ export function nearestInteractableFeast(
   let bestId: number | null = null;
   let bestDistance = Number.POSITIVE_INFINITY;
   for (const entity of entities.values()) {
-    if (entity.kind !== 'object' || entity.templateId !== FARM_FEAST_TEMPLATE_ID) continue;
+    if (entity.kind !== 'object' || !isFeastTemplateId(entity.templateId)) continue;
     const distance = dist2d(playerPos, entity.pos);
     if (distance <= INTERACT_RANGE && distance < bestDistance) {
       bestId = entity.id;

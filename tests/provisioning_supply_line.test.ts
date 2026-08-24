@@ -867,13 +867,20 @@ describe('masterwrought R18 and farming D24: the displacement guard', () => {
     // that consume herbs (goldleaf 2 on the rung-75 dish, sunpetal 2 on the
     // rung-100 dish and 1 on the capstone feast) and reduces nothing anywhere,
     // so goldleaf goes 27 to 29 and sunpetal 39 to 42 while silverleaf holds.
+    // RE-MEASURED AGAIN AT masterwrought Phase 11k, which is the first phase to
+    // RETIRE a herb-consuming row, so the direction had to be checked rather
+    // than assumed: it cut 11i's capstone feast (sunpetal 1) and minted three
+    // apex feasts carrying sunpetal 1 each, so the line goes 42 to 44. The rule
+    // is the reason the seasonings are on the new bill at all: RULE 3 forbids
+    // reducing any herb, fish, meat or salt count ANYWHERE, so a replacement
+    // row must carry what the row it replaces carried.
     // The claim this arm makes has never been "the numbers do not move"; it is
     // "herbalism loses nothing", and a total that only ever climbs is what says
     // so.
     expect(totals).toEqual({
       silverleaf_herb: 28,
       goldleaf_herb: 29,
-      sunpetal_herb: 42,
+      sunpetal_herb: 44,
     });
   });
 
@@ -893,10 +900,16 @@ describe('masterwrought R18 and farming D24: the displacement guard', () => {
     expect(totalFor(['game_meat']), 'the skinning meat line').toBe(28);
     expect(totalFor(['prime_cut']), 'the rare harvest specimen').toBe(12);
     // 39 since masterwrought Phase 11i: its three cooking rows take salt 2 each.
-    expect(totalFor(['cooking_salt']), 'the salt line').toBe(39);
+    // 43 since Phase 11k: minus the retired capstone's 2, plus 2 on each of the
+    // three apex feasts that replace it.
+    expect(totalFor(['cooking_salt']), 'the salt line').toBe(43);
     // 77 since 11i, which is the largest single move any line here has taken and
     // is the phase's whole point: fishing fed only its own rod ladder before it.
-    expect(totalFor(RAW_COOKING_CATCH_IDS), 'the whole fishing line').toBe(77);
+    // 95 since Phase 11k: the three apex feasts each carry the WHOLE high-band
+    // ladder at the counts 11i's retired capstone carried (catfish 4, sturgeon
+    // 3, salmon 2, nine fish a craft), so retiring that row cost the line 9 and
+    // the three replacements paid 27.
+    expect(totalFor(RAW_COOKING_CATCH_IDS), 'the whole fishing line').toBe(95);
     // PER CATCH, NOT ONLY THE SUM (qr-11G-FISH, Phase 11g QA). The other three
     // lines above are single ids, so their totals ARE per-id and a reduction
     // cannot hide inside them. The fishing line is seven ids under one number,
@@ -927,16 +940,25 @@ describe('masterwrought R18 and farming D24: the displacement guard', () => {
     // should pay into the deepest plate on it. The WHOLE-LINE total is
     // unchanged at 77 across the change, which is the arithmetic reason a
     // sum-only pin could not have seen any of this and the per-catch map can.
+    //
+    // PHASE 11k MOVED THE THREE HIGH-BAND ROWS AND NOTHING ELSE, which is the
+    // direction claim again: it retired 11i's capstone feast (catfish 4,
+    // sturgeon 3, salmon 2) and minted three rows carrying the same three
+    // counts each, so catfish goes 26 to 34, sturgeon 17 to 23, and salmon 2 to
+    // 6. The salmon now has THREE consumers rather than one, which is what
+    // makes the retirement safe: a cut that left it at zero would have reddened
+    // the demand arm of tests/gathering_supply_coverage.test.ts for real, since
+    // the band-5 catch has no fine grade to substitute through.
     const perCatch: Record<string, number> = {
       glimmerfin_koi: 8,
       raw_bog_eel: 4,
-      raw_deepbarb_catfish: 26,
+      raw_deepbarb_catfish: 34,
       raw_frostgill_trout: 4,
-      raw_hollowgill_sturgeon: 17,
+      raw_hollowgill_sturgeon: 23,
       raw_marsh_pike: 2,
       raw_mirror_trout: 1,
       raw_river_perch: 2,
-      raw_stillmere_salmon: 2,
+      raw_stillmere_salmon: 6,
       raw_stonescale_carp: 11,
     };
     // The pre-11i demands, spelled out so "nothing fell" is a checked claim
@@ -965,7 +987,7 @@ describe('masterwrought R18 and farming D24: the displacement guard', () => {
     expect(
       Object.values(perCatch).reduce((t, n) => t + n, 0),
       'the per-catch map must account for the whole fishing line',
-    ).toBe(77);
+    ).toBe(95);
     expect(Object.keys(perCatch).sort(), 'every shipped catch is accounted for').toEqual(
       [...RAW_COOKING_CATCH_IDS].sort(),
     );

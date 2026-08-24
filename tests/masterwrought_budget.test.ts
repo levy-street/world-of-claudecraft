@@ -397,8 +397,15 @@ const roleFoodBill = (cropId: string, count: number): { itemId: string; count: n
 const ANGLER_OUTPUTS = [
   'peppered_deepbarb_catfish',
   'roast_hollowgill_sturgeon',
-  'deepwater_feast',
 ] as const;
+
+// masterwrought Phase 11k's apex feast tier, which REPLACED Phase 11i's single
+// capstone feast (that id and its recipe are retired, not moved). Their own
+// list rather than an ANGLER_OUTPUTS append, because they belong to the
+// provisioning capstone rather than to the angler block: each carries NO power
+// of its own and serves a shipped apex plate through feast.dishItemId, which is
+// R14 satisfied by construction rather than by a magnitude check.
+const APEX_FEAST_OUTPUTS = ['stonepot_feast', 'warspice_feast', 'sageleaf_feast'] as const;
 
 // The deliberately UNFLAGGED tool outputs: tools, never counted combat power,
 // pinned the way APEX_BAG_ID is below. The phase 09 pair came off
@@ -775,6 +782,7 @@ describe('masterwrought apex budget sweep', () => {
         ...Object.keys(APEX_TOOLS),
         ...Object.keys(APEX_CONSUMABLES),
         ...ANGLER_OUTPUTS,
+        ...APEX_FEAST_OUTPUTS,
       ].sort(),
     );
     // The angler block is named apart rather than folded into APEX_CONSUMABLES,
@@ -782,7 +790,11 @@ describe('masterwrought apex budget sweep', () => {
     // 10's shapes (epic, resultCount, the wellFed payload). Two of these three
     // are rare plain dishes and one is a placeable, so folding them in would
     // have meant loosening those arms for rows they were never about.
-    expect(ANGLER_OUTPUTS).toHaveLength(3);
+    expect(ANGLER_OUTPUTS).toHaveLength(2);
+    // Same reasoning for the apex feast tier, one rung up: three placeables
+    // whose whole power story is an indirection at a shipped plate, so the
+    // phase-10 per-row arms would have had nothing true to say about them.
+    expect(APEX_FEAST_OUTPUTS).toHaveLength(3);
   });
 
   it.each(Object.entries(APEX_ARMOR))('%s: budget, rating, armor, and texture', (id, row) => {
@@ -1365,17 +1377,23 @@ describe('the phase 10 apex rungs step exactly one rung off the shipped ladders'
     for (const id of CAPSTONE_IDS) expect(rungOf(id), `${id} capstone rung`).toBe(125);
     const consumableIds = Object.keys(APEX_CONSUMABLES);
     expect(consumableIds.length, 'the six phase 10 consumables').toBe(6);
-    // The array is exactly these ELEVEN rows today (six phase-10 rungs, two
-    // capstones, and masterwrought Phase 11i's three angler rows), so a third
-    // capstone or a twelfth row of any kind forces a visit here instead of
-    // landing unchecked beside a hand-picked capstone list.
+    // The array is exactly these THIRTEEN rows today (six phase-10 rungs, two
+    // station capstones, masterwrought Phase 11i's two surviving angler rows,
+    // and Phase 11k's three apex role feasts), so a third station capstone or a
+    // fourteenth row of any kind forces a visit here instead of landing
+    // unchecked beside a hand-picked capstone list.
     expect(
       APEX_CONSUMABLE_RECIPES,
-      'six apex rungs, two capstones, three angler rows',
-    ).toHaveLength(11);
+      'six apex rungs, two station capstones, two angler rows, three apex feasts',
+    ).toHaveLength(13);
     // And the split is named, so a row moving BETWEEN the three groups cannot
     // keep the total right while changing what the groups mean.
-    expect(consumableIds.length + CAPSTONE_IDS.length + ANGLER_OUTPUTS.length).toBe(11);
+    expect(
+      consumableIds.length +
+        CAPSTONE_IDS.length +
+        ANGLER_OUTPUTS.length +
+        APEX_FEAST_OUTPUTS.length,
+    ).toBe(13);
     for (const id of consumableIds) expect(rungOf(id), `${id} apex rung`).toBe(100);
     // The relation itself, so the two numbers can never be levelled without
     // this line failing even if both moved together.

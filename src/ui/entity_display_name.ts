@@ -15,10 +15,9 @@
 //    a value; sim and server stay language-agnostic);
 //  - every other entity (players, plain objects) shows its wire name as is.
 import { isNecromancyUndead } from '../sim/combat/necromancy';
-import { FARM_FEAST_TEMPLATE_ID } from '../sim/professions/feast';
 import type { Entity } from '../sim/types';
 import { tEntity } from './entity_i18n';
-import { t } from './i18n';
+import { feastTitleFor } from './feast_title';
 import { localizeSimAuraName } from './sim_i18n';
 
 export function entityDisplayName(entity: Entity): string {
@@ -28,8 +27,12 @@ export function entityDisplayName(entity: Entity): string {
       : tEntity({ kind: 'mob', id: entity.templateId, field: 'name' });
   }
   if (entity.kind === 'npc') return tEntity({ kind: 'npc', id: entity.templateId, field: 'name' });
-  if (entity.kind === 'object' && entity.templateId === FARM_FEAST_TEMPLATE_ID) {
-    return t('hudChrome.farming.feastTitle', { name: entity.name });
+  if (entity.kind === 'object') {
+    // ANY placed feast, of any tier (masterwrought Phase 11k): the shared
+    // feast_title leaf owns the templateId-to-key rule so this surface and the
+    // world label cannot name the same table two different things.
+    const feastTitle = feastTitleFor(entity.templateId, entity.name);
+    if (feastTitle !== null) return feastTitle;
   }
   return entity.name;
 }

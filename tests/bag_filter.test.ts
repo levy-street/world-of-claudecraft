@@ -509,10 +509,6 @@ describe('chip reachability census: the All-only set, pinned', () => {
     'cracked_wyrm_scale',
     'dawnhold_posy',
     'deepfen_pearl',
-    // masterwrought Phase 11i's capstone feast, the same shape as harvest_feast
-    // below and All-only for the same reason: a placeable crafted junk-kind
-    // item whose click PLACES rather than uses or equips.
-    'deepwater_feast',
     'emberwing_cinderscale',
     'frayed_prayer_beads',
     'gleamstag_charm',
@@ -540,8 +536,9 @@ describe('chip reachability census: the All-only set, pinned', () => {
     'pattern_briarstep_jerkin',
     // masterwrought Phase 11i's four: three angler recipes and the apex rod's
     // schematic, All-only on the same kind-'recipe' rule as every pattern here.
+    // Phase 11k retired the capstone feast's pattern with its recipe and added
+    // three of its own, further down in sort order.
     'pattern_clockreel_fishing_rod',
-    'pattern_deepwater_feast',
     'pattern_duskforged_bulwark',
     'pattern_duskforged_warblade',
     'pattern_evergarden_braised_greens',
@@ -564,7 +561,11 @@ describe('chip reachability census: the All-only set, pinned', () => {
     'pattern_roast_hollowgill_sturgeon',
     'pattern_runewater_flask',
     'pattern_sageleaf_chowder',
+    // masterwrought Phase 11k's three apex feast recipes, on the same
+    // kind-'recipe' rule as every other pattern in this list.
+    'pattern_sageleaf_feast',
     'pattern_spiritweld_girdle',
+    'pattern_stonepot_feast',
     'pattern_stonepot_stew',
     'pattern_sunspun_handwraps',
     'pattern_sunspun_haversack',
@@ -574,13 +575,19 @@ describe('chip reachability census: the All-only set, pinned', () => {
     'pattern_warboar_flask',
     'pattern_wardspeaker_sabatons',
     'pattern_warhewn_signet',
+    'pattern_warspice_feast',
     'pattern_warspice_skewers',
     'pattern_wyrmfall_pendant',
+    // masterwrought Phase 11k's three apex feasts, the same shape as
+    // harvest_feast and All-only for the same reason: a placeable crafted
+    // junk-kind item whose click PLACES rather than uses or equips.
+    'sageleaf_feast',
     'silkspun_satchel',
     'soft_down',
     'soggy_boot',
     'soggy_moccasin',
     'stag_antler',
+    'stonepot_feast',
     // Masterwrought phase 08: the apex bag joins the bag-kind rows;
     // forgefold_plating, sunspun_bolt, wyrmfall_core, and wyrmhide_cording
     // left this list with their apex consumers (they now derive into the
@@ -591,6 +598,7 @@ describe('chip reachability census: the All-only set, pinned', () => {
     'tallow_candle',
     'tangled_weed',
     'travelers_knapsack',
+    'warspice_feast',
     'wolfhide_satchel',
   ] as const;
 

@@ -1949,10 +1949,24 @@ describe('Guide professions generated content accuracy', () => {
     const longestRows = ALL_RECIPES.filter((r) => r.reagents.length === longestBill).map(
       (r) => r.id,
     );
-    expect(longestRows, 'the page names the hearth as the sole longest bill').toEqual([
+    // masterwrought Phase 11k TIED the record and the page said otherwise, which
+    // is exactly the drift this derivation was written to catch: the prose read
+    // "the longest bill in the game" of the hearth alone while three apex
+    // feasts joined it at eight entries. Corrected in the ENGLISH catalog and
+    // pinned BOTH WAYS, so a revert of either half reds: the live set is the
+    // four rows, the page no longer claims a sole holder, and it names the tie.
+    expect(longestRows.sort(), 'the rows that actually hold the record').toEqual([
       'recipe_laden_hearth',
+      'recipe_sageleaf_feast',
+      'recipe_stonepot_feast',
+      'recipe_warspice_feast',
     ]);
-    expect(cookHtml).toContain('the longest bill in the game');
+    expect(cookHtml).toContain('one of the longest bills in the game');
+    expect(
+      cookHtml,
+      'the retired sole-holder claim must be ABSENT, not merely outnumbered',
+    ).not.toContain('the longest bill in the game.');
+    expect(cookHtml).toContain('Three apex feasts share the top rung with the hearth');
     expect(alcHtml).toContain('The bench above the ladder asks for the garden too');
     expect(alcHtml).toContain('stand beside the herbs rather than in place of them');
     // The negative half for the claim 11h retires: the cooking page said the

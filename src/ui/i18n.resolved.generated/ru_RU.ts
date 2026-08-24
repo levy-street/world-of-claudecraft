@@ -3197,6 +3197,9 @@ export const ru_RU: EnTranslations = {
         "feast_eaten": "Вы уже поели с этого пира."
       },
       "feastTitle": "Пир урожая {name}",
+      "stonepotFeastTitle": "Пир каменного котла {name}",
+      "warspiceFeastTitle": "Боевой пряный пир {name}",
+      "sageleafFeastTitle": "Пир из мудролиста {name}",
       "feastPlacedLine": "Вы накрыли свой пир урожая.",
       "huskTrade": "Обменять шелуху на компост",
       "huskTradeAria": "Обменять шелуху на компост у {name}",
@@ -13106,23 +13109,35 @@ export const ru_RU: EnTranslations = {
       "roast_hollowgill_sturgeon": {
         "name": "Жареный полужаберный осётр"
       },
-      "deepwater_feast": {
-        "name": "Глубоководный пир"
-      },
       "pattern_peppered_deepbarb_catfish": {
         "name": "Рецепт: Перчёный глубокоусый сом"
       },
       "pattern_roast_hollowgill_sturgeon": {
         "name": "Рецепт: Жареный полужаберный осётр"
       },
-      "pattern_deepwater_feast": {
-        "name": "Рецепт: Глубоководный пир"
-      },
       "pattern_clockreel_fishing_rod": {
         "name": "Чертёж: Удочка с часовой катушкой"
       },
       "evergarden_hoe": {
         "name": "Мотыга Вечного Сада"
+      },
+      "stonepot_feast": {
+        "name": "Пир каменного котла"
+      },
+      "warspice_feast": {
+        "name": "Боевой пряный пир"
+      },
+      "sageleaf_feast": {
+        "name": "Пир из мудролиста"
+      },
+      "pattern_stonepot_feast": {
+        "name": "Рецепт: Пир каменного котла"
+      },
+      "pattern_warspice_feast": {
+        "name": "Рецепт: Боевой пряный пир"
+      },
+      "pattern_sageleaf_feast": {
+        "name": "Рецепт: Пир из мудролиста"
       },
       "conjured_water4": {
         "name": "Сотворённая родниковая вода"

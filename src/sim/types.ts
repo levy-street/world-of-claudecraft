@@ -1239,7 +1239,7 @@ export interface OtherItemDef extends BaseItemDef {
   >;
   armorType?: never;
   // The shared feast (farming, D16): a placeable item whose use spawns a
-  // farm_feast world entity instead of consuming food. `charges` is how many
+  // world entity instead of consuming food. `charges` is how many
   // players may eat once each, `durationTicks` the tick-domain lifetime, and
   // `dishItemId` names the dish whose serving each bite IS: the eating slot
   // points at that dish, so its foodHp and wellFed fields drive the restore
@@ -1249,7 +1249,22 @@ export interface OtherItemDef extends BaseItemDef {
   // FoodItemDef: the shipped harvest_feast is kind 'junk' (the tonic
   // precedent for a crafted non-equippable usable), and kind-scoping keeps a
   // sword or a drink from silently carrying a feast payload nothing places.
-  feast?: { charges: number; durationTicks: number; dishItemId: string };
+  //
+  // `templateId` NAMES THE PLACED ENTITY'S TEMPLATE, and it is a content field
+  // rather than a constant in the behavior module for one reason
+  // (masterwrought Phase 11k): the placed title is composed client-side off
+  // templateId, so a feast sharing another feast's template is labelled as the
+  // rung it is not. Putting it here makes the placeable FAMILY derivable from
+  // the catalog (professions/feast.ts walks ITEMS for this payload and builds
+  // the membership set), so a new feast cannot be half-wired across the six
+  // sites that key on it: authoring the def joins them all at once. The
+  // template must be UNIQUE per feast id, pinned in tests/professions_feast.
+  feast?: {
+    charges: number;
+    durationTicks: number;
+    dishItemId: string;
+    templateId: string;
+  };
 }
 
 // FOOD. Its own kind-scoped def for exactly one reason: `wellFed` lives HERE

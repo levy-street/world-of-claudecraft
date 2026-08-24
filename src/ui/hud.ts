@@ -6148,7 +6148,7 @@ export class Hud {
     }
     html += this.itemProcBlock(item);
     html += this.itemSetBlock(item);
-    html += instanceMakersMarkLine(instance, item.kind);
+    html += instanceMakersMarkLine(instance, item);
     // Stackables state their per-slot cap (sim/bags.ts stackSizeOf), so a
     // player holding a single potion learns more copies will share the slot;
     // 1-per-slot kinds, mounts, and charge-bearing payloads render nothing.

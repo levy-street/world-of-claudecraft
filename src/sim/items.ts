@@ -799,7 +799,12 @@ export function useItem(
   // (ours-first per the absorb's RULE 3b). The `in` guard is the union port:
   // `feast` lives on OtherItemDef (kind-scoped), not BaseItemDef.
   if ('feast' in def && def.feast) {
-    placeFeastAction(ctx, p, meta, slotIndex);
+    // The USED item id is threaded through (masterwrought Phase 11k): this arm
+    // is already generic on the def, and passing the id is what makes the
+    // ACTION generic too, so the clicked feast is the one spent and the one
+    // placed. Before this the action re-read a module constant and a
+    // non-party feast either did nothing or destroyed a party feast instead.
+    placeFeastAction(ctx, p, meta, slotIndex, itemId);
     return;
   }
   // Raw fishing catches are cooking reagents only (kind junk, no foodHp).

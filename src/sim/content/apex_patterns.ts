@@ -314,13 +314,34 @@ export const APEX_PATTERN_ITEMS: Record<string, ItemDef> = {
     sellValue: 100,
     teachesRecipeId: 'recipe_roast_hollowgill_sturgeon',
   },
-  pattern_deepwater_feast: {
-    id: 'pattern_deepwater_feast',
-    name: 'Recipe: Deepwater Feast',
+  // THE APEX FEAST TIER (masterwrought Phase 11k). These three REPLACE Phase
+  // 11i's pattern_deepwater_feast, whose recipe this phase retired under the
+  // ruling recorded at content/profession_items.ts. Epic under ruling 11f-PAT,
+  // because each teaches an epic output; all three sit at the 16-marks
+  // skill-125 rung on the Heroic Quartermaster beside the two mobile stations.
+  pattern_stonepot_feast: {
+    id: 'pattern_stonepot_feast',
+    name: 'Recipe: Stonepot Feast',
     kind: 'recipe',
     quality: 'epic',
     sellValue: 100,
-    teachesRecipeId: 'recipe_deepwater_feast',
+    teachesRecipeId: 'recipe_stonepot_feast',
+  },
+  pattern_warspice_feast: {
+    id: 'pattern_warspice_feast',
+    name: 'Recipe: Warspice Feast',
+    kind: 'recipe',
+    quality: 'epic',
+    sellValue: 100,
+    teachesRecipeId: 'recipe_warspice_feast',
+  },
+  pattern_sageleaf_feast: {
+    id: 'pattern_sageleaf_feast',
+    name: 'Recipe: Sageleaf Feast',
+    kind: 'recipe',
+    quality: 'epic',
+    sellValue: 100,
+    teachesRecipeId: 'recipe_sageleaf_feast',
   },
   pattern_clockreel_fishing_rod: {
     id: 'pattern_clockreel_fishing_rod',

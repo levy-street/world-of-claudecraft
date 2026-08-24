@@ -721,36 +721,105 @@ export const PROFESSION_ITEMS: Record<string, ItemDef> = {
     foodHp: 980,
     sellValue: 150,
   },
-  // THE CAPSTONE (masterwrought Phase 11i, deliverable 5): a ROLE, never a new
-  // stat. The master angler becomes the sole faucet of a good the raid wants,
-  // and every number in it is shipped:
+  // THE APEX FEAST TIER (masterwrought Phase 11k, deliverable 1): three
+  // placeable role feasts at cooking 125, one per combat role, on ONE
+  // byte-identical bill. This block REPLACES Phase 11i's single
+  // `deepwater_feast`, and the replacement is a maintainer ruling rather than a
+  // tidy-up, so the reasoning is recorded here where the rows are:
   //
-  // - It is a FEAST on the shipped machinery (the harvest_feast shape,
-  //   professions/feast.ts owns the lifecycle), so `dishItemId` names the dish
-  //   each bite IS and that dish's own foodHp and wellFed drive the restore and
-  //   the mint. No new aura id, no new magnitude, no new duration: eating from
-  //   this feast is eating a Stonepot Stew, byte for byte.
-  // - stonepot_stew is the plate it serves because a feast serves ONE dish and
-  //   stamina is the apex buff no role refuses, so serving it privileges no
-  //   role. A caster who wants the chowder still eats the chowder; one shared
-  //   'well_fed' aura id means last eaten wins.
+  // - 11i minted `deepwater_feast` (cooking 125, epic, junk, charges 10,
+  //   durationTicks 3600, dishItemId stonepot_stew, drop-taught, kitchens, an
+  //   epic pattern at 100 on the 16-marks rung) three days after this phase was
+  //   specified. It matched THIS tier's stamina rung on every settled field.
+  // - It was also DEAD: professions/feast.ts bound its whole lifecycle to one
+  //   module constant, so using it either denied `no_feast` forever or spent a
+  //   Harvest Feast and placed one instead. The Phase 11k widening is the
+  //   machinery whose absence killed it, so this phase could not be neutral on
+  //   the row: fixing it, cutting it, and shipping a fourth feast beside it
+  //   were the only three options and all three are decisions.
+  // - CUT AND RE-MINT was ruled. Folding the shipped row in would have left the
+  //   family with a non-uniform bill (its own bill is all-fish where these take
+  //   produce, core and catch) and a non-uniform price (250, which is the RARE
+  //   party rung's own point), and its name names a water rather than the plate
+  //   it serves, which is the one thing decision K1 makes functional: the placed
+  //   title is how a raider at the table knows which plate is on it. The id was
+  //   branch-only and never shipped in a release, so nothing append-only broke.
+  //
+  // WHAT IS INHERITED RATHER THAN INVENTED, which is the whole tier's thesis:
+  // - A serving IS a shipped apex plate, through the `dishItemId` indirection
+  //   farming already built. Re-tuning the plate re-tunes the feast, and the
+  //   feast can never drift from the bagged dish. NO new aura id, NO new
+  //   magnitude, NO new duration, NO new proc effect anywhere in this block.
   // - charges 10 is RAID_MAX (social/party.ts), one serving each for a full
-  //   raid, so the batch size is derived rather than picked. durationTicks 3600
-  //   is harvest_feast's own 180 seconds, reused.
+  //   raid; durationTicks 3600 is the party feast's own 180 seconds. Both are
+  //   decision K5, taken from the rung below rather than re-picked, because
+  //   feast.ts's per-player ledger, its 1 Hz despawn sweep and the render
+  //   shadow cap were all sized for these numbers and feast uptime is a
+  //   Phase 15 input.
   // - kind 'junk' is the placeable-usable precedent harvest_feast set (the
   //   junk-sale sweep keys on quality 'poor', so an epic feast can never ride
-  //   the bulk sale); quality 'epic' matches the skill-125 rung. sellValue 250
-  //   is harvest_feast's own point, shared on purpose so the two feasts read as
-  //   one family.
-  deepwater_feast: {
-    id: 'deepwater_feast',
-    name: 'Deepwater Feast',
+  //   the bulk sale). quality 'epic' is decision K2 and matches the skill-125
+  //   rung and the epic pattern that teaches it; it also keeps every feast
+  //   rare-or-better, which is what makes the crafted copy carry its crafter's
+  //   signature under the shipped craft-signing rule (professions/crafting.ts).
+  //
+  // sellValue 300 IS DERIVED, inside decision K2's binding window (strictly
+  // above the rare party feast at 250, strictly below the epic permanent
+  // station laden_hearth at 380, a multiple of 10). The step is the one reagent
+  // this tier adds that the party feast's bill does not carry: a Wyrmfall Core,
+  // sellValue 50. 250 + 50 = 300. That is the rate limiter made legible in the
+  // price rather than a number chosen between two bounds, and every input is a
+  // shipped point read off the merged table. Gold-negative by a wide margin
+  // (input 1464 against 300); the arithmetic is printed at the recipe rows.
+  //
+  // EACH CARRIES ITS OWN templateId, and they are unique per feast id. The
+  // placed title is composed client-side off templateId
+  // (src/ui/feast_title.ts), so sharing one would label an apex feast as the
+  // rung it is not, which is exactly decision K1's rejected alternative.
+  stonepot_feast: {
+    id: 'stonepot_feast',
+    name: 'Stonepot Feast',
     kind: 'junk',
     quality: 'epic',
-    sellValue: 250,
-    feast: { charges: 10, durationTicks: 3600, dishItemId: 'stonepot_stew' },
+    sellValue: 300,
+    // THE TANK TABLE: serves Stonepot Stew (buff_sta), the plate its name is
+    // compounded from, so the role is legible from the placed title BY
+    // CONSTRUCTION and this phase coins no proper noun at all.
+    feast: {
+      charges: 10,
+      durationTicks: 3600,
+      dishItemId: 'stonepot_stew',
+      templateId: 'stonepot_feast',
+    },
   },
-
+  warspice_feast: {
+    id: 'warspice_feast',
+    name: 'Warspice Feast',
+    kind: 'junk',
+    quality: 'epic',
+    sellValue: 300,
+    // THE PHYSICAL TABLE: serves Warspice Skewers (buff_ap).
+    feast: {
+      charges: 10,
+      durationTicks: 3600,
+      dishItemId: 'warspice_skewers',
+      templateId: 'warspice_feast',
+    },
+  },
+  sageleaf_feast: {
+    id: 'sageleaf_feast',
+    name: 'Sageleaf Feast',
+    kind: 'junk',
+    quality: 'epic',
+    sellValue: 300,
+    // THE CASTER TABLE: serves Sageleaf Chowder (buff_int).
+    feast: {
+      charges: 10,
+      durationTicks: 3600,
+      dishItemId: 'sageleaf_chowder',
+      templateId: 'sageleaf_feast',
+    },
+  },
   // --- Farm dishes (cooking, Phase 6 economy hooks) ------------------------
   // Outputs of FARM_RECIPES (content/recipes.ts), the farm half of cooking:
   // eight dishes cooked from crop produce at the kitchens, a SIBLING of the
@@ -931,7 +1000,12 @@ export const PROFESSION_ITEMS: Record<string, ItemDef> = {
     kind: 'junk',
     quality: 'rare',
     sellValue: 250,
-    feast: { charges: 10, durationTicks: 3600, dishItemId: 'evergarden_braised_greens' },
+    feast: {
+      charges: 10,
+      durationTicks: 3600,
+      dishItemId: 'evergarden_braised_greens',
+      templateId: 'farm_feast',
+    },
   },
 
   // --- Crafted alchemy ladder (alchemy) ------------------------------------

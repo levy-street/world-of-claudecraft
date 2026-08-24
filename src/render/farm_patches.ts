@@ -26,7 +26,7 @@
 // flourishes are COSMETIC and go out through vfx.ts, whose scaledCount path IS
 // the tier shed; there is no bespoke knob here.
 import * as THREE from 'three';
-import { FARM_FEAST_TEMPLATE_ID } from '../sim/professions/feast';
+import { isFeastTemplateId } from '../sim/professions/feast';
 import type { Entity, SimEvent } from '../sim/types';
 import { terrainHeight } from '../sim/world';
 import type { FarmPatchDef, FarmPlotView } from '../world_api/farming';
@@ -458,7 +458,7 @@ export class FarmPatchVisuals {
     this.feastsSeen.clear();
     const flourish = this.feastFlourishArmed;
     for (const e of entities.values()) {
-      if (e.kind !== 'object' || e.templateId !== FARM_FEAST_TEMPLATE_ID) continue;
+      if (e.kind !== 'object' || !isFeastTemplateId(e.templateId)) continue;
       this.feastsSeen.add(e.id);
       if (!this.feasts.has(e.id)) this.createFeast(e, seed, flourish);
     }

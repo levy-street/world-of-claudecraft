@@ -200,7 +200,12 @@ export const HEROIC_VENDOR_STOCK: readonly HeroicVendorOffer[] = [
   // point, where the skill-125 capstones sit). No third price point is minted.
   { itemId: 'pattern_peppered_deepbarb_catfish', marks: 12 },
   { itemId: 'pattern_roast_hollowgill_sturgeon', marks: 12 },
-  { itemId: 'pattern_deepwater_feast', marks: 16 },
+  // The apex feast tier (masterwrought Phase 11k), at the 16-marks skill-125
+  // rung the two mobile stations occupy. They replace the retired
+  // pattern_deepwater_feast row; no new price point is minted.
+  { itemId: 'pattern_stonepot_feast', marks: 16 },
+  { itemId: 'pattern_warspice_feast', marks: 16 },
+  { itemId: 'pattern_sageleaf_feast', marks: 16 },
   { itemId: 'pattern_clockreel_fishing_rod', marks: 16 },
   // Masterwrought phase 11f: the farming valve. All SIX farming patterns and
   // every tier-3 and tier-4 SEED, on the wyrmfall_core precedent above ("a

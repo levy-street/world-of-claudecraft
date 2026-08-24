@@ -2679,15 +2679,23 @@ export const APEX_GEAR_RECIPES: ProfessionRecipeRecord[] = [
 // here carries the flag. The food chain runs through seasoned_stock, which is
 // NOT daily-gated, so cooking's apex output paces on materials alone.
 //
-// The two skill-125 CAPSTONE rungs sit at the end: the alchemy and cooking
-// mobile stations, one rung above everything else in the game. 125 is legal
-// (the tidewrought precedent) and there is no craft-time skill admission gate
-// anyway; skillReq shapes teachability, the gold fee, the masterwork proc, and
-// skill gain, so the rung reads as the prestige marker it is. Their bills
-// mirror recipe_masters_field_forge: 3 of the craft's intermediate, 2 Wyrmfall
-// Cores, then the craft's gathered family (the hearth's meats plus the shared
-// sunpetal herb that Marlow's roast and the three role dishes already carry,
-// so the mirror is by shape, not by literal item list).
+// THE SKILL-125 CAPSTONE FAMILIES sit at the end, one rung above everything
+// else in the game. Named as FAMILIES rather than counted, per the anchor rule,
+// because a count here rots the moment a rung is added (this sentence said "the
+// two skill-125 CAPSTONE rungs" until masterwrought Phase 11k made it false):
+//   - THE TWO MOBILE STATIONS, alchemy's Grand Cauldron and cooking's Laden
+//     Hearth. Permanent, never consumed, 2 Wyrmfall Cores each.
+//   - THE THREE APEX ROLE FEASTS (Phase 11k), cooking's consumed capstone.
+//     One byte-identical bill, 1 Core each because a feast is spent per raid
+//     night where a station is permanent.
+// 125 is legal (the tidewrought precedent) and there is no craft-time skill
+// admission gate anyway; skillReq shapes teachability, the gold fee, the
+// masterwork proc, and skill gain, so the rung reads as the prestige marker it
+// is. The STATIONS' bills mirror recipe_masters_field_forge: 3 of the craft's
+// intermediate, 2 Wyrmfall Cores, then the craft's gathered family (the
+// hearth's meats plus the shared sunpetal herb that Marlow's roast and the
+// three role dishes already carry, so the mirror is by shape, not by literal
+// item list). The feasts take the same 3-of-the-intermediate idiom.
 //
 // acquisition ['drop'] on every row per R8, same as the other two apex arrays:
 // the patterns land as drops and heroic-marks vendor rows in phase 11, so
@@ -3047,25 +3055,176 @@ export const APEX_CONSUMABLE_RECIPES: ProfessionRecipeRecord[] = [
     acquisition: ['drop'],
     stationType: 'kitchens',
   },
+  // ---- THE APEX FEAST TIER (masterwrought Phase 11k) ---------------------
+  //
+  // Three cooking-125 rows, one per combat role, on ONE BYTE-IDENTICAL BILL.
+  // They REPLACE Phase 11i's `recipe_deepwater_feast` under the ruling recorded
+  // at the item defs (content/profession_items.ts): that row was this tier's
+  // stamina rung minted early, against a bill and a name the tier's own rules
+  // refuse, and it was unplaceable besides.
+  //
+  // THE BILL IS UNIFORM AND THAT IS THE ARRAY HEADER'S OWN RULE: a role choice
+  // is never also an economy choice. The role here is carried entirely by
+  // `dishItemId` on the output def, so there is nothing left for a reagent to
+  // differentiate. (11h's amendment lets the three bagged FOOD plates differ by
+  // exactly one crop row; that amendment is scoped to the plates and does not
+  // reach these feast bills, which stay byte-identical to each other.)
+  //
+  // WHY THIS BILL IS THE PACKET'S THESIS IN ONE ROW: all three provisioning
+  // skills and the raid meet in it. FARMING pays the crop, FISHING pays all
+  // three high-band catches, HERBALISM and COOKING pay the seasoning and the
+  // craft's own intermediate, and the Wyrmfall Core comes from outside every
+  // profession. A raider who farms nothing buys the greens on the market
+  // exactly as they buy sunpetal_herb today (masterwrought R18); a cook with no
+  // rift access buys cores.
+  //
+  // THE BILL WAS RE-DERIVED AGAINST THE STANDING ACCENT RULES, and this is the
+  // part worth reading, because the phase file's own prescribed bill (both
+  // tier-4 FINE twins plus one catch) is illegal three ways on the merged tree
+  // and was written before the rules that refuse it existed:
+  //   - The fish-forward rule (masterwrought R17) wants fish to OUTNUMBER
+  //     produce on any row carrying a raw catch. Two fine twins at 2 each is
+  //     produce 4 against one catch.
+  //   - At most ONE crop family may join a fish row. Two twins is two families.
+  //   - RULE 2's value half wants a crop's contribution AT OR BELOW the row's
+  //     dominant non-produce reagent. A fine twin carries buyValue 320, so a
+  //     single one contributes 320 and would need a 320-plus non-produce
+  //     reagent beside it; only recipe_laden_hearth's sunpetal_herb 2 reaches
+  //     that, and it TIES, which the 11j QA already recorded as resting on the
+  //     open reading of that half. Three more ties is not a thing a content
+  //     phase should spend an open maintainer item on.
+  // So the row takes the BASE crop, one family, at the accent cap. The fine
+  // twins are not orphaned by that: 11h gave each its own station capstone and
+  // 11j gave the greens the apex hoe, which is the consumer the phase file
+  // thought was missing.
+  //
+  // EVERY COUNT IS DERIVED, and the precedent taken is named:
+  // - seasoned_stock 3: the CAPSTONE idiom. recipe_laden_hearth and
+  //   recipe_grand_cauldron both take 3 of their craft's own intermediate at
+  //   this rung, where the skill-100 consumables take 1. These sit at 125, so
+  //   they take the capstone idiom. No third number was invented.
+  // - wyrmfall_core 1, and the row records the comparison rather than hiding
+  //   it: the two shipped capstones take 2, and a feast takes 1 because a feast
+  //   is SPENT per raid night while a station is permanent. The Core is the
+  //   deliberate rate limiter and it lives OUTSIDE the farm (masterwrought R9:
+  //   A and S rift first clears, once per character per day, tradable), so no
+  //   farming daily is minted anywhere (masterwrought R19).
+  // - evergarden_greens 1: the tier-4 crop the PARTY feast one rung down
+  //   already asks for, at ONE rather than its 4, because the apex row spends
+  //   the rest of its weight on the catch ladder. One family, and it keeps the
+  //   two feast rungs legibly the same dish.
+  //   ONE RATHER THAN THE CAP OF TWO IS DELIBERATE, and the reason is a
+  //   maintainer item rather than taste: RULE 2's value half has an OPEN
+  //   reading (dominant-by-value, which ships, versus largest-by-count, which
+  //   does not), and tests/provisioning_supply_line.test.ts carries a census of
+  //   exactly what the alternative reading would refuse. At 2 the crop
+  //   contributes 80 against a count-reading reference of 56 (the catfish at
+  //   the row's largest count), so all three rows would have JOINED that census
+  //   and made the open decision cost three more rows to settle. At 1 it
+  //   contributes 40 and clears BOTH readings, so this phase leaves that
+  //   decision exactly as expensive as it found it. A content phase should not
+  //   spend the maintainer's open items.
+  // - THE WHOLE CATCH LADDER, at exactly the counts Phase 11i's retired
+  //   capstone carried: catfish 4, sturgeon 3, salmon 2. That is not
+  //   sentiment, it is masterwrought RULE 3, which forbids REDUCING any fish,
+  //   herb, meat or salt count anywhere: retiring 11i's row without carrying
+  //   its catches would have cut all three lines. Carrying them on all three
+  //   feasts raises each instead. It also keeps 11i's own design statement
+  //   intact, that the whole ladder feeds its own capstone, and the band-5
+  //   salmon is still the keystone: band 5 gates at proficiency 200 AND the
+  //   tier-6 rod, so the master angler remains the sole faucet of the tier and
+  //   now gates three goods instead of one.
+  // - sunpetal_herb 1 and cooking_salt 2: the same RULE 3 arithmetic, and the
+  //   same two seasonings every shipped cooking apex row carries.
+  //
+  // GOLD-NEGATIVE, WITH THE ARITHMETIC PRINTED. Unit value is buyValue when
+  // finite and above zero, else sellValue (the shipped recipe_economy
+  // convention), which is why the herb and the salt cost more here than their
+  // sell prices suggest:
+  //   seasoned_stock         3 x  30 =   90
+  //   wyrmfall_core          1 x  50 =   50
+  //   evergarden_greens      1 x  40 =   40
+  //   sunpetal_herb          1 x 160 =  160
+  //   cooking_salt           2 x   8 =   16
+  //   raw_deepbarb_catfish   4 x  14 =   56
+  //   raw_hollowgill_sturgeon 3 x  18 =  54
+  //   raw_stillmere_salmon   2 x  22 =   44
+  //   INPUT 510 vs output 1 x 300. Gold-negative by 210.
+  // The rows stay OUT of the counterfactually-vendor-fed set for a reason worth
+  // stating, because the herb and the salt alone would not carry it: that set
+  // needs EVERY reagent to carry a positive buyValue, and seasoned_stock, the
+  // core, the greens and all three catches carry none, so no counter could feed
+  // this bill even in principle.
+  //
+  // EIGHT REAGENT ENTRIES, which TIES recipe_laden_hearth rather than beating
+  // it, and the tie is deliberate: the consumed provisioning capstone asks for
+  // as much as the permanent station does. The longest-bill pin in
+  // tests/provisioning_supply_line_apex.test.ts names both rather than one.
+  //
+  // acquisition ['drop'] per masterwrought R8 (the patterns are Heroic Marks
+  // stock at the skill-125 rung); stationType 'kitchens' so the per-craft wiki
+  // station field stays unanimous; resultCount 1 is the shipped feast
+  // precedent; itemLevelBudget feeds only the craft gold fee.
   {
-    id: 'recipe_deepwater_feast',
+    id: 'recipe_stonepot_feast',
     professionId: 'cooking',
-    resultItemId: 'deepwater_feast',
+    resultItemId: 'stonepot_feast',
     resultCount: 1,
-    // THE CAPSTONE (deliverable 5). Its keystone is the band-5 catch, which
-    // takes proficiency 200 AND the tier-6 rod, so the master angler is the
-    // sole faucet: that is the ROLE the phase set out to give the profession,
-    // and it is a role rather than a stat because the output serves a SHIPPED
-    // plate's buff and mints nothing of its own (content/profession_items.ts).
-    // All three high-band catches appear, so the whole ladder feeds its own
-    // capstone. Input 390 vs output 250.
+    // Input 510 vs output 300 (arithmetic in the block header).
     reagents: [
-      { itemId: 'raw_stillmere_salmon', count: 2 },
-      { itemId: 'raw_hollowgill_sturgeon', count: 3 },
-      { itemId: 'raw_deepbarb_catfish', count: 4 },
-      { itemId: 'seasoned_stock', count: 2 },
+      { itemId: 'seasoned_stock', count: 3 },
+      { itemId: 'wyrmfall_core', count: 1 },
+      { itemId: 'evergarden_greens', count: 1 },
       { itemId: 'sunpetal_herb', count: 1 },
       { itemId: 'cooking_salt', count: 2 },
+      { itemId: 'raw_deepbarb_catfish', count: 4 },
+      { itemId: 'raw_hollowgill_sturgeon', count: 3 },
+      { itemId: 'raw_stillmere_salmon', count: 2 },
+    ],
+    skillReq: 125,
+    itemLevelBudget: 25,
+    level: 25,
+    acquisition: ['drop'],
+    stationType: 'kitchens',
+  },
+  {
+    id: 'recipe_warspice_feast',
+    professionId: 'cooking',
+    resultItemId: 'warspice_feast',
+    resultCount: 1,
+    // Input 510 vs output 300. BYTE-IDENTICAL to the row above and the row
+    // below: the role lives on the output def, never in the bill.
+    reagents: [
+      { itemId: 'seasoned_stock', count: 3 },
+      { itemId: 'wyrmfall_core', count: 1 },
+      { itemId: 'evergarden_greens', count: 1 },
+      { itemId: 'sunpetal_herb', count: 1 },
+      { itemId: 'cooking_salt', count: 2 },
+      { itemId: 'raw_deepbarb_catfish', count: 4 },
+      { itemId: 'raw_hollowgill_sturgeon', count: 3 },
+      { itemId: 'raw_stillmere_salmon', count: 2 },
+    ],
+    skillReq: 125,
+    itemLevelBudget: 25,
+    level: 25,
+    acquisition: ['drop'],
+    stationType: 'kitchens',
+  },
+  {
+    id: 'recipe_sageleaf_feast',
+    professionId: 'cooking',
+    resultItemId: 'sageleaf_feast',
+    resultCount: 1,
+    // Input 510 vs output 300. BYTE-IDENTICAL to the two rows above.
+    reagents: [
+      { itemId: 'seasoned_stock', count: 3 },
+      { itemId: 'wyrmfall_core', count: 1 },
+      { itemId: 'evergarden_greens', count: 1 },
+      { itemId: 'sunpetal_herb', count: 1 },
+      { itemId: 'cooking_salt', count: 2 },
+      { itemId: 'raw_deepbarb_catfish', count: 4 },
+      { itemId: 'raw_hollowgill_sturgeon', count: 3 },
+      { itemId: 'raw_stillmere_salmon', count: 2 },
     ],
     skillReq: 125,
     itemLevelBudget: 25,
