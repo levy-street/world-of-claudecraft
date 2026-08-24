@@ -489,7 +489,7 @@ describe('item level: the phase 11l trophy recipe outputs (TROPHY_RECIPES)', () 
   // (buildSourceIndex), so a trophy row's level is part of its output's item
   // level: a future level edit on a trophy row is a deliberate re-tier of a
   // shipped item, never a drive-by. The itemLevel pin is decisive only UPWARD
-  // for the rows capped at their output's live drop source (the lantern, the
+  // for the rows capped at their output's live drop source (the
   // oiled boots, the gravewyrm bone quiver at Korzul, where the rung-50
   // scaffolding and the level-20 cap coincide, the maul, the cragprowl belt
   // at the Thornpeak Ogres, the leather row the second review round added,
@@ -497,18 +497,15 @@ describe('item level: the phase 11l trophy recipe outputs (TROPHY_RECIPES)', () 
   // the fourth fix round re-picked it off cragwalker_boots): the mob source
   // wins on a LOWERED recipe level and the item level never moves, which is
   // why the recipe.level literal is pinned beside it in TROPHY_RECIPE_LEVELS.
-  // hobnail_boots (vendor-only, level chosen as an honest content level, 10,
-  // not the rung scaffolding's 15: the fifth fix round) had no derivable
-  // source before and GAINED its level from the recipe. The potion and the
-  // pouch carry no combat slot, so they are not item-level eligible and stay
-  // undefined whatever the row says.
+  // (The lantern and the hobnail boots left this map when the 11l QA excluded
+  // their rows; the arm below pins what their item levels read without
+  // them.) The potion and the pouch carry no combat slot, so they are not
+  // item-level eligible and stay undefined whatever the row says.
   const TROPHY_OUTPUT_LEVELS: Record<string, number | undefined> = {
-    valefire_lantern: 7,
     oiled_boots: 11,
     gravewyrm_bone_quiver: 23,
-    hobnail_boots: 10,
     fenshadow_maul: 13,
-    healing_potion: undefined,
+    lesser_healing_potion: undefined,
     linen_pouch: undefined,
     // 15 = the Ridge Stalkers' 14 plus the uncommon bonus 1 (the same 15
     // tests/itemization_coverage.test.ts pins from the drop side).
@@ -523,7 +520,7 @@ describe('item level: the phase 11l trophy recipe outputs (TROPHY_RECIPES)', () 
   });
 
   it('pins every trophy output at its item level', () => {
-    expect(Object.keys(TROPHY_OUTPUT_LEVELS)).toHaveLength(9);
+    expect(Object.keys(TROPHY_OUTPUT_LEVELS)).toHaveLength(7);
     for (const [id, level] of Object.entries(TROPHY_OUTPUT_LEVELS)) {
       expect(ITEMS[id], `${id} is a real item`).toBeTruthy();
       expect(itemLevel(ITEMS[id]), `${id} item level`).toBe(level);
@@ -544,17 +541,25 @@ describe('item level: the phase 11l trophy recipe outputs (TROPHY_RECIPES)', () 
     expect(itemLevel(ITEMS.mirejaw_fang_knife)).toBeUndefined();
   });
 
+  it('the 11l QA exclusions left the lantern at its Mogger level and took the boots back to sourceless', () => {
+    // The valefire_lantern row was capped at Mogger's level 6 so the item
+    // level never moved; with the row gone it still reads 7 from that drop.
+    // hobnail_boots gained its only source from the deleted row (an honest
+    // 10 chosen by hand), so it is vendor-only and sourceless again, with no
+    // tooltip item level line, the pre-phase behavior.
+    expect(itemLevel(ITEMS.valefire_lantern)).toBe(7);
+    expect(itemLevel(ITEMS.hobnail_boots)).toBeUndefined();
+  });
+
   // The recipe.level literal per row: the source-capped rows sit AT their
   // output's live source level (a lowered value would be invisible to the
   // itemLevel pin above), the scaffolding rows at the rung convention, and
   // the boots at the chosen content level.
   const TROPHY_RECIPE_LEVELS: Record<string, number> = {
-    recipe_valefire_lantern: 6,
     recipe_oiled_boots: 10,
     recipe_gravewyrm_bone_quiver: 20,
-    recipe_hobnail_boots: 10,
     recipe_fenshadow_maul: 12,
-    recipe_healing_potion: 15,
+    recipe_lesser_healing_potion: 15,
     recipe_linen_pouch: 10,
     recipe_wildgrove_cinch: 14,
     recipe_cragprowl_belt: 16,
@@ -567,7 +572,7 @@ describe('item level: the phase 11l trophy recipe outputs (TROPHY_RECIPES)', () 
   });
 
   it('pins every trophy row at its recipe level', () => {
-    expect(Object.keys(TROPHY_RECIPE_LEVELS)).toHaveLength(9);
+    expect(Object.keys(TROPHY_RECIPE_LEVELS)).toHaveLength(7);
     for (const recipe of TROPHY_RECIPES) {
       expect(recipe.level, `${recipe.id} recipe.level`).toBe(TROPHY_RECIPE_LEVELS[recipe.id]);
     }

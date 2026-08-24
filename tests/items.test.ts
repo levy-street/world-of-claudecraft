@@ -1004,7 +1004,7 @@ describe('items vendor: buy / sell / sellAllJunk / buyBack', () => {
   });
 
   it('phase 11l trophy promotion holds at the sweep: promoted reagents never sell, holdouts do', () => {
-    // The nine trophy drops adopted as common TROPHY_RECIPES reagents (seven
+    // The seven trophy drops adopted as common TROPHY_RECIPES reagents (five
     // promoted from poor, two already common: the cinderscale and the pelt)
     // must be invisible to the junk sweep, exactly like wolf_fang; the two
     // still-poor holdouts prove the sweep predicate itself stayed live.
@@ -1017,13 +1017,12 @@ describe('items vendor: buy / sell / sellAllJunk / buyBack', () => {
     // adoption. The derived set ALSO reds if a non-trophy recipe starts
     // consuming an adopted trophy (the helper's header names the fix: widen
     // the derivation, never de-adopt). The chipped tusk left the list when
-    // the sixth fix round output-excluded it, so it sells at the sweep
-    // again, beside the holdouts.
+    // the sixth fix round output-excluded it, and the bogiron nugget and the
+    // cracked fetish when the 11l QA excluded them the same way, so all three
+    // sell at the sweep again, beside the holdouts.
     const slot = { count: 1 };
     const adopted = [
       'bandit_bandana',
-      'bogiron_nugget',
-      'cracked_fetish',
       'cracked_ogre_tusk',
       'cracked_wyrm_scale',
       'emberwing_cinderscale',
@@ -1034,12 +1033,18 @@ describe('items vendor: buy / sell / sellAllJunk / buyBack', () => {
     // A do-not-shrink marker, not a pin: it compares the literal to itself
     // and can only red when someone edits the list above. The derived
     // equality on the next line is the pin.
-    expect(adopted).toHaveLength(9);
+    expect(adopted).toHaveLength(7);
     expect(adoptedTrophyIds(ITEMS)).toEqual([...adopted]);
     for (const id of adopted) {
       expect(items.junkSellableSlot(ITEMS[id], slot), id).toBe(false);
     }
-    for (const id of ['tangled_weed', 'soggy_moccasin', 'chipped_tusk'] as const) {
+    for (const id of [
+      'tangled_weed',
+      'soggy_moccasin',
+      'chipped_tusk',
+      'bogiron_nugget',
+      'cracked_fetish',
+    ] as const) {
       expect(items.junkSellableSlot(ITEMS[id], slot), id).toBe(true);
     }
   });

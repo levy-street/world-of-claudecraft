@@ -2195,14 +2195,11 @@ export const ZONE2_ITEMS: Record<string, ItemDef> = {
     buyValue: 1800,
   },
   // --- junk (gray) ---
-  // Reagent now (TROPHY_RECIPES, Masterwrought phase 11l), same convention as
-  // wolf_fang in items.ts: common NOT poor so sellAllJunk never sweeps it;
-  // sellValue unchanged.
   bogiron_nugget: {
     id: 'bogiron_nugget',
     name: 'Bogiron Nugget',
     kind: 'junk',
-    quality: 'common',
+    quality: 'poor',
     sellValue: 12,
   },
   soggy_moccasin: {
@@ -2212,14 +2209,11 @@ export const ZONE2_ITEMS: Record<string, ItemDef> = {
     quality: 'poor',
     sellValue: 9,
   },
-  // Reagent now (TROPHY_RECIPES, Masterwrought phase 11l), same convention as
-  // wolf_fang in items.ts: common NOT poor so sellAllJunk never sweeps it;
-  // sellValue unchanged.
   cracked_fetish: {
     id: 'cracked_fetish',
     name: 'Cracked Fetish',
     kind: 'junk',
-    quality: 'common',
+    quality: 'poor',
     sellValue: 14,
   },
   chipped_tusk: {

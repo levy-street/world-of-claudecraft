@@ -847,10 +847,15 @@ describe('item-art audit builder', () => {
     // one 'common' minus 'poor' = 2 (498042 to 498040), predicted and then
     // measured, and the sha moves with them; everything else on the object
     // is unchanged for the same reasons as before.
+    // Re-minted a third time at the 11l QA, which excluded the cracked fetish
+    // and the bogiron nugget under the tusk standard and put both defs back
+    // to poor: five quality tokens moved instead of seven, so the bytes
+    // shrink by exactly two more 'common' minus 'poor' = 4 (498040 to
+    // 498036), predicted and then measured, and the sha moves with them.
     expect(verified).toMatchObject({
       catalogPath: 'tmp/imagegen/item-art-consistency/final-audit/catalog.json',
-      catalogSha256: '2155856eee85acc463c89872a472c76f56f27d946ea9c122bde5f13349acf41a',
-      catalogBytes: 498040,
+      catalogSha256: '976fb7dbec77e42235f9395cd16543ed2f2ff6cbfe946c22805003caca0f3394',
+      catalogBytes: 498036,
       rendererFingerprint: '84410592a4686975e13d43d4fecc88fb7eb0e3b90f27f7b7dc38498cdf7e090c',
       catalogCount: 907,
       liveItemCount: 922,

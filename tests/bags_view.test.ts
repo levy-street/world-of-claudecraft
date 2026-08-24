@@ -309,8 +309,8 @@ describe('vendorSellIsInstant (the plain-click vendor sale safety gate)', () => 
   });
 
   it('the REAL catalog: an adopted trophy prompts, grey trash still sells on the spot', () => {
-    // Masterwrought phase 11l adopted nine junk mob drops as TROPHY_RECIPES
-    // reagents (seven promoted poor -> common, two already common). This
+    // Masterwrought phase 11l adopted seven junk mob drops as TROPHY_RECIPES
+    // reagents (five promoted poor -> common, two already common). This
     // gate reads quality, so a plain vendor click on one routes to the
     // confirm prompt instead of selling instantly. The adopted list is
     // DERIVED from the shipped rows by the shared
@@ -320,11 +320,11 @@ describe('vendorSellIsInstant (the plain-click vendor sale safety gate)', () => 
     // under-covering and a re-picked reagent reds the literal. Pinned off
     // the shipped defs so the gate cannot detach from what the catalog says.
     // The chipped tusk left the list when the sixth fix round
-    // output-excluded it: poor again, it sells on the spot like the holdouts.
+    // output-excluded it, and the bogiron nugget and the cracked fetish when
+    // the 11l QA excluded them the same way: poor again, all three sell on
+    // the spot like the holdouts.
     const adopted = [
       'bandit_bandana',
-      'bogiron_nugget',
-      'cracked_fetish',
       'cracked_ogre_tusk',
       'cracked_wyrm_scale',
       'emberwing_cinderscale',
@@ -332,13 +332,22 @@ describe('vendorSellIsInstant (the plain-click vendor sale safety gate)', () => 
       'old_cragmaws_pelt',
       'tallow_candle',
     ];
-    expect(adopted).toHaveLength(9);
+    // A do-not-shrink marker, not a pin: it compares the literal to itself
+    // and can only red when someone edits the list above. The derived
+    // equality on the next line is the pin.
+    expect(adopted).toHaveLength(7);
     expect(adoptedTrophyIds(CATALOG_ITEMS)).toEqual(adopted);
     for (const id of adopted) {
       expect(CATALOG_ITEMS[id], `${id} is a real item`).toBeDefined();
       expect(vendorSellIsInstant(CATALOG_ITEMS[id]), `${id} prompts now`).toBe(false);
     }
-    for (const id of ['tangled_weed', 'soggy_moccasin', 'chipped_tusk']) {
+    for (const id of [
+      'tangled_weed',
+      'soggy_moccasin',
+      'chipped_tusk',
+      'bogiron_nugget',
+      'cracked_fetish',
+    ]) {
       expect(CATALOG_ITEMS[id], `${id} is a real item`).toBeDefined();
       expect(vendorSellIsInstant(CATALOG_ITEMS[id]), `${id} still sells instantly`).toBe(true);
     }

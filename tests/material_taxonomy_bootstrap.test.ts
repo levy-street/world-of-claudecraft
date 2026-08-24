@@ -42,7 +42,10 @@ describe('material_taxonomy as the first-evaluated sim module', () => {
     // 118 -> 117 at the phase's sixth fix round, which output-excluded the
     // chipped tusk (its weaponcrafting row deleted, the def poor again), so
     // it derives OUT like the other survivors.
-    expect(MATERIAL_ITEM_IDS.size).toBe(117);
+    // 117 -> 115 at the 11l QA, which excluded the cracked fetish and the
+    // bogiron nugget under the tusk standard (their rows deleted, the defs
+    // poor again), so both derive OUT like the other survivors.
+    expect(MATERIAL_ITEM_IDS.size).toBe(115);
     expect(MATERIAL_ITEM_IDS.has('iron_ore')).toBe(true);
     expect(MATERIAL_ITEM_IDS.has('arcanite_bar')).toBe(true);
     // The farming source specifically, because it is the newest and the one

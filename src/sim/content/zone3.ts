@@ -3738,7 +3738,7 @@ export const ZONE3_ITEMS: Record<string, ItemDef> = {
     sellValue: 450,
     buyValue: 4500,
   },
-  // --- junk (gray) ---
+  // --- junk-kind drops: gray trash, plus the two 11l trophy reagents (common) ---
   ogre_toe_ring: {
     id: 'ogre_toe_ring',
     name: 'Ogre Toe Ring',

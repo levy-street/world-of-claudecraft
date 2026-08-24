@@ -21,6 +21,7 @@ import {
   hasSupersedingPurposeHint,
   materialProfessionHintText,
 } from '../src/ui/material_profession_hint_view';
+import { adoptedTrophyIds } from './helpers/adopted_trophy_ids';
 
 function tooltipHtml(itemId: string): string {
   const h = Object.create(Hud.prototype) as unknown as {
@@ -61,22 +62,38 @@ describe('materialProfessionHintText', () => {
   });
 
   it('phase 11l trophies read the simple Used by line for their adopted craft', () => {
-    // Three of the seven junk trophies the trophy economy promoted, one per
-    // distinct craft, pinned as exact strings so the localized craft name and
-    // the sentence template both hold (none of the seven carries a
-    // superseding purpose hint, so the line always renders). The chipped
-    // tusk lost its pin with its recipe: the sixth fix round output-excluded
-    // it, so it is plain junk with no Used-by line again.
-    expect(materialProfessionHintText('mudfin_scale')).toBe('Used by Leatherworking.');
-    expect(materialProfessionHintText('tallow_candle')).toBe('Used by Alchemy.');
-    expect(materialProfessionHintText('bandit_bandana')).toBe('Used by Tailoring.');
-    // The two already-common rare-elite leather trophies the second review
-    // round adopted (recipe_wildgrove_cinch, recipe_cragprowl_belt) read the
-    // same line: adoption is what put a Used-by line on them at all.
-    expect(materialProfessionHintText('old_cragmaws_pelt')).toBe('Used by Leatherworking.');
-    expect(materialProfessionHintText('emberwing_cinderscale')).toBe('Used by Leatherworking.');
-    // Poor trash again, outside MATERIAL_ITEM_IDS: the Used-by line is empty.
-    expect(materialProfessionHintText('chipped_tusk')).toBe('');
+    // Every adopted junk trophy, pinned as an EXACT rendered string so the
+    // localized craft name and the sentence template both hold (none carries
+    // a superseding purpose hint, so the line always renders). The key set is
+    // held equal to the shared derivation (tests/helpers/adopted_trophy_ids.ts)
+    // so an adoption or a de-adoption moves this map too; the two
+    // already-common rare-elite leather trophies read the same line as the
+    // promoted five, since adoption is what put a Used-by line on them at all.
+    const USED_BY: Record<string, string> = {
+      bandit_bandana: 'Used by Tailoring.',
+      cracked_ogre_tusk: 'Used by Weaponcrafting.',
+      cracked_wyrm_scale: 'Used by Leatherworking.',
+      emberwing_cinderscale: 'Used by Leatherworking.',
+      mudfin_scale: 'Used by Leatherworking.',
+      old_cragmaws_pelt: 'Used by Leatherworking.',
+      tallow_candle: 'Used by Alchemy.',
+    };
+    expect(Object.keys(USED_BY).sort()).toEqual(adoptedTrophyIds(ITEMS));
+    for (const [id, text] of Object.entries(USED_BY)) {
+      expect(materialProfessionHintText(id), id).toBe(text);
+    }
+    // Poor trash again, outside MATERIAL_ITEM_IDS: the Used-by line is empty
+    // for the chipped tusk (the sixth fix round), the bogiron nugget and the
+    // cracked fetish (the 11l QA), and it never rendered for the holdouts.
+    for (const id of [
+      'chipped_tusk',
+      'bogiron_nugget',
+      'cracked_fetish',
+      'tangled_weed',
+      'soggy_moccasin',
+    ]) {
+      expect(materialProfessionHintText(id), id).toBe('');
+    }
   });
 
   it('skips pure cooking catches; multi-craft catches keep the line, and both arms are live', () => {

@@ -6,19 +6,18 @@ import { adoptedTrophyIds } from './adopted_trophy_ids';
 
 // The paired test for the shared adopted-trophy derivation. The three consumer
 // suites each hold their own literal equal to its output, so the helper's
-// contract is pinned here once: the live catalog answers the nine adopted
+// contract is pinned here once: the live catalog answers the seven adopted
 // trophies exactly, and each of the two filters (junk kind, no second
 // consumer) is proven to be live by a case that would pass without it.
 
 describe('adoptedTrophyIds', () => {
-  // The nine Masterwrought phase 11l adoptions: seven promoted from poor plus
+  // The seven Masterwrought phase 11l adoptions: five promoted from poor plus
   // the two already-common leather trophies the second review round adopted.
-  // The chipped tusk is absent since the sixth fix round output-excluded it
-  // (src/sim/content/recipes.ts, the 11l-RUNG EXCLUSION RECORD).
+  // The chipped tusk, the bogiron nugget and the cracked fetish are absent:
+  // output-excluded, the tusk at the sixth fix round and the other two at the
+  // 11l QA (src/sim/content/recipes.ts, the 11l-RUNG EXCLUSION RECORD).
   const ADOPTED = [
     'bandit_bandana',
-    'bogiron_nugget',
-    'cracked_fetish',
     'cracked_ogre_tusk',
     'cracked_wyrm_scale',
     'emberwing_cinderscale',
@@ -27,8 +26,8 @@ describe('adoptedTrophyIds', () => {
     'tallow_candle',
   ];
 
-  it('derives exactly the nine adopted trophies from the live catalog, sorted', () => {
-    expect(ADOPTED).toHaveLength(9);
+  it('derives exactly the seven adopted trophies from the live catalog, sorted', () => {
+    expect(ADOPTED).toHaveLength(7);
     expect(adoptedTrophyIds(ITEMS)).toEqual(ADOPTED);
   });
 
@@ -52,17 +51,18 @@ describe('adoptedTrophyIds', () => {
   });
 
   it('excludes a junk-kind reagent another recipe also consumes (the shared filter is live)', () => {
-    // iron_ore is junk-kind and sits on a trophy bill (recipe_hobnail_boots),
-    // so the kind filter alone would admit it; the shared filter is what keeps
-    // it out, because the ladder rungs consume it too. Stated against the
-    // live catalog so the premise (junk kind, on a trophy bill, shared) is
-    // checked rather than assumed.
+    // thorium_ore is junk-kind and sits on three trophy bills (the quiver,
+    // the cinch, the belt; iron_ore left with the hobnail row at the 11l QA),
+    // so the kind filter alone would admit it; the shared filter is what
+    // keeps it out, because the ladder rungs consume it too. Stated against
+    // the live catalog so the premise (junk kind, on a trophy bill, shared)
+    // is checked rather than assumed.
     const consumes = (recipes: typeof ALL_RECIPES): boolean =>
-      recipes.some((r) => r.reagents.some((g) => g.itemId === 'iron_ore'));
-    expect(ITEMS.iron_ore.kind).toBe('junk');
+      recipes.some((r) => r.reagents.some((g) => g.itemId === 'thorium_ore'));
+    expect(ITEMS.thorium_ore.kind).toBe('junk');
     expect(consumes(TROPHY_RECIPES)).toBe(true);
     const trophyIds = new Set(TROPHY_RECIPES.map((r) => r.id));
     expect(consumes(ALL_RECIPES.filter((r) => !trophyIds.has(r.id)))).toBe(true);
-    expect(adoptedTrophyIds(ITEMS)).not.toContain('iron_ore');
+    expect(adoptedTrophyIds(ITEMS)).not.toContain('thorium_ore');
   });
 });

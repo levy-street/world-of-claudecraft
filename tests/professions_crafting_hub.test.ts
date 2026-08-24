@@ -194,13 +194,12 @@ describe('station content', () => {
     // decision, Sablewax Vellum at the apothecary), and the Masterwrought
     // phase 09 apex gear rows for the station-less crafts (the three
     // jewelcrafting apex pieces at the forge, inscription's Voidbound
-    // Grimoire at the apothecary), plus the Masterwrought phase 11l trophy
-    // consumer for inscription (the Valefire Lantern, inscription home,
-    // apothecary binding beside the rest of the inscription catalog; the
-    // other eight trophy rows bind their own craft's station and ride the
-    // equality branch), pinned literally so a
+    // Grimoire at the apothecary), pinned literally so a
     // new foreign binding is a deliberate edit here, not a drive-by. The
-    // pin carries id:station PAIRS (review round): a bare id list would
+    // pin carries id:station PAIRS (review round; the Masterwrought phase 11l
+    // trophy rows all bind their own craft's station and ride the equality
+    // branch, the Valefire Lantern's apothecary binding having left with its
+    // row at the 11l QA): a bare id list would
     // stay green if a station-less craft's recipe silently moved to a
     // different foreign station.
     const foreignBound: string[] = [];
@@ -234,7 +233,6 @@ describe('station content', () => {
       'recipe_silverleaf_scroll:apothecary',
       'recipe_sunpetal_grimoire:apothecary',
       'recipe_sunpetal_scroll:apothecary',
-      'recipe_valefire_lantern:apothecary',
       'recipe_voidbound_grimoire:apothecary',
       'recipe_warhewn_signet:forge',
       'recipe_weighted_thorium_band:forge',

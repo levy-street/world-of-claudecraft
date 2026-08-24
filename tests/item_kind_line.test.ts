@@ -13,6 +13,7 @@ import { MATERIAL_ITEM_IDS } from '../src/sim/material_taxonomy';
 import { baseMaterialFor } from '../src/sim/professions/material_grades';
 import { Hud } from '../src/ui/hud';
 import { itemKindLabel, itemQualityLabel } from '../src/ui/item_kind_label';
+import { adoptedTrophyIds } from './helpers/adopted_trophy_ids';
 
 function tooltipHtml(itemId: string): string {
   const h = Object.create(Hud.prototype) as unknown as {
@@ -74,18 +75,35 @@ describe('the tooltip kind line for material grades', () => {
   });
 
   it('phase 11l trophies read Material, not Junk, now recipes consume them', () => {
-    // Two of the seven junk trophies the trophy economy promoted (different
-    // adopted crafts: armorcrafting's nugget, leatherworking's scale).
-    // Membership is derived from recipe reagents, so these arms hold the
-    // whole promotion visible on the kind line. The nugget replaced the
-    // chipped tusk here when the sixth fix round output-excluded the tusk.
-    for (const id of ['bogiron_nugget', 'mudfin_scale']) {
+    // Every adopted junk trophy (the shared derivation in
+    // tests/helpers/adopted_trophy_ids.ts: the junk-kind reagents of the
+    // TROPHY_RECIPES rows no other recipe consumes), by name, so a future
+    // adoption or de-adoption moves this arm too. Membership is derived
+    // from recipe reagents, so these arms hold the whole promotion visible
+    // on the kind line, through the REAL Hud.prototype.itemTooltip.
+    const adopted = adoptedTrophyIds(ITEMS);
+    expect(adopted).toHaveLength(7);
+    for (const id of adopted) {
       expect(MATERIAL_ITEM_IDS.has(id), id).toBe(true);
       expect(itemKindLabel('junk', id), id).toBe('Material');
       const html = tooltipHtml(id);
       expect(html, id).toContain('Material');
       expect(html, id).not.toMatch(/\bJunk\b/);
       expect(html, id).not.toContain('Fine Material');
+    }
+    // The two holdouts and the three output-excluded trophies (the chipped
+    // tusk at the sixth fix round, the bogiron nugget and the cracked fetish
+    // at the 11l QA) keep the Junk line, by name.
+    for (const id of [
+      'tangled_weed',
+      'soggy_moccasin',
+      'chipped_tusk',
+      'bogiron_nugget',
+      'cracked_fetish',
+    ]) {
+      expect(MATERIAL_ITEM_IDS.has(id), id).toBe(false);
+      expect(itemKindLabel('junk', id), id).toBe('Junk');
+      expect(tooltipHtml(id), id).toContain('Junk');
     }
   });
 

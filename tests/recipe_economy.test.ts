@@ -527,7 +527,7 @@ describe('REFERENTIAL INTEGRITY', () => {
     // masterwrought Phase 11i added is a drop, see the derived term below), the two tool-effect
     // charms, the nine jewelcrafting catalog recipes, the six inscription
     // catalog recipes, the ten Masterwrought phase 07 intermediates, the
-    // three crafted hoes, the nine Masterwrought phase 11l trophy consumers,
+    // three crafted hoes, the seven Masterwrought phase 11l trophy consumers,
     // and the farm-economy set's ON-RAMP: the
     // pre-training id list is frozen, so anything authored after that switch
     // has to be learned.
@@ -593,12 +593,13 @@ describe('REFERENTIAL INTEGRITY', () => {
     // channel split: the whole list still feeds the sum above.
     expect(HOE_RECIPES).toHaveLength(4);
     // The Masterwrought phase 11l trophy economy: one consumer recipe per
-    // adopted junk trophy (seven promoted from poor, plus the two
+    // adopted junk trophy (five promoted from poor, plus the two
     // already-common leather trophies its second review round adopted; the
-    // sixth fix round output-excluded the chipped tusk and deleted its row),
-    // all nine trainer-taught, so the whole list feeds the sum above (no
+    // sixth fix round output-excluded the chipped tusk and the 11l QA the
+    // cracked fetish and the bogiron nugget, each deleting its row), all
+    // seven trainer-taught, so the whole list feeds the sum above (no
     // channel split).
-    expect(TROPHY_RECIPES).toHaveLength(9);
+    expect(TROPHY_RECIPES).toHaveLength(7);
     // The economy-hooks phase's eight farm dishes, the four Phase 11 well-fed
     // buff dishes, the growth tonic's alchemy row, and the Phase 12 shared
     // feast (a cooking row with a placeable junk output). Deliberately
@@ -623,12 +624,10 @@ describe('REFERENTIAL INTEGRITY', () => {
     // outside the stacked one reds here by design, and widening the arm is a
     // deliberate edit, never a drive-by.
     const TROPHY_BY_RECIPE: Record<string, string> = {
-      recipe_valefire_lantern: 'cracked_fetish',
       recipe_oiled_boots: 'mudfin_scale',
       recipe_gravewyrm_bone_quiver: 'cracked_wyrm_scale',
-      recipe_hobnail_boots: 'bogiron_nugget',
       recipe_fenshadow_maul: 'cracked_ogre_tusk',
-      recipe_healing_potion: 'tallow_candle',
+      recipe_lesser_healing_potion: 'tallow_candle',
       recipe_linen_pouch: 'bandit_bandana',
       recipe_wildgrove_cinch: 'old_cragmaws_pelt',
       recipe_cragprowl_belt: 'emberwing_cinderscale',
@@ -653,9 +652,9 @@ describe('REFERENTIAL INTEGRITY', () => {
     // The 11l-OUT doctrine above is list-count-only by design (the listed
     // bill, never the discounted one), so the crafter's reward, the
     // specialization and self-signed discounts requiredReagentCountFor
-    // composes, can and does take a bill under its output: eight of the nine
-    // floors below sit under the output (the healing potion is the one that
-    // does not), gold-positive at the floor and bounded by trophy supply.
+    // composes, can and does take a bill under its output: six of the seven
+    // floors below sit under the output (the lesser healing potion is the one
+    // that does not), gold-positive at the floor and bounded by trophy supply.
     // THREE bills per row, each through requiredReagentCountFor (the function
     // the sim charges), specialized in the recipe's own craft, Jack excluded:
     // specOnly is specialization alone (no self-signed copy); floor is what
@@ -670,13 +669,12 @@ describe('REFERENTIAL INTEGRITY', () => {
     // HARVEST_COMPONENT_SPECIMENS), so a trophy reagent that joins or leaves
     // a signable source moves a literal here. Row by row: the cinch (401)
     // and the belt (421) reach their floor exactly by one self-signed
-    // pristine hide; the lantern, the maul, and the potion sit on it at
-    // specialization alone; the quiver reaches 231 by a signed thorium ore
-    // and the hobnail boots 52 by a signed iron ore, short of the 196 and 40
-    // floors, which also need a signed trophy (and, for the boots, a signed
-    // vendor flux); the oiled boots (56 reachable against a floor of 51) and
-    // the pouch (51 against 36) never reach theirs, since the lines a
-    // signature would move are a trophy, a mob drop, and vendor staples.
+    // pristine hide; the maul and the potion sit on it at specialization
+    // alone; the quiver reaches 231 by a signed thorium ore, short of the
+    // 196 floor, which also needs a signed trophy; the oiled boots (56
+    // reachable against a floor of 51) and the pouch (51 against 36) never
+    // reach theirs, since the lines a signature would move are a trophy, a
+    // mob drop, vendor staples, and the plain-granted hide and silk.
     // Each row's comment in src/sim/content/recipes.ts prints the same three
     // figures. This map does NOT assert any bill above the output; it makes
     // every figure VISIBLE as a literal, so a bill edit, a reagent re-price,
@@ -684,7 +682,6 @@ describe('REFERENTIAL INTEGRITY', () => {
     // someone has to re-derive (the recipe_sootscale_mantle precedent in THE
     // ECONOMY INVARIANT).
     const SIGNABLE_TROPHY_REAGENTS = new Set([
-      'iron_ore',
       'thorium_ore',
       'goldleaf_herb',
       'elderwood_log',
@@ -727,12 +724,10 @@ describe('REFERENTIAL INTEGRITY', () => {
       return total;
     };
     const TROPHY_BILLS: Record<string, { specOnly: number; floor: number; reachable: number }> = {
-      recipe_valefire_lantern: { specOnly: 104, floor: 104, reachable: 104 },
       recipe_oiled_boots: { specOnly: 56, floor: 51, reachable: 56 },
       recipe_gravewyrm_bone_quiver: { specOnly: 291, floor: 196, reachable: 231 },
-      recipe_hobnail_boots: { specOnly: 60, floor: 40, reachable: 52 },
       recipe_fenshadow_maul: { specOnly: 222, floor: 222, reachable: 222 },
-      recipe_healing_potion: { specOnly: 77, floor: 77, reachable: 77 },
+      recipe_lesser_healing_potion: { specOnly: 77, floor: 77, reachable: 77 },
       recipe_linen_pouch: { specOnly: 51, floor: 36, reachable: 51 },
       recipe_wildgrove_cinch: { specOnly: 426, floor: 401, reachable: 401 },
       recipe_cragprowl_belt: { specOnly: 446, floor: 421, reachable: 421 },
@@ -754,10 +749,10 @@ describe('REFERENTIAL INTEGRITY', () => {
     // resolveCraftForRecipe charges (ceil(itemLevelBudget x
     // CRAFT_GOLD_SINK_COPPER_PER_BUDGET) copper per craft), lands on top of
     // every bill, and the trophy header's verdicts are pinned as literals
-    // against it. At the floor plus the sink five rows pay out and three the
+    // against it. At the floor plus the sink three rows pay out and three the
     // sink alone turns gold-negative (their floor sits under the output,
     // their floor plus sink at or above it); at the reachable bill plus the
-    // sink four pay out. The potion never pays: its most permissive bill,
+    // sink two pay out. The potion never pays: its most permissive bill,
     // specialization alone with no sink, already sits above its output.
     // sinkFor restates the charge formula to price the verdicts; the charge
     // SITE is driven end to end by tests/professions_acquisition_salvage_sink
@@ -776,9 +771,7 @@ describe('REFERENTIAL INTEGRITY', () => {
     expect(paysOutAt((bills) => bills.floor)).toEqual([
       'recipe_fenshadow_maul',
       'recipe_gravewyrm_bone_quiver',
-      'recipe_hobnail_boots',
       'recipe_linen_pouch',
-      'recipe_valefire_lantern',
     ]);
     const sinkTurned = TROPHY_RECIPES.filter(
       (r) =>
@@ -795,11 +788,9 @@ describe('REFERENTIAL INTEGRITY', () => {
     expect(paysOutAt((bills) => bills.reachable)).toEqual([
       'recipe_fenshadow_maul',
       'recipe_gravewyrm_bone_quiver',
-      'recipe_hobnail_boots',
-      'recipe_valefire_lantern',
     ]);
-    expect(TROPHY_BILLS.recipe_healing_potion.specOnly).toBeGreaterThan(
-      outputValue(requireRecipe('recipe_healing_potion')),
+    expect(TROPHY_BILLS.recipe_lesser_healing_potion.specOnly).toBeGreaterThan(
+      outputValue(requireRecipe('recipe_lesser_healing_potion')),
     );
   });
 

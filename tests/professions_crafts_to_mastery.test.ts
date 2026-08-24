@@ -745,17 +745,19 @@ describe('armorcrafting mastery derives from the live tables (R13)', () => {
     // ladder (which consumes no thorium at all) cannot reshape silently
     // under the window either.
     expect(RUN.bill.get('thorium_ore')).toBe(450);
-    // 75 since Masterwrought phase 11l: the trophy row recipe_hobnail_boots
-    // (iron 3 gathered; its bogiron trophy and flux are non-gathered, so free
-    // in this model) wins the rung-25 fewest-gathered tie-break, so the 25
-    // rung-25 crafts bill 3 iron each instead of the previous pick's 4.
-    expect(RUN.bill.get('iron_ore')).toBe(75);
-    // The 75 rests on WHICH row won the rung, so the winner is pinned by id AND
-    // exact use count beside it (25, the whole rung-25 allotment): a different
-    // pick that happened to bill 3 iron would keep the literal green while the
+    // 100 again since the 11l QA: the 11l build's trophy row recipe_hobnail_boots
+    // (iron 3 gathered; its bogiron trophy and flux were non-gathered, so free
+    // in this model) had won the rung-25 fewest-gathered tie-break at 75, and
+    // the QA excluded the bogiron nugget and deleted that row, so the previous
+    // pick's 4 iron per craft is back.
+    expect(RUN.bill.get('iron_ore')).toBe(100);
+    // The 100 rests on WHICH row won the rung, so the winner is pinned by id
+    // AND exact use count beside it (25, the whole rung-25 allotment), the
+    // shape the 11l build established for its hobnail row: a different pick
+    // that happened to bill 4 iron would keep the literal green while the
     // comment above named the wrong recipe, and a presence check alone would
-    // pass a row that won only part of the rung.
-    expect(RUN.recipeUse.get('recipe_hobnail_boots')).toBe(25);
+    // pass a row that won only part of the rung. Measured at the 11l QA.
+    expect(RUN.recipeUse.get('recipe_ironlink_spaulders')).toBe(25);
     expect(RUN.bill.get('copper_ore')).toBe(75);
     // Gain curve ON: the whole per-rung craft vector, not just the top rung.
     const craftsPerRung = new Map<number, number>();

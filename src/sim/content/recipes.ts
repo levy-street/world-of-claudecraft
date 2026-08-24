@@ -3862,20 +3862,20 @@ export const FARM_RECIPES: ProfessionRecipeRecord[] = [
   },
 ];
 
-// The trophy economy (Masterwrought phase 11l): the nine orphaned junk mob
-// drops become reagents, one consumer recipe per adopted trophy (seven
-// promoted poor to common, plus the two already-common rare-elite leather
-// trophies the second review round adopted; the sixth fix round
-// output-excluded the chipped tusk, see the exclusion record below, so the
-// weaponcrafting rung-25 row is gone). Outputs are EXISTING uncrafted
+// The trophy economy (Masterwrought phase 11l): the seven orphaned junk mob
+// drops the output doctrine admits become reagents, one consumer recipe per
+// adopted trophy (five promoted poor to common, plus the two already-common
+// rare-elite leather trophies the second review round adopted). The sixth
+// fix round output-excluded the chipped tusk, and the 11l QA excluded the
+// cracked fetish and the bogiron nugget under the same standard (see the
+// exclusion record below), so the weaponcrafting, inscription and
+// armorcrafting rung-25 rows are gone. Outputs are EXISTING uncrafted
 // shipped items (the COMMON_RECIPES precedent: no new item defs), and no
 // shipped recipe's bill was edited. Each row's RUNG (skillReq) follows its
 // trophy's drop level; the LEVEL field is capped at the OUTPUT's live drop
-// source where one exists, and takes the rung scaffolding where none does,
-// or an honest content level where the scaffolding would overstate a
-// stat-less vendor item (the boots). Every bill contains its trophy
-// (sellValue only, no buyValue), so no row joins the
-// counterfactually-vendor-fed set.
+// source where one exists, and takes the rung scaffolding where none does.
+// Every bill contains its trophy (sellValue only, no buyValue), so no row
+// joins the counterfactually-vendor-fed set.
 //
 // The pinned economy doctrine (tests/recipe_economy.test.ts: output strictly
 // between the trophy's sellValue and the LISTED bill) is list-count-only by
@@ -3890,60 +3890,67 @@ export const FARM_RECIPES: ProfessionRecipeRecord[] = [
 // specialization-only bill, and the specialization-plus-self-signed FLOOR
 // (a self-signed copy of every reagent, which is what
 // tests/recipe_economy.test.ts minAchievableInputValue computes and pins
-// per row in TROPHY_MIN_ACHIEVABLE; the Jack multiplier is in neither
+// per row in TROPHY_BILLS, its floor field; the Jack multiplier is in neither
 // figure, since no live quest path attunes a Jack today, and the same test
 // pins that attuneJackOfAllTrades has no production caller). How much of
 // the floor a crafter can actually reach depends on WHICH lines a signature
-// can move: a self-signed copy exists for a node yield or a corpse component
-// rolled at a rare-plus material rarity (gathering.ts
-// isSignableMaterialRarity; the corpse-harvest arms in interaction.ts mint
-// the signed component, or the family's specimen in its place), for a rare
-// gather event, and for a rare-plus masterwork craft, so the crafter's own
-// node and corpse harvests CAN sign iron_ore, thorium_ore, goldleaf_herb,
-// elderwood_log, rough_hide, spider_silk, and pristine_hide, while a
-// mob-dropped trophy and a bought vendor staple never sign. The floor is
-// therefore EXACTLY reachable for the cinch (401) and the belt (421), by one
-// self-signed pristine hide; the lantern, the maul, and the potion sit on it
+// can move: a self-signed copy exists for a node yield rolled at a rare-plus
+// material rarity (gathering.ts isSignableMaterialRarity), for a corpse
+// component whose family has NO pristine specimen (the corpse-harvest arms
+// in interaction.ts sign the component only then; a hide or silk family
+// grants its component PLAIN and signs the specimen in its place), for a
+// rare gather event, and for a rare-plus masterwork craft, so the crafter's
+// own harvests CAN sign thorium_ore, goldleaf_herb, elderwood_log and
+// pristine_hide, while rough_hide and spider_silk (their families carry a
+// specimen), a mob-dropped trophy and a bought vendor staple never sign. The
+// floor is therefore EXACTLY reachable for the cinch (401) and the belt
+// (421), by one self-signed pristine hide; the maul and the potion sit on it
 // at specialization alone (every line already at 1, nothing left for a
 // signature to move); the quiver reaches 231 by a signed thorium ore (its
-// 196 floor also needs a signed wyrm scale, a mob drop) and the hobnail
-// boots 52 by a signed iron ore (the 40 floor also needs a signed nugget and
-// a signed flux); and the floor is a counterfactual only for the oiled boots
-// (51 against a reachable 56: the one movable line is the mudfin scale, a
-// trophy) and the pouch (36 against a reachable 51: the bandana, the scrap,
-// and the thread are a trophy, a mob drop, and a vendor staple). Where the
-// floor sits under the output the row says so, bounded by trophy supply (the
-// crafter's reward, by the doctrine's design). The #1301 gold sink then adds
+// 196 floor also needs a signed wyrm scale, a mob drop); and the floor is a
+// counterfactual only for the oiled boots (51 against a reachable 56: no
+// line on that bill can carry a signature) and the pouch (36 against a
+// reachable 51: the bandana, the scrap, and the thread are a trophy, a mob
+// drop, and a vendor staple). Where the floor sits under the output the row
+// says so, bounded by trophy supply (the crafter's reward, by the doctrine's
+// design). The #1301 gold sink then adds
 // ceil(itemLevelBudget x CRAFT_GOLD_SINK_COPPER_PER_BUDGET) copper per craft
 // on top (crafting.ts resolveCraftForRecipe, 2 copper per budget point: 32
 // for a budget-16 row, 40 for budget 20, 20 for budget 10), so the true
-// floor is the printed floor plus that sink: five of the nine stay
-// gold-positive after it (the lantern 136 vs 160, the quiver 236 vs 360, the
-// hobnail boots 72 vs 90, the maul 262 vs 420, the pouch 56 vs 60), the sink
-// turns three gold-negative (the oiled boots 83 vs 80, the cinch 441 vs 420,
-// the belt 461 vs 440), and the potion was never positive (109 vs 32). At
-// the REACHABLE bill plus the sink, the oiled boots (88 vs 80) and the pouch
-// (71 vs 60) are gold-negative too, so four of the nine pay out in practice:
-// the lantern, the quiver (271 vs 360), the hobnail boots (84 vs 90), and
-// the maul.
+// floor is the printed floor plus that sink: three of the seven stay
+// gold-positive after it (the quiver 236 vs 360, the maul 262 vs 420, the
+// pouch 56 vs 60), the sink turns three gold-negative (the oiled boots 83 vs
+// 80, the cinch 441 vs 420, the belt 461 vs 440), and the potion was never
+// positive (109 vs 16). At the REACHABLE bill plus the sink, the oiled boots
+// (88 vs 80) and the pouch (71 vs 60) are gold-negative too, so two of the
+// seven pay out in practice: the quiver (271 vs 360) and the maul.
 //
-// FLAGGED FOR MAINTAINER EYES, the maul outlier: at specialization alone
+// FLAGGED FOR MAINTAINER EYES, the two surplus rows. Every figure above is
+// VENDOR-PURCHASE accounting (buyValue-first unit values, the price basis
+// tests/recipe_economy.test.ts uses to bar a vendor-buy-to-vendor-sell
+// loop); a crafter who gathers the signable lines pays their sellValue
+// instead (thorium 15 not 60, elderwood 40 not 160, goldleaf 15 not 60), the
+// GATHERED column the same test pins per row. At specialization alone
 // recipe_fenshadow_maul bills 222 against 420 out, net +158 per craft after
-// the 40-copper sink, bounded by one cracked_ogre_tusk per craft from a
-// single named elite (brutok_skullsmasher); the next largest margin is the
-// quiver at +89 (231 vs 360 with a self-signed thorium ore, less the 40
-// sink; +29 at specialization alone, 291 vs 360). The doctrine is
-// list-count-only, so this is a tuning read, not a rule breach, left to the
-// maintainer.
+// the 40-copper sink (102 in and +278 at gathered cost), bounded by one
+// cracked_ogre_tusk per craft from a single named elite
+// (brutok_skullsmasher); the quiver is next at +89 with a self-signed
+// thorium ore (231 vs 360 less the 40 sink; +29 at specialization alone,
+// 291 vs 360) and +164 at gathered cost (156 in), bounded more loosely
+// (cracked_wyrm_scale drops at 0.5 from the sanctum drakonids, dungeon
+// trash rather than one elite). The maul is also dominated by the trainer's
+// OWN rung-25 row on every axis but one (the ironshod comparison at its
+// row). The doctrine is list-count-only, so these are tuning reads, not rule
+// breaches, left to the maintainer.
 //
 // 11l-RUNG EXCLUSION RECORD (one line per id, so the record greps in src).
-// Scope: the 21 junk mob-drop orphans (nine adopted below, ten excluded
+// Scope: the 21 junk mob-drop orphans (seven adopted below, twelve excluded
 // here, two holdouts); soggy_boot (fishing only) and the three Brightwood
 // Glade wildlife ids (no source) are not mob drops and carry no line.
 // Row 123 (docs/prd/masterwrought/farming/state.md) predicted
 // old_cragmaws_pelt and emberwing_cinderscale as value exclusions against
 // the CRAFTED ceiling (460, leather 420); row 122's doctrine picks UNCRAFTED
-// outputs, whose leather pool answers 400 and 440, which is what admits them
+// outputs, whose leather pool answers 420 and 440, which is what admits them
 // (a divergence recorded, not a re-decision).
 //   gleamstag_charm 2500: value-excluded, jewelcrafting (the uncrafted neck
 //     and ring pool is 25 items: 9 honor pieces at sellValue 0 and 16 above
@@ -3994,43 +4001,37 @@ export const FARM_RECIPES: ProfessionRecipeRecord[] = [
 //     everything else, str 9 sta 4 against str 2 sta 2, rare against
 //     uncommon, one hand against two, is overwhelming); under R21 no
 //     weaponcrafting output is defensible, so the tusk stays poor trash).
+//   cracked_fetish 14: output-excluded, inscription (the eighth output
+//     exclusion, the 11l QA, under the tusk standard: its one in-register
+//     uncrafted output, valefire_lantern (offhand, uncommon, int 1 spi 1,
+//     item level 7, sellValue 160), is strictly dominated by the trainer's
+//     OWN rows at the same rung and below, recipe_goldleaf_folio (rung 25,
+//     int 3 spi 2, a 150 bill) and recipe_silverleaf_primer (rung 0, int 2
+//     spi 1, a 36 bill): same slot, same CASTER_ALL lock, same quality, more
+//     stats, cheaper. The only axis the lantern wins is sellValue, so the row
+//     was a fetish sink whose one use was the vendor loop (+24 per craft at
+//     the floor after the sink). No other uncrafted caster offhand sits in
+//     (14, 178], so inscription's lane goes EMPTY like jewelcrafting's and
+//     the fetish returns to poor trash, untouched on every other axis).
+//   bogiron_nugget 12: output-excluded, armorcrafting (the ninth, the 11l
+//     QA, the same standard: hobnail_boots (mail feet, common, armor 18, no
+//     stats, sellValue 90, a 900 counter price at Smith Haldren) is strictly
+//     dominated by the trainer's OWN rung-0 row recipe_coppermail_sabatons
+//     (mail feet, common, armor 38, a 46 bill); the counter item is itself
+//     dead beside the sabatons, so a 100-copper craft door onto it was a
+//     nugget sink, not a discount route. No other uncrafted mail foot sits
+//     in (12, 100], and stretching a bill to admit bogiron_hauberk (300) was
+//     rejected at the build; armorcrafting keeps no trophy row and the
+//     nugget returns to poor trash).
+//   RECORDED CONSEQUENCE (found by the 11l QA, the maintainer's to heal):
+//     with bandit_bandana, tallow_candle and mudfin_scale promoted, zone 1
+//     (Eastbrook Vale, levels 1 to 7) carries NO poor mob drop, so a
+//     starter-zone character has nothing for the Sell Junk button the guide
+//     teaches until zone 2, and only the band-0 fishing pair (tangled_weed,
+//     soggy_boot) as gray. Not healed here (authoring a drop is content
+//     design); it sits beside the col_junk_drawer margin on the open list.
 //   tangled_weed, soggy_moccasin: holdouts (11l-HOLDOUT).
 export const TROPHY_RECIPES: ProfessionRecipeRecord[] = [
-  {
-    id: 'recipe_valefire_lantern',
-    professionId: 'inscription',
-    resultItemId: 'valefire_lantern',
-    resultCount: 1,
-    // Fetish charms ground into the lamp's oil, the ink register's herb and
-    // essence lines beside them. Input 178 vs output 160.
-    // 11l-OUT: trophy 14 < output 160 < input 178; no prior recipe crafts
-    // valefire_lantern (recipeForResultItem); uncommon at the 25 rung ceiling.
-    // Discounted bills (requiredReagentCountFor): specialization only, the
-    // fetish and the herb 2 to 1, 104 vs 160; specialization plus self-signed
-    // lands on the same floor, 104 vs 160 (every listed 2 is already at 1 and
-    // a 1 never drops, so the floor IS the specialization-only bill),
-    // gold-positive at the floor and after the 32-copper #1301 sink (136 vs
-    // 160), bounded by trophy supply.
-    reagents: [
-      { itemId: 'cracked_fetish', count: 2 },
-      { itemId: 'goldleaf_herb', count: 2 },
-      { itemId: 'arcane_essence', count: 1 },
-      { itemId: 'glass_vial', count: 1 },
-    ],
-    skillReq: 25,
-    itemLevelBudget: 16,
-    // Capped at the lantern's live drop source (Mogger, level 6): the item
-    // level source index treats recipe.level as an acquisition level
-    // (src/sim/item_level.ts), so a higher value here would re-tier the
-    // shipped item past its pinned item level 7 and off its stat budget.
-    // craftActionXp(recipe.level, characterLevel) in
-    // src/sim/professions/profession_xp.ts reads this field too: a level-20
-    // crafter earns craftActionXp(6, 20) = 0 character XP per craft (the gray
-    // band), against 100 for a level-20 row.
-    level: 6,
-    acquisition: ['trainer'],
-    stationType: 'apothecary',
-  },
   {
     id: 'recipe_oiled_boots',
     professionId: 'leatherworking',
@@ -4044,11 +4045,17 @@ export const TROPHY_RECIPES: ProfessionRecipeRecord[] = [
     // 4 to 3, hide 6 to 4, silk and agent 2 to 1, 56 vs 80; specialization
     // plus self-signed, scales 4 to 2, hide 6 to 4, silk and agent 1, the
     // floor 51 vs 80, a counterfactual only: the one line a signature moves
-    // past 56 is the mudfin scale, a mob drop that never signs (the hide and
-    // the silk sign but land on 4 and 1 either way), so the reachable bill is
+    // past 56 is the mudfin scale, a mob drop that never signs, and the hide
+    // and the silk never sign either (their families grant the component
+    // plain and sign only the pristine specimen), so the reachable bill is
     // the 56. Gold-positive at the floor, but the 32-copper #1301 sink turns
     // the row gold-negative, 83 vs 80 (88 vs 80 at the reachable bill),
     // bounded by trophy supply.
+    // Beside the trainer's OWN rung-0 row recipe_fenbridge_hide_boots (leather
+    // feet, common, armor 26, a 26 bill) this row wins one axis, agility 1,
+    // and is uncommon rather than common, at three and a half times the bill:
+    // the weakest surviving prize, recorded by the 11l QA as a tuning read,
+    // not an exclusion, since it is not strictly dominated.
     reagents: [
       { itemId: 'mudfin_scale', count: 4 },
       { itemId: 'rough_hide', count: 6 },
@@ -4101,46 +4108,6 @@ export const TROPHY_RECIPES: ProfessionRecipeRecord[] = [
     stationType: 'tannery',
   },
   {
-    id: 'recipe_hobnail_boots',
-    professionId: 'armorcrafting',
-    resultItemId: 'hobnail_boots',
-    resultCount: 1,
-    // Bog iron hammered into the hobnails, iron and flux from the forge
-    // rung's own register. Input 100 vs output 90.
-    // 11l-OUT: trophy 12 < output 90 < input 100; no prior recipe crafts
-    // hobnail_boots (recipeForResultItem); common, below the 25 rung ceiling.
-    // Discounted bills (requiredReagentCountFor): specialization only,
-    // nuggets and ore 3 to 2, flux 2 to 1, 60 vs 90; specialization plus
-    // self-signed, every listed count to 1, the floor 40 vs 90; the reachable
-    // figure is 52 (a self-signed iron ore takes 3 to 1; the nugget is a mob
-    // drop and the flux a vendor staple, neither signs), gold-positive at the
-    // floor and after the 32-copper #1301 sink (72 vs 90; 84 vs 90 at the
-    // reachable bill), bounded by trophy supply.
-    reagents: [
-      { itemId: 'bogiron_nugget', count: 3 },
-      { itemId: 'iron_ore', count: 3 },
-      { itemId: 'smithing_flux', count: 2 },
-    ],
-    skillReq: 25,
-    itemLevelBudget: 16,
-    // No live source to cap against: hobnail_boots is vendor-only (Smith
-    // Haldren, smith_haldren in zone1.ts, sells it at 900; no drop, quest or
-    // loot source), so the level is CHOSEN as an honest content level rather
-    // than taken from the rung-25 scaffolding: the boot is armor 18 mail with
-    // no primary stats, and the scaffolding's 15 would stamp it above this
-    // phase's own oiled_boots (item level 11, armor 25 plus agi 1). 10 is the
-    // zone1/2 border the bogiron trophy's fen trolls (level 10 to 12) sit on.
-    // The consequence is recorded, not accidental: the item gains a derivable
-    // item level (10, not 15) and so a tooltip item level line it never
-    // showed before. recipe.level's other two consumers: craftActionXp(10, 20)
-    // = 0 for a level-20 crafter (gray band), so the row is a pure discount
-    // route (a 100-copper listed bill against the 900 counter price), and
-    // masterworkBonusStats (craftBonusStatsFor) is moot for a stat-less def.
-    level: 10,
-    acquisition: ['trainer'],
-    stationType: 'forge',
-  },
-  {
     id: 'recipe_fenshadow_maul',
     professionId: 'weaponcrafting',
     resultItemId: 'fenshadow_maul',
@@ -4160,6 +4127,12 @@ export const TROPHY_RECIPES: ProfessionRecipeRecord[] = [
     // bill).
     // Re-picked from bristleback_maul (R21): that maul is item level 7, so a
     // rung-50 crafter had no reason to make it.
+    // Beside the trainer's OWN rung-25 row recipe_ironshod_maul (two-hand,
+    // uncommon, 36-51 at 3.3 = 13.18 dps, str 5 sta 3, no class lock, item
+    // level 16, a 104 bill) this maul (12.21 dps, str 3 agi 2 sta 2, druid
+    // only, item level 13) wins one axis, agility 2; recorded by the 11l QA
+    // beside the surplus in the header as the maintainer's read, not an
+    // exclusion.
     reagents: [
       { itemId: 'cracked_ogre_tusk', count: 2 },
       { itemId: 'elderwood_log', count: 2 },
@@ -4178,19 +4151,30 @@ export const TROPHY_RECIPES: ProfessionRecipeRecord[] = [
     stationType: 'forge',
   },
   {
-    id: 'recipe_healing_potion',
+    id: 'recipe_lesser_healing_potion',
     professionId: 'alchemy',
-    resultItemId: 'healing_potion',
+    resultItemId: 'lesser_healing_potion',
     resultCount: 1,
     // Tallow renders into the draught's salve base, goldleaf and vial from
-    // the rung's own register. Input 82 vs output 32 (the goldleaf_scroll
-    // precedent ships 90 vs 15). 11l-OUT: trophy 5 < output 32 < input 82; no
+    // the rung's own register. Input 82 vs output 16 (the goldleaf_scroll
+    // precedent ships 90 vs 15). 11l-OUT: trophy 5 < output 16 < input 82; no
     // prior recipe crafts it (recipeForResultItem); common, below the ceiling.
+    // Re-picked by the 11l QA from healing_potion (320 HP, sellValue 32): at
+    // rung 25 that potion out-healed the trainer's OWN rung-25 row
+    // recipe_goldleaf_healing_draught (200 HP for a 140 bill) at 82 and sat
+    // within 15 HP of the rung-50 rare draught (335 HP for 344), on the one
+    // shared potion cooldown, which inverted alchemy's ladder (R21 in
+    // reverse: the shipped rows go dead for anyone holding tallow). The
+    // lesser potion (190 HP) sits UNDER the rung-25 draught and above the
+    // rung-0 pair (110 and 120 HP), so the ladder keeps its order; the
+    // vendor's own 320 HP potion at 170 already undercuts the draught's 140
+    // bill, a pre-existing tension that is the maintainer's, not this row's.
     // Discounted bills (requiredReagentCountFor): specialization only, candles
-    // 2 to 1, 77 vs 32; specialization plus self-signed lands on the same
-    // floor, 77 vs 32 (the herb and the vial are already 1), still
+    // 2 to 1, 77 vs 16; specialization plus self-signed lands on the same
+    // floor, 77 vs 16 (the herb and the vial are already 1), still
     // gold-negative: the one row whose floor stays above its output (109 vs
-    // 32 after the 32-copper #1301 sink).
+    // 16 after the 32-copper #1301 sink). The crafter's prize is the potion
+    // itself (an 85 counter price), never copper.
     reagents: [
       { itemId: 'tallow_candle', count: 2 },
       { itemId: 'goldleaf_herb', count: 1 },

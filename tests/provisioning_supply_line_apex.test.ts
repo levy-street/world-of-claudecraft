@@ -835,9 +835,10 @@ describe('masterwrought Phase 11h GATE C: the flask crop', () => {
       recipe_goldleaf_mana_draught: 2,
       recipe_grand_cauldron: 6,
       recipe_growth_tonic: 2,
-      // Masterwrought phase 11l: the trophy consumer recipe_healing_potion
-      // (tallow trophy plus goldleaf and a vial) joined alchemy's herb line.
-      recipe_healing_potion: 1,
+      // Masterwrought phase 11l: the trophy consumer recipe_lesser_healing_potion
+      // (tallow trophy plus goldleaf and a vial; re-picked by the 11l QA from
+      // the 320 HP potion, the bill unchanged) joined alchemy's herb line.
+      recipe_lesser_healing_potion: 1,
       recipe_ironhusk_flask: 2,
       recipe_minor_healing_potion: 2,
       recipe_quickening_catalyst: 3,
@@ -1438,10 +1439,13 @@ describe('masterwrought Phase 11h: what it did NOT touch', () => {
     // trophy consumer rows in all), the same shape: ALL_RECIPES alone. Then
     // 165 at that phase's sixth fix round, which output-excluded the chipped
     // tusk and deleted its weaponcrafting row (nine trophy consumer rows):
-    // again ALL_RECIPES alone, this time downward.
+    // again ALL_RECIPES alone, this time downward. Then 163 at the 11l QA,
+    // which excluded the cracked fetish and the bogiron nugget under the same
+    // standard and deleted their rows (seven trophy consumer rows):
+    // ALL_RECIPES alone, downward again.
     expect(APEX_CONSUMABLE_RECIPES).toHaveLength(13);
     expect(INTERMEDIATE_RECIPES).toHaveLength(10);
-    expect(ALL_RECIPES).toHaveLength(165);
+    expect(ALL_RECIPES).toHaveLength(163);
     for (const row of APEX_ROWS) {
       expect(requireRecipe(row.id).skillReq, `${row.id} rung`).toBe(row.rung);
     }

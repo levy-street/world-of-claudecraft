@@ -1917,13 +1917,16 @@ describe('col_junk_drawer stays completable after the phase 11l trophy promotion
   );
   const unreachable = [...livePoor].filter((id) => !reachable.has(id)).sort();
 
-  it('the reachable poor set is exactly the eleven survivors with an acquisition route', () => {
+  it('the reachable poor set is exactly the thirteen survivors with an acquisition route', () => {
     // The chipped tusk is back since the phase's sixth fix round
-    // output-excluded it (poor again, and its fen-troll loot rows never
-    // moved).
+    // output-excluded it, and the bogiron nugget and the cracked fetish since
+    // the 11l QA excluded them the same way (poor again; the fen-troll and
+    // drowned-dead loot rows never moved).
     expect([...reachable].sort()).toEqual([
+      'bogiron_nugget',
       'briny_idol',
       'chipped_tusk',
+      'cracked_fetish',
       'deepfen_pearl',
       'frayed_prayer_beads',
       'inert_storm_shard',
@@ -1944,12 +1947,13 @@ describe('col_junk_drawer stays completable after the phase 11l trophy promotion
   });
 
   it('the trigger amount fits inside the reachable pool', () => {
-    // Phase 11l promoted seven junk drops out of poor (eight until its sixth
-    // fix round output-excluded the chipped tusk), cutting the reachable
-    // pool from 18 to 11 against an amount of 10: a margin of ONE. The meter
-    // recounts live quality, so a character holding promoted trophies still
-    // sees an in-progress counter regress, and two more promotions would
-    // strand the deed outright. Re-tuning the trigger is a maintainer decision
+    // Phase 11l promoted five junk drops out of poor (eight until its sixth
+    // fix round output-excluded the chipped tusk, seven until the 11l QA
+    // excluded the bogiron nugget and the cracked fetish), cutting the
+    // reachable pool from 18 to 13 against an amount of 10: a margin of
+    // THREE. The meter recounts live quality, so a character holding promoted
+    // trophies still sees an in-progress counter regress, and four more
+    // promotions would strand the deed outright. Re-tuning the trigger is a maintainer decision
     // (docs/design/deeds.md, rule 9: no retro-editing a shipped trigger),
     // left OPEN in the phase ledger rather than edited here. The same doc's
     // rule 5 (no permanently missable deeds) names retroFallbackGrants

@@ -46,22 +46,21 @@ const HONEST_MATERIALS = [
   'arcane_shard',
   'arcanite_bar',
   'ashwood_log',
-  // Masterwrought phase 11l: the seven promoted trophy drops (this one and
-  // the six at their sorted positions below) derive IN as the reagents the
-  // trophy recipes (TROPHY_RECIPES) consume. The chipped tusk is NOT among
-  // them since the sixth fix round output-excluded it (it is poor trash
-  // again, see SURVIVING_POOR_JUNK below).
+  // Masterwrought phase 11l: the five promoted trophy drops (this one and
+  // the four at their sorted positions below) derive IN as the reagents the
+  // trophy recipes (TROPHY_RECIPES) consume. The chipped tusk, the bogiron
+  // nugget and the cracked fetish are NOT among them: the sixth fix round
+  // output-excluded the tusk and the 11l QA the other two under the same
+  // standard (poor trash again, see SURVIVING_POOR_JUNK below).
   'bandit_bandana',
   'bog_beet',
   'bog_beet_seed',
-  'bogiron_nugget',
   'bone_fragments',
   'brook_carrot',
   'brook_carrot_seed',
   'compost',
   'cooking_salt',
   'copper_ore',
-  'cracked_fetish',
   'cracked_ogre_tusk',
   'cracked_wyrm_scale',
   'curved_tusk',
@@ -321,7 +320,8 @@ describe('MATERIAL_ITEM_IDS: class exclusions, keyed on KIND against the live ca
       expect(MATERIAL_ITEM_IDS.has(def.id), def.id).toBe(false);
     }
     // Non-vacuity: a rename of the 'poor' quality token must not leave this
-    // sweep iterating nothing (13 poor items at authoring time).
+    // sweep iterating nothing (16 poor items at the 11l QA; the build's
+    // comment said 13 against a live 14, an off-by-one the QA measured).
     expect(poor).toBeGreaterThan(9);
   });
 
@@ -614,13 +614,16 @@ describe('completeness tripwire: unclassified non-poor junk', () => {
 });
 
 describe('phase 11l trophy promotion: the promoted set, exactly', () => {
-  // The 21 quality-poor junk ids at the phase 11l boundary, frozen. The 7
+  // The 21 quality-poor junk ids at the phase 11l boundary, frozen. The 5
   // promoted trophies became common TROPHY_RECIPES reagents (and so derive
-  // IN); the 14 survivors stay poor grey trash outside the material set (the
+  // IN); the 16 survivors stay poor grey trash outside the material set (the
   // chipped tusk rejoined them at the sixth fix round, which output-excluded
   // it: every uncrafted weapon in its band is dominated by the trainer's own
-  // recipe_whetted_iron_dirk). A diff on either side means a shipped poor
-  // item was promoted (or a promoted one demoted) by accident.
+  // recipe_whetted_iron_dirk; the bogiron nugget and the cracked fetish
+  // rejoined at the 11l QA under the same standard, their outputs dominated
+  // by the trainer's own rung-0 sabatons and rung-25 folio). A diff on
+  // either side means a shipped poor item was promoted (or a promoted one
+  // demoted) by accident.
   const PRE_11L_POOR_JUNK = [
     'amber_hide',
     'bandit_bandana',
@@ -646,8 +649,6 @@ describe('phase 11l trophy promotion: the promoted set, exactly', () => {
   ] as const;
   const PROMOTED_TROPHIES = new Set<string>([
     'bandit_bandana',
-    'bogiron_nugget',
-    'cracked_fetish',
     'cracked_ogre_tusk',
     'cracked_wyrm_scale',
     'mudfin_scale',
@@ -659,18 +660,18 @@ describe('phase 11l trophy promotion: the promoted set, exactly', () => {
   // "sellValue unchanged" is measured here rather than claimed.
   const PROMOTED_SELL_VALUE: Record<string, number> = {
     bandit_bandana: 6,
-    bogiron_nugget: 12,
-    cracked_fetish: 14,
     cracked_ogre_tusk: 42,
     cracked_wyrm_scale: 35,
     mudfin_scale: 5,
     tallow_candle: 5,
   };
-  // The 14 survivors as the LIVE poor set must read, sorted.
+  // The 16 survivors as the LIVE poor set must read, sorted.
   const SURVIVING_POOR_JUNK = [
     'amber_hide',
+    'bogiron_nugget',
     'briny_idol',
     'chipped_tusk',
+    'cracked_fetish',
     'deepfen_pearl',
     'frayed_prayer_beads',
     'inert_storm_shard',
@@ -684,12 +685,12 @@ describe('phase 11l trophy promotion: the promoted set, exactly', () => {
     'tangled_weed',
   ];
 
-  it('promotes exactly the 7 trophies to common materials and leaves the 14 survivors poor', () => {
+  it('promotes exactly the 5 trophies to common materials and leaves the 16 survivors poor', () => {
     // Length guards first: an emptied literal or set would let the loop below
     // pass vacuously.
     expect(PRE_11L_POOR_JUNK).toHaveLength(21);
-    expect(PROMOTED_TROPHIES.size).toBe(7);
-    expect(SURVIVING_POOR_JUNK).toHaveLength(14);
+    expect(PROMOTED_TROPHIES.size).toBe(5);
+    expect(SURVIVING_POOR_JUNK).toHaveLength(16);
     expect(Object.keys(PROMOTED_SELL_VALUE).sort()).toEqual([...PROMOTED_TROPHIES].sort());
     expect(SURVIVING_POOR_JUNK).toEqual(
       PRE_11L_POOR_JUNK.filter((id) => !PROMOTED_TROPHIES.has(id)),
@@ -708,7 +709,7 @@ describe('phase 11l trophy promotion: the promoted set, exactly', () => {
     }
   });
 
-  it('the LIVE poor set is exactly the 14 survivors (a new poor id cannot land unseen)', () => {
+  it('the LIVE poor set is exactly the 16 survivors (a new poor id cannot land unseen)', () => {
     // The frozen-21 loop above only visits ids it already knows, so a poor
     // item authored AFTER the phase 11l boundary would never enter it: this
     // exact-set pin over the whole catalog closes that direction. The

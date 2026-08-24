@@ -8921,8 +8921,8 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
         }
       },
       {
-        "id": "recipe_healing_potion",
-        "name": "Healing Potion",
+        "id": "recipe_lesser_healing_potion",
+        "name": "Lesser Healing Potion",
         "skillReq": 25,
         "tier": 1,
         "station": "apothecary",
@@ -8943,7 +8943,7 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
           }
         ],
         "output": {
-          "name": "Healing Potion",
+          "name": "Lesser Healing Potion",
           "count": 1,
           "quality": "common"
         },
@@ -12271,45 +12271,6 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
           "minimalAt": 150,
           "zeroAt": 175
         }
-      },
-      {
-        "id": "recipe_valefire_lantern",
-        "name": "Valefire Lantern",
-        "skillReq": 25,
-        "tier": 1,
-        "station": "apothecary",
-        "acquisition": "trainer",
-        "feeCopper": 2500,
-        "materials": [
-          {
-            "name": "Cracked Fetish",
-            "count": 2
-          },
-          {
-            "name": "Goldleaf Herb",
-            "count": 2
-          },
-          {
-            "name": "Chime Essence",
-            "count": 1
-          },
-          {
-            "name": "Glass Vial",
-            "count": 1
-          }
-        ],
-        "output": {
-          "name": "Valefire Lantern",
-          "count": 1,
-          "quality": "uncommon"
-        },
-        "combo": null,
-        "oncePerDay": false,
-        "gain": {
-          "reducedAt": 50,
-          "minimalAt": 75,
-          "zeroAt": 100
-        }
       }
     ]
   },
@@ -14182,41 +14143,6 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
           "reducedAt": 125,
           "minimalAt": 150,
           "zeroAt": 175
-        }
-      },
-      {
-        "id": "recipe_hobnail_boots",
-        "name": "Hobnailed Boots",
-        "skillReq": 25,
-        "tier": 1,
-        "station": "forge",
-        "acquisition": "trainer",
-        "feeCopper": 2500,
-        "materials": [
-          {
-            "name": "Bogiron Nugget",
-            "count": 3
-          },
-          {
-            "name": "Iron Ore",
-            "count": 3
-          },
-          {
-            "name": "Smithing Flux",
-            "count": 2
-          }
-        ],
-        "output": {
-          "name": "Hobnailed Boots",
-          "count": 1,
-          "quality": "common"
-        },
-        "combo": null,
-        "oncePerDay": false,
-        "gain": {
-          "reducedAt": 50,
-          "minimalAt": 75,
-          "zeroAt": 100
         }
       }
     ]

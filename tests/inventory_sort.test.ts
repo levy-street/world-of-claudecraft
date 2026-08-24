@@ -579,7 +579,7 @@ describe('sortInventoryStacks against the REAL catalog', () => {
 
   it('phase 11l trophy promotion holds in the ladder: adopted trophies rank as junk, holdouts as trash', () => {
     // categoryRankOf (src/sim/inventory_sort.ts) sends a poor-quality def to
-    // TRASH_RANK before it reads the kind, so promoting the nine trophies to
+    // TRASH_RANK before it reads the kind, so promoting the seven trophies to
     // common moved them out of the tail band and into KIND_RANK.junk, where
     // every material lives. The ranks are module-private, so each band is
     // pinned BEHAVIORALLY through compareBagStacks, the exported comparator,
@@ -601,11 +601,11 @@ describe('sortInventoryStacks against the REAL catalog', () => {
     // trophy row that no other recipe also consumes) and held equal to the
     // literal, so a de-adopted trophy (its row dropped or re-picked off it)
     // reds here too. The chipped tusk left the list when the sixth fix round
-    // output-excluded it: poor again, it ranks as trash beside the holdouts.
+    // output-excluded it, and the bogiron nugget and the cracked fetish when
+    // the 11l QA excluded them the same way: poor again, all three rank as
+    // trash beside the holdouts.
     const adopted = [
       'bandit_bandana',
-      'bogiron_nugget',
-      'cracked_fetish',
       'cracked_ogre_tusk',
       'cracked_wyrm_scale',
       'emberwing_cinderscale',
@@ -616,7 +616,7 @@ describe('sortInventoryStacks against the REAL catalog', () => {
     // A do-not-shrink marker, not a pin: it compares the literal to itself
     // and can only red when someone edits the list above. The derived
     // equality on the next line is the pin.
-    expect(adopted).toHaveLength(9);
+    expect(adopted).toHaveLength(7);
     expect(adoptedTrophyIds(REAL_ITEMS)).toEqual([...adopted]);
     // The sandwich neighbours are checked to be what the comment says, so a
     // content edit to either id cannot hollow the arm out.
@@ -637,7 +637,13 @@ describe('sortInventoryStacks against the REAL catalog', () => {
         `${id} before the quest item`,
       ).toBeLessThan(0);
     }
-    for (const id of ['tangled_weed', 'soggy_moccasin', 'chipped_tusk'] as const) {
+    for (const id of [
+      'tangled_weed',
+      'soggy_moccasin',
+      'chipped_tusk',
+      'bogiron_nugget',
+      'cracked_fetish',
+    ] as const) {
       expect(REAL_ITEMS[id]?.quality, id).toBe('poor');
       expect(
         compareBagStacks(quest, slot(id), realLookup),

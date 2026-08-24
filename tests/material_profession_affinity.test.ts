@@ -67,15 +67,14 @@ describe('craftIdsForMaterialItem', () => {
     expect(craftIdsForMaterialItem('arcane_shard')).toEqual(['enchanting']);
   });
 
-  it('the nine junk trophies map to their one adopted craft (Masterwrought phase 11l)', () => {
+  it('the seven junk trophies map to their one adopted craft (Masterwrought phase 11l)', () => {
     // The trophy economy gave each of these mob drops exactly ONE consuming
     // craft, so each pin doubles as a no-second-consumer tripwire: a later
     // recipe borrowing a trophy into another craft changes the tooltip and
-    // must change the literal here deliberately. The chipped tusk is pinned
-    // EMPTY: the sixth fix round output-excluded it, so no craft consumes it.
+    // must change the literal here deliberately. The chipped tusk, the
+    // bogiron nugget and the cracked fetish are pinned EMPTY: output-excluded
+    // (the sixth fix round, then the 11l QA), so no craft consumes them.
     expect(craftIdsForMaterialItem('bandit_bandana')).toEqual(['tailoring']);
-    expect(craftIdsForMaterialItem('bogiron_nugget')).toEqual(['armorcrafting']);
-    expect(craftIdsForMaterialItem('cracked_fetish')).toEqual(['inscription']);
     expect(craftIdsForMaterialItem('cracked_ogre_tusk')).toEqual(['weaponcrafting']);
     expect(craftIdsForMaterialItem('cracked_wyrm_scale')).toEqual(['leatherworking']);
     expect(craftIdsForMaterialItem('mudfin_scale')).toEqual(['leatherworking']);
@@ -85,9 +84,11 @@ describe('craftIdsForMaterialItem', () => {
     expect(craftIdsForMaterialItem('emberwing_cinderscale')).toEqual(['leatherworking']);
     expect(craftIdsForMaterialItem('old_cragmaws_pelt')).toEqual(['leatherworking']);
     // Poor trash again: craftIdsForMaterialItem derives purely from recipe
-    // and enchant reagents, and neither a recipe nor an enchant consumes the
-    // tusk, so no craft.
+    // and enchant reagents, and neither a recipe nor an enchant consumes any
+    // of the three, so no craft.
     expect(craftIdsForMaterialItem('chipped_tusk')).toEqual([]);
+    expect(craftIdsForMaterialItem('bogiron_nugget')).toEqual([]);
+    expect(craftIdsForMaterialItem('cracked_fetish')).toEqual([]);
   });
 
   it('five crops name ALCHEMY as a consumer (Masterwrought phases 11g and 11h)', () => {

@@ -708,9 +708,18 @@ describe('the professions blob growth bound (phase 16)', () => {
     // restored). The first time since the phase began that the measurement
     // moved DOWN; the band moved with it by the same rule (measurement plus
     // 11 above, minus 380 below), so the headroom stays 11 and 380.
+    //
+    // AND AGAIN AT the 11l QA: 17,101 bytes, upper edge 17,154 to 17,112,
+    // floor 16,763 to 16,721. The QA excluded the cracked fetish and the
+    // bogiron nugget under the tusk standard, DELETING recipe_valefire_lantern
+    // (23 characters, 26 quoted plus comma) and recipe_hobnail_boots (20, 23)
+    // from knownRecipes, and re-picked the potion row's id from
+    // recipe_healing_potion (21, 24) to recipe_lesser_healing_potion (28, 31):
+    // predicted 17,143 - 26 - 23 + 7 = 17,101 and measured so (the same
+    // temporary exact pin, then the band restored by the same rule).
     const bytes = professionsBytes(s2);
-    expect(bytes).toBeGreaterThan(16763);
-    expect(bytes).toBeLessThan(17154);
+    expect(bytes).toBeGreaterThan(16721);
+    expect(bytes).toBeLessThan(17112);
     // Strictly dominated by the band's upper edge while the band holds:
     // kept as documentation that the structural ceiling also bounds this
     // state, never the live guard.

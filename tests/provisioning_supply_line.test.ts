@@ -874,17 +874,18 @@ describe('masterwrought R18 and farming D24: the displacement guard', () => {
     // is the reason the seasonings are on the new bill at all: RULE 3 forbids
     // reducing any herb, fish, meat or salt count ANYWHERE, so a replacement
     // row must carry what the row it replaces carried.
-    // RE-MEASURED AT Masterwrought phase 11l, the trophy economy: two of the
-    // nine trophy consumer rows carry goldleaf (the Valefire Lantern's 2, the
-    // Healing Potion's 1) and none carries silverleaf or sunpetal, so goldleaf
-    // goes 29 to 32 while the other two hold. Pure additions again: nothing
-    // was reduced anywhere.
+    // RE-MEASURED AT Masterwrought phase 11l, the trophy economy: one of the
+    // seven trophy consumer rows carries goldleaf (the Lesser Healing
+    // Potion's 1) and none carries silverleaf or sunpetal, so goldleaf goes
+    // 29 to 30 while the other two hold (32 at the 11l build, whose Valefire
+    // Lantern row carried 2 more until the 11l QA excluded it: a row the
+    // phase authored and withdrew, not a reduction on any shipped bill).
     // The claim this arm makes has never been "the numbers do not move"; it is
     // "herbalism loses nothing", and a total that only ever climbs is what says
     // so.
     expect(totals).toEqual({
       silverleaf_herb: 28,
-      goldleaf_herb: 32,
+      goldleaf_herb: 30,
       sunpetal_herb: 44,
     });
   });
