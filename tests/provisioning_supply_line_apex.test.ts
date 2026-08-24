@@ -949,6 +949,15 @@ describe('masterwrought Phase 11h GATE D: the capstones and the tier-4 fine twin
       // and a capstone authored under a third craft would drift out of a
       // profession list while staying in the set it belongs to. 11j's apex hoe
       // is an engineering TOOL at the same 125 rung, excluded for that reason.
+      //
+      // AND NAME WHAT THE NARROWING GIVES UP (masterwrought Phase 11j QA), so
+      // it is not read as free: a NON-capstone 125-rung consumer of either twin
+      // is now invisible to this line. The count pin above covers most of that,
+      // since it counts consumers at EVERY rung against a literal, so a new
+      // consumer of either twin reds there. What survives both is swapping one
+      // non-capstone consumer for another non-capstone consumer at the same
+      // count. That is outside this gate's claim, which is about the capstones,
+      // and it is recorded rather than described as covered.
       const apexConsumableIds = new Set(APEX_CONSUMABLE_RECIPES.map((r) => r.id));
       expect(
         consumers.filter((r) => r.skillReq >= 125 && apexConsumableIds.has(r.id)).map((r) => r.id),

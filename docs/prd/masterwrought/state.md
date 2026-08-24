@@ -11602,11 +11602,25 @@ census (mining 21, herbalism 15, skinning 11, logging 6, fishing 1, farming 0)
 counted endgame bills at skillReq >= 75, which is b3 + b4 here, on the
 PRE-11e tree and WITHOUT the self-feeding refusal. Re-measured that way on the
 merged tree: mining 20 and logging 6, which match qr-CENSUS's recorded 20 and
-the maintainer's 6 EXACTLY. The apparent one-row gap on mining is the
-self-feeding refusal removing `recipe_arcanite_mining_pick`, which is
-decision D working as designed rather than a lost row. fishing, farming,
-herbalism and the corpse family all moved because 11f to 11i is exactly what
-moved them.
+the maintainer's 6 EXACTLY. fishing, farming, herbalism and the corpse family
+all moved because 11f to 11i is exactly what moved them.
+
+**AMENDED 2026-08-23 (Phase 11j QA): THE MINING 21-TO-20 GAP IS NOT THE
+REFUSAL.** This paragraph used to close by saying the one-row gap between the
+maintainer's 21 and the re-measured 20 was the self-feeding refusal removing
+`recipe_arcanite_mining_pick`. It cannot be, and the paragraph contradicts
+itself two sentences earlier: the re-measurement is explicitly WITHOUT the
+refusal, so the pick is INSIDE the 20. Applying the refusal takes mining to 19,
+not to 20. Re-measured independently at the QA, skillReq >= 75 over the merged
+tree, without the refusal and then with it: mining 20 then 19, logging 6 then
+5, herbalism 18 then 17, fishing 10 then 8, farming 17 then 16, corpse 21 both
+ways.
+
+The real cause is already a SETTLED record and this ledger overwrote it.
+qr-CENSUS (farming/state.md row 130) says "mining measures 20 under the
+node-family derivation": the gap is a definitional difference in which ids
+count as mining supply, on a pre-11e tree, not a designed removal. The numbers
+in this section are all correct; only the explanation was wrong.
 
 ### THE DEMAND RATIO TABLE (masterwrought R21)
 

@@ -165,7 +165,10 @@ becomes punishment: no daily reset, no decay, and a late harvest costs only
 opportunity. The schedule and its teaching ceilings are
 `FARMING_GAIN_SCHEDULE` and `farmingHarvestGainAt`
 (`src/sim/professions/farming.ts`), whose boundary column IS the
-teaching-ceiling source and so is not tuning.
+teaching-ceiling source and so is not tuning. Enforced by
+`tests/professions_farming.test.ts` against the calendar model in
+`tests/helpers/farming_calendar_model.ts`, and by the no-punishment sweep
+in `tests/farming_anti_chore.test.ts`.
 
 **THE RECIPROCAL LOOP**, which is the part a reader otherwise misses.
 Herbalism feeds farming through the alchemy-crafted growth tonic; farming
@@ -363,7 +366,7 @@ gathering family may be absent from recipes at the gathering cap or above,
 nor from any 25-point band below it, and this is enforced by a TEST rather
 than by intention. **masterwrought R21** is the demand half of the same
 invariant, at the scope a test can actually hold: every id a family SUPPLIES
-must have at least one consumer. The wider R21 question, whether the world
+must have at least one consumer. The wider masterwrought R21 question, whether the world
 eats what the crafts MAKE, is a judgment surface recorded in the packet
 ledger's ratio table rather than something this guard asserts. Both live in
 `tests/gathering_supply_coverage.test.ts`, which derives every supply set

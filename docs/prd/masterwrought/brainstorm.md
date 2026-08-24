@@ -79,10 +79,17 @@ recipes today). v1 is pure stats and bounded utility: no new proc effects anywhe
 - A gathering-wide APEX-TIER EXPANSION beyond what this packet ships (recorded at Phase
   11j, which completed the tier-5 tool family and so drew the boundary): new node and
   water tiers above the world's current deepest, the tier-6 tool rung the wield table has
-  no row for, and a maxSkill climb past the shipped land cap of 100. (That last one is
-  NOT already reserved anywhere: proficiency_bands.ts carries no 150 at all, its
-  PROFICIENCY_BAND_THRESHOLDS are [0, 100, 200], and its own comment warns off an
-  earlier speculative figure that never shipped. Any such climb is new design.) Each depends on the others. A tier-6 LAND tool cannot ship before the wield
+  no row for, and a maxSkill climb past the shipped land cap of 100. (That last one IS
+  reserved, corrected at the 11j QA where an earlier draft of this line said it was not
+  reserved anywhere: the maxSkill 150 bullet four rows above this one is the reservation,
+  and proficiency_bands.ts calls its unreachable band 2 "deliberate forward room for the
+  V3 cap climb". What is true is only the narrow reading the draft actually measured:
+  proficiency_bands.ts carries no literal 150, its PROFICIENCY_BAND_THRESHOLDS are
+  [0, 100, 200], and its own comment warns off an earlier speculative 300 that never
+  shipped. So the climb is reserved in intent and unbuilt in numbers, which is a
+  different thing from unreserved. A census scoped to one FILE reported as a claim about
+  everywhere is the masterwrought R21 worked example, one medium over.)
+  Each of the three depends on the others. A tier-6 LAND tool cannot ship before the wield
   table gains its row, because wieldRequirementForTier fails OPEN at 0 for an unknown
   tier and the rung would ship ungated (fishing's tier-6 rod escapes only because rods
   are the structural R22 exemption). A tier-6 tool is also pointless before a tier-4 node
