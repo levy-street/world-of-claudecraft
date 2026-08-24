@@ -12537,10 +12537,50 @@ a defect of its own. This one was re-read as such and it had TWO.
   it. Correcting a false claim with a slightly false claim would have been the
   purest version of this phase's own lesson.
 
-TWO OF THE SIX AUDIT LANES DID NOT RETURN, and that is recorded rather than
-papered over: the doc-accuracy and qa-checklist agents both finished without
-delivering a report. Both lanes were then run BY HAND and every item they were
-given is answered somewhere above: the supply matrix verified cell by cell
+**BOTH LATE LANES THEN LANDED, AND BOTH FOUND REAL THINGS**, which is why this
+section has a second half. The doc-accuracy and qa-checklist lanes delivered
+after the first fix round had already shipped, and between them they produced
+one finding worth more than anything in this audit's own first pass:
+
+- **THE REACHABILITY FIXPOINT NEVER SAW THE APEX RUNG.** The hoe loop in
+  `tests/recipe_reachability.test.ts` walked the typed list
+  `['bronze_hoe','skysilver_hoe','osmium_hoe']` under a comment calling
+  osmium_hoe "the top hoe", and stayed green when 11j put a rung above it. The
+  block immediately below asserts the fishing apex BY NAME, so the file's own
+  convention was to cover the apex; and this phase, and then this audit, both
+  opened this exact file without noticing. Derived from `HOE_RECIPES` now, with
+  the four ids pinned beside it.
+- **THE ENDGAME COLUMN'S CAUSE WAS TAUGHT BACKWARDS.**
+  `docs/design/professions.md` said the tool ladders sit in levelling bands
+  "rather than any rule" and that the self-feeding refusal explains "a
+  different absence". It is the SAME absence, and the six refused rows are the
+  proof: all three ladders have a rung at or above the cap and the refusal is
+  the only thing keeping each out of its own family's endgame cell. The
+  paragraph taught the wrong cause of the very mechanism this audit spent the
+  day proving.
+- **A FOURTH FALSE CLAUSE ON THE WIKI PAGE**, missed by this audit's own first
+  pass: the vendor-ladder sentence promises tiers 1 to 3 across the three
+  heartland hubs, and farming's only priced rung is stocked by a farmer NPC at
+  the allotments. Corrected and anchored with the other three.
+- Plus: "the game's first between-sessions mechanic" is false (the `oncePerDay`
+  craft gate, the Wyrmfall daily and the weekly keystone all predate farming,
+  and masterwrought R19's own paragraph leans on their existence); a bare R22
+  inside the packet's own brainstorm reads as the masterwrought series where it
+  means Professions 2.0; a bare R8 six lines after the same paragraph wrote it
+  in full; three rot-prone counts the anchor rule bans; and two coverage gaps,
+  the catalog-English stay-in-step arm that walked `FARM_RECIPES` alone so no
+  hoe rung had ever been covered, and the hoe icon family's missing
+  prim-distinctness pin (A4's whole-recipe identity is satisfied by a shared
+  radial; A4d now pins the prims, and a mutation giving the apex rung the
+  tier-4 rung's prims reds A4d while A4 stays green).
+
+THE LESSON IS THE ONE THIS PHASE KEEPS RE-LEARNING, one level up: this audit
+found two holes in the phase's guard and then shipped a fix round with a stale
+comment of its own in the file next door. A late lane is not a lane you can
+skip, and the two that reported first are not the two that found the most.
+
+The lanes were ALSO run by hand while they were outstanding, and every item
+they were given is answered somewhere above: the supply matrix verified cell by cell
 against an independent derivation, every masterwrought R17 to R21 enforcement
 citation re-grepped (`grep -c` on the named file for the rule's own name), the
 bare R-number found and fixed, the rod-band and naming-convention claims checked
