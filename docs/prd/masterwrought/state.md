@@ -12182,9 +12182,9 @@ BOTH ENDS OF ALL THREE BASELINES, so the drift is attributable:
 
 | measure | 11j stamp (9300b5c36d) | post-sync (1f3a844732) | post-fix (this QA) |
 |---|---|---|---|
-| vitest | EXIT=0, 3069 files / 12 skipped (3081); 43956 passed / 2 xfail / 115 skipped (44073) | **EXIT=0**, 3069 / 12 (3081); **43961** passed / 2 xfail / 115 skipped (44078) | see the frozen stamp below |
-| `npm run ci:changed` | EXIT=0, 797 files, 3094 warnings, 0 errors | **EXIT=0**, 797 files, 3094 warnings, 0 errors | see below |
-| `npx tsc --noEmit` | clean | **clean** | see below |
+| vitest | EXIT=0, 3069 files / 12 skipped (3081); 43956 passed / 2 xfail / 115 skipped (44073) | **EXIT=0**, 3069 / 12 (3081); **43961** passed / 2 xfail / 115 skipped (44078) | **EXIT=0**, 3069 / 12 (3081); **43964** passed / 2 xfail / 115 skipped (44081) |
+| `npm run ci:changed` | EXIT=0, 797 files, 3094 warnings, 0 errors | **EXIT=0**, 797 files, 3094 warnings, 0 errors | **EXIT=0**, 797 files, 3094 warnings, 0 errors, no FAIL marker |
+| `npx tsc --noEmit` | clean | **clean** | **clean** |
 
 The +5 tests are the merge's own (the warlock anchor suites plus a
 `suite_duration_budget` row); +0 files. THE RELEASE CONTRIBUTED THE WHOLE DRIFT
@@ -12515,6 +12515,35 @@ test.
   `icons.ts` and a reworded English catalog value on an existing `paras()` render
   path, so no pure core, painter, style, per-frame path or new render sink is
   involved.
+
+### THE FROZEN STAMP, AND WHAT IT COST
+
+Committed clean tree at **2844cbc41b**, `git status` empty before and after, this
+audit's own agents all idle first. EXIT=0: 3069 files passed / 12 skipped (3081);
+43964 passed / 2 expected fail / 115 skipped (44081). `npx tsc --noEmit` clean.
+`npm run ci:changed` EXIT=0 over 797 files, 3094 warnings, 0 errors, no FAIL
+marker. `npm run wiki:content` and `npm run i18n:gen` both reproduce a zero diff
+on this tip.
+
+THE DRIFT IS EXACTLY THIS AUDIT'S, three tests and no files: the levelling-band
+tripwire in the coverage guard, A4d in the icon suite, and the farming prose arm
+in the guide suite. The +5 against 11j's own stamp is the release merge's
+(measured separately in the pre-flight table above), so neither number is
+carrying the other's movement.
+
+ONE RUN WAS DISCARDED, and the reason is worth recording because it is the
+opposite of 11j's. 11j burned four runs to commits landing mid-run, so this
+audit sequenced its fixes first and froze. Then two audit lanes reported LATE,
+after the freeze, with findings that had to be applied, which voided the run
+that was already in flight. The discipline that survives is not "freeze early",
+it is "freeze after the last lane has spoken", and a lane that has gone idle
+without reporting has not spoken.
+
+A SECOND WORKTREE WAS RUNNING ITS OWN SUITE throughout this measurement
+(`wocc-deed-border-cartouche`, another session on the same machine). Its
+processes were left alone. The DURATION is therefore not comparable to 11j's
+455 s (this run took 716 s); the counts are, since a pass or fail does not
+depend on load, and no duration-budget suite redded.
 
 ### THE FIX ROUND'S OWN REVIEW, AND WHAT IT CAUGHT
 
