@@ -72,10 +72,10 @@ await page.evaluate(() => {
 // Summoning is a CHANNEL, not instant: the mount appears on its completion
 // edge, so this has to wait rather than re-issue the use every poll.
 await sleep(1000);
-await page.waitForFunction(
-  () => window.__game.sim.player.mountKey === 'rallycart_rxt',
-  { timeout: 30000, polling: 400 },
-);
+await page.waitForFunction(() => window.__game.sim.player.mountKey === 'rallycart_rxt', {
+  timeout: 30000,
+  polling: 400,
+});
 await page.waitForFunction(
   () => !!window.__game.renderer?.views?.get(window.__game.sim.playerId)?.mountVisual,
   { timeout: 30000, polling: 300 },
