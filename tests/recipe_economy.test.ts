@@ -280,16 +280,19 @@ describe('THE ECONOMY INVARIANT', () => {
     // whatever the value); a right-hand side that is the literal false and
     // nothing else (a reset, a default parameter, the empty state) is the one
     // write skipped, and `false || true` is not that. A key built at runtime
-    // is the one spelling no static scan can see, which is why the caller
-    // scan above stays the primary guard. The walk is .ts-only through
+    // is one spelling no static scan can see, and a wholesale copy
+    // (`Object.assign(state, savedBlob)`, a spread of a persisted blob) is the
+    // other, which is why the caller scan above stays the primary guard and
+    // tests/professions_jack.test.ts carries the behavioral pins on the
+    // hydrate arm. The walk is .ts-only through
     // tsFilesUnder (the scan's one structural blind spot beside the runtime
     // key); the Svelte files under src/admin cannot reach ArchetypeState.
     const FLAG_WRITE =
       /\bisJackOfAllTrades(?:["']\])?\s*(?:\|\|=|\?\?=|=(?!=))|\bisJackOfAllTrades(?:["']\])?\s*:/g;
     const GUARDED_RE_EMIT = /state\.isJackOfAllTrades\s*\?\s*\{\s*isJackOfAllTrades:\s*true\s*\}/;
-    // The hydrate line verbatim (archetype.ts sits at 94 columns there; a
-    // rename that wraps it empties the read right-hand side and reds the pin
-    // below as `other`, which is loud rather than silent).
+    // The hydrate line verbatim (archetype.ts sits close to the column limit
+    // there; a rename that wraps it empties the read right-hand side and reds
+    // the pin below as `other`, which is loud rather than silent).
     const HYDRATE_RHS = 'state.activeArchetype === null && saved.isJackOfAllTrades === true;';
     // A skipped write must be the literal false AND a terminator on the same
     // line: a bare `false` alone (the first line of a wrapped `false || true`)
@@ -320,6 +323,11 @@ describe('THE ECONOMY INVARIANT', () => {
     expect(FALSE_ONLY.test('false')).toBe(false);
     expect(FALSE_ONLY.test('false || true;')).toBe(false);
     expect(FALSE_ONLY.test('false ?? flag')).toBe(false);
+    // The two anchors: a right-hand side that merely ENDS in a terminated
+    // false (`saved.flag ?? false;` mints whenever the saved flag is true)
+    // and one that continues past the terminator are both writes.
+    expect(FALSE_ONLY.test('true || false;')).toBe(false);
+    expect(FALSE_ONLY.test('false, jack = true;')).toBe(false);
     // The hydrate key has no string control on purpose: a string compared to
     // itself proves nothing, and the key is exercised where it bites, in the
     // classification of the live line below (a widened disjunction, a moved
