@@ -13505,8 +13505,8 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
         }
       },
       {
-        "id": "recipe_vale_carving_knife",
-        "name": "Vale Carving Knife",
+        "id": "recipe_mirejaw_fang_knife",
+        "name": "Mirejaw Fang-Knife",
         "skillReq": 25,
         "tier": 1,
         "station": "forge",
@@ -13515,21 +13515,21 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
         "materials": [
           {
             "name": "Chipped Tusk",
-            "count": 3
+            "count": 4
           },
           {
             "name": "Iron Ore",
-            "count": 3
+            "count": 6
           },
           {
             "name": "Smithing Flux",
-            "count": 3
+            "count": 5
           }
         ],
         "output": {
-          "name": "Vale Carving Knife",
+          "name": "Mirejaw Fang-Knife",
           "count": 1,
-          "quality": "common"
+          "quality": "uncommon"
         },
         "combo": null,
         "oncePerDay": false,

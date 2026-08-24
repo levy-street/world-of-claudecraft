@@ -71,11 +71,21 @@ function requireRecipe(id: string): ProfessionRecipeRecord {
   return recipe;
 }
 
-// The cheapest achievable bill: specialized in the recipe's own craft (cap
-// skill clears any threshold) AND holding a self-signed copy of every reagent,
-// through requiredReagentCountFor, the same function the sim charges. Module
-// scope so the vendor-loop bound (THE ECONOMY INVARIANT) and the trophy floor
-// map (REFERENTIAL INTEGRITY) compute one number from one body.
+// The counterfactual floor: specialized in the recipe's own craft (cap skill
+// clears any threshold) AND holding a self-signed copy of every reagent,
+// through requiredReagentCountFor, the same function the sim charges. Two
+// caveats the src/sim/content/recipes.ts trophy header names, so this is a
+// conservative bound rather than a bill a crafter pays: the Jack of All Trades
+// 0.9 multiplier is EXCLUDED (the default false arm; no live quest path
+// attunes a Jack today, so nothing here reds when that changes, and the bound
+// only loosens when it lands), and self-signing a reagent needs a copy the
+// crafter gathered or harvested at a rare-plus material rarity roll
+// (gathering.ts isSignableMaterialRarity) or a masterwork proc copy, which a
+// mob-dropped trophy or a vendor staple never is; every trophy bill carries
+// both, so the realistic figure is the specialization-only one. Stricter than
+// reality is the safe direction for an invariant. Module scope so the
+// vendor-loop bound (THE ECONOMY INVARIANT) and the trophy floor map
+// (REFERENTIAL INTEGRITY) compute one number from one body.
 function minAchievableInputValue(recipe: ProfessionRecipeRecord): number {
   const specialized = { [recipe.professionId]: 125 };
   let total = 0;
@@ -405,7 +415,7 @@ describe('REFERENTIAL INTEGRITY', () => {
       recipe_oiled_boots: 'mudfin_scale',
       recipe_gravewyrm_bone_quiver: 'cracked_wyrm_scale',
       recipe_hobnail_boots: 'bogiron_nugget',
-      recipe_vale_carving_knife: 'chipped_tusk',
+      recipe_mirejaw_fang_knife: 'chipped_tusk',
       recipe_fenshadow_maul: 'cracked_ogre_tusk',
       recipe_healing_potion: 'tallow_candle',
       recipe_linen_pouch: 'bandit_bandana',
@@ -428,25 +438,30 @@ describe('REFERENTIAL INTEGRITY', () => {
     }
   });
 
-  it('every trophy row floors at its pinned cheapest achievable bill', () => {
+  it('every trophy row floors at its pinned counterfactual bill', () => {
     // The 11l-OUT doctrine above is list-count-only by design (the listed
     // bill, never the discounted one), so the crafter's reward, the
     // specialization and self-signed discounts requiredReagentCountFor
     // composes, can and does take a bill under its output: nine of the ten
     // floors below sit under the output (the healing potion is the one that
-    // does not), gold-positive at full discount and bounded by trophy supply.
-    // This map does NOT assert the floor above the output; it makes every
-    // floor VISIBLE as a literal, so a bill edit, a reagent re-price, or a
-    // discount regression inside requiredReagentCountFor moves a number
+    // does not), gold-positive at the counterfactual floor and bounded by
+    // trophy supply. The floor is the conservative counterfactual
+    // minAchievableInputValue describes (Jack excluded, a self-signed copy of
+    // every reagent assumed, which the trophy and the vendor staples on every
+    // bill can never be), so the realistic bill is the specialization-only
+    // figure each row's comment in src/sim/content/recipes.ts prints beside
+    // this one. This map does NOT assert the floor above the output; it makes
+    // every floor VISIBLE as a literal, so a bill edit, a reagent re-price, or
+    // a discount regression inside requiredReagentCountFor moves a number
     // someone has to re-derive (the recipe_sootscale_mantle precedent in THE
-    // ECONOMY INVARIANT). Each row's comment in src/sim/content/recipes.ts
-    // prints the same figure.
+    // ECONOMY INVARIANT). Each row's comment in recipes.ts prints the same
+    // figure.
     const TROPHY_MIN_ACHIEVABLE: Record<string, number> = {
       recipe_valefire_lantern: 104,
       recipe_oiled_boots: 51,
       recipe_gravewyrm_bone_quiver: 196,
       recipe_hobnail_boots: 40,
-      recipe_vale_carving_knife: 43,
+      recipe_mirejaw_fang_knife: 122,
       recipe_fenshadow_maul: 222,
       recipe_healing_potion: 77,
       recipe_linen_pouch: 36,

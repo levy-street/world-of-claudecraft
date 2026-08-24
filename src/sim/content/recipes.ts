@@ -3869,9 +3869,11 @@ export const FARM_RECIPES: ProfessionRecipeRecord[] = [
 // shipped items (the COMMON_RECIPES precedent: no new item defs), and no
 // shipped recipe's bill was edited. Each row's RUNG (skillReq) follows its
 // trophy's drop level; the LEVEL field is capped at the OUTPUT's live drop
-// source where one exists, and takes the rung scaffolding where none does.
-// Every bill contains its trophy (sellValue only, no buyValue), so no row
-// joins the counterfactually-vendor-fed set.
+// source where one exists, and takes the rung scaffolding where none does,
+// or an honest content level where the scaffolding would overstate a
+// stat-less vendor item (the boots). Every bill contains its trophy
+// (sellValue only, no buyValue), so no row joins the
+// counterfactually-vendor-fed set.
 //
 // The pinned economy doctrine (tests/recipe_economy.test.ts: output strictly
 // between the trophy's sellValue and the LISTED bill) is list-count-only by
@@ -3884,16 +3886,31 @@ export const FARM_RECIPES: ProfessionRecipeRecord[] = [
 // Trades multiplier 0.9 (#1296, JACK_MATERIAL_DISCOUNT_PCT in crafting.ts).
 // Every row below prints two figures against its output: the
 // specialization-only bill, and the specialization-plus-self-signed FLOOR
-// (a self-signed copy of every reagent, the true cheapest bill, which is
-// what tests/recipe_economy.test.ts minAchievableInputValue computes and
-// pins per row in TROPHY_MIN_ACHIEVABLE; the Jack multiplier is not in
-// either figure). Where the floor sits under the output the row says so:
-// gold-positive at full discount, bounded by trophy supply (the crafter's
-// reward, by the doctrine's design). The #1301 gold sink then adds
-// ceil(itemLevelBudget x CRAFT_GOLD_SINK_COPPER_PER_BUDGET) copper per craft
-// on top (crafting.ts resolveCraftForRecipe, 2 copper per budget point: 32
-// for a budget-16 row, 40 for budget 20, 20 for budget 10), so the true
-// floor is the printed floor plus that sink.
+// (a self-signed copy of every reagent, which is what
+// tests/recipe_economy.test.ts minAchievableInputValue computes and pins
+// per row in TROPHY_MIN_ACHIEVABLE; the Jack multiplier is in neither
+// figure, since no live quest path attunes a Jack today). The floor is a
+// conservative COUNTERFACTUAL, not a bill any crafter pays: a self-signed
+// copy exists only for a node yield or corpse component rolled at a
+// rare-plus material rarity (gathering.ts isSignableMaterialRarity) or a
+// masterwork proc copy, so a mob-dropped trophy and a vendor staple never
+// sign, and every bill here carries both. The realistic bill is the
+// specialization-only figure. Where the floor sits under the output the
+// row says so: gold-positive at the counterfactual floor, bounded by
+// trophy supply (the crafter's reward, by the doctrine's design). The #1301
+// gold sink then adds ceil(itemLevelBudget x
+// CRAFT_GOLD_SINK_COPPER_PER_BUDGET) copper per craft on top (crafting.ts
+// resolveCraftForRecipe, 2 copper per budget point: 32 for a budget-16 row,
+// 40 for budget 20, 20 for budget 10), so the true floor is the printed
+// floor plus that sink.
+//
+// FLAGGED FOR MAINTAINER EYES, the maul outlier: at specialization alone
+// recipe_fenshadow_maul bills 222 against 420 out, net +158 per craft after
+// the 40-copper sink, bounded by one cracked_ogre_tusk per craft from a
+// single named elite (brutok_skullsmasher); the next largest margin is the
+// quiver at +29 (291 vs 360, less the 40 sink). The doctrine is
+// list-count-only, so this is a tuning read, not a rule breach, left to the
+// maintainer.
 //
 // 11l-RUNG EXCLUSION RECORD (one line per id, so the record greps in src).
 // Scope: the 21 junk mob-drop orphans (ten adopted below, nine excluded
@@ -3941,8 +3958,8 @@ export const TROPHY_RECIPES: ProfessionRecipeRecord[] = [
     // Discounted bills (requiredReagentCountFor): specialization only, the
     // fetish and the herb 2 to 1, 104 vs 160; specialization plus self-signed
     // lands on the same floor, 104 vs 160 (every listed 2 is already at 1 and
-    // a 1 never drops), gold-positive at full discount, bounded by trophy
-    // supply.
+    // a 1 never drops), gold-positive at the counterfactual floor, bounded by
+    // trophy supply.
     reagents: [
       { itemId: 'cracked_fetish', count: 2 },
       { itemId: 'goldleaf_herb', count: 2 },
@@ -3975,8 +3992,8 @@ export const TROPHY_RECIPES: ProfessionRecipeRecord[] = [
     // Discounted bills (requiredReagentCountFor): specialization only, scales
     // 4 to 3, hide 6 to 4, silk and agent 2 to 1, 56 vs 80; specialization
     // plus self-signed, scales 4 to 2, hide 6 to 4, silk and agent 1, the
-    // floor 51 vs 80, gold-positive at full discount, bounded by trophy
-    // supply.
+    // floor 51 vs 80, gold-positive at the counterfactual floor, bounded by
+    // trophy supply.
     reagents: [
       { itemId: 'mudfin_scale', count: 4 },
       { itemId: 'rough_hide', count: 6 },
@@ -4005,7 +4022,8 @@ export const TROPHY_RECIPES: ProfessionRecipeRecord[] = [
     // Discounted bills (requiredReagentCountFor): specialization only, scales
     // 3 to 2, hide 2 to 1, thorium 4 to 3, 291 vs 360; specialization plus
     // self-signed, scales 3 to 1, hide 1, thorium 4 to 2, agent 1, the floor
-    // 196 vs 360, gold-positive at full discount, bounded by trophy supply.
+    // 196 vs 360, gold-positive at the counterfactual floor, bounded by
+    // trophy supply.
     reagents: [
       { itemId: 'cracked_wyrm_scale', count: 3 },
       { itemId: 'pristine_hide', count: 2 },
@@ -4014,6 +4032,12 @@ export const TROPHY_RECIPES: ProfessionRecipeRecord[] = [
     ],
     skillReq: 50,
     itemLevelBudget: 20,
+    // Capped at the quiver's live boss source (korzul_the_gravewyrm, level 20
+    // exactly) so the recipe route cannot re-tier the shipped item past its
+    // pinned item level 23 (20 plus the rare bonus 3; see the lantern note):
+    // here the rung-50 scaffolding and the cap coincide. Profession XP reads
+    // the same field: craftActionXp(20, 20) = 100 for a level-20 crafter,
+    // the full level-20 figure.
     level: 20,
     acquisition: ['trainer'],
     stationType: 'tannery',
@@ -4030,7 +4054,7 @@ export const TROPHY_RECIPES: ProfessionRecipeRecord[] = [
     // Discounted bills (requiredReagentCountFor): specialization only,
     // nuggets and ore 3 to 2, flux 2 to 1, 60 vs 90; specialization plus
     // self-signed, every listed count to 1, the floor 40 vs 90, gold-positive
-    // at full discount, bounded by trophy supply.
+    // at the counterfactual floor, bounded by trophy supply.
     reagents: [
       { itemId: 'bogiron_nugget', count: 3 },
       { itemId: 'iron_ore', count: 3 },
@@ -4038,39 +4062,74 @@ export const TROPHY_RECIPES: ProfessionRecipeRecord[] = [
     ],
     skillReq: 25,
     itemLevelBudget: 16,
-    // No live source to cap against: hobnail_boots is vendor-only (no drop,
-    // quest or loot source), so 15 is the rung-25 scaffolding convention. The
-    // consequence is recorded, not accidental: the item gains a derivable
-    // item level (15) and so a tooltip item level line it never showed before.
-    level: 15,
+    // No live source to cap against: hobnail_boots is vendor-only (Smith
+    // Haldren, smith_haldren in zone1.ts, sells it at 900; no drop, quest or
+    // loot source), so the level is CHOSEN as an honest content level rather
+    // than taken from the rung-25 scaffolding: the boot is armor 18 mail with
+    // no primary stats, and the scaffolding's 15 would stamp it above this
+    // phase's own oiled_boots (item level 11, armor 25 plus agi 1). 10 is the
+    // zone1/2 border the bogiron trophy's fen trolls (level 10 to 12) sit on.
+    // The consequence is recorded, not accidental: the item gains a derivable
+    // item level (10, not 15) and so a tooltip item level line it never
+    // showed before. recipe.level's other two consumers: craftActionXp(10, 20)
+    // = 0 for a level-20 crafter (gray band), so the row is a pure discount
+    // route (a 100-copper listed bill against the 900 counter price), and
+    // masterworkBonusStats (craftBonusStatsFor) is moot for a stat-less def.
+    level: 10,
     acquisition: ['trainer'],
     stationType: 'forge',
   },
   {
-    id: 'recipe_vale_carving_knife',
+    id: 'recipe_mirejaw_fang_knife',
     professionId: 'weaponcrafting',
-    resultItemId: 'vale_carving_knife',
+    resultItemId: 'mirejaw_fang_knife',
     resultCount: 1,
-    // Tusk chips scale the grip, iron and flux from the forge rung's own
-    // register. Input 129 vs output 120.
-    // 11l-OUT: trophy 15 < output 120 < input 129; no prior recipe crafts
-    // vale_carving_knife (recipeForResultItem); common, below the 25 ceiling.
-    // Discounted bills (requiredReagentCountFor): specialization only, every
-    // listed 3 to 2, 86 vs 120; specialization plus self-signed, every listed
-    // 3 to 1, the floor 43 vs 120, gold-positive at full discount, bounded by
-    // trophy supply.
+    // Fen-troll tusk chips scale the grip of the Mirejaw fang knife the
+    // Drowned Litany chest rolls for rogues (drowned_litany_loot.ts
+    // UNCOMMON_B, the delve's rogue-archetype uncommon), iron and flux from
+    // the forge rung's own register: a deterministic door beside a chest
+    // roll from a DIFFERENT source, the cragprowl_belt shape. Input 208 vs
+    // output 200.
+    // 11l-OUT: trophy 15 < output 200 < input 208 (stacked, 60 < 200); no
+    // prior recipe crafts mirejaw_fang_knife (recipeForResultItem; the knife
+    // has no mob, quest, vendor, or recipe source and is not a Reliquary
+    // relic); uncommon at the 25 rung ceiling.
+    // Re-picked from vale_carving_knife (R21, the fifth fix round): that
+    // knife is a 4-7 at 1.8 dagger (3.06 dps, the weakest dagger in the
+    // catalog but one), and the recipe's level 15 minted a misleading item
+    // level on it that sorted it above rare item-level-14 daggers doing 2.6x
+    // its damage: a tusk sink, not a prize. The fang knife is 14-22 at 1.8
+    // (10.0 dps), on curve against weaponDpsBudget(16) = 11.5.
+    // Discounted bills (requiredReagentCountFor): specialization only, tusk
+    // 4 to 3, iron 6 to 4, flux 5 to 4, 45 + 32 + 80 = 157 vs 200;
+    // specialization plus self-signed, tusk 3 to 2, iron 5 to 4, flux 4 to
+    // 3, 30 + 32 + 60 = 122, the floor 122 vs 200, gold-positive at the
+    // counterfactual floor, bounded by trophy supply.
     reagents: [
-      { itemId: 'chipped_tusk', count: 3 },
-      { itemId: 'iron_ore', count: 3 },
-      { itemId: 'smithing_flux', count: 3 },
+      { itemId: 'chipped_tusk', count: 4 },
+      { itemId: 'iron_ore', count: 6 },
+      { itemId: 'smithing_flux', count: 5 },
     ],
     skillReq: 25,
     itemLevelBudget: 16,
-    // No live source to cap against: vale_carving_knife is vendor-only (no
-    // drop, quest or loot source), so 15 is the rung-25 scaffolding
-    // convention. The consequence is recorded, not accidental: the item gains
-    // a derivable item level (15) and so a tooltip item level line it never
-    // showed before.
+    // No live source to cap against (a delve chest is not an item level
+    // source: buildSourceIndex in src/sim/item_level.ts reads mob loot, quest
+    // rewards, the two vendor stocks it names, the heroic and rift tables,
+    // and recipes), so 15 is the rung-25 scaffolding convention. The
+    // consequence is recorded, not accidental: the knife gains a derivable
+    // item level 16 (15 plus the uncommon bonus 1) and so a tooltip item
+    // level line, the one delve chest item with a derived item level; its
+    // 10.0 dps sits under weaponDpsBudget(16) = 6.7 + 0.3 x 16 = 11.5.
+    // recipe.level has THREE consumers, all read from this one field: the
+    // item level source index (the derivation above);
+    // craftActionXp(recipe.level, characterLevel) in
+    // src/sim/professions/profession_xp.ts, craftActionXp(15, 20) = 30
+    // character XP per craft for a level-20 crafter (green band, 5 below
+    // against zeroDiff 8), against 100 for a level-20 row; and
+    // masterworkBonusStats through craftBonusStatsFor (crafting.ts), which
+    // sizes the masterwork proc's bonus record off this level: the knife HAS
+    // a stat profile (agi 2), so the proc can bump it, the shipped behavior
+    // for every stat-bearing output.
     level: 15,
     acquisition: ['trainer'],
     stationType: 'forge',
@@ -4088,7 +4147,7 @@ export const TROPHY_RECIPES: ProfessionRecipeRecord[] = [
     // at full specialization alone floors every listed 2 to 1, so the bill
     // falls to 42 + 160 + 20 = 222 against 420 out; specialization plus
     // self-signed lands on the same floor, 222 vs 420 (a 1 never drops),
-    // gold-positive at full discount, bounded by trophy supply
+    // gold-positive at the counterfactual floor, bounded by trophy supply
     // (cracked_ogre_tusk has one source, brutok_skullsmasher, so at the
     // discounted bill each craft is ONE named-elite kill, two at the listed
     // bill).
@@ -4131,6 +4190,10 @@ export const TROPHY_RECIPES: ProfessionRecipeRecord[] = [
     ],
     skillReq: 25,
     itemLevelBudget: 16,
+    // The free rung-25 scaffolding: the potion is slotless, so no item level
+    // results whatever this says (isItemLevelEligible), and only
+    // craftActionXp reads it: craftActionXp(15, 20) = 30 for a level-20
+    // crafter (green band), against 100 for a level-20 row.
     level: 15,
     acquisition: ['trainer'],
     stationType: 'apothecary',
@@ -4147,7 +4210,7 @@ export const TROPHY_RECIPES: ProfessionRecipeRecord[] = [
     // Discounted bills (requiredReagentCountFor): specialization only,
     // bandanas 2 to 1, scrap and thread 4 to 3, 51 vs 60; specialization plus
     // self-signed, bandanas 1, scrap and thread 4 to 2, the floor 36 vs 60,
-    // gold-positive at full discount, bounded by trophy supply.
+    // gold-positive at the counterfactual floor, bounded by trophy supply.
     reagents: [
       { itemId: 'bandit_bandana', count: 2 },
       { itemId: 'linen_scrap', count: 4 },
@@ -4155,6 +4218,10 @@ export const TROPHY_RECIPES: ProfessionRecipeRecord[] = [
     ],
     skillReq: 0,
     itemLevelBudget: 10,
+    // The free rung-0 scaffolding: the pouch is a bag, slotless, so no item
+    // level results whatever this says (isItemLevelEligible), and only
+    // craftActionXp reads it: craftActionXp(10, 20) = 0 for a level-20
+    // crafter (gray band), against 100 for a level-20 row.
     level: 10,
     acquisition: ['trainer'],
     stationType: 'loom',
@@ -4186,9 +4253,9 @@ export const TROPHY_RECIPES: ProfessionRecipeRecord[] = [
     // Discounted bills (requiredReagentCountFor, src/sim/professions/crafting.ts):
     // specialization only, pristine_hide 3 to 2, 426 vs 420; specialization
     // plus self-signed, the hide 3 to 1, 300 + 25 + 60 + 16 = 401, the floor
-    // 401 vs 420, gold-positive at full discount, bounded by trophy supply
-    // (the pelt has one source, Old Cragmaw, so every craft is one rare-elite
-    // kill at any bill).
+    // 401 vs 420, gold-positive at the counterfactual floor, bounded by
+    // trophy supply (the pelt has one source, Old Cragmaw, so every craft is
+    // one rare-elite kill at any bill).
     reagents: [
       { itemId: 'old_cragmaws_pelt', count: 1 },
       { itemId: 'pristine_hide', count: 3 },
@@ -4229,8 +4296,9 @@ export const TROPHY_RECIPES: ProfessionRecipeRecord[] = [
     // Discounted bills (requiredReagentCountFor, src/sim/professions/crafting.ts):
     // specialization only, pristine_hide 3 to 2, 446 vs 440; specialization
     // plus self-signed, the hide 3 to 1, the floor 421 vs 440, gold-positive
-    // at full discount, bounded by trophy supply (the listed 471 inverts; the
-    // cinderscale's one source is Voskar, and the bought agent is 16).
+    // at the counterfactual floor, bounded by trophy supply (the listed 471
+    // inverts; the cinderscale's one source is Voskar, and the bought agent
+    // is 16).
     reagents: [
       { itemId: 'emberwing_cinderscale', count: 1 },
       { itemId: 'pristine_hide', count: 3 },

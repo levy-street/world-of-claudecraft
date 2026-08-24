@@ -1218,9 +1218,10 @@ describe('Reliquary Rares of the Realm pages pin against the live rare tables', 
     const quiver = sanctum.relics.find(
       (r) => r.kind === 'item' && r.itemId === 'gravewyrm_bone_quiver',
     );
-    expect(quiver).toBeDefined();
+    if (!quiver)
+      throw new Error('conquerors_gravewyrm_sanctum lost its gravewyrm_bone_quiver slot');
     expect(
-      reliquaryRelicSource(sanctum, quiver!).filter((h) => h.sourceKind === 'profession'),
+      reliquaryRelicSource(sanctum, quiver).filter((h) => h.sourceKind === 'profession'),
     ).toEqual([{ sourceKind: 'profession', sourceId: 'leatherworking' }]);
   });
 

@@ -690,6 +690,14 @@ describe('the professions blob growth bound (phase 16)', () => {
     // comma) out of knownRecipes and recipe_wildgrove_cinch (22, 25) in:
     // predicted 17,172 - 1 = 17,171 and measured so (a temporary exact pin,
     // then restored to the band). Headroom stays 11 above and 380 below.
+    //
+    // AND AGAIN AT 11l's fifth fix round: 17,171 bytes, band unchanged. The
+    // round re-picked the weaponcrafting rung-25 row's id,
+    // recipe_vale_carving_knife (25 characters, 28 quoted plus comma) out of
+    // knownRecipes and recipe_mirejaw_fang_knife (also 25, 28) in: predicted
+    // delta 0, 17,171, and measured so (the same temporary exact pin, then
+    // the band restored). The boots' level edit in the same round touches no
+    // persisted byte (recipe.level is content, never state).
     const bytes = professionsBytes(s2);
     expect(bytes).toBeGreaterThan(16791);
     expect(bytes).toBeLessThan(17182);

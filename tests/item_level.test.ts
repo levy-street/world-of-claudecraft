@@ -490,22 +490,26 @@ describe('item level: the phase 11l trophy recipe outputs (TROPHY_RECIPES)', () 
   // level: a future level edit on a trophy row is a deliberate re-tier of a
   // shipped item, never a drive-by. The itemLevel pin is decisive only UPWARD
   // for the rows capped at their output's live drop source (the lantern, the
-  // oiled boots, the maul, the cragprowl belt at the Thornpeak Ogres, the
-  // leather row the second review round added, and the wildgrove cinch at
-  // the Ridge Stalkers, the pelt's output since the fourth fix round
-  // re-picked it off cragwalker_boots): the mob source wins on a LOWERED
-  // recipe level and the item level never moves, which is why the
-  // recipe.level literal is pinned beside it in TROPHY_RECIPE_LEVELS.
-  // hobnail_boots and vale_carving_knife were vendor-only before (no
-  // derivable source at all) and GAINED their level from the recipe. The
+  // oiled boots, the gravewyrm bone quiver at Korzul, where the rung-50
+  // scaffolding and the level-20 cap coincide, the maul, the cragprowl belt
+  // at the Thornpeak Ogres, the leather row the second review round added,
+  // and the wildgrove cinch at the Ridge Stalkers, the pelt's output since
+  // the fourth fix round re-picked it off cragwalker_boots): the mob source
+  // wins on a LOWERED recipe level and the item level never moves, which is
+  // why the recipe.level literal is pinned beside it in TROPHY_RECIPE_LEVELS.
+  // hobnail_boots (vendor-only, level chosen as an honest content level, 10,
+  // not the rung scaffolding's 15: the fifth fix round) and
+  // mirejaw_fang_knife (a Drowned Litany chest uncommon, which is not an item
+  // level source, so the rung scaffolding's 15 plus the uncommon bonus 1) had
+  // no derivable source before and GAINED their level from the recipe. The
   // potion and the pouch carry no combat slot, so they are not item-level
   // eligible and stay undefined whatever the row says.
   const TROPHY_OUTPUT_LEVELS: Record<string, number | undefined> = {
     valefire_lantern: 7,
     oiled_boots: 11,
     gravewyrm_bone_quiver: 23,
-    hobnail_boots: 15,
-    vale_carving_knife: 15,
+    hobnail_boots: 10,
+    mirejaw_fang_knife: 16,
     fenshadow_maul: 13,
     healing_potion: undefined,
     linen_pouch: undefined,
@@ -529,15 +533,24 @@ describe('item level: the phase 11l trophy recipe outputs (TROPHY_RECIPES)', () 
     }
   });
 
+  it('the re-pick took the misleading item level back off vale_carving_knife', () => {
+    // The fifth fix round moved the weaponcrafting rung-25 row off the
+    // vendor-only carving knife (R21: a 3.06 dps dagger the recipe's level
+    // 15 sorted above rare item-level-14 daggers), so it is sourceless again
+    // and its tooltip shows no item level line, the pre-phase behavior.
+    expect(itemLevel(ITEMS.vale_carving_knife)).toBeUndefined();
+  });
+
   // The recipe.level literal per row: the source-capped rows sit AT their
   // output's live source level (a lowered value would be invisible to the
-  // itemLevel pin above), the scaffolding rows at the rung convention.
+  // itemLevel pin above), the scaffolding rows at the rung convention, and
+  // the boots at the chosen content level.
   const TROPHY_RECIPE_LEVELS: Record<string, number> = {
     recipe_valefire_lantern: 6,
     recipe_oiled_boots: 10,
     recipe_gravewyrm_bone_quiver: 20,
-    recipe_hobnail_boots: 15,
-    recipe_vale_carving_knife: 15,
+    recipe_hobnail_boots: 10,
+    recipe_mirejaw_fang_knife: 15,
     recipe_fenshadow_maul: 12,
     recipe_healing_potion: 15,
     recipe_linen_pouch: 10,

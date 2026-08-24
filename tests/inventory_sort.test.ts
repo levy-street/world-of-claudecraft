@@ -3,6 +3,7 @@ import { fileURLToPath } from 'node:url';
 import { describe, expect, it } from 'vitest';
 import { HEAVY_SELF_CMDS } from '../server/heavy_self';
 import { stackSizeOf } from '../src/sim/bags';
+import { ALL_RECIPES, TROPHY_RECIPES } from '../src/sim/content/recipes';
 // Aliased: this file declares a small synthetic table for the ladder arms; the
 // real merged catalog drives the whole-catalog and grade-family arms.
 import { ITEMS as REAL_ITEMS } from '../src/sim/data';
@@ -572,6 +573,85 @@ describe('sortInventoryStacks against the REAL catalog', () => {
       expect(
         compareBagStacks(slot(`q_${LADDER[i]}`), slot(`q_${LADDER[i + 1]}`), qLookup),
         `${LADDER[i]} must sort before ${LADDER[i + 1]}`,
+      ).toBeLessThan(0);
+    }
+  });
+
+  it('phase 11l trophy promotion holds in the ladder: adopted trophies rank as junk, holdouts as trash', () => {
+    // categoryRankOf (src/sim/inventory_sort.ts) sends a poor-quality def to
+    // TRASH_RANK before it reads the kind, so promoting the ten trophies to
+    // common moved them out of the tail band and into KIND_RANK.junk, where
+    // every material lives. The ranks are module-private, so each band is
+    // pinned BEHAVIORALLY through compareBagStacks, the exported comparator,
+    // by sandwiching: a real recipe pattern (KIND_RANK.recipe, the rank just
+    // below junk) must sort before every adopted trophy and a real quest item
+    // (KIND_RANK.quest, the rank just above) after it, which the integer
+    // ladder satisfies only at the junk rank; a holdout must sort after that
+    // quest item and before a def the lookup cannot resolve (MISSING_DEF_RANK,
+    // the last rank), which only TRASH_RANK satisfies while the KIND_RANK
+    // Record stays total (UNRANKED_KIND_RANK is unreachable).
+    // The adopted list is DERIVED from the shipped rows the way
+    // tests/items.test.ts derives it (every junk-kind reagent of a trophy row
+    // that no other recipe also consumes) and held equal to the literal, so a
+    // de-adopted trophy (its row dropped or re-picked off it) reds here too.
+    const trophyRecipeIds = new Set(TROPHY_RECIPES.map((r) => r.id));
+    const sharedReagents = new Set<string>();
+    for (const recipe of ALL_RECIPES) {
+      if (trophyRecipeIds.has(recipe.id)) continue;
+      for (const reagent of recipe.reagents) sharedReagents.add(reagent.itemId);
+    }
+    const derived = new Set<string>();
+    for (const recipe of TROPHY_RECIPES) {
+      for (const reagent of recipe.reagents) {
+        if (REAL_ITEMS[reagent.itemId]?.kind !== 'junk') continue;
+        if (!sharedReagents.has(reagent.itemId)) derived.add(reagent.itemId);
+      }
+    }
+    const adopted = [
+      'bandit_bandana',
+      'bogiron_nugget',
+      'chipped_tusk',
+      'cracked_fetish',
+      'cracked_ogre_tusk',
+      'cracked_wyrm_scale',
+      'emberwing_cinderscale',
+      'mudfin_scale',
+      'old_cragmaws_pelt',
+      'tallow_candle',
+    ] as const;
+    // A do-not-shrink marker, not a pin: it compares the literal to itself
+    // and can only red when someone edits the list above. The derived
+    // equality on the next line is the pin.
+    expect(adopted).toHaveLength(10);
+    expect([...derived].sort()).toEqual([...adopted]);
+    // The sandwich neighbours are checked to be what the comment says, so a
+    // content edit to either id cannot hollow the arm out.
+    expect(REAL_ITEMS.pattern_spiritweld_girdle?.kind).toBe('recipe');
+    expect(REAL_ITEMS.boar_hide?.kind).toBe('quest');
+    expect(REAL_ITEMS.mystery_from_the_future).toBeUndefined();
+    const pattern = slot('pattern_spiritweld_girdle');
+    const quest = slot('boar_hide');
+    const missing = slot('mystery_from_the_future');
+    for (const id of adopted) {
+      expect(REAL_ITEMS[id]?.quality, id).toBe('common');
+      expect(
+        compareBagStacks(pattern, slot(id), realLookup),
+        `${id} after the pattern`,
+      ).toBeLessThan(0);
+      expect(
+        compareBagStacks(slot(id), quest, realLookup),
+        `${id} before the quest item`,
+      ).toBeLessThan(0);
+    }
+    for (const id of ['tangled_weed', 'soggy_moccasin'] as const) {
+      expect(REAL_ITEMS[id]?.quality, id).toBe('poor');
+      expect(
+        compareBagStacks(quest, slot(id), realLookup),
+        `${id} after the quest item`,
+      ).toBeLessThan(0);
+      expect(
+        compareBagStacks(slot(id), missing, realLookup),
+        `${id} before a missing def`,
       ).toBeLessThan(0);
     }
   });
