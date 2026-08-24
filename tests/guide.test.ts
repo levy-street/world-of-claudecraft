@@ -54,6 +54,7 @@ import { buildIndex, rank } from '../src/guide/search';
 import { DEEDS } from '../src/sim/content/deeds';
 import { DELVE_SHOPS } from '../src/sim/content/delves/shop';
 import { ENCHANTS } from '../src/sim/content/enchants';
+import { FARM_CROPS } from '../src/sim/content/farm_crops';
 import { GATHER_NODES } from '../src/sim/content/gather_nodes';
 import { HEROIC_BOSS_LOOT } from '../src/sim/content/heroic_loot';
 import { HEROIC_VENDOR_STOCK } from '../src/sim/content/heroic_vendor';
@@ -67,7 +68,7 @@ import {
   STATION_TYPE_BY_CRAFT,
   STATIONS,
 } from '../src/sim/content/professions';
-import { ALL_RECIPES, ROD_RECIPES } from '../src/sim/content/recipes';
+import { ALL_RECIPES, HOE_RECIPES, ROD_RECIPES } from '../src/sim/content/recipes';
 import { RELIQUARY_PAGES } from '../src/sim/content/reliquary';
 import {
   TIER2_TOOL_GATE_PROFICIENCY,
@@ -2669,6 +2670,61 @@ describe('Guide professions gathering accuracy', () => {
     expect([bought, crafted]).toEqual([3, 3]);
   });
 
+  it('the shared tools note is TRUE of farming, not only of the node trades', () => {
+    // THE ONLY GUARD OVER THIS HAND-AUTHORED PROSE, added at the masterwrought
+    // Phase 11j QA. professions_gathering.ts renders toolsNoteThreeRods above
+    // the tool table on EVERY gathering page, farming included, and the note
+    // described the node trades as if they were all of them. On the farming
+    // page it sat directly above a table showing five hoe rungs while saying
+    // each land trade has two crafted tools; it said every character knows the
+    // land recipes, where all four hoe rungs are acquisition ['trainer']; and
+    // it said the land trades' crafted tools buy no access, where planting a
+    // tier-N bed needs a tier-N hoe. content.generated.ts is regenerated and
+    // diffed, but a diff of the table cannot see the paragraph beside it.
+    //
+    // ANCHORED ON CLAUSES THAT EXIST ONLY IN THE CORRECTED TEXT, the rule the
+    // Phase 11g arm above records: an anchor the old wording also carried lets
+    // a revert stay green. Apostrophe-free, since the page escapes to &#39;.
+    setLanguage('en');
+    const en = t('guide.profPages.toolsNoteThreeRods', {
+      tier2Prof: String(TIER2_TOOL_GATE_PROFICIENCY),
+      tier3Prof: String(TIER3_TOOL_GATE_PROFICIENCY),
+    });
+    expect(en).toContain('the three node trades each have two crafted tools');
+    expect(en).toContain('ladder is the long one, and none of it is free');
+    expect(en).toContain('all four taught by the toolmaker rather than known from the start');
+    expect(en).toContain('a bed of tier N asks a hoe of tier N');
+    // The retired claims, each pinned ABSENT so a revert reds rather than
+    // quietly restoring a false page.
+    expect(en, 'the node-trade count must not be claimed of every land trade').not.toContain(
+      'each land trade has two crafted tools',
+    );
+    expect(en, 'the hoes are trainer-taught, never known').not.toContain(
+      'every character knows the land recipes',
+    );
+    expect(en, 'farming is not covered by the node-tier ceiling').not.toContain(
+      'For the land trades no node today needs more than tier 3',
+    );
+
+    // AND TIED TO THE LIVE TABLES, so the sentences are true rather than
+    // merely present. Every hoe rung above the entry one is trainer-taught,
+    // the ladder really runs 2 through 5, and the top crop tier really is the
+    // one the tier-4 hoe reaches.
+    expect(HOE_RECIPES.map((r) => r.acquisition?.join(','))).toEqual([
+      'trainer',
+      'trainer',
+      'trainer',
+      'trainer',
+    ]);
+    expect(
+      HOE_RECIPES.map((r) => {
+        const use = ITEMS[r.resultItemId].use;
+        return use?.type === 'gatherTool' ? use.tier : 0;
+      }),
+    ).toEqual([2, 3, 4, 5]);
+    expect(Math.max(...Object.values(FARM_CROPS).map((c) => c.tier))).toBe(4);
+  });
+
   it('publishes the tool-gate thresholds through placeholders in EVERY locale', () => {
     // The tools note states the two gate thresholds. It takes them as {tier2} /
     // {tier3} rather than as literals so a retune moves the published prose in
@@ -2688,8 +2744,13 @@ describe('Guide professions gathering accuracy', () => {
     // crafted-rung clause to the frozen wield table: a retune fails here
     // instead of rotting in the prose, and the clause scope keeps an
     // unrelated 100 elsewhere in the note from ever satisfying this.
+    // PER TIER RATHER THAN "for the two crafted rungs", re-worded at the
+    // masterwrought Phase 11j QA: farming has FOUR crafted rungs, so the old
+    // phrasing named the wrong set on the page that shows a five-rung hoe
+    // ladder. The derivation from the frozen wield table is unchanged, which
+    // is the half that matters here.
     expect(en).toContain(
-      `${TIER4_TOOL_WIELD_PROFICIENCY} and ${TIER5_TOOL_WIELD_PROFICIENCY} for the two crafted rungs`,
+      `${TIER4_TOOL_WIELD_PROFICIENCY} for tier 4 and ${TIER5_TOOL_WIELD_PROFICIENCY} for tier 5`,
     );
     // The Marks-route cells name their gates as English words, so tie the
     // wording to the live gate IN THE SAME BREATH: if the delve counter's

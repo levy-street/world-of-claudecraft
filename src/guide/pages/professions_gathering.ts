@@ -38,7 +38,8 @@ export function gatheringById(id: string): GuideProfGathering | undefined {
 
 // The Source cell's one decision, flattened: crafted tools name their craft
 // and, when a delve counter also stocks them, the Marks price behind its
-// clears gate (the eight top tools; naming only the craft made the table
+// clears gate (the ten top tools, eight until masterwrought Phase 11j put both
+// crafted hoe rungs on the counter; naming only the craft made the table
 // contradict the prose above it); bought tools name their counter.
 function toolSource(tool: GuideProfTool): string {
   if (tool.craftedBy) {
