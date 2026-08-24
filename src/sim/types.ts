@@ -3128,6 +3128,15 @@ export interface ActionReplacementRule {
   actorAuraKind?: AuraKind;
 }
 
+export type PlayerAttackResolution =
+  | 'meleeCone'
+  | 'ballisticProjectile'
+  | 'directionalHitscan'
+  | 'groundArea'
+  | 'selfArea'
+  | 'support'
+  | 'lockOnActivation';
+
 export interface AbilityDef {
   id: string;
   name: string;
@@ -3153,6 +3162,8 @@ export interface AbilityDef {
   // undefined = 1 (a plain cooldown).
   maxCharges?: number;
   range: number; // yards; 0 = melee range
+  /** Optional authored override for the player directional-combat resolver. */
+  playerAttackResolution?: PlayerAttackResolution;
   minRange?: number;
   // The attack travels to its target as a projectile, so its damage and effects
   // resolve when the bolt LANDS (projectile_travel), not at cast completion. Every
@@ -5866,6 +5877,30 @@ export type SimEvent = { pid?: number } & (
       // caller, which keeps the existing generic sound unchanged.
       sfxKey?: string;
     }
+  | {
+      type: 'projectileLaunch';
+      trajectoryId: string;
+      sourceId: number;
+      x: number;
+      z: number;
+      dirX: number;
+      dirZ: number;
+      speed: number;
+      maxDistance: number;
+      radius: number;
+      school: string;
+      ability?: string;
+      attackAnimation?: 'ranged-shot';
+      wand?: true;
+    }
+  | {
+      type: 'projectileImpact';
+      trajectoryId: string;
+      x: number;
+      z: number;
+      targetId?: number;
+      reason: 'entity' | 'wall' | 'range' | 'sourceDespawn';
+    }
   // entityId (when set) anchors the log to that entity so the server only
   // delivers it to nearby players; anchorless logs broadcast server-wide
   // `telegraph` marks an entityId-anchored line as an actionable mechanic cue
@@ -6831,6 +6866,10 @@ export interface SimConfig {
   playerName?: string;
   noPlayer?: boolean; // multiplayer server: start with an empty world and addPlayer() later
   devCommands?: boolean; // local dev: /dev level|tp|give chat cheats
+  // Player runtime combat mode. `true` enables phase two, `false` keeps the
+  // phase-one directional/homing fallback, and omission retains the legacy
+  // resolver for deterministic tools and historical fixtures.
+  playerDirectionalCombat?: boolean;
   lockoutNowMs?: () => number; // host wall-clock for persisted raid lockouts
   // Live server: schedule the first world-boss rise at boot instead of one
   // interval out, so a freshly (re)started realm has Thunzharr up immediately.

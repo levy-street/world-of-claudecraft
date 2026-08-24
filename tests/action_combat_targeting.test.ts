@@ -57,7 +57,8 @@ describe('action combat targeting', () => {
 
   it('only enables aim substitution for offensive entity targets', () => {
     expect(abilityUsesActionCombatAim(ABILITIES.fireball)).toBe(true);
-    expect(abilityUsesActionCombatAim(ABILITIES.holy_shock)).toBe(true);
+    // Ally-capable/lock-on activations retain explicit hard-target semantics.
+    expect(abilityUsesActionCombatAim(ABILITIES.holy_shock)).toBe(false);
     expect(abilityUsesActionCombatAim(ABILITIES.healing_touch)).toBe(false);
     expect(abilityUsesActionCombatAim(ABILITIES.flamestrike)).toBe(false);
     expect(abilityUsesActionCombatAim(ABILITIES.unleash_weapon)).toBe(false);

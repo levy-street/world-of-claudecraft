@@ -276,6 +276,20 @@ interface Projectile {
   onImpact?: (position: THREE.Vector3) => void;
 }
 
+interface BallisticProjectileVisual {
+  trajectoryId: string;
+  pos: THREE.Vector3;
+  dirX: number;
+  dirZ: number;
+  speed: number;
+  remaining: number;
+  color: THREE.Color;
+  coreColor: THREE.Color;
+  trailColor: THREE.Color;
+  coreSprite: number;
+  trailSprite: number;
+}
+
 interface BubbleBeam {
   sourceId: number;
   targetId: number;
@@ -321,6 +335,7 @@ export class Vfx {
   private readonly cullViewProjection = new THREE.Matrix4();
   private head = 0;
   private projectiles: Projectile[] = [];
+  private ballisticProjectiles: BallisticProjectileVisual[] = [];
   private bubbleBeams: BubbleBeam[] = [];
   private drainLifeVfx: DrainLifeVfx;
   private tmpColor = new THREE.Color();
@@ -560,6 +575,7 @@ export class Vfx {
 
   clear(): void {
     this.projectiles.length = 0;
+    this.ballisticProjectiles.length = 0;
     this.paladinSpellFx.clear();
     for (let i = this.bubbleBeams.length - 1; i >= 0; i--) this.removeBubbleBeam(i);
     this.drainLifeVfx.clear();
@@ -724,6 +740,75 @@ export class Vfx {
     const from = this.anchor(sourceId, 0.62);
     if (!from) return;
     this.projectileFrom(from, targetId, school, scale, 26, undefined, color);
+  }
+
+  ballisticProjectile(
+    trajectoryId: string,
+    x: number,
+    y: number,
+    z: number,
+    dirX: number,
+    dirZ: number,
+    speed: number,
+    maxDistance: number,
+    school: string,
+  ): void {
+    const length = Math.hypot(dirX, dirZ);
+    if (!Number.isFinite(length) || length <= 1e-6) return;
+    const colors = projectileSchoolColors(school);
+    const sprites = projectileSprites(school);
+    // A reconnect/replayed launch replaces the same trajectory instead of
+    // rendering two bolts. Server impact remains the termination authority.
+    this.ballisticProjectiles = this.ballisticProjectiles.filter(
+      (projectile) => projectile.trajectoryId !== trajectoryId,
+    );
+    this.ballisticProjectiles.push({
+      trajectoryId,
+      pos: new THREE.Vector3(x, y, z),
+      dirX: dirX / length,
+      dirZ: dirZ / length,
+      speed,
+      remaining: Math.max(0, maxDistance),
+      color: colors.base,
+      coreColor: colors.core,
+      trailColor: colors.trail,
+      coreSprite: sprites.core,
+      trailSprite: sprites.trail,
+    });
+  }
+
+  ballisticImpact(
+    trajectoryId: string,
+    x: number,
+    y: number,
+    z: number,
+    visibleImpact: boolean,
+  ): void {
+    const index = this.ballisticProjectiles.findIndex(
+      (projectile) => projectile.trajectoryId === trajectoryId,
+    );
+    if (index < 0) return;
+    const [projectile] = this.ballisticProjectiles.splice(index, 1);
+    if (!visibleImpact) return;
+    this.tmpColor.copy(projectile.color).multiplyScalar(hdr(1.6));
+    this.spawn(x, y, z, 0, 0.5, 0, this.tmpColor, 1.05, 0.22, 0, SPR.flash);
+    for (let k = 0; k < this.scaledCount(18); k++) {
+      const angle = Math.random() * Math.PI * 2;
+      const speed = 2.2 + Math.random() * 3.8;
+      this.spawn(
+        x,
+        y,
+        z,
+        Math.sin(angle) * speed,
+        Math.random() * 2.7,
+        Math.cos(angle) * speed,
+        this.tmpColor,
+        0.4,
+        0.5,
+        7,
+        k % 2 === 0 ? SPR.sparkle : SPR.sparkBurst,
+      );
+    }
   }
 
   private projectileFrom(
@@ -2079,6 +2164,52 @@ export class Vfx {
           1.4,
           SPR.ring,
         );
+      }
+    }
+
+    // Player ballistic attacks advance locally along the immutable launch
+    // trajectory. The sim's projectileImpact event removes them at its exact
+    // entity/wall/range result, so this never predicts gameplay contact.
+    for (let i = this.ballisticProjectiles.length - 1; i >= 0; i--) {
+      const projectile = this.ballisticProjectiles[i];
+      const step = Math.min(Math.max(0, projectile.remaining), projectile.speed * dt);
+      projectile.pos.x += projectile.dirX * step;
+      projectile.pos.z += projectile.dirZ * step;
+      projectile.remaining -= step;
+      this.spawn(
+        projectile.pos.x,
+        projectile.pos.y,
+        projectile.pos.z,
+        0,
+        0,
+        0,
+        projectile.coreColor,
+        0.46,
+        0.1,
+        0,
+        projectile.coreSprite,
+      );
+      for (let n = 0; n < this.emitCount(34, dt); n++) {
+        this.spawn(
+          projectile.pos.x - projectile.dirX * (0.15 + Math.random() * 0.65),
+          projectile.pos.y + (Math.random() - 0.5) * 0.16,
+          projectile.pos.z - projectile.dirZ * (0.15 + Math.random() * 0.65),
+          -projectile.dirX * (0.8 + Math.random()),
+          (Math.random() - 0.35) * 0.6,
+          -projectile.dirZ * (0.8 + Math.random()),
+          projectile.trailColor,
+          0.24,
+          0.28,
+          0,
+          projectile.trailSprite,
+        );
+      }
+      // Impact normally arrives in the same or next render frame. Keep an
+      // inert short grace window for network ordering, then discard silently.
+      if (projectile.remaining <= 0) {
+        projectile.speed = 0;
+        projectile.remaining -= dt;
+        if (projectile.remaining < -0.5) this.ballisticProjectiles.splice(i, 1);
       }
     }
 

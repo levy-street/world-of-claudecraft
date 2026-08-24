@@ -13,105 +13,110 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.bg.doubleHonorLine",
     "hudChrome.calendar.events.doubleHonor.note",
     "hudChrome.calendar.events.doubleHonor.title",
-    "hudChrome.options.actionCombat"
+    "hudChrome.keybinds.toggleActionCamera",
+    "hudChrome.options.actionCamera"
   ],
   "es_ES": [
     "hudChrome.bg.doubleHonorLine",
     "hudChrome.calendar.events.doubleHonor.note",
     "hudChrome.calendar.events.doubleHonor.title",
-    "hudChrome.options.actionCombat"
+    "hudChrome.keybinds.toggleActionCamera",
+    "hudChrome.options.actionCamera"
   ],
   "fr_FR": [
     "hudChrome.bg.doubleHonorLine",
     "hudChrome.calendar.events.doubleHonor.note",
     "hudChrome.calendar.events.doubleHonor.title",
-    "hudChrome.options.actionCombat"
+    "hudChrome.keybinds.toggleActionCamera",
+    "hudChrome.options.actionCamera"
   ],
   "fr_CA": [
     "hudChrome.bg.doubleHonorLine",
     "hudChrome.calendar.events.doubleHonor.note",
     "hudChrome.calendar.events.doubleHonor.title",
-    "hudChrome.options.actionCombat"
+    "hudChrome.keybinds.toggleActionCamera",
+    "hudChrome.options.actionCamera"
   ],
   "en_CA": [],
   "it_IT": [
     "hudChrome.bg.doubleHonorLine",
     "hudChrome.calendar.events.doubleHonor.note",
     "hudChrome.calendar.events.doubleHonor.title",
-    "hudChrome.options.actionCombat"
+    "hudChrome.keybinds.toggleActionCamera",
+    "hudChrome.options.actionCamera"
   ],
   "de_DE": [
     "hudChrome.bg.doubleHonorLine",
     "hudChrome.calendar.events.doubleHonor.note",
     "hudChrome.calendar.events.doubleHonor.title",
-    "hudChrome.options.actionCombat"
+    "hudChrome.keybinds.toggleActionCamera",
+    "hudChrome.options.actionCamera"
   ],
-  "zh_CN": [
-    "hudChrome.options.actionCombat"
-  ],
-  "zh_TW": [
-    "hudChrome.options.actionCombat"
-  ],
-  "ko_KR": [
-    "hudChrome.options.actionCombat"
-  ],
-  "ja_JP": [
-    "hudChrome.options.actionCombat"
-  ],
+  "zh_CN": [],
+  "zh_TW": [],
+  "ko_KR": [],
+  "ja_JP": [],
   "pt_BR": [
     "hudChrome.bg.doubleHonorLine",
     "hudChrome.calendar.events.doubleHonor.note",
     "hudChrome.calendar.events.doubleHonor.title",
-    "hudChrome.options.actionCombat"
+    "hudChrome.keybinds.toggleActionCamera",
+    "hudChrome.options.actionCamera"
   ],
-  "ru_RU": [
-    "hudChrome.options.actionCombat"
-  ],
+  "ru_RU": [],
   "cs_CZ": [
     "hudChrome.bg.doubleHonorLine",
     "hudChrome.calendar.events.doubleHonor.note",
     "hudChrome.calendar.events.doubleHonor.title",
-    "hudChrome.options.actionCombat"
+    "hudChrome.keybinds.toggleActionCamera",
+    "hudChrome.options.actionCamera"
   ],
   "nl_NL": [
     "hudChrome.bg.doubleHonorLine",
     "hudChrome.calendar.events.doubleHonor.note",
     "hudChrome.calendar.events.doubleHonor.title",
-    "hudChrome.options.actionCombat"
+    "hudChrome.keybinds.toggleActionCamera",
+    "hudChrome.options.actionCamera"
   ],
   "pl_PL": [
     "hudChrome.bg.doubleHonorLine",
     "hudChrome.calendar.events.doubleHonor.note",
     "hudChrome.calendar.events.doubleHonor.title",
-    "hudChrome.options.actionCombat"
+    "hudChrome.keybinds.toggleActionCamera",
+    "hudChrome.options.actionCamera"
   ],
   "id_ID": [
     "hudChrome.bg.doubleHonorLine",
     "hudChrome.calendar.events.doubleHonor.note",
     "hudChrome.calendar.events.doubleHonor.title",
-    "hudChrome.options.actionCombat"
+    "hudChrome.keybinds.toggleActionCamera",
+    "hudChrome.options.actionCamera"
   ],
   "tr_TR": [
     "hudChrome.bg.doubleHonorLine",
     "hudChrome.calendar.events.doubleHonor.note",
-    "hudChrome.calendar.events.doubleHonor.title"
+    "hudChrome.calendar.events.doubleHonor.title",
+    "hudChrome.options.startAttackOnAbility"
   ],
   "sv_SE": [
     "hudChrome.bg.doubleHonorLine",
     "hudChrome.calendar.events.doubleHonor.note",
     "hudChrome.calendar.events.doubleHonor.title",
-    "hudChrome.options.actionCombat"
+    "hudChrome.keybinds.toggleActionCamera",
+    "hudChrome.options.actionCamera"
   ],
   "vi_VN": [
     "hudChrome.bg.doubleHonorLine",
     "hudChrome.calendar.events.doubleHonor.note",
     "hudChrome.calendar.events.doubleHonor.title",
-    "hudChrome.options.actionCombat"
+    "hudChrome.keybinds.toggleActionCamera",
+    "hudChrome.options.actionCamera"
   ],
   "da_DK": [
     "hudChrome.bg.doubleHonorLine",
     "hudChrome.calendar.events.doubleHonor.note",
     "hudChrome.calendar.events.doubleHonor.title",
-    "hudChrome.options.actionCombat"
+    "hudChrome.keybinds.toggleActionCamera",
+    "hudChrome.options.actionCamera"
   ]
 };

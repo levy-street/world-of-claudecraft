@@ -40,3 +40,10 @@ services:
         sync: false
       - key: REALM_NAME
         sync: false
+      # Emergency rollback: set to "0" in Render to retain directional input
+      # while reverting player projectiles/three-target melee to release-one
+      # resolution. Keep phase two off for the first production rollout.
+      - key: PLAYER_DIRECTIONAL_COMBAT
+        # First rollout keeps ballistic projectiles / three-target melee dormant.
+        # Set to "1" only after the phase-one live combat smoke test is stable.
+        value: "0"

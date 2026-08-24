@@ -87,6 +87,7 @@ export interface SimContextPrimitives {
   readonly rng: Rng;
   readonly time: number;
   readonly tickCount: number;
+  readonly playerDirectionalCombat?: boolean;
   readonly entities: Map<number, Entity>;
   // Live player roster (keyed by entity id). Stays a Sim field; exposed here so the
   // moved party machine (A1) resolves member names/metas through the seam.
@@ -182,8 +183,10 @@ export interface SimContextPrimitives {
   // temporary host-owned tick profiler probe), and `respawnSeconds` stays
   // possibly-undefined so respawn_policy.ts can tell an explicit host-pinned
   // global base from "fall through to the zone tier"; the rest defaulted.
-  readonly cfg: Required<Omit<SimConfig, 'noPlayer' | 'world' | 'perfLap' | 'respawnSeconds'>> &
-    Pick<SimConfig, 'world' | 'perfLap' | 'respawnSeconds'>;
+  readonly cfg: Required<
+    Omit<SimConfig, 'noPlayer' | 'world' | 'perfLap' | 'respawnSeconds' | 'playerDirectionalCombat'>
+  > &
+    Pick<SimConfig, 'world' | 'perfLap' | 'respawnSeconds' | 'playerDirectionalCombat'>;
   // Per-Sim key for the rift collision registry in colliders.ts (rift/runs.ts
   // registers regions under it, rift-aware collision reads pass it). Per INSTANCE,
   // not per seed: two same-seed Sims in one process must stay isolated.
@@ -910,6 +913,11 @@ export interface SimContextCallbacks {
   ): boolean;
   effectiveAttackPower(e: Entity): number;
   hasLineOfSight(source: Entity, target: Entity): boolean;
+  projectilePathClear?(
+    source: Entity,
+    from: Readonly<{ x: number; z: number }>,
+    to: Readonly<{ x: number; z: number }>,
+  ): boolean;
   findChargePath(p: Entity, target: Entity): Vec3[];
   runEffects(
     p: Entity,
@@ -917,6 +925,13 @@ export interface SimContextCallbacks {
     target: Entity | null,
     res: ResolvedAbility,
     attackAnimationStarted?: boolean,
+  ): void;
+  runSecondaryTargetEffects?(
+    p: Entity,
+    meta: PlayerMeta,
+    target: Entity,
+    res: ResolvedAbility,
+    snapshot: { spentCombo: number; sureCrit: boolean },
   ): void;
 
   // P1a pet AI (src/sim/pet/pet_ai): the moved updatePet/petRangedAttack/petPickTarget
@@ -1126,6 +1141,9 @@ export function createSimContext(host: SimContextHost): SimContext {
     },
     get tickCount() {
       return host.tickCount;
+    },
+    get playerDirectionalCombat() {
+      return host.playerDirectionalCombat;
     },
     get entities() {
       return host.entities;
@@ -1606,8 +1624,10 @@ export function createSimContext(host: SimContextHost): SimContext {
     meleeSwing: host.meleeSwing,
     effectiveAttackPower: host.effectiveAttackPower,
     hasLineOfSight: host.hasLineOfSight,
+    projectilePathClear: host.projectilePathClear,
     findChargePath: host.findChargePath,
     runEffects: host.runEffects,
+    runSecondaryTargetEffects: host.runSecondaryTargetEffects,
     // P1a pet-AI seam (effectiveAttackPower/isHostileTo already bound above; deduped).
     // C5 auto-attack consumes aggroMob/swingIntervalMult, already passed through above (M2; deduped).
     syncPetAspect: host.syncPetAspect,

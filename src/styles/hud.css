@@ -19,6 +19,43 @@
      @layer components would let the unlayered base win and invert the cascade, so they
      stay inline beside their bases and relocate later. */
 @layer components {
+  #action-camera-crosshair {
+    position: fixed;
+    left: 50%;
+    top: 50%;
+    width: 18px;
+    height: 18px;
+    transform: translate(-50%, -50%);
+    z-index: 18;
+    pointer-events: none;
+    filter: drop-shadow(0 1px 2px rgb(0 0 0 / 85%));
+  }
+
+  #action-camera-crosshair[hidden] {
+    display: none;
+  }
+
+  #action-camera-crosshair::before,
+  #action-camera-crosshair::after {
+    content: "";
+    position: absolute;
+    background: rgb(255 255 255 / 88%);
+    border-radius: 1px;
+  }
+
+  #action-camera-crosshair::before {
+    left: 8px;
+    top: 1px;
+    width: 2px;
+    height: 16px;
+  }
+
+  #action-camera-crosshair::after {
+    left: 1px;
+    top: 8px;
+    width: 16px;
+    height: 2px;
+  }
   /* ---------- nameplates ---------- */
   .nameplate {
     position: absolute;

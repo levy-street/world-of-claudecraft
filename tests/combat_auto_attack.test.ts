@@ -32,7 +32,12 @@ function makeSim(
   level: number,
   seed = 7,
 ): { sim: Sim; p: Entity; meta: PlayerMeta } {
-  const sim = new Sim({ seed, playerClass: cls, autoEquip: true });
+  const sim = new Sim({
+    seed,
+    playerClass: cls,
+    autoEquip: true,
+    playerDirectionalCombat: true,
+  });
   sim.setPlayerLevel(level);
   // Ranged fixtures place their target relative to the player, so stand on
   // empty ground: the town is furnished and would block the shot lane.
@@ -55,6 +60,7 @@ function spawnDummy(sim: Sim, p: Entity, level = 5, dz = 2): Entity {
   mob.hp = 500000;
   mob.hostile = true;
   mob.aiState = 'idle';
+  mob.moveSpeed = 0; // a combat dummy must not sidestep new ballistic shots
   sim.addEntity(mob);
   p.facing = Math.atan2(mob.pos.x - p.pos.x, mob.pos.z - p.pos.z);
   sim.targetEntity(mob.id, p.id);
@@ -447,7 +453,7 @@ describe('auto_attack updatePlayerAutoAttack: ranged-vs-melee dispatch', () => {
     p.autoAttack = true;
     p.swingTimer = 0;
     const shots = (evs: SimEvent[]): SimEvent[] =>
-      evs.filter((e) => e.type === 'spellfx' && e.fx === 'projectile' && e.sourceId === p.id);
+      evs.filter((e) => e.type === 'projectileLaunch' && e.sourceId === p.id);
     // First tick: one legitimate shot fired, and the timer is armed to the interval.
     const first = capture(sim);
     updatePlayerAutoAttack(sim.ctx, p, meta);
@@ -486,7 +492,7 @@ describe('auto_attack Vanish (issue #2426): a target that escapes stealth mid-fi
     };
   }
 
-  it('drops auto-attack (and stops dealing damage) the instant the target vanishes', () => {
+  it('keeps the held attack intent but cannot contact a vanished target', () => {
     const { sim, p, meta } = makeSim('warrior', 12);
     const mob = spawnDummy(sim, p, 5, 2); // within MELEE_RANGE, already engaged
     p.autoAttack = true;
@@ -494,20 +500,18 @@ describe('auto_attack Vanish (issue #2426): a target that escapes stealth mid-fi
     mob.auras.push(vanishAura(mob.id));
     const events = capture(sim);
     updatePlayerAutoAttack(sim.ctx, p, meta);
-    expect(p.autoAttack).toBe(false);
+    expect(p.autoAttack).toBe(true);
     expect(events.some((e) => e.type === 'damage' && e.sourceId === p.id)).toBe(false);
   });
 
-  it('startAutoAttack refuses to engage a vanished target as a fresh attack', () => {
+  it('startAutoAttack arms targetless intent even when the selected target vanished', () => {
     const { sim, p } = makeSim('warrior', 12);
     const mob = spawnDummy(sim, p, 5, 2);
     mob.auras.push(vanishAura(mob.id));
     const events = capture(sim);
     startAutoAttack(sim.ctx, p.id);
-    expect(p.autoAttack).toBe(false);
-    expect(events.some((e) => e.type === 'error' && e.text === 'Invalid attack target.')).toBe(
-      true,
-    );
+    expect(p.autoAttack).toBe(true);
+    expect(events.some((e) => e.type === 'error')).toBe(false);
   });
 });
 
@@ -564,28 +568,28 @@ describe('auto_attack Auto Shot scales off the equipped weapon (ranged DPS)', ()
 });
 
 describe('auto_attack start/stopAutoAttack', () => {
-  it('startAutoAttack rejects an invalid target and sets the flag for a valid one', () => {
+  it('startAutoAttack arms a targetless held intent and does not pre-aggro a selected target', () => {
     const { sim, p } = makeSim('warrior', 12);
     p.targetId = null;
     const events = capture(sim);
     startAutoAttack(sim.ctx, p.id);
-    expect(p.autoAttack).toBe(false);
-    expect(events.some((e) => e.type === 'error')).toBe(true); // "Invalid attack target."
+    expect(p.autoAttack).toBe(true);
+    expect(events.some((e) => e.type === 'error')).toBe(false);
 
     const mob = spawnDummy(sim, p, 5, 2);
     startAutoAttack(sim.ctx, p.id);
     expect(p.autoAttack).toBe(true);
-    expect(mob.aggroTargetId).toBe(p.id); // idle mob pulled into combat (ctx.aggroMob)
+    expect(mob.aggroTargetId).toBe(null); // contact, not button-down, owns aggro
   });
 
-  it('silently no-ops on a target that just died (no spurious "Invalid attack target." toast)', () => {
+  it('arms intent across a selected corpse without a spurious error', () => {
     const { sim, p } = makeSim('warrior', 12);
     const mob = spawnDummy(sim, p, 5, 2);
     mob.dead = true; // the engaging spell landed the killing blow this same tick
     p.targetId = mob.id;
     const events = capture(sim);
     startAutoAttack(sim.ctx, p.id);
-    expect(p.autoAttack).toBe(false); // no engage on a corpse
+    expect(p.autoAttack).toBe(true); // targetless intent remains valid
     expect(events.some((e) => e.type === 'error')).toBe(false); // and NO error toast
   });
 
@@ -612,11 +616,15 @@ describe('auto_attack startAutoAttack: ranged engage must not pre-aggro (issue #
     expect(mob.aggroTargetId).toBe(null);
   });
 
-  it('melee engage still seeds aggro immediately (unchanged behavior)', () => {
+  it('melee engage waits for the first physical swing before seeding aggro', () => {
     const { sim, p } = makeSim('warrior', 12);
     const mob = spawnDummy(sim, p, 12, 2); // 2yd: melee range, a swing lands at once
     startAutoAttack(sim.ctx, p.id);
     expect(p.autoAttack).toBe(true);
+    expect(mob.aggroTargetId).toBe(null);
+    const meta = sim.meta(p.id);
+    if (!meta) throw new Error('test player metadata missing');
+    updatePlayerAutoAttack(sim.ctx, p, meta);
     expect(mob.aggroTargetId).toBe(p.id);
   });
 
@@ -634,7 +642,7 @@ describe('auto_attack startAutoAttack: ranged engage must not pre-aggro (issue #
     sim.targetEntity(egg.id, p.id);
 
     startAutoAttack(sim.ctx, p.id);
-    expect(p.autoAttack).toBe(false);
+    expect(p.autoAttack).toBe(true);
     expect(egg.aiState).toBe('idle');
     expect(egg.aggroTargetId).toBeNull();
     expect(egg.threat.size).toBe(0);
@@ -698,12 +706,12 @@ describe('startAutoAttack while casting (the aggro-before-damage bug)', () => {
     expect(mob.aggroTargetId).toBe(null);
   });
 
-  it('outside a cast the toggle still pulls the idle target at once (unchanged)', () => {
+  it('outside a cast the held intent still waits for physical contact to pull', () => {
     const { sim, p } = makeSim('warrior', 10);
     const mob = spawnDummy(sim, p, 5, 2);
     startAutoAttack(sim.ctx, p.id);
-    expect(mob.aiState).not.toBe('idle');
-    expect(p.inCombat).toBe(true);
+    expect(mob.aiState).toBe('idle');
+    expect(p.inCombat).toBe(false);
   });
 });
 

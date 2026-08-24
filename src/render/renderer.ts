@@ -542,6 +542,8 @@ import { type SelfMotionFrame, SelfMotionPredictor, updateSelfRenderFallback } f
 import { SelfSpiritPrewarmer } from './self_spirit_prewarm';
 import { SentenceVfx } from './sentence_vfx';
 import { sentenceImpactPlan } from './sentence_vfx_core';
+import { GroundPointProjector } from './ground_point_projector';
+import { handleProjectileEventVfx } from './projectile_event_vfx';
 import {
   createShadowCadenceState,
   resetShadowCadence,
@@ -1384,9 +1386,8 @@ export class Renderer {
   private groundAimReticle: GroundAimReticleVisual;
   raycaster = new THREE.Raycaster();
   private readonly raycastNdc = new THREE.Vector2();
-  private readonly raycastGroundPlane = new THREE.Plane(new THREE.Vector3(0, 1, 0), 0);
-  private readonly raycastHit = new THREE.Vector3();
   private readonly raycastHits: THREE.Intersection[] = [];
+  private readonly groundPointProjector: GroundPointProjector;
   private readonly directHitIds: number[] = [];
   clickTargets: THREE.Object3D[] = [];
   // Gather-node meshes (#1866), raycast separately from `clickTargets`/`pick()`:
@@ -2220,6 +2221,7 @@ export class Renderer {
       this.farVista.enabled ? 0.2 : 0.1,
       this.farVista.enabled ? this.farVista.cameraFar : 950,
     );
+    this.groundPointProjector = new GroundPointProjector(this.canvas, this.camera);
     // updateCamera owns the one explicit camera matrix refresh. Prevent each
     // WebGLRenderer pass from repeating it for an unchanged camera. r185 also
     // gates the camera's own compose on this flag, so every explicit refresh
@@ -7702,6 +7704,10 @@ export class Renderer {
   }
 
   handleEvent(ev: SimEvent): void {
+    if (ev.type === 'projectileLaunch' && ev.attackAnimation === 'ranged-shot') {
+      this.triggerAttack(ev.sourceId);
+    }
+    if (handleProjectileEventVfx(ev, () => this.sim.cfg.seed, this.vfx)) return;
     switch (ev.type) {
       case 'castStart': {
         if (ev.ability === 'needle_of_fate') {
@@ -13489,19 +13495,8 @@ export class Renderer {
     }
   }
 
-  // Click-to-move (#95): where a screen click meets the ground. Intersects a
-  // horizontal plane at the player's foot height, robust on the gentle terrain
-  // here and far cheaper than raycasting the terrain mesh.
   groundPoint(clientX: number, clientY: number, planeY: number): { x: number; z: number } | null {
-    this.raycastNdc.set(
-      (clientX / window.innerWidth) * 2 - 1,
-      -(clientY / window.innerHeight) * 2 + 1,
-    );
-    this.raycaster.setFromCamera(this.raycastNdc, this.camera);
-    this.raycastGroundPlane.constant = -planeY;
-    return this.raycaster.ray.intersectPlane(this.raycastGroundPlane, this.raycastHit)
-      ? { x: this.raycastHit.x, z: this.raycastHit.z }
-      : null;
+    return this.groundPointProjector.project(clientX, clientY, planeY);
   }
 
   // Click/tap-to-harvest (#1866): raycasts the static gather-node meshes

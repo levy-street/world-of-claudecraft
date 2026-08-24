@@ -545,8 +545,7 @@ const FRAMES_KEYS = [
 ];
 const CHAT_KEYS = ['chatFontScale', 'chatOpacity', 'compactChat'];
 const COMBAT_KEYS = [
-  'startAttackOnAbilityUse',
-  'actionCombat',
+  'actionCamera',
   'stopAutoAttackOnTargetSwitch',
   'showAttackButton',
   'walkByAutoloot',

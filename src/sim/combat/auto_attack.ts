@@ -31,7 +31,7 @@ import { isArenaPos, MOBS } from '../data';
 import { questGateBlocksAggro } from '../mob/quest_gated_aggro';
 import { forceDismount } from '../mounts';
 import { grantDevotionFromBlock } from '../paladin_devotion';
-import { scheduleProjectile } from '../projectile_travel';
+import { scheduleBallisticProjectile, scheduleProjectile } from '../projectile_travel';
 import type { PlayerMeta } from '../sim';
 import type { SimContext } from '../sim_context';
 import { resolveTalentHitMult } from '../talent_hit_mult';
@@ -54,6 +54,11 @@ import {
 import { drawWeapon } from '../weapon_stow';
 import { applyRageSpendCooldownRefund, spendResource } from './casting_lifecycle';
 import { blindMissBonus, isDisarmed, isInStasis, isStunned } from './cc';
+import {
+  combatAimAngle,
+  selectFirstTargetOnSegment,
+  selectMeleeConeTargets,
+} from './directional_attack';
 import { druidEngineOnLandedStrike } from './druid_engines';
 import { consumeNextAttackCrit } from './empower_next';
 import { runWeaponProcs } from './equip_procs';
@@ -126,20 +131,40 @@ export function startAutoAttack(ctx: SimContext, pid?: number): void {
   if (isInStasis(p)) return;
   if (isValkyrsCallingAirborne(p)) return;
   if (p.auras.some((a) => isTravelFormAuraKind(a.kind))) return;
-  const t = p.targetId !== null ? ctx.entities.get(p.targetId) : null;
-  // A target that just DIED (commonly the mob the engaging spell killed) is not a
-  // user error: engaging a corpse is a silent no-op. This stops the "Attack on
-  // Ability Use" QoL from popping a spurious "Invalid attack target." toast on a
-  // killing blow (e.g. a Fire mage's Cinderfall). Because this runs in the shared
-  // sim, the authoritative server drops a client engage sent against a stale
-  // still-alive snapshot just as quietly. A genuinely invalid target (none, or a
-  // friendly) still reports the error.
-  if (t?.dead) return;
-  // Vanish (hasEscapeStealth) makes the target fully undetectable, same as a
-  // mob that lost line of sight on a stealthed player (mob/targeting.ts): a
-  // fresh engage against it is refused exactly like any other invalid target.
-  if (!t || !ctx.isHostileTo(p, t) || hasEscapeStealth(t)) {
-    ctx.error(p.id, 'Invalid attack target.');
+  if (ctx.playerDirectionalCombat === undefined) {
+    const target = p.targetId !== null ? ctx.entities.get(p.targetId) : null;
+    if (target?.dead) return;
+    if (!target || !ctx.isHostileTo(p, target) || hasEscapeStealth(target)) {
+      ctx.error(p.id, 'Invalid attack target.');
+      return;
+    }
+    if (p.mountKey !== '') forceDismount(ctx, p);
+    if (p.sitting) ctx.standUp(p);
+    if (p.weaponStowed) drawWeapon(p);
+    p.autoAttack = true;
+    r.meta.lastActiveTick = ctx.tickCount;
+    const distance = dist2d(p.pos, target.pos);
+    if (
+      distance <= MELEE_RANGE &&
+      !p.castingAbility &&
+      target.kind === 'mob' &&
+      target.hostile &&
+      target.ownerId === null &&
+      target.aiState !== 'evade'
+    ) {
+      if (questGateBlocksAggro(ctx.players, target, p)) {
+        p.autoAttack = false;
+        return;
+      }
+      if (target.aiState === 'idle' && !ctx.aggroMob(target, p, true)) {
+        p.autoAttack = false;
+        return;
+      }
+      if (target.aggroTargetId === null) target.aggroTargetId = p.id;
+      addThreat(target, p.id, 1);
+      p.combatTimer = 0;
+      p.inCombat = true;
+    }
     return;
   }
   // Auto-dismount when the player is mounted and starts auto-attack.
@@ -147,49 +172,38 @@ export function startAutoAttack(ctx: SimContext, pid?: number): void {
   if (p.sitting) ctx.standUp(p);
   if (p.weaponStowed) drawWeapon(p);
   p.autoAttack = true;
+  r.meta.basicAttackHeld = true;
   r.meta.lastActiveTick = ctx.tickCount; // starting auto-attack is a deliberate action
-  // Engaging MELEE auto-attack seeds aggro at once, because the swing lands almost
-  // immediately. Ranged auto-attack (wand / auto shot, up to 30-35yd) must NOT pre-aggro
-  // at engage: its threat comes from the shot LANDING (rangedSwing schedules a projectile
-  // whose impact aggros, like the spell it accompanies). Otherwise the "Attack on Ability
-  // Use" QoL, which engages auto-attack when you cast a damaging spell, pulls a distant
-  // mob the instant the cast starts, before anything lands.
-  const d = dist2d(p.pos, t.pos);
-  // The melee seed is additionally gated on no cast in progress: the swing loop is
-  // paused while casting (updatePlayerAutoAttack bails on castingAbility), so a
-  // mid-cast Attack press must not aggro an untouched mob (the aggro-before-damage
-  // bug, #1324). The toggle still arms autoAttack above; once the cast resolves, the
-  // first landed swing (or the spell's own damage) aggros the target legitimately.
-  if (
-    d <= MELEE_RANGE &&
-    !p.castingAbility &&
-    t.kind === 'mob' &&
-    t.hostile &&
-    t.ownerId === null &&
-    t.aiState !== 'evade'
-  ) {
-    if (questGateBlocksAggro(ctx.players, t, p)) {
-      p.autoAttack = false;
-      return;
-    }
-    if (t.aiState === 'idle' && !ctx.aggroMob(t, p, true)) {
-      p.autoAttack = false;
-      return;
-    } else if (t.aggroTargetId === null) {
-      t.aggroTargetId = p.id;
-    }
-    addThreat(t, p.id, 1);
-    p.combatTimer = 0;
-    p.inCombat = true;
-  }
 }
 
 export function stopAutoAttack(ctx: SimContext, pid?: number): void {
   const r = ctx.resolve(pid);
-  if (r) r.e.autoAttack = false;
+  if (r) {
+    r.e.autoAttack = false;
+    r.meta.basicAttackHeld = false;
+  }
 }
 
-export function updatePlayerAutoAttack(ctx: SimContext, p: Entity, meta: PlayerMeta): void {
+function autoAttackCandidates(ctx: SimContext, player: Entity, maxRange: number): Entity[] {
+  const candidates: Entity[] = [];
+  const paddedRange = Math.max(0, maxRange) + 2;
+  const paddedRangeSq = paddedRange * paddedRange;
+  for (const entity of ctx.entities.values()) {
+    if (
+      entity.id === player.id ||
+      entity.dead ||
+      !ctx.isHostileTo(player, entity) ||
+      hasEscapeStealth(entity)
+    )
+      continue;
+    const dx = entity.pos.x - player.pos.x;
+    const dz = entity.pos.z - player.pos.z;
+    if (dx * dx + dz * dz <= paddedRangeSq) candidates.push(entity);
+  }
+  return candidates;
+}
+
+function updateLegacyPlayerAutoAttack(ctx: SimContext, p: Entity, meta: PlayerMeta): void {
   p.swingTimer = Math.max(0, p.swingTimer - DT);
   p.offhandSwingTimer = Math.max(0, p.offhandSwingTimer - DT);
   if (isValkyrsCallingAirborne(p)) return;
@@ -198,21 +212,117 @@ export function updatePlayerAutoAttack(ctx: SimContext, p: Entity, meta: PlayerM
     return;
   }
   if (!p.autoAttack || p.castingAbility) return;
-  const t = p.targetId !== null ? ctx.entities.get(p.targetId) : null;
-  // A target that slips into Vanish's escape stealth mid-fight must drop the
-  // swing too (issue #2426): the client stops rendering it as targeted, but
-  // without this the swing kept connecting on a target the caster could no
-  // longer see, the same detection the mob AI already honors (mobCanSeeTarget).
-  if (!t || t.dead || !ctx.isHostileTo(p, t) || hasEscapeStealth(t)) {
+  const target = p.targetId !== null ? ctx.entities.get(p.targetId) : null;
+  if (!target || target.dead || !ctx.isHostileTo(p, target) || hasEscapeStealth(target)) {
     p.autoAttack = false;
     return;
   }
   if (p.swingTimer > 0 && (!p.dualWielding || !p.offhandWeapon || p.offhandSwingTimer > 0)) return;
+  if (isStunned(p) || isDisarmed(p)) return;
+  const distance = dist2d(p.pos, target.pos);
+  const facingDiff = Math.abs(normAngle(angleTo(p.pos, target.pos) - p.facing));
+  if (facingDiff > MELEE_ARC) return;
+
+  if (p.mountKey !== '') forceDismount(ctx, p);
+  const ranged = rangedAutoProfile(p, meta.cls);
+  if (ranged && distance <= ranged.maxRange && distance >= (ranged.wand ? 0 : ranged.minRange)) {
+    if (!ctx.hasLineOfSight(p, target)) return;
+    ctx.breakGhostWolf(p);
+    const shot = rangedShotProfile(ranged, p.weapon);
+    rangedSwing(ctx, p, target, { ...ranged, min: shot.min, max: shot.max, speed: shot.speed });
+    p.swingTimer = (shot.speed * ctx.swingIntervalMult(p)) / (1 + p.rangedHaste);
+    return;
+  }
+  if (distance > MELEE_RANGE) return;
+  if (isArenaPos(p.pos.x) && !ctx.hasLineOfSight(p, target)) return;
+  ctx.breakGhostWolf(p);
+  const dualWieldWhiteMissPenalty = hasDualWieldWhiteMissPenalty(ctx, p, meta);
+
+  if (p.swingTimer <= 0) {
+    let bonus = 0;
+    let abilityName: string | null = null;
+    let abilityId: string | undefined;
+    let threatFlat = 0;
+    let threatMult = 1;
+    let weaponMult = 1;
+    if (p.queuedOnSwing) {
+      const queued = ctx.resolvedAbility(p.queuedOnSwing, p.id);
+      if (queued) {
+        const effect = queued.effects.find((entry) => entry.type === 'weaponDamage');
+        const queuedCost =
+          p.queuedOnSwingFree === true
+            ? 0
+            : Math.ceil(queued.cost * (p.queuedOnSwingCostMultiplier ?? 1));
+        if (p.resource >= queuedCost && effect && effect.type === 'weaponDamage') {
+          spendResource(p, queuedCost);
+          applyRageSpendCooldownRefund(ctx, p, meta, p.resourceType === 'rage' ? queuedCost : 0);
+          if (queued.def.cooldown > 0) p.cooldowns.set(queued.def.id, queued.def.cooldown);
+          bonus = effect.bonus;
+          abilityName = queued.def.name;
+          abilityId = queued.def.id;
+          threatFlat = queued.threatFlat;
+          threatMult = queued.threatMult;
+          weaponMult = resolveTalentHitMult(queued.def, ctx.playerMods(meta)).dmgMult;
+        }
+      }
+      p.queuedOnSwing = null;
+      delete p.queuedOnSwingFree;
+      delete p.queuedOnSwingCostMultiplier;
+    }
+    const connected = meleeSwing(ctx, p, target, bonus, abilityName, {
+      autoAttackHand: 'mainhand',
+      abilityId,
+      threatFlat,
+      threatMult,
+      weaponMult,
+      whiteDualWieldPenalty: dualWieldWhiteMissPenalty && abilityName === null,
+      autoAttack: true,
+    });
+    const extraAttackPct = ctx.playerMods(meta).global.extraAttackPct;
+    if (connected && abilityName === null && extraAttackPct > 0 && ctx.rng.chance(extraAttackPct)) {
+      meleeSwing(ctx, p, target, 0, null, {
+        autoAttackHand: 'mainhand',
+        whiteDualWieldPenalty: dualWieldWhiteMissPenalty,
+        autoAttack: true,
+      });
+    }
+    maybeProcBattleTrance(ctx, p, meta, connected);
+    maybeProcSuddenDeath(ctx, p, meta, connected);
+    p.swingTimer =
+      (baseSwingSpeed(p) * ctx.swingIntervalMult(p)) / (1 + stanceMasteryAutoHaste(ctx, p, meta));
+  }
+  if (p.dualWielding && p.offhandWeapon && p.offhandSwingTimer <= 0) {
+    const offhand = p.offhandWeapon;
+    const connected = meleeSwing(ctx, p, target, 0, null, {
+      weapon: offhand,
+      autoAttackHand: 'offhand',
+      apSwingSpeed: offhand.speed,
+      whiteDualWieldPenalty: dualWieldWhiteMissPenalty,
+      autoAttack: true,
+    });
+    maybeProcBattleTrance(ctx, p, meta, connected);
+    maybeProcSuddenDeath(ctx, p, meta, connected);
+    p.offhandSwingTimer =
+      (offhand.speed * ctx.swingIntervalMult(p)) / (1 + stanceMasteryAutoHaste(ctx, p, meta));
+  }
+}
+
+export function updatePlayerAutoAttack(ctx: SimContext, p: Entity, meta: PlayerMeta): void {
+  if (ctx.playerDirectionalCombat === undefined) {
+    updateLegacyPlayerAutoAttack(ctx, p, meta);
+    return;
+  }
+  p.swingTimer = Math.max(0, p.swingTimer - DT);
+  p.offhandSwingTimer = Math.max(0, p.offhandSwingTimer - DT);
+  if (isValkyrsCallingAirborne(p)) return;
+  if (p.auras.some((a) => isTravelFormAuraKind(a.kind))) {
+    p.autoAttack = false;
+    return;
+  }
+  if (!p.autoAttack || p.castingAbility) return;
+  if (p.swingTimer > 0 && (!p.dualWielding || !p.offhandWeapon || p.offhandSwingTimer > 0)) return;
   if (isStunned(p)) return;
   if (isDisarmed(p)) return; // weapon knocked away: no auto-attack swings
-  const d = dist2d(p.pos, t.pos);
-  const facingDiff = Math.abs(normAngle(angleTo(p.pos, t.pos) - p.facing));
-  if (facingDiff > MELEE_ARC) return;
 
   // ranged auto-attack: hunters (auto shot, dead zone inside minRange) and
   // casters (wand-style, no dead zone so they don't run into melee, #94).
@@ -223,24 +333,75 @@ export function updatePlayerAutoAttack(ctx: SimContext, p: Entity, meta: PlayerM
   // mirroring the ghost_wolf break pattern below and the startAutoAttack guard.
   if (p.mountKey !== '') forceDismount(ctx, p);
   const ranged = rangedAutoProfile(p, meta.cls);
-  if (ranged && d <= ranged.maxRange && d >= (ranged.wand ? 0 : ranged.minRange)) {
-    if (!ctx.hasLineOfSight(p, t)) return;
+  if (ranged) {
     ctx.breakGhostWolf(p);
     // Hunters shoot with their equipped weapon (damage range + speed), casters
     // with their fixed class wand; the shot then fires at that resolved profile.
     const shot = rangedShotProfile(ranged, p.weapon);
-    rangedSwing(ctx, p, t, { ...ranged, min: shot.min, max: shot.max, speed: shot.speed });
+    const angle = combatAimAngle(p, meta);
+    p.facing = angle;
+    const rangedProfile = { ...ranged, min: shot.min, max: shot.max, speed: shot.speed };
+    if (ctx.playerDirectionalCombat === false) {
+      const target = selectFirstTargetOnSegment({
+        origin: p.pos,
+        angle,
+        maxDistance: ranged.maxRange,
+        minDistance: ranged.wand ? 0 : ranged.minRange,
+        candidates: autoAttackCandidates(ctx, p, ranged.maxRange),
+      });
+      if (target) rangedSwing(ctx, p, target, rangedProfile);
+      else {
+        ctx.emit({
+          type: 'spellfx',
+          sourceId: p.id,
+          targetId: p.id,
+          school: ranged.wand ? (ranged.school ?? 'arcane') : 'physical',
+          fx: 'selfCast',
+          ability: ranged.wand ? 'wand' : 'auto_shot',
+        });
+      }
+    } else {
+      rangedSwing(ctx, p, null, rangedProfile, {
+        angle,
+        maxDistance: ranged.maxRange,
+        minDistance: ranged.wand ? 0 : ranged.minRange,
+      });
+    }
     // The weapon's speed sets the cadence; ranged haste (item-set bonus) then
     // shortens the auto-shot interval.
     p.swingTimer = (shot.speed * ctx.swingIntervalMult(p)) / (1 + p.rangedHaste);
     return;
   }
-  if (d > MELEE_RANGE) return;
-  // Melee normally skips line of sight (it's always point-blank), but the
-  // arena's thin enclosing walls sit inside MELEE_RANGE: without this a
-  // combatant pressed against a wall could swing through it. See sibling
-  // logic in Sim.abilityNeedsLineOfSight.
-  if (isArenaPos(p.pos.x) && !ctx.hasLineOfSight(p, t)) return;
+  const targets = selectMeleeConeTargets({
+    origin: p.pos,
+    facing: p.facing,
+    range: MELEE_RANGE,
+    candidates: autoAttackCandidates(ctx, p, MELEE_RANGE).filter(
+      (candidate) => !isArenaPos(p.pos.x) || ctx.hasLineOfSight(p, candidate),
+    ),
+    cap: ctx.playerDirectionalCombat === false ? 1 : undefined,
+  });
+  if (targets.length === 0) {
+    if (p.swingTimer <= 0) {
+      ctx.emit({
+        type: 'spellfx',
+        sourceId: p.id,
+        targetId: p.id,
+        school: 'physical',
+        fx: 'selfCast',
+        ability: 'attack',
+      });
+      p.swingTimer =
+        (baseSwingSpeed(p) * ctx.swingIntervalMult(p)) / (1 + stanceMasteryAutoHaste(ctx, p, meta));
+    }
+    if (p.dualWielding && p.offhandWeapon && p.offhandSwingTimer <= 0) {
+      p.offhandSwingTimer =
+        (p.offhandWeapon.speed * ctx.swingIntervalMult(p)) /
+        (1 + stanceMasteryAutoHaste(ctx, p, meta));
+    }
+    return;
+  }
+  p.targetId = targets[0].id;
   ctx.breakGhostWolf(p);
   const dualWieldWhiteMissPenalty = hasDualWieldWhiteMissPenalty(ctx, p, meta);
 
@@ -282,28 +443,39 @@ export function updatePlayerAutoAttack(ctx: SimContext, p: Entity, meta: PlayerM
       delete p.queuedOnSwingFree;
       delete p.queuedOnSwingCostMultiplier;
     }
-    const connected = meleeSwing(ctx, p, t, bonus, abilityName, {
-      autoAttackHand: 'mainhand',
-      abilityId,
-      threatFlat,
-      threatMult,
-      weaponMult,
-      whiteDualWieldPenalty: dualWieldWhiteMissPenalty && abilityName === null,
-      autoAttack: true,
-    });
+    let primaryConnected = false;
+    for (let index = 0; index < targets.length; index++) {
+      const connected = meleeSwing(ctx, p, targets[index], bonus, abilityName, {
+        autoAttackHand: 'mainhand',
+        abilityId,
+        threatFlat,
+        threatMult,
+        weaponMult,
+        whiteDualWieldPenalty: dualWieldWhiteMissPenalty && abilityName === null,
+        autoAttack: true,
+      });
+      if (index === 0) primaryConnected = connected;
+      maybeProcBattleTrance(ctx, p, meta, connected);
+      maybeProcSuddenDeath(ctx, p, meta, connected);
+    }
     // Thuggery mastery (Sword Specialization shape): a landed mainhand auto has
     // a chance to swing once more. The pct gate keeps the rng stream untouched
     // for everyone without the mastery, and the extra swing cannot chain.
     const extraAttackPct = ctx.playerMods(meta).global.extraAttackPct;
-    if (connected && abilityName === null && extraAttackPct > 0 && ctx.rng.chance(extraAttackPct)) {
-      meleeSwing(ctx, p, t, 0, null, {
-        autoAttackHand: 'mainhand',
-        whiteDualWieldPenalty: dualWieldWhiteMissPenalty,
-        autoAttack: true,
-      });
+    if (
+      primaryConnected &&
+      abilityName === null &&
+      extraAttackPct > 0 &&
+      ctx.rng.chance(extraAttackPct)
+    ) {
+      for (const target of targets) {
+        meleeSwing(ctx, p, target, 0, null, {
+          autoAttackHand: 'mainhand',
+          whiteDualWieldPenalty: dualWieldWhiteMissPenalty,
+          autoAttack: true,
+        });
+      }
     }
-    maybeProcBattleTrance(ctx, p, meta, connected);
-    maybeProcSuddenDeath(ctx, p, meta, connected);
     // Wolf Form swings at the fixed fast cat cadence, not the carried weapon's
     // speed (see combat/form_swing.ts); everyone else uses their weapon speed.
     // Melee haste (item sets + Enrage + haste buffs) lives in the ONE additive
@@ -314,15 +486,17 @@ export function updatePlayerAutoAttack(ctx: SimContext, p: Entity, meta: PlayerM
   }
   if (p.dualWielding && p.offhandWeapon && p.offhandSwingTimer <= 0) {
     const offhand = p.offhandWeapon;
-    const connected = meleeSwing(ctx, p, t, 0, null, {
-      weapon: offhand,
-      autoAttackHand: 'offhand',
-      apSwingSpeed: offhand.speed,
-      whiteDualWieldPenalty: dualWieldWhiteMissPenalty,
-      autoAttack: true,
-    });
-    maybeProcBattleTrance(ctx, p, meta, connected);
-    maybeProcSuddenDeath(ctx, p, meta, connected);
+    for (const target of targets) {
+      const connected = meleeSwing(ctx, p, target, 0, null, {
+        weapon: offhand,
+        autoAttackHand: 'offhand',
+        apSwingSpeed: offhand.speed,
+        whiteDualWieldPenalty: dualWieldWhiteMissPenalty,
+        autoAttack: true,
+      });
+      maybeProcBattleTrance(ctx, p, meta, connected);
+      maybeProcSuddenDeath(ctx, p, meta, connected);
+    }
     p.offhandSwingTimer =
       (offhand.speed * ctx.swingIntervalMult(p)) / (1 + stanceMasteryAutoHaste(ctx, p, meta));
   }
@@ -382,25 +556,31 @@ export const AUTO_SHOT_LABEL = 'Auto Shot';
 export function rangedSwing(
   ctx: SimContext,
   attacker: Entity,
-  target: Entity,
+  target: Entity | null,
   ranged: { min: number; max: number; speed: number; wand?: boolean; school?: string },
+  directional?: { angle: number; maxDistance: number; minDistance?: number },
 ): void {
   const school = ranged.wand ? (ranged.school ?? 'arcane') : 'physical';
   const label = ranged.wand ? 'Wand' : AUTO_SHOT_LABEL;
-  ctx.emit({
-    type: 'spellfx',
-    sourceId: attacker.id,
-    targetId: target.id,
-    school,
-    fx: 'projectile',
-    ...(ranged.wand ? { wand: true as const } : { attackAnimation: 'ranged-shot' as const }),
-  });
+  if (target && !directional) {
+    ctx.emit({
+      type: 'spellfx',
+      sourceId: attacker.id,
+      targetId: target.id,
+      school,
+      fx: 'projectile',
+      ...(ranged.wand ? { wand: true as const } : { attackAnimation: 'ranged-shot' as const }),
+    });
+  }
   if (!ranged.wand && attacker.kind === 'player') {
     onCastCompleted(ctx, attacker, 'auto_shot', target);
   }
   // The shot/bolt is in flight: its miss roll and damage land when it reaches the
   // target (projectile_travel), and fizzle if the target dies before impact.
-  scheduleProjectile(ctx, attacker, target, (atk, tgt) => {
+  const resolve = (atk: Entity, tgt: Entity) => {
+    // Physical contact, even one whose hit table becomes miss/dodge/parry,
+    // owns the hard target. Empty travel leaves manual click/Tab selection alone.
+    atk.targetId = tgt.id;
     const missChance = swingMissChance(atk, tgt) + blindMissBonus(atk);
     if (ctx.rng.chance(missChance)) {
       ctx.emit({
@@ -452,7 +632,24 @@ export function rangedSwing(
     // swing the mainhand, so casters never roll it. No-op (no rng draw) unless the
     // shooter wields a proc weapon with a weaponHit proc.
     if (!ranged.wand) runWeaponProcs(ctx, atk, tgt, 'weaponHit');
-  });
+  };
+  if (directional) {
+    scheduleBallisticProjectile(
+      ctx,
+      attacker,
+      {
+        angle: directional.angle,
+        minDistance: directional.minDistance,
+        maxDistance: directional.maxDistance,
+        school,
+        ability: ranged.wand ? 'wand' : 'auto_shot',
+        ...(ranged.wand ? { wand: true as const } : { attackAnimation: 'ranged-shot' as const }),
+      },
+      resolve,
+    );
+  } else if (target) {
+    scheduleProjectile(ctx, attacker, target, resolve);
+  }
 }
 
 // Returns true if the swing connected.

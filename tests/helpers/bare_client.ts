@@ -169,6 +169,7 @@ export function bareClient(pid: number, overrides: BareClientOverrides = {}): Cl
   c.activeConsecrations = [];
   c.profanityWords = [];
   c.mouselookFacing = null;
+  c.combatAimAngle = null;
   c.lastInputSentAt = 0;
   c.lastInputSig = '';
   c.inputSeq = 0;
@@ -231,8 +232,9 @@ export function bareClient(pid: number, overrides: BareClientOverrides = {}): Cl
 }
 
 export interface FakeClient {
-  // biome-ignore lint/suspicious/noExplicitAny: sent frames are untyped wire JSON, read all
-  // over the calling suites (msg.t, msg.list, ...); matches the idiom's prior local type.
+  // Sent frames are untyped wire JSON, read all over the calling suites
+  // (msg.t, msg.list, ...); this matches the idiom's prior local type.
+  // biome-ignore lint/suspicious/noExplicitAny: shared fixture intentionally mirrors raw wire JSON
   sent: any[];
   // biome-ignore lint/suspicious/noExplicitAny: mirrors the `ws` field GameServer.join expects
   ws: any;

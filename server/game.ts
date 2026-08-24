@@ -31,7 +31,6 @@ import {
   isBgPos,
   isDelvePos,
   MOBS,
-  ZONES,
   zoneAt,
 } from '../src/sim/data';
 import { devTierIndexForMergedPrs } from '../src/sim/dev_tier';
@@ -286,6 +285,7 @@ import {
   createMobScanTickStats,
   resetMobScanCaptureAccumulators,
 } from './mob_scan_tick_stats';
+import { MOB_ZONE_PHASE_PREFIX, mobZonePhase, SIM_MOB_ZONE_PHASES } from './mob_zone_phase';
 import { parseModerationChatCommand } from './moderation_commands';
 import {
   forceCharacterRename,
@@ -510,26 +510,6 @@ export const SIM_LAP_PHASES = [
   ...MOB_UPDATE_BUCKETS.map((b) => `mob.update|${b}`),
 ].map((n) => `sim.${n}`);
 
-// Per-zone attribution buckets for the mob.update phase. The mob loop
-// tags each mob.update lap with its entity; the host splits that slice of the phase
-// time by the mob's zone/group so a stall localizes to "which zone froze" instead of
-// only the phase total. These are HOST-DERIVED (the sim never emits them), so they are
-// registered in the profiler but deliberately kept OUT of SIM_LAP_PHASES (which pins
-// the sim's own emissions). Overworld mobs bucket by zone id; instance/delve mobs
-// (x beyond DUNGEON_X_THRESHOLD) share one 'instance' bucket; 'other' is a safety net.
-const MOB_ZONE_PHASE_PREFIX = 'sim.mob.z:';
-const MOB_ZONE_PHASE_INSTANCE = `${MOB_ZONE_PHASE_PREFIX}instance`;
-const MOB_ZONE_PHASE_OTHER = `${MOB_ZONE_PHASE_PREFIX}other`;
-// Pre-interned zone-id -> phase-name map so the per-mob probe allocates no strings.
-const MOB_ZONE_PHASE_BY_ID = new Map<string, string>(
-  ZONES.map((z) => [z.id, `${MOB_ZONE_PHASE_PREFIX}${z.id}`]),
-);
-export const SIM_MOB_ZONE_PHASES = [
-  ...ZONES.map((z) => `${MOB_ZONE_PHASE_PREFIX}${z.id}`),
-  MOB_ZONE_PHASE_INSTANCE,
-  MOB_ZONE_PHASE_OTHER,
-];
-
 // Per-key-group attribution buckets for the bcastSelf phase (selfWireJson).
 // HOST-DERIVED like the mob zone buckets and populated only while a detailed
 // capture is active, so a production capture names WHICH self key group eats
@@ -556,13 +536,6 @@ export const SELF_WIRE_PHASES = [
   'heavy', // the wireRev-gated heavy block + sport
   'assemble', // the final base-JSON + extras splice (multi-KB copy on a heavy payload)
 ].map((n) => `self.${n}`);
-
-// The zone/group bucket a mob's update cost is attributed to. Pure and allocation-free
-// (a cheap zoneAt band scan plus a Map lookup of an interned string).
-export function mobZonePhase(mob: Entity): string {
-  if (mob.pos.x > DUNGEON_X_THRESHOLD) return MOB_ZONE_PHASE_INSTANCE;
-  return MOB_ZONE_PHASE_BY_ID.get(zoneAt(mob.pos.x, mob.pos.z).id) ?? MOB_ZONE_PHASE_OTHER;
-}
 
 const ARENA_WIRE_HZ = 0.1;
 const ARENA_WIRE_INTERVAL_TICKS = Math.max(1, Math.round(1 / (DT * ARENA_WIRE_HZ)));
@@ -2098,6 +2071,7 @@ export class GameServer {
       playerClass: 'warrior',
       noPlayer: true,
       devCommands: process.env.ALLOW_DEV_COMMANDS === '1',
+      playerDirectionalCombat: process.env.PLAYER_DIRECTIONAL_COMBAT !== '0',
       // Thunzharr is up as soon as the realm boots; subsequent rises keep the
       // normal interval cadence (see src/sim/world_boss.ts).
       worldBossAtBoot: true,
@@ -6586,6 +6560,9 @@ export class GameServer {
       if (!meta || !e) return;
       const frame = parseMoveInputFrame(msg);
       Object.assign(meta.moveInput, frame.moveInput);
+      // Older clients and malformed/non-finite aim fields safely fall back to
+      // the current facing instead of retaining a stale previous cursor ray.
+      meta.combatAimAngle = frame.combatAimAngle ?? frame.facing ?? e.facing;
       session.lastInputAt = sim.time;
       if (typeof msg.seq === 'number' && Number.isFinite(msg.seq) && msg.seq > 0) {
         const seq = Math.floor(msg.seq);

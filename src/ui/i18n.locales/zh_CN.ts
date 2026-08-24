@@ -12828,6 +12828,8 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
     '比赛进行中退出即为逃跑，而排名阶梯不能奖励在落后时拔掉插头的人：逃跑者当场记下这场失利与随之而来的评分损失，若正携旗则将旗帜掉落，其队伍则少一人继续作战。最后这一点正是空位的由来。当一场比赛缺人时，队列可以把这个位置让给正在等待的人，而这始终是一份你可以接受或拒绝的邀请，而不是径直把你传送过去；拒绝不需付出任何代价，位置会顺延给下一位。只有单人排队者会被询问，因此一同排队的小队绝不会被拆散去填补空缺。',
   'guide.thornhollowPage.backfillNote':
     '接下补位的席位是刻意不带风险的：你落入的是一份与你无关的比分，因此无论胜负，这场比赛都不会触动你的战场评分，中途离开也不欠任何代价。当一场比赛已接近尾声、新来者再也无法改变结果时，邀请也就不再发出，所以你绝不会被安置进别人的结局里。',
+  'hudChrome.keybinds.toggleActionCamera': '切换动作镜头',
+  'hudChrome.options.actionCamera': '动作镜头（准星）',
   'hudChrome.bags.lockItem': '锁定物品',
   'hudChrome.otaUpdate.applying': '更新已下载。正在重新启动游戏以应用更新。',
   'hudChrome.otaUpdate.continueAnyway': '暂不更新，继续游戏',

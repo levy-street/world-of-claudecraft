@@ -38,6 +38,7 @@ import {
 } from './game/click_move';
 import { clientEnvBits, installPageStateTracking, pageStateBits } from './game/client_env';
 import { getClientSeed } from './game/client_seed';
+import { createCombatAimController } from './game/combat_aim_controller';
 import { localPartyMemberIds } from './game/corpse_loot_availability';
 import { shouldClearAutorunOnDeath } from './game/death_input_reset';
 import { setDisplayChangeTarget } from './game/desktop_display_change';
@@ -70,6 +71,7 @@ import {
   suspendActiveEntryDiagnostics,
 } from './game/entry_diagnostics';
 import { GamepadManager } from './game/gamepad';
+import { dispatchGamepadAction } from './game/gamepad_action_dispatch';
 import { createGamepadActivityNotifier } from './game/gamepad_activity_notify';
 import { GamepadBindings } from './game/gamepad_bindings';
 import { shouldUseGamepadPointerMode } from './game/gamepad_pointer_mode';
@@ -347,6 +349,7 @@ import {
   validateEmailShape,
   validatePasswordChange,
 } from './ui/account_portal';
+import { createActionCameraCrosshair } from './ui/action_camera_crosshair';
 import { technicalErrorMessage, userFacingApiError } from './ui/api_error_i18n';
 import { formatFooterVersion } from './ui/app_version';
 import { type AppearanceCustomizer, mountAppearanceCustomizer } from './ui/appearance_customizer';
@@ -1424,6 +1427,7 @@ async function startGame(
   mountGameUi();
 
   const canvas = $('#game-canvas') as unknown as HTMLCanvasElement;
+  const actionCameraCrosshair = createActionCameraCrosshair();
   const nameplates = $('#nameplates') as HTMLDivElement;
 
   const keybinds = new Keybinds(keybindScope);
@@ -1893,6 +1897,7 @@ async function startGame(
       chatComposerFocused: document.activeElement === chatInput,
     });
 
+  let pointerBasicAttackStarted = false;
   const input = new Input(
     canvas,
     {
@@ -1916,6 +1921,23 @@ async function startGame(
       onAbility: (slot) => hud.castSlot(slot),
       onAbilityDown: (slot) => hud.pressSlot(slot),
       onAbilityUp: (slot) => hud.releaseSlot(slot),
+      onBasicAttackStart: () => {
+        if (hud.isGroundAimActive()) {
+          hud.commitGroundAimAt();
+          pointerBasicAttackStarted = false;
+          return;
+        }
+        pointerBasicAttackStarted = true;
+        combatAim.sync();
+        world.startAutoAttack();
+      },
+      onBasicAttackStop: () => {
+        if (!pointerBasicAttackStarted) return;
+        pointerBasicAttackStarted = false;
+        world.stopAutoAttack();
+      },
+      onToggleActionCamera: () => applySetting('actionCamera', !settings.get('actionCamera')),
+      onRightMouseRelease: () => hud.cancelGroundAim(),
       onInputIntent: (kind) => perf.markInputIntent(kind),
       onUiKey: (key) => {
         if (key !== 'escape') hud.cancelGroundAim();
@@ -2020,6 +2042,14 @@ async function startGame(
     keybinds,
   );
   input.camYaw = world.player.facing;
+  const combatAim = createCombatAimController({
+    canvas,
+    input,
+    player: () => world.player,
+    groundPoint: (x, y, planeY) => renderer.groundPoint(x, y, planeY),
+    offlineMeta: () => offlineSim?.meta(offlineSim.playerId) ?? null,
+    online: () => online,
+  });
   perf.setInputDebugProvider(() => ({
     ...input.debugState(),
     canUseGameKeys: !gameplayInputBlocked(),
@@ -2175,155 +2205,21 @@ async function startGame(
   }, APM_BEAT_MS);
   const gamepadBindings = new GamepadBindings();
   const canUseGameKeysNow = () => !gameplayInputBlocked();
-  function dispatchGamepadAction(id: string): void {
-    if (id === 'escape') {
-      if (dismissCameraPrompt()) return;
-      if (hud.cancelGroundAim()) return;
-      if (!hud.closeAll()) hud.toggleOptionsMenu();
-      return;
-    }
-    if (!canUseGameKeysNow()) return; // suppress play actions while a modal/chat is up
-    if (id.startsWith('slot')) {
-      hud.castSlot(Number(id.slice(4)));
-      return;
-    }
-    hud.cancelGroundAim();
-    switch (id) {
-      case 'target':
-        world.tabTarget();
-        break;
-      case 'targetPrev':
-        world.tabTargetPrev();
-        break;
-      case 'targetFriendly':
-        world.targetNearestFriendly();
-        break;
-      case 'targetFriendlyNext':
-        world.friendlyTabTarget();
-        break;
-      case 'interact': {
-        // The pad reel (the UX pass): mid fishing cast, the interact press
-        // answers the bite by re-using the rod (the sim's armed-window arm),
-        // instead of running a nearby scan over a live bobber and forcing
-        // the angler into cursor-mode bag clicks. Resolves the B-button
-        // interact conflict for pad anglers; keyboard anglers keep their
-        // hotbar/bags press unchanged.
-        const reelRod = padReelItemId(world.player.castingAbility, world.inventory);
-        if (reelRod !== null) {
-          world.useItem(reelRod);
-          break;
-        }
-        interactKey();
-        break;
-      }
-      case 'bags':
-        hud.toggleBags();
-        break;
-      case 'char':
-        hud.toggleChar();
-        break;
-      case 'spellbook':
-        hud.toggleSpellbook();
-        break;
-      case 'questlog':
-        hud.toggleQuestLog();
-        break;
-      case 'map':
-        hud.toggleMap();
-        break;
-      case 'nameplates':
-        renderer.showNameplates = !renderer.showNameplates;
-        break;
-      case 'talents':
-        hud.toggleTalents();
-        break;
-      case 'meters':
-        hud.toggleMeters();
-        break;
-      case 'targetAuras':
-        hud.toggleTargetAuras();
-        break;
-      case 'social':
-        hud.toggleSocial();
-        break;
-      case 'arena':
-        hud.toggleArena();
-        break;
-      case 'valecup':
-        hud.toggleValeCup();
-        break;
-      case 'bgFlag':
-        bgFlagKey();
-        break;
-      case 'mount':
-        world.toggleMounted();
-        break;
-      case 'leaderboard':
-        hud.toggleLeaderboard();
-        break;
-      case 'calendar':
-        hud.toggleCalendar();
-        break;
-      case 'discord':
-        toggleDiscordPanel();
-        break;
-      case 'deeds':
-        hud.toggleDeeds();
-        break;
-      case 'professions':
-        hud.toggleProfessions();
-        break;
-      case 'reliquary':
-        hud.toggleReliquary();
-        break;
-      case 'crafting':
-        // The controller panel has always OFFERED this bind (it lists every
-        // edge keybind action); the dispatch dropped it silently.
-        hud.toggleCrafting();
-        break;
-      case 'petStop':
-        // The pet edges, the dungeon finder, and the sheathe toggle: the
-        // same offered-but-dropped sweep that found Crafting (the controller
-        // panel lists every edge keybind action), each wired to its exact
-        // keyboard handler.
-        world.setPetMode('passive');
-        break;
-      case 'petTaunt':
-        world.petTaunt();
-        break;
-      case 'petAttack':
-        world.petAttack();
-        break;
-      case 'petDefensive':
-        world.setPetMode('defensive');
-        break;
-      case 'petAggressive':
-        world.setPetMode('aggressive');
-        break;
-      case 'targetPet':
-        hud.targetOwnPet();
-        break;
-      case 'dungeonFinder':
-        hud.toggleDungeonFinder();
-        break;
-      case 'sheathe': {
-        // The keyboard arm's exact rule: the world owns the gate, the cue
-        // plays only when the state moved.
-        const wasStowed = world.player.weaponStowed;
-        world.toggleWeaponStow();
-        if (world.player.weaponStowed !== wasStowed) {
-          if (world.player.weaponStowed) audio.weaponSheathe();
-          else audio.weaponUnsheathe();
-        }
-        break;
-      }
-      case 'chat':
-        openChat();
-        break;
-    }
-  }
+  const gamepadActionDeps = {
+    world,
+    hud,
+    renderer,
+    audio,
+    dismissCameraPrompt,
+    canUseGameKeys: canUseGameKeysNow,
+    interact: interactKey,
+    battlegroundFlag: bgFlagKey,
+    toggleDiscord: toggleDiscordPanel,
+    openChat,
+    toggleActionCamera: () => applySetting('actionCamera', !settings.get('actionCamera')),
+  };
   const gamepad = new GamepadManager(input, gamepadBindings, {
-    onAction: (id) => dispatchGamepadAction(id),
+    onAction: (id) => dispatchGamepadAction(id, gamepadActionDeps),
     onInputEdge: () => inputMeter.record(performance.now()),
     isPointerMode: () =>
       shouldUseGamepadPointerMode(
@@ -2453,15 +2349,10 @@ async function startGame(
       settings.set('filterProfanity', !!value);
       return;
     }
-    if (key === 'startAttackOnAbilityUse') {
-      // No live subsystem to update: the HUD reads this setting at ability-cast
-      // time (see hud.castSlot). Persist the choice and we are done.
-      settings.set('startAttackOnAbilityUse', !!value);
-      return;
-    }
-    if (key === 'actionCombat') {
-      // Read live by Hud.castSlot; persistence is the only subsystem update.
-      settings.set('actionCombat', !!value);
+    if (key === 'actionCamera') {
+      const v = settings.set('actionCamera', !!value);
+      input.setActionCameraEnabled(v);
+      actionCameraCrosshair.setVisible(v && input.isActionCameraLocked());
       return;
     }
     if (key === 'stopAutoAttackOnTargetSwitch') {
@@ -3014,14 +2905,8 @@ async function startGame(
     },
     captureKey: (cb) => input.captureNextKey(cb),
     settings,
-    actionCombatAim: () => {
-      const cursor = input.cursorPoint();
-      if (!cursor) return null;
-      const pickedId = renderer.pick(cursor.x, cursor.y);
-      const picked = pickedId !== null ? world.entities.get(pickedId) : null;
-      if (picked) return { x: picked.pos.x, z: picked.pos.z };
-      return renderer.groundPoint(cursor.x, cursor.y, world.player.pos.y);
-    },
+    combatAim: () => combatAim.point(),
+    syncCombatAim: () => combatAim.sync(),
     onSettingChange: (key, value) => applySetting(key, value),
     graphicsApplied: () => appliedGraphicsSettings,
     applyGraphics: async (draft) => {
@@ -3508,7 +3393,7 @@ async function startGame(
     // Chromium builds also expose a synthetic hover cursor parked at (0, 0);
     // reading it here would erase the finger-owned point every render frame.
     if (!document.body.classList.contains('mobile-touch')) {
-      const cursor = input.cursorPoint();
+      const cursor = combatAim.screenPoint();
       hud.updateGroundAimPoint(
         cursor ? renderer.groundPoint(cursor.x, cursor.y, world.player.pos.y) : null,
       );
@@ -4362,8 +4247,12 @@ async function startGame(
     if (shouldClearAutorunOnDeath(playerWasDead, playerDead)) {
       input.setAutorun(false);
       mobileControls.syncAutorun(false);
+      world.stopAutoAttack();
     }
     playerWasDead = playerDead;
+    actionCameraCrosshair.setVisible(
+      settings.get('actionCamera') && input.isActionCameraLocked() && !gameplayInputBlocked(),
+    );
     const frameDtMs = frameDt * 1000;
     let traceStart = perf.startTrace();
     try {
@@ -4424,6 +4313,9 @@ async function startGame(
       // itself, to stay deterministic).
       feedSimCalendar(offlineSim);
       while (acc >= DT) {
+        const aim = combatAim.current();
+        const meta = offlineSim.meta(offlineSim.playerId);
+        if (meta) meta.combatAimAngle = aim.angle;
         const { mi, facing } = resolveMove(
           mouselook,
           offlineSim.player.pos,
@@ -4607,6 +4499,7 @@ async function startGame(
       net.moveInput.turnRight = false;
     }
     net.setMouselookFacing(netFacing);
+    net.setCombatAimAngle(combatAim.current().angle);
     // Online streams facing every frame, so the mouselook release yaw is
     // consumed here; drop it so it is not re-applied next frame.
     pendingReleaseFacing = null;
@@ -5227,6 +5120,10 @@ async function startOffline(
         playerClass,
         playerName: name,
         devCommands: import.meta.env.DEV,
+        // Directional combat is the normal player runtime contract. The Sim
+        // library itself remains opt-in so old deterministic fixtures do not
+        // silently gain a synthetic aim source.
+        playerDirectionalCombat: true,
         // The offline world runs the ranked rift portal scheduler like the live
         // server (custom editor play-test maps keep it off: their zones differ).
         riftPortals: world === undefined,

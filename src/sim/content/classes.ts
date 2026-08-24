@@ -6881,7 +6881,8 @@ export const ABILITIES: Record<string, AbilityDef> = {
     cooldown: 10,
     range: 0,
     school: 'physical',
-    requiresTarget: true,
+    requiresTarget: false,
+    playerAttackResolution: 'selfArea',
     effects: [
       {
         type: 'aoeDamage',

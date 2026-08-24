@@ -1,4 +1,5 @@
 import type { AbilityDef } from '../types';
+import { abilityUsesDirectionalHostileAim } from './directional_attack';
 
 export interface ActionCombatAim {
   x: number;
@@ -30,13 +31,7 @@ export const ACTION_COMBAT_CONE_HALF_ANGLE = Math.PI / 6;
  * target rules.
  */
 export function abilityUsesActionCombatAim(ability: AbilityDef): boolean {
-  return (
-    ability.requiresTarget &&
-    !ability.targetsDead &&
-    ability.targetType !== 'friendly' &&
-    ability.targetMode !== 'position' &&
-    ability.id !== 'unleash_weapon'
-  );
+  return abilityUsesDirectionalHostileAim(ability);
 }
 
 /**
