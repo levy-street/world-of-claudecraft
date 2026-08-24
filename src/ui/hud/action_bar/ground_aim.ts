@@ -1,4 +1,5 @@
-import type { AbilityEffect, Entity } from '../../../sim/types';
+import type { AbilityDef, AbilityEffect, Entity } from '../../../sim/types';
+import { MELEE_RANGE } from '../../../sim/types';
 
 export interface AimPoint {
   x: number;
@@ -21,6 +22,22 @@ export function shouldUseGroundAim(
   desktopPreference: boolean,
 ): boolean {
   return mobileTouch ? abilityId === 'meteor' : desktopPreference;
+}
+
+/** Desktop combat skills enter a confirmable prepared state. Touch keeps its
+ * existing direct-cast controls, apart from authored ground placement. */
+export function shouldPrepareAbility(
+  ability: Pick<AbilityDef, 'id' | 'targetMode' | 'selfCentered'>,
+  mobileTouch: boolean,
+  groundPlacementEnabled: boolean,
+): boolean {
+  if (mobileTouch) {
+    return ability.targetMode === 'position' && !ability.selfCentered && groundPlacementEnabled;
+  }
+  if (ability.targetMode === 'position' && !ability.selfCentered) {
+    return groundPlacementEnabled;
+  }
+  return true;
 }
 
 export function createGroundAimState(): GroundAimState {
@@ -71,10 +88,27 @@ export function clampAimToRange(
 }
 
 export function abilityAoeRadius(res: { effects: readonly AbilityEffect[] }): number {
+  return explicitAbilityAoeRadius(res) ?? DEFAULT_GROUND_AOE_RADIUS;
+}
+
+export function explicitAbilityAoeRadius(res: {
+  effects: readonly AbilityEffect[];
+}): number | null {
   const effect = res.effects.find(
     (eff) =>
       eff.type === 'aoeDamage' || eff.type === 'groundAoE' || eff.type === 'temporalHourglass',
   );
   if (effect?.type === 'temporalHourglass') return effect.captureRadius;
-  return effect && 'radius' in effect ? effect.radius : DEFAULT_GROUND_AOE_RADIUS;
+  return effect && 'radius' in effect ? effect.radius : null;
+}
+
+/** Radius of the player-centered maximum-range guide for a prepared skill. */
+export function abilityPreviewRange(res: {
+  def: Pick<AbilityDef, 'range' | 'requiresTarget' | 'selfCentered'>;
+  effects: readonly AbilityEffect[];
+}): number {
+  if (res.def.range > 0) return res.def.range;
+  const authoredArea = explicitAbilityAoeRadius(res);
+  if (authoredArea !== null) return authoredArea;
+  return res.def.requiresTarget ? MELEE_RANGE : 0;
 }

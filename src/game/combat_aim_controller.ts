@@ -1,3 +1,4 @@
+import { actionCameraScreenPoint } from '../ui/action_camera_anchor';
 import type { CombatAimIntent } from './combat_aim';
 import { pointAlongCombatAim, resolveCombatAimIntent } from './combat_aim';
 
@@ -46,9 +47,7 @@ export function createCombatAimController(deps: CombatAimControllerDeps): Combat
 
   function screenPoint(): { x: number; y: number } | null {
     if (!usesFacing()) return deps.input.cursorPoint();
-    const rect = deps.canvas.getBoundingClientRect();
-    if (rect.width <= 0 || rect.height <= 0) return null;
-    return { x: rect.left + rect.width / 2, y: rect.top + rect.height / 2 };
+    return actionCameraScreenPoint(deps.canvas.getBoundingClientRect());
   }
 
   function current(): CombatAimIntent {

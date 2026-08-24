@@ -374,12 +374,14 @@ import { CONSUMABLE_BAR_SLOTS, consumableBarItems } from './hud/action_bar/consu
 import {
   type AimPoint,
   abilityAoeRadius,
+  abilityPreviewRange,
   cancelGroundAim,
   clampAimToRange,
   commitGroundAim,
   createGroundAimState,
   enterGroundAim,
   type GroundAimState,
+  shouldPrepareAbility,
   shouldUseGroundAim,
 } from './hud/action_bar/ground_aim';
 import {
@@ -6927,12 +6929,23 @@ export class Hud {
     this.groundAimPoint = null;
     this.groundAimClamped = false;
     this.renderer.setGroundAimReticle(null);
+    this.renderer.setAbilityRangeReticle(null);
+    this.paintPreparedSlot(null);
     return true;
   }
 
   private beginGroundAim(abilityId: string, slot: number): void {
     this.groundAim = enterGroundAim(this.groundAim, abilityId, slot);
     this.groundAimPoint = null;
+    this.paintPreparedSlot(slot);
+  }
+
+  private paintPreparedSlot(slot: number | null): void {
+    for (let i = 0; i < this.abilityButtons.length; i++) {
+      const active = i === slot;
+      this.abilityButtons[i]?.btn.classList.toggle('prepared', active);
+      this.abilityButtons[i]?.btn.setAttribute('aria-pressed', active ? 'true' : 'false');
+    }
   }
 
   private activeGroundAimAbility(): ResolvedAbility | null {
@@ -6968,12 +6981,45 @@ export class Hud {
     if (!point) return null;
     const res = this.activeGroundAimAbility();
     if (!res) return null;
+    if (res.def.targetMode !== 'position' || res.def.selfCentered) return null;
     return {
       point,
       radius: abilityAoeRadius(res),
       school: res.def.school,
       clamped: this.groundAimClamped,
     };
+  }
+
+  abilityRangeReticle(): {
+    point: AimPoint;
+    radius: number;
+    school: string;
+  } | null {
+    if (!this.isGroundAimActive()) return null;
+    const res = this.activeGroundAimAbility();
+    if (!res) return null;
+    const radius = abilityPreviewRange(res);
+    if (radius <= 0) return null;
+    return {
+      point: { x: this.sim.player.pos.x, z: this.sim.player.pos.z },
+      radius,
+      school: res.def.school,
+    };
+  }
+
+  private castResolvedAbility(abilityId: string, resolved: ResolvedAbility): void {
+    const def = resolved.def;
+    if (
+      this.hoveredPartyPid !== null &&
+      (this.optionsHooks?.settings.get('mouseoverCast') ?? true) &&
+      def.requiresTarget &&
+      def.targetType === 'friendly' &&
+      this.sim.entities.has(this.hoveredPartyPid)
+    ) {
+      this.sim.castAbilityOn(abilityId, this.hoveredPartyPid);
+      return;
+    }
+    this.castActionAbility(abilityId, def);
   }
 
   commitGroundAimAt(rawPoint: AimPoint | null = this.groundAimPoint): boolean {
@@ -6992,7 +7038,13 @@ export class Hud {
     this.groundAimPoint = null;
     this.groundAimClamped = false;
     this.renderer.setGroundAimReticle(null);
-    this.sim.castAbilityAt(abilityId, point);
+    this.renderer.setAbilityRangeReticle(null);
+    this.paintPreparedSlot(null);
+    if (res.def.targetMode === 'position' && !res.def.selfCentered) {
+      this.sim.castAbilityAt(abilityId, point);
+    } else {
+      this.castResolvedAbility(abilityId, res);
+    }
     return true;
   }
 
@@ -7039,6 +7091,11 @@ export class Hud {
           this.flashActionSlot(barSlot);
           return;
         }
+        const mobileTouch = document.body.classList.contains('mobile-touch');
+        if (shouldPrepareAbility(resolved.def, mobileTouch, this.groundReticleEnabled(action.id))) {
+          this.beginGroundAim(action.id, barSlot);
+          return;
+        }
         // A self-centered channel (Bladestorm) casts at the caster's own feet:
         // no ground-aim reticle, straight to the normal cast path.
         if (resolved.def.targetMode === 'position' && !resolved.def.selfCentered) {
@@ -7055,18 +7112,7 @@ export class Hud {
           // while hovering a party frame lands on the hovered member instead of
           // the current target; the sim validates and falls back if it went stale.
           // Gated on the Interface option (mouseoverCast, on by default).
-          const def = resolved.def;
-          if (
-            this.hoveredPartyPid !== null &&
-            (this.optionsHooks?.settings.get('mouseoverCast') ?? true) &&
-            def.requiresTarget &&
-            def.targetType === 'friendly' &&
-            this.sim.entities.has(this.hoveredPartyPid)
-          ) {
-            this.sim.castAbilityOn(action.id, this.hoveredPartyPid);
-          } else {
-            this.castActionAbility(action.id, def);
-          }
+          this.castResolvedAbility(action.id, resolved);
         }
         this.flashActionSlot(barSlot);
       }

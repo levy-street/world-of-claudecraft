@@ -1427,7 +1427,7 @@ async function startGame(
   mountGameUi();
 
   const canvas = $('#game-canvas') as unknown as HTMLCanvasElement;
-  const actionCameraCrosshair = createActionCameraCrosshair();
+  const actionCameraCrosshair = createActionCameraCrosshair(canvas);
   const nameplates = $('#nameplates') as HTMLDivElement;
 
   const keybinds = new Keybinds(keybindScope);
@@ -3387,6 +3387,7 @@ async function startGame(
   function syncGroundAimReticle(): void {
     if (!hud.isGroundAimActive()) {
       renderer.setGroundAimReticle(null);
+      renderer.setAbilityRangeReticle(null);
       return;
     }
     // Touch placement is updated directly by MobileControls. Some mobile
@@ -3407,6 +3408,17 @@ async function startGame(
             radius: reticle.radius,
             school: reticle.school,
             dimmed: reticle.clamped,
+          }
+        : null,
+    );
+    const range = hud.abilityRangeReticle();
+    renderer.setAbilityRangeReticle(
+      range
+        ? {
+            x: range.point.x,
+            z: range.point.z,
+            radius: range.radius,
+            school: range.school,
           }
         : null,
     );

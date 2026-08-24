@@ -7,6 +7,7 @@ describe('ActionCameraCrosshair', () => {
     const element = {
       id: '',
       hidden: false,
+      style: { left: '', top: '' },
       setAttribute: vi.fn(),
       remove,
     };
@@ -16,7 +17,12 @@ describe('ActionCameraCrosshair', () => {
       body: { appendChild },
     } as unknown as Document;
 
-    const crosshair = createActionCameraCrosshair(doc);
+    const crosshair = createActionCameraCrosshair(
+      {
+        getBoundingClientRect: () => ({ left: 100, top: 40, width: 500, height: 300 }) as DOMRect,
+      },
+      doc,
+    );
     expect(element.id).toBe('action-camera-crosshair');
     expect(element.hidden).toBe(true);
     expect(element.setAttribute).toHaveBeenCalledWith('aria-hidden', 'true');
@@ -24,6 +30,7 @@ describe('ActionCameraCrosshair', () => {
 
     crosshair.setVisible(true);
     expect(element.hidden).toBe(false);
+    expect(element.style).toEqual({ left: '350px', top: '166px' });
     crosshair.setVisible(true);
     expect(element.hidden).toBe(false);
     crosshair.setVisible(false);

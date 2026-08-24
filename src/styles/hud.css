@@ -21,8 +21,6 @@
 @layer components {
   #action-camera-crosshair {
     position: fixed;
-    left: 50%;
-    top: 50%;
     width: 18px;
     height: 18px;
     transform: translate(-50%, -50%);
@@ -2526,6 +2524,14 @@
       0 0 10px #ffd100aa,
       inset 0 0 0 1px #ffd10077,
       inset 0 1px 0 #ffffff28;
+  }
+  .action-btn.prepared {
+    border-color: #f8e27a;
+    outline: 2px solid rgb(255 240 151 / 78%);
+    outline-offset: 2px;
+    box-shadow:
+      0 0 14px rgb(255 218 80 / 88%),
+      inset 0 0 0 2px rgb(255 250 196 / 48%);
   }
   .action-btn.empty {
     background: #0d0d13;
