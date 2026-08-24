@@ -16367,13 +16367,37 @@ THE READER COUNT, for the record: eighteen fresh readers over eleven review
 rounds, and every reviewed round found something the round before it had
 shipped, this ledger's author's rounds included.
 
+### THE FROZEN STAMP, BOTH ENDS
+
+Frozen at `182c28d649` (the ledger commit; the last code commit is
+`e3d8017619`, round eleven), with every reader idle AND reported, `git status`
+empty, `ps aux | grep -c "[v]itest"` at 0 and `DATABASE_URL` unset, then the
+full suite into its own log with the tip written as its first line. Fifteen
+commits since the 11k QA's frozen tip.
+
+| Check | 11k QA frozen tip `b94887558d` | 11l frozen tip `182c28d649` |
+|---|---|---|
+| vitest | EXIT=0, 3167 files / 21 skipped (3188); 46553 passed / 2 xfail / 373 skipped (46928) | **EXIT=0**, 3168 files / 21 skipped (3189); **46588** passed / 2 xfail / 373 skipped (46963) |
+| ci:changed | EXIT=0, 804 files, 0 errors | **EXIT=0**, 813 files, 0 errors, no FAIL marker |
+| tsc --noEmit | clean | **clean** |
+| wiki:content | zero diff | **zero diff** |
+| i18n:gen | zero diff | **zero diff** |
+
+The test accounting: +1 file (`tests/helpers/adopted_trophy_ids.test.ts`) and
++35 tests. Twenty-six are `it(` blocks this phase authored, counted by grep
+over the diff since `b94887558d` (zero removed); the other nine are derived
+cases (`it.each` rows over the promoted set and the trophy rows) and are not
+attributed to a hand. No run was discarded: the one earlier full run
+(`748402cdb1`, the probe that found the item-art fingerprint and the forge
+row) is recorded above as a probe, and the frozen run is this one.
+
 ### THE HANDOFF TO PHASE 11l QA
 
 - **THE OUTPUT DOCTRINE IS THE THING TO RE-DERIVE, NOT THE VALUE ONE.** The
   settled prediction was made against the crafted ceiling; every count that
   moved in this phase moved because row 122's uncrafted pool answers
   differently. Re-run the nine rows through the checklist yourself (uniqueness,
-  rung quality, in-register flavor, the interval) and the nine exclusions
+  rung quality, in-register flavor, the interval) and the ten exclusions
   through their recorded reasons; the `TROPHY_RECIPES` header carries the
   greppable record, and the pool the explorers computed is reproducible from
   `ALL_RECIPES` and `ITEMS` in one pass. The record's domination claims (the
@@ -16387,9 +16411,10 @@ shipped, this ledger's author's rounds included.
   OUTPUT (would a crafter at that rung make it?) on top of the doctrine's
   letter; judge the remaining eight against the same standard, the lantern
   (item level 7 at rung 25) and the maul (a level-13 output at rung 50) first.
-- **THE ECONOMY IS LIST-COUNT-ONLY AND EVERY FLOOR IS VISIBLE.** Nine of ten
-  rows are gold-positive at the counterfactual floor and the maul is +158 per
-  craft at specialization alone; the floors are pinned so a change is loud,
+- **THE ECONOMY IS LIST-COUNT-ONLY AND EVERY FLOOR IS VISIBLE.** Eight of the
+  nine floors sit under their output before the gold sink (the healing potion
+  does not, and the sink turns three more gold-negative) and the maul is +158
+  per craft at specialization alone; the floors are pinned so a change is loud,
   not guarded so a change is refused. Whether the maul's surplus is wanted is
   the maintainer's read, recorded, not decided.
 - **`col_junk_drawer` IS THE NEW OPEN ITEM.** Zero margin, live recount, an
