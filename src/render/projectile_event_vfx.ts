@@ -35,7 +35,7 @@ export function handleProjectileEventVfx(
       event.x,
       groundHeight(event.x, event.z, seed) + 0.7,
       event.z,
-      event.reason === 'entity' || event.reason === 'wall',
+      event.reason,
     );
     return true;
   }
