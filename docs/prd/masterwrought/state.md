@@ -12518,12 +12518,13 @@ test.
 
 ### THE FROZEN STAMP, AND WHAT IT COST
 
-Committed clean tree at **2844cbc41b**, `git status` empty before and after, this
-audit's own agents all idle first. EXIT=0: 3069 files passed / 12 skipped (3081);
-43964 passed / 2 expected fail / 115 skipped (44081). `npx tsc --noEmit` clean.
-`npm run ci:changed` EXIT=0 over 797 files, 3094 warnings, 0 errors, no FAIL
-marker. `npm run wiki:content` and `npm run i18n:gen` both reproduce a zero diff
-on this tip.
+Committed clean tree at **c140b52c12**, `git status` empty before and after, this
+audit's own agents all idle first AND nothing else running anywhere on the
+machine. EXIT=0: 3069 files passed / 12 skipped (3081); 43964 passed / 2
+expected fail / 115 skipped (44081). `npx tsc --noEmit` clean. `npm run
+ci:changed` EXIT=0 over 797 files, 3094 warnings, 0 errors, no FAIL marker.
+`npm run wiki:content` and `npm run i18n:gen` both reproduce a zero diff on this
+tip.
 
 THE DRIFT IS EXACTLY THIS AUDIT'S, three tests and no files: the levelling-band
 tripwire in the coverage guard, A4d in the icon suite, and the farming prose arm
@@ -12539,11 +12540,15 @@ that was already in flight. The discipline that survives is not "freeze early",
 it is "freeze after the last lane has spoken", and a lane that has gone idle
 without reporting has not spoken.
 
-A SECOND WORKTREE WAS RUNNING ITS OWN SUITE throughout this measurement
-(`wocc-deed-border-cartouche`, another session on the same machine). Its
-processes were left alone. The DURATION is therefore not comparable to 11j's
-455 s (this run took 716 s); the counts are, since a pass or fail does not
-depend on load, and no duration-budget suite redded.
+THREE RUNS WERE DISCARDED IN TOTAL, and the last two are the interesting ones.
+The second was voided by the two late lanes; the third by a defect this audit's
+own third pass over the wiki paragraph found in its own second fix. What the
+run history proves as a side effect is worth keeping: the discarded run at
+2844cbc41b, taken while a SECOND WORKTREE (`wocc-deed-border-cartouche`, another
+session on this machine, left alone) was running its own suite, returned the
+IDENTICAL counts in 716 s that this unloaded run returns in 425 s. Load moves the
+duration and not the verdict, which is the thing a stamp actually needs to be
+true.
 
 ### THE FIX ROUND'S OWN REVIEW, AND WHAT IT CAUGHT
 
