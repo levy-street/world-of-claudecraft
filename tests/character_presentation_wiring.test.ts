@@ -7,6 +7,13 @@ const characterVisual = readFileSync(
   'utf8',
 );
 const main = readFileSync(new URL('../src/main.ts', import.meta.url), 'utf8');
+// The mount half of the presentation split moved out of renderer.ts into its own
+// module when the vehicle work landed; the behaviour is unchanged, so the pins
+// below follow it there rather than being dropped.
+const mountPresentation = readFileSync(
+  new URL('../src/render/mount_presentation.ts', import.meta.url),
+  'utf8',
+);
 
 describe('character presentation sleep wiring', () => {
   it('routes hidden cosmetic rigs through bounded off-screen advancement', () => {
@@ -29,7 +36,14 @@ describe('character presentation sleep wiring', () => {
     expect(renderer).toContain(
       'if (runCharacterPresentation) {\n        v.visual.updateWeaponVfx(dt, weaponVfxShedScale(d2, this.appliedBudgetLevels?.vfx ?? 1));\n      }',
     );
-    expect(renderer).toContain('v.mountVisual.advanceOffscreen(dt);');
+    // The mount rig takes the same bounded-advance path as the character rig,
+    // now from inside updateMountPresentation: renderer.ts forwards presentation
+    // as `present`, and a rig that is not present advances and returns before any
+    // per-frame work.
+    expect(renderer).toContain('present: runCharacterPresentation,');
+    expect(mountPresentation).toContain(
+      'if (!input.present) {\n      v.mountVisual.advanceOffscreen(dt);\n      return;\n    }',
+    );
   });
 
   it('ticks deferred weapon stow transitions while a rig is off screen', () => {
@@ -52,15 +66,19 @@ describe('character presentation sleep wiring', () => {
   });
 
   it('sleeps ability VFX semantically while mount particles remain presentation-gated', () => {
-    const mountStart = renderer.indexOf('if (v.mountVisual && mountSpec && mountShown) {');
-    const abilityStart = renderer.indexOf('// per-ability windup orb + buff-orbit bands');
+    // Mount particles stay behind the presentation gate: the off-screen branch
+    // returns FIRST, so a hidden mount can never reach the emitters below it.
+    const mountStart = mountPresentation.indexOf('if (v.mountVisual && spec && input.shown) {');
+    const offscreenReturn = mountPresentation.indexOf('v.mountVisual.advanceOffscreen(dt);');
+    const slimeAt = mountPresentation.indexOf('input.vfx.mountSlimeTrail');
+    const exhaustAt = mountPresentation.indexOf('input.vfx.mountExhaust(');
     expect(mountStart).toBeGreaterThan(-1);
-    expect(abilityStart).toBeGreaterThan(mountStart);
+    expect(offscreenReturn).toBeGreaterThan(mountStart);
+    expect(slimeAt).toBeGreaterThan(offscreenReturn);
+    expect(exhaustAt).toBeGreaterThan(offscreenReturn);
 
-    const mountBlock = renderer.slice(mountStart, abilityStart);
-    expect(mountBlock).toContain('if (runCharacterPresentation) {');
-    expect(mountBlock).toContain('this.vfx.mountSlimeTrail');
-    expect(mountBlock).toContain('this.vfx.mountExhaust');
+    const abilityStart = renderer.indexOf('// per-ability windup orb + buff-orbit bands');
+    expect(abilityStart).toBeGreaterThan(-1);
     expect(renderer.slice(abilityStart)).toContain(
       'this.abilityVfx.syncEntity(e, runCharacterPresentation);',
     );
