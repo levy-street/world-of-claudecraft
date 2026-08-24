@@ -3,12 +3,15 @@ import { ABILITIES } from '../src/sim/data';
 import type { AbilityEffect, Entity } from '../src/sim/types';
 import {
   abilityAoeRadius,
+  abilityPreviewRange,
   cancelGroundAim,
   clampAimToRange,
   commitGroundAim,
   createGroundAimState,
   DEFAULT_GROUND_AOE_RADIUS,
   enterGroundAim,
+  explicitAbilityAoeRadius,
+  shouldPrepareAbility,
   shouldUseGroundAim,
 } from '../src/ui/hud/action_bar/ground_aim';
 
@@ -26,6 +29,15 @@ describe('ground_aim', () => {
     expect(shouldUseGroundAim('meteor', false, true)).toBe(true);
     expect(shouldUseGroundAim('meteor', false, false)).toBe(false);
     expect(shouldUseGroundAim('flamestrike', false, true)).toBe(true);
+  });
+
+  it('prepares desktop skills but preserves direct touch casting outside ground placement', () => {
+    const bolt = { id: 'bolt', targetMode: undefined, selfCentered: undefined };
+    const ground = { id: 'meteor', targetMode: 'position' as const, selfCentered: false };
+    expect(shouldPrepareAbility(bolt, false, true)).toBe(true);
+    expect(shouldPrepareAbility(bolt, true, true)).toBe(false);
+    expect(shouldPrepareAbility(ground, true, true)).toBe(true);
+    expect(shouldPrepareAbility(ground, false, false)).toBe(false);
   });
 
   it('passes through points inside range', () => {
@@ -59,6 +71,30 @@ describe('ground_aim', () => {
     expect(abilityAoeRadius({ effects: [{ type: 'directDamage', min: 1, max: 2 }] })).toBe(
       DEFAULT_GROUND_AOE_RADIUS,
     );
+  });
+
+  it('builds maximum-range guides from authored range, area, or melee reach', () => {
+    expect(
+      abilityPreviewRange({
+        def: { range: 35, requiresTarget: true },
+        effects: [{ type: 'directDamage', min: 1, max: 2 }],
+      }),
+    ).toBe(35);
+    expect(
+      abilityPreviewRange({
+        def: { range: 0, requiresTarget: false, selfCentered: true },
+        effects: [{ type: 'aoeDamage', min: 1, max: 2, radius: 6 }],
+      }),
+    ).toBe(6);
+    expect(
+      abilityPreviewRange({
+        def: { range: 0, requiresTarget: true },
+        effects: [{ type: 'directDamage', min: 1, max: 2 }],
+      }),
+    ).toBeGreaterThan(0);
+    expect(
+      explicitAbilityAoeRadius({ effects: [{ type: 'directDamage', min: 1, max: 2 }] }),
+    ).toBeNull();
   });
 
   it('uses Meteor actual 8-yard impact radius', () => {

@@ -35,7 +35,7 @@ describe('combat aim controller', () => {
     expect(online.flushInput).toHaveBeenCalledTimes(1);
   });
 
-  it('uses canvas center and camera facing while mouselook owns aim', () => {
+  it('uses the raised action-camera anchor and camera facing while mouselook owns aim', () => {
     const online = {
       setCombatAimAngle: vi.fn(),
       setMouselookFacing: vi.fn(),
@@ -56,7 +56,7 @@ describe('combat aim controller', () => {
       online: () => online,
     });
 
-    expect(controller.screenPoint()).toEqual({ x: 200, y: 110 });
+    expect(controller.screenPoint()).toEqual({ x: 200, y: 95.6 });
     expect(controller.current()).toMatchObject({ source: 'facing', angle: 1.2, point: null });
     controller.sync();
     expect(online.setMouselookFacing).toHaveBeenCalledWith(1.2);

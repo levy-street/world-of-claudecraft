@@ -45,6 +45,7 @@ import { groundHeight, waterLevelAt, zoneBiomeAt } from '../sim/world';
 import type { ChatBubbleStyle } from '../ui/chat_bubble_style';
 import { tEntity } from '../ui/entity_i18n';
 import type { IWorld } from '../world_api';
+import { AbilityRangeReticleVisual } from './ability_range_reticle_visual';
 import {
   AbilityVfx,
   AbilityVfxFx,
@@ -1384,6 +1385,7 @@ export class Renderer {
   private aoeRingNext = 0;
   private recklessSkulls = new RecklessSkullPainter();
   private groundAimReticle: GroundAimReticleVisual;
+  private abilityRangeReticle: AbilityRangeReticleVisual;
   raycaster = new THREE.Raycaster();
   private readonly raycastNdc = new THREE.Vector2();
   private readonly raycastHits: THREE.Intersection[] = [];
@@ -2900,6 +2902,12 @@ export class Renderer {
       this.lowGfx ? 1 : SELECTION_RING_BOOST,
     );
     setRenderCategory(this.groundAimReticle.group, 'ui3d');
+    this.abilityRangeReticle = new AbilityRangeReticleVisual(
+      this.scene,
+      (x, z) => groundHeight(x, z, this.sim.cfg.seed),
+      this.lowGfx ? 1 : SELECTION_RING_BOOST,
+    );
+    setRenderCategory(this.abilityRangeReticle.group, 'ui3d');
     for (let i = 0; i < CLICK_MARKER_POOL; i++) {
       const mat = new THREE.MeshBasicMaterial({
         transparent: true,
@@ -13085,6 +13093,8 @@ export class Renderer {
     this.nameplatePainter.dispose();
     this.travelSpeedFx.dispose();
     this.blobShadows?.dispose();
+    this.groundAimReticle.dispose();
+    this.abilityRangeReticle.dispose();
   }
 
   /**
@@ -13710,6 +13720,26 @@ export class Renderer {
     );
   }
 
+  setAbilityRangeReticle(
+    aim: {
+      x: number;
+      z: number;
+      radius: number;
+      school: string;
+    } | null,
+  ): void {
+    this.abilityRangeReticle.setRange(
+      aim
+        ? {
+            x: aim.x,
+            z: aim.z,
+            radius: aim.radius,
+            color: SCHOOL_COLORS[aim.school] ?? 0xffffff,
+          }
+        : null,
+    );
+  }
+
   private updateAoeRings(dt: number): void {
     for (const slot of this.aoeRings) {
       if (slot.elapsed >= AOE_RING_LIFETIME) continue;
@@ -13726,6 +13756,7 @@ export class Renderer {
 
   private updateGroundAimReticle(dt: number): void {
     this.groundAimReticle.update(dt);
+    this.abilityRangeReticle.update(dt);
   }
 
   worldToScreen(x: number, y: number, z: number): { x: number; y: number; behind: boolean } {
