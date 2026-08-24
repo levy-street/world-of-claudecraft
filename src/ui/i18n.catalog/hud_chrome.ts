@@ -936,8 +936,7 @@ export const hudChromeStrings = {
       'A colossal storm-hatched gobbler that struts down from the Waking Peak, tail fanned like a thunderhead.',
     desc_goblin_rocket_sled:
       'A dangerously overbuilt goblin sled propelled by twin rockets and excellent bad judgment.',
-    desc_rallycart_rxt:
-      'A pint-sized rally machine that provides enhanced travel speed.',
+    desc_rallycart_rxt: 'A pint-sized rally machine that provides enhanced travel speed.',
     desc_terrorspark_groundshaker:
       'A compact armored engine with heavy tracks, a deep-bore cannon, and a saddle built for fearless pilots.',
     desc_drakemaw_raptor:
