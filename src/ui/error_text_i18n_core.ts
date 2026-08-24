@@ -14,7 +14,7 @@
 
 import { DELVES, DUNGEON_LIST } from '../sim/data';
 import { delveDisplayName, dungeonDisplayNameFromSource } from './entity_display_core';
-import { dungeonDisplayName, tEntity } from './entity_i18n';
+import { dungeonDisplayName } from './entity_i18n';
 import { formatDuration, formatNumber, type TranslationKey, t } from './i18n';
 import type { RaidLockout } from './raid_lockout';
 import { localizeServerText } from './server_i18n';

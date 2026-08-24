@@ -246,7 +246,7 @@ import {
   type CraftTierUp,
   observeCraftSkillsForTierUps,
 } from './craft_celebration_view';
-import { craftDenialLine } from './craft_denial_line_view';
+import { craftDenyMessage } from './crafting_deny_core';
 import { parseCraftingTab, serializeCraftingTab } from './crafting_tab_pref';
 import {
   buildCraftingView,
@@ -806,7 +806,6 @@ import {
 import { makeWindowFocus } from './window_focus';
 import { syncWindowOpenBodyClasses } from './window_open_state';
 import { installWindowResize, markResizableWindow } from './window_resize';
-import { stackedWindowsVisible } from './window_stack_state_core';
 import { wocBalanceChipHtml } from './woc_balance_chip';
 import { type WocMarketHooks, WocMarketWindow } from './woc_market_window';
 import { installWorldDropTarget } from './world_drop_target';
@@ -11613,12 +11612,12 @@ export class Hud {
             // event (see src/sim/types.ts), so this one check covers both.
             if (ev.masterwork) audio.masterwork();
           } else if (!ev.ok) {
-            // Key selection lives in the craft_denial_line_view pure core
-            // (every arm table-tested there); this stays the thin render,
-            // and the core's key is LIVE for the station arm too (review
-            // round: a hardcoded key here left the core's stationRequired
-            // row dead data).
-            const denial = craftDenialLine(ev.reason, recipeById(ev.recipeId)?.stationType);
+            // Key selection lives in crafting_deny_core, which resolves the
+            // recipe and delegates to craft_denial_line_view's exhaustive
+            // Record (its header carries why the two modules exist); this
+            // stays the thin render, and the core's key is LIVE for the
+            // station arm too (a hardcoded key here left that row dead data).
+            const denial = craftDenyMessage(ev.reason, ev.recipeId);
             this.log(
               t(
                 denial.key,

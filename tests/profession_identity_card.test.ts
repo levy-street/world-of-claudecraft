@@ -1044,14 +1044,18 @@ describe('craftResult deny toast names the station (source pins)', () => {
   // comment must never satisfy a pin about live code (review round).
   const hud = codeOnly(readFileSync(path.resolve(process.cwd(), 'src/ui/hud.ts'), 'utf8'));
 
-  it('the denial routes through the craft_denial_line_view core with the recipe station type', () => {
-    // The reason-to-key mapping moved into the pure core at the Phase 07
-    // review round; every arm (the no_bag_space pairing and the daily_limit
-    // rung included) is table-pinned in tests/craft_denial_line_view.test.ts.
-    // This pin holds the hud side of the split: the wire passes the RECIPE
-    // CONTENT station type (no station field rides the event), so the core
-    // can name the station in both worlds identically.
-    expect(hud).toMatch(/craftDenialLine\(ev\.reason, recipeById\(ev\.recipeId\)\?\.stationType\)/);
+  it("the denial routes through the deny core with the event's own recipe id", () => {
+    // The reason-to-key mapping moved into a pure core at the Phase 07 review
+    // round; every arm (the no_bag_space pairing and the daily_limit rung
+    // included) is table-pinned in tests/craft_denial_line_view.test.ts.
+    // RE-POINTED at the 2026-08-24 release sync's QA: hud calls the release's
+    // crafting_deny_core, which resolves the recipe itself and delegates the
+    // decision to that table, so there is one authority AND no module without
+    // a production consumer. The station type still comes from RECIPE CONTENT
+    // (no station field rides the event), so the core can name the station in
+    // both worlds identically.
+    expect(hud).toMatch(/craftDenyMessage\(ev\.reason, ev\.recipeId\)/);
+    expect(hud, 'and hud no longer resolves the station itself').not.toMatch(/craftDenialLine\(/);
   });
 
   it('the toast renders the CORE-selected key, station params riding the resolved type', () => {

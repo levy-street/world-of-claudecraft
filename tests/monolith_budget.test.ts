@@ -214,7 +214,13 @@ const MONOLITHS: MonolithRow[] = [
     // parents' extractions land together and the two deleted the same ability
     // tooltip helpers, so the ratchet follows it down. Exact merged count, zero
     // slack: any further growth reds again.
-    ceiling: 18483,
+    // MEASURED AGAIN AT THE 11k QA FIX ROUND and lowered by three: the number
+    // above was taken mid-resolution, and the conflict work then removed the
+    // twin display-name import block and the merge's own unused
+    // window_stack_state_core import. A row whose comment says zero slack and
+    // whose pin sits above the file is the defect this packet's sim.ts row
+    // already named, so it is re-measured rather than left green.
+    ceiling: 18480,
     seam: 'pure view core + thin painter on PainterHost (src/ui/CLAUDE.md)',
   },
   {

@@ -4,7 +4,7 @@ import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import { computeTalentModifiers } from '../src/sim/content/talents';
 import { abilitiesKnownAt, BUILTIN_WORLD, setActiveWorldContent } from '../src/sim/data';
 import { mobCombatProfile } from '../src/sim/mob/combat_profile';
-import { PET_AGGRESSIVE_RANGE, petPickTarget } from '../src/sim/pet/pet_ai';
+import { petPickTarget } from '../src/sim/pet/pet_ai';
 import { Sim } from '../src/sim/sim';
 import {
   addThreat,

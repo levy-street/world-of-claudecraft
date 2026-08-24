@@ -6,13 +6,17 @@
 // name; the painter owns the t() calls and the station-name rendering
 // (stationNameText stays in crafting_window.ts).
 //
-// ONE AUTHORITY, TWO CALL SHAPES (the masterwrought release sync, 2026-08-24):
-// the release extracted this core out of hud.ts's arm while this branch
-// extracted the same table as ./craft_denial_line_view. The reason-to-key
-// table lives there, exhaustively typed, so a reason added to the union fails
-// tsc rather than falling silently through to the materials line; this module
-// keeps its own signature (it resolves the recipe id itself) and delegates the
-// decision, so the two surfaces cannot disagree about what a refusal says.
+// ONE AUTHORITY, TWO MODULES (the masterwrought release sync, 2026-08-24): the
+// release extracted this core out of hud.ts's arm while this branch extracted
+// the same table as ./craft_denial_line_view. The reason-to-key table lives
+// there, exhaustively typed, so a reason added to the union fails tsc rather
+// than falling silently through to the materials line. THIS module is what
+// hud.ts calls: it owns the id-resolving signature the release's call site
+// already had, and delegates the decision. Keeping the call here rather than
+// on the table directly is deliberate: a delegate nothing calls is dead
+// production code, and the first version of this resolution left exactly that
+// (its own header claimed two surfaces that cannot disagree, when only one
+// existed).
 
 import { recipeById } from '../sim/content/recipes';
 import type { StationType } from '../sim/professions/stations';
