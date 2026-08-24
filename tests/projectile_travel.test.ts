@@ -404,7 +404,7 @@ describe('ballistic player projectiles', () => {
     const target = ballisticEntity(2, 0, 4.7);
     const ctx = ballisticCtx([source, target]);
     ctx.projectilePathClear = (_source, _from, to) => to.z <= 4;
-    const projectileCtx = ctx as Parameters<typeof scheduleBallisticProjectile>[0];
+    const projectileCtx = ctx as unknown as Parameters<typeof scheduleBallisticProjectile>[0];
     const hit = vi.fn();
 
     scheduleBallisticProjectile(

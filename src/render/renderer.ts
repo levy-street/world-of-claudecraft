@@ -45,7 +45,10 @@ import { groundHeight, waterLevelAt, zoneBiomeAt } from '../sim/world';
 import type { ChatBubbleStyle } from '../ui/chat_bubble_style';
 import { tEntity } from '../ui/entity_i18n';
 import type { IWorld } from '../world_api';
-import { AbilityRangeReticleVisual } from './ability_range_reticle_visual';
+import {
+  type AbilityRangeVisualKind,
+  AbilityRangeReticleVisual,
+} from './ability_range_reticle_visual';
 import {
   AbilityVfx,
   AbilityVfxFx,
@@ -13726,6 +13729,9 @@ export class Renderer {
       z: number;
       radius: number;
       school: string;
+      kind: AbilityRangeVisualKind;
+      angle?: number;
+      halfAngle?: number;
     } | null,
   ): void {
     this.abilityRangeReticle.setRange(
@@ -13735,6 +13741,9 @@ export class Renderer {
             z: aim.z,
             radius: aim.radius,
             color: SCHOOL_COLORS[aim.school] ?? 0xffffff,
+            kind: aim.kind,
+            angle: aim.angle,
+            halfAngle: aim.halfAngle,
           }
         : null,
     );

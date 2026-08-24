@@ -43,6 +43,7 @@ import {
 } from '../sim/account_flair';
 import { abilityUsesActionCombatAim } from '../sim/combat/action_combat_targeting';
 import { resolveActionReplacement } from '../sim/combat/action_replacement';
+import { PLAYER_MELEE_CONE_HALF_ANGLE } from '../sim/combat/directional_attack';
 import { resolveColdsightAbilityForSpec } from '../sim/combat/hunter_coldsight';
 import { resolveHunterSharedAbilityForTalents } from '../sim/combat/hunter_shared';
 import { isNecromancyUndead } from '../sim/combat/necromancy';
@@ -374,6 +375,9 @@ import { CONSUMABLE_BAR_SLOTS, consumableBarItems } from './hud/action_bar/consu
 import {
   type AimPoint,
   abilityAoeRadius,
+  abilityPreviewAngle,
+  type AbilityPreviewKind,
+  abilityPreviewKind,
   abilityPreviewRange,
   cancelGroundAim,
   clampAimToRange,
@@ -7004,16 +7008,28 @@ export class Hud {
     point: AimPoint;
     radius: number;
     school: string;
+    kind: AbilityPreviewKind;
+    angle?: number;
+    halfAngle?: number;
   } | null {
     if (!this.isGroundAimActive()) return null;
     const res = this.activeGroundAimAbility();
     if (!res) return null;
     const radius = abilityPreviewRange(res);
     if (radius <= 0) return null;
+    const kind = abilityPreviewKind(res.def);
+    const angle = abilityPreviewAngle(
+      kind,
+      this.sim.player,
+      this.optionsHooks?.combatAim() ?? null,
+    );
     return {
       point: { x: this.sim.player.pos.x, z: this.sim.player.pos.z },
       radius,
       school: res.def.school,
+      kind,
+      angle,
+      halfAngle: kind === 'meleeCone' ? PLAYER_MELEE_CONE_HALF_ANGLE : undefined,
     };
   }
 
