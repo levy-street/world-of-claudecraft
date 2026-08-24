@@ -75,6 +75,8 @@ describe('materialProfessionHintText', () => {
     // same line: adoption is what put a Used-by line on them at all.
     expect(materialProfessionHintText('old_cragmaws_pelt')).toBe('Used by Leatherworking.');
     expect(materialProfessionHintText('emberwing_cinderscale')).toBe('Used by Leatherworking.');
+    // Poor trash again, outside MATERIAL_ITEM_IDS: the Used-by line is empty.
+    expect(materialProfessionHintText('chipped_tusk')).toBe('');
   });
 
   it('skips pure cooking catches; multi-craft catches keep the line, and both arms are live', () => {

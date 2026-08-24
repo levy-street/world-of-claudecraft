@@ -12,6 +12,7 @@ import { readFileSync } from 'node:fs';
 import path from 'node:path';
 import { describe, expect, it } from 'vitest';
 import {
+  CRAFT_GOLD_SINK_COPPER_PER_BUDGET,
   HARVEST_COMPONENT_ITEMS,
   HARVEST_COMPONENT_SPECIMENS,
   STATION_TYPE_BY_CRAFT,
@@ -228,7 +229,7 @@ describe('THE ECONOMY INVARIANT', () => {
     expect(minAchievableInputValue(requireRecipe('recipe_sootscale_mantle'))).toBe(300);
   });
 
-  it('attuneJackOfAllTrades has no production caller, so excluding the Jack arm above is honest', () => {
+  it('attuneJackOfAllTrades has no production caller and mints the only Jack flag, so excluding the Jack arm above is honest', () => {
     // The vendor-loop bound computes minAchievableInputValue with the Jack
     // multiplier EXCLUDED, and exclusion is the PERMISSIVE direction: the 0.9
     // shaves counts, so a Jack's real bill is at or under the figure the
@@ -237,30 +238,94 @@ describe('THE ECONOMY INVARIANT', () => {
     // less-than fails. The bound is honest today only because no character
     // can become a Jack: attuneJackOfAllTrades
     // (src/sim/professions/archetype.ts) is exported for its tests and has
-    // no caller in src/ or server/ outside its own module. This scan pins
-    // that. THE DAY A PRODUCTION CALLER LANDS (a quest turn-in, a dev
-    // command, an admin runtime arm) THIS REDS, and the vendor-loop bound
-    // must be re-derived with the Jack arm: thread isJackOfAllTrades = true
-    // through minAchievableInputValue, at which point the mantle sits ON its
-    // output and its bill or price has to move first.
+    // no caller in src/, server/ or headless/ (the three hosts that run the
+    // one sim) outside its own module. This scan pins that. THE DAY A
+    // PRODUCTION CALLER LANDS (a quest turn-in, a dev command, an admin
+    // runtime arm) THIS REDS, and the vendor-loop bound must be re-derived
+    // with the Jack arm: thread isJackOfAllTrades = true through
+    // minAchievableInputValue, at which point the mantle sits ON its output
+    // and its bill or price has to move first.
+    //
+    // Each root carries a file-count floor a little under its real count.
+    // These roots are deep, so the floor pins the walk directly (the
+    // tests/CLAUDE.md deep-root recipe): a root dropping out of the walk (a
+    // renamed directory, a walker regression to a flat read, a typo in this
+    // list) reds here instead of leaving an empty caller list that reads as
+    // a scan result. Re-measure with tsFilesUnder when a floor trips on an
+    // honest shrink.
+    const ROOT_FILE_FLOOR: Record<string, number> = { src: 2100, server: 300, headless: 2 };
+    // THE FLAG'S WRITE SET, the same closed-circuit argument stated as a scan
+    // rather than trusted to the caller list. A caller scan alone leaves one
+    // door: the hydrate arm of normalizeArchetypeState (archetype.ts) copies
+    // a persisted `isJackOfAllTrades: true` back into the live flag with no
+    // call to attuneJackOfAllTrades at all. That door is closed because the
+    // persisted blob has ONE writer, serializeArchetypeState, which emits
+    // `isJackOfAllTrades: true` only while the live flag is already true,
+    // and the live flag has ONE mint, the `state.isJackOfAllTrades = true`
+    // inside attuneJackOfAllTrades. Read in a loop: a persisted true needs a
+    // live true, a live true needs the mint, the mint needs a caller, and
+    // the caller list is empty. So the scan pins exactly two writes of true
+    // (`isJackOfAllTrades = true` or `isJackOfAllTrades: true`, comments
+    // stripped) across the three roots: the mint inside the
+    // attuneJackOfAllTrades body, and the serializer's re-emit, which must
+    // keep its `state.isJackOfAllTrades ?` guard (an unconditional
+    // projection would mint a true through the hydrate arm on the next
+    // load). The `=== true` read in the hydrate arm and the `: false`
+    // literals in src/net/online.ts and
+    // src/ui/hud/quest/quest_dialog_controller.ts are not writes of true and
+    // never match. Any third write, in any root, is a new mint and reds
+    // here.
+    const TRUE_WRITE = /\bisJackOfAllTrades\s*(?::|=(?!=))\s*true\b/g;
+    const GUARDED_RE_EMIT = /state\.isJackOfAllTrades\s*\?\s*\{\s*isJackOfAllTrades:\s*true\s*\}/;
+    // The predicate's own controls, so a regex edit cannot quietly widen or
+    // narrow what counts as a write: both write spellings match, the
+    // comparison and the optional type member do not.
+    expect('state.isJackOfAllTrades = true;'.match(TRUE_WRITE)).not.toBeNull();
+    expect('{ isJackOfAllTrades: true }'.match(TRUE_WRITE)).not.toBeNull();
+    expect('saved.isJackOfAllTrades === true'.match(TRUE_WRITE)).toBeNull();
+    expect('isJackOfAllTrades?: true;'.match(TRUE_WRITE)).toBeNull();
     const declaringModule = 'sim/professions/archetype.ts';
     const callers: string[] = [];
     let declared = false;
-    for (const root of ['src', 'server']) {
-      for (const { file, full } of tsFilesUnder(path.resolve(process.cwd(), root))) {
+    const trueWrites: string[] = [];
+    for (const [root, floor] of Object.entries(ROOT_FILE_FLOOR)) {
+      const files = tsFilesUnder(path.resolve(process.cwd(), root));
+      expect(files.length, `${root}/ file count under its floor`).toBeGreaterThanOrEqual(floor);
+      for (const { file, full } of files) {
         const code = stripComments(readFileSync(full, 'utf8'));
+        const isDeclaring = root === 'src' && file === declaringModule;
+        const attuneStart = isDeclaring
+          ? code.indexOf('export function attuneJackOfAllTrades(')
+          : -1;
+        const attuneEnd = attuneStart === -1 ? -1 : code.indexOf('\n}', attuneStart);
+        const guard = isDeclaring ? GUARDED_RE_EMIT.exec(code) : null;
+        for (const write of code.matchAll(TRUE_WRITE)) {
+          const at = write.index;
+          const kind =
+            attuneStart !== -1 && at > attuneStart && at < attuneEnd
+              ? 'attune'
+              : guard !== null && at >= guard.index && at < guard.index + guard[0].length
+                ? 'serializer'
+                : 'other';
+          trueWrites.push(`${kind}@${root}/${file}`);
+        }
         if (!/\battuneJackOfAllTrades\b/.test(code)) continue;
-        if (root === 'src' && file === declaringModule) {
-          declared = /export function attuneJackOfAllTrades\(/.test(code);
+        if (isDeclaring) {
+          declared = /export function attuneJackOfAllTrades\(/.test(code) && attuneEnd !== -1;
           continue;
         }
         callers.push(`${root}/${file}`);
       }
     }
     // Positive control: the walk reached the declaring module and read the
-    // export, so an empty caller list is a scan result, not a missed root.
+    // export (and found the body's close), so an empty caller list is a scan
+    // result, not a missed root.
     expect(declared).toBe(true);
     expect(callers).toEqual([]);
+    expect(trueWrites.sort()).toEqual([
+      'attune@src/sim/professions/archetype.ts',
+      'serializer@src/sim/professions/archetype.ts',
+    ]);
     // The reason the guard exists, pinned as numbers through the same
     // function the bound uses: the Jack arm lands the mantle exactly on its
     // output.
@@ -281,7 +346,7 @@ describe('THE ECONOMY INVARIANT', () => {
     expect(jackBill).toBe(outputValue(mantle));
   });
 
-  it('the caller scan reads src/ and server/ only through the shared walker', () => {
+  it('the caller scan reads src/, server/ and headless/ only through the shared walker', () => {
     expectScansOnlyThroughSharedWalkers(import.meta.url, ['ts_files_under']);
   });
 
@@ -512,53 +577,156 @@ describe('REFERENTIAL INTEGRITY', () => {
     }
   });
 
-  it('every trophy row floors at its pinned counterfactual bill', () => {
+  it('every trophy row bills at its three pinned figures, and the sink verdicts hold', () => {
     // The 11l-OUT doctrine above is list-count-only by design (the listed
     // bill, never the discounted one), so the crafter's reward, the
     // specialization and self-signed discounts requiredReagentCountFor
     // composes, can and does take a bill under its output: eight of the nine
     // floors below sit under the output (the healing potion is the one that
-    // does not), gold-positive at the floor and bounded by trophy supply. The
-    // floor is what minAchievableInputValue describes (Jack excluded, a
-    // self-signed copy of every reagent assumed). How reachable it is varies
-    // by row, because only a node yield or a corpse component or specimen
-    // can carry the crafter's own signature (gathering.ts
-    // isSignableMaterialRarity): the cinch (401) and the belt (421) reach it
-    // exactly by one self-signed pristine hide; the lantern, the maul, and
-    // the potion sit on it at specialization alone; the quiver reaches 231
-    // by a signed thorium ore and the hobnail boots 52 by a signed iron ore,
-    // short of the 196 and 40 floors, which also need a signed trophy (and,
-    // for the boots, a signed vendor flux); the oiled boots (56 reachable
-    // against a floor of 51) and the pouch (51 against 36) never reach
-    // theirs, since the lines a signature would move are a trophy, a mob
-    // drop, and vendor staples. Each row's comment in
-    // src/sim/content/recipes.ts prints the specialization-only bill, this
-    // floor, and the reachable figure where it differs from both. This map
-    // does NOT assert the floor above the output; it makes every floor
-    // VISIBLE as a literal, so a bill edit, a reagent re-price, or a
-    // discount regression inside requiredReagentCountFor moves a number
+    // does not), gold-positive at the floor and bounded by trophy supply.
+    // THREE bills per row, each through requiredReagentCountFor (the function
+    // the sim charges), specialized in the recipe's own craft, Jack excluded:
+    // specOnly is specialization alone (no self-signed copy); floor is what
+    // minAchievableInputValue describes (a self-signed copy of EVERY
+    // reagent); reachable is a self-signed copy of exactly the reagents a
+    // crafter's own gathering can sign. That last set is a LITERAL, because
+    // only a node yield or a corpse component or specimen can carry the
+    // crafter's own signature (gathering.ts isSignableMaterialRarity; the
+    // corpse-harvest arms in interaction.ts mint the signed component or its
+    // family's specimen), and it is cross-checked below against the live
+    // source tables (NODE_MATERIAL_TABLE, HARVEST_COMPONENT_ITEMS,
+    // HARVEST_COMPONENT_SPECIMENS), so a trophy reagent that joins or leaves
+    // a signable source moves a literal here. Row by row: the cinch (401)
+    // and the belt (421) reach their floor exactly by one self-signed
+    // pristine hide; the lantern, the maul, and the potion sit on it at
+    // specialization alone; the quiver reaches 231 by a signed thorium ore
+    // and the hobnail boots 52 by a signed iron ore, short of the 196 and 40
+    // floors, which also need a signed trophy (and, for the boots, a signed
+    // vendor flux); the oiled boots (56 reachable against a floor of 51) and
+    // the pouch (51 against 36) never reach theirs, since the lines a
+    // signature would move are a trophy, a mob drop, and vendor staples.
+    // Each row's comment in src/sim/content/recipes.ts prints the same three
+    // figures. This map does NOT assert any bill above the output; it makes
+    // every figure VISIBLE as a literal, so a bill edit, a reagent re-price,
+    // or a discount regression inside requiredReagentCountFor moves a number
     // someone has to re-derive (the recipe_sootscale_mantle precedent in THE
     // ECONOMY INVARIANT).
-    const TROPHY_MIN_ACHIEVABLE: Record<string, number> = {
-      recipe_valefire_lantern: 104,
-      recipe_oiled_boots: 51,
-      recipe_gravewyrm_bone_quiver: 196,
-      recipe_hobnail_boots: 40,
-      recipe_fenshadow_maul: 222,
-      recipe_healing_potion: 77,
-      recipe_linen_pouch: 36,
-      recipe_wildgrove_cinch: 401,
-      recipe_cragprowl_belt: 421,
-    };
-    expect(Object.keys(TROPHY_MIN_ACHIEVABLE).sort()).toEqual(
-      TROPHY_RECIPES.map((r) => r.id).sort(),
+    const SIGNABLE_TROPHY_REAGENTS = new Set([
+      'iron_ore',
+      'thorium_ore',
+      'goldleaf_herb',
+      'elderwood_log',
+      'rough_hide',
+      'spider_silk',
+      'pristine_hide',
+    ]);
+    const nodeYields = new Set(
+      Object.values(NODE_MATERIAL_TABLE).flatMap((byZone) =>
+        Object.values(byZone).map((row) => row.itemId),
+      ),
     );
-    for (const [id, floor] of Object.entries(TROPHY_MIN_ACHIEVABLE)) {
-      expect(minAchievableInputValue(requireRecipe(id)), `${id} floor`).toBe(floor);
+    const corpseComponents = new Set(Object.values(HARVEST_COMPONENT_ITEMS));
+    const specimens = new Set(Object.values(HARVEST_COMPONENT_SPECIMENS));
+    const inASignableSource = (itemId: string): boolean =>
+      nodeYields.has(itemId) || corpseComponents.has(itemId) || specimens.has(itemId);
+    const trophyReagents = new Set(TROPHY_RECIPES.flatMap((r) => r.reagents.map((g) => g.itemId)));
+    for (const itemId of SIGNABLE_TROPHY_REAGENTS) {
+      expect(trophyReagents.has(itemId), `${itemId} sits on no trophy bill`).toBe(true);
+      expect(inASignableSource(itemId), `${itemId} is in none of the signable sources`).toBe(true);
     }
-    // The one gold-negative floor, pinned as the direction rather than the
-    // number so the comment above cannot drift from the map.
-    expect(TROPHY_MIN_ACHIEVABLE.recipe_healing_potion).toBeGreaterThan(
+    for (const itemId of trophyReagents) {
+      if (SIGNABLE_TROPHY_REAGENTS.has(itemId)) continue;
+      expect(inASignableSource(itemId), `${itemId} is signable but not in the literal set`).toBe(
+        false,
+      );
+    }
+    const billWith = (recipe: ProfessionRecipeRecord, signed: (itemId: string) => boolean) => {
+      const specialized = { [recipe.professionId]: 125 };
+      let total = 0;
+      for (const reagent of recipe.reagents) {
+        const { count } = requiredReagentCountFor(
+          signed(reagent.itemId),
+          reagent,
+          specialized,
+          recipe.professionId,
+        );
+        total += count * reagentUnitValue(reagent.itemId);
+      }
+      return total;
+    };
+    const TROPHY_BILLS: Record<string, { specOnly: number; floor: number; reachable: number }> = {
+      recipe_valefire_lantern: { specOnly: 104, floor: 104, reachable: 104 },
+      recipe_oiled_boots: { specOnly: 56, floor: 51, reachable: 56 },
+      recipe_gravewyrm_bone_quiver: { specOnly: 291, floor: 196, reachable: 231 },
+      recipe_hobnail_boots: { specOnly: 60, floor: 40, reachable: 52 },
+      recipe_fenshadow_maul: { specOnly: 222, floor: 222, reachable: 222 },
+      recipe_healing_potion: { specOnly: 77, floor: 77, reachable: 77 },
+      recipe_linen_pouch: { specOnly: 51, floor: 36, reachable: 51 },
+      recipe_wildgrove_cinch: { specOnly: 426, floor: 401, reachable: 401 },
+      recipe_cragprowl_belt: { specOnly: 446, floor: 421, reachable: 421 },
+    };
+    expect(Object.keys(TROPHY_BILLS).sort()).toEqual(TROPHY_RECIPES.map((r) => r.id).sort());
+    for (const [id, bills] of Object.entries(TROPHY_BILLS)) {
+      const recipe = requireRecipe(id);
+      expect(minAchievableInputValue(recipe), `${id} floor`).toBe(bills.floor);
+      expect(
+        billWith(recipe, () => false),
+        `${id} specOnly`,
+      ).toBe(bills.specOnly);
+      expect(
+        billWith(recipe, () => true),
+        `${id} floor, restated`,
+      ).toBe(bills.floor);
+      expect(
+        billWith(recipe, (itemId) => SIGNABLE_TROPHY_REAGENTS.has(itemId)),
+        `${id} reachable`,
+      ).toBe(bills.reachable);
+    }
+    // The #1301 gold sink, read from the constant crafting.ts
+    // resolveCraftForRecipe charges (ceil(itemLevelBudget x
+    // CRAFT_GOLD_SINK_COPPER_PER_BUDGET) copper per craft), lands on top of
+    // every bill, and the trophy header's verdicts are pinned as literals
+    // against it. At the floor plus the sink five rows pay out and three the
+    // sink alone turns gold-negative (their floor sits under the output,
+    // their floor plus sink at or above it); at the reachable bill plus the
+    // sink four pay out. The potion never pays: its most permissive bill,
+    // specialization alone with no sink, already sits above its output.
+    const sinkFor = (recipe: ProfessionRecipeRecord): number =>
+      Math.ceil(recipe.itemLevelBudget * CRAFT_GOLD_SINK_COPPER_PER_BUDGET);
+    const SINK_BY_BUDGET: Record<number, number> = { 10: 20, 16: 32, 20: 40 };
+    for (const recipe of TROPHY_RECIPES) {
+      expect(sinkFor(recipe), `${recipe.id} sink`).toBe(SINK_BY_BUDGET[recipe.itemLevelBudget]);
+    }
+    const paysOutAt = (pick: (bills: { floor: number; reachable: number }) => number): string[] =>
+      TROPHY_RECIPES.filter((r) => pick(TROPHY_BILLS[r.id]) + sinkFor(r) < outputValue(r))
+        .map((r) => r.id)
+        .sort();
+    expect(paysOutAt((bills) => bills.floor)).toEqual([
+      'recipe_fenshadow_maul',
+      'recipe_gravewyrm_bone_quiver',
+      'recipe_hobnail_boots',
+      'recipe_linen_pouch',
+      'recipe_valefire_lantern',
+    ]);
+    const sinkTurned = TROPHY_RECIPES.filter(
+      (r) =>
+        TROPHY_BILLS[r.id].floor < outputValue(r) &&
+        TROPHY_BILLS[r.id].floor + sinkFor(r) >= outputValue(r),
+    )
+      .map((r) => r.id)
+      .sort();
+    expect(sinkTurned).toEqual([
+      'recipe_cragprowl_belt',
+      'recipe_oiled_boots',
+      'recipe_wildgrove_cinch',
+    ]);
+    expect(paysOutAt((bills) => bills.reachable)).toEqual([
+      'recipe_fenshadow_maul',
+      'recipe_gravewyrm_bone_quiver',
+      'recipe_hobnail_boots',
+      'recipe_valefire_lantern',
+    ]);
+    expect(TROPHY_BILLS.recipe_healing_potion.specOnly).toBeGreaterThan(
       outputValue(requireRecipe('recipe_healing_potion')),
     );
   });

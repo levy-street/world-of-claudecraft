@@ -3969,13 +3969,28 @@ export const FARM_RECIPES: ProfessionRecipeRecord[] = [
 //     disenchant outputs, wyrmfall_core is rare, arcanite_bar a master-stocked
 //     premium reagent; any rare output would owe a prog_enchanting_rare deed).
 //   chipped_tusk 15: output-excluded, weaponcrafting (the seventh output
-//     exclusion, the sixth fix round: every uncrafted weapon in the tusk's
-//     rung-25 band is strictly dominated by the trainer's OWN rung-25 row
-//     recipe_whetted_iron_dirk, 16-24 at 1.8 = 11.1 dps, agi 5 sta 2, no
-//     class lock, a 50-copper listed bill (iron 2 x 8, bone 2 x 7, flux 1 x
-//     20): vale_carving_knife is 3.06 dps, mirejaw_fang_knife 10.0 dps and
-//     rogue-locked, the Crossroads caravan set around 4 dps; every rung-50
-//     candidate is dominated by the crafted rares; under R21 no
+//     exclusion, the sixth fix round, split by archetype: of the 25 uncrafted
+//     weapons with sellValue in (15, 460], the 18 physical rows are strictly
+//     dominated by the trainer's OWN rung-25 row recipe_whetted_iron_dirk,
+//     16-24 at 1.8 = 11.1 dps, agi 5 sta 2, no class lock, a 50-copper listed
+//     bill (iron 2 x 8, bone 2 x 7, flux 1 x 20): vale_carving_knife is 3.06
+//     dps, mirejaw_fang_knife 10.0 dps and rogue- and hunter-locked, the
+//     Crossroads caravan set around 4 dps. The 7 caster rows
+//     (apprentice_staff, hickory_shortstaff, drovers_staff,
+//     corpse_candle_focus, fenreed_staff, staff_of_drowned_prayers,
+//     voss_sanctified_mace) have no rung-25 comparand, since weaponcrafting
+//     serves casters only at rung 50, where recipe_elderwood_battle_staff
+//     (rare, int 9 spi 4, 8.33 dps, no class lock) dominates all seven; the
+//     one caster row inside the deleted bill's reach (208) that any chest or
+//     mob drops, corpse_candle_focus (195, int 2 spi 2, 9-15 at 2.0), is
+//     Drowned Litany chest loot with the same reward-loop question the fang
+//     knife carried and no tusk flavor (apprentice_staff, hickory_shortstaff
+//     and drovers_staff sit under 208 too, as a quest reward, a Haldren
+//     vendor row and a house market listing). The rung-50 physical
+//     candidates are dominated by the crafted rares on every axis but one
+//     (briarroot_staff's 10.45 dps edges thorium_warblade's 10.40;
+//     everything else, str 9 sta 4 against str 2 sta 2, rare against
+//     uncommon, one hand against two, is overwhelming); under R21 no
 //     weaponcrafting output is defensible, so the tusk stays poor trash).
 //   tangled_weed, soggy_moccasin: holdouts (11l-HOLDOUT).
 export const TROPHY_RECIPES: ProfessionRecipeRecord[] = [

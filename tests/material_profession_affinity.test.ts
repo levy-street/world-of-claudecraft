@@ -71,8 +71,8 @@ describe('craftIdsForMaterialItem', () => {
     // The trophy economy gave each of these mob drops exactly ONE consuming
     // craft, so each pin doubles as a no-second-consumer tripwire: a later
     // recipe borrowing a trophy into another craft changes the tooltip and
-    // must change the literal here deliberately. The chipped tusk carries no
-    // pin: the sixth fix round output-excluded it, so no craft consumes it.
+    // must change the literal here deliberately. The chipped tusk is pinned
+    // EMPTY: the sixth fix round output-excluded it, so no craft consumes it.
     expect(craftIdsForMaterialItem('bandit_bandana')).toEqual(['tailoring']);
     expect(craftIdsForMaterialItem('bogiron_nugget')).toEqual(['armorcrafting']);
     expect(craftIdsForMaterialItem('cracked_fetish')).toEqual(['inscription']);
@@ -84,6 +84,8 @@ describe('craftIdsForMaterialItem', () => {
     // review round adopted (recipe_cragprowl_belt, recipe_wildgrove_cinch).
     expect(craftIdsForMaterialItem('emberwing_cinderscale')).toEqual(['leatherworking']);
     expect(craftIdsForMaterialItem('old_cragmaws_pelt')).toEqual(['leatherworking']);
+    // Poor trash again, outside MATERIAL_ITEM_IDS: no consumer, so no craft.
+    expect(craftIdsForMaterialItem('chipped_tusk')).toEqual([]);
   });
 
   it('five crops name ALCHEMY as a consumer (Masterwrought phases 11g and 11h)', () => {

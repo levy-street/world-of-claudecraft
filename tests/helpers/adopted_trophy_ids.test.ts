@@ -1,8 +1,8 @@
 import { describe, expect, it } from 'vitest';
-import { ALL_RECIPES, TROPHY_RECIPES } from '../src/sim/content/recipes';
-import { ITEMS } from '../src/sim/data';
-import type { ItemDef } from '../src/sim/types';
-import { adoptedTrophyIds } from './helpers/adopted_trophy_ids';
+import { ALL_RECIPES, TROPHY_RECIPES } from '../../src/sim/content/recipes';
+import { ITEMS } from '../../src/sim/data';
+import type { ItemDef } from '../../src/sim/types';
+import { adoptedTrophyIds } from './adopted_trophy_ids';
 
 // The paired test for the shared adopted-trophy derivation. The three consumer
 // suites each hold their own literal equal to its output, so the helper's
