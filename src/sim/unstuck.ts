@@ -357,6 +357,23 @@ function cancelUnstuck(
   return event;
 }
 
+function failUnstuckNoSafePosition(
+  ctx: SimContext,
+  meta: PlayerMeta,
+  pending: PendingUnstuck,
+): void {
+  meta.pendingUnstuck = null;
+  ctx.emit({
+    type: 'unstuck',
+    phase: 'failed',
+    reason: 'no_safe_position',
+    area: pending.area,
+    origin: pending.origin,
+    duration: Math.max(0, ctx.time - pending.startedAt),
+    pid: meta.entityId,
+  });
+}
+
 export function cancelPendingUnstuckForDisconnect(
   ctx: SimContext,
   pid: number,
@@ -412,6 +429,10 @@ function completeUnstuck(
   const wasDead = p.dead || p.ghost;
   const battlegroundDestination =
     pending.area.kind === 'battleground' ? completeBattlegroundUnstuck(ctx, meta, p) : null;
+  if (pending.area.kind === 'battleground' && !battlegroundDestination) {
+    failUnstuckNoSafePosition(ctx, meta, pending);
+    return;
+  }
   if (!battlegroundDestination) {
     if (wasDead) reviveAtGraveyardForUnstuck(ctx, p.id);
     else moveToGraveyardForUnstuck(ctx, p.id);
