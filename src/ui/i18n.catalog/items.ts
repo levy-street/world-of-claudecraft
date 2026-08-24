@@ -2662,9 +2662,12 @@ const ITEM_ENTITY_IDS = [
   'pattern_harvest_feast',
   // masterwrought Phase 11i, the angler's endgame. Appended at the END under
   // the append-only contract, after the farming block, so no earlier position
-  // moves: three high-band catches, the apex rod, two dishes, and the four
+  // moves: three high-band catches, the apex rod, two dishes, and the three
   // patterns that teach the drop-taught rows. The capstone feast and its
-  // pattern were here too until Phase 11k retired both ids.
+  // pattern were here too until Phase 11k retired both ids, which is what took
+  // the patterns from four to three (the TWIN of this comment in src/ui/icons.ts
+  // was corrected at the Phase 11k QA and this one was missed, so both are
+  // named here).
   'raw_deepbarb_catfish',
   'raw_hollowgill_sturgeon',
   'raw_stillmere_salmon',

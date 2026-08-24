@@ -1262,14 +1262,16 @@ export interface OtherItemDef extends BaseItemDef {
   // templateId, so a feast sharing another feast's template is labelled as the
   // rung it is not. Putting it here makes the placeable FAMILY derivable from
   // the catalog (professions/feast.ts walks ITEMS for this payload and builds
-  // the membership set), so authoring a def joins the FIVE sites that key on a
-  // template id without an edit at any of them. It does NOT join everything:
-  // the two title composers reach the family through a hand-listed key map in
-  // src/ui/feast_title.ts (a t() key built by template literal is invisible to
-  // every static consumer), so a new def leaves that map short and the
-  // exhaustiveness pin in tests/entity_display_name.test.ts is what catches it.
-  // professions/feast.ts's own header carries the full site list. The template
-  // must be UNIQUE per feast id, pinned in tests/professions_feast.
+  // the membership set). FIVE sites key on a template id and none of them names
+  // a string literal any more, which is the narrow and true version of the
+  // claim: authoring a def joins the DERIVED set at all five. It does not
+  // finish the job. Two of those five are the title composers, and they reach
+  // the family through a hand-listed key map in src/ui/feast_title.ts (a t()
+  // key built by template literal is invisible to every static consumer), so a
+  // new def leaves that map short and the exhaustiveness pin in
+  // tests/entity_display_name.test.ts is what catches it. professions/feast.ts's
+  // own header carries the full site list. The template must be UNIQUE per
+  // feast id, pinned in tests/professions_feast.
   feast?: {
     charges: number;
     durationTicks: number;

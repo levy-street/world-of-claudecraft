@@ -370,12 +370,18 @@ describe('isGatheredProvenanceKind partition over the live content', () => {
     // crafted-kind, and every crafted junk-kind output must sit BELOW
     // signable rarity, or the "Gathered by" mislabel goes live the day a
     // retune bumps an intermediate to rare.
-    // ONE sanctioned junk-kind exception composes with that rule (the farming
-    // absorb, RULE 3b: the two suites' rules COMPOSE). Farming deviation
-    // (ak): the growth tonic is a crafted output whose def is DELIBERATELY
-    // kind 'junk' (plant_crop consumes it as the plant-time knob; there is no
-    // use arm and Sell Junk must vendor it); common quality sits below the
-    // signing floor and the masterwork arm needs slot+stats the def lacks.
+    // ONE DEF IS A SANCTIONED JUNK KIND rather than a sanctioned exception, and
+    // the distinction is the point (the farming absorb, RULE 3b: the two
+    // suites' rules COMPOSE). Farming deviation (ak): the growth tonic is a
+    // crafted output whose def is DELIBERATELY kind 'junk' (plant_crop consumes
+    // it as the plant-time knob; there is no use arm and Sell Junk must vendor
+    // it). It needs NO skip here: common quality sits below the signing floor
+    // so the sweep below never admits it, the masterwork arm needs slot+stats
+    // the def lacks, and if a retune ever lifted its quality the craftedJunk
+    // loop further down would red on it first. A skip list carrying it was
+    // therefore a branch that could not fire, which is where the next defect
+    // hides, so it is retired rather than re-worded (masterwrought Phase 11k
+    // QA).
     //
     // THE FEASTS WERE EXCEPTIONS HERE AND THEY SHOULD NEVER HAVE BEEN
     // (masterwrought Phase 11k). Their entry claimed the never-signable proof
@@ -387,16 +393,6 @@ describe('isGatheredProvenanceKind partition over the live content', () => {
     // carrying a `feast` payload, because a feast is only ever crafted or
     // traded for. So the sweep below reads the DEF-level predicate and the
     // feasts are ordinary members of it, at every rung.
-    // THE GROWTH TONIC NEEDS NO EXCEPTION AND ITS SKIP WAS DEAD (masterwrought
-    // Phase 11k QA). Its own reason says the def sits below the signing floor at
-    // quality 'common', which means the `signable` filter never admits it and
-    // the skip could not fire; and if a retune ever DID lift it, a skip is the
-    // wrong answer, because the craftedJunk loop below already pins every
-    // non-feast junk output BELOW signable rarity and would red first. An
-    // exception that cannot fire is where the next defect hides, which is the
-    // lesson this phase learned on the feast entry one screen up, so it is
-    // retired rather than re-worded.
-    const CRAFTED_JUNK_EXCEPTIONS = new Set<string>();
     const PLACEABLE_FEASTS = [
       'harvest_feast',
       'stonepot_feast',
@@ -418,7 +414,10 @@ describe('isGatheredProvenanceKind partition over the live content', () => {
     for (const recipe of signable) {
       const def = ITEMS[recipe.resultItemId];
       expect(def, recipe.resultItemId).toBeDefined();
-      if (CRAFTED_JUNK_EXCEPTIONS.has(recipe.resultItemId)) continue;
+      // NO SKIP LIST: the sweep runs over every signable-rarity crafted output
+      // with no carve-out at all, which is what the feast fix made possible
+      // (the carve-out lives in the SOURCE predicate now, keyed on the feast
+      // payload, rather than on a list here).
       expect(isGatheredProvenance(def), `${recipe.resultItemId} (${def.kind})`).toBe(false);
     }
     const craftedJunk = ALL_RECIPES.filter((r) => ITEMS[r.resultItemId].kind === 'junk');

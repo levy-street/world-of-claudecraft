@@ -430,8 +430,8 @@ export class FarmPatchVisuals {
 
   /** Mirrors the placed feast entities (kind 'object', any templateId
    *  `isFeastTemplateId` admits) into the scene: create on first appearance,
-   *  remove on
-   *  despawn. Steady state is one entity-map walk plus set membership, no
+   *  remove on despawn. Steady state is one entity-map walk plus set
+   *  membership, no
    *  allocation (the reused seen-set idiom of applyPlots). The placement
    *  flourish fires once per feast appearing on any pass AFTER the first:
    *  the first pass after construction registers standing tables silently,

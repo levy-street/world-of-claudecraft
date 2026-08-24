@@ -82,12 +82,16 @@ function ladderSection(): string {
           if (out.placeable) {
             return `<li>${name} ${esc(t('guide.profPages.prov.placeableTag'))}</li>`;
           }
-          // The station tag REUSES the shipped hudChrome name every locale
-          // already carries, the same borrow the supplier labels above take:
-          // minting a second key to say "field station" would be a row of
-          // translation debt for a word the catalog ships.
+          // The station tag OWNS ITS BRACKETS, exactly as the placeable tag
+          // above does, and that is the whole reason it is its own key rather
+          // than the shipped hudChrome noun composed into ASCII parentheses
+          // here: ja and zh spell brackets FULL-WIDTH, so composing them would
+          // print two bracket styles side by side on the one rung that carries
+          // both tags. The supplier labels above borrow a bare noun into a
+          // <dt> and add no punctuation, which is why that borrow is fine and
+          // this one was not.
           if (out.station) {
-            return `<li>${name} (${esc(t('hudChrome.professions.mobileStationTooltip.kind'))})</li>`;
+            return `<li>${name} ${esc(t('guide.profPages.prov.stationTag'))}</li>`;
           }
           return `<li>${name}</li>`;
         })

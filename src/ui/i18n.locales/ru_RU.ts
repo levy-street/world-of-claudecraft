@@ -12221,6 +12221,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Кулинария {skill}',
   'guide.profPages.prov.placeableTag':
     '(выставляют, а не едят)',
+  'guide.profPages.prov.stationTag': '(походная станция)',
   'guide.profPages.prov.tableHeading':
     'Стол на вершине',
   'guide.profPages.prov.tableBody':

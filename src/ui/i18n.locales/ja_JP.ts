@@ -12012,6 +12012,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     '料理 {skill}',
   'guide.profPages.prov.placeableTag':
     '（食べずに据える）',
+  'guide.profPages.prov.stationTag': '（野営の製作拠点）',
   'guide.profPages.prov.tableHeading':
     '頂にある食卓',
   'guide.profPages.prov.tableBody':

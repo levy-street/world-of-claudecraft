@@ -2,13 +2,18 @@ import { describe, expect, it } from 'vitest';
 import { nearestInteractableFeast } from '../src/game/feast_interact';
 import { type Entity, INTERACT_RANGE } from '../src/sim/types';
 
-// The pure feast resolver for the interact funnel's Phase 12 arm: nearest
-// kind:'object' farm_feast entity within the INCLUSIVE interact range (the
-// farm_bed_interact comparator exactly), so the client never refuses a press
-// the sim would accept (the sim's own deny is strictly `> INTERACT_RANGE`).
-// The templateId is asserted against the LITERAL 'farm_feast' below (never
-// re-imported from the sim constant): the feast entities the sim spawns carry
-// this exact string on the wire, so a constant-value drift must red here.
+// The pure feast resolver for the interact funnel's Phase 12 arm: the nearest
+// kind:'object' entity carrying ANY placed-feast templateId, within the
+// INCLUSIVE interact range (the farm_bed_interact comparator exactly), so the
+// client never refuses a press the sim would accept (the sim's own deny is
+// strictly `> INTERACT_RANGE`).
+// The templateIds are asserted against LITERALS below (never re-imported from
+// the sim constants): the feast entities the sim spawns carry these exact
+// strings on the wire, so a constant-value drift must red here.
+// EVERY TIER, not only the party rung (masterwrought Phase 11k widened the
+// family and its QA found this file still driving one template): the resolver
+// asks isFeastTemplateId, which is derived from the catalog, so an apex rung
+// must open the same press.
 
 function entity(overrides: Partial<Entity> & Pick<Entity, 'id' | 'kind'>): Entity {
   return {
@@ -30,6 +35,22 @@ describe('nearestInteractableFeast', () => {
   it('finds a feast within reach', () => {
     const feast = entity({ id: 7, kind: 'object', pos: { x: 3, y: 0, z: 0 } });
     expect(nearestInteractableFeast(mapOf(feast), ORIGIN)).toBe(7);
+  });
+
+  it('opens on an APEX rung too, not only the party feast', () => {
+    // The literal templateIds the three apex feast defs carry
+    // (content/profession_items.ts). Written out rather than derived, because
+    // the claim under test is that the client resolver admits the wire strings
+    // the sim really spawns; a derivation would move with the catalog and
+    // could not see a wire-value drift.
+    for (const templateId of ['stonepot_feast', 'warspice_feast', 'sageleaf_feast']) {
+      const feast = entity({ id: 11, kind: 'object', templateId, pos: { x: 3, y: 0, z: 0 } });
+      expect(nearestInteractableFeast(mapOf(feast), ORIGIN), templateId).toBe(11);
+    }
+    // And the negative that keeps it honest: a placed object of the same kind
+    // that is NOT a feast opens nothing.
+    const bed = entity({ id: 12, kind: 'object', templateId: 'farm_bed', pos: { x: 1, y: 0, z: 0 } });
+    expect(nearestInteractableFeast(mapOf(bed), ORIGIN), 'a farm bed is not a feast').toBeNull();
   });
 
   it('is INCLUSIVE at the exact interact range and excludes just beyond it', () => {

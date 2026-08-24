@@ -14929,11 +14929,22 @@ ones the costing already recorded:
   the diff; the first version of this ledger recorded neither). The six ids this
   phase mints are three repeatably crafted, tradable consumables and the three
   patterns that teach them. `docs/design/reliquary.md` curates CONQUERABLE
-  UNIQUE loot, the catalog holds zero crafted gear by precedent, and the
-  packet's Phase 11 build already settled that a PATTERN takes no page either
-  (consumed-on-learn knowledge, executed as the kind-keyed carve-out in
-  tests/reliquary_content.test.ts). Both grounds apply unchanged, so no page is
-  owed and `tests/reliquary_content.test.ts` is untouched by this phase.
+  UNIQUE loot, and the packet's Phase 11 build already settled that a PATTERN
+  takes no page (consumed-on-learn knowledge, executed as the kind-keyed
+  carve-out in tests/reliquary_content.test.ts).
+  **THE FIRST VERSION OF THIS RECORD GAVE A GROUND THE TREE HAD ALREADY
+  REFUTED**, and it is corrected here rather than left, because a record whose
+  whole purpose is to state grounds is worthless with a stale one: it said the
+  catalog holds zero crafted gear by precedent. Derived from the shipped
+  catalog, RELIQUARY_PAGES holds FIVE crafted outputs
+  (`boundstone_helm`, `gravewyrm_gauntlets`, and all three crafted rods, one of
+  them this packet's own 11i `clockreel_fishing_rod`), and
+  `src/sim/content/reliquary.ts` carries the packet's own Phase 11j correction
+  of exactly that reasoning in as many words. THE GROUND THAT ACTUALLY HOLDS is
+  narrower and checkable: every crafted id in the catalog is GEAR or a TOOL, no
+  crafted CONSUMABLE carries a relic row anywhere, and a feast is a consumable
+  a cook can make again tomorrow. So no page is owed, and
+  `tests/reliquary_content.test.ts` is untouched by this phase.
 - **K3 (the storefront).** Executed as the CUT. No ACHIEVEMENT_MAP row in
   server/steam/ or server/epic/, the epic_achievement_map pins unmoved at 84
   (verified green, not assumed), no server/ file touched by this phase, and

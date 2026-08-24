@@ -11994,6 +11994,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '요리 {skill}',
   'guide.profPages.prov.placeableTag':
     '(먹지 않고 차려 둠)',
+  'guide.profPages.prov.stationTag': '(야전 제작 거점)',
   'guide.profPages.prov.tableHeading':
     '꼭대기의 식탁',
   'guide.profPages.prov.tableBody':

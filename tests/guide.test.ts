@@ -3401,6 +3401,14 @@ describe('Guide professions pages and routes', () => {
       t('guide.profPages.prov.suppliersBody'),
       'the section must not claim a lead it does not hold',
     ).not.toContain('than any other craft');
+    // AND THE POSITIVE HALF, this file's own idiom one correction over (the
+    // longest-bill pin pins the live clause present and the retired one
+    // absent): without it a reword to "more gathering lines than any other
+    // PROFESSION" sails through the negative.
+    expect(
+      t('guide.profPages.prov.suppliersBody'),
+      'and it must still make the claim the tables support',
+    ).toContain('nearly every gathering line');
     for (const id of ['farming', 'fishing', 'herbalism', 'corpseHarvesting', 'logging']) {
       const line = lineOf(id);
       for (const name of line.materials) {
@@ -3465,8 +3473,14 @@ describe('Guide professions pages and routes', () => {
         .filter((o) => o.placeable && o.station),
       'no output is both a feast and a station',
     ).toEqual([]);
-    expect(html, 'and the station tag renders').toContain(
-      t('hudChrome.professions.mobileStationTooltip.kind'),
+    // THE LITERAL, not t() on both sides (the fix round's own reviewer): a
+    // resolved key compared against itself moves together, so it can only see
+    // the tag's total absence, never the tag rendering the wrong words. It is
+    // also what would have caught the first version of this tag, which composed
+    // ASCII brackets around a shipped noun that ja and zh spell full-width.
+    expect(html, 'and the station tag renders its own words').toContain('(field station)');
+    expect(t('guide.profPages.prov.stationTag'), 'the tag owns its brackets').toBe(
+      '(field station)',
     );
     // The rung they share, so a reader meets both tags in one list: the claim
     // is about what sits BESIDE the feasts, not merely that a tag exists.

@@ -6316,6 +6316,7 @@ export type TranslationKeyFlat =
   | 'guide.profPages.prov.marketHeading'
   | 'guide.profPages.prov.placeableTag'
   | 'guide.profPages.prov.rungFmt'
+  | 'guide.profPages.prov.stationTag'
   | 'guide.profPages.prov.suppliersBody'
   | 'guide.profPages.prov.suppliersHeading'
   | 'guide.profPages.prov.tableBody'

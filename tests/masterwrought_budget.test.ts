@@ -393,7 +393,7 @@ const roleFoodBill = (cropId: string, count: number): { itemId: string; count: n
 // but they are NOT phase-10 consumables and the arms over APEX_CONSUMABLES
 // above pin phase-10 shapes, so they are censused here instead: two plain rare
 // dishes with no payload at all and one placeable epic feast whose payload is
-// another dish's. R14 is why they carry no power of their own.
+// another dish's. masterwrought R14 is why they carry no power of their own.
 const ANGLER_OUTPUTS = ['peppered_deepbarb_catfish', 'roast_hollowgill_sturgeon'] as const;
 
 // masterwrought Phase 11k's apex feast tier, which REPLACED Phase 11i's single

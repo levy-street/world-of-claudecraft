@@ -11470,6 +11470,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
     '烹饪 {skill}',
   'guide.profPages.prov.placeableTag':
     '（摆放，而非食用）',
+  'guide.profPages.prov.stationTag': '（野战制作站）',
   'guide.profPages.prov.tableHeading':
     '顶端的那张餐桌',
   'guide.profPages.prov.tableBody':
