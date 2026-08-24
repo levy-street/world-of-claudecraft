@@ -3735,11 +3735,14 @@ export const ZONE3_ITEMS: Record<string, ItemDef> = {
     quality: 'poor',
     sellValue: 25,
   },
+  // Reagent now (TROPHY_RECIPES, Masterwrought phase 11l), same convention as
+  // wolf_fang in items.ts: common NOT poor so sellAllJunk never sweeps it;
+  // sellValue unchanged.
   cracked_ogre_tusk: {
     id: 'cracked_ogre_tusk',
     name: 'Cracked Ogre Tusk',
     kind: 'junk',
-    quality: 'poor',
+    quality: 'common',
     sellValue: 42,
   },
   inert_storm_shard: {
@@ -3756,11 +3759,14 @@ export const ZONE3_ITEMS: Record<string, ItemDef> = {
     quality: 'poor',
     sellValue: 30,
   },
+  // Reagent now (TROPHY_RECIPES, Masterwrought phase 11l), same convention as
+  // wolf_fang in items.ts: common NOT poor so sellAllJunk never sweeps it;
+  // sellValue unchanged.
   cracked_wyrm_scale: {
     id: 'cracked_wyrm_scale',
     name: 'Cracked Wyrm Scale',
     kind: 'junk',
-    quality: 'poor',
+    quality: 'common',
     sellValue: 35,
   },
   // --- Class/spec gap fill: the 17-22 band plus endgame caster pieces ---

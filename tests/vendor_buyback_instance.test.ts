@@ -15,7 +15,7 @@ import { groundHeight } from '../src/sim/world';
 
 const BOOTS = 'oiled_boots'; // armor, sellValue 80, stack 1
 const HIDE = 'pristine_hide'; // junk rare material, sellValue 25, stack 20
-const SCALE = 'mudfin_scale'; // poor junk, eviction filler
+const SCALE = 'mudfin_scale'; // junk reagent (common since phase 11l), eviction filler
 
 const makeWorld = () => new Sim({ seed: 42, playerClass: 'warrior', noPlayer: true });
 

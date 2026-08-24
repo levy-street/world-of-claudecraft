@@ -46,14 +46,23 @@ const HONEST_MATERIALS = [
   'arcane_shard',
   'arcanite_bar',
   'ashwood_log',
+  // Masterwrought phase 11l: the eight promoted trophy drops (this one and
+  // the seven at their sorted positions below) derive IN as the reagents the
+  // trophy recipes (TROPHY_RECIPES) consume.
+  'bandit_bandana',
   'bog_beet',
   'bog_beet_seed',
+  'bogiron_nugget',
   'bone_fragments',
   'brook_carrot',
   'brook_carrot_seed',
+  'chipped_tusk',
   'compost',
   'cooking_salt',
   'copper_ore',
+  'cracked_fetish',
+  'cracked_ogre_tusk',
+  'cracked_wyrm_scale',
   'curved_tusk',
   // Masterwrought phase 09: derives IN as the reagent the apex weapon rows
   // consume (APEX_GEAR_RECIPES), per the phase 07 allowlist obligation.
@@ -113,6 +122,7 @@ const HONEST_MATERIALS = [
   'lucent_reagent',
   'marsh_rice',
   'marsh_rice_seed',
+  'mudfin_scale',
   // Masterwrought phase 09: derives IN as the reagent the apex engineering
   // rows consume (APEX_GEAR_RECIPES), per the phase 07 allowlist obligation.
   'precision_chassis',
@@ -160,6 +170,7 @@ const HONEST_MATERIALS = [
   'sunpetal_herb',
   // Masterwrought phase 08: derives IN via the tailoring apex rows.
   'sunspun_bolt',
+  'tallow_candle',
   'tanning_agent',
   'thorium_ore',
   'thornpeak_cabbage',
@@ -294,8 +305,8 @@ describe('MATERIAL_ITEM_IDS: class exclusions, keyed on KIND against the live ca
       expect(MATERIAL_ITEM_IDS.has(def.id), def.id).toBe(false);
     }
     // Non-vacuity: a rename of the 'poor' quality token must not leave this
-    // sweep iterating nothing (21 poor items at authoring time).
-    expect(poor).toBeGreaterThan(15);
+    // sweep iterating nothing (13 poor items at authoring time).
+    expect(poor).toBeGreaterThan(9);
   });
 
   it('excludes the named settlement cases: implements, charms, cosmetics, oddments', () => {
@@ -583,6 +594,61 @@ describe('completeness tripwire: unclassified non-poor junk', () => {
       .map((d) => d.id)
       .sort();
     expect(unclassified).toEqual([...ALLOWED_UNCLASSIFIED_JUNK]);
+  });
+});
+
+describe('phase 11l trophy promotion: the promoted set, exactly', () => {
+  // The 21 quality-poor junk ids at the phase 11l boundary, frozen. The 8
+  // promoted trophies became common TROPHY_RECIPES reagents (and so derive
+  // IN); the 13 survivors stay poor grey trash outside the material set. A
+  // diff on either side means a shipped poor item was promoted (or a promoted
+  // one demoted) by accident.
+  const PRE_11L_POOR_JUNK = [
+    'amber_hide',
+    'bandit_bandana',
+    'bogiron_nugget',
+    'briny_idol',
+    'chipped_tusk',
+    'cracked_fetish',
+    'cracked_ogre_tusk',
+    'cracked_wyrm_scale',
+    'deepfen_pearl',
+    'frayed_prayer_beads',
+    'inert_storm_shard',
+    'moonpale_scale',
+    'mudfin_scale',
+    'ogre_toe_ring',
+    'pale_pearl',
+    'soft_down',
+    'soggy_boot',
+    'soggy_moccasin',
+    'stag_antler',
+    'tallow_candle',
+    'tangled_weed',
+  ] as const;
+  const PROMOTED_TROPHIES = new Set<string>([
+    'bandit_bandana',
+    'bogiron_nugget',
+    'chipped_tusk',
+    'cracked_fetish',
+    'cracked_ogre_tusk',
+    'cracked_wyrm_scale',
+    'mudfin_scale',
+    'tallow_candle',
+  ]);
+
+  it('promotes exactly the 8 trophies to common materials and leaves the 13 survivors poor', () => {
+    for (const id of PRE_11L_POOR_JUNK) {
+      const def = ITEMS[id];
+      expect(def, `${id} has no ITEMS def`).toBeTruthy();
+      if (PROMOTED_TROPHIES.has(id)) {
+        expect(def?.quality, `${id} should be common`).toBe('common');
+        expect(MATERIAL_ITEM_IDS.has(id), `${id} should be a material`).toBe(true);
+      } else {
+        expect(def?.quality, `${id} should stay poor`).toBe('poor');
+        expect(MATERIAL_ITEM_IDS.has(id), `${id} should stay out of the material set`).toBe(false);
+      }
+    }
   });
 });
 

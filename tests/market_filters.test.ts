@@ -46,10 +46,11 @@ function filterIds(ids: readonly string[], over: Partial<MarketQuery> = {}): str
 }
 
 describe('World Market filters', () => {
-  // wolf_fang became a crafting reagent (common, white), so the
-  // poor-quality exemplar here is mudfin_scale.
+  // wolf_fang became a crafting reagent (common, white), and phase 11l
+  // promoted mudfin_scale the same way, so the poor-quality exemplar here
+  // is soggy_moccasin.
   const items = [
-    'mudfin_scale',
+    'soggy_moccasin',
     'bone_fragments',
     'keen_dirk',
     'greyjaw_pelt_cloak',
@@ -417,7 +418,7 @@ describe('World Market filters', () => {
 
   it('matches rarities by the game quality names', () => {
     // bone_fragments is a crafting reagent, so it is common (white), not poor.
-    expect(filterIds(items, { rarity: 'poor' })).toEqual(['mudfin_scale']);
+    expect(filterIds(items, { rarity: 'poor' })).toEqual(['soggy_moccasin']);
     expect(filterIds(items, { rarity: 'common' })).toEqual([
       'bone_fragments',
       'roasted_boar',
@@ -633,7 +634,7 @@ describe('World Market filters', () => {
   });
 
   it('matches an item name or id substring, and never an unknown item', () => {
-    expect(filterIds(items, { search: 'mudfin' })).toEqual(['mudfin_scale']);
+    expect(filterIds(items, { search: 'moccasin' })).toEqual(['soggy_moccasin']);
     expect(filterIds(items, { search: 'ZZZNOMATCH' })).toEqual([]);
     // The server drops listings whose item it no longer knows, so the predicate rejects them.
     expect(marketItemMatches('not_a_real_item', q())).toBe(false);

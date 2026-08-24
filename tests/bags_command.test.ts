@@ -32,9 +32,9 @@ describe('/bags command', () => {
     sim.players.get(pid)!.inventory.length = 0; // shed the starter rations
 
     // Added out of quality order to prove the readout sorts them. wolf_fang
-    // is a crafting reagent (common), so the gray exemplar here is
-    // mudfin_scale.
-    sim.addItem('mudfin_scale', 5, pid); // poor
+    // is a crafting reagent (common), and phase 11l promoted mudfin_scale
+    // the same way, so the gray exemplar here is soggy_moccasin.
+    sim.addItem('soggy_moccasin', 5, pid); // poor
     sim.addItem('fen_reaver_glaive', 1, pid); // rare
     sim.addItem('minor_healing_potion', 3, pid); // common
     sim.addItem('redbrook_blade', 1, pid); // uncommon
@@ -42,7 +42,7 @@ describe('/bags command', () => {
     sim.chat('/bags', pid);
     expect(lastReadout(sim, pid)).toBe(
       'Bags (4): Fen Reaver Glaive, Redbrook Militia Blade, ' +
-        'Minor Healing Potion x3, Slimy Mudfin Scale x5. Purse: 12g 4s 5c.',
+        'Minor Healing Potion x3, Soggy Moccasin x5. Purse: 12g 4s 5c.',
     );
   });
 

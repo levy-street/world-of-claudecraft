@@ -949,21 +949,24 @@ describe('items vendor: buy / sell / sellAllJunk / buyBack', () => {
     const { pid, meta } = vendorPlayer(sim);
     const ctx = ctxOf(sim);
     meta.copper = 0;
-    // wolf_fang is a crafting reagent now (quality common, never
-    // swept), so this sweep uses mudfin_scale as its gray fodder.
-    sim.addItem('mudfin_scale', 2, pid); // poor, sellValue 5 -> 10
-    sim.addItem('bandit_bandana', 1, pid); // poor, sellValue 6
+    // mudfin_scale and bandit_bandana are crafting reagents now (quality
+    // common, never swept), so this sweep uses soggy_moccasin and
+    // tangled_weed as its gray fodder.
+    sim.addItem('soggy_moccasin', 2, pid); // poor, sellValue 9 -> 18
+    sim.addItem('tangled_weed', 1, pid); // poor, sellValue 1
     sim.addItem('wolf_fang', 1, pid); // reagent (common, white) -> kept
     sim.addItem('apprentice_staff', 1, pid); // not poor -> kept
     sim.drainEvents();
 
     items.sellAllJunk(ctx, pid);
-    expect(sim.countItem('mudfin_scale', pid)).toBe(0);
-    expect(sim.countItem('bandit_bandana', pid)).toBe(0);
+    expect(sim.countItem('soggy_moccasin', pid)).toBe(0);
+    expect(sim.countItem('tangled_weed', pid)).toBe(0);
     expect(sim.countItem('wolf_fang', pid)).toBe(1);
     expect(sim.countItem('apprentice_staff', pid)).toBe(1);
-    expect(meta.copper).toBe(2 * 5 + 6); // 16
-    expect(meta.vendorBuyback.some((s) => s.itemId === 'mudfin_scale' && s.count === 2)).toBe(true);
+    expect(meta.copper).toBe(2 * 9 + 1); // 19
+    expect(meta.vendorBuyback.some((s) => s.itemId === 'soggy_moccasin' && s.count === 2)).toBe(
+      true,
+    );
     const summary = sim
       .drainEvents()
       .filter((e) => e.type === 'loot' && /^Sold \d+ junk item/.test((e as { text: string }).text));
@@ -974,7 +977,7 @@ describe('items vendor: buy / sell / sellAllJunk / buyBack', () => {
     // The predicate is shared by sellAllJunk and the vendor preview in
     // hud.ts renderVendor; per-arm decisiveness here plus the source pin
     // below keep the two surfaces from ever drifting apart again.
-    const gray: ItemDef = ITEMS.mudfin_scale;
+    const gray: ItemDef = ITEMS.soggy_moccasin;
     const slot = { count: 1 };
     expect(items.junkSellableSlot(gray, slot)).toBe(true);
     expect(items.junkSellableSlot(undefined, slot)).toBe(false);
@@ -997,6 +1000,29 @@ describe('items vendor: buy / sell / sellAllJunk / buyBack', () => {
       'utf8',
     );
     expect(vendorView).toContain('junkSellableSlot(items[slot.itemId], slot)');
+  });
+
+  it('phase 11l trophy promotion holds at the sweep: promoted reagents never sell, holdouts do', () => {
+    // The eight trophy drops promoted to common TROPHY_RECIPES reagents must
+    // be invisible to the junk sweep, exactly like wolf_fang; the two
+    // still-poor holdouts prove the sweep predicate itself stayed live.
+    const slot = { count: 1 };
+    const promoted = [
+      'bandit_bandana',
+      'bogiron_nugget',
+      'chipped_tusk',
+      'cracked_fetish',
+      'cracked_ogre_tusk',
+      'cracked_wyrm_scale',
+      'mudfin_scale',
+      'tallow_candle',
+    ] as const;
+    for (const id of promoted) {
+      expect(items.junkSellableSlot(ITEMS[id], slot), id).toBe(false);
+    }
+    for (const id of ['tangled_weed', 'soggy_moccasin'] as const) {
+      expect(items.junkSellableSlot(ITEMS[id], slot), id).toBe(true);
+    }
   });
 
   it('buyBackItem repurchases via the silent add, spends copper, and clears the buyback slot', () => {
@@ -1030,7 +1056,7 @@ describe('items module determinism', () => {
       sim.addItem('wolf_fang', 3, pid);
       items.discardItem(ctx, 'wolf_fang', 1, pid);
       items.sellItem(ctx, 'wolf_fang', 1, pid);
-      sim.addItem('bandit_bandana', 1, pid);
+      sim.addItem('soggy_moccasin', 1, pid);
       items.sellAllJunk(ctx, pid);
       items.buyBackItem(ctx, 'wolf_fang', undefined, pid);
       return {

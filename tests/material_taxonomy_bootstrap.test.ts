@@ -34,7 +34,9 @@ describe('material_taxonomy as the first-evaluated sim module', () => {
     // 108 since masterwrought Phase 11i's three high-band catches, which derive
     // IN through the recipe-reagent source table like the six catches before
     // them. The capstone feast does NOT: it is a placeable, not a material.
-    expect(MATERIAL_ITEM_IDS.size).toBe(108);
+    // 108 -> 116 at masterwrought Phase 11l: the eight promoted trophy drops
+    // (poor junk turned common) derive IN as the TROPHY_RECIPES reagents.
+    expect(MATERIAL_ITEM_IDS.size).toBe(116);
     expect(MATERIAL_ITEM_IDS.has('iron_ore')).toBe(true);
     expect(MATERIAL_ITEM_IDS.has('arcanite_bar')).toBe(true);
     // The farming source specifically, because it is the newest and the one

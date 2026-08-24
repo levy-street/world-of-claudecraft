@@ -339,10 +339,11 @@ describe('food, drink, vendor', () => {
     const wilkes = [...sim.entities.values()].find((e) => e.templateId === 'trader_wilkes')!;
     teleportTo(sim, wilkes.pos.x + 2, wilkes.pos.z);
     sim.copper = 0;
-    // wolf_fang is a crafting reagent now (quality common, never
-    // swept), so this sweep uses mudfin_scale as its gray fodder.
-    sim.addItem('mudfin_scale', 2); // poor (gray), sellValue 5 -> 10
-    sim.addItem('bandit_bandana', 1); // poor (gray), sellValue 6
+    // mudfin_scale and bandit_bandana are crafting reagents now (quality
+    // common, never swept), so this sweep uses soggy_moccasin and
+    // tangled_weed as its gray fodder.
+    sim.addItem('soggy_moccasin', 2); // poor (gray), sellValue 9 -> 18
+    sim.addItem('tangled_weed', 1); // poor (gray), sellValue 1
     sim.addItem('wolf_fang', 1); // reagent (common, white) -> kept
     sim.addItem('apprentice_staff', 1); // not poor -> kept
     sim.addItem('boar_hide', 1); // quest item -> kept
@@ -350,22 +351,22 @@ describe('food, drink, vendor', () => {
     sim.sellAllJunk();
 
     // only the gray items leave the bags
-    expect(sim.countItem('mudfin_scale')).toBe(0);
-    expect(sim.countItem('bandit_bandana')).toBe(0);
+    expect(sim.countItem('soggy_moccasin')).toBe(0);
+    expect(sim.countItem('tangled_weed')).toBe(0);
     expect(sim.countItem('wolf_fang')).toBe(1);
     expect(sim.countItem('apprentice_staff')).toBe(1);
     expect(sim.countItem('boar_hide')).toBe(1);
-    // proceeds = 2*5 + 6 = 16 copper
-    expect(sim.copper).toBe(16);
+    // proceeds = 2*9 + 1 = 19 copper
+    expect(sim.copper).toBe(19);
     // each sold gray stack is recorded for buyback
-    expect(sim.vendorBuyback.some((s) => s.itemId === 'mudfin_scale' && s.count === 2)).toBe(true);
-    expect(sim.vendorBuyback.some((s) => s.itemId === 'bandit_bandana' && s.count === 1)).toBe(
+    expect(sim.vendorBuyback.some((s) => s.itemId === 'soggy_moccasin' && s.count === 2)).toBe(
       true,
     );
+    expect(sim.vendorBuyback.some((s) => s.itemId === 'tangled_weed' && s.count === 1)).toBe(true);
     // exactly one summary loot line (not one per stack)
     const sold = sim.events.filter((e) => e.type === 'loot' && /^Sold /.test(e.text));
     expect(sold).toHaveLength(1);
-    expect(sold[0]).toMatchObject({ text: 'Sold 3 junk items for 16c.' });
+    expect(sold[0]).toMatchObject({ text: 'Sold 3 junk items for 19c.' });
   });
 
   it('Sell Junk needs a vendor in range and no-ops cleanly with nothing to sell', () => {

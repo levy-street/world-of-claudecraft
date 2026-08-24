@@ -2715,11 +2715,14 @@ export const BASE_ITEMS: Record<string, ItemDef> = {
     quality: 'common',
     sellValue: 4,
   },
+  // Reagent now (TROPHY_RECIPES, Masterwrought phase 11l), same convention as
+  // wolf_fang above: common NOT poor so sellAllJunk never sweeps it; sellValue
+  // unchanged.
   bandit_bandana: {
     id: 'bandit_bandana',
     name: 'Red Bandana',
     kind: 'junk',
-    quality: 'poor',
+    quality: 'common',
     sellValue: 6,
   },
   tough_jerky: {
@@ -2731,18 +2734,24 @@ export const BASE_ITEMS: Record<string, ItemDef> = {
     sellValue: 2,
     buyValue: 25,
   },
+  // Reagent now (TROPHY_RECIPES, Masterwrought phase 11l), same convention as
+  // wolf_fang above: common NOT poor so sellAllJunk never sweeps it; sellValue
+  // unchanged.
   mudfin_scale: {
     id: 'mudfin_scale',
     name: 'Slimy Mudfin Scale',
     kind: 'junk',
-    quality: 'poor',
+    quality: 'common',
     sellValue: 5,
   },
+  // Reagent now (TROPHY_RECIPES, Masterwrought phase 11l), same convention as
+  // wolf_fang above: common NOT poor so sellAllJunk never sweeps it; sellValue
+  // unchanged.
   tallow_candle: {
     id: 'tallow_candle',
     name: 'Greasy Tallow Lump',
     kind: 'junk',
-    quality: 'poor',
+    quality: 'common',
     sellValue: 5,
   },
   // These three are crafting reagents (COMMON_RECIPES), so they are common (white),

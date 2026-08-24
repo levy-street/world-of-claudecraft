@@ -500,13 +500,12 @@ describe('chip reachability census: the All-only set, pinned', () => {
   // through All is the settled behavior rather than a gap.
   const ALL_ONLY = [
     'amber_hide',
-    'bandit_bandana',
-    'bogiron_nugget',
+    // masterwrought Phase 11l removed the eight promoted trophy drops
+    // (bandit_bandana, bogiron_nugget, chipped_tusk, cracked_fetish,
+    // cracked_ogre_tusk, cracked_wyrm_scale, mudfin_scale, tallow_candle):
+    // the trophy recipes are their consumers, so all eight derive into the
+    // material set and gain the materials chip.
     'briny_idol',
-    'chipped_tusk',
-    'cracked_fetish',
-    'cracked_ogre_tusk',
-    'cracked_wyrm_scale',
     'dawnhold_posy',
     'deepfen_pearl',
     'emberwing_cinderscale',
@@ -523,7 +522,6 @@ describe('chip reachability census: the All-only set, pinned', () => {
     'linen_pouch',
     'mistcallers_duffel',
     'moonpale_scale',
-    'mudfin_scale',
     'ogre_toe_ring',
     'old_cragmaws_pelt',
     'pale_pearl',
@@ -595,7 +593,6 @@ describe('chip reachability census: the All-only set, pinned', () => {
     // seasoned_stock, whose consumers are the apex role foods and the Laden
     // Hearth.
     'sunspun_haversack',
-    'tallow_candle',
     'tangled_weed',
     'travelers_knapsack',
     'warspice_feast',

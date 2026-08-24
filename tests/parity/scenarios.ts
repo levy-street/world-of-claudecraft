@@ -4502,7 +4502,9 @@ function inventoryVendor(): Scenario {
       rec.snapshot('sold');
 
       // 7) bulk-sell the remaining gray (sellAllJunk: one summary line + per-stack buyback).
-      sim.addItem('bandit_bandana', 1, buyer);
+      // bandit_bandana was the fodder here until phase 11l promoted it to a
+      // common trophy reagent; soggy_moccasin keeps the junk-sold beat live.
+      sim.addItem('soggy_moccasin', 1, buyer);
       sim.sellAllJunk(buyer);
       rec.snapshot('sold-junk');
 
