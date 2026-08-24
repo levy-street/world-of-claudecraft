@@ -2562,9 +2562,9 @@ export const ZONE3_ITEMS: Record<string, ItemDef> = {
   },
   // --- Old Cragmaw drops ---
   // Old Cragmaw's signature trophy, guaranteed to the slayer of the rare elite.
-  // A leatherworking reagent (recipe_cragwalker_boots) and still no quest tie,
+  // A leatherworking reagent (recipe_wildgrove_cinch) and still no quest tie,
   // so it feels like a boss-kill reward, vendors at its 300 or tans into the
-  // crags' boots, and never blocks a turn-in.
+  // cinch his own Ridge Stalker pack drops, and never blocks a turn-in.
   // Reagent now (TROPHY_RECIPES, Masterwrought phase 11l), same convention as
   // wolf_fang in items.ts: common NOT poor so sellAllJunk never sweeps it;
   // already common, sellValue unchanged.
@@ -2743,6 +2743,10 @@ export const ZONE3_ITEMS: Record<string, ItemDef> = {
     sellValue: 1050,
   },
   // Voskar the Emberwing drops (rare elite dragonkin)
+  // Voskar's signature trophy, guaranteed to the slayer of the rare elite.
+  // A leatherworking reagent (recipe_cragprowl_belt) and no quest tie, so it
+  // feels like a boss-kill reward, vendors at its 320 or plates into the
+  // Thornpeak Ogres' belt, and never blocks a turn-in.
   // Reagent now (TROPHY_RECIPES, Masterwrought phase 11l), same convention as
   // wolf_fang in items.ts: common NOT poor so sellAllJunk never sweeps it;
   // already common, sellValue unchanged.

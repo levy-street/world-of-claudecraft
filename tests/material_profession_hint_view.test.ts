@@ -70,7 +70,7 @@ describe('materialProfessionHintText', () => {
     expect(materialProfessionHintText('tallow_candle')).toBe('Used by Alchemy.');
     expect(materialProfessionHintText('bandit_bandana')).toBe('Used by Tailoring.');
     // The two already-common rare-elite leather trophies the second review
-    // round adopted (recipe_cragwalker_boots, recipe_cragprowl_belt) read the
+    // round adopted (recipe_wildgrove_cinch, recipe_cragprowl_belt) read the
     // same line: adoption is what put a Used-by line on them at all.
     expect(materialProfessionHintText('old_cragmaws_pelt')).toBe('Used by Leatherworking.');
     expect(materialProfessionHintText('emberwing_cinderscale')).toBe('Used by Leatherworking.');

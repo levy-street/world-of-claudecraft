@@ -1834,10 +1834,11 @@ describe('col_junk_drawer stays completable after the phase 11l trophy promotion
   // (MARKET_HOUSE_STOCK), ground pickups, every fishing cell in every band,
   // quest rewards, and recipe outputs.
   //
-  // The heroic, rift and delve arms contribute no poor id today (78 heroic
-  // and rift entries and 189 chest entries visited, zero poor), so they are
-  // scope insurance rather than a pin: a poor id authored onto one of those
-  // tables later enters the walk here instead of stranding the deed unseen.
+  // The heroic, rift, delve and MARKET_HOUSE_STOCK arms contribute no poor
+  // id today (78 heroic and rift entries, 189 chest entries and the 23 house
+  // stock rows visited, zero poor), so they are scope insurance rather than
+  // a pin: a poor id authored onto one of those tables later enters the walk
+  // here instead of stranding the deed unseen.
   //
   // CLOSURE: the faucets deliberately NOT walked cannot emit a poor id, so
   // the scope is complete rather than merely wide. Gathering yields carry no

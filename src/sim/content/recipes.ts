@@ -3875,10 +3875,25 @@ export const FARM_RECIPES: ProfessionRecipeRecord[] = [
 //
 // The pinned economy doctrine (tests/recipe_economy.test.ts: output strictly
 // between the trophy's sellValue and the LISTED bill) is list-count-only by
-// the shipped test's design: the specialization and self-signed discounts
-// (requiredReagentCountFor in src/sim/professions/crafting.ts, the crafter's
-// reward) can take a bill under its output, bounded by trophy supply, and
-// each row prints its discounted figure.
+// the shipped test's design. requiredReagentCountFor
+// (src/sim/professions/crafting.ts) composes THREE discounts into one floor
+// per reagent, count-1 first, then the multipliers, floored and never below
+// 1: the self-signed count-1 (#1145, a held copy the crafter signed), the
+// specialization multiplier 0.8 (#1134, materialDiscountPct in
+// src/sim/content/professions.ts PERK_THRESHOLDS), and the Jack of All
+// Trades multiplier 0.9 (#1296, JACK_MATERIAL_DISCOUNT_PCT in crafting.ts).
+// Every row below prints two figures against its output: the
+// specialization-only bill, and the specialization-plus-self-signed FLOOR
+// (a self-signed copy of every reagent, the true cheapest bill, which is
+// what tests/recipe_economy.test.ts minAchievableInputValue computes and
+// pins per row in TROPHY_MIN_ACHIEVABLE; the Jack multiplier is not in
+// either figure). Where the floor sits under the output the row says so:
+// gold-positive at full discount, bounded by trophy supply (the crafter's
+// reward, by the doctrine's design). The #1301 gold sink then adds
+// ceil(itemLevelBudget x CRAFT_GOLD_SINK_COPPER_PER_BUDGET) copper per craft
+// on top (crafting.ts resolveCraftForRecipe, 2 copper per budget point: 32
+// for a budget-16 row, 40 for budget 20, 20 for budget 10), so the true
+// floor is the printed floor plus that sink.
 //
 // 11l-RUNG EXCLUSION RECORD (one line per id, so the record greps in src).
 // Scope: the 21 junk mob-drop orphans (ten adopted below, nine excluded
@@ -3923,8 +3938,11 @@ export const TROPHY_RECIPES: ProfessionRecipeRecord[] = [
     // essence lines beside them. Input 178 vs output 160.
     // 11l-OUT: trophy 14 < output 160 < input 178; no prior recipe crafts
     // valefire_lantern (recipeForResultItem); uncommon at the 25 rung ceiling.
-    // Discounted bill (requiredReagentCountFor at full specialization: the
-    // fetish and the herb 2 to 1): 104 vs 160.
+    // Discounted bills (requiredReagentCountFor): specialization only, the
+    // fetish and the herb 2 to 1, 104 vs 160; specialization plus self-signed
+    // lands on the same floor, 104 vs 160 (every listed 2 is already at 1 and
+    // a 1 never drops), gold-positive at full discount, bounded by trophy
+    // supply.
     reagents: [
       { itemId: 'cracked_fetish', count: 2 },
       { itemId: 'goldleaf_herb', count: 2 },
@@ -3954,8 +3972,11 @@ export const TROPHY_RECIPES: ProfessionRecipeRecord[] = [
     // hide/silk/agent register does the rest. Input 92 vs output 80.
     // 11l-OUT: trophy 5 < output 80 < input 92; no prior recipe crafts
     // oiled_boots (recipeForResultItem); uncommon at the 25 rung ceiling.
-    // Discounted bill (requiredReagentCountFor at full specialization: scales
-    // 4 to 3, hide 6 to 4, silk and agent 2 to 1): 56 vs 80.
+    // Discounted bills (requiredReagentCountFor): specialization only, scales
+    // 4 to 3, hide 6 to 4, silk and agent 2 to 1, 56 vs 80; specialization
+    // plus self-signed, scales 4 to 2, hide 6 to 4, silk and agent 1, the
+    // floor 51 vs 80, gold-positive at full discount, bounded by trophy
+    // supply.
     reagents: [
       { itemId: 'mudfin_scale', count: 4 },
       { itemId: 'rough_hide', count: 6 },
@@ -3981,8 +4002,10 @@ export const TROPHY_RECIPES: ProfessionRecipeRecord[] = [
     // studs, pristine hide, the vats) carries the value. Input 411 vs
     // output 360. 11l-OUT: trophy 35 < output 360 < input 411; no prior
     // recipe crafts it (recipeForResultItem); rare at the 50 rung ceiling.
-    // Discounted bill (requiredReagentCountFor at full specialization: scales
-    // 3 to 2, hide 2 to 1, thorium 4 to 3): 291 vs 360.
+    // Discounted bills (requiredReagentCountFor): specialization only, scales
+    // 3 to 2, hide 2 to 1, thorium 4 to 3, 291 vs 360; specialization plus
+    // self-signed, scales 3 to 1, hide 1, thorium 4 to 2, agent 1, the floor
+    // 196 vs 360, gold-positive at full discount, bounded by trophy supply.
     reagents: [
       { itemId: 'cracked_wyrm_scale', count: 3 },
       { itemId: 'pristine_hide', count: 2 },
@@ -4004,8 +4027,10 @@ export const TROPHY_RECIPES: ProfessionRecipeRecord[] = [
     // rung's own register. Input 100 vs output 90.
     // 11l-OUT: trophy 12 < output 90 < input 100; no prior recipe crafts
     // hobnail_boots (recipeForResultItem); common, below the 25 rung ceiling.
-    // Discounted bill (requiredReagentCountFor at full specialization:
-    // nuggets and ore 3 to 2, flux 2 to 1): 60 vs 90.
+    // Discounted bills (requiredReagentCountFor): specialization only,
+    // nuggets and ore 3 to 2, flux 2 to 1, 60 vs 90; specialization plus
+    // self-signed, every listed count to 1, the floor 40 vs 90, gold-positive
+    // at full discount, bounded by trophy supply.
     reagents: [
       { itemId: 'bogiron_nugget', count: 3 },
       { itemId: 'iron_ore', count: 3 },
@@ -4030,8 +4055,10 @@ export const TROPHY_RECIPES: ProfessionRecipeRecord[] = [
     // register. Input 129 vs output 120.
     // 11l-OUT: trophy 15 < output 120 < input 129; no prior recipe crafts
     // vale_carving_knife (recipeForResultItem); common, below the 25 ceiling.
-    // Discounted bill (requiredReagentCountFor at full specialization: every
-    // listed 3 to 2): 86 vs 120.
+    // Discounted bills (requiredReagentCountFor): specialization only, every
+    // listed 3 to 2, 86 vs 120; specialization plus self-signed, every listed
+    // 3 to 1, the floor 43 vs 120, gold-positive at full discount, bounded by
+    // trophy supply.
     reagents: [
       { itemId: 'chipped_tusk', count: 3 },
       { itemId: 'iron_ore', count: 3 },
@@ -4057,9 +4084,11 @@ export const TROPHY_RECIPES: ProfessionRecipeRecord[] = [
     // battle staff's rung-50 log precedent). Input 444 vs output 420.
     // 11l-OUT: trophy 42 < output 420 < input 444; no prior recipe crafts
     // fenshadow_maul (recipeForResultItem); uncommon, below the 50 ceiling.
-    // Discounted bill: requiredReagentCountFor (src/sim/professions/crafting.ts)
-    // at full specialization plus self-signed floors every listed 2 to 1, so
-    // the bill falls to 42 + 160 + 20 = 222 against 420 out, bounded by supply
+    // Discounted bills: requiredReagentCountFor (src/sim/professions/crafting.ts)
+    // at full specialization alone floors every listed 2 to 1, so the bill
+    // falls to 42 + 160 + 20 = 222 against 420 out; specialization plus
+    // self-signed lands on the same floor, 222 vs 420 (a 1 never drops),
+    // gold-positive at full discount, bounded by trophy supply
     // (cracked_ogre_tusk has one source, brutok_skullsmasher, so at the
     // discounted bill each craft is ONE named-elite kill, two at the listed
     // bill).
@@ -4091,8 +4120,10 @@ export const TROPHY_RECIPES: ProfessionRecipeRecord[] = [
     // the rung's own register. Input 82 vs output 32 (the goldleaf_scroll
     // precedent ships 90 vs 15). 11l-OUT: trophy 5 < output 32 < input 82; no
     // prior recipe crafts it (recipeForResultItem); common, below the ceiling.
-    // Discounted bill (requiredReagentCountFor at full specialization: candles
-    // 2 to 1): 77 vs 32, still gold-negative.
+    // Discounted bills (requiredReagentCountFor): specialization only, candles
+    // 2 to 1, 77 vs 32; specialization plus self-signed lands on the same
+    // floor, 77 vs 32 (the herb and the vial are already 1), still
+    // gold-negative: the one row whose floor stays above its output.
     reagents: [
       { itemId: 'tallow_candle', count: 2 },
       { itemId: 'goldleaf_herb', count: 1 },
@@ -4113,8 +4144,10 @@ export const TROPHY_RECIPES: ProfessionRecipeRecord[] = [
     // thread register; the vendor sells it at 250, so crafting is the
     // discount route. Input 72 vs output 60. 11l-OUT: trophy 6 < output 60 <
     // input 72; no prior recipe crafts it (recipeForResultItem); common.
-    // Discounted bill (requiredReagentCountFor at full specialization:
-    // bandanas 2 to 1, scrap and thread 4 to 3): 51 vs 60.
+    // Discounted bills (requiredReagentCountFor): specialization only,
+    // bandanas 2 to 1, scrap and thread 4 to 3, 51 vs 60; specialization plus
+    // self-signed, bandanas 1, scrap and thread 4 to 2, the floor 36 vs 60,
+    // gold-positive at full discount, bounded by trophy supply.
     reagents: [
       { itemId: 'bandit_bandana', count: 2 },
       { itemId: 'linen_scrap', count: 4 },
@@ -4127,26 +4160,35 @@ export const TROPHY_RECIPES: ProfessionRecipeRecord[] = [
     stationType: 'loom',
   },
   {
-    id: 'recipe_cragwalker_boots',
+    id: 'recipe_wildgrove_cinch',
     professionId: 'leatherworking',
-    resultItemId: 'cragwalker_boots',
+    resultItemId: 'wildgrove_cinch',
     resultCount: 1,
-    // Old Cragmaw's pelt into the Cragwalker boots the same crags' vendor
-    // sells (Cragmaw to Cragwalker), the duskhide rung-50 register (pristine
-    // hide, a thorium stud, the vats) around it; Quartermaster Bree sells the
-    // boots at 4000, so crafting is the discount route (the linen_pouch
-    // shape). Input 451 vs output 400. 11l-OUT: trophy 300 < output 400 <
-    // input 451; no prior recipe crafts cragwalker_boots
-    // (recipeForResultItem); common, below the 50 rung ceiling.
+    // Old Cragmaw's pelt (the Ridge Stalkers' rare elite) into the Wildgrove
+    // Cinch his own pack drops at 2 percent (ridge_stalker, zone3.ts: the
+    // druid caster line's uncommon leather waist), the duskhide rung-50
+    // register (pristine hide, a thorium stud, the vats) around it: a
+    // deterministic door beside a trash roll from a DIFFERENT kill, the
+    // cragprowl_belt shape (Voskar's scale into the Thornpeak Ogres' 2
+    // percent belt), not the huntcord's. Input 451 vs output 420. 11l-OUT:
+    // trophy 300 < output 420 < input 451; no prior recipe crafts
+    // wildgrove_cinch (recipeForResultItem); uncommon, below the 50 rung
+    // ceiling.
+    // Re-picked from cragwalker_boots (R21, the fourth fix round): that boot
+    // is a rung-50 common with no stats (armor only), dominated inside its
+    // own zone by the rare cragmaw_prowlboots from the very kill that yields
+    // the pelt, so it was a pelt sink, not a crafter's prize.
     // Deliberately NOT cragmaw_huntcord, Old Cragmaw's own 0.25 chase belt:
     // the pelt is that same kill's guaranteed drop, so one pelt per craft
     // would make the chase deterministic (not the quiver precedent, which
     // pairs three 0.5 trash-drop scales with a 0.05 boss roll), and two
     // pelts per craft vendor 600 against 340 out, barred by the doctrine.
-    // Discounted bill (the maul precedent): requiredReagentCountFor
-    // (src/sim/professions/crafting.ts) at full specialization floors
-    // pristine_hide 3 to 2, 426 vs 400; specialized with a self-signed hide,
-    // 3 to 1, 300 + 25 + 60 + 16 = 401 vs 400, which holds by one copper.
+    // Discounted bills (requiredReagentCountFor, src/sim/professions/crafting.ts):
+    // specialization only, pristine_hide 3 to 2, 426 vs 420; specialization
+    // plus self-signed, the hide 3 to 1, 300 + 25 + 60 + 16 = 401, the floor
+    // 401 vs 420, gold-positive at full discount, bounded by trophy supply
+    // (the pelt has one source, Old Cragmaw, so every craft is one rare-elite
+    // kill at any bill).
     reagents: [
       { itemId: 'old_cragmaws_pelt', count: 1 },
       { itemId: 'pristine_hide', count: 3 },
@@ -4155,12 +4197,21 @@ export const TROPHY_RECIPES: ProfessionRecipeRecord[] = [
     ],
     skillReq: 50,
     itemLevelBudget: 20,
-    // No live source to cap against: cragwalker_boots is vendor-only (no
-    // drop, quest or loot source), so 20 is the rung-50 scaffolding
-    // convention. The consequence is recorded, not accidental: the item gains
-    // a derivable item level (20) and so a tooltip item level line it never
-    // showed before.
-    level: 20,
+    // Capped at the cinch's live drop source (the Ridge Stalkers, level 13 to
+    // 14) so the recipe route cannot re-tier the shipped item past its pinned
+    // item level 15 (tests/itemization_coverage.test.ts: 14 plus the uncommon
+    // bonus 1; see the lantern note). recipe.level has THREE consumers, all
+    // read from this one field: the item level source index
+    // (buildSourceIndex, src/sim/item_level.ts, the cap above);
+    // craftActionXp(recipe.level, characterLevel) in
+    // src/sim/professions/profession_xp.ts, craftActionXp(14, 20) = 19
+    // character XP per craft for a level-20 crafter (green band, 6 below
+    // against zeroDiff 8), against 100 for a level-20 row; and
+    // masterworkBonusStats through craftBonusStatsFor (crafting.ts), which
+    // sizes the masterwork proc's bonus record off this level: the cinch HAS
+    // a stat profile (int 2, spi 2), so the proc can bump it, the shipped
+    // behavior for every stat-bearing output.
+    level: 14,
     acquisition: ['trainer'],
     stationType: 'tannery',
   },
@@ -4175,10 +4226,11 @@ export const TROPHY_RECIPES: ProfessionRecipeRecord[] = [
     // vs output 440. 11l-OUT: trophy 320 < output 440 < input 471; no prior
     // recipe crafts cragprowl_belt (recipeForResultItem); uncommon, below the
     // 50 rung ceiling.
-    // Discounted bill (requiredReagentCountFor, src/sim/professions/crafting.ts):
-    // specialized only, pristine_hide 3 to 2, 446 vs 440; specialized with a
-    // self-signed hide, 3 to 1, 421 vs 440 (the listed 471 inverts; bounded by
-    // the cinderscale's one source, Voskar, and the bought agent at 16).
+    // Discounted bills (requiredReagentCountFor, src/sim/professions/crafting.ts):
+    // specialization only, pristine_hide 3 to 2, 446 vs 440; specialization
+    // plus self-signed, the hide 3 to 1, the floor 421 vs 440, gold-positive
+    // at full discount, bounded by trophy supply (the listed 471 inverts; the
+    // cinderscale's one source is Voskar, and the bought agent is 16).
     reagents: [
       { itemId: 'emberwing_cinderscale', count: 1 },
       { itemId: 'pristine_hide', count: 3 },

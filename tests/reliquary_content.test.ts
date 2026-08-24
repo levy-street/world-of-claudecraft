@@ -1200,12 +1200,28 @@ describe('Reliquary Rares of the Realm pages pin against the live rare tables', 
       // At most one profession door per spoils relic: a craft route beside
       // a rare's roll is a deliberate second door (the gravewyrm quiver's
       // shape), never a bundle of them. None is named today: the phase 11l
-      // huntcord door was withdrawn in the third fix round.
+      // huntcord door was withdrawn in the third fix round, and the fourth
+      // round's re-pick (recipe_wildgrove_cinch) outputs a trash drop no
+      // page catalogs, so this arm is vacuous over the spoils page; the
+      // positive control below proves the filter sees a profession hint.
       expect(
         hints.filter((h) => h.sourceKind === 'profession').length,
         relic.itemId,
       ).toBeLessThanOrEqual(1);
     }
+    // Positive control for the vacuous arm above: the same filter, run over
+    // the one slot that DOES carry a craft door (gravewyrm_bone_quiver on
+    // conquerors_gravewyrm_sanctum, the boss-plus-leatherworking shape),
+    // yields exactly one profession hint. A filter that stopped seeing
+    // sourceKind 'profession' would pass every spoils relic and red here.
+    const sanctum = RELIQUARY_PAGES_BY_ID.conquerors_gravewyrm_sanctum;
+    const quiver = sanctum.relics.find(
+      (r) => r.kind === 'item' && r.itemId === 'gravewyrm_bone_quiver',
+    );
+    expect(quiver).toBeDefined();
+    expect(
+      reliquaryRelicSource(sanctum, quiver!).filter((h) => h.sourceKind === 'profession'),
+    ).toEqual([{ sourceKind: 'profession', sourceId: 'leatherworking' }]);
   });
 
   it('the five no-drop rares stay marks-only (signatures sub-rare by quality)', () => {
@@ -2749,7 +2765,8 @@ const EXPECTED_DISTINCT_SOURCES: Record<string, number> = {
   // broodlord is marks-only), and gutripper_shiv's q_drogmar door. (The
   // Masterwrought phase 11l leatherworking door on cragmaw_huntcord was
   // withdrawn in the phase's third fix round: the pelt recipe now makes
-  // cragwalker_boots, not Old Cragmaw's own chase belt.)
+  // wildgrove_cinch, a Ridge Stalker trash drop no page catalogs, not Old
+  // Cragmaw's own chase belt.)
   conquerors_spoils_of_the_realm: 19,
   // The two honor quartermasters, on every slot of both pages (Phase 21).
   conquerors_warfare_gallery: 2,
@@ -3794,7 +3811,12 @@ describe('Reliquary source hint coverage', () => {
     // counted recipe_cragmaw_huntcord here; its third fix round withdrew
     // that door, because the pelt is Old Cragmaw's guaranteed drop and one
     // pelt per craft made his own 0.25 chase belt deterministic (the recipe
-    // now makes the vendor's cragwalker_boots, which no page catalogs).
+    // now makes wildgrove_cinch, the Ridge Stalkers' trash drop, which no
+    // page catalogs). The floor tracks the family COUNT and cannot tell a
+    // lost route from a returned one (a withdrawn door and a new door net to
+    // zero here); the whole-record distinct-sources equality
+    // (EXPECTED_DISTINCT_SOURCES, 'pins the distinct source count of every
+    // page') is the pin that does.
     expect(routesByFamily.mob).toBeGreaterThanOrEqual(211);
     expect(routesByFamily.heroic).toBeGreaterThanOrEqual(47);
     expect(routesByFamily.vendor).toBeGreaterThanOrEqual(101);

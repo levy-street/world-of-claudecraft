@@ -683,9 +683,16 @@ describe('the professions blob growth bound (phase 16)', () => {
     // and predicted 17,171, the measurement said 17,172, and recounting the
     // id settles it (also 23, 26): the delta is 0. Recorded as the
     // discipline requires, prediction, observation, and the reconciliation.
+    //
+    // AND AGAIN AT 11l's fourth fix round: 17,171 bytes, upper edge 17,183
+    // to 17,182, floor 16,792 to 16,791. The round re-picked the pelt row's
+    // id once more, recipe_cragwalker_boots (23 characters, 26 quoted plus
+    // comma) out of knownRecipes and recipe_wildgrove_cinch (22, 25) in:
+    // predicted 17,172 - 1 = 17,171 and measured so (a temporary exact pin,
+    // then restored to the band). Headroom stays 11 above and 380 below.
     const bytes = professionsBytes(s2);
-    expect(bytes).toBeGreaterThan(16792);
-    expect(bytes).toBeLessThan(17183);
+    expect(bytes).toBeGreaterThan(16791);
+    expect(bytes).toBeLessThan(17182);
     // Strictly dominated by the band's upper edge while the band holds:
     // kept as documentation that the structural ceiling also bounds this
     // state, never the live guard.

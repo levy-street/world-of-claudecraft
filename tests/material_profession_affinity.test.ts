@@ -81,7 +81,7 @@ describe('craftIdsForMaterialItem', () => {
     expect(craftIdsForMaterialItem('mudfin_scale')).toEqual(['leatherworking']);
     expect(craftIdsForMaterialItem('tallow_candle')).toEqual(['alchemy']);
     // The two already-common rare-elite leather trophies the phase's second
-    // review round adopted (recipe_cragprowl_belt, recipe_cragwalker_boots).
+    // review round adopted (recipe_cragprowl_belt, recipe_wildgrove_cinch).
     expect(craftIdsForMaterialItem('emberwing_cinderscale')).toEqual(['leatherworking']);
     expect(craftIdsForMaterialItem('old_cragmaws_pelt')).toEqual(['leatherworking']);
   });

@@ -490,15 +490,16 @@ describe('item level: the phase 11l trophy recipe outputs (TROPHY_RECIPES)', () 
   // level: a future level edit on a trophy row is a deliberate re-tier of a
   // shipped item, never a drive-by. The itemLevel pin is decisive only UPWARD
   // for the rows capped at their output's live drop source (the lantern, the
-  // boots, the maul, and the cragprowl belt at the Thornpeak Ogres, the
-  // leather row the second review round added): the mob source wins on a
-  // LOWERED recipe level and the item level never moves, which is why the
+  // oiled boots, the maul, the cragprowl belt at the Thornpeak Ogres, the
+  // leather row the second review round added, and the wildgrove cinch at
+  // the Ridge Stalkers, the pelt's output since the fourth fix round
+  // re-picked it off cragwalker_boots): the mob source wins on a LOWERED
+  // recipe level and the item level never moves, which is why the
   // recipe.level literal is pinned beside it in TROPHY_RECIPE_LEVELS.
-  // hobnail_boots, vale_carving_knife and cragwalker_boots (the pelt's
-  // output since the third fix round re-picked it off cragmaw_huntcord) were
-  // vendor-only before (no derivable source at all) and GAINED their level
-  // from the recipe. The potion and the pouch carry no combat slot, so they
-  // are not item-level eligible and stay undefined whatever the row says.
+  // hobnail_boots and vale_carving_knife were vendor-only before (no
+  // derivable source at all) and GAINED their level from the recipe. The
+  // potion and the pouch carry no combat slot, so they are not item-level
+  // eligible and stay undefined whatever the row says.
   const TROPHY_OUTPUT_LEVELS: Record<string, number | undefined> = {
     valefire_lantern: 7,
     oiled_boots: 11,
@@ -508,7 +509,9 @@ describe('item level: the phase 11l trophy recipe outputs (TROPHY_RECIPES)', () 
     fenshadow_maul: 13,
     healing_potion: undefined,
     linen_pouch: undefined,
-    cragwalker_boots: 20,
+    // 15 = the Ridge Stalkers' 14 plus the uncommon bonus 1 (the same 15
+    // tests/itemization_coverage.test.ts pins from the drop side).
+    wildgrove_cinch: 15,
     cragprowl_belt: 17,
   };
 
@@ -538,7 +541,7 @@ describe('item level: the phase 11l trophy recipe outputs (TROPHY_RECIPES)', () 
     recipe_fenshadow_maul: 12,
     recipe_healing_potion: 15,
     recipe_linen_pouch: 10,
-    recipe_cragwalker_boots: 20,
+    recipe_wildgrove_cinch: 14,
     recipe_cragprowl_belt: 16,
   };
 

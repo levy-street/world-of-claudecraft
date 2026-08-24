@@ -11193,8 +11193,8 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
         }
       },
       {
-        "id": "recipe_cragwalker_boots",
-        "name": "Cragwalker Boots",
+        "id": "recipe_wildgrove_cinch",
+        "name": "Wildgrove Cinch",
         "skillReq": 50,
         "tier": 2,
         "station": "tannery",
@@ -11219,9 +11219,9 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
           }
         ],
         "output": {
-          "name": "Cragwalker Boots",
+          "name": "Wildgrove Cinch",
           "count": 1,
-          "quality": "common"
+          "quality": "uncommon"
         },
         "combo": null,
         "oncePerDay": false,

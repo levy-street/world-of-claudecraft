@@ -215,13 +215,15 @@ describe('buildTrainView', () => {
     // phase 11l leatherworking trophy row (TROPHY_RECIPES) reaches Tanner
     // Hesk's window at skill 0 as a locked row naming its craft and rung.
     // The rung per row is a LITERAL, never recipe.skillReq echoed back.
+    // 'locked' is hard-coded because no leather trophy row is skillReq 0
+    // today; a future skillReq-0 row reds the key-set equality below first.
     const tannery = STATIONS.find((station) => station.type === 'tannery');
     expect(tannery?.masterNpcId).toBe('tanner_hesk');
     const leatherTrophyRows = TROPHY_RECIPES.filter((r) => r.professionId === 'leatherworking');
     const RUNG_BY_ROW: Record<string, number> = {
       recipe_oiled_boots: 25,
       recipe_gravewyrm_bone_quiver: 50,
-      recipe_cragwalker_boots: 50,
+      recipe_wildgrove_cinch: 50,
       recipe_cragprowl_belt: 50,
     };
     expect(leatherTrophyRows.map((r) => r.id).sort()).toEqual(Object.keys(RUNG_BY_ROW).sort());

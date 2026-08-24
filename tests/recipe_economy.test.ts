@@ -71,6 +71,21 @@ function requireRecipe(id: string): ProfessionRecipeRecord {
   return recipe;
 }
 
+// The cheapest achievable bill: specialized in the recipe's own craft (cap
+// skill clears any threshold) AND holding a self-signed copy of every reagent,
+// through requiredReagentCountFor, the same function the sim charges. Module
+// scope so the vendor-loop bound (THE ECONOMY INVARIANT) and the trophy floor
+// map (REFERENTIAL INTEGRITY) compute one number from one body.
+function minAchievableInputValue(recipe: ProfessionRecipeRecord): number {
+  const specialized = { [recipe.professionId]: 125 };
+  let total = 0;
+  for (const reagent of recipe.reagents) {
+    const { count } = requiredReagentCountFor(true, reagent, specialized, recipe.professionId);
+    total += count * reagentUnitValue(reagent.itemId);
+  }
+  return total;
+}
+
 // The legacy gold-positive exception list is EMPTY as of the economy rework
 // (maintainer-approved 2026-07-22): 10 of the original 14
 // members were reworked gold-negative through INPUT-only reagent reworks, and
@@ -128,17 +143,6 @@ describe('THE ECONOMY INVARIANT', () => {
     }
     return stocked;
   }
-  function minAchievableInputValue(recipe: ProfessionRecipeRecord): number {
-    // Specialized in the recipe's own craft (cap skill clears any threshold).
-    const specialized = { [recipe.professionId]: 125 };
-    let total = 0;
-    for (const reagent of recipe.reagents) {
-      const { count } = requiredReagentCountFor(true, reagent, specialized, recipe.professionId);
-      total += count * reagentUnitValue(reagent.itemId);
-    }
-    return total;
-  }
-
   // The set this bound runs over is keyed on the PRICE BASIS, not on live
   // vendor stock. It used to be derived from vendorItems, which made it
   // fragile in the worst way: the gathered-material delist emptied the live
@@ -405,7 +409,7 @@ describe('REFERENTIAL INTEGRITY', () => {
       recipe_fenshadow_maul: 'cracked_ogre_tusk',
       recipe_healing_potion: 'tallow_candle',
       recipe_linen_pouch: 'bandit_bandana',
-      recipe_cragwalker_boots: 'old_cragmaws_pelt',
+      recipe_wildgrove_cinch: 'old_cragmaws_pelt',
       recipe_cragprowl_belt: 'emberwing_cinderscale',
     };
     expect(Object.keys(TROPHY_BY_RECIPE).sort()).toEqual(TROPHY_RECIPES.map((r) => r.id).sort());
@@ -422,6 +426,44 @@ describe('REFERENTIAL INTEGRITY', () => {
           `${consumedTrophyValue} (${trophyId} x${(line as { count: number }).count})`,
       ).toBeGreaterThan(consumedTrophyValue);
     }
+  });
+
+  it('every trophy row floors at its pinned cheapest achievable bill', () => {
+    // The 11l-OUT doctrine above is list-count-only by design (the listed
+    // bill, never the discounted one), so the crafter's reward, the
+    // specialization and self-signed discounts requiredReagentCountFor
+    // composes, can and does take a bill under its output: nine of the ten
+    // floors below sit under the output (the healing potion is the one that
+    // does not), gold-positive at full discount and bounded by trophy supply.
+    // This map does NOT assert the floor above the output; it makes every
+    // floor VISIBLE as a literal, so a bill edit, a reagent re-price, or a
+    // discount regression inside requiredReagentCountFor moves a number
+    // someone has to re-derive (the recipe_sootscale_mantle precedent in THE
+    // ECONOMY INVARIANT). Each row's comment in src/sim/content/recipes.ts
+    // prints the same figure.
+    const TROPHY_MIN_ACHIEVABLE: Record<string, number> = {
+      recipe_valefire_lantern: 104,
+      recipe_oiled_boots: 51,
+      recipe_gravewyrm_bone_quiver: 196,
+      recipe_hobnail_boots: 40,
+      recipe_vale_carving_knife: 43,
+      recipe_fenshadow_maul: 222,
+      recipe_healing_potion: 77,
+      recipe_linen_pouch: 36,
+      recipe_wildgrove_cinch: 401,
+      recipe_cragprowl_belt: 421,
+    };
+    expect(Object.keys(TROPHY_MIN_ACHIEVABLE).sort()).toEqual(
+      TROPHY_RECIPES.map((r) => r.id).sort(),
+    );
+    for (const [id, floor] of Object.entries(TROPHY_MIN_ACHIEVABLE)) {
+      expect(minAchievableInputValue(requireRecipe(id)), `${id} floor`).toBe(floor);
+    }
+    // The one gold-negative floor, pinned as the direction rather than the
+    // number so the comment above cannot drift from the map.
+    expect(TROPHY_MIN_ACHIEVABLE.recipe_healing_potion).toBeGreaterThan(
+      outputValue(requireRecipe('recipe_healing_potion')),
+    );
   });
 
   it('no two recipes share a result item, and every trophy row is the one recipe for its output', () => {

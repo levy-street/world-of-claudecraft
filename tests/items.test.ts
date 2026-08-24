@@ -1014,6 +1014,11 @@ describe('items vendor: buy / sell / sellAllJunk / buyBack', () => {
     // a de-adopted trophy (its row dropped or re-picked off it) reds here
     // too, which the two already-common ids could never do on their own,
     // since their sweep verdict is the same before and after adoption.
+    // The derived set ALSO reds if a non-trophy recipe starts consuming an
+    // adopted trophy (the "no other recipe also consumes" clause drops it
+    // from `derived` while the literal keeps it): a deliberate tripwire. The
+    // trophy is still adopted in that case, so the fix is to widen the
+    // derivation (name the second consumer), never to de-adopt the trophy.
     const trophyRecipeIds = new Set(TROPHY_RECIPES.map((r) => r.id));
     const sharedReagents = new Set<string>();
     for (const recipe of ALL_RECIPES) {
@@ -1040,6 +1045,9 @@ describe('items vendor: buy / sell / sellAllJunk / buyBack', () => {
       'old_cragmaws_pelt',
       'tallow_candle',
     ] as const;
+    // A do-not-shrink marker, not a pin: it compares the literal to itself
+    // and can only red when someone edits the list above. The derived
+    // equality on the next line is the pin.
     expect(adopted).toHaveLength(10);
     expect([...derived].sort()).toEqual([...adopted]);
     for (const id of adopted) {

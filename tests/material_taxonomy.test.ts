@@ -128,7 +128,7 @@ const HONEST_MATERIALS = [
   'marsh_rice_seed',
   'mudfin_scale',
   // Masterwrought phase 11l's second review round: already common (never
-  // poor), derives IN as the trophy recipe_cragwalker_boots consumes
+  // poor), derives IN as the trophy recipe_wildgrove_cinch consumes
   // (TROPHY_RECIPES); the cinderscale above is its twin.
   'old_cragmaws_pelt',
   // Masterwrought phase 09: derives IN as the reagent the apex engineering
@@ -215,7 +215,7 @@ const ALLOWED_UNCLASSIFIED_JUNK = [
   'dawnhold_posy',
   // Masterwrought phase 11l's second review round removed
   // emberwing_cinderscale and old_cragmaws_pelt: the two leather trophy
-  // recipes (recipe_cragprowl_belt, recipe_cragwalker_boots) are their
+  // recipes (recipe_cragprowl_belt, recipe_wildgrove_cinch) are their
   // consumers, so both derive IN through the reagent source table
   // (HONEST_MATERIALS above); the completeness tripwire below forces the
   // move.
@@ -721,7 +721,7 @@ describe('phase 11l trophy promotion: the promoted set, exactly', () => {
   });
 
   // The two already-common rare-elite leather trophies the phase's second
-  // review round adopted (recipe_cragprowl_belt, recipe_cragwalker_boots).
+  // review round adopted (recipe_cragprowl_belt, recipe_wildgrove_cinch).
   // Neither was ever poor, so the frozen-21 loop above never visits them:
   // this is their own pin, the same three-way shape (quality, frozen
   // sellValue, material membership), with literal values for the same reason.
