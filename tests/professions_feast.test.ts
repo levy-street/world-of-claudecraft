@@ -12,7 +12,7 @@
 
 import { describe, expect, it } from 'vitest';
 import { DELVES, ITEMS } from '../src/sim/data';
-import { delveRunForPlayer, freeDelveRun } from '../src/sim/delves/runs';
+import { advanceDelveModule, delveRunForPlayer, freeDelveRun } from '../src/sim/delves/runs';
 import { enterDungeon, instanceAt, leaveDungeon } from '../src/sim/instances/dungeons';
 import { setItemLocked } from '../src/sim/item_lock';
 import {
@@ -1457,6 +1457,39 @@ describe('the apex feast tier: the teardown class is INHERITED, not rewritten', 
     // And the one-active slot freed with it, which is the half a stranded
     // entity would silently hold for the full 180 seconds.
     expect(useToPlace(sim, placer, 'stonepot_feast'), 'the slot freed too').toBeTruthy();
+  });
+
+  it('an apex feast placed in a delve room falls at the MODULE ADVANCE too', () => {
+    // THE SECOND TEARDOWN SITE, and it is a different one (masterwrought Phase
+    // 11k QA). delves/runs.ts drops run.objectIds in TWO places: freeDelveRun,
+    // driven by the arm below, and spawnDelveModule, which clears the room the
+    // party just left. A party that eats half a feast in the first chamber and
+    // walks the passage must not leave the table standing in a room the run has
+    // reused, holding the placer's one-active slot for the rest of its 180s.
+    // Neither rung pinned this until now, so a regression in the advance arm
+    // alone would have kept every other teardown assertion green.
+    const { sim, placer } = world(0);
+    sim.setPlayerLevel(DELVES.collapsed_reliquary.minLevel, placer.pid);
+    sim.enterDelve('collapsed_reliquary', 'normal', placer.pid);
+    sim.tick();
+    const run = delveRunForPlayer(sim.ctx, placer.pid);
+    expect(run, 'the placer stands inside the claimed run').not.toBeNull();
+    if (!run) return;
+    const e = useToPlace(sim, placer, 'warspice_feast');
+    expect(e).toBeTruthy();
+    if (!e) return;
+    expect(run.objectIds, 'the APEX entity joined the room roster').toContain(e.id);
+
+    // The real advance, through the shipped verb rather than a hand-poked
+    // index: it needs the exit portal open, which is the state the room's own
+    // completion opens.
+    run.exitPortalOpen = true;
+    advanceDelveModule(sim.ctx, run);
+    tickSeconds(sim, 2.05); // a farming sweep boundary for the state reclaim
+
+    expect(sim.entities.has(e.id), 'the entity fell with the room it stood in').toBe(false);
+    expect(sim.ctx.feasts.has(e.id), 'the sweep reclaimed the state').toBe(false);
+    expect(useToPlace(sim, placer, 'warspice_feast'), 'and the slot freed too').toBeTruthy();
   });
 
   it('an apex feast placed inside a delve run falls with the run', () => {
