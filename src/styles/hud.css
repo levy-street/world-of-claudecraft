@@ -1194,15 +1194,10 @@
     display: block;
     border-radius: 50%;
   }
-  /* Book of Deeds border accent: the cosmetic ring around the portrait, keyed by
-     the unit's active border deed. The unit_frame painter writes the SLUG into
-     data-border (this rule gates on a non-empty value) and that slug's palette
-     into the three custom properties, so ONE treatment lives here and zero
-     per-slug colors do: src/ui/deed_border_view.ts stays the single source of
-     truth. The ring is identity, never actionable info, so it renders at every
-     graphics tier; only the decorative outer bloom scales with --fx-shadow, like
-     the portrait combat glow above. z-index 2 sits it over the portrait but UNDER
-     the level chip (3) and the combat flash (4), whose corners it crosses.
+  /* Deed Heraldry keeps the portrait circular and adds only a fine family edge.
+     The unit-frame painter writes the slug and shared palette tokens. Identity
+     lines render at every tier; only the decorative outer bloom scales.
+     z-index 2 stays below the level chip (3) and combat flash (4).
      The inset is ASYMMETRIC on purpose: the 60x60 .portrait disc sits at the
      top-left of the 64x64 wrap, so its center is (30,30) while the wrap's is
      (32,32). -6px top/left with -2px bottom/right keeps the same 72px ring but
@@ -1213,37 +1208,56 @@
     position: absolute;
     inset: -6px -2px -2px -6px;
     border-radius: 50%;
-    border: 2px solid var(--border-accent-frame, transparent);
+    border: 1.5px solid var(--border-accent-frame, transparent);
     outline: 1px solid var(--border-accent-edge, transparent);
-    outline-offset: -3px;
+    outline-offset: -2px;
     box-shadow:
-      0 0 calc(6px * var(--fx-shadow, 1)) var(--border-accent-glow, transparent),
-      inset 0 0 4px var(--border-accent-edge, transparent);
+      0 0 calc(4px * var(--fx-shadow, 1)) var(--border-accent-glow, transparent),
+      inset 0 0 2px var(--border-accent-edge, transparent);
     z-index: 2;
     pointer-events: none;
   }
-  /* The forced-colors arm the nameplate cartouche already had and the ring did
-     not (recorded at Phase 19 QA, completed here). The accent custom properties
-     are never missing here: paintPortraitBorder writes all three together with
-     the data-border slug this rule gates on, so the var() fallbacks cannot
-     engage. What the forced palette does instead is REPLACE the computed colors
-     with the system palette, and the value of this arm is that it chooses that
-     replacement rather than taking whatever the UA picks. Three things: frame ->
-     CanvasText and edge -> Canvas, the SAME pair drawBorderAccent uses in
-     src/render/nameplate_canvas.ts, so the two surfaces of one identity agree
-     under high contrast; the outline is remapped rather than left to be forced
-     onto the frame's color, which would flatten the two-tone contour into a
-     single line; and the decorative bloom is dropped explicitly, since
-     box-shadow is stripped in forced-colors regardless and a surviving
-     declaration would read load-bearing. Collapsing all four slugs onto one
-     system pair hides nothing: the accent is cosmetic identity and carries no
-     health, range, rank, or threat, unlike the quest marker tones that earn a
-     redundant non-color cue. */
+  /* The canonical forged seal replaces the old hollow 12-o'clock clasp. It sits
+     at the portrait/name joint, not over a bar, and remains below gameplay
+     overlays. Target mirrors the joint because its portrait is on the right. */
+  .portrait-wrap > .deed-heraldry-seal {
+    display: none;
+  }
+  .portrait-wrap[data-border]:not([data-border=""]) > .deed-heraldry-seal {
+    display: grid;
+    position: absolute;
+    top: 19px;
+    right: -7px;
+    width: 22px;
+    height: 22px;
+    z-index: 3;
+    pointer-events: none;
+  }
+  #target-frame > .portrait-wrap[data-border]:not([data-border=""]) > .deed-heraldry-seal {
+    left: -7px;
+    right: auto;
+  }
+  /* Forced colors keeps the circular edge, seal silhouette, and header pattern.
+     Color is redundant identity; the shared motif remains the non-color cue. */
   @media (forced-colors: active) {
     .portrait-wrap[data-border]:not([data-border=""])::after {
       border-color: CanvasText;
-      outline-color: Canvas;
+      outline-color: CanvasText;
       box-shadow: none;
+    }
+    .portrait-wrap[data-border]:not([data-border=""]) > .deed-heraldry-seal {
+      border-color: CanvasText;
+      background-color: Canvas;
+      box-shadow: none;
+    }
+    .uf-name-header[data-border]:not([data-border=""]) {
+      background-color: CanvasText;
+      outline: 1px solid CanvasText;
+      outline-offset: -1px;
+      box-shadow: none;
+    }
+    .uf-name-header[data-border]:not([data-border=""]) .deed-heraldry-pattern {
+      stroke: CanvasText;
     }
   }
   .level-chip {
@@ -1375,7 +1389,55 @@
       transform: translateY(-2px);
     }
   }
+  .uf-name-header {
+    position: relative;
+    min-width: 0;
+    overflow: hidden;
+  }
+  .uf-name-header[data-border]:not([data-border=""]) {
+    width: calc(100% - 2px);
+    min-width: 76px;
+    margin-left: 2px;
+    padding: 1px 14px 1px 6px;
+    background-color: var(--border-accent-frame, transparent);
+    --deed-heraldry-plaque-fill: color-mix(
+      in srgb,
+      var(--deed-heraldry-well, transparent) 88%,
+      var(--border-accent-edge, transparent)
+    );
+    box-shadow:
+      inset 0 1px var(--border-accent-frame, transparent),
+      inset 0 -1px var(--border-accent-edge, transparent),
+      0 0 calc(3px * var(--fx-shadow, 1)) var(--border-accent-glow, transparent);
+  }
+  .uf-name-header.deed-heraldry-plaque-mirror[data-border]:not([data-border=""]) {
+    margin-right: 2px;
+    margin-left: 0;
+    padding-right: 6px;
+    padding-left: 14px;
+  }
+  .uf-name-header[data-border]:not([data-border=""]) .uf-name {
+    text-align: center;
+  }
+  .uf-name-header .deed-heraldry-pattern {
+    display: none;
+  }
+  .uf-name-header[data-border]:not([data-border=""]) .deed-heraldry-pattern {
+    position: absolute;
+    top: 50%;
+    right: 4px;
+    display: block;
+    width: 34px;
+    height: 34px;
+    transform: translateY(-50%);
+    opacity: 0.1;
+    stroke: var(--border-accent-frame, transparent);
+    stroke-width: 1.5;
+    pointer-events: none;
+  }
   .uf-name {
+    position: relative;
+    z-index: 1;
     font-size: 13px;
     font-weight: bold;
     font-family: var(--title-font);

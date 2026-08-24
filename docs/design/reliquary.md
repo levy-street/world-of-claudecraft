@@ -173,9 +173,9 @@ repeat at every growth. It owes a release-note line whenever a growth ships.
 | Reliquary window | Primary; DESIGN.md window grammar; mobile full-bleed. |
 | HUD tracker | Pinned-page strip beside the deed tracker, on by default behind the `showReliquaryTracker` master switch; pins persist per character (visibility and seat: the subsection below). |
 | Live toast / combat log | Relic logged; page Illumination; rank up. All four emitters are node-built and clickable, deep-linking to the page. |
-| Book of Deeds | Unchanged; optional soft links from collection deeds. Also hosts the "Titles and Borders" shelf where a border is picked. |
-| Nameplate and portrait rings | The active border renders in-world as a slug-keyed accent (cosmetic only; carries no actionable information). |
-| Inspect card | Curator standing line, border accent, and the rank-5 Curator sigil (identity-wire note below). |
+| Book of Deeds | Optional soft links from collection deeds, plus the "Titles and Borders" shelf. Earned heraldry options show their canonical seal and material sample; hover and focus preview the world and interaction forms without equipping. |
+| World and unit frames | Active Deed Heraldry renders as a compact forged seal plus name ribbon in the world. The player frame and valid player targets reuse the seal at the circular portrait/name joint and pattern only the name header. No gameplay bar or non-player frame inherits it. |
+| Inspect card | Curator standing line, the compact Deed Heraldry banner with the localized granting-deed name, and the rank-5 Curator sigil (identity-wire note below). |
 | Character sheet / public sheet | Completion pair, Curator rank (labeled set/scope), and the capped recent-finds strip (ids and kinds; privacy note below). |
 | Wiki `/wiki` | Spoiler-safe catalog of pages and relic names, with the rule-7 outside-completion label (Retired / Personal tag plus note) on flagged pages; no personal progress. Also indexed by guide search. |
 | Population rarity | Two optional lines (relic tooltip, page header) served from an anonymous aggregate endpoint; online only, absent offline (section below). |
@@ -343,12 +343,12 @@ Book completion pair, and its title stays off the titles page (the
 non-terminating self-reference).
 
 The rank 5 bridge deed's border reward (`reliquary_gilt`, Eternal Spoils) is
-wearable in-world: one active border per character, selected in the Book of
-Deeds beside the title picker, rendered as a slug-keyed accent on the
-wearer's nameplate and on the player and target portrait rings (the deeds
-design doc owns the border reward definition; palettes live in
-`src/ui/deed_border_view.ts`). The rank-up banner and the Overview note say
-so at rank 5, and every LIVE border deed unlock logs a wear hint. Retro
+wearable Deed Heraldry: one active reward per character, selected in the Book
+of Deeds beside the title picker. Its forged seal and material appear on the
+world name ribbon, the player and valid-player-target headers, the inspect
+banner, and the picker previews. `src/ui/deed_border_view.ts` owns the single
+slug-to-palette-and-motif mapping for every form. The rank-up banner and the
+Overview note say so at rank 5, and every LIVE border deed unlock logs a wear hint. Retro
 back-credits (the on-join catch-up) log no hint at all, by the same rule that
 keeps them free of banners and celebration audio; the pure unlock plan is what
 draws that line, and `tests/deeds_view.test.ts` pins it.

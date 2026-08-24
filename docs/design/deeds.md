@@ -17,7 +17,7 @@ content) must follow.
 | Feat | A deed flagged `feat: true`: legacy, world-first, or unobtainable-by-design records. Every Feat is zero-Renown, but zero Renown does not make a deed a Feat (see Zero-Renown deed). Feats sit outside the completion count entirely. |
 | Zero-Renown deed | A deed authored at Renown 0 under rule 2: luck-based drops (`col_first_rare`), the `col_set_*` armor-set collections, dynamic metas, and hidden luck moments (`hid_roll_hundred`). It counts toward Book completion like any other deed; it never scores on the Renown board. The exact non-feat set is pinned by `tests/deeds_completion.test.ts`, so growing it is a conscious, reviewed act. |
 | Title | A cosmetic name suffix a player can select and display (nameplate, chat, target frame, character panel, boards). |
-| Border | A cosmetic frame accent on capstone deeds that a player can select and wear (one at a time, chosen in the Book of Deeds beside the title picker): a slug-keyed treatment on their nameplate and on the player and target unit-frame portrait rings, plus a badge on the character sheet. |
+| Border | The persisted name for a selectable Deed Heraldry reward. One can be worn at a time from the Book of Deeds: a compact forged seal and name ribbon in the world, the same seal with a quiet name-header pattern on the player frame and valid player targets, a ceremonial inspect banner, and a character-sheet badge. Portraits remain circular and gameplay bars remain standard. |
 
 ## Architecture
 
