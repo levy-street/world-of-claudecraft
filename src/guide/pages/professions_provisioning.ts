@@ -63,9 +63,12 @@ function suppliersSection(): string {
     </section>`;
 }
 
-/** Cooking's own ladder, rung by rung. The placeable feasts are marked as such
- *  because they are the one cooking output a player does not eat from bags,
- *  and a ladder that did not say so would read wrong at the top. */
+/** Cooking's own ladder, rung by rung. The outputs a player does not eat from
+ *  bags are marked as such, because a ladder that did not say so would read
+ *  wrong at the top: the feasts are set on the ground, and the Laden Hearth is
+ *  a field station. Both live on the 125 rung beside plates that ARE eaten, so
+ *  marking only the feasts told a reader the station was a dish (the Phase 11k
+ *  QA finding). */
 function ladderSection(): string {
   const rows = GUIDE_PROF_PROVISIONING.ladder
     .map((rung) => {
@@ -76,9 +79,17 @@ function ladderSection(): string {
           // minting a class no sheet defines would be a silent no-op dressed as
           // a design decision.
           const name = esc(out.name);
-          return out.placeable
-            ? `<li>${name} ${esc(t('guide.profPages.prov.placeableTag'))}</li>`
-            : `<li>${name}</li>`;
+          if (out.placeable) {
+            return `<li>${name} ${esc(t('guide.profPages.prov.placeableTag'))}</li>`;
+          }
+          // The station tag REUSES the shipped hudChrome name every locale
+          // already carries, the same borrow the supplier labels above take:
+          // minting a second key to say "field station" would be a row of
+          // translation debt for a word the catalog ships.
+          if (out.station) {
+            return `<li>${name} (${esc(t('hudChrome.professions.mobileStationTooltip.kind'))})</li>`;
+          }
+          return `<li>${name}</li>`;
         })
         .join('');
       return `<li>

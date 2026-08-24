@@ -3431,6 +3431,32 @@ describe('Guide professions pages and routes', () => {
       'Stonepot Feast',
       'Warspice Feast',
     ]);
+    // AND THE OTHER OUTPUT NOBODY EATS (masterwrought Phase 11k QA). The
+    // placeable flag is a FEAST flag, so with it alone The Laden Hearth
+    // rendered untagged between three tagged feasts on its OWN rung and told a
+    // reader it was a dish. The station flag reads the def's own use record;
+    // the two sets are disjoint, which is what stops a future feast from
+    // wearing both tags.
+    const stations = GUIDE_PROF_PROVISIONING.ladder
+      .flatMap((r) => r.outputs)
+      .filter((o) => o.station)
+      .map((o) => o.name)
+      .sort();
+    expect(stations, 'the cooking mobile station is marked as one').toEqual(['The Laden Hearth']);
+    expect(
+      GUIDE_PROF_PROVISIONING.ladder.flatMap((r) => r.outputs).filter((o) => o.placeable && o.station),
+      'no output is both a feast and a station',
+    ).toEqual([]);
+    expect(html, 'and the station tag renders').toContain(t('hudChrome.professions.mobileStationTooltip.kind'));
+    // The rung they share, so a reader meets both tags in one list: the claim
+    // is about what sits BESIDE the feasts, not merely that a tag exists.
+    const topRung = GUIDE_PROF_PROVISIONING.ladder.find((r) => r.skillReq === 125);
+    expect(topRung?.outputs.map((o) => o.name).sort(), 'the 125 rung holds both kinds').toEqual([
+      'Sageleaf Feast',
+      'Stonepot Feast',
+      'The Laden Hearth',
+      'Warspice Feast',
+    ]);
 
     // THE PROSE'S OWN CLAIM, PINNED (the packet's recurring defect is a page
     // sentence nothing checks): the market section tells a reader that every

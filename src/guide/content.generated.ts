@@ -326,7 +326,7 @@ export interface GuideProfProvisioningLine { id: string; materials: string[]; }
 /** One rung of cooking's ladder and the outputs it teaches. */
 export interface GuideProfProvisioningRung {
   skillReq: number;
-  outputs: { name: string; quality: string; placeable: boolean }[];
+  outputs: { name: string; quality: string; placeable: boolean; station: boolean }[];
 }
 export interface GuideProfProvisioning {
   lines: GuideProfProvisioningLine[];
@@ -16824,37 +16824,44 @@ export const GUIDE_PROF_PROVISIONING: GuideProfProvisioning = {
         {
           "name": "Eastbrook Glazed Carrots",
           "quality": "common",
-          "placeable": false
+          "placeable": false,
+          "station": false
         },
         {
           "name": "Eastbrook Root Pottage",
           "quality": "common",
-          "placeable": false
+          "placeable": false,
+          "station": false
         },
         {
           "name": "Herbed Marsh Pike",
           "quality": "common",
-          "placeable": false
+          "placeable": false,
+          "station": false
         },
         {
           "name": "Hunter's Game Skewer",
           "quality": "common",
-          "placeable": false
+          "placeable": false,
+          "station": false
         },
         {
           "name": "Pan-Seared River Perch",
           "quality": "common",
-          "placeable": false
+          "placeable": false,
+          "station": false
         },
         {
           "name": "Salted Jerky",
           "quality": "common",
-          "placeable": false
+          "placeable": false,
+          "station": false
         },
         {
           "name": "Vale Hearth Loaf",
           "quality": "common",
-          "placeable": false
+          "placeable": false,
+          "station": false
         }
       ]
     },
@@ -16864,32 +16871,38 @@ export const GUIDE_PROF_PROVISIONING: GuideProfProvisioning = {
         {
           "name": "Ashwood Smoked Eel",
           "quality": "uncommon",
-          "placeable": false
+          "placeable": false,
+          "station": false
         },
         {
           "name": "Fenbridge Beet Braise",
           "quality": "uncommon",
-          "placeable": false
+          "placeable": false,
+          "station": false
         },
         {
           "name": "Fenbridge Rice Bowl",
           "quality": "uncommon",
-          "placeable": false
+          "placeable": false,
+          "station": false
         },
         {
           "name": "Fenbridge Rice Pudding",
           "quality": "uncommon",
-          "placeable": false
+          "placeable": false,
+          "station": false
         },
         {
           "name": "Frostgill Chowder",
           "quality": "uncommon",
-          "placeable": false
+          "placeable": false,
+          "station": false
         },
         {
           "name": "Goldleaf Game Stew",
           "quality": "uncommon",
-          "placeable": false
+          "placeable": false,
+          "station": false
         }
       ]
     },
@@ -16899,22 +16912,26 @@ export const GUIDE_PROF_PROVISIONING: GuideProfProvisioning = {
         {
           "name": "Angler's Feast Platter",
           "quality": "rare",
-          "placeable": false
+          "placeable": false,
+          "station": false
         },
         {
           "name": "Highwatch Barley Bannock",
           "quality": "rare",
-          "placeable": false
+          "placeable": false,
+          "station": false
         },
         {
           "name": "Marlow's Grand Roast",
           "quality": "rare",
-          "placeable": false
+          "placeable": false,
+          "station": false
         },
         {
           "name": "Silvered Carp Supper",
           "quality": "rare",
-          "placeable": false
+          "placeable": false,
+          "station": false
         }
       ]
     },
@@ -16924,22 +16941,26 @@ export const GUIDE_PROF_PROVISIONING: GuideProfProvisioning = {
         {
           "name": "Highwatch Barley Porridge",
           "quality": "rare",
-          "placeable": false
+          "placeable": false,
+          "station": false
         },
         {
           "name": "Highwatch Gourd Soup",
           "quality": "rare",
-          "placeable": false
+          "placeable": false,
+          "station": false
         },
         {
           "name": "Peppered Deepbarb Catfish",
           "quality": "rare",
-          "placeable": false
+          "placeable": false,
+          "station": false
         },
         {
           "name": "Seasoned Stock",
           "quality": "common",
-          "placeable": false
+          "placeable": false,
+          "station": false
         }
       ]
     },
@@ -16949,42 +16970,50 @@ export const GUIDE_PROF_PROVISIONING: GuideProfProvisioning = {
         {
           "name": "Evergarden Braised Greens",
           "quality": "rare",
-          "placeable": false
+          "placeable": false,
+          "station": false
         },
         {
           "name": "Evergarden Harvest Platter",
           "quality": "rare",
-          "placeable": false
+          "placeable": false,
+          "station": false
         },
         {
           "name": "Evergarden Sunmelon Tart",
           "quality": "rare",
-          "placeable": false
+          "placeable": false,
+          "station": false
         },
         {
           "name": "Harvest Feast",
           "quality": "rare",
-          "placeable": true
+          "placeable": true,
+          "station": false
         },
         {
           "name": "Roast Hollowgill Sturgeon",
           "quality": "rare",
-          "placeable": false
+          "placeable": false,
+          "station": false
         },
         {
           "name": "Sageleaf Chowder",
           "quality": "epic",
-          "placeable": false
+          "placeable": false,
+          "station": false
         },
         {
           "name": "Stonepot Stew",
           "quality": "epic",
-          "placeable": false
+          "placeable": false,
+          "station": false
         },
         {
           "name": "Warspice Skewers",
           "quality": "epic",
-          "placeable": false
+          "placeable": false,
+          "station": false
         }
       ]
     },
@@ -16994,22 +17023,26 @@ export const GUIDE_PROF_PROVISIONING: GuideProfProvisioning = {
         {
           "name": "Sageleaf Feast",
           "quality": "epic",
-          "placeable": true
+          "placeable": true,
+          "station": false
         },
         {
           "name": "Stonepot Feast",
           "quality": "epic",
-          "placeable": true
+          "placeable": true,
+          "station": false
         },
         {
           "name": "The Laden Hearth",
           "quality": "epic",
-          "placeable": false
+          "placeable": false,
+          "station": true
         },
         {
           "name": "Warspice Feast",
           "quality": "epic",
-          "placeable": true
+          "placeable": true,
+          "station": false
         }
       ]
     }

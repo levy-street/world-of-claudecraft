@@ -1247,9 +1247,17 @@ for (const recipe of cookingRecipes) {
   provisioningLadderMap.get(rung).push({
     name: def?.name ?? recipe.resultItemId,
     quality: def?.quality ?? 'common',
-    // A placeable feast is the one cooking output that is not eaten from bags,
-    // and the ladder reads wrong without saying so.
+    // A placeable feast is not eaten from bags, and the ladder reads wrong
+    // without saying so.
     placeable: !!(def && 'feast' in def && def.feast),
+    // NEITHER IS THE MOBILE STATION, and the first version of this flag said
+    // the feasts were "the one cooking output a player does not eat from bags"
+    // (masterwrought Phase 11k QA). The Laden Hearth is a placeMobileStation
+    // item on the SAME 125 rung as the three apex feasts, so with only the
+    // feast flag it rendered untagged between three tagged siblings and told a
+    // reader it was a dish. Read off the def's own use record rather than an
+    // id list, so a second station joins by existing.
+    station: def?.use?.type === 'placeMobileStation',
   });
 }
 const provisioningLadder = [...provisioningLadderMap.entries()]
@@ -1589,7 +1597,7 @@ export interface GuideProfProvisioningLine { id: string; materials: string[]; }
 /** One rung of cooking's ladder and the outputs it teaches. */
 export interface GuideProfProvisioningRung {
   skillReq: number;
-  outputs: { name: string; quality: string; placeable: boolean }[];
+  outputs: { name: string; quality: string; placeable: boolean; station: boolean }[];
 }
 export interface GuideProfProvisioning {
   lines: GuideProfProvisioningLine[];
