@@ -3206,11 +3206,18 @@ export const HOE_RECIPES: ProfessionRecipeRecord[] = [
     // the hoe ladder's shipped 4 is the TIER-4 convention and an apex hoe at 4
     // would be the only apex tool in the game that did not halve.
     //
-    // WHICH TWIN follows the NAME, because a tier-5 tool is named for the fine
-    // reagent its rung consumes: Highpine Axe from fine_elderwood_log, Sunpetal
-    // Sickle from fine_sunpetal_herb, Evergarden Hoe from
-    // fine_evergarden_greens. Input 220 (fine greens 2x80 + the rung-4 hoe at
-    // 60) vs output 150: gold-negative like every rung below it.
+    // WHICH TWIN follows the NAME, and be precise about how much of a rule
+    // that is (narrowed at the masterwrought Phase 11j QA, where the earlier
+    // wording claimed it of every tier-5 tool and two of the four falsify it).
+    // It holds for the two land rungs whose bill is a fine grade plus the rung
+    // below: Highpine Axe from Fine Highpine Log, Sunpetal Sickle from Fine
+    // Sunpetal Herb. It does NOT hold for the other two: the Glyphsteel Mining
+    // Pick is named for its Glyphsteel Bar and takes Fine Osmium Ore beside
+    // it, and the Tidewrought Fishing Rod consumes no fine grade at all. So
+    // the naming convention is what PICKS between the four shipped tier-4
+    // twins, all of which satisfy the one-tier-below invariant equally; it is
+    // not what forces the bill's shape. Input 220 (fine greens 2x80 + the
+    // rung-4 hoe at 60) vs output 150: gold-negative like every rung below it.
     reagents: [
       { itemId: 'fine_evergarden_greens', count: 2 },
       { itemId: 'osmium_hoe', count: 1 },

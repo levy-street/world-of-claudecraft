@@ -1393,9 +1393,12 @@ export const BASE_ITEMS: Record<string, ItemDef> = {
   // NOT A HOE REAGENT, and masterwrought Phase 11j re-reasoned this rather than
   // re-asserting it: the ladder no longer tops at 4, so "there is no tier-5
   // hoe" has stopped being the reason. The reason now is that the tier-5 rung
-  // takes exactly ONE tier-4 twin and it takes fine_evergarden_greens, because
-  // an apex tool is named for the reagent its rung consumes. This twin stays a
-  // dish reagent, which it already was.
+  // takes exactly ONE tier-4 twin and it takes fine_evergarden_greens, which
+  // the hoe's own name follows. All four tier-4 twins satisfy the ladder's
+  // one-tier-below invariant equally, so the name is what PICKED between them
+  // rather than a rule that forced the pick (narrowed at the masterwrought
+  // Phase 11j QA: two of the four shipped tier-5 tools are not named for a
+  // fine reagent at all). This twin stays a dish reagent, which it already was.
   fine_gilded_sunmelon: {
     id: 'fine_gilded_sunmelon',
     name: 'Fine Gilded Sunmelon',
@@ -1448,8 +1451,11 @@ export const BASE_ITEMS: Record<string, ItemDef> = {
   // The ladder no longer tops at 4, and deviation (ad)'s one-tier-below
   // invariant therefore points the tier-5 rung straight at a tier-4 twin: THIS
   // twin is recipe_evergarden_hoe's gathered reagent, at count 2. The tool is
-  // named for it (Evergarden Hoe from fine_evergarden_greens), following the
-  // tier-5 land convention exactly.
+  // named for it (Evergarden Hoe from Fine Evergarden Greens), which is what
+  // chose this twin over the other three the invariant admits, on the pattern
+  // the Highpine Axe and the Sunpetal Sickle set. It is a convention rather
+  // than a rule: the Glyphsteel Mining Pick is named for its bar and the
+  // Tidewrought Fishing Rod takes no fine grade at all.
   fine_evergarden_greens: {
     id: 'fine_evergarden_greens',
     name: 'Fine Evergarden Greens',
@@ -1607,8 +1613,17 @@ export const BASE_ITEMS: Record<string, ItemDef> = {
   //
   // WHAT IT ACTUALLY BUYS, stated plainly because a player will ask: no new
   // crop tier. Four crop tiers exist and the tier-4 hoe already reaches the
-  // last one, exactly as the tier-5 rod opens no catch band the tier-4 rod
-  // does not. What it buys is the EPIC rung on the tool-effect economy.
+  // last one, so this rung opens no ground.
+  //
+  // THE ROD IS NOT THE ANALOGY, corrected at the masterwrought Phase 11j QA,
+  // where an earlier draft of this comment said the tier-5 rod opens no catch
+  // band the tier-4 rod does not. It does: professions/fishing_bands.ts
+  // `fishingRodBandFor` runs band b off tool tier b + 1, so band 3 takes the
+  // tier-4 stormreel and band 4 the tier-5 tidewrought. Fishing is the ONE
+  // gathering profession whose apex rungs buy access, which is exactly why the
+  // hoe cannot lean on it: the honest comparison is the three land apex tools,
+  // whose deepest node tier is 3. What this rung buys is the EPIC rung on the
+  // tool-effect economy.
   // professions/tools.ts startingDurabilityFor pays RARITY_DURABILITY_BONUS
   // more charges per rarity rung and ratchetCeilingForUse prices the refill
   // ceiling off the same rarity, so rare to epic is one rung on both, and a

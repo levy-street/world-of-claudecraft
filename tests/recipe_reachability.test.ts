@@ -420,6 +420,7 @@ describe('every gathering tool is wieldable by the profession that owns it', () 
   it('no shipped tool demands more proficiency than its profession can reach', () => {
     const unswingable: string[] = [];
     let checked = 0;
+    let asserted = 0;
     for (const def of Object.values(ITEMS)) {
       const use = def.use;
       if (use?.type !== 'gatherTool') continue;
@@ -433,6 +434,7 @@ describe('every gathering tool is wieldable by the profession that owns it', () 
       // requirement of 100), so lowering fishing's cap under 100 would have red
       // this arm on a rung the engine never gates.
       if (use.professionId === 'fishing') continue;
+      asserted += 1;
       const cap = GATHERING_PROFESSIONS[use.professionId].maxSkill;
       // THE LADDER MUST KNOW THIS TIER. wieldRequirementForTier returns 0 for
       // any tier outside WIELD_REQUIREMENT_BY_TIER, so it fails OPEN: a tier-6
@@ -463,6 +465,14 @@ describe('every gathering tool is wieldable by the profession that owns it', () 
     // tools could have left this sweep with the arm still green. Exact, so a
     // tool joining or leaving the roster is a deliberate edit here.
     expect(checked, 'every shipped gatherTool def, fishing included').toBe(25);
+    // AND THE POPULATION THAT REACHES THE ASSERTIONS, which is the number the
+    // line above does NOT bound (masterwrought Phase 11j QA): `checked` is
+    // incremented before the fishing `continue`, so it counts the LOOP. A land
+    // tool retyped to professionId 'fishing' would leave the sweep entirely
+    // with `checked` still 25 and this arm still green, which is the shape of
+    // hole this pin exists to close. Twenty land tools: five hoes, five picks,
+    // five axes, five sickles.
+    expect(asserted, 'the LAND tools that actually reach the assertions').toBe(20);
   });
 
   it("the apex hoe's cap is REACHABLE on the ground the rung below already works", () => {

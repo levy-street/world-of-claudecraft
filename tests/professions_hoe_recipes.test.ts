@@ -108,8 +108,10 @@ describe('the crafted hoe ladder', () => {
     // twins, so swapping fine_evergarden_greens for the yam leaves them green;
     // and no arm reads the count at all, so 4 would pass too. Both are
     // argued at length in the row comment (the halving the tier-5 family
-    // applies, and the naming rule that a tier-5 tool is named for the reagent
-    // its rung consumes), so both get a literal.
+    // applies, and the naming CONVENTION that picked this twin over the other
+    // three the invariant admits: two of the four shipped tier-5 tools do not
+    // follow it, so it is a tie-breaker rather than a rule), so both get a
+    // literal.
     const apex = HOE_RECIPES.find((r) => r.id === 'recipe_evergarden_hoe');
     expect(apex?.reagents).toEqual([
       { itemId: 'fine_evergarden_greens', count: 2 },
