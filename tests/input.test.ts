@@ -100,6 +100,7 @@ function makeInput(userAgent?: string) {
     onBasicAttackStart: vi.fn(),
     onBasicAttackStop: vi.fn(),
     onToggleActionCamera: vi.fn(),
+    onDodge: vi.fn(),
     onRightMouseRelease: vi.fn(),
     canUseGameKeys: () => gameKeysAllowed,
   };
@@ -1341,6 +1342,49 @@ describe('keyboard jump latch', () => {
     now.mockReturnValue(5200); // released and latch expired
     expect(input.readMoveInput().jump).toBe(false);
     now.mockRestore();
+  });
+});
+
+describe('keyboard dodge input', () => {
+  it('fires a forward dodge on a released W double tap', () => {
+    const { cb, windowListeners } = makeInput();
+    const now = vi.spyOn(performance, 'now');
+    now.mockReturnValue(1000);
+    windowListeners.get('keydown')!({ code: 'KeyW', repeat: false });
+    windowListeners.get('keyup')!({ code: 'KeyW' });
+    now.mockReturnValue(1200);
+    windowListeners.get('keydown')!({ code: 'KeyW', repeat: false });
+
+    expect(cb.onDodge).toHaveBeenCalledTimes(1);
+    expect(cb.onDodge).toHaveBeenCalledWith({ x: 0, z: 1 });
+    now.mockRestore();
+  });
+
+  it('does not carry a first tap through focus loss', () => {
+    const { cb, windowListeners } = makeInput();
+    const now = vi.spyOn(performance, 'now');
+    now.mockReturnValue(1000);
+    windowListeners.get('keydown')!({ code: 'KeyA', repeat: false });
+    windowListeners.get('keyup')!({ code: 'KeyA' });
+    windowListeners.get('blur')!({});
+    now.mockReturnValue(1100);
+    windowListeners.get('keydown')!({ code: 'KeyA', repeat: false });
+
+    expect(cb.onDodge).not.toHaveBeenCalled();
+    now.mockRestore();
+  });
+
+  it('dispatches the dedicated Shift+V bind backward while idle', () => {
+    const { cb, windowListeners } = makeInput();
+    windowListeners.get('keydown')!({
+      code: 'KeyV',
+      repeat: false,
+      shiftKey: true,
+      preventDefault: vi.fn(),
+    });
+
+    expect(cb.onDodge).toHaveBeenCalledWith({ x: 0, z: -1 });
+    expect(cb.onUiKey).not.toHaveBeenCalledWith('nameplates');
   });
 });
 

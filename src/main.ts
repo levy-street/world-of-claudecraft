@@ -54,6 +54,7 @@ import { desktopPresentationHidden } from './game/desktop_presentation';
 import { initDesktopShellIntegration } from './game/desktop_shell_integration';
 import { installDevTeleports } from './game/dev_shortcuts';
 import { desktopPresenceOnFrame, pushDiscordPresenceEnabled } from './game/discord_presence';
+import { localDodgeToWorld } from './game/dodge_input';
 import { takeEditorPlaytestRequest } from './game/editor_playtest';
 import {
   clearEntryProbe,
@@ -1937,6 +1938,10 @@ async function startGame(
         world.stopAutoAttack();
       },
       onToggleActionCamera: () => applySetting('actionCamera', !settings.get('actionCamera')),
+      onDodge: (direction) => {
+        const facing = input.combatAimUsesFacing() ? input.camYaw : world.player.facing;
+        world.dodge(localDodgeToWorld(direction, facing));
+      },
       onRightMouseRelease: () => hud.cancelGroundAim(),
       onInputIntent: (kind) => perf.markInputIntent(kind),
       onUiKey: (key) => {
@@ -4610,6 +4615,7 @@ async function startGame(
           net.spectating === null &&
             !movementFrozen() &&
             !playerImmobilized() &&
+            (pe.dodgeRemaining ?? 0) <= 0 &&
             !isDelvePos(pe.pos.x) &&
             // Rifts (like delves) are server-authoritative instanced content, and
             // their raised sanctum tiers lift the player's Y server-side. The local

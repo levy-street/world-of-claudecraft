@@ -55,6 +55,7 @@ import type { PickAction } from '../src/sim/lockpick';
 import { lootHasGoneFfa } from '../src/sim/loot/loot_ffa';
 import { type MarketQuery, sanitizeMarketQuery } from '../src/sim/market_query';
 import { parseMoveInputFrame } from '../src/sim/move_input';
+import { playerEndurance } from '../src/sim/player_dodge';
 import {
   partyFrameAbsorb,
   partyFrameAggroTargets,
@@ -1519,6 +1520,14 @@ function dynamicFields(e: Entity, includeAuras = true): Record<string, unknown> 
     mhp: e.maxHp,
   };
   if (e.dead) out.dead = 1;
+  if (e.kind === 'player') {
+    out.end = round2(playerEndurance(e));
+    if ((e.dodgeRemaining ?? 0) > 0) {
+      out.dg = round2(e.dodgeRemaining ?? 0);
+      out.dgx = round2(e.dodgeDirX ?? 0);
+      out.dgz = round2(e.dodgeDirZ ?? 0);
+    }
+  }
   if (e.ghost) out.gh = 1; // released spirit (ghost form); renders translucent
   if (e.lootable) out.loot = 1;
   if (e.hostile) out.h = 1;
@@ -6772,6 +6781,16 @@ export class GameServer {
         break;
       case 'stopattack':
         sim.stopAutoAttack(pid);
+        break;
+      case 'dodge':
+        if (
+          typeof msg.x === 'number' &&
+          Number.isFinite(msg.x) &&
+          typeof msg.z === 'number' &&
+          Number.isFinite(msg.z)
+        ) {
+          sim.dodge({ x: msg.x, z: msg.z }, pid);
+        }
         break;
       case 'interact':
         sim.interact(pid);

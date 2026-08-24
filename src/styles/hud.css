@@ -1490,6 +1490,32 @@
     text-shadow: 1px 1px 1px #000;
     font-weight: bold;
   }
+  .dodge-endurance {
+    position: absolute;
+    right: 2px;
+    bottom: 1px;
+    z-index: 2;
+    display: flex;
+    width: 42px;
+    height: 3px;
+    gap: 2px;
+    pointer-events: none;
+  }
+  .dodge-endurance > span {
+    flex: 1;
+    overflow: hidden;
+    background: #071b1d;
+    box-shadow: 0 0 0 1px #000c;
+  }
+  .dodge-endurance i {
+    display: block;
+    width: 100%;
+    height: 100%;
+    transform: scaleX(1);
+    transform-origin: left;
+    background: #52e0c4;
+    box-shadow: 0 0 3px #71ffe5;
+  }
   .hp .bar-fill {
     background-color: var(--color-hp);
   }

@@ -28,6 +28,7 @@ import {
   segmentCircleTimeOfImpact,
 } from './combat/directional_attack';
 import type { SimContext } from './sim_context';
+import { evadeIncomingAttack } from './player_dodge';
 import { DT, type Entity } from './types';
 
 // Yards per second. Matches the homing projectile speed in src/render/vfx.ts so the
@@ -91,6 +92,8 @@ export type PendingBallisticProjectile = {
   travelled: number;
   minDistance: number;
   maxDistance: number;
+  school: string;
+  ability: string | null;
   resolve: (source: Entity, target: Entity) => void;
   fizzle?: () => void;
 };
@@ -161,6 +164,8 @@ export function scheduleBallisticProjectile(
     travelled: 0,
     minDistance: Math.max(0, options.minDistance ?? 0),
     maxDistance,
+    school: options.school,
+    ability: options.ability ?? null,
     resolve,
     fizzle,
   });
@@ -272,7 +277,9 @@ function advanceBallisticProjectile(
       targetId: hit.entity.id,
       reason: 'entity',
     });
-    projectile.resolve(source, hit.entity);
+    if (!evadeIncomingAttack(ctx, source, hit.entity, projectile.school, projectile.ability)) {
+      projectile.resolve(source, hit.entity);
+    }
     return false;
   }
   if (wallImpact !== null) {

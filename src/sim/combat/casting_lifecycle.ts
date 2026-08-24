@@ -34,6 +34,7 @@ import { recalcPlayerStats } from '../entity';
 import { isShieldItem } from '../equipment_rules';
 import { instanceInfoAt } from '../instances/dungeons';
 import { forceDismount } from '../mounts';
+import { isPlayerDodging } from '../player_dodge';
 import {
   canActivateDivineAscension,
   hasDevotion,
@@ -914,6 +915,10 @@ export function castAbility(
     return;
   }
   if (p.dead) return;
+  if (isPlayerDodging(p)) {
+    ctx.error(p.id, 'You are busy.');
+    return;
+  }
   if (isValkyrsCallingAirborne(p)) {
     ctx.error(p.id, 'You are busy.');
     return;

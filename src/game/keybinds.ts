@@ -146,6 +146,13 @@ export const BIND_ACTIONS: BindAction[] = [
     kind: 'edge',
     defaults: ['KeyR'],
   },
+  {
+    id: 'dodge',
+    label: 'Dodge',
+    category: 'Movement',
+    kind: 'edge',
+    defaults: ['Shift+KeyV'],
+  },
   // Targeting / interaction
   {
     id: 'target',

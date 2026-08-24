@@ -97,6 +97,11 @@ import { type FrozenOrbState, tickFrozenOrbs } from './combat/frozen_orb';
 import { applyGreaterInvisibilityAftereffect } from './combat/greater_invisibility';
 import { updateGuardian } from './combat/guardians';
 import {
+  advancePlayerDodge,
+  evadeIncomingAttack,
+  tryStartPlayerDodge,
+} from './player_dodge';
+import {
   applyHeal as applyHealImpl,
   consumeHealAbsorb as consumeHealAbsorbImpl,
   critVulnBonus as critVulnBonusImpl,
@@ -6827,6 +6832,10 @@ export class Sim {
       // no-op unless the player is currently AFK. Do Not Disturb survives.
       clearAfkOnMove(this.ctx, meta, p);
     }
+    if (advancePlayerDodge(this.ctx, p)) {
+      stepPlayerMotion(this.playerMotionDeps, p, emptyMoveInput());
+      return;
+    }
     if (advanceValkyrsCalling(this.ctx, p)) return;
     // The race countdown is a real start lock, not just a client animation.
     // Hold every forced/manual locomotion mode until the authoritative GO tick.
@@ -7639,6 +7648,10 @@ export class Sim {
     stopAutoAttackImpl(this.ctx, pid);
   }
 
+  dodge(direction: { x: number; z: number }, pid?: number): void {
+    tryStartPlayerDodge(this.ctx, direction, pid);
+  }
+
   private updatePlayerAutoAttack(p: Entity, meta: PlayerMeta): void {
     updatePlayerAutoAttackImpl(this.ctx, p, meta);
   }
@@ -7988,6 +8001,10 @@ export class Sim {
   }
 
   mobSwing(mob: Entity, target: Entity): void {
+    if (evadeIncomingAttack(this.ctx, mob, target, 'physical', null)) {
+      this.tryRevengeFree(target);
+      return;
+    }
     const missChance = swingMissChance(mob, target);
     const dodgeChance = target.kind === 'player' ? target.dodgeChance : 0.05;
     const { parryChance, blockChance } = warriorMeleeDefense(target, mob);

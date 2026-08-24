@@ -4171,6 +4171,11 @@ export interface Entity extends ClientMirroredEntityFields {
   vx: number; // horizontal air velocity (x, yards/sec)
   vz: number; // horizontal air velocity (z, yards/sec)
   vy: number; // vertical velocity (jumping/falling)
+  /** Runtime-only dodge charge and active movement state. Full charge is undefined. */
+  endurance?: number;
+  dodgeRemaining?: number;
+  dodgeDirX?: number;
+  dodgeDirZ?: number;
   onGround: boolean;
   // True while airborne from a deliberate jump (not from walking off a ledge).
   // Lets a jump clear fences for the whole arc, independent of slope.

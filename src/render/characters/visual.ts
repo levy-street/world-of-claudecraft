@@ -1365,6 +1365,17 @@ export class CharacterVisual {
     this.playOneShot(clips[Math.floor(Math.random() * clips.length)], 1.2);
   }
 
+  /** Existing authored defensive gesture, time-scaled to the server dodge window. */
+  playDodge(): void {
+    if (this.deadLock) return;
+    const clip = this.def.clips.dodge ?? this.def.clips.jump ?? this.def.clips.run;
+    if (!clip) return;
+    const action = this.action(clip);
+    if (!action) return;
+    const timeScale = Math.min(2.5, Math.max(0.5, action.getClip().duration / 0.75));
+    this.playOneShot(clip, timeScale);
+  }
+
   /** Contact-frame hitstop: hold THIS rig's animation at `scale` speed for
    *  `dur` seconds (the melee "bite"; also the struck target's flinch-freeze).
    *  Overlapping requests merge, longest duration, slowest scale, and the

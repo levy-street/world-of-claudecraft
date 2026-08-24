@@ -154,6 +154,11 @@ describe('reserved keys', () => {
 });
 
 describe('Keybinds defaults', () => {
+  it('keeps nameplates on V and assigns dodge to the shifted chord', () => {
+    expect(BIND_ACTIONS.find((action) => action.id === 'nameplates')?.defaults).toEqual(['KeyV']);
+    expect(BIND_ACTIONS.find((action) => action.id === 'dodge')?.defaults).toEqual(['Shift+KeyV']);
+  });
+
   it('resolves default movement, system, and action-bar keys to actions', () => {
     const kb = new Keybinds();
     expect(kb.actionForCode('KeyW')).toBe('forward');

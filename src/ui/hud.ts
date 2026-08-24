@@ -85,6 +85,11 @@ import {
 import { specialRoleColor } from '../sim/discord_roles';
 import { canEquipItem, isUniqueEquipped, weaponHand } from '../sim/equipment_rules';
 import { isItemLevelEligible, itemLevel, itemScore } from '../sim/item_level';
+import {
+  DODGE_ENDURANCE_COST,
+  DODGE_ENDURANCE_MAX,
+  playerEndurance,
+} from '../sim/player_dodge';
 import { requiredLevelFor } from '../sim/item_level_req';
 import type { Ante, PickAction } from '../sim/lockpick';
 import { petCanForceTaunt } from '../sim/pet/pet_taunt_gate';
@@ -1470,6 +1475,9 @@ export class Hud {
   private pfResEl = $('#pf-res');
   private pfResTextEl = $('#pf-res-text');
   private pfResourceEl = $('#pf-resource');
+  private dodgeEnduranceEl = $('#dodge-endurance');
+  private dodgeEnduranceFirstEl = $('#dodge-endurance-first');
+  private dodgeEnduranceSecondEl = $('#dodge-endurance-second');
   private pfAbsorbEl = $('#pf-absorb');
   private buffBarEl = $('#buff-bar');
   private debuffBarEl = $('#debuff-bar');
@@ -9106,6 +9114,21 @@ export class Hud {
     playerFrame.borderSlug = deedBorderSlug(sim.activeBorder);
     playerFrame.absorb = p;
     this.playerFramePainter.paint(unitFrameViewInto(this.playerFrameBuffer, playerFrame));
+    const dodgeEndurance = playerEndurance(p);
+    this.writerFacet.setTransform(
+      this.dodgeEnduranceFirstEl,
+      `scaleX(${Math.min(1, dodgeEndurance / DODGE_ENDURANCE_COST)})`,
+    );
+    this.writerFacet.setTransform(
+      this.dodgeEnduranceSecondEl,
+      `scaleX(${Math.min(1, Math.max(0, dodgeEndurance - DODGE_ENDURANCE_COST) / DODGE_ENDURANCE_COST)})`,
+    );
+    this.writerFacet.setAttr(this.dodgeEnduranceEl, 'aria-valuenow', String(dodgeEndurance));
+    this.writerFacet.setAttr(
+      this.dodgeEnduranceEl,
+      'aria-valuetext',
+      `${Math.round(dodgeEndurance)} / ${DODGE_ENDURANCE_MAX}`,
+    );
     this.updateLowHealthVignette(p.hp, p.maxHp);
     this.updateLowResource(p);
     const fateThreads = this.updateWarlockDoomMeter(p);

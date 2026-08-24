@@ -17,6 +17,7 @@ const W6_TAGS: Readonly<Record<string, string>> = {
   releaseEmpowered: 'IWorldCombat',
   attack: 'IWorldCombat',
   stopattack: 'IWorldCombat',
+  dodge: 'IWorldCombat',
   release: 'IWorldCombat',
   unstuck: 'IWorldCombat',
   resurrect_respond: 'IWorldCombat',

@@ -1164,6 +1164,7 @@ function referencedClips(clips: ClipMap): string[] {
   add(clips.sitIdle);
   add(clips.swim);
   add(clips.jump);
+  add(clips.dodge);
   add(clips.stow);
   add(clips.flourish);
   for (const spec of Object.values(clips.emote ?? {})) for (const c of spec?.clips ?? []) add(c);

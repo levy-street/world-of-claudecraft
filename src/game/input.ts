@@ -8,6 +8,12 @@ import { sanitizeMoveFacing, sanitizeMoveInput } from '../sim/move_input';
 import type { MoveInput } from '../sim/types';
 import { detectBrowserEngine } from './browser_env';
 import { cursorForHover, type HoverCursorKind } from './cursors';
+import {
+  type DodgeLocalDirection,
+  DodgeDoubleTapTracker,
+  dodgeDirectionForAction,
+  heldDodgeDirection,
+} from './dodge_input';
 import { comboCode, isModifierCode, type Keybinds, makeCombo } from './keybinds';
 import { bindableMouseCodeForButton, isReservedMouseButton } from './mouse_binds';
 import {
@@ -115,6 +121,7 @@ export interface InputCallbacks {
   onBasicAttackStart?(): void;
   onBasicAttackStop?(): void;
   onToggleActionCamera?(): void;
+  onDodge?(direction: DodgeLocalDirection): void;
   onRightMouseRelease?(): void;
 }
 
@@ -261,6 +268,7 @@ export class Input {
   // Physical key code -> action-bar slot currently held down, so key UP (or a
   // blur) releases the matching slot (drives the hold-to-charge shoot).
   private heldSlotCodes = new Map<string, number>();
+  private readonly dodgeDoubleTap = new DodgeDoubleTapTracker();
   // MouseEvent.button indices whose press this frame was consumed by a binding
   // (or by the rebind capture), so the matching `auxclick` can be cancelled too.
   // Chromium and Gecko navigate back/forward on the thumb buttons; cancelling
@@ -595,6 +603,7 @@ export class Input {
     // when the modal is the hold-open emote wheel handled by the early return
     // below. The preference remains enabled; a later canvas click reacquires.
     this.stopBasicAttack();
+    this.dodgeDoubleTap.clear();
     if (this.isActionCameraLocked()) document.exitPointerLock?.();
     // The held-open emote wheel itself counts as a modal (hud.isModalOpen()),
     // so when its keys are down this suspension almost always IS the wheel. The
@@ -609,6 +618,7 @@ export class Input {
     if (this.emoteWheelHeldCodes.size > 0) return;
     const hadHeldInput = this.keys.size > 0 || this.keyJumpUntil > 0;
     this.keys.clear();
+    this.dodgeDoubleTap.clear();
     this.keyJumpUntil = 0;
     // Suspending input drops any charging Vale Cup sport move (held Shoot etc.).
     this.releaseHeldSlots();
@@ -940,6 +950,7 @@ export class Input {
     // normally, so clearing keys here would cancel a walk the instant a camera
     // drag ends (every right/left-drag exits pointer lock on release).
     if (reason !== 'pointerlock') this.keys.clear();
+    if (reason !== 'pointerlock') this.dodgeDoubleTap.clear();
     if (reason !== 'pointerlock' && this.emoteWheelHeldCodes.size > 0) {
       this.emoteWheelHeldCodes.clear();
       this.cb.onEmoteWheel(false);
@@ -1059,6 +1070,10 @@ export class Input {
       // edge) so a fast tap survives until a grounded movement tick samples it.
       if (held === 'jump')
         this.keyJumpUntil = Math.max(this.keyJumpUntil, performance.now() + KEY_JUMP_LATCH_MS);
+      const dodgeDirection = dodgeDirectionForAction(held);
+      if (dodgeDirection && this.dodgeDoubleTap.press(e.code, performance.now())) {
+        this.cb.onDodge?.(dodgeDirection);
+      }
       this.noteMovementIntent();
     }
     const edge = combo ? this.keybinds.edgeActionForCombo(combo) : null;
@@ -1101,6 +1116,7 @@ export class Input {
   // that was charging. Returns true when the emote wheel closed, the one case
   // the caller cancels the event's default for.
   private releaseBoundCode(code: string): boolean {
+    this.dodgeDoubleTap.release(code);
     if (this.keys.delete(code)) this.noteIntent('move');
     let closedEmoteWheel = false;
     if (this.emoteWheelHeldCodes.delete(code) && this.emoteWheelHeldCodes.size === 0) {
@@ -1132,6 +1148,9 @@ export class Input {
     switch (action) {
       case 'toggleActionCamera':
         this.cb.onToggleActionCamera?.();
+        return;
+      case 'dodge':
+        this.cb.onDodge?.(heldDodgeDirection(this.readMoveInput()));
         return;
       case 'autorun':
         this.autorun = !this.autorun;

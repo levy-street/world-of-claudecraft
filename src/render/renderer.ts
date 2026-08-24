@@ -1142,6 +1142,7 @@ export interface EntityView {
   waterContactAccum: number;
   wasAirborne: boolean;
   wasSwimming: boolean;
+  wasDodging: boolean;
   // feet under the waterline but the ground still under them (the wade latch)
   wasWading: boolean;
   // head under the waterline (the stroke + VFX latch, hysteresis in anim_state)
@@ -9006,6 +9007,7 @@ export class Renderer {
       waterContactAccum: 0,
       wasAirborne: false,
       wasSwimming: false,
+      wasDodging: false,
       wasSubmerged: false,
       wasFalling: false,
       swimKickPhase: 0,
@@ -11444,6 +11446,9 @@ export class Renderer {
         v.travelVisual,
         v.metamorphVisual,
       );
+      const dodging = (e.dodgeRemaining ?? 0) > 0;
+      if (dodging && !v.wasDodging) active.playDodge();
+      v.wasDodging = dodging;
       if (!e.templateId.startsWith('vision_')) {
         active.clickProxy.userData.entityId = e.id;
       }
