@@ -228,15 +228,17 @@ const ROGUE_SPECS: SpecDef[] = [
     "A stealth striker. Openers from Duskveil add Gloam; at 3 Gloam your openers work without stealth, and the next one is free and starts the Shadow Veil, doubling your first Lurker's Strike inside it.",
     'hemorrhage',
     // Balance pass (maintainer sheet): tuned down from +40% crit damage and
-    // +10% Agility; the stealth-speed identity comes in instead (the Duskveil
-    // slow eases from 50% toward 25% at full mastery).
+    // +10% Agility; the stealth-speed identity comes in instead. The buffPct
+    // scales the Duskveil aura's own move-speed multiplier (0.5 = half speed),
+    // so 1.0 lifts it to 1.0: the mastery removes the stealth slow outright
+    // rather than easing it to 75%.
     'False Face',
-    'Increases the damage of your critical strikes by 25%, and you move 50% faster while in Duskveil.',
+    'Increases the damage of your critical strikes by 25%, and you move at 100% speed while in Duskveil.',
     {
       global: { critDmgPhysPct: 0.25 },
       ability: [
-        { ability: 'stealth', buffPct: 0.5 },
-        { ability: 'vanish', buffPct: 0.5 },
+        { ability: 'stealth', buffPct: 1 },
+        { ability: 'vanish', buffPct: 1 },
       ],
     },
   ),

@@ -155,7 +155,7 @@
       "tick": 20,
       "time": 1,
       "nextId": 972,
-      "state": "348465d9",
+      "state": "49c2e46c",
       "events": "c319de4f",
       "rng": {
         "draws": 0,
@@ -166,7 +166,7 @@
       "tick": 40,
       "time": 2,
       "nextId": 972,
-      "state": "5f867bd4",
+      "state": "3993147f",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -177,7 +177,7 @@
       "tick": 60,
       "time": 3,
       "nextId": 972,
-      "state": "31844fb7",
+      "state": "7d58b7f0",
       "events": "741638a5",
       "rng": {
         "draws": 149,
@@ -188,7 +188,7 @@
       "tick": 60,
       "time": 3,
       "nextId": 972,
-      "state": "31844fb7",
+      "state": "7d58b7f0",
       "events": "741638a5",
       "rng": {
         "draws": 149,
@@ -223,6 +223,9 @@
               "eastbrook_buckler",
               "recruit_tunic",
               "worn_sword"
+            ],
+            "visited": [
+              "poi:eastbrook_vale:eastbrook"
             ]
           },
           "deedsEarned": [
@@ -334,7 +337,7 @@
       "tick": 60,
       "time": 3,
       "nextId": 972,
-      "state": "82891a68",
+      "state": "52ea9611",
       "events": "4860b1ec",
       "rng": {
         "draws": 149,
@@ -371,6 +374,9 @@
               "eastbrook_buckler",
               "recruit_tunic",
               "worn_sword"
+            ],
+            "visited": [
+              "poi:eastbrook_vale:eastbrook"
             ]
           },
           "deedsEarned": [
@@ -484,7 +490,7 @@
       "tick": 60,
       "time": 3,
       "nextId": 972,
-      "state": "1dc63ce5",
+      "state": "6253f11a",
       "events": "c3103611",
       "rng": {
         "draws": 149,
@@ -522,6 +528,9 @@
               "eastbrook_buckler",
               "recruit_tunic",
               "worn_sword"
+            ],
+            "visited": [
+              "poi:eastbrook_vale:eastbrook"
             ]
           },
           "deedsEarned": [
@@ -635,7 +644,7 @@
       "tick": 60,
       "time": 3,
       "nextId": 972,
-      "state": "496c1957",
+      "state": "c9f20204",
       "events": "d42a8c37",
       "rng": {
         "draws": 149,
@@ -673,6 +682,9 @@
               "eastbrook_buckler",
               "recruit_tunic",
               "worn_sword"
+            ],
+            "visited": [
+              "poi:eastbrook_vale:eastbrook"
             ]
           },
           "deedsEarned": [
@@ -786,7 +798,7 @@
       "tick": 60,
       "time": 3,
       "nextId": 972,
-      "state": "9533b7f8",
+      "state": "1a26a457",
       "events": "3cad1e12",
       "rng": {
         "draws": 149,
@@ -824,6 +836,9 @@
               "eastbrook_buckler",
               "recruit_tunic",
               "worn_sword"
+            ],
+            "visited": [
+              "poi:eastbrook_vale:eastbrook"
             ]
           },
           "deedsEarned": [
@@ -937,7 +952,7 @@
       "tick": 60,
       "time": 3,
       "nextId": 972,
-      "state": "9533b7f8",
+      "state": "1a26a457",
       "events": "741638a5",
       "rng": {
         "draws": 149,
@@ -975,6 +990,9 @@
               "eastbrook_buckler",
               "recruit_tunic",
               "worn_sword"
+            ],
+            "visited": [
+              "poi:eastbrook_vale:eastbrook"
             ]
           },
           "deedsEarned": [
@@ -1088,7 +1106,7 @@
       "tick": 60,
       "time": 3,
       "nextId": 972,
-      "state": "9533b7f8",
+      "state": "1a26a457",
       "events": "741638a5",
       "rng": {
         "draws": 149,
@@ -1126,6 +1144,9 @@
               "eastbrook_buckler",
               "recruit_tunic",
               "worn_sword"
+            ],
+            "visited": [
+              "poi:eastbrook_vale:eastbrook"
             ]
           },
           "deedsEarned": [

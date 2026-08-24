@@ -62,7 +62,6 @@ import {
   partyFrameIncomingHeals,
   partyFrameRole,
 } from '../src/sim/party_frame_info';
-import { isPersistentEngineAura } from '../src/sim/persistent_aura';
 import { livePlaytimeSeconds } from '../src/sim/playtime';
 import { effectiveFishingBand } from '../src/sim/professions/fishing';
 import { RESPEC_TIER_CONFIG, type RespecPaymentTier } from '../src/sim/professions/focus';
@@ -76,6 +75,7 @@ import {
   curatorRankFromOwned,
   reliquaryWireJson,
 } from '../src/sim/reliquary';
+import { corpseHasDecayed } from '../src/sim/respawn_policy';
 import { loadRiftWorldState, serializeRiftWorldState } from '../src/sim/rift/persistence';
 import type { CharacterState, PetState, PlayerMeta } from '../src/sim/sim';
 import { MAX_CHAT_MESSAGE_LEN, Sim } from '../src/sim/sim';
@@ -90,7 +90,6 @@ import {
 } from '../src/sim/talent_allocation_input';
 import { stealthDetectionRadius, threatEntries } from '../src/sim/threat';
 import {
-  type Aura,
   DT,
   dist2d,
   type Entity,
@@ -153,6 +152,7 @@ import {
   type DetectionCalibrationSnapshot,
 } from './calibration_snapshot';
 import { RESTORE_ITEM_MAX_COUNT } from './character_professions';
+import { applyCharacterSaveFixups } from './character_save_fixups';
 import { ChatFilter } from './chat_filter';
 import {
   isChatFilterWrite,
@@ -161,6 +161,12 @@ import {
 } from './chat_filter_commands';
 import { applyChatStrike, loadChatFilterState, recordChatViolation } from './chat_filter_db';
 import { ChatLogger } from './chat_log';
+import {
+  type ChatModerationHydration,
+  ChatModerationLiveState,
+  pushMuteChange,
+  pushStrikesChange,
+} from './chat_mod_live';
 import {
   applyCheaterMarkLive as applyCheaterMarkLiveRuntime,
   persistCheaterMark,
@@ -340,16 +346,22 @@ import { createRealmReadoutMemo, realmReadoutJson, realmReadoutObject } from './
 import { RiftAssetCoordinator, riftAssetConfigFromEnv } from './rift_assets';
 import { refusedRiftForgeCommand } from './rift_forge_gate';
 import { RiftUpgradeCoordinator, riftUpgraderConfigFromEnv } from './rift_upgrader';
-import { createSerialWriter } from './serial_writer';
+import {
+  createDepthWarnedSerialWriter,
+  createKeyedSerialWriter,
+  createSerialWriter,
+} from './serial_writer';
 import {
   jsonWithField,
   StableAuraWireCache,
   StableSelfTimerWireCache,
+  wireAura,
 } from './snapshot_timer_wire';
 import type { GuildRank, Presence, PresenceStatus, SocialActor, SocialTransport } from './social';
 import { SocialService } from './social';
 import { PgSocialDb } from './social_db';
 import { reconcileOnLogin as reconcileSteamOnLogin } from './steam/mirror';
+import { attachDetectorFlagHost } from './suspicion_flags';
 import { TickProfiler } from './tick_profiler';
 import { hrtimeToMs, TickRateMeter } from './tick_rate_meter';
 import { maybeTrackDay7Retained, trackLevelMilestoneCapi } from './ua_capi';
@@ -1147,58 +1159,6 @@ export interface RestartCountdownStatus {
   remainingSeconds: number;
 }
 
-interface WireAura {
-  id: string;
-  name: string;
-  kind: string;
-  rem: number;
-  dur: number;
-  perm?: 1;
-  // The aura's magnitude, so buff/debuff hover tooltips show the REAL numbers online, exactly
-  // as offline (the descriptor in src/ui/aura_effect.ts reads value per kind: flat stat amount,
-  // slow/haste multiplier, dot/hot per-tick, absorb remaining, ...). Sent RAW (like `dur`, not
-  // round2) so the exact number and its sign survive JSON: round2 could turn a tiny negative
-  // into -0 -> 0 and flip a stat-sap's isAuraDebuff classification. Omitted only when exactly 0,
-  // which decodes back to 0, so value-less auras and an old server are unchanged.
-  value?: number;
-  // Optional secondary aura values: imbue judgement's min/max damage range and
-  // Greater Invisibility's reduction/aftereffect duration.
-  value2?: number;
-  value3?: number;
-  // dot/hot tick cadence in seconds, so the tooltip's "every N sec" is right online.
-  tickInterval?: number;
-  // damage/heal school for dot/absorb/thorns tooltips. Physical is the client's decode default,
-  // so only a non-physical school needs to ride the wire.
-  school?: string;
-  stacks?: number;
-  // Remaining charges on a charge-limited aura (Lightning Shield's reflect count). Sent only
-  // when defined, so ordinary auras stay off the wire and decode to undefined as before; the
-  // client badge prefers this over stacks (auras_view). A pure cosmetic count, not actionable
-  // information a graphics preset could hide, so it rides the wire unconditionally when present.
-  charges?: number;
-  // Next-cast empowerment scope. Omitted for unscoped empowerment auras, which match any
-  // eligible cast just like the sim helper.
-  emp?: string[];
-  // The caster's entity id, so the client's target strip can lead with and enlarge the
-  // viewer's OWN dots/hots (auras_view ownFirst). A shared per-entity value (never
-  // per-viewer), so the per-entity dyn cache keeps eliding; an old client ignores it and
-  // an old server's omission decodes to 0, which matches no player id.
-  src?: number;
-  // Encounter-owned control marker. Omitted for ordinary auras.
-  ub?: 1;
-  // No-player-counter-may-shed marker (the recovery sicknesses). Presence only: the
-  // client reads it through the same isPlayerRemovableAura predicate the sim uses, so
-  // the buff bar never offers a right-click cancel the server would refuse. Omitted for
-  // ordinary auras, and an old server's omission decodes to undefined, as before.
-  und?: 1;
-  // Break-threshold ARMED marker (Lingering Dread's soak-before-snap fear):
-  // presence only, never the live soak value - the number decrements per hit
-  // and would churn the stable aura cache, while the client (the victim-worn
-  // dread band in src/render/ability_vfx) only keys on whether the talent
-  // armed the fear at all. Omitted for ordinary auras.
-  bt?: 1;
-}
-
 interface WhoRosterRow {
   name: string;
   cls: string;
@@ -1345,65 +1305,6 @@ function chatSenderFlair(flair: AccountFlair): ChatSenderFlair | undefined {
   return out;
 }
 
-// Builds one aura's wire record via direct assignment rather than chained
-// conditional spreads (`...(cond ? {...} : {})`), which allocated a throwaway
-// object literal per branch regardless of which side taken. This runs for
-// every aura on every entity every tick (dynamicFields below is unconditional
-// per-entity, per-tick, even when wireCacheFor's diff ends up eliding the
-// result), so at raid-sized entity/aura counts and 20 Hz the spread form was a
-// measurable source of short-lived garbage. Output is byte-identical to the
-// prior spread chain; only the allocation shape changed.
-// A pre-v3 recipient ignores `perm`. Give it a large finite timer that is
-// refreshed by ordinary legacy aura snapshots, so rolling deploys keep the
-// aura visible instead of decoding the v3 sentinel as already expired.
-const LEGACY_PERMANENT_AURA_SECONDS = 7 * 24 * 60 * 60;
-
-function wireAura(a: Aura): WireAura {
-  const permanent = a.permanent === true;
-  const w: WireAura = {
-    id: a.id,
-    name: a.name,
-    kind: a.kind,
-    rem: permanent ? LEGACY_PERMANENT_AURA_SECONDS : round2(a.remaining),
-    dur: permanent ? LEGACY_PERMANENT_AURA_SECONDS : a.duration,
-  };
-  if (permanent) w.perm = 1;
-  // Carry the aura's magnitude so buff/debuff hover tooltips show the real numbers online,
-  // not 0 (the descriptor in src/ui/aura_effect.ts reads value per kind). Sent RAW (like
-  // `dur`, not round2) so the exact number and its sign survive JSON, keeping a negative
-  // stat-sap's isAuraDebuff classification intact (round2 could turn a tiny negative into
-  // -0 -> 0). Omitted only when exactly 0, which decodes back to 0, so value-less auras and
-  // an old server are unchanged. A hover tooltip magnitude is non-actionable cosmetic text,
-  // so sending it cannot let a graphics preset hide anything (graphics-settings fairness).
-  if (a.value !== 0) w.value = a.value;
-  // Optional secondary aura values (imbue range or Greater Invisibility aftereffect);
-  // dot/hot cadence; non-physical school. Each rides only when it carries meaning, so
-  // ordinary auras stay lean and decode to their defaults.
-  if (a.value2 !== undefined) w.value2 = a.value2;
-  if (a.value3 !== undefined) w.value3 = a.value3;
-  if (a.tickInterval !== undefined) w.tickInterval = a.tickInterval;
-  if (a.school !== 'physical') w.school = a.school;
-  // Stacks are omitted below 2 as a sparsity rule, EXCEPT for the persistent
-  // engine banks (druid/shaman/hunter spec engines): their badge and tooltip
-  // teach the live stage including 0 and 1, and the decode side cannot tell
-  // "absent because 1" from "absent because 0", so the count is always sent.
-  if (isPersistentEngineAura(a.id)) w.stacks = a.stacks ?? 0;
-  else if (a.stacks && a.stacks > 1) w.stacks = a.stacks;
-  // Carry the remaining charges only for a charge-limited aura (Lightning Shield), so the
-  // buff icon can badge the count online exactly as offline; undefined for every other aura.
-  if (a.charges !== undefined) w.charges = a.charges;
-  // Next-cast empowerment scope. Omitted for unscoped empowerment auras, which match any
-  // eligible cast just like the sim helper.
-  if (a.empowerAbilities !== undefined) w.emp = a.empowerAbilities;
-  // The caster's entity id, for the client's own-aura prominence on the target strip
-  // (auras_view ownFirst). Omitted for the rare 0/absent source, which decodes to 0.
-  if (a.sourceId) w.src = a.sourceId;
-  if (a.unbreakableControl) w.ub = 1;
-  if (a.undispellable) w.und = 1;
-  if (a.breakThreshold !== undefined) w.bt = 1;
-  return w;
-}
-
 // Dynamic fields are re-sent whole in every full or lite record, so the
 // conditional ones keep their absent-means-unset semantics.
 function dynamicFields(e: Entity, includeAuras = true): Record<string, unknown> {
@@ -1475,6 +1376,7 @@ function dynamicFields(e: Entity, includeAuras = true): Record<string, unknown> 
   // reliability contract hcb gives harvest claims. Flips once per corpse, so
   // the per-entity dyn cache re-serializes exactly one changed record.
   if (e.kind === 'mob' && e.lootable && lootHasGoneFfa(e.lootFfaTimer)) out.ffa = 1;
+  if (e.kind === 'mob' && corpseHasDecayed(e.dead, e.corpseTimer)) out.cd = 1; // corpse decayed
   if (e.ownerId !== null) out.own = e.ownerId;
   if (e.overheadEmoteId) {
     out.emo = e.overheadEmoteId;
@@ -1716,6 +1618,7 @@ export class GameServer {
   private readonly moderation: ModerationService<ClientSession>;
   private readonly generalChatQuota: GeneralChatQuotaCoordinator;
   private readonly generalChatRateLimitLiveState = new GeneralChatRateLimitLiveState();
+  private readonly chatModerationLiveState = new ChatModerationLiveState();
   private wireCache = new Map<number, EntityWireCache>();
   // partyFrameAggroTargets / partyFrameIncomingHeals scan the whole entity set and
   // are GLOBAL (identical for every grouped session), yet partyWire runs once for
@@ -1776,15 +1679,17 @@ export class GameServer {
   private saveTimer = 0;
   private socialPosTimer = 0;
   private saveAllInFlight: Promise<void> | null = null;
-  private readonly characterSaveQueues = new Map<number, Promise<boolean>>();
+  // One FIFO per character id: every durable LIVE-SESSION character write
+  // rides it, so commit order is enqueue order (exceptions: server/CLAUDE.md).
+  readonly characterSaveQueues = createKeyedSerialWriter<number>();
   // Weapon-skin loadouts are whole-record replacements in their dedicated paid
   // state row. Keep one FIFO per account so rapid apply/detach commands cannot
   // commit on separate pool clients in reverse order and resurrect stale state.
-  private readonly weaponSkinLoadoutSaveQueues = new Map<number, Promise<void>>();
+  private readonly weaponSkinLoadoutSaveQueues = createKeyedSerialWriter<number>();
   // Action-bar layout is a whole-record replacement in its own character column.
   // One FIFO per character so a burst of debounced client saves cannot commit on
   // separate pool clients in reverse order and persist a stale layout.
-  private readonly hotbarLayoutSaveQueues = new Map<number, Promise<void>>();
+  private readonly hotbarLayoutSaveQueues = createKeyedSerialWriter<number>();
   // Serializes every write of the single global Market blob (the 30s autosave
   // and the leave-path combined save). Both serialize the whole market; without
   // a queue their transactions could commit out of capture order and persist an
@@ -1798,24 +1703,11 @@ export class GameServer {
   // queue a leave flush behind an autosave batch. The depth watch below makes
   // that collapse loud; if the warn fires in production, the escalation path
   // is a per-guild serializer for the autosave arm (state.md records it).
-  private readonly marketSerialWriter = createSerialWriter();
-  private marketWriteQueueDepth = 0;
-  private lastMarketQueueWarnMs = 0;
-  private readonly enqueueMarketWrite = <T>(write: () => Promise<T>): Promise<T> => {
-    this.marketWriteQueueDepth++;
-    if (
-      this.marketWriteQueueDepth > MARKET_WRITE_QUEUE_WARN_DEPTH &&
-      Date.now() - this.lastMarketQueueWarnMs > 60_000
-    ) {
-      this.lastMarketQueueWarnMs = Date.now();
-      console.warn(
-        `market serial writer queue depth ${this.marketWriteQueueDepth}: dirty-book autosaves are queueing behind the shared writer; escrow save latency is rising`,
-      );
-    }
-    return this.marketSerialWriter(write).finally(() => {
-      this.marketWriteQueueDepth--;
-    });
-  };
+  private readonly enqueueMarketWrite = createDepthWarnedSerialWriter(
+    MARKET_WRITE_QUEUE_WARN_DEPTH,
+    (depth) =>
+      `market serial writer queue depth ${depth}: dirty-book autosaves are queueing behind the shared writer; escrow save latency is rising`,
+  );
   private readonly enqueueRiftWrite = createSerialWriter();
   private restartCountdownStartedAt: number | null = null;
   private readonly restartCountdownTimers: NodeJS.Timeout[] = [];
@@ -1917,6 +1809,7 @@ export class GameServer {
   private readonly riftAssets: RiftAssetCoordinator;
 
   constructor(generalChatQuotaMaxInFlight = GENERAL_CHAT_QUOTA_MAX_IN_FLIGHT) {
+    attachDetectorFlagHost(this.botDetector);
     this.generalChatQuota = new GeneralChatQuotaCoordinator({
       consume: consumeGeneralChatQuota,
       maxInFlight: generalChatQuotaMaxInFlight,
@@ -3076,6 +2969,10 @@ export class GameServer {
     return this.generalChatRateLimitLiveState.beginHydration(accountId);
   }
 
+  beginChatModerationHydration(accountId: number): ChatModerationHydration {
+    return this.chatModerationLiveState.beginHydration(accountId);
+  }
+
   generalChatQuotaInFlight(): number {
     return this.generalChatQuota.inFlight;
   }
@@ -3538,37 +3435,21 @@ export class GameServer {
     weaponSkinLoadout: Record<string, string>,
   ): void {
     const snapshot = { ...weaponSkinLoadout };
-    const previous = this.weaponSkinLoadoutSaveQueues.get(accountId);
-    const run = (previous ? previous.catch(() => {}) : Promise.resolve()).then(async () => {
-      await setAccountWeaponSkinLoadout(accountId, snapshot);
-    });
-    this.weaponSkinLoadoutSaveQueues.set(accountId, run);
-    const cleanup = (): void => {
-      if (this.weaponSkinLoadoutSaveQueues.get(accountId) === run) {
-        this.weaponSkinLoadoutSaveQueues.delete(accountId);
-      }
-    };
-    void run.then(cleanup, (err) => {
-      console.error('failed to save weapon skin loadout:', err);
-      cleanup();
-    });
+    // Fire and forget BY CONTRACT: a failed save is a cosmetic loss the next
+    // apply overwrites, so it swallows to the log.
+    void this.weaponSkinLoadoutSaveQueues
+      .enqueue(accountId, () => setAccountWeaponSkinLoadout(accountId, snapshot))
+      .catch((err) => {
+        console.error('failed to save weapon skin loadout:', err);
+      });
   }
 
   private enqueueHotbarLayoutSave(characterId: number, layout: ActionBarLayout): void {
-    const previous = this.hotbarLayoutSaveQueues.get(characterId);
-    const run = (previous ? previous.catch(() => {}) : Promise.resolve()).then(async () => {
-      await setCharacterHotbarLayout(characterId, layout);
-    });
-    this.hotbarLayoutSaveQueues.set(characterId, run);
-    const cleanup = (): void => {
-      if (this.hotbarLayoutSaveQueues.get(characterId) === run) {
-        this.hotbarLayoutSaveQueues.delete(characterId);
-      }
-    };
-    void run.then(cleanup, (err) => {
-      console.error('failed to save hotbar layout:', err);
-      cleanup();
-    });
+    void this.hotbarLayoutSaveQueues
+      .enqueue(characterId, () => setCharacterHotbarLayout(characterId, layout))
+      .catch((err) => {
+        console.error('failed to save hotbar layout:', err);
+      });
   }
 
   join(
@@ -4272,8 +4153,7 @@ export class GameServer {
     // its book half could not, so persisting it is exactly the mint the
     // refusal prevented. It reloads from its durable row instead.
     if (session.escrowQuarantined) return false;
-    const previous = this.characterSaveQueues.get(session.characterId);
-    const run = (previous ? previous.catch(() => {}) : Promise.resolve()).then(async () => {
+    return this.characterSaveQueues.enqueue(session.characterId, async () => {
       // Re-checked INSIDE the queue, not only at entry: a save enqueued before
       // the rollback would otherwise run after it, and by then this session's
       // book ops have been undone while its character blob still reflects
@@ -4298,36 +4178,9 @@ export class GameServer {
       if (state && e) {
         // The session-position/jail fixups, applicable to ANY snapshot of this
         // character (the T0 one below, or a re-serialized one inside the
-        // queued escrow thunk).
-        const applyFixups = (s: NonNullable<typeof state>): NonNullable<typeof state> => {
-          if (session.spectating) {
-            s.pos = {
-              x: session.spectating.savedPos.x,
-              z: session.spectating.savedPos.z,
-            };
-            s.pet = session.spectating.stowedPet;
-          }
-          if (session.jailVisit) {
-            s.pos = {
-              x: session.jailVisit.savedPos.x,
-              z: session.jailVisit.savedPos.z,
-            };
-            s.facing = session.jailVisit.savedFacing;
-            s.pet = session.jailVisit.stowedPet;
-          }
-          if (session.jailed) {
-            const jailPos = this.jailSpawnFor(session);
-            s.pos = { x: jailPos.x, z: jailPos.z };
-            s.jail = session.jailed;
-            s.dead = false;
-            s.ghost = false;
-            s.corpsePos = null;
-            s.hp = Math.max(1, s.hp);
-          } else {
-            delete s.jail;
-          }
-          return s;
-        };
+        // queued escrow thunk); the module header owns the rationale.
+        const applyFixups = (s: NonNullable<typeof state>): NonNullable<typeof state> =>
+          applyCharacterSaveFixups(session, s, () => this.jailSpawnFor(session));
         applyFixups(state);
         // Use the SERIALIZED level (not e.level): during a 2v2 Fiesta bout e.level
         // is temporarily 20, but serializeCharacter reports the real level — so the
@@ -4601,13 +4454,27 @@ export class GameServer {
       }
       return true;
     });
-    this.characterSaveQueues.set(session.characterId, run);
-    try {
-      return await run;
-    } finally {
-      if (this.characterSaveQueues.get(session.characterId) === run) {
-        this.characterSaveQueues.delete(session.characterId);
-      }
+  }
+
+  /** An out-of-band durable character write (the marketplace escrow persist)
+   *  on saveCharacter's own per-character FIFO; a job must not await a same-
+   *  character enqueue (self-deadlock). saveCharacter's post-commit steps
+   *  (lastSave, deed publish, level feed) catch up one save later. */
+  enqueueCharacterWrite<T>(characterId: number, job: () => Promise<T>): Promise<T> {
+    return this.characterSaveQueues.enqueue(characterId, job);
+  }
+
+  /** Terminal escrow-job arms, fired from inside the job: 'fenced' kicks the displaced
+   *  zombie; 'ambiguous' quarantines so the durable row decides an unknown COMMIT (right in
+   *  BOTH branches, committed or rolled back). Pid = extraction identity; a mid-leave session
+   *  still quarantines (its queued flush re-checks); books revert; kick WIRES the takeover literal. */
+  escrowSessionLost(pid: number, characterId: number, kind: 'fenced' | 'ambiguous'): void {
+    const session = this.sessionByCharacterId(characterId);
+    if (!session || session.pid !== pid) return;
+    if (kind === 'ambiguous') session.escrowQuarantined = true;
+    this.revertOwnGuildBookOps(session, [...session.dirtyGuildBanks.keys()]);
+    if (!session.left) {
+      void this.kickSession(session, 'character taken over', `market escrow ${kind}`);
     }
   }
 
@@ -5023,7 +4890,7 @@ export class GameServer {
     // withdrawing that phantom value would be refused in turn.
     this.revertOwnGuildBookOps(session, [...session.dirtyGuildBanks.keys()]);
     if (!session.left) {
-      void this.kickSession(session, 'guild bank escrow rollback', 'character taken over');
+      void this.kickSession(session, 'character taken over', 'guild bank escrow rollback');
     }
   }
 
@@ -5963,6 +5830,69 @@ export class GameServer {
     return state ? state.level : null;
   }
 
+  // $WOC Exchange custody primitives: the narrow, logic-free bridge the
+  // marketplace custody module (server/woc_market_custody.ts) builds on. The
+  // custody LOGIC lives there; these only surface the live session identity
+  // and the serialized mail write, and the mail write deliberately rides the
+  // market/mail serial queue (a custody parcel must never interleave with the
+  // atomic leave-path escrow flush) and PROPAGATES failure, unlike saveMail's
+  // logging arm: the custodian holds a settlement in 'delivering' until this
+  // resolves, so a swallowed error would fake durability.
+  wocCustodySession(characterId: number): {
+    pid: number;
+    accountId: number;
+    name: string;
+    leaseNonce: string | undefined;
+  } | null {
+    const session = this.sessionByCharacterId(characterId);
+    // A quarantined session's live state is abandoned: not truth for ANY
+    // custody op, so every custody wrapper treats it as absent.
+    if (!session || session.left || session.escrowQuarantined) return null;
+    return {
+      pid: session.pid,
+      accountId: session.accountId,
+      name: session.name,
+      leaseNonce: session.leaseNonce,
+    };
+  }
+
+  // The save-shaped snapshot every marketplace custody persist must use: the
+  // live serialization PLUS the session save fixups (character_save_fixups.ts
+  // owns the rationale; skipping them is a jail escape, not cosmetics).
+  serializeCharacterForPersist(
+    characterId: number,
+  ): { level: number; state: import('../src/sim/sim').CharacterState } | null {
+    const session = this.sessionByCharacterId(characterId);
+    if (!session || session.left || session.escrowQuarantined) return null;
+    const state = this.sim.serializeCharacter(session.pid);
+    if (!state) return null;
+    applyCharacterSaveFixups(session, state, () => this.jailSpawnFor(session));
+    return { level: state.level, state };
+  }
+
+  hasDirtyGuildBooks(characterId: number): boolean {
+    const session = this.sessionByCharacterId(characterId);
+    // Quarantined marks can never flush clear (saves refuse), so reporting
+    // them dirty would refuse 'contended' (a retry hint) forever.
+    if (!session || session.left || session.escrowQuarantined) return false;
+    return session.dirtyGuildBanks.size > 0;
+  }
+
+  // One ordinary save to flush a seller's dirty guild books BEFORE the escrow
+  // critical section (that write persists the character row ALONE; unflushed
+  // book-paired deltas would tear the guild-bank atomicity). Never call from
+  // inside a queued character write: deadlock. The boolean is deliberately
+  // discarded: every false re-verdicts downstream (re-check or extractCopy).
+  async flushDirtyGuildBooks(characterId: number): Promise<void> {
+    const session = this.sessionByCharacterId(characterId);
+    if (!session || session.left || session.dirtyGuildBanks.size === 0) return;
+    await this.saveCharacter(session);
+  }
+
+  async persistMailBlob(): Promise<void> {
+    await this.enqueueMarketWrite(() => saveMailState(this.sim.serializeMail()));
+  }
+
   // Force-close every live session for the account. A bearer token is a reusable
   // wire credential, not a per-socket identity: an earlier revision tried to spare
   // the caller's own session by comparing the live socket's auth token against the
@@ -6128,6 +6058,7 @@ export class GameServer {
       if (session.accountId !== accountId) continue;
       session.chatMutedUntil = until.getTime();
       session.chatMuteReason = reason.trim();
+      pushMuteChange(this.chatModerationLiveState, session);
       this.send(session, {
         t: 'events',
         list: [{ type: 'error', text: this.chatMuteMessage(session) }],
@@ -6198,6 +6129,7 @@ export class GameServer {
       if (session.accountId === accountId) {
         session.chatMutedUntil = null;
         session.chatMuteReason = '';
+        pushMuteChange(this.chatModerationLiveState, session);
       }
     }
   }
@@ -6205,7 +6137,9 @@ export class GameServer {
   /** Reflect an admin "reset strikes" on any live sessions. */
   resetChatStrikesLive(accountId: number): void {
     for (const session of this.clients.values()) {
-      if (session.accountId === accountId) session.chatStrikes = 0;
+      if (session.accountId !== accountId) continue;
+      session.chatStrikes = 0;
+      pushStrikesChange(this.chatModerationLiveState, session);
     }
   }
 
@@ -7408,6 +7342,9 @@ export class GameServer {
         break;
       case 'trade_cancel':
         sim.tradeCancel(pid);
+        break;
+      case 'trade_close':
+        sim.tradeClose(pid);
         break;
       // duels
       case 'duel_req':
@@ -9478,6 +9415,7 @@ export class GameServer {
     const mine = t.a === pid;
     const otherPid = mine ? t.b : t.a;
     const other = this.sim.meta(otherPid);
+    // FULL payloads on purpose, no publicInstanceView trim: see stagedOfferSlots (trade.ts).
     return {
       otherPid,
       otherName: other?.name ?? '?',
@@ -10522,9 +10460,11 @@ export class GameServer {
     void applyChatStrike(session.accountId, outcome.muteSeconds)
       .then((applied) => {
         session.chatStrikes = applied.strikes;
-        session.chatMutedUntil = applied.chatMutedUntil
-          ? new Date(applied.chatMutedUntil).getTime()
-          : session.chatMutedUntil;
+        pushStrikesChange(this.chatModerationLiveState, session);
+        if (applied.chatMutedUntil) {
+          session.chatMutedUntil = new Date(applied.chatMutedUntil).getTime();
+          pushMuteChange(this.chatModerationLiveState, session);
+        }
       })
       .catch((err) => console.error('applyChatStrike failed:', err));
     void recordChatViolation({
@@ -10723,7 +10663,6 @@ export class GameServer {
   private send(session: ClientSession, obj: unknown): void {
     this.sendRaw(session, JSON.stringify(obj));
   }
-
   private sendCommandOutcome(session: ClientSession, msg: ClientMessage, succeeded: boolean): void {
     if (!Number.isSafeInteger(msg.rid) || (msg.rid ?? 0) <= 0) return;
     this.send(session, { t: 'commandOutcome', rid: msg.rid, ok: succeeded });

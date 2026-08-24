@@ -9,6 +9,7 @@ import {
   MIN_PASSWORD_LENGTH,
   validateCompanionTokenLabel,
   validateEmailShape,
+  validateInitialPassword,
   validateNewPassword,
   validatePasswordChange,
 } from '../src/ui/account_portal';
@@ -76,6 +77,23 @@ describe('validatePasswordChange', () => {
 
   it('accepts a valid confirmed password change', () => {
     expect(validatePasswordChange('oldpass', 'brandnew', 'brandnew')).toBeNull();
+  });
+});
+
+describe('validateInitialPassword', () => {
+  it('rejects a too-short password with no current password to compare against', () => {
+    expect(validateInitialPassword('a'.repeat(MIN_PASSWORD_LENGTH - 1), 'x')).toBe('too-short');
+  });
+  it('rejects a too-long password (matches the server upper bound)', () => {
+    expect(validateInitialPassword('a'.repeat(MAX_PASSWORD_LENGTH + 1), 'x')).toBe('too-long');
+    const atBound = 'a'.repeat(MAX_PASSWORD_LENGTH);
+    expect(validateInitialPassword(atBound, atBound)).toBeNull();
+  });
+  it('rejects a confirmation mismatch', () => {
+    expect(validateInitialPassword('brandnew', 'brandnew2')).toBe('confirm-mismatch');
+  });
+  it('accepts a valid new password with no current password involved', () => {
+    expect(validateInitialPassword('brandnew', 'brandnew')).toBeNull();
   });
 });
 

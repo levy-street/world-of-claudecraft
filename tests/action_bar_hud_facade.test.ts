@@ -120,6 +120,21 @@ describe('Hud action-bar facade', () => {
     );
   });
 
+  it("cancels a focused slot's native Space activation without blocking the jump key", () => {
+    // tests/browser/action_bar_space_jump.browser.test.ts pins the live
+    // behavior; this source pin keeps buildActionBar from regressing back to
+    // stopPropagation, which would swallow the keydown before Input's
+    // window-level jump handler sees it.
+    const source = readFileSync(new URL('../src/ui/hud.ts', import.meta.url), 'utf8');
+    const buildStart = source.indexOf('private buildActionBar(): void');
+    const keydownStart = source.indexOf("btn.addEventListener('keydown'", buildStart);
+    const keydownEnd = source.indexOf('});', keydownStart);
+    const keydownBlock = source.slice(keydownStart, keydownEnd);
+
+    expect(keydownBlock).toContain('e.preventDefault();');
+    expect(keydownBlock).not.toContain('e.stopPropagation();');
+  });
+
   // WAS: 'cancels a mobile drag before exposing a newly loaded form page'. The
   // long-press rearrange that drag belonged to is retired, so there is no drag
   // to cancel here any more. What still matters at this seam is the OTHER half

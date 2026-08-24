@@ -90,6 +90,7 @@ export const apiErrorStrings = {
     // reuses hudChrome.account.deactivatedLocked
     deactivated: 'This account has been deactivated. Contact an admin to restore it.',
     not_found: 'Account not found.',
+    password_already_set: 'This account already has a password. Use Change Password instead.',
   },
   // character: character creation, selection, and world-entry failures.
   character: {
@@ -217,5 +218,71 @@ export const apiErrorStrings = {
     reason_required: 'A reason is required.',
     invalid_duration: 'Enter a mark duration of at least one second.',
     not_marked: 'That account is not marked.',
+  },
+  // woc_market: the config-gated $WOC Exchange family
+  // (server/woc_market_routes.ts). USD-denominated auctions settled in $WOC;
+  // every code here is a player-actionable refusal.
+  woc_market: {
+    invalid_input: 'Invalid input.',
+    disabled: 'The $WOC Exchange is not available on this realm.',
+    paused: 'Exchange trading is paused. Auctions keep counting down.',
+    wallet_required: 'Link and verify a wallet before trading on the Exchange.',
+    recipient_wallet_required:
+      'That player must connect a wallet before they can accept $WOC payments.',
+    self_offer: 'You cannot send a $WOC offer to yourself.',
+    offer_expired: 'That $WOC offer expired. Ask for a new one.',
+    terms_required: 'Accept the Marketplace terms to continue.',
+    // RETIRED, never rendered (B6/R1): no server path raises either totp
+    // code; the rows stay because the catalog leaf set must equal the
+    // append-only ERROR_CODES (tests/api_error_code_parity.test.ts).
+    totp_required:
+      'This amount requires two-factor authentication. Enable it in account settings, then enter your code.',
+    totp_invalid: 'That two-factor code did not verify. Try again.',
+    suspended:
+      'Your Exchange access is suspended after unpaid deals: no bids, purchases, listings, or $WOC trades.',
+    character_invalid: 'Play the character you are listing from, and try again.',
+    not_found: 'That Exchange entry no longer exists.',
+    not_yours: 'That Exchange entry no longer exists.',
+    not_active: 'That listing is no longer open for this action.',
+    own_listing: 'You cannot bid on or buy your own listing.',
+    has_bids: 'A listing with bids cannot be withdrawn. Contact support if you must cancel.',
+    bid_too_low: 'Your bid does not clear the current bid plus its increment.',
+    already_pending: 'Confirm or abandon your pending bid on this listing first.',
+    insufficient_balance: 'Your wallet does not hold enough $WOC for this bid and its bond.',
+    quote_unavailable: 'A price quote could not be issued right now. Try again shortly.',
+    // Also answers the lapse-straddle refresh (a bond seat that closed while
+    // the quote aged), where no fresh quote will come: the second sentence
+    // must not promise one.
+    quote_expired:
+      'That quote expired. Request a fresh one; if none is offered, that window has closed.',
+    not_pending: 'That bid is no longer awaiting its bond.',
+    confirm_failed: 'The transaction could not be confirmed. Request a fresh quote and try again.',
+    confirm_in_flight: 'Your payment is still confirming. Try again once it resolves.',
+    buy_now_locked: 'Another buyer is completing this purchase. Try again in a moment.',
+    cancel_pending: 'The seller is cancelling this listing.',
+    claim_cooldown: 'You recently walked away from a Buy Now. Try again later.',
+    bond_window_closed:
+      'This bid can no longer be paid: its payment window has closed. Bid again for a fresh one.',
+    settlement_in_flight: 'A buyer is paying for this listing. Try again once the payment settles.',
+    contended: 'The Exchange is busy with this listing. Try again in a moment.',
+    sale_conflict: 'Another live sale record stands for this listing. Exclude it first.',
+    no_buy_now: 'This listing has no buy-now price.',
+    cap_reached: 'You have reached your Exchange listing limit.',
+    stale_item: 'That item changed or moved. Re-select it and try again.',
+    item_mismatch:
+      'That is not the exact copy the buyer agreed to, or its state changed (a lock counts). Start a fresh deal for it.',
+    offer_pending: 'You already have a deal standing with this player. Resolve it first.',
+    not_eligible: 'That item cannot be listed on the $WOC Exchange.',
+    invalid_params: 'Check the starting bid, reserve, buy-now price, and duration.',
+    signature_reused: 'That transaction was already submitted.',
+    item_locked: 'That item is locked. Unlock it in your bags before selling it.',
+    stepup_required: 'Selling on the Exchange needs a signature from your linked wallet.',
+    stepup_challenge_invalid: 'That wallet confirmation is no longer valid. Start the sale again.',
+    stepup_challenge_expired: 'The wallet confirmation expired. Start the sale again.',
+    stepup_wallet_mismatch:
+      'Your linked wallet changed since this confirmation was issued. Start the sale again.',
+    stepup_binding_mismatch:
+      'That wallet confirmation does not match this sale. Start the sale again.',
+    stepup_signature_invalid: 'The wallet signature did not verify. Start the sale again.',
   },
 };

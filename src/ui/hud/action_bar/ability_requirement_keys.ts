@@ -38,6 +38,7 @@ export interface AbilityRequirementKey {
     | 'offGlobalCooldown'
     | 'friendlyTarget'
     | 'enemyTarget'
+    | 'anyTarget'
     | 'selfOnly';
   /** Set only for key 'requiresForm'. */
   form?: NonNullable<AbilityDef['requiresForm']>;
@@ -74,6 +75,10 @@ export function abilityRequirementKeys(
   if (def.onNextSwing) out.push({ key: 'onNextSwing' });
   if (def.offGcd) out.push({ key: 'offGlobalCooldown' });
   if (def.targetType === 'friendly') out.push({ key: 'friendlyTarget' });
+  // targetType 'any' really casts on either side (Shadeslip steps to a friend
+  // or a foe), so it must not read as the enemy-only line: the tooltip would
+  // be telling the player the cast they can make is illegal.
+  else if (def.targetType === 'any') out.push({ key: 'anyTarget' });
   else if (def.requiresTarget) out.push({ key: 'enemyTarget' });
   else if (isSelfOnlyAbility(def)) out.push({ key: 'selfOnly' });
   return out;

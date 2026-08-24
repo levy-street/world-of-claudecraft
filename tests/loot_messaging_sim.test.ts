@@ -7,6 +7,7 @@ import { WORLD_SEED } from '../src/sim/world_seed';
 
 const SEED = WORLD_SEED;
 const PREMIUM = 'greyjaw_hide_boots'; // uncommon: opens a need/greed roll by default
+const FRESH_CORPSE_TIMER = 60;
 
 function makeSim() {
   return new Sim({ seed: SEED, playerClass: 'warrior' });
@@ -34,6 +35,7 @@ function partyOfThree(sim: Sim, itemId: string, mobId = 990501) {
   teleportTo(sim, 900, 900, c);
   const mob = createMob(mobId, MOBS.forest_wolf, 2, { x: 20, y: 0, z: 22 });
   mob.dead = true;
+  mob.corpseTimer = FRESH_CORPSE_TIMER;
   mob.lootable = true;
   mob.tappedById = a;
   mob.loot = { copper: 0, items: [{ itemId, count: 1 }] };

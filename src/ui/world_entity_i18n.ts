@@ -627,6 +627,11 @@ const LETTER_IDS = [
   'prof_tier_engineering_alchemy_3',
   'prof_tier_engineering_alchemy_4',
   'prof_tier_engineering_alchemy_5',
+  // $WOC Exchange custody letters (the server-side marketplace,
+  // WOC_MARKET_*_LETTER in src/sim/content/letters.ts).
+  'woc_market_delivery',
+  'woc_market_return',
+  'woc_market_sold',
 ] as const;
 
 type MobId = (typeof MOB_IDS)[number];

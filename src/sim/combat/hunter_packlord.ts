@@ -1,4 +1,3 @@
-import { pctValue } from '../entity';
 import type { SimContext } from '../sim_context';
 import type { Entity } from '../types';
 import { armorReduction, dist2d, swingMissChance } from '../types';
@@ -7,7 +6,7 @@ import {
   activateHunterMajorWindow,
   grantHunterFocus,
   hunterFerocityDamageMultiplier,
-  hunterPetFerocityDamageMultiplier,
+  hunterPetDamageMultiplier,
 } from './hunter_shared';
 
 export const PACK_FEROCITY_AURA_ID = 'pack_ferocity';
@@ -26,21 +25,6 @@ function removeAura(ctx: SimContext, entity: Entity, id: string): void {
   if (index < 0) return;
   const [aura] = entity.auras.splice(index, 1);
   ctx.emit({ type: 'aura', targetId: entity.id, name: aura.name, gained: false });
-}
-
-function petDamageMultiplier(ctx: SimContext, pet: Entity): number {
-  let multiplier = 1;
-  for (const aura of pet.auras) {
-    if (aura.kind === 'pet_damage_pct') multiplier += pctValue(aura.value);
-  }
-  if (pet.ownerId !== null) {
-    const ownerMeta = ctx.players.get(pet.ownerId);
-    if (ownerMeta) multiplier *= 1 + ctx.playerMods(ownerMeta).global.petDmgPct;
-    const owner = ctx.entities.get(pet.ownerId);
-    if (owner?.auras.some((aura) => aura.kind === 'hunter_frenzy')) multiplier *= 1.25;
-  }
-  multiplier *= hunterPetFerocityDamageMultiplier(ctx, pet);
-  return multiplier;
 }
 
 function petStrike(
@@ -70,7 +54,7 @@ function petStrike(
   let damage = ctx.rng.range(min, max);
   damage += (ctx.effectiveAttackPower(pet) / 14) * 0.5;
   if (crit) damage *= 2;
-  damage *= petDamageMultiplier(ctx, pet);
+  damage *= hunterPetDamageMultiplier(ctx, pet);
   damage *= 1 - armorReduction(ctx.effectiveArmor(target), pet.level);
   const dealt = Math.max(1, Math.round(damage));
   ctx.dealDamage(pet, target, dealt, crit, 'physical', abilityName, 'hit', true);

@@ -44,6 +44,8 @@ interface SimPrivateHarness {
   ): void;
 }
 
+const FRESH_CORPSE_TIMER = 60;
+
 function asHarness(sim: Sim): SimPrivateHarness {
   return sim as unknown as SimPrivateHarness;
 }
@@ -843,6 +845,7 @@ describe('boss loot and encounter resets', () => {
     expectDefined(sim.entities.get(c)).dead = true;
     const mob = createMob(990099, MOBS.forest_wolf, 2, { x: 20, y: 0, z: 22 });
     mob.dead = true;
+    mob.corpseTimer = FRESH_CORPSE_TIMER;
     mob.lootable = true;
     mob.tappedById = a;
     mob.loot = { copper: 12, items: [] };
@@ -869,6 +872,7 @@ describe('boss loot and encounter resets', () => {
     teleportTo(sim, 21, 20, b);
     const mob = createMob(990098, MOBS.forest_wolf, 2, { x: 20, y: 0, z: 22 });
     mob.dead = true;
+    mob.corpseTimer = FRESH_CORPSE_TIMER;
     mob.lootable = true;
     mob.tappedById = a;
     mob.loot = {
@@ -906,6 +910,7 @@ describe('boss loot and encounter resets', () => {
     teleportTo(sim, 21, 20, b);
     const mob = createMob(990100, MOBS.forest_wolf, 2, { x: 20, y: 0, z: 22 });
     mob.dead = true;
+    mob.corpseTimer = FRESH_CORPSE_TIMER;
     mob.lootable = true;
     mob.tappedById = a;
     mob.loot = { copper: 0, items: [{ itemId: 'greyjaw_hide_boots', count: 1 }] };
@@ -931,6 +936,7 @@ describe('boss loot and encounter resets', () => {
     teleportTo(sim, 21, 20, b);
     const mob = createMob(990102, MOBS.forest_wolf, 2, { x: 20, y: 0, z: 22 });
     mob.dead = true;
+    mob.corpseTimer = FRESH_CORPSE_TIMER;
     mob.lootable = true;
     mob.tappedById = a;
     mob.loot = { copper: 0, items: [{ itemId: 'greyjaw_hide_boots', count: 1 }] };
@@ -957,6 +963,7 @@ describe('boss loot and encounter resets', () => {
     teleportTo(sim, 21, 20, b);
     const mob = createMob(990103, MOBS.forest_wolf, 2, { x: 20, y: 0, z: 22 });
     mob.dead = true;
+    mob.corpseTimer = FRESH_CORPSE_TIMER;
     mob.lootable = true;
     mob.tappedById = a;
     mob.loot = { copper: 0, items: [{ itemId: 'greyjaw_hide_boots', count: 1 }] };
@@ -992,6 +999,7 @@ describe('boss loot and encounter resets', () => {
     teleportTo(sim, 21, 20, b);
     const mob = createMob(990104, MOBS.forest_wolf, 2, { x: 20, y: 0, z: 22 });
     mob.dead = true;
+    mob.corpseTimer = FRESH_CORPSE_TIMER;
     mob.lootable = true;
     mob.tappedById = a;
     mob.loot = { copper: 0, items: [{ itemId: 'greyjaw_hide_boots', count: 1 }] };
@@ -1018,6 +1026,7 @@ describe('boss loot and encounter resets', () => {
     teleportTo(sim, 21, 20, b);
     const mob = createMob(990105, MOBS.forest_wolf, 2, { x: 20, y: 0, z: 22 });
     mob.dead = true;
+    mob.corpseTimer = FRESH_CORPSE_TIMER;
     mob.lootable = true;
     mob.tappedById = a;
     mob.loot = { copper: 0, items: [{ itemId: 'greyjaw_hide_boots', count: 1 }] };
@@ -1047,6 +1056,7 @@ describe('boss loot and encounter resets', () => {
     teleportTo(sim, 21, 20, b);
     const mob = createMob(990106, MOBS.forest_wolf, 2, { x: 20, y: 0, z: 22 });
     mob.dead = true;
+    mob.corpseTimer = FRESH_CORPSE_TIMER;
     mob.lootable = true;
     mob.tappedById = a;
     mob.loot = { copper: 0, items: [{ itemId: 'greyjaw_hide_boots', count: 1 }] };
@@ -1084,6 +1094,7 @@ describe('boss loot and encounter resets', () => {
     teleportTo(sim, 22, 20, c);
     const mob = createMob(990107, MOBS.forest_wolf, 2, { x: 20, y: 0, z: 22 });
     mob.dead = true;
+    mob.corpseTimer = FRESH_CORPSE_TIMER;
     mob.lootable = true;
     mob.tappedById = a;
     mob.loot = { copper: 0, items: [{ itemId: 'greyjaw_hide_boots', count: 1 }] };
@@ -1116,6 +1127,7 @@ describe('boss loot and encounter resets', () => {
     teleportTo(sim, 21, 20, b);
     const mob = createMob(990108, MOBS.forest_wolf, 2, { x: 20, y: 0, z: 22 });
     mob.dead = true;
+    mob.corpseTimer = FRESH_CORPSE_TIMER;
     mob.lootable = true;
     mob.tappedById = a;
     mob.loot = { copper: 0, items: [{ itemId: 'greyjaw_hide_boots', count: 1 }] };
@@ -1168,6 +1180,7 @@ describe('boss loot and encounter resets', () => {
     expect(mob.loot?.items).toContainEqual({ itemId: 'boar_hide', count: 1, personalFor: [a, b] });
 
     mob.dead = true;
+    mob.corpseTimer = FRESH_CORPSE_TIMER;
     mob.lootable = true;
     mob.tappedById = a;
     sim.entities.set(mob.id, mob);
@@ -1195,6 +1208,7 @@ describe('boss loot and encounter resets', () => {
     const b = sim.addPlayer('mage', 'Bert');
     const mob = createMob(990103, MOBS.forest_wolf, 2, { x: 20, y: 0, z: 22 });
     mob.dead = true;
+    mob.corpseTimer = FRESH_CORPSE_TIMER;
     mob.lootable = true;
     mob.tappedById = a;
     mob.loot = {

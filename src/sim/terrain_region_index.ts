@@ -58,6 +58,7 @@ export const TERRAIN_APPLIER = {
   sowfieldFlatten: 32,
   stableFlatten: 33,
   fenSouthShore: 34,
+  gardenwalkWestPass: 35,
 } as const;
 
 function bounds(minX: number, maxX: number, minZ: number, maxZ: number): TerrainRegionBounds {
@@ -109,6 +110,11 @@ export const TERRAIN_APPLIER_BOUNDS: readonly (readonly TerrainRegionBounds[] | 
   // tail fade (FEN_SHORE_TAIL_Z) north to FEN_ZMIN + FEN_SHORE_SUPPORT, the
   // widest the wandered waterline plus its bank shave can reach inland.
   [bounds(-566, -232, 132, 336)],
+  // The Gardenwalk pass floor's west-of-border mirror (applyGardenwalkWestPass):
+  // its smoothstep(26,52,|z-800|) z-falloff and smoothstep(0,58,|x-180|)
+  // x-falloff (centered ON the border, STRIP_MAX_X 180) are both fully zero
+  // outside this box.
+  [bounds(122, 238, 748, 852)],
 ];
 
 interface MutableCell {

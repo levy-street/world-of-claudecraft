@@ -176,6 +176,7 @@ import {
 import { loadingCurtainFadeMs, resolveUiEffectsProfile } from './game/ui_effects_profile';
 import { currentResetDay, currentUtcDay } from './game/utc_day';
 import { voice } from './game/voice';
+import { attachWocMarketExchange } from './game/woc_market_wiring';
 import { telemetryZoneId } from './game/world_telemetry';
 import { zoneWarmupMode } from './game/zone_transition';
 import { createZoneWarmTracker } from './game/zone_warm_tracker';
@@ -194,6 +195,7 @@ import {
 } from './net/desktop_wallet_manager';
 import { shouldEnterDiscordOnboarding } from './net/discord_onboarding_gate';
 import { EconomyClient, newIdempotencyKey, startClaudiumPurchase } from './net/economy_sdk';
+import { watchWorldEntry } from './net/entry_watch';
 // The wallet module is loaded lazily via dynamic import() in the wallet
 // controller below, so it stays out of the main entry chunk and only loads when
 // the feature is enabled + used.
@@ -351,8 +353,15 @@ import {
   accountPortalModel,
   deactivateConfirmReady,
   validateEmailShape,
+  validateInitialPassword,
   validatePasswordChange,
 } from './ui/account_portal';
+import {
+  paintAccountPortal,
+  paintPasswordSetStatus,
+  paintTwoFactorStatus,
+  setAccountFieldMsg,
+} from './ui/account_portal_dom';
 import { technicalErrorMessage, userFacingApiError } from './ui/api_error_i18n';
 import { formatFooterVersion } from './ui/app_version';
 import { type AppearanceCustomizer, mountAppearanceCustomizer } from './ui/appearance_customizer';
@@ -426,7 +435,6 @@ import {
 } from './ui/hud/player_card/player_card_share';
 import {
   ensureLocaleLoaded,
-  formatDateTime,
   formatNumber,
   getLanguage,
   isLocaleResident,
@@ -489,6 +497,7 @@ import {
   setWocBalance,
   shouldDisconnectUnverifiedWallet,
 } from './ui/wallet_balance';
+import { claudiumCheckoutErrorText } from './ui/wallet_bridge_reason_text';
 import { buildWalletConnectionView } from './ui/wallet_connection_view';
 import type { IWorld } from './world_api';
 import { ONLINE_WORLD_INCOMPATIBLE_MESSAGE } from './world_api';
@@ -2041,6 +2050,7 @@ async function startGame(
     onCrafting: () => hud.toggleCrafting(),
     onSpellbook: () => hud.toggleSpellbook(),
     onBarEditor: () => hud.toggleBarEditor(),
+    onWocMarket: () => hud.toggleWocMarket(),
     onTalents: () => hud.toggleTalents(),
     onMap: () => hud.toggleMap(),
     onLeaderboard: () => hud.toggleLeaderboard(),
@@ -3351,14 +3361,9 @@ async function startGame(
             throw new Error(t('hudChrome.claudium.checkoutNotSettled'));
           }
         })().catch((err) => {
-          const message = err instanceof Error ? err.message : '';
-          if (/connect a wallet first/i.test(message)) {
-            throw new Error(t('hudChrome.claudium.checkoutWalletRequired'));
-          }
-          if (/wallet cannot sign and send transactions/i.test(message)) {
-            throw new Error(t('hudChrome.claudium.checkoutWalletUnsupported'));
-          }
-          throw new Error(message || t('hudChrome.claudium.checkoutFailed'));
+          // Classified in the shared wallet-bridge module; raw log for devs.
+          console.warn('[claudium] checkout failed', err);
+          throw new Error(claudiumCheckoutErrorText(err));
         });
       },
       spend: async (itemId, kind, expectedCostClaudium) => {
@@ -3376,6 +3381,12 @@ async function startGame(
         };
       },
     };
+    attachWocMarketExchange({
+      hud,
+      api,
+      online,
+      wallet: { linkedPubkey: () => linkedWalletPubkey, load: loadWallet },
+    });
     if (!NATIVE_APP) {
       hud.attachClaudium(claudiumHooks);
       if (
@@ -6026,72 +6037,6 @@ function logoutAccount(): void {
   void api.logout().finally(finish);
 }
 
-function setAccountFieldMsg(sel: string, text: string, ok: boolean): void {
-  const el = $(sel);
-  el.textContent = text;
-  el.classList.toggle('is-error', !ok && text !== '');
-  el.classList.toggle('is-ok', ok && text !== '');
-}
-
-// Reflect the account's 2FA state: when enabled, only the password-gated disable
-// form shows; when disabled, only the "Set Up" entry point. The transient setup
-// and recovery panes always reset to hidden so re-opening the portal is clean.
-function paintTwoFactorStatus(enabled: boolean): void {
-  const setText = (sel: string, key: TranslationKey) => {
-    const el = document.querySelector(sel);
-    if (el) el.textContent = t(key);
-  };
-  setText(
-    '#account-2fa-status',
-    enabled ? 'hudChrome.account.twoFactorStatusOn' : 'hudChrome.account.twoFactorStatusOff',
-  );
-  const show = (sel: string, visible: boolean) => {
-    const el = document.querySelector(sel) as HTMLElement | null;
-    if (el) el.hidden = !visible;
-  };
-  show('#account-2fa-setup-btn', !enabled);
-  show('#account-2fa-begin-form', false);
-  show('#account-2fa-setup', false);
-  show('#account-2fa-recovery', false);
-  show('#account-2fa-disable-form', enabled);
-  const msg = document.getElementById('account-2fa-msg');
-  if (msg) {
-    msg.textContent = '';
-    msg.className = 'auth-field-msg';
-  }
-}
-
-function paintAccountPortal(
-  model: ReturnType<typeof accountPortalModel>,
-  // When the account fetch failed transiently we re-render the shell but must
-  // NOT clobber an already-populated email field: a blank value would otherwise
-  // be submitted as a null email update on the next save.
-  preserveEmailInput = false,
-  twoFactorEnabled = false,
-): void {
-  // The account portal lives only in index.html; focused entries such as
-  // play.html omit it, so there is nothing to paint (token revalidation and the
-  // nav chrome in loadAccountPortal still run).
-  const loggedOut = $('#account-logged-out') as HTMLElement | null;
-  if (!loggedOut) return;
-  loggedOut.hidden = model.loggedIn;
-  ($('#account-sections') as HTMLElement).hidden = !model.loggedIn;
-  if (model.loggedIn) paintTwoFactorStatus(twoFactorEnabled);
-  $('#account-username').textContent = model.header.username;
-  const since = $('#account-member-since');
-  since.textContent = model.header.memberSinceIso
-    ? t('hudChrome.account.memberSince', {
-        date: formatDateTime(new Date(model.header.memberSinceIso), {
-          dateStyle: 'medium',
-        }),
-      })
-    : '';
-  $('#account-char-count').textContent = t('hudChrome.account.charactersCount', {
-    count: formatNumber(model.header.characterCount),
-  });
-  if (!preserveEmailInput) ($('#account-email') as HTMLInputElement).value = model.email;
-}
-
 const loggedOutModel = () =>
   accountPortalModel({
     loggedIn: false,
@@ -6131,6 +6076,7 @@ async function loadAccountPortal(setChrome: boolean): Promise<void> {
       }),
       false,
       acct.twoFactorEnabled,
+      acct.passwordSet,
     );
   } catch (err) {
     if (isAuthError(err)) {
@@ -6254,6 +6200,39 @@ function setupAccountPortal(): void {
       ($('#account-confirm-pass') as HTMLInputElement).value = '';
     } catch (e2) {
       setAccountFieldMsg('#account-password-msg', userFacingApiError(e2), false);
+    }
+  });
+
+  // "Set a Password": shown instead of "Change Password" for an Apple- or
+  // Discord-provisioned account (passwordSet:false) that has no current
+  // password to re-verify, so this validates only length + confirmation match.
+  ($('#account-set-password-form') as HTMLFormElement).addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const next = ($('#account-set-new-pass') as HTMLInputElement).value;
+    const confirm = ($('#account-set-confirm-pass') as HTMLInputElement).value;
+    const err = validateInitialPassword(next, confirm);
+    if (err) {
+      const key =
+        err === 'too-short'
+          ? 'errPasswordShort'
+          : err === 'too-long'
+            ? 'errPasswordLong'
+            : 'errPasswordConfirm';
+      setAccountFieldMsg(
+        '#account-set-password-msg',
+        t(`hudChrome.account.${key}` as TranslationKey),
+        false,
+      );
+      return;
+    }
+    try {
+      await api.setInitialPassword(next);
+      setAccountFieldMsg('#account-set-password-msg', t('hudChrome.account.passwordSet'), true);
+      paintPasswordSetStatus(true);
+      ($('#account-set-new-pass') as HTMLInputElement).value = '';
+      ($('#account-set-confirm-pass') as HTMLInputElement).value = '';
+    } catch (e2) {
+      setAccountFieldMsg('#account-set-password-msg', userFacingApiError(e2), false);
     }
   });
 
@@ -7035,37 +7014,35 @@ async function enterWorld(c: CharacterSummary, button?: HTMLButtonElement): Prom
   const proceedToGame = () => {
     if (started) return;
     started = true;
-    clearInterval(poll);
+    entryWatch.cancel();
     loadPhaseEnd('realm-connect');
     void startGame(world, null, world, `char:${c.id}`, true);
   };
   enterLoadingState(t('loading.connectingRealm'));
 
-  // wait for hello + first snapshot so the world starts populated
-  const waitStart = Date.now();
-  const poll = setInterval(() => {
-    if (world.connected && world.entities.has(world.playerId)) {
-      clearInterval(poll);
+  const entryWatch = watchWorldEntry(
+    world,
+    () => {
       // Remember the active session (character + realm) so a WebView reload
       // during play resumes straight back into the world instead of the
       // home/login screen. Also resets the resume-attempt budget: entry
       // completed, the session is known-good.
       if (api.realm) savePlayMarker(c.id, api.realm, Date.now());
       proceedToGame();
-    } else if (Date.now() - waitStart > 10000) {
-      clearInterval(poll);
+    },
+    () => {
       world.close();
       clearCardProviders();
       hideReconnectOverlay();
       // Entry never completed: fatalOverlay drops the resume marker so the next
       // boot does not loop straight back into a session that will not start.
       fatalOverlay(t('loading.enterTimeout'));
-    }
-  }, 50);
+    },
+  );
   // a rejected join must stop the poll too, or its timeout overlay would
   // mask the real reason (e.g. "character already in world")
   world.onDisconnect = (reason) => {
-    clearInterval(poll);
+    entryWatch.cancel();
     clearCardProviders();
     hideReconnectOverlay();
     checkpointActiveEntryDiagnostics('connection-lost', { fatal: true });
@@ -7093,6 +7070,7 @@ async function enterWorld(c: CharacterSummary, button?: HTMLButtonElement): Prom
   // (linkdead) while ClientWorld auto-reconnects, so just veil the game until
   // the world resumes; onDisconnect above fires if the retries run out
   world.onConnectionLost = (attempt, maxAttempts, nextRetryAtMs) => {
+    entryWatch.noteActivity(nextRetryAtMs);
     checkpointActiveEntryDiagnostics('connection-lost', {
       attempt,
       maxAttempts,

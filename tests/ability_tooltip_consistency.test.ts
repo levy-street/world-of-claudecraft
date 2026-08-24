@@ -31,6 +31,9 @@ import {
 // truth. Keep this list SHORT and justified; prefer a placeholder in the
 // description over a new entry here.
 const NUMBER_ALLOWLIST: Record<string, number[]> = {
+  // Courser's Guise daze lasts COURSER_DAZE_DURATION (combat/hunter_shared.ts),
+  // a fixed constant applied by the damage hook, not an ability effect field.
+  aspect_of_the_cheetah: [4],
   // Grace Devotion's mana cadence is stamped by effect_dispatch from its effect kind.
   grace_devotion: [5],
   // The Soul Stone heal fraction is SOUL_STONE_HEAL_PCT_MAX (src/sim/soulwell.ts),

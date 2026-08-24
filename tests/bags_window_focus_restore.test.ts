@@ -155,6 +155,37 @@ describe('bags window focus restore (the vendor ladder pattern)', () => {
     expect(activeKey()).toBe('bag-sort');
   });
 
+  it('a mouse-driven use sheds focus so the rebuilt row cannot hijack the next Space (issue: potion keeps drinking instead of jumping)', () => {
+    // The 'use' case in runBagAction calls world.useItem() then this.render()
+    // SYNCHRONOUSLY, inside the row's OWN click handler: the ladder above
+    // restores focus onto the rebuilt row by data-focus-key before the click
+    // event ever finishes bubbling to Input's window-level mouse-click blur
+    // guard, so that guard's "did THIS click activate what's now focused"
+    // check never matches the (new, unrelated) rebuilt node and never fires.
+    // A real mouse click (detail > 0) must shed focus before the rebuild can
+    // re-seat it, or the still-focused native <button> row natively
+    // reactivates on the next Space (the #bags panel guard stops propagation
+    // without preventDefault so keyboard reactivation still works), replaying
+    // useItem and swallowing the jump.
+    const inv: InvSlot[] = [{ itemId: 'baked_bread', count: 3 }];
+    const { root } = harness(inv);
+    focusRow(root, 'bag:baked_bread:0');
+    const row = document.activeElement as HTMLElement;
+    row.dispatchEvent(new MouseEvent('click', { bubbles: true, detail: 1 }));
+    expect(root.contains(document.activeElement)).toBe(false);
+  });
+
+  it('a keyboard-driven use (Tab then Enter/Space) still restores focus onto the rebuilt row', () => {
+    const inv: InvSlot[] = [{ itemId: 'baked_bread', count: 3 }];
+    const { root } = harness(inv);
+    focusRow(root, 'bag:baked_bread:0');
+    const row = document.activeElement as HTMLElement;
+    // A keyboard-synthesized click reports detail 0 (no mouse click count),
+    // matching the convention Input.releaseMouseActivatedFocus already uses.
+    row.dispatchEvent(new MouseEvent('click', { bubbles: true, detail: 0 }));
+    expect(activeKey()).toBe('bag:baked_bread:0');
+  });
+
   it('the last stack falls to Close, and non-grid controls restore exactly', () => {
     const inv: InvSlot[] = [{ itemId: 'wolf_fang', count: 1 }];
     const { root, w } = harness(inv);

@@ -236,6 +236,7 @@ export const IWORLD_MEMBERS = [
   { name: 'tradeSetOffer', kind: 'method' },
   { name: 'tradeConfirm', kind: 'method' },
   { name: 'tradeCancel', kind: 'method' },
+  { name: 'tradeClose', kind: 'method' },
   { name: 'duelRequest', kind: 'method' },
   { name: 'duelAccept', kind: 'method' },
   { name: 'duelDecline', kind: 'method' },
@@ -665,9 +666,15 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
     // even when the total agrees. Only running the suite says what these
     // numbers really are; never reconcile them by arithmetic in the diff (the
     // numbers below were set from a suite run, not from this narrative).
-    expect(IWORLD_MEMBERS.length).toBe(332);
+    // The Phase 11k QA release sync composes a SIXTH time and this one
+    // CONFLICTED rather than auto-merging: the release's neutral trade close
+    // adds tradeClose (IWorldTrade, a method), and both parents' totals
+    // differed, so the merged tree carries ours plus that one, 333 with the
+    // method half at 245. Set from a suite run on the merged tree, never by
+    // arithmetic in the diff.
+    expect(IWORLD_MEMBERS.length).toBe(333);
     expect(DATA_MEMBERS.length).toBe(88);
-    expect(METHOD_MEMBERS.length).toBe(244);
+    expect(METHOD_MEMBERS.length).toBe(245);
   });
   it('has no duplicate member names', () => {
     const names = IWORLD_MEMBERS.map((m) => m.name);
@@ -988,6 +995,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'townFocus',
       'tradeAccept',
       'tradeCancel',
+      'tradeClose',
       'tradeConfirm',
       'tradeInfo',
       'tradeRequest',
@@ -1334,6 +1342,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'toggleWeaponStow',
       'tradeAccept',
       'tradeCancel',
+      'tradeClose',
       'tradeConfirm',
       'tradeRequest',
       'tradeSetOffer',
@@ -1387,8 +1396,8 @@ describe('membership, not equality: world extras do not fail the gate', () => {
   });
 });
 
-// --- W1: aggregate == disjoint union of the 28 facet member sets --------------------
-// After the facet split (W1), `interface IWorld extends` 28 domain facet interfaces
+// --- W1: aggregate == disjoint union of the facet member sets -----------------------
+// After the facet split (W1), `interface IWorld extends` the domain facet interfaces
 // (src/world_api/<facet>.ts; the owner-backed facets plus IWorldTelemetry, the
 // bank-system's IWorldBank, the Book of Deeds' IWorldDeeds, and the Dungeon Finder's
 // IWorldDungeonFinder). This block proves the split dropped nothing and duplicated
@@ -1613,6 +1622,7 @@ const FACET_TRADE = [
   'tradeSetOffer',
   'tradeConfirm',
   'tradeCancel',
+  'tradeClose',
 ] as const satisfies readonly (keyof IWorldTrade)[];
 type _ExhaustTrade = AssertNever<Exclude<keyof IWorldTrade, (typeof FACET_TRADE)[number]>>;
 
@@ -2028,8 +2038,8 @@ describe('W1: aggregate IWorld member set equals the disjoint union of the facet
 
   it('the facet union equals the pinned IWORLD_MEMBERS set', () => {
     const union = Object.values(FACET_MEMBER_ARRAYS).flatMap((arr) => [...arr]);
-    expect(union.length, 'union size before dedup (catches a duplicated member)').toBe(332);
-    expect(new Set(union).size, 'union size after dedup (catches a duplicated member)').toBe(332);
+    expect(union.length, 'union size before dedup (catches a duplicated member)').toBe(333);
+    expect(new Set(union).size, 'union size after dedup (catches a duplicated member)').toBe(333);
     const sortedUnion = [...union].sort();
     const pinned = IWORLD_MEMBERS.map((m) => m.name).sort();
     expect(sortedUnion).toEqual(pinned);

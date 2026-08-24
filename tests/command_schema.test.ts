@@ -51,10 +51,12 @@ const repoRoot = fileURLToPath(new URL('..', import.meta.url));
 // arrangement deterministically), and bg_respond as a send + dispatch pair
 // (the release's battleground queue-pop confirmation).
 // The Reliquary packet's nameplate border adds deed_set_border as a send +
-// dispatch pair, the exact sibling of deed_set_title, and this branch adds
-// tabPrev as a send + dispatch pair (the backward half of the Tab target
-// cycle, Shift+Tab by default; no payload, the sim walks the same ordered
-// list in reverse). NOTE (merge trap): both
+// dispatch pair, the exact sibling of deed_set_title. The v0.37.0 release adds
+// tabPrev as a send + dispatch pair (the backward half of the Tab target cycle,
+// Shift+Tab by default; no payload, the sim walks the same ordered list in
+// reverse), and this branch's neutral trade close adds trade_close as a send +
+// dispatch pair, the sibling of trade_cancel. The release's player item lock
+// (issue 3042) adds lock_item as a send + dispatch pair. NOTE (merge trap): both
 // sides of every v0.36.0 sync bump these counts independently, and git has
 // auto-merged identical numbers before while the real total was higher; the
 // merged tree carries BOTH sides' pairs. Only the suite says what they really
@@ -79,8 +81,14 @@ const repoRoot = fileURLToPath(new URL('..', import.meta.url));
 // consume_feast) land beside extract_essence, so the merged universe is
 // ours' 200/213 plus farming's five on each axis.
 
-const EXPECTED_SEND_COUNT = 205;
-const EXPECTED_DISPATCH_COUNT = 218;
+// The Phase 11k QA release sync composes a SIXTH time, and the trap held:
+// both sides' constants differ, so this one CONFLICTED rather than
+// auto-merging, and the numbers below were re-set from a suite run on the
+// merged tree, never by adding the two sides' deltas on paper. They compose
+// exactly: base 199/212, ours +6 (extract_essence plus farming's five),
+// theirs +1 (the release's own pair), merged 206/219.
+const EXPECTED_SEND_COUNT = 206;
+const EXPECTED_DISPATCH_COUNT = 219;
 const EXPECTED_DISPATCH_ONLY_COUNT = 13;
 
 // The chat sub-channel routing switch (server/game.ts `switch

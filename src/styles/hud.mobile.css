@@ -2321,9 +2321,50 @@
   body.mobile-touch #pet-cluster {
     display: contents;
   }
+  /* Issue: on a narrow landscape phone the true-centered pet bar can reach far
+     enough left to sit on top of the #mobile-combat-controls row (Chat/Social/
+     Quests/Settings/More) or the #mobile-consumables-toggle chip docked right
+     past it, stealing More's tap target (bags/spellbook/character become
+     unreachable). left:50% stays the norm on a wide viewport, but never below
+     the toggle chip's own right edge (the trio's 338px un-scaled row -- the
+     wider tier, safe for the narrower landscape tier too -- plus the chip's own
+     10px dock gap and 40px width, echoing #mobile-consumables' own dock formula
+     above) plus HALF the pet bar's own worst-case rendered width (121px: a
+     4-button command group (attack/special/taunt/feed) + the 1-button stance
+     toggle). transform still centers around whichever left this resolves to,
+     so a wider (mode-menu-open) bar stays centered on that same anchor rather
+     than drifting further. Also clears #buff-bar on its right at the default
+     UI Scale (verified together, alongside #mobile-more, by the widest-pet-
+     plus-populated-buff-bar sweep in scripts/mobile_hud_overlap_audit.mjs);
+     a large UI Scale (below) grows both bars together and can still narrow
+     that margin, a pre-existing tension between two independently dynamic-
+     width bars this fix does not fully close, deliberately scoped to the
+     reported bug (#mobile-more unreachable), not a #buff-bar readability
+     regression. The trio and the chip live OUTSIDE #ui, in real viewport
+     pixels; #petbar lives inside it, zoomed by --ui-scale (src/ui/ui_scale.ts,
+     hudChrome.options.uiScale, 0.85 to 1.4), so that reference (the "+ 50px"
+     is the chip's own 10px dock gap plus 40px width) is converted back into
+     #ui's logical space the same way target_frame_pos.ts / #fiesta-augments
+     do. The +121px half-width stays OUTSIDE that division: it is already an
+     #ui-logical length (the zoom grows the bar's own rendered buttons
+     together with this reservation), so dividing it too would under-reserve
+     and the bar would crowd the chip again above a UI Scale of 1. */
   body.mobile-touch #petbar {
     position: fixed;
-    left: 50%;
+    left: max(
+      50%,
+      calc(
+        (
+          max(12px, env(safe-area-inset-left)) +
+          338px *
+          var(--btn-scale, 1) *
+          var(--mobile-chrome-scale, 1) +
+          50px
+        ) /
+        var(--ui-scale, 1) +
+        121px
+      )
+    );
     top: max(8px, env(safe-area-inset-top));
     transform: translateX(-50%);
     align-self: auto;
@@ -3893,6 +3934,7 @@
   body.mobile-touch #loot-settings-window,
   body.mobile-touch #town-focus-window,
   body.mobile-touch #dev-command-window,
+  body.mobile-touch #woc-market-window,
   body.mobile-touch #claudium-window {
     left: 10px;
     right: 10px;
@@ -3906,6 +3948,174 @@
     height: calc(var(--app-vh) / var(--ui-scale, 1) - 20px);
     max-height: none;
     overflow: hidden;
+  }
+  /* $WOC Exchange browse tab on touch: one column, detail pane stacked under
+     the table. The desktop template reserves a 240px-min side column, which on
+     a 915px landscape phone spent a third of the width on a pane that is empty
+     until a listing is picked, squeezing the five money columns. */
+  body.mobile-touch #woc-market-window .wm-browse {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-rows: auto auto 1fr;
+  }
+  body.mobile-touch #woc-market-window .wm-detail {
+    position: static;
+    max-height: none;
+  }
+  /* Row rhythm on the phone sheet (the 15 QA sign-off note): taller cells
+     than the desktop 6px, and the FIRST row clears the header hairline with
+     its own top padding instead of starting flush against it. */
+  body.mobile-touch #woc-market-window .wm-table td {
+    padding-top: 12px;
+    padding-bottom: 12px;
+  }
+  body.mobile-touch #woc-market-window .wm-table tbody tr:first-child td {
+    padding-top: 16px;
+  }
+  /* The touch-target floor for the controls the desktop sheet sizes by padding
+     alone. The tab strip came out about 30px tall (7px padding on a 13px line),
+     under the 40x40 floor in src/ui/CLAUDE.md; the pager, form and row-open
+     buttons already carry their own min-height, and the close button inherits
+     the shared .x-btn floor. */
+  /* The shell stops scrolling so the inner .wm-body pane owns the touch scroll
+     (the shared window block above sets overflow-y: auto, and .wm-body is a
+     scroller too: two nested ones fight and let the header scroll away on iOS).
+     Same shape as #crafting-window below. */
+  body.mobile-touch #woc-market-window {
+    height: auto;
+    overflow: hidden;
+    /* A money sheet under a landscape notch: the close button and the pager
+       sit inside the corner bands unless the pins clear the safe-area insets.
+       A re-pinned left re-declares transform. Every inset is divided by the UI
+       scale, because these pins are authored
+       INSIDE #ui's zoom: a raw 44px notch renders at 37px on the 0.85 floor and
+       leaves the corner controls inside the band the pin exists to clear (the
+       #social-window shape, which documents the same reasoning). The height cap
+       subtracts BOTH insets rather than a flat 20px: with a top inset above
+       10px the sheet's bottom edge fell BELOW the viewport, and a fixed sheet
+       cannot be scrolled back, so the sticky commit row pinned to that edge
+       went out of reach entirely. The cap alone fixes that; pinning `bottom`
+       as well would stretch every short sheet to the full screen (a two-line
+       trade painting a 400px panel), so it is deliberately not set here. The
+       SPLIT rule below pins both edges, because a side-by-side dock is meant
+       to be full height. With no bottom pin this cap is the ONLY thing holding
+       the sheet on screen, so --app-vh is read WITH a fallback: that token is
+       set by JS, and an unset one makes the whole declaration invalid at
+       computed-value time, leaving max-height at its initial `none` and the
+       sheet uncapped with its commit row below the fold. */
+    left: calc(max(10px, env(safe-area-inset-left)) / var(--ui-scale, 1));
+    right: calc(max(10px, env(safe-area-inset-right)) / var(--ui-scale, 1));
+    top: calc(max(10px, env(safe-area-inset-top)) / var(--ui-scale, 1));
+    max-height: calc(
+      var(--app-vh, 100dvh) /
+      var(--ui-scale, 1) -
+      (max(10px, env(safe-area-inset-top)) / var(--ui-scale, 1)) -
+      (max(10px, env(safe-area-inset-bottom)) / var(--ui-scale, 1))
+    );
+    transform: none;
+  }
+  /* 16px and no-wrap follow .opt-tab: at 13px in a verbose locale the three
+     labels wrapped inside their own tabs, and flex:1 alone cannot grow the
+     strip, so it scrolls instead of squeezing. */
+  body.mobile-touch #woc-market-window button.wm-tab {
+    min-height: 40px;
+    font-size: 16px;
+    flex: 1 0 auto;
+    white-space: nowrap;
+  }
+  body.mobile-touch #woc-market-window .wm-tabs {
+    /* BOTH axes named. Per the overflow spec a `visible` axis computes to `auto`
+       when its partner is not visible, so `overflow-x: auto` alone silently made
+       the strip a vertical scroller too and clipped the taller 16px labels. */
+    overflow-x: auto;
+    overflow-y: hidden;
+  }
+  /* The scrolling strip clips an outside ring: draw the tab's focus ring inside. */
+  body.mobile-touch #woc-market-window button.wm-tab:focus-visible {
+    outline-offset: -2px;
+  }
+  /* Every money-entry control at the touch floor, border-box so a padded
+     text input and a UA border-box select land at the same 40px (the pinned
+     bid-field rule below stays as it is). */
+  body.mobile-touch #woc-market-window input[type="text"],
+  body.mobile-touch #woc-market-window input[type="number"],
+  body.mobile-touch #woc-market-window select {
+    min-height: 40px;
+    box-sizing: border-box;
+  }
+  body.mobile-touch #woc-market-window .wm-sort select {
+    min-height: 40px;
+  }
+  /* A checkbox cannot be 40px without looking broken, so the LABEL is the tap
+     target (clicking it toggles the box) and the label is what gets the floor.
+     The trade arm's consent row is the same control on the other money
+     surface, so it gets the same floor; the terms links beside both are the
+     smallest money-surface tap targets and get an inline-flex floor of their
+     own (a bare inline anchor cannot honour min-height). */
+  body.mobile-touch #woc-market-window label.wm-terms,
+  body.mobile-touch #woc-market-window label.wm-offer-next,
+  body.mobile-touch #trade-window .trade-woc-terms {
+    min-height: 40px;
+  }
+  body.mobile-touch #woc-market-window .wm-terms-link,
+  body.mobile-touch #trade-window .trade-woc-terms-link {
+    display: inline-flex;
+    align-items: center;
+    min-height: 40px;
+  }
+  /* The consent caption and its link are legal text on a phone: floored like
+     the window's buttons (16px) rather than the desktop's 11px, which the
+     UI-scale floor of 0.85 would render below 10px on a small screen. */
+  body.mobile-touch #woc-market-window label.wm-terms,
+  body.mobile-touch #woc-market-window .wm-terms-link,
+  body.mobile-touch #woc-market-window label.wm-offer-next,
+  body.mobile-touch #trade-window .trade-woc-terms,
+  body.mobile-touch #trade-window .trade-woc-terms-link {
+    font-size: 16px;
+  }
+  /* The rest of the arm's money and legal lines join the phone floor: the fee
+     and net figures, the strike and variable-price warnings and the
+     disabled-affordance hint were 11px beside a 16px consent caption. */
+  body.mobile-touch #trade-window .trade-woc-warn,
+  body.mobile-touch #trade-window .trade-woc-note,
+  body.mobile-touch #trade-window .trade-woc-hint,
+  body.mobile-touch #trade-window .trade-woc-block,
+  body.mobile-touch #trade-window .trade-woc-price-label,
+  body.mobile-touch #trade-window .trade-woc-equiv,
+  body.mobile-touch #trade-window .trade-woc-fee,
+  body.mobile-touch #trade-window .trade-woc-net,
+  body.mobile-touch #trade-window .trade-woc-leg,
+  body.mobile-touch #trade-window .trade-woc-waiting,
+  body.mobile-touch #trade-window .trade-woc-done,
+  body.mobile-touch #trade-window .trade-hint {
+    font-size: 14px;
+  }
+  /* The bid amount field is a money-surface tap target too (the buttons
+     beside it are floored at 40px by the shared rule; the input was 37px). */
+  body.mobile-touch #woc-market-window .wm-bid-form input[data-field="bid-usd"] {
+    min-height: 40px;
+    box-sizing: border-box;
+  }
+  /* The combobox parts the desktop sheet sizes by padding alone. The options are
+     the tap targets here, and the clear button inherits the shared .x-btn floor. */
+  body.mobile-touch #woc-market-window .wm-combo-item {
+    min-height: 44px;
+  }
+  body.mobile-touch #woc-market-window .wm-combo-chosen {
+    min-height: 44px;
+  }
+  body.mobile-touch #woc-market-window .wm-combo-list {
+    /* The 100dvh fallback is defence in depth, parity with the money sheets:
+       tokens.css seeds --app-vh on :root, so the unset case needs a failed
+       stylesheet load, but if it ever fires the declaration would otherwise
+       go invalid at computed-value time and max-height would land on its
+       initial none rather than the desktop cap this rule overrode. */
+    max-height: calc(var(--app-vh, 100dvh) / var(--ui-scale, 1) * 0.4);
+  }
+  body.mobile-touch #woc-market-window label.wm-terms input,
+  body.mobile-touch #woc-market-window label.wm-offer-next input,
+  body.mobile-touch #trade-window .trade-woc-terms input {
+    width: 24px;
+    height: 24px;
   }
   /* Crafting window on touch: the mailbox "tall list window" shape. The sheet
      shell stops scrolling (overflow hidden) so the inner .crafting-body pane
@@ -4146,7 +4356,8 @@
      single column on mobile; a shorter clamp (like the vendor window's own,
      see the comment on #vendor-window below) would leave the flex:1 listing
      body (#market-body) zero height, so it collapsed and could not be scrolled.
-     Give the window the full available height (like #trade-window) so the listing
+     Give the window the full available height (like #bags, which pins both
+     edges; #trade-window no longer does) so the listing
      body keeps a usable, touch-scrollable height under the header.
      The search box living in `.mkt-controls` (a sibling above #market-body, not
      inside it) added a fourth stacked chrome row: tabs + controls + body. With
@@ -4220,7 +4431,7 @@
   }
   /* Phase 5: the tall list windows (mailbox, calendar) are flex columns with an
      inner scroll body (#mailbox-body, .cal-day-pane) and overflow:hidden on the
-     shell. Edge-pinned they take the full available height (the #trade-window
+     shell. Edge-pinned they take the full available height (the #bags
      template) so the inner body keeps a usable, touch-scrollable height under the
      header instead of the sheet's overflow-y:auto fighting the inner flex scroll.
      #market-window used to follow this same inner-scroll shape, but PR #2107
@@ -4284,13 +4495,179 @@
     height: min(560px, calc(var(--app-vh) / var(--ui-scale, 1) - 20px));
   }
   body.mobile-touch #trade-window {
-    top: 10px;
+    /* A money sheet under a landscape notch: the pins clear the safe-area
+       insets (the #bags shape) so the close button, the arm's Pay and the
+       Accept row never sit in a corner band; the raw-vw clamp is dropped
+       because it under-fills the pinned sheet below uiScale 1 (the #bags
+       comment). A re-pinned left re-declares transform. */
+    /* Every inset is divided by the UI scale, because these pins are authored
+       INSIDE #ui's zoom: a raw 44px notch renders at 37px on the 0.85 floor and
+       leaves the corner controls inside the band the pin exists to clear (the
+       #social-window shape, which documents the same reasoning). The height cap
+       subtracts BOTH insets rather than a flat 20px: with a top inset above
+       10px the sheet's bottom edge fell BELOW the viewport, and a fixed sheet
+       cannot be scrolled back, so the sticky commit row pinned to that edge
+       went out of reach entirely. The cap alone fixes that; pinning `bottom`
+       as well would stretch every short sheet to the full screen (a two-line
+       trade painting a 400px panel), so it is deliberately not set here. The
+       SPLIT rule below pins both edges, because a side-by-side dock is meant
+       to be full height. With no bottom pin this cap is the ONLY thing holding
+       the sheet on screen, so --app-vh is read WITH a fallback: that token is
+       set by JS, and an unset one makes the whole declaration invalid at
+       computed-value time, leaving max-height at its initial `none` and the
+       sheet uncapped with its commit row below the fold. */
+    left: calc(max(10px, env(safe-area-inset-left)) / var(--ui-scale, 1));
+    right: calc(max(10px, env(safe-area-inset-right)) / var(--ui-scale, 1));
+    top: calc(max(10px, env(safe-area-inset-top)) / var(--ui-scale, 1));
+    max-width: none;
     transform: none;
-    max-height: calc(var(--app-vh) / var(--ui-scale, 1) - 20px);
+    max-height: calc(
+      var(--app-vh, 100dvh) /
+      var(--ui-scale, 1) -
+      (max(10px, env(safe-area-inset-top)) / var(--ui-scale, 1)) -
+      (max(10px, env(safe-area-inset-bottom)) / var(--ui-scale, 1))
+    );
     overflow-y: auto;
   }
-  body.mobile-touch #trade-window .trade-cols {
+  /* In-game mobile is landscape only, so the two offer columns stay side by
+     side (a 900px sheet has room for both) and the empty wells shrink: the
+     stacked column spent the scarce axis on two 120px boxes and pushed the arm
+     and the Accept row a screen below the fold. */
+  body.mobile-touch #trade-window .trade-items {
+    min-height: 84px;
+  }
+  /* The window's Accept / Cancel row sticks to the sheet's bottom edge, so the
+     commit control is reachable however long the arm's face runs. The sheet
+     scrolls behind it, so it also reserves its own height as scroll padding:
+     without that, a control scrolled to the bottom (the consent row, Send,
+     Sign) came to rest UNDERNEATH the sticky row and stopped being the
+     top-most element at its own centre, which is exactly untappable. The
+     mobile capture rig asserts that top-most fact per control. */
+  body.mobile-touch #trade-window {
+    /* Derived, not guessed, and derived from the SCROLLPORT's bottom edge,
+       which is where scroll-padding resolves: the window's own bottom padding
+       sits BELOW the sticky row inside that scrollport, so it is part of the
+       band a scrolled control has to clear. Leaving it out (a 60px reserve for
+       a row whose band is 72px) parked the price label under the row again,
+       which is exactly what the rig's top-most check caught. Row: a 40px button
+       floor between two --spacing-sm bands, plus its --spacing-xs top margin,
+       plus the window's REAL bottom padding below it, plus slack. That padding
+       is the inset-aware max() the generic mobile window rule sets (the
+       `padding-bottom` beside its own max-height above), NOT a flat
+       --window-pad: on a landscape phone with a 21px home indicator it
+       resolves to 39px, so a reserve built on the flat token came up short and
+       put the control back under the row. Headless capture reports zero
+       insets, which is why this mirrors the source rule instead of trusting a
+       measurement taken without one.
+       Read the terms honestly. The 40px is the button FLOOR, not the row's
+       height: a locale whose commit label wraps grows the row past the slack,
+       and no arithmetic here can see that. The --spacing-xs is the row's top
+       margin, which sits ABOVE it and so lands as slack rather than as part of
+       the covered band. The two guards cover each other's blind spot and
+       neither is sufficient alone: this calc is the only thing that can see an
+       inset, and the rig's `reserve >= measured band` assertion (run per face
+       and per locale, the Russian pass being the wordiest) is the only thing
+       that can see a row that grew. The rig also measures from the border box
+       while scroll-padding resolves against the padding box, so its band reads
+       2px conservative, which is the safe direction. */
+    scroll-padding-bottom: calc(
+      40px +
+      2 *
+      var(--spacing-sm) +
+      var(--spacing-xs) +
+      max(var(--window-pad), calc(18px + env(safe-area-inset-bottom))) +
+      var(--spacing-sm)
+    );
+    /* The same fact at the TOP edge, and the one the bottom fix did not cover.
+       48px is the header's own declared floor (the mobile .panel-title rule
+       above), tied to it by tests/mobile_window_layout.test.ts rather than
+       copied and hoped for. Note the whole family of scroll-padding only
+       steers scroll-INTO-view (focus, scrollIntoView): a player who drags a
+       field under the sticky header by hand still can. Focus is the trigger
+       this fixes.
+       .window > .panel-title is sticky (layout.css) and paints over the sheet
+       scrolling beneath it, so a control the browser scrolls to the top of the
+       scrollport (focusing a money field does exactly that) came to rest
+       UNDER the header. The centre-point hit test missed it because a control
+       half-covered still answers at its own centre. The inset mirrors the
+       mobile header's 48px floor declared above, plus a gap. */
+    scroll-padding-top: calc(48px + var(--spacing-sm));
+  }
+  body.mobile-touch #trade-window .trade-actions {
+    position: sticky;
+    bottom: 0;
+    padding: var(--spacing-sm) 0;
+    margin-top: var(--spacing-xs);
+    background: var(--panel-base);
+  }
+  /* The last arm line clears the sticky row when the face is scrolled to its
+     end, so nothing rests under it at rest either. */
+  body.mobile-touch #trade-window .trade-woc-arm {
+    padding-bottom: var(--spacing-lg);
+  }
+  /* The $WOC price field lives in the arm, not in .trade-money, so the coin
+     floor below never reached it: the same 40px / 16px / border-box, wide
+     enough for a four-figure price at the 16px touch font. */
+  body.mobile-touch #trade-window .trade-woc-price {
+    min-height: 40px;
+    font-size: 16px;
+    box-sizing: border-box;
+    max-width: 140px;
+  }
+  /* The ways out do not span the sheet: only the commitment button does, so
+     a full-width destructive Cancel sale never reads as the primary action
+     above the window's own Cancel. */
+  body.mobile-touch #trade-window .trade-woc-arm > .btn.trade-woc-quiet {
+    align-self: flex-start;
+  }
+  body.mobile-touch #trade-window .trade-woc-arm > .btn.trade-woc-primary {
+    align-self: stretch;
+  }
+  /* The trade opens the bags beside it, and on the sheet layout the bags
+     (z 95, the modal sheet) covered the trade window entirely, arm included.
+     Keyed on the open marker the Hud stamps on every visible window (no new
+     wiring): while BOTH are open they split the sheet like the vendor and
+     bank docks (trade left, bags right), and a bags close returns the trade
+     sheet to full width on its own. */
+  body.mobile-touch:has(#trade-window[data-window-open="1"]):has(#bags[data-window-open="1"])
+  #trade-window,
+  body.mobile-touch:has(#trade-window[data-window-open="1"]):has(#bags[data-window-open="1"])
+    #bags {
+    position: fixed;
+    /* Divided by the UI scale like the un-split pins above: authored inside
+       #ui's zoom, a raw inset shrinks with the scale and stops clearing the
+       band it names. */
+    top: calc(max(10px, env(safe-area-inset-top)) / var(--ui-scale, 1));
+    bottom: calc(max(10px, env(safe-area-inset-bottom)) / var(--ui-scale, 1));
+    width: auto;
+    max-width: none;
+    max-height: none;
+    height: auto;
+    transform: none;
+    box-sizing: border-box;
+    z-index: 95 !important;
+  }
+  body.mobile-touch:has(#trade-window[data-window-open="1"]):has(#bags[data-window-open="1"])
+    #trade-window {
+    left: calc(max(10px, env(safe-area-inset-left)) / var(--ui-scale, 1));
+    right: calc(var(--app-vw) / var(--ui-scale, 1) / 2);
+    overflow-y: auto;
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
+  }
+  body.mobile-touch:has(#trade-window[data-window-open="1"]):has(#bags[data-window-open="1"])
+    #trade-window
+    .trade-cols {
     flex-direction: column;
+  }
+  body.mobile-touch:has(#trade-window[data-window-open="1"]):has(#bags[data-window-open="1"])
+    #bags {
+    left: calc(var(--app-vw) / var(--ui-scale, 1) / 2);
+    right: calc(max(10px, env(safe-area-inset-right)) / var(--ui-scale, 1));
+    overflow: hidden;
+    border-top-left-radius: 0;
+    border-bottom-left-radius: 0;
+    border-left: 0;
   }
   /* Issue 1577 round 2 (9): the bags window used to reserve 72px at the bottom to
      keep clear of the player frame below it. The player frame is fine to cover
@@ -4424,6 +4801,14 @@
     min-height: 40px;
     font-size: 16px;
     box-sizing: border-box;
+  }
+  /* Three 16px digits did not fit the desktop 52px coin box: a five-digit gold
+     value scrolled inside it. */
+  body.mobile-touch .trade-money input.coininput {
+    width: 72px;
+  }
+  body.mobile-touch .trade-coins {
+    flex-wrap: wrap;
   }
   body.mobile-touch .soc-x,
   body.mobile-touch .soc-name.soc-link {
@@ -4876,6 +5261,23 @@
   }
   body.mobile-touch.vendor-open #vendor-window .panel-title .x-btn {
     display: none;
+  }
+  body.mobile-touch #prompt-stack {
+    position: fixed;
+    left: max(10px, env(safe-area-inset-left));
+    right: max(10px, env(safe-area-inset-right));
+    top: max(12px, calc(env(safe-area-inset-top) + 12px));
+    transform: none;
+    z-index: 120;
+    align-items: center;
+    pointer-events: none;
+  }
+  body.mobile-touch #prompt-stack .prompt {
+    width: min(340px, calc(var(--app-vw) / var(--ui-scale, 1) - 20px));
+    min-width: 0;
+    max-width: calc(var(--app-vw) / var(--ui-scale, 1) - 20px);
+    box-sizing: border-box;
+    pointer-events: auto;
   }
   /* The bank docks its bags companion side by side on touch exactly like the
      vendor cluster: a divided full-height panel split 50/50 at the viewport
@@ -6796,8 +7198,9 @@
     body.mobile-touch #petbar {
       top: max(6px, env(safe-area-inset-top));
       /* No scale(0.88) on landscape: it shrank the 40px pet command buttons to
-         ~35px, below the 40px touch floor. Keep them full-size (the two-group bar
-         still fits the top-centre band on the narrowest 740px landscape phone). */
+         ~35px, below the 40px touch floor. Keep them full-size; the base rule's
+         `left` clamp (above) is what keeps the bar clear of the top-left trio on
+         the narrowest 740px landscape phone, not centering alone. */
       transform: translateX(-50%);
     }
     body.mobile-touch #chatlog-wrap {

@@ -738,6 +738,90 @@ export function resetClaudiumMutationRateLimits(): void {
   claudiumPreAuthIpAttempts.clear();
 }
 
+// $WOC Exchange writes create listings (a custody escrow), place bids, request
+// on-chain quotes, or poll a settlement verifier. The Claudium model applies
+// verbatim: each action gets its own fused per-IP AND per-account bucket so
+// no marketplace action can starve another, and confirm is the roomiest
+// because the client retries pending chain finality. Quotes are capped well
+// under the economy-service call budget (the proxy also caches estimates).
+export const WOC_MARKET_LIST_MAX_PER_MINUTE = 10;
+export const WOC_MARKET_BID_MAX_PER_MINUTE = 20;
+export const WOC_MARKET_QUOTE_MAX_PER_MINUTE = 30;
+export const WOC_MARKET_CONFIRM_MAX_PER_MINUTE = 60;
+
+// The one shared read bucket covers SEVEN marketplace GETs (offers, status,
+// browse, detail, activity, history, seller-history; trade-partner
+// deliberately rides the smaller quote bucket, an enumeration-shaped read),
+// sized against the real client cadences, not per route: the Exchange's
+// awaiting-chain poll is two reads every 3 seconds (40/min), the trade
+// window's directed-offer poll is one every 2 seconds (30/min), and a player
+// actively browsing adds a detail+history pair per row tap plus a
+// seller-history read per seller click (click-driven only, never polled, and
+// the client no-ops a repeat click while one is outstanding). One worst-case
+// player sits near 90/min; 240 keeps TWO players behind one NAT (the fused
+// per-IP bucket is shared) under the window with margin. Three or more
+// worst-case players behind one NAT exceed the shared IP arm and 429 each
+// other's polls (silent staleness, retried next beat); accepted at this
+// scale, re-judged pre-enable. The caches behind six of the seven routes
+// bound what an allowed flood buys to in-memory work; the offers poll stays
+// an uncached, index-tuned per-account read whose cost control is the
+// retention window.
+export const WOC_MARKET_READ_MAX_PER_MINUTE = 240;
+
+// Step-up challenge issuance (B6/R1): its OWN bucket, sized at double the
+// list bucket, so the challenge-then-create pair never halves the effective
+// listing throughput (both custody routes ride the shared 'list' bucket) and
+// a declined wallet popup leaves room to retry.
+export const WOC_MARKET_STEPUP_MAX_PER_MINUTE = 20;
+
+export type WocMarketMutationAction = 'list' | 'bid' | 'quote' | 'confirm' | 'read' | 'stepup';
+
+const wocMarketMutationIpAttempts = new Map<string, number[]>();
+const wocMarketMutationAccountAttempts = new Map<string, number[]>();
+
+export function wocMarketMutationLimit(action: WocMarketMutationAction): number {
+  switch (action) {
+    case 'list':
+      return WOC_MARKET_LIST_MAX_PER_MINUTE;
+    case 'bid':
+      return WOC_MARKET_BID_MAX_PER_MINUTE;
+    case 'quote':
+      return WOC_MARKET_QUOTE_MAX_PER_MINUTE;
+    case 'confirm':
+      return WOC_MARKET_CONFIRM_MAX_PER_MINUTE;
+    case 'read':
+      return WOC_MARKET_READ_MAX_PER_MINUTE;
+    case 'stepup':
+      return WOC_MARKET_STEPUP_MAX_PER_MINUTE;
+  }
+}
+
+/** Fused per-IP and per-account throttle for one marketplace mutation action. */
+export function wocMarketMutationRateLimited(
+  req: http.IncomingMessage,
+  accountId: number,
+  action: WocMarketMutationAction,
+): RateLimitOutcome {
+  const limit = wocMarketMutationLimit(action);
+  const ip = recordSlidingWindowAttempt(
+    wocMarketMutationIpAttempts,
+    `${action}:${requestIp(req)}`,
+    limit,
+  );
+  const account = recordSlidingWindowAttempt(
+    wocMarketMutationAccountAttempts,
+    `${action}:${accountId}`,
+    limit,
+  );
+  return mergeFusedOutcomes(ip, account);
+}
+
+/** Reset $WOC Exchange mutation throttles. Test-only. */
+export function resetWocMarketMutationRateLimits(): void {
+  wocMarketMutationIpAttempts.clear();
+  wocMarketMutationAccountAttempts.clear();
+}
+
 // Player-report creation had no dedicated limiter (it was gated only by the full
 // session plus the per-target 12h duplicate-report window in moderation_db). This
 // adds a coarse per-account create limiter so a single account cannot flood the
@@ -771,6 +855,64 @@ export function reportsCreateRateLimited(
 export function resetReportsCreateRateLimits(): void {
   reportsCreateIpAttempts.clear();
   reportsCreateAccountAttempts.clear();
+}
+
+// ---------------------------------------------------------------------------
+// Admin economy-oversight endpoints (player search / wealth / flagged
+// workflow). Dedicated buckets, NOT the shared `attempts` map, so dashboard
+// polling can never burn anyone's login budget (the cardUpload precedent).
+// Reads get headroom for several admins polling with the dashboard's 5 s
+// refresh plus debounced search keystrokes; flag-workflow writes are
+// deliberate clicks and get a tighter cap.
+// ---------------------------------------------------------------------------
+export const ADMIN_OVERSIGHT_READ_MAX_PER_MINUTE = 120;
+export const ADMIN_FLAG_WRITE_MAX_PER_MINUTE = 30;
+
+const adminOversightReadIpAttempts = new Map<string, number[]>();
+const adminOversightReadAccountAttempts = new Map<number, number[]>();
+const adminFlagWriteIpAttempts = new Map<string, number[]>();
+const adminFlagWriteAccountAttempts = new Map<number, number[]>();
+
+export function adminOversightReadRateLimited(
+  req: http.IncomingMessage,
+  accountId: number,
+): RateLimitOutcome {
+  const ip = recordSlidingWindowAttempt(
+    adminOversightReadIpAttempts,
+    requestIp(req),
+    ADMIN_OVERSIGHT_READ_MAX_PER_MINUTE,
+  );
+  const account = recordSlidingWindowAttempt(
+    adminOversightReadAccountAttempts,
+    accountId,
+    ADMIN_OVERSIGHT_READ_MAX_PER_MINUTE,
+  );
+  return mergeFusedOutcomes(ip, account);
+}
+
+export function adminFlagWriteRateLimited(
+  req: http.IncomingMessage,
+  accountId: number,
+): RateLimitOutcome {
+  const ip = recordSlidingWindowAttempt(
+    adminFlagWriteIpAttempts,
+    requestIp(req),
+    ADMIN_FLAG_WRITE_MAX_PER_MINUTE,
+  );
+  const account = recordSlidingWindowAttempt(
+    adminFlagWriteAccountAttempts,
+    accountId,
+    ADMIN_FLAG_WRITE_MAX_PER_MINUTE,
+  );
+  return mergeFusedOutcomes(ip, account);
+}
+
+/** Reset admin economy-oversight throttles. Test-only. */
+export function resetAdminOversightRateLimits(): void {
+  adminOversightReadIpAttempts.clear();
+  adminOversightReadAccountAttempts.clear();
+  adminFlagWriteIpAttempts.clear();
+  adminFlagWriteAccountAttempts.clear();
 }
 
 // ---------------------------------------------------------------------------

@@ -852,37 +852,6 @@ export function buildRegionDecalGeometry(
     tris = next;
   }
 
-  // 4b. drop the underside of the nose, AFTER subdividing so its edge is as
-  //     fine as the rest of the decal. (Culling whole head faces here instead
-  //     takes a bite out of the philtrum, which is the very thing the cull
-  //     exists to keep.) The vertices it orphans cost a few hundred bytes and
-  //     are never referenced.
-  const nrmData = attrs.get('normal');
-  const posData = attrs.get('position');
-  if (nrmData && posData) {
-    tris = tris.filter(([a, b, c]) => {
-      let mt = 0;
-      let ma = 0;
-      let ny = 0;
-      for (const v of [a, b, c]) {
-        const [t, az] = headAngles(
-          frame,
-          posData.data[v * 3],
-          posData.data[v * 3 + 1],
-          posData.data[v * 3 + 2],
-        );
-        mt += t / 3;
-        ma += az / 3;
-        const nx = nrmData.data[v * 3];
-        const nyv = nrmData.data[v * 3 + 1];
-        const nz = nrmData.data[v * 3 + 2];
-        ny += nyv / (Math.hypot(nx, nyv, nz) || 1) / 3;
-      }
-      return !isNoseUnderside(mt, ma, ny);
-    });
-    if (!tris.length) return null;
-  }
-
   // 5. UV from the projection, then lift along the (renormalized) normal
   const pos = attrs.get('position');
   const nrm = attrs.get('normal');
@@ -910,6 +879,32 @@ export function buildRegionDecalGeometry(
       pos.data[i * 3 + 1] = y + (ny / len) * lift;
       pos.data[i * 3 + 2] = z + (nz / len) * lift;
     }
+  }
+
+  // 6. Drop the underside of the nose after subdivision AND after lift, so the
+  // predicate runs on the same surface the renderer receives. Culling whole
+  // source-head faces earlier takes a bite out of the philtrum, which is the
+  // very thing the cull exists to keep. The vertices it orphans cost a few
+  // hundred bytes and are never referenced.
+  if (nrm && pos) {
+    tris = tris.filter(([a, b, c]) => {
+      let mt = 0;
+      let ma = 0;
+      let ny = 0;
+      for (const v of [a, b, c]) {
+        const [t, az] = headAngles(
+          frame,
+          pos.data[v * 3],
+          pos.data[v * 3 + 1],
+          pos.data[v * 3 + 2],
+        );
+        mt += t / 3;
+        ma += az / 3;
+        ny += nrm.data[v * 3 + 1] / 3;
+      }
+      return !isNoseUnderside(mt, ma, ny);
+    });
+    if (!tris.length) return null;
   }
 
   const geo = new THREE.BufferGeometry();

@@ -274,3 +274,35 @@ export function duelFor(ctx: SimContext, pid: number): DuelState | null {
   // ends, matching the old synchronous-delete behavior.
   return duel && duel.endedTick === undefined ? duel : null;
 }
+
+/**
+ * True when `opponent` just ended a duel against `recipient` on THIS very
+ * tick. A duel that ends still lingers in `ctx.duels` (see the comment on
+ * `duelFor` above) because the clamp in `combat/damage.ts` calls `endDuel`
+ * SYNCHRONOUSLY mid-swing: it strips every aura the opponent had inflicted
+ * (`clearAurasFromController`) BEFORE returning control to the swing shell
+ * (`combat/auto_attack.ts`), which then fires proc effects (weapon procs,
+ * set-bonus procs) unconditionally right after. Without this check, the
+ * killing blow's own crit can stamp a fresh hostile aura on the loser a beat
+ * after the clear already ran, and nothing purges that one afterward: the
+ * duel is over, so it rides out with no clamp left to stop it, and kills the
+ * 1-hp loser for real seconds later.
+ *
+ * Resolves `opponent` through `pvpController`, the same definition of "the
+ * opponent" `clearAurasFromController` uses, so a pet or Necromancy undead
+ * source is covered exactly like a direct opponent hit. Requires the
+ * resolved controller be the SIDE OPPOSITE `recipient`: a player's own
+ * self-targeted proc (a heal, a self-buff) is never something the duel's end
+ * would have cleared, and must keep applying even on the ending tick.
+ */
+export function duelJustEndedBetween(
+  ctx: SimContext,
+  recipient: Entity,
+  opponent: Entity,
+): boolean {
+  if (recipient.kind !== 'player') return false;
+  const duel = ctx.duels.get(recipient.id);
+  if (!duel || duel.endedTick !== ctx.tickCount) return false;
+  const opponentPid = recipient.id === duel.a ? duel.b : duel.a;
+  return ctx.pvpController(opponent)?.id === opponentPid;
+}

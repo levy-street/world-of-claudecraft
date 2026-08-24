@@ -1617,6 +1617,30 @@ export function outfitSwatchHex(set: ArmorSetId, id: OutfitColorway): number {
   return hslToHex(hue, sat, light);
 }
 
+/** A multiply-safe approximation of a colorway's dye, for a material with no
+ *  shader to run it (the low-tier Lambert rebuild in characters/assets.ts
+ *  buildTintedClone, which drops the onBeforeCompile hook attachArmorDye
+ *  needs). `outfitSwatchHex` is tuned to read as a small swatch CHIP against
+ *  the customizer's dark background, roughly half brightness; used directly
+ *  as a `material.color` multiply factor over a bright atlas texture, that
+ *  same half-brightness crushes the whole armour toward black. Scaling every
+ *  channel so the brightest reads full brightness keeps the swatch's hue and
+ *  relative saturation while multiplying the atlas back toward its own
+ *  brightness instead of away from it. */
+export function outfitDyeFallbackHex(set: ArmorSetId, id: OutfitColorway): number {
+  const hex = outfitSwatchHex(set, id);
+  const r = (hex >> 16) & 0xff;
+  const g = (hex >> 8) & 0xff;
+  const b = hex & 0xff;
+  const max = Math.max(r, g, b);
+  if (max <= 0) return 0xffffff;
+  const scale = 255 / max;
+  const nr = Math.min(255, Math.round(r * scale));
+  const ng = Math.min(255, Math.round(g * scale));
+  const nb = Math.min(255, Math.round(b * scale));
+  return (nr << 16) | (ng << 8) | nb;
+}
+
 /** Gradient stops for a colorway chip. A hue colorway is one flat stop; a
  *  material colorway shows what its rules do to the set's measured steel,
  *  bright-plate and cloth anchors, so the chip is an honest three-material preview. */

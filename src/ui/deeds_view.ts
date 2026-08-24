@@ -187,6 +187,19 @@ function progressFraction(progress: DeedProgress | null): number {
   return progress ? progress.current / progress.target : 0;
 }
 
+/** The unvisited markIds for an all-poi 'visits' trigger (an exploration
+ *  wayfarer deed: every markId is a poi: mark, whether the checklist is one
+ *  zone's named places, like Wayfarer of the Heights, or spans several,
+ *  like The Long Road North), in authored order. Returns [] for every other
+ *  trigger kind and for a 'visits' trigger that mixes poi: marks with
+ *  another namespace (gather:/slain:/npc:), since those have no single
+ *  place name to surface. */
+function missingPoiVisits(trigger: DeedTrigger, stats: Readonly<DeedStats>): readonly string[] {
+  if (trigger.kind !== 'visits') return [];
+  if (!trigger.markIds.every((markId) => markId.startsWith('poi:'))) return [];
+  return trigger.markIds.filter((markId) => !stats.visited.has(markId));
+}
+
 export const DEED_FILTERS = ['all', 'earned', 'unearned', 'nearly'] as const;
 export type DeedsFilter = (typeof DEED_FILTERS)[number];
 
@@ -282,6 +295,12 @@ export interface DeedEntryModel {
   // says so before it is earned, the way a title-reward deed already does.
   borderReward: boolean;
   crestId: string;
+  // Unvisited poi:<zone>:<id> marks for an unearned all-poi 'visits' deed (an
+  // exploration wayfarer), in trigger order; the painter resolves each to its
+  // localized place name. Empty for every other deed, including an earned one
+  // and a 'visits' deed whose markIds are not entirely poi-shaped (a mixed
+  // gather/slain/npc checklist has no single-namespace place name to show).
+  missingPoiMarkIds: readonly string[];
 }
 
 export interface DeedTitleOption {
@@ -367,6 +386,7 @@ export function buildDeedsView(input: DeedsViewInput): DeedsViewModel {
       titleReward: def.reward?.kind === 'title',
       borderReward: def.reward?.kind === 'border',
       crestId: deedCrestId(id, def.category),
+      missingPoiMarkIds: earned ? [] : missingPoiVisits(def.trigger, input.deedStats),
     });
   }
 

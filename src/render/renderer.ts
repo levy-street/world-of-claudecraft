@@ -207,6 +207,7 @@ import {
   CHARACTER_LOD_RANGE_SQ,
   type CharacterLodBands,
   characterLodBandsInto,
+  movingHoldoutActive,
   showsStaticFarMesh,
 } from './crowd_lod';
 import { daisVisualLift } from './dais_lift';
@@ -259,6 +260,7 @@ import {
   entityViewCandidatePriority,
   entityViewDistanceSq,
   entityViewIsAdmitted,
+  isDistanceCullExemptObject,
   isPersistentPortalObject,
   entityViewShouldDrop as shouldDropView,
   viewBuildClass,
@@ -352,7 +354,7 @@ import { createGroundTilt, type GroundTiltState, stepGroundTilt } from './ground
 import { buildHauntFeatures, type HauntFeaturesView } from './haunt_features';
 import { usedJsHeapMb } from './heap_sample';
 import { createHitchFrameAligner } from './hitch_frame_align_core';
-import { buildHollowGates } from './hollow_gates';
+import { buildHollowGates, type HollowGatesView } from './hollow_gates';
 import { type IceBlockVisual, syncIceBlockVisual } from './ice_block_visual';
 import { idleSlot } from './idle_queue';
 import { buildImpactSite, buildImpactSitePrewarmGroup, type ImpactSiteView } from './impact_site';
@@ -416,7 +418,7 @@ import { NecromancyArmyPortalFx } from './necromancy_army_portal_fx';
 import { NecromancyGroundFx } from './necromancy_ground_fx';
 import { NeedleOfFateVfx } from './needle_of_fate_vfx';
 import { isNeedleOfFateProjectile } from './needle_of_fate_vfx_core';
-import { facingAlpha, remoteEntityAlpha } from './net_interp_core';
+import { facingAlpha, POS_EXTRAPOLATION_CAP, remoteEntityAlpha } from './net_interp_core';
 import { buildNightAccents, type NightAccentsView } from './night_accents';
 import { buildNightFeatures, type NightFeaturesView } from './night_features';
 import {
@@ -1670,6 +1672,7 @@ export class Renderer {
   private foliageRevealGate: RevealGateCore | null = null;
   private eastbrookTownView!: EastbrookTownView;
   private fenbridgeTownView!: FenbridgeTownView;
+  private hollowGates!: HollowGatesView;
   private lightRank: RankedPointLight[] = [];
   private doomedIds: number[] = [];
   private dungeons: DungeonInteriors | null = null;
@@ -2482,8 +2485,9 @@ export class Renderer {
     // palm strand. Attached like the per-zone features so the distance cull
     // applies: the gates and the palm strand have compact footprints of their
     // own, and water flora registers one cull child per zone.
+    this.hollowGates = buildHollowGates(this.sim.cfg.seed);
     for (const staticFeature of [
-      buildHollowGates(this.sim.cfg.seed),
+      this.hollowGates,
       buildWaterFlora(this.sim.cfg.seed),
       buildFarshoreFeatures(this.sim.cfg.seed),
     ]) {
@@ -4672,7 +4676,7 @@ export class Renderer {
       const required = e.id === center.id || e.id === center.targetId;
       if (required && !includeRequired) continue;
       const d2 = entityViewDistanceSq(e, center);
-      if (!required && d2 > rangeSq) continue;
+      if (!required && d2 > rangeSq && !isDistanceCullExemptObject(e)) continue;
       writeViewCandidate(
         this.viewCandidatePool,
         this.viewCandidates,
@@ -10591,9 +10595,8 @@ export class Renderer {
     for (const [id, v] of this.views) {
       const e = sim.entities.get(id);
       if (!e) continue;
-      // Distance rejection comes before effect/state derivation. Retained views
-      // outside the 80/96 yard visibility hysteresis rendered nothing before
-      // and still render nothing, so their aura and actionability work can wait.
+      // Distance rejection (isDistanceCullExemptObject excepted) comes before
+      // effect/state derivation, so a rejected view's aura/actionability work waits.
       const cdx = e.pos.x - p.pos.x,
         cdz = e.pos.z - p.pos.z;
       const d2 = cdx * cdx + cdz * cdz;
@@ -10605,7 +10608,8 @@ export class Renderer {
           d2,
           this.entityViewCreateRangeSq,
           this.entityViewDestroyRangeSq,
-        )
+        ) &&
+        !isDistanceCullExemptObject(e)
       ) {
         v.group.visible = false;
         continue;
@@ -10700,6 +10704,18 @@ export class Renderer {
         combatTargetId,
         combatTarget?.ownerId ?? null,
       );
+      const ea = isSelf
+        ? Math.min(1, alpha)
+        : remoteEntityAlpha(now, e.netUpdatedAt, e.netInterval, alpha);
+      const movingFarHoldout = movingHoldoutActive(
+        e.pos,
+        e.prevPos,
+        ea,
+        !isSelf && e.netUpdatedAt !== undefined && e.netInterval !== undefined
+          ? POS_EXTRAPOLATION_CAP
+          : 1,
+        e.vx !== 0 || e.vz !== 0,
+      );
       let wantShadow = true;
       let inProxyBand = false;
       if (isSelf) {
@@ -10711,14 +10727,9 @@ export class Renderer {
         }
       }
       if (!isSelf) {
-        // Per-frame visibility uses the same create/destroy hysteresis as view
-        // retention (above) so a rig hovering right at the draw edge
-        // doesn't toggle visible/invisible every frame, that hard cutoff is the
-        // actual on-screen boundary flicker. group.visible carries last frame's
-        // state: once shown, keep it until past the 96yd destroy radius (where
-        // the view is torn down anyway); while hidden, show only within 80yd.
-        // hidden until its shaders finish linking off-thread (async-compile gate);
-        // the object branch below may still re-hide loot
+        // Per-frame visibility follows the create/destroy hysteresis above so
+        // rigs at the draw edge do not flicker. The object branch below may
+        // still re-hide loot.
         v.group.visible = !v.compilePending;
         // The graveyard resurrection angel is present only to a released spirit: hide
         // it from the living local player. It stays in the sim for the ghost and for
@@ -10765,7 +10776,7 @@ export class Renderer {
             for (const caster of v.objectCasters) (caster as THREE.Mesh).castShadow = wantShadow;
           }
         }
-        if (v.visual) v.isFar = showsStaticFarMesh(d2, lodBands, actionablePose);
+        if (v.visual) v.isFar = showsStaticFarMesh(d2, lodBands, actionablePose, movingFarHoldout);
       }
       // online, entities beyond nameplate range stream below snapshot rate;
       // each interpolates on its own clock so they move smoothly instead of
@@ -10779,9 +10790,6 @@ export class Renderer {
       // turn stream, mouselook, click-move via the sent facing). Remote
       // entities interpolate on their own measured cadence via
       // remoteEntityAlpha (unknown-cadence fallback).
-      const ea = isSelf
-        ? Math.min(1, alpha)
-        : remoteEntityAlpha(now, e.netUpdatedAt, e.netInterval, alpha);
       const x = isSelf ? selfPos.x : e.prevPos.x + (e.pos.x - e.prevPos.x) * ea;
       const y = isSelf ? selfPos.y : e.prevPos.y + (e.pos.y - e.prevPos.y) * ea;
       const z = isSelf ? selfPos.z : e.prevPos.z + (e.pos.z - e.prevPos.z) * ea;
@@ -12398,49 +12406,39 @@ export class Renderer {
     worldStart = this.markRendererWorldPhase(worldPhaseMs, 'terrain', worldStart);
     this.updateZoneFeatureVisibility(fogFar);
     worldStart = this.markRendererWorldPhase(worldPhaseMs, 'zoneVisibility', worldStart);
-    this.propsView.update(
-      this.camera.position.x,
-      this.camera.position.y,
-      this.camera.position.z,
-      this.cameraLookAt.x,
-      this.cameraLookAt.y,
-      this.cameraLookAt.z,
-      fogFar,
-      dt,
-      this.reducedMotion(),
-    );
+    // Shared by every occluder-fade view below: same camera and look-at
+    // point, so one read stands in for the six repeated field accesses.
+    const camX = this.camera.position.x;
+    const camY = this.camera.position.y;
+    const camZ = this.camera.position.z;
+    const eyeX = this.cameraLookAt.x;
+    const eyeY = this.cameraLookAt.y;
+    const eyeZ = this.cameraLookAt.z;
+    this.propsView.update(camX, camY, camZ, eyeX, eyeY, eyeZ, fogFar, dt, this.reducedMotion());
     this.eastbrookTownView.update(
-      this.camera.position.x,
-      this.camera.position.y,
-      this.camera.position.z,
-      this.cameraLookAt.x,
-      this.cameraLookAt.y,
-      this.cameraLookAt.z,
+      camX,
+      camY,
+      camZ,
+      eyeX,
+      eyeY,
+      eyeZ,
       fogFar,
       dt,
       this.reducedMotion(),
     );
     this.fenbridgeTownView.update(
-      this.camera.position.x,
-      this.camera.position.y,
-      this.camera.position.z,
-      this.cameraLookAt.x,
-      this.cameraLookAt.y,
-      this.cameraLookAt.z,
+      camX,
+      camY,
+      camZ,
+      eyeX,
+      eyeY,
+      eyeZ,
       fogFar,
       dt,
       this.reducedMotion(),
     );
-    this.dungeons?.update(
-      this.camera.position.x,
-      this.camera.position.y,
-      this.camera.position.z,
-      this.cameraLookAt.x,
-      this.cameraLookAt.y,
-      this.cameraLookAt.z,
-      dt,
-      this.reducedMotion(),
-    );
+    this.dungeons?.update(camX, camY, camZ, eyeX, eyeY, eyeZ, dt, this.reducedMotion());
+    this.hollowGates.update(camX, camY, camZ, eyeX, eyeY, eyeZ, dt, this.reducedMotion());
     worldStart = this.markRendererWorldPhase(worldPhaseMs, 'props', worldStart);
     this.foliage.update(
       p.pos.x,

@@ -17,6 +17,10 @@ beforeEach(() => {
   dbMock.query.mockReset();
 });
 
+/** A live expiry: the SQL qual only returns unexpired rows, so the mocked row
+ *  carries one (the read-time re-check in tokenInfoFromRow sees it). */
+const LIVE_EXPIRY = new Date(Date.now() + 60 * 60 * 1000).toISOString();
+
 describe('accountAndScopeForToken', () => {
   it.each([
     ['full', { accountId: 7, scope: 'full' }],
@@ -26,9 +30,24 @@ describe('accountAndScopeForToken', () => {
     [null, null],
   ])('decodes database scope %j fail closed', async (scope, expected) => {
     dbMock.query.mockResolvedValueOnce({
-      rows: [{ account_id: 7, scope }],
+      rows: [{ account_id: 7, scope, expires_at: LIVE_EXPIRY }],
     });
 
     await expect(accountAndScopeForToken('a'.repeat(64))).resolves.toEqual(expected);
+  });
+
+  // The read-time expiry belt (tokenInfoFromRow): the SQL qual already
+  // excludes expired rows, but a row that somehow arrives past its expiry
+  // (the cached arm's whole hazard; here, a defensive arm on the direct
+  // path) must fail closed rather than authenticate on the qual's word.
+  it.each([
+    ['a past expiry', new Date(Date.now() - 1000).toISOString()],
+    ['a null expiry', null],
+  ])('refuses a returned row carrying %s', async (_label, expiresAt) => {
+    dbMock.query.mockResolvedValueOnce({
+      rows: [{ account_id: 7, scope: 'full', expires_at: expiresAt }],
+    });
+
+    await expect(accountAndScopeForToken('a'.repeat(64))).resolves.toBeNull();
   });
 });

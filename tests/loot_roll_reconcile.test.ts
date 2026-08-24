@@ -14,6 +14,7 @@ import { LOOT_ROLL_REGRACE_MS, reconcileLootRolls } from '../src/ui/hud/loot/loo
 
 const makeSim = (seed = 42) =>
   new Sim({ seed, playerClass: 'warrior', autoEquip: true, noPlayer: true });
+const FRESH_CORPSE_TIMER = 60;
 
 function teleportTo(sim: Sim, pid: number, x: number, z: number) {
   const e = sim.entities.get(pid)!;
@@ -34,6 +35,7 @@ function partyWithSharedRoll(seed = 42) {
   const mob = createMob(990700, MOBS.forest_wolf, 2, { x: 20, y: 0, z: 22 });
   mob.dead = true;
   mob.lootable = true;
+  mob.corpseTimer = FRESH_CORPSE_TIMER;
   mob.tappedById = a;
   mob.loot = { copper: 0, items: [{ itemId: 'greyjaw_hide_boots', count: 1 }] };
   sim.entities.set(mob.id, mob);

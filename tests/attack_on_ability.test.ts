@@ -7,6 +7,7 @@ import {
   hasAutoAttackTarget,
   isPvpHostileTarget,
 } from '../src/ui/hud/action_bar/attack_on_ability';
+import type { BgInfo, BgMatchInfo } from '../src/world_api/battleground';
 import type { ArenaInfo, DuelInfo } from '../src/world_api/duel_arena';
 
 // Resolve a real ability's rank-1 effects by id, so the test pins behavior against
@@ -206,7 +207,106 @@ describe('isPvpHostileTarget (the duel/arena PvP gate, #2451)', () => {
     const arena: ArenaInfo = arenaInfoWith(null);
     expect(isPvpHostileTarget(OTHER_PID, null, arena)).toBe(false);
   });
+
+  // Thornhollow Fields (5v5 CTF). The renderer's nameplate predicate
+  // (`isHostilePlayer`, src/render/renderer.ts) already paints the opposing
+  // TEAM hostile for the whole live match; this gate must agree, or the
+  // "Auto-Attack on Ability Use" QoL never engages a white swing on a
+  // battleground cast while the same cast in a duel/arena does.
+  const bgMatch: BgMatchInfo = {
+    state: 'active',
+    myTeam: 0,
+    capsToWin: 3,
+    scores: [0, 0],
+    flags: [
+      { state: 'home', carrierPid: null, carrierName: null, carrierTeam: null },
+      { state: 'home', carrierPid: null, carrierName: null, carrierTeam: null },
+    ],
+    players: [bgRow(1, 0), bgRow(OTHER_PID, 1), bgRow(7, 1)],
+    countdown: 0,
+    timeLeft: 600,
+    waveIn: [10, 10],
+    respawnIn: 0,
+    winner: null,
+  };
+
+  it('is true for an opposing-team fighter in an active battleground match', () => {
+    expect(isPvpHostileTarget(OTHER_PID, null, null, bgInfoWith(bgMatch))).toBe(true);
+    expect(isPvpHostileTarget(7, null, null, bgInfoWith(bgMatch))).toBe(true);
+  });
+
+  it('is false for a teammate in an active battleground match', () => {
+    expect(isPvpHostileTarget(1, null, null, bgInfoWith(bgMatch))).toBe(false);
+  });
+
+  it('is false for a pid not on the battleground roster', () => {
+    expect(isPvpHostileTarget(999, null, null, bgInfoWith(bgMatch))).toBe(false);
+  });
+
+  it('is false while the battleground match is not active (countdown/ended)', () => {
+    expect(
+      isPvpHostileTarget(OTHER_PID, null, null, bgInfoWith({ ...bgMatch, state: 'countdown' })),
+    ).toBe(false);
+    expect(
+      isPvpHostileTarget(OTHER_PID, null, null, bgInfoWith({ ...bgMatch, state: 'ended' })),
+    ).toBe(false);
+  });
+
+  it('is false with no battleground match (queued only) or no bgInfo at all', () => {
+    expect(isPvpHostileTarget(OTHER_PID, null, null, bgInfoWith(null))).toBe(false);
+    expect(isPvpHostileTarget(OTHER_PID, null, null, null)).toBe(false);
+    expect(isPvpHostileTarget(OTHER_PID, null, null, undefined)).toBe(false);
+  });
+
+  it('engages a white swing on a hostile cast at a battleground enemy exactly as in a duel', () => {
+    // Both HUD engage sites (the instant press and the deferred castStop)
+    // compute hasAutoAttackTarget(target, isPvpHostileTarget(...)). A player
+    // target never carries the mob-only `hostile` flag, so the PvP verdict is
+    // the whole gate: the duel arm already passed, the battleground arm did not.
+    const enemy = { id: OTHER_PID, kind: 'player', dead: false, hostile: false } as Entity;
+    const duel = { state: 'active', otherPid: OTHER_PID } as DuelInfo;
+    const inDuel = hasAutoAttackTarget(enemy, isPvpHostileTarget(OTHER_PID, duel, null, null));
+    const inBg = hasAutoAttackTarget(
+      enemy,
+      isPvpHostileTarget(OTHER_PID, null, null, bgInfoWith(bgMatch)),
+    );
+    expect(inDuel).toBe(true);
+    expect(inBg).toBe(true);
+  });
 });
+
+function bgRow(pid: number, team: number): BgMatchInfo['players'][number] {
+  return {
+    pid,
+    name: `P${pid}`,
+    cls: 'warrior',
+    team,
+    carrying: false,
+    dead: false,
+    kills: 0,
+    deaths: 0,
+    captures: 0,
+    assists: 0,
+  };
+}
+
+function bgInfoWith(match: BgMatchInfo | null): BgInfo {
+  return {
+    rating: 0,
+    wins: 0,
+    losses: 0,
+    draws: 0,
+    captures: 0,
+    queued: false,
+    queueSize: 0,
+    queuedParty: 0,
+    firstWinBonusReady: false,
+    proposal: null,
+    requeueIn: 0,
+    match,
+    ladder: [],
+  };
+}
 
 function arenaInfoWith(match: ArenaInfo['match']): ArenaInfo {
   return {

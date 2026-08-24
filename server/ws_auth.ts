@@ -289,6 +289,12 @@ export function createWsAuth(deps: WsAuthDeps): WsAuthHandlers {
     // notification received during later handshake awaits overrides this query's
     // stale value at the synchronous game.join boundary, with no second DB read.
     const generalChatRateLimitHydration = game.beginGeneralChatRateLimitHydration(accountId);
+    // Same capture-before-the-read contract as above, for the sibling
+    // mute/reason/strikes snapshot: see chat_mod_live.ts for why this fence
+    // exists (a live push landing on this same still-linkdead session during
+    // the reads below must never be discarded by the stale snapshot they'd
+    // otherwise resolve to).
+    const chatModerationHydration = game.beginChatModerationHydration(accountId);
     try {
       const status = await moderationStatusForAccount(accountId);
       if (status.locked) {
@@ -305,6 +311,17 @@ export function createWsAuth(deps: WsAuthDeps): WsAuthHandlers {
         return;
       }
       const chatMute = await chatMuteStatusForAccount(accountId);
+      // Resolved at each game.join call below, not here: like
+      // generalChatRateLimitHydration, resolving early would leave every
+      // await between here and the synchronous join boundary (adminRolesForAccount,
+      // loadAccountCosmetics, and on the fresh arm bankBonusForAccount, the lease
+      // acquire, and the character reload) unfenced against a live push landing
+      // in that window.
+      const freshModeration = {
+        mutedUntil: status.chatMutedUntil ?? chatMute.mutedUntil,
+        reason: chatMute.reason,
+        strikes: status.chatStrikes,
+      };
       // Hard per-IP WS connection limit. The soft threshold (composite score evidence)
       // is handled inside game.join(); this guard blocks egregious bot farms before
       // they consume a session slot.
@@ -329,9 +346,6 @@ export function createWsAuth(deps: WsAuthDeps): WsAuthHandlers {
         ...meta,
         ...metaRequestUserData(req, meta),
         sourceUrl: metaEventSourceUrl(req),
-        mutedUntil: status.chatMutedUntil ?? chatMute.mutedUntil,
-        reason: chatMute.reason,
-        chatStrikes: status.chatStrikes,
         accountCosmetics,
         isAdmin,
         adminPermissions,
@@ -374,6 +388,7 @@ export function createWsAuth(deps: WsAuthDeps): WsAuthHandlers {
           // resumes and keeps its nonce; a live duplicate is rejected) and never
           // re-stamp the row with a fresh acquire that a doomed handshake could
           // leave mismatched.
+          const moderation = chatModerationHydration.resolve(freshModeration);
           result = game.join(
             ws,
             accountId,
@@ -384,6 +399,9 @@ export function createWsAuth(deps: WsAuthDeps): WsAuthHandlers {
             character.is_gm,
             {
               ...joinMeta,
+              mutedUntil: moderation.mutedUntil,
+              reason: moderation.reason,
+              chatStrikes: moderation.strikes,
               generalChatRateLimit: generalChatRateLimitHydration.resolve(
                 status.generalChatRateLimit ?? null,
               ),
@@ -471,6 +489,7 @@ export function createWsAuth(deps: WsAuthDeps): WsAuthHandlers {
               leaseNonce = undefined;
               throw err;
             }
+            const moderation = chatModerationHydration.resolve(freshModeration);
             result = game.join(
               ws,
               accountId,
@@ -483,6 +502,9 @@ export function createWsAuth(deps: WsAuthDeps): WsAuthHandlers {
                 ...joinMeta,
                 leaseNonce,
                 bankBonus,
+                mutedUntil: moderation.mutedUntil,
+                reason: moderation.reason,
+                chatStrikes: moderation.strikes,
                 generalChatRateLimit: generalChatRateLimitHydration.resolve(
                   status.generalChatRateLimit ?? null,
                 ),
@@ -572,6 +594,7 @@ export function createWsAuth(deps: WsAuthDeps): WsAuthHandlers {
       }
     } finally {
       generalChatRateLimitHydration.release();
+      chatModerationHydration.release();
     }
   }
 

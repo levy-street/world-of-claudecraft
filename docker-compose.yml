@@ -162,6 +162,23 @@ services:
       WOC_DAILY_REWARD_CONFIG_TTL_MS: ${WOC_DAILY_REWARD_CONFIG_TTL_MS:-}
       WOC_ECONOMY_SERVICE_URL: ${WOC_ECONOMY_SERVICE_URL:-}
       WOC_ECONOMY_INTERNAL_SECRET: ${WOC_ECONOMY_INTERNAL_SECRET:-}
+      # The $WOC Exchange. Ships disabled: unset leaves every path answering
+      # woc_market.disabled and the sweep never starts. WOC_MARKET_SERVICE_URL
+      # points at the economy service's /v1/market/ prefix, authenticated with
+      # the WOC_ECONOMY_INTERNAL_SECRET above (the market proxy shares it).
+      # The DEV arms are deliberately absent here: they are dev-only and this
+      # compose is the production deployment.
+      WOC_MARKET_ENABLED: ${WOC_MARKET_ENABLED:-}
+      WOC_MARKET_SERVICE_URL: ${WOC_MARKET_SERVICE_URL:-}
+      WOC_MARKET_EXCLUDED_ITEM_IDS: ${WOC_MARKET_EXCLUDED_ITEM_IDS:-}
+      WOC_MARKET_LISTINGS_RETENTION_DAYS: ${WOC_MARKET_LISTINGS_RETENTION_DAYS:-}
+      WOC_MARKET_ABANDONS_RETENTION_DAYS: ${WOC_MARKET_ABANDONS_RETENTION_DAYS:-}
+      WOC_MARKET_OFFERS_RETENTION_DAYS: ${WOC_MARKET_OFFERS_RETENTION_DAYS:-}
+      WOC_MARKET_CUSTODY_CLAIMS_RETENTION_DAYS: ${WOC_MARKET_CUSTODY_CLAIMS_RETENTION_DAYS:-}
+      WOC_MARKET_CONFIRMING_REVIEW_HOURS: ${WOC_MARKET_CONFIRMING_REVIEW_HOURS:-}
+      # WOC_MARKET_DEV_SERVICE / WOC_MARKET_DEV_PRICE_MICRO_USD are deliberately
+      # NOT passed through: compose is the production deployment and the dev
+      # economy must be unreachable from it (the ALLOW_DEV_COMMANDS posture).
       SOLANA_RPC_URL: ${SOLANA_RPC_URL:-}
       WOC_MINT: ${WOC_MINT:-}
       META_CAPI_PIXEL_ID: ${META_CAPI_PIXEL_ID:-}

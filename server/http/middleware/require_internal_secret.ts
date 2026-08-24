@@ -35,6 +35,17 @@ export const DISCORD_SECRET_ENV = 'DISCORD_BOT_SECRET';
 export const DAILY_REWARD_SECRET_HEADER = 'x-woc-daily-reward-secret';
 export const DAILY_REWARD_SECRET_ENV = 'WOC_DAILY_REWARD_SERVICE_SECRET';
 
+/**
+ * Header + env pair for the internal DASHBOARD gate (the read-only
+ * /internal/woc-market/* ops family).
+ *
+ * Its own pair rather than a share of the Discord bot's: the two callers are
+ * different processes with different blast radii, and revoking one must never
+ * silently revoke or widen the other.
+ */
+export const DASHBOARD_SECRET_HEADER = 'x-woc-dashboard-secret';
+export const DASHBOARD_SECRET_ENV = 'DASHBOARD_INTERNAL_SECRET';
+
 /** The legacy fail() bodies from server/internal.ts, frozen for byte parity. */
 const FEATURE_OFF_BODY = { success: false, data: null, error: 'unknown endpoint' } as const;
 const NOT_AUTHENTICATED_BODY = { success: false, data: null, error: 'not authenticated' } as const;

@@ -171,7 +171,8 @@ export const hudChromeStrings = {
     remainingDaysHours: '{days}d {hours}h',
     score: 'Score',
     walletValue: 'Wallet Value (WOC)',
-    usd: '{amount} USD',
+    // Intl already spells the currency; no code appended.
+    usd: '{amount}',
     sol: '{amount} SOL',
     unknown: 'Unknown',
     spinTitle: 'Daily Spin',
@@ -212,6 +213,164 @@ export const hudChromeStrings = {
       banned: 'You are banned from Daily Rewards. Reason: {reason}',
       bannedUntil:
         'You are banned from Daily Rewards for another {remaining}. Access returns {until}. Reason: {reason}',
+    },
+  },
+  // The trade window's $WOC arm (docs/prd/woc/p2p-woc-trade.md): selling a
+  // staged item to the player you are trading with, for $WOC.
+  trade: {
+    // The neutral end of a trade session, for when the business the window
+    // existed for concluded elsewhere. Its sibling (hud.logs.tradeCancelled)
+    // lives in the hud catalog; this one is here because hud_chrome is the
+    // en-only domain, and a completed sale should not wait on twenty locale
+    // blocks to stop calling itself cancelled.
+    windowClosed: 'Trade window closed.',
+    woc: {
+      tabGold: 'Gold',
+      tabWoc: '$WOC',
+      // The currency switch's own accessible name (a group of two toggles),
+      // never one toggle's label for the pair; and why the $WOC toggle is
+      // off on the gold face (true for every cause the model refuses on).
+      modesLabel: 'Payment currency',
+      tabWocHint:
+        'Paying in $WOC is available when your side of the table is empty and no gold is offered.',
+      priceLabel: 'Price in USD',
+      pricePlaceholder: '0.00',
+      equivalent: 'About {tokens} $WOC at the current rate',
+      // The compose face is the BUYER's (offering $WOC buys what the other
+      // side staged), so its lines speak to the buyer; the seller's net rides
+      // netLine on the review and waiting faces, where the seller commits.
+      variableWarning:
+        'The $WOC amount is a preview, not a fixed price. The exact number is set by a fresh quote when you pay.',
+      feeLine: 'Exchange fee {fee}, taken out of the price.',
+      netLine: 'You receive {net}',
+      netLineBuyer: 'The seller receives {net}',
+      sendOffer: 'Offer $WOC',
+      offerSent: 'Offer sent. It expires in 10 minutes unless {name} accepts.',
+      // The real expiry from the wire, when the server sends one.
+      offerSentUntil: 'Offer sent. It expires at {time} unless {name} accepts.',
+      incomingAccept: '{name} offers {price} for your items.',
+      // Role-neutral: it renders on the buyer's compose face and on BOTH
+      // review faces.
+      notInstant:
+        'A $WOC sale is not instant. The item moves into escrow once both sides accept, and reaches the buyer once payment is verified.',
+      blockDisabled: 'The $WOC Exchange is not available on this realm.',
+      blockNoWallet: 'Link and verify a wallet to sell items for $WOC.',
+      blockPartnerUnknown: 'Checking whether that player can accept $WOC...',
+      blockRecipientNoWallet: 'That player must connect a wallet to accept $WOC payments.',
+      // Offering $WOC means you are BUYING: items go one way, $WOC the other.
+      // These say so, rather than leaving a disabled button unexplained.
+      hintClearYourItems: 'Remove your own items: a $WOC offer buys what they are selling.',
+      hintAwaitTheirItems: 'Waiting for them to offer something that can be sold for $WOC.',
+      // Role-neutral: the same key reads on the buyer's compose face (about
+      // the seller's table) and the seller's accept face.
+      hintOneItem:
+        'A $WOC deal covers exactly one item. Only the item being sold can be on the table.',
+      hintEnterPrice: 'Enter a price in USD.',
+      hintAcceptNeedsItem: 'Add the item you are selling before accepting.',
+      // The staged copy is a snapshot: after unlocking in the bags the item
+      // has to be re-staged for the trade to see the change, so the hint names
+      // that step (the R10 dead end).
+      hintAcceptLocked:
+        'That item is locked. Unlock it in your bags, then remove it from the trade and add it again.',
+      hintGoldOffered: 'Remove your gold offer first: a trade is gold or $WOC, not both.',
+      // The count rides the plurals base wocTradeIneligible; this sentence
+      // says WHY (the exchange lock predicate's arms).
+      ineligibleReason:
+        'Soulbound, quest, and locked items, and items outside the Exchange categories, cannot be sold for $WOC.',
+      incomingTitle: '$WOC offer from {name}',
+      incomingBody: '{name} offers to sell you {item} for {price}.',
+      // The formatter already spells the currency in every locale (US$,
+      // USD, $US), so the key adds no code of its own.
+      moneyUsd: '{usd}',
+      // One template for both figures, so a locale orders and spaces them.
+      moneyLine: '{usd} (~ {tokens} $WOC)',
+      waitingOther: 'Offer accepted. Waiting for the other player to accept.',
+      payNow: 'Pay {usd}',
+      awaitingPayment: 'Waiting for payment confirmation...',
+      paying: 'Confirm the payment in your wallet...',
+      // A directed sale hands the copy straight into the online buyer's bags;
+      // Ravenpost mail is the fallback (offline, or bags full).
+      settled: 'Paid. Your item is in your bags, or arrives by Ravenpost mail if they were full.',
+      settledSeller: 'Paid. The item was delivered to the buyer.',
+      accept: 'Accept offer',
+      accepted: 'Offer accepted. Your item is held until payment is verified.',
+      decline: 'Decline',
+      withdraw: 'Withdraw offer',
+      hintInsufficientBalance: 'That is more $WOC than your connected wallet holds.',
+      statusAwaitingBuyer: 'Waiting for the buyer to pay.',
+      statusPayingBuyer: 'Confirming your payment on the network...',
+      statusPayingSeller: "The buyer's payment is confirming on the network...",
+      // A settlement parked under an operator verdict is neither confirming
+      // nor decided: its own sentence per side, and no spinner.
+      statusReviewBuyer: 'Your payment is under review.',
+      statusReviewSeller: "The buyer's payment is under review.",
+      paidSeller: 'You have received a payment of {price} for your {item}.',
+      paidBuyer: 'You have sent a payment of {price} for {item}.',
+      // The honest ends of a deal that DID NOT sell (the H13 fix: a closed
+      // listing used to render as settled and print the paid line).
+      closedCancelled: 'This sale was cancelled. The item returns to the seller by Ravenpost mail.',
+      closedSuspended:
+        'This sale was suspended by a Game Master. The item returns to the seller by Ravenpost mail.',
+      closedUnpaid:
+        'This sale ended without payment. The item returns to the seller by Ravenpost mail.',
+      closedUnpaidBuyer:
+        'This sale ended without your payment. The item returns to the seller by Ravenpost mail; not paying an accepted deal earns a Marketplace strike.',
+      // The seller's way out of an incoming offer and of an unpaid directed
+      // sale (the dead wiring H13 named).
+      cancelSale: 'Cancel sale',
+      // The seller's cancel answered cancel-pending (a buyer holds the
+      // purchase window): the face records it instead of re-offering Cancel.
+      cancelPendingSeller:
+        'Cancel requested. The sale ends on its own unless the buyer pays first.',
+      youDeclined: 'You declined the offer.',
+      youWithdrew: 'You withdrew your offer.',
+      // A resolve that raced the other side (or a double tap): the trade
+      // arm's own words, not the bid-bond copy the shared code maps to.
+      offerNotPending: 'This offer is no longer pending.',
+      // What the OTHER side sees when a standing offer stops standing.
+      offerDeclined: 'The $WOC offer was declined.',
+      offerWithdrawn: 'The $WOC offer was withdrawn.',
+      offerExpired: 'The $WOC offer expired.',
+      // Informed waiting: when the offer lapses, and what closing the window
+      // mid-deal does and does not end.
+      offerExpiresAt: 'Offer expires at {time}.',
+      offerStandsUntil:
+        'Your $WOC offer still stands until {time}. Trade with the seller again to finish the deal if they accept.',
+      dealAwaitsPayment:
+        'Your $WOC purchase is still unpaid. Trade with the seller again to pay; the deal expires on its own if you do not, and not paying earns a Marketplace strike.',
+      // Close-time lines for the states the buyer arms above did not cover:
+      // the seller whose copy stays escrowed, and either side mid-payment.
+      closeSellerHold:
+        "Your item stays held for the buyer's payment. Cancel the sale from the Exchange's Activity tab if you change your mind.",
+      closePaymentContinuesBuyer:
+        'Your payment is still being confirmed. Delivery completes on its own.',
+      closePaymentContinuesSeller:
+        "The buyer's payment is still being confirmed. The sale completes on its own.",
+      // The p2p commitment disclosure (the auction arm's bidBindingNote,
+      // for the buyer whose accept escrows the copy): shown before the
+      // shared Accept and again on the pay face.
+      p2pBindingNote:
+        'Once both sides accept, payment is due within {duration}, or within the shorter window that opens when you press Pay. Not paying earns a Marketplace strike.',
+      p2pBindingNoteUntimed:
+        'Once both sides accept, payment is due shortly after, or within the shorter window that opens when you press Pay. Not paying earns a Marketplace strike.',
+      // The claim's own deadline, once Pay was pressed (Not now keeps it
+      // running): the figure the pay and quote faces show from then on.
+      p2pPaymentDueAt: 'Payment is due by {time}. Not paying earns a Marketplace strike.',
+      // The lapsed staged quote, in this arm's words: there is no request
+      // control here, the way back is Not now, then Pay.
+      quoteExpiredTrade: 'The quote expired. Press Not now, then Pay again for a fresh one.',
+      // Announced (and kept in the log) when the review face appears, so a
+      // screen reader hears the figures the face was built to show.
+      quoteStaged: 'Payment quote ready for {usd}: {tokens} $WOC, valid until {time}.',
+      // Decided money whose delivery has not finished: its own sentence, so
+      // "confirming on the network" never describes a confirmed payment and
+      // "on its way by mail" never predates the delivery.
+      paymentConfirmed:
+        'Payment confirmed. Your item arrives in your bags, or by Ravenpost mail if they are full, once delivery completes.',
+      statusConfirmedBuyer: 'Payment confirmed. Delivery is completing...',
+      statusConfirmedSeller: 'Payment confirmed. The sale is completing...',
+      // The courtesy floor hint (the server's refusal stays the authority).
+      hintBelowMin: 'The Exchange minimum price is {usd}.',
     },
   },
   wocStore: {
@@ -328,6 +487,12 @@ export const hudChromeStrings = {
     showAmounts: 'Show all Claudium amounts',
     hideAmounts: 'Hide extra Claudium amounts',
     skuRow: '{usd} for {claudium} Claudium',
+    // The pack price in the chosen crypto rail: the amount is a localized
+    // number and the ticker is a template token, never a glued suffix (the
+    // usd_text.ts rule for the USD arm, applied to the token arms).
+    priceSol: '{amount} SOL',
+    priceUsdc: '{amount} USDC',
+    priceWoc: '{amount} WOC',
     buyButton: 'Buy',
     buyUnavailable: 'Purchasing is unavailable right now.',
     storeTitle: 'Cosmetic Store',
@@ -520,6 +685,8 @@ export const hudChromeStrings = {
     jump: 'Jump',
     leaderboard: 'Ranks',
     dailyRewards: 'Store',
+    // The Exchange launcher's own short label (it borrowed the Browse tab's).
+    wocMarket: 'Exchange',
     deeds: 'Deeds',
     mounts: 'Mounts',
     professions: 'Professions',
@@ -895,6 +1062,13 @@ export const hudChromeStrings = {
     // so is the point: a frozen damage readout under a "Threat" heading is what
     // players read as the meter having stopped updating.
     threatFallback: 'No live threat: showing damage to {name}',
+    // Threat tab subtitle when the engaged mob died or left mid-segment but DID
+    // have a live hate table on this segment: these are still real threat
+    // numbers, just latched at the last moment they were readable, not
+    // recalculated from damage. Distinct from threatFallback above (which has
+    // no threat numbers to show at all) so a tank who watched their threat
+    // climb past a boss's health does not read the kill as having erased it.
+    threatFrozen: 'Final threat vs {name}',
     // Hover breakdown for one bar: a header line, then one row per ability. On
     // the threat tab each contributor (member or pet) has its own bar, so the
     // panel is narrowed to that contributor's abilities.
@@ -2251,6 +2425,18 @@ export const hudChromeStrings = {
       many: 'your guild rank is {rank}; {count} members',
       other: 'your guild rank is {rank}; {count} members',
     },
+    wocMarketSellChoose: {
+      one: 'Choose from {count} item',
+      few: 'Choose from {count} items',
+      many: 'Choose from {count} items',
+      other: 'Choose from {count} items',
+    },
+    wocTradeIneligible: {
+      one: '{count} staged item cannot be sold for $WOC.',
+      few: '{count} staged items cannot be sold for $WOC.',
+      many: '{count} staged items cannot be sold for $WOC.',
+      other: '{count} staged items cannot be sold for $WOC.',
+    },
     finderPartySize: {
       one: '{count} player',
       few: '{count} players',
@@ -2416,6 +2602,12 @@ export const hudChromeStrings = {
     errPasswordLong: 'New password must be at most 128 characters.',
     errPasswordUnchanged: 'New password must be different from the current one.',
     errPasswordConfirm: 'New passwords do not match.',
+    // Set a Password (Apple/Discord-provisioned accounts with no password yet)
+    setPasswordTitle: 'Set a Password',
+    setPasswordHint:
+      'This account was created with Sign in with Apple or Discord and has no password yet. Set one to sign in on other devices, such as the Mac and Windows desktop apps, or the web, and to link additional sign-in methods.',
+    setPasswordSubmit: 'Set Password',
+    passwordSet: 'Password set. You can now sign in with your username and password anywhere.',
     // Email
     emailLabel: 'Email (optional)',
     emailHint: 'Used only for account recovery. Use Change Email below to update it.',
@@ -4549,6 +4741,12 @@ export const hudChromeStrings = {
     // D8 downward substitution, 2x gather value), so the spend is stated
     // before the click instead of silent after it.
     reagentFineSub: '(spends {count} fine-grade)',
+    // The #1301 gold-sink fee (src/sim/professions/crafting.ts
+    // resolveCraftForRecipe), charged on every successful craft but never
+    // shown anywhere before this: {fee} is the already-localized formatMoney
+    // string, so no separate number param is needed. "Each" matters because
+    // the row's Create and Create All controls can submit multi-craft batches.
+    craftFeeLine: 'Craft fee: {fee} each',
     empty: 'No recipes known yet.',
     resultAria: 'Craft {name}',
     // The SOLE player-visible line for a craft grant (#2430). The grant hub's
@@ -5488,6 +5686,11 @@ export const hudChromeStrings = {
     unlockedBorderHint: 'New border earned: {name}. Wear it from the Book of Deeds.',
     broadcastLine: '{name} has accomplished a deed: {deed}',
     rarityLine: 'Earned by {percent} of adventurers',
+    // The exploration-deed card's still-missing-places line (deeds_window.ts
+    // missingPoiLabels): which named places an unearned wayfarer deed still
+    // needs, so a player is never left guessing which one of the ten never
+    // registered.
+    stillToVisit: 'Still to visit: {places}',
     trackerLabel: 'Deeds',
     collapseHint: 'Collapse deed tracker',
     expandHint: 'Expand deed tracker',
@@ -5546,5 +5749,368 @@ export const hudChromeStrings = {
   // when the local character is below the floor.
   arenaGate: {
     minLevelNote: 'Requires level {level}',
+  },
+  // The $WOC Exchange window (docs/prd/woc/marketplace.md): USD-denominated
+  // auctions settled in $WOC, browser-web only, config-gated server-side.
+  // Every USD amount renders through formatNumber currency options and every
+  // timestamp through formatDateTime (UTC plus local, per the PRD); the
+  // window never composes numbers into these strings by concatenation.
+  // Wallet-bridge failure classes (src/ui/wallet_bridge_reason_text.ts): the
+  // bridge throws English prose and provider Errors, and these are the
+  // player-facing lines the classifier resolves instead of rendering
+  // err.message raw. Shared by every surface the bridge signs for (the
+  // Exchange, the trade arm, the Claudium checkout).
+  walletBridge: {
+    cancelled: 'The wallet request was cancelled. Nothing was sent.',
+    timeout: 'Your wallet did not respond in time. Open the wallet and try again.',
+    notConnected: 'Connect and verify a wallet, then try again.',
+    unsupported: 'This wallet cannot complete that action. Connect a different wallet.',
+    unavailable: 'No wallet connection is available here. Reconnect your wallet and try again.',
+    badResponse: 'Your wallet returned an unusable answer. Try again.',
+  },
+  wocMarket: {
+    title: '$WOC Exchange',
+    close: 'Close the Exchange',
+    launcherLabel: '$WOC Exchange',
+    tabBrowse: 'Browse',
+    tabSell: 'Sell',
+    // "My", said outright: the tab is the viewer's own bids and listings, and
+    // the bare "Activity" read as a market-wide feed (Zyzz's dev-test note).
+    tabActivity: 'My Activities',
+    // The tab strip's own accessible name (the store's 'WOC Store sections'
+    // precedent), never the window title twice.
+    tabsLabel: '$WOC Exchange sections',
+    loading: 'Loading the Exchange...',
+    loadFailed: 'The Exchange could not be reached. Try again shortly.',
+    disabledRealm: 'The $WOC Exchange is not available on this realm.',
+    // Names no cause (an operator pause and an unhealthy price print both
+    // land here) and every action the pause refuses (guardEnabledHealthy
+    // gates listing, bidding, offers and the payment quote); a payment
+    // already sent is not health-gated and still settles.
+    pausedBanner:
+      'Trading is paused. Auctions keep counting down; new listings, bids, offers, and payments wait until trading resumes, and a payment already sent still settles.',
+    walletBanner: 'Link and verify a wallet to bid, buy, or sell on the Exchange.',
+    // The banner's own shortcut into the shared wallet connect flow (the
+    // woc:wallet-verify event the store and daily rewards buttons dispatch),
+    // so an unlinked player is never told to link with nowhere to do it.
+    walletBannerCta: 'Connect wallet',
+    // The rate is per ONE dollar, said outright: 'per USD' read as a unit
+    // label and players asked per how many.
+    rateNote: 'Rate: about {tokens} $WOC per $1.00 USD as of {time}.',
+    // Under the paused banner the print is the last KNOWN rate, dated, never a
+    // live one.
+    rateNotePaused: 'Last known rate: about {tokens} $WOC per $1.00 USD as of {time}.',
+    // Anchored to the amount it converts (the current bid, else the starting
+    // bid: the same rule the server priced); the fixed-at-payment rule lives
+    // in the bid form's own warning.
+    estimateNote: 'About {tokens} $WOC for {usd} at the current rate.',
+    browseEmpty: 'No listings right now. Check back soon.',
+    browseError: 'Listings could not be loaded.',
+    colItem: 'Item',
+    colSeller: 'Seller',
+    colCurrentBid: 'Current bid',
+    colBuyNow: 'Buy now',
+    colTimeLeft: 'Time left',
+    reserveMet: 'Reserve met',
+    reserveNotMet: 'Reserve not met',
+    yourListing: 'Your listing',
+    buyNowLockedBadge: 'Purchase in progress',
+    // The badges' explainers (the shared tooltip box, hover, focus and touch):
+    // a bidder's only encounter with a hidden reserve, and what a locked or
+    // own listing means for them.
+    reserveMetTip: 'The seller set a hidden minimum price, and the current bid meets it.',
+    reserveNotMetTip:
+      'The seller set a hidden minimum price. If the highest bid at close is below it, the item is not sold and every bond is returned.',
+    yourListingTip:
+      'You listed this item. You cannot bid on your own listing; while it has no bids you can cancel it here or from Activity.',
+    buyNowLockedTip:
+      'Another buyer holds this listing while they pay. If they do not pay in time, it reopens.',
+    pagePrev: 'Previous page',
+    pageNext: 'Next page',
+    pageNumber: 'Page {current}',
+    sortLabel: 'Sort',
+    sortEnding: 'Ending soonest',
+    sortNewest: 'Newest',
+    sortPriceAsc: 'Price: low to high',
+    sortPriceDesc: 'Price: high to low',
+    // The Browse filters (the server-validated browse params, finally on the
+    // strip): quality and format are closed vocabularies, the item box is a
+    // free-text name search resolved to item ids client-side and applied on
+    // change (Enter or blur), never per keystroke.
+    filterQuality: 'Quality',
+    filterFormat: 'Format',
+    filterAny: 'Any',
+    filterFormatAuction: 'Auction',
+    filterFormatBuyNow: 'Buy now',
+    filterItemLabel: 'Item',
+    filterItemPlaceholder: 'Search by item name',
+    // The stamped category axes: the player split (weapons and armor apart,
+    // unlike the policy's one equipment bucket) plus the finer weapon-type /
+    // armor-slot axis, whose option labels come from the shared families
+    // (weaponTypeLabel, itemSlotLabel).
+    filterCategory: 'Category',
+    filterCategoryWeapon: 'Weapons',
+    filterCategoryArmor: 'Armor',
+    filterCategoryMount: 'Mounts',
+    filterSubcategory: 'Type',
+    // The seller click-through: a seller's recent completed trades, opened
+    // from any Browse row's seller cell, with its own way back.
+    sellerLinkAria: 'View recent trades by {name}',
+    sellerTitle: 'Recent trades by {name}',
+    sellerBack: 'Back to Browse',
+    sellerEmpty: 'No completed trades yet.',
+    sellerError: 'Recent trades could not be loaded.',
+    sellerSaleRow: '{time}: {item} to {buyer} for {usd}',
+    detailTitle: 'Listing',
+    detailSeller: 'Sold by {name}',
+    detailEndsAt: 'Ends {utc} UTC ({local} local)',
+    detailStartingBid: 'Starting bid: {usd}',
+    detailCurrentBid: 'Current bid: {usd}',
+    detailNoBids: 'No bids yet',
+    detailMinNext: 'Minimum next bid: {usd}',
+    detailBuyNow: 'Buy now: {usd}',
+    detailSales: 'Recent sales',
+    detailSaleRow: '{time}: {seller} sold to {buyer} for {usd}',
+    detailNoSales: 'No recorded sales for this item yet.',
+    // The history is its own round trip: while it is on its way the pane says
+    // so, never 'no recorded sales'.
+    detailSalesLoading: 'Loading recent sales...',
+    bidLabel: 'Your bid (USD)',
+    bidPlaceholder: 'Enter a USD amount',
+    bidButton: 'Place bid',
+    bidAria: 'Place a bid on {item}',
+    // The disclosure well's toggle: the full commitment disclosures collapsed
+    // behind one line so Place bid stays above the fold (aria-expanded says
+    // which state the button is in; the label never changes).
+    bidTermsToggle: 'Bid terms',
+    // The row activator opens the listing (a buy-now-only listing takes no
+    // bids, and neither does your own), so its name says that.
+    rowOpenAria: 'View the listing for {item}',
+    buyNowButton: 'Buy now for {usd}',
+    buyNowAria: 'Buy {item} now for {usd}',
+    cancelButton: 'Cancel listing',
+    cancelAria: 'Cancel your listing of {item}',
+    // The bond schedule for THIS listing: both figures are server-computed
+    // and ride the listing view (the bond for the minimum next bid; a higher
+    // bid holds more), on top of the bid, and every way it comes back. The
+    // forfeit and strike rule is stated once, in bidBindingNote.
+    bidBondNote:
+      'Placing a bid holds a refundable bond in $WOC on top of the bid: {bond} for a bid of {bid}, more for a higher bid. It is returned when you are outbid or lose, or after you pay if you win; a second-chance offer holds it again.',
+    // The GENERAL bond schedule for an arbitrary typed bid, resolved from the
+    // figures /status ships (the copy-figures rule: named figures come off
+    // the wire, never hard-coded prose). Rendered only when the server sent
+    // them; an older server keeps the figure-free bidBondNote alone.
+    bidBondSchedule: 'The bond is {rate} percent of your bid, at least {min} and at most {max}.',
+    // The bond payment window off /status: an unpaid bond lapses the bid.
+    bidBondPayWindow: 'Pay the bond within {duration} of placing your bid, or the bid lapses.',
+    // The pre-bid commitment disclosures (draft Terms 10.4/10.5), shown
+    // BEFORE the first bond charge: a bid binds once its bond is signed.
+    bidBindingNote:
+      'A bid is binding once you sign its bond transaction: it cannot be withdrawn, and if you win and do not pay, the bond is forfeited and your account earns a Marketplace strike.',
+    // The anti-snipe rule with its real figures (2 minutes, capped at 30
+    // past the listed end; pinned against the server constants), and what a
+    // bond that confirms after the close is: not counted, refunded.
+    bidCloseNote:
+      'A bid whose bond confirms in the last 2 minutes extends the auction to 2 minutes after that bid, up to 30 minutes past the listed end. A bond that confirms after the auction closes does not count and is refunded.',
+    // Bidder-facing second-chance disclosure, shown when the seller opted in:
+    // the cascade is automatic (the bond is re-held and a settlement opens),
+    // not an offer the bidder accepts.
+    offerNextNote:
+      'If the winner does not pay, you may become the buyer at your own bid: your bond is held again (or asked for again if it was already returned) and payment is due within {duration}.',
+    // Buy now claims the listing; walking away has a cost of its own.
+    // The real figures (a 270 second hold, a 30 minute per-listing cooldown,
+    // three unpaid Buy Nows per rolling hour; pinned against the server
+    // constants), in plain words.
+    buyNowNote:
+      'Buy now holds this listing for you for about four and a half minutes while you pay. If you do not pay in time, you cannot try this listing again for 30 minutes, and three unpaid Buy Nows within an hour pause Buy Now for you until the oldest is an hour old.',
+    variableTokenWarning:
+      'You are committing to pay a USD value in $WOC. The exact token amount is set by a fresh quote when payment is requested and may differ from the estimate.',
+    // On the quote faces the amount IS fixed until the quote expires: the note
+    // says that instead of warning that the number on screen may still move.
+    quoteFixedNote: 'This quote fixes the $WOC amount until it expires. A new quote may differ.',
+    settlementDeadlineNote: 'If you win, payment is due within {duration} of the auction closing.',
+    // The claim_cooldown refusal's parametric variant: rendered by the
+    // api_error matcher when the server names the remaining time (it lives
+    // here because the apiError catalog is a strict bijection with the
+    // server code set).
+    claimCooldownRetry: 'You recently walked away from a Buy Now. Try again in {duration}.',
+    // Named after the document it links (10.3: presented, or clearly linked,
+    // at the moment of acceptance), not a settlement-mechanics nickname.
+    termsLabel: 'I accept the Marketplace terms.',
+    termsLink: 'View the Marketplace terms (opens in a new tab)',
+    quoteTitle: 'Confirm payment',
+    quoteTotal: 'Total: {tokens} $WOC',
+    quoteSeller: 'Seller receives: {tokens} $WOC',
+    // The two fee legs name what each share is: the buyer never reads the
+    // seller's fee note.
+    quoteBurn: 'Burned (removed from supply): {tokens} $WOC',
+    quoteTreasury: 'To the game treasury: {tokens} $WOC',
+    quoteExpires: 'Quote expires in {duration}',
+    // The static-time twin for cold surfaces with no countdown driver (the
+    // trade arm's review panel).
+    quoteExpiresAt: 'Quote expires at {time}.',
+    quoteExpired: 'The quote expired. Request a fresh one.',
+    quoteSign: 'Sign and pay',
+    quoteRefresh: 'New quote',
+    quoteCancel: 'Not now',
+    quoteBondFor: 'Refundable bid bond: {usd}',
+    // The bond face names its listing's item when the painter knows it (a
+    // retry after a declined wallet still says which auction it is for).
+    quoteBondForItem: 'Refundable bid bond for {item}: {usd}',
+    quoteSettlementFor: 'Settlement for {item}: {usd}',
+    // The claim's own payment deadline on the settlement quote face (the trade
+    // arm's quote face shows its twin); a public Buy Now that lapses earns a
+    // cooldown, not a strike, so this line names no strike.
+    paymentDueAt: 'Payment is due by {time}.',
+    signing: 'Waiting for your wallet...',
+    signFailed: 'Your wallet did not complete the payment. Check the wallet and try again.',
+    // The step-up (listing / directed acceptance) authorization is a message
+    // signature that moves NO funds, so its failure must not say "payment".
+    signFailedConfirm: 'Your wallet did not sign the confirmation. Check the wallet and try again.',
+    confirming: 'Confirming on chain...',
+    // The listing submit's second phase is a plain REST create, not an on-chain
+    // settlement: it must not borrow the payment path's "Confirming on chain".
+    listing: 'Listing your item...',
+    activityCancelPending: 'Cancel pending',
+    activityDirected: 'Directed sale',
+    bidPlacedStanding: 'Your bid stands. You are the high bidder.',
+    bidPlacedOutbid: 'Your bond confirmed, but a higher bid landed first.',
+    purchaseComplete: 'Purchase complete. Your item arrives by Ravenpost mail.',
+    // A CONFIRMED or DELIVERING answer is decided money whose delivery has
+    // not finished: not "complete" yet, and not "confirming" any more.
+    paymentConfirmedDelivering:
+      'Payment confirmed. Your item arrives by Ravenpost mail once delivery completes.',
+    listingCreated: 'Your listing is live.',
+    listingCancelled: 'Listing cancelled. Your item returns by Ravenpost mail.',
+    listingCancelPending:
+      'Cancel pending: a buyer holds the purchase window. Unless they pay, the listing closes and your item returns by Ravenpost mail.',
+    sellTitle: 'Create a listing',
+    // The RESOLVED sell-empty caption: {floor} is this realm's live quality
+    // floor off /status (localized through itemQualityLabel), and the
+    // collectible sentence below it is chosen from the realm's own category
+    // switches, so the copy names what THIS realm takes instead of a generic
+    // "some realms" sentence (the copy-figures rule). Replaces the retired
+    // figure-free sellEmpty; the ready model always has the figures.
+    sellEmptyFloor:
+      'No eligible items in your bags. This realm takes unbound equipment of {floor} quality or better.',
+    // The collectible-category sentence, one key per switch combination so no
+    // locale ever composes a list in code; omitted when both are off.
+    sellCollectiblesBoth: 'Mounts and mech chroma plates can also be listed.',
+    sellCollectiblesMounts: 'Mounts can also be listed.',
+    sellCollectiblesChromas: 'Mech chroma plates can also be listed.',
+    // A copy the player locked themselves is filtered out of the picker; the
+    // note says so instead of leaving it silently missing.
+    sellLockedHidden: 'Locked items are not listed here. Unlock them in your bags to sell them.',
+    sellSearchPlaceholder: 'Type to filter your bags',
+    sellClear: 'Clear {item} and choose another',
+    sellChoose: 'Item to list',
+    sellNoMatches: 'No items match that search',
+    sellBuyNowAboveStart: 'The buy-now price must be higher than the starting bid.',
+    sellFormat: 'Format',
+    sellFormatAuction: 'Auction',
+    sellFormatBuyNow: 'Buy now only',
+    sellFormatAuctionBuyNow: 'Auction with buy now',
+    sellStart: 'Starting bid (USD)',
+    sellReserve: 'Reserve (USD, optional)',
+    sellReserveNote:
+      'Optional, at least the starting bid. Bidders see only whether it is met; if the highest bid at close is below it, the item comes back to you unsold and every bond is returned.',
+    sellBuyNowNote: 'Required. A buy-now listing sells at this price with no bidding.',
+    sellBuyNowAuctionNote:
+      'Optional. Set a price a buyer can pay to end the auction early; it must be above the starting bid and the reserve.',
+    sellBuyNowPrice: 'Buy-now price (USD)',
+    sellDuration: 'Duration',
+    sellOfferNext:
+      'If the winner does not pay, sell to the next-highest bidder whose bid meets the reserve, at their bid, instead of ending unsold.',
+    sellSubmit: 'List item',
+    sellSubmitAria: 'List {item} on the Exchange',
+    // The fee schedule is service configuration and is not on the wire, so
+    // the note names no percentage: the resolved fee for the price being
+    // typed renders beside it from the server's estimate (an auction's fee
+    // follows the final price).
+    sellFeeNote:
+      'A completed sale pays an Exchange fee out of the price: part is burned and part goes to the treasury, and you receive the remainder at your linked wallet in the settlement transaction. The fee for the price you enter is shown here; on an auction it follows the final price.',
+    activityListings: 'My listings',
+    activityBids: 'My bids',
+    activitySettlements: 'My settlements',
+    // YOUR-scoped on both sentences: "Nothing yet. Bids ... appear here."
+    // read as an empty market-wide feed rather than "you have none".
+    activityEmpty:
+      'You have no bids, listings, or settlements yet. Your Exchange activity appears here.',
+    // A section with nothing in it says so instead of a heading over air.
+    activityNoListings: 'You have no listings.',
+    activityNoBids: 'You have no bids.',
+    activityNoSettlements: 'You have no settlements.',
+    activityPayNow: 'Pay now',
+    activityPayNowAria: 'Pay for settlement {id} now',
+    // The item-named twin, used when the wire carries the item (H13 put it on
+    // the row); the id form stays for an older server.
+    activityPayNowItemAria: 'Pay {usd} for {item} now',
+    activityDeadline: 'Payment due in {duration}',
+    // The exact deadline (the countdown's tooltip), the detailEndsAt shape.
+    dueAt: 'Due {utc} UTC ({local} local)',
+    activityStrikes: 'Marketplace strikes: {count}',
+    // A strike suspends listing, buying, offers and the step-up too (every
+    // guardSuspended arm), not only bidding.
+    activitySuspended:
+      'Exchange suspended for {duration} after unpaid deals: no bids, purchases, listings, or $WOC trades until then.',
+    // What a strike is and the ladder it climbs (pinned against the server's
+    // suspension table).
+    strikesTip:
+      'A strike is earned each time you do not pay for a deal you committed to. After the first, each strike suspends you from the Exchange for longer: 3 days, then 14, then 90, then a year.',
+    bidStatusPending: 'Awaiting bond',
+    bidStatusActive: 'High bidder',
+    bidStatusOutbid: 'Outbid',
+    bidStatusLapsed: 'Lapsed',
+    bidStatusWon: 'Won',
+    bidStatusDefaulted: 'Defaulted',
+    bidStatusCancelled: 'Cancelled',
+    bidBondPay: 'Pay bond',
+    bidBondPayAria: 'Pay the bond for your bid on listing {id}',
+    bidBondPayItemAria: 'Pay the {bond} bond for your bid on {item}',
+    settlementOffered: 'Payment due',
+    settlementConfirming: 'Confirming',
+    settlementConfirmedDelivering: 'Payment confirmed, delivering',
+    settlementReview: 'Payment under review',
+    settlementDelivered: 'Delivered',
+    settlementExpired: 'Expired unpaid',
+    settlementFailed: 'Payment failed',
+    settlementFailBurnMissing: 'The payment did not include the required token burn.',
+    settlementFailBurnMismatch: 'The payment burned the wrong token amount.',
+    settlementFailBurnAuthority: 'The token burn came from a wallet this purchase did not name.',
+    settlementFailUnexpectedCredit: 'The transaction paid a wallet outside this purchase.',
+    // The common non-forensic ends, each its own sentence (the generic line
+    // used to cover them all and explained nothing).
+    settlementFailQuoteExpired:
+      'The payment quote expired before it was used. Request a fresh one and pay again.',
+    settlementFailTransaction:
+      'The payment transaction failed on the network. Request a fresh quote and try again.',
+    settlementFailRefunded: 'This payment was returned to your wallet.',
+    settlementFailSuperseded: 'This payment attempt was replaced by a newer one.',
+    // Rendered on a FAILED row only (a review row carries its own label), so
+    // it names the terminal outcome, never a review that is over.
+    settlementFailConfirmingOverdue:
+      'This payment took too long to confirm and could not be verified.',
+    settlementFailGeneric: 'This payment could not be completed.',
+    paymentSeenAwaitingFinality: 'Payment seen on the ledger. Waiting for final confirmation.',
+    paymentNotYetVisible:
+      'No payment is visible on the ledger yet. It can take a moment to appear.',
+    paymentServiceUnreachable:
+      'The payment service is unreachable. Your payment stays recorded and will be re-checked.',
+    paymentPendingGeneric: 'Your payment is submitted and awaiting confirmation.',
+    // The bond leg's own pending voice: "payment seen" reads as the purchase
+    // money, and the figure in flight here is the refundable bid bond.
+    bondSeenAwaitingFinality: 'Bond payment seen on the ledger. Waiting for final confirmation.',
+    bondNotYetVisible:
+      'No bond payment is visible on the ledger yet. It can take a moment to appear.',
+    bondServiceUnreachable:
+      'The payment service is unreachable. Your bond payment stays recorded and will be re-checked.',
+    bondPendingGeneric: 'Your bond payment is submitted and awaiting confirmation.',
+    listingStatusActive: 'Active',
+    listingStatusSettling: 'Awaiting payment',
+    listingStatusSold: 'Sold',
+    listingStatusReturned: 'Returned',
+    listingStatusCancelled: 'Cancelled',
+    listingStatusSuspended: 'Suspended',
+    listingStatusUnsold: 'Unsold',
   },
 };

@@ -796,8 +796,10 @@ Every window adopts the grammar; these carry specific intent:
   form controls (section 10.7) restyle every row for free; new settings this program adds
   (the sound mute, the chat idle state if it needs a knob) enter as declarative entries,
   never bespoke DOM.
-- **Book of Deeds, social, spellbook, talents, crafting, market, mailbox, arena, dungeon
-  finder, Vale Cup, leaderboard, calendar, meters, trade, inspect, loot settings**:
+- **Book of Deeds, social, spellbook, talents, crafting, market (the gold World Market
+  and the $WOC Exchange, `woc_market_window.ts`, which ships config-off), mailbox, arena,
+  dungeon finder, Vale Cup, leaderboard, calendar, meters, trade (including its $WOC arm,
+  `src/ui/hud/woc_trade/`), inspect, loot settings**:
   grammar plus tokens, preserving each window's existing information design. Talents 2.0
   (`docs/prd/talents-2.0.md`) and the Encounter UI draft
   (`docs/prd/dungeon-mechanic-primitives.md`) inherit this language when built.

@@ -65,10 +65,13 @@ describe('the trade panel first-paint visibility (R34 review)', () => {
     // A throw on the FIRST paint used to leave a live trade with no panel at
     // all (no Accept, no Cancel): the visible-before-render ordering is the
     // fix, and only source order can pin it (the render is throw-free by
-    // construction today).
-    const guardAt = HUD.indexOf('if (sig === this.lastTradeSig) return;');
+    // construction today). The trade window lives in the woc_trade domain.
+    const controller = stripComments(
+      readFileSync(resolve(process.cwd(), 'src/ui/hud/woc_trade/woc_trade_controller.ts'), 'utf8'),
+    );
+    const guardAt = controller.indexOf('if (sig === this.lastTradeSig) return;');
     expect(guardAt).toBeGreaterThan(-1);
-    const window = HUD.slice(guardAt, guardAt + 600);
+    const window = controller.slice(guardAt, guardAt + 600);
     const displayAt = window.indexOf("el.style.display = 'block';");
     const tryAt = window.indexOf('try {');
     expect(displayAt).toBeGreaterThan(-1);

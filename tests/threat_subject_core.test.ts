@@ -5,7 +5,11 @@
 // mob it ever saw and never letting go, including after that mob died.
 
 import { describe, expect, it } from 'vitest';
-import { resolveThreatSubject, type ThreatSubjectMob } from '../src/ui/threat_subject_core';
+import {
+  resolveThreatSubject,
+  resolveThreatValues,
+  type ThreatSubjectMob,
+} from '../src/ui/threat_subject_core';
 
 const mob = (id: number, over: Partial<ThreatSubjectMob> = {}): ThreatSubjectMob => ({
   id,
@@ -92,5 +96,34 @@ describe('threat subject', () => {
     // panel labels those bars as damage, never as hate.
     expect(resolve([], { fallbackMobId: 51 })).toBe(51);
     expect(resolve([])).toBeNull();
+  });
+});
+
+describe('threat values (the freeze-on-death fallback)', () => {
+  it('shows the live table while the mob holds one', () => {
+    const alive = mob(10, { threat: new Map([[1, 3000]]) });
+    const frozen = new Map([[1, 1000]]);
+    expect(resolveThreatValues(alive, frozen)).toEqual({ values: alive.threat, frozen: false });
+  });
+
+  it('falls back to the frozen snapshot once the mob dies, never to a lower recalculation', () => {
+    // The reported bug: real threat (stance/ability multipliers) ran to 3000 on
+    // a 1000 hp mob; the kill clears its hate table, so a naive fallback would
+    // "recalculate" the tab down to the 1000 raw damage that killed it.
+    const dead = mob(10, { dead: true, threat: new Map() });
+    const frozen = new Map([[1, 3000]]);
+    expect(resolveThreatValues(dead, frozen)).toEqual({ values: frozen, frozen: true });
+  });
+
+  it('falls back to the frozen snapshot once the mob is gone from the world view', () => {
+    const frozen = new Map([[1, 3000]]);
+    expect(resolveThreatValues(null, frozen)).toEqual({ values: frozen, frozen: true });
+  });
+
+  it('reports nothing when neither a live table nor a snapshot exists', () => {
+    const dead = mob(10, { dead: true, threat: new Map() });
+    expect(resolveThreatValues(dead, null)).toEqual({ values: null, frozen: false });
+    expect(resolveThreatValues(null, null)).toEqual({ values: null, frozen: false });
+    expect(resolveThreatValues(null, new Map())).toEqual({ values: null, frozen: false });
   });
 });

@@ -271,7 +271,7 @@ export function colliderTopAt(c: Collider, x: number, z: number): number {
  */
 export const MANTLE_REACH = 0.9;
 /** Float slack when comparing feet height against a collider top. */
-const MOVE_TOP_EPS = 1e-3;
+export const MOVE_TOP_EPS = 1e-3;
 // How much of the body radius must overlap a standable top before it supports
 // the mover: standing needs the center meaningfully over the prop, while the
 // full collision radius still gates entry, so a jump can graze past a rim
@@ -2487,6 +2487,11 @@ export function pathCrossesFence(
 // conservative default, and MOVEMENT collision is untouched everywhere.
 export const SIGHT_HEIGHT = 1.6;
 
+interface SightFeetOverride {
+  from?: number;
+  to?: number;
+}
+
 // Does any collider at (x,z) rise above `sightY` (absolute world Y of the
 // sight line at that sample)? Mirrors resolvePosition's zone routing so
 // interiors, delves and the arena keep their wall sets, but tests pure overlap
@@ -2574,6 +2579,7 @@ export function lineOfSightClear(
   r = 0.05,
   delveModules?: readonly string[],
   riftToken = 0,
+  sightFeet?: SightFeetOverride,
 ): boolean {
   const dx = to.x - from.x;
   const dz = to.z - from.z;
@@ -2582,23 +2588,17 @@ export function lineOfSightClear(
   // The sight line runs eye-to-eye: lerp the endpoint eye heights per sample so
   // a low prop only blocks when its top actually crosses the line.
   //
-  // Eye height is TERRAIN-DERIVED everywhere except the battleground band, and
-  // that scoping is deliberate. Taking the caller's own `y` is the honest rule
-  // ("what you stand on, you see over"), and the band needs it: its field is
-  // the one instanced region with real sculpted terrain and standable decks,
-  // and its cover was authored against tops measured from the body's real
-  // height. But BOTH live callers pass an Entity.pos, which always carries a
-  // y, so applying it everywhere would silently retune open-world spell line
-  // of sight for every player: a caster standing on a knee-high standable prop
-  // (or mid-jump) would start seeing over cover that blocks them today. That
-  // is a global combat change, not a battleground one, so it stays scoped here
-  // and the open world keeps its historical behavior byte for byte. Widening
-  // it is a deliberate change of its own, with its own tests.
-  const eyeAt = (p: { x: number; y?: number; z: number }): number =>
-    (isBgPos(p.x) ? (p.y ?? groundHeight(p.x, p.z, seed)) : groundHeight(p.x, p.z, seed)) +
+  // The battleground keeps caller y because its sculpted terrain, standable
+  // decks, and cover were authored against real fighter height. Raw caller y
+  // remains untrusted everywhere else: entity-aware open-world callers may
+  // opt in only after constraining feet height to terrain or authored support,
+  // so a jump cannot lift the sight line above intended cover.
+  const eyeAt = (p: { x: number; y?: number; z: number }, trustedY?: number): number =>
+    (trustedY ??
+      (isBgPos(p.x) ? (p.y ?? groundHeight(p.x, p.z, seed)) : groundHeight(p.x, p.z, seed))) +
     SIGHT_HEIGHT;
-  const eyeFrom = eyeAt(from);
-  const eyeTo = eyeAt(to);
+  const eyeFrom = eyeAt(from, sightFeet?.from);
+  const eyeTo = eyeAt(to, sightFeet?.to);
   const steps = Math.max(2, Math.ceil(d / 0.5));
   if (isDelvePos(from.x)) {
     const delve = delveAt(from.x);

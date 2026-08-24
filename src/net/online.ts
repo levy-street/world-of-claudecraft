@@ -349,6 +349,9 @@ export interface AccountInfo {
   createdAt: string;
   characterCount: number;
   twoFactorEnabled: boolean;
+  // False for an account provisioned by Apple or Discord sign-in that never got
+  // a real, owner-chosen password (see setInitialPassword below).
+  passwordSet: boolean;
 }
 
 // Carries the HTTP status alongside the server's error text so callers can
@@ -729,6 +732,14 @@ export class Api {
 
   async changePassword(current: string, next: string): Promise<void> {
     await this.post('/api/account/password', { current, next });
+  }
+
+  // Set a real password on an account that has none yet (an Apple- or
+  // Discord-provisioned account whose only credential is a random placeholder
+  // hash the owner never saw). Bearer-scoped; the server rejects it once a real
+  // password exists (use changePassword from there).
+  async setInitialPassword(next: string): Promise<void> {
+    await this.post('/api/account/password/set-initial', { next });
   }
 
   // Request a password-reset email (for a locked-out user). Always resolves: the
@@ -2620,24 +2631,25 @@ export class ClientWorld implements IWorld {
     if (msg.t === 'error') {
       const wasConnected = this.connected;
       this.connected = false;
-      // Mid-reconnect, 'character already in world' is the transient window
-      // where the server has not yet noticed the old socket died (a
-      // black-holed drop sends no FIN/RST): keep backing off, the server's
-      // keepalive sweep flips the held session linkdead within a ping
-      // interval or two and the next retry resumes. Bounded, so a character
+      // 'character already in world' is the transient window where the
+      // server has not yet noticed the old socket died (a black-holed drop
+      // sends no FIN/RST): keep backing off, the server's keepalive sweep
+      // flips the held session linkdead within a ping interval or two and
+      // the next retry resumes. Applies on the very first join attempt too
+      // (a char-select "Enter World" click can land in this same window, see
+      // reconnect_policy.ts), not only mid-reconnect. Bounded, so a character
       // genuinely held by another device's live socket still ends fatal.
-      if (
-        isTransientReconnectRejection(msg.error, this.reconnectAttempts, this.conflictRejections)
-      ) {
+      if (isTransientReconnectRejection(msg.error, this.conflictRejections)) {
         this.conflictRejections++;
         return; // the server closes this socket; onclose schedules the retry
       }
-      // Mid-reconnect, 'authentication timed out' is the other transient
-      // window: a server event-loop stall kept the handshake from processing
-      // the first auth frame in time, or a database failure interrupted the
-      // handshake server-side. Keep backing off; the next retry lands after
-      // the stall clears or the database recovers. Bounded on its own counter.
-      if (isTransientTimeoutRejection(msg.error, this.reconnectAttempts, this.timeoutRejections)) {
+      // 'authentication timed out' is the other transient window: a server
+      // event-loop stall kept the handshake from processing the first auth
+      // frame in time, or a database failure interrupted the handshake
+      // server-side. Keep backing off; the next retry lands after the stall
+      // clears or the database recovers. Bounded on its own counter, and
+      // applies to a first join attempt exactly like a mid-reconnect one.
+      if (isTransientTimeoutRejection(msg.error, this.timeoutRejections)) {
         this.timeoutRejections++;
         return; // the server closes this socket; onclose schedules the retry
       }
@@ -3207,6 +3219,13 @@ export class ClientWorld implements IWorld {
       e.dead = nowDead;
       e.ghost = !!w.gh; // released spirit: rendered translucent, runs faster
       e.lootable = !!w.loot;
+      // Synthetic sentinel, not a real countdown (same idiom as the paladin
+      // `pasc` note above): 0 once the server's one-shot `cd` corpse-decay
+      // flag has fired, 1 while still inside the loot window.
+      // entity_view_policy_core's admission check only ever tests <= 0, so
+      // this coarse mirror is all it needs; offline Sim entities carry the
+      // real countdown. Same idea as the ffa/lootFfaTimer mirror below.
+      e.corpseTimer = w.cd ? 0 : 1;
       e.hostile = !!w.h;
       e.castingAbility = w.cast ?? null;
       e.castRemaining = w.castRem ?? 0;
@@ -4945,6 +4964,9 @@ export class ClientWorld implements IWorld {
   }
   tradeCancel(): void {
     this.cmd({ cmd: 'trade_cancel' });
+  }
+  tradeClose(): void {
+    this.cmd({ cmd: 'trade_close' });
   }
   // --- IWorldDuelArena: duel + rated-arena-queue + 2v2 Fiesta augment-pick sends
   // (duelInfo/arenaInfo are snapshot reads; fiesta dynamics ride the events queue). ---

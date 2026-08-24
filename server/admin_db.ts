@@ -698,6 +698,9 @@ export interface AdminAccountRow {
   characterCount: number;
   maxLevel: number;
   playtimeSeconds: number;
+  // The materialised account_wealth total (purse + mail/market escrow; see
+  // server/account_wealth_db.ts). 0 until the first sweep writes the row.
+  totalCopper: number;
   // Operator-set account flair. The list carries only the two flags (the links
   // themselves ride the detail response, where the edit form reads them).
   isAi: boolean;
@@ -912,7 +915,9 @@ const ACCOUNT_SORT_COLUMNS: Record<AdminAccountSort, string> = {
   playtime_seconds: 'playtime_seconds',
   created_at: 'a.created_at',
   last_login: 'a.last_login',
+  total_copper: 'total_copper',
 };
+const POSTGRES_INT_MAX = 2_147_483_647;
 
 export async function listAccounts(
   search: string,
@@ -921,7 +926,17 @@ export async function listAccounts(
   sort: AdminAccountSort = 'id',
   dir: AdminAccountSortDirection = sort === 'username' ? 'asc' : 'desc',
 ): Promise<Paginated<AdminAccountRow>> {
-  const pattern = search ? `%${escapeLike(search)}%` : '%';
+  // Trimmed ahead of the empty check so a whitespace-only search from either
+  // dispatch arm takes the no-search predicate below, never the search arm.
+  const term = search.trim();
+  const pattern = term ? `%${escapeLike(term)}%` : '%';
+  // An all-digits search additionally matches an exact account id or character
+  // id, so admins can paste an id from a report and land on the account; the
+  // username/character-name partial match still applies alongside.
+  const numericSearch =
+    /^\d+$/.test(term) && Number.isSafeInteger(Number(term)) && Number(term) <= POSTGRES_INT_MAX
+      ? Number(term)
+      : null;
   const offset = (page - 1) * limit;
   const direction = dir === 'asc' ? 'ASC' : 'DESC';
   const column = ACCOUNT_SORT_COLUMNS[sort];
@@ -935,25 +950,46 @@ export async function listAccounts(
   // just repeat "a.id DESC, a.id DESC", so it is the whole ORDER BY on its own.
   const order =
     sort === 'id' ? `a.id ${direction}` : `${column} ${direction}${nullsPolicy}, a.id ${direction}`;
+  // Shared by the page and count queries so the two can never disagree.
+  // $1 = ILIKE pattern, and the last parameter is the exact-id arm (NULL when
+  // the search is not numeric). With NO search term the predicate stays the
+  // pre-search shape (a plain ILIKE '%' over username): the default listing is
+  // the most-opened page in the dashboard and must not pay the correlated
+  // character-match subqueries it is not using. The id parameter is still
+  // referenced (always NULL here) so both queries keep a fixed bind count.
+  const matchSql = (idParam: string) =>
+    term === ''
+      ? `(a.username ILIKE $1 AND ${idParam}::int IS NULL)`
+      : `(
+       a.username ILIKE $1
+       OR EXISTS (SELECT 1 FROM characters cs WHERE cs.account_id = a.id AND cs.name ILIKE $1)
+       OR (${idParam}::int IS NOT NULL AND (a.id = ${idParam}
+           OR EXISTS (SELECT 1 FROM characters ci WHERE ci.account_id = a.id AND ci.id = ${idParam})))
+     )`;
   const [rows, total] = await Promise.all([
     pool.query(
       `SELECT a.id, a.username, a.created_at, a.last_login, a.is_admin,
               a.banned_at, a.suspended_until, a.is_ai, a.is_streamer,
               count(c.id)::int AS character_count,
               COALESCE(max(c.level), 0)::int AS max_level,
+              COALESCE(w.total_copper, 0)::bigint AS total_copper,
               (COALESCE((SELECT sum(EXTRACT(EPOCH FROM (COALESCE(s.ended_at, now()) - s.started_at)))
                          FROM play_sessions s WHERE s.account_id = a.id), 0)
                + COALESCE((SELECT sum(t.playtime_seconds)
                            FROM play_session_totals t WHERE t.account_id = a.id), 0))::bigint AS playtime_seconds
        FROM accounts a
        LEFT JOIN characters c ON c.account_id = a.id
-       WHERE a.username ILIKE $1
-       GROUP BY a.id
+       LEFT JOIN account_wealth w ON w.account_id = a.id
+       WHERE ${matchSql('$4')}
+       GROUP BY a.id, w.total_copper
        ORDER BY ${order}
        LIMIT $2 OFFSET $3`,
-      [pattern, limit, offset],
+      [pattern, limit, offset, numericSearch],
     ),
-    pool.query(`SELECT count(*)::int AS total FROM accounts WHERE username ILIKE $1`, [pattern]),
+    pool.query(`SELECT count(*)::int AS total FROM accounts a WHERE ${matchSql('$2')}`, [
+      pattern,
+      numericSearch,
+    ]),
   ]);
   return {
     rows: rows.rows.map((r) => ({
@@ -967,6 +1003,7 @@ export async function listAccounts(
       characterCount: r.character_count,
       maxLevel: r.max_level,
       playtimeSeconds: Number(r.playtime_seconds),
+      totalCopper: Number(r.total_copper),
       isAi: r.is_ai === true,
       isStreamer: r.is_streamer === true,
     })),

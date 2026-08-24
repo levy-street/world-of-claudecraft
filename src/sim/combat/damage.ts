@@ -32,7 +32,6 @@ import { weaponHand } from '../equipment_rules';
 import { lockNormalDungeonResetOnBossKill, spawnBossExitPortal } from '../instances/dungeons';
 import { spawnWidowHatchlingOnEggDeath } from '../mob/egg_hatchling';
 import { grantAbilityDevotion } from '../paladin_devotion';
-import { PET_AGGRESSIVE_RANGE } from '../pet/pet_ai';
 import { snapshotPetOnOwnerDeath } from '../pet/pet_owner_revive';
 import { pvpDamageMultiplier } from '../pvp';
 import { resolveRespawnSeconds } from '../respawn_policy';
@@ -40,7 +39,7 @@ import { aurasSurvivingDeath } from '../resurrection';
 import type { PlayerMeta } from '../sim';
 import type { DamageResolution, SimContext } from '../sim_context';
 import { vcupBothSeated } from '../social/vale_cup';
-import { addThreat, canDetectStealthedTarget, clearThreat } from '../threat';
+import { addThreat, clearThreat, petCanSeeStealthedTarget } from '../threat';
 import type { DamageEventKind, Entity } from '../types';
 import {
   berserkerCritDamage,
@@ -84,6 +83,7 @@ import { clearPacklordState } from './hunter_packlord';
 import {
   breakEnduringCourserBurst,
   clearHunterTalentState,
+  courserGuiseDazeOnDamage,
   hasHunterTalent,
 } from './hunter_shared';
 import {
@@ -137,7 +137,6 @@ const VICTORY_RUSH_WINDOW = 20;
 const PURSUIT_SPEED_DURATION = 6;
 const BLOODBATH_DURATION = 8;
 const BLOODBATH_MAX_STACKS = 5;
-const PET_STEALTH_DETECTION_RADIUS = PET_AGGRESSIVE_RANGE;
 
 // Baseline uninterruptible casts and a resolved talent modifier can each block
 // classic-era damage pushback. The resolved check is player-only and reads the
@@ -192,11 +191,14 @@ export function dealDamage(
   // Quest-gated destructible (e.g. Broodmother eggs): only a player (or pet) whose
   // owner has the gating quest active/ready may harm it; other hits are a no-op.
   if (questGateBlocksDamage(ctx.players, source, target)) return 0;
+  // A pet (an owned mob) cannot strike a stealthed enemy player, just as it
+  // cannot see or acquire one (pet/pet_ai.ts). No proximity detection, unlike a
+  // wild mob.
   if (
     source?.kind === 'mob' &&
     source.ownerId !== null &&
     target.kind === 'player' &&
-    !canDetectStealthedTarget(source, target, PET_STEALTH_DETECTION_RADIUS)
+    !petCanSeeStealthedTarget(target)
   )
     return 0;
   if (target.gm || target.devGod || (target.profilerInvulnerable && ctx.devCommands)) {
@@ -589,7 +591,19 @@ export function dealDamage(
 
   if (!resolvedHpLoss && target.kind === 'player' && amount > 0) {
     const meta = ctx.players.get(target.id);
-    if (meta?.cls === 'hunter') breakEnduringCourserBurst(ctx, target);
+    if (meta?.cls === 'hunter') {
+      breakEnduringCourserBurst(ctx, target);
+      // Courser's Guise daze: taking real damage while the aspect (or its Pack
+      // Rally form) is up halves the hunter's speed for 4s. Co-located here so it
+      // shares the canonical hunter-damage-taken guards: post-absorb `amount > 0`
+      // means a fully soaked hit never dazes, `!resolvedHpLoss` means a
+      // pre-resolved damage share never re-dazes, and only hunters pay the scan.
+      // Fall damage, drowning, and fatigue all route through dealDamage and so DO
+      // daze (classic-accurate: fall damage dazing Cheetah is the famous case); an
+      // incidental max-HP-buff HP clamp goes through recalcPlayerStats, never
+      // dealDamage, so it does not.
+      courserGuiseDazeOnDamage(ctx, target);
+    }
     const share = meta ? ctx.playerMods(meta).global.petDmgSharePct : 0;
     const pet = share > 0 ? ctx.petOf(target.id) : null;
     const beastguard = !!meta && hasHunterTalent(meta, 'hun_r8_beastguard');

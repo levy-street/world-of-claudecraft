@@ -1,5 +1,8 @@
 import { describe, expect, it, vi } from 'vitest';
-import { hunterPetFerocityDamageMultiplier } from '../src/sim/combat/hunter_shared';
+import {
+  hunterPetDamageMultiplier,
+  hunterPetFerocityDamageMultiplier,
+} from '../src/sim/combat/hunter_shared';
 import { MOBS } from '../src/sim/data';
 import { createMob } from '../src/sim/entity';
 import { Sim } from '../src/sim/sim';
@@ -115,6 +118,49 @@ describe('Hunter v0.29 baseline specialization loops', () => {
     const twoStageDamage = commandDamage(2);
     expect(twoStageDamage / calmDamage).toBeGreaterThan(1.15);
     expect(twoStageDamage / calmDamage).toBeLessThan(1.25);
+  });
+
+  it('stacks Unleashed Frenzy (+25%) with Pack Ferocity in the ONE canonical pet damage multiplier', () => {
+    // hunterPetDamageMultiplier is the single source every pet damage site (auto-attack,
+    // ranged bolt, cleave, Pack Command/Unleash Beast/Frenzy Cleave strikes, Fang
+    // Chorus) must read. This pins the function's OWN math contract (Frenzy and
+    // Ferocity compose multiplicatively); it cannot by itself catch a call site that
+    // stops calling the function (tests/spec_masteries.test.ts drives the actual
+    // mobSwing/updateRangedPetAttack emit sites for that regression class).
+    // marksmanship carries no petDmgPct mastery baseline, so the multiplier starts
+    // clean at 1 and isolates the frenzy/ferocity terms under test.
+    const sim = hunter('marksmanship', 2917);
+    const pet = addPet(sim);
+    expect(hunterPetDamageMultiplier(sim.ctx, pet)).toBeCloseTo(1);
+
+    sim.player.auras.push({
+      id: 'pack_frenzy',
+      name: 'Unleashed Frenzy',
+      kind: 'hunter_frenzy',
+      remaining: 8,
+      duration: 8,
+      value: 0.25,
+      sourceId: sim.playerId,
+      school: 'physical',
+    });
+    expect(hunterPetDamageMultiplier(sim.ctx, pet)).toBeCloseTo(1.25);
+
+    sim.player.auras.push({
+      id: 'pack_ferocity',
+      name: 'Pack Ferocity',
+      kind: 'hunter_ferocity',
+      remaining: 30,
+      duration: 30,
+      value: 3,
+      stacks: 3,
+      sourceId: sim.playerId,
+      school: 'physical',
+    });
+    // In real play runUnleashBeast strips Pack Ferocity the instant Frenzy starts, so
+    // the two never actually coexist; this pins the function's own math contract
+    // (multiplicative composition of every term, not additive and not a max() pick)
+    // independent of that gameplay rule.
+    expect(hunterPetDamageMultiplier(sim.ctx, pet)).toBeCloseTo(1.25 * 1.3, 5);
   });
 
   it('grants no Focus or Ferocity when Pack Command cannot land', () => {

@@ -16,13 +16,14 @@ interface FakeLetter extends IndexedLetter {
 function letter(
   id: number,
   recipientKey: string,
-  opts: { read?: boolean; deliverAt?: number } = {},
+  opts: { read?: boolean; deliverAt?: number; custodyRef?: string } = {},
 ): FakeLetter {
   return {
     id,
     recipientKey,
     read: opts.read ?? false,
     deliverAt: opts.deliverAt ?? 0,
+    ...(opts.custodyRef === undefined ? {} : { custodyRef: opts.custodyRef }),
   };
 }
 
@@ -207,5 +208,48 @@ describe('MailIndex buckets and unread counts', () => {
     expect(index.bucketFor('alice').map((m) => m.id)).toEqual([1, 3]);
     index.track(b, 0);
     expect(index.bucketFor('alice').map((m) => m.id)).toEqual([1, 3, 2]);
+  });
+});
+
+describe('MailIndex custody-ref presence', () => {
+  // The Exchange booking dedupe (PostOffice.hasCustodyParcel) rides this
+  // index instead of scanning the whole book, so presence must track the
+  // book through every membership mutation the contract names.
+  it('tracks a parcel ref through track, untrack, and the mutation bracket', () => {
+    const index = new MailIndex<FakeLetter>();
+    const parcel = letter(1, 'alice', { custodyRef: 'wm_ref_1' });
+    expect(index.hasCustodyRef('wm_ref_1')).toBe(false);
+    index.track(parcel, 0);
+    expect(index.hasCustodyRef('wm_ref_1')).toBe(true);
+    // The untrack/track bracket (the return flight) must keep the ref present.
+    index.untrack(parcel, 0);
+    index.track(parcel, 0);
+    expect(index.hasCustodyRef('wm_ref_1')).toBe(true);
+    index.untrack(parcel, 0);
+    expect(index.hasCustodyRef('wm_ref_1')).toBe(false);
+  });
+
+  it('refcounts a shared ref so removing one letter never erases the other', () => {
+    const index = new MailIndex<FakeLetter>();
+    const a = letter(1, 'alice', { custodyRef: 'wm_ref_2' });
+    const b = letter(2, 'bob', { custodyRef: 'wm_ref_2' });
+    index.track(a, 0);
+    index.track(b, 0);
+    index.untrack(a, 0);
+    expect(index.hasCustodyRef('wm_ref_2')).toBe(true);
+    // A double untrack of the removed letter must under-count nothing.
+    index.untrack(a, 0);
+    expect(index.hasCustodyRef('wm_ref_2')).toBe(true);
+    index.untrack(b, 0);
+    expect(index.hasCustodyRef('wm_ref_2')).toBe(false);
+  });
+
+  it('rebuild reconstructs presence from the canonical book alone', () => {
+    const index = new MailIndex<FakeLetter>();
+    index.track(letter(1, 'alice', { custodyRef: 'wm_stale' }), 0);
+    const book = [letter(2, 'bob', { custodyRef: 'wm_live' }), letter(3, 'bob')];
+    index.rebuild(book, 0);
+    expect(index.hasCustodyRef('wm_live')).toBe(true);
+    expect(index.hasCustodyRef('wm_stale')).toBe(false);
   });
 });

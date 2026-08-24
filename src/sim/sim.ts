@@ -31,12 +31,12 @@ import {
 } from './bags';
 import * as bankMod from './bank';
 import { type BankState, clampBonusSlots, sanitizeBankState } from './bank';
+import { extractTradableCopyImpl, grantTradableCopyImpl } from './broker_custody';
 import { campSpawnOffset } from './camp_scatter';
 import { buildCivicServicePlacements } from './civic_service_placements';
 import { advanceClimb, tryStartClimb } from './climb';
 import {
   allocRiftCollisionToken,
-  lineOfSightClear,
   moverHeight,
   placementFloorHeight,
   resolveMovement,
@@ -86,6 +86,7 @@ import {
 import { damageTakenWithin } from './combat/damage_history';
 import { druidEngineCombatState } from './combat/druid_engines';
 import { runEffects as runEffectsImpl } from './combat/effect_dispatch';
+import { steerFearFromWalls } from './combat/fear_steering';
 import { applyIgnite } from './combat/fire_mage';
 import { frostMageChannelPulse } from './combat/frost_mage';
 import { type FrozenOrbState, tickFrozenOrbs } from './combat/frozen_orb';
@@ -105,7 +106,7 @@ import { clearFieldcraftState, finishBloodhook } from './combat/hunter_fieldcraf
 import { clearPacklordState } from './combat/hunter_packlord';
 import {
   clearHunterTalentState,
-  hunterPetFerocityDamageMultiplier,
+  hunterPetDamageMultiplier,
   resolveHunterSharedAbility,
 } from './combat/hunter_shared';
 import { tickNaturesFury } from './combat/natures_fury';
@@ -188,6 +189,7 @@ import {
   type SavedCooldowns,
   serializeCooldowns,
 } from './cooldown_persist';
+import { dailyRewardsStub } from './daily_rewards_stub';
 import type { DelveShopGate, DelveShopOffer } from './data';
 import {
   ABILITIES,
@@ -246,7 +248,6 @@ import {
   createPlayer,
   type PlayerEquipment,
   type PlayerEquipmentInstances,
-  pctValue,
   recalcPlayerStats,
 } from './entity';
 import {
@@ -274,6 +275,7 @@ import { formatMoney } from './format_money';
 import type { GuildBankState, GuildMembership } from './guild_bank';
 import * as guildBankMod from './guild_bank';
 import * as interaction from './interaction';
+import type { ExtractOutcome, ExtractRef } from './inventory_extract';
 import {
   boundCraftedRecipeIdOnLoad,
   sanitizeItemInstancePayloadOnLoad,
@@ -295,6 +297,7 @@ import {
   paginateGuildLeaderboard,
   paginateLeaderboard,
 } from './leaderboard_page';
+import { entityLineOfSightClear } from './line_of_sight_elevation';
 import type { Ante, PickAction } from './lockpick';
 // L1: the loot-distribution layer (party-loot strategy, the rollLoot roller, copper
 // split, need-greed roll lifecycle, corpse-loot helpers) moved to ./loot/loot_roll.ts;
@@ -2401,11 +2404,11 @@ export class Sim {
       cancelCast: (p) => this.cancelCast(p),
       standUp: (p) => this.standUp(p),
       dealDamage: (source, target, amount, crit, school, ability, kind, noRage) => {
+        const wasAlive = !target.dead;
         this.dealDamage(source, target, amount, crit, school, ability, kind, noRage);
-        // The one sim-side observer of a lethal fall (hid_fall_death): the
-        // shared pure kernel labels the hit 'Falling' with a null source, and
-        // this wrapper keeps the deed hook out of the kernel both hosts run.
-        if (source === null && ability === 'Falling' && target.kind === 'player' && target.dead) {
+        // Null-source Falling is the kernel sentinel; dead targets no-op, so require transition.
+        const isPlayerFall = source === null && ability === 'Falling' && target.kind === 'player';
+        if (isPlayerFall && wasAlive && target.dead) {
           deedsMod.onFallDeathForDeeds(this.ctx, target);
         }
       },
@@ -4917,31 +4920,10 @@ export class Sim {
     return Promise.resolve(paginateDeedsLeaderboard([], page, pageSize));
   }
 
+  // The offline constant readout (#1307) lives in daily_rewards_stub.ts, the
+  // one file the $WOC token firewall allows to name chain vocabulary.
   dailyRewards(): Promise<DailyRewardStatus> {
-    const day = '1970-01-01';
-    return Promise.resolve({
-      enabled: true,
-      day,
-      resetAt: '1970-01-02T00:00:00.000Z',
-      prizePoolUsd: 0,
-      prizePoolSol: null,
-      eligibility: {
-        eligible: false,
-        reason: 'no_wallet',
-        banReason: null,
-        walletPubkey: null,
-        wocBalance: null,
-        wocUsdPrice: null,
-        usdValue: null,
-        minUsd: 20,
-      },
-      score: 0,
-      rank: null,
-      spin: { claimed: false, points: null, outcomeKey: null, claimedAt: null },
-      tasks: [],
-      leaderboard: [],
-      leaderboardTotal: 0,
-    });
+    return dailyRewardsStub();
   }
 
   dailyRewardLeaderboard(
@@ -6594,7 +6576,16 @@ export class Sim {
     const aura = this.fearAura(e);
     if (!aura || e.auras.some((a) => a.kind === 'root') || hasUnbreakableMovementLock(e, aura))
       return false;
-    const angle = Number.isFinite(aura.value) ? aura.value : e.facing;
+    let angle = Number.isFinite(aura.value) ? aura.value : e.facing;
+    // Player-only wall guard (combat/fear_steering.ts): redirect the flee heading
+    // away from a wall it is about to run into, and remember the new heading on the
+    // aura so it holds until the next wall. Feared mobs keep their untouched
+    // movement (and the parity draw order with it), matching the vertical snap's
+    // player-only scoping.
+    if (e.kind === 'player') {
+      angle = steerFearFromWalls(this.ctx, e, angle);
+      aura.value = angle;
+    }
     const dest = this.groundPos(e.pos.x + Math.sin(angle) * 10, e.pos.z + Math.cos(angle) * 10);
     this.moveToward(e, dest, this.fleeMoveSpeed(e));
     return true;
@@ -6681,6 +6672,9 @@ export class Sim {
         reductionPct = Math.max(reductionPct, SUNDER_ARMOR_PCT_PER_STACK * (a.stacks ?? 1));
       else if (a.kind === 'faerie_fire')
         reductionPct = Math.max(reductionPct, FAERIE_FIRE_ARMOR_PCT);
+      // Melting Acid carries its own fraction on the aura (0.05), so a future
+      // rank or talent scales the value rather than a constant here.
+      else if (a.kind === 'melting_acid') reductionPct = Math.max(reductionPct, a.value);
     }
     return Math.max(0, armor * (1 - reductionPct));
   }
@@ -6702,14 +6696,7 @@ export class Sim {
 
   private petDamageMult(e: Entity): number {
     if (e.ownerId === null) return 1;
-    let mult = 1;
-    for (const a of e.auras) {
-      if (a.kind === 'pet_damage_pct') mult += pctValue(a.value);
-    }
-    const ownerMeta = this.players.get(e.ownerId);
-    if (ownerMeta) mult *= 1 + this.playerMods(ownerMeta).global.petDmgPct;
-    mult *= hunterPetFerocityDamageMultiplier(this.ctx, e);
-    return mult;
+    return hunterPetDamageMultiplier(this.ctx, e);
   }
 
   // Non-player stat-aura HP bookkeeping moved to pet/pet_commands.ts (P1b); Sim keeps
@@ -7139,7 +7126,7 @@ export class Sim {
     // The delve-run lookup is O(active runs x mobs per run) and allocates a
     // party key per call, and this method sits on every ranged auto-attack,
     // AoE pulse, and LOS-gated cast. Only a sight line with an endpoint
-    // inside the delve band can ever consume run.modules (lineOfSightClear's
+    // inside the delve band can ever consume run.modules (the collider LOS
     // delve arm keys off from.x), so every other combat sight check skips
     // all four lookups. Mirrors the movement path's isDelvePos guard.
     const inDelve = isDelvePos(source.pos.x) || isDelvePos(target.pos.x);
@@ -7149,10 +7136,10 @@ export class Sim {
         this.delveRunForPlayer(source.id) ??
         this.delveRunForPlayer(target.id))
       : undefined;
-    return lineOfSightClear(
+    return entityLineOfSightClear(
       this.cfg.seed,
-      source.pos,
-      target.pos,
+      source,
+      target,
       0.05,
       run?.modules,
       this.riftCollisionToken,
@@ -8731,6 +8718,17 @@ export class Sim {
       if (s.count <= 0) meta.inventory.splice(i, 1);
     }
     this.ctx.onInventoryChangedForQuests(meta);
+  }
+
+  // The broker custody pair (extraction into escrow, grant back) lives in
+  // broker_custody.ts; these stay as the delegates server/woc_market_custody.ts
+  // resolves on the Sim facade.
+  extractTradableCopy(pid: number | undefined, ref: ExtractRef): ExtractOutcome {
+    return extractTradableCopyImpl(this.ctx, pid, ref);
+  }
+
+  grantTradableCopy(pid: number | undefined, slot: InvSlot): boolean {
+    return grantTradableCopyImpl(this.ctx, pid, slot);
   }
 
   // Enchanting-eligible count for `itemId` (#1712 review): a plain fungible
@@ -10902,6 +10900,10 @@ export class Sim {
     tradeMod.tradeCancel(this.ctx, pid);
   }
 
+  tradeClose(pid?: number): void {
+    tradeMod.tradeClose(this.ctx, pid);
+  }
+
   // offerCovered / closeTrade are module-internal in social/trade.ts now (no Sim
   // delegate; only the moved trade methods used them).
 
@@ -11174,6 +11176,22 @@ export class Sim {
   // mailInfoFor rebuild. Null while the player is not at a raven pillar.
   mailRevFor(pid: number): number | null {
     return this.postOffice.mailRevFor(pid);
+  }
+
+  // Custody mail (the server's $WOC Exchange escrow returns and deliveries):
+  // thin delegates so a foreign caller resolves these on the Sim facade like
+  // every other mail entry, instead of reaching into sim.postOffice directly.
+  mailSystemParcel(
+    recipient: { key: string; name: string },
+    letter: import('./content/letters').LetterDef,
+    items: InvSlot[],
+    custodyRef?: string,
+  ): boolean {
+    return this.postOffice.mailSystemParcel(recipient, letter, items, custodyRef);
+  }
+
+  hasCustodyParcel(custodyRef: string): boolean {
+    return this.postOffice.hasCustodyParcel(custodyRef);
   }
 
   mailUnreadFor(pid: number): number {

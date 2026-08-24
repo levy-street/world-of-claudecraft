@@ -44,16 +44,18 @@ const dmg = (
     ability,
     kind: 'hit',
   }) as SimEvent;
-// `ability` sits ahead of `cueOnly`: the per-ability breakdown reads it on most
-// calls, while the audio-only HoT cue is the single case that needs the flag.
+// `ability` sits ahead of `cueOnly`/`hot`: the per-ability breakdown reads it on most
+// calls, while the audio-only HoT cue and the periodic-tick flag are the two cases
+// that need the flags.
 const heal = (
   sourceId: number,
   targetId: number,
   amount: number,
   ability = 'Heal',
   cueOnly = false,
+  hot = false,
 ): SimEvent =>
-  ({ type: 'heal2', sourceId, targetId, amount, crit: false, ability, cueOnly }) as SimEvent;
+  ({ type: 'heal2', sourceId, targetId, amount, crit: false, ability, cueOnly, hot }) as SimEvent;
 
 describe('combat meters', () => {
   it('tallies party damage and healing into the current encounter and all-time', () => {
@@ -314,6 +316,85 @@ describe('combat meters', () => {
     ]);
   });
 
+  it("latches the mob's live hate table so the fight's real threat survives its death", () => {
+    // The reported bug: real threat (stance/ability multipliers) runs well
+    // above raw damage. The kill clears the mob's hate table before the
+    // client ever reads it again, so without a latch the tab would
+    // "recalculate" down to the damage that landed the killing blow.
+    const w = fakeWorld();
+    const party = new Set([1, 2]);
+    const m = new MeterData(0);
+    const wolf = w.entities.get(50) as any;
+    wolf.threat = new Map([[1, 3000]]);
+    m.onEvent(dmg(1, 50, 400), w, party, 1000);
+    expect(m.current!.threatSnapshotByMob.get(50)).toEqual(new Map([[1, 3000]]));
+
+    // the killing blow: the server clears the hate table before this event is
+    // even processed, exactly like the real death sequence
+    wolf.dead = true;
+    wolf.threat.clear();
+    m.onEvent(dmg(1, 50, 600), w, party, 1100);
+
+    // the snapshot survives the live table being wiped out from under it
+    expect(m.current!.threatSnapshotByMob.get(50)).toEqual(new Map([[1, 3000]]));
+  });
+
+  it('refreshes frozen threat when healing threat lands between the last hit and death', () => {
+    const w = fakeWorld();
+    const party = new Set([1, 2]);
+    const m = new MeterData(0);
+    const wolf = w.entities.get(50) as any;
+    wolf.threat = new Map([[1, 3000]]);
+    m.onEvent(dmg(1, 50, 100), w, party, 1000);
+
+    wolf.threat = new Map([
+      [1, 3000],
+      [2, 120],
+    ]);
+    m.onEvent(heal(2, 1, 240, 'Flash Heal'), w, party, 1100);
+
+    wolf.dead = true;
+    wolf.threat.clear();
+    m.onEvent(dmg(1, 50, 600), w, party, 1200);
+
+    expect(m.current!.threatSnapshotByMob.get(50)).toEqual(
+      new Map([
+        [1, 3000],
+        [2, 120],
+      ]),
+    );
+  });
+
+  it('refreshes frozen threat for flat threat events that deal zero damage', () => {
+    const w = fakeWorld();
+    const party = new Set([1, 2]);
+    const m = new MeterData(0);
+    const wolf = w.entities.get(50) as any;
+    wolf.threat = new Map([[1, 3000]]);
+    m.onEvent(dmg(1, 50, 100), w, party, 1000);
+
+    wolf.threat = new Map([[1, 3600]]);
+    m.onEvent(dmg(1, 50, 0, 'Taunt'), w, party, 1100);
+
+    wolf.dead = true;
+    wolf.threat.clear();
+    m.onEvent(dmg(1, 50, 600), w, party, 1200);
+
+    expect(m.current!.threatSnapshotByMob.get(50)).toEqual(new Map([[1, 3600]]));
+  });
+
+  it('never latches an empty hate table over a real one', () => {
+    const w = fakeWorld();
+    const party = new Set([1, 2]);
+    const m = new MeterData(0);
+    const wolf = w.entities.get(50) as any;
+    wolf.threat = new Map([[1, 900]]);
+    m.onEvent(dmg(1, 50, 100), w, party, 1000);
+    wolf.threat.clear(); // e.g. left combat but did not die
+    m.onEvent(dmg(1, 50, 50), w, party, 1100);
+    expect(m.current!.threatSnapshotByMob.get(50)).toEqual(new Map([[1, 900]]));
+  });
+
   it('leaves an unowned mob and a pet whose owner is outside the party off the meter', () => {
     const w = fakeWorld();
     const party = new Set([1, 2]);
@@ -333,5 +414,58 @@ describe('combat meters', () => {
     m.onEvent(dmg(12, 50, 40, 'Firebolt'), w, party, 1200);
     expect([...m.current!.tallies.keys()]).toEqual([1]);
     expect(m.current!.tallies.get(1)!.dmg).toBe(10);
+  });
+
+  it('a HoT tick does not extend the inactivity clock, so the segment still closes on schedule (#meter-hot-cooldown)', () => {
+    const w = fakeWorld();
+    const party = new Set([1, 2]);
+    const m = new MeterData(0);
+    // The kill: the last REAL combat activity.
+    m.onEvent(dmg(1, 50, 10), w, party, 1000);
+    (w.entities.get(50) as any).dead = true;
+    (w.entities.get(50) as any).aggroTargetId = null;
+    (w.entities.get(51) as any).aggroTargetId = null;
+    // The healer's Renew keeps ticking on the tank after the kill, well inside
+    // the 5s grace window each time it lands.
+    m.onEvent(heal(2, 1, 15, 'Renew', false, true), w, party, 3000);
+    m.onEvent(heal(2, 1, 15, 'Renew', false, true), w, party, 5000);
+    // 5s after the LAST REAL activity (1000), with no live mob holding aggro,
+    // the segment must already be closed, regardless of the HoT ticks.
+    m.update(w, party, 6001);
+    expect(m.current).toBeNull();
+    expect(m.history.length).toBe(1);
+    expect(m.history[0].tallies.get(1)!.dmg).toBe(10);
+    // The ticks that landed before the close still count toward the healer's total.
+    expect(m.history[0].tallies.get(2)!.heal).toBe(30);
+  });
+
+  it('a lone HoT tick with no open segment does not spawn a phantom combat segment', () => {
+    const w = fakeWorld();
+    const party = new Set([1, 2]);
+    const m = new MeterData(0);
+    m.onEvent(heal(2, 1, 20, 'Renew', false, true), w, party, 1000);
+    expect(m.current).toBeNull();
+    expect(m.allTime.tallies.has(2)).toBe(false);
+  });
+
+  it('a HoT ticking through the gap between pulls never merges them into one segment (#meter-hot-cooldown)', () => {
+    const w = fakeWorld();
+    const party = new Set([1, 2]);
+    const m = new MeterData(0);
+    // Pull 1 ends.
+    m.onEvent(dmg(1, 50, 10), w, party, 1000);
+    (w.entities.get(50) as any).dead = true;
+    (w.entities.get(50) as any).aggroTargetId = null;
+    (w.entities.get(51) as any).aggroTargetId = null;
+    m.update(w, party, 6001); // 5s later, no live mob: segment 1 closes.
+    expect(m.current).toBeNull();
+    // The healer keeps a HoT rolling on the tank between pulls, well past the close.
+    m.onEvent(heal(2, 1, 15, 'Renew', false, true), w, party, 9000);
+    expect(m.current).toBeNull(); // the stray tick alone must not reopen anything
+    // Pull 2 starts: a genuinely fresh segment, not merged with the stray tick.
+    m.onEvent(dmg(1, 50, 7), w, party, 10_000);
+    expect(m.current!.tallies.get(1)!.dmg).toBe(7);
+    expect(m.current!.tallies.has(2)).toBe(false);
+    expect(m.history.length).toBe(1); // pull 1 alone, still in history
   });
 });

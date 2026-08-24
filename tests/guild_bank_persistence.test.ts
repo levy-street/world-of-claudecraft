@@ -1625,7 +1625,8 @@ describe('the guild_create fee gate + the create/disband hooks', () => {
     // undone this session's book ops while its character blob still reflects
     // them: exactly the mint the rollback prevented.
     const server = new GameServer();
-    const a = joinServer(server, 1, 'RacerA').session;
+    const aJoin = joinServer(server, 1, 'RacerA');
+    const a = aJoin.session;
     const b = joinServer(server, 2, 'StuckB').session;
     ladderDeadlock(server, a, b);
     const purse = server.sim.players.get(a.pid)?.copper;
@@ -1647,6 +1648,11 @@ describe('the guild_create fee gate + the create/disband hooks', () => {
       true,
     );
     expect(a.escrowQuarantined).toBe(true);
+    // The kick's WIRE argument is the matcher-covered takeover literal, never
+    // the internal cause (kickSession sends its SECOND argument on the wire;
+    // this pins the guild-bank arm the same way the escrow-queue suite pins
+    // the market arm).
+    expect(aJoin.sent).toContainEqual({ t: 'error', error: 'character taken over' });
     release?.();
     await queued;
     errSpy.mockRestore();

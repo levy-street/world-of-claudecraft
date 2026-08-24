@@ -205,6 +205,37 @@ describe('classifyDiff', () => {
     expect(plan.specific[0].variants).toHaveLength(4);
   });
 
+  it('maps an ability-copy change to the tooltip target, per owning module', () => {
+    // An ability's player-facing surface is its spellbook row and hovered
+    // tooltip; nothing else in the registry shoots that. Pin the routing per
+    // module so a when-list trim silently stops capturing the copy.
+    for (const file of [
+      'src/ui/hud/action_bar/ability_requirement_keys.ts',
+      'src/sim/incapacitate_dr.ts',
+      'src/sim/combat/stealth_focus.ts',
+    ]) {
+      const plan = classifyDiff([file]);
+      expect(
+        plan.specific.map((t: { key: string }) => t.key),
+        file,
+      ).toContain('ability-tooltip');
+    }
+    const target = resolveTargets(['src/sim/incapacitate_dr.ts']).find(
+      (candidate: { key: string }) => candidate.key === 'ability-tooltip',
+    );
+    expect((target?.variants ?? []).map((v: { key: string } | null) => v?.key)).toEqual([
+      'melting-acid',
+      'nightshade-coating',
+      'sap',
+      'shadeslip',
+      'shadeslip-mobile',
+    ]);
+    // The tooltip is the point, so the recipe must hover the row and prove the
+    // shared #tooltip actually painted rather than shooting the row alone.
+    expect(target?.capture.toString()).toContain('#tooltip');
+    expect(target?.capture.toString()).toContain('mouseenter');
+  });
+
   it('maps a zone/terrain change to the world-map target', () => {
     const plan = classifyDiff(['src/render/terrain.ts']);
     expect(plan.specific.map((t: { key: string }) => t.key)).toContain('world-map');

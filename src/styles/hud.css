@@ -7428,6 +7428,12 @@
   }
 
   /* ---------- trade window ---------- */
+  /* The host chrome the $WOC arm sits inside: on the themed tokens (no
+     literal hex: the wells and inputs on --color-bg-input, the accepted tick
+     on the success token, the hint on the muted text token), radii on
+     --radius-sm, spacing on the --spacing-* scale with the dense 3px cell
+     exception, and every money figure in tabular numerals. Body copy sits at
+     the 12px metadata floor or above (DESIGN.md 5.3). */
   #trade-window {
     width: 460px;
     box-sizing: border-box;
@@ -7435,10 +7441,11 @@
   }
   .trade-cols {
     display: flex;
-    gap: 12px;
+    gap: var(--window-pad);
   }
   .trade-col {
     flex: 1;
+    min-width: 0;
   }
   .trade-col h4 {
     font-family: var(--title-font);
@@ -7447,25 +7454,25 @@
     margin-bottom: 6px;
   }
   .trade-col.accepted h4::after {
-    content: " ✓";
-    color: #1eff00;
+    content: " \2713";
+    color: var(--color-text-success);
   }
   .trade-items {
     min-height: 120px;
     border: 1px solid var(--color-border-showcase);
-    border-radius: 4px;
-    padding: 4px;
-    background: #0c0c12;
+    border-radius: var(--radius-sm);
+    padding: var(--spacing-xs);
+    background: var(--color-bg-input);
   }
   .trade-item {
     display: flex;
     gap: 6px;
     align-items: center;
     width: 100%;
-    font-size: 11.5px;
+    font-size: 12px;
     padding: 3px;
     border: 0;
-    border-radius: 3px;
+    border-radius: var(--radius-sm);
     background: transparent;
     color: inherit;
     font-family: var(--ui-font);
@@ -7475,24 +7482,25 @@
     cursor: var(--cursor-point);
   }
   .trade-item.mine:hover {
-    background: #ffffff14;
+    background: color-mix(in srgb, var(--color-text-light) 8%, transparent);
   }
   .trade-empty {
     color: var(--color-text-muted);
-    font-size: 11px;
-    padding: 4px;
+    font-size: 12px;
+    padding: var(--spacing-xs);
   }
   .trade-money {
     margin-top: 6px;
     font-size: 12px;
+    font-variant-numeric: tabular-nums;
   }
   .trade-money-label {
     display: block;
-    margin-bottom: 4px;
+    margin-bottom: var(--spacing-xs);
   }
   .trade-coins {
     display: flex;
-    gap: 4px;
+    gap: var(--spacing-xs);
     align-items: center;
   }
   /* The coin disc sits between its input and the g/s/c tag; flex gap handles spacing, so drop the disc's own margins here. The tag hugs the disc (no preceding gap). */
@@ -7505,22 +7513,322 @@
   .trade-money input.coininput {
     width: 52px;
   }
-  .trade-money input {
+  /* The $WOC price field joins this declaration rather than restating it: the
+     two are the same control in the same window, and a second copy of the
+     colours would drift the moment either is retuned. */
+  .trade-money input,
+  .trade-woc-price {
     width: 80px;
-    background: #0d0d14;
-    color: #ffd100;
+    background: var(--color-bg-input);
+    color: var(--gold);
     border: 1px solid var(--border);
-    border-radius: 3px;
+    border-radius: var(--radius-sm);
     padding: 3px 6px;
     user-select: text;
+    font-variant-numeric: tabular-nums;
+  }
+  /* The one focus ring the window's other controls already carry (.btn, the
+     checkbox, the terms link): the number fields were showing the UA blue. */
+  #trade-window input:focus-visible {
+    outline: 2px solid var(--color-border-focus);
+    outline-offset: 2px;
+  }
+  .trade-woc-price::placeholder {
+    color: var(--color-text-muted);
+    opacity: 1;
   }
   .trade-money .mkt-coin-tag {
     margin-right: 2px;
   }
   .trade-hint {
-    font-size: 10.5px;
-    color: #887c5c;
-    margin-top: 8px;
+    font-size: 12px;
+    color: var(--color-text-muted);
+    margin-top: var(--spacing-sm);
+  }
+  /* The window's two actions in one row (the sheet pins it on touch). The
+     shared .btn margins fight a flex row, so they are zeroed here and the row's
+     gap owns the spacing. */
+  .trade-actions {
+    display: flex;
+    gap: var(--spacing-sm);
+    margin-top: var(--spacing-sm);
+  }
+  .trade-actions .btn {
+    margin: 0;
+  }
+
+  /* ---------- trade window: the $WOC arm ---------- */
+  /* Tokens only, no literals (src/styles/CLAUDE.md): the arm is ordinary window
+     chrome and inherits the panel's palette (the accent is --color-accent, the
+     themed contrast-repaired one; a bare --accent is defined nowhere). Money
+     lines read at 13px, warnings at the 12px floor in parchment, metadata at
+     the 12px floor in muted; every figure is tabular. Owl spacing (the sibling
+     margin, not the flex gap) so an empty derived line costs no height and yet
+     STAYS in the accessibility tree: the hint is the arm's live region and a
+     display: none region drops out of it between announcements. */
+  .trade-woc-arm {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    margin-top: var(--spacing-sm);
+    padding-top: var(--spacing-sm);
+    /* The one internal divider: the 10.6 gold fade, not a flat bronze line. */
+    background:
+      linear-gradient(
+        90deg,
+        transparent,
+        color-mix(in srgb, var(--color-accent) 38%, transparent),
+        transparent
+      )
+      top / 100% 1px no-repeat;
+    font-variant-numeric: tabular-nums;
+  }
+  .trade-woc-arm > * + * {
+    margin-top: 6px;
+  }
+  /* An empty line costs nothing, except the three money lines that arrive
+     asynchronously (the estimate lands a debounce and a round trip after the
+     first keystroke): those keep their slot so Send never moves under a hand
+     that is already reaching for it. */
+  .trade-woc-arm > :empty:not(.trade-woc-equiv):not(.trade-woc-fee):not(.trade-woc-net) {
+    margin-top: 0;
+  }
+  .trade-woc-equiv,
+  .trade-woc-fee,
+  .trade-woc-net {
+    min-height: 1.3em;
+  }
+  .trade-woc-arm .btn {
+    margin: 0;
+  }
+  /* A disabled coin field must READ as disabled, not merely refuse input. */
+  .trade-money .coininput:disabled {
+    opacity: 0.45;
+    cursor: not-allowed;
+  }
+  /* The standing offer, read in the Money row in place of that side's gold:
+     its own line under the label, in the accent, tabular. */
+  .trade-money .trade-woc-money {
+    display: block;
+    color: var(--color-accent);
+    font-variant-numeric: tabular-nums;
+    margin-top: var(--spacing-xs);
+  }
+  .trade-woc-waiting {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin: 0;
+    font-size: 13px;
+    color: var(--color-text-muted);
+  }
+  .trade-woc-done {
+    margin: 0;
+    font-size: 13px;
+    color: var(--color-accent);
+  }
+  /* The ONE waiting ring both money surfaces use (the Exchange's busy line and
+     inline bond rows, the arm's Pay button and waiting lines): a plain rotating
+     arc in the accent over a faint accent ring, sized and inline-block so it
+     draws inside a button too. prefers-reduced-motion drops the spin rather
+     than the element, so the waiting state still reads as waiting. */
+  .woc-spinner {
+    display: inline-block;
+    flex: 0 0 auto;
+    width: 11px;
+    height: 11px;
+    margin-right: 6px;
+    vertical-align: -1px;
+    border: 2px solid color-mix(in srgb, var(--color-accent) 30%, transparent);
+    border-top-color: var(--color-accent);
+    border-radius: 50%;
+    animation: woc-spin 0.9s linear infinite;
+  }
+  /* Inside a flex line the container's gap owns the spacing. */
+  .trade-woc-waiting .woc-spinner,
+  .trade-woc-block .woc-spinner {
+    margin-right: 0;
+  }
+  @keyframes woc-spin {
+    to {
+      transform: rotate(360deg);
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .woc-spinner {
+      animation: none;
+    }
+  }
+  /* The currency switch: a group of two pressed-state toggles under a hairline,
+     the pressed one in the accent with a 2px underline (shape as well as tone,
+     so it survives forced colours), not the maroon action-button gradient. */
+  .trade-woc-modes {
+    display: flex;
+    gap: var(--spacing-sm);
+    border-bottom: 1px solid var(--color-border-default);
+  }
+  .trade-woc-arm .btn.trade-woc-mode {
+    margin: 0 0 -1px;
+    padding: 6px 12px;
+    background: transparent;
+    border: 0;
+    border-bottom: 2px solid transparent;
+    border-radius: 0;
+    box-shadow: none;
+    text-shadow: none;
+    color: var(--color-text-muted);
+    font-family: var(--font-ui);
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 0;
+  }
+  .trade-woc-arm .btn.trade-woc-mode:hover:enabled {
+    color: var(--color-text-light);
+    filter: none;
+    box-shadow: none;
+  }
+  .trade-woc-arm .btn.trade-woc-mode[aria-pressed="true"] {
+    color: var(--color-accent);
+    border-bottom-color: var(--color-accent);
+  }
+  .trade-woc-arm .btn.trade-woc-mode:disabled {
+    filter: none;
+    opacity: 0.55;
+  }
+  .trade-woc-price-label {
+    font-size: 12px;
+    color: var(--color-text-muted);
+  }
+  .trade-woc-price {
+    width: auto;
+    min-width: 7ch;
+    max-width: 120px;
+  }
+  .trade-woc-equiv,
+  .trade-woc-fee,
+  .trade-woc-net,
+  .trade-woc-leg {
+    margin: 0;
+    font-size: 13px;
+    font-variant-numeric: tabular-nums;
+  }
+  .trade-woc-net {
+    color: var(--color-accent);
+  }
+  .trade-woc-leg-total {
+    font-weight: 700;
+    color: var(--color-text-light);
+  }
+  .trade-woc-quote-title {
+    margin: 0;
+    font-family: var(--title-font);
+    font-size: 13px;
+    color: var(--color-accent);
+  }
+  /* A price the connected wallet cannot cover. The figure carries the refusal
+     itself, because that is the number being typed at; the hint below says why
+     and the Send button is disabled alongside it, so the state never rests on
+     colour alone. */
+  .trade-woc-equiv.over-balance {
+    color: var(--color-text-error);
+  }
+  /* The warnings and the block reason are the copy a player acts on: parchment
+     at the floor, with a hairline accent rule as the second signal. Notes and
+     the disabled-affordance hint are metadata: muted at the floor. */
+  .trade-woc-warn,
+  .trade-woc-note,
+  .trade-woc-hint,
+  .trade-woc-block {
+    margin: 0;
+    font-size: 12px;
+    color: var(--color-text-muted);
+  }
+  .trade-woc-warn {
+    color: var(--color-text-light);
+    padding-left: var(--spacing-sm);
+    border-left: 2px solid color-mix(in srgb, var(--color-accent) 60%, transparent);
+  }
+  .trade-woc-block {
+    display: flex;
+    align-items: center;
+    color: var(--gold-dim);
+  }
+  /* The consent row (R9): checkbox beside its caption, the terms link on the
+     same line at the same size so the two read as one sentence, wrapping as a
+     unit when the column is narrow. */
+  .trade-woc-consent {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--spacing-xs) var(--spacing-sm);
+  }
+  .trade-woc-terms {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 6px;
+    margin: 0;
+    font-size: 12px;
+    color: var(--color-text-light);
+  }
+  /* 24px is the absolute minimum target in src/ui/CLAUDE.md, and a consent box
+     is the one control the server will not take money without: 18px cleared the
+     13px UA default but stopped short of the floor. The mobile sheet already
+     floors both consent boxes at 24 (hud.mobile.css); this is the desktop half
+     of the same rule. */
+  .trade-woc-terms input {
+    width: 24px;
+    height: 24px;
+    margin: 0;
+  }
+  .trade-woc-terms-link {
+    font-size: 12px;
+    color: var(--color-accent);
+    text-decoration: underline;
+  }
+  /* The consent link is a keyboard target on a money surface: a token ring,
+     not the UA fallback (the trade window's other controls are .btn / .x-btn,
+     which already carry theirs). */
+  .trade-woc-terms-link:focus-visible {
+    outline: 2px solid var(--color-border-focus);
+    outline-offset: 2px;
+  }
+  /* Button hierarchy on a money surface (DESIGN.md 10.1): the ONE commitment
+     button per face (Offer, Pay, Sign) wears the primary treatment, the ways
+     out (Withdraw, Decline, Cancel sale, Not now) the quiet one, so nothing
+     tells the player two adjacent maroon buttons apart by reading alone. The
+     primary is the shared .btn primitive with the accent as its edge and a
+     subdued accent tint over the panel; the quiet one is the same primitive
+     without its fill. Paired actions share one row. */
+  .trade-woc-arm > .btn {
+    align-self: flex-start;
+  }
+  .trade-woc-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--spacing-sm);
+  }
+  .trade-woc-arm .btn.trade-woc-primary {
+    background: color-mix(in srgb, var(--color-accent) 22%, var(--panel-base));
+    border-color: var(--color-accent);
+    color: var(--color-text-light);
+    text-shadow: none;
+  }
+  .trade-woc-arm .btn.trade-woc-primary:hover:enabled {
+    background: color-mix(in srgb, var(--color-accent) 32%, var(--panel-base));
+  }
+  .trade-woc-arm .btn.trade-woc-quiet {
+    background: transparent;
+    box-shadow: none;
+    text-shadow: none;
+    border-color: var(--color-border-default);
+    color: var(--color-text-muted);
+  }
+  .trade-woc-arm .btn.trade-woc-quiet:hover:enabled {
+    color: var(--color-text-error);
+    border-color: var(--color-border-invalid);
+    filter: none;
+    box-shadow: none;
   }
 
   /* ---------- elite target frame ---------- */

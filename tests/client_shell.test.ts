@@ -5,6 +5,8 @@ import {
   QUEST_STRIP_MAX_OBJECTIVES,
   QUEST_STRIP_TARGET_FRAME_GAP_PX,
 } from '../src/ui/hud/quest/quest_strip_core';
+import { shellStrings } from '../src/ui/i18n.catalog/shell';
+import { es_ES, fr_CA } from '../src/ui/i18n.resolved.generated';
 
 const html = readFileSync(new URL('../index.html', import.meta.url), 'utf8').replace(/\r\n/g, '\n');
 // The CSS extraction moved the :root tokens and the reset/base
@@ -265,6 +267,45 @@ describe('client HTML shell', () => {
     expect(liveHtml).not.toContain('Release Spirit');
     expect(liveHtml).not.toContain('id="chatlog-tabs"');
     expect(liveHtml).not.toContain('id="chat-input"');
+  });
+
+  it('pins the approved Exit Game values in every locale overlay and dialect resolution', () => {
+    const escapeRegExp = (value: string) => value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    expect(shellStrings.en.desktop.titlebar.exitGame).toBe('Exit Game');
+    for (const [locale, translation] of [
+      ['cs_CZ', 'Ukončit hru'],
+      ['da_DK', 'Afslut spillet'],
+      ['de_DE', 'Spiel beenden'],
+      ['es', 'Salir del juego'],
+      ['fr_FR', 'Quitter le jeu'],
+      ['id_ID', 'Keluar dari Gim'],
+      ['it_IT', 'Esci dal gioco'],
+      ['ja_JP', 'ゲームを終了'],
+      ['ko_KR', '게임 종료'],
+      ['nl_NL', 'Spel afsluiten'],
+      ['pl_PL', 'Zakończ grę'],
+      ['pt_BR', 'Sair do jogo'],
+      ['ru_RU', 'Выйти из игры'],
+      ['sv_SE', 'Avsluta spelet'],
+      ['tr_TR', 'Oyundan Çık'],
+      ['vi_VN', 'Thoát trò chơi'],
+      ['zh_CN', '退出游戏'],
+      ['zh_TW', '離開遊戲'],
+    ]) {
+      const overlay = readFileSync(
+        new URL(`../src/ui/i18n.locales/${locale}.ts`, import.meta.url),
+        'utf8',
+      )
+        .replace(/(^|[^:])\/\/[^\n]*/gm, '$1')
+        .replace(/\/\*[\s\S]*?\*\//g, '');
+      expect(overlay).toMatch(
+        new RegExp(
+          `['"]desktop\\.titlebar\\.exitGame['"]:\\s*['"]${escapeRegExp(translation)}['"]`,
+        ),
+      );
+    }
+    expect(es_ES.desktop.titlebar.exitGame).toBe('Salir del juego');
+    expect(fr_CA.desktop.titlebar.exitGame).toBe('Quitter le jeu');
   });
 
   it('carries the concise live map summary and detailed non-live description in BOTH entries', () => {
@@ -1251,7 +1292,8 @@ describe('client HTML shell', () => {
     }
     // The seat is styled off the shared gesture-menu token, and its row carries
     // the two geometry literals the strip gesture controller reads back.
-    expect(hudMobileCss).not.toContain('#mobile-consumables');
+    expect(hudMobileCss).not.toContain('body.mobile-touch #mobile-consumables');
+    expect(hudMobileCss).not.toContain('id="mobile-consumables"');
     expect(hudMobileCss).not.toContain('.mobile-consumable-slot');
     expect(hudMobileCss).toContain('    --strip-gap: 8px;');
     expect(hudMobileCss).toContain('    --strip-margin: 6px;');
@@ -2559,7 +2601,10 @@ describe('client HTML shell', () => {
     // #mobile-more is an absolutely seated strip item now, never a static grid cell.
     expect(hudMobileCss).not.toContain('body.mobile-touch #mobile-more {\n    position: static;');
     expect(hudMobileCss).toContain(
-      'body.mobile-touch #petbar {\n    position: fixed;\n    left: 50%;\n    top: max(8px, env(safe-area-inset-top));',
+      'body.mobile-touch #petbar {\n    position: fixed;\n    left: max(\n      50%,\n      calc(',
+    );
+    expect(hudMobileCss).toContain(
+      '338px *\n          var(--btn-scale, 1) *\n          var(--mobile-chrome-scale, 1) +\n          50px\n        ) /\n        var(--ui-scale, 1) +\n        121px',
     );
     // Every strip action routes to the handler its own button already had: four
     // keep the row's bindings, five are promoted out of the More tray onto the

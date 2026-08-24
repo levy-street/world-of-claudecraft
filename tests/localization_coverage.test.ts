@@ -1067,11 +1067,13 @@ describe('i18n Localization Key Coverage', () => {
       // Ravenpost authored letters: welcome + Heroic Marks reward + Wyrmfall
       // Core reward (Masterwrought phase 04; it reached the translation key set
       // at once but entity_i18n's own registry only at the phase 10 QA, which
-      // is when this hand count grew from 3 to 4) + mastery reset notice +
-      // quest letters + Guild trend letters + master tier letters (keyed
-      // pair -> tier), 3 fields each. Counted by hand on purpose: deriving it
-      // from authoredLettersById would compare the manifest with itself.
-      (4 +
+      // is when this hand count grew from 3 to 4) + mastery reset notice + the
+      // three $WOC Exchange custody letters (the release side, joined at the
+      // Phase 11k QA sync: 4 + 3 = 7) + quest letters + Guild trend letters +
+      // master tier letters (keyed pair -> tier), 3 fields each. Counted by
+      // hand on purpose: deriving it from authoredLettersById would compare the
+      // manifest with itself.
+      (7 +
         Object.keys(QUEST_LETTERS).length +
         Object.keys(GUILD_TREND_LETTERS).length +
         Object.values(MASTER_TIER_LETTERS).reduce(

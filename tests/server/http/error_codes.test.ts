@@ -1,3 +1,5 @@
+import { readFileSync } from 'node:fs';
+import { fileURLToPath } from 'node:url';
 import { describe, expect, it } from 'vitest';
 import { ERROR_CODES, type ErrorCode } from '../../../server/http/error_codes';
 
@@ -8,6 +10,7 @@ const EXPECTED_CODES = [
   'account.characters_online',
   'account.deactivated',
   'account.not_found',
+  'account.password_already_set',
   'account.password_too_long',
   'account.password_too_short',
   'account.username_invalid',
@@ -75,6 +78,53 @@ const EXPECTED_CODES = [
   'two_factor.setup_required',
   'validation.failed',
   'wallet.handoff_invalid',
+  'woc_market.invalid_input',
+  'woc_market.disabled',
+  'woc_market.paused',
+  'woc_market.wallet_required',
+  'woc_market.recipient_wallet_required',
+  'woc_market.self_offer',
+  'woc_market.offer_expired',
+  'woc_market.terms_required',
+  'woc_market.totp_required',
+  'woc_market.totp_invalid',
+  'woc_market.suspended',
+  'woc_market.character_invalid',
+  'woc_market.not_found',
+  'woc_market.not_yours',
+  'woc_market.not_active',
+  'woc_market.own_listing',
+  'woc_market.has_bids',
+  'woc_market.bid_too_low',
+  'woc_market.already_pending',
+  'woc_market.insufficient_balance',
+  'woc_market.quote_unavailable',
+  'woc_market.quote_expired',
+  'woc_market.not_pending',
+  'woc_market.claim_cooldown',
+  'woc_market.bond_window_closed',
+  'woc_market.confirm_failed',
+  'woc_market.confirm_in_flight',
+  'woc_market.buy_now_locked',
+  'woc_market.cancel_pending',
+  'woc_market.settlement_in_flight',
+  'woc_market.contended',
+  'woc_market.sale_conflict',
+  'woc_market.no_buy_now',
+  'woc_market.cap_reached',
+  'woc_market.stale_item',
+  'woc_market.not_eligible',
+  'woc_market.invalid_params',
+  'woc_market.signature_reused',
+  'woc_market.item_mismatch',
+  'woc_market.offer_pending',
+  'woc_market.item_locked',
+  'woc_market.stepup_required',
+  'woc_market.stepup_challenge_invalid',
+  'woc_market.stepup_challenge_expired',
+  'woc_market.stepup_wallet_mismatch',
+  'woc_market.stepup_binding_mismatch',
+  'woc_market.stepup_signature_invalid',
   'deeds.invalid_input',
   'steam.disabled',
   'steam.invalid_ticket',
@@ -101,8 +151,22 @@ describe('ERROR_CODES catalog', () => {
   });
 
   it('has no duplicate codes', () => {
-    const keys = Object.keys(ERROR_CODES);
-    expect(new Set(keys).size).toBe(keys.length);
+    // Over the SOURCE TEXT, not Object.keys: a duplicated literal key (the
+    // union-merge hazard this guard exists for) has already collapsed by the
+    // time the object is constructed, so a runtime key-set comparison can
+    // never fail. tsc flags the duplicate too; this keeps the guard local
+    // and named.
+    const source = readFileSync(
+      fileURLToPath(new URL('../../../server/http/error_codes.ts', import.meta.url)),
+      'utf8',
+    );
+    const start = source.indexOf('export const ERROR_CODES');
+    const literal = source.slice(start, source.indexOf('as const', start));
+    const keys = [...literal.matchAll(/^\s{2}'([a-z0-9_.]+)': \{/gm)].map((m) => m[1]);
+    expect(keys.length).toBe(Object.keys(ERROR_CODES).length);
+    const seen = new Set<string>();
+    const dupes = keys.filter((k) => (seen.has(k) ? true : (seen.add(k), false)));
+    expect(dupes).toEqual([]);
   });
 
   it('carries the 9 structural codes with their exact param keys', () => {
@@ -119,6 +183,10 @@ describe('ERROR_CODES catalog', () => {
 
   it('seeds the one parametric harvested code with its date param', () => {
     expect(ERROR_CODES['moderation.suspended_until'].params).toEqual(['date']);
+  });
+
+  it('declares the buy-now cooldown remaining time (the client renders it as a duration)', () => {
+    expect(ERROR_CODES['woc_market.claim_cooldown'].params).toEqual(['retryAfterSeconds']);
   });
 
   it('gives every code a params array of non-empty strings', () => {

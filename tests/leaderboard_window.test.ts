@@ -77,22 +77,31 @@ describe('leaderboard_window: guild tag beside the ranked name', () => {
     // Inside .lb-name, not a seventh grid column: the row grid is shared by every
     // tab, so a column here would misalign all of them (the Renown tab's realm tag
     // is the same treatment).
-    expect(code).toContain('<span class="lb-guild"');
+    // The tag markup lives in the shared builder now (src/ui/guild_tag.ts,
+    // the rule-of-three extraction); this window passes its own class.
+    expect(code).toContain("guildTagHtml(r.guild, 'lb-guild')");
     // biome-ignore lint/suspicious/noTemplateCurlyInString: asserting the painter source literally contains this template expression
-    expect(code).toContain('${esc(r.name)}${this.guildTagHtml(r.guild)}');
+    expect(code).toContain("${esc(r.name)}${guildTagHtml(r.guild, 'lb-guild')}");
     // biome-ignore lint/suspicious/noTemplateCurlyInString: asserting the painter source literally contains this template expression
-    expect(code).toContain('${esc(standing.name)}${this.guildTagHtml(standing.guild)}');
+    expect(code).toContain("${esc(standing.name)}${guildTagHtml(standing.guild, 'lb-guild')}");
   });
 
+  // The escape, empty-arm, and entity disciplines live in the SHARED builder
+  // now (src/ui/guild_tag.ts): the pins follow the code, comment-stripped
+  // like `code` so a commented-out guard cannot satisfy them.
+  const guildTagSrc = readFileSync(new URL('../src/ui/guild_tag.ts', import.meta.url), 'utf8')
+    .replace(/\/\*[\s\S]*?\*\//g, '')
+    .replace(/(^|[^:])\/\/.*$/gm, '$1');
+
   it('escapes the player-authored guild name and labels the tag from the catalog', () => {
-    // biome-ignore lint/suspicious/noTemplateCurlyInString: asserting the painter source literally contains this template expression
-    expect(code).toContain('${esc(guild)}');
-    expect(code).not.toMatch(/\$\{guild\}/);
-    expect(code).toContain("t('hudChrome.leaderboard.guildName')");
+    // biome-ignore lint/suspicious/noTemplateCurlyInString: asserting the builder source literally contains this template expression
+    expect(guildTagSrc).toContain('${esc(guild)}');
+    expect(guildTagSrc).not.toMatch(/\$\{guild\}/);
+    expect(guildTagSrc).toContain("t('hudChrome.leaderboard.guildName')");
   });
 
   it('renders no tag at all for an unguilded row', () => {
-    expect(code).toMatch(/if \(!guild\) return '';/);
+    expect(guildTagSrc).toMatch(/if \(!guild\) return '';/);
   });
 
   it('feeds the viewer their own guild so the sticky standing can carry the tag', () => {
@@ -101,8 +110,8 @@ describe('leaderboard_window: guild tag beside the ranked name', () => {
 
   it('writes the angle brackets as HTML entities, not literal markup', () => {
     // The classic `<Guild>` nameplate convention; a literal '<' here would open a tag.
-    expect(code).toContain('&lt;');
-    expect(code).toContain('&gt;');
+    expect(guildTagSrc).toContain('&lt;');
+    expect(guildTagSrc).toContain('&gt;');
   });
 });
 

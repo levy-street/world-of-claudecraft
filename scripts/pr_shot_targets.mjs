@@ -1850,6 +1850,71 @@ export const TARGETS = [
     },
   },
   {
+    key: 'vendor-sell-confirm',
+    label:
+      'Vendor: a plain click on a valuable item confirms before selling; junk still sells instantly',
+    when: ['ui/bags_view', 'ui/bags_window'],
+    // On a base checkout the click sells the sword outright (no dialog exists yet),
+    // so the SAME recipe shoots the honest BEFORE state (the bag empties on the
+    // spot). On the fix, the same click opens the confirm prompt instead and the
+    // sword stays put until the player actually confirms.
+    variants: [{ key: 'desktop' }, { key: 'mobile', mobile: true }],
+    async capture(page) {
+      await page.evaluate(() => {
+        document.querySelector('.camera-prompt-confirm')?.click();
+        document.querySelector('.tut-skip')?.click();
+        document.querySelector('.gpu-notice-dismiss')?.click();
+        document.querySelector('#gpu-notice')?.remove();
+      });
+      await wait(300);
+      const setup = await page.evaluate(() => {
+        const game = window.__game;
+        const sim = game?.sim;
+        if (!sim) return { ok: false, reason: 'no sim' };
+        const vendor = [...sim.entities.values()].find(
+          (e) => e.templateId === 'quartermaster_bree',
+        );
+        if (!vendor) return { ok: false, reason: 'no vendor entity' };
+        const p = sim.player;
+        if (!p?.pos) return { ok: false, reason: 'no player' };
+        p.pos.x = vendor.pos.x + 2;
+        p.pos.z = vendor.pos.z;
+        p.prevPos = { ...p.pos };
+        // A common-quality sword (needs confirm) beside a poor-quality junk stack
+        // (still sells on the spot): the same click, two different outcomes.
+        try {
+          sim.addItem('eastbrook_arming_sword', 1);
+        } catch {}
+        try {
+          sim.addItem('tangled_weed', 1);
+        } catch {}
+        // Force hidden first so the poll below cannot pass on a window left up
+        // by an earlier target in the same run (the vendor-tool-gate precedent).
+        // openVendor opens its bags companion itself (hud.ts: renderBags plus
+        // an explicit display:flex), so no separate toggleBags call is needed
+        // or wanted here (that would TOGGLE an already-open companion closed).
+        const el = document.querySelector('#vendor-window');
+        if (el) el.style.display = 'none';
+        game.hud.openVendor(vendor.id);
+        return { ok: true };
+      });
+      if (!setup.ok) throw new Error(`vendor-sell-confirm setup failed: ${setup.reason}`);
+      if (!(await pollForSize(page, '#vendor-window'))) {
+        throw new Error('vendor window did not open');
+      }
+      if (!(await pollForSize(page, '#bags'))) throw new Error('bags window did not open');
+      await wait(300);
+      await page.evaluate(() => {
+        const cell = Array.from(document.querySelectorAll('#bags button')).find((b) =>
+          b.getAttribute('aria-label')?.includes('Eastbrook Arming Sword'),
+        );
+        cell?.click();
+      });
+      await wait(400);
+      return {};
+    },
+  },
+  {
     key: 'bank-chips',
     label: 'Bank window with its bags companion: category chips and Deposit materials',
     when: ['ui/bank', 'ui/bag_filter', 'sim/material_taxonomy'],
@@ -4120,6 +4185,7 @@ export const TARGETS = [
     variants: [
       { key: 'live', charClass: 'warlock', charName: 'Nyxaris', scene: 'live' },
       { key: 'fallback', charClass: 'warlock', charName: 'Nyxaris', scene: 'fallback' },
+      { key: 'frozen', charClass: 'warlock', charName: 'Nyxaris', scene: 'frozen' },
     ],
     // A warlock with a real summoned Emberkin, because the pet is the whole
     // point: its hate is its own hate-table entry and the mob is swinging at it.
@@ -4154,6 +4220,11 @@ export const TARGETS = [
         meters.dock?.('heal');
         meters.dock?.('threat');
         meters.resetFrames?.();
+        // A world mob can carry incidental hate from something offscreen
+        // before this scene ever touches it; start every scene from a known
+        // empty table so none of them freeze on a snapshot the scene itself
+        // never intended.
+        mob.threat.clear();
         const hit = (sourceId, amount, ability) =>
           meters.onEvent({
             type: 'damage',
@@ -4165,20 +4236,40 @@ export const TARGETS = [
             ability,
             kind: 'hit',
           });
+
+        if (scene === 'frozen') {
+          // Seed the real hate table BEFORE the hits land: the panel's own
+          // freeze latch only ever reads mob.threat live, through
+          // Meters.onEvent, so it needs real numbers on the table while at
+          // least one hit is processed to have anything to freeze once the
+          // mob dies below.
+          mob.threat.set(player.id, 3200);
+          if (pet) mob.threat.set(pet.id, 4100);
+        }
         hit(player.id, 2400, 'Shadow Bolt');
         hit(player.id, 800, 'Corruption');
         if (pet) hit(pet.id, 2600, 'Ashbolt');
 
-        // The hate table the mob really compares: the Emberkin is ahead of its
-        // owner and is the one the mob is swinging at.
-        mob.threat.clear();
-        mob.threat.set(player.id, 3200);
-        if (pet) mob.threat.set(pet.id, 4100);
+        if (scene !== 'frozen') {
+          // The hate table the mob really compares: the Emberkin is ahead of
+          // its owner and is the one the mob is swinging at.
+          mob.threat.clear();
+          mob.threat.set(player.id, 3200);
+          if (pet) mob.threat.set(pet.id, 4100);
+        }
         mob.aggroTargetId = pet ? pet.id : player.id;
 
         if (scene === 'fallback') {
-          // Nothing live left: the tab has only the latched mob's damage to
-          // show, and must say so rather than pass it off as hate.
+          // Nothing live left, and no live table was ever seen: the tab has
+          // only the latched mob's damage to show, and must say so rather
+          // than pass it off as hate.
+          mob.dead = true;
+          mob.threat.clear();
+        } else if (scene === 'frozen') {
+          // The kill: the server clears the hate table before the client
+          // ever reads it again, exactly like the real death sequence. The
+          // tab must keep the fight's real numbers on screen, not
+          // recalculate down to the raw damage that landed the killing blow.
           mob.dead = true;
           mob.threat.clear();
         }
@@ -4196,6 +4287,100 @@ export const TARGETS = [
         if (el) el.click();
       });
       await wait(800);
+      return { clip: '#meters-window' };
+    },
+  },
+  {
+    key: 'meters-hot-cooldown-reset',
+    label:
+      "Damage meters: the Current segment resets between pulls instead of being held open by a healer's lingering HoT",
+    // The encounter-close clock lives in MeterData.onEvent/update (ui/meters.ts): a
+    // HoT's periodic tick must not keep refreshing it, or a second pull silently
+    // merges into the first's totals. Drives MeterData directly with synthetic
+    // timestamps (the same deterministic-injection approach the threat-meter
+    // target above uses) instead of waiting out the real 5s+ window: this is a
+    // TIMING bug, so the same script run against the base commit and this
+    // branch is what actually shows the fix, per the before/after protocol.
+    when: ['ui/meters.ts'],
+    variants: [{ key: 'desktop', charClass: 'warrior', charName: 'Rurik' }],
+    async capture(page) {
+      await page.evaluate(() => {
+        const game = window.__game;
+        const sim = game?.sim;
+        const player = sim?.player;
+        if (!sim || !player) return;
+        document.querySelector('#gpu-notice')?.remove();
+        document.querySelector('.camera-prompt-confirm')?.click();
+        let mob = null;
+        for (const e of sim.entities.values()) {
+          if (e.kind === 'mob' && e.ownerId == null && !e.dead) {
+            mob = e;
+            break;
+          }
+        }
+        const meters = game?.hud?.meters;
+        if (!meters || !mob) return;
+        meters.resetFrames?.();
+        const world = sim;
+        const party = new Set([player.id]);
+        const dmg = (amount, ability, t) =>
+          meters.data.onEvent(
+            {
+              type: 'damage',
+              sourceId: player.id,
+              targetId: mob.id,
+              amount,
+              crit: false,
+              school: 'physical',
+              ability,
+              kind: 'hit',
+            },
+            world,
+            party,
+            t,
+          );
+        const hotTick = (t) =>
+          meters.data.onEvent(
+            {
+              type: 'heal2',
+              sourceId: player.id,
+              targetId: player.id,
+              amount: 60,
+              crit: false,
+              ability: 'Renew',
+              hot: true,
+            },
+            world,
+            party,
+            t,
+          );
+        // Pull 1: the kill.
+        dmg(240, 'Mortal Strike', 1000);
+        mob.dead = true;
+        for (const e of sim.entities.values()) {
+          if (e.kind === 'mob' && e.aggroTargetId === player.id) e.aggroTargetId = null;
+        }
+        // The healer keeps a Renew rolling on the tank well past the kill.
+        hotTick(3000);
+        hotTick(5000);
+        // 5s past the LAST REAL activity (the kill at 1000): the segment must
+        // already be closed here, regardless of the ticks at 3000/5000.
+        meters.data.update(world, party, 6001);
+        // Pull 2 starts, well after the close.
+        mob.dead = false;
+        mob.aggroTargetId = player.id;
+        dmg(95, 'Whirlwind', 10_000);
+        meters.data.update(world, party, 10_001);
+        meters.render(true);
+        const el = document.querySelector('#meters-window');
+        if (el) el.style.display = 'none';
+        game?.hud?.toggleMeters?.();
+        const banner = document.querySelector('#banner');
+        if (banner) banner.style.opacity = '0';
+      });
+      const open = await pollForSize(page, '#meters-window');
+      if (!open) return {};
+      await wait(600);
       return { clip: '#meters-window' };
     },
   },
@@ -5986,6 +6171,115 @@ export const TARGETS = [
       });
       await wait(200);
       return { clip: '#chatlog-wrap' };
+    },
+  },
+  {
+    key: 'ability-tooltip',
+    label: 'Ability tooltip + spellbook row (what a kit change actually reads as)',
+    // An ability's COPY is its whole player-facing surface: what the spellbook row
+    // and the hovered #tooltip say. No in-world HUD frame shows it, so a kit change
+    // (a reworded tooltip, a new requirement line, a newly learned ability) has no
+    // reviewable evidence without this target. Keyed to the modules that decide that
+    // copy rather than to a class table, so it fires for the change that owns the
+    // wording and not for every content edit.
+    when: [
+      'ui/hud/action_bar/ability_requirement_keys',
+      'sim/incapacitate_dr',
+      'sim/combat/stealth_focus',
+    ],
+    variants: [
+      // Every variant enters as the class that OWNS the ability: the standalone
+      // page enters with variant.charClass, and the default (warrior) knows none
+      // of these, which reads as "not known at level 20".
+      // The two utility poisons: new rows, so their BEFORE is "not in the book".
+      {
+        key: 'melting-acid',
+        charClass: 'rogue',
+        charName: 'Nightsliver',
+        abilityId: 'melting_acid',
+      },
+      {
+        key: 'nightshade-coating',
+        charClass: 'rogue',
+        charName: 'Nightsliver',
+        abilityId: 'nightshade_coating',
+      },
+      // Reworded copy: Sap gained its no-fight clause.
+      { key: 'sap', charClass: 'rogue', charName: 'Nightsliver', abilityId: 'sap' },
+      // Shadeslip is a row-5 talent grant, so the recipe allocates before it
+      // resolves. It carries the new "Enemy or friendly target" requirement line.
+      {
+        key: 'shadeslip',
+        charClass: 'rogue',
+        charName: 'Nightsliver',
+        abilityId: 'shadowstep',
+        talentRow: { 5: 'rog_r5_shadeslip' },
+      },
+      {
+        key: 'shadeslip-mobile',
+        charClass: 'rogue',
+        charName: 'Nightsliver',
+        abilityId: 'shadowstep',
+        talentRow: { 5: 'rog_r5_shadeslip' },
+        mobile: true,
+      },
+    ],
+    async capture(page, variant) {
+      await page.keyboard.press('Escape');
+      await wait(400);
+      await page.evaluate(() => {
+        document.querySelector('.camera-prompt-confirm')?.click();
+        document.querySelector('.tut-skip')?.click();
+        document.querySelector('#gpu-notice')?.remove();
+        // The Escape above dismisses the entry overlays but also opens the game
+        // menu, which then sits behind the spellbook in frame. Close it through
+        // its own control so the shot is only the surface under review.
+        document.querySelector('#options-menu [data-close]')?.click();
+      });
+      await wait(300);
+      const setup = await page.evaluate((shot) => {
+        const game = window.__game;
+        const sim = game?.sim;
+        const player = sim?.player;
+        if (!sim || !player) return { known: false };
+        sim.setPlayerLevel?.(20, player.id);
+        if (shot.talentRow) sim.applyTalents?.({ spec: null, rows: shot.talentRow }, player.id);
+        const resolved = sim.resolvedAbility?.(shot.abilityId);
+        game.hud.toggleSpellbook?.();
+        return { known: !!resolved, abilityName: resolved?.def.name ?? shot.abilityId };
+      }, variant);
+      if (!setup.known) throw new Error(`${variant.abilityId} is not known at level 20`);
+      if (!(await pollForSize(page, '#spellbook', 20, 250))) {
+        throw new Error('spellbook did not open');
+      }
+      // Hover the row through the real listeners so the SHARED #tooltip paints the
+      // copy under test, rather than asserting on the row markup alone.
+      await page.evaluate((shot) => {
+        const row = document.querySelector(`.spell-row[data-ability-id="${shot.abilityId}"]`);
+        row?.scrollIntoView({ block: 'center' });
+        row?.dispatchEvent(new MouseEvent('mouseenter', { bubbles: true }));
+        row?.dispatchEvent(new MouseEvent('mouseover', { bubbles: true }));
+      }, variant);
+      await wait(500);
+      const shown = await page.evaluate((shot) => {
+        const row = document.querySelector(`.spell-row[data-ability-id="${shot.abilityId}"]`);
+        const tip = document.querySelector('#tooltip');
+        return {
+          row: !!row && getComputedStyle(row).display !== 'none',
+          tooltip: !!tip && getComputedStyle(tip).display !== 'none' && !!tip.textContent?.trim(),
+        };
+      }, variant);
+      if (!shown.row) throw new Error(`no spellbook row for ${variant.abilityId}`);
+      // The hovered tooltip is a POINTER surface: a touch viewport has no hover,
+      // so the mobile variant is about the spellbook ROW reading correctly at
+      // phone width and deliberately makes no tooltip claim. Asserting one there
+      // would fail on a platform difference rather than on a regression.
+      if (!variant.mobile && !shown.tooltip) {
+        throw new Error(`tooltip did not paint for ${variant.abilityId}`);
+      }
+      // Full frame on purpose: the shared #tooltip renders OUTSIDE #spellbook, so
+      // clipping to the window would cut off the copy this target exists to show.
+      return {};
     },
   },
   {
@@ -8962,6 +9256,51 @@ export const TARGETS = [
         const input = document.querySelector('#deeds-window .deed-search');
         if (!(input instanceof HTMLInputElement)) return;
         input.value = '3v3 bracket or larger';
+        input.dispatchEvent(new Event('input', { bubbles: true }));
+      });
+      await wait(400);
+      return { clip: '#deeds-window' };
+    },
+  },
+  {
+    key: 'deed-missing-poi-places',
+    label:
+      'Book of Deeds: an unearned wayfarer deed names which places are still missing, not just a bare count',
+    when: ['sim/deeds.ts', 'ui/deeds_window', 'ui/deeds_view', 'ui/entity_i18n'],
+    // Nine of Thornpeak Heights' ten named places already visited, one held
+    // back deliberately (Gravewyrm Sanctum), so the card's new missing-places
+    // line has exactly one name to show instead of an empty or ten-item list.
+    variants: [{ key: 'desktop' }, { key: 'mobile', mobile: true }],
+    async capture(page) {
+      let opened = false;
+      for (let attempt = 0; attempt < 3 && !opened; attempt++) {
+        await page.evaluate(() => {
+          const sim = window.__game?.sim;
+          if (sim?.primary?.deedStats?.visited) {
+            const visited = [
+              'poi:thornpeak_heights:highwatch',
+              'poi:thornpeak_heights:stalker_ridge',
+              'poi:thornpeak_heights:deeprock_burrows',
+              'poi:thornpeak_heights:ogre_foothills',
+              'poi:thornpeak_heights:drogmars_war_camp',
+              'poi:thornpeak_heights:stormcrag',
+              'poi:thornpeak_heights:the_glimmermere',
+              'poi:thornpeak_heights:wyrmcult_tents',
+              'poi:thornpeak_heights:revenant_fields',
+            ];
+            for (const id of visited) sim.primary.deedStats.visited.add(id);
+          }
+          const el = document.querySelector('#deeds-window');
+          if (el) el.style.display = 'none';
+          window.__game?.hud?.openDeeds?.('exploration');
+        });
+        opened = await pollForSize(page, '#deeds-window', 10, 500);
+      }
+      if (!opened) throw new Error('deeds window did not open');
+      await page.evaluate(() => {
+        const input = document.querySelector('#deeds-window .deed-search');
+        if (!(input instanceof HTMLInputElement)) return;
+        input.value = 'Thornpeak Heights';
         input.dispatchEvent(new Event('input', { bubbles: true }));
       });
       await wait(400);

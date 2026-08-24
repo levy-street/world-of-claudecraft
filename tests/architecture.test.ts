@@ -62,8 +62,12 @@ function onDiskCores(dir: string): string[] {
 
 // Blank out comments while preserving line count and column positions, so prose
 // (a code comment that names Math.random, or "the search window") cannot create a
-// false positive. String literals are left intact: the dotted patterns matched
-// below (Math.random, window., ...) do not appear inside the sim's player text.
+// false positive. A shared twin lives at tests/helpers/strip_comments.ts; this
+// copy stays local ON PURPOSE (a load-bearing guard stays self-contained) and
+// the two may drift independently. String literals are left intact: the dotted patterns matched
+// below (Math.random, window., ...) do not appear inside the sim's player text, and neither does
+// the $WOC firewall's vocabulary, whose two words the game DOES use of its own accord (treasury,
+// signature) are matched only in their money-affixed compound forms for exactly that reason.
 // One alternation, so leftmost-first matching decides precedence: a line comment
 // whose text contains /* is consumed AS a line comment instead of opening a
 // bogus block that swallows everything to the next */ elsewhere in the file
@@ -219,6 +223,7 @@ const UI_PURE_CORES = [
   'src/ui/daily_rewards_launcher_core.ts',
   'src/ui/char_bags_pairing_core.ts',
   'src/ui/equip_drop_core.ts',
+  'src/ui/error_text_i18n_core.ts',
   'src/ui/general_chat_quota_view.ts',
   'src/ui/known_item.ts',
   'src/ui/log_event_route.ts',
@@ -321,6 +326,7 @@ const UI_PURE_CORES = [
   'src/ui/farming_plant_sheet_view.ts',
   'src/ui/harvest_journal_view.ts',
   'src/ui/crafting_view.ts',
+  'src/ui/crafting_deny_core.ts',
   'src/ui/commission_order_view.ts',
   'src/ui/craft_cast_view.ts',
   'src/ui/profession_event_lines_core.ts',
@@ -332,6 +338,20 @@ const UI_PURE_CORES = [
   'src/ui/market_name_color.ts',
   'src/ui/market_armor_badge.ts',
   'src/ui/market_buy_confirm_core.ts',
+  'src/ui/usd_text.ts',
+  'src/ui/woc_tokens_text.ts',
+  'src/ui/woc_log_tones.ts',
+  'src/ui/woc_balance_chip.ts',
+  'src/ui/woc_market_chrome.ts',
+  'src/ui/woc_market_activity_html.ts',
+  'src/ui/guild_tag.ts',
+  'src/ui/wallet_bridge_reason_text.ts',
+  'src/ui/terms_link.ts',
+  'src/ui/duration_text.ts',
+  'src/ui/woc_affordable_core.ts',
+  'src/ui/woc_market_poll_core.ts',
+  'src/ui/woc_market_reason_text.ts',
+  'src/ui/woc_market_view.ts',
   'src/ui/mailbox_view.ts',
   'src/ui/calendar_view.ts',
   'src/ui/char_view.ts',
@@ -443,7 +463,9 @@ const UI_PURE_CORES = [
   'src/game/ui_effects_profile.ts',
   'src/game/ui_tier_knobs.ts',
   'src/ui/trade_view.ts',
+  'src/ui/trade_woc_view.ts',
   'src/ui/hud/rift/rift_floor_tracker_view.ts',
+  'src/ui/hud/woc_trade/woc_trade_offer_view.ts',
   'src/ui/safe_local_storage.ts',
 ].map((rel) => join(repoRoot, rel));
 
@@ -658,6 +680,17 @@ const BARE_NAMED = [
   'src/ui/item_name_color.ts',
   'src/ui/market_name_color.ts',
   'src/ui/market_armor_badge.ts',
+  'src/ui/usd_text.ts',
+  'src/ui/woc_tokens_text.ts',
+  'src/ui/woc_log_tones.ts',
+  'src/ui/woc_balance_chip.ts',
+  'src/ui/woc_market_chrome.ts',
+  'src/ui/woc_market_activity_html.ts',
+  'src/ui/guild_tag.ts',
+  'src/ui/wallet_bridge_reason_text.ts',
+  'src/ui/terms_link.ts',
+  'src/ui/duration_text.ts',
+  'src/ui/woc_market_reason_text.ts',
   'src/render/foliage_lod.ts',
   'src/render/frame_present.ts',
   'src/game/presentation_gate.ts',
@@ -1182,6 +1215,259 @@ describe('server host-layer import invariants', () => {
   });
 });
 
+// The $WOC token firewall (docs/prd/woc/marketplace.md "Constraints"): no
+// wallet, token, or settlement code may live in src/sim. The PRD names this
+// scan as the mechanical enforcement, so it exists here rather than as prose.
+// The allowlist is read-only projections of chain state, never money logic.
+describe('the $WOC token firewall over src/sim', () => {
+  // The ONE tenant: daily_rewards_stub.ts, the offline daily-rewards readout
+  // (#1307), which is a constant literal with no logic behind it. It was carved
+  // out of sim.ts precisely so the coordinator is scanned like every other
+  // file. holder_tier.ts and types.ts came OFF this list when they were
+  // measured against the pattern: the cosmetic holder ladder and the holder
+  // field declarations name none of this vocabulary outside comments, and an
+  // allowlist entry that is not covering a real hit only hides the next one.
+  // A NEW file wanting on this list is the signal the firewall is being
+  // breached, not extended.
+  const FIREWALL_ALLOWED = new Set(['src/sim/daily_rewards_stub.ts']);
+  // The shape every allowlisted file must keep to stay exempt: a read-only
+  // projection. Exactly ONE `export function`, and the only other statements
+  // allowed are type-only lines (`export type`, `import type`). Everything
+  // that could grow money LOGIC behind the exemption is refused by name:
+  // any other export form (const/let/var/class/default/interface/enum), a
+  // re-export (`export {}` / `export *`, which would let the file front a
+  // module nothing scans), a generator, control flow, try/catch, the logical
+  // operators, a ternary or optional, a value import, and a dynamic
+  // `import(...)`. Each rule is proven to bite against a synthetic offender
+  // below, so none of them is passing merely because the file never had the
+  // construct; the non-vacuity check additionally requires each entry to
+  // still carry a real pattern hit, so a stale entry cannot linger as a
+  // whole-file blind spot.
+  const PROJECTION_RULES: [string, RegExp][] = [
+    ['a non-function export', /\bexport\s+(?!(?:async\s+)?function\b|type\b)/],
+    ['a re-export', /\bexport\s*[{*]/],
+    ['a generator', /\bfunction\s*\*/],
+    ['control flow', /\b(?:if|for|while|switch)\s*\(/],
+    ['a try or catch', /\b(?:try|catch)\b/],
+    ['a logical operator', /&&|\|\||\?\?/],
+    ['a ternary or optional', /\?/],
+    ['a value import', /^import\b(?!\s+type\s)/m],
+    ['a dynamic import', /\bimport\s*\(/],
+  ];
+  const projectionViolations = (src: string): string[] =>
+    PROJECTION_RULES.filter(([, re]) => re.test(src)).map(([rule]) => rule);
+  // Identifier-shaped money/chain vocabulary. Deliberately NOT matched inside
+  // comments (the escrow prose in market.ts and inventory_extract.ts is fine):
+  // the scan strips comments first, exactly like the sibling purity scans.
+  // No trailing \b on purpose: the leak shapes are COMPOUND identifiers
+  // (sellerWallet, walletForAccount, quoteUsdCents), which a closed word
+  // boundary would miss entirely.
+  // The compound arms carry NO LEFT boundary either, and that asymmetry is
+  // deliberate: a sim file named orderSignature or blockHash over-matches and
+  // reds at PR time, which costs one reviewer glance, while a missed leak
+  // costs the firewall. Failing toward MORE scanning is the direction this
+  // guard prefers.
+  // `treasury` carries a REQUIRED money suffix, unlike the rest. A bare match was
+  // too broad to survive contact with the game's own vocabulary: v0.34.0 added a
+  // keep room whose id is literally 'treasury' (src/sim/dungeon_layout.ts), which
+  // is a place on a map, not a fee destination. Every shape this firewall exists
+  // to catch is compound anyway (treasuryWallet, treasuryBps), and the bare word
+  // was the one token here that could flag ordinary content.
+  // `signature` is narrowed the same way and for the same reason: the bare word
+  // is the game's own vocabulary (the talent-spec `signature` field, ability and
+  // reliquary descriptions calling something a signature move), while every leak
+  // shape is a money-affixed compound (txSignature, signature_reused,
+  // signatureRequired). Bare `token` is left out entirely on the same grounds
+  // (riftToken, chatTokens).
+  // The affix sets are calibrated against the REAL identifier corpus of the
+  // excluded modules (server/woc_market_*, claudium_proxy, native_attestation,
+  // woc_balance), not invented examples: treasuryBase, signatureAtMs,
+  // derSignature, signatureHeader, bs58 (the npm package name, which the
+  // literal 'base58' misses), keypair, the secret- and private-key shapes,
+  // blockhash, and the transaction verbs all exist server-side today. (The
+  // key shapes are spelled with their optional separator in the pattern
+  // below and hyphenated here so the malware scanner's own key-exfil
+  // signature, which hunts the contiguous identifiers, does not flag the
+  // very guard that forbids them in the sim.)
+  const FIREWALL_RE =
+    /(?:wallet|pubkey|solana|usdcents|pricecents|amountbase|settlementquote|bondcents|treasury[_-]?(?:wallet|pubkey|address|bps|cents|leg|share|base|cut|fee|account)|custodyclaim|lamports|base58|bs58|keypair|secret[_-]?key|private[_-]?key|blockhash|spl[_-]?token|(?:send|sign)[_-]?transaction|woc[_-]?(?:balance|price|amount|payout|transfer)|(?:tx|txn|bond|settlement|burn|transfer|der|escrow|payer|seller|mint)[_-]?signature|signature[_-]?(?:reused|required|field|header|verified|at[_-]?ms|bytes))/i;
+
+  it('exempts exactly one file, by exact membership', () => {
+    // Set EQUALITY, not a lower bound: widening the exemption has to be a
+    // deliberate visible edit to this line, never a quiet extra entry that
+    // takes a whole sim file out of the scan.
+    expect([...FIREWALL_ALLOWED]).toEqual(['src/sim/daily_rewards_stub.ts']);
+    expect(FIREWALL_ALLOWED.size).toBe(1);
+  });
+
+  it('keeps wallet, token, and settlement identifiers out of every sim file', () => {
+    const offenders: string[] = [];
+    for (const file of simFiles) {
+      const rel = relative(repoRoot, file).replace(/\\/g, '/');
+      if (FIREWALL_ALLOWED.has(rel)) continue;
+      const stripped = stripComments(readFileSync(file, 'utf8'));
+      const hit = FIREWALL_RE.exec(stripped);
+      if (hit) offenders.push(`${rel}: ${hit[0]}`);
+    }
+    expect(offenders, offenders.join('\n')).toEqual([]);
+  });
+
+  it('is non-vacuous: the scan sees the sim tree and its own pattern bites', () => {
+    // Near the real count (492 today) per the tests/CLAUDE.md floor rule: a
+    // walk that quietly lost most of the tree must fail here, because with
+    // sim.ts off the allowlist the corpus IS the firewall.
+    expect(simFiles.length).toBeGreaterThan(480);
+    // Every allowlisted file still exists, still trips the pattern (a stale
+    // entry is a whole-file blind spot), and still has the read-only
+    // projection shape spelled out at PROJECTION_RULES above.
+    for (const rel of FIREWALL_ALLOWED) {
+      const src = readFileSync(join(repoRoot, rel), 'utf8');
+      const stripped = stripComments(src);
+      expect(FIREWALL_RE.test(stripped), `${rel} no longer trips the pattern`).toBe(true);
+      // \b, not a trailing space: `export function* rows()` is a generator
+      // whose exported name a space-anchored count never sees.
+      expect(
+        stripped.match(/\bexport\s+(?:async\s+)?function\b/g),
+        `${rel} export count`,
+      ).toHaveLength(1);
+      expect(projectionViolations(stripped), `${rel} left the read-only projection shape`).toEqual(
+        [],
+      );
+      // Inline type imports (import { type X }) are deliberately refused by
+      // the value-import rule too: write them as import type instead.
+    }
+    // Both compound shapes must bite, and ordinary custody vocabulary must not.
+    expect(FIREWALL_RE.test('const w = walletForAccount(id);')).toBe(true);
+    expect(FIREWALL_RE.test('const k = row.sellerWallet;')).toBe(true);
+    expect(FIREWALL_RE.test('const escrowed = extractTradableCopy(inv, ref, def);')).toBe(false);
+    // The narrowed treasury arm, both directions: a fee destination or a split
+    // still bites, a room on a dungeon map does not.
+    expect(FIREWALL_RE.test('const dest = cfg.treasuryWallet;')).toBe(true);
+    expect(FIREWALL_RE.test('const bps = TREASURY_BPS;')).toBe(true);
+    expect(FIREWALL_RE.test("{ id: 'treasury', x0: 32, x1: 42 }")).toBe(false);
+    // The chain-settlement arms: an on-chain amount, an address encoding, and
+    // both compound signature shapes.
+    expect(FIREWALL_RE.test('const sig = row.txSignature;')).toBe(true);
+    expect(FIREWALL_RE.test('const b = toBase58(pk);')).toBe(true);
+    expect(FIREWALL_RE.test('const fee = LAMPORTS_PER_SOL / 2;')).toBe(true);
+    expect(FIREWALL_RE.test("if (reason === 'signature_reused') {")).toBe(true);
+    // ...and the game's own `signature`, which the narrowing must leave alone:
+    // player copy, the talent-spec field, and an ordinary derived-key helper.
+    expect(
+      FIREWALL_RE.test("description: 'Blasts nearby enemies with frost. (Frost signature)'"),
+    ).toBe(false);
+    expect(FIREWALL_RE.test("signature: 'mortal_strike',")).toBe(false);
+    expect(FIREWALL_RE.test('stationTypesSignature(types)')).toBe(false);
+  });
+
+  // One realistic usage per pattern arm the checks above do not already reach.
+  // An arm nobody probes is an arm a careless narrowing can delete for free,
+  // which is how a firewall loses a lane while staying green.
+  //
+  // The key shapes and the two transaction verbs are ASSEMBLED from fragments
+  // rather than spelled contiguously: the repo's malware scanner hunts exactly
+  // those source shapes (its key-exfil and web3-drain signatures), and the
+  // guard that forbids them in the sim must not read as one itself (the same
+  // hyphenation workaround the pattern comment describes). Each probe still
+  // carries the whole identifier at RUNTIME, which is what the pattern sees.
+  const CAMEL_KEY = 'Key';
+  const SNAKE_KEY = '_key';
+  const TX = 'Transaction';
+  const FIREWALL_ARM_PROBES: [string, string][] = [
+    ['bs58', 'const enc = bs58.encode(bytes);'],
+    ['keypair', 'const kp = keypairFromSeed(seed);'],
+    ['a camel-cased secret key', `const k = cfg.secret${CAMEL_KEY};`],
+    ['a snake-cased secret key', `const k = row.secret${SNAKE_KEY};`],
+    ['a private key', `const k = cfg.private${CAMEL_KEY};`],
+    ['blockhash', 'const { blockhash } = await conn.getLatest();'],
+    ['splToken', 'const mint = splToken.createMint(conn, payer);'],
+    ['sendTransaction', `await conn.send${TX}(tx);`],
+    ['signTransaction', `const signed = await provider.sign${TX}(tx);`],
+    ['wocBalance', 'const bal = row.wocBalance;'],
+    ['wocPrice', 'const price = quote.wocPrice;'],
+    ['wocAmount', 'const amount = order.wocAmount;'],
+    ['wocPayout', 'const payout = leg.wocPayout;'],
+    ['wocTransfer', 'await wocTransfer(from, to, amount);'],
+    ['treasuryPubkey', 'const dest = cfg.treasuryPubkey;'],
+    ['treasuryAddress', 'const dest = cfg.treasuryAddress;'],
+    ['treasuryBase', 'const base = split.treasuryBase;'],
+    ['treasuryCents', 'const cents = split.treasuryCents;'],
+    ['treasuryLeg', 'const leg = split.treasuryLeg;'],
+    ['treasuryShare', 'const share = split.treasuryShare;'],
+    ['treasuryCut', 'const cut = split.treasuryCut;'],
+    ['treasuryFee', 'const fee = split.treasuryFee;'],
+    ['treasuryAccount', 'const acct = cfg.treasuryAccount;'],
+    ['txnSignature', 'const sig = row.txnSignature;'],
+    ['derSignature', 'const sig = row.derSignature;'],
+    ['bondSignature', 'const sig = row.bondSignature;'],
+    ['settlementSignature', 'const sig = row.settlementSignature;'],
+    ['burnSignature', 'const sig = row.burnSignature;'],
+    ['transferSignature', 'const sig = row.transferSignature;'],
+    ['escrowSignature', 'const sig = row.escrowSignature;'],
+    ['payerSignature', 'const sig = row.payerSignature;'],
+    ['sellerSignature', 'const sig = row.sellerSignature;'],
+    ['mintSignature', 'const sig = row.mintSignature;'],
+    ['signatureRequired', 'const need = rules.signatureRequired;'],
+    ['signatureField', 'const field = body.signatureField;'],
+    ['signatureHeader', 'const header = req.signatureHeader;'],
+    ['signatureVerified', 'const ok = row.signatureVerified;'],
+    ['signatureAtMs', 'const at = row.signatureAtMs;'],
+    ['signatureBytes', 'const raw = row.signatureBytes;'],
+    ['custodyClaim', 'const claim = row.custodyClaim;'],
+    ['usdCents', 'const usd = quote.usdCents;'],
+    ['priceCents', 'const price = row.priceCents;'],
+    ['bondCents', 'const bond = order.bondCents;'],
+    ['amountBase', 'const amount = order.amountBase;'],
+    ['settlementQuote', 'const quote = order.settlementQuote;'],
+    ['pubkey', 'const pk = session.pubkey;'],
+    ['solana', 'const rpc = cfg.solanaRpcUrl;'],
+  ];
+
+  it.each(FIREWALL_ARM_PROBES)('bites on %s', (_arm, probe) => {
+    expect(FIREWALL_RE.test(probe)).toBe(true);
+  });
+
+  // The read-only-projection shape, proven rule by rule. Each offender names
+  // the rule it must trip, so deleting or loosening one rule reds here even
+  // though the one allowlisted file never carried the construct.
+  const PROJECTION_OFFENDERS: [string, string, string][] = [
+    ['a generator export', 'export function* rows() { yield 1; }', 'a generator'],
+    ['a named re-export', "export { dailyRewardsStub } from './other';", 'a re-export'],
+    ['a star re-export', "export * from './other';", 'a re-export'],
+    ['an exported interface', 'export interface Shape { a: number }', 'a non-function export'],
+    ['an exported enum', 'export enum Tier { One }', 'a non-function export'],
+    ['an exported const', 'export const rate = 1;', 'a non-function export'],
+    ['a loop', 'for (const row of rows) sum += row.a;', 'control flow'],
+    ['a try block', 'try { run(); } catch { }', 'a try or catch'],
+    ['a logical and', 'const v = a && b;', 'a logical operator'],
+    ['a logical or', 'const v = a || b;', 'a logical operator'],
+    ['a nullish fallback', 'const v = a ?? b;', 'a logical operator'],
+    ['a ternary', 'const v = a > 1 ? a : b;', 'a ternary or optional'],
+    ['a value import', "import { ITEMS } from './data';", 'a value import'],
+    ['a dynamic import', "const m = await import('./other');", 'a dynamic import'],
+  ];
+
+  it.each(PROJECTION_OFFENDERS)('refuses %s in an allowlisted file', (_label, src, rule) => {
+    expect(projectionViolations(src)).toContain(rule);
+  });
+
+  it('probes every projection rule, and still allows the one sanctioned shape', () => {
+    // Completeness both ways: a new rule with no offender above is unproven
+    // (the distinct rule names the offenders trip must cover the whole list),
+    // and the shape the exemption exists for must keep passing.
+    const probed = new Set(PROJECTION_OFFENDERS.map(([, , rule]) => rule));
+    expect(probed.size).toBe(PROJECTION_RULES.length);
+    const sanctioned = [
+      "import type { DailyRewardStatus } from '../world_api';",
+      'export type Readout = DailyRewardStatus;',
+      'export function readout(): Promise<Readout> {',
+      "  return Promise.resolve({ day: '1970-01-01' } as Readout);",
+      '}',
+    ].join('\n');
+    expect(projectionViolations(sanctioned)).toEqual([]);
+  });
+});
+
 describe('src/ui pure-core invariants', () => {
   it('lists only files that exist (the curated pure cores)', () => {
     const missing = UI_PURE_CORES.filter((f) => !statSync(f).isFile());
@@ -1483,6 +1769,7 @@ const EXPECTED_BARE_NAMED = [
   'src/ui/clock.ts',
   'src/ui/compass.ts',
   'src/ui/coords.ts',
+  'src/ui/duration_text.ts',
   'src/ui/entity_display_name.ts',
   'src/ui/fct_event.ts',
   'src/ui/focus_order.ts',
@@ -1490,6 +1777,7 @@ const EXPECTED_BARE_NAMED = [
   'src/ui/gather_tool_tooltip.ts',
   'src/ui/guild_hide_offline.ts',
   'src/ui/guild_motd_login.ts',
+  'src/ui/guild_tag.ts',
   'src/ui/hud/delve/delve_map.ts',
   'src/ui/hud/quest/quest_tracker.ts',
   'src/ui/hud_frames.ts',
@@ -1519,10 +1807,19 @@ const EXPECTED_BARE_NAMED = [
   'src/ui/roving_index.ts',
   'src/ui/safe_local_storage.ts',
   'src/ui/swing_timer.ts',
+  'src/ui/terms_link.ts',
   'src/ui/tool_effect_tooltip.ts',
   'src/ui/unit_frame.ts',
   'src/ui/unit_portrait.ts',
+  'src/ui/usd_text.ts',
+  'src/ui/wallet_bridge_reason_text.ts',
   'src/ui/wellfed_stat_keys.ts',
+  'src/ui/woc_balance_chip.ts',
+  'src/ui/woc_log_tones.ts',
+  'src/ui/woc_market_activity_html.ts',
+  'src/ui/woc_market_chrome.ts',
+  'src/ui/woc_market_reason_text.ts',
+  'src/ui/woc_tokens_text.ts',
   'src/ui/xp_bar.ts',
 ];
 
@@ -1715,12 +2012,13 @@ const UI_HOST_MEMBER_RE = new RegExp(`\\b(?:${UI_HOST_GLOBALS})\\??\\s*(?:\\.[A-
 // Assigned, passed, returned, spread, shorthanded, probed or cast rather than
 // dereferenced: `= document)`, `(document)`, `return document;`, `() => window`,
 // `{ document }`, `[document, window]`, `{ ...globalThis }`,
-// `typeof window !== 'undefined'`, `(window as X).y`. Anchored on a code delimiter
-// at BOTH ends so prose ("close the window, then click") cannot match, and the
-// open brace refuses a `${...}` interpolation so a template variable named
-// `window` (talent_i18n has one) is not mistaken for the global.
+// `typeof window !== 'undefined'`, `(window as X).y`, and ternary value arms such
+// as `enabled ? window : fallback`. Anchored on a code delimiter at BOTH ends so
+// prose ("close the window, then click") cannot match, and the open brace refuses
+// a `${...}` interpolation so a template variable named `window` (talent_i18n has
+// one) is not mistaken for the global.
 const UI_HOST_VALUE_RE = new RegExp(
-  `typeof\\s+(?:${UI_HOST_GLOBALS})\\b|(?:[=(,?!\\[]|(?<!\\$)\\{|=>|\\.\\.\\.|\\breturn)\\s*(?:${UI_HOST_GLOBALS})\\s*(?:[),;:!=}\\]]|\\s+as\\b|$)`,
+  `typeof\\s+(?:${UI_HOST_GLOBALS})\\b|\\?\\s*(?:${UI_HOST_GLOBALS})\\s*:|(?:[=(,?!\\[]|(?<!\\$)\\{|=>|\\.\\.\\.|\\breturn)\\s*(?:${UI_HOST_GLOBALS})\\s*(?:[),;!=}\\]]|\\s+as\\b|$)`,
   'm',
 );
 // window.location reached bare. Pinned to the real Location members so a game
@@ -1781,7 +2079,7 @@ const HELPER_HOST_PATTERNS: ReadonlyArray<readonly [string, RegExp]> = [
   [
     'a browser global, passed or probed',
     new RegExp(
-      `typeof\\s+(?:${HELPER_HOST_GLOBALS})\\b|(?:[=(,?!\\[]|(?<!\\$)\\{|=>|\\.\\.\\.|\\breturn)\\s*(?:${HELPER_HOST_GLOBALS})\\s*(?:[),;:!=}\\]]|\\s+as\\b|$)`,
+      `typeof\\s+(?:${HELPER_HOST_GLOBALS})\\b|\\?\\s*(?:${HELPER_HOST_GLOBALS})\\s*:|(?:[=(,?!\\[]|(?<!\\$)\\{|=>|\\.\\.\\.|\\breturn)\\s*(?:${HELPER_HOST_GLOBALS})\\s*(?:[),;!=}\\]]|\\s+as\\b|$)`,
       'm',
     ),
   ],
@@ -1844,6 +2142,7 @@ const UI_PAINTER_HELPERS = [
 // the English catalog, it is a maintainer fix during the release locale fill:
 // contributors do not edit those files.
 const UI_DOM_MODULES = [
+  'src/ui/account_portal_dom.ts',
   'src/ui/appearance_customizer.ts',
   'src/ui/arena_window.ts',
   'src/ui/armory_inspect.ts',
@@ -1914,6 +2213,7 @@ const UI_DOM_MODULES = [
   'src/ui/hud/vendor/unbind_window.ts',
   'src/ui/hud/vendor/vendor_window.ts',
   'src/ui/hud/vendor/warfare_vendor_window.ts',
+  'src/ui/hud/woc_trade/woc_trade_controller.ts',
   'src/ui/i18n.ts',
   'src/ui/icon_prewarm.ts',
   'src/ui/icon_prewarm_worker.ts',
@@ -1929,10 +2229,12 @@ const UI_DOM_MODULES = [
   'src/ui/map_marker_icon_loader.ts',
   'src/ui/map_marker_palette_lifecycle.ts',
   'src/ui/market_window.ts',
+  'src/ui/woc_market_window.ts',
   'src/ui/meters.ts',
   'src/ui/meters_frame.ts',
   'src/ui/minimap_gilded_ornament.ts',
   'src/ui/mobile_wallet_launcher.ts',
+  'src/ui/wallet_verify_request.ts',
   'src/ui/mount_race_controls.ts',
   'src/ui/mount_race_strip.ts',
   'src/ui/aura_overlay_config.ts',
@@ -2208,6 +2510,8 @@ describe('src/ui module classification (every module is swept by exactly one gat
       'const deps = { document };',
       'const hosts = [document, window];',
       'const merged = { ...globalThis };',
+      'const host = enabled ? window : fallback;',
+      'const doc = enabled ? document : fallback;',
     ]) {
       expect(UI_HOST_VALUE_RE.test(positive), positive).toBe(true);
     }
@@ -2283,6 +2587,7 @@ describe('src/ui module classification (every module is swept by exactly one gat
     expect(HELPER_HOST_PATTERNS[0][1].test('document.createElement(x)')).toBe(false);
     expect(HELPER_HOST_PATTERNS[0][1].test('window.innerWidth')).toBe(true);
     expect(HELPER_HOST_PATTERNS[1][1].test("typeof localStorage !== 'undefined'")).toBe(true);
+    expect(HELPER_HOST_PATTERNS[1][1].test('const host = enabled ? window : fallback;')).toBe(true);
     expect(HELPER_HOST_PATTERNS[1][1].test('return document;')).toBe(false);
     // The helper document rule counts every access, so a second, live-tree call
     // cannot hide behind the sanctioned one.

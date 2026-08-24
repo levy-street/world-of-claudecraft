@@ -12,7 +12,9 @@ import { describe, expect, it } from 'vitest';
 
 // db.ts builds a pg Pool at import; give it a dummy URL (no connection is made
 // until a query runs, and these tests never query).
-process.env.DATABASE_URL ||= 'postgres://test:test@localhost:5432/test';
+// Port 5433 like every other deliberately-dead fallback URL: 5432 is LIVE
+// inside the CI legs since the R16 Postgres service landed.
+process.env.DATABASE_URL ||= 'postgres://test:test@localhost:5433/test';
 
 const { scopeAllowsMutation, scopeAllowsRead, SCHEMA } = await import('../server/db');
 

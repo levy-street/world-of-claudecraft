@@ -37,6 +37,7 @@ describe('electron IPC channel contract (preload <-> main)', () => {
         'desktop-epic-capability',
         'desktop-epic-link-proof',
         'desktop-epic-link-settled',
+        'desktop-app-quit',
         'desktop-gamepad-activity',
         'desktop-get-display-mode',
         'desktop-get-gpu-force-opt-out',
@@ -231,6 +232,30 @@ describe('electron IPC channel contract (preload <-> main)', () => {
     const body = main.slice(start, main.indexOf('\n});', start));
     expect(body).toContain('if (!trustedSender(event)) return false;');
     expect(body).toContain('powerSave.notifyActivity();');
+  });
+
+  it('the app-quit handler accepts only a trusted live-window request', () => {
+    const main = stripComments(read('electron/main.cjs'));
+    const start = main.indexOf("ipcMain.handle('desktop-app-quit'");
+    expect(start).toBeGreaterThan(-1);
+    const end = main.indexOf('\n});', start);
+    expect(end).toBeGreaterThan(start);
+    const body = main.slice(start, end);
+    expect(body).toContain('if (!trustedSender(event)) return false;');
+    expect(body).not.toContain('if (trustedSender(event)) return false;');
+    expect(body).toContain('if (!mainWindow) return false;');
+    expect(body).toContain('if (mainWindow.isDestroyed()) return false;');
+    expect(body).toContain('app.quit();');
+    expect(body).not.toContain('app.exit(');
+    expect(body).toContain('return true;');
+    expect(body).toMatch(/desktop-app-quit', \(event\) => \{/);
+    const trustAt = body.indexOf('if (!trustedSender(event)) return false;');
+    const missingWindowAt = body.indexOf('if (!mainWindow) return false;');
+    const destroyedWindowAt = body.indexOf('if (mainWindow.isDestroyed()) return false;');
+    const quitAt = body.indexOf('app.quit();');
+    expect(missingWindowAt).toBeGreaterThan(trustAt);
+    expect(destroyedWindowAt).toBeGreaterThan(missingWindowAt);
+    expect(quitAt).toBeGreaterThan(destroyedWindowAt);
   });
 
   it('the show-notification handler validates, re-checks focus, then paces the OS surface', () => {
@@ -551,6 +576,7 @@ describe('electron IPC channel contract (preload <-> main)', () => {
       'reportRendererError',
       'onUpdateEvent',
       'installUpdate',
+      'quitApp',
       'onGpuStatus',
       'onPresentationChanged',
       'onDisplayChanged',
@@ -575,5 +601,11 @@ describe('electron IPC channel contract (preload <-> main)', () => {
     ]) {
       expect(preload, `preload is missing bridge method ${method}`).toContain(`${method}:`);
     }
+  });
+
+  it('exposes app quit as an argument-free capability', () => {
+    expect(preload).toContain("quitApp: () => ipcRenderer.invoke('desktop-app-quit'),");
+    expect(preload).not.toMatch(/quitApp:\s*\([^)]*[A-Za-z_$][^)]*\)/);
+    expect(preload).not.toMatch(/ipcRenderer\.invoke\('desktop-app-quit',\s*[^)]/);
   });
 });

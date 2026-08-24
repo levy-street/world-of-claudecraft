@@ -67,6 +67,19 @@ import { tsFilesUnder } from './helpers/ts_files_under';
 
 const uiRoot = fileURLToPath(new URL('../src/ui/', import.meta.url));
 const hudSource = readFileSync(new URL('../src/ui/hud.ts', import.meta.url), 'utf8');
+const strippedHudSource = stripComments(hudSource);
+const uiTsFiles = [...tsFilesUnder(uiRoot)];
+const uiSources = uiTsFiles.map(({ file, full }) => ({
+  file,
+  full,
+  source: stripComments(readFileSync(full, 'utf8')),
+}));
+const hudFieldsByClass = new Map<string, string[]>();
+for (const [, field, constructed] of strippedHudSource.matchAll(/(\w+)\s*=\s*new (\w+)\(/g)) {
+  const fields = hudFieldsByClass.get(constructed) ?? [];
+  fields.push(field);
+  hudFieldsByClass.set(constructed, fields);
+}
 
 // Raw source to the parser (a `//` inside one of hud.ts's regex literals or
 // template strings truncates a line for a comment stripper, and ts.createSourceFile
@@ -86,6 +99,7 @@ const scan = readMethodCallSites('src/ui/hud.ts', hudSource, 'Hud', 'refreshLoca
 const FANOUT_ARMS: readonly string[] = [
   'this.bgScoreboard.relocalize|',
   'this.syncDailyRewardsSurfaceLabels|',
+  'this.wocMarketWindow.relocalize|',
   'this.storePromoCard.relocalize|',
   'this.refreshKeybindLabels|',
   'this.questTracker.relocalize|',
@@ -181,8 +195,7 @@ interface GatedModule {
 
 function discoverGatedModules(): GatedModule[] {
   const out: GatedModule[] = [];
-  for (const { file, full } of tsFilesUnder(uiRoot)) {
-    const source = stripComments(readFileSync(full, 'utf8'));
+  for (const { file, source } of uiSources) {
     if (!EMITS_TEXT.test(source)) continue;
     const declared = [...source.matchAll(MEMO_DECL)].map((m) => m[1]);
     // A memo is only a REPAINT gate when the module compares it. A retained
@@ -326,6 +339,12 @@ const ANSWERED: readonly AnsweredSurface[] = [
     why: 'the listing ids, prices and the active tab; render() carries no self-gate. lastSellPriceRefSig (issue 3043) is the Sell tab price reference: render() rebuilds it via renderSell -> sellPriceRefHtml with the CURRENT language, the same full-rebuild path that already answers lastSig',
   },
   {
+    file: 'woc_market_window.ts',
+    memos: ['lastSig'],
+    answer: 'this.wocMarketWindow.relocalize',
+    why: 'the Exchange listing rows, statuses and countdowns digest into lastSig; relocalize() self-gates on isOpen, rebuilds once, and render() re-latches the signature',
+  },
+  {
     file: 'professions_window.ts',
     memos: ['lastSig'],
     answer: 'this.professionsWindow.render',
@@ -453,6 +472,12 @@ const NOT_A_LANGUAGE_GATE: ReadonlyArray<{
       'lastChip gates only the header ARIA presence swap (aria-expanded / aria-controls / aria-haspopup), which carries no player-visible text. Every string in this painter goes through the elided writer facet, which compares resolved text, and the fan-out drives it through this.updateReliquaryTracker.',
   },
   {
+    file: 'hud/woc_trade/woc_trade_controller.ts',
+    memos: ['lastTradeSig'],
+    reason:
+      'the trade window repaint signature: it reads no text at all (offer structs, staged items and copper, acceptance flags, partner, the staged quote and consent structural state), so a locale switch cannot move it, and there is deliberately no fan-out arm, exactly as when the method lived on hud.ts. A live trade re-renders in the new locale on the next data motion (either offer, stake, or acceptance change; the standing-offer poll adoption; the 2s poll makes an ACTIVE deal converge within a beat). RE-JUDGED TWICE by the UX-honesty pass, which added the consent row and the quote review to this arm: both of those faces are deliberately STATIC (the staged quote waits for a human and polls keep, the consent row keeps the price outside the signature), so each can sit indefinitely in a stale locale, including a player who switches language to READ the terms and then accepts a label rendered in the language they left. The posture still stands, on narrower grounds: the consent SEND carries a boolean judged by the server, never the label text, and the surface is the short-lived two-player trade window. The polish pass owns the real fix, a self-gated relocalize() with form_draft.ts carrying the price field, if the stale-idle residue is judged worth the behavior change.',
+  },
+  {
     file: 'hud.ts',
     memos: 'coordinator',
     reason:
@@ -527,11 +552,9 @@ describe('language fan-out: half 1, the arms of refreshLocalizedDynamicUi', () =
   });
 
   it('wires the fan-out to the woc:languagechange event exactly once', () => {
-    const wiring = stripComments(hudSource).match(
-      /document\.addEventListener\('woc:languagechange'/g,
-    );
+    const wiring = strippedHudSource.match(/document\.addEventListener\('woc:languagechange'/g);
     expect(wiring, 'hud.ts no longer listens for woc:languagechange').toHaveLength(1);
-    expect(stripComments(hudSource)).toContain(
+    expect(strippedHudSource).toContain(
       "document.addEventListener('woc:languagechange', () => this.refreshLocalizedDynamicUi());",
     );
   });
@@ -592,7 +615,7 @@ describe('language fan-out: half 2, every signature-gated src/ui surface is clas
     // src/ui is the one DEEP scan root in this repo, so the floor has to sit
     // above what a NON-recursive read returns (about 300 top-level files today)
     // or it cannot detect the failure its own message names.
-    const corpus = tsFilesUnder(uiRoot);
+    const corpus = uiTsFiles;
     expect(corpus.length, 'the src/ui walk came back short').toBeGreaterThan(400);
     expect(
       corpus.filter((f) => f.file.includes('/')).length,
@@ -665,6 +688,21 @@ describe('language fan-out: half 2, every signature-gated src/ui surface is clas
         );
       }
     }
+    // The exempt rows hold the SAME pin: their own doc says the exemption was
+    // granted about specific fields, so a module that grows a second compared
+    // memo must not inherit an answer given about a different one. Without
+    // this arm the new gate would be absorbed silently ('coordinator' rows
+    // are the one shape with no field list to compare).
+    for (const row of NOT_A_LANGUAGE_GATE) {
+      if (row.memos === 'coordinator') continue;
+      const found = discoveredByFile.get(row.file);
+      if (!found) continue; // reported by the stale-row test above
+      if (found.memos.join(',') !== [...row.memos].sort().join(',')) {
+        drift.push(
+          `${row.file}: exemption ${row.memos.join(',')} vs source ${found.memos.join(',')}`,
+        );
+      }
+    }
     expect(
       drift,
       'a classified module gained or lost a repaint memo. A NEW memo is a NEW gate and needs the language question answered about it, not inherited from the answer given about a different field:\n' +
@@ -710,10 +748,18 @@ describe('language fan-out: half 2, every signature-gated src/ui surface is clas
       // no text); fillGrid rebuilds every cell unconditionally and the
       // existing bags fan-out arm repaints the window wholesale on a locale
       // switch.
-      // 9 as of map semantic accessibility: lastHash is paired with
-      // lastLanguage in the same guard, so getLanguage() changing explicitly
-      // invalidates the localized summary without a separate fan-out arm.
-    ).toBe(9);
+      // 9 as of the woc_trade extraction: the trade window's `lastTradeSig`
+      // moved verbatim off the coordinator (where the blanket hud.ts row
+      // covered it) into hud/woc_trade/woc_trade_controller.ts, carrying the
+      // coordinator-era posture unchanged; the row states the reasoning and
+      // the deferred relocalize call.
+      // 10 as of the v0.38.0 sync merge, which brought in map semantic
+      // accessibility: lastHash is paired with lastLanguage in the same
+      // guard, so getLanguage() changing explicitly invalidates the
+      // localized summary without a separate fan-out arm. Each side of the
+      // merge had added one row (woc_trade above, the map core here), so the
+      // merged list carries both.
+    ).toBe(10);
   });
 
   it('gives every relocalize() in src/ui a caller in the fan-out', () => {
@@ -723,22 +769,17 @@ describe('language fan-out: half 2, every signature-gated src/ui surface is clas
     const armCalls = new Set(scan.sites.map((s) => s.call));
     const uncalled: string[] = [];
     const scanned: string[] = [];
-    for (const { file, full } of tsFilesUnder(uiRoot)) {
-      const source = stripComments(readFileSync(full, 'utf8'));
+    const ownedRelocalizeClasses = relocalizeOwnedClasses(armCalls);
+    for (const { file, source } of uiSources) {
       if (!/^\s{2}relocalize\(/m.test(source)) continue;
       scanned.push(file);
       const cls = /export class (\w+)/.exec(source)?.[1] ?? '';
       // Map the class back to the Hud field that holds it, then look for an arm
       // on that field. A module whose relocalize is reached through a wrapper
       // (LockpickWindow via LockpickController) is credited by the wrapper's arm.
-      const fields = [...stripComments(hudSource).matchAll(/(\w+)\s*=\s*new (\w+)\(/g)]
-        .filter(([, , constructed]) => constructed === cls)
-        .map(([, field]) => field);
+      const fields = hudFieldsByClass.get(cls) ?? [];
       const credited =
-        fields.some((f) => armCalls.has(`this.${f}.relocalize`)) ||
-        [...armCalls].some(
-          (c) => c.endsWith('.relocalize') && (wrapperOwns(c, cls) || builderOwns(c, cls)),
-        );
+        fields.some((f) => armCalls.has(`this.${f}.relocalize`)) || ownedRelocalizeClasses.has(cls);
       if (!credited) uncalled.push(`${file} (${cls || 'unnamed class'})`);
     }
     // The filter above is the whole test: an empty `uncalled` proves nothing if
@@ -770,34 +811,47 @@ describe('language fan-out: half 2, every signature-gated src/ui surface is clas
  *  the same chain the coordinator does (field <- builder result <- builder
  *  function <- the module that news the class) so the credit stays a proof, not
  *  an exemption. */
-function builderOwns(armCall: string, cls: string): boolean {
-  const field = armCall.slice('this.'.length, -'.relocalize'.length);
-  const hud = stripComments(hudSource);
-  const assigned = new RegExp(`\\b${field}\\s*=\\s*(\\w+)\\.\\w+;`).exec(hud);
-  if (!assigned) return false;
-  const built = new RegExp(`\\b${assigned[1]}\\s*=\\s*(\\w+)\\(`).exec(hud);
-  if (!built) return false;
-  for (const { full } of tsFilesUnder(uiRoot)) {
-    const source = stripComments(readFileSync(full, 'utf8'));
-    if (!new RegExp(`export function ${built[1]}\\b`).test(source)) continue;
-    return new RegExp(`new ${cls}\\(`).test(source);
+function relocalizeOwnedClasses(armCalls: ReadonlySet<string>): Set<string> {
+  const owned = new Set<string>();
+  for (const armCall of armCalls) {
+    if (!armCall.endsWith('.relocalize')) continue;
+    for (const cls of builderOwnedClasses(armCall)) owned.add(cls);
+    for (const cls of wrapperOwnedClasses(armCall)) owned.add(cls);
   }
-  return false;
+  return owned;
 }
 
-function wrapperOwns(armCall: string, cls: string): boolean {
+function builderOwnedClasses(armCall: string): Set<string> {
+  const owned = new Set<string>();
   const field = armCall.slice('this.'.length, -'.relocalize'.length);
-  const constructed = new RegExp(`\\b${field}\\s*=\\s*new (\\w+)\\(`).exec(
-    stripComments(hudSource),
-  );
-  if (!constructed) return false;
-  for (const { full } of tsFilesUnder(uiRoot)) {
-    const source = stripComments(readFileSync(full, 'utf8'));
+  const hud = strippedHudSource;
+  const assigned = new RegExp(`\\b${field}\\s*=\\s*(\\w+)\\.\\w+;`).exec(hud);
+  if (!assigned) return owned;
+  const built = new RegExp(`\\b${assigned[1]}\\s*=\\s*(\\w+)\\(`).exec(hud);
+  if (!built) return owned;
+  for (const { source } of uiSources) {
+    if (!new RegExp(`export function ${built[1]}\\b`).test(source)) continue;
+    for (const [, cls] of source.matchAll(/\bnew (\w+)\(/g)) owned.add(cls);
+    return owned;
+  }
+  return owned;
+}
+
+function wrapperOwnedClasses(armCall: string): Set<string> {
+  const owned = new Set<string>();
+  const field = armCall.slice('this.'.length, -'.relocalize'.length);
+  const constructed = new RegExp(`\\b${field}\\s*=\\s*new (\\w+)\\(`).exec(strippedHudSource);
+  if (!constructed) return owned;
+  for (const { source } of uiSources) {
     if (!new RegExp(`export class ${constructed[1]}\\b`).test(source)) continue;
     // The wrapper must both hold one of these and forward to it.
-    return (
-      new RegExp(`:\\s*${cls}\\b|new ${cls}\\(`).test(source) && /\.relocalize\(\)/.test(source)
-    );
+    if (!/\.relocalize\(\)/.test(source)) return owned;
+    if (/:\s*\b/.test(source)) owned.add('');
+    for (const match of source.matchAll(/:\s*(\w+)\b|\bnew (\w+)\(/g)) {
+      const cls = match[1] ?? match[2];
+      if (cls) owned.add(cls);
+    }
+    return owned;
   }
-  return false;
+  return owned;
 }

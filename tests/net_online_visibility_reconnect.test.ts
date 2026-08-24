@@ -672,3 +672,96 @@ describe('ClientWorld reconnect error-frame tolerance (auth timeout)', () => {
     });
   });
 });
+
+// Regression for the "relog takes minutes" reports: a char-select "Enter
+// World" click (or a page reload after a client-side bug/crash) builds a
+// BRAND NEW ClientWorld whose first join attempt previously could not benefit
+// from the same reconnect_policy.ts tolerance a mid-session drop already got,
+// because that tolerance used to require reconnectAttempts > 0. The roster's
+// online flag that routed the click to "Enter World" rather than "Take Over"
+// can lag a drop from seconds ago, so the very first attempt lands in the
+// same "server has not yet noticed the old socket died" window a later
+// reconnect does; treating it as instantly fatal forced the player to
+// manually retry (each retry itself a fresh, still-fatal attempt zero) until
+// the server-side state caught up on its own. This suite pins that the first
+// attempt now backs off and retries exactly like a mid-session drop.
+describe('ClientWorld reconnect error-frame tolerance (first join attempt, never previously connected)', () => {
+  afterEach(() => {
+    StubWebSocket.instances = [];
+    vi.restoreAllMocks();
+  });
+
+  type WorldProbe = {
+    onMessage(raw: string): void;
+    reconnectAttempts: number;
+    conflictRejections: number;
+    timeoutRejections: number;
+    sessionEnded: boolean;
+  };
+
+  it('tolerates "character already in world" on attempt zero instead of ending the session', () => {
+    withDomStubs((_doc, harness) => {
+      const world = new ClientWorld('t', 1, PROBE_CLASS, 'http://localhost');
+      const w = world as unknown as WorldProbe;
+      const reasons: string[] = [];
+      world.onDisconnect = (reason) => {
+        reasons.push(reason);
+      };
+      expect(w.reconnectAttempts).toBe(0); // never dropped and retried before
+
+      w.onMessage(JSON.stringify({ t: 'error', error: 'character already in world' }));
+
+      expect(w.sessionEnded).toBe(false);
+      expect(reasons).toEqual([]);
+      expect(w.conflictRejections).toBe(1);
+
+      // The server closes the rejecting socket; that close event must schedule
+      // an actual backoff retry, the same path a mid-session drop takes.
+      const first = StubWebSocket.instances[0];
+      first.onclose?.();
+      expect(w.sessionEnded).toBe(false);
+      expect(harness.timers.length).toBe(1);
+      world.close();
+    });
+  });
+
+  it('tolerates "authentication timed out" on attempt zero instead of ending the session', () => {
+    withDomStubs((_doc, harness) => {
+      const world = new ClientWorld('t', 1, PROBE_CLASS, 'http://localhost');
+      const w = world as unknown as WorldProbe;
+      const reasons: string[] = [];
+      world.onDisconnect = (reason) => {
+        reasons.push(reason);
+      };
+      expect(w.reconnectAttempts).toBe(0);
+
+      w.onMessage(JSON.stringify({ t: 'error', error: 'authentication timed out' }));
+
+      expect(w.sessionEnded).toBe(false);
+      expect(reasons).toEqual([]);
+      expect(w.timeoutRejections).toBe(1);
+
+      const first = StubWebSocket.instances[0];
+      first.onclose?.();
+      expect(w.sessionEnded).toBe(false);
+      expect(harness.timers.length).toBe(1);
+      world.close();
+    });
+  });
+
+  it('still ends the session on attempt zero for a genuinely fatal rejection (e.g. a real takeover elsewhere)', () => {
+    withDomStubs(() => {
+      const world = new ClientWorld('t', 1, PROBE_CLASS, 'http://localhost');
+      const w = world as unknown as WorldProbe;
+      const reasons: string[] = [];
+      world.onDisconnect = (reason) => {
+        reasons.push(reason);
+      };
+
+      w.onMessage(JSON.stringify({ t: 'error', error: 'character taken over' }));
+
+      expect(w.sessionEnded).toBe(true);
+      expect(reasons).toEqual(['character taken over']);
+    });
+  });
+});

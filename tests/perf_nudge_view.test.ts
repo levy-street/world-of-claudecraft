@@ -1,3 +1,4 @@
+import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 import {
   dismissPerfNudge,
@@ -159,6 +160,26 @@ describe('inactive-dedicated-GPU notice suppression', () => {
     // Absent (a caller with no shell verdict at all) reads the same as false.
     expect(resolvePerfNudge({ ...baseInput, suggestionIds: ['integrated-gpu'] }).bodyKey).toBe(
       'perfNudge.integratedGpu',
+    );
+  });
+
+  it('the capture helper presses the same element the toast builds', () => {
+    // A capture rig cannot pre-seed this dismissal (the stored value must EQUAL
+    // the triggering id set, which is not known until the analyzer has run), so
+    // scripts/lib/perf_nudge_dismiss.mjs presses the toast's own Dismiss
+    // button. The helper is plain .mjs and cannot import the toast module, so
+    // its two selectors are pinned against the source that builds them: a
+    // rename there would otherwise leave the nudge sitting in every captured
+    // frame, silently, which is how it reached the committed set once already.
+    const toast = readFileSync('src/ui/perf_nudge_toast.ts', 'utf8');
+    const helper = readFileSync('scripts/lib/perf_nudge_dismiss.mjs', 'utf8');
+    expect(toast, 'the toast still builds #perf-nudge').toContain("root.id = 'perf-nudge'");
+    expect(toast, 'the toast still classes its dismiss button').toContain(
+      "dismissButton.className = 'perf-nudge-dismiss'",
+    );
+    expect(helper, 'the helper targets that root id').toContain("ROOT_ID = 'perf-nudge'");
+    expect(helper, 'the helper targets that dismiss class').toContain(
+      "DISMISS_CLASS = 'perf-nudge-dismiss'",
     );
   });
 

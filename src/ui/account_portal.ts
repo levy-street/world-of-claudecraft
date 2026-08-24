@@ -98,6 +98,22 @@ export function validatePasswordChange(
 }
 
 /**
+ * Validate the "Set a Password" form shown to a passwordSet:false account (one
+ * provisioned by Apple or Discord sign-in): there is no current password to
+ * re-verify or compare against, so this omits validatePasswordChange's
+ * empty-current and unchanged checks and only gates length + confirmation match.
+ */
+export function validateInitialPassword(
+  next: string,
+  confirm: string,
+): Exclude<PasswordError, 'empty-current' | 'unchanged'> | null {
+  if (next.length < MIN_PASSWORD_LENGTH) return 'too-short';
+  if (next.length > MAX_PASSWORD_LENGTH) return 'too-long';
+  if (next !== confirm) return 'confirm-mismatch';
+  return null;
+}
+
+/**
  * Lenient email shape check, matching the server's tolerance. Empty is valid
  * (it clears the stored address). Returns true when acceptable.
  */

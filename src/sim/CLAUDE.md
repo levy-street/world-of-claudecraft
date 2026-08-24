@@ -96,7 +96,8 @@ plausibly covers means the table needs a new row in the same change.
 | `items.ts` | equip/use/discard + vendor buy/sell/buyback command bodies (W2 move out of `sim.ts`) |
 | `wellfed.ts` | the ONE Well Fed mint (`applyWellFedOnMealComplete` over the carried `Consuming.wellFed` payload, `WELL_FED_AURA_ID`), called from the updateRegen completion site after the slot clears; the pure meal builder is the `consuming.ts` leaf (Masterwrought 11c) |
 | `mech_chroma_ownership.ts` | mech-chroma cosmetic ownership: the worn-chroma readers plus the mutation verbs `unlockMechChromaFromItem`/`unequipWornMechChroma`, extracted from `sim.ts` behind the bespoke structural `MechChromaOwnershipHost` interface (the `player_motion.ts` `PlayerMotionDeps` seam shape, not `SimContext`: the module names only the host members it touches and `sim.ts` forwards the live `Sim` as the host); `ItemUseResult` lives here and is re-exported from `sim.ts` |
-| `item_instance_transfer.ts` | shared instanced-transfer rules for the anonymous exchange pipes (market listings + mail parcels, issue 1165): the transfer-lock predicate, the public display trim, payload-matching escrow removal, escrow-slot sanitizing; consumed by `market.ts`, `mail/post_office.ts`, and the ui staging gates (the `removePreferFungible` cross-import precedent) |
+| `item_instance_transfer.ts` | shared instanced-transfer rules for the anonymous exchange pipes (market listings + mail parcels, issue 1165): the transfer-lock predicate (its body is the dependency-free `transfer_lock.ts` leaf, re-exported here; `exchange_eligibility.ts` imports the leaf directly), the public display trim, payload-matching escrow removal, escrow-slot sanitizing; consumed by `market.ts`, `mail/post_office.ts`, and the ui staging gates (the `removePreferFungible` cross-import precedent) |
+| `broker_custody.ts` | the broker-side custody moves for the server's marketplace, both kept as thin `Sim` delegates the server resolves on the facade: `extractTradableCopyImpl` (one exact copy into escrow through the `inventory_extract.ts` leaf, plus the dismount when a seller escrows the mount they are riding) and `grantTradableCopyImpl` (the copy back into the bags through the shared `canGrantCopies` / `grantCopies` pair, in one call); draws NO rng |
 | `interaction.ts` | `lootCorpse`/`pickUpObject`/`interact` + corpse harvest and party auto-loot (W3); `corpse_interaction.ts` is its shared availability predicate (`corpseInteractionAvailability`: loot rights vs harvestability on a dead lootable mob) |
 | `bags.ts` | pooled bag capacity: the backpack plus equipped bag items raise one flat slot budget |
 | `quests/quest_credit.ts` | kill/collect/craft/gather quest credit + turn-in readiness, plus the farm ACTION arm `onCropFarmedForQuests` that `professions/farming.ts` imports directly and calls after every committed plant and harvest (every harvest outcome, withered included; never from a deny arm; it never reads bags); siblings `quests/interact_object_credit.ts` (the per-object credit ledger for multi-count interact objectives, since interact deliberately does not consume the object) and `quests/profession_quest_effects.ts` (the profession-quest effect arms over `professions/archetype.ts`) |
@@ -190,6 +191,10 @@ those rather than a roster here. The ones whose CONTRACT you cannot infer from t
   SYSTEM logic stays on `Sim`.
 - `professions/proficiency_display_heal.ts`: the one-time gathering-proficiency
   display-band heal applied at character load.
+- `daily_rewards_stub.ts`: the offline daily-rewards readout constant, and the
+  ONE file on the $WOC token-firewall allowlist (`tests/architecture.test.ts`
+  pins its read-only-projection shape: one exported function, no control flow,
+  type-only imports).
 
 ## The SimContext seam (final shape)
 `sim_context.ts` defines `SimContext` = `SimContextPrimitives` (live getters onto the

@@ -134,14 +134,16 @@ describe('stale focus vs Space (the reported bug and its fix)', () => {
 
   it('(b2) layer 2 alone: a stale mouse-focused chrome button outside the rail guards is suppressed while blocked, and a second Space stays suppressed', async () => {
     // A chrome button OUTSIDE every key-guarded container and dialog root, e.g.
-    // a window button the audit missed: the input-layer guard is its only net.
-    // Focused by a real mouse click (no pointer drop bound here), the stale shape.
+    // a window button the audit missed. Stop click bubbling so Input's global
+    // mouse-focus shed cannot clean it up: the input-layer guard is its only net.
+    // Focused by a real mouse click (no delegated pointer drop bound here), the stale shape.
     const btn = document.createElement('button');
     btn.type = 'button';
     btn.textContent = 'chrome';
     let count = 0;
-    btn.addEventListener('click', () => {
+    btn.addEventListener('click', (e) => {
       count++;
+      e.stopPropagation();
     });
     document.body.appendChild(btn);
     await userEvent.click(btn);

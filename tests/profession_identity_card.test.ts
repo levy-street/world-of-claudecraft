@@ -278,6 +278,7 @@ describe('profession identity card painter contract', () => {
             craftable: false,
             commissionEligible: false,
             durationSec: 1.75,
+            craftFeeCopper: 0,
             comboRequirement: {
               craftA: 'armorcrafting',
               craftB: 'weaponcrafting',
@@ -364,6 +365,7 @@ describe('profession identity card painter contract', () => {
             craftable: false,
             commissionEligible: false,
             durationSec: 1.75,
+            craftFeeCopper: 0,
           },
         ],
       },
@@ -421,6 +423,7 @@ describe('profession identity card painter contract', () => {
             craftable: true,
             commissionEligible: false,
             durationSec: 1.75,
+            craftFeeCopper: 0,
           },
           {
             recipeId: 'known_armor',
@@ -434,6 +437,7 @@ describe('profession identity card painter contract', () => {
             craftable: true,
             commissionEligible: false,
             durationSec: 1.75,
+            craftFeeCopper: 0,
           },
         ],
       },
@@ -712,6 +716,7 @@ describe('crafting window pins', () => {
         craftable: false,
         commissionEligible: false,
         durationSec: 1.75,
+        craftFeeCopper: 0,
         comboRequirement: {
           craftA: 'armorcrafting',
           craftB: 'weaponcrafting',
@@ -768,6 +773,7 @@ describe('crafting window pins', () => {
             craftable: true,
             commissionEligible: false,
             durationSec: 1.75,
+            craftFeeCopper: 0,
           },
         ],
       },
@@ -821,6 +827,7 @@ describe('crafting window pins', () => {
               craftable: true,
               commissionEligible: false,
               durationSec: 1.75,
+              craftFeeCopper: 0,
             },
           ],
         },
@@ -925,6 +932,7 @@ describe('crafting window pins', () => {
             craftable: true,
             commissionEligible: false,
             durationSec: 1.75,
+            craftFeeCopper: 0,
           },
         ],
       },
@@ -955,6 +963,7 @@ describe('crafting window pins', () => {
             craftable: false,
             commissionEligible: false,
             durationSec: 1.75,
+            craftFeeCopper: 0,
           },
         ],
       },
@@ -1055,5 +1064,36 @@ describe('craftResult deny toast names the station (source pins)', () => {
     // Spelling-tolerant negative: either quote style, and whitespace after
     // t(, so a reintroduction cannot slip past on formatting alone.
     expect(hud).not.toMatch(/t\(\s*['"]hudChrome\.crafting\.stationRequired['"]/);
+  });
+
+  // RE-POINTED AT THE SEAM (the Phase 11k QA release sync). The release
+  // extracted the same table as src/ui/crafting_deny_core.ts and pinned its
+  // TERNARY CHAIN by source text; the merge collapsed the twin cores to one
+  // authority (the exhaustive Record in craft_denial_line_view.ts, which
+  // crafting_deny_core now delegates to), so the chain those pins named no
+  // longer exists. The behaviour they protected keeps its pins: the station
+  // resolution below, the exhaustive table in tests/craft_denial_line_view.test.ts,
+  // and the release's own behavioural suite tests/crafting_deny_core.test.ts,
+  // which still drives craftDenyMessage end to end through the delegate.
+  const denyCore = codeOnly(
+    readFileSync(path.resolve(process.cwd(), 'src/ui/crafting_deny_core.ts'), 'utf8'),
+  );
+  const denyTable = codeOnly(
+    readFileSync(path.resolve(process.cwd(), 'src/ui/craft_denial_line_view.ts'), 'utf8'),
+  );
+
+  it('the release core resolves the station from recipe content and delegates the key', () => {
+    // No station field rides the event: the type comes from static recipe
+    // content, identical in both worlds.
+    expect(denyCore).toMatch(/craftDenialLine\(reason, recipeById\(recipeId\)\?\.stationType\)/);
+  });
+
+  it('no_bag_space keeps its own toast, insufficient_materials stays the fall-through', () => {
+    // The pairing the release pinned on its ternary tail, held on the Record
+    // that replaced it: a key swap between these two rows reds here.
+    expect(denyTable).toMatch(/no_bag_space: 'hudChrome\.crafting\.noBagSpace',/);
+    expect(denyTable).toMatch(
+      /insufficient_materials: 'hudChrome\.crafting\.insufficientMaterials',/,
+    );
   });
 });

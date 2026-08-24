@@ -260,6 +260,8 @@ export const CLASSES: Record<PlayerClass, ClassDef> = {
       'instant_poison',
       'adrenaline_rush',
       'deadly_poison',
+      'melting_acid',
+      'nightshade_coating',
       'blind',
       'stealth',
       'kick',
@@ -3258,9 +3260,14 @@ export const ABILITIES: Record<string, AbilityDef> = {
     requiresTarget: true,
     requiresStealth: true,
     requiresOutOfCombat: true,
+    // The classic setup tool: it neither reveals the rogue (preservesStealth in
+    // effect_dispatch) nor starts a fight, so the victim wakes where it stood.
+    // Its PvP diminishing returns ride the 'incapacitate' category, the same
+    // full/half/quarter/immune ladder Gripping Roots uses (src/sim/incapacitate_dr.ts).
+    noCombatEntry: true,
     effects: [{ type: 'incapacitate', duration: 8 }],
     description:
-      'Incapacitates the target for 8 sec. Must be stealthed and out of combat. Any damage breaks the effect.',
+      'Incapacitates the target for 8 sec without breaking Duskveil or starting a fight. Must be stealthed and out of combat. Any damage breaks the effect.',
   },
   crippling_poison: {
     id: 'crippling_poison',
@@ -3362,6 +3369,53 @@ export const ABILITIES: Record<string, AbilityDef> = {
     effects: [{ type: 'imbue', bonus: 14, duration: 1800 }],
     description:
       'Coats your weapon for 30 min, causing each of your melee swings to deal 14 additional Nature damage.',
+  },
+  // The two utility poisons. Both are STRIKE poisons in the Leaden Venom
+  // (crippling_poison) mould rather than weapon coats: same class, cost, school,
+  // melee range, and the same small 3 to 5 Nature hit that carries the strike
+  // into combat and gives the debuff something to ride in on. Only the rider
+  // differs, so no new balance number is invented beyond the two the design
+  // asked for (5% armor, 25% healing taken, 12 sec each, matching Leaden
+  // Venom's 12 sec snare).
+  melting_acid: {
+    id: 'melting_acid',
+    name: 'Melting Acid',
+    class: 'rogue',
+    learnLevel: 16,
+    cost: 40,
+    castTime: 0,
+    cooldown: 0,
+    range: 0,
+    school: 'nature',
+    requiresTarget: true,
+    effects: [
+      { type: 'directDamage', min: 3, max: 5 },
+      { type: 'buffTarget', kind: 'melting_acid', value: 0.05, duration: 12 },
+    ],
+    description:
+      'Splashes the target with a caustic poison, dealing $d Nature damage and reducing its armor by 5% for 12 sec.',
+  },
+  nightshade_coating: {
+    id: 'nightshade_coating',
+    name: 'Nightshade Coating',
+    class: 'rogue',
+    learnLevel: 18,
+    cost: 40,
+    castTime: 0,
+    cooldown: 0,
+    range: 0,
+    school: 'nature',
+    requiresTarget: true,
+    effects: [
+      { type: 'directDamage', min: 3, max: 5 },
+      // Reuses the existing healing-taken debuff kind (combat/heal.ts folds
+      // every mortal_wound aura in). Its aura id is the ability id (the first
+      // buffTarget of a def), so it never evicts a warrior's Maiming Strike
+      // debuff or vice versa.
+      { type: 'buffTarget', kind: 'mortal_wound', value: 0.25, duration: 12 },
+    ],
+    description:
+      'Coats the target in nightshade, dealing $d Nature damage and reducing the healing it receives by 25% for 12 sec.',
   },
   blind: {
     id: 'blind',
@@ -4059,7 +4113,8 @@ export const ABILITIES: Record<string, AbilityDef> = {
     requiresTarget: false,
     exclusiveGroup: 'aspect',
     effects: [{ type: 'selfBuff', kind: 'buff_speed', value: 1.3, duration: 1800 }],
-    description: "Adopt Courser's Guise, increasing your movement speed by 30% for 30 min.",
+    description:
+      "Adopt Courser's Guise, increasing your movement speed by 30% for 30 min. While active, taking damage dazes you, halving your movement speed for 4 sec (each hit refreshes the daze).",
   },
   pack_rally: {
     id: 'pack_rally',

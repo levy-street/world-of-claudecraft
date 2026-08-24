@@ -46,7 +46,11 @@ const SECOND_PASS_RECORD =
 // items are ITEM_ART_PENDING debt, outside the art-subject universe the
 // record seals, so the record bytes did not move.
 const SECOND_PASS_RECORD_SHA256 =
-  '2d8ece746cf703da9dd8f16679209a7aeb337e9b18c0f9f8a7de73a7bb17c16b';
+  // RE-MINTED at the Phase 11k QA release sync: each parent moved exactly one
+  // number in the sealed record (ours the hotbar census 72 to 75 for the three
+  // role foods, the release the ability census 410 to 412), the record
+  // auto-merged carrying BOTH, and this seal is the merged file's own bytes.
+  'd103d73d7cb6f38fa3e8935c6ceab5247e5cb0c472b40da97e4c7d6cf62460f6';
 const EVIDENCE = {
   'icon-art-before-after-desktop.png': {
     sha256: '61d19fb321f2b30eb3749e0966f26efea0fa4df53edae4b253cfd70edb82cd7a',
@@ -336,10 +340,11 @@ describe('release v0.39 icon-art second-pass lineage', () => {
         retriedAssets: ['dismiss_pet'],
       },
       runtimeClosure: {
-        abilities: { live: 410, painted: 410 },
-        // 75 on the masterwrought branch: the three phase 10 role foods
-        // joined the census (see the record-sha comment above). The art-
-        // subject universe, live minus ITEM_ART_PENDING.
+        // 412 from the release side (its own two new abilities), 75 on this
+        // branch: the three phase 10 role foods joined the census (see the
+        // record-sha comment above). The art-subject universe, live minus
+        // ITEM_ART_PENDING.
+        abilities: { live: 412, painted: 412 },
         hotbarItems: { live: 75, painted: 75 },
         fixedActions: { painted: 11 },
         mobAuraRouting: { paintedFamilies: 44, exactRuntimeIds: 89 },
@@ -433,7 +438,7 @@ describe('release v0.39 icon-art second-pass lineage', () => {
     expect(new Set(liveAbilityIds).size, 'live ability ids remain unique').toBe(
       liveAbilityIds.length,
     );
-    expect(liveAbilityIds, 'live production ability inventory').toHaveLength(410);
+    expect(liveAbilityIds, 'live production ability inventory').toHaveLength(412);
     expect(
       liveAbilityIds.filter((id) => !paintedAbilityIds.has(id)),
       'every live ability resolves through production to committed painted art',

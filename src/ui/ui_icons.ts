@@ -86,7 +86,8 @@ export type UiIconName =
   | 'promote'
   | 'demote'
   | 'out-of-range'
-  | 'wiki';
+  | 'wiki'
+  | 'alert';
 
 // Inner SVG markup per icon (one or more <path>). Default fill rule is nonzero
 // (correct for game-icons.net art incl. overlaps); the two hand-authored cut-out
@@ -239,6 +240,11 @@ const ICONS: Record<UiIconName, string> = {
   // micro-button size and stays tellable apart from the emote speech bubble
   // (a filled balloon) and the deeds book (a solid tome)
   wiki: '<path d="M168 180c0-72 176-80 176 6 0 62-88 64-88 132" stroke="currentColor" stroke-width="46" fill="none" stroke-linecap="round"/><circle cx="256" cy="412" r="36"/>',
+  // The state glyph beside an error line (DESIGN.md 12: errors are icon plus
+  // text): an outlined triangle with a bang, currentColor like every other
+  // chrome glyph so it tints with the error text token.
+  alert:
+    '<path d="M256 62 L472 438 H40 Z" fill="none" stroke="currentColor" stroke-width="40" stroke-linejoin="round"/><path d="M256 186v118" stroke="currentColor" stroke-width="44" stroke-linecap="round"/><circle cx="256" cy="374" r="28"/>',
   // World of ClaudeCraft maker's mark: the exact project-owned calligraphic
   // stroke used beside a crafted copy's provenance line. Unlike the filled
   // chrome glyphs above, this mark is intentionally an open currentColor line.

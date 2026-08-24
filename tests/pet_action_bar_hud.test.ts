@@ -299,6 +299,47 @@ describe('Hud Warlock pet signature bar', () => {
     expect(replacement?.dataset.suppressFocusTooltip).toBe('true');
   });
 
+  it('keeps commanding surviving Necromancy summons after Graveguard dies (issue: pet bar vanishes)', () => {
+    const hud = makeHud('emberkin', true, {}, 'warlock');
+    // Graveguard has died and unraveled off the roster (pet/mob/locomotion.ts
+    // despawnPet after its corpse timer), so the primary-pet resolver now
+    // returns null, exactly as findOwnPet would. A Skeletal Warrior the same
+    // cast raised is still alive and fighting.
+    hud.sim.entities.set(3, {
+      id: 3,
+      kind: 'mob',
+      ownerId: 1,
+      templateId: 'necromancy_skeletal_warrior',
+      dead: false,
+      auras: [],
+      hp: 40,
+      maxHp: 40,
+      petMode: 'aggressive',
+    });
+
+    hud.renderPetBar(null);
+
+    const bar = document.getElementById('petbar');
+    expect(bar?.style.display).not.toBe('none');
+    const attack = document.querySelector<HTMLButtonElement>('[data-focus-key="pet_attack"]');
+    expect(attack).not.toBeNull();
+    attack?.click();
+    expect(hud.sim.petAttack).toHaveBeenCalledTimes(1);
+
+    const stanceMenu = document.querySelector<HTMLButtonElement>('[data-focus-key="stance-menu"]');
+    expect(stanceMenu).not.toBeNull();
+    expect(document.querySelector<HTMLButtonElement>('[data-focus-key="pet_mend"]')).toBeNull();
+  });
+
+  it('still hides the pet bar once every demon is gone', () => {
+    const hud = makeHud('emberkin', true, {}, 'warlock');
+    hud.sim.entities.delete(2);
+
+    hud.renderPetBar(null);
+
+    expect(document.getElementById('petbar')?.style.display).toBe('none');
+  });
+
   it('keeps a non-colour autocast cue in forced-colors mode', () => {
     const css = readFileSync(resolve(process.cwd(), 'src/styles/hud.css'), 'utf8');
     const forcedColors = css.slice(

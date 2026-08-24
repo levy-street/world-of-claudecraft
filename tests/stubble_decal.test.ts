@@ -465,7 +465,16 @@ describe('decal geometry on the shipped head', () => {
         const [th, a] = headAngles(frame, pos.getX(i), pos.getY(i), pos.getZ(i));
         theta += th / 3;
         az += a / 3;
-        ny += nrm.getY(i) / 3;
+        // Subdivision midpoints carry an unrenormalized AVERAGE of their two
+        // parent normals (see the `midpoint` closure in buildDecalGeometry),
+        // so it is shorter than unit length; the production exclusion filter
+        // renormalizes each vertex normal before averaging its y component
+        // (same as here), and comparing raw components instead can flip the
+        // isNoseUnderside verdict right at the boundary.
+        const nx = nrm.getX(i);
+        const nyv = nrm.getY(i);
+        const nz = nrm.getZ(i);
+        ny += nyv / (Math.hypot(nx, nyv, nz) || 1) / 3;
       }
       if (isNoseUnderside(theta, az, ny)) bad++;
     }

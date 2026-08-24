@@ -120,6 +120,31 @@ export interface BotTrackingContext {
   readonly [botTrackingBrand]: true;
 }
 
+// One automated-detection observation for an account, in the words the
+// detector itself uses (the evidence summary). The host owns the storage
+// policy: source, kind, severity, dedupe, and field limits never cross the seam.
+export interface SuspicionFlagObservation {
+  accountId: number;
+  details: string;
+}
+
+// What the host lends a detector that files automated cases. Both calls are
+// fire-and-forget from the detector's tick: they never throw, and the promise
+// they return never rejects. It resolves once the host has settled the write:
+// true when the observation was accepted (persisted, or coalesced into a
+// pending write), false only when the host could not persist it and the
+// detector should retry later, the way it retries a failed report.
+//   recordSuspicionFlag: a decision (the initial one, or an escalation worth a
+//     fresh look): mints the account's active flag or bumps its occurrences.
+//   refreshSuspicionFlagDetails: the evidence behind an already-recorded case
+//     evolved: replaces the active flag's details, occurrences unchanged; no
+//     active flag (an admin cleared it) means nothing is written. The host
+//     paces these per account, so a detector may call as often as it likes.
+export interface BotDetectorHost {
+  recordSuspicionFlag(observation: SuspicionFlagObservation): Promise<boolean>;
+  refreshSuspicionFlagDetails(observation: SuspicionFlagObservation): Promise<boolean>;
+}
+
 export interface BotDetector {
   createTrackingContext(ref: PlayerSessionRef, meta?: unknown): BotTrackingContext;
   // Contexts start connected; linkdead drop marks false, same-session resume marks true with fresh meta.
@@ -150,4 +175,10 @@ export interface BotDetector {
   // caller rejects on any error (re-applying its previous document) while boot applies
   // what it can and logs the rest.
   applyConfig(overrides: Record<string, unknown>): ConfigApplyResult;
+  // Optional on purpose so either side of the seam can move first: a host that
+  // offers it to a detector without it skips the call, and a detector that has
+  // it keeps filing automated cases its old way until a host attaches. The
+  // bundled implementation is whatever sits beside the server at build time,
+  // so the two never have to be updated in the same step.
+  attachHost?(host: BotDetectorHost): void;
 }

@@ -933,10 +933,32 @@ const ACCEPTED_POLISH_V2_METADATA_PATH = path.join(REPO_ROOT, POLISH_SEAL_PATH);
 // long-session resource lifecycle) and again for that branch's loading review
 // fixes. Minted from the merged WORKING TREE with the repo's own tool and
 // committed with exactly the bytes it read. No capture was retaken.
+// RE-MINTED AT THE PHASE 11k QA RELEASE SYNC (the FOURTEENTH sync,
+// release/v0.40.0 b39b16022e to efb1220e85). BOTH parents re-minted this seal
+// since their common base again, so the merged tree mints a value matching
+// NEITHER parent and taking either side's literal would pin a tree that never
+// existed. Parent values for the record: ours 6c733d41, the release 4ad25d5f.
+// Minted from the merged WORKING TREE with the repo's own tool
+// (scripts/assets/eastbrook_grand_armoury/remint_polish_provenance.mjs), never
+// hand-edited, and committed with exactly the bytes it read. No capture was
+// retaken: the merged renderer delta is this branch's farm-visual wiring plus
+// the release's own renderer work (the far-mesh swap holdout, the stale
+// remote-entity repair, the loading-review admission gates), none of which
+// moves the sealed pixels.
+//
+// UPSTREAM'S OWN RE-MINT HISTORY over this span, kept rather than dropped:
+// the shader-memory-probes instrumentation and VFX teardown extraction, the
+// fast-loading-screen-variety merge, its review-fix round (the nearby-view
+// floor in prewarm_policy.ts, the weapon-skin early-out in renderer.ts), the
+// release/v0.40.0 merge into the loading-hitch branch, the v0.40 batch
+// merge-forward, the loading review fixes (rebuild reveal gates, inactive
+// horizon fast path, display-pacing admission), the sliding-far-mob-freeze fix
+// and the stale remote-entity holdout repair. Every one of them retook no
+// capture and moved only the renderer/prewarm runtime leaves.
 const ACCEPTED_POLISH_V2_METADATA_SHA256 =
-  '07ad4712a9d78b7f44e9058049c58376604d04de9ca80fcf9de2da74a4c9a70c';
+  'd19d1129dd6468f05d808b0aa5bf01d40eb09b4a39d0be7b1d40732c88bf5ec5';
 const ACCEPTED_POLISH_V2_COMPOSITE_PROVENANCE =
-  '6c733d4138b79075328129c5badcf93d5f8c458e608cc4464724f9c76f22dbef';
+  '0e27f9adfaf2ef41b901c25bfc84fc5b5bcda81bb77a7c1badfba11f1e927ba7';
 const ACCEPTED_POLISH_V2_METADATA = readJsonFile<CaptureMetadata>(ACCEPTED_POLISH_V2_METADATA_PATH);
 const ACCEPTED_POLISH_V2_PROVENANCE = ACCEPTED_POLISH_V2_METADATA.polishProvenance;
 const ACCEPTED_POLISH_V2_TOWN_CONTRACT = ACCEPTED_POLISH_V2_METADATA.records[0]?.townContract;
@@ -2022,6 +2044,29 @@ describe('Eastbrook polish performance and contact evidence', () => {
     // edited renderer.ts, so the merged file is a third content and neither
     // parent's literal describes it. Same order, the composite first, then
     // this seal. No capture was retaken.
+
+    // RE-MINTED AT THE PHASE 11k QA RELEASE SYNC (the FOURTEENTH sync,
+    // release/v0.40.0 b39b16022e to efb1220e85). BOTH parents re-minted this seal
+    // since their common base again, so the merged tree mints a value matching
+    // NEITHER parent and taking either side's literal would pin a tree that never
+    // existed. Parent values for the record: ours 6c733d41, the release 4ad25d5f.
+    // Minted from the merged WORKING TREE with the repo's own tool
+    // (scripts/assets/eastbrook_grand_armoury/remint_polish_provenance.mjs), never
+    // hand-edited, and committed with exactly the bytes it read. No capture was
+    // retaken: the merged renderer delta is this branch's farm-visual wiring plus
+    // the release's own renderer work (the far-mesh swap holdout, the stale
+    // remote-entity repair, the loading-review admission gates), none of which
+    // moves the sealed pixels.
+//
+    // UPSTREAM'S OWN RE-MINT HISTORY over this span, kept rather than dropped:
+    // the shader-memory-probes instrumentation and VFX teardown extraction, the
+    // fast-loading-screen-variety merge, its review-fix round (the nearby-view
+    // floor in prewarm_policy.ts, the weapon-skin early-out in renderer.ts), the
+    // release/v0.40.0 merge into the loading-hitch branch, the v0.40 batch
+    // merge-forward, the loading review fixes (rebuild reveal gates, inactive
+    // horizon fast path, display-pacing admission), the sliding-far-mob-freeze fix
+    // and the stale remote-entity holdout repair. Every one of them retook no
+    // capture and moved only the renderer/prewarm runtime leaves.
     expect(
       fingerprint.digest('hex'),
       `the second-order performance digest moved; if every input moved legitimately, re-mint with: ${REMINT_COMMAND} (it recomputes this literal LAST, from the swept files)`,
@@ -2045,7 +2090,12 @@ describe('Eastbrook polish performance and contact evidence', () => {
       // moved on both sides of THAT merge) and again for its loading review
       // fixes. Same order, the composite first, then this seal. No capture was
       // retaken.
-    ).toBe('2519fee9b5602d3797a43c28bbc33274a6fa72f5b513daa32c70f3b618ca3c0c');
+      // Re-minted at the Phase 11k QA release sync (release tip efb1220e85):
+      // both parents edited renderer.ts again, so the merged tree is a third
+      // content once more. Parent values for the record: ours 2519fee9, the
+      // release 3e429f96. Same order, the composite first, then this seal.
+      // No capture was retaken.
+    ).toBe('addb319d29915e53e8d9c326a697b111f6007ea21ffafd7d41afec61025f0fc0');
   });
 
   it('binds every historical after record to its accepted source and asset provenance', () => {

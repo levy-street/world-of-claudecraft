@@ -10,25 +10,85 @@
 // and `pretest`). Reproducibility is checked by tests/i18n_admin_catalog.test.ts.
 
 export const pending: Record<string, readonly string[]> = {
-  "es": [],
-  "es_ES": [],
-  "fr_FR": [],
-  "fr_CA": [],
+  "es": [
+    "error.flagActiveExists",
+    "wealth.largeMovementsUnavailable"
+  ],
+  "es_ES": [
+    "error.flagActiveExists",
+    "wealth.largeMovementsUnavailable"
+  ],
+  "fr_FR": [
+    "error.flagActiveExists",
+    "wealth.largeMovementsUnavailable"
+  ],
+  "fr_CA": [
+    "error.flagActiveExists",
+    "wealth.largeMovementsUnavailable"
+  ],
   "en_CA": [],
-  "it_IT": [],
-  "de_DE": [],
-  "zh_CN": [],
-  "zh_TW": [],
-  "ko_KR": [],
-  "ja_JP": [],
-  "pt_BR": [],
-  "ru_RU": [],
-  "cs_CZ": [],
-  "nl_NL": [],
-  "pl_PL": [],
-  "id_ID": [],
-  "tr_TR": [],
-  "sv_SE": [],
-  "vi_VN": [],
-  "da_DK": []
+  "it_IT": [
+    "error.flagActiveExists",
+    "wealth.largeMovementsUnavailable"
+  ],
+  "de_DE": [
+    "error.flagActiveExists",
+    "wealth.largeMovementsUnavailable"
+  ],
+  "zh_CN": [
+    "error.flagActiveExists",
+    "wealth.largeMovementsUnavailable"
+  ],
+  "zh_TW": [
+    "error.flagActiveExists",
+    "wealth.largeMovementsUnavailable"
+  ],
+  "ko_KR": [
+    "error.flagActiveExists",
+    "wealth.largeMovementsUnavailable"
+  ],
+  "ja_JP": [
+    "error.flagActiveExists",
+    "wealth.largeMovementsUnavailable"
+  ],
+  "pt_BR": [
+    "error.flagActiveExists",
+    "wealth.largeMovementsUnavailable"
+  ],
+  "ru_RU": [
+    "error.flagActiveExists",
+    "wealth.largeMovementsUnavailable"
+  ],
+  "cs_CZ": [
+    "error.flagActiveExists",
+    "wealth.largeMovementsUnavailable"
+  ],
+  "nl_NL": [
+    "error.flagActiveExists",
+    "wealth.largeMovementsUnavailable"
+  ],
+  "pl_PL": [
+    "error.flagActiveExists",
+    "wealth.largeMovementsUnavailable"
+  ],
+  "id_ID": [
+    "error.flagActiveExists",
+    "wealth.largeMovementsUnavailable"
+  ],
+  "tr_TR": [
+    "error.flagActiveExists",
+    "wealth.largeMovementsUnavailable"
+  ],
+  "sv_SE": [
+    "error.flagActiveExists",
+    "wealth.largeMovementsUnavailable"
+  ],
+  "vi_VN": [
+    "error.flagActiveExists",
+    "wealth.largeMovementsUnavailable"
+  ],
+  "da_DK": [
+    "error.flagActiveExists",
+    "wealth.largeMovementsUnavailable"
+  ]
 };

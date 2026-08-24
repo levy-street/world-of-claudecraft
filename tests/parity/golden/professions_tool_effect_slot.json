@@ -1072,7 +1072,7 @@
       "tick": 157,
       "time": 7.85,
       "nextId": 972,
-      "state": "9eae46ee",
+      "state": "286a3945",
       "events": "7554e3a3",
       "rng": {
         "draws": 6,
@@ -1116,6 +1116,7 @@
             ],
             "visited": [
               "gather:mirefen_marsh:ore",
+              "poi:mirefen_marsh:the_sunken_bastion",
               "quality:rare"
             ]
           },
@@ -1275,7 +1276,7 @@
       "tick": 159,
       "time": 7.95,
       "nextId": 972,
-      "state": "12abfac3",
+      "state": "3b528c9a",
       "events": "741638a5",
       "rng": {
         "draws": 6,
@@ -1319,6 +1320,7 @@
             ],
             "visited": [
               "gather:mirefen_marsh:ore",
+              "poi:mirefen_marsh:the_sunken_bastion",
               "quality:rare"
             ]
           },

@@ -1,6 +1,7 @@
 import { MOBS } from './data';
 import { hasSharedLootRights as computeSharedLootRights, lootHasGoneFfa } from './loot/loot_ffa';
 import { isHarvestableCorpse } from './professions/gathering';
+import { corpseHasDecayed } from './respawn_policy';
 import type { SimContext } from './sim_context';
 import type { Entity } from './types';
 
@@ -10,13 +11,22 @@ export interface CorpseInteractionAvailability {
   canInteract: boolean;
 }
 
+export function corpseCanInteract(mob: Entity): boolean {
+  return (
+    mob.kind === 'mob' &&
+    mob.ownerId == null &&
+    mob.dead &&
+    !corpseHasDecayed(mob.dead, mob.corpseTimer)
+  );
+}
+
 export function corpseInteractionAvailability(
   ctx: SimContext,
   mob: Entity,
   entityId: number,
   honorFfa: boolean,
 ): CorpseInteractionAvailability {
-  if (mob.kind !== 'mob' || !mob.dead || !mob.lootable) {
+  if (!corpseCanInteract(mob)) {
     return { harvestable: false, hasLootRights: false, canInteract: false };
   }
 
@@ -31,6 +41,6 @@ export function corpseInteractionAvailability(
   );
   const personal = mob.loot?.items.some((s) => s.personalFor?.includes(entityId)) ?? false;
   const open = mob.loot?.items.some((s) => s.openToAll && s.count > 0) ?? false;
-  const hasLootRights = shared || personal || open;
+  const hasLootRights = mob.lootable && (shared || personal || open);
   return { harvestable, hasLootRights, canInteract: harvestable || hasLootRights };
 }

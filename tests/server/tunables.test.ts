@@ -480,6 +480,202 @@ describe('db pool timeouts hold their literal values and the query_timeout layer
     expect(getPoolClientErrorCount()).toBe(before + 1);
   });
 
+  it('the escrow listing allowance sits between the lock ceiling and the session default', async () => {
+    const { DB_STATEMENT_TIMEOUT_MS, DB_HEAVY_STATEMENT_TIMEOUT_MS } = await import(
+      '../../server/db'
+    );
+    const {
+      ESCROW_STATEMENT_TIMEOUT_MS,
+      ESCROW_LOCK_TIMEOUT_MS,
+      GUARD_IDLE_TX_TIMEOUT_MS,
+      SAVE_IDLE_TX_TIMEOUT_MS,
+    } = await import('../../server/woc_market_db');
+    const { ESCROW_QUEUE_WAIT_MS, ESCROW_QUEUE_WARN_MS, ESCROW_QUEUE_WARN_THROTTLE_MS } =
+      await import('../../server/woc_market_custody');
+    // 4000 since the directed-rail work: FIVE workload statements now share
+    // the occupancy relation (the cap count stopped skipping directed rows
+    // and the offer stamp joined), and five 5s allowances would price the
+    // pinned sum past one autosave period.
+    expect(ESCROW_STATEMENT_TIMEOUT_MS).toBe(4_000);
+    expect(ESCROW_LOCK_TIMEOUT_MS).toBe(2_000);
+    // Equal BY RULING (the idle bound and the lock wait tell one story).
+    expect(GUARD_IDLE_TX_TIMEOUT_MS).toBe(2_000);
+    expect(GUARD_IDLE_TX_TIMEOUT_MS).toBe(ESCROW_LOCK_TIMEOUT_MS);
+    // The save-bearing pair's wider idle bound: the character serialize runs
+    // between statements (idle to Postgres), so the 2s guard bound would
+    // false-fire on an ordinary stall and lose the grant for the pass. It
+    // must sit strictly above the guard bound and stay finite.
+    expect(SAVE_IDLE_TX_TIMEOUT_MS).toBe(10_000);
+    expect(SAVE_IDLE_TX_TIMEOUT_MS).toBeGreaterThan(GUARD_IDLE_TX_TIMEOUT_MS);
+    // The HTTP-side queue bounds: the wait deadline mirrors the pool's own
+    // 5s checkout deadline, and slow waits warn before they refuse.
+    expect(ESCROW_QUEUE_WAIT_MS).toBe(5_000);
+    expect(ESCROW_QUEUE_WARN_MS).toBe(2_000);
+    expect(ESCROW_QUEUE_WARN_THROTTLE_MS).toBe(30_000);
+    // The warn must be REACHABLE before the deadline refuses: a warn sitting at
+    // or above the wait would only ever fire on waits that already failed, so
+    // the slow-but-served band (the one an operator wants to see coming) would
+    // never log at all.
+    expect(ESCROW_QUEUE_WARN_MS).toBeLessThan(ESCROW_QUEUE_WAIT_MS);
+    // And the throttle covers at least one whole wait, which is what makes it
+    // one line per burst rather than one line per waiter: a throttle shorter
+    // than the deadline would let a single pile-up log repeatedly.
+    expect(ESCROW_QUEUE_WARN_THROTTLE_MS).toBeGreaterThanOrEqual(ESCROW_QUEUE_WAIT_MS);
+    // The escrow transaction heads a character's save FIFO (the H5 custody
+    // entry), so its allowance must sit under the ordinary session default
+    // and far under one autosave period; the 60s heavy allowance stays
+    // reserved for the logout-shaped saves whose loss is data loss. It must
+    // also sit ABOVE the 2s lock-wait ceiling so a contended row surfaces as
+    // the typed 55P03 refusal, never as a statement cancel.
+    expect(ESCROW_STATEMENT_TIMEOUT_MS).toBeLessThan(DB_STATEMENT_TIMEOUT_MS);
+    expect(ESCROW_STATEMENT_TIMEOUT_MS).toBeLessThan(DB_HEAVY_STATEMENT_TIMEOUT_MS);
+    expect(ESCROW_STATEMENT_TIMEOUT_MS).toBeGreaterThan(ESCROW_LOCK_TIMEOUT_MS);
+    // The escrow FIFO-occupancy relation, and it bounds exactly this much: the
+    // FIVE workload statements plus the lock wait plus the pool checkout, kept
+    // under one autosave period so a listing does not stall a saveAll worker
+    // across a whole wave. It is NOT the whole worst case: BEGIN and the SET
+    // LOCAL that installs the allowance run under the 15s session default, the
+    // two LATER SET LOCALs run under the 4s allowance but are protocol
+    // statements with no locks, IO, or planning (excluded from the sum on
+    // that ground), COMMIT's only hard bound is the 65s driver
+    // query_timeout backstop, and the PRE-JOB GUILD FLUSH (an ordinary
+    // saveCharacter the escrow path triggers first, on the SAME FIFO) rides
+    // the 60s heavy allowance, the dominant term of the whole tail (its own
+    // relation is pinned below), so a genuinely wedged sequence CAN exceed
+    // one autosave interval. What bounds the player-facing impact there is
+    // the queue wait deadline plus the depth cap, not this sum.
+    // AUTOSAVE_SECONDS is a game.ts MODULE-PRIVATE const, so a re-typed 30_000
+    // here would stay green after a re-tuned save cadence; scrape it (comments
+    // stripped first, the file's own idiom) and let the relation follow it.
+    const { DB_POOL_CONNECT_TIMEOUT_MS } = await import('../../server/db');
+    const autosaveMatch = codeOnly(read('server/game.ts')).match(
+      /^const AUTOSAVE_SECONDS = (\d+);$/m,
+    );
+    expect(autosaveMatch).not.toBeNull();
+    // A failed scrape yields NaN, and the relation below would then red with a
+    // comparison message that says nothing about the real cause, so the parse
+    // asserts for itself first.
+    const autosaveMs = Number(autosaveMatch?.[1]) * 1000;
+    expect(autosaveMs).toBeGreaterThan(0);
+    // FIVE workload statements since the directed-rail work: the accounts
+    // lock, the cap count (no longer skipped for directed rows), the fenced
+    // character save, the listing insert, and the offer-stamp CAS. The
+    // allowance dropped 5000 -> 4000 in the same change, because five 5s
+    // allowances would put this sum past one autosave period.
+    expect(
+      ESCROW_STATEMENT_TIMEOUT_MS * 5 + ESCROW_LOCK_TIMEOUT_MS + DB_POOL_CONNECT_TIMEOUT_MS,
+    ).toBeLessThan(autosaveMs);
+    // The honest occupancy tail (the escrow write-path rider). The pre-job
+    // guild flush is an ordinary saveCharacter on the SAME per-character
+    // FIFO, and its statements ride the 60s heavy allowance, so that ONE
+    // term exceeds the entire pinned workload sum above on its own: any
+    // occupancy story quoting the 27s sum without the flush term is
+    // dishonest, and this relation is what keeps the two numbers from
+    // quietly converging (a heavy-allowance cut below the workload sum
+    // would make the exclusion comment above overstate the tail). Threading
+    // a workload-scoped allowance through saveCharacter stays REJECTED as
+    // invasive (the 06 ruling, re-affirmed by the rider with the file
+    // open): the heavy allowance is correct for the logout-shaped saves
+    // whose loss is data loss, and the flush IS one of those saves.
+    const { DB_QUERY_TIMEOUT_MS } = await import('../../server/db');
+    expect(DB_HEAVY_STATEMENT_TIMEOUT_MS).toBeGreaterThan(
+      ESCROW_STATEMENT_TIMEOUT_MS * 5 + ESCROW_LOCK_TIMEOUT_MS + DB_POOL_CONNECT_TIMEOUT_MS,
+    );
+    // The started-request ceiling, DERIVED so the docblocks can state a
+    // number that cannot drift from the constants: once the escrow job has
+    // STARTED, the request rides pool checkout + BEGIN and the installing
+    // SET LOCAL under the session default + the five workload statements +
+    // the lock wait + the five inter-statement idle windows under the SAVE
+    // bound (the review round's term: the character serialize and every
+    // round-trip gap run between statements, each bounded only by the
+    // idle-in-transaction kill) + COMMIT under the driver backstop. The
+    // wait deadline bounds only the un-started stage. The ceiling must stay
+    // under the HTTP layer's 300s so a wedged escrow surfaces as a typed or
+    // coded answer, never as a socket the client gave up on first.
+    const startedCeilingMs =
+      DB_POOL_CONNECT_TIMEOUT_MS +
+      DB_STATEMENT_TIMEOUT_MS +
+      ESCROW_STATEMENT_TIMEOUT_MS * 5 +
+      SAVE_IDLE_TX_TIMEOUT_MS * 5 +
+      ESCROW_LOCK_TIMEOUT_MS +
+      DB_QUERY_TIMEOUT_MS;
+    expect(startedCeilingMs).toBe(157_000);
+    expect(startedCeilingMs).toBeLessThan(300_000);
+    // The docblocks that QUOTE the ceiling scrape-pin against the derived
+    // figure, so re-tuning a constant cannot leave prose lying (the audit
+    // round's drift note).
+    const ceilingLabel = `${startedCeilingMs / 1000}s`;
+    expect(read('server/woc_market_custody.ts')).toContain(ceilingLabel);
+    expect(read('server/woc_market_db.ts')).toContain(ceilingLabel);
+    // The realm-global escrow gate's sizing (the write-path rider). Equal to
+    // the autosave wave's SAVE_CONCURRENCY by decision: the realm already
+    // prices in that many concurrent character-save writes, so the gate adds
+    // at most the same load again. SAVE_CONCURRENCY is game.ts
+    // module-private, so scrape it like AUTOSAVE_SECONDS above; a re-tune of
+    // either side reds this pin and forces the sizing to be re-decided
+    // rather than silently diverging. Both saturated must still leave the
+    // pool headroom for the guard transactions and the sweep's locked
+    // segments (two clients at the default sizing).
+    const { WOC_ESCROW_GATE_MAX_IN_FLIGHT } = await import('../../server/woc_market_escrow_gate');
+    const { parseDbPoolMaxClients } = await import('../../server/db');
+    // The SHARED block-aware stripper for the scrapes, not the file's local
+    // line-only codeOnly: a block-commented decoy declaration would otherwise
+    // feed the relation a wrong number (the stripper contract lives in
+    // tests/helpers/strip_comments.ts).
+    const { stripComments } = await import('../helpers/strip_comments');
+    const saveConcurrencyMatch = stripComments(read('server/game.ts')).match(
+      /^const SAVE_CONCURRENCY = (\d+);$/m,
+    );
+    expect(saveConcurrencyMatch).not.toBeNull();
+    const saveConcurrency = Number(saveConcurrencyMatch?.[1]);
+    expect(saveConcurrency).toBeGreaterThan(0);
+    expect(WOC_ESCROW_GATE_MAX_IN_FLIGHT).toBe(4);
+    expect(WOC_ESCROW_GATE_MAX_IN_FLIGHT).toBe(saveConcurrency);
+    const poolDefault = parseDbPoolMaxClients(undefined);
+    expect(WOC_ESCROW_GATE_MAX_IN_FLIGHT).toBeLessThan(poolDefault);
+    expect(WOC_ESCROW_GATE_MAX_IN_FLIGHT + saveConcurrency).toBeLessThanOrEqual(poolDefault - 2);
+    // The gate's leak-reclaim ceiling sits above a legitimate sequence, and
+    // the hold spans MORE than the sequence: the slot is taken before the
+    // guild flush and before the FIFO enqueue (woc_market_custody.ts
+    // runSerialized), so it also covers whatever that character already had
+    // queued, and the 5s waiter deadline does not end it (a cancelled job
+    // still settles only when the FIFO reaches it). So the comparand is the
+    // honest started ceiling plus the pre-job guild flush's heavy allowance
+    // plus a HEAD-OF-LINE term, and the pin states how many queued heavy
+    // saves the ceiling actually buys: exactly one. A second one exceeds it,
+    // which is the recorded degradation at the constant (a reclaim that can
+    // also fire on a still-legitimate hold, costing one over-admitted slot
+    // and a misleading line, never correctness). Re-tuning any term moves
+    // this arithmetic, which is the point: the slack is decided, not assumed.
+    const { WOC_ESCROW_GATE_HOLD_CEILING_MS } = await import('../../server/woc_market_escrow_gate');
+    expect(WOC_ESCROW_GATE_HOLD_CEILING_MS).toBe(300_000);
+    const holdFloor = startedCeilingMs + DB_HEAVY_STATEMENT_TIMEOUT_MS;
+    expect(WOC_ESCROW_GATE_HOLD_CEILING_MS).toBeGreaterThan(holdFloor);
+    // One queued heavy save fits.
+    expect(WOC_ESCROW_GATE_HOLD_CEILING_MS).toBeGreaterThan(
+      holdFloor + DB_HEAVY_STATEMENT_TIMEOUT_MS,
+    );
+    // Two do NOT: the ceiling's honest limit, asserted so the docblock's
+    // stated degradation cannot quietly become false in either direction.
+    expect(WOC_ESCROW_GATE_HOLD_CEILING_MS).toBeLessThan(
+      holdFloor + DB_HEAVY_STATEMENT_TIMEOUT_MS * 2,
+    );
+    // The park-ledger cap (the rider's growth bound) sits many multiples
+    // above the sweep batch: each pass can park at most one batch per arm,
+    // so the cap only bites a mass-park event while steady state never
+    // grazes it. SWEEP_BATCH moved to woc_market_budgets.ts (the ratchet's
+    // sibling split) and is exported there, so import it instead of the old
+    // module-private source scrape.
+    const { WOC_LOCAL_PARK_MAX_ENTRIES } = await import('../../server/woc_market_local_ledgers');
+    const { SWEEP_BATCH: sweepBatch } = await import('../../server/woc_market_budgets');
+    expect(sweepBatch).toBeGreaterThan(0);
+    expect(WOC_LOCAL_PARK_MAX_ENTRIES).toBeGreaterThanOrEqual(sweepBatch * 8);
+    // And it stays SQL-sane: the cap bounds the batch reads' exclusion
+    // array, which must never grow toward the territory where a linear
+    // `<> ALL($n)` scan starts pricing the read.
+    expect(WOC_LOCAL_PARK_MAX_ENTRIES).toBeLessThanOrEqual(4_096);
+  });
+
   it('runWithStatementTimeout rejects a non-integer or negative timeout before touching the pool', async () => {
     // SET LOCAL cannot bind a parameter, so the timeout is interpolated into the
     // statement text as an integer; the safe-integer validation is therefore the

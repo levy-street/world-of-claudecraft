@@ -21,6 +21,8 @@
 // mobSwing, spawnDelveModule), never reaching into not-yet-extracted internals
 // in a way the sim itself does not already expose.
 
+import { supportHeightAt } from '../../src/sim/colliders';
+import { CORPSE_DURATION } from '../../src/sim/combat/damage';
 import {
   arenaOrigin,
   DELVES,
@@ -31,11 +33,13 @@ import {
   QUESTS,
   STATIONS,
 } from '../../src/sim/data';
+import { EASTBROOK_LAYOUT } from '../../src/sim/eastbrook_layout';
 import { createMob } from '../../src/sim/entity';
 import type { DelayedEvent } from '../../src/sim/entity_roster';
 import { solveLockActions } from '../../src/sim/lockpick';
 import type { PendingLootRoll } from '../../src/sim/loot/loot_roll';
 import { RIFT_MECHANIC_SPACING_SEC } from '../../src/sim/mob/mechanic_spacing';
+import { PLAYER_BODY_RADIUS } from '../../src/sim/pathfind';
 import type { PlotState } from '../../src/sim/professions/farm_projection';
 import {
   convertHusks,
@@ -68,7 +72,8 @@ import {
   type SimEvent,
   xpForLevel,
 } from '../../src/sim/types';
-import { terrainHeight } from '../../src/sim/world';
+import { groundHeight, terrainHeight } from '../../src/sim/world';
+import { WORLD_SEED } from '../../src/sim/world_seed';
 import { runCraft } from '../helpers/enchant_family_cast';
 import { OPEN_FIELD } from '../helpers/open_field';
 import type { Recorder, Scenario } from './record';
@@ -76,6 +81,7 @@ import type { Recorder, Scenario } from './record';
 // ----- shared helpers ---------------------------------------------------------
 
 type AnyEntity = Entity & { nythraxis?: NythraxisEncounterState };
+const FRESH_CORPSE_TIMER = 60;
 
 interface SimPrivateHarness {
   completeTame(player: Entity, target: Entity): void;
@@ -1519,6 +1525,7 @@ function partyLoot(): Scenario {
         z: 22,
       }) as AnyEntity;
       mob.dead = true;
+      mob.corpseTimer = FRESH_CORPSE_TIMER;
       mob.lootable = true;
       mob.tappedById = a;
       mob.loot = { copper: 0, items: [{ itemId: 'greyjaw_hide_boots', count: 1 }] };
@@ -1578,6 +1585,7 @@ function l1LootDistribution(): Scenario {
         z: 22,
       }) as AnyEntity;
       mob.dead = true;
+      mob.corpseTimer = FRESH_CORPSE_TIMER;
       mob.lootable = true;
       mob.tappedById = a;
       mob.lootRecipientIds = [a, b, c];
@@ -1711,6 +1719,7 @@ function masterLoot(): Scenario {
         z: 22,
       }) as AnyEntity;
       mob.dead = true;
+      mob.corpseTimer = FRESH_CORPSE_TIMER;
       mob.lootable = true;
       mob.tappedById = a;
       mob.lootRecipientIds = [a, b, c, d];
@@ -6496,10 +6505,130 @@ function riftClearRewards(baseLevel = 25, seed = 4332): Scenario {
         if (e) {
           e.hp = 0;
           e.dead = true;
+          // The corpse window a REAL death stamps (combat/damage.ts). The
+          // fixture kill has to stamp it too since the 2026-08-24 release:
+          // updateMob now expires a DECAYED corpse's interactions
+          // (expireDecayedCorpseInteractions over respawn_policy's
+          // corpseHasDecayed), and a hand-killed body left at corpseTimer 0
+          // reads as already decayed, so the payout's own corpse would go
+          // unlootable inside the sweep window below.
+          e.corpseTimer = CORPSE_DURATION;
         }
       }
       rec.tick(25); // covers the stamp tick plus one full sweep window
       rec.snapshot('clear-paid');
+    },
+  };
+}
+
+// The entity-aware open-world LOS policy must use real supported feet while
+// continuing to reject an airborne source whose lifted ray clears ordinary
+// cover. Both arms run in the shipping world seed so the positive arm uses the
+// exact Eastbrook stall and the negative arm stays on the same deterministic
+// collider set.
+function supportedElevationLineOfSight(): Scenario {
+  return {
+    name: 'supported_elevation_line_of_sight',
+    coverage: [
+      'Eastbrook standable canopy supplies grounded player eye elevation for a completed heal',
+      'Eastbrook standable canopy keeps a jumping target visible without granting jump height',
+      'airborne player elevation is rejected behind ordinary open-world cover',
+      'shared Sim cast entry point and completion LOS recheck',
+    ],
+    sampleEvery: 10,
+    build: () => new Sim({ seed: WORLD_SEED, playerClass: 'priest', noPlayer: true }),
+    drive(rec: Recorder) {
+      const sim = rec.sim;
+      const healerId = sim.addPlayer('priest', 'ElevatedHealer') as number;
+      const allyId = sim.addPlayer('warrior', 'SightAlly') as number;
+      const healer = requireEntity(sim, healerId, 'elevated healer');
+      const ally = requireEntity(sim, allyId, 'line-of-sight ally');
+      const stall = EASTBROOK_LAYOUT.market.stalls[0];
+      const terrainY = groundHeight(stall.position.x, stall.position.z, WORLD_SEED);
+      const canopyY = supportHeightAt(
+        WORLD_SEED,
+        stall.position.x,
+        stall.position.z,
+        PLAYER_BODY_RADIUS,
+        terrainY + stall.height,
+      );
+      const place = (
+        entity: AnyEntity,
+        pos: { x: number; y: number; z: number },
+        grounded: boolean,
+      ): void => {
+        entity.pos = { ...pos };
+        entity.prevPos = { ...pos };
+        entity.vx = 0;
+        entity.vy = 0;
+        entity.vz = 0;
+        entity.onGround = grounded;
+        entity.jumping = !grounded;
+        entity.fallStartY = pos.y;
+        sim.rebucket(entity);
+      };
+
+      place(healer, { x: stall.position.x, y: canopyY, z: stall.position.z }, true);
+      place(
+        ally,
+        {
+          x: stall.position.x,
+          y: groundHeight(stall.position.x, stall.position.z + 8, WORLD_SEED),
+          z: stall.position.z + 8,
+        },
+        true,
+      );
+      ally.hp = 1;
+      healer.resource = healer.maxResource;
+      healer.gcdRemaining = 0;
+      sim.castAbilityOn('lesser_heal', allyId, healerId);
+      rec.snapshot('supported-heal-start');
+      rec.tick(40);
+      rec.snapshot('supported-heal-complete');
+
+      place(
+        healer,
+        {
+          x: stall.position.x,
+          y: groundHeight(stall.position.x, stall.position.z + 8, WORLD_SEED),
+          z: stall.position.z + 8,
+        },
+        true,
+      );
+      place(ally, { x: stall.position.x, y: canopyY, z: stall.position.z }, true);
+      ally.hp = 1;
+      healer.resource = healer.maxResource;
+      healer.gcdRemaining = 0;
+      const allyMeta = sim.players.get(allyId);
+      if (!allyMeta) throw new Error('missing line-of-sight ally metadata');
+      allyMeta.moveInput.jump = true;
+      rec.tick();
+      allyMeta.moveInput.jump = false;
+      sim.castAbilityOn('lesser_heal', allyId, healerId);
+      rec.snapshot('canopy-jump-heal-start');
+      rec.tick(40);
+      rec.snapshot('canopy-jump-heal-complete');
+
+      const from = { x: -224, z: 200 };
+      const to = { x: -224, z: 224 };
+      place(
+        healer,
+        {
+          x: from.x,
+          y: groundHeight(from.x, from.z, WORLD_SEED) + 3,
+          z: from.z,
+        },
+        false,
+      );
+      place(ally, { x: to.x, y: groundHeight(to.x, to.z, WORLD_SEED), z: to.z }, true);
+      ally.hp = 1;
+      healer.resource = healer.maxResource;
+      healer.gcdRemaining = 0;
+      sim.castAbilityOn('lesser_heal', allyId, healerId);
+      rec.snapshot('airborne-cover-denied');
+
+      rec.notes.healerId = healerId;
+      rec.notes.allyId = allyId;
     },
   };
 }
@@ -6589,4 +6718,5 @@ export const SCENARIOS: Scenario[] = [
   // last, so it lands in the final shard automatically like every other
   // addition; SHARD_BOUNDS ends at SCENARIOS.length and needs no edit.
   nythraxisHeroicClaim(),
+  supportedElevationLineOfSight(),
 ];

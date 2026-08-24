@@ -583,6 +583,7 @@ function mobileCallbacks() {
     onMap: noop,
     onLeaderboard: noop,
     onDailyRewards: noop,
+    onWocMarket: noop,
     onMountToggle: noop,
     onDeeds: noop,
     onReliquary: noop,

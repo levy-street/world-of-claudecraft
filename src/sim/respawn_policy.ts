@@ -198,3 +198,18 @@ export function resolveRespawnSeconds(
   if (span) return base * (roll ? roll(span.minMult, span.maxMult) : span.minMult);
   return base * (template?.respawnMult ?? (template?.rare ? 4 : 1));
 }
+
+/**
+ * Has a dead mob's corpse fully decayed (its loot window elapsed) even though
+ * it has not yet respawned? Deliberately independent of the RESPAWN timer
+ * above: a self-scheduled rare/elite's respawnMult/respawnWindow can leave
+ * this true for minutes to hours before the mob is actually due back (Grix
+ * the Tunnelking's 15 to 30 minute window against his 60s corpseTimer).
+ * Consumers: server/game.ts wires it as the sparse `cd` flag, and
+ * entity_view_policy_core.ts reads it to drop the corpse's render/pick view
+ * rather than leaving an empty, unclickable body standing for the rest of the
+ * respawn wait.
+ */
+export function corpseHasDecayed(dead: boolean, corpseTimer: number | undefined): boolean {
+  return dead && corpseTimer !== undefined && corpseTimer <= 0;
+}

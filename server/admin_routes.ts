@@ -83,6 +83,33 @@ export const ADMIN_ROUTE_PERMISSIONS: readonly AdminRouteRule[] = [
 
   { method: 'GET', pattern: '/admin/api/accounts', permission: 'accounts.read' },
   { method: 'GET', pattern: /^\/admin\/api\/accounts\/(\d+)$/, permission: 'accounts.read' },
+  // Economy oversight (p2p market launch). Wealth reads ride accounts.read
+  // (the account list and detail already expose per-character copper to the
+  // same permission); the suspicion-flag workflow is moderation data, so its
+  // reads sit with the moderation queue and its writes with the other audited
+  // moderation actions.
+  { method: 'GET', pattern: '/admin/api/wealth/top', permission: 'accounts.read' },
+  {
+    method: 'GET',
+    pattern: /^\/admin\/api\/accounts\/(\d+)\/wealth$/,
+    permission: 'accounts.read',
+  },
+  {
+    method: 'GET',
+    pattern: /^\/admin\/api\/accounts\/(\d+)\/flags$/,
+    permission: 'moderation.read',
+  },
+  { method: 'GET', pattern: '/admin/api/flags', permission: 'moderation.read' },
+  {
+    method: 'POST',
+    pattern: /^\/admin\/api\/flags\/(\d+)\/status$/,
+    permission: 'moderation.act',
+  },
+  {
+    method: 'POST',
+    pattern: /^\/admin\/api\/flags\/(\d+)\/note$/,
+    permission: 'moderation.act',
+  },
   {
     method: 'GET',
     pattern: /^\/admin\/api\/accounts\/(\d+)\/daily-rewards-events$/,
@@ -99,6 +126,24 @@ export const ADMIN_ROUTE_PERMISSIONS: readonly AdminRouteRule[] = [
     permission: 'moderation.act',
   },
   { method: 'GET', pattern: '/admin/api/shared-ips', permission: 'moderation.read' },
+
+  // $WOC Exchange moderation (server/woc_market_routes.ts operator arms).
+  { method: 'GET', pattern: '/admin/api/woc-market/listings', permission: 'moderation.read' },
+  {
+    method: 'POST',
+    pattern: /^\/admin\/api\/woc-market\/listings\/(\d+)\/suspend$/,
+    permission: 'moderation.act',
+  },
+  {
+    method: 'POST',
+    pattern: /^\/admin\/api\/woc-market\/sales\/(\d+)\/excluded$/,
+    permission: 'moderation.act',
+  },
+  {
+    method: 'POST',
+    pattern: /^\/admin\/api\/woc-market\/accounts\/(\d+)\/clear-strikes$/,
+    permission: 'moderation.act',
+  },
   { method: 'GET', pattern: '/admin/api/ip-associations', permission: 'accounts.read' },
 
   { method: 'GET', pattern: '/admin/api/moderation/queue', permission: 'moderation.read' },

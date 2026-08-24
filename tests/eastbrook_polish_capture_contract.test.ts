@@ -362,8 +362,30 @@ interface AttributionTargetFixture {
 // was retaken: the merged renderer delta is upstream's entry-admission and
 // texture/compile extraction work plus this branch's farm-visual wiring,
 // neither of which moves the sealed pixels.
+// RE-MINTED AT THE PHASE 11k QA RELEASE SYNC (the FOURTEENTH sync,
+// release/v0.40.0 b39b16022e to efb1220e85). BOTH parents re-minted this seal
+// since their common base again, so the merged tree mints a value matching
+// NEITHER parent and taking either side's literal would pin a tree that never
+// existed. Parent values for the record: ours 6c733d41, the release 4ad25d5f.
+// Minted from the merged WORKING TREE with the repo's own tool
+// (scripts/assets/eastbrook_grand_armoury/remint_polish_provenance.mjs), never
+// hand-edited, and committed with exactly the bytes it read. No capture was
+// retaken: the merged renderer delta is this branch's farm-visual wiring plus
+// the release's own renderer work (the far-mesh swap holdout, the stale
+// remote-entity repair, the loading-review admission gates), none of which
+// moves the sealed pixels.
+//
+// UPSTREAM'S OWN RE-MINT HISTORY over this span, kept rather than dropped:
+// the shader-memory-probes instrumentation and VFX teardown extraction, the
+// fast-loading-screen-variety merge, its review-fix round (the nearby-view
+// floor in prewarm_policy.ts, the weapon-skin early-out in renderer.ts), the
+// release/v0.40.0 merge into the loading-hitch branch, the v0.40 batch
+// merge-forward, the loading review fixes (rebuild reveal gates, inactive
+// horizon fast path, display-pacing admission), the sliding-far-mob-freeze fix
+// and the stale remote-entity holdout repair. Every one of them retook no
+// capture and moved only the renderer/prewarm runtime leaves.
 const PINNED_POLISH_COMPOSITE_FINGERPRINT =
-  '6c733d4138b79075328129c5badcf93d5f8c458e608cc4464724f9c76f22dbef';
+  '0e27f9adfaf2ef41b901c25bfc84fc5b5bcda81bb77a7c1badfba11f1e927ba7';
 
 function validPolishAttributionTargets(): AttributionTargetFixture[] {
   return [

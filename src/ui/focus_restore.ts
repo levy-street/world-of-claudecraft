@@ -74,6 +74,13 @@
  */
 import { POINTER_FOCUS_PARK_SELECTOR } from './pointer_blur';
 
+/** The shared focus-key ATTRIBUTE, exported so an emit-only builder (a pure
+ *  chrome module that writes the markup but never reads focus back) can
+ *  spell the namespace from its one source instead of a stray literal; the
+ *  reads in this module stay on dataset.focusKey, the same attribute through
+ *  the DOM's own camelCase mapping. */
+export const FOCUS_KEY_ATTR = 'data-focus-key';
+
 export interface FocusRestoreCandidate {
   readonly disabled?: boolean;
   focus(): void;

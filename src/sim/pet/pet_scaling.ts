@@ -82,6 +82,31 @@ export const PET_OWNER_ARMOR_SHARE = 0.35;
 export const PET_OWNER_AP_SHARE = 0.22;
 
 /**
+ * The pet mirrors the owner's total melee haste (item-set bonuses, haste rating,
+ * and meleeHastePct talents) one-for-one rather than at a fraction, unlike the AP/HP/
+ * armor shares above.
+ *
+ * Unlike those three, this ratio does NOT have a classic-era formula, a checked-in
+ * reference, or a measured result behind it (the framework's usual bar, see the
+ * provenance note above): real classic-era hunter pets do not scale with the
+ * owner's haste stat at all, so there is nothing to port. The 1:1 value instead
+ * follows the ONE precedent this game already sets for hunter/pet haste (Pack
+ * Rally applies the identical `buff_haste` value to both the hunter and the pet)
+ * rather than inventing an unrelated fraction. That precedent is a temporary AURA,
+ * a different axis from a passive baseline stat, so treat 1:1 as the best current
+ * model, not a verified constant: revisit with the class owner if it needs a
+ * different ratio.
+ *
+ * What is NOT a judgment call: that the share should be nonzero. Before this, the
+ * pet's `meleeHaste` stayed at its `baseEntity` default of 0 for its whole life,
+ * so a hunter's attack-speed gear did nothing for the pet even though the hunter's
+ * own swings sped up, and even though Unleash Beast's own tooltip already promises
+ * pet attack speed responds to the hunter (a separate, already-correct mechanic:
+ * see `packlordPetHasteMultiplier` in hunter_packlord.ts).
+ */
+export const PET_OWNER_HASTE_SHARE = 1;
+
+/**
  * How much faster than its owner a heeling pet may run while catching up. The
  * pet has to close ground it already lost, so it needs headroom above the
  * owner's own speed rather than a fixed sprint.
@@ -96,6 +121,8 @@ export interface PetOwnerScaling {
   armor: number;
   /** The pet's attack power, inherited whole from the owner's ranged power. */
   attackPower: number;
+  /** The pet's melee haste, mirrored one-for-one from the owner's melee haste. */
+  meleeHaste: number;
 }
 
 /** The owner fields the inheritance reads. Keeps the math testable without an Entity. */
@@ -103,6 +130,7 @@ export interface PetScalingOwner {
   maxHp: number;
   armor: number;
   rangedPower: number;
+  meleeHaste: number;
 }
 
 /**
@@ -114,6 +142,7 @@ export function petOwnerScaling(owner: PetScalingOwner): PetOwnerScaling {
     hp: Math.max(0, Math.round(owner.maxHp * PET_OWNER_HP_SHARE)),
     armor: Math.max(0, Math.round(owner.armor * PET_OWNER_ARMOR_SHARE)),
     attackPower: Math.max(0, Math.round(owner.rangedPower * PET_OWNER_AP_SHARE)),
+    meleeHaste: Math.max(0, owner.meleeHaste * PET_OWNER_HASTE_SHARE),
   };
 }
 

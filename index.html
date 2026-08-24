@@ -526,6 +526,7 @@
     <div id="daily-rewards-window" class="window panel"></div>
     <div id="claudium-window" class="window panel"></div>
     <div id="market-window" class="window panel"></div>
+    <div id="woc-market-window" class="window panel"></div>
     <div id="mailbox-window" class="window panel"></div>
     <div id="bank-window" class="window panel"></div>
     <div id="deeds-window" class="window panel"></div>
@@ -561,6 +562,7 @@
         <button type="button" class="micro-btn" id="mm-valecup" data-i18n-title="hudChrome.keybinds.valecup" data-i18n-aria="hudChrome.keybinds.valecup" title="Vale Cup" aria-label="Vale Cup" data-icon="ball"><span class="keybind">y</span></button>
         <button type="button" class="micro-btn" id="mm-cardduel" data-i18n-title="cardDuel.title" data-i18n-aria="cardDuel.title" title="Card Duel" aria-label="Card Duel" data-icon="cards"></button>
         <button type="button" class="micro-btn" id="mm-leaderboard" data-i18n-title="game.leaderboard.title" data-i18n-aria="game.leaderboard.title" title="Leaderboard" aria-label="Leaderboard" data-icon="leaderboard"><span class="keybind">k</span></button>
+        <button type="button" class="micro-btn" id="mm-wocmarket" hidden data-i18n-title="hudChrome.wocMarket.launcherLabel" data-i18n-aria="hudChrome.wocMarket.launcherLabel" title="$WOC Exchange" aria-label="$WOC Exchange" data-icon="market"></button>
         <button type="button" class="micro-btn" id="mm-emote" data-i18n-aria="hudChrome.emoteWheel.label" aria-label="Emotes" data-icon="emote"><span class="keybind">x</span></button>
         <button type="button" class="micro-btn" id="mm-music" data-i18n-title="hud.options.music" data-i18n-aria="hud.options.music" title="Music" aria-label="Music" data-icon="music"></button>
         <button type="button" class="micro-btn" id="mm-social" data-i18n-title="hud.keybinds.actions.social" data-i18n-aria="hud.keybinds.actions.social" title="Friends &amp; Guild" aria-label="Friends &amp; Guild" data-icon="social"><span class="keybind">o</span></button>
@@ -730,6 +732,15 @@
 
         <div class="header-actions">
           <button type="button" class="homepage-music-btn" id="homepage-music-toggle" data-i18n-title="hud.options.music" data-i18n-aria="hud.options.music" title="Music" aria-label="Music" aria-pressed="true" data-icon="music"></button>
+          <button
+            type="button"
+            class="desktop-login-exit"
+            id="desktop-login-exit"
+            data-i18n="desktop.titlebar.exitGame"
+            data-i18n-title="desktop.titlebar.exitGame"
+            title="Exit Game"
+            hidden
+          >Exit Game</button>
           <a class="donate-cta" href="https://ko-fi.com/worldofclaudecraft" target="_blank" rel="noopener noreferrer" data-i18n-title="a11y.donateProject" data-i18n-aria="a11y.donateProject" title="Support the project" aria-label="Donate to support World of ClaudeCraft">
             <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
             <span data-i18n="nav.donate">Donate</span>
@@ -1384,6 +1395,23 @@
                 <button type="submit" class="btn btn-primary" data-i18n="hudChrome.account.savePassword">Update Password</button>
               </form>
 
+              <!-- Shown instead of Change Password for an Apple- or Discord-provisioned
+                   account (passwordSet:false): there is no current password to re-verify. -->
+              <form id="account-set-password-form" class="account-form" novalidate hidden>
+                <h4 class="account-form-title" data-i18n="hudChrome.account.setPasswordTitle">Set a Password</h4>
+                <p class="account-hint" data-i18n="hudChrome.account.setPasswordHint">This account was created with Sign in with Apple or Discord and has no password yet. Set one to sign in on other devices, such as the Mac and Windows desktop apps, or the web, and to link additional sign-in methods.</p>
+                <div class="auth-field">
+                  <label for="account-set-new-pass" class="auth-label" data-i18n="hudChrome.account.newPassword">New password</label>
+                  <input id="account-set-new-pass" type="password" maxlength="128" autocomplete="new-password" />
+                </div>
+                <div class="auth-field">
+                  <label for="account-set-confirm-pass" class="auth-label" data-i18n="hudChrome.account.confirmNewPassword">Confirm new password</label>
+                  <input id="account-set-confirm-pass" type="password" maxlength="128" autocomplete="new-password" />
+                </div>
+                <div id="account-set-password-msg" class="auth-field-msg" aria-live="polite"></div>
+                <button type="submit" class="btn btn-primary" data-i18n="hudChrome.account.setPasswordSubmit">Set Password</button>
+              </form>
+
               <div class="account-form">
                 <div class="auth-field">
                   <label for="account-email" class="auth-label" data-i18n="hudChrome.account.emailLabel">Email (optional)</label>
@@ -1755,6 +1783,7 @@
           <button type="button" class="mobile-btn" id="mobile-map" data-i18n-title="hud.keybinds.actions.map" data-i18n-aria="hud.keybinds.actions.map" title="World Map" aria-label="World Map" data-icon="map"><span class="mobile-label" data-i18n="hud.core.mobileMap">Map</span></button>
           <button type="button" class="mobile-btn" id="mobile-leaderboard" data-i18n-title="game.leaderboard.title" data-i18n-aria="game.leaderboard.title" title="Leaderboard" aria-label="Leaderboard" data-icon="leaderboard"><span class="mobile-label" data-i18n="hudChrome.mobile.leaderboard">Ranks</span></button>
           <button type="button" class="mobile-btn" id="mobile-daily-rewards" data-i18n-title="hudChrome.wocStore.title" data-i18n-aria="hudChrome.wocStore.title" title="WOC Store" aria-label="WOC Store" data-icon="chest"><span class="mobile-label" data-i18n="hudChrome.mobile.dailyRewards">Store</span></button>
+          <button type="button" class="mobile-btn" id="mobile-wocmarket" hidden data-i18n-title="hudChrome.wocMarket.launcherLabel" data-i18n-aria="hudChrome.wocMarket.launcherLabel" title="$WOC Exchange" aria-label="$WOC Exchange" data-icon="market"><span class="mobile-label" data-i18n="hudChrome.mobile.wocMarket">Exchange</span></button>
           <button type="button" class="mobile-btn" id="mobile-deeds" data-i18n-title="hudChrome.deeds.title" data-i18n-aria="hudChrome.deeds.title" title="Book of Deeds" aria-label="Book of Deeds" data-icon="book"><span class="mobile-label" data-i18n="hudChrome.mobile.deeds">Deeds</span></button>
           <button type="button" class="mobile-btn" id="mobile-reliquary" data-i18n-title="hudChrome.reliquary.title" data-i18n-aria="hudChrome.reliquary.title" title="The Reliquary" aria-label="The Reliquary" data-icon="crown"><span class="mobile-label" data-i18n="hudChrome.mobile.reliquary">Reliquary</span></button>
           <button type="button" class="mobile-btn" id="mobile-mounts" data-i18n-title="hudChrome.keybinds.mount" data-i18n-aria="hudChrome.keybinds.mount" title="Mount / Dismount" aria-label="Mount / Dismount" data-icon="mount"><span class="mobile-label" data-i18n="hudChrome.mounts.mount">Mount</span></button>

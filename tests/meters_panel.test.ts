@@ -277,19 +277,47 @@ describe('meters panel', () => {
   it('says so when it has fallen back to damage, so bars never pose as hate', () => {
     const { meters, world, visibleRows } = setup();
     const entities = world.entities as Map<number, any>;
+    const wolfA = entities.get(51);
+    wolfA.threat.clear(); // never held any hate to begin with: nothing to freeze
     meters.onEvent(dmg(1, 51, 300, 'Aimed Shot'));
     meters.update();
     (document.querySelector('.mt-tab[data-tab="threat"]') as HTMLElement).click();
 
-    // nothing live is left: the only mob is dead and its table is gone
-    const wolfA = entities.get(51);
+    // nothing live is left: the only mob is dead and never carried a table
     wolfA.dead = true;
-    wolfA.threat.clear();
     meters.render(true);
 
     expect(visibleRows()).toHaveLength(1);
     const sub = document.querySelector('.mt-sub')?.textContent ?? '';
     expect(sub).toContain('showing damage');
+    expect(sub).toContain('Gorrak');
+  });
+
+  it("freezes the fight's real threat numbers once the mob dies, instead of recalculating from raw damage", () => {
+    // The reported bug, reproduced end to end: a tank's threat reads 3000 on a
+    // mob that only took 900 raw damage (stance/ability multipliers). Killing
+    // it must not "recalculate" the tab down to that 900.
+    const { meters, world, visibleRows } = setup();
+    const entities = world.entities as Map<number, any>;
+    const wolfA = entities.get(51);
+    wolfA.threat = new Map([
+      [1, 3000],
+      [2, 300],
+    ]);
+    meters.onEvent(dmg(1, 51, 900, 'Mortal Strike'));
+    meters.onEvent(dmg(2, 51, 300, 'Smite'));
+    meters.update();
+    (document.querySelector('.mt-tab[data-tab="threat"]') as HTMLElement).click();
+
+    // the kill: the server clears the hate table before this render ever sees it
+    wolfA.dead = true;
+    wolfA.threat.clear();
+    meters.render(true);
+
+    const rows = visibleRows();
+    expect(rows.map((el) => el.querySelector('.mt-num')?.textContent)).toEqual(['3000', '300']);
+    const sub = document.querySelector('.mt-sub')?.textContent ?? '';
+    expect(sub).not.toContain('showing damage');
     expect(sub).toContain('Gorrak');
   });
 

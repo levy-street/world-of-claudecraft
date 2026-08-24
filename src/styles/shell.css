@@ -314,6 +314,66 @@
     pointer-events: none;
   }
 
+  .desktop-login-exit {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex: 0 0 auto;
+    min-height: 40px;
+    box-sizing: border-box;
+    padding: 7px 14px;
+    border: 1px solid var(--color-border-default);
+    border-radius: var(--radius-sm);
+    background: var(--color-bg-input);
+    color: var(--color-primary-dim);
+    font-family: var(--font-heading);
+    font-size: 13.5px;
+    font-weight: 700;
+    white-space: nowrap;
+    cursor: var(--cursor-point);
+    box-shadow: inset 0 1px 0 var(--color-primary-glow);
+    transition:
+      color var(--transition-speed) var(--transition-ease),
+      border-color var(--transition-speed) var(--transition-ease),
+      background-color var(--transition-speed) var(--transition-ease),
+      box-shadow var(--transition-speed) var(--transition-ease);
+  }
+
+  .desktop-login-exit[hidden] {
+    display: none;
+  }
+
+  .desktop-login-exit:hover {
+    color: var(--color-primary);
+    border-color: var(--color-border-focus);
+    background: var(--color-bg-dark);
+    box-shadow:
+      0 0 10px var(--color-primary-glow),
+      inset 0 1px 0 var(--color-primary-glow-heavy);
+  }
+
+  .desktop-login-exit:active {
+    color: var(--color-text-light);
+    border-color: var(--color-primary-dim);
+    background: var(--color-bg-dark);
+    box-shadow: inset 0 2px 4px var(--color-primary-glow);
+  }
+
+  .desktop-login-exit:focus-visible {
+    outline: 3px solid var(--color-border-focus);
+    outline-offset: 2px;
+  }
+
+  @media (forced-colors: active) {
+    .desktop-login-exit {
+      border-color: ButtonText;
+    }
+
+    .desktop-login-exit:focus-visible {
+      outline-color: Highlight;
+    }
+  }
+
   /* Donate: the header's primary call-to-action (filled gold so it reads as the
      main action, unlike the ghost nav links). Mirrored as a footer social link
      and an in-game community button. */

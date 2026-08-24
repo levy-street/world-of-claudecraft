@@ -1202,7 +1202,7 @@ async function runSocialAndTradeSurfaces(page, locale, viewport) {
     g.sim.tradeConfirm = () => {};
     g.sim.tradeCancel = () => {};
     g.hud.closeAll();
-    g.hud.updateTradeWindow();
+    g.hud.wocTrade.updateTradeWindow();
   });
   await page.waitForSelector('#trade-window .trade-cols', { timeout: WAIT_TIMEOUT });
   await assertNonEnglishNotFallback(

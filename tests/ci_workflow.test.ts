@@ -4,7 +4,11 @@ import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { describe, expect, it } from 'vitest';
 import { isCodePath } from '../scripts/lib/ci_change_classify.mjs';
-import { CI_LONG_SUITE_HALVES, resolveWorkerCount } from '../scripts/lib/ci_shard_plan.mjs';
+import {
+  CI_LONG_SUITE_HALVES,
+  CI_LONG_SUITES,
+  resolveWorkerCount,
+} from '../scripts/lib/ci_shard_plan.mjs';
 import { decideTestMode } from '../scripts/lib/ci_test_select.mjs';
 import {
   GENERATED_I18N_ARTIFACT_FILES,
@@ -16,11 +20,13 @@ import {
 import {
   buildFullGateSteps,
   I18N_ARTIFACTS,
+  I18N_RELEASE_TIER_SUITES,
   MANIFEST_ARTIFACTS,
 } from '../scripts/lib/gate_steps.mjs';
 import { PLAYWRIGHT_INSTALL_BLOCK } from './helpers/playwright_install_block';
 import { expectScansOnlyThroughSharedWalkers } from './helpers/scan_guard_self_audit';
 import { stripComments } from './helpers/strip_comments';
+import { tsFilesUnder } from './helpers/ts_files_under';
 
 const workflow = readFileSync(new URL('../.github/workflows/ci.yml', import.meta.url), 'utf8');
 const detectEntry = readFileSync(
@@ -323,6 +329,7 @@ describe('CI workflow parity', () => {
       '            /docs/screenshots/release-v039-icon-art-first-pass-2026-08-16/',
       '            /docs/screenshots/touch-ui-rework/',
       '            /docs/screenshots/wildheart/',
+      '            /docs/screenshots/woc-market/',
       '          sparse-checkout-cone-mode: false',
     ].join('\n');
     // Job-anchored, not a bare workflow-wide count: each sparse job carries
@@ -457,7 +464,7 @@ describe('CI workflow parity', () => {
   });
 
   it('performs no hand-rolled directory reads (the corpus is the git index)', () => {
-    expectScansOnlyThroughSharedWalkers(import.meta.url, []);
+    expectScansOnlyThroughSharedWalkers(import.meta.url, ['ts_files_under']);
   });
 
   it('installs with pnpm frozen-lockfile and pins the packageManager version', () => {
@@ -1777,5 +1784,243 @@ describe('CI workflow parity', () => {
     // naming the sequencer so the next reader finds the mechanism.
     expect(viteConfig).toContain('passWithNoTests: false');
     expect(workflow).toContain('ci_balanced_sequencer.mjs');
+  });
+
+  it('classifies every CI job for the real-SQL merge bar: pg-wired, guarded DB-less, or test-free', () => {
+    // Ruling R16 (the woc-marketplace hardening state): the real-SQL pg
+    // suites classify into the always-run floor but SKIP GREEN without
+    // TEST_DATABASE_URL, so this wiring IS their presence at the merge bar.
+    // Three pin shapes fell before this one: a file-wide count stayed green
+    // when the blocks were relocated onto vitest-free jobs; a hand-listed job
+    // set stayed green when the shard matrix was split into a new job with no
+    // service; and a run-line recognizer (four literal `run: <cmd>` forms)
+    // stayed green when the same split wrote its command in a `run: |` block
+    // scalar or an npm-script indirection. Shape four inverts the burden:
+    // EVERY job key in both files must appear in exactly one class below, so
+    // a new or renamed job in ANY spelling fails this test until a human
+    // classifies it, and the token scan cross-checks that a classification is
+    // not a lie. tests/ci_pg_presence.test.ts is the runtime twin (red inside
+    // any armed run when the variable is absent, and a CI_GUARD_SUITES member
+    // so every selective run executes it on one of its legs).
+    const jobKey = /\n {2}(["']?)([A-Za-z0-9_][A-Za-z0-9_-]*)\1:[ \t]*(?:#[^\n]*)?\n/g;
+    const jobsIn = (source: string) => {
+      // Sliced from the jobs: map so a header key (push, group, contents) can
+      // never satisfy a job lookup; quoted keys and _-or-digit initials are
+      // collected so an unconventional job id is classified, not swallowed
+      // into a neighbour's span.
+      const body = source.slice(source.indexOf('\njobs:'));
+      // Every two-space line in the jobs body must BE a recognized job key
+      // or a comment: a flow-style job (`  x: {steps: [...]}`) or any
+      // spelling the key regex misses would otherwise be swallowed into the
+      // previous job's span instead of forcing a classification.
+      for (const line of body.split('\n')) {
+        if (!/^ {2}\S/.test(line) || line.startsWith('  #')) continue;
+        expect(
+          /^ {2}(["']?)[A-Za-z0-9_][A-Za-z0-9_-]*\1:[ \t]*(?:#[^\n]*)?$/.test(line),
+          `unrecognized two-space line in the jobs body: ${line}`,
+        ).toBe(true);
+      }
+      const keys = [...body.matchAll(jobKey)].map((m) => ({ name: m[2], at: m.index ?? 0 }));
+      return keys.map((k, i) => ({
+        name: k.name,
+        span: body.slice(k.at, i + 1 < keys.length ? keys[i + 1].at : body.length),
+      }));
+    };
+    // Full-line YAML comments leave the scan so prose about tests cannot
+    // convict a test-free job; a trailing comment on a code line still
+    // convicts, which errs toward attention, never toward silence.
+    const codeLines = (span: string) =>
+      span
+        .split('\n')
+        .filter((line) => !line.trimStart().startsWith('#'))
+        .join('\n');
+    // Token scan over span CONTENT, deliberately not anchored to `run: `:
+    // block scalars, npm-script names, and pnpm forms all carry one of these
+    // tokens somewhere in the step that runs them.
+    const testTokens =
+      /vitest|ci_shard_test|npm test|npm run test|npm run gate|yarn test|bun test|turbo run test|node --test|node --run test|pnpm (?:run )?test/;
+    const nightly = readFileSync(
+      new URL('../.github/workflows/nightly.yml', import.meta.url),
+      'utf8',
+    );
+    // The classification. wired: carries the per-leg Postgres service and the
+    // job-level env pinned below. dbless: runs vitest with NO database, each
+    // member covered by a coupled guard below. testFree: never runs the node
+    // test suite at all.
+    const classes = [
+      {
+        source: workflow,
+        wired: ['pr-gate', 'release-gate'],
+        dbless: ['browser-gate', 'pr-long-sims-a', 'pr-long-sims-b', 'release-i18n'],
+        testFree: ['release-version-gate', 'changes', 'lint', 'pr-checks', 'release-checks'],
+      },
+      {
+        source: nightly,
+        wired: ['tests'],
+        dbless: ['browser'],
+        testFree: ['targets', 'checks', 'report'],
+      },
+    ];
+    for (const { source, wired, dbless, testFree } of classes) {
+      const jobs = jobsIn(source);
+      // COMPLETENESS, the load-bearing assertion: a job key missing from the
+      // three lists (new, renamed, or spelled in a way no recognizer guessed)
+      // fails here, toward a human decision, never toward a silent skip.
+      expect(jobs.map((j) => j.name).sort()).toEqual([...wired, ...dbless, ...testFree].sort());
+      for (const { name, span } of jobs) {
+        const code = codeLines(span);
+        // An expression-valued run COMMAND could smuggle a test invocation
+        // past the token scan; no job uses one today, so novelty is refused
+        // in every spelling: inline (quoted or bare) and as the first token
+        // of any line (the block-scalar form). Mid-line expressions in
+        // ARGUMENTS stay legal; the shard index rides one.
+        expect(
+          /run:\s*["']?\$\{\{/.test(code),
+          `${name}: expression-valued run lines are refused`,
+        ).toBe(false);
+        expect(
+          /\n\s*["']?\$\{\{/.test(code),
+          `${name}: a line may not begin with an expression`,
+        ).toBe(false);
+        // A job-level uses: (reusable workflow) is unclassifiable here: its
+        // tests live in another file this pin never reads. None exists
+        // today, so novelty is refused; a future one must extend this pin
+        // with the called workflow's own classification first. (Step-level
+        // `- uses:` actions sit at deeper indent and stay legal.)
+        expect(/\n {4}uses: /.test(span), `${name}: a job-level uses is refused`).toBe(false);
+        if (testFree.includes(name)) {
+          expect(
+            testTokens.test(code),
+            `${name} is classified test-free but its span carries a test token; wire it or exempt it above`,
+          ).toBe(false);
+          continue;
+        }
+        // Both test-running classes must LOOK like it, so a runner migration
+        // that the token scan cannot see fails loudly here instead of
+        // silently reclassifying the job.
+        expect(testTokens.test(code), `${name} is classified test-running`).toBe(true);
+        if (!wired.includes(name)) continue;
+        // One container per wired job leg (isolated fixed-name databases);
+        // the health gate lives in the service options because a wait STEP
+        // would break the step-count pins above.
+        expect(span, name).toContain('    services:\n      postgres:\n');
+        expect(span, name).toContain('        image: postgres:16-alpine\n');
+        expect(span, name).toContain('--health-cmd "pg_isready -U postgres -d wocc_ci"');
+        expect(span, name).toContain('          - 5432:5432\n');
+        // The JOB-LEVEL env lines (a step-level copy would not cover the
+        // leg); other job env keys may precede either one. WOCC_EXPECT_PG
+        // arms the runtime twin on ANY runner, so the sentinel that demands
+        // the database URL travels in the same pinned block as the URL.
+        expect(span, name).toMatch(
+          /\n {4}env:\n(?: {6}\S[^\n]*\n)*? {6}TEST_DATABASE_URL: postgres:\/\/postgres:postgres@127\.0\.0\.1:5432\/wocc_ci\n/,
+        );
+        expect(span, name).toMatch(/\n {4}env:\n(?: {6}\S[^\n]*\n)*? {6}WOCC_EXPECT_PG: '1'\n/);
+        // Exactly ONE occurrence of each variable in the job's code: a
+        // second copy at any indent is a step-level or matrix-conditional
+        // override that could blank the URL on a subset of legs while the
+        // job-level pin above stays satisfied.
+        expect(code.match(/TEST_DATABASE_URL/g) ?? [], name).toHaveLength(1);
+        expect(code.match(/WOCC_EXPECT_PG/g) ?? [], name).toHaveLength(1);
+      }
+    }
+    // THE FORCING FUNCTION for the DB-less class: membership alone would be
+    // the one unguarded door (classify a new pg-suite job "dbless" and it
+    // skips green forever), so every dbless member must name its coupled
+    // guard here, and the label set is pinned to the guards implemented
+    // below; a new exempt job cannot land without a human writing what
+    // makes its DB-lessness safe.
+    const dblessGuard: Record<string, string> = {
+      'pr-long-sims-a': 'lane',
+      'pr-long-sims-b': 'lane',
+      'release-i18n': 'i18n-tier',
+      'browser-gate': 'browser',
+      browser: 'browser',
+    };
+    expect(Object.keys(dblessGuard).sort()).toEqual(classes.flatMap((c) => c.dbless).sort());
+    expect(new Set(Object.values(dblessGuard))).toEqual(new Set(['lane', 'i18n-tier', 'browser']));
+    // The coupled guards for the DB-less classes (labels "lane" and
+    // "i18n-tier"). Lanes and the i18n tier:
+    // no member file may gate on TEST_DATABASE_URL (a pg suite becoming
+    // lane-resident would skip green in the DB-less lane forever). KNOWN
+    // LIMIT, recorded: this is a literal scan of the suite files themselves,
+    // blind to a gate reached through a helper import (today every pg suite
+    // inlines the variable; if the shared pg-gate helper follow-up ever
+    // lands, this guard must move to the helper's importers in the same
+    // change), and stripComments treats a /* inside a string literal as a
+    // block opener, which here blanks code toward a false pass.
+    for (const file of [...CI_LONG_SUITES, ...I18N_RELEASE_TIER_SUITES]) {
+      const gated = stripComments(
+        readFileSync(new URL(`../${file}`, import.meta.url), 'utf8'),
+      ).includes('TEST_DATABASE_URL');
+      expect(gated, `${file} must not gate on TEST_DATABASE_URL (its job has no Postgres)`).toBe(
+        false,
+      );
+    }
+    // The browser jobs run vitest through npm run test:browser against a
+    // separate config (label "browser"); the guard pins the whole chain: the
+    // script targets the browser config, that config collects only
+    // tests/browser, and no file there gates on TEST_DATABASE_URL.
+    const pkg = readFileSync(new URL('../package.json', import.meta.url), 'utf8');
+    expect(pkg).toContain('"test:browser": "vitest run --config vitest.browser.config.ts"');
+    // RAW read on purpose: the include glob's /**/ parses as a block comment
+    // to every stripper in this repo (the documented string-literal caveat in
+    // helpers/strip_comments.ts), so stripping would blank the very line this
+    // asserts on.
+    const browserConfig = readFileSync(
+      new URL('../vitest.browser.config.ts', import.meta.url),
+      'utf8',
+    );
+    expect(browserConfig).toContain("include: ['tests/browser/**/*.browser.test.ts']");
+    const browserFiles = tsFilesUnder(fileURLToPath(new URL('../tests/browser', import.meta.url)));
+    expect(browserFiles.length).toBeGreaterThan(0);
+    for (const { file, full } of browserFiles) {
+      const gated = stripComments(readFileSync(full, 'utf8')).includes('TEST_DATABASE_URL');
+      expect(gated, `tests/browser/${file} must not gate on TEST_DATABASE_URL`).toBe(false);
+    }
+    // FILE-WIDE dead-letter negatives, deliberately on the RAW text (a
+    // commented-out 5433 mapping should red, the safe direction): 5433 is the
+    // dev-compose port that vite.config's intended-dead fallback DATABASE_URL
+    // names; a service mapping it ANYWHERE in CI (any job, quoted or
+    // host-bound) would turn the deliberately-dead unit-suite URLs into live
+    // connections. Positive controls first: the matchers must fire on every
+    // shape they exist to catch, so they cannot rot into unmatchable.
+    const portMap5433 = /5433:\d/;
+    const url5433 = /:5433\//;
+    expect(portMap5433.test('- 5433:5432')).toBe(true);
+    expect(portMap5433.test('- "5433:5432"')).toBe(true);
+    expect(portMap5433.test('- 127.0.0.1:5433:5432')).toBe(true);
+    expect(url5433.test('postgres://u:p@h:5433/db')).toBe(true);
+    for (const source of [workflow, nightly]) {
+      expect(source).not.toMatch(portMap5433);
+      expect(source).not.toMatch(url5433);
+    }
+    // The classification covers the two vitest-carrying workflow files;
+    // every OTHER workflow must stay free of test invocations, and the
+    // corpus is the git index (the shared-walker doctrine), so a NEW
+    // workflow file forces a decision here instead of running tests nobody
+    // classified.
+    const listed = spawnSync('git', ['ls-files', '.github/workflows'], {
+      cwd: fileURLToPath(new URL('..', import.meta.url)),
+      encoding: 'utf8',
+    })
+      .stdout.trim()
+      .split('\n')
+      .sort();
+    const testFreeWorkflows = [
+      '.github/workflows/audit.yml',
+      '.github/workflows/ci-stall-rerun.yml',
+      '.github/workflows/desktop-publish.yml',
+      '.github/workflows/ota-publish.yml',
+    ];
+    expect(listed).toEqual(
+      ['.github/workflows/ci.yml', '.github/workflows/nightly.yml', ...testFreeWorkflows].sort(),
+    );
+    for (const file of testFreeWorkflows) {
+      const text = codeLines(readFileSync(new URL(`../${file}`, import.meta.url), 'utf8'));
+      expect(
+        testTokens.test(text),
+        `${file} carries a test invocation; classify it in this pin first`,
+      ).toBe(false);
+    }
   });
 });

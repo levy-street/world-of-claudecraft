@@ -20,6 +20,7 @@ import { formatDateTime, formatNumber, t } from './i18n';
 import { hydratePortraits, portraitChipHtml } from './portrait_chip';
 import { rovingTarget } from './roving_index';
 import { svgIcon } from './ui_icons';
+import { usdDollarsText } from './usd_text';
 import {
   type ArmorySection,
   type ArmorySkinRow,
@@ -738,10 +739,7 @@ export class DailyRewardsWindow {
         : `${t('hudChrome.dailyRewards.sol', {
             amount: formatNumber(s.prizePoolSol, { maximumFractionDigits: 3 }),
           })} (${t('hudChrome.dailyRewards.usd', {
-            amount: `$${formatNumber(s.prizePoolUsd, {
-              maximumFractionDigits: 2,
-              minimumFractionDigits: 2,
-            })}`,
+            amount: usdDollarsText(s.prizePoolUsd),
           })})`;
     const reset = formatDateTime(new Date(s.resetAt), { hour: 'numeric', minute: '2-digit' });
     const remaining = this.remainingText(s.resetAt);
@@ -749,7 +747,7 @@ export class DailyRewardsWindow {
       s.eligibility.usdValue === null
         ? t('hudChrome.dailyRewards.unknown')
         : t('hudChrome.dailyRewards.usd', {
-            amount: `$${formatNumber(s.eligibility.usdValue, { maximumFractionDigits: 2 })}`,
+            amount: usdDollarsText(s.eligibility.usdValue),
           });
     const reason = dailyRewardReasonText(s.eligibility);
     return (
@@ -929,9 +927,9 @@ export class DailyRewardsWindow {
         : history.payouts
             .slice(0, 10)
             .map((row) => {
-              const prize = `$${t('hudChrome.dailyRewards.usd', {
-                amount: formatNumber(row.prizeUsd, { maximumFractionDigits: 2 }),
-              })}`;
+              const prize = t('hudChrome.dailyRewards.usd', {
+                amount: usdDollarsText(row.prizeUsd),
+              });
               return `<div class="dr-rank"><span>${esc(row.day)} #${row.rank}</span><b>${esc(row.name)}</b><strong>${esc(prize)}</strong></div>`;
             })
             .join('');

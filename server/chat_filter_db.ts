@@ -9,6 +9,7 @@ import {
   parseWordList,
 } from './chat_filter';
 import { pool } from './db';
+import { bustWocAuthGuardAccount } from './woc_auth_guard_cache';
 
 // SQL for the chat filter: admin-managed word lists, escalation config,
 // per-account mute/strike state, and the hard-word incident log. Logic +
@@ -203,6 +204,8 @@ export async function applyChatStrike(
      RETURNING chat_strikes, chat_muted_until`,
     [accountId, Math.max(0, Math.floor(muteSeconds))],
   );
+  // The strike/mute columns ride the cached guard read's projection.
+  bustWocAuthGuardAccount(accountId);
   const row = res.rows[0];
   return {
     strikes: Number(row?.chat_strikes ?? 0),
@@ -340,5 +343,6 @@ export async function chatModeratedAccounts(limit = 200): Promise<ChatModeratedA
 
 export async function resetChatStrikes(accountId: number): Promise<boolean> {
   const res = await pool.query(`UPDATE accounts SET chat_strikes = 0 WHERE id = $1`, [accountId]);
+  bustWocAuthGuardAccount(accountId);
   return (res.rowCount ?? 0) > 0;
 }

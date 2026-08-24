@@ -582,6 +582,19 @@ const HOT_PAINTERS: ReadonlyArray<ScannedPainter> = [
   // (one in the click handler, one in the roving-key branch, one in the Enter/Space
   // branch), never a per-frame write.
   { file: 'tab_strip_painter.ts', allow: { '.dataset': 3 }, reflowAllow: {} },
+  // The trade window's $WOC arm: cold (repainted only with the trade window,
+  // no driver of its own) but held to the full write contract like tab_strip
+  // above. Its in-place derived-line refresh (refreshWocTradeArm) reads and
+  // writes textContent through one elided setter (2), toggles the equiv line's
+  // over-balance class after a contains() read (2), and reads the mode
+  // toggle's dataset once in the click wiring (1). A third textContent or a
+  // new classList site here is a new write path, the shape this count exists
+  // to make a conscious act.
+  {
+    file: 'trade_woc_arm_painter.ts',
+    allow: { '.textContent': 2, '.classList': 2, '.dataset': 1 },
+    reflowAllow: {},
+  },
   // yumi builds its whole strip + respawn overlay once in ensureEls (14 class
   // assignments + the two role attributes + the toggle's type); every
   // per-frame write is facet-routed.
@@ -1029,6 +1042,15 @@ const COLD_PAINTER_ALLOWANCES: ReadonlyArray<ColdPainter> = [
     driverAllow: {},
   },
   { file: 'town_focus_window.ts', reflowAllow: { '.scrollTop': 2 }, driverAllow: {} },
+  // The scroll pair again, and TWO containers behind it (the panel body and the
+  // detail pane) rather than one, which is why the count is still 2: the painter
+  // walks a SCROLL_KEEPERS table, so both share a single read site and a single
+  // write site. A third occurrence here means someone added a second read path,
+  // which is the shape this count exists to make a conscious act. It carries more
+  // weight in this window than in most: the slow-band poll rebuilds on every
+  // countdown bucket change, once a second inside the anti-snipe window, so
+  // without the pair the browse list yanks itself to the top while it is read.
+  { file: 'woc_market_window.ts', reflowAllow: { '.scrollTop': 2 }, driverAllow: {} },
 ];
 
 function stripComments(src: string): string {

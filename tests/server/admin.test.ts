@@ -828,7 +828,10 @@ describe('page/limit pagination contract', () => {
       limit,
       search,
     }));
-    authedAdminDb({ listAccounts });
+    // The caller here is a superadmin (moderation.read held), so the handler
+    // stamps each row's active suspicion-flag count after the list read.
+    const activeSuspicionFlagCounts = vi.fn(async () => new Map<number, number>([[1, 2]]));
+    authedAdminDb({ listAccounts, activeSuspicionFlagCounts });
     installAdminRuntime();
     const r = await runRoute('GET', '/admin/api/accounts', {
       url: '/admin/api/accounts?page=2&limit=10&search=bob',
@@ -836,9 +839,16 @@ describe('page/limit pagination contract', () => {
     });
     expect(r.status).toBe(200);
     expect(listAccounts).toHaveBeenCalledWith('bob', 2, 10, 'id', 'desc');
+    expect(activeSuspicionFlagCounts).toHaveBeenCalledWith([1]);
     expect(r.body).toEqual({
       success: true,
-      data: { rows: [{ id: 1 }], total: 1, page: 2, limit: 10, search: 'bob' },
+      data: {
+        rows: [{ id: 1, activeFlagCount: 2 }],
+        total: 1,
+        page: 2,
+        limit: 10,
+        search: 'bob',
+      },
       error: null,
     });
   });
@@ -874,6 +884,7 @@ describe('page/limit pagination contract', () => {
 
   it('clamps limit to MAX_PAGE_LIMIT (200) and floors page at 1', async () => {
     const listAccounts = vi.fn(async (_s: string, page: number, limit: number) => ({
+      rows: [],
       page,
       limit,
     }));
@@ -888,6 +899,7 @@ describe('page/limit pagination contract', () => {
 
   it('is LENIENT: a non-numeric page/limit DEFAULTS (never 422)', async () => {
     const listAccounts = vi.fn(async (_s: string, page: number, limit: number) => ({
+      rows: [],
       page,
       limit,
     }));
