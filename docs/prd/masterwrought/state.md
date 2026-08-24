@@ -15171,9 +15171,27 @@ gaps repairs rather than reassurance:
 |---|---|---|---|
 | M15 | the logging supplier line is dropped from the generated data | the wiki page's line-set pin | DEAD (would have survived: the sweep looped four hand-picked ids) |
 | M16 | the herbalism line shrinks from three materials to one | the per-line size pins | DEAD (would have survived: the only floor was `> 0`) |
-| M17 | a non-feast template claims a feast title | the reverse-direction exhaustiveness pin | DEAD (would have survived: only the forward direction was pinned) |
+| M17 | `farm_bed` claims a feast title | (intended: the reverse pin) | DEAD, BUT NOT WHERE CLAIMED, see below |
 
-**EIGHTEEN RUN, EIGHTEEN DEAD.**
+**M17's CLAIM WAS FALSE AND A REVIEWER FALSIFIED IT BY RUNNING IT.** The
+mutation dies on a hand-picked negative two lines ABOVE the new reverse pin, a
+line this phase never touched, so the pin never executed and "would have
+survived before" was untrue. A mutation run only AFTER a fix can never establish
+what would have survived before it; that is the harness gap, and it is recorded
+rather than smoothed over. Re-measured properly, it took THREE candidates to
+find one that reaches the pin at all:
+
+| # | mutation | outcome |
+|---|---|---|
+| M17b | `mailbox` claims a feast title | DEAD, on the "every other entity by its wire name" arm at the bottom of the same file. Still not the pin. |
+| M17c | `delve_bell_rope` claims a feast title, a template NO arm in the suite names | DEAD **on the reverse pin itself**. This is the one that proves it. |
+| M18 | the caster plate's Well Fed value is re-tuned | DEAD. The fourth pin gap had NO mutation at all until this one: a mitigation nobody drove is a claim nobody checked. |
+| M19 | the deed desc names the wrong shipped item (the ORIGINAL bug text, put back) | DEAD on the new desc guard. Not a synthetic case: it is what shipped. |
+
+So the reverse pin IS load-bearing, for every object template nobody thought to
+list as a negative, and the honest measure of that is how hard it was to reach.
+
+**TWENTY-TWO RUN, TWENTY-TWO DEAD.**
 
 M11b is worth a line: M11 died on the TITLE-key arm, which says nothing about
 whether the sim suite's uniqueness pin bites. A pin that never fires is the
@@ -15245,6 +15263,49 @@ two deleted is plus four live, and the debt term moved by the same four, so
 defs-minus-debt holds at 922, which the audit's own assertion confirms); the
 WORDING was ambiguous because "net plus four" is true of both terms and they are
 different sums, so the arithmetic is spelled out now rather than the pin moved.
+
+### THE FIX ROUND WAS REVIEWED AS UNREVIEWED CODE, AND IT WAS NOT CLEAN
+
+A fourth fresh reader took the fix commit alone. It found five false statements
+in the round's own comments, two assertions that cannot fail, two fresh token
+floors, and one falsified claim, and the two worst are the same class the round
+exists to retire.
+
+**THE FAKE POSITIVE CONTROL, and it is mine.** The spoiler sweep's new control
+read ``expect(`${html}<!-- ${token} -->`.includes(token)).toBe(true)``: the
+needle is interpolated into the haystack in the same expression, so it is true
+for EVERY possible string including the empty one, and it exercises
+`String.prototype.includes` rather than the `toContain` matcher it claims to
+control. I wrote a decorative pin inside the commit whose stated purpose was
+retiring decorative pins. It drives the real matcher now.
+
+**A SECOND VACUOUS ASSERTION** beside it compared a `flatMap`'s length to a
+reduce over the same lines, an identity that cannot fail. And TWO FRESH TOKEN
+FLOORS had crept into the commit that replaces token floors (farming at `>= 20`
+against a real 21, the ladder at `>= 4` against a real 6). All three now pin
+real counts.
+
+**THE FIVE FALSE STATEMENTS**, each corrected: the items.ts note described a
+positional index shift that did not happen (appended ids resolve BY KEY, and
+every locale list including English is the legacy length, so nothing shifted);
+a feast.ts comment named `CRAFT_INDEX`, which is module-private and not what the
+line uses; the naming audit credited two search hits to a row that never
+recorded them; a pointer said "below" where the rows are above; and bags_view
+said the view "never places anything" when it owns the placement routing.
+
+**AND THE GUARD THE BLOCKING BUG ASKED FOR.** This ledger noted that no test
+reads a deed desc and then added none, so a deed naming a non-existent item
+still reddened nothing. `tests/deeds_content.test.ts` now enumerates every desc
+that exactly matches a shipped item name (five today, each legitimate), so a new
+mention is read by a human once. Proven by M19: the original bug text put back
+reds it. The desc also stopped hardcoding "three", in a subsystem built so a
+fourth feast joins with no edit.
+
+THE LESSON THIS PACKET KEEPS RE-LEARNING, one level up again: this phase found
+two false comments in its own work, corrected them, and shipped five more plus a
+fake control inside the correction. A fix round is a content change and it owes
+the same review, and this is now the third phase in a row where the reviewer of
+the fix round found more than the reviewers of the work.
 
 ### THE FULL SUITE FOUND EIGHT FILES THE PHASE BATTERY COULD NOT
 
