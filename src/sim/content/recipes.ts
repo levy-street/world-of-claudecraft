@@ -3954,6 +3954,10 @@ export const TROPHY_RECIPES: ProfessionRecipeRecord[] = [
     ],
     skillReq: 25,
     itemLevelBudget: 16,
+    // No live source to cap against: hobnail_boots is vendor-only (no drop,
+    // quest or loot source), so 15 is the rung-25 scaffolding convention. The
+    // consequence is recorded, not accidental: the item gains a derivable
+    // item level (15) and so a tooltip item level line it never showed before.
     level: 15,
     acquisition: ['trainer'],
     stationType: 'forge',
@@ -3974,29 +3978,37 @@ export const TROPHY_RECIPES: ProfessionRecipeRecord[] = [
     ],
     skillReq: 25,
     itemLevelBudget: 16,
+    // No live source to cap against: vale_carving_knife is vendor-only (no
+    // drop, quest or loot source), so 15 is the rung-25 scaffolding
+    // convention. The consequence is recorded, not accidental: the item gains
+    // a derivable item level (15) and so a tooltip item level line it never
+    // showed before.
     level: 15,
     acquisition: ['trainer'],
     stationType: 'forge',
   },
   {
-    id: 'recipe_bristleback_maul',
+    id: 'recipe_fenshadow_maul',
     professionId: 'weaponcrafting',
-    resultItemId: 'bristleback_maul',
+    resultItemId: 'fenshadow_maul',
     resultCount: 1,
-    // Ogre tusks stud the head on an elderwood haft (the battle staff's
-    // rung-50 log precedent). Input 284 vs output 160.
-    // 11l-OUT: trophy 42 < output 160 < input 284; no prior recipe crafts
-    // bristleback_maul (recipeForResultItem); uncommon, below the 50 ceiling.
+    // Ogre tusks stud the fen maul on an elderwood haft (the battle staff's
+    // rung-50 log precedent). Input 444 vs output 420.
+    // 11l-OUT: trophy 42 < output 420 < input 444; no prior recipe crafts
+    // fenshadow_maul (recipeForResultItem); uncommon, below the 50 ceiling.
+    // Re-picked from bristleback_maul (R21): that maul is item level 7, so a
+    // rung-50 crafter had no reason to make it.
     reagents: [
       { itemId: 'cracked_ogre_tusk', count: 2 },
-      { itemId: 'elderwood_log', count: 1 },
+      { itemId: 'elderwood_log', count: 2 },
       { itemId: 'smithing_flux', count: 2 },
     ],
     skillReq: 50,
     itemLevelBudget: 20,
-    // Capped at the hammer's live quest source (q_mogger, level 6) so the
-    // recipe route cannot re-tier the shipped item (see the lantern note).
-    level: 6,
+    // Capped at the maul's live boss source (Deacon Voss, level 12) so the
+    // recipe route cannot re-tier the shipped item past its pinned item level
+    // 13 (see the lantern note).
+    level: 12,
     acquisition: ['trainer'],
     stationType: 'forge',
   },

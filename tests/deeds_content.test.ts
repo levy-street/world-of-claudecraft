@@ -1808,3 +1808,74 @@ describe('the border-reward set (a public Discord feed surface since Phase 18)',
     for (const id of borderIds) expect(DEEDS[id].hidden, id).not.toBe(true);
   });
 });
+
+describe('col_junk_drawer stays completable after the phase 11l trophy promotion', () => {
+  // The meter behind the deed (poorItemsDiscoveredCount, src/sim/deeds.ts)
+  // recounts itemsDiscovered against the LIVE quality === 'poor', so what the
+  // deed can ever reach is the set of poor ids a character can actually
+  // acquire. Walked here over every acquisition source this file already
+  // knows: mob loot (the delve and rift tables are merged into MOBS, and are
+  // walked again by name so a future un-merge cannot hide them), vendor stock
+  // (NPC rows, the heroic quartermaster, the delve shops), ground pickups,
+  // every fishing cell in every band, quest rewards, and recipe outputs.
+  const reachable = new Set<string>();
+  const note = (itemId: string | null | undefined): void => {
+    if (itemId && ITEMS[itemId]?.quality === 'poor') reachable.add(itemId);
+  };
+  for (const m of Object.values(MOBS)) for (const l of m.loot ?? []) note(l.itemId);
+  for (const m of Object.values(DELVE_MOBS)) for (const l of m.loot ?? []) note(l.itemId);
+  for (const m of Object.values(RIFT_MOBS)) for (const l of m.loot ?? []) note(l.itemId);
+  for (const npc of Object.values(NPCS)) for (const itemId of npc.vendorItems ?? []) note(itemId);
+  for (const offer of HEROIC_VENDOR_STOCK) note(offer.itemId);
+  for (const entries of Object.values(DELVE_SHOPS)) for (const entry of entries) note(entry.itemId);
+  for (const g of GROUND_OBJECTS) note(g.itemId);
+  for (const band of FISHING_TABLES_BY_BAND) {
+    for (const rows of Object.values(band)) for (const entry of rows) note(entry.itemId);
+  }
+  for (const quest of Object.values(QUESTS)) {
+    for (const itemId of Object.values(quest.itemRewards ?? {})) note(itemId);
+  }
+  for (const recipe of ALL_RECIPES) note(recipe.resultItemId);
+  const livePoor = new Set(
+    Object.values(ITEMS)
+      .filter((d) => d.quality === 'poor')
+      .map((d) => d.id),
+  );
+  const unreachable = [...livePoor].filter((id) => !reachable.has(id)).sort();
+
+  it('the reachable poor set is exactly the ten survivors with an acquisition route', () => {
+    expect([...reachable].sort()).toEqual([
+      'briny_idol',
+      'deepfen_pearl',
+      'frayed_prayer_beads',
+      'inert_storm_shard',
+      'moonpale_scale',
+      'ogre_toe_ring',
+      'pale_pearl',
+      'soggy_boot',
+      'soggy_moccasin',
+      'tangled_weed',
+    ]);
+  });
+
+  it('the unreachable poor remainder is exactly the Brightwood Glade wildlife pack', () => {
+    // Authored in src/sim/content/items.ts under the wildlife-pack banner with
+    // no loot, vendor, pickup, fishing, quest, or recipe route anywhere: they
+    // exist in the catalog and count for nothing here.
+    expect(unreachable).toEqual(['amber_hide', 'soft_down', 'stag_antler']);
+  });
+
+  it('the trigger amount fits inside the reachable pool', () => {
+    // Phase 11l promoted eight junk drops out of poor, cutting the reachable
+    // pool from 18 to 10 against an amount of 10: ZERO margin. The meter
+    // recounts live quality, so a character holding promoted trophies sees
+    // an in-progress counter regress, and one more promotion strands the deed
+    // outright. Re-tuning the trigger is a maintainer decision
+    // (docs/design/deeds.md, rule 9: no retro-editing a shipped trigger),
+    // left OPEN in the phase ledger rather than edited here.
+    const trigger = DEEDS.col_junk_drawer.trigger;
+    if (trigger.kind !== 'meter') throw new Error('col_junk_drawer lost its meter trigger');
+    expect(trigger.meter).toBe('poorItemsDiscoveredCount');
+    expect(trigger.amount).toBeLessThanOrEqual(reachable.size);
+  });
+});

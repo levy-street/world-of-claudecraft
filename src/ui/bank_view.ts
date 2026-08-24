@@ -187,8 +187,8 @@ export interface DepositAllPlan {
  *  Selection: every fungible OR instanced honest-material stack (isMaterialItem, the
  *  derived taxonomy in src/sim/material_taxonomy.ts: node yields, grades, harvest
  *  components, specimens, salvage returns, junk-kind reagents), NEVER a quest item
- *  (kind-tool implements, grey trash, and trophies are excluded by the taxonomy; the
- *  quest guard here is the belt to that suspenders).
+ *  (kind-tool implements, grey trash, and the unadopted trophies are excluded by the
+ *  taxonomy; the quest guard here is the belt to that suspenders).
  *  Each send is a WHOLE-stack deposit (the sim's all-or-nothing rule): a stack that
  *  does not FULLY fit is skipped, not partially deposited, and sets `full`. Partial
  *  deposits would have to re-derive the sim's countFit stacking math, which this must
@@ -250,8 +250,8 @@ export function depositAllSummaryKey(
 }
 
 /** True when the carried inventory holds at least one depositable material stack (an
- *  honest material per isMaterialItem; tools, grey trash, trophies, and quest items
- *  are all outside the taxonomy): the deposit-all button's enabled state. */
+ *  honest material per isMaterialItem; tools, grey trash, the unadopted trophies, and
+ *  quest items are all outside the taxonomy): the deposit-all button's enabled state. */
 export function hasDepositableMaterials(
   inventory: readonly InvSlot[],
   lookup: ItemLookup,

@@ -1436,6 +1436,9 @@ describe('Reliquary curation bounds (no full-table scrape)', () => {
       'bone_fragments',
       'linen_scrap',
       'spider_leg',
+      // A common MATERIAL since masterwrought Phase 11l (a TROPHY_RECIPES
+      // reagent, no longer poor), still refused as a non-relic: the list is
+      // correct as it stands.
       'chipped_tusk',
       'inert_storm_shard',
       'deepfen_pearl',
@@ -3769,19 +3772,27 @@ describe('Reliquary source hint coverage', () => {
     // shared drops' two rares each, and the two dominated trash routes (35);
     // the quest family gains gutripper_shiv's q_drogmar door. The Warfare
     // pages grow the vendor family by 94 (47 slots on two counters each) and
-    // the rods add their Litany board keeper (2) plus their two engineering
-    // recipes on the recipe family.
+    // the rods add their Litany board keeper (2) plus, on the recipe family,
+    // the three engineering rod recipes (every catalogued rod names the
+    // craft, the apex rung since masterwrought Phase 11i). The recipe family
+    // is six today: the two combo brand pieces (boundstone_helm's
+    // armorcrafting helm, gravewyrm_gauntlets' weaponcrafting gauntlets), the
+    // three rods, and the masterwrought Phase 11l trophy route
+    // recipe_gravewyrm_bone_quiver (leatherworking, beside its Korzul boss
+    // door on conquerors_gravewyrm_sanctum).
     expect(routesByFamily.mob).toBeGreaterThanOrEqual(209);
     expect(routesByFamily.heroic).toBeGreaterThanOrEqual(47);
     expect(routesByFamily.vendor).toBeGreaterThanOrEqual(101);
     expect(routesByFamily.quest).toBeGreaterThanOrEqual(8);
-    expect(routesByFamily.recipe).toBeGreaterThanOrEqual(4);
+    expect(routesByFamily.recipe).toBeGreaterThanOrEqual(6);
     expect(routesByFamily.delveChest).toBeGreaterThanOrEqual(8);
     expect(routesByFamily.riftReins).toBeGreaterThanOrEqual(6);
     expect(routesByFamily.store).toBeGreaterThanOrEqual(29);
     expect(routesByFamily.activity).toBeGreaterThanOrEqual(10);
     const checkedRoutes = Object.values(routesByFamily).reduce((a, b) => a + b, 0);
-    expect(checkedRoutes).toBeGreaterThanOrEqual(422);
+    // Measured at Phase 11l's review round: mob 211, heroic 47, vendor 101,
+    // quest 8, recipe 6, delveChest 8, riftReins 6, store 29, activity 10.
+    expect(checkedRoutes).toBeGreaterThanOrEqual(426);
   });
 
   it('every acknowledgment family can actually fail (one doctored miss per family)', () => {

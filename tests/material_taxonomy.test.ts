@@ -636,19 +636,73 @@ describe('phase 11l trophy promotion: the promoted set, exactly', () => {
     'mudfin_scale',
     'tallow_candle',
   ]);
+  // The promoted trophies keep their FROZEN vendor price: the promotion changed
+  // quality and recipe membership only, never sellValue, so a trophy a player
+  // already held sells for exactly what it did before. Literal values, so
+  // "sellValue unchanged" is measured here rather than claimed.
+  const PROMOTED_SELL_VALUE: Record<string, number> = {
+    bandit_bandana: 6,
+    bogiron_nugget: 12,
+    chipped_tusk: 15,
+    cracked_fetish: 14,
+    cracked_ogre_tusk: 42,
+    cracked_wyrm_scale: 35,
+    mudfin_scale: 5,
+    tallow_candle: 5,
+  };
+  // The 13 survivors as the LIVE poor set must read, sorted.
+  const SURVIVING_POOR_JUNK = [
+    'amber_hide',
+    'briny_idol',
+    'deepfen_pearl',
+    'frayed_prayer_beads',
+    'inert_storm_shard',
+    'moonpale_scale',
+    'ogre_toe_ring',
+    'pale_pearl',
+    'soft_down',
+    'soggy_boot',
+    'soggy_moccasin',
+    'stag_antler',
+    'tangled_weed',
+  ];
 
   it('promotes exactly the 8 trophies to common materials and leaves the 13 survivors poor', () => {
+    // Length guards first: an emptied literal or set would let the loop below
+    // pass vacuously.
+    expect(PRE_11L_POOR_JUNK).toHaveLength(21);
+    expect(PROMOTED_TROPHIES.size).toBe(8);
+    expect(Object.keys(PROMOTED_SELL_VALUE).sort()).toEqual([...PROMOTED_TROPHIES].sort());
+    expect(SURVIVING_POOR_JUNK).toEqual(
+      PRE_11L_POOR_JUNK.filter((id) => !PROMOTED_TROPHIES.has(id)),
+    );
     for (const id of PRE_11L_POOR_JUNK) {
       const def = ITEMS[id];
       expect(def, `${id} has no ITEMS def`).toBeTruthy();
       if (PROMOTED_TROPHIES.has(id)) {
         expect(def?.quality, `${id} should be common`).toBe('common');
         expect(MATERIAL_ITEM_IDS.has(id), `${id} should be a material`).toBe(true);
+        expect(def?.sellValue, `${id} sellValue must stay frozen`).toBe(PROMOTED_SELL_VALUE[id]);
       } else {
         expect(def?.quality, `${id} should stay poor`).toBe('poor');
         expect(MATERIAL_ITEM_IDS.has(id), `${id} should stay out of the material set`).toBe(false);
       }
     }
+  });
+
+  it('the LIVE poor set is exactly the 13 survivors (a new poor id cannot land unseen)', () => {
+    // The frozen-21 loop above only visits ids it already knows, so a poor
+    // item authored AFTER the phase 11l boundary would never enter it: this
+    // exact-set pin over the whole catalog closes that direction. The
+    // toBeGreaterThan(9) floor in the quality sweep stays as the settled
+    // non-vacuity guard; this is the membership pin beside it, not a
+    // replacement for it.
+    expect(
+      Object.values(ITEMS)
+        .filter((d) => d.quality === 'poor')
+        .map((d) => d.id)
+        .sort(),
+    ).toEqual(SURVIVING_POOR_JUNK);
   });
 });
 

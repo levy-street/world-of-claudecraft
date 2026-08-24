@@ -13462,8 +13462,8 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
         }
       },
       {
-        "id": "recipe_bristleback_maul",
-        "name": "Gallowglass Hammer",
+        "id": "recipe_fenshadow_maul",
+        "name": "Fenshadow Maul",
         "skillReq": 50,
         "tier": 2,
         "station": "forge",
@@ -13476,7 +13476,7 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
           },
           {
             "name": "Highpine Log",
-            "count": 1
+            "count": 2
           },
           {
             "name": "Smithing Flux",
@@ -13484,7 +13484,7 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
           }
         ],
         "output": {
-          "name": "Gallowglass Hammer",
+          "name": "Fenshadow Maul",
           "count": 1,
           "quality": "uncommon"
         },

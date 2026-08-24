@@ -306,6 +306,33 @@ describe('vendorSellIsInstant (the plain-click vendor sale safety gate)', () => 
     expect(vendorSellIsInstant(ITEMS.junk, undefined, 'recipe_tangled_weed')).toBe(false);
     expect(vendorSellIsInstant(ITEMS.junk, undefined, undefined)).toBe(true);
   });
+
+  it('the REAL catalog: a promoted trophy prompts, grey trash still sells on the spot', () => {
+    // Masterwrought phase 11l promoted eight junk drops poor -> common (the
+    // TROPHY_RECIPES reagents). This gate reads quality, so a plain vendor
+    // click on one now routes to the confirm prompt instead of selling
+    // instantly: the fifth surface the promotion flipped. Pinned off the
+    // shipped defs so the gate cannot detach from what the catalog says.
+    const promoted = [
+      'bandit_bandana',
+      'bogiron_nugget',
+      'chipped_tusk',
+      'cracked_fetish',
+      'cracked_ogre_tusk',
+      'cracked_wyrm_scale',
+      'mudfin_scale',
+      'tallow_candle',
+    ];
+    expect(promoted).toHaveLength(8);
+    for (const id of promoted) {
+      expect(CATALOG_ITEMS[id], `${id} is a real item`).toBeDefined();
+      expect(vendorSellIsInstant(CATALOG_ITEMS[id]), `${id} prompts now`).toBe(false);
+    }
+    for (const id of ['tangled_weed', 'soggy_moccasin']) {
+      expect(CATALOG_ITEMS[id], `${id} is a real item`).toBeDefined();
+      expect(vendorSellIsInstant(CATALOG_ITEMS[id]), `${id} still sells instantly`).toBe(true);
+    }
+  });
 });
 
 describe('transfer-locked instanced copies (issue 1165)', () => {

@@ -650,18 +650,23 @@ describe('the professions blob growth bound (phase 16)', () => {
     // which is the discipline: the edge tracks the measurement, never the other
     // way round.
     //
-    // AND AGAIN AT masterwrought Phase 11l: 17,124 bytes, upper edge 16,935 to
-    // 17,135. The delta is +200 and it is the eight trophy consumer recipe ids
+    // AND AGAIN AT masterwrought Phase 11l: 17,122 bytes, upper edge 16,935 to
+    // 17,133. The delta is +198 and it is the eight trophy consumer recipe ids
     // in knownRecipes, accounted exactly: the quoted-plus-comma cost of each id
     // is its length plus 3, and the eight (recipe_valefire_lantern 26,
     // recipe_oiled_boots 21, recipe_gravewyrm_bone_quiver 31,
     // recipe_hobnail_boots 23, recipe_vale_carving_knife 28,
-    // recipe_bristleback_maul 26, recipe_healing_potion 24,
-    // recipe_linen_pouch 21) sum to 200.
+    // recipe_fenshadow_maul 24, recipe_healing_potion 24,
+    // recipe_linen_pouch 21) sum to 198. The phase's review round re-picked
+    // the weaponcrafting rung-50 row from recipe_bristleback_maul (26) to
+    // recipe_fenshadow_maul (24), predicted 17,124 to 17,122 and measured so.
     // Headroom above the measurement stays 11 bytes, the fourth time running.
+    // Since 11l the FLOOR tracks the measurement too: measurement minus 380,
+    // the headroom the pre-phase band carried below its own measurement
+    // (16,544 under 16,924), so a silent shrink reds as loudly as a growth.
     const bytes = professionsBytes(s2);
-    expect(bytes).toBeGreaterThan(16544);
-    expect(bytes).toBeLessThan(17135);
+    expect(bytes).toBeGreaterThan(16742);
+    expect(bytes).toBeLessThan(17133);
     // Strictly dominated by the band's upper edge while the band holds:
     // kept as documentation that the structural ceiling also bounds this
     // state, never the live guard.

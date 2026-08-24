@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { HEROIC_BOSS_LOOT } from '../src/sim/content/heroic_loot';
+import { TROPHY_RECIPES } from '../src/sim/content/recipes';
 import {
   RIFT_EPIC_ITEM_IDS,
   RIFT_LEGENDARY_ITEM_IDS,
@@ -480,5 +481,41 @@ describe('item level: crafted gear derives its level from the recipe (content/re
     expect(primaryStatSum(ITEMS.wardweave_cowl)).toBe(primaryStatSum(ITEMS.boundstone_helm));
     expect(primaryStatSum(ITEMS.duskhide_wraps)).toBe(primaryStatSum(ITEMS.gravewyrm_gauntlets));
     expect(primaryStatSum(ITEMS.sootscale_mantle)).toBe(primaryStatSum(ITEMS.gravewyrm_mantle));
+  });
+});
+
+describe('item level: the phase 11l trophy recipe outputs (TROPHY_RECIPES)', () => {
+  // The recipe route registers an acquisition source at recipe.level
+  // (buildSourceIndex), so a trophy row's level is part of its output's item
+  // level: a future level edit on a trophy row is a deliberate re-tier of a
+  // shipped item, never a drive-by. The rows capped at their output's live
+  // drop or quest source (the lantern, the boots, the maul) leave the pinned
+  // level where it already was; hobnail_boots and vale_carving_knife were
+  // vendor-only before (no derivable source at all) and GAINED their level
+  // from the recipe. The potion and the pouch carry no combat slot, so they
+  // are not item-level eligible and stay undefined whatever the row says.
+  const TROPHY_OUTPUT_LEVELS: Record<string, number | undefined> = {
+    valefire_lantern: 7,
+    oiled_boots: 11,
+    gravewyrm_bone_quiver: 23,
+    hobnail_boots: 15,
+    vale_carving_knife: 15,
+    fenshadow_maul: 13,
+    healing_potion: undefined,
+    linen_pouch: undefined,
+  };
+
+  it('the pinned outputs are exactly the TROPHY_RECIPES result ids', () => {
+    expect(TROPHY_RECIPES.map((r) => r.resultItemId).sort()).toEqual(
+      Object.keys(TROPHY_OUTPUT_LEVELS).sort(),
+    );
+  });
+
+  it('pins every trophy output at its item level', () => {
+    expect(Object.keys(TROPHY_OUTPUT_LEVELS)).toHaveLength(8);
+    for (const [id, level] of Object.entries(TROPHY_OUTPUT_LEVELS)) {
+      expect(ITEMS[id], `${id} is a real item`).toBeTruthy();
+      expect(itemLevel(ITEMS[id]), `${id} item level`).toBe(level);
+    }
   });
 });

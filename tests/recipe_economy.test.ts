@@ -26,6 +26,7 @@ import {
   LADDER_RECIPES,
   ROD_RECIPES,
   recipeById,
+  recipeForResultItem,
   TOOL_EFFECT_RECIPES,
   TROPHY_RECIPES,
 } from '../src/sim/content/recipes';
@@ -379,6 +380,58 @@ describe('REFERENTIAL INTEGRITY', () => {
     // rows and minted no new id; what moved is that only 8 of the 14 feed the
     // trainer term above.
     expect(FARM_RECIPES).toHaveLength(14);
+  });
+
+  it('every trophy row still consumes its trophy and vendors above the trophy it consumes', () => {
+    // The 11l-OUT interval's lower arm, pinned per row rather than trusted to
+    // the row comments: each consumer must still list its adopted trophy on
+    // the bill, and the finished item must vendor above the trophies it ate
+    // (sellValue times the consumed count, the stacked form), or the recipe
+    // is a way to LOSE value against vendoring the trophy raw. The literal
+    // map is the pin: a re-picked output or a dropped trophy line reds here.
+    const TROPHY_BY_RECIPE: Record<string, string> = {
+      recipe_valefire_lantern: 'cracked_fetish',
+      recipe_oiled_boots: 'mudfin_scale',
+      recipe_gravewyrm_bone_quiver: 'cracked_wyrm_scale',
+      recipe_hobnail_boots: 'bogiron_nugget',
+      recipe_vale_carving_knife: 'chipped_tusk',
+      recipe_fenshadow_maul: 'cracked_ogre_tusk',
+      recipe_healing_potion: 'tallow_candle',
+      recipe_linen_pouch: 'bandit_bandana',
+    };
+    expect(Object.keys(TROPHY_BY_RECIPE).sort()).toEqual(TROPHY_RECIPES.map((r) => r.id).sort());
+    for (const recipe of TROPHY_RECIPES) {
+      const trophyId = TROPHY_BY_RECIPE[recipe.id];
+      const line = recipe.reagents.find((reagent) => reagent.itemId === trophyId);
+      expect(line, `${recipe.id} no longer consumes ${trophyId}`).toBeDefined();
+      const trophy = ITEMS[trophyId];
+      expect(trophy, `${trophyId} has no ItemDef`).toBeDefined();
+      const consumedTrophyValue = trophy.sellValue * (line as { count: number }).count;
+      expect(
+        outputValue(recipe),
+        `${recipe.id}: output ${outputValue(recipe)} must be above the consumed trophy value ` +
+          `${consumedTrophyValue} (${trophyId} x${(line as { count: number }).count})`,
+      ).toBeGreaterThan(consumedTrophyValue);
+    }
+  });
+
+  it('no two recipes share a result item, and every trophy row is the one recipe for its output', () => {
+    // recipeForResultItem is first-match-wins over ALL_RECIPES and its own
+    // comment says no two recipes share a resultItemId today; the trophy rows
+    // lean on that (each 11l-OUT comment claims "no prior recipe crafts" the
+    // output), so the claim is pinned globally and then per trophy row.
+    const recipesByResult = new Map<string, string[]>();
+    for (const recipe of ALL_RECIPES) {
+      recipesByResult.set(recipe.resultItemId, [
+        ...(recipesByResult.get(recipe.resultItemId) ?? []),
+        recipe.id,
+      ]);
+    }
+    const shared = [...recipesByResult.entries()].filter(([, ids]) => ids.length > 1);
+    expect(shared).toEqual([]);
+    for (const recipe of TROPHY_RECIPES) {
+      expect(recipeForResultItem(recipe.resultItemId)?.id, recipe.resultItemId).toBe(recipe.id);
+    }
   });
 
   it('every intermediate row holds the R13 rung shape, and the nine consume exactly one catalyst', () => {
