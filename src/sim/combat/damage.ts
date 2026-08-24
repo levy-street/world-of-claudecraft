@@ -34,6 +34,7 @@ import { spawnWidowHatchlingOnEggDeath } from '../mob/egg_hatchling';
 import { grantAbilityDevotion } from '../paladin_devotion';
 import { PET_AGGRESSIVE_RANGE } from '../pet/pet_ai';
 import { snapshotPetOnOwnerDeath } from '../pet/pet_owner_revive';
+import { clearPlayerDodge, evadeIncomingAttack } from '../player_dodge';
 import { pvpDamageMultiplier } from '../pvp';
 import { resolveRespawnSeconds } from '../respawn_policy';
 import { aurasSurvivingDeath } from '../resurrection';
@@ -252,6 +253,7 @@ export function dealDamage(
     }
     return 0;
   }
+  if (direct && evadeIncomingAttack(ctx, source, target, school, ability, abilityId)) return 0;
   amount = Math.max(0, amount);
   amount = Math.round(amount * veilboundMarkDamageMultiplier(source, target));
   const attackAnimation = attackAnimationStarted ? { attackAnimationStarted: true as const } : {};
@@ -1309,6 +1311,7 @@ export function handleDeath(
   if (e.kind === 'player') {
     clearSpiritmendCurrents(ctx, e.id);
     clearShamanTalentState(ctx, e);
+    clearPlayerDodge(e, true);
   }
   vespersOnEntityDeath(ctx, e);
   afflictionOnDeath(ctx, e);

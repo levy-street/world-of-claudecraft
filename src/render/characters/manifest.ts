@@ -50,6 +50,8 @@ export interface ClipMap {
   wade?: string;
   /** airborne base pose while jumping/falling */
   jump?: string;
+  /** short evasive one-shot used by the player dodge movement. */
+  dodge?: string;
   /** long-fall flail (arms windmilling, legs kicking), played once the body
    *  is dropping faster than any hop can (anim_state.isFallingAtSpeed).
    *  Absent = the jump pose holds for the whole fall, as it always did. */
@@ -187,6 +189,7 @@ const kaykit = (attack: string[], idle = 'Idle'): ClipMap => ({
   sitIdle: 'Sit_Floor_Idle',
   swim: 'Lie_Idle',
   jump: 'Jump_Idle',
+  dodge: 'Block',
   // The trimmed player GLBs ship no dedicated sheathe clip; the 1H chop WINDUP
   // (the clip's first ~40%, cut at the swap point by visual.ts) reaches over the
   // shoulder toward the back, which reads as grabbing/planting the hilt.

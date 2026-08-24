@@ -31,6 +31,7 @@ import { isArenaPos, MOBS } from '../data';
 import { questGateBlocksAggro } from '../mob/quest_gated_aggro';
 import { forceDismount } from '../mounts';
 import { grantDevotionFromBlock } from '../paladin_devotion';
+import { evadeIncomingAttack, isPlayerDodging } from '../player_dodge';
 import { scheduleBallisticProjectile, scheduleProjectile } from '../projectile_travel';
 import type { PlayerMeta } from '../sim';
 import type { SimContext } from '../sim_context';
@@ -314,6 +315,7 @@ export function updatePlayerAutoAttack(ctx: SimContext, p: Entity, meta: PlayerM
   }
   p.swingTimer = Math.max(0, p.swingTimer - DT);
   p.offhandSwingTimer = Math.max(0, p.offhandSwingTimer - DT);
+  if (isPlayerDodging(p)) return;
   if (isValkyrsCallingAirborne(p)) return;
   if (p.auras.some((a) => isTravelFormAuraKind(a.kind))) {
     p.autoAttack = false;
@@ -691,6 +693,10 @@ export function meleeSwing(
     normalizedInstant?: boolean;
   },
 ): boolean {
+  if (evadeIncomingAttack(ctx, attacker, target, 'physical', abilityName, opts.abilityId ?? null)) {
+    if (attacker.kind === 'player') attacker.overpowerUntil = ctx.time + 5;
+    return false;
+  }
   const missChance =
     swingMissChance(attacker, target) +
     blindMissBonus(attacker) +

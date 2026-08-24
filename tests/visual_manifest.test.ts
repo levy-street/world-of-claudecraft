@@ -29,6 +29,7 @@ function expectedClipNames(clips: ClipMap): string[] {
     clips.swim,
     clips.swimSurface,
     clips.jump,
+    clips.dodge,
     clips.walkBack,
     clips.flourish,
     ...clips.attack,

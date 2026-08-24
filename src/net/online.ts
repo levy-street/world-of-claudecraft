@@ -42,6 +42,7 @@ import { LEADERBOARD_PAGE_SIZE } from '../sim/leaderboard_page';
 import type { Ante, PickAction } from '../sim/lockpick';
 import type { MarketQuery } from '../sim/market_query';
 import { normalizeMoveFacing, sanitizeMoveInput } from '../sim/move_input';
+import { DODGE_ENDURANCE_MAX } from '../sim/player_dodge';
 import { isPersistentEngineAura } from '../sim/persistent_aura';
 import { isPrimaryOwnedPetEntity } from '../sim/pet/pet_selection';
 import { getArchetypeTitle, getHobbyCraft } from '../sim/professions/archetype';
@@ -3139,6 +3140,16 @@ export class ClientWorld implements IWorld {
       e.facing = w.f;
       e.hp = w.hp;
       e.maxHp = w.mhp;
+      if (e.kind === 'player') {
+        e.endurance =
+          typeof w.end === 'number' && Number.isFinite(w.end)
+            ? Math.min(DODGE_ENDURANCE_MAX, Math.max(0, w.end))
+            : DODGE_ENDURANCE_MAX;
+        e.dodgeRemaining =
+          typeof w.dg === 'number' && Number.isFinite(w.dg) ? Math.max(0, w.dg) : 0;
+        e.dodgeDirX = e.dodgeRemaining > 0 && Number.isFinite(w.dgx) ? w.dgx : 0;
+        e.dodgeDirZ = e.dodgeRemaining > 0 && Number.isFinite(w.dgz) ? w.dgz : 0;
+      }
       // Resource (the target frame's bar): the wire sends it only for entities
       // that have one, so a missing rtype keeps the blank defaults (no bar).
       if (w.rtype !== undefined) {
@@ -4035,6 +4046,9 @@ export class ClientWorld implements IWorld {
   }
   stopAutoAttack(): void {
     this.cmd({ cmd: 'stopattack' });
+  }
+  dodge(direction: { x: number; z: number }): void {
+    this.cmd({ cmd: 'dodge', x: direction.x, z: direction.z });
   }
   unstuck(): void {
     this.cmd({ cmd: 'unstuck' });

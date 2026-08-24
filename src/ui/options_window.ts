@@ -196,6 +196,7 @@ const BIND_ACTION_LABEL_KEYS: Partial<Record<string, TranslationKey>> = {
   // domain was tsc-locked to inline per-locale blocks.
   dive: 'hudChrome.keybinds.dive',
   autorun: 'hud.keybinds.actions.autorun',
+  dodge: 'itemUi.stats.dodge',
   target: 'hud.keybinds.actions.target',
   attackMove: 'hud.keybinds.actions.attackMove',
   interact: 'hud.keybinds.actions.interact',
