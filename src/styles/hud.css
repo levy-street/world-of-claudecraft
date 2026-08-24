@@ -21,12 +21,18 @@
 @layer components {
   #action-camera-crosshair {
     position: fixed;
-    width: 18px;
-    height: 18px;
+    width: 24px;
+    height: 24px;
     transform: translate(-50%, -50%);
     z-index: 18;
     pointer-events: none;
-    filter: drop-shadow(0 1px 2px rgb(0 0 0 / 85%));
+    background: radial-gradient(
+      circle,
+      rgb(255 215 96 / 95%) 0 1.5px,
+      rgb(0 0 0 / 82%) 1.75px 2.75px,
+      transparent 3px
+    );
+    filter: drop-shadow(0 1px 2px rgb(0 0 0 / 90%));
   }
 
   #action-camera-crosshair[hidden] {
@@ -42,17 +48,29 @@
   }
 
   #action-camera-crosshair::before {
-    left: 8px;
-    top: 1px;
+    left: 11px;
+    top: 0;
     width: 2px;
-    height: 16px;
+    height: 24px;
+    background: linear-gradient(
+      to bottom,
+      rgb(255 255 255 / 90%) 0 7px,
+      transparent 7px 17px,
+      rgb(255 255 255 / 90%) 17px 24px
+    );
   }
 
   #action-camera-crosshair::after {
-    left: 1px;
-    top: 8px;
-    width: 16px;
+    left: 0;
+    top: 11px;
+    width: 24px;
     height: 2px;
+    background: linear-gradient(
+      to right,
+      rgb(255 255 255 / 90%) 0 7px,
+      transparent 7px 17px,
+      rgb(255 255 255 / 90%) 17px 24px
+    );
   }
   /* ---------- nameplates ---------- */
   .nameplate {

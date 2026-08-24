@@ -4149,6 +4149,7 @@ async function startGame(
       cameraMoveActive(),
       input.isMouselookActive(),
       movementFrozen(),
+      input.isActionCameraLocked(),
     )
       ? input.camYaw
       : null;
@@ -4304,6 +4305,7 @@ async function startGame(
       cameraMoveActive(),
       input.isMouselookActive(),
       movementFrozen(),
+      input.isActionCameraLocked(),
     );
     const edgeReleaseFacing = mouselookReleaseFacing(
       prevCameraDrivenFacing,

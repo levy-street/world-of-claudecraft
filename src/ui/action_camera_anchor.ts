@@ -11,7 +11,16 @@ export interface ActionCameraAnchorRect {
 export function actionCameraScreenPoint(
   rect: ActionCameraAnchorRect,
 ): { x: number; y: number } | null {
-  if (rect.width <= 0 || rect.height <= 0) return null;
+  if (
+    !Number.isFinite(rect.left) ||
+    !Number.isFinite(rect.top) ||
+    !Number.isFinite(rect.width) ||
+    !Number.isFinite(rect.height) ||
+    rect.width <= 0 ||
+    rect.height <= 0
+  ) {
+    return null;
+  }
   return {
     x: rect.left + rect.width * 0.5,
     y: rect.top + rect.height * ACTION_CAMERA_AIM_HEIGHT_RATIO,

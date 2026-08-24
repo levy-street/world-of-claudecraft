@@ -20,9 +20,12 @@ export function createActionCameraCrosshair(
   let lastTop = '';
   return {
     setVisible(visible) {
+      let effectiveVisible = visible;
       if (visible) {
         const point = actionCameraScreenPoint(canvas.getBoundingClientRect());
-        if (point) {
+        if (!point) {
+          effectiveVisible = false;
+        } else {
           const left = `${point.x}px`;
           const top = `${point.y}px`;
           if (left !== lastLeft) {
@@ -35,9 +38,9 @@ export function createActionCameraCrosshair(
           }
         }
       }
-      if (visible !== shown) {
-        shown = visible;
-        element.hidden = !visible;
+      if (effectiveVisible !== shown) {
+        shown = effectiveVisible;
+        element.hidden = !effectiveVisible;
       }
     },
     dispose() {
