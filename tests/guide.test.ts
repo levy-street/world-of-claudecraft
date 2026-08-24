@@ -2699,8 +2699,22 @@ describe('Guide professions gathering accuracy', () => {
     // The FOURTH clause, and the one a farmer would have acted on: the vendor
     // ladder paragraph promised tiers 1 to 3 across the three heartland hubs,
     // where farming's only priced rung sits on a farmer NPC at the allotments.
-    expect(en).toContain('its tier-1 hoe is stocked by the farmers at the allotments');
+    expect(en).toContain('its tier-1 hoe is stocked by the farmer who keeps the first allotment');
     expect(en).toContain('no hoe rung above it is sold for coin anywhere');
+    // SINGULAR, and pinned as such: exactly ONE NPC anywhere sells garden_hoe,
+    // and the correction to this paragraph first said "the farmers at the
+    // allotments", which would have been a smaller falsehood inside a fix for a
+    // larger one. The other three farmers stock seeds and compost only.
+    const hoeSellers = Object.values(NPCS)
+      .filter((npc) => npc.vendorItems?.includes('garden_hoe'))
+      .map((npc) => npc.id);
+    expect(hoeSellers, 'exactly one NPC sells the tier-1 hoe').toHaveLength(1);
+    // And no OTHER hoe rung is on any NPC counter at all, which is the second
+    // half of the sentence.
+    const anyHoeSeller = Object.values(NPCS).flatMap((npc) =>
+      (npc.vendorItems ?? []).filter((id) => id.endsWith('_hoe') && id !== 'garden_hoe'),
+    );
+    expect(anyHoeSeller, 'no hoe rung above the first is vendor-sold').toEqual([]);
     // The retired claims, each pinned ABSENT so a revert reds rather than
     // quietly restoring a false page.
     expect(en, 'the node-trade count must not be claimed of every land trade').not.toContain(
