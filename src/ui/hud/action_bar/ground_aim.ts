@@ -1,3 +1,4 @@
+import { playerAttackResolution } from '../../../sim/combat/directional_attack';
 import type { AbilityDef, AbilityEffect, Entity } from '../../../sim/types';
 import { MELEE_RANGE } from '../../../sim/types';
 
@@ -12,6 +13,31 @@ export interface GroundAimState {
 }
 
 export const DEFAULT_GROUND_AOE_RADIUS = 6;
+
+export type AbilityPreviewKind = 'circle' | 'area' | 'meleeCone' | 'directionLine';
+
+/** Visual geometry keyed from the same resolver category the server applies. */
+export function abilityPreviewKind(ability: AbilityDef): AbilityPreviewKind {
+  const resolution = playerAttackResolution(ability);
+  if (resolution === 'meleeCone') return 'meleeCone';
+  if (resolution === 'ballisticProjectile' || resolution === 'directionalHitscan') {
+    return 'directionLine';
+  }
+  if (resolution === 'selfArea') return 'area';
+  return 'circle';
+}
+
+/** Melee follows character facing; ranged guides follow the live combat aim. */
+export function abilityPreviewAngle(
+  kind: AbilityPreviewKind,
+  caster: Pick<Entity, 'pos' | 'facing'>,
+  aim: AimPoint | null,
+): number {
+  if (kind === 'meleeCone' || !aim) return caster.facing;
+  const dx = aim.x - caster.pos.x;
+  const dz = aim.z - caster.pos.z;
+  return Math.hypot(dx, dz) > 1e-6 ? Math.atan2(dx, dz) : caster.facing;
+}
 
 /** Touch normally keeps instant target-feet casting, but Meteor needs an
  * explicit terrain tap so it never falls on the caster merely for lacking a

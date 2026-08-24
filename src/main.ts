@@ -3419,6 +3419,9 @@ async function startGame(
             z: range.point.z,
             radius: range.radius,
             school: range.school,
+            kind: range.kind,
+            angle: range.angle,
+            halfAngle: range.halfAngle,
           }
         : null,
     );
