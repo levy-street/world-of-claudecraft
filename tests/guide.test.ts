@@ -53,7 +53,6 @@ import {
 } from '../src/guide/routes';
 import { buildIndex, rank } from '../src/guide/search';
 import { DEEDS } from '../src/sim/content/deeds';
-import { gatheringSupplyByFamily } from '../src/sim/professions/gathering_supply';
 import { DELVE_SHOPS } from '../src/sim/content/delves/shop';
 import { ENCHANTS } from '../src/sim/content/enchants';
 import { FARM_CROPS } from '../src/sim/content/farm_crops';
@@ -101,6 +100,7 @@ import {
   GATHER_CAST_TOOL_TIER_REDUCTION_SEC,
   GATHER_GAIN_TIER_STEP,
 } from '../src/sim/professions/gathering';
+import { gatheringSupplyByFamily } from '../src/sim/professions/gathering_supply';
 import {
   MASTERWORK_BASE_CHANCE,
   MASTERWORK_CHANCE_CAP,
@@ -3460,10 +3460,14 @@ describe('Guide professions pages and routes', () => {
       .sort();
     expect(stations, 'the cooking mobile station is marked as one').toEqual(['The Laden Hearth']);
     expect(
-      GUIDE_PROF_PROVISIONING.ladder.flatMap((r) => r.outputs).filter((o) => o.placeable && o.station),
+      GUIDE_PROF_PROVISIONING.ladder
+        .flatMap((r) => r.outputs)
+        .filter((o) => o.placeable && o.station),
       'no output is both a feast and a station',
     ).toEqual([]);
-    expect(html, 'and the station tag renders').toContain(t('hudChrome.professions.mobileStationTooltip.kind'));
+    expect(html, 'and the station tag renders').toContain(
+      t('hudChrome.professions.mobileStationTooltip.kind'),
+    );
     // The rung they share, so a reader meets both tags in one list: the claim
     // is about what sits BESIDE the feasts, not merely that a tag exists.
     const topRung = GUIDE_PROF_PROVISIONING.ladder.find((r) => r.skillReq === 125);

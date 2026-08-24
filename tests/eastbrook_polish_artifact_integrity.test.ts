@@ -2057,7 +2057,7 @@ describe('Eastbrook polish performance and contact evidence', () => {
     // the release's own renderer work (the far-mesh swap holdout, the stale
     // remote-entity repair, the loading-review admission gates), none of which
     // moves the sealed pixels.
-//
+    //
     // UPSTREAM'S OWN RE-MINT HISTORY over this span, kept rather than dropped:
     // the shader-memory-probes instrumentation and VFX teardown extraction, the
     // fast-loading-screen-variety merge, its review-fix round (the nearby-view
