@@ -14906,8 +14906,13 @@ ones the costing already recorded:
   authoring a feast def joins the DERIVED set everywhere at once and leaves that
   map short. That is caught rather than trusted: the map is pinned exhaustively
   in BOTH directions against the sim's own family, and the reverse half was
-  added at the review round after a reviewer showed a bogus key would otherwise
-  have labelled every farm bed as a feast.
+  added at the review round. **ITS STATED JUSTIFICATION WAS THE ONE THIS
+  LEDGER'S OWN MUTATION TABLE FALSIFIES** (M17, M17b, M17c) and is corrected
+  here rather than left standing two screens apart from its refutation: a bogus
+  `farm_bed` key would NOT have gone green, it reds on a hand-picked negative
+  that predates the pin. What the reverse half actually buys is every object
+  template nobody thought to list as a negative, which is why it took
+  `delve_bell_rope` to reach it at all.
 - **K2 (quality and price).** Executed. Quality epic. sellValue **300**,
   DERIVED inside the binding window (strictly above the rare party feast at 250,
   strictly below the epic permanent station at 380, a multiple of 10) by the one
@@ -14918,6 +14923,17 @@ ones the costing already recorded:
   correction 3, and they came back intact: harvest_feast is still rare at 250
   and laden_hearth still epic at 380. What had moved was the thing sitting ON
   the excluded bound, and this phase retired it.
+- **THE RELIQUARY SWEEP RAN, and the verdict is NO PAGE** (recorded here
+  because the packet's own standing rule, set at the 11h drift correction, is
+  that a ledger records the sweep RAN rather than that the file is absent from
+  the diff; the first version of this ledger recorded neither). The six ids this
+  phase mints are three repeatably crafted, tradable consumables and the three
+  patterns that teach them. `docs/design/reliquary.md` curates CONQUERABLE
+  UNIQUE loot, the catalog holds zero crafted gear by precedent, and the
+  packet's Phase 11 build already settled that a PATTERN takes no page either
+  (consumed-on-learn knowledge, executed as the kind-keyed carve-out in
+  tests/reliquary_content.test.ts). Both grounds apply unchanged, so no page is
+  owed and `tests/reliquary_content.test.ts` is untouched by this phase.
 - **K3 (the storefront).** Executed as the CUT. No ACHIEVEMENT_MAP row in
   server/steam/ or server/epic/, the epic_achievement_map pins unmoved at 84
   (verified green, not assumed), no server/ file touched by this phase, and
