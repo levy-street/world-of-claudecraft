@@ -354,10 +354,7 @@ describe('casting_lifecycle: channel start -> tick -> finish', () => {
     updateCasting(sim.ctx, p, meta);
 
     expect(p.channelTicksLeft).toBe(2);
-    expect(sim.ctx.pendingProjectiles).toHaveLength(1);
-    for (let tick = 0; tick < 20 && mob.hp === mobHp0; tick++) {
-      advancePendingProjectiles(sim.ctx);
-    }
+    expect(sim.ctx.pendingProjectiles).toHaveLength(0);
     expect(mob.hp).toBeLessThan(mobHp0);
   });
 
@@ -450,7 +447,7 @@ describe('casting_lifecycle: channel start -> tick -> finish', () => {
     expect(stops.some((e: any) => e.success === false)).toBe(false);
   });
 
-  it('launches Litany of Woe bolts on the ballistic channel path', () => {
+  it('keeps Litany of Woe on its authored beam channel path', () => {
     const { sim, p } = makeSim('priest', 20);
     const mob = spawnTarget(sim, p, 20, 6);
     sim.drainEvents();
@@ -459,14 +456,18 @@ describe('casting_lifecycle: channel start -> tick -> finish', () => {
     const events: any[] = [];
     for (let tick = 0; tick < 25; tick++) events.push(...sim.tick());
 
+    expect(events).toContainEqual(
+      expect.objectContaining({
+        type: 'spellfx',
+        sourceId: p.id,
+        targetId: mob.id,
+        fx: 'beam',
+        ability: 'mind_flay',
+      }),
+    );
     expect(
-      events.some(
-        (event) =>
-          event.type === 'projectileLaunch' &&
-          event.sourceId === p.id &&
-          event.ability === 'mind_flay',
-      ),
-    ).toBe(true);
+      events.some((event) => event.type === 'projectileLaunch' && event.ability === 'mind_flay'),
+    ).toBe(false);
   });
 });
 

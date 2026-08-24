@@ -40,7 +40,12 @@ export function playerAttackResolution(ability: AbilityDef): PlayerAttackResolut
   if (ability.effects?.some((effect) => effect.type === 'aoeDamage')) return 'selfArea';
   if (!ability.requiresTarget) return 'selfArea';
   if (ability.range <= MELEE_RANGE) return 'meleeCone';
-  if (ability.projectile ?? ability.school !== 'physical') return 'ballisticProjectile';
+  // Projectile travel is an authored mechanic, not a proxy for "non-physical".
+  // The old school fallback turned every ranged spell, including target-born
+  // bursts, beams, DoTs and crowd control, into the same generic magic orb.
+  // Real bolts/arrows opt in through projectile (or the explicit resolution
+  // override above); everything else resolves on the aim line.
+  if (ability.projectile === true) return 'ballisticProjectile';
   return 'directionalHitscan';
 }
 

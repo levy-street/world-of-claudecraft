@@ -8,6 +8,7 @@ import {
   NEEDLE_OF_FATE_MAX_FLIGHT,
   NEEDLE_OF_FATE_REACH,
   NEEDLE_OF_FATE_RELEASE_SECONDS,
+  NEEDLE_OF_FATE_SPEED,
   type NeedleFlightPlan,
   type NeedleImpactPlan,
   type NeedleReleasePlan,
@@ -64,6 +65,10 @@ interface NeedleSlot {
   active: boolean;
   sourceId: number;
   targetId: number;
+  trajectoryId: string | null;
+  ballistic: boolean;
+  speed: number;
+  remainingDistance: number;
   age: number;
   ttl: number;
   group: THREE.Group;
@@ -483,6 +488,10 @@ export class NeedleOfFateVfx {
       active: false,
       sourceId: -1,
       targetId: -1,
+      trajectoryId: null,
+      ballistic: false,
+      speed: NEEDLE_OF_FATE_SPEED,
+      remainingDistance: 0,
       age: 0,
       ttl: 0,
       group,
@@ -697,6 +706,10 @@ export class NeedleOfFateVfx {
     slot.active = true;
     slot.sourceId = sourceId;
     slot.targetId = targetId;
+    slot.trajectoryId = null;
+    slot.ballistic = false;
+    slot.speed = NEEDLE_OF_FATE_SPEED;
+    slot.remainingDistance = 0;
     slot.age = 0;
     slot.ttl = NEEDLE_OF_FATE_MAX_FLIGHT;
     slot.group.position.copy(this.spawnPoint);
@@ -711,6 +724,65 @@ export class NeedleOfFateVfx {
       slot.history[offset + 2] = this.spawnPoint.z;
     }
     this.writeRibbon(slot);
+  }
+
+  spawnBallistic(
+    trajectoryId: string,
+    sourceId: number,
+    dirX: number,
+    dirZ: number,
+    speed: number,
+    maxDistance: number,
+  ): void {
+    if (!this.anchor(sourceId, 0.64, this.spawnPoint)) return;
+    this.endCast(sourceId);
+    this.openRelease(sourceId, this.spawnPoint);
+    const slot = this.needles[this.needleCursor];
+    this.needleCursor = (this.needleCursor + 1) % this.needles.length;
+    slot.active = true;
+    slot.sourceId = sourceId;
+    slot.targetId = -1;
+    slot.trajectoryId = trajectoryId;
+    slot.ballistic = true;
+    slot.speed = Math.max(0.01, speed);
+    slot.remainingDistance = Math.max(0, maxDistance);
+    slot.age = 0;
+    slot.ttl = slot.remainingDistance / slot.speed + 1;
+    slot.group.position.copy(this.spawnPoint);
+    slot.group.visible = true;
+    slot.trail.visible = true;
+    if (slot.ribbonGlow) slot.ribbonGlow.visible = true;
+    slot.coils.rotation.set(0, 0, 0);
+    slot.direction.set(dirX, 0, dirZ);
+    if (slot.direction.lengthSq() < 0.000001) slot.direction.set(0, 0, 1);
+    else slot.direction.normalize();
+    for (let index = 0; index < TRAIL_POINTS; index++) {
+      const offset = index * 3;
+      slot.history[offset] = this.spawnPoint.x;
+      slot.history[offset + 1] = this.spawnPoint.y;
+      slot.history[offset + 2] = this.spawnPoint.z;
+    }
+    this.writeRibbon(slot);
+  }
+
+  finishBallistic(
+    trajectoryId: string,
+    targetId: number | null,
+    x: number,
+    y: number,
+    z: number,
+  ): boolean {
+    const slot = this.needles.find(
+      (candidate) =>
+        candidate.active && candidate.ballistic && candidate.trajectoryId === trajectoryId,
+    );
+    if (!slot) return false;
+    this.hideNeedle(slot);
+    if (targetId !== null) {
+      this.tmpA.set(x, y, z);
+      this.openImpact(targetId, this.tmpA);
+    }
+    return true;
   }
 
   private openRelease(sourceId: number, position: THREE.Vector3): void {
@@ -784,6 +856,18 @@ export class NeedleOfFateVfx {
     if (!slot.active) return;
     slot.age += dt;
     slot.ttl -= dt;
+    if (slot.ballistic) {
+      if (slot.ttl <= 0) {
+        this.hideNeedle(slot);
+        return;
+      }
+      const step = Math.min(slot.remainingDistance, slot.speed * Math.max(0, dt));
+      slot.group.position.addScaledVector(slot.direction, step);
+      slot.remainingDistance = Math.max(0, slot.remainingDistance - step);
+      writeNeedleFlightPlan(slot.plan, slot.remainingDistance, dt, slot.age, reducedMotion);
+      this.paintNeedle(slot);
+      return;
+    }
     if (
       !this.anchor(slot.sourceId, 0.64, this.sourceProbe) ||
       !this.anchor(slot.targetId, 0.55, slot.target)
@@ -806,6 +890,10 @@ export class NeedleOfFateVfx {
     }
     slot.direction.multiplyScalar(1 / Math.max(0.0001, distance));
     slot.group.position.addScaledVector(slot.direction, slot.plan.step);
+    this.paintNeedle(slot);
+  }
+
+  private paintNeedle(slot: NeedleSlot): void {
     slot.group.quaternion.setFromUnitVectors(UP, slot.direction);
     slot.coils.rotation.y = slot.plan.spin;
     slot.coils.rotation.z = slot.plan.coil;
@@ -968,6 +1056,8 @@ export class NeedleOfFateVfx {
 
   private hideNeedle(slot: NeedleSlot): void {
     slot.active = false;
+    slot.trajectoryId = null;
+    slot.ballistic = false;
     slot.group.visible = false;
     slot.trail.visible = false;
     if (slot.ribbonGlow) slot.ribbonGlow.visible = false;

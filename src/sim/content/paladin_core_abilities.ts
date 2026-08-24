@@ -590,6 +590,7 @@ const protection: AbilityDef[] = [
     range: 30,
     school: 'holy',
     projectile: true,
+    playerAttackResolution: 'lockOnActivation',
     projectileFx: 'paladinSunwardDisc',
     requiresTarget: true,
     requiresShield: true,

@@ -228,7 +228,8 @@ function buildAtlasTexture(): ParticleAtlas {
     // Read back from the retained composed canvas: composeAtlasCanvas() runs at
     // most once per page, so its local 2d context is not in scope here.
     const size = atlasCanvas.width;
-    const ctx = atlasCanvas.getContext('2d')!;
+    const ctx = atlasCanvas.getContext('2d');
+    if (!ctx) throw new Error('Particle atlas canvas has no 2d context');
     const pixels = ctx.getImageData(0, 0, size, size).data;
     for (let i = 0; i < SPRITE_FILES.length; i++) {
       earlyRejectRadiusSq[i] = spriteEarlyRejectRadiusSq(
@@ -288,6 +289,30 @@ interface BallisticProjectileVisual {
   trailColor: THREE.Color;
   coreSprite: number;
   trailSprite: number;
+  scale: number;
+  jagged: boolean;
+  coils: boolean;
+  tracer: boolean;
+}
+
+export type BallisticProjectileStyle =
+  | 'rock'
+  | 'shard'
+  | 'comet'
+  | 'arrow'
+  | 'wisp'
+  | 'felLance'
+  | 'shadowFang'
+  | 'essenceLance'
+  | 'soulLance';
+
+export interface BallisticProjectileAppearance {
+  color?: number;
+  scale?: number;
+  style?: BallisticProjectileStyle;
+  jagged?: boolean;
+  coils?: boolean;
+  tracer?: boolean;
 }
 
 interface BubbleBeam {
@@ -304,6 +329,30 @@ function projectileSprites(school: string): { core: number; trail: number } {
   return school === 'fire'
     ? { core: SPR.firePuff, trail: SPR.flame }
     : { core: SPR.glowCore, trail: SPR.sparkle };
+}
+
+function ballisticProjectileSprites(
+  school: string,
+  style: BallisticProjectileStyle | undefined,
+): { core: number; trail: number } {
+  switch (style) {
+    case 'arrow':
+      return { core: SPR.trace, trail: SPR.trace };
+    case 'shard':
+      return { core: SPR.star, trail: SPR.sparkle };
+    case 'wisp':
+    case 'felLance':
+    case 'shadowFang':
+    case 'essenceLance':
+    case 'soulLance':
+      return { core: SPR.magicWisp, trail: SPR.magicWisp };
+    case 'rock':
+      return school === 'fire'
+        ? { core: SPR.firePuff, trail: SPR.flame }
+        : { core: SPR.debris, trail: SPR.sparkle };
+    default:
+      return projectileSprites(school);
+  }
 }
 
 // The world-anchor resolver (src/render/vfx_anchor.ts owns the contract and the
@@ -752,11 +801,12 @@ export class Vfx {
     speed: number,
     maxDistance: number,
     school: string,
+    appearance?: BallisticProjectileAppearance,
   ): void {
     const length = Math.hypot(dirX, dirZ);
     if (!Number.isFinite(length) || length <= 1e-6) return;
-    const colors = projectileSchoolColors(school);
-    const sprites = projectileSprites(school);
+    const colors = projectileSchoolColors(school, appearance?.color);
+    const sprites = ballisticProjectileSprites(school, appearance?.style);
     // A reconnect/replayed launch replaces the same trajectory instead of
     // rendering two bolts. Server impact remains the termination authority.
     this.ballisticProjectiles = this.ballisticProjectiles.filter(
@@ -774,6 +824,10 @@ export class Vfx {
       trailColor: colors.trail,
       coreSprite: sprites.core,
       trailSprite: sprites.trail,
+      scale: Math.max(0.5, Math.min(2.5, appearance?.scale ?? 1)),
+      jagged: appearance?.jagged === true,
+      coils: appearance?.coils === true,
+      tracer: appearance?.tracer === true,
     });
   }
 
@@ -2229,32 +2283,97 @@ export class Vfx {
       projectile.pos.x += projectile.dirX * step;
       projectile.pos.z += projectile.dirZ * step;
       projectile.remaining -= step;
-      this.spawn(
-        projectile.pos.x,
-        projectile.pos.y,
-        projectile.pos.z,
-        0,
-        0,
-        0,
-        projectile.coreColor,
-        0.46,
-        0.1,
-        0,
-        projectile.coreSprite,
-      );
-      for (let n = 0; n < this.emitCount(34, dt); n++) {
+      if (projectile.jagged) {
+        const perpX = -projectile.dirZ;
+        const perpZ = projectile.dirX;
+        let lateral = 0;
+        let vertical = 0;
+        for (let segment = 0; segment < 5; segment++) {
+          lateral = lateral * 0.45 + (Math.random() - 0.5) * 0.75;
+          vertical = vertical * 0.45 + (Math.random() - 0.5) * 0.55;
+          const back = segment * 0.55 * projectile.scale;
+          const x = projectile.pos.x - projectile.dirX * back + perpX * lateral * projectile.scale;
+          const y = projectile.pos.y + vertical * projectile.scale;
+          const z = projectile.pos.z - projectile.dirZ * back + perpZ * lateral * projectile.scale;
+          const head = segment === 0;
+          this.spawn(
+            x,
+            y,
+            z,
+            0,
+            0,
+            0,
+            head ? projectile.coreColor : projectile.color,
+            (head ? 0.5 : 0.36) * projectile.scale,
+            0.13,
+            0,
+            SPR.glowCore,
+          );
+          this.spawn(
+            x,
+            y,
+            z,
+            0,
+            0,
+            0,
+            projectile.trailColor,
+            (head ? 0.7 : 0.5) * projectile.scale,
+            0.15,
+            0,
+            SPR.glowSoft,
+          );
+        }
+      } else {
         this.spawn(
-          projectile.pos.x - projectile.dirX * (0.15 + Math.random() * 0.65),
+          projectile.pos.x,
+          projectile.pos.y,
+          projectile.pos.z,
+          0,
+          0,
+          0,
+          projectile.coreColor,
+          0.46 * projectile.scale,
+          0.1,
+          0,
+          projectile.coreSprite,
+        );
+      }
+      for (let n = 0; n < this.emitCount(34, dt); n++) {
+        const coil = projectile.coils
+          ? Math.sin(projectile.remaining * 9 + n * Math.PI) * 0.34 * projectile.scale
+          : 0;
+        this.spawn(
+          projectile.pos.x -
+            projectile.dirX * (0.15 + Math.random() * 0.65) -
+            projectile.dirZ * coil,
           projectile.pos.y + (Math.random() - 0.5) * 0.16,
-          projectile.pos.z - projectile.dirZ * (0.15 + Math.random() * 0.65),
+          projectile.pos.z -
+            projectile.dirZ * (0.15 + Math.random() * 0.65) +
+            projectile.dirX * coil,
           -projectile.dirX * (0.8 + Math.random()),
           (Math.random() - 0.35) * 0.6,
           -projectile.dirZ * (0.8 + Math.random()),
           projectile.trailColor,
-          0.24,
+          0.24 * projectile.scale,
           0.28,
           0,
           projectile.trailSprite,
+        );
+      }
+      if (projectile.tracer && this.emitChance(18, dt)) {
+        this.spawn(
+          projectile.pos.x - projectile.dirX * 0.45,
+          projectile.pos.y,
+          projectile.pos.z - projectile.dirZ * 0.45,
+          -projectile.dirX * 1.4,
+          0,
+          -projectile.dirZ * 1.4,
+          projectile.trailColor,
+          0.35 * projectile.scale,
+          0.2,
+          0,
+          SPR.trace,
+          0,
         );
       }
       // Impact normally arrives in the same or next render frame. Keep an

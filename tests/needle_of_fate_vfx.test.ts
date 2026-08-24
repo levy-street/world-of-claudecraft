@@ -116,6 +116,36 @@ describe('Needle of Fate VFX painter', () => {
     expect(graphAfter).toEqual(graphBefore);
   });
 
+  it('follows a server ballistic trajectory and impacts only at its authoritative endpoint', () => {
+    const scene = new THREE.Scene();
+    const camera = new THREE.PerspectiveCamera();
+    const anchors = new Map([
+      [1, new THREE.Vector3(0, 1.4, 0)],
+      [2, new THREE.Vector3(8, 1.1, 0)],
+    ]);
+    const onImpact = vi.fn();
+    const vfx = new NeedleOfFateVfx(scene, camera, anchorWriter(anchors), false, onImpact);
+
+    vfx.spawnBallistic('needle:1', 1, 1, 0, 26, 30);
+    vfx.update(0.1);
+
+    const projectile = scene.getObjectByName('needle-of-fate-projectile-0');
+    expect(projectile?.visible).toBe(true);
+    expect(projectile?.position.x).toBeCloseTo(2.6, 5);
+    expect(vfx.finishBallistic('other', 2, 8, 1.1, 0)).toBe(false);
+    expect(projectile?.visible).toBe(true);
+
+    expect(vfx.finishBallistic('needle:1', 2, 8, 1.1, 0)).toBe(true);
+    expect(projectile?.visible).toBe(false);
+    expect(scene.getObjectByName('needle-of-fate-impact-0')?.visible).toBe(true);
+    expect(onImpact).toHaveBeenCalledOnce();
+    expect(onImpact).toHaveBeenCalledWith(2);
+
+    vfx.spawnBallistic('needle:2', 1, 0, 1, 26, 30);
+    expect(vfx.finishBallistic('needle:2', null, 0, 1, 30)).toBe(true);
+    expect(onImpact).toHaveBeenCalledOnce();
+  });
+
   it('uses smaller bounded pools on low detail while retaining the needle and impact', () => {
     const scene = new THREE.Scene();
     const camera = new THREE.PerspectiveCamera();

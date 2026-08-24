@@ -46,8 +46,8 @@ import type { ChatBubbleStyle } from '../ui/chat_bubble_style';
 import { tEntity } from '../ui/entity_i18n';
 import type { IWorld } from '../world_api';
 import {
-  type AbilityRangeVisualKind,
   AbilityRangeReticleVisual,
+  type AbilityRangeVisualKind,
 } from './ability_range_reticle_visual';
 import {
   AbilityVfx,
@@ -328,6 +328,7 @@ import {
   storePooledObject as storeGroundObjectInPool,
   takeOrBuildGroundObject,
 } from './ground_object_pool';
+import { GroundPointProjector } from './ground_point_projector';
 import { createGroundTilt, type GroundTiltState, stepGroundTilt } from './ground_tilt_core';
 import { buildHauntFeatures, type HauntFeaturesView } from './haunt_features';
 import { buildHollowGates } from './hollow_gates';
@@ -497,6 +498,7 @@ import {
 } from './prewarm_resume';
 import { createPrewarmResumeLedger } from './prewarm_resume_ledger_core';
 import { type PriestMarkersVisual, syncPriestMarkersVisual } from './priest_markers_visual';
+import { handleProjectileEventVfx } from './projectile_event_vfx';
 import { buildPropMaterialPrewarmGroup, buildProps, propResidencySources } from './props';
 import { makeQuestObjectGate, type QuestObjectGateOptions } from './quest_object_gate_core';
 import { buildGroundQuestObject } from './quest_objects';
@@ -546,8 +548,6 @@ import { type SelfMotionFrame, SelfMotionPredictor, updateSelfRenderFallback } f
 import { SelfSpiritPrewarmer } from './self_spirit_prewarm';
 import { SentenceVfx } from './sentence_vfx';
 import { sentenceImpactPlan } from './sentence_vfx_core';
-import { GroundPointProjector } from './ground_point_projector';
-import { handleProjectileEventVfx } from './projectile_event_vfx';
 import {
   createShadowCadenceState,
   resetShadowCadence,
@@ -7718,7 +7718,30 @@ export class Renderer {
     if (ev.type === 'projectileLaunch' && ev.attackAnimation === 'ranged-shot') {
       this.triggerAttack(ev.sourceId);
     }
-    if (handleProjectileEventVfx(ev, () => this.sim.cfg.seed, this.vfx)) return;
+    if (ev.type === 'projectileLaunch' && ev.ability === 'needle_of_fate') {
+      this.needleOfFateVfx.spawnBallistic(
+        ev.trajectoryId,
+        ev.sourceId,
+        ev.dirX,
+        ev.dirZ,
+        ev.speed,
+        ev.maxDistance,
+      );
+      return;
+    }
+    if (
+      ev.type === 'projectileImpact' &&
+      this.needleOfFateVfx.finishBallistic(
+        ev.trajectoryId,
+        ev.reason === 'entity' ? (ev.targetId ?? null) : null,
+        ev.x,
+        groundHeight(ev.x, ev.z, this.sim.cfg.seed) + 0.7,
+        ev.z,
+      )
+    ) {
+      return;
+    }
+    if (handleProjectileEventVfx(ev, () => this.sim.cfg.seed, this.vfx, this.abilityVfx)) return;
     switch (ev.type) {
       case 'castStart': {
         if (ev.ability === 'needle_of_fate') {

@@ -29,6 +29,8 @@ function makePainter(hasGestureClip: (id: number, ability: string) => boolean, i
     sequenceInstantAt: vi.fn(),
     sequenceBolt: vi.fn(),
     sequenceBoltAt: vi.fn(),
+    beginBallisticSequence: vi.fn(),
+    finishBallisticSequence: vi.fn(),
     groundYAt: vi.fn().mockReturnValue(0),
   };
   const vfx = {
@@ -53,20 +55,20 @@ function makePainter(hasGestureClip: (id: number, ability: string) => boolean, i
     localPlayerId: () => -1,
   } as unknown as AbilityVfxDeps;
   const painter = new AbilityVfx(deps, () => 0);
-  return { painter, triggerAttack };
+  return { painter, triggerAttack, fx, vfx };
 }
 
 describe('player gesture release on cast fx (review #2961)', () => {
-  it('plays the authored clip for a player projectile cast whose ability has a gesture (earth_shock)', () => {
-    const { painter, triggerAttack } = makePainter((_id, ability) => ability === 'earth_shock');
+  it('plays the authored clip for a target-born impact whose ability has a gesture', () => {
+    const { painter, triggerAttack } = makePainter((_id, ability) => ability === 'flame_shock');
     painter.handleSpellfx({
       sourceId: SOURCE_ID,
       targetId: TARGET_ID,
-      school: 'nature',
-      fx: 'projectile',
-      ability: 'earth_shock',
+      school: 'fire',
+      fx: 'impact',
+      ability: 'flame_shock',
     });
-    expect(triggerAttack).toHaveBeenCalledWith(SOURCE_ID, 'earth_shock');
+    expect(triggerAttack).toHaveBeenCalledWith(SOURCE_ID, 'flame_shock');
   });
 
   it('plays the authored clip for a player lightning cast with a gesture (lightning_bolt)', () => {
@@ -79,6 +81,71 @@ describe('player gesture release on cast fx (review #2961)', () => {
       ability: 'lightning_bolt',
     });
     expect(triggerAttack).toHaveBeenCalledWith(SOURCE_ID, 'lightning_bolt');
+  });
+
+  it('carries Arc Bolt authored lightning DNA into a straight ballistic launch', () => {
+    const { painter, fx } = makePainter(() => false);
+    const appearance = painter.handleBallisticLaunch({
+      trajectoryId: '3:4:0',
+      sourceId: SOURCE_ID,
+      ability: 'lightning_bolt',
+    });
+
+    expect(appearance).toEqual(
+      expect.objectContaining({
+        jagged: true,
+        coils: true,
+      }),
+    );
+    expect(appearance?.color).not.toBe(0x86e86a);
+    expect(fx.beginBallisticSequence).toHaveBeenCalledWith(
+      '3:4:0',
+      'lightning_bolt',
+      expect.objectContaining({ archetype: 'bolt', palette: 'storm' }),
+      SOURCE_ID,
+      appearance?.color,
+      expect.any(Number),
+    );
+  });
+
+  it('ends Fireball authored impact anatomy at the server contact event', () => {
+    const { painter, fx } = makePainter(() => false);
+    painter.handleBallisticLaunch({
+      trajectoryId: '3:5:0',
+      sourceId: SOURCE_ID,
+      ability: 'fireball',
+    });
+    painter.handleBallisticImpact({
+      trajectoryId: '3:5:0',
+      x: 11,
+      z: 14,
+      targetId: TARGET_ID,
+      reason: 'entity',
+    });
+
+    expect(fx.finishBallisticSequence).toHaveBeenCalledWith('3:5:0', 11, 14, TARGET_ID, 'entity');
+  });
+
+  it('lands a target-born DoT with its authored contact sequence and no projectile', () => {
+    const { painter, fx, vfx } = makePainter(() => false);
+    const claimed = painter.handleSpellfx({
+      sourceId: SOURCE_ID,
+      targetId: TARGET_ID,
+      school: 'fire',
+      fx: 'impact',
+      ability: 'flame_shock',
+    });
+
+    expect(claimed).toBe(true);
+    expect(fx.sequenceInstant).toHaveBeenCalledWith(
+      'flame_shock',
+      expect.objectContaining({ archetype: 'dot', palette: 'fire' }),
+      SOURCE_ID,
+      TARGET_ID,
+      expect.any(Number),
+      expect.any(Number),
+    );
+    expect(vfx.projectile).not.toHaveBeenCalled();
   });
 
   it('plays the authored clip for a player nova cast with a gesture (thunder_clap)', () => {
@@ -112,9 +179,9 @@ describe('player gesture release on cast fx (review #2961)', () => {
     painter.handleSpellfx({
       sourceId: SOURCE_ID,
       targetId: TARGET_ID,
-      school: 'nature',
-      fx: 'projectile',
-      ability: 'earth_shock',
+      school: 'fire',
+      fx: 'impact',
+      ability: 'flame_shock',
     });
     expect(triggerAttack).not.toHaveBeenCalled();
   });
@@ -127,9 +194,9 @@ describe('player gesture release on cast fx (review #2961)', () => {
     painter.handleSpellfx({
       sourceId: SOURCE_ID,
       targetId: TARGET_ID,
-      school: 'nature',
-      fx: 'projectile',
-      ability: 'earth_shock',
+      school: 'fire',
+      fx: 'impact',
+      ability: 'flame_shock',
     });
     // A mob source is skipped by playerGestureRelease and by mobThrowFallback
     // (deps.isMob is stubbed true but castingAbilityOf/isMidOneShot are
@@ -137,7 +204,7 @@ describe('player gesture release on cast fx (review #2961)', () => {
     // NO ability id if it ran); assert no call ever carries the ability id
     // from the player gesture path specifically.
     for (const call of triggerAttack.mock.calls) {
-      expect(call[1]).not.toBe('earth_shock');
+      expect(call[1]).not.toBe('flame_shock');
     }
   });
 });

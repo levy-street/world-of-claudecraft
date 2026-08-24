@@ -931,7 +931,7 @@ export interface SimContextCallbacks {
     meta: PlayerMeta,
     target: Entity,
     res: ResolvedAbility,
-    snapshot: { spentCombo: number; sureCrit: boolean },
+    snapshot: { spentCombo: number; sureCrit: boolean; castDamageMultiplier?: number },
   ): void;
 
   // P1a pet AI (src/sim/pet/pet_ai): the moved updatePet/petRangedAttack/petPickTarget
