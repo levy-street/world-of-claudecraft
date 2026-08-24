@@ -12158,8 +12158,9 @@ round included, happened after that.
 
 THE HEADLINE, and it is about the guard rather than the content: **TWO MUTATIONS
 SURVIVED `tests/gathering_supply_coverage.test.ts`, and both were holes in
-masterwrought decision D itself.** Sixteen mutations run in total, fourteen dead
-on the shipped tree, two alive; both are fixed, both re-proven dead, and the
+masterwrought decision D itself.** Sixteen mutations run in total, twelve dead
+against the guard as it shipped, two alive, and two more that only the repair
+made runnable; both are fixed, both re-proven dead, and the
 other eight arms re-run afterwards because a fix to a guard is the change most
 likely to blunt it.
 
@@ -12271,7 +12272,10 @@ PROVEN APPLIED before the run (numstat, plus the removed-line count the harness
 prints), then restored by FILE COPY and verified with `diff -q` plus a clean
 `git status`. Never `git checkout`.
 
-**Fourteen dead on the shipped guard:**
+**TWELVE DEAD ON THE SHIPPED GUARD, and two more the fix made possible.** The last two rows below could not have been run against the guard as 11j
+shipped it, because neither the refused-set pin nor the land-tool counter
+existed; they are listed here rather than in the fix section because they are
+evidence about the arms, not about the repair.
 
 | mutation | arm proven | outcome |
 |---|---|---|
