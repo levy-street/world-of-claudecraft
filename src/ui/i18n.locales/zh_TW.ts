@@ -11459,7 +11459,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'guide.profPages.prov.suppliersHeading':
     '誰在供養廚房',
   'guide.profPages.prov.suppliersBody':
-    '烹飪從採集線中取材之廣，勝過任何其他行業，而這是刻意的：一名兼顧釣魚、務農或剝皮的廚師，從不缺可用之物；而一名三者皆不涉獵的廚師，也能在市場上買齊所需。\n\n下方列出每條線各自帶來什麼，這些內容直接讀取自當前的配方表，而非在此寫死，因此它始終是廚房今天真正需要的東西。',
+    '烹飪幾乎從每一條採集線中取材，而這是刻意的：一名兼顧釣魚、務農或剝皮的廚師，從不缺可用之物；而一名三者皆不涉獵的廚師，也能在市場上買齊所需。\n\n下方列出每條線各自帶來什麼，這些內容直接讀取自當前的配方表，而非在此寫死，因此它始終是廚房今天真正需要的東西。',
   'guide.profPages.prov.lineCountFmt':
     '{count} 種進入烹飪配方',
   'guide.profPages.prov.lineCorpse':

@@ -6444,7 +6444,7 @@ export const en: EnTranslations = {
         "title": "Provisioning: from the field to the raid",
         "intro": "The gathering lines meet in one kitchen, and the ladder above it ends at a table a whole raid eats from.",
         "suppliersHeading": "Who feeds the kitchen",
-        "suppliersBody": "Cooking takes from more of the gathering lines than any other craft, and that is deliberate: a cook who also fishes, farms, or skins is never short of something to work with, and a cook who does none of those can buy the lot on the market.\n\nWhat each line brings is listed below, and it is read straight off the live recipe list rather than written down here, so it is always what the kitchen actually asks for today.",
+        "suppliersBody": "Cooking takes from nearly every gathering line, and that is deliberate: a cook who also fishes, farms, or skins is never short of something to work with, and a cook who does none of those can buy the lot on the market.\n\nWhat each line brings is listed below, and it is read straight off the live recipe list rather than written down here, so it is always what the kitchen actually asks for today.",
         "lineCountFmt": "{count} into cooking bills",
         "lineCorpse": "Corpse harvesting",
         "ladderHeading": "The ladder, rung by rung",

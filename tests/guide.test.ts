@@ -53,6 +53,7 @@ import {
 } from '../src/guide/routes';
 import { buildIndex, rank } from '../src/guide/search';
 import { DEEDS } from '../src/sim/content/deeds';
+import { gatheringSupplyByFamily } from '../src/sim/professions/gathering_supply';
 import { DELVE_SHOPS } from '../src/sim/content/delves/shop';
 import { ENCHANTS } from '../src/sim/content/enchants';
 import { FARM_CROPS } from '../src/sim/content/farm_crops';
@@ -3385,6 +3386,21 @@ describe('Guide professions pages and routes', () => {
       GUIDE_PROF_PROVISIONING.lines.map((l) => l.id).sort(),
       'exactly the lines that feed the kitchen, and mining does not',
     ).toEqual(['corpseHarvesting', 'farming', 'fishing', 'herbalism', 'logging']);
+    // AND THE PROSE CLAIM THOSE FIVE HAVE TO CARRY (masterwrought Phase 11k QA).
+    // The section opened by telling a player cooking takes from MORE gathering
+    // lines than any other craft, which the tables refuse: engineering takes
+    // from five too (farming, fishing, herbalism, logging, mining), so it is a
+    // tie and not a lead. Corrected to "nearly every gathering line", which is
+    // measured here rather than trusted: five of the six supplying families,
+    // the missing one named above.
+    expect(
+      gatheringSupplyByFamily().size,
+      'six supplying families in all, so five of them is nearly every one',
+    ).toBe(6);
+    expect(
+      t('guide.profPages.prov.suppliersBody'),
+      'the section must not claim a lead it does not hold',
+    ).not.toContain('than any other craft');
     for (const id of ['farming', 'fishing', 'herbalism', 'corpseHarvesting', 'logging']) {
       const line = lineOf(id);
       for (const name of line.materials) {
