@@ -17,6 +17,7 @@ import {
   recipeById,
   TOOL_EFFECT_RECIPES,
   TOOL_RECIPES,
+  TROPHY_RECIPES,
 } from '../src/sim/content/recipes';
 import { STATIONS } from '../src/sim/data';
 import {
@@ -435,7 +436,8 @@ describe('craftItem command (#1127)', () => {
     // Every authored recipe list, spelled out: a new list that joins
     // ALL_RECIPES but not this enumeration would be unreachable through
     // recipeList, which is the exact defect #1132 found. FARM_RECIPES (the
-    // Phase 6 farm-economy hook set) joined here with the dishes.
+    // Phase 6 farm-economy hook set) joined here with the dishes;
+    // TROPHY_RECIPES (Masterwrought phase 11l) with the trophy consumers.
     const allIds = [
       ...COMMON_RECIPES,
       ...TOOL_RECIPES,
@@ -452,6 +454,7 @@ describe('craftItem command (#1127)', () => {
       ...APEX_GEAR_RECIPES,
       ...APEX_CONSUMABLE_RECIPES,
       ...FARM_RECIPES,
+      ...TROPHY_RECIPES,
     ]
       .map((r) => r.id)
       .sort();
@@ -470,7 +473,8 @@ describe('craftItem command (#1127)', () => {
         APEX_ARMOR_RECIPES.length +
         APEX_GEAR_RECIPES.length +
         APEX_CONSUMABLE_RECIPES.length +
-        FARM_RECIPES.length,
+        FARM_RECIPES.length +
+        TROPHY_RECIPES.length,
     );
     expect(sim.recipeList.map((r) => r.id).sort()).toEqual(allIds);
   });

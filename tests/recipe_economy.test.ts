@@ -27,6 +27,7 @@ import {
   ROD_RECIPES,
   recipeById,
   TOOL_EFFECT_RECIPES,
+  TROPHY_RECIPES,
 } from '../src/sim/content/recipes';
 import { ITEMS, NPCS, STATIONS } from '../src/sim/data';
 
@@ -300,7 +301,8 @@ describe('REFERENTIAL INTEGRITY', () => {
     // masterwrought Phase 11i added is a drop, see the derived term below), the two tool-effect
     // charms, the nine jewelcrafting catalog recipes, the six inscription
     // catalog recipes, the ten Masterwrought phase 07 intermediates, the
-    // three crafted hoes, and the farm-economy set's ON-RAMP: the
+    // three crafted hoes, the eight Masterwrought phase 11l trophy consumers,
+    // and the farm-economy set's ON-RAMP: the
     // pre-training id list is frozen, so anything authored after that switch
     // has to be learned.
     //
@@ -335,6 +337,7 @@ describe('REFERENTIAL INTEGRITY', () => {
         INSCRIPTION_RECIPES.length +
         INTERMEDIATE_RECIPES.length +
         HOE_RECIPES.length +
+        TROPHY_RECIPES.length +
         farmTrainerRows,
     );
     // The sibling literal for the derived term, same reason every other term
@@ -363,6 +366,10 @@ describe('REFERENTIAL INTEGRITY', () => {
     // trainer-taught, so unlike the rod and farm sets the hoe term needs no
     // channel split: the whole list still feeds the sum above.
     expect(HOE_RECIPES).toHaveLength(4);
+    // The Masterwrought phase 11l trophy economy: one consumer recipe per
+    // adopted junk trophy, all eight trainer-taught, so the whole list feeds
+    // the sum above (no channel split).
+    expect(TROPHY_RECIPES).toHaveLength(8);
     // The economy-hooks phase's eight farm dishes, the four Phase 11 well-fed
     // buff dishes, the growth tonic's alchemy row, and the Phase 12 shared
     // feast (a cooking row with a placeable junk output). Deliberately

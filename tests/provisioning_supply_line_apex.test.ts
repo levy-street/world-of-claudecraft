@@ -835,6 +835,9 @@ describe('masterwrought Phase 11h GATE C: the flask crop', () => {
       recipe_goldleaf_mana_draught: 2,
       recipe_grand_cauldron: 6,
       recipe_growth_tonic: 2,
+      // Masterwrought phase 11l: the trophy consumer recipe_healing_potion
+      // (tallow trophy plus goldleaf and a vial) joined alchemy's herb line.
+      recipe_healing_potion: 1,
       recipe_ironhusk_flask: 2,
       recipe_minor_healing_potion: 2,
       recipe_quickening_catalyst: 3,
@@ -855,15 +858,17 @@ describe('masterwrought Phase 11h GATE C: the flask crop', () => {
       if (n > 0) liveAlchemyHerb[recipe.id] = n;
     }
     expect(liveAlchemyHerb, "alchemy's herb demand, per row").toEqual(alchemyHerbPerRecipe);
-    // 44 is a MEASUREMENT of the merged table, taken here rather than predicted:
-    // this phase adds no herb anywhere, so the number it pins is whatever
-    // shipped, and the three global herb totals in
-    // tests/provisioning_supply_line.test.ts (28 / 27 / 39, green and unmoved)
-    // are the independent evidence that the phase did not change it.
+    // 44 was a MEASUREMENT of the merged table, taken here rather than
+    // predicted: 11h adds no herb anywhere, so the number it pinned is
+    // whatever shipped, and the three global herb totals in
+    // tests/provisioning_supply_line.test.ts (28 / 27 / 39 then, green and
+    // unmoved by 11h) were the independent evidence. 45 since Masterwrought
+    // phase 11l, whose trophy row recipe_healing_potion added goldleaf 1 (a
+    // pure addition, so R18's no-reduction direction still holds).
     expect(
       Object.values(alchemyHerbPerRecipe).reduce((t, n) => t + n, 0),
-      "alchemy's whole herb demand, unchanged by this phase",
-    ).toBe(44);
+      "alchemy's whole herb demand",
+    ).toBe(45);
   });
 
   it('every apex alchemy row that took a crop still consumes an herb', () => {
@@ -1423,12 +1428,15 @@ describe('masterwrought Phase 11h: what it did NOT touch', () => {
     // every id 11h added already existed. The table sizes are re-pinned rather
     // than deleted because their job here is to make a later phase's mint
     // VISIBLE in 11h's own file rather than silent, which is exactly what has
-    // now happened three times. The two counts moved TOGETHER this time, where
+    // now happened three times. The two counts moved TOGETHER at 11k, where
     // 11j moved only ALL_RECIPES: that divergence, and its absence, is itself
-    // the record of what kind of row each later phase added.
+    // the record of what kind of row each later phase added. Then 164 at
+    // Masterwrought phase 11l, which minted the eight trophy consumer rows:
+    // ALL_RECIPES alone moved again (no apex row, no new item id, every
+    // output an already-shipped def).
     expect(APEX_CONSUMABLE_RECIPES).toHaveLength(13);
     expect(INTERMEDIATE_RECIPES).toHaveLength(10);
-    expect(ALL_RECIPES).toHaveLength(156);
+    expect(ALL_RECIPES).toHaveLength(164);
     for (const row of APEX_ROWS) {
       expect(requireRecipe(row.id).skillReq, `${row.id} rung`).toBe(row.rung);
     }

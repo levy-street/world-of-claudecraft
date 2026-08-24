@@ -8919,6 +8919,41 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
           "minimalAt": 50,
           "zeroAt": 75
         }
+      },
+      {
+        "id": "recipe_healing_potion",
+        "name": "Healing Potion",
+        "skillReq": 25,
+        "tier": 1,
+        "station": "apothecary",
+        "acquisition": "trainer",
+        "feeCopper": 2500,
+        "materials": [
+          {
+            "name": "Greasy Tallow Lump",
+            "count": 2
+          },
+          {
+            "name": "Goldleaf Herb",
+            "count": 1
+          },
+          {
+            "name": "Glass Vial",
+            "count": 1
+          }
+        ],
+        "output": {
+          "name": "Healing Potion",
+          "count": 1,
+          "quality": "common"
+        },
+        "combo": null,
+        "oncePerDay": false,
+        "gain": {
+          "reducedAt": 50,
+          "minimalAt": 75,
+          "zeroAt": 100
+        }
       }
     ]
   },
@@ -11078,6 +11113,84 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
           "minimalAt": 150,
           "zeroAt": 175
         }
+      },
+      {
+        "id": "recipe_oiled_boots",
+        "name": "Oiled Leather Boots",
+        "skillReq": 25,
+        "tier": 1,
+        "station": "tannery",
+        "acquisition": "trainer",
+        "feeCopper": 2500,
+        "materials": [
+          {
+            "name": "Slimy Mudfin Scale",
+            "count": 4
+          },
+          {
+            "name": "Rough Hide",
+            "count": 6
+          },
+          {
+            "name": "Spider Silk",
+            "count": 2
+          },
+          {
+            "name": "Tanning Agent",
+            "count": 2
+          }
+        ],
+        "output": {
+          "name": "Oiled Leather Boots",
+          "count": 1,
+          "quality": "uncommon"
+        },
+        "combo": null,
+        "oncePerDay": false,
+        "gain": {
+          "reducedAt": 50,
+          "minimalAt": 75,
+          "zeroAt": 100
+        }
+      },
+      {
+        "id": "recipe_gravewyrm_bone_quiver",
+        "name": "Gravewyrm Bone Quiver",
+        "skillReq": 50,
+        "tier": 2,
+        "station": "tannery",
+        "acquisition": "trainer",
+        "feeCopper": 10000,
+        "materials": [
+          {
+            "name": "Cracked Wyrm Scale",
+            "count": 3
+          },
+          {
+            "name": "Pristine Hide",
+            "count": 2
+          },
+          {
+            "name": "Osmium Ore",
+            "count": 4
+          },
+          {
+            "name": "Tanning Agent",
+            "count": 1
+          }
+        ],
+        "output": {
+          "name": "Gravewyrm Bone Quiver",
+          "count": 1,
+          "quality": "rare"
+        },
+        "combo": null,
+        "oncePerDay": false,
+        "gain": {
+          "reducedAt": 75,
+          "minimalAt": 100,
+          "zeroAt": 125
+        }
       }
     ]
   },
@@ -11725,6 +11838,41 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
           "minimalAt": 150,
           "zeroAt": 175
         }
+      },
+      {
+        "id": "recipe_linen_pouch",
+        "name": "Linen Pouch",
+        "skillReq": 0,
+        "tier": 0,
+        "station": "loom",
+        "acquisition": "trainer",
+        "feeCopper": 0,
+        "materials": [
+          {
+            "name": "Red Bandana",
+            "count": 2
+          },
+          {
+            "name": "Linen Scrap",
+            "count": 4
+          },
+          {
+            "name": "Spool of Thread",
+            "count": 4
+          }
+        ],
+        "output": {
+          "name": "Linen Pouch",
+          "count": 1,
+          "quality": "common"
+        },
+        "combo": null,
+        "oncePerDay": false,
+        "gain": {
+          "reducedAt": 25,
+          "minimalAt": 50,
+          "zeroAt": 75
+        }
       }
     ]
   },
@@ -12044,6 +12192,45 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
           "reducedAt": 125,
           "minimalAt": 150,
           "zeroAt": 175
+        }
+      },
+      {
+        "id": "recipe_valefire_lantern",
+        "name": "Valefire Lantern",
+        "skillReq": 25,
+        "tier": 1,
+        "station": "apothecary",
+        "acquisition": "trainer",
+        "feeCopper": 2500,
+        "materials": [
+          {
+            "name": "Cracked Fetish",
+            "count": 2
+          },
+          {
+            "name": "Goldleaf Herb",
+            "count": 2
+          },
+          {
+            "name": "Chime Essence",
+            "count": 1
+          },
+          {
+            "name": "Glass Vial",
+            "count": 1
+          }
+        ],
+        "output": {
+          "name": "Valefire Lantern",
+          "count": 1,
+          "quality": "uncommon"
+        },
+        "combo": null,
+        "oncePerDay": false,
+        "gain": {
+          "reducedAt": 50,
+          "minimalAt": 75,
+          "zeroAt": 100
         }
       }
     ]
@@ -13238,6 +13425,76 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
           "minimalAt": 150,
           "zeroAt": 175
         }
+      },
+      {
+        "id": "recipe_vale_carving_knife",
+        "name": "Vale Carving Knife",
+        "skillReq": 25,
+        "tier": 1,
+        "station": "forge",
+        "acquisition": "trainer",
+        "feeCopper": 2500,
+        "materials": [
+          {
+            "name": "Chipped Tusk",
+            "count": 3
+          },
+          {
+            "name": "Iron Ore",
+            "count": 3
+          },
+          {
+            "name": "Smithing Flux",
+            "count": 3
+          }
+        ],
+        "output": {
+          "name": "Vale Carving Knife",
+          "count": 1,
+          "quality": "common"
+        },
+        "combo": null,
+        "oncePerDay": false,
+        "gain": {
+          "reducedAt": 50,
+          "minimalAt": 75,
+          "zeroAt": 100
+        }
+      },
+      {
+        "id": "recipe_bristleback_maul",
+        "name": "Gallowglass Hammer",
+        "skillReq": 50,
+        "tier": 2,
+        "station": "forge",
+        "acquisition": "trainer",
+        "feeCopper": 10000,
+        "materials": [
+          {
+            "name": "Cracked Ogre Tusk",
+            "count": 2
+          },
+          {
+            "name": "Highpine Log",
+            "count": 1
+          },
+          {
+            "name": "Smithing Flux",
+            "count": 2
+          }
+        ],
+        "output": {
+          "name": "Gallowglass Hammer",
+          "count": 1,
+          "quality": "uncommon"
+        },
+        "combo": null,
+        "oncePerDay": false,
+        "gain": {
+          "reducedAt": 75,
+          "minimalAt": 100,
+          "zeroAt": 125
+        }
       }
     ]
   },
@@ -13882,6 +14139,41 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
           "reducedAt": 125,
           "minimalAt": 150,
           "zeroAt": 175
+        }
+      },
+      {
+        "id": "recipe_hobnail_boots",
+        "name": "Hobnailed Boots",
+        "skillReq": 25,
+        "tier": 1,
+        "station": "forge",
+        "acquisition": "trainer",
+        "feeCopper": 2500,
+        "materials": [
+          {
+            "name": "Bogiron Nugget",
+            "count": 3
+          },
+          {
+            "name": "Iron Ore",
+            "count": 3
+          },
+          {
+            "name": "Smithing Flux",
+            "count": 2
+          }
+        ],
+        "output": {
+          "name": "Hobnailed Boots",
+          "count": 1,
+          "quality": "common"
+        },
+        "combo": null,
+        "oncePerDay": false,
+        "gain": {
+          "reducedAt": 50,
+          "minimalAt": 75,
+          "zeroAt": 100
         }
       }
     ]

@@ -745,7 +745,11 @@ describe('armorcrafting mastery derives from the live tables (R13)', () => {
     // ladder (which consumes no thorium at all) cannot reshape silently
     // under the window either.
     expect(RUN.bill.get('thorium_ore')).toBe(450);
-    expect(RUN.bill.get('iron_ore')).toBe(100);
+    // 75 since Masterwrought phase 11l: the trophy row recipe_hobnail_boots
+    // (iron 3 gathered; its bogiron trophy and flux are non-gathered, so free
+    // in this model) wins the rung-25 fewest-gathered tie-break, so the 25
+    // rung-25 crafts bill 3 iron each instead of the previous pick's 4.
+    expect(RUN.bill.get('iron_ore')).toBe(75);
     expect(RUN.bill.get('copper_ore')).toBe(75);
     // Gain curve ON: the whole per-rung craft vector, not just the top rung.
     const craftsPerRung = new Map<number, number>();
