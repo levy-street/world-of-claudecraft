@@ -154,8 +154,24 @@ export const SPEC_BASELINES: SpecBaselineTable = {
     },
   },
   warlock: {
+    // 2026-08-23 PVE viability round: all three specs benched 21 to 33% under
+    // the re-anchored best real kit at the heroic Nythraxis profile (level-22
+    // target, real armor curve), against live heroic parse tops of 169/133/131
+    // versus combat/fire at 217 to 222. The spellDmgPct floors (plus the
+    // demonology pet top-up, since pets scale with neither spell knob) size
+    // each spec to the 200 DPS heroic anchor in
+    // tests/warlock_anchor_*: measured slopes, not invented numbers.
+    // Stated collateral, accepted with the round: dmgMult also reaches the
+    // flat-magnitude buff kinds (SCALABLE_BUFF_KINDS in content/classes.ts),
+    // so Fiendhide armor resolves 88/176 instead of 80/160 (pinned in
+    // tests/warlock_class_talents.test.ts); Hard Bargain's mana yield is
+    // deliberately excluded (the lifeTap arm of scaleEffect). Rounding on
+    // small authored magnitudes makes the delivered percent wobble around the
+    // knob (Litany 9 to 11 is +10% under the 0.07 floor). The floors apply in
+    // PvP too (no PvE/PvP scaling split); flagged for the PvP review.
     affliction: {
       stats: { int: 6 },
+      global: { spellDmgPct: 0.07 },
       ability: [
         { ability: 'needle_of_fate', dmgPct: 0.08, costPct: -0.08 },
         { ability: 'drain_life', costPct: -0.08 },
@@ -167,6 +183,7 @@ export const SPEC_BASELINES: SpecBaselineTable = {
       // stat. Pet armour/health is not a modifier the engine exposes (only pet
       // damage), so that direction would be a separate feature, not this pass.
       stats: { sta: 8, armorPct: 0.06, int: 6 },
+      global: { spellDmgPct: 0.1, petDmgPct: 0.15 },
       ability: [
         { ability: 'soul_harvest', costPct: -0.08, dmgPct: 0.08 },
         { ability: 'bone_armor', costPct: -0.08 },
@@ -174,6 +191,7 @@ export const SPEC_BASELINES: SpecBaselineTable = {
     },
     destruction: {
       stats: { sta: 6 },
+      global: { spellDmgPct: 0.1 },
       ability: [
         { ability: 'shadow_bolt', costPct: -0.23, castPct: -0.03 },
         { ability: 'immolate', costPct: -0.23, castPct: -0.03 },
