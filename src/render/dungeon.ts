@@ -1350,15 +1350,19 @@ export class DungeonInteriors {
     deck.position.set(0, height / 2, rampZ1 + deckDepth / 2);
     deck.receiveShadow = true;
     group.add(deck);
-    // Full-width staircase rising 0 to height; each step's top approximates the
-    // linear lift at its centre (the tiny sub-step mismatch is imperceptible). Step
-    // count scales with the ramp length (~2yd tread) so both a short steep sanctum
-    // and a long gentle climb read as proper stairs, not a few giant blocks.
+    // Full-width staircase rising 0 to height. Each step's top sits at the walkable
+    // lift (riftPlatformLift) at the step's CENTRE, so the ramp the player walks on
+    // passes through the middle of every tread: the worst-case gap between the drawn
+    // step and where the player stands is half a step, centred, instead of a full
+    // step below. (The tops previously sampled the step's back edge, (i + 1) / steps,
+    // which read in-game as the character sinking a whole step into the stairs while
+    // climbing.) Step count scales with the ramp length (~2yd tread) so both a short
+    // steep sanctum and a long gentle climb read as proper stairs, not giant blocks.
     const rampLen = rampZ1 - rampZ0;
     const steps = Math.max(5, Math.min(20, Math.round(rampLen / 2.2)));
     const stepDepth = rampLen / steps;
     for (let i = 0; i < steps; i++) {
-      const topY = (height * (i + 1)) / steps;
+      const topY = (height * (i + 0.5)) / steps;
       const step = new THREE.Mesh(new THREE.BoxGeometry(halfW * 2, topY, stepDepth + 0.05), mat);
       step.position.set(0, topY / 2, rampZ0 + (i + 0.5) * stepDepth);
       step.receiveShadow = true;
