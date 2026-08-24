@@ -86,7 +86,9 @@
       </div>
     {/if}
     <h4>{t('wealth.largeMovementsHeader')}</h4>
-    {#if wealth.largeMovements.length === 0}
+    {#if wealth.largeMovementsUnavailable}
+      <div class="empty">{t('wealth.largeMovementsUnavailable')}</div>
+    {:else if wealth.largeMovements.length === 0}
       <div class="empty">{t('wealth.noLargeMovements')}</div>
     {:else}
       <div class="table-scroll">

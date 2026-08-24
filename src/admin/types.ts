@@ -124,7 +124,8 @@ export interface SuspiciousPlayer {
     name: string;
     ip: string;
   };
-  // CONFIRMED = an automated moderator report went out for this session.
+  // CONFIRMED = an automated case (a suspicion flag, or a moderator report on a
+  // host without the flag store) went out for this session.
   state: 'SUSPICIOUS' | 'CONFIRMED';
   snapshot: {
     capturedAt: number;
@@ -272,6 +273,9 @@ export interface AccountWealthData {
   updatedAt: string | null;
   characters: AccountWealthCharacterRow[];
   largeMovements: LargeGoldMovementRow[];
+  /** The ledger read failed (timed out) after the breakdown was computed:
+   *  largeMovements is empty because it is unknown, not because it is none. */
+  largeMovementsUnavailable?: boolean;
 }
 
 export interface RelatedAccountRef {

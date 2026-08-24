@@ -944,6 +944,25 @@ describe('/admin/api dispatch parity (legacy flag vs new flag)', () => {
       url: '/admin/api/guilds/5/bank',
       label: 'the guild bank operator read',
     },
+    // Economy oversight (PR 3511): the rich list, the per-account breakdown
+    // and flag history, the flag queue, and the two workflow writes. All six
+    // are bearer-gated on both arms (auth precedes the permission gate, the
+    // :id loader, and the dedicated oversight limiters), so an anonymous
+    // caller never reaches the wealth or flag stores on either dispatch path.
+    { method: 'GET', url: '/admin/api/wealth/top', label: 'the rich-list read' },
+    {
+      method: 'GET',
+      url: '/admin/api/accounts/5/wealth',
+      label: 'the account wealth breakdown read',
+    },
+    {
+      method: 'GET',
+      url: '/admin/api/accounts/5/flags',
+      label: 'the account flag history read',
+    },
+    { method: 'GET', url: '/admin/api/flags', label: 'the flag queue read' },
+    { method: 'POST', url: '/admin/api/flags/5/status', label: 'the flag status write' },
+    { method: 'POST', url: '/admin/api/flags/5/note', label: 'the flag note write' },
     { method: 'PUT', url: '/admin/api/overview', label: 'a wrong method (delegates to legacy)' },
     {
       method: 'HEAD',

@@ -256,6 +256,71 @@ describe('admin account detail query', () => {
     expect(mocks.query.mock.calls[1][1]).toEqual(['%3000000000%', null]);
   });
 
+  it('keeps the cheap no-search predicate for an empty or whitespace-only search', async () => {
+    // Both the page and the count query share the predicate: with no term it
+    // stays a plain ILIKE over username, never the correlated character-name
+    // EXISTS subqueries (the default listing is the most-opened admin page).
+    // The trim happens here, ahead of the empty check, so a whitespace-only
+    // search from either dispatch arm takes this arm too.
+    for (const search of ['', '   ', '\t\n']) {
+      mocks.query.mockReset();
+      mocks.query
+        .mockResolvedValueOnce({ rows: [] })
+        .mockResolvedValueOnce({ rows: [{ total: 0 }] });
+
+      await listAccounts(search, 1, 25);
+
+      const [pageSql, pageParams] = mocks.query.mock.calls[0];
+      const [countSql, countParams] = mocks.query.mock.calls[1];
+      expect(pageSql, JSON.stringify(search)).toContain(
+        'WHERE (a.username ILIKE $1 AND $4::int IS NULL)',
+      );
+      expect(pageSql, JSON.stringify(search)).not.toContain('EXISTS');
+      expect(pageSql, JSON.stringify(search)).not.toContain('cs.name ILIKE');
+      expect(pageParams, JSON.stringify(search)).toEqual(['%', 25, 0, null]);
+      expect(countSql, JSON.stringify(search)).toContain(
+        'WHERE (a.username ILIKE $1 AND $2::int IS NULL)',
+      );
+      expect(countSql, JSON.stringify(search)).not.toContain('EXISTS');
+      expect(countParams, JSON.stringify(search)).toEqual(['%', null]);
+    }
+  });
+
+  it('takes the character-match predicate for a real search term, trimmed', async () => {
+    mocks.query.mockResolvedValueOnce({ rows: [] }).mockResolvedValueOnce({ rows: [{ total: 0 }] });
+
+    await listAccounts('  ali ', 1, 25);
+
+    const [pageSql, pageParams] = mocks.query.mock.calls[0];
+    const [countSql, countParams] = mocks.query.mock.calls[1];
+    for (const sql of [pageSql, countSql]) {
+      expect(sql).toContain('a.username ILIKE $1');
+      expect(sql).toContain(
+        'OR EXISTS (SELECT 1 FROM characters cs WHERE cs.account_id = a.id AND cs.name ILIKE $1)',
+      );
+      expect(sql).not.toContain('IS NULL)');
+    }
+    expect(pageSql).toContain(
+      'OR EXISTS (SELECT 1 FROM characters ci WHERE ci.account_id = a.id AND ci.id = $4)',
+    );
+    expect(countSql).toContain(
+      'OR EXISTS (SELECT 1 FROM characters ci WHERE ci.account_id = a.id AND ci.id = $2)',
+    );
+    expect(pageParams).toEqual(['%ali%', 25, 0, null]);
+    expect(countParams).toEqual(['%ali%', null]);
+  });
+
+  it('matches an exact account or character id for an all-digits search, trimmed', async () => {
+    mocks.query.mockResolvedValueOnce({ rows: [] }).mockResolvedValueOnce({ rows: [{ total: 0 }] });
+
+    await listAccounts(' 4242 ', 1, 25);
+
+    expect(mocks.query.mock.calls[0][0]).toContain('a.id = $4');
+    expect(mocks.query.mock.calls[0][1]).toEqual(['%4242%', 25, 0, 4242]);
+    expect(mocks.query.mock.calls[1][0]).toContain('a.id = $2');
+    expect(mocks.query.mock.calls[1][1]).toEqual(['%4242%', 4242]);
+  });
+
   it('defaults the accounts ORDER BY to id DESC, matching the old fixed order', async () => {
     mocks.query.mockResolvedValueOnce({ rows: [] }).mockResolvedValueOnce({ rows: [{ total: 0 }] });
 

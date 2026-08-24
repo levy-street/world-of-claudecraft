@@ -9,26 +9,42 @@ type TestQuery = (
   values?: readonly unknown[],
 ) => Promise<QueryResult<Record<string, unknown>>>;
 
-const db = vi.hoisted(() => ({
-  query: vi.fn<TestQuery>(),
-  connect: vi.fn<() => Promise<PoolClient>>(),
-}));
+const db = vi.hoisted(() => {
+  const query = vi.fn<TestQuery>();
+  // The statement handed to a runWithStatementTimeout callback: forwards to the
+  // shared query spy through a DISTINCT spy, so a test can tell a bounded
+  // statement from a bare pool one.
+  const boundedQuery = vi.fn<TestQuery>((text, values) => query(text, values));
+  const runWithStatementTimeout = vi.fn(
+    (_timeoutMs: number, fn: (q: TestQuery) => Promise<unknown>) => fn(boundedQuery),
+  );
+  return {
+    query,
+    boundedQuery,
+    runWithStatementTimeout,
+    connect: vi.fn<() => Promise<PoolClient>>(),
+  };
+});
 
 vi.mock('../server/db', () => ({
-  pool: db,
+  pool: { query: db.query, connect: db.connect },
+  runWithStatementTimeout: db.runWithStatementTimeout,
 }));
 
+import { SUSPICION_FLAG_ACTIVE_STATUSES } from '../server/suspicion_flag_workflow';
 import {
   activeSuspicionFlagCounts,
   addSuspicionFlagNote,
   listSuspicionFlagDataset,
+  refreshSuspicionFlagDetails,
   SUSPICION_FLAG_LIST_MAX,
+  SUSPICION_FLAG_WRITE_TIMEOUT_MS,
   suspicionFlagsForAccount,
   transitionSuspicionFlag,
   upsertSuspicionFlag,
 } from '../server/suspicion_flags_db';
 
-const { query, connect } = db;
+const { query, boundedQuery, runWithStatementTimeout, connect } = db;
 
 function queryResult<T extends QueryResultRow>(rows: T[], rowCount = rows.length): QueryResult<T> {
   return { command: '', rowCount, oid: 0, fields: [], rows };
@@ -60,6 +76,8 @@ function rawFlagRow(overrides: Record<string, unknown> = {}): Record<string, unk
 beforeEach(() => {
   query.mockReset();
   connect.mockReset();
+  boundedQuery.mockClear();
+  runWithStatementTimeout.mockClear();
 });
 
 describe('upsertSuspicionFlag', () => {
@@ -70,9 +88,13 @@ describe('upsertSuspicionFlag', () => {
       source: 'bot_detector',
       kind: 'session_automation',
       severity: 'high',
-      details: 'x'.repeat(2_000),
+      details: 'x'.repeat(3_000),
       relatedAccountIds: [41, 42, 0, -3, 41.5],
     });
+    // A single-row write rides its own short bound, never the 15 s pool default.
+    expect(SUSPICION_FLAG_WRITE_TIMEOUT_MS).toBe(2_000);
+    expect(runWithStatementTimeout).toHaveBeenCalledWith(2_000, expect.any(Function));
+    expect(boundedQuery).toHaveBeenCalledOnce();
     const sql = query.mock.calls[0][0];
     const params = (query.mock.calls[0][1] ?? []) as unknown[];
     expect(sql).toMatch(/INSERT INTO account_suspicion_flags/);
@@ -82,7 +104,7 @@ describe('upsertSuspicionFlag', () => {
     expect(params[0]).toBe(42);
     // Details capped, related ids sanitized (self, non-positive, and
     // non-integer entries dropped).
-    expect((params[4] as string).length).toBe(1000);
+    expect((params[4] as string).length).toBe(2000);
     expect(params[5]).toEqual([41]);
   });
 });
@@ -159,10 +181,53 @@ describe('suspicionFlagsForAccount', () => {
   });
 });
 
+describe('refreshSuspicionFlagDetails', () => {
+  it('rewrites the ACTIVE flag details only, never counting an occurrence', async () => {
+    query.mockResolvedValueOnce(queryResult([], 1));
+    await expect(
+      refreshSuspicionFlagDetails({
+        accountId: 42,
+        source: 'bot_detector',
+        kind: 'session_automation',
+        details: 'x'.repeat(2500),
+      }),
+    ).resolves.toBe(true);
+    expect(runWithStatementTimeout).toHaveBeenCalledWith(2_000, expect.any(Function));
+    expect(boundedQuery).toHaveBeenCalledOnce();
+    expect(query).toHaveBeenCalledOnce();
+    const sql = query.mock.calls[0][0];
+    const params = (query.mock.calls[0][1] ?? []) as unknown[];
+    expect(sql).toMatch(/UPDATE account_suspicion_flags/);
+    expect(sql).toMatch(/SET details = \$4, last_seen_at = now\(\), updated_at = now\(\)/);
+    expect(sql).toMatch(/status IN \('new', 'under_review'\)/);
+    expect(sql).not.toMatch(/occurrences/);
+    expect(sql).not.toMatch(/INSERT/);
+    expect(params.slice(0, 3)).toEqual([42, 'bot_detector', 'session_automation']);
+    expect((params[3] as string).length).toBe(2000);
+  });
+
+  it('resolves false when no active flag was there to refresh (cleared by an admin)', async () => {
+    query.mockResolvedValueOnce(queryResult([], 0));
+    await expect(
+      refreshSuspicionFlagDetails({
+        accountId: 42,
+        source: 'bot_detector',
+        kind: 'session_automation',
+        details: 'x',
+      }),
+    ).resolves.toBe(false);
+  });
+});
+
 describe('transitionSuspicionFlag', () => {
-  function clientStub(currentStatus: string | null) {
+  function clientStub(
+    currentStatus: string | null,
+    activeSiblingId: number | null = null,
+    updateError: unknown = null,
+  ) {
     const cquery = vi.fn<TestQuery>(async (text: string) => {
-      if (/WHERE id = \$1 FOR UPDATE/.test(text)) {
+      if (updateError && /UPDATE account_suspicion_flags SET status/.test(text)) throw updateError;
+      if (/SELECT account_id, source, kind, status FROM account_suspicion_flags/.test(text)) {
         return queryResult(
           currentStatus === null
             ? []
@@ -175,6 +240,9 @@ describe('transitionSuspicionFlag', () => {
                 },
               ],
         );
+      }
+      if (/AND id <> \$4/.test(text)) {
+        return queryResult(activeSiblingId === null ? [] : [{ id: activeSiblingId }]);
       }
       return queryResult([]);
     });
@@ -196,11 +264,87 @@ describe('transitionSuspicionFlag', () => {
     const statements = cquery.mock.calls.map((call) => call[0]);
     expect(statements[0]).toBe('BEGIN');
     expect(statements[1]).toMatch(/FOR UPDATE/);
-    expect(statements[2]).toMatch(/AND id <> \$4/);
+    // Active to active is the one active row the index allows: no sibling read.
+    expect(statements[2]).toMatch(/UPDATE account_suspicion_flags SET status/);
+    expect(statements[3]).toMatch(/INSERT INTO account_suspicion_flag_events/);
+    expect(statements[4]).toBe('COMMIT');
+    expect(cquery.mock.calls[3][1]).toEqual([11, 7, 'new', 'under_review', 'looking']);
+    expect(release).toHaveBeenCalled();
+  });
+
+  it('locks any active sibling before a reopen, on the literal active-status list', async () => {
+    const { cquery } = clientStub('cleared');
+    query.mockResolvedValueOnce(queryResult([rawFlagRow({ status: 'under_review' })]));
+    await transitionSuspicionFlag({ flagId: 11, adminAccountId: 7, to: 'under_review', note: '' });
+    const statements = cquery.mock.calls.map((call) => call[0]);
+    expect(statements[2]).toMatch(/SELECT id FROM account_suspicion_flags/);
+    expect(statements[2]).toMatch(/account_id = \$1 AND source = \$2 AND kind = \$3 AND id <> \$4/);
+    // The literal keeps the partial dedupe index usable on a generic plan; pin
+    // it against the workflow vocabulary so the two cannot drift.
+    expect(statements[2]).toMatch(/status IN \('new', 'under_review'\)/);
+    expect([...SUSPICION_FLAG_ACTIVE_STATUSES]).toEqual(['new', 'under_review']);
+    expect(statements[2]).toMatch(/LIMIT 1\s+FOR UPDATE/);
+    expect(cquery.mock.calls[2][1]).toEqual([42, 'bot_detector', 'session_automation', 11]);
     expect(statements[3]).toMatch(/UPDATE account_suspicion_flags SET status/);
-    expect(statements[4]).toMatch(/INSERT INTO account_suspicion_flag_events/);
-    expect(statements[5]).toBe('COMMIT');
-    expect(cquery.mock.calls[4][1]).toEqual([11, 7, 'new', 'under_review', 'looking']);
+  });
+
+  it('skips the sibling lock when moving to a terminal status', async () => {
+    for (const to of ['cleared', 'actioned'] as const) {
+      const { cquery } = clientStub('new');
+      query.mockResolvedValueOnce(queryResult([rawFlagRow({ status: to })]));
+      await transitionSuspicionFlag({ flagId: 11, adminAccountId: 7, to, note: '' });
+      const statements = cquery.mock.calls.map((call) => call[0]);
+      expect(
+        statements.some((s) => /AND id <> \$4/.test(s)),
+        to,
+      ).toBe(false);
+      expect(statements[2], to).toMatch(/UPDATE account_suspicion_flags SET status/);
+    }
+  });
+
+  it('refuses a reopen that would collide with an active sibling, naming the cause', async () => {
+    const { cquery, release } = clientStub('cleared', 12);
+    const result = await transitionSuspicionFlag({
+      flagId: 11,
+      adminAccountId: 7,
+      to: 'under_review',
+      note: 'second look',
+    });
+    expect(result).toEqual({ ok: false, error: 'active_flag_exists' });
+    const statements = cquery.mock.calls.map((call) => call[0]);
+    expect(statements).toContain('ROLLBACK');
+    expect(statements.some((s) => /UPDATE account_suspicion_flags/.test(s))).toBe(false);
+    expect(statements.some((s) => /INSERT INTO account_suspicion_flag_events/.test(s))).toBe(false);
+    expect(release).toHaveBeenCalled();
+    expect(query).not.toHaveBeenCalled();
+  });
+
+  it('maps the unique violation of a sibling the read could not see to the same refusal', async () => {
+    // A sibling inserted or reopened by an uncommitted transaction is invisible
+    // to the sibling read; the partial index rejects the UPDATE instead.
+    const violation = Object.assign(new Error('duplicate key'), { code: '23505' });
+    const { cquery, release } = clientStub('cleared', null, violation);
+    const result = await transitionSuspicionFlag({
+      flagId: 11,
+      adminAccountId: 7,
+      to: 'under_review',
+      note: '',
+    });
+    expect(result).toEqual({ ok: false, error: 'active_flag_exists' });
+    const statements = cquery.mock.calls.map((call) => call[0]);
+    expect(statements[statements.length - 1]).toBe('ROLLBACK');
+    expect(statements.some((s) => /INSERT INTO account_suspicion_flag_events/.test(s))).toBe(false);
+    expect(release).toHaveBeenCalled();
+    // The FLAG_ROW_SQL re-read never runs after a rollback.
+    expect(query).not.toHaveBeenCalled();
+  });
+
+  it('rethrows any other UPDATE failure after rolling back', async () => {
+    const { cquery, release } = clientStub('new', null, new Error('connection reset'));
+    await expect(
+      transitionSuspicionFlag({ flagId: 11, adminAccountId: 7, to: 'cleared', note: '' }),
+    ).rejects.toThrow('connection reset');
+    expect(cquery.mock.calls.map((call) => call[0])).toContain('ROLLBACK');
     expect(release).toHaveBeenCalled();
   });
 
@@ -218,39 +362,6 @@ describe('transitionSuspicionFlag', () => {
     expect(statements.some((s) => /UPDATE account_suspicion_flags/.test(s))).toBe(false);
     expect(release).toHaveBeenCalled();
     expect(query).not.toHaveBeenCalled();
-  });
-
-  it('returns invalid_transition when reopening would collide with an active sibling', async () => {
-    const cquery = vi.fn<TestQuery>(async (text: string) => {
-      if (/WHERE id = \$1 FOR UPDATE/.test(text)) {
-        return queryResult([
-          {
-            account_id: 42,
-            source: 'bot_detector',
-            kind: 'session_automation',
-            status: 'cleared',
-          },
-        ]);
-      }
-      if (/AND id <> \$4/.test(text)) return queryResult([{ id: 12 }]);
-      return queryResult([]);
-    });
-    const release = vi.fn();
-    connect.mockResolvedValue({ query: cquery, release } as unknown as PoolClient);
-
-    const result = await transitionSuspicionFlag({
-      flagId: 11,
-      adminAccountId: 7,
-      to: 'under_review',
-      note: 'new evidence',
-    });
-
-    expect(result).toEqual({ ok: false, error: 'invalid_transition' });
-    const statements = cquery.mock.calls.map((call) => call[0]);
-    expect(statements.some((s) => /AND id <> \$4/.test(s))).toBe(true);
-    expect(statements.some((s) => /UPDATE account_suspicion_flags/.test(s))).toBe(false);
-    expect(statements).toContain('ROLLBACK');
-    expect(release).toHaveBeenCalled();
   });
 
   it('reports a missing flag as not_found', async () => {

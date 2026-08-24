@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import type { BotDetector, SessionRuntimeSnapshot } from '../server/bot_detector/contract';
 import { createBotDetector } from '../server/bot_detector/stub';
+import { attachDetectorFlagHost } from '../server/suspicion_flags';
 import { emptyMoveInput } from '../src/sim/types';
 
 const snapshot: SessionRuntimeSnapshot = {
@@ -44,6 +45,14 @@ const BOT_DETECTOR_METHODS = [
   'applyConfig',
 ] as const satisfies readonly (keyof BotDetector)[];
 
+// Contract members a detector build MAY lack. Every call site reaches them
+// through optional access (attachDetectorFlagHost is the reference), so a
+// deployed detector without one degrades instead of throwing. The stub omits
+// them on purpose: it is the proof that the absent arm works.
+const BOT_DETECTOR_OPTIONAL_METHODS = [
+  'attachHost',
+] as const satisfies readonly (keyof BotDetector)[];
+
 // Compile-time exhaustiveness (same AssertNever idiom as tests/server/tick_perf_capture.test.ts):
 // if the contract gains a method the array above lacks, this Exclude is non-never and
 // tsc fails. This is what caught a past production incident in reverse: a call site was
@@ -51,7 +60,10 @@ const BOT_DETECTOR_METHODS = [
 // TypeErrors. Widening the contract now forces the array (and any call site) to keep up.
 type AssertNever<T extends never> = T;
 type _ExhaustBotDetectorMethods = AssertNever<
-  Exclude<keyof BotDetector, (typeof BOT_DETECTOR_METHODS)[number]>
+  Exclude<
+    keyof BotDetector,
+    (typeof BOT_DETECTOR_METHODS)[number] | (typeof BOT_DETECTOR_OPTIONAL_METHODS)[number]
+  >
 >;
 
 describe('bot-detector stub (open-source no-op)', () => {
@@ -66,6 +78,19 @@ describe('bot-detector stub (open-source no-op)', () => {
     for (const name of BOT_DETECTOR_METHODS) {
       expect(typeof detector[name], `${name} is not a function on the detector`).toBe('function');
     }
+  });
+
+  it('omits the optional members, and the host wiring tolerates their absence', () => {
+    const detector = createBotDetector();
+    expect(BOT_DETECTOR_OPTIONAL_METHODS).toHaveLength(1);
+    for (const name of BOT_DETECTOR_OPTIONAL_METHODS) {
+      expect(detector[name], `${name} must stay absent on the stub`).toBeUndefined();
+    }
+    const lines: string[] = [];
+    expect(attachDetectorFlagHost(detector, (line) => lines.push(line))).toBe(false);
+    expect(lines).toEqual([
+      '[bot-detector] suspicion-flag host: not accepted by this detector build',
+    ]);
   });
 
   it('satisfies the BotDetector seam and detects nothing', () => {

@@ -3,6 +3,7 @@ import { verifyLoginTwoFactor } from './account';
 import {
   LARGE_GOLD_MOVEMENT_LIMIT,
   LARGE_GOLD_MOVEMENT_THRESHOLD_COPPER,
+  readLargeMovementsPane,
   readTopWealthHolders,
   redactActiveFlagCounts,
 } from './account_wealth';
@@ -176,6 +177,7 @@ import { bustSuspicionFlagCache, readSuspicionFlagDataset } from './suspicion_fl
 import {
   activeSuspicionFlagCounts,
   addSuspicionFlagNote,
+  type SuspicionFlagTransitionResult,
   suspicionFlagsForAccount,
   transitionSuspicionFlag,
 } from './suspicion_flags_db';
@@ -217,6 +219,7 @@ const ADMIN_TOO_MANY_REQUESTS = 'too many requests, wait a moment and try again'
 const FLAG_NOT_FOUND = 'flag not found';
 const FLAG_INVALID_STATUS = 'invalid flag status';
 const FLAG_INVALID_TRANSITION = 'that status change is not allowed';
+const FLAG_ACTIVE_EXISTS = 'this account already has an open flag of that kind';
 const FLAG_NOTE_REQUIRED = 'a note is required';
 // Second factor, mirroring server/auth_routes.ts loginHandler exactly: an account
 // with TOTP enabled (account.totp_enabled_at) must supply a live code or a recovery
@@ -302,6 +305,29 @@ async function respondGeneralChatRateLimit(
   if (!outcome.ok) return fail(res, outcome.status, outcome.error);
   applyLive(input.targetAccountId, outcome.value.after);
   return ok(res, { ok: true });
+}
+
+function flagTransitionFailure(
+  res: http.ServerResponse,
+  error: Exclude<SuspicionFlagTransitionResult, { ok: true }>['error'],
+): void {
+  switch (error) {
+    case 'not_found':
+      fail(res, 404, FLAG_NOT_FOUND);
+      return;
+    case 'active_flag_exists':
+      fail(res, 409, FLAG_ACTIVE_EXISTS);
+      return;
+    case 'invalid_transition':
+      fail(res, 400, FLAG_INVALID_TRANSITION);
+      return;
+    default: {
+      // Exhaustiveness: a new refusal variant must fail HERE at compile time,
+      // not fall through with no response written and hold the socket open.
+      const unhandled: never = error;
+      throw new Error(`unhandled flag transition refusal: ${String(unhandled)}`);
+    }
+  }
 }
 
 function guildRenameFailure(error: AdminGuildRenameError): { status: number; message: string } {
@@ -1453,9 +1479,8 @@ export async function handleAdminApi(
         note,
       });
       if (!result.ok) {
-        return result.error === 'not_found'
-          ? fail(res, 404, FLAG_NOT_FOUND)
-          : fail(res, 400, FLAG_INVALID_TRANSITION);
+        flagTransitionFailure(res, result.error);
+        return;
       }
       bustSuspicionFlagCache();
       return ok(res, { flag: result.flag });
@@ -1597,12 +1622,14 @@ export async function handleAdminApi(
       const targetAccountId = Number(accountWealthMatch[1]);
       const breakdown = await accountWealthBreakdown(targetAccountId);
       if (breakdown === null) return fail(res, 404, 'account not found');
-      const largeMovements = await largeGoldMovementsForAccount(
-        targetAccountId,
-        LARGE_GOLD_MOVEMENT_THRESHOLD_COPPER,
-        LARGE_GOLD_MOVEMENT_LIMIT,
+      const pane = await readLargeMovementsPane(targetAccountId, () =>
+        largeGoldMovementsForAccount(
+          targetAccountId,
+          LARGE_GOLD_MOVEMENT_THRESHOLD_COPPER,
+          LARGE_GOLD_MOVEMENT_LIMIT,
+        ),
       );
-      return ok(res, { ...breakdown, largeMovements });
+      return ok(res, { ...breakdown, ...pane });
     }
     const accountFlagsMatch = /^\/admin\/api\/accounts\/(\d+)\/flags$/.exec(path);
     if (accountFlagsMatch) {
@@ -2489,12 +2516,14 @@ async function accountWealthHandler(ctx: Ctx): Promise<void> {
   const accountId = adminTargetId(ctx);
   const breakdown = await adminDb().accountWealthBreakdown(accountId);
   if (breakdown === null) return fail(ctx.res, 404, 'account not found');
-  const largeMovements = await adminDb().largeGoldMovementsForAccount(
-    accountId,
-    LARGE_GOLD_MOVEMENT_THRESHOLD_COPPER,
-    LARGE_GOLD_MOVEMENT_LIMIT,
+  const pane = await readLargeMovementsPane(accountId, () =>
+    adminDb().largeGoldMovementsForAccount(
+      accountId,
+      LARGE_GOLD_MOVEMENT_THRESHOLD_COPPER,
+      LARGE_GOLD_MOVEMENT_LIMIT,
+    ),
   );
-  ok(ctx.res, { ...breakdown, largeMovements });
+  ok(ctx.res, { ...breakdown, ...pane });
 }
 
 /** GET /admin/api/accounts/:id/flags: the account's full flag history (active
@@ -2539,9 +2568,8 @@ async function flagStatusHandler(ctx: Ctx): Promise<void> {
     note,
   });
   if (!result.ok) {
-    return result.error === 'not_found'
-      ? fail(ctx.res, 404, FLAG_NOT_FOUND)
-      : fail(ctx.res, 400, FLAG_INVALID_TRANSITION);
+    flagTransitionFailure(ctx.res, result.error);
+    return;
   }
   bustSuspicionFlagCache();
   ok(ctx.res, { flag: result.flag });

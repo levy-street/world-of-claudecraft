@@ -19,7 +19,7 @@
 // doctrine), so any per-member share would be fiction. The account detail
 // endpoint surfaces each character's guild treasury as context instead.
 
-import { pool } from './db';
+import { DB_HEAVY_STATEMENT_TIMEOUT_MS, pool, runWithStatementTimeout } from './db';
 
 // account_wealth is bounded (one row per account, cascade-deleted with the
 // account), so it needs no retention registration: it can never grow past the
@@ -48,9 +48,20 @@ CREATE INDEX IF NOT EXISTS account_wealth_total ON account_wealth (total_copper 
 // pass in every process.
 export const ACCOUNT_WEALTH_SWEEP_LOCK_KEY = 0x57_4f_43_03; // "WOC\x03"
 
+export type AccountWealthSweepLockError = (scope: 'unlock', err: unknown) => void;
+
+const defaultLockError: AccountWealthSweepLockError = (scope, err) =>
+  console.error(`account wealth sweep ${scope} failed:`, err);
+
 /** Run one sweep pass under the global advisory lock. Returns false (without
- *  running) when a peer process holds the lock. */
-export async function withAccountWealthSweepLock(run: () => Promise<void>): Promise<boolean> {
+ *  running) when a peer process holds the lock. A failed unlock is reported
+ *  through onError (default console.error) before the client is destroyed:
+ *  that arm is the module header's poisoned-lock hazard, so it must never be
+ *  silent. */
+export async function withAccountWealthSweepLock(
+  run: () => Promise<void>,
+  onError: AccountWealthSweepLockError = defaultLockError,
+): Promise<boolean> {
   const client = await pool.connect();
   let destroyClient = false;
   try {
@@ -70,7 +81,8 @@ export async function withAccountWealthSweepLock(run: () => Promise<void>): Prom
     } finally {
       try {
         await client.query('SELECT pg_advisory_unlock($1)', [ACCOUNT_WEALTH_SWEEP_LOCK_KEY]);
-      } catch {
+      } catch (err) {
+        onError('unlock', err);
         destroyClient = true;
       }
     }
@@ -80,12 +92,29 @@ export async function withAccountWealthSweepLock(run: () => Promise<void>): Prom
   }
 }
 
+/** Row counts of one purse refresh: rows whose purse changed (inserted or
+ *  updated; the IS DISTINCT FROM guard skips the rest) and orphan rows zeroed. */
+export interface AccountPurseRefreshCounts {
+  rowsChanged: number;
+  orphansZeroed: number;
+}
+
 /** Upsert every account's purse total from characters.state (the sweep's SQL
  *  arm). Accounts whose characters were all deleted get their purse zeroed so
- *  a stale row can never keep a vanished fortune on the rich list. */
-export async function refreshAccountPurseTotals(): Promise<void> {
-  await pool.query(
-    `INSERT INTO account_wealth (account_id, purse_copper, total_copper, updated_at)
+ *  a stale row can never keep a vanished fortune on the rich list.
+ *
+ *  Both statements scan every characters.state blob, so each rides the heavy
+ *  allowance: on the pool default a scan that outgrows 15 s would be cancelled
+ *  and retried, identically doomed, every sweep tick. One transaction PER
+ *  statement, not one around both: the upsert's ON CONFLICT locks every
+ *  conflicting row even when the DO UPDATE WHERE guard skips it, and those
+ *  locks must release at the statement's own commit rather than be held
+ *  through a second full scan (an account deletion cascading into
+ *  account_wealth would block for the pair otherwise). */
+export async function refreshAccountPurseTotals(): Promise<AccountPurseRefreshCounts> {
+  const upsert = await runWithStatementTimeout(DB_HEAVY_STATEMENT_TIMEOUT_MS, (query) =>
+    query(
+      `INSERT INTO account_wealth (account_id, purse_copper, total_copper, updated_at)
      SELECT c.account_id,
             COALESCE(sum(COALESCE((c.state->>'copper')::bigint, 0)), 0),
             COALESCE(sum(COALESCE((c.state->>'copper')::bigint, 0)), 0),
@@ -98,15 +127,19 @@ export async function refreshAccountPurseTotals(): Promise<void> {
          + account_wealth.mail_copper + account_wealth.market_copper,
        updated_at = now()
      WHERE account_wealth.purse_copper IS DISTINCT FROM EXCLUDED.purse_copper`,
+    ),
   );
-  await pool.query(
-    `UPDATE account_wealth w SET
+  const zero = await runWithStatementTimeout(DB_HEAVY_STATEMENT_TIMEOUT_MS, (query) =>
+    query(
+      `UPDATE account_wealth w SET
        purse_copper = 0,
        total_copper = w.mail_copper + w.market_copper,
        updated_at = now()
      WHERE w.purse_copper <> 0
        AND NOT EXISTS (SELECT 1 FROM characters c WHERE c.account_id = w.account_id)`,
+    ),
   );
+  return { rowsChanged: upsert.rowCount ?? 0, orphansZeroed: zero.rowCount ?? 0 };
 }
 
 export interface EscrowStateRow {
@@ -136,14 +169,15 @@ export interface EscrowCharacterTotal {
 
 /** Write the sweep's escrow totals: resolve each entry to its account, sum per
  *  account, upsert, and zero escrow on every account absent from this pass so
- *  collected mail or market gold leaves the total on the next sweep. */
-export async function applyEscrowTotals(totals: EscrowCharacterTotal[]): Promise<void> {
+ *  collected mail or market gold leaves the total on the next sweep. Returns
+ *  the number of stale escrow rows zeroed (the outer UPDATE's count). */
+export async function applyEscrowTotals(totals: EscrowCharacterTotal[]): Promise<number> {
   const ids = totals.map((t) => t.characterId ?? -1);
   const names = totals.map((t) => t.characterName ?? '');
   const realms = totals.map((t) => t.realm ?? '');
   const mail = totals.map((t) => String(t.mailCopper));
   const market = totals.map((t) => String(t.marketCopper));
-  await pool.query(
+  const res = await pool.query(
     `WITH incoming AS (
        SELECT * FROM unnest(
          $1::int[], $2::text[], $3::text[], $4::bigint[], $5::bigint[]
@@ -172,7 +206,6 @@ export async function applyEscrowTotals(totals: EscrowCharacterTotal[]): Promise
          updated_at = now()
        WHERE account_wealth.mail_copper IS DISTINCT FROM EXCLUDED.mail_copper
           OR account_wealth.market_copper IS DISTINCT FROM EXCLUDED.market_copper
-       RETURNING account_id
      )
      UPDATE account_wealth w SET
        mail_copper = 0,
@@ -183,6 +216,7 @@ export async function applyEscrowTotals(totals: EscrowCharacterTotal[]): Promise
        AND NOT EXISTS (SELECT 1 FROM resolved r WHERE r.account_id = w.account_id)`,
     [ids, names, realms, mail, market],
   );
+  return res.rowCount ?? 0;
 }
 
 export interface TopWealthHolderRow {
@@ -319,6 +353,15 @@ export interface LargeGoldMovementRow {
   createdAt: string;
 }
 
+// Far BELOW the pool default, same reasoning as GUILD_BANK_LOG_TIMEOUT_MS in
+// server/db.ts: the intended cost is a bounded backward scan of the
+// bank_ledger_account_recent index, but that index is built CONCURRENTLY after
+// listen (server/bank_ledger_indexes.ts), so a realm can serve this read
+// before it exists, and a missing or INVALID index turns it into a sequential
+// scan of a keep-forever table. Two seconds fails this one admin read instead
+// of pinning pooled clients for the full 15 s default.
+export const LARGE_GOLD_MOVEMENTS_TIMEOUT_MS = 2_000;
+
 /** Recent large gold movements for one account, from the append-only
  *  bank_ledger (the only per-op gold audit trail that exists; vendor, quest,
  *  trade, and mail flows are not ledgered and cannot appear here). */
@@ -327,15 +370,17 @@ export async function largeGoldMovementsForAccount(
   thresholdCopper: number,
   limit: number,
 ): Promise<LargeGoldMovementRow[]> {
-  const res = await pool.query(
-    `SELECT l.id, l.character_id, c.name AS character_name, l.op, l.container,
+  const res = await runWithStatementTimeout(LARGE_GOLD_MOVEMENTS_TIMEOUT_MS, (query) =>
+    query(
+      `SELECT l.id, l.character_id, c.name AS character_name, l.op, l.container,
             l.copper_delta, l.created_at
      FROM bank_ledger l
      LEFT JOIN characters c ON c.id = l.character_id
      WHERE l.account_id = $1 AND abs(l.copper_delta) >= $2
      ORDER BY l.id DESC
      LIMIT $3`,
-    [accountId, thresholdCopper, limit],
+      [accountId, thresholdCopper, limit],
+    ),
   );
   return res.rows.map((row) => ({
     id: Number(row.id),

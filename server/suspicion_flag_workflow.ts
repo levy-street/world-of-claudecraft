@@ -50,12 +50,11 @@ export function allowedSuspicionFlagTransition(
   return TRANSITIONS[from].includes(to);
 }
 
-/** Severity for a bot-detector confirmation. Only CONFIRMED sessions (the
- *  detector's own bar for filing an automated report) are persisted, always
- *  high; the live SUSPICIOUS pool stays on the existing real-time page. */
-export function severityForDetectorState(state: 'SUSPICIOUS' | 'CONFIRMED'): SuspicionFlagSeverity {
-  return state === 'CONFIRMED' ? 'high' : 'medium';
-}
+/** Severity of every detector-filed flag: one bar for one case kind. The
+ *  detector only records once its own reporting threshold is met, so there is
+ *  no lower tier to grade; the live SUSPICIOUS pool stays on the real-time
+ *  page and never becomes a flag. */
+export const DETECTOR_FLAG_SEVERITY: SuspicionFlagSeverity = 'high';
 
 /** Severity for a registration burst: one tripped signal is medium; a
  *  multi-signal burst (e.g. shared prefix AND shared IP) is high. */

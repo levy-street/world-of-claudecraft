@@ -332,6 +332,58 @@ describe('ensureSchema wires every schema module at boot', () => {
     expect(applied).toContain('CREATE INDEX IF NOT EXISTS content_moderation_actions_resource');
   });
 
+  it('applies the economy-oversight schemas (account wealth, suspicion flags) after the accounts table', async () => {
+    // ACCOUNT_WEALTH_SCHEMA (server/account_wealth_db.ts) and
+    // SUSPICION_FLAGS_SCHEMA (server/suspicion_flags_db.ts) back the admin
+    // economy oversight (the rich list, the per-account breakdown, the flag
+    // workflow). Pin them by name so neither can regress to defined-but-unwired
+    // (the DISCORD_SCHEMA lesson): deleting an ensureSchema line must fail here.
+    await ensureSchema();
+    const coreIndex = h.calls.findIndex((sql) =>
+      sql.includes('CREATE TABLE IF NOT EXISTS accounts'),
+    );
+    const wealthIndex = h.calls.findIndex((sql) =>
+      sql.includes('CREATE TABLE IF NOT EXISTS account_wealth'),
+    );
+    const flagsIndex = h.calls.findIndex((sql) =>
+      sql.includes('CREATE TABLE IF NOT EXISTS account_suspicion_flags'),
+    );
+    // Both tables reference accounts(id), so they must land after the core schema.
+    expect(coreIndex).toBeGreaterThanOrEqual(0);
+    expect(wealthIndex).toBeGreaterThan(coreIndex);
+    expect(flagsIndex).toBeGreaterThan(coreIndex);
+
+    const wealthDdl = h.calls[wealthIndex];
+    expect(wealthDdl).toContain(
+      'account_id INT PRIMARY KEY REFERENCES accounts(id) ON DELETE CASCADE',
+    );
+    // The rich-list index: the top-holders read orders by total_copper DESC.
+    expect(wealthDdl).toContain(
+      'CREATE INDEX IF NOT EXISTS account_wealth_total ON account_wealth (total_copper DESC)',
+    );
+    expect(wealthDdl).not.toMatch(/CREATE TABLE (?!IF NOT EXISTS)/i);
+    expect(wealthDdl).not.toMatch(/CREATE (?:UNIQUE )?INDEX (?!IF NOT EXISTS)/i);
+    expect(wealthDdl).not.toMatch(/\b(?:DROP|TRUNCATE|ALTER COLUMN)\b/i);
+
+    const flagsDdl = h.calls[flagsIndex];
+    // The partial unique index the whole emitter dedupe rides on: at most one
+    // ACTIVE flag per account/source/kind, so a re-detection bumps the row
+    // instead of stacking a duplicate, while cleared/actioned history stays.
+    // Pinned with its key columns AND its WHERE clause: dropping the partial
+    // predicate would refuse the second flag of a cleared kind forever.
+    expect(flagsDdl).toContain('CREATE UNIQUE INDEX IF NOT EXISTS suspicion_flags_active_dedupe');
+    expect(flagsDdl).toMatch(
+      /suspicion_flags_active_dedupe\s+ON account_suspicion_flags \(account_id, source, kind\)\s+WHERE status IN \('new', 'under_review'\)/,
+    );
+    expect(flagsDdl).toContain('CREATE INDEX IF NOT EXISTS suspicion_flags_status_seen');
+    expect(flagsDdl).toContain('CREATE INDEX IF NOT EXISTS suspicion_flags_account');
+    expect(flagsDdl).toContain('CREATE TABLE IF NOT EXISTS account_suspicion_flag_events');
+    expect(flagsDdl).toContain('CREATE INDEX IF NOT EXISTS suspicion_flag_events_flag');
+    expect(flagsDdl).not.toMatch(/CREATE TABLE (?!IF NOT EXISTS)/i);
+    expect(flagsDdl).not.toMatch(/CREATE (?:UNIQUE )?INDEX (?!IF NOT EXISTS)/i);
+    expect(flagsDdl).not.toMatch(/\b(?:DROP|TRUNCATE|ALTER COLUMN)\b/i);
+  });
+
   it('applies the tier-2 rate-limit schema under the advisory lock', async () => {
     // The multi-realm tier-2 backstop depends on the rate_limits table being
     // created at boot (RATELIMIT_SCHEMA in server/ratelimit_db.ts). Pin that it is

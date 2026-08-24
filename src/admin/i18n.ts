@@ -294,6 +294,7 @@ export const ADMIN_ERROR_KEYS: Record<string, string> = {
   'flag not found': 'error.flagNotFound',
   'invalid flag status': 'error.flagInvalidStatus',
   'that status change is not allowed': 'error.flagInvalidTransition',
+  'this account already has an open flag of that kind': 'error.flagActiveExists',
   'a note is required': 'error.flagNoteRequired',
 };
 export function localizeAdminError(message: string): string {

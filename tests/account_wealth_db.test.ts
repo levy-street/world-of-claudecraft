@@ -8,19 +8,34 @@ type TestQuery = (
   values?: readonly unknown[],
 ) => Promise<QueryResult<Record<string, unknown>>>;
 
-const db = vi.hoisted(() => ({
-  query: vi.fn<TestQuery>(),
-  connect: vi.fn<() => Promise<PoolClient>>(),
-}));
+const db = vi.hoisted(() => {
+  const query = vi.fn<TestQuery>();
+  // The statement handed to a runWithStatementTimeout callback: forwards to the
+  // shared query spy (so every test's result chain keeps its order) through a
+  // DISTINCT spy, so a test can tell a bounded statement from a bare pool one.
+  const boundedQuery = vi.fn<TestQuery>((text, values) => query(text, values));
+  const runWithStatementTimeout = vi.fn(
+    (_timeoutMs: number, fn: (q: TestQuery) => Promise<unknown>) => fn(boundedQuery),
+  );
+  return {
+    query,
+    boundedQuery,
+    runWithStatementTimeout,
+    connect: vi.fn<() => Promise<PoolClient>>(),
+  };
+});
 
 vi.mock('../server/db', () => ({
-  pool: db,
+  pool: { query: db.query, connect: db.connect },
+  DB_HEAVY_STATEMENT_TIMEOUT_MS: 60_000,
+  runWithStatementTimeout: db.runWithStatementTimeout,
 }));
 
 import {
   ACCOUNT_WEALTH_SWEEP_LOCK_KEY,
   accountWealthBreakdown,
   applyEscrowTotals,
+  LARGE_GOLD_MOVEMENTS_TIMEOUT_MS,
   largeGoldMovementsForAccount,
   listEscrowStateRows,
   refreshAccountPurseTotals,
@@ -28,7 +43,7 @@ import {
   withAccountWealthSweepLock,
 } from '../server/account_wealth_db';
 
-const { query, connect } = db;
+const { query, boundedQuery, runWithStatementTimeout, connect } = db;
 
 function queryResult<T extends QueryResultRow>(rows: T[], rowCount = rows.length): QueryResult<T> {
   return { command: '', rowCount, oid: 0, fields: [], rows };
@@ -37,11 +52,18 @@ function queryResult<T extends QueryResultRow>(rows: T[], rowCount = rows.length
 beforeEach(() => {
   query.mockReset();
   query.mockResolvedValue(queryResult([]));
+  // mockClear only: the pass-through implementations must survive resets.
+  boundedQuery.mockClear();
+  runWithStatementTimeout.mockClear();
 });
 
 describe('refreshAccountPurseTotals', () => {
   it('upserts every purse sum, preserving escrow in the conflict arm, then zeroes orphans', async () => {
-    await refreshAccountPurseTotals();
+    query.mockResolvedValueOnce(queryResult([], 7)).mockResolvedValueOnce(queryResult([], 2));
+    await expect(refreshAccountPurseTotals()).resolves.toEqual({
+      rowsChanged: 7,
+      orphansZeroed: 2,
+    });
     expect(query).toHaveBeenCalledTimes(2);
     const [upsert] = query.mock.calls[0];
     expect(upsert).toMatch(/INSERT INTO account_wealth/);
@@ -57,6 +79,28 @@ describe('refreshAccountPurseTotals', () => {
     expect(zero).toMatch(/purse_copper = 0/);
     expect(zero).toMatch(/NOT EXISTS \(SELECT 1 FROM characters/);
   });
+
+  it('runs each full-scan statement on its own heavy allowance, never bare on the pool', async () => {
+    await refreshAccountPurseTotals();
+    // Each statement detoasts every characters.state blob; on the 15 s pool
+    // default a scan that outgrows it would be cancelled and retried, doomed,
+    // every tick. One transaction PER statement: the upsert's ON CONFLICT row
+    // locks must release at its own commit, not be held through the second
+    // full scan.
+    expect(runWithStatementTimeout).toHaveBeenCalledTimes(2);
+    for (const [timeoutMs] of runWithStatementTimeout.mock.calls) expect(timeoutMs).toBe(60_000);
+    expect(boundedQuery).toHaveBeenCalledTimes(2);
+    expect(boundedQuery.mock.calls[0][0]).toMatch(/INSERT INTO account_wealth/);
+    expect(boundedQuery.mock.calls[1][0]).toMatch(/purse_copper = 0/);
+  });
+
+  it('reports a missing rowCount as zero', async () => {
+    query.mockResolvedValue(queryResult([], null as unknown as number));
+    await expect(refreshAccountPurseTotals()).resolves.toEqual({
+      rowsChanged: 0,
+      orphansZeroed: 0,
+    });
+  });
 });
 
 describe('listEscrowStateRows', () => {
@@ -70,7 +114,8 @@ describe('listEscrowStateRows', () => {
 
 describe('applyEscrowTotals', () => {
   it('marshals the totals into parallel unnest arrays and zeroes stale escrow', async () => {
-    await applyEscrowTotals([
+    query.mockResolvedValueOnce(queryResult([], 3));
+    const zeroed = await applyEscrowTotals([
       { characterId: 12, characterName: null, realm: null, mailCopper: 750, marketCopper: 0 },
       {
         characterId: null,
@@ -80,10 +125,15 @@ describe('applyEscrowTotals', () => {
         marketCopper: 300,
       },
     ]);
+    // The outer UPDATE's count: the stale escrow rows this pass zeroed.
+    expect(zeroed).toBe(3);
     const [sql, params] = query.mock.calls[0];
     expect(sql).toMatch(/unnest\(/);
     expect(sql).toMatch(/ON CONFLICT \(account_id\) DO UPDATE/);
     expect(sql).toMatch(/mail_copper = 0/); // the stale-escrow zeroing arm
+    // The upsert CTE feeds nothing downstream (the outer UPDATE reads
+    // `resolved`), so it must not carry a dead RETURNING clause.
+    expect(sql).not.toMatch(/RETURNING/);
     // Conditional, like the purse arm: unchanged escrow must not rewrite rows.
     expect(sql).toMatch(
       /WHERE account_wealth\.mail_copper IS DISTINCT FROM EXCLUDED\.mail_copper\s+OR account_wealth\.market_copper IS DISTINCT FROM EXCLUDED\.market_copper/,
@@ -95,6 +145,11 @@ describe('applyEscrowTotals', () => {
       ['750', '0'],
       ['0', '300'],
     ]);
+  });
+
+  it('reports a missing rowCount as zero stale rows', async () => {
+    query.mockResolvedValueOnce(queryResult([], null as unknown as number));
+    await expect(applyEscrowTotals([])).resolves.toBe(0);
   });
 });
 
@@ -240,6 +295,20 @@ describe('largeGoldMovementsForAccount', () => {
     const rows = await largeGoldMovementsForAccount(42, 100_000, 25);
     expect(query.mock.calls[0][0]).toMatch(/abs\(l\.copper_delta\) >= \$2/);
     expect(query.mock.calls[0][1]).toEqual([42, 100_000, 25]);
+    // The read depends on the CONCURRENTLY-built bank_ledger_account_recent
+    // index, which a realm can serve before it exists (server/db.ts, the
+    // runConcurrentIndexMigrations rule): it carries its own bound, far below
+    // the 15 s pool default, so a full ledger scan fails this one read instead
+    // of pinning pooled clients.
+    expect(LARGE_GOLD_MOVEMENTS_TIMEOUT_MS).toBe(2_000);
+    expect(LARGE_GOLD_MOVEMENTS_TIMEOUT_MS).toBeLessThan(15_000);
+    expect(runWithStatementTimeout).toHaveBeenCalledTimes(1);
+    expect(runWithStatementTimeout).toHaveBeenCalledWith(
+      LARGE_GOLD_MOVEMENTS_TIMEOUT_MS,
+      expect.any(Function),
+    );
+    expect(boundedQuery).toHaveBeenCalledTimes(1);
+    expect(boundedQuery.mock.calls[0][0]).toMatch(/FROM bank_ledger l/);
     expect(rows).toEqual([
       {
         id: 9,
@@ -255,12 +324,13 @@ describe('largeGoldMovementsForAccount', () => {
 });
 
 describe('withAccountWealthSweepLock', () => {
-  function clientStub(acquired: boolean | 'error') {
-    const cquery = vi.fn(async (text: string) => {
+  function clientStub(acquired: boolean | 'error', opts: { failUnlock?: Error } = {}) {
+    const cquery = vi.fn(async (text: string, _params?: unknown[]) => {
       if (/pg_try_advisory_lock/.test(text)) {
         if (acquired === 'error') throw new Error('lock query failed');
         return queryResult([{ acquired }]);
       }
+      if (/pg_advisory_unlock/.test(text) && opts.failUnlock) throw opts.failUnlock;
       return queryResult([]);
     });
     const release = vi.fn();
@@ -307,5 +377,33 @@ describe('withAccountWealthSweepLock', () => {
     const failed = clientStub('error');
     await expect(withAccountWealthSweepLock(async () => {})).rejects.toThrow('lock query failed');
     expect(failed.release).toHaveBeenCalledWith(true);
+  });
+
+  it('an unlock failure is reported, then DESTROYS the client (the pass itself still counts)', async () => {
+    const boom = new Error('unlock failed');
+    const { release } = clientStub(true, { failUnlock: boom });
+    const onError = vi.fn();
+    const run = vi.fn(async () => {});
+    // The pass completed; only the cleanup misfired, so the caller still sees
+    // a run (true), not a stand-down and not a throw.
+    await expect(withAccountWealthSweepLock(run, onError)).resolves.toBe(true);
+    expect(run).toHaveBeenCalledTimes(1);
+    // The header's catastrophic arm must speak: a leaked session lock on a
+    // pooled connection would silently stop every future pass in every process.
+    expect(onError).toHaveBeenCalledWith('unlock', boom);
+    expect(release).toHaveBeenCalledWith(true);
+  });
+
+  it('defaults the unlock-failure report to console.error', async () => {
+    const boom = new Error('unlock failed');
+    const { release } = clientStub(true, { failUnlock: boom });
+    const consoleError = vi.spyOn(console, 'error').mockImplementation(() => {});
+    try {
+      await expect(withAccountWealthSweepLock(async () => {})).resolves.toBe(true);
+      expect(consoleError).toHaveBeenCalledWith('account wealth sweep unlock failed:', boom);
+      expect(release).toHaveBeenCalledWith(true);
+    } finally {
+      consoleError.mockRestore();
+    }
   });
 });

@@ -381,6 +381,8 @@
   .details-text {
     line-height: 1.5;
     overflow-wrap: anywhere;
+    /* Emitter details may span several lines. */
+    white-space: pre-line;
   }
 
   .related {

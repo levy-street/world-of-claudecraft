@@ -926,15 +926,16 @@ export async function listAccounts(
   sort: AdminAccountSort = 'id',
   dir: AdminAccountSortDirection = sort === 'username' ? 'asc' : 'desc',
 ): Promise<Paginated<AdminAccountRow>> {
-  const pattern = search ? `%${escapeLike(search)}%` : '%';
+  // Trimmed ahead of the empty check so a whitespace-only search from either
+  // dispatch arm takes the no-search predicate below, never the search arm.
+  const term = search.trim();
+  const pattern = term ? `%${escapeLike(term)}%` : '%';
   // An all-digits search additionally matches an exact account id or character
   // id, so admins can paste an id from a report and land on the account; the
   // username/character-name partial match still applies alongside.
   const numericSearch =
-    /^\d+$/.test(search) &&
-    Number.isSafeInteger(Number(search)) &&
-    Number(search) <= POSTGRES_INT_MAX
-      ? Number(search)
+    /^\d+$/.test(term) && Number.isSafeInteger(Number(term)) && Number(term) <= POSTGRES_INT_MAX
+      ? Number(term)
       : null;
   const offset = (page - 1) * limit;
   const direction = dir === 'asc' ? 'ASC' : 'DESC';
@@ -957,7 +958,7 @@ export async function listAccounts(
   // character-match subqueries it is not using. The id parameter is still
   // referenced (always NULL here) so both queries keep a fixed bind count.
   const matchSql = (idParam: string) =>
-    search === ''
+    term === ''
       ? `(a.username ILIKE $1 AND ${idParam}::int IS NULL)`
       : `(
        a.username ILIKE $1

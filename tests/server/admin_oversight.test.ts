@@ -23,6 +23,8 @@ import {
   resetRateLimits,
   setRateLimitClock,
 } from '../../server/ratelimit';
+import { ADMIN_ERROR_KEYS } from '../../src/admin/i18n';
+import { en } from '../../src/admin/i18n.en';
 import { type FakeRes, fakeCtx } from './helpers';
 
 const BEARER = `Bearer ${'a'.repeat(64)}`;
@@ -190,6 +192,24 @@ describe('auth gate on every oversight route', () => {
     expect(r.reached).toBe(false);
   });
 
+  it('403s a note write for a viewer (moderation.read without moderation.act) before any db write', async () => {
+    const addSuspicionFlagNote = vi.fn(async () => true);
+    authedAdminDb({ addSuspicionFlagNote, adminFlagWriteRateLimited: vi.fn(allowed) }, ['viewer']);
+    const r = await runRoute('POST', '/admin/api/flags/:id/note', {
+      headers: { authorization: BEARER },
+      params: { id: '11' },
+      body: { note: 'a viewer must not annotate' },
+    });
+    expect(r.status).toBe(403);
+    expect(r.reached).toBe(false);
+    expect(r.body).toEqual({
+      success: false,
+      data: null,
+      error: 'you do not have permission to do this',
+    });
+    expect(addSuspicionFlagNote).not.toHaveBeenCalled();
+  });
+
   it('403s the flag list for a role without moderation.read', async () => {
     // The two non-superadmin-only roles holding accounts.read but not
     // moderation.read do not exist as a bundle; fake a bare analytics viewer.
@@ -261,6 +281,42 @@ describe('GET /admin/api/accounts/:id/wealth', () => {
       data: { ...breakdown, largeMovements: movements },
       error: null,
     });
+  });
+
+  it('degrades to an empty, flagged movement list when the ledger read fails', async () => {
+    // largeGoldMovementsForAccount carries a 2 s statement bound; a timeout
+    // there must not fail the pane whose breakdown is already computed.
+    const breakdown = {
+      accountId: 42,
+      purseCopper: 100,
+      mailCopper: 10,
+      marketCopper: 5,
+      totalCopper: 115,
+      updatedAt: '2026-08-18T00:00:00Z',
+      characters: [],
+    };
+    const consoleError = vi.spyOn(console, 'error').mockImplementation(() => {});
+    authedAdminDb({
+      accountWealthBreakdown: vi.fn(async () => breakdown),
+      largeGoldMovementsForAccount: vi.fn(async () => {
+        throw new Error('canceling statement due to statement timeout');
+      }),
+      adminOversightReadRateLimited: vi.fn(allowed),
+    });
+    const r = await runRoute('GET', '/admin/api/accounts/:id/wealth', {
+      headers: { authorization: BEARER },
+      params: { id: '42' },
+    });
+    expect(r.status).toBe(200);
+    expect(r.body).toEqual({
+      success: true,
+      data: { ...breakdown, largeMovements: [], largeMovementsUnavailable: true },
+      error: null,
+    });
+    expect(consoleError).toHaveBeenCalledTimes(1);
+    expect(consoleError.mock.calls[0][0]).toMatch(
+      /large gold movements read failed for account 42/,
+    );
   });
 
   it('404s an unknown account', async () => {
@@ -396,7 +452,7 @@ describe('POST /admin/api/flags/:id/status', () => {
     expect(transitionSuspicionFlag).not.toHaveBeenCalled();
   });
 
-  it('400s a transition the state machine refuses and 404s a missing flag', async () => {
+  it('400s a refused transition, 409s an active-sibling collision, 404s a missing flag', async () => {
     authedAdminDb({
       transitionSuspicionFlag: vi.fn(async () => ({ ok: false, error: 'invalid_transition' })),
       adminFlagWriteRateLimited: vi.fn(allowed),
@@ -412,6 +468,28 @@ describe('POST /admin/api/flags/:id/status', () => {
       data: null,
       error: 'that status change is not allowed',
     });
+
+    authedAdminDb({
+      transitionSuspicionFlag: vi.fn(async () => ({ ok: false, error: 'active_flag_exists' })),
+      adminFlagWriteRateLimited: vi.fn(allowed),
+    });
+    const collided = await runRoute('POST', '/admin/api/flags/:id/status', {
+      headers: { authorization: BEARER },
+      params: { id: '11' },
+      body: { status: 'under_review' },
+    });
+    expect(collided.status).toBe(409);
+    expect(collided.body).toEqual({
+      success: false,
+      data: null,
+      error: 'this account already has an open flag of that kind',
+    });
+    // The admin SPA re-localizes the prose through its reverse map: pin the
+    // server literal to its catalog key so neither side can drift silently.
+    expect(ADMIN_ERROR_KEYS['this account already has an open flag of that kind']).toBe(
+      'error.flagActiveExists',
+    );
+    expect(en['error.flagActiveExists']).toBe('this account already has an open flag of that kind');
 
     authedAdminDb({
       transitionSuspicionFlag: vi.fn(async () => ({ ok: false, error: 'not_found' })),

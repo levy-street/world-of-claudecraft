@@ -5,7 +5,7 @@
 // admins through the new / under_review / cleared / actioned workflow. SQL
 // only; the state machine and the emitter logic live in suspicion_flags.ts.
 
-import { pool } from './db';
+import { pool, runWithStatementTimeout } from './db';
 import {
   allowedSuspicionFlagTransition,
   SUSPICION_FLAG_ACTIVE_STATUSES,
@@ -61,7 +61,20 @@ CREATE INDEX IF NOT EXISTS suspicion_flag_events_flag
 `;
 
 export const SUSPICION_FLAG_NOTE_MAX = 2000;
-export const SUSPICION_FLAG_DETAILS_MAX = 1000;
+// Sized for the detector's full evidence summary (the automated report text it
+// mirrors), not a one-line label. The detector caps its summary at the same
+// length on its side; a larger summary would be truncated here.
+export const SUSPICION_FLAG_DETAILS_MAX = 2000;
+
+// Flag writes are single-row, index-served statements whose intended cost is
+// milliseconds; on the pool default a blocked write (an admin holding the row
+// lock) would pin a pooled client for the full 15 s, at the head of the
+// emitters' serialized queue. Same reasoning as GUILD_BANK_LOG_TIMEOUT_MS.
+export const SUSPICION_FLAG_WRITE_TIMEOUT_MS = 2_000;
+
+// Postgres unique_violation: the partial dedupe index is the real arbiter of
+// "one active flag per account/source/kind" when two writers race.
+const UNIQUE_VIOLATION = '23505';
 export const SUSPICION_FLAG_RELATED_MAX = 50;
 
 export interface SuspicionFlagUpsertInput {
@@ -84,8 +97,9 @@ export async function upsertSuspicionFlag(input: SuspicionFlagUpsertInput): Prom
   const related = (input.relatedAccountIds ?? [])
     .filter((id) => Number.isSafeInteger(id) && id > 0 && id !== input.accountId)
     .slice(0, SUSPICION_FLAG_RELATED_MAX);
-  await pool.query(
-    `INSERT INTO account_suspicion_flags
+  await runWithStatementTimeout(SUSPICION_FLAG_WRITE_TIMEOUT_MS, (query) =>
+    query(
+      `INSERT INTO account_suspicion_flags
        (account_id, source, kind, severity, details, related_account_ids, copper_at_flag)
      VALUES ($1, $2, $3, $4, $5, $6,
              (SELECT total_copper FROM account_wealth WHERE account_id = $1))
@@ -103,15 +117,50 @@ export async function upsertSuspicionFlag(input: SuspicionFlagUpsertInput): Prom
            THEN 'medium'
          ELSE 'low'
        END`,
-    [
-      input.accountId,
-      input.source,
-      input.kind,
-      input.severity,
-      input.details.slice(0, SUSPICION_FLAG_DETAILS_MAX),
-      related.length > 0 ? related : null,
-    ],
+      [
+        input.accountId,
+        input.source,
+        input.kind,
+        input.severity,
+        input.details.slice(0, SUSPICION_FLAG_DETAILS_MAX),
+        related.length > 0 ? related : null,
+      ],
+    ),
   );
+}
+
+export interface SuspicionFlagDetailsInput {
+  accountId: number;
+  source: SuspicionFlagSource;
+  kind: string;
+  details: string;
+}
+
+/**
+ * Replace the details of the account's ACTIVE flag (same account/source/kind)
+ * without counting an occurrence: the case an emitter already recorded grew
+ * new evidence. No active flag (an admin cleared or actioned it) means nothing
+ * is written; only a fresh record can bring the account back. Resolves to
+ * whether an active flag was there to refresh.
+ */
+export async function refreshSuspicionFlagDetails(
+  input: SuspicionFlagDetailsInput,
+): Promise<boolean> {
+  const res = await runWithStatementTimeout(SUSPICION_FLAG_WRITE_TIMEOUT_MS, (query) =>
+    query(
+      `UPDATE account_suspicion_flags
+       SET details = $4, last_seen_at = now(), updated_at = now()
+       WHERE account_id = $1 AND source = $2 AND kind = $3
+         AND status IN ('new', 'under_review')`,
+      [
+        input.accountId,
+        input.source,
+        input.kind,
+        input.details.slice(0, SUSPICION_FLAG_DETAILS_MAX),
+      ],
+    ),
+  );
+  return (res.rowCount ?? 0) > 0;
 }
 
 export interface RelatedAccountRef {
@@ -297,12 +346,22 @@ export async function suspicionFlagsForAccount(
 
 export type SuspicionFlagTransitionResult =
   | { ok: true; flag: SuspicionFlagRow }
-  | { ok: false; error: 'not_found' | 'invalid_transition' };
+  | { ok: false; error: 'not_found' | 'invalid_transition' | 'active_flag_exists' };
 
 /**
  * Move one flag through the workflow, recording the audit event atomically
  * with the status write (row-locked so two admins racing the same flag
  * serialize). The allowed-transition table lives in suspicion_flag_workflow.ts.
+ * Reopening is refused with active_flag_exists when the account already has
+ * another ACTIVE flag of the same source/kind, and the refusal names that
+ * cause (an open sibling) rather than the transition. Two layers: the sibling
+ * read under FOR UPDATE is the fast path (it also serializes behind a move in
+ * progress on the sibling), and the partial unique index is the arbiter for
+ * the race it cannot see (a sibling inserted or reopened by a transaction
+ * that has not committed yet): its unique_violation on the UPDATE maps to the
+ * same refusal instead of escaping as a 500. No deadlock shape: the index
+ * allows one active row per key, so two transactions can never each hold the
+ * row the other wants.
  */
 export async function transitionSuspicionFlag(input: {
   flagId: number;
@@ -326,34 +385,34 @@ export async function transitionSuspicionFlag(input: {
       await client.query('ROLLBACK');
       return { ok: false, error: 'invalid_transition' };
     }
-    if (input.to === 'new' || input.to === 'under_review') {
-      const activeSibling = await client.query(
-        `SELECT id
-         FROM account_suspicion_flags
-         WHERE account_id = $1
-           AND source = $2
-           AND kind = $3
-           AND id <> $4
-           AND status = ANY($5::text[])
+    const active = SUSPICION_FLAG_ACTIVE_STATUSES as readonly string[];
+    // Only a reopen (terminal to active) can collide: an active row moving to
+    // another active status IS the one active row the index allows. The status
+    // list is a literal so the partial index serves this read on a generic plan.
+    if (active.includes(input.to) && !active.includes(from)) {
+      const sibling = await client.query(
+        `SELECT id FROM account_suspicion_flags
+         WHERE account_id = $1 AND source = $2 AND kind = $3 AND id <> $4
+           AND status IN ('new', 'under_review')
          LIMIT 1
          FOR UPDATE`,
-        [
-          current.rows[0].account_id,
-          current.rows[0].source,
-          current.rows[0].kind,
-          input.flagId,
-          [...SUSPICION_FLAG_ACTIVE_STATUSES],
-        ],
+        [current.rows[0].account_id, current.rows[0].source, current.rows[0].kind, input.flagId],
       );
-      if (activeSibling.rows[0]) {
+      if (sibling.rows[0]) {
         await client.query('ROLLBACK');
-        return { ok: false, error: 'invalid_transition' };
+        return { ok: false, error: 'active_flag_exists' };
       }
     }
-    await client.query(
-      `UPDATE account_suspicion_flags SET status = $2, updated_at = now() WHERE id = $1`,
-      [input.flagId, input.to],
-    );
+    try {
+      await client.query(
+        `UPDATE account_suspicion_flags SET status = $2, updated_at = now() WHERE id = $1`,
+        [input.flagId, input.to],
+      );
+    } catch (err) {
+      if ((err as { code?: string }).code !== UNIQUE_VIOLATION) throw err;
+      await client.query('ROLLBACK');
+      return { ok: false, error: 'active_flag_exists' };
+    }
     await client.query(
       `INSERT INTO account_suspicion_flag_events
          (flag_id, admin_account_id, from_status, to_status, note)

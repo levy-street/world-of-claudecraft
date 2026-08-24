@@ -1,10 +1,10 @@
 import { describe, expect, it } from 'vitest';
 import {
   allowedSuspicionFlagTransition,
+  DETECTOR_FLAG_SEVERITY,
   isSuspicionFlagStatus,
   SUSPICION_FLAG_ACTIVE_STATUSES,
   SUSPICION_FLAG_STATUSES,
-  severityForDetectorState,
   severityForRegistrationBurst,
 } from '../server/suspicion_flag_workflow';
 import {
@@ -47,9 +47,8 @@ describe('suspicion flag workflow state machine', () => {
     expect(isSuspicionFlagStatus(null)).toBe(false);
   });
 
-  it('maps detector states and burst signal counts to severities', () => {
-    expect(severityForDetectorState('CONFIRMED')).toBe('high');
-    expect(severityForDetectorState('SUSPICIOUS')).toBe('medium');
+  it('pins the detector severity bar and maps burst signal counts to severities', () => {
+    expect(DETECTOR_FLAG_SEVERITY).toBe('high');
     expect(severityForRegistrationBurst(1)).toBe('medium');
     expect(severityForRegistrationBurst(2)).toBe('high');
     expect(severityForRegistrationBurst(4)).toBe('high');

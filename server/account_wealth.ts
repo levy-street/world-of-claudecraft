@@ -5,7 +5,13 @@
 // endpoint reads through. See account_wealth_db.ts's header for why the totals
 // are materialised at all.
 
-import type { EscrowCharacterTotal, EscrowStateRow, TopWealthHolderRow } from './account_wealth_db';
+import type {
+  AccountPurseRefreshCounts,
+  EscrowCharacterTotal,
+  EscrowStateRow,
+  LargeGoldMovementRow,
+  TopWealthHolderRow,
+} from './account_wealth_db';
 import { type CachedRead, createCachedRead } from './cached_read';
 
 // Sweep cadence. The database-visible purse only advances on the 30 s
@@ -110,13 +116,22 @@ export function escrowTotalsFromStateRows(rows: EscrowStateRow[]): EscrowCharact
 
 /** The db functions one refresh pass needs, injectable for pool-less tests. */
 export interface AccountWealthSweepDeps {
-  refreshAccountPurseTotals(): Promise<void>;
+  refreshAccountPurseTotals(): Promise<AccountPurseRefreshCounts>;
   listEscrowStateRows(): Promise<EscrowStateRow[]>;
-  applyEscrowTotals(totals: EscrowCharacterTotal[]): Promise<void>;
+  /** Resolves to the number of stale escrow rows zeroed. */
+  applyEscrowTotals(totals: EscrowCharacterTotal[]): Promise<number>;
   // The cross-process guard (account_wealth_db.ts withAccountWealthSweepLock):
   // the sweep's queries are global, so exactly one realm process may run a
   // pass; a false return means a peer holds the lock and this tick is a no-op.
   withSweepLock(run: () => Promise<void>): Promise<boolean>;
+}
+
+/** The row counts one refresh pass touched, for the per-pass log line. */
+export interface AccountWealthRefreshSummary {
+  purseRowsChanged: number;
+  orphanPursesZeroed: number;
+  escrowEntries: number;
+  staleEscrowZeroed: number;
 }
 
 /** One full refresh: purse totals in SQL, then the Node-parsed escrow pass.
@@ -127,10 +142,31 @@ export async function refreshAccountWealth(
     AccountWealthSweepDeps,
     'refreshAccountPurseTotals' | 'listEscrowStateRows' | 'applyEscrowTotals'
   >,
-): Promise<void> {
-  await deps.refreshAccountPurseTotals();
+): Promise<AccountWealthRefreshSummary> {
+  const purse = await deps.refreshAccountPurseTotals();
   const rows = await deps.listEscrowStateRows();
-  await deps.applyEscrowTotals(escrowTotalsFromStateRows(rows));
+  const totals = escrowTotalsFromStateRows(rows);
+  const staleEscrowZeroed = await deps.applyEscrowTotals(totals);
+  return {
+    purseRowsChanged: purse.rowsChanged,
+    orphanPursesZeroed: purse.orphansZeroed,
+    escrowEntries: totals.length,
+    staleEscrowZeroed,
+  };
+}
+
+/** The one line a completed pass emits (0 counts included): a sweep that
+ *  stops speaking is wedged, not quiet, so the line is unconditional. */
+export function formatAccountWealthSweepLine(
+  summary: AccountWealthRefreshSummary,
+  durationMs: number,
+): string {
+  return (
+    `account wealth sweep: ${summary.purseRowsChanged} purse rows changed, ` +
+    `${summary.orphanPursesZeroed} orphan purses zeroed, ` +
+    `${summary.escrowEntries} escrow entries applied, ` +
+    `${summary.staleEscrowZeroed} stale escrow rows zeroed in ${durationMs} ms`
+  );
 }
 
 export interface AccountWealthSweepHandle {
@@ -141,24 +177,44 @@ export interface AccountWealthSweepHandle {
  * The self-clocked sweep loop: one refresh per interval, never overlapping
  * (the next timer arms only after the current pass settles), failures logged
  * and retried on the next tick. Registered after listen in main.ts beside the
- * retention sweep.
+ * retention sweep. Every completed pass emits one onInfo line with its row
+ * counts and duration (the retention sweep's one-line contract); a stand-down
+ * to a peer's lock is deliberately silent because at this cadence every loser
+ * process would otherwise log once a minute forever.
  */
 export function startAccountWealthSweep(
   deps: AccountWealthSweepDeps,
-  opts: { intervalMs?: number; onError?: (err: unknown) => void } = {},
+  opts: {
+    intervalMs?: number;
+    /** A failed pass, with how long it ran before failing (a timeout and a
+     *  fast refusal look the same without it). */
+    onError?: (err: unknown, durationMs: number) => void;
+    onInfo?: (message: string) => void;
+  } = {},
 ): AccountWealthSweepHandle {
   const intervalMs = opts.intervalMs ?? ACCOUNT_WEALTH_REFRESH_MS;
-  const onError = opts.onError ?? ((err) => console.error('account wealth sweep failed:', err));
+  const onError =
+    opts.onError ??
+    ((err, durationMs) =>
+      console.error(`account wealth sweep failed after ${durationMs} ms:`, err));
+  const onInfo = opts.onInfo ?? ((message) => console.log(message));
   let stopped = false;
   let timer: NodeJS.Timeout | null = null;
   const run = async (): Promise<void> => {
+    const startedAt = Date.now();
     try {
       // A false return means a peer process holds the sweep lock and is
       // running this pass globally; standing down until the next tick is the
       // correct outcome, not an error.
-      await deps.withSweepLock(() => refreshAccountWealth(deps));
+      const pass: { summary?: AccountWealthRefreshSummary } = {};
+      const ran = await deps.withSweepLock(async () => {
+        pass.summary = await refreshAccountWealth(deps);
+      });
+      if (ran && pass.summary) {
+        onInfo(formatAccountWealthSweepLine(pass.summary, Date.now() - startedAt));
+      }
     } catch (err) {
-      onError(err);
+      onError(err, Date.now() - startedAt);
     }
     if (!stopped) timer = setTimeout(() => void run(), intervalMs);
   };
@@ -202,6 +258,34 @@ export function redactActiveFlagCounts(
   rows: readonly TopWealthHolderRow[],
 ): Omit<TopWealthHolderRow, 'activeFlagCount'>[] {
   return rows.map(({ activeFlagCount: _redacted, ...rest }) => rest);
+}
+
+/** The large-movements half of the account wealth pane, read through both
+ *  admin dispatch arms. */
+export interface LargeMovementsPane {
+  largeMovements: LargeGoldMovementRow[];
+  /** Set when the ledger read failed (its bound is
+   *  LARGE_GOLD_MOVEMENTS_TIMEOUT_MS): the pane degrades to an empty list
+   *  with this marker instead of failing the whole wealth response, since the
+   *  breakdown is already computed by then. Absent on a successful read. */
+  largeMovementsUnavailable?: true;
+}
+
+/** Run the ledger read for one account and degrade, not fail, on error; the
+ *  failure is logged once here (both dispatch arms funnel through this). */
+export async function readLargeMovementsPane(
+  accountId: number,
+  read: () => Promise<LargeGoldMovementRow[]>,
+): Promise<LargeMovementsPane> {
+  try {
+    return { largeMovements: await read() };
+  } catch (err) {
+    console.error(
+      `admin account wealth: large gold movements read failed for account ${accountId}:`,
+      err,
+    );
+    return { largeMovements: [], largeMovementsUnavailable: true };
+  }
 }
 
 /** The cached top-holders board both admin dispatch arms read. */
