@@ -33,7 +33,12 @@
 import { describe, expect, it } from 'vitest';
 import { FARM_CROPS } from '../src/sim/content/farm_crops';
 import { STATIONS } from '../src/sim/content/professions';
-import { FARM_DROP_RUNG_FLOOR, FARM_RECIPES, LADDER_RECIPES } from '../src/sim/content/recipes';
+import {
+  FARM_DROP_RUNG_FLOOR,
+  FARM_RECIPES,
+  HOE_RECIPES,
+  LADDER_RECIPES,
+} from '../src/sim/content/recipes';
 // ITEMS and ALL_RECIPES from data (the merged view the sim, the trainer, the
 // crafting window and the guide all read), not from content: a row authored in
 // content but never joined into the merged table would be unreachable in play,
@@ -1067,17 +1072,24 @@ describe('FARM_RECIPES: the dish ItemDef shape, reopened by Phase 11 and closed 
     // The def name is what sim/server text uses; the catalog row is what the
     // HUD renders. The catalog comment states the stay-in-step rule, but no
     // pin held it: an English reword on one side would drift the other
-    // silently. Scoped to the phase ids (the thirteen this suite owns).
+    // silently.
+    //
+    // WIDENED TO THE HOE LADDER at the masterwrought Phase 11j QA. The sweep
+    // walked FARM_RECIPES alone, so no HOE_RECIPES output had ever been
+    // covered, all five rungs included, and the apex hoe joined that gap
+    // rather than closing it. Both lists are farming's minted item ids and
+    // both belong here; nothing else in the tree pins the pair.
     const enNames = itemNames.en.entities.items as Record<string, { name?: string } | undefined>;
-    for (const recipe of FARM_RECIPES) {
-      const def = ITEMS[recipe.resultItemId];
-      const row = enNames[recipe.resultItemId];
-      expect(row?.name, `${recipe.resultItemId} has no catalog English name row`).toBeDefined();
-      expect(
-        row?.name,
-        `${recipe.resultItemId}: catalog English and ItemDef.name drifted apart`,
-      ).toBe(def.name);
+    const covered = [...FARM_RECIPES, ...HOE_RECIPES].map((r) => r.resultItemId);
+    for (const itemId of covered) {
+      const def = ITEMS[itemId];
+      const row = enNames[itemId];
+      expect(row?.name, `${itemId} has no catalog English name row`).toBeDefined();
+      expect(row?.name, `${itemId}: catalog English and ItemDef.name drifted apart`).toBe(def.name);
     }
+    // Non-vacuity at the real count rather than a floor: fourteen farm rows
+    // plus four crafted hoe rungs.
+    expect(covered.length, 'the farm and hoe outputs this arm covers').toBe(18);
   });
 
   it('every allowed curve point is carried by a live non-dish food, so the reuse claim stays true', () => {

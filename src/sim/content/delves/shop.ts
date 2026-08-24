@@ -77,11 +77,17 @@ const DROWNED_LITANY_SHOP: DelveShopEntry[] = [
   { itemId: 'drowned_choir_fang', marks: 56, gate: 'heroicClear' },
   // -- the crafted top-tier gathering tools, as a NON-CRAFTER's route to them --
   //
-  // These ten are the tier-4 and tier-5 picks, axes, sickles, rods and hoes
-  // that otherwise only an engineer at a toolworks can produce (recipes.ts
+  // The rows below are the tier-4 and tier-5 picks, axes, sickles, rods and
+  // hoes that otherwise only an engineer at a toolworks can produce (recipes.ts
   // TOOL_RECIPES, ROD_RECIPES and HOE_RECIPES). A player who never took a
   // crafting profession had no path to the top of the tool ladder at all; this
   // is that path, priced in Marks rather than in a profession.
+  //
+  // NO COUNT HERE ON PURPOSE. This sentence said "these eight" and rotted to
+  // ten the day masterwrought Phase 11j seated the hoes, which is the anchor
+  // rule biting: the SET is derived and pinned in tests/delve_shop.test.ts
+  // (a filter over every gatherTool above tier 3 and below the apex rod's,
+  // with per-tier arms), so a number repeated here can only ever go stale.
   //
   // EIGHT UNTIL masterwrought Phase 11j, which added both HOE rungs under
   // decision B and so closed the last gap in the family. Farming was the only

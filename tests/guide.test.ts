@@ -2696,6 +2696,11 @@ describe('Guide professions gathering accuracy', () => {
     );
     expect(en).toContain('all four taught by the toolmaker rather than known from the start');
     expect(en).toContain('a bed of tier N asks a hoe of tier N');
+    // The FOURTH clause, and the one a farmer would have acted on: the vendor
+    // ladder paragraph promised tiers 1 to 3 across the three heartland hubs,
+    // where farming's only priced rung sits on a farmer NPC at the allotments.
+    expect(en).toContain('its tier-1 hoe is stocked by the farmers at the allotments');
+    expect(en).toContain('no hoe rung above it is sold for coin anywhere');
     // The retired claims, each pinned ABSENT so a revert reds rather than
     // quietly restoring a false page.
     expect(en, 'the node-trade count must not be claimed of every land trade').not.toContain(

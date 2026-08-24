@@ -106,7 +106,12 @@ harvest mirrors online via the sparse per-entity `hcb` wire key.
 Farming shares the gathering proficiency shape and the land cap, and it is
 the one gathering row whose pacing is WALL-CLOCK rather than swing-gated: a
 player plants a bed, leaves, and harvests on a later session, which makes it
-the game's first between-sessions mechanic. The growth engine and its draw
+the first GATHERING mechanic that pays out across sessions. It is not the
+game's first between-sessions mechanic at all: the `oncePerDay` craft gate,
+the Wyrmfall Core daily and the weekly keystone all predate it, and farming's
+own masterwrought R19 paragraph below leans on their existence when it
+promises no daily reset. What is new is that the WAIT is the gathering step
+rather than a cooldown on a step you already took. The growth engine and its draw
 contract live in `src/sim/professions/farming.ts`, the bed geography in
 `src/sim/content/farm_patches.ts`, and the crop catalog in
 `src/sim/content/farm_crops.ts`; the per-zone tier ladder is farming's own
@@ -117,9 +122,10 @@ Two things separate it from the node trades and both matter downstream.
 Planting is what needs the tool, so a crop of tier N needs a hoe of tier N
 and the hoe ladder gates the crop ladder rather than the harvest. And
 farming's FINE grade is a skill-scaled harvest roll rather than a tool
-comparison, so it is not a `material_grades.ts` row at all: a fine crop
-costs exactly what its base crop costs and takes the same tier, where a fine
-ORE needs a tool strictly above its material. A guard that gates a fine crop
+comparison, so it is not a `material_grades.ts` row at all: a fine crop takes
+the same TOOL TIER as its base crop, where a fine ORE needs a tool strictly
+above its material. (Its sell price is the ordinary fine premium, double the
+base; "the same" is about the gate, not the value.) A guard that gates a fine crop
 one tier high invents a requirement the engine does not have
 (`tests/recipe_reachability.test.ts` records the distinction at its farming
 branch).
@@ -232,8 +238,9 @@ never mine, fell, or pick; `bestOwnedGatherToolTierOrNone` +
 likewise requires a fishing implement in bags: the simple pole or any
 tiered rod (`hasFishingImplement`, the startFishing gate). Bare hands
 still resolve to effective tool tier 1 ONLY on the surfaces that keep the
-old floor: corpse harvesting (`bestOwnedAnyGatherToolTier`, which spans every
-gathering profession, five of them since farming) and fishing's bite/reel/band synergy math. The node gate
+old floor: corpse harvesting (`bestOwnedAnyGatherToolTier`, which walks
+`GATHERING_PROFESSION_IDS`, so farming joined it with no edit and a sixth
+profession would too) and fishing's bite/reel/band synergy math. The node gate
 holds at cast START and is deliberately not re-checked at completion;
 completion re-validates exactly range, respawn, and capacity. Using a
 pick/axe/sickle from the bags starts the standard gather cast on the
@@ -311,8 +318,9 @@ an acquisition list against its own craft's cap so it cannot happen twice.
 What an apex tool BUYS is narrower than its rarity suggests, and the
 honest version is worth stating because a player will ask. It opens no node
 or crop tier that the tier-4 rung does not already reach, on any land
-profession: the world's deepest node tier is below it and there are four
-crop tiers, which the tier-4 hoe already covers. Fishing is the one
+profession: the world's deepest node tier is below it, and `FARM_CROPS` types
+its tier field `1 | 2 | 3 | 4`, so the tier-4 hoe already covers every crop
+tier the type admits. Fishing is the one
 exception, and only because its catch ladder has a band above what a tier-5
 rod opens. What the rung actually buys everywhere is the epic rarity step on
 the tool-effect economy: `startingDurabilityFor` pays
@@ -346,7 +354,7 @@ per cell would be wrong as often as right.)
 | logging | `LADDER_RECIPES` across the lower bands, then `TOOL_RECIPES` and `INTERMEDIATE_RECIPES` at the top levelling band | `APEX_GEAR_RECIPES` |
 | herbalism | `COMMON_RECIPES`, `LADDER_RECIPES` and `INSCRIPTION_RECIPES` across the lower bands, plus a `FARM_RECIPES` row; then `TOOL_RECIPES`, `INTERMEDIATE_RECIPES`, `CASTER_HUB_RECIPES` and one `APEX_CONSUMABLE_RECIPES` row at the top | `APEX_CONSUMABLE_RECIPES` and `APEX_GEAR_RECIPES` |
 | fishing | `LADDER_RECIPES` across the lower bands, then `ROD_RECIPES` and one `APEX_CONSUMABLE_RECIPES` row at the top levelling band | `APEX_CONSUMABLE_RECIPES` |
-| farming | `FARM_RECIPES` across every levelling band and `HOE_RECIPES` from the second, plus `LADDER_RECIPES` low and `INTERMEDIATE_RECIPES` at the top | `APEX_CONSUMABLE_RECIPES` and `FARM_RECIPES` |
+| farming | `FARM_RECIPES` across every levelling band and `HOE_RECIPES` from the second, plus `LADDER_RECIPES` across the lower bands and `INTERMEDIATE_RECIPES` at the top | `APEX_CONSUMABLE_RECIPES` and `FARM_RECIPES` |
 | corpse harvesting | `COMMON_RECIPES` and `LADDER_RECIPES` across the lower bands; `COMBO_RECIPES`; then `INTERMEDIATE_RECIPES` and `CASTER_HUB_RECIPES` at the top | `APEX_ARMOR_RECIPES` and `APEX_CONSUMABLE_RECIPES` |
 
 One cell is worth naming because it looks like a mistake: `APEX_CONSUMABLE_RECIPES`
@@ -354,17 +362,19 @@ appears in a LEVELLING band as well as the endgame one, because that family
 is not uniformly endgame. Its rungs run 75, 100 and 125, and the row at 75
 falls in the top levelling band.
 
-Two more readings the table is worth pausing on. The tool ladders sit in
-LEVELLING bands rather than endgame cells, and that is their skillReq doing
-the work rather than any rule: `TOOL_RECIPES` and `ROD_RECIPES` craft at 75
-and above, and `HOE_RECIPES` spans several bands, so a ladder appears
-wherever its rungs sit. What the coverage guard's self-feeding refusal
-actually explains is a different absence: a rung at or above the gathering
-cap is kept OUT of its own family's endgame cell, because a gathering tool a
-family feeds only ITSELF is no evidence that the family feeds the crafts. And
-the endgame column is narrower than the levelling ones by design: the apex
-sets are where the whole realm's demand concentrates, which is the shape
-masterwrought R21 exists to keep honest.
+Two more readings the table is worth pausing on. **A tool ladder appears in
+its own family's LEVELLING bands and never in its endgame cell, and those are
+two different causes rather than one.** Where it DOES appear is skillReq doing
+the work: `TOOL_RECIPES` and `ROD_RECIPES` craft at 75 and above, `HOE_RECIPES`
+spans several bands, so a rung shows up wherever it sits. Where it does NOT is
+the rule: all three ladders have a rung at or above the gathering cap, and the
+coverage guard's self-feeding refusal is the only thing keeping each one out of
+its own family's endgame cell, because a gathering tool a family feeds only
+ITSELF is no evidence that the family feeds the crafts. Read the endgame column
+as the refusal's work, not as an accident of where the rungs landed. And the
+endgame column is narrower than the levelling ones by design: the apex sets are
+where the whole realm's demand concentrates, which is the shape masterwrought
+R21 exists to keep honest.
 
 **masterwrought R20, every gathering profession reaches the endgame.** No
 gathering family may be absent from recipes at the gathering cap or above,

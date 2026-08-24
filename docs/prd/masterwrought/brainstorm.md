@@ -89,13 +89,16 @@ recipes today). v1 is pure stats and bounded utility: no new proc effects anywhe
   shipped. So the climb is reserved in intent and unbuilt in numbers, which is a
   different thing from unreserved. A census scoped to one FILE reported as a claim about
   everywhere is the masterwrought R21 worked example, one medium over.)
-  Each of the three depends on the others. A tier-6 LAND tool cannot ship before the wield
-  table gains its row, because wieldRequirementForTier fails OPEN at 0 for an unknown
-  tier and the rung would ship ungated (fishing's tier-6 rod escapes only because rods
-  are the structural R22 exemption). A tier-6 tool is also pointless before a tier-4 node
-  or water exists for it to open, and the delve shop's own re-check trigger says the
-  patch shipping the first of those re-derives the Marks prices and the wield table in
-  that SAME change. This is real design intent and it is not this packet.
+  Each of the three depends on the others. A tier-6 LAND tool cannot ship before
+  the wield table gains its row, because wieldRequirementForTier fails OPEN at 0
+  for an unknown tier and the rung would ship ungated (fishing's tier-6 rod
+  escapes only because rods are the structural Professions 2.0 R22 exemption,
+  written out because a bare R-number inside this packet's own file reads as the
+  masterwrought series). A tier-6 tool is also pointless before a tier-4 node or
+  water exists for it to open, and the delve shop's own re-check trigger says the
+  patch shipping the first of those re-derives the Marks prices and the wield
+  table in that SAME change. This is real design intent and it is not this
+  packet.
 
 ## OPEN items (resolved inside phases, tracked in state.md)
 - Jewelcrafting/inscription station model (phase 05/06 decision).

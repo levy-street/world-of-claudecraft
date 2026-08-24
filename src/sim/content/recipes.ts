@@ -3130,7 +3130,8 @@ export const APEX_CONSUMABLE_RECIPES: ProfessionRecipeRecord[] = [
 // reaches players through the pillars". That ground is about apex-ness itself
 // and applies to ANY apex rung, this one included. The header's band-5 clause
 // answers a DIFFERENT question, why the schematic is deterministic Marks stock
-// rather than a band-5 catch, so it is not a reason the hoe escapes R8. Do not
+// rather than a band-5 catch, so it is not a reason the hoe escapes
+// masterwrought R8. Do not
 // re-derive a distinction there; there is not one.
 //
 // WHAT THIS RUNG MATCHES INSTEAD is the family it completes rather than the

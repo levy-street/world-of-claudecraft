@@ -44,7 +44,7 @@ import { describe, expect, it } from 'vitest';
 import { FARM_CROPS } from '../src/sim/content/farm_crops';
 import { FISHING_TABLES_BY_BAND, RAW_COOKING_CATCH_IDS } from '../src/sim/content/items';
 import { GATHERING_PROFESSIONS } from '../src/sim/content/professions';
-import { ALL_RECIPES } from '../src/sim/content/recipes';
+import { ALL_RECIPES, HOE_RECIPES } from '../src/sim/content/recipes';
 import { ITEMS } from '../src/sim/data';
 import { farmingTeachingCeilingFor } from '../src/sim/professions/farming';
 import { NODE_MATERIAL_TABLE, NODE_TYPE_BY_PROFESSION } from '../src/sim/professions/gathering';
@@ -333,8 +333,20 @@ describe('the crafting economy bootstraps from an empty realm', () => {
     expect(toolGateFor('fine_highland_barley')).toEqual({ professionId: 'farming', nodeTier: 3 });
     // The ladder really is climbed: the top hoe is only reachable because the
     // rungs below it are crafted first, which is the ordering a circuit inverts.
+    // FIVE RUNGS SINCE masterwrought Phase 11j, and the list is derived rather
+    // than typed for exactly the reason this arm went stale: it named
+    // osmium_hoe as "the top hoe" and stayed green when a rung was added above
+    // it, which is the same shape as the fishing arm below asserting its apex
+    // by name. A new rung now joins this sweep with no edit here.
     const farmOwned = reachableItems().owned;
-    for (const id of ['bronze_hoe', 'skysilver_hoe', 'osmium_hoe']) {
+    const hoeRungs = HOE_RECIPES.map((r) => r.resultItemId);
+    expect(hoeRungs, 'every crafted hoe rung, apex included').toEqual([
+      'bronze_hoe',
+      'skysilver_hoe',
+      'osmium_hoe',
+      'evergarden_hoe',
+    ]);
+    for (const id of hoeRungs) {
       expect(farmOwned.has(id), `${id} must be reachable`).toBe(true);
     }
     // And the ladder really is climbed rather than assumed: the top catch is

@@ -452,6 +452,38 @@ describe('item webp icons', () => {
     expect(b.prims[0]?.p).toBe('sack');
   });
 
+  it('A4d) the five hoe rungs differ in their PRIM LISTS, never only the radial', () => {
+    // The A4b lesson applied to the third family to earn it (masterwrought
+    // Phase 11j QA). The hoe ladder is FIVE rungs sharing one staff-plus-fang
+    // silhouette, and two of them (skysilver and osmium) sit on the same
+    // 'steel' radial, so A4's whole-recipe JSON identity could be satisfied by
+    // the background while two rungs drew the same tool at 32px. The family's
+    // own stated rule is that the blade steps up a size and the palette steps
+    // up a rung, which is a claim about the PRIMS, so pin the prims.
+    const rungs = ['garden_hoe', 'bronze_hoe', 'skysilver_hoe', 'osmium_hoe', 'evergarden_hoe'];
+    const byPrims = new Map<string, string>();
+    for (const id of rungs) {
+      const recipe = itemIconRecipe(id);
+      expect(isUnknownIconRecipe(recipe), `${id} must resolve a real recipe`).toBe(false);
+      const key = JSON.stringify(recipe.prims);
+      const clash = byPrims.get(key);
+      expect(clash, `${id} draws the same tool as ${clash}`).toBeUndefined();
+      byPrims.set(key, id);
+    }
+    // Non-vacuity: the family really is one silhouette, so the distinctness
+    // above is carried by palette and size rather than by different shapes.
+    // If a rung ever stops being staff-plus-fang, re-aim this pin deliberately.
+    for (const id of rungs) {
+      expect(
+        itemIconRecipe(id).prims.map((p) => p.p),
+        `${id} silhouette`,
+      ).toEqual(['staff', 'fang']);
+    }
+    // And the blade really does step up, which is the rule the prose states.
+    const bladeSizes = rungs.map((id) => itemIconRecipe(id).prims[1]?.s);
+    expect(bladeSizes, 'the blade steps up one size per rung').toEqual([0.5, 0.55, 0.6, 0.65, 0.7]);
+  });
+
   it('A4c) the fifteen AUTHORED-FAMILY dishes differ in their PRIM LISTS, never only the shared food radial', () => {
     // The A4b lesson generalized to the dish family (the Phase 6 eight, the
     // Phase 11 four buff dishes, and masterwrought Phase 11i's two angler
