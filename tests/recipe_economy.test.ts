@@ -273,17 +273,27 @@ describe('THE ECONOMY INVARIANT', () => {
     // load). The `=== true` read in the hydrate arm and the `: false`
     // literals in src/net/online.ts and
     // src/ui/hud/quest/quest_dialog_controller.ts are not writes of true and
-    // never match. Any third write, in any root, is a new mint and reds
-    // here.
-    const TRUE_WRITE = /\bisJackOfAllTrades\s*(?::|=(?!=))\s*true\b/g;
+    // never match. Any ASSIGNMENT to the flag (bare, ||= or ??=, whatever the
+    // right-hand side) and any literal-true object member (plain or quoted
+    // computed key), in any root, is a new mint and reds here; a key built at
+    // runtime is the one spelling no static scan can see, which is why the
+    // caller scan above stays the primary guard. The walk is .ts-only through
+    // tsFilesUnder; the Svelte files under src/admin cannot reach
+    // ArchetypeState.
+    const FLAG_WRITE =
+      /\bisJackOfAllTrades\s*(?:\|\|=|\?\?=|=(?!=))|\bisJackOfAllTrades(?:["']\])?\s*:\s*true\b/g;
     const GUARDED_RE_EMIT = /state\.isJackOfAllTrades\s*\?\s*\{\s*isJackOfAllTrades:\s*true\s*\}/;
     // The predicate's own controls, so a regex edit cannot quietly widen or
-    // narrow what counts as a write: both write spellings match, the
-    // comparison and the optional type member do not.
-    expect('state.isJackOfAllTrades = true;'.match(TRUE_WRITE)).not.toBeNull();
-    expect('{ isJackOfAllTrades: true }'.match(TRUE_WRITE)).not.toBeNull();
-    expect('saved.isJackOfAllTrades === true'.match(TRUE_WRITE)).toBeNull();
-    expect('isJackOfAllTrades?: true;'.match(TRUE_WRITE)).toBeNull();
+    // narrow what counts as a write: every assignment spelling and both
+    // literal-true member spellings match, the comparison and the optional
+    // type member do not.
+    expect('state.isJackOfAllTrades = true;'.match(FLAG_WRITE)).not.toBeNull();
+    expect('state.isJackOfAllTrades = ok;'.match(FLAG_WRITE)).not.toBeNull();
+    expect('state.isJackOfAllTrades ||= true;'.match(FLAG_WRITE)).not.toBeNull();
+    expect('{ isJackOfAllTrades: true }'.match(FLAG_WRITE)).not.toBeNull();
+    expect('{ ["isJackOfAllTrades"]: true }'.match(FLAG_WRITE)).not.toBeNull();
+    expect('saved.isJackOfAllTrades === true'.match(FLAG_WRITE)).toBeNull();
+    expect('isJackOfAllTrades?: true;'.match(FLAG_WRITE)).toBeNull();
     const declaringModule = 'sim/professions/archetype.ts';
     const callers: string[] = [];
     let declared = false;
@@ -299,14 +309,25 @@ describe('THE ECONOMY INVARIANT', () => {
           : -1;
         const attuneEnd = attuneStart === -1 ? -1 : code.indexOf('\n}', attuneStart);
         const guard = isDeclaring ? GUARDED_RE_EMIT.exec(code) : null;
-        for (const write of code.matchAll(TRUE_WRITE)) {
+        for (const write of code.matchAll(FLAG_WRITE)) {
           const at = write.index;
+          const after = at + write[0].length;
+          // The assignment arm carries its right-hand side after the match;
+          // the member arm already consumed its literal true.
+          const rhs = write[0].includes(':')
+            ? 'true'
+            : code.slice(after, code.indexOf('\n', after)).trim();
+          // A write of the literal false (the requiredReagentCountFor default
+          // parameter in crafting.ts, a reset) can never mint a Jack.
+          if (/^false\b/.test(rhs)) continue;
           const kind =
             attuneStart !== -1 && at > attuneStart && at < attuneEnd
               ? 'attune'
               : guard !== null && at >= guard.index && at < guard.index + guard[0].length
                 ? 'serializer'
-                : 'other';
+                : isDeclaring && rhs.includes('saved.isJackOfAllTrades === true')
+                  ? 'hydrate'
+                  : 'other';
           trueWrites.push(`${kind}@${root}/${file}`);
         }
         if (!/\battuneJackOfAllTrades\b/.test(code)) continue;
@@ -322,8 +343,14 @@ describe('THE ECONOMY INVARIANT', () => {
     // result, not a missed root.
     expect(declared).toBe(true);
     expect(callers).toEqual([]);
+    // Three writes, each a named link of the closed circuit: the mint in the
+    // attune body, the serializer's guarded re-emit, and the hydrate arm's
+    // assignment, whose right-hand side is `saved.isJackOfAllTrades === true`
+    // and so can only carry a true the serializer already wrote. A fourth
+    // entry, or one of these three reading `other`, is a new door.
     expect(trueWrites.sort()).toEqual([
       'attune@src/sim/professions/archetype.ts',
+      'hydrate@src/sim/professions/archetype.ts',
       'serializer@src/sim/professions/archetype.ts',
     ]);
     // The reason the guard exists, pinned as numbers through the same
@@ -346,7 +373,7 @@ describe('THE ECONOMY INVARIANT', () => {
     expect(jackBill).toBe(outputValue(mantle));
   });
 
-  it('the caller scan reads src/, server/ and headless/ only through the shared walker', () => {
+  it('the caller scan makes no directory read of its own (the shared walker is its only reader; the roots themselves are pinned by ROOT_FILE_FLOOR above)', () => {
     expectScansOnlyThroughSharedWalkers(import.meta.url, ['ts_files_under']);
   });
 
@@ -674,10 +701,6 @@ describe('REFERENTIAL INTEGRITY', () => {
         `${id} specOnly`,
       ).toBe(bills.specOnly);
       expect(
-        billWith(recipe, () => true),
-        `${id} floor, restated`,
-      ).toBe(bills.floor);
-      expect(
         billWith(recipe, (itemId) => SIGNABLE_TROPHY_REAGENTS.has(itemId)),
         `${id} reachable`,
       ).toBe(bills.reachable);
@@ -691,6 +714,10 @@ describe('REFERENTIAL INTEGRITY', () => {
     // their floor plus sink at or above it); at the reachable bill plus the
     // sink four pay out. The potion never pays: its most permissive bill,
     // specialization alone with no sink, already sits above its output.
+    // sinkFor restates the charge formula to price the verdicts; the charge
+    // SITE is driven end to end by tests/professions_acquisition_salvage_sink
+    // (the copper resolveCraftForRecipe deducts, pinned against the constant
+    // and the budget), so this arm pins the formula's inputs, not the charge.
     const sinkFor = (recipe: ProfessionRecipeRecord): number =>
       Math.ceil(recipe.itemLevelBudget * CRAFT_GOLD_SINK_COPPER_PER_BUDGET);
     const SINK_BY_BUDGET: Record<number, number> = { 10: 20, 16: 32, 20: 40 };

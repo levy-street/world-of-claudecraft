@@ -3969,7 +3969,9 @@ export const FARM_RECIPES: ProfessionRecipeRecord[] = [
 //     disenchant outputs, wyrmfall_core is rare, arcanite_bar a master-stocked
 //     premium reagent; any rare output would owe a prog_enchanting_rare deed).
 //   chipped_tusk 15: output-excluded, weaponcrafting (the seventh output
-//     exclusion, the sixth fix round, split by archetype: of the 25 uncrafted
+//     exclusion, the sixth fix round, split by archetype; the counts below
+//     were measured 2026-08-24 and no test pins them, so re-derive them when
+//     a weapon lands in the band: of the 25 uncrafted
 //     weapons with sellValue in (15, 460], the 18 physical rows are strictly
 //     dominated by the trainer's OWN rung-25 row recipe_whetted_iron_dirk,
 //     16-24 at 1.8 = 11.1 dps, agi 5 sta 2, no class lock, a 50-copper listed
