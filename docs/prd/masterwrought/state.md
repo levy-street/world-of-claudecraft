@@ -15005,6 +15005,41 @@ the FeastState and the placer's one-active slot both reclaimed, and its
 membership on each roster asserted directly. `respawnTimer` Infinity,
 `lootable` false and `objectItemId` null are all pinned on an APEX feast.
 
+### THE TWO PRESTIGE SEAMS, AND THE ONE CUT BETWEEN THEM
+
+Deliverable 3 claims prestige for near-free, and it is true in exactly two
+places, both of which this phase VERIFIED and PINNED rather than built:
+
+- **THE CRAFTER'S NAME, on the item instance.** `mintsSignerPayload`
+  (professions/crafting.ts) stamps any output whose def quality is
+  rare-or-better and is not a bag. Decision K2 keeps the apex feasts at epic, so
+  a crafted copy is signed the day it exists. Asserted against the copy in the
+  bags after a real craft (tests/apex_feast_craft.test.ts), never against the
+  threshold helper: the claim is that a player ends up holding a signed feast.
+- **THE PLACER'S NAME, on the entity.** The shipped placement builds the ground
+  object with `createGroundObject(..., meta.name, ...)`, carrying the placer's
+  raw name as a VALUE, and the client composes the localized title around it.
+  That is what makes "a raid that eats at a feast sees whose feast it is"
+  literally true with zero new machinery.
+
+**THE CUT, RECORDED HERE BECAUSE IT WAS OWED AND THIS LEDGER FIRST SHIPPED
+WITHOUT IT.** The crafter's signature is NOT carried onto a feast placed by
+someone else. Doing so needs a new `FeastState` field carrying the SOURCE
+INSTANCE's signer and, because the title is composed client-side off the entity,
+a new wire field to get that signer to the client: a cross-platform change
+(cross-platform-sync dispatch) for a case that arises only when a cook sells a
+feast and a stranger places it. Refused, not deferred.
+
+Note the difference from the dish field, which this phase DID add: `dishItemId`
+is copied from the item DEF at placement and never leaves the sim, so it is a
+transient sim-local field. A signer is per-COPY payload that has to reach a
+client, which is the whole cost.
+
+**SO THE CLAIM IS NARROWED TO WHAT IS TRUE**, in this ledger and nowhere looser:
+the signature lives on the item instance, the placer's name lives on the entity,
+and the two COINCIDE in the common case where a cook places their own feast. Any
+broader sentence about the two seams is a finding against this record.
+
 ### THE LIVE DEFECT THIS PHASE FOUND
 
 **A CRAFTED HARVEST FEAST HAS BEEN READING "GATHERED BY" SINCE IT SHIPPED.**
