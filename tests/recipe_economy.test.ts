@@ -281,17 +281,28 @@ describe('THE ECONOMY INVARIANT', () => {
     // nothing else (a reset, a default parameter, the empty state) is the one
     // write skipped, and `false || true` is not that. A key built at runtime
     // is the one spelling no static scan can see, which is why the caller
-    // scan above stays the primary guard.
+    // scan above stays the primary guard. The walk is .ts-only through
+    // tsFilesUnder (the scan's one structural blind spot beside the runtime
+    // key); the Svelte files under src/admin cannot reach ArchetypeState.
     const FLAG_WRITE =
-      /\bisJackOfAllTrades(?:["']\])?\s*(?:\|\|=|\?\?=|=(?!=))|\bisJackOfAllTrades(?:["']\])?\s*:(?!:)/g;
+      /\bisJackOfAllTrades(?:["']\])?\s*(?:\|\|=|\?\?=|=(?!=))|\bisJackOfAllTrades(?:["']\])?\s*:/g;
     const GUARDED_RE_EMIT = /state\.isJackOfAllTrades\s*\?\s*\{\s*isJackOfAllTrades:\s*true\s*\}/;
+    // The hydrate line verbatim (archetype.ts sits at 94 columns there; a
+    // rename that wraps it empties the read right-hand side and reds the pin
+    // below as `other`, which is loud rather than silent).
     const HYDRATE_RHS = 'state.activeArchetype === null && saved.isJackOfAllTrades === true;';
-    const FALSE_ONLY = /^false[\s,;)}]*$/;
+    // A skipped write must be the literal false AND a terminator on the same
+    // line: a bare `false` alone (the first line of a wrapped `false || true`)
+    // is not skipped, so it classifies like any write and reads `other`.
+    const FALSE_ONLY = /^false\s*[,;)}][\s,;)}]*$/;
     // The predicate's own controls, so a regex edit cannot quietly widen or
     // narrow what counts as a write: every assignment spelling and every
-    // member spelling match, the comparison, the optional type member and the
-    // declared type do not; the false skip clears a bare false and nothing
-    // longer; the hydrate key refuses a longer disjunction.
+    // member spelling match, the comparison and the optional `?:` type member
+    // do not; any OTHER `isJackOfAllTrades:` (a required type member, an
+    // inline object type, a destructuring rename) matches by design and reads
+    // loudly as `other`, so a new spelling is classified rather than
+    // exempted; the false skip clears a terminated literal false and nothing
+    // longer.
     expect('state.isJackOfAllTrades = true;'.match(FLAG_WRITE)).not.toBeNull();
     expect('state.isJackOfAllTrades = ok;'.match(FLAG_WRITE)).not.toBeNull();
     expect('state.isJackOfAllTrades ||= true;'.match(FLAG_WRITE)).not.toBeNull();
@@ -305,9 +316,14 @@ describe('THE ECONOMY INVARIANT', () => {
     expect('isJackOfAllTrades?: true;'.match(FLAG_WRITE)).toBeNull();
     expect('isJackOfAllTrades?: boolean;'.match(FLAG_WRITE)).toBeNull();
     expect(FALSE_ONLY.test('false,')).toBe(true);
+    expect(FALSE_ONLY.test('false }')).toBe(true);
+    expect(FALSE_ONLY.test('false')).toBe(false);
     expect(FALSE_ONLY.test('false || true;')).toBe(false);
     expect(FALSE_ONLY.test('false ?? flag')).toBe(false);
-    expect(`${HYDRATE_RHS.slice(0, -1)} || questJack;`).not.toBe(HYDRATE_RHS);
+    // The hydrate key has no string control on purpose: a string compared to
+    // itself proves nothing, and the key is exercised where it bites, in the
+    // classification of the live line below (a widened disjunction, a moved
+    // arm, or a dropped guard reads `other` and reds the pin).
     const declaringModule = 'sim/professions/archetype.ts';
     const callers: string[] = [];
     let declared = false;
