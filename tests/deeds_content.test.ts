@@ -27,6 +27,7 @@ import {
   GATHERING_PROFESSIONS,
 } from '../src/sim/content/professions';
 import { ALL_RECIPES } from '../src/sim/content/recipes';
+import { APEX_FEAST_CRAFT_MARK, isApexFeastRecipe } from '../src/sim/professions/feast';
 import { RIFT_MOBS } from '../src/sim/content/rift/mobs';
 import { WARLOCK_PET_MOBS } from '../src/sim/content/warlock_pets';
 import { YUMI_TEMPLATE_ID } from '../src/sim/content/yumi';
@@ -95,10 +96,16 @@ describe('audited launch totals (literals: update deliberately with the catalog)
     // first-harvest chronicles at renown 5, col_golden_harvest at 0 per the
     // luck rule, prog_farming_100 at the profession-100 family value of 10,
     // so +35 Renown in all), plus Phase 11e's roster deed col_farm_roster
-    // (renown 5, the gathering ladder's first-rung point), which is what takes
-    // this to 288 / 3285.
-    expect(DEED_ORDER.length).toBe(288);
-    expect(ALL.reduce((sum, d) => sum + d.renown, 0)).toBe(3285);
+    // (renown 5, the gathering ladder's first-rung point), which took this to
+    // 288 / 3285, plus Phase 11k's cross-packet deed prog_field_to_feast
+    // (renown 5, no title), which takes it to 289 / 3290.
+    //
+    // PREDICTED THEN OBSERVED, which is the method that tells an append from a
+    // lost row: the preceding phase's ledger recorded 288 / 3285, this phase
+    // adds exactly one deed at exactly renown 5, so 289 / 3290 was written
+    // BEFORE the run and matched it.
+    expect(DEED_ORDER.length).toBe(289);
+    expect(ALL.reduce((sum, d) => sum + d.renown, 0)).toBe(3290);
   });
 
   it('ships the audited per-category counts', () => {
@@ -111,7 +118,7 @@ describe('audited launch totals (literals: update deliberately with the catalog)
       // +3 for the phase 06 inscription trio (rare-tier, 50-skill, and
       // Grandmaster) landing the same three families at the table tail, then
       // +2 farming celebrations (prog_first_planting, prog_farming_100).
-      progression: 65,
+      progression: 66,
       combat: 10,
       // +2 Rift coverage deeds (dgn_rift, dgn_rift_s_rank).
       dungeon: 31,
@@ -286,8 +293,11 @@ describe('audited launch totals (literals: update deliberately with the catalog)
       'chr_evergarden_first_harvest',
       'col_golden_harvest',
       'prog_farming_100',
-      // Phase 11e's roster deed, the tail today.
       'col_farm_roster',
+      // Phase 11k's cross-packet deed, the tail today. Appended at the literal
+      // end under the 11b three-tier ordering rule, which keeps the farming
+      // block contiguous ahead of it.
+      'prog_field_to_feast',
     ]);
     expect(DEEDS.dgn_wildheart_basin.renown).toBe(10);
     expect(DEEDS.dgn_wildheart_basin_heroic.renown).toBe(10);
@@ -651,6 +661,14 @@ describe('audited launch totals (literals: update deliberately with the catalog)
   });
 });
 
+/** The one recipe with this id, or a loud failure: a silent undefined would
+ *  make a predicate arm below pass by measuring nothing. */
+function recipeById(id: string) {
+  const found = ALL_RECIPES.find((r) => r.id === id);
+  if (!found) throw new Error(`no such recipe: ${id}`);
+  return found;
+}
+
 describe('frozen trigger + renown catalog (design rule 9: never retro-edit a trigger)', () => {
   // A single digest over (id, trigger, renown) for every deed in authored order.
   // The literal pins above cover only a handful of deeds; the other ~180 have no
@@ -761,7 +779,14 @@ describe('frozen trigger + renown catalog (design rule 9: never retro-edit a tri
   // renown value was touched, and the row was inserted ahead of the farming
   // block rather than at the literal tail so that block stays contiguous, which
   // moves DEED_ORDER's tail positions but no authored trigger.
-  const FROZEN_CATALOG_SHA256 = '2b6e36a45825f84c5037d8427c2e9ce0fca9300d7161278a8e05dfa61a4375be';
+  // Re-baselined at masterwrought Phase 11k for the appended prog_field_to_feast,
+  // and re-minted THE AUDITABLE WAY rather than by pasting the new suite output:
+  // the PRE-append row list was reconstructed first (every row minus the new id,
+  // with feat_book_complete's live deedIds filtered back to its prior value) and
+  // it reproduced 2b6e36a4... EXACTLY, which is what distinguishes an append
+  // from an edit. Only then was the digest re-minted with the one appended
+  // tuple. No shipped trigger or renown value was touched.
+  const FROZEN_CATALOG_SHA256 = '52569f4b65150f9c6d3f242e65915d99d281ebeedc34698e9c1cbcb9fe8f4066';
 
   it('every shipped deed keeps its trigger and renown unchanged', () => {
     const canonical = JSON.stringify(
@@ -963,9 +988,10 @@ describe('table shape', () => {
     // Reliquary completion ladder, then the Masterwrought phase 05
     // jewelcrafting milestones and the phase 06 inscription milestones
     // append behind it, and the absorbed farming celebration block closes
-    // the catalog per the 11b three-tier ordering rule; the Farming 100
-    // milestone is the tail.
-    expect(DEED_ORDER[DEED_ORDER.length - 1]).toBe('col_farm_roster');
+    // the catalog per the 11b three-tier ordering rule, and the 11-block's own
+    // appends follow it in phase order; Phase 11k's prog_field_to_feast is the
+    // tail.
+    expect(DEED_ORDER[DEED_ORDER.length - 1]).toBe('prog_field_to_feast');
   });
 
   it('every entry key matches its id and its prefix matches its category', () => {
@@ -1250,6 +1276,69 @@ describe('trigger references resolve against the real content tables', () => {
     const trigger = DEEDS.col_farm_roster.trigger;
     expect(trigger.kind).toBe('visits');
     if (trigger.kind === 'visits') expect([...trigger.markIds].sort()).toEqual(marks);
+  });
+
+
+  it('the apex_feast namespace SURVIVES a save/load round trip, so the deed can refill', () => {
+    // THE SAME MANDATORY TRAP one deed over (masterwrought Phase 11k), and the
+    // reason it is a ROUND TRIP rather than a membership check: an unregistered
+    // namespace serializes fine and is silently dropped by restoreDeedStats, so
+    // a cook who logs out after crafting their first apex feast would come back
+    // with the mark gone and the deed permanently unearnable. This packet has
+    // paid for that three times (gather_event, masterwork, farm_crop).
+    const stats = restoreDeedStats(undefined);
+    stats.visited.add(APEX_FEAST_CRAFT_MARK);
+    const restored = restoreDeedStats(serializeDeedStats(stats));
+    expect(
+      restored.visited.has(APEX_FEAST_CRAFT_MARK),
+      `${APEX_FEAST_CRAFT_MARK} was dropped on load`,
+    ).toBe(true);
+    // The control that makes the arm mean something: a mark in an UNREGISTERED
+    // namespace really is dropped by the same round trip.
+    const bogus = restoreDeedStats(undefined);
+    bogus.visited.add('apex_feast_typo:crafted');
+    expect(
+      restoreDeedStats(serializeDeedStats(bogus)).visited.has('apex_feast_typo:crafted'),
+    ).toBe(false);
+    // ...and the deed's own trigger really names THIS mark, so the round trip
+    // above is over the key the evaluator reads.
+    const trigger = DEEDS.prog_field_to_feast.trigger;
+    expect(trigger.kind).toBe('visit');
+    if (trigger.kind === 'visit') expect(trigger.markId).toBe(APEX_FEAST_CRAFT_MARK);
+    // The mark key is a FIXED literal, which is what makes it bounded: an
+    // interpolated key source would write permanent ledger noise nothing reads
+    // back, the hazard craft_rare's own bounding exists for.
+    expect(APEX_FEAST_CRAFT_MARK).toBe('apex_feast:crafted');
+  });
+
+  it('isApexFeastRecipe admits exactly the capstone feast bills, and no others', () => {
+    // The predicate the craft-credit arm gates on, CALLED rather than described,
+    // and pinned by its OUTCOME over every shipped recipe rather than over the
+    // three rows this phase happened to add. A predicate that returned true
+    // unconditionally would still leave a membership spot-check green.
+    const admitted = ALL_RECIPES.filter((r) => isApexFeastRecipe(r))
+      .map((r) => r.id)
+      .sort();
+    expect(admitted).toEqual([
+      'recipe_sageleaf_feast',
+      'recipe_stonepot_feast',
+      'recipe_warspice_feast',
+    ]);
+    // THE TWO DISCRIMINATING CASES, spelled out because the pin above is
+    // satisfied by either half of the rule alone:
+    //  - the PARTY feast carries a feast payload and is refused on the RUNG
+    //    (cooking 100 against cooking's cap of 125), so a rung-blind predicate
+    //    would admit it and the deed would fire on the wrong feast;
+    const partyFeast = recipeById('recipe_harvest_feast');
+    expect(ITEMS[partyFeast.resultItemId], 'the party feast is a real feast def').toBeTruthy();
+    expect(isApexFeastRecipe(partyFeast), 'the PARTY rung is not the apex one').toBe(false);
+    //  - the two mobile STATIONS sit at the same 125 rung and are refused on the
+    //    PAYLOAD, so a payload-blind predicate would admit them.
+    for (const id of ['recipe_laden_hearth', 'recipe_grand_cauldron']) {
+      const station = recipeById(id);
+      expect(station.skillReq, `${id} really is at the capstone rung`).toBe(125);
+      expect(isApexFeastRecipe(station), `${id} is a station, not a feast`).toBe(false);
+    }
   });
 
   it('every visited mark belongs to an authored namespace and resolves to real content', () => {

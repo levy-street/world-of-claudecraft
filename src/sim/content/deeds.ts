@@ -3133,6 +3133,28 @@ export const DEEDS: Record<string, DeedDef> = {
       markIds: [...FARM_CROP_IDS].sort().map((cropId) => `farm_crop:${cropId}`),
     },
   },
+  // THE CROSS-PACKET DEED (masterwrought Phase 11k). It cannot be earned
+  // without touching BOTH halves of the merged program, and that is structural
+  // rather than a claim: the apex feast bill names farm produce, a Wyrmfall
+  // Core from the rift, and all three high-band fishing catches, so a cook who
+  // has never farmed, never raided or never fished cannot complete one.
+  //
+  // Cosmetic with ZERO rng, satisfying D13 and docs/design/deeds.md: renown 5,
+  // NO title, no border. A capstone that is a ROLE rather than a stat is the
+  // whole design claim of this phase's prestige deliverable, and paying it in
+  // stats would refute it. The trigger is the shipped { kind: 'visit' } family
+  // on a mark written at the SAME craft-credit arm that already writes
+  // craft_rare and the masterwork marks (professions/crafting.ts), and the mark
+  // key is BOUNDED by the authored recipe set exactly as craft_rare's is: an
+  // unbounded key source writes permanent ledger noise nothing can read back.
+  prog_field_to_feast: {
+    id: 'prog_field_to_feast',
+    name: 'From Field to Feast',
+    desc: 'Cook an apex Harvest Feast, the table a whole raid eats from.',
+    category: 'progression',
+    renown: 5,
+    trigger: { kind: 'visit', markId: 'apex_feast:crafted' },
+  },
 };
 
 for (const def of Object.values(DEEDS)) {

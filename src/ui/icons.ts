@@ -5921,6 +5921,12 @@ export const DEED_ART_PENDING: ReadonlySet<string> = new Set([
   // rule that forced prog_farming_100's crest to ship committed does not apply
   // here, and the pending row is the honest place for it.
   'col_farm_roster',
+  // Phase 11k's cross-packet deed, falling back to deed_cat_progression on the
+  // same scheduled park, and appended at the TAIL because this set is compared
+  // against a DEED_ORDER-derived list in insertion order (see the load-bearing
+  // note above). It carries NO title, so the Reliquary title-shelf rule that
+  // forced prog_farming_100's crest to ship committed does not apply here.
+  'prog_field_to_feast',
 ]);
 /** Static URL of a deed crest's painted art, or null when the crest id has no committed image. */
 export function deedImageUrl(crestId: string): string | null {

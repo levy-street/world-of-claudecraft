@@ -50,6 +50,7 @@
 // persistence machinery the credited-objects ledger needs.
 
 import { buildConsuming } from '../consuming';
+import { CRAFT_RING } from '../content/professions';
 import { ITEMS } from '../data';
 import { delveRunForPlayer } from '../delves/runs';
 import { createGroundObject } from '../entity';
@@ -100,6 +101,30 @@ export function isFeastTemplateId(templateId: string | null | undefined): boolea
  *  to its own title key. Sorted so a reader and a test see a stable order. */
 export function feastTemplateIds(): string[] {
   return [...FEAST_TEMPLATE_IDS].sort();
+}
+
+/** The ONE visited-mark key behind prog_field_to_feast (masterwrought Phase
+ *  11k). A fixed literal rather than a per-feast key: the deed asks whether a
+ *  player has cooked an apex feast at all, and the three rungs are the same act
+ *  with a different plate on it. Its namespace is registered in
+ *  src/sim/deeds.ts (an unregistered one is dropped on load). */
+export const APEX_FEAST_CRAFT_MARK = 'apex_feast:crafted';
+
+/** Is this recipe an APEX feast bill, the capstone rung rather than the party
+ *  one? Derived from the CONTENT on both axes so a fourth feast joins with no
+ *  edit: the output must carry a `feast` payload, and the bill must sit at its
+ *  craft's own cap. The party feast is cooking 100 against cooking's cap of
+ *  125, so it is correctly outside; a hypothetical feast authored above a cap
+ *  would be unlearnable anyway (the unlearnable-at-150 finding). */
+export function isApexFeastRecipe(recipe: {
+  professionId: string;
+  resultItemId: string;
+  skillReq: number;
+}): boolean {
+  const def = ITEMS[recipe.resultItemId];
+  if (!def || !('feast' in def) || !def.feast) return false;
+  const craft = CRAFT_RING.find((c) => c.id === recipe.professionId);
+  return craft !== undefined && recipe.skillReq >= craft.maxSkill;
 }
 
 /** One live placed feast. Keyed in SimContext.feasts by its entity id. */

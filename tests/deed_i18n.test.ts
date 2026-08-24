@@ -68,7 +68,7 @@ describe('deed_i18n English resolution', () => {
     // (no title reward).
     // 288 deeds since masterwrought Phase 11i: two rows each (name and desc)
     // plus the 45 title rewards, which col_deepest_cast does not join.
-    expect(manifest.length).toBe(288 * 2 + 45);
+    expect(manifest.length).toBe(289 * 2 + 45);
     expect(manifest.filter((row) => row.field === 'title').length).toBe(45);
     expect(manifest).toContainEqual({
       id: 'prog_veteran',

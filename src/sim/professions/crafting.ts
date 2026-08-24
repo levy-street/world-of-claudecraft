@@ -83,6 +83,7 @@ import { archetypeCeilingFor, craftSkillGainMultiplier } from './archetype';
 import { comboEligibility } from './combo_eligibility';
 import { isCommissionEligible } from './commission';
 import { craftCastDurationSec } from './craft_cast_duration';
+import { APEX_FEAST_CRAFT_MARK, isApexFeastRecipe } from './feast';
 import { isDisenchantable } from './enchanting';
 import { announceMasterworkZone } from './gather_events';
 import { isSignableMaterialRarity, type MaterialRarity } from './gathering';
@@ -1251,6 +1252,18 @@ function applyCraftSuccessHooks(
   const recipe = recipeById(recipeId);
   if (result.quality !== undefined && isSignableMaterialRarity(result.quality) && recipe) {
     ctx.markVisited(meta, `craft_rare:${recipe.professionId}`);
+  }
+  // The apex feast craft mark (masterwrought Phase 11k), behind
+  // prog_field_to_feast. Written HERE rather than at the item grant for the
+  // same reason craft_rare is: this is the one arm that knows a CRAFT happened,
+  // so a feast bought on the market or traded for never earns it.
+  //
+  // BOUNDED BY THE CONTENT, never by the id: the key is the fixed literal
+  // 'apex_feast:crafted' and the membership test reads the output def's own
+  // `feast` payload plus the capstone rung, so a fourth feast joins with no
+  // edit here and no unbounded key ever reaches the ledger.
+  if (recipe && isApexFeastRecipe(recipe)) {
+    ctx.markVisited(meta, APEX_FEAST_CRAFT_MARK);
   }
   // The dirty mark also covers the craft-skill gain the resolve applied.
   ctx.markDeedsDirty(meta.entityId);

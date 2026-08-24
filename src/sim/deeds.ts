@@ -2245,4 +2245,18 @@ export const VISITED_MARK_NAMESPACES = [
   // and masterwork bug twice over; tests/deeds_content.test.ts pins the round
   // trip rather than trusting this comment.
   'farm_crop',
+  // The apex feast craft mark (masterwrought Phase 11k), written at the same
+  // craft-credit arm as craft_rare and masterwork above. ONE key today,
+  // 'apex_feast:crafted', deliberately bounded rather than keyed per feast id:
+  // the deed asks whether a player has cooked an apex feast at all, and the
+  // three rungs are the same act with a different plate on it, so a per-id key
+  // would write three permanent entries where the question has one answer.
+  //
+  // REGISTERED FOR THE USUAL REASON, which this packet has now paid for three
+  // times (gather_event, masterwork, farm_crop): an unregistered namespace
+  // serializes fine and is silently DROPPED by restoreDeedStats on load, so the
+  // mark could never refill and the deed would be unearnable for anyone who
+  // logs out after the craft. tests/deeds_content.test.ts pins the round trip
+  // rather than trusting this comment.
+  'apex_feast',
 ] as const;
