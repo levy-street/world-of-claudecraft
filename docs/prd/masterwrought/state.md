@@ -12565,6 +12565,25 @@ a defect of its own. This one was re-read as such and it had TWO.
   starter is crafted"), so the loose half is gone and the test anchor moved with
   it. Correcting a false claim with a slightly false claim would have been the
   purest version of this phase's own lesson.
+- **AND THEN IT HAPPENED ANYWAY, one round later.** The clause added to fix the
+  vendor-ladder half read "its tier-1 hoe is stocked by the farmers at the
+  allotments". Exactly ONE npc anywhere sells `garden_hoe`: Farmer Jessica, who
+  keeps the first allotment. The other three farmers stock seeds and compost.
+  That is a smaller falsehood shipped inside the fix for a larger one, on the
+  third pass over the same paragraph, which is the honest measure of how easy
+  this class is. It is corrected and PINNED rather than reworded quietly: two
+  arms now hold the sentence against the tree instead of against its own
+  wording, that exactly one NPC sells the tier-1 hoe and that no rung above it
+  is on any counter at all.
+
+**THE FIX-DIFF REVIEWER LANE NEVER DELIVERED AT ALL**, across five requests to
+two separate fresh agents, and that is recorded rather than dressed up: the user
+asked for a fresh reviewer over the fix diff and did not get one. What stood in
+for it is three passes of my own over the same diff, which found the three
+defects listed above, so the lane produced findings rather than nothing. It is
+still not the same thing as an independent read, and the third finding, a
+falsehood introduced by the second fix of the same paragraph, is exactly what an
+independent read is for.
 
 **BOTH LATE LANES THEN LANDED, AND BOTH FOUND REAL THINGS**, which is why this
 section has a second half. The doc-accuracy and qa-checklist lanes delivered
