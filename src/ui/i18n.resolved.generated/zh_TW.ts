@@ -6071,6 +6071,28 @@ export const zh_TW: EnTranslations = {
         "orderBoardBody": "你不必在聊天頻道裡找製作者。打開你的製作視窗，委託板就在它的標題列上、一鍵之遙。任何人都能在上頭張貼訂單：指名你想要做的配方，然後或是敞開來讓任何製作者接手，或是指定給某一位製作者，那麼便只有那個人能夠接下它。瀏覽委託板的製作者接下一則訂單，而接單即代表承諾，因此一件工作在同一時間只會由一個人進行。\n\n你張貼時不會扣留任何東西：訂單不會預留任何錢幣、也不會預留任何材料，所以價格與由誰提供材料，是你們兩人之間談定的事，就像任何委託一向那樣談。訂單還開著時你可以自行取消，而沒有人接的訂單會在一天後自動失效。一旦有製作者接下，交件才是結案的方式。\n\n交件是面對面進行的。製作者以委託的形式做出成品，來到你面前交給你，所以請留一格背包空間收下它。送到的東西遵循下方一般的委託規則，會透過製作者之約綁定給你。",
         "commissionsBoardNote": "委託有兩種起頭的方式：你在上方的委託板張貼一則訂單，把工作送到製作者面前；或是某位製作者純粹決定為你做一件成品。兩者最後都歸於同一份製作者之約。"
       },
+      "prov": {
+        "title": "Provisioning: from the field to the raid",
+        "intro": "The gathering lines meet in one kitchen, and the ladder above it ends at a table a whole raid eats from.",
+        "suppliersHeading": "Who feeds the kitchen",
+        "suppliersBody": "Cooking takes from more of the gathering lines than any other craft, and that is deliberate: a cook who also fishes, farms, or skins is never short of something to work with, and a cook who does none of those can buy the lot on the market.\n\nWhat each line brings is listed below, and it is read straight off the live recipe list rather than written down here, so it is always what the kitchen actually asks for today.",
+        "lineCountFmt": "{count} into cooking bills",
+        "lineMining": "Mining",
+        "lineLogging": "Logging",
+        "lineHerbalism": "Herbalism",
+        "lineFishing": "Fishing",
+        "lineFarming": "Farming",
+        "lineCorpse": "Corpse harvesting",
+        "ladderHeading": "The ladder, rung by rung",
+        "ladderBody": "Cooking climbs in the usual brackets, and every rung is listed with what it teaches. The early rungs are single dishes you eat from your bags. Higher up the kitchen starts making things for other people: plates that carry a lasting buff, and above those the feasts, which you do not eat at all but set down on the ground for everyone standing near it.",
+        "rungFmt": "Cooking {skill}",
+        "placeableTag": "(placed, not eaten)",
+        "tableHeading": "The table at the top",
+        "tableBody": "A feast is set down where you stand and anyone nearby takes one serving each. What a serving gives is exactly the dish that feast is built around, so a feast never has power of its own to learn: it is a way of handing a whole group the plate you already know how to cook.\n\nThe top of the ladder is three feasts rather than one, and picking between them is the only choice there is. They cost the same, ask for the same materials, and take the same skill; each simply serves a different one of the three great plates, so a group takes the one that suits what it is about to do. Only one feast of yours can stand at a time, whichever rung it came from, and it keeps for a few minutes before it is cleared away.",
+        "marketHeading": "If you cook none of it",
+        "marketBody": "None of this is a wall for anyone who does not cook. Every material on this page is ordinary tradable goods, so a fisher sells catches, a farmer sells crops, and a raider who does neither buys a feast outright from a cook who made a spare. The kitchen is a place the professions meet, never a toll on the ones who skip it.",
+        "cookingLink": "Cooking"
+      },
       "faq": {
         "title": "專業常見問題",
         "intro": "製作者最常問的問題，一併作答。",

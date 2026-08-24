@@ -6071,6 +6071,28 @@ export const vi_VN: EnTranslations = {
         "orderBoardBody": "Bạn không cần phải tìm thợ chế tác qua khung chat. Mở cửa sổ chế tác của bạn và bảng đơn ủy thác chỉ cách một cú nhấp trong phần đầu của nó. Ai cũng có thể đăng một đơn ở đó: đặt tên công thức bạn muốn được làm ra, rồi hoặc để nó mở cho bất kỳ thợ chế tác nào nhận, hoặc nhắm nó vào một thợ chế tác cụ thể, người khi đó là người duy nhất có thể nhận đơn. Một thợ chế tác đang xem bảng chấp nhận một đơn, và việc chấp nhận ràng buộc họ với nó, nên một công việc chỉ bao giờ được một người làm tại một thời điểm.\n\nKhông có gì bị giữ lại khi bạn đăng đơn: một đơn không giữ trước tiền vàng hay nguyên liệu nào cả, nên giá cả và ai cung cấp nguyên liệu vẫn là chuyện giữa hai bạn với nhau, thỏa thuận theo cách mọi đơn ủy thác vẫn luôn được thỏa thuận. Bạn có thể hủy đơn của chính mình khi nó vẫn còn mở, và một đơn không ai nhận sẽ tự hết hạn sau một ngày. Một khi một thợ chế tác đã chấp nhận, việc giao hàng là thứ khép lại nó.\n\nViệc giao hàng diễn ra mặt đối mặt. Thợ chế tác làm ra món đồ dưới dạng ủy thác, đến chỗ bạn, và trao nó tận tay, nên hãy chừa sẵn một ô túi trống để nhận nó. Món đồ đến tay bạn sẽ theo các quy tắc ủy thác thông thường bên dưới, ràng buộc với bạn qua Giao Kèo Thợ Thủ Công.",
         "commissionsBoardNote": "Có hai cách để bắt đầu một đơn ủy thác: một đơn bạn đăng lên bảng phía trên, mang công việc đến với một thợ chế tác, hoặc một thợ chế tác đơn giản là chọn làm một món đồ cho bạn. Cả hai đều kết thúc bằng cùng một giao kèo."
       },
+      "prov": {
+        "title": "Provisioning: from the field to the raid",
+        "intro": "The gathering lines meet in one kitchen, and the ladder above it ends at a table a whole raid eats from.",
+        "suppliersHeading": "Who feeds the kitchen",
+        "suppliersBody": "Cooking takes from more of the gathering lines than any other craft, and that is deliberate: a cook who also fishes, farms, or skins is never short of something to work with, and a cook who does none of those can buy the lot on the market.\n\nWhat each line brings is listed below, and it is read straight off the live recipe list rather than written down here, so it is always what the kitchen actually asks for today.",
+        "lineCountFmt": "{count} into cooking bills",
+        "lineMining": "Mining",
+        "lineLogging": "Logging",
+        "lineHerbalism": "Herbalism",
+        "lineFishing": "Fishing",
+        "lineFarming": "Farming",
+        "lineCorpse": "Corpse harvesting",
+        "ladderHeading": "The ladder, rung by rung",
+        "ladderBody": "Cooking climbs in the usual brackets, and every rung is listed with what it teaches. The early rungs are single dishes you eat from your bags. Higher up the kitchen starts making things for other people: plates that carry a lasting buff, and above those the feasts, which you do not eat at all but set down on the ground for everyone standing near it.",
+        "rungFmt": "Cooking {skill}",
+        "placeableTag": "(placed, not eaten)",
+        "tableHeading": "The table at the top",
+        "tableBody": "A feast is set down where you stand and anyone nearby takes one serving each. What a serving gives is exactly the dish that feast is built around, so a feast never has power of its own to learn: it is a way of handing a whole group the plate you already know how to cook.\n\nThe top of the ladder is three feasts rather than one, and picking between them is the only choice there is. They cost the same, ask for the same materials, and take the same skill; each simply serves a different one of the three great plates, so a group takes the one that suits what it is about to do. Only one feast of yours can stand at a time, whichever rung it came from, and it keeps for a few minutes before it is cleared away.",
+        "marketHeading": "If you cook none of it",
+        "marketBody": "None of this is a wall for anyone who does not cook. Every material on this page is ordinary tradable goods, so a fisher sells catches, a farmer sells crops, and a raider who does neither buys a feast outright from a cook who made a spare. The kitchen is a place the professions meet, never a toll on the ones who skip it.",
+        "cookingLink": "Cooking"
+      },
       "faq": {
         "title": "Câu Hỏi Thường Gặp Về Nghề Nghiệp",
         "intro": "Giải đáp nhanh những câu hỏi thợ chế tác hay hỏi nhất.",

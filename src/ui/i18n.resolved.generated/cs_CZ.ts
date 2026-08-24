@@ -6071,6 +6071,28 @@ export const cs_CZ: EnTranslations = {
         "orderBoardBody": "Řemeslníka nemusíš hledat v chatu. Otevři okno výroby a nástěnka zakázek je jeden klik od tebe v jeho záhlaví. Kdokoli tam může zadat objednávku: pojmenuj recept, který chceš nechat vyrobit, a pak ji buď nech otevřenou pro kteréhokoli řemeslníka, nebo ji zaměř na jednoho jmenovaného řemeslníka, který je pak jediný, kdo si ji může vzít. Řemeslník procházející nástěnku objednávku přijme, a přijetím se k ní zaváže, takže na zakázce vždy pracuje jen jeden člověk najednou.\n\nPři zadání se nic nezadržuje: objednávka nerezervuje žádné mince ani materiály, takže cena i to, kdo dodá suroviny, zůstává jen mezi vámi dvěma, dohodnuté stejně jako každá jiná zakázka. Vlastní objednávku můžeš zrušit, dokud je ještě otevřená, a objednávka, kterou nikdo nepřijme, sama vyprší po dni. Jakmile řemeslník přijme, uzavírá ji až doručení.\n\nDoručení probíhá tváří v tvář. Řemeslník kus vyrobí jako zakázku, přijde za tebou a předá ti ho, takže si nech volný slot v brašně na jeho přijetí. Co dorazí, řídí se běžnými pravidly zakázek níže a naváže se na tebe skrze Výrobcovo pouto.",
         "commissionsBoardNote": "K zakázce vedou dvě cesty: objednávka, kterou zadáš na nástěnce výše a která práci přinese řemeslníkovi, nebo řemeslník, který se sám rozhodne kus pro tebe vyrobit. Obě končí stejným poutem."
       },
+      "prov": {
+        "title": "Provisioning: from the field to the raid",
+        "intro": "The gathering lines meet in one kitchen, and the ladder above it ends at a table a whole raid eats from.",
+        "suppliersHeading": "Who feeds the kitchen",
+        "suppliersBody": "Cooking takes from more of the gathering lines than any other craft, and that is deliberate: a cook who also fishes, farms, or skins is never short of something to work with, and a cook who does none of those can buy the lot on the market.\n\nWhat each line brings is listed below, and it is read straight off the live recipe list rather than written down here, so it is always what the kitchen actually asks for today.",
+        "lineCountFmt": "{count} into cooking bills",
+        "lineMining": "Mining",
+        "lineLogging": "Logging",
+        "lineHerbalism": "Herbalism",
+        "lineFishing": "Fishing",
+        "lineFarming": "Farming",
+        "lineCorpse": "Corpse harvesting",
+        "ladderHeading": "The ladder, rung by rung",
+        "ladderBody": "Cooking climbs in the usual brackets, and every rung is listed with what it teaches. The early rungs are single dishes you eat from your bags. Higher up the kitchen starts making things for other people: plates that carry a lasting buff, and above those the feasts, which you do not eat at all but set down on the ground for everyone standing near it.",
+        "rungFmt": "Cooking {skill}",
+        "placeableTag": "(placed, not eaten)",
+        "tableHeading": "The table at the top",
+        "tableBody": "A feast is set down where you stand and anyone nearby takes one serving each. What a serving gives is exactly the dish that feast is built around, so a feast never has power of its own to learn: it is a way of handing a whole group the plate you already know how to cook.\n\nThe top of the ladder is three feasts rather than one, and picking between them is the only choice there is. They cost the same, ask for the same materials, and take the same skill; each simply serves a different one of the three great plates, so a group takes the one that suits what it is about to do. Only one feast of yours can stand at a time, whichever rung it came from, and it keeps for a few minutes before it is cleared away.",
+        "marketHeading": "If you cook none of it",
+        "marketBody": "None of this is a wall for anyone who does not cook. Every material on this page is ordinary tradable goods, so a fisher sells catches, a farmer sells crops, and a raider who does neither buys a feast outright from a cook who made a spare. The kitchen is a place the professions meet, never a toll on the ones who skip it.",
+        "cookingLink": "Cooking"
+      },
       "faq": {
         "title": "Profese: nejčastější dotazy",
         "intro": "Rychlé odpovědi na otázky, které řemeslníci kladou nejčastěji.",

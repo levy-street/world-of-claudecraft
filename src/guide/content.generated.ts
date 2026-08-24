@@ -320,6 +320,19 @@ export interface GuideProfStation {
 
 export interface GuideProfStations { radius: number; stations: GuideProfStation[]; }
 
+/** One gathering line's contribution to the kitchen: the materials it supplies
+ *  that cooking bills actually ask for, by English item name. */
+export interface GuideProfProvisioningLine { id: string; materials: string[]; }
+/** One rung of cooking's ladder and the outputs it teaches. */
+export interface GuideProfProvisioningRung {
+  skillReq: number;
+  outputs: { name: string; quality: string; placeable: boolean }[];
+}
+export interface GuideProfProvisioning {
+  lines: GuideProfProvisioningLine[];
+  ladder: GuideProfProvisioningRung[];
+}
+
 export const GUIDE_CLASSES: GuideClassInfo[] = [
   {
     "id": "warrior",
@@ -5704,6 +5717,13 @@ export const GUIDE_DEEDS: GuideDeed[] = [
     "id": "col_farm_roster",
     "name": "Every Furrow Filled",
     "category": "collection",
+    "renown": 5,
+    "feat": false
+  },
+  {
+    "id": "prog_field_to_feast",
+    "name": "From Field to Feast",
+    "category": "progression",
     "renown": 5,
     "feat": false
   }
@@ -16725,6 +16745,269 @@ export const GUIDE_PROF_STATIONS: GuideProfStations = {
   ]
 };
 
+export const GUIDE_PROF_PROVISIONING: GuideProfProvisioning = {
+  "lines": [
+    {
+      "id": "logging",
+      "materials": [
+        "Ashwood Log"
+      ]
+    },
+    {
+      "id": "herbalism",
+      "materials": [
+        "Goldleaf Herb",
+        "Sheenleaf Herb",
+        "Sunpetal Herb"
+      ]
+    },
+    {
+      "id": "fishing",
+      "materials": [
+        "Raw Bog Eel",
+        "Raw Deepbarb Catfish",
+        "Raw Frostgill Trout",
+        "Raw Hollowgill Sturgeon",
+        "Raw Marsh Pike",
+        "Raw Mirror Trout",
+        "Raw River Perch",
+        "Raw Slatefin Carp",
+        "Raw Stillmere Salmon"
+      ]
+    },
+    {
+      "id": "farming",
+      "materials": [
+        "Bog Beet",
+        "Brook Carrot",
+        "Evergarden Greens",
+        "Evergarden Pumpkin",
+        "Fine Bog Beet",
+        "Fine Brook Carrot",
+        "Fine Evergarden Greens",
+        "Fine Evergarden Pumpkin",
+        "Fine Frost Gourd",
+        "Fine Frost Lentils",
+        "Fine Gilded Sunmelon",
+        "Fine Gilded Yam",
+        "Fine Thornpeak Cabbage",
+        "Frost Gourd",
+        "Frost Lentils",
+        "Gilded Sunmelon",
+        "Gilded Yam",
+        "Highland Barley",
+        "Marsh Rice",
+        "Thornpeak Cabbage",
+        "Vale Wheat"
+      ]
+    },
+    {
+      "id": "corpseHarvesting",
+      "materials": [
+        "Game Meat",
+        "Prime Cut"
+      ]
+    }
+  ],
+  "ladder": [
+    {
+      "skillReq": 0,
+      "outputs": [
+        {
+          "name": "Eastbrook Glazed Carrots",
+          "quality": "common",
+          "placeable": false
+        },
+        {
+          "name": "Eastbrook Root Pottage",
+          "quality": "common",
+          "placeable": false
+        },
+        {
+          "name": "Herbed Marsh Pike",
+          "quality": "common",
+          "placeable": false
+        },
+        {
+          "name": "Hunter's Game Skewer",
+          "quality": "common",
+          "placeable": false
+        },
+        {
+          "name": "Pan-Seared River Perch",
+          "quality": "common",
+          "placeable": false
+        },
+        {
+          "name": "Salted Jerky",
+          "quality": "common",
+          "placeable": false
+        },
+        {
+          "name": "Vale Hearth Loaf",
+          "quality": "common",
+          "placeable": false
+        }
+      ]
+    },
+    {
+      "skillReq": 25,
+      "outputs": [
+        {
+          "name": "Ashwood Smoked Eel",
+          "quality": "uncommon",
+          "placeable": false
+        },
+        {
+          "name": "Fenbridge Beet Braise",
+          "quality": "uncommon",
+          "placeable": false
+        },
+        {
+          "name": "Fenbridge Rice Bowl",
+          "quality": "uncommon",
+          "placeable": false
+        },
+        {
+          "name": "Fenbridge Rice Pudding",
+          "quality": "uncommon",
+          "placeable": false
+        },
+        {
+          "name": "Frostgill Chowder",
+          "quality": "uncommon",
+          "placeable": false
+        },
+        {
+          "name": "Goldleaf Game Stew",
+          "quality": "uncommon",
+          "placeable": false
+        }
+      ]
+    },
+    {
+      "skillReq": 50,
+      "outputs": [
+        {
+          "name": "Angler's Feast Platter",
+          "quality": "rare",
+          "placeable": false
+        },
+        {
+          "name": "Highwatch Barley Bannock",
+          "quality": "rare",
+          "placeable": false
+        },
+        {
+          "name": "Marlow's Grand Roast",
+          "quality": "rare",
+          "placeable": false
+        },
+        {
+          "name": "Silvered Carp Supper",
+          "quality": "rare",
+          "placeable": false
+        }
+      ]
+    },
+    {
+      "skillReq": 75,
+      "outputs": [
+        {
+          "name": "Highwatch Barley Porridge",
+          "quality": "rare",
+          "placeable": false
+        },
+        {
+          "name": "Highwatch Gourd Soup",
+          "quality": "rare",
+          "placeable": false
+        },
+        {
+          "name": "Peppered Deepbarb Catfish",
+          "quality": "rare",
+          "placeable": false
+        },
+        {
+          "name": "Seasoned Stock",
+          "quality": "common",
+          "placeable": false
+        }
+      ]
+    },
+    {
+      "skillReq": 100,
+      "outputs": [
+        {
+          "name": "Evergarden Braised Greens",
+          "quality": "rare",
+          "placeable": false
+        },
+        {
+          "name": "Evergarden Harvest Platter",
+          "quality": "rare",
+          "placeable": false
+        },
+        {
+          "name": "Evergarden Sunmelon Tart",
+          "quality": "rare",
+          "placeable": false
+        },
+        {
+          "name": "Harvest Feast",
+          "quality": "rare",
+          "placeable": true
+        },
+        {
+          "name": "Roast Hollowgill Sturgeon",
+          "quality": "rare",
+          "placeable": false
+        },
+        {
+          "name": "Sageleaf Chowder",
+          "quality": "epic",
+          "placeable": false
+        },
+        {
+          "name": "Stonepot Stew",
+          "quality": "epic",
+          "placeable": false
+        },
+        {
+          "name": "Warspice Skewers",
+          "quality": "epic",
+          "placeable": false
+        }
+      ]
+    },
+    {
+      "skillReq": 125,
+      "outputs": [
+        {
+          "name": "Sageleaf Feast",
+          "quality": "epic",
+          "placeable": true
+        },
+        {
+          "name": "Stonepot Feast",
+          "quality": "epic",
+          "placeable": true
+        },
+        {
+          "name": "The Laden Hearth",
+          "quality": "epic",
+          "placeable": false
+        },
+        {
+          "name": "Warspice Feast",
+          "quality": "epic",
+          "placeable": true
+        }
+      ]
+    }
+  ]
+};
+
 export const GUIDE_PROF_PAGES: string[] = [
   "engineering",
   "alchemy",
@@ -16742,7 +17025,8 @@ export const GUIDE_PROF_PAGES: string[] = [
   "fishing",
   "farming",
   "economy",
-  "faq"
+  "faq",
+  "provisioning"
 ];
 
 export const GUIDE_MODELS: Record<string, GuideModelSpec> = {

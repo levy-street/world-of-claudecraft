@@ -6071,6 +6071,28 @@ export const pt_BR: EnTranslations = {
         "orderBoardBody": "Você não precisa procurar um artesão no chat. Abra sua janela de criação e o quadro de encomendas está a um clique de distância no cabeçalho dela. Qualquer um pode publicar um pedido ali: nomeie a receita que quer feita, depois deixe-o aberto para qualquer artesão aceitar, ou direcione-o a um artesão específico, que passa a ser a única pessoa que pode pegá-lo. Um artesão navegando pelo quadro aceita um pedido, e aceitar o compromete, então um trabalho é sempre feito por apenas uma pessoa por vez.\n\nNada fica retido quando você publica: um pedido não reserva moedas nem materiais, então o preço e quem fornece os reagentes ficam entre vocês dois, combinados do jeito que qualquer encomenda é combinada. Você pode cancelar seu próprio pedido enquanto ele ainda estiver aberto, e um pedido que ninguém aceita expira sozinho depois de um dia. Assim que um artesão aceita, a entrega é o que fecha o trabalho.\n\nA entrega acontece cara a cara. O artesão faz a peça como encomenda, vem até você e a entrega, então mantenha um espaço de bolsa livre para recebê-la. O que chega segue as regras comuns de encomenda abaixo, vinculando-se a você pelo Vínculo do Artesão.",
         "commissionsBoardNote": "Há duas formas de chegar a uma encomenda: um pedido que você publica no quadro acima, que leva o trabalho até um artesão, e um artesão simplesmente escolhendo fazer uma peça para você. As duas terminam no mesmo vínculo."
       },
+      "prov": {
+        "title": "Provisioning: from the field to the raid",
+        "intro": "The gathering lines meet in one kitchen, and the ladder above it ends at a table a whole raid eats from.",
+        "suppliersHeading": "Who feeds the kitchen",
+        "suppliersBody": "Cooking takes from more of the gathering lines than any other craft, and that is deliberate: a cook who also fishes, farms, or skins is never short of something to work with, and a cook who does none of those can buy the lot on the market.\n\nWhat each line brings is listed below, and it is read straight off the live recipe list rather than written down here, so it is always what the kitchen actually asks for today.",
+        "lineCountFmt": "{count} into cooking bills",
+        "lineMining": "Mining",
+        "lineLogging": "Logging",
+        "lineHerbalism": "Herbalism",
+        "lineFishing": "Fishing",
+        "lineFarming": "Farming",
+        "lineCorpse": "Corpse harvesting",
+        "ladderHeading": "The ladder, rung by rung",
+        "ladderBody": "Cooking climbs in the usual brackets, and every rung is listed with what it teaches. The early rungs are single dishes you eat from your bags. Higher up the kitchen starts making things for other people: plates that carry a lasting buff, and above those the feasts, which you do not eat at all but set down on the ground for everyone standing near it.",
+        "rungFmt": "Cooking {skill}",
+        "placeableTag": "(placed, not eaten)",
+        "tableHeading": "The table at the top",
+        "tableBody": "A feast is set down where you stand and anyone nearby takes one serving each. What a serving gives is exactly the dish that feast is built around, so a feast never has power of its own to learn: it is a way of handing a whole group the plate you already know how to cook.\n\nThe top of the ladder is three feasts rather than one, and picking between them is the only choice there is. They cost the same, ask for the same materials, and take the same skill; each simply serves a different one of the three great plates, so a group takes the one that suits what it is about to do. Only one feast of yours can stand at a time, whichever rung it came from, and it keeps for a few minutes before it is cleared away.",
+        "marketHeading": "If you cook none of it",
+        "marketBody": "None of this is a wall for anyone who does not cook. Every material on this page is ordinary tradable goods, so a fisher sells catches, a farmer sells crops, and a raider who does neither buys a feast outright from a cook who made a spare. The kitchen is a place the professions meet, never a toll on the ones who skip it.",
+        "cookingLink": "Cooking"
+      },
       "faq": {
         "title": "Perguntas Frequentes sobre Profissões",
         "intro": "Respostas rápidas para as perguntas que os artesãos fazem com mais frequência.",

@@ -6071,6 +6071,28 @@ export const fr_CA: EnTranslations = {
         "orderBoardBody": "Vous n'avez pas besoin de trouver un artisan dans le chat. Ouvrez votre fenêtre d'artisanat et le tableau des commandes n'est qu'à un clic dans son en-tête. N'importe qui peut y publier une commande : nommez la recette que vous voulez voir fabriquer, puis laissez-la ouverte pour que n'importe quel artisan la prenne, ou visez-la sur un artisan nommé, qui devient alors la seule personne pouvant la prendre. Un artisan qui parcourt le tableau accepte une commande, et accepter l'engage, si bien qu'un travail n'est jamais mené que par une seule personne à la fois.\n\nRien n'est retenu quand vous publiez : une commande ne réserve ni pièce ni matériau, si bien que le prix et la fourniture des réactifs restent entre vous deux, à convenir comme n'importe quelle commande se convient. Vous pouvez annuler votre propre commande tant qu'elle reste ouverte, et une commande que personne n'accepte expire d'elle-même au bout d'un jour. Une fois qu'un artisan l'a acceptée, c'est la livraison qui la clôt.\n\nLa livraison se fait face à face. L'artisan fabrique la pièce en commande, vient à vous et vous la remet, gardez donc un emplacement de sac libre pour la recevoir. Ce qui arrive suit les règles de commande ordinaires ci-dessous, lié à vous par le Lien du Créateur.",
         "commissionsBoardNote": "Il y a deux façons d'entrer dans une commande : une commande que vous publiez sur le tableau ci-dessus, qui apporte le travail à un artisan, et un artisan qui choisit simplement de fabriquer une pièce pour vous. Les deux se terminent par le même Lien du Créateur."
       },
+      "prov": {
+        "title": "Provisioning: from the field to the raid",
+        "intro": "The gathering lines meet in one kitchen, and the ladder above it ends at a table a whole raid eats from.",
+        "suppliersHeading": "Who feeds the kitchen",
+        "suppliersBody": "Cooking takes from more of the gathering lines than any other craft, and that is deliberate: a cook who also fishes, farms, or skins is never short of something to work with, and a cook who does none of those can buy the lot on the market.\n\nWhat each line brings is listed below, and it is read straight off the live recipe list rather than written down here, so it is always what the kitchen actually asks for today.",
+        "lineCountFmt": "{count} into cooking bills",
+        "lineMining": "Mining",
+        "lineLogging": "Logging",
+        "lineHerbalism": "Herbalism",
+        "lineFishing": "Fishing",
+        "lineFarming": "Farming",
+        "lineCorpse": "Corpse harvesting",
+        "ladderHeading": "The ladder, rung by rung",
+        "ladderBody": "Cooking climbs in the usual brackets, and every rung is listed with what it teaches. The early rungs are single dishes you eat from your bags. Higher up the kitchen starts making things for other people: plates that carry a lasting buff, and above those the feasts, which you do not eat at all but set down on the ground for everyone standing near it.",
+        "rungFmt": "Cooking {skill}",
+        "placeableTag": "(placed, not eaten)",
+        "tableHeading": "The table at the top",
+        "tableBody": "A feast is set down where you stand and anyone nearby takes one serving each. What a serving gives is exactly the dish that feast is built around, so a feast never has power of its own to learn: it is a way of handing a whole group the plate you already know how to cook.\n\nThe top of the ladder is three feasts rather than one, and picking between them is the only choice there is. They cost the same, ask for the same materials, and take the same skill; each simply serves a different one of the three great plates, so a group takes the one that suits what it is about to do. Only one feast of yours can stand at a time, whichever rung it came from, and it keeps for a few minutes before it is cleared away.",
+        "marketHeading": "If you cook none of it",
+        "marketBody": "None of this is a wall for anyone who does not cook. Every material on this page is ordinary tradable goods, so a fisher sells catches, a farmer sells crops, and a raider who does neither buys a feast outright from a cook who made a spare. The kitchen is a place the professions meet, never a toll on the ones who skip it.",
+        "cookingLink": "Cooking"
+      },
       "faq": {
         "title": "FAQ Métiers",
         "intro": "Réponses rapides aux questions les plus posées par les artisans.",

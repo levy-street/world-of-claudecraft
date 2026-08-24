@@ -24,6 +24,7 @@ import { craftById, craftDetailHtml, craftLabel, stationLabel } from './professi
 import { economyDetailHtml } from './professions_economy';
 import { faqDetailHtml } from './professions_faq';
 import { gatheringById, gatheringDetailHtml, gatheringLabel } from './professions_gathering';
+import { provisioningDetailHtml } from './professions_provisioning';
 import type { GuidePage, PageContext } from './types';
 import { lead, paras, related } from './ui';
 
@@ -165,6 +166,7 @@ function overviewHtml(): string {
         ${paras('guide.professions.startBody')}
       </section>
       ${related([
+        { href: hrefFor('professions/provisioning'), key: 'guide.profPages.prov.title' },
         { href: hrefFor('professions/economy'), key: 'guide.profPages.econ.title' },
         { href: hrefFor('professions/faq'), key: 'guide.profPages.faq.title' },
         { href: hrefFor('gear'), key: 'guide.nav.gear' },
@@ -183,6 +185,7 @@ export const professions: GuidePage = {
     if (gatheringById(id)) return gatheringLabel(id);
     if (id === 'economy') return t('guide.profPages.econ.title');
     if (id === 'faq') return t('guide.profPages.faq.title');
+    if (id === 'provisioning') return t('guide.profPages.prov.title');
     return t('guide.nav.professions');
   },
   render(ctx: PageContext) {
@@ -194,6 +197,7 @@ export const professions: GuidePage = {
     if (gathering) return gatheringDetailHtml(gathering);
     if (id === 'economy') return economyDetailHtml();
     if (id === 'faq') return faqDetailHtml();
+    if (id === 'provisioning') return provisioningDetailHtml();
     return notFoundInline();
   },
 };

@@ -23,6 +23,7 @@ import {
   GUIDE_PROF_ECONOMY,
   GUIDE_PROF_ENCHANTING,
   GUIDE_PROF_GATHERING,
+  GUIDE_PROF_PROVISIONING,
   GUIDE_PROF_MASTERWORK,
   GUIDE_PROF_PAGES,
   GUIDE_PROF_RING,
@@ -3166,6 +3167,10 @@ describe('Guide professions pages and routes', () => {
       ...GUIDE_PROF_GATHERING.map((g) => g.id),
       'economy',
       'faq',
+      // masterwrought Phase 11k's provisioning story, the third FIXED page:
+      // a narrative across professions rather than one profession's reference,
+      // which is why it sits with these two rather than deriving from a craft.
+      'provisioning',
     ]);
   });
 
@@ -3353,6 +3358,81 @@ describe('Guide professions pages and routes', () => {
     expect(econ).toContain('Forge Work Order');
     // An unknown id renders the inline not-found, never a blank page.
     expect(professionsPage.render(ctx(['nonsense']))).toContain('guide-notfound');
+  });
+
+
+  it('the provisioning page tells the story from real generated data', () => {
+    setLanguage('en');
+    const html = professionsPage.render(ctx(['provisioning']));
+    expect((html.match(/<h1>/g) ?? []).length).toBe(1);
+
+    // THE THREE LINES THE PAGE EXISTS TO JOIN, each with a REAL contribution
+    // rendered beside it. An empty story section would satisfy a heading check
+    // and say nothing, which is why every arm below names a material the live
+    // bills actually ask for rather than only the section label.
+    const lineOf = (id: string) => {
+      const line = GUIDE_PROF_PROVISIONING.lines.find((l) => l.id === id);
+      if (!line) throw new Error(`the ${id} line vanished from the generated data`);
+      expect(line.materials.length, `${id} contributes nothing to cooking`).toBeGreaterThan(0);
+      return line;
+    };
+    for (const id of ['farming', 'fishing', 'herbalism', 'corpseHarvesting']) {
+      const line = lineOf(id);
+      for (const name of line.materials) {
+        expect(html, `${id} line missing ${name}`).toContain(name);
+      }
+    }
+    // And the ones a reader would name if asked, as literals, so the arm above
+    // cannot pass on a generated list that quietly emptied out to one item.
+    expect(html, 'the band-5 catch the apex tier keys on').toContain('Raw Stillmere Salmon');
+    expect(html, 'the crop the feast ladder takes').toContain('Evergarden Greens');
+    expect(html, 'the corpse-harvest meat').toContain('Game Meat');
+
+    // THE LADDER, from a levelling rung to the capstone, with the placeable
+    // marker on the feasts, because a ladder that did not say which outputs are
+    // set on the ground rather than eaten reads wrong at the top.
+    const rungs = GUIDE_PROF_PROVISIONING.ladder.map((r) => r.skillReq);
+    expect(rungs, 'the rungs climb').toEqual([...rungs].sort((a, b) => a - b));
+    expect(rungs, 'the capstone rung is on the page').toContain(125);
+    expect(html).toContain('Stonepot Feast');
+    expect(html).toContain('Warspice Feast');
+    expect(html).toContain('Sageleaf Feast');
+    expect(html).toContain(t('guide.profPages.prov.placeableTag'));
+    const placeables = GUIDE_PROF_PROVISIONING.ladder
+      .flatMap((r) => r.outputs)
+      .filter((o) => o.placeable)
+      .map((o) => o.name)
+      .sort();
+    expect(placeables, 'exactly the four feasts are marked placeable').toEqual([
+      'Harvest Feast',
+      'Sageleaf Feast',
+      'Stonepot Feast',
+      'Warspice Feast',
+    ]);
+
+    // THE PROSE'S OWN CLAIM, PINNED (the packet's recurring defect is a page
+    // sentence nothing checks): the market section tells a reader that every
+    // material here is ordinary tradable goods, so a raider who cooks none of
+    // it can buy the lot. That is only true while no listed material is
+    // soulbound or barred from the market, and it is checked here rather than
+    // trusted, over the ids the page actually renders.
+    const nameToDef = new Map(Object.values(ITEMS).map((def) => [def.name, def]));
+    const listed = GUIDE_PROF_PROVISIONING.lines.flatMap((l) => l.materials);
+    expect(listed.length, 'the page lists real materials at all').toBeGreaterThan(10);
+    for (const name of listed) {
+      const def = nameToDef.get(name);
+      expect(def, `${name} must be a real item def`).toBeTruthy();
+      expect(def?.soulbound, `${name} is soulbound, so the market claim is false`).toBeFalsy();
+      expect(def?.noMarketList, `${name} cannot be listed, so the claim is false`).toBeFalsy();
+    }
+
+    // SPOILER-SAFE, asserted rather than intended: this page names no instance,
+    // no boss and no drop table. The professions pages publish exact numbers by
+    // policy, so rungs and material names are correct here; instanced content
+    // is what must never appear.
+    for (const forbidden of ['Nythraxis', 'Drowned Litany', 'Collapsed Reliquary', 'Heroic']) {
+      expect(html, `the provisioning page must not name ${forbidden}`).not.toContain(forbidden);
+    }
   });
 
   it('rewrites the overview into the hub: ring cards, links, and honesty about empty crafts', () => {

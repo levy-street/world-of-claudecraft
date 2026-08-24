@@ -107,28 +107,33 @@
 import { describe, expect, it } from 'vitest';
 import { ENCHANTS } from '../src/sim/content/enchants';
 import { FARM_CROPS } from '../src/sim/content/farm_crops';
-import { FISHING_TABLES_BY_BAND } from '../src/sim/content/items';
 import type { GatheringProfessionId } from '../src/sim/content/professions';
-import {
-  GATHERING_PROFESSION_IDS,
-  GATHERING_PROFESSIONS,
-  HARVEST_COMPONENT_ITEMS,
-  HARVEST_COMPONENT_SPECIMENS,
-} from '../src/sim/content/professions';
+import { GATHERING_PROFESSION_IDS, GATHERING_PROFESSIONS } from '../src/sim/content/professions';
 import { ALL_RECIPES } from '../src/sim/content/recipes';
 import { ITEMS } from '../src/sim/data';
 import { NODE_HARVEST_TABLE, NODE_MATERIAL_TABLE } from '../src/sim/professions/gathering';
+import {
+  CORPSE_HARVEST_FAMILY,
+  gatheringSupplyByFamily,
+  nodeSupplyFor,
+} from '../src/sim/professions/gathering_supply';
 import { baseMaterialFor, MATERIAL_GRADES } from '../src/sim/professions/material_grades';
 import { gatherToolTier } from '../src/sim/professions/tools';
-import { TIER_SKILL_STEP, tierForSkill } from '../src/sim/professions/wheel';
 import type { GatherNodeType } from '../src/sim/types';
+import { TIER_SKILL_STEP, tierForSkill } from '../src/sim/professions/wheel';
 
-// The sixth family. Corpse harvesting is a gathering FAMILY without being a
-// gathering PROFESSION: it has no id in GATHERING_PROFESSION_IDS, no counter
-// and no tool of its own, but it is a faucet the crafts eat from, so
-// masterwrought decision C binds it here with the other five rather than
-// reporting it and leaving it unguarded.
-const CORPSE_HARVEST_FAMILY = 'corpseHarvesting';
+// THE SUPPLY DERIVATION MOVED OUT AT masterwrought Phase 11k, and the move is
+// why this file no longer carries it. The provisioning wiki page became a
+// SECOND reader of "which line supplies which material", and a page built on a
+// second implementation could tell a player one thing while this guard asserted
+// another, with both green. So the whole derivation is now the pure leaf
+// src/sim/professions/gathering_supply.ts and both sides import it. Nothing
+// about the rule changed: the functions there have the bodies they had here,
+// and every literal below still pins the ANSWER rather than the code.
+//
+// The sixth family (masterwrought decision C) travelled with them: corpse
+// harvesting is a gathering FAMILY without being a gathering PROFESSION, so it
+// has no id in GATHERING_PROFESSION_IDS but is bound here with the other five.
 
 /**
  * The band a recipe sits in. This is the shared 25-point bucket math the whole
@@ -158,79 +163,7 @@ const ENDGAME_BAND = bandOf(GATHERING_ENDGAME_SKILL);
 /** The bands strictly below the endgame, each of which every family must feed. */
 const LEVELLING_BANDS = Array.from({ length: ENDGAME_BAND }, (_, i) => i);
 
-/**
- * mining / logging / herbalism: the NODE_MATERIAL_TABLE yields for whichever
- * node type NODE_HARVEST_TABLE says this profession harvests, plus each
- * yield's fine twin. Resolved through the tables rather than by hard-coding
- * ore/wood/herb, so a fourth node type joins its profession automatically.
- */
-function nodeSupplyFor(professionId: GatheringProfessionId): Set<string> {
-  const ids = new Set<string>();
-  for (const nodeType of Object.keys(NODE_HARVEST_TABLE) as GatherNodeType[]) {
-    if (NODE_HARVEST_TABLE[nodeType].professionId !== professionId) continue;
-    for (const cell of Object.values(NODE_MATERIAL_TABLE[nodeType])) {
-      ids.add(cell.itemId);
-      const fine = MATERIAL_GRADES[cell.itemId]?.fineItemId;
-      if (fine !== undefined) ids.add(fine);
-    }
-  }
-  return ids;
-}
-
-/**
- * fishing: every catchable id in the band tables, minus grey junk BY ITS DEF
- * (quality 'poor') rather than by an id list. Grey junk is a coin drop dressed
- * as a catch, never supply: sellAllJunk vendors it. The null rows are the
- * empty-hook weight and carry no id at all.
- */
-function fishingSupply(): Set<string> {
-  const ids = new Set<string>();
-  for (const band of FISHING_TABLES_BY_BAND) {
-    for (const table of Object.values(band)) {
-      for (const entry of table) {
-        if (entry.itemId === null) continue;
-        if (ITEMS[entry.itemId]?.quality === 'poor') continue;
-        ids.add(entry.itemId);
-      }
-    }
-  }
-  return ids;
-}
-
-/** farming: both grades of every crop, off the crop records themselves. */
-function farmingSupply(): Set<string> {
-  const ids = new Set<string>();
-  for (const crop of Object.values(FARM_CROPS)) {
-    ids.add(crop.produceItemId);
-    ids.add(crop.fineProduceItemId);
-  }
-  return ids;
-}
-
-/** corpse harvesting: the ordinary components plus the premium specimens. */
-function corpseSupply(): Set<string> {
-  return new Set([
-    ...Object.values(HARVEST_COMPONENT_ITEMS),
-    ...Object.values(HARVEST_COMPONENT_SPECIMENS),
-  ]);
-}
-
-/**
- * The supply map: one id set per family. THE SUBJECT LIST IS DERIVED from
- * GATHERING_PROFESSION_IDS (masterwrought decision C) so a sixth gathering
- * profession joins this guard the day it is authored, with corpse harvesting
- * appended as the one family that has no profession id.
- */
-function supplyByFamily(): Map<string, Set<string>> {
-  const out = new Map<string, Set<string>>();
-  for (const professionId of GATHERING_PROFESSION_IDS) {
-    if (professionId === 'fishing') out.set(professionId, fishingSupply());
-    else if (professionId === 'farming') out.set(professionId, farmingSupply());
-    else out.set(professionId, nodeSupplyFor(professionId));
-  }
-  out.set(CORPSE_HARVEST_FAMILY, corpseSupply());
-  return out;
-}
+const supplyByFamily = gatheringSupplyByFamily;
 
 const SUPPLY = supplyByFamily();
 const FAMILY_IDS = [...SUPPLY.keys()];

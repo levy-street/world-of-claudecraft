@@ -6071,6 +6071,28 @@ export const sv_SE: EnTranslations = {
         "orderBoardBody": "Du behöver inte hitta en hantverkare i chatten. Öppna ditt hantverksfönster, så är beställningstavlan ett klick bort i dess sidhuvud. Vem som helst kan lägga upp en order där: namnge receptet du vill ha tillverkat, och lämna det antingen öppet för vilken hantverkare som helst att ta, eller rikta det mot en namngiven hantverkare, som då är den enda som kan plocka upp det. En hantverkare som bläddrar i tavlan accepterar en order, och att acceptera binder dem, så ett jobb utförs alltid bara av en person i taget.\n\nInget hålls tillbaka när du lägger upp den: en order reserverar varken mynt eller material, så priset och vem som står för reagenserna stannar mellan er två, avtalat på samma sätt som varje beställning avtalas. Du kan avbryta din egen order medan den fortfarande är öppen, och en order som ingen accepterar går ut av sig själv efter en dag. När en hantverkare väl har accepterat är det leveransen som avslutar den.\n\nLeverans sker ansikte mot ansikte. Hantverkaren tillverkar pjäsen som en beställning, kommer till dig och lämnar över den, så håll en väskplats fri för att ta emot den. Det som anländer följer de vanliga beställningsreglerna nedan, och binds till dig genom Tillverkarens Band.",
         "commissionsBoardNote": "Det finns två vägar in i en beställning: en order du lägger upp på tavlan ovan, som för fram arbetet till en hantverkare, och att en hantverkare helt enkelt väljer att tillverka en pjäs åt dig. Båda slutar i samma band."
       },
+      "prov": {
+        "title": "Provisioning: from the field to the raid",
+        "intro": "The gathering lines meet in one kitchen, and the ladder above it ends at a table a whole raid eats from.",
+        "suppliersHeading": "Who feeds the kitchen",
+        "suppliersBody": "Cooking takes from more of the gathering lines than any other craft, and that is deliberate: a cook who also fishes, farms, or skins is never short of something to work with, and a cook who does none of those can buy the lot on the market.\n\nWhat each line brings is listed below, and it is read straight off the live recipe list rather than written down here, so it is always what the kitchen actually asks for today.",
+        "lineCountFmt": "{count} into cooking bills",
+        "lineMining": "Mining",
+        "lineLogging": "Logging",
+        "lineHerbalism": "Herbalism",
+        "lineFishing": "Fishing",
+        "lineFarming": "Farming",
+        "lineCorpse": "Corpse harvesting",
+        "ladderHeading": "The ladder, rung by rung",
+        "ladderBody": "Cooking climbs in the usual brackets, and every rung is listed with what it teaches. The early rungs are single dishes you eat from your bags. Higher up the kitchen starts making things for other people: plates that carry a lasting buff, and above those the feasts, which you do not eat at all but set down on the ground for everyone standing near it.",
+        "rungFmt": "Cooking {skill}",
+        "placeableTag": "(placed, not eaten)",
+        "tableHeading": "The table at the top",
+        "tableBody": "A feast is set down where you stand and anyone nearby takes one serving each. What a serving gives is exactly the dish that feast is built around, so a feast never has power of its own to learn: it is a way of handing a whole group the plate you already know how to cook.\n\nThe top of the ladder is three feasts rather than one, and picking between them is the only choice there is. They cost the same, ask for the same materials, and take the same skill; each simply serves a different one of the three great plates, so a group takes the one that suits what it is about to do. Only one feast of yours can stand at a time, whichever rung it came from, and it keeps for a few minutes before it is cleared away.",
+        "marketHeading": "If you cook none of it",
+        "marketBody": "None of this is a wall for anyone who does not cook. Every material on this page is ordinary tradable goods, so a fisher sells catches, a farmer sells crops, and a raider who does neither buys a feast outright from a cook who made a spare. The kitchen is a place the professions meet, never a toll on the ones who skip it.",
+        "cookingLink": "Cooking"
+      },
       "faq": {
         "title": "Yrkens FAQ",
         "intro": "Snabba svar på de frågor hantverkare ställer oftast.",

@@ -6071,6 +6071,28 @@ export const ko_KR: EnTranslations = {
         "orderBoardBody": "채팅에서 제작자를 수소문할 필요는 없다. 제작 창을 열면 그 머리글에서 클릭 한 번으로 주문 게시판에 닿는다. 누구나 주문을 올릴 수 있다. 만들어 주었으면 하는 제조법을 지정한 다음, 어느 제작자든 가져갈 수 있도록 열어 두거나, 특정 제작자 한 사람을 지목하면 그 사람만 집어 갈 수 있다. 게시판을 둘러보던 제작자가 주문을 수락하고, 수락은 곧 약속이므로 한 건의 일은 언제나 한 사람만 맡는다.\n\n올린다고 해서 무엇이 묶이지는 않는다. 주문은 동전도 재료도 잡아 두지 않으므로, 값과 재료를 누가 댈지는 여느 주문 제작이 그렇듯 두 사람 사이에서 정하면 된다. 열려 있는 동안에는 자기 주문을 취소할 수 있고, 아무도 수락하지 않은 주문은 하루가 지나면 저절로 만료된다. 제작자가 수락한 뒤에는 인도가 그 주문을 마무리한다.\n\n인도는 얼굴을 맞대고 이루어진다. 제작자가 주문 제작으로 물건을 만들어 당신에게 찾아와 건네주니, 받을 가방 칸을 하나 비워 두라. 도착한 물건은 아래의 일반적인 주문 제작 규칙을 따라 제작자의 서약으로 당신에게 귀속된다.",
         "commissionsBoardNote": "주문 제작으로 가는 길은 둘이다. 위의 게시판에 올려 제작자에게 일을 가져다주는 주문서, 그리고 제작자가 그저 당신을 위해 한 점 만들기로 하는 것. 둘 다 같은 서약으로 끝난다."
       },
+      "prov": {
+        "title": "Provisioning: from the field to the raid",
+        "intro": "The gathering lines meet in one kitchen, and the ladder above it ends at a table a whole raid eats from.",
+        "suppliersHeading": "Who feeds the kitchen",
+        "suppliersBody": "Cooking takes from more of the gathering lines than any other craft, and that is deliberate: a cook who also fishes, farms, or skins is never short of something to work with, and a cook who does none of those can buy the lot on the market.\n\nWhat each line brings is listed below, and it is read straight off the live recipe list rather than written down here, so it is always what the kitchen actually asks for today.",
+        "lineCountFmt": "{count} into cooking bills",
+        "lineMining": "Mining",
+        "lineLogging": "Logging",
+        "lineHerbalism": "Herbalism",
+        "lineFishing": "Fishing",
+        "lineFarming": "Farming",
+        "lineCorpse": "Corpse harvesting",
+        "ladderHeading": "The ladder, rung by rung",
+        "ladderBody": "Cooking climbs in the usual brackets, and every rung is listed with what it teaches. The early rungs are single dishes you eat from your bags. Higher up the kitchen starts making things for other people: plates that carry a lasting buff, and above those the feasts, which you do not eat at all but set down on the ground for everyone standing near it.",
+        "rungFmt": "Cooking {skill}",
+        "placeableTag": "(placed, not eaten)",
+        "tableHeading": "The table at the top",
+        "tableBody": "A feast is set down where you stand and anyone nearby takes one serving each. What a serving gives is exactly the dish that feast is built around, so a feast never has power of its own to learn: it is a way of handing a whole group the plate you already know how to cook.\n\nThe top of the ladder is three feasts rather than one, and picking between them is the only choice there is. They cost the same, ask for the same materials, and take the same skill; each simply serves a different one of the three great plates, so a group takes the one that suits what it is about to do. Only one feast of yours can stand at a time, whichever rung it came from, and it keeps for a few minutes before it is cleared away.",
+        "marketHeading": "If you cook none of it",
+        "marketBody": "None of this is a wall for anyone who does not cook. Every material on this page is ordinary tradable goods, so a fisher sells catches, a farmer sells crops, and a raider who does neither buys a feast outright from a cook who made a spare. The kitchen is a place the professions meet, never a toll on the ones who skip it.",
+        "cookingLink": "Cooking"
+      },
       "faq": {
         "title": "생산 전문직 FAQ",
         "intro": "제작자들이 가장 자주 묻는 질문과 짧은 답.",
