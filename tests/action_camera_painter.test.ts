@@ -1,7 +1,7 @@
 import { describe, expect, it, vi } from 'vitest';
-import { createActionCameraPainter } from '../src/ui/action_camera_painter';
+import { createActionCameraCrosshair } from '../src/ui/action_camera_crosshair';
 
-describe('ActionCameraPainter', () => {
+describe('ActionCameraCrosshair', () => {
   it('mounts a hidden crosshair, toggles it, and disposes cleanly', () => {
     const remove = vi.fn();
     const element = {
@@ -16,18 +16,20 @@ describe('ActionCameraPainter', () => {
       body: { appendChild },
     } as unknown as Document;
 
-    const painter = createActionCameraPainter(doc);
+    const crosshair = createActionCameraCrosshair(doc);
     expect(element.id).toBe('action-camera-crosshair');
     expect(element.hidden).toBe(true);
     expect(element.setAttribute).toHaveBeenCalledWith('aria-hidden', 'true');
     expect(appendChild).toHaveBeenCalledWith(element);
 
-    painter.setVisible(true);
+    crosshair.setVisible(true);
     expect(element.hidden).toBe(false);
-    painter.setVisible(false);
+    crosshair.setVisible(true);
+    expect(element.hidden).toBe(false);
+    crosshair.setVisible(false);
     expect(element.hidden).toBe(true);
 
-    painter.dispose();
+    crosshair.dispose();
     expect(remove).toHaveBeenCalledTimes(1);
   });
 });

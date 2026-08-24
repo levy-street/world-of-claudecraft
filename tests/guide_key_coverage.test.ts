@@ -104,6 +104,7 @@ const RETIRED_KEYS: string[] = [
   'guide.glossary.augmentDef',
   'guide.bestiary.flavor.mirejaw_frenzy', // summon-only encounter add, filtered from the bestiary
   'guide.footer.communityWiki', // the standalone MediaWiki redirect this SPA replaced
+  'guide.settingsPage.ifStartAttack', // ability casts no longer start held Basic Attack
 
   // -- Superseded by generated content. These were hand-written dungeon facts before
   // GUIDE_DUNGEONS carried the roster; the page now renders names and level bands from

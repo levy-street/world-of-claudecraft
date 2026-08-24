@@ -11,6 +11,10 @@ const VIEWPORT_H = 1080;
 const EDGE = { clientX: 6, clientY: 540 };
 const CENTER = { clientX: 960, clientY: 540 };
 const mainSource = readFileSync(new URL('../src/main.ts', import.meta.url), 'utf8');
+const gamepadDispatchSource = readFileSync(
+  new URL('../src/game/gamepad_action_dispatch.ts', import.meta.url),
+  'utf8',
+);
 
 function installStorage(): void {
   const map = new Map<string, string>();
@@ -1137,10 +1141,10 @@ describe('Input target buffs and debuffs keybind', () => {
       keyboardStart,
       mainSource.indexOf('onEmoteWheel:', keyboardStart),
     );
-    const gamepadStart = mainSource.indexOf('function dispatchGamepadAction(id: string): void {');
-    const gamepadRoute = mainSource.slice(
+    const gamepadStart = gamepadDispatchSource.indexOf('function dispatchGamepadAction');
+    const gamepadRoute = gamepadDispatchSource.slice(
       gamepadStart,
-      mainSource.indexOf('const gamepad =', gamepadStart),
+      gamepadDispatchSource.indexOf('\n}', gamepadStart),
     );
     const route = /case 'targetAuras':\s*hud\.toggleTargetAuras\(\);\s*break;/g;
 

@@ -215,7 +215,7 @@ interface AttributionTargetFixture {
 // resolved renderer bytes retain the queued self-spirit prewarm and delve
 // rebuild repair. No capture was retaken.
 const PINNED_POLISH_COMPOSITE_FINGERPRINT =
-  '2772a342485f6158c9c05d7b2915e2535388775df9722d7a06fe68a4b412c5e4';
+  '6e3e500d55693f32268cbaa6c2e88c9bf5ff6ef364de2d95c6df6be42f09ae2b';
 
 function validPolishAttributionTargets(): AttributionTargetFixture[] {
   return [

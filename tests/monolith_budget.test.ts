@@ -123,7 +123,9 @@ const MONOLITHS: MonolithRow[] = [
     // resolved count.
     // PR #3468 changes the shadow-depth prewarm material contract, but this
     // wrapper's combined renderer remains at the same resolved count.
-    ceiling: 13744,
+    // Lowered after projectile event painting and ground-ray projection moved to
+    // projectile_event_vfx.ts and ground_point_projector.ts.
+    ceiling: 13742,
     seam: 'a new src/render/<thing>.ts module the renderer calls (src/render/CLAUDE.md)',
   },
   {
@@ -133,12 +135,16 @@ const MONOLITHS: MonolithRow[] = [
   },
   {
     file: 'src/main.ts',
-    ceiling: 11490,
+    // Lowered after gamepad edge dispatch and combat-aim synchronization moved
+    // into src/game sibling modules.
+    ceiling: 11475,
     seam: 'a src/game/ or src/ui/ sibling module; main.ts is a firewall, not a home',
   },
   {
     file: 'server/game.ts',
-    ceiling: 10900,
+    // Lowered after the mob profiler's zone bucket policy moved to
+    // server/mob_zone_phase.ts.
+    ceiling: 10890,
     seam: 'a sibling server module; see the hot-path seams in server/CLAUDE.md',
   },
   {

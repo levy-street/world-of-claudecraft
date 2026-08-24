@@ -54,28 +54,28 @@ describe('padReelItemId', () => {
     expect(body).toContain('world.useItem(reelRod);');
   });
 
-  it('main.ts wires the reel ahead of the nearby-interaction scan (source pin)', () => {
+  it('the gamepad dispatcher wires the reel ahead of the nearby-interaction scan', () => {
     // Comment-stripped (the repo scrape rule): the arm's own prose names
     // padReelItemId and interactKey.
-    const mainTs = readFileSync(join(__dirname, '../src/main.ts'), 'utf8').replace(
-      /^\s*\/\/.*$/gm,
-      '',
-    );
+    const dispatchTs = readFileSync(
+      join(__dirname, '../src/game/gamepad_action_dispatch.ts'),
+      'utf8',
+    ).replace(/^\s*\/\/.*$/gm, '');
     // The braced form is unique to the pad dispatch (the keyboard Input
     // callbacks carry their own unbraced interact/bags pair earlier), so the
     // bags terminator must be searched FROM the pad case.
-    const start = mainTs.indexOf("case 'interact': {");
+    const start = dispatchTs.indexOf("case 'interact': {");
     expect(start).toBeGreaterThan(-1);
-    const end = mainTs.indexOf("case 'bags':", start);
+    const end = dispatchTs.indexOf("case 'bags':", start);
     expect(end).toBeGreaterThan(start);
-    const interactCase = mainTs.slice(start, end);
+    const interactCase = dispatchTs.slice(start, end);
     expect(interactCase).toContain(
       'const reelRod = padReelItemId(world.player.castingAbility, world.inventory);',
     );
-    // The reel wins BEFORE interactKey runs: a live bobber must never be
+    // The reel wins BEFORE the nearby interaction callback runs: a live bobber must never be
     // answered with a nearby scan.
     expect(interactCase.indexOf('padReelItemId')).toBeLessThan(
-      interactCase.indexOf('interactKey()'),
+      interactCase.indexOf('deps.interact()'),
     );
   });
 });
@@ -87,16 +87,15 @@ describe('padReelItemId', () => {
 // dungeon finder, sheathe, and three pet edges dead on the pad).
 describe('gamepad dispatch covers every action the controller panel offers', () => {
   const strip = (src: string): string => src.replace(/^\s*\/\/.*$/gm, '');
-  const mainTs = strip(readFileSync(join(__dirname, '../src/main.ts'), 'utf8'));
+  const dispatchTs = strip(
+    readFileSync(join(__dirname, '../src/game/gamepad_action_dispatch.ts'), 'utf8'),
+  );
   const dispatchBody = (): string => {
-    const start = mainTs.indexOf('function dispatchGamepadAction');
+    const start = dispatchTs.indexOf('function dispatchGamepadAction');
     expect(start).toBeGreaterThan(-1);
-    const end = mainTs.indexOf('const gamepad = new GamepadManager', start);
-    // The end anchor must resolve AFTER the start (the phase 14 QA: an
-    // unasserted -1 would slice to the end of the file and every arm would
-    // pass vacuously).
+    const end = dispatchTs.indexOf('\n}', start);
     expect(end).toBeGreaterThan(start);
-    return mainTs.slice(start, end);
+    return dispatchTs.slice(start, end + 2);
   };
 
   it('every offered edge action id has a case in dispatchGamepadAction', () => {

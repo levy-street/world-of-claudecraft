@@ -52,22 +52,10 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.keybinds.toggleActionCamera",
     "hudChrome.options.actionCamera"
   ],
-  "zh_CN": [
-    "hudChrome.keybinds.toggleActionCamera",
-    "hudChrome.options.actionCamera"
-  ],
-  "zh_TW": [
-    "hudChrome.keybinds.toggleActionCamera",
-    "hudChrome.options.actionCamera"
-  ],
-  "ko_KR": [
-    "hudChrome.keybinds.toggleActionCamera",
-    "hudChrome.options.actionCamera"
-  ],
-  "ja_JP": [
-    "hudChrome.keybinds.toggleActionCamera",
-    "hudChrome.options.actionCamera"
-  ],
+  "zh_CN": [],
+  "zh_TW": [],
+  "ko_KR": [],
+  "ja_JP": [],
   "pt_BR": [
     "hudChrome.bg.doubleHonorLine",
     "hudChrome.calendar.events.doubleHonor.note",
@@ -75,10 +63,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.keybinds.toggleActionCamera",
     "hudChrome.options.actionCamera"
   ],
-  "ru_RU": [
-    "hudChrome.keybinds.toggleActionCamera",
-    "hudChrome.options.actionCamera"
-  ],
+  "ru_RU": [],
   "cs_CZ": [
     "hudChrome.bg.doubleHonorLine",
     "hudChrome.calendar.events.doubleHonor.note",
