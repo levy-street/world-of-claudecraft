@@ -782,14 +782,67 @@ export class Vfx {
     x: number,
     y: number,
     z: number,
-    visibleImpact: boolean,
+    reason: 'entity' | 'wall' | 'range' | 'sourceDespawn',
   ): void {
     const index = this.ballisticProjectiles.findIndex(
       (projectile) => projectile.trajectoryId === trajectoryId,
     );
     if (index < 0) return;
     const [projectile] = this.ballisticProjectiles.splice(index, 1);
-    if (!visibleImpact) return;
+    if (reason === 'sourceDespawn') return;
+
+    if (reason === 'range') {
+      // Maximum-range expiry is readable but deliberately soft: a fading ring
+      // says "the shot ended here" without resembling a successful hit.
+      this.tmpColor.copy(projectile.trailColor).multiplyScalar(hdr(1.15));
+      this.spawn(x, y, z, 0, 0.12, 0, this.tmpColor, 0.62, 0.28, 0, SPR.ring);
+      for (let k = 0; k < this.scaledCount(7); k++) {
+        const spread = (Math.random() - 0.5) * 0.8;
+        this.spawn(
+          x,
+          y + (Math.random() - 0.5) * 0.12,
+          z,
+          projectile.dirZ * spread - projectile.dirX * (0.25 + Math.random() * 0.35),
+          (Math.random() - 0.2) * 0.35,
+          -projectile.dirX * spread - projectile.dirZ * (0.25 + Math.random() * 0.35),
+          projectile.trailColor,
+          0.2,
+          0.3,
+          0,
+          projectile.trailSprite,
+        );
+      }
+      return;
+    }
+
+    if (reason === 'wall') {
+      // A blocked shot gets a compact, backward-scattering spark fan. It is
+      // visibly different from both a target hit and a harmless range fade.
+      this.tmpColor.copy(projectile.coreColor).multiplyScalar(hdr(1.25));
+      this.spawn(x, y, z, 0, 0.25, 0, this.tmpColor, 0.72, 0.16, 0, SPR.flash);
+      for (let k = 0; k < this.scaledCount(13); k++) {
+        const side = (Math.random() - 0.5) * 2.4;
+        const rebound = 1.6 + Math.random() * 3.2;
+        this.spawn(
+          x,
+          y,
+          z,
+          -projectile.dirX * rebound + projectile.dirZ * side,
+          0.45 + Math.random() * 2.1,
+          -projectile.dirZ * rebound - projectile.dirX * side,
+          projectile.trailColor,
+          0.3,
+          0.38,
+          7,
+          k % 2 === 0 ? SPR.sparkle : SPR.sparkBurst,
+        );
+      }
+      return;
+    }
+
+    // Entity contact is the strongest response. The combat result can still
+    // be miss, dodge, parry or resist; this burst communicates physical contact,
+    // while combat text communicates the authoritative roll result.
     this.tmpColor.copy(projectile.color).multiplyScalar(hdr(1.6));
     this.spawn(x, y, z, 0, 0.5, 0, this.tmpColor, 1.05, 0.22, 0, SPR.flash);
     for (let k = 0; k < this.scaledCount(18); k++) {
