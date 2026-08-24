@@ -11642,6 +11642,36 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'guide.profPages.econ.doctrineBody':
     '제작 장비의 힘은 언제나 공격대 하한 아래에 머물고, 위의 비용들은 물건을 상점 순환이 아니라 플레이어 간 거래로 밀어낸다.',
   'guide.profPages.faq.title': '생산 전문직 FAQ',
+  'guide.profPages.prov.title':
+    '보급의 길: 밭에서 공격대까지',
+  'guide.profPages.prov.intro':
+    '채집 계통들이 하나의 주방에서 만나고, 그 위로 뻗은 사다리의 끝에는 공격대 전원이 둘러앉는 식탁이 있습니다.',
+  'guide.profPages.prov.suppliersHeading':
+    '주방을 먹여 살리는 이들',
+  'guide.profPages.prov.suppliersBody':
+    '요리는 어느 제작 기술보다도 많은 채집 계통에서 재료를 가져오며, 이는 의도된 것입니다. 낚시나 농사, 가죽 벗기기를 함께 하는 요리사는 쓸 재료가 떨어지는 법이 없고, 그중 무엇도 하지 않는 요리사도 시장에서 전부 사들일 수 있습니다.\n\n각 계통이 무엇을 가져오는지는 아래에 정리되어 있습니다. 여기에 옮겨 적은 것이 아니라 현재의 제조법 목록에서 그대로 읽어오므로, 언제나 오늘의 주방이 실제로 요구하는 것이 표시됩니다.',
+  'guide.profPages.prov.lineCountFmt':
+    '요리 제조법에 {count}종',
+  'guide.profPages.prov.lineCorpse':
+    '사체 채집',
+  'guide.profPages.prov.ladderHeading':
+    '사다리, 한 단씩',
+  'guide.profPages.prov.ladderBody':
+    '요리는 익숙한 구간으로 올라가며, 각 단마다 그 단에서 배우는 결과물이 함께 적혀 있습니다. 초반의 단은 가방에서 혼자 먹는 한 그릇짜리 음식입니다. 위로 올라가면 주방은 남을 위해 만들기 시작합니다. 지속되는 강화를 담은 요리, 그리고 그 위의 잔치입니다. 잔치는 먹는 것이 아니라 바닥에 차려 두어 근처의 모두가 한 몫씩 가져가는 것입니다.',
+  'guide.profPages.prov.rungFmt':
+    '요리 {skill}',
+  'guide.profPages.prov.placeableTag':
+    '(먹지 않고 차려 둠)',
+  'guide.profPages.prov.tableHeading':
+    '꼭대기의 식탁',
+  'guide.profPages.prov.tableBody':
+    '잔치는 서 있는 자리에 차려지고, 근처에 있는 사람이 한 몫씩 가져갑니다. 한 몫이 주는 것은 그 잔치가 중심에 둔 바로 그 요리이므로, 잔치가 따로 배울 힘을 갖는 일은 없습니다. 이미 만들 줄 아는 요리를 한 무리에게 한 번에 건네는 방법일 뿐입니다.\n\n사다리의 꼭대기는 하나가 아니라 세 개의 잔치이며, 그 사이에서 고르는 것이 유일한 선택입니다. 값도, 요구하는 재료도, 필요한 숙련도 같습니다. 다만 세 가지 큰 요리 중 어느 것을 내는지가 다를 뿐이어서, 무리는 지금 하려는 일에 맞는 것을 고릅니다. 어느 단에서 나왔든 자신의 잔치는 한 번에 하나만 세워 둘 수 있고, 치워지기까지 몇 분간 유지됩니다.',
+  'guide.profPages.prov.marketHeading':
+    '아무것도 직접 만들지 않는다면',
+  'guide.profPages.prov.marketBody':
+    '요리를 하지 않는 사람에게 이 가운데 어느 것도 장벽이 아닙니다. 이 페이지의 모든 재료는 자유롭게 거래되는 평범한 물건입니다. 어부는 잡은 것을 팔고, 농부는 작물을 팔며, 둘 다 하지 않는 공격대원은 여분을 만들어 둔 요리사에게서 잔치를 그대로 사면 됩니다. 주방은 제작 기술들이 만나는 자리이지, 지나치는 이들에게 물리는 통행세가 아닙니다.',
+  'guide.profPages.prov.cookingLink':
+    '요리',
   'guide.profPages.faq.intro': '제작자들이 가장 자주 묻는 질문과 짧은 답.',
   'guide.profPages.faq.q1': '서명된 아이템은 왜 겹쳐 쌓이지 않나요?',
   'guide.profPages.faq.a1':

@@ -819,10 +819,12 @@ describe('real catalog integration', () => {
     // to 278.
     // 275 since masterwrought Phase 11i's col_deepest_cast, which is also a
     // visible non-feat collection deed and so joins both counts again.
-    expect(view.summary.visibleTotal).toBe(275);
+    // 276 since masterwrought Phase 11k's prog_field_to_feast, a visible
+    // non-feat PROGRESSION deed, which joins both counts for the same reason.
+    expect(view.summary.visibleTotal).toBe(276);
     // The bucket sum adds the feat-flagged rows back on top (3 on the Feats
     // shelf plus the off-prefix capstone on Collection).
-    expect(view.categories.reduce((n, c) => n + c.visible, 0)).toBe(279);
+    expect(view.categories.reduce((n, c) => n + c.visible, 0)).toBe(280);
   });
 
   it('offers exactly the live catalog border deeds once they are earned', () => {

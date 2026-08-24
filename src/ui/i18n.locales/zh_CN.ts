@@ -11158,6 +11158,36 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'guide.profPages.econ.doctrineBody':
     '制作装备的强度始终低于团队副本的底线，而上述费用会把货物推向玩家之间的交易，而非商店循环。',
   'guide.profPages.faq.title': '专业常见问题',
+  'guide.profPages.prov.title':
+    '给养之道：从田间到团队',
+  'guide.profPages.prov.intro':
+    '各条采集线汇入同一间厨房，而它上方的阶梯，终点是一整支团队共享的餐桌。',
+  'guide.profPages.prov.suppliersHeading':
+    '谁在供养厨房',
+  'guide.profPages.prov.suppliersBody':
+    '烹饪从采集线中取材之广，胜过任何其他行业，而这是刻意的：一名兼顾钓鱼、务农或剥皮的厨师，从不缺可用之物；而一名三者皆不涉猎的厨师，也能在市场上买齐所需。\n\n下方列出每条线各自带来什么，这些内容直接读取自当前的配方表，而非在此写死，因此它始终是厨房今天真正需要的东西。',
+  'guide.profPages.prov.lineCountFmt':
+    '{count} 种进入烹饪配方',
+  'guide.profPages.prov.lineCorpse':
+    '尸体采集',
+  'guide.profPages.prov.ladderHeading':
+    '阶梯，逐级而上',
+  'guide.profPages.prov.ladderBody':
+    '烹饪按惯常的分段攀升，每一级都列出了它所教授的成品。早期的几级是从背包中直接食用的单份菜肴。再往上，厨房开始为他人制作：带有持续增益的菜品，以及在其之上的宴席，你并不食用宴席本身，而是把它摆在地上，供附近所有人取用。',
+  'guide.profPages.prov.rungFmt':
+    '烹饪 {skill}',
+  'guide.profPages.prov.placeableTag':
+    '（摆放，而非食用）',
+  'guide.profPages.prov.tableHeading':
+    '顶端的那张餐桌',
+  'guide.profPages.prov.tableBody':
+    '宴席摆在你所站之处，附近的每个人各取一份。一份所给予的，正是这场宴席所围绕的那道菜，因此宴席本身从无需要另行学习的力量：它只是把你早已会做的那道菜，一次交给一整群人。\n\n阶梯的顶端是三席而非一席，而在它们之间的取舍，是唯一的选择。它们造价相同、所需材料相同、所要求的技能也相同；每一席只是供应三道大菜中的不同一道，因此队伍会选取契合眼下所为的那一席。无论出自哪一级，你名下同时只能有一席立于地上，且它在被撤去之前会维持数分钟。',
+  'guide.profPages.prov.marketHeading':
+    '若你一样都不烹饪',
+  'guide.profPages.prov.marketBody':
+    '对不下厨的人而言，这一切都不构成壁垒。本页上的每一种材料都是可自由交易的寻常货物：渔人售出渔获，农人售出作物，而两者皆不涉足的团队成员，可直接从备有余份的厨师手中买下一席宴席。厨房是各行业交汇之处，绝非对绕行者的一道关卡。',
+  'guide.profPages.prov.cookingLink':
+    '烹饪',
   'guide.profPages.faq.intro': '制作者最常问的问题，一并作答。',
   'guide.profPages.faq.q1': '为什么我的署名物品不能堆叠？',
   'guide.profPages.faq.a1':

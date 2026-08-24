@@ -147,11 +147,12 @@ describe('masterwrought R8 referential contract: every drop recipe reaches exact
   // counts are LITERAL floors (the recorded phase decisions), never re-derived.
   const apexDropRecipes = ALL_RECIPES.filter((recipe) => recipe.acquisition?.includes('drop'));
 
-  it('the drop-acquisition recipe set partitions 10 gear / 10 armor / 11 consumable / 6 farm / 1 rod', () => {
+  it('the drop-acquisition recipe set partitions 10 gear / 10 armor / 13 consumable / 6 farm / 1 rod', () => {
     // 38 since masterwrought Phase 11i: three angler cooking rows plus the
     // apex rod's schematic, the first pattern teaching a row outside the
-    // three APEX_* tables.
-    expect(apexDropRecipes).toHaveLength(38);
+    // three APEX_* tables. 40 since masterwrought Phase 11k, which retired
+    // 11i's capstone feast row and minted three apex role feasts in its place.
+    expect(apexDropRecipes).toHaveLength(40);
     const gear = apexDropRecipes.filter((r) => APEX_GEAR_RECIPES.includes(r));
     const armor = apexDropRecipes.filter((r) => APEX_ARMOR_RECIPES.includes(r));
     const consumable = apexDropRecipes.filter((r) => APEX_CONSUMABLE_RECIPES.includes(r));
@@ -165,8 +166,9 @@ describe('masterwrought R8 referential contract: every drop recipe reaches exact
     const rod = apexDropRecipes.filter((r) => ROD_RECIPES.includes(r));
     expect(gear).toHaveLength(10);
     expect(armor).toHaveLength(10);
-    // ELEVEN: the eight phase-11 consumables plus 11i's three angler rows.
-    expect(consumable).toHaveLength(11);
+    // THIRTEEN: the eight phase-11 consumables, 11i's two surviving angler
+    // rows, and Phase 11k's three apex role feasts.
+    expect(consumable).toHaveLength(13);
     expect(farm).toHaveLength(6);
     expect(rod).toHaveLength(1);
     // No drop recipe outside the five families: one with no assigned channel
@@ -585,15 +587,16 @@ describe('the no-fourth-channel sweep (masterwrought R8: three pillars, no fourt
 });
 
 describe('the phase 02 sweep floor', () => {
-  it('EXACTLY 34 shipped kind:recipe defs, each teaching a drop-acquirable recipe', () => {
+  it('EXACTLY 40 shipped kind:recipe defs, each teaching a drop-acquirable recipe', () => {
     // recipe_pattern_items.test.ts sweeps every kind:'recipe' def for this
     // shape but is deliberately floorless (it predates shipped content); the
     // literal here is the floor, and the referential arms above make it
     // un-gameable (a 35th def would also have to seat a channel to pass them).
     // 28 apex plus the 6 farming patterns Phase 11f added.
     const recipeDefs = Object.values(ITEMS).filter((def) => def.kind === 'recipe');
-    // 38 since masterwrought Phase 11i (the angler's endgame block).
-    expect(recipeDefs).toHaveLength(38);
+    // 38 since masterwrought Phase 11i (the angler's endgame block), 40 since
+    // Phase 11k (three apex feast recipes in, 11i's capstone feast out).
+    expect(recipeDefs).toHaveLength(40);
     for (const def of recipeDefs) {
       if (def.kind !== 'recipe') continue; // narrow for teachesRecipeId
       const recipe = recipeById(def.teachesRecipeId);

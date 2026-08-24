@@ -649,8 +649,8 @@ describe('missing painted deed and Heroic weapon integration', () => {
     // 11e, whose roster deed joins the PENDING side: that phase ships no crest
     // under the packet's declared art park for 11e to 11k. 288 at Phase 11i,
     // whose one deed (col_deepest_cast) joins the same pending side for the
-    // same reason.
-    expect(DEED_ORDER).toHaveLength(288);
+    // same reason, and 289 at Phase 11k, whose prog_field_to_feast does too.
+    expect(DEED_ORDER).toHaveLength(289);
     expect(DEED_ORDER.filter((id) => !DEED_IMAGE_IDS.has(id))).toEqual([...DEED_ART_PENDING]);
     const credits = readFileSync(path.join(repoRoot, 'CREDITS.md'), 'utf8');
     const provenance = readFileSync(

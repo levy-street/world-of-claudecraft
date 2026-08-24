@@ -21,22 +21,25 @@ import { esc } from '../../ui/esc';
 import { formatNumber, type TranslationKey, t } from '../../ui/i18n';
 import { GUIDE_PROF_PROVISIONING } from '../content.generated';
 import { hrefFor } from '../routes';
+import { gatheringLabel } from './professions_gathering';
 import { paras, related } from './ui';
 
-/** The label key for one supplying line. A LITERAL map rather than an
- *  interpolated `guide.professions.<id>` path, for the reason this packet has
- *  now paid for twice: a key built by template literal is invisible to every
- *  static consumer, so it cannot be re-keyed and the release fill cannot see
- *  it. Corpse harvesting has no profession record of its own, which is why it
- *  cannot simply reuse a profession label. */
-const LINE_LABEL_KEYS: Readonly<Record<string, TranslationKey>> = {
-  mining: 'guide.profPages.prov.lineMining',
-  logging: 'guide.profPages.prov.lineLogging',
-  herbalism: 'guide.profPages.prov.lineHerbalism',
-  fishing: 'guide.profPages.prov.lineFishing',
-  farming: 'guide.profPages.prov.lineFarming',
-  corpseHarvesting: 'guide.profPages.prov.lineCorpse',
-};
+/** The label for one supplying line. The five real gathering professions REUSE
+ *  their shipped `hudChrome.gathering.*` names, which every locale already
+ *  carries: minting a second set of one-word keys would have added six rows of
+ *  translation debt to say what the catalog already says, and the two copies
+ *  could then disagree.
+ *
+ *  Corpse harvesting is the one that needs its own key, and the reason is the
+ *  same reason it needs one everywhere else in this packet: it is a gathering
+ *  FAMILY without being a gathering PROFESSION, so it has no record and no
+ *  shipped name to borrow. */
+const CORPSE_LABEL_KEY: TranslationKey = 'guide.profPages.prov.lineCorpse';
+
+function lineLabel(id: string): string {
+  if (id === 'corpseHarvesting') return t(CORPSE_LABEL_KEY);
+  return gatheringLabel(id);
+}
 
 /** One card per line that actually feeds the kitchen, listing what it brings.
  *  A line whose materials no cooking bill asks for never renders, so the page
@@ -44,8 +47,7 @@ const LINE_LABEL_KEYS: Readonly<Record<string, TranslationKey>> = {
 function suppliersSection(): string {
   const cards = GUIDE_PROF_PROVISIONING.lines
     .map((line) => {
-      const labelKey = LINE_LABEL_KEYS[line.id];
-      const label = labelKey ? t(labelKey) : line.id;
+      const label = lineLabel(line.id);
       const items = line.materials.map((name) => `<li>${esc(name)}</li>`).join('');
       return `<div class="guide-fact">
           <dt>${esc(label)}</dt>

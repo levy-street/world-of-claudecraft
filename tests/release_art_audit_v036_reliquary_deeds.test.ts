@@ -214,15 +214,18 @@ describe('v0.36 release-audit Reliquary deed art', () => {
       'chr_evergarden_first_harvest',
       'col_golden_harvest',
       'col_farm_roster',
+      'prog_field_to_feast',
     ]);
     // 286 at the farming absorb (Phase 11d): the base 273 plus the six
     // Masterwrought milestone deeds plus farming's seven; 287 at Phase 11e,
     // which appends the roster deed; 288 at Phase 11i, which adds the angler's
-    // one. The PAINTED count is unmoved at 278 through both, because neither
-    // phase ships a crest: the packet's art park runs 11e to 11k, so each deed
+    // one; 289 at Phase 11k, which adds the cross-packet feast deed. The
+    // PAINTED count is unmoved at 278 through all three, because none of those
+    // phases ships a crest: the packet's art park runs 11e to 11k, so each deed
     // joins the pending ledger instead. The pending list above is in DEED_ORDER
-    // position, which is why 11i's row sits ahead of the farming block.
-    expect(DEED_ORDER).toHaveLength(288);
+    // position, which is why 11i's row sits ahead of the farming block and
+    // 11k's sits behind it, at the tail.
+    expect(DEED_ORDER).toHaveLength(289);
     expect(DEED_IMAGE_IDS.size).toBe(278);
     expect(DEED_ORDER.filter((id) => !DEED_IMAGE_IDS.has(id))).toEqual([...DEED_ART_PENDING]);
     expect(sorted(DEED_IMAGE_IDS)).toEqual(

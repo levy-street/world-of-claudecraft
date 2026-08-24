@@ -344,6 +344,14 @@ describe('FARM_RECIPES: the farm-economy hook set', () => {
     // stock is a shipped cooking intermediate that farming did not write, and
     // the whole cooking apex flows through it.
     //
+    // PHASE 11k ADDS THE EIGHTEENTH, NINETEENTH AND TWENTIETH: the three apex
+    // role feasts, each taking one Evergarden Greens. They are CONSUMABLE rows
+    // at the top rung, so unlike 11j's tool below they move the consumable
+    // clause too, which is the half masterwrought R20 actually cares about.
+    // They are also the first rows to put farm produce in a bill that a raid
+    // eats from rather than a single player, which is the whole provisioning
+    // arc arriving at its own top.
+    //
     // PHASE 11j ADDS THE SEVENTEENTH, recipe_evergarden_hoe, the apex rung of
     // the hoe ladder. It is a TOOL row rather than a consumable one, so it
     // moves the headline count and deliberately NOT the consumable clause
@@ -373,16 +381,19 @@ describe('FARM_RECIPES: the farm-economy hook set', () => {
         'recipe_osmium_hoe',
         'recipe_runewater_flask',
         'recipe_sageleaf_chowder',
+        'recipe_sageleaf_feast',
         'recipe_seasoned_stock',
+        'recipe_stonepot_feast',
         'recipe_stonepot_stew',
         'recipe_warboar_flask',
+        'recipe_warspice_feast',
         'recipe_warspice_skewers',
       ].sort(),
     );
     expect(
       endgameBills,
       "farming's endgame-bill count for the masterwrought R20 census",
-    ).toHaveLength(17);
+    ).toHaveLength(20);
     // THE TOP RUNG SPECIFICALLY, kept as its own clause because the count above
     // can be satisfied entirely at 75 and 100. masterwrought R13 puts the
     // catalog's ceiling at 125 and until Phase 11h nothing farming grows
@@ -393,7 +404,18 @@ describe('FARM_RECIPES: the farm-economy hook set', () => {
         .map((r) => r.id)
         .sort(),
       'produce must reach the 125 rung (the top CONSUMABLE rung, plus the apex hoe, a tool)',
-    ).toEqual(['recipe_evergarden_hoe', 'recipe_grand_cauldron', 'recipe_laden_hearth']);
+    ).toEqual([
+      'recipe_evergarden_hoe',
+      'recipe_grand_cauldron',
+      'recipe_laden_hearth',
+      // masterwrought Phase 11k: the three apex role feasts, the first produce
+      // consumers at this rung that a whole raid eats from rather than one
+      // player. Three CONSUMABLE rows, so unlike the hoe they also move the
+      // clause below, which is the one masterwrought R20 is really about.
+      'recipe_sageleaf_feast',
+      'recipe_stonepot_feast',
+      'recipe_warspice_feast',
+    ]);
     // The claim masterwrought R20 actually cares about, stated separately from the literal
     // above so a future re-tier that moves WHICH rows qualify still has to keep
     // the property true: produce reaches a CONSUMABLE endgame bill, not only a
@@ -402,7 +424,7 @@ describe('FARM_RECIPES: the farm-economy hook set', () => {
     const consumableEndgame = endgameBills.filter(
       (r) => r.professionId === 'cooking' || r.professionId === 'alchemy',
     );
-    expect(consumableEndgame.length, 'produce must feed a consumable endgame bill').toBe(15);
+    expect(consumableEndgame.length, 'produce must feed a consumable endgame bill').toBe(18);
     // AND THE CLAUSE PHASE 11g MAKES CHECKABLE, kept separate for the same
     // reason the one above is: a consumable endgame bill that is not one of
     // farming's own dishes. Satisfying masterwrought R20 entirely out of
@@ -423,16 +445,19 @@ describe('FARM_RECIPES: the farm-economy hook set', () => {
       'recipe_laden_hearth',
       'recipe_runewater_flask',
       'recipe_sageleaf_chowder',
+      'recipe_sageleaf_feast',
       'recipe_seasoned_stock',
+      'recipe_stonepot_feast',
       'recipe_stonepot_stew',
       'recipe_warboar_flask',
+      'recipe_warspice_feast',
       'recipe_warspice_skewers',
     ]);
-    // BOTH CRAFTS, not one. The nine above are FIVE cooking rows (the stock,
-    // the three role plates and the hearth) and FOUR alchemy rows (the three
-    // flasks and the cauldron); without this clause a later walk-back that left
-    // every non-farm endgame consumer in ONE craft would keep the list long and
-    // the claim hollow.
+    // BOTH CRAFTS, not one. The twelve above are EIGHT cooking rows (the stock,
+    // the three role plates, the hearth and Phase 11k's three apex feasts) and
+    // FOUR alchemy rows (the three flasks and the cauldron); without this
+    // clause a later walk-back that left every non-farm endgame consumer in
+    // ONE craft would keep the list long and the claim hollow.
     expect(
       new Set(consumableEndgame.filter((r) => !farmOwnIds.has(r.id)).map((r) => r.professionId)),
       'produce must reach the endgame of BOTH consumable crafts',
@@ -949,6 +974,10 @@ describe('FARM_RECIPES: the shared feast, the Phase 12 placeable cooking row', (
     expect(feastRecord, `${FEAST_ITEM_ID} feast record`).toEqual({
       charges: 10,
       durationTicks: 3600,
+      // masterwrought Phase 11k: the placed entity's template moved onto the
+      // payload, which is what makes the placeable family derivable from the
+      // catalog. The party feast keeps the templateId it always carried.
+      templateId: 'farm_feast',
       dishItemId: 'evergarden_braised_greens',
     });
     const dishDef = ITEMS[feastRecord?.dishItemId ?? ''];

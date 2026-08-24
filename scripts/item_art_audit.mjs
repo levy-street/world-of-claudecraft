@@ -122,10 +122,15 @@ const build = await buildItemArtAudit({
     // 62; Phase 11i's angler's endgame parks eleven more under the same
     // declaration (three high-band catches, the apex rod, two dishes, the
     // capstone feast and four patterns), taking it to 73; Phase 11j's apex
-    // hoe parks one more under the same declaration, taking it to 74.
+    // hoe parks one more under the same declaration, taking it to 74; and
+    // Phase 11k's apex feast tier parks its six ids (three feasts, three
+    // patterns) while RETIRING two of 11i's (that phase's capstone feast and
+    // its pattern, removed from the game rather than moved), a net plus four
+    // to 78.
     // liveItemCount is unmoved by any of that, which is the point of the
-    // split: a new artless def that joins the park moves the debt term alone.
-    pendingArtCount: 74,
+    // split: a new artless def that joins the park moves the debt term alone,
+    // and 11k's retirements cancel against its mints on the LIVE side too.
+    pendingArtCount: 78,
     generatedHeroicDefinitions: 64,
     heroicDefinitionsWithOwnWebp: 48,
     heroicWeaponArtAliases: 16,

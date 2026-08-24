@@ -11653,6 +11653,36 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'guide.profPages.econ.doctrineBody':
     '製作装備の強さは常にレイドの下限を下回り、上記の費用は品物を商店の循環ではなくプレイヤー間の取引へと押し出します。',
   'guide.profPages.faq.title': '生産職FAQ',
+  'guide.profPages.prov.title':
+    '糧食の道：畑からレイドへ',
+  'guide.profPages.prov.intro':
+    '採集の各系統はひとつの厨房で交わり、その上に伸びる梯子の先には、レイド全員が囲む食卓がある。',
+  'guide.profPages.prov.suppliersHeading':
+    '厨房を支えるのは誰か',
+  'guide.profPages.prov.suppliersBody':
+    '料理はどの生産技能よりも多くの採集系統から材料を取る。これは意図されたものだ。釣りや農耕、皮剥ぎも手がける料理人が扱う材料に事欠くことはなく、そのいずれもしない料理人でも市場で一式そろえられる。\n\n各系統が何をもたらすかは下に並べてある。ここに書き写したものではなく、現在のレシピ表から直接読み取っているので、いつでも今日の厨房が実際に求めているものが並ぶ。',
+  'guide.profPages.prov.lineCountFmt':
+    '料理レシピへ{count}種',
+  'guide.profPages.prov.lineCorpse':
+    '死体からの採取',
+  'guide.profPages.prov.ladderHeading':
+    '梯子を一段ずつ',
+  'guide.profPages.prov.ladderBody':
+    '料理はいつもの区切りで上っていき、どの段にもそこで習得できるものが並ぶ。序盤の段は、鞄から自分で食べる一人分の料理だ。上に進むと、厨房は他人のために作りはじめる。持続する強化を宿した皿、そしてその上の宴。宴は自分で食べるものではなく、地面に据えて、近くにいる全員が取り分けるものだ。',
+  'guide.profPages.prov.rungFmt':
+    '料理 {skill}',
+  'guide.profPages.prov.placeableTag':
+    '（食べずに据える）',
+  'guide.profPages.prov.tableHeading':
+    '頂にある食卓',
+  'guide.profPages.prov.tableBody':
+    '宴は立っている場所に据えられ、近くにいる者が一人一杯ずつ取る。一杯が与えるのは、その宴が中心に据えている料理そのものだ。だから宴が独自の力を持つことはない。すでに作れる皿を、まとめて一団に手渡す方法にすぎない。\n\n梯子の頂は一つではなく三つの宴で、その中から選ぶことだけが唯一の選択だ。費用も、求める材料も、必要な技能も同じ。違うのは三つの大皿のどれを供するかだけで、集団はこれから挑むものに合うものを選ぶ。どの段のものであれ、自分の宴は一度にひとつしか据えられず、片づけられるまで数分は保つ。',
+  'guide.profPages.prov.marketHeading':
+    '自分では一切作らないなら',
+  'guide.profPages.prov.marketBody':
+    '料理をしない者にとって、ここに壁はない。このページに載る素材はすべて取引できる普通の品だ。釣り人は釣果を売り、農夫は作物を売り、そのどちらもしないレイドの者は、余分に作った料理人から宴をそのまま買えばいい。厨房は生産技能が交わる場所であって、素通りする者への関所ではない。',
+  'guide.profPages.prov.cookingLink':
+    '料理',
   'guide.profPages.faq.intro': '作り手からよく聞かれる質問への短い答えです。',
   'guide.profPages.faq.q1': 'なぜ署名入りのアイテムはスタックしないのですか？',
   'guide.profPages.faq.a1':
