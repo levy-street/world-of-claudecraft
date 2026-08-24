@@ -6941,10 +6941,20 @@ export class Hud {
   }
 
   private paintPreparedSlot(slot: number | null): void {
+    const prepared = slot !== null ? this.activeGroundAimAbility() : null;
+    const previewRange = prepared ? abilityPreviewRange(prepared) : 0;
+    const previewRangeLabel =
+      previewRange > 0
+        ? t('abilityUi.tooltip.range', { range: formatAbilityNumber(previewRange) })
+        : '';
     for (let i = 0; i < this.abilityButtons.length; i++) {
       const active = i === slot;
-      this.abilityButtons[i]?.btn.classList.toggle('prepared', active);
-      this.abilityButtons[i]?.btn.setAttribute('aria-pressed', active ? 'true' : 'false');
+      const btn = this.abilityButtons[i]?.btn;
+      if (!btn) continue;
+      btn.classList.toggle('prepared', active);
+      btn.setAttribute('aria-pressed', active ? 'true' : 'false');
+      if (active && previewRangeLabel) btn.dataset.previewRange = previewRangeLabel;
+      else delete btn.dataset.previewRange;
     }
   }
 
