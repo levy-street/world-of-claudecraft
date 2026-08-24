@@ -8,7 +8,12 @@ import { placePlayerInOpenField } from './helpers/open_field';
 type DamageEvent = Extract<SimEvent, { type: 'damage' }>;
 
 function makeMage(): { sim: Sim; player: Entity } {
-  const sim = new Sim({ seed: 11, playerClass: 'mage', autoEquip: true });
+  const sim = new Sim({
+    seed: 11,
+    playerClass: 'mage',
+    autoEquip: true,
+    playerDirectionalCombat: true,
+  });
   sim.setPlayerLevel(60);
   sim.setSpec('fire');
   placePlayerInOpenField(sim);
@@ -49,7 +54,7 @@ describe('server-authoritative action combat aim', () => {
     expect(player.facing).toBeCloseTo(0, 5);
   });
 
-  it('refuses an empty cone without spending resources or hitting the selected enemy', () => {
+  it('commits an empty directional cast, misses, and preserves the manual target', () => {
     const { sim, player } = makeMage();
     const wolf = spawnWolf(sim, player, 0, 3);
     const hpBefore = wolf.hp;
@@ -60,11 +65,11 @@ describe('server-authoritative action combat aim', () => {
     const events = sim.tick();
 
     expect(damageEvents(events)).toHaveLength(0);
-    expect(events).toContainEqual(
+    expect(events).not.toContainEqual(
       expect.objectContaining({ type: 'error', text: 'You have no target.' }),
     );
     expect(wolf.hp).toBe(hpBefore);
-    expect(player.resource).toBe(resourceBefore);
+    expect(player.resource).toBeLessThan(resourceBefore);
     expect(player.targetId).toBe(wolf.id);
   });
 

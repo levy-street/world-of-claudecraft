@@ -3,11 +3,12 @@
 // homing bolt arrives, not on the cast tick, tracks a target that moves during flight,
 // and fizzles if the target dies mid-flight.
 
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 import {
   advancePendingProjectiles,
   PROJECTILE_REACH,
   PROJECTILE_SPEED,
+  scheduleBallisticProjectile,
   scheduleProjectile,
   stepProjectile,
 } from '../src/sim/projectile_travel';
@@ -233,6 +234,167 @@ describe('scheduleProjectile + advancePendingProjectiles', () => {
     }
     expect(landed.n).toBe(1);
     expect(ctx.pendingProjectiles.length).toBe(0);
+  });
+});
+
+function ballisticCtx(mobs: any[] = [], players: any[] = []) {
+  const entities = new Map<number, any>();
+  for (const entity of [...mobs, ...players]) entities.set(entity.id, entity);
+  const grid = (entries: any[]) => ({
+    forEachInRadius: (_x: number, _z: number, _radius: number, visit: (e: any) => void) => {
+      for (const entry of entries) visit(entry);
+    },
+  });
+  return {
+    tickCount: 40,
+    entities,
+    pendingProjectiles: [] as any[],
+    grid: grid(mobs),
+    playerGrid: grid(players),
+    isHostileTo: (_source: any, target: any) => target.hostile === true,
+    projectilePathClear: (_source: any, _from: any, _to: any) => true,
+    emit: vi.fn(),
+  };
+}
+
+function ballisticEntity(id: number, x: number, z: number, hostile = true) {
+  return { ...ent(id, x, z), hostile, scale: 1 };
+}
+
+describe('ballistic player projectiles', () => {
+  it('flies straight and lets the first intervening hostile take the shot', () => {
+    const source = ballisticEntity(1, 0, 0, false);
+    const far = ballisticEntity(2, 0, 16);
+    const interceptor = ballisticEntity(3, 0, 6);
+    const ctx = ballisticCtx([source, far, interceptor]);
+    const hits: number[] = [];
+
+    scheduleBallisticProjectile(
+      ctx as any,
+      source,
+      { angle: 0, maxDistance: 35, school: 'physical' },
+      (_src, target) => hits.push(target.id),
+    );
+    while (ctx.pendingProjectiles.length > 0) advancePendingProjectiles(ctx as any);
+
+    expect(hits).toEqual([interceptor.id]);
+    expect(ctx.emit).toHaveBeenCalledWith(
+      expect.objectContaining({ type: 'projectileImpact', targetId: interceptor.id }),
+    );
+  });
+
+  it('breaks simultaneous entity impacts deterministically by entity id', () => {
+    const source = ballisticEntity(1, 0, 0, false);
+    const higherId = ballisticEntity(9, 0, 6);
+    const lowerId = ballisticEntity(4, 0, 6);
+    const ctx = ballisticCtx([source, higherId, lowerId]);
+    const hits: number[] = [];
+
+    scheduleBallisticProjectile(
+      ctx as any,
+      source,
+      { angle: 0, maxDistance: 20, school: 'physical' },
+      (_src, target) => hits.push(target.id),
+    );
+    while (ctx.pendingProjectiles.length > 0) advancePendingProjectiles(ctx as any);
+
+    expect(hits).toEqual([lowerId.id]);
+  });
+
+  it('ignores friendlies and also collides with hostile players from playerGrid', () => {
+    const source = ballisticEntity(1, 0, 0, false);
+    const friendly = ballisticEntity(2, 0, 4, false);
+    const hostilePlayer = ballisticEntity(3, 0, 8, true);
+    const ctx = ballisticCtx([source, friendly], [hostilePlayer]);
+    const hits: number[] = [];
+
+    scheduleBallisticProjectile(
+      ctx as any,
+      source,
+      { angle: 0, maxDistance: 20, school: 'arcane' },
+      (_src, target) => hits.push(target.id),
+    );
+    while (ctx.pendingProjectiles.length > 0) advancePendingProjectiles(ctx as any);
+
+    expect(hits).toEqual([hostilePlayer.id]);
+  });
+
+  it('can be dodged by moving out of the launch line and ends at maximum range', () => {
+    const source = ballisticEntity(1, 0, 0, false);
+    const target = ballisticEntity(2, 0, 10);
+    const ctx = ballisticCtx([source, target]);
+    const hit = vi.fn();
+    const fizzle = vi.fn();
+
+    scheduleBallisticProjectile(
+      ctx as any,
+      source,
+      { angle: 0, maxDistance: 12, school: 'frost' },
+      hit,
+      fizzle,
+    );
+    target.pos.x = 5;
+    while (ctx.pendingProjectiles.length > 0) advancePendingProjectiles(ctx as any);
+
+    expect(hit).not.toHaveBeenCalled();
+    expect(fizzle).toHaveBeenCalledTimes(1);
+    expect(ctx.emit).toHaveBeenCalledWith(
+      expect.objectContaining({ type: 'projectileImpact', reason: 'range' }),
+    );
+  });
+
+  it('continues after source death but fizzles if the source despawns', () => {
+    const source = ballisticEntity(1, 0, 0, false);
+    const target = ballisticEntity(2, 0, 5);
+    const ctx = ballisticCtx([source, target]);
+    const hits: number[] = [];
+
+    scheduleBallisticProjectile(
+      ctx as any,
+      source,
+      { angle: 0, maxDistance: 10, school: 'fire' },
+      (_src, hitTarget) => hits.push(hitTarget.id),
+    );
+    source.dead = true;
+    while (ctx.pendingProjectiles.length > 0) advancePendingProjectiles(ctx as any);
+    expect(hits).toEqual([target.id]);
+
+    const fizzle = vi.fn();
+    source.dead = false;
+    scheduleBallisticProjectile(
+      ctx as any,
+      source,
+      { angle: 0, maxDistance: 10, school: 'fire' },
+      () => undefined,
+      fizzle,
+    );
+    ctx.entities.delete(source.id);
+    advancePendingProjectiles(ctx as any);
+    expect(fizzle).toHaveBeenCalledTimes(1);
+    expect(ctx.emit).toHaveBeenCalledWith(
+      expect.objectContaining({ type: 'projectileImpact', reason: 'sourceDespawn' }),
+    );
+  });
+
+  it('resolves a wall before a later entity without running the hit callback', () => {
+    const source = ballisticEntity(1, 0, 0, false);
+    const target = ballisticEntity(2, 0, 8);
+    const ctx = ballisticCtx([source, target]);
+    ctx.projectilePathClear = (_source: any, _from: any, to: any) => to.z < 4;
+    const hit = vi.fn();
+
+    scheduleBallisticProjectile(
+      ctx as any,
+      source,
+      { angle: 0, maxDistance: 12, school: 'nature' },
+      hit,
+    );
+    while (ctx.pendingProjectiles.length > 0) advancePendingProjectiles(ctx as any);
+
+    expect(hit).not.toHaveBeenCalled();
+    expect(ctx.emit).toHaveBeenCalledWith(
+      expect.objectContaining({ type: 'projectileImpact', reason: 'wall' }),
+    );
   });
 });
 

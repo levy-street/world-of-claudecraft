@@ -42,6 +42,14 @@ function makeInput(userAgent?: string) {
   let gameKeysAllowed = true;
   const canvas = {
     style: { cursor: '' },
+    getBoundingClientRect: () => ({
+      left: 0,
+      top: 0,
+      right: VIEWPORT_W,
+      bottom: VIEWPORT_H,
+      width: VIEWPORT_W,
+      height: VIEWPORT_H,
+    }),
     addEventListener: vi.fn((type: string, cb: (event: any) => void) => {
       canvasListeners.set(type, cb);
     }),
@@ -85,6 +93,10 @@ function makeInput(userAgent?: string) {
     onEmoteWheel: vi.fn(),
     onClickPick: vi.fn(),
     onAttackMove: vi.fn(),
+    onBasicAttackStart: vi.fn(),
+    onBasicAttackStop: vi.fn(),
+    onToggleActionCamera: vi.fn(),
+    onRightMouseRelease: vi.fn(),
     canUseGameKeys: () => gameKeysAllowed,
   };
   const input = new Input(canvas as any, cb, new Keybinds());
@@ -114,6 +126,78 @@ beforeEach(() => {
 
 afterEach(() => {
   vi.unstubAllGlobals();
+});
+
+describe('GW2 directional mouse combat', () => {
+  const down = (button: number) => ({ button, ...CENTER, preventDefault: vi.fn() });
+  const up = (button: number, target: unknown) => ({ button, ...CENTER, target });
+
+  it('uses RMB+LMB as a held Basic Attack without synthesizing forward or a right click', () => {
+    const { canvas, canvasListeners, windowListeners, cb, input } = makeInput();
+
+    canvasListeners.get('mousedown')!(down(2));
+    canvasListeners.get('mousedown')!(down(0));
+
+    expect(cb.onBasicAttackStart).toHaveBeenCalledTimes(1);
+    expect(input.readMoveInput().forward).toBe(false);
+
+    windowListeners.get('mouseup')!(up(0, canvas));
+    windowListeners.get('mouseup')!(up(2, canvas));
+
+    expect(cb.onBasicAttackStop).toHaveBeenCalledTimes(1);
+    expect(cb.onClickPick).not.toHaveBeenCalled();
+    expect(cb.onRightMouseRelease).toHaveBeenCalledTimes(1);
+  });
+
+  it('stops a held Basic Attack on focus loss so attack cannot stick', () => {
+    const { canvasListeners, windowListeners, cb } = makeInput();
+    canvasListeners.get('mousedown')!(down(2));
+    canvasListeners.get('mousedown')!(down(0));
+    expect(cb.onBasicAttackStart).toHaveBeenCalledTimes(1);
+
+    windowListeners.get('blur')!({});
+    expect(cb.onBasicAttackStop).toHaveBeenCalledTimes(1);
+  });
+
+  it('uses the first Action Camera canvas click only to acquire pointer lock', () => {
+    const { canvasListeners, cb, input, canvas } = makeInput();
+    input.setActionCameraEnabled(true);
+
+    canvasListeners.get('mousedown')!(down(0));
+
+    expect(canvas.requestPointerLock).toHaveBeenCalledTimes(1);
+    expect(cb.onBasicAttackStart).not.toHaveBeenCalled();
+    expect(cb.onClickPick).not.toHaveBeenCalled();
+  });
+
+  it('holds LMB attack once Action Camera is pointer-locked and preserves the preference after Esc', () => {
+    const { canvasListeners, windowListeners, documentListeners, cb, input, canvas } = makeInput();
+    input.setActionCameraEnabled(true);
+    (document as any).pointerLockElement = canvas;
+    documentListeners.get('pointerlockchange')!({});
+
+    canvasListeners.get('mousedown')!(down(0));
+    expect(cb.onBasicAttackStart).toHaveBeenCalledTimes(1);
+
+    (document as any).pointerLockElement = null;
+    documentListeners.get('pointerlockchange')!({});
+    expect(cb.onBasicAttackStop).toHaveBeenCalledTimes(1);
+    expect(input.isActionCameraEnabled()).toBe(true);
+
+    windowListeners.get('mouseup')!(up(0, canvas));
+  });
+
+  it('does not capture or attack through a modal gameplay-input gate', () => {
+    const { canvasListeners, cb, input, canvas, setGameKeysAllowed } = makeInput();
+    input.setActionCameraEnabled(true);
+    setGameKeysAllowed(false);
+
+    canvasListeners.get('mousedown')!(down(0));
+    canvasListeners.get('mousedown')!(down(2));
+
+    expect(canvas.requestPointerLock).not.toHaveBeenCalled();
+    expect(cb.onBasicAttackStart).not.toHaveBeenCalled();
+  });
 });
 
 describe('Input camera zoom', () => {

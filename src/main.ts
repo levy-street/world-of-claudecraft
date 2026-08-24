@@ -38,6 +38,7 @@ import {
 } from './game/click_move';
 import { clientEnvBits, installPageStateTracking, pageStateBits } from './game/client_env';
 import { getClientSeed } from './game/client_seed';
+import { pointAlongCombatAim, resolveCombatAimIntent } from './game/combat_aim';
 import { localPartyMemberIds } from './game/corpse_loot_availability';
 import { shouldClearAutorunOnDeath } from './game/death_input_reset';
 import { setDisplayChangeTarget } from './game/desktop_display_change';
@@ -347,6 +348,7 @@ import {
   validateEmailShape,
   validatePasswordChange,
 } from './ui/account_portal';
+import { createActionCameraPainter } from './ui/action_camera_painter';
 import { technicalErrorMessage, userFacingApiError } from './ui/api_error_i18n';
 import { formatFooterVersion } from './ui/app_version';
 import { type AppearanceCustomizer, mountAppearanceCustomizer } from './ui/appearance_customizer';
@@ -1424,6 +1426,7 @@ async function startGame(
   mountGameUi();
 
   const canvas = $('#game-canvas') as unknown as HTMLCanvasElement;
+  const actionCameraPainter = createActionCameraPainter();
   const nameplates = $('#nameplates') as HTMLDivElement;
 
   const keybinds = new Keybinds(keybindScope);
@@ -1893,6 +1896,7 @@ async function startGame(
       chatComposerFocused: document.activeElement === chatInput,
     });
 
+  let pointerBasicAttackStarted = false;
   const input = new Input(
     canvas,
     {
@@ -1916,6 +1920,23 @@ async function startGame(
       onAbility: (slot) => hud.castSlot(slot),
       onAbilityDown: (slot) => hud.pressSlot(slot),
       onAbilityUp: (slot) => hud.releaseSlot(slot),
+      onBasicAttackStart: () => {
+        if (hud.isGroundAimActive()) {
+          hud.commitGroundAimAt();
+          pointerBasicAttackStarted = false;
+          return;
+        }
+        pointerBasicAttackStarted = true;
+        syncCurrentCombatAim();
+        world.startAutoAttack();
+      },
+      onBasicAttackStop: () => {
+        if (!pointerBasicAttackStarted) return;
+        pointerBasicAttackStarted = false;
+        world.stopAutoAttack();
+      },
+      onToggleActionCamera: () => applySetting('actionCamera', !settings.get('actionCamera')),
+      onRightMouseRelease: () => hud.cancelGroundAim(),
       onInputIntent: (kind) => perf.markInputIntent(kind),
       onUiKey: (key) => {
         if (key !== 'escape') hud.cancelGroundAim();
@@ -2020,6 +2041,45 @@ async function startGame(
     keybinds,
   );
   input.camYaw = world.player.facing;
+
+  function combatAimScreenPoint(): { x: number; y: number } | null {
+    if (input.combatAimUsesFacing()) {
+      const rect = canvas.getBoundingClientRect();
+      if (rect.width <= 0 || rect.height <= 0) return null;
+      return { x: rect.left + rect.width / 2, y: rect.top + rect.height / 2 };
+    }
+    return input.cursorPoint();
+  }
+
+  function currentCombatAim() {
+    const screen = combatAimScreenPoint();
+    const cursorPoint = screen
+      ? renderer.groundPoint(screen.x, screen.y, world.player.pos.y)
+      : null;
+    return resolveCombatAimIntent({
+      player: world.player.pos,
+      facing: input.combatAimUsesFacing() ? input.camYaw : world.player.facing,
+      cursorPoint,
+      useFacing: input.combatAimUsesFacing(),
+    });
+  }
+
+  function currentCombatAimPoint(): { x: number; z: number } {
+    const aim = currentCombatAim();
+    return aim.point ?? pointAlongCombatAim(world.player.pos, aim.angle);
+  }
+
+  function syncCurrentCombatAim(): void {
+    const aim = currentCombatAim();
+    const offlineMeta = offlineSim?.meta(offlineSim.playerId);
+    if (offlineMeta) offlineMeta.combatAimAngle = aim.angle;
+    if (!online) return;
+    online.setCombatAimAngle(aim.angle);
+    if (input.combatAimUsesFacing()) online.setMouselookFacing(input.camYaw);
+    // WebSocket ordering guarantees this movement frame precedes the attack
+    // token, eliminating the one-render-frame stale-aim race on mouse/key down.
+    online.flushInput();
+  }
   perf.setInputDebugProvider(() => ({
     ...input.debugState(),
     canUseGameKeys: !gameplayInputBlocked(),
@@ -2453,15 +2513,10 @@ async function startGame(
       settings.set('filterProfanity', !!value);
       return;
     }
-    if (key === 'startAttackOnAbilityUse') {
-      // No live subsystem to update: the HUD reads this setting at ability-cast
-      // time (see hud.castSlot). Persist the choice and we are done.
-      settings.set('startAttackOnAbilityUse', !!value);
-      return;
-    }
-    if (key === 'actionCombat') {
-      // Read live by Hud.castSlot; persistence is the only subsystem update.
-      settings.set('actionCombat', !!value);
+    if (key === 'actionCamera') {
+      const v = settings.set('actionCamera', !!value);
+      input.setActionCameraEnabled(v);
+      actionCameraPainter.setVisible(v && input.isActionCameraLocked());
       return;
     }
     if (key === 'stopAutoAttackOnTargetSwitch') {
@@ -3014,14 +3069,8 @@ async function startGame(
     },
     captureKey: (cb) => input.captureNextKey(cb),
     settings,
-    actionCombatAim: () => {
-      const cursor = input.cursorPoint();
-      if (!cursor) return null;
-      const pickedId = renderer.pick(cursor.x, cursor.y);
-      const picked = pickedId !== null ? world.entities.get(pickedId) : null;
-      if (picked) return { x: picked.pos.x, z: picked.pos.z };
-      return renderer.groundPoint(cursor.x, cursor.y, world.player.pos.y);
-    },
+    combatAim: () => currentCombatAimPoint(),
+    syncCombatAim: () => syncCurrentCombatAim(),
     onSettingChange: (key, value) => applySetting(key, value),
     graphicsApplied: () => appliedGraphicsSettings,
     applyGraphics: async (draft) => {
@@ -3508,7 +3557,7 @@ async function startGame(
     // Chromium builds also expose a synthetic hover cursor parked at (0, 0);
     // reading it here would erase the finger-owned point every render frame.
     if (!document.body.classList.contains('mobile-touch')) {
-      const cursor = input.cursorPoint();
+      const cursor = combatAimScreenPoint();
       hud.updateGroundAimPoint(
         cursor ? renderer.groundPoint(cursor.x, cursor.y, world.player.pos.y) : null,
       );
@@ -4362,8 +4411,12 @@ async function startGame(
     if (shouldClearAutorunOnDeath(playerWasDead, playerDead)) {
       input.setAutorun(false);
       mobileControls.syncAutorun(false);
+      world.stopAutoAttack();
     }
     playerWasDead = playerDead;
+    actionCameraPainter.setVisible(
+      settings.get('actionCamera') && input.isActionCameraLocked() && !gameplayInputBlocked(),
+    );
     const frameDtMs = frameDt * 1000;
     let traceStart = perf.startTrace();
     try {
@@ -4424,6 +4477,9 @@ async function startGame(
       // itself, to stay deterministic).
       feedSimCalendar(offlineSim);
       while (acc >= DT) {
+        const aim = currentCombatAim();
+        const meta = offlineSim.meta(offlineSim.playerId);
+        if (meta) meta.combatAimAngle = aim.angle;
         const { mi, facing } = resolveMove(
           mouselook,
           offlineSim.player.pos,
@@ -4607,6 +4663,7 @@ async function startGame(
       net.moveInput.turnRight = false;
     }
     net.setMouselookFacing(netFacing);
+    net.setCombatAimAngle(currentCombatAim().angle);
     // Online streams facing every frame, so the mouselook release yaw is
     // consumed here; drop it so it is not re-applied next frame.
     pendingReleaseFacing = null;
@@ -5227,6 +5284,10 @@ async function startOffline(
         playerClass,
         playerName: name,
         devCommands: import.meta.env.DEV,
+        // Directional combat is the normal player runtime contract. The Sim
+        // library itself remains opt-in so old deterministic fixtures do not
+        // silently gain a synthetic aim source.
+        playerDirectionalCombat: true,
         // The offline world runs the ranked rift portal scheduler like the live
         // server (custom editor play-test maps keep it off: their zones differ).
         riftPortals: world === undefined,

@@ -40,3 +40,8 @@ services:
         sync: false
       - key: REALM_NAME
         sync: false
+      # Emergency rollback: set to "0" in Render to retain directional input
+      # while reverting player projectiles/three-target melee to release-one
+      # resolution. Default-on for this feature branch.
+      - key: PLAYER_DIRECTIONAL_COMBAT
+        value: "1"

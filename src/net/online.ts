@@ -1970,6 +1970,7 @@ export class ClientWorld implements IWorld {
     { resolve: (succeeded: boolean) => void; timeout: ReturnType<typeof setTimeout> }
   >();
   private mouselookFacing: number | null = null;
+  private combatAimAngle: number | null = null;
   private sendTimer: number | undefined;
   private lastInputSentAt = 0;
   private lastInputSig = '';
@@ -2225,6 +2226,10 @@ export class ClientWorld implements IWorld {
     this.mouselookFacing = normalizeMoveFacing(facing);
   }
 
+  setCombatAimAngle(angle: unknown): void {
+    this.combatAimAngle = normalizeMoveFacing(angle);
+  }
+
   flushInput(now = performance.now()): boolean {
     return this.sendInput(now, 'changed');
   }
@@ -2238,6 +2243,7 @@ export class ClientWorld implements IWorld {
   neutralizeInputForClientPause(now = performance.now()): boolean {
     Object.assign(this.moveInput, emptyMoveInput());
     this.mouselookFacing = null;
+    this.combatAimAngle = null;
     // On an open socket the forced path admits exactly one neutral frame
     // despite a saturated browser buffer. The accepted neutral frame consumes
     // any pre-pause engagement intent without putting it on the wire.
@@ -2264,6 +2270,8 @@ export class ClientWorld implements IWorld {
     const mi = this.moveInput;
     const facing =
       this.mouselookFacing === null ? '' : Math.round(this.mouselookFacing * 10000).toString();
+    const combatAim =
+      this.combatAimAngle === null ? '' : Math.round(this.combatAimAngle * 10000).toString();
     return [
       mi.forward ? 1 : 0,
       mi.back ? 1 : 0,
@@ -2279,6 +2287,7 @@ export class ClientWorld implements IWorld {
       // the frame every time the camera twitches.
       mi.swimSteer ?? 1,
       facing,
+      combatAim,
     ].join(',');
   }
 
@@ -2363,6 +2372,7 @@ export class ClientWorld implements IWorld {
       (msg.mi as Record<string, number>).ss = mi.swimSteer;
     }
     if (this.mouselookFacing !== null) msg.facing = this.mouselookFacing;
+    if (this.combatAimAngle !== null) msg.aim = this.combatAimAngle;
     this.ws.send(JSON.stringify(msg));
     // WebSocket.send accepted the real frame. Pending edges are transport-local
     // and are consumed exactly once, including when the forced-neutral mode

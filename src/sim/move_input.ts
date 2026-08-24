@@ -57,12 +57,14 @@ export function normalizeMoveFacing(raw: unknown): number | null {
 export interface MoveInputFrame {
   moveInput: MoveInput;
   facing: number | null;
+  combatAimAngle?: number | null;
 }
 
 export function parseMoveInputFrame(raw: unknown): MoveInputFrame {
-  if (!isRecord(raw)) return { moveInput: emptyMoveInput(), facing: null };
+  if (!isRecord(raw)) return { moveInput: emptyMoveInput(), facing: null, combatAimAngle: null };
   return {
     moveInput: sanitizeMoveInput(raw.mi),
     facing: sanitizeMoveFacing(raw.facing),
+    combatAimAngle: normalizeMoveFacing(raw.combatAimAngle ?? raw.aim),
   };
 }

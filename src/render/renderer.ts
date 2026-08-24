@@ -7703,6 +7703,32 @@ export class Renderer {
 
   handleEvent(ev: SimEvent): void {
     switch (ev.type) {
+      case 'projectileLaunch': {
+        if (ev.attackAnimation === 'ranged-shot') this.triggerAttack(ev.sourceId);
+        const y = groundHeight(ev.x, ev.z, this.sim.cfg.seed) + 0.7;
+        this.vfx.ballisticProjectile(
+          ev.trajectoryId,
+          ev.x,
+          y,
+          ev.z,
+          ev.dirX,
+          ev.dirZ,
+          ev.speed,
+          ev.maxDistance,
+          ev.school,
+        );
+        break;
+      }
+      case 'projectileImpact': {
+        this.vfx.ballisticImpact(
+          ev.trajectoryId,
+          ev.x,
+          groundHeight(ev.x, ev.z, this.sim.cfg.seed) + 0.7,
+          ev.z,
+          ev.reason === 'entity' || ev.reason === 'wall',
+        );
+        break;
+      }
       case 'castStart': {
         if (ev.ability === 'needle_of_fate') {
           this.needleOfFateVfx.beginCast(ev.entityId, ev.time);
@@ -13493,9 +13519,11 @@ export class Renderer {
   // horizontal plane at the player's foot height, robust on the gentle terrain
   // here and far cheaper than raycasting the terrain mesh.
   groundPoint(clientX: number, clientY: number, planeY: number): { x: number; z: number } | null {
+    const rect = this.canvas.getBoundingClientRect();
+    if (rect.width <= 0 || rect.height <= 0) return null;
     this.raycastNdc.set(
-      (clientX / window.innerWidth) * 2 - 1,
-      -(clientY / window.innerHeight) * 2 + 1,
+      ((clientX - rect.left) / rect.width) * 2 - 1,
+      -((clientY - rect.top) / rect.height) * 2 + 1,
     );
     this.raycaster.setFromCamera(this.raycastNdc, this.camera);
     this.raycastGroundPlane.constant = -planeY;

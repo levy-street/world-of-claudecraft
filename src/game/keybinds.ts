@@ -220,6 +220,13 @@ export const BIND_ACTIONS: BindAction[] = [
     kind: 'edge',
     defaults: ['KeyV'],
   },
+  {
+    id: 'toggleActionCamera',
+    label: 'Toggle Action Camera',
+    category: 'Interface',
+    kind: 'edge',
+    defaults: [],
+  },
   { id: 'talents', label: 'Talents', category: 'Interface', kind: 'edge', defaults: ['KeyN'] },
   // Every bare letter is claimed by another default (see the KeyZ note on
   // Book of Deeds below), so Damage Meters parks on the shifted layer of its

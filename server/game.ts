@@ -2098,6 +2098,7 @@ export class GameServer {
       playerClass: 'warrior',
       noPlayer: true,
       devCommands: process.env.ALLOW_DEV_COMMANDS === '1',
+      playerDirectionalCombat: process.env.PLAYER_DIRECTIONAL_COMBAT !== '0',
       // Thunzharr is up as soon as the realm boots; subsequent rises keep the
       // normal interval cadence (see src/sim/world_boss.ts).
       worldBossAtBoot: true,
@@ -6586,6 +6587,9 @@ export class GameServer {
       if (!meta || !e) return;
       const frame = parseMoveInputFrame(msg);
       Object.assign(meta.moveInput, frame.moveInput);
+      // Older clients and malformed/non-finite aim fields safely fall back to
+      // the current facing instead of retaining a stale previous cursor ray.
+      meta.combatAimAngle = frame.combatAimAngle ?? frame.facing ?? e.facing;
       session.lastInputAt = sim.time;
       if (typeof msg.seq === 'number' && Number.isFinite(msg.seq) && msg.seq > 0) {
         const seq = Math.floor(msg.seq);

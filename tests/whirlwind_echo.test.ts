@@ -28,7 +28,15 @@ type TestSim = Sim & {
 };
 
 function makeSim(seed = 31338, spec: 'fury' | 'arms' = 'fury'): { sim: TestSim; p: Entity } {
-  const sim = new Sim({ seed, playerClass: 'warrior', autoEquip: true }) as TestSim;
+  // These tests pin the legacy cleave implementation used by the emergency
+  // rollback flag. Directional combat owns one central three-target cone and
+  // deliberately does not stack these replay paths on top of it.
+  const sim = new Sim({
+    seed,
+    playerClass: 'warrior',
+    autoEquip: true,
+    playerDirectionalCombat: false,
+  }) as TestSim;
   sim.setPlayerLevel(20);
   expect(sim.setSpec(spec)).toBe(true);
   // A warrior spawns seeded in Battle Stance; one tick lets the stance reconcile

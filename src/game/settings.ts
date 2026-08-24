@@ -209,16 +209,9 @@ export const BOOL_SETTINGS = {
   // swipe-to-look) so pushing the stick up tilts the camera down — the classic
   // flight-sim / console preference some touch players reach for (#323-adjacent)
   touchInvertLook: { def: false },
-  // on by default: classic-style "start auto-attack on ability use". When on,
-  // using an offensive ability also engages your white-swing auto-attack (read
-  // live by the HUD at cast time, see ui/attack_on_ability.ts). The sim's
-  // startAutoAttack still no-ops unless a valid hostile target is in range, and
-  // heals / buffs / damage-breakable CC (gouge, sap, sheep) never trigger it.
-  startAttackOnAbilityUse: { def: true },
-  // off by default: GW2-style hybrid targeting. Offensive entity-targeted
-  // abilities select the hostile under a narrow cursor-facing cone; classic
-  // hard-target casting remains the default and friendly/ground casts are unchanged.
-  actionCombat: { def: false },
+  // Directional combat is always enabled. This preference controls only the
+  // optional GW2-style pointer-locked crosshair/camera presentation.
+  actionCamera: { def: false },
   // off by default (issue #1358): the classic MMO default is that switching
   // targets while auto-attacking carries the swing over to the new target
   // (Tab, click, nearest-enemy, assist, any method). Turning this on flips
