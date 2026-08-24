@@ -23,11 +23,21 @@
 // in a failure message would point a reader at the wrong ruling.
 //
 // THE FLOOR IS PRESENCE AND NOWHERE ELSE (masterwrought decision E, settled
-// 2026-08-20). No arm in this file asserts a COUNT of bills. Zero is a
+// 2026-08-20). No COVERAGE arm in this file asserts a count of bills. Zero is a
 // structural fact; everything above zero is a balance number nobody measured,
 // and a numeric floor would turn a correctness guard into a content quota that
 // passes on padding. The per-band and per-material counts ARE collected, and
 // they are recorded in the phase ledger as a judgment surface instead.
+//
+// THE CARVE-OUT, written into the ruling rather than left for a reader to trip
+// over (masterwrought Phase 11j QA). The anti-vacuity block at the bottom DOES
+// carry exact counts: family supply-set sizes, the farming crop total, and
+// farming's endgame cell at 12. Those are not floors on content, they are
+// SUBJECT-SIZE pins: what they guard is that the coverage arms above ran over
+// the population they claim to, and a token `> 0` in their place is the trap
+// tests/CLAUDE.md names. Decision E governs what the coverage arms demand of
+// the CONTENT; it says nothing about pinning the subject. Do not delete those
+// literals to restore the sentence above.
 //
 // THE SUPPLY ARM COUNTS DIRECT REAGENTS ONLY, and the refusal is deliberate.
 // Transitive credit through an intermediate is NOT counted: if a band-75 row
@@ -73,11 +83,21 @@
 // Widening it would need the quest corpus, which is a second content catalog
 // to keep in step, so the scope is a deliberate trade rather than an oversight.
 //
-// EVERYTHING IS DERIVED FROM LIVE TABLES. There is no hand-written id list and
-// no literal 25 in this file: the subject list comes from
+// EVERY DERIVATION READS THE LIVE TABLES: the subject list comes from
 // GATHERING_PROFESSION_IDS, the supply sets come from the content tables the
-// engine itself reads, and the band math comes from wheel.ts tierForSkill, so
-// a TIER_SKILL_STEP change moves this test and the game together.
+// engine itself reads, and the band math comes from wheel.ts tierForSkill.
+//
+// AND EVERY DERIVATION CARRIES A LITERAL BESIDE IT, which is the opposite of
+// what this paragraph said before masterwrought Phase 11j's review round and
+// is worth stating plainly because the earlier wording is what let four
+// constant-self-comparisons ship here. A derivation alone cannot fail: delete
+// a profession, a crop or a node row and both sides of a purely derived
+// assertion move together. So the id lists at the subject-list, self-feeding,
+// substitution and supply-size arms ARE hand-written, deliberately, and
+// TIER_SKILL_STEP is pinned at its literal 25 rather than only referenced.
+// A TIER_SKILL_STEP change therefore REDS this file rather than silently
+// following the game, which is the behavior wanted: the bucket width is a
+// shared contract, and moving it should force a reader through this file.
 //
 // NOT A SECOND COPY OF tests/recipe_economy.test.ts. That file asserts every
 // material has at least one consumer SOMEWHERE. This file is the band-aware
@@ -238,6 +258,30 @@ function reagentIdsOf(recipe: (typeof ALL_RECIPES)[number]): string[] {
   return recipe.reagents.map((r) => r.itemId);
 }
 
+/** The item a recipe id produces. The matrix stores recipe ids, and the
+ *  levelling-band tripwire needs the RESULT to ask isSelfFeedingFor. */
+function resultOf(recipeId: string): string {
+  const recipe = ALL_RECIPES.find((r) => r.id === recipeId);
+  if (recipe === undefined) throw new Error(`no recipe ${recipeId}`);
+  return recipe.resultItemId;
+}
+
+/**
+ * WHAT THE REFUSAL ACTUALLY DROPPED, recorded by the matrix as it builds
+ * rather than re-derived beside it (masterwrought Phase 11j QA). The arm that
+ * pins this reads THIS list, so it is a statement about the run that produced
+ * the matrix and not a second implementation of the same rule that could agree
+ * with a broken one.
+ *
+ * It exists because the outcome pin below it covered ONE family. Narrowing the
+ * refusal to `family === 'farming'` inside the loop below left every arm in
+ * this file green while mining, logging, herbalism and fishing were each
+ * credited at the endgame band by their own tool, which is the exact thing
+ * masterwrought decision D refuses. Proven by mutation: that narrowing now
+ * reds here.
+ */
+const REFUSED_ENDGAME_ROWS: string[] = [];
+
 /** The per-family, per-band count of qualifying recipes: the audit matrix. */
 function bandMatrix(): Map<string, Map<number, string[]>> {
   const matrix = new Map<string, Map<number, string[]>>();
@@ -248,7 +292,10 @@ function bandMatrix(): Map<string, Map<number, string[]>> {
     for (const recipe of ALL_RECIPES) {
       const band = Math.min(bandOf(recipe.skillReq ?? 0), ENDGAME_BAND);
       if (!reagentIdsOf(recipe).some((id) => ids.has(id))) continue;
-      if (band === ENDGAME_BAND && isSelfFeedingFor(recipe.resultItemId, family)) continue;
+      if (band === ENDGAME_BAND && isSelfFeedingFor(recipe.resultItemId, family)) {
+        REFUSED_ENDGAME_ROWS.push(`${family}:${recipe.id}`);
+        continue;
+      }
       (perBand.get(band) as string[]).push(recipe.id);
     }
     matrix.set(family, perBand);
@@ -283,17 +330,23 @@ function consumptionIdsFor(itemId: string): string[] {
   return base === undefined ? [itemId] : [itemId, base];
 }
 
-/** Consumers and unit demand per id, over ALL reagent sources on the tree. */
-function demandIndex(): Map<string, { consumers: string[]; units: number }> {
-  const demand = new Map<string, { consumers: string[]; units: number }>();
-  const note = (itemId: string, source: string, count: number) => {
-    const row = demand.get(itemId) ?? { consumers: [], units: 0 };
+/** The consumers of each id, over ALL reagent sources on the tree.
+ *
+ *  CONSUMERS ONLY. This used to accumulate a `units` total beside them and
+ *  nothing ever read it: the ledger's demand RATIO table is measured by a
+ *  temporary reporter over these same two corpora and then deleted, which is
+ *  where the unit counts belong. A field the guard computes on every run and
+ *  never asserts is dead code that reads like coverage (masterwrought Phase
+ *  11j QA). */
+function demandIndex(): Map<string, { consumers: string[] }> {
+  const demand = new Map<string, { consumers: string[] }>();
+  const note = (itemId: string, source: string) => {
+    const row = demand.get(itemId) ?? { consumers: [] };
     row.consumers.push(source);
-    row.units += count;
     demand.set(itemId, row);
   };
   for (const recipe of ALL_RECIPES) {
-    for (const reagent of recipe.reagents) note(reagent.itemId, recipe.id, reagent.count);
+    for (const reagent of recipe.reagents) note(reagent.itemId, recipe.id);
   }
   // src/sim/content/enchants.ts IS a reagent source and it is the one a
   // hand-scoped census misses: the census that once called arcane_shard a
@@ -301,7 +354,7 @@ function demandIndex(): Map<string, { consumers: string[]; units: number }> {
   // consumer rows here. Scoping a demand scan to one file is the exact error
   // this arm exists to make impossible.
   for (const enchant of Object.values(ENCHANTS)) {
-    for (const reagent of enchant.reagents) note(reagent.itemId, enchant.id, reagent.count);
+    for (const reagent of enchant.reagents) note(reagent.itemId, enchant.id);
   }
   return demand;
 }
@@ -322,8 +375,11 @@ describe('masterwrought R20: every gathering family feeds the crafts at every ba
       const perBand = MATRIX.get(family) as Map<number, string[]>;
       for (const band of LEVELLING_BANDS) {
         if ((perBand.get(band) as string[]).length > 0) continue;
-        const low = band * (GATHERING_ENDGAME_SKILL / ENDGAME_BAND);
-        const high = low + GATHERING_ENDGAME_SKILL / ENDGAME_BAND - 1;
+        // Off the SHARED bucket width rather than re-derived from the cap and
+        // the band count: a message is unreachable while the file is green, so
+        // a second derivation here could drift wrong invisibly.
+        const low = band * TIER_SKILL_STEP;
+        const high = low + TIER_SKILL_STEP - 1;
         holes.push(
           `${family} supplies NO recipe in band ${band} (skillReq ${low} to ${high}). ` +
             `It supplies: ${[...(SUPPLY.get(family) as Set<string>)].sort().join(', ')}. ` +
@@ -349,6 +405,67 @@ describe('masterwrought R20: every gathering family feeds the crafts at every ba
       );
     }
     expect(holes).toEqual([]);
+  });
+
+  it('no LEVELLING band is covered only by the family feeding its own tool', () => {
+    // A SELF-CLEARING TRIPWIRE, added at the masterwrought Phase 11j QA, and
+    // it is a tripwire rather than a rule because the rule is the maintainer's
+    // to set. masterwrought decision D applies the self-feeding refusal at the
+    // ENDGAME band alone. Below the cap the same hole is possible and is
+    // exactly what this file's opening paragraph calls worthless: a band whose
+    // only qualifying row is the family's own tool ladder gives a player
+    // levelling through it no reason to have taken the profession.
+    //
+    // It bites NOTHING today, and it is one row from biting. Logging's band 3
+    // holds recipe_ashwood_axe (logging's own axe) and recipe_precision_chassis
+    // and nothing else, so deleting the chassis's log leaves logging band 3
+    // credited solely by an axe; farming's bands 1, 2 and 3 each carry their
+    // own hoe rung beside real bills. Proven by mutation: before this arm
+    // existed, stripping recipe_precision_chassis left the whole file GREEN.
+    //
+    // WHEN THIS REDS, RE-DECIDE DECISION D'S SCOPE, never widen this arm. The
+    // measured cost of extending the refusal to every band was taken at the
+    // 11j QA and no cell empties: logging b3 2 to 1, mining b3 7 to 6,
+    // herbalism b3 6 to 5, fishing b3 2 to 1, farming b1 7 to 6, b2 5 to 4,
+    // b3 4 to 3.
+    const selfOnly: string[] = [];
+    for (const family of FAMILY_IDS) {
+      const perBand = MATRIX.get(family) as Map<number, string[]>;
+      for (const band of LEVELLING_BANDS) {
+        const rows = perBand.get(band) as string[];
+        if (rows.length === 0) continue;
+        if (!rows.every((id) => isSelfFeedingFor(resultOf(id), family))) continue;
+        selfOnly.push(
+          `${family} band ${band} is credited ONLY by ${rows.join(', ')}, which produce ` +
+            `${family}'s own gathering tools. That is the family feeding itself, which ` +
+            `masterwrought decision D refuses at the endgame band and this file's opening ` +
+            `paragraph refuses in principle at every band. RE-DECIDE decision D's scope ` +
+            `(the measured cost of extending the refusal to every band is in the arm's ` +
+            `comment), never widen this arm. Rule: ${WHERE_THE_RULE_LIVES}.`,
+        );
+      }
+    }
+    expect(selfOnly).toEqual([]);
+    // Non-vacuity: the discriminator this arm runs really does separate the
+    // two kinds of row over the levelling bands, so the empty result above is
+    // a measurement rather than a predicate that matches nothing. Six tool
+    // rungs sit in levelling bands and are credited to their own family today.
+    const selfFeedingInLevellingBands = FAMILY_IDS.flatMap((family) =>
+      LEVELLING_BANDS.flatMap((band) =>
+        ((MATRIX.get(family) as Map<number, string[]>).get(band) as string[])
+          .filter((id) => isSelfFeedingFor(resultOf(id), family))
+          .map((id) => `${family}:${id}`),
+      ),
+    );
+    expect(selfFeedingInLevellingBands.sort(), 'the levelling-band tool rungs').toEqual([
+      'farming:recipe_bronze_hoe',
+      'farming:recipe_osmium_hoe',
+      'farming:recipe_skysilver_hoe',
+      'fishing:recipe_stormreel_fishing_rod',
+      'herbalism:recipe_goldleaf_sickle',
+      'logging:recipe_ashwood_axe',
+      'mining:recipe_thorium_mining_pick',
+    ]);
   });
 });
 
@@ -380,13 +497,31 @@ describe('masterwrought R21: the world eats what the gathering families supply',
 
 describe('the derivation itself cannot pass by matching nothing', () => {
   it('every family has a non-empty supply set and every id resolves in ITEMS', () => {
+    // AT THE REAL SIZES, not at a token floor (masterwrought Phase 11j QA).
+    // `> 0` against real populations of 6 to 24 is the floor-far-below-the-set
+    // trap tests/CLAUDE.md names: nodeSupplyFor could stop adding the fine
+    // twins, halving three families, and every arm in this file would stay
+    // green because the bases alone still cover every band. The empty-set
+    // message is kept for the case that matters most to a reader.
+    const SIZES: Record<string, number> = {
+      mining: 6,
+      logging: 6,
+      herbalism: 6,
+      fishing: 10,
+      farming: 24,
+      corpseHarvesting: 13,
+    };
     for (const family of FAMILY_IDS) {
       const ids = SUPPLY.get(family) as Set<string>;
       expect(ids.size, `${family} derived an EMPTY supply set`).toBeGreaterThan(0);
+      expect(ids.size, `${family} supply-set size`).toBe(SIZES[family]);
       for (const id of ids) {
         expect(ITEMS[id], `${family} supplies ${id}, which resolves in no item def`).toBeDefined();
       }
     }
+    // The map itself, so a family losing its SIZES row is a red rather than an
+    // undefined compared against nothing.
+    expect(Object.keys(SIZES).sort()).toEqual([...FAMILY_IDS].sort());
   });
 
   it('binds all six families, derived from GATHERING_PROFESSION_IDS', () => {
@@ -410,8 +545,19 @@ describe('the derivation itself cannot pass by matching nothing', () => {
   });
 
   it('pins the derived supply sets against the live tables', () => {
-    // The MATERIAL DEMAND COVERAGE anti-rot idiom: a table row added without a
-    // supply mapping reds HERE rather than silently shrinking the guard.
+    // BE HONEST ABOUT WHAT THIS ONE CATCHES, corrected at the masterwrought
+    // Phase 11j QA. It used to claim the MATERIAL DEMAND COVERAGE anti-rot
+    // idiom, "a table row added without a supply mapping reds HERE", and that
+    // is false for the case it names: both sides below walk the SAME
+    // NODE_MATERIAL_TABLE, so a new zone row grows nodeYields and the derived
+    // set together and stays green. Its real and only tooth is a node TYPE
+    // whose NODE_HARVEST_TABLE.professionId does not name one of the three
+    // node professions (a typo, or a fourth node type routed to fishing or
+    // farming): that drops its whole column out of the derived side while
+    // nodeYields keeps it. Proven by mutation rather than asserted: mistyping
+    // wood's professionId reds this arm along with four others.
+    // The LITERAL below is what catches a table row: nine node yields, three
+    // per profession.
     const nodeYields = new Set<string>();
     for (const byZone of Object.values(NODE_MATERIAL_TABLE)) {
       for (const cell of Object.values(byZone)) nodeYields.add(cell.itemId);
@@ -422,6 +568,21 @@ describe('the derivation itself cannot pass by matching nothing', () => {
       ),
     );
     expect([...derivedNodeIds].sort()).toEqual([...nodeYields].sort());
+    // AND THE LITERAL, which is the half with teeth against the table itself:
+    // nine yields, three per node profession. A tenth row added without a
+    // supply mapping reds here, which is what the paragraph above used to
+    // claim of the derived line.
+    expect([...nodeYields].sort()).toEqual([
+      'ashwood_log',
+      'copper_ore',
+      'elderwood_log',
+      'goldleaf_herb',
+      'iron_ore',
+      'ironbark_log',
+      'silverleaf_herb',
+      'sunpetal_herb',
+      'thorium_ore',
+    ]);
 
     // Every fine twin in the grade table is claimed by exactly one family.
     const derivedFine = new Set(
@@ -501,6 +662,21 @@ describe('the derivation itself cannot pass by matching nothing', () => {
     );
     // At the real count rather than a token floor, this round's own convention.
     expect(farmingEndgame.length, 'and it still has real endgame rows').toBe(12);
+    // AND THE OUTCOME FOR EVERY OTHER FAMILY, which the two lines above do not
+    // reach (masterwrought Phase 11j QA). The pin is the set the matrix
+    // ACTUALLY refused, so it fails on a family-scoped narrowing of the rule
+    // as well as on deleting it: six rows across all five gathering
+    // professions, fishing twice because both its crafted rods sit at or above
+    // the cap. Corpse harvesting is absent because it has no tool of its own,
+    // which is the refusal being structurally inert there rather than off.
+    expect([...REFUSED_ENDGAME_ROWS].sort(), 'the rows decision D refused').toEqual([
+      'farming:recipe_evergarden_hoe',
+      'fishing:recipe_clockreel_fishing_rod',
+      'fishing:recipe_tidewrought_fishing_rod',
+      'herbalism:recipe_sunpetal_sickle',
+      'logging:recipe_elderwood_axe',
+      'mining:recipe_arcanite_mining_pick',
+    ]);
     // The precondition: both kinds of recipe exist, so neither branch of the
     // discriminator is unreachable over this corpus.
     const isTool = ALL_RECIPES.filter((r) =>
