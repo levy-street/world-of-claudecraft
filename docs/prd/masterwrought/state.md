@@ -15831,3 +15831,576 @@ code trusted, which is the rule this packet already wrote down.
   wiki page with its two false claims corrected and both pinned, and a release
   sync whose no-dropped-hunk claim rests on a mechanical reproduction rather
   than on reading the diff.
+
+## Phase 11l BUILT ledger (2026-08-24, the trophy economy)
+
+VERDICT: **BUILT**, LOCAL, no push, no PR. Base tip b94887558d (the 11k QA
+stamp), `git log --oneline b94887558d..HEAD`: the promotions plus taxonomy, the
+trophy consumer rows, the economy recompute plus wiki regen, the first review
+fix round, the second round (two more adoptions plus every fix-round finding),
+and the docs.
+
+THE PHASE IN ONE LINE: nine orphaned junk drops feed a craft instead of a
+vendor, at zero new item ids; the settled record predicted fourteen, and the
+record's own output doctrine, run row by row for the first time, is what moved
+the count, three times.
+
+### STEP 0: THE FIFTEENTH RELEASE SYNC WAS A ZERO-COMMIT NO-OP
+
+`origin/release/v0.40.0` still sits at efb1220e85, the tip the fourteenth sync
+merged; `git rev-list --count HEAD..origin/release/v0.40.0` printed 0 and the
+merge reported already up to date. No merge commit exists, so the
+release-merge-audit skill had nothing to audit (recorded, not skipped
+silently). Every baseline was RE-MEASURED at b94887558d rather than carried,
+per the brief, and all four came back identical to the 11k stamp: full suite
+EXIT=0 (3167 files / 21 skipped, 46553 passed / 2 expected fail / 373
+skipped), `ci:changed` EXIT=0 (804 files, 3111 warnings, 0 errors), `tsc`
+clean, `wiki:content` and `i18n:gen` zero diff. Nothing upstream contributed
+drift to this phase; every moved number below is the phase's own.
+
+### THE SETTLED RECORD, WHERE IT ACTUALLY LIVES, AND HOW IT WAS EXECUTED
+
+The phase file points at state.md for the settled rows; they live in
+`docs/prd/masterwrought/farming/state.md`, rows 82 to 85 (11l-D-11,
+11l-HOLDOUT, 11l-SELL, 11l-RUNG) and rows 122 to 123 (qr-11l-OUT,
+qr-11l-VALUE). The pointer is the drift; the rows are the decision, and this
+phase executed them without re-deciding anything:
+
+- **11l-D-11, the mapping.** Followed id for id. No trophy was re-mapped to
+  another craft; membership was decided by the arithmetic the rows delegate it
+  to, exactly as instructed, and every adopted reagent is quality common.
+- **11l-HOLDOUT.** `tangled_weed` and `soggy_moccasin` stay poor, are reagents
+  of nothing, and both sit on the TRUE arm of the sweep pin.
+- **11l-SELL.** Every sellValue in the diff is unchanged; all nine adopted
+  values are pinned to literals (6, 12, 14, 42, 35, 5, 5, 300, 320).
+- **11l-OUT.** Every consumer row outputs an EXISTING, previously uncrafted
+  shipped item, the checklist executed and written into each row comment
+  (uniqueness through `recipeForResultItem`, quality at or below the rung's
+  ladder quality, the flavor pairing, the open-interval arithmetic). No
+  shipped bill was edited. The exclusion record is greppable in the
+  `TROPHY_RECIPES` header as well as here.
+- **11l-RUNG.** Each row's rung follows its trophy's drop level (zone1 to 0,
+  zone2 to 25, zone3 and dungeon to 50), and every adopted bill's output sits
+  strictly above the trophy it eats and strictly below the bill, pinned in
+  the stricter stacked form (output above sellValue times consumed count).
+
+### THE CENSUS, RE-DERIVED FROM THE MERGED TREE
+
+29 junk-kind ids appear in a mob drop table. Four feed a recipe already
+(`bone_fragments`, `linen_scrap`, `spider_leg`, `wolf_fang`, the precedent).
+Four are the tier-4 farm seeds (`evergarden_greens_seed`,
+`evergarden_pumpkin_seed`, `gilded_sunmelon_seed`, `gilded_yam_seed`): kind
+junk, quality common, sellValue 8, dropped by Nythraxis at 0.04 and stocked by
+the Heroic Quartermaster, and consumed by the PLANT action
+(`professions/farming.ts` `removeUnlockedFromSlots`), which the recipe-reagent
+predicate cannot see. They are already `FARM_MATERIAL_ITEM_IDS` members and are
+recorded here as a NAMED NON-ADOPTION with that reason, not as orphans. The
+remaining 21 match the phase file's list exactly; 17 of them ship poor. Every
+other spend mechanism was enumerated before calling any of the 21 an orphan
+(enchant reagents, quest turn-ins and `requiredItems`, pattern learns, rift
+essence and gems, heroic marks, respec and skin tokens, tool-effect
+materials, pet feed, bag use, mech chroma, and downward grade substitution):
+none reaches any of the 21.
+
+### THE MATRIX: NINE ADOPTED, TEN EXCLUDED, TWO HELD OUT
+
+The settled prediction (qr-11l-VALUE) was FOURTEEN adopted and FIVE value
+exclusions, measured against the CRAFTED output ceiling (460). The output
+doctrine (qr-11l-OUT), written the same day, makes every output an UNCRAFTED
+shipped item and was never run against that pool. Run here it moved the count
+twice, both times as a divergence recorded under the record's own clause ("a
+mapping for which no defensible existing output exists is EXCLUDED and
+recorded, exactly like a value exclusion") and never as a re-decision:
+
+- SIX mapped poor trophies have NO defensible uncrafted output in their
+  craft's register (below), so adoption fell from fourteen to eight; a
+  SEVENTH, the weaponcrafting tusk, fell the same way in the sixth fix round
+  (on the fifth review's finding) after two re-picks, because every physical
+  candidate is dominated by the trainer's own rung-25 dirk and weaponcrafting
+  serves casters only at rung 50 (below).
+- TWO of the five predicted value exclusions turned out to be ADMITTED by the
+  arithmetic once the output pool is the uncrafted one: the leather ceiling
+  the record measured (420, crafted) is not the ceiling the doctrine uses (the
+  uncrafted leather pool reaches 450). I first wrote the opposite into this
+  ledger's own draft ("no uncrafted leather output between 320 and 460
+  exists"), a false ground caught by grepping my own sentence before it
+  shipped, which is the fifth phase running this packet has needed that check.
+  Adoption rose from eight to ten, then settled at nine.
+
+ADOPTED (nine rows in `TROPHY_RECIPES`, `src/sim/content/recipes.ts`; the seven
+poor trophies promote to common, the two leather trophies were common already):
+
+| trophy (sell) | craft, rung | output (quality, sell) | bill (input) | interval |
+|---|---|---|---|---|
+| cracked_fetish (14) | inscription, 25 | valefire_lantern (uncommon, 160) | fetish x2, goldleaf_herb x2, arcane_essence x1, glass_vial x1 (178) | 14 < 160 < 178 |
+| mudfin_scale (5) | leatherworking, 25 | oiled_boots (uncommon, 80) | scale x4, rough_hide x6, spider_silk x2, tanning_agent x2 (92) | 5 < 80 < 92 |
+| cracked_wyrm_scale (35) | leatherworking, 50 | gravewyrm_bone_quiver (rare, 360) | scale x3, pristine_hide x2, thorium_ore x4, tanning_agent x1 (411) | 35 < 360 < 411 |
+| old_cragmaws_pelt (300) | leatherworking, 50 | wildgrove_cinch (uncommon, 420) | pelt x1, pristine_hide x3, thorium_ore x1, tanning_agent x1 (451) | 300 < 420 < 451 |
+| emberwing_cinderscale (320) | leatherworking, 50 | cragprowl_belt (uncommon, 440) | cinderscale x1, pristine_hide x3, thorium_ore x1, tanning_agent x1 (471) | 320 < 440 < 471 |
+| bogiron_nugget (12) | armorcrafting, 25 | hobnail_boots (common, 90) | nugget x3, iron_ore x3, smithing_flux x2 (100) | 12 < 90 < 100 |
+| cracked_ogre_tusk (42) | weaponcrafting, 50 | fenshadow_maul (uncommon, 420) | tusk x2, elderwood_log x2, smithing_flux x2 (444) | 42 < 420 < 444 |
+| tallow_candle (5) | alchemy, 25 | healing_potion (common, 32) | tallow x2, goldleaf_herb x1, glass_vial x1 (82) | 5 < 32 < 82 |
+| bandit_bandana (6) | tailoring, 0 | linen_pouch (common, 60) | bandana x2, linen_scrap x4, spool_of_thread x4 (72) | 6 < 60 < 72 |
+
+Unit values are buyValue-first per `tests/recipe_economy.test.ts` (flux 20,
+vial 12, goldleaf 60, thorium 60, elderwood 160, thread 12, tanning agent 16;
+ores, herbs, dust, essence, hides at 5 and 25, silk and every trophy at
+sellValue). Every bill contains its trophy, which has no buyValue, so no row
+can join the counterfactually-vendor-fed set, and that literal did not move.
+Four things about the rows a reader would otherwise have to discover:
+the `linen_pouch` row crafts vendor stock (250 at the counter), so crafting is
+the discount route, which is the phase's point; the two rare-elite leather
+rows turn a guaranteed trophy into a deterministic door beside a 0.02 trash
+roll from a DIFFERENT kill (the cinderscale to the ogres' belt, the pelt to
+the cinch Old Cragmaw's own stalker pack drops), the shape the 11k QA accepted
+for the quiver; the one catalogued relic among the nine outputs
+(`gravewyrm_bone_quiver`) names the recipe on its Reliquary page as a second
+comparable door (`fromProfession('leatherworking')`, the boundstone_helm shape,
+forced by the existing page-versus-recipe guard); and the pinned economy
+doctrine is list-count-only by the shipped test's design: under the sim's
+three reagent discounts (specialization 0.8, the self-signed count-1, Jack's
+0.9, the crafter's reward) eight of the nine floors sit under their output (the
+maul at 222 in against 420 out is the largest; the healing potion at 77 in
+against 32 out is the one that does not; the 40-copper gold sink turns the
+oiled boots, the cinch and the belt gold-negative again), bounded by trophy
+supply
+rather than by the pin, and every row prints both its specialization-only bill
+and its true floor, with all nine floors pinned to literals through the test's
+own `minAchievableInputValue` so they are VISIBLE rather than guarded (the
+#1301 gold sink adds 40 copper per craft on top).
+
+THE PELT WAS RE-PICKED TWICE MORE, at the round-two and round-three reviews.
+Its first output, `cragmaw_huntcord`, is Old Cragmaw's OWN 0.25 chase belt,
+and the pelt is that same mob's guaranteed drop at one unit per bill, so one
+kill made the mob's chase item deterministic; not the quiver's shape (three
+0.5 trash-drop scales beside a 0.05 boss roll), and costing two pelts is
+barred by the doctrine itself (600 vendored against 340 out is the trap
+11l-RUNG forbids). The second output, `cragwalker_boots`, is nobody's chase
+item but a white boot with no primary stats, the only rung-50 recipe in the
+catalog whose output is a common equippable, dominated in its own zone by the
+rare prowlboots off the very boss whose pelt feeds it: a pelt sink, not a
+prize (R21). The third and final output, `wildgrove_cinch`, is the uncommon
+druid caster belt the stalkers drop at 0.02, a real prize a level-20 crafter
+would make, at the cragprowl row's exact shape.
+
+VALUE-EXCLUDED, three of the record's five, re-derived rather than pasted (the
+crafted ceiling is still 460, `boundstone_helm`): `gleamstag_charm` 2500 and
+`deepfen_pearl` 600 (jewelcrafting: the uncrafted jewelry pool above 600 is 16
+endgame epics, barred by the rung-50 rare ceiling, and one rift rare at 5000,
+rift-exclusive relic content a bill cannot honestly exceed), `guardian_core`
+180 (engineering's lane is empty by ruling, row 119, whatever the arithmetic
+says). All three untouched on every axis.
+
+OUTPUT-EXCLUDED, the six the doctrine adds, each with the derivation:
+
+- `pale_pearl` 30 and `ogre_toe_ring` 25 (jewelcrafting). Jewelcrafting's
+  register is neck and ring (all 13 of its rows). The uncrafted neck and ring
+  pool is 9 WARFARE honor pieces at sellValue 0 (epic, `pvp_honor.ts`) and 16
+  endgame epics at 1800 to 50000; nothing in (25, 460]. A sweep of every
+  uncrafted id whose name reads jewel, gem, pearl or prism found only the
+  trophies themselves, a fine herb, an apex pattern item and a cloth circlet.
+  Jewelcrafting's lane goes EMPTY, like engineering's, and the phase file's
+  "jewelcrafting and inscription are the point" is intent the doctrine could
+  not honour on this catalog.
+- `briny_idol` 32, `frayed_prayer_beads` 30, `moonpale_scale` 26
+  (inscription). Inscription's register is caster held-offhands and scrolls.
+  The uncrafted scroll pool is EMPTY; the uncrafted held-offhand pool is six
+  ids: three hunter quivers (leatherwork), two epics at 12000, and
+  `valefire_lantern`. One in-register output for four mapped trophies. It went
+  to `cracked_fetish` on rung fit: the lantern is item level 7 and uncommon
+  (rung 25 at most), and the fetish is the one zone2 trophy of the four; the
+  three temple and zone3 trophies would have paired a level-20 bill with a
+  level-7 offhand.
+- `inert_storm_shard` 28 (enchanting). Every candidate above 28 is barred by
+  a shipped ruling or the deed literal: `arcane_shard` is reserved for the apex
+  band (phase 04, restated at recipes.ts on the jewelcrafting and inscription
+  catalogs), the five `resonant_*` secondaries are enchant-exclusive
+  disenchant outputs and rare, `wyrmfall_core` is rare and dragon-flavored,
+  `arcanite_bar` is a master-stocked premium reagent, `glimmerfin_koi` is a
+  fish, and any rare output would put enchanting on `rareTierCrafts` and owe a
+  `prog_enchanting_rare` deed (`tests/deeds_content.test.ts`). Enchanting's
+  lane goes empty.
+- `chipped_tusk` 15 (weaponcrafting), the seventh, found by the fifth review
+  round and applied in the sixth fix round, after two re-picks. Its band is
+  rung 25. Of the 25 uncrafted weapons selling in (15, 460], the 18 physical
+  rows are strictly dominated by the trainer's OWN rung-25 row
+  `recipe_whetted_iron_dirk` (16-24 at 1.8, 11.1 dps, agility 5 stamina 2, no
+  class lock, a 50-copper bill): the carving knife at 3.06 dps (the recipe
+  had also minted a misleading item level 15 onto it), the Drowned Litany
+  fang knife at 10.0 dps and rogue- and hunter-locked for a 208-copper bill,
+  the Crossroads caravan set near 4 dps. The 7 caster rows have no rung-25
+  comparand because weaponcrafting serves casters only at rung 50, where the
+  elderwood battle staff (rare, int 9 spi 4) dominates all seven; the one
+  inside the deleted bill's reach, `corpse_candle_focus`, is delve chest loot
+  with the fang knife's reward-loop question and no tusk flavor. Every
+  rung-50 physical candidate is dominated by the crafted rares on every axis
+  but one (a druid staff edges the warblade's dps by five hundredths). Under
+  R21 no output is a prize, so the doctrine's answer is exclusion; the tusk
+  returns to poor, untouched on every axis, and weaponcrafting keeps the maul.
+
+The exclusion list's reasons were read for what they do NOT cover before it
+was frozen, and that reading is what caught the leather pair: jewelcrafting
+has no trinket slot and no other output class; inscription has no uncrafted
+scroll; the enchanting bars cover crafting AS WELL AS consuming (a craft
+faucet breaks the 1:1 disenchant sizing); and the leather reasons, once read,
+covered nothing, so the pair adopted.
+
+### THE PINS THE PHASE MOVED (predicted, then observed)
+
+| measure | before | predicted | observed |
+|---|---|---|---|
+| adopted rows | 0 | 14 (record), 8 (first derivation), 10 (round two), 9 (round six) | 9 |
+| promoted defs (poor to common) | 0 | 8, then 7 (the two leather trophies were common; the tusk went back) | 7, in items.ts, zone2.ts, zone3.ts; temple.ts and realm.ts untouched |
+| MATERIAL_ITEM_IDS size (bootstrap pin) | 108 (the file said 66) | 116, 118, then 117 | 117 |
+| HONEST_MATERIALS literal | 108 ids | +8, +10, then +9, sorted | 117, exact-set green |
+| live poor count / non-vacuity floor | 21 / >15 | 13 then 14 / re-derived to >9 | 14; floor >9; PLUS an exact 14-id survivor pin |
+| poor survivors | | amber_hide, briny_idol, chipped_tusk, deepfen_pearl, frayed_prayer_beads, inert_storm_shard, moonpale_scale, ogre_toe_ring, pale_pearl, soft_down, soggy_boot, soggy_moccasin, stag_antler, tangled_weed | exactly those 14 |
+| ALLOWED_UNCLASSIFIED_JUNK | 10 (the file said six; harvest_feast and the three apex feasts joined since) | unchanged, then minus the leather pair | 8, tripwire green, the four feasts untouched |
+| isMaterialItem negative control | guardian_core | stays valid | stays valid |
+| ALL_RECIPES | 156 | 164, 166, then 165 | 165 |
+| trainer-recipe sum | 98 | 106, 108, then 107 (a TROPHY term plus its sibling literal) | 107, literal 9 |
+| counterfactual vendor-fed literal | 7 ids | unchanged | unchanged |
+| crafting-hub foreign-bound literal | 24 pairs | +recipe_valefire_lantern:apothecary | 25 |
+| forge trainer locked-row literal (train_view) | 23 | +3 forge rows, then +2 | 26, then 25 |
+| alchemy herb demand / goldleaf total | 44 / 29 | 45 / 32 | 45 / 32 |
+| professions blob bytes (band) | 16924 (16544..16935) | 17124, 17122, 17170, 17171, 17171, 17171, 17143 | 17122, 17172, 17172, 17171, 17171, then 17143 (16763..17154): I miscounted the leather ids TWICE (two short at round two, one short at round three, the cragwalker id was 23 characters like the huntcord's); every later prediction landed exactly; the lanes' re-derivations are exact and the pins carry every recount |
+| mastery model rung-25 iron literal | 100 | moves (hobnail row wins the tie-break) | 75, winner pinned at exactly 25 crafts |
+| Reliquary distinct sources | sanctum 8, spoils 19 | 9, and 20 then back to 19 | 9, 19 |
+| Reliquary route floors (recipe / mob / checked) | 4 / 209 / 422 | re-derived to the measurement | 6 / 211 / 426 |
+| item-art audit catalog bytes / sha | 498026 | +16 (8 x 'common' minus 'poor'), then +14 | 498042, then 498040, sha re-pinned twice |
+| output item levels | | 7, 11, 23, 10, 13, 15, 17, undefined, undefined (the boots at 15 until the qa gate's re-level; the carving knife at 15 and then the fang knife at 16 until the tusk was excluded, both now pinned undefined again) | as predicted, pinned with the recipe levels |
+| parity goldens | | inventory_vendor only, rng unmoved | 13+/13-, digest 811c9dc5 in every frame, draws 0 |
+| shipped_item_ids golden / liveItemCount | 922 | unchanged | unchanged |
+| i18n bundles | | zero diff (no new key) | zero diff |
+| wiki content | | +8 rows, then the maul swap, then +2 rows; no quality lines | as predicted, each regen idempotent |
+
+THE 11m HARD INPUT SURVIVES: `mudfin_scale` is adopted and promoted, so 11m's
+`gills` mapping reads a common material in the tree.
+
+### WHAT THE PROMOTION FLIPPED WITH NO CODE EDIT (all pinned)
+
+The kind label (Junk to Material), the "Used by <craft>." hint, the bags
+materials chip, the bank deposit sweep, the vendor instant-sell gate
+(`vendorSellIsInstant`, which no brief named: a plain vendor click on an
+adopted reagent now prompts instead of selling), the `col_junk_drawer` meter
+(below) and the item-art audit catalog. All reuse shipped keys; no i18n key
+was owed, and a per-item hint lead was deliberately not added (it would
+duplicate the Used-by line and owe five non-Latin fills).
+
+### DEVIATIONS FROM THE PHASE FILE, each recorded rather than silent
+
+1. **NINE, NOT FOURTEEN, BY WAY OF EIGHT AND TEN.** The output doctrine's own
+   checklist excludes seven mapped ids (six at derivation, the tusk at the
+   sixth fix round, on the fifth review's finding) and admits two the value
+   prediction had excluded.
+   Above, with the derivation per id.
+2. **ONE RECIPE FILE, ONE LIST.** The file's four-agent split assumed
+   per-profession recipe files; every recipe lives in `recipes.ts`, so the
+   rows landed as ONE new `TROPHY_RECIPES` list (the INTERMEDIATE precedent),
+   one lane owning the file, and the commit cadence is one commit for the rows
+   rather than one per profession group.
+3. **THE COUNT PINS THE FILE NAMED WERE STALE.** MATERIAL_ITEM_IDS 108 not 66;
+   ALLOWED_UNCLASSIFIED_JUNK ten not six; measured, not pasted.
+4. **FIVE RECIPE LEVELS ARE CAPPED BELOW THE SCAFFOLDING.** The item level
+   index reads `recipe.level` as an acquisition source (`item_level.ts`
+   `buildSourceIndex`), so the convention's 15 and 20 would have re-tiered
+   shipped items (the lantern 7 to 16, the boots 11 to 16, the maul off its
+   budget). Capped at each output's live source (6, 10, 12, 14, 16) under the
+   level doctrine in `professions/types.ts`. `recipe.level` has three
+   consumers and each row records all three: the index above, the
+   profession-XP band (`craftActionXp`: a level-20 crafter earns 0 character
+   XP on the three gray rows at 6, 10 and 12, and 19 and 42 on the green rows
+   at 14 and 16, against 100 for a level-20 row), and the masterwork bonus
+   path for stat-bearing outputs (the shipped behavior for every such row).
+   Two outputs had NO source to cap against and GAIN a derivable item level
+   and a tooltip item-level line they never showed: the fang knife takes the
+   rung scaffolding (15, item level 16, on the 11.5 dps budget curve at its
+   10.0 dps; it becomes the one delve chest item with a derived level), and
+   the hobnail boots take an HONEST content level of 10 instead, because the
+   scaffolding 15 would have stamped a stat-less armor-18 mail boot above this
+   phase's own oiled_boots (armor 25, agility, item level 11); no equip gate
+   moves (`requiredLevelFor` gates rare and above only), stats are untouched,
+   and the budget sweeps pass on identity, not slack. Every output item level
+   and every recipe level is pinned.
+5. **THE WEAPONCRAFTING RUNG-50 ROW WAS RE-PICKED AT THE REVIEW ROUND.** The
+   first pick, `bristleback_maul`, is item level 7, so a rung-50 crafter had
+   no reason to make it (masterwrought R21); `fenshadow_maul` (level 13, the
+   Deacon Voss maul) replaces it. The lantern keeps a milder version of the
+   same tension (rung 25, item level 7) because inscription has no second
+   in-register output; accepted and recorded, not hidden.
+6. **THE SWEEP FIXTURES MOVED.** `mudfin_scale` and `bandit_bandana` were the
+   gray fodder of four sell-junk fixtures and one parity scenario; all swapped
+   to `soggy_moccasin` and `tangled_weed` with the arithmetic re-derived (19c,
+   27c), and the golden re-recorded with the hunted beat kept LIVE.
+7. **SIX MORE FIXTURES OUTSIDE THE FILE'S BLAST LIST** depended on the
+   adopted ids' quality or on the recipe count (the bags chip census, the
+   market rarity exemplar, the /bags sort readout, a buyback comment, the
+   mastery model's rung-25 pick, the forge trainer's locked-row literal), and
+   two more the full-suite probe found where the curated battery could not
+   (the item-art audit fingerprint, the train view).
+
+### DETERMINISM: NOT IN PLAY, AND SAID PLAINLY
+
+No rng draw, no tick-phase change, no wire field, no facet member. The one
+golden that moved did so because its fixture item was swapped, and every rng
+digest in it is identical.
+
+### OPEN ITEMS: THE ELEVEN ARE THE MAINTAINER'S, AND THIS PHASE ADDS ONE
+
+The eleven carried in are unchanged and none was needed to execute this phase.
+Two TUNING READS are flagged for the maintainer's eyes without a ruling row,
+because the doctrine they sit under is list-count-only by design and neither
+breaks a rule: the fenshadow maul's specialization-only bill is 222 against
+420 out, net +158 copper per craft after the 40-copper gold sink and the
+largest surplus of the nine (the quiver is next at +29 at specialization alone
+and +89 at its reachable bill, a self-signed thorium stud), bounded by one
+tusk per craft from a single named elite; and the hobnail boots' recipe level
+is an honest 10 chosen by hand rather than derived from any source. Both are
+recorded at their rows.
+
+This phase ADDS a twelfth OPEN item, found by the content reviewer and pinned
+rather than decided:
+
+12. **`col_junk_drawer` has one of margin.** The deed asks for ten distinct
+    poor-quality discoveries (renown 5) and its meter recounts
+    `itemsDiscovered` against LIVE quality. The promotion cut the reachable
+    poor pool from 18 to 11 against an amount of 10 (it sat at exactly 10
+    until the tusk went back to poor in the sixth fix round; three poor
+    ids, `amber_hide`, `soft_down`, `stag_antler`, the Brightwood Glade
+    wildlife pack, have no acquisition route anywhere), so a routine
+    collection deed now demands all but one obtainable poor item,
+    `deepfen_pearl` (a dungeon final boss) and `soggy_boot` (fishing only)
+    among them, and a character holding promoted
+    trophies sees an in-progress counter regress (earned deeds are never
+    revoked). Re-tuning a shipped trigger is forbidden to a phase
+    (`docs/design/deeds.md`, never retro-edit a shipped trigger), and the same
+    doc names `retroFallbackGrants` as the sanctioned heal for this failure
+    mode; the candidates are lowering the amount through that heal or
+    sourcing the wildlife pack. `tests/deeds_content.test.ts` now pins the
+    reachable set (11), the unreachable set (3) and amount <= reachable, so
+    the promotion after next reds it.
+
+### THE REJECTION LIST, AS RECORDED DESIGN
+
+- Adopting `soggy_moccasin` as a scrap (11l-HOLDOUT, inherited).
+- Stretching a bill to admit `bogiron_hauberk` (300, the flavor match for
+  the nugget) at rung 25: it needs ten iron ore or five essence on top of six
+  nuggets from a single 0.3 source; `hobnail_boots` at 90 is the honest bill.
+- A rung-50 output above the 460 ceiling for the ogre tusk (every zone3-band
+  uncrafted weapon sells 700 or more): a new ceiling and a stretched bill.
+- A rung-25 tailoring row for the bandana on the strength of its two level-20
+  galecrest sources: the zone1 band carries three of four sources.
+- A per-item `hudChrome.materialHint.*` lead for any of the nine.
+- Editing `col_junk_drawer`'s trigger, or sourcing the wildlife pack, inside
+  this phase: both are the maintainer's.
+- Pricing non-gathered reagents in the mastery model (the trophy rows win
+  its tie-breaks because a mob drop costs it nothing): a model question for
+  the maintainer, recorded with the moved literal.
+- Authoring a `prog_enchanting_rare` deed to force an enchanting row through
+  a rare output: a deed minted to make a mapping true.
+
+### THE REVIEW ROUNDS: EIGHTEEN FRESH READERS, EVERY FINDING APPLIED
+
+ROUND ONE, three readers over the three phase commits (content obligations,
+frontend seam, test coverage): 1 BLOCKING, 12 SHOULD-FIX, 5 NITS, all applied.
+The blocking finding is the deed above. The should-fixes that changed the
+diff rather than its prose: the weaponcrafting rung-50 re-pick (R21), the
+reliquary recipe-family floor, the two vendor-only rows' level derivation,
+the mastery model's silent winner, the trophy-above half of the interval
+(pinned nowhere until then), `recipeForResultItem` uniqueness (a comment,
+not a test, until then), the eight frozen sellValues, the outputs' item
+levels, and a FIFTH flipped surface no brief named (`vendorSellIsInstant`).
+The frontend reader's verdict on i18n stands as recorded: no key owed, and
+the vendor hint copy ("every gray item") stayed literally true because it is
+worded on quality.
+
+THE FIX ROUND WAS REVIEWED AS UNREVIEWED CODE, by two more readers, AND IT
+WAS NOT CLEAN: the item-art audit catalog fingerprint was RED at the reviewed
+tip (the catalog embeds quality; +16 bytes; the promotion commit had moved it
+and neither the phase battery nor round one ran that file), the reliquary
+mob floor sat at 209 under a comment that measured 211, the mastery pin
+proved presence rather than the exact count, the deed walk's exact pins were
+right on the merits but its source list was narrower than its completeness
+claim, and the ledger's own EXCLUSION RECORD did not yet exist anywhere a
+grep could find it. Two more prose defects in my own comments: a "fifth
+surface" ordinal nothing enumerates, and "elderwood haft" for an item whose
+display name is Highpine Log. 2 BLOCKING (the same red file, seen by both),
+7 SHOULD-FIX, 10 NITS, all applied in round two.
+
+ROUND TWO'S OWN CONTENT CHANGE, the leather pair, came out of my prose check
+rather than out of a reviewer: see the matrix.
+
+ROUND TWO WAS REVIEWED AS UNREVIEWED CODE BY TWO MORE READERS: 0 BLOCKING, 9
+SHOULD-FIX, 14 NITS, all applied in round three. The finding that changed
+content is the pelt re-pick above. The rest were the record's own prose (the
+jewelry pool miscounted and self-contradicting, `guardian_core` labelled a
+value exclusion when its exclusion is a ruling, "the one uncrafted caster
+offhand" refuted by an epic orb the rung cap bars, the record's scope never
+stated, a "two kills" clause describing the listed bill inside the sentence
+about the discounted one), two stale counts, a deed-walk closure claim that
+denied the market is a faucet when its house stock is a reseeded table (now
+walked), a sweep-arm addition that proved nothing on revert (now derived), a
+vacuous negative pin, and two coverage gaps (the tannery trainer's locked rows,
+the two adopted-common ids' Used-by line). One INFO item is carried to the QA
+twin rather than fixed here, because it predates this phase's rows: crafting a
+relic whose page carries a dungeon clear meter (`gravewyrm_bone_quiver` on
+`conquerors_gravewyrm_sanctum`) stamps a first-find "on clear N" of a dungeon
+the craft had nothing to do with, because the crafting grant path carries no
+`movement` flag; the spoils page has no meter, so the round-two relic never
+had the problem, and the round-three re-pick removes it from the catalog
+anyway.
+
+ROUND THREE WAS REVIEWED THE SAME WAY BY TWO MORE READERS: 1 BLOCKING, 8
+SHOULD-FIX, 8 NITS, all applied in round four. The blocking finding was a
+one-copper claim ("holds by one copper", 401 against 400) that no test
+guarded; the fix is the ten-row floor map pinned through the test's own
+`minAchievableInputValue`, which also closed the should-fix that seven rows
+printed the shallower specialization-only figure as "the discounted bill"
+(the quiver's printed 291 against a true floor of 196 was the worst). The
+content finding was the boots themselves (above), and the record gaps were
+the three consumers of `recipe.level` (one recorded of three), the Jack of
+All Trades multiplier the header omitted, a profession-hint arm with no
+positive control, and a comment placed under the wrong section header.
+
+THE QA GATE RAN LAST, over the whole range with round four read first as
+unreviewed code, and returned NOT READY on five FAILs: three were this
+ledger, the progress row and the two doc files not yet committed (STEP 6, in
+flight), and two were the class round four had just established and not
+applied to the other vendor-only rows. The carving knife was the sharp one:
+a 4-7 at 1.8 dagger, 3.06 dps, the weakest in the catalog but one, and the
+recipe had MINTED an item level 15 onto it that sorted it above rare
+level-14 daggers doing 2.6 times its damage. Re-picked to the Mirejaw
+fang-knife (above); the hobnail boots kept their output and took an honest
+level 10. The gate also found the one behavior change no test pinned (the
+ten leave the bag sort's trash rank, now pinned), the maul surplus (recorded
+above), and four record nits (the quiver's uncapped-by-coincidence level,
+the two slotless rows' scaffolding levels, the floor map's "cheapest
+achievable" overstatement, and the six-member allowlist prediction this
+ledger records as ten then eight). Its own adversarial pass cleared master
+loot thresholds, party loot strategy, gathering supply, battlefield-XP
+attribution on drop-and-craft outputs, the $WOC exchange's quality snapshot,
+the World Market, heroic variants, deed side effects and the vendor
+instant-sell gate by reading the code rather than assuming. Everything
+applied in round five, itself read fresh before the freeze.
+
+ROUND FIVE WAS READ BY TWO MORE, and the content reader ended the tusk: the
+fang knife it had just chosen is strictly dominated by the trainer's OWN
+rung-25 row (the whetted iron dirk: 11.1 dps, agility 5 stamina 2, no class
+lock, a 50-copper bill), so the row was a tusk sink under a new name, and no
+uncrafted weapon in the tusk's band survives beside that dirk. That is the
+doctrine's exclusion clause, not a re-pick, and round six applied it (the
+seventh output exclusion, above). The test reader found the header's
+self-sign caveat refuted for four rows (a self-signed pristine hide reaches
+the cinch and belt floors exactly; a signed thorium or iron moves the quiver
+and the boots part way) and the Jack caveat's "safe direction" backwards for
+the vendor-loop bound (excluding the 0.9 multiplier makes the bound MORE
+permissive; the sootscale mantle's Jack-arm bill is exactly its output),
+plus the rule of three on the derived adopted-list block three suites had
+copied. 0 BLOCKING, 5 SHOULD-FIX, 8 NITS, all applied in round six: the
+caveats now say per row which figure is reachable, a source scan pins that
+`attuneJackOfAllTrades` has no production caller so the day one lands the
+bound is re-derived, and the derivation lives in one tests helper with its
+own three-arm test.
+
+ROUND SIX WAS READ BY TWO MORE: 0 BLOCKING, 5 SHOULD-FIX, 7 NITS, all
+applied in round seven. The content reader caught the exclusion record
+over-claiming: the physical dirk dominates the eighteen physical candidates,
+but the seven caster weapons in the band have no rung-25 comparand at all
+(weaponcrafting serves casters only at rung 50, where the elderwood battle
+staff dominates them), so the record now says which half each argument
+covers; the verdict did not move. The test reader found the Jack scan with
+a positive control for one of its two roots and blind to the second writer
+of the flag (the archetype hydrate path), the reachable-bill and gold-sink
+figures living only in prose, and the two deleted view-function pins with
+no empty-result replacement; round seven pins all of it (per-row
+specialization-only, floor and reachable figures with the sink term read
+from the real constant, per-root file-count floors on the scan, the
+closed-circuit write guard) and moves the helper's test beside the helper.
+
+ROUND SEVEN WAS READ BY ONE MORE: 0 BLOCKING, 3 SHOULD-FIX, 5 NITS, all
+applied in round eight, which I made myself. The reader mutation-proved four
+of round seven's pins red and then proved the one that did not: the
+literal-true write predicate let a non-literal right-hand side, a compound
+assignment and a quoted computed key through. The predicate now sees every
+assignment to the flag, skips a write of the literal false (a crafting
+default parameter), and names the hydrate arm's guarded assignment as the
+third link of the circuit beside the mint and the serializer's re-emit; a
+planted non-literal assignment under headless reds it, proven before the
+commit. The duplicated floor arm went, the sink helper's comment now points
+at the suite that drives the charge site, and the record dates the weapon
+counts it derives.
+
+ROUND EIGHT, MY OWN, WAS NOT CLEAN EITHER, AND THE READER PROVED IT: 2
+BLOCKING, 5 SHOULD-FIX, 3 NITS. The 'hydrate' label I had added keyed on a
+substring with no positional bound, so a persisted disjunction one clause
+longer minted a Jack on load with 130 tests green, and the literal-false
+skip tested a prefix, so `false || true` was swallowed. Round nine anchors
+the hydrate arm inside `normalizeArchetypeState` and matches its right-hand
+side whole, matches the false skip on the whole right-hand side, teaches
+the assignment arm bracket access and the member arm any value, reads a
+last line to the end of the file, and adds the missing controls; four
+planted mutants (the widened disjunction, `false || true`, bracket access,
+a non-literal member) red the scan with the test running, and the clean
+tree stays green, all proven before the commit.
+
+ROUND NINE, MINE AGAIN, STILL HAD A HOLE: 1 BLOCKING, 2 SHOULD-FIX, 5 NITS.
+The whole-line false skip read one line, so a mint wrapped as `false` on its
+own line and `|| true` on the next passed green (biome would re-join that
+shape, a suppression would not). Round ten requires a terminator beside the
+literal false, drops an unpinnable lookahead, replaces a string control
+that compared a literal to itself with the source pin that bites, and says
+what the member arm really excludes; five mutants red, the clean tree
+green, proven before the commit.
+
+ROUND TEN'S READER FOUND NO LIVE HOLE. It re-planted the wrapped mint and
+watched it red, worked the terminator cases exhaustively, and returned one
+should-fix and three nits, all prose or a control: the false skip's start
+anchor had no control (dropping one character would let `saved.flag ??
+false` skip a mint), the end anchor likewise, a column count in a comment
+was off by one, and the blind-spot sentence omitted the wholesale-copy
+shape. ROUND ELEVEN applied those four and is THE ONE ROUND NO READER
+FOLLOWED: two control lines on a regex, one comment number turned into a
+description, one sentence naming a blind spot. Its diff is the last commit
+before the freeze and the 11l QA twin reads it first.
+
+THE READER COUNT, for the record: eighteen fresh readers over eleven review
+rounds, and every reviewed round found something the round before it had
+shipped, this ledger's author's rounds included.
+
+### THE HANDOFF TO PHASE 11l QA
+
+- **THE OUTPUT DOCTRINE IS THE THING TO RE-DERIVE, NOT THE VALUE ONE.** The
+  settled prediction was made against the crafted ceiling; every count that
+  moved in this phase moved because row 122's uncrafted pool answers
+  differently. Re-run the nine rows through the checklist yourself (uniqueness,
+  rung quality, in-register flavor, the interval) and the nine exclusions
+  through their recorded reasons; the `TROPHY_RECIPES` header carries the
+  greppable record, and the pool the explorers computed is reproducible from
+  `ALL_RECIPES` and `ITEMS` in one pass. The record's domination claims (the
+  tusk's above all) are selection results over catalog data stated as
+  conclusions; nothing pins them because the outcome is the ABSENCE of a row,
+  so they rot silently the day a stronger uncrafted weapon lands in the band.
+  Re-run them when one does.
+- **THREE ROWS WERE RE-PICKED AT REVIEW, TWO OF THEM TWICE.** The pelt (chase
+  belt, then a stat-less white, then the cinch) and the tusk (a 3 dps dagger,
+  then the fang knife). The standard that settled them is R21 applied to the
+  OUTPUT (would a crafter at that rung make it?) on top of the doctrine's
+  letter; judge the remaining eight against the same standard, the lantern
+  (item level 7 at rung 25) and the maul (a level-13 output at rung 50) first.
+- **THE ECONOMY IS LIST-COUNT-ONLY AND EVERY FLOOR IS VISIBLE.** Nine of ten
+  rows are gold-positive at the counterfactual floor and the maul is +158 per
+  craft at specialization alone; the floors are pinned so a change is loud,
+  not guarded so a change is refused. Whether the maul's surplus is wanted is
+  the maintainer's read, recorded, not decided.
+- **`col_junk_drawer` IS THE NEW OPEN ITEM.** Zero margin, live recount, an
+  in-progress regression for holders of promoted trophies; pinned so the next
+  promotion reds; the trigger is the maintainer's to move.
+- **THE PROSE CHECK PAID AGAIN, ON MY OWN SENTENCE.** The leather pair adopted
+  because the ledger's own draft reason for excluding them was false when
+  grepped. Grep every count in this ledger before believing it, including the
+  ones the reviewers verified: the blob byte count was mis-predicted twice by
+  one and two characters before it landed.
+- **WHAT 11m INHERITS GREEN:** `mudfin_scale` adopted and common (its `gills`
+  mapping reads the promotion in the tree), nine reagents that light the
+  Used-by line, the taxonomy at 118 with the allowlist at eight, and a
+  sell-junk sweep whose fixtures no longer lean on any adopted id.

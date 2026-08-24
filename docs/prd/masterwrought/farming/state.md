@@ -598,6 +598,7 @@ except the one hand-back, which gets its own table row:
 | The masterwrought delegated-rulings block (133 rows, the full delegation plus the same-day reconcile pass), migrated here whole at the 11b doc move | MW 11b | record | closed-by-the-2026-08-20-delegation (block below) |
 | The guide professions-overview reword (ruling 11b-R3c-2): write the merged five-gathering sentence around guide.profPages plus the five non-Latin overlays, AND reconcile it with farming's count-free guard in tests/guide.test.ts, which forbids ANY spelled count while the ruling's wording spells "five"; 11c records whichever way it resolves (11b carry items 4 and 14) | MW 11c | 11c session | CLOSED 2026-08-21, executed COUNT-FREE: guide.professions.whatBody rewritten ("the gathering trades ... a ring of ten crafts"; "every gathering profession") with real count-free fills in the five non-Latin overlays; the guard stands unamended (its names-every-trade arm is self-maintaining) and ruling row 6 below carries the dated wording amendment; the stale professions.ts code comment swept (carry 15); reasoning in the 11c BUILT ledger |
 | The interaction-priority pin (ruling 11b-R3c-1): the placed transient (station or feast) wins over the farm bed. The merged tree keeps farming's shipped bed-over-feast order and masterwrought stations take NO press today (proximity-activated), so the both-directions pin needs the arm reorder first; owned by 11c per the ruling's carry clause, with the apex-feast press also concerning 11k (11b carry item 7) | MW 11c | 11c session | CLOSED 2026-08-21, EXECUTED (not re-routed): tryNearbyInteraction reordered (nodes, feast, bed, escort-away) and BOTH directions pinned in one tests/nearby_interaction.test.ts rig; the station half stays moot by construction (stations take no press; recorded at the arm), and 11k's apex feasts ride the ordered feast arm as placed farm_feast entities |
+| `col_junk_drawer` (src/sim/content/deeds.ts, "Discover 10 different poor-quality items", renown 5) has ONE of margin since 11l: its meter recounts itemsDiscovered against LIVE quality, and promoting seven junk trophies to common cut the reachable poor pool from 18 to 11 against an amount of 10 (one of margin; it sat at exactly 10 until the sixth fix round returned chipped_tusk to poor; amber_hide, soft_down and stag_antler, the Brightwood Glade wildlife pack, have no acquisition route anywhere), so all but one obtainable poor item is now required (deepfen_pearl from a dungeon final boss and soggy_boot from fishing included) and a character holding promoted trophies sees an in-progress counter regress (earned deeds are never revoked). A phase may not retro-edit a shipped trigger (docs/design/deeds.md), which names retroFallbackGrants as the sanctioned heal; the candidates are lowering the amount through that heal or sourcing the wildlife pack. tests/deeds_content.test.ts pins the reachable set (11), the unreachable set (3) and amount <= reachable, so the promotion after next reds instead of stranding the deed. Found by the 11l content reviewer; the 11l BUILT ledger carries the derivation | MW 11l | maintainer | open ruling-owed (opened 2026-08-24) |
 
 ### Decisions closed 2026-08-20 (the full delegation)
 
@@ -4577,3 +4578,35 @@ rather than taken: a fine twin carries `buyValue: 320`, two of them are two crop
 families on a fish row, and produce 4 against one catch breaks fish-forward, so
 the prescribed bill is refused three separate ways by rules 11h and 11i shipped
 after that line was written.
+
+## Phase 11l note (2026-08-24): one row ADDED to the OPEN list, and the settled counts moved twice
+
+THE 11l BUILD ADDED ONE ROW to the handoff table (the `col_junk_drawer` zero-margin
+item above, the maintainer's) and closed nothing; the eleven carried in are unchanged.
+(The row's "exactly 10" reads 11 against 10 since the sixth fix round returned
+chipped_tusk to poor: one of margin, the regression and the next-promotion tripwire
+unchanged.)
+
+ROWS 82 TO 85 AND 122 TO 123 WERE EXECUTED AS WRITTEN, and the pointer in
+`phase-11l-trophy-economy.md` that sends a reader to state.md for them is the drift:
+they live here. What moved is the COUNT the rows predicted, not the rules. Row 123
+predicted FOURTEEN adoptions and FIVE value exclusions against the CRAFTED ceiling
+(460). Row 122's output doctrine makes every output an UNCRAFTED shipped item, and
+run against that pool it does two things the same-day prediction could not see: it
+excludes SEVEN mapped poor trophies for want of any in-register uncrafted output
+(both jewelcrafting ids, three of the four inscription ids, the enchanting id, and
+the weaponcrafting chipped_tusk, whose every candidate is dominated by the trainer's
+own rung-25 dirk, found by the fifth review round and applied in the sixth fix
+round, after two re-picks), and
+it ADMITS two of the five predicted value exclusions (old_cragmaws_pelt 300 and
+emberwing_cinderscale 320: the uncrafted leather pool reaches 450, so both clear
+the arithmetic; each now feeds a 2 percent trash-drop belt from a DIFFERENT kill at
+rung 50, the cinderscale the ogres' cragprowl_belt and the pelt the stalkers'
+wildgrove_cinch, the pelt deliberately NOT Old Cragmaw's own chase huntcord, which
+its guaranteed drop would have made deterministic, and not a stat-less white either,
+which would have been a sink rather than a prize). NINE adopted,
+TEN excluded, two held out. Jewelcrafting's lane is EMPTY, like engineering's, and
+inscription keeps one row: the phase file's "jewelcrafting and inscription are the
+point" was intent the doctrine could not honour on this catalog. Recorded under row
+122's own clause (excluded and recorded, exactly like a value exclusion); nothing
+was re-decided. The full derivation per id is in the 11l BUILT ledger in state.md.

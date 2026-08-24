@@ -448,7 +448,7 @@ Economy continuity: zone-2 quests pay 2–25s (total ≈ 1g31s + ~1g+ mob copper
 | cragwalker_boots | Cragwalker Boots | armor/feet, armor 55 | common | 4000 | 400 |
 | windguard_leggings | Windguard Leggings | armor/legs, armor 70 | common | 4500 | 450 |
 
-**Junk (kind 'junk', quality 'poor'):** bogiron_nugget (12), soggy_moccasin (9), cracked_fetish (14), chipped_tusk (15), ogre_toe_ring (25), inert_storm_shard (28), frayed_prayer_beads (30), cracked_wyrm_scale (35), deepfen_pearl (600, Vael trophy).
+**Junk (kind 'junk', quality 'poor'):** soggy_moccasin (9), chipped_tusk (15), ogre_toe_ring (25), inert_storm_shard (28), frayed_prayer_beads (30), deepfen_pearl (600, Vael trophy). Since Masterwrought phase 11l (the trophy economy) bogiron_nugget (12), cracked_fetish (14) and cracked_wyrm_scale (35) are quality 'common' crafting reagents consumed by `TROPHY_RECIPES` (src/sim/content/recipes.ts), never swept by Sell Junk; sellValues unchanged. chipped_tusk stays poor: no uncrafted weapon in its band survives beside the trainer's own rung-25 whetted_iron_dirk, so it is output-excluded (the record in the `TROPHY_RECIPES` header).
 
 Mage conjured-water upgrades: covered by the existing **ability-ranks companion spec** (two new conjure_water ranks) — do not duplicate here.
 
