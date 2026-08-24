@@ -1252,7 +1252,7 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'hudChrome.bags.noQuestItems': 'No tienes objetos de misión en tus bolsas.',
   'hudChrome.bank.cannotDepositNow': 'No se puede depositar en este momento',
   'hudChrome.bank.depositAllTooltip':
-    'Envía al banco de una vez todos los reactivos de fabricación de tus bolsas. Las herramientas de recolección, el equipo puesto, los objetos de misión, los consumibles y los objetos grises nunca se tocan.',
+    'Envía al banco de una vez todas las materias de fabricación (todo lo que en su descripción dice "Materia") de tus bolsas. Todo lo demás se queda en tus bolsas, incluidas las herramientas de recolección, los objetos de misión, los consumibles y los objetos grises.',
   'hudChrome.bank.guildBuyConfirm':
     '¿Comprar {count} espacios adicionales del banco de la hermandad por {price} de la tesorería de la hermandad?',
   'hudChrome.bank.guildBuyNote': 'Pagado desde la tesorería de la hermandad',

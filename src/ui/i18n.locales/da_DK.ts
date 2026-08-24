@@ -1227,7 +1227,7 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'hudChrome.bags.noQuestItems': 'Ingen opgavegenstande i dine tasker.',
   'hudChrome.bank.cannotDepositNow': 'Kan ikke indsættes lige nu',
   'hudChrome.bank.depositAllTooltip':
-    'Sender alle håndværksmaterialer fra dine tasker til banken på én gang. Indsamlingsværktøjer, udrustet udstyr, opgavegenstande, forbrugsvarer og grå genstande røres aldrig.',
+    'Sender alle håndværksmaterialer (alt, hvis beskrivelse siger "Materiale") fra dine tasker til banken på én gang. Alt andet bliver i dine tasker, inklusive indsamlingsværktøjer, opgavegenstande, forbrugsvarer og grå genstande.',
   'hudChrome.bank.guildBuyConfirm':
     'Køb {count} ekstra laugsbankpladser for {price} fra laugets skatkammer?',
   'hudChrome.bank.guildBuyNote': 'Betalt fra laugets skatkammer',

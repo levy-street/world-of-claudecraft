@@ -1225,7 +1225,7 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'hudChrome.bags.noQuestItems': 'Inga uppdragsföremål i dina väskor.',
   'hudChrome.bank.cannotDepositNow': 'Kan inte sättas in just nu',
   'hudChrome.bank.depositAllTooltip':
-    'Skickar alla hantverksreagenser från dina väskor till banken i en enda resa. Insamlingsverktyg, utrustad utrustning, uppdragsföremål, förbrukningsvaror och grå föremål rörs aldrig.',
+    'Skickar alla hantverksmaterial (allt vars verktygstips säger "Material") från dina väskor till banken i en enda resa. Allt annat stannar i dina väskor, inklusive insamlingsverktyg, uppdragsföremål, förbrukningsvaror och grå föremål.',
   'hudChrome.bank.guildBuyConfirm':
     'Köp {count} extra fack i gillesbanken för {price} från gillets kassa?',
   'hudChrome.bank.guildBuyNote': 'Betalas från gillets kassa',

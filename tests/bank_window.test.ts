@@ -8,6 +8,7 @@
 import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 import { CHROME_GUARDED_PANELS } from '../src/ui/chrome_focus_wiring';
+import { t } from '../src/ui/i18n';
 
 const painter = readFileSync(new URL('../src/ui/bank_window.ts', import.meta.url), 'utf8');
 const promptDialog = readFileSync(new URL('../src/ui/prompt_dialog.ts', import.meta.url), 'utf8');
@@ -343,6 +344,21 @@ describe('bank_window: search / sort / deposit-all', () => {
   it('gives the deposit-all button a tooltip clarifying which items it moves (issue #2132)', () => {
     expect(painter).toContain("const depositTooltip = t('hudChrome.bank.depositAllTooltip')");
     expect(painter).toContain('deposit.title = depositTooltip');
+  });
+
+  it('the deposit-all tooltip says what the sweep does: every Material moves, everything else stays', () => {
+    // The full-sentence pin (#2715; moved here from the cooking-catch suite
+    // at the Masterwrought 11l QA, beside the render pins above). The sweep
+    // is set membership on isMaterialItem (src/ui/bank_view.ts), which is
+    // exactly the set whose tooltip kind line reads Material
+    // (src/ui/item_kind_label.ts): seeds, husks, compost and the growth tonic
+    // included, gray junk and every non-poor keepsake excluded, so the copy
+    // names the kind line rather than "reagents" and refuses to enumerate what
+    // stays. A rewrite that keeps only loose tokens fails here; the 18
+    // overlays were re-filled in the same change (the reword-staleness class).
+    expect(t('hudChrome.bank.depositAllTooltip')).toBe(
+      'Sends every crafting material (anything whose tooltip reads Material) from your bags to the bank in one trip. Everything else stays in your bags, gathering tools, quest items, consumables, and gray items included.',
+    );
   });
 
   it('exposes the deposit-all clarification beyond hover-only title (PR #2715 review)', () => {

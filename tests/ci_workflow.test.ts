@@ -409,10 +409,12 @@ describe('CI workflow parity', () => {
         const match = line.match(/^docs\/screenshots\/([A-Za-z0-9._-]+)\//);
         if (match) indexDirs.add(match[1]);
       }
-      // Vacuity floor near the real count (249 subtrees on 2026-08-24, after the
-      // deed-border-cartouche packet's cone landed through the sixteenth
-      // release sync; the 2026-08-14 comment said 169 against a real 235, so
-      // the floor sat 36 percent under the count it exists to guard).
+      // Vacuity floor near the real count (249 subtrees on 2026-08-24). The
+      // 169 this comment carried was accurate on 2026-08-14; ten days of
+      // committed evidence took it to 235 at efb1220e85, 248 at the 11l stamp
+      // and 249 after the sixteenth release sync, so a floor of 160 had rotted
+      // by ACCUMULATION, not by a miscount: re-measure it at every release
+      // sync (the 11l QA), and keep it within a few subtrees of the count.
       expect(indexDirs.size).toBeGreaterThanOrEqual(240);
     }
     // The guard's own file is excluded from the corpus: its SPARSE_CONE

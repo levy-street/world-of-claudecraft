@@ -3874,8 +3874,17 @@ export const FARM_RECIPES: ProfessionRecipeRecord[] = [
 // shipped recipe's bill was edited. Each row's RUNG (skillReq) follows its
 // trophy's drop level; the LEVEL field is capped at the OUTPUT's live drop
 // source where one exists, and takes the rung scaffolding where none does.
-// Every bill contains its trophy (sellValue only, no buyValue), so no row
-// joins the counterfactually-vendor-fed set.
+// THE recipe.level NOTE (every row's level comment cites it): the item level
+// source index (src/sim/item_level.ts buildSourceIndex) treats recipe.level as
+// an acquisition level, so a value above the output's live drop source would
+// re-tier the shipped item past its pinned item level and off its stat
+// budget; craftActionXp(recipe.level, characterLevel) in
+// src/sim/professions/profession_xp.ts reads the same field (a level-20
+// crafter earns 0 character XP on a row at 12 or below, the gray band), and
+// masterworkBonusStats (crafting.ts craftBonusStatsFor) sizes the proc's
+// bonus off it for a stat-bearing output. Every bill contains its trophy
+// (sellValue only, no buyValue), so no row joins the
+// counterfactually-vendor-fed set.
 //
 // The pinned economy doctrine (tests/recipe_economy.test.ts: output strictly
 // between the trophy's sellValue and the LISTED bill) is list-count-only by
@@ -3966,9 +3975,12 @@ export const FARM_RECIPES: ProfessionRecipeRecord[] = [
 //   ogre_toe_ring 25: output-excluded, jewelcrafting (the same gap).
 //   briny_idol 32: output-excluded, inscription (register: caster held-offhands
 //     and scrolls; the uncrafted scroll pool is empty, and the one uncrafted
-//     caster offhand below the rung ceiling, valefire_lantern, went to the
-//     zone2-rung cracked_fetish; wraithfire_orb is epic at 12000, barred by
-//     the rung-50 rare cap).
+//     caster offhand below the rung ceiling, valefire_lantern, is itself
+//     excluded as an output by the cracked_fetish derivation below, strictly
+//     dominated by the trainer's own folio and primer, so no inscription
+//     trophy can take it; wraithfire_orb is epic at 12000, barred by the
+//     rung-50 rare cap; eastbrook_buckler and moggers_hide_quiver sit in the
+//     band but are a shield and a hunter quiver, outside the register).
 //   frayed_prayer_beads 30: output-excluded, inscription (as briny_idol).
 //   moonpale_scale 26: output-excluded, inscription (as briny_idol).
 //   inert_storm_shard 28: output-excluded, enchanting (arcane_shard is reserved
@@ -4065,7 +4077,8 @@ export const TROPHY_RECIPES: ProfessionRecipeRecord[] = [
     skillReq: 25,
     itemLevelBudget: 16,
     // Capped at the boots' top live drop source (Morthen, level 10) so the
-    // recipe route cannot re-tier the shipped item (see the lantern note).
+    // recipe route cannot re-tier the shipped item (the recipe.level note in
+    // the header).
     // Profession XP reads the same field: craftActionXp(10, 20) = 0 for a
     // level-20 crafter (gray band), against 100 for a level-20 row.
     level: 10,
@@ -4099,7 +4112,8 @@ export const TROPHY_RECIPES: ProfessionRecipeRecord[] = [
     itemLevelBudget: 20,
     // Capped at the quiver's live boss source (korzul_the_gravewyrm, level 20
     // exactly) so the recipe route cannot re-tier the shipped item past its
-    // pinned item level 23 (20 plus the rare bonus 3; see the lantern note):
+    // pinned item level 23 (20 plus the rare bonus 3; the recipe.level note
+    // in the header):
     // here the rung-50 scaffolding and the cap coincide. Profession XP reads
     // the same field: craftActionXp(20, 20) = 100 for a level-20 crafter,
     // the full level-20 figure.
@@ -4142,7 +4156,7 @@ export const TROPHY_RECIPES: ProfessionRecipeRecord[] = [
     itemLevelBudget: 20,
     // Capped at the maul's live boss source (Deacon Voss, level 12) so the
     // recipe route cannot re-tier the shipped item past its pinned item level
-    // 13 (see the lantern note).
+    // 13 (the recipe.level note in the header).
     // Profession XP reads the same field: craftActionXp(12, 20) = 0 for a
     // level-20 crafter (gray band, 8 below against zeroDiff 8), against 100
     // for a level-20 row.
@@ -4168,13 +4182,20 @@ export const TROPHY_RECIPES: ProfessionRecipeRecord[] = [
     // lesser potion (190 HP) sits UNDER the rung-25 draught and above the
     // rung-0 pair (110 and 120 HP), so the ladder keeps its order; the
     // vendor's own 320 HP potion at 170 already undercuts the draught's 140
-    // bill, a pre-existing tension that is the maintainer's, not this row's.
+    // bill PER POINT OF HEALING (0.53 copper an HP against 0.70), a
+    // pre-existing tension that is the maintainer's, not this row's.
     // Discounted bills (requiredReagentCountFor): specialization only, candles
     // 2 to 1, 77 vs 16; specialization plus self-signed lands on the same
     // floor, 77 vs 16 (the herb and the vial are already 1), still
     // gold-negative: the one row whose floor stays above its output (109 vs
-    // 16 after the 32-copper #1301 sink). The crafter's prize is the potion
-    // itself (an 85 counter price), never copper.
+    // 16 after the 32-copper #1301 sink). No prize in copper and none in
+    // access either: Provisioner Hale (zone2.ts) and the zone-3 counter sell
+    // the same potion at 85, under the 109 floor-plus-sink, so the row is a
+    // tallow sink held under the doctrine's list-count-only clause whose one
+    // use is the alchemy skill gain a tallow-holder buys with it; recorded by
+    // the 11l QA as a tuning read beside the oiled boots, not an exclusion
+    // (the trainer's own rung-25 draught does not dominate it: 190 HP common
+    // for 82 against 200 HP uncommon for 140).
     reagents: [
       { itemId: 'tallow_candle', count: 2 },
       { itemId: 'goldleaf_herb', count: 1 },
@@ -4267,7 +4288,7 @@ export const TROPHY_RECIPES: ProfessionRecipeRecord[] = [
     // Capped at the cinch's live drop source (the Ridge Stalkers, level 13 to
     // 14) so the recipe route cannot re-tier the shipped item past its pinned
     // item level 15 (tests/itemization_coverage.test.ts: 14 plus the uncommon
-    // bonus 1; see the lantern note). recipe.level has THREE consumers, all
+    // bonus 1; the recipe.level note in the header). recipe.level has THREE consumers, all
     // read from this one field: the item level source index
     // (buildSourceIndex, src/sim/item_level.ts, the cap above);
     // craftActionXp(recipe.level, characterLevel) in
@@ -4310,7 +4331,7 @@ export const TROPHY_RECIPES: ProfessionRecipeRecord[] = [
     itemLevelBudget: 20,
     // Capped at the belt's live drop source (Thornpeak Ogres, level 16) so
     // the recipe route cannot re-tier the shipped item past its pinned item
-    // level 17 (see the lantern note).
+    // level 17 (the recipe.level note in the header).
     // Profession XP reads the same field: craftActionXp(16, 20) = 42 for a
     // level-20 crafter (green band, 4 below), against 100 for a level-20 row.
     level: 16,

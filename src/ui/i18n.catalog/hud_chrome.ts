@@ -3774,7 +3774,7 @@ export const hudChromeStrings = {
     // the number of material stacks moved.
     depositAll: 'Deposit all materials',
     depositAllTooltip:
-      'Sends every crafting reagent from your bags to the bank in one trip. Gathering tools, equipped gear, quest items, consumables, and gray junk are never touched.',
+      'Sends every crafting material (anything whose tooltip reads Material) from your bags to the bank in one trip. Everything else stays in your bags, gathering tools, quest items, consumables, and gray items included.',
     depositAllDone: 'Materials deposited: {count}.',
     depositAllFull: 'Materials deposited: {count}. Bank now full.',
     depositAllNone: 'Bank full: nothing deposited.',

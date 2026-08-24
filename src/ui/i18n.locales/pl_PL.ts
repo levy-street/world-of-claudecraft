@@ -1236,7 +1236,7 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'hudChrome.bags.noQuestItems': 'Brak przedmiotów zadań w twoich torbach.',
   'hudChrome.bank.cannotDepositNow': 'Nie można teraz zdeponować',
   'hudChrome.bank.depositAllTooltip':
-    'Wysyła każdy reagent rzemieślniczy z twoich toreb do banku za jednym razem. Narzędzia do zbieractwa, założony ekwipunek, przedmioty zadań, przedmioty konsumpcyjne i szare przedmioty nigdy nie są ruszane.',
+    'Wysyła każdy materiał rzemieślniczy (wszystko, co w opisie ma "Materiał") z twoich toreb do banku za jednym razem. Cała reszta zostaje w torbach, w tym narzędzia do zbieractwa, przedmioty zadań, przedmioty konsumpcyjne i szare przedmioty.',
   'hudChrome.bank.guildBuyConfirm':
     'Kupić {count} dodatkowych miejsc w banku gildii za {price} ze skarbca gildii?',
   'hudChrome.bank.guildBuyNote': 'Opłacone ze skarbca gildii',

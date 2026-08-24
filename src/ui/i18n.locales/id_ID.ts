@@ -1226,7 +1226,7 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'hudChrome.bags.noQuestItems': 'Tidak ada barang misi di dalam tasmu.',
   'hudChrome.bank.cannotDepositNow': 'Tidak dapat disetor saat ini',
   'hudChrome.bank.depositAllTooltip':
-    'Mengirim semua reagen kerajinan dari tasmu ke bank dalam satu kali jalan. Alat pengumpul, perlengkapan yang dipakai, barang misi, barang habis pakai, dan barang abu-abu tidak pernah disentuh.',
+    'Mengirim semua bahan kerajinan (apa pun yang keterangannya bertuliskan "Bahan") dari tasmu ke bank dalam satu kali jalan. Semua yang lain tetap di tasmu, termasuk alat pengumpul, barang misi, barang habis pakai, dan barang abu-abu.',
   'hudChrome.bank.guildBuyConfirm':
     'Beli {count} slot bank guild tambahan seharga {price} dari kas guild?',
   'hudChrome.bank.guildBuyNote': 'Dibayar dari kas guild',
