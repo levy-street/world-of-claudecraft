@@ -3375,23 +3375,46 @@ describe('Guide professions pages and routes', () => {
       expect(line.materials.length, `${id} contributes nothing to cooking`).toBeGreaterThan(0);
       return line;
     };
-    for (const id of ['farming', 'fishing', 'herbalism', 'corpseHarvesting']) {
+    // THE WHOLE SET, not a hand-picked subset: `logging` feeds cooking too (one
+    // ashwood log smokes the eel) and an earlier version of this arm looped
+    // four ids and left it unexercised, so a generator change that dropped the
+    // logging line entirely was invisible here. The id list is pinned as a
+    // literal so a line LEAVING the page reds, which a loop over the live
+    // lines could never do.
+    expect(
+      GUIDE_PROF_PROVISIONING.lines.map((l) => l.id).sort(),
+      'exactly the lines that feed the kitchen, and mining does not',
+    ).toEqual(['corpseHarvesting', 'farming', 'fishing', 'herbalism', 'logging']);
+    for (const id of ['farming', 'fishing', 'herbalism', 'corpseHarvesting', 'logging']) {
       const line = lineOf(id);
       for (const name of line.materials) {
         expect(html, `${id} line missing ${name}`).toContain(name);
       }
     }
-    // And the ones a reader would name if asked, as literals, so the arm above
-    // cannot pass on a generated list that quietly emptied out to one item.
+    // PER-LINE SIZES at the real counts rather than a shared floor of one: a
+    // line shrinking from nine materials to one satisfies `length > 0` and
+    // renders a page that quietly stopped saying what it says.
+    const sizeOf = (id: string) => lineOf(id).materials.length;
+    expect(
+      [sizeOf('logging'), sizeOf('herbalism'), sizeOf('fishing'), sizeOf('corpseHarvesting')],
+      'the per-line contributions, at their real sizes',
+    ).toEqual([1, 3, 9, 2]);
+    expect(sizeOf('farming'), 'farming is the widest supplier').toBeGreaterThanOrEqual(20);
+    // And one literal anchor per line, so each is named somewhere by a human
+    // and not only reached through the generated list above.
     expect(html, 'the band-5 catch the apex tier keys on').toContain('Raw Stillmere Salmon');
     expect(html, 'the crop the feast ladder takes').toContain('Evergarden Greens');
     expect(html, 'the corpse-harvest meat').toContain('Game Meat');
+    expect(html, 'the herb every apex cooking row seasons with').toContain('Sunpetal Herb');
+    expect(html, 'the one log the kitchen smokes with').toContain('Ashwood Log');
 
     // THE LADDER, from a levelling rung to the capstone, with the placeable
     // marker on the feasts, because a ladder that did not say which outputs are
     // set on the ground rather than eaten reads wrong at the top.
     const rungs = GUIDE_PROF_PROVISIONING.ladder.map((r) => r.skillReq);
     expect(rungs, 'the rungs climb').toEqual([...rungs].sort((a, b) => a - b));
+    expect(rungs.length, 'and there is a ladder to climb at all').toBeGreaterThanOrEqual(4);
+    expect(rungs, 'it starts at the free rung').toContain(0);
     expect(rungs, 'the capstone rung is on the page').toContain(125);
     expect(html).toContain('Stonepot Feast');
     expect(html).toContain('Warspice Feast');
@@ -3417,7 +3440,14 @@ describe('Guide professions pages and routes', () => {
     // trusted, over the ids the page actually renders.
     const nameToDef = new Map(Object.values(ITEMS).map((def) => [def.name, def]));
     const listed = GUIDE_PROF_PROVISIONING.lines.flatMap((l) => l.materials);
-    expect(listed.length, 'the page lists real materials at all').toBeGreaterThan(10);
+    // AT THE REAL COUNT, not a token floor. This used to read `> 10` against a
+    // real population of 36, which the farming line alone satisfies: every
+    // other line could have emptied and this sweep would still have run over a
+    // valid-looking list.
+    expect(listed.length, 'every listed material is swept, at the real count').toBe(
+      GUIDE_PROF_PROVISIONING.lines.reduce((n, l) => n + l.materials.length, 0),
+    );
+    expect(listed.length, 'and the literal beside it').toBe(36);
     for (const name of listed) {
       const def = nameToDef.get(name);
       expect(def, `${name} must be a real item def`).toBeTruthy();
@@ -3425,12 +3455,24 @@ describe('Guide professions pages and routes', () => {
       expect(def?.noMarketList, `${name} cannot be listed, so the claim is false`).toBeFalsy();
     }
 
-    // SPOILER-SAFE, asserted rather than intended: this page names no instance,
-    // no boss and no drop table. The professions pages publish exact numbers by
-    // policy, so rungs and material names are correct here; instanced content
-    // is what must never appear.
-    for (const forbidden of ['Nythraxis', 'Drowned Litany', 'Collapsed Reliquary', 'Heroic']) {
+    // SPOILER-SAFE, and READ WHAT THIS DOES AND DOES NOT CLAIM. The four
+    // negatives below are structurally unreachable today: the page renders
+    // cooking material names, cooking output names and fixed prose, so no boss
+    // or instance name can appear whatever the generator does. They are a
+    // TRIPWIRE against a future widening of this page (a "where do I get it"
+    // column, a drop-source cell), not a live guard, and pretending otherwise
+    // is the decorative-pin trap this packet keeps finding.
+    //
+    // The POSITIVE CONTROL is what makes them worth keeping: it proves the
+    // matcher would see such a token if the page ever grew one, so a green
+    // sweep means absence rather than a broken check.
+    const FORBIDDEN = ['Nythraxis', 'Drowned Litany', 'Collapsed Reliquary', 'Heroic'];
+    for (const forbidden of FORBIDDEN) {
       expect(html, `the provisioning page must not name ${forbidden}`).not.toContain(forbidden);
+      expect(
+        `${html}<!-- ${forbidden} -->`.includes(forbidden),
+        `the sweep can actually see ${forbidden}`,
+      ).toBe(true);
     }
   });
 

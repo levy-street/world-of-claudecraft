@@ -1004,6 +1004,12 @@ export const PROFESSION_ITEMS: Record<string, ItemDef> = {
       charges: 10,
       durationTicks: 3600,
       dishItemId: 'evergarden_braised_greens',
+      // The party rung KEEPS ITS LEGACY TEMPLATE ID, which is deliberately not
+      // its item id: 'farm_feast' is what shipped, what every placed entity in
+      // a live realm carries, and what the render prop is registered under
+      // (scripts/assets/farm_props/model.js). The three apex rungs below match
+      // their item ids only because they are new. Do not "tidy" this to
+      // 'harvest_feast'.
       templateId: 'farm_feast',
     },
   },

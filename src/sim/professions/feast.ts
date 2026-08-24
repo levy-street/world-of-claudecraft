@@ -78,12 +78,22 @@ export const FARM_FEAST_TEMPLATE_ID = 'farm_feast';
  *  Phase 11i shipped a second feast that no code could place and no client
  *  could label.
  *
- *  The six keyed sites, all of which read the helpers below rather than a
- *  string literal: src/ui/entity_display_name.ts, src/render/entity_labels.ts
- *  (the world title), src/render/nameplate_view.ts (the interact hysteresis
- *  band), src/render/farm_patches.ts (the applyFeasts filter AND the
- *  shadow-cap sweep), src/game/feast_interact.ts, and the contract comment in
- *  src/render/quest_objects.ts. */
+ *  FIVE SITES KEY ON A TEMPLATE ID and none of them names a string literal any
+ *  more: src/ui/entity_display_name.ts and src/render/entity_labels.ts (the two
+ *  title composers, which reach the family through src/ui/feast_title.ts),
+ *  src/render/nameplate_view.ts (the interact hysteresis band),
+ *  src/render/farm_patches.ts (the applyFeasts filter; the shadow-cap sweep
+ *  beside it iterates the ALREADY-filtered map and compares no template), and
+ *  src/game/feast_interact.ts. The contract comment in
+ *  src/render/quest_objects.ts is a sixth reader but not a keyed site.
+ *
+ *  ONE CAVEAT, because the sentence above is easy to over-read: the two title
+ *  composers reach the family through feast_title.ts, whose templateId-to-key
+ *  map is HAND-LISTED (a t() key built by template literal is invisible to
+ *  every static consumer, which this packet has paid for twice). So authoring a
+ *  feast def joins the DERIVED set everywhere at once but leaves that map
+ *  short. It is caught rather than trusted: tests/entity_display_name.test.ts
+ *  pins the map exhaustively in BOTH directions against feastTemplateIds(). */
 const FEAST_TEMPLATE_IDS: ReadonlySet<string> = new Set(
   Object.values(ITEMS).flatMap((def) =>
     'feast' in def && def.feast ? [def.feast.templateId] : [],
@@ -123,6 +133,10 @@ export function isApexFeastRecipe(recipe: {
 }): boolean {
   const def = ITEMS[recipe.resultItemId];
   if (!def || !('feast' in def) || !def.feast) return false;
+  // CRAFT_INDEX rather than craftById/craftMaxSkillFor, which THROW on an
+  // unknown id: this runs on the craft-credit arm of every successful craft,
+  // and a content typo should refuse the deed mark, never throw inside a live
+  // craft. The map is the same authority those accessors read.
   const craft = CRAFT_RING.find((c) => c.id === recipe.professionId);
   return craft !== undefined && recipe.skillReq >= craft.maxSkill;
 }

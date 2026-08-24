@@ -1322,9 +1322,16 @@ describe('the apex feast tier: the placeable family', () => {
     expect(auras, 'exactly one Well Fed').toHaveLength(1);
     const dish = ITEMS.sageleaf_chowder;
     const wanted = dish.kind === 'food' ? dish.wellFed : undefined;
+    // DERIVATION PLUS LITERAL, because the derivation alone is a constant
+    // self-comparison: both sides would read the same def the production code
+    // reads, so a re-tune of the plate would move them together and prove
+    // nothing. The literal is what reds on a re-tune; the derivation is what
+    // says WHERE the number is supposed to come from.
+    expect(wanted?.value, 'the plate really carries a magnitude').toBeDefined();
     expect(auras[0].value, 'the magnitude resolved off the DISH, never re-typed').toBe(
       wanted?.value,
     );
+    expect(auras[0].value, 'and the literal beside it').toBe(6);
     // And the discriminator, which is what makes this arm decisive: the party
     // feast's dish is buff_sta at 5, so a bite that served the module constant
     // instead of the placed item would land buff_sta here.

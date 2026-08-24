@@ -259,6 +259,13 @@ Warboar Flask / Runewater Flask (apex flasks, the shipped '<Word> Flask' form ov
 head of phase 11) ride the recorded 'Enchant <Slot> - <Stat>'
 scheme with the registered Lucent tier word (no new coin). GW2's Lucent Mote / Pile of
 Lucent Crystal (same enchanting-material role class) recorded against the Lucent row.
+Phase 11k additions (web-verified 2026-08-24, evidence in naming-audit.md):
+Stonepot Feast / Warspice Feast / Sageleaf Feast (the apex role feasts). These
+COIN NOTHING: each compounds a registered, already-verified apex plate name with
+the mechanic word this packet owns, so the audit question is the compound, not
+the token. Deepwater Feast is RETIRED (its id was cut at 11k, branch-only and
+never released); its audit row is kept rather than deleted so the name is not
+re-coined and the neighbour search is not re-run.
 Phase 11 head, per ruling (9): the four aura DISPLAY names (Ironhusk Vigor, Warboar
 Might, Runewater Clarity, Well Fed) registered GENERIC-with-caveat in naming-audit.md
 (Well Fed's caveat: WoW's verbatim same-role food-buff name, kept as a plain-English

@@ -128,8 +128,12 @@ const build = await buildItemArtAudit({
     // its pattern, removed from the game rather than moved), a net plus four
     // to 78.
     // liveItemCount is unmoved by any of that, which is the point of the
-    // split: a new artless def that joins the park moves the debt term alone,
-    // and 11k's retirements cancel against its mints on the LIVE side too.
+    // split, and the 11k arithmetic is worth spelling out because "net plus
+    // four" appears on BOTH terms and they are different sums. Live ITEMS defs
+    // went up four (six minted, two deleted). The debt went up four (the same
+    // six parked, the same two unparked). liveItemCount is defs MINUS debt, so
+    // it holds at 922: an artless def joining the park moves the debt term and
+    // the def count together and cancels out of this one.
     pendingArtCount: 78,
     generatedHeroicDefinitions: 64,
     heroicDefinitionsWithOwnWebp: 48,

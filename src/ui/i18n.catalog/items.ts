@@ -2686,8 +2686,16 @@ const ITEM_ENTITY_IDS = [
   // (`deepwater_feast` and `pattern_deepwater_feast`) are removed from the 11i
   // block above rather than left behind: both were minted on this branch and
   // never shipped in a release, which is the one case content/CLAUDE.md permits
-  // an outright delete. All six names are wordy in English, so M16 non-Latin
-  // fills land with them.
+  // an outright delete (verified against origin/release/v0.40.0: neither id
+  // appears in that tree's items catalog or content tables).
+  //
+  // THAT REMOVAL SHIFTED POSITIONS, and this list is POSITIONAL: the `en`
+  // itemTranslations list is read at the same indexes, so the two rows came out
+  // of BOTH sides together. Nothing after the 11i block is index-stable across
+  // this change, which is fine (the ids are what the runtime resolves) but is
+  // worth saying, because "append-only" otherwise reads as "index-stable" and
+  // this phase is the first in the packet to remove a row rather than add one.
+  // All six new names are wordy in English, so M16 non-Latin fills land here.
   'stonepot_feast',
   'warspice_feast',
   'sageleaf_feast',

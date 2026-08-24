@@ -3150,7 +3150,7 @@ export const DEEDS: Record<string, DeedDef> = {
   prog_field_to_feast: {
     id: 'prog_field_to_feast',
     name: 'From Field to Feast',
-    desc: 'Cook an apex Harvest Feast, the table a whole raid eats from.',
+    desc: 'Cook one of the three apex feasts, the table a whole raid eats from.',
     category: 'progression',
     renown: 5,
     trigger: { kind: 'visit', markId: 'apex_feast:crafted' },

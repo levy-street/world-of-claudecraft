@@ -11,8 +11,16 @@
 // leaf and both sides import it. This is a MOVE, not a rewrite: every function
 // below has the body it had in the guard.
 //
-// PURE LEAF: no SimContext, no rng, no clock, no player state. It reads content
-// tables and answers a question about them.
+// PURE in the sense that matters here: no SimContext, no rng, no clock, no
+// player state. It reads content tables and answers a question about them.
+//
+// NOT a dependency-free leaf, and saying so matters to its second consumer:
+// `./gathering` is imported for NODE_HARVEST_TABLE and NODE_MATERIAL_TABLE, and
+// that module is a full profession system, so every importer (the wiki
+// generator included) pulls its transitive closure. The derivation itself
+// touches only the two tables. Moving those two tables into a data-only leaf
+// would make this a true leaf; that is a larger extraction than this phase
+// owns, so the cost is recorded rather than implied away.
 
 import { FARM_CROPS } from '../content/farm_crops';
 import { FISHING_TABLES_BY_BAND } from '../content/items';

@@ -497,6 +497,27 @@ and near-homophones. An in-repo neighbour grep ran on every candidate too.
   the word in Deepwater Lure, Deepwater Blossom and Hungering Deepwater Treads.
   Not one is this name, and no game pairs the two words. The "<Word> Feast"
   construction is genre-shared and already ours (Harvest Feast ships).
+  **RETIRED AT masterwrought Phase 11k.** The id was cut outright (branch-only,
+  never in a release), so this name ships nowhere. The verdict is KEPT rather
+  than deleted, because a retired audit row is what stops a later phase
+  re-coining the same name and re-doing the same search; the neighbour list
+  above is the reusable half.
+- **Stonepot Feast**, **Warspice Feast** and **Sageleaf Feast** (the Phase 11k
+  apex role feasts) CLEAR, and the three together coin NOTHING. Each is a
+  SHIPPED apex plate name (Stonepot Stew, Warspice Skewers, Sageleaf Chowder,
+  all three audited and accepted in the Phase 10 block above) compounded with
+  the mechanic word this packet already owns. So the only thing this phase asks
+  of the registry is whether the COMPOUND collides, not whether a token is
+  original, which is why one search covers all three.
+  Web-verified at authoring (2026-08-24): an exact-phrase search for
+  "Stonepot Feast" OR "Warspice Feast" OR "Sageleaf Feast" returns none of the
+  three anywhere; the hits are the generic feast mechanic in Guild Wars 2 and
+  WoW (Fish Feast, Stone Soup and the rest, already recorded on the Deepwater
+  row above) plus unrelated non-game titles. The neighbour list from that row
+  carries over unchanged and is not re-searched.
+  Role legibility is the reason for the construction rather than flavor: the
+  placed entity's title is how a raider at the table learns which plate is on
+  it (decision K1), so the name has to carry the plate.
 - **The Deepest Cast** (col_deepest_cast, the untitled deed) CLEAR. Four plain
   English words in the shipped deed voice (Glimmer of Hope, Full Creel, The Junk
   Drawer, Every Furrow Filled), no coined token, packet-original. Exact phrase

@@ -3141,14 +3141,14 @@ export const APEX_CONSUMABLE_RECIPES: ProfessionRecipeRecord[] = [
   // finite and above zero, else sellValue (the shipped recipe_economy
   // convention), which is why the herb and the salt cost more here than their
   // sell prices suggest:
-  //   seasoned_stock         3 x  30 =   90
-  //   wyrmfall_core          1 x  50 =   50
-  //   evergarden_greens      1 x  40 =   40
-  //   sunpetal_herb          1 x 160 =  160
-  //   cooking_salt           2 x   8 =   16
-  //   raw_deepbarb_catfish   4 x  14 =   56
-  //   raw_hollowgill_sturgeon 3 x  18 =  54
-  //   raw_stillmere_salmon   2 x  22 =   44
+  //   seasoned_stock           3 x  30 =   90
+  //   wyrmfall_core            1 x  50 =   50
+  //   evergarden_greens        1 x  40 =   40
+  //   sunpetal_herb            1 x 160 =  160
+  //   cooking_salt             2 x   8 =   16
+  //   raw_deepbarb_catfish     4 x  14 =   56
+  //   raw_hollowgill_sturgeon  3 x  18 =   54
+  //   raw_stillmere_salmon     2 x  22 =   44
   //   INPUT 510 vs output 1 x 300. Gold-negative by 210.
   // The rows stay OUT of the counterfactually-vendor-fed set for a reason worth
   // stating, because the herb and the salt alone would not carry it: that set

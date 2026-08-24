@@ -6,7 +6,11 @@ import { describe, expect, it } from 'vitest';
 import { MOBS, NPCS } from '../src/sim/data';
 import type { Entity } from '../src/sim/types';
 import { entityDisplayName } from '../src/ui/entity_display_name';
-import { feastTitleKeyFor, feastTitleTemplateIds } from '../src/ui/feast_title';
+import {
+  feastTitleKeyedTemplateIds,
+  feastTitleKeyFor,
+  feastTitleTemplateIds,
+} from '../src/ui/feast_title';
 
 function ent(over: Record<string, unknown>): Entity {
   return {
@@ -87,8 +91,16 @@ describe('the apex feast titles', () => {
   });
 
   it('the raw wire name is a VALUE and is never translated', () => {
-    // The i18n invariant: the text is the key, the name is the param. A player
-    // called "Harvest Feast" must still come through verbatim inside the title.
+    // The i18n invariant: the text is the key, the name is the param. Two
+    // cases, because they fail differently. A player whose name COLLIDES with a
+    // title string must not be rewritten by any lookup:
+    const collides = ent({
+      kind: 'object',
+      templateId: 'stonepot_feast',
+      name: 'Harvest Feast',
+    });
+    expect(entityDisplayName(collides)).toBe("Harvest Feast's Stonepot Feast");
+    // ...and a non-ASCII name must survive interpolation byte for byte.
     const odd = ent({ kind: 'object', templateId: 'stonepot_feast', name: 'Zháng' });
     expect(entityDisplayName(odd)).toBe("Zháng's Stonepot Feast");
   });
@@ -112,5 +124,12 @@ describe('the apex feast titles', () => {
     }
     expect(feastTitleKeyFor('farm_bed'), 'a non-feast object has no title key').toBeNull();
     expect(feastTitleKeyFor(undefined)).toBeNull();
+    // AND THE REVERSE DIRECTION, which the two negatives above do not give:
+    // the title map must claim NO template outside the family. Without this,
+    // adding `farm_bed` to the map would label every garden bed as a feast and
+    // every arm above would stay green, because they only ever walk the family
+    // and ask whether the map answers. "and nothing else does" is in this
+    // test's own title, so it is asserted rather than implied.
+    expect(feastTitleKeyedTemplateIds(), 'the map claims exactly the family').toEqual(templates);
   });
 });

@@ -37,6 +37,12 @@ export interface BagItemInfo {
   /** The catalog mount a kind:'mount' reins item owns (see MountItemDef). */
   mount?: string;
   /** The placeable shared feast payload (ItemDef.feast, Farming Phase 12). */
+  // The shipped payload also carries `templateId` (masterwrought Phase 11k); it
+  // is omitted here because this view never places anything, and a structural
+  // mirror that lists a field it does not read invites the next reader to think
+  // it does. Under-describing is the deliberate half: adding a field to the def
+  // does not red this line, so a field that ever becomes load-bearing HERE must
+  // be added here on purpose.
   feast?: { charges: number; durationTicks: number; dishItemId: string };
 }
 

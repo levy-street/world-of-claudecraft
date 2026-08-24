@@ -600,7 +600,11 @@ describe('the derivation itself cannot pass by matching nothing', () => {
     );
     // At the real count rather than a token floor, this round's own convention.
     // 12 to 15 at masterwrought Phase 11k: the three apex role feasts each name
-    // both tier-4 fine twins, so all three credit farming at the endgame band.
+    // `evergarden_greens`, the BASE tier-4 crop, so all three credit farming at
+    // the endgame band. NOT the fine twins: the bill's own header records why a
+    // fine twin is illegal on a fish row under RULE 2's value half, and a
+    // reader repairing this pin from a fine-twin premise would look for a
+    // reagent that is not there.
     expect(farmingEndgame.length, 'and it still has real endgame rows').toBe(15);
     // AND THE OUTCOME FOR EVERY OTHER FAMILY, which the two lines above do not
     // reach (masterwrought Phase 11j QA). The pin is the set the matrix

@@ -53,3 +53,11 @@ export function feastTitleFor(
 export function feastTitleTemplateIds(): string[] {
   return feastTemplateIds();
 }
+
+/** Every templateId this map CLAIMS a title for, sorted. Exported for the
+ *  reverse half of the exhaustiveness pin: without it the map could gain a key
+ *  for a non-feast template (labelling, say, every farm bed as a feast) and the
+ *  forward-direction check would stay green. */
+export function feastTitleKeyedTemplateIds(): string[] {
+  return Object.keys(TITLE_KEY_BY_TEMPLATE_ID).sort();
+}
