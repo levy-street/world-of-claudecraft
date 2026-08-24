@@ -12147,6 +12147,469 @@ stale-client window), 11h's two deviations, 11i's session cap 15 s to 16 s,
 - Raising farming's maxSkill to make the apex hoe fit.
 - Growing `PRE_TRAINING_RECIPE_IDS`.
 
+## Phase 11j QA ledger (2026-08-23, verify the gathering completion pass)
+
+VERDICT: **PASS-WITH-FOLLOWUPS**. Base tip a1e26df5a0, twelfth release sync at
+1f3a844732, LOCAL, no push, no PR. The phase under audit is SEVENTEEN commits,
+`git log --oneline 6bdb4bcf18..HEAD`, not the five its own phase file expected:
+the file was written 2026-08-20 against a tree where logging was predicted to be
+a live masterwrought R20 violation, and two thirds of the phase, every review
+round included, happened after that.
+
+THE HEADLINE, and it is about the guard rather than the content: **TWO MUTATIONS
+SURVIVED `tests/gathering_supply_coverage.test.ts`, and both were holes in
+masterwrought decision D itself.** Sixteen mutations run in total, fourteen dead
+on the shipped tree, two alive; both are fixed, both re-proven dead, and the
+other eight arms re-run afterwards because a fix to a guard is the change most
+likely to blunt it.
+
+The phase's own numbers, by contrast, are correct. Every cell of the band matrix,
+every row of the demand ratio table, every median, the endgame row lists and the
+refused-set all reproduce EXACTLY from an independent derivation that shares no
+code with the guard (its own band math is `Math.floor(skillReq / 25)` rather than
+`tierForSkill`, and the two agree everywhere).
+
+### STEP 0: THE TWELFTH RELEASE SYNC
+
+`origin/release/v0.40.0` had moved four commits, a warlock PvE viability balance
+pass. Merged at 1f3a844732 with NO conflicts. It touches no 11j surface: no
+items, recipes, shop, icons, deeds, reliquary, guide content or item catalog.
+The monolith ratchet and the architecture guard were both MEASURED after the
+merge rather than assumed, and both are green.
+
+BOTH ENDS OF ALL THREE BASELINES, so the drift is attributable:
+
+| measure | 11j stamp (9300b5c36d) | post-sync (1f3a844732) | post-fix (this QA) |
+|---|---|---|---|
+| vitest | EXIT=0, 3069 files / 12 skipped (3081); 43956 passed / 2 xfail / 115 skipped (44073) | **EXIT=0**, 3069 / 12 (3081); **43961** passed / 2 xfail / 115 skipped (44078) | see the frozen stamp below |
+| `npm run ci:changed` | EXIT=0, 797 files, 3094 warnings, 0 errors | **EXIT=0**, 797 files, 3094 warnings, 0 errors | see below |
+| `npx tsc --noEmit` | clean | **clean** | see below |
+
+The +5 tests are the merge's own (the warlock anchor suites plus a
+`suite_duration_budget` row); +0 files. THE RELEASE CONTRIBUTED THE WHOLE DRIFT
+and this audit contributed none of it, which is the reason both ends are stamped.
+
+`env | grep -c DATABASE_URL` printed 0 before every run.
+
+### THE MATRIX, REPRODUCED INDEPENDENTLY
+
+Derived by a temporary reporter that re-implements the supply sets, the bands and
+the refusal from the CONTENT TABLES rather than calling the guard's functions,
+then deleted. Recorded beside the phase's own so the comparison is checkable.
+
+| family | b0 | b1 | b2 | b3 | b4 | matches ledger |
+|---|---|---|---|---|---|---|
+| mining | 11 | 11 | 12 | 7 | 12 | yes |
+| logging | 2 | 2 | 1 | 2 | 3 | yes |
+| herbalism | 9 | 10 | 11 | 6 | 11 | yes |
+| fishing | 2 | 2 | 2 | 2 | 6 | yes |
+| farming | 5 | 7 | 5 | 4 | 12 | yes |
+| corpse harvesting | 15 | 13 | 10 | 7 | 14 | yes |
+
+**ZERO EMPTY CELLS, CONFIRMED INDEPENDENTLY.** There were no gaps to close, so
+the phase file's "confirm every gap was closed by an ADDED row" is answered by
+confirming the ZERO, not by hunting fills. The two things that would have made
+the zero a lie are both checked by derivation rather than by reading the ledger:
+across the WHOLE phase, `src/sim/content/` gained exactly FOUR lines carrying an
+itemId (two delve shop rows and the apex hoe's two reagents) and LOST none, and
+exactly ONE `skillReq` line was added (the hoe's 125) with none changed. So no
+bill was substituted (masterwrought R18 holds trivially), no band was satisfied
+by re-banding an existing recipe, and the only produce this phase put in any bill
+is `fine_evergarden_greens` into a gathering TOOL, which is decision F's
+carve-out (masterwrought R17 holds, and nothing reached the gear chain, the
+Perfecting materials or `recipe_quickening_catalyst`).
+
+LOGGING'S QUESTION IS ANSWERED RATHER THAN OPEN, confirmed from the merged tree:
+it is the thinnest family at every band (2/2/1/2/3) and it has THREE endgame rows
+at exactly 100, `recipe_gyrelens_array`, `recipe_masters_field_forge` and
+`recipe_makers_charm`. The standing prediction is falsified in the good
+direction.
+
+DECISION D'S REFUSAL BITES SIX ROWS ACROSS ALL FIVE GATHERING PROFESSIONS, which
+reproduces the ledger's corrected count and not the "five across four" that
+`progress.md` still carried (fixed here):
+`mining:recipe_arcanite_mining_pick`, `logging:recipe_elderwood_axe`,
+`herbalism:recipe_sunpetal_sickle`, `fishing:recipe_tidewrought_fishing_rod`,
+`fishing:recipe_clockreel_fishing_rod`, `farming:recipe_evergarden_hoe`.
+
+### THE BEFORE COLUMN, RE-MEASURED BOTH WAYS
+
+The reconciliation is already recorded and is not re-litigated; what this audit
+adds is the second column, because the ledger's EXPLANATION of its own residual
+was wrong. skillReq >= 75 on the merged tree:
+
+| family | without the refusal | with it |
+|---|---|---|
+| mining | 20 | 19 |
+| logging | 6 | 5 |
+| herbalism | 18 | 17 |
+| fishing | 10 | 8 |
+| farming | 17 | 16 |
+| corpse harvesting | 21 | 21 |
+
+The maintainer's 20 and 6 reproduce EXACTLY in the left column, which is the
+instrument the ledger names. The right column is what makes the ledger's closing
+sentence false: it said the mining 21-to-20 gap was the refusal removing the
+tier-5 pick, and the refusal takes mining to 19, not 20. Amended in place, with
+the settled qr-CENSUS reading (the node-family derivation) restored as the
+cause.
+
+### THE DEMAND RATIO TABLE, REPRODUCED
+
+Every row of the ledger's ratio table reproduces from the independent derivation,
+including all six medians (mining 6, logging 1, herbalism 6.5, fishing 2,
+farming 1, corpse 6) and the three substitution-only grades. Two summary rows the
+ledger states in prose were expanded and checked: the farming "other ten fine
+twins and three produce at 1 each" is exactly ten twins and exactly three
+produce, at 1 to 4 units, and the corpse tail is exactly `curved_tusk`,
+`sharp_claw` and `pristine_claw`.
+
+### THE MUTATION PROOFS, IN FULL
+
+Sixteen mutations. Every one applied to the real tree on a clean checkout,
+PROVEN APPLIED before the run (numstat, plus the removed-line count the harness
+prints), then restored by FILE COPY and verified with `diff -q` plus a clean
+`git status`. Never `git checkout`.
+
+**Fourteen dead on the shipped guard:**
+
+| mutation | arm proven | outcome |
+|---|---|---|
+| drop `elderwood_log` from logging's ONLY band-2 row | band arm | RED, names `logging`, `band 2`, `skillReq 50 to 74` and the six ids logging supplies, plus the fix instruction and the rule's home. The demand arm reds too, since the id loses its only consumer |
+| empty fishing b0 AND mining b3 in ONE invocation | band arm, two families at once | RED, and the output names BOTH holes. This is the "reports every hole in one run" property proven rather than asserted |
+| empty herbalism b3 AND logging b1 | band arm | RED, both named |
+| empty farming b3 AND corpse b3 | band arm | RED, both named. With the four rows above, every family and every band is covered |
+| strip logging's three endgame rows | endgame arm | RED, and it proves the refusal is load-bearing: `recipe_elderwood_axe` would otherwise cover logging falsely |
+| `isSelfFeedingFor` returns false unconditionally | decision D | RED at the discriminator's first case |
+| the refusal broken for FARMING ONLY (the three literal cases still correct) | decision D's outcome pin | RED at "farming must not be credited for its own hoe". This is the sharper half: it proves the fix round's repair, not just that the arm exists |
+| a synthetic SIXTH gathering profession appended like farming was | subject list + anti-vacuity | RED on FOUR arms. The guard picks it up with no edit, and the literal beside the derivation is what names it |
+| mistype `NODE_HARVEST_TABLE`'s wood professionId | anti-vacuity + anti-rot | RED on FIVE arms, including "logging derived an EMPTY supply set". The derivation cannot pass by matching nothing |
+| `TIER_SKILL_STEP` 25 to 20 | band math | RED on THREE arms |
+| strip `raw_mirror_trout`'s only consumer | demand arm | RED, naming the material and stating no base grade could absorb it |
+| delete the substitution credit from `consumptionIdsFor` | demand arm + the load-bearing arm | RED on BOTH, the three eastbrook grades named |
+| re-band the apex hoe out of the endgame | this phase's OWN content | RED (after the fix; see below) |
+| retype a land tool to `professionId: 'fishing'` | the wield sweep's population | RED at 19 against 20 (after the fix) |
+
+**TWO SURVIVED, and both are decision D:**
+
+1. **NARROW THE REFUSAL TO FARMING ALONE** (`family === 'farming' &&
+   isSelfFeedingFor(...)` inside `bandMatrix`). VITEST EXIT=0, all ten arms
+   green. Mining, logging, herbalism and fishing would each have been credited
+   at the endgame band by their own tool, which is the one thing decision D
+   exists to refuse, and the outcome pin the 11j fix round added covers FARMING
+   and nothing else. The 11j ledger's own handoff says the refusal "is
+   load-bearing rather than decorative"; it was load-bearing for one family in
+   six.
+   FIXED by recording what the matrix actually refused as it builds
+   (`REFUSED_ENDGAME_ROWS`) and pinning the whole six-row set. The pin reads the
+   RUN, not a second implementation of the rule, so it cannot agree with a
+   broken one. Re-proven: the same mutation now reds with the five missing
+   families named.
+
+2. **LEAVE A LEVELLING BAND CREDITED ONLY BY THE FAMILY'S OWN TOOL.** The
+   refusal applies at the ENDGAME band only, and below the cap the same hole is
+   possible. Logging band 3 is ONE row from it: it holds
+   `recipe_ashwood_axe` (logging's own axe) and `recipe_precision_chassis` and
+   nothing else, so stripping the chassis's log leaves logging band 3 credited
+   solely by an axe. VITEST EXIT=0. That is exactly the state the file's own
+   opening paragraph calls worthless.
+   FIXED with a SELF-CLEARING TRIPWIRE rather than a rule change, because the
+   rule is the maintainer's: the arm reds if any levelling band is ever left
+   self-credited, and its message says re-decide decision D's scope rather than
+   widen the arm. The measured cost of extending the refusal to every band is
+   recorded beside it and no cell empties (logging b3 2 to 1, mining b3 7 to 6,
+   herbalism b3 6 to 5, fishing b3 2 to 1, farming b1 7 to 6, b2 5 to 4, b3 4 to
+   3). Re-proven: the same mutation now reds naming the family, the band and the
+   rows.
+
+**AFTER THE FIX, EIGHT MUTATIONS RE-RUN AGAINST THE AMENDED GUARD**, because a
+fix to a guard is the change most likely to blunt it. All eight still dead: the
+two survivors, plus the band arm, the endgame arm, the unconditional-false
+refusal, the farming-only refusal, the substitution credit and the empty-supply
+typo.
+
+**AND ONE MEASUREMENT WORTH CARRYING FORWARD.** Before this fix the guard was
+INVARIANT to this phase's own content: the refusal drops the apex hoe either
+way, so farming's endgame cell reads 12 with the hoe and 12 without it, and
+`not.toContain('recipe_evergarden_hoe')` passes vacuously on a tree where the
+recipe does not exist. Zero of 11j's content additions were protected by 11j's
+headline deliverable. The refused-set pin changes that: re-banding the apex hoe
+out of the endgame now reds the guard.
+
+### THE APEX HOE: EVERY FIELD RE-DERIVED
+
+Compared field by field against `arcanite_mining_pick`, `elderwood_axe`,
+`sunpetal_sickle` and `tidewrought_fishing_rod` on the merged tree, not against
+the ledger's description of them. `kind: 'tool'`, `quality: 'epic'`,
+`use: { gatherTool, farming, tier 5 }`, `sellValue: 150`, no `buyValue`, and
+NEITHER `noVendorSell` nor `noMarketList`: identical in shape to all four. Input
+220 (fine greens 2x80 plus the rung-4 hoe at 60) against output 150,
+gold-negative, and the same arithmetic as `recipe_sunpetal_sickle` (80x2 + 60).
+No deviation to explain.
+
+LEARNABLE, re-derived rather than trusted: engineering's cap is 125,
+`tierForSkill(125)` is 5 and `tierForSkill(150)` is 6, `teachTierMet` runs on
+BOTH channels, so 125 is forced and 150 would be dead content.
+`PRE_TRAINING_RECIPE_IDS` is untouched (`src/sim/professions/training.ts` has no
+diff across the whole phase).
+
+THE LADDER'S OWN INVARIANT holds unchanged: the fine twin of a crop one tier
+below the result, plus exactly one hoe one rung down. It joined `HOE_RECIPES`
+and `TOOL_RECIPES` stays pinned at 6.
+
+THE WIELD GATE needed no table change, and BOTH halves are now pinned: the
+tier-5 row reads `TIER5_TOOL_WIELD_PROFICIENCY` (100) against farming's cap of
+100, and `farmingTeachingCeilingFor(4)` is 100, so the cap is reachable on the
+ground the rung below opens. The second half had no test before 11j.
+
+THE NAMING VERDICT stands (CLEAR, inheriting the registered proper noun's
+existing KEEP-with-caveat verdict, web-verified at authoring), and is not
+re-litigated. What IS corrected is the ground beneath it: three comments and a
+test asserted that "a tier-5 tool is named for the fine reagent its rung
+consumes", and only TWO of the four shipped tier-5 tools follow it. The
+Glyphsteel Mining Pick is named for its Glyphsteel Bar and takes Fine Osmium Ore
+beside it; the Tidewrought Fishing Rod consumes no fine grade at all. The twin
+choice survives, because all four tier-4 twins satisfy the one-tier-below
+invariant equally and the name is what picked between them, but it is a
+tie-breaker rather than a rule and now says so.
+
+### THE TWO RETIREMENTS, JUDGED
+
+Both are FORCED and both replacements are at least as strong. This is where a
+phase most easily launders a weakening, so each was re-derived rather than read.
+
+- `tests/farm_recipes.test.ts`'s twin-EXCLUSIVITY clause. It asserted a hoe twin
+  has NO dish slot. The apex rung consumes a TIER-4 twin under the ladder's own
+  one-tier-below invariant, and 11h had already given every tier-4 twin a dish,
+  so no unbooked twin existed: the partition cannot survive ANY apex hoe.
+  Genuinely falsified. The replacement pins the exact double-booked set
+  (`['fine_evergarden_greens']`), which is STRICTER than the old empty-set claim
+  in the direction that matters: a second double-booking reds. The
+  whole-column orphan sweep beside it is a labelled shape statement rather than
+  a guard, and its disclaiming comment is accurate (checked: for the four hoe
+  twins its filter is false by construction, and for the other eight the dish
+  loop above it is stricter).
+- `tests/provisioning_supply_line_apex.test.ts`'s no-overlap sweep. It asserted
+  no APEX_CONSUMABLE row consumes a hoe twin, and `recipe_laden_hearth` IS such
+  a row and DOES consume `fine_evergarden_greens`, which the apex rung promoted
+  into the hoe-twin set. Genuinely falsified. Replaced by an exact enumeration
+  of the non-hoe consumers, which refuses a SILENT third consumer by name, plus
+  a per-twin consumer count. The one thing the narrowing gives up (swapping one
+  non-capstone consumer for another at the same count) is now NAMED in the file
+  rather than described as covered.
+
+### WHAT THIS AUDIT FOUND AND FIXED
+
+Beyond the two mutation survivors, every finding below was applied, in four
+commits with explicit paths.
+
+**THE GUARD'S OWN HEADER WAS THE MOST MISLEADING TEXT IN IT.** Three claims, all
+falsified by the phase's own fix round, in a file whose entire thesis is honest
+labelling:
+- "There is no hand-written id list and no literal 25 in this file." Both halves
+  false: the fix round added `expect(TIER_SKILL_STEP).toBe(25)` and four
+  hand-written id lists, deliberately, because a derivation alone cannot fail.
+  The paragraph now says so, and says a `TIER_SKILL_STEP` change REDS this file
+  rather than following the game, which is the behavior wanted.
+- "No arm in this file asserts a COUNT of bills." False: farming's endgame cell
+  is pinned at 12. The pin is right and is kept; decision E's paragraph gains
+  the subject-size carve-out, or the next reader deletes the pin to restore the
+  stated invariant.
+- The node-yield anti-rot arm claimed "a table row added without a supply
+  mapping reds HERE", and both its sides walk the SAME `NODE_MATERIAL_TABLE`, so
+  a new zone row grows them together. Its only real tooth is a mis-mapped node
+  professionId, which the typo mutation proves. Comment corrected and the
+  nine-id literal that DOES catch a table row added beside it.
+
+**TWO MORE TOKEN FLOORS, in the file that writes "at the real count rather than
+a token floor" one arm over.** `ids.size > 0` against real supply sets of 6 to
+24 is the floor-far-below-the-population trap: `nodeSupplyFor` could stop adding
+fine twins, halving three families, with every arm green because the bases alone
+still cover every band. Pinned at the real sizes. And
+`tests/recipe_reachability.test.ts`'s `checked` counter increments BEFORE the
+fishing `continue`, so its 25 bounds the LOOP rather than the twenty land tools
+the arm asserts over; a land tool retyped to fishing left the sweep entirely
+with the arm green. Proven by that mutation, and a second counter now pins 20.
+
+**A FALSE MECHANIC CLAIM IN THE NEW ITEM'S OWN HEADER.** It said the apex hoe
+opens no crop tier "exactly as the tier-5 rod opens no catch band the tier-4 rod
+does not". `fishingRodBandFor` runs band b off tool tier b + 1, so band 3 takes
+the tier-4 stormreel and band 4 the tier-5 tidewrought. Fishing is the ONE
+gathering profession whose apex rungs buy access, which is precisely why the hoe
+cannot lean on it. The phase's own shop.ts comment and its own decision-B
+paragraph both say the rods open bands 3 and 4; only this header disagreed. The
+hoe half was always true and is kept.
+
+**A PLAYER-VISIBLE WIKI PAGE CONTRADICTING ITSELF IN ENGLISH.**
+`guide.profPages.toolsNoteThreeRods` renders above the tool table on EVERY
+gathering page, farming included, and described the three node trades as if they
+were all of them. On the farming page it sat directly above a table this phase
+regenerated to five hoe rungs while saying each land trade has two crafted
+tools; it said every character knows the land recipes, where all four hoe
+recipes are `acquisition: ['trainer']` and the very next sentence contrasts
+fishing as learned rather than known; it said the land trades' top tools buy no
+access, where planting a tier-N bed needs a tier-N hoe; and its wield clause
+called 85 and 100 "the two crafted rungs", which is the node trades' count and
+not farming's four. Two of those predate 11j. What 11j did is regenerate the
+table under them and make the Marks clause true for farming for the first time,
+which is when inherited debt becomes a page that contradicts itself.
+Corrected in the ENGLISH catalog only, per the contributor rule, and pinned by a
+new arm that anchors on clauses existing ONLY in the corrected text, pins the
+three retired claims ABSENT, and ties the sentences to the live tables. Proven
+by reverting one clause, which reds it.
+**AND THE EXPOSURE IS RECORDED because no gate can see it:** a REWORD leaves a
+translated row translated, so `ja_JP`, `ko_KR`, `ru_RU`, `zh_CN` and `zh_TW`
+still carry the old claims on that key. The overlays are the maintainer's at
+release and are deliberately untouched; the fifteen Latin locales were pending
+and were re-English-filled by the regen.
+
+**FOUR RECORDS THIS PHASE LEFT WRONG.** The ledger's BEFORE-column
+reconciliation contradicted itself two sentences apart and overwrote a settled
+qr-CENSUS reading (above). `progress.md` still carried the draft the ledger
+corrected ("five rows across four families") AND repeated the guard's
+pre-review-round no-literals claim. `brainstorm.md` said a maxSkill climb past
+100 is "NOT already reserved anywhere", four bullets below its own "maxSkill 150
+with the next map/level-cap expansion" bullet, with `proficiency_bands.ts`
+calling its unreachable band 2 deliberate forward room for the V3 cap climb: the
+narrow measured reading is kept, the general claim is not. And
+`docs/design/professions.md` carried one bare `R21` in a file whose own
+Professions 2.0 series has an R19, R20 and R22, plus a masterwrought R19
+paragraph naming source symbols where every sibling rule names its enforcing
+test.
+
+### WHAT WAS CHECKED AND CAME BACK CLEAN
+
+- **The obligations, all discharged.** The art park agrees at 74 across all three
+  independent terms (`ITEM_ART_PENDING`, the exact-set arm in
+  `tests/item_icons.test.ts`, `pendingArtCount` in `scripts/item_art_audit.mjs`)
+  plus the derived hotbar term at 20; the batch-XOR rule holds (`evergarden_hoe`
+  is `kind: 'tool'`, so it enters `ITEM_IMAGE_IDS` only through the derivation
+  loop, and no committed webp or mapping owner exists); the icon recipe follows
+  the family rule with the `r()` arguments in the right positions; the M16
+  verdict was obtained FROM the guard (the wordy predicate matches
+  "Evergarden Hoe") and all five non-Latin fills are real and non-identical;
+  `npm run wiki:content` reproduces a ZERO diff and so does `npm run i18n:gen`;
+  the deed and Reliquary declines are both correct AND their stated grounds are
+  true (no sibling tier-5 tool carries a deed, and the pick, axe and sickle carry
+  no relic row).
+- **Sim purity and the ratchets.** `tests/architecture.test.ts` and
+  `tests/monolith_budget.test.ts` both green after the release sync, measured
+  rather than assumed. No `Math.random`, wall clock, DOM or cross-layer import
+  entered `src/sim/`.
+- **Cleanup.** No `.only`, no `debugger`, no leftover `console.log`, no
+  temporary reporter surviving in the tree, and no em dash, en dash or emoji in
+  any added line, across both the phase diff and this audit's.
+- **Reviewer dispatch, answered rather than performed.**
+  `content-obligations-reviewer` ran (the content diff) and
+  `test-coverage-auditor` ran (the pin quality), and the two mutation survivors
+  came from following the latter's lead and proving it by mutation rather than
+  taking it. `architecture-reviewer` was NOT dispatched and the reason is
+  explicit: no `src/sim/` BEHAVIOR file changed, only data-as-code under
+  `src/sim/content/`, with no SimContext seam, no rng draw and no tick phase
+  touched. `frontend-seam-reviewer` was NOT dispatched either: the only
+  `src/ui/` movement is an `ITEM_RECIPES` row plus an `ITEM_ART_PENDING` entry in
+  `icons.ts` and a reworded English catalog value on an existing `paras()` render
+  path, so no pure core, painter, style, per-frame path or new render sink is
+  involved.
+
+### THE FIX ROUND'S OWN REVIEW, AND WHAT IT CAUGHT
+
+A fix round is unreviewed code, and in this packet every one of them has shipped
+a defect of its own. This one was re-read as such and it had TWO.
+
+- **THE REFUSED-SET BOOKKEEPING DEPENDED ON BEING CALLED ONCE.**
+  `REFUSED_ENDGAME_ROWS` is a module-level array that `bandMatrix` pushes into.
+  It is built exactly once today (`MATRIX`, at module scope) and a second call
+  would have failed the pin loudly rather than silently, so nothing was wrong on
+  the tree; but a guard whose own bookkeeping is correct only because of how many
+  times it happens to be invoked is a trap for whoever extends it, which is the
+  same shape as the vacuity findings this file exists to record. It resets first
+  now.
+- **THE REWORDED WIKI SENTENCE OVERREACHED BY ONE CLAUSE.** "Farming's ladder is
+  the long one, and none of it is free" reads against the tier-1 hoe
+  `q_farm_intro` hands over through `requiredItems`. The clause carrying the
+  actual meaning was already beside it ("every hoe above the 20-copper
+  starter is crafted"), so the loose half is gone and the test anchor moved with
+  it. Correcting a false claim with a slightly false claim would have been the
+  purest version of this phase's own lesson.
+
+TWO OF THE SIX AUDIT LANES DID NOT RETURN, and that is recorded rather than
+papered over: the doc-accuracy and qa-checklist agents both finished without
+delivering a report. Both lanes were then run BY HAND and every item they were
+given is answered somewhere above: the supply matrix verified cell by cell
+against an independent derivation, every masterwrought R17 to R21 enforcement
+citation re-grepped (`grep -c` on the named file for the rule's own name), the
+bare R-number found and fixed, the rod-band and naming-convention claims checked
+against the shipped functions, sim purity and both ratchets measured after the
+merge, the generated artifacts re-generated to a zero diff, and the cleanup scan
+run over both diffs. The two lanes that DID return, content obligations and pin
+quality, are where the guard's two survivors came from: the pin auditor named
+the family-scoped narrowing and the endgame-only scope as suspicions, and both
+were then PROVEN by mutation rather than taken on its word, which is the only
+reason they are recorded as holes rather than as opinions.
+
+### DEVIATIONS AND WHAT WAS DELIBERATELY NOT DONE
+
+1. **The shipped-id golden was NOT re-minted**, ratifying 11j's own decision and
+   the same call 11e through 11i made. Re-minting would pin 102 unshipped
+   branch-only ids as permanent API on a branch that has not merged, and the pin
+   is a SUBSET check that passes untouched. This is a standing policy question,
+   open item (10) below, not a missed obligation.
+2. **The five non-Latin overlays were left stale on the reworded wiki key**, per
+   the repo rule that a contributor never edits `src/ui/i18n.locales/`. Recorded
+   above with the exact key and locales so the release fill can find it; the M16
+   guard cannot, because a reword leaves a translated row translated.
+3. **Decision D's endgame-only SCOPE was not changed**, only tripwired. Extending
+   the refusal to every band is shippable (no cell empties, cost measured above)
+   but it re-takes a settled decision, which is the maintainer's.
+
+### OPEN ITEMS, ALL THE MAINTAINER'S
+
+The ten inherited are unchanged and NOT re-decided here: the three inherited
+(scroll/elixir 15c parity, RULE 2's value-half reading, the inherited
+stale-client window), 11h's two deviations, 11i's session cap 15 s to 16 s,
+`prog_first_harvest` taking 13 catches for a fishing-only character, the
+`deepwater_feast` FIX-or-CUT, the DECISION-A contradiction (the apex hoe's
+acquisition channel), and the shipped-id golden policy. This audit adds:
+
+(11) **DECISION D'S BAND SCOPE.** The self-feeding refusal applies at the endgame
+     band only. A levelling band credited solely by the family's own tool ladder
+     is the thing masterwrought R20's own opening paragraph calls worthless, and
+     logging band 3 is one row from it. A tripwire now reds if it ever happens.
+     Extending the refusal to every band empties no cell (cost table above);
+     leaving it is also defensible, since below the cap a tool rung is at least a
+     rung a leveller passes through. Ruling wanted, not a fix.
+(12) **THE REWORDED WIKI KEY'S FIVE STALE NON-LATIN FILLS.**
+     `guide.profPages.toolsNoteThreeRods` in `ja_JP`, `ko_KR`, `ru_RU`, `zh_CN`
+     and `zh_TW`. No gate can see a stale reword. Either re-fill at release or
+     rule that the key is re-keyed instead.
+
+### THE HANDOFF TO 11k
+
+- **A GUARD IS WORTH ITS FAILURE MODE, AND THIS ONE COST TWO MUTATIONS TO
+  MEASURE.** The 11j fix round found four vacuous assertions in this file and
+  repaired them well; the two that survived are the class one level up, where
+  every assertion is real and the SET they cover is one sixth of the claim. When
+  a rule applies to N subjects, pin the rule's OUTCOME over all N, not over the
+  one the phase happened to add. The cheap general form is what the fix uses:
+  have the derivation record what it did, and pin THAT, so the pin cannot be a
+  second implementation that agrees with a broken first one.
+- **11k MOVES THE SAME PINS 11j MOVED**, and re-derives each by
+  predicted-then-observed rather than re-pasting: the deed totals, the economy
+  literals (`ALL_RECIPES`, `HOE_RECIPES`, the delve stock rows and per-tier
+  arms, `farmingItemIds`, `NEVER_STOCKED`, `delveRowsSeen`), the three art-park
+  terms (only `pendingArtCount` under `scripts/` is invisible to `vitest
+  related`; the two in `tests/` are selected by any content change), the
+  professions blob byte band, and the shipped-id golden.
+- **AND IT NOW INHERITS A GUARD THAT PROTECTS CONTENT.** Before this audit the
+  coverage file was invariant to 11j's own additions; the refused-set pin ties
+  the two together, so 11k's own apex rows will red it if they go missing.
+- **PROSE STILL HAS NO TEST, and the wiki is where it costs a player.** 11j
+  fixed three fabricated citations after a reviewer found them; this audit found
+  a fourth false claim in shipped source, a bare R-number, and a wiki paragraph
+  contradicting the table beneath it. Grep every citation before writing it, and
+  when a phase regenerates a table, read the hand-authored paragraph beside it.
+
 ## Phase 11i QA ledger (2026-08-23, verify the angler's endgame)
 
 VERDICT: **FAIL**, on one deliverable, with everything else PASS. Base tip

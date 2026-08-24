@@ -298,7 +298,12 @@ resolves to, and BOTH learning channels run the same `teachTierMet` gate
 there is permanently unlearnable through every shipped route. Those three
 escape only because they predate training and sit in the frozen
 `PRE_TRAINING_RECIPE_IDS`. The rod and hoe rows were authored after that
-switch and sit at the reachable top rung instead. **150 is not a target**:
+switch and sit at the reachable top rung instead. That split has a COST a
+player pays and this file should say so: a grandfathered row is known from the
+start and free, while the two reachable rows are trainer-taught and charge
+`TRAINING_FEE_BY_TIER`'s top entry once each. So the completed tier-5 family is
+uniform in what it does and not in what it costs to learn, which is history
+rather than a balance statement. **150 is not a target**:
 an apex tool authored there today would be dead content that ships green,
 and `tests/professions_rod_recipes.test.ts` now walks every recipe carrying
 an acquisition list against its own craft's cap so it cannot happen twice.
