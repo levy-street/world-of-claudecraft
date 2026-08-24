@@ -2222,14 +2222,11 @@ export const ZONE2_ITEMS: Record<string, ItemDef> = {
     quality: 'common',
     sellValue: 14,
   },
-  // Reagent now (TROPHY_RECIPES, Masterwrought phase 11l), same convention as
-  // wolf_fang in items.ts: common NOT poor so sellAllJunk never sweeps it;
-  // sellValue unchanged.
   chipped_tusk: {
     id: 'chipped_tusk',
     name: 'Chipped Tusk',
     kind: 'junk',
-    quality: 'common',
+    quality: 'poor',
     sellValue: 15,
   },
   deepfen_pearl: {

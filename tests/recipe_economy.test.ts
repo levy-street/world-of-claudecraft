@@ -8,6 +8,8 @@
 // members gold-negative; the last 4 (jerkin, vestments, druids hide, warded
 // leggings) closed through the maintainer-approved paired arm (input rework
 // plus an output sellValue re-price), so the frozen list below is EMPTY.
+import { readFileSync } from 'node:fs';
+import path from 'node:path';
 import { describe, expect, it } from 'vitest';
 import {
   HARVEST_COMPONENT_ITEMS,
@@ -42,6 +44,9 @@ import { NODE_MATERIAL_TABLE } from '../src/sim/professions/gathering';
 import { stationsOfType, stationTypeForCraft } from '../src/sim/professions/stations';
 import { PRE_TRAINING_RECIPE_IDS, trainingStationTypeFor } from '../src/sim/professions/training';
 import type { ProfessionRecipeRecord } from '../src/sim/professions/types';
+import { expectScansOnlyThroughSharedWalkers } from './helpers/scan_guard_self_audit';
+import { stripComments } from './helpers/strip_comments';
+import { tsFilesUnder } from './helpers/ts_files_under';
 
 // --- economy math (the locked reagent-value rule) --------------------------
 // inputValue: sum over reagents of count x the reagent's unit value, where the
@@ -74,18 +79,30 @@ function requireRecipe(id: string): ProfessionRecipeRecord {
 // The counterfactual floor: specialized in the recipe's own craft (cap skill
 // clears any threshold) AND holding a self-signed copy of every reagent,
 // through requiredReagentCountFor, the same function the sim charges. Two
-// caveats the src/sim/content/recipes.ts trophy header names, so this is a
-// conservative bound rather than a bill a crafter pays: the Jack of All Trades
-// 0.9 multiplier is EXCLUDED (the default false arm; no live quest path
-// attunes a Jack today, so nothing here reds when that changes, and the bound
-// only loosens when it lands), and self-signing a reagent needs a copy the
-// crafter gathered or harvested at a rare-plus material rarity roll
-// (gathering.ts isSignableMaterialRarity) or a masterwork proc copy, which a
-// mob-dropped trophy or a vendor staple never is; every trophy bill carries
-// both, so the realistic figure is the specialization-only one. Stricter than
-// reality is the safe direction for an invariant. Module scope so the
-// vendor-loop bound (THE ECONOMY INVARIANT) and the trophy floor map
-// (REFERENTIAL INTEGRITY) compute one number from one body.
+// caveats the src/sim/content/recipes.ts trophy header names, and they cut in
+// OPPOSITE directions. FIRST, the Jack of All Trades 0.9 multiplier is
+// EXCLUDED (the default false arm), and that is the PERMISSIVE direction, not
+// the safe one: the multiplier shaves counts, so a Jack's real bill is at or
+// under the figure computed here, and the vendor-loop bound below checks a
+// number LARGER than a Jack would pay (recipe_sootscale_mantle: 300 here,
+// exactly 280 under the Jack arm, equal to its output, where the strict
+// less-than fails). The bound is honest only while no character can become a
+// Jack, which the attuneJackOfAllTrades caller scan in THE ECONOMY INVARIANT
+// pins. SECOND, self-signing a reagent needs a copy the crafter gathered or
+// harvested at a rare-plus material rarity roll (gathering.ts
+// isSignableMaterialRarity; the corpse-harvest arms in interaction.ts mint
+// the signed component or its family's specimen) or a rare-plus masterwork
+// craft. A node yield or a corpse component or specimen (iron_ore,
+// thorium_ore, goldleaf_herb, elderwood_log, rough_hide, spider_silk,
+// pristine_hide) CAN therefore be self-signed, while a mob-dropped trophy and
+// a bought vendor staple never can, so the floor is exactly reachable for
+// some rows (the cinch and the belt, by one self-signed pristine hide) and a
+// counterfactual for others (the trophy header prints the reachable figure
+// per row where it differs). Assuming every reagent signed is the STRICT
+// direction for this caveat (a bill at or under what any crafter pays), the
+// safe one for the bound. Module scope so the vendor-loop bound (THE ECONOMY
+// INVARIANT) and the trophy floor map (REFERENTIAL INTEGRITY) compute one
+// number from one body.
 function minAchievableInputValue(recipe: ProfessionRecipeRecord): number {
   const specialized = { [recipe.professionId]: 125 };
   let total = 0;
@@ -211,6 +228,63 @@ describe('THE ECONOMY INVARIANT', () => {
     expect(minAchievableInputValue(requireRecipe('recipe_sootscale_mantle'))).toBe(300);
   });
 
+  it('attuneJackOfAllTrades has no production caller, so excluding the Jack arm above is honest', () => {
+    // The vendor-loop bound computes minAchievableInputValue with the Jack
+    // multiplier EXCLUDED, and exclusion is the PERMISSIVE direction: the 0.9
+    // shaves counts, so a Jack's real bill is at or under the figure the
+    // bound checks, and recipe_sootscale_mantle drops from 300 to exactly
+    // 280 under the Jack arm, equal to its output, where the strict
+    // less-than fails. The bound is honest today only because no character
+    // can become a Jack: attuneJackOfAllTrades
+    // (src/sim/professions/archetype.ts) is exported for its tests and has
+    // no caller in src/ or server/ outside its own module. This scan pins
+    // that. THE DAY A PRODUCTION CALLER LANDS (a quest turn-in, a dev
+    // command, an admin runtime arm) THIS REDS, and the vendor-loop bound
+    // must be re-derived with the Jack arm: thread isJackOfAllTrades = true
+    // through minAchievableInputValue, at which point the mantle sits ON its
+    // output and its bill or price has to move first.
+    const declaringModule = 'sim/professions/archetype.ts';
+    const callers: string[] = [];
+    let declared = false;
+    for (const root of ['src', 'server']) {
+      for (const { file, full } of tsFilesUnder(path.resolve(process.cwd(), root))) {
+        const code = stripComments(readFileSync(full, 'utf8'));
+        if (!/\battuneJackOfAllTrades\b/.test(code)) continue;
+        if (root === 'src' && file === declaringModule) {
+          declared = /export function attuneJackOfAllTrades\(/.test(code);
+          continue;
+        }
+        callers.push(`${root}/${file}`);
+      }
+    }
+    // Positive control: the walk reached the declaring module and read the
+    // export, so an empty caller list is a scan result, not a missed root.
+    expect(declared).toBe(true);
+    expect(callers).toEqual([]);
+    // The reason the guard exists, pinned as numbers through the same
+    // function the bound uses: the Jack arm lands the mantle exactly on its
+    // output.
+    const mantle = requireRecipe('recipe_sootscale_mantle');
+    const specialized = { [mantle.professionId]: 125 };
+    let jackBill = 0;
+    for (const reagent of mantle.reagents) {
+      const { count } = requiredReagentCountFor(
+        true,
+        reagent,
+        specialized,
+        mantle.professionId,
+        true,
+      );
+      jackBill += count * reagentUnitValue(reagent.itemId);
+    }
+    expect(jackBill).toBe(280);
+    expect(jackBill).toBe(outputValue(mantle));
+  });
+
+  it('the caller scan reads src/ and server/ only through the shared walker', () => {
+    expectScansOnlyThroughSharedWalkers(import.meta.url, ['ts_files_under']);
+  });
+
   it('no recipe is fully vendor-fed in live stock, and the bound above does not rest on that', () => {
     const stocked = vendorStockedIds();
     const liveVendorFed = ALL_RECIPES.filter((recipe) =>
@@ -316,7 +390,7 @@ describe('REFERENTIAL INTEGRITY', () => {
     // masterwrought Phase 11i added is a drop, see the derived term below), the two tool-effect
     // charms, the nine jewelcrafting catalog recipes, the six inscription
     // catalog recipes, the ten Masterwrought phase 07 intermediates, the
-    // three crafted hoes, the ten Masterwrought phase 11l trophy consumers,
+    // three crafted hoes, the nine Masterwrought phase 11l trophy consumers,
     // and the farm-economy set's ON-RAMP: the
     // pre-training id list is frozen, so anything authored after that switch
     // has to be learned.
@@ -382,11 +456,12 @@ describe('REFERENTIAL INTEGRITY', () => {
     // channel split: the whole list still feeds the sum above.
     expect(HOE_RECIPES).toHaveLength(4);
     // The Masterwrought phase 11l trophy economy: one consumer recipe per
-    // adopted junk trophy (eight promoted from poor, plus the two
-    // already-common leather trophies its second review round adopted), all
-    // ten trainer-taught, so the whole list feeds the sum above (no channel
-    // split).
-    expect(TROPHY_RECIPES).toHaveLength(10);
+    // adopted junk trophy (seven promoted from poor, plus the two
+    // already-common leather trophies its second review round adopted; the
+    // sixth fix round output-excluded the chipped tusk and deleted its row),
+    // all nine trainer-taught, so the whole list feeds the sum above (no
+    // channel split).
+    expect(TROPHY_RECIPES).toHaveLength(9);
     // The economy-hooks phase's eight farm dishes, the four Phase 11 well-fed
     // buff dishes, the growth tonic's alchemy row, and the Phase 12 shared
     // feast (a cooking row with a placeable junk output). Deliberately
@@ -415,7 +490,6 @@ describe('REFERENTIAL INTEGRITY', () => {
       recipe_oiled_boots: 'mudfin_scale',
       recipe_gravewyrm_bone_quiver: 'cracked_wyrm_scale',
       recipe_hobnail_boots: 'bogiron_nugget',
-      recipe_mirejaw_fang_knife: 'chipped_tusk',
       recipe_fenshadow_maul: 'cracked_ogre_tusk',
       recipe_healing_potion: 'tallow_candle',
       recipe_linen_pouch: 'bandit_bandana',
@@ -442,26 +516,34 @@ describe('REFERENTIAL INTEGRITY', () => {
     // The 11l-OUT doctrine above is list-count-only by design (the listed
     // bill, never the discounted one), so the crafter's reward, the
     // specialization and self-signed discounts requiredReagentCountFor
-    // composes, can and does take a bill under its output: nine of the ten
+    // composes, can and does take a bill under its output: eight of the nine
     // floors below sit under the output (the healing potion is the one that
-    // does not), gold-positive at the counterfactual floor and bounded by
-    // trophy supply. The floor is the conservative counterfactual
-    // minAchievableInputValue describes (Jack excluded, a self-signed copy of
-    // every reagent assumed, which the trophy and the vendor staples on every
-    // bill can never be), so the realistic bill is the specialization-only
-    // figure each row's comment in src/sim/content/recipes.ts prints beside
-    // this one. This map does NOT assert the floor above the output; it makes
-    // every floor VISIBLE as a literal, so a bill edit, a reagent re-price, or
-    // a discount regression inside requiredReagentCountFor moves a number
+    // does not), gold-positive at the floor and bounded by trophy supply. The
+    // floor is what minAchievableInputValue describes (Jack excluded, a
+    // self-signed copy of every reagent assumed). How reachable it is varies
+    // by row, because only a node yield or a corpse component or specimen
+    // can carry the crafter's own signature (gathering.ts
+    // isSignableMaterialRarity): the cinch (401) and the belt (421) reach it
+    // exactly by one self-signed pristine hide; the lantern, the maul, and
+    // the potion sit on it at specialization alone; the quiver reaches 231
+    // by a signed thorium ore and the hobnail boots 52 by a signed iron ore,
+    // short of the 196 and 40 floors, which also need a signed trophy (and,
+    // for the boots, a signed vendor flux); the oiled boots (56 reachable
+    // against a floor of 51) and the pouch (51 against 36) never reach
+    // theirs, since the lines a signature would move are a trophy, a mob
+    // drop, and vendor staples. Each row's comment in
+    // src/sim/content/recipes.ts prints the specialization-only bill, this
+    // floor, and the reachable figure where it differs from both. This map
+    // does NOT assert the floor above the output; it makes every floor
+    // VISIBLE as a literal, so a bill edit, a reagent re-price, or a
+    // discount regression inside requiredReagentCountFor moves a number
     // someone has to re-derive (the recipe_sootscale_mantle precedent in THE
-    // ECONOMY INVARIANT). Each row's comment in recipes.ts prints the same
-    // figure.
+    // ECONOMY INVARIANT).
     const TROPHY_MIN_ACHIEVABLE: Record<string, number> = {
       recipe_valefire_lantern: 104,
       recipe_oiled_boots: 51,
       recipe_gravewyrm_bone_quiver: 196,
       recipe_hobnail_boots: 40,
-      recipe_mirejaw_fang_knife: 122,
       recipe_fenshadow_maul: 222,
       recipe_healing_potion: 77,
       recipe_linen_pouch: 36,

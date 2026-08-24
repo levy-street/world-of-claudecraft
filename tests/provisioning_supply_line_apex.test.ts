@@ -1435,10 +1435,13 @@ describe('masterwrought Phase 11h: what it did NOT touch', () => {
     // ALL_RECIPES alone moved again (no apex row, no new item id, every
     // output an already-shipped def). Then 166 at that phase's second review
     // round, which adopted the two already-common leather trophies (ten
-    // trophy consumer rows in all), the same shape: ALL_RECIPES alone.
+    // trophy consumer rows in all), the same shape: ALL_RECIPES alone. Then
+    // 165 at that phase's sixth fix round, which output-excluded the chipped
+    // tusk and deleted its weaponcrafting row (nine trophy consumer rows):
+    // again ALL_RECIPES alone, this time downward.
     expect(APEX_CONSUMABLE_RECIPES).toHaveLength(13);
     expect(INTERMEDIATE_RECIPES).toHaveLength(10);
-    expect(ALL_RECIPES).toHaveLength(166);
+    expect(ALL_RECIPES).toHaveLength(165);
     for (const row of APEX_ROWS) {
       expect(requireRecipe(row.id).skillReq, `${row.id} rung`).toBe(row.rung);
     }

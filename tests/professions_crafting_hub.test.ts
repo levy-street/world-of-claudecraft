@@ -197,7 +197,7 @@ describe('station content', () => {
     // Grimoire at the apothecary), plus the Masterwrought phase 11l trophy
     // consumer for inscription (the Valefire Lantern, inscription home,
     // apothecary binding beside the rest of the inscription catalog; the
-    // other nine trophy rows bind their own craft's station and ride the
+    // other eight trophy rows bind their own craft's station and ride the
     // equality branch), pinned literally so a
     // new foreign binding is a deliberate edit here, not a drive-by. The
     // pin carries id:station PAIRS (review round): a bare id list would

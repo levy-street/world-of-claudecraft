@@ -841,10 +841,16 @@ describe('item-art audit builder', () => {
     // 8 x ('common' minus 'poor') = 16 (498026 to 498042) and the sha moves
     // with them; liveItemCount, the 907 reviewed files and the shipping
     // catalog sha are unchanged (no new id, no art touched).
+    // Re-minted once more at the phase's sixth fix round, which
+    // output-excluded the chipped tusk and put its def back to poor: seven
+    // quality tokens moved instead of eight, so the bytes shrink by exactly
+    // one 'common' minus 'poor' = 2 (498042 to 498040), predicted and then
+    // measured, and the sha moves with them; everything else on the object
+    // is unchanged for the same reasons as before.
     expect(verified).toMatchObject({
       catalogPath: 'tmp/imagegen/item-art-consistency/final-audit/catalog.json',
-      catalogSha256: '8649108707b9126d35e2cf50bcd69060db89670d6ac2db6164a5fb3e2150ed5c',
-      catalogBytes: 498042,
+      catalogSha256: '2155856eee85acc463c89872a472c76f56f27d946ea9c122bde5f13349acf41a',
+      catalogBytes: 498040,
       rendererFingerprint: '84410592a4686975e13d43d4fecc88fb7eb0e3b90f27f7b7dc38498cdf7e090c',
       catalogCount: 907,
       liveItemCount: 922,

@@ -1461,9 +1461,9 @@ describe('Reliquary curation bounds (no full-table scrape)', () => {
       'bone_fragments',
       'linen_scrap',
       'spider_leg',
-      // A common MATERIAL since masterwrought Phase 11l (a TROPHY_RECIPES
-      // reagent, no longer poor), still refused as a non-relic: the list is
-      // correct as it stands.
+      // Poor trash again since masterwrought Phase 11l's sixth fix round
+      // output-excluded it (it was briefly a common TROPHY_RECIPES reagent),
+      // refused as a non-relic exactly as before the phase.
       'chipped_tusk',
       'inert_storm_shard',
       'deepfen_pearl',

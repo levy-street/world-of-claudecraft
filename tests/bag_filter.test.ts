@@ -500,14 +500,18 @@ describe('chip reachability census: the All-only set, pinned', () => {
   // through All is the settled behavior rather than a gap.
   const ALL_ONLY = [
     'amber_hide',
-    // masterwrought Phase 11l removed the eight promoted trophy drops
-    // (bandit_bandana, bogiron_nugget, chipped_tusk, cracked_fetish,
-    // cracked_ogre_tusk, cracked_wyrm_scale, mudfin_scale, tallow_candle):
-    // the trophy recipes are their consumers, so all eight derive into the
-    // material set and gain the materials chip. Its second review round
-    // removed emberwing_cinderscale and old_cragmaws_pelt the same way: the
-    // two leather trophy recipes consume them, so both derive IN too.
+    // masterwrought Phase 11l removed the seven promoted trophy drops
+    // (bandit_bandana, bogiron_nugget, cracked_fetish, cracked_ogre_tusk,
+    // cracked_wyrm_scale, mudfin_scale, tallow_candle): the trophy recipes
+    // are their consumers, so all seven derive into the material set and
+    // gain the materials chip. Its second review round removed
+    // emberwing_cinderscale and old_cragmaws_pelt the same way: the two
+    // leather trophy recipes consume them, so both derive IN too.
     'briny_idol',
+    // Back since the phase's sixth fix round output-excluded it: no recipe
+    // consumes the chipped tusk, so it is poor grey trash outside the
+    // material set again, All-only exactly as before the phase.
+    'chipped_tusk',
     'dawnhold_posy',
     'deepfen_pearl',
     'frayed_prayer_beads',

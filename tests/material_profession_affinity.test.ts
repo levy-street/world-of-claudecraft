@@ -67,14 +67,14 @@ describe('craftIdsForMaterialItem', () => {
     expect(craftIdsForMaterialItem('arcane_shard')).toEqual(['enchanting']);
   });
 
-  it('the ten junk trophies map to their one adopted craft (Masterwrought phase 11l)', () => {
+  it('the nine junk trophies map to their one adopted craft (Masterwrought phase 11l)', () => {
     // The trophy economy gave each of these mob drops exactly ONE consuming
     // craft, so each pin doubles as a no-second-consumer tripwire: a later
     // recipe borrowing a trophy into another craft changes the tooltip and
-    // must change the literal here deliberately.
+    // must change the literal here deliberately. The chipped tusk carries no
+    // pin: the sixth fix round output-excluded it, so no craft consumes it.
     expect(craftIdsForMaterialItem('bandit_bandana')).toEqual(['tailoring']);
     expect(craftIdsForMaterialItem('bogiron_nugget')).toEqual(['armorcrafting']);
-    expect(craftIdsForMaterialItem('chipped_tusk')).toEqual(['weaponcrafting']);
     expect(craftIdsForMaterialItem('cracked_fetish')).toEqual(['inscription']);
     expect(craftIdsForMaterialItem('cracked_ogre_tusk')).toEqual(['weaponcrafting']);
     expect(craftIdsForMaterialItem('cracked_wyrm_scale')).toEqual(['leatherworking']);

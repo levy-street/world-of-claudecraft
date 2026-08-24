@@ -498,18 +498,15 @@ describe('item level: the phase 11l trophy recipe outputs (TROPHY_RECIPES)', () 
   // wins on a LOWERED recipe level and the item level never moves, which is
   // why the recipe.level literal is pinned beside it in TROPHY_RECIPE_LEVELS.
   // hobnail_boots (vendor-only, level chosen as an honest content level, 10,
-  // not the rung scaffolding's 15: the fifth fix round) and
-  // mirejaw_fang_knife (a Drowned Litany chest uncommon, which is not an item
-  // level source, so the rung scaffolding's 15 plus the uncommon bonus 1) had
-  // no derivable source before and GAINED their level from the recipe. The
-  // potion and the pouch carry no combat slot, so they are not item-level
-  // eligible and stay undefined whatever the row says.
+  // not the rung scaffolding's 15: the fifth fix round) had no derivable
+  // source before and GAINED its level from the recipe. The potion and the
+  // pouch carry no combat slot, so they are not item-level eligible and stay
+  // undefined whatever the row says.
   const TROPHY_OUTPUT_LEVELS: Record<string, number | undefined> = {
     valefire_lantern: 7,
     oiled_boots: 11,
     gravewyrm_bone_quiver: 23,
     hobnail_boots: 10,
-    mirejaw_fang_knife: 16,
     fenshadow_maul: 13,
     healing_potion: undefined,
     linen_pouch: undefined,
@@ -526,19 +523,25 @@ describe('item level: the phase 11l trophy recipe outputs (TROPHY_RECIPES)', () 
   });
 
   it('pins every trophy output at its item level', () => {
-    expect(Object.keys(TROPHY_OUTPUT_LEVELS)).toHaveLength(10);
+    expect(Object.keys(TROPHY_OUTPUT_LEVELS)).toHaveLength(9);
     for (const [id, level] of Object.entries(TROPHY_OUTPUT_LEVELS)) {
       expect(ITEMS[id], `${id} is a real item`).toBeTruthy();
       expect(itemLevel(ITEMS[id]), `${id} item level`).toBe(level);
     }
   });
 
-  it('the re-pick took the misleading item level back off vale_carving_knife', () => {
+  it('the re-pick and the exclusion took the derived item level back off both knives', () => {
     // The fifth fix round moved the weaponcrafting rung-25 row off the
     // vendor-only carving knife (R21: a 3.06 dps dagger the recipe's level
     // 15 sorted above rare item-level-14 daggers), so it is sourceless again
-    // and its tooltip shows no item level line, the pre-phase behavior.
+    // and its tooltip shows no item level line, the pre-phase behavior. The
+    // sixth fix round then output-excluded the chipped tusk outright (every
+    // uncrafted weapon in its band is dominated by the trainer's own
+    // recipe_whetted_iron_dirk), so the Mirejaw fang knife it had moved onto
+    // is sourceless again too: a Drowned Litany chest is not an item level
+    // source, and the recipe was the one thing that gave it a level.
     expect(itemLevel(ITEMS.vale_carving_knife)).toBeUndefined();
+    expect(itemLevel(ITEMS.mirejaw_fang_knife)).toBeUndefined();
   });
 
   // The recipe.level literal per row: the source-capped rows sit AT their
@@ -550,7 +553,6 @@ describe('item level: the phase 11l trophy recipe outputs (TROPHY_RECIPES)', () 
     recipe_oiled_boots: 10,
     recipe_gravewyrm_bone_quiver: 20,
     recipe_hobnail_boots: 10,
-    recipe_mirejaw_fang_knife: 15,
     recipe_fenshadow_maul: 12,
     recipe_healing_potion: 15,
     recipe_linen_pouch: 10,
@@ -565,7 +567,7 @@ describe('item level: the phase 11l trophy recipe outputs (TROPHY_RECIPES)', () 
   });
 
   it('pins every trophy row at its recipe level', () => {
-    expect(Object.keys(TROPHY_RECIPE_LEVELS)).toHaveLength(10);
+    expect(Object.keys(TROPHY_RECIPE_LEVELS)).toHaveLength(9);
     for (const recipe of TROPHY_RECIPES) {
       expect(recipe.level, `${recipe.id} recipe.level`).toBe(TROPHY_RECIPE_LEVELS[recipe.id]);
     }

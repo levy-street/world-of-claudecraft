@@ -698,9 +698,19 @@ describe('the professions blob growth bound (phase 16)', () => {
     // delta 0, 17,171, and measured so (the same temporary exact pin, then
     // the band restored). The boots' level edit in the same round touches no
     // persisted byte (recipe.level is content, never state).
+    //
+    // AND AGAIN AT 11l's sixth fix round: 17,143 bytes, upper edge 17,182 to
+    // 17,154, floor 16,791 to 16,763. The round output-excluded the chipped
+    // tusk and DELETED the weaponcrafting rung-25 row outright, so
+    // recipe_mirejaw_fang_knife (25 characters, 28 quoted plus comma) leaves
+    // knownRecipes with nothing in its place: predicted 17,171 - 28 = 17,143
+    // and measured so (the same temporary exact pin, then the band
+    // restored). The first time since the phase began that the measurement
+    // moved DOWN; the band moved with it by the same rule (measurement plus
+    // 11 above, minus 380 below), so the headroom stays 11 and 380.
     const bytes = professionsBytes(s2);
-    expect(bytes).toBeGreaterThan(16791);
-    expect(bytes).toBeLessThan(17182);
+    expect(bytes).toBeGreaterThan(16763);
+    expect(bytes).toBeLessThan(17154);
     // Strictly dominated by the band's upper edge while the band holds:
     // kept as documentation that the structural ceiling also bounds this
     // state, never the live guard.

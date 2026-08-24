@@ -3,7 +3,6 @@ import { fileURLToPath } from 'node:url';
 import { describe, expect, it } from 'vitest';
 import { HEAVY_SELF_CMDS } from '../server/heavy_self';
 import { stackSizeOf } from '../src/sim/bags';
-import { ALL_RECIPES, TROPHY_RECIPES } from '../src/sim/content/recipes';
 // Aliased: this file declares a small synthetic table for the ladder arms; the
 // real merged catalog drives the whole-catalog and grade-family arms.
 import { ITEMS as REAL_ITEMS } from '../src/sim/data';
@@ -16,6 +15,7 @@ import {
 import { MATERIAL_GRADES } from '../src/sim/professions/material_grades';
 import { Sim } from '../src/sim/sim';
 import type { InvSlot, ItemDef } from '../src/sim/types';
+import { adoptedTrophyIds } from './helpers/adopted_trophy_ids';
 
 // Synthetic defs for the ladder arms; the material-grade family arms use REAL
 // grade-table ids (elderwood_log / fine_elderwood_log / copper_ore /
@@ -579,38 +579,32 @@ describe('sortInventoryStacks against the REAL catalog', () => {
 
   it('phase 11l trophy promotion holds in the ladder: adopted trophies rank as junk, holdouts as trash', () => {
     // categoryRankOf (src/sim/inventory_sort.ts) sends a poor-quality def to
-    // TRASH_RANK before it reads the kind, so promoting the ten trophies to
+    // TRASH_RANK before it reads the kind, so promoting the nine trophies to
     // common moved them out of the tail band and into KIND_RANK.junk, where
     // every material lives. The ranks are module-private, so each band is
     // pinned BEHAVIORALLY through compareBagStacks, the exported comparator,
     // by sandwiching: a real recipe pattern (KIND_RANK.recipe, the rank just
     // below junk) must sort before every adopted trophy and a real quest item
-    // (KIND_RANK.quest, the rank just above) after it, which the integer
-    // ladder satisfies only at the junk rank; a holdout must sort after that
-    // quest item and before a def the lookup cannot resolve (MISSING_DEF_RANK,
-    // the last rank), which only TRASH_RANK satisfies while the KIND_RANK
-    // Record stays total (UNRANKED_KIND_RANK is unreachable).
-    // The adopted list is DERIVED from the shipped rows the way
-    // tests/items.test.ts derives it (every junk-kind reagent of a trophy row
-    // that no other recipe also consumes) and held equal to the literal, so a
-    // de-adopted trophy (its row dropped or re-picked off it) reds here too.
-    const trophyRecipeIds = new Set(TROPHY_RECIPES.map((r) => r.id));
-    const sharedReagents = new Set<string>();
-    for (const recipe of ALL_RECIPES) {
-      if (trophyRecipeIds.has(recipe.id)) continue;
-      for (const reagent of recipe.reagents) sharedReagents.add(reagent.itemId);
-    }
-    const derived = new Set<string>();
-    for (const recipe of TROPHY_RECIPES) {
-      for (const reagent of recipe.reagents) {
-        if (REAL_ITEMS[reagent.itemId]?.kind !== 'junk') continue;
-        if (!sharedReagents.has(reagent.itemId)) derived.add(reagent.itemId);
-      }
-    }
+    // (KIND_RANK.quest, the rank just above) after it. The sandwich pins the
+    // RANK into the recipe-to-quest band and no further: a trophy flipped to
+    // kind 'recipe' would sit at the pattern's own rank and still pass it,
+    // because at an equal rank the comparator falls through to quality and
+    // the epic pattern sorts before a common trophy on that tiebreak. The
+    // KIND is pinned by the derivation instead (adoptedTrophyIds keeps only
+    // junk-kind reagents), so that flip reds on the derived equality below,
+    // never on the sandwich. A holdout must sort after that quest item and
+    // before a def the lookup cannot resolve (MISSING_DEF_RANK, the last
+    // rank), which only TRASH_RANK satisfies while the KIND_RANK Record stays
+    // total (UNRANKED_KIND_RANK is unreachable).
+    // The adopted list is DERIVED from the shipped rows by the shared
+    // tests/helpers/adopted_trophy_ids.ts (every junk-kind reagent of a
+    // trophy row that no other recipe also consumes) and held equal to the
+    // literal, so a de-adopted trophy (its row dropped or re-picked off it)
+    // reds here too. The chipped tusk left the list when the sixth fix round
+    // output-excluded it: poor again, it ranks as trash beside the holdouts.
     const adopted = [
       'bandit_bandana',
       'bogiron_nugget',
-      'chipped_tusk',
       'cracked_fetish',
       'cracked_ogre_tusk',
       'cracked_wyrm_scale',
@@ -622,8 +616,8 @@ describe('sortInventoryStacks against the REAL catalog', () => {
     // A do-not-shrink marker, not a pin: it compares the literal to itself
     // and can only red when someone edits the list above. The derived
     // equality on the next line is the pin.
-    expect(adopted).toHaveLength(10);
-    expect([...derived].sort()).toEqual([...adopted]);
+    expect(adopted).toHaveLength(9);
+    expect(adoptedTrophyIds(REAL_ITEMS)).toEqual([...adopted]);
     // The sandwich neighbours are checked to be what the comment says, so a
     // content edit to either id cannot hollow the arm out.
     expect(REAL_ITEMS.pattern_spiritweld_girdle?.kind).toBe('recipe');
@@ -643,7 +637,7 @@ describe('sortInventoryStacks against the REAL catalog', () => {
         `${id} before the quest item`,
       ).toBeLessThan(0);
     }
-    for (const id of ['tangled_weed', 'soggy_moccasin'] as const) {
+    for (const id of ['tangled_weed', 'soggy_moccasin', 'chipped_tusk'] as const) {
       expect(REAL_ITEMS[id]?.quality, id).toBe('poor');
       expect(
         compareBagStacks(quest, slot(id), realLookup),

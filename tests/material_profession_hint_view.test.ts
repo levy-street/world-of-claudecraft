@@ -61,12 +61,13 @@ describe('materialProfessionHintText', () => {
   });
 
   it('phase 11l trophies read the simple Used by line for their adopted craft', () => {
-    // Four of the eight junk trophies the trophy economy promoted, one per
+    // Three of the seven junk trophies the trophy economy promoted, one per
     // distinct craft, pinned as exact strings so the localized craft name and
-    // the sentence template both hold (none of the eight carries a
-    // superseding purpose hint, so the line always renders).
+    // the sentence template both hold (none of the seven carries a
+    // superseding purpose hint, so the line always renders). The chipped
+    // tusk lost its pin with its recipe: the sixth fix round output-excluded
+    // it, so it is plain junk with no Used-by line again.
     expect(materialProfessionHintText('mudfin_scale')).toBe('Used by Leatherworking.');
-    expect(materialProfessionHintText('chipped_tusk')).toBe('Used by Weaponcrafting.');
     expect(materialProfessionHintText('tallow_candle')).toBe('Used by Alchemy.');
     expect(materialProfessionHintText('bandit_bandana')).toBe('Used by Tailoring.');
     // The two already-common rare-elite leather trophies the second review

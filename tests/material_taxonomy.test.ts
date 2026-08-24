@@ -46,9 +46,11 @@ const HONEST_MATERIALS = [
   'arcane_shard',
   'arcanite_bar',
   'ashwood_log',
-  // Masterwrought phase 11l: the eight promoted trophy drops (this one and
-  // the seven at their sorted positions below) derive IN as the reagents the
-  // trophy recipes (TROPHY_RECIPES) consume.
+  // Masterwrought phase 11l: the seven promoted trophy drops (this one and
+  // the six at their sorted positions below) derive IN as the reagents the
+  // trophy recipes (TROPHY_RECIPES) consume. The chipped tusk is NOT among
+  // them since the sixth fix round output-excluded it (it is poor trash
+  // again, see SURVIVING_POOR_JUNK below).
   'bandit_bandana',
   'bog_beet',
   'bog_beet_seed',
@@ -56,7 +58,6 @@ const HONEST_MATERIALS = [
   'bone_fragments',
   'brook_carrot',
   'brook_carrot_seed',
-  'chipped_tusk',
   'compost',
   'cooking_salt',
   'copper_ore',
@@ -613,11 +614,13 @@ describe('completeness tripwire: unclassified non-poor junk', () => {
 });
 
 describe('phase 11l trophy promotion: the promoted set, exactly', () => {
-  // The 21 quality-poor junk ids at the phase 11l boundary, frozen. The 8
+  // The 21 quality-poor junk ids at the phase 11l boundary, frozen. The 7
   // promoted trophies became common TROPHY_RECIPES reagents (and so derive
-  // IN); the 13 survivors stay poor grey trash outside the material set. A
-  // diff on either side means a shipped poor item was promoted (or a promoted
-  // one demoted) by accident.
+  // IN); the 14 survivors stay poor grey trash outside the material set (the
+  // chipped tusk rejoined them at the sixth fix round, which output-excluded
+  // it: every uncrafted weapon in its band is dominated by the trainer's own
+  // recipe_whetted_iron_dirk). A diff on either side means a shipped poor
+  // item was promoted (or a promoted one demoted) by accident.
   const PRE_11L_POOR_JUNK = [
     'amber_hide',
     'bandit_bandana',
@@ -644,7 +647,6 @@ describe('phase 11l trophy promotion: the promoted set, exactly', () => {
   const PROMOTED_TROPHIES = new Set<string>([
     'bandit_bandana',
     'bogiron_nugget',
-    'chipped_tusk',
     'cracked_fetish',
     'cracked_ogre_tusk',
     'cracked_wyrm_scale',
@@ -658,17 +660,17 @@ describe('phase 11l trophy promotion: the promoted set, exactly', () => {
   const PROMOTED_SELL_VALUE: Record<string, number> = {
     bandit_bandana: 6,
     bogiron_nugget: 12,
-    chipped_tusk: 15,
     cracked_fetish: 14,
     cracked_ogre_tusk: 42,
     cracked_wyrm_scale: 35,
     mudfin_scale: 5,
     tallow_candle: 5,
   };
-  // The 13 survivors as the LIVE poor set must read, sorted.
+  // The 14 survivors as the LIVE poor set must read, sorted.
   const SURVIVING_POOR_JUNK = [
     'amber_hide',
     'briny_idol',
+    'chipped_tusk',
     'deepfen_pearl',
     'frayed_prayer_beads',
     'inert_storm_shard',
@@ -682,11 +684,12 @@ describe('phase 11l trophy promotion: the promoted set, exactly', () => {
     'tangled_weed',
   ];
 
-  it('promotes exactly the 8 trophies to common materials and leaves the 13 survivors poor', () => {
+  it('promotes exactly the 7 trophies to common materials and leaves the 14 survivors poor', () => {
     // Length guards first: an emptied literal or set would let the loop below
     // pass vacuously.
     expect(PRE_11L_POOR_JUNK).toHaveLength(21);
-    expect(PROMOTED_TROPHIES.size).toBe(8);
+    expect(PROMOTED_TROPHIES.size).toBe(7);
+    expect(SURVIVING_POOR_JUNK).toHaveLength(14);
     expect(Object.keys(PROMOTED_SELL_VALUE).sort()).toEqual([...PROMOTED_TROPHIES].sort());
     expect(SURVIVING_POOR_JUNK).toEqual(
       PRE_11L_POOR_JUNK.filter((id) => !PROMOTED_TROPHIES.has(id)),
@@ -705,7 +708,7 @@ describe('phase 11l trophy promotion: the promoted set, exactly', () => {
     }
   });
 
-  it('the LIVE poor set is exactly the 13 survivors (a new poor id cannot land unseen)', () => {
+  it('the LIVE poor set is exactly the 14 survivors (a new poor id cannot land unseen)', () => {
     // The frozen-21 loop above only visits ids it already knows, so a poor
     // item authored AFTER the phase 11l boundary would never enter it: this
     // exact-set pin over the whole catalog closes that direction. The

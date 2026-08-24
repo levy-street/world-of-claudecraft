@@ -39,7 +39,10 @@ describe('material_taxonomy as the first-evaluated sim module', () => {
     // 116 -> 118 at the same phase's second review round: the two
     // already-common leather trophies (emberwing_cinderscale,
     // old_cragmaws_pelt) derive IN the same way once their recipes land.
-    expect(MATERIAL_ITEM_IDS.size).toBe(118);
+    // 118 -> 117 at the phase's sixth fix round, which output-excluded the
+    // chipped tusk (its weaponcrafting row deleted, the def poor again), so
+    // it derives OUT like the other survivors.
+    expect(MATERIAL_ITEM_IDS.size).toBe(117);
     expect(MATERIAL_ITEM_IDS.has('iron_ore')).toBe(true);
     expect(MATERIAL_ITEM_IDS.has('arcanite_bar')).toBe(true);
     // The farming source specifically, because it is the newest and the one

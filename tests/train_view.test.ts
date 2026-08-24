@@ -149,10 +149,10 @@ describe('buildTrainView', () => {
     // station of its own. Its three skillReq-0 copper rungs are deliberately
     // absent: like every other free-floor rung they stay teachable at tier 0.
     // The three skillReq-75 Masterwrought intermediates lock here too, and so
-    // do the three Masterwrought phase 11l forge trophy rows (TROPHY_RECIPES:
-    // recipe_hobnail_boots and recipe_mirejaw_fang_knife at skillReq 25, the
-    // knife re-picked off recipe_vale_carving_knife by the fifth fix round,
-    // recipe_fenshadow_maul at 50), 23 rows to 26.
+    // do the two Masterwrought phase 11l forge trophy rows (TROPHY_RECIPES:
+    // recipe_hobnail_boots at skillReq 25 and recipe_fenshadow_maul at 50;
+    // the sixth fix round output-excluded the chipped tusk, so the
+    // weaponcrafting rung-25 row is gone), 23 rows to 25.
     const view = buildTrainView('forgemistress_darva', deps());
     const locked = view.rows.filter((row) => row.state === 'locked');
     expect(locked.map((row) => row.recipeId).sort()).toEqual([
@@ -173,7 +173,6 @@ describe('buildTrainView', () => {
       'recipe_ironlink_legguards',
       'recipe_ironlink_spaulders',
       'recipe_ironshod_maul',
-      'recipe_mirejaw_fang_knife',
       'recipe_prismglass_setting',
       'recipe_riveted_iron_signet',
       'recipe_thorium_warblade',

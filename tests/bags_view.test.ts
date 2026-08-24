@@ -1,6 +1,5 @@
 import { describe, expect, it } from 'vitest';
 import { RAW_COOKING_CATCH_IDS } from '../src/sim/content/items';
-import { ALL_RECIPES, TROPHY_RECIPES } from '../src/sim/content/recipes';
 import { ITEMS as CATALOG_ITEMS } from '../src/sim/data';
 import type { InvSlot, ItemDef } from '../src/sim/types';
 import { DEFAULT_BAG_FILTER, type ItemLookup } from '../src/ui/bag_filter';
@@ -23,6 +22,7 @@ import {
   resolveDepositSubmit,
   vendorSellIsInstant,
 } from '../src/ui/bags_view';
+import { adoptedTrophyIds } from './helpers/adopted_trophy_ids';
 
 // The bags core decides the mode-dependent click + tooltip (the 6-way branch) and
 // the filtered grid model (empty / no-match / items), reusing bag_filter for the
@@ -309,32 +309,21 @@ describe('vendorSellIsInstant (the plain-click vendor sale safety gate)', () => 
   });
 
   it('the REAL catalog: an adopted trophy prompts, grey trash still sells on the spot', () => {
-    // Masterwrought phase 11l adopted ten junk mob drops as TROPHY_RECIPES
-    // reagents (eight promoted poor -> common, two already common). This gate
-    // reads quality, so a plain vendor click on one routes to the confirm
-    // prompt instead of selling instantly. The adopted list is DERIVED from
-    // the shipped rows (every junk-kind reagent of a trophy row that no other
-    // recipe also consumes) and held equal to the literal, so a newly adopted
-    // trophy cannot leave this arm silently under-covering and a re-picked
-    // reagent reds the literal. Pinned off the shipped defs so the gate
-    // cannot detach from what the catalog says.
-    const trophyRecipeIds = new Set(TROPHY_RECIPES.map((r) => r.id));
-    const sharedReagents = new Set<string>();
-    for (const recipe of ALL_RECIPES) {
-      if (trophyRecipeIds.has(recipe.id)) continue;
-      for (const reagent of recipe.reagents) sharedReagents.add(reagent.itemId);
-    }
-    const derived = new Set<string>();
-    for (const recipe of TROPHY_RECIPES) {
-      for (const reagent of recipe.reagents) {
-        if (CATALOG_ITEMS[reagent.itemId]?.kind !== 'junk') continue;
-        if (!sharedReagents.has(reagent.itemId)) derived.add(reagent.itemId);
-      }
-    }
+    // Masterwrought phase 11l adopted nine junk mob drops as TROPHY_RECIPES
+    // reagents (seven promoted poor -> common, two already common). This
+    // gate reads quality, so a plain vendor click on one routes to the
+    // confirm prompt instead of selling instantly. The adopted list is
+    // DERIVED from the shipped rows by the shared
+    // tests/helpers/adopted_trophy_ids.ts (every junk-kind reagent of a
+    // trophy row that no other recipe also consumes) and held equal to the
+    // literal, so a newly adopted trophy cannot leave this arm silently
+    // under-covering and a re-picked reagent reds the literal. Pinned off
+    // the shipped defs so the gate cannot detach from what the catalog says.
+    // The chipped tusk left the list when the sixth fix round
+    // output-excluded it: poor again, it sells on the spot like the holdouts.
     const adopted = [
       'bandit_bandana',
       'bogiron_nugget',
-      'chipped_tusk',
       'cracked_fetish',
       'cracked_ogre_tusk',
       'cracked_wyrm_scale',
@@ -343,13 +332,13 @@ describe('vendorSellIsInstant (the plain-click vendor sale safety gate)', () => 
       'old_cragmaws_pelt',
       'tallow_candle',
     ];
-    expect(adopted).toHaveLength(10);
-    expect([...derived].sort()).toEqual(adopted);
+    expect(adopted).toHaveLength(9);
+    expect(adoptedTrophyIds(CATALOG_ITEMS)).toEqual(adopted);
     for (const id of adopted) {
       expect(CATALOG_ITEMS[id], `${id} is a real item`).toBeDefined();
       expect(vendorSellIsInstant(CATALOG_ITEMS[id]), `${id} prompts now`).toBe(false);
     }
-    for (const id of ['tangled_weed', 'soggy_moccasin']) {
+    for (const id of ['tangled_weed', 'soggy_moccasin', 'chipped_tusk']) {
       expect(CATALOG_ITEMS[id], `${id} is a real item`).toBeDefined();
       expect(vendorSellIsInstant(CATALOG_ITEMS[id]), `${id} still sells instantly`).toBe(true);
     }

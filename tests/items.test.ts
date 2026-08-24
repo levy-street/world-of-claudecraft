@@ -1,12 +1,12 @@
 import { readFileSync } from 'node:fs';
 import path from 'node:path';
 import { describe, expect, it } from 'vitest';
-import { ALL_RECIPES, TROPHY_RECIPES } from '../src/sim/content/recipes';
 import { ITEMS } from '../src/sim/data';
 import * as items from '../src/sim/items';
 import { Sim } from '../src/sim/sim';
 import type { SimContext } from '../src/sim/sim_context';
 import { type Entity, type ItemDef, POTION_COOLDOWN, type SimEvent } from '../src/sim/types';
+import { adoptedTrophyIds } from './helpers/adopted_trophy_ids';
 
 // Direct tests for the extracted inventory/vendor module (W2). They call the module
 // functions with the real SimContext the Sim built in its ctor (the same seam the thin
@@ -1004,39 +1004,25 @@ describe('items vendor: buy / sell / sellAllJunk / buyBack', () => {
   });
 
   it('phase 11l trophy promotion holds at the sweep: promoted reagents never sell, holdouts do', () => {
-    // The ten trophy drops adopted as common TROPHY_RECIPES reagents (eight
+    // The nine trophy drops adopted as common TROPHY_RECIPES reagents (seven
     // promoted from poor, two already common: the cinderscale and the pelt)
     // must be invisible to the junk sweep, exactly like wolf_fang; the two
     // still-poor holdouts prove the sweep predicate itself stayed live.
-    // The adopted list is DERIVED from the shipped rows the way
-    // tests/bags_view.test.ts derives it (every junk-kind reagent of a trophy
-    // row that no other recipe also consumes) and held equal to the literal:
-    // a de-adopted trophy (its row dropped or re-picked off it) reds here
-    // too, which the two already-common ids could never do on their own,
-    // since their sweep verdict is the same before and after adoption.
-    // The derived set ALSO reds if a non-trophy recipe starts consuming an
-    // adopted trophy (the "no other recipe also consumes" clause drops it
-    // from `derived` while the literal keeps it): a deliberate tripwire. The
-    // trophy is still adopted in that case, so the fix is to widen the
-    // derivation (name the second consumer), never to de-adopt the trophy.
-    const trophyRecipeIds = new Set(TROPHY_RECIPES.map((r) => r.id));
-    const sharedReagents = new Set<string>();
-    for (const recipe of ALL_RECIPES) {
-      if (trophyRecipeIds.has(recipe.id)) continue;
-      for (const reagent of recipe.reagents) sharedReagents.add(reagent.itemId);
-    }
-    const derived = new Set<string>();
-    for (const recipe of TROPHY_RECIPES) {
-      for (const reagent of recipe.reagents) {
-        if (ITEMS[reagent.itemId]?.kind !== 'junk') continue;
-        if (!sharedReagents.has(reagent.itemId)) derived.add(reagent.itemId);
-      }
-    }
+    // The adopted list is DERIVED from the shipped rows by the shared
+    // tests/helpers/adopted_trophy_ids.ts (every junk-kind reagent of a
+    // trophy row that no other recipe also consumes) and held equal to the
+    // literal: a de-adopted trophy (its row dropped or re-picked off it)
+    // reds here too, which the two already-common ids could never do on
+    // their own, since their sweep verdict is the same before and after
+    // adoption. The derived set ALSO reds if a non-trophy recipe starts
+    // consuming an adopted trophy (the helper's header names the fix: widen
+    // the derivation, never de-adopt). The chipped tusk left the list when
+    // the sixth fix round output-excluded it, so it sells at the sweep
+    // again, beside the holdouts.
     const slot = { count: 1 };
     const adopted = [
       'bandit_bandana',
       'bogiron_nugget',
-      'chipped_tusk',
       'cracked_fetish',
       'cracked_ogre_tusk',
       'cracked_wyrm_scale',
@@ -1048,12 +1034,12 @@ describe('items vendor: buy / sell / sellAllJunk / buyBack', () => {
     // A do-not-shrink marker, not a pin: it compares the literal to itself
     // and can only red when someone edits the list above. The derived
     // equality on the next line is the pin.
-    expect(adopted).toHaveLength(10);
-    expect([...derived].sort()).toEqual([...adopted]);
+    expect(adopted).toHaveLength(9);
+    expect(adoptedTrophyIds(ITEMS)).toEqual([...adopted]);
     for (const id of adopted) {
       expect(items.junkSellableSlot(ITEMS[id], slot), id).toBe(false);
     }
-    for (const id of ['tangled_weed', 'soggy_moccasin'] as const) {
+    for (const id of ['tangled_weed', 'soggy_moccasin', 'chipped_tusk'] as const) {
       expect(items.junkSellableSlot(ITEMS[id], slot), id).toBe(true);
     }
   });

@@ -13505,41 +13505,6 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
         }
       },
       {
-        "id": "recipe_mirejaw_fang_knife",
-        "name": "Mirejaw Fang-Knife",
-        "skillReq": 25,
-        "tier": 1,
-        "station": "forge",
-        "acquisition": "trainer",
-        "feeCopper": 2500,
-        "materials": [
-          {
-            "name": "Chipped Tusk",
-            "count": 4
-          },
-          {
-            "name": "Iron Ore",
-            "count": 6
-          },
-          {
-            "name": "Smithing Flux",
-            "count": 5
-          }
-        ],
-        "output": {
-          "name": "Mirejaw Fang-Knife",
-          "count": 1,
-          "quality": "uncommon"
-        },
-        "combo": null,
-        "oncePerDay": false,
-        "gain": {
-          "reducedAt": 50,
-          "minimalAt": 75,
-          "zeroAt": 100
-        }
-      },
-      {
         "id": "recipe_fenshadow_maul",
         "name": "Fenshadow Maul",
         "skillReq": 50,
