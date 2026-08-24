@@ -94,6 +94,37 @@ describe('player directional melee integration', () => {
     expect(p.resource).toBeCloseTo(26.4, 8);
   });
 
+  it('applies authored damage and debuffs to each cone victim', () => {
+    const sim = new Sim({
+      seed: 94,
+      playerClass: 'warrior',
+      autoEquip: true,
+      playerDirectionalCombat: true,
+    });
+    sim.setPlayerLevel(16);
+    placePlayerInOpenField(sim);
+    const p = sim.player;
+    p.facing = 0;
+    p.resource = p.maxResource;
+    sim.tick();
+
+    const targets = [
+      addHostile(sim, p, 0, 0, 2.2),
+      addHostile(sim, p, 10, -0.8, 2.4),
+      addHostile(sim, p, 20, 0.8, 2.4),
+    ];
+    const fourth = addHostile(sim, p, 30, 1.8, 1.8);
+
+    sim.castAbilityToward('hamstring', { x: p.pos.x, z: p.pos.z - 100 });
+
+    for (const target of targets) {
+      expect(target.hp).toBeLessThan(target.maxHp);
+      expect(target.auras.some((aura) => aura.id === 'hamstring_slow')).toBe(true);
+    }
+    expect(fourth.hp).toBe(fourth.maxHp);
+    expect(fourth.auras.some((aura) => aura.id === 'hamstring_slow')).toBe(false);
+  });
+
   it('keeps authored self AoE targetless instead of routing it through the melee cone', () => {
     const sim = new Sim({
       seed: 93,

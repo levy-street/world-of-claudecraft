@@ -396,6 +396,34 @@ describe('ballistic player projectiles', () => {
       expect.objectContaining({ type: 'projectileImpact', reason: 'wall' }),
     );
   });
+
+  it('lets an entity win when entity and wall impact at the same distance', () => {
+    const source = ballisticEntity(1, 0, 0, false);
+    // The default projectile plus target radius is 0.7, so this target's
+    // swept entry point is z=4, exactly at the wall boundary below.
+    const target = ballisticEntity(2, 0, 4.7);
+    const ctx = ballisticCtx([source, target]);
+    ctx.projectilePathClear = (_source, _from, to) => to.z <= 4;
+    const projectileCtx = ctx as Parameters<typeof scheduleBallisticProjectile>[0];
+    const hit = vi.fn();
+
+    scheduleBallisticProjectile(
+      projectileCtx,
+      source,
+      { angle: 0, maxDistance: 12, school: 'nature' },
+      hit,
+    );
+    while (ctx.pendingProjectiles.length > 0) advancePendingProjectiles(projectileCtx);
+
+    expect(hit).toHaveBeenCalledTimes(1);
+    expect(ctx.emit).toHaveBeenCalledWith(
+      expect.objectContaining({
+        type: 'projectileImpact',
+        targetId: target.id,
+        reason: 'entity',
+      }),
+    );
+  });
 });
 
 // End-to-end: drive a real Sim and assert a mage Ice Lance (an INSTANT projectile
