@@ -235,6 +235,10 @@ describe('first-run camera prompt DOM and state', () => {
 
 describe('camera prompt client integration', () => {
   const main = readFileSync(new URL('../src/main.ts', import.meta.url), 'utf8');
+  const gamepadDispatch = readFileSync(
+    new URL('../src/game/gamepad_action_dispatch.ts', import.meta.url),
+    'utf8',
+  );
 
   it('shares one gameplay gate across keyboard and gamepad actions', () => {
     expect(main).toContain('const gameplayInputBlocked = () =>');
@@ -249,6 +253,6 @@ describe('camera prompt client integration', () => {
   });
 
   it('routes the gamepad Escape action to the prompt before HUD windows', () => {
-    expect(main).toMatch(/if \(dismissCameraPrompt\(\)\) return;/);
+    expect(gamepadDispatch).toMatch(/if \(deps\.dismissCameraPrompt\(\)\) return;/);
   });
 });
