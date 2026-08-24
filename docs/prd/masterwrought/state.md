@@ -15398,6 +15398,36 @@ reading exactly as cheap to settle as it was.
 - Minting six one-word line-label keys on the wiki page when the catalog
   already ships five of them.
 
+### THE FROZEN STAMP, BOTH ENDS
+
+Committed clean tree at **4d5fc94f5f**, `git status` empty before and after, and
+NOTHING else running: all four reviewers idle and reported first, every finding
+applied, and no background lane in flight. That sequencing is the whole point,
+and it is the discipline 11j burned four runs learning and the 11j QA burned
+three learning the other way round: freeze after the last lane has SPOKEN, and a
+lane that has gone idle without reporting has not spoken. This phase ran the
+full suite exactly twice and discarded neither.
+
+`env | grep -c DATABASE_URL` printed 0 before the run.
+
+| measure | 11j QA stamp (c140b52c12 / 5f087a6e2a) | this phase (4d5fc94f5f) |
+|---|---|---|
+| vitest | EXIT=0, 3069 files / 12 skipped (3081); 43964 passed / 2 xfail / 115 skipped (44081) | **EXIT=0**, 3070 files / 12 skipped (3082); **43986** passed / 2 xfail / 115 skipped (44103) |
+| `npm run ci:changed` | EXIT=0, 797 files, 3094 warnings, 0 errors | **EXIT=0**, 801 files, 3097 warnings, 0 errors, no FAIL marker in the log |
+| `npx tsc --noEmit` | clean | **clean** |
+| `wiki:content` + `i18n:gen` | zero diff | **zero diff** |
+
+THE DRIFT IS ENTIRELY THIS PHASE'S, and it is attributable because the
+thirteenth release sync was a NO-OP (the release is still the tip the twelfth
+merged), so nothing upstream contributed a single test: +1 file (the new
+`tests/apex_feast_craft.test.ts`) and +22 tests, which is that file's three plus
+the nineteen added across the feast, title, deed, guide and provenance suites.
+The +4 ci:changed files are the four new modules and the +3 warnings are theirs;
+the whole-repo warning debt is untouched.
+
+THE FIRST FULL RUN, by contrast, was EXIT=1 with eight files and ten tests red,
+recorded above. Two runs, one discarded on purpose because it did its job.
+
 ### THE HANDOFF TO PHASE 11k QA
 
 - **THE PHASE FILE IS THE LEAST RELIABLE DOCUMENT IN THE ROOM, and this is the
