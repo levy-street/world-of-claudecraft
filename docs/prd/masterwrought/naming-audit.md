@@ -511,10 +511,14 @@ and near-homophones. An in-repo neighbour grep ran on every candidate too.
   original, which is why one search covers all three.
   Web-verified at authoring (2026-08-24): an exact-phrase search for
   "Stonepot Feast" OR "Warspice Feast" OR "Sageleaf Feast" returns none of the
-  three anywhere; the hits are the generic feast mechanic in Guild Wars 2 and
-  WoW (Fish Feast, Stone Soup and the rest, already recorded on the Deepwater
-  row above) plus unrelated non-game titles. The neighbour list from that row
-  carries over unchanged and is not re-searched.
+  three anywhere. What it returns instead is the generic feast MECHANIC in other
+  games, and the hits are recorded here rather than waved at: Guild Wars 2's
+  Feast (food) and Ascended feast pages, and WoW's community Stone Soup feast.
+  Neither of those two is on the Deepwater row above, which recorded a different
+  set (Fish Feast, Fisherman's Feast, Seafood Magnifique Feast, Bountiful Feast,
+  Great Feast, and the three Deepwater items); that row's list carries over
+  unchanged and is not re-searched, and these two are added to the record rather
+  than folded into it.
   Role legibility is the reason for the construction rather than flavor: the
   placed entity's title is how a raider at the table learns which plate is on
   it (decision K1), so the name has to carry the plate.

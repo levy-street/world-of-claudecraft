@@ -70,30 +70,30 @@ export const FARM_FEAST_ITEM_ID = 'harvest_feast';
 export const FARM_FEAST_TEMPLATE_ID = 'farm_feast';
 
 /** THE PLACEABLE FEAST FAMILY, derived from the catalog and never hand-listed
- *  (masterwrought Phase 11k). A feast is any item def carrying `feast`, and
- *  its payload names the templateId its placed entity wears, so authoring one
- *  def joins every site that keys on the family at once. That is the whole
- *  point of the derivation: before this, ONE item id and ONE templateId were
- *  module constants and SIX sites compared against them, which is exactly how
- *  Phase 11i shipped a second feast that no code could place and no client
- *  could label.
+ *  (masterwrought Phase 11k). A feast is any item def carrying `feast`, and its
+ *  payload names the templateId its placed entity wears, so authoring one def
+ *  joins the DERIVED SET at every site that keys on it. That is the whole point:
+ *  before this, ONE item id and ONE templateId were module constants and five
+ *  sites compared against them, which is exactly how Phase 11i shipped a second
+ *  feast that no code could place and no client could label.
+ *
+ *  WHAT AUTHORING A DEF DOES NOT DO, stated here rather than as a footnote,
+ *  because "joins every site at once" is the over-reading this comment has to
+ *  refuse: the two TITLE composers reach the family through
+ *  src/ui/feast_title.ts, whose templateId-to-key map is HAND-LISTED (a t() key
+ *  built by template literal is invisible to every static consumer, which this
+ *  packet has paid for twice). A new def joins the derived set everywhere and
+ *  leaves that map short, so the placed entity falls through to the raw placer
+ *  name. It is caught rather than trusted: tests/entity_display_name.test.ts
+ *  pins the map exhaustively in BOTH directions against feastTemplateIds().
  *
  *  FIVE SITES KEY ON A TEMPLATE ID and none of them names a string literal any
  *  more: src/ui/entity_display_name.ts and src/render/entity_labels.ts (the two
- *  title composers, which reach the family through src/ui/feast_title.ts),
- *  src/render/nameplate_view.ts (the interact hysteresis band),
- *  src/render/farm_patches.ts (the applyFeasts filter; the shadow-cap sweep
- *  beside it iterates the ALREADY-filtered map and compares no template), and
- *  src/game/feast_interact.ts. The contract comment in
- *  src/render/quest_objects.ts is a sixth reader but not a keyed site.
- *
- *  ONE CAVEAT, because the sentence above is easy to over-read: the two title
- *  composers reach the family through feast_title.ts, whose templateId-to-key
- *  map is HAND-LISTED (a t() key built by template literal is invisible to
- *  every static consumer, which this packet has paid for twice). So authoring a
- *  feast def joins the DERIVED set everywhere at once but leaves that map
- *  short. It is caught rather than trusted: tests/entity_display_name.test.ts
- *  pins the map exhaustively in BOTH directions against feastTemplateIds(). */
+ *  title composers, through the leaf above), src/render/nameplate_view.ts (the
+ *  interact hysteresis band), src/render/farm_patches.ts (the applyFeasts
+ *  filter; the shadow-cap sweep beside it iterates the ALREADY-filtered map and
+ *  compares no template), and src/game/feast_interact.ts. The contract comment
+ *  in src/render/quest_objects.ts is a sixth reader but not a keyed site. */
 const FEAST_TEMPLATE_IDS: ReadonlySet<string> = new Set(
   Object.values(ITEMS).flatMap((def) =>
     'feast' in def && def.feast ? [def.feast.templateId] : [],
@@ -133,10 +133,11 @@ export function isApexFeastRecipe(recipe: {
 }): boolean {
   const def = ITEMS[recipe.resultItemId];
   if (!def || !('feast' in def) || !def.feast) return false;
-  // CRAFT_INDEX rather than craftById/craftMaxSkillFor, which THROW on an
-  // unknown id: this runs on the craft-credit arm of every successful craft,
-  // and a content typo should refuse the deed mark, never throw inside a live
-  // craft. The map is the same authority those accessors read.
+  // A find over CRAFT_RING rather than craftById/craftMaxSkillFor, which THROW
+  // on an unknown id: this runs on the craft-credit arm of every successful
+  // craft, and a content typo should refuse the deed mark, never throw inside a
+  // live craft. CRAFT_RING is the same authority those accessors resolve
+  // through, so there is one source for the cap either way.
   const craft = CRAFT_RING.find((c) => c.id === recipe.professionId);
   return craft !== undefined && recipe.skillReq >= craft.maxSkill;
 }

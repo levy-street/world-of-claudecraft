@@ -38,7 +38,9 @@ export interface BagItemInfo {
   mount?: string;
   /** The placeable shared feast payload (ItemDef.feast, Farming Phase 12). */
   // The shipped payload also carries `templateId` (masterwrought Phase 11k); it
-  // is omitted here because this view never places anything, and a structural
+  // is omitted here because this view routes a placement but never renders the
+  // PLACED ENTITY (the command carries the item id; the template is the placed
+  // object's, which only the world sites read), and a structural
   // mirror that lists a field it does not read invites the next reader to think
   // it does. Under-describing is the deliberate half: adding a field to the def
   // does not red this line, so a field that ever becomes load-bearing HERE must

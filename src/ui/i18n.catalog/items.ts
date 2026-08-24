@@ -2689,13 +2689,16 @@ const ITEM_ENTITY_IDS = [
   // an outright delete (verified against origin/release/v0.40.0: neither id
   // appears in that tree's items catalog or content tables).
   //
-  // THAT REMOVAL SHIFTED POSITIONS, and this list is POSITIONAL: the `en`
-  // itemTranslations list is read at the same indexes, so the two rows came out
-  // of BOTH sides together. Nothing after the 11i block is index-stable across
-  // this change, which is fine (the ids are what the runtime resolves) but is
-  // worth saying, because "append-only" otherwise reads as "index-stable" and
-  // this phase is the first in the packet to remove a row rather than add one.
-  // All six new names are wordy in English, so M16 non-Latin fills land here.
+  // THE REMOVAL SHIFTED NO INDEX, and that is worth stating precisely because
+  // this list IS positional for its older half and a reader could reasonably
+  // assume the worst. `itemTranslations` only reads names by index when it is
+  // handed a full-length list (`includesAppendedNames`, below); every locale
+  // list including the English one is the LEGACY length, so all 272 ids on
+  // APPENDED_ITEM_NAMES resolve BY KEY. Both retired feast ids were appended
+  // ids, so they came out of this array and that keyed map together and no
+  // positional row moved anywhere.
+  // All six new names are wordy in English, so M16 non-Latin fills are owed;
+  // they land in the src/ui/i18n.locales overlays, never in this file.
   'stonepot_feast',
   'warspice_feast',
   'sageleaf_feast',

@@ -124,12 +124,22 @@ describe('the apex feast titles', () => {
     }
     expect(feastTitleKeyFor('farm_bed'), 'a non-feast object has no title key').toBeNull();
     expect(feastTitleKeyFor(undefined)).toBeNull();
-    // AND THE REVERSE DIRECTION, which the two negatives above do not give:
-    // the title map must claim NO template outside the family. Without this,
-    // adding `farm_bed` to the map would label every garden bed as a feast and
-    // every arm above would stay green, because they only ever walk the family
-    // and ask whether the map answers. "and nothing else does" is in this
-    // test's own title, so it is asserted rather than implied.
+    // AND THE REVERSE DIRECTION, which the family walk above cannot give: the
+    // map must claim NO template outside the family. "and nothing else does" is
+    // in this test's own title, so it is asserted rather than implied.
+    //
+    // WHAT IT ACTUALLY BUYS, corrected after a reviewer ran the mutation this
+    // comment first claimed, and then measured properly. It took THREE
+    // candidate mutations to find one that reaches this line, which is itself
+    // the argument for keeping it:
+    //   - a key for `farm_bed` reds on the hand-picked negative two lines up;
+    //   - a key for `mailbox` reds on the "every other entity by its wire name"
+    //     arm at the bottom of this file;
+    //   - a key for `delve_bell_rope`, which NO arm in this suite names, reaches
+    //     only this assertion and reds here.
+    // So the negatives cover the templates somebody thought to list, and this
+    // line covers every object template in the game that nobody did. The first
+    // version of this comment claimed the `farm_bed` case, which was false.
     expect(feastTitleKeyedTemplateIds(), 'the map claims exactly the family').toEqual(templates);
   });
 });

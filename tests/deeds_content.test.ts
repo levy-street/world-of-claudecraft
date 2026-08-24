@@ -1278,6 +1278,52 @@ describe('trigger references resolve against the real content tables', () => {
     if (trigger.kind === 'visits') expect([...trigger.markIds].sort()).toEqual(marks);
   });
 
+  it('every deed desc that names a shipped item names the RIGHT one', () => {
+    // THE GUARD THE BLOCKING BUG ASKED FOR (masterwrought Phase 11k). That
+    // phase's deed shipped reading "Cook an apex Harvest Feast", and no such
+    // item exists: its outputs are the Stonepot, Warspice and Sageleaf Feasts,
+    // while Harvest Feast is a DIFFERENT shipped item, the rare party rung one
+    // below. A reviewer caught it. Nothing in this suite could, because nothing
+    // read a deed desc, and the Book is player-visible English.
+    //
+    // THE RULE IS DELIBERATELY NARROW. A desc is prose and most Title Case in
+    // it is ordinary English, so a loose check would fire on every deed. This
+    // asks only: does the desc contain a phrase that EXACTLY matches a shipped
+    // item NAME? That is precisely the shape the bug had, a real item name
+    // naming the wrong real item, and it is rare enough to enumerate.
+    //
+    // AN ALLOWLIST RATHER THAN A BAN, because naming an item is often right
+    // (col_deepest_cast really is about the Clockreel Fishing Rod). Its value
+    // is that a NEW mention has to be read by a human once: a deed naming an
+    // item is making a promise about content, and this is where it is checked.
+    const itemNames = [...new Set(Object.values(ITEMS).map((def) => def.name))];
+    const mentions: string[] = [];
+    for (const id of DEED_ORDER) {
+      const desc = DEEDS[id].desc;
+      for (const name of itemNames) {
+        const escaped = name.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+        if (new RegExp(`\\b${escaped}\\b`).test(desc)) mentions.push(`${id}:${name}`);
+      }
+    }
+    expect(
+      mentions.sort(),
+      'every deed desc naming a shipped item, each reviewed as naming the right one',
+    ).toEqual([
+      'col_deepest_cast:Clockreel Fishing Rod',
+      'col_glimmerfin:Sunglint Koi',
+      'feat_brightwood_relic:Bramblehide Jerkin',
+      "feat_brightwood_relic:Monarch's Crown",
+      'hid_codfather:The Codfather',
+    ]);
+    // NON-VACUITY: the sweep must actually be able to see a name, or the
+    // expectation above is a list of five things it never looked for.
+    expect(itemNames.length, 'the item name corpus is real').toBeGreaterThan(500);
+    expect(
+      DEED_ORDER.some((id) => /Clockreel Fishing Rod/.test(DEEDS[id].desc)),
+      'and the matcher really does find one by hand',
+    ).toBe(true);
+  });
+
   it('the apex_feast namespace SURVIVES a save/load round trip, so the deed can refill', () => {
     // THE SAME MANDATORY TRAP one deed over (masterwrought Phase 11k), and the
     // reason it is a ROUND TRIP rather than a membership check: an unregistered

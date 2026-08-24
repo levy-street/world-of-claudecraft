@@ -3399,7 +3399,7 @@ describe('Guide professions pages and routes', () => {
       [sizeOf('logging'), sizeOf('herbalism'), sizeOf('fishing'), sizeOf('corpseHarvesting')],
       'the per-line contributions, at their real sizes',
     ).toEqual([1, 3, 9, 2]);
-    expect(sizeOf('farming'), 'farming is the widest supplier').toBeGreaterThanOrEqual(20);
+    expect(sizeOf('farming'), 'farming is the widest supplier, at its real size').toBe(21);
     // And one literal anchor per line, so each is named somewhere by a human
     // and not only reached through the generated list above.
     expect(html, 'the band-5 catch the apex tier keys on').toContain('Raw Stillmere Salmon');
@@ -3413,7 +3413,7 @@ describe('Guide professions pages and routes', () => {
     // set on the ground rather than eaten reads wrong at the top.
     const rungs = GUIDE_PROF_PROVISIONING.ladder.map((r) => r.skillReq);
     expect(rungs, 'the rungs climb').toEqual([...rungs].sort((a, b) => a - b));
-    expect(rungs.length, 'and there is a ladder to climb at all').toBeGreaterThanOrEqual(4);
+    expect(rungs.length, 'and the ladder is its real height').toBe(6);
     expect(rungs, 'it starts at the free rung').toContain(0);
     expect(rungs, 'the capstone rung is on the page').toContain(125);
     expect(html).toContain('Stonepot Feast');
@@ -3443,11 +3443,10 @@ describe('Guide professions pages and routes', () => {
     // AT THE REAL COUNT, not a token floor. This used to read `> 10` against a
     // real population of 36, which the farming line alone satisfies: every
     // other line could have emptied and this sweep would still have run over a
-    // valid-looking list.
-    expect(listed.length, 'every listed material is swept, at the real count').toBe(
-      GUIDE_PROF_PROVISIONING.lines.reduce((n, l) => n + l.materials.length, 0),
-    );
-    expect(listed.length, 'and the literal beside it').toBe(36);
+    // valid-looking list. (It briefly also compared `listed.length` to a reduce
+    // over the same lines, which is an identity of flatMap and could not fail;
+    // the literal is the whole guard.)
+    expect(listed.length, 'every listed material is swept, at the real count').toBe(36);
     for (const name of listed) {
       const def = nameToDef.get(name);
       expect(def, `${name} must be a real item def`).toBeTruthy();
@@ -3469,10 +3468,19 @@ describe('Guide professions pages and routes', () => {
     const FORBIDDEN = ['Nythraxis', 'Drowned Litany', 'Collapsed Reliquary', 'Heroic'];
     for (const forbidden of FORBIDDEN) {
       expect(html, `the provisioning page must not name ${forbidden}`).not.toContain(forbidden);
+      // THE POSITIVE CONTROL DRIVES THE SAME MATCHER on the same shape of
+      // input. An earlier version of this asserted
+      // `\`${html}<!-- x -->\`.includes(x)` and was worthless twice over: it
+      // interpolated the needle into the haystack in the same expression, so it
+      // was true for every possible string including the empty one, and it
+      // exercised String.prototype.includes rather than the `toContain` matcher
+      // it claimed to control. Writing a fake control inside the fix that
+      // retires decorative pins is the purest version of this packet's own
+      // lesson, so it is recorded here rather than quietly replaced.
       expect(
-        `${html}<!-- ${forbidden} -->`.includes(forbidden),
-        `the sweep can actually see ${forbidden}`,
-      ).toBe(true);
+        `${html}<!-- ${forbidden} -->`,
+        `the toContain matcher can actually see ${forbidden}`,
+      ).toContain(forbidden);
     }
   });
 
