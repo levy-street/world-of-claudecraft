@@ -103,8 +103,8 @@ function ride(sim: Sim, pid: number, key: string): void {
 }
 
 describe('mount catalog', () => {
-  it('has exactly ten mounts with the horse first and the developer tank last', () => {
-    expect(MOUNT_KEYS).toHaveLength(10);
+  it('has exactly eleven mounts with the horse first and the developer tank last', () => {
+    expect(MOUNT_KEYS).toHaveLength(11);
     expect(MOUNT_KEYS[0]).toBe('valorsteed');
     expect(MOUNT_KEYS.at(-1)).toBe('terrorspark_groundshaker');
     expect(DEFAULT_MOUNT).toBe('valorsteed');
@@ -172,7 +172,11 @@ describe('mount reins items (the collection: owning the item is owning the mount
     Object.values(ITEMS).filter((d) => d.kind === 'mount' && d.mount === key) as MountItemDef[];
 
   it('every mount has exactly one reins item; player reins are unbound, dev mounts stay bound', () => {
-    const developerMounts = new Set(['goblin_rocket_sled', 'terrorspark_groundshaker']);
+    const developerMounts = new Set([
+      'goblin_rocket_sled',
+      'rallycart_rxt',
+      'terrorspark_groundshaker',
+    ]);
     for (const key of MOUNT_KEYS) {
       const items = reinsFor(key);
       expect(items).toHaveLength(1);
@@ -245,7 +249,11 @@ describe('mount reins items (the collection: owning the item is owning the mount
     // acquisition path at all. Listed EXPLICITLY so a sourceless mount is a
     // decision and never an accident: when the world boss lands, delete the entry
     // and the rarity-derived rule below takes back over.
-    const NO_SOURCE_YET: readonly string[] = ['reins_drakemaw_raptor', 'reins_goblin_rocket_sled'];
+    const NO_SOURCE_YET: readonly string[] = [
+      'reins_drakemaw_raptor',
+      'reins_goblin_rocket_sled',
+      'reins_rallycart_rxt',
+    ];
     const FIVE_MAN_SOURCES: Record<string, readonly string[]> = {
       reins_stormfeather_griffin: ['morthen'],
       reins_shadowjump_toad: ['vael_the_mistcaller'],

@@ -415,7 +415,7 @@ export const BASE_ITEMS: Record<string, ItemDef> = {
     sellValue: 0,
   },
   // Developer-only mount checkpoint. It deliberately has no acquisition path;
-  // use /dev mounts or /dev give reins_goblin_rocket_sled during visual review.
+  // use /dev mounts or /dev give reins_rallycart_rxt during visual review.
   reins_rallycart_rxt: {
     id: 'reins_rallycart_rxt',
     name: 'Ignition Key: Rallycart RXT',
