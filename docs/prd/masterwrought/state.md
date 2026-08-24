@@ -14590,3 +14590,257 @@ record already warns about, not this round's file count, which is nine.
   give one plate a second crop row, or the fish row to only two of the three;
   both are refused by the control with the halves isolated so each case names its
   own reason.
+
+## Phase 11k STEP 0 ledger (2026-08-23, pre-flight only; authoring NOT started)
+
+STATUS: **BLOCKED AT THE PREREQUISITE CHECK, BY DESIGN.** Base tip 5f087a6e2a,
+clean, LOCAL, no push, no PR. Step 0 ran in full and passed on every axis but
+one: this phase's deliverable 1 collides head-on with `deepwater_feast`, which
+is OPEN MAINTAINER ITEM (8) and which the phase brief forbids this session from
+folding in, cutting, or minting a fourth feast beside. Surfaced and costed
+below; not decided. No source file was edited.
+
+### THE THIRTEENTH RELEASE SYNC: NO MERGE WAS OWED
+
+`git fetch origin --prune`, then every `origin/release/*` by version sort. The
+newest is still `release/v0.40.0` and its tip is still **b39b16022e**, the exact
+commit the TWELFTH sync (1f3a844732, Phase 11j QA) merged.
+`git merge-base --is-ancestor origin/release/v0.40.0 HEAD` exits 0 and
+`git log HEAD..origin/release/v0.40.0` is empty. So no merge was manufactured,
+no seal re-mint, no ratchet re-measure owed by a merge, and no
+release-merge-audit to run.
+
+ONE THING WORTH RECORDING FOR THE NEXT SYNC: the fetch brought a new
+`gh-readonly-queue/release/v0.40.0/pr-3608-b39b16022e...` ref, so PR #3608 is
+sitting in the merge queue built on b39b16022e. The release will move; it has
+not moved yet. The next phase's sync is the one that pays for it.
+
+BOTH ENDS OF THE BASELINE, and the drift is zero because the tree did not move:
+
+| measure | 11j QA frozen stamp (c140b52c12 / 5f087a6e2a) | after this STEP 0 |
+|---|---|---|
+| vitest | EXIT=0, 3069 files / 12 skipped (3081); 43964 passed / 2 xfail / 115 skipped (44081) | **unchanged**: no merge landed and no file was edited, so the tree is byte-identical to the stamped tip |
+| `npm run ci:changed` | EXIT=0, 797 files, 3094 warnings, 0 errors | **unchanged**, same reason |
+| `npx tsc --noEmit` | clean | **re-measured this session: clean** |
+
+The full suite was NOT re-run, and the reason is the freeze discipline this
+packet paid four discarded runs to learn: a suite number is evidence about a
+tree, and this tree is the one the 11j QA stamp already measured, at the same
+commit, with nothing edited since. Re-running it would produce the same numbers
+and prove nothing new. The stamp is re-run when this phase's first content
+lands, not before.
+
+### THE PREREQUISITE CONTENT, CONFIRMED IN CODE AND NOT FROM ANY LEDGER
+
+Read from the merged tree, per the phase file's own instruction not to trust a
+ledger row here.
+
+| prerequisite | verdict | evidence |
+|---|---|---|
+| tier-4 seeds vendor-stocked | PRESENT | `farmer_hollis`'s `vendorItems` (content/evergarden.ts) carries `gilded_sunmelon_seed`, `evergarden_greens_seed`, `gilded_yam_seed`, `evergarden_pumpkin_seed` beside `compost` |
+| `fine_gilded_sunmelon` exists and is reachable | PRESENT | items.ts, sellValue 80, and `FARM_CROPS`' `fineProduceItemId` for the tier-4 sunmelon |
+| `fine_evergarden_greens` exists and is reachable | PRESENT | items.ts, sellValue 80, same derivation |
+| the fishing arm's high-band catch exists with a real id and sellValue | PRESENT, and there are THREE | `raw_deepbarb_catfish` 14 (band 3), `raw_hollowgill_sturgeon` 18 (band 4), `raw_stillmere_salmon` 22 (band 5) |
+
+So the phase file's fish STOPPING RULE does not fire. What fires is a different
+one.
+
+### THE BLOCKER: DELIVERABLE 1 IS ALREADY ONE THIRD SHIPPED, AS DEAD CONTENT
+
+The phase file was written 2026-08-20. 11i shipped on 2026-08-23 and minted
+`deepwater_feast`. Compare the two, field by field, from the tree:
+
+| field | 11k deliverable 1, stamina feast | shipped `deepwater_feast` |
+|---|---|---|
+| craft and rung | cooking 125 | cooking 125 |
+| quality | epic (decision K2) | epic |
+| kind | 'junk' | 'junk' |
+| charges | 10 (decision K5) | 10 |
+| durationTicks | 3600 (decision K5) | 3600 |
+| `feast.dishItemId` | `stonepot_stew` | `stonepot_stew` |
+| acquisition | `['drop']` (R8) | `['drop']` |
+| stationType | `kitchens` | `kitchens` |
+| pattern | `pattern_<id>`, epic, sellValue 100 | `pattern_deepwater_feast`, epic, 100 |
+| marks channel | 16, the skill-125 rung | 16 |
+
+**THE STAMINA THIRD OF DELIVERABLE 1 IS `deepwater_feast`.** Every settled
+decision K2 through K5 describes the row that already exists. The only two
+differences are the BILL (all-fish: salmon 2, sturgeon 3, catfish 4,
+seasoned_stock 2, sunpetal_herb 1, cooking_salt 2, input 390 against output
+250) and the NAME, which is a fishing coinage rather than a compound of the
+plate it serves.
+
+AND IT IS DEAD, which is open item (8). `professions/feast.ts` binds the whole
+lifecycle to `FARM_FEAST_ITEM_ID = 'harvest_feast'`: the hold check, both spend
+arms, and the dish lookup in `consumeFeastAction` all read that constant.
+`src/sim/items.ts` DOES route the use generically (`if ('feast' in def &&
+def.feast)`), so the live outcomes are exactly the two the 11i QA recorded, and
+which path a player gets depends on whether a slot index rides the press:
+
+- The bag right-click is `this.sim.useItem(itemId)` with NO slot
+  (src/ui/hud.ts:7207), so it takes the id-only arm: a player holding a Harvest
+  Feast has the HARVEST FEAST spent and a harvest_feast placed. The Deepwater
+  Feast is untouched and the wrong item is destroyed.
+- Any caller that DOES name the slot gets `selectedInventorySlot(inventory,
+  'harvest_feast', slotIndex)` returning `null` (the slot holds a different id),
+  so the press denies `no_feast` and nothing happens, forever.
+
+### WHY THIS PHASE CANNOT PROCEED WITHOUT THE RULING
+
+Because the K1 widening cannot be NEUTRAL on `deepwater_feast`. Whatever this
+phase does to `placeFeastAction`, it takes a position:
+
+- Widen generically on `def.feast` and `deepwater_feast` becomes placeable. That
+  IS the FIX half of open item (8), delivered as a side effect.
+- Widen to "a small authored set" (the phase file's own wording) and the set's
+  membership is the decision: including it is the FIX, excluding it is a
+  deliberate refusal to fix a shipped row.
+- Leave it out of the template family and it places under `farm_feast`, so an
+  epic capstone renders as "{name}'s Harvest Feast", which is the exact
+  mislabel decision K1 exists to prevent.
+
+There is no fourth option where the widening lands and item (8) stays untouched.
+
+### THE THREE REMEDIES, COSTED FROM THE TREE
+
+Recorded so the ruling is a choice between measured options, not a preference.
+
+**A. FOLD IN.** `deepwater_feast` becomes the stamina apex feast; this phase
+mints TWO new feasts, for `warspice_skewers` and `sageleaf_chowder`.
+
+- Cheapest in ids: `ALL_RECIPES` 154 to 156, `ITEM_ART_PENDING` 74 to 78 (two
+  feasts, two patterns), `HEROIC_VENDOR_STOCK` 37 to 39,
+  `APEX_CONSUMABLE_RECIPES` 11 to 13.
+- It KEEPS `raw_stillmere_salmon`'s only consumer, so the demand arm of
+  `tests/gathering_supply_coverage.test.ts` stays green with no new bill needed.
+- It BREAKS two of the phase's own rules, and both are load-bearing rather than
+  cosmetic. The bills would NOT be byte-identical to each other (the shipped one
+  is all-fish, the two new ones are produce plus core plus fish), which the
+  APEX_CONSUMABLE header's own uniform-bill rule forbids for a family; and the
+  price would not be uniform either, since decision K2's window opens strictly
+  ABOVE 250 and the shipped row sits AT 250.
+- Role legibility, which decision K1 makes a functional requirement, fails on the
+  name: "Deepwater Feast" does not say Stonepot. A rename is an i18n reword with
+  the stale-fill exposure the packet has now met four times, and the id cannot
+  move.
+
+**B. CUT.** Remove `deepwater_feast`, its recipe, its pattern and its vendor row;
+mint three fresh feasts on one byte-identical bill.
+
+- Highest fidelity to the phase as written: three ids, one bill, one price, three
+  compounded names, every rule intact.
+- The 11i QA's costing holds: `ALL_RECIPES` 154 to 153 to 156,
+  `APEX_CONSUMABLE_RECIPES` 11 to 10 to 13, `HEROIC_VENDOR_STOCK` 37 to 36 to 39,
+  `ITEM_ART_PENDING` 74 to 72 to 78, plus the pattern universe.
+- THE SALMON STRAND IS THE REAL COST, and 11j measured it: `raw_stillmere_salmon`
+  has exactly ONE consumer and it is `recipe_deepwater_feast`, at count 2. A cut
+  takes it to zero, and it has no fine grade to substitute through, so the demand
+  arm of `tests/gathering_supply_coverage.test.ts` REDS for real.
+- THAT STRAND IS CLOSABLE BY THIS PHASE'S OWN BILL, which is worth stating
+  because it changes the price of the option: the phase file leaves the
+  high-band catch's identity to derivation ("the fishing arm's new high-band
+  catch"). Choosing `raw_stillmere_salmon` absorbs the demand the cut releases,
+  and it is also the strongest R20 statement available, being the band-5 catch
+  only a capped angler with the apex rod can farm.
+- It retires an M16-filled name and five real non-Latin fills.
+- The append-only id rule is NOT violated: `deepwater_feast` is branch-only and
+  has never shipped in a release, so `tests/shipped_item_ids.test.ts`'s subset
+  check does not see it.
+
+**C. BESIDE.** Mint three, leave `deepwater_feast` alone.
+
+- Ships FOUR apex feasts at cooking 125, TWO of which serve `stonepot_stew`, and
+  leaves one of them dead or mislabeled per the widening argument above. This is
+  the option that cannot be made coherent, and it is recorded so it is not
+  reached for by default.
+
+### FOUR MORE CORRECTIONS TO THE PHASE FILE, FOUND BY READING THE TREE
+
+Each is beyond the eleven the brief already carries, and each was checked in
+code rather than inferred.
+
+1. **THERE ARE SIX KEYED SITES, NOT FOUR.** Decision K1 names
+   `src/ui/entity_display_name.ts`, `src/render/farm_patches.ts`,
+   `src/game/feast_interact.ts` and the contract comment in
+   `src/render/quest_objects.ts`. Two more import `FARM_FEAST_TEMPLATE_ID` and
+   key on it: `src/render/entity_labels.ts:88`, which is the site that actually
+   composes `hudChrome.farming.feastTitle` for the world label, and
+   `src/render/nameplate_view.ts:152`, which gates the plate on the feast's own
+   `INTERACT_RANGE + 1` hysteresis band. Left unrepointed, an apex feast would
+   fall through `entity_labels` to `entity.name` and render the placer's RAW
+   name as its world label, which is both the wrong title and an i18n violation,
+   and it would lose the hysteresis band. Six is the number the membership helper
+   has to reach.
+2. **`consumeFeastAction` HARD-CODES THE ITEM ID TOO, and the phase file's
+   Agent 1 brief does not mention it.** The brief widens `placeFeastAction`
+   only. But the dish lookup at the bite reads
+   `ITEMS[FARM_FEAST_ITEM_ID].feast.dishItemId`, so a widened placement alone
+   would serve every feast harvest_feast's `evergarden_braised_greens`. The
+   acceptance criterion "a serving mints an aura IDENTICAL to eating that plate
+   from bags" is therefore unreachable without carrying the source item id (or
+   the dish id) on `FeastState`. That is NOT the cross-platform change the
+   Agent 3 CUT costs: `FeastState` is transient by design (the module header
+   states it enters no save blob, no PlayerMeta, no wire field), so the field is
+   sim-local and adds no wire arm. Worth separating, because the phase file's
+   own CUT reasoning conflates the two.
+3. **BOTH FINE TWINS CARRY `buyValue: 320`.** The Agent 2 brief says "the fine
+   twins and the core carry no buyValue, so they cannot be bought into existence
+   at a counter". False on the merged tree: `fine_gilded_sunmelon` and
+   `fine_evergarden_greens` are both `sellValue: 80, buyValue: 320`. THE
+   CONCLUSION SURVIVES for a different reason, which is why this is a correction
+   and not a stop: `counterfactuallyVendorFedRecipes` in
+   `tests/recipe_economy.test.ts` requires EVERY reagent to carry a positive
+   buyValue, and `wyrmfall_core`, `seasoned_stock` and all three catches carry
+   none, so the new rows stay out of that set. No counter stocks either twin
+   either (their only other reference anywhere is `FARM_CROPS`'
+   `fineProduceItemId`).
+4. **THE PRINTED GOLD-NEGATIVE ARITHMETIC MOVES WITH IT.** The brief tells the
+   bill to work against "each fine twin 80". The shipped convention is buyValue
+   when finite and positive else sellValue, which `recipe_laden_hearth`'s own
+   input of 1062 already reflects, so a fine twin costs **320** in that
+   arithmetic and not 80. The COUNT derivation is unaffected (it rests on the
+   sellValue relation, a fine twin at 80 against its base at 40, so the
+   value-equivalent count is half the base count), but every printed figure at
+   the row changes.
+
+ONE OF THE BRIEF'S OWN CORRECTIONS IS OVERSTATED, recorded so the next session
+does not hunt a pin that will not move. Correction 6 lists the per-family
+supply-size map (6/6/6/10/24/13) among the four pins this phase will move. It
+will not: that map counts gathering MATERIALS per family, and this phase mints
+no material. Of the four, `REFUSED_ENDGAME_ROWS` is also predicted UNCHANGED,
+since the refusal only drops rows whose result is a gathering TOOL and no feast
+is one. The two that really move are `farmingEndgame.length` (12, rising by the
+number of new endgame rows naming farm produce) and fishing's endgame cell
+(6, rising the same way through the catch in the bill).
+Predicted-then-observed still applies to all four; the prediction for two of
+them is "unchanged", which is a prediction and not a skip.
+
+### WHAT WAS DELIBERATELY NOT DONE
+
+1. **No source file was edited and nothing was committed but this record.** The
+   collision reaches every one of the five deliverables: the feast ids the deed
+   triggers on, the bills the economy pins re-derive from, the titles and their
+   M16 fills, the art park rows, and the wiki page's ladder prose. Authoring any
+   of them under an assumption would have to be redone under either of the other
+   two rulings.
+2. **The `deepwater_feast` FIX-or-CUT was not decided**, per the brief. Costed
+   above, three ways, and handed back.
+3. **The full suite was not re-run.** No merge landed and no file changed, so the
+   11j QA stamp at this exact tip stands. It gets re-run when content lands.
+
+### THE HANDOFF
+
+- **THE RULING WANTED IS ONE LINE: A, B, or C above.** B is the option that lets
+  the phase ship as written, and its one real cost (the stranded salmon) is
+  closable inside this phase's own bill by keying the apex feasts on
+  `raw_stillmere_salmon`, which is also the strongest available masterwrought
+  R20 statement. That is a costing, not a recommendation the session is entitled
+  to act on.
+- **DECISION K2's WINDOW NEEDS RE-DERIVING WHATEVER IS RULED**, per the brief's
+  correction 3, and the reason is now concrete: an epic feast at the rare party
+  rung's price of 250 is already shipped, so the window's lower bound was
+  chosen against a table that has since moved.
+- **THE OPEN-ITEM COUNT IS STILL TWELVE.** This pre-flight decided none of them
+  and adds none. It moves item (8) from "handed back with two remedies" to
+  "handed back with three remedies and the reason the next phase cannot route
+  around it".
