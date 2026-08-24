@@ -15,6 +15,7 @@ export const TALENT_ABILITIES_V2_A = {
     school: 'physical',
     scalesWith: 'ranged',
     requiresTarget: true,
+    projectile: true,
     targetType: 'enemy',
     effects: [{ type: 'incapacitate', duration: 4 }],
     description: 'A wild shot that disorients the target for $t sec. Any damage breaks the effect.',

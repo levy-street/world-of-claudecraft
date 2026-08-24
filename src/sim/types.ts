@@ -3164,16 +3164,18 @@ export interface AbilityDef {
   range: number; // yards; 0 = melee range
   /** Optional authored override for the player directional-combat resolver. */
   playerAttackResolution?: PlayerAttackResolution;
+  /**
+   * A target-born impact aimed at a world point. The ability keeps its authored
+   * effects and class hooks; the cast lifecycle applies target-facing effects
+   * to the nearest hostiles inside this radius, up to maxTargets. Cast-level
+   * costs, procs and resource consumers still resolve only once.
+   */
+  impactArea?: { radius: number; maxTargets: number };
   minRange?: number;
   // The attack travels to its target as a projectile, so its damage and effects
-  // resolve when the bolt LANDS (projectile_travel), not at cast completion. Every
-  // non-physical spell is a projectile by convention (keyed off school in
-  // casting_lifecycle); a PHYSICAL ranged shot (hunter Aimed / Concussive Shot) must
-  // set this explicitly, or it would deal its damage instantly while the arrow is
-  // still visibly in flight. Melee physical attacks leave it unset.
-  // Projectile opt-IN for physical ranged shots (hunter Aimed/Concussive), and
-  // opt-OUT for spells: `projectile: false` on a non-physical spell resolves its
-  // damage instantly at cast completion instead of on bolt arrival (Fire Blast).
+  // resolve when the bolt LANDS (projectile_travel), not at cast completion.
+  // This is an authored opt-in for every school: true bolts and arrows set it;
+  // target-born bursts, beams, DoTs and control spells leave it false/unset.
   projectile?: boolean;
   // Overrides the flying-projectile VISUAL for this spell (the mechanic is
   // unchanged): 'lightning' draws a jagged electric bolt from caster to target
@@ -5745,6 +5747,10 @@ export type SimEvent = { pid?: number } & (
         | 'flourish'
         // Ability-specific, entity-anchored activation with no travel component.
         | 'selfCast'
+        // A target-born directional spell made physical contact without a
+        // travelling projectile. The renderer plays the ability's authored
+        // burst, DoT, CC or special contact sequence directly on targetId.
+        | 'impact'
         // Talent-moment effects: a proc arming (procSurge), a ward appearing
         // (wardBloom), a stored heal-echo firing (echoBurst), and a DoT being
         // detonated (detonate). Visual-only; whole-JSON wire needs no schema change.

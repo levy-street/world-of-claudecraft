@@ -243,7 +243,6 @@ describe('Shaman v0.29 Warspirit', () => {
     ).toBeCloseTo(Math.round(baseArmor * 1.4), 5);
 
     castInstant(sim, shaman, 'earth_shock');
-    for (let tick = 0; tick < 20 * 3; tick++) sim.tick();
     expect(target.forcedTargetId).toBe(shaman.id);
     expect(target.forcedTargetTimer).toBeGreaterThan(0);
 

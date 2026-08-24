@@ -1480,6 +1480,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     range: 30,
     school: 'fire',
     requiresTarget: true,
+    projectile: true,
     effects: [
       { type: 'directDamage', min: 16, max: 25 },
       { type: 'dot', total: 2, duration: 4, interval: 2 },
@@ -1600,6 +1601,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     range: 30,
     school: 'frost',
     requiresTarget: true,
+    projectile: true,
     effects: [
       { type: 'directDamage', min: 18, max: 20 },
       { type: 'slow', mult: 0.6, duration: 5 },
@@ -1654,6 +1656,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     range: 30,
     school: 'frost',
     requiresTarget: true,
+    projectile: true,
     effects: [{ type: 'directDamage', min: 10, max: 12 }],
     ranks: [
       {
@@ -1688,6 +1691,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     range: 30,
     school: 'frost',
     requiresTarget: true,
+    projectile: true,
     effects: [
       { type: 'directDamage', min: 7, max: 9 },
       { type: 'directDamage', min: 7, max: 9 },
@@ -1772,6 +1776,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     range: 30,
     school: 'frost',
     requiresTarget: true,
+    projectile: true,
     requiresAuraKind: 'icicles',
     requiresAuraStacks: 5,
     effects: [
@@ -2020,7 +2025,9 @@ export const ABILITIES: Record<string, AbilityDef> = {
     cooldown: 30,
     range: 20,
     school: 'fire',
-    requiresTarget: true,
+    requiresTarget: false,
+    targetMode: 'position',
+    impactArea: { radius: 3, maxTargets: 5 },
     // Owner playtest 2026-07-11: pressable in the middle of another cast.
     usableWhileCasting: true,
     // Owner rule (round five): fully off the GCD, like Phoenix Trance: castable
@@ -2045,7 +2052,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
         effects: [{ type: 'directDamage', min: 68, max: 82 }],
       },
     ],
-    description: 'Blasts the enemy for $d Fire damage. Instant.',
+    description: 'Blasts a 3-yard area for $d Fire damage. Instant.',
   },
   arcane_missiles: {
     id: 'arcane_missiles',
@@ -2060,6 +2067,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     range: 30,
     school: 'arcane',
     requiresTarget: true,
+    projectile: true,
     effects: [{ type: 'directDamage', min: 8, max: 8 }], // per missile
     ranks: [
       {
@@ -2317,7 +2325,9 @@ export const ABILITIES: Record<string, AbilityDef> = {
     cooldown: 0,
     range: 30,
     school: 'fire',
-    requiresTarget: true,
+    requiresTarget: false,
+    targetMode: 'position',
+    impactArea: { radius: 3, maxTargets: 5 },
     // Owner playtest 2026-07-13: Scald lands instantly, no traveling bolt (projectile
     // false), so the damage resolves the moment the cast finishes.
     projectile: false,
@@ -2329,7 +2339,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
       { type: 'selfBuff', kind: 'buff_speed', value: 1.2, duration: 3 },
     ],
     description:
-      'Scalds the enemy for $d Fire damage and quickens you by 20% for 3 sec. Quick to cast, and castable while moving.',
+      'Scalds enemies in a 3-yard area for $d Fire damage and quickens you by 20% for 3 sec. Quick to cast, and castable while moving.',
   },
   pyroblast: {
     id: 'pyroblast',
@@ -2345,6 +2355,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     range: 30,
     school: 'fire',
     requiresTarget: true,
+    projectile: true,
     // The kit's hardest hit flies as the visibly heavier bolt (render-only).
     projectileFx: 'heavyBolt',
     effects: [
@@ -3588,9 +3599,11 @@ export const ABILITIES: Record<string, AbilityDef> = {
     cooldown: 15,
     range: 30,
     school: 'holy',
-    requiresTarget: true,
+    requiresTarget: false,
+    targetMode: 'position',
+    impactArea: { radius: 4, maxTargets: 5 },
     effects: [{ type: 'directDamage', min: 46, max: 56 }],
-    description: 'Banishes the wicked with Holy wrath, causing $d Holy damage.',
+    description: 'Banishes enemies in a 4-yard area with Holy wrath, causing $d Holy damage.',
   },
   righteous_fury: {
     id: 'righteous_fury',
@@ -3924,6 +3937,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     school: 'arcane',
     scalesWith: 'ranged',
     requiresTarget: true,
+    projectile: true,
     effects: [{ type: 'directDamage', min: 13, max: 17 }],
     ranks: [
       { rank: 2, level: 12, cost: 25, effects: [{ type: 'directDamage', min: 24, max: 30 }] },
@@ -4250,7 +4264,9 @@ export const ABILITIES: Record<string, AbilityDef> = {
     cooldown: 0,
     range: 30,
     school: 'holy',
-    requiresTarget: true,
+    requiresTarget: false,
+    targetMode: 'position',
+    impactArea: { radius: 4, maxTargets: 5 },
     effects: [{ type: 'directDamage', min: 15, max: 20 }],
     ranks: [
       {
@@ -4275,7 +4291,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
       },
     ],
     description:
-      'Deal $d Holy damage. Damage increases with Spell Power. Doctrine: heal each linked ally for 30% of the damage. If no ally is linked, heal the lowest-health party member for 15%.',
+      'Deal $d Holy damage to enemies in a 4-yard area. Damage increases with Spell Power. Doctrine uses the primary impact to heal linked allies.',
   },
   lesser_heal: {
     id: 'lesser_heal',
@@ -4432,7 +4448,9 @@ export const ABILITIES: Record<string, AbilityDef> = {
     cooldown: 8,
     range: 30,
     school: 'shadow',
-    requiresTarget: true,
+    requiresTarget: false,
+    targetMode: 'position',
+    impactArea: { radius: 4, maxTargets: 5 },
     effects: [{ type: 'directDamage', min: 42, max: 46 }],
     ranks: [
       {
@@ -4449,7 +4467,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
       },
     ],
     description:
-      'Deal $d Shadow damage. Damage increases with Spell Power. Vespers binds a target with your Dirge of Decay as its Effigy, grants 1 Gloomtithe, and echoes 30% of the damage to up to 3 other enemies with your Dirge.',
+      'Deal $d Shadow damage to enemies in a 4-yard area. Damage increases with Spell Power. Vespers binds the primary impact as its Effigy and resolves its echo once.',
   },
   heal: {
     id: 'heal',
@@ -4511,6 +4529,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     range: 30,
     school: 'nature',
     requiresTarget: true,
+    projectile: true,
     projectileFx: 'lightning', // a jagged electric bolt instead of the default glowing bolt
     effects: [{ type: 'directDamage', min: 15, max: 17 }],
     ranks: [
@@ -4794,7 +4813,9 @@ export const ABILITIES: Record<string, AbilityDef> = {
     cooldown: 6,
     range: 20,
     school: 'nature',
-    requiresTarget: true,
+    requiresTarget: false,
+    targetMode: 'position',
+    impactArea: { radius: 4, maxTargets: 5 },
     effects: [{ type: 'directDamage', min: 19, max: 22 }],
     ranks: [
       {
@@ -4811,7 +4832,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
       },
     ],
     description:
-      'Deal $d Nature damage. Damage increases with Spell Power. Thundercall: at 5 Thunder, deal 125% more damage and consume all Thunder. Stonebound: force the target to attack you for 3 sec.',
+      'Jolt a 4-yard area for $d Nature damage. Damage increases with Spell Power. Thundercall: at 5 Thunder, empower the whole impact and consume Thunder once. Stonebound taunts the primary impact.',
   },
   lightning_shield: {
     id: 'lightning_shield',
@@ -4926,13 +4947,15 @@ export const ABILITIES: Record<string, AbilityDef> = {
     cooldown: 6,
     range: 20,
     school: 'frost',
-    requiresTarget: true,
+    requiresTarget: false,
+    targetMode: 'position',
+    impactArea: { radius: 3, maxTargets: 5 },
     effects: [
       { type: 'directDamage', min: 36, max: 42 },
       { type: 'slow', mult: 0.5, duration: 8 },
     ],
     description:
-      'Deal $d Frost damage and slow the target by 50% for 8 sec. Damage increases with Spell Power.',
+      'Deal $d Frost damage and slow enemies in a 3-yard area by 50% for 8 sec. Damage increases with Spell Power.',
   },
   frostbrand_weapon: {
     id: 'frostbrand_weapon',
@@ -5035,6 +5058,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     range: 30,
     school: 'shadow',
     requiresTarget: true,
+    projectile: true,
     effects: [{ type: 'afflictionNeedle' }, { type: 'directDamage', min: 22, max: 27 }],
     ranks: [
       {
@@ -5065,6 +5089,8 @@ export const ABILITIES: Record<string, AbilityDef> = {
     range: 30,
     school: 'shadow',
     requiresTarget: true,
+    projectile: true,
+    playerAttackResolution: 'lockOnActivation',
     requiresAuraKind: 'affliction_doom',
     requiresAuraStacks: 20,
     effects: [{ type: 'afflictionSentence' }],
@@ -5218,6 +5244,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     range: 30,
     school: 'shadow',
     requiresTarget: true,
+    projectile: true,
     effects: [{ type: 'directDamage', min: 36, max: 50 }],
     ranks: [
       {
@@ -5285,6 +5312,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     range: 30,
     school: 'fire',
     requiresTarget: true,
+    projectile: true,
     effects: [
       { type: 'directDamage', min: 31, max: 31 },
       { type: 'dot', total: 56, duration: 15, interval: 3 },
@@ -5442,6 +5470,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     range: 30,
     school: 'shadow',
     requiresTarget: true,
+    projectile: true,
     effects: [{ type: 'directDamage', min: 30, max: 36 }],
     ranks: [
       {
@@ -5577,6 +5606,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     range: 30,
     school: 'fire',
     requiresTarget: true,
+    projectile: true,
     excludeSpecs: ['affliction', 'demonology', 'destruction'],
     effects: [{ type: 'directDamage', min: 30, max: 38 }],
     description: 'Sears the enemy with agonizing fire for $d Fire damage. Quick to cast.',
@@ -5735,6 +5765,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     range: 30,
     school: 'shadow',
     requiresTarget: true,
+    projectile: true,
     effects: [
       { type: 'directDamage', min: 16, max: 20 },
       { type: 'gainSoulFragments', amount: 1 },
@@ -6000,6 +6031,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     range: 30,
     school: 'nature',
     requiresTarget: true,
+    projectile: true,
     effects: [{ type: 'directDamage', min: 13, max: 16 }],
     ranks: [
       {
@@ -6592,6 +6624,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     range: 30,
     school: 'arcane',
     requiresTarget: true,
+    projectile: true,
     effects: [{ type: 'directDamage', min: 135, max: 185 }],
     actionReplacement: {
       abilityId: 'sunlance',
@@ -6663,6 +6696,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     range: 30,
     school: 'nature',
     requiresTarget: true,
+    projectile: true,
     effects: [{ type: 'faerieFire', duration: 40 }],
     description: "Decreases the target's armor by $d% for 40 sec.",
   },

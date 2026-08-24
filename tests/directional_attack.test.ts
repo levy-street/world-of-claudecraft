@@ -35,6 +35,40 @@ describe('directional attack resolution', () => {
     expect(playerAttackResolution(ABILITIES.bloodhook)).toBe('lockOnActivation');
   });
 
+  it('uses authored projectile mechanics instead of treating every spell school as a bolt', () => {
+    for (const id of [
+      'fireball',
+      'frostbolt',
+      'lightning_bolt',
+      'arcane_shot',
+      'shadow_bolt',
+      'immolate',
+      'wrath',
+    ] as const) {
+      expect(playerAttackResolution(ABILITIES[id]), id).toBe('ballisticProjectile');
+      expect(ABILITIES[id].projectile, id).toBe(true);
+    }
+
+    for (const id of ['mind_flay', 'flame_shock', 'polymorph'] as const) {
+      expect(playerAttackResolution(ABILITIES[id]), id).toBe('directionalHitscan');
+    }
+
+    for (const id of ['earth_shock', 'fire_blast', 'mind_blast'] as const) {
+      expect(playerAttackResolution(ABILITIES[id]), id).toBe('groundArea');
+      expect(ABILITIES[id].impactArea, id).toBeDefined();
+    }
+
+    expect(playerAttackResolution(ABILITIES.sunward_disc)).toBe('lockOnActivation');
+  });
+
+  it('requires an explicit projectile opt-in for every inferred ballistic ability', () => {
+    for (const ability of Object.values(ABILITIES)) {
+      if (ability.playerAttackResolution !== undefined) continue;
+      if (playerAttackResolution(ability) !== 'ballisticProjectile') continue;
+      expect(ability.projectile, ability.id).toBe(true);
+    }
+  });
+
   it('selects at most three melee targets in the 120-degree facing cone', () => {
     const selected = selectMeleeConeTargets({
       origin: { x: 0, z: 0 },

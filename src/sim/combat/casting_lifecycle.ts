@@ -196,6 +196,7 @@ import {
 } from './rogue_engines';
 import { combineCostMultipliers, duskCostMultiplier } from './rogue_talents';
 import { onShamanManaSpent, shamanCastTimeMultiplier, shamanManaCost } from './shaman_talents';
+import { thundercallDamageMultiplier } from './shaman_thundercall';
 import { resolveUnleashWeaponTarget, unleashWeaponCastError } from './shaman_unleash_weapon';
 import { onStormcastConsumed, STORMCAST_CHEAP_ID, STORMCAST_ID } from './shaman_warspirit';
 import {
@@ -1562,11 +1563,12 @@ export function castAbility(
           ? { x: p.pos.x + (dx / d) * maxRange, y: p.pos.y, z: p.pos.z + (dz / d) * maxRange }
           : { x: aim.x, y: p.pos.y, z: aim.z };
     } else {
-      // Faultwake's keybind default is the selected hostile; other position
-      // spells retain the canonical at-feet fallback. Clamp the selected point
-      // through the same authoritative range rule as explicit ground input.
+      // Faultwake and target-born impact areas default to the selected hostile
+      // when no explicit point is supplied; other position spells retain the
+      // canonical at-feet fallback. Clamp through the same authoritative rule.
       const selected =
-        (ability.id === 'earthquake' || ability.id === 'earthbind') && p.targetId !== null
+        (ability.id === 'earthquake' || ability.id === 'earthbind' || ability.impactArea) &&
+        p.targetId !== null
           ? (ctx.entities.get(p.targetId) ?? null)
           : null;
       const fallback =
@@ -2286,19 +2288,42 @@ function applyChannelTick(
     const angle = combatAimAngle(p, meta);
     p.facing = angle;
     if (ctx.playerDirectionalCombat === true) {
-      scheduleBallisticProjectile(
-        ctx,
-        p,
-        {
-          angle,
-          minDistance: res.def.minRange,
-          maxDistance: res.def.range > 0 ? res.def.range : MELEE_RANGE,
-          school: res.def.school,
-          ability: res.def.id,
-          ...(res.def.school === 'physical' ? { attackAnimation: 'ranged-shot' as const } : {}),
-        },
-        applyDirectionalImpact,
-      );
+      if (playerAttackResolution(res.def) === 'ballisticProjectile') {
+        scheduleBallisticProjectile(
+          ctx,
+          p,
+          {
+            angle,
+            minDistance: res.def.minRange,
+            maxDistance: res.def.range > 0 ? res.def.range : MELEE_RANGE,
+            school: res.def.school,
+            ability: res.def.id,
+            ...(res.def.school === 'physical' ? { attackAnimation: 'ranged-shot' as const } : {}),
+          },
+          applyDirectionalImpact,
+        );
+        return;
+      }
+
+      const aimedTarget = aimedHostileTarget(ctx, p, meta, res.def);
+      if (aimedTarget) {
+        // Target-born channel effects stay beams. The projectile classifier no
+        // longer turns Mind Flay/Drain Life ticks into green travelling orbs.
+        if (
+          res.def.id !== 'drain_life' &&
+          res.effects.some((effect) => effect.type === 'drainTick')
+        ) {
+          ctx.emit({
+            type: 'spellfx',
+            sourceId: p.id,
+            targetId: aimedTarget.id,
+            school: res.def.school,
+            fx: 'beam',
+            ability: res.def.id,
+          });
+        }
+        applyDirectionalImpact(p, aimedTarget);
+      }
       return;
     }
 
@@ -2411,6 +2436,32 @@ const SELF_ANNOUNCING_EFFECTS: ReadonlySet<AbilityEffect['type']> = new Set([
   'sportDash',
   'sportShove',
 ]);
+
+/**
+ * Resolve a target-born authored impact around the aimed world point. Grid
+ * iteration order is not stable, so the primary and cap are selected by
+ * distance to the impact center and then entity id. LoS remains authoritative
+ * per victim and vanished targets cannot be caught by an area cast.
+ */
+function aimedImpactAreaTargets(
+  ctx: SimContext,
+  caster: Entity,
+  ability: AbilityDef,
+): { center: Vec3; targets: Entity[] } {
+  const area = ability.impactArea;
+  const center = caster.castAim ?? caster.pos;
+  if (!area) return { center, targets: [] };
+  const cap = Math.max(1, Math.floor(area.maxTargets));
+  const targets = ctx
+    .hostilesInRadius(caster, center, area.radius)
+    .filter(
+      (candidate) =>
+        !hasEscapeStealth(candidate) && !ctx.lineOfSightBlocked(caster, candidate, ability),
+    )
+    .sort((a, b) => dist2d(a.pos, center) - dist2d(b.pos, center) || a.id - b.id)
+    .slice(0, cap);
+  return { center, targets };
+}
 
 function applyAbility(
   ctx: SimContext,
@@ -2751,15 +2802,61 @@ function applyAbility(
     return;
   }
 
-  // A ranged attack travels as a projectile, so its damage/effects resolve when the
-  // bolt LANDS, not at cast completion. Every non-physical spell is a bolt by
-  // convention (school proxy); a physical ranged shot (hunter Aimed / Concussive Shot)
-  // opts in with projectile:true. Without this a physical shot deals its damage
-  // instantly while the arrow is still visibly in flight (health drops, or the mob
-  // dies, before it arrives).
-  // `projectile: false` opts a spell OUT (Fire Blast bites instantly).
-  const firesProjectile = ability.projectile ?? ability.school !== 'physical';
   const attackResolution = playerAttackResolution(ability);
+  if (ability.impactArea && ability.targetMode === 'position') {
+    const { center, targets } = aimedImpactAreaTargets(ctx, p, ability);
+    const primary = targets[0] ?? null;
+    const dx = center.x - p.pos.x;
+    const dz = center.z - p.pos.z;
+    if (Math.hypot(dx, dz) > 1e-6) p.facing = Math.atan2(dx, dz);
+
+    spendAbilityCost(ctx, p, meta, res, primary);
+    armAbilityCooldownWithReflection(ctx, p, meta, res, togglingOff);
+    res = reserveRuinousBrandCopy(ctx, p, meta, primary, res);
+    ctx.emit({
+      type: 'spellfxAt',
+      x: center.x,
+      z: center.z,
+      school: ability.school,
+      fx: 'nova',
+      ability: ability.id,
+      radius: ability.impactArea.radius,
+      sourceId: p.id,
+    });
+
+    if (primary) {
+      p.targetId = primary.id;
+      const secondarySnapshot = {
+        spentCombo: ability.spendsCombo ? p.comboPoints : 0,
+        sureCrit: hasSureCritAura(p),
+        castDamageMultiplier: thundercallDamageMultiplier(ctx, p, ability.id),
+      };
+      ctx.runEffects(p, meta, primary, res);
+      for (const secondary of targets.slice(1)) {
+        if (ctx.runSecondaryTargetEffects) {
+          ctx.runSecondaryTargetEffects(p, meta, secondary, res, secondarySnapshot);
+        } else {
+          ctx.runEffects(p, meta, secondary, res);
+        }
+      }
+    } else {
+      // A valid empty cast still spends its action and runs caster-only effects.
+      ctx.runEffects(p, meta, null, res);
+    }
+
+    completeStormcastReservation(ctx, p, stormcastReservation);
+    if (p.kind === 'player' && ability.school !== 'physical' && !togglingOff) {
+      ctx.applySetProcs(p, primary, 'spellCast');
+    }
+    if (p.kind === 'player' && !togglingOff) onCastCompleted(ctx, p, ability.id, primary);
+    return;
+  }
+  // Travel is driven by the central authored resolution. School is not a
+  // projectile proxy: target-born bursts, beams, DoTs and control spells keep
+  // their original contact style instead of becoming generic magic orbs.
+  const firesProjectile =
+    attackResolution === 'ballisticProjectile' ||
+    (attackResolution === 'lockOnActivation' && ability.projectile === true);
   if (
     firesProjectile &&
     attackResolution === 'ballisticProjectile' &&
@@ -2941,6 +3038,7 @@ function applyAbility(
   ) {
     p.targetId = target.id;
   }
+  const authoredDirectionalImpact = target !== null && attackResolution === 'directionalHitscan';
   // A shout announces itself: world-visible cue so the caster roars and the
   // shockwave ring reads for everyone nearby (renderer-only; no mechanic).
   if (ability.castFx && !togglingOff) {
@@ -2954,6 +3052,7 @@ function applyAbility(
     });
   } else if (
     !togglingOff &&
+    !authoredDirectionalImpact &&
     (!target || target === p || !res.effects.some((eff) => SELF_ANNOUNCING_EFFECTS.has(eff.type)))
   ) {
     // An untargeted/self completion (Shadewolf, summon rites, forms, aspects)
@@ -2969,6 +3068,16 @@ function applyAbility(
       targetId: (target ?? p).id,
       school: ability.school,
       fx: 'selfCast',
+      ability: ability.id,
+    });
+  }
+  if (target && attackResolution === 'directionalHitscan' && !togglingOff) {
+    ctx.emit({
+      type: 'spellfx',
+      sourceId: p.id,
+      targetId: target.id,
+      school: ability.school,
+      fx: 'impact',
       ability: ability.id,
     });
   }

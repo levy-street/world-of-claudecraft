@@ -403,7 +403,7 @@ function advanceSunGodVerdictForHit(
   advanceSunGodVerdict(ctx, caster, target, abilityId, mark, verdict.effect, verdict.name);
 }
 
-const SECONDARY_MELEE_TARGET_EFFECTS = new Set<AbilityEffect['type']>([
+const SECONDARY_TARGET_EFFECTS = new Set<AbilityEffect['type']>([
   'weaponStrike',
   'directDamage',
   'interrupt',
@@ -436,6 +436,8 @@ const SECONDARY_MELEE_TARGET_EFFECTS = new Set<AbilityEffect['type']>([
 interface SecondaryTargetSnapshot {
   spentCombo: number;
   sureCrit: boolean;
+  /** Cast-scoped damage multiplier captured before the primary consumes it. */
+  castDamageMultiplier?: number;
 }
 
 export function runSecondaryTargetEffects(
@@ -604,7 +606,7 @@ export function runEffects(
 
   let targetBuffIndex = 0;
   for (const eff of res.effects) {
-    if (secondaryTarget && !SECONDARY_MELEE_TARGET_EFFECTS.has(eff.type)) continue;
+    if (secondaryTarget && !SECONDARY_TARGET_EFFECTS.has(eff.type)) continue;
     switch (eff.type) {
       case 'destructionConflagrate': {
         if (target) advanceBurningPactTick(ctx, p, target);
@@ -834,7 +836,8 @@ export function runEffects(
         // more Temporal Echo healing (no hidden heal bonus). Deterministic; reads
         // the caster's charge aura (combat/chronomancy.ts).
         if (ability.id === ARCANE_SURGE_ID) dmg *= aetherSurgeDamageMult(p);
-        dmg *= thundercallDamageMultiplier(ctx, p, ability.id);
+        dmg *=
+          secondaryTarget?.castDamageMultiplier ?? thundercallDamageMultiplier(ctx, p, ability.id);
         dmg *= druidApexPayoffMult(ctx, p, ability.id);
         const finalDamage = Math.round(dmg);
         lastDirectDamage = finalDamage;
@@ -864,7 +867,7 @@ export function runEffects(
           thundercallOnArcBoltImpact(ctx, p);
           triggerWardCycle(ctx, p);
         }
-        if (ability.id === 'earth_shock') {
+        if (ability.id === 'earth_shock' && !secondaryTarget) {
           consumeThunderVent(ctx, p, ability.id, target, finalDamage);
           applyStoneboundJolt(ctx, p, target);
         }
@@ -979,7 +982,7 @@ export function runEffects(
             }
           }
         }
-        if (isSpell) noteSpellHit(ctx, p, crit, ability.id);
+        if (isSpell && !secondaryTarget) noteSpellHit(ctx, p, crit, ability.id);
         // Aether Surge (Chronomancy Phase 3): this cast used the pre-cast charges
         // for cost and damage above; now bank one more Arcane Charge (cap 4) and
         // refresh the window, so the NEXT cast reads the higher count.
@@ -2561,13 +2564,18 @@ export function runEffects(
         for (let i = 0; i < hitList.length; i++) {
           const m = hitList[i];
           const sunwardDisc = ability.id === 'sunward_disc';
+          const authoredChainLightning = ability.id === 'chain_lightning';
           ctx.emit({
             type: 'spellfx',
             sourceId: i === 0 ? (hitsPrimary ? p.id : origin.id) : hitList[i - 1].id,
             targetId: m.id,
             school: ability.school,
-            fx: sunwardDisc ? 'paladinSunwardDisc' : 'projectile',
-            ability: ability.id,
+            fx: sunwardDisc
+              ? 'paladinSunwardDisc'
+              : authoredChainLightning
+                ? 'lightning'
+                : 'projectile',
+            ...(authoredChainLightning ? {} : { ability: ability.id }),
             ...(sunwardDisc
               ? {
                   level: i + 1,

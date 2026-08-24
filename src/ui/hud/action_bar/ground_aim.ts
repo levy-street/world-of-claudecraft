@@ -113,13 +113,18 @@ export function clampAimToRange(
   };
 }
 
-export function abilityAoeRadius(res: { effects: readonly AbilityEffect[] }): number {
+export function abilityAoeRadius(res: {
+  def?: Pick<AbilityDef, 'impactArea'>;
+  effects: readonly AbilityEffect[];
+}): number {
   return explicitAbilityAoeRadius(res) ?? DEFAULT_GROUND_AOE_RADIUS;
 }
 
 export function explicitAbilityAoeRadius(res: {
+  def?: Pick<AbilityDef, 'impactArea'>;
   effects: readonly AbilityEffect[];
 }): number | null {
+  if (res.def?.impactArea) return res.def.impactArea.radius;
   const effect = res.effects.find(
     (eff) =>
       eff.type === 'aoeDamage' || eff.type === 'groundAoE' || eff.type === 'temporalHourglass',
@@ -130,7 +135,7 @@ export function explicitAbilityAoeRadius(res: {
 
 /** Radius of the player-centered maximum-range guide for a prepared skill. */
 export function abilityPreviewRange(res: {
-  def: Pick<AbilityDef, 'range' | 'requiresTarget' | 'selfCentered'>;
+  def: Pick<AbilityDef, 'range' | 'requiresTarget' | 'selfCentered' | 'impactArea'>;
   effects: readonly AbilityEffect[];
 }): number {
   if (res.def.range > 0) return res.def.range;
