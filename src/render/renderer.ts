@@ -7707,7 +7707,7 @@ export class Renderer {
     if (ev.type === 'projectileLaunch' && ev.attackAnimation === 'ranged-shot') {
       this.triggerAttack(ev.sourceId);
     }
-    if (handleProjectileEventVfx(ev, this.sim.cfg.seed, this.vfx)) return;
+    if (handleProjectileEventVfx(ev, () => this.sim.cfg.seed, this.vfx)) return;
     switch (ev.type) {
       case 'castStart': {
         if (ev.ability === 'needle_of_fate') {

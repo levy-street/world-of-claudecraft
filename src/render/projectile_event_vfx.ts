@@ -10,10 +10,11 @@ type ProjectileEvent = Extract<
 /** Paints server-authored ballistic travel and impact events. */
 export function handleProjectileEventVfx(
   event: SimEvent,
-  seed: number,
+  getSeed: () => number,
   vfx: Pick<Vfx, 'ballisticProjectile' | 'ballisticImpact'>,
 ): event is ProjectileEvent {
   if (event.type === 'projectileLaunch') {
+    const seed = getSeed();
     vfx.ballisticProjectile(
       event.trajectoryId,
       event.x,
@@ -28,6 +29,7 @@ export function handleProjectileEventVfx(
     return true;
   }
   if (event.type === 'projectileImpact') {
+    const seed = getSeed();
     vfx.ballisticImpact(
       event.trajectoryId,
       event.x,
