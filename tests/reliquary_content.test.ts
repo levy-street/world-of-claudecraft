@@ -2692,7 +2692,9 @@ const EXPECTED_DISTINCT_SOURCES: Record<string, number> = {
   conquerors_sunken_bastion_heroic: 1,
   conquerors_drowned_temple: 2,
   conquerors_drowned_temple_heroic: 1,
-  conquerors_gravewyrm_sanctum: 8,
+  // NINE since Masterwrought phase 11l: the trophy recipe route added
+  // fromProfession('leatherworking') beside the quiver's korzul hint.
+  conquerors_gravewyrm_sanctum: 9,
   conquerors_gravewyrm_sanctum_heroic: 1,
   conquerors_wildheart_basin: 2,
   conquerors_wildheart_basin_heroic: 1,

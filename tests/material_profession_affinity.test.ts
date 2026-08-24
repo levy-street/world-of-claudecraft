@@ -67,6 +67,21 @@ describe('craftIdsForMaterialItem', () => {
     expect(craftIdsForMaterialItem('arcane_shard')).toEqual(['enchanting']);
   });
 
+  it('the eight junk trophies map to their one adopted craft (Masterwrought phase 11l)', () => {
+    // The trophy economy gave each of these mob drops exactly ONE consuming
+    // craft, so each pin doubles as a no-second-consumer tripwire: a later
+    // recipe borrowing a trophy into another craft changes the tooltip and
+    // must change the literal here deliberately.
+    expect(craftIdsForMaterialItem('bandit_bandana')).toEqual(['tailoring']);
+    expect(craftIdsForMaterialItem('bogiron_nugget')).toEqual(['armorcrafting']);
+    expect(craftIdsForMaterialItem('chipped_tusk')).toEqual(['weaponcrafting']);
+    expect(craftIdsForMaterialItem('cracked_fetish')).toEqual(['inscription']);
+    expect(craftIdsForMaterialItem('cracked_ogre_tusk')).toEqual(['weaponcrafting']);
+    expect(craftIdsForMaterialItem('cracked_wyrm_scale')).toEqual(['leatherworking']);
+    expect(craftIdsForMaterialItem('mudfin_scale')).toEqual(['leatherworking']);
+    expect(craftIdsForMaterialItem('tallow_candle')).toEqual(['alchemy']);
+  });
+
   it('five crops name ALCHEMY as a consumer (Masterwrought phases 11g and 11h)', () => {
     // THE PLAYER-VISIBLE HALF OF THE PROVISIONING SUPPLY LINE, pinned here
     // because nothing else in the tree can see it. Farm materials are

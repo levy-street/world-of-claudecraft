@@ -3862,6 +3862,186 @@ export const FARM_RECIPES: ProfessionRecipeRecord[] = [
   },
 ];
 
+// The trophy economy (Masterwrought phase 11l): the eight orphaned junk mob
+// drops become reagents, one consumer recipe per adopted trophy. Outputs are
+// EXISTING uncrafted shipped items (the COMMON_RECIPES precedent: no new item
+// defs), each rung matches its trophy's drop level, and no shipped recipe's
+// bill was edited. Every bill contains its trophy (sellValue only, no
+// buyValue), so no row joins the counterfactually-vendor-fed set.
+export const TROPHY_RECIPES: ProfessionRecipeRecord[] = [
+  {
+    id: 'recipe_valefire_lantern',
+    professionId: 'inscription',
+    resultItemId: 'valefire_lantern',
+    resultCount: 1,
+    // Fetish charms ground into the lamp's oil, the ink register's herb and
+    // essence lines beside them. Input 178 vs output 160.
+    // 11l-OUT: trophy 14 < output 160 < input 178; no prior recipe crafts
+    // valefire_lantern (recipeForResultItem); uncommon at the 25 rung ceiling.
+    reagents: [
+      { itemId: 'cracked_fetish', count: 2 },
+      { itemId: 'goldleaf_herb', count: 2 },
+      { itemId: 'arcane_essence', count: 1 },
+      { itemId: 'glass_vial', count: 1 },
+    ],
+    skillReq: 25,
+    itemLevelBudget: 16,
+    // Capped at the lantern's live drop source (Mogger, level 6): the item
+    // level source index treats recipe.level as an acquisition level
+    // (src/sim/item_level.ts), so a higher value here would re-tier the
+    // shipped item past its pinned item level 7 and off its stat budget.
+    level: 6,
+    acquisition: ['trainer'],
+    stationType: 'apothecary',
+  },
+  {
+    id: 'recipe_oiled_boots',
+    professionId: 'leatherworking',
+    resultItemId: 'oiled_boots',
+    resultCount: 1,
+    // Mudfin scales water-proof the leather, the marshstalker rung's own
+    // hide/silk/agent register does the rest. Input 92 vs output 80.
+    // 11l-OUT: trophy 5 < output 80 < input 92; no prior recipe crafts
+    // oiled_boots (recipeForResultItem); uncommon at the 25 rung ceiling.
+    reagents: [
+      { itemId: 'mudfin_scale', count: 4 },
+      { itemId: 'rough_hide', count: 6 },
+      { itemId: 'spider_silk', count: 2 },
+      { itemId: 'tanning_agent', count: 2 },
+    ],
+    skillReq: 25,
+    itemLevelBudget: 16,
+    // Capped at the boots' top live drop source (Morthen, level 10) so the
+    // recipe route cannot re-tier the shipped item (see the lantern note).
+    level: 10,
+    acquisition: ['trainer'],
+    stationType: 'tannery',
+  },
+  {
+    id: 'recipe_gravewyrm_bone_quiver',
+    professionId: 'leatherworking',
+    resultItemId: 'gravewyrm_bone_quiver',
+    resultCount: 1,
+    // Wyrm scales plate the quiver, the duskhide rung-50 register (thorium
+    // studs, pristine hide, the vats) carries the value. Input 411 vs
+    // output 360. 11l-OUT: trophy 35 < output 360 < input 411; no prior
+    // recipe crafts it (recipeForResultItem); rare at the 50 rung ceiling.
+    reagents: [
+      { itemId: 'cracked_wyrm_scale', count: 3 },
+      { itemId: 'pristine_hide', count: 2 },
+      { itemId: 'thorium_ore', count: 4 },
+      { itemId: 'tanning_agent', count: 1 },
+    ],
+    skillReq: 50,
+    itemLevelBudget: 20,
+    level: 20,
+    acquisition: ['trainer'],
+    stationType: 'tannery',
+  },
+  {
+    id: 'recipe_hobnail_boots',
+    professionId: 'armorcrafting',
+    resultItemId: 'hobnail_boots',
+    resultCount: 1,
+    // Bog iron hammered into the hobnails, iron and flux from the forge
+    // rung's own register. Input 100 vs output 90.
+    // 11l-OUT: trophy 12 < output 90 < input 100; no prior recipe crafts
+    // hobnail_boots (recipeForResultItem); common, below the 25 rung ceiling.
+    reagents: [
+      { itemId: 'bogiron_nugget', count: 3 },
+      { itemId: 'iron_ore', count: 3 },
+      { itemId: 'smithing_flux', count: 2 },
+    ],
+    skillReq: 25,
+    itemLevelBudget: 16,
+    level: 15,
+    acquisition: ['trainer'],
+    stationType: 'forge',
+  },
+  {
+    id: 'recipe_vale_carving_knife',
+    professionId: 'weaponcrafting',
+    resultItemId: 'vale_carving_knife',
+    resultCount: 1,
+    // Tusk chips scale the grip, iron and flux from the forge rung's own
+    // register. Input 129 vs output 120.
+    // 11l-OUT: trophy 15 < output 120 < input 129; no prior recipe crafts
+    // vale_carving_knife (recipeForResultItem); common, below the 25 ceiling.
+    reagents: [
+      { itemId: 'chipped_tusk', count: 3 },
+      { itemId: 'iron_ore', count: 3 },
+      { itemId: 'smithing_flux', count: 3 },
+    ],
+    skillReq: 25,
+    itemLevelBudget: 16,
+    level: 15,
+    acquisition: ['trainer'],
+    stationType: 'forge',
+  },
+  {
+    id: 'recipe_bristleback_maul',
+    professionId: 'weaponcrafting',
+    resultItemId: 'bristleback_maul',
+    resultCount: 1,
+    // Ogre tusks stud the head on an elderwood haft (the battle staff's
+    // rung-50 log precedent). Input 284 vs output 160.
+    // 11l-OUT: trophy 42 < output 160 < input 284; no prior recipe crafts
+    // bristleback_maul (recipeForResultItem); uncommon, below the 50 ceiling.
+    reagents: [
+      { itemId: 'cracked_ogre_tusk', count: 2 },
+      { itemId: 'elderwood_log', count: 1 },
+      { itemId: 'smithing_flux', count: 2 },
+    ],
+    skillReq: 50,
+    itemLevelBudget: 20,
+    // Capped at the hammer's live quest source (q_mogger, level 6) so the
+    // recipe route cannot re-tier the shipped item (see the lantern note).
+    level: 6,
+    acquisition: ['trainer'],
+    stationType: 'forge',
+  },
+  {
+    id: 'recipe_healing_potion',
+    professionId: 'alchemy',
+    resultItemId: 'healing_potion',
+    resultCount: 1,
+    // Tallow renders into the draught's salve base, goldleaf and vial from
+    // the rung's own register. Input 82 vs output 32 (the goldleaf_scroll
+    // precedent ships 90 vs 15). 11l-OUT: trophy 5 < output 32 < input 82; no
+    // prior recipe crafts it (recipeForResultItem); common, below the ceiling.
+    reagents: [
+      { itemId: 'tallow_candle', count: 2 },
+      { itemId: 'goldleaf_herb', count: 1 },
+      { itemId: 'glass_vial', count: 1 },
+    ],
+    skillReq: 25,
+    itemLevelBudget: 16,
+    level: 15,
+    acquisition: ['trainer'],
+    stationType: 'apothecary',
+  },
+  {
+    id: 'recipe_linen_pouch',
+    professionId: 'tailoring',
+    resultItemId: 'linen_pouch',
+    resultCount: 1,
+    // Bandit bandanas sewn into the pouch body with the rung-0 scrap and
+    // thread register; the vendor sells it at 250, so crafting is the
+    // discount route. Input 72 vs output 60. 11l-OUT: trophy 6 < output 60 <
+    // input 72; no prior recipe crafts it (recipeForResultItem); common.
+    reagents: [
+      { itemId: 'bandit_bandana', count: 2 },
+      { itemId: 'linen_scrap', count: 4 },
+      { itemId: 'spool_of_thread', count: 4 },
+    ],
+    skillReq: 0,
+    itemLevelBudget: 10,
+    level: 10,
+    acquisition: ['trainer'],
+    stationType: 'loom',
+  },
+];
+
 // Exported (not just used internally by recipeById below) so the IWorld
 // recipeList read surface (Sim.recipeList / ClientWorld.recipeList) can list
 // every recipe, common, tool, and combo alike: see PR #1209 review, a combo
@@ -3884,6 +4064,7 @@ export const ALL_RECIPES: ProfessionRecipeRecord[] = [
   ...APEX_CONSUMABLE_RECIPES,
   ...HOE_RECIPES,
   ...FARM_RECIPES,
+  ...TROPHY_RECIPES,
 ];
 
 // O(1) indexes for the two per-lookup resolvers below (the recipe table grows

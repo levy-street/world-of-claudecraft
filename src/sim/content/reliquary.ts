@@ -1043,7 +1043,13 @@ export const RELIQUARY_PAGES: readonly ReliquaryPageDef[] = freezePageTable([
       ['wildgrowth_leggings', fromBoss('korzul_the_gravewyrm')],
       ['grovewardens_grips', fromBoss('korzul_the_gravewyrm')],
       ['verdant_walkers', fromBoss('korzul_the_gravewyrm')],
-      ['gravewyrm_bone_quiver', fromBoss('korzul_the_gravewyrm')],
+      // korzul_bonus 0.05 plus the leatherworking trophy recipe
+      // recipe_gravewyrm_bone_quiver (Masterwrought phase 11l): two
+      // comparable doors, so both are named, the boundstone_helm shape.
+      [
+        'gravewyrm_bone_quiver',
+        [fromBoss('korzul_the_gravewyrm'), fromProfession('leatherworking')],
+      ],
     ),
   },
   {

@@ -73,6 +73,20 @@ describe('the tooltip kind line for material grades', () => {
     expect(tooltipHtml('game_meat')).not.toMatch(/\bJunk\b/);
   });
 
+  it('phase 11l trophies read Material, not Junk, now recipes consume them', () => {
+    // Two of the eight junk trophies the trophy economy promoted (different
+    // adopted crafts). Membership is derived from recipe reagents, so these
+    // arms hold the whole promotion visible on the kind line.
+    for (const id of ['chipped_tusk', 'mudfin_scale']) {
+      expect(MATERIAL_ITEM_IDS.has(id), id).toBe(true);
+      expect(itemKindLabel('junk', id), id).toBe('Material');
+      const html = tooltipHtml(id);
+      expect(html, id).toContain('Material');
+      expect(html, id).not.toMatch(/\bJunk\b/);
+      expect(html, id).not.toContain('Fine Material');
+    }
+  });
+
   it('ordinary junk-kind items keep the Junk line when not honest materials', () => {
     const junkId = Object.keys(ITEMS).find(
       (id) =>

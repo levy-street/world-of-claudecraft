@@ -60,6 +60,17 @@ describe('materialProfessionHintText', () => {
     expect(materialProfessionHintText('venom_gland')).toBe('Used by Alchemy.');
   });
 
+  it('phase 11l trophies read the simple Used by line for their adopted craft', () => {
+    // Four of the eight junk trophies the trophy economy promoted, one per
+    // distinct craft, pinned as exact strings so the localized craft name and
+    // the sentence template both hold (none of the eight carries a
+    // superseding purpose hint, so the line always renders).
+    expect(materialProfessionHintText('mudfin_scale')).toBe('Used by Leatherworking.');
+    expect(materialProfessionHintText('chipped_tusk')).toBe('Used by Weaponcrafting.');
+    expect(materialProfessionHintText('tallow_candle')).toBe('Used by Alchemy.');
+    expect(materialProfessionHintText('bandit_bandana')).toBe('Used by Tailoring.');
+  });
+
   it('skips pure cooking catches; multi-craft catches keep the line, and both arms are live', () => {
     // Sole-cooking catches share cookingCatchHint; the Used-by line would only
     // repeat "Cooking". Multi-craft catches still get Used-by. Count both arms
