@@ -663,10 +663,21 @@ describe('the professions blob growth bound (phase 16)', () => {
     // Headroom above the measurement stays 11 bytes, the fourth time running.
     // Since 11l the FLOOR tracks the measurement too: measurement minus 380,
     // the headroom the pre-phase band carried below its own measurement
-    // (16,544 under 16,924), so a silent shrink reds as loudly as a growth.
+    // (16,544 under 16,924). The asymmetry IS the discipline: the ceiling
+    // tracks growth tightly (11 bytes, less than one id), while the floor is
+    // a non-vacuity guard held at the pre-phase slack, so it catches a
+    // wholesale shrink (a dropped field, a lost list) rather than one retired
+    // id.
+    //
+    // AND AGAIN AT 11l's second review round: 17,172 bytes, upper edge 17,133
+    // to 17,183, floor 16,742 to 16,792. The delta is +50 and it is the two
+    // leather trophy consumer ids the round adopted, accounted the same way:
+    // recipe_cragmaw_huntcord (23 characters, 26 quoted plus comma) and
+    // recipe_cragprowl_belt (21, 24), predicted 17,122 + 50 = 17,172 and
+    // measured so. Headroom stays 11 above and 380 below, unchanged.
     const bytes = professionsBytes(s2);
-    expect(bytes).toBeGreaterThan(16742);
-    expect(bytes).toBeLessThan(17133);
+    expect(bytes).toBeGreaterThan(16792);
+    expect(bytes).toBeLessThan(17183);
     // Strictly dominated by the band's upper edge while the band holds:
     // kept as documentation that the structural ceiling also bounds this
     // state, never the live guard.

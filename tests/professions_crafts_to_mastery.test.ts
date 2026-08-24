@@ -750,10 +750,12 @@ describe('armorcrafting mastery derives from the live tables (R13)', () => {
     // in this model) wins the rung-25 fewest-gathered tie-break, so the 25
     // rung-25 crafts bill 3 iron each instead of the previous pick's 4.
     expect(RUN.bill.get('iron_ore')).toBe(75);
-    // The 75 rests on WHICH row won the rung, so the winner is pinned by id
-    // beside it: a different pick that happened to bill 3 iron would keep the
-    // literal green while the comment above named the wrong recipe.
-    expect(RUN.recipeUse.has('recipe_hobnail_boots')).toBe(true);
+    // The 75 rests on WHICH row won the rung, so the winner is pinned by id AND
+    // exact use count beside it (25, the whole rung-25 allotment): a different
+    // pick that happened to bill 3 iron would keep the literal green while the
+    // comment above named the wrong recipe, and a presence check alone would
+    // pass a row that won only part of the rung.
+    expect(RUN.recipeUse.get('recipe_hobnail_boots')).toBe(25);
     expect(RUN.bill.get('copper_ore')).toBe(75);
     // Gain curve ON: the whole per-rung craft vector, not just the top rung.
     const craftsPerRung = new Map<number, number>();

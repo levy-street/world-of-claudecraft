@@ -302,7 +302,7 @@ describe('REFERENTIAL INTEGRITY', () => {
     // masterwrought Phase 11i added is a drop, see the derived term below), the two tool-effect
     // charms, the nine jewelcrafting catalog recipes, the six inscription
     // catalog recipes, the ten Masterwrought phase 07 intermediates, the
-    // three crafted hoes, the eight Masterwrought phase 11l trophy consumers,
+    // three crafted hoes, the ten Masterwrought phase 11l trophy consumers,
     // and the farm-economy set's ON-RAMP: the
     // pre-training id list is frozen, so anything authored after that switch
     // has to be learned.
@@ -368,9 +368,11 @@ describe('REFERENTIAL INTEGRITY', () => {
     // channel split: the whole list still feeds the sum above.
     expect(HOE_RECIPES).toHaveLength(4);
     // The Masterwrought phase 11l trophy economy: one consumer recipe per
-    // adopted junk trophy, all eight trainer-taught, so the whole list feeds
-    // the sum above (no channel split).
-    expect(TROPHY_RECIPES).toHaveLength(8);
+    // adopted junk trophy (eight promoted from poor, plus the two
+    // already-common leather trophies its second review round adopted), all
+    // ten trainer-taught, so the whole list feeds the sum above (no channel
+    // split).
+    expect(TROPHY_RECIPES).toHaveLength(10);
     // The economy-hooks phase's eight farm dishes, the four Phase 11 well-fed
     // buff dishes, the growth tonic's alchemy row, and the Phase 12 shared
     // feast (a cooking row with a placeable junk output). Deliberately
@@ -389,6 +391,11 @@ describe('REFERENTIAL INTEGRITY', () => {
     // (sellValue times the consumed count, the stacked form), or the recipe
     // is a way to LOSE value against vendoring the trophy raw. The literal
     // map is the pin: a re-picked output or a dropped trophy line reds here.
+    // Pinned in the STRICTER stacked form on purpose (output above sellValue
+    // times the consumed count), while the 11l-OUT doctrine's letter compares
+    // the UNIT sellValue: a future row inside the doctrine's interval but
+    // outside the stacked one reds here by design, and widening the arm is a
+    // deliberate edit, never a drive-by.
     const TROPHY_BY_RECIPE: Record<string, string> = {
       recipe_valefire_lantern: 'cracked_fetish',
       recipe_oiled_boots: 'mudfin_scale',
@@ -398,6 +405,8 @@ describe('REFERENTIAL INTEGRITY', () => {
       recipe_fenshadow_maul: 'cracked_ogre_tusk',
       recipe_healing_potion: 'tallow_candle',
       recipe_linen_pouch: 'bandit_bandana',
+      recipe_cragmaw_huntcord: 'old_cragmaws_pelt',
+      recipe_cragprowl_belt: 'emberwing_cinderscale',
     };
     expect(Object.keys(TROPHY_BY_RECIPE).sort()).toEqual(TROPHY_RECIPES.map((r) => r.id).sort());
     for (const recipe of TROPHY_RECIPES) {
@@ -419,7 +428,10 @@ describe('REFERENTIAL INTEGRITY', () => {
     // recipeForResultItem is first-match-wins over ALL_RECIPES and its own
     // comment says no two recipes share a resultItemId today; the trophy rows
     // lean on that (each 11l-OUT comment claims "no prior recipe crafts" the
-    // output), so the claim is pinned globally and then per trophy row.
+    // output), so the claim is pinned globally and then per trophy row. The
+    // two non-vacuity guards keep an emptied list from passing the sweep.
+    expect(ALL_RECIPES.length).toBeGreaterThan(0);
+    expect(TROPHY_RECIPES.length).toBeGreaterThan(0);
     const recipesByResult = new Map<string, string[]>();
     for (const recipe of ALL_RECIPES) {
       recipesByResult.set(recipe.resultItemId, [

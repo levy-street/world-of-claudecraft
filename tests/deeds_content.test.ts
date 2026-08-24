@@ -8,11 +8,13 @@ import path from 'node:path';
 import { describe, expect, it } from 'vitest';
 import { POWERUPS } from '../src/sim/content/augments';
 import { DEED_ORDER, DEEDS, DEEDS_ERA } from '../src/sim/content/deeds';
+import { drownedLitanyChestItemsForTier } from '../src/sim/content/delves/drowned_litany_loot';
 import { DELVE_MOBS } from '../src/sim/content/delves/mobs';
 import { DELVE_SHOPS } from '../src/sim/content/delves/shop';
 import { HEROIC_DUNGEON_TUNING } from '../src/sim/content/dungeon_difficulty';
 import { FARM_CROP_IDS, FARM_CROPS } from '../src/sim/content/farm_crops';
 import { FARM_PATCHES } from '../src/sim/content/farm_patches';
+import { HEROIC_BOSS_LOOT } from '../src/sim/content/heroic_loot';
 import { HEROIC_VENDOR_STOCK } from '../src/sim/content/heroic_vendor';
 import {
   FISHING_RARE_ID,
@@ -27,6 +29,12 @@ import {
   GATHERING_PROFESSIONS,
 } from '../src/sim/content/professions';
 import { ALL_RECIPES } from '../src/sim/content/recipes';
+import {
+  RIFT_EPIC_ITEM_IDS,
+  RIFT_GEAR_ITEM_IDS,
+  RIFT_LEGENDARY_ITEM_IDS,
+  RIFT_RARE_ITEM_IDS,
+} from '../src/sim/content/rift/items';
 import { RIFT_MOBS } from '../src/sim/content/rift/mobs';
 import { WARLOCK_PET_MOBS } from '../src/sim/content/warlock_pets';
 import { YUMI_TEMPLATE_ID } from '../src/sim/content/yumi';
@@ -53,6 +61,7 @@ import {
   VISITED_MARK_NAMESPACES,
   ZONE_FISH,
 } from '../src/sim/deeds';
+import type { LootTier } from '../src/sim/lockpick';
 import {
   craftSkillGainMultiplier,
   enchantingGainMultiplier,
@@ -60,8 +69,9 @@ import {
 import { farmingTeachingCeilingFor } from '../src/sim/professions/farming';
 import { APEX_FEAST_CRAFT_MARK, isApexFeastRecipe } from '../src/sim/professions/feast';
 import { RIFT_LEVEL_CAP, RIFT_MAX_MOB_LEVEL } from '../src/sim/rift/rift_gen';
+import type { Rng } from '../src/sim/rng';
 import { type PlayerMeta, Sim } from '../src/sim/sim';
-import { DEED_STAT_KEYS, type DeedCategory, MILESTONES } from '../src/sim/types';
+import { ALL_CLASSES, DEED_STAT_KEYS, type DeedCategory, MILESTONES } from '../src/sim/types';
 
 const ALL = DEED_ORDER.map((id) => DEEDS[id]);
 
@@ -1815,9 +1825,29 @@ describe('col_junk_drawer stays completable after the phase 11l trophy promotion
   // deed can ever reach is the set of poor ids a character can actually
   // acquire. Walked here over every acquisition source this file already
   // knows: mob loot (the delve and rift tables are merged into MOBS, and are
-  // walked again by name so a future un-merge cannot hide them), vendor stock
-  // (NPC rows, the heroic quartermaster, the delve shops), ground pickups,
-  // every fishing cell in every band, quest rewards, and recipe outputs.
+  // walked again by name so a future un-merge cannot hide them), the heroic
+  // boss tables (HEROIC_BOSS_LOOT), the four rift clear and world-drop id
+  // lists (RIFT_*_ITEM_IDS), the Drowned Litany chest table (every LootTier,
+  // every class, both bountiful arms), vendor stock (NPC rows, the heroic
+  // quartermaster, the delve shops), ground pickups, every fishing cell in
+  // every band, quest rewards, and recipe outputs.
+  //
+  // CLOSURE: the faucets deliberately NOT walked cannot emit a poor id, so
+  // the scope is complete rather than merely wide. Gathering yields carry no
+  // poor entry: the node, corpse, and farm supplies in
+  // src/sim/professions/gathering_supply.ts are common materials, and its
+  // fishingSupply skips poor by def (the `quality === 'poor'` continue near
+  // line 76) over the same fishing tables walked above. Salvage returns only
+  // the three common materials of SALVAGE_MATERIAL_BY_QUALITY
+  // (src/sim/professions/salvage.ts, near line 53) and refuses a poor INPUT
+  // outright (isSalvageable, near line 73). Mail letters attach only
+  // q_greyjaw's roasted_boar (the one authored `items:` in
+  // src/sim/content/letters.ts) plus the per-kill Heroic Mark and Wyrmfall
+  // Core stacks the PostOffice fills; the Exchange custody letters carry the
+  // player's own parcel back. The heroic variants are merged into ITEMS
+  // before this scan runs (src/sim/data.ts, buildHeroicVariants), so livePoor
+  // below already sees them. The player market is not a faucet: it moves ids
+  // a character acquired through one of the routes above.
   const reachable = new Set<string>();
   const note = (itemId: string | null | undefined): void => {
     if (itemId && ITEMS[itemId]?.quality === 'poor') reachable.add(itemId);
@@ -1825,6 +1855,33 @@ describe('col_junk_drawer stays completable after the phase 11l trophy promotion
   for (const m of Object.values(MOBS)) for (const l of m.loot ?? []) note(l.itemId);
   for (const m of Object.values(DELVE_MOBS)) for (const l of m.loot ?? []) note(l.itemId);
   for (const m of Object.values(RIFT_MOBS)) for (const l of m.loot ?? []) note(l.itemId);
+  for (const entries of Object.values(HEROIC_BOSS_LOOT)) for (const l of entries) note(l.itemId);
+  for (const id of RIFT_GEAR_ITEM_IDS) note(id);
+  for (const id of RIFT_EPIC_ITEM_IDS) note(id);
+  for (const id of RIFT_LEGENDARY_ITEM_IDS) note(id);
+  for (const id of RIFT_RARE_ITEM_IDS) note(id);
+  // The delve chest table is a function, not a list: every tier LootTier
+  // admits (the satisfies clause reds the moment the union grows), every
+  // class, both bountiful arms, under a stub rng pinned all-true and then
+  // all-false. Its header says exactly two chance draws per call, so the two
+  // stubs between them reach every branch and every id it can ever return.
+  const LOOT_TIERS = Object.keys({
+    premium: true,
+    medium: true,
+    low: true,
+  } satisfies Record<LootTier, true>) as LootTier[];
+  for (const tier of LOOT_TIERS) {
+    for (const cls of ALL_CLASSES) {
+      for (const bountiful of [false, true]) {
+        for (const always of [true, false]) {
+          const rng = { chance: () => always } as unknown as Rng;
+          for (const entry of drownedLitanyChestItemsForTier(tier, cls, rng, bountiful)) {
+            note(entry.itemId);
+          }
+        }
+      }
+    }
+  }
   for (const npc of Object.values(NPCS)) for (const itemId of npc.vendorItems ?? []) note(itemId);
   for (const offer of HEROIC_VENDOR_STOCK) note(offer.itemId);
   for (const entries of Object.values(DELVE_SHOPS)) for (const entry of entries) note(entry.itemId);
@@ -1872,7 +1929,15 @@ describe('col_junk_drawer stays completable after the phase 11l trophy promotion
     // an in-progress counter regress, and one more promotion strands the deed
     // outright. Re-tuning the trigger is a maintainer decision
     // (docs/design/deeds.md, rule 9: no retro-editing a shipped trigger),
-    // left OPEN in the phase ledger rather than edited here.
+    // left OPEN in the phase ledger rather than edited here. The same doc's
+    // rule 5 (no permanently missable deeds) names retroFallbackGrants
+    // (src/sim/deeds.ts) as the sanctioned heal for exactly this failure
+    // mode: a deed that can silently become permanently impossible for one
+    // character is granted at world join from proof, or outright once no earn
+    // path can ever exist again for that character.
+    // trigger.amount itself is pinned by FROZEN_CATALOG_SHA256 earlier in
+    // this file (the whole-catalog hash), so a silent retune reds there
+    // before this arm ever sees it.
     const trigger = DEEDS.col_junk_drawer.trigger;
     if (trigger.kind !== 'meter') throw new Error('col_junk_drawer lost its meter trigger');
     expect(trigger.meter).toBe('poorItemsDiscoveredCount');

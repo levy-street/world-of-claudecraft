@@ -835,10 +835,16 @@ describe('item-art audit builder', () => {
     // art-shipping ids), and the catalog sha moves only through the lib's
     // self-hash fingerprint. The 907 reviewed art files and their shipping
     // catalog sha are untouched.
+    // Re-minted again at Masterwrought phase 11l: the catalog embeds each
+    // item's quality (scripts/lib/item_art_audit.mjs), and the phase moved
+    // eight junk trophies from poor to common, so the bytes grow by exactly
+    // 8 x ('common' minus 'poor') = 16 (498026 to 498042) and the sha moves
+    // with them; liveItemCount, the 907 reviewed files and the shipping
+    // catalog sha are unchanged (no new id, no art touched).
     expect(verified).toMatchObject({
       catalogPath: 'tmp/imagegen/item-art-consistency/final-audit/catalog.json',
-      catalogSha256: '100088198a02f7742178e322d96d722b5b1723c40b7d8269a4be5e05f335061b',
-      catalogBytes: 498026,
+      catalogSha256: '8649108707b9126d35e2cf50bcd69060db89670d6ac2db6164a5fb3e2150ed5c',
+      catalogBytes: 498042,
       rendererFingerprint: '84410592a4686975e13d43d4fecc88fb7eb0e3b90f27f7b7dc38498cdf7e090c',
       catalogCount: 907,
       liveItemCount: 922,

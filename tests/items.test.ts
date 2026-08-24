@@ -1003,21 +1003,24 @@ describe('items vendor: buy / sell / sellAllJunk / buyBack', () => {
   });
 
   it('phase 11l trophy promotion holds at the sweep: promoted reagents never sell, holdouts do', () => {
-    // The eight trophy drops promoted to common TROPHY_RECIPES reagents must
-    // be invisible to the junk sweep, exactly like wolf_fang; the two
+    // The ten trophy drops adopted as common TROPHY_RECIPES reagents (eight
+    // promoted from poor, two already common: the cinderscale and the pelt)
+    // must be invisible to the junk sweep, exactly like wolf_fang; the two
     // still-poor holdouts prove the sweep predicate itself stayed live.
     const slot = { count: 1 };
-    const promoted = [
+    const adopted = [
       'bandit_bandana',
       'bogiron_nugget',
       'chipped_tusk',
       'cracked_fetish',
       'cracked_ogre_tusk',
       'cracked_wyrm_scale',
+      'emberwing_cinderscale',
       'mudfin_scale',
+      'old_cragmaws_pelt',
       'tallow_candle',
     ] as const;
-    for (const id of promoted) {
+    for (const id of adopted) {
       expect(items.junkSellableSlot(ITEMS[id], slot), id).toBe(false);
     }
     for (const id of ['tangled_weed', 'soggy_moccasin'] as const) {

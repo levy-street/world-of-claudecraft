@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { RAW_COOKING_CATCH_IDS } from '../src/sim/content/items';
+import { ALL_RECIPES, TROPHY_RECIPES } from '../src/sim/content/recipes';
 import { ITEMS as CATALOG_ITEMS } from '../src/sim/data';
 import type { InvSlot, ItemDef } from '../src/sim/types';
 import { DEFAULT_BAG_FILTER, type ItemLookup } from '../src/ui/bag_filter';
@@ -307,24 +308,44 @@ describe('vendorSellIsInstant (the plain-click vendor sale safety gate)', () => 
     expect(vendorSellIsInstant(ITEMS.junk, undefined, undefined)).toBe(true);
   });
 
-  it('the REAL catalog: a promoted trophy prompts, grey trash still sells on the spot', () => {
-    // Masterwrought phase 11l promoted eight junk drops poor -> common (the
-    // TROPHY_RECIPES reagents). This gate reads quality, so a plain vendor
-    // click on one now routes to the confirm prompt instead of selling
-    // instantly: the fifth surface the promotion flipped. Pinned off the
-    // shipped defs so the gate cannot detach from what the catalog says.
-    const promoted = [
+  it('the REAL catalog: an adopted trophy prompts, grey trash still sells on the spot', () => {
+    // Masterwrought phase 11l adopted ten junk mob drops as TROPHY_RECIPES
+    // reagents (eight promoted poor -> common, two already common). This gate
+    // reads quality, so a plain vendor click on one routes to the confirm
+    // prompt instead of selling instantly. The adopted list is DERIVED from
+    // the shipped rows (every junk-kind reagent of a trophy row that no other
+    // recipe also consumes) and held equal to the literal, so a newly adopted
+    // trophy cannot leave this arm silently under-covering and a re-picked
+    // reagent reds the literal. Pinned off the shipped defs so the gate
+    // cannot detach from what the catalog says.
+    const trophyRecipeIds = new Set(TROPHY_RECIPES.map((r) => r.id));
+    const sharedReagents = new Set<string>();
+    for (const recipe of ALL_RECIPES) {
+      if (trophyRecipeIds.has(recipe.id)) continue;
+      for (const reagent of recipe.reagents) sharedReagents.add(reagent.itemId);
+    }
+    const derived = new Set<string>();
+    for (const recipe of TROPHY_RECIPES) {
+      for (const reagent of recipe.reagents) {
+        if (CATALOG_ITEMS[reagent.itemId]?.kind !== 'junk') continue;
+        if (!sharedReagents.has(reagent.itemId)) derived.add(reagent.itemId);
+      }
+    }
+    const adopted = [
       'bandit_bandana',
       'bogiron_nugget',
       'chipped_tusk',
       'cracked_fetish',
       'cracked_ogre_tusk',
       'cracked_wyrm_scale',
+      'emberwing_cinderscale',
       'mudfin_scale',
+      'old_cragmaws_pelt',
       'tallow_candle',
     ];
-    expect(promoted).toHaveLength(8);
-    for (const id of promoted) {
+    expect(adopted).toHaveLength(10);
+    expect([...derived].sort()).toEqual(adopted);
+    for (const id of adopted) {
       expect(CATALOG_ITEMS[id], `${id} is a real item`).toBeDefined();
       expect(vendorSellIsInstant(CATALOG_ITEMS[id]), `${id} prompts now`).toBe(false);
     }

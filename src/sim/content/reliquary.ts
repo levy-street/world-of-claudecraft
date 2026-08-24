@@ -1519,7 +1519,13 @@ export const RELIQUARY_PAGES: readonly ReliquaryPageDef[] = freezePageTable([
       // Marrowlord Varkas (Thornpeak Heights)
       ['necromancers_legwraps', [fromBoss('marrowlord_varkas'), fromZone('thornpeak_heights')]],
       // Old Cragmaw (Thornpeak Heights)
-      ['cragmaw_huntcord', [fromBoss('old_cragmaw'), fromZone('thornpeak_heights')]],
+      // old_cragmaw 0.25 plus the leatherworking trophy recipe
+      // recipe_cragmaw_huntcord (Masterwrought phase 11l, the pelt door): two
+      // comparable doors, so both are named, the gravewyrm quiver's shape.
+      [
+        'cragmaw_huntcord',
+        [fromBoss('old_cragmaw'), fromZone('thornpeak_heights'), fromProfession('leatherworking')],
+      ],
       ['cragmaw_prowlboots', [fromBoss('old_cragmaw'), fromZone('thornpeak_heights')]],
       ['cragthorn_greatstaff', [fromBoss('old_cragmaw'), fromZone('thornpeak_heights')]],
       ['boneglass_shiv', [fromBoss('old_cragmaw'), fromZone('thornpeak_heights')]],

@@ -504,11 +504,12 @@ describe('chip reachability census: the All-only set, pinned', () => {
     // (bandit_bandana, bogiron_nugget, chipped_tusk, cracked_fetish,
     // cracked_ogre_tusk, cracked_wyrm_scale, mudfin_scale, tallow_candle):
     // the trophy recipes are their consumers, so all eight derive into the
-    // material set and gain the materials chip.
+    // material set and gain the materials chip. Its second review round
+    // removed emberwing_cinderscale and old_cragmaws_pelt the same way: the
+    // two leather trophy recipes consume them, so both derive IN too.
     'briny_idol',
     'dawnhold_posy',
     'deepfen_pearl',
-    'emberwing_cinderscale',
     'frayed_prayer_beads',
     'gleamstag_charm',
     'gravewoven_bag',
@@ -523,7 +524,6 @@ describe('chip reachability census: the All-only set, pinned', () => {
     'mistcallers_duffel',
     'moonpale_scale',
     'ogre_toe_ring',
-    'old_cragmaws_pelt',
     'pale_pearl',
     // Masterwrought phase 11: the 28 apex patterns. Kind 'recipe' is
     // deliberately All-only in the BAG window (the phase 02 chip-count

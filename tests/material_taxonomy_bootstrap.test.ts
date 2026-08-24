@@ -36,7 +36,10 @@ describe('material_taxonomy as the first-evaluated sim module', () => {
     // them. The capstone feast does NOT: it is a placeable, not a material.
     // 108 -> 116 at masterwrought Phase 11l: the eight promoted trophy drops
     // (poor junk turned common) derive IN as the TROPHY_RECIPES reagents.
-    expect(MATERIAL_ITEM_IDS.size).toBe(116);
+    // 116 -> 118 at the same phase's second review round: the two
+    // already-common leather trophies (emberwing_cinderscale,
+    // old_cragmaws_pelt) derive IN the same way once their recipes land.
+    expect(MATERIAL_ITEM_IDS.size).toBe(118);
     expect(MATERIAL_ITEM_IDS.has('iron_ore')).toBe(true);
     expect(MATERIAL_ITEM_IDS.has('arcanite_bar')).toBe(true);
     // The farming source specifically, because it is the newest and the one

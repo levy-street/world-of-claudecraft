@@ -67,7 +67,7 @@ describe('craftIdsForMaterialItem', () => {
     expect(craftIdsForMaterialItem('arcane_shard')).toEqual(['enchanting']);
   });
 
-  it('the eight junk trophies map to their one adopted craft (Masterwrought phase 11l)', () => {
+  it('the ten junk trophies map to their one adopted craft (Masterwrought phase 11l)', () => {
     // The trophy economy gave each of these mob drops exactly ONE consuming
     // craft, so each pin doubles as a no-second-consumer tripwire: a later
     // recipe borrowing a trophy into another craft changes the tooltip and
@@ -80,6 +80,10 @@ describe('craftIdsForMaterialItem', () => {
     expect(craftIdsForMaterialItem('cracked_wyrm_scale')).toEqual(['leatherworking']);
     expect(craftIdsForMaterialItem('mudfin_scale')).toEqual(['leatherworking']);
     expect(craftIdsForMaterialItem('tallow_candle')).toEqual(['alchemy']);
+    // The two already-common rare-elite leather trophies the phase's second
+    // review round adopted (recipe_cragprowl_belt, recipe_cragmaw_huntcord).
+    expect(craftIdsForMaterialItem('emberwing_cinderscale')).toEqual(['leatherworking']);
+    expect(craftIdsForMaterialItem('old_cragmaws_pelt')).toEqual(['leatherworking']);
   });
 
   it('five crops name ALCHEMY as a consumer (Masterwrought phases 11g and 11h)', () => {

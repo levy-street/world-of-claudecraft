@@ -474,7 +474,7 @@ describe('craftItem command (#1127)', () => {
         APEX_GEAR_RECIPES.length +
         APEX_CONSUMABLE_RECIPES.length +
         FARM_RECIPES.length +
-        // Sibling literal: expect(TROPHY_RECIPES).toHaveLength(8) in
+        // Sibling literal: expect(TROPHY_RECIPES).toHaveLength(10) in
         // tests/recipe_economy.test.ts.
         TROPHY_RECIPES.length,
     );

@@ -1433,10 +1433,12 @@ describe('masterwrought Phase 11h: what it did NOT touch', () => {
     // the record of what kind of row each later phase added. Then 164 at
     // Masterwrought phase 11l, which minted the eight trophy consumer rows:
     // ALL_RECIPES alone moved again (no apex row, no new item id, every
-    // output an already-shipped def).
+    // output an already-shipped def). Then 166 at that phase's second review
+    // round, which adopted the two already-common leather trophies (ten
+    // trophy consumer rows in all), the same shape: ALL_RECIPES alone.
     expect(APEX_CONSUMABLE_RECIPES).toHaveLength(13);
     expect(INTERMEDIATE_RECIPES).toHaveLength(10);
-    expect(ALL_RECIPES).toHaveLength(164);
+    expect(ALL_RECIPES).toHaveLength(166);
     for (const row of APEX_ROWS) {
       expect(requireRecipe(row.id).skillReq, `${row.id} rung`).toBe(row.rung);
     }

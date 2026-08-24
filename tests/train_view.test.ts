@@ -148,7 +148,10 @@ describe('buildTrainView', () => {
     // window through its recipes' own stationType: 'forge', not through a
     // station of its own. Its three skillReq-0 copper rungs are deliberately
     // absent: like every other free-floor rung they stay teachable at tier 0.
-    // The three skillReq-75 Masterwrought intermediates lock here too.
+    // The three skillReq-75 Masterwrought intermediates lock here too, and so
+    // do the three Masterwrought phase 11l forge trophy rows (TROPHY_RECIPES:
+    // recipe_hobnail_boots and recipe_vale_carving_knife at skillReq 25,
+    // recipe_fenshadow_maul at 50), 23 rows to 26.
     const view = buildTrainView('forgemistress_darva', deps());
     const locked = view.rows.filter((row) => row.state === 'locked');
     expect(locked.map((row) => row.recipeId).sort()).toEqual([
@@ -157,9 +160,11 @@ describe('buildTrainView', () => {
       'recipe_duskforged_billet',
       'recipe_elderwood_battle_staff',
       'recipe_etched_iron_loop',
+      'recipe_fenshadow_maul',
       'recipe_forgefold_plating',
       'recipe_forgeguard_bulwark_gauntlets',
       'recipe_gleaming_thorium_loop',
+      'recipe_hobnail_boots',
       'recipe_iron_link_choker',
       'recipe_ironbound_warplate_helm',
       'recipe_ironedge_longsword',
@@ -173,6 +178,7 @@ describe('buildTrainView', () => {
       'recipe_thoriumscale_cuirass',
       'recipe_thoriumscale_greathelm',
       'recipe_thoriumscale_leggings',
+      'recipe_vale_carving_knife',
       'recipe_weighted_thorium_band',
       'recipe_whetted_iron_dirk',
     ]);

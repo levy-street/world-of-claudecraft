@@ -635,6 +635,7 @@ describe('deposit-all narrows to the honest taxonomy (phase 19)', () => {
     'spider_leg', // mob-drop reagent
     'arcanite_bar', // vendor staple (Q6: in)
     'raw_river_perch', // raw fishing catch (junk cooking reagent: in)
+    'cracked_ogre_tusk', // adopted junk trophy (phase 11l junk-kind reagent: in)
   ] as const;
   // ...and of every excluded class the settlement ruled on.
   const EXCLUDED = [

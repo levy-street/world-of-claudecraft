@@ -488,9 +488,13 @@ describe('item level: the phase 11l trophy recipe outputs (TROPHY_RECIPES)', () 
   // The recipe route registers an acquisition source at recipe.level
   // (buildSourceIndex), so a trophy row's level is part of its output's item
   // level: a future level edit on a trophy row is a deliberate re-tier of a
-  // shipped item, never a drive-by. The rows capped at their output's live
-  // drop or quest source (the lantern, the boots, the maul) leave the pinned
-  // level where it already was; hobnail_boots and vale_carving_knife were
+  // shipped item, never a drive-by. The itemLevel pin is decisive only UPWARD
+  // for the rows capped at their output's live drop source (the lantern, the
+  // boots, the maul, and the two leather rows the second review round added:
+  // the huntcord at Old Cragmaw, the cragprowl belt at the Thornpeak Ogres):
+  // the mob source wins on a LOWERED recipe level and the item level never
+  // moves, which is why the recipe.level literal is pinned beside it in
+  // TROPHY_RECIPE_LEVELS. hobnail_boots and vale_carving_knife were
   // vendor-only before (no derivable source at all) and GAINED their level
   // from the recipe. The potion and the pouch carry no combat slot, so they
   // are not item-level eligible and stay undefined whatever the row says.
@@ -503,6 +507,8 @@ describe('item level: the phase 11l trophy recipe outputs (TROPHY_RECIPES)', () 
     fenshadow_maul: 13,
     healing_potion: undefined,
     linen_pouch: undefined,
+    cragmaw_huntcord: 17,
+    cragprowl_belt: 17,
   };
 
   it('the pinned outputs are exactly the TROPHY_RECIPES result ids', () => {
@@ -512,10 +518,39 @@ describe('item level: the phase 11l trophy recipe outputs (TROPHY_RECIPES)', () 
   });
 
   it('pins every trophy output at its item level', () => {
-    expect(Object.keys(TROPHY_OUTPUT_LEVELS)).toHaveLength(8);
+    expect(Object.keys(TROPHY_OUTPUT_LEVELS)).toHaveLength(10);
     for (const [id, level] of Object.entries(TROPHY_OUTPUT_LEVELS)) {
       expect(ITEMS[id], `${id} is a real item`).toBeTruthy();
       expect(itemLevel(ITEMS[id]), `${id} item level`).toBe(level);
+    }
+  });
+
+  // The recipe.level literal per row: the source-capped rows sit AT their
+  // output's live source level (a lowered value would be invisible to the
+  // itemLevel pin above), the scaffolding rows at the rung convention.
+  const TROPHY_RECIPE_LEVELS: Record<string, number> = {
+    recipe_valefire_lantern: 6,
+    recipe_oiled_boots: 10,
+    recipe_gravewyrm_bone_quiver: 20,
+    recipe_hobnail_boots: 15,
+    recipe_vale_carving_knife: 15,
+    recipe_fenshadow_maul: 12,
+    recipe_healing_potion: 15,
+    recipe_linen_pouch: 10,
+    recipe_cragmaw_huntcord: 14,
+    recipe_cragprowl_belt: 16,
+  };
+
+  it('the pinned recipe levels are exactly the TROPHY_RECIPES rows', () => {
+    expect(TROPHY_RECIPES.map((r) => r.id).sort()).toEqual(
+      Object.keys(TROPHY_RECIPE_LEVELS).sort(),
+    );
+  });
+
+  it('pins every trophy row at its recipe level', () => {
+    expect(Object.keys(TROPHY_RECIPE_LEVELS)).toHaveLength(10);
+    for (const recipe of TROPHY_RECIPES) {
+      expect(recipe.level, `${recipe.id} recipe.level`).toBe(TROPHY_RECIPE_LEVELS[recipe.id]);
     }
   });
 });

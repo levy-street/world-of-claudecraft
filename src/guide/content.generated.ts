@@ -11191,6 +11191,80 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
           "minimalAt": 100,
           "zeroAt": 125
         }
+      },
+      {
+        "id": "recipe_cragmaw_huntcord",
+        "name": "Cragmaw's Huntcord",
+        "skillReq": 50,
+        "tier": 2,
+        "station": "tannery",
+        "acquisition": "trainer",
+        "feeCopper": 10000,
+        "materials": [
+          {
+            "name": "Old Cragmaw's Pelt",
+            "count": 1
+          },
+          {
+            "name": "Pristine Hide",
+            "count": 2
+          },
+          {
+            "name": "Tanning Agent",
+            "count": 1
+          }
+        ],
+        "output": {
+          "name": "Cragmaw's Huntcord",
+          "count": 1,
+          "quality": "rare"
+        },
+        "combo": null,
+        "oncePerDay": false,
+        "gain": {
+          "reducedAt": 75,
+          "minimalAt": 100,
+          "zeroAt": 125
+        }
+      },
+      {
+        "id": "recipe_cragprowl_belt",
+        "name": "Cragprowl Belt",
+        "skillReq": 50,
+        "tier": 2,
+        "station": "tannery",
+        "acquisition": "trainer",
+        "feeCopper": 10000,
+        "materials": [
+          {
+            "name": "Emberwing Cinderscale",
+            "count": 1
+          },
+          {
+            "name": "Pristine Hide",
+            "count": 3
+          },
+          {
+            "name": "Osmium Ore",
+            "count": 1
+          },
+          {
+            "name": "Tanning Agent",
+            "count": 1
+          }
+        ],
+        "output": {
+          "name": "Cragprowl Belt",
+          "count": 1,
+          "quality": "uncommon"
+        },
+        "combo": null,
+        "oncePerDay": false,
+        "gain": {
+          "reducedAt": 75,
+          "minimalAt": 100,
+          "zeroAt": 125
+        }
       }
     ]
   },

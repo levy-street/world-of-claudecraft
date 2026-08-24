@@ -3862,12 +3862,35 @@ export const FARM_RECIPES: ProfessionRecipeRecord[] = [
   },
 ];
 
-// The trophy economy (Masterwrought phase 11l): the eight orphaned junk mob
-// drops become reagents, one consumer recipe per adopted trophy. Outputs are
-// EXISTING uncrafted shipped items (the COMMON_RECIPES precedent: no new item
-// defs), each rung matches its trophy's drop level, and no shipped recipe's
-// bill was edited. Every bill contains its trophy (sellValue only, no
-// buyValue), so no row joins the counterfactually-vendor-fed set.
+// The trophy economy (Masterwrought phase 11l): the ten orphaned junk mob
+// drops become reagents, one consumer recipe per adopted trophy (eight
+// promoted poor to common, plus the two already-common rare-elite leather
+// trophies the second review round adopted). Outputs are EXISTING uncrafted
+// shipped items (the COMMON_RECIPES precedent: no new item defs), each rung
+// matches its trophy's drop level, and no shipped recipe's bill was edited.
+// Every bill contains its trophy (sellValue only, no buyValue), so no row
+// joins the counterfactually-vendor-fed set.
+//
+// 11l-RUNG EXCLUSION RECORD (one line per id, so the record greps in src):
+//   gleamstag_charm 2500: value-excluded, jewelcrafting (the uncrafted jewelry
+//     pool above 600 is 16 endgame epics, barred by the rung-50 rare ceiling,
+//     and one rift rare at 5000).
+//   deepfen_pearl 600: value-excluded, jewelcrafting (the same pool).
+//   guardian_core 180: value-excluded, engineering (lane empty by ruling,
+//     farming/state.md row 119).
+//   pale_pearl 30: output-excluded, jewelcrafting (no uncrafted neck or ring
+//     in (25, 460]: the pool is 9 honor epics at 0 and 16 endgame epics).
+//   ogre_toe_ring 25: output-excluded, jewelcrafting (the same gap).
+//   briny_idol 32: output-excluded, inscription (register: caster held-offhands
+//     and scrolls; the uncrafted scroll pool is empty, and the one uncrafted
+//     caster offhand, valefire_lantern, went to the zone2-rung cracked_fetish).
+//   frayed_prayer_beads 30: output-excluded, inscription (as briny_idol).
+//   moonpale_scale 26: output-excluded, inscription (as briny_idol).
+//   inert_storm_shard 28: output-excluded, enchanting (arcane_shard is reserved
+//     for the apex band, the resonant secondaries are enchant-exclusive rare
+//     disenchant outputs, wyrmfall_core is rare, arcanite_bar a master-stocked
+//     premium reagent; any rare output would owe a prog_enchanting_rare deed).
+//   tangled_weed, soggy_moccasin: holdouts (11l-HOLDOUT).
 export const TROPHY_RECIPES: ProfessionRecipeRecord[] = [
   {
     id: 'recipe_valefire_lantern',
@@ -3890,6 +3913,10 @@ export const TROPHY_RECIPES: ProfessionRecipeRecord[] = [
     // level source index treats recipe.level as an acquisition level
     // (src/sim/item_level.ts), so a higher value here would re-tier the
     // shipped item past its pinned item level 7 and off its stat budget.
+    // craftActionXp(recipe.level, characterLevel) in
+    // src/sim/professions/profession_xp.ts reads this field too: a level-20
+    // crafter earns craftActionXp(6, 20) = 0 character XP per craft (the gray
+    // band), against 100 for a level-20 row.
     level: 6,
     acquisition: ['trainer'],
     stationType: 'apothecary',
@@ -3913,6 +3940,8 @@ export const TROPHY_RECIPES: ProfessionRecipeRecord[] = [
     itemLevelBudget: 16,
     // Capped at the boots' top live drop source (Morthen, level 10) so the
     // recipe route cannot re-tier the shipped item (see the lantern note).
+    // Profession XP reads the same field: craftActionXp(10, 20) = 0 for a
+    // level-20 crafter (gray band), against 100 for a level-20 row.
     level: 10,
     acquisition: ['trainer'],
     stationType: 'tannery',
@@ -3992,10 +4021,15 @@ export const TROPHY_RECIPES: ProfessionRecipeRecord[] = [
     professionId: 'weaponcrafting',
     resultItemId: 'fenshadow_maul',
     resultCount: 1,
-    // Ogre tusks stud the fen maul on an elderwood haft (the battle staff's
-    // rung-50 log precedent). Input 444 vs output 420.
+    // Ogre tusks stud the fen maul on a highpine haft (elderwood_log, the
+    // battle staff's rung-50 log precedent). Input 444 vs output 420.
     // 11l-OUT: trophy 42 < output 420 < input 444; no prior recipe crafts
     // fenshadow_maul (recipeForResultItem); uncommon, below the 50 ceiling.
+    // Discounted bill: requiredReagentCountFor (src/sim/professions/crafting.ts)
+    // at full specialization plus self-signed floors every listed 2 to 1, so
+    // the bill falls to 42 + 160 + 20 = 222 against 420 out, bounded by supply
+    // (cracked_ogre_tusk has one source, brutok_skullsmasher, so each craft is
+    // two named-elite kills).
     // Re-picked from bristleback_maul (R21): that maul is item level 7, so a
     // rung-50 crafter had no reason to make it.
     reagents: [
@@ -4008,6 +4042,9 @@ export const TROPHY_RECIPES: ProfessionRecipeRecord[] = [
     // Capped at the maul's live boss source (Deacon Voss, level 12) so the
     // recipe route cannot re-tier the shipped item past its pinned item level
     // 13 (see the lantern note).
+    // Profession XP reads the same field: craftActionXp(12, 20) = 0 for a
+    // level-20 crafter (gray band, 8 below against zeroDiff 8), against 100
+    // for a level-20 row.
     level: 12,
     acquisition: ['trainer'],
     stationType: 'forge',
@@ -4051,6 +4088,62 @@ export const TROPHY_RECIPES: ProfessionRecipeRecord[] = [
     level: 10,
     acquisition: ['trainer'],
     stationType: 'loom',
+  },
+  {
+    id: 'recipe_cragmaw_huntcord',
+    professionId: 'leatherworking',
+    resultItemId: 'cragmaw_huntcord',
+    resultCount: 1,
+    // The pelt is Old Cragmaw's guaranteed trophy and the huntcord his chase
+    // belt (a 0.25 roll), so the recipe is the deterministic door beside the
+    // roll (the gravewyrm quiver's Korzul shape), the duskhide rung-50
+    // register (pristine hide, the vats) around it. Input 366 vs output 340.
+    // 11l-OUT: trophy 300 < output 340 < input 366; no prior recipe crafts
+    // cragmaw_huntcord (recipeForResultItem); rare at the 50 rung ceiling.
+    reagents: [
+      { itemId: 'old_cragmaws_pelt', count: 1 },
+      { itemId: 'pristine_hide', count: 2 },
+      { itemId: 'tanning_agent', count: 1 },
+    ],
+    skillReq: 50,
+    itemLevelBudget: 20,
+    // Capped at the huntcord's live drop source (Old Cragmaw, level 14) so
+    // the recipe route cannot re-tier the shipped item past its pinned item
+    // level 17 (see the lantern note).
+    // Profession XP reads the same field: craftActionXp(14, 20) = 19 for a
+    // level-20 crafter (green band, 6 below against zeroDiff 8), against 100
+    // for a level-20 row.
+    level: 14,
+    acquisition: ['trainer'],
+    stationType: 'tannery',
+  },
+  {
+    id: 'recipe_cragprowl_belt',
+    professionId: 'leatherworking',
+    resultItemId: 'cragprowl_belt',
+    resultCount: 1,
+    // Voskar's cinderscale plates the belt, the duskhide rung-50 register
+    // (pristine hide, a thorium stud, the vats) carries the rest, so a 2
+    // percent Thornpeak Ogre drop gains a deterministic craft door. Input 471
+    // vs output 440. 11l-OUT: trophy 320 < output 440 < input 471; no prior
+    // recipe crafts cragprowl_belt (recipeForResultItem); uncommon, below the
+    // 50 rung ceiling.
+    reagents: [
+      { itemId: 'emberwing_cinderscale', count: 1 },
+      { itemId: 'pristine_hide', count: 3 },
+      { itemId: 'thorium_ore', count: 1 },
+      { itemId: 'tanning_agent', count: 1 },
+    ],
+    skillReq: 50,
+    itemLevelBudget: 20,
+    // Capped at the belt's live drop source (Thornpeak Ogres, level 16) so
+    // the recipe route cannot re-tier the shipped item past its pinned item
+    // level 17 (see the lantern note).
+    // Profession XP reads the same field: craftActionXp(16, 20) = 42 for a
+    // level-20 crafter (green band, 4 below), against 100 for a level-20 row.
+    level: 16,
+    acquisition: ['trainer'],
+    stationType: 'tannery',
   },
 ];
 
