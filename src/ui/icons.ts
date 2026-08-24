@@ -5813,11 +5813,13 @@ export const ITEM_ART_PENDING = new Set<string>([
   'marsh_rice',
   'marsh_rice_seed',
   'osmium_hoe',
-  // The angler's endgame, masterwrought Phase 11i: ten ids on the SAME
+  // The angler's endgame, masterwrought Phase 11i: NINE ids on the SAME
   // scheduled park (three high-band catches, the apex rod, two dishes, and the
-  // four patterns that teach the drop-taught rows). It was ELEVEN until
-  // Phase 11k retired the capstone feast and its pattern; those two ids are
-  // gone from the game, not moved.
+  // three patterns that teach the drop-taught rows). It was ELEVEN with four
+  // patterns until Phase 11k retired the capstone feast AND its pattern; those
+  // two ids are gone from the game, not moved, which is why both the total and
+  // the pattern count fall by one (the Phase 11k QA caught this arithmetic
+  // reading ten and four).
   // The park is the packet-wide decision recorded above, not a way to silence
   // A2: committed WebP art needs the maintainer's master SHA, which a phase
   // session cannot produce. Each id serves its procedural recipe through

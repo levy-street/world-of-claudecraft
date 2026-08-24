@@ -387,7 +387,16 @@ describe('isGatheredProvenanceKind partition over the live content', () => {
     // carrying a `feast` payload, because a feast is only ever crafted or
     // traded for. So the sweep below reads the DEF-level predicate and the
     // feasts are ordinary members of it, at every rung.
-    const CRAFTED_JUNK_EXCEPTIONS = new Set(['growth_tonic']);
+    // THE GROWTH TONIC NEEDS NO EXCEPTION AND ITS SKIP WAS DEAD (masterwrought
+    // Phase 11k QA). Its own reason says the def sits below the signing floor at
+    // quality 'common', which means the `signable` filter never admits it and
+    // the skip could not fire; and if a retune ever DID lift it, a skip is the
+    // wrong answer, because the craftedJunk loop below already pins every
+    // non-feast junk output BELOW signable rarity and would red first. An
+    // exception that cannot fire is where the next defect hides, which is the
+    // lesson this phase learned on the feast entry one screen up, so it is
+    // retired rather than re-worded.
+    const CRAFTED_JUNK_EXCEPTIONS = new Set<string>();
     const PLACEABLE_FEASTS = [
       'harvest_feast',
       'stonepot_feast',

@@ -1,5 +1,7 @@
 // Shared-feast item tooltip lines (Phase 12): what USING the feast item does
-// (places a farm_feast world entity others eat from) and what each serving
+// (places the world entity others eat from, of whatever tier: the templateId
+// comes off the item's own feast payload since masterwrought Phase 11k, and
+// this view never reads it) and what each serving
 // pays, as a pure string-builder composed inside Hud.itemTooltip beside the
 // wellfed line (the elixir_tooltip_view.ts pattern: t() + esc here, no DOM,
 // no Hud state, so tests/feast_tooltip_view.test.ts drives it directly).

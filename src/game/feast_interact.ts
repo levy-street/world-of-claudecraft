@@ -2,8 +2,10 @@ import { isFeastTemplateId } from '../sim/professions/feast';
 import { dist2d, type Entity, INTERACT_RANGE, type Vec3 } from '../sim/types';
 
 /** Nearest placed feast entity within reach of the player, by 2D distance, or
- *  null. A feast is the kind:'object' entity carrying the farm_feast
- *  templateId (src/sim/professions/feast.ts): it is not lootable and owns no
+ *  null. A feast is the kind:'object' entity carrying a templateId
+ *  `isFeastTemplateId` admits (src/sim/professions/feast.ts derives the family
+ *  from the catalog, so every tier is in reach of one press): it is not
+ *  lootable and owns no
  *  pickup item, so no other funnel arm ever competes for it. The boundary is
  *  INCLUSIVE (`<= INTERACT_RANGE`) to mirror the sim's own deny,
  *  `dist2d(p.pos, entity.pos) > INTERACT_RANGE` (farmDenied 'feast_range'),

@@ -401,7 +401,7 @@ const ANGLER_OUTPUTS = ['peppered_deepbarb_catfish', 'roast_hollowgill_sturgeon'
 // list rather than an ANGLER_OUTPUTS append, because they belong to the
 // provisioning capstone rather than to the angler block: each carries NO power
 // of its own and serves a shipped apex plate through feast.dishItemId, which is
-// R14 satisfied by construction rather than by a magnitude check.
+// masterwrought R14 satisfied by construction rather than by a magnitude check.
 const APEX_FEAST_OUTPUTS = ['stonepot_feast', 'warspice_feast', 'sageleaf_feast'] as const;
 
 // The deliberately UNFLAGGED tool outputs: tools, never counted combat power,
@@ -478,8 +478,11 @@ const APEX_TOOLS: Record<
     recipes: APEX_CONSUMABLE_RECIPES,
     skillReq: 125,
     stationType: 'kitchens',
-    // EIGHT entries, still the longest bill in the game: seven at masterwrought
-    // Phase 11h, then 11i's uniform fish row.
+    // EIGHT entries: seven at masterwrought Phase 11h, then 11i's uniform fish
+    // row. It held the longest bill ALONE until Phase 11k, whose three apex
+    // role feasts TIE it at eight; the four holders are enumerated in
+    // tests/provisioning_supply_line_apex.test.ts and the wiki prose says "one
+    // of the longest bills" for the same reason.
     reagents: [
       { itemId: 'seasoned_stock', count: 3 },
       { itemId: 'wyrmfall_core', count: 2 },
