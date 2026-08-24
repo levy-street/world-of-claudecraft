@@ -15536,3 +15536,298 @@ recorded above. Two runs, one discarded on purpose because it did its job.
   diff points a mutation at are the generated wiki data (a line leaving, a line
   shrinking) and the hand-listed title-key map, and all three are closed now.
   The next reader should ask the same question of whatever it adds.
+
+## Phase 11k QA ledger (2026-08-24, verify the provisioning capstone)
+
+VERDICT: **PASS-WITH-FOLLOWUPS**. The phase's numbers hold up under independent
+derivation, its central claims are true, and the two things a player would have
+read as false were on the wiki page rather than in the tier. LOCAL, no push, no
+PR.
+
+THE AUDIT IN ONE LINE: everything 11k said about the SIM is true and re-derives;
+everything it said about ITSELF needed checking, and the four claims that failed
+were all counts or grounds in prose, which is this packet's besetting defect
+landing for the fourth phase running.
+
+### STEP 0: THE FOURTEENTH RELEASE SYNC, AND IT WAS THE BIG ONE
+
+The thirteenth was a no-op and this one paid for it: `release/v0.40.0` moved
+**b39b16022e to efb1220e85, 673 commits and 930 files**, with **55 conflicted
+paths**. Merged at `57b1a09d43`. Nothing was resolved by taking a side wholesale
+and every derived number was re-measured on the merged tree.
+
+THE RESOLUTIONS A LATER READER CANNOT RECOVER FROM THE DIFF:
+
+- **TWO DOUBLE-EXTRACTIONS, collapsed to one authority each.** The release
+  extracted the craft-denial table as `crafting_deny_core` while this branch had
+  extracted the same table as `craft_denial_line_view`; the release's module now
+  DELEGATES, so the two surfaces cannot disagree, and its exhaustive `satisfies`
+  table gained the branch-only `daily_limit` row it would otherwise have failed
+  tsc on. Same shape for `delveDisplayName` / `dungeonDisplayNameFromSource`,
+  extracted by both sides with byte-identical bodies: `entity_display_core`
+  keeps them, `error_text_i18n_core` re-exports.
+- **A MIRROR OBLIGATION THE MERGE WOULD HAVE DROPPED SILENTLY.** The release
+  added an `anyTarget` arm to `abilityRequirementLines` in hud.ts, which this
+  branch had already moved WHOLE to `ability_tooltip_lines`. Ported, or the
+  merged tree would have lost a shipped tooltip line with nothing red.
+- **THE THREE $WOC EXCHANGE LETTERS** joined `authoredLettersById`, the shared
+  builder this branch introduced to retire the second hand-seeded registry the
+  release was still writing into.
+- **THE MONOLITH RATCHET WAS MEASURED ON EVERY ROW**, not only the four that
+  conflicted, which is the hazard this packet has recorded twice: three rows
+  (`sim.ts`, `net/online.ts`, `server/db.ts`) grew WITHOUT conflicting and take a
+  RECORDED RAISE of exactly the release's own delta; four fall and follow the
+  file down. Every row composes exactly.
+- **THE COUNT PINS WERE SET FROM RUNS**: IWorld 333 members (the release's
+  `tradeClose`), command schema 206/219 (base 199/212 + ours 6 + theirs 1), the
+  letters hand-count 7 (ours 4 + the release's 3).
+- **NINE PARITY GOLDENS RE-RECORDED, AND THE RNG STREAM IS IDENTICAL TO BOTH
+  PARENTS IN EVERY FRAME OF EIGHT.** The ninth, `dungeon_instances`, DROPS three
+  draws, and that is the release's own dungeon-door fall-damage fix landing
+  (5490bf359c, whose commit body says its golden was regenerated to drop a bogus
+  death), not a lost hunk.
+- **ONE REAL BEHAVIOURAL INTERACTION.** The release added
+  `expireDecayedCorpseInteractions`, which clears `lootable` on a body left at
+  `corpseTimer` 0. The `rift_clear_rewards` fixture hand-kills its boss, so the
+  payout's own corpse read as already decayed and four coverage arms went red.
+  The fixture now stamps the corpse window a REAL death stamps
+  (`CORPSE_DURATION`), which is the honest repair rather than weakening the
+  assertion.
+- The i18n bundles, the wiki content, the shard-weight union (3032 rows after
+  five stale rows with no file on disk were dropped, coverage 0.9562 against the
+  0.95 floor) and the Eastbrook polish seals were all REGENERATED with their own
+  tools, never hand-merged.
+
+THE DROPPED-HUNK CLASS WAS MEASURED RATHER THAN HOPED FOR: of the 483 files the
+release ADDED, zero are missing from the merged tree; of the 165 files BOTH
+parents changed, ZERO are byte-identical to either parent, so no side's change
+was silently taken wholesale on a contested file.
+
+### WHAT WAS VERIFIED BY INDEPENDENT DERIVATION, not read from the ledger
+
+- **THE DEED DIGEST RE-MINT IS A GENUINE APPEND.** Reconstructing the pre-append
+  row list (289 rows minus `prog_field_to_feast`, with `feat_book_complete`'s
+  live `deedIds` filtered back) reproduces `2b6e36a4...` EXACTLY at 288 rows, and
+  the 289-row digest is the pinned `52569f4b...`. This is the phase's centrepiece
+  claim and it holds under a derivation that shares no code with the pin.
+- **THE BILL.** 3x30 + 1x50 + 1x40 + 1x160 + 2x8 + 4x14 + 3x18 + 2x22 = **510**
+  in against 300 out on the shipped unit-value convention, gold-negative by 210,
+  every input a shipped point. LEGAL under every live guard, checked by running
+  them rather than reading them: fish 9 outnumber produce 1 (R17), one crop
+  family, RULE 2's count half 1 < 4, its value half 40 <= 160, and the accent cap
+  1 <= 2. Eight reagent entries TIES `recipe_laden_hearth`, measured over
+  ALL_RECIPES.
+- **THE DEMAND MOVES**: salmon 6 across three consumers (the strand the cut
+  released is closed), sturgeon 23, catfish 34, salt 43, sunpetal 44, and the
+  fine twins UNCHANGED at 2 / 3, which is what the "unchanged" prediction
+  claimed.
+- **THE COUNTS**: DEED_ORDER 289 with `prog_field_to_feast` at the tail, summed
+  renown 3290, progression 66, ALL_RECIPES 156, ITEM_ART_PENDING 78,
+  liveItemCount 922 = 1000 defs minus 78 parked, book-complete requirements 276.
+- **THE CUT IS CLEAN.** `deepwater_feast` survives nowhere in live code, i18n,
+  icons, the art audit or the shipped-id golden; the only occurrences are
+  comments recording the retirement. Its absence from `origin/release/v0.40.0`
+  was VERIFIED rather than taken, so the branch-only claim that licenses an
+  outright delete is a fact.
+- **FIVE KEYED SITES plus one contract comment**, counted by grep over the real
+  consumers rather than from either document, and the title map is pinned in
+  both directions.
+- `harvest_feast`'s def diff is EXACTLY the `templateId` addition: def, recipe,
+  charges, dish, quality and price are untouched, so 11f's row is intact.
+- **THE SUPPLY DERIVATION MOVED WHOLE**: all four relocated function bodies are
+  byte-identical to their pre-move source.
+- The phase touches NO wire, snapshot, bandwidth, env-protocol, parity golden or
+  IWorld file, and no server/, headless/ or python/ file at all. Host three's
+  status: the RL env is untouched, correct under the settled CUT.
+- **M14 RE-RUN INDEPENDENTLY**: deleting the instance roster push reds BOTH the
+  party and the apex teardown arms, so the phase's highest-risk mutation claim is
+  confirmed rather than credited.
+
+### THE FINDINGS: 2 BLOCKING, 7 SHOULD-FIX, 5 NITS, ALL APPLIED
+
+**BOTH BLOCKING WERE PLAYER-VISIBLE ENGLISH ON THE NEW PUBLIC WIKI PAGE**, which
+is the same class as the deed description the phase's own reviewer caught, one
+surface over:
+
+1. The suppliers section opened "Cooking takes from more of the gathering lines
+   than any other craft". Derived through the page's own supply authority:
+   cooking takes from FIVE families and ENGINEERING takes from five too. It is a
+   tie, not a lead. Corrected to "nearly every gathering line" (five of six, all
+   but mining) and PINNED both ways against the live map.
+2. The Russian fill of that same key inverted its first clause: "никогда не из
+   чего выбирать" reads that a cook who fishes and farms never has anything to
+   choose from, where the English says such a cook is never short of materials.
+
+SHOULD-FIX: the ladder's `placeable` flag is a FEAST flag, so The Laden Hearth (a
+`placeMobileStation` item on the SAME 125 rung) rendered untagged between three
+tagged feasts and read as a dish; `types.ts` still carried BOTH errors the
+phase's review round fixed in `feast.ts` (six keyed sites, and "joins them all at
+once"); `icons.ts`'s corrected park comment was off by one in both terms (nine
+ids, three patterns); the laden_hearth budget row still claimed a sole longest
+bill; the K1 bullet kept the `farm_bed` justification its own mutation table
+falsifies; no Reliquary verdict was recorded at all; and the delve MODULE ADVANCE
+teardown was unpinned for a feast of any tier.
+
+NITS: three single-template comments left behind at the very sites the widening
+re-pointed, a bare packet R-number, and a dead exception entry.
+
+**THE MODULE-ADVANCE GAP IS THE ONE WORTH NAMING.** `delves/runs.ts` drops
+`run.objectIds` at TWO sites, `freeDelveRun` and `spawnDelveModule`, and only the
+first was driven. A party that eats half a feast in one chamber and walks the
+passage would have left the table standing in a room the run reused, holding the
+placer's one-active slot. Proven by mutation rather than argued: deleting the
+object drop from the advance arm alone reds the new test and NOTHING else in the
+suite, including both existing teardown arms.
+
+### THE FIX ROUND WAS REVIEWED AS UNREVIEWED CODE, AND IT WAS NOT CLEAN
+
+A fresh reader took the fix commits alone and returned TWO BLOCKING, both of
+which I re-derived before believing:
+
+- **THE RELIQUARY RECORD I WROTE RESTED ON A GROUND THE TREE HAD ALREADY
+  REFUTED.** It said the catalog holds zero crafted gear by precedent, copied
+  forward from an older ledger entry. `RELIQUARY_PAGES` holds FIVE crafted
+  outputs (`boundstone_helm`, `gravewyrm_gauntlets`, and all three crafted rods,
+  one of them this packet's own 11i clockreel), and `src/sim/content/reliquary.ts`
+  carries the packet's Phase 11j correction of exactly that reasoning in as many
+  words. The verdict NO PAGE stands on the ground that actually holds: no crafted
+  CONSUMABLE carries a relic row anywhere.
+- **THE STATION TAG COMPOSED ASCII BRACKETS** around a borrowed HUD noun, and ja
+  and zh spell the sibling tag's brackets FULL-WIDTH, so the one rung carrying
+  both tags would have printed two bracket styles side by side. It is its own key
+  now, brackets inside the value, with five fills compounded from each locale's
+  shipped station noun.
+
+Plus four should-fix and the nits: the `items.ts` TWIN of the park arithmetic
+still read four patterns where `icons.ts` was corrected to three (one home fixed,
+the twin missed, which is the same defect the phase itself made); a bare packet
+R-number three lines above the one that was fixed; the retired exception set was
+still CONSULTED, leaving a branch that cannot fire inside the very fix that
+condemns them; the interact resolver gained an "every tier" claim no test drove;
+and both new guide pins were one-directional. ONE FINDING DECLINED with its
+reason recorded rather than silently skipped (the styles.css sole-holder line is
+historical narration of the state 11h created, and was true when written).
+
+THE LESSON, one level up again: this audit corrected four false counts and
+grounds in the phase's prose, and then shipped a false ground and a punctuation
+defect of its own inside the correction. The fix round is a content change and it
+owes the same review.
+
+### THE OPEN ITEMS ARE THE MAINTAINER'S: STILL ELEVEN, AND THIS AUDIT ADDS NONE
+
+The eleven carried in are unchanged and NOT re-decided here. The crop count of 1
+was NOT re-tuned: at 2 all three rows would join the census of what RULE 2's
+alternative reading refuses, taking that open item from six entries across four
+rows to nine across seven, and re-tuning it would have been this audit spending a
+maintainer decision to make a content choice it was not asked to make.
+
+### THE MERGE WAS REVIEWED AS UNREVIEWED CODE TOO, AND THAT IS WHY IT IS TRUSTED
+
+A second fresh reader audited the sync itself rather than the phase. It found
+NO DROPPED RELEASE HUNK, and it established that mechanically rather than by
+reading: a `git merge-file --diff3` reproduction of all 164 both-changed text
+files (93 landed exactly as the auto-merge, 55 conflicted, matching this
+audit's own count, and 16 were hand-edited after a clean auto-merge, all of
+them the letters builder plus generated i18n bundles it then proved
+regenerated); a line-level census of every release-added and release-deleted
+line across all 930 release-changed files; 483 release-added files all present;
+and zero files from either parent tip missing. It also mapped the deny
+delegate reason by reason against the release's ternary, diffed all six moved
+ability-tooltip helpers against the release's bodies, and extracted the rng
+draws, digests and event hashes from all nine goldens programmatically.
+
+THREE RESIDUES, all applied:
+
+- **THE RELEASE'S DENY CORE HAD NO PRODUCTION CONSUMER.** The resolution kept
+  it alive as a delegate and then pointed hud.ts at the branch's table
+  directly, so the module's own header described "two surfaces that cannot
+  disagree" when only one existed, and its release-authored suite no longer
+  covered a shipping path. hud.ts calls it now, which is also the call shape
+  the release already had. hud.ts does NOT grow to pay for that: the call-site
+  comment shrank and the ceiling is re-measured DOWN.
+- **THREE UNUSED IMPORTS THE MERGE ITSELF INTRODUCED**, each where one parent
+  deleted the use and the other kept the import. The fourth flagged import is
+  inherited debt (import-only at base, ours, theirs and merged alike) and was
+  left, with the reason recorded rather than swept in.
+- **THE hud.ts CEILING CARRIED TWO LINES OF SLACK** against a row whose own
+  text says zero, which is the exact defect this packet's sim.ts row named at
+  11d. Re-measured and re-pinned at the exact count.
+
+### PREDICTED THEN OBSERVED: WHAT THIS AUDIT MOVED
+
+| measure | before (11k stamp) | predicted | observed |
+|---|---|---|---|
+| vitest files | 3070 / 12 skipped (3082) | +97, the release's own | 3167 / 21 skipped (3188) |
+| vitest tests | 43986 passed (44103) | 46552 after the fix round | **46553** |
+| `ci:changed` | 801 files, 3097 warnings, 0 errors | more files, still 0 errors | 804 files, 3111 warnings, 0 errors |
+| hud.ts ceiling | 18792 | falls (both parents extract) | 18480, exact |
+| sim.ts / online.ts / db.ts ceilings | 12370 / 5967 / 4865 | raise by the release's delta only | 12388 / 5989 / 4883, exact |
+| IWorld members | 332 (88 data, 244 method) | +1, the release's tradeClose | 333 (88, 245) |
+| command schema | 205 / 218 | base 199/212 + ours 6 + theirs 1 | 206 / 219 |
+| parity goldens moved | 0 | the 4 conflicted + the rift arm | 9, rng unmoved in 8 |
+| shard-weight rows | 2991 | union, over the 0.95 floor | 3032, coverage 0.9562 |
+| ALL_RECIPES / DEED_ORDER | 156 / 289 | UNCHANGED (the release adds none) | 156 / 289 |
+
+THE ONE PREDICTION THAT MISSED, and the miss is worth more than the hit: the
+test count was predicted at 46552, one above the merge tip, because the fix
+round had added exactly one test (the delve module-advance arm). It observed
+46553. The extra test is the apex-rung interact fixture the FIX ROUND'S OWN
+REVIEWER asked for, added after the prediction was written. The prediction was
+correct for the tree it was made against and stale for the tree that ran, which
+is exactly what a prediction is for: it made the second test visible instead of
+letting a moved number pass as noise.
+
+### THE FROZEN STAMP, BOTH ENDS
+
+Committed clean tree at **6ee8db2cc7**, `git status` empty before and after,
+NOTHING else running: both reviewers idle AND reported first, every finding
+applied, `ps aux | grep -c "[v]itest"` printed 0 and `env | grep -c DATABASE_URL`
+printed 0 before the run.
+
+| measure | 11k stamp (4d5fc94f5f) | this audit (6ee8db2cc7) |
+|---|---|---|
+| vitest | EXIT=0, 3070 files / 12 skipped (3082); 43986 passed / 2 xfail / 115 skipped (44103) | **EXIT=0**, 3167 files / 21 skipped (3188); **46553** passed / 2 xfail / 373 skipped (46928) |
+| `npm run ci:changed` | EXIT=0, 801 files, 3097 warnings, 0 errors | **EXIT=0**, 804 files, 3111 warnings, 0 errors, no FAIL marker in the log |
+| `npx tsc --noEmit` | clean | **clean** |
+| `wiki:content` + `i18n:gen` | zero diff | **zero diff** |
+
+THE DRIFT IS ALMOST ENTIRELY THE RELEASE'S, and it is attributable because the
+sync is measured at both ends: +97 files and +2565 tests arrived with 673
+upstream commits, and exactly TWO tests are this audit's own (the delve
+module-advance teardown arm and the apex-rung interact fixture). TWO full runs,
+neither discarded: the first at the merge tip 57b1a09d43 (EXIT=0, 46551) proved
+the merge before any fix landed, the second is the stamp above.
+
+TWO ci:changed RUNS WERE RED FIRST, both on the same class and both mine: a
+comment left at column 0 by the merge-note script, and a fixture line over the
+100-column width. Biome grades a format diff as an ERROR while the 3111
+warnings are inherited debt, so the log has to be read rather than the exit
+code trusted, which is the rule this packet already wrote down.
+
+### THE HANDOFF TO PHASE 11l
+
+- **THE FOURTEENTH SYNC IS THE ONE TO READ BEFORE THE FIFTEENTH.** It moved 673
+  commits and 930 files with 55 conflicts, and its lessons are structural rather
+  than incidental: two independent extractions of the SAME table (twice), a
+  release edit landing on a function this branch had moved WHOLE, three ratchet
+  rows that grew without conflicting, and a release behaviour change
+  (`expireDecayedCorpseInteractions`) that turned a fixture shortcut into four
+  red arms. A sync this size is not a chore step; budget it as its own phase.
+- **THE PROSE CHECK PAID FOR THE FIFTH PHASE RUNNING, and it paid on BOTH
+  sides.** Four false counts or grounds in the phase's own record, and then a
+  false ground and a punctuation defect inside the correction. Every count in a
+  comment is a claim; grep it before believing it, including the ones in this
+  ledger.
+- **A DELEGATE NOBODY CALLS IS DEAD PRODUCTION CODE.** The collapse of a
+  double-extraction is only finished when the surviving module is on a live
+  path. Check the consumer, not just the compile.
+- **ELEVEN OPEN ITEMS, UNCHANGED.** This audit decided none of them and added
+  none. The crop count of 1 was deliberately NOT re-tuned: at 2 the three rows
+  would join the census of what RULE 2's alternative reading refuses, and
+  spending a maintainer's open decision to make a content choice is not a QA's
+  to make.
+- **WHAT 11l INHERITS GREEN**: the apex feast tier with its teardown pinned at
+  BOTH delve drop sites, the deed digest proven an append by reconstruction, the
+  wiki page with its two false claims corrected and both pinned, and a release
+  sync whose no-dropped-hunk claim rests on a mechanical reproduction rather
+  than on reading the diff.

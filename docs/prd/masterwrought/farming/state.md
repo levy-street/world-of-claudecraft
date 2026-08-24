@@ -4554,3 +4554,26 @@ ledger: `fine_gilded_sunmelon` in `recipe_evergarden_sunmelon_tart` and
 `evergarden_greens` three, so 11h's items.ts comments claiming it "added the
 second consumer" were wrong on the ordinal and right on the half that matters,
 which is that it added the first consumer outside farming. Corrected in place.
+
+
+## Phase 11k QA note (2026-08-24): nothing moved on the OPEN list, and one row was deliberately left expensive
+
+THE 11k AUDIT CLOSED NOTHING ON THE OPEN LIST AND OPENED NOTHING ON IT EITHER.
+The list was read row by row a fourth time; no farming row's answer changed.
+
+WHAT BELONGS TO FARMING RATHER THAN TO THE PACKET is the one decision this audit
+declined to make. The apex feast bill takes ONE base crop (`evergarden_greens`)
+where the accent cap allows two, and the reason is a maintainer item rather than
+a taste: at 2 the crop contributes 80 against a count-reading reference of 56, so
+all three rows would join the census of what RULE 2's ALTERNATIVE reading
+refuses, taking that open item from six entries across four rows to nine across
+seven. At 1 it contributes 40 and clears BOTH readings. A QA re-tuning that count
+would be spending the maintainer's open decision to make a content choice, so it
+was left exactly as expensive to settle as it was found.
+
+THE GATE-E AMENDMENT THE PHASE WROTE HOLDS. Its closing clause (that the bill can
+take both tier-4 fine twins) really is false on the merged tree, re-derived here
+rather than taken: a fine twin carries `buyValue: 320`, two of them are two crop
+families on a fish row, and produce 4 against one catch breaks fish-forward, so
+the prescribed bill is refused three separate ways by rules 11h and 11i shipped
+after that line was written.
