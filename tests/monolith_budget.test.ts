@@ -487,7 +487,15 @@ const MONOLITHS: MonolithRow[] = [
     // thin wiring for rebuild reveal-gate installation, entry-barrier cleanup
     // and observed display pacing, with the policy and timer ownership left in
     // sibling modules. The release re-pinned to its own exact 13541.
-    ceiling: 13571,
+    // LOWERED 13571 -> 13569 at the 11l QA's sixteenth sync
+    // (release/v0.40.0 efb1220e85 -> 9a89e3483e, merge 7553c795): the
+    // release's Phase 11k-window shrink (13541 -> 13539 at the base) had
+    // already landed under the fourteenth sync, whose re-measure covered the
+    // hud/sim/main/game/online/db rows but not this one, so the branch
+    // parent carried two lines of unbanked slack under a zero-slack comment;
+    // the merge audit measured the merged file at 13569 (base 13539 + 30
+    // ours). Exact merged count, zero slack: any further growth reds again.
+    ceiling: 13569,
     seam: 'a new src/render/<thing>.ts module the renderer calls (src/render/CLAUDE.md)',
   },
   {
@@ -797,7 +805,11 @@ const MONOLITHS: MonolithRow[] = [
   },
   {
     file: 'src/render/nameplate_canvas.ts',
-    ceiling: 852,
+    // The release's own row (the deed-border-cartouche packet) pinned 852
+    // when the file was 842 and never re-pinned after it grew to 851; taken
+    // to the exact merged count at the 11l QA's sixteenth sync (release tip
+    // 9a89e3483e, merge 7553c795) under this branch's zero-slack posture.
+    ceiling: 851,
     seam: 'the pure src/render/nameplate_heraldry_core.ts geometry module',
   },
   {
