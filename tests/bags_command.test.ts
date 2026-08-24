@@ -38,11 +38,14 @@ describe('/bags command', () => {
     sim.addItem('fen_reaver_glaive', 1, pid); // rare
     sim.addItem('minor_healing_potion', 3, pid); // common
     sim.addItem('redbrook_blade', 1, pid); // uncommon
+    // An adopted 11l trophy (common since the promotion): it prints among
+    // the common rows, above the gray moccasin it used to sit beside.
+    sim.addItem('cracked_wyrm_scale', 2, pid); // common (the promoted trophy)
 
     sim.chat('/bags', pid);
     expect(lastReadout(sim, pid)).toBe(
-      'Bags (4): Fen Reaver Glaive, Redbrook Militia Blade, ' +
-        'Minor Healing Potion x3, Soggy Moccasin x5. Purse: 12g 4s 5c.',
+      'Bags (5): Fen Reaver Glaive, Redbrook Militia Blade, ' +
+        'Minor Healing Potion x3, Cracked Wyrm Scale x2, Soggy Moccasin x5. Purse: 12g 4s 5c.',
     );
   });
 

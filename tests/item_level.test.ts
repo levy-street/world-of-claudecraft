@@ -577,4 +577,28 @@ describe('item level: the phase 11l trophy recipe outputs (TROPHY_RECIPES)', () 
       expect(recipe.level, `${recipe.id} recipe.level`).toBe(TROPHY_RECIPE_LEVELS[recipe.id]);
     }
   });
+
+  // The RUNG per row, EXACTLY: the trainer view buckets skillReq into 25-point
+  // tiers (train_view.ts tierForSkill), the training fee and the craft cast
+  // read the same bucket, and the mastery model pinned only the hobnail row,
+  // so a within-band drift (25 to 49) on six of the seven rows survived every
+  // suite (the 11l QA's test-coverage audit, mutation-proven). The doctrine
+  // says each row's rung follows its trophy's drop band (zone 1 to 0, zone 2
+  // to 25, zone 3 and dungeon to 50), and this literal holds it to the digit.
+  const TROPHY_RECIPE_RUNGS: Record<string, number> = {
+    recipe_oiled_boots: 25,
+    recipe_gravewyrm_bone_quiver: 50,
+    recipe_fenshadow_maul: 50,
+    recipe_lesser_healing_potion: 25,
+    recipe_linen_pouch: 0,
+    recipe_wildgrove_cinch: 50,
+    recipe_cragprowl_belt: 50,
+  };
+
+  it('pins every trophy row at its exact rung, not its 25-point tier', () => {
+    expect(Object.keys(TROPHY_RECIPE_RUNGS).sort()).toEqual(TROPHY_RECIPES.map((r) => r.id).sort());
+    for (const recipe of TROPHY_RECIPES) {
+      expect(recipe.skillReq, `${recipe.id} skillReq`).toBe(TROPHY_RECIPE_RUNGS[recipe.id]);
+    }
+  });
 });

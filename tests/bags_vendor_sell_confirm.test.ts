@@ -14,6 +14,7 @@ import { BagsWindow, type BagsWindowDeps } from '../src/ui/bags_window';
 import { ItemDragState } from '../src/ui/item_drag_state';
 import { tSim } from '../src/ui/sim_i18n';
 import type { IWorld } from '../src/world_api';
+import { adoptedTrophyIds } from './helpers/adopted_trophy_ids';
 
 // Real merged-table ids, derived rather than hardcoded (the guild-deposit
 // suite's own convention). A junk id (poor quality, plain sale is instant) and
@@ -216,5 +217,26 @@ describe('vendor ctrl/meta click on a non-junk item still confirms', () => {
     clickCellFor(h.root, junkId, { ctrl: true });
     expect(confirmPrompt()).toBeNull();
     expect(h.calls).toEqual([`sellItem:${junkId},3`]);
+  });
+});
+
+describe('vendor plain click on an adopted 11l trophy confirms like any common item', () => {
+  it('opens the prompt with no sale, then Confirm sells exactly the named slot', () => {
+    // The trophy economy promoted junk mob drops to common reagents, and the
+    // plain-click gate reads quality, so the whole class now routes through
+    // the confirm prompt instead of the one-step junk arm. Driven through the
+    // REAL window for every id of the shared derivation, so a de-adopted
+    // trophy (poor again) drops out of the loop rather than passing it.
+    const adopted = adoptedTrophyIds(ITEMS);
+    expect(adopted).toHaveLength(7);
+    for (const trophyId of adopted) {
+      const h = harness([{ itemId: trophyId, count: 1 }]);
+      clickCellFor(h.root, trophyId);
+      expect(h.calls, trophyId).toEqual([]);
+      expect(confirmPrompt()?.textContent, trophyId).toContain(ITEMS[trophyId].name);
+      clickPromptConfirmButton();
+      expect(h.calls, trophyId).toEqual([`sellItem:${trophyId},1,{"slotIndex":0}`]);
+      expect(confirmPrompt(), trophyId).toBeNull();
+    }
   });
 });

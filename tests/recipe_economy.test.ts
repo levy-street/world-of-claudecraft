@@ -93,10 +93,13 @@ function requireRecipe(id: string): ProfessionRecipeRecord {
 // harvested at a rare-plus material rarity roll (gathering.ts
 // isSignableMaterialRarity; the corpse-harvest arms in interaction.ts mint
 // the signed component or its family's specimen) or a rare-plus masterwork
-// craft. A node yield or a corpse component or specimen (iron_ore,
-// thorium_ore, goldleaf_herb, elderwood_log, rough_hide, spider_silk,
-// pristine_hide) CAN therefore be self-signed, while a mob-dropped trophy and
-// a bought vendor staple never can, so the floor is exactly reachable for
+// craft. A node yield, a pristine specimen, or a corpse component whose
+// family carries NO specimen (thorium_ore, goldleaf_herb, elderwood_log and
+// pristine_hide on the trophy bills) CAN therefore be self-signed, while a
+// component whose family has a specimen (rough_hide, spider_silk: the
+// harvest grants the component PLAIN and signs the specimen instead), a
+// mob-dropped trophy and a bought vendor staple never can, so the floor is
+// exactly reachable for
 // some rows (the cinch and the belt, by one self-signed pristine hide) and a
 // counterfactual for others (the trophy header prints the reachable figure
 // per row where it differs). Assuming every reagent signed is the STRICT
@@ -253,7 +256,7 @@ describe('THE ECONOMY INVARIANT', () => {
     // list) reds here instead of leaving an empty caller list that reads as
     // a scan result. Re-measure with tsFilesUnder when a floor trips on an
     // honest shrink.
-    const ROOT_FILE_FLOOR: Record<string, number> = { src: 2100, server: 300, headless: 2 };
+    const ROOT_FILE_FLOOR: Record<string, number> = { src: 2100, server: 300, headless: 3 };
     // THE FLAG'S WRITE SET, the same closed-circuit argument stated as a scan
     // rather than trusted to the caller list. A caller scan alone leaves one
     // door: the hydrate arm of normalizeArchetypeState (archetype.ts) copies
@@ -270,7 +273,11 @@ describe('THE ECONOMY INVARIANT', () => {
     // inside the attuneJackOfAllTrades body; the serializer's re-emit, which
     // must keep its `state.isJackOfAllTrades ?` guard (an unconditional
     // projection would mint a true through the hydrate arm on the next
-    // load); and the hydrate arm itself inside normalizeArchetypeState, whose
+    // load) and keep it UN-inverted (a `!state.isJackOfAllTrades ?` guard
+    // would persist a true for every never-attuned character, a worse door,
+    // so the guard regex is anchored against a leading `!`, and
+    // tests/professions_jack.test.ts pins the serializer behaviorally); and
+    // the hydrate arm itself inside normalizeArchetypeState, whose
     // right-hand side must be EXACTLY
     // `state.activeArchetype === null && saved.isJackOfAllTrades === true;`
     // (a longer disjunction there would be a second door, so the arm is
@@ -280,16 +287,19 @@ describe('THE ECONOMY INVARIANT', () => {
     // whatever the value); a right-hand side that is the literal false and
     // nothing else (a reset, a default parameter, the empty state) is the one
     // write skipped, and `false || true` is not that. A key built at runtime
-    // is one spelling no static scan can see, and a wholesale copy
-    // (`Object.assign(state, savedBlob)`, a spread of a persisted blob) is the
-    // other, which is why the caller scan above stays the primary guard and
-    // tests/professions_jack.test.ts carries the behavioral pins on the
-    // hydrate arm. The walk is .ts-only through
+    // is one spelling no static scan can see; a wholesale copy
+    // (`Object.assign(state, savedBlob)`, a spread of a persisted blob), an
+    // API write with a string key (`Reflect.set`, `Object.defineProperty`)
+    // and the SHORTHAND member (`{ ...state, isJackOfAllTrades }`, which
+    // carries no colon) are the others, which is why the caller scan above
+    // stays the primary guard and tests/professions_jack.test.ts carries the
+    // behavioral pins on the hydrate arm. The walk is .ts-only through
     // tsFilesUnder (the scan's one structural blind spot beside the runtime
     // key); the Svelte files under src/admin cannot reach ArchetypeState.
     const FLAG_WRITE =
       /\bisJackOfAllTrades(?:["']\])?\s*(?:\|\|=|\?\?=|=(?!=))|\bisJackOfAllTrades(?:["']\])?\s*:/g;
-    const GUARDED_RE_EMIT = /state\.isJackOfAllTrades\s*\?\s*\{\s*isJackOfAllTrades:\s*true\s*\}/;
+    const GUARDED_RE_EMIT =
+      /(?<![!\w$.])state\.isJackOfAllTrades\s*\?\s*\{\s*isJackOfAllTrades:\s*true\s*\}/;
     // The hydrate line verbatim (archetype.ts sits close to the column limit
     // there; a rename that wraps it empties the read right-hand side and reds
     // the pin below as `other`, which is loud rather than silent).
@@ -318,14 +328,33 @@ describe('THE ECONOMY INVARIANT', () => {
     expect('saved.isJackOfAllTrades === true'.match(FLAG_WRITE)).toBeNull();
     expect('isJackOfAllTrades?: true;'.match(FLAG_WRITE)).toBeNull();
     expect('isJackOfAllTrades?: boolean;'.match(FLAG_WRITE)).toBeNull();
+    // The shorthand member is the one member spelling the regex cannot see
+    // (no colon); named as a blind spot above rather than exempted silently.
+    expect('{ isJackOfAllTrades }'.match(FLAG_WRITE)).toBeNull();
+    // The serializer link's guard, both ways: the live shape matches, and the
+    // inverted guard (a true persisted for every non-Jack) does NOT, so an
+    // inversion reads `other` and reds the three-write pin below.
+    expect(
+      GUARDED_RE_EMIT.test('...(state.isJackOfAllTrades ? { isJackOfAllTrades: true } : {}),'),
+    ).toBe(true);
+    expect(
+      GUARDED_RE_EMIT.test('...(!state.isJackOfAllTrades ? { isJackOfAllTrades: true } : {}),'),
+    ).toBe(false);
     expect(FALSE_ONLY.test('false,')).toBe(true);
     expect(FALSE_ONLY.test('false }')).toBe(true);
     expect(FALSE_ONLY.test('false')).toBe(false);
     expect(FALSE_ONLY.test('false || true;')).toBe(false);
     expect(FALSE_ONLY.test('false ?? flag')).toBe(false);
-    // The two anchors: a right-hand side that merely ENDS in a terminated
-    // false (`saved.flag ?? false;` mints whenever the saved flag is true)
-    // and one that continues past the terminator are both writes.
+    // The two anchors. The start anchor: a right-hand side that merely ENDS
+    // in a terminated false (`saved.isJackOfAllTrades ?? false;` mints
+    // whenever the saved flag is true, and the assignment arm finds no
+    // second FLAG_WRITE match on that line, so `^` is the only thing between
+    // it and a silent skip) is a write. The end anchor: a `false,`-prefixed
+    // line is not exempted wholesale, which matters when the rest of the
+    // line is a write the scan cannot see (an Object.assign, a runtime key);
+    // a visible continuation is a second FLAG_WRITE match classified on its
+    // own.
+    expect(FALSE_ONLY.test('saved.isJackOfAllTrades ?? false;')).toBe(false);
     expect(FALSE_ONLY.test('true || false;')).toBe(false);
     expect(FALSE_ONLY.test('false, jack = true;')).toBe(false);
     // The hydrate key has no string control on purpose: a string compared to
@@ -661,10 +690,12 @@ describe('REFERENTIAL INTEGRITY', () => {
     // minAchievableInputValue describes (a self-signed copy of EVERY
     // reagent); reachable is a self-signed copy of exactly the reagents a
     // crafter's own gathering can sign. That last set is a LITERAL, because
-    // only a node yield or a corpse component or specimen can carry the
-    // crafter's own signature (gathering.ts isSignableMaterialRarity; the
-    // corpse-harvest arms in interaction.ts mint the signed component or its
-    // family's specimen), and it is cross-checked below against the live
+    // only a node yield, a pristine specimen, or a corpse component whose
+    // family carries no specimen can carry the crafter's own signature
+    // (gathering.ts isSignableMaterialRarity; the corpse-harvest arms in
+    // interaction.ts grant a specimen family's component PLAIN and sign the
+    // specimen in its place, and sign the component itself only for a family
+    // without one), and it is cross-checked below against the live
     // source tables (NODE_MATERIAL_TABLE, HARVEST_COMPONENT_ITEMS,
     // HARVEST_COMPONENT_SPECIMENS), so a trophy reagent that joins or leaves
     // a signable source moves a literal here. Row by row: the cinch (401)
@@ -685,8 +716,6 @@ describe('REFERENTIAL INTEGRITY', () => {
       'thorium_ore',
       'goldleaf_herb',
       'elderwood_log',
-      'rough_hide',
-      'spider_silk',
       'pristine_hide',
     ]);
     const nodeYields = new Set(
@@ -696,8 +725,22 @@ describe('REFERENTIAL INTEGRITY', () => {
     );
     const corpseComponents = new Set(Object.values(HARVEST_COMPONENT_ITEMS));
     const specimens = new Set(Object.values(HARVEST_COMPONENT_SPECIMENS));
+    // A component whose family carries a specimen is granted PLAIN by the
+    // corpse-harvest arms (src/sim/interaction.ts: the specimen enters the
+    // signed grants in its place), so it can never carry the crafter's own
+    // signature; the 11l QA corrected the predicate, whose earlier reading
+    // (every component signable) called rough_hide and spider_silk signable.
+    const plainGrantedComponents = new Set(
+      Object.keys(HARVEST_COMPONENT_SPECIMENS).map(
+        (family) => (HARVEST_COMPONENT_ITEMS as Record<string, string>)[family],
+      ),
+    );
+    expect(plainGrantedComponents.has('rough_hide')).toBe(true);
+    expect(plainGrantedComponents.has('spider_silk')).toBe(true);
     const inASignableSource = (itemId: string): boolean =>
-      nodeYields.has(itemId) || corpseComponents.has(itemId) || specimens.has(itemId);
+      nodeYields.has(itemId) ||
+      specimens.has(itemId) ||
+      (corpseComponents.has(itemId) && !plainGrantedComponents.has(itemId));
     const trophyReagents = new Set(TROPHY_RECIPES.flatMap((r) => r.reagents.map((g) => g.itemId)));
     for (const itemId of SIGNABLE_TROPHY_REAGENTS) {
       expect(trophyReagents.has(itemId), `${itemId} sits on no trophy bill`).toBe(true);
@@ -723,14 +766,36 @@ describe('REFERENTIAL INTEGRITY', () => {
       }
       return total;
     };
-    const TROPHY_BILLS: Record<string, { specOnly: number; floor: number; reachable: number }> = {
-      recipe_oiled_boots: { specOnly: 56, floor: 51, reachable: 56 },
-      recipe_gravewyrm_bone_quiver: { specOnly: 291, floor: 196, reachable: 231 },
-      recipe_fenshadow_maul: { specOnly: 222, floor: 222, reachable: 222 },
-      recipe_lesser_healing_potion: { specOnly: 77, floor: 77, reachable: 77 },
-      recipe_linen_pouch: { specOnly: 51, floor: 36, reachable: 51 },
-      recipe_wildgrove_cinch: { specOnly: 426, floor: 401, reachable: 401 },
-      recipe_cragprowl_belt: { specOnly: 446, floor: 421, reachable: 421 },
+    // The fourth figure, GATHERED, prices the specialization-only bill with
+    // every signable line at its sellValue instead of the buyValue-first unit
+    // value the doctrine uses (a crafter who mined the thorium and cut the
+    // log never paid the counter price): the accounting under which the
+    // trophy header's surplus rows are read, pinned so the maul (+278 after
+    // the 40 sink) and the quiver (+164) sit on the maintainer's list as
+    // numbers, not prose (the 11l QA).
+    const gatheredBill = (recipe: ProfessionRecipeRecord): number => {
+      const specialized = { [recipe.professionId]: 125 };
+      let total = 0;
+      for (const reagent of recipe.reagents) {
+        const { count } = requiredReagentCountFor(false, reagent, specialized, recipe.professionId);
+        const unit = SIGNABLE_TROPHY_REAGENTS.has(reagent.itemId)
+          ? ITEMS[reagent.itemId].sellValue
+          : reagentUnitValue(reagent.itemId);
+        total += count * unit;
+      }
+      return total;
+    };
+    const TROPHY_BILLS: Record<
+      string,
+      { specOnly: number; floor: number; reachable: number; gathered: number }
+    > = {
+      recipe_oiled_boots: { specOnly: 56, floor: 51, reachable: 56, gathered: 56 },
+      recipe_gravewyrm_bone_quiver: { specOnly: 291, floor: 196, reachable: 231, gathered: 156 },
+      recipe_fenshadow_maul: { specOnly: 222, floor: 222, reachable: 222, gathered: 102 },
+      recipe_lesser_healing_potion: { specOnly: 77, floor: 77, reachable: 77, gathered: 32 },
+      recipe_linen_pouch: { specOnly: 51, floor: 36, reachable: 51, gathered: 51 },
+      recipe_wildgrove_cinch: { specOnly: 426, floor: 401, reachable: 401, gathered: 381 },
+      recipe_cragprowl_belt: { specOnly: 446, floor: 421, reachable: 421, gathered: 401 },
     };
     expect(Object.keys(TROPHY_BILLS).sort()).toEqual(TROPHY_RECIPES.map((r) => r.id).sort());
     for (const [id, bills] of Object.entries(TROPHY_BILLS)) {
@@ -744,6 +809,7 @@ describe('REFERENTIAL INTEGRITY', () => {
         billWith(recipe, (itemId) => SIGNABLE_TROPHY_REAGENTS.has(itemId)),
         `${id} reachable`,
       ).toBe(bills.reachable);
+      expect(gatheredBill(recipe), `${id} gathered`).toBe(bills.gathered);
     }
     // The #1301 gold sink, read from the constant crafting.ts
     // resolveCraftForRecipe charges (ceil(itemLevelBudget x
@@ -792,6 +858,22 @@ describe('REFERENTIAL INTEGRITY', () => {
     expect(TROPHY_BILLS.recipe_lesser_healing_potion.specOnly).toBeGreaterThan(
       outputValue(requireRecipe('recipe_lesser_healing_potion')),
     );
+    // The two surplus rows under gathered cost, less the sink, in order: the
+    // maintainer's tuning reads (the trophy header), pinned as the numbers
+    // the header prints so a bill or price edit moves them here first.
+    const marginAtGathered = (id: string): number => {
+      const recipe = requireRecipe(id);
+      return outputValue(recipe) - TROPHY_BILLS[id].gathered - sinkFor(recipe);
+    };
+    const byGatheredMargin = TROPHY_RECIPES.map((r) => r.id).sort(
+      (a, b) => marginAtGathered(b) - marginAtGathered(a),
+    );
+    expect(byGatheredMargin.slice(0, 2)).toEqual([
+      'recipe_fenshadow_maul',
+      'recipe_gravewyrm_bone_quiver',
+    ]);
+    expect(marginAtGathered('recipe_fenshadow_maul')).toBe(278);
+    expect(marginAtGathered('recipe_gravewyrm_bone_quiver')).toBe(164);
   });
 
   it('no two recipes share a result item, and every trophy row is the one recipe for its output', () => {

@@ -416,6 +416,21 @@ describe('World Market filters', () => {
     expect(sanitizeMarketQuery({ itemType: 'pattern' }).itemType).toBe('pattern');
   });
 
+  it('an adopted 11l trophy browses as a common material, and the holdout as poor', () => {
+    // itemMatchesRarity reads live quality, so the promotion moved every
+    // adopted trophy from the poor chip to the common one. The market's
+    // material chip is keyed on KIND (junk or tool, market_query.ts), not on
+    // the honest taxonomy, so the poor holdout browses there beside the
+    // promoted trophy and the rarity chip is what tells them apart.
+    const pair = ['cracked_wyrm_scale', 'soggy_moccasin'];
+    expect(filterIds(pair, { rarity: 'common' })).toEqual(['cracked_wyrm_scale']);
+    expect(filterIds(pair, { rarity: 'poor' })).toEqual(['soggy_moccasin']);
+    expect(filterIds(pair, { itemType: 'material' })).toEqual(pair);
+    expect(filterIds(pair, { itemType: 'material', rarity: 'common' })).toEqual([
+      'cracked_wyrm_scale',
+    ]);
+  });
+
   it('matches rarities by the game quality names', () => {
     // bone_fragments is a crafting reagent, so it is common (white), not poor.
     expect(filterIds(items, { rarity: 'poor' })).toEqual(['soggy_moccasin']);

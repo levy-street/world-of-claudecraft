@@ -3146,6 +3146,47 @@ describe('Reliquary source hints resolve against live content', () => {
     expect(checked).toBeGreaterThanOrEqual(11);
   });
 
+  it('every catalogued relic with a live recipe names that craft as a door (the reverse pass)', () => {
+    // The sweep above validates every AUTHORED profession hint against the
+    // live tables but skips a relic that carries none, so a craftable relic
+    // shipped without its craft door stayed green (docs/design/reliquary.md:
+    // an uncollected silhouette lists EVERY real way to get it). This pass
+    // runs the other direction (the 11l QA): every catalogued slot with a
+    // recipe must carry a profession hint naming a craft that really makes
+    // it. Masterwork marks are derived rows and are skipped as above.
+    const craftableBySlotId = new Map<string, Set<string>>();
+    for (const recipe of ALL_RECIPES) {
+      const professions = craftableBySlotId.get(recipe.resultItemId) ?? new Set<string>();
+      professions.add(recipe.professionId);
+      craftableBySlotId.set(recipe.resultItemId, professions);
+    }
+    const craftable = new Set<string>();
+    const missing: string[] = [];
+    for (const { page, relic, slotId } of RELIC_SLOTS) {
+      if (slotId.startsWith('masterwork:')) continue;
+      const crafts = craftableBySlotId.get(slotId);
+      if (!crafts) continue;
+      craftable.add(slotId);
+      const doors = reliquaryRelicSource(page, relic)
+        .filter((h) => h.sourceKind === 'profession')
+        .map((h) => h.sourceId);
+      if (!doors.some((id) => crafts.has(id))) missing.push(`${page.id}:${slotId}`);
+    }
+    expect(missing).toEqual([]);
+    // The craftable catalogued slots, exactly (the two Sanctum combo pieces,
+    // the Masterwrought phase 11l quiver door, and the three engineering
+    // rods), so an emptied recipe table or a renamed resultItemId cannot pass
+    // this pass by checking nothing.
+    expect([...craftable].sort()).toEqual([
+      'boundstone_helm',
+      'clockreel_fishing_rod',
+      'gravewyrm_bone_quiver',
+      'gravewyrm_gauntlets',
+      'stormreel_fishing_rod',
+      'tidewrought_fishing_rod',
+    ]);
+  });
+
   it('authored craft professions resolve through the live craftById lookup', () => {
     // The gathering ids are covered by the GATHERING_PROFESSIONS half of the
     // set above; this walks the craft half through the real accessor the call

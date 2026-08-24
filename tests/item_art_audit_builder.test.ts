@@ -17,6 +17,8 @@ import {
   renderItemArtAuditPreview,
   updateItemArtAuditVerdict,
 } from '../scripts/lib/item_art_audit.mjs';
+import { ITEMS } from '../src/sim/data';
+import { adoptedTrophyIds } from './helpers/adopted_trophy_ids';
 
 const repoRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const temporaryRoots: string[] = [];
@@ -847,6 +849,21 @@ describe('item-art audit builder', () => {
     // one 'common' minus 'poor' = 2 (498042 to 498040), predicted and then
     // measured, and the sha moves with them; everything else on the object
     // is unchanged for the same reasons as before.
+    // The contract beside the blob (the 11l QA): the only byte movement since
+    // the pre-phase catalog (498026, the sha above it) is the promoted
+    // trophies' quality token, 'common' for 'poor', two bytes each, so the
+    // count is DERIVED from the live adopted set minus the two trophies that
+    // were common before the phase and the sha's cause is stated rather
+    // than only re-recorded: a promotion or a demotion moves this arithmetic
+    // before it moves the sha.
+    const ALREADY_COMMON_TROPHIES = new Set(['emberwing_cinderscale', 'old_cragmaws_pelt']);
+    const promoted = adoptedTrophyIds(ITEMS).filter((id) => !ALREADY_COMMON_TROPHIES.has(id));
+    expect(promoted).toHaveLength(5);
+    for (const id of promoted) expect(ITEMS[id].quality, id).toBe('common');
+    for (const id of ALREADY_COMMON_TROPHIES) expect(ITEMS[id].quality, id).toBe('common');
+    expect(verified.catalogBytes).toBe(
+      498026 + promoted.length * ('common'.length - 'poor'.length),
+    );
     // Re-minted a third time at the 11l QA, which excluded the cracked fetish
     // and the bogiron nugget under the tusk standard and put both defs back
     // to poor: five quality tokens moved instead of seven, so the bytes

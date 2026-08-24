@@ -16,6 +16,7 @@ import {
   planDepositAllMaterials,
 } from '../src/ui/bank_view';
 import type { BankInfo } from '../src/world_api';
+import { adoptedTrophyIds } from './helpers/adopted_trophy_ids';
 
 // The bank core maps the proximity-gated BankInfo snapshot (null away from a
 // banker) to a flat render model (capacity / ordered slots / empty pad / buy
@@ -635,13 +636,16 @@ describe('deposit-all narrows to the honest taxonomy (phase 19)', () => {
     'spider_leg', // mob-drop reagent
     'arcanite_bar', // vendor staple (Q6: in)
     'raw_river_perch', // raw fishing catch (junk cooking reagent: in)
-    'cracked_ogre_tusk', // adopted junk trophy (phase 11l junk-kind reagent: in)
+    // every adopted junk trophy (phase 11l junk-kind reagents: in), derived by
+    // the shared helper so an adoption or a de-adoption reds this suite
+    ...adoptedTrophyIds(REAL_ITEMS),
   ] as const;
   // ...and of every excluded class the settlement ruled on.
   const EXCLUDED = [
     'simple_fishing_pole', // gathering implement (kind tool)
     'gatherers_cache', // charm (kind tool by deliberate authoring)
     'amber_hide', // grey vendor trash (Q3: out)
+    'cracked_fetish', // output-excluded 11l trophy, poor again (the 11l QA: out)
     'guardian_core', // non-poor junk oddment (Q4: out)
     'boar_hide', // quest item
     'linen_pouch', // bag item
@@ -665,6 +669,7 @@ describe('deposit-all narrows to the honest taxonomy (phase 19)', () => {
       simple_fishing_pole: { kind: 'tool' },
       gatherers_cache: { kind: 'tool' },
       amber_hide: { kind: 'junk', quality: 'poor' },
+      cracked_fetish: { kind: 'junk', quality: 'poor' },
       guardian_core: { kind: 'junk' },
       boar_hide: { kind: 'quest' },
       linen_pouch: { kind: 'bag' },

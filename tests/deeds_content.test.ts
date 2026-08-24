@@ -9,6 +9,7 @@ import { describe, expect, it } from 'vitest';
 import { POWERUPS } from '../src/sim/content/augments';
 import { DEED_ORDER, DEEDS, DEEDS_ERA } from '../src/sim/content/deeds';
 import { drownedLitanyChestItemsForTier } from '../src/sim/content/delves/drowned_litany_loot';
+import { delveChestItemsForTier } from '../src/sim/content/delves/lockpick_tiers';
 import { DELVE_MOBS } from '../src/sim/content/delves/mobs';
 import { DELVE_SHOPS } from '../src/sim/content/delves/shop';
 import { HEROIC_DUNGEON_TUNING } from '../src/sim/content/dungeon_difficulty';
@@ -1863,7 +1864,11 @@ describe('col_junk_drawer stays completable after the phase 11l trophy promotion
   // (allEpicGearIds), so it is invisible to the NPCS walk and can emit no
   // poor id. The rift clear pools (src/sim/rift/loot_pools.ts) derive from
   // tables the walk already covers: the five-man dungeon mob loot merged
-  // into MOBS, HEROIC_BOSS_LOOT, and RIFT_EPIC_ITEM_IDS.
+  // into MOBS, HEROIC_BOSS_LOOT, and RIFT_EPIC_ITEM_IDS. The Collapsed
+  // Reliquary chest table (delveChestItemsForTier, granted by
+  // src/sim/rift/runs.ts) is walked below beside the Litany table: the 11l
+  // QA found it neither walked nor named, gear-only today, so scope
+  // insurance rather than a live defect.
   const reachable = new Set<string>();
   const note = (itemId: string | null | undefined): void => {
     if (itemId && ITEMS[itemId]?.quality === 'poor') reachable.add(itemId);
@@ -1876,11 +1881,15 @@ describe('col_junk_drawer stays completable after the phase 11l trophy promotion
   for (const id of RIFT_EPIC_ITEM_IDS) note(id);
   for (const id of RIFT_LEGENDARY_ITEM_IDS) note(id);
   for (const id of RIFT_RARE_ITEM_IDS) note(id);
-  // The delve chest table is a function, not a list: every tier LootTier
-  // admits (the satisfies clause reds the moment the union grows), every
-  // class, both bountiful arms, under a stub rng pinned all-true and then
-  // all-false. Its header says exactly two chance draws per call, so the two
-  // stubs between them reach every branch and every id it can ever return.
+  // The two delve chest tables are functions, not lists: every tier LootTier
+  // admits (the satisfies clause reds the moment the union grows, under tsc,
+  // which the gate runs; a bare vitest run strips types), every class, both
+  // bountiful arms, under a stub rng pinned all-true and then all-false. The
+  // Litany header says exactly two chance draws per call, so the two stubs
+  // between them reach every id it can ever return (not every branch: the
+  // low tier pushes its second uncommon only on a mixed draw, and the medium,
+  // premium and bountiful arms push that id unconditionally, so the id set is
+  // complete while one branch is not visited).
   const LOOT_TIERS = Object.keys({
     premium: true,
     medium: true,
@@ -1892,6 +1901,9 @@ describe('col_junk_drawer stays completable after the phase 11l trophy promotion
         for (const always of [true, false]) {
           const rng = { chance: () => always } as unknown as Rng;
           for (const entry of drownedLitanyChestItemsForTier(tier, cls, rng, bountiful)) {
+            note(entry.itemId);
+          }
+          for (const entry of delveChestItemsForTier(tier, cls, rng, bountiful)) {
             note(entry.itemId);
           }
         }
