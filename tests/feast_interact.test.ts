@@ -49,7 +49,12 @@ describe('nearestInteractableFeast', () => {
     }
     // And the negative that keeps it honest: a placed object of the same kind
     // that is NOT a feast opens nothing.
-    const bed = entity({ id: 12, kind: 'object', templateId: 'farm_bed', pos: { x: 1, y: 0, z: 0 } });
+    const bed = entity({
+      id: 12,
+      kind: 'object',
+      templateId: 'farm_bed',
+      pos: { x: 1, y: 0, z: 0 },
+    });
     expect(nearestInteractableFeast(mapOf(bed), ORIGIN), 'a farm bed is not a feast').toBeNull();
   });
 
