@@ -203,28 +203,16 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.perf.diagnostics.metrics.hitchesBuild"
   ],
   "zh_CN": [
-    "entities.items.reins_rallycart_rxt.name",
-    "hudChrome.controller.crossHotbarPosition",
-    "hudChrome.mounts.desc_rallycart_rxt",
-    "hudChrome.mounts.name_rallycart_rxt"
+    "hudChrome.controller.crossHotbarPosition"
   ],
   "zh_TW": [
-    "entities.items.reins_rallycart_rxt.name",
-    "hudChrome.controller.crossHotbarPosition",
-    "hudChrome.mounts.desc_rallycart_rxt",
-    "hudChrome.mounts.name_rallycart_rxt"
+    "hudChrome.controller.crossHotbarPosition"
   ],
   "ko_KR": [
-    "entities.items.reins_rallycart_rxt.name",
-    "hudChrome.controller.crossHotbarPosition",
-    "hudChrome.mounts.desc_rallycart_rxt",
-    "hudChrome.mounts.name_rallycart_rxt"
+    "hudChrome.controller.crossHotbarPosition"
   ],
   "ja_JP": [
-    "entities.items.reins_rallycart_rxt.name",
-    "hudChrome.controller.crossHotbarPosition",
-    "hudChrome.mounts.desc_rallycart_rxt",
-    "hudChrome.mounts.name_rallycart_rxt"
+    "hudChrome.controller.crossHotbarPosition"
   ],
   "pt_BR": [
     "entities.items.reins_goblin_rocket_sled.name",
@@ -259,10 +247,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.perf.diagnostics.metrics.hitchesBuild"
   ],
   "ru_RU": [
-    "entities.items.reins_rallycart_rxt.name",
-    "hudChrome.controller.crossHotbarPosition",
-    "hudChrome.mounts.desc_rallycart_rxt",
-    "hudChrome.mounts.name_rallycart_rxt"
+    "hudChrome.controller.crossHotbarPosition"
   ],
   "cs_CZ": [
     "entities.items.reins_goblin_rocket_sled.name",

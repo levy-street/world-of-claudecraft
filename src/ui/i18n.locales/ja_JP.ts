@@ -9639,6 +9639,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.mounts.name_thunderstrut_gobbler': '大七面鳥サンダーストラット',
   'hudChrome.mounts.name_terrorspark_groundshaker': '地揺らしのテラースパーク',
   'hudChrome.mounts.name_goblin_rocket_sled': 'ゴブリンロケットそり',
+  'hudChrome.mounts.name_rallycart_rxt': 'ラリーカートRXT',
   'hudChrome.mounts.desc_valorsteed': '頑健で足取り確かな駿馬。移動速度を高める。',
   'hudChrome.mounts.desc_grag_bear': '頑健で足取り確かな熊。移動速度を高める。',
   'hudChrome.mounts.desc_stalkglider_snail': '粘り強くゆっくり燃えるカタツムリ。移動速度を高める。',
@@ -9653,6 +9654,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.mounts.desc_terrorspark_groundshaker':
     '重厚な履帯と大口径砲、恐れ知らずの操縦士向けの鞍を備えた小型装甲車両。',
   'hudChrome.mounts.desc_goblin_rocket_sled': '危険なほど過剰に組み上げられたゴブリンのそり。二基のロケットと最悪の判断力で突き進む。',
+  'hudChrome.mounts.desc_rallycart_rxt': '小型ながら本格的なラリーマシン。移動速度を高めてくれる。',
   'hudChrome.mounts.emptyTitle': 'マウントは未入手',
   'hudChrome.mounts.emptyStableHint':
     'レベル20に到達し、ハイウォッチ西の厩舎で厩舎長マーラの乗馬レッスンを受けましょう。',
@@ -10427,6 +10429,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.dungeons.the_last_keep.enterText': '最後の砦の冷たく静まり返った広間へ足を踏み入れた。',
   'entities.items.reins_terrorspark_groundshaker.name': 'テラースパークの始動キー',
   'entities.items.reins_goblin_rocket_sled.name': 'ゴブリンロケットそりの始動キー',
+  'entities.items.reins_rallycart_rxt.name': 'ラリーカートRXTの始動キー',
   'entities.dungeons.the_last_keep.leaveText': '砦の扉を閉め、ドレイクランドの風の中へ戻った。',
   'entities.dungeons.dawnhold_castle.name': 'ドーンホールド城',
   'entities.items.dawnhold_posy.name': 'ドーンホールド庭園の小さな花束',

@@ -9228,6 +9228,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.mounts.name_thunderstrut_gobbler': '雷霆阔步大火鸡',
   'hudChrome.mounts.name_terrorspark_groundshaker': '惊雷撼地者',
   'hudChrome.mounts.name_goblin_rocket_sled': '哥布林火箭雪橇',
+  'hudChrome.mounts.name_rallycart_rxt': '拉力卡丁车 RXT',
   'hudChrome.mounts.desc_valorsteed': '一匹坚韧稳健的骏马，可提升旅行速度。',
   'hudChrome.mounts.desc_grag_bear': '一头坚韧稳健的巨熊，可提升旅行速度。',
   'hudChrome.mounts.desc_stalkglider_snail': '一只坚毅耐久的蜗牛，可提升旅行速度。',
@@ -9242,6 +9243,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.mounts.desc_terrorspark_groundshaker':
     '一台紧凑的装甲机械，配备重型履带、大口径火炮，以及为无畏驾驶员打造的鞍座。',
   'hudChrome.mounts.desc_goblin_rocket_sled': '一辆结构过剩到危险的哥布林雪橇，靠双发火箭和极差的判断力推进。',
+  'hudChrome.mounts.desc_rallycart_rxt': '一辆小巧却地道的拉力赛车，能提升移动速度。',
   'hudChrome.mounts.emptyTitle': '尚未收集坐骑',
   'hudChrome.mounts.emptyStableHint': '升到20级，前往高望以西的马厩，向马厩总管玛拉学习骑术。',
   'hudChrome.mounts.emptyDropHint': '较稀有的坐骑由英雄地下城首领掉落或完成裂隙获得。',
@@ -9966,6 +9968,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'entities.dungeons.the_last_keep.enterText': '你踏入最后的堡垒那冰冷而寂静的大厅。',
   'entities.items.reins_terrorspark_groundshaker.name': '惊雷撼地者点火钥匙',
   'entities.items.reins_goblin_rocket_sled.name': '哥布林火箭雪橇点火钥匙',
+  'entities.items.reins_rallycart_rxt.name': '拉力卡丁车 RXT 点火钥匙',
   'entities.dungeons.the_last_keep.leaveText': '你带上堡门，重新走进龙裔荒原的寒风中。',
   'entities.dungeons.dawnhold_castle.name': '晨曦堡',
   'entities.items.dawnhold_posy.name': '晨曦堡花园小花束',
