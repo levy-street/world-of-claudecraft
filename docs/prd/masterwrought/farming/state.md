@@ -971,6 +971,17 @@ existing row that was wrong is AMENDED IN PLACE with a dated line rather than re
     every piece of machinery the feasts need, so minting them in 11h would ship three placeable
     entities no code can place; and at 125 the bill can take both tier-4 fine twins plus 11i's
     new high-band catch, the strongest R20 statement in the packet.
+    AMENDED 2026-08-24 (Phase 11k, as built). The GATE-E ruling itself HELD and was
+    vindicated twice over: 11i minted a feast anyway, against a different gate, and it
+    shipped unplaceable for exactly the reason recorded here. The CLOSING CLAUSE is
+    false and is corrected rather than left: the bill canNOT take both tier-4 fine
+    twins, and could not on the tree 11k inherited. A fine twin carries buyValue 320,
+    two of them are two crop families on a fish row, and produce 4 against one catch
+    breaks fish-forward, so the prescribed bill is refused three separate ways by rules
+    11h and 11i shipped after this line was written. The shipped bill takes ONE base
+    crop plus the whole high-band catch ladder, which is a stronger masterwrought R20
+    statement than the sentence promised: the band-5 salmon gates at proficiency 200
+    AND the tier-6 rod, so all three feasts pass through the master angler.
 51. 11h-GATE-F. DROPPED from 11h: 11g DECISION C owns recipe_seasoned_stock, and 11h takes the
     merged bill as given, re-derives the gold-negative arithmetic from it, and edits the row for
     nothing. WHY: exactly one phase may edit a choke point, 11g runs first, and 11g's bill is

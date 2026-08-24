@@ -14851,3 +14851,535 @@ them is "unchanged", which is a prediction and not a skip.
   and adds none. It moves item (8) from "handed back with two remedies" to
   "handed back with three remedies and the reason the next phase cannot route
   around it".
+
+## Phase 11k BUILT ledger (2026-08-24, the provisioning capstone)
+
+VERDICT: **BUILT**, all five deliverables, LOCAL, no push, no PR. Base tip
+5f087a6e2a, `git log --oneline 5f087a6e2a..HEAD`: the pre-flight record, the
+apex tier and its machinery, the deed, the wiki page, the eight files the phase
+battery could not see, the format pass, and the review fix round.
+
+THE PHASE IN ONE LINE: the capstone this phase was written to mint was already
+half-shipped as dead content, so what it actually does is retire that row, mint
+the tier properly on machinery that can place it, and fix a live mislabel it
+found on the way.
+
+### THE RULING THIS PHASE EXECUTES, AND WHO MADE IT
+
+The STEP 0 ledger above stopped at a blocker: 11i's `deepwater_feast` was this
+phase's stamina apex feast on every settled decision, and it was unplaceable.
+Three remedies were costed and handed back. **The maintainer ruled: do whatever
+is best for the feature.** Executed as CUT-AND-RE-MINT, and the grounds are the
+ones the costing already recorded:
+
+- FOLDING IT IN would have left the family with a non-uniform bill (its own is
+  all-fish where the tier's is produce, core and catch) and a non-uniform price
+  (250, the RARE party rung's own point, which decision K2's window excludes),
+  and its name names a water rather than the plate it serves, which is the one
+  thing decision K1 makes functional.
+- The id was branch-only and never shipped in a release, which is the ONE case
+  `src/sim/content/CLAUDE.md` permits an outright delete rather than a retire.
+- The cut's measured cost, the stranded band-5 salmon, is closed INSIDE this
+  phase's own bill rather than left open (below).
+
+### THE FIVE SETTLED DECISIONS, AS EXECUTED
+
+- **K1 (the placed-entity identity).** Executed, and WIDER than the file said.
+  Three new templateIds, one per role, all drawn with the shipped farm_feast
+  prop, all reached through one membership helper. But the template is now a
+  CONTENT field on `ItemDef.feast` rather than a constant in the behavior
+  module, which is what makes the family DERIVABLE: `feast.ts` walks ITEMS for
+  the payload and builds the set, so authoring a def joins every keyed site at
+  once and a fifth feast cannot be half-wired.
+  **THE PHASE FILE NAMED FOUR KEYED SITES AND THERE ARE FIVE**, plus one
+  contract comment. It missed `src/render/entity_labels.ts` (the site that
+  actually composes the world label's title) and `src/render/nameplate_view.ts`
+  (which owns the feast's own `INTERACT_RANGE + 1` hysteresis band), and it
+  double-counted `src/render/farm_patches.ts`, whose shadow-cap sweep iterates
+  an already-filtered map and compares no template at all. Left unrepointed, an
+  apex feast would have fallen through to `entity.name` and rendered the
+  placer's RAW name as its label, which is both the wrong title and an i18n
+  leak.
+  The two title composers now share one leaf, `src/ui/feast_title.ts`. ITS KEY
+  MAP IS HAND-LISTED, deliberately (a `t()` key built by template literal is
+  invisible to every static consumer, which this packet has paid for twice), so
+  authoring a feast def joins the DERIVED set everywhere at once and leaves that
+  map short. That is caught rather than trusted: the map is pinned exhaustively
+  in BOTH directions against the sim's own family, and the reverse half was
+  added at the review round after a reviewer showed a bogus key would otherwise
+  have labelled every farm bed as a feast.
+- **K2 (quality and price).** Executed. Quality epic. sellValue **300**,
+  DERIVED inside the binding window (strictly above the rare party feast at 250,
+  strictly below the epic permanent station at 380, a multiple of 10) by the one
+  reagent this tier adds that the party feast's bill does not carry: a Wyrmfall
+  Core at 50. 250 + 50 = 300, every input a shipped point off the merged table.
+  Gold-negative by 210 with the arithmetic printed at the row.
+  THE FILE'S OWN BOUNDS WERE RE-DERIVED RATHER THAN PASTED, per the brief's
+  correction 3, and they came back intact: harvest_feast is still rare at 250
+  and laden_hearth still epic at 380. What had moved was the thing sitting ON
+  the excluded bound, and this phase retired it.
+- **K3 (the storefront).** Executed as the CUT. No ACHIEVEMENT_MAP row in
+  server/steam/ or server/epic/, the epic_achievement_map pins unmoved at 84
+  (verified green, not assumed), no server/ file touched by this phase, and
+  privacy-security-review correctly not triggered. This ledger is the POINTER
+  to the packet-level record Phase 16 writes; it does not restate the reason.
+- **K4 (one live feast per placer).** Executed and pinned in BOTH directions:
+  an apex placement while a harvest_feast stands is refused, and the reverse,
+  each asserting the refusal reason AND that nothing was spent.
+- **K5 (charges and duration).** Executed at the rung below's own numbers,
+  charges 10 and durationTicks 3600, on all three.
+
+### THE BILL, AND WHY IT IS NOT THE BILL THE PHASE FILE PRESCRIBED
+
+**THE PRESCRIBED BILL IS ILLEGAL THREE WAYS ON THE MERGED TREE**, and this is
+the phase's largest deviation. The file called for both tier-4 FINE twins plus
+one high-band catch. Measured against the standing rules:
+
+1. The fish-forward rule (masterwrought R17) wants fish to OUTNUMBER produce on
+   any row carrying a raw catch. Two twins at 2 each is produce 4 against one
+   catch.
+2. At most ONE crop family may join a fish row. Two twins is two families.
+3. RULE 2's value half wants a crop's contribution at or below the row's
+   dominant non-produce reagent. A fine twin carries **buyValue 320**, which is
+   the brief's own correction 12 in a different form: the file says the twins
+   "carry no buyValue", and both carry 320. A single twin contributes 320 and
+   would need a 320-plus non-produce reagent beside it; only
+   `recipe_laden_hearth` reaches that, and it TIES.
+
+THE SHIPPED BILL, byte-identical across all three rows:
+
+| reagent | count | unit value | contribution |
+|---|---|---|---|
+| seasoned_stock | 3 | 30 | 90 |
+| wyrmfall_core | 1 | 50 | 50 |
+| evergarden_greens | 1 | 40 | 40 |
+| sunpetal_herb | 1 | 160 | 160 |
+| cooking_salt | 2 | 8 | 16 |
+| raw_deepbarb_catfish | 4 | 14 | 56 |
+| raw_hollowgill_sturgeon | 3 | 18 | 54 |
+| raw_stillmere_salmon | 2 | 22 | 44 |
+| **INPUT** | | | **510** vs output 300, gold-negative by 210 |
+
+Every count derived, and the precedent named at the row: seasoned_stock 3 is
+the capstone idiom both shipped stations take; wyrmfall_core 1 against their 2
+because a feast is spent per raid night where a station is permanent; the whole
+catch ladder at exactly the counts the retired row carried, which is
+masterwrought RULE 3 (no fish, herb, meat or salt count may be REDUCED
+anywhere) rather than sentiment; sunpetal_herb 1 and cooking_salt 2 for the
+same RULE 3 arithmetic.
+
+**THE CROP IS AT ONE RATHER THAN THE ACCENT CAP OF TWO, DELIBERATELY.** At 2 it
+contributes 80 against a count-reading reference of 56, so all three rows would
+have JOINED the census of what RULE 2's alternative reading refuses, taking that
+OPEN maintainer item from six entries across four rows to nine across seven. At
+1 it contributes 40 and clears BOTH readings. A content phase should not spend
+the maintainer's open items, so this phase leaves that decision exactly as
+expensive as it found it.
+
+**EIGHT REAGENT ENTRIES TIES recipe_laden_hearth** rather than beating it, and
+the tie is the design statement: the consumed provisioning capstone asks for as
+much as the permanent station does. The longest-bill pin now names all four
+holders, and its title no longer claims a sole one.
+
+### THE SIM WIDENING
+
+`placeFeastAction` takes the item id it is placing, defaulting to the party
+feast so the dedicated `place_feast` command's meaning is untouched (pinned in
+both directions: holding only an apex feast, the bare command refuses
+`no_feast`; holding both, it takes the party feast and leaves the apex copy).
+`FeastState` gained a transient `dishItemId` copied at placement, because the
+bite had no memory of which item was spent, and WITHOUT IT EVERY FEAST SERVES
+THE PARTY FEAST'S DISH. The phase file's Agent 1 brief widened the placement
+only and never mentioned `consumeFeastAction`, so its own acceptance criterion
+("a serving mints an aura IDENTICAL to eating that plate from bags") was
+unreachable as written. The field is sim-local: no save blob, no PlayerMeta, no
+wire field, so it is NOT the cross-platform change the Agent 3 CUT costs.
+
+No new command, no new wire arm, no new interaction surface, and the module
+still draws ZERO rng.
+
+THE TEARDOWN CLASS IS INHERITED AND ASSERTED BY BEHAVIOR, which the phase file
+calls the highest-risk detail in the slice: an apex feast placed inside a
+claimed dungeon instance and inside a delve run is torn down with the room, with
+the FeastState and the placer's one-active slot both reclaimed, and its
+membership on each roster asserted directly. `respawnTimer` Infinity,
+`lootable` false and `objectItemId` null are all pinned on an APEX feast.
+
+### THE LIVE DEFECT THIS PHASE FOUND
+
+**A CRAFTED HARVEST FEAST HAS BEEN READING "GATHERED BY" SINCE IT SHIPPED.**
+`mintsSignerPayload` stamps any output whose def quality is rare-or-better and
+is not a bag; harvest_feast is kind 'junk' AND quality 'rare', so a cook's own
+feast really is signed, and `isGatheredProvenanceKind` answers true for junk, so
+the tooltip called it gathered.
+
+The sweep that should have caught this had the feast on an exception list whose
+stated proof examined only the MASTERWORK signing channel ("a stat-less,
+slot-less def can never proc a signed masterwork instance"), which is true and
+irrelevant: the RARITY channel was never examined. That is the same shape as
+every other finding in this packet's record, a proof that covers one of two
+arms and is written as though it covered both.
+
+Fixed at the source rather than on the list: `isGatheredProvenance` carves out
+any def carrying a `feast` payload, because a feast is only ever crafted or
+traded for. Keyed on the payload rather than an id list, so every rung past and
+future is covered. Both rungs are pinned, so a revert reds on the SHIPPED item
+and not only on this phase's.
+
+### THE DEED
+
+`prog_field_to_feast`, category 'progression', renown 5, NO title, no border,
+appended at the tail under the three-tier ordering rule. It cannot be earned
+without touching both halves of the merged program, and that is structural: the
+bill names farm produce, a Wyrmfall Core from the rift, and all three high-band
+catches.
+
+The trigger is the shipped `{ kind: 'visit' }` family on a mark written at the
+SAME craft-credit arm that already writes craft_rare and the masterwork marks.
+The key is the fixed literal `apex_feast:crafted`, bounded rather than
+interpolated. The namespace is REGISTERED, which this packet has now paid for
+three times (gather_event, masterwork, farm_crop): an unregistered one
+serializes fine and is dropped on load, so the deed could never refill.
+
+THE DIGEST WAS RE-MINTED THE AUDITABLE WAY. The PRE-append row list was
+reconstructed first, with `feat_book_complete`'s live `deedIds` filtered back to
+its prior value, and it reproduced `2b6e36a4...` EXACTLY. Only then was the
+digest re-minted with the one appended tuple. That reconstruction is what
+distinguishes an append from an edit, and without it a re-mint proves nothing.
+
+### THE WIKI PAGE
+
+`/wiki/professions/provisioning`, a third FIXED page beside economy and faq
+because it is a narrative across professions rather than one craft's reference.
+Registered in `profPages`, so the sitemap loop and the head canonicalization
+came free; linked from the professions hub; its `GUIDE_PROF_PAGES` pin derived.
+
+NOTHING ON IT IS HAND-LISTED. The supplier map and the ladder are generated, and
+the supplier half reads the ONE shared authority the coverage guard reads.
+
+**THE SUPPLY DERIVATION MOVED OUT OF THE TEST INTO A PURE SIM LEAF**
+(`src/sim/professions/gathering_supply.ts`), and that is the phase's one
+structural change beyond the feast machinery. It lived in
+`tests/gathering_supply_coverage.test.ts` while the guard was its only reader.
+The page is a SECOND reader, and this packet's own recorded lesson is that a
+fixture driving a COPY of a rule proves nothing about the rule: a page built on
+a second implementation could tell a player one thing while the guard asserted
+another, both green. A MOVE, not a rewrite: every function kept its body, the
+guard's literals still pin the answers, and the move was re-proven by re-running
+11j QA's own anti-vacuity mutation against the relocated code (M7 below).
+
+TWO OF MY OWN PROSE CLAIMS WERE FALSE AND WERE CAUGHT BEFORE SHIPPING, which is
+worth recording because the packet's besetting defect is prose nobody ran. The
+intro said "four gathering lines" where FIVE feed cooking. And the market
+section's "every material here is ordinary tradable goods" is now a pinned
+assertion over the ids the page actually renders (no soulbound, no
+noMarketList), rather than a sentence nobody checked.
+
+A THIRD false claim was already in the SHIPPED wiki and this phase's own content
+falsified it: `craftProse.cooking.materialsBody` called The Laden Hearth "the
+longest bill in the game", which four rows now tie. Corrected in the English
+catalog and pinned BOTH ways (the live set is the four rows; the retired
+sole-holder sentence is pinned ABSENT).
+
+### PREDICTED THEN OBSERVED: EVERY RE-DERIVED PIN
+
+Each predicted from the change before the run, then observed.
+
+| pin | before | predicted | observed |
+|---|---|---|---|
+| ALL_RECIPES | 154 | 156 | 156 |
+| APEX_CONSUMABLE_RECIPES | 11 | 13 | 13 |
+| HEROIC_VENDOR_STOCK.length | 37 | 39 | 39 |
+| heroic vendor view rows | 37 | 39 | 39 |
+| heroic vendor non-gear rows | 27 | 29 | 29 |
+| PATTERN_PRICES rows | 18 | 20 | 20 |
+| APEX_PATTERN_PRICES | 8 | 11 | 11 |
+| ANGLER_PATTERN_PRICES | 4 | 3 | 3 |
+| angler [ring, neck] non-vacuity | [2,2] | [2,1] | [2,1] |
+| pattern universe (EVERY_PATTERN_ID) | 38 | 40 | 40 |
+| CONSUMABLE_PATTERN_IDS | 11 | 13 | 13 |
+| shipped kind-'recipe' defs | 38 | 40 | 40 |
+| drop-acquisition recipes | 38 | 40 | 40 |
+| ITEM_ART_PENDING (icons.ts) | 74 | 78 | 78 |
+| ITEM_ART_PENDING (item_icons exact set) | 74 | 78 | 78 |
+| pendingArtCount (scripts/) | 74 | 78 | 78 |
+| DISH_ICON_IDS family | 15 | 17 | 17 |
+| DEED_ORDER | 288 | 289 | 289 |
+| summed renown | 3285 | 3290 | 3290 |
+| progression category | 65 | 66 | 66 |
+| DEED_ORDER tail | col_farm_roster | prog_field_to_feast | prog_field_to_feast |
+| deed translation manifest | 288x2+45 | 289x2+45 | 623 |
+| deeds view visibleTotal | 275 | 276 | 276 |
+| deeds view bucket sum | 279 | 280 | 280 |
+| farming endgame cell (coverage guard) | 12 | 15 | 15 |
+| farming R20 endgame census (farm_recipes) | 17 | 20 | 20 |
+| consumable endgame consumers | 15 | 18 | 18 |
+| fishing line total demand | 77 | 95 | 95 |
+| catfish / sturgeon / salmon demand | 26 / 17 / 2 | 34 / 23 / 6 | 34 / 23 / 6 |
+| cooking_salt line | 39 | 43 | 43 |
+| sunpetal_herb line | 42 | 44 | 44 |
+| longest bill holders | 1 | 4 | 4 |
+| professions blob bytes | 16,877 | +47 = 16,924 | 16,924 |
+| GUIDE_PROF_PAGES | 17 | 18 | 18 |
+| REFUSED_ENDGAME_ROWS | 6 rows | UNCHANGED | unchanged |
+| per-family supply-size map | 6/6/6/10/24/13 | UNCHANGED | unchanged |
+| fine twin consumers (sunmelon / greens) | 2 / 3 | UNCHANGED | unchanged |
+| epic_achievement_map | 84 | UNCHANGED | unchanged |
+
+TWO OF THOSE PREDICTIONS ARE "UNCHANGED" ON PURPOSE, and the brief predicted
+otherwise. Its correction 6 lists the per-family supply-size map and
+`REFUSED_ENDGAME_ROWS` among the four pins this phase would move. Neither does:
+the map counts gathering MATERIALS and this phase mints none, and the refusal
+only drops rows whose result is a gathering TOOL, which no feast is. An
+"unchanged" prediction is still a prediction, and both were written before the
+run.
+
+THE BLOB BYTE DELTA WAS MEASURED, NOT INFERRED, per the brief's correction 9:
+minus `"recipe_deepwater_feast",` (25 bytes) plus three ids at 24 each is 47
+exactly, and the band's upper edge moved by that and no further, keeping the
+11-byte headroom for the third time.
+
+### THE MUTATION PROOFS: FIFTEEN RUN, FIFTEEN DEAD
+
+Every one applied to the real tree, PROVEN APPLIED by numstat before the run,
+then restored BY FILE COPY and verified by content compare plus a clean numstat.
+Never `git checkout`.
+
+| # | mutation | arm proven | outcome |
+|---|---|---|---|
+| M1 | the bite reads the module constant, not the placed dish | the whole tier's central claim | DEAD: "a bite from an apex feast mints the APEX plate aura" |
+| M2 | placement ignores the item id it was handed | the widening itself | DEAD: "an apex feast places through use_item" |
+| M3 | the family collapses to the party template | the catalog derivation | DEAD on both the sim and the title suites |
+| M4 | the deed predicate ignores the rung | the deed's discriminator | DEAD: "the PARTY feast earns neither the mark nor the deed" |
+| M5 | the apex_feast namespace is unregistered | the save/load round trip | DEAD: the mark is dropped on load |
+| M6 | the provenance carve-out is deleted | the live mislabel fix | DEAD on both feast rungs |
+| M7 | the MOVED derivation mis-maps a node profession | that the move did not blunt the guard | DEAD, naming the empty band |
+| M8 | one feast bill differs from its siblings | the uniform-bill rule | DEAD on the economy sweep |
+| M9 | the crop breaks the accent cap | standing RULE 2 | DEAD: "a crop is a seasoning and never the body, by COUNT" |
+| M10 | the band-5 salmon leaves every apex feast bill | the strand the cut would have caused | DEAD, naming the id with no consumer |
+| M11 | two feasts share one templateId | decision K1's rejected alternative | DEAD |
+| M11b | the same, against the SIM suite alone | the uniqueness pin specifically | DEAD: proven separately rather than assumed |
+| M12 | a feast template loses its title key | the exhaustiveness pin | DEAD |
+| M13 | the wiki page renders no suppliers | the page arm's non-vacuity | DEAD |
+| M14 | an apex feast skips the instance teardown roster | the highest-risk detail | DEAD: the entity outlives the room |
+
+THREE MORE AFTER THE REVIEW ROUND, run against the FIXED pins and each one a
+mutation that would have SURVIVED before it, which is what makes the four pin
+gaps repairs rather than reassurance:
+
+| # | mutation | arm proven | outcome |
+|---|---|---|---|
+| M15 | the logging supplier line is dropped from the generated data | the wiki page's line-set pin | DEAD (would have survived: the sweep looped four hand-picked ids) |
+| M16 | the herbalism line shrinks from three materials to one | the per-line size pins | DEAD (would have survived: the only floor was `> 0`) |
+| M17 | a non-feast template claims a feast title | the reverse-direction exhaustiveness pin | DEAD (would have survived: only the forward direction was pinned) |
+
+**EIGHTEEN RUN, EIGHTEEN DEAD.**
+
+M11b is worth a line: M11 died on the TITLE-key arm, which says nothing about
+whether the sim suite's uniqueness pin bites. A pin that never fires is the
+vacuity trap this packet keeps finding, so it was proven on its own rather than
+credited to a sibling's red.
+
+M17's restore left a residual numstat and that is recorded rather than glossed:
+the file carried UNCOMMITTED work at the time (the new exhaustiveness export),
+so the restore returned it to the working-tree state it was taken from, which
+the harness verified by content compare. A residual is only a failure when the
+backup and the restored file differ, and they did not.
+
+### THE REVIEW ROUND: THREE FRESH READERS, EVERY FINDING APPLIED
+
+Content obligations, the sim seam and pin quality each read the whole diff as
+unreviewed code. TWO BLOCKING, seven should-fix, eight nits, all applied in one
+commit, with a FOURTH fresh reader over the fix diff afterwards because in this
+packet every fix round has shipped a defect of its own.
+
+**THE ONE A PLAYER WOULD HAVE SEEN.** The deed's own description read "Cook an
+apex Harvest Feast", and no such item exists: the three outputs are the
+Stonepot, Warspice and Sageleaf Feasts, and Harvest Feast is the RARE PARTY RUNG
+one below. The deed named the wrong item, in player-visible English, in exactly
+the way this phase's own decision K1 exists to prevent. Found by the content
+reviewer, not by the suite: no test reads a deed desc.
+
+**TWO FALSE COMMENTS, BOTH MINE, both the packet's besetting defect.**
+- The coverage guard's re-pin said the three feasts "each name both tier-4 fine
+  twins". They name the BASE crop, and the bill's own header two files over
+  records why a fine twin is illegal on a fish row. I wrote that comment before
+  the bill was re-derived and never went back. A reader repairing the pin would
+  have hunted a reagent that is not in the row.
+- `feast.ts` claimed all six keyed sites "read the helpers rather than a string
+  literal", so authoring a def joins them all at once. The two TITLE composers
+  reach the family through a hand-listed key map, so a new def joins the derived
+  set and leaves that map short. Corrected, with the caveat and its guard named.
+  The same comment also counted `farm_patches.ts` as two keyed sites where the
+  shadow-cap sweep iterates an already-filtered map and compares no template, so
+  "six" was inflated by one. It reads FIVE keyed sites plus one contract comment
+  now.
+
+**THE NAMING AUDIT WAS OWED IN THIS CHANGE AND WAS NOT WRITTEN.** The IP rule
+wants the check to land with the name. The three verdicts are recorded now with
+their evidence (one search covers all three: each compounds a plate name already
+audited and accepted at Phase 10 with the mechanic word this packet owns, so the
+question is the compound, not the token), and the registry has its row. The
+retired Deepwater Feast row is KEPT rather than deleted, so the name is not
+re-coined and its neighbour search is not re-run.
+
+**FOUR PIN GAPS, each closed and then PROVEN by a mutation that would have
+survived before the fix.** The title map's reverse direction was unpinned (a key
+for a non-feast template would have labelled every farm bed as a feast, green);
+the wiki page's supplier sweep looped four hand-picked lines and never touched
+logging; its non-vacuity floor sat at 10 against a real population of 36; and
+the apex bite's magnitude was a constant self-comparison, the trap this file's
+own sibling five lines down already mitigates correctly.
+
+**AND ONE PIN IS NOW HONEST ABOUT BEING A TRIPWIRE.** The page's spoiler sweep
+is structurally unreachable: it renders only cooking material names, cooking
+output names and fixed prose, so no boss or instance name can appear whatever
+the generator does. It keeps its four negatives as a tripwire against a future
+widening of the page, and it now carries a POSITIVE CONTROL proving the matcher
+would see such a token if one appeared. A negative pin over a never-present
+token, with nothing showing the check works, is the decorative-pin class.
+
+REFUTED, recorded so it is not re-raised: the content reviewer read the
+`liveItemCount` comment as possibly stale. It is correct (six defs minted minus
+two deleted is plus four live, and the debt term moved by the same four, so
+defs-minus-debt holds at 922, which the audit's own assertion confirms); the
+WORDING was ambiguous because "net plus four" is true of both terms and they are
+different sums, so the arithmetic is spelled out now rather than the pin moved.
+
+### THE FULL SUITE FOUND EIGHT FILES THE PHASE BATTERY COULD NOT
+
+The first full run after the tier landed was EXIT=1, **eight files and ten tests
+red, every one outside the curated battery that had been green all day.** The
+recorded lesson landing again, exactly: a content id ripples past its phase's
+tests, every time.
+
+The one worth naming is `pendingArtCount` in `scripts/item_art_audit.mjs`, the
+third art-debt term, the only one outside `tests/` and reached through
+`execFileSync`, so no `vitest related` selection can ever point at it. It was
+PREDICTED in the brief and it still had to be found by the full suite, which is
+the honest measure of how little a prediction buys without the run.
+
+The others: farming's R20 endgame census and its two sub-clauses, the party
+feast's own payload pin, the drop-recipe partition and the kind-'recipe' sweep
+floor, three separate deed counts in three files, the bag-filter All-only
+census, the material taxonomy allowlist, and M16's fifteen guide keys.
+
+### RELEASE-FILL AND i18n EXPOSURE
+
+- All six new item ids and the three new placed-entity title keys carry their
+  five non-Latin fills, authored by COMPOUNDING each locale's shipped tokens
+  (the plate names and the feast word were looked up per locale rather than
+  coined, per the 11i QA's own fill lesson).
+- The wiki page's fifteen prose keys carry their five fills too.
+- **THE SIX LINE-LABEL KEYS THE PAGE FIRST MINTED WERE RETIRED BEFORE SHIPPING.**
+  Five of them duplicated `hudChrome.gathering.*` names every locale already
+  carries, which is six rows of translation debt to say what the catalog says
+  and a second place for two copies of a label to disagree. Only corpse
+  harvesting keeps a key, because it is a gathering FAMILY without being a
+  PROFESSION and has no shipped name to borrow. The repo's own
+  `guide_key_coverage` guard is what caught the mining label rendering nowhere.
+- **ONE REWORD EXPOSURE IS RECORDED RATHER THAN FIXED**, because no gate can see
+  it: `guide.profPages.craftProse.cooking.materialsBody` was reworded (the
+  longest-bill correction plus the apex feast paragraph), and a reword leaves a
+  translated row translated, so the five non-Latin overlays now carry prose that
+  predates this tier. That key was ALREADY on the release-fill worklist twice
+  from 11i, so this adds staleness to a tracked row rather than a new one.
+
+### DEVIATIONS FROM THE PHASE FILE, each recorded rather than silent
+
+1. **THE BILL IS NOT THE PRESCRIBED BILL.** Illegal three ways; re-derived
+   above. This is the phase's largest deviation and the reasoning is at the row.
+2. **FIVE KEYED SITES, NOT FOUR.** Two the file never named, one of which is
+   the site that actually composes the title; and one it double-counted. The
+   arithmetic went four, then briefly six (my own miscount, caught at the review
+   round), then five.
+3. **`consumeFeastAction` NEEDED WIDENING TOO**, which the Agent 1 brief did not
+   mention and without which its own acceptance criterion is unreachable.
+4. **THE TEMPLATE IS A CONTENT FIELD**, not a constant in the behavior module.
+   The file's "export the membership from feast.ts" would have put three content
+   ids in a behavior module; deriving from the catalog is what makes a fifth
+   feast impossible to half-wire rather than merely inconvenient.
+5. **THE SUPPLY DERIVATION MOVED** into a sim leaf so the page and the guard
+   share one authority. Not in the file; forced by the page's data needs.
+6. **THE SHIPPED-ID GOLDEN WAS NOT RE-MINTED**, ratifying the same call 11e
+   through 11j made. Open item (10), unchanged.
+7. **A LIVE DEFECT WAS FIXED IN PASSING** (the "Gathered by" mislabel on the
+   shipped party feast). Out of the phase's stated scope, in scope for not
+   shipping three more instances of it.
+
+### OPEN ITEMS, ALL THE MAINTAINER'S
+
+The twelve carried in are unchanged and NOT re-decided here, EXCEPT that item
+(8), the `deepwater_feast` FIX-or-CUT, is now **CLOSED**: the maintainer ruled,
+and this phase executed the CUT. The count is therefore **ELEVEN**: the three
+inherited (scroll/elixir 15c parity, RULE 2's value-half reading, the inherited
+stale-client window), 11h's two deviations, 11i's session cap 15 s to 16 s,
+`prog_first_harvest` taking 13 catches, the DECISION-A contradiction (the apex
+hoe's acquisition channel), the shipped-id golden policy, decision D's band
+scope, and the reworded wiki key's five stale non-Latin fills (to which this
+phase adds a second reworded key, recorded above).
+
+This phase adds NO new open item. Where it could have added one, it chose the
+option that closes rather than opens: the crop count at 1 keeps RULE 2's open
+reading exactly as cheap to settle as it was.
+
+### THE REJECTION LIST, AS RECORDED DESIGN
+
+- Folding `deepwater_feast` in as the stamina rung. Costed and refused above.
+- A fine twin on the apex feast bill. Structurally impossible under RULE 2's
+  value half without a 320-plus non-produce reagent, and the only row that
+  reaches one TIES, which is already resting on an open reading.
+- The crop at the accent cap of 2. Legal, and refused because it would have
+  grown an open maintainer item by three rows.
+- A distinct apex feast prop, a role-pick interaction at the table, raid-scale
+  charges, a second oncePerDay row, any power on the deed, differentiated feast
+  bills: all inherited from the phase file's own list and none re-proposed.
+- Minting six one-word line-label keys on the wiki page when the catalog
+  already ships five of them.
+
+### THE HANDOFF TO PHASE 11k QA
+
+- **THE PHASE FILE IS THE LEAST RELIABLE DOCUMENT IN THE ROOM, and this is the
+  first phase where that was true of its CENTRAL deliverable rather than its
+  edges.** It was written 2026-08-20; 11i shipped its stamina rung on 2026-08-23
+  and 11j moved the rules its bill has to satisfy. Three of its own settled
+  instructions were unfollowable as written (the bill, the four keyed sites, the
+  placement-only widening). A QA that grades this phase against the file rather
+  than against the tree will grade it wrong in three places, and each deviation
+  is recorded with its measurement at the row.
+- **RE-DERIVE THE BILL AGAINST THE STANDING RULES, not against the ledger.** The
+  fish-forward rule, the one-crop-family rule and both halves of RULE 2 are live
+  guards, and the crop sits at 1 rather than the cap of 2 for a reason that is a
+  MAINTAINER-ITEM argument rather than a balance one: at 2 the rows would join
+  the census of what RULE 2's alternative reading refuses. If a QA re-tunes that
+  count, it should know it is spending an open decision.
+- **THE PROSE CHECK IS WHERE THIS PACKET KEEPS PAYING, and it paid three times
+  here.** A false deed description, a false coverage comment and a false
+  feast.ts comment, none of them reachable by any test. Two were mine and were
+  written while correcting something else. Grep every claim before believing it,
+  including the ones in the ledger above.
+- **THE THIRD ART-DEBT TERM IS STILL THE ONE TO WATCH.** `pendingArtCount` in
+  `scripts/item_art_audit.mjs` is invisible to `vitest related` and was predicted
+  in this phase's own brief and STILL had to be found by the full suite. Run the
+  full suite on a tree nobody is editing before believing a content change is
+  done.
+- **THE REWORD EXPOSURE IS TRACKED, NOT FIXED.**
+  `guide.profPages.craftProse.cooking.materialsBody` was reworded (the
+  longest-bill correction and the apex feast paragraph), and a reword leaves a
+  translated row translated, so every non-English bundle now carries prose that
+  predates this tier. The re-key remedy 11i used is UNAVAILABLE here: that key's
+  path is built by template literal (`craftProse.${craftId}.${slot}Body`), which
+  11i QA already recorded as the boundary of that remedy. The key was already on
+  the release-fill worklist twice from 11i, so this adds staleness to a tracked
+  row rather than a new one.
+- **ELEVEN OPEN ITEMS, DOWN FROM TWELVE.** Item (8), the deepwater_feast
+  FIX-or-CUT, is CLOSED by the maintainer's ruling and this phase's execution.
+  Nothing else moved, and this phase adds none. Where it could have added one it
+  chose the option that closes: the crop count at 1.
+- **WHAT A QA SHOULD MUTATE FIRST.** The eighteen dead mutations are listed
+  above; the three most recent exist because a pin auditor named the gaps a
+  mutation run would NOT have found, which is the honest limit of a mutation
+  battery: it only points where you already suspect. The pins nothing in this
+  diff points a mutation at are the generated wiki data (a line leaving, a line
+  shrinking) and the hand-listed title-key map, and all three are closed now.
+  The next reader should ask the same question of whatever it adds.
