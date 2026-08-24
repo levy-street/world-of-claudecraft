@@ -264,36 +264,50 @@ describe('THE ECONOMY INVARIANT', () => {
     // and the live flag has ONE mint, the `state.isJackOfAllTrades = true`
     // inside attuneJackOfAllTrades. Read in a loop: a persisted true needs a
     // live true, a live true needs the mint, the mint needs a caller, and
-    // the caller list is empty. So the scan pins exactly two writes of true
-    // (`isJackOfAllTrades = true` or `isJackOfAllTrades: true`, comments
-    // stripped) across the three roots: the mint inside the
-    // attuneJackOfAllTrades body, and the serializer's re-emit, which must
-    // keep its `state.isJackOfAllTrades ?` guard (an unconditional
+    // the caller list is empty. So the scan classifies EVERY write to the flag
+    // across the three roots (comments stripped) and pins exactly three, each
+    // a named link of that loop and each anchored to its site: the mint
+    // inside the attuneJackOfAllTrades body; the serializer's re-emit, which
+    // must keep its `state.isJackOfAllTrades ?` guard (an unconditional
     // projection would mint a true through the hydrate arm on the next
-    // load). The `=== true` read in the hydrate arm and the `: false`
-    // literals in src/net/online.ts and
-    // src/ui/hud/quest/quest_dialog_controller.ts are not writes of true and
-    // never match. Any ASSIGNMENT to the flag (bare, ||= or ??=, whatever the
-    // right-hand side) and any literal-true object member (plain or quoted
-    // computed key), in any root, is a new mint and reds here; a key built at
-    // runtime is the one spelling no static scan can see, which is why the
-    // caller scan above stays the primary guard. The walk is .ts-only through
-    // tsFilesUnder; the Svelte files under src/admin cannot reach
-    // ArchetypeState.
+    // load); and the hydrate arm itself inside normalizeArchetypeState, whose
+    // right-hand side must be EXACTLY
+    // `state.activeArchetype === null && saved.isJackOfAllTrades === true;`
+    // (a longer disjunction there would be a second door, so the arm is
+    // matched whole, never by substring). A write is any assignment to the
+    // flag (bare, ||= or ??=, plain or bracket access, whatever the
+    // right-hand side) and any object member (plain or quoted computed key,
+    // whatever the value); a right-hand side that is the literal false and
+    // nothing else (a reset, a default parameter, the empty state) is the one
+    // write skipped, and `false || true` is not that. A key built at runtime
+    // is the one spelling no static scan can see, which is why the caller
+    // scan above stays the primary guard.
     const FLAG_WRITE =
-      /\bisJackOfAllTrades\s*(?:\|\|=|\?\?=|=(?!=))|\bisJackOfAllTrades(?:["']\])?\s*:\s*true\b/g;
+      /\bisJackOfAllTrades(?:["']\])?\s*(?:\|\|=|\?\?=|=(?!=))|\bisJackOfAllTrades(?:["']\])?\s*:(?!:)/g;
     const GUARDED_RE_EMIT = /state\.isJackOfAllTrades\s*\?\s*\{\s*isJackOfAllTrades:\s*true\s*\}/;
+    const HYDRATE_RHS = 'state.activeArchetype === null && saved.isJackOfAllTrades === true;';
+    const FALSE_ONLY = /^false[\s,;)}]*$/;
     // The predicate's own controls, so a regex edit cannot quietly widen or
-    // narrow what counts as a write: every assignment spelling and both
-    // literal-true member spellings match, the comparison and the optional
-    // type member do not.
+    // narrow what counts as a write: every assignment spelling and every
+    // member spelling match, the comparison, the optional type member and the
+    // declared type do not; the false skip clears a bare false and nothing
+    // longer; the hydrate key refuses a longer disjunction.
     expect('state.isJackOfAllTrades = true;'.match(FLAG_WRITE)).not.toBeNull();
     expect('state.isJackOfAllTrades = ok;'.match(FLAG_WRITE)).not.toBeNull();
     expect('state.isJackOfAllTrades ||= true;'.match(FLAG_WRITE)).not.toBeNull();
+    expect('state.isJackOfAllTrades ??= true;'.match(FLAG_WRITE)).not.toBeNull();
+    expect("state['isJackOfAllTrades'] = true;".match(FLAG_WRITE)).not.toBeNull();
     expect('{ isJackOfAllTrades: true }'.match(FLAG_WRITE)).not.toBeNull();
+    expect('{ isJackOfAllTrades: flag }'.match(FLAG_WRITE)).not.toBeNull();
     expect('{ ["isJackOfAllTrades"]: true }'.match(FLAG_WRITE)).not.toBeNull();
+    expect("{ ['isJackOfAllTrades']: true }".match(FLAG_WRITE)).not.toBeNull();
     expect('saved.isJackOfAllTrades === true'.match(FLAG_WRITE)).toBeNull();
     expect('isJackOfAllTrades?: true;'.match(FLAG_WRITE)).toBeNull();
+    expect('isJackOfAllTrades?: boolean;'.match(FLAG_WRITE)).toBeNull();
+    expect(FALSE_ONLY.test('false,')).toBe(true);
+    expect(FALSE_ONLY.test('false || true;')).toBe(false);
+    expect(FALSE_ONLY.test('false ?? flag')).toBe(false);
+    expect(`${HYDRATE_RHS.slice(0, -1)} || questJack;`).not.toBe(HYDRATE_RHS);
     const declaringModule = 'sim/professions/archetype.ts';
     const callers: string[] = [];
     let declared = false;
@@ -309,23 +323,28 @@ describe('THE ECONOMY INVARIANT', () => {
           : -1;
         const attuneEnd = attuneStart === -1 ? -1 : code.indexOf('\n}', attuneStart);
         const guard = isDeclaring ? GUARDED_RE_EMIT.exec(code) : null;
+        const hydrateStart = isDeclaring
+          ? code.indexOf('export function normalizeArchetypeState(')
+          : -1;
+        const hydrateEnd = hydrateStart === -1 ? -1 : code.indexOf('\n}', hydrateStart);
         for (const write of code.matchAll(FLAG_WRITE)) {
           const at = write.index;
           const after = at + write[0].length;
-          // The assignment arm carries its right-hand side after the match;
-          // the member arm already consumed its literal true.
-          const rhs = write[0].includes(':')
-            ? 'true'
-            : code.slice(after, code.indexOf('\n', after)).trim();
-          // A write of the literal false (the requiredReagentCountFor default
-          // parameter in crafting.ts, a reset) can never mint a Jack.
-          if (/^false\b/.test(rhs)) continue;
+          // Both arms carry their value after the match: the rest of the line,
+          // read to the end of the file when the line is the last one.
+          const eol = code.indexOf('\n', after);
+          const rhs = code.slice(after, eol === -1 ? undefined : eol).trim();
+          // A right-hand side that is the literal false and nothing else (the
+          // requiredReagentCountFor default parameter in crafting.ts, the
+          // empty archetype state, the two client `: false` literals) can
+          // never mint a Jack; anything longer is classified like any write.
+          if (FALSE_ONLY.test(rhs)) continue;
           const kind =
             attuneStart !== -1 && at > attuneStart && at < attuneEnd
               ? 'attune'
               : guard !== null && at >= guard.index && at < guard.index + guard[0].length
                 ? 'serializer'
-                : isDeclaring && rhs.includes('saved.isJackOfAllTrades === true')
+                : hydrateStart !== -1 && at > hydrateStart && at < hydrateEnd && rhs === HYDRATE_RHS
                   ? 'hydrate'
                   : 'other';
           trueWrites.push(`${kind}@${root}/${file}`);
@@ -343,11 +362,13 @@ describe('THE ECONOMY INVARIANT', () => {
     // result, not a missed root.
     expect(declared).toBe(true);
     expect(callers).toEqual([]);
-    // Three writes, each a named link of the closed circuit: the mint in the
-    // attune body, the serializer's guarded re-emit, and the hydrate arm's
-    // assignment, whose right-hand side is `saved.isJackOfAllTrades === true`
-    // and so can only carry a true the serializer already wrote. A fourth
-    // entry, or one of these three reading `other`, is a new door.
+    // Three writes, each a named link of the closed circuit and each anchored
+    // to its site: the mint in the attune body, the serializer's guarded
+    // re-emit, and the hydrate arm inside normalizeArchetypeState, whose
+    // right-hand side is exactly HYDRATE_RHS and so can only carry a true the
+    // serializer already wrote. A fourth entry, or one of these three reading
+    // `other` (a moved arm, a widened disjunction, a dropped guard), is a new
+    // door.
     expect(trueWrites.sort()).toEqual([
       'attune@src/sim/professions/archetype.ts',
       'hydrate@src/sim/professions/archetype.ts',

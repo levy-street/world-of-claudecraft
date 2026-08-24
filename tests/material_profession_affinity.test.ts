@@ -85,7 +85,8 @@ describe('craftIdsForMaterialItem', () => {
     expect(craftIdsForMaterialItem('emberwing_cinderscale')).toEqual(['leatherworking']);
     expect(craftIdsForMaterialItem('old_cragmaws_pelt')).toEqual(['leatherworking']);
     // Poor trash again: craftIdsForMaterialItem derives purely from recipe
-    // and enchant reagents, and no recipe consumes the tusk, so no craft.
+    // and enchant reagents, and neither a recipe nor an enchant consumes the
+    // tusk, so no craft.
     expect(craftIdsForMaterialItem('chipped_tusk')).toEqual([]);
   });
 
