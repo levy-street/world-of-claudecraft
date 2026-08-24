@@ -1237,7 +1237,7 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'hudChrome.bags.noQuestItems': 'Geen questvoorwerpen in je tassen.',
   'hudChrome.bank.cannotDepositNow': 'Kan nu niet worden gestort',
   'hudChrome.bank.depositAllTooltip':
-    'Stuurt in één keer elk ambachtsreagens en rommelvoorwerp uit je tassen naar de bank. Verzamelgereedschap, gedragen uitrusting, questvoorwerpen en verbruiksartikelen worden nooit aangeraakt.',
+    'Stuurt in één keer elk ambachtsreagens uit je tassen naar de bank. Verzamelgereedschap, gedragen uitrusting, questvoorwerpen, verbruiksartikelen en grijze voorwerpen worden nooit aangeraakt.',
   'hudChrome.bank.guildBuyConfirm':
     '{count} extra gildebankvakken kopen voor {price} uit de gildekas?',
   'hudChrome.bank.guildBuyNote': 'Betaald uit de gildekas',

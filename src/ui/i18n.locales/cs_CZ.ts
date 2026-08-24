@@ -1237,7 +1237,7 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'hudChrome.bags.noQuestItems': 'V batozích nemáš žádné úkolové předměty.',
   'hudChrome.bank.cannotDepositNow': 'Teď nelze uložit',
   'hudChrome.bank.depositAllTooltip':
-    'Pošle všechny řemeslné suroviny a odpadní předměty z tvých batohů do banky najednou. Sběrných nástrojů, nasazené výbavy, úkolových předmětů a spotřebních předmětů se nikdy nedotkne.',
+    'Pošle všechny řemeslné suroviny z tvých batohů do banky najednou. Sběrných nástrojů, nasazené výbavy, úkolových předmětů, spotřebních předmětů a šedých předmětů se nikdy nedotkne.',
   'hudChrome.bank.guildBuyConfirm':
     'Koupit {count} dalších slotů cechovní banky za {price} z cechovní pokladny?',
   'hudChrome.bank.guildBuyNote': 'Placeno z cechovní pokladny',

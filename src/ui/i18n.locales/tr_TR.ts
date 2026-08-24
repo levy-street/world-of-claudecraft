@@ -1225,7 +1225,7 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.bags.noQuestItems': 'Çantalarında görev eşyası yok.',
   'hudChrome.bank.cannotDepositNow': 'Şu anda yatırılamaz',
   'hudChrome.bank.depositAllTooltip':
-    'Çantalarındaki tüm zanaat malzemelerini ve döküntü eşyaları tek seferde bankaya gönderir. Toplama aletlerine, kuşanılan teçhizata, görev eşyalarına ve sarf malzemelerine asla dokunulmaz.',
+    'Çantalarındaki tüm zanaat malzemelerini tek seferde bankaya gönderir. Toplama aletlerine, kuşanılan teçhizata, görev eşyalarına, sarf malzemelerine ve gri eşyalara asla dokunulmaz.',
   'hudChrome.bank.guildBuyConfirm':
     'Lonca hazinesinden {price} karşılığında {count} ek lonca bankası yuvası satın alınsın mı?',
   'hudChrome.bank.guildBuyNote': 'Lonca hazinesinden ödenir',

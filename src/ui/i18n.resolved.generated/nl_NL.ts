@@ -3020,7 +3020,7 @@ export const nl_NL: EnTranslations = {
       "sortAria": "Bankvoorwerpen sorteren",
       "searchAria": "Bankvoorwerpen zoeken op naam",
       "depositAll": "Alle materialen storten",
-      "depositAllTooltip": "Stuurt in één keer elk ambachtsreagens en rommelvoorwerp uit je tassen naar de bank. Verzamelgereedschap, gedragen uitrusting, questvoorwerpen en verbruiksartikelen worden nooit aangeraakt.",
+      "depositAllTooltip": "Stuurt in één keer elk ambachtsreagens uit je tassen naar de bank. Verzamelgereedschap, gedragen uitrusting, questvoorwerpen, verbruiksartikelen en grijze voorwerpen worden nooit aangeraakt.",
       "depositAllDone": "Materialen gestort: {count}.",
       "depositAllFull": "Materialen gestort: {count}. De bank is nu vol.",
       "depositAllNone": "Bank vol: niets gestort.",

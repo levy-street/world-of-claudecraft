@@ -1255,7 +1255,7 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.bags.noQuestItems': 'Aucun objet de quête dans vos sacs.',
   'hudChrome.bank.cannotDepositNow': 'Ne peut pas être déposé maintenant',
   'hudChrome.bank.depositAllTooltip':
-    "Envoie en un seul geste tous les réactifs d'artisanat et objets de rebut de vos sacs vers la banque. Les outils de récolte, l'équipement porté, les objets de quête et les consommables ne sont jamais touchés.",
+    "Envoie en un seul geste tous les réactifs d'artisanat de vos sacs vers la banque. Les outils de récolte, l'équipement porté, les objets de quête, les consommables et les objets gris ne sont jamais touchés.",
   'hudChrome.bank.guildBuyConfirm':
     'Acheter {count} emplacements de banque de guilde supplémentaires pour {price}, prélevés sur la trésorerie de la guilde ?',
   'hudChrome.bank.guildBuyNote': 'Payé depuis la trésorerie de la guilde',

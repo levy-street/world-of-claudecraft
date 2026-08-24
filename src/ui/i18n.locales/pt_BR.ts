@@ -1249,7 +1249,7 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.bags.noQuestItems': 'Nenhum item de missão em suas bolsas.',
   'hudChrome.bank.cannotDepositNow': 'Não pode ser depositado agora',
   'hudChrome.bank.depositAllTooltip':
-    'Envia todos os reagentes de criação e itens cinza das suas bolsas para o banco em uma única viagem. Ferramentas de coleta, itens equipados, itens de missão e consumíveis nunca são tocados.',
+    'Envia todos os reagentes de criação das suas bolsas para o banco em uma única viagem. Ferramentas de coleta, itens equipados, itens de missão, consumíveis e itens cinza nunca são tocados.',
   'hudChrome.bank.guildBuyConfirm':
     'Comprar {count} espaços adicionais do banco da guilda por {price} da tesouraria da guilda?',
   'hudChrome.bank.guildBuyNote': 'Pago pela tesouraria da guilda',

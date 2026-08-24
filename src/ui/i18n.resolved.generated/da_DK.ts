@@ -3020,7 +3020,7 @@ export const da_DK: EnTranslations = {
       "sortAria": "Sortér bankens genstande",
       "searchAria": "Søg i bankens genstande efter navn",
       "depositAll": "Indsæt alle materialer",
-      "depositAllTooltip": "Sender alle håndværksmaterialer og skrammelgenstande fra dine tasker til banken på én gang. Indsamlingsværktøjer, udrustet udstyr, opgavegenstande og forbrugsvarer røres aldrig.",
+      "depositAllTooltip": "Sender alle håndværksmaterialer fra dine tasker til banken på én gang. Indsamlingsværktøjer, udrustet udstyr, opgavegenstande, forbrugsvarer og grå genstande røres aldrig.",
       "depositAllDone": "Materialer indsat: {count}.",
       "depositAllFull": "Materialer indsat: {count}. Banken er nu fuld.",
       "depositAllNone": "Banken er fuld: intet indsat.",

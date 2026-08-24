@@ -3020,7 +3020,7 @@ export const pl_PL: EnTranslations = {
       "sortAria": "Sortuj przedmioty w banku",
       "searchAria": "Szukaj przedmiotów w banku po nazwie",
       "depositAll": "Zdeponuj wszystkie materiały",
-      "depositAllTooltip": "Wysyła każdy reagent rzemieślniczy i przedmiot tandetny z twoich toreb do banku za jednym razem. Narzędzia do zbieractwa, założony ekwipunek, przedmioty zadań i przedmioty konsumpcyjne nigdy nie są ruszane.",
+      "depositAllTooltip": "Wysyła każdy reagent rzemieślniczy z twoich toreb do banku za jednym razem. Narzędzia do zbieractwa, założony ekwipunek, przedmioty zadań, przedmioty konsumpcyjne i szare przedmioty nigdy nie są ruszane.",
       "depositAllDone": "Zdeponowane materiały: {count}.",
       "depositAllFull": "Zdeponowane materiały: {count}. Bank jest teraz pełny.",
       "depositAllNone": "Bank pełny: niczego nie zdeponowano.",

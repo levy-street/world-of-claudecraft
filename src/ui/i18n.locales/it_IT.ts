@@ -1257,7 +1257,7 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'hudChrome.bags.noQuestItems': 'Nessun oggetto missione nelle tue borse.',
   'hudChrome.bank.cannotDepositNow': 'Al momento non depositabile',
   'hudChrome.bank.depositAllTooltip':
-    'Invia in banca in un solo viaggio ogni reagente di fabbricazione e oggetto di scarto dalle tue borse. Strumenti di raccolta, equipaggiamento indossato, oggetti missione e consumabili non vengono mai toccati.',
+    'Invia in banca in un solo viaggio ogni reagente di fabbricazione dalle tue borse. Strumenti di raccolta, equipaggiamento indossato, oggetti missione, consumabili e oggetti grigi non vengono mai toccati.',
   'hudChrome.bank.guildBuyConfirm':
     'Acquistare {count} spazi aggiuntivi della banca della gilda per {price} dalla tesoreria della gilda?',
   'hudChrome.bank.guildBuyNote': 'Pagato dalla tesoreria della gilda',

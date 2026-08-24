@@ -3020,7 +3020,7 @@ export const es: EnTranslations = {
       "sortAria": "Ordenar los objetos del banco",
       "searchAria": "Buscar objetos del banco por nombre",
       "depositAll": "Depositar todos los materiales",
-      "depositAllTooltip": "Envía al banco de una vez todos los reactivos de fabricación y objetos de chatarra de tus bolsas. Las herramientas de recolección, el equipo puesto, los objetos de misión y los consumibles nunca se tocan.",
+      "depositAllTooltip": "Envía al banco de una vez todos los reactivos de fabricación de tus bolsas. Las herramientas de recolección, el equipo puesto, los objetos de misión, los consumibles y los objetos grises nunca se tocan.",
       "depositAllDone": "Materiales depositados: {count}.",
       "depositAllFull": "Materiales depositados: {count}. El banco está ahora lleno.",
       "depositAllNone": "Banco lleno: no se depositó nada.",

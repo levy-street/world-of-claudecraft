@@ -3020,7 +3020,7 @@ export const fr_CA: EnTranslations = {
       "sortAria": "Trier les objets de la banque",
       "searchAria": "Rechercher un objet de la banque par son nom",
       "depositAll": "Déposer tous les matériaux",
-      "depositAllTooltip": "Envoie en un seul geste tous les réactifs d'artisanat et objets de rebut de vos sacs vers la banque. Les outils de récolte, l'équipement porté, les objets de quête et les consommables ne sont jamais touchés.",
+      "depositAllTooltip": "Envoie en un seul geste tous les réactifs d'artisanat de vos sacs vers la banque. Les outils de récolte, l'équipement porté, les objets de quête, les consommables et les objets gris ne sont jamais touchés.",
       "depositAllDone": "Matériaux déposés : {count}.",
       "depositAllFull": "Matériaux déposés : {count}. La banque est maintenant pleine.",
       "depositAllNone": "Banque pleine : rien n'a été déposé.",

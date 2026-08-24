@@ -3020,7 +3020,7 @@ export const en_CA: EnTranslations = {
       "sortAria": "Sort bank items",
       "searchAria": "Search bank items by name",
       "depositAll": "Deposit all materials",
-      "depositAllTooltip": "Sends every crafting reagent and junk item from your bags to the bank in one trip. Gathering tools, equipped gear, quest items, and consumables are never touched.",
+      "depositAllTooltip": "Sends every crafting reagent from your bags to the bank in one trip. Gathering tools, equipped gear, quest items, consumables, and gray junk are never touched.",
       "depositAllDone": "Materials deposited: {count}.",
       "depositAllFull": "Materials deposited: {count}. Bank now full.",
       "depositAllNone": "Bank full: nothing deposited.",

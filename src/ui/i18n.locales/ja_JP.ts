@@ -9829,7 +9829,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.bank.searchAria': '名前で銀行のアイテムを検索',
   'hudChrome.bank.depositAll': 'すべての素材を預ける',
   'hudChrome.bank.depositAllTooltip':
-    'カバン内の製作素材とがらくたをまとめて銀行に預けます。採集用道具、装備中の防具、クエストアイテム、消耗品は対象外です。',
+    'カバン内の製作素材をまとめて銀行に預けます。採集用道具、装備中の防具、クエストアイテム、消耗品、灰色アイテムは対象外です。',
   'hudChrome.bank.depositAllDone': '素材を預けました：{count}。',
   'hudChrome.bank.depositAllFull': '素材を預けました：{count}。銀行がいっぱいになりました。',
   'hudChrome.bank.depositAllNone': '銀行がいっぱいです：何も預けられませんでした。',

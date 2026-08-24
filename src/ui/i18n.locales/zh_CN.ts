@@ -9378,7 +9378,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.bank.searchAria': '按名称搜索银行物品',
   'hudChrome.bank.depositAll': '存入所有材料',
   'hudChrome.bank.depositAllTooltip':
-    '将背包中的所有制作材料和废品一次性存入银行。采集工具、已装备的装备、任务物品和消耗品不会受到影响。',
+    '将背包中的所有制作材料一次性存入银行。采集工具、已装备的装备、任务物品、消耗品和灰色物品不会受到影响。',
   'hudChrome.bank.depositAllDone': '已存入材料：{count}。',
   'hudChrome.bank.depositAllFull': '已存入材料：{count}。银行已满。',
   'hudChrome.bank.depositAllNone': '银行已满：未存入任何物品。',

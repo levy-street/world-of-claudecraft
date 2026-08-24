@@ -3020,7 +3020,7 @@ export const cs_CZ: EnTranslations = {
       "sortAria": "Seřadit předměty v bance",
       "searchAria": "Hledat předměty v bance podle názvu",
       "depositAll": "Uložit všechny materiály",
-      "depositAllTooltip": "Pošle všechny řemeslné suroviny a odpadní předměty z tvých batohů do banky najednou. Sběrných nástrojů, nasazené výbavy, úkolových předmětů a spotřebních předmětů se nikdy nedotkne.",
+      "depositAllTooltip": "Pošle všechny řemeslné suroviny z tvých batohů do banky najednou. Sběrných nástrojů, nasazené výbavy, úkolových předmětů, spotřebních předmětů a šedých předmětů se nikdy nedotkne.",
       "depositAllDone": "Uloženo materiálů: {count}.",
       "depositAllFull": "Uloženo materiálů: {count}. Banka je teď plná.",
       "depositAllNone": "Banka je plná: nic nebylo uloženo.",

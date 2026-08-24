@@ -3020,7 +3020,7 @@ export const tr_TR: EnTranslations = {
       "sortAria": "Banka eşyalarını sırala",
       "searchAria": "Banka eşyalarını ada göre ara",
       "depositAll": "Tüm malzemeleri yatır",
-      "depositAllTooltip": "Çantalarındaki tüm zanaat malzemelerini ve döküntü eşyaları tek seferde bankaya gönderir. Toplama aletlerine, kuşanılan teçhizata, görev eşyalarına ve sarf malzemelerine asla dokunulmaz.",
+      "depositAllTooltip": "Çantalarındaki tüm zanaat malzemelerini tek seferde bankaya gönderir. Toplama aletlerine, kuşanılan teçhizata, görev eşyalarına, sarf malzemelerine ve gri eşyalara asla dokunulmaz.",
       "depositAllDone": "Yatırılan malzeme: {count}.",
       "depositAllFull": "Yatırılan malzeme: {count}. Banka artık dolu.",
       "depositAllNone": "Banka dolu: hiçbir şey yatırılmadı.",

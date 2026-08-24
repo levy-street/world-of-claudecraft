@@ -1254,7 +1254,7 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'hudChrome.bags.noQuestItems': 'Keine Questgegenstände in Euren Taschen.',
   'hudChrome.bank.cannotDepositNow': 'Kann derzeit nicht eingelagert werden',
   'hudChrome.bank.depositAllTooltip':
-    'Sendet jeden Handwerksreagenz und Ramschgegenstand aus deinen Taschen in einem Rutsch zur Bank. Sammelwerkzeuge, angelegte Ausrüstung, Questgegenstände und Verbrauchsgüter werden nie angetastet.',
+    'Sendet jedes Handwerksreagenz aus deinen Taschen in einem Rutsch zur Bank. Sammelwerkzeuge, angelegte Ausrüstung, Questgegenstände, Verbrauchsgüter und graue Gegenstände werden nie angetastet.',
   'hudChrome.bank.guildBuyConfirm':
     '{count} zusätzliche Gildenbankfächer für {price} aus der Gildenkasse kaufen?',
   'hudChrome.bank.guildBuyNote': 'Aus der Gildenkasse bezahlt',

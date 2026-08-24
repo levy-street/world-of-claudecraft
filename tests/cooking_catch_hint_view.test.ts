@@ -95,11 +95,16 @@ describe('itemTooltip integration for raw catches', () => {
 });
 
 describe('bank deposit-all copy after catches are materials', () => {
-  it('depositAllTooltip still describes crafting reagents and junk', () => {
+  it('depositAllTooltip describes crafting reagents and names gray junk as untouched', () => {
     // #2715: button gates on isMaterialItem; raw catches are honest materials.
     // Full sentence pin so a rewrite that keeps only loose tokens fails.
+    // Reworded at the Masterwrought 11l QA: the sweep is set membership on
+    // isMaterialItem, so gray junk (poor, outside the taxonomy) never moves,
+    // and the old "and junk item" clause promised it would; the sentence now
+    // says what the sweep does, with the 18 overlays re-filled in the same
+    // change (the reword-staleness class).
     expect(t('hudChrome.bank.depositAllTooltip')).toBe(
-      'Sends every crafting reagent and junk item from your bags to the bank in one trip. Gathering tools, equipped gear, quest items, and consumables are never touched.',
+      'Sends every crafting reagent from your bags to the bank in one trip. Gathering tools, equipped gear, quest items, consumables, and gray junk are never touched.',
     );
   });
 });

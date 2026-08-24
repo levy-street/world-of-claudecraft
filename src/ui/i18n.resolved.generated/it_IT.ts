@@ -3020,7 +3020,7 @@ export const it_IT: EnTranslations = {
       "sortAria": "Ordina gli oggetti della banca",
       "searchAria": "Cerca gli oggetti della banca per nome",
       "depositAll": "Deposita tutti i materiali",
-      "depositAllTooltip": "Invia in banca in un solo viaggio ogni reagente di fabbricazione e oggetto di scarto dalle tue borse. Strumenti di raccolta, equipaggiamento indossato, oggetti missione e consumabili non vengono mai toccati.",
+      "depositAllTooltip": "Invia in banca in un solo viaggio ogni reagente di fabbricazione dalle tue borse. Strumenti di raccolta, equipaggiamento indossato, oggetti missione, consumabili e oggetti grigi non vengono mai toccati.",
       "depositAllDone": "Materiali depositati: {count}.",
       "depositAllFull": "Materiali depositati: {count}. Ora la banca è piena.",
       "depositAllNone": "Banca piena: non è stato depositato nulla.",
