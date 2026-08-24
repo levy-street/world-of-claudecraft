@@ -42,6 +42,7 @@ const chrome = read('../src/ui/i18n.catalog/hud_chrome.ts');
 const components = read('../src/styles/components.css');
 const hudCss = read('../src/styles/hud.css');
 const hudMobile = read('../src/styles/hud.mobile.css');
+const shellCss = read('../src/styles/shell.css');
 const mobileControlsSrc = read('../src/game/mobile_controls.ts');
 const indexHtml = read('../index.html');
 const playHtml = read('../play.html');
@@ -147,7 +148,9 @@ describe('hud wiring', () => {
     // which drive the painter with a descriptor the call site builds here: drop
     // either line and the picker changes nothing on screen with every test green.
     expect(hud).toContain('playerFrame.borderSlug = deedBorderSlug(sim.activeBorder);');
-    expect(hud).toContain('targetFrame.borderSlug = deedBorderSlug(target.border ?? null);');
+    expect(hud).toContain(
+      'targetFrame.borderSlug = deedTargetBorderSlug(target.kind, target.border ?? null);',
+    );
     // The painter can only write the ring on a frame it was handed.
     expect(hud).toContain("private pfPortraitWrapEl = $('#pf-portrait-wrap');");
     expect(hud).toContain("private targetPortraitWrapEl = $('#tf-portrait-wrap');");
@@ -700,11 +703,14 @@ describe('touch long-press peek', () => {
     // Association, not just count: the guard is the FIRST statement of each
     // action handler specifically, never merely present somewhere in the file.
     for (const selector of ['data-watch', 'data-title', 'data-border-pick']) {
-      expect(painter).toMatch(
-        new RegExp(
-          `\\('\\[${selector}\\]'\\)\\)\\s*\\{\\s*btn\\.addEventListener\\('click', \\(\\) => \\{\\s*` +
-            `if \\(this\\.deps\\.consumePeek\\(\\)\\)`,
-        ),
+      const loopStart = painter.indexOf(`el.querySelectorAll<HTMLElement>('[${selector}]')`);
+      expect(loopStart).toBeGreaterThan(-1);
+      const nextLoop = painter.indexOf('\n    for (const btn of ', loopStart + 1);
+      const loopEnd =
+        nextLoop === -1 ? painter.indexOf('\n  }\n\n  private fmt', loopStart) : nextLoop;
+      expect(loopEnd).toBeGreaterThan(loopStart);
+      expect(painter.slice(loopStart, loopEnd)).toMatch(
+        /btn\.addEventListener\('click', \(\) => \{\s*if \(this\.deps\.consumePeek\(\)\)/,
       );
     }
     expect(hud).toMatch(
@@ -869,6 +875,218 @@ describe('chrome keys and CSS floors', () => {
     expect(hudMobile).toMatch(
       /body\.mobile-touch #deeds-window \.deeds-recent-item \{\s*min-width: 40px;\s*min-height: 40px;/,
     );
+  });
+
+  it('keeps focused cosmetic-picker rows separate and contained on desktop and mobile', () => {
+    // The shell-wide button focus indicator wins with !important and reaches
+    // five CSS pixels beyond a row (3px outline + 2px offset). Both the shelf
+    // gap and its inline padding must leave visible air outside that ring, not
+    // merely keep the button border boxes disjoint. Touch gets two extra pixels
+    // because the 40px rows and high-DPR landscape presentation make a
+    // desktop-sized gap look fused.
+    const focusRule = shellCss.match(
+      /\[tabindex="0"\]:focus-visible,\n {2}button:focus-visible,\n {2}a:focus-visible \{([^}]*)\}/,
+    )?.[1];
+    const shelfRule = components.match(/\.deeds-titles,\n {2}\.deeds-borders \{([^}]*)\}/)?.[1];
+    const touchShelfRule = hudMobile.match(
+      /body\.mobile-touch #deeds-window \.deeds-titles,\n {2}body\.mobile-touch #deeds-window \.deeds-borders \{([^}]*)\}/,
+    )?.[1];
+    expect(focusRule, 'global focus-ring rule missing').toBeTruthy();
+    expect(shelfRule, 'desktop cosmetic shelf rule missing').toBeTruthy();
+    expect(touchShelfRule, 'mobile cosmetic shelf rule missing').toBeTruthy();
+    expect(shelfRule).not.toMatch(/!\s*important/i);
+    expect(touchShelfRule).not.toMatch(/!\s*important/i);
+
+    const px = (body: string, property: string): number => {
+      const escapedProperty = property.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+      const declarations = body.replace(/\/\*[\s\S]*?\*\//g, '');
+      const value = declarations.match(
+        new RegExp(`(?:^|;)\\s*${escapedProperty}:\\s*(\\d+)px(?:\\s|!|;)`),
+      )?.[1];
+      expect(value, `${property} pixel value missing`).toBeTruthy();
+      return Number(value);
+    };
+    const inlinePx = (body: string, property: string): [number, number] => {
+      const escapedProperty = property.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+      const declarations = body.replace(/\/\*[\s\S]*?\*\//g, '');
+      const match = declarations.match(
+        new RegExp(
+          `(?:^|;)\\s*${escapedProperty}:\\s*(\\d+)px(?:\\s+(\\d+)px)?\\s*(?:!important\\s*)?(?=;|$)`,
+        ),
+      );
+      expect(match, `${property} one- or two-value pixel declaration missing`).toBeTruthy();
+      const inlineStart = Number(match?.[1]);
+      return [inlineStart, Number(match?.[2] ?? inlineStart)];
+    };
+    const effectiveInlinePx = (body: string): [number, number] => {
+      type Side = { value: number; important: boolean; order: number };
+      const sides: { start?: Side; end?: Side } = {};
+      const setSide = (side: 'start' | 'end', value: number, important: boolean, order: number) => {
+        const previous = sides[side];
+        if (!previous || (important && !previous.important) || important === previous.important) {
+          sides[side] = { value, important, order };
+        }
+      };
+      const declarations = body
+        .replace(/\/\*[\s\S]*?\*\//g, '')
+        .split(';')
+        .map((declaration) => declaration.trim())
+        .filter(Boolean);
+      declarations.forEach((declaration, order) => {
+        const match = declaration.match(/^([a-z-]+)\s*:\s*(.*?)(\s*!important)?\s*$/);
+        if (!match) return;
+        const [, property, rawValue, importantToken] = match;
+        if (
+          ![
+            'padding',
+            'padding-inline',
+            'padding-inline-start',
+            'padding-inline-end',
+            'padding-left',
+            'padding-right',
+          ].includes(property)
+        ) {
+          return;
+        }
+        const tokens = rawValue.trim().split(/\s+/);
+        expect(tokens.length, `${property} must use one to four pixel values`).toBeGreaterThan(0);
+        expect(tokens.length, `${property} must use one to four pixel values`).toBeLessThanOrEqual(
+          4,
+        );
+        expect(tokens, `${property} must remain statically measurable`).toEqual(
+          tokens.map((_token) => expect.stringMatching(/^\d+px$/)),
+        );
+        const values = tokens.map((token) => Number.parseInt(token, 10));
+        const important = Boolean(importantToken);
+        if (property === 'padding') {
+          const inlineEnd = values.length === 1 ? values[0] : values[1];
+          const inlineStart = values.length < 4 ? inlineEnd : values[3];
+          setSide('start', inlineStart, important, order);
+          setSide('end', inlineEnd, important, order);
+        } else if (property === 'padding-inline') {
+          expect(values.length, 'padding-inline accepts one or two values').toBeLessThanOrEqual(2);
+          setSide('start', values[0], important, order);
+          setSide('end', values[1] ?? values[0], important, order);
+        } else if (property === 'padding-inline-start' || property === 'padding-left') {
+          expect(values).toHaveLength(1);
+          setSide('start', values[0], important, order);
+        } else {
+          expect(values).toHaveLength(1);
+          setSide('end', values[0], important, order);
+        }
+      });
+      expect(sides.start, 'effective inline-start padding missing').toBeTruthy();
+      expect(sides.end, 'effective inline-end padding missing').toBeTruthy();
+      return [sides.start?.value ?? 0, sides.end?.value ?? 0];
+    };
+    const effectiveRowGapPx = (body: string): number => {
+      let effective: { value: number; important: boolean } | undefined;
+      const declarations = body
+        .replace(/\/\*[\s\S]*?\*\//g, '')
+        .split(';')
+        .map((declaration) => declaration.trim())
+        .filter(Boolean);
+      for (const declaration of declarations) {
+        const match = declaration.match(/^([a-z-]+)\s*:\s*(.*?)(\s*!important)?\s*$/);
+        if (!match) continue;
+        const [, property, rawValue, importantToken] = match;
+        if (property !== 'gap' && property !== 'row-gap') continue;
+        const tokens = rawValue.trim().split(/\s+/);
+        expect(tokens.length, `${property} must use one or two pixel values`).toBeGreaterThan(0);
+        expect(tokens.length, `${property} must use one or two pixel values`).toBeLessThanOrEqual(
+          property === 'gap' ? 2 : 1,
+        );
+        expect(tokens, `${property} must remain statically measurable`).toEqual(
+          tokens.map((_token) => expect.stringMatching(/^\d+px$/)),
+        );
+        const candidate = {
+          value: Number.parseInt(tokens[0], 10),
+          important: Boolean(importantToken),
+        };
+        if (
+          !effective ||
+          (candidate.important && !effective.important) ||
+          candidate.important === effective.important
+        ) {
+          effective = candidate;
+        }
+      }
+      expect(effective, 'effective row gap missing').toBeTruthy();
+      return effective?.value ?? 0;
+    };
+    const outlineWidth = px(focusRule as string, 'outline');
+    const outlineOffset = px(focusRule as string, 'outline-offset');
+    expect(outlineWidth).toBe(3);
+    expect(outlineOffset).toBe(2);
+    const focusReach = outlineWidth + outlineOffset;
+    expect(focusReach).toBe(5);
+    px(shelfRule as string, 'gap');
+    px(touchShelfRule as string, 'gap');
+    const desktopGap = effectiveRowGapPx(shelfRule as string);
+    const mobileGap = effectiveRowGapPx(touchShelfRule as string);
+    inlinePx(shelfRule as string, 'padding-inline');
+    inlinePx(touchShelfRule as string, 'padding-inline');
+    const [desktopInlineStart, desktopInlineEnd] = effectiveInlinePx(shelfRule as string);
+    const [mobileInlineStart, mobileInlineEnd] = effectiveInlinePx(touchShelfRule as string);
+    expect(desktopGap - focusReach).toBeGreaterThanOrEqual(3);
+    expect(mobileGap - focusReach).toBeGreaterThanOrEqual(5);
+    expect(desktopInlineStart - focusReach).toBeGreaterThanOrEqual(3);
+    expect(desktopInlineEnd - focusReach).toBeGreaterThanOrEqual(3);
+    expect(mobileInlineStart - focusReach).toBeGreaterThanOrEqual(5);
+    expect(mobileInlineEnd - focusReach).toBeGreaterThanOrEqual(5);
+
+    const shelfGeometryRules: Array<{
+      rel: string;
+      selectors: string[];
+      declarations: string[];
+    }> = [];
+    for (const [rel, css] of [
+      ['components', components],
+      ['hud', hudCss],
+      ['hud.mobile', hudMobile],
+      ['shell', shellCss],
+    ] as const) {
+      for (const rule of stripLineComments(css).matchAll(/([^{}]+)\{([^{}]*)\}/g)) {
+        const declarations = rule[2]
+          .split(';')
+          .map((declaration) => declaration.trim())
+          .filter((declaration) =>
+            /^(?:gap|row-gap|padding|padding-inline|padding-inline-start|padding-inline-end|padding-left|padding-right|margin|margin-inline|margin-inline-start|margin-inline-end|margin-left|margin-right|position|inset|inset-inline|inset-inline-start|inset-inline-end|left|right|width|min-width|max-width|inline-size|min-inline-size|max-inline-size|transform|translate|scale|box-sizing|overflow|overflow-x|overflow-y)\s*:/.test(
+              declaration,
+            ),
+          );
+        if (declarations.length === 0) continue;
+        const selectors = rule[1]
+          .split(',')
+          .map((selector) => selector.trim())
+          .filter((selector) => /\.deeds-(?:titles|borders)\s*$/.test(selector));
+        if (selectors.length > 0) {
+          shelfGeometryRules.push({
+            rel,
+            selectors,
+            declarations: declarations.map((declaration) => declaration.replace(/\s+/g, ' ')),
+          });
+        }
+      }
+    }
+    expect(
+      shelfGeometryRules,
+      'only the base and touch shelf rules may participate in row-gap or edge containment',
+    ).toEqual([
+      {
+        rel: 'components',
+        selectors: ['.deeds-titles', '.deeds-borders'],
+        declarations: ['gap: 8px', 'padding: 2px', 'padding-inline: 8px'],
+      },
+      {
+        rel: 'hud.mobile',
+        selectors: [
+          'body.mobile-touch #deeds-window .deeds-titles',
+          'body.mobile-touch #deeds-window .deeds-borders',
+        ],
+        declarations: ['gap: 10px', 'padding-inline: 10px'],
+      },
+    ]);
   });
 
   it('the jump spotlight flashes once and degrades to a static ring under reduced motion', () => {

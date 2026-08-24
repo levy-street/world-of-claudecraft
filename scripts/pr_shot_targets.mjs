@@ -411,11 +411,36 @@ async function clearReliquaryPins(page) {
  *  every rig shoots the lowest preset so shots stay comparable across
  *  machines; only deliberate gfx-comparison shots keep their own preset).
  *  Merges over any existing woc_settings so unrelated persisted options
- *  survive; graphicsPreset 1 is PRESET_LOW in src/render/gfx.ts. */
+ *  survive; graphicsPreset 1 is PRESET_LOW in src/render/gfx.ts. The applied
+ *  marker makes this an explicit choice, so first-run detection cannot replace
+ *  the capture tier after boot. */
 async function seedLowGraphicsPreset(page) {
   await page.evaluateOnNewDocument(
-    `try { const s = JSON.parse(localStorage.getItem('woc_settings') ?? '{}') || {}; s.graphicsPreset = 1; localStorage.setItem('woc_settings', JSON.stringify(s)); } catch {}`,
+    `try { const s = JSON.parse(localStorage.getItem('woc_settings') ?? '{}') || {}; s.graphicsPreset = 1; s.graphicsDefaultApplied = true; localStorage.setItem('woc_settings', JSON.stringify(s)); } catch {}`,
   );
+}
+
+/** Deliberate HIGH comparison leg for identity-versus-bloom evidence. */
+async function seedHighGraphicsPreset(page) {
+  await page.evaluateOnNewDocument(
+    `try { const s = JSON.parse(localStorage.getItem('woc_settings') ?? '{}') || {}; s.graphicsPreset = 3; s.graphicsDefaultApplied = true; localStorage.setItem('woc_settings', JSON.stringify(s)); } catch {}`,
+  );
+}
+
+async function seedClassicOnLowPreset(page) {
+  await seedLowGraphicsPreset(page);
+  await themeSeed('classic')(page);
+}
+
+async function seedClassicOnHighPreset(page) {
+  await seedHighGraphicsPreset(page);
+  await themeSeed('classic')(page);
+}
+
+/** Parchment on the low preset: the light-panel acid test for inspect and picker metal. */
+async function seedParchmentOnLowPreset(page) {
+  await seedLowGraphicsPreset(page);
+  await themeSeed('parchment')(page);
 }
 
 /** The tracker variants need BOTH pre-load seeds: the pin-store wipe and the
@@ -5216,11 +5241,17 @@ export const TARGETS = [
   },
   {
     key: 'nameplate-border',
-    label: 'Rank-5 Curator border on the own nameplate and portrait ring, in world',
-    when: ['ui/deed_border_view', 'render/nameplate_view', 'reliquary_phase22_closeout'],
+    label: 'Rank-5 Curator Deed Heraldry seal and name ribbon, in world',
+    when: [
+      'ui/deed_border_view',
+      'render/nameplate_view',
+      'render/nameplate_canvas',
+      'render/nameplate_heraldry_core',
+      'reliquary_phase22_closeout',
+    ],
     // Desktop only: the plate paints identically on the compact tier and the
     // full frame is the evidence (a canvas plate cannot be DOM-clipped).
-    variants: [{ key: 'desktop', beforeLoad: seedLowGraphicsPreset }],
+    variants: [{ key: 'desktop', beforeLoad: seedClassicOnLowPreset }],
     async capture(page) {
       const seeded = await page.evaluate(`(async () => {
         document.querySelector('#gpu-notice')?.remove();
@@ -5249,6 +5280,209 @@ export const TARGETS = [
       // repaint with the border before the frame is taken.
       await wait(1200);
       return {};
+    },
+  },
+  {
+    key: 'deed-heraldry-unit-frames',
+    label: 'Deed Heraldry on the player frame and a valid player target',
+    when: [
+      'ui/deed_border_view',
+      'ui/unit_frame',
+      'ui/unit_frame_painter',
+      'ui/hud.ts',
+      'styles/hud.css',
+      'index.html',
+      'play.html',
+    ],
+    variants: [
+      { key: 'desktop-low', beforeLoad: seedClassicOnLowPreset },
+      { key: 'desktop-high', beforeLoad: seedClassicOnHighPreset },
+      { key: 'mobile', mobile: true, beforeLoad: seedClassicOnLowPreset },
+      { key: 'parchment', beforeLoad: seedParchmentOnLowPreset },
+    ],
+    async capture(page, variant) {
+      if (variant.key === 'desktop-low' || variant.key === 'desktop-high') {
+        await page.evaluate(() => {
+          const chat = document.querySelector('#chat-input');
+          if (!(chat instanceof HTMLTextAreaElement)) {
+            throw new Error('chat composer is unavailable for daylight staging');
+          }
+          chat.value = '/daynight day';
+          chat.dispatchEvent(new Event('input', { bubbles: true }));
+          chat.dispatchEvent(
+            new KeyboardEvent('keydown', { code: 'Enter', key: 'Enter', bubbles: true }),
+          );
+        });
+        await wait(8000);
+      }
+      const staged = await page.evaluate(() => {
+        document.querySelector('#gpu-notice')?.remove();
+        document.querySelector('.camera-prompt-confirm')?.click();
+        document.querySelector('.tut-skip')?.click();
+        const game = window.__game;
+        const sim = game?.sim;
+        const player = sim?.player;
+        if (!game || !sim || !player) {
+          return { ok: false, reason: 'offline world is unavailable' };
+        }
+        const deedId = 'col_discovery_250';
+        sim.deedsEarned.set(deedId, '2026-08-01');
+        sim.setActiveBorder(deedId);
+        const peerId = sim.addPlayer('mage', 'Aldwin');
+        const peer = sim.entities.get(peerId);
+        const peerMeta = sim.meta(peerId);
+        if (!peer || !peerMeta) return { ok: false, reason: 'peer spawn failed' };
+        peerMeta.deedsEarned.set(deedId, '2026-08-01');
+        sim.setActiveBorder(deedId, peerId);
+        peer.level = 18;
+        peer.pos.x = player.pos.x + Math.sin(game.input.camYaw) * 4;
+        peer.pos.z = player.pos.z + Math.cos(game.input.camYaw) * 4;
+        sim.targetEntity(peerId);
+        const root = document.documentElement;
+        const settings = JSON.parse(localStorage.getItem('woc_settings') ?? '{}');
+        return {
+          ok: true,
+          selfBorder: sim.activeBorder,
+          peerBorder: peer.border,
+          targeted: player.targetId === peerId,
+          graphicsPreset: settings.graphicsPreset,
+          graphicsDefaultApplied: settings.graphicsDefaultApplied === true,
+          fxLevel: root.dataset.fxLevel ?? '',
+          fxShadow: getComputedStyle(root).getPropertyValue('--fx-shadow').trim(),
+        };
+      });
+      if (!staged.ok) throw new Error(staged.reason);
+      const expectedGraphicsPreset = variant.key === 'desktop-high' ? 3 : 1;
+      const expectedFxLevel = variant.key === 'desktop-high' ? 'high' : 'low';
+      const expectedFxShadow = variant.key === 'desktop-high' ? '1' : '0';
+      if (
+        staged.selfBorder !== 'col_discovery_250' ||
+        staged.peerBorder !== 'col_discovery_250' ||
+        !staged.targeted ||
+        staged.graphicsPreset !== expectedGraphicsPreset ||
+        !staged.graphicsDefaultApplied ||
+        staged.fxLevel !== expectedFxLevel ||
+        staged.fxShadow !== expectedFxShadow
+      ) {
+        throw new Error(`Deed Heraldry unit-frame staging failed: ${JSON.stringify(staged)}`);
+      }
+      await wait(1200);
+      await page.evaluate(() => {
+        const menu = document.querySelector('#options-menu');
+        if (menu instanceof HTMLElement && getComputedStyle(menu).display !== 'none') {
+          window.__game?.hud?.toggleOptionsMenu?.();
+        }
+      });
+      return {};
+    },
+  },
+  {
+    key: 'deed-border-picker',
+    label: 'Book of Deeds Deed Heraldry seals, materials, and interaction preview',
+    when: ['ui/deed_border_view', 'ui/deeds_window'],
+    variants: [
+      { key: 'desktop', beforeLoad: seedClassicOnLowPreset },
+      { key: 'mobile', mobile: true, beforeLoad: seedClassicOnLowPreset },
+      { key: 'parchment', beforeLoad: seedParchmentOnLowPreset },
+    ],
+    async capture(page) {
+      const seeded = await page.evaluate(() => {
+        document.querySelector('#gpu-notice')?.remove();
+        document.querySelector('.camera-prompt-confirm')?.click();
+        document.querySelector('.tut-skip')?.click();
+        const sim = window.__game?.sim;
+        if (!sim) return { ok: false, reason: 'no sim' };
+        sim.deedsEarned.set('prog_prestige_10', '2026-08-01');
+        sim.deedsEarned.set('dgn_deepward', '2026-08-02');
+        sim.deedsEarned.set('col_discovery_250', '2026-08-03');
+        sim.deedsEarned.set('col_reliquary_rank_5', '2026-08-04');
+        sim.setActiveBorder('col_discovery_250');
+        window.__game?.hud?.openDeeds?.('titles');
+        return { ok: true };
+      });
+      if (!seeded.ok) throw new Error(`deed border picker seeding failed: ${seeded.reason}`);
+      const opened = await pollForSize(page, '#deeds-window');
+      if (!opened) throw new Error('deeds window did not open');
+      await page.evaluate(() => {
+        document.querySelector('#deeds-window .deeds-borders')?.scrollIntoView({
+          block: 'center',
+        });
+      });
+      const previewed = await page.evaluate(() => {
+        const sim = window.__game?.sim;
+        const option = document.querySelector(
+          '#deeds-window [data-border-pick="col_reliquary_rank_5"]',
+        );
+        if (!sim || !(option instanceof HTMLElement)) {
+          return { ok: false, reason: 'heraldry preview option is unavailable' };
+        }
+        const before = sim.activeBorder;
+        option.focus();
+        const preview = document.querySelector('#deeds-window .deed-heraldry-preview');
+        return {
+          ok: true,
+          before,
+          after: sim.activeBorder,
+          previewDeed: preview?.getAttribute('data-preview-deed') ?? null,
+          previewBorder: preview?.getAttribute('data-border') ?? null,
+        };
+      });
+      if (!previewed.ok) throw new Error(previewed.reason);
+      if (
+        previewed.before !== 'col_discovery_250' ||
+        previewed.after !== previewed.before ||
+        previewed.previewDeed !== 'col_reliquary_rank_5' ||
+        previewed.previewBorder !== 'reliquary_gilt'
+      ) {
+        throw new Error(`Deed Heraldry preview staging failed: ${JSON.stringify(previewed)}`);
+      }
+      await wait(200);
+      return { clip: '#deeds-window' };
+    },
+  },
+  {
+    key: 'inspect-border-cartouche',
+    label: 'Inspect Deed Heraldry banner: seal, motif pattern, title, and granting deed',
+    when: ['ui/deed_border_view', 'ui/inspect_window', 'ui/inspect_view', 'styles/shell.css'],
+    variants: [
+      { key: 'desktop', beforeLoad: seedClassicOnLowPreset },
+      { key: 'mobile', mobile: true, beforeLoad: seedClassicOnLowPreset },
+      { key: 'parchment', beforeLoad: seedParchmentOnLowPreset },
+    ],
+    async capture(page) {
+      const seeded = await page.evaluate(`(async () => {
+        document.querySelector('#gpu-notice')?.remove();
+        document.querySelector('.camera-prompt-confirm')?.click();
+        const sim = window.__game?.sim;
+        if (!sim) return { ok: false, reason: 'no sim' };
+        const mod = await import('/src/sim/content/reliquary.ts');
+        for (const pageDef of mod.RELIQUARY_PAGES) {
+          for (const relic of pageDef.relics) {
+            if (relic.kind === 'item') sim.primary.deedStats.itemsDiscovered.add(relic.itemId);
+          }
+        }
+        sim.deedsEarned.set('col_reliquary_rank_5', '2026-08-01');
+        sim.setActiveBorder('col_reliquary_rank_5');
+        sim.deedsEarned.set('prog_grandmaster_armorcrafting', '2026-08-02');
+        sim.setActiveTitle('prog_grandmaster_armorcrafting');
+        window.__game.hud.openInspect(sim.playerId);
+        const meta = sim.players?.get?.(sim.playerId);
+        return {
+          ok: true,
+          border: meta?.activeBorder ?? null,
+          title: meta?.activeTitle ?? null,
+        };
+      })()`);
+      if (!seeded.ok) throw new Error(`inspect cartouche seeding failed: ${seeded.reason}`);
+      if (
+        seeded.border !== 'col_reliquary_rank_5' ||
+        seeded.title !== 'prog_grandmaster_armorcrafting'
+      ) {
+        throw new Error(`inspect Deed Heraldry staging failed: ${JSON.stringify(seeded)}`);
+      }
+      const opened = await pollForSize(page, '#inspect-window');
+      if (!opened) throw new Error('inspect window did not open');
+      return { clip: '#inspect-window' };
     },
   },
   {

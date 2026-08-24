@@ -1,5 +1,5 @@
 import { spawnSync } from 'node:child_process';
-import { readFileSync } from 'node:fs';
+import { existsSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { describe, expect, it } from 'vitest';
@@ -256,6 +256,7 @@ describe('CI workflow parity', () => {
       '            !/docs/screenshots/*/',
       '            /docs/screenshots/admin-cheater-mark/',
       '            /docs/screenshots/admin-guild-bank-panel/',
+      '            /docs/screenshots/deed-border-cartouche/',
       '            /docs/screenshots/eastbrook-grand-armoury/',
       '            /docs/screenshots/eastbrook-vale-rebuild/',
       '            /docs/screenshots/far-foliage-impostors/',
@@ -331,21 +332,40 @@ describe('CI workflow parity', () => {
         maxBuffer: 64 * 1024 * 1024,
       });
       expect(ls.status).toBe(0);
-      const corpus = ls.stdout
-        .split('\0')
-        .filter(
-          (file) =>
-            file.length > 0 &&
-            file !== SELF &&
-            !file.startsWith('docs/screenshots/') &&
-            REFERENCE_EXTENSIONS.some((ext) => file.endsWith(ext)),
-        );
+      const repoRoot = fileURLToPath(repoRootUrl);
+      const tracked = ls.stdout.split('\0').filter((file) => file.length > 0);
+      const corpusCandidates = tracked.filter(
+        (file) =>
+          file !== SELF &&
+          !file.startsWith('docs/screenshots/') &&
+          REFERENCE_EXTENSIONS.some((ext) => file.endsWith(ext)),
+      );
+      // In a local unstaged feature tree, a retired tracked file is absent by
+      // design until the user stages the deletion. Derive that set from Git
+      // instead of keeping a path allowlist that could become a permanent hole.
+      // Sparse-checkout omissions carry skip-worktree, not a deletion diff, so
+      // an unexpectedly absent corpus candidate in CI still fails loudly.
+      const deleted = spawnSync('git', ['diff', '--name-only', '--diff-filter=D', '-z', '--'], {
+        cwd: repoRoot,
+        encoding: 'utf8',
+        maxBuffer: 64 * 1024 * 1024,
+      });
+      expect(deleted.status).toBe(0);
+      const pendingDeletions = new Set(
+        deleted.stdout.split('\0').filter((file) => file.length > 0),
+      );
+      const missing = corpusCandidates.filter((file) => !existsSync(join(repoRoot, file)));
+      expect(
+        missing.filter((file) => !pendingDeletions.has(file)),
+        `unexpected tracked paths are missing from the screenshot-reference corpus: ${missing.join(', ')}`,
+      ).toEqual([]);
+      const corpus = corpusCandidates.filter((file) => existsSync(join(repoRoot, file)));
       // Vacuity floor near the real count (about 6,600 tracked
       // reference-carrying files on 2026-08-14): an emptied enumeration
       // cannot green the coupling by scanning nothing.
       expect(corpus.length).toBeGreaterThanOrEqual(6_000);
       for (const file of corpus) {
-        const source = readFileSync(join(fileURLToPath(repoRootUrl), file), 'utf8');
+        const source = readFileSync(join(repoRoot, file), 'utf8');
         for (const match of source.matchAll(/docs\/screenshots\/([A-Za-z0-9._-]+)/g)) {
           if (indexDirs.has(match[1])) referenced.add(match[1]);
         }

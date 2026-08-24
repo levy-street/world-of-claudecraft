@@ -1,0 +1,64 @@
+{
+  "bookEquips": [
+    "prog_prestige_10",
+    "dgn_deepward",
+    "col_discovery_250",
+    "col_reliquary_rank_5"
+  ],
+  "bookEquipScreenshots": [
+    "14-book-equipped-prestige-laurels.png",
+    "15-book-equipped-deepward.png",
+    "16-book-equipped-grand-catalogue.png",
+    "17-book-equipped-eternal-spoils.png"
+  ],
+  "previewsWithoutEquip": [
+    "prog_prestige_10",
+    "dgn_deepward",
+    "col_discovery_250",
+    "col_reliquary_rank_5"
+  ],
+  "activeDuringPreview": "col_reliquary_rank_5",
+  "noneUnequipped": true,
+  "restoredActiveBorder": "col_reliquary_rank_5",
+  "tierComparison": {
+    "low": {
+      "graphicsPreset": 1,
+      "graphicsDefaultApplied": true,
+      "fxLevel": "low",
+      "fxShadow": "0",
+      "screenshot": "02-deed-heraldry-unit-frames-desktop-low.png"
+    },
+    "high": {
+      "graphicsPreset": 3,
+      "graphicsDefaultApplied": true,
+      "fxLevel": "high",
+      "fxShadow": "1",
+      "screenshot": "03-deed-heraldry-unit-frames-desktop-high.png"
+    },
+    "identityGeometryUnchanged": true,
+    "onlyBloomReadsFxShadow": true
+  },
+  "parchment": {
+    "pickerTextContrastTest": "pass",
+    "inspectTextContrastTest": "pass",
+    "pickerScreenshot": "08-deed-border-picker-parchment.png",
+    "inspectScreenshot": "11-inspect-border-cartouche-parchment.png"
+  },
+  "forcedColors": {
+    "active": true,
+    "playerSlug": "deepward",
+    "targetSlug": "deepward",
+    "pickerSlug": "deepward"
+  },
+  "localizedTarget": {
+    "line": "< Schummler >Aldwin [Großmeister der Rüstungsherstellung]",
+    "title": " [Großmeister der Rüstungsherstellung]",
+    "cheater": "< Schummler >",
+    "slug": "curators_gilt"
+  },
+  "captureNotes": {
+    "offlineProxyWarnings": "non-blocking",
+    "mobileSkippedNpcAssets": 18,
+    "reviewedHeraldrySurfacesObscured": false
+  }
+}

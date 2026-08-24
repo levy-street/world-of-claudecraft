@@ -187,11 +187,21 @@
     <div id="target-frame" class="unitframe" role="group" data-i18n-aria="hudChrome.unitFrame.targetLabel" aria-label="Your Mark">
       <div class="portrait-wrap" id="tf-portrait-wrap">
         <div class="portrait"><canvas id="tf-portrait" width="54" height="54"></canvas></div>
+        <span class="deed-heraldry-seal" aria-hidden="true">
+          <svg class="deed-heraldry-seal-art" viewBox="0 0 24 24" focusable="false" aria-hidden="true">
+            <path id="tf-heraldry-seal-motif"></path>
+          </svg>
+        </span>
         <div class="level-chip" id="tf-level"></div>
         <div id="tf-elite-tag" data-i18n="hud.core.elite">ELITE</div>
       </div>
       <div class="uf-bars">
-        <div class="uf-name" id="tf-name"></div>
+        <div class="uf-name-header deed-heraldry-plaque deed-heraldry-plaque-mirror" id="tf-name-header">
+          <svg class="deed-heraldry-pattern" viewBox="0 0 24 24" focusable="false" aria-hidden="true">
+            <path id="tf-heraldry-pattern-motif"></path>
+          </svg>
+          <div class="uf-name" id="tf-name"></div>
+        </div>
         <div class="bar hp"><div class="bar-fill" id="tf-hp"></div><div class="bar-absorb" id="tf-absorb"></div><div class="bar-text" id="tf-hp-text"></div></div>
         <div class="bar" id="tf-resource"><div class="bar-fill" id="tf-res"></div><div class="bar-text" id="tf-res-text"></div></div>
         <div class="uf-discord" id="tf-discord"></div>
@@ -324,12 +334,22 @@
           <div id="player-frame" class="unitframe" role="group" tabindex="0" aria-haspopup="menu" data-i18n-aria="hudChrome.unitFrame.playerLabel" aria-label="Your Hero">
             <div class="portrait-wrap" id="pf-portrait-wrap">
               <div class="portrait"><canvas id="pf-portrait" width="54" height="54"></canvas></div>
+              <span class="deed-heraldry-seal" aria-hidden="true">
+                <svg class="deed-heraldry-seal-art" viewBox="0 0 24 24" focusable="false" aria-hidden="true">
+                  <path id="pf-heraldry-seal-motif"></path>
+                </svg>
+              </span>
               <div class="level-chip" id="pf-level">1</div>
               <div class="combat-flash" id="pf-combat" role="status" data-i18n-title="hud.social.status.combat" data-i18n-aria="hud.social.status.combat" title="In Combat" aria-label="In Combat"><img src="/ui/crests/status/combat.webp" data-crest-fallback-id="status_combat" data-crest-fallback-size="32" alt="" aria-hidden="true" /></div>
               <div class="rest-indicator" id="pf-rest" role="status" data-i18n-title="hudChrome.rest.resting" data-i18n-aria="hudChrome.rest.resting" title="Resting" aria-label="Resting">z</div>
             </div>
             <div class="uf-bars">
-              <div class="uf-name" id="pf-name"></div>
+              <div class="uf-name-header deed-heraldry-plaque" id="pf-name-header">
+                <svg class="deed-heraldry-pattern" viewBox="0 0 24 24" focusable="false" aria-hidden="true">
+                  <path id="pf-heraldry-pattern-motif"></path>
+                </svg>
+                <div class="uf-name" id="pf-name"></div>
+              </div>
               <div class="combo-row" id="combo-row" role="meter" aria-valuemin="0" aria-valuemax="5" aria-valuenow="0"></div>
               <div class="bar hp"><div class="bar-fill" id="pf-hp"></div><div class="bar-absorb" id="pf-absorb"></div><div class="bar-text" id="pf-hp-text"></div></div>
               <div class="bar mana" id="pf-resource"><div class="bar-fill" id="pf-res"></div><div class="bar-text" id="pf-res-text"></div><div class="low-resource-label" id="pf-low-resource"></div></div>

@@ -427,6 +427,11 @@ const MONOLITHS: MonolithRow[] = [
     seam: 'a new src/render/<thing>.ts module (src/render/CLAUDE.md)',
   },
   {
+    file: 'src/render/nameplate_canvas.ts',
+    ceiling: 852,
+    seam: 'the pure src/render/nameplate_heraldry_core.ts geometry module',
+  },
+  {
     file: 'src/sim/colliders.ts',
     // Lowered from 2660 after the cell-index math moved out to
     // collider_cells.ts (the ratchet rule: extraction lowers the ceiling).

@@ -248,7 +248,7 @@ import { shouldRefreshDailyRewardsLauncher } from './daily_rewards_launcher_core
 import { DailyRewardsWindow } from './daily_rewards_window';
 import { deathRecapFeedback } from './death_recap_feedback';
 import { decorativeArtImg } from './decorative_art';
-import { deedBorderSlug } from './deed_border_view';
+import { deedBorderSlug, deedTargetBorderSlug } from './deed_border_view';
 import {
   deedBroadcastRendered,
   deedName,
@@ -4236,14 +4236,10 @@ export class Hud {
     // governor. spawn() reads this per event.
     { getFxTier: () => this.fxTier() },
   );
-  // The player frame is the FIRST instance of the unit_frame family. It owns
-  // its own element set; target/party become further instances of this exact
-  // painter. The element set + options deliberately mirror the inline block
-  // exactly, so the player path stays byte-faithful: no `name` (the player name is
-  // static, set once at login, not on the hot path); no `stateClasses` (the player
-  // frame never carries dead/out-of-range, those are party-only); no `shownDisplay`
-  // (the frame is always visible via CSS, never toggled); no `repaintPortrait` (its
-  // portrait is drawn at character setup, drawPlayerFramePortrait, not per frame).
+  // First unit-frame painter instance; heraldry hosts are captured once. The name
+  // stays login-owned, and player dead/range state is absent, so no stateClasses.
+  // CSS keeps this visible, so no shownDisplay; setup owns the portrait, so no
+  // repaintPortrait.
   private readonly playerFramePainter = new UnitFramePainter(this.writerFacet, {
     frame: this.playerFrameEl,
     level: this.pfLevelEl,
@@ -4251,6 +4247,11 @@ export class Hud {
     hpText: this.pfHpTextEl,
     absorb: this.pfAbsorbEl,
     portraitBorder: this.pfPortraitWrapEl,
+    heraldry: {
+      nameHeader: $('#pf-name-header'),
+      sealMotif: $('#pf-heraldry-seal-motif'),
+      headerPattern: $('#pf-heraldry-pattern-motif'),
+    },
     resource: {
       container: this.pfResourceEl,
       fill: this.pfResEl,
@@ -4284,16 +4285,11 @@ export class Hud {
     },
     { resolveCastLabel: (s) => s.label },
   );
-  // The target frame is the SECOND instance of the unit_frame family: the same
-  // painter + core as the player, over the target's element set. It supplies the
-  // per-unit `name`, the cached `#tf-absorb` overlay node (no per-frame query), the
-  // `shownDisplay` show/hide path, and the portrait repaint gate (the painter owns
-  // the gate, so the old `lastPortraitTarget` sentinel is now the painter's
-  // `lastPortraitKey`). It passes NO resource group (the target has no power bar) and
-  // NO `stateClasses` (the target carries its own `elite` class, painted at the call
-  // site, not the party dead/out-of-range classes). The target-only concerns the
-  // family does not express (the elite class + tag, the hostile/friendly name
-  // color) route through the SAME elided writers in update() below.
+  // Second unit-frame painter instance; heraldry hosts are player identity only.
+  // Target validity stays call-site gated. Elite and reaction CSS stay there too;
+  // dead/out-of-range are deliberately pinned false, so no stateClasses.
+  // shownDisplay and repaintPortrait remain because target identity can appear,
+  // disappear, and change portrait.
   private readonly targetFramePainter = new UnitFramePainter(
     this.writerFacet,
     {
@@ -4310,6 +4306,11 @@ export class Hud {
       hpText: this.targetHpTextEl,
       absorb: this.targetAbsorbEl,
       portraitBorder: this.targetPortraitWrapEl,
+      heraldry: {
+        nameHeader: $('#tf-name-header'),
+        sealMotif: $('#tf-heraldry-seal-motif'),
+        headerPattern: $('#tf-heraldry-pattern-motif'),
+      },
       resource: {
         container: this.targetResourceEl,
         fill: this.targetResEl,
@@ -8826,10 +8827,9 @@ export class Hud {
         // cheaterTagLabel is a field read plus one t() lookup, so a memo would
         // cost more than it saves and would need its own language key.
         targetFrame.cheaterTag = cheaterTagLabel(target);
-        // entity.border is the Book of Deeds deed id on the identity wire, the
-        // title field's sibling (players only; deedBorderSlug answers '' for a
-        // mob, an absent field, or an id this build does not know).
-        targetFrame.borderSlug = deedBorderSlug(target.border ?? null);
+        // Explicit player-kind gate: stale/malformed NPC or mob identity data
+        // must never inherit a player reward surface.
+        targetFrame.borderSlug = deedTargetBorderSlug(target.kind, target.border ?? null);
         // id-keyed gate, byte-faithful to the old lastPortraitTarget !== target.id;
         // the painter resets it on hide so an id reused by a new mob still redraws.
         targetFrame.portraitKey = String(target.id);

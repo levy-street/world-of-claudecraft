@@ -38,6 +38,7 @@ const NAV_TIMEOUT = Number(process.env.NAV_TIMEOUT_MS ?? 60000);
 // helper documents this exact case). Same escape hatch as NAV_TIMEOUT_MS: the
 // default is unchanged, so CI behavior does not move.
 const ENTRY_SELECTOR_TIMEOUT = Number(process.env.ENTRY_SELECTOR_TIMEOUT_MS ?? 15000);
+const ENTRY_PROBE_KEY = 'woc_entry_probe';
 const OUT = process.env.SHOTS_DIR ?? 'pr-shots';
 const DIFF_FILE = process.env.DIFF_FILE;
 fs.mkdirSync(OUT, { recursive: true });
@@ -92,6 +93,20 @@ const browser = await puppeteer.launch({
 // entry helper's defaults are tuned for a GPU host and time out here (its own
 // header says so). One shared override for every entry below.
 const ENTRY_OPTS = { settleMs: 3000, selectorTimeoutMs: 60000, gameBootTimeoutMs: 60000 };
+
+// Standalone screenshot variants intentionally close a live world page and open
+// another in the same browser profile. v0.40's crash guard correctly treats an
+// uncleared probe as a killed world, but a harness-owned page.close is not a crash
+// and must not step the next variant's seeded graphics preset down a tier.
+async function clearIntentionalPageCloseProbe(page) {
+  await page.evaluateOnNewDocument((key) => {
+    try {
+      localStorage.removeItem(key);
+    } catch {
+      // Storage unavailable: the entry guard is fail-soft too.
+    }
+  }, ENTRY_PROBE_KEY);
+}
 
 // One guarded shot: a failure in one frame must not lose the others, so the run always
 // keeps whatever it managed to capture. `clip` is an optional CSS selector; when given
@@ -155,6 +170,7 @@ async function shootSpecific(targets) {
       try {
         if (standalone) {
           page = await browser.newPage();
+          await clearIntentionalPageCloseProbe(page);
           watch(page, `${t.key}-${variant.key}`);
           await suppressGpuNotice(page);
           if (variant.mobile) {
@@ -188,6 +204,7 @@ async function shootSpecific(targets) {
             });
         } else if (!page) {
           page = await browser.newPage();
+          await clearIntentionalPageCloseProbe(page);
           sharedPage = page;
           watch(page, 'desktop');
           await suppressGpuNotice(page);
@@ -221,6 +238,7 @@ async function shootGenericHud(frames) {
 
   if (frames.includes('hud-desktop')) {
     const page = await browser.newPage();
+    await clearIntentionalPageCloseProbe(page);
     watch(page, 'desktop');
     await suppressGpuNotice(page);
     await page.goto(URL, { waitUntil: 'networkidle0', timeout: NAV_TIMEOUT });
@@ -232,6 +250,7 @@ async function shootGenericHud(frames) {
   if (frames.includes('hud-mobile')) {
     try {
       const mobile = await browser.newPage();
+      await clearIntentionalPageCloseProbe(mobile);
       watch(mobile, 'mobile');
       await suppressGpuNotice(mobile);
       await mobile.emulate({

@@ -64,17 +64,19 @@ COSMETIC (may be tiered down on lower presets):
     that differs between two players looking at the same wearer, and it can only dim.
   What is faded is decoration ON a weapon. The wearer, their nameplate, their cast bar, their
   auras, their position and the weapon model itself are untouched at every scale.
-- The deed border accent's decorative bloom (the Book of Deeds border rewards worn in-world).
-  The accent is IDENTITY: it encodes no health, range, rank, or threat, so it may never be
-  hidden, but its outer glow is pure richness. The identity arms are tier-invariant by
-  construction: the nameplate cartouche is canvas shapes resolved from entity state on the
-  same cadence as the title text (no tier input on the accent path, pinned by the path scan
-  in `tests/deed_border_accent.test.ts`), and the portrait ring's frame border, edge outline,
-  and inset shadow never read a tier token (pinned by the CSS arm of the same suite). The ONE
-  tier-scaled quantity is the ring's outer box-shadow bloom, which rides `--fx-shadow` (0 at
-  low) exactly like the sibling portrait combat glow. The ring also repaints on the existing
-  low-tier target-frame body throttle (about 10 Hz, target swap bypasses), a redraw-smoothness
-  shed this list already sanctions for the portrait.
+- Deed Heraldry's decorative bloom (the Book of Deeds rewards worn in-world and on social
+  surfaces). Heraldry is IDENTITY: it encodes no health, range, rank, or threat, so its
+  forged seal, motif, material, and structural edge may never be hidden. The world seal and
+  name ribbon are canvas shapes resolved from entity state on the same cadence as the title
+  text. The player and valid-player-target headers, inspect banner, picker samples, and both
+  picker previews consume the same canonical slug-to-palette-and-motif mapping. None accepts
+  a graphics preset, tier, effects profile, or governor input. `tests/deed_border_accent.test.ts`
+  pins those identity arms and the four normalized motif paths. The ONE tier-scaled quantity
+  is outer box-shadow bloom, which rides `--fx-shadow` and may reach 0 on low. Structural
+  borders, inset edges, seals, motifs, and material fills remain. The target reveal repaints
+  on the existing low-tier target-frame body throttle (about 10 Hz, target swap bypasses), a
+  redraw-smoothness shed this list already sanctions for the portrait. Party, pet,
+  target-of-target, NPC, mob, and object frames receive no heraldry on any tier.
 
 - The armour DYE of a picked outfit colorway (`src/render/characters/armor_dye.ts`,
   `outfitDye` in `modular.ts`). The colorway itself is IDENTITY the player chose in the
