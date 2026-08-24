@@ -2691,7 +2691,9 @@ describe('Guide professions gathering accuracy', () => {
       tier3Prof: String(TIER3_TOOL_GATE_PROFICIENCY),
     });
     expect(en).toContain('the three node trades each have two crafted tools');
-    expect(en).toContain('ladder is the long one, and none of it is free');
+    expect(en).toContain(
+      'ladder is the long one: every hoe above the 20-copper starter is crafted',
+    );
     expect(en).toContain('all four taught by the toolmaker rather than known from the start');
     expect(en).toContain('a bed of tier N asks a hoe of tier N');
     // The retired claims, each pinned ABSENT so a revert reds rather than

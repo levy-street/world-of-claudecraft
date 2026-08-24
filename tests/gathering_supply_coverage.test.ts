@@ -284,6 +284,11 @@ const REFUSED_ENDGAME_ROWS: string[] = [];
 
 /** The per-family, per-band count of qualifying recipes: the audit matrix. */
 function bandMatrix(): Map<string, Map<number, string[]>> {
+  // Reset FIRST, so a second call cannot double the refused list. It is called
+  // exactly once today (MATRIX, at module scope) and the pin below would fail
+  // loudly rather than silently on a second call, but a guard whose own
+  // bookkeeping depends on being invoked once is a trap for whoever extends it.
+  REFUSED_ENDGAME_ROWS.length = 0;
   const matrix = new Map<string, Map<number, string[]>>();
   for (const family of FAMILY_IDS) {
     const ids = SUPPLY.get(family) as Set<string>;
