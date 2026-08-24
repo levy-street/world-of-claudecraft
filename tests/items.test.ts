@@ -1,6 +1,7 @@
 import { readFileSync } from 'node:fs';
 import path from 'node:path';
 import { describe, expect, it } from 'vitest';
+import { ALL_RECIPES, TROPHY_RECIPES } from '../src/sim/content/recipes';
 import { ITEMS } from '../src/sim/data';
 import * as items from '../src/sim/items';
 import { Sim } from '../src/sim/sim';
@@ -1007,6 +1008,25 @@ describe('items vendor: buy / sell / sellAllJunk / buyBack', () => {
     // promoted from poor, two already common: the cinderscale and the pelt)
     // must be invisible to the junk sweep, exactly like wolf_fang; the two
     // still-poor holdouts prove the sweep predicate itself stayed live.
+    // The adopted list is DERIVED from the shipped rows the way
+    // tests/bags_view.test.ts derives it (every junk-kind reagent of a trophy
+    // row that no other recipe also consumes) and held equal to the literal:
+    // a de-adopted trophy (its row dropped or re-picked off it) reds here
+    // too, which the two already-common ids could never do on their own,
+    // since their sweep verdict is the same before and after adoption.
+    const trophyRecipeIds = new Set(TROPHY_RECIPES.map((r) => r.id));
+    const sharedReagents = new Set<string>();
+    for (const recipe of ALL_RECIPES) {
+      if (trophyRecipeIds.has(recipe.id)) continue;
+      for (const reagent of recipe.reagents) sharedReagents.add(reagent.itemId);
+    }
+    const derived = new Set<string>();
+    for (const recipe of TROPHY_RECIPES) {
+      for (const reagent of recipe.reagents) {
+        if (ITEMS[reagent.itemId]?.kind !== 'junk') continue;
+        if (!sharedReagents.has(reagent.itemId)) derived.add(reagent.itemId);
+      }
+    }
     const slot = { count: 1 };
     const adopted = [
       'bandit_bandana',
@@ -1020,6 +1040,8 @@ describe('items vendor: buy / sell / sellAllJunk / buyBack', () => {
       'old_cragmaws_pelt',
       'tallow_candle',
     ] as const;
+    expect(adopted).toHaveLength(10);
+    expect([...derived].sort()).toEqual([...adopted]);
     for (const id of adopted) {
       expect(items.junkSellableSlot(ITEMS[id], slot), id).toBe(false);
     }

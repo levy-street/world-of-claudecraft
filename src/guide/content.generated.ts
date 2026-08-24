@@ -11193,8 +11193,8 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
         }
       },
       {
-        "id": "recipe_cragmaw_huntcord",
-        "name": "Cragmaw's Huntcord",
+        "id": "recipe_cragwalker_boots",
+        "name": "Cragwalker Boots",
         "skillReq": 50,
         "tier": 2,
         "station": "tannery",
@@ -11207,7 +11207,11 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
           },
           {
             "name": "Pristine Hide",
-            "count": 2
+            "count": 3
+          },
+          {
+            "name": "Osmium Ore",
+            "count": 1
           },
           {
             "name": "Tanning Agent",
@@ -11215,9 +11219,9 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
           }
         ],
         "output": {
-          "name": "Cragmaw's Huntcord",
+          "name": "Cragwalker Boots",
           "count": 1,
-          "quality": "rare"
+          "quality": "common"
         },
         "combo": null,
         "oncePerDay": false,

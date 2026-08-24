@@ -1197,6 +1197,14 @@ describe('Reliquary Rares of the Realm pages pin against the live rare tables', 
         hints.filter((h) => h.sourceKind === 'zone'),
         relic.itemId,
       ).toHaveLength(1);
+      // At most one profession door per spoils relic: a craft route beside
+      // a rare's roll is a deliberate second door (the gravewyrm quiver's
+      // shape), never a bundle of them. None is named today: the phase 11l
+      // huntcord door was withdrawn in the third fix round.
+      expect(
+        hints.filter((h) => h.sourceKind === 'profession').length,
+        relic.itemId,
+      ).toBeLessThanOrEqual(1);
     }
   });
 
@@ -2736,12 +2744,13 @@ const EXPECTED_DISTINCT_SOURCES: Record<string, number> = {
   // 24 = the 19 rares plus the 5 zones they camp across (vale, marsh, peaks,
   // hollow, drakelands).
   conquerors_rares_of_the_realm: 24,
-  // 20 = the 14 rares that drop a rare+ item (the five no-drop templates
+  // 19 = the 14 rares that drop a rare+ item (the five no-drop templates
   // contribute nothing here), their 4 camp zones (no drakelands: the
-  // broodlord is marks-only), gutripper_shiv's q_drogmar door, and since
-  // Masterwrought phase 11l cragmaw_huntcord's leatherworking trophy recipe
-  // door (recipe_cragmaw_huntcord, beside its old_cragmaw hint).
-  conquerors_spoils_of_the_realm: 20,
+  // broodlord is marks-only), and gutripper_shiv's q_drogmar door. (The
+  // Masterwrought phase 11l leatherworking door on cragmaw_huntcord was
+  // withdrawn in the phase's third fix round: the pelt recipe now makes
+  // cragwalker_boots, not Old Cragmaw's own chase belt.)
+  conquerors_spoils_of_the_realm: 19,
   // The two honor quartermasters, on every slot of both pages (Phase 21).
   conquerors_warfare_gallery: 2,
   conquerors_warfare_armory: 2,
@@ -3777,27 +3786,31 @@ describe('Reliquary source hint coverage', () => {
     // the rods add their Litany board keeper (2) plus, on the recipe family,
     // the three engineering rod recipes (every catalogued rod names the
     // craft, the apex rung since masterwrought Phase 11i). The recipe family
-    // is seven today: the two combo brand pieces (boundstone_helm's
+    // is six today: the two combo brand pieces (boundstone_helm's
     // armorcrafting helm, gravewyrm_gauntlets' weaponcrafting gauntlets), the
-    // three rods, and the two masterwrought Phase 11l trophy routes,
+    // three rods, and the one masterwrought Phase 11l trophy route,
     // recipe_gravewyrm_bone_quiver (leatherworking, beside its Korzul boss
-    // door on conquerors_gravewyrm_sanctum) and recipe_cragmaw_huntcord
-    // (leatherworking, beside its Old Cragmaw boss door on
-    // conquerors_spoils_of_the_realm).
+    // door on conquerors_gravewyrm_sanctum). The phase's second round also
+    // counted recipe_cragmaw_huntcord here; its third fix round withdrew
+    // that door, because the pelt is Old Cragmaw's guaranteed drop and one
+    // pelt per craft made his own 0.25 chase belt deterministic (the recipe
+    // now makes the vendor's cragwalker_boots, which no page catalogs).
     expect(routesByFamily.mob).toBeGreaterThanOrEqual(211);
     expect(routesByFamily.heroic).toBeGreaterThanOrEqual(47);
     expect(routesByFamily.vendor).toBeGreaterThanOrEqual(101);
     expect(routesByFamily.quest).toBeGreaterThanOrEqual(8);
-    expect(routesByFamily.recipe).toBeGreaterThanOrEqual(7);
+    expect(routesByFamily.recipe).toBeGreaterThanOrEqual(6);
     expect(routesByFamily.delveChest).toBeGreaterThanOrEqual(8);
     expect(routesByFamily.riftReins).toBeGreaterThanOrEqual(6);
     expect(routesByFamily.store).toBeGreaterThanOrEqual(29);
     expect(routesByFamily.activity).toBeGreaterThanOrEqual(10);
     const checkedRoutes = Object.values(routesByFamily).reduce((a, b) => a + b, 0);
-    // Measured at Phase 11l's second review round: mob 211, heroic 47,
-    // vendor 101, quest 8, recipe 7, delveChest 8, riftReins 6, store 29,
-    // activity 10.
-    expect(checkedRoutes).toBeGreaterThanOrEqual(427);
+    // Measured at Phase 11l's third fix round: mob 211, heroic 47, vendor
+    // 101, quest 8, recipe 6, delveChest 8, riftReins 6, store 29, activity
+    // 10. This total equals the sum of the nine family floors above, so it is
+    // documentation of the whole rather than an independent tripwire: the
+    // per-family floors are what red on a lost route.
+    expect(checkedRoutes).toBeGreaterThanOrEqual(426);
   });
 
   it('every acknowledgment family can actually fail (one doctored miss per family)', () => {

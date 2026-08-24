@@ -7,7 +7,7 @@
 // same plain fields either way; sim-only junk must be ignored).
 import { describe, expect, it } from 'vitest';
 import { STATIONS } from '../src/sim/content/professions';
-import { COMBO_RECIPES } from '../src/sim/content/recipes';
+import { COMBO_RECIPES, TROPHY_RECIPES } from '../src/sim/content/recipes';
 import { ITEMS } from '../src/sim/data';
 import {
   availableTrainCopper,
@@ -206,6 +206,38 @@ describe('buildTrainView', () => {
     // Known rows never carry a requirement.
     for (const row of view.rows.filter((entry) => entry.state === 'known')) {
       expect(row.requirement, row.recipeId).toBeUndefined();
+    }
+  });
+
+  it('the tannery master lists every leatherworking trophy row, locked at its rung', () => {
+    // PRESENCE-based, unlike the forge arm's exact locked ladder: the
+    // tannery's whole list is not pinned here, only that each Masterwrought
+    // phase 11l leatherworking trophy row (TROPHY_RECIPES) reaches Tanner
+    // Hesk's window at skill 0 as a locked row naming its craft and rung.
+    // The rung per row is a LITERAL, never recipe.skillReq echoed back.
+    const tannery = STATIONS.find((station) => station.type === 'tannery');
+    expect(tannery?.masterNpcId).toBe('tanner_hesk');
+    const leatherTrophyRows = TROPHY_RECIPES.filter((r) => r.professionId === 'leatherworking');
+    const RUNG_BY_ROW: Record<string, number> = {
+      recipe_oiled_boots: 25,
+      recipe_gravewyrm_bone_quiver: 50,
+      recipe_cragwalker_boots: 50,
+      recipe_cragprowl_belt: 50,
+    };
+    expect(leatherTrophyRows.map((r) => r.id).sort()).toEqual(Object.keys(RUNG_BY_ROW).sort());
+    for (const [shape, junk] of SHAPES) {
+      const view = buildTrainView('tanner_hesk', deps(junk));
+      expect(view.stationType, shape).toBe('tannery');
+      const byId = new Map(view.rows.map((row) => [row.recipeId, row]));
+      for (const recipe of leatherTrophyRows) {
+        const row = byId.get(recipe.id);
+        expect(row, `${shape} ${recipe.id} present`).toBeDefined();
+        expect(row?.state, `${shape} ${recipe.id}`).toBe('locked');
+        expect(row?.requirement, `${shape} ${recipe.id}`).toEqual({
+          craft: 'leatherworking',
+          skill: RUNG_BY_ROW[recipe.id],
+        });
+      }
     }
   });
 

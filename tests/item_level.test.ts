@@ -490,11 +490,12 @@ describe('item level: the phase 11l trophy recipe outputs (TROPHY_RECIPES)', () 
   // level: a future level edit on a trophy row is a deliberate re-tier of a
   // shipped item, never a drive-by. The itemLevel pin is decisive only UPWARD
   // for the rows capped at their output's live drop source (the lantern, the
-  // boots, the maul, and the two leather rows the second review round added:
-  // the huntcord at Old Cragmaw, the cragprowl belt at the Thornpeak Ogres):
-  // the mob source wins on a LOWERED recipe level and the item level never
-  // moves, which is why the recipe.level literal is pinned beside it in
-  // TROPHY_RECIPE_LEVELS. hobnail_boots and vale_carving_knife were
+  // boots, the maul, and the cragprowl belt at the Thornpeak Ogres, the
+  // leather row the second review round added): the mob source wins on a
+  // LOWERED recipe level and the item level never moves, which is why the
+  // recipe.level literal is pinned beside it in TROPHY_RECIPE_LEVELS.
+  // hobnail_boots, vale_carving_knife and cragwalker_boots (the pelt's
+  // output since the third fix round re-picked it off cragmaw_huntcord) were
   // vendor-only before (no derivable source at all) and GAINED their level
   // from the recipe. The potion and the pouch carry no combat slot, so they
   // are not item-level eligible and stay undefined whatever the row says.
@@ -507,7 +508,7 @@ describe('item level: the phase 11l trophy recipe outputs (TROPHY_RECIPES)', () 
     fenshadow_maul: 13,
     healing_potion: undefined,
     linen_pouch: undefined,
-    cragmaw_huntcord: 17,
+    cragwalker_boots: 20,
     cragprowl_belt: 17,
   };
 
@@ -537,7 +538,7 @@ describe('item level: the phase 11l trophy recipe outputs (TROPHY_RECIPES)', () 
     recipe_fenshadow_maul: 12,
     recipe_healing_potion: 15,
     recipe_linen_pouch: 10,
-    recipe_cragmaw_huntcord: 14,
+    recipe_cragwalker_boots: 20,
     recipe_cragprowl_belt: 16,
   };
 

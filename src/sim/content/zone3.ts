@@ -2562,8 +2562,12 @@ export const ZONE3_ITEMS: Record<string, ItemDef> = {
   },
   // --- Old Cragmaw drops ---
   // Old Cragmaw's signature trophy, guaranteed to the slayer of the rare elite.
-  // Pure vendor value, no quest tie, so it always feels like a boss-kill reward
-  // and never blocks a turn-in.
+  // A leatherworking reagent (recipe_cragwalker_boots) and still no quest tie,
+  // so it feels like a boss-kill reward, vendors at its 300 or tans into the
+  // crags' boots, and never blocks a turn-in.
+  // Reagent now (TROPHY_RECIPES, Masterwrought phase 11l), same convention as
+  // wolf_fang in items.ts: common NOT poor so sellAllJunk never sweeps it;
+  // already common, sellValue unchanged.
   old_cragmaws_pelt: {
     id: 'old_cragmaws_pelt',
     name: "Old Cragmaw's Pelt",
@@ -2739,6 +2743,9 @@ export const ZONE3_ITEMS: Record<string, ItemDef> = {
     sellValue: 1050,
   },
   // Voskar the Emberwing drops (rare elite dragonkin)
+  // Reagent now (TROPHY_RECIPES, Masterwrought phase 11l), same convention as
+  // wolf_fang in items.ts: common NOT poor so sellAllJunk never sweeps it;
+  // already common, sellValue unchanged.
   emberwing_cinderscale: {
     id: 'emberwing_cinderscale',
     name: 'Emberwing Cinderscale',

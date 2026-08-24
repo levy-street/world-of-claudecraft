@@ -675,6 +675,14 @@ describe('the professions blob growth bound (phase 16)', () => {
     // recipe_cragmaw_huntcord (23 characters, 26 quoted plus comma) and
     // recipe_cragprowl_belt (21, 24), predicted 17,122 + 50 = 17,172 and
     // measured so. Headroom stays 11 above and 380 below, unchanged.
+    //
+    // AND AGAIN AT 11l's third fix round: 17,172 bytes, band unchanged. The
+    // round re-picked the pelt row's id, recipe_cragmaw_huntcord (23
+    // characters, 26 quoted plus comma) out of knownRecipes and
+    // recipe_cragwalker_boots in; the round's brief counted the new id at 22
+    // and predicted 17,171, the measurement said 17,172, and recounting the
+    // id settles it (also 23, 26): the delta is 0. Recorded as the
+    // discipline requires, prediction, observation, and the reconciliation.
     const bytes = professionsBytes(s2);
     expect(bytes).toBeGreaterThan(16792);
     expect(bytes).toBeLessThan(17183);

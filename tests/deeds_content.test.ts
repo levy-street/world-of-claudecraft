@@ -62,6 +62,7 @@ import {
   ZONE_FISH,
 } from '../src/sim/deeds';
 import type { LootTier } from '../src/sim/lockpick';
+import { MARKET_HOUSE_STOCK } from '../src/sim/market';
 import {
   craftSkillGainMultiplier,
   enchantingGainMultiplier,
@@ -1829,8 +1830,14 @@ describe('col_junk_drawer stays completable after the phase 11l trophy promotion
   // boss tables (HEROIC_BOSS_LOOT), the four rift clear and world-drop id
   // lists (RIFT_*_ITEM_IDS), the Drowned Litany chest table (every LootTier,
   // every class, both bountiful arms), vendor stock (NPC rows, the heroic
-  // quartermaster, the delve shops), ground pickups, every fishing cell in
-  // every band, quest rewards, and recipe outputs.
+  // quartermaster, the delve shops), the World Market's house stock
+  // (MARKET_HOUSE_STOCK), ground pickups, every fishing cell in every band,
+  // quest rewards, and recipe outputs.
+  //
+  // The heroic, rift and delve arms contribute no poor id today (78 heroic
+  // and rift entries and 189 chest entries visited, zero poor), so they are
+  // scope insurance rather than a pin: a poor id authored onto one of those
+  // tables later enters the walk here instead of stranding the deed unseen.
   //
   // CLOSURE: the faucets deliberately NOT walked cannot emit a poor id, so
   // the scope is complete rather than merely wide. Gathering yields carry no
@@ -1846,8 +1853,16 @@ describe('col_junk_drawer stays completable after the phase 11l trophy promotion
   // Core stacks the PostOffice fills; the Exchange custody letters carry the
   // player's own parcel back. The heroic variants are merged into ITEMS
   // before this scan runs (src/sim/data.ts, buildHeroicVariants), so livePoor
-  // below already sees them. The player market is not a faucet: it moves ids
-  // a character acquired through one of the routes above.
+  // below already sees them. The World Market IS a faucet on its house side:
+  // MARKET_HOUSE_STOCK (src/sim/market.ts) is a reseeded house-listing table
+  // that never depletes, so it is walked below; player listings only move
+  // ids a character acquired through one of the routes above. The /dev
+  // vendor (src/sim/content/ptr_dev_vendor.ts) is spawned on demand under
+  // ALLOW_DEV_COMMANDS, never placed in NPCS, and stocks epic gear only
+  // (allEpicGearIds), so it is invisible to the NPCS walk and can emit no
+  // poor id. The rift clear pools (src/sim/rift/loot_pools.ts) derive from
+  // tables the walk already covers: the five-man dungeon mob loot merged
+  // into MOBS, HEROIC_BOSS_LOOT, and RIFT_EPIC_ITEM_IDS.
   const reachable = new Set<string>();
   const note = (itemId: string | null | undefined): void => {
     if (itemId && ITEMS[itemId]?.quality === 'poor') reachable.add(itemId);
@@ -1885,6 +1900,7 @@ describe('col_junk_drawer stays completable after the phase 11l trophy promotion
   for (const npc of Object.values(NPCS)) for (const itemId of npc.vendorItems ?? []) note(itemId);
   for (const offer of HEROIC_VENDOR_STOCK) note(offer.itemId);
   for (const entries of Object.values(DELVE_SHOPS)) for (const entry of entries) note(entry.itemId);
+  for (const stock of MARKET_HOUSE_STOCK) note(stock.itemId);
   for (const g of GROUND_OBJECTS) note(g.itemId);
   for (const band of FISHING_TABLES_BY_BAND) {
     for (const rows of Object.values(band)) for (const entry of rows) note(entry.itemId);

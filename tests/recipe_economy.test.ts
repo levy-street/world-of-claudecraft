@@ -405,7 +405,7 @@ describe('REFERENTIAL INTEGRITY', () => {
       recipe_fenshadow_maul: 'cracked_ogre_tusk',
       recipe_healing_potion: 'tallow_candle',
       recipe_linen_pouch: 'bandit_bandana',
-      recipe_cragmaw_huntcord: 'old_cragmaws_pelt',
+      recipe_cragwalker_boots: 'old_cragmaws_pelt',
       recipe_cragprowl_belt: 'emberwing_cinderscale',
     };
     expect(Object.keys(TROPHY_BY_RECIPE).sort()).toEqual(TROPHY_RECIPES.map((r) => r.id).sort());

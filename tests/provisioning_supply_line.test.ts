@@ -875,7 +875,7 @@ describe('masterwrought R18 and farming D24: the displacement guard', () => {
     // reducing any herb, fish, meat or salt count ANYWHERE, so a replacement
     // row must carry what the row it replaces carried.
     // RE-MEASURED AT Masterwrought phase 11l, the trophy economy: two of the
-    // eight trophy consumer rows carry goldleaf (the Valefire Lantern's 2, the
+    // ten trophy consumer rows carry goldleaf (the Valefire Lantern's 2, the
     // Healing Potion's 1) and none carries silverleaf or sunpetal, so goldleaf
     // goes 29 to 32 while the other two hold. Pure additions again: nothing
     // was reduced anywhere.

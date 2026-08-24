@@ -3866,24 +3866,46 @@ export const FARM_RECIPES: ProfessionRecipeRecord[] = [
 // drops become reagents, one consumer recipe per adopted trophy (eight
 // promoted poor to common, plus the two already-common rare-elite leather
 // trophies the second review round adopted). Outputs are EXISTING uncrafted
-// shipped items (the COMMON_RECIPES precedent: no new item defs), each rung
-// matches its trophy's drop level, and no shipped recipe's bill was edited.
+// shipped items (the COMMON_RECIPES precedent: no new item defs), and no
+// shipped recipe's bill was edited. Each row's RUNG (skillReq) follows its
+// trophy's drop level; the LEVEL field is capped at the OUTPUT's live drop
+// source where one exists, and takes the rung scaffolding where none does.
 // Every bill contains its trophy (sellValue only, no buyValue), so no row
 // joins the counterfactually-vendor-fed set.
 //
-// 11l-RUNG EXCLUSION RECORD (one line per id, so the record greps in src):
-//   gleamstag_charm 2500: value-excluded, jewelcrafting (the uncrafted jewelry
-//     pool above 600 is 16 endgame epics, barred by the rung-50 rare ceiling,
-//     and one rift rare at 5000).
+// The pinned economy doctrine (tests/recipe_economy.test.ts: output strictly
+// between the trophy's sellValue and the LISTED bill) is list-count-only by
+// the shipped test's design: the specialization and self-signed discounts
+// (requiredReagentCountFor in src/sim/professions/crafting.ts, the crafter's
+// reward) can take a bill under its output, bounded by trophy supply, and
+// each row prints its discounted figure.
+//
+// 11l-RUNG EXCLUSION RECORD (one line per id, so the record greps in src).
+// Scope: the 21 junk mob-drop orphans (ten adopted below, nine excluded
+// here, two holdouts); soggy_boot (fishing only) and the three Brightwood
+// Glade wildlife ids (no source) are not mob drops and carry no line.
+// Row 123 (docs/prd/masterwrought/farming/state.md) predicted
+// old_cragmaws_pelt and emberwing_cinderscale as value exclusions against
+// the CRAFTED ceiling (460, leather 420); row 122's doctrine picks UNCRAFTED
+// outputs, whose leather pool answers 400 and 440, which is what admits them
+// (a divergence recorded, not a re-decision).
+//   gleamstag_charm 2500: value-excluded, jewelcrafting (the uncrafted neck
+//     and ring pool is 25 items: 9 honor pieces at sellValue 0 and 16 above
+//     600, of them 14 epic, one legendary (heart_of_the_rift at 50000) and
+//     one rare (abyssal_loop at 5000, rift-exclusive relic content whose
+//     value no honest bill exceeds); nothing in (25, 460]).
 //   deepfen_pearl 600: value-excluded, jewelcrafting (the same pool).
-//   guardian_core 180: value-excluded, engineering (lane empty by ruling,
-//     farming/state.md row 119).
+//   guardian_core 180: ruling-excluded, engineering (180 is under every
+//     ceiling; the lane goes empty by ruling, farming/state.md row 123, and
+//     its on-ramp is row 119).
 //   pale_pearl 30: output-excluded, jewelcrafting (no uncrafted neck or ring
-//     in (25, 460]: the pool is 9 honor epics at 0 and 16 endgame epics).
+//     in (25, 460]: the same 25-item pool).
 //   ogre_toe_ring 25: output-excluded, jewelcrafting (the same gap).
 //   briny_idol 32: output-excluded, inscription (register: caster held-offhands
 //     and scrolls; the uncrafted scroll pool is empty, and the one uncrafted
-//     caster offhand, valefire_lantern, went to the zone2-rung cracked_fetish).
+//     caster offhand below the rung ceiling, valefire_lantern, went to the
+//     zone2-rung cracked_fetish; wraithfire_orb is epic at 12000, barred by
+//     the rung-50 rare cap).
 //   frayed_prayer_beads 30: output-excluded, inscription (as briny_idol).
 //   moonpale_scale 26: output-excluded, inscription (as briny_idol).
 //   inert_storm_shard 28: output-excluded, enchanting (arcane_shard is reserved
@@ -3901,6 +3923,8 @@ export const TROPHY_RECIPES: ProfessionRecipeRecord[] = [
     // essence lines beside them. Input 178 vs output 160.
     // 11l-OUT: trophy 14 < output 160 < input 178; no prior recipe crafts
     // valefire_lantern (recipeForResultItem); uncommon at the 25 rung ceiling.
+    // Discounted bill (requiredReagentCountFor at full specialization: the
+    // fetish and the herb 2 to 1): 104 vs 160.
     reagents: [
       { itemId: 'cracked_fetish', count: 2 },
       { itemId: 'goldleaf_herb', count: 2 },
@@ -3930,6 +3954,8 @@ export const TROPHY_RECIPES: ProfessionRecipeRecord[] = [
     // hide/silk/agent register does the rest. Input 92 vs output 80.
     // 11l-OUT: trophy 5 < output 80 < input 92; no prior recipe crafts
     // oiled_boots (recipeForResultItem); uncommon at the 25 rung ceiling.
+    // Discounted bill (requiredReagentCountFor at full specialization: scales
+    // 4 to 3, hide 6 to 4, silk and agent 2 to 1): 56 vs 80.
     reagents: [
       { itemId: 'mudfin_scale', count: 4 },
       { itemId: 'rough_hide', count: 6 },
@@ -3955,6 +3981,8 @@ export const TROPHY_RECIPES: ProfessionRecipeRecord[] = [
     // studs, pristine hide, the vats) carries the value. Input 411 vs
     // output 360. 11l-OUT: trophy 35 < output 360 < input 411; no prior
     // recipe crafts it (recipeForResultItem); rare at the 50 rung ceiling.
+    // Discounted bill (requiredReagentCountFor at full specialization: scales
+    // 3 to 2, hide 2 to 1, thorium 4 to 3): 291 vs 360.
     reagents: [
       { itemId: 'cracked_wyrm_scale', count: 3 },
       { itemId: 'pristine_hide', count: 2 },
@@ -3976,6 +4004,8 @@ export const TROPHY_RECIPES: ProfessionRecipeRecord[] = [
     // rung's own register. Input 100 vs output 90.
     // 11l-OUT: trophy 12 < output 90 < input 100; no prior recipe crafts
     // hobnail_boots (recipeForResultItem); common, below the 25 rung ceiling.
+    // Discounted bill (requiredReagentCountFor at full specialization:
+    // nuggets and ore 3 to 2, flux 2 to 1): 60 vs 90.
     reagents: [
       { itemId: 'bogiron_nugget', count: 3 },
       { itemId: 'iron_ore', count: 3 },
@@ -4000,6 +4030,8 @@ export const TROPHY_RECIPES: ProfessionRecipeRecord[] = [
     // register. Input 129 vs output 120.
     // 11l-OUT: trophy 15 < output 120 < input 129; no prior recipe crafts
     // vale_carving_knife (recipeForResultItem); common, below the 25 ceiling.
+    // Discounted bill (requiredReagentCountFor at full specialization: every
+    // listed 3 to 2): 86 vs 120.
     reagents: [
       { itemId: 'chipped_tusk', count: 3 },
       { itemId: 'iron_ore', count: 3 },
@@ -4028,8 +4060,9 @@ export const TROPHY_RECIPES: ProfessionRecipeRecord[] = [
     // Discounted bill: requiredReagentCountFor (src/sim/professions/crafting.ts)
     // at full specialization plus self-signed floors every listed 2 to 1, so
     // the bill falls to 42 + 160 + 20 = 222 against 420 out, bounded by supply
-    // (cracked_ogre_tusk has one source, brutok_skullsmasher, so each craft is
-    // two named-elite kills).
+    // (cracked_ogre_tusk has one source, brutok_skullsmasher, so at the
+    // discounted bill each craft is ONE named-elite kill, two at the listed
+    // bill).
     // Re-picked from bristleback_maul (R21): that maul is item level 7, so a
     // rung-50 crafter had no reason to make it.
     reagents: [
@@ -4058,6 +4091,8 @@ export const TROPHY_RECIPES: ProfessionRecipeRecord[] = [
     // the rung's own register. Input 82 vs output 32 (the goldleaf_scroll
     // precedent ships 90 vs 15). 11l-OUT: trophy 5 < output 32 < input 82; no
     // prior recipe crafts it (recipeForResultItem); common, below the ceiling.
+    // Discounted bill (requiredReagentCountFor at full specialization: candles
+    // 2 to 1): 77 vs 32, still gold-negative.
     reagents: [
       { itemId: 'tallow_candle', count: 2 },
       { itemId: 'goldleaf_herb', count: 1 },
@@ -4078,6 +4113,8 @@ export const TROPHY_RECIPES: ProfessionRecipeRecord[] = [
     // thread register; the vendor sells it at 250, so crafting is the
     // discount route. Input 72 vs output 60. 11l-OUT: trophy 6 < output 60 <
     // input 72; no prior recipe crafts it (recipeForResultItem); common.
+    // Discounted bill (requiredReagentCountFor at full specialization:
+    // bandanas 2 to 1, scrap and thread 4 to 3): 51 vs 60.
     reagents: [
       { itemId: 'bandit_bandana', count: 2 },
       { itemId: 'linen_scrap', count: 4 },
@@ -4090,30 +4127,40 @@ export const TROPHY_RECIPES: ProfessionRecipeRecord[] = [
     stationType: 'loom',
   },
   {
-    id: 'recipe_cragmaw_huntcord',
+    id: 'recipe_cragwalker_boots',
     professionId: 'leatherworking',
-    resultItemId: 'cragmaw_huntcord',
+    resultItemId: 'cragwalker_boots',
     resultCount: 1,
-    // The pelt is Old Cragmaw's guaranteed trophy and the huntcord his chase
-    // belt (a 0.25 roll), so the recipe is the deterministic door beside the
-    // roll (the gravewyrm quiver's Korzul shape), the duskhide rung-50
-    // register (pristine hide, the vats) around it. Input 366 vs output 340.
-    // 11l-OUT: trophy 300 < output 340 < input 366; no prior recipe crafts
-    // cragmaw_huntcord (recipeForResultItem); rare at the 50 rung ceiling.
+    // Old Cragmaw's pelt into the Cragwalker boots the same crags' vendor
+    // sells (Cragmaw to Cragwalker), the duskhide rung-50 register (pristine
+    // hide, a thorium stud, the vats) around it; Quartermaster Bree sells the
+    // boots at 4000, so crafting is the discount route (the linen_pouch
+    // shape). Input 451 vs output 400. 11l-OUT: trophy 300 < output 400 <
+    // input 451; no prior recipe crafts cragwalker_boots
+    // (recipeForResultItem); common, below the 50 rung ceiling.
+    // Deliberately NOT cragmaw_huntcord, Old Cragmaw's own 0.25 chase belt:
+    // the pelt is that same kill's guaranteed drop, so one pelt per craft
+    // would make the chase deterministic (not the quiver precedent, which
+    // pairs three 0.5 trash-drop scales with a 0.05 boss roll), and two
+    // pelts per craft vendor 600 against 340 out, barred by the doctrine.
+    // Discounted bill (the maul precedent): requiredReagentCountFor
+    // (src/sim/professions/crafting.ts) at full specialization floors
+    // pristine_hide 3 to 2, 426 vs 400; specialized with a self-signed hide,
+    // 3 to 1, 300 + 25 + 60 + 16 = 401 vs 400, which holds by one copper.
     reagents: [
       { itemId: 'old_cragmaws_pelt', count: 1 },
-      { itemId: 'pristine_hide', count: 2 },
+      { itemId: 'pristine_hide', count: 3 },
+      { itemId: 'thorium_ore', count: 1 },
       { itemId: 'tanning_agent', count: 1 },
     ],
     skillReq: 50,
     itemLevelBudget: 20,
-    // Capped at the huntcord's live drop source (Old Cragmaw, level 14) so
-    // the recipe route cannot re-tier the shipped item past its pinned item
-    // level 17 (see the lantern note).
-    // Profession XP reads the same field: craftActionXp(14, 20) = 19 for a
-    // level-20 crafter (green band, 6 below against zeroDiff 8), against 100
-    // for a level-20 row.
-    level: 14,
+    // No live source to cap against: cragwalker_boots is vendor-only (no
+    // drop, quest or loot source), so 20 is the rung-50 scaffolding
+    // convention. The consequence is recorded, not accidental: the item gains
+    // a derivable item level (20) and so a tooltip item level line it never
+    // showed before.
+    level: 20,
     acquisition: ['trainer'],
     stationType: 'tannery',
   },
@@ -4128,6 +4175,10 @@ export const TROPHY_RECIPES: ProfessionRecipeRecord[] = [
     // vs output 440. 11l-OUT: trophy 320 < output 440 < input 471; no prior
     // recipe crafts cragprowl_belt (recipeForResultItem); uncommon, below the
     // 50 rung ceiling.
+    // Discounted bill (requiredReagentCountFor, src/sim/professions/crafting.ts):
+    // specialized only, pristine_hide 3 to 2, 446 vs 440; specialized with a
+    // self-signed hide, 3 to 1, 421 vs 440 (the listed 471 inverts; bounded by
+    // the cinderscale's one source, Voskar, and the bought agent at 16).
     reagents: [
       { itemId: 'emberwing_cinderscale', count: 1 },
       { itemId: 'pristine_hide', count: 3 },

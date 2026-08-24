@@ -128,7 +128,7 @@ const HONEST_MATERIALS = [
   'marsh_rice_seed',
   'mudfin_scale',
   // Masterwrought phase 11l's second review round: already common (never
-  // poor), derives IN as the trophy recipe_cragmaw_huntcord consumes
+  // poor), derives IN as the trophy recipe_cragwalker_boots consumes
   // (TROPHY_RECIPES); the cinderscale above is its twin.
   'old_cragmaws_pelt',
   // Masterwrought phase 09: derives IN as the reagent the apex engineering
@@ -199,21 +199,23 @@ const HONEST_MATERIALS = [
   'wyrmhide_cording',
 ] as const;
 
-// The ONLY non-poor junk allowed outside the material set: two rare-mob
-// signature trophies (dawnhold_posy, gleamstag_charm), the guardian_core and
-// last_keep_signet oddments (the Quickening Catalyst is deliberately NOT here,
-// it derives IN via its nine in-phase consumers), and the Phase 12 harvest
-// feast (a crafted PLACEABLE, not a material: nothing crafts FROM it, and its
-// one consumer is the place_feast command). A new junk item landing in this
-// assertion's diff must be classified: either author it into a source table
-// (a node yield, grade, component, specimen, salvage return, or junk-kind
-// reagent) so it derives IN, or add it here as a deliberate non-material with
-// the maintainer's sign-off.
+// The ONLY non-poor junk allowed outside the material set, all eight of them:
+// two rare-mob signature trophies (dawnhold_posy, gleamstag_charm), the
+// guardian_core and last_keep_signet oddments (the Quickening Catalyst is
+// deliberately NOT here, it derives IN via its nine in-phase consumers), the
+// Phase 12 harvest_feast (a crafted PLACEABLE, not a material: nothing crafts
+// FROM it, and its one consumer is the place_feast command), and the three
+// Masterwrought phase 11k apex role feasts on the same footing
+// (sageleaf_feast, stonepot_feast, warspice_feast). A new junk item landing in
+// this assertion's diff must be classified: either author it into a source
+// table (a node yield, grade, component, specimen, salvage return, or
+// junk-kind reagent) so it derives IN, or add it here as a deliberate
+// non-material with the maintainer's sign-off.
 const ALLOWED_UNCLASSIFIED_JUNK = [
   'dawnhold_posy',
   // Masterwrought phase 11l's second review round removed
   // emberwing_cinderscale and old_cragmaws_pelt: the two leather trophy
-  // recipes (recipe_cragprowl_belt, recipe_cragmaw_huntcord) are their
+  // recipes (recipe_cragprowl_belt, recipe_cragwalker_boots) are their
   // consumers, so both derive IN through the reagent source table
   // (HONEST_MATERIALS above); the completeness tripwire below forces the
   // move.
@@ -719,10 +721,13 @@ describe('phase 11l trophy promotion: the promoted set, exactly', () => {
   });
 
   // The two already-common rare-elite leather trophies the phase's second
-  // review round adopted (recipe_cragprowl_belt, recipe_cragmaw_huntcord).
+  // review round adopted (recipe_cragprowl_belt, recipe_cragwalker_boots).
   // Neither was ever poor, so the frozen-21 loop above never visits them:
   // this is their own pin, the same three-way shape (quality, frozen
   // sellValue, material membership), with literal values for the same reason.
+  // The quality === 'common' assertion is the "never poor" evidence; a
+  // not-in-PRE_11L_POOR_JUNK check would be vacuous beside it (that list is
+  // frozen text, so it can never start containing them).
   const ADOPTED_NON_POOR: Record<string, number> = {
     emberwing_cinderscale: 320,
     old_cragmaws_pelt: 300,
@@ -736,7 +741,6 @@ describe('phase 11l trophy promotion: the promoted set, exactly', () => {
       expect(def?.quality, `${id} is common`).toBe('common');
       expect(def?.sellValue, `${id} sellValue must stay frozen`).toBe(sellValue);
       expect(MATERIAL_ITEM_IDS.has(id), `${id} should be a material`).toBe(true);
-      expect(PRE_11L_POOR_JUNK, `${id} was never poor`).not.toContain(id);
     }
   });
 });
