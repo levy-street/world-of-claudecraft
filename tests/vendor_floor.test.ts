@@ -17,6 +17,17 @@ import type { ItemDef } from '../src/sim/types';
 
 type MagnitudeAxis = 'potionHp' | 'potionMana' | 'foodHp' | 'drinkMana' | 'potionHpPctMax';
 
+// The one list of consumable magnitude axes, written once so the face check,
+// the classification sweep, and the delve and heroic sweeps cannot drift
+// apart (a fix-round review caught the list written three ways).
+const CONSUMABLE_AXES: readonly MagnitudeAxis[] = [
+  'potionHp',
+  'potionMana',
+  'foodHp',
+  'drinkMana',
+  'potionHpPctMax',
+];
+
 function liveMagnitude(itemId: string, axis: MagnitudeAxis): number | undefined {
   const def = ITEMS[itemId] as ItemDef | undefined;
   return def?.[axis];
@@ -212,9 +223,11 @@ describe('the ladder: every vendor/crafted pair meets its rung margin', () => {
   );
 
   // The rung labels are not free text: each food row's tercile is re-derived
-  // from the pairing range (the crafted tiers that pair with vendor food),
-  // with the endpoints taken from the table's own craftedValue literals and
-  // then pinned, so an endpoint retune re-derives every label with it.
+  // from the pairing range (the crafted tiers that pair with vendor food).
+  // The endpoints come from the table's own craftedValue column and are then
+  // pinned, so the pin is where an endpoint retune fails first; the
+  // derivation documents where the endpoints come from rather than adding
+  // protection beyond the pin.
   it('each food rung label matches the magnitude tercile of its crafted tier', () => {
     const foodRows = PAIRS.filter((r) => r.axis === 'foodHp');
     const lo = Math.min(...foodRows.map((r) => r.craftedValue));
@@ -231,21 +244,49 @@ describe('the ladder: every vendor/crafted pair meets its rung margin', () => {
   });
 
   // The derivation above is one-sided (at or above the vendor value), so the
-  // crafted-only food TIER LIST is pinned whole: a crafted sibling lowered
-  // BELOW its vendor counterpart (the maximal R23 inversion, a crafted food
-  // under the vendor floor) changes this sorted set and reds here even though
-  // no PAIRS row names it. The potion axes need no twin: the six
-  // draught-over-potion pairs in tests/consumables.test.ts backstop them.
-  it('the distinct crafted-only foodHp tiers are exactly the seven known values', () => {
-    const tiers = [
-      ...new Set(
-        [...RECIPE_RESULT_IDS]
-          .filter((id) => !STOCKED_IDS.has(id))
-          .map((id) => liveMagnitude(id, 'foodHp'))
-          .filter((v): v is number => v !== undefined),
-      ),
-    ].sort((a, b) => a - b);
-    expect(tiers).toEqual([90, 117, 243, 432, 552, 980, 1392]);
+  // crafted-only food LINE is pinned whole, PER ID: a crafted sibling
+  // lowered BELOW its vendor counterpart (the maximal R23 inversion, a
+  // crafted food under the vendor floor) reds here even when it lands ON an
+  // existing tier value, which a distinct-tier set would miss because every
+  // tier has several carriers. A deliberate change-detector: authoring or
+  // retuning any crafted food updates this map in the same diff. The potion
+  // axes need no twin: the six draught-over-potion pairs in
+  // tests/consumables.test.ts backstop them.
+  it('the crafted-only foodHp line is exactly the 26 known id-to-value rows', () => {
+    const line: Record<string, number> = {};
+    for (const id of RECIPE_RESULT_IDS) {
+      if (STOCKED_IDS.has(id)) continue;
+      const v = liveMagnitude(id, 'foodHp');
+      if (v !== undefined) line[id] = v;
+    }
+    expect(line).toEqual({
+      anglers_feast_platter: 552,
+      ashwood_smoked_eel: 243,
+      eastbrook_glazed_carrots: 90,
+      eastbrook_root_pottage: 117,
+      evergarden_braised_greens: 980,
+      evergarden_harvest_platter: 980,
+      evergarden_sunmelon_tart: 980,
+      fenbridge_beet_braise: 432,
+      fenbridge_rice_bowl: 243,
+      fenbridge_rice_pudding: 243,
+      frostgill_chowder: 432,
+      goldleaf_game_stew: 243,
+      herbed_marsh_pike: 117,
+      highwatch_barley_bannock: 552,
+      highwatch_barley_porridge: 552,
+      highwatch_gourd_soup: 552,
+      hunters_game_skewer: 117,
+      marlows_grand_roast: 980,
+      pan_seared_perch: 90,
+      peppered_deepbarb_catfish: 552,
+      roast_hollowgill_sturgeon: 980,
+      sageleaf_chowder: 1392,
+      silvered_carp_supper: 552,
+      stonepot_stew: 1392,
+      vale_hearth_loaf: 90,
+      warspice_skewers: 1392,
+    });
   });
 });
 
@@ -353,9 +394,7 @@ describe('the both-sourced nine (ruling qr-11n-NINE)', () => {
       // stock-pulled id (the four gear rows) carries none.
       const def = ITEMS[id] as ItemDef | undefined;
       const consumableFace =
-        (['potionHp', 'potionMana', 'foodHp', 'drinkMana'] as MagnitudeAxis[]).some(
-          (axis) => liveMagnitude(id, axis) !== undefined,
-        ) ||
+        CONSUMABLE_AXES.some((axis) => liveMagnitude(id, axis) !== undefined) ||
         def?.elixir !== undefined ||
         def?.kind === 'bag';
       expect(consumableFace, `${id} carries a consumable face iff exempt`).toBe(
@@ -444,17 +483,9 @@ describe('the classification is exhaustive over every vendor-stocked consumable'
   it('every magnitude-bearing stocked id is classified: paired, exempt, or a drink', () => {
     // potionHpPctMax rides along so a percent-of-max heal potion (soul_stone
     // is the only carrier today, stocked nowhere) cannot slip past the sweep
-    // unclassified. wellFed needs no row: every wellFed carrier also carries
-    // foodHp.
-    const axes: MagnitudeAxis[] = [
-      'potionHp',
-      'potionMana',
-      'foodHp',
-      'drinkMana',
-      'potionHpPctMax',
-    ];
+    // unclassified.
     const stocked = vendorStockedIdsBy(NPCS, (id) =>
-      axes.some((axis) => liveMagnitude(id, axis) !== undefined),
+      CONSUMABLE_AXES.some((axis) => liveMagnitude(id, axis) !== undefined),
     );
     const classified = new Set<string>([
       ...PAIRS.map((r) => r.vendorId),
@@ -470,6 +501,21 @@ describe('the classification is exhaustive over every vendor-stocked consumable'
     expect(stocked).toEqual([...classified].sort());
   });
 
+  // The sweep above reads magnitude axes, so its wellFed omission rests on a
+  // premise: every wellFed carrier also carries foodHp. Pin the premise, or
+  // a future buff-only food (type-legal: both fields are optional) would be
+  // vendor-stockable past every arm here.
+  it('no item carries wellFed without foodHp (the premise of the axis sweep)', () => {
+    const carriers = Object.entries(ITEMS).filter(
+      ([, def]) => (def as { wellFed?: unknown }).wellFed !== undefined,
+    );
+    expect(carriers.length, 'wellFed carriers exist to check').toBeGreaterThan(0);
+    const buffOnly = carriers
+      .filter(([, def]) => (def as { foodHp?: number }).foodHp === undefined)
+      .map(([id]) => id);
+    expect(buffOnly).toEqual([]);
+  });
+
   // NPCS.vendorItems is not the game's only stock counter: the delve shop and
   // the heroic quartermaster sell for marks. Both are gear and tools by
   // design, and this exact blind spot bit the profession-tool guards once
@@ -477,22 +523,20 @@ describe('the classification is exhaustive over every vendor-stocked consumable'
   // sweep covers them: no consumable-axis item may enter either table without
   // joining this suite's classification first.
   it('the delve shop and heroic vendor stock carry no consumable-axis items', () => {
-    const axes: MagnitudeAxis[] = [
-      'potionHp',
-      'potionMana',
-      'foodHp',
-      'drinkMana',
-      'potionHpPctMax',
-    ];
     const delveIds = Object.values(DELVE_SHOPS).flatMap((rows) => rows.map((r) => r.itemId));
     const heroicIds = HEROIC_VENDOR_STOCK.map((r) => r.itemId);
-    // Non-empty floors first, so an emptied or unwired table cannot pass the
-    // expect-empty sweeps below by producing nothing.
-    expect(delveIds.length, 'delve shop rows exist').toBeGreaterThan(0);
-    expect(heroicIds.length, 'heroic vendor rows exist').toBeGreaterThan(0);
+    // Vacuity floors near the real counts (28 delve rows over two shops and
+    // 39 heroic offers today), so a whole shop key dropping out of either
+    // table cannot leave the expect-empty sweeps green over a quietly
+    // smaller surface.
+    expect(delveIds.length, 'delve shop rows near the live count').toBeGreaterThanOrEqual(25);
+    expect(heroicIds.length, 'heroic vendor rows near the live count').toBeGreaterThanOrEqual(35);
     const consumable = (id: string) =>
-      axes.some((axis) => liveMagnitude(id, axis) !== undefined) ||
+      CONSUMABLE_AXES.some((axis) => liveMagnitude(id, axis) !== undefined) ||
       (ITEMS[id] as ItemDef | undefined)?.elixir !== undefined;
+    // Positive control: the predicate flags a known consumable, so the empty
+    // filters below are real absences.
+    expect(consumable('healing_potion'), 'the consumable predicate is alive').toBe(true);
     expect(delveIds.filter(consumable)).toEqual([]);
     expect(heroicIds.filter(consumable)).toEqual([]);
   });
