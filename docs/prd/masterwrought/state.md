@@ -17099,7 +17099,7 @@ the rows this phase's families touch:
 | glass_vial | 24 | 24 | recipes only |
 | iron_ore | 23 | 65 | recipes only |
 | spider_silk | 14 | 49 | recipes only |
-| arcane_shard | 12 | 21 | 2 recipes (the two rung-25 charms at 5) + 10 enchants (six Greater, four Lucent, at 1) |
+| arcane_shard | 12 | 21 | 2 recipes (the two rung-25 charms at 5) + 10 enchants (nine rows at 1, the Lucent Infusion at 2; corrected by the 11m QA sink lane: the earlier "at 1" summed to 20 against this row's own 21) |
 | game_meat | 8 | 28 | recipes only |
 | venom_gland | 8 | 17 | recipes only |
 | homespun_cloth | 7 | 23 | recipes only |
@@ -17183,6 +17183,13 @@ PER-TEMPLATE CONCENTRATION DELTAS, measured through the live
 harvestConcentrationBonus with the old map emulated for the before column
 (the denominator is the advertised tag count either way; the before
 numerator drops horn and gills, the only tags the old map lacked).
+CONVENTION, stated by the 11m QA concentration lane after re-deriving the
+table: the before column records the REACHABLE bonus. A single-family
+pick of a then-unmapped family was refused pre-claim by
+forfeitsEveryMappedYield (#2509) and yielded nothing, so those picks read
+0 here even though the bare base function returns the tag count (bogtoad
+gills raw 2, the Palecoil horn raw 3); a reader re-deriving from the bare
+function gets the raw numbers, not these.
 Twenty-two templates moved: the eighteen tag moves and four the mapping
 alone moved. Full pick = every tag chosen; singles = one family chosen.
 | template | tags before to after | full pick | singles before to after |
@@ -17211,7 +17218,10 @@ mapping's effect, not the spread's.
 
 Spawn density per family after the spread, for the metric's blind spot
 (count-1 and quest-gated members inside the counts): tusk 50 (the Horror
-1), silk 44 (the clutch 13, the boss 1), venomSac 43 (the Palecoil 1),
+1; ogre_crusher's 8 is one camp of level 16-17 ELITES counted like trash,
+the 11m QA reachability lane's addendum, with tusk standing at 5 ungated
+non-count-1 members without it), silk 44 (the clutch 13, the boss 1),
+venomSac 43 (the Palecoil 1),
 claw 61, horn 28 (the Palecoil 1, Aurelhorn 1), gills 59. The corpus pins
 that read the old shapes move in the orphan-mapping commit beside the
 families they depend on.
@@ -17302,8 +17312,10 @@ three, fang, cloth, and tusk"). Reworded in the English (ten families;
 "the other five, fang, cloth, tusk, horn, and gills") and re-filled in all
 eighteen overlays in each locale's own component words (the labels from
 hudChrome.corpseHarvest.components.*; zh uses the two-character register
-the list already carried, 兽角/獸角 beside 鱼鳃/魚鰓), the three
-divergence-only overlays untouched, and pinned by
+the list already carried, 兽角/獸角 beside 鱼鳃/魚鰓), the divergence-only
+overlays untouched (en_CA, es_ES, fr_CA; the 11m QA scope lane corrected
+the enumeration: en_XA has no overlay file to touch, and fr_CA inherits
+fr_FR's fills so its resolved output moved without an edit), and pinned by
 tests/guide_harvest_families_prose.test.ts, which derives the expected
 family words from the two maps rather than restating a list
 (mutation-proven both directions). No new key, so M16 does not apply; the
@@ -17317,8 +17329,9 @@ before.
 Agent 3's deliverable is the census, and the census (STEP 1 above)
 reproduces the qr-11m-SUPPLY correction exactly on the merged tree:
 arcane_shard has 12 consumers and 21 units over recipes.ts AND enchants.ts
-(the two rung-25 charms at 5 each; six Greater enchant rows and four
-Lucent rows at 1), and its supply is the family's scarcest (epic and
+(the two rung-25 charms at 5 each; nine enchant rows at 1 and the Lucent
+Infusion at 2, the per-row split the 11m QA sink lane corrected: the
+earlier "four Lucent rows at 1" summed to 20), and its supply is the family's scarcest (epic and
 legendary disenchants only, one shard per disenchant regardless of item
 level, against dust's quantity-scaled yield). The stale "2 recipes, 10
 units, dead-end rung" premise is falsified as the settled row said, and the
@@ -17681,8 +17694,10 @@ phase records, not numbered: es and pt_BR render fang and tusk with one
 word in the two reworded guide lists (pre-existing); Farmer Hollis borrows
 Huntsman Deral's voice since Bram's entry left with the Sowfield (a role
 match to override at leisure); the hollow silk members (d); the two
-count-1 horn members (the Palecoil, Aurelhorn) and the count-1 tusk member
-(the Sundered Horror) inside otherwise-met floors, with their density
+count-1 horn members (the Palecoil a rare, Aurelhorn a rare AND elite, one
+notch weaker as a solo farm source, the 11m QA precision) and the count-1
+tusk member
+(the Sundered Horror, an elite) inside otherwise-met floors, with their density
 recorded; and the qa gate's one design read: the oiled boots trophy
 row's reachable margin moved 88-vs-80 to 83-vs-80 because a gills
 harvest signs the scale (the gold-negative invariant is machine-checked
