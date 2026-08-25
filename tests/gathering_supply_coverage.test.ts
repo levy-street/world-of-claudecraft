@@ -68,20 +68,27 @@
 // FISHING_TABLES_BY_BAND would be the durable fix and belongs to whoever owns
 // that file.
 //
-// AND THE ARM SCANS TWO MECHANISMS, NOT ALL OF THEM. It walks ALL_RECIPES and
-// ENCHANTS, which is the shipped reagent union, and QUEST turn-ins are a third
-// real consumption channel it does not see: q_prof_workorder_forge collects
-// copper_ore, and quest_commands.ts routes collection through the same
-// planGradeRemoval the crafts use. Stating that here rather than leaving it
-// implied, because a census scoped to one mechanism and reported as
-// consumption in general is exactly the defect that forced this arm's own
-// substitution fix, one mechanism over.
+// AND THE FAMILY-SCOPED ARM SCANS TWO MECHANISMS, NOT ALL OF THEM. It walks
+// ALL_RECIPES and ENCHANTS, which is the shipped reagent union, and QUEST
+// turn-ins are a third real consumption channel it does not see:
+// q_prof_workorder_forge collects copper_ore, and quest_commands.ts routes
+// collection through the same planGradeRemoval the crafts use. Stating that
+// here rather than leaving it implied, because a census scoped to one
+// mechanism and reported as consumption in general is exactly the defect that
+// forced this arm's own substitution fix, one mechanism over.
 //
 // The omission is SAFE IN THE ONE DIRECTION THAT MATTERS: an unscanned
 // consumer can only make the arm report an orphan that is not one, a false
 // RED that a human resolves, never a false green that hides a dead material.
-// Widening it would need the quest corpus, which is a second content catalog
-// to keep in step, so the scope is a deliberate trade rather than an oversight.
+// The family-scoped arm keeps that two-mechanism scope and its pins untouched.
+// The MATERIAL-WIDE presence arm beside it (masterwrought Phase 11m, state.md
+// row 11m-FLOOR) is the one that took the trade the other way: it covers every
+// id in MATERIAL_ITEM_IDS, so it walks the WIDE demand index (wideDemandIndex
+// below: recipes, enchants, quest collect objectives, the farming verbs, and
+// the same substitution credit), because over the whole material set the
+// farming inputs (seeds, compost, the growth tonic, withered husks) have NO
+// recipe or enchant consumer at all and the narrow index would red every one
+// of them as dead content that a farmer spends daily.
 //
 // EVERY DERIVATION READS THE LIVE TABLES: the subject list comes from
 // GATHERING_PROFESSION_IDS, the supply sets come from the content tables the
@@ -110,7 +117,14 @@ import { FARM_CROPS } from '../src/sim/content/farm_crops';
 import type { GatheringProfessionId } from '../src/sim/content/professions';
 import { GATHERING_PROFESSION_IDS, GATHERING_PROFESSIONS } from '../src/sim/content/professions';
 import { ALL_RECIPES } from '../src/sim/content/recipes';
-import { ITEMS } from '../src/sim/data';
+import { ITEMS, QUESTS } from '../src/sim/data';
+import { MATERIAL_ITEM_IDS } from '../src/sim/material_taxonomy';
+import { eligibleWatchFeeItemIds } from '../src/sim/professions/farm_watch_fee';
+import {
+  FARM_COMPOST_ITEM_ID,
+  FARM_GROWTH_TONIC_ITEM_ID,
+  FARM_WITHERED_HUSK_ITEM_ID,
+} from '../src/sim/professions/farming';
 import { NODE_HARVEST_TABLE, NODE_MATERIAL_TABLE } from '../src/sim/professions/gathering';
 import {
   CORPSE_HARVEST_FAMILY,
@@ -297,8 +311,75 @@ function demandIndex(): Map<string, { consumers: string[] }> {
   return demand;
 }
 
+/**
+ * THE WIDE DEMAND INDEX (masterwrought Phase 11m, state.md row 11m-FLOOR):
+ * every spend mechanism the tree has, for the MATERIAL-WIDE presence arm.
+ * Starts from demandIndex() (recipes and enchants, unchanged) and adds:
+ *
+ *  - QUEST collect objectives (QUESTS, objectives of type 'collect'):
+ *    quest_commands.ts removes the collected items at turn-in through the same
+ *    planGradeRemoval the crafts use.
+ *  - THE FARMING VERBS, each cited at its spend site in
+ *    src/sim/professions/farming.ts, with the ids IMPORTED from the module
+ *    the engine spends them through, never re-typed:
+ *      plantCrop spends the crop's seedItemId (removeUnlockedFromSlots of
+ *        crop.seedItemId, one per plant), the compost knob spends
+ *        FARM_COMPOST_ITEM_ID, the tonic knob spends FARM_GROWTH_TONIC_ITEM_ID,
+ *        and the watch knob spends its FEE in produce, planned by planWatchFee
+ *        over eligibleWatchFeeItemIds(crop.tier) (farm_watch_fee.ts) and
+ *        removed leg by leg in the same payment block;
+ *      convertHusks spends FARM_WITHERED_HUSK_ITEM_ID at FARM_HUSKS_PER_COMPOST
+ *        per compost minted.
+ *  - DOWNWARD GRADE SUBSTITUTION, credited at lookup time through the same
+ *    consumptionIdsFor the family arm uses (a fine grade is spendable on
+ *    every consumer of its base).
+ *
+ * WHICH DIRECTION AN OMISSION FAILS: a mechanism this index does not walk can
+ * only leave a real consumer uncounted, so the presence arm reds on a
+ * material that is in fact spent (a FALSE RED a human resolves by adding the
+ * mechanism here). It can never turn a dead material green. The mechanism
+ * list is data (WIDE_DEMAND_MECHANISMS) so the failure message names exactly
+ * what was walked.
+ */
+const WIDE_DEMAND_MECHANISMS = [
+  'recipe reagents (ALL_RECIPES)',
+  'enchant reagents (ENCHANTS)',
+  'quest collect objectives (QUESTS, type collect)',
+  'farming verbs (plantCrop: seed, compost knob, tonic knob, watch fee produce; convertHusks: husks)',
+  'downward grade substitution (consumptionIdsFor)',
+] as const;
+
+function wideDemandIndex(): Map<string, { consumers: string[] }> {
+  const demand = demandIndex();
+  const note = (itemId: string, source: string) => {
+    const row = demand.get(itemId) ?? { consumers: [] };
+    row.consumers.push(source);
+    demand.set(itemId, row);
+  };
+  for (const quest of Object.values(QUESTS)) {
+    for (const objective of quest.objectives) {
+      if (objective.type === 'collect') note(objective.itemId, `quest:${quest.id}`);
+    }
+  }
+  const cropTiers = new Set<number>();
+  for (const crop of Object.values(FARM_CROPS)) {
+    note(crop.seedItemId, `farming:plantCrop:seed:${crop.id}`);
+    cropTiers.add(crop.tier);
+  }
+  note(FARM_COMPOST_ITEM_ID, 'farming:plantCrop:compost');
+  note(FARM_GROWTH_TONIC_ITEM_ID, 'farming:plantCrop:tonic');
+  for (const tier of [...cropTiers].sort((a, b) => a - b)) {
+    for (const itemId of eligibleWatchFeeItemIds(tier)) {
+      note(itemId, `farming:plantCrop:watchFee:tier${tier}`);
+    }
+  }
+  note(FARM_WITHERED_HUSK_ITEM_ID, 'farming:convertHusks');
+  return demand;
+}
+
 const MATRIX = bandMatrix();
 const DEMAND = demandIndex();
+const WIDE_DEMAND = wideDemandIndex();
 
 const WHERE_THE_RULE_LIVES =
   'masterwrought R20, docs/prd/masterwrought/state.md, restated in docs/design/professions.md';
@@ -431,6 +512,73 @@ describe('masterwrought R21: the world eats what the gathering families supply',
     }
     expect(orphans).toEqual([]);
   });
+
+  it('every material id has at least ONE consumer across every spend mechanism (presence only)', () => {
+    // THE MATERIAL-WIDE ARM (masterwrought Phase 11m, state.md row 11m-FLOOR).
+    // Subject: every id in MATERIAL_ITEM_IDS (src/sim/material_taxonomy.ts),
+    // not only what the six gathering families supply. Index: the WIDE one
+    // (wideDemandIndex above): recipe reagents, enchant reagents, quest
+    // collect objectives, the farming verbs, and downward grade substitution
+    // through consumptionIdsFor. The ONLY assertion is presence, a consumer
+    // count at or above 1; consumer and unit counts per material are the
+    // ledger's ratio table and are never asserted here. A mechanism this
+    // index misses can only produce a FALSE RED (a spent material reported as
+    // dead), never a false green, and the failure names the material and the
+    // mechanisms walked so the reader knows what to add.
+    const orphans: string[] = [];
+    for (const id of [...MATERIAL_ITEM_IDS].sort()) {
+      const consumers = consumptionIdsFor(id).reduce(
+        (n, spendable) => n + (WIDE_DEMAND.get(spendable)?.consumers.length ?? 0),
+        0,
+      );
+      if (consumers > 0) continue;
+      orphans.push(
+        `${id} has NO consumer under any spend mechanism walked: ` +
+          `${WIDE_DEMAND_MECHANISMS.join('; ')}. Either the material is dead content ` +
+          `(the fix is a consumer at the rung that PRODUCES it, masterwrought R21) or it is ` +
+          `spent by a mechanism wideDemandIndex does not walk yet (add the mechanism there, ` +
+          `citing its spend site). Rule: ${WHERE_THE_RULE_LIVES}, state.md row 11m-FLOOR.`,
+      );
+    }
+    expect(orphans).toEqual([]);
+    // Subject non-vacuity: the material set is the live derived one, and it
+    // is not empty (tests/material_taxonomy.test.ts pins its exact members).
+    expect(MATERIAL_ITEM_IDS.size).toBeGreaterThan(0);
+  });
+
+  it('the wide index really walks the quest and farming mechanisms', () => {
+    // Non-vacuity for the two walks the family arm does not have, proven by
+    // asking the index for consumers the header already cites: the
+    // work-order quest collects copper_ore, and the farming inputs are
+    // credited by the verbs that spend them. Nothing here asserts a count or
+    // an exclusivity (a recipe consuming compost tomorrow is allowed); it
+    // asserts the mechanism walked, which is the difference between an index
+    // that covers farming and one that merely lists it.
+    const sourcesOf = (id: string) => WIDE_DEMAND.get(id)?.consumers ?? [];
+    expect(sourcesOf('copper_ore')).toContain('quest:q_prof_workorder_forge');
+    expect(sourcesOf(FARM_COMPOST_ITEM_ID)).toContain('farming:plantCrop:compost');
+    expect(sourcesOf(FARM_GROWTH_TONIC_ITEM_ID)).toContain('farming:plantCrop:tonic');
+    expect(sourcesOf(FARM_WITHERED_HUSK_ITEM_ID)).toContain('farming:convertHusks');
+    for (const crop of Object.values(FARM_CROPS)) {
+      expect(sourcesOf(crop.seedItemId), `${crop.id} seed`).toContain(
+        `farming:plantCrop:seed:${crop.id}`,
+      );
+      expect(
+        sourcesOf(crop.produceItemId).some((s) => s.startsWith('farming:plantCrop:watchFee:')),
+        `${crop.id} produce is watch-fee eligible at its own tier or above`,
+      ).toBe(true);
+    }
+    // And the three farming inputs the family arm's narrow index cannot see
+    // at all, which is WHY the material-wide arm needed the wide one.
+    for (const id of [
+      FARM_COMPOST_ITEM_ID,
+      FARM_GROWTH_TONIC_ITEM_ID,
+      FARM_WITHERED_HUSK_ITEM_ID,
+    ]) {
+      expect(MATERIAL_ITEM_IDS.has(id), `${id} is a material`).toBe(true);
+      expect(DEMAND.get(id), `${id} under the narrow index`).toBeUndefined();
+    }
+  });
 });
 
 describe('the derivation itself cannot pass by matching nothing', () => {
@@ -447,7 +595,13 @@ describe('the derivation itself cannot pass by matching nothing', () => {
       herbalism: 6,
       fishing: 10,
       farming: 24,
-      corpseHarvesting: 13,
+      // 14 since masterwrought Phase 11m (state.md row 11m-ORPHAN), two facts:
+      // gills maps to mudfin_scale, an id NEW to the corpse set (+1), while
+      // horn maps to curved_tusk, which tusk already supplied, so corpseSupply
+      // (src/sim/professions/gathering_supply.ts spreads Object.values into a
+      // Set) dedupes it (+0). Ten tags now yield nine distinct component ids,
+      // plus the five specimens.
+      corpseHarvesting: 14,
     };
     for (const family of FAMILY_IDS) {
       const ids = SUPPLY.get(family) as Set<string>;
