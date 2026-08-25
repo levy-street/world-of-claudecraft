@@ -371,8 +371,9 @@ export function harvestCorpse(
   // corpse does not CARRY, which sanitizes away and spreads. This covers a tag
   // it carries that HARVEST_COMPONENT_ITEMS does not map, on a corpse that
   // ALSO carries a mapped one (gills and horn were the shipped such tags
-  // until Phase 11m mapped them; today only a retagged fixture carries one). A corpse whose tags ALL map to
-  // nothing never reaches this gate at all any more (#2513): the
+  // until Phase 11m mapped them; today only a retagged fixture carries one).
+  // A corpse whose tags ALL map to nothing never reaches this gate at all
+  // any more (#2513): the
   // isHarvestableCorpse check above answers on mapped families, so such a
   // corpse is refused there with error.corpseNothingToHarvest, exactly like
   // the 101 shipped templates that carry no component tags. (fen_troll (claw,
