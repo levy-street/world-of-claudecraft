@@ -72,6 +72,10 @@ here and the magnitudes are arithmetic the phase computes from them.
   lesser_mana_potion 250 to 226, healing_potion 320 to 279, and mana_potion 410 to 354;
   minor_mana_potion at 145 already clears 10 percent against silverleaf_mana_draught's 160
   and does not move. Re-derive all of these from the merged tree rather than pasting them.
+  AMENDED 2026-08-25 (qr-11n-NINE, farming/state.md row 134): lesser_healing_potion is now
+  both-sourced (the 11l QA re-pick) and EXEMPT exactly like minor_healing_potion, so the
+  illustrative "190 to 173" no longer applies and the 190 rung does not move; the ladder
+  binds on lesser_mana_potion, healing_potion, mana_potion and the food line.
   WHY: the measured shape is inverted, 9.1 percent at the bottom shrinking to 3.7 percent at
   the top, so the crafted economy is weakest exactly where it is supposed to live. R23 says
   weight the nerf toward the TOP rungs because vendor consumables are a new player's floor
@@ -119,6 +123,12 @@ rows. NO SPLIT AND NO MAGNITUDE CHANGE for any of them: they are one item with t
 so a nerf hits the crafted arm too, and a split needing new art or new names is a STOP inside
 a tuning phase. Pin the allowlist in tests/vendor_floor.test.ts so a future contributor
 cannot create a fourth silently.
+  AMENDED 2026-08-25 (qr-11n-NINE, farming/state.md row 134): the set re-derives to NINE
+  on the inherited tree (the correction section below lists them) and 11n-BOTH WIDENS to
+  that set. The four smith_haldren gear ids are handled by the settled stock-row pulls;
+  the magnitude-exempt allowlist is FIVE (minor_healing_potion, lesser_healing_potion,
+  elixir_of_the_bear, tough_jerky, linen_pouch; linen_pouch is a BAG, allowlist-only).
+  The STOP rule re-arms at NINE.
   ONE FURTHER RULING, and it is the sharpest R23 case in the catalog: REMOVE
   `elixir_of_the_bear` from `alchemist_verane`'s vendorItems row in
   `src/sim/content/zone3.ts`. Keep the item, keep its 7 percent Mirefen drop, keep its combo
@@ -160,7 +170,9 @@ WHY THIS IS NOT JUST A NUMBERS EDIT. Three interactions to respect:
   silently. A consequence worth stating: minor_healing_potion is exempt, so the bottom hp rung
   keeps its 9.1 percent margin and is recorded as EXEMPT rather than as a miss. The 10/15/20
   ladder therefore binds at the lesser and standard rungs and on the food line, and this phase
-  must not reach for the bottom hp rung.
+  must not reach for the bottom hp rung. AMENDED 2026-08-25 (qr-11n-NINE): the lesser hp rung
+  is exempt the same way (lesser_healing_potion is both-sourced), so the ladder binds at the
+  lesser and standard MANA rungs, the standard hp rung, and the food line.
 - Potion magnitudes feed combat throughput. Lowering the vendor line lowers the floor of
   what an unprepared player brings to a fight, which touches encounter tuning at the low
   end. Sanity-check against the levelling curve rather than assuming a percentage is safe.
@@ -288,7 +300,10 @@ STOPPING RULES:
 - Stop if a vendor nerf would leave a levelling band with no workable consumable at all.
 - Stop if the both-sourced set re-derives to anything other than the three allowlisted ids:
   a fourth means the catalog moved and the exemption reasoning has to be re-judged, not
-  extended by analogy.
+  extended by analogy. AMENDED 2026-08-25 (qr-11n-NINE): the re-judgment happened and the
+  rule RE-ARMS AT NINE: stop if the set re-derives to anything other than the nine, or a
+  sixth stock row seems needed, or closing any gap would require raising a crafted
+  magnitude.
 - Stop if a both-sourced id turns out to need a split with new art or new names: ledger it
   and ask, rather than minting content inside a tuning phase.
 ```
@@ -323,3 +338,14 @@ Two premises above no longer hold on the tree the 11n session will inherit
   so the premise was moved by an earlier release sync, not misread. The "keep
   its 7 percent Mirefen drop" instruction above reads 0.8 percent, and the
   pin-per-id arm asserts the real value.
+
+## The ruling that resolves the STOP (2026-08-25, maintainer, relayed in-session)
+
+Recorded as qr-11n-NINE, farming/state.md row 134, and inlined as the dated AMENDED
+lines above: 11n-BOTH widens to the re-derived NINE (four handled by the settled
+stock-row pulls, FIVE magnitude-exempt: minor_healing_potion, lesser_healing_potion,
+elixir_of_the_bear, tough_jerky, linen_pouch). lesser_healing_potion's rung is EXEMPT,
+never a miss; linen_pouch is a bag, allowlist-only. The ladder binds on
+lesser_mana_potion (250 to 226), healing_potion (320 to 279), mana_potion (410 to 354)
+and the food line, every number re-derived from the tree rather than pasted. The STOP
+rule re-arms at NINE.

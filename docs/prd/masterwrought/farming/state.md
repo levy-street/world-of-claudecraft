@@ -1246,7 +1246,9 @@ existing row that was wrong is AMENDED IN PLACE with a dated line rather than re
     BUFF in the catalog, which the floor never had to protect. (AMENDED 2026-08-20 by the
     quality-review adoption pass, row 127: the stock-row carve-out WIDENS to FIVE rows, this
     one plus smith_haldren's four byte-identical crafted gear ids, the same purest-competitor
-    shape at the gear axis. Row 127 is the live reading.)
+    shape at the gear axis. Row 127 is the live reading.) (AMENDED 2026-08-25 by the relayed
+    maintainer ruling, row 134: the set re-derives to NINE and the magnitude-exempt
+    allowlist is FIVE; row 134 is the live reading of the set.)
 92. state-GATE-1. Answered at 11e-D-A: about 10 weeks (70 to 75 days) for the reference farmer,
     floor about 5 weeks at maximum dedication, values DERIVED and recorded, band boundaries
     25/50/75/100 FROZEN. Closed-by-11e. WHY: one question, one answer, recorded where sessions
@@ -1792,6 +1794,25 @@ daily gate anywhere in professions is out of ruling and STOPS.
      R-number in that paragraph reads "masterwrought R<n>" in full per the namespace rule.
      WHY: the review judged the design good and undocumented, reading like a bug until
      traced; writing it down is what stops a future contributor from "fixing" it.
+134. qr-11n-NINE (2026-08-25, maintainer ruling relayed in-session; RECORDED, never
+     re-decided). The 11n STOP on the both-sourced re-derivation is RESOLVED: the set
+     re-derives to NINE ids (the phase file's 2026-08-25 correction section lists them)
+     and 11n-BOTH WIDENS to that re-derived set. Classification over the nine: the four
+     smith_haldren gear ids (eastbrook_arming_sword, eastbrook_chain_vest,
+     eastbrook_wool_trousers, tanned_leather_jerkin) are handled by the settled
+     stock-row pulls (five rows total per qr-11n-WIDE, still exhaustive); the
+     magnitude-exempt allowlist is FIVE ids: minor_healing_potion,
+     lesser_healing_potion, elixir_of_the_bear, tough_jerky, linen_pouch.
+     lesser_healing_potion is EXEMPT exactly like minor_healing_potion: the 11l QA
+     re-pick made it both-sourced, so decision 13's illustrative "190 to 173" nerf no
+     longer applies (one id, two sources; a nerf would hit the crafted arm, which the
+     phase's own premise forbids), and the lesser hp rung is recorded as EXEMPT, never
+     as a miss. linen_pouch is a BAG, not a consumable: allowlist-only, no action. The
+     ladder therefore binds on lesser_mana_potion (250 to 226), healing_potion (320 to
+     279), mana_potion (410 to 354) and the food line; the executing session re-derives
+     every number from the tree rather than pasting these. The STOP rule RE-ARMS at
+     NINE: if the set re-derives to anything else, or a sixth stock row seems needed,
+     or closing any gap would require raising a crafted magnitude, STOP.
 
 ## Locked design decisions
 
