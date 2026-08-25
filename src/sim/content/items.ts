@@ -1884,8 +1884,8 @@ export const BASE_ITEMS: Record<string, ItemDef> = {
     sellValue: 22,
   },
   // Vendor food nerf (11n-D-13): crafted 117 tier (hunters_game_skewer,
-  // herbed_marsh_pike) / 1.10, the bottom food tercile's 10 percent margin,
-  // floored; crafted margin +10.4 percent.
+  // herbed_marsh_pike, eastbrook_root_pottage) / 1.10, the bottom food
+  // tercile's 10 percent margin, floored; crafted margin +10.4 percent.
   roasted_boar: {
     id: 'roasted_boar',
     name: 'Spitted Boar Haunch',

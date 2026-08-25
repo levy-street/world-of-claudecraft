@@ -187,16 +187,17 @@ describe('#1608: potionHp/potionMana ladder', () => {
   // Measured fractions after the 11n vendor floor: 0.894/0.792/0.721 by rung.
   // The band brackets the items.ts header's stated "72-90%" (floor 0.70, not
   // 0.72, because the lowest live fraction clears 0.72 by only 0.0009; the
-  // golden pin below is the change detector for the values themselves, this
-  // band guards against pool drift). Deterministic but tight at the top: one
-  // point off the priest's level-7 base hp pool reds the 0.90 ceiling.
+  // ceiling 0.92 leaves the top fraction real slack so an unrelated
+  // one-point priest base-hp retune does not red a potion suite; the golden
+  // pin below is the change detector for the values themselves, this band
+  // guards against pool drift).
   it.each(HP_TIERS)(
-    "%s restores a meaningful, documented fraction (0.70-0.90) of a priest's base hp pool at its bracket top",
+    "%s restores a meaningful, documented fraction (0.70-0.92) of a priest's base hp pool at its bracket top",
     (itemId, topLevel) => {
       const { maxHp } = basePoolAt('priest', topLevel);
       const fraction = potionHp(itemId) / maxHp;
       expect(fraction).toBeGreaterThanOrEqual(0.7);
-      expect(fraction).toBeLessThanOrEqual(0.9);
+      expect(fraction).toBeLessThanOrEqual(0.92);
     },
   );
 

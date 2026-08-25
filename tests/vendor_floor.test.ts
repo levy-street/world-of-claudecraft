@@ -13,6 +13,7 @@ import { HEROIC_VENDOR_STOCK } from '../src/sim/content/heroic_vendor';
 import { ALL_RECIPES } from '../src/sim/content/recipes';
 import { ZONE2_MOBS } from '../src/sim/content/zone2';
 import { ITEMS, NPCS } from '../src/sim/data';
+import { MARKET_HOUSE_STOCK } from '../src/sim/market';
 import type { ItemDef } from '../src/sim/types';
 
 type MagnitudeAxis = 'potionHp' | 'potionMana' | 'foodHp' | 'drinkMana' | 'potionHpPctMax';
@@ -334,6 +335,11 @@ describe('the margin widens as the rungs climb', () => {
 
 describe('the both-sourced nine (ruling qr-11n-NINE)', () => {
   it('the live vendor-stocked AND crafted intersection is exactly the four kept exemptions', () => {
+    // The derivation basis is NPCS.vendorItems ONLY, the basis ruling
+    // qr-11n-NINE used. Deliberately narrower than the classification
+    // sweep's: widening it to the Merchant's house listings would add
+    // oiled_boots (a recipe result the house sells) and trip the phase's
+    // re-arms-at-nine STOP over a basis change, not a catalog change.
     const both = vendorStockedIdsBy(NPCS, (itemId) => RECIPE_RESULT_IDS.has(itemId));
     expect(both).toEqual([
       'lesser_healing_potion',
@@ -483,10 +489,22 @@ describe('the classification is exhaustive over every vendor-stocked consumable'
   it('every magnitude-bearing stocked id is classified: paired, exempt, or a drink', () => {
     // potionHpPctMax rides along so a percent-of-max heal potion (soul_stone
     // is the only carrier today, stocked nowhere) cannot slip past the sweep
-    // unclassified.
-    const stocked = vendorStockedIdsBy(NPCS, (id) =>
-      CONSUMABLE_AXES.some((axis) => liveMagnitude(id, axis) !== undefined),
-    );
+    // unclassified. The Merchant's house listings are the THIRD stock counter
+    // (unlimited-restock fixed-price rows seeded every boot, exactly R23's
+    // surface) and join the derivation here: its two consumable rows,
+    // roasted_boar and spring_water, are already classified.
+    expect(
+      MARKET_HOUSE_STOCK.length,
+      'house stock rows near the live count (23 today)',
+    ).toBeGreaterThanOrEqual(20);
+    const consumablePred = (id: string) =>
+      CONSUMABLE_AXES.some((axis) => liveMagnitude(id, axis) !== undefined);
+    const stocked = [
+      ...new Set([
+        ...vendorStockedIdsBy(NPCS, consumablePred),
+        ...MARKET_HOUSE_STOCK.map((r) => r.itemId).filter(consumablePred),
+      ]),
+    ].sort();
     const classified = new Set<string>([
       ...PAIRS.map((r) => r.vendorId),
       'minor_healing_potion',
@@ -509,7 +527,7 @@ describe('the classification is exhaustive over every vendor-stocked consumable'
     const carriers = Object.entries(ITEMS).filter(
       ([, def]) => (def as { wellFed?: unknown }).wellFed !== undefined,
     );
-    expect(carriers.length, 'wellFed carriers exist to check').toBeGreaterThan(0);
+    expect(carriers.length, 'wellFed carriers near the live count').toBeGreaterThanOrEqual(6);
     const buffOnly = carriers
       .filter(([, def]) => (def as { foodHp?: number }).foodHp === undefined)
       .map(([id]) => id);
