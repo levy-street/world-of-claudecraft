@@ -17771,3 +17771,177 @@ EXIT 0 and the real-browser suite 29 files / 261 tests at 542a7d77f0
 (the commits since are tests, docs and the proven-comment-only sweep).
 The stamp commit after run two is docs-only (this ledger, progress.md),
 the sanctioned exception to commit-voids-the-run.
+
+## Phase 11m QA ledger (2026-08-25, the twin: verify the harvest geography and material sinks)
+
+VERDICT: **PASS** (findings applied in-round, so no follow-ups survive
+the stamp). LOCAL, no push, no PR. Zero blocking findings against the
+build; the whole round's ONE blocking item was the QA round's own (a
+106-column format error its second fix commit introduced, caught by the
+qa gate's ci:changed run, fixed as d4ec53da2d before the freeze). Counts:
+24 findings (0 blocking against the build, 8 should-fix, 16 nits and
+observations), 19 fixed over five fix commits, 5 recorded-not-acted with
+reasons below.
+
+### STEP 0
+git clean at 41f14fbe22; release/v0.41.0 still at ff2837da1f (fetched,
+zero new commits, no merge audit owed); tsc clean; both regens zero-diff
+before any read.
+
+### THE FIVE LANES (parallel; every ledger number independently derived)
+- REACHABILITY: all 24 checks CONFIRMED, zero numeric mismatches, via own
+  census scripts over the live tree and a git-archive extraction of
+  9f130d3b7c: catalog totals (235 / 54 tagged / 0 mixed / 15 zones / 218
+  camps), every after- and before-census row, the 18-move set exactly, the
+  ungated non-count-1 column (silk 4, horn 4, tusk 5, venomSac 5, gills 6,
+  claw 5), spider_egg the ONLY quest-gated camped template and
+  mister_crabs campless, the ferry premise read in code. DENSITY VERDICTS
+  (the judgment qr-11m-SPREAD assigns the twin): gills SOLID (the
+  strongest floor), claw SOLID, tusk SOLID, venomSac SOLID; silk MET BY
+  THE LETTER, hollow exactly as admitted and no more (solid core 4
+  templates d30; the player's mid-band complaint materially answered by
+  mire_widow's 13 concurrent spawns at levels 8 to 10); horn MET BY THE
+  LETTER, weakest after silk (solid core 4, everything level 15 plus,
+  band 2 resting on veiled_stag alone in the ungated Veiled Hollow). NO
+  FAMILY IS MORE HOLLOW THAN THE LEDGER ADMITS.
+- CONCENTRATION: exactly 22 movers name-for-name (18 tag moves plus the 4
+  map-only movers), every full-pick and singles value reproduced by
+  running the REAL base gathering module beside the live one; the #2514
+  bound holds on all 22 (live partly-mapped census 0, whole-catalog sweep
+  zero violations); mob_component_tags iterates ALL of MOBS. One
+  convention gap found and written into the delta table above (the before
+  column is the REACHABLE bonus, not the bare function).
+- SINK-REALITY: the full ratio table reproduced (dust 41/152, essence
+  40/84, shard 12/21, 115 materials, 97 fed at median 3, the 18-zero set
+  exact, the 38-member single-consumer tail, every head row identical).
+  The one MISMATCH anywhere in the round was this ledger's own "at 1"
+  shard prose (nine rows at 1 plus the Lucent Infusion at 2 is the truth,
+  the phase file was already right; corrected above). All four
+  NEVER-arcane_shard reservations byte-identical at base and tip; the
+  recipes.ts hunk in range comment-only; enchants.ts untouched; supply
+  confirmed (rare yields essence, shards epic and legendary only). Both
+  no-action spot-checks passed end to end (withered_husks through
+  convertHusks in both hosts; oiled boots' mudfin_scale x4 at
+  leatherworking 25 from the trainer).
+- SCOPE: the content diff re-proven BY EXECUTION over both trees: MOBS
+  235 to 235 with zero body changes beyond componentTags on exactly 18
+  templates, item ids 1006 to 1006 with added and removed both empty (the
+  BLOCKING class did not fire), CAMPS 218 with zero serialized rows
+  changed, zero loot or rate changes over all 235 templates. All 108
+  files bucketed, none unexplained; the comment-only claims proven at AST
+  level, plus three MORE comment-only files the build ledger had not
+  enumerated (recipes.ts, farm_patches.ts, paladin_core_abilities.ts) and
+  three code-level sync-audit fixes its bucket prose had not named
+  (the deeds visited-mark allowlist widened farm then farm_crop,
+  bare_client dropping four retired Vale Cup fields, the ci_workflow
+  vacuity floor re-measured 240 to 245); hygiene sweep clean; i18n scope
+  exact (two keys, 18 overlays in native words, divergence overlays
+  untouched: en_CA, es_ES, fr_CA, with en_XA file-less).
+- INVARIANT DECISIVENESS: own kill table, 7/7, in a throwaway detached
+  worktree at the tip (the real tree never written), summary lines
+  quoted, byte-restore and empty porcelain between mutants:
+  (a) silk off mire_widow: the floor arm alone, "templates 5 of 6",
+  carriers listed; (b) antler onto forest_wolf: 5 arms (unmapped-tag by
+  name, never-mapped families, both helper premise arms, the #2514
+  census); (c) THE TEETH, silk off mire_widow AND onto instance-only
+  wildheart_stalker: STILL "templates 5 of 6", the padding refused by
+  name; (d) the boar spear's curved_tusk reagent dropped: BOTH R21 arms
+  red naming curved_tusk and the mechanism list; (e) horn off veiled_stag
+  (fresh, the band clause): "templates 5 of 6, bands 1 of 2", zones
+  correctly absent; (f) the horn map row dropped: 4 arms (carried-key
+  naming all 7 carriers, the map-size ratchet, #2513 on aurelhorn, the
+  #2514 overtake firing live on the Palecoil at 9.3 over 8.44); (g) the
+  test's own floor weakened 6 to 5: FIVE arms red, matching the suite's
+  measured comment.
+
+### THE REVIEWERS
+- content-obligations-reviewer (fresh): all six checks PASS, zero
+  blocking or should-fix. Beyond the checklist it verified the
+  specimen-gated deed and Reliquary trophy unreachable from horn and
+  gills, the v0.21.0 quest-collect collision NOT re-opened (mudfin_scale's
+  six loot rows carry no questId; curved_tusk has no loot row),
+  TOWN_FOCUS append order, and the capacity pre-gate at worst count 1.
+  Its one nit (the retired guide keys unpinned against a re-point) became
+  the round's retired-keys arm; its report's "amber_stag" was a typo for
+  gilded_stag (code and ledger agree).
+- test-coverage-auditor (fresh): 0 blocking, 5 should-fix, 7 nits over
+  the final state. All 22 harvest_geography arms verdicted; a
+  leave-one-out sweep over all 112 (template, tag) pairs (silk, venomSac,
+  gills, horn and tusk red on ANY single carrier removal; the two claw
+  additions are protected JOINTLY, correct floor semantics); the seed
+  title-versus-body census CLEAN with three stale COMMENT chains, all
+  pre-existing, fixed in-round with the history established from git; the
+  blob-growth band internally consistent and exact-plus-one decisive.
+- The fix-round reviewer (fresh, over the first two fix commits): 0
+  blocking, 3 should-fix (the ferry header's necessity overclaim against
+  tutorial_greeting's existing rides; the economy_yield pipeline lacking
+  a positive control; the combat arm asserting shore-only rather than
+  position plus message), 9 nits, ALL applied in round two.
+- qa-checklist LAST over the round's own commits: every category PASS or
+  verified N/A, cross-platform-sync and architecture-reviewer confirmed
+  genuinely not owed (no sim behavior, facet member or wire field grew),
+  ONE BLOCKING (the round's own format error, the format-pass-is-not-a-
+  check-pass trap exactly), fixed, then READY by its stated condition.
+
+### THE FIX ROUND, as commits
+2d1db47fa0 (decisive pins: the unmappedTagCarriers positive control, the
+MAP_LANDMARK_MAX_NUDGE_YD literal 4, the 54 ratchet replacing a vacuous
+arrayContaining, one shared isBare, the Palecoil literal pin, the
+retired-guide-keys source pin, and the NEW tests/ferry_bell.test.ts);
+e0db7fe777 (the three seed chains ended at d4deed629a with hashes cited,
+the wide-index comment scoped to what its arms pin); 0ffbc70127 (the
+fix-round review applied: header truth plus two-way cross-references,
+position-snapshot and error-message asserts, the bareRows pipeline
+control, the exact four-tag Palecoil list, the subsumed floor folded, the
+16 step attributed to a5d51c7500, three long-unused imports out);
+8ad39c5894 (the five ledger precision corrections above); d4ec53da2d
+(the qa gate's format fix). THE ROUND'S OWN KILL TABLE, 9/9, in-tree
+with checkout restore on the committed tree, porcelain empty after each:
+the retired-key re-point, the defanged scanner, the cap widened 4 to 12
+(green everywhere before this round's pin: the finding demonstrated
+live), isBare some-to-every, the Palecoil venomSac drop, the aurelhorn
+untag against the 54 ratchet, a graduation gate on the ferry (both new
+arms), bareRows filter-to-false, and the ctx.error line removed (the
+silent-refusal arm). 16 of 16 mutants killed round-wide.
+
+### RECORDED, NOT ACTED, each with its reason
+- The zone-membership half of the reachability predicate is vacuous by
+  construction (zoneAt clamps every overworld query to some zone); the
+  plane arm's zoneContaining assertion is the working guard. Known fact
+  recorded, no action.
+- fang spans bands 0, 2, 3 with no band-1 source: pre-existing, outside
+  the phase's claim set, floor green. An observation for a future spread.
+- A locale overlay that omitted the two new families would ship silently:
+  the reword-staleness class has no gate BY RECORD (the build ledger:
+  the manual sweep is the record); not re-gated here.
+- The wide-index farming assertions pin the INDEX walking each mechanism,
+  not the engine spend (the comment now says so; the engine spend is
+  pinned behaviorally in tests/professions_farming.test.ts).
+- Shards also spend a fourth wide-index way (tool recharge priced at the
+  epic rung, professions/tools.ts), consistent with the enchants.ts
+  header; recorded.
+
+### MAINTAINER READS: unchanged from the build, plus precision
+The quest-gated silk ruling and the oiled-boots margin read stand exactly
+as the build recorded them; nothing this round moves either. Precision
+added: Aurelhorn is a count-1 rare AND elite (one notch weaker as a solo
+source); ogre_crusher's 8 density is one elite camp counted like trash.
+
+### THE FROZEN STAMP: one run, EXIT=0 first try
+At d4ec53da2d, every reader idle AND reported, git status empty, zero
+vitest processes, DATABASE_URL unset; the wrapper wrote TIP first and the
+suite's EXIT before the follow-on stages, one fresh log, no commit
+anywhere between: 3190 test files passed / 21 skipped (3211), 46842
+passed / 2 expected fail / 373 skipped (47217); tsc clean; ci:changed
+EXIT=0; wiki:content and i18n:gen both zero diff; status empty and the
+tip unchanged after every stage. Against the build stamp (3189 files /
+21 skipped (3210), 46840 / 2 / 373 (47215)) the drift is exactly the
+round's own arms: plus one file (tests/ferry_bell.test.ts) and plus two
+tests net (ferry_bell's two and the retired-keys arm, minus the folded
+at-least-one-tagged arm). The stamp commit after the run is docs-only
+(this ledger, progress.md), the sanctioned exception.
+
+HANDOFF: Phase 11n (phase-11n-vendor-floor.md). Its own STOP rule fires
+at its STEP 0 by record: the both-sourced set re-derives to NINE ids and
+elixir_of_the_bear's Mirefen drop is 0.8 percent, both already written
+into its file by the 11m sync.
