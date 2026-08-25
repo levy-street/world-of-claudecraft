@@ -140,7 +140,8 @@ describe('#1608: eating stacks with natural hp regen', () => {
 describe('#1608: potionHp/potionMana ladder', () => {
   // The reference class per resource type is the one with the SMALLEST base
   // (no-gear) pool at that resource, per the design comment above
-  // minor_healing_potion in content/items.ts: priest for hp, hunter for mana.
+  // minor_healing_potion in content/items.ts: priest for hp, paladin for mana
+  // (hunters run on focus since the hunter overhaul).
   function basePoolAt(
     cls: 'priest' | 'paladin',
     level: number,
@@ -184,9 +185,11 @@ describe('#1608: potionHp/potionMana ladder', () => {
   ];
 
   // Measured fractions after the 11n vendor floor: 0.894/0.792/0.721 by rung.
-  // The band brackets the items.ts header's stated "72-90%" tightly (the
-  // golden pin below is the change detector for the values themselves; this
-  // band is what keeps the header's stated range honest against pool drift).
+  // The band brackets the items.ts header's stated "72-90%" (floor 0.70, not
+  // 0.72, because the lowest live fraction clears 0.72 by only 0.0009; the
+  // golden pin below is the change detector for the values themselves, this
+  // band guards against pool drift). Deterministic but tight at the top: one
+  // point off the priest's level-7 base hp pool reds the 0.90 ceiling.
   it.each(HP_TIERS)(
     "%s restores a meaningful, documented fraction (0.70-0.90) of a priest's base hp pool at its bracket top",
     (itemId, topLevel) => {
@@ -199,8 +202,9 @@ describe('#1608: potionHp/potionMana ladder', () => {
 
   // 11n re-derivation: the vendor mana rungs moved to 226 and 354, so the
   // measured fractions are 0.662/0.545/0.536 by rung. The band brackets the
-  // items.ts header's stated "53-66%" tightly, same division of labor as the
-  // hp band above.
+  // items.ts header's stated "53-66%" (that prose rounds: the live top is
+  // 0.6621, so the ceiling sits at 0.68), same division of labor as the hp
+  // band above.
   it.each(MANA_TIERS)(
     // Hunters run on focus on this line (the hunter overhaul), so the potion
     // floor's subject is the smallest MANA pool: the paladin.

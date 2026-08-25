@@ -8,12 +8,14 @@
 // recipe. All expectations are literals, never derived from the live tables.
 
 import { describe, expect, it } from 'vitest';
+import { DELVE_SHOPS } from '../src/sim/content/delves';
+import { HEROIC_VENDOR_STOCK } from '../src/sim/content/heroic_vendor';
 import { ALL_RECIPES } from '../src/sim/content/recipes';
 import { ZONE2_MOBS } from '../src/sim/content/zone2';
 import { ITEMS, NPCS } from '../src/sim/data';
 import type { ItemDef } from '../src/sim/types';
 
-type MagnitudeAxis = 'potionHp' | 'potionMana' | 'foodHp' | 'drinkMana';
+type MagnitudeAxis = 'potionHp' | 'potionMana' | 'foodHp' | 'drinkMana' | 'potionHpPctMax';
 
 function liveMagnitude(itemId: string, axis: MagnitudeAxis): number | undefined {
   const def = ITEMS[itemId] as ItemDef | undefined;
@@ -210,18 +212,40 @@ describe('the ladder: every vendor/crafted pair meets its rung margin', () => {
   );
 
   // The rung labels are not free text: each food row's tercile is re-derived
-  // from the pairing range (90 to 980, the six crafted tiers that pair with
-  // vendor food, both endpoints pinned above as craftedValue literals).
+  // from the pairing range (the crafted tiers that pair with vendor food),
+  // with the endpoints taken from the table's own craftedValue literals and
+  // then pinned, so an endpoint retune re-derives every label with it.
   it('each food rung label matches the magnitude tercile of its crafted tier', () => {
-    const lo = 90;
-    const hi = 980;
+    const foodRows = PAIRS.filter((r) => r.axis === 'foodHp');
+    const lo = Math.min(...foodRows.map((r) => r.craftedValue));
+    const hi = Math.max(...foodRows.map((r) => r.craftedValue));
+    expect(lo, 'pairing range low endpoint').toBe(90);
+    expect(hi, 'pairing range high endpoint').toBe(980);
     const t1 = lo + (hi - lo) / 3;
     const t2 = lo + (2 * (hi - lo)) / 3;
-    for (const row of PAIRS.filter((r) => r.axis === 'foodHp')) {
+    for (const row of foodRows) {
       const expected =
         row.craftedValue <= t1 ? 'bottom' : row.craftedValue <= t2 ? 'middle' : 'top';
       expect(row.rung, `${row.vendorId} tercile over [${lo}, ${hi}]`).toBe(expected);
     }
+  });
+
+  // The derivation above is one-sided (at or above the vendor value), so the
+  // crafted-only food TIER LIST is pinned whole: a crafted sibling lowered
+  // BELOW its vendor counterpart (the maximal R23 inversion, a crafted food
+  // under the vendor floor) changes this sorted set and reds here even though
+  // no PAIRS row names it. The potion axes need no twin: the six
+  // draught-over-potion pairs in tests/consumables.test.ts backstop them.
+  it('the distinct crafted-only foodHp tiers are exactly the seven known values', () => {
+    const tiers = [
+      ...new Set(
+        [...RECIPE_RESULT_IDS]
+          .filter((id) => !STOCKED_IDS.has(id))
+          .map((id) => liveMagnitude(id, 'foodHp'))
+          .filter((v): v is number => v !== undefined),
+      ),
+    ].sort((a, b) => a - b);
+    expect(tiers).toEqual([90, 117, 243, 432, 552, 980, 1392]);
   });
 });
 
@@ -323,6 +347,20 @@ describe('the both-sourced nine (ruling qr-11n-NINE)', () => {
       expect(EXEMPT_ALLOWLIST.has(id), `${id} exempt allowlist membership`).toBe(
         classification !== 'stock pulled',
       );
+      // The exempt distinction is anchored to a live fact, not only to the
+      // allowlist literal: an exempt id carries a consumable face (a
+      // magnitude axis, an elixir payload, or the bag kind), while a plain
+      // stock-pulled id (the four gear rows) carries none.
+      const def = ITEMS[id] as ItemDef | undefined;
+      const consumableFace =
+        (['potionHp', 'potionMana', 'foodHp', 'drinkMana'] as MagnitudeAxis[]).some(
+          (axis) => liveMagnitude(id, axis) !== undefined,
+        ) ||
+        def?.elixir !== undefined ||
+        def?.kind === 'bag';
+      expect(consumableFace, `${id} carries a consumable face iff exempt`).toBe(
+        classification !== 'stock pulled',
+      );
     },
   );
 
@@ -391,11 +429,30 @@ describe('the classification is exhaustive over every vendor-stocked consumable'
 
   it('no vendor stocks an elixir: the 11n pull left zero vendor-sold buffs', () => {
     const def = (id: string) => ITEMS[id] as ItemDef | undefined;
-    expect(vendorStockedIdsBy(NPCS, (id) => def(id)?.elixir !== undefined)).toEqual([]);
+    const stockedElixir = (npcs: VendorStockTable) =>
+      vendorStockedIdsBy(npcs, (id) => def(id)?.elixir !== undefined);
+    // Positive control for THIS predicate composed with the scanner: a
+    // synthetic vendor stocking the bear elixir must be found, so the empty
+    // result over the real tables is a real absence.
+    const probe: VendorStockTable = {
+      synthetic_apothecary: { vendorItems: ['elixir_of_the_bear'] },
+    };
+    expect(stockedElixir(probe)).toEqual(['elixir_of_the_bear']);
+    expect(stockedElixir(NPCS)).toEqual([]);
   });
 
   it('every magnitude-bearing stocked id is classified: paired, exempt, or a drink', () => {
-    const axes: MagnitudeAxis[] = ['potionHp', 'potionMana', 'foodHp', 'drinkMana'];
+    // potionHpPctMax rides along so a percent-of-max heal potion (soul_stone
+    // is the only carrier today, stocked nowhere) cannot slip past the sweep
+    // unclassified. wellFed needs no row: every wellFed carrier also carries
+    // foodHp.
+    const axes: MagnitudeAxis[] = [
+      'potionHp',
+      'potionMana',
+      'foodHp',
+      'drinkMana',
+      'potionHpPctMax',
+    ];
     const stocked = vendorStockedIdsBy(NPCS, (id) =>
       axes.some((axis) => liveMagnitude(id, axis) !== undefined),
     );
@@ -411,6 +468,33 @@ describe('the classification is exhaustive over every vendor-stocked consumable'
       'glacier_melt',
     ]);
     expect(stocked).toEqual([...classified].sort());
+  });
+
+  // NPCS.vendorItems is not the game's only stock counter: the delve shop and
+  // the heroic quartermaster sell for marks. Both are gear and tools by
+  // design, and this exact blind spot bit the profession-tool guards once
+  // (the widening is recorded at the top of content/delves/shop.ts), so the
+  // sweep covers them: no consumable-axis item may enter either table without
+  // joining this suite's classification first.
+  it('the delve shop and heroic vendor stock carry no consumable-axis items', () => {
+    const axes: MagnitudeAxis[] = [
+      'potionHp',
+      'potionMana',
+      'foodHp',
+      'drinkMana',
+      'potionHpPctMax',
+    ];
+    const delveIds = Object.values(DELVE_SHOPS).flatMap((rows) => rows.map((r) => r.itemId));
+    const heroicIds = HEROIC_VENDOR_STOCK.map((r) => r.itemId);
+    // Non-empty floors first, so an emptied or unwired table cannot pass the
+    // expect-empty sweeps below by producing nothing.
+    expect(delveIds.length, 'delve shop rows exist').toBeGreaterThan(0);
+    expect(heroicIds.length, 'heroic vendor rows exist').toBeGreaterThan(0);
+    const consumable = (id: string) =>
+      axes.some((axis) => liveMagnitude(id, axis) !== undefined) ||
+      (ITEMS[id] as ItemDef | undefined)?.elixir !== undefined;
+    expect(delveIds.filter(consumable)).toEqual([]);
+    expect(heroicIds.filter(consumable)).toEqual([]);
   });
 });
 
