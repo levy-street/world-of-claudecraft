@@ -107,7 +107,11 @@ export const TEMPLE_MOBS: Record<string, MobTemplate> = {
     ],
     scale: 1.2,
     color: 0xbcd2e6,
-    componentTags: ['hide', 'claw', 'horn'],
+    // A serpent: the Palecoil carries a venom gland, the same family the
+    // spiders and the bogtoad yield. Phase 11m added venomSac as the band-3
+    // open-world source that completes the family's floor. A count-1 rare, so
+    // a hollow venomSac floor member: the ledger records its density.
+    componentTags: ['hide', 'claw', 'horn', 'venomSac'],
   },
 };
 

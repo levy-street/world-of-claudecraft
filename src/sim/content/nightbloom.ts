@@ -127,7 +127,9 @@ export const NIGHTBLOOM_MOBS: Record<string, MobTemplate> = {
     ],
     scale: 1.1,
     color: 0xe6e9f4,
-    componentTags: ['hide', 'meat'],
+    // A fleeced grazer, ram-like and horned (horn maps to curved_tusk per
+    // 11m-ORPHAN). Phase 11m added the tag as a band-3 open-world horn source.
+    componentTags: ['hide', 'horn', 'meat'],
   },
   gloam_strider: {
     id: 'gloam_strider',

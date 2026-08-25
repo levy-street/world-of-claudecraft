@@ -246,7 +246,10 @@ export const ZONE2_MOBS: Record<string, MobTemplate> = {
     ],
     scale: 1.0,
     color: 0x283747,
-    componentTags: ['venomSac', 'hide'],
+    // The one open-world mid-band spider: its web is spider silk, the same
+    // family the Webwood and Canopy spiders yield. Phase 11m added the tag by
+    // name (qr-11m-SPREAD) as the directed band-1 silk source.
+    componentTags: ['venomSac', 'silk', 'hide'],
   },
   spider_egg: {
     id: 'spider_egg',
@@ -268,6 +271,10 @@ export const ZONE2_MOBS: Record<string, MobTemplate> = {
     loot: [],
     scale: 0.9,
     color: 0xb7a7c9,
+    // A silk-wrapped egg sac of the spider family. Phase 11m added the tag. The
+    // clutch is quest-gated to damage (requiresQuestId above), so it is a
+    // hollow silk floor member: the ledger records its density beside the count.
+    componentTags: ['silk'],
   },
   widow_hatchling: {
     id: 'widow_hatchling',
@@ -321,6 +328,10 @@ export const ZONE2_MOBS: Record<string, MobTemplate> = {
     ],
     scale: 1.4,
     color: 0x641e16,
+    // The spider boss that spins the Mirefen's webs (it drops
+    // broodmother_silk_robe). Phase 11m added the tag. A count-1 boss, so a
+    // hollow silk floor member: the ledger records its density beside the count.
+    componentTags: ['silk'],
   },
   drowned_dead: {
     id: 'drowned_dead',

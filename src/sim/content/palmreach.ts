@@ -125,7 +125,9 @@ export const PALMREACH_MOBS: Record<string, MobTemplate> = {
     loot: [{ copper: 105, chance: 1 }],
     scale: 1.15,
     color: 0xe86848,
-    componentTags: ['meat'],
+    // A tide-line crab breathes through gills like the murlocs and the bogtoad.
+    // Phase 11m added the tag (gills maps to mudfin_scale per 11m-ORPHAN).
+    componentTags: ['gills', 'meat'],
   },
   thicket_boar: {
     id: 'thicket_boar',
@@ -144,7 +146,9 @@ export const PALMREACH_MOBS: Record<string, MobTemplate> = {
     loot: [{ copper: 105, chance: 1 }],
     scale: 1.2,
     color: 0x6a4e38,
-    componentTags: ['hide', 'meat'],
+    // A boar like wild_boar (hide, tusk, meat): boars are tusked. Phase 11m
+    // added the tag so tusk has a band-3 open-world source beside the trolls.
+    componentTags: ['hide', 'tusk', 'meat'],
   },
   canopy_weaver: {
     id: 'canopy_weaver',

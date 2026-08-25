@@ -216,7 +216,10 @@ export const REALM_MOBS: Record<string, MobTemplate> = {
     ],
     scale: 1.0,
     color: 0xb9a3cf,
-    componentTags: ['hide', 'meat'],
+    // A stag carries antlers, the horn family (it even drops gleaming_antler;
+    // horn maps to curved_tusk per 11m-ORPHAN). Phase 11m added the tag as the
+    // band-2 open-world horn source.
+    componentTags: ['hide', 'horn', 'meat'],
   },
   veiled_doe: {
     id: 'veiled_doe',
@@ -432,6 +435,10 @@ export const REALM_MOBS: Record<string, MobTemplate> = {
     ],
     scale: 1.45,
     color: 0xd8c49a,
+    // The herd's horned elite (it drops gleaming_antler at chance 1; horn maps
+    // to curved_tusk per 11m-ORPHAN). Phase 11m added the tag. A count-1 rare,
+    // so a hollow horn floor member: the ledger records its density.
+    componentTags: ['horn'],
   },
   waking_warden: {
     id: 'waking_warden',

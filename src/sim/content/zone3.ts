@@ -301,6 +301,9 @@ export const ZONE3_MOBS: Record<string, MobTemplate> = {
     ],
     scale: 1.3,
     color: 0x9e7b53,
+    // Ogres are tusked (the game ships cracked_ogre_tusk), so the corpse gives
+    // up a tusk. Phase 11m added the tag: the band-2 open-world tusk source.
+    componentTags: ['tusk'],
   },
   brakka_wallbreaker: {
     id: 'brakka_wallbreaker',
@@ -358,6 +361,8 @@ export const ZONE3_MOBS: Record<string, MobTemplate> = {
     ],
     scale: 1.35,
     color: 0x7e5c3e,
+    // Same tusked ogre stock as the Thornpeak Ogre. Phase 11m added the tag.
+    componentTags: ['tusk'],
   },
   warlord_drogmar: {
     id: 'warlord_drogmar',

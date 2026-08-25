@@ -116,7 +116,9 @@ export const AMBERFALL_MOBS: Record<string, MobTemplate> = {
     loot: [{ itemId: 'gilded_sap_clot', chance: 0.6, questId: 'q_af_amber_from_the_herd' }],
     scale: 1.15,
     color: 0xd8a848,
-    componentTags: ['hide', 'meat'],
+    // A stag carries antlers, the horn family (horn maps to curved_tusk per
+    // 11m-ORPHAN). Phase 11m added the tag as a band-3 open-world horn source.
+    componentTags: ['hide', 'horn', 'meat'],
   },
   gloam_fox: {
     id: 'gloam_fox',
@@ -135,7 +137,9 @@ export const AMBERFALL_MOBS: Record<string, MobTemplate> = {
     loot: [{ copper: 90, chance: 1 }],
     scale: 1,
     color: 0xd87838,
-    componentTags: ['hide', 'fang'],
+    // A fox digs and fights with its claws, the old_greyjaw (hide, fang, claw)
+    // shape. Phase 11m added the tag as a band-3 open-world claw source.
+    componentTags: ['hide', 'fang', 'claw'],
   },
   orchard_treant: {
     id: 'orchard_treant',

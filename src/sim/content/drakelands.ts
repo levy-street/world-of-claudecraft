@@ -262,11 +262,14 @@ export const DRAKELANDS_MOBS: Record<string, MobTemplate> = {
       { copper: 90, chance: 1 },
       { itemId: 'emberwing_scale', chance: 0.5, questId: 'q_dk_scales_of_the_maw' },
     ],
-    // Only MAPPED families (HARVEST_COMPONENT_ITEMS): claw and horn read well on
-    // a dragonkin but yield no item, so they would be dead weight that still
-    // inflates the concentration bonus (the denominator is the advertised tag
-    // count), which is the #2514 shape tests/mob_component_tags.test.ts guards.
-    componentTags: ['hide', 'fang'],
+    // Only MAPPED families (HARVEST_COMPONENT_ITEMS): an unmapped tag yields no
+    // item and still inflates the concentration bonus (the denominator is the
+    // advertised tag count), the #2514 shape tests/mob_component_tags.test.ts
+    // guards. claw joined the yield table (sharp_claw) with #2513, so Phase 11m
+    // added it here: a brood guard fights with its foreclaws, and claw needed a
+    // band-3 open-world source. horn stays off this template (11m spreads it
+    // over the horned herd beasts, not the brood).
+    componentTags: ['hide', 'fang', 'claw'],
     offStreamIdle: true,
     // Playtest bump: 30% over the first cut. Still inside the stock melee
     // profile's honest reach (the bespoke-reach threshold is the scale-2
