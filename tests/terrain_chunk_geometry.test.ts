@@ -365,10 +365,15 @@ describe('generated chunk geometry is stable', () => {
     // processes) AFTER the same merge re-seated Farmer Jessica from (24.5,
     // 32.5) to (-15.5, -81.5) at the rebuilt town's north-east edge: the
     // merged digest equals the RELEASE's literal, which is what the pin below
-    // carries. Both seats sit on ground the rebuilt town already levels (the
-    // old one under the second wolf run's ring, the new one on the plat), so
-    // her calm pad moves no in-rect vertex at either: measured on a 0.5 yd
-    // lattice at the merge, zero points moved at both sites.
+    // carries. The NEW seat is the measured one: the merge commit 9f130d3b7c
+    // records the (-15.5, -81.5) site on already-calm town ground, probed on a
+    // 0.5 yd lattice with zero points moved, so her calm pad moves no in-rect
+    // vertex there. The OLD seat (24.5, 32.5) has no such record; that it
+    // moved nothing is an inference, not a measurement: it sat 23.2 yd from
+    // the second forest_wolf camp at (12, 52) r26, inside that camp's own
+    // flatten disc (world.ts levels terrain to the camp-centre height within
+    // radius * 0.8 and blends it out to radius * 1.8, 46.8 yd; the seat sat
+    // in the blend band), which is camp levelling, not the town's.
     // The branch's gap super-chunk pin (c4839177e825dbcf8dc5bcf501336fc2) is
     // gone with the gap chunks themselves: the island claims the old vale gap
     // cells, and gapFill.length above pins their absence.

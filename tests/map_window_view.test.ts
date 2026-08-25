@@ -1957,15 +1957,16 @@ describe('zone-map farm patches', () => {
     expect(Number.isFinite(sim.farmPatches[0].my)).toBe(true);
   });
 
-  it('caps the farm-patch badge inside the world-yard nudge bound like every other landmark', () => {
+  it('caps the farm-patch badge inside the world-yard nudge bound like other landmarks', () => {
     // The release/v0.41.0 merge landed the patch loop WITHOUT the cap the
     // release had threaded through every other placeLandmarkBadge call, so
     // the one badge that marks a place a player walks back to every day was
     // the one badge still free to drift up to MAP_LANDMARK_PLACEMENT_STEPS
     // pixels (about 30 yards at the full-zone frame). Decisive fixture: a
     // mailbox badge is placed first, exactly on the patch's projection, so the
-    // farm badge MUST collide. Under the cap (about 7 px here) no candidate
-    // inside the cap clears the 24 px separation, so the badge stays at its
+    // farm badge MUST collide. Under the cap (6.2 px here: 4 yd over the 360 yd
+    // span at 560 px, which stepLimit rounds to 6) no candidate inside the cap
+    // clears the 24 px separation, so the badge stays at its
     // authored projection; without the cap the search walks to the first
     // clear ring, 24 px out, three times the bound. The real Eastbrook patch
     // is not displaced at zoom 1, which is why the fixture is synthetic.

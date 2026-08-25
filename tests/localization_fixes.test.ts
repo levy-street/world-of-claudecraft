@@ -986,6 +986,17 @@ function scanEmitCandidates(simSrc: string, serverSrc: string): Cand[] {
   for (const m of serverSrc.matchAll(s2)) cands.push({ type: 'error', tmpl: unq(m[1]) });
   const s3 = new RegExp(`sendSystemNotice\\([^,]+,\\s*${lit}`, 'g');
   for (const m of serverSrc.matchAll(s3)) cands.push({ type: 'log', tmpl: unq(m[1]) });
+  // server/social.ts routes its player text through three private helpers rather
+  // than inline { type, text } objects: this.err(charId, '<lit>') delivers
+  // { type: 'error' }, this.info(charId, '<lit>') delivers { type: 'log' }, and
+  // notifyGuildOfficers(guildId, '<lit>') fans a { type: 'log' } line out to a
+  // guild's online officers. Its call sites wrap (the id on its own line), so the
+  // first-arg class admits newlines but, like nr above, no parens or commas: a
+  // single-arg call cannot span into the NEXT call's literal.
+  const s4 = new RegExp(`this\\.err\\([^,()]+,\\s*${lit}`, 'g');
+  for (const m of serverSrc.matchAll(s4)) cands.push({ type: 'error', tmpl: unq(m[1]) });
+  const s5 = new RegExp(`(?:this\\.info|notifyGuildOfficers)\\([^,()]+,\\s*${lit}`, 'g');
+  for (const m of serverSrc.matchAll(s5)) cands.push({ type: 'log', tmpl: unq(m[1]) });
   const seen = new Set<string>();
   return cands.filter((c) => {
     const k = `${c.type} ${c.tmpl}`;
@@ -1314,10 +1325,15 @@ describe('S3: every sim.ts emit is recognized (drift guard)', () => {
   // a new server emit (chat-filter notices, pet-name, etc.) could ship English to
   // every locale while the gate stayed green. Recognized via the localizeServerText
   // fallback in recognized() below. server/social.ts joined the corpus at the
-  // seventeenth release sync (masterwrought Phase 11m): the guild pledge board
-  // emits its notices from there (notifyGuildOfficers), and every one is a
-  // server_i18n matcher row already, so widening the scan is what keeps the
-  // NEXT literal added to that file from shipping English to every locale.
+  // seventeenth release sync (masterwrought Phase 11m). That file's own emit
+  // idiom is not the inline { type, text } object: almost all of its player
+  // text goes through this.err(charId, '...') (an error), this.info(charId,
+  // '...') (a log line) and notifyGuildOfficers(guildId, '...') (a log line to
+  // a guild's online officers), which the s4/s5 regexes in scanEmitCandidates
+  // harvest; the few inline { type: 'log', text } broadcasts ride s1. Every
+  // literal harvested today is a server_i18n matcher row, so with those shapes
+  // scanned the NEXT literal added to that file in its own idiom fails here
+  // instead of shipping English to every locale.
   const serverSrc = ['server/game.ts', 'server/social.ts']
     .map((file) => fs.readFileSync(path.resolve(process.cwd(), file), 'utf8'))
     .join('\n');
@@ -1362,8 +1378,12 @@ describe('S3: every sim.ts emit is recognized (drift guard)', () => {
     const tern = expr.match(/\?\s*'([^']*)'\s*:\s*'([^']*)'/);
     if (tern) return tern[1] || tern[2];
     if (/\?[^:]*:/.test(expr)) return '';
+    // server/social.ts's guild-rank lines interpolate RANK_LABEL[rank], and their
+    // server_i18n rows accept only the three real labels, so the probe value is
+    // one of them (the numeric class below would otherwise read `rank` as 5).
+    if (/RANK_LABEL/.test(expr)) return 'Officer';
     if (
-      /rank|level|count|players|roll|prestige|amount|seconds|percent|\bN\b|MAX_|FIRST_|threshold|number|\.length|Math|round|parseInt|\*\s*100|suggested|FEE_GOLD/i.test(
+      /rank|level|count|players|roll|prestige|amount|seconds|minutes|percent|\bN\b|MAX_|FIRST_|threshold|number|\.length|Math|round|parseInt|\*\s*100|suggested|FEE_GOLD/i.test(
         expr,
       )
     )
@@ -1590,8 +1610,8 @@ describe('S3: every sim.ts emit is recognized (drift guard)', () => {
 
 // Regression for the S3 hardening: prove the scanner ENUMERATES each emit form it was
 // hardened to cover, by feeding it synthetic source. If a future refactor drops one of
-// the regexes (s1/s1t/s2/s3/nr/ert/e3), the matching assertion bites - so the drift guard
-// cannot silently lose coverage of a whole emit shape.
+// the regexes (s1/s1t/s2/s3/s4/s5/nr/ert/e3), the matching assertion bites - so the drift
+// guard cannot silently lose coverage of a whole emit shape.
 describe('S3 scanner enumerates each hardened emit form (regression)', () => {
   const synthSim = [
     "this.emit({ type: 'log', text: 'SYNTH_SIM_LOG' });", // e1
@@ -1613,6 +1633,15 @@ describe('S3 scanner enumerates each hardened emit form (regression)', () => {
     "this.send({ type: 'log', text: flag ? 'SYNTH_SRV_TERN_A' : 'SYNTH_SRV_TERN_B' });", // s1t
     "sendChatNotice(session, 'SYNTH_CHATNOTICE');", // s2
     "sendSystemNotice(session, 'SYNTH_SYSNOTICE');", // s3
+    // server/social.ts idiom (s4/s5): the private err/info helpers and the
+    // officer fan-out, one of them wrapped across lines the way biome lays the
+    // real call sites out (the id on its own line, the literal on the next).
+    "this.err(actor.characterId, 'SYNTH_SOCIAL_ERR');", // s4
+    "this.info(\n  actor.characterId,\n  'SYNTH_SOCIAL_INFO_WRAPPED',\n);", // s5 (info, wrapped)
+    'await this.notifyGuildOfficers(guild.id, `SYNTH_SOCIAL_OFFICERS ${x}`);', // s5 (officers)
+    // s4 anti-bleed: a single-arg this.err() must stop its first-arg scan at ')'
+    // and NOT span into a following call's literal.
+    "this.err(charId); track(metric, 'SOCIAL_BLEED_SENTINEL_should_not_capture');",
   ].join('\n');
 
   // [label, expected type, expected tmpl] - every entry must be enumerated.
@@ -1634,6 +1663,9 @@ describe('S3 scanner enumerates each hardened emit form (regression)', () => {
     ['server ternary text, branch B (s1t)', 'log', 'SYNTH_SRV_TERN_B'],
     ['server sendChatNotice (s2)', 'error', 'SYNTH_CHATNOTICE'],
     ['server sendSystemNotice (s3)', 'log', 'SYNTH_SYSNOTICE'],
+    ['social this.err literal (s4)', 'error', 'SYNTH_SOCIAL_ERR'],
+    ['social this.info literal, wrapped call (s5)', 'log', 'SYNTH_SOCIAL_INFO_WRAPPED'],
+    ['social notifyGuildOfficers template (s5)', 'log', 'SYNTH_SOCIAL_OFFICERS ${x}'],
   ];
 
   it('every hardened emit form is enumerated by scanEmitCandidates()', () => {
@@ -1649,6 +1681,8 @@ describe('S3 scanner enumerates each hardened emit form (regression)', () => {
     // ever stopped excluding ')').
     const bled = cands.some((c) => c.tmpl === 'BLEED_SENTINEL_should_not_capture');
     expect(bled, "nr first-arg class must stop at ')' (no cross-call bleed)").toBe(false);
+    const socialBled = cands.some((c) => c.tmpl === 'SOCIAL_BLEED_SENTINEL_should_not_capture');
+    expect(socialBled, "s4 first-arg class must stop at ')' (no cross-call bleed)").toBe(false);
   });
 });
 

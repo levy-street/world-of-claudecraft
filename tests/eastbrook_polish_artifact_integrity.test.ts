@@ -1153,13 +1153,9 @@ const ACCEPTED_POLISH_V2_METADATA_PATH = path.join(REPO_ROOT, POLISH_SEAL_PATH);
 // stood in as placeholders while the merge was mid-resolution; the values
 // below are the re-mint (node
 // scripts/assets/eastbrook_grand_armoury/remint_polish_provenance.mjs over
-// the fully resolved tree), committed with exactly the bytes it read. No
-// capture was retaken.
-// Re-minted at the merge of release/v0.41.0 (ff2837da1f) into
-// feature/masterwrought (base 9a89e3483e): both parents had re-minted, so
-// neither literal was right for the merged tree; remint_polish_provenance.mjs
-// ran over the fully resolved tree (renderer.ts, eastbrook_town.ts and
-// eastbrook_layout.ts are the drifted inputs). No capture was retaken.
+// the fully resolved tree, with renderer.ts, eastbrook_town.ts and
+// eastbrook_layout.ts as the drifted inputs), committed with exactly the
+// bytes it read. No capture was retaken.
 const ACCEPTED_POLISH_V2_METADATA_SHA256 =
   'a718525e4ed723cf4693d0a730191da33f0049455073704180be0cc4a931d507';
 const ACCEPTED_POLISH_V2_COMPOSITE_PROVENANCE =

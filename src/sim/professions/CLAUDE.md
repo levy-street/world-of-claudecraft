@@ -45,11 +45,16 @@ or pure leaves, never a `Sim` import, randomness only via `ctx.rng` (guarded by
   together on every cast exit path.
 - `session_teardown.ts`: the ONE displacement cancel for a live gather or
   fishing session (`cancelProfessionSessionOnDisplacement`), called from every
-  hard-displacement site: the sim and server teleport paths (`displacement.ts`,
-  `sim.ts`, `spirit.ts`, `dev_commands.ts`, `delves/runs.ts`) and the `/follow`
-  zone-line crossing (the Vale Cup's pitch eject and kickoff placements were
-  sites too, until it retired with release/v0.41.0);
-  gated on `isNonSpellCast`, delegates to `ctx.cancelCast`.
+  hard-displacement site. The caller list is the grep for that symbol, never a
+  list kept here; the families it spans are the shared sim teleport landing
+  (`displacePlayer`), instance entry and exit for dungeons, delves and rifts
+  (enter, leave, eject, module advance), the spirit paths (unstuck,
+  resurrection), the `/follow` zone-line crossing, the dev teleports (the sim's
+  `/dev` commands and the server's `dev_teleport` message), and the server's
+  own moderation moves (spectate enter and exit, jail and moderation
+  teleports). The Vale Cup's pitch eject and kickoff placements were sites too,
+  until it retired with release/v0.41.0. Gated on `isNonSpellCast`, delegates
+  to `ctx.cancelCast`.
 - `wheel.ts`: flat per-craft skills (`CraftSkills`, `gainCraftSkill`,
   `tierForSkill`/`tierCapability`, the four-state `tierProgressMultiplier`
   curve, perk-eligibility reads).

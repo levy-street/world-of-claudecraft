@@ -464,13 +464,9 @@ interface AttributionTargetFixture {
 // b4f994b0. The release literal stood in as a placeholder while the merge
 // was mid-resolution; the value below is the re-mint (node
 // scripts/assets/eastbrook_grand_armoury/remint_polish_provenance.mjs over
-// the fully resolved tree), committed with exactly the bytes it read. No
-// capture was retaken.
-// Re-minted at the merge of release/v0.41.0 (ff2837da1f) into
-// feature/masterwrought (base 9a89e3483e): both parents had re-minted, so
-// neither literal was right for the merged tree; remint_polish_provenance.mjs
-// ran over the fully resolved tree (renderer.ts, eastbrook_town.ts and
-// eastbrook_layout.ts are the drifted inputs). No capture was retaken.
+// the fully resolved tree, with renderer.ts, eastbrook_town.ts and
+// eastbrook_layout.ts as the drifted inputs), committed with exactly the
+// bytes it read. No capture was retaken.
 const PINNED_POLISH_COMPOSITE_FINGERPRINT =
   'ad463f06d9f597d8aed5b13cba23564161e09170e9cbb1dbee8a2ee5a54f67b1';
 

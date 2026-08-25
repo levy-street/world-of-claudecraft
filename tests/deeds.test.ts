@@ -1170,9 +1170,19 @@ describe('persistence', () => {
     e.pos.z = poi.z;
     e.prevPos = { ...e.pos };
     for (let i = 0; i < 25; i++) sim.tick(); // let the 1 Hz proximity sweep run
+    // A sweep-scoped allowlist: parked on a POI for 25 ticks with no action
+    // taken, the only writer that runs is the 1 Hz sweepProximityMarks, which
+    // mints poi: and witness: marks, so those two namespaces are all this arm
+    // can observe. The other names cover deeds.ts's own event-driven marks
+    // (fish, npc, slain, quality, fiesta, and the farm and farm_crop marks
+    // onCropHarvestedForDeeds mints) plus the gather, gather_event and dungeon
+    // marks other modules route through ctx.markVisited; the crafting marks
+    // (masterwork, craft_rare, relic, apex feast) are not listed and not
+    // reachable here. A mark outside the list fails whichever writer minted
+    // it, but only the sweep's two namespaces are exercised by this scenario.
     for (const mark of meta.deedStats.visited) {
       expect(mark).toMatch(
-        /^(poi|gather|gather_event|fish|npc|slain|quality|fiesta|dungeon|witness|farm):/,
+        /^(poi|gather|gather_event|fish|npc|slain|quality|fiesta|dungeon|witness|farm|farm_crop):/,
       );
     }
     // Parked on the hub POI (the harbor-town spawn quay sits outside every POI
