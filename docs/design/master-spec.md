@@ -418,9 +418,9 @@ Economy continuity: zone-2 quests pay 2–25s (total ≈ 1g31s + ~1g+ mob copper
 
 | id | name | kind | effect / stats | buy | sell |
 |---|---|---|---|---|---|
-| fenbridge_rye | Fenbridge Rye Loaf | food | foodHp 243 | 400 | 25 |
+| fenbridge_rye | Fenbridge Rye Loaf | food | foodHp 220 | 400 | 25 |
 | marsh_mint_tea | Marsh Mint Tea | drink | drinkMana 288 | 400 | 25 |
-| smoked_eel | Smoked Mirefen Eel | food | foodHp 432 | 1000 | 60 |
+| smoked_eel | Smoked Mirefen Eel | food | foodHp 375 | 1000 | 60 |
 | silvermist_cordial | Silvermist Cordial | drink | drinkMana 436 | 1000 | 60 |
 | bogiron_mace | Bogiron Mace | weapon (8–14 spd 2.6) | common | 2500 | 250 |
 | fenreed_staff | Fenreed Staff | weapon (9–16 spd 3.0, int 1) | common | 2500 | 250 |
@@ -435,9 +435,9 @@ Economy continuity: zone-2 quests pay 2–25s (total ≈ 1g31s + ~1g+ mob copper
 
 | id | name | kind | effect / stats | buy | sell |
 |---|---|---|---|---|---|
-| trail_hardtack | Highwatch Trail Hardtack | food | foodHp 552 | 1200 | 75 |
+| trail_hardtack | Highwatch Trail Hardtack | food | foodHp 480 | 1200 | 75 |
 | meltwater_flask | Meltwater Flask | drink | drinkMana 672 | 1200 | 75 |
-| roast_mountain_goat | Roast Mountain Goat | food | foodHp 874 | 2500 | 150 |
+| roast_mountain_goat | Roast Mountain Goat | food | foodHp 816 | 2500 | 150 |
 | glacier_melt | Glacier Melt | drink | drinkMana 900 | 2500 | 150 |
 | highwatch_warblade | Highwatch Warblade | weapon (15–24 spd 2.3) | common | 6000 | 600 |
 | craghorn_staff | Craghorn Staff | weapon (16–27 spd 3.0, int 2) | common | 6000 | 600 |

@@ -551,9 +551,11 @@ export const PROFESSION_ITEMS: Record<string, ItemDef> = {
   // --- Crafted cooking ladder (cooking) ------------------------------------
   // Trainer-taught outputs of LADDER_RECIPES (content/recipes.ts), three rungs
   // at skillReq 0/25/50, kitchens-bound at cook_marlow. kind 'food' + foodHp
-  // (an 18s sit heal); no new effect machinery. Every foodHp/sellValue reuses
-  // an existing point on the vendor food curve (foodHp ceiling 980 =
-  // conjured_bread4, the top existing food). Never vendor-stocked (no buyValue);
+  // (an 18s sit heal); no new effect machinery. Every foodHp/sellValue was
+  // authored on an existing point of the pre-11n food curve (foodHp ceiling
+  // 980 = conjured_bread4); since the 11n vendor floor the vendor food line
+  // sits the 10/15/20 margin ladder BELOW these crafted points, which stayed
+  // frozen per R5. Never vendor-stocked (no buyValue);
   // output quality matches the rung. Reagent economy clears strictly per rung.
   pan_seared_perch: {
     id: 'pan_seared_perch',

@@ -515,8 +515,26 @@ describe('Eastbrook authored gameplay data integration', () => {
     // Measured on the merged working tree (npx vitest run
     // tests/eastbrook_gameplay_integration.test.ts, with zone1.ts and the
     // layout both conflict-free) and set to exactly what it reported.
+    //
+    // Re-minted at the 11n vendor floor (qr-11n-WIDE): exactly one payload
+    // moved and the move is smith_haldren's vendorItems row, the four
+    // byte-identical crafted gear rows pulled (eastbrook_arming_sword,
+    // eastbrook_chain_vest, eastbrook_wool_trousers, tanned_leather_jerkin).
+    // Nothing else in any def, and no placement field, changed. The row
+    // assertion below is asserted BEFORE the digest, same as the vendor rows
+    // above, so the one moved field is described where it can actually fail;
+    // tests/vendor_floor.test.ts owns the deeper per-id keeps.
+    expect(ZONE1_NPCS.smith_haldren.vendorItems).toEqual([
+      'eastbrook_greatsword',
+      'bronzework_mace',
+      'vale_carving_knife',
+      'hickory_shortstaff',
+      'eastbrook_buckler',
+      'valespun_robe',
+      'hobnail_boots',
+    ]);
     expect(createHash('sha256').update(JSON.stringify(stableTownNpcPayload())).digest('hex')).toBe(
-      '91e9c7645e2a8a18e158831f8e38031e9bf54feb913fea66d567a1012abb7383',
+      'a9448fdddffaac362da8792a7a013d2a840122c2c12a25adb73779767952e14d',
     );
     expect(ZONE1_TOWN_NPC_IDS).toHaveLength(15);
     for (const id of ZONE1_TOWN_NPC_IDS) {
