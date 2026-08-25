@@ -458,7 +458,10 @@ describe('coverage: each scenario fires its subsystem', () => {
     ).toBe(true);
     expect(rec.notes.guardianId).not.toBeNull();
     expect(rec.notes.bankBeforeMindfracture).toBe(0);
-    expect(rec.notes.bankAfterMindfracture).toBe(1);
+    // The aimed area contacts primary, foreignOnly and secondary. Each real
+    // Mindfracture contact contributes one stack, while foreign-owned Dirge
+    // state stays isolated from the echo graph.
+    expect(rec.notes.bankAfterMindfracture).toBe(3);
     expect(rec.notes.mindfractureEchoTargets).toEqual(rec.notes.expectedEchoTargets);
     expect(rec.notes.foreignOwnerIsolated).toBe(true);
     expect(rec.notes.manaAfterGuardian).toBeGreaterThan(rec.notes.manaAfterSummon as number);

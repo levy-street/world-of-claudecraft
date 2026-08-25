@@ -5322,7 +5322,11 @@ function priestCodex(seed = 2929): Scenario {
         }
       }
       rec.notes.mindfractureEchoTargets = mindfractureEchoTargets;
-      rec.notes.expectedEchoTargets = [secondary.id, tertiary.id];
+      // Mindfracture is now a target-born area impact. The primary hit echoes
+      // to the two other owned Dirges; the secondary hit then moves Effigy and
+      // echoes back to the primary and tertiary. The foreign owner's Dirge can
+      // take area damage but never joins this priest's echo graph.
+      rec.notes.expectedEchoTargets = [secondary.id, tertiary.id, primary.id, tertiary.id];
       rec.notes.foreignOwnerIsolated = !mindfractureEchoTargets.includes(foreignOnly.id);
       rec.snapshot('effigy-banked');
       cast(vespersId, primary.id, 'summon_tithefiend', 2);
