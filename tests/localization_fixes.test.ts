@@ -923,7 +923,7 @@ type Cand = { type: 'log' | 'error' | 'loot'; tmpl: string };
 function scanEmitCandidates(simSrc: string, serverSrc: string): Cand[] {
   const cands: Cand[] = [];
   const lit = '(`[^`]*`|\'(?:[^\'\\\\]|\\\\.)*\'|"(?:[^"\\\\]|\\\\.)*")';
-  // A ternary condition up to the `?` (no quotes/braces/commas of its own beyond
+  // A ternary condition up to the `?` (no braces/commas of its own beyond
   // the matched literals, and no `;` or `)`: a condition never crosses a
   // statement or call boundary, so a one-line `this.err(id, 'A'); y = b ? 'C'
   // : 'D';` cannot false-harvest C and D as an err ternary): catches
