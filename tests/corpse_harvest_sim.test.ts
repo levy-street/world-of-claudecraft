@@ -675,7 +675,7 @@ describe('signed Pristine specimens (#1145)', () => {
     }
   });
 
-  it('the cloth family (no specimen) grants the signed component at rare-or-better (seed 23)', () => {
+  it('the cloth family (no specimen) grants the signed component at rare-or-better (seed 30)', () => {
     const { sim, internals, a } = setup(30);
     const template = MOBS.vale_bandit;
     const corpse = createMob(7775, template, template.maxLevel, { x: 0, y: 0, z: 0 });
@@ -736,6 +736,10 @@ describe('signed Pristine specimens (#1145)', () => {
     expect(
       meta.inventory.filter((s) => s.instance?.signer === 'Alpha' && s.itemId !== 'mudfin_scale'),
     ).toEqual([]);
+    // Non-vacuity floor for the sweep below, in the file's own ratchet shape
+    // (the #2139 premise arm): 5 specimen families measured 2026-08-25 as a
+    // ratchet, so an emptied table cannot turn the sweep into a no-op.
+    expect(Object.keys(HARVEST_COMPONENT_SPECIMENS).length).toBeGreaterThanOrEqual(5);
     for (const specimen of Object.values(HARVEST_COMPONENT_SPECIMENS)) {
       expect(sim.countItem(specimen, a), specimen).toBe(0);
     }
@@ -1623,6 +1627,9 @@ describe('a repeated component tag harvests the family once (#2474)', () => {
       {
         label: 'the corpse carries no component tags',
         arrange: ({ internals }) => {
+          // The retags scoping claim below, asserted: this arm runs against
+          // warlock_imp as shipped (untagged), never under another arm's retag.
+          expect(MOBS.warlock_imp.componentTags).toBeUndefined();
           const template = MOBS.warlock_imp;
           const corpse = createMob(7770, template, template.maxLevel, { x: 0, y: 0, z: 0 });
           corpse.dead = true;
@@ -2122,6 +2129,9 @@ describe('an invalid component tag is ignored entirely (#2504)', () => {
       {
         label: 'the corpse carries no component tags',
         arrange: ({ internals }) => {
+          // The retags scoping claim below, asserted: this arm runs against
+          // warlock_imp as shipped (untagged), never under another arm's retag.
+          expect(MOBS.warlock_imp.componentTags).toBeUndefined();
           const template = MOBS.warlock_imp;
           const corpse = createMob(7752, template, template.maxLevel, { x: 0, y: 0, z: 0 });
           corpse.dead = true;

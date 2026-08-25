@@ -316,8 +316,9 @@ Two premises above no longer hold on the tree the 11n session will inherit
 - **elixir_of_the_bear's Mirefen drop is 0.8 percent, not 7 percent**
   (src/sim/content/zone2.ts, chance 0.008). The 7 percent was TRUE when this
   file was written on 2026-08-20: the release's classic-era loot-rate fix
-  (98afdc0ec1, 2026-08-21) moved it to 0.008 and reached this branch with the
-  release/v0.40.0 sync merge e3efdd1ad1 (2026-08-21; its second parent
+  (98afdc0ec1, no ancestor of this file's authoring commit 2c1191fbbc: git
+  merge-base --is-ancestor says so) moved it to 0.008 and reached this branch
+  with the release/v0.40.0 sync merge e3efdd1ad1 (2026-08-21; its second parent
   2df374a074 is the first release tip merged here that carries 98afdc0ec1),
   so the premise was moved by an earlier release sync, not misread. The "keep
   its 7 percent Mirefen drop" instruction above reads 0.8 percent, and the

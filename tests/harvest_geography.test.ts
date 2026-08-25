@@ -308,11 +308,13 @@ describe('masterwrought R22: every mapped harvest family is reachable across the
   it('the floor IS the settled DECISION 12 triple, written as literals', () => {
     // state.md row 11m-D-12: TARGET (6 templates, 4 zones, 2 level bands).
     // Every other expectation in this file DERIVES from REACH_FLOOR (the
-    // shortfall clauses, the fixture sizes, the teeth arm's message), so
-    // without this one literal pin a lowered floor ({ templates: 2, zones: 1,
-    // bands: 1 }) passes every arm: the derived checks agree with whatever
-    // the constant says. This is the one place the number is written down
-    // rather than read back.
+    // shortfall clauses, the fixture sizes, the teeth arm's message); this
+    // is the only place the floor is stated as a TRIPLE. The clause arms
+    // state its components as literals too ('templates 5 of 6', 'zones 3 of
+    // 4', 'bands 1 of 2'), and the silk hollowness pin reads
+    // REACH_FLOOR.templates against a live count, so a lowered floor
+    // ({ templates: 2, zones: 1, bands: 1 }) reds five arms at once, this
+    // one included (measured 2026-08-25 by running exactly that mutant).
     expect(REACH_FLOOR).toEqual({ templates: 6, zones: 4, bands: 2 });
   });
 
@@ -331,12 +333,14 @@ describe('masterwrought R22: every mapped harvest family is reachable across the
 
   it('binds every key of the yield map, read live, never a hand list', () => {
     // The subject list is derived; a family mapped tomorrow is under the
-    // floor tomorrow. The one thing worth pinning about it is that it is
-    // not empty (an empty map would make the floor arm a statement about
-    // nothing) and that every key is carried by at least one shipped
-    // template (a mapped tag nobody carries is a yield nobody can reach,
-    // which is the same hole in different clothes).
-    expect(MAPPED_TAGS.length).toBeGreaterThan(0);
+    // floor tomorrow. Two things are worth pinning about it: a floor on its
+    // size (an empty map would make the floor arm a statement about
+    // nothing; 10 measured 2026-08-25, a ratchet: raise it when a family
+    // lands, lowering it needs a ledger entry) and that every key is
+    // carried by at least one shipped template (a mapped tag nobody carries
+    // is a yield nobody can reach, which is the same hole in different
+    // clothes).
+    expect(MAPPED_TAGS.length).toBeGreaterThanOrEqual(10);
     const uncarried = MAPPED_TAGS.filter((tag) => carriersOf(tag, LIVE_WORLD).length === 0);
     expect(uncarried, 'mapped tags no shipped template carries').toEqual([]);
   });
@@ -379,8 +383,21 @@ describe('the reachability predicate', () => {
     // camp at all (the summon-only miniboss the zero-camp arm below lists).
     expect(MOBS.spider_egg.requiresQuestId).toBe('q_broodmother');
     expect(MOBS.spider_egg.componentTags).toContain('silk');
-    expect(overworldCampsOf('spider_egg', LIVE_WORLD).length).toBeGreaterThan(0);
+    // Predicted from src/sim/content/zone2.ts before running: CAMPS carries
+    // exactly two spider_egg rows (the clutches at (70, 300) and (95, 340)),
+    // both overworld.
+    expect(overworldCampsOf('spider_egg', LIVE_WORLD)).toHaveLength(2);
     expect(familyReach('silk', LIVE_WORLD).reachable).toContain('spider_egg');
+    // The admission's hollowness, pinned in derived form: silk's UNGATED
+    // reachable carriers alone sit under the floor, which is what makes the
+    // quest-gate admission load-bearing. When a seventh UNGATED silk carrier
+    // lands this arm reds, and the red is the signal to retire the admission
+    // and its record, never to weaken this arm.
+    expect(
+      familyReach('silk', LIVE_WORLD).reachable.filter(
+        (id) => MOBS[id].requiresQuestId === undefined,
+      ).length,
+    ).toBeLessThan(REACH_FLOOR.templates);
     expect(MOBS.mister_crabs.requiresQuestId).toBe('q_ps_mother_of_pearl');
     expect(CAMPS.some((camp) => camp.mobId === 'mister_crabs')).toBe(false);
   });
@@ -717,20 +734,33 @@ describe('the never-mapped synthetic families the corpse-harvest corpus uses', (
 
   it('withRetaggedTemplates puts back the absence it found, even when the body throws', () => {
     // The corpus's one retag idiom (tests/helpers/unmapped_family.ts): a
-    // throwing arm must not leave warlock_imp tagged for every suite that
-    // runs after it, which is the cascade the finally exists to prevent.
+    // throwing arm must not leave warlock_imp or warlock_voidwalker tagged
+    // for every arm in the same suite that runs after it, which is the
+    // cascade the finally exists to prevent. TWO templates on purpose: a
+    // finally that restores only the first entry leaves the voidwalker
+    // tagged, and the last four expects are what red that mutant.
     expect(MOBS.warlock_imp.componentTags).toBeUndefined();
+    expect(MOBS.warlock_voidwalker.componentTags).toBeUndefined();
     expect(() =>
-      withRetaggedTemplates({ warlock_imp: [UNMAPPED_FAMILY] }, () => {
-        expect(MOBS.warlock_imp.componentTags).toEqual([UNMAPPED_FAMILY]);
-        expect(carriersOf(UNMAPPED_FAMILY, LIVE_WORLD).map((mob) => mob.id)).toEqual([
-          'warlock_imp',
-        ]);
-        throw new Error('sentinel');
-      }),
+      withRetaggedTemplates(
+        { warlock_imp: [UNMAPPED_FAMILY], warlock_voidwalker: [UNMAPPED_FAMILY_2] },
+        () => {
+          expect(MOBS.warlock_imp.componentTags).toEqual([UNMAPPED_FAMILY]);
+          expect(MOBS.warlock_voidwalker.componentTags).toEqual([UNMAPPED_FAMILY_2]);
+          expect(carriersOf(UNMAPPED_FAMILY, LIVE_WORLD).map((mob) => mob.id)).toEqual([
+            'warlock_imp',
+          ]);
+          expect(carriersOf(UNMAPPED_FAMILY_2, LIVE_WORLD).map((mob) => mob.id)).toEqual([
+            'warlock_voidwalker',
+          ]);
+          throw new Error('sentinel');
+        },
+      ),
     ).toThrow('sentinel');
     expect(MOBS.warlock_imp.componentTags).toBeUndefined();
+    expect(MOBS.warlock_voidwalker.componentTags).toBeUndefined();
     expect(carriersOf(UNMAPPED_FAMILY, LIVE_WORLD)).toEqual([]);
+    expect(carriersOf(UNMAPPED_FAMILY_2, LIVE_WORLD)).toEqual([]);
   });
 
   it('withRetaggedTemplates refuses a template that ships tagged, before mutating any', () => {
@@ -751,5 +781,18 @@ describe('the never-mapped synthetic families the corpse-harvest corpus uses', (
     expect(ran).toBe(false);
     expect(MOBS.forest_wolf.componentTags).toBe(wolfTags);
     expect(MOBS.warlock_imp.componentTags).toBeUndefined();
+  });
+
+  it('withRetaggedTemplates refuses a name that is no shipped template at all', () => {
+    // The guard's other refusal arm: an id MOBS does not carry throws before
+    // any template is mutated and the body never runs, so a typo in a retag
+    // map is a loud fixture bug, never a silent no-op retag.
+    let ran = false;
+    expect(() =>
+      withRetaggedTemplates({ not_a_mob: [UNMAPPED_FAMILY] }, () => {
+        ran = true;
+      }),
+    ).toThrow('not_a_mob is not a shipped mob template');
+    expect(ran).toBe(false);
   });
 });

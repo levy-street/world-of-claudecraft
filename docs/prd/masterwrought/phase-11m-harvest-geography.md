@@ -354,8 +354,10 @@ STOPPING RULES:
 
 Re-derived from the merged tree at 9f130d3b7c (the seventeenth release sync,
 release/v0.41.0), before the spread (bf4f36405d), as STEP 0 and STEP 1
-require; the bullets are anchored there and phrased in the past, and the
-numbers the spread then moved are in the state.md ledger:
+require; the bullets are anchored there: read every "is" in them as of that
+tree (9f130d3b7c). The numbers the spread then moved are in the state.md
+Phase 11m ledger STEP 6 writes; until then the spread commit body
+(bf4f36405d) carries them:
 
 - **meat is 17 templates over 10 zones, not 15 over 9** (16 over 10 on the
   reachable subset): the release's Proving Shore added shore_scuttler (levels
@@ -372,12 +374,17 @@ numbers the spread then moved are in the state.md ledger:
 - **horn's "2 templates" is 1 reachable**: wildheart_hexcaller lives only in
   the Wildheart dungeon roster (no camp), as qr-11m-SPREAD already measured.
 - **The corpse-harvest test corpus used gills and horn as THE unmapped
-  exemplars** (229 literal sites across fourteen suites, 239 lines retired by
-  the orphan commit, whose body undercounts them as eleven; sethrael_palecoil
-  and mudfin_murloc as the shipped mixed fixtures). Mapping the orphans
-  retires every shipped unmapped fixture, so the migration to a synthetic
-  never-mapped family (tests/helpers/unmapped_family.ts) is part of the orphan
-  commit; the phase file above did not name it. Recorded in the ledger.
+  exemplars** (229 occurrences of the QUOTED literals 'gills' or 'horn'
+  across fourteen test files at 722003809e^; 239 lines under tests/ that
+  722003809e removed containing either word as a bare substring, 236 of
+  them word-bounded; the commit body undercounts the sites as eleven;
+  sethrael_palecoil and mudfin_murloc as the shipped mixed fixtures).
+  Mapping the orphans retires every shipped unmapped fixture, so the
+  migration to a synthetic never-mapped family
+  (tests/helpers/unmapped_family.ts) is part of the orphan commit; the
+  phase file above did not name it. Recorded in the state.md
+  Phase 11m ledger STEP 6 writes; until then the spread commit body
+  (bf4f36405d) carries the record.
 - **A premise the plan did not name**: the capacity pre-gate assumes no corpse
   carries two specimen-less families (fang, cloth, tusk, and with this phase
   horn and gills), pinned in tests/corpse_harvest_sim.test.ts. It refused two
@@ -385,4 +392,5 @@ numbers the spread then moved are in the state.md ledger:
   horn, both fang carriers); the spread swapped in the Farshore's Sundered
   Horror for tusk, and horn's floor holds on six reachable carriers: the
   three settled candidates that survived, the Palecoil, and moonfleece_grazer
-  and aurelhorn, which the spread added.
+  and aurelhorn, which the spread added beyond the settled candidate list
+  (qr-11m-SPREAD names moor_ram, veiled_stag, gilded_stag, frostmane_yeti).
