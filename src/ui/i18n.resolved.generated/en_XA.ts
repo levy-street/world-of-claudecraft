@@ -2400,6 +2400,7 @@ export const en_XA: EnTranslations = {
       "dodge": "[Íñçŕéášéš ðóðĝé çĥáñçé ƀý {pct}%]",
       "dodgeReduce": "[Ŕéðúçéš ðóðĝé çĥáñçé ƀý {pct}%]",
       "damageReduction": "[Ŕéðúçéš áļļ ðáɱáĝé ţáķéñ ƀý {pct}%]",
+      "slumber": "[Ášļééþ úñţíļ ðáŵñ. Çáññóţ ƀé áţţáçķéð áñð ŵíļļ ñóţ ŵáķé ƒóŕ áñýóñé.]",
       "guardianWard": "[Ţĥé ñéẋţ ļéţĥáļ éñéɱý ĥíţ ŕéšţóŕéš ýóú ţó {pct}% ĥéáļţĥ íñšţéáð]",
       "armorFlat": "[Ŕéðúçéš áŕɱóŕ ƀý {value}]",
       "armorFlatStacks": "[Ŕéðúçéš áŕɱóŕ ƀý {value} ({stacks} šţáçķš)]",
@@ -2476,7 +2477,9 @@ export const en_XA: EnTranslations = {
       }
     },
     "worldBoss": {
-      "spawn": "[{name} ŕíšéš óʋéŕ {zone}!]"
+      "spawn": "[{name} ŕíšéš óʋéŕ {zone}!]",
+      "wake": "[{name} ŵáķéš óʋéŕ {zone}!]",
+      "sleep": "[{name} šļééþš úñţíļ ðáŵñ.]"
     },
     "auth": {
       "appleLoginCta": "[Çóñţíñúé ŵíţĥ Áþþļé]",
@@ -11938,6 +11941,15 @@ export const en_XA: EnTranslations = {
       "mirestone_stride": {
         "name": "[Ɱíŕéšţóñé Šţŕíðé]"
       },
+      "foremans_wage_band": {
+        "name": "[Ƒóŕéɱáñ'š Ŵáĝé Ɓáñð]"
+      },
+      "mirelight_locket": {
+        "name": "[Ɱíŕéļíĝĥţ Ļóçķéţ]"
+      },
+      "fenwright_grips": {
+        "name": "[Ƒéñŵŕíĝĥţ Ĝŕíþš]"
+      },
       "wildgrove_cinch": {
         "name": "[Ŵíļðĝŕóʋé Çíñçĥ]"
       },
@@ -16574,6 +16586,9 @@ export const en_XA: EnTranslations = {
           },
           "8": {
             "label": "[Ɓáŕŕóŵɱóúñð Ŕéáçĥ]"
+          },
+          "9": {
+            "label": "[Šţáŕƒáļļ Çŕáţéŕ]"
           }
         }
       },

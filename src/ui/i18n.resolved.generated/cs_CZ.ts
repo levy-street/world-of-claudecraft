@@ -2400,6 +2400,7 @@ export const cs_CZ: EnTranslations = {
       "dodge": "Zvyšuje šanci na vyhnutí o {pct} %",
       "dodgeReduce": "Snižuje šanci na vyhnutí o {pct} %",
       "damageReduction": "Snižuje veškeré utrpěné poškození o {pct} %",
+      "slumber": "Spí až do úsvitu. Nelze na něj zaútočit a pro nikoho se neprobudí.",
       "guardianWard": "Příští smrtící nepřátelský útok místo toho obnoví tvoje zdraví na {pct} %",
       "armorFlat": "Snižuje brnění o {value}",
       "armorFlatStacks": "Snižuje brnění o {value} ({stacks} stacků)",
@@ -2476,7 +2477,9 @@ export const cs_CZ: EnTranslations = {
       }
     },
     "worldBoss": {
-      "spawn": "{name} povstává nad {zone}!"
+      "spawn": "{name} povstává nad {zone}!",
+      "wake": "{name} se probouzí nad {zone}!",
+      "sleep": "{name} spí až do úsvitu."
     },
     "auth": {
       "appleLoginCta": "Pokračovat přes Apple",
@@ -11938,6 +11941,15 @@ export const cs_CZ: EnTranslations = {
       "mirestone_stride": {
         "name": "Bahnokamenný krok"
       },
+      "foremans_wage_band": {
+        "name": "Prsten předákovy mzdy"
+      },
+      "mirelight_locket": {
+        "name": "Medailon bažinného světla"
+      },
+      "fenwright_grips": {
+        "name": "Rukavice bažinného řemeslníka"
+      },
       "wildgrove_cinch": {
         "name": "Opasek divoké hájovny"
       },
@@ -16574,6 +16586,9 @@ export const cs_CZ: EnTranslations = {
           },
           "8": {
             "label": "Mohylové panství"
+          },
+          "9": {
+            "label": "Kráter padlé hvězdy"
           }
         }
       },

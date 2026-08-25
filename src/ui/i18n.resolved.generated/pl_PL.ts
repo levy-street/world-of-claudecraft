@@ -2400,6 +2400,7 @@ export const pl_PL: EnTranslations = {
       "dodge": "Erhöht Ausweichchance um {pct}%",
       "dodgeReduce": "Verringert Ausweichchance um {pct}%",
       "damageReduction": "Zmniejsza wszelkie otrzymywane obrażenia o {pct}%",
+      "slumber": "Śpi do świtu. Nie można go zaatakować i nie obudzi się dla nikogo.",
       "guardianWard": "Kolejny śmiertelny cios wroga zamiast tego przywraca cię do {pct}% zdrowia",
       "armorFlat": "Verringert Rüstung um {value}",
       "armorFlatStacks": "Verringert Rüstung um {value} ({stacks} Stapel)",
@@ -2476,7 +2477,9 @@ export const pl_PL: EnTranslations = {
       }
     },
     "worldBoss": {
-      "spawn": "{name} wznosi się nad {zone}!"
+      "spawn": "{name} wznosi się nad {zone}!",
+      "wake": "{name} budzi się nad {zone}!",
+      "sleep": "{name} śpi do świtu."
     },
     "auth": {
       "appleLoginCta": "Kontynuuj przez Apple",
@@ -11938,6 +11941,15 @@ export const pl_PL: EnTranslations = {
       "mirestone_stride": {
         "name": "Krok Bagiennego Kamienia"
       },
+      "foremans_wage_band": {
+        "name": "Pierścień zapłaty Brygadzisty"
+      },
+      "mirelight_locket": {
+        "name": "Medalion Bagiennego Blasku"
+      },
+      "fenwright_grips": {
+        "name": "Chwyty Bagiennego Rzemieślnika"
+      },
       "wildgrove_cinch": {
         "name": "Pas Dzikich Ostępów"
       },
@@ -16574,6 +16586,9 @@ export const pl_PL: EnTranslations = {
           },
           "8": {
             "label": "Włości Kurhanu"
+          },
+          "9": {
+            "label": "Krater Spadającej Gwiazdy"
           }
         }
       },

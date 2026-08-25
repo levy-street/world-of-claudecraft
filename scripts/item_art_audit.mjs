@@ -95,12 +95,12 @@ const build = await buildItemArtAudit({
   items,
   mapping,
   expected: {
-    // 828 with Skerrit's Shardpike: the world-boss quest tool gained a held model, which put
-    // it in the weapon registry and therefore obliged it painted inventory art.
-    catalogCount: 828,
-    // 843: the Mirefen world boss's quest chain added an item definition. Bumped here rather
-    // than in a later sweep because the audit refuses to run at all on a mismatch.
-    liveItemCount: 843,
+    // 831 with the three Foreman's Wage spoils (ring, locket, gloves), the Mirefen world
+    // boss's level-13 rare drops, each of which obliged painted inventory art.
+    catalogCount: 831,
+    // 846: the three Foreman's Wage item definitions. Bumped here rather than in a later
+    // sweep because the audit refuses to run at all on a mismatch.
+    liveItemCount: 846,
     generatedHeroicDefinitions: 64,
     heroicDefinitionsWithOwnWebp: 48,
     heroicWeaponArtAliases: 16,

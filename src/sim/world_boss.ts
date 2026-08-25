@@ -21,7 +21,7 @@
 import { MOBS } from './data';
 import type { PlayerMeta } from './sim';
 import type { SimContext } from './sim_context';
-import type { Entity, LootSlot } from './types';
+import type { Entity, LootEntry, LootSlot } from './types';
 
 // Sim-time cadence: a fresh boss rises this many seconds after the previous one
 // was scheduled. On the live server the sim runs at wall-clock speed (20 Hz), so
@@ -212,10 +212,16 @@ export function scaleWorldBossHp(ctx: SimContext, boss: Entity, def: WorldBossDe
 // to the shared corpse as `personalFor` slots only that player can take. Mirrors
 // rollLoot's per-entry semantics (exclusive rollGroups via one partitioned draw,
 // plain per-entry chance) but runs the whole table once per eligible contributor.
-// SUPPORTED ENTRY SHAPES: itemId with optional rollGroup only. Unlike rollLoot,
-// there is no questId gating and no per-entry copper here; a world-boss loot
-// table must not use those fields (they would hand quest items to everyone
-// ungated / silently drop the copper).
+// SUPPORTED ENTRY SHAPES: itemId with optional rollGroup and optional maxPlayerLevel.
+// Unlike rollLoot, there is no questId gating and no per-entry copper here; a
+// world-boss loot table must not use those fields (they would hand quest items to
+// everyone ungated / silently drop the copper).
+//
+// LEVEL-GATED ENTRIES (maxPlayerLevel): a whole roll group, or a lone entry, meant
+// for the low-level locals a zone boss fights beside. The gate is checked per
+// contributor against the level of their own character, and a group NOBODY in the
+// roster qualifies for is still rolled for each of them (one draw, discarded) so the
+// rng draw order is a function of the roster alone, never of who is what level.
 export function rollWorldBossLoot(ctx: SimContext, mob: Entity, contributors: PlayerMeta[]): void {
   const template = MOBS[mob.templateId];
   if (!template) return;
@@ -230,6 +236,9 @@ export function rollWorldBossLoot(ctx: SimContext, mob: Entity, contributors: Pl
   // never overlaps the spawn cadence, so at most one corpse is ever lootable at a time.
   for (const meta of contributors) {
     if (!isWorldBossLootEligible(meta, mob.templateId, ctx.lockoutNowMs())) continue;
+    const level = ctx.entities.get(meta.entityId)?.level ?? Number.POSITIVE_INFINITY;
+    const qualifies = (entry: LootEntry): boolean =>
+      entry.maxPlayerLevel === undefined || level <= entry.maxPlayerLevel;
     const rolledGroups = new Set<string>();
     // At most ONE roll-group (gear) item per contributor: no double gear drop (a glove
     // AND a belt) from a single kill. Every group is still ROLLED so the rng draw order
@@ -246,7 +255,7 @@ export function rollWorldBossLoot(ctx: SimContext, mob: Entity, contributors: Pl
         for (const g of group) {
           cumulative += g.chance;
           if (roll < cumulative) {
-            if (g.itemId && !gearWon) {
+            if (g.itemId && !gearWon && qualifies(g)) {
               items.push({ itemId: g.itemId, count: 1, personalFor: [meta.entityId] });
               gearWon = true;
             }
@@ -256,7 +265,7 @@ export function rollWorldBossLoot(ctx: SimContext, mob: Entity, contributors: Pl
         continue;
       }
       if (!ctx.rng.chance(entry.chance)) continue;
-      if (entry.itemId)
+      if (entry.itemId && qualifies(entry))
         items.push({ itemId: entry.itemId, count: 1, personalFor: [meta.entityId] });
     }
   }

@@ -2400,6 +2400,7 @@ export const ko_KR: EnTranslations = {
       "dodge": "회피 확률을 {pct}% 증가시킵니다",
       "dodgeReduce": "회피 확률을 {pct}% 감소시킵니다",
       "damageReduction": "받는 모든 피해가 {pct}% 감소합니다",
+      "slumber": "새벽까지 잠들어 있습니다. 공격할 수 없으며 누가 와도 깨어나지 않습니다.",
       "guardianWard": "다음 적의 치명적인 공격을 막고 대신 생명력을 {pct}%까지 회복합니다",
       "armorFlat": "방어도를 {value} 감소시킵니다",
       "armorFlatStacks": "방어도를 {value} 감소시킵니다 ({stacks}중첩)",
@@ -2476,7 +2477,9 @@ export const ko_KR: EnTranslations = {
       }
     },
     "worldBoss": {
-      "spawn": "{name}이(가) {zone} 위로 일어섰습니다!"
+      "spawn": "{name}이(가) {zone} 위로 일어섰습니다!",
+      "wake": "{name}이(가) {zone}에서 깨어났습니다!",
+      "sleep": "{name}이(가) 새벽까지 잠들었습니다."
     },
     "auth": {
       "appleLoginCta": "Apple로 계속하기",
@@ -11938,6 +11941,15 @@ export const ko_KR: EnTranslations = {
       "mirestone_stride": {
         "name": "진흙돌 발걸음"
       },
+      "foremans_wage_band": {
+        "name": "감독관의 임금 반지"
+      },
+      "mirelight_locket": {
+        "name": "늪빛 로켓"
+      },
+      "fenwright_grips": {
+        "name": "늪지 장인의 장갑"
+      },
       "wildgrove_cinch": {
         "name": "야생숲 허리띠"
       },
@@ -16574,6 +16586,9 @@ export const ko_KR: EnTranslations = {
           },
           "8": {
             "label": "봉분의 영역"
+          },
+          "9": {
+            "label": "별똥 분화구"
           }
         }
       },

@@ -2400,6 +2400,7 @@ export const nl_NL: EnTranslations = {
       "dodge": "Erhöht Ausweichchance um {pct}%",
       "dodgeReduce": "Verringert Ausweichchance um {pct}%",
       "damageReduction": "Vermindert alle schade die je oploopt met {pct}%",
+      "slumber": "Slaapt tot de dageraad. Kan niet worden aangevallen en wordt voor niemand wakker.",
       "guardianWard": "De volgende dodelijke vijandelijke treffer herstelt je in plaats daarvan naar {pct}% gezondheid",
       "armorFlat": "Verringert Rüstung um {value}",
       "armorFlatStacks": "Verringert Rüstung um {value} ({stacks} Stapel)",
@@ -2476,7 +2477,9 @@ export const nl_NL: EnTranslations = {
       }
     },
     "worldBoss": {
-      "spawn": "{name} verrijst boven {zone}!"
+      "spawn": "{name} verrijst boven {zone}!",
+      "wake": "{name} ontwaakt boven {zone}!",
+      "sleep": "{name} slaapt tot de dageraad."
     },
     "auth": {
       "appleLoginCta": "Ga verder met Apple",
@@ -11938,6 +11941,15 @@ export const nl_NL: EnTranslations = {
       "mirestone_stride": {
         "name": "Moersteentred"
       },
+      "foremans_wage_band": {
+        "name": "Loonring van de Voorman"
+      },
+      "mirelight_locket": {
+        "name": "Moeraslicht-medaillon"
+      },
+      "fenwright_grips": {
+        "name": "Grepen van de Moerasbouwer"
+      },
       "wildgrove_cinch": {
         "name": "Wildwoud-Gordel"
       },
@@ -16574,6 +16586,9 @@ export const nl_NL: EnTranslations = {
           },
           "8": {
             "label": "Grafheuvelgebied"
+          },
+          "9": {
+            "label": "Sterrenvalkrater"
           }
         }
       },

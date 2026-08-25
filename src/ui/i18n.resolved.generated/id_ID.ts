@@ -2400,6 +2400,7 @@ export const id_ID: EnTranslations = {
       "dodge": "Aumenta la probabilidad de esquivar un {pct}%",
       "dodgeReduce": "Reduce la probabilidad de esquivar un {pct}%",
       "damageReduction": "Mengurangi semua kerusakan yang diterima sebesar {pct}%",
+      "slumber": "Tertidur hingga fajar. Tidak dapat diserang dan tidak akan bangun untuk siapa pun.",
       "guardianWard": "Serangan musuh mematikan berikutnya memulihkanmu menjadi {pct}% kesehatan",
       "armorFlat": "Reduce la armadura en {value}",
       "armorFlatStacks": "Reduce la armadura en {value} ({stacks} acumulaciones)",
@@ -2476,7 +2477,9 @@ export const id_ID: EnTranslations = {
       }
     },
     "worldBoss": {
-      "spawn": "{name} bangkit di atas {zone}!"
+      "spawn": "{name} bangkit di atas {zone}!",
+      "wake": "{name} terbangun di atas {zone}!",
+      "sleep": "{name} tertidur hingga fajar."
     },
     "auth": {
       "appleLoginCta": "Lanjutkan dengan Apple",
@@ -11938,6 +11941,15 @@ export const id_ID: EnTranslations = {
       "mirestone_stride": {
         "name": "Langkah Batu Rawa"
       },
+      "foremans_wage_band": {
+        "name": "Cincin Upah Mandor"
+      },
+      "mirelight_locket": {
+        "name": "Liontin Cahaya Rawa"
+      },
+      "fenwright_grips": {
+        "name": "Genggaman Tukang Rawa"
+      },
       "wildgrove_cinch": {
         "name": "Sabuk Rumpun Liar"
       },
@@ -16574,6 +16586,9 @@ export const id_ID: EnTranslations = {
           },
           "8": {
             "label": "Wilayah Gundukan"
+          },
+          "9": {
+            "label": "Kawah Bintang Jatuh"
           }
         }
       },

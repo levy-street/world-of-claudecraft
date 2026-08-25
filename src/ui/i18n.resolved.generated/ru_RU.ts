@@ -2400,6 +2400,7 @@ export const ru_RU: EnTranslations = {
       "dodge": "Повышает шанс уклонения на {pct}%",
       "dodgeReduce": "Снижает шанс уклонения на {pct}%",
       "damageReduction": "Уменьшает весь получаемый урон на {pct}%",
+      "slumber": "Спит до рассвета. Его нельзя атаковать, и он не проснется ни для кого.",
       "guardianWard": "Следующий смертельный удар противника вместо этого восстанавливает здоровье до {pct}%",
       "armorFlat": "Снижает броню на {value}",
       "armorFlatStacks": "Снижает броню на {value} ({stacks} зарядов)",
@@ -2476,7 +2477,9 @@ export const ru_RU: EnTranslations = {
       }
     },
     "worldBoss": {
-      "spawn": "{name} восстаёт над {zone}!"
+      "spawn": "{name} восстаёт над {zone}!",
+      "wake": "{name} пробуждается над {zone}!",
+      "sleep": "{name} спит до рассвета."
     },
     "auth": {
       "appleLoginCta": "Продолжить с Apple",
@@ -11938,6 +11941,15 @@ export const ru_RU: EnTranslations = {
       "mirestone_stride": {
         "name": "Поступь Топьекамня"
       },
+      "foremans_wage_band": {
+        "name": "Кольцо жалованья Старшины"
+      },
+      "mirelight_locket": {
+        "name": "Медальон болотного света"
+      },
+      "fenwright_grips": {
+        "name": "Рукавицы болотного мастера"
+      },
       "wildgrove_cinch": {
         "name": "Пояс Дикой рощи"
       },
@@ -16574,6 +16586,9 @@ export const ru_RU: EnTranslations = {
           },
           "8": {
             "label": "Курганные Владения"
+          },
+          "9": {
+            "label": "Кратер Упавшей Звезды"
           }
         }
       },

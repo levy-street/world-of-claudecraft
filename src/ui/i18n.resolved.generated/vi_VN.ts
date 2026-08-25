@@ -2400,6 +2400,7 @@ export const vi_VN: EnTranslations = {
       "dodge": "Aumenta la probabilidad de esquivar un {pct}%",
       "dodgeReduce": "Reduce la probabilidad de esquivar un {pct}%",
       "damageReduction": "Giảm {pct}% toàn bộ sát thương nhận vào",
+      "slumber": "Ngủ đến bình minh. Không thể bị tấn công và sẽ không thức giấc vì bất kỳ ai.",
       "guardianWard": "Đòn chí mạng tiếp theo của kẻ địch thay vào đó hồi bạn lên {pct}% máu",
       "armorFlat": "Reduce la armadura en {value}",
       "armorFlatStacks": "Reduce la armadura en {value} ({stacks} acumulaciones)",
@@ -2476,7 +2477,9 @@ export const vi_VN: EnTranslations = {
       }
     },
     "worldBoss": {
-      "spawn": "{name} trỗi dậy trên {zone}!"
+      "spawn": "{name} trỗi dậy trên {zone}!",
+      "wake": "{name} thức giấc trên {zone}!",
+      "sleep": "{name} ngủ đến bình minh."
     },
     "auth": {
       "appleLoginCta": "Tiếp Tục với Apple",
@@ -11938,6 +11941,15 @@ export const vi_VN: EnTranslations = {
       "mirestone_stride": {
         "name": "Bước Đá Đầm Lầy"
       },
+      "foremans_wage_band": {
+        "name": "Nhẫn Tiền Công của Đốc Công"
+      },
+      "mirelight_locket": {
+        "name": "Mặt Dây Ánh Đầm Lầy"
+      },
+      "fenwright_grips": {
+        "name": "Bao Tay Thợ Đầm Lầy"
+      },
       "wildgrove_cinch": {
         "name": "Đai Lưng Rừng Hoang"
       },
@@ -16574,6 +16586,9 @@ export const vi_VN: EnTranslations = {
           },
           "8": {
             "label": "Lãnh Địa Gò Mộ"
+          },
+          "9": {
+            "label": "Hố Sao Rơi"
           }
         }
       },

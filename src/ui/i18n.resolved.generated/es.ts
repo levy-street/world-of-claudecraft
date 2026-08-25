@@ -2400,6 +2400,7 @@ export const es: EnTranslations = {
       "dodge": "Aumenta la probabilidad de esquivar un {pct}%",
       "dodgeReduce": "Reduce la probabilidad de esquivar un {pct}%",
       "damageReduction": "Reduce el dano recibido en un {pct}%",
+      "slumber": "Dormido hasta el amanecer. No puede ser atacado y no despertará por nadie.",
       "guardianWard": "El siguiente golpe enemigo letal te restaura al {pct}% de salud en su lugar",
       "armorFlat": "Reduce la armadura en {value}",
       "armorFlatStacks": "Reduce la armadura en {value} ({stacks} acumulaciones)",
@@ -2476,7 +2477,9 @@ export const es: EnTranslations = {
       }
     },
     "worldBoss": {
-      "spawn": "¡{name} se alza sobre {zone}!"
+      "spawn": "¡{name} se alza sobre {zone}!",
+      "wake": "¡{name} despierta sobre {zone}!",
+      "sleep": "{name} duerme hasta el amanecer."
     },
     "auth": {
       "appleLoginCta": "Continuar con Apple",
@@ -11938,6 +11941,15 @@ export const es: EnTranslations = {
       "mirestone_stride": {
         "name": "Zancada de Piedracieno"
       },
+      "foremans_wage_band": {
+        "name": "Anillo de paga del Capataz"
+      },
+      "mirelight_locket": {
+        "name": "Relicario de luz de ciénaga"
+      },
+      "fenwright_grips": {
+        "name": "Manoplas del Artesano del Pantano"
+      },
       "wildgrove_cinch": {
         "name": "Ceñidor del bosque salvaje"
       },
@@ -16574,6 +16586,9 @@ export const es: EnTranslations = {
           },
           "8": {
             "label": "Dominio del Túmulo"
+          },
+          "9": {
+            "label": "Cráter de la Estrella Caída"
           }
         }
       },

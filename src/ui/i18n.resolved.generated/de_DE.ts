@@ -2400,6 +2400,7 @@ export const de_DE: EnTranslations = {
       "dodge": "Erhöht Ausweichchance um {pct}%",
       "dodgeReduce": "Verringert Ausweichchance um {pct}%",
       "damageReduction": "Verringert allen erlittenen Schaden um {pct}%",
+      "slumber": "Schläft bis zur Dämmerung. Kann nicht angegriffen werden und erwacht für niemanden.",
       "guardianWard": "Der naechste todliche Feindtreffer stellt stattdessen {pct}% deiner Gesundheit wieder her",
       "armorFlat": "Verringert Rüstung um {value}",
       "armorFlatStacks": "Verringert Rüstung um {value} ({stacks} Stapel)",
@@ -2476,7 +2477,9 @@ export const de_DE: EnTranslations = {
       }
     },
     "worldBoss": {
-      "spawn": "{name} erhebt sich über {zone}!"
+      "spawn": "{name} erhebt sich über {zone}!",
+      "wake": "{name} erwacht über {zone}!",
+      "sleep": "{name} schläft bis zur Dämmerung."
     },
     "auth": {
       "appleLoginCta": "Mit Apple fortfahren",
@@ -11938,6 +11941,15 @@ export const de_DE: EnTranslations = {
       "mirestone_stride": {
         "name": "Moorsteinschritt"
       },
+      "foremans_wage_band": {
+        "name": "Lohnring des Vorarbeiters"
+      },
+      "mirelight_locket": {
+        "name": "Sumpflicht-Medaillon"
+      },
+      "fenwright_grips": {
+        "name": "Griffe des Moorbauers"
+      },
       "wildgrove_cinch": {
         "name": "Wildhain-Gürtel"
       },
@@ -16574,6 +16586,9 @@ export const de_DE: EnTranslations = {
           },
           "8": {
             "label": "Hügelgrab-Revier"
+          },
+          "9": {
+            "label": "Sternenfall-Krater"
           }
         }
       },

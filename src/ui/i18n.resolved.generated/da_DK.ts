@@ -2400,6 +2400,7 @@ export const da_DK: EnTranslations = {
       "dodge": "Erhöht Ausweichchance um {pct}%",
       "dodgeReduce": "Verringert Ausweichchance um {pct}%",
       "damageReduction": "Reducerer al skade modtaget med {pct}%",
+      "slumber": "Sover til daggry. Kan ikke angribes og vågner ikke for nogen.",
       "guardianWard": "Det næste dødelige fjendtlige slag genopretter dig til {pct}% helbred i stedet",
       "armorFlat": "Verringert Rüstung um {value}",
       "armorFlatStacks": "Verringert Rüstung um {value} ({stacks} Stapel)",
@@ -2476,7 +2477,9 @@ export const da_DK: EnTranslations = {
       }
     },
     "worldBoss": {
-      "spawn": "{name} rejser sig over {zone}!"
+      "spawn": "{name} rejser sig over {zone}!",
+      "wake": "{name} vågner over {zone}!",
+      "sleep": "{name} sover til daggry."
     },
     "auth": {
       "appleLoginCta": "Fortsæt med Apple",
@@ -11938,6 +11941,15 @@ export const da_DK: EnTranslations = {
       "mirestone_stride": {
         "name": "Mosestensskridt"
       },
+      "foremans_wage_band": {
+        "name": "Formandens Lønring"
+      },
+      "mirelight_locket": {
+        "name": "Sumplys-medaljon"
+      },
+      "fenwright_grips": {
+        "name": "Mosebyggerens Greb"
+      },
       "wildgrove_cinch": {
         "name": "Vildlund-Livbælte"
       },
@@ -16574,6 +16586,9 @@ export const da_DK: EnTranslations = {
           },
           "8": {
             "label": "Gravhøjsområdet"
+          },
+          "9": {
+            "label": "Stjernefaldskrateret"
           }
         }
       },

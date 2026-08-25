@@ -2400,6 +2400,7 @@ export const sv_SE: EnTranslations = {
       "dodge": "Erhöht Ausweichchance um {pct}%",
       "dodgeReduce": "Verringert Ausweichchance um {pct}%",
       "damageReduction": "Minskar all inkommande skada med {pct}%",
+      "slumber": "Sover till gryningen. Kan inte anfallas och vaknar inte för någon.",
       "guardianWard": "Nästa dödliga fiendeträff återger dig {pct}% av dina livspunkter i stället",
       "armorFlat": "Verringert Rüstung um {value}",
       "armorFlatStacks": "Verringert Rüstung um {value} ({stacks} Stapel)",
@@ -2476,7 +2477,9 @@ export const sv_SE: EnTranslations = {
       }
     },
     "worldBoss": {
-      "spawn": "{name} reser sig över {zone}!"
+      "spawn": "{name} reser sig över {zone}!",
+      "wake": "{name} vaknar över {zone}!",
+      "sleep": "{name} sover till gryningen."
     },
     "auth": {
       "appleLoginCta": "Fortsätt med Apple",
@@ -11938,6 +11941,15 @@ export const sv_SE: EnTranslations = {
       "mirestone_stride": {
         "name": "Myrstenssteg"
       },
+      "foremans_wage_band": {
+        "name": "Förmannens Lönering"
+      },
+      "mirelight_locket": {
+        "name": "Kärrljusmedaljong"
+      },
+      "fenwright_grips": {
+        "name": "Kärrbyggarens Grepp"
+      },
       "wildgrove_cinch": {
         "name": "Vildlundsknippe"
       },
@@ -16574,6 +16586,9 @@ export const sv_SE: EnTranslations = {
           },
           "8": {
             "label": "Gravhögsområdet"
+          },
+          "9": {
+            "label": "Stjärnfallskratern"
           }
         }
       },

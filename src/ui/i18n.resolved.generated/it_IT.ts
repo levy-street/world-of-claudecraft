@@ -2400,6 +2400,7 @@ export const it_IT: EnTranslations = {
       "dodge": "Aumenta la probabilità di schivata del {pct}%",
       "dodgeReduce": "Riduce la probabilità di schivata del {pct}%",
       "damageReduction": "Riduce tutti i danni subiti del {pct}%",
+      "slumber": "Dorme fino all'alba. Non può essere attaccato e non si sveglierà per nessuno.",
       "guardianWard": "Il prossimo colpo nemico letale ti ripristina al {pct}% della salute",
       "armorFlat": "Riduce l'armatura di {value}",
       "armorFlatStacks": "Riduce l'armatura di {value} ({stacks} accumuli)",
@@ -2476,7 +2477,9 @@ export const it_IT: EnTranslations = {
       }
     },
     "worldBoss": {
-      "spawn": "{name} si erge su {zone}!"
+      "spawn": "{name} si erge su {zone}!",
+      "wake": "{name} si sveglia su {zone}!",
+      "sleep": "{name} dorme fino all'alba."
     },
     "auth": {
       "appleLoginCta": "Continua con Apple",
@@ -11938,6 +11941,15 @@ export const it_IT: EnTranslations = {
       "mirestone_stride": {
         "name": "Passo di Pietrafanghiglia"
       },
+      "foremans_wage_band": {
+        "name": "Anello della paga del Caposquadra"
+      },
+      "mirelight_locket": {
+        "name": "Medaglione della luce di palude"
+      },
+      "fenwright_grips": {
+        "name": "Guanti dell'Artigiano di Palude"
+      },
       "wildgrove_cinch": {
         "name": "Cintura del Bosco Selvaggio"
       },
@@ -16574,6 +16586,9 @@ export const it_IT: EnTranslations = {
           },
           "8": {
             "label": "Dominio dei Tumuli"
+          },
+          "9": {
+            "label": "Cratere della Stella Caduta"
           }
         }
       },

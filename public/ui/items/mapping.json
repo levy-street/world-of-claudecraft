@@ -6069,6 +6069,24 @@
       "itemIds": [
         "skerrits_shardpike"
       ]
+    },
+    {
+      "batchId": "foremans-wage-icons-2026-08-25",
+      "source": "OpenAI gpt-image-2 via scripts/asset_pipeline/lib/openai_image.mjs",
+      "owner": "World of ClaudeCraft",
+      "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
+      "styleContract": {
+        "id": "woc-item-icon-v1",
+        "document": "docs/design/item-icon-art-style.md"
+      },
+      "styleReference": "Generated at 1024x1024 under item-icon contract woc-item-icon-v1 as a gpt-image-2 image edit against accepted catalog paintings used for house style, lighting, material and composition only: the ring and locket against public/ui/items/loomshard_eye.webp, foremans_barrowmaul.webp and eastbrook_buckler.webp; the gloves against barrowhide_pauldrons.webp, mirestone_stride.webp and linen_pouch.webp. Exact per-item prompts, reference roles, and shipped hashes are retained in docs/achievements/foremans-wage-icons-2026-08-25/generation-report.json; the original generated masters stay in ignored tmp/imagegen staging.",
+      "commonPrompt": "Premium hand-painted classic-fantasy MMORPG inventory painting of the Mirefen world boss's Foreman's Wage spoils, the rare level-13 drops from Balgath, the one-eyed granite cyclops of Mirefen Marsh: rough hammered bog-iron, wet dark barrow granite and dark oiled peat-stained leather, with one small teal Loomshard crystal chip (#76e0d8 and #5fe8d2) glowing faintly like marsh-light to tie each piece to the boss. Scene and backdrop: wet dark barrow granite in a deep charcoal-blue painted vignette, faint marsh mist, grounded contact shadow, dark corners; opaque full-square painted ground, never a flat black void. Style: premium hand-painted classic fantasy MMO inventory art matching the World of ClaudeCraft item catalog; tactile materials (hammered iron with a controlled edge highlight and broad reflected value, wet stone with damp sheen, oiled leather with grain and warm wear, crystal with a crisp rim and a small specular accent); crisp focal edges with softer peripheral brushwork; restrained magical accent. Lighting and mood: warm top-left key light, cool deep bottom-right shadow; the teal crystal glow is kept subordinate to the object silhouette; worn, handmade, but rare. Framing: square, borderless, centered complete silhouette; about 72 percent subject fill; safe padding on all four sides; readable at 22px, 28px, 40px and inside a 64px circular crop. Input roles: every attached image controls house style, lighting, material rendering, value range and composition only; their objects and shapes are never copied. Constraints: one inventory icon only; one opaque full-square painted ground; no text, letters, numbers, pseudo-writing, runes, label, UI border, rarity frame, watermark, signature, checkerboard, transparency, split sheet, collage, contact sheet, mannequin, hand, body, held presentation or cropped subject; no photorealism, raw 3D render, flat vector, cel shading, pixel art, sketch lines or cartoon outline; no exterior drop shadow.",
+      "provenanceRecord": "docs/achievements/foremans-wage-icons-2026-08-25/generation-report.json",
+      "itemIds": [
+        "foremans_wage_band",
+        "mirelight_locket",
+        "fenwright_grips"
+      ]
     }
   ]
 }

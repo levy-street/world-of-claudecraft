@@ -333,8 +333,8 @@ describe('item-art consistency accepted-art provenance', () => {
       },
       {
         path: `${evidenceDir}/final-item-art-audit-verdict.json`,
-        acceptedSha256: '973a4606494c1870793672c4c2097b41e3ef5bc7ebbc750e426b10cc1de241e6',
-        acceptedBytes: 109236,
+        acceptedSha256: '4ecfb147b5cefa42c823c638e8aa0d183d98daf8b5bb737f0dae4f49b5e623e7',
+        acceptedBytes: 109461,
       },
     ]);
     for (const evidence of [...value.sourceEvidence, ...value.generationReports]) {
@@ -442,16 +442,16 @@ describe('item-art consistency accepted-art provenance', () => {
     }
   });
 
-  it('pins the final 821-item visual audit, Heroic accounting, and evidence digests', () => {
+  it('pins the final 831-item visual audit, Heroic accounting, and evidence digests', () => {
     const verdictPath = `${evidenceDir}/final-item-art-audit-verdict.json`;
     const readme = readFileSync(path.join(repoRoot, evidenceDir, 'README.md'), 'utf8');
     expect(readme).toContain('`final-item-art-audit-verdict.json`');
     expect(readme).toContain('node scripts/item_art_audit.mjs\n');
     expect(readme).toContain('node scripts/item_art_audit.mjs --refresh-verdict');
     const verdictBytes = readFileSync(path.join(repoRoot, verdictPath));
-    expect(verdictBytes.length).toBe(109236);
+    expect(verdictBytes.length).toBe(109461);
     expect(sha256(verdictBytes)).toBe(
-      '973a4606494c1870793672c4c2097b41e3ef5bc7ebbc750e426b10cc1de241e6',
+      '4ecfb147b5cefa42c823c638e8aa0d183d98daf8b5bb737f0dae4f49b5e623e7',
     );
     const verdict = JSON.parse(verdictBytes.toString('utf8')) as FinalAuditVerdict;
 
@@ -460,8 +460,8 @@ describe('item-art consistency accepted-art provenance', () => {
       baselineCommit: 'aee195551b5aef628eb7a72192117d7e3079818e',
       branch: 'feature/placeholder-art-completion-v036',
       shippingDirectory: 'public/ui/items',
-      itemArtFilesReviewed: 828,
-      liveItemDefinitions: 843,
+      itemArtFilesReviewed: 831,
+      liveItemDefinitions: 846,
       generatedHeroicDefinitions: 64,
       heroicDefinitionsWithOwnWebp: 48,
       heroicWeaponArtAliases: 16,
@@ -471,10 +471,11 @@ describe('item-art consistency accepted-art provenance', () => {
       manifest().targetSets.items.map((id) => `public/ui/items/${id}.webp`),
     );
     expect(Object.values(verdict.auditScope.groups).reduce((sum, count) => sum + count, 0)).toBe(
-      828,
+      831,
     );
     // Still 22: the audit groups by SLOT, so the world-boss spoils land in the existing
-    // armor-feet / armor-neck / armor-shoulder / weapon groups rather than adding one.
+    // armor-feet / armor-neck / armor-shoulder / weapon groups rather than adding one, and the
+    // Foreman's Wage spoils land in armor-ring / armor-neck / armor-gloves the same way.
     expect(Object.keys(verdict.auditScope.groups)).toHaveLength(22);
     const shippingIds = new Set(
       readdirSync(path.join(repoRoot, 'public/ui/items'))
@@ -518,13 +519,13 @@ describe('item-art consistency accepted-art provenance', () => {
     ]);
     expect(verdict.visualVerdict).toMatchObject({
       status: 'pass',
-      passCount: 828,
+      passCount: 831,
       watchCount: 0,
       watch: [],
       rejectCount: 0,
       reject: [],
       summary:
-        "All 828 shipping item-art files pass the visual contract: 817 reviewed in the 2026-08-09 campaign (documented retries included), plus the five class-overhaul integration additions owner-reviewed and passed on 2026-08-10, plus the Dawnhold posy addition (project-authored vector illustration) owner-reviewed and passed on 2026-08-12, plus the four Mirefen world-boss spoils owner-reviewed and passed on 2026-08-18, plus Skerrit's Shardpike (the world-boss quest tool, which gained a held model and therefore painted inventory art) owner-reviewed and passed on 2026-08-20.",
+        "All 831 shipping item-art files pass the visual contract: 817 reviewed in the 2026-08-09 campaign (documented retries included), plus the five class-overhaul integration additions owner-reviewed and passed on 2026-08-10, plus the Dawnhold posy addition (project-authored vector illustration) owner-reviewed and passed on 2026-08-12, plus the four Mirefen world-boss spoils owner-reviewed and passed on 2026-08-18, plus Skerrit's Shardpike (the world-boss quest tool, which gained a held model and therefore painted inventory art) owner-reviewed and passed on 2026-08-20, plus the three Foreman's Wage spoils (the Mirefen world boss's level-13 rare ring, locket and gloves) owner-reviewed and passed on 2026-08-25.",
     });
     expect(verdict.visualVerdict.passIds).toEqual(currentIds);
     expect(verdict.nonVisualContentWatch).toEqual([
@@ -564,8 +565,8 @@ describe('item-art consistency accepted-art provenance', () => {
 
     expect(verdict.evidence.catalog).toEqual({
       path: 'tmp/imagegen/item-art-consistency/final-audit/catalog.json',
-      sha256: '18ff863218a06da7dc88fae12fa067e7fbacb7579d1a6e37cd0362c15ff8b0fc',
-      bytes: 454391,
+      sha256: '8c2342dae06f19c5c97ce17aa848bc24f33d151912ac615da8c5a1fd9c0e35f8',
+      bytes: 455957,
     });
     expect(verdict.evidence.rendererFingerprint).toBe(
       'fd92c41a206cd55b05a1de94c4789f6eb6ca4200d063f4bbd284c21ae03b6082',
@@ -618,7 +619,7 @@ describe('item-art consistency accepted-art provenance', () => {
       sheetSetDigest.update(`${sheet.path}\0${sheet.sha256}\0${sheet.bytes}\n`);
     }
     expect(verdict.evidence.sheetSetSha256).toBe(
-      'b74032e982cd27ef1ea127d326fc01ba45434e38e4791465b95871b25ad14758',
+      '5a2f27e5317e36e482321b526bd1198ee3495ab16dbfa81fcc5dbfbb573af7e7',
     );
     expect(sheetSetDigest.digest('hex')).toBe(verdict.evidence.sheetSetSha256);
 
@@ -628,7 +629,7 @@ describe('item-art consistency accepted-art provenance', () => {
       shippingCatalogDigest.update(`${id}\0${sha256(bytes)}\0${bytes.length}\n`);
     }
     expect(verdict.evidence.shippingCatalogSha256).toBe(
-      '87fa60c4a44fef1de789aec555b382851b7cabe304a8befb46449ffd50d06e72',
+      'c76c32016e5009e4bfa559be28278287c934e122b939a7270061630f42fb20c3',
     );
     expect(shippingCatalogDigest.digest('hex')).toBe(verdict.evidence.shippingCatalogSha256);
   });
@@ -742,7 +743,8 @@ describe('item-art consistency accepted-art provenance', () => {
     expect(mapping.entries.every(({ license }) => Boolean(license))).toBe(true);
     // 17 with the Mirefen world boss batch (balgath-boss-icons-2026-08-18).
     // 18 with the Shardpike mechanic batch.
-    expect(mapping.generatedBatches).toHaveLength(18);
+    // 19 with the Foreman's Wage batch (foremans-wage-icons-2026-08-25).
+    expect(mapping.generatedBatches).toHaveLength(19);
     const batch = mapping.generatedBatches.find(({ batchId }) => batchId === BATCH_ID);
     expect(batch).toBeDefined();
     expect(batch).toMatchObject({
@@ -759,15 +761,16 @@ describe('item-art consistency accepted-art provenance', () => {
     const oldGeneratedIds = mapping.generatedBatches
       .filter(({ batchId }) => batchId !== BATCH_ID)
       .flatMap(({ itemIds }) => itemIds);
-    // 514 with the Shardpike mechanic batch's one weapon id.
-    expect(oldGeneratedIds).toHaveLength(514);
+    // 514 with the Shardpike mechanic batch's one weapon id; 517 with the three Foreman's
+    // Wage spoils.
+    expect(oldGeneratedIds).toHaveLength(517);
     const allCurrentOwnerIds = [
       ...mapping.entries.map(({ itemId }) => itemId),
       ...mapping.generatedBatches.flatMap(({ itemIds }) => itemIds),
     ];
-    // 828 with Skerrit's Shardpike.
-    expect(allCurrentOwnerIds).toHaveLength(828);
-    expect(new Set(allCurrentOwnerIds).size).toBe(828);
+    // 828 with Skerrit's Shardpike; 831 with the three Foreman's Wage spoils.
+    expect(allCurrentOwnerIds).toHaveLength(831);
+    expect(new Set(allCurrentOwnerIds).size).toBe(831);
     expect(batch?.provenanceRecords).toEqual([
       `${evidenceDir}/accepted-art.json`,
       `${evidenceDir}/supersession-audit.json`,
@@ -889,7 +892,7 @@ describe('item-art consistency accepted-art provenance', () => {
     expect(report.assets.every((asset) => asset.issues.length === 0)).toBe(true);
   }, 30_000);
 
-  it('keeps the full 821-icon catalog owned, decodable, opaque, budgeted, and unique', async () => {
+  it('keeps the full 831-icon catalog owned, decodable, opaque, budgeted, and unique', async () => {
     const mapping = readJson<ItemMapping>('public/ui/items/mapping.json');
     const ownerIds = [
       ...mapping.entries.map(({ itemId }) => itemId),
@@ -903,10 +906,10 @@ describe('item-art consistency accepted-art provenance', () => {
     for (const id of ownerIds) ownerCountById.set(id, (ownerCountById.get(id) ?? 0) + 1);
 
     const violations: string[] = [];
-    // 828: the 827-icon catalog plus Skerrit's Shardpike, whose held model put it in the
-    // weapon registry and therefore obliged it painted inventory art.
-    if (ownerIds.length !== 828) violations.push(`mapping owner count: ${ownerIds.length} != 828`);
-    if (fileIds.length !== 828) violations.push(`shipping WebP count: ${fileIds.length} != 828`);
+    // 831: the 828-icon catalog (Skerrit's Shardpike included) plus the three Foreman's Wage
+    // spoils, the Mirefen world boss's level-13 rare ring, locket and gloves.
+    if (ownerIds.length !== 831) violations.push(`mapping owner count: ${ownerIds.length} != 831`);
+    if (fileIds.length !== 831) violations.push(`shipping WebP count: ${fileIds.length} != 831`);
     for (const id of ids) {
       const ownerCount = ownerCountById.get(id) ?? 0;
       if (ownerCount !== 1) violations.push(`${id}: current owner count ${ownerCount} != 1`);

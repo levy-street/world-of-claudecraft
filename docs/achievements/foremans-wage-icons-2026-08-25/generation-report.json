@@ -1,0 +1,57 @@
+{
+  "batchId": "foremans-wage-icons-2026-08-25",
+  "owner": "World of ClaudeCraft",
+  "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
+  "styleContract": "woc-item-icon-v1",
+  "model": "gpt-image-2 (image edit)",
+  "references": [
+    "public/ui/items/loomshard_eye.webp",
+    "public/ui/items/foremans_barrowmaul.webp",
+    "public/ui/items/eastbrook_buckler.webp",
+    "public/ui/items/barrowhide_pauldrons.webp",
+    "public/ui/items/mirestone_stride.webp",
+    "public/ui/items/linen_pouch.webp"
+  ],
+  "referenceRoles": "house style, lighting, material and composition only; subject identity from the item definition. The ring and locket were edited against loomshard_eye, foremans_barrowmaul and eastbrook_buckler; the gloves against barrowhide_pauldrons, mirestone_stride and linen_pouch (per-item list below).",
+  "masterSize": "1024x1024 generated at quality high, reviewed as the master and converted directly (the converter resizes to the 128px shipping square)",
+  "processing": "npm run assets:items (128px sRGB WebP, q82); masters retained in ignored tmp/imagegen/foremans-wage staging, not committed",
+  "review": "Reviewed at the 1024 master, 128px and 24px for silhouette, opacity, fill, absence of text or border, and legibility; all three accepted on the first generation round.",
+  "items": [
+    {
+      "itemId": "foremans_wage_band",
+      "shipped": "public/ui/items/foremans_wage_band.webp",
+      "bytes": 2400,
+      "sha256": "694e023da8db7db30050acca082aac3a1036cf3d5f53698a32c7ca5d095bca1e",
+      "references": [
+        "public/ui/items/loomshard_eye.webp",
+        "public/ui/items/foremans_barrowmaul.webp",
+        "public/ui/items/eastbrook_buckler.webp"
+      ],
+      "prompt": "Use case: stylized-concept\nAsset type: opaque square fantasy MMORPG inventory item icon\nPrimary request: paint Foreman's Wage Band (foremans_wage_band), a rare level-13 drop from Balgath, the one-eyed granite cyclops world boss of Mirefen Marsh, in the World of ClaudeCraft item style contract woc-item-icon-v1.\nSubject and identity: one heavy ring of rough bog-iron, a stone-wright foreman's wage token hammered flat into a broad band, hammer-dimpled dull dark iron with a controlled edge highlight and faint orange-brown rust in the dents, a single tiny chip of teal Loomshard crystal set flush into the flat face of the band and glowing faintly.\nComposition: ring family, one hero object shown large in a readable three-quarter tilt so the flat token face, the hammered band and the inner opening all read; nothing else in frame.\nScene and backdrop: wet dark barrow granite in a deep charcoal-blue painted vignette, faint marsh mist, grounded contact shadow, dark corners; opaque full-square painted ground, never a flat black void.\nStyle: premium hand-painted classic fantasy MMO inventory art matching the World of ClaudeCraft item catalog; tactile materials (hammered iron with a controlled edge highlight and broad reflected value, wet stone with damp sheen, oiled leather with grain and warm wear, crystal with a crisp rim and a small specular accent); crisp focal edges with softer peripheral brushwork; restrained magical accent.\nLighting and mood: warm top-left key light, cool deep bottom-right shadow; the teal Loomshard crystal glows faintly in #76e0d8 and #5fe8d2 like marsh-light, kept subordinate to the object silhouette; worn, handmade, but rare.\nFraming: square, borderless, centered complete silhouette; about 72 percent subject fill; safe padding on all four sides; readable at 22px, 28px, 40px and inside a 64px circular crop.\nInput roles: every attached image controls house style, lighting, material rendering, value range and composition only. Do not copy or reproduce their objects or shapes (no maul, no teardrop pendant, no shoulder plates, no boots, no shield, no pouch).\nConstraints: one inventory icon only; one opaque full-square painted ground; no text, letters, numbers, pseudo-writing, runes, label, UI border, rarity frame, watermark, signature, checkerboard, transparency, split sheet, collage, contact sheet, mannequin, hand, body, held presentation or cropped subject; no photorealism, raw 3D render, flat vector, cel shading, pixel art, sketch lines or cartoon outline; no exterior drop shadow."
+    },
+    {
+      "itemId": "mirelight_locket",
+      "shipped": "public/ui/items/mirelight_locket.webp",
+      "bytes": 2148,
+      "sha256": "f61ac7f93c9200d1a20efee477e6efcbff3ecce0c3560f68e55bc513d452c45e",
+      "references": [
+        "public/ui/items/loomshard_eye.webp",
+        "public/ui/items/foremans_barrowmaul.webp",
+        "public/ui/items/eastbrook_buckler.webp"
+      ],
+      "prompt": "Use case: stylized-concept\nAsset type: opaque square fantasy MMORPG inventory item icon\nPrimary request: paint Mirelight Locket (mirelight_locket), a rare level-13 drop from Balgath, the one-eyed granite cyclops world boss of Mirefen Marsh, in the World of ClaudeCraft item style contract woc-item-icon-v1.\nSubject and identity: one small closed oval locket of tarnished bog-iron hanging from a simple dark waxed cord chain, a plain worn hinge and clasp on the case, its face set with a thin sliver of teal Loomshard crystal glowing faintly like marsh-light inside the oval. It is a closed iron case, not a bare crystal pendant.\nComposition: necklace family, one hero object with the locket large and centered in the lower two thirds and the cord looping above it in a soft arc; nothing else in frame.\nScene and backdrop: wet dark barrow granite in a deep charcoal-blue painted vignette, faint marsh mist, grounded contact shadow, dark corners; opaque full-square painted ground, never a flat black void.\nStyle: premium hand-painted classic fantasy MMO inventory art matching the World of ClaudeCraft item catalog; tactile materials (hammered iron with a controlled edge highlight and broad reflected value, wet stone with damp sheen, oiled leather with grain and warm wear, crystal with a crisp rim and a small specular accent); crisp focal edges with softer peripheral brushwork; restrained magical accent.\nLighting and mood: warm top-left key light, cool deep bottom-right shadow; the teal Loomshard crystal glows faintly in #76e0d8 and #5fe8d2 like marsh-light, kept subordinate to the object silhouette; worn, handmade, but rare.\nFraming: square, borderless, centered complete silhouette; about 72 percent subject fill; safe padding on all four sides; readable at 22px, 28px, 40px and inside a 64px circular crop.\nInput roles: every attached image controls house style, lighting, material rendering, value range and composition only. Do not copy or reproduce their objects or shapes (no maul, no teardrop pendant, no shoulder plates, no boots, no shield, no pouch).\nConstraints: one inventory icon only; one opaque full-square painted ground; no text, letters, numbers, pseudo-writing, runes, label, UI border, rarity frame, watermark, signature, checkerboard, transparency, split sheet, collage, contact sheet, mannequin, hand, body, held presentation or cropped subject; no photorealism, raw 3D render, flat vector, cel shading, pixel art, sketch lines or cartoon outline; no exterior drop shadow."
+    },
+    {
+      "itemId": "fenwright_grips",
+      "shipped": "public/ui/items/fenwright_grips.webp",
+      "bytes": 2422,
+      "sha256": "372b7b4ac9206ad39c4f3d8823e94e8892bf35648bcf6cbee6121ca4f4701eae",
+      "references": [
+        "public/ui/items/barrowhide_pauldrons.webp",
+        "public/ui/items/mirestone_stride.webp",
+        "public/ui/items/linen_pouch.webp"
+      ],
+      "prompt": "Use case: stylized-concept\nAsset type: opaque square fantasy MMORPG inventory item icon\nPrimary request: paint Fenwright Grips (fenwright_grips), a rare level-13 drop from Balgath, the one-eyed granite cyclops world boss of Mirefen Marsh, in the World of ClaudeCraft item style contract woc-item-icon-v1.\nSubject and identity: a compact natural pair of rugged leather work gloves of a fen stone-wright, dark oiled hide with visible grain, warm wear and stitched seams, short reinforced cuffs, a row of dull bog-iron knuckle studs across each hand, and on one glove a single knuckle stud replaced by a small teal Loomshard crystal chip glowing faintly.\nComposition: gloves family, one strong natural pair side by side and slightly overlapping, backs of the hands toward the viewer, fingers relaxed, complete silhouettes with safe padding; no hands inside them, no pile, nothing else in frame.\nScene and backdrop: wet dark barrow granite in a deep charcoal-blue painted vignette, faint marsh mist, grounded contact shadow, dark corners; opaque full-square painted ground, never a flat black void.\nStyle: premium hand-painted classic fantasy MMO inventory art matching the World of ClaudeCraft item catalog; tactile materials (hammered iron with a controlled edge highlight and broad reflected value, wet stone with damp sheen, oiled leather with grain and warm wear, crystal with a crisp rim and a small specular accent); crisp focal edges with softer peripheral brushwork; restrained magical accent.\nLighting and mood: warm top-left key light, cool deep bottom-right shadow; the teal Loomshard crystal glows faintly in #76e0d8 and #5fe8d2 like marsh-light, kept subordinate to the object silhouette; worn, handmade, but rare.\nFraming: square, borderless, centered complete silhouette; about 72 percent subject fill; safe padding on all four sides; readable at 22px, 28px, 40px and inside a 64px circular crop.\nInput roles: every attached image controls house style, lighting, material rendering, value range and composition only. Do not copy or reproduce their objects or shapes (no maul, no teardrop pendant, no shoulder plates, no boots, no shield, no pouch).\nConstraints: one inventory icon only; one opaque full-square painted ground; no text, letters, numbers, pseudo-writing, runes, label, UI border, rarity frame, watermark, signature, checkerboard, transparency, split sheet, collage, contact sheet, mannequin, hand, body, held presentation or cropped subject; no photorealism, raw 3D render, flat vector, cel shading, pixel art, sketch lines or cartoon outline; no exterior drop shadow."
+    }
+  ]
+}

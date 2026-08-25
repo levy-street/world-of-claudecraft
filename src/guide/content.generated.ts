@@ -2087,7 +2087,8 @@ export const GUIDE_ZONES: GuideZoneInfo[] = [
       "Troll Mounds",
       "Gravecaller Encampment",
       "The Sunken Bastion",
-      "Barrowmound Reach"
+      "Barrowmound Reach",
+      "Starfall Crater"
     ],
     "welcome": "Report to Warden Fenwick at the Fenbridge gate.",
     "families": [
@@ -6174,6 +6175,18 @@ export const GUIDE_RELIQUARY: GuideReliquaryPage[] = [
       {
         "kind": "item",
         "name": "The Loomshard Eye"
+      },
+      {
+        "kind": "item",
+        "name": "Foreman's Wage Band"
+      },
+      {
+        "kind": "item",
+        "name": "Mirelight Locket"
+      },
+      {
+        "kind": "item",
+        "name": "Fenwright Grips"
       }
     ]
   },

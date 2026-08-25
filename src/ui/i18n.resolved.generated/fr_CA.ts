@@ -2400,6 +2400,7 @@ export const fr_CA: EnTranslations = {
       "dodge": "Accroît les chances d'esquive de {pct}%",
       "dodgeReduce": "Diminue les chances d'esquive de {pct}%",
       "damageReduction": "Réduit tous les dégâts subis de {pct} %",
+      "slumber": "Endormi jusqu'à l'aube. Ne peut pas être attaqué et ne s'éveillera pour personne.",
       "guardianWard": "Le prochain coup ennemi fatal vous restaure à {pct} % de vos points de vie à la place",
       "armorFlat": "Diminue l'armure de {value}",
       "armorFlatStacks": "Diminue l'armure de {value} ({stacks} charges)",
@@ -2476,7 +2477,9 @@ export const fr_CA: EnTranslations = {
       }
     },
     "worldBoss": {
-      "spawn": "{name} se dresse au-dessus de {zone} !"
+      "spawn": "{name} se dresse au-dessus de {zone} !",
+      "wake": "{name} s'éveille au-dessus de {zone} !",
+      "sleep": "{name} dort jusqu'à l'aube."
     },
     "auth": {
       "appleLoginCta": "Continuer avec Apple",
@@ -11938,6 +11941,15 @@ export const fr_CA: EnTranslations = {
       "mirestone_stride": {
         "name": "Foulée de Pierrebourbe"
       },
+      "foremans_wage_band": {
+        "name": "Anneau de paie du Contremaître"
+      },
+      "mirelight_locket": {
+        "name": "Médaillon de lueur des marais"
+      },
+      "fenwright_grips": {
+        "name": "Poignes du bâtisseur des marais"
+      },
       "wildgrove_cinch": {
         "name": "Ceinturon du bosquet sauvage"
       },
@@ -16574,6 +16586,9 @@ export const fr_CA: EnTranslations = {
           },
           "8": {
             "label": "Le Domaine des Tertres"
+          },
+          "9": {
+            "label": "Cratère de l'Étoile tombée"
           }
         }
       },

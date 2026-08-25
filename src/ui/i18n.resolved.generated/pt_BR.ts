@@ -2400,6 +2400,7 @@ export const pt_BR: EnTranslations = {
       "dodge": "Aumenta la probabilidad de esquivar un {pct}%",
       "dodgeReduce": "Reduce la probabilidad de esquivar un {pct}%",
       "damageReduction": "Reduz em {pct}% o dano recebido",
+      "slumber": "Adormecido até o amanhecer. Não pode ser atacado e não acordará por ninguém.",
       "guardianWard": "O próximo golpe inimigo letal restaura sua vida para {pct}% em vez de matar",
       "armorFlat": "Reduce la armadura en {value}",
       "armorFlatStacks": "Reduce la armadura en {value} ({stacks} acumulaciones)",
@@ -2476,7 +2477,9 @@ export const pt_BR: EnTranslations = {
       }
     },
     "worldBoss": {
-      "spawn": "{name} se ergue sobre {zone}!"
+      "spawn": "{name} se ergue sobre {zone}!",
+      "wake": "{name} despertou sobre {zone}!",
+      "sleep": "{name} dorme até o amanhecer."
     },
     "auth": {
       "appleLoginCta": "Continuar com a Apple",
@@ -11938,6 +11941,15 @@ export const pt_BR: EnTranslations = {
       "mirestone_stride": {
         "name": "Passada de Pedralodo"
       },
+      "foremans_wage_band": {
+        "name": "Anel do Salário do Capataz"
+      },
+      "mirelight_locket": {
+        "name": "Medalhão da Luz do Pântano"
+      },
+      "fenwright_grips": {
+        "name": "Manoplas do Artesão do Pântano"
+      },
       "wildgrove_cinch": {
         "name": "Cinto do Bosque Selvagem"
       },
@@ -16574,6 +16586,9 @@ export const pt_BR: EnTranslations = {
           },
           "8": {
             "label": "Domínio dos Túmulos"
+          },
+          "9": {
+            "label": "Cratera da Estrela Cadente"
           }
         }
       },

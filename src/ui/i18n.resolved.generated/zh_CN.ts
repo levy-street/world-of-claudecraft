@@ -2400,6 +2400,7 @@ export const zh_CN: EnTranslations = {
       "dodge": "躲闪几率提高 {pct}%",
       "dodgeReduce": "躲闪几率降低 {pct}%",
       "damageReduction": "受到的所有伤害降低 {pct}%",
+      "slumber": "沉睡至黎明。无法被攻击，任何人都无法将其唤醒。",
       "guardianWard": "下一次敌人的致命攻击会改为将你的生命值恢复至 {pct}%",
       "armorFlat": "护甲降低 {value}",
       "armorFlatStacks": "护甲降低 {value}（{stacks} 层）",
@@ -2476,7 +2477,9 @@ export const zh_CN: EnTranslations = {
       }
     },
     "worldBoss": {
-      "spawn": "{name}在{zone}上空崛起！"
+      "spawn": "{name}在{zone}上空崛起！",
+      "wake": "{name}在{zone}上空苏醒！",
+      "sleep": "{name}沉睡至黎明。"
     },
     "auth": {
       "appleLoginCta": "通过 Apple 继续",
@@ -11938,6 +11941,15 @@ export const zh_CN: EnTranslations = {
       "mirestone_stride": {
         "name": "沼石步履"
       },
+      "foremans_wage_band": {
+        "name": "工头的工钱指环"
+      },
+      "mirelight_locket": {
+        "name": "沼光吊坠"
+      },
+      "fenwright_grips": {
+        "name": "沼泽工匠握手"
+      },
       "wildgrove_cinch": {
         "name": "野林束带"
       },
@@ -16574,6 +16586,9 @@ export const zh_CN: EnTranslations = {
           },
           "8": {
             "label": "冢丘领地"
+          },
+          "9": {
+            "label": "星陨坑"
           }
         }
       },

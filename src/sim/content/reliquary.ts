@@ -282,11 +282,12 @@ export const RELIQUARY_HORIZON_MOUNTS = [
 // def in content/zone3.ts), so a quest hint there would name a door that hands
 // out nothing.
 //
-// drakemaw_raptor and terrorspark_groundshaker are absent, and that absence IS
-// the answer: no live table awards either (drakemaw_raptor has no acquisition
-// path, terrorspark_groundshaker is dev-grant only). They are the catalog's
-// two SOURCE_PENDING_RULING mounts; masterwork:engineering on the professions
-// shelf is the third pending slot (QA ruling 2026-08-07).
+// drakemaw_raptor is the Mirefen world boss's mount: the reins ride Balgath's
+// table as an ungrouped 1% personal drop (content/zone2.ts), the "dedicated world
+// boss" the 2026-08-04 owner call held them back for. terrorspark_groundshaker is
+// absent, and that absence IS the answer: no live table awards it (dev-grant
+// only). It is the catalog's one SOURCE_PENDING_RULING mount; masterwork:engineering
+// on the professions shelf is the other pending slot (QA ruling 2026-08-07).
 //
 // Keys are typed against the live mount ladder so a misspelled or renamed key
 // fails tsc at the authoring site instead of falling through to the pending
@@ -322,6 +323,7 @@ const MOUNT_SOURCES: Readonly<
   ],
   aether_hover_cycle: fromRift('S'),
   thunderstrut_gobbler: fromRift('S'),
+  drakemaw_raptor: fromBoss('balgath_cyclops'),
 };
 
 /** Mount slots carrying their MOUNT_SOURCES hints, with RELIQUARY_HORIZON_MOUNTS
@@ -1118,13 +1120,19 @@ export const RELIQUARY_PAGES: readonly ReliquaryPageDef[] = freezePageTable([
     clearSource: { kind: 'deed_stat', stat: 'balgathKills' },
     // Every relic here comes off the boss himself and nowhere else, which is what a world
     // boss page is supposed to mean: no shared tier, no second door, no page you can
-    // complete without meeting him.
+    // complete without meeting him. The three Foreman's Wage rares are his too, but they
+    // only ever fall to a contributor at or below level 13 (LootEntry.maxPlayerLevel), so
+    // a page completed at twenty was started as a local. His reins are on the Horizons
+    // mounts page, never here (the curation rule above).
     sourceDefault: fromBoss('balgath_cyclops'),
     relics: items(
       'foremans_barrowmaul',
       'barrowhide_pauldrons',
       'mirestone_stride',
       'loomshard_eye',
+      'foremans_wage_band',
+      'mirelight_locket',
+      'fenwright_grips',
     ),
   },
   // ---- Delves (rare+ uniques; mark-shop signature pieces included) ----

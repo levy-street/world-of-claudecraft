@@ -2400,6 +2400,7 @@ export const en_CA: EnTranslations = {
       "dodge": "Increases dodge chance by {pct}%",
       "dodgeReduce": "Reduces dodge chance by {pct}%",
       "damageReduction": "Reduces all damage taken by {pct}%",
+      "slumber": "Asleep until dawn. Cannot be attacked and will not wake for anyone.",
       "guardianWard": "The next lethal enemy hit restores you to {pct}% health instead",
       "armorFlat": "Reduces armor by {value}",
       "armorFlatStacks": "Reduces armor by {value} ({stacks} stacks)",
@@ -2476,7 +2477,9 @@ export const en_CA: EnTranslations = {
       }
     },
     "worldBoss": {
-      "spawn": "{name} rises over {zone}!"
+      "spawn": "{name} rises over {zone}!",
+      "wake": "{name} wakes over {zone}!",
+      "sleep": "{name} sleeps until dawn."
     },
     "auth": {
       "appleLoginCta": "Continue with Apple",
@@ -11938,6 +11941,15 @@ export const en_CA: EnTranslations = {
       "mirestone_stride": {
         "name": "Mirestone Stride"
       },
+      "foremans_wage_band": {
+        "name": "Foreman's Wage Band"
+      },
+      "mirelight_locket": {
+        "name": "Mirelight Locket"
+      },
+      "fenwright_grips": {
+        "name": "Fenwright Grips"
+      },
       "wildgrove_cinch": {
         "name": "Wildgrove Cinch"
       },
@@ -16574,6 +16586,9 @@ export const en_CA: EnTranslations = {
           },
           "8": {
             "label": "Barrowmound Reach"
+          },
+          "9": {
+            "label": "Starfall Crater"
           }
         }
       },

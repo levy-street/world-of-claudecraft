@@ -2400,6 +2400,7 @@ export const ja_JP: EnTranslations = {
       "dodge": "回避率を{pct}%上昇させる",
       "dodgeReduce": "回避率を{pct}%低下させる",
       "damageReduction": "受けるすべてのダメージを{pct}%軽減する",
+      "slumber": "夜明けまで眠っている。攻撃できず、誰が来ても目を覚まさない。",
       "guardianWard": "次に受ける敵の致死攻撃を防ぎ、代わりに体力を{pct}%まで回復する",
       "armorFlat": "防御力を{value}低下させる",
       "armorFlatStacks": "防御力を{value}低下させる({stacks}スタック)",
@@ -2476,7 +2477,9 @@ export const ja_JP: EnTranslations = {
       }
     },
     "worldBoss": {
-      "spawn": "{name}が{zone}にそびえ立つ！"
+      "spawn": "{name}が{zone}にそびえ立つ！",
+      "wake": "{name}が{zone}で目を覚ました！",
+      "sleep": "{name}は夜明けまで眠っている。"
     },
     "auth": {
       "appleLoginCta": "Appleで続ける",
@@ -11938,6 +11941,15 @@ export const ja_JP: EnTranslations = {
       "mirestone_stride": {
         "name": "泥石の歩み"
       },
+      "foremans_wage_band": {
+        "name": "職長の賃金の指輪"
+      },
+      "mirelight_locket": {
+        "name": "沼灯りのロケット"
+      },
+      "fenwright_grips": {
+        "name": "沼地職人のグリップ"
+      },
       "wildgrove_cinch": {
         "name": "野林の締め帯"
       },
@@ -16574,6 +16586,9 @@ export const ja_JP: EnTranslations = {
           },
           "8": {
             "label": "塚山の領域"
+          },
+          "9": {
+            "label": "星落ちのクレーター"
           }
         }
       },

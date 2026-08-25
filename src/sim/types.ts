@@ -1441,6 +1441,14 @@ export interface LootEntry {
   // Entries sharing a rollGroup are exclusive: one rng draw is partitioned by
   // their chances, so at most one matching entry drops.
   rollGroup?: string;
+  // WORLD-BOSS PERSONAL LOOT ONLY (world_boss.ts rollWorldBossLoot): the entry is
+  // rolled only for a contributor whose level is at or below this. The locals' share
+  // of a boss placed in their zone: gear a level-eight can wear, which the level-twenty
+  // raid alongside them never sees in its own roll. Item level follows the gate, not
+  // the boss (item_level.ts): an item that can only ever fall to a level-13 player is
+  // level-13 content, whatever the level of the thing that dropped it. Ignored by the
+  // shared rollLoot path, so it must never appear on an ordinary mob's table.
+  maxPlayerLevel?: number;
 }
 
 export type MobFamily =

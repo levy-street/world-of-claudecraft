@@ -2400,6 +2400,7 @@ export const tr_TR: EnTranslations = {
       "dodge": "Aumenta la probabilidad de esquivar un {pct}%",
       "dodgeReduce": "Reduce la probabilidad de esquivar un {pct}%",
       "damageReduction": "Alınan tüm hasarı %{pct} azaltır",
+      "slumber": "Şafağa kadar uyuyor. Saldırılamaz ve kimse için uyanmaz.",
       "guardianWard": "Seni öldürecek bir sonraki düşman darbesi engellenir ve yerine canın %{pct}'e geri döner",
       "armorFlat": "Reduce la armadura en {value}",
       "armorFlatStacks": "Reduce la armadura en {value} ({stacks} acumulaciones)",
@@ -2476,7 +2477,9 @@ export const tr_TR: EnTranslations = {
       }
     },
     "worldBoss": {
-      "spawn": "{name}, {zone} üzerinde yükseliyor!"
+      "spawn": "{name}, {zone} üzerinde yükseliyor!",
+      "wake": "{name}, {zone} üzerinde uyanıyor!",
+      "sleep": "{name} şafağa kadar uyuyor."
     },
     "auth": {
       "appleLoginCta": "Apple ile Devam Et",
@@ -11938,6 +11941,15 @@ export const tr_TR: EnTranslations = {
       "mirestone_stride": {
         "name": "Bataklıktaşı Adımı"
       },
+      "foremans_wage_band": {
+        "name": "Ustabaşının Ücret Yüzüğü"
+      },
+      "mirelight_locket": {
+        "name": "Bataklık Işığı Madalyonu"
+      },
+      "fenwright_grips": {
+        "name": "Bataklık Ustası Eldivenleri"
+      },
       "wildgrove_cinch": {
         "name": "Vahşi Koruluk Kemeri"
       },
@@ -16574,6 +16586,9 @@ export const tr_TR: EnTranslations = {
           },
           "8": {
             "label": "Höyük Sahası"
+          },
+          "9": {
+            "label": "Yıldız Düşüşü Krateri"
           }
         }
       },

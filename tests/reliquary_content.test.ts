@@ -362,7 +362,8 @@ describe('Reliquary Conqueror catalog structure', () => {
     // and the flag keeps each whole page out of owned AND total (the dedicated
     // vault and riftbound pins in this file and tests/reliquary_state.test.ts
     // hold both sides), so neither page moves these two literals.
-    expect(full).toEqual({ owned: 344, total: 344 });
+    // Plus the three Foreman's Wage rares on the Balgath page (2026-08-25): 347.
+    expect(full).toEqual({ owned: 347, total: 347 });
     const character = catalogCharacterCompletion({
       itemsDiscovered: allOwned,
       marks: allOwned,
@@ -373,7 +374,7 @@ describe('Reliquary Conqueror catalog structure', () => {
     // pair above, including the three release-merged daggers; marks are
     // character-scoped, so this trails the overview by the 29 account-scoped
     // weapon skins).
-    expect(character).toEqual({ owned: 315, total: 315 });
+    expect(character).toEqual({ owned: 318, total: 318 });
   });
 
   it('pins the final measured catalog shape: total slots and distinct marks', () => {
@@ -394,7 +395,7 @@ describe('Reliquary Conqueror catalog structure', () => {
     expect(
       slots,
       `slot total moved; per page: ${RELIQUARY_PAGES.map((p) => `${p.id}=${p.relics.length}`).join(', ')}`,
-    ).toBe(379);
+    ).toBe(382);
     // Distinct mark ids: the 10 shipped before Phase 21 plus the 19
     // rare-slain proofs of conquerors_rares_of_the_realm.
     expect(
@@ -609,7 +610,7 @@ describe('Reliquary relic item ids resolve in ITEMS', () => {
     // ids, plus the three daggers the v0.36.0 release merge added: 240 (the
     // sixth figure of the ledger row's "all pinned" claim; the other five are
     // the page/overview/character/slot/mark literals nearby).
-    expect(RELIQUARY_ITEM_TO_PAGES.size).toBe(244);
+    expect(RELIQUARY_ITEM_TO_PAGES.size).toBe(247);
     for (const [id, pages] of RELIQUARY_ITEM_TO_PAGES) {
       expect(pages.length, `catalogued id ${id} maps to an empty page list`).toBeGreaterThan(0);
     }
@@ -2369,12 +2370,13 @@ const SOURCE_PENDING_RULING: Readonly<Record<string, readonly string[]>> = {
   // no-answer slot, and Phase 13b authored all of them (a relic lists every
   // comparable route it really has).
   //
-  // drakemaw_raptor: NO acquisition path exists anywhere in content, see the
-  // def comment in content/drakelands.ts. Owner call recorded 2026-08-04: the
-  // slot stays listed and sourceless until the mount gets a route.
+  // drakemaw_raptor LEFT this list on 2026-08-25: the reins now ride the Mirefen
+  // world boss's table (content/zone2.ts, the "dedicated world boss" the
+  // 2026-08-04 owner call held them back for), so its Horizons slot names that
+  // door (MOUNT_SOURCES in content/reliquary.ts).
   // terrorspark_groundshaker: dev-grant only, deliberately absent from vendors,
   // quests, mob loot, heroic loot, and the rift reins pools.
-  horizons_mounts: ['drakemaw_raptor', 'terrorspark_groundshaker'],
+  horizons_mounts: ['terrorspark_groundshaker'],
   // masterwork:engineering: unearnable, QA ruling 2026-08-07. Every live
   // engineering recipe produces a slotless, statless tool, masterworkBonusStats
   // returns null for all of them, so the masterwork proc can never fire and
@@ -2477,7 +2479,7 @@ const EXPECTED_DISTINCT_SOURCES: Record<string, number> = {
   // (mining, logging, herbalism, fishing) + the rods' engineering craft and
   // their Litany board keeper (Phase 21).
   professions_specimens: 7,
-  horizons_mounts: 10,
+  horizons_mounts: 11,
   horizons_weapon_skins: 1,
   // Every title relic's source is its own deed, so the count tracks the page
   // rows: 36 + the four Phase 18 completion-ladder titles.
@@ -3328,7 +3330,7 @@ describe('Reliquary source hint coverage', () => {
     ).toBe(true);
   });
 
-  it('the surviving pending rows are the three slots content awards no route at all', () => {
+  it('the surviving pending rows are the two slots content awards no route at all', () => {
     // The page-wide Horizons rulings are EXECUTED: mounts and skins are no
     // longer derived from the catalog lists (the derivation era ended when the
     // rulings landed), so the identity pins to RELIQUARY_HORIZON_MOUNTS and
@@ -3339,10 +3341,7 @@ describe('Reliquary source hint coverage', () => {
       'horizons_mounts',
       'professions_masterwork',
     ]);
-    expect(SOURCE_PENDING_RULING.horizons_mounts).toEqual([
-      'drakemaw_raptor',
-      'terrorspark_groundshaker',
-    ]);
+    expect(SOURCE_PENDING_RULING.horizons_mounts).toEqual(['terrorspark_groundshaker']);
     // masterwork:engineering pended by the QA ruling 2026-08-07: no
     // engineering recipe can proc a masterwork (see the gear-capability pin),
     // so its former profession hint named a door that awards nothing.
@@ -3657,9 +3656,9 @@ describe('Reliquary source hint coverage', () => {
     expect(delveOnly.counts.vendor).toBeGreaterThanOrEqual(1);
   });
 
-  it('the two pending mounts really have ZERO live award routes (the row is justified)', () => {
+  it('the pending mount really has ZERO live award routes (the row is justified)', () => {
     // The surviving SOURCE_PENDING_RULING row's whole claim is "no live table
-    // awards either mount", and the acknowledgment sweep can never check it
+    // awards this mount", and the acknowledgment sweep can never check it
     // (it short-circuits on un-hinted relics). This is the inverse sweep: the
     // day content gives either mount ANY route, this reds and forces the hint
     // plus the pending-row deletion in the same change, so the window can

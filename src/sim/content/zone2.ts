@@ -608,13 +608,36 @@ export const ZONE2_MOBS: Record<string, MobTemplate> = {
     // Mirefen boss. Both were tried and both were wrong, which is what forced the
     // `balgath_spoils` set below into existence: `worldBoss: true` obliges a Reliquary
     // page, and a page with no relics of his own is one you complete without meeting him.
+    //
+    // Three more rows make the kill worth turning up for twice, which is the actual
+    // design problem this table has to solve for a boss in the zone players quit in:
+    //
+    // THE FOREMAN'S WAGE (`foremans_wage`, maxPlayerLevel 13): the locals' share. Rolled
+    // only for a contributor at or below the zone's top level, one of three level-13
+    // rares at 30% each (so nine kills in ten pay a local something wearable), and
+    // listed FIRST so the one-gear-item cap in rollWorldBossLoot hands a level eight the
+    // blue they can wear rather than a level-20 epic they cannot. A level twenty on the
+    // same kill never sees these rows at all. The gate is also what sets the items'
+    // level (item_level.ts): they are level-13 content, not re-levelled boss loot.
+    //
+    // THE REINS (`reins_drakemaw_raptor`): the one epic mount with no acquisition path,
+    // held back by owner call for "a dedicated world boss" (content/drakelands.ts). One
+    // percent, ungrouped so it rides independently of the gear roll, personal per
+    // contributor and once a day per character through the world-boss lockout. That is
+    // the retail world-boss mount rate (Sha of Anger's serpent, the Galleon), and against
+    // a daily lockout it is a mount most of the realm will see on someone before they see
+    // it in their own bags, which is what makes a horizon out of it.
     loot: [
       { copper: 2500, chance: 1 },
       { itemId: 'bogiron_nugget', chance: 1 },
+      { itemId: 'foremans_wage_band', chance: 0.3, rollGroup: 'foremans_wage', maxPlayerLevel: 13 },
+      { itemId: 'mirelight_locket', chance: 0.3, rollGroup: 'foremans_wage', maxPlayerLevel: 13 },
+      { itemId: 'fenwright_grips', chance: 0.3, rollGroup: 'foremans_wage', maxPlayerLevel: 13 },
       { itemId: 'foremans_barrowmaul', chance: 0.1, rollGroup: 'balgath_spoils' },
       { itemId: 'barrowhide_pauldrons', chance: 0.1, rollGroup: 'balgath_spoils' },
       { itemId: 'mirestone_stride', chance: 0.1, rollGroup: 'balgath_spoils' },
       { itemId: 'loomshard_eye', chance: 0.08, rollGroup: 'balgath_spoils' },
+      { itemId: 'reins_drakemaw_raptor', chance: 0.01 },
     ],
     yells: {
       engage: 'One eye is enough to find you.',
@@ -1870,6 +1893,53 @@ export const ZONE2_ITEMS: Record<string, ItemDef> = {
     quality: 'epic',
     stats: { armor: 96, agi: 7, sta: 5 },
     sellValue: 8600,
+  },
+  // The Foreman's Wage: the LOCALS' share of the world boss, three level-13 rares.
+  //
+  // These drop only to a contributor at or below level 13 (LootEntry.maxPlayerLevel on
+  // his table), and that gate is also their level: item_level.ts derives a level-gated
+  // personal entry from the gate rather than from the level-20 boss, so they budget as
+  // ilvl 16 rares (13 + 3), the zone's own tier and a real upgrade until twenty, instead
+  // of re-levelling to boss loot a level eight could never wear. Budgets are exact to
+  // primaryStatBudget (ring 5, neck 6, gloves 6) so the level-band budget sweep stays
+  // honest, and the armor follows the epic set's per-ilvl line (leather gloves 110 at
+  // ilvl 26). Jewelry for two of the three because it is class-agnostic and, in the
+  // classic era, nearly absent before level twenty: a level-ten neck is a real event.
+  //
+  // `requiredLevel: 11` is the classic blue rule (item level minus five) written down
+  // explicitly, because a rare otherwise gates at its SOURCE level (13) and half the zone
+  // would carry the reward around unable to wear it; item_level_req.ts sanctions the
+  // override for exactly this.
+  foremans_wage_band: {
+    id: 'foremans_wage_band',
+    name: "Foreman's Wage Band",
+    kind: 'armor',
+    slot: 'ring',
+    quality: 'rare',
+    stats: { sta: 3, str: 2 },
+    requiredLevel: 11,
+    sellValue: 1150,
+  },
+  mirelight_locket: {
+    id: 'mirelight_locket',
+    name: 'Mirelight Locket',
+    kind: 'armor',
+    slot: 'neck',
+    quality: 'rare',
+    stats: { int: 3, sta: 3 },
+    requiredLevel: 11,
+    sellValue: 1200,
+  },
+  fenwright_grips: {
+    id: 'fenwright_grips',
+    name: 'Fenwright Grips',
+    kind: 'armor',
+    slot: 'gloves',
+    armorType: 'leather',
+    quality: 'rare',
+    stats: { armor: 68, agi: 3, sta: 3 },
+    requiredLevel: 11,
+    sellValue: 1250,
   },
 
   // --- quest items ---
