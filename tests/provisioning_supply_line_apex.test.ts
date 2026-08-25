@@ -864,7 +864,8 @@ describe('masterwrought Phase 11h GATE C: the flask crop', () => {
     // whatever shipped, and the three global herb totals in
     // tests/provisioning_supply_line.test.ts (28 / 27 / 39 then, green and
     // unmoved by 11h) were the independent evidence. 45 since Masterwrought
-    // phase 11l, whose trophy row recipe_healing_potion added goldleaf 1 (a
+    // phase 11l, whose trophy row recipe_lesser_healing_potion (re-picked by
+    // the 11l QA from recipe_healing_potion) added goldleaf 1 (a
     // pure addition, so R18's no-reduction direction still holds).
     expect(
       Object.values(alchemyHerbPerRecipe).reduce((t, n) => t + n, 0),
