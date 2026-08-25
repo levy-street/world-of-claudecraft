@@ -2571,12 +2571,16 @@ export const guideStrings = {
     colMaster: 'Master',
     masterCellFmt: '{name}, {title}',
     // #2905/#3015 reword, as a NEW key (the harvestBodyChoice precedent above):
-    // HARVEST_COMPONENT_ITEMS now carries eight families (claw and tusk joined
-    // hide, fang, silk, venom, cloth, meat) and HARVEST_COMPONENT_SPECIMENS
-    // five (pristine_claw joined the list). The retired harvestBodyChoice value
+    // HARVEST_COMPONENT_ITEMS now carries ten families (claw and tusk joined
+    // hide, fang, silk, venom, cloth, meat at #2905; horn and gills joined at
+    // Masterwrought Phase 11m) and HARVEST_COMPONENT_SPECIMENS five
+    // (pristine_claw joined the list). The retired harvestBodyChoice value
     // keeps its reviewed translations rather than being reworded in place.
+    // The family list below is pinned against the live map by
+    // tests/guide_harvest_families_prose.test.ts; the Phase 11m edit re-filled
+    // every overlay in the same change (the reword-staleness rule).
     harvestBodyFamilies:
-      'Gathering does not stop at nodes. Many slain beasts can be harvested once each, first come first served, for hides, fangs, claws, tusks, silk, venom, cloth, and meat, straight from the corpse alongside its ordinary loot; one press opens both. Where a beast carries more than one workable component, the choice is yours: take everything it can give, or concentrate on fewer components and take a measurably finer grade of what you do take.\n\nA rare or better harvest roll on a specimen-bearing family also grants a signed perfect specimen (a Pristine Hide, Pristine Silk, Pristine Venom Gland, Pristine Claw, or Prime Cut) on top of the ordinary yield, and records A Perfect Specimen in your Book of Deeds. Any character can harvest, no training required, and any gathering tool you own counts toward the premium arm, whichever trade it belongs to.',
+      'Gathering does not stop at nodes. Many slain beasts can be harvested once each, first come first served, for hides, fangs, claws, tusks, horns, gills, silk, venom, cloth, and meat, straight from the corpse alongside its ordinary loot; one press opens both. Where a beast carries more than one workable component, the choice is yours: take everything it can give, or concentrate on fewer components and take a measurably finer grade of what you do take.\n\nA rare or better harvest roll on a specimen-bearing family also grants a signed perfect specimen (a Pristine Hide, Pristine Silk, Pristine Venom Gland, Pristine Claw, or Prime Cut) on top of the ordinary yield, and records A Perfect Specimen in your Book of Deeds. Any character can harvest, no training required, and any gathering tool you own counts toward the premium arm, whichever trade it belongs to.',
     // Re-spec payment tiers (RESPEC_TIER_CONFIG, sim/professions/focus.ts), as
     // a NEW key: the retired focusBody promised a free rework, which is now
     // true of only one of the three tiers. Numbers are literals the way
@@ -3154,9 +3158,13 @@ export const guideStrings = {
       'You do not have to find these by eye. Every node in the zone is drawn on the zone map wherever the map is showing that ground, and on the minimap as you pass it, so a farming loop can be planned from the map screen before you set out. A node your tools cannot work yet is marked rather than hidden: it keeps its place with a struck, dimmed mark, so you can see the ground you are training toward. On desktop, hovering a vein, stand, or patch in the world names it, tells you the tool it wants, and, once you have worked it, counts your own respawn down to the second. On touch there is nothing to hover, so the minimap marks tell the same story.',
     // Specimen families, as a NEW key beside specimenBody: claw joined
     // HARVEST_COMPONENT_SPECIMENS, leaving fang, cloth, and tusk as the
-    // specimen-less trio.
+    // specimen-less trio; Masterwrought Phase 11m then mapped horn and gills
+    // in HARVEST_COMPONENT_ITEMS with no specimen row, so the specimen-less
+    // set is five. Pinned against both maps by
+    // tests/guide_harvest_families_prose.test.ts; overlays re-filled in the
+    // same change.
     specimenBodyFamilies:
-      'Keep a little bag room spare when you farm: a signed windfall needs room of its own or a matching signed stack to land in, and if nothing fits the yield still arrives but the signature is lost. Corpse harvesting has its own jackpot arm too: about {pct}% of each harvested component comes up rare or better. A family with a perfect specimen to give (hide, silk, venom, claw, meat) keeps its ordinary yield plain and mints the signed specimen beside it; the other three, fang, cloth, and tusk, sign the yield itself.',
+      'Keep a little bag room spare when you farm: a signed windfall needs room of its own or a matching signed stack to land in, and if nothing fits the yield still arrives but the signature is lost. Corpse harvesting has its own jackpot arm too: about {pct}% of each harvested component comes up rare or better. A family with a perfect specimen to give (hide, silk, venom, claw, meat) keeps its ordinary yield plain and mints the signed specimen beside it; the other five, fang, cloth, tusk, horn, and gills, sign the yield itself.',
   },
 
   economy: {

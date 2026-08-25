@@ -9,7 +9,9 @@ import {
 } from '../src/game/interactions';
 import { tryNearbyInteraction } from '../src/game/nearby_interaction';
 import { MOBS } from '../src/sim/data';
+import { harvestFamilyYieldsItem } from '../src/sim/professions/gathering';
 import { type Entity, INTERACT_RANGE } from '../src/sim/types';
+import { UNMAPPED_FAMILY, UNMAPPED_FAMILY_2 } from './helpers/unmapped_family';
 
 // The open-gate flip: the hcb wire mirror (PR 2087) made online corpse
 // harvest-claim state reliable, so the helper arms main.ts calls now run with
@@ -147,17 +149,22 @@ describe('direct corpse hits over gather nodes', () => {
   it('defers an all-unmapped corpse with nothing to loot, claim or no claim (#2513)', () => {
     // The click-path knock-on of the corpse-level harvest gate. fen_troll
     // carried claw and tusk, neither mapped at the time, so it had no harvest
-    // half to open for; both are mapped now (this branch's own fix), so no
-    // shipped template is left in that shape. gills and horn are still
-    // waiting on theirs, so this retags a real, otherwise-untagged template
-    // (warlock_imp) for the duration of the case, restored in a finally. With
-    // no loot either, `canOpen` is false and a click on the corpse mesh should
-    // fall through to a gather node sitting under it rather than being swallowed.
-    // Pinned with the claim UNSPENT, which is the state that used to keep it
-    // open, so this is the predicate talking and not the pre-existing claim arm.
+    // half to open for; both are mapped now (#2905), and Phase 11m mapped
+    // gills and horn after them, so no shipped template is left in that
+    // shape. This retags two real, otherwise-untagged templates with the
+    // synthetic never-mapped families (tests/helpers/unmapped_family.ts) for
+    // the duration of the case, restored in a finally: warlock_imp
+    // all-unmapped, warlock_voidwalker mixed. With no loot either, `canOpen`
+    // is false and a click on the corpse mesh should fall through to a gather
+    // node sitting under it rather than being swallowed. Pinned with the claim
+    // UNSPENT, which is the state that used to keep it open, so this is the
+    // predicate talking and not the pre-existing claim arm.
     const template = MOBS.warlock_imp;
     const priorTags = template.componentTags;
-    template.componentTags = ['gills', 'horn'];
+    template.componentTags = [UNMAPPED_FAMILY, UNMAPPED_FAMILY_2];
+    const mixedTemplate = MOBS.warlock_voidwalker;
+    const priorMixedTags = mixedTemplate.componentTags;
+    mixedTemplate.componentTags = ['hide', UNMAPPED_FAMILY];
     try {
       const troll = corpse({ templateId: 'warlock_imp', harvestClaimedBy: null, loot: null });
       expect(shouldDeferPickedCorpseToGatherNode(troll, 1)).toBe(true);
@@ -178,13 +185,25 @@ describe('direct corpse hits over gather nodes', () => {
         loot: { copper: 50, items: [] },
       });
       expect(shouldDeferPickedCorpseToGatherNode(withCoin, 1)).toBe(false);
+      // The discriminator: a MIXED template carrying an unmapped family
+      // beside a mapped one keeps its harvest half, so an empty one still
+      // opens (same two-tag width as the all-unmapped fixture, so it is the
+      // yield table deciding and not the count).
+      const mixed = corpse({
+        templateId: 'warlock_voidwalker',
+        harvestClaimedBy: null,
+        loot: null,
+      });
+      expect(shouldDeferPickedCorpseToGatherNode(mixed, 1)).toBe(false);
     } finally {
       template.componentTags = priorTags;
+      mixedTemplate.componentTags = priorMixedTags;
     }
-    // The discriminator on real content: a MIXED template carrying an
-    // unmapped horn beside two mapped families keeps its harvest half, so an
-    // empty one still opens.
-    expect(MOBS.sethrael_palecoil.componentTags).toEqual(['hide', 'claw', 'horn']);
+    // ...and on real content: sethrael_palecoil (the shipped mixed exemplar
+    // until Phase 11m mapped its horn) still carries horn, every tag it
+    // carries maps now, and an empty one still opens.
+    expect(MOBS.sethrael_palecoil.componentTags).toContain('horn');
+    expect(MOBS.sethrael_palecoil.componentTags?.every(harvestFamilyYieldsItem)).toBe(true);
     const palecoil = corpse({
       templateId: 'sethrael_palecoil',
       harvestClaimedBy: null,

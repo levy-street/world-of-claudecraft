@@ -1359,8 +1359,11 @@ export interface FocusHarvestYield {
  * nothing), which was itself only ever true BELOW the threshold: above it, the
  * same frame already spread. Scope, so the sentence above is not read as more
  * than it is: this covers a tag the corpse does not CARRY. A tag it carries
- * that HARVEST_COMPONENT_ITEMS does not map (claw, tusk, gills, horn) is a
- * different case and is still handled a different way: it survives THIS
+ * that HARVEST_COMPONENT_ITEMS does not map (claw and tusk shipped that way
+ * until #2905, gills and horn until Masterwrought Phase 11m; no shipped family
+ * does today, and the corpse suites drive the shape through the synthetic
+ * families of tests/helpers/unmapped_family.ts) is a different case and is
+ * still handled a different way: it survives THIS
  * function, because two later readers need to see it. The command boundary
  * REFUSES the harvest pre-claim when the surviving pick maps to no item at all
  * (#2509, forfeitsEveryMappedYield and src/sim/interaction.ts harvestCorpse),
@@ -1412,7 +1415,8 @@ export function effectiveFocusComponents(
  * be one narrowing away from disagreeing. Its second half is now belt and
  * braces rather than the load-bearing term it was for #2509, and both states
  * are pinned separately (tests/corpse_harvest_view.test.ts drives both terms
- * on sethrael_palecoil's real mixed tags, and the all-unmapped arm rides the
+ * on the three-tag mixed shape sethrael_palecoil shipped with until Phase 11m
+ * mapped its horn, now a retagged fixture, and the all-unmapped arm rides the
  * retagged fixtures in tests/corpse_harvest_window.test.ts and
  * tests/loot_window_controller.test.ts, so the two terms can never quietly
  * coincide).
@@ -1456,8 +1460,11 @@ export function yieldingFocusComponents(
  * `[0, HARVEST_TIERS.length - 1]`.
  *
  * THE #2514 RULING, next to the formula it governs. The bonus counts families
- * the harvest could not extract, and a family with no item behind it (claw,
- * tusk, gills, horn) is NEVER extracted, whether or not the player checked it.
+ * the harvest could not extract, and a family with no item behind it is NEVER
+ * extracted, whether or not the player checked it (claw, tusk, gills and horn
+ * each shipped that way, until #2905 mapped the first two and Masterwrought
+ * Phase 11m the last two; no shipped family does today, so the shape lives in
+ * the retagged fixtures of the corpse suites, tests/helpers/unmapped_family.ts).
  * So it is always forfeited breadth: the numerator is yieldingFocusComponents,
  * not the raw effective pick.
  *
@@ -1466,9 +1473,10 @@ export function yieldingFocusComponents(
  * nothing for claw. Measured at seed 5, `['hide']` gave bonus 2 (rough_hide 4
  * plus a signed pristine_hide) and `['hide','claw']` gave bonus 1 (rough_hide 3):
  * the player paid a tier and a specimen roll to tick a box that can only ever
- * come back empty. Nine shipped templates mix mapped and unmapped families and
- * on sethrael_palecoil (hide, claw, horn) two of the three boxes carried that
- * cost. After: `['hide','claw']` is byte-identical to `['hide']`.
+ * come back empty. At the time nine shipped templates mixed mapped and
+ * unmapped families and on sethrael_palecoil (then hide, claw, horn) two of
+ * the three boxes carried that cost. After: `['hide','claw']` is
+ * byte-identical to `['hide']`.
  *
  * Why THIS numerator and not a matching move of the denominator to the mapped
  * tag count: the denominator is the corpse's ADVERTISED breadth, what it
@@ -1478,9 +1486,9 @@ export function yieldingFocusComponents(
  * today where `['hide']` on forest_wolf (2 tags) is bonus 1. #2514 does not
  * introduce that, it extends it to the picks that were paying for breadth they
  * never received. Moving the denominator too would make the single-mapped
- * shapes (the three `gills, hide` murlocs, sethrael_palecoil) permanently
- * bonus-0, a NERF on the very templates this issue is about, and it would make
- * the bonus SHRINK when content ships.
+ * shapes (at the time, the three `gills, hide` murlocs and sethrael_palecoil)
+ * permanently bonus-0, a NERF on the very templates this issue was about, and
+ * it would make the bonus SHRINK when content ships.
  *
  * The tension with #2513, stated rather than left for a reader to find: that
  * issue called an unmapped tag inert data and masked a corpse made of nothing
@@ -1530,18 +1538,25 @@ export function yieldingFocusComponents(
  *     harvestCorpse, so nothing downstream is pinned to the old phase; what it
  *     means in practice is that which harvests happen to mint a specimen is
  *     reshuffled symmetrically rather than made more or less likely.
- *   - It is self-healing. The day claw/tusk/gills/horn get items, every number
- *     returns to today's, with no code change.
+ *   - It is self-healing. The day an unmapped family gets an item, every
+ *     number on its carriers returns to the all-mapped world with no code
+ *     change: claw and tusk did exactly that at #2905, and gills and horn at
+ *     Phase 11m (measured on sethrael_palecoil and mudfin_murloc in
+ *     tests/corpse_harvest_sim.test.ts, "the concentration bonus on a mixed
+ *     corpse").
  *
  * What is deliberately retired, because "the equivalence survives" must not be
  * read as "nothing moved": on a mixed corpse bonus 0, the unshifted
  * BASE_TIER_WEIGHTS roll #1141 shipped as the spread, is no longer REACHABLE.
- * The widest pick available on those nine templates is now bonus 1 (2 on
- * sethrael_palecoil), because part of their breadth is unreachable content. On
- * the four templates carrying exactly one mapped family (the three murlocs and
- * sethrael_palecoil) that collapses every legal pick to one identical outcome,
- * so the picker there stops being a choice, which is honest: a picker offering
- * one live row and one dead one never was one.
+ * The widest pick available on the nine templates then mixed was bonus 1 (2
+ * on sethrael_palecoil), because part of their breadth was unreachable
+ * content. On the four templates then carrying exactly one mapped family (the
+ * three murlocs and sethrael_palecoil) that collapsed every legal pick to one
+ * identical outcome, so the picker there stopped being a choice, which is
+ * honest: a picker offering one live row and one dead one never was one. No
+ * shipped template is in either shape since Phase 11m; the rule still governs
+ * any future unmapped tag, and the corpse suites keep it exercised on the
+ * retagged fixtures.
  *
  * The "an explicit full cover spreads exactly like an empty pick" equivalence
  * SURVIVES, and is pinned: both still collapse to `taggedComponents` inside

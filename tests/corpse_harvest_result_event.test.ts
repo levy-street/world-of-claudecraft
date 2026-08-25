@@ -41,6 +41,7 @@ import { createMob } from '../src/sim/entity';
 import type { PlayerMeta } from '../src/sim/sim';
 import { Sim } from '../src/sim/sim';
 import type { Entity, SimEvent } from '../src/sim/types';
+import { UNMAPPED_FAMILY, UNMAPPED_FAMILY_2 } from './helpers/unmapped_family';
 
 type SimInternals = {
   entities: Map<number, Entity>;
@@ -422,11 +423,12 @@ describe('the worst case in shipped content (#2457)', () => {
 describe('a harvest that lands nothing never gets that far (#2457, #2513)', () => {
   it('a corpse whose every tag maps to no item is refused, so there is nothing to report', () => {
     // fen_troll carried claw and tusk, neither of which was in
-    // HARVEST_COMPONENT_ITEMS; both are mapped now (this branch's own fix), so
-    // no shipped template is left in this shape. gills and horn are still
-    // waiting on theirs, so this drives the gate through a real, otherwise-
-    // untagged template (warlock_imp) retagged for the duration of the case,
-    // restored in a finally. The "no result event, no loot line" half of this
+    // HARVEST_COMPONENT_ITEMS; both are mapped now (#2905), and Phase 11m
+    // mapped gills and horn after them, so no shipped template is left in
+    // this shape. The gate is driven through a real, otherwise-untagged
+    // template (warlock_imp) retagged with the synthetic never-mapped
+    // families (tests/helpers/unmapped_family.ts) for the duration of the
+    // case, restored in a finally. The "no result event, no loot line" half of this
     // pin is the #2457 contract and still holds; what changed is WHY. Pre-#2513
     // the claim was spent and the ledger was skipped, so the client got a
     // no-op it could not distinguish from a lost keypress. Now the command is
@@ -434,9 +436,9 @@ describe('a harvest that lands nothing never gets that far (#2457, #2513)', () =
     // player gets is the refusal.
     const template = MOBS.warlock_imp;
     const priorTags = template.componentTags;
-    template.componentTags = ['gills', 'horn'];
+    template.componentTags = [UNMAPPED_FAMILY, UNMAPPED_FAMILY_2];
     try {
-      expect(template.componentTags).toEqual(['gills', 'horn']);
+      expect(template.componentTags).toEqual([UNMAPPED_FAMILY, UNMAPPED_FAMILY_2]);
       const { sim, a, mob } = setup(60, 'warlock_imp');
       const { results, loots, events } = harvest(sim, mob.id, undefined, a);
       expect(mob.harvestClaimedBy).toBeNull();

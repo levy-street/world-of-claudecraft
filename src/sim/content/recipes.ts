@@ -4056,12 +4056,14 @@ export const TROPHY_RECIPES: ProfessionRecipeRecord[] = [
     // Discounted bills (requiredReagentCountFor): specialization only, scales
     // 4 to 3, hide 6 to 4, silk and agent 2 to 1, 56 vs 80; specialization
     // plus self-signed, scales 4 to 2, hide 6 to 4, silk and agent 1, the
-    // floor 51 vs 80, a counterfactual only: the one line a signature moves
-    // past 56 is the mudfin scale, a mob drop that never signs, and the hide
-    // and the silk never sign either (their families grant the component
-    // plain and sign only the pristine specimen), so the reachable bill is
-    // the 56. Gold-positive at the floor, but the 32-copper #1301 sink turns
-    // the row gold-negative, 83 vs 80 (88 vs 80 at the reachable bill),
+    // floor 51 vs 80, and since Phase 11m the floor IS reachable: the one
+    // line a signature moves past 56 is the mudfin scale, which a gills
+    // harvest signs at rare or better (gills maps to it with no specimen row,
+    // so the scale itself carries the signature), while the hide and the silk
+    // never sign (their families grant the component plain and sign only the
+    // pristine specimen); before 11m the scale was a mob drop that never
+    // signed and the reachable bill was the 56. Gold-positive at the floor,
+    // but the 32-copper #1301 sink turns the row gold-negative, 83 vs 80,
     // bounded by trophy supply.
     // Beside the trainer's OWN rung-0 row recipe_fenbridge_hide_boots (leather
     // feet, common, armor 26, a 26 bill) this row wins one axis, agility 1,

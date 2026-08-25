@@ -104,9 +104,18 @@ export const GATHERING_PROFESSION_IDS: GatheringProfessionId[] = [
 // field the bonus adjusts.
 // Corpse-harvest yield map (#1141): component tag -> the item id a profession
 // harvest of a tagged corpse yields (claim logic: src/sim/professions/gathering.ts,
-// command body: src/sim/interaction.ts harvestCorpse). Only tags with a concrete
-// item wired up so far are listed here; two families shipped content also tags
-// (gills, horn) are still waiting on theirs.
+// command body: src/sim/interaction.ts harvestCorpse). EVERY family shipped
+// content tags is listed here. History, since the gap it closes is the kind
+// that reopens quietly: #1141 shipped six rows (hide, fang, silk, venomSac,
+// meat, cloth); `claw` and `tusk` were wired at #2905 (fen_troll's family);
+// `horn` and `gills` were wired at Masterwrought Phase 11m (state.md row
+// 11m-ORPHAN), which reuses two shipped ids rather than minting new ones:
+// horn reads as the same hard keratin as tusk, so it feeds curved_tusk, the
+// thinnest mapped family in the 11m census; gills feeds mudfin_scale, the
+// trophy 11l promoted out of quality 'poor' so the junk sweep never sells it.
+// The phase's one authorized new item id was NOT taken for either row.
+// tests/harvest_geography.test.ts pins that no template carries a tag absent
+// from this table, so the next orphan tag is a red test, not a dead corpse.
 //
 // THIS TABLE IS THE HARVEST GATE, not just a yield lookup (#2513). A corpse is
 // harvestable exactly when it carries a family listed here (isHarvestableCorpse,
@@ -127,18 +136,26 @@ export const GATHERING_PROFESSION_IDS: GatheringProfessionId[] = [
 // So wiring a new family here is neither a yield-only nor a local change. It
 // re-enables the harvest affordance on every template carrying that tag with no
 // code change, AND it re-tunes the bonus back down on every MIXED template
-// carrying that same tag (wiring `claw` and `tusk` moves old_greyjaw, wild_boar,
+// carrying that same tag (wiring `claw` and `tusk` moved old_greyjaw, wild_boar,
 // sethrael_palecoil, and every other mixed claw/tusk template back down toward
-// bonus 0, exactly the self-healing the #2514 ruling predicted). The same runs
-// the other way: adding a decorative unlisted tag to a mob widens that mob's
-// bonus denominator, which is a balance edit. The bound that keeps it honest (a
-// corpse never out-pays the tag list it advertises) is a checked property in
-// tests/mob_component_tags.test.ts, not an assumption.
+// bonus 0, exactly the self-healing the #2514 ruling predicted; wiring `horn`
+// and `gills` did the same for the last six mixed templates, the four
+// `gills, hide` swamp dwellers and the two horn carriers, so no shipped
+// template mixes mapped and unmapped families any more and the mixed shapes
+// live only in the retagged test fixtures, tests/helpers/unmapped_family.ts).
+// The same runs the other way: adding a decorative unlisted tag to a mob
+// widens that mob's bonus denominator, which is a balance edit. The bound that
+// keeps it honest (a corpse never out-pays the tag list it advertises) is a
+// checked property in tests/mob_component_tags.test.ts, not an assumption.
 // The v0.21.0 collision gap is closed: hide/silk/venomSac now yield the
 // dedicated profession materials (content/profession_items.ts), so a harvest
 // never grants quest-collect credit. The old quest items (boar_hide via
 // q_boars kill loot, webwood_silk via q_spiders, widow_venom_sac via q_widows)
 // keep their quest roles only.
+//
+// ORDER IS A SAVE CONTRACT: TOWN_FOCUS_COMPONENTS (../professions/focus.ts) is
+// Object.keys of this table, in this order, and the Town Focus panel renders
+// its rows in that order, so new families are APPENDED, never inserted.
 export const HARVEST_COMPONENT_ITEMS: Readonly<Record<string, string>> = {
   hide: 'rough_hide',
   fang: 'wolf_fang',
@@ -148,6 +165,8 @@ export const HARVEST_COMPONENT_ITEMS: Readonly<Record<string, string>> = {
   cloth: 'homespun_cloth',
   claw: 'sharp_claw',
   tusk: 'curved_tusk',
+  horn: 'curved_tusk',
+  gills: 'mudfin_scale',
 };
 
 // Monster material access tiers (Professions 2.0): which tool tier
@@ -157,7 +176,10 @@ export const HARVEST_COMPONENT_ITEMS: Readonly<Record<string, string>> = {
 // bestWieldableAnyGatherToolTier). EVERY
 // HARVEST_COMPONENT_ITEMS key is listed explicitly, ALL at 1 in wave one
 // (the prime directive: all pre-existing content stays bare-hands
-// harvestable); future corpse families may ship higher.
+// harvestable); future corpse families may ship higher. horn and gills
+// (Phase 11m) join at 1 for the same reason: both were tagged on shipped,
+// bare-hands corpses long before they yielded anything, so a higher tier
+// would gate a corpse a player has been harvesting all along.
 export const MONSTER_MATERIAL_TIERS: Readonly<Record<string, number>> = {
   hide: 1,
   fang: 1,
@@ -167,6 +189,8 @@ export const MONSTER_MATERIAL_TIERS: Readonly<Record<string, number>> = {
   cloth: 1,
   claw: 1,
   tusk: 1,
+  horn: 1,
+  gills: 1,
 };
 
 // The access tier for one component family. An unlisted component (a future
@@ -184,11 +208,29 @@ export function monsterMaterialTierFor(component: string): number {
 // the fallback behavior (the regular component itself grants signed).
 //
 // claw is listed here (tusk is not) purely to keep the capacity pre-gate's
-// one-specimen-less-family-per-corpse premise honest: fang/cloth/tusk are
-// the specimen-less trio, and no shipped template carries two of them
-// together (checked in tests/corpse_harvest_sim.test.ts). Leaving claw
+// one-specimen-less-family-per-corpse premise honest: fang/cloth/tusk were
+// the specimen-less trio, and at the time no shipped template carried two of
+// them together (checked in tests/corpse_harvest_sim.test.ts). Leaving claw
 // specimen-less too would have put fen_troll (claw, tusk) and old_greyjaw
 // (hide, fang, claw) each over that line.
+//
+// horn and gills (Phase 11m, state.md row 11m-ORPHAN) carry NO specimen, as a
+// decision and not a default: both sit at MONSTER_MATERIAL_TIERS 1, the
+// bare-hands floor, and a signed pristine jackpot on a bare-hands-floor
+// component would invert the premium ladder that tier table exists to state
+// (the rare-or-better roll is the reward for reaching a family, not a free
+// ride on the one every corpse already gives away). Both therefore keep the
+// fallback behaviour: the plain component itself grants signed at rare+.
+// That makes the specimen-less set five families (fang, cloth, tusk, horn,
+// gills), and the one-per-corpse premise above now has to be checked against
+// the 11m tag spread rather than assumed: the spread refused two of its
+// settled candidates for exactly this premise (dune_troll's fang beside tusk,
+// frostmane_yeti's fang beside horn) and routed tusk to the Farshore's
+// Sundered Horror instead, so the tests/corpse_harvest_sim.test.ts guard holds
+// at a worst count of ONE over every tagged template. It is left standing
+// rather than papered over with a specimen row here, because a horn or tusk
+// specimen would be the ladder inversion above and a fang one would move
+// #2139's measured crossing case.
 export const HARVEST_COMPONENT_SPECIMENS: Readonly<Record<string, string>> = {
   hide: 'pristine_hide',
   silk: 'pristine_silk',

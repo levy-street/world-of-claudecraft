@@ -15,6 +15,27 @@ import {
   yieldingFocusComponents,
 } from '../src/sim/professions/gathering';
 import { Rng } from '../src/sim/rng';
+import { UNMAPPED_FAMILY, UNMAPPED_FAMILY_2 } from './helpers/unmapped_family';
+
+/**
+ * Retag real, otherwise-untagged templates for the duration of `body`,
+ * restored in a finally: the corpse-harvest suites' idiom for the mixed
+ * shapes shipped content no longer carries since Masterwrought Phase 11m
+ * mapped gills and horn (tests/helpers/unmapped_family.ts).
+ */
+function withRetaggedTemplates<T>(retags: Record<string, readonly string[]>, body: () => T): T {
+  const prior = new Map<string, string[] | undefined>();
+  for (const [id, tags] of Object.entries(retags)) {
+    const template = MOBS[id];
+    prior.set(id, template.componentTags);
+    template.componentTags = [...tags];
+  }
+  try {
+    return body();
+  } finally {
+    for (const [id, tags] of prior) MOBS[id].componentTags = tags;
+  }
+}
 
 /** Every subset of a corpse's tags, in tag order, the empty pick included. */
 function subsetsOf(tags: readonly string[]): string[][] {
@@ -87,42 +108,64 @@ describe('isHarvestableCorpse', () => {
     expect(isHarvestableCorpse(['hide'])).toBe(true);
     // ...and a mapped family beside unmapped ones still qualifies: a mixed
     // corpse keeps its picker, its claim and its yields untouched (#2509 owns
-    // the pick-level refusal there, not this predicate).
-    expect(isHarvestableCorpse(['gills', 'hide', 'horn'])).toBe(true);
+    // the pick-level refusal there, not this predicate). The unmapped
+    // families are the synthetic never-mapped pair: no shipped family is
+    // unmapped since Phase 11m (tests/helpers/unmapped_family.ts).
+    expect(isHarvestableCorpse([UNMAPPED_FAMILY_2, 'hide', UNMAPPED_FAMILY])).toBe(true);
   });
 
   it('is false when every tag is carried but unmapped (#2513)', () => {
     // The tag COUNT answer was a lie on exactly this shape: it advertised a
     // harvest that could never pay, and the command spent the single-use claim
     // and reported nothing at all. Answering on mapped families instead puts
-    // such a corpse on the same path as an untagged one.
-    expect(isHarvestableCorpse(['horn'])).toBe(false);
-    expect(isHarvestableCorpse(['gills', 'horn'])).toBe(false);
+    // such a corpse on the same path as an untagged one. gills and horn were
+    // the shipped families in this shape until Phase 11m mapped both; the
+    // synthetic pair carries it now.
+    expect(isHarvestableCorpse([UNMAPPED_FAMILY])).toBe(false);
+    expect(isHarvestableCorpse([UNMAPPED_FAMILY_2, UNMAPPED_FAMILY])).toBe(false);
     // Not merely "a short list is false": the same LENGTH with one family
     // swapped for a mapped one flips it, so the predicate is reading the table
     // and not the count.
-    expect(isHarvestableCorpse(['horn', 'hide'])).toBe(true);
+    expect(isHarvestableCorpse([UNMAPPED_FAMILY, 'hide'])).toBe(true);
   });
 
   it('reads the real yield table, so a family gaining an item retires the case', () => {
     // Both sides literal, the tests/corpse_harvest_sim.test.ts idiom: deriving
     // the unmapped list from HARVEST_COMPONENT_ITEMS alone would pass against
-    // any table, including an empty one.
+    // any table, including an empty one. Ten rows since Phase 11m mapped horn
+    // and gills (state.md row 11m-ORPHAN), the last two families shipped
+    // content tagged without an item behind them.
     expect(Object.keys(HARVEST_COMPONENT_ITEMS).sort()).toEqual([
       'claw',
       'cloth',
       'fang',
+      'gills',
       'hide',
+      'horn',
       'meat',
       'silk',
       'tusk',
       'venomSac',
     ]);
-    for (const mapped of ['claw', 'cloth', 'fang', 'hide', 'meat', 'silk', 'tusk', 'venomSac']) {
+    for (const mapped of [
+      'claw',
+      'cloth',
+      'fang',
+      'gills',
+      'hide',
+      'horn',
+      'meat',
+      'silk',
+      'tusk',
+      'venomSac',
+    ]) {
       expect(harvestFamilyYieldsItem(mapped), mapped).toBe(true);
       expect(isHarvestableCorpse([mapped]), mapped).toBe(true);
     }
-    for (const unmapped of ['gills', 'horn']) {
+    // The synthetic pair is the unmapped side, and it is unmapped by
+    // construction rather than by today's content (tests/harvest_geography.test.ts
+    // pins that no row maps either and no template carries either).
+    for (const unmapped of [UNMAPPED_FAMILY, UNMAPPED_FAMILY_2]) {
       expect(harvestFamilyYieldsItem(unmapped), unmapped).toBe(false);
       expect(isHarvestableCorpse([unmapped]), unmapped).toBe(false);
     }
@@ -159,30 +202,36 @@ describe('isHarvestableCorpse', () => {
     // claim would be spent for zero items with no event: the exact bug,
     // reintroduced. Every row below is chosen to FLIP under that rewrite; the
     // table is Readonly by TYPE only, which is what lets this case exist at all,
-    // and it is restored in a finally. `horn` is the mutation target (claw and
-    // tusk carry real, permanent entries now); `gills` is the always-unmapped
-    // companion tag.
+    // and it is restored in a finally. UNMAPPED_FAMILY is the mutation target
+    // (horn played that part until Phase 11m gave it a real, permanent entry,
+    // as #2905 had done for claw and tusk before); UNMAPPED_FAMILY_2 is the
+    // always-unmapped companion tag.
     const table = HARVEST_COMPONENT_ITEMS as Record<string, string>;
-    expect('horn' in table).toBe(false);
+    expect(UNMAPPED_FAMILY in table).toBe(false);
     try {
-      table.horn = '';
-      expect('horn' in table).toBe(true);
-      expect(harvestItemForFamily('horn')).toBe('');
-      expect(harvestFamilyYieldsItem('horn')).toBe(false);
-      expect(isHarvestableCorpse(['horn', 'gills'])).toBe(false);
+      table[UNMAPPED_FAMILY] = '';
+      expect(UNMAPPED_FAMILY in table).toBe(true);
+      expect(harvestItemForFamily(UNMAPPED_FAMILY)).toBe('');
+      expect(harvestFamilyYieldsItem(UNMAPPED_FAMILY)).toBe(false);
+      expect(isHarvestableCorpse([UNMAPPED_FAMILY, UNMAPPED_FAMILY_2])).toBe(false);
       // The sibling predicate reads the SAME accessor, so the two cannot disagree
-      // about what an empty mapping means. Both rows are sensitive: with `horn`
-      // treated as yieldable the first flips to false and the second to true.
-      expect(forfeitsEveryMappedYield(['horn', 'gills'], ['gills'])).toBe(false);
-      expect(forfeitsEveryMappedYield(['hide', 'horn'], ['horn'])).toBe(true);
+      // about what an empty mapping means. Both rows are sensitive: with the
+      // target treated as yieldable the first flips to false and the second to
+      // true.
+      expect(
+        forfeitsEveryMappedYield([UNMAPPED_FAMILY, UNMAPPED_FAMILY_2], [UNMAPPED_FAMILY_2]),
+      ).toBe(false);
+      expect(forfeitsEveryMappedYield(['hide', UNMAPPED_FAMILY], [UNMAPPED_FAMILY])).toBe(true);
       // A non-empty mapping on the same key flips all of it, so the case is about
       // the VALUE and not about the key being freshly added.
-      table.horn = 'rough_hide';
-      expect(harvestFamilyYieldsItem('horn')).toBe(true);
-      expect(isHarvestableCorpse(['horn', 'gills'])).toBe(true);
-      // ...and now `gills` alone really does forfeit something, which is the row
-      // that was insensitive while horn mapped to nothing.
-      expect(forfeitsEveryMappedYield(['horn', 'gills'], ['gills'])).toBe(true);
+      table[UNMAPPED_FAMILY] = 'rough_hide';
+      expect(harvestFamilyYieldsItem(UNMAPPED_FAMILY)).toBe(true);
+      expect(isHarvestableCorpse([UNMAPPED_FAMILY, UNMAPPED_FAMILY_2])).toBe(true);
+      // ...and now the companion alone really does forfeit something, which is
+      // the row that was insensitive while the target mapped to nothing.
+      expect(
+        forfeitsEveryMappedYield([UNMAPPED_FAMILY, UNMAPPED_FAMILY_2], [UNMAPPED_FAMILY_2]),
+      ).toBe(true);
       // #2514's readers belong in THIS rig and nowhere else. The two
       // `if (!itemId) continue` arms in harvestCorpse are unreachable only
       // because yieldingFocusComponents filters on the same TRUTHINESS the
@@ -191,15 +240,19 @@ describe('isHarvestableCorpse', () => {
       // filter as `c in HARVEST_COMPONENT_ITEMS` and every row below flips
       // while the shipped-content sweeps stay green, because no shipped family
       // maps to ''.
-      table.horn = '';
-      expect(yieldingFocusComponents(['hide', 'horn'], [])).toEqual(['hide']);
-      expect(harvestConcentrationBonus(['hide', 'horn'], [])).toBe(1);
+      table[UNMAPPED_FAMILY] = '';
+      expect(yieldingFocusComponents(['hide', UNMAPPED_FAMILY], [])).toEqual(['hide']);
+      expect(harvestConcentrationBonus(['hide', UNMAPPED_FAMILY], [])).toBe(1);
       const emptyMappingRng = new Rng(5);
       let emptyMappingDraws = 0;
       emptyMappingRng.setObserver(() => {
         emptyMappingDraws++;
       });
-      const emptyMappingYields = resolveCorpseFocusHarvest(['hide', 'horn'], [], emptyMappingRng);
+      const emptyMappingYields = resolveCorpseFocusHarvest(
+        ['hide', UNMAPPED_FAMILY],
+        [],
+        emptyMappingRng,
+      );
       emptyMappingRng.setObserver(null);
       // One tier roll, for hide alone: an empty mapping must cost no draw, or
       // the family is back in the roll and back in both dead arms.
@@ -212,10 +265,10 @@ describe('isHarvestableCorpse', () => {
       expect(yieldingFocusComponents(['hide', 'constructor'], [])).toEqual(['hide']);
       expect(harvestConcentrationBonus(['hide', 'constructor'], [])).toBe(1);
     } finally {
-      delete table.horn;
+      delete table[UNMAPPED_FAMILY];
     }
-    expect('horn' in table).toBe(false);
-    expect(isHarvestableCorpse(['horn', 'gills'])).toBe(false);
+    expect(UNMAPPED_FAMILY in table).toBe(false);
+    expect(isHarvestableCorpse([UNMAPPED_FAMILY, UNMAPPED_FAMILY_2])).toBe(false);
   });
 
   it('deliberately does NOT govern the Town Focus slider list', () => {
@@ -237,10 +290,14 @@ describe('isHarvestableCorpse', () => {
       expect(harvestFamilyYieldsItem(component), component).toBe(true);
     }
     expect([...TOWN_FOCUS_COMPONENTS]).toEqual(Object.keys(HARVEST_COMPONENT_ITEMS));
-    expect(TOWN_FOCUS_COMPONENTS).toHaveLength(8);
-    // No unmapped family reaches the panel today, which is the property that
-    // actually matters for a player: the two unmapped ones are not keys at all.
-    for (const unmapped of ['gills', 'horn']) {
+    // Ten since Phase 11m appended horn and gills to the yield table (the
+    // literal order is pinned in tests/focus.test.ts).
+    expect(TOWN_FOCUS_COMPONENTS).toHaveLength(10);
+    // No unmapped family reaches the panel, which is the property that
+    // actually matters for a player: a family no row maps is not a key at all.
+    // The synthetic never-mapped pair stands in, since no shipped family is
+    // unmapped any more.
+    for (const unmapped of [UNMAPPED_FAMILY, UNMAPPED_FAMILY_2]) {
       expect(TOWN_FOCUS_COMPONENTS).not.toContain(unmapped);
       expect(isTownFocusComponent(unmapped), unmapped).toBe(false);
       expect(harvestFamilyYieldsItem(unmapped), unmapped).toBe(false);
@@ -284,23 +341,33 @@ describe('isHarvestableCorpse', () => {
     // was only ever tagged ogre from the generic-giant era), which puts it under
     // the every-beast-pays-in-components rule and so gives it hide/fang/meat.
     // The Proving Shore tutorial island's shore_scuttler (a beast, meat) makes
-    // 47, and its tide-pool king mister_crabs (also meat) makes 48.
-    expect(included).toHaveLength(48);
-    // ...and the untagged templates are counted rather than assumed: 188 of
-    // them ship, all excluded before this change and all excluded after it,
-    // since fen_troll was already tagged (claw, tusk) and only moves from
-    // `excluded` into this list, never through `untagged`. (184 before the
-    // v0.32.0 base merge, plus the untagged dragonkin egg from the brood and
-    // the four untagged camp mobs the quest-dedupe pass added, minus
-    // shoal_scuttler once it gained a mapped tag. Plus the three practice
-    // dummies the Highwatch row added: a straw target carries no components.
-    // Minus frostmane_yeti, which gained hide/fang/meat with its move into
-    // the beast family: the same template the `included` count above picked
-    // up. Minus vale_cup_ball once it retired with the Vale Cup. Plus the
-    // Proving Shore tutorial island's training_effigy, a straw target that
-    // yields nothing either.)
+    // 47, and its tide-pool king mister_crabs (also meat) makes 48. Then 54
+    // with the Masterwrought Phase 11m tag spread (bf4f36405d): six
+    // previously untagged templates gained a single mapped family each
+    // (thornpeak_ogre, ogre_crusher and sundered_horror their ogre tusk,
+    // spider_egg and mirefen_broodmother their silk, aurelhorn its horn);
+    // the twelve other templates the spread touched were already tagged, and
+    // mapping horn and gills in the same phase moved nothing here, since
+    // every carrier of either already carried a mapped family beside it.
+    expect(included).toHaveLength(54);
+    // ...and the untagged templates are counted rather than assumed: 181 of
+    // them ship, every one excluded, and none of them ever passed through
+    // `excluded` (fen_troll was already tagged with claw and tusk when #2905
+    // mapped both, so it moved from `excluded` into `included` above, never
+    // through `untagged`). The chain to 181: 184 before the v0.32.0 base
+    // merge, plus the untagged dragonkin egg from the brood and the four
+    // untagged camp mobs the quest-dedupe pass added, minus shoal_scuttler
+    // once it gained a mapped tag. Plus the three practice dummies the
+    // Highwatch row added: a straw target carries no components. Minus
+    // frostmane_yeti, which gained hide/fang/meat with its move into the
+    // beast family: the same template the `included` count above picked up.
+    // Minus vale_cup_ball once it retired with the Vale Cup. Plus the Proving
+    // Shore tutorial island's training_effigy, a straw target that yields
+    // nothing either: 187. Minus the six templates the Phase 11m spread
+    // tagged for the first time, the same six the `included` count above
+    // picked up: 181.
     const untagged = Object.values(MOBS).filter((m) => !m.componentTags?.length);
-    expect(untagged).toHaveLength(187);
+    expect(untagged).toHaveLength(181);
     for (const m of untagged) expect(isHarvestableCorpse(m.componentTags)).toBe(false);
     // The three literals above are the load-bearing ones; this sum states that
     // they partition MOBS, so a template that fell out of all three would read
@@ -314,12 +381,14 @@ describe('resolveCorpseFocusHarvest: concentrate vs spread tradeoff (#1142)', ()
   // MAPPED is four families that all have an item behind them, so it is the
   // only shape that can still reach bonus 0, the unshifted BASE_TIER_WEIGHTS
   // roll #1141 shipped as the spread. MIXED carries two families the item table
-  // does not map, so its widest pick is bonus 2 and bonus 0 is unreachable on
-  // it. Before #2514 this describe ran entirely on MIXED and called its full
-  // cover "zero bonus", which was already only true because an unmapped family
-  // used to count as extracted breadth.
+  // does not map (the synthetic pair, tests/helpers/unmapped_family.ts: gills
+  // and horn filled these slots until Phase 11m mapped both), so its widest
+  // pick is bonus 2 and bonus 0 is unreachable on it. Before #2514 this
+  // describe ran entirely on MIXED and called its full cover "zero bonus",
+  // which was already only true because an unmapped family used to count as
+  // extracted breadth.
   const MAPPED = ['hide', 'fang', 'silk', 'meat'];
-  const MIXED = ['hide', 'fang', 'gills', 'horn'];
+  const MIXED = ['hide', 'fang', UNMAPPED_FAMILY_2, UNMAPPED_FAMILY];
 
   function meanTierIndex(componentTags: string[], chosen: string[], seed: number, trials: number) {
     const rng = new Rng(seed);
@@ -388,7 +457,7 @@ describe('resolveCorpseFocusHarvest: concentrate vs spread tradeoff (#1142)', ()
     // Two of the four tags are breadth the harvest cannot reach, so the widest
     // pick on this corpse is bonus 2. Every pick shape, so this is a statement
     // about the corpse and not about one selection.
-    for (const pick of [[], MIXED, ['hide', 'fang'], ['hide', 'fang', 'horn']]) {
+    for (const pick of [[], MIXED, ['hide', 'fang'], ['hide', 'fang', UNMAPPED_FAMILY]]) {
       expect(harvestConcentrationBonus(MIXED, pick), JSON.stringify(pick)).toBe(2);
     }
     // ...and the roll really is shifted by it. Same seed on both fixtures, so
@@ -433,14 +502,18 @@ describe('resolveCorpseFocusHarvest: concentrate vs spread tradeoff (#1142)', ()
 // checked it. Before, an unmapped family sat in the pick like any other and
 // diluted the bonus, so ticking a then-unmapped family (claw, in the original
 // issue) beside Hide cost a full tier on hide and returned nothing for it.
-// claw is mapped now (this branch's own fix), so the fixture below uses horn,
-// one of the two families still waiting on theirs.
+// claw was mapped at #2905 and horn (the fixture family after it) at
+// Masterwrought Phase 11m, so no shipped family is unmapped any more and the
+// fixtures below carry the synthetic never-mapped pair
+// (tests/helpers/unmapped_family.ts): MIXED3 is the three-tag shape
+// sethrael_palecoil shipped with (hide, claw, horn) and MIXED2 the two-tag
+// shape the murlocs shipped with (gills, hide), until 11m.
 describe('yieldingFocusComponents and harvestConcentrationBonus (#2514)', () => {
-  const MIXED3 = ['hide', 'fang', 'horn'];
-  const MIXED2 = ['gills', 'hide'];
+  const MIXED3 = ['hide', 'fang', UNMAPPED_FAMILY];
+  const MIXED2 = [UNMAPPED_FAMILY_2, 'hide'];
 
   it('drops the unmapped families from the extracted set, order preserved', () => {
-    expect(yieldingFocusComponents(MIXED3, ['hide', 'horn'])).toEqual(['hide']);
+    expect(yieldingFocusComponents(MIXED3, ['hide', UNMAPPED_FAMILY])).toEqual(['hide']);
     expect(yieldingFocusComponents(MIXED3, [])).toEqual(['hide', 'fang']);
     expect(yieldingFocusComponents(MIXED3, MIXED3)).toEqual(['hide', 'fang']);
     // The filter preserves whatever order effectiveFocusComponents produced,
@@ -452,20 +525,23 @@ describe('yieldingFocusComponents and harvestConcentrationBonus (#2514)', () => 
     // A cover written back to front is still a cover, so it takes the spread
     // arm and comes back in TAG order, not the order it was written in. Both
     // rows here so the pin cannot be read as "always the pick's order".
-    expect(yieldingFocusComponents(MIXED3, ['fang', 'horn', 'hide'])).toEqual(['hide', 'fang']);
-    // An all-mapped corpse is untouched, which is why eight shipped templates
-    // do not move at all.
+    expect(yieldingFocusComponents(MIXED3, ['fang', UNMAPPED_FAMILY, 'hide'])).toEqual([
+      'hide',
+      'fang',
+    ]);
+    // An all-mapped corpse is untouched, which is why every shipped template
+    // (all-mapped since Phase 11m) does not move at all.
     expect(yieldingFocusComponents(['hide', 'fang'], ['hide'])).toEqual(['hide']);
   });
 
   it('makes an unmapped box free: the pick beside it scores exactly what it scores alone', () => {
-    expect(harvestConcentrationBonus(MIXED3, ['hide', 'horn'])).toBe(
+    expect(harvestConcentrationBonus(MIXED3, ['hide', UNMAPPED_FAMILY])).toBe(
       harvestConcentrationBonus(MIXED3, ['hide']),
     );
     expect(harvestConcentrationBonus(MIXED3, ['hide'])).toBe(2);
     // The whole world, not just the number: same set, same bonus, so the same
     // draws in the same order off the same seed.
-    expect(resolveCorpseFocusHarvest(MIXED3, ['hide', 'horn'], new Rng(5))).toEqual(
+    expect(resolveCorpseFocusHarvest(MIXED3, ['hide', UNMAPPED_FAMILY], new Rng(5))).toEqual(
       resolveCorpseFocusHarvest(MIXED3, ['hide'], new Rng(5)),
     );
   });
@@ -474,14 +550,14 @@ describe('yieldingFocusComponents and harvestConcentrationBonus (#2514)', () => 
     // The load-bearing half of the ruling, and the one a "tidy" refactor to a
     // mapped-family denominator would silently reverse. On the murloc shape a
     // mapped denominator gives 1 - 1 = 0 for every pick; the shipped rule gives
-    // 2 - 1 = 1. sethrael_palecoil's 3-tag shape cannot tell the two apart for
-    // ['hide'] (both answer 2), which is why this case exists.
+    // 2 - 1 = 1. The 3-tag shape cannot tell the two apart for ['hide'] (both
+    // answer 2), which is why this case exists.
     expect(harvestConcentrationBonus(MIXED2, [])).toBe(1);
     expect(harvestConcentrationBonus(MIXED2, ['hide'])).toBe(1);
-    expect(harvestConcentrationBonus(MIXED2, ['gills', 'hide'])).toBe(1);
+    expect(harvestConcentrationBonus(MIXED2, [UNMAPPED_FAMILY_2, 'hide'])).toBe(1);
     // ...and one mapped family out of three tags is a two-tier concentrate,
     // which a mapped denominator would flatten to 0.
-    expect(harvestConcentrationBonus(['hide', 'gills', 'horn'], [])).toBe(2);
+    expect(harvestConcentrationBonus(['hide', UNMAPPED_FAMILY_2, UNMAPPED_FAMILY], [])).toBe(2);
   });
 
   it('never lowers a bonus and never raises one past the reachable ceiling, over every shipped corpse and pick', () => {
@@ -490,54 +566,92 @@ describe('yieldingFocusComponents and harvestConcentrationBonus (#2514)', () => 
     // the shipped function would compare it with itself.
     const legacyBonus = (tags: readonly string[], chosen: readonly string[]) =>
       Math.max(0, Math.min(5, tags.length - effectiveFocusComponents(tags, chosen).length));
-    let raised = 0;
-    for (const template of Object.values(MOBS)) {
-      const tags = template.componentTags;
-      if (!tags || !isHarvestableCorpse(tags)) continue;
-      for (const pick of subsetsOf(tags)) {
-        // Only picks a caller can actually harvest on: the #2509 refusal takes
-        // the rest BEFORE the bonus is ever asked, which is exactly what makes
-        // the ceiling hold.
-        if (forfeitsEveryMappedYield(tags, pick)) continue;
-        const label = `${template.id} ${JSON.stringify(pick)}`;
-        const now = harvestConcentrationBonus(tags, pick);
-        expect(now, label).toBeGreaterThanOrEqual(legacyBonus(tags, pick));
-        expect(now, label).toBeLessThanOrEqual(tags.length - 1);
-        if (now > legacyBonus(tags, pick)) raised++;
+    const sweep = () => {
+      let raised = 0;
+      for (const template of Object.values(MOBS)) {
+        const tags = template.componentTags;
+        if (!tags || !isHarvestableCorpse(tags)) continue;
+        for (const pick of subsetsOf(tags)) {
+          // Only picks a caller can actually harvest on: the #2509 refusal
+          // takes the rest BEFORE the bonus is ever asked, which is exactly
+          // what makes the ceiling hold.
+          if (forfeitsEveryMappedYield(tags, pick)) continue;
+          const label = `${template.id} ${JSON.stringify(pick)}`;
+          const now = harvestConcentrationBonus(tags, pick);
+          expect(now, label).toBeGreaterThanOrEqual(legacyBonus(tags, pick));
+          expect(now, label).toBeLessThanOrEqual(tags.length - 1);
+          if (now > legacyBonus(tags, pick)) raised++;
+        }
       }
-    }
-    // The sweep must actually have exercised the raising arm, or a formula
-    // that changed nothing would pass both bounds above. A CORPUS CENSUS like
-    // the mixed-template count in tests/mob_component_tags: v0.32.0 authored 30
-    // against the release bestiary, and the rift bestiary + quest-dedupe passes
-    // raised two more picks, to 32. claw and tusk joining the yield table
-    // (this branch) then folded most of those raised picks into fully-mapped
-    // corpses (32 down to 12), leaving the gills/horn-mixed templates that
-    // still raise a picture. The two bounds inside the loop are the real
-    // assertions.
-    expect(raised).toBe(14);
+      return raised;
+    };
+    // A CORPUS CENSUS like the mixed-template count in
+    // tests/mob_component_tags: v0.32.0 authored 30 raised picks against the
+    // release bestiary, and the rift bestiary + quest-dedupe passes raised two
+    // more, to 32. claw and tusk joining the yield table (#2905) then folded
+    // most of those into fully-mapped corpses (32 down to 12), then 14 with
+    // the templates the later passes tagged, leaving only the gills/horn-mixed
+    // templates raising a pick. Masterwrought Phase 11m mapped gills and horn,
+    // so no shipped template mixes mapped and unmapped families (mixed 0 over
+    // 54 tagged templates) and the raising arm is never entered on shipped
+    // content: ZERO is the shipped reality, pinned as such.
+    expect(sweep()).toBe(0);
+    // The raising arm still has to be exercised, or a formula that changed
+    // nothing would pass both bounds above. The two mixed widths shipped
+    // content carried until 11m are retagged onto real, otherwise-untagged
+    // templates for the duration of the sweep (restored in a finally): the
+    // three-tag sethrael_palecoil shape and the two-tag murloc shape. Derived
+    // from the legacy formula by hand, not from the function under test: on
+    // the three-tag shape the legacy bonus is `3 - effective.length` and the
+    // shipped one `3 - extracted.length`, so the two differ exactly on the
+    // picks whose effective set contains the unmapped family without
+    // forfeiting everything ([], the full cover, [hide, U] and [claw, U]:
+    // four picks); on the two-tag shape the same reading gives [] and the
+    // full cover (two picks). Six in all.
+    const retagged = withRetaggedTemplates(
+      {
+        warlock_voidwalker: ['hide', 'claw', UNMAPPED_FAMILY],
+        tunnel_rat: [UNMAPPED_FAMILY_2, 'hide'],
+      },
+      sweep,
+    );
+    expect(retagged).toBe(6);
   });
 
-  it('is self-healing: giving horn an item returns every number to the pre-#2514 world', () => {
+  it('is self-healing: giving the unmapped family an item returns every number to the pre-#2514 world', () => {
     // The live-table mutation rig from the isHarvestableCorpse describe above,
     // and the reason the ruling is safe to make: the change is a correction
     // that only exists while content is missing. Restored in a finally. claw
-    // already made this exact move for real (this branch's own fix); horn is
-    // the one still left to demonstrate it on.
+    // and tusk made this exact move for real at #2905 and gills and horn at
+    // Phase 11m, which is why the synthetic family is the one left to
+    // demonstrate it on.
     const table = HARVEST_COMPONENT_ITEMS as Record<string, string>;
     expect(harvestConcentrationBonus(MIXED3, [])).toBe(1);
     try {
-      table.horn = 'rough_hide';
+      table[UNMAPPED_FAMILY] = 'rough_hide';
       expect(yieldingFocusComponents(MIXED3, [])).toEqual(MIXED3);
       expect(harvestConcentrationBonus(MIXED3, [])).toBe(0);
-      expect(harvestConcentrationBonus(MIXED3, ['hide', 'horn'])).toBe(1);
+      expect(harvestConcentrationBonus(MIXED3, ['hide', UNMAPPED_FAMILY])).toBe(1);
       // ...and it stops being equal to ['hide'], which is the exact equality
       // #2514 introduced. The day the content lands, the issue closes itself.
       expect(harvestConcentrationBonus(MIXED3, ['hide'])).toBe(2);
     } finally {
-      delete table.horn;
+      delete table[UNMAPPED_FAMILY];
     }
     expect(harvestConcentrationBonus(MIXED3, [])).toBe(1);
+    // ...and the real thing, on shipped content: horn's row landed at Phase
+    // 11m, so sethrael_palecoil's full cover is the bonus-0 spread today and
+    // every family it carries is extracted. Literal tags on the left so the
+    // row cannot pass against a template that lost its horn.
+    expect(MOBS.sethrael_palecoil.componentTags).toEqual(['hide', 'claw', 'horn', 'venomSac']);
+    expect(yieldingFocusComponents(['hide', 'claw', 'horn', 'venomSac'], [])).toEqual([
+      'hide',
+      'claw',
+      'horn',
+      'venomSac',
+    ]);
+    expect(harvestConcentrationBonus(['hide', 'claw', 'horn', 'venomSac'], [])).toBe(0);
+    expect(harvestConcentrationBonus(['hide', 'claw', 'horn', 'venomSac'], ['horn'])).toBe(3);
   });
 
   it('answers above the ceiling only for a pick both refusals already took', () => {
@@ -545,16 +659,16 @@ describe('yieldingFocusComponents and harvestConcentrationBonus (#2514)', () => 
     // are the shapes the #2509 and #2513 gates refuse before the bonus is
     // asked; resolveCorpseFocusHarvest then rolls nothing at all with them, so
     // no rng is drawn either.
-    expect(harvestConcentrationBonus(MIXED3, ['horn'])).toBe(3);
-    expect(forfeitsEveryMappedYield(MIXED3, ['horn'])).toBe(true);
-    expect(harvestConcentrationBonus(['gills', 'horn'], [])).toBe(2);
-    expect(isHarvestableCorpse(['gills', 'horn'])).toBe(false);
+    expect(harvestConcentrationBonus(MIXED3, [UNMAPPED_FAMILY])).toBe(3);
+    expect(forfeitsEveryMappedYield(MIXED3, [UNMAPPED_FAMILY])).toBe(true);
+    expect(harvestConcentrationBonus([UNMAPPED_FAMILY_2, UNMAPPED_FAMILY], [])).toBe(2);
+    expect(isHarvestableCorpse([UNMAPPED_FAMILY_2, UNMAPPED_FAMILY])).toBe(false);
     const rng = new Rng(5);
     let draws = 0;
     rng.setObserver(() => {
       draws++;
     });
-    expect(resolveCorpseFocusHarvest(['gills', 'horn'], [], rng)).toEqual([]);
+    expect(resolveCorpseFocusHarvest([UNMAPPED_FAMILY_2, UNMAPPED_FAMILY], [], rng)).toEqual([]);
     rng.setObserver(null);
     expect(draws).toBe(0);
   });
@@ -941,9 +1055,22 @@ describe('effectiveFocusComponents drops a tag the corpse does not carry (#2504)
 // (src/ui/hud/loot/corpse_harvest_view.ts), so a bug here is a bug in both.
 describe('forfeitsEveryMappedYield (#2509)', () => {
   // Anchored to the real table on both sides, with LITERAL sets so the cases
-  // below cannot be measuring the table against itself.
-  const MAPPED = ['hide', 'fang', 'silk', 'venomSac', 'meat', 'cloth', 'claw', 'tusk'];
-  const UNMAPPED = ['gills', 'horn'];
+  // below cannot be measuring the table against itself. Ten mapped families
+  // since Phase 11m mapped horn and gills; the unmapped side is the synthetic
+  // never-mapped pair (tests/helpers/unmapped_family.ts).
+  const MAPPED = [
+    'hide',
+    'fang',
+    'silk',
+    'venomSac',
+    'meat',
+    'cloth',
+    'claw',
+    'tusk',
+    'horn',
+    'gills',
+  ];
+  const UNMAPPED = [UNMAPPED_FAMILY, UNMAPPED_FAMILY_2];
 
   it('is stated against the families the content really maps', () => {
     expect(Object.keys(HARVEST_COMPONENT_ITEMS).sort()).toEqual([...MAPPED].sort());
@@ -951,34 +1078,39 @@ describe('forfeitsEveryMappedYield (#2509)', () => {
   });
 
   it('is true only for a strict pick of nothing but unmapped families', () => {
-    // old_greyjaw (hide, fang, claw) was the shipped fixture; claw is mapped
-    // now, so sethrael_palecoil's shape (hide, claw, horn) takes its place,
-    // with horn as the still-unmapped family.
-    const PALECOIL = ['hide', 'claw', 'horn'];
-    expect(forfeitsEveryMappedYield(PALECOIL, ['horn'])).toBe(true);
+    // old_greyjaw (hide, fang, claw) was the shipped fixture; claw was mapped
+    // at #2905 and sethrael_palecoil's shape (hide, claw, horn) took its place
+    // until Phase 11m mapped horn too. The same three-tag shape, with the
+    // synthetic family in horn's slot, carries it now.
+    const PALECOIL = ['hide', 'claw', UNMAPPED_FAMILY];
+    expect(forfeitsEveryMappedYield(PALECOIL, [UNMAPPED_FAMILY])).toBe(true);
     // ...and false for each of the three ways out, one per term.
-    expect(forfeitsEveryMappedYield(PALECOIL, ['horn', 'hide'])).toBe(false); // a mapped family is in
+    expect(forfeitsEveryMappedYield(PALECOIL, [UNMAPPED_FAMILY, 'hide'])).toBe(false); // a mapped family is in
     expect(forfeitsEveryMappedYield(PALECOIL, [])).toBe(false); // empty spreads
-    expect(forfeitsEveryMappedYield(['gills', 'horn'], ['horn'])).toBe(false); // nothing to forfeit
+    expect(forfeitsEveryMappedYield([UNMAPPED_FAMILY_2, UNMAPPED_FAMILY], [UNMAPPED_FAMILY])).toBe(
+      false,
+    ); // nothing to forfeit
+    // ...and on the shape as it ships today, every tag mapped, the strict
+    // pick of horn alone forfeits nothing: it pays now.
+    expect(forfeitsEveryMappedYield(['hide', 'claw', 'horn', 'venomSac'], ['horn'])).toBe(false);
   });
 
   it('reads the pick through effectiveFocusComponents, not raw', () => {
+    const PALECOIL = ['hide', 'claw', UNMAPPED_FAMILY];
     // A full cover spreads, so it always reaches the mapped families...
-    expect(forfeitsEveryMappedYield(['hide', 'claw', 'horn'], ['hide', 'claw', 'horn'])).toBe(
-      false,
-    );
+    expect(forfeitsEveryMappedYield(PALECOIL, ['hide', 'claw', UNMAPPED_FAMILY])).toBe(false);
     // ...an uncarried tag sanitizes away, so junk alone is the empty pick (#2504)...
-    expect(forfeitsEveryMappedYield(['hide', 'claw', 'horn'], ['junk'])).toBe(false);
+    expect(forfeitsEveryMappedYield(PALECOIL, ['junk'])).toBe(false);
     // ...but a carried unmapped tag survives, so junk beside it changes nothing (#2504 + #2509).
-    expect(forfeitsEveryMappedYield(['hide', 'claw', 'horn'], ['horn', 'junk'])).toBe(true);
+    expect(forfeitsEveryMappedYield(PALECOIL, [UNMAPPED_FAMILY, 'junk'])).toBe(true);
     // ...and a repeat collapses to one (#2474).
-    expect(forfeitsEveryMappedYield(['hide', 'claw', 'horn'], ['horn', 'horn'])).toBe(true);
+    expect(forfeitsEveryMappedYield(PALECOIL, [UNMAPPED_FAMILY, UNMAPPED_FAMILY])).toBe(true);
   });
 
   it('needs a corpse with something to give AND a pick that takes none of it', () => {
     // The two-tag shape, where a single entry is the whole refusal.
-    expect(forfeitsEveryMappedYield(['gills', 'hide'], ['gills'])).toBe(true);
-    expect(forfeitsEveryMappedYield(['gills', 'hide'], ['hide'])).toBe(false);
+    expect(forfeitsEveryMappedYield([UNMAPPED_FAMILY_2, 'hide'], [UNMAPPED_FAMILY_2])).toBe(true);
+    expect(forfeitsEveryMappedYield([UNMAPPED_FAMILY_2, 'hide'], ['hide'])).toBe(false);
     // A corpse of nothing but mapped families can never trip it, whatever the pick.
     for (const pick of [[], ['hide'], ['fang'], ['hide', 'fang']]) {
       expect(forfeitsEveryMappedYield(['hide', 'fang'], pick), JSON.stringify(pick)).toBe(false);

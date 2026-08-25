@@ -1,7 +1,9 @@
 import { describe, expect, it } from 'vitest';
 import { corpseLootAvailability } from '../src/game/corpse_loot_availability';
 import { MOBS } from '../src/sim/data';
+import { harvestFamilyYieldsItem } from '../src/sim/professions/gathering';
 import type { Entity } from '../src/sim/types';
+import { UNMAPPED_FAMILY, UNMAPPED_FAMILY_2 } from './helpers/unmapped_family';
 
 function corpse(overrides: Partial<Entity>): Entity {
   return {
@@ -106,17 +108,22 @@ describe('corpseLootAvailability', () => {
 
   it('closes a depleted corpse whose every component family is unmapped (#2513)', () => {
     // fen_troll carried claw and tusk and HARVEST_COMPONENT_ITEMS mapped
-    // neither, so the sim refused a harvest there. Both are mapped now (this
-    // branch's own fix), so no shipped template is left in that shape: gills
-    // and horn are still waiting on theirs, so this drives the gate through a
-    // real, otherwise-untagged template (warlock_imp) retagged for the
-    // duration of the case, restored in a finally. This arm used to answer on
-    // the tag COUNT and reported the corpse harvestable, which kept the popup
-    // open on an empty body with an enabled Harvest button whose every submit
-    // the server refused. It now reads the sim's own isHarvestableCorpse.
+    // neither, so the sim refused a harvest there. Both are mapped now
+    // (#2905), and Phase 11m mapped gills and horn after them, so no shipped
+    // template is left in that shape: this drives the gate through two real,
+    // otherwise-untagged templates retagged with the synthetic never-mapped
+    // families (tests/helpers/unmapped_family.ts) for the duration of the
+    // case, restored in a finally (warlock_imp all-unmapped,
+    // warlock_voidwalker mixed). This arm used to answer on the tag COUNT and
+    // reported the corpse harvestable, which kept the popup open on an empty
+    // body with an enabled Harvest button whose every submit the server
+    // refused. It now reads the sim's own isHarvestableCorpse.
     const template = MOBS.warlock_imp;
     const priorTags = template.componentTags;
-    template.componentTags = ['gills', 'horn'];
+    template.componentTags = [UNMAPPED_FAMILY, UNMAPPED_FAMILY_2];
+    const mixedTemplate = MOBS.warlock_voidwalker;
+    const priorMixedTags = mixedTemplate.componentTags;
+    mixedTemplate.componentTags = ['hide', UNMAPPED_FAMILY];
     try {
       const depleted = corpseLootAvailability(
         corpse({ templateId: 'warlock_imp', loot: null, harvestClaimedBy: null }),
@@ -140,13 +147,25 @@ describe('corpseLootAvailability', () => {
       expect(withCoin.hasLoot).toBe(true);
       expect(withCoin.canOpen).toBe(true);
       expect(withCoin.visibleCopper).toBe(50);
+      // The discriminator: a template carrying an unmapped family beside a
+      // mapped one stays harvestable, so this is the yield table talking and
+      // not a special case of the corpse-level gate (both fixtures carry
+      // exactly two tags, so it is not the count either).
+      const mixed = corpseLootAvailability(
+        corpse({ templateId: 'warlock_voidwalker', loot: null, harvestClaimedBy: null }),
+        1,
+      );
+      expect(mixed.harvestable).toBe(true);
+      expect(mixed.canOpen).toBe(true);
     } finally {
       template.componentTags = priorTags;
+      mixedTemplate.componentTags = priorMixedTags;
     }
-    // The discriminator on real content: a template carrying an unmapped
-    // family beside a mapped one stays harvestable, so this is the yield
-    // table talking and not a special case of the corpse-level gate.
-    expect(MOBS.sethrael_palecoil.componentTags).toEqual(['hide', 'claw', 'horn']);
+    // ...and on real content: sethrael_palecoil was the shipped mixed
+    // exemplar (hide, claw, horn) until Phase 11m mapped horn; it still
+    // carries horn, every tag it carries maps now, and it is harvestable.
+    expect(MOBS.sethrael_palecoil.componentTags).toContain('horn');
+    expect(MOBS.sethrael_palecoil.componentTags?.every(harvestFamilyYieldsItem)).toBe(true);
     const palecoil = corpseLootAvailability(
       corpse({ templateId: 'sethrael_palecoil', loot: null, harvestClaimedBy: null }),
       1,

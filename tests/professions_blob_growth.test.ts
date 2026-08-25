@@ -720,9 +720,21 @@ describe('the professions blob growth bound (phase 16)', () => {
     // recipe_healing_potion (21, 24) to recipe_lesser_healing_potion (28, 31):
     // predicted 17,143 - 26 - 23 + 7 = 17,101 and measured so (the same
     // temporary exact pin, then the band restored by the same rule).
+    //
+    // AND AGAIN AT masterwrought Phase 11m: 17,120 bytes, upper edge 17,112
+    // to 17,131, floor 16,721 to 16,740. The delta is +19 and it is the
+    // townFocus record, not knownRecipes for once: 11m mapped horn and gills
+    // (state.md row 11m-ORPHAN), which appends two keys to
+    // HARVEST_COMPONENT_ITEMS and so two rows to the fixture's full-budget
+    // focus allocation, `,"horn":1` (9 bytes) and `,"gills":1` (10 bytes):
+    // predicted 17,101 + 19 = 17,120 and measured so (the same temporary
+    // exact pin, then the band restored by the same rule, measurement plus
+    // 11 above, minus 380 below). The ten-key townFocus is the same
+    // content-scaled field it always was (one row per mapped family, never
+    // per player action); what moved is the family count.
     const bytes = professionsBytes(s2);
-    expect(bytes).toBeGreaterThan(16721);
-    expect(bytes).toBeLessThan(17112);
+    expect(bytes).toBeGreaterThan(16740);
+    expect(bytes).toBeLessThan(17131);
     // Strictly dominated by the band's upper edge while the band holds:
     // kept as documentation that the structural ceiling also bounds this
     // state, never the live guard.

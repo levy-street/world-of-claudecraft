@@ -8,6 +8,7 @@ import { isSelfScheduled } from '../src/sim/respawn_policy';
 import type { MobTemplate } from '../src/sim/types';
 import { mobXpValue } from '../src/sim/types';
 import { coinEvPerKill, itemEvPerKill, worldFarmClusters, xpPerKill } from './helpers/farm_yield';
+import { UNMAPPED_FAMILY, UNMAPPED_FAMILY_2 } from './helpers/unmapped_family';
 
 // Budgets are pinned ~25% above the shipped maxima, so ordinary content tuning
 // has room while a structural regression (a coin fill an order of magnitude off,
@@ -221,9 +222,10 @@ describe('harvest-family trash carries usable components', () => {
   });
 
   it('gives every beast, spider and reptile at least one HARVESTABLE tag', () => {
-    // Mapped in HARVEST_COMPONENT_ITEMS specifically: unmapped tags like gills
-    // and horn are dead weight the corpse-harvest command cannot turn into an
-    // item.
+    // Mapped in HARVEST_COMPONENT_ITEMS specifically: an unmapped tag is dead
+    // weight the corpse-harvest command cannot turn into an item (gills and
+    // horn were the shipped examples until Phase 11m mapped both; the
+    // synthetic families below are what stand in for that shape now).
     const bare = governed()
       .filter(
         ({ template }) =>
@@ -241,9 +243,9 @@ describe('harvest-family trash carries usable components', () => {
       [{ componentTags: tags }].filter(
         (t) => !(t.componentTags ?? []).some((tag) => tag in HARVEST_COMPONENT_ITEMS),
       ).length;
-    expect(bareOf(['gills', 'horn'])).toBe(1);
+    expect(bareOf([UNMAPPED_FAMILY, UNMAPPED_FAMILY_2])).toBe(1);
     expect(bareOf(['hide'])).toBe(0);
-    expect(bareOf(['gills', 'hide'])).toBe(0);
+    expect(bareOf([UNMAPPED_FAMILY_2, 'hide'])).toBe(0);
     expect(bareOf([])).toBe(1);
   });
 

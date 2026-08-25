@@ -21,6 +21,7 @@ import type { PlayerMeta } from '../src/sim/sim';
 import { Sim } from '../src/sim/sim';
 import type { Entity, LootEntry, LootSlot, SimEvent } from '../src/sim/types';
 import { expectDefined } from './helpers/defined';
+import { UNMAPPED_FAMILY, UNMAPPED_FAMILY_2 } from './helpers/unmapped_family';
 
 // Direct unit tests for the extracted loot-distribution module (L1). These drive the
 // module's exported `(ctx, ...)` functions through `sim.ctx` (the real SimContext
@@ -626,16 +627,17 @@ describe('loot_roll: corpse-loot helpers (module entry)', () => {
     // The fourth arm, and the reason the harvest half is isHarvestableCorpse
     // here and not a tag COUNT. fen_troll carried claw and tusk, neither
     // mapped at the time, so the command boundary refused a harvest and the
-    // claim could never be spent. Both are mapped now (this branch's own
-    // fix), so no shipped template is left in that shape: gills and horn are
-    // still waiting on theirs, so this retags a real, otherwise-untagged
-    // template (warlock_imp) for the duration of the case, restored in a
-    // finally. Counting tags held the 30s grace window open forever waiting
-    // on it, which is worse than the pre-#2513 world where a player could at
-    // least burn the claim to collapse the corpse.
+    // claim could never be spent. Both are mapped now (#2905), and Phase 11m
+    // mapped gills and horn after them, so no shipped template is left in
+    // that shape: this retags a real, otherwise-untagged template
+    // (warlock_imp) with the synthetic never-mapped families
+    // (tests/helpers/unmapped_family.ts) for the duration of the case,
+    // restored in a finally. Counting tags held the 30s grace window open
+    // forever waiting on it, which is worse than the pre-#2513 world where a
+    // player could at least burn the claim to collapse the corpse.
     const template = MOBS.warlock_imp;
     const priorTags = template.componentTags;
-    template.componentTags = ['gills', 'horn'];
+    template.componentTags = [UNMAPPED_FAMILY, UNMAPPED_FAMILY_2];
     const sim = makeSim();
     try {
       expect(isHarvestableCorpse(template.componentTags)).toBe(false);

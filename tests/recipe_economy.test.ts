@@ -702,10 +702,14 @@ describe('REFERENTIAL INTEGRITY', () => {
     // and the belt (421) reach their floor exactly by one self-signed
     // pristine hide; the maul and the potion sit on it at specialization
     // alone; the quiver reaches 231 by a signed thorium ore, short of the
-    // 196 floor, which also needs a signed trophy; the oiled boots (56
-    // reachable against a floor of 51) and the pouch (51 against 36) never
-    // reach theirs, since the lines a signature would move are a trophy, a
-    // mob drop, vendor staples, and the plain-granted hide and silk.
+    // 196 floor, which also needs a signed trophy; the oiled boots reach
+    // their floor of 51 exactly by one self-signed mudfin scale (Masterwrought
+    // Phase 11m mapped gills to mudfin_scale with NO specimen row, so a gills
+    // harvest signs the scale itself at rare-or-better, which is what turned
+    // the scale from "a mob drop that never signs" into a signable source:
+    // 56 reachable before 11m, 51 after); the pouch (51 against 36) never
+    // reaches its floor, since the lines a signature would move are a
+    // trophy, vendor staples, and the plain-granted hide and silk.
     // Each row's comment in src/sim/content/recipes.ts prints the same three
     // figures. This map does NOT assert any bill above the output; it makes
     // every figure VISIBLE as a literal, so a bill edit, a reagent re-price,
@@ -717,6 +721,7 @@ describe('REFERENTIAL INTEGRITY', () => {
       'goldleaf_herb',
       'elderwood_log',
       'pristine_hide',
+      'mudfin_scale',
     ]);
     const nodeYields = new Set(
       Object.values(NODE_MATERIAL_TABLE).flatMap((byZone) =>
@@ -796,7 +801,13 @@ describe('REFERENTIAL INTEGRITY', () => {
       string,
       { specOnly: number; floor: number; reachable: number; gathered: number }
     > = {
-      recipe_oiled_boots: { specOnly: 56, floor: 51, reachable: 56, gathered: 56 },
+      // reachable 56 to 51 at Phase 11m: the signed mudfin scale takes the
+      // scale line 4 to 3 before the specialization multiplier (3 x 0.75
+      // floors to 2, against 3 unsigned), one scale at its 5-copper unit
+      // value, which lands the reachable bill ON the floor. gathered stays
+      // 56: the scale has no buyValue, so its unit value already IS its
+      // sellValue and re-pricing it as gathered moves nothing.
+      recipe_oiled_boots: { specOnly: 56, floor: 51, reachable: 51, gathered: 56 },
       recipe_gravewyrm_bone_quiver: { specOnly: 291, floor: 196, reachable: 231, gathered: 156 },
       recipe_fenshadow_maul: { specOnly: 222, floor: 222, reachable: 222, gathered: 102 },
       recipe_lesser_healing_potion: { specOnly: 77, floor: 77, reachable: 77, gathered: 32 },
@@ -1047,6 +1058,10 @@ describe('MATERIAL DEMAND COVERAGE', () => {
     'goldleaf_herb',
     'sunpetal_herb',
   ];
+  // Nine DISTINCT ids behind ten families since Masterwrought Phase 11m:
+  // horn reuses curved_tusk (the same hard keratin as tusk) and gills feeds
+  // mudfin_scale, the trophy 11l promoted out of quality 'poor'; neither row
+  // minted an item id, which is why the pin below dedupes the live values.
   const HARVEST_MATERIALS = [
     'rough_hide',
     'wolf_fang',
@@ -1056,6 +1071,7 @@ describe('MATERIAL DEMAND COVERAGE', () => {
     'homespun_cloth',
     'sharp_claw',
     'curved_tusk',
+    'mudfin_scale',
   ];
   const SPECIMENS = [
     'pristine_hide',
@@ -1096,8 +1112,16 @@ describe('MATERIAL DEMAND COVERAGE', () => {
   it('pins the harvest material and specimen literals to the live component tables', () => {
     // Same anti-rot arm as the node yields above: the next harvest family
     // must join these lists (and so the consumed-by-a-recipe sweep below), not
-    // drift past them the way #2905's claw/tusk trio originally shipped.
-    expect([...HARVEST_MATERIALS].sort()).toEqual(Object.values(HARVEST_COMPONENT_ITEMS).sort());
+    // drift past them the way #2905's claw/tusk trio originally shipped. The
+    // live side is deduped because two families may share one id (horn and
+    // tusk both feed curved_tusk since Phase 11m): the sweep is over ITEMS a
+    // recipe must consume, and an id is consumed or not however many
+    // families grant it. The family count is pinned beside it so the dedupe
+    // cannot hide a dropped row.
+    expect([...HARVEST_MATERIALS].sort()).toEqual(
+      [...new Set(Object.values(HARVEST_COMPONENT_ITEMS))].sort(),
+    );
+    expect(Object.keys(HARVEST_COMPONENT_ITEMS)).toHaveLength(10);
     expect([...SPECIMENS].sort()).toEqual(Object.values(HARVEST_COMPONENT_SPECIMENS).sort());
   });
 
