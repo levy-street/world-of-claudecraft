@@ -582,9 +582,16 @@ describe('item level: the phase 11l trophy recipe outputs (TROPHY_RECIPES)', () 
   // tiers (train_view.ts tierForSkill), the training fee and the craft cast
   // read the same bucket, and the mastery model pinned only the hobnail row,
   // so a within-band drift (25 to 49) on six of the seven rows survived every
-  // suite (the 11l QA's test-coverage audit, mutation-proven). The doctrine
-  // says each row's rung follows its trophy's drop band (zone 1 to 0, zone 2
-  // to 25, zone 3 and dungeon to 50), and this literal holds it to the digit.
+  // suite (the 11l QA's test-coverage audit, mutation-proven). The literal
+  // holds each row's rung to the digit; the rung is NOT derivable from a
+  // drop-zone rule, and this map is the record of why each sits where it
+  // does: the four zone-3 and dungeon trophies (the wyrm scale, the ogre
+  // tusk, the pelt, the cinderscale) feed the rung-50 registers; the mudfin
+  // scale drops from level 3 to 20 and the tallow from 4 to 15, and their
+  // rows sit at 25 on the marshstalker leather rung and under the rung-25
+  // healing draught (the potion is placed by the ladder, not by the drop);
+  // the bandana's four sources split two zone-1 and two level-20, and the
+  // rung-0 tailoring row is the honest tie-break for a 6-copper drop.
   const TROPHY_RECIPE_RUNGS: Record<string, number> = {
     recipe_oiled_boots: 25,
     recipe_gravewyrm_bone_quiver: 50,

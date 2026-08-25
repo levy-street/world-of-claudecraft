@@ -321,8 +321,12 @@ describe('MATERIAL_ITEM_IDS: class exclusions, keyed on KIND against the live ca
     }
     // Non-vacuity: a rename of the 'poor' quality token must not leave this
     // sweep iterating nothing (16 poor items at the 11l QA; the build's
-    // comment said 13 against a live 14, an off-by-one the QA measured).
-    expect(poor).toBeGreaterThan(9);
+    // comment said 13 against a live 14, an off-by-one the QA measured, and
+    // its floor of 9 sat 37 percent under the count, so the floor now sits
+    // near it, the round's own standard; re-derive it DOWNWARD with the next
+    // promotion, never delete it). The exact live set is pinned below in
+    // SURVIVING_POOR_JUNK; this is the belt to that suspenders.
+    expect(poor).toBeGreaterThan(12);
   });
 
   it('excludes the named settlement cases: implements, charms, cosmetics, oddments', () => {
@@ -665,6 +669,15 @@ describe('phase 11l trophy promotion: the promoted set, exactly', () => {
     mudfin_scale: 5,
     tallow_candle: 5,
   };
+  // The three output-excluded trophies (the tusk at the sixth fix round, the
+  // nugget and the fetish at the 11l QA) went BACK to poor with their
+  // sellValue frozen too, and that half of the claim left the promoted map
+  // when they did; pinned here so the revert is measured on both axes.
+  const RESTORED_POOR_SELL_VALUE: Record<string, number> = {
+    chipped_tusk: 15,
+    bogiron_nugget: 12,
+    cracked_fetish: 14,
+  };
   // The 16 survivors as the LIVE poor set must read, sorted.
   const SURVIVING_POOR_JUNK = [
     'amber_hide',
@@ -706,6 +719,11 @@ describe('phase 11l trophy promotion: the promoted set, exactly', () => {
         expect(def?.quality, `${id} should stay poor`).toBe('poor');
         expect(MATERIAL_ITEM_IDS.has(id), `${id} should stay out of the material set`).toBe(false);
       }
+    }
+    expect(Object.keys(RESTORED_POOR_SELL_VALUE)).toHaveLength(3);
+    for (const [id, sellValue] of Object.entries(RESTORED_POOR_SELL_VALUE)) {
+      expect(SURVIVING_POOR_JUNK, `${id} is a survivor`).toContain(id);
+      expect(ITEMS[id]?.sellValue, `${id} sellValue must stay frozen`).toBe(sellValue);
     }
   });
 

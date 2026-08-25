@@ -730,10 +730,17 @@ describe('REFERENTIAL INTEGRITY', () => {
     // signed grants in its place), so it can never carry the crafter's own
     // signature; the 11l QA corrected the predicate, whose earlier reading
     // (every component signable) called rough_hide and spider_silk signable.
+    // This is a MODEL of the interaction.ts grant arms over the data tables,
+    // not the arms themselves: the production behavior (a specimen family's
+    // plain component stays unsigned, every family) is pinned in
+    // tests/corpse_harvest_sim.test.ts, which is what would red if the arms
+    // changed under this model.
     const plainGrantedComponents = new Set(
-      Object.keys(HARVEST_COMPONENT_SPECIMENS).map(
-        (family) => (HARVEST_COMPONENT_ITEMS as Record<string, string>)[family],
-      ),
+      Object.keys(HARVEST_COMPONENT_SPECIMENS).map((family) => {
+        const component = (HARVEST_COMPONENT_ITEMS as Record<string, string | undefined>)[family];
+        if (component === undefined) throw new Error(`specimen family ${family} has no component`);
+        return component;
+      }),
     );
     expect(plainGrantedComponents.has('rough_hide')).toBe(true);
     expect(plainGrantedComponents.has('spider_silk')).toBe(true);

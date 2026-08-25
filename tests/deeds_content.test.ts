@@ -1829,15 +1829,17 @@ describe('col_junk_drawer stays completable after the phase 11l trophy promotion
   // knows: mob loot (the delve and rift tables are merged into MOBS, and are
   // walked again by name so a future un-merge cannot hide them), the heroic
   // boss tables (HEROIC_BOSS_LOOT), the four rift clear and world-drop id
-  // lists (RIFT_*_ITEM_IDS), the Drowned Litany chest table (every LootTier,
-  // every class, both bountiful arms), vendor stock (NPC rows, the heroic
+  // lists (RIFT_*_ITEM_IDS), the two delve chest tables, the Drowned Litany
+  // and the Collapsed Reliquary (every LootTier, every class, both bountiful
+  // arms), vendor stock (NPC rows, the heroic
   // quartermaster, the delve shops), the World Market's house stock
   // (MARKET_HOUSE_STOCK), ground pickups, every fishing cell in every band,
   // quest rewards, and recipe outputs.
   //
   // The heroic, rift, delve and MARKET_HOUSE_STOCK arms contribute no poor
-  // id today (78 heroic and rift entries, 189 chest entries and the 23 house
-  // stock rows visited, zero poor), so they are scope insurance rather than
+  // id today (78 heroic and rift entries, 355 chest entries (189 Litany and
+  // 166 Collapsed Reliquary) and the 23 house stock rows visited, zero
+  // poor), so they are scope insurance rather than
   // a pin: a poor id authored onto one of those tables later enters the walk
   // here instead of stranding the deed unseen.
   //
