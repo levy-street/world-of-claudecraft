@@ -246,7 +246,9 @@ describe('harvest-family trash carries usable components', () => {
     // Positive control on the PIPELINE, not only the predicate: one bare
     // synthetic entry must come out as exactly one formatted row.
     expect(
-      bareRows([{ template: { id: 'x', componentTags: [UNMAPPED_FAMILY] } as MobTemplate, zoneId: 'z' }]),
+      bareRows([
+        { template: { id: 'x', componentTags: [UNMAPPED_FAMILY] } as MobTemplate, zoneId: 'z' },
+      ]),
     ).toEqual(['x (z)']);
   });
 

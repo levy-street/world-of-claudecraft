@@ -17331,7 +17331,8 @@ reproduces the qr-11m-SUPPLY correction exactly on the merged tree:
 arcane_shard has 12 consumers and 21 units over recipes.ts AND enchants.ts
 (the two rung-25 charms at 5 each; nine enchant rows at 1 and the Lucent
 Infusion at 2, the per-row split the 11m QA sink lane corrected: the
-earlier "four Lucent rows at 1" summed to 20), and its supply is the family's scarcest (epic and
+earlier "four Lucent rows at 1" summed to 20), and its supply is the
+family's scarcest (epic and
 legendary disenchants only, one shard per disenchant regardless of item
 level, against dust's quantity-scaled yield). The stale "2 recipes, 10
 units, dead-end rung" premise is falsified as the settled row said, and the
