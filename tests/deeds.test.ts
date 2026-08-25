@@ -1174,12 +1174,15 @@ describe('persistence', () => {
     // taken, the only writer that runs is the 1 Hz sweepProximityMarks, which
     // mints poi: and witness: marks, so those two namespaces are all this arm
     // can observe. The other names cover deeds.ts's own event-driven marks
-    // (fish, npc, slain, quality, fiesta, and the farm and farm_crop marks
-    // onCropHarvestedForDeeds mints) plus the gather, gather_event and dungeon
-    // marks other modules route through ctx.markVisited; the crafting marks
-    // (masterwork, craft_rare, relic, apex feast) are not listed and not
-    // reachable here. A mark outside the list fails whichever writer minted
-    // it, but only the sweep's two namespaces are exercised by this scenario.
+    // (fish, npc, slain, quality, fiesta, plus the farm and farm_crop
+    // namespaces: professions/farming.ts mints farm:planted inline at plant
+    // success, and its harvest arm calls onCropHarvestedForDeeds, which mints
+    // farm:<zone> and farm_crop:<crop>) plus the gather, gather_event and
+    // dungeon marks other modules route through ctx.markVisited; the crafting
+    // marks (masterwork, which the relic marks ride via isCataloguedRelicMark,
+    // craft_rare, apex_feast) are not listed and not reachable here. A mark
+    // outside the list fails whichever writer minted it, but only the sweep's
+    // two namespaces are exercised by this scenario.
     for (const mark of meta.deedStats.visited) {
       expect(mark).toMatch(
         /^(poi|gather|gather_event|fish|npc|slain|quality|fiesta|dungeon|witness|farm|farm_crop):/,

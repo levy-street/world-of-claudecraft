@@ -997,6 +997,28 @@ function scanEmitCandidates(simSrc: string, serverSrc: string): Cand[] {
   for (const m of serverSrc.matchAll(s4)) cands.push({ type: 'error', tmpl: unq(m[1]) });
   const s5 = new RegExp(`(?:this\\.info|notifyGuildOfficers)\\([^,()]+,\\s*${lit}`, 'g');
   for (const m of serverSrc.matchAll(s5)) cands.push({ type: 'log', tmpl: unq(m[1]) });
+  // Ternary payloads through the same social helpers (both branches), the ert
+  // shape above in server/social.ts clothing: the guild-create name_taken arm
+  // routes `cond ? LIT : LIT` through this.err, and biome wraps the call, so
+  // the condition and each branch sit on their own lines. The `\\s*` before the
+  // `?` and around the `:` admit that layout; the literal-only s4/s5 above
+  // cannot see either branch of a ternary payload.
+  const s4t = new RegExp(`this\\.err\\([^,()]+,\\s*${cond}\\s*\\?\\s*${lit}\\s*:\\s*${lit}`, 'g');
+  for (const m of serverSrc.matchAll(s4t)) {
+    cands.push({ type: 'error', tmpl: unq(m[1]) });
+    cands.push({ type: 'error', tmpl: unq(m[2]) });
+  }
+  // No live this.info/notifyGuildOfficers ternary site today; kept for
+  // symmetry with s4t so the FIRST one added is harvested instead of shipping
+  // English (the synthetic regression arm below exercises this companion).
+  const s5t = new RegExp(
+    `(?:this\\.info|notifyGuildOfficers)\\([^,()]+,\\s*${cond}\\s*\\?\\s*${lit}\\s*:\\s*${lit}`,
+    'g',
+  );
+  for (const m of serverSrc.matchAll(s5t)) {
+    cands.push({ type: 'log', tmpl: unq(m[1]) });
+    cands.push({ type: 'log', tmpl: unq(m[2]) });
+  }
   const seen = new Set<string>();
   return cands.filter((c) => {
     const k = `${c.type} ${c.tmpl}`;
@@ -1330,7 +1352,9 @@ describe('S3: every sim.ts emit is recognized (drift guard)', () => {
   // text goes through this.err(charId, '...') (an error), this.info(charId,
   // '...') (a log line) and notifyGuildOfficers(guildId, '...') (a log line to
   // a guild's online officers), which the s4/s5 regexes in scanEmitCandidates
-  // harvest; the few inline { type: 'log', text } broadcasts ride s1. Every
+  // harvest; a `cond ? LIT : LIT` payload through the same helpers (the
+  // guild-create name_taken arm) rides their s4t/s5t ternary companions; the
+  // few inline { type: 'log', text } broadcasts ride s1. Every
   // literal harvested today is a server_i18n matcher row, so with those shapes
   // scanned the NEXT literal added to that file in its own idiom fails here
   // instead of shipping English to every locale.
@@ -1610,7 +1634,7 @@ describe('S3: every sim.ts emit is recognized (drift guard)', () => {
 
 // Regression for the S3 hardening: prove the scanner ENUMERATES each emit form it was
 // hardened to cover, by feeding it synthetic source. If a future refactor drops one of
-// the regexes (s1/s1t/s2/s3/s4/s5/nr/ert/e3), the matching assertion bites - so the drift
+// the regexes (s1/s1t/s2/s3/s4/s4t/s5/s5t/nr/ert/e3), the matching assertion bites - so the drift
 // guard cannot silently lose coverage of a whole emit shape.
 describe('S3 scanner enumerates each hardened emit form (regression)', () => {
   const synthSim = [
@@ -1639,6 +1663,11 @@ describe('S3 scanner enumerates each hardened emit form (regression)', () => {
     "this.err(actor.characterId, 'SYNTH_SOCIAL_ERR');", // s4
     "this.info(\n  actor.characterId,\n  'SYNTH_SOCIAL_INFO_WRAPPED',\n);", // s5 (info, wrapped)
     'await this.notifyGuildOfficers(guild.id, `SYNTH_SOCIAL_OFFICERS ${x}`);', // s5 (officers)
+    // s4t: the guild-create idiom, a ternary payload through this.err with the
+    // call wrapped the way biome lays the real site out (the id, the condition
+    // and each branch on their own lines). BOTH branches must be harvested.
+    "this.err(\n  actor.characterId,\n  result.error === 'name_taken'\n    ? 'SYNTH_SOCIAL_ERR_TERN_A'\n    : 'SYNTH_SOCIAL_ERR_TERN_B',\n);", // s4t (wrapped ternary)
+    "this.info(charId, ok ? 'SYNTH_SOCIAL_INFO_TERN_A' : 'SYNTH_SOCIAL_INFO_TERN_B');", // s5t
     // s4 anti-bleed: a single-arg this.err() must stop its first-arg scan at ')'
     // and NOT span into a following call's literal.
     "this.err(charId); track(metric, 'SOCIAL_BLEED_SENTINEL_should_not_capture');",
@@ -1666,6 +1695,10 @@ describe('S3 scanner enumerates each hardened emit form (regression)', () => {
     ['social this.err literal (s4)', 'error', 'SYNTH_SOCIAL_ERR'],
     ['social this.info literal, wrapped call (s5)', 'log', 'SYNTH_SOCIAL_INFO_WRAPPED'],
     ['social notifyGuildOfficers template (s5)', 'log', 'SYNTH_SOCIAL_OFFICERS ${x}'],
+    ['social this.err ternary, branch A, wrapped call (s4t)', 'error', 'SYNTH_SOCIAL_ERR_TERN_A'],
+    ['social this.err ternary, branch B, wrapped call (s4t)', 'error', 'SYNTH_SOCIAL_ERR_TERN_B'],
+    ['social this.info ternary, branch A (s5t)', 'log', 'SYNTH_SOCIAL_INFO_TERN_A'],
+    ['social this.info ternary, branch B (s5t)', 'log', 'SYNTH_SOCIAL_INFO_TERN_B'],
   ];
 
   it('every hardened emit form is enumerated by scanEmitCandidates()', () => {
