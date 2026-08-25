@@ -17945,3 +17945,250 @@ HANDOFF: Phase 11n (phase-11n-vendor-floor.md). Its own STOP rule fires
 at its STEP 0 by record: the both-sourced set re-derives to NINE ids and
 elixir_of_the_bear's Mirefen drop is 0.8 percent, both already written
 into its file by the 11m sync.
+
+## Phase 11n ledger (2026-08-25, the vendor floor)
+
+STATUS: COMPLETE. LOCAL, no push, no PR. Decision 13 EXECUTED AS SETTLED
+(11n-D-13, 11n-BOTH as widened by qr-11n-WIDE row 127 and resolved over
+the nine by qr-11n-NINE row 134; nothing re-decided, this ledger cites
+the settled rows rather than restating them). The maintainer ruling
+relayed 2026-08-25 resolved the recorded STEP 0 STOP before any edit:
+recorded as farming/state.md row 134 and inlined into the phase file as
+dated AMENDED lines, the phase's first commit (5f291a174e).
+
+### STEP 0
+git clean at 93bb9855c4 (the 11m QA stamp); origin/release/v0.41.0
+fetched, still at ff2837da1f, zero new commits, no merge audit owed; tsc
+clean; both regens zero-diff; DATABASE_URL unset. Baselines inherited as
+expected, zero drift.
+
+### THE STOP AND ITS RESOLUTION (qr-11n-NINE)
+The both-sourced set re-derived on this tree to EXACTLY the ruled NINE
+(vendorItems intersected with ALL_RECIPES results): the four
+smith_haldren gear ids, elixir_of_the_bear, minor_healing_potion,
+tough_jerky, lesser_healing_potion (the 11l QA re-pick), linen_pouch.
+Classification per the ruling: four handled by the settled stock pulls;
+FIVE magnitude-exempt (minor_healing_potion, lesser_healing_potion,
+elixir_of_the_bear, tough_jerky, linen_pouch; linen_pouch is a BAG,
+allowlist-only). lesser_healing_potion is exempt exactly like
+minor_healing_potion, so the lesser hp rung (190 vs goldleaf 200, +5.3
+percent) is recorded EXEMPT, never a miss, and decision 13's
+illustrative "190 to 173" no longer applies. The STOP re-armed at NINE
+and held. The live post-pull intersection is FOUR (lesser_healing_potion,
+linen_pouch, minor_healing_potion, tough_jerky), pinned; the derivation
+basis is NPCS.vendorItems ONLY, documented at the arm (a wider basis
+including the Merchant's house would add oiled_boots and trip a false
+nine-set STOP over a basis change, not a catalog change).
+
+### THE PAIRING TABLE, BEFORE AND AFTER
+Potions (rungs minor/lesser/standard = 10/15/20 percent):
+- minor_healing_potion 110 vs silverleaf_healing_draught 120: +9.1,
+  EXEMPT (both-sourced), unchanged
+- minor_mana_potion 145 vs silverleaf_mana_draught 160: +10.3, already
+  clears, unchanged
+- lesser_healing_potion 190 vs goldleaf_healing_draught 200: +5.3,
+  EXEMPT (qr-11n-NINE), unchanged
+- lesser_mana_potion 250 -> 226 (260/1.15 floored): +4.0 -> +15.0
+- healing_potion 320 -> 279 (335/1.20 floored): +4.7 -> +20.1
+- mana_potion 410 -> 354 (425/1.20 floored): +3.7 -> +20.1
+Food (tercile over the six crafted tiers that pair with vendor food, 90
+to 980, boundaries 386.7 and 683.3; bottom/middle/top = 10/15/20):
+- baked_bread 61 vs the 90 tier: +47.5, clears, unchanged (bottom)
+- tough_jerky 61: EXEMPT (both-sourced), unchanged
+- brightwood_venison 92 -> 81 (90/1.10): NEGATIVE -> +11.1 (bottom)
+- roasted_boar 117 -> 106 (117/1.10): ZERO -> +10.4 (bottom)
+- fenbridge_rye 243 -> 220 (243/1.10): ZERO -> +10.5 (bottom)
+- smoked_eel 432 -> 375 (432/1.15): ZERO -> +15.2 (middle)
+- trail_hardtack 552 -> 480 (552/1.15, exact): ZERO -> +15.0 (middle)
+- roast_mountain_goat 874 -> 816 (980/1.20): +12.1 -> +20.1 (top)
+Elixir: elixir_of_the_bear magnitude EXEMPT; its alchemist_verane stock
+row PULLED (the zero-margin twin of crafted elixir_of_the_serpent, the
+one vendor-sold buff in the catalog). Achieved margins monotone
+non-decreasing by rung on both bound axes: mana 10.3/15.0/20.1, food
+10.4/15.0/20.1; the hp axis has one bound rung (standard, +20.1) with
+its minor and lesser rungs recorded exempt.
+
+### TERCILE-RANGE DERIVATION DRIFT, RECORDED
+The crafted food line runs SEVEN magnitude tiers on this tree (90 to
+1392): the apex role foods (sageleaf_chowder, stonepot_stew,
+warspice_skewers at 1392) landed 2026-08-14 and were PRESENT when
+qr-11n-WIDE recorded "six tiers" on 2026-08-20 (ancestry-verified:
+5096551bd1 is an ancestor of b424828fee). The settled tercile range is
+therefore the six tiers that PAIR with vendor food (90 to 980): the apex
+tier faces no vendor competitor, and the seven-tier reading would
+re-derive roast_mountain_goat to the middle rung, contradicting row
+127(b)'s settled 20 percent top-rung target. The six-tier pairing range
+was adopted; every qr-11n-WIDE illustration reproduces exactly under it.
+
+### THE TWO EXCLUSION LISTS (each its own pinned arm)
+1. No crafted counterpart: the FIVE vendor drinks (spring_water 76,
+   marsh_mint_tea 288, silvermist_cordial 436, meltwater_flask 672,
+   glacier_melt 900), re-derived: zero crafted drinkMana items exist
+   anywhere, pinned with a crafted-side positive control. The R21-shaped
+   crafted-drink-line gap recorded by qr-11n-WIDE(d) stands (future
+   content, never an 11n nerf); conjured mage food stays outside R23's
+   vendor-sold scope by wording.
+2. Both-sourced: the nine of qr-11n-NINE, classified above.
+
+### THE FIVE STOCK PULLS (exactly five; nothing else lost a row)
+- alchemist_verane loses elixir_of_the_bear (zone3.ts): the item, its
+  0.008 fen_troll drop (the corrected figure, pinned per id), its combo
+  recipe (Verane still TEACHES it) and its buyValue 100 all stay.
+- smith_haldren loses eastbrook_arming_sword, eastbrook_chain_vest,
+  eastbrook_wool_trousers, tanned_leather_jerkin (zone1.ts): all four
+  keep defs, buyValues (1400/1800/1100/1600) and their ungated
+  PRE_TRAINING COMMON_RECIPES, so the craft route needs no trainer.
+Vendor stock rows 224 -> 219; the per-vendor 22-entry count map is the
+pinned ratchet (a lost row reds by name). RECORDED CONSEQUENCE (the qa
+gate's read): after the pull no zone-1 vendor sells a legs item and the
+only vendor-sold zone-1 chest is cloth (valespun_robe; tanner_hesk is
+zone 2). The pieces stay reachable via crafting, drops and the market: a
+consequence of the settled pull, recorded so it is not rediscovered as a
+bug. The eastbrook town-NPC payload digest was re-minted (91e9c764 to
+a9448fdd) with a named smith_haldren row assertion BEFORE the digest,
+per that file's own precedent.
+
+### THE POTION-HEADER FRACTIONS, RE-DERIVED IN THE SAME CHANGE
+Reference pools (least tanky class, base stats, bracket tops 7/13/20):
+priest hp 123/240/387, paladin mana 219/415/660. New fractions: potionHp
+0.894/0.792/0.721 (header now "72-90%"), potionMana 0.662/0.545/0.536
+(header now "53-66%"; the old "65-70%" prose was already stale against
+the live pre-change 0.60-0.66). tests/consumables.test.ts re-pinned in
+the same change: golden values 279/226/354, bands re-derived to hp
+0.70-0.92 and mana 0.52-0.68 (the golden pin is the change detector, the
+bands guard pool drift). Every fraction predicted from the arithmetic
+before observed; observed matched to three decimals. master-spec.md's
+four stale food rows updated; no changed value renders in the guide
+(proven three ways: id absence in content.generated.ts, generator
+construction, byte-identical regen).
+
+### LEVELLING-CURVE SANITY
+Every band keeps a stocked heal, mana and food: zone 1 wholly on
+unchanged or gently-moved rungs (bread and jerky 61, venison 81, boar
+106, both minor potions untouched), zone 2 rye 220 / eel 375 / both
+lesser potions, zone 3 hardtack 480 / goat 816 / the standard potions,
+the Veiled Hollow the zone-3 line via provisioner_fenna. The lowered
+standard potions still restore 72 percent of a level-20 priest's base hp
+pool and 54 percent of a level-20 paladin's base mana pool. The nerf is
+weighted to the top rungs by construction; the whole minor tier and the
+bottom hp rung did not move. Cost per point still rises with tier, the
+classic shape.
+
+### R5 UNTOUCHED, PROVEN BY SWEEP
+Content snapshot diff both sides (the census script over ITEMS, NPCS,
+ALL_RECIPES at base and tip): exactly the nine vendor magnitudes
+changed, zero crafted magnitudes moved, item ids 1006 -> 1006 with added
+and removed both empty, recipes 163 -> 163, stock rows 224 -> 219
+(exactly the five pulls). No crafted magnitude rose, so R5's measured
+ceiling is untouched by construction and Phase 15 inherits no new
+measurement. The crafted-only foodHp line is additionally pinned per id
+(26 rows) so a crafted sibling cannot move silently in either direction
+after this phase.
+
+### THE INVARIANT (tests/vendor_floor.test.ts, 53 tests)
+The 10/15/20 ladder per pair (both sides literal, margin recomputed
+live, failures naming pair, achieved and required); the crafted
+counterpart DERIVED as the smallest crafted-only magnitude at or above
+the vendor value and pinned to the literal; per-axis monotonicity of
+required and achieved margins; the both-sourced nine classified three
+ways with the exempt distinction anchored to the live consumable-face
+fact beside the allowlist literal; the exempt magnitudes and the elixir
+payload (aura included) pinned; the five-drink arm with its own positive
+controls; per-axis exhaustiveness set-equality over every vendor-stocked
+consumable (8 foods, 3 hp potions, 3 mana potions, 5 drinks, zero
+elixirs) plus a classification-union arm; ALL FOUR stock counters swept
+(NPCS.vendorItems, DELVE_SHOPS, HEROIC_VENDOR_STOCK,
+MARKET_HOUSE_STOCK) behind vacuity floors near live counts (28, 39, 23)
+with per-arm liveness probes; the per-vendor 22-entry row-count map; the
+per-id keeps arm. tests/consumables.test.ts and the eastbrook digest
+re-mint rode the same change.
+
+### MUTATION KILL TABLE, 9/9 (byte-restore + empty porcelain between)
+1. mana_potion 354 -> 400 (into the band): 2 arms red, pair named.
+2. Same WITH the test's identity literal moved in step: the margin arm
+   alone red ("sunpetal_mana_draught (425) must beat mana_potion (400)
+   by at least 20 percent; achieved 6.3 percent").
+3. spring_water dropped from the exclusion literal: the drink set arm
+   red naming it.
+4. elixir_of_the_bear restored to verane's stock: FOUR arms red
+   (intersection, classification row, verane list, row-count map).
+5. One-for-one stock swap (bogiron_mace -> conjured_bread4, counts
+   unchanged): the foodHp exhaustiveness and classification-union arms
+   red by name (the class that escaped the pre-review suite).
+6. hunters_game_skewer 117 -> 110 (the pinned representative): red.
+7. herbed_marsh_pike 117 -> 110 (an UNPINNED sibling, into the band):
+   the derivation arm alone red ("expected 110 to be 117").
+8. herbed_marsh_pike 117 -> 100 (below the vendor floor): the 26-row
+   map arm red.
+9. highwatch_gourd_soup 552 -> 90 (a crafted food dropped ONTO an
+   existing tier, the class that escaped BOTH earlier arms): the 26-row
+   map arm red.
+
+### THE REVIEW CHAIN (every fix round read fresh; all findings applied)
+The pin census (read-only, whole-tree): the one live red was the
+eastbrook payload digest, re-minted per its file's precedent; two stale
+comment sites and master-spec's four rows, fixed; parity goldens proven
+unaffected (the inventory_vendor scenario buys only unchanged trader
+rows). content-obligations-reviewer: zero blocking, one should-fix
+(per-axis exhaustiveness, applied), two nits (applied); R5 verified
+mechanically, wiki no-op proven three ways, referential integrity clean,
+per-band balance census PASS. test-coverage-auditor: TWO blocking (the
+hand-written pairing table had no completeness sweep, demonstrated by a
+live one-for-one swap escape; the scalar 219 ratchet pinned a count, not
+identity), five should-fix and nits: all applied except ONE refuted nit
+(the profession_items.ts classic-band ladder comment cites the EXTERNAL
+classic-era reference, judged still true against the census's identical
+refutation and my own read). Fix-round reviewer (fresh): zero blocking,
+four should-fix (the one-sided derivation, the delve and heroic side
+tables, the wellFed premise, the literal-to-literal exempt tie),
+applied. Round-two reviewer (fresh): ONE blocking (the distinct-tier set
+missed a crafted food lowered ONTO an existing tier, demonstrated by
+replay over four hypothetical retunes), applied as the 26-row per-id
+map. qa-checklist LAST: READY, ZERO BLOCKING, five should-fix (the
+MARKET_HOUSE_STOCK fourth counter, the boar comment's third carrier, the
+zone-1 gear-slot record above, the wellFed floor, the hp ceiling),
+applied. Final convergence audit over the last two commits: zero
+blocking, three should-fix (the house-fold liveness pin, the elixir-arm
+probe past the short-circuit, the house elixir sweep), applied in the
+closing commit. Judged lists BINDING; do not re-raise.
+
+### RECORDED, NOT ACTED (maintainer reads)
+- Vendor drinks out-scale vendor foods at equal price within a band (rye
+  220 vs tea 288 at 400c; hardtack 480 vs meltwater 672 at 1200c):
+  follows from the settled no-crafted-drink exclusion; in scope the day
+  a crafted drink line exists (the recorded R21 gap).
+- The elixir pull leaves NO vendor-sold buff anywhere in the catalog: a
+  levelling non-alchemist buys buffs from players or farms the 0.8
+  percent drop. The settled 11n-BOTH outcome, recorded as the
+  player-facing consequence.
+- tests/farm_recipes.test.ts's ALLOWED_FOOD_CURVE_POINTS still hardcodes
+  the crafted points (117/243/432/552 with sell values): green because
+  the crafted twins own those points; a future CRAFTED food retune
+  breaks it.
+- Two pre-existing per-point price inversions in the food line did not
+  worsen (boar vs venison narrowed 2.24 to 2.18; hardtack vs eel is
+  cross-zone).
+- The oiled-boots house-listing margin and the quest-gated silk ruling
+  remain the 11m maintainer reads, untouched here.
+- Tooling: vitest 4.1.10 EXITS 0 on an unknown --reporter flag after
+  aborting at startup (reviewer-observed); never trust a wrapper exit
+  around a nonstandard reporter. The freeze wrapper used plain npm test.
+
+### THE FROZEN STAMP: one run, EXIT=0 first try
+At eaa1dbef27 (the review chain's last commit), every reader idle AND
+reported, git status empty, zero vitest processes, DATABASE_URL unset;
+the wrapper wrote TIP first and the suite's EXIT before the follow-on
+stages, one fresh log, no commit anywhere between: 3191 test files
+passed / 21 skipped (3212), 46895 passed / 2 expected fail / 373 skipped
+(47270); tsc clean; ci:changed EXIT=0 over 848 files with zero errors;
+wiki:content and i18n:gen both zero diff; tip and porcelain unchanged
+after every stage. Against the 11m QA stamp (d4ec53da2d: 3190 files / 21
+skipped (3211), 46842 / 2 / 373 (47217)) the drift is exactly +1 test
+file and +53 tests, the vendor_floor suite. The stamp commit after the
+run is docs-only (this ledger, progress.md, the memory note), the
+sanctioned exception to commit-voids-the-run.
+
+HANDOFF: Phase 11n QA (phase-11n-qa.md), the twin. R5's ceiling is
+untouched by construction so Phase 15 inherits no new measurement; the
+qr-11n-NINE ruling and the six-tier tercile-range reading above are the
+two records the twin should re-derive first.
