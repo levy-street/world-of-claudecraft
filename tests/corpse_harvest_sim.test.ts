@@ -867,14 +867,16 @@ describe('two-specimen-family harvest capacity contract', () => {
   }
 
   it('with a genuinely spare slot the jackpot still lands beside both plain yields (seed 6)', () => {
-    // Seed 11 pre-verified: the hide rarity roll clears the signable floor with
+    // Seed 6 pre-verified: the hide rarity roll clears the signable floor with
     // this exact draw sequence (the rolls are inventory-independent, so this
     // arm also proves the exactly-reserved arm below EARNED its jackpot).
     //
-    // Re-seeded 1 -> 11 (#2514) -> 15 (the v0.32.0 base merge) -> 6 (tusk
-    // joining HARVEST_COMPONENT_ITEMS) -> 4 (re-hunted again for the final
-    // rebase onto release/v0.35.0, which shifted the shared content catalog
-    // again). wild_boar is now a corpse with THREE mapped families (hide,
+    // Re-seeded as content moved under the draw order (1, 11 at #2514, 15 at
+    // the v0.32.0 base merge, 16, then 4 at the #2905 claw and tusk wiring,
+    // c53520b499); the v0.35.0 base-sync fixture refresh (d4deed629a)
+    // re-hunted it to the CURRENT 6, where this chain ends (11m QA: the old
+    // text opened "Seed 11" and narrated the abandoned 4 as terminal over a
+    // setup(6) body). wild_boar is now a corpse with THREE mapped families (hide,
     // tusk, meat), so the default harvest extracts all three and the pre-gate
     // reserves a plain-stack slot for each: three reserved slots, not two, so
     // "genuinely spare" is four free slots, not three. Every re-seed for the
@@ -1070,8 +1072,11 @@ describe('corpse signed-guard capacity vs merge room (#2139)', () => {
 //
 // The two rig seeds here were re-hunted (45 to 153, 63 to 104) after the
 // Eastbrook camp respacing merged into this branch, then again (153 to 115,
-// 104 to 211) after the zones 1-3 quest-dedupe content pass, and again (115 to
-// 114, 211 to 50) after the Galecrest quest-camp pass (#2887): any content add
+// 104 to 211) after the zones 1-3 quest-dedupe content pass, again (115 to
+// 114, 211 to 50) after the Galecrest quest-camp pass (#2887), and the fang
+// rig once more by the v0.35.0 base-sync fixture refresh (d4deed629a), 114 to
+// the CURRENT 31, the spill rig's 50 standing (11m QA: the chain used to end
+// at 114 over setup(31) bodies): any content add
 // shifts the shared world-gen draw sequence, and each time the old seed's fang
 // roll stopped clearing the signable floor. Every replacement reproduces the
 // ORIGINAL rig profile exactly (a signed 3-unit epic fang roll, a signed
@@ -2372,7 +2377,9 @@ describe('corpse premium-arm tool gating (Professions 2.0)', () => {
     // from seed 45 after the Eastbrook camp respacing (to 4), then from 4 to
     // 31 after the zones 1-3 quest-dedupe content pass shifted the camp-driven
     // world-gen draw sequence again, then from 31 to 21 after the Galecrest
-    // quest-camp pass (#2887) shifted it once more. Every re-hunt reproduces
+    // quest-camp pass (#2887), and finally from 21 to the CURRENT 15 by the
+    // v0.35.0 base-sync fixture refresh (d4deed629a; 11m QA: the chain used
+    // to end at 21 over soloRig(15) bodies). Every re-hunt reproduces
     // the same 3-unit signable hide roll, so the literals below are unchanged.
     const base = soloRig(15);
     let baseDraws = 0;

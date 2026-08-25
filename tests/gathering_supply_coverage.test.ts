@@ -551,9 +551,12 @@ describe('masterwrought R21: the world eats what the gathering families supply',
     // asking the index for consumers the header already cites: the
     // work-order quest collects copper_ore, and the farming inputs are
     // credited by the verbs that spend them. Nothing here asserts a count or
-    // an exclusivity (a recipe consuming compost tomorrow is allowed); it
-    // asserts the mechanism walked, which is the difference between an index
-    // that covers farming and one that merely lists it.
+    // an exclusivity (a recipe consuming compost tomorrow is allowed). What
+    // these lines pin is that the INDEX keeps walking each mechanism (drop
+    // the farming walk from wideDemandIndex and they red); whether the
+    // ENGINE really spends what the index credits is the other half, pinned
+    // behaviorally in tests/professions_farming.test.ts (compost and tonic
+    // counts decrement through a live Sim), not here (11m QA).
     const sourcesOf = (id: string) => WIDE_DEMAND.get(id)?.consumers ?? [];
     expect(sourcesOf('copper_ore')).toContain('quest:q_prof_workorder_forge');
     expect(sourcesOf(FARM_COMPOST_ITEM_ID)).toContain('farming:plantCrop:compost');
