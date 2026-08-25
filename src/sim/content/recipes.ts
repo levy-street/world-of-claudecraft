@@ -4288,17 +4288,12 @@ export const TROPHY_RECIPES: ProfessionRecipeRecord[] = [
     // Capped at the cinch's live drop source (the Ridge Stalkers, level 13 to
     // 14) so the recipe route cannot re-tier the shipped item past its pinned
     // item level 15 (tests/itemization_coverage.test.ts: 14 plus the uncommon
-    // bonus 1; the recipe.level note in the header). recipe.level has THREE consumers, all
-    // read from this one field: the item level source index
-    // (buildSourceIndex, src/sim/item_level.ts, the cap above);
-    // craftActionXp(recipe.level, characterLevel) in
-    // src/sim/professions/profession_xp.ts, craftActionXp(14, 20) = 19
-    // character XP per craft for a level-20 crafter (green band, 6 below
-    // against zeroDiff 8), against 100 for a level-20 row; and
-    // masterworkBonusStats through craftBonusStatsFor (crafting.ts), which
-    // sizes the masterwork proc's bonus record off this level: the cinch HAS
-    // a stat profile (int 2, spi 2), so the proc can bump it, the shipped
-    // behavior for every stat-bearing output.
+    // bonus 1; the recipe.level note in the header names its three
+    // consumers). Here: craftActionXp(14, 20) = 19 character XP per craft for
+    // a level-20 crafter (green band, 6 below against zeroDiff 8), against
+    // 100 for a level-20 row; and the cinch HAS a stat profile (int 2, spi
+    // 2), so the masterwork proc can bump it, the shipped behavior for every
+    // stat-bearing output.
     level: 14,
     acquisition: ['trainer'],
     stationType: 'tannery',

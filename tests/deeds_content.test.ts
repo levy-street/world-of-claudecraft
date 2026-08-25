@@ -1838,8 +1838,9 @@ describe('col_junk_drawer stays completable after the phase 11l trophy promotion
   //
   // The heroic, rift, delve and MARKET_HOUSE_STOCK arms contribute no poor
   // id today (78 heroic and rift entries, 355 chest entries (189 Litany and
-  // 166 Collapsed Reliquary) and the 23 house stock rows visited, zero
-  // poor), so they are scope insurance rather than
+  // 166 lockpick, pinned below so the count cannot rot silently) and the 23
+  // house stock rows visited, zero poor), so they are scope insurance rather
+  // than
   // a pin: a poor id authored onto one of those tables later enters the walk
   // here instead of stranding the deed unseen.
   //
@@ -1866,9 +1867,10 @@ describe('col_junk_drawer stays completable after the phase 11l trophy promotion
   // (allEpicGearIds), so it is invisible to the NPCS walk and can emit no
   // poor id. The rift clear pools (src/sim/rift/loot_pools.ts) derive from
   // tables the walk already covers: the five-man dungeon mob loot merged
-  // into MOBS, HEROIC_BOSS_LOOT, and RIFT_EPIC_ITEM_IDS. The Collapsed
-  // Reliquary chest table (delveChestItemsForTier, granted by
-  // src/sim/rift/runs.ts) is walked below beside the Litany table: the 11l
+  // into MOBS, HEROIC_BOSS_LOOT, and RIFT_EPIC_ITEM_IDS. The lockpick chest
+  // table delveChestItemsForTier (granted by src/sim/rift/runs.ts and
+  // src/sim/delves/lockpick_controller.ts; today only the Collapsed
+  // Reliquary presets it) is walked below beside the Litany table: the 11l
   // QA found it neither walked nor named, gear-only today, so scope
   // insurance rather than a live defect.
   const reachable = new Set<string>();
@@ -1891,7 +1893,9 @@ describe('col_junk_drawer stays completable after the phase 11l trophy promotion
   // between them reach every id it can ever return (not every branch: the
   // low tier pushes its second uncommon only on a mixed draw, and the medium,
   // premium and bountiful arms push that id unconditionally, so the id set is
-  // complete while one branch is not visited).
+  // complete while one branch is not visited; the lockpick table draws at
+  // most once per call, so the same two stubs cover it a fortiori).
+  let chestEntries = 0;
   const LOOT_TIERS = Object.keys({
     premium: true,
     medium: true,
@@ -1903,9 +1907,11 @@ describe('col_junk_drawer stays completable after the phase 11l trophy promotion
         for (const always of [true, false]) {
           const rng = { chance: () => always } as unknown as Rng;
           for (const entry of drownedLitanyChestItemsForTier(tier, cls, rng, bountiful)) {
+            chestEntries += 1;
             note(entry.itemId);
           }
           for (const entry of delveChestItemsForTier(tier, cls, rng, bountiful)) {
+            chestEntries += 1;
             note(entry.itemId);
           }
         }
@@ -1930,6 +1936,14 @@ describe('col_junk_drawer stays completable after the phase 11l trophy promotion
       .map((d) => d.id),
   );
   const unreachable = [...livePoor].filter((id) => !reachable.has(id)).sort();
+
+  it('the chest walk visits every entry of both tables (a count that cannot rot silently)', () => {
+    // 3 tiers x 9 classes x 2 bountiful arms x 2 stubs = 108 calls per table:
+    // 189 Litany entries and 166 lockpick entries at the 11l QA. A table that
+    // stopped contributing (a renamed export, a tier the satisfies clause
+    // missed) would shrink this before it could hide a poor id.
+    expect(chestEntries).toBe(355);
+  });
 
   it('the reachable poor set is exactly the thirteen survivors with an acquisition route', () => {
     // The chipped tusk is back since the phase's sixth fix round

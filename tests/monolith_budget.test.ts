@@ -489,7 +489,8 @@ const MONOLITHS: MonolithRow[] = [
     // sibling modules. The release re-pinned to its own exact 13541.
     // LOWERED 13571 -> 13569 at the 11l QA's sixteenth sync
     // (release/v0.40.0 efb1220e85 -> 9a89e3483e, merge 7553c795): the
-    // release's far-LOD repair (ec5e9e9afa, 13541 -> 13539) had already
+    // release's far-LOD repair (ec5e9e9afa, 13549 -> 13539, under the
+    // release's own ceiling of 13541) had already
     // landed through the sync that merged efb1220e85 (57b1a09d43, the 11k
     // QA's), whose re-measure covered the hud/sim/main/game/online/db rows
     // but not this one, so the branch parent carried two lines of unbanked

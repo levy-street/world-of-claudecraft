@@ -722,7 +722,9 @@ describe('phase 11l trophy promotion: the promoted set, exactly', () => {
     }
     expect(Object.keys(RESTORED_POOR_SELL_VALUE)).toHaveLength(3);
     for (const [id, sellValue] of Object.entries(RESTORED_POOR_SELL_VALUE)) {
-      expect(SURVIVING_POOR_JUNK, `${id} is a survivor`).toContain(id);
+      // Read off the live def, not the sibling literal (a literal-to-literal
+      // membership check reads no production state).
+      expect(ITEMS[id]?.quality, `${id} is poor again`).toBe('poor');
       expect(ITEMS[id]?.sellValue, `${id} sellValue must stay frozen`).toBe(sellValue);
     }
   });
@@ -731,7 +733,7 @@ describe('phase 11l trophy promotion: the promoted set, exactly', () => {
     // The frozen-21 loop above only visits ids it already knows, so a poor
     // item authored AFTER the phase 11l boundary would never enter it: this
     // exact-set pin over the whole catalog closes that direction. The
-    // toBeGreaterThan(9) floor in the quality sweep stays as the settled
+    // toBeGreaterThan(12) floor in the quality sweep stays as the settled
     // non-vacuity guard; this is the membership pin beside it, not a
     // replacement for it.
     expect(
