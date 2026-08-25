@@ -598,7 +598,8 @@ except the one hand-back, which gets its own table row:
 | The masterwrought delegated-rulings block (133 rows, the full delegation plus the same-day reconcile pass), migrated here whole at the 11b doc move | MW 11b | record | closed-by-the-2026-08-20-delegation (block below) |
 | The guide professions-overview reword (ruling 11b-R3c-2): write the merged five-gathering sentence around guide.profPages plus the five non-Latin overlays, AND reconcile it with farming's count-free guard in tests/guide.test.ts, which forbids ANY spelled count while the ruling's wording spells "five"; 11c records whichever way it resolves (11b carry items 4 and 14) | MW 11c | 11c session | CLOSED 2026-08-21, executed COUNT-FREE: guide.professions.whatBody rewritten ("the gathering trades ... a ring of ten crafts"; "every gathering profession") with real count-free fills in the five non-Latin overlays; the guard stands unamended (its names-every-trade arm is self-maintaining) and ruling row 6 below carries the dated wording amendment; the stale professions.ts code comment swept (carry 15); reasoning in the 11c BUILT ledger |
 | The interaction-priority pin (ruling 11b-R3c-1): the placed transient (station or feast) wins over the farm bed. The merged tree keeps farming's shipped bed-over-feast order and masterwrought stations take NO press today (proximity-activated), so the both-directions pin needs the arm reorder first; owned by 11c per the ruling's carry clause, with the apex-feast press also concerning 11k (11b carry item 7) | MW 11c | 11c session | CLOSED 2026-08-21, EXECUTED (not re-routed): tryNearbyInteraction reordered (nodes, feast, bed, escort-away) and BOTH directions pinned in one tests/nearby_interaction.test.ts rig; the station half stays moot by construction (stations take no press; recorded at the arm), and 11k's apex feasts ride the ordered feast arm as placed farm_feast entities |
-| `col_junk_drawer` (src/sim/content/deeds.ts, "Discover 10 different poor-quality items", renown 5) has ONE of margin since 11l: its meter recounts itemsDiscovered against LIVE quality, and promoting seven junk trophies to common cut the reachable poor pool from 18 to 11 against an amount of 10 (one of margin; it sat at exactly 10 until the sixth fix round returned chipped_tusk to poor; amber_hide, soft_down and stag_antler, the Brightwood Glade wildlife pack, have no acquisition route anywhere), so all but one obtainable poor item is now required (deepfen_pearl from a dungeon final boss and soggy_boot from fishing included) and a character holding promoted trophies sees an in-progress counter regress (earned deeds are never revoked). A phase may not retro-edit a shipped trigger (docs/design/deeds.md), which names retroFallbackGrants as the sanctioned heal; the candidates are lowering the amount through that heal or sourcing the wildlife pack. tests/deeds_content.test.ts pins the reachable set (11), the unreachable set (3) and amount <= reachable, so the promotion after next reds instead of stranding the deed. Found by the 11l content reviewer; the 11l BUILT ledger carries the derivation | MW 11l | maintainer | open ruling-owed (opened 2026-08-24) |
+| `col_junk_drawer` (src/sim/content/deeds.ts, "Discover 10 different poor-quality items", renown 5) has THREE of margin since the 11l QA (one at the 11l build): its meter recounts itemsDiscovered against LIVE quality, and promoting five junk trophies to common (seven at the build; the QA excluded the bogiron nugget and the cracked fetish, poor again) cut the reachable poor pool from 18 to 13 against an amount of 10 (it sat at exactly 10 until the sixth fix round returned chipped_tusk to poor, and at 11 until the QA; amber_hide, soft_down and stag_antler, the Brightwood Glade wildlife pack, have no acquisition route anywhere), so ten of thirteen obtainable poor items are required (deepfen_pearl from a dungeon final boss and soggy_boot from fishing included) and a character holding promoted trophies sees an in-progress counter regress (earned deeds are never revoked). A phase may not retro-edit a shipped trigger (docs/design/deeds.md), which names retroFallbackGrants as the sanctioned heal; the candidates are lowering the amount through that heal or sourcing the wildlife pack. tests/deeds_content.test.ts pins the reachable set (13), the unreachable set (3) and amount <= reachable, so the fourth promotion from here reds instead of stranding the deed. Found by the 11l content reviewer; the 11l BUILT and QA ledgers carry the derivation | MW 11l | maintainer | open ruling-owed (opened 2026-08-24) |
+| Zone 1 (Eastbrook Vale, levels 1 to 7) carries NO poor mob drop since 11l: its only three gray drops were bandit_bandana, tallow_candle and mudfin_scale, all promoted, so a starter-zone character has nothing for the Sell Junk button the guide teaches (guide.ts junkBody) until zone 2, and only the band-0 fishing pair (tangled_weed, soggy_boot) as gray. The candidates are authoring one poor drop back onto a zone-1 mob table (content design, the maintainer's) or accepting the affordance gap on the record. Distinct from the col_junk_drawer margin (a completability count); found by the 11l QA's content reviewer and recorded in the TROPHY_RECIPES exclusion record as a consequence, not healed | MW 11l QA | maintainer | open ruling-owed (opened 2026-08-24) |
 
 ### Decisions closed 2026-08-20 (the full delegation)
 
@@ -4610,3 +4611,28 @@ inscription keeps one row: the phase file's "jewelcrafting and inscription are t
 point" was intent the doctrine could not honour on this catalog. Recorded under row
 122's own clause (excluded and recorded, exactly like a value exclusion); nothing
 was re-decided. The full derivation per id is in the 11l BUILT ledger in state.md.
+
+## Phase 11l QA note (2026-08-24): the count moved once more, and one row ADDED
+
+THE 11l QA RAN THE SAME STANDARD OVER THE ROWS THE BUILD DID NOT RE-PICK (R21
+applied to the OUTPUT against the trainer's own rows, the clause that excluded the
+chipped tusk) and two more fall to it strictly: valefire_lantern (int 1 spi 1, item
+level 7) beside the same-rung goldleaf_folio (int 3 spi 2, a 150 bill) and the rung-0
+silverleaf_primer, and hobnail_boots (armor 18, a 100 bill) beside the rung-0
+coppermail_sabatons (armor 38, a 46 bill). Both rows were trophy sinks whose only use
+was the vendor loop, and no other uncrafted output sits in either band, so
+cracked_fetish and bogiron_nugget are EXCLUDED under row 122's own clause (the eighth
+and ninth output exclusions, their defs back to the pre-phase bytes): SEVEN adopted,
+TWELVE excluded, two held out. Inscription's lane is now EMPTY like jewelcrafting's
+and engineering's, and armorcrafting keeps no trophy row. The healing potion row
+inverted alchemy's ladder (320 HP for an 82 bill at rung 25 against the trainer's 200
+HP draught at 140) and is re-picked to lesser_healing_potion (190 HP), under the
+rung-25 draught and above the rung-0 pair; the vendor's own 320 HP potion at 170
+already undercut the draught's bill, a pre-existing tension that is the maintainer's.
+The maul (dominated on every axis but agility 2 by the rung-25 ironshod_maul) and
+the oiled boots (near-dominated by the rung-0 fenbridge boots) are recorded at their
+rows as tuning reads, not excluded; the quiver joins the maul on the maintainer's
+surplus list under gathered-cost accounting (+164 and +278 after the sink, pinned).
+Rows 82 to 85 and 122 to 123 stand; nothing was re-decided. ONE ROW ADDED to the
+handoff table (zone 1's loss of every poor mob drop, above); the col_junk_drawer row
+above re-reads at three of margin.

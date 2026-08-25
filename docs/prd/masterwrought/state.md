@@ -15840,6 +15840,15 @@ trophy consumer rows, the economy recompute plus wiki regen, the first review
 fix round, the second round (two more adoptions plus every fix-round finding),
 and the docs.
 
+SUPERSEDED IN PART BY THE 11l QA LEDGER (the section after this one, dated
+2026-08-24): the QA judged the eight rows this ledger did not re-pick under the
+same standard that excluded the chipped tusk and excluded two more (the
+lantern's fetish and the boots' nugget), and re-picked the potion row's output,
+so the live count is SEVEN adopted, TWELVE excluded, two held out. The counts
+below (nine, ten, 117, fourteen survivors, eleven reachable) are the build's
+dated record; the QA ledger carries what replaced each. The stale prose the QA
+readers caught in this ledger is corrected in place and marked.
+
 THE PHASE IN ONE LINE: nine orphaned junk drops feed a craft instead of a
 vendor, at zero new item ids; the settled record predicted fourteen, and the
 record's own output doctrine, run row by row for the first time, is what moved
@@ -15890,8 +15899,10 @@ phase executed them without re-deciding anything:
 (`bone_fragments`, `linen_scrap`, `spider_leg`, `wolf_fang`, the precedent).
 Four are the tier-4 farm seeds (`evergarden_greens_seed`,
 `evergarden_pumpkin_seed`, `gilded_sunmelon_seed`, `gilded_yam_seed`): kind
-junk, quality common, sellValue 8, dropped by Nythraxis at 0.04 and stocked by
-the Heroic Quartermaster, and consumed by the PLANT action
+junk, quality common, sellValue 8, dropped by Nythraxis at 0.04, stocked by the
+Heroic Quartermaster (12 marks) and by farmer_verbena (buyValue 64), plus an 8
+percent appended rift draw (`src/sim/rift/progression.ts`; the QA's spend lane
+supplied the two sources this line omitted), and consumed by the PLANT action
 (`professions/farming.ts` `removeUnlockedFromSlots`), which the recipe-reagent
 predicate cannot see. They are already `FARM_MATERIAL_ITEM_IDS` members and are
 recorded here as a NAMED NON-ADOPTION with that reason, not as orphans. The
@@ -15944,8 +15955,9 @@ poor trophies promote to common, the two leather trophies were common already):
 
 Unit values are buyValue-first per `tests/recipe_economy.test.ts` (flux 20,
 vial 12, goldleaf 60, thorium 60, elderwood 160, thread 12, tanning agent 16;
-ores, herbs, dust, essence, hides at 5 and 25, silk and every trophy at
-sellValue). Every bill contains its trophy, which has no buyValue, so no row
+copper ore 5 and iron ore 8, dust 5, arcane essence 18, hides at 5 and 25, silk
+and every trophy at sellValue; the QA corrected the iron and essence figures
+this line had folded into "5 and 25"). Every bill contains its trophy, which has no buyValue, so no row
 can join the counterfactually-vendor-fed set, and that literal did not move.
 Four things about the rows a reader would otherwise have to discover:
 the `linen_pouch` row crafts vendor stock (250 at the counter), so crafting is
@@ -15961,13 +15973,14 @@ doctrine is list-count-only by the shipped test's design: under the sim's
 three reagent discounts (specialization 0.8, the self-signed count-1, Jack's
 0.9, the crafter's reward) eight of the nine floors sit under their output (the
 maul at 222 in against 420 out is the largest; the healing potion at 77 in
-against 32 out is the one that does not; the 40-copper gold sink turns the
-oiled boots, the cinch and the belt gold-negative again), bounded by trophy
+against 32 out is the one that does not; the gold sink, 32 for the boots at
+budget 16 and 40 for the cinch and the belt at budget 20, turns those three
+gold-negative again), bounded by trophy
 supply
 rather than by the pin, and every row prints both its specialization-only bill
 and its true floor, with all nine floors pinned to literals through the test's
 own `minAchievableInputValue` so they are VISIBLE rather than guarded (the
-#1301 gold sink adds 40 copper per craft on top).
+#1301 gold sink adds 20 to 40 copper per craft on top, by budget).
 
 THE PELT WAS RE-PICKED TWICE MORE, at the round-two and round-three reviews.
 Its first output, `cragmaw_huntcord`, is Old Cragmaw's OWN 0.25 chase belt,
@@ -15994,7 +16007,8 @@ says). All three untouched on every axis.
 OUTPUT-EXCLUDED, the six the doctrine adds, each with the derivation:
 
 - `pale_pearl` 30 and `ogre_toe_ring` 25 (jewelcrafting). Jewelcrafting's
-  register is neck and ring (all 13 of its rows). The uncrafted neck and ring
+  register is neck and ring (12 of its 13 rows; the thirteenth is the
+  prismglass_setting intermediate). The uncrafted neck and ring
   pool is 9 WARFARE honor pieces at sellValue 0 (epic, `pvp_honor.ts`) and 16
   endgame epics at 1800 to 50000; nothing in (25, 460]. A sweep of every
   uncrafted id whose name reads jewel, gem, pearl or prism found only the
@@ -16005,7 +16019,8 @@ OUTPUT-EXCLUDED, the six the doctrine adds, each with the derivation:
 - `briny_idol` 32, `frayed_prayer_beads` 30, `moonpale_scale` 26
   (inscription). Inscription's register is caster held-offhands and scrolls.
   The uncrafted scroll pool is EMPTY; the uncrafted held-offhand pool is six
-  ids: three hunter quivers (leatherwork), two epics at 12000, and
+  authored ids (the generated heroic_ variants excluded): three hunter quivers
+  (leatherwork), two epics at 12000, and
   `valefire_lantern`. One in-register output for four mapped trophies. It went
   to `cracked_fetish` on rung fit: the lantern is item level 7 and uncommon
   (rung 25 at most), and the fetish is the one zone2 trophy of the four; the
@@ -16072,7 +16087,7 @@ covered nothing, so the pair adopted.
 | parity goldens | | inventory_vendor only, rng unmoved | 13+/13-, digest 811c9dc5 in every frame, draws 0 |
 | shipped_item_ids golden / liveItemCount | 922 | unchanged | unchanged |
 | i18n bundles | | zero diff (no new key) | zero diff |
-| wiki content | | +8 rows, then the maul swap, then +2 rows; no quality lines | as predicted, each regen idempotent |
+| wiki content | | +8 rows, then the maul swap, then +2 rows; no line about the trophies' quality (the outputs' quality fields render as every recipe's do) | as predicted, each regen idempotent |
 
 THE 11m HARD INPUT SURVIVES: `mudfin_scale` is adopted and promoted, so 11m's
 `gills` mapping reads a common material in the tree.
@@ -16189,7 +16204,9 @@ rather than decided:
 - A rung-50 output above the 460 ceiling for the ogre tusk (every zone3-band
   uncrafted weapon sells 700 or more): a new ceiling and a stretched bill.
 - A rung-25 tailoring row for the bandana on the strength of its two level-20
-  galecrest sources: the zone1 band carries three of four sources.
+  galecrest sources: the zone1 band carries two of four sources (vale_bandit,
+  gorrak), a tie the QA counted; the tie-break is that galecrest is a level-20
+  zone where a rung-0 tailoring row is the honest rung for a 6-copper drop.
 - A per-item `hudChrome.materialHint.*` lead for any of the nine.
 - Editing `col_junk_drawer`'s trigger, or sourcing the wildlife pack, inside
   this phase: both are the maintainer's.
@@ -16417,15 +16434,404 @@ row) is recorded above as a probe, and the frozen run is this one.
   per craft at specialization alone; the floors are pinned so a change is loud,
   not guarded so a change is refused. Whether the maul's surplus is wanted is
   the maintainer's read, recorded, not decided.
-- **`col_junk_drawer` IS THE NEW OPEN ITEM.** Zero margin, live recount, an
-  in-progress regression for holders of promoted trophies; pinned so the next
-  promotion reds; the trigger is the maintainer's to move.
+- **`col_junk_drawer` IS THE NEW OPEN ITEM.** One of margin at the build (11
+  reachable against an amount of 10; this bullet said "zero" and the QA
+  corrected it; three of margin after the QA's two exclusions), live recount,
+  an in-progress regression for holders of promoted trophies; pinned so the
+  next promotion reds; the trigger is the maintainer's to move.
 - **THE PROSE CHECK PAID AGAIN, ON MY OWN SENTENCE.** The leather pair adopted
   because the ledger's own draft reason for excluding them was false when
   grepped. Grep every count in this ledger before believing it, including the
   ones the reviewers verified: the blob byte count was mis-predicted twice by
   one and two characters before it landed.
 - **WHAT 11m INHERITS GREEN:** `mudfin_scale` adopted and common (its `gills`
-  mapping reads the promotion in the tree), nine reagents that light the
-  Used-by line, the taxonomy at 118 with the allowlist at eight, and a
-  sell-junk sweep whose fixtures no longer lean on any adopted id.
+  mapping reads the promotion in the tree), seven reagents that light the
+  Used-by line (nine at the build; the QA excluded two), the taxonomy at 115
+  (117 at the build; this bullet pasted 118, the round-two count) with the
+  allowlist at eight, and a sell-junk sweep whose fixtures no longer lean on
+  any adopted id.
+
+## Phase 11l QA ledger (2026-08-24, verify the trophy economy)
+
+VERDICT: **PASS-WITH-FOLLOWUPS**, LOCAL, no push, no PR. The build's trophy
+economy survives its verification with the doctrine applied one rung further
+than the build applied it: the same standard that excluded the chipped tusk
+(R21 against the trainer's own rows) excludes two of the nine adopted rows,
+one row is re-picked for inverting its ladder, and every pin is re-derived on
+the result. Nothing in the settled record was re-decided; every move is a
+divergence under row 122's own clause, exactly as the build's were. The
+follow-ups are all the maintainer's (below), none is a future-PR item.
+
+THE QA IN ONE LINE: nine adopted became seven, twelve excluded, two held out,
+at zero new item ids; sixteen readers over the built diff and its fix round,
+every finding applied, and a mutation battery that proves the pins on both
+the built tree and the stamped one.
+
+### STEP 0: THE SIXTEENTH RELEASE SYNC, THE FIRST NON-EMPTY ONE SINCE THE FOURTEENTH
+
+`origin/release/v0.40.0` moved efb1220e85 to 9a89e3483e (27 commits, 211
+files: the deed-border-cartouche packet, PR #3611), merged at 7553c795 with
+ZERO conflicted paths and fourteen files auto-merged on both sides (ci.yml,
+three style sheets, hud.ts, both html entries, the shot-target script and its
+test, the architecture, ci_workflow and monolith pins). Measured on the merged
+tree before the commit: tsc clean; the monolith, CI-parity, architecture and
+shard-partition pins green (hud.ts lands at exactly its 18480 ceiling, the
+release's net delta on it being zero); ci:changed 813 files, 0 errors;
+i18n:gen and wiki:content zero diff; the release's own 17 touched test files
+588/588. No lockfile or patches movement, so no reinstall was owed. The
+release-merge-audit skill ran as six read-only lanes (hud.ts, styles, CI cone
+and shot targets, pins and html and design docs, legacy arms and injection
+sites, planning premises): NO dropped intent on any of the fourteen
+both-changed files (every branch hunk survived byte-identical, every release
+hunk landed in live code, no double extraction, no re-shaped injection site
+missed: the release added no server, net, headless or python file and no
+route, command or facet member), and four stale pins it did not create: the
+renderer.ts ratchet row 13571 over a 13569 file whose comment claimed zero
+slack (the release's far-LOD repair ec5e9e9afa had landed under the sync that
+merged efb1220e85, 57b1a09d43, whose re-measure did not cover this row), the
+release's own nameplate_canvas row 852 over 851, the screenshot-cone vacuity
+floor 160 under a real 249 (169 was true on 2026-08-14; ten days of committed
+evidence took it to 249, accumulation, not a miscount), and the Phase 11e
+CLOSED paragraph in docs/design/deeds.md sitting under the heading below the
+waiver it closes. All four applied (fab171092f). Two release-side notes stay
+upstream: two browser fixtures hand-build pre-heraldry player-frame markup
+(green, synthetic, not this branch's), and shard-weight coverage reads 0.9547
+(3032 of 3176; two release test files carry no row; the standing fix is the
+CI harvest, ruling 11d-U1-SHARD). The 11l BUILT ledger's "fifteenth sync was
+a no-op, release still at efb1220e85" paragraph is superseded by this one.
+
+### STEP 2: SEVEN COVERAGE LANES, THREE MATRIX REVIEWERS, AND ONE READER FOR ROUND ELEVEN
+
+The seven lanes ran as one workflow over the merged tree (sweep safety, the
+spend census, consumer reality and the output doctrine, the economy pins, no
+new content, surfaces, and round eleven read as unreviewed code), each
+re-deriving rather than reading, and the three matrix reviewers ran fresh
+beside them. What they established, with the derivation method each used:
+
+- **THE CENSUS IS EXACT.** 29 junk-kind ids in a mob drop table = 4
+  precedent + 4 tier-4 seeds (consumed by PLANT, FARM_MATERIAL_ITEM_IDS
+  members, sourced by Nythraxis, the Heroic Quartermaster, farmer_verbena and
+  an 8 percent rift draw) + 21 orphans; every one of 26 spend mechanisms
+  (recipes, enchants, quest collects and turn-ins, pattern learns, rift
+  essence and gems, marks, tokens, tool effects, pet feed, bag use, chroma,
+  grade substitution, PLANT, place_feast, salvage, the exchange, the market,
+  mail, buy-back, deed meters, every removeItem site across the three hosts)
+  was walked, and none reaches an orphan; none of the adopted has a second
+  consumer. The sweep predicate is unchanged and gates on quality alone; no
+  adopted def gained noVendorSell or soulbound; junkSellableSlot answers false
+  for every adopted id and true for every poor one; every other poor-gated
+  read (twelve sites) is in the build's flipped-surface list or neutral.
+- **NO NEW CONTENT, PROVEN.** The item id set is byte-identical to the
+  pre-phase set (1000 keys, same sha, 922 live); a field-level diff over all
+  1000 defs finds exactly the build's seven quality flips and nothing else;
+  every drop, stock, chest and fishing table deep-equals the pre-phase tree;
+  recipes.ts removed zero lines; icons, public/ui/items, the i18n catalog and
+  overlays and world_entity_i18n.ts have zero diff; the release merge added no
+  src/sim file.
+- **EVERY ECONOMY LITERAL RECOMPUTES** from the merged ALL_RECIPES and ITEMS
+  through requiredReagentCountFor (all 27 bill figures, the sink verdicts, the
+  mantle 300/280, the trainer sum, the hub pair, the mastery winner, the herb
+  totals, the blob, the reliquary counts, the art fingerprint, the taxonomy);
+  one real defect: the signable set called rough_hide and spider_silk
+  self-signable when interaction.ts grants a specimen family's component PLAIN
+  and signs the specimen instead (no pinned figure moved; the predicate and
+  four prose sites were wrong).
+- **THE OUTPUT DOCTRINE, RE-RUN, IS WHERE THE COUNT MOVED.** Every recorded
+  exclusion re-derives (the 25-item jewelry pool with none in band, the empty
+  scroll pool, the six authored held-offhands, the 25 uncrafted weapons as 18
+  physical under the dirk and 7 caster under the battle staff, the leather
+  ceiling at 450, engineering by ruling). The handoff asked the QA to judge
+  the eight rows the build had not re-picked against the standard that
+  excluded the tusk, and two fail it STRICTLY: valefire_lantern (offhand,
+  uncommon, int 1 spi 1, item level 7) beside the same-rung goldleaf_folio
+  (int 3 spi 2, a 150 bill) and the rung-0 silverleaf_primer (int 2 spi 1, a
+  36 bill), same slot, same CASTER_ALL lock, same quality; and hobnail_boots
+  (mail feet, common, armor 18, a 100 bill, a 900 counter price) beside the
+  rung-0 coppermail_sabatons (armor 38, a 46 bill). Each row was a trophy
+  sink whose one use was the vendor loop, and no other uncrafted output sits
+  in either band (the offhand band holds a shield and a hunter quiver, out of
+  register; the feet band holds the boots alone). The maul loses to the
+  rung-25 ironshod_maul on every axis but agility 2 and the oiled boots to
+  the rung-0 fenbridge boots on every axis but agility 1 and quality: both
+  recorded at their rows as tuning reads (the maul is the maintainer's already
+  flagged surplus row), not exclusions. The healing potion row inverted
+  alchemy's ladder: 320 HP for 82 at rung 25 against the trainer's own 200 HP
+  draught at 140 and within 15 HP of the rung-50 rare at 344, on one shared
+  cooldown.
+- **ROUND ELEVEN DID WHAT ITS LEDGER SAID**, and working its regexes to the
+  end found the hole beside it: GUARDED_RE_EMIT had no left anchor, so the
+  INVERTED serializer guard (`!state.isJackOfAllTrades ?`, a true persisted
+  for every never-attuned character and minted on the next load) classified
+  as the serializer link and the three-write pin stayed green; only the blob
+  band's 11-byte headroom caught it, by coincidence. Both false-skip anchors
+  are real (probe-proven), the `false, jack = true;` shape is reachable
+  through the comma operator, the column description is accurate, the
+  wholesale-copy sentence names a hypothetical (sim.ts hydrates only through
+  normalizeArchetypeState), and tests/professions_jack.test.ts pins both
+  hydrate directions.
+- **THE SURFACES DERIVE AS CLAIMED** (kind line, Used-by line, chip, deposit
+  sweep, vendor gate, Sell Junk preview and sweep, sort rank, market rarity,
+  /bags), the nine names carry their non-Latin fills, the wiki rows match the
+  live recipes, the guide's junk prose stays literally true; the build had
+  pinned most of them for one or two ids by name, the rest only through the
+  taxonomy's exact set.
+- **THE MATRIX REVIEWERS**: content obligations (0 blocking, 3 should-fix:
+  the reliquary craft-door guard ran one direction, zone 1 lost its every poor
+  mob drop, the margin figures were vendor-purchase accounting under which the
+  quiver's second-faucet margin was never measured); frontend seam (0
+  blocking, 1 should-fix: the deposit-all tooltip promised junk the sweep
+  never moves; 2 nits); test coverage (0 blocking, 1 should-fix: trophy rungs
+  pinned only to their 25-point tier, a 25-to-49 drift survived fifteen
+  suites; 3 nits; fifteen sandbox mutations, fourteen caught).
+
+Counts across the four sources over the built diff: 2 BLOCKING, 15
+SHOULD_FIX, 35 NITS, and the INFO rows, every one applied or recorded as a
+CUT with its reason below.
+
+### THE MUTATION BATTERY, BOTH ENDS (the tree as built, then the tree as stamped)
+
+Every mutant applied by exact match, proven applied by `git diff --stat`, run
+with the summary line read for a failed count (never a skipped one), and
+restored by path. A harness note for the next battery, from the coverage
+auditor's own false start: the Jack scan in tests/recipe_economy.test.ts
+resolves its roots through `process.cwd()`, so a mutated COPY must be the
+working directory (`env -C <copy> npx vitest run`), never only `--root`, or
+the scan reads the unmutated tree and the mutant "passes". On the BUILT tree
+(7553c795):
+
+| mutant | reds (files / tests) | named |
+|---|---|---|
+| mudfin_scale back to poor | 7 / 10 | the sweep pin (items), four taxonomy arms (promoted set, live poor set, non-poor member, poor exclusion), the sort ladder, the vendor gate, the deed pool, the reagent-quality guard, the art fingerprint |
+| the potion row deleted | 14 / 30 | the three economy arms, ten taxonomy arms, the bootstrap count, the Used-by and affinity pins, the sweep, two item-level key sets, the sort, both helper arms, both guide arms, the vendor gate, the chip census, three herb totals; NOT the blob band (24 bytes inside its floor slack), the art fingerprint, reliquary or the deed pool, correctly, since a deleted row moves no quality |
+| Jack mint, widened hydrate disjunction | 1 / 1 | the three-write pin, `hydrate` reads `other` (1 failed, 25 skipped: the -t filter selected one test) |
+| Jack mint, wrapped `false \|\| true` | 1 / 1 | a fourth write, `other` |
+| Jack mint, bracket access in crafting.ts | 1 / 1 | a fourth write, `other@src/sim/professions/crafting.ts` |
+| the inverted serializer guard | 0 / 0 on the scan and the Jack suite; 1 / 1 on the blob band | the hole round eleven's reader missed, proven before the fix |
+
+On the STAMPED tree (after the fix round): the flip reds 9 / 12 (the built
+ten plus the Sell Junk button arm and the real confirm-prompt loop), the
+quiver row deleted reds 19 / 37 (the built classes plus the reverse pass and
+two sibling reliquary arms, the tannery arm and the exact-rung pin), and the
+fix round's own three new pins were mutation-proven before their commit: the
+inverted guard reds the anchored scan AND the serializer behavioral pin,
+skillReq 25 to 49 on the oiled boots reds the exact-rung map (fifteen suites
+had let it through), and the quiver's door removed reds the reverse pass plus
+three sibling arms.
+
+### THE FIX ROUND: FIVE COMMITS, EACH READ FRESH
+
+1. **b413eb973d, the content.** The lantern and hobnail rows deleted,
+   cracked_fetish and bogiron_nugget back to their pre-phase bytes (zone2.ts
+   is byte-identical to b94887558d), the potion row re-picked to
+   lesser_healing_potion (190 HP, common, uncrafted; interval 5 < 16 < 82;
+   under the rung-25 draught and above the rung-0 pair; the row id renamed to
+   match), the exclusion record extended with the eighth and ninth output
+   exclusions and the zone-1 consequence, the header's signable claim
+   corrected, the gathered-cost accounting stated, the maul's and the boots'
+   comparisons recorded, the zone3 banner and master-spec's junk line
+   corrected, the wiki regenerated. Every pin re-derived, predicted then
+   observed: MATERIAL_ITEM_IDS 115, sixteen poor survivors, thirteen
+   reachable (col_junk_drawer's margin three), ALL_RECIPES 163, the trainer
+   sum 105, goldleaf 30, the blob 17143 to 17101 (minus 26 and 23, plus 7 for
+   the rename; measured exactly under a temporary pin, the band restored by
+   the plus-11 minus-380 rule to 16721..17112), the art catalog 498036 (two
+   more quality tokens back), the rung-25 mastery winner back to the ironlink
+   spaulders at 25 crafts and 100 iron.
+2. **4e64e92d53, the hardening.** The anchored serializer guard with its
+   inverted control and a behavioral serializer pin in the Jack suite; the
+   exact-rung map; the reliquary reverse pass with the six craftable
+   catalogued slots pinned (boundstone_helm, gravewyrm_gauntlets,
+   gravewyrm_bone_quiver, the three rods); the signable predicate matching
+   interaction.ts with rough_hide and spider_silk proven plain-granted; the
+   gathered column with the maul (+278) and the quiver (+164) pinned as
+   numbers; the Collapsed Reliquary chest table walked for the deed pool; the
+   art byte delta derived from the live promoted set; every flipped surface
+   pinned by name through the shared derivation (kind line, Used-by map, bank
+   INCLUDED, Sell Junk button, market pair, /bags readout, the real confirm
+   prompt for all seven); the shorthand-member control, the false-skip
+   anchor control on the named shape, the headless root floor at its real 3.
+3. **ffb0d5a357, the deposit-all tooltip**, reworded with all 18 overlays
+   re-filled (the reword-staleness class has no gate).
+4. **fab171092f, the sync's four stale pins** (above).
+5. **5fd9c81707, the fix round's readers' findings** (below).
+
+FOUR FRESH READERS OVER THE FIX ROUND (content, test coverage, frontend seam,
+gate integrity) returned 0 BLOCKING. Content: three inscription exclusion
+lines still cited the deleted fetish row, five level comments cited the
+deleted lantern note, the potion row's "prize" reason was refuted by the 85
+counter price (Hale and the zone-3 counter sell the same potion under the 109
+floor-plus-sink, so the row is a tallow sink held under the list-count-only
+clause, a tuning read beside the boots), and a pre-existing alchemy guide
+sentence (nine recipes three per rung, a 280/360 sunpetal) became this
+packet's the day it put a fifth row on Verane's rung 25; all applied, the
+guide sentence reworded count-free with its five non-Latin fills swept.
+Frontend seam: "crafting reagent" under-covered the swept set (seeds, husks,
+compost and the tonic derive in through the farm table) and the never-touched
+list enumerated an open set, so the English now names the kind line and says
+everything else stays, with the 18 overlays re-filled a second time on each
+locale's own Material label; the render-site comment retired its
+junk-moves-too claim; the sentence pin moved beside the bank render pins; the
+German fill took the Ihr form its siblings use. Gate integrity: the renderer
+comment attributed its gap to an ordinal that reads one off between the
+reviewer's and the ledger's numbering, now to the merge commit itself; the
+cone comment stated a miscount where the truth is accumulation; the
+nameplate row is marked upstream-owned with its resolution rule; the header's
+stale row count reads countless. Test coverage: 0 blocking, 2 should-fix (the three restored-poor sellValues had lost their frozen pin; the exact-rung comment stated a drop-band rule three rows do not follow), 3 nits, six live mutations and one independent reimplementation over the new pins, all caught; applied in the sixth commit (f8fc9f9d3e). The
+reviewers' remaining items are recorded as CUTS below.
+
+THE FIX ROUND'S FIXES WERE READ FRESH IN TURN (the i18n half and the test half
+of the fifth and sixth commits), 0 BLOCKING. The i18n reader found the
+tooltip's parenthetical false for the nine fine grades (in MATERIAL_ITEM_IDS,
+so swept, with a kind line that reads Fine Material; in pt_BR the two labels
+share no word), the alchemy reword shipped with no regression pin, the ja fill
+had kept the retired three-per-rung count, and the engineering ladder body
+carried the same stale-count class ("nine recipes" against a live seventeen
+since this packet's hoes and chassis), with the armorcrafting and
+jewelcrafting "nine in three rungs" claims one row away from the same rot.
+Applied in the seventh commit (d54ae86dd7): the English names both lines and
+all 18 overlays carry both of their own labels (a THIRD pass over the same
+key in one QA, the cost of the reword-staleness class having no gate; the
+cs, de and pl fills took their files' native low quotes), a fine grade is
+pinned in the swept set beside the sentence, the alchemy and engineering
+bodies are held count-free with every draught number derived from the item
+table, and the armorcrafting and jewelcrafting claims are pinned to
+LADDER_RECIPES and the trainer rows rather than reworded (still true of the
+wearable ladder; the plating is an intermediate outside it). The test reader
+of the same two commits proved the new pins by six live mutations (the frozen
+sellValue of a restored trophy, a rung drift of one, a one-word reword of the
+resolved sentence, the signable predicate reverted, a specimen family stripped
+of its component) and found one blocking item the seventh commit had already
+closed (the moved sentence pin quantified over a set it never read: the
+fine-grade arm is that read), one should-fix (a comment citing the retired
+floor of 9) and four nits (a literal-to-literal membership check now reads
+the live def; the renderer comment's transition figure; an un-rewrapped cinch
+row re-enumerating the header's consumers; the deed walk's three prose
+counts, now an assertion over the 355 chest entries), applied in the eighth
+commit. Its harness note (the Jack scan reads `process.cwd()`) sits with the
+battery above.
+
+THE QA GATE RAN LAST over the QA's own eight commits and returned READY, 0
+BLOCKING: every invariant in play checked (sim purity with zone2.ts
+byte-identical to the pre-phase tip, no parity golden moved, no facet or wire
+member, the reword's render sink and its aria path, M16 and S3 green, the
+generated wiki and bundles reproduced with zero diff, the ratchet and cone
+pins exact against the live tree, the blob band by its own rule, every moved
+count an exact pin over a derived quantity), its own full suite green at the
+eighth commit, and an adversarial pass that ruled out a surface still calling
+a restored trophy a material, a live reference to a retired recipe id, a
+count moved but not re-pinned, and a stripped ru dash. Its one should-fix was
+this ledger's unfilled stamp (below); its nits, a stale recipe id in one
+supply-line comment and the master-spec junk line omitting the ogre tusk
+(pre-existing), are applied in the ninth commit, and the nameplate_canvas row
+lowered on an upstream-owned line is left as the maintainer's glance, marked
+in the row. The gate itself read the seventh and eighth commits in full, and
+one more fresh pair read them and the ninth before the freeze, per the rule
+that a fix round is unreviewed code, 0 BLOCKING between them. The i18n reader:
+the count-free engineering opening had pulled the hoes and the chassis into
+"the ladder", which made two later sentences false (the rods as the taught
+exception; every finished tool rare or epic and signed, when the bronze and
+skysilver hoes are common and uncommon and never sign), so the opening is
+re-scoped to the tool ladder with a pointer to the gathering page's hoe note
+and its five fills swept once more; the master-spec line had named Brutok
+Skullsmasher a chief (a rare elite) and carried revision history; and the
+locale-agnostic containment the English asserts (every locale's tooltip
+contains its own two kind labels) is now an arm over every supported
+language, which needs no hash to catch a stale fill. Its remaining nit, that
+the twelve farm fine produce ids read Material while the nine ore, log and
+herb grades read Fine Material (both swept, so the copy stays true), is a
+kind-line consistency read for the maintainer, recorded below. The coverage
+reader, by twelve mutants: the fine-grade exemplar was over-determined (a
+recipe consumes it), so all nine grades are pinned; the engineering negative
+had no positive control and left the body's own "six land-tool" count
+unprotected; the armorcrafting arm filtered LADDER_RECIPES and was blind to
+a trainer row landing from another list (the alchemy vector), so both craft
+arms now filter ALL_RECIPES with the Boundstone combo excluded by pinned
+membership and the per-rung distribution held; the chest counter summed two
+tables, so it is two counters. Applied in the tenth and eleventh commits.
+
+### CUTS, EACH WITH ITS REASON (never a future-PR item)
+
+- Two browser fixtures hand-build pre-heraldry player-frame markup: release-
+  owned synthetic fixtures, green on both parents, not this branch's to
+  re-shape; noted for the release.
+- The fourteenth-sync ledger row "renderer.ts ceiling 13571 MATCH" and the
+  build's "+recipe_valefire_lantern:apothecary" pin row: dated history, true
+  when written, superseded by this ledger rather than rewritten.
+- The commit body of b413eb973d says no other uncrafted output sits in either
+  band; the in-source record is correctly qualified (a shield and a hunter
+  quiver sit in the offhand band, out of register). Commit bodies are
+  immutable history here; the record is the source.
+- The mobile item-action menu's Sell route now raises a second confirm for a
+  promoted trophy: the flow every common item already has, with no bypass;
+  recorded, not changed.
+- The reword-staleness class is still ungated by design (srcHash always
+  equals enHash); the two manual 18-overlay sweeps this QA performed were
+  the only available answer.
+
+### THE MAINTAINER'S ITEMS, THIRTEEN NOW
+
+The twelve carried in are unchanged and none was needed. `col_junk_drawer`
+re-reads at THREE of margin (13 reachable against 10; the build's handoff
+said zero and its item said one; both corrected in place), still pinned so
+the fourth promotion from here reds. This QA ADDS ONE: **zone 1 carries no
+poor mob drop** (its only three grays were the promoted bandana, tallow and
+scale), so a starter-zone character has nothing for the Sell Junk button the
+guide teaches until zone 2; the candidates are a poor drop authored back onto
+a zone-1 table or the gap accepted on the record. Two tuning reads join the
+maul's: the quiver is a second faucet under gathered cost (+164 after the
+sink against the maul's +278, both pinned), and the lesser healing potion is
+a tallow sink the counter undercuts. The maul's ironshod comparison and the
+oiled boots' fenbridge comparison sit at their rows. One kind-line
+consistency read, not this phase's to change: the twelve farm fine produce
+ids (FARM_MATERIAL_ITEM_IDS, not MATERIAL_GRADES) read Material on their
+tooltip while the nine ore, log and herb fine grades read Fine Material;
+both are swept and the deposit-all copy stays true, but "Fine Vale Wheat:
+Material" beside "Fine Iron Ore: Fine Material" is a farming-era label split
+the maintainer may want closed in src/ui/item_kind_label.ts. And the
+nameplate_canvas ratchet row lowered to the exact 851 on an upstream-owned
+line: a release-side growth to exactly 852 lands red here (loud, never a
+skip); the row says to keep ours at the next sync.
+
+### WHAT MOVED IN THE RECORD, AND WHAT DID NOT
+
+farming/state.md: rows 82 to 85 and 122 to 123 stand as written; the
+col_junk_drawer handoff row re-reads at three of margin; one row ADDED (zone
+1); a dated QA note records the count's last move. The BUILT ledger's stale
+prose the readers caught (the handoff's 118 and "zero margin", the 40-copper
+sink generalized over a 32-copper row, "5 and 25" over an 8 and an 18,
+jewelcrafting's "all 13 rows", the six-id offhand pool's unstated scope, "no
+quality lines", the seeds' two omitted sources, the bandana's "three of
+four") is corrected in place and marked, and the ledger carries a SUPERSEDED
+IN PART pointer at its head.
+
+### DETERMINISM: STILL NOT IN PLAY
+
+No rng draw, tick-phase, wire field or facet member moved in the build or the
+QA; no parity golden moved in the fix round (the build's one re-record stands
+with every digest identical). Not dispatched: architecture-reviewer and
+cross-platform-sync, per the matrix, since no sim behavior grew.
+
+### THE FROZEN STAMP, BOTH ENDS
+
+[STAMP]
+
+### THE HANDOFF TO PHASE 11m (harvest geography)
+
+- **`mudfin_scale` IS STILL ADOPTED AND COMMON.** 11m's `gills` mapping reads
+  the promotion in the tree; the QA's two exclusions touched neither it nor
+  any leather trophy.
+- **SEVEN reagents light the Used-by line, the taxonomy sits at 115 with the
+  allowlist at eight, the live poor set is sixteen, thirteen reachable.** Read
+  the pins, not this sentence: tests/material_taxonomy_bootstrap.test.ts,
+  SURVIVING_POOR_JUNK, and the col_junk_drawer walk.
+- **THE DOMINATION STANDARD IS NOW A CHECKLIST ITEM, NOT A REVIEW FINDING.**
+  For any output an 11m row picks, compare it to the trainer's own rows at the
+  same rung and below on every axis before the row lands (memory:
+  domination-standard-applies-to-the-picked-row), and state the price basis
+  of any surplus claim.
+- **A RUNG IS PINNED AS THE FIELD, NOT THROUGH THE TRAINER VIEW** (memory:
+  rung-pinned-to-tier-bucket); a source-text guard regex gets a left anchor
+  and an inverted control (memory: unanchored-guard-regex-accepts-inversion).
+- **THE SIXTEENTH SYNC LANDED HERE**; 11m starts from a tree already at
+  9a89e3483e, and the cone floor now sits nine subtrees under the count, so
+  the next screenshot subtree the release adds needs the floor re-measured.
