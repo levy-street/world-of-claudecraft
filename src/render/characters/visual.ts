@@ -841,7 +841,7 @@ export class CharacterVisual {
     }
     this.hitCooldown = Math.max(0, this.hitCooldown - dt);
     this.chargeGlow?.update(dt);
-    this.eyeGlow?.update(dt, reducedMotion);
+    this.eyeGlow?.update(dt, reducedMotion, s.asleep === true);
     this.eyeWardMarker?.update(this.eyeWardPlan, dt, reducedMotion);
     this.updateMetamorphWings(dt, s, reducedMotion);
     if (this.holdCooldown > 0) this.holdCooldown = Math.max(0, this.holdCooldown - dt);
@@ -881,6 +881,12 @@ export class CharacterVisual {
         this.currentIsOneShot = false;
         this.currentOneShotIsEmote = false;
         this.fadeTo(this.baseAction(), this.baseTransitionFade(desired), false);
+      } else if (baseChanged && previousBase === 'sleep' && this.wakeAction()) {
+        // The dawn rise. Leaving the sleep loop plays the authored wake ONCE (it begins
+        // in the sleep pose, so the hand-off is a continuation rather than a cut) and
+        // onFinished fades it into whatever base the machine now wants; an interrupting
+        // one-shot (a hit, an attack) simply replaces it, as with any other one-shot.
+        this.playOneShot(this.def.clips.wake as string, 1);
       } else if (baseChanged && !this.currentIsOneShot) {
         this.fadeTo(this.baseAction(), this.baseTransitionFade(desired), false);
         this.fadeTo(this.baseAction(), waterFade(previousBase, desired), false);
@@ -2605,6 +2611,7 @@ export class CharacterVisual {
       s,
       !!this.action(this.def.clips.walkBack),
       !!this.action(this.def.clips.wade),
+      !!this.action(this.def.clips.sleep),
     );
   }
 
@@ -2860,6 +2867,10 @@ export class CharacterVisual {
         return this.action(c.wade) ?? this.action(c.walk) ?? this.action(c.idle);
       case 'sit':
         return this.action(c.sitDown) ?? this.action(c.sitIdle) ?? this.action(c.idle);
+      case 'sleep':
+        // Only ever entered when the rig HAS the clip (desiredBase gates on it), so the
+        // idle fallback is belt-and-braces rather than a state anything runs in.
+        return this.action(c.sleep) ?? this.action(c.idle);
       case 'jump':
         return this.action(c.jump) ?? this.action(c.idle);
       case 'fall':
@@ -3016,6 +3027,12 @@ export class CharacterVisual {
       if (n.name === swap.hide) n.visible = !dead;
       else if (n.name === swap.show) n.visible = dead;
     });
+  }
+
+  /** The authored wake one-shot, if the ClipMap names one AND the loaded rig has it. */
+  private wakeAction(): THREE.AnimationAction | null {
+    const clip = this.def.clips.wake;
+    return clip ? this.action(clip) : null;
   }
 
   /** One-shot the flourish clip (skeleton awaken / boss taunt / the dragonkin

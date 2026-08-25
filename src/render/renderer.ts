@@ -174,7 +174,7 @@ import {
   requestedCharacterForm,
   resolvedCharacterForm,
 } from './characters/form_visual_selection_core';
-import { skinCount, visualKeyFor } from './characters/manifest';
+import { prewarmPlayerSkinVariantCount, skinCount, visualKeyFor } from './characters/manifest';
 import { modularLookChanged } from './characters/player_look_core';
 import {
   playerRangedAttackAlreadyStarted,
@@ -557,6 +557,7 @@ import {
   resetShadowCadence,
   updateShadowCadence,
 } from './shadow_cadence_core';
+import { collectCasters } from './shadow_casters';
 import {
   type ShadowAnchor,
   shadowTexelWorldSize,
@@ -975,10 +976,6 @@ const PREWARM_OBJECT_POOL_COPIES = 2;
 // OTHER mob model is still built once so its shader program compiles at load.
 const PREWARM_MOB_COMMON_IDS = new Set<string>(PREWARM_MOB_TEMPLATE_IDS);
 
-function prewarmPlayerSkinVariantCount(): number {
-  return ALL_CLASSES.reduce((sum, cls) => sum + skinCount(`player_${cls}`), 0);
-}
-
 type RendererPhase = 'setup' | 'entities' | 'world' | 'nameplates' | 'submit' | 'total';
 type RendererWorldPhase =
   | 'lights'
@@ -1176,12 +1173,6 @@ export interface EntityView {
   tiltOnProp: boolean;
   /** Countdown to the next gradient resample (seconds). */
   tiltSampleT: number;
-}
-
-function collectCasters(root: THREE.Object3D, into: THREE.Object3D[]): void {
-  root.traverse((o) => {
-    if ((o as THREE.Mesh).isMesh && (o as THREE.Mesh).castShadow) into.push(o);
-  });
 }
 
 export interface RendererCreateOptions extends QuestObjectGateOptions {
@@ -1848,6 +1839,8 @@ export class Renderer {
   // seed-bound ground sampler, built once so the per-frame Vale Cup ring update
   // allocates no closure (see the drape path in vale_cup_team_ring.ts).
   private groundSample = (x: number, z: number): number => groundHeight(x, z, this.sim.cfg.seed);
+  /** Boss impostor exclusion input: true while this entity's rig is drawn this frame. */
+  private rigShownFor = (id: number): boolean => this.views.get(id)?.group.visible === true;
   private selectionDrapeSupportY = 0;
   private selectionGroundSample = (x: number, z: number): number =>
     Math.max(this.groundSample(x, z), this.selectionDrapeSupportY);
@@ -11226,8 +11219,8 @@ export class Renderer {
       // model origin (the toad's is well back toward the tail).
       v.visual.root.position.y = v.mountLift;
       v.visual.root.position.z = v.mountLift > 0 && mountSpec ? mountSpec.seatFwd : 0;
-      // distant rigs swap to the single-draw baked idle-pose mesh
-      v.visual.setFar(v.isFar && active === v.visual && resolvedForm !== 'fireball');
+      // distant rigs swap to the single-draw baked idle-pose mesh (never a sleeper: it STANDS)
+      v.visual.setFar(v.isFar && active === v.visual && resolvedForm !== 'fireball' && !e.asleep);
       v.sheepVisual?.setFar(v.isFar && active === v.sheepVisual);
       v.bearVisual?.setFar(v.isFar && active === v.bearVisual);
       v.catVisual?.setFar(v.isFar && active === v.catVisual);
@@ -11273,7 +11266,9 @@ export class Renderer {
         !e.dead && feetDepth >= floorSampleDepth
           ? wl - groundHeight(ax, az, this.sim.cfg.seed)
           : Number.NEGATIVE_INFINITY;
-      const swimming = isSwimmingAtDepth(v.wasSwimming, e.dead, feetDepth, floorDepth);
+      // A wading body (MobTemplate.wadeDepth) swims only past ITS depth, not the human line.
+      const wadeDepth = e.kind === 'mob' ? MOBS[e.templateId]?.wadeDepth : undefined;
+      const swimming = isSwimmingAtDepth(v.wasSwimming, e.dead, feetDepth, floorDepth, wadeDepth);
       // ...and the band under it, where the feet are wet but the ground is
       // still doing the work. Read off the SAME displayed depth as the swim
       // latch, so a body crossing a shoreline can never be both at once.
@@ -11477,6 +11472,7 @@ export class Renderer {
       st.reverseBackpedal = ghostWolf;
       st.dead = visuallyDead;
       st.casting = characterCasting;
+      st.asleep = e.asleep === true; // in bed (mob/slumber.ts): the sleep loop holds
       // Which ability, so the pose layer can tell a drawn shot from a pet
       // utility cast (tame_beast is a 6s cast; a bow must not sit aimed for it).
       st.castingAbility = characterCasting ? (e.castingAbility ?? null) : null;
@@ -12227,15 +12223,18 @@ export class Renderer {
     this.sentenceVfx.update(dt, this.reducedMotion());
     this.frozenOrbFx.update(dt);
     this.balgathFx.update(dt, this.reducedMotion(), this.sim.entities.values());
-    // Measured from the PLAYER, not the camera: a boss must appear on the horizon at the
-    // same range whether the viewer is zoomed to the shoulder or fully out.
+    // Measured from the PLAYER, not the camera (same range zoomed in or out). Draws only
+    // while the rig is not; takes the rig's light grade (neutral day on the low tier).
     this.bossImpostors.sync(
       this.webgl,
       this.sim.entities.values(),
       this.camera,
       p.pos,
       this.scene.fog instanceof THREE.Fog ? this.scene.fog : null,
-      this.groundSample,
+      this.rigShownFor,
+      this.lowGfx ? NEUTRAL_DAY_GRADE : this.dnGrade,
+      now,
+      alpha,
     );
     this.mageGroundFx.update(dt);
     this.warlockMeteorFx.update(dt, this.reducedMotion());

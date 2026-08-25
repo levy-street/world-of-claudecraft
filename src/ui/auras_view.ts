@@ -148,6 +148,10 @@ export interface AuraInput {
   // present it drives the badge overlay INSTEAD of stacks (a charge count, not a stack count),
   // and unlike stacks it shows even at 1 so the player sees the shield about to drop.
   charges?: number;
+  // A permanent aura (a boss's standing ward, the slumber a sleeping boss wears): a STATE,
+  // not a timer. The sim backs it with a long finite duration purely so nothing expires
+  // it, and the wire mirrors the bit (`perm`), so both worlds can hide the countdown.
+  permanent?: boolean;
   // Full authored duration in seconds, for the expiring-blink threshold. Present on the
   // offline Sim aura and mirrored over the wire (terse `dur`); an old server omitting it
   // degrades to never-blink rather than misfiring.
@@ -396,7 +400,10 @@ export function createAurasView(
         slot.isDebuff = debuff;
         slot.school = debuff ? (a.school ?? 'physical') : '';
         const toggle =
-          (TOGGLE_KINDS.has(a.kind) || TOGGLE_IDS.has(a.id) || isPersistentEngineAura(a.id)) &&
+          (TOGGLE_KINDS.has(a.kind) ||
+            TOGGLE_IDS.has(a.id) ||
+            isPersistentEngineAura(a.id) ||
+            a.permanent === true) &&
           !TIMED_IDS.has(a.id);
         slot.durationText = toggle ? '' : compactAuraDuration(a.remaining, units);
         // Toggles show no countdown, so they never blink either.

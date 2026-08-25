@@ -16,6 +16,8 @@ import { type EyeWardMarkerPlan, eyeWardMarkerPlan, eyeWardStateOf } from './eye
 export interface EyeWardCandidate {
   auras?: readonly { id?: string }[];
   pos: { x: number; z: number };
+  /** In bed (mob/slumber.ts): neutral and unattackable, so there is no window to read. */
+  asleep?: boolean;
 }
 
 /**
@@ -47,6 +49,9 @@ export function eyeWardPlanFor(
   viewerPos: { x: number; z: number },
   candidate: EyeWardCandidate,
 ): EyeWardMarkerPlan | null {
+  // A sleeping boss cannot be attacked at all (Sim.isHostileTo), so a badge saying "his
+  // ward is open, your damage lands" over him would be a lie the whole raid can see.
+  if (candidate.asleep) return null;
   const ward = eyeWardStateOf(candidate.auras);
   if (!ward) return null;
   const wielding = world.equipment.mainhand === SHARDPIKE_ITEM_ID;

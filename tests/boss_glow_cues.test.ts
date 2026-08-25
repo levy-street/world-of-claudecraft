@@ -16,7 +16,11 @@ import {
   chargeGlowIntensity,
   moteWorldSize,
 } from '../src/render/characters/charge_glow_core';
-import { type EyeGlowSpec, eyeGlowIntensity } from '../src/render/characters/eye_glow_core';
+import {
+  EYE_GLOW_ASLEEP,
+  type EyeGlowSpec,
+  eyeGlowIntensity,
+} from '../src/render/characters/eye_glow_core';
 import { VISUALS } from '../src/render/characters/manifest';
 
 const BALGATH_KEY = 'mob_balgath_cyclops';
@@ -54,6 +58,23 @@ describe('the eye is never out', () => {
     const a = eyeGlowIntensity(s, 0);
     const b = eyeGlowIntensity(s, 1 / (s.pulseHz * 4));
     expect(a).not.toBeCloseTo(b, 3);
+  });
+
+  it('smoulders through a shut lid while he sleeps: dim, steady, never out', () => {
+    // A sleeping cyclops with a blazing eye reads as awake, and a dark socket reads as a
+    // corpse. The ember is the one identifying light he keeps in bed, and it does not
+    // breathe: a pulsing glow on a sleeping face is the awake cue again.
+    const s = eyeSpec();
+    const asleep = [0, 0.37, 1 / (s.pulseHz * 4), 5].map((t) =>
+      eyeGlowIntensity(s, t, false, true),
+    );
+    for (const k of asleep) {
+      expect(k).toBe(EYE_GLOW_ASLEEP);
+      expect(k).toBeGreaterThan(0);
+      expect(k).toBeLessThan(0.5);
+    }
+    // Reduced motion never brightens a sleeper either.
+    expect(eyeGlowIntensity(s, 1, true, true)).toBe(EYE_GLOW_ASLEEP);
   });
 
   it('holds steady under reduced motion instead of switching off', () => {

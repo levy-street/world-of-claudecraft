@@ -40,9 +40,13 @@ export interface AnimState {
    *  body down (player_motion.wadeSpeedMult). */
   wading: boolean;
   sitting: boolean;
+  /** A mob that keeps hours is in bed (Entity.asleep, mob/slumber.ts): the sleep
+   *  loop outranks every locomotion and posture state below it. */
+  asleep?: boolean;
 }
 
 export type BaseState =
+  | 'sleep'
   | 'idle'
   | 'walk'
   | 'walkBack'
@@ -140,10 +144,16 @@ export function isSwimmingAtDepth(
   dead: boolean,
   feetDepth: number,
   floorDepth: number,
+  wadeDepth?: number,
 ): boolean {
   if (dead || !Number.isFinite(feetDepth) || !Number.isFinite(floorDepth)) return false;
   const minFeetDepth = previous ? SWIM_EXIT_FEET_DEPTH : SWIM_ENTER_FEET_DEPTH;
-  const minFloorDepth = previous ? SWIM_EXIT_FLOOR_DEPTH : SWIM_ENTER_FLOOR_DEPTH;
+  // A body that WADES (MobTemplate.wadeDepth, the sim keeps its feet on the bed through
+  // this much water) swims only past that depth, whatever a human-sized swimmer would do.
+  // Without it a thirteen-yard giant in two yards of fen would latch the swim pose the
+  // moment his boots went under and be pitched prone across the surface of a puddle.
+  const minFloorDepth =
+    wadeDepth !== undefined ? wadeDepth : previous ? SWIM_EXIT_FLOOR_DEPTH : SWIM_ENTER_FLOOR_DEPTH;
   return feetDepth >= minFeetDepth && floorDepth >= minFloorDepth;
 }
 
@@ -345,7 +355,12 @@ export function desiredBaseState(
   s: AnimState,
   hasWalkBackClip: boolean,
   hasWadeClip = true,
+  hasSleepClip = true,
 ): BaseState {
+  // In bed. Same rule as wade: a rig with no sleep clip must not enter the state at
+  // all, or it would hold its idle at a tempo nothing authored (baseAction falls back
+  // to idle, but the machine would still believe it was asleep).
+  if (s.asleep && hasSleepClip) return 'sleep';
   if (s.swimming) {
     // A swimmer who stops treads water rather than stroking on the spot; a
     // swimmer who moves picks the stroke for their depth — surface crawl above

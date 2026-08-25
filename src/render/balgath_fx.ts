@@ -23,13 +23,7 @@
 
 import * as THREE from 'three';
 import type { Surface } from './audio_sink';
-import {
-  auraAlphaAt,
-  type BossAuraPlan,
-  bossAuraPlan,
-  moteBudget,
-  readBossVfxState,
-} from './balgath_aura_core';
+import { bossAuraPlan, moteBudget, readBossVfxState } from './balgath_aura_core';
 import { BalgathDebris } from './balgath_debris';
 import {
   BALGATH_CLEAVE_ABILITY,
@@ -134,10 +128,11 @@ export interface BalgathBody {
   id: number;
   templateId?: string;
   /**
-   * `y` matters as much as the other two here. A body wading a fen rides the WATER
-   * SURFACE rather than the bed (mob movement clamps it there), so his own displayed
-   * height is what tells the surface classifier he is in water at all: sampling the
-   * ground under him would report the bed and he would kick dust up through the lake.
+   * `y` matters as much as the other two here. He WADES a fen with his feet on the bed
+   * (MobTemplate.wadeDepth), so his displayed height sits under the waterline wherever he
+   * is in water, and the surface classifier reads exactly that: a foot below the surface
+   * is a splash, a foot on dry mud is dust. Sampling terrain alone could not tell the two
+   * apart, and the first cut (which rode the surface) kicked dust up through the lake.
    */
   pos: { x: number; y: number; z: number };
   castingAbility?: string | null;

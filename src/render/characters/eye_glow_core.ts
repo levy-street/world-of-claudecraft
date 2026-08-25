@@ -31,13 +31,26 @@ export interface EyeGlowSpec {
 }
 
 /**
+ * The eye behind a SHUT lid (mob/slumber.ts): the shard still smoulders through it, so the
+ * sleeper keeps his one identifying light, but nothing like the open eye. Steady, no pulse:
+ * a breathing glow on a sleeping face reads as awake.
+ */
+export const EYE_GLOW_ASLEEP = 0.16;
+
+/**
  * Brightness of the eye at `clock`.
  *
  * Never reaches zero, and that is the contract: this is what a creature IS, not something it
  * is doing, so there is no frame in which the eye is out. Reduced motion holds it steady
- * rather than turning it off, for the same reason.
+ * rather than turning it off, for the same reason; sleep dims it to the ember above.
  */
-export function eyeGlowIntensity(spec: EyeGlowSpec, clock: number, reducedMotion = false): number {
+export function eyeGlowIntensity(
+  spec: EyeGlowSpec,
+  clock: number,
+  reducedMotion = false,
+  asleep = false,
+): number {
+  if (asleep) return EYE_GLOW_ASLEEP;
   if (reducedMotion) return 0.8;
   return 0.62 + 0.38 * (0.5 + 0.5 * Math.sin(clock * spec.pulseHz * Math.PI * 2));
 }

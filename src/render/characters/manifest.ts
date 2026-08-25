@@ -70,6 +70,12 @@ export interface ClipMap {
   walkBack?: string;
   /** one-shot played on respawn (skeleton awaken / boss taunt) */
   flourish?: string;
+  /** Looping sleep pose for a mob that keeps hours (MobTemplate.slumber): played for
+   *  as long as the entity's `asleep` bit rides, above every locomotion state. */
+  sleep?: string;
+  /** One-shot on the asleep-to-awake edge (the dawn rise). Absent = a plain crossfade
+   *  from the sleep loop back into idle. */
+  wake?: string;
   /** arm gesture for the Z-key sheathe toggle; the held-prop swap lands at its
    *  midpoint (see visual.ts setWeaponStowed). Absent = snap with no gesture. */
   stow?: string;
@@ -307,10 +313,11 @@ const BALGATH_RUN_REF = 8.38;
 //
 // `cast` is the scry channel rather than a generic cast: the boss's only channelled
 // ability IS the eye, so the bar and the pose are the same event. `flourish` is the
-// enrage roar. Neither `Balgath_Blinded` nor `Balgath_Wake` gets a generic slot,
-// deliberately: one has to hold for as long as a debuff lasts and one fires once at
-// spawn, so both are encounter one-shots rather than states the animation machine may
-// pick on its own.
+// enrage roar. `sleep` and `wake` are the night (mob/slumber.ts): the sleep loop plays
+// for as long as the wire says he is in bed, and the wake fires exactly once on the
+// asleep-to-awake edge, so `Balgath_Wake` is reachable from ONE state transition and
+// nowhere else. `Balgath_Blinded` still gets no generic slot: it has to hold for as long
+// as a debuff lasts, so it stays an encounter one-shot the machine may not pick on its own.
 //
 // NOTE for the cyclops: its own retargeted `Attack` clip is FOLDED (the slash preset
 // collapsed that body) and is named nowhere here, which is exactly why `attack` is
@@ -389,6 +396,11 @@ const BALGATH: ClipMap = {
   cast: 'Balgath_EyeFlare',
   jump: 'Jump',
   flourish: 'Balgath_Roar',
+  // The night. He folds down into a mound of granite beside the fallen star and breathes
+  // (the loop), then levers himself up out of it at dawn (the one-shot, which is the same
+  // rise the spawn was always meant to have and now has a state edge to fire on).
+  sleep: 'Balgath_Sleep',
+  wake: 'Balgath_Wake',
 };
 
 const DRAGONKIN_BROODLORD: ClipMap = {
@@ -1135,6 +1147,13 @@ export const SKIN_EMISSIVE: Record<string, (string | null)[]> = {
 /** Number of skins (including the default) available for a visual key — min 1. */
 export function skinCount(key: string): number {
   return SKINS[key]?.length ?? 1;
+}
+
+/** How many player skin variants the boot prewarm plans across every class: one rig per
+ *  authored skin per class (`skinCount`), which the prewarm manifest and its telemetry
+ *  both read so they can never disagree about the count. */
+export function prewarmPlayerSkinVariantCount(): number {
+  return ALL_CLASSES.reduce((sum, cls) => sum + skinCount(`player_${cls}`), 0);
 }
 
 /** Texture url to preview a skin option (default index 0 → the model's base.png). */

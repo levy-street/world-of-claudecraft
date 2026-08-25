@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { ABILITIES } from '../src/sim/data';
+import { SLUMBER_AURA_ID } from '../src/sim/mob/slumber';
 import {
   BATTLE_RUNE_AURA_ID,
   CARRIED_FLAG_AURA_ID,
@@ -77,6 +78,16 @@ describe('aura icons reuse image-based ability art', () => {
 
   it('keeps a readable attack-power-percent safety fallback', () => {
     expect(hasAuraRecipe('aura_buff_ap_pct')).toBe(true);
+  });
+
+  it('the world boss slumber aura carries its own moon recipe, not the shield of its kind', () => {
+    // Its kind is buff_dr (value 0) purely so every frame classifies it as a benign buff;
+    // keyed by the bare aura id (that is how a dedicated per-aura recipe is found), so a
+    // sleeping boss reads "asleep" rather than "damage reduction" on the target frame.
+    expect(hasAuraRecipe(SLUMBER_AURA_ID), 'the slumber aura needs its recipe').toBe(true);
+    expect(hasAuraRecipe('aura_slumber'), 'the aura_ prefix is the kind fallback, not an id').toBe(
+      false,
+    );
   });
 
   it('keeps painted modifier timers meaningful before their WebPs decode', () => {

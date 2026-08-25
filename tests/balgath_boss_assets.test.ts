@@ -9,7 +9,8 @@
 import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { describe, expect, it } from 'vitest';
-import { loadRigPoser } from './helpers/gltf_pose';
+import { createGlbIO, indexClip, sampleChannel } from '../scripts/anim/pose_blend.mjs';
+import { loadRigPoser, type PosedSkeleton } from './helpers/gltf_pose';
 
 const ROOT = resolve(__dirname, '..');
 const RIG = resolve(ROOT, 'public/models/creatures/balgath_cyclops.glb');
@@ -68,7 +69,8 @@ const AUTHORED = [
   'Balgath_EyeFlare', // the scry channel under the cast bar
   'Balgath_Blinded', // the low-level counterplay, loops for the debuff
   'Balgath_Roar', // the enrage flourish
-  'Balgath_Wake', // the spawn rise
+  'Balgath_Sleep', // the night: folded into a mound and breathing, loops until dawn
+  'Balgath_Wake', // the dawn rise, out of the sleep pose
   'Balgath_Swipe', // the ORDINARY auto-attack, kept small so the slams stay rare
   'Balgath_Barrowsweep', // the mid-run backhand: its legs are sampled off the Run cycle
   'Balgath_Barrowfall', // the warpath arrival slam, timed to its own telegraph fuse
@@ -174,11 +176,74 @@ describe('balgath world boss assets', () => {
   });
 
   it('holds the encounter-only clips out of the generic slots', () => {
-    // Blinded holds for as long as a debuff lasts and Wake fires once at spawn; either one
-    // landing in attack/hit/flourish would be picked at random mid-fight.
-    const map = clipMapSource();
+    // Blinded holds for as long as a debuff lasts, and Sleep/Wake are the night; any of the
+    // three landing in attack/hit/flourish would be picked at random mid-fight. Blinded is
+    // driven by the encounter and stays unnamed. Sleep and Wake ARE named, but each exactly
+    // once and only in the slot the slumber state plays it from: `sleep` loops while the
+    // asleep bit rides and `wake` fires once on the asleep-to-awake edge. Comments are
+    // stripped first so prose about a clip cannot stand in for the slot.
+    const map = clipMapSource().replace(/\/\/.*$/gm, '');
     expect(map).not.toContain('Balgath_Blinded');
-    expect(map).not.toContain('Balgath_Wake');
+    const mentions = (clip: string) => map.match(new RegExp(`'${clip}'`, 'g')) ?? [];
+    expect(map).toContain("sleep: 'Balgath_Sleep'");
+    expect(mentions('Balgath_Sleep'), 'Sleep is named outside the sleep slot').toHaveLength(1);
+    expect(map).toContain("wake: 'Balgath_Wake'");
+    expect(mentions('Balgath_Wake'), 'Wake is named outside the wake slot').toHaveLength(1);
+  });
+
+  it('loops the sleep in place and wakes out of its exact first pose', async () => {
+    // The sleep loop holds from dusk to dawn, so its wrap has to be invisible: the last
+    // sampled key equals the first on every channel, exactly, not to a tolerance. And the
+    // wake fires on the edge the loop was playing across, so ITS first key must equal the
+    // loop's first key channel for channel, or he jumps to a new pose the frame he wakes.
+    // Checked on the shipped channels rather than on a build-script constant, because it is
+    // the baked Float32 data the mixer reads.
+    const root = (await createGlbIO().read(ABILITIES)).getRoot();
+    const sleep = indexClip(root, 'Balgath_Sleep');
+    const wake = indexClip(root, 'Balgath_Wake');
+    expect(sleep.size, 'the sleep loop drives almost nothing').toBeGreaterThan(40);
+    let loop = 0;
+    for (const ch of sleep.values()) loop = Math.max(loop, ch.times[ch.times.length - 1]);
+    expect(loop).toBeGreaterThan(3.2);
+    expect(loop).toBeLessThan(4.0);
+    let breathing = 0;
+    for (const [key, ch] of sleep) {
+      const first = sampleChannel(ch, 0);
+      expect(sampleChannel(ch, loop), `${key} pops at the loop point`).toEqual(first);
+      const edge = wake.get(key);
+      expect(edge, `the wake does not drive ${key}, so the edge would drop it`).toBeDefined();
+      expect(
+        sampleChannel(edge as NonNullable<typeof edge>, 0),
+        `${key} seams on the wake edge`,
+      ).toEqual(first);
+      if (sampleChannel(ch, loop / 2).some((v, i) => Math.abs(v - first[i]) > 1e-4)) breathing++;
+    }
+    // ...and it is a breath, not a held frame: mid-loop he is somewhere else.
+    expect(breathing, 'the sleep loop never moves').toBeGreaterThan(5);
+  });
+
+  it('sleeps folded low with his soles in the ground, never hovering above it', async () => {
+    // From across the fen the sleeping boss has to pass for a boulder, and up close the one
+    // thing that breaks a held pose is a hover. Every donor on this rig keeps the Hip at a
+    // fixed height and folds the legs UP under it, so a crouch blended out of them floats
+    // unless the build sinks the Hip (build_balgath_anims.mjs `sunk`); the circle-smash's
+    // impact frame hovers for exactly that reason and gets away with it by being brief.
+    // Measured against his own retargeted Idle, the pose prepareVisual takes the sole line
+    // from, so "the ground" here is the ground the renderer will stand him on.
+    const poser = await loadRigPoser(RIG, ABILITIES);
+    const own = await loadRigPoser(RIG, RIG);
+    const stand = own.pose('Idle', 0.5);
+    const asleep = poser.pose('Balgath_Sleep', 0);
+    const sole = (p: PosedSkeleton) =>
+      Math.min(...['R_Foot', 'L_Foot', 'R_ToeBase', 'L_ToeBase'].map((b) => p.at(b)[1]));
+    expect(sole(asleep), 'the sleeping soles float above his idle sole line').toBeLessThanOrEqual(
+      sole(stand) + 0.005,
+    );
+    // Folded: the head sits far lower over the hip than standing, and further FORWARD of it
+    // than above it (the rig faces +X), which is a spine pitched past 45 degrees, not a bow.
+    const rise = (p: PosedSkeleton) => p.at('Head')[1] - p.at('Hip')[1];
+    expect(rise(asleep)).toBeLessThan(rise(stand) * 0.6);
+    expect(asleep.at('Head')[0] - asleep.at('Hip')[0]).toBeGreaterThan(rise(asleep));
   });
 
   it('is reachable through MOB_KEYS, and therefore NOT lazily preloaded', () => {

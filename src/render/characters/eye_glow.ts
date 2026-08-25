@@ -42,10 +42,10 @@ export class EyeGlow {
     return this.core !== null;
   }
 
-  update(dt: number, reducedMotion = false): void {
+  update(dt: number, reducedMotion = false, asleep = false): void {
     if (!this.core || !this.halo) return;
     this.clock += dt;
-    const k = eyeGlowIntensity(this.spec, this.clock, reducedMotion);
+    const k = eyeGlowIntensity(this.spec, this.clock, reducedMotion, asleep);
     (this.core.material as THREE.MeshBasicMaterial).opacity = 0.72 * k;
     (this.halo.material as THREE.MeshBasicMaterial).opacity = 0.3 * k;
     // The halo breathes in SIZE as well as brightness; a glow that only changes opacity

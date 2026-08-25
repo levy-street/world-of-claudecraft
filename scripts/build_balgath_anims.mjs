@@ -36,8 +36,15 @@
 //                    claws, off the axis he normally tracks on. Loops, so it can hold for
 //                    as long as the blind lasts.
 //   Balgath_Roar     the enrage flourish.
-//   Balgath_Wake     his rise out of the barrow at the scheduled spawn: held folded low,
-//                    then levered upright with both arms thrown up at full height.
+//   Balgath_Sleep    the night (mob/slumber.ts). He folds down into a mound of granite
+//                    beside the fallen star and BREATHES: a slow loop whose last key is its
+//                    first, so it can hold from dusk to dawn without a pop at the wrap. From
+//                    a distance it has to read as a boulder, so it is the lowest, most
+//                    compact silhouette the donor set can reach, sunk into the ground.
+//   Balgath_Wake     the dawn one-shot on the asleep-to-awake edge (the same rise the
+//                    scheduled spawn always meant). Its first key IS the sleep loop's first
+//                    key, so the edge is seamless: a beat still in the mound, then a slow
+//                    heavy lever up to standing with both arms thrown up at full height.
 //   Balgath_Swipe    the ORDINARY auto-attack. Small and quick on purpose, so the two
 //                    telegraphed slams stay rare and therefore stay meaningful.
 //   Balgath_Barrowsweep  the backhand he throws at whatever is chasing him WHILE HE RUNS
@@ -64,7 +71,7 @@
 //                    impact frame is authored to land ON the telegraph fuse.
 //
 // Usage: node scripts/build_balgath_anims.mjs [--preview]
-// Output: public/models/creatures/balgath_ability_anims.glb (mesh-free, 11 clips)
+// Output: public/models/creatures/balgath_ability_anims.glb (mesh-free, 12 clips)
 import { readFileSync } from 'node:fs';
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -141,7 +148,9 @@ const donorFor = (key) =>
 //
 // None of these donors animate Root or Pelvis translation at all (verified channel by
 // channel), so a blend between any two of them is pure bone rotation and cannot slide the
-// body: that is what makes sampling from deep inside a clip safe here.
+// body: that is what makes sampling from deep inside a clip safe here. The sleep pose is
+// the one deliberate exception, and it is authored rather than sampled: `sunk` below
+// writes the Hip translation on purpose, straight down, to put his soles in the ground.
 const P_idle = samplePose(idleIdx, 0.2); // neutral standing bookend
 const P_raise = samplePose(attackIdx, 1.66); // arms coming up, hands at 0.87
 const P_top = samplePose(attackIdx, 1.99); // BOTH fists overhead: R 1.08, L 1.62
@@ -215,6 +224,50 @@ const partial = (from, to, amount, upperOnly = false) => {
 const P_jab = partial(P_idle, P_swing, 0.7, true);
 const P_jabHit = partial(P_idle, P_impact, 0.55, true);
 
+/** The arm chains, for a blend that weights them apart from the body (the sleep fold). */
+const ARMS = /^[LR]_(Clavicle|Upperarm|Forearm|Hand|UpperarmTwist\d+|ForearmTwist\d+)\|/;
+
+/**
+ * A full-body blend with the ARMS on their own weight.
+ *
+ * `partial` cannot author the sleep pose, and the reason is worth keeping: on this rig
+ * the forward fold of the slam donors lives in the HIP rotation, not the spine, so an
+ * upper-body-only blend toward P_impact leaves him standing with a bowed head (rendered:
+ * 97% of idle height, a brooding stance, not a mound). The body has to take the fold whole.
+ * But at the body's weight the arms are the slam's arms, both fists thrown two body-lengths
+ * forward, and that reads as a giant mid-slam rather than one asleep. Half that weight and
+ * the fists knuckle down beside the head instead, which is the resting shape.
+ */
+const fold = (from, to, body, arms) => {
+  const out = new Map();
+  for (const key of allKeys) {
+    const a = poseValue(from, key, P_all);
+    const b = poseValue(to, key, P_all);
+    if (!a || !b) continue;
+    out.set(key, blendValue(key, a, b, ARMS.test(key) ? arms : body));
+  }
+  return out;
+};
+
+/**
+ * The same pose, sunk straight down into the ground by `depth` (donor units).
+ *
+ * Every donor keeps the Hip at a fixed height and folds the legs under it, so a crouch
+ * blended out of them lifts the FEET rather than lowering the body: the circle-smash's
+ * impact frame hovers 0.04 above his idle sole line. Held for a whole night that hover
+ * is the first thing anyone sees, so the sleep pose translates the Hip down instead.
+ * Hip-local +Z is world UP here: Root's world rotation is the same quarter-turn
+ * (-0.5, 0.5, 0.5, 0.5) in every donor pose, measured by forward kinematics, so the
+ * offset is one component and cannot drift sideways. Sinking is fine (his soles end up
+ * ankle-deep in the fen, which a mound of granite should be); hovering is not.
+ */
+const sunk = (pose, depth) => {
+  const out = new Map(pose);
+  const t = poseValue(pose, 'Hip|translation', P_all);
+  out.set('Hip|translation', [t[0], t[1], t[2] - depth]);
+  return out;
+};
+
 // --- Balgath_Smash: 1.75s, impact at ~0.95s ---------------------------------
 // The long slow lift is the mechanic: the telegraph ring is drawn at cast start and
 // players need every frame of it. The 0.15s hold at the top is the "now" beat.
@@ -284,21 +337,60 @@ ramp(swipe, 0.18, 0.32, 2, easeOutCubic, P_jab, P_jabHit);
 ramp(swipe, 0.32, 0.55, 3, easeOutCubic, P_jabHit, P_jab);
 ramp(swipe, 0.55, 0.85, 4, easeInOutQuad, P_jab, P_idle);
 
-// --- Balgath_Wake: 3.40s ----------------------------------------------------
-// He levers himself up out of the barrow: held low and folded, then a slow push to
-// standing, then both arms thrown up as he takes his full height.
+// --- Balgath_Sleep: 3.80s, loops --------------------------------------------
+// The night. He is folded down into a mound beside the fallen star, and from across the
+// fen he should be mistakable for a boulder, so this is the lowest shape the donors reach.
 //
-// This was first built by sampling the Death collapse in REVERSE, which is elegant in
-// principle and did not work in practice: on this rig the collapse lives mostly in ROOT
-// TRANSLATION rather than in bone pose, so the reversed samples all read as a standing
-// figure shuffling. The crouch donor carries its low pose in the bones themselves, so it
-// survives the blend. Verified by render, not by reasoning.
-const wake = [[0, (k) => poseValue(P_crouch, k, P_all)]];
-wake.push([0.55, (k) => poseValue(P_crouch, k, P_all)]); // a beat still folded in the mound
-ramp(wake, 0.55, 1.5, 6, easeInOutQuad, P_crouch, P_extend);
-ramp(wake, 1.5, 2.3, 5, easeOutCubic, P_extend, P_raise);
-ramp(wake, 2.3, 2.9, 4, easeOutCubic, P_raise, P_top); // arms thrown up at full height
-ramp(wake, 2.9, 3.4, 4, easeInOutQuad, P_top, P_idle);
+// The Death donor is no help, and not for the reason the old Wake comment gave: sampled
+// by forward kinematics, its Hip never leaves y=0 and its head never drops below 0.26 of
+// the 0.28 standing height at ANY time in its 8.5s. The retarget simply did not carry the
+// collapse, in translation or in bone. The fold this rig CAN do is the slam's landing
+// (P_impact: head at 0.10, both fists below the hip), so the mound is the loaded crouch
+// folded most of the way into that, arms at half weight (see `fold`), then sunk 0.08 so
+// the soles sit in the ground instead of above it. Rendered from the hero, side, front
+// and a 14-height distance: a rounded lump with the face down at the front, fists
+// knuckled on the ground either side of it, 69% of his idle height.
+//
+// Then he breathes. The inhale is the fold eased a little way back toward the upright
+// crouch from the waist up (legs and the sunk Hip held, so nothing under him shifts):
+// about 3% of the silhouette's height, enough to read as a heave from raid distance on
+// a 13-yard body and not enough to look like a nod. Two eased halves, and the LAST row
+// is the first row's exact valueFor rather than the ramp's end, so the loop point cannot
+// pop even by a float.
+const P_sleep = sunk(fold(P_crouch, P_impact, 0.85, 0.5), 0.08);
+const P_sleepIn = partial(P_sleep, P_crouch, 0.15, true);
+const SLEEP_LOOP = 3.8;
+const sleepRow = [0, (k) => poseValue(P_sleep, k, P_all)];
+const sleep = [sleepRow];
+ramp(sleep, 0, SLEEP_LOOP / 2, 6, easeInOutQuad, P_sleep, P_sleepIn); // inhale
+ramp(sleep, SLEEP_LOOP / 2, SLEEP_LOOP, 6, easeInOutQuad, P_sleepIn, P_sleep); // exhale
+sleep[sleep.length - 1] = [SLEEP_LOOP, sleepRow[1]]; // loop-safe: identical to key 0
+
+// --- Balgath_Wake: 3.95s ----------------------------------------------------
+// Dawn. He levers himself up out of the mound: a beat still asleep, then the rise from
+// the fold to the loaded crouch (the Hip un-sinking as the spine comes up), the legs
+// driving out, and both arms thrown up as he takes his full height.
+//
+// Its first row is the SAME valueFor as the sleep loop's first row, which is what makes
+// the asleep-to-awake edge seamless: the renderer swaps clips on that edge and the pose
+// it lands on is the pose it left. The old cut began from the bare P_crouch, which
+// rendered as a giant already standing with his hands slightly forward (105% of idle
+// height), so "held folded low" was never what it showed. The real fold is above.
+//
+// The rise is in TWO heaves, because one eased ramp read as a spring: the fold's top is
+// his back at 69% of idle height and the crouch's is his head at 105%, so a single ramp
+// had the silhouette at 98% before its midpoint (rendered at 1.1s). Pushing partway,
+// settling for a beat under the weight, then finishing is what a heavy thing does.
+const P_halfUp = partial(P_sleep, P_crouch, 0.45);
+const wake = [[0, sleepRow[1]]];
+wake.push([0.5, sleepRow[1]]); // a beat still in the mound
+ramp(wake, 0.5, 1.3, 5, easeOutCubic, P_sleep, P_halfUp); // first heave, dying off
+wake.push([1.55, (k) => poseValue(P_halfUp, k, P_all)]); // the weight settles
+ramp(wake, 1.55, 2.2, 5, easeInOutQuad, P_halfUp, P_crouch); // second heave, to the crouch
+ramp(wake, 2.2, 2.7, 4, easeInOutQuad, P_crouch, P_extend);
+ramp(wake, 2.7, 3.15, 4, easeOutCubic, P_extend, P_raise);
+ramp(wake, 3.15, 3.55, 4, easeOutCubic, P_raise, P_top); // arms thrown up at full height
+ramp(wake, 3.55, 3.95, 4, easeInOutQuad, P_top, P_idle);
 
 // --- Balgath_Barrowsweep: 1.292s authored, one full Run cycle ---------------
 // The backhand he throws at whoever is chasing him, WITHOUT stopping.
@@ -441,6 +533,7 @@ const CLIPS = [
   ['Balgath_EyeFlare', eyeFlare],
   ['Balgath_Blinded', blinded],
   ['Balgath_Roar', roar],
+  ['Balgath_Sleep', sleep],
   ['Balgath_Wake', wake],
   ['Balgath_Swipe', swipe],
   ['Balgath_Barrowsweep', sweep],

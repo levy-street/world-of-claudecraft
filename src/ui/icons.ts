@@ -3655,6 +3655,10 @@ const AURA_RECIPES: Record<string, IconRecipe> = {
   // Physical-only damage-reduction buffs (Raised Guard's cut), mirroring
   // aura_buff_dr on the steel palette
   aura_buff_dr_phys: r('steel', 'steel', ['shield', { p: 'heart', ...TR }], ['glow']),
+  // The slumbering world boss in bed (src/sim/mob/slumber.ts): keyed by the bare aura id,
+  // which is how a dedicated per-aura recipe is found (hasAuraRecipe), so the frame reads
+  // "asleep" under a moon rather than the generic shield its buff_dr kind falls back to.
+  slumber: r('shadow', 'shadowPurple', ['moon'], ['glow']),
   // Breachmaker's source-scoped vulnerability debuff (kind 'vuln_source'), shown
   // on the target's debuff frame: a cracked guard struck by a blade
   aura_vuln_source: r('blood', 'earthBrown', ['sword', { p: 'sunburst', ...BR }], ['crack']),
