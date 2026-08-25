@@ -22,10 +22,6 @@ describe('mob component-type tags', () => {
     (mob) => Array.isArray(mob.componentTags) && mob.componentTags.length > 0,
   );
 
-  it('has tagged at least one mob (a representative sample across zones)', () => {
-    expect(tagged.length).toBeGreaterThan(0);
-  });
-
   it('every componentTags entry is a non-empty string with no duplicates', () => {
     for (const mob of tagged) {
       const tags = mob.componentTags ?? [];
@@ -167,7 +163,8 @@ describe('mob component-type tags', () => {
     // 54 / 181 partition is pinned in gathering.test.ts; this file's own
     // sweeps iterate `tagged`, so the ratchet is their non-vacuity floor).
     // The arrayContaining(summary) line that used to sit here was x === x
-    // and asserted nothing; removed 2026-08-25 (11m QA).
+    // and asserted nothing; removed 2026-08-25 (11m QA), and the separate
+    // at-least-one-tagged arm folded in here (this floor subsumes it).
     expect(tagged.length).toBeGreaterThanOrEqual(54);
   });
 });

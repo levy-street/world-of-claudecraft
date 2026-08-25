@@ -125,16 +125,14 @@ import {
   FARM_GROWTH_TONIC_ITEM_ID,
   FARM_WITHERED_HUSK_ITEM_ID,
 } from '../src/sim/professions/farming';
-import { NODE_HARVEST_TABLE, NODE_MATERIAL_TABLE } from '../src/sim/professions/gathering';
+import { NODE_MATERIAL_TABLE } from '../src/sim/professions/gathering';
 import {
   CORPSE_HARVEST_FAMILY,
   gatheringSupplyByFamily,
-  nodeSupplyFor,
 } from '../src/sim/professions/gathering_supply';
 import { baseMaterialFor, MATERIAL_GRADES } from '../src/sim/professions/material_grades';
 import { gatherToolTier } from '../src/sim/professions/tools';
 import { TIER_SKILL_STEP, tierForSkill } from '../src/sim/professions/wheel';
-import type { GatherNodeType } from '../src/sim/types';
 
 // THE SUPPLY DERIVATION MOVED OUT AT masterwrought Phase 11k, and the move is
 // why this file no longer carries it. The provisioning wiki page became a

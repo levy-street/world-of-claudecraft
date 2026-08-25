@@ -228,15 +228,26 @@ describe('harvest-family trash carries usable components', () => {
   const isBare = (tags: readonly string[] | undefined) =>
     !(tags ?? []).some((tag) => tag in HARVEST_COMPONENT_ITEMS);
 
+  // The sweep's whole pipeline as one callable, so the empty-sweep arm can be
+  // proven to produce a row before it is trusted (the filter or the row
+  // format breaking would otherwise leave the sweep AND its control green;
+  // the same class harvest_geography's scanner control closed, 11m QA).
+  const bareRows = (list: readonly { template: MobTemplate; zoneId: string }[]) =>
+    list
+      .filter(({ template }) => isBare(template.componentTags))
+      .map(({ template, zoneId }) => `${template.id} (${zoneId})`);
+
   it('gives every beast, spider and reptile at least one HARVESTABLE tag', () => {
     // Mapped in HARVEST_COMPONENT_ITEMS specifically: an unmapped tag is dead
     // weight the corpse-harvest command cannot turn into an item (gills and
     // horn were the shipped examples until Phase 11m mapped both; the
     // synthetic families below are what stand in for that shape now).
-    const bare = governed()
-      .filter(({ template }) => isBare(template.componentTags))
-      .map(({ template, zoneId }) => `${template.id} (${zoneId})`);
-    expect(bare).toEqual([]);
+    expect(bareRows(governed())).toEqual([]);
+    // Positive control on the PIPELINE, not only the predicate: one bare
+    // synthetic entry must come out as exactly one formatted row.
+    expect(
+      bareRows([{ template: { id: 'x', componentTags: [UNMAPPED_FAMILY] } as MobTemplate, zoneId: 'z' }]),
+    ).toEqual(['x (z)']);
   });
 
   it('rejects an unmapped-only tag set, running the same predicate as the rule', () => {

@@ -362,11 +362,11 @@ describe('LootWindowController', () => {
     const shippedTest = harness([palecoil], (entry) => corpseLootAvailability(entry, 7));
     shippedTest.controller.openCorpse(22, 0, 0);
     expect(shippedTest.element.querySelector('.corpse-harvest')).not.toBeNull();
-    // 4 as a literal, not derived from the template: the view renders the
-    // same componentTags this line would read, so a derived expectation
-    // moves with a dropped tag and passes (11m QA). The Palecoil ships
-    // hide, claw, horn, venomSac since the 11m spread.
-    expect(MOBS.sethrael_palecoil.componentTags).toHaveLength(4);
+    // The exact list as a literal, not derived from the template: the view
+    // renders the same componentTags a derived expectation would read, so it
+    // would move with a dropped tag and pass; the exact list also reds a
+    // same-count tag SWAP a bare length could not (11m QA).
+    expect(MOBS.sethrael_palecoil.componentTags).toEqual(['hide', 'claw', 'horn', 'venomSac']);
     expect(shippedTest.element.querySelectorAll('.corpse-harvest-check')).toHaveLength(4);
   });
 

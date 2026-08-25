@@ -299,6 +299,10 @@ describe('startTutorial (the ferry)', () => {
   });
 });
 
+// Sibling coverage: tests/ferry_bell.test.ts pins the crossing's UNGATED
+// premise (zero-progress character, repeat rides, combat as the only refusal
+// with its message); this block pins the exact landings and markers. Neither
+// is redundant with the other (11m QA).
 describe('the ferry bells (the clicked crossing)', () => {
   function bells(sim: Sim) {
     const found = [...sim.entities.values()].filter(

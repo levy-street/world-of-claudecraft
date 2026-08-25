@@ -872,7 +872,8 @@ describe('two-specimen-family harvest capacity contract', () => {
     // arm also proves the exactly-reserved arm below EARNED its jackpot).
     //
     // Re-seeded as content moved under the draw order (1, 11 at #2514, 15 at
-    // the v0.32.0 base merge, 16, then 4 at the #2905 claw and tusk wiring,
+    // the v0.32.0 base merge, 16 at the zones 1-3 quest-dedupe pass
+    // (a5d51c7500), then 4 at the #2905 claw and tusk wiring,
     // c53520b499); the v0.35.0 base-sync fixture refresh (d4deed629a)
     // re-hunted it to the CURRENT 6, where this chain ends (11m QA: the old
     // text opened "Seed 11" and narrated the abandoned 4 as terminal over a
@@ -1075,9 +1076,9 @@ describe('corpse signed-guard capacity vs merge room (#2139)', () => {
 // 104 to 211) after the zones 1-3 quest-dedupe content pass, again (115 to
 // 114, 211 to 50) after the Galecrest quest-camp pass (#2887), and the fang
 // rig once more by the v0.35.0 base-sync fixture refresh (d4deed629a), 114 to
-// the CURRENT 31, the spill rig's 50 standing (11m QA: the chain used to end
-// at 114 over setup(31) bodies): any content add
-// shifts the shared world-gen draw sequence, and each time the old seed's fang
+// the CURRENT 31 with the spill rig's 50 standing (11m QA: the chain used to
+// end at 114 over setup(31) bodies). Any content add shifts the shared
+// world-gen draw sequence, and each time the old seed's fang
 // roll stopped clearing the signable floor. Every replacement reproduces the
 // ORIGINAL rig profile exactly (a signed 3-unit epic fang roll, a signed
 // 2-unit cloth roll, and for the spill seed a 2-unit signed spill beside a

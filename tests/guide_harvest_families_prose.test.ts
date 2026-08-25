@@ -133,7 +133,11 @@ describe('guide harvest-family prose derives from the live harvest maps', () => 
     // green (11m QA). Comments in the page mention the retired names as
     // history, so the scan strips comments first and harvests exact quoted
     // key literals (specimenBody is a PREFIX of specimenBodyFamilies; a
-    // substring check could not tell them apart).
+    // substring check could not tell them apart). The pin assumes
+    // single-quoted literals, the style Biome enforces repo-wide; a key built
+    // as a template literal or computed string would escape the negative
+    // arms, and the two positive arms are what prove the matcher still sees
+    // the page at all.
     const src = stripComments(
       readFileSync(new URL('../src/guide/pages/professions_gathering.ts', import.meta.url), 'utf8'),
     );
