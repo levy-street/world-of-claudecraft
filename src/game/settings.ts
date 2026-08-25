@@ -212,6 +212,9 @@ export const BOOL_SETTINGS = {
   // Directional combat is always enabled. This preference controls only the
   // optional GW2-style pointer-locked crosshair/camera presentation.
   actionCamera: { def: false },
+  // on by default: a quick second press of the same movement key dodges in
+  // that direction. Players who prefer only the dedicated bind can disable it.
+  doubleTapDodge: { def: true },
   // off by default (issue #1358): the classic MMO default is that switching
   // targets while auto-attacking carries the swing over to the new target
   // (Tab, click, nearest-enemy, assist, any method). Turning this on flips

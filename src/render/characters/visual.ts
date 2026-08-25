@@ -9,6 +9,7 @@ import * as THREE from 'three';
 import { offhandMirrorsWeaponSkin } from '../../sim/content/weapon_skin_rules';
 import { WEAPON_SKINS } from '../../sim/content/weapon_skins';
 import type { OverheadEmoteId } from '../../world_api';
+import type { DodgeVisualDirection } from '../dodge_visual_core';
 import { GFX } from '../gfx';
 import { cloneMaterialWithHooks } from '../material_clone_hooks';
 import {
@@ -1365,10 +1366,21 @@ export class CharacterVisual {
     this.playOneShot(clips[Math.floor(Math.random() * clips.length)], 1.2);
   }
 
-  /** Existing authored defensive gesture, time-scaled to the server dodge window. */
-  playDodge(): void {
+  /** Direction-specific evasive gesture, time-scaled to the server dodge window. */
+  playDodge(direction: DodgeVisualDirection = 'forward'): void {
     if (this.deadLock) return;
-    const clip = this.def.clips.dodge ?? this.def.clips.jump ?? this.def.clips.run;
+    const directional =
+      direction === 'back'
+        ? this.def.clips.walkBack
+        : direction === 'left'
+          ? 'Running_Strafe_Left'
+          : direction === 'right'
+            ? 'Running_Strafe_Right'
+            : this.def.clips.dodge;
+    const clip =
+      (directional && this.action(directional) ? directional : this.def.clips.dodge) ??
+      this.def.clips.jump ??
+      this.def.clips.run;
     if (!clip) return;
     const action = this.action(clip);
     if (!action) return;

@@ -1000,9 +1000,9 @@ class Sfx {
     this.preload(keys.stopKey);
   }
 
-  /** Jump / land / water-entry / swim-stroke. */
+  /** Jump / land / dodge / water-entry / swim-stroke. */
   movement(
-    kind: 'jump' | 'land' | 'splash' | 'swim',
+    kind: 'jump' | 'land' | 'dodge' | 'splash' | 'swim',
     x: number,
     y: number,
     z: number,
@@ -1013,10 +1013,15 @@ class Sfx {
         ? 'move_jump'
         : kind === 'land'
           ? 'move_land'
-          : kind === 'splash'
-            ? 'move_splash'
-            : 'move_swim';
-    this.playAt(key, x, y, z, { gain: kind === 'swim' ? 0.5 : 0.7, cooldown: 0.08 });
+          : kind === 'dodge'
+            ? 'combat_dodge'
+            : kind === 'splash'
+              ? 'move_splash'
+              : 'move_swim';
+    this.playAt(key, x, y, z, {
+      gain: kind === 'swim' ? 0.5 : kind === 'dodge' ? 0.55 : 0.7,
+      cooldown: 0.08,
+    });
   }
 
   necromancy(

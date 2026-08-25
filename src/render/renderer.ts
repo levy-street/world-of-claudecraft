@@ -226,6 +226,7 @@ import { shouldPlayDeedFirework } from './deed_fx_gate';
 import { DelveInteriorTracker } from './delve_interior_tracker';
 import { buildDelveInteractable, syncDelveInteractableVisibility } from './delve_props';
 import { detailHorizonStarved } from './detail_horizon_core';
+import { dodgeVisualDirection } from './dodge_visual_core';
 import { buildDoorBody, buildRiftGateBody, buildRiftPuzzleProp } from './door_portal';
 import { watchDevicePixelRatio } from './dpr_watch';
 import { DrainChannelStopLatch, drainChannelVisualPlan } from './drain_channel_visual_core';
@@ -11447,7 +11448,10 @@ export class Renderer {
         v.metamorphVisual,
       );
       const dodging = (e.dodgeRemaining ?? 0) > 0;
-      if (dodging && !v.wasDodging) active.playDodge();
+      const dodgeStarted = dodging && !v.wasDodging;
+      if (dodgeStarted) {
+        active.playDodge(dodgeVisualDirection(e.dodgeDirX ?? 0, e.dodgeDirZ ?? 0, e.facing));
+      }
       v.wasDodging = dodging;
       if (!e.templateId.startsWith('vision_')) {
         active.clickProxy.userData.entityId = e.id;
@@ -11767,8 +11771,10 @@ export class Renderer {
       }
       // --- spatial movement audio (self + others) --------------------------
       // All gated by audibility (squared distance) so far entities cost nothing.
+      if (dodgeStarted && d2 < SFX_MOVE_RANGE_SQ) this.emitGroundPuff(ax, ay, az, 0.22);
       const sink = this.audioSink;
       if (sink && d2 < SFX_MOVE_RANGE_SQ) {
+        if (dodgeStarted) sink.movement('dodge', ax, ay, az, isSelf);
         // jump / land / water-entry edges
         if (airborne && !v.wasAirborne && !visuallyDead) sink.movement('jump', ax, ay, az, isSelf);
         else if (!airborne && v.wasAirborne && !visuallyDead) {

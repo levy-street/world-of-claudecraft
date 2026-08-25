@@ -9,8 +9,8 @@ import type { MoveInput } from '../sim/types';
 import { detectBrowserEngine } from './browser_env';
 import { cursorForHover, type HoverCursorKind } from './cursors';
 import {
-  type DodgeLocalDirection,
   DodgeDoubleTapTracker,
+  type DodgeLocalDirection,
   dodgeDirectionForAction,
   heldDodgeDirection,
 } from './dodge_input';
@@ -269,6 +269,7 @@ export class Input {
   // blur) releases the matching slot (drives the hold-to-charge shoot).
   private heldSlotCodes = new Map<string, number>();
   private readonly dodgeDoubleTap = new DodgeDoubleTapTracker();
+  private doubleTapDodgeEnabled = true;
   // MouseEvent.button indices whose press this frame was consumed by a binding
   // (or by the rebind capture), so the matching `auxclick` can be cancelled too.
   // Chromium and Gecko navigate back/forward on the thumb buttons; cancelling
@@ -534,6 +535,11 @@ export class Input {
       if (document.pointerLockElement === this.canvas) document.exitPointerLock?.();
     }
     this.updateCursor();
+  }
+
+  setDoubleTapDodgeEnabled(on: boolean): void {
+    this.doubleTapDodgeEnabled = on;
+    if (!on) this.dodgeDoubleTap.clear();
   }
 
   isAttackMoveEnabled(): boolean {
@@ -1071,7 +1077,11 @@ export class Input {
       if (held === 'jump')
         this.keyJumpUntil = Math.max(this.keyJumpUntil, performance.now() + KEY_JUMP_LATCH_MS);
       const dodgeDirection = dodgeDirectionForAction(held);
-      if (dodgeDirection && this.dodgeDoubleTap.press(e.code, performance.now())) {
+      if (
+        this.doubleTapDodgeEnabled &&
+        dodgeDirection &&
+        this.dodgeDoubleTap.press(e.code, performance.now())
+      ) {
         this.cb.onDodge?.(dodgeDirection);
       }
       this.noteMovementIntent();

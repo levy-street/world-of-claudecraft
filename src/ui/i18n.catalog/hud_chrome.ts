@@ -1405,6 +1405,7 @@ export const hudChromeStrings = {
     aurasOnPlayerFrame: 'Buffs on the Player Frame',
     highContrastBackground: 'High-Contrast Background',
     actionCamera: 'Action Camera (Crosshair)',
+    doubleTapDodge: 'Double-Tap Dodge',
     // Retired combat setting. The key stays because translated locale overlays
     // are append-only, but no options or guide surface renders it anymore.
     startAttackOnAbility: 'Auto-Attack on Ability Use',

@@ -20,11 +20,13 @@ import { WEAPON_SKINS } from '../../sim/content/weapon_skins';
 import { retryDelayMs as gltfRetryDelayMs } from '../assets/load_retry';
 import { loadGltf, loadKtx2Texture, loadTexture } from '../assets/loader';
 import { registerPreload } from '../assets/preload';
+import { PLAYER_DODGE_ROLL_CLIP, PLAYER_DODGE_ROLL_SOURCE } from '../dodge_visual_core';
 import { addRimGlow, EMISSIVE_GLOW, GFX, type GfxSettings } from '../gfx';
 import { applySurfaceDetail, riggedWornFamilyFor } from '../worn_stone';
 import { type ArmorDyeSpec, attachArmorDye } from './armor_dye';
 import { backGripFor } from './back_grips';
 import { dequantizeAttribute } from './dequantize_attribute';
+import { createPlayerDodgeRollClip } from './dodge_roll_clip';
 import { type HandGrip, KAYKIT_SHIELD_ACCESSORIES, KAYKIT_SHIELD_GRIPS } from './held_item_grips';
 import { buildMakeupDecal } from './makeup';
 import {
@@ -2029,6 +2031,10 @@ export const PALADIN_SYNTHESIZED_CLIP_SOURCES: Readonly<Record<string, string>> 
   [PALADIN_BASTION_SWEEP_CLIP]: '1H_Melee_Attack_Slice_Diagonal',
 };
 
+export const PLAYER_DODGE_SYNTHESIZED_CLIP_SOURCES: Readonly<Record<string, string>> = {
+  [PLAYER_DODGE_ROLL_CLIP]: PLAYER_DODGE_ROLL_SOURCE,
+};
+
 /** Test-only observation window into the shared tinted-material cache. */
 export const tintedMaterialInternalsForTest = {
   cacheSize: (): number => matCache.size,
@@ -2046,6 +2052,11 @@ export function prepareVisual(key: string): PreparedVisual {
   for (const clip of gltf.animations) clips.set(clip.name, clip);
   for (const url of def.animUrls ?? []) {
     for (const clip of resolvedGltf(url).animations) clips.set(clip.name, clip);
+  }
+  if (def.clips.dodge === PLAYER_DODGE_ROLL_CLIP) {
+    const source = clips.get(PLAYER_DODGE_ROLL_SOURCE);
+    if (!source) throw new Error(`Player dodge roll requires ${PLAYER_DODGE_ROLL_SOURCE}`);
+    clips.set(PLAYER_DODGE_ROLL_CLIP, createPlayerDodgeRollClip(source));
   }
   // The modular paladin mirrors the classic clip map (attackByAbility includes
   // the synthesized Verdict and Sweep names), so it needs the same synthesis:

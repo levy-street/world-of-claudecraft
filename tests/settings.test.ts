@@ -118,6 +118,7 @@ describe('Settings', () => {
     expect(s.get('cameraFov')).toBe(60); // unchanged from the shipped look by default
     expect(s.get('mouseCamera')).toBe(false);
     expect(s.get('actionCamera')).toBe(false);
+    expect(s.get('doubleTapDodge')).toBe(true);
     // walk-by autoloot is opt-in: auto-grabbing loot by walking past can feel jarring.
     expect(s.get('walkByAutoloot')).toBe(false);
     // both unit frames ship at their stock size; the scale sliders are opt-in tuning.
@@ -219,6 +220,12 @@ describe('Settings', () => {
     a.set('mouseCamera', true);
     const b = new Settings();
     expect(b.get('mouseCamera')).toBe(true);
+  });
+
+  it('persists disabling movement-key double-tap dodge', () => {
+    const a = new Settings();
+    a.set('doubleTapDodge', false);
+    expect(new Settings().get('doubleTapDodge')).toBe(false);
   });
 
   it('ignores retired combat settings and persists only the optional action camera', () => {
