@@ -1249,7 +1249,7 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.bags.noQuestItems': 'Nenhum item de missão em suas bolsas.',
   'hudChrome.bank.cannotDepositNow': 'Não pode ser depositado agora',
   'hudChrome.bank.depositAllTooltip':
-    'Envia todas as matérias-primas de criação (tudo cuja descrição diz "Matéria-prima") das suas bolsas para o banco em uma única viagem. Todo o resto fica nas suas bolsas, inclusive ferramentas de coleta, itens de missão, consumíveis e itens cinza.',
+    'Envia todas as matérias-primas de criação (tudo cuja descrição diz "Matéria-prima" ou "Material Fino") das suas bolsas para o banco em uma única viagem. Todo o resto fica nas suas bolsas, inclusive ferramentas de coleta, itens de missão, consumíveis e itens cinza.',
   'hudChrome.bank.guildBuyConfirm':
     'Comprar {count} espaços adicionais do banco da guilda por {price} da tesouraria da guilda?',
   'hudChrome.bank.guildBuyNote': 'Pago pela tesouraria da guilda',

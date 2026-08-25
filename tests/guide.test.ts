@@ -69,7 +69,7 @@ import {
   STATION_TYPE_BY_CRAFT,
   STATIONS,
 } from '../src/sim/content/professions';
-import { ALL_RECIPES, HOE_RECIPES, ROD_RECIPES } from '../src/sim/content/recipes';
+import { ALL_RECIPES, HOE_RECIPES, LADDER_RECIPES, ROD_RECIPES } from '../src/sim/content/recipes';
 import { RELIQUARY_PAGES } from '../src/sim/content/reliquary';
 import {
   TIER2_TOOL_GATE_PROFICIENCY,
@@ -3744,5 +3744,71 @@ describe('Guide professions pages and routes', () => {
     expect(
       t('guide.profPages.gainFmt' as never, { reduced: '75', minimal: '100', zero: '125' }),
     ).toBe('75 / 100 / 125');
+  });
+});
+
+describe('the craft ladder prose keeps its counts derived or count-free (Masterwrought 11l QA)', () => {
+  // The alchemy ladder body shipped "nine recipes ... three at each rung" and
+  // a "280 health, 360 mana" sunpetal against a live 335/425, and stayed green
+  // because no arm read it (the freshness gate cannot see a guide.* string).
+  // The 11l QA reworded it count-free with the tallow potion named; these arms
+  // are the regression pins the reword lacked, every number derived from the
+  // item table and every count claim held to the recipe table.
+  const potion = (id: string): { potionHp?: number; potionMana?: number } =>
+    ITEMS[id] as unknown as { potionHp?: number; potionMana?: number };
+
+  it('the alchemy ladder body spells no rung count and carries the live draught numbers', () => {
+    const body = t('guide.profPages.craftProse.alchemy.ladderBody');
+    expect(body).not.toMatch(/\b(nine|three at each rung)\b/i);
+    for (const [hp, mana] of [
+      ['silverleaf_healing_draught', 'silverleaf_mana_draught'],
+      ['goldleaf_healing_draught', 'goldleaf_mana_draught'],
+      ['sunpetal_healing_draught', 'sunpetal_mana_draught'],
+    ] as const) {
+      const heal = potion(hp).potionHp;
+      const mp = potion(mana).potionMana;
+      expect(heal, hp).toBeDefined();
+      expect(mp, mana).toBeDefined();
+      expect(body).toContain(`(${heal} health, ${mp} mana)`);
+    }
+    // The tallow row the trophy economy put on the skill 25 rung, named by
+    // the output's live name and rung.
+    const tallowRow = ALL_RECIPES.find((r) => r.id === 'recipe_lesser_healing_potion');
+    expect(tallowRow?.skillReq).toBe(25);
+    expect(body).toContain(ITEMS[tallowRow?.resultItemId ?? ''].name);
+    expect(body).toContain('skill 25 rung');
+  });
+
+  it('the engineering ladder body spells no recipe count (the hoes and the chassis grew it)', () => {
+    const body = t('guide.profPages.craftProse.engineering.ladderBody');
+    expect(body).not.toMatch(/\b(eight|nine|ten) recipes\b/i);
+    expect(body).toContain('toolworks');
+    // The count the sentence retired is the one that keeps moving: the
+    // engineering rows are well past the nine the old sentence claimed.
+    expect(ALL_RECIPES.filter((r) => r.professionId === 'engineering').length).toBeGreaterThan(9);
+  });
+
+  it('the armorcrafting and jewelcrafting ladder counts are held to the live ladders', () => {
+    // These two sentences still spell "nine ... in three rungs"; that is true
+    // of the wearable ladder (LADDER_RECIPES, three per rung) and of the
+    // jewelcrafting trainer rows below the intermediate rung, so the claim is
+    // pinned to those tables rather than reworded: the day either table
+    // moves, this reds and the sentence is reworded count-free with its
+    // overlays swept in the same change.
+    const armor = t('guide.profPages.craftProse.armorcrafting.ladderBody');
+    expect(armor).toContain('nine recipes in three rungs');
+    const armorLadder = LADDER_RECIPES.filter((r) => r.professionId === 'armorcrafting');
+    expect(armorLadder).toHaveLength(9);
+    expect(new Set(armorLadder.map((r) => r.skillReq))).toEqual(new Set([0, 25, 50]));
+    const jewel = t('guide.profPages.craftProse.jewelcrafting.ladderBody');
+    expect(jewel).toContain('nine trainer recipes in three rungs');
+    const jewelTrainer = ALL_RECIPES.filter(
+      (r) =>
+        r.professionId === 'jewelcrafting' &&
+        (r.acquisition ?? []).includes('trainer') &&
+        r.skillReq <= 50,
+    );
+    expect(jewelTrainer).toHaveLength(9);
+    expect(new Set(jewelTrainer.map((r) => r.skillReq))).toEqual(new Set([0, 25, 50]));
   });
 });

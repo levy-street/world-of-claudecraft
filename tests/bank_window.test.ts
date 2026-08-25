@@ -7,8 +7,10 @@
 
 import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
+import { MATERIAL_ITEM_IDS } from '../src/sim/material_taxonomy';
 import { CHROME_GUARDED_PANELS } from '../src/ui/chrome_focus_wiring';
 import { t } from '../src/ui/i18n';
+import { itemKindLabel } from '../src/ui/item_kind_label';
 
 const painter = readFileSync(new URL('../src/ui/bank_window.ts', import.meta.url), 'utf8');
 const promptDialog = readFileSync(new URL('../src/ui/prompt_dialog.ts', import.meta.url), 'utf8');
@@ -357,8 +359,17 @@ describe('bank_window: search / sort / deposit-all', () => {
     // stays. A rewrite that keeps only loose tokens fails here; the 18
     // overlays were re-filled in the same change (the reword-staleness class).
     expect(t('hudChrome.bank.depositAllTooltip')).toBe(
-      'Sends every crafting material (anything whose tooltip reads Material) from your bags to the bank in one trip. Everything else stays in your bags, gathering tools, quest items, consumables, and gray items included.',
+      'Sends every crafting material (anything whose tooltip reads Material or Fine Material) from your bags to the bank in one trip. Everything else stays in your bags, gathering tools, quest items, consumables, and gray items included.',
     );
+    // The parenthetical names BOTH kind lines the swept set renders: the nine
+    // fine grades are in MATERIAL_ITEM_IDS (so the sweep moves them) and their
+    // line reads Fine Material, not Material, which the first reword missed
+    // (in pt_BR the two labels share no word, so a player could not read
+    // through). Pinned against the live set and the live label.
+    expect(MATERIAL_ITEM_IDS.has('fine_iron_ore')).toBe(true);
+    expect(itemKindLabel('junk', 'fine_iron_ore')).toBe('Fine Material');
+    expect(itemKindLabel('junk', 'iron_ore')).toBe('Material');
+    expect(t('hudChrome.bank.depositAllTooltip')).toContain('reads Material or Fine Material');
   });
 
   it('exposes the deposit-all clarification beyond hover-only title (PR #2715 review)', () => {

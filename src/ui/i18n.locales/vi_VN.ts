@@ -1186,7 +1186,7 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.bags.itemAriaQuest': '{item}, số lượng {count}, vật phẩm nhiệm vụ',
   'hudChrome.bags.noQuestItems': 'Không có vật phẩm nhiệm vụ nào trong túi đồ của bạn.',
   'hudChrome.bank.cannotDepositNow': 'Hiện không thể gửi vào',
-  'hudChrome.bank.depositAllTooltip': 'Gửi toàn bộ nguyên liệu chế tác (mọi vật phẩm có chú giải ghi "Nguyên Liệu") từ túi đồ của bạn vào ngân hàng chỉ trong một lần. Mọi thứ khác vẫn ở trong túi đồ, kể cả dụng cụ thu thập, vật phẩm nhiệm vụ, vật phẩm tiêu hao và vật phẩm màu xám.',
+  'hudChrome.bank.depositAllTooltip': 'Gửi toàn bộ nguyên liệu chế tác (mọi vật phẩm có chú giải ghi "Nguyên Liệu" hoặc "Nguyên Liệu Hảo Hạng") từ túi đồ của bạn vào ngân hàng chỉ trong một lần. Mọi thứ khác vẫn ở trong túi đồ, kể cả dụng cụ thu thập, vật phẩm nhiệm vụ, vật phẩm tiêu hao và vật phẩm màu xám.',
   'hudChrome.bank.guildBuyConfirm': 'Mua thêm {count} ô ngân hàng bang hội với giá {price} từ ngân khố bang hội?',
   'hudChrome.bank.guildBuyNote': 'Thanh toán từ ngân khố bang hội',
   'hudChrome.bank.guildCannotDeposit': 'Không thể cất vào ngân hàng bang hội',
