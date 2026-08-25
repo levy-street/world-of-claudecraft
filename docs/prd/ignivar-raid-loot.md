@@ -166,7 +166,23 @@ Constant changes: SET_HASTE_3PC_RATING 150 to 80 (7.5 to 4 percent, with
 the test-pinned SET_HASTE_3PC literal moving in step), SET_HIT_4PC_RATING
 60 to 30. Full cast-pushback immunity leaves the incumbents (they keep 50
 percent at 2 pieces) and moves to the new tier's caster and healer
-2-piece bonuses. WARFARE families are untouched (already PvE-inert and
+2-piece bonuses.
+
+**Hit seed flip (part of the retune).** The authored tier-2 pieces are
+seeded with hitRating 20 (crownforged, nighttalon, AND soulflame;
+stormcallers is crit), and the heroic-variant rule "the base's rating
+key wins" turns each heroic-33 copy into 55 Hit: a heroic four-piece
+alone carries 220 ambient Hit, 280 with today's 4-piece bonus. That is
+past the +3 heroic melee cap (260 rating) and about 80 percent dead
+weight against the equal-level Normal raid (cap 50). The retune flips
+the authored seeds to the archetype's throughput rating (crownforged
+and nighttalon to critRating 20, soulflame to hasteRating 20); the
+heroic variants then derive 55 crit or haste through the existing rule
+with no variant-code change. After the flip, the retuned 6-piece
+lineage bonus (3 percent) is the only Hit the old stack provides, and
+old kits stop carrying mostly-dead Hit into Normal content. The
+five-man heroic epics' Hit seeds (40 rating on about half that set) are
+correctly aimed at the +3 content they drop in and stay unchanged. WARFARE families are untouched (already PvE-inert and
 already lineage-shaped). The haste leveling kits keep their single
 3-piece tier and ride the shared haste constant down, which is
 acceptable for leveling gear. Heroic set-tag inheritance stays:
@@ -231,6 +247,12 @@ Conclusions:
 - **The melee margin leans on the 60/25 ratings step.** If that proposal
   is trimmed later, melee viability thins first; the harness must re-run
   whenever either side's numbers move.
+- **Hit is honest on both sides after the seed flip.** Before it, the old
+  heroic kit carried about 280 Hit rating, mostly dead against Normal
+  bosses and past cap even at +3; counting it at face value flattered
+  neither side accurately. With old pieces flipped to crit and haste and
+  the new tier's Hit confined to elective slots, the rating totals above
+  compare live stats to live stats, and the delta stands.
 
 ### Guard
 
@@ -304,9 +326,27 @@ heroic_loot.ts and heroic_variants.ts). Ignivar tier steps once more:
 
 - IGNIVAR_ARMOR_PRIMARY_RATING = 60, IGNIVAR_SECONDARY_RATING = 25.
 - IGNIVAR_WEAPON_PRIMARY_RATING = 70, weapon secondary 30.
-- Distribution follows the established archetype rules: roughly half the
-  physical pieces carry Hit as primary; healer-facing pieces never carry Hit
-  (heals are not resisted); jewelry carries a single rating.
+- Healer-facing pieces never carry Hit (heals are not resisted); jewelry
+  carries a single rating.
+
+**Hit is scarce by policy on this tier.** Hit is the densest rating in the
+game (10 rating per percent against 20 for crit and haste, no
+above-level suppression), and the useful amounts are small: the melee
+miss floor against an equal-level raid boss is 5 percent (50 rating), the
+spell resist floor about 4 percent, and only +3 heroic content opens the
+big 26 percent melee window (260 rating). A tier that showers Hit both
+kills the stat as a choice and ships dead weight on mandatory pieces. So:
+
+- Tier set pieces NEVER carry Hit. Their primary is crit or haste per the
+  spec identity, with the other as secondary.
+- Hit appears only on elective pieces: the waist off-set of each physical
+  and spell-damage variant carries Hit 60 as its primary, the physical
+  neck and the spell-damage ring carry Hit 25 as their single jewelry
+  rating, and two weapons carry Hit 30 as their secondary.
+- The result: the Normal-raid hit floor is covered by one elective piece,
+  and a deliberate full stack reaches about 170 rating, under the +3
+  heroic melee cap, so heroic five-man players still have a real chase
+  with no ambient saturation.
 
 These are proposed constants on the existing curve, to be confirmed in the
 tuning pass with the DPS study harness before merge.
@@ -405,20 +445,24 @@ coverage in both leather and Agility mail.
 
 Primary budgets split by identity, then normalize to the exact slot budget:
 
-- Cloth spell damage: int 2 : spi 1, Spell Damage, crit or hit rating.
+- Cloth spell damage: int 2 : spi 1, Spell Damage, crit and haste ratings.
 - Cloth healing: int 1 : spi 1, Healing Power, haste or crit rating.
-- Leather tanking: sta 1.2 : agi 1, secondary rating hit, extra armor line.
-- Leather dps: agi 2 : sta 1, crit and hit ratings.
+- Leather tanking: sta 1.2 : agi 1, crit rating, extra armor line.
+- Leather dps: agi 2 : sta 1, crit and haste ratings.
 - Leather spell damage: int 2 : spi 1, Spell Damage, crit rating.
 - Leather healing: int 1 : spi 1, Healing Power, haste rating.
-- Mail tanking (Strength): sta 1.2 : str 1, hit rating, extra armor line,
+- Mail tanking (Strength): sta 1.2 : str 1, crit rating, extra armor line,
   shields.
-- Mail tanking (Agility, Stonehearth): sta 1.2 : agi 1, hit rating, extra
+- Mail tanking (Agility, Stonehearth): sta 1.2 : agi 1, crit rating, extra
   armor line, shields.
-- Mail dps (Strength): str 2 : sta 1, crit and hit ratings.
-- Mail dps (Agility, Warspirit): agi 2 : sta 1, crit and hit ratings.
-- Mail spell damage: int 2 : spi 1, Spell Damage, hit rating.
+- Mail dps (Strength): str 2 : sta 1, crit and haste ratings.
+- Mail dps (Agility, Warspirit): agi 2 : sta 1, crit and haste ratings.
+- Mail spell damage: int 2 : spi 1, Spell Damage, crit and haste ratings.
 - Mail healing: int 1 : spi 1, Healing Power, crit or haste rating.
+
+Set pieces carry only crit and haste by the Hit-scarcity policy in the
+ratings section; Hit lives on the elective waist, jewelry, and weapon
+pieces, which is also where tanks pick up their threat Hit.
 
 ### The sets
 
@@ -738,10 +782,10 @@ Each phase is a reviewable commit (or small commit series) with its tests:
 3. **Incumbent retune**: the lineage mechanism (ItemSet lineage id plus
    the aggregateSetBonuses cross-family count, a small sim change,
    test-first), the merged 2/4/6 bonus tables and constant changes from
-   "Prerequisite: retune the incumbent set stack", their bonus-text and
-   set-tooltip updates, and the old-versus-new balance harness test
-   (initially pinning the retuned lineage values; the new-kit comparison
-   arm lands with phase 5).
+   "Prerequisite: retune the incumbent set stack", the tier-2 Hit seed
+   flip to crit and haste, their bonus-text and set-tooltip updates, and
+   the old-versus-new balance harness test (initially pinning the retuned
+   lineage values; the new-kit comparison arm lands with phase 5).
 4. **Sets**: ITEM_SETS declarations for all 29 families with the shared
    bonus-family constants; the 145 set-piece ItemDefs in a new
    src/sim/content/ignivar_loot.ts (data-as-code, large is correct); the 15
