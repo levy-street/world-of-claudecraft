@@ -647,6 +647,13 @@ const HUD_UPDATE_DRIVES: readonly DriveRow[] = [
     why: 'the auto-attack swing timer',
   },
   {
+    call: 'this.dodgeEndurancePainter.paint',
+    band: 'frame',
+    gate: '',
+    surface: 'chrome',
+    why: 'the two-charge dodge endurance meter; writer-facet updates elide unchanged values',
+  },
+  {
     call: 'this.procOverlayEl.classList.add',
     band: 'frame',
     gate: "!this.procOverlayPreviewed && this.sim.talentSpec === 'fire'",
@@ -1640,7 +1647,8 @@ describe('Hud.update() drives exactly the registered set, on the registered band
       // v0.40.0 sync merge back in.
       // chrome 82 -> 83: the controller-tutorial merge's gamepad control
       // hint apply.
-    ).toEqual({ window: 44, chrome: 83, none: 17 });
+      // chrome 83 -> 84: the always-on dodge endurance charge meter.
+    ).toEqual({ window: 44, chrome: 84, none: 17 });
     const windows = HUD_UPDATE_DRIVES.filter((r) => r.surface === 'window');
     expect(windows.map((r) => r.call)).toContain('this.spellbookWindow.tickOpen');
     expect(windows.map((r) => r.call)).toContain('this.refreshOpenTownFocusIfChanged');

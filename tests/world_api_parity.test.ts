@@ -615,8 +615,8 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
     // numbers really are; never reconcile them by arithmetic in the diff (the
     // numbers below were set from a suite run, not from this narrative).
     expect(IWORLD_MEMBERS.length).toBe(325);
-    expect(DATA_MEMBERS.length).toBe(86);
-    expect(METHOD_MEMBERS.length).toBe(239);
+    expect(DATA_MEMBERS.length).toBe(85);
+    expect(METHOD_MEMBERS.length).toBe(240);
   });
   it('has no duplicate member names', () => {
     const names = IWORLD_MEMBERS.map((m) => m.name);
