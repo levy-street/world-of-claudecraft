@@ -192,6 +192,46 @@ Damage the old stack simply does not have). The 6-piece capstone values
 are the numbers the harness is most likely to shave further; exact
 margins are measured, not asserted (below).
 
+### Viability check (static)
+
+Reviewed 2026-08-26 with the live derivation constants (attack power 2 per
+Strength for the heavy classes, swing damage AP/14, 20 rating per percent
+of crit or haste, 10 per percent of Hit, spell power 0.5 per Intellect).
+Both kits are compared at their best case: the old side wears the ideal
+retuned six-piece lineage (heroic-33 tier-2 in helmet/shoulder/gloves/
+waist, heroic-28 tier-1 in chest/legs, the best free ilvl-31 feet), the
+new side a full five-piece plus new waist and feet at 35 with the 60/25
+ratings. Armor slots and set bonuses only; jewelry and weapons are common
+to both sides.
+
+| Term | Old best kit | New full kit | Delta |
+|---|---|---|---|
+| Primary stat points (gear + set tiers) | 141 | 136 | old ahead by 5 |
+| Rating points (gear + capstone haste/hit as rating equivalents) | 450 | 595 | new ahead by 145 |
+| Flat plus proc-average attack power (Strength case) | ~47 | ~68 | new ahead by ~20 |
+| Spell Damage (caster case, affix debut included) | ~22 | ~108 | new ahead by ~86 |
+| Healing Power (healer case) | 0 | ~143 | new ahead outright |
+
+Conclusions:
+
+- **Every archetype prefers the full new kit.** Melee margins are real but
+  not insulting (on the order of five to eight percent of throughput,
+  carried by the ratings step and the stronger bonus package, minus the
+  old bleed). Casters and healers are decisively ahead through the affix
+  debut. Tanks win on stamina budgets, armor, and the ward procs against
+  an old capstone that pays them almost nothing defensive.
+- **The old side above is the best case.** It assumes full heroic
+  variants; the median raider's mix is weaker, so real margins are wider.
+- **There is a one-swap valley, and it is accepted.** The first new piece
+  breaks the old six-piece capstone before any new bonus exists, a small
+  net loss until the second piece lands the new 2-piece tier. One swap
+  deep is classic-normal, and the token flow (a sigil converts to a piece
+  immediately) makes the two-piece threshold fast. No further softening
+  of the old capstone is needed for this.
+- **The melee margin leans on the 60/25 ratings step.** If that proposal
+  is trimmed later, melee viability thins first; the harness must re-run
+  whenever either side's numbers move.
+
 ### Guard
 
 A new balance harness test (the warfare_balance_harness pattern) assembles
