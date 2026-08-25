@@ -179,6 +179,7 @@ export const TALENT_ABILITIES_V2_B = {
     school: 'fire',
     requiresTarget: true,
     specs: ['destruction'],
+    projectile: true,
     projectileFx: 'heavyBolt',
     effects: [{ type: 'directDamage', min: 192, max: 235 }],
     description:

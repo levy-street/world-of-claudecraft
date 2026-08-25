@@ -47,6 +47,10 @@ import { tEntity } from '../ui/entity_i18n';
 import type { IWorld } from '../world_api';
 import { buildAbilityMaterialPrewarmGroup } from './ability_material_prewarm';
 import {
+  AbilityRangeReticleVisual,
+  type AbilityRangeVisualKind,
+} from './ability_range_reticle_visual';
+import {
   AbilityVfx,
   AbilityVfxFx,
   abilityVfxTexturePrewarmSteps,
@@ -241,6 +245,7 @@ import { shouldPlayDeedFirework } from './deed_fx_gate';
 import { DelveInteriorTracker } from './delve_interior_tracker';
 import { buildDelveInteractable, syncDelveInteractableVisibility } from './delve_props';
 import { detailHorizonStarved } from './detail_horizon_core';
+import { dodgeVisualDirection } from './dodge_visual_core';
 import { buildDoorBody, buildRiftGateBody, buildRiftPuzzleProp } from './door_portal';
 import { watchDevicePixelRatio } from './dpr_watch';
 import { DrainChannelStopLatch, drainChannelVisualPlan } from './drain_channel_visual_core';
@@ -350,6 +355,7 @@ import {
   storePooledObject as storeGroundObjectInPool,
   takeOrBuildGroundObject,
 } from './ground_object_pool';
+import { GroundPointProjector } from './ground_point_projector';
 import { createGroundTilt, type GroundTiltState, stepGroundTilt } from './ground_tilt_core';
 import { buildHauntFeatures, type HauntFeaturesView } from './haunt_features';
 import { usedJsHeapMb } from './heap_sample';
@@ -547,6 +553,7 @@ import {
 import { createPrewarmResumeLedger } from './prewarm_resume_ledger_core';
 import { type PriestMarkersVisual, syncPriestMarkersVisual } from './priest_markers_visual';
 import { pieceProgramSettle } from './program_variant_settle';
+import { handleProjectileEventVfx } from './projectile_event_vfx';
 import { buildPropMaterialPrewarmGroup, buildProps, propResidencySources } from './props';
 
 import { makeQuestObjectGate, type QuestObjectGateOptions } from './quest_object_gate_core';
@@ -1165,6 +1172,7 @@ export interface EntityView {
   waterContactAccum: number;
   wasAirborne: boolean;
   wasSwimming: boolean;
+  wasDodging: boolean;
   // feet under the waterline but the ground still under them (the wade latch)
   wasWading: boolean;
   // head under the waterline (the stroke + VFX latch, hysteresis in anim_state)
@@ -1293,11 +1301,11 @@ export class Renderer {
   private aoeRingNext = 0;
   private recklessSkulls = new RecklessSkullPainter();
   private groundAimReticle: GroundAimReticleVisual;
+  private abilityRangeReticle: AbilityRangeReticleVisual;
   raycaster = new THREE.Raycaster();
   private readonly raycastNdc = new THREE.Vector2();
-  private readonly raycastGroundPlane = new THREE.Plane(new THREE.Vector3(0, 1, 0), 0);
-  private readonly raycastHit = new THREE.Vector3();
   private readonly raycastHits: THREE.Intersection[] = [];
+  private readonly groundPointProjector: GroundPointProjector;
   private readonly directHitIds: number[] = [];
   clickTargets: THREE.Object3D[] = [];
   // Gather-node meshes (#1866), raycast separately from `clickTargets`/`pick()`:
@@ -2135,6 +2143,7 @@ export class Renderer {
       this.farVista.enabled ? 0.2 : 0.1,
       this.farVista.enabled ? this.farVista.cameraFar : 950,
     );
+    this.groundPointProjector = new GroundPointProjector(this.canvas, this.camera);
     // updateCamera owns the one explicit camera matrix refresh. Prevent each
     // WebGLRenderer pass from repeating it for an unchanged camera. r185 also
     // gates the camera's own compose on this flag, so every explicit refresh
@@ -2801,6 +2810,12 @@ export class Renderer {
       this.lowGfx ? 1 : SELECTION_RING_BOOST,
     );
     setRenderCategory(this.groundAimReticle.group, 'ui3d');
+    this.abilityRangeReticle = new AbilityRangeReticleVisual(
+      this.scene,
+      (x, z) => groundHeight(x, z, this.sim.cfg.seed),
+      this.lowGfx ? 1 : SELECTION_RING_BOOST,
+    );
+    setRenderCategory(this.abilityRangeReticle.group, 'ui3d');
     for (let i = 0; i < CLICK_MARKER_POOL; i++) {
       const mat = new THREE.MeshBasicMaterial({
         transparent: true,
@@ -7396,6 +7411,33 @@ export class Renderer {
   }
 
   handleEvent(ev: SimEvent): void {
+    if (ev.type === 'projectileLaunch' && ev.attackAnimation === 'ranged-shot') {
+      this.triggerAttack(ev.sourceId);
+    }
+    if (ev.type === 'projectileLaunch' && ev.ability === 'needle_of_fate') {
+      this.needleOfFateVfx.spawnBallistic(
+        ev.trajectoryId,
+        ev.sourceId,
+        ev.dirX,
+        ev.dirZ,
+        ev.speed,
+        ev.maxDistance,
+      );
+      return;
+    }
+    if (
+      ev.type === 'projectileImpact' &&
+      this.needleOfFateVfx.finishBallistic(
+        ev.trajectoryId,
+        ev.reason === 'entity' ? (ev.targetId ?? null) : null,
+        ev.x,
+        groundHeight(ev.x, ev.z, this.sim.cfg.seed) + 0.7,
+        ev.z,
+      )
+    ) {
+      return;
+    }
+    if (handleProjectileEventVfx(ev, () => this.sim.cfg.seed, this.vfx, this.abilityVfx)) return;
     switch (ev.type) {
       case 'castStart': {
         if (ev.ability === 'needle_of_fate') {
@@ -8545,6 +8587,7 @@ export class Renderer {
       waterContactAccum: 0,
       wasAirborne: false,
       wasSwimming: false,
+      wasDodging: false,
       wasSubmerged: false,
       wasFalling: false,
       swimKickPhase: 0,
@@ -11015,6 +11058,12 @@ export class Renderer {
         v.travelVisual,
         v.metamorphVisual,
       );
+      const dodging = (e.dodgeRemaining ?? 0) > 0;
+      const dodgeStarted = dodging && !v.wasDodging;
+      if (dodgeStarted) {
+        active.playDodge(dodgeVisualDirection(e.dodgeDirX ?? 0, e.dodgeDirZ ?? 0, e.facing));
+      }
+      v.wasDodging = dodging;
       if (!e.templateId.startsWith('vision_')) {
         active.clickProxy.userData.entityId = e.id;
       }
@@ -11332,8 +11381,10 @@ export class Renderer {
       }
       // --- spatial movement audio (self + others) --------------------------
       // All gated by audibility (squared distance) so far entities cost nothing.
+      if (dodgeStarted && d2 < SFX_MOVE_RANGE_SQ) this.emitGroundPuff(ax, ay, az, 0.22);
       const sink = this.audioSink;
       if (sink && d2 < SFX_MOVE_RANGE_SQ) {
+        if (dodgeStarted) sink.movement('dodge', ax, ay, az, isSelf);
         // jump / land / water-entry edges
         if (airborne && !v.wasAirborne && !visuallyDead) sink.movement('jump', ax, ay, az, isSelf);
         else if (!airborne && v.wasAirborne && !visuallyDead) {
@@ -12665,6 +12716,8 @@ export class Renderer {
     this.nameplatePainter.dispose();
     this.travelSpeedFx.dispose();
     this.blobShadows?.dispose();
+    this.groundAimReticle.dispose();
+    this.abilityRangeReticle.dispose();
   }
 
   /**
@@ -13072,19 +13125,8 @@ export class Renderer {
     }
   }
 
-  // Click-to-move (#95): where a screen click meets the ground. Intersects a
-  // horizontal plane at the player's foot height, robust on the gentle terrain
-  // here and far cheaper than raycasting the terrain mesh.
   groundPoint(clientX: number, clientY: number, planeY: number): { x: number; z: number } | null {
-    this.raycastNdc.set(
-      (clientX / window.innerWidth) * 2 - 1,
-      -(clientY / window.innerHeight) * 2 + 1,
-    );
-    this.raycaster.setFromCamera(this.raycastNdc, this.camera);
-    this.raycastGroundPlane.constant = -planeY;
-    return this.raycaster.ray.intersectPlane(this.raycastGroundPlane, this.raycastHit)
-      ? { x: this.raycastHit.x, z: this.raycastHit.z }
-      : null;
+    return this.groundPointProjector.project(clientX, clientY, planeY);
   }
 
   // Click/tap-to-harvest (#1866): raycasts the static gather-node meshes
@@ -13298,6 +13340,32 @@ export class Renderer {
     );
   }
 
+  setAbilityRangeReticle(
+    aim: {
+      x: number;
+      z: number;
+      radius: number;
+      school: string;
+      kind: AbilityRangeVisualKind;
+      angle?: number;
+      halfAngle?: number;
+    } | null,
+  ): void {
+    this.abilityRangeReticle.setRange(
+      aim
+        ? {
+            x: aim.x,
+            z: aim.z,
+            radius: aim.radius,
+            color: SCHOOL_COLORS[aim.school] ?? 0xffffff,
+            kind: aim.kind,
+            angle: aim.angle,
+            halfAngle: aim.halfAngle,
+          }
+        : null,
+    );
+  }
+
   private updateAoeRings(dt: number): void {
     for (const slot of this.aoeRings) {
       if (slot.elapsed >= AOE_RING_LIFETIME) continue;
@@ -13314,6 +13382,7 @@ export class Renderer {
 
   private updateGroundAimReticle(dt: number): void {
     this.groundAimReticle.update(dt);
+    this.abilityRangeReticle.update(dt);
   }
 
   worldToScreen(x: number, y: number, z: number): { x: number; y: number; behind: boolean } {

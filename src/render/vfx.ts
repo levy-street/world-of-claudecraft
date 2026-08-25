@@ -228,7 +228,8 @@ function buildAtlasTexture(): ParticleAtlas {
     // Read back from the retained composed canvas: composeAtlasCanvas() runs at
     // most once per page, so its local 2d context is not in scope here.
     const size = atlasCanvas.width;
-    const ctx = atlasCanvas.getContext('2d')!;
+    const ctx = atlasCanvas.getContext('2d');
+    if (!ctx) throw new Error('Particle atlas canvas has no 2d context');
     const pixels = ctx.getImageData(0, 0, size, size).data;
     for (let i = 0; i < SPRITE_FILES.length; i++) {
       earlyRejectRadiusSq[i] = spriteEarlyRejectRadiusSq(
@@ -276,6 +277,44 @@ interface Projectile {
   onImpact?: (position: THREE.Vector3) => void;
 }
 
+interface BallisticProjectileVisual {
+  trajectoryId: string;
+  pos: THREE.Vector3;
+  dirX: number;
+  dirZ: number;
+  speed: number;
+  remaining: number;
+  color: THREE.Color;
+  coreColor: THREE.Color;
+  trailColor: THREE.Color;
+  coreSprite: number;
+  trailSprite: number;
+  scale: number;
+  jagged: boolean;
+  coils: boolean;
+  tracer: boolean;
+}
+
+export type BallisticProjectileStyle =
+  | 'rock'
+  | 'shard'
+  | 'comet'
+  | 'arrow'
+  | 'wisp'
+  | 'felLance'
+  | 'shadowFang'
+  | 'essenceLance'
+  | 'soulLance';
+
+export interface BallisticProjectileAppearance {
+  color?: number;
+  scale?: number;
+  style?: BallisticProjectileStyle;
+  jagged?: boolean;
+  coils?: boolean;
+  tracer?: boolean;
+}
+
 interface BubbleBeam {
   sourceId: number;
   targetId: number;
@@ -290,6 +329,30 @@ function projectileSprites(school: string): { core: number; trail: number } {
   return school === 'fire'
     ? { core: SPR.firePuff, trail: SPR.flame }
     : { core: SPR.glowCore, trail: SPR.sparkle };
+}
+
+function ballisticProjectileSprites(
+  school: string,
+  style: BallisticProjectileStyle | undefined,
+): { core: number; trail: number } {
+  switch (style) {
+    case 'arrow':
+      return { core: SPR.trace, trail: SPR.trace };
+    case 'shard':
+      return { core: SPR.star, trail: SPR.sparkle };
+    case 'wisp':
+    case 'felLance':
+    case 'shadowFang':
+    case 'essenceLance':
+    case 'soulLance':
+      return { core: SPR.magicWisp, trail: SPR.magicWisp };
+    case 'rock':
+      return school === 'fire'
+        ? { core: SPR.firePuff, trail: SPR.flame }
+        : { core: SPR.debris, trail: SPR.sparkle };
+    default:
+      return projectileSprites(school);
+  }
 }
 
 // The world-anchor resolver (src/render/vfx_anchor.ts owns the contract and the
@@ -321,6 +384,7 @@ export class Vfx {
   private readonly cullViewProjection = new THREE.Matrix4();
   private head = 0;
   private projectiles: Projectile[] = [];
+  private ballisticProjectiles: BallisticProjectileVisual[] = [];
   private bubbleBeams: BubbleBeam[] = [];
   private drainLifeVfx: DrainLifeVfx;
   private tmpColor = new THREE.Color();
@@ -562,6 +626,7 @@ export class Vfx {
   clear(): void {
     if (this.disposed) return;
     this.projectiles.length = 0;
+    this.ballisticProjectiles.length = 0;
     this.paladinSpellFx.clear();
     for (let i = this.bubbleBeams.length - 1; i >= 0; i--) this.removeBubbleBeam(i);
     this.drainLifeVfx.clear();
@@ -745,6 +810,133 @@ export class Vfx {
     const from = this.anchor(sourceId, 0.62);
     if (!from) return;
     this.projectileFrom(from, targetId, school, scale, 26, undefined, color);
+  }
+
+  ballisticProjectile(
+    trajectoryId: string,
+    x: number,
+    y: number,
+    z: number,
+    dirX: number,
+    dirZ: number,
+    speed: number,
+    maxDistance: number,
+    school: string,
+    appearance?: BallisticProjectileAppearance,
+  ): void {
+    const length = Math.hypot(dirX, dirZ);
+    if (!Number.isFinite(length) || length <= 1e-6) return;
+    const colors = projectileSchoolColors(school, appearance?.color);
+    const sprites = ballisticProjectileSprites(school, appearance?.style);
+    // A reconnect/replayed launch replaces the same trajectory instead of
+    // rendering two bolts. Server impact remains the termination authority.
+    this.ballisticProjectiles = this.ballisticProjectiles.filter(
+      (projectile) => projectile.trajectoryId !== trajectoryId,
+    );
+    this.ballisticProjectiles.push({
+      trajectoryId,
+      pos: new THREE.Vector3(x, y, z),
+      dirX: dirX / length,
+      dirZ: dirZ / length,
+      speed,
+      remaining: Math.max(0, maxDistance),
+      color: colors.base,
+      coreColor: colors.core,
+      trailColor: colors.trail,
+      coreSprite: sprites.core,
+      trailSprite: sprites.trail,
+      scale: Math.max(0.5, Math.min(2.5, appearance?.scale ?? 1)),
+      jagged: appearance?.jagged === true,
+      coils: appearance?.coils === true,
+      tracer: appearance?.tracer === true,
+    });
+  }
+
+  ballisticImpact(
+    trajectoryId: string,
+    x: number,
+    y: number,
+    z: number,
+    reason: 'entity' | 'wall' | 'range' | 'sourceDespawn',
+  ): void {
+    const index = this.ballisticProjectiles.findIndex(
+      (projectile) => projectile.trajectoryId === trajectoryId,
+    );
+    if (index < 0) return;
+    const [projectile] = this.ballisticProjectiles.splice(index, 1);
+    if (reason === 'sourceDespawn') return;
+
+    if (reason === 'range') {
+      // Maximum-range expiry is readable but deliberately soft: a fading ring
+      // says "the shot ended here" without resembling a successful hit.
+      this.tmpColor.copy(projectile.trailColor).multiplyScalar(hdr(1.15));
+      this.spawn(x, y, z, 0, 0.12, 0, this.tmpColor, 0.62, 0.28, 0, SPR.ring);
+      for (let k = 0; k < this.scaledCount(7); k++) {
+        const spread = (Math.random() - 0.5) * 0.8;
+        this.spawn(
+          x,
+          y + (Math.random() - 0.5) * 0.12,
+          z,
+          projectile.dirZ * spread - projectile.dirX * (0.25 + Math.random() * 0.35),
+          (Math.random() - 0.2) * 0.35,
+          -projectile.dirX * spread - projectile.dirZ * (0.25 + Math.random() * 0.35),
+          projectile.trailColor,
+          0.2,
+          0.3,
+          0,
+          projectile.trailSprite,
+        );
+      }
+      return;
+    }
+
+    if (reason === 'wall') {
+      // A blocked shot gets a compact, backward-scattering spark fan. It is
+      // visibly different from both a target hit and a harmless range fade.
+      this.tmpColor.copy(projectile.coreColor).multiplyScalar(hdr(1.25));
+      this.spawn(x, y, z, 0, 0.25, 0, this.tmpColor, 0.72, 0.16, 0, SPR.flash);
+      for (let k = 0; k < this.scaledCount(13); k++) {
+        const side = (Math.random() - 0.5) * 2.4;
+        const rebound = 1.6 + Math.random() * 3.2;
+        this.spawn(
+          x,
+          y,
+          z,
+          -projectile.dirX * rebound + projectile.dirZ * side,
+          0.45 + Math.random() * 2.1,
+          -projectile.dirZ * rebound - projectile.dirX * side,
+          projectile.trailColor,
+          0.3,
+          0.38,
+          7,
+          k % 2 === 0 ? SPR.sparkle : SPR.sparkBurst,
+        );
+      }
+      return;
+    }
+
+    // Entity contact is the strongest response. The combat result can still
+    // be miss, dodge, parry or resist; this burst communicates physical contact,
+    // while combat text communicates the authoritative roll result.
+    this.tmpColor.copy(projectile.color).multiplyScalar(hdr(1.6));
+    this.spawn(x, y, z, 0, 0.5, 0, this.tmpColor, 1.05, 0.22, 0, SPR.flash);
+    for (let k = 0; k < this.scaledCount(18); k++) {
+      const angle = Math.random() * Math.PI * 2;
+      const speed = 2.2 + Math.random() * 3.8;
+      this.spawn(
+        x,
+        y,
+        z,
+        Math.sin(angle) * speed,
+        Math.random() * 2.7,
+        Math.cos(angle) * speed,
+        this.tmpColor,
+        0.4,
+        0.5,
+        7,
+        k % 2 === 0 ? SPR.sparkle : SPR.sparkBurst,
+      );
+    }
   }
 
   private projectileFrom(
@@ -2107,6 +2299,117 @@ export class Vfx {
           1.4,
           SPR.ring,
         );
+      }
+    }
+
+    // Player ballistic attacks advance locally along the immutable launch
+    // trajectory. The sim's projectileImpact event removes them at its exact
+    // entity/wall/range result, so this never predicts gameplay contact.
+    for (let i = this.ballisticProjectiles.length - 1; i >= 0; i--) {
+      const projectile = this.ballisticProjectiles[i];
+      const step = Math.min(Math.max(0, projectile.remaining), projectile.speed * dt);
+      projectile.pos.x += projectile.dirX * step;
+      projectile.pos.z += projectile.dirZ * step;
+      projectile.remaining -= step;
+      if (projectile.jagged) {
+        const perpX = -projectile.dirZ;
+        const perpZ = projectile.dirX;
+        let lateral = 0;
+        let vertical = 0;
+        for (let segment = 0; segment < 5; segment++) {
+          lateral = lateral * 0.45 + (Math.random() - 0.5) * 0.75;
+          vertical = vertical * 0.45 + (Math.random() - 0.5) * 0.55;
+          const back = segment * 0.55 * projectile.scale;
+          const x = projectile.pos.x - projectile.dirX * back + perpX * lateral * projectile.scale;
+          const y = projectile.pos.y + vertical * projectile.scale;
+          const z = projectile.pos.z - projectile.dirZ * back + perpZ * lateral * projectile.scale;
+          const head = segment === 0;
+          this.spawn(
+            x,
+            y,
+            z,
+            0,
+            0,
+            0,
+            head ? projectile.coreColor : projectile.color,
+            (head ? 0.5 : 0.36) * projectile.scale,
+            0.13,
+            0,
+            SPR.glowCore,
+          );
+          this.spawn(
+            x,
+            y,
+            z,
+            0,
+            0,
+            0,
+            projectile.trailColor,
+            (head ? 0.7 : 0.5) * projectile.scale,
+            0.15,
+            0,
+            SPR.glowSoft,
+          );
+        }
+      } else {
+        this.spawn(
+          projectile.pos.x,
+          projectile.pos.y,
+          projectile.pos.z,
+          0,
+          0,
+          0,
+          projectile.coreColor,
+          0.46 * projectile.scale,
+          0.1,
+          0,
+          projectile.coreSprite,
+        );
+      }
+      for (let n = 0; n < this.emitCount(34, dt); n++) {
+        const coil = projectile.coils
+          ? Math.sin(projectile.remaining * 9 + n * Math.PI) * 0.34 * projectile.scale
+          : 0;
+        this.spawn(
+          projectile.pos.x -
+            projectile.dirX * (0.15 + Math.random() * 0.65) -
+            projectile.dirZ * coil,
+          projectile.pos.y + (Math.random() - 0.5) * 0.16,
+          projectile.pos.z -
+            projectile.dirZ * (0.15 + Math.random() * 0.65) +
+            projectile.dirX * coil,
+          -projectile.dirX * (0.8 + Math.random()),
+          (Math.random() - 0.35) * 0.6,
+          -projectile.dirZ * (0.8 + Math.random()),
+          projectile.trailColor,
+          0.24 * projectile.scale,
+          0.28,
+          0,
+          projectile.trailSprite,
+        );
+      }
+      if (projectile.tracer && this.emitChance(18, dt)) {
+        this.spawn(
+          projectile.pos.x - projectile.dirX * 0.45,
+          projectile.pos.y,
+          projectile.pos.z - projectile.dirZ * 0.45,
+          -projectile.dirX * 1.4,
+          0,
+          -projectile.dirZ * 1.4,
+          projectile.trailColor,
+          0.35 * projectile.scale,
+          0.2,
+          0,
+          SPR.trace,
+          0,
+        );
+      }
+      // Impact normally arrives in the same or next render frame. Keep an
+      // inert short grace window for network ordering, then discard silently.
+      if (projectile.remaining <= 0) {
+        projectile.speed = 0;
+        projectile.remaining -= dt;
+        if (projectile.remaining < -0.5) this.ballisticProjectiles.splice(i, 1);
       }
     }
 

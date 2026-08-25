@@ -537,6 +537,7 @@ const RENDER_PURE_CORES = [
   'src/render/cliff_scree_core.ts',
   'src/render/dashed_ring_core.ts',
   'src/render/detail_horizon_core.ts',
+  'src/render/dodge_visual_core.ts',
   'src/render/drape_lod_core.ts',
   'src/render/weapon_vfx_emissive_cache_core.ts',
   'src/render/weapon_vfx_shed_core.ts',
@@ -2129,6 +2130,7 @@ const UI_PAINTER_HELPERS = [
 // contributors do not edit those files.
 const UI_DOM_MODULES = [
   'src/ui/account_portal_dom.ts',
+  'src/ui/action_camera_crosshair.ts',
   'src/ui/appearance_customizer.ts',
   'src/ui/arena_window.ts',
   'src/ui/armory_inspect.ts',

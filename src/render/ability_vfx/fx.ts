@@ -19,7 +19,7 @@ import { OverlaySprites } from './overlay_sprites';
 import { LightPillars } from './pillars';
 import { AbilityVfxRibbons, type BoltTrailStyle, type RibbonAnchor } from './ribbons';
 import { ShockRings } from './rings';
-import { ArchetypeSequencer, type SeqPoint, type SequencerHost } from './sequencer';
+import { ArchetypeSequencer, type SeqPoint, type SeqSlot, type SequencerHost } from './sequencer';
 import { BuffShells } from './shells';
 import { SPECTACLE, usesCrescendoScale } from './spectacle';
 import {
@@ -326,6 +326,7 @@ export class AbilityVfxFx implements SequencerHost {
   private groundAuras: GroundAuras;
   private flipbooks: ImpactFlipbooks;
   private spirits: SpiritApparitions;
+  private ballisticSequences = new Map<string, SeqSlot>();
   private windups = new Map<number, WindupState>();
   private orbits = new Map<number, OrbitBand[]>();
   private orbitBandCount = 0;
@@ -635,6 +636,43 @@ export class AbilityVfxFx implements SequencerHost {
     });
     if (wantsScreenFx(spec, tier))
       this.scheduleScreenFx(windupDelay + 0.15, -1, x, y, z, screenFxStrengthOf(spec));
+  }
+
+  // Server-authored ballistic travel keeps the gallery sequence alive from
+  // release until the authoritative impact event. The pooled Vfx layer owns
+  // movement; this slot preserves the ability's original release, impact,
+  // motif, decal and linger composition without predicting contact locally.
+  beginBallisticSequence(
+    trajectoryId: string,
+    abilityId: string,
+    spec: AbilityVfxFullSpec,
+    casterId: number,
+    colorHex: number,
+    tier: number,
+  ): void {
+    const existing = this.ballisticSequences.get(trajectoryId);
+    if (existing) this.sequencer.cancel(existing);
+    const slot = this.sequencer.start(this, abilityId, spec, casterId, -1, colorHex, tier, true);
+    if (slot) this.ballisticSequences.set(trajectoryId, slot);
+    else this.ballisticSequences.delete(trajectoryId);
+  }
+
+  finishBallisticSequence(
+    trajectoryId: string,
+    x: number,
+    z: number,
+    targetId: number | undefined,
+    reason: 'entity' | 'wall' | 'range' | 'sourceDespawn',
+  ): void {
+    const slot = this.ballisticSequences.get(trajectoryId);
+    if (!slot) return;
+    this.ballisticSequences.delete(trajectoryId);
+    if (reason !== 'entity') {
+      this.sequencer.cancel(slot);
+      return;
+    }
+    slot.targetId = targetId ?? -1;
+    this.sequencer.triggerImpact(this, slot, x, this.groundY(x, z) + 0.7, z);
   }
 
   // Traveling bolt carrying the full spec's bolt DNA. Without a bolt block
@@ -1700,6 +1738,7 @@ export class AbilityVfxFx implements SequencerHost {
     this.groundAuras.clear();
     this.spirits.clear();
     this.sequencer.clear();
+    this.ballisticSequences.clear();
     for (const [id, g] of this.glows) this.applyGlow?.(id, g.color, 0);
     this.glows.clear();
     this.windups.clear();

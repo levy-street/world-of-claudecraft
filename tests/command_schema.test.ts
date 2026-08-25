@@ -64,9 +64,10 @@ const repoRoot = fileURLToPath(new URL('..', import.meta.url));
 // The New Eastbrook program then retires the Vale Cup minigame, removing its
 // six vcup_* send + dispatch pairs (docs/design/eastbrook-revamp/master-plan.md);
 // the Proving Shore tutorial adds its one start_tutorial pair back on top, and
-// the v0.40.0 sync merge brings the release side's one new pair with it.
-const EXPECTED_SEND_COUNT = 199;
-const EXPECTED_DISPATCH_COUNT = 212;
+// the v0.40.0 sync merge brings the release side's one new pair with it. The
+// directional combat branch adds the dodge pair.
+const EXPECTED_SEND_COUNT = 200;
+const EXPECTED_DISPATCH_COUNT = 213;
 const EXPECTED_DISPATCH_ONLY_COUNT = 13;
 
 // The chat sub-channel routing switch (server/game.ts `switch

@@ -747,7 +747,8 @@ export function buildInterfaceControls(
       boolToggle(s, 'compactChat', 'hud.options.compactChat'),
     ]),
     ...tag('combat', [
-      boolToggle(s, 'startAttackOnAbilityUse', 'hudChrome.options.startAttackOnAbility'),
+      boolToggle(s, 'actionCamera', 'hudChrome.options.actionCamera'),
+      boolToggle(s, 'doubleTapDodge', 'hudChrome.options.doubleTapDodge'),
       boolToggle(
         s,
         'stopAutoAttackOnTargetSwitch',

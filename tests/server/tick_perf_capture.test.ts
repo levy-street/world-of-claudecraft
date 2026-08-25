@@ -17,11 +17,10 @@ vi.mock('../../server/db', () => ({
 import {
   GameServer,
   MOB_UPDATE_BUCKETS,
-  mobZonePhase,
   type PerfCaptureResult as ServerPerfCaptureResult,
   SIM_LAP_PHASES,
-  SIM_MOB_ZONE_PHASES,
 } from '../../server/game';
+import { mobZonePhase, SIM_MOB_ZONE_PHASES } from '../../server/mob_zone_phase';
 import type { PerfCaptureResult as AdminPerfCaptureResult } from '../../src/admin/types';
 import { DUNGEON_X_THRESHOLD, MOBS, ZONES } from '../../src/sim/data';
 import { createMob } from '../../src/sim/entity';

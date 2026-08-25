@@ -146,6 +146,13 @@ export const BIND_ACTIONS: BindAction[] = [
     kind: 'edge',
     defaults: ['KeyR'],
   },
+  {
+    id: 'dodge',
+    label: 'Dodge',
+    category: 'Movement',
+    kind: 'edge',
+    defaults: ['Shift+KeyV'],
+  },
   // Targeting / interaction
   {
     id: 'target',
@@ -219,6 +226,13 @@ export const BIND_ACTIONS: BindAction[] = [
     category: 'Interface',
     kind: 'edge',
     defaults: ['KeyV'],
+  },
+  {
+    id: 'toggleActionCamera',
+    label: 'Toggle Action Camera',
+    category: 'Interface',
+    kind: 'edge',
+    defaults: [],
   },
   { id: 'talents', label: 'Talents', category: 'Interface', kind: 'edge', defaults: ['KeyN'] },
   // Every bare letter is claimed by another default (see the KeyZ note on

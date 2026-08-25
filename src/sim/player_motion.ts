@@ -19,6 +19,7 @@
 
 import { isInstancedRegion, MANTLE_REACH, slopeGlueHeight } from './colliders';
 import { afflictionCanCastWhileMoving } from './combat/affliction';
+import { castSurvivesMovement } from './combat/cast_movement';
 import { isRooted, isStunned } from './combat/cc';
 import { iceFloesAuraForAbility } from './combat/empower_next';
 import { isVeilboundMarchActive } from './combat/paladin_veilbound_state';
@@ -264,7 +265,10 @@ export interface PlayerMotionDeps {
   resolvedAbility(
     abilityId: string,
     pid: number,
-  ): { def: { castWhileMoving?: boolean }; castWhileMoving?: boolean } | null;
+  ): {
+    def: { castWhileMoving?: boolean; channel?: { duration: number } };
+    castWhileMoving?: boolean;
+  } | null;
   cancelCast(p: Entity): void;
   standUp(p: Entity): void;
   /** Fall damage: the one rng-reachable callee. A no-op on the client. */
@@ -349,19 +353,14 @@ export function stepPlayerMotion(deps: PlayerMotionDeps, p: Entity, inp: MoveInp
     wishSpeed = 0;
   if (moving) {
     if (p.castingAbility) {
-      // A mobile cast (def flag, or talent-granted via the resolved ability)
-      // survives its caster's movement; everything else breaks, fishing included.
-      // Ice Floes (mage choice row) also protects: while its aura is worn the
-      // cast survives, and COMPLETING the hard cast spends one of the aura's
-      // protected uses (casting_lifecycle), so moving mid-cast never overspends.
+      // Combat casts follow the shared GW2-style mobility policy. Non-combat
+      // activities and selected long channels still break on movement.
       const casting = deps.resolvedAbility(p.castingAbility, p.id);
-      const mobile =
-        casting != null &&
-        (casting.def.castWhileMoving ||
-          casting.castWhileMoving ||
-          iceFloesAuraForAbility(p, p.castingAbility) !== undefined ||
-          afflictionCanCastWhileMoving(p, p.castingAbility) ||
-          p.auras.some((a) => a.kind === 'processional_grace'));
+      const temporaryMobility =
+        iceFloesAuraForAbility(p, p.castingAbility) !== undefined ||
+        afflictionCanCastWhileMoving(p, p.castingAbility) ||
+        p.auras.some((a) => a.kind === 'processional_grace');
+      const mobile = castSurvivesMovement(casting, temporaryMobility);
       if (!mobile) deps.cancelCast(p);
     }
     const len = Math.hypot(mx, mz);

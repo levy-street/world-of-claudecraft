@@ -156,7 +156,7 @@ describe('Shaman v0.29 Thundercall', () => {
     const manaBefore = failed.shaman.resource;
     failed.sim.castAbility('earth_shock', failed.shaman.id);
     expect(thunderBank(failed.shaman)?.stacks).toBe(3);
-    expect(failed.shaman.resource).toBe(manaBefore);
+    expect(failed.shaman.resource).toBeLessThan(manaBefore);
   });
 
   it('vents Faultwake at the selected target with deterministic area state', () => {

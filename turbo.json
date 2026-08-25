@@ -74,6 +74,7 @@
     "ONLY",
     "OUT",
     "PERF_TICK_LOG",
+    "PLAYER_DIRECTIONAL_COMBAT",
     "PROBE",
     "RIFT_FORGE_ENABLED",
     "SCAN",

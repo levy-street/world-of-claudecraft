@@ -69,6 +69,15 @@ describe('movement input sanitizing', () => {
     expect(normalizeMoveFacing(Math.PI * 401)).toBeCloseTo(Math.PI);
     expect(normalizeMoveFacing(Number.POSITIVE_INFINITY)).toBeNull();
   });
+
+  it('normalizes finite combat aim carried on the movement frame and rejects malformed aim', () => {
+    expect(parseMoveInputFrame({ mi: {}, aim: Math.PI * 5 }).combatAimAngle).toBeCloseTo(Math.PI);
+    expect(
+      parseMoveInputFrame({ mi: {}, combatAimAngle: -Math.PI / 2 }).combatAimAngle,
+    ).toBeCloseTo(-Math.PI / 2);
+    expect(parseMoveInputFrame({ mi: {}, aim: Number.NaN }).combatAimAngle).toBeNull();
+    expect(parseMoveInputFrame({ mi: {}, aim: 'north' }).combatAimAngle).toBeNull();
+  });
 });
 
 describe('agent movement channel', () => {
@@ -131,6 +140,7 @@ describe('agent movement channel', () => {
       surface: false,
     };
     client.mouselookFacing = null;
+    client.combatAimAngle = null;
 
     client.setMoveInput({ f: '1', forward: true, sr: 1, jump: 'yes' }, Number.NaN);
 
@@ -150,5 +160,8 @@ describe('agent movement channel', () => {
     client.setMouselookFacing(Math.PI * 401);
 
     expect(client.mouselookFacing).toBeCloseTo(Math.PI);
+
+    client.setCombatAimAngle(-Math.PI * 7.5);
+    expect(client.combatAimAngle).toBeCloseTo(Math.PI / 2);
   });
 });

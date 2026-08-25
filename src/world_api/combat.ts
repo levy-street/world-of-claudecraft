@@ -38,6 +38,8 @@ export interface IWorldCombat {
   /** Remaining server-authoritative lifetime of a reactive ability window. */
   reactiveAbilityWindowRemaining(abilityId: string): number;
   castAbility(abilityId: string): void;
+  /** Cast an entity-targeted offensive ability toward a world-space aim ray. */
+  castAbilityToward(abilityId: string, aim: { x: number; z: number }): void;
   castAbilityBySlot(slot: number): void;
   // Ground-targeted cast: the ability is aimed at a world point (x, z) the player
   // chose, instead of the current entity target. Cast by ability id (like
@@ -56,6 +58,8 @@ export interface IWorldCombat {
   cancelAura(auraId: string): void;
   startAutoAttack(): void;
   stopAutoAttack(): void;
+  /** Spend endurance and evade while moving in the supplied world direction. */
+  dodge(direction: { x: number; z: number }): void;
   // Begin the local, server-authoritative geometry recovery countdown. It may
   // only relocate within the current reachable area and can be cancelled by
   // movement or combat.

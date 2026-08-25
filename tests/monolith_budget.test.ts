@@ -179,9 +179,8 @@ const MONOLITHS: MonolithRow[] = [
     // Lowered again by the castle branch's interior_light_rig.ts extraction;
     // after merging main the merged file lands below both prior pins, so the
     // ceiling is the exact merged count.
-    // Re-pinned to the integration merge of the latest v0.40.0 (the touch UI
-    // rework); exact merged count.
-    ceiling: 13329,
+    // Re-pinned to the exact v0.40.0 directional-combat integration count.
+    ceiling: 13396,
     seam: 'a new src/render/<thing>.ts module the renderer calls (src/render/CLAUDE.md)',
   },
   {
@@ -241,16 +240,8 @@ const MONOLITHS: MonolithRow[] = [
     // b650d9d7d2): release-side growth only (its own row went to 11490); the
     // branch's main.ts lines are unchanged. Exact merged count, zero headroom.
     file: 'src/main.ts',
-    // Re-pinned to the integration merge of the latest v0.40.0 (the touch UI
-    // rework); exact merged count.
-    // Re-pinned to the exact merged count of the v0.40.0 sync merge (the
-    // OSSBrain v0.40 batch on the release arm). Exact count, zero slack.
-    // Re-pinned to the exact merged count after the controller-tutorial
-    // merge (its controller-setting dispatch extraction shrinks main.ts;
-    // the ratchet follows the merged file down). Exact count, zero slack.
-    // Re-pinned to the exact merged count of the v0.39.3 main back-merge
-    // (the utc_day import consolidation shed one line).
-    ceiling: 11566,
+    // Re-pinned to the exact v0.40.0 directional-combat integration count.
+    ceiling: 11554,
     seam: 'a src/game/ or src/ui/ sibling module; main.ts is a firewall, not a home',
   },
   {
@@ -269,31 +260,8 @@ const MONOLITHS: MonolithRow[] = [
     // in the self-snapshot build plus its wireParkedMana import); the
     // branch's own surface is unchanged (exact merged count, zero headroom).
     file: 'server/game.ts',
-    // Re-pinned 10900 -> 10909 for the Proving Shore branch: the +9 is the
-    // tutorial_start dispatch case (a thin delegate onto sim.startTutorial,
-    // where the real gates live) and the firstCharacter field on the join
-    // meta plumb; the island's ferry and greeting logic itself lives in sim
-    // modules. Exact merged count.
-    // Re-pinned to the eastbrook-plus-tutorial integration merge output: the
-    // combined tree lands below the branch ceilings, so keep the exact merged
-    // count.
-    // Re-pinned +43 for the guild pledge board: four dispatch cases (thin
-    // validated delegates onto SocialService), the applyPledge transport arm,
-    // and the join-time pledge stamp in sendSocialSnapshot; the service logic
-    // itself lives in server/social.ts. Exact count.
-    // Re-pinned to the exact merged count of the v0.40.0 sync merge (the
-    // OSSBrain v0.40 batch on the release arm). Exact count, zero slack.
-    // Raised +11 for the guild-signpost fill: the noticeboardGuilds provider
-    // field and the one routeEvents call into server/noticeboard_guilds.ts
-    // (thin-consumer wiring; the mapping and fill logic live in that
-    // module). Exact count, zero slack. Plus 4 for the board-note hard-tier
-    // screen: the SocialService construction wires ChatFilter.findHardHit
-    // (the screening logic lives in chat_filter.ts and social.ts). Then
-    // LOWERED to the exact count again when the signpost fill moved out of
-    // routeEvents into the guild board window's live REST read (the
-    // noticeboard_guilds event transform is deleted). Exact count, zero
-    // slack.
-    ceiling: 10645,
+    // Re-pinned to the exact v0.40.0 directional-combat integration count.
+    ceiling: 10650,
     seam: 'a sibling server module; see the hot-path seams in server/CLAUDE.md',
   },
   {

@@ -9,25 +9,93 @@
 // Reproducibility is checked by tests/i18n_resolved_equivalence.test.ts.
 
 export const pending: Record<string, readonly string[]> = {
-  "es": [],
-  "es_ES": [],
-  "fr_FR": [],
-  "fr_CA": [],
+  "es": [
+    "hudChrome.keybinds.toggleActionCamera",
+    "hudChrome.options.actionCamera",
+    "hudChrome.options.doubleTapDodge"
+  ],
+  "es_ES": [
+    "hudChrome.keybinds.toggleActionCamera",
+    "hudChrome.options.actionCamera",
+    "hudChrome.options.doubleTapDodge"
+  ],
+  "fr_FR": [
+    "hudChrome.keybinds.toggleActionCamera",
+    "hudChrome.options.actionCamera",
+    "hudChrome.options.doubleTapDodge"
+  ],
+  "fr_CA": [
+    "hudChrome.keybinds.toggleActionCamera",
+    "hudChrome.options.actionCamera",
+    "hudChrome.options.doubleTapDodge"
+  ],
   "en_CA": [],
-  "it_IT": [],
-  "de_DE": [],
-  "zh_CN": [],
-  "zh_TW": [],
-  "ko_KR": [],
-  "ja_JP": [],
-  "pt_BR": [],
-  "ru_RU": [],
-  "cs_CZ": [],
-  "nl_NL": [],
-  "pl_PL": [],
-  "id_ID": [],
-  "tr_TR": [],
-  "sv_SE": [],
-  "vi_VN": [],
-  "da_DK": []
+  "it_IT": [
+    "hudChrome.keybinds.toggleActionCamera",
+    "hudChrome.options.actionCamera",
+    "hudChrome.options.doubleTapDodge"
+  ],
+  "de_DE": [
+    "hudChrome.keybinds.toggleActionCamera",
+    "hudChrome.options.actionCamera",
+    "hudChrome.options.doubleTapDodge"
+  ],
+  "zh_CN": [
+    "hudChrome.options.doubleTapDodge"
+  ],
+  "zh_TW": [
+    "hudChrome.options.doubleTapDodge"
+  ],
+  "ko_KR": [
+    "hudChrome.options.doubleTapDodge"
+  ],
+  "ja_JP": [
+    "hudChrome.options.doubleTapDodge"
+  ],
+  "pt_BR": [
+    "hudChrome.keybinds.toggleActionCamera",
+    "hudChrome.options.actionCamera",
+    "hudChrome.options.doubleTapDodge"
+  ],
+  "ru_RU": [
+    "hudChrome.options.doubleTapDodge"
+  ],
+  "cs_CZ": [
+    "hudChrome.keybinds.toggleActionCamera",
+    "hudChrome.options.actionCamera",
+    "hudChrome.options.doubleTapDodge"
+  ],
+  "nl_NL": [
+    "hudChrome.keybinds.toggleActionCamera",
+    "hudChrome.options.actionCamera",
+    "hudChrome.options.doubleTapDodge"
+  ],
+  "pl_PL": [
+    "hudChrome.keybinds.toggleActionCamera",
+    "hudChrome.options.actionCamera",
+    "hudChrome.options.doubleTapDodge"
+  ],
+  "id_ID": [
+    "hudChrome.keybinds.toggleActionCamera",
+    "hudChrome.options.actionCamera",
+    "hudChrome.options.doubleTapDodge"
+  ],
+  "tr_TR": [
+    "hudChrome.options.startAttackOnAbility"
+  ],
+  "sv_SE": [
+    "hudChrome.keybinds.toggleActionCamera",
+    "hudChrome.options.actionCamera",
+    "hudChrome.options.doubleTapDodge"
+  ],
+  "vi_VN": [
+    "hudChrome.keybinds.toggleActionCamera",
+    "hudChrome.options.actionCamera",
+    "hudChrome.options.doubleTapDodge"
+  ],
+  "da_DK": [
+    "hudChrome.keybinds.toggleActionCamera",
+    "hudChrome.options.actionCamera",
+    "hudChrome.options.doubleTapDodge"
+  ]
 };

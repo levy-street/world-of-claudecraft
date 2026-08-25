@@ -15,6 +15,7 @@
 // `src/sim`-pure: sibling sim modules + the SimContext seam only
 // (enforced by tests/architecture.test.ts).
 
+import { evadeIncomingAttack } from '../player_dodge';
 import type { SimContext } from '../sim_context';
 import { DT, type Entity } from '../types';
 import { gainIcicle } from './frost_mage';
@@ -192,6 +193,7 @@ function pulseOrb(ctx: SimContext, orb: FrozenOrbState, source: Entity): void {
     // Line of sight from the CASTER, the pulseGroundAoE convention (a zone
     // pulse is the caster's spell, not an independent actor).
     if (!ctx.hasLineOfSight(source, target)) continue;
+    if (evadeIncomingAttack(ctx, source, target, 'frost', orb.abilityName, orb.abilityId)) continue;
     const raw = ctx.rng.range(orb.min, orb.max) + orb.spBonus;
     const dmg = Math.round(raw * spellDamageMultFromAuras(source));
     ctx.dealDamage(

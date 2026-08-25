@@ -10,6 +10,7 @@ import type {
   DailyRewardStatus,
 } from '../src/world_api';
 import { type CachedRead, createCachedRead } from './cached_read';
+import { TEST_WOC_USD_PRICE, testEconomyEnabled, testSolUsdRate } from './claudium_test_service';
 import { DailyRewardScheduleCache } from './daily_reward_schedule';
 import { DAILY_REWARD_BOARD_TTL_MS, DailyRewardBoardCache } from './daily_rewards_board_cache';
 import {
@@ -297,13 +298,18 @@ function parseTaskPayload(payload: unknown): DailyRewardTaskSeed[] {
 }
 
 function fallbackRuntimeConfig(): DailyRewardRuntimeConfig {
+  // Test economy (WOC_TEST_ECONOMY=1, no payout service): publish the fixed
+  // test price feed so eligibility computes and the prize pool shows its SOL
+  // value, and drop the $WOC minimum to 0 — on the test cluster nobody holds
+  // the mainnet $WOC mint, so the upstream $20 gate would lock everyone out.
+  const testMode = testEconomyEnabled();
   return {
     enabled: true,
-    minUsd: DEFAULT_MIN_USD,
+    minUsd: testMode ? 0 : DEFAULT_MIN_USD,
     prizePoolUsd: DEFAULT_POOL_USD,
     prizePoolSol: null,
-    wocUsdPrice: null,
-    solUsdPrice: null,
+    wocUsdPrice: testMode ? TEST_WOC_USD_PRICE : null,
+    solUsdPrice: testMode ? testSolUsdRate() : null,
     activeSeconds: DEFAULT_ACTIVE_SECONDS,
     dayStartUtcMinutes: DEFAULT_DAY_START_UTC_MINUTES,
     tasks: DEFAULT_TASKS,

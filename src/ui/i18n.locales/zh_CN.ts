@@ -13449,6 +13449,8 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.trade.woc.modesLabel': '付款货币',
   'hudChrome.trade.woc.paidSeller': '你的 {item} 已收到 {price} 的付款。',
   'hudChrome.trade.woc.paidBuyer': '你已为 {item} 支付 {price}。',
+  'hudChrome.keybinds.toggleActionCamera': '切换动作镜头',
+  'hudChrome.options.actionCamera': '动作镜头（准星）',
   'hudChrome.bags.lockItem': '锁定物品',
   'hudChrome.otaUpdate.applying': '更新已下载。正在重新启动游戏以应用更新。',
   'hudChrome.otaUpdate.continueAnyway': '暂不更新，继续游戏',

@@ -44,7 +44,9 @@ import {
   normalizeStreamerLink,
   type StreamerLinks,
 } from '../sim/account_flair';
+import { abilityUsesActionCombatAim } from '../sim/combat/action_combat_targeting';
 import { resolveActionReplacement } from '../sim/combat/action_replacement';
+import { PLAYER_MELEE_CONE_HALF_ANGLE } from '../sim/combat/directional_attack';
 import { resolveColdsightAbilityForSpec } from '../sim/combat/hunter_coldsight';
 import { resolveHunterSharedAbilityForTalents } from '../sim/combat/hunter_shared';
 import { isNecromancyUndead } from '../sim/combat/necromancy';
@@ -82,6 +84,11 @@ import {
 import { specialRoleColor } from '../sim/discord_roles';
 import { canEquipItem, isUniqueEquipped, weaponHand } from '../sim/equipment_rules';
 import { isItemLevelEligible, itemLevel, itemScore } from '../sim/item_level';
+import {
+  DODGE_ENDURANCE_COST,
+  DODGE_ENDURANCE_MAX,
+  playerEndurance,
+} from '../sim/player_dodge';
 import { requiredLevelFor } from '../sim/item_level_req';
 import type { Ante, PickAction } from '../sim/lockpick';
 import { petCanForceTaunt } from '../sim/pet/pet_taunt_gate';
@@ -376,26 +383,26 @@ import {
   EMPTY_ICON_KEY,
   ITEM_ICON_PREFIX,
 } from './hud/action_bar/action_bar_view';
-import {
-  abilityStartsAutoAttack,
-  deferAutoAttackUntilCastEnd,
-  hasAutoAttackTarget,
-  isPvpHostileTarget,
-} from './hud/action_bar/attack_on_ability';
 import { BarEditorWindow } from './hud/action_bar/bar_editor';
 import {
   buildMobileConsumableSeat,
   type MobileConsumableSeat,
 } from './hud/action_bar/consumable_seat_controller';
+import { CONSUMABLE_BAR_SLOTS, consumableBarItems } from './hud/action_bar/consumable_bar_view';
 import {
   type AimPoint,
   abilityAoeRadius,
+  abilityPreviewAngle,
+  type AbilityPreviewKind,
+  abilityPreviewKind,
+  abilityPreviewRange,
   cancelGroundAim,
   clampAimToRange,
   commitGroundAim,
   createGroundAimState,
   enterGroundAim,
   type GroundAimState,
+  shouldPrepareAbility,
   shouldUseGroundAim,
 } from './hud/action_bar/ground_aim';
 import {
@@ -791,6 +798,10 @@ export interface OptionsHooks {
   logout(): void;
   captureKey(cb: ((code: string | null) => void) | null): void;
   settings: Settings;
+  /** Resolve the current cursor ray to a world point for optional action combat. */
+  combatAim(): { x: number; z: number } | null;
+  /** Flush the latest aim/facing before a held Basic Attack command. */
+  syncCombatAim?(): void;
   onSettingChange(key: keyof GameSettings, value: GameSettings[keyof GameSettings]): void;
   /** Current renderer-bound profile. Options clones this into a disposable local draft. */
   graphicsApplied(): GraphicsSettingsSnapshot;
@@ -1455,6 +1466,9 @@ export class Hud {
   private pfResEl = $('#pf-res');
   private pfResTextEl = $('#pf-res-text');
   private pfResourceEl = $('#pf-resource');
+  private dodgeEnduranceEl = $('#dodge-endurance');
+  private dodgeEnduranceFirstEl = $('#dodge-endurance-first');
+  private dodgeEnduranceSecondEl = $('#dodge-endurance-second');
   private pfAbsorbEl = $('#pf-absorb');
   private buffBarEl = $('#buff-bar');
   private debuffBarEl = $('#debuff-bar');
@@ -4351,7 +4365,6 @@ export class Hud {
   // the QoL would engage but the ability has a cast time, consumed by the
   // castStop event (engage on success, drop on interrupt), so starting a Smite
   // never aggros the target before its damage lands.
-  private pendingAutoAttackOnCastEnd = false;
   // The party rows' mini aura strips share these deps (each row builds its own
   // view + painter instance over them). The wire summaries carry no remaining
   // time (Infinity reaches the core, so the duration label stays blank), which
@@ -6749,6 +6762,8 @@ export class Hud {
   // one is selected (the usual "cast on that pack" intent), else the caster's own
   // spot for an open-ground cast. The sim clamps this to the ability's range.
   private groundTargetAim(): { x: number; z: number } {
+    const directional = this.optionsHooks?.combatAim();
+    if (directional) return directional;
     const me = this.sim.player;
     const tid = me.targetId;
     const t = tid !== null ? this.sim.entities.get(tid) : null;
@@ -6764,11 +6779,19 @@ export class Hud {
   // Slot key DOWN: every slot fires immediately (a tap is down + up, so this
   // is the press).
   pressSlot(slot: number): void {
+    if (slot === 0 && this.attackSlotIsAttack()) {
+      this.optionsHooks?.syncCombatAim?.();
+      this.sim.startAutoAttack();
+      this.flashActionSlot(0);
+      return;
+    }
     const empowered = this.empoweredAbilityIdForSlot(slot);
     if (empowered) {
       if (this.empowerCharge) return;
       this.empowerCharge = { slot, abilityId: empowered };
-      this.sim.castAbility(empowered);
+      const resolved = this.sim.known.find((known) => known.def.id === empowered);
+      if (resolved) this.castActionAbility(empowered, resolved.def);
+      else this.sim.castAbility(empowered);
       return;
     }
     this.castSlot(slot);
@@ -6777,6 +6800,10 @@ export class Hud {
   // Slot key UP: release an empowered hold. A non-charging slot already fired
   // on press, so this is a no-op.
   releaseSlot(slot: number): void {
+    if (slot === 0 && this.attackSlotIsAttack()) {
+      this.sim.stopAutoAttack();
+      return;
+    }
     if (this.empowerCharge?.slot === slot) {
       const charge = this.empowerCharge;
       this.empowerCharge = null;
@@ -6826,6 +6853,12 @@ export class Hud {
     );
   }
 
+  private castActionAbility(abilityId: string, ability: AbilityDef): void {
+    const actionAim = abilityUsesActionCombatAim(ability) ? this.optionsHooks?.combatAim() : null;
+    if (actionAim) this.sim.castAbilityToward(abilityId, actionAim);
+    else this.sim.castAbility(abilityId);
+  }
+
   isGroundAimActive(): boolean {
     return this.groundAim.activeAbilityId !== null;
   }
@@ -6836,12 +6869,33 @@ export class Hud {
     this.groundAimPoint = null;
     this.groundAimClamped = false;
     this.renderer.setGroundAimReticle(null);
+    this.renderer.setAbilityRangeReticle(null);
+    this.paintPreparedSlot(null);
     return true;
   }
 
   private beginGroundAim(abilityId: string, slot: number): void {
     this.groundAim = enterGroundAim(this.groundAim, abilityId, slot);
     this.groundAimPoint = null;
+    this.paintPreparedSlot(slot);
+  }
+
+  private paintPreparedSlot(slot: number | null): void {
+    const prepared = slot !== null ? this.activeGroundAimAbility() : null;
+    const previewRange = prepared ? abilityPreviewRange(prepared) : 0;
+    const previewRangeLabel =
+      previewRange > 0
+        ? t('abilityUi.tooltip.range', { range: formatAbilityNumber(previewRange) })
+        : '';
+    for (let i = 0; i < this.abilityButtons.length; i++) {
+      const active = i === slot;
+      const btn = this.abilityButtons[i]?.btn;
+      if (!btn) continue;
+      btn.classList.toggle('prepared', active);
+      btn.setAttribute('aria-pressed', active ? 'true' : 'false');
+      if (active && previewRangeLabel) btn.dataset.previewRange = previewRangeLabel;
+      else delete btn.dataset.previewRange;
+    }
   }
 
   private activeGroundAimAbility(): ResolvedAbility | null {
@@ -6877,12 +6931,57 @@ export class Hud {
     if (!point) return null;
     const res = this.activeGroundAimAbility();
     if (!res) return null;
+    if (res.def.targetMode !== 'position' || res.def.selfCentered) return null;
     return {
       point,
       radius: abilityAoeRadius(res),
       school: res.def.school,
       clamped: this.groundAimClamped,
     };
+  }
+
+  abilityRangeReticle(): {
+    point: AimPoint;
+    radius: number;
+    school: string;
+    kind: AbilityPreviewKind;
+    angle?: number;
+    halfAngle?: number;
+  } | null {
+    if (!this.isGroundAimActive()) return null;
+    const res = this.activeGroundAimAbility();
+    if (!res) return null;
+    const radius = abilityPreviewRange(res);
+    if (radius <= 0) return null;
+    const kind = abilityPreviewKind(res.def);
+    const angle = abilityPreviewAngle(
+      kind,
+      this.sim.player,
+      this.optionsHooks?.combatAim() ?? null,
+    );
+    return {
+      point: { x: this.sim.player.pos.x, z: this.sim.player.pos.z },
+      radius,
+      school: res.def.school,
+      kind,
+      angle,
+      halfAngle: kind === 'meleeCone' ? PLAYER_MELEE_CONE_HALF_ANGLE : undefined,
+    };
+  }
+
+  private castResolvedAbility(abilityId: string, resolved: ResolvedAbility): void {
+    const def = resolved.def;
+    if (
+      this.hoveredPartyPid !== null &&
+      (this.optionsHooks?.settings.get('mouseoverCast') ?? true) &&
+      def.requiresTarget &&
+      def.targetType === 'friendly' &&
+      this.sim.entities.has(this.hoveredPartyPid)
+    ) {
+      this.sim.castAbilityOn(abilityId, this.hoveredPartyPid);
+      return;
+    }
+    this.castActionAbility(abilityId, def);
   }
 
   commitGroundAimAt(rawPoint: AimPoint | null = this.groundAimPoint): boolean {
@@ -6901,7 +7000,13 @@ export class Hud {
     this.groundAimPoint = null;
     this.groundAimClamped = false;
     this.renderer.setGroundAimReticle(null);
-    this.sim.castAbilityAt(abilityId, point);
+    this.renderer.setAbilityRangeReticle(null);
+    this.paintPreparedSlot(null);
+    if (res.def.targetMode === 'position' && !res.def.selfCentered) {
+      this.sim.castAbilityAt(abilityId, point);
+    } else {
+      this.castResolvedAbility(abilityId, res);
+    }
     return true;
   }
 
@@ -6980,9 +7085,14 @@ export class Hud {
         // A keyboard-generated button click has no pointer hold. Resolve it as
         // a minimum-charge tap so an empowered spell can never stay stuck.
         if (resolved.def.empowerStages) {
-          this.sim.castAbility(action.id);
+          this.castActionAbility(action.id, resolved.def);
           this.sim.releaseEmpoweredAbility(action.id);
           this.flashActionSlot(barSlot);
+          return;
+        }
+        const mobileTouch = document.body.classList.contains('mobile-touch');
+        if (shouldPrepareAbility(resolved.def, mobileTouch, this.groundReticleEnabled(action.id))) {
+          this.beginGroundAim(action.id, barSlot);
           return;
         }
         // A self-centered channel (Bladestorm) casts at the caster's own feet:
@@ -6998,45 +7108,7 @@ export class Hud {
           // while hovering a party frame lands on the hovered member instead of
           // the current target; the sim validates and falls back if it went stale.
           // Gated on the Interface option (mouseoverCast, on by default).
-          const def = resolved.def;
-          if (
-            this.hoveredPartyPid !== null &&
-            (this.optionsHooks?.settings.get('mouseoverCast') ?? true) &&
-            def.requiresTarget &&
-            def.targetType === 'friendly' &&
-            this.sim.entities.has(this.hoveredPartyPid)
-          ) {
-            this.sim.castAbilityOn(action.id, this.hoveredPartyPid);
-          } else {
-            this.sim.castAbility(action.id);
-          }
-          // Optional QoL: also engage auto-attack when the ability is an offensive
-          // attack, so white swings start without a separate Attack press. Gated on
-          // the player setting; abilityStartsAutoAttack skips heals/buffs and CC the
-          // swing would shatter. hasAutoAttackTarget keeps requiresTarget:false AOEs
-          // from tripping "Invalid attack target" and covers PvP player targets that
-          // never carry the mob-only `hostile` flag.
-          const tid = this.sim.player.targetId;
-          const target = tid !== null ? (this.sim.entities.get(tid) ?? null) : null;
-          if (
-            this.optionsHooks?.settings.get('startAttackOnAbilityUse') &&
-            abilityStartsAutoAttack(resolved.effects) &&
-            hasAutoAttackTarget(
-              target,
-              isPvpHostileTarget(tid, this.sim.duelInfo, this.sim.arenaInfo, this.sim.bgInfo),
-            )
-          ) {
-            // A TIMED cast must not engage yet: startAutoAttack aggros the target
-            // immediately, so engaging at cast start pulled the mob before any
-            // damage existed (the aggro-before-damage bug). Defer to the
-            // successful castStop (handled in the events switch); instants keep
-            // engaging at once since their damage lands this same tick.
-            if (deferAutoAttackUntilCastEnd(resolved.castTime)) {
-              this.pendingAutoAttackOnCastEnd = true;
-            } else {
-              this.sim.startAutoAttack();
-            }
-          }
+          this.castResolvedAbility(action.id, resolved);
         }
         this.flashActionSlot(barSlot);
       }
@@ -7199,6 +7271,29 @@ export class Hud {
       // slot 0 is Attack for every class (auto-attack toggle — players
       // without right-click need a way in); the kit fills slots 1+
       this.bindEmpoweredActionHold(btn, () => slot);
+      let fixedAttackPointer: number | null = null;
+      btn.addEventListener('pointerdown', (event) => {
+        if (slot !== 0 || !this.attackSlotIsAttack()) return;
+        if (event.pointerType === 'mouse' && event.button !== 0) return;
+        if (this.actionBarBind) return;
+        fixedAttackPointer = event.pointerId;
+        this.pressSlot(0);
+        try {
+          btn.setPointerCapture?.(event.pointerId);
+        } catch {
+          /* pointer already released */
+        }
+        event.preventDefault();
+      });
+      const releaseFixedAttack = (event: PointerEvent): void => {
+        if (fixedAttackPointer !== event.pointerId) return;
+        fixedAttackPointer = null;
+        this.releaseSlot(0);
+        this.suppressNextActionClick = true;
+        event.preventDefault();
+      };
+      btn.addEventListener('pointerup', releaseFixedAttack);
+      btn.addEventListener('pointercancel', releaseFixedAttack);
       btn.addEventListener('click', () => {
         if (this.suppressNextActionClick) {
           this.suppressNextActionClick = false;
@@ -8520,6 +8615,21 @@ export class Hud {
     playerFrame.borderSlug = deedBorderSlug(sim.activeBorder);
     playerFrame.absorb = p;
     this.playerFramePainter.paint(unitFrameViewInto(this.playerFrameBuffer, playerFrame));
+    const dodgeEndurance = playerEndurance(p);
+    this.writerFacet.setTransform(
+      this.dodgeEnduranceFirstEl,
+      `scaleX(${Math.min(1, dodgeEndurance / DODGE_ENDURANCE_COST)})`,
+    );
+    this.writerFacet.setTransform(
+      this.dodgeEnduranceSecondEl,
+      `scaleX(${Math.min(1, Math.max(0, dodgeEndurance - DODGE_ENDURANCE_COST) / DODGE_ENDURANCE_COST)})`,
+    );
+    this.writerFacet.setAttr(this.dodgeEnduranceEl, 'aria-valuenow', String(dodgeEndurance));
+    this.writerFacet.setAttr(
+      this.dodgeEnduranceEl,
+      'aria-valuetext',
+      `${Math.round(dodgeEndurance)} / ${DODGE_ENDURANCE_MAX}`,
+    );
     this.updateLowHealthVignette(p.hp, p.maxHp);
     this.updateLowResource(p);
     const fateThreads = this.updateWarlockDoomMeter(p);
@@ -13183,25 +13293,6 @@ export class Hud {
           }
           break;
         case 'castStop':
-          // Deferred "Auto-Attack on Ability Use" (timed casts): engage only when
-          // the player's own cast COMPLETES, so the aggro happens as the damage
-          // lands, never at cast start (the aggro-before-damage bug). An
-          // interrupted/canceled cast just drops the pending engage; the target
-          // is re-validated since the cast itself may have killed or cleared it.
-          if (ev.entityId === sim.playerId && this.pendingAutoAttackOnCastEnd) {
-            this.pendingAutoAttackOnCastEnd = false;
-            if (ev.success) {
-              const castTid = sim.player.targetId;
-              const castTarget = castTid !== null ? (sim.entities.get(castTid) ?? null) : null;
-              const castPvpHostile = isPvpHostileTarget(
-                castTid,
-                sim.duelInfo,
-                sim.arenaInfo,
-                sim.bgInfo,
-              );
-              if (hasAutoAttackTarget(castTarget, castPvpHostile)) this.sim.startAutoAttack();
-            }
-          }
           break;
         case 'aura': {
           const tgt = sim.entities.get(ev.targetId);

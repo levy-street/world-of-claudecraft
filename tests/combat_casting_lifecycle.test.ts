@@ -57,6 +57,7 @@ function makeSim(cls: PlayerClass, level: number): { sim: AnySim; p: AnyEntity; 
     seed: 99,
     playerClass: cls,
     autoEquip: true,
+    playerDirectionalCombat: true,
     world: CAST_TEST_WORLD,
   }) as AnySim;
   sim.setPlayerLevel(level);
@@ -68,9 +69,9 @@ function makeSim(cls: PlayerClass, level: number): { sim: AnySim; p: AnyEntity; 
 }
 
 // An idle hostile target in range + faced, so an offensive cast passes its guards.
-function spawnTarget(sim: AnySim, p: AnyEntity, level = 1, dz = 6): AnyEntity {
+function spawnTarget(sim: AnySim, p: AnyEntity, level = 1, dz = 6, dx = 0): AnyEntity {
   const mob = createMob(sim.nextId++, MOBS.forest_wolf, level, {
-    x: p.pos.x,
+    x: p.pos.x + dx,
     y: p.pos.y,
     z: p.pos.z + dz,
   }) as AnyEntity;
@@ -78,6 +79,7 @@ function spawnTarget(sim: AnySim, p: AnyEntity, level = 1, dz = 6): AnyEntity {
   mob.hp = 5000;
   mob.hostile = true;
   mob.aiState = 'idle';
+  mob.moveSpeed = 0;
   sim.addEntity(mob);
   p.facing = Math.atan2(mob.pos.x - p.pos.x, mob.pos.z - p.pos.z);
   sim.targetEntity(mob.id, p.id);
@@ -125,7 +127,7 @@ describe('casting_lifecycle: timed cast start -> progress -> finish', () => {
     expect(p.hp).toBeGreaterThan(hp0); // applyAbility ran the heal effect
   });
 
-  it('resolves a completed hostile cast against the target selected at cast start', () => {
+  it('resolves a completed hostile cast along the latest launch-time aim', () => {
     const { sim, p, meta } = makeSim('mage', 12);
     const firstTarget = spawnTarget(sim, p, 12, 6);
     const firstHp0 = firstTarget.hp;
@@ -133,7 +135,7 @@ describe('casting_lifecycle: timed cast start -> progress -> finish', () => {
     expect(p.castingAbility).toBe('fireball');
     expect(p.castTargetId).toBe(firstTarget.id);
 
-    const secondTarget = spawnTarget(sim, p, 12, 8);
+    const secondTarget = spawnTarget(sim, p, 12, 8, 5);
     const secondHp0 = secondTarget.hp;
     expect(p.targetId).toBe(secondTarget.id);
     sim.rng.chance = () => true;
@@ -141,11 +143,11 @@ describe('casting_lifecycle: timed cast start -> progress -> finish', () => {
 
     expect(p.castingAbility).toBeNull();
     expect(p.castTargetId).toBeNull();
-    expect(sim.ctx.pendingProjectiles[0]?.targetId).toBe(firstTarget.id);
+    expect(sim.ctx.pendingProjectiles[0]?.kind).toBe('ballistic');
     for (let i = 0; i < 200 && sim.ctx.pendingProjectiles.length > 0; i++)
       advancePendingProjectiles(sim.ctx);
-    expect(firstTarget.hp).toBeLessThan(firstHp0);
-    expect(secondTarget.hp).toBe(secondHp0);
+    expect(firstTarget.hp).toBe(firstHp0);
+    expect(secondTarget.hp).toBeLessThan(secondHp0);
   });
 
   it('resolves a completed friendly heal against the target locked at cast start', () => {
@@ -189,7 +191,7 @@ describe('casting_lifecycle: Vanish escape stealth blocks a hostile cast (issue 
     };
   }
 
-  it('refuses to start a hostile cast against a target that just vanished', () => {
+  it('starts a directional cast but cannot acquire a vanished hostile', () => {
     const { sim, p } = makeSim('mage', 12);
     const target = spawnTarget(sim, p, 12, 6);
     const hp0 = target.hp;
@@ -201,8 +203,8 @@ describe('casting_lifecycle: Vanish escape stealth blocks a hostile cast (issue 
       orig(e);
     };
     castAbility(sim.ctx, 'fireball', p.id);
-    expect(p.castingAbility).toBeNull(); // never started
-    expect(errors.some((e) => e.type === 'error' && e.text === 'You have no target.')).toBe(true);
+    expect(p.castingAbility).toBe('fireball');
+    expect(errors.some((e) => e.type === 'error')).toBe(false);
     expect(target.hp).toBe(hp0);
   });
 
@@ -228,7 +230,7 @@ describe('casting_lifecycle: Vanish escape stealth blocks a hostile cast (issue 
 });
 
 describe('casting_lifecycle: auto-acquire on cast with no target (issue #2787)', () => {
-  it('acquires the nearest ATTACKING mob over a closer idle one', () => {
+  it('does not mutate hard target while aim resolves a cast candidate', () => {
     const { sim, p } = makeSim('mage', 12);
     const idleNear = spawnTarget(sim, p, 1, 4); // idle, closer, never attacking
     idleNear.aiState = 'idle';
@@ -237,12 +239,12 @@ describe('casting_lifecycle: auto-acquire on cast with no target (issue #2787)',
     expect(p.targetId).toBeNull();
 
     castAbility(sim.ctx, 'fireball', p.id);
-    expect(p.targetId).toBe(attackerFar.id);
+    expect(p.targetId).toBeNull();
     expect(p.castingAbility).toBe('fireball'); // the cast actually started
-    expect(p.castTargetId).toBe(attackerFar.id);
+    expect(p.castTargetId).toBe(idleNear.id); // first body on the aim ray
   });
 
-  it('among several attackers, picks the nearest one', () => {
+  it('among several bodies on the aim ray, snapshots the nearest launch candidate', () => {
     const { sim, p } = makeSim('mage', 12);
     const near = spawnAttacker(sim, p, 6);
     const mid = spawnAttacker(sim, p, 14);
@@ -250,12 +252,13 @@ describe('casting_lifecycle: auto-acquire on cast with no target (issue #2787)',
     expect(p.targetId).toBeNull();
 
     castAbility(sim.ctx, 'fireball', p.id);
-    expect(p.targetId).toBe(near.id);
+    expect(p.targetId).toBeNull();
+    expect(p.castTargetId).toBe(near.id);
     void mid;
     void far;
   });
 
-  it('never overrides an existing target, even one nearer than the attacker', () => {
+  it('manual target remains selected while aim chooses a different first body', () => {
     const { sim, p } = makeSim('mage', 12);
     const selected = spawnTarget(sim, p, 1, 15); // explicitly targeted, farther away
     const attacker = spawnAttacker(sim, p, 6); // closer, actively attacking, but not selected
@@ -263,11 +266,11 @@ describe('casting_lifecycle: auto-acquire on cast with no target (issue #2787)',
 
     castAbility(sim.ctx, 'fireball', p.id);
     expect(p.targetId).toBe(selected.id); // unchanged
-    expect(p.castTargetId).toBe(selected.id);
+    expect(p.castTargetId).toBe(attacker.id);
     void attacker;
   });
 
-  it('still errors "You have no target." when no mob is attacking the player', () => {
+  it('can commit a directional cast with no hard target', () => {
     const { sim, p } = makeSim('mage', 12);
     spawnTarget(sim, p); // an idle mob exists, but is never targeted here
     sim.targetEntity(null, p.id);
@@ -280,8 +283,8 @@ describe('casting_lifecycle: auto-acquire on cast with no target (issue #2787)',
 
     castAbility(sim.ctx, 'fireball', p.id);
     expect(p.targetId).toBeNull();
-    expect(p.castingAbility).toBeNull();
-    expect(errors.some((e) => e.type === 'error' && e.text === 'You have no target.')).toBe(true);
+    expect(p.castingAbility).toBe('fireball');
+    expect(errors.some((e) => e.type === 'error')).toBe(false);
   });
 
   it('also auto-acquires for a dual-purpose (targetType "any") ability', () => {
@@ -334,9 +337,11 @@ describe('casting_lifecycle: auto-acquire on cast with no target (issue #2787)',
     expect(slot).toBeGreaterThanOrEqual(0);
     applyAction(headless.sim, ACTIONS.indexOf(`ability_${slot + 1}` as (typeof ACTIONS)[number]));
 
-    expect(headless.p.targetId).toBe(headlessAttacker.id);
+    expect(headless.p.targetId).toBeNull();
     expect(headless.p.castingAbility).toBe(direct.p.castingAbility);
-    expect(direct.p.targetId).toBe(directAttacker.id);
+    expect(direct.p.targetId).toBeNull();
+    expect(headless.p.castTargetId).toBe(headlessAttacker.id);
+    expect(direct.p.castTargetId).toBe(directAttacker.id);
   });
 });
 
@@ -350,10 +355,7 @@ describe('casting_lifecycle: channel start -> tick -> finish', () => {
     updateCasting(sim.ctx, p, meta);
 
     expect(p.channelTicksLeft).toBe(2);
-    expect(sim.ctx.pendingProjectiles).toHaveLength(1);
-    for (let tick = 0; tick < 20 && mob.hp === mobHp0; tick++) {
-      advancePendingProjectiles(sim.ctx);
-    }
+    expect(sim.ctx.pendingProjectiles).toHaveLength(0);
     expect(mob.hp).toBeLessThan(mobHp0);
   });
 
@@ -376,7 +378,7 @@ describe('casting_lifecycle: channel start -> tick -> finish', () => {
     expect(mob.hp).toBeLessThan(mobHp0); // applyChannelTick dealt drain damage
   });
 
-  it('keeps channel ticks on the target locked at channel start after retargeting', () => {
+  it('retargeting/facing changes redirect later channel launches', () => {
     const { sim, p, meta } = makeSim('warlock', 12);
     const first = spawnTarget(sim, p, 12, 6);
     const firstHp0 = first.hp;
@@ -385,7 +387,7 @@ describe('casting_lifecycle: channel start -> tick -> finish', () => {
     expect(p.channeling).toBe(true);
     expect(p.castTargetId).toBe(first.id);
 
-    const second = spawnTarget(sim, p, 12, 8); // spawnTarget also retargets p to it
+    const second = spawnTarget(sim, p, 12, 8, 5); // also retargets and faces p
     const secondHp0 = second.hp;
     expect(p.targetId).toBe(second.id);
     drainCast(sim, p, meta);
@@ -396,8 +398,8 @@ describe('casting_lifecycle: channel start -> tick -> finish', () => {
     expect(stops.some((e: any) => e.success === false)).toBe(false); // never cancelled
     for (let i = 0; i < 200 && sim.ctx.pendingProjectiles.length > 0; i++)
       advancePendingProjectiles(sim.ctx);
-    expect(first.hp).toBeLessThan(firstHp0); // ticks kept hitting the locked target
-    expect(second.hp).toBe(secondHp0); // the new current target was never drained
+    expect(first.hp).toBe(firstHp0);
+    expect(second.hp).toBeLessThan(secondHp0);
   });
 
   it('keeps a channel ticking when the current target is cleared mid-channel', () => {
@@ -426,7 +428,7 @@ describe('casting_lifecycle: channel start -> tick -> finish', () => {
     expect(mob.hp).toBeLessThan(mobHp0); // the locked target kept taking ticks
   });
 
-  it('cancels the channel when the locked target dies mid-channel', () => {
+  it('keeps a directional channel alive when the previous target dies', () => {
     const { sim, p, meta } = makeSim('warlock', 12);
     const mob = spawnTarget(sim, p, 12, 6);
     sim.drainEvents();
@@ -438,20 +440,15 @@ describe('casting_lifecycle: channel start -> tick -> finish', () => {
     handleDeath(sim.ctx, mob, p); // the locked target dies mid-channel
     for (let i = 0; i < 25 && p.castingAbility; i++) updateCasting(sim.ctx, p, meta);
 
-    expect(p.castingAbility).toBeNull(); // the 2s tick found a dead locked target
-    expect(p.channeling).toBe(false);
-    expect(p.castTargetId).toBeNull();
-    expect(p.castRemaining).toBe(0);
-    // cancelCast emitted castStop(success:false). (updateCasting's channel branch also
-    // emits a trailing success:true because the cancel zeroed castRemaining, a
-    // pre-existing quirk of mid-tick cancellation, so assert on the cancel event.)
+    expect(p.castingAbility).toBe('drain_life');
+    expect(p.channeling).toBe(true);
     const stops = sim
       .drainEvents()
       .filter((e: any) => e.type === 'castStop' && e.entityId === p.id);
-    expect(stops.some((e: any) => e.success === false)).toBe(true);
+    expect(stops.some((e: any) => e.success === false)).toBe(false);
   });
 
-  it('keeps Litany of Woe on the existing projectile channel path', () => {
+  it('keeps Litany of Woe on its authored beam channel path', () => {
     const { sim, p } = makeSim('priest', 20);
     const mob = spawnTarget(sim, p, 20, 6);
     sim.drainEvents();
@@ -460,15 +457,18 @@ describe('casting_lifecycle: channel start -> tick -> finish', () => {
     const events: any[] = [];
     for (let tick = 0; tick < 25; tick++) events.push(...sim.tick());
 
+    expect(events).toContainEqual(
+      expect.objectContaining({
+        type: 'spellfx',
+        sourceId: p.id,
+        targetId: mob.id,
+        fx: 'beam',
+        ability: 'mind_flay',
+      }),
+    );
     expect(
-      events.some(
-        (event) =>
-          event.type === 'spellfx' &&
-          event.fx === 'projectile' &&
-          event.sourceId === p.id &&
-          event.targetId === mob.id,
-      ),
-    ).toBe(true);
+      events.some((event) => event.type === 'projectileLaunch' && event.ability === 'mind_flay'),
+    ).toBe(false);
   });
 });
 
@@ -997,9 +997,7 @@ describe('casting_lifecycle: physical ranged shots resolve on projectile impact 
     // The shot is LAUNCHED at cast completion, not landed: no damage yet, a bolt is in flight.
     expect(mob.hp).toBe(hp0);
     expect(
-      events.some(
-        (e) => e.type === 'spellfx' && e.fx === 'projectile' && e.attackAnimation === 'ranged-shot',
-      ),
+      events.some((e) => e.type === 'projectileLaunch' && e.attackAnimation === 'ranged-shot'),
     ).toBe(true);
     // Advance ticks so the arrow travels and connects.
     for (let i = 0; i < 60 && mob.hp === hp0; i++) sim.tick();

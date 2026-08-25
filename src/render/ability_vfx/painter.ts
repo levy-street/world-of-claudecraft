@@ -25,6 +25,7 @@ import { abilityVfxFullSpec, abilityVfxSpec } from '../ability_vfx_registry';
 import { isVisuallyDead } from '../anim_state';
 import type { AbilityAudioKind, AbilityAudioOpts } from '../audio_sink';
 import { attackAbilityId } from '../characters/weapon_attack_style_core';
+import type { BallisticProjectileAppearance } from '../vfx';
 import { type AbilityVfxFx, asOrbitStyle, type ParticleBurstKind } from './fx';
 
 interface VfxPoint {
@@ -218,6 +219,7 @@ const CAST_FX = new Set([
   'nova',
   'tick',
   'beam',
+  'impact',
   'selfCast',
 ]);
 // spawnAoeRing radius in yards per spec ringScale unit (rg 2 = the classic
@@ -448,6 +450,49 @@ export class AbilityVfx {
   setQuality(q: number): void {
     this.quality = Math.min(1, Math.max(0, Number.isFinite(q) ? q : 1));
     this.deps.fx.setQuality(this.quality);
+  }
+
+  handleBallisticLaunch(ev: {
+    trajectoryId: string;
+    sourceId: number;
+    ability?: string;
+  }): BallisticProjectileAppearance | undefined {
+    if (!ev.ability) return undefined;
+    const spec = abilityVfxSpec(ev.ability);
+    const full = abilityVfxFullSpec(ev.ability);
+    if (!spec) return undefined;
+    const tier = this.castTier(ev.sourceId, ev.ability);
+    const plan = planCast(spec, this.quality, tier);
+    if (full) {
+      this.deps.fx.beginBallisticSequence(
+        ev.trajectoryId,
+        ev.ability,
+        full,
+        ev.sourceId,
+        plan.color,
+        tier,
+      );
+    }
+    this.playerGestureRelease(ev.sourceId, ev.ability);
+    this.recordStat(ev.ability, true);
+    return {
+      color: plan.color,
+      scale: plan.projScale,
+      style: full?.bolt?.style,
+      jagged: plan.jagged || full?.bolt?.jagged === true,
+      coils: full?.bolt?.coils === true,
+      tracer: full?.bolt?.tracer === true,
+    };
+  }
+
+  handleBallisticImpact(ev: {
+    trajectoryId: string;
+    x: number;
+    z: number;
+    targetId?: number;
+    reason: 'entity' | 'wall' | 'range' | 'sourceDespawn';
+  }): void {
+    this.deps.fx.finishBallisticSequence(ev.trajectoryId, ev.x, ev.z, ev.targetId, ev.reason);
   }
 
   // Dev probe surface: per-ability claim/primitive counters (copied out).
@@ -689,6 +734,23 @@ export class AbilityVfx {
             this.windupDelayFor(ev.ability, full, ev.sourceId),
           );
         break;
+      case 'impact': {
+        // Target-born spells have no travel silhouette. Land the complete
+        // authored burst, DoT, CC or link anatomy at the authoritative contact
+        // entity instead of inventing a generic school-colored projectile.
+        if (tier < 2 && full) {
+          fx.sequenceInstant(ev.ability, full, ev.sourceId, ev.targetId, plan.color, tier);
+          this.spawned++;
+        } else {
+          const at = this.deps.anchor(ev.targetId, 0.55);
+          if (at) {
+            this.deps.vfx.burst(at, ev.school, plan.burstCount, plan.burstPower, plan.color);
+            this.spawned++;
+          }
+        }
+        if (!plan.whirl) this.playerGestureRelease(ev.sourceId, ev.ability);
+        break;
+      }
       case 'selfCast': {
         // The pre-switch gate guarantees a full ceremonial or utility spec.
         // A self cue runs the ceremony on the caster (spirits, shells, orbits

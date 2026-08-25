@@ -36,6 +36,7 @@ import {
   syncDivineAscensionAura,
 } from '../paladin_devotion';
 import { PLAYER_BODY_RADIUS } from '../pathfind';
+import { evadeIncomingAttack } from '../player_dodge';
 import { scheduleProjectile } from '../projectile_travel';
 import type { PlayerMeta, ResolvedAbility } from '../sim';
 import type { SimContext } from '../sim_context';
@@ -53,7 +54,7 @@ import { stunDrCategory } from '../stun_dr';
 import { resolveTalentHitMult } from '../talent_hit_mult';
 import { addThreat, dropThreat } from '../threat';
 import { creditAbilityDrill } from '../tutorial/ability_drill';
-import type { AbilityDef, Aura, Entity } from '../types';
+import type { AbilityDef, AbilityEffect, Aura, Entity } from '../types';
 import {
   angleTo,
   armorReduction,
@@ -109,6 +110,7 @@ import {
   destructionAfterCast,
   summonPyreColossus,
 } from './destruction';
+import { playerAttackResolution } from './directional_attack';
 import { extendOwnedDot } from './dot_mutation';
 import {
   druidApexPayoffMult,
@@ -125,6 +127,7 @@ import { isFormAuraKind, isTravelFormAuraKind } from './forms';
 import {
   frostMageAfterCast,
   frostMageChannelStart,
+  INERT_FROZEN,
   resolveFrozenCast,
   SHATTER_CRIT_BONUS,
 } from './frost_mage';
@@ -412,6 +415,54 @@ function advanceSunGodVerdictForHit(
   advanceSunGodVerdict(ctx, caster, target, abilityId, mark, verdict.effect, verdict.name);
 }
 
+const SECONDARY_TARGET_EFFECTS = new Set<AbilityEffect['type']>([
+  'weaponStrike',
+  'directDamage',
+  'interrupt',
+  'dispel',
+  'silence',
+  'buffTarget',
+  'debuffTargetSource',
+  'finisherDamage',
+  'dot',
+  'extendDot',
+  'consumeDot',
+  'slow',
+  'root',
+  'stun',
+  'incapacitate',
+  'polymorph',
+  'applyDebuff',
+  'finisherStun',
+  'sunder',
+  'faerieFire',
+  'destructionConflagrate',
+  'ruinousBrand',
+  'duskfireClaim',
+  'afflictionNeedle',
+  'afflictionSentence',
+  'gainResource',
+  'enrageChance',
+]);
+
+interface SecondaryTargetSnapshot {
+  spentCombo: number;
+  sureCrit: boolean;
+  /** Cast-scoped damage multiplier captured before the primary consumes it. */
+  castDamageMultiplier?: number;
+}
+
+export function runSecondaryTargetEffects(
+  ctx: SimContext,
+  p: Entity,
+  meta: PlayerMeta,
+  target: Entity,
+  res: ResolvedAbility,
+  snapshot: SecondaryTargetSnapshot,
+): void {
+  runEffects(ctx, p, meta, target, res, false, false, undefined, snapshot);
+}
+
 export function runEffects(
   ctx: SimContext,
   p: Entity,
@@ -421,6 +472,7 @@ export function runEffects(
   attackAnimationStarted = false,
   deferredBastionImpact = false,
   facingOverride?: number,
+  secondaryTarget?: SecondaryTargetSnapshot,
 ): void {
   const ability = res.def;
   // The island's ability drill (tutorial/ability_drill.ts): the lesson is
@@ -431,6 +483,16 @@ export function runEffects(
   // asked for. The resist branch that returns before this point credits
   // itself (combat/casting_lifecycle.ts). Draws no rng.
   if (target) creditAbilityDrill(ctx, p, target, ability.id);
+  const attackResolution = playerAttackResolution(ability);
+  const evadedTargetIds = new Set<number>();
+  const evadeTarget = (candidate: Entity): boolean => {
+    if (evadedTargetIds.has(candidate.id)) return true;
+    if (!evadeIncomingAttack(ctx, p, candidate, ability.school, ability.name, ability.id)) {
+      return false;
+    }
+    evadedTargetIds.add(candidate.id);
+    return true;
+  };
   const vespersGloomtitheStacks = gloomtitheStacksForCast(p, ability.id);
   const initialTarget = target;
   const ascensionFxTargetId = target?.id ?? p.id;
@@ -444,13 +506,17 @@ export function runEffects(
   // reaches the whole hit, not just the base (issue: mastery/talent damage
   // percent under-delivered at high SP/AP since the rider was never scaled).
   const { dmgMult: talentDmgMult, healMult: talentHealMult } = resolveTalentHitMult(ability, mods);
-  const spentCombo = ability.spendsCombo ? p.comboPoints : 0;
+  const spentCombo = ability.spendsCombo ? (secondaryTarget?.spentCombo ?? p.comboPoints) : 0;
   let comboAwarded = false;
-  const sureCrit = hasSureCritAura(p);
+  const sureCrit = secondaryTarget?.sureCrit ?? hasSureCritAura(p);
   let sureCritRolled = false;
   const echoEligible = abilityQualifiesForAreaEcho(res.effects);
-  const areaEcho = echoEligible && hasAreaEchoAura(p);
-  const sweeping = echoEligible && hasSweepingStrikes(p);
+  // Directional player melee already resolves the authored attack against its
+  // three capped cone targets. The legacy echo/sweeping fan-out must not run on
+  // top of that resolver or it can damage a fourth target and duplicate hits.
+  const directionalMelee = ctx.playerDirectionalCombat === true && attackResolution === 'meleeCone';
+  const areaEcho = !secondaryTarget && !directionalMelee && echoEligible && hasAreaEchoAura(p);
+  const sweeping = !secondaryTarget && !directionalMelee && echoEligible && hasSweepingStrikes(p);
   let areaEchoDealt = false;
   let devotionDamageTriggered = false;
   let devotionHealingTriggered = false;
@@ -466,18 +532,21 @@ export function runEffects(
   // cast shares one frozen resolution and spends at most one Fingers of Frost
   // stack / Winter's Chill charge. Inert (and free) for everyone who is not a
   // committed-frost mage. Deterministic, no rng.
-  const frozen = resolveFrozenCast(ctx, p, meta, ability, target);
+  const frozen = secondaryTarget ? INERT_FROZEN : resolveFrozenCast(ctx, p, meta, ability, target);
   // Skulduggery detonation (combat/rogue_engines.ts): a Duskveil opener thrown
   // in the open with a full Gloam bank raises the shadow veil BEFORE this
   // cast's effects resolve, so the detonating Lurker's Strike is the doubled
   // one. Checked before breakStealth: a true-stealth opener banks instead.
-  rogueGloamDetonation(ctx, p, ability.id);
+  if (!secondaryTarget) rogueGloamDetonation(ctx, p, ability.id);
   // acting breaks stealth (the opener itself still lands first inside the swing).
   // Stealth toggles and Rogue Sprint are allowed while remaining hidden.
-  if (!preservesStealth(ability)) ctx.breakStealth(p);
+  if (!secondaryTarget && !preservesStealth(ability)) ctx.breakStealth(p);
   // Casting a healing spell drops a Shadow priest out of Shadowform: the form
   // amplifies Shadow damage but forbids healing (classic Shadowform rule).
-  if (res.effects.some((e) => e.type === 'heal' || e.type === 'hot' || e.type === 'aoeHeal')) {
+  if (
+    !secondaryTarget &&
+    res.effects.some((e) => e.type === 'heal' || e.type === 'hot' || e.type === 'aoeHeal')
+  ) {
     const sf = p.auras.findIndex((a) => a.kind === 'form_shadow');
     if (sf >= 0) {
       const lost = p.auras[sf];
@@ -496,16 +565,18 @@ export function runEffects(
     mult: res.threatMult * stoneboundThreatMultiplier(ctx, p),
   };
 
-  if (ability.id === 'elemental_mastery') armPrimalMastery(ctx, p);
-  if (ability.id === 'primal_exaltation') applyPrimalExaltation(ctx, p);
-  if (ability.id === 'stoneward' && target) applyStoneward(ctx, p, target);
-  if (ability.id === 'lightning_shield') onThunderWardActivated(ctx, p);
-  if (ability.id === 'unleash_weapon') runUnleashWeapon(ctx, p, target);
+  if (!secondaryTarget) {
+    if (ability.id === 'elemental_mastery') armPrimalMastery(ctx, p);
+    if (ability.id === 'primal_exaltation') applyPrimalExaltation(ctx, p);
+    if (ability.id === 'stoneward' && target) applyStoneward(ctx, p, target);
+    if (ability.id === 'lightning_shield') onThunderWardActivated(ctx, p);
+    if (ability.id === 'unleash_weapon') runUnleashWeapon(ctx, p, target);
+  }
 
   // Paladin aura choices share the warrior-stance-style selector. Remove the
   // caster's previous choice from every affected entity before applying the new
   // party aura; other Paladins' auras remain because conflicts key by sourceId.
-  if (PALADIN_DEVOTION_ABILITY_IDS.has(ability.id)) {
+  if (!secondaryTarget && PALADIN_DEVOTION_ABILITY_IDS.has(ability.id)) {
     replacePaladinDevotionChoice(ctx, p.id, ability.id);
   }
 
@@ -514,6 +585,7 @@ export function runEffects(
   // running recharge ticking for the next charge but re-opens the pool, so the
   // empty-pool cooldown mirror goes either way (see updateTimers).
   if (
+    !secondaryTarget &&
     ability.id === 'red_harvest' &&
     meta.known.some((known) => known.def.passive && known.def.id === 'cleaving_blows')
   ) {
@@ -537,7 +609,7 @@ export function runEffects(
     }
   }
 
-  if (ctx.playerMods(meta).global.battleRhythm > 0) {
+  if (!secondaryTarget && ctx.playerMods(meta).global.battleRhythm > 0) {
     meta.abilityRhythm = (meta.abilityRhythm + 1) % 3;
     if (meta.abilityRhythm === 0) {
       ctx.applyAura(p, {
@@ -561,8 +633,28 @@ export function runEffects(
   // cast attempt (issue #2632). Sentence is the exception: resolveSentence owns
   // consuming its Doom pool after the cast is committed.
 
+  const targetedAttack =
+    attackResolution === 'meleeCone' ||
+    attackResolution === 'ballisticProjectile' ||
+    attackResolution === 'directionalHitscan';
+  const weaponStrikes = res.effects.filter((effect) => effect.type === 'weaponStrike');
+  const activeEvadeAllowed =
+    weaponStrikes.length === 0 || weaponStrikes.some((effect) => !effect.cannotBeDodged);
+  if (
+    target &&
+    target.id !== p.id &&
+    ctx.isHostileTo(p, target) &&
+    targetedAttack &&
+    activeEvadeAllowed &&
+    evadeTarget(target)
+  ) {
+    if (weaponStrikes.length > 0 && p.kind === 'player') p.overpowerUntil = ctx.time + 5;
+    return;
+  }
+
   let targetBuffIndex = 0;
   for (const eff of res.effects) {
+    if (secondaryTarget && !SECONDARY_TARGET_EFFECTS.has(eff.type)) continue;
     switch (eff.type) {
       case 'destructionConflagrate': {
         if (target) advanceBurningPactTick(ctx, p, target);
@@ -792,7 +884,8 @@ export function runEffects(
         // more Temporal Echo healing (no hidden heal bonus). Deterministic; reads
         // the caster's charge aura (combat/chronomancy.ts).
         if (ability.id === ARCANE_SURGE_ID) dmg *= aetherSurgeDamageMult(p);
-        dmg *= thundercallDamageMultiplier(ctx, p, ability.id);
+        dmg *=
+          secondaryTarget?.castDamageMultiplier ?? thundercallDamageMultiplier(ctx, p, ability.id);
         dmg *= druidApexPayoffMult(ctx, p, ability.id);
         const finalDamage = Math.round(dmg);
         lastDirectDamage = finalDamage;
@@ -822,7 +915,7 @@ export function runEffects(
           thundercallOnArcBoltImpact(ctx, p);
           triggerWardCycle(ctx, p);
         }
-        if (ability.id === 'earth_shock') {
+        if (ability.id === 'earth_shock' && !secondaryTarget) {
           consumeThunderVent(ctx, p, ability.id, target, finalDamage);
           applyStoneboundJolt(ctx, p, target);
         }
@@ -937,7 +1030,7 @@ export function runEffects(
             }
           }
         }
-        if (isSpell) noteSpellHit(ctx, p, crit, ability.id);
+        if (isSpell && !secondaryTarget) noteSpellHit(ctx, p, crit, ability.id);
         // Aether Surge (Chronomancy Phase 3): this cast used the pre-cast charges
         // for cost and damage above; now bank one more Arcane Charge (cap 4) and
         // refresh the window, so the NEXT cast reads the higher count.
@@ -1607,6 +1700,7 @@ export function runEffects(
           if (hostile.dead) continue;
           if (eff.maxTargets !== undefined && feared >= eff.maxTargets) break;
           if (!ctx.hasLineOfSight(p, hostile)) continue;
+          if (evadeTarget(hostile)) continue;
           const duration = ctx.diminishedCrowdControlDuration(p, hostile, 'fear', eff.duration);
           if (duration === null) continue;
           const warlockBreakThreshold = warlockFearBreakThreshold(ability.id, hostile.maxHp);
@@ -2309,6 +2403,7 @@ export function runEffects(
             );
             if (facingDiff > (eff.frontalHalfAngle ?? MELEE_ARC)) continue;
           }
+          if (evadeTarget(m)) continue;
           aoeTargets.push(m);
         }
         // Classic AoE soft cap (Revenge): above `softCap` targets, hold the TOTAL
@@ -2541,13 +2636,18 @@ export function runEffects(
         for (let i = 0; i < hitList.length; i++) {
           const m = hitList[i];
           const sunwardDisc = ability.id === 'sunward_disc';
+          const authoredChainLightning = ability.id === 'chain_lightning';
           ctx.emit({
             type: 'spellfx',
             sourceId: i === 0 ? (hitsPrimary ? p.id : origin.id) : hitList[i - 1].id,
             targetId: m.id,
             school: ability.school,
-            fx: sunwardDisc ? 'paladinSunwardDisc' : 'projectile',
-            ability: ability.id,
+            fx: sunwardDisc
+              ? 'paladinSunwardDisc'
+              : authoredChainLightning
+                ? 'lightning'
+                : 'projectile',
+            ...(authoredChainLightning ? {} : { ability: ability.id }),
             ...(sunwardDisc
               ? {
                   level: i + 1,
@@ -2805,6 +2905,7 @@ export function runEffects(
         for (const m of ctx.hostilesInRadius(p, p.pos, eff.radius)) {
           if (m.dead) continue;
           if (!ctx.hasLineOfSight(p, m)) continue;
+          if (evadeTarget(m)) continue;
           ctx.applyAura(m, {
             id: `${ability.id}_as`,
             name: ability.name,
@@ -2821,6 +2922,7 @@ export function runEffects(
       case 'aoeAttackPower': {
         for (const m of ctx.hostilesInRadius(p, p.pos, eff.radius)) {
           if (m.dead) continue;
+          if (evadeTarget(m)) continue;
           // pct form (Direhowl rework): a NEGATIVE buff_dmg_done aura cuts a
           // fraction of ALL damage the victim deals (the dealDamage amp fold
           // handles the negative side); the legacy amount form stays the flat
@@ -2869,6 +2971,7 @@ export function runEffects(
         for (const m of ctx.hostilesInRadius(p, p.pos, eff.radius)) {
           if (m.dead) continue;
           if (!ctx.hasLineOfSight(p, m)) continue;
+          if (evadeTarget(m)) continue;
           ctx.applyAura(m, {
             id: `${ability.id}_slow`,
             name: ability.name,
@@ -2912,6 +3015,7 @@ export function runEffects(
         for (const m of ctx.hostilesInRadius(p, p.pos, stage.range)) {
           if (m.dead || !ctx.hasLineOfSight(p, m)) continue;
           if (!glacialFrontContains(p.pos, p.facing, m.pos, stage.range, angle)) continue;
+          if (evadeTarget(m)) continue;
           const critRoll = ctx.rng.chance(ctx.spellCrit(p));
           const crit =
             critRoll ||
@@ -3194,6 +3298,7 @@ export function runEffects(
         // Materialize before movement so displacement cannot perturb iteration.
         for (const hostile of [...ctx.hostilesInRadius(p, p.pos, eff.radius)]) {
           if (!ctx.hasLineOfSight(p, hostile)) continue;
+          if (evadeTarget(hostile)) continue;
           ctx.applyKnockback(p, hostile, eff.distance);
           ctx.applyAura(hostile, {
             id: `${ability.id}_daze`,
@@ -3260,6 +3365,7 @@ export function runEffects(
           : 0;
         for (const m of ctx.hostilesInRadius(p, center, eff.radius)) {
           if (!ctx.hasLineOfSight(p, m)) continue;
+          if (evadeTarget(m)) continue;
           if (dealsDamage) {
             const dmg = ctx.rng.range(eff.min, eff.max) + aoeRootSp;
             ctx.dealDamage(
@@ -4047,7 +4153,9 @@ export function runEffects(
       }
       case 'aoeTaunt': {
         for (const hostile of ctx.hostilesInRadius(p, p.pos, eff.radius)) {
-          if (hostile.kind === 'mob' && !hostile.dead) ctx.applyTaunt(p, hostile);
+          if (hostile.kind === 'mob' && !hostile.dead && !evadeTarget(hostile)) {
+            ctx.applyTaunt(p, hostile);
+          }
         }
         break;
       }
@@ -4084,6 +4192,11 @@ export function runEffects(
     }
     if (target?.dead) target = null;
   }
+
+  // Secondary cone victims receive their own target-facing hit table, damage,
+  // debuffs and target-on-hit procs. Everything below this point is cast-level
+  // bookkeeping and must run exactly once, for the primary target.
+  if (secondaryTarget) return;
 
   if (deferredBastionImpact) {
     const paladinSpec = mods.spec;

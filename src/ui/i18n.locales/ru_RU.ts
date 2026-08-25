@@ -13914,6 +13914,8 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.trade.woc.modesLabel': 'Валюта оплаты',
   'hudChrome.trade.woc.paidSeller': 'Вы получили платёж {price} за ваш предмет {item}.',
   'hudChrome.trade.woc.paidBuyer': 'Вы отправили платёж {price} за {item}.',
+  'hudChrome.keybinds.toggleActionCamera': 'Переключить экшен-камеру',
+  'hudChrome.options.actionCamera': 'Экшен-камера (прицел)',
   'hudChrome.bags.lockItem': 'Заблокировать предмет',
   'hudChrome.otaUpdate.applying': 'Обновление загружено. Игра перезапускается для его применения.',
   'hudChrome.otaUpdate.continueAnyway': 'Продолжить без обновления',

@@ -10,6 +10,7 @@ import { offhandMirrorsWeaponSkin } from '../../sim/content/weapon_skin_rules';
 import { WEAPON_SKINS } from '../../sim/content/weapon_skins';
 import type { OverheadEmoteId } from '../../world_api';
 import { recordBuildSpan, timeBuildSpan } from '../build_spans';
+import type { DodgeVisualDirection } from '../dodge_visual_core';
 import { GFX } from '../gfx';
 import { cloneMaterialWithHooks } from '../material_clone_hooks';
 import {
@@ -1481,6 +1482,28 @@ export class CharacterVisual {
     if (!clips || clips.length === 0) return;
     this.hitCooldown = HIT_REACT_COOLDOWN;
     this.playOneShot(clips[Math.floor(Math.random() * clips.length)], 1.2);
+  }
+
+  /** Direction-specific evasive gesture, time-scaled to the server dodge window. */
+  playDodge(direction: DodgeVisualDirection = 'forward'): void {
+    if (this.deadLock) return;
+    const directional =
+      direction === 'back'
+        ? this.def.clips.walkBack
+        : direction === 'left'
+          ? 'Running_Strafe_Left'
+          : direction === 'right'
+            ? 'Running_Strafe_Right'
+            : this.def.clips.dodge;
+    const clip =
+      (directional && this.action(directional) ? directional : this.def.clips.dodge) ??
+      this.def.clips.jump ??
+      this.def.clips.run;
+    if (!clip) return;
+    const action = this.action(clip);
+    if (!action) return;
+    const timeScale = Math.min(2.5, Math.max(0.5, action.getClip().duration / 0.75));
+    this.playOneShot(clip, timeScale);
   }
 
   /** Contact-frame hitstop: hold THIS rig's animation at `scale` speed for

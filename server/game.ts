@@ -30,7 +30,6 @@ import {
   isBgPos,
   isDelvePos,
   MOBS,
-  ZONES,
   zoneAt,
 } from '../src/sim/data';
 import { devTierIndexForMergedPrs } from '../src/sim/dev_tier';
@@ -55,6 +54,7 @@ import type { PickAction } from '../src/sim/lockpick';
 import { lootHasGoneFfa } from '../src/sim/loot/loot_ffa';
 import { type MarketQuery, sanitizeMarketQuery } from '../src/sim/market_query';
 import { parseMoveInputFrame } from '../src/sim/move_input';
+import { playerEndurance } from '../src/sim/player_dodge';
 import {
   partyFrameAbsorb,
   partyFrameAggroTargets,
@@ -283,6 +283,7 @@ import {
   createMobScanTickStats,
   resetMobScanCaptureAccumulators,
 } from './mob_scan_tick_stats';
+import { MOB_ZONE_PHASE_PREFIX, mobZonePhase, SIM_MOB_ZONE_PHASES } from './mob_zone_phase';
 import { parseModerationChatCommand } from './moderation_commands';
 import {
   forceCharacterRename,
@@ -513,26 +514,6 @@ export const SIM_LAP_PHASES = [
   ...MOB_UPDATE_BUCKETS.map((b) => `mob.update|${b}`),
 ].map((n) => `sim.${n}`);
 
-// Per-zone attribution buckets for the mob.update phase. The mob loop
-// tags each mob.update lap with its entity; the host splits that slice of the phase
-// time by the mob's zone/group so a stall localizes to "which zone froze" instead of
-// only the phase total. These are HOST-DERIVED (the sim never emits them), so they are
-// registered in the profiler but deliberately kept OUT of SIM_LAP_PHASES (which pins
-// the sim's own emissions). Overworld mobs bucket by zone id; instance/delve mobs
-// (x beyond DUNGEON_X_THRESHOLD) share one 'instance' bucket; 'other' is a safety net.
-const MOB_ZONE_PHASE_PREFIX = 'sim.mob.z:';
-const MOB_ZONE_PHASE_INSTANCE = `${MOB_ZONE_PHASE_PREFIX}instance`;
-const MOB_ZONE_PHASE_OTHER = `${MOB_ZONE_PHASE_PREFIX}other`;
-// Pre-interned zone-id -> phase-name map so the per-mob probe allocates no strings.
-const MOB_ZONE_PHASE_BY_ID = new Map<string, string>(
-  ZONES.map((z) => [z.id, `${MOB_ZONE_PHASE_PREFIX}${z.id}`]),
-);
-export const SIM_MOB_ZONE_PHASES = [
-  ...ZONES.map((z) => `${MOB_ZONE_PHASE_PREFIX}${z.id}`),
-  MOB_ZONE_PHASE_INSTANCE,
-  MOB_ZONE_PHASE_OTHER,
-];
-
 // Per-key-group attribution buckets for the bcastSelf phase (selfWireJson).
 // HOST-DERIVED like the mob zone buckets and populated only while a detailed
 // capture is active, so a production capture names WHICH self key group eats
@@ -558,13 +539,6 @@ export const SELF_WIRE_PHASES = [
   'heavy', // the wireRev-gated heavy block
   'assemble', // the final base-JSON + extras splice (multi-KB copy on a heavy payload)
 ].map((n) => `self.${n}`);
-
-// The zone/group bucket a mob's update cost is attributed to. Pure and allocation-free
-// (a cheap zoneAt band scan plus a Map lookup of an interned string).
-export function mobZonePhase(mob: Entity): string {
-  if (mob.pos.x > DUNGEON_X_THRESHOLD) return MOB_ZONE_PHASE_INSTANCE;
-  return MOB_ZONE_PHASE_BY_ID.get(zoneAt(mob.pos.x, mob.pos.z).id) ?? MOB_ZONE_PHASE_OTHER;
-}
 
 const ARENA_WIRE_HZ = 0.1;
 const ARENA_WIRE_INTERVAL_TICKS = Math.max(1, Math.round(1 / (DT * ARENA_WIRE_HZ)));
@@ -1412,6 +1386,14 @@ function dynamicFields(e: Entity, includeAuras = true): Record<string, unknown> 
     mhp: e.maxHp,
   };
   if (e.dead) out.dead = 1;
+  if (e.kind === 'player') {
+    out.end = round2(playerEndurance(e));
+    if ((e.dodgeRemaining ?? 0) > 0) {
+      out.dg = round2(e.dodgeRemaining ?? 0);
+      out.dgx = round2(e.dodgeDirX ?? 0);
+      out.dgz = round2(e.dodgeDirZ ?? 0);
+    }
+  }
   if (e.ghost) out.gh = 1; // released spirit (ghost form); renders translucent
   if (e.lootable) out.loot = 1;
   if (e.hostile) out.h = 1;
@@ -1945,6 +1927,7 @@ export class GameServer {
       noPlayer: true,
       devCommands: process.env.ALLOW_DEV_COMMANDS === '1',
       compulsoryTutorial: true, // live realm: legacy fresh mainland rows get ferried too
+      playerDirectionalCombat: process.env.PLAYER_DIRECTIONAL_COMBAT !== '0',
       // Thunzharr is up as soon as the realm boots; subsequent rises keep the
       // normal interval cadence (see src/sim/world_boss.ts).
       worldBossAtBoot: true,
@@ -6484,6 +6467,9 @@ export class GameServer {
       if (!meta || !e) return;
       const frame = parseMoveInputFrame(msg);
       Object.assign(meta.moveInput, frame.moveInput);
+      // Older clients and malformed/non-finite aim fields safely fall back to
+      // the current facing instead of retaining a stale previous cursor ray.
+      meta.combatAimAngle = frame.combatAimAngle ?? frame.facing ?? e.facing;
       session.lastInputAt = sim.time;
       if (typeof msg.seq === 'number' && Number.isFinite(msg.seq) && msg.seq > 0) {
         const seq = Math.floor(msg.seq);
@@ -6645,6 +6631,17 @@ export class GameServer {
           // the classic current-target-else-self resolution when invalid.
           if (typeof msg.target === 'number') {
             sim.castAbilityOn(msg.ability, msg.target | 0, pid);
+          } else if (msg.x !== undefined || msg.z !== undefined) {
+            // An aim-bearing cast never falls back to the current hard target:
+            // malformed/partial/non-finite coordinates are rejected outright.
+            if (
+              typeof msg.x === 'number' &&
+              typeof msg.z === 'number' &&
+              Number.isFinite(msg.x) &&
+              Number.isFinite(msg.z)
+            ) {
+              sim.castAbility(msg.ability, pid, { x: msg.x, z: msg.z });
+            }
           } else {
             sim.castAbility(msg.ability, pid);
           }
@@ -6682,6 +6679,16 @@ export class GameServer {
         break;
       case 'stopattack':
         sim.stopAutoAttack(pid);
+        break;
+      case 'dodge':
+        if (
+          typeof msg.x === 'number' &&
+          Number.isFinite(msg.x) &&
+          typeof msg.z === 'number' &&
+          Number.isFinite(msg.z)
+        ) {
+          sim.dodge({ x: msg.x, z: msg.z }, pid);
+        }
         break;
       case 'interact':
         sim.interact(pid);

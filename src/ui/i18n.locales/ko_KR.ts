@@ -13734,6 +13734,8 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.trade.woc.modesLabel': '결제 통화',
   'hudChrome.trade.woc.paidSeller': '{item}에 대한 {price} 결제를 받았습니다.',
   'hudChrome.trade.woc.paidBuyer': '{item}에 대해 {price}를 결제했습니다.',
+  'hudChrome.keybinds.toggleActionCamera': '액션 카메라 전환',
+  'hudChrome.options.actionCamera': '액션 카메라 (조준점)',
   'hudChrome.bags.lockItem': '아이템 잠그기',
   'hudChrome.otaUpdate.applying': '업데이트를 다운로드했습니다. 적용을 위해 게임을 다시 시작합니다.',
   'hudChrome.otaUpdate.continueAnyway': '업데이트하지 않고 계속',

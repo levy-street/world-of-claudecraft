@@ -1,7 +1,10 @@
 import { existsSync, readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { describe, expect, it } from 'vitest';
-import { PALADIN_SYNTHESIZED_CLIP_SOURCES } from '../src/render/characters/assets';
+import {
+  PALADIN_SYNTHESIZED_CLIP_SOURCES,
+  PLAYER_DODGE_SYNTHESIZED_CLIP_SOURCES,
+} from '../src/render/characters/assets';
 import {
   type ClipMap,
   modularVisualKey,
@@ -141,6 +144,9 @@ function loadedClipNames(def: VisualDef, standardMaterials: boolean, key?: strin
       if (names.has(source)) names.add(synthesized);
     }
   }
+  for (const [synthesized, source] of Object.entries(PLAYER_DODGE_SYNTHESIZED_CLIP_SOURCES)) {
+    if (def.clips.dodge === synthesized && names.has(source)) names.add(synthesized);
+  }
   return names;
 }
 
@@ -159,6 +165,7 @@ function requiredClipNames(clips: ClipMap): string[] {
     clips.swimIdle,
     clips.wade,
     clips.jump,
+    clips.dodge,
     clips.land,
     clips.walkBack,
     clips.flourish,
@@ -191,6 +198,7 @@ const COVERED_CLIP_FIELDS = new Set<keyof ClipMap>([
   'swimIdle',
   'wade',
   'jump',
+  'dodge',
   'fall',
   'land',
   'walkBack',

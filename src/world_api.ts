@@ -619,6 +619,8 @@ export const COMMAND_NAMES = [
   // life, and band server-side). Appended because wire tokens are never
   // reordered.
   'tutorial_start',
+  // Player dodge intent. Appended because wire tokens are never reordered.
+  'dodge',
 ] as const;
 
 // The union both the send path (`online.ts`) and the dispatch switch
@@ -711,6 +713,7 @@ export const COMMAND_FACETS = {
   cancel_aura: 'IWorldCombat',
   attack: 'IWorldCombat',
   stopattack: 'IWorldCombat',
+  dodge: 'IWorldCombat',
   release: 'IWorldCombat',
   unstuck: 'IWorldCombat',
   // Ghost resurrection: run the spirit to its corpse, or accept the Spirit Healer's

@@ -37,6 +37,7 @@ import { buildCivicServicePlacements } from './civic_service_placements';
 import { advanceClimb, tryStartClimb } from './climb';
 import {
   allocRiftCollisionToken,
+  lineOfSightClear,
   moverHeight,
   placementFloorHeight,
   resolveMovement,
@@ -87,7 +88,10 @@ import {
 } from './combat/damage';
 import { damageTakenWithin } from './combat/damage_history';
 import { druidEngineCombatState } from './combat/druid_engines';
-import { runEffects as runEffectsImpl } from './combat/effect_dispatch';
+import {
+  runEffects as runEffectsImpl,
+  runSecondaryTargetEffects as runSecondaryTargetEffectsImpl,
+} from './combat/effect_dispatch';
 import { steerFearFromWalls } from './combat/fear_steering';
 import { applyIgnite } from './combat/fire_mage';
 import { frostMageChannelPulse } from './combat/frost_mage';
@@ -379,6 +383,7 @@ import * as petCommands from './pet/pet_commands';
 import type { MatchPetSnapshot } from './pet/pet_match_return';
 import type { PetReturnSnapshot } from './pet/pet_return';
 import { floorHeightAt } from './physics/character';
+import { advancePlayerDodge, evadeIncomingAttack, tryStartPlayerDodge } from './player_dodge';
 import {
   isSwimming as isSwimmingImpl,
   moveSpeedMult as moveSpeedMultImpl,
@@ -1317,6 +1322,10 @@ export interface PlayerMeta {
   // any character whose stamp is below the current BOOST_KIT_VERSION.
   pbeBoostKit?: number;
   moveInput: MoveInput;
+  // Directional-combat input, runtime only. Old clients leave it absent and
+  // every resolver safely falls back to the entity's current facing.
+  combatAimAngle?: number;
+  basicAttackHeld?: boolean;
   // Monotonic counter bumped when a bulky, rarely-changing wire field (the
   // inventory, and the collection-quest progress derived from it) mutates, so a
   // host can cheaply tell whether that state needs re-sending without diffing
@@ -2000,8 +2009,10 @@ export class Sim {
   readonly petSpecialCommandsSupported = true;
   // `world` stays optional (a custom map for play-test, else undefined for the
   // built-in world); everything else is defaulted to a concrete value below.
-  cfg: Required<Omit<SimConfig, 'noPlayer' | 'world' | 'perfLap' | 'respawnSeconds'>> &
-    Pick<SimConfig, 'world' | 'perfLap' | 'respawnSeconds'>;
+  cfg: Required<
+    Omit<SimConfig, 'noPlayer' | 'world' | 'perfLap' | 'respawnSeconds' | 'playerDirectionalCombat'>
+  > &
+    Pick<SimConfig, 'world' | 'perfLap' | 'respawnSeconds' | 'playerDirectionalCombat'>;
   /**
    * The authored world this simulation owns. The active registry is a host/render
    * seam and may be swapped by an editor after construction; gameplay services,
@@ -2314,6 +2325,9 @@ export class Sim {
       autoEquip: cfg.autoEquip ?? false,
       playerName: cfg.playerName ?? 'Adventurer',
       devCommands: this.devCommands,
+      // Runtime hosts opt in explicitly. Undefined is a deliberate legacy mode
+      // for deterministic fixtures and tools without live combat aim frames.
+      playerDirectionalCombat: cfg.playerDirectionalCombat,
       worldBossAtBoot: cfg.worldBossAtBoot ?? false,
       riftPortals: cfg.riftPortals ?? false,
       compulsoryTutorial: cfg.compulsoryTutorial ?? false,
@@ -5124,6 +5138,9 @@ export class Sim {
       get tickCount() {
         return sim.tickCount;
       },
+      get playerDirectionalCombat() {
+        return sim.cfg.playerDirectionalCombat;
+      },
       get entities() {
         return sim.entities;
       },
@@ -5750,9 +5767,12 @@ export class Sim {
       meleeSwing: sim.meleeSwing.bind(sim),
       effectiveAttackPower: sim.effectiveAttackPower.bind(sim),
       hasLineOfSight: sim.hasLineOfSight.bind(sim),
+      projectilePathClear: sim.projectilePathClear.bind(sim),
       findChargePath: sim.findChargePath.bind(sim),
       runEffects: (p, meta, target, res, attackAnimationStarted) =>
         runEffectsImpl(sim.ctx, p, meta, target, res, attackAnimationStarted),
+      runSecondaryTargetEffects: (p, meta, target, res, snapshot) =>
+        runSecondaryTargetEffectsImpl(sim.ctx, p, meta, target, res, snapshot),
       applySetProcs: sim.applySetProcs.bind(sim),
       // P1a pet-AI seam: the helper the moved updatePet/petRangedAttack/petPickTarget
       // reach back for. syncPetAspect STAYS on Sim (pet-management, P1b owns it eventually);
@@ -6848,6 +6868,10 @@ export class Sim {
       // no-op unless the player is currently AFK. Do Not Disturb survives.
       clearAfkOnMove(this.ctx, meta, p);
     }
+    if (advancePlayerDodge(this.ctx, p)) {
+      stepPlayerMotion(this.playerMotionDeps, p, emptyMoveInput());
+      return;
+    }
     if (advanceValkyrsCalling(this.ctx, p)) return;
     // The race countdown is a real start lock, not just a client animation.
     // Hold every forced/manual locomotion mode until the authoritative GO tick.
@@ -6941,6 +6965,18 @@ export class Sim {
     let zoneEffectiveDamage = 0;
     for (const target of this.hostilesInRadius(source, effect.pos, effect.radius)) {
       if (!this.hasLineOfSight(source, target)) continue;
+      if (
+        evadeIncomingAttack(
+          this.ctx,
+          source,
+          target,
+          effect.school,
+          effect.ability,
+          effect.abilityId,
+        )
+      ) {
+        continue;
+      }
       zoneStruck++;
       const isSpell = effect.school !== 'physical';
       const rawDmg = this.rng.range(effect.min, effect.max) + (effect.spBonus ?? 0);
@@ -7043,6 +7079,15 @@ export class Sim {
     );
   }
 
+  private projectilePathClear(
+    source: Entity,
+    from: Readonly<{ x: number; z: number }>,
+    to: Readonly<{ x: number; z: number }>,
+  ): boolean {
+    const run = this.delveRunForMob(source.id) ?? this.delveRunForPlayer(source.id);
+    return lineOfSightClear(this.cfg.seed, from, to, 0.05, run?.modules, this.riftCollisionToken);
+  }
+
   private lineOfSightBlocked(source: Entity, target: Entity, ability: AbilityDef): boolean {
     return this.abilityNeedsLineOfSight(ability, source) && !this.hasLineOfSight(source, target);
   }
@@ -7057,6 +7102,12 @@ export class Sim {
 
   castAbility(abilityId: string, pid?: number, aim?: { x: number; z: number }): void {
     castAbilityImpl(this.ctx, abilityId, pid, aim);
+  }
+
+  // IWorld action-combat cast: offline, select an authoritative hostile from
+  // the local player's world-space aim ray instead of requiring a hard target.
+  castAbilityToward(abilityId: string, aim: { x: number; z: number }): void {
+    castAbilityImpl(this.ctx, abilityId, undefined, aim);
   }
 
   // IWorld ground-targeted cast: offline, the local player (pid undefined) casts
@@ -7653,6 +7704,10 @@ export class Sim {
     stopAutoAttackImpl(this.ctx, pid);
   }
 
+  dodge(direction: { x: number; z: number }, pid?: number): void {
+    tryStartPlayerDodge(this.ctx, direction, pid);
+  }
+
   private updatePlayerAutoAttack(p: Entity, meta: PlayerMeta): void {
     updatePlayerAutoAttackImpl(this.ctx, p, meta);
   }
@@ -8002,6 +8057,10 @@ export class Sim {
   }
 
   mobSwing(mob: Entity, target: Entity): void {
+    if (evadeIncomingAttack(this.ctx, mob, target, 'physical', null)) {
+      this.tryRevengeFree(target);
+      return;
+    }
     const missChance = swingMissChance(mob, target);
     const dodgeChance = target.kind === 'player' ? target.dodgeChance : 0.05;
     const { parryChance, blockChance } = warriorMeleeDefense(target, mob);

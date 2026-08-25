@@ -43,6 +43,7 @@ import { emptySaleLog } from '../src/sim/market_sale_log';
 import { MOUNT_RACE_COUNTDOWN_TICKS } from '../src/sim/mount_race';
 import { petOf, serializePet, summonPet } from '../src/sim/pet/pet_commands';
 import { livePlaytimeSeconds } from '../src/sim/playtime';
+import { DODGE_ENDURANCE_COST, DODGE_ENDURANCE_MAX } from '../src/sim/player_dodge';
 import { noteRelicItemFind, noteRelicObtain } from '../src/sim/reliquary';
 import { Sim } from '../src/sim/sim';
 import { type Aura, DT, type PlayerClass, type WorldContent } from '../src/sim/types';
@@ -105,6 +106,46 @@ function eventTexts(sent: any[]): string[] {
 function feedEventFrame(client: ClientWorld, frame: unknown): void {
   (client as any).onMessage(JSON.stringify(frame));
 }
+
+describe('dodge state over the wire', () => {
+  it('mirrors endurance and active dodge direction from the authoritative entity', () => {
+    const sim = new Sim({ seed: 25, playerClass: 'hunter', autoEquip: true });
+    sim.dodge({ x: 1, z: 0 });
+    expect(sim.player.dodgeRemaining).toBeGreaterThan(0);
+
+    const wire = wireEntity(sim.player);
+    expect(wire).toMatchObject({
+      end: DODGE_ENDURANCE_MAX - DODGE_ENDURANCE_COST,
+      dgx: 1,
+      dgz: 0,
+    });
+    expect(wire.dg).toBeGreaterThan(0);
+
+    const client = bareClient(sim.playerId + 1000);
+    (client as any).applySnapshot({ t: 'snap', ents: [wire] });
+    expect(client.entities.get(sim.playerId)).toMatchObject({
+      endurance: DODGE_ENDURANCE_MAX - DODGE_ENDURANCE_COST,
+      dodgeDirX: 1,
+      dodgeDirZ: 0,
+    });
+    expect(client.entities.get(sim.playerId)?.dodgeRemaining).toBeGreaterThan(0);
+  });
+
+  it('rejects malformed dodge vectors at the server command boundary', () => {
+    const server = new GameServer();
+    const session = joinServer(server, fakeWs(), 1, 'Fleetfoot', 'hunter');
+    const player = server.sim.entities.get(session.pid)!;
+
+    server.handleMessage(
+      session,
+      JSON.stringify({ t: 'cmd', cmd: 'dodge', x: 'right', z: null }),
+    );
+    expect(player.dodgeRemaining).toBeUndefined();
+
+    server.handleMessage(session, JSON.stringify({ t: 'cmd', cmd: 'dodge', x: 1, z: 0 }));
+    expect(player.dodgeRemaining).toBeGreaterThan(0);
+  });
+});
 
 describe('self stat wire round-trip', () => {
   it('mirrors Paladin Devotion and Ascension state from the authoritative server', () => {

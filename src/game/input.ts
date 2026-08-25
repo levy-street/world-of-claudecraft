@@ -8,6 +8,12 @@ import { sanitizeMoveFacing, sanitizeMoveInput } from '../sim/move_input';
 import type { MoveInput } from '../sim/types';
 import { detectBrowserEngine } from './browser_env';
 import { cursorForHover, type HoverCursorKind } from './cursors';
+import {
+  DodgeDoubleTapTracker,
+  type DodgeLocalDirection,
+  dodgeDirectionForAction,
+  heldDodgeDirection,
+} from './dodge_input';
 import { comboCode, isModifierCode, type Keybinds, makeCombo } from './keybinds';
 import { bindableMouseCodeForButton, isReservedMouseButton } from './mouse_binds';
 import {
@@ -112,6 +118,22 @@ export interface InputCallbacks {
    *  onUiKey; key releases are ungated. */
   canUseGameKeys?: () => boolean;
   onInputIntent?(kind: 'move' | 'look' | 'zoom'): void;
+  onBasicAttackStart?(): void;
+  onBasicAttackStop?(): void;
+  onToggleActionCamera?(): void;
+  onDodge?(direction: DodgeLocalDirection): void;
+  onRightMouseRelease?(): void;
+}
+
+interface MouseGesture {
+  button: 0 | 2;
+  downX: number;
+  downY: number;
+  downAt: number;
+  dragDistance: number;
+  dragged: boolean;
+  consumed: boolean;
+  basicAttack: boolean;
 }
 
 export interface TouchMoveInput {
@@ -218,12 +240,14 @@ export class Input {
   // When on, an active camera drag pointer-locks the canvas so the OS cursor
   // cannot reach the screen edge (camera freeze) or slip to a second monitor.
   private lockCursorOnRotate = true;
-  private dragDistance = 0;
   private cameraDragActive = false;
   private clickMoveMouseButton: 0 | 2 | null = null;
   // +1 normal, -1 inverts the vertical mouselook axis (settings: invertLookY).
   private lookPitchSign = 1;
   private downButton = -1;
+  private readonly mouseGestures = new Map<0 | 2, MouseGesture>();
+  private basicAttackHeld = false;
+  private actionCameraEnabled = false;
   private pointerLockRequestedForDrag = false;
   // Set when the browser itself force-unlocks the pointer (Escape, focus
   // loss) while a drag button was still held; see inForcedPointerLockCooldown.
@@ -231,9 +255,6 @@ export class Input {
   // Firefox rejects requestPointerLock() when it is deferred to a later
   // mousemove; computed once since the browser cannot change mid-session.
   private readonly needsSyncPointerLockGesture = detectPointerLockNeedsSyncGesture();
-  private downX = 0;
-  private downY = 0;
-  private downAt = 0;
   // one-shot key capture for the rebind UI: the next keydown is delivered here
   // (Escape cancels with null) instead of being dispatched as an action
   private captureCb: ((code: string | null) => void) | null = null;
@@ -247,6 +268,8 @@ export class Input {
   // Physical key code -> action-bar slot currently held down, so key UP (or a
   // blur) releases the matching slot (drives the hold-to-charge shoot).
   private heldSlotCodes = new Map<string, number>();
+  private readonly dodgeDoubleTap = new DodgeDoubleTapTracker();
+  private doubleTapDodgeEnabled = true;
   // MouseEvent.button indices whose press this frame was consumed by a binding
   // (or by the rebind capture), so the matching `auxclick` can be cancelled too.
   // Chromium and Gecko navigate back/forward on the thumb buttons; cancelling
@@ -337,6 +360,10 @@ export class Input {
         // (#1834 recurrence).
         if (this.leftDown || this.rightDown) this.forcedUnlockAt = performance.now();
         this.releaseCapture('pointerlock');
+        return;
+      }
+      if (this.actionCameraEnabled && document.pointerLockElement === this.canvas) {
+        this.updateCursor();
         return;
       }
       // A fast click can beat the async requestPointerLock() grant: the
@@ -491,6 +518,33 @@ export class Input {
     return this.mouseCameraEnabled;
   }
 
+  isActionCameraEnabled(): boolean {
+    return this.actionCameraEnabled;
+  }
+
+  isActionCameraLocked(): boolean {
+    return this.actionCameraEnabled && document.pointerLockElement === this.canvas;
+  }
+
+  combatAimUsesFacing(): boolean {
+    return this.rightDown || this.isActionCameraLocked();
+  }
+
+  setActionCameraEnabled(on: boolean): void {
+    if (this.actionCameraEnabled === on) return;
+    this.actionCameraEnabled = on;
+    if (!on) {
+      this.stopBasicAttack();
+      if (document.pointerLockElement === this.canvas) document.exitPointerLock?.();
+    }
+    this.updateCursor();
+  }
+
+  setDoubleTapDodgeEnabled(on: boolean): void {
+    this.doubleTapDodgeEnabled = on;
+    if (!on) this.dodgeDoubleTap.clear();
+  }
+
   isAttackMoveEnabled(): boolean {
     return this.attackMoveEnabled;
   }
@@ -532,14 +586,14 @@ export class Input {
 
   setLockCursorOnRotate(on: boolean): void {
     this.lockCursorOnRotate = on;
-    if (!on && document.pointerLockElement === this.canvas) {
+    if (!on && !this.actionCameraEnabled && document.pointerLockElement === this.canvas) {
       document.exitPointerLock?.();
     }
   }
 
   setMouseCameraEnabled(on: boolean): void {
     this.mouseCameraEnabled = on;
-    if (on && document.pointerLockElement === this.canvas) {
+    if (on && !this.actionCameraEnabled && document.pointerLockElement === this.canvas) {
       document.exitPointerLock?.();
       // Toggling mode mid-drag: drop the drag/lock state now rather than waiting
       // for the async pointerlockchange, so the in-flight drag cannot leave the
@@ -554,6 +608,12 @@ export class Input {
     if (this.suspendMovement === on) return;
     this.suspendMovement = on;
     if (!on) return;
+    // Combat holds and Action Camera capture must never survive a modal, even
+    // when the modal is the hold-open emote wheel handled by the early return
+    // below. The preference remains enabled; a later canvas click reacquires.
+    this.stopBasicAttack();
+    this.dodgeDoubleTap.clear();
+    if (this.isActionCameraLocked()) document.exitPointerLock?.();
     // The held-open emote wheel itself counts as a modal (hud.isModalOpen()),
     // so when its keys are down this suspension almost always IS the wheel. The
     // stale-input clear below must not run then: it would close the wheel one
@@ -567,6 +627,7 @@ export class Input {
     if (this.emoteWheelHeldCodes.size > 0) return;
     const hadHeldInput = this.keys.size > 0 || this.keyJumpUntil > 0;
     this.keys.clear();
+    this.dodgeDoubleTap.clear();
     this.keyJumpUntil = 0;
     // Suspending input drops any charging Vale Cup sport move (held Shoot etc.).
     this.releaseHeldSlots();
@@ -595,6 +656,8 @@ export class Input {
     this.controllerFacing = null;
     this.leftDown = false;
     this.rightDown = false;
+    this.mouseGestures.clear();
+    this.stopBasicAttack();
     this.cameraDragActive = false;
     this.downButton = -1;
     this.pointerLockRequestedForDrag = false;
@@ -792,10 +855,9 @@ export class Input {
   }
 
   isMouselookActive(): boolean {
+    if (this.isActionCameraLocked()) return true;
     if (this.mouseCameraEnabled) return this.touchLookActive || this.gamepadLookActive;
-    return (
-      (this.rightDown && this.cameraDragActive) || this.touchLookActive || this.gamepadLookActive
-    );
+    return this.rightDown || this.touchLookActive || this.gamepadLookActive;
   }
 
   setControllerMoveInput(input: unknown, facing?: unknown): void {
@@ -886,6 +948,8 @@ export class Input {
     // Always drop the mouse-drag state so a button can't stick "held".
     this.leftDown = false;
     this.rightDown = false;
+    this.mouseGestures.clear();
+    this.stopBasicAttack();
     this.cameraDragActive = false;
     this.downButton = -1;
     this.pointerLockRequestedForDrag = false;
@@ -895,6 +959,7 @@ export class Input {
     // normally, so clearing keys here would cancel a walk the instant a camera
     // drag ends (every right/left-drag exits pointer lock on release).
     if (reason !== 'pointerlock') this.keys.clear();
+    if (reason !== 'pointerlock') this.dodgeDoubleTap.clear();
     if (reason !== 'pointerlock' && this.emoteWheelHeldCodes.size > 0) {
       this.emoteWheelHeldCodes.clear();
       this.cb.onEmoteWheel(false);
@@ -951,10 +1016,6 @@ export class Input {
   private isBrowserFullscreen(): boolean {
     const doc = document as FullscreenDocument;
     return !!(document.fullscreenElement ?? doc.webkitFullscreenElement);
-  }
-
-  private pressDurationMs(): number {
-    return Math.max(0, performance.now() - this.downAt);
   }
 
   private onKeyDown(e: KeyboardEvent): void {
@@ -1036,6 +1097,14 @@ export class Input {
       // edge) so a fast tap survives until a grounded movement tick samples it.
       if (held === 'jump')
         this.keyJumpUntil = Math.max(this.keyJumpUntil, performance.now() + KEY_JUMP_LATCH_MS);
+      const dodgeDirection = dodgeDirectionForAction(held);
+      if (
+        this.doubleTapDodgeEnabled &&
+        dodgeDirection &&
+        this.dodgeDoubleTap.press(e.code, performance.now())
+      ) {
+        this.cb.onDodge?.(dodgeDirection);
+      }
       this.noteMovementIntent();
     }
     const edge = combo ? this.keybinds.edgeActionForCombo(combo) : null;
@@ -1078,6 +1147,7 @@ export class Input {
   // that was charging. Returns true when the emote wheel closed, the one case
   // the caller cancels the event's default for.
   private releaseBoundCode(code: string): boolean {
+    this.dodgeDoubleTap.release(code);
     if (this.keys.delete(code)) this.noteIntent('move');
     let closedEmoteWheel = false;
     if (this.emoteWheelHeldCodes.delete(code) && this.emoteWheelHeldCodes.size === 0) {
@@ -1107,6 +1177,12 @@ export class Input {
       return;
     }
     switch (action) {
+      case 'toggleActionCamera':
+        this.cb.onToggleActionCamera?.();
+        return;
+      case 'dodge':
+        this.cb.onDodge?.(heldDodgeDirection(this.readMoveInput()));
+        return;
       case 'autorun':
         this.autorun = !this.autorun;
         this.noteMovementIntent();
@@ -1222,16 +1298,42 @@ export class Input {
     // already in flight, and so its release cannot synthesize a world click;
     // its binding dispatch is the window-level onBindableMouseDown below.
     if (!isReservedMouseButton(e.button)) return;
+    // A modal/chat overlay may still leave the canvas under the pointer. It is
+    // authoritative for gameplay suppression: do not capture the cursor or
+    // begin an RMB/LMB combat gesture while game keys are suspended.
+    if (this.cb.canUseGameKeys && !this.cb.canUseGameKeys()) return;
+    if (e.button === 0 && this.actionCameraEnabled && document.pointerLockElement !== this.canvas) {
+      // The acquisition click has one job: enter pointer lock. It must never
+      // leak through as selection or the first Basic Attack.
+      e.preventDefault?.();
+      void this.canvas.requestPointerLock?.()?.catch?.(() => {});
+      return;
+    }
     if (e.button === 0) this.leftDown = true;
     if (e.button === 2) this.rightDown = true;
     if (e.button === 0 || e.button === 2) e.preventDefault?.();
     if (e.button === 0 || e.button === 2) this.noteIntent(e.button === 2 ? 'look' : 'move');
+    const button = e.button as 0 | 2;
+    const gesture: MouseGesture = {
+      button,
+      downX: e.clientX,
+      downY: e.clientY,
+      downAt: performance.now(),
+      dragDistance: 0,
+      dragged: false,
+      consumed: false,
+      basicAttack: false,
+    };
+    this.mouseGestures.set(button, gesture);
     this.downButton = e.button;
-    this.downX = e.clientX;
-    this.downY = e.clientY;
-    this.downAt = performance.now();
-    this.dragDistance = 0;
-    this.cameraDragActive = false;
+    this.cameraDragActive = [...this.mouseGestures.values()].some((g) => g.dragged);
+    if (button === 0 && (this.rightDown || this.isActionCameraLocked())) {
+      gesture.basicAttack = true;
+      gesture.consumed = true;
+      const rightGesture = this.mouseGestures.get(2);
+      if (rightGesture) rightGesture.consumed = true;
+      this.startBasicAttack();
+    }
     // Pointer lock is requested lazily once a drag actually begins on browsers
     // that allow a deferred request (see onMouseMove), not on every press, so
     // ordinary clicks do not show the browser's capture notice (#116). Firefox
@@ -1415,27 +1517,38 @@ export class Input {
       if (this.releaseBoundCode(boundCode)) e.preventDefault?.();
       return;
     }
-    if (e.button === 0) this.leftDown = false;
-    if (e.button === 2) this.rightDown = false;
+    const gesture = this.mouseGestures.get(e.button as 0 | 2);
+    if (!gesture) return;
+    this.mouseGestures.delete(gesture.button);
+    if (e.button === 0) {
+      this.leftDown = false;
+      if (gesture.basicAttack) this.stopBasicAttack();
+    }
+    if (e.button === 2) {
+      this.rightDown = false;
+      this.cb.onRightMouseRelease?.();
+    }
     if (e.button === 0 || e.button === 2) this.noteIntent(e.button === 2 ? 'look' : 'move');
-    const wasCameraDrag = this.cameraDragActive;
-    const pick = wasCameraDrag
-      ? null
-      : clickPickFromMouseGesture({
-          button: e.button,
-          downButton: this.downButton,
-          downX: this.downX,
-          downY: this.downY,
-          upX: e.clientX,
-          upY: e.clientY,
-          movementDrag: this.dragDistance,
-          releaseOnCanvas: e.target === this.canvas || document.pointerLockElement === this.canvas,
-          pointerLocked: document.pointerLockElement === this.canvas,
-          pressDurationMs: performance.now() - this.downAt,
-        });
+    const pick =
+      gesture.dragged || gesture.consumed
+        ? null
+        : clickPickFromMouseGesture({
+            button: e.button,
+            downButton: gesture.button,
+            downX: gesture.downX,
+            downY: gesture.downY,
+            upX: e.clientX,
+            upY: e.clientY,
+            movementDrag: gesture.dragDistance,
+            releaseOnCanvas:
+              e.target === this.canvas || document.pointerLockElement === this.canvas,
+            pointerLocked: document.pointerLockElement === this.canvas,
+            pressDurationMs: performance.now() - gesture.downAt,
+          });
     // Release the drag lock in both camera modes once no rotation button is
     // held, so the OS cursor returns between drags for target/loot/UI clicking.
     if (
+      !this.actionCameraEnabled &&
       shouldReleasePointerLock({
         anyButtonDown: this.leftDown || this.rightDown,
         hasLock: document.pointerLockElement === this.canvas,
@@ -1444,18 +1557,26 @@ export class Input {
       document.exitPointerLock();
     }
     if (pick) this.cb.onClickPick(pick.x, pick.y, pick.button);
-    if (!this.leftDown && !this.rightDown) this.cameraDragActive = false;
-    this.downButton = -1;
+    this.cameraDragActive = [...this.mouseGestures.values()].some((g) => g.dragged);
+    this.downButton = this.rightDown ? 2 : this.leftDown ? 0 : -1;
     this.pointerLockRequestedForDrag = false;
     this.updateCursor();
   }
 
   private onMouseMove(e: MouseEvent): void {
-    if (e.target === this.canvas) {
+    const rect = this.canvas.getBoundingClientRect();
+    if (
+      e.clientX >= rect.left &&
+      e.clientX <= rect.right &&
+      e.clientY >= rect.top &&
+      e.clientY <= rect.bottom
+    ) {
       this.hoverX = e.clientX;
       this.hoverY = e.clientY;
+      this.hoverActive = true;
     }
-    if (!this.leftDown && !this.rightDown) return;
+    const actionCameraLook = this.isActionCameraLocked();
+    if (!this.leftDown && !this.rightDown && !actionCameraLook) return;
     // Normalize the raw movement delta to Chromium's physical-pixel unit so
     // mouselook keeps the same speed and drag-start feel on Firefox, where the
     // deltas arrive in CSS pixels (#1834). A no-op on Chromium/WebKit.
@@ -1469,12 +1590,24 @@ export class Input {
       if (this.cameraDragActive) this.maybeEngageDragPointerLock();
       return;
     }
-    const heldMs = this.pressDurationMs();
-    if (this.downButton === this.clickMoveMouseButton && heldMs <= DEFAULT_CLICK_PICK_MAX_MS)
+    const gesture = this.rightDown
+      ? this.mouseGestures.get(2)
+      : this.leftDown
+        ? this.mouseGestures.get(0)
+        : undefined;
+    const heldMs = gesture ? Math.max(0, performance.now() - gesture.downAt) : 0;
+    if (gesture?.button === this.clickMoveMouseButton && heldMs <= DEFAULT_CLICK_PICK_MAX_MS)
       return;
-    this.dragDistance += Math.abs(mx) + Math.abs(my);
-    if (!this.cameraDragActive) {
-      if (this.dragDistance < CAMERA_DRAG_START_DISTANCE && heldMs < CAMERA_DRAG_START_MS) return;
+    if (gesture) {
+      gesture.dragDistance += Math.abs(mx) + Math.abs(my);
+    }
+    if (!this.cameraDragActive && !actionCameraLook) {
+      if (
+        !gesture ||
+        (gesture.dragDistance < CAMERA_DRAG_START_DISTANCE && heldMs < CAMERA_DRAG_START_MS)
+      )
+        return;
+      gesture.dragged = true;
       this.activateCameraDrag();
       this.noteIntent('look');
       this.updateCursor();
@@ -1489,12 +1622,25 @@ export class Input {
       1.35,
       Math.max(-0.4, this.camPitch + my * this.lookSensitivity * this.lookPitchSign),
     );
-    if (this.rightDown || this.mouseCameraEnabled) this.swimAimPitch = this.camPitch;
+    if (this.rightDown || this.mouseCameraEnabled || actionCameraLook)
+      this.swimAimPitch = this.camPitch;
     if (mx !== 0 || my !== 0) this.noteIntent('look');
   }
 
   private noteIntent(kind: 'move' | 'look' | 'zoom'): void {
     this.cb.onInputIntent?.(kind);
+  }
+
+  private startBasicAttack(): void {
+    if (this.basicAttackHeld) return;
+    this.basicAttackHeld = true;
+    this.cb.onBasicAttackStart?.();
+  }
+
+  private stopBasicAttack(): void {
+    if (!this.basicAttackHeld) return;
+    this.basicAttackHeld = false;
+    this.cb.onBasicAttackStop?.();
   }
 
   private noteMovementIntent(): void {
@@ -1596,7 +1742,7 @@ export class Input {
     }
     if (this.controllerMoveInput) return { ...this.controllerMoveInput };
     const held = (id: string) => this.heldAction(id);
-    const bothButtons = this.leftDown && this.rightDown;
+    const bothButtons = this.leftDown && this.rightDown && !this.basicAttackHeld;
     const forward =
       held('forward') ||
       bothButtons ||

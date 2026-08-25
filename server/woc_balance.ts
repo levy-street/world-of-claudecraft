@@ -168,13 +168,15 @@ export async function fetchWocBalance(pubkey: string): Promise<number | null> {
     });
     if (!res.ok) {
       recordUsageMetric('woc.balance.rpc.failure');
-      return null;
+      return testModeWocBalanceFailure(pubkey, 'http');
     }
     const data = (await res.json()) as RpcTokenAccountsResponse;
     const accounts = data?.result?.value;
     if (!Array.isArray(accounts)) {
+      // Test clusters reject the mainnet $WOC mint outright ("Token mint could
+      // not be unpacked"), which surfaces as a JSON-RPC error with no result.
       recordUsageMetric('woc.balance.rpc.failure');
-      return null;
+      return testModeWocBalanceFailure(pubkey, 'rpc_error');
     }
     let total = 0;
     for (const a of accounts) {
@@ -186,8 +188,20 @@ export async function fetchWocBalance(pubkey: string): Promise<number | null> {
   } catch (err) {
     recordUsageMetric('woc.balance.rpc.failure');
     logger.error({ pubkey, err }, 'woc balance read failed');
-    return null;
+    return testModeWocBalanceFailure(pubkey, 'exception');
   }
+}
+
+/**
+ * Test-mode balance failure policy: on the test cluster the $WOC mint does not
+ * exist, so every read errors. Report a plain 0 instead of null so the wallet
+ * panel shows a balance and daily-rewards eligibility can compute usdValue
+ * (its minUsd is 0 in test mode). Production keeps the null (unknown) semantic.
+ */
+function testModeWocBalanceFailure(pubkey: string, kind: string): number | null {
+  if ((process.env.WOC_TEST_ECONOMY ?? '').trim() !== '1') return null;
+  logger.warn({ pubkey, kind }, 'woc balance read failed on test cluster; reporting 0');
+  return 0;
 }
 
 /**

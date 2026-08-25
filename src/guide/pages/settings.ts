@@ -387,10 +387,6 @@ const INTERFACE_TABS: InterfaceTabBlock[] = [
     intro: 'guide.settingsPage.ifCombatIntro',
     rows: [
       {
-        setting: 'hudChrome.options.startAttackOnAbility',
-        body: 'guide.settingsPage.ifStartAttack',
-      },
-      {
         setting: 'hudChrome.options.stopAutoAttackOnTargetSwitch',
         body: 'guide.settingsPage.ifStopAutoAttack',
       },

@@ -45,6 +45,7 @@ import {
 } from './game/click_move';
 import { clientEnvBits, installPageStateTracking, pageStateBits } from './game/client_env';
 import { getClientSeed } from './game/client_seed';
+import { createCombatAimController } from './game/combat_aim_controller';
 import { localPartyMemberIds } from './game/corpse_loot_availability';
 import { createCrossHotbar, measureCrossHotbarLift } from './game/cross_hotbar_wiring';
 import { shouldClearAutorunOnDeath } from './game/death_input_reset';
@@ -62,6 +63,7 @@ import { initDesktopShellIntegration } from './game/desktop_shell_integration';
 import { installDevTeleports } from './game/dev_shortcuts';
 import { desktopPresenceOnFrame, pushDiscordPresenceEnabled } from './game/discord_presence';
 import { cycleHudFocus } from './game/dpad_focus_nav';
+import { localDodgeToWorld } from './game/dodge_input';
 import { takeEditorPlaytestRequest } from './game/editor_playtest';
 import {
   clearEntryProbe,
@@ -80,9 +82,9 @@ import {
 } from './game/entry_diagnostics';
 import { ferryPrewarmTargetFor } from './game/ferry_prewarm';
 import { GamepadManager } from './game/gamepad';
+import { dispatchGamepadAction } from './game/gamepad_action_dispatch';
 import { createGamepadActivityNotifier } from './game/gamepad_activity_notify';
 import { GamepadBindings } from './game/gamepad_bindings';
-import { GAMEPAD_CANCEL, GAMEPAD_CYCLE_HUD, GAMEPAD_SUBCOMMANDS } from './game/gamepad_map';
 import { shouldUseGamepadPointerMode } from './game/gamepad_pointer_mode';
 import { createGamepadSettingApplier } from './game/gamepad_settings';
 import { isGameplayInputBlocked } from './game/gameplay_input_gate';
@@ -366,6 +368,7 @@ import {
   paintTwoFactorStatus,
   setAccountFieldMsg,
 } from './ui/account_portal_dom';
+import { createActionCameraCrosshair } from './ui/action_camera_crosshair';
 import { technicalErrorMessage, userFacingApiError } from './ui/api_error_i18n';
 import { formatFooterVersion } from './ui/app_version';
 import { type AppearanceCustomizer, mountAppearanceCustomizer } from './ui/appearance_customizer';
@@ -466,7 +469,7 @@ import { showMobileWalletLauncher } from './ui/mobile_wallet_launcher';
 import { mobileMountAction } from './ui/mount_quick_summon';
 import { applyNativeDeviceLanguage } from './ui/native_language';
 import { scheduleNativeUpdateCheck } from './ui/native_update_prompt';
-import { loadNewsInto } from './ui/news_feed';
+import { fetchReleasesWithFallback, loadNewsInto } from './ui/news_feed';
 import { hideOtaUpdateOverlay, renderOtaUpdateOverlay } from './ui/ota_update_overlay';
 import { createMetricsSampler } from './ui/perf_metrics_sampler';
 import { applyPerfOrnamentVars } from './ui/perf_ornament_svg';
@@ -1186,6 +1189,9 @@ function mountGameUi(): void {
   // earlier, before any world entry) silently no-ops on it. Re-sync now so the
   // desktop micro-menu entry is revealed the moment the in-game HUD actually exists.
   syncDiscordEntries();
+  // #mm-donate also lives inside the lazy template. The boot-time wiring runs
+  // before this clone exists, so re-run it now to reveal and activate the rail.
+  wireDonateLinks();
 }
 
 // ---------------------------------------------------------------------------
@@ -1428,6 +1434,7 @@ async function startGame(
   mountGameUi();
 
   const canvas = $('#game-canvas') as unknown as HTMLCanvasElement;
+  const actionCameraCrosshair = createActionCameraCrosshair(canvas);
   const nameplates = $('#nameplates') as HTMLDivElement;
 
   const keybinds = new Keybinds(keybindScope);
@@ -1897,6 +1904,7 @@ async function startGame(
       chatComposerFocused: document.activeElement === chatInput,
     });
 
+  let pointerBasicAttackStarted = false;
   const input = new Input(
     canvas,
     {
@@ -1920,6 +1928,27 @@ async function startGame(
       onAbility: (slot) => hud.castSlot(slot),
       onAbilityDown: (slot) => hud.pressSlot(slot),
       onAbilityUp: (slot) => hud.releaseSlot(slot),
+      onBasicAttackStart: () => {
+        if (hud.isGroundAimActive()) {
+          hud.commitGroundAimAt();
+          pointerBasicAttackStarted = false;
+          return;
+        }
+        pointerBasicAttackStarted = true;
+        combatAim.sync();
+        world.startAutoAttack();
+      },
+      onBasicAttackStop: () => {
+        if (!pointerBasicAttackStarted) return;
+        pointerBasicAttackStarted = false;
+        world.stopAutoAttack();
+      },
+      onToggleActionCamera: () => applySetting('actionCamera', !settings.get('actionCamera')),
+      onDodge: (direction) => {
+        const facing = input.combatAimUsesFacing() ? input.camYaw : world.player.facing;
+        world.dodge(localDodgeToWorld(direction, facing));
+      },
+      onRightMouseRelease: () => hud.cancelGroundAim(),
       onInputIntent: (kind) => perf.markInputIntent(kind),
       onUiKey: (key) => {
         if (key !== 'escape') hud.cancelGroundAim();
@@ -2021,6 +2050,14 @@ async function startGame(
     keybinds,
   );
   input.camYaw = world.player.facing;
+  const combatAim = createCombatAimController({
+    canvas,
+    input,
+    player: () => world.player,
+    groundPoint: (x, y, planeY) => renderer.groundPoint(x, y, planeY),
+    offlineMeta: () => offlineSim?.meta(offlineSim.playerId) ?? null,
+    online: () => online,
+  });
   perf.setInputDebugProvider(() => ({
     ...input.debugState(),
     canUseGameKeys: !gameplayInputBlocked(),
@@ -2197,185 +2234,33 @@ async function startGame(
   const gamepadBindings = new GamepadBindings();
   const crossHotbar = createCrossHotbar(() => hud, keybindScope);
   const canUseGameKeysNow = () => !gameplayInputBlocked();
-  function dispatchGamepadAction(id: string): void {
-    // Cancel backs out one step at a time: the top window, then the target. Only
-    // once there is nothing left to leave does the game menu come up, which is
-    // what keeps this distinct from the menu button rather than a second copy.
-    if (id === GAMEPAD_CANCEL) {
-      if (dismissCameraPrompt() || hud.cancelGroundAim() || hud.closeAll()) return;
-      world.targetEntity(null);
-      return;
-    }
-    if (id === GAMEPAD_CYCLE_HUD) {
-      cycleHudFocus();
-      return;
-    }
-    if (id === 'escape') {
-      if (hud.cancelGroundAim()) return;
-      if (!hud.closeAll()) hud.toggleOptionsMenu();
-      return;
-    }
-    if (!canUseGameKeysNow()) return; // suppress play actions while a modal/chat is up
-    if (id.startsWith('slot')) {
-      hud.castSlot(Number(id.slice(4)));
-      return;
-    }
-    hud.cancelGroundAim();
-    switch (id) {
-      case 'target':
-        world.tabTarget();
-        break;
-      case 'targetPrev':
-        world.tabTargetPrev();
-        break;
-      case 'targetFriendly':
-        world.targetNearestFriendly();
-        break;
-      // Selecting the people you talk to. The sim's friendly cycle answers heal
-      // eligibility and so skips every quest giver, which left a pad player with
-      // no way to pick one; targetEntity is the seam that already exists for it.
-      case 'targetNpcNext':
-      case 'targetNpcPrev': {
-        const next = nextNpcTarget(
-          world.entities.values(),
-          world.player.pos,
-          world.player.targetId ?? null,
-          id === 'targetNpcNext' ? 1 : -1,
-        );
-        if (next !== null) world.targetEntity(next);
-        break;
-      }
-      case 'targetFriendlyNext':
-        world.friendlyTabTarget();
-        break;
-      case 'interact': {
-        // The pad reel (the UX pass): mid fishing cast, the interact press
-        // answers the bite by re-using the rod (the sim's armed-window arm),
-        // instead of running a nearby scan over a live bobber and forcing
-        // the angler into cursor-mode bag clicks. Resolves the B-button
-        // interact conflict for pad anglers; keyboard anglers keep their
-        // hotbar/bags press unchanged.
-        const reelRod = padReelItemId(world.player.castingAbility, world.inventory);
-        if (reelRod !== null) {
-          world.useItem(reelRod);
-          break;
-        }
-        padTargetPick.interact();
-        break;
-      }
-      case 'bags':
-        hud.toggleBags();
-        break;
-      case 'char':
-        hud.toggleChar();
-        break;
-      case 'spellbook':
-        hud.toggleSpellbook();
-        break;
-      case 'questlog':
-        hud.toggleQuestLog();
-        break;
-      case 'map':
-        hud.toggleMap();
-        break;
-      // The target's subcommands, or the map when there is no target: one button
-      // for "what can I do with this", the way a console MMO spends its left face
-      // button. The menu itself is the one the mouse opens by right-clicking, so
-      // there is no second menu to keep in step with it.
-      case GAMEPAD_SUBCOMMANDS: {
-        if (!openTargetSubcommands()) hud.toggleMap();
-        break;
-      }
-      case 'nameplates':
-        renderer.showNameplates = !renderer.showNameplates;
-        break;
-      case 'talents':
-        hud.toggleTalents();
-        break;
-      case 'meters':
-        hud.toggleMeters();
-        break;
-      case 'targetAuras':
-        hud.toggleTargetAuras();
-        break;
-      case 'social':
-        hud.toggleSocial();
-        break;
-      case 'arena':
-        hud.toggleArena();
-        break;
-      case 'bgFlag':
-        bgFlagKey();
-        break;
-      case 'mount':
-        world.toggleMounted();
-        break;
-      case 'leaderboard':
-        hud.toggleLeaderboard();
-        break;
-      case 'calendar':
-        hud.toggleCalendar();
-        break;
-      case 'discord':
-        toggleDiscordPanel();
-        break;
-      case 'deeds':
-        hud.toggleDeeds();
-        break;
-      case 'professions':
-        hud.toggleProfessions();
-        break;
-      case 'reliquary':
-        hud.toggleReliquary();
-        break;
-      case 'crafting':
-        // The controller panel has always OFFERED this bind (it lists every
-        // edge keybind action); the dispatch dropped it silently.
-        hud.toggleCrafting();
-        break;
-      case 'petStop':
-        // The pet edges, the dungeon finder, and the sheathe toggle: the
-        // same offered-but-dropped sweep that found Crafting (the controller
-        // panel lists every edge keybind action), each wired to its exact
-        // keyboard handler.
-        world.setPetMode('passive');
-        break;
-      case 'petTaunt':
-        world.petTaunt();
-        break;
-      case 'petAttack':
-        world.petAttack();
-        break;
-      case 'petDefensive':
-        world.setPetMode('defensive');
-        break;
-      case 'petAggressive':
-        world.setPetMode('aggressive');
-        break;
-      case 'targetPet':
-        hud.targetOwnPet();
-        break;
-      case 'dungeonFinder':
-        hud.toggleDungeonFinder();
-        break;
-      case 'sheathe': {
-        // The keyboard arm's exact rule: the world owns the gate, the cue
-        // plays only when the state moved.
-        const wasStowed = world.player.weaponStowed;
-        world.toggleWeaponStow();
-        if (world.player.weaponStowed !== wasStowed) {
-          if (world.player.weaponStowed) audio.weaponSheathe();
-          else audio.weaponUnsheathe();
-        }
-        break;
-      }
-      case 'chat':
-        openChat();
-        break;
-    }
-  }
+  const gamepadActionDeps = {
+    world,
+    hud,
+    renderer,
+    audio,
+    dismissCameraPrompt,
+    canUseGameKeys: canUseGameKeysNow,
+    clearTarget: () => world.targetEntity(null),
+    cycleHudFocus,
+    targetNpc: (direction: 1 | -1) => {
+      const next = nextNpcTarget(
+        world.entities.values(),
+        world.player.pos,
+        world.player.targetId ?? null,
+        direction,
+      );
+      if (next !== null) world.targetEntity(next);
+    },
+    interact: () => padTargetPick.interact(),
+    openTargetSubcommands,
+    battlegroundFlag: bgFlagKey,
+    toggleDiscord: toggleDiscordPanel,
+    openChat,
+    toggleActionCamera: () => applySetting('actionCamera', !settings.get('actionCamera')),
+  };
   const gamepad = new GamepadManager(input, gamepadBindings, {
-    onAction: (id) => dispatchGamepadAction(id),
+    onAction: (id) => dispatchGamepadAction(id, gamepadActionDeps),
     onInputEdge: () => inputMeter.record(performance.now()),
     isPointerMode: () =>
       shouldUseGamepadPointerMode(
@@ -2515,10 +2400,14 @@ async function startGame(
       settings.set('filterProfanity', !!value);
       return;
     }
-    if (key === 'startAttackOnAbilityUse') {
-      // No live subsystem to update: the HUD reads this setting at ability-cast
-      // time (see hud.castSlot). Persist the choice and we are done.
-      settings.set('startAttackOnAbilityUse', !!value);
+    if (key === 'actionCamera') {
+      const v = settings.set('actionCamera', !!value);
+      input.setActionCameraEnabled(v);
+      actionCameraCrosshair.setVisible(v && input.isActionCameraLocked());
+      return;
+    }
+    if (key === 'doubleTapDodge') {
+      input.setDoubleTapDodgeEnabled(settings.set('doubleTapDodge', !!value));
       return;
     }
     if (key === 'stopAutoAttackOnTargetSwitch') {
@@ -3054,6 +2943,8 @@ async function startGame(
     },
     captureKey: (cb) => input.captureNextKey(cb),
     settings,
+    combatAim: () => combatAim.point(),
+    syncCombatAim: () => combatAim.sync(),
     onSettingChange: (key, value) => applySetting(key, value),
     graphicsApplied: () => appliedGraphicsSettings,
     applyGraphics: async (draft) => {
@@ -3337,6 +3228,13 @@ async function startGame(
           const refreshClaudiumLater = () => {
             void hud.refreshClaudium();
           };
+          // A native buy needs a CONNECTED wallet to sign with. The SDK would
+          // bury a missing wallet as a generic 'unavailable' refusal; checking
+          // here surfaces the actionable "connect a wallet first" error instead.
+          if (rail !== 'stripe' && !desktopWalletBrowserHandoffAvailable()) {
+            const wallet = await loadWallet();
+            if (!wallet.currentWallet()?.address) throw new Error('connect a wallet first');
+          }
           const result = await startClaudiumPurchase(economy, rail, sku, {
             nativePayer:
               desktopWalletBrowserHandoffAvailable() && linkedWalletPubkey
@@ -3376,7 +3274,20 @@ async function startGame(
                 return result.signature;
               }
               const wallet = await loadWallet();
-              return wallet.signAndSendTransactionBase64(transactionBase64);
+              try {
+                return await wallet.signAndSendTransactionBase64(transactionBase64);
+              } catch (sendErr) {
+                // The service-built transaction carries a TEST-CLUSTER blockhash;
+                // a wallet pointed at another cluster rejects it with a raw
+                // 'Blockhash not found'. Translate that into the actual fix.
+                const sendMessage = sendErr instanceof Error ? sendErr.message : String(sendErr);
+                if (/blockhash/i.test(sendMessage)) {
+                  throw new Error(
+                    'wallet cluster mismatch: switch your wallet to the devnet cluster (Phantom: Settings → Developer Settings → Testnet Mode) and try again',
+                  );
+                }
+                throw sendErr;
+              }
             },
           });
           if ('ok' in result && !result.ok) {
@@ -3522,13 +3433,14 @@ async function startGame(
   function syncGroundAimReticle(): void {
     if (!hud.isGroundAimActive()) {
       renderer.setGroundAimReticle(null);
+      renderer.setAbilityRangeReticle(null);
       return;
     }
     // Touch placement is updated directly by MobileControls. Some mobile
     // Chromium builds also expose a synthetic hover cursor parked at (0, 0);
     // reading it here would erase the finger-owned point every render frame.
     if (!document.body.classList.contains('mobile-touch')) {
-      const cursor = input.cursorPoint();
+      const cursor = combatAim.screenPoint();
       hud.updateGroundAimPoint(
         cursor ? renderer.groundPoint(cursor.x, cursor.y, world.player.pos.y) : null,
       );
@@ -3542,6 +3454,20 @@ async function startGame(
             radius: reticle.radius,
             school: reticle.school,
             dimmed: reticle.clamped,
+          }
+        : null,
+    );
+    const range = hud.abilityRangeReticle();
+    renderer.setAbilityRangeReticle(
+      range
+        ? {
+            x: range.point.x,
+            z: range.point.z,
+            radius: range.radius,
+            school: range.school,
+            kind: range.kind,
+            angle: range.angle,
+            halfAngle: range.halfAngle,
           }
         : null,
     );
@@ -4312,6 +4238,7 @@ async function startGame(
       cameraMoveActive(),
       input.isMouselookActive(),
       movementFrozen(),
+      input.isActionCameraLocked(),
     )
       ? input.camYaw
       : null;
@@ -4449,8 +4376,12 @@ async function startGame(
     if (shouldClearAutorunOnDeath(playerWasDead, playerDead)) {
       input.setAutorun(false);
       mobileControls.syncAutorun(false);
+      world.stopAutoAttack();
     }
     playerWasDead = playerDead;
+    actionCameraCrosshair.setVisible(
+      settings.get('actionCamera') && input.isActionCameraLocked() && !gameplayInputBlocked(),
+    );
     const frameDtMs = frameDt * 1000;
     let traceStart = perf.startTrace();
     try {
@@ -4487,6 +4418,7 @@ async function startGame(
       cameraMoveActive(),
       input.isMouselookActive(),
       movementFrozen(),
+      input.isActionCameraLocked(),
     );
     const edgeReleaseFacing = mouselookReleaseFacing(
       prevCameraDrivenFacing,
@@ -4511,6 +4443,9 @@ async function startGame(
       // itself, to stay deterministic).
       feedSimCalendar(offlineSim);
       while (acc >= DT) {
+        const aim = combatAim.current();
+        const meta = offlineSim.meta(offlineSim.playerId);
+        if (meta) meta.combatAimAngle = aim.angle;
         const { mi, facing } = resolveMove(
           mouselook,
           offlineSim.player.pos,
@@ -4695,6 +4630,7 @@ async function startGame(
       net.moveInput.turnRight = false;
     }
     net.setMouselookFacing(netFacing);
+    net.setCombatAimAngle(combatAim.current().angle);
     // Online streams facing every frame, so the mouselook release yaw is
     // consumed here; drop it so it is not re-applied next frame.
     pendingReleaseFacing = null;
@@ -4788,6 +4724,7 @@ async function startGame(
           net.spectating === null &&
             !movementFrozen() &&
             !playerImmobilized() &&
+            (pe.dodgeRemaining ?? 0) <= 0 &&
             !isDelvePos(pe.pos.x) &&
             // Rifts (like delves) are server-authoritative instanced content, and
             // their raised sanctum tiers lift the player's Y server-side. The local
@@ -5315,6 +5252,12 @@ async function startOffline(
         playerName: name,
         devCommands: import.meta.env.DEV,
         // Live-world features (custom editor play-test maps keep both off).
+        // Directional combat is the normal player runtime contract. The Sim
+        // library itself remains opt-in so old deterministic fixtures do not
+        // silently gain a synthetic aim source.
+        playerDirectionalCombat: true,
+        // The offline world runs the ranked rift portal scheduler like the live
+        // server (custom editor play-test maps keep it off: their zones differ).
         riftPortals: world === undefined,
         compulsoryTutorial: world === undefined,
         // Match the live server's proven-safe idle-AI interest throttle. Ordinary
@@ -5954,7 +5897,9 @@ function show(el: string): void {
   // moment the player can actually read it, and the NEW-badge marker should
   // advance only then.
   if (el === '#charselect-panel') {
-    void loadCharselectNews($('#charselect-news-feed'), () => api.releases(20));
+    void loadCharselectNews($('#charselect-news-feed'), () =>
+      fetchReleasesWithFallback(() => api.releases(20)),
+    );
   }
 
   // Reset currently rendered classes to force re-render/animation when opening a panel
@@ -7834,15 +7779,41 @@ async function loadHighscores(): Promise<void> {
   await loadHighscoresInto($('#hs-leaderboard'), () => api.leaderboard('global', 100));
 }
 
-// News & Updates: published GitHub releases, proxied + cached by the server.
-// Re-fetched each time the view is opened (the server caches, so it is cheap).
-// The sanitizing renderer + fetch/paint loop live in ./ui/news_feed (extracted
-// out of this firewall file); this call site just supplies the host + fetcher.
+// News & Updates: published GitHub releases, proxied + cached by the server,
+// with a direct-from-GitHub fallback when the proxy's shared-IP budget is dry
+// (see fetchReleasesWithFallback in ./ui/news_feed). The sanitizing renderer
+// + fetch/paint loop live in ./ui/news_feed; this call site just supplies the
+// host + fetcher.
 async function loadNews(): Promise<void> {
-  await loadNewsInto($('#news-feed'), () => api.releases(20));
+  await loadNewsInto($('#news-feed'), () => fetchReleasesWithFallback(() => api.releases(20)));
 }
 
 let caCopyResetTimer: number | null = null;
+
+// Donate buttons ([data-donate-sol]) ship with a %VITE_DONATION_ADDRESS%
+// placeholder in their solscan URL. With a valid operator wallet baked in at
+// build time the link opens that address on-chain; with an unset/invalid
+// placeholder the button hides instead of pointing at upstream's fundraiser.
+function wireDonateLinks(): void {
+  const address = String(import.meta.env.VITE_DONATION_ADDRESS ?? '').trim();
+  const valid = /^[1-9A-HJ-NP-Za-km-z]{32,44}$/.test(address);
+  for (const anchor of document.querySelectorAll<HTMLAnchorElement>('[data-donate-sol]')) {
+    if (!valid) {
+      anchor.hidden = true;
+      continue;
+    }
+    anchor.href = `https://solscan.io/account/${address}`;
+  }
+  // The icon-rail #mm-donate micro-button (which replaced #mm-discord on this
+  // fork) rides the same address: shown + wired when valid, hidden when not.
+  const railBtn = document.getElementById('mm-donate');
+  if (railBtn) {
+    railBtn.hidden = !valid;
+    railBtn.addEventListener('click', () => {
+      window.open(DONATE_URL, '_blank', 'noopener,noreferrer');
+    });
+  }
+}
 
 // Click-to-copy for the $WOC contract address on the landing page. Falls back to
 // a hidden-textarea copy when the async Clipboard API is unavailable (insecure
@@ -7851,6 +7822,16 @@ function wireContractAddressCopy(): void {
   const btn = document.getElementById('btn-copy-ca');
   const container = document.getElementById('token-ca');
   if (!btn || !container) return;
+
+  // The pill ships with a %VITE_DONATION_ADDRESS% placeholder that Vite replaces
+  // at build time. When the operator never set a donation wallet the raw
+  // placeholder (or empty string) survives; anything that is not a plausible
+  // Solana address hides the whole block instead of advertising a bogus address.
+  const rawCa = btn.getAttribute('data-ca') ?? '';
+  if (!/^[1-9A-HJ-NP-Za-km-z]{32,44}$/.test(rawCa)) {
+    container.hidden = true;
+    return;
+  }
 
   const showCopied = () => {
     container.classList.add('is-copied');
@@ -8591,7 +8572,13 @@ const DISCORD_BUILD_ENABLED = String(import.meta.env.VITE_DISCORD_DISABLED ?? ''
 // falls back to DEFAULT_DISCORD_INVITE_URL (discord_status.ts) when the
 // server-fed value is not known yet (logged out, offline), so every caller
 // gets the fail-open behavior for free.
-const DONATE_URL = 'https://ko-fi.com/worldofclaudecraft';
+// Operator fork: in-game donations go to the operator's Solana wallet (build-time
+// VITE_DONATION_ADDRESS), mirroring the header Donate button. Without a valid
+// address baked in, the button still opens solscan rather than upstream's page.
+const DONATE_ADDRESS = String(import.meta.env.VITE_DONATION_ADDRESS ?? '').trim();
+const DONATE_URL = /^[1-9A-HJ-NP-Za-km-z]{32,44}$/.test(DONATE_ADDRESS)
+  ? `https://solscan.io/account/${DONATE_ADDRESS}`
+  : 'https://solscan.io';
 const DISCORD_ONBOARD_KEY = 'woc_discord_onboard';
 let discordPopup: Window | null = null;
 
@@ -9717,6 +9704,7 @@ function wireStartScreens(): void {
   hydrateIcons();
   void loadProjectStats();
   wireContractAddressCopy();
+  wireDonateLinks();
   wireHomepageMusicToggle();
   void wireWallet();
   wireGithubLink();

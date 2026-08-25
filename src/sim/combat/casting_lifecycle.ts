@@ -34,6 +34,7 @@ import { recalcPlayerStats } from '../entity';
 import { isShieldItem } from '../equipment_rules';
 import { instanceInfoAt } from '../instances/dungeons';
 import { forceDismount } from '../mounts';
+import { isPlayerDodging } from '../player_dodge';
 import {
   canActivateDivineAscension,
   hasDevotion,
@@ -42,7 +43,7 @@ import {
 } from '../paladin_devotion';
 import { effectiveFishingBand, fishReelWindowSecFor } from '../professions/fishing';
 import { bestOwnedGatherToolFor } from '../professions/tools';
-import { scheduleProjectile } from '../projectile_travel';
+import { scheduleBallisticProjectile, scheduleProjectile } from '../projectile_travel';
 import type { PlayerMeta, ResolvedAbility } from '../sim';
 import type { SimContext } from '../sim_context';
 import { abilityScalingPower, channelTickBonus } from '../spell_scaling';
@@ -77,6 +78,7 @@ import {
 } from '../types';
 import { drawWeapon } from '../weapon_stow';
 import { sharedCooldownIds } from './ability_cooldown_groups';
+import { type ActionCombatAim, abilityUsesActionCombatAim } from './action_combat_targeting';
 import {
   afflictionAdjustedCastTime,
   afflictionCastError,
@@ -119,6 +121,13 @@ import {
   ruinAmount,
   spendRuin,
 } from './destruction';
+import {
+  abilityUsesDirectionalHostileAim,
+  combatAimAngle,
+  playerAttackResolution,
+  selectFirstTargetOnSegment,
+  selectMeleeConeTargets,
+} from './directional_attack';
 import { extendOwnedDot } from './dot_mutation';
 import {
   consumeAuraKind,
@@ -189,6 +198,7 @@ import {
 } from './rogue_engines';
 import { combineCostMultipliers, duskCostMultiplier } from './rogue_talents';
 import { onShamanManaSpent, shamanCastTimeMultiplier, shamanManaCost } from './shaman_talents';
+import { thundercallDamageMultiplier } from './shaman_thundercall';
 import { resolveUnleashWeaponTarget, unleashWeaponCastError } from './shaman_unleash_weapon';
 import { onStormcastConsumed, STORMCAST_CHEAP_ID, STORMCAST_ID } from './shaman_warspirit';
 import {
@@ -198,6 +208,7 @@ import {
   spellHasteMult,
 } from './spell_combat';
 import { isSpellResisted } from './spell_resist';
+import { hasSureCritAura } from './sure_crit';
 import { onCastCompleted } from './talent_procs';
 import { emitRainOfFireStop } from './warlock_meteor_events';
 import {
@@ -841,6 +852,62 @@ function nearestAttackingMob(ctx: SimContext, p: Entity): Entity | null {
   return id !== null ? (ctx.entities.get(id) ?? null) : null;
 }
 
+function directionalAimAngle(p: Entity, meta: PlayerMeta, aim?: ActionCombatAim): number {
+  if (aim) {
+    const dx = aim.x - p.pos.x;
+    const dz = aim.z - p.pos.z;
+    if (Number.isFinite(dx) && Number.isFinite(dz) && Math.hypot(dx, dz) > 1e-6) {
+      const angle = Math.atan2(dx, dz);
+      meta.combatAimAngle = angle;
+      return angle;
+    }
+  }
+  return combatAimAngle(p, meta);
+}
+
+function aimedHostileTargets(
+  ctx: SimContext,
+  p: Entity,
+  meta: PlayerMeta,
+  ability: AbilityDef,
+  aim?: ActionCombatAim,
+): Entity[] {
+  const maxRange = ability.range > 0 ? ability.range : MELEE_RANGE;
+  const candidates: Entity[] = [];
+  for (const entity of ctx.entities.values()) {
+    if (entity.id === p.id || entity.dead || !ctx.isHostileTo(p, entity)) continue;
+    if (hasEscapeStealth(entity) || ctx.lineOfSightBlocked(p, entity, ability)) continue;
+    candidates.push(entity);
+  }
+  const resolution = playerAttackResolution(ability);
+  if (resolution === 'meleeCone') {
+    return selectMeleeConeTargets({
+      origin: p.pos,
+      facing: p.facing,
+      range: maxRange,
+      candidates,
+    });
+  }
+  const selected = selectFirstTargetOnSegment({
+    origin: p.pos,
+    angle: directionalAimAngle(p, meta, aim),
+    minDistance: ability.minRange,
+    maxDistance: maxRange,
+    candidates,
+  });
+  return selected ? [selected] : [];
+}
+
+function aimedHostileTarget(
+  ctx: SimContext,
+  p: Entity,
+  meta: PlayerMeta,
+  ability: AbilityDef,
+  aim?: ActionCombatAim,
+): Entity | null {
+  return aimedHostileTargets(ctx, p, meta, ability, aim)[0] ?? null;
+}
+
 export function castAbility(
   ctx: SimContext,
   abilityId: string,
@@ -857,6 +924,10 @@ export function castAbility(
     return;
   }
   if (p.dead) return;
+  if (isPlayerDodging(p)) {
+    ctx.error(p.id, 'You are busy.');
+    return;
+  }
   if (isValkyrsCallingAirborne(p)) {
     ctx.error(p.id, 'You are busy.');
     return;
@@ -1267,10 +1338,19 @@ export function castAbility(
       }
     }
   } else if (ability.requiresTarget && ability.targetType === 'any') {
-    target = p.targetId !== null ? (ctx.entities.get(p.targetId) ?? null) : null;
+    const actionAim = aim !== undefined && abilityUsesActionCombatAim(ability) ? aim : null;
+    target = actionAim
+      ? aimedHostileTarget(ctx, p, meta, ability, actionAim)
+      : p.targetId !== null
+        ? (ctx.entities.get(p.targetId) ?? null)
+        : null;
+    if (actionAim && target) {
+      p.targetId = target.id;
+      p.facing = Math.atan2(actionAim.x - p.pos.x, actionAim.z - p.pos.z);
+    }
     // Auto-acquire (issue #2787): only when nothing is targeted at all, never
     // overriding an existing (even stale/invalid) selection.
-    if (!target && p.targetId === null) {
+    if (!actionAim && !target && p.targetId === null) {
       target = nearestAttackingMob(ctx, p);
       if (target) p.targetId = target.id;
     }
@@ -1297,7 +1377,11 @@ export function castAbility(
       return;
     }
   } else if (ability.requiresTarget) {
-    if (p.targetId !== null) {
+    const directionalHostile =
+      ctx.playerDirectionalCombat !== undefined && abilityUsesDirectionalHostileAim(ability);
+    if (directionalHostile) {
+      target = aimedHostileTarget(ctx, p, meta, ability, aim);
+    } else if (p.targetId !== null) {
       target = ctx.entities.get(p.targetId) ?? null;
     } else {
       // The stealth ambush fallback (Kidney Shot) takes priority when it
@@ -1312,99 +1396,104 @@ export function castAbility(
     // Vanish (hasEscapeStealth) makes the target fully undetectable, same gate
     // the mob AI already applies (mob/targeting.ts): a hostile cast against it
     // is refused exactly like an out-of-range or dead target (issue #2426).
-    if (!target || target.dead || !ctx.isHostileTo(p, target) || hasEscapeStealth(target)) {
+    if (
+      !directionalHostile &&
+      (!target || target.dead || !ctx.isHostileTo(p, target) || hasEscapeStealth(target))
+    ) {
       ctx.error(p.id, 'You have no target.', target?.dead ? 'target_dead' : undefined);
       return;
     }
-    const d = dist2d(p.pos, target.pos);
-    const maxRange = ability.range > 0 ? ability.range : MELEE_RANGE;
-    if (d > maxRange) {
-      ctx.error(p.id, 'Out of range.');
-      return;
-    }
-    if (ability.minRange && d < ability.minRange) {
-      ctx.error(p.id, 'Too close!');
-      return;
-    }
-    if (ctx.lineOfSightBlocked(p, target, ability)) {
-      ctx.error(p.id, 'Line of sight.');
-      return;
-    }
-    const facingDiff = Math.abs(normAngle(angleTo(p.pos, target.pos) - p.facing));
-    if (facingDiff > MELEE_ARC) {
-      ctx.error(p.id, 'You must be facing your target.');
-      return;
-    }
-    // execute-style gate: only usable while the target is nearly dead
-    const targetHpThreshold = ability.executeThreshold ?? ability.requiresTargetHpBelow;
-    const targetOutsideExecuteWindow =
-      targetHpThreshold !== undefined &&
-      (ability.executeThreshold !== undefined
-        ? target.hp >= target.maxHp * targetHpThreshold
-        : target.hp > target.maxHp * targetHpThreshold);
-    if (
-      targetOutsideExecuteWindow &&
-      !(ability.id === 'execute' && p.auras.some((aura) => aura.kind === 'sudden_death')) &&
-      !paladinExecuteWindowActive(p, ability.id) &&
-      !dawnsWrathHammerActive(p, ability.id)
-    ) {
-      ctx.error(
-        p.id,
-        `That ability requires the target below ${Math.round(targetHpThreshold * 100)}% health.`,
-      );
-      return;
-    }
-    for (const eff of res.effects) {
-      if (eff.type === 'weaponStrike' && eff.requiresBehind) {
-        if (!p.weapon.dagger) {
-          ctx.error(p.id, 'You must wield a dagger.');
-          return;
-        }
-        // Shadow-wreathed (or about to detonate a full Gloam bank), the
-        // strike comes from nowhere: the veil waives the behind requirement
-        // like it waives stealth. Without it, a solo mob faces its attacker
-        // constantly and the veiled Lurker's Strike could never land (owner
-        // playtest). The armed-bank case covers the detonator itself, whose
-        // veil rises at runEffects, after this gate.
-        if (veilAllowsStealthAbilities(p) || gloamBankArmed(p)) continue;
-        // Inside FACING_HOLD_DIST the target's facing is held steady (see
-        // steadyAngleTo) and "behind" is undefined anyway, so overlapping the
-        // target always reads as in front: no point-blank Backstab through a
-        // frozen facing.
-        const behindDiff = Math.abs(normAngle(angleTo(target.pos, p.pos) - target.facing));
-        if (behindDiff < Math.PI / 2 || dist2d(target.pos, p.pos) < FACING_HOLD_DIST) {
-          ctx.error(p.id, 'You must be behind your target.');
-          return;
-        }
+    if (target) {
+      const d = dist2d(p.pos, target.pos);
+      const maxRange = ability.range > 0 ? ability.range : MELEE_RANGE;
+      if (d > maxRange) {
+        ctx.error(p.id, 'Out of range.');
+        return;
       }
-      if (eff.type === 'polymorph') {
-        if (target.kind === 'mob') {
-          const fam = MOBS[target.templateId]?.family;
-          // Undead/gorrak are lore-exempt; cc-immune mobs (raid bosses) reject it here so
-          // the cast never reaches the effect's sheep full-heal side effect.
-          if (
-            fam === 'undead' ||
-            target.templateId === 'gorrak' ||
-            MOBS[target.templateId]?.ccImmune ||
-            target.ccImmune
-          ) {
+      if (ability.minRange && d < ability.minRange) {
+        ctx.error(p.id, 'Too close!');
+        return;
+      }
+      if (ctx.lineOfSightBlocked(p, target, ability)) {
+        ctx.error(p.id, 'Line of sight.');
+        return;
+      }
+      const facingDiff = Math.abs(normAngle(angleTo(p.pos, target.pos) - p.facing));
+      if (!directionalHostile && facingDiff > MELEE_ARC) {
+        ctx.error(p.id, 'You must be facing your target.');
+        return;
+      }
+      // execute-style gate: only usable while the target is nearly dead
+      const targetHpThreshold = ability.executeThreshold ?? ability.requiresTargetHpBelow;
+      const targetOutsideExecuteWindow =
+        targetHpThreshold !== undefined &&
+        (ability.executeThreshold !== undefined
+          ? target.hp >= target.maxHp * targetHpThreshold
+          : target.hp > target.maxHp * targetHpThreshold);
+      if (
+        targetOutsideExecuteWindow &&
+        !(ability.id === 'execute' && p.auras.some((aura) => aura.kind === 'sudden_death')) &&
+        !paladinExecuteWindowActive(p, ability.id) &&
+        !dawnsWrathHammerActive(p, ability.id)
+      ) {
+        ctx.error(
+          p.id,
+          `That ability requires the target below ${Math.round(targetHpThreshold * 100)}% health.`,
+        );
+        return;
+      }
+      for (const eff of res.effects) {
+        if (eff.type === 'weaponStrike' && eff.requiresBehind) {
+          if (!p.weapon.dagger) {
+            ctx.error(p.id, 'You must wield a dagger.');
+            return;
+          }
+          // Shadow-wreathed (or about to detonate a full Gloam bank), the
+          // strike comes from nowhere: the veil waives the behind requirement
+          // like it waives stealth. Without it, a solo mob faces its attacker
+          // constantly and the veiled Lurker's Strike could never land (owner
+          // playtest). The armed-bank case covers the detonator itself, whose
+          // veil rises at runEffects, after this gate.
+          if (veilAllowsStealthAbilities(p) || gloamBankArmed(p)) continue;
+          // Inside FACING_HOLD_DIST the target's facing is held steady (see
+          // steadyAngleTo) and "behind" is undefined anyway, so overlapping the
+          // target always reads as in front: no point-blank Backstab through a
+          // frozen facing.
+          const behindDiff = Math.abs(normAngle(angleTo(target.pos, p.pos) - target.facing));
+          if (behindDiff < Math.PI / 2 || dist2d(target.pos, p.pos) < FACING_HOLD_DIST) {
+            ctx.error(p.id, 'You must be behind your target.');
+            return;
+          }
+        }
+        if (eff.type === 'polymorph') {
+          if (target.kind === 'mob') {
+            const fam = MOBS[target.templateId]?.family;
+            // Undead/gorrak are lore-exempt; cc-immune mobs (raid bosses) reject it here so
+            // the cast never reaches the effect's sheep full-heal side effect.
+            if (
+              fam === 'undead' ||
+              target.templateId === 'gorrak' ||
+              MOBS[target.templateId]?.ccImmune ||
+              target.ccImmune
+            ) {
+              ctx.error(p.id, 'This creature cannot be polymorphed.');
+              return;
+            }
+          } else if (target.kind !== 'player') {
             ctx.error(p.id, 'This creature cannot be polymorphed.');
             return;
           }
-        } else if (target.kind !== 'player') {
-          ctx.error(p.id, 'This creature cannot be polymorphed.');
+        }
+        if (eff.type === 'taunt' && target.kind !== 'mob') {
+          ctx.error(p.id, 'You cannot taunt that.');
           return;
         }
-      }
-      if (eff.type === 'taunt' && target.kind !== 'mob') {
-        ctx.error(p.id, 'You cannot taunt that.');
-        return;
-      }
-      if (eff.type === 'tamePet') {
-        const err = ctx.tameError(p, target);
-        if (err) {
-          ctx.error(p.id, err);
-          return;
+        if (eff.type === 'tamePet') {
+          const err = ctx.tameError(p, target);
+          if (err) {
+            ctx.error(p.id, err);
+            return;
+          }
         }
       }
     }
@@ -1488,11 +1577,12 @@ export function castAbility(
           ? { x: p.pos.x + (dx / d) * maxRange, y: p.pos.y, z: p.pos.z + (dz / d) * maxRange }
           : { x: aim.x, y: p.pos.y, z: aim.z };
     } else {
-      // Faultwake's keybind default is the selected hostile; other position
-      // spells retain the canonical at-feet fallback. Clamp the selected point
-      // through the same authoritative range rule as explicit ground input.
+      // Faultwake and target-born impact areas default to the selected hostile
+      // when no explicit point is supplied; other position spells retain the
+      // canonical at-feet fallback. Clamp through the same authoritative rule.
       const selected =
-        (ability.id === 'earthquake' || ability.id === 'earthbind') && p.targetId !== null
+        (ability.id === 'earthquake' || ability.id === 'earthbind' || ability.impactArea) &&
+        p.targetId !== null
           ? (ctx.entities.get(p.targetId) ?? null)
           : null;
       const fallback =
@@ -2151,6 +2241,124 @@ function applyChannelTick(
     return;
   }
 
+  const applyDirectionalImpact = (src: Entity, target: Entity): void => {
+    // Direction, not the pre-channel hard target, selects every individual
+    // missile. Physical contact owns hard-target selection even when a later
+    // hit-table roll misses, is dodged, or is parried.
+    src.targetId = target.id;
+    const channelSp = channelTickBonus(abilityScalingPower(src, res.def), res.def, talentDmgMult);
+    const surgeBonus =
+      res.def.id === 'arcane_missiles'
+        ? aetherDartsBoltBonus(ctx, src, res.def.channel?.ticks ?? 1)
+        : 0;
+    const isFinalConsumePulse = res.def.id === 'drain_life' && src.channelTicksLeft === 0;
+    const consumeThreadDoomBonus =
+      res.def.id === 'drain_life' ? afflictionConsumeThreadDoomBonus(src) : 0;
+    for (const eff of res.effects) {
+      if (eff.type === 'directDamage') {
+        const crit = ctx.rng.chance(consumeNextAttackCrit(ctx, src) ? 1 : ctx.spellCrit(src));
+        let dmg = ctx.rng.range(eff.min, eff.max) + channelSp + surgeBonus;
+        dmg *= spellDamageMultFromAuras(src);
+        if (crit) dmg *= 1.5 + src.critDmgSpellBonus;
+        ctx.dealDamage(src, target, Math.round(dmg), crit, res.def.school, res.def.name, 'hit');
+        noteSpellHit(ctx, src, crit, res.def.id);
+      } else if (eff.type === 'drainTick') {
+        const doom = afflictionDrainTickDoom(ctx, src, target, consumeThreadDoomBonus);
+        const completionDoom = isFinalConsumePulse
+          ? afflictionDrainCompletionDoom(ctx, src, target)
+          : 0;
+        const dmg = Math.round(ctx.rng.range(eff.min, eff.max) + channelSp);
+        ctx.dealDamage(src, target, dmg, false, res.def.school, res.def.name, 'hit');
+        if (doom > 0) gainDoom(ctx, src, doom);
+        if (!src.dead) {
+          const intended = Math.round(dmg * eff.healFrac);
+          const healed = Math.min(intended, src.maxHp - src.hp);
+          if (healed > 0) {
+            src.hp += healed;
+            const overheal = intended - healed;
+            ctx.emit({
+              type: 'heal2',
+              sourceId: src.id,
+              targetId: src.id,
+              amount: healed,
+              crit: false,
+              ability: res.def.name,
+              ...(overheal > 0 ? { overheal } : {}),
+            });
+            ctx.healingThreat(src, src, healed);
+          }
+        }
+        if (res.def.id === 'drain_life' && target.dead && src.castingAbility === res.def.id) {
+          if (completionDoom > 0) gainDoom(ctx, src, completionDoom);
+          cancelCast(ctx, src);
+        }
+      } else if (eff.type === 'extendDot') {
+        extendOwnedDot(target, src.id, eff.dot, eff.seconds, eff.maxBonus);
+      }
+    }
+  };
+
+  if (ctx.playerDirectionalCombat !== undefined && abilityUsesDirectionalHostileAim(res.def)) {
+    const angle = combatAimAngle(p, meta);
+    p.facing = angle;
+    if (ctx.playerDirectionalCombat === true) {
+      if (playerAttackResolution(res.def) === 'ballisticProjectile') {
+        scheduleBallisticProjectile(
+          ctx,
+          p,
+          {
+            angle,
+            minDistance: res.def.minRange,
+            maxDistance: res.def.range > 0 ? res.def.range : MELEE_RANGE,
+            school: res.def.school,
+            ability: res.def.id,
+            ...(res.def.school === 'physical' ? { attackAnimation: 'ranged-shot' as const } : {}),
+          },
+          applyDirectionalImpact,
+        );
+        return;
+      }
+
+      const aimedTarget = aimedHostileTarget(ctx, p, meta, res.def);
+      if (aimedTarget) {
+        // Target-born channel effects stay beams. The projectile classifier no
+        // longer turns Mind Flay/Drain Life ticks into green travelling orbs.
+        if (
+          res.def.id !== 'drain_life' &&
+          res.effects.some((effect) => effect.type === 'drainTick')
+        ) {
+          ctx.emit({
+            type: 'spellfx',
+            sourceId: p.id,
+            targetId: aimedTarget.id,
+            school: res.def.school,
+            fx: 'beam',
+            ability: res.def.id,
+          });
+        }
+        applyDirectionalImpact(p, aimedTarget);
+      }
+      return;
+    }
+
+    // Rollback mode keeps the release-one homing resolver, while retaining the
+    // targetless, aim-driven input contract.
+    const aimedTarget = aimedHostileTarget(ctx, p, meta, res.def);
+    if (!aimedTarget) {
+      ctx.emit({
+        type: 'spellfx',
+        sourceId: p.id,
+        targetId: p.id,
+        school: res.def.school,
+        fx: 'selfCast',
+        ability: res.def.id,
+      });
+      return;
+    }
+    scheduleProjectile(ctx, p, aimedTarget, applyDirectionalImpact);
+    return;
+  }
+
   const target = p.castTargetId !== null ? ctx.entities.get(p.castTargetId) : null;
   // A channel whose target vanishes mid-cast (Vanish, hasEscapeStealth) stops
   // ticking on it, same as an out-of-range or dead target (issue #2426).
@@ -2179,71 +2387,9 @@ function applyChannelTick(
       ability: res.def.id,
     });
   }
-  const isFinalConsumePulse = res.def.id === 'drain_life' && p.channelTicksLeft === 0;
-  const consumeThreadDoomBonus =
-    res.def.id === 'drain_life' ? afflictionConsumeThreadDoomBonus(p) : 0;
   // Each channel bolt (e.g. Arcane Missiles) deals its damage on arrival, not on the
   // tick it is fired; a target that dies mid-flight fizzles it (the drain's guard).
-  scheduleProjectile(ctx, p, target, (src, tgt) => {
-    const channelSp = channelTickBonus(abilityScalingPower(src, res.def), res.def, talentDmgMult);
-    // Aether Darts: the FIRST landed missile consumes the caster's Arcane Charges
-    // and locks a flat per-missile Arcane bonus (combat/chronomancy.ts); later
-    // missiles reuse it. It is plain Arcane damage, so Temporal Echo heals from it
-    // at the normal rate. Draws no rng; a no-op (0) for any other channel and with
-    // no charges held.
-    const surgeBonus =
-      res.def.id === 'arcane_missiles'
-        ? aetherDartsBoltBonus(ctx, src, res.def.channel?.ticks ?? 1)
-        : 0;
-    for (const eff of res.effects) {
-      if (eff.type === 'directDamage') {
-        const crit = ctx.rng.chance(consumeNextAttackCrit(ctx, src) ? 1 : ctx.spellCrit(src));
-        let dmg = ctx.rng.range(eff.min, eff.max) + channelSp + surgeBonus;
-        dmg *= spellDamageMultFromAuras(src);
-        // A channeled spell tick (Arcane Missiles) is a spell crit, so it takes the
-        // spell crit-damage channel of the mastery (plus the generic bonus) like
-        // every other spell crit.
-        if (crit) dmg *= 1.5 + src.critDmgSpellBonus;
-        ctx.dealDamage(src, tgt, Math.round(dmg), crit, res.def.school, res.def.name, 'hit');
-        noteSpellHit(ctx, src, crit, res.def.id);
-      } else if (eff.type === 'drainTick') {
-        const doom = afflictionDrainTickDoom(ctx, src, tgt, consumeThreadDoomBonus);
-        const completionDoom = isFinalConsumePulse
-          ? afflictionDrainCompletionDoom(ctx, src, tgt)
-          : 0;
-        const dmg = Math.round(ctx.rng.range(eff.min, eff.max) + channelSp);
-        ctx.dealDamage(src, tgt, dmg, false, res.def.school, res.def.name, 'hit');
-        if (doom > 0) gainDoom(ctx, src, doom);
-        if (!src.dead) {
-          const intended = Math.round(dmg * eff.healFrac);
-          const healed = Math.min(intended, src.maxHp - src.hp);
-          if (healed > 0) {
-            src.hp += healed;
-            const overheal = intended - healed;
-            ctx.emit({
-              type: 'heal2',
-              sourceId: src.id,
-              targetId: src.id,
-              amount: healed,
-              crit: false,
-              ability: res.def.name,
-              ...(overheal > 0 ? { overheal } : {}),
-            });
-            ctx.healingThreat(src, src, healed);
-          }
-        }
-        if (res.def.id === 'drain_life' && tgt.dead && src.castingAbility === res.def.id) {
-          // The first pulse is front-loaded, so the third can land just before
-          // the channel's visual tail ends. All authored pulses were completed:
-          // preserve Consume's completion gain before stopping the dead-target beam.
-          if (completionDoom > 0) gainDoom(ctx, src, completionDoom);
-          cancelCast(ctx, src);
-        }
-      } else if (eff.type === 'extendDot') {
-        extendOwnedDot(tgt, src.id, eff.dot, eff.seconds, eff.maxBonus);
-      }
-    }
-  });
+  scheduleProjectile(ctx, p, target, applyDirectionalImpact);
 }
 
 interface StormcastReservation {
@@ -2299,6 +2445,32 @@ const SELF_ANNOUNCING_EFFECTS: ReadonlySet<AbilityEffect['type']> = new Set([
   'blinkForward',
   'repositionToAim',
 ]);
+
+/**
+ * Resolve a target-born authored impact around the aimed world point. Grid
+ * iteration order is not stable, so the primary and cap are selected by
+ * distance to the impact center and then entity id. LoS remains authoritative
+ * per victim and vanished targets cannot be caught by an area cast.
+ */
+function aimedImpactAreaTargets(
+  ctx: SimContext,
+  caster: Entity,
+  ability: AbilityDef,
+): { center: Vec3; targets: Entity[] } {
+  const area = ability.impactArea;
+  const center = caster.castAim ?? caster.pos;
+  if (!area) return { center, targets: [] };
+  const cap = Math.max(1, Math.floor(area.maxTargets));
+  const targets = ctx
+    .hostilesInRadius(caster, center, area.radius)
+    .filter(
+      (candidate) =>
+        !hasEscapeStealth(candidate) && !ctx.lineOfSightBlocked(caster, candidate, ability),
+    )
+    .sort((a, b) => dist2d(a.pos, center) - dist2d(b.pos, center) || a.id - b.id)
+    .slice(0, cap);
+  return { center, targets };
+}
 
 function applyAbility(
   ctx: SimContext,
@@ -2412,6 +2584,7 @@ function applyAbility(
   }
 
   let target: Entity | null = null;
+  let directionalTargets: Entity[] = [];
   if (ability.id === 'unleash_weapon') {
     target = resolveUnleashWeaponTarget(ctx, p, castTarget);
     const error = unleashWeaponCastError(p, target);
@@ -2499,20 +2672,32 @@ function applyAbility(
       return;
     }
   } else if (ability.requiresTarget) {
-    target = castTarget !== null ? (ctx.entities.get(castTarget) ?? null) : null;
-    if (!target || target.dead || !ctx.isHostileTo(p, target) || hasEscapeStealth(target)) {
+    const directionalHostile =
+      ctx.playerDirectionalCombat !== undefined && abilityUsesDirectionalHostileAim(ability);
+    if (directionalHostile) {
+      directionalTargets = aimedHostileTargets(ctx, p, meta, ability);
+      target = directionalTargets[0] ?? null;
+    } else {
+      target = castTarget !== null ? (ctx.entities.get(castTarget) ?? null) : null;
+    }
+    if (
+      !directionalHostile &&
+      (!target || target.dead || !ctx.isHostileTo(p, target) || hasEscapeStealth(target))
+    ) {
       ctx.error(p.id, 'You have no target.');
       return;
     }
-    const d = dist2d(p.pos, target.pos);
-    const maxRange = ability.range > 0 ? ability.range : MELEE_RANGE;
-    if (d > maxRange + 2) {
-      ctx.error(p.id, 'Out of range.');
-      return;
-    }
-    if (ctx.lineOfSightBlocked(p, target, ability)) {
-      ctx.error(p.id, 'Line of sight.');
-      return;
+    if (target) {
+      const d = dist2d(p.pos, target.pos);
+      const maxRange = ability.range > 0 ? ability.range : MELEE_RANGE;
+      if (d > maxRange + 2) {
+        ctx.error(p.id, 'Out of range.');
+        return;
+      }
+      if (ctx.lineOfSightBlocked(p, target, ability)) {
+        ctx.error(p.id, 'Line of sight.');
+        return;
+      }
     }
   }
   if (ability.id === 'conflagrate' && !hasBurningPact(p, target)) {
@@ -2626,14 +2811,138 @@ function applyAbility(
     return;
   }
 
-  // A ranged attack travels as a projectile, so its damage/effects resolve when the
-  // bolt LANDS, not at cast completion. Every non-physical spell is a bolt by
-  // convention (school proxy); a physical ranged shot (hunter Aimed / Concussive Shot)
-  // opts in with projectile:true. Without this a physical shot deals its damage
-  // instantly while the arrow is still visibly in flight (health drops, or the mob
-  // dies, before it arrives).
-  // `projectile: false` opts a spell OUT (Fire Blast bites instantly).
-  const firesProjectile = ability.projectile ?? ability.school !== 'physical';
+  const attackResolution = playerAttackResolution(ability);
+  if (ability.impactArea && ability.targetMode === 'position') {
+    const { center, targets } = aimedImpactAreaTargets(ctx, p, ability);
+    const primary = targets[0] ?? null;
+    const dx = center.x - p.pos.x;
+    const dz = center.z - p.pos.z;
+    if (Math.hypot(dx, dz) > 1e-6) p.facing = Math.atan2(dx, dz);
+
+    spendAbilityCost(ctx, p, meta, res, primary);
+    armAbilityCooldownWithReflection(ctx, p, meta, res, togglingOff);
+    res = reserveRuinousBrandCopy(ctx, p, meta, primary, res);
+    ctx.emit({
+      type: 'spellfxAt',
+      x: center.x,
+      z: center.z,
+      school: ability.school,
+      fx: 'nova',
+      ability: ability.id,
+      radius: ability.impactArea.radius,
+      sourceId: p.id,
+    });
+
+    if (primary) {
+      p.targetId = primary.id;
+      const secondarySnapshot = {
+        spentCombo: ability.spendsCombo ? p.comboPoints : 0,
+        sureCrit: hasSureCritAura(p),
+        castDamageMultiplier: thundercallDamageMultiplier(ctx, p, ability.id),
+      };
+      ctx.runEffects(p, meta, primary, res);
+      for (const secondary of targets.slice(1)) {
+        if (ctx.runSecondaryTargetEffects) {
+          ctx.runSecondaryTargetEffects(p, meta, secondary, res, secondarySnapshot);
+        } else {
+          ctx.runEffects(p, meta, secondary, res);
+        }
+      }
+    } else {
+      // A valid empty cast still spends its action and runs caster-only effects.
+      ctx.runEffects(p, meta, null, res);
+    }
+
+    completeStormcastReservation(ctx, p, stormcastReservation);
+    if (p.kind === 'player' && ability.school !== 'physical' && !togglingOff) {
+      ctx.applySetProcs(p, primary, 'spellCast');
+    }
+    if (p.kind === 'player' && !togglingOff) onCastCompleted(ctx, p, ability.id, primary);
+    return;
+  }
+  // Travel is driven by the central authored resolution. School is not a
+  // projectile proxy: target-born bursts, beams, DoTs and control spells keep
+  // their original contact style instead of becoming generic magic orbs.
+  const firesProjectile =
+    attackResolution === 'ballisticProjectile' ||
+    (attackResolution === 'lockOnActivation' && ability.projectile === true);
+  if (
+    firesProjectile &&
+    attackResolution === 'ballisticProjectile' &&
+    ctx.playerDirectionalCombat === true
+  ) {
+    const isSpell = ability.school !== 'physical';
+    spendAbilityCost(ctx, p, meta, res, target);
+    armAbilityCooldownWithReflection(ctx, p, meta, res, togglingOff);
+    const angle = combatAimAngle(p, meta);
+    p.facing = angle;
+    const isTaunt = res.effects.some((eff) => eff.type === 'taunt');
+    scheduleBallisticProjectile(
+      ctx,
+      p,
+      {
+        angle,
+        minDistance: ability.minRange,
+        maxDistance: ability.range > 0 ? ability.range : MELEE_RANGE,
+        school: ability.school,
+        ability: ability.id,
+        ...(isSpell ? {} : { attackAnimation: 'ranged-shot' as const }),
+      },
+      (src, tgt) => {
+        // The first physical contact owns hard-target selection before the hit
+        // table; resist/miss outcomes still contacted this entity.
+        src.targetId = tgt.id;
+        const impactRes = reserveRuinousBrandCopy(ctx, src, meta, tgt, res);
+        if (impactRes.effects.some((effect) => effect.type === 'afflictionNeedle')) {
+          completeNeedleOfFateCast(ctx, src, tgt);
+        }
+        if (ability.id === 'sunward_disc') {
+          ctx.emit({
+            type: 'spellfx',
+            sourceId: src.id,
+            targetId: tgt.id,
+            school: ability.school,
+            fx: 'paladinSunwardDiscImpact',
+            ability: ability.id,
+            level: 0,
+            count:
+              1 +
+              impactRes.effects.reduce(
+                (jumps, effect) => (effect.type === 'chainDamage' ? effect.jumps : jumps),
+                0,
+              ),
+          });
+        }
+        if (isSpell && !isTaunt && isSpellResisted(ctx.rng, src.level, tgt.level, src.hitBonus)) {
+          ctx.emit({
+            type: 'damage',
+            sourceId: src.id,
+            targetId: tgt.id,
+            amount: 0,
+            crit: false,
+            school: ability.school,
+            ability: ability.name,
+            kind: 'resist',
+          });
+          ctx.enterCombat(src, tgt);
+          restoreStormcastReservation(ctx, src, stormcastReservation);
+          return;
+        }
+        ctx.runEffects(src, meta, tgt, impactRes, !isSpell);
+        completeStormcastReservation(ctx, src, stormcastReservation);
+      },
+      () => restoreStormcastReservation(ctx, p, stormcastReservation),
+    );
+    if (p.kind === 'player' && isSpell) ctx.applySetProcs(p, target, 'spellCast');
+    if (p.kind === 'player') onCastCompleted(ctx, p, ability.id, target);
+    return;
+  }
+  if (
+    ctx.playerDirectionalCombat !== undefined &&
+    (attackResolution === 'ballisticProjectile' || attackResolution === 'directionalHitscan')
+  ) {
+    p.facing = combatAimAngle(p, meta);
+  }
   if (target && firesProjectile) {
     const isSpell = ability.school !== 'physical';
     spendAbilityCost(ctx, p, meta, res, target);
@@ -2680,6 +2989,7 @@ function applyAbility(
       p,
       target,
       (src, tgt) => {
+        src.targetId = tgt.id;
         if (ability.id === 'sunward_disc') {
           ctx.emit({
             type: 'spellfx',
@@ -2735,6 +3045,14 @@ function applyAbility(
   spendAbilityCost(ctx, p, meta, res, target);
   armAbilityCooldownWithReflection(ctx, p, meta, res, togglingOff);
   res = reserveRuinousBrandCopy(ctx, p, meta, target, res);
+  if (
+    ctx.playerDirectionalCombat !== undefined &&
+    target &&
+    (attackResolution === 'meleeCone' || attackResolution === 'directionalHitscan')
+  ) {
+    p.targetId = target.id;
+  }
+  const authoredDirectionalImpact = target !== null && attackResolution === 'directionalHitscan';
   // A shout announces itself: world-visible cue so the caster roars and the
   // shockwave ring reads for everyone nearby (renderer-only; no mechanic).
   if (ability.castFx && !togglingOff) {
@@ -2748,6 +3066,7 @@ function applyAbility(
     });
   } else if (
     !togglingOff &&
+    !authoredDirectionalImpact &&
     (!target || target === p || !res.effects.some((eff) => SELF_ANNOUNCING_EFFECTS.has(eff.type)))
   ) {
     // An untargeted/self completion (Shadewolf, summon rites, forms, aspects)
@@ -2766,7 +3085,36 @@ function applyAbility(
       ability: ability.id,
     });
   }
-  ctx.runEffects(p, meta, target, res);
+  if (target && attackResolution === 'directionalHitscan' && !togglingOff) {
+    ctx.emit({
+      type: 'spellfx',
+      sourceId: p.id,
+      targetId: target.id,
+      school: ability.school,
+      fx: 'impact',
+      ability: ability.id,
+    });
+  }
+  if (
+    ctx.playerDirectionalCombat === true &&
+    attackResolution === 'meleeCone' &&
+    directionalTargets.length > 1
+  ) {
+    const secondarySnapshot = {
+      spentCombo: ability.spendsCombo ? p.comboPoints : 0,
+      sureCrit: hasSureCritAura(p),
+    };
+    ctx.runEffects(p, meta, directionalTargets[0], res);
+    for (const meleeTarget of directionalTargets.slice(1)) {
+      if (ctx.runSecondaryTargetEffects) {
+        ctx.runSecondaryTargetEffects(p, meta, meleeTarget, res, secondarySnapshot);
+      } else {
+        ctx.runEffects(p, meta, meleeTarget, res);
+      }
+    }
+  } else {
+    ctx.runEffects(p, meta, target, res);
+  }
   completeStormcastReservation(ctx, p, stormcastReservation);
   // 'spellCast' means SPELLS: physical specials (a cat/bear weapon strike from a
   // cloth-capable druid) and toggle-offs fall through here and must not roll.

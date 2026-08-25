@@ -24,6 +24,43 @@ export interface NewsReleaseEntry {
   publishedAt: string;
 }
 
+/**
+ * Release-feed fetch with a player-IP fallback. The server proxies GitHub
+ * releases unauthenticated from its egress IP; on shared hosting that 60/hr
+ * budget is usually exhausted and the proxy serves an empty feed. When it
+ * does, read the public releases API straight from the browser (each player
+ * has their own rate budget; api.github.com is CORS-open) and map it into the
+ * same sanitized entry shape. Both news surfaces (home view + character
+ * select) go through this one helper.
+ */
+export async function fetchReleasesWithFallback(
+  proxyFetch: () => Promise<NewsReleaseEntry[]>,
+): Promise<NewsReleaseEntry[]> {
+  const proxied = await proxyFetch();
+  if (proxied.length > 0) return proxied;
+  try {
+    const res = await fetch(
+      'https://api.github.com/repos/levy-street/world-of-claudecraft/releases?per_page=20',
+      { headers: { Accept: 'application/vnd.github+json' } },
+    );
+    if (!res.ok) return [];
+    const raw = (await res.json()) as Array<Record<string, unknown>>;
+    return raw
+      .filter((r) => r && !r.draft)
+      .map((r) => ({
+        id: Number(r.id),
+        tag: String(r.tag_name ?? ''),
+        name: String(r.name || r.tag_name || ''),
+        body: String(r.body ?? '').slice(0, 8000),
+        url: String(r.html_url ?? ''),
+        prerelease: Boolean(r.prerelease),
+        publishedAt: String(r.published_at ?? r.created_at ?? ''),
+      }));
+  } catch {
+    return [];
+  }
+}
+
 /** The minimal release shape the NEW-badge marker logic needs. */
 export interface ReleaseSummary {
   id: number;

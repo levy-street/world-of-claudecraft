@@ -1443,6 +1443,7 @@ export const hudChromeStrings = {
     // as "previous enemy", so it cannot read as a classic last-target memory:
     // this bind walks the same ordered list backwards, it remembers nothing.
     targetPrev: 'Cycle Target Backward',
+    toggleActionCamera: 'Toggle Action Camera',
     // Discord is a brand name; it stays identical across locales.
     discord: 'Discord',
     bgFlag: 'Battleground Flag Action',
@@ -1828,8 +1829,10 @@ export const hudChromeStrings = {
     // fills land in this same change).
     aurasOnPlayerFrame: 'Buffs on the Player Frame',
     highContrastBackground: 'High-Contrast Background',
-    // Interface panel toggle: also engage auto-attack when using an offensive
-    // ability, so white swings start without a separate Attack press (on by default).
+    actionCamera: 'Action Camera (Crosshair)',
+    doubleTapDodge: 'Double-Tap Dodge',
+    // Retired combat setting. The key stays because translated locale overlays
+    // are append-only, but no options or guide surface renders it anymore.
     startAttackOnAbility: 'Auto-Attack on Ability Use',
     // Interface panel toggle: disengage auto-attack whenever the target
     // switches, instead of the classic default of carrying the swing over to

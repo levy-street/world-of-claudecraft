@@ -29,9 +29,11 @@ COPY private ./private
 ARG VITE_TURNSTILE_SITEKEY=""
 ARG VITE_REOWN_PROJECT_ID=""
 ARG VITE_WALLET_DISABLED=""
+ARG VITE_DONATION_ADDRESS=""
 RUN VITE_TURNSTILE_SITEKEY="$VITE_TURNSTILE_SITEKEY" \
     VITE_REOWN_PROJECT_ID="$VITE_REOWN_PROJECT_ID" \
     VITE_WALLET_DISABLED="$VITE_WALLET_DISABLED" \
+    VITE_DONATION_ADDRESS="$VITE_DONATION_ADDRESS" \
     pnpm run build && cp -a dist/media ./media-build && rm -rf dist/media && pnpm run build:server && pnpm run build:bot
 
 FROM node:26-slim

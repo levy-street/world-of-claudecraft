@@ -13735,6 +13735,8 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.trade.woc.modesLabel': '支払い通貨',
   'hudChrome.trade.woc.paidSeller': '{item} の代金 {price} を受け取りました。',
   'hudChrome.trade.woc.paidBuyer': '{item} の代金 {price} を支払いました。',
+  'hudChrome.keybinds.toggleActionCamera': 'アクションカメラ切替',
+  'hudChrome.options.actionCamera': 'アクションカメラ（照準）',
   'hudChrome.bags.lockItem': 'アイテムをロック',
   'hudChrome.otaUpdate.applying': 'アップデートをダウンロードしました。適用のためゲームを再起動しています。',
   'hudChrome.otaUpdate.continueAnyway': '更新せずに続行',

@@ -23,6 +23,10 @@ describe('isCameraDrivenFacingActive', () => {
     expect(isCameraDrivenFacingActive(true, false, false, false)).toBe(false);
   });
 
+  it('gives locked Action Camera priority over idle Mouse Camera mode', () => {
+    expect(isCameraDrivenFacingActive(true, false, true, false, true)).toBe(true);
+  });
+
   it('mouselook is ignored while Mouse Camera mode owns the override', () => {
     expect(isCameraDrivenFacingActive(true, false, true, false)).toBe(false);
   });
@@ -30,6 +34,7 @@ describe('isCameraDrivenFacingActive', () => {
   it('is inactive while dead, regardless of mode', () => {
     expect(isCameraDrivenFacingActive(false, false, true, true)).toBe(false);
     expect(isCameraDrivenFacingActive(true, true, false, true)).toBe(false);
+    expect(isCameraDrivenFacingActive(true, false, true, true, true)).toBe(false);
   });
 });
 

@@ -60,10 +60,10 @@ describe('/play is online-only', () => {
   });
 });
 
-describe('/play login panel carries Continue with Discord', () => {
-  it('play.html ships the Discord login button and the or-email divider', () => {
-    expect(playHtml).toContain('id="btn-login-discord"');
-    expect(playHtml).toContain('data-i18n="hudChrome.discord.loginCta"');
+describe('/play login panel drops Continue with Discord (operator fork)', () => {
+  it('play.html ships the or-email divider without the Discord button', () => {
+    expect(playHtml).not.toContain('id="btn-login-discord"');
+    expect(playHtml).not.toContain('data-i18n="hudChrome.discord.loginCta"');
     expect(playHtml).toContain('id="auth-or-divider"');
   });
 

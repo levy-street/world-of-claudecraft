@@ -37,6 +37,13 @@ describe('ClientWorld dead-target cast pre-validation', () => {
     expect(c.drainEvents()).toHaveLength(0);
   });
 
+  it('sends action aim even when the old hard target is dead', () => {
+    const c = castClient(true);
+    c.castAbilityToward('fireball', { x: 12, z: 34 });
+    expect(c.cmd).toHaveBeenCalledWith({ cmd: 'cast', ability: 'fireball', x: 12, z: 34 });
+    expect(c.drainEvents()).toHaveLength(0);
+  });
+
   it('does not block a friendly-target ability on a dead target', () => {
     const c = castClient(true);
     c.known = [{ def: { id: 'renew', requiresTarget: true, targetType: 'friendly' } }];
