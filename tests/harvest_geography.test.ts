@@ -738,7 +738,9 @@ describe('the never-mapped synthetic families the corpse-harvest corpus uses', (
     // for every arm in the same suite that runs after it, which is the
     // cascade the finally exists to prevent. TWO templates on purpose: a
     // finally that restores only the first entry leaves the voidwalker
-    // tagged, and the last four expects are what red that mutant.
+    // tagged, and the voidwalker pair among the last four expects (its
+    // componentTags and carriersOf lines) is what reds that mutant; the imp
+    // pair passes either way, since that mutant still restores the imp.
     expect(MOBS.warlock_imp.componentTags).toBeUndefined();
     expect(MOBS.warlock_voidwalker.componentTags).toBeUndefined();
     expect(() =>

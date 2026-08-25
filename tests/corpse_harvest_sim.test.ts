@@ -552,13 +552,15 @@ describe('corpse harvest: single-use, first-come (#1141)', () => {
 // zone-1 camp counts, then from 2 to 30 after the zones 1-3 quest-dedupe
 // content pass shifted the camp-driven world-gen draw sequence again, then
 // from 30 to 9 after the Galecrest quest-camp pass (#2887) added four camps
-// and shifted it once more. The below-rare seed has never had to move: its
-// roll stayed under the floor through all three passes, only its quantity
+// and shifted it once more (4c2b43f8f7), then back to 30 when the v0.35.0
+// base sync re-recorded this file's pins against the synced base content
+// (d4deed629a). The below-rare seed has never had to move: its
+// roll stayed under the floor through every re-record, only its quantity
 // changed. Every re-hunt reproduces the same rig profile (a one-unit base
 // tier roll that reads 2 on the wolf's fang at bonus 1 and 1 on the bandit's
 // cloth at bonus 0), so every literal in this block is unchanged.
 describe('signed Pristine specimens (#1145)', () => {
-  it('a rare-or-better harvest grants the signed specimen PLUS the plain component (seed 23)', () => {
+  it('a rare-or-better harvest grants the signed specimen PLUS the plain component (seed 30)', () => {
     const { sim, internals, a, mob } = setup(30);
     sim.drainEvents();
     sim.harvestCorpse(mob.id, ['hide'], a);
@@ -591,13 +593,14 @@ describe('signed Pristine specimens (#1145)', () => {
     // Quantity re-recorded after the Eastbrook camp respacing (2 to 3), then
     // again after the zones 1-3 quest-dedupe content pass shifted the shared
     // stream (back to 2), then to 4 after the Galecrest quest-camp pass
-    // (#2887) shifted it once more; the below-rare property held every time,
-    // so the seed itself never had to move.
+    // (#2887, 4c2b43f8f7), then back to 2 when the v0.35.0 base sync
+    // re-recorded this file's pins (d4deed629a); the below-rare property held
+    // every time, so the seed itself never had to move.
     expect(sim.countItem('rough_hide', a)).toBe(2);
     expect(sim.countItem('pristine_hide', a)).toBe(0);
   });
 
-  it('a specimen-less family (fang) keeps the signed-component behavior at rare-or-better (seed 23)', () => {
+  it('a specimen-less family (fang) keeps the signed-component behavior at rare-or-better (seed 30)', () => {
     const { sim, internals, a, mob } = setup(30);
     sim.harvestCorpse(mob.id, ['fang'], a);
     const meta = expectDefined(internals.players.get(a));
@@ -633,7 +636,7 @@ describe('signed Pristine specimens (#1145)', () => {
     expect(sim.countItem('wolf_fang', a)).toBe(3);
   });
 
-  it('every other specimen family grants its own jackpot beside the plain component (seed 23)', () => {
+  it('every other specimen family grants its own jackpot beside the plain component (seed 30)', () => {
     // The hide row is exercised above; this sweeps the remaining three
     // specimen rows behaviorally (silk and venomSac via webwood_spider, meat
     // via wild_boar), so a mistargeted HARVEST_COMPONENT_SPECIMENS row cannot
@@ -736,9 +739,11 @@ describe('signed Pristine specimens (#1145)', () => {
     expect(
       meta.inventory.filter((s) => s.instance?.signer === 'Alpha' && s.itemId !== 'mudfin_scale'),
     ).toEqual([]);
-    // Non-vacuity floor for the sweep below, in the file's own ratchet shape
-    // (the #2139 premise arm): 5 specimen families measured 2026-08-25 as a
-    // ratchet, so an emptied table cannot turn the sweep into a no-op.
+    // Non-vacuity floor for the sweep below, this file's first measured
+    // ratchet (the #2139 capacity pre-gate premise arm below carries only a
+    // bare toBeGreaterThan(0) floor, and nothing else here ratchets): 5
+    // specimen families measured 2026-08-25, so an emptied table cannot turn
+    // the sweep into a no-op.
     expect(Object.keys(HARVEST_COMPONENT_SPECIMENS).length).toBeGreaterThanOrEqual(5);
     for (const specimen of Object.values(HARVEST_COMPONENT_SPECIMENS)) {
       expect(sim.countItem(specimen, a), specimen).toBe(0);
@@ -746,7 +751,7 @@ describe('signed Pristine specimens (#1145)', () => {
     expect(sim.countItem('rough_hide', a)).toBe(0);
   });
 
-  it('a slot-full signed-family harvest falls back to the plain stack, never over capacity (seed 23)', () => {
+  it('a slot-full signed-family harvest falls back to the plain stack, never over capacity (seed 30)', () => {
     // The pre-gate reserves plain-stack room only, so a partial stack lets it
     // pass while a signed instance would still need a fresh slot. The rare+
     // arm must then fall back to the plain fungible top-up (the signature
@@ -775,7 +780,7 @@ describe('signed Pristine specimens (#1145)', () => {
     ]);
   });
 
-  it('a slot-full specimen harvest truncates the specimen and keeps the plain yield (seed 23)', () => {
+  it('a slot-full specimen harvest truncates the specimen and keeps the plain yield (seed 30)', () => {
     // Plain grant tops up the partial stack without opening a slot, so the
     // specimen guard sees a full bag: the jackpot truncates rather than
     // overflowing, and the plain component still arrives.
@@ -1006,7 +1011,7 @@ describe('corpse signed-guard capacity vs merge room (#2139)', () => {
     expect(sim.drainEvents().filter((e) => e.type === 'gatherDowngrade')).toHaveLength(0);
   });
 
-  it('a slot-full bag with the same-signer stack AT its cap still falls back plain, at the boundary (seed 23)', () => {
+  it('a slot-full bag with the same-signer stack AT its cap still falls back plain, at the boundary (seed 30)', () => {
     // The boundary tick: the same-signer stack sits EXACTLY at stackSizeOf,
     // so it offers zero merge room and the guard must refuse, top up the
     // plain stack, and emit the mark-lost downgrade, never overflow.
@@ -1031,7 +1036,7 @@ describe('corpse signed-guard capacity vs merge room (#2139)', () => {
     ]);
   });
 
-  it('a slot-full specimen jackpot merges into a same-signer specimen stack instead of truncating (seed 23)', () => {
+  it('a slot-full specimen jackpot merges into a same-signer specimen stack instead of truncating (seed 30)', () => {
     // The specimen arm shares the merge-aware guard: with the plain component
     // topping up its own partial stack, the jackpot's only room is the
     // byte-equal same-signer specimen stack, and it must land there signed
@@ -2348,7 +2353,7 @@ describe('corpse premium-arm tool gating (Professions 2.0)', () => {
     expect(canHarvestMonsterMaterial(2, 2)).toBe(true);
   });
 
-  it('bare hands still earn the signed specimen on real content: tier-1 families never gate (seed 23)', () => {
+  it('bare hands still earn the signed specimen on real content: tier-1 families never gate (seed 30)', () => {
     const { sim, internals, a, mob } = setup(30);
     const meta = expectDefined(internals.players.get(a));
     // Genuinely bare-handed: the starting kit resolves to the tier-1 floor.
@@ -2488,14 +2493,15 @@ describe('corpse premium-arm tool gating (Professions 2.0)', () => {
   });
 
   it('at most ONE gatherDenied per harvest command, even with several denied families (seed 23)', () => {
-    // Seed 138 pre-verified against soloRig: BOTH wolf families (hide and
+    // Seed 23 pre-verified against soloRig: BOTH wolf families (hide and
     // fang) roll signable on an untagged harvest, so raising both tiers
     // denies two yields in one command; the dedupe flag must emit exactly one
     // event, tiered off the FIRST failing family. Re-recorded from seed 23
     // after the Eastbrook camp respacing (to 31), then from 31 to 26 after
     // the zones 1-3 quest-dedupe content pass shifted the camp-driven
     // world-gen draw sequence again, then from 26 to 138 after the Galecrest
-    // quest-camp pass (#2887) shifted it once more.
+    // quest-camp pass (#2887, 4c2b43f8f7), then back to 23 when the v0.35.0
+    // base sync re-recorded this file's pins (d4deed629a).
     const base = soloRig(23);
     base.sim.harvestCorpse(base.mob.id, undefined, base.a);
     const baseMeta = expectDefined(base.internals.players.get(base.a));
@@ -2530,7 +2536,9 @@ describe('corpse premium-arm tool gating (Professions 2.0)', () => {
     // dedupe arm above. Re-recorded from seed 63 after the Eastbrook camp
     // respacing (to 42), then from 42 to 62 after the zones 1-3 quest-dedupe
     // content pass shifted the camp-driven world-gen draw sequence again, then
-    // from 62 to 280 after the Galecrest quest-camp pass (#2887).
+    // from 62 to 280 after the Galecrest quest-camp pass (#2887, 4c2b43f8f7),
+    // then to 2 when the v0.35.0 base sync re-recorded this file's pins
+    // (d4deed629a).
     const first = soloRig(2);
     first.sim.drainEvents();
     withTier('hide', 2, () => {

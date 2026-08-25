@@ -1179,7 +1179,9 @@ describe('persistence', () => {
     // success, and its harvest arm calls onCropHarvestedForDeeds, which mints
     // farm:<zone> and farm_crop:<crop>) plus the gather, gather_event and
     // dungeon marks other modules route through ctx.markVisited; the crafting
-    // marks (masterwork, which the relic marks ride via isCataloguedRelicMark,
+    // marks (masterwork, whose authored masterwork:first mark is written
+    // ungated as a RELIQUARY_PROFESSION_MARKS constant while only the derived
+    // masterwork:<craftId> marks are gated by isCataloguedRelicMark;
     // craft_rare, apex_feast) are not listed and not reachable here. A mark
     // outside the list fails whichever writer minted it, but only the sweep's
     // two namespaces are exercised by this scenario.

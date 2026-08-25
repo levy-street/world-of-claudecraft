@@ -377,8 +377,10 @@ Phase 11m ledger STEP 6 writes; until then the spread commit body
   exemplars** (229 occurrences of the QUOTED literals 'gills' or 'horn'
   across fourteen test files at 722003809e^; 239 lines under tests/ that
   722003809e removed containing either word as a bare substring, 236 of
-  them word-bounded; the commit body undercounts the sites as eleven;
-  sethrael_palecoil and mudfin_murloc as the shipped mixed fixtures).
+  them word-bounded; the commit body's "about two hundred sites across
+  eleven suites" undercounts the SUITES as eleven, fourteen measured, and
+  rounds the sites to about two hundred; sethrael_palecoil and
+  mudfin_murloc as the shipped mixed fixtures).
   Mapping the orphans retires every shipped unmapped fixture, so the
   migration to a synthetic never-mapped family
   (tests/helpers/unmapped_family.ts) is part of the orphan commit; the

@@ -924,9 +924,13 @@ function scanEmitCandidates(simSrc: string, serverSrc: string): Cand[] {
   const cands: Cand[] = [];
   const lit = '(`[^`]*`|\'(?:[^\'\\\\]|\\\\.)*\'|"(?:[^"\\\\]|\\\\.)*")';
   // A ternary condition up to the `?` (no quotes/braces/commas of its own beyond
-  // the matched literals): catches `text: cond ? 'A' : 'B'` emits the literal-only
-  // patterns below miss.
-  const cond = '[^?,{}\\n]*?';
+  // the matched literals, and no `;` or `)`: a condition never crosses a
+  // statement or call boundary, so a one-line `this.err(id, 'A'); y = b ? 'C'
+  // : 'D';` cannot false-harvest C and D as an err ternary): catches
+  // `text: cond ? 'A' : 'B'` emits the literal-only patterns below miss.
+  // Quotes stay admitted on purpose: the live guild-create condition is
+  // `result.error === 'name_taken'` (server/social.ts).
+  const cond = '[^?,{}\\n;)]*?';
   const unq = (s: string) => s.slice(1, -1);
   // --- src/sim/sim.ts (+ extracted sim modules, which emit via ctx.*) emits ---
   const e1 = new RegExp(`emit\\(\\{[^}]*?type:\\s*'(log|loot)'[^}]*?text:\\s*${lit}`, 'gs');
@@ -1671,6 +1675,10 @@ describe('S3 scanner enumerates each hardened emit form (regression)', () => {
     // s4 anti-bleed: a single-arg this.err() must stop its first-arg scan at ')'
     // and NOT span into a following call's literal.
     "this.err(charId); track(metric, 'SOCIAL_BLEED_SENTINEL_should_not_capture');",
+    // s4t anti-bleed: the cond class must stop at ';' and ')', so a one-line
+    // statement followed by an unrelated ternary is harvested as the plain s4
+    // literal ONLY, never as an err ternary over the neighbor's branches.
+    "this.err(charId, 'SYNTH_SOCIAL_ERR_STOP'); y = b ? 'TERN_BLEED_A' : 'TERN_BLEED_B';",
   ].join('\n');
 
   // [label, expected type, expected tmpl] - every entry must be enumerated.
@@ -1699,6 +1707,11 @@ describe('S3 scanner enumerates each hardened emit form (regression)', () => {
     ['social this.err ternary, branch B, wrapped call (s4t)', 'error', 'SYNTH_SOCIAL_ERR_TERN_B'],
     ['social this.info ternary, branch A (s5t)', 'log', 'SYNTH_SOCIAL_INFO_TERN_A'],
     ['social this.info ternary, branch B (s5t)', 'log', 'SYNTH_SOCIAL_INFO_TERN_B'],
+    [
+      'social this.err literal beside an unrelated ternary (the s4t anti-bleed host)',
+      'error',
+      'SYNTH_SOCIAL_ERR_STOP',
+    ],
   ];
 
   it('every hardened emit form is enumerated by scanEmitCandidates()', () => {
@@ -1716,6 +1729,14 @@ describe('S3 scanner enumerates each hardened emit form (regression)', () => {
     expect(bled, "nr first-arg class must stop at ')' (no cross-call bleed)").toBe(false);
     const socialBled = cands.some((c) => c.tmpl === 'SOCIAL_BLEED_SENTINEL_should_not_capture');
     expect(socialBled, "s4 first-arg class must stop at ')' (no cross-call bleed)").toBe(false);
+    // Negative: the s4t/s5t cond class must NOT cross the statement boundary
+    // after the plain s4 literal and harvest the unrelated ternary's branches
+    // (would regress if cond ever stopped excluding ';' and ')').
+    const ternBled = cands.filter((c) => c.tmpl === 'TERN_BLEED_A' || c.tmpl === 'TERN_BLEED_B');
+    expect(
+      ternBled,
+      "cond class must stop at ';' and ')' (no cross-statement ternary harvest)",
+    ).toEqual([]);
   });
 });
 
