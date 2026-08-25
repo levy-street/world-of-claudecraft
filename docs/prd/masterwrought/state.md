@@ -16813,7 +16813,30 @@ cross-platform-sync, per the matrix, since no sim behavior grew.
 
 ### THE FROZEN STAMP, BOTH ENDS
 
-[STAMP]
+Frozen at `a4e250b597` (the ledger commit; the last code commit is
+`99dd186d4a`, the eleventh fix), with every reader idle AND reported (twelve
+agents listed idle), `git status` empty, `ps aux | grep -c "[v]itest"` at 0,
+`DATABASE_URL` unset and no probe file under tests/, then the full suite
+detached into its own log with the tip written as its first line (the
+harness caps a background command at ten minutes, so the run was relaunched
+under nohup with a wrapper that writes TIP first and EXIT last; the first,
+capped attempt was stopped and its log discarded rather than read). Twelve
+commits since the 11l stamp: the sync merge and eleven fixes.
+
+| Check | 11l frozen tip `182c28d649` | 11l QA frozen tip `a4e250b597` |
+|---|---|---|
+| vitest | EXIT=0, 3168 files / 21 skipped (3189); 46588 passed / 2 xfail / 373 skipped (46963) | **EXIT=0**, 3170 files / 21 skipped (3191); **46690** passed / 2 xfail / 373 skipped (47065) |
+| ci:changed | EXIT=0, 813 files, 0 errors | **EXIT=0**, 818 files, 0 errors, no FAIL marker |
+| tsc --noEmit | clean | **clean** |
+| wiki:content | zero diff | **zero diff** |
+| i18n:gen | zero diff | **zero diff** |
+
+The test accounting: +2 collected files and +102 tests against the 11l
+stamp, the sixteenth sync's collected suites plus this QA's own pins (the
+merge's four new test files include browser suites vitest does not collect
+in a bare run). The run took seven minutes wall clock on an otherwise idle
+machine (01:15:35Z to 01:22:45Z), against the 15 to 20 the packet budgets
+under load; the tree was byte-identical before and after it.
 
 ### THE HANDOFF TO PHASE 11m (harvest geography)
 
