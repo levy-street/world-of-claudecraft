@@ -253,7 +253,7 @@ describe('the ladder: every vendor/crafted pair meets its rung margin', () => {
   // retuning any crafted food updates this map in the same diff. The potion
   // axes need no twin: the six draught-over-potion pairs in
   // tests/consumables.test.ts backstop them.
-  it('the crafted-only foodHp line is exactly the 26 known id-to-value rows', () => {
+  it('the crafted-only foodHp line matches the pinned id-to-value map', () => {
     const line: Record<string, number> = {};
     for (const id of RECIPE_RESULT_IDS) {
       if (STOCKED_IDS.has(id)) continue;
@@ -484,21 +484,34 @@ describe('the classification is exhaustive over every vendor-stocked consumable'
     };
     expect(stockedElixir(probe)).toEqual(['elixir_of_the_bear']);
     expect(stockedElixir(NPCS)).toEqual([]);
+    // The Merchant's house is swept for elixirs too, so a buff row seeded
+    // there cannot re-open the no-vendor-sold-buff outcome past this suite.
+    expect(
+      MARKET_HOUSE_STOCK.map((r) => r.itemId).filter((id) => def(id)?.elixir !== undefined),
+    ).toEqual([]);
   });
 
   it('every magnitude-bearing stocked id is classified: paired, exempt, or a drink', () => {
     // potionHpPctMax rides along so a percent-of-max heal potion (soul_stone
     // is the only carrier today, stocked nowhere) cannot slip past the sweep
-    // unclassified. The Merchant's house listings are the THIRD stock counter
-    // (unlimited-restock fixed-price rows seeded every boot, exactly R23's
-    // surface) and join the derivation here: its two consumable rows,
-    // roasted_boar and spring_water, are already classified.
+    // unclassified. The Merchant's house listings are the fourth stock
+    // counter this file names, after NPCS.vendorItems and the delve and
+    // heroic tables below (unlimited-restock fixed-price rows seeded every
+    // boot, exactly R23's surface), and they join the derivation here.
     expect(
       MARKET_HOUSE_STOCK.length,
       'house stock rows near the live count (23 today)',
     ).toBeGreaterThanOrEqual(20);
     const consumablePred = (id: string) =>
       CONSUMABLE_AXES.some((axis) => liveMagnitude(id, axis) !== undefined);
+    // The house half of the union is load-bearing only if the predicate
+    // really reaches its rows: pin the two consumable rows it holds today,
+    // so a dead spread or predicate cannot hide behind ids NPCS also stocks.
+    expect(
+      MARKET_HOUSE_STOCK.map((r) => r.itemId)
+        .filter(consumablePred)
+        .sort(),
+    ).toEqual(['roasted_boar', 'spring_water']);
     const stocked = [
       ...new Set([
         ...vendorStockedIdsBy(NPCS, consumablePred),
@@ -555,6 +568,10 @@ describe('the classification is exhaustive over every vendor-stocked consumable'
     // Positive control: the predicate flags a known consumable, so the empty
     // filters below are real absences.
     expect(consumable('healing_potion'), 'the consumable predicate is alive').toBe(true);
+    // healing_potion satisfies the axis arm and short-circuits the ||, so
+    // the elixir arm needs its own liveness probe: the bear elixir carries
+    // no magnitude axis and exercises that arm alone.
+    expect(consumable('elixir_of_the_bear'), 'the elixir arm is alive').toBe(true);
     expect(delveIds.filter(consumable)).toEqual([]);
     expect(heroicIds.filter(consumable)).toEqual([]);
   });
