@@ -15,8 +15,10 @@ Scope decisions fixed by the maintainer:
 - Every class-and-spec pair gets a five-piece tier set in the style of classic
   World of Warcraft tier gear, acquired through class-group tokens that drop
   from bosses and are redeemed at a quartermaster.
-- There are 27 sets: 9 classes times 3 specs (the full table in
-  src/sim/content/dev_kit_roles.ts).
+- There are 29 sets: one per class-and-spec pair (9 classes times 3 specs,
+  the full table in src/sim/content/dev_kit_roles.ts) plus two extra
+  off-tank sets, so both hybrid specs carry a damage set and a tank set: a
+  druid feral bear tank set and a shaman enhancement tank set.
 - The table must cover every equipment slot for every armor variant in the
   game, plus a full weapon spread: one-handers, two-handers, shields, held
   offhands, spell damage weapons, and healing weapons.
@@ -40,7 +42,8 @@ What the review says about the current model, and what this tier changes:
    specs: crownforged serves warrior AND paladin in every role, soulflame
    serves every cloth caster. Spec identity comes only from talent baselines,
    never from gear. This tier moves to one set per class-and-spec pair, which
-   is the whole point of the 27-set request.
+   is the whole point of the 29-set request (one set per spec, plus
+   dual-role sets for the two off-tank hybrids).
 2. **Caster itemization has no authored affixes.** The spellPower field on
    BaseItemDef is fully engine-wired (recalcPlayerStats sums it; heals and
    damage spells both consume it via directHealBonus/directHitBonus) but not
@@ -172,27 +175,33 @@ Armor proficiency (src/sim/equipment_rules.ts): mail = warrior, paladin,
 shaman; leather = druid, rogue, hunter; cloth = priest, mage, warlock. There
 is no plate; "plate" in old comments means the Strength mail archetype.
 
-The 10 armor variants map to the 27 specs like this:
+The 10 armor variants map to the 27 specs (and 29 sets) like this:
 
 | Variant | Specs (count) |
 |---|---|
 | Cloth spell damage | priest shadow (Vespers), mage fire (Pyromancy), mage frost (Cryomancy), warlock affliction (Hexcraft), warlock demonology (Necromancy), warlock destruction (Ruination) (6) |
 | Cloth healing | priest discipline (Doctrine), priest holy (Benison), mage arcane (Chronomancy) (3) |
-| Leather tanking | druid feral (Wildfang) (1) |
-| Leather dps | rogue assassination (Knifework), rogue combat (Thuggery), rogue subtlety (Skulduggery), hunter beast_mastery (Packlord), hunter marksmanship (Coldsight), hunter survival (Fieldcraft) (6) |
+| Leather tanking | druid feral (Wildfang), the bear tank set (1) |
+| Leather dps | rogue assassination (Knifework), rogue combat (Thuggery), rogue subtlety (Skulduggery), hunter beast_mastery (Packlord), hunter marksmanship (Coldsight), hunter survival (Fieldcraft), druid feral (Wildfang) cat set (7) |
 | Leather spell damage | druid balance (Moongrove) (1) |
 | Leather healing | druid restoration (Groveheart) (1) |
-| Mail tanking | warrior prot (Ironguard), paladin protection (Faithwarden) (2) |
+| Mail tanking | warrior prot (Ironguard), paladin protection (Faithwarden), shaman enhancement (Warspirit) off-tank set (3) |
 | Mail dps | warrior arms (Battlecraft), warrior fury (Bloodrush), paladin retribution (Dawnreaver), shaman enhancement (Warspirit) (4) |
 | Mail spell damage | shaman elemental (Thundercall) (1) |
 | Mail healing | paladin holy (Sunmender), shaman restoration (Spiritmend) (2) |
 
 Notes that are not the genre default and must not be "corrected": mage arcane
-(Chronomancy) is a healer; druid feral (Wildfang) is a tank; hunters are a
-leather class; enhancement, hunter, and feral itemize Agility-led, not
-Strength-led (dev_kit_roles.ts weights).
+(Chronomancy) is a healer; druid feral (Wildfang) is the declared tank spec;
+hunters are a leather class; enhancement, hunter, and feral itemize
+Agility-led, not Strength-led (dev_kit_roles.ts weights).
 
-## The 27 tier sets
+Two specs carry two sets each, by maintainer decision: feral gets a cat
+damage set (Wildfang Emberhide) and a bear tank set (Cinderbark Ward), and
+enhancement gets its damage set (Warspirit Emberscale) and an off-tank set
+(Stonehearth Bastion). That makes 29 sets across 27 specs, with tank
+coverage in both leather and Agility mail.
+
+## The 29 tier sets
 
 ### Structure
 
@@ -221,7 +230,10 @@ Primary budgets split by identity, then normalize to the exact slot budget:
 - Leather dps: agi 2 : sta 1, crit and hit ratings.
 - Leather spell damage: int 2 : spi 1, Spell Damage, crit rating.
 - Leather healing: int 1 : spi 1, Healing Power, haste rating.
-- Mail tanking: sta 1.2 : str 1, hit rating, extra armor line, shields.
+- Mail tanking (Strength): sta 1.2 : str 1, hit rating, extra armor line,
+  shields.
+- Mail tanking (Agility, Stonehearth): sta 1.2 : agi 1, hit rating, extra
+  armor line, shields.
 - Mail dps (Strength): str 2 : sta 1, crit and hit ratings.
 - Mail dps (Agility, Warspirit): agi 2 : sta 1, crit and hit ratings.
 - Mail spell damage: int 2 : spi 1, Spell Damage, hit rating.
@@ -280,6 +292,7 @@ weaponCrit, spellCrit, spellCast, kill.
 |---|---|---|---|
 | Stormkindled Regalia (stormkindled) | elemental, Thundercall | +14 Spell Damage | Stormkindled Surge: spell crits grant +25 Spell Damage for 8 s (icd 10 s) |
 | Warspirit Emberscale (warspirit_emberscale) | enhancement, Warspirit | +40 attack power | Emberscale Tempo: weapon crits grant +7.5 percent haste for 6 s (icd 15 s) |
+| Stonehearth Bastion (stonehearth) | enhancement, Warspirit (off-tank) | +25 Stamina | Stonehearth Ward: weapon crits grant a 300 absorb shield for 10 s (icd 20 s) |
 | Springmender Scale (springmender) | restoration, Spiritmend | +25 Healing Power | Springmender's Gift: heal casts have a 6 percent chance to make the next cast free (icd 15 s) |
 
 **Mage (cloth)**
@@ -303,7 +316,8 @@ weaponCrit, spellCrit, spellCast, kill.
 | Set | Spec | 2-piece | 4-piece |
 |---|---|---|---|
 | Moonscorch Raiment (moonscorch) | balance, Moongrove | +14 Spell Damage | Moonscorch Insight: spell crits grant +25 Spell Damage for 8 s (icd 10 s) |
-| Wildfang Emberhide (wildfang_emberhide) | feral, Wildfang | +25 Stamina | Emberhide: weapon crits grant a 300 absorb shield for 10 s (icd 20 s) |
+| Wildfang Emberhide (wildfang_emberhide) | feral, Wildfang (cat) | +40 attack power | Wildfang Rend: weapon crits apply a stacking physical bleed (3 stacks, 8 per tick) plus +25 crit rating |
+| Cinderbark Ward (cinderbark) | feral, Wildfang (bear tank) | +25 Stamina | Cinderbark: weapon crits grant +15 percent dodge for 6 s (icd 20 s) |
 | Grovespring Raiment (grovespring) | restoration, Groveheart | +25 Healing Power | Grovespring Bloom: heal casts have an 8 percent chance to grant +10 percent healing done for 8 s (icd 15 s) |
 
 Implementation notes for the bonuses:
@@ -314,10 +328,13 @@ Implementation notes for the bonuses:
 - Every 4-piece proc needs a color row in SET_PROC_FX_BY_ID
   (src/render/renderer.ts) or it renders without its swirl.
 - Tank and healer 4-pieces share mechanical families across classes on
-  purpose: 27 fully bespoke mechanics is a tuning surface this phase cannot
+  purpose: 29 fully bespoke mechanics is a tuning surface this phase cannot
   validate. Flavor names and stat identities differentiate; mechanics come
-  from five proven families (bleed/dot, attack power surge, haste surge,
-  spell damage surge, free cast, absorb ward, pet surge, healing done).
+  from proven families (bleed/dot, attack power surge, haste surge, spell
+  damage surge, free cast, absorb ward, dodge surge, pet surge, healing
+  done). The Cinderbark dodge proc uses the existing buff_dodge aura kind
+  (the WARFARE Thornguard precedent), giving the Agility tank avoidance
+  where the mail tanks get absorb wards.
 
 ## Tokens and redemption
 
@@ -344,13 +361,14 @@ three classes, exactly the heroic_mark pattern.
 A new Crucible Quartermaster NPC stands in the Halls of the First Tempering
 beside the raid entrance (id `crucible_quartermaster`). A new content module
 (the ignivar vendor, mirroring src/sim/content/heroic_vendor.ts +
-src/sim/instances/heroic_vendor.ts) lists all 135 set pieces, each priced at
+src/sim/instances/heroic_vendor.ts) lists all 145 set pieces, each priced at
 exactly one token of the matching slot and group. The buy path validates the
 buyer's class against the piece's requiredClass, so a priest holding a Helm
 Sigil of the Anvil sees and chooses among exactly three helms: Creed of
-Embers, Benison Dawnweave, or Vesperash. This is the per-spec choice moment,
-and it is deliberate: one token serves three classes and each class then
-picks its spec.
+Embers, Benison Dawnweave, or Vesperash. A druid or shaman chooses among
+four, because their hybrid spec carries both a damage and a tank set. This
+is the per-spec choice moment, and it is deliberate: one token serves three
+classes and each class then picks its spec and role.
 
 The vendor purchase path debits one token by item id through the same
 inventory seam the Heroic Quartermaster uses for marks. No new server
@@ -374,7 +392,7 @@ finalized during implementation; ids `crucible_<variant>_<slot>` style:
 |---|---|---|
 | Cloth spell damage | Cord of the Last Flame | Cindersoaked Slippers |
 | Cloth healing | Springbinder Sash | Steps of Quiet Water |
-| Leather tanking | Emberhide Cinch | Wildfang Treads |
+| Leather tanking | Cinderbark Cinch | Ashenbark Treads |
 | Leather dps | Slagstalker Belt | Ashrunner Boots |
 | Leather spell damage | Moonscorch Waistwrap | Scorchgrove Striders |
 | Leather healing | Grovetender Belt | Dewfall Moccasins |
@@ -469,7 +487,7 @@ weapon, one neck.
 Five guaranteed drops per kill: two tier tokens (the end boss owns the chest
 and helm, the prestige slots), one weapon, one off-set piece, one ring.
 
-A full clear pays five tokens, so a 10-player group completes 27 five-piece
+A full clear pays five tokens, so a 10-player group completes 29 five-piece
 sets over a long, classic-feeling campaign; later bosses accelerate this by
 taking over token slots (below).
 
@@ -494,8 +512,8 @@ Every implementation slice carries its same-change obligations (root
 CLAUDE.md, content-obligations-reviewer):
 
 - **Item art**: one committed public/ui/items/<id>.webp per non-weapon item.
-  The table adds 192 new item ids total (135 set pieces, 15 sigils, 20
-  waist/feet, 8 jewelry, 4 held/shield, 10 weapons); the 182 non-weapon ids
+  The table adds 202 new item ids total (145 set pieces, 15 sigils, 20
+  waist/feet, 8 jewelry, 4 held/shield, 10 weapons); the 192 non-weapon ids
   each need an icon, while the 10 weapons register through the weapon
   variant tables instead. Generated through the assets:items pipeline with
   provenance rows in mapping.json; ITEM_IMAGE_IDS auto-picks up non-weapon
@@ -531,8 +549,8 @@ Each phase is a reviewable commit (or small commit series) with its tests:
    heal paths, tooltip, parity pin); IGNIVAR_RAID_LOOT_SOURCE_LEVEL
    registration in the item-level source index; token redemption vendor seam
    (content + instances modules mirroring the heroic vendor).
-3. **Sets**: ITEM_SETS declarations for all 27 families with the shared
-   bonus-family constants; the 135 set-piece ItemDefs in a new
+3. **Sets**: ITEM_SETS declarations for all 29 families with the shared
+   bonus-family constants; the 145 set-piece ItemDefs in a new
    src/sim/content/ignivar_loot.ts (data-as-code, large is correct); the 15
    sigil tokens; vendor stock wiring.
 4. **Off-set, weapons, jewelry, boss tables**: the 42 direct-drop items and
@@ -557,5 +575,5 @@ Each phase is a reviewable commit (or small commit series) with its tests:
 4. **Drop cadence**: five guaranteed items per boss kill (Nythraxis pays
    four plus a bonus group from its single boss). Confirm for a two-boss
    clear.
-5. **Set names**: the 27 names above are proposals; vetoes are cheap until
+5. **Set names**: the 29 names above are proposals; vetoes are cheap until
    the art wave mints.
