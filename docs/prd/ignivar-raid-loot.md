@@ -57,15 +57,117 @@ What the review says about the current model, and what this tier changes:
    Heroic Marks currency (heroic_mark item + the Heroic Quartermaster stock in
    src/sim/content/heroic_vendor.ts), which this tier extends into per-slot,
    class-group tokens.
-4. **Existing bonus structure is 2/3/4 with a 4-piece proc.** The archetype
-   bonus tables (attack power at 2, primary stats plus haste rating at 3, a
-   proc plus hit rating at 4) are sound and the resolver surface
-   (SetBonusEffect + SetProc) is rich enough for this tier: the new sets keep
-   the same machinery with 5-piece families and 2/4 breakpoints.
+4. **Existing bonus structure is 2/3/4 with a 4-piece proc.** The resolver
+   surface (SetBonusEffect + SetProc) is rich enough for this tier: the new
+   sets keep the same machinery with 5-piece families and 2/4 breakpoints.
+   The magnitudes of the incumbent bonuses, however, are a launch blocker
+   for this tier; see "Prerequisite: retune the incumbent set stack".
 5. **Budget enforcement is real.** tests/item_level.test.ts sweeps every
    shipped item against primaryStatBudget, so every new piece must land its
    exact primary-stat budget. Ratings, spellPower, and armor are off that
    budget by design (the heroic_loot.ts convention).
+
+## Prerequisite: retune the incumbent set stack
+
+### The evidence
+
+Audited 2026-08-26 against the live parse service (the rankings and fight
+read API behind parses.worldofclaudecraft.com): the top five Nythraxis
+parses per spec, both difficulties, best-per-character, with each top
+parser's equipment snapshot classified by set membership (252 top parses,
+187 distinct fights).
+
+Result: the top parsers of essentially every spec wear six to seven old-set
+pieces at once. The universal pattern is the tier-2 four-piece plus the
+tier-1 three-piece, which is possible because the two tiers deliberately
+occupy complementary slots: tier 2 covers helmet, shoulder, gloves, waist
+and tier 1 covers chest, legs, feet (plus one overlap piece). The rank-one
+fury warrior (310 DPS, the top Normal parse alongside combat rogue 330 and
+enhancement 320) wears exactly crownforged helm, shoulder, gloves, waist
+plus deathlord chest, legs, feet. Casters do the same with soulflame plus
+necromancers, mail casters with stormcallers plus necromancers. 36 percent
+of the worn set pieces are heroic variants: makeHeroicVariant spreads the
+base def, so the `set` tag rides the item-level ladder to 33 and the
+bonuses never have to be broken to upgrade.
+
+What the double stack pays (Strength archetype): 80 flat attack power (two
+2-piece tiers), 30 primary stats (two 3-piece tiers), 7.5 percent haste,
+6 percent Hit, and the Bonesplinter bleed (roughly another 40 attack power
+of sustained damage). Casters: 40 flat spell power, 25 primary stats, 7.5
+percent haste, full cast-pushback immunity, and the Soulblaze proc. Against
+that, an item-level-35 upgrade offers a few primary-stat points per slot
+and one ratings step; the new tier's own 2-piece plus 4-piece is far
+smaller than what breaking the old stack forfeits. The new sets would be
+dead on arrival for exactly the players they target. Confirmed both by the
+math and by live behavior: the playerbase has already solved this ladder,
+and the answer is the old stack.
+
+### Root causes
+
+1. **Cross-tier stacking.** Tier 1 and tier 2 families share an archetype
+   but not slots, so their bonuses sum. Any new tier competes with the
+   combined package of two sets, not one.
+2. **Bonus magnitudes sized like a tier, not like a bonus.** 7.5 percent
+   haste at 3 pieces and 6 percent Hit at 4 pieces dwarf the per-slot
+   item-level deltas (0.7 primary points per level times slot mult) and
+   even the whole ratings ladder step (40 to 55 to 65 rating).
+3. **Heroic variants inherit set tags**, so the classic tradeoff (break
+   the set to wear higher item level) never occurs; the stack upgrades in
+   place.
+
+### The retune
+
+Halve the incumbent throughput bonuses so the summed old stack sits below
+the value of a full new-tier kit, while keeping every old set worth
+completing for a fresh level-20. Exact targets (shared constants keep this
+a small diff in item_sets.ts; bonus text updates in the same change):
+
+| Bonus | Today | Retuned |
+|---|---|---|
+| SET_HASTE_3PC_RATING (t1/t2/haste kits) | 150 (7.5 percent) | 80 (4 percent) |
+| SET_HIT_4PC_RATING (t2 4-piece) | 60 (6 percent) | 30 (3 percent) |
+| Strength/Agility 2-piece attack power (t1 and t2) | 40 | 25 |
+| Caster 2-piece spell power (t1 and t2) | 20 | 12 |
+| Caster 2-piece cast pushback | full immunity | 50 percent; full immunity moves to the new tier's caster and healer 2-piece bonuses |
+| 3-piece primary stat pairs (all t1/t2) | 15/15 | 10/10 (t1 agility keeps its 1 percent crit) |
+| Gravemight proc (t1 Strength 4-piece) | 60 attack power | 40 |
+| Fangrush proc (t1 Agility 4-piece) | 25 percent attack speed | 15 percent |
+| Clearcasting proc (t1 caster 4-piece) | 10 percent chance | 6 percent chance |
+| Soulblaze proc (t2 caster 4-piece) | 40 spell power | 25 |
+| Bonesplinter bleed (t2 Strength 4-piece) | 8 per tick per stack | 5 |
+| Ragged Gash bleed (t2 Agility 4-piece) | 6 per tick per stack | 4 |
+
+SET_HASTE_3PC (the test-pinned literal) moves with its rating in the same
+change. WARFARE families are untouched (already PvE-inert). The haste
+leveling kits ride the shared constant down, which is acceptable for
+leveling gear. Heroic set-tag inheritance stays: it is fine once the
+magnitudes are sane, and stripping tags from heroic variants would
+invalidate loot players already won.
+
+After the retune the Strength double stack pays roughly 50 attack power,
+20 stats, 4 percent haste, 3 percent Hit, and a lighter bleed. A full new
+kit answers with the 2-piece and 4-piece of its own set, two more item
+levels of budget over the heroic-33 copies, the 60/25 ratings step, and
+for casters and healers the Spell Damage and Healing Power affix debut
+(a five-piece caster set carries roughly 58 authored Spell Damage the old
+stack simply does not have). The intended outcome is a clear but not
+insulting upgrade path; exact margins are measured, not asserted (below).
+
+### Guard
+
+A new balance harness test (the warfare_balance_harness pattern) assembles
+the best old-stack kit and the best new-tier kit per representative
+archetype (Strength melee, Agility melee, damage caster, healer, tank) and
+pins that the new kit wins on the harness metric by a real margin, in
+absolute DPS and HPS. This test is the acceptance gate for both the retune
+numbers and the new tier's bonus numbers, and it keeps the next tier from
+recreating this problem silently.
+
+### Sequencing
+
+The retune lands on this PR, in the same release as the new loot: softening
+the incumbent stack only when the replacement chase exists. It must never
+ship on its own ahead of the raid loot.
 
 ## Itemization framework
 
@@ -322,6 +424,11 @@ weaponCrit, spellCrit, spellCast, kill.
 
 Implementation notes for the bonuses:
 
+- Every damage caster and healer set's 2-piece ALSO grants full cast
+  pushback immunity (castPushbackReduction 1), taking over the utility the
+  incumbent caster sets give up in the retune (their 2-piece drops to 50
+  percent). Pushback max-combines in the resolver, so wearing old and new
+  together never exceeds immunity.
 - "Heal casts" use the existing spellCast trigger; the proc aura kinds all
   exist today (next_cast_free, buff_ap, buff_haste, buff_spelldmg,
   buff_healing_done, pet_damage_pct, absorb, dot).
@@ -549,19 +656,25 @@ Each phase is a reviewable commit (or small commit series) with its tests:
    heal paths, tooltip, parity pin); IGNIVAR_RAID_LOOT_SOURCE_LEVEL
    registration in the item-level source index; token redemption vendor seam
    (content + instances modules mirroring the heroic vendor).
-3. **Sets**: ITEM_SETS declarations for all 29 families with the shared
+3. **Incumbent retune**: the item_sets.ts constant and proc changes from
+   "Prerequisite: retune the incumbent set stack", their bonus-text
+   updates, and the old-versus-new balance harness test (initially pinning
+   the retuned old-stack values; the new-kit comparison arm lands with
+   phase 5).
+4. **Sets**: ITEM_SETS declarations for all 29 families with the shared
    bonus-family constants; the 145 set-piece ItemDefs in a new
    src/sim/content/ignivar_loot.ts (data-as-code, large is correct); the 15
    sigil tokens; vendor stock wiring.
-4. **Off-set, weapons, jewelry, boss tables**: the 42 direct-drop items and
-   both bosses' rollGroup tables; budget and progression tests green.
-5. **Art and i18n wave**: 192 icons via the pipeline, catalog names, M16
+5. **Off-set, weapons, jewelry, boss tables**: the 42 direct-drop items and
+   both bosses' rollGroup tables; budget and progression tests green; the
+   harness test's old-versus-new comparison arm.
+6. **Art and i18n wave**: 192 icons via the pipeline, catalog names, M16
    fills, quartermaster entity names.
-6. **Obligations closeout**: deeds, reliquary, wiki regen, set proc FX rows,
+7. **Obligations closeout**: deeds, reliquary, wiki regen, set proc FX rows,
    qa-checklist + content-obligations-reviewer pass.
-7. **Tuning pass**: DPS/HPS harness comparison against the Nythraxis-tier
-   baselines; confirm the proposed rating/affix constants; adjust set proc
-   numbers.
+8. **Tuning pass**: DPS/HPS harness comparison against the Nythraxis-tier
+   baselines; confirm the proposed rating/affix constants and the retune
+   magnitudes; adjust set proc numbers.
 
 ## Open questions for the maintainer
 
@@ -577,3 +690,7 @@ Each phase is a reviewable commit (or small commit series) with its tests:
    clear.
 5. **Set names**: the 29 names above are proposals; vetoes are cheap until
    the art wave mints.
+6. **Retune magnitudes**: the halved values in "Prerequisite: retune the
+   incumbent set stack" are design targets sized to put the old double
+   stack under a full new kit; the harness test measures the real margin
+   before any number ships.
