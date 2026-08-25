@@ -47,6 +47,20 @@ const baseEnTable = {
   'error.bankMaxSlots': 'Your bank cannot be expanded further.',
   'error.bankTooFar': 'You are too far from the banker.',
   'log.bankSlotsPurchased': 'You purchase additional bank slots.',
+  // The Shardpike trial (src/sim/lance_trial.ts): the brace/thrust refusals and the
+  // set/fumble/blind notices. Placeholder-free, so all register in the EXACT matcher.
+  'error.lanceNeedPike': "You need Skerrit's Shardpike in hand.",
+  'error.lanceResting': 'The pike needs a moment to be re-set.',
+  'error.lanceNeedGround': 'You need solid ground under you.',
+  'error.lanceMounted': 'Not from the saddle.',
+  'error.lanceNotSet': 'The pike is not set.',
+  'error.lanceNoTarget': 'Nothing worth the point in reach.',
+  'error.lanceShoved': 'The stance is broken!',
+  'error.lanceFumbled': 'You fumble the Shardpike!',
+  'error.lanceWindowOver': 'The moment passes.',
+  'log.lanceBraced': 'You couch the Shardpike. Hold it true.',
+  'log.lanceSet': 'The pike is set. STRIKE!',
+  'log.lanceBlinded': 'Your thrust finds the Loomshard. The Barrowhide sloughs away!',
   // Guild Bank (src/sim/guild_bank.ts): the officer-plus shared treasury +
   // item store. The error.* lines are the refusal toasts (too-far, quest-item,
   // and "Not enough money." reuse the existing rows above / the hud arm); the

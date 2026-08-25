@@ -2281,6 +2281,7 @@ const ITEM_ENTITY_IDS = [
   'fenshadow_maul',
   // Mirefen world-boss spoils.
   'foremans_barrowmaul',
+  'skerrits_shardpike',
   'loomshard_eye',
   'barrowhide_pauldrons',
   'mirestone_stride',
@@ -2462,6 +2463,8 @@ type ItemEntityTranslations = Record<ItemEntityId, ItemEntityTranslation>;
 const APPENDED_ITEM_NAMES: Partial<Record<ItemEntityId, string>> = {
   // Mirefen world-boss spoils.
   foremans_barrowmaul: "Foreman's Barrowmaul",
+  // The quest tool the world boss's level-spread mechanic runs on, not a spoil.
+  skerrits_shardpike: "Skerrit's Shardpike",
   loomshard_eye: 'The Loomshard Eye',
   barrowhide_pauldrons: 'Barrowhide Pauldrons',
   mirestone_stride: 'Mirestone Stride',

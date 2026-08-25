@@ -200,6 +200,7 @@ const COVERED_CLIP_FIELDS = new Set<keyof ClipMap>([
   'hit',
   'attackByAbility',
   'attackTimeScaleByAbility',
+  'chargeGlowByAbility',
   'attackByHand',
   'emote',
 ]);
@@ -251,6 +252,22 @@ describe('character ClipMaps match the shipped GLBs', () => {
         (field) => !COVERED_CLIP_FIELDS.has(field as keyof ClipMap),
       );
       expect(unknown, `${key} has ClipMap fields the gate does not check`).toEqual([]);
+    }
+  });
+
+  it('keeps every charge-glow spec inside its own mechanic', () => {
+    // `chargeGlowByAbility` names no clip, so it rides the covered-fields list rather than
+    // requiredClipNames; this is the check that replaces the one it skips. A glow that
+    // outlives its windup is still burning when the blow lands, which reads as a mechanic
+    // that never resolved, and a rise longer than the whole life never reaches full at all.
+    for (const [key, def] of rigs) {
+      for (const [ability, spec] of Object.entries(def.clips.chargeGlowByAbility ?? {})) {
+        expect(spec.seconds, `${key}/${ability} glow has no life`).toBeGreaterThan(0);
+        expect(spec.rise, `${key}/${ability} glow never reaches full`).toBeLessThanOrEqual(
+          spec.seconds,
+        );
+        expect(spec.radius, `${key}/${ability} glow has no size`).toBeGreaterThan(0);
+      }
     }
   });
 

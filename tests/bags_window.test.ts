@@ -11,6 +11,10 @@ const view = readFileSync(new URL('../src/ui/bags_view.ts', import.meta.url), 'u
 const promptDialog = readFileSync(new URL('../src/ui/prompt_dialog.ts', import.meta.url), 'utf8');
 const tokens = readFileSync(new URL('../src/styles/tokens.css', import.meta.url), 'utf8');
 const hud = readFileSync(new URL('../src/ui/hud.ts', import.meta.url), 'utf8');
+const bagCurrency = readFileSync(
+  new URL('../src/ui/bag_currency_html.ts', import.meta.url),
+  'utf8',
+);
 const components = readFileSync(new URL('../src/styles/components.css', import.meta.url), 'utf8');
 
 describe('bags_window: no magic values', () => {
@@ -53,7 +57,12 @@ describe('bags_window: accessibility contract', () => {
 
 describe('bags_window: load-bearing behaviors preserved', () => {
   it('uses the branded Claudium icon and matching balance color', () => {
-    expect(hud).toContain('src="/claudium/icons/claudium_coin_64.webp"');
+    // The markup moved out of hud.ts into bag_currency_html.ts (the two bag-header currency
+    // chips are pure value-to-markup and needed nothing from the coordinator). Scraped from
+    // its new home rather than deleted: the point of the pin is that the BRANDED asset is
+    // the one referenced, and a scrape of a file that no longer contains the string passes
+    // vacuously the moment it goes missing.
+    expect(bagCurrency).toContain('src="/claudium/icons/claudium_coin_64.webp"');
     expect(components).toMatch(/\.claudium-launcher\s*\{[^}]*color:\s*#9eeeff;/s);
   });
 

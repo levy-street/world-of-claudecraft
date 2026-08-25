@@ -333,8 +333,8 @@ describe('item-art consistency accepted-art provenance', () => {
       },
       {
         path: `${evidenceDir}/final-item-art-audit-verdict.json`,
-        acceptedSha256: 'c6d35e041406bb51058324ed99f53978ce4e6ce3a3aeabf91cb7e872395d6aff',
-        acceptedBytes: 108_325,
+        acceptedSha256: '973a4606494c1870793672c4c2097b41e3ef5bc7ebbc750e426b10cc1de241e6',
+        acceptedBytes: 109236,
       },
     ]);
     for (const evidence of [...value.sourceEvidence, ...value.generationReports]) {
@@ -449,9 +449,9 @@ describe('item-art consistency accepted-art provenance', () => {
     expect(readme).toContain('node scripts/item_art_audit.mjs\n');
     expect(readme).toContain('node scripts/item_art_audit.mjs --refresh-verdict');
     const verdictBytes = readFileSync(path.join(repoRoot, verdictPath));
-    expect(verdictBytes.length).toBe(108_325);
+    expect(verdictBytes.length).toBe(109236);
     expect(sha256(verdictBytes)).toBe(
-      'c6d35e041406bb51058324ed99f53978ce4e6ce3a3aeabf91cb7e872395d6aff',
+      '973a4606494c1870793672c4c2097b41e3ef5bc7ebbc750e426b10cc1de241e6',
     );
     const verdict = JSON.parse(verdictBytes.toString('utf8')) as FinalAuditVerdict;
 
@@ -460,8 +460,8 @@ describe('item-art consistency accepted-art provenance', () => {
       baselineCommit: 'aee195551b5aef628eb7a72192117d7e3079818e',
       branch: 'feature/placeholder-art-completion-v036',
       shippingDirectory: 'public/ui/items',
-      itemArtFilesReviewed: 827,
-      liveItemDefinitions: 842,
+      itemArtFilesReviewed: 828,
+      liveItemDefinitions: 843,
       generatedHeroicDefinitions: 64,
       heroicDefinitionsWithOwnWebp: 48,
       heroicWeaponArtAliases: 16,
@@ -471,7 +471,7 @@ describe('item-art consistency accepted-art provenance', () => {
       manifest().targetSets.items.map((id) => `public/ui/items/${id}.webp`),
     );
     expect(Object.values(verdict.auditScope.groups).reduce((sum, count) => sum + count, 0)).toBe(
-      827,
+      828,
     );
     // Still 22: the audit groups by SLOT, so the world-boss spoils land in the existing
     // armor-feet / armor-neck / armor-shoulder / weapon groups rather than adding one.
@@ -518,13 +518,13 @@ describe('item-art consistency accepted-art provenance', () => {
     ]);
     expect(verdict.visualVerdict).toMatchObject({
       status: 'pass',
-      passCount: 827,
+      passCount: 828,
       watchCount: 0,
       watch: [],
       rejectCount: 0,
       reject: [],
       summary:
-        'All 827 shipping item-art files pass the visual contract: 817 reviewed in the 2026-08-09 campaign (documented retries included), plus the five class-overhaul integration additions owner-reviewed and passed on 2026-08-10, plus the Dawnhold posy addition (project-authored vector illustration) owner-reviewed and passed on 2026-08-12, plus the four Mirefen world-boss spoils owner-reviewed and passed on 2026-08-18.',
+        "All 828 shipping item-art files pass the visual contract: 817 reviewed in the 2026-08-09 campaign (documented retries included), plus the five class-overhaul integration additions owner-reviewed and passed on 2026-08-10, plus the Dawnhold posy addition (project-authored vector illustration) owner-reviewed and passed on 2026-08-12, plus the four Mirefen world-boss spoils owner-reviewed and passed on 2026-08-18, plus Skerrit's Shardpike (the world-boss quest tool, which gained a held model and therefore painted inventory art) owner-reviewed and passed on 2026-08-20.",
     });
     expect(verdict.visualVerdict.passIds).toEqual(currentIds);
     expect(verdict.nonVisualContentWatch).toEqual([
@@ -564,8 +564,8 @@ describe('item-art consistency accepted-art provenance', () => {
 
     expect(verdict.evidence.catalog).toEqual({
       path: 'tmp/imagegen/item-art-consistency/final-audit/catalog.json',
-      sha256: '1b1bc1bd54c05b187c76cc16580655839fbe8661bc94b015e23f927eb95c9ff0',
-      bytes: 453_864,
+      sha256: '18ff863218a06da7dc88fae12fa067e7fbacb7579d1a6e37cd0362c15ff8b0fc',
+      bytes: 454391,
     });
     expect(verdict.evidence.rendererFingerprint).toBe(
       'fd92c41a206cd55b05a1de94c4789f6eb6ca4200d063f4bbd284c21ae03b6082',
@@ -628,7 +628,7 @@ describe('item-art consistency accepted-art provenance', () => {
       shippingCatalogDigest.update(`${id}\0${sha256(bytes)}\0${bytes.length}\n`);
     }
     expect(verdict.evidence.shippingCatalogSha256).toBe(
-      'ae54a999c6eba4ed98fc91c14d3776fc73fb4403dfc16db895ba5d6ca5f5f3c0',
+      '87fa60c4a44fef1de789aec555b382851b7cabe304a8befb46449ffd50d06e72',
     );
     expect(shippingCatalogDigest.digest('hex')).toBe(verdict.evidence.shippingCatalogSha256);
   });
@@ -741,7 +741,8 @@ describe('item-art consistency accepted-art provenance', () => {
     expect(mapping.entries).toHaveLength(40);
     expect(mapping.entries.every(({ license }) => Boolean(license))).toBe(true);
     // 17 with the Mirefen world boss batch (balgath-boss-icons-2026-08-18).
-    expect(mapping.generatedBatches).toHaveLength(17);
+    // 18 with the Shardpike mechanic batch.
+    expect(mapping.generatedBatches).toHaveLength(18);
     const batch = mapping.generatedBatches.find(({ batchId }) => batchId === BATCH_ID);
     expect(batch).toBeDefined();
     expect(batch).toMatchObject({
@@ -758,13 +759,15 @@ describe('item-art consistency accepted-art provenance', () => {
     const oldGeneratedIds = mapping.generatedBatches
       .filter(({ batchId }) => batchId !== BATCH_ID)
       .flatMap(({ itemIds }) => itemIds);
-    expect(oldGeneratedIds).toHaveLength(513);
+    // 514 with the Shardpike mechanic batch's one weapon id.
+    expect(oldGeneratedIds).toHaveLength(514);
     const allCurrentOwnerIds = [
       ...mapping.entries.map(({ itemId }) => itemId),
       ...mapping.generatedBatches.flatMap(({ itemIds }) => itemIds),
     ];
-    expect(allCurrentOwnerIds).toHaveLength(827);
-    expect(new Set(allCurrentOwnerIds).size).toBe(827);
+    // 828 with Skerrit's Shardpike.
+    expect(allCurrentOwnerIds).toHaveLength(828);
+    expect(new Set(allCurrentOwnerIds).size).toBe(828);
     expect(batch?.provenanceRecords).toEqual([
       `${evidenceDir}/accepted-art.json`,
       `${evidenceDir}/supersession-audit.json`,
@@ -900,8 +903,10 @@ describe('item-art consistency accepted-art provenance', () => {
     for (const id of ownerIds) ownerCountById.set(id, (ownerCountById.get(id) ?? 0) + 1);
 
     const violations: string[] = [];
-    if (ownerIds.length !== 827) violations.push(`mapping owner count: ${ownerIds.length} != 827`);
-    if (fileIds.length !== 827) violations.push(`shipping WebP count: ${fileIds.length} != 827`);
+    // 828: the 827-icon catalog plus Skerrit's Shardpike, whose held model put it in the
+    // weapon registry and therefore obliged it painted inventory art.
+    if (ownerIds.length !== 828) violations.push(`mapping owner count: ${ownerIds.length} != 828`);
+    if (fileIds.length !== 828) violations.push(`shipping WebP count: ${fileIds.length} != 828`);
     for (const id of ids) {
       const ownerCount = ownerCountById.get(id) ?? 0;
       if (ownerCount !== 1) violations.push(`${id}: current owner count ${ownerCount} != 1`);

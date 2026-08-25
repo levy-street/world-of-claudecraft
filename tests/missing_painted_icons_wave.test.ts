@@ -240,6 +240,8 @@ const ALLOWED_REFERENCE_ROLES = [
 // Choice-row talents, modifier art, retired summon paintings, and pet signature
 // actions are image ids without live ABILITIES rows by design.
 const PRESERVED_IMAGE_BACKED_MODIFIER_IDS = [
+  // The Shardpike bar's three verbs: painted art on a quest tool's ACTIONS, which have no
+  // ABILITIES row of their own to be image-backed from.
   'anger_management',
   'attack',
   'battle_rhythm',
@@ -253,6 +255,9 @@ const PRESERVED_IMAGE_BACKED_MODIFIER_IDS = [
   'elemental_convergence',
   'emberkin_felbolt',
   'gloomshade_abyssal_chain',
+  'lance_brace',
+  'lance_release',
+  'lance_thrust',
   'lingering_dread',
   'overflowing_power',
   'pursuit',

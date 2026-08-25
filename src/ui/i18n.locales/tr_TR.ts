@@ -11298,6 +11298,7 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'entities.items.duskthorn_mantle.name': 'Alacadiken Pelerini',
   'entities.items.fenbark_leggings.name': 'Bataklık Kabuğu Tozlukları',
   'entities.items.fenshadow_maul.name': 'Bataklık Gölgesi Balyozu',
+  'entities.items.skerrits_shardpike.name': 'Skerrit’in Kıymık Kargısı',
   'entities.items.foremans_barrowmaul.name': 'Ustabaşının Höyük Balyozu',
   'entities.items.loomshard_eye.name': 'Tezgah Kırığı Gözü',
   'entities.items.barrowhide_pauldrons.name': 'Höyük Omuzlukları',

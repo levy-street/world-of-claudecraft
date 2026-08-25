@@ -58,6 +58,7 @@ import type { IWorldDungeonFinder } from '../src/world_api/dungeon_finder';
 import type { IWorldDungeons } from '../src/world_api/dungeons';
 import type { IWorldEntityRoster } from '../src/world_api/entity_roster';
 import type { IWorldGuildBank } from '../src/world_api/guild_bank';
+import type { IWorldLanceTrial } from '../src/world_api/lance_trial';
 import type { IWorldInteraction } from '../src/world_api/interaction';
 import type { IWorldInventory } from '../src/world_api/inventory';
 import type { IWorldLoot } from '../src/world_api/loot';
@@ -320,6 +321,13 @@ export const IWORLD_MEMBERS = [
   { name: 'lockpickEngage', kind: 'method' },
   { name: 'lockpickAction', kind: 'method' },
   { name: 'lockpickAbort', kind: 'method' },
+  // The Shardpike trial (world_api/lance_trial.ts).
+  { name: 'lanceTrial', kind: 'data' },
+  { name: 'lanceRestRemaining', kind: 'data' },
+  { name: 'lanceGuidance', kind: 'data' },
+  { name: 'lanceBrace', kind: 'method' },
+  { name: 'lanceThrust', kind: 'method' },
+  { name: 'lanceRelease', kind: 'method' },
   { name: 'collectDelveChestLoot', kind: 'method' },
   { name: 'delveRiteChoose', kind: 'method' },
   { name: 'delveRun', kind: 'data' },
@@ -596,7 +604,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
     // (IWorldInventory, a method), leaving 321. Civic service anchors add
     // civicServicePlacements (IWorldInteraction, data), leaving 322. The market
     // Sell-tab price reference adds marketSellPriceCheck (IWorldMarket, a
-    // method), leaving 323.
+    // method), leaving 323; +5 for the Shardpike trial (2 data + 3 method), 328.
     //
     // NOTE for the next merge, four syncs run now: BOTH sides of this pin move
     // it independently every cycle. Twice git merged identical numbers with no
@@ -606,9 +614,9 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
     // even when the total agrees. Only running the suite says what these
     // numbers really are; never reconcile them by arithmetic in the diff (the
     // numbers below were set from a suite run, not from this narrative).
-    expect(IWORLD_MEMBERS.length).toBe(323);
-    expect(DATA_MEMBERS.length).toBe(86);
-    expect(METHOD_MEMBERS.length).toBe(237);
+    expect(IWORLD_MEMBERS.length).toBe(329);
+    expect(DATA_MEMBERS.length).toBe(89);
+    expect(METHOD_MEMBERS.length).toBe(240);
   });
   it('has no duplicate member names', () => {
     const names = IWORLD_MEMBERS.map((m) => m.name);
@@ -771,6 +779,12 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'inventory',
       'joinCardDuelQueue',
       'known',
+      'lanceBrace',
+      'lanceGuidance',
+      'lanceRelease',
+      'lanceRestRemaining',
+      'lanceThrust',
+      'lanceTrial',
       'lastCraftResult',
       'lastDisenchantResult',
       'lastEnchantResult',
@@ -989,6 +1003,9 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'honor',
       'inventory',
       'known',
+      'lanceGuidance',
+      'lanceRestRemaining',
+      'lanceTrial',
       'lastCraftResult',
       'lastDisenchantResult',
       'lastEnchantResult',
@@ -1148,6 +1165,9 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'ignoreRemove',
       'interact',
       'joinCardDuelQueue',
+      'lanceBrace',
+      'lanceRelease',
+      'lanceThrust',
       'leaderboard',
       'learnRiding',
       'leaveCardDuelQueue',
@@ -1378,6 +1398,20 @@ const FACET_TARGETING = [
 ] as const satisfies readonly (keyof IWorldTargeting)[];
 type _ExhaustTargeting = AssertNever<
   Exclude<keyof IWorldTargeting, (typeof FACET_TARGETING)[number]>
+>;
+
+// The Shardpike trial (world_api/lance_trial.ts): the wielder's own beam and rest clock, the
+// guidance the loud prompt paints, and the three verbs.
+const FACET_LANCE_TRIAL = [
+  'lanceTrial',
+  'lanceRestRemaining',
+  'lanceGuidance',
+  'lanceBrace',
+  'lanceThrust',
+  'lanceRelease',
+] as const satisfies readonly (keyof IWorldLanceTrial)[];
+type _ExhaustLanceTrial = AssertNever<
+  Exclude<keyof IWorldLanceTrial, (typeof FACET_LANCE_TRIAL)[number]>
 >;
 
 const FACET_INTERACTION = [
@@ -1851,13 +1885,15 @@ const FACET_MEMBER_ARRAYS: Readonly<Record<string, readonly string[]>> = {
   deeds: FACET_DEEDS,
   reliquary: FACET_RELIQUARY,
   actionBar: FACET_ACTION_BAR,
+  lanceTrial: FACET_LANCE_TRIAL,
 };
 
 describe('W1: aggregate IWorld member set equals the disjoint union of the facets', () => {
   it('pins the facet count', () => {
     // +1 battleground facet (Thornhollow Fields) on the release line; +1
-    // Reliquary facet on this branch: 33 total.
-    expect(Object.keys(FACET_MEMBER_ARRAYS).length).toBe(33);
+    // Reliquary facet on this branch; +1 lance-trial facet (the Shardpike world-boss
+    // mechanic): 34 total.
+    expect(Object.keys(FACET_MEMBER_ARRAYS).length).toBe(34);
   });
 
   it('each facet array is non-empty and internally duplicate-free', () => {
@@ -1885,8 +1921,8 @@ describe('W1: aggregate IWorld member set equals the disjoint union of the facet
 
   it('the facet union equals the pinned IWORLD_MEMBERS set', () => {
     const union = Object.values(FACET_MEMBER_ARRAYS).flatMap((arr) => [...arr]);
-    expect(union.length, 'union size before dedup (catches a duplicated member)').toBe(323);
-    expect(new Set(union).size, 'union size after dedup (catches a duplicated member)').toBe(323);
+    expect(union.length, 'union size before dedup (catches a duplicated member)').toBe(329);
+    expect(new Set(union).size, 'union size after dedup (catches a duplicated member)').toBe(329);
     const sortedUnion = [...union].sort();
     const pinned = IWORLD_MEMBERS.map((m) => m.name).sort();
     expect(sortedUnion).toEqual(pinned);

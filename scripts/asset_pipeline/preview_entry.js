@@ -10,13 +10,24 @@
 import * as THREE from 'three';
 import { MeshoptDecoder } from 'three/examples/jsm/libs/meshopt_decoder.module.js';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
+import { KTX2Loader } from 'three/examples/jsm/loaders/KTX2Loader.js';
 
 const renderer = new THREE.WebGLRenderer({ antialias: true, preserveDrawingBuffer: true });
 renderer.setPixelRatio(1);
 renderer.outputColorSpace = THREE.SRGBColorSpace;
 document.body.appendChild(renderer.domElement);
 
-const loader = new GLTFLoader().setMeshoptDecoder(MeshoptDecoder);
+// Every shipped character body is now KTX2-compressed (KHR_texture_basisu), so a
+// GLTFLoader without a KTX2Loader throws "setKTX2Loader must be called before loading
+// KTX2 textures" and every held-weapon preview silently fails to render. The page has no
+// HTTP origin (lib/preview.mjs injects this bundle with setContent on about:blank), so the
+// transcoder cannot be fetched from a relative path: preview.mjs intercepts this synthetic
+// origin and fulfills both files from public/basis/. That is the SHIPPED transcoder, patch
+// and all, so the preview decodes textures exactly as the client does.
+const TRANSCODER_PATH = 'https://asset-preview.invalid/basis/';
+const ktx2 = new KTX2Loader().setTranscoderPath(TRANSCODER_PATH).detectSupport(renderer);
+
+const loader = new GLTFLoader().setMeshoptDecoder(MeshoptDecoder).setKTX2Loader(ktx2);
 
 function makeLights() {
   const g = new THREE.Group();

@@ -125,11 +125,14 @@ describe('ability icons', () => {
   it('pins every ABILITY_RECIPES key and payload by stable content identity', () => {
     const ids = abilityRecipeIds();
     expect(ids).toEqual([...new Set(ids)].sort((left, right) => left.localeCompare(right)));
-    expect(ids).toHaveLength(436);
+    // 439: the Shardpike bar's three verbs (lance_brace/thrust/release) joined the table
+    // with the Mirefen world boss. They now also ship painted art, so these recipes are the
+    // documented fallback path, and they stay pinned here like every other ability's.
+    expect(ids).toHaveLength(439);
     for (const id of ids) expect(hasExplicitAbilityIcon(id), id).toBe(true);
 
     const identity = ids.map((id) => ({ id, recipe: abilityIconRecipe(id) }));
     const hash = createHash('sha256').update(stableSerialize(identity)).digest('hex');
-    expect(hash).toBe('75db90c0112f17535c921f9c0d12fb904755da9ce532cf77c7a19e7958174a56');
+    expect(hash).toBe('c2816d80076d27a7b8672e8b8a708dd0f676519efe9726003f5d60cf14eea2a6');
   });
 });

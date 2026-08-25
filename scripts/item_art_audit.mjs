@@ -95,8 +95,12 @@ const build = await buildItemArtAudit({
   items,
   mapping,
   expected: {
-    catalogCount: 827,
-    liveItemCount: 842,
+    // 828 with Skerrit's Shardpike: the world-boss quest tool gained a held model, which put
+    // it in the weapon registry and therefore obliged it painted inventory art.
+    catalogCount: 828,
+    // 843: the Mirefen world boss's quest chain added an item definition. Bumped here rather
+    // than in a later sweep because the audit refuses to run at all on a mismatch.
+    liveItemCount: 843,
     generatedHeroicDefinitions: 64,
     heroicDefinitionsWithOwnWebp: 48,
     heroicWeaponArtAliases: 16,

@@ -8,8 +8,53 @@
 /** How long a shockwave ring lives, seconds. */
 export const BALGATH_RING_SECONDS = 0.62;
 
-/** How long the smash crater darkening lingers, seconds. */
-export const BALGATH_CRATER_SECONDS = 3.4;
+/**
+ * How long a crater he punched into the ground stays there, seconds.
+ *
+ * Three minutes and a bit, and the length IS the point. A scorch that fades in a few
+ * seconds is an impact flash; ground that is still torn open long after the fists that
+ * tore it have gone is a record of the fight, and it is the difference between a boss who
+ * visits a landmark and a boss who WRECKED one. It deliberately outlives his death, so a
+ * raid that kills him at the Fenbridge gate walks away past the holes.
+ *
+ * It is a wall-clock life rather than anything keyed to his state on purpose: nothing has
+ * to notice that he died, reset, despawned or was never there, which is exactly the set of
+ * cases a "clear the craters when the fight ends" rule gets wrong one at a time.
+ */
+export const BALGATH_CRATER_SECONDS = 195;
+
+/** Fraction of a crater's life spent fading out at the end. */
+export const BALGATH_CRATER_FADE = 0.28;
+
+/**
+ * The aimed slams' cue ids, which are agreed with the sim rather than imported from it.
+ *
+ * `src/render` may import pure sim leaves, but mob/boss_slams.ts is a SimContext consumer
+ * and pulling it in here would drag the whole simulation into the render bundle for two
+ * string constants. tests/balgath_boss_assets.test.ts welds the two sides instead, the
+ * same way the gait references are welded to the sim's scale.
+ */
+export const BALGATH_HAMMER_ABILITY = 'mob_balgath_hammer';
+export const BALGATH_CLEAVE_ABILITY = 'mob_balgath_cleave';
+
+/** Half-width of the cleave arc in radians; matches the template's halfArcDeg of 60. */
+export const BALGATH_CLEAVE_HALF_ARC = (60 * Math.PI) / 180;
+
+/** Camera trauma for the aimed slams: the hammer is a jolt, the cleave a long shove. */
+export const BALGATH_HAMMER_TRAUMA = 0.3;
+export const BALGATH_CLEAVE_TRAUMA = 0.38;
+
+/**
+ * Debris thrown per unit of blast radius, and why it is not simply proportional.
+ *
+ * A sixteen-yard slam does not throw four times the soil of an eight-yard one; it throws
+ * soil over four times the area, and the eye reads the RIM. Scaling the burst by the
+ * square root of the radius keeps the density along that rim roughly constant, so the big
+ * slams look bigger without the small ones looking empty.
+ */
+export function debrisPowerForBlast(radius: number): number {
+  return Math.min(1.6, Math.sqrt(Math.max(0.5, radius) / 9));
+}
 
 /** Ground-pool radius under the scrying eye, world units. */
 export const BALGATH_EYE_POOL_RADIUS = 5.5;
@@ -112,3 +157,25 @@ export const BALGATH_STRIDE_UNITS = 4.4;
  * on its own, with no cancel event to miss.
  */
 export const EYE_POOL_LEASE_SECONDS = 0.25;
+
+/**
+ * How much of a slam's camera trauma survives the distance to it.
+ *
+ * His slams land across the whole zone, and a boss wrecking a landmark two hundred yards
+ * away must not punch the viewer in the face. Full strength inside `near`, nothing past
+ * `far`, and a squared falloff between so the drop is felt as distance rather than as a
+ * switch. Pure, so the curve is unit-testable without a camera.
+ */
+export function slamShakeFalloff(
+  camera: { x: number; z: number },
+  x: number,
+  z: number,
+  near = 18,
+  far = 95,
+): number {
+  const d = Math.hypot(camera.x - x, camera.z - z);
+  if (d <= near) return 1;
+  if (d >= far) return 0;
+  const t = 1 - (d - near) / (far - near);
+  return t * t;
+}

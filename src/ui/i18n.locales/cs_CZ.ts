@@ -2808,6 +2808,7 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'entities.items.duskthorn_mantle.name': 'Plášť soumračného trnu',
   'entities.items.fenbark_leggings.name': 'Nohavice z bahenní kůry',
   'entities.items.fenshadow_maul.name': 'Palice bahenního stínu',
+  'entities.items.skerrits_shardpike.name': 'Skerritova střepová píka',
   'entities.items.foremans_barrowmaul.name': 'Předákovo mohylové kladivo',
   'entities.items.loomshard_eye.name': 'Oko z útržku Stavu',
   'entities.items.barrowhide_pauldrons.name': 'Mohylové nárameníky',

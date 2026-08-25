@@ -11739,6 +11739,7 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'entities.items.duskthorn_mantle.name': 'Manteau des épines du crépuscule',
   'entities.items.fenbark_leggings.name': 'Jambières en écorce des marais',
   'entities.items.fenshadow_maul.name': 'Marteau des ombres des marais',
+  'entities.items.skerrits_shardpike.name': 'Pique-éclat de Skerrit',
   'entities.items.foremans_barrowmaul.name': 'Maillet Tumulaire du Contremaître',
   'entities.items.loomshard_eye.name': 'L\'Oeil en Éclat du Métier',
   'entities.items.barrowhide_pauldrons.name': 'Spallières Tumulaires',

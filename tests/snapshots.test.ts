@@ -4180,8 +4180,11 @@ const ALL_DELTA_KEYS = [
   'honor',
   'hrat',
   'inv',
+  'lance',
+  'lguide',
   'lhonor',
   'lockouts',
+  'lrest',
   'lroll',
   'lrollg',
   'lxp',
@@ -4278,8 +4281,10 @@ const TERSE_TO_IWORLD: Record<string, string> = {
   hirat: 'hitRating',
   hrat: 'hasteRating',
   inv: 'inventory',
+  lance: 'lanceTrial',
   lhonor: 'lifetimeHonor',
   lockouts: 'selfLockouts',
+  lrest: 'lanceRestRemaining',
   lroll: 'lootRollPrompts',
   lrollg: 'lootRollGroup',
   lxp: 'lifetimeXp',
@@ -4363,6 +4368,13 @@ function dirtyEveryDeltaField(): {
   // before the creator has none), so the fixture stamps one, exactly as the
   // join path does from the character's own column.
   p.modularAppearance = { gender: 'female', hair: 'highbun' };
+
+  // The Shardpike trial (lance + lrest): pike in hand, brace live, rest stamp set.
+  // Brace FIRST (the verb refuses while resting), then stamp the rest window.
+  meta.equipment.mainhand = 'skerrits_shardpike';
+  p.onGround = true;
+  sim.lanceBrace(lp);
+  meta.lanceRestUntil = sim.time + 3;
 
   // Poke the encoder's exact sources for the mutually-exclusive cases.
   const run = sim.delveRunForPlayer(lp) as any;
@@ -5141,7 +5153,7 @@ describe('gather node cooldown wire round trip (ncd)', () => {
 });
 
 describe('delta-key contract pins (anti-drift)', () => {
-  it('ALL_DELTA_KEYS contains exactly 86 unique keys in sorted order', () => {
+  it('ALL_DELTA_KEYS contains exactly 89 unique keys in sorted order', () => {
     // +1: guildBank (Guild Bank Phase 2), +1: the battleground bg key, +1: the
     // commission order board's corder key (issue #1298), +1: the character
     // sheet's lifetime played-time key ptime, for 67, then +16: the static
@@ -5149,15 +5161,18 @@ describe('delta-key contract pins (anti-drift)', () => {
     // hrat/hirat/xp/lxp/rxp/prk/copper/ddiff) moved off the always-present
     // self record and behind this same delta gate, for 83, then +1 reliq
     // (Reliquary Phase 3 sparse blob), +1 aborder (the Book of Deeds nameplate
-    // border echo, atitle's sibling), and +1 `app` (the release's authored
+    // border echo, atitle's sibling), +2 lance/lrest (the Shardpike trial's
+    // self view + rest cooldown), and +1 `app` (the release's authored
     // modular look, which cannot come from the entity list because the
     // broadcast loop skips the viewer's own entity, and which is heavy and
     // immutable so it rides this channel instead of re-serializing per tick),
     // for 86. Every v0.36.0 sync conflicts here because each side pins its own
     // additions alone; the merged tree carries all of them, and this number
-    // came from a run on the merged tree.
-    expect(ALL_DELTA_KEYS).toHaveLength(86);
-    expect(new Set(ALL_DELTA_KEYS).size).toBe(86);
+    // came from a run on the merged tree. Then +1 `lguide` (the Shardpike
+    // guidance the loud on-screen prompt paints: null between pikes, so the
+    // delta only ever ships it to a wielder), for 89.
+    expect(ALL_DELTA_KEYS).toHaveLength(89);
+    expect(new Set(ALL_DELTA_KEYS).size).toBe(89);
     expect([...ALL_DELTA_KEYS]).toEqual([...ALL_DELTA_KEYS].sort());
   });
 
@@ -5188,7 +5203,7 @@ describe('delta-key contract pins (anti-drift)', () => {
     // (ap/sp/sh/crit/dodge/blk/bval/crat/hrat/hirat/xp/lxp/rxp/prk/copper/ddiff)
     // for 83, then reliq (Reliquary Phase 3 sparse blob) for 84, the nameplate
     // border echo aborder for 85, and the authored modular look `app` for 86.
-    expect(scraped.size).toBe(86);
+    expect(scraped.size).toBe(89);
     expect([...scraped].sort()).toEqual([...ALL_DELTA_KEYS].sort());
   });
 

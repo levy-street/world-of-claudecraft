@@ -239,6 +239,8 @@ const UI_PURE_CORES = [
   'src/ui/hud/quest/quest_tracker.ts',
   'src/ui/hud/quest/prof_intro_hint_core.ts',
   'src/ui/hud/pet_bar_core.ts',
+  'src/ui/hud/shardpike/shardpike_bar_view.ts',
+  'src/ui/hud/shardpike/shardpike_prompt_view.ts',
   'src/ui/hud/warlock/doom_meter_view.ts',
   'src/ui/hud/quest/master_craft_core.ts',
   'src/ui/quest_marker_tags.ts',
@@ -443,7 +445,14 @@ const DOM_GLOBAL_VALUE_ALLOWLIST = new Set([join(repoRoot, 'src/ui/safe_local_st
 // post_bloom_shader_core is the host-agnostic GLSL source patch for the
 // identity tint terms in UnrealBloom's composite shader.
 const RENDER_PURE_CORES = [
+  'src/render/balgath_aura_core.ts',
+  'src/render/balgath_debris_core.ts',
+  'src/render/characters/charge_glow_core.ts',
+  'src/render/characters/eye_glow_core.ts',
   'src/render/balgath_fx_core.ts',
+  'src/render/boss_impostor_core.ts',
+  'src/render/eye_ward_marker_core.ts',
+  'src/render/ground_puff_color_core.ts',
   'src/render/entity_view_policy_core.ts',
   'src/render/quest_object_gate_core.ts',
   'src/render/adaptive_link_budget_core.ts',
@@ -1892,6 +1901,9 @@ const UI_DOM_MODULES = [
   'src/ui/talents_window.ts',
   'src/ui/target_auras_window.ts',
   'src/ui/theme.ts',
+  // Binding an element to the shared #tooltip box: six listeners, a touch-peek timer
+  // through window.setTimeout, and the box's own style writes.
+  'src/ui/tooltip_attach.ts',
   'src/ui/touch_item_drag.ts',
   'src/ui/touch_tap.ts',
   'src/ui/town_focus_window.ts',

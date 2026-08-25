@@ -2961,6 +2961,7 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'entities.items.duskthorn_mantle.name': 'Dornendämmer-Umhang',
   'entities.items.fenbark_leggings.name': 'Moorrinden-Beinkleider',
   'entities.items.fenshadow_maul.name': 'Moorschatten-Streitkolben',
+  'entities.items.skerrits_shardpike.name': 'Skerrits Splitterpike',
   'entities.items.foremans_barrowmaul.name': 'Hügelgrabhammer des Vorarbeiters',
   'entities.items.loomshard_eye.name': 'Das Websplitter-Auge',
   'entities.items.barrowhide_pauldrons.name': 'Hügelgrab-Schulterstücke',

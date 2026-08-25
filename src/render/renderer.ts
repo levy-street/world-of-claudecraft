@@ -70,6 +70,7 @@ import {
   GPU_WORK_PRIORITY,
 } from './background_gpu_queue';
 import { BalgathFx, routeBalgathSpellfxAt } from './balgath_fx';
+import { slamShakeFalloff } from './balgath_fx_core';
 import { attachBankerChestToNpcView } from './banker_chest';
 import { type BattlegroundView, buildBattleground } from './battleground';
 import { BattlegroundFx } from './battleground_fx';
@@ -87,6 +88,7 @@ import {
   createBlobShadowSlot,
 } from './blob_shadow_core';
 import { BlobShadows } from './blob_shadows';
+import { BossImpostorField } from './boss_impostor';
 import { type BulwarkFeaturesView, buildBulwarkFeatures } from './bulwark_features';
 import { BurningPactMarkers } from './burning_pact_markers';
 import { createCameraBoom, stepCameraBoom } from './camera_boom_core';
@@ -106,6 +108,7 @@ import {
 } from './camera_feel_core';
 import { buildCampBraziers, type CampBraziersView } from './camp_braziers';
 import { canopyDetailPrewarmTextures } from './canopy_detail';
+import { canvasDataUrlAsync, sleep } from './canvas_capture';
 import { buildCastleFeatures, type CastleFeaturesView } from './castle_features';
 import { buildCelestialSprites, type CelestialSprites } from './celestial_sprites';
 import {
@@ -239,6 +242,7 @@ import { buildEastbrookTownView, type EastbrookTownView } from './eastbrook_town
 import { buildEmberFeatures, type EmberFeaturesView } from './ember_features';
 import { buildEmberPools, type EmberPoolsView } from './ember_pools';
 import {
+  createdViewType,
   entityViewCandidatePriority,
   entityViewDistanceSq,
   entityViewIsAdmitted,
@@ -257,6 +261,8 @@ import {
   ZONE_ENVIRONMENT_RESPONSE,
 } from './environment_transition_core';
 import { EvilEyeMarkers } from './evil_eye_markers';
+import { EyeWardBadgeField, visualHeightFor } from './eye_ward_badge_field';
+import { eyeWardPlanFor } from './eye_ward_marker_drive';
 import { advanceSelfFacing, releaseSelfFacing, wrapAngle } from './facing_smooth';
 import {
   buildFarTerrain,
@@ -326,6 +332,7 @@ import {
   storePooledObject as storeGroundObjectInPool,
   takeOrBuildGroundObject,
 } from './ground_object_pool';
+import { groundPuffColor } from './ground_puff_color_core';
 import { createGroundTilt, type GroundTiltState, stepGroundTilt } from './ground_tilt_core';
 import { buildHauntFeatures, type HauntFeaturesView } from './haunt_features';
 import { buildHollowGates } from './hollow_gates';
@@ -510,6 +517,7 @@ import {
   type RenderDiagnosticsSnapshot,
 } from './render_diagnostics';
 import {
+  collectObjectTextures,
   measureFeatureFootprint,
   setRenderCategory,
   type TextureBackedMaterial,
@@ -517,8 +525,13 @@ import {
 } from './renderer_diagnostics';
 import {
   beginRendererFrameTelemetry,
+  emptyFoliagePerfStats,
+  emptyFramePhaseMs,
+  emptyWorldPhaseMs,
   type RendererFramePhaseMs,
   type RendererWorldPhaseMs,
+  roundMs,
+  summarizeMs,
 } from './renderer_frame_telemetry_core';
 import { createRevealGate } from './reveal_gate';
 import { collectRiftAmbientSources } from './rift_ambience';
@@ -1171,128 +1184,6 @@ function collectCasters(root: THREE.Object3D, into: THREE.Object3D[]): void {
   });
 }
 
-function roundMs(v: number): number {
-  return Math.round(v * 100) / 100;
-}
-
-function summarizeMs(values: number[]): {
-  count: number;
-  avg: number;
-  p95: number;
-  max: number;
-} {
-  if (values.length === 0) return { count: 0, avg: 0, p95: 0, max: 0 };
-  const sorted = [...values].sort((a, b) => a - b);
-  const total = values.reduce((a, b) => a + b, 0);
-  const p95Idx = Math.min(sorted.length - 1, Math.max(0, Math.ceil(sorted.length * 0.95) - 1));
-  return {
-    count: values.length,
-    avg: roundMs(total / values.length),
-    p95: roundMs(sorted[p95Idx]),
-    max: roundMs(sorted[sorted.length - 1]),
-  };
-}
-
-function emptyFramePhaseMs(): RendererFramePhaseMs {
-  return {
-    setup: 0,
-    entities: 0,
-    world: 0,
-    nameplates: 0,
-    submit: 0,
-    total: 0,
-  };
-}
-
-function emptyWorldPhaseMs(): RendererWorldPhaseMs {
-  return {
-    lights: 0,
-    water: 0,
-    terrain: 0,
-    props: 0,
-    foliage: 0,
-    fish: 0,
-    ambientScenery: 0,
-    zoneVisibility: 0,
-    zoneFeatures: 0,
-    vfx: 0,
-    camera: 0,
-    ambience: 0,
-    shadows: 0,
-    sky: 0,
-    sunSprites: 0,
-    godRays: 0,
-  };
-}
-
-function emptyFoliagePerfStats(): FoliagePerfStats {
-  return {
-    modelQuality: 1,
-    modelBuckets: 0,
-    modelVisibleBuckets: 0,
-    modelBucketsByLod: {},
-    modelVisibleByLod: {},
-    modelDraws: 0,
-    modelVisibleDraws: 0,
-    modelDrawsByLod: {},
-    modelVisibleDrawsByLod: {},
-    modelTriangles: 0,
-    modelVisibleTriangles: 0,
-    modelTrianglesByLod: {},
-    modelVisibleTrianglesByLod: {},
-    grassEnabled: false,
-    grassQuality: 0,
-    grassActiveRadius: 0,
-    grassChunks: 0,
-    grassReadyChunks: 0,
-    grassVisibleChunks: 0,
-    grassQueuedChunks: 0,
-    grassTufts: 0,
-    grassVisibleTufts: 0,
-    grassBuiltChunks: 0,
-    grassDisposedChunks: 0,
-    grassLastBuildMs: 0,
-    grassBuildMs: 0,
-    grassCacheLimit: 0,
-  };
-}
-
-function sleep(ms: number): Promise<void> {
-  return new Promise((resolve) => window.setTimeout(resolve, Math.max(0, ms)));
-}
-
-/** Encode a copied 2D canvas without paying Canvas.toDataURL's synchronous
- *  compression cost on the UI thread. FileReader keeps the server-facing data
- *  URL contract while both compression and blob reading happen asynchronously. */
-function canvasDataUrlAsync(
-  canvas: HTMLCanvasElement,
-  type: string,
-  quality?: number,
-): Promise<string | null> {
-  return new Promise((resolve) => {
-    try {
-      canvas.toBlob(
-        (blob) => {
-          if (!blob) {
-            resolve(null);
-            return;
-          }
-          const reader = new FileReader();
-          reader.addEventListener('load', () =>
-            resolve(typeof reader.result === 'string' ? reader.result : null),
-          );
-          reader.addEventListener('error', () => resolve(null));
-          reader.readAsDataURL(blob);
-        },
-        type,
-        quality,
-      );
-    } catch {
-      resolve(null);
-    }
-  });
-}
-
 export interface RendererCreateOptions extends QuestObjectGateOptions {
   context?: WebGL2RenderingContext;
   initializeGfx?: boolean;
@@ -1882,6 +1773,10 @@ export class Renderer {
   ) => void;
   private frozenOrbFx!: FrozenOrbFx;
   private balgathFx!: BalgathFx;
+  /** Far sprites for landmark mobs, drawn well past the 80yd entity band. */
+  private bossImpostors!: BossImpostorField;
+  /** One ward-state badge per warded boss in view (eye_ward_badge_field.ts). */
+  private eyeWardBadges!: EyeWardBadgeField;
   private mageGroundFx!: MageGroundFx;
   private warlockMeteorFx!: WarlockMeteorFx;
   private necromancyGroundFx!: NecromancyGroundFx;
@@ -2907,7 +2802,18 @@ export class Renderer {
     // 'orb' release event (see src/render/frozen_orb_fx.ts).
     this.frozenOrbFx = new FrozenOrbFx(this.scene, (x, z) => groundHeight(x, z, this.sim.cfg.seed));
     // The Mirefen world boss's ground layer (src/render/balgath_fx.ts).
-    this.balgathFx = new BalgathFx(this.scene, this.groundSample, (t) => this.addShake(t));
+    this.balgathFx = new BalgathFx(
+      this.scene,
+      this.groundSample,
+      // Trauma falls off with how far the CAMERA is from the impact: his slams land all
+      // over the zone, and a wreck two hundred yards away must not punch the viewer.
+      (t, x, z) => this.addShake(t * slamShakeFalloff(this.camera.position, x, z)),
+      (x, z, y) => this.surfaceAt(x, z, y),
+    );
+    // A world boss stays visible from across the zone as a baked sprite, long after his rig
+    // has left the entity band (src/render/boss_impostor.ts).
+    this.bossImpostors = new BossImpostorField(this.scene);
+    this.eyeWardBadges = new EyeWardBadgeField(this.scene);
     this.glacialFrontVisual = new GlacialFrontVisual(this.scene, (x, z) =>
       groundHeight(x, z, this.sim.cfg.seed),
     );
@@ -3886,7 +3792,7 @@ export class Renderer {
               const group = groupLike as THREE.Group;
               const childRoot = child as THREE.Object3D;
               const units: { label: string; run: () => void }[] = [];
-              const textures = [...this.collectObjectTextures(childRoot, false)];
+              const textures = [...collectObjectTextures(childRoot, false)];
               for (let i = 0; i < textures.length; i += PREWARM_TEXTURE_UNIT_BATCH) {
                 const batch = textures.slice(i, i + PREWARM_TEXTURE_UNIT_BATCH);
                 units.push({
@@ -4284,18 +4190,9 @@ export class Renderer {
   private emitGroundPuff(x: number, y: number, z: number, power: number): void {
     const p = Math.min(1, power);
     if (p <= 0.02) return;
-    const surface = this.surfaceAt(x, z, y);
-    if (surface === 'water') return;
-    const color =
-      surface === 'stone'
-        ? 0x9b9a95
-        : surface === 'wood'
-          ? 0xa8895f
-          : surface === 'snow'
-            ? 0xe6eef5
-            : surface === 'dirt'
-              ? 0xa38257
-              : 0x8d9a63;
+    // null means this surface throws no dust (water: a splash is not a puff).
+    const color = groundPuffColor(this.surfaceAt(x, z, y));
+    if (color === null) return;
     this.tmpPuff.set(x, y, z);
     this.vfx.groundPuff(this.tmpPuff, p, color);
   }
@@ -4828,13 +4725,8 @@ export class Renderer {
     finishViewCandidates(this.viewCandidates, count);
   }
 
-  private createdViewType(e: Entity): string {
-    const id = e.templateId || e.kind;
-    return `${e.kind}:${id}`.slice(0, 64);
-  }
-
   private sampleCreatedViewType(into: string[], e: Entity): void {
-    if (into.length < VIEW_CREATED_TYPE_SAMPLE_LIMIT) into.push(this.createdViewType(e));
+    if (into.length < VIEW_CREATED_TYPE_SAMPLE_LIMIT) into.push(createdViewType(e));
   }
 
   private createRequiredView(id: number | null, createdViewTypes: string[]): number {
@@ -5677,53 +5569,13 @@ export class Renderer {
   // the canvas. Lazily built once and kept: 8x8 RGBA plus depth is negligible.
   private prewarmRenderTarget: THREE.WebGLRenderTarget | null = null;
 
-  private collectObjectTextures(
-    obj: THREE.Object3D,
-    visibleOnly: boolean,
-    textures = new Set<THREE.Texture>(),
-  ): Set<THREE.Texture> {
-    const textureKeys: TextureMaterialKey[] = [
-      'map',
-      'alphaMap',
-      'aoMap',
-      'bumpMap',
-      'displacementMap',
-      'emissiveMap',
-      'envMap',
-      'lightMap',
-      'metalnessMap',
-      'normalMap',
-      'roughnessMap',
-      'specularMap',
-      'gradientMap',
-    ];
-    const collect = (child: THREE.Object3D): void => {
-      const renderable = child as RenderableDiagnosticObject;
-      const materials = Array.isArray(renderable.material)
-        ? renderable.material
-        : renderable.material
-          ? [renderable.material]
-          : [];
-      for (const material of materials) {
-        const textureMaterial = material as TextureBackedMaterial;
-        for (const key of textureKeys) {
-          const texture = textureMaterial[key];
-          if (texture) textures.add(texture);
-        }
-      }
-    };
-    if (visibleOnly) obj.traverseVisible(collect);
-    else obj.traverse(collect);
-    return textures;
-  }
-
   private collectInitialSceneTextures(): THREE.Texture[] {
-    const textures = this.collectObjectTextures(this.scene, true);
+    const textures = collectObjectTextures(this.scene, true);
     // Async shader compilation temporarily hides non-self entity groups. Include
     // those already-created views explicitly so their textures do not all upload
     // during the first live submit when the compile gate restores visibility.
     for (const view of this.views.values()) {
-      this.collectObjectTextures(view.group, false, textures);
+      collectObjectTextures(view.group, false, textures);
     }
     return [...textures];
   }
@@ -7905,6 +7757,13 @@ export class Renderer {
             if (!vis?.isMidOneShot) this.triggerAttack(ev.sourceId, ev.ability);
           }
         }
+        break;
+      }
+      // A Loomshard Thrust broke the ward: burst the reticle on the eye it went through.
+      // Keyed on the event's own targetId rather than on the wielder's current target, so
+      // the burst lands on the boss that was actually hit.
+      case 'lanceBlind': {
+        this.views.get(ev.targetId)?.visual?.strikeEyeWardMarker();
         break;
       }
       case 'spellfxAt': {
@@ -10677,6 +10536,7 @@ export class Renderer {
     // Contact blobs are refilled from scratch inside the loop below (null on
     // every tier that casts real shadows).
     this.blobShadows?.begin();
+    this.eyeWardBadges.begin();
 
     for (const [id, v] of this.views) {
       const e = sim.entities.get(id);
@@ -10701,6 +10561,21 @@ export class Renderer {
         continue;
       }
       this.syncDrainChannelVisual(id, e);
+      // The ward's on-model cues (eye_ward_marker_drive.ts owns every decision). The RETICLE
+      // only aims for a pike carrier; the STATE badge shows for everyone, because "his ward
+      // is down, your damage lands" is what the whole raid is waiting to be told.
+      const wardPlan = eyeWardPlanFor(this.sim, p.pos, e);
+      v.visual?.setEyeWardMarker(wardPlan);
+      if (wardPlan)
+        this.eyeWardBadges.mark(
+          id,
+          wardPlan,
+          e.pos,
+          visualHeightFor(e),
+          this.camera,
+          dt,
+          this.reducedMotion(),
+        );
       // form swaps (polymorph sheep, druid forms), computed up front because
       // the shadow gates below must not run the base rig's proxy under a form.
       // One pass over the aura list instead of repeated .some() scans per entity per
@@ -12081,6 +11956,8 @@ export class Renderer {
       // skip the draw for off-screen rigs (pose/audio above already ran)
       if (!charOnScreen) v.group.visible = false;
     }
+    // Dispose any badge whose boss left view this frame.
+    this.eyeWardBadges.end();
     this.lastVisibleRigCount = visibleRigCount;
     this.blobShadows?.commit();
     this.drainWeaponSkinApplies();
@@ -12350,6 +12227,16 @@ export class Renderer {
     this.sentenceVfx.update(dt, this.reducedMotion());
     this.frozenOrbFx.update(dt);
     this.balgathFx.update(dt, this.reducedMotion(), this.sim.entities.values());
+    // Measured from the PLAYER, not the camera: a boss must appear on the horizon at the
+    // same range whether the viewer is zoomed to the shoulder or fully out.
+    this.bossImpostors.sync(
+      this.webgl,
+      this.sim.entities.values(),
+      this.camera,
+      p.pos,
+      this.scene.fog instanceof THREE.Fog ? this.scene.fog : null,
+      this.groundSample,
+    );
     this.mageGroundFx.update(dt);
     this.warlockMeteorFx.update(dt, this.reducedMotion());
     // Same post-fx budget recovery as the prewarm frame path: a landing or
@@ -12988,6 +12875,10 @@ export class Renderer {
     this.nameplatePainter.dispose();
     this.travelSpeedFx.dispose();
     this.blobShadows?.dispose();
+    // Holds a baked render target; the graphics rebuild mints a whole new Renderer, so
+    // leaving it would strand an atlas per rebuild for the rest of the session.
+    this.bossImpostors.dispose();
+    this.eyeWardBadges.dispose();
   }
 
   /**

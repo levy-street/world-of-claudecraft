@@ -66,6 +66,7 @@ logic module pairs with a `<domain>_db.ts` that owns its SQL).
 | `cached_read.ts` / `deeds_board_warm.ts` / `discord_status_cache.ts` | the three shared-read cache shapes: single-key `createCachedRead` (TTL, single-flight, stale-on-error, joiner-refusing bust) / the extended `singleFlight(run, epochOf?)` for per-scope epoch-keyed board flights / the keyed bounded per-account cache behind `GET /api/discord` (see Hot paths) |
 | `retention_sweep.ts` | the advisory-locked, self-clocked nightly sweep of batched per-table prunes; every table that grows without bound registers here (see Hot paths) |
 | `concurrent_indexes.ts` | post-boot `CREATE INDEX CONCURRENTLY` seam for new indexes on big live tables |
+| `interest_scope.ts` | who is inside whose interest: the radii and hysteresis, the same-slot battleground widening, and the world-boss LANDMARK widening (`MobTemplate.landmarkRange`, so a boss the client draws as a far sprite is actually sent from across the zone). One module because the question is answered at THREE points that must agree, the shared query's reach, the per-viewer cutoff and the per-entity limit, and widening one of the three alone is a silent no-op |
 | `realm_readout_memo.ts` / `event_frame.ts` / `interest_candidates.ts` | broadcast build-once seams: per-pass realm readout memo (rides `maybeRaw`), serialize-once event frames (sent via `sendRaw`), per-cell shared interest gathering (see Hot paths) |
 
 ## Invariants, YOU MUST keep these

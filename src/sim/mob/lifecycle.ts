@@ -37,10 +37,12 @@ import type { SimContext } from '../sim_context';
 import { clearThreat } from '../threat';
 import { dist2d, type Entity, NYTHRAXIS_BOSS_ID } from '../types';
 import { groundHeight } from '../world';
+import { resetBossSlams } from './boss_slams';
 import { resetMobCharge } from './charge';
 import { idleRng, wanderPause } from './idle_rng';
 import { resetMechanicSpacing } from './mechanic_spacing';
 import { resetRiftMechanicWindups } from './rift_escape_window';
+import { resetWarpath } from './warpath';
 
 const PACK_FRENZY_AURA_ID = 'pack_frenzy'; // attack-speed buff granted to surviving packmates
 
@@ -78,6 +80,10 @@ export function respawnMob(ctx: SimContext, mob: Entity): void {
   mob.fleeTimer = 0;
   mob.fleeReturnTimer = 0;
   mob.hasFled = false;
+  // A warpath circuit does not survive a death: the next spawn opens on his focus
+  // phase at the barrow, not mid-run to whichever landmark he was heading for.
+  resetWarpath(mob);
+  resetBossSlams(mob);
   clearThreat(mob);
   // A respawn is a brand-new pull: the world-boss damager roster clears with
   // the hate table so loot rights never carry across lives.

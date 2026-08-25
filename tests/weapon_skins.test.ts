@@ -128,6 +128,9 @@ describe('weapon type classification', () => {
       if (/^(adv_)?axe/.test(variant)) return 'axe';
       if (/^(adv_)?wand/.test(variant)) return 'wand';
       if (/^spear|^scythe/.test(variant)) return 'polearm';
+      // Another bespoke thematic name, same shape as the barrowmaul above: the family token
+      // is a SUFFIX here (`shardpike_spear`) and every other rule in this list is prefixed.
+      if (/^shardpike_spear$/.test(variant)) return 'polearm';
       return null;
     };
     for (const id of weaponIds) {

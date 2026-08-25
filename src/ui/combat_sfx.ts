@@ -534,3 +534,20 @@ export function shouldPlayMobVoiceSfxForEntity(entity: Entity): boolean {
     entity.templateId !== 'nythraxis_skeleton_warrior'
   );
 }
+
+/**
+ * Stable voice-clip key for a spoken YELL line.
+ *
+ * MUST match the generator slug in `scripts/voices/extra_lines.mjs` (`yellKey`), so
+ * encounter dialogue (the Nythraxis raid, Balgath's circuit barks) plays the right clip
+ * from the live chat event text. Lives here beside the rest of the voice-cue vocabulary
+ * rather than in the HUD coordinator: it is a pure slug rule shared with a build script,
+ * and nothing about it needs the HUD's DOM or per-frame state.
+ */
+export function yellVoiceKey(text: string): string {
+  return `yell__${text
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '_')
+    .replace(/^_+|_+$/g, '')
+    .slice(0, 60)}`;
+}

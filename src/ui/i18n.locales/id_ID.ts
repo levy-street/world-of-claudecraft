@@ -11412,6 +11412,7 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'entities.items.duskthorn_mantle.name': 'Mantel Duri Senja',
   'entities.items.fenbark_leggings.name': 'Celana Kulit Pohon Rawa',
   'entities.items.fenshadow_maul.name': 'Gada Bayangan Rawa',
+  'entities.items.skerrits_shardpike.name': 'Tombak Serpih Skerrit',
   'entities.items.foremans_barrowmaul.name': 'Godam Gundukan Sang Mandor',
   'entities.items.loomshard_eye.name': 'Mata Serpihan Alat Tenun',
   'entities.items.barrowhide_pauldrons.name': 'Bahuan Gundukan',

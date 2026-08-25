@@ -39,8 +39,10 @@ describe('painted weapon inventory icons', () => {
   it('covers every authored base weapon exactly once', () => {
     // 124: 123 with the class-overhaul integration daggers (rimefang, marrowpoint,
     // duskwhisper, boneglass_shiv, painted in integration-dagger-icons-2026-08-10), plus
-    // the Mirefen world boss's signature maul (balgath-boss-icons-2026-08-18).
-    expect(baseWeapons).toHaveLength(124);
+    // the Mirefen world boss's signature maul (balgath-boss-icons-2026-08-18). 125 with
+    // Skerrit's Shardpike, the world-boss quest tool: it got its own held model, which puts
+    // it in the weapon registry, which is what obliges it a painted inventory icon.
+    expect(baseWeapons).toHaveLength(125);
     expect([...WEAPON_IMAGE_IDS].sort()).toEqual(baseWeapons);
     expect(Object.keys(ITEM_WEAPON_VARIANTS).sort()).toEqual(baseWeapons);
     for (const id of baseWeapons) {
@@ -69,8 +71,9 @@ describe('painted weapon inventory icons', () => {
     const weaponBatches = batches.filter((batch) =>
       batch.itemIds.some((id) => Object.hasOwn(ITEM_WEAPON_VARIANTS, id)),
     );
-    // 4 with the Mirefen world-boss batch, whose maul is a weapon-registry item.
-    expect(weaponBatches).toHaveLength(4);
+    // 4 with the Mirefen world-boss batch, whose maul is a weapon-registry item; 5 with the
+    // Shardpike mechanic batch, whose pike is another.
+    expect(weaponBatches).toHaveLength(5);
     const historicalBatch = weaponBatches.find(
       ({ batchId }) => batchId === 'placeholder-art-completion-weapons-2026-08-09',
     );
@@ -131,12 +134,22 @@ describe('painted weapon inventory icons', () => {
       .filter((id) => Object.hasOwn(ITEM_WEAPON_VARIANTS, id))
       .sort();
     expect(bossWeaponIds).toEqual(['foremans_barrowmaul']);
+    // Same shape again for the Shardpike mechanic batch: a batch that lands after the
+    // historical one OWNS its ids, so the historical batch's frozen scope excludes them.
+    const shardpikeBatch = weaponBatches.find(
+      ({ batchId }) => batchId === 'shardpike-mechanic-icons-2026-08-20',
+    );
+    const shardpikeWeaponIds = (shardpikeBatch?.itemIds ?? [])
+      .filter((id) => Object.hasOwn(ITEM_WEAPON_VARIANTS, id))
+      .sort();
+    expect(shardpikeWeaponIds).toEqual(['skerrits_shardpike']);
     expect(historicalBatch?.itemIds).toEqual(
       expected.filter(
         (id) =>
           !replacementWeaponIds.includes(id) &&
           !integrationWeaponIds.includes(id) &&
-          !bossWeaponIds.includes(id),
+          !bossWeaponIds.includes(id) &&
+          !shardpikeWeaponIds.includes(id),
       ),
     );
     expect(
@@ -175,15 +188,23 @@ describe('painted weapon inventory icons', () => {
     const chunkD = readJsonRecord(weaponGenerationRecordFiles[3]) as {
       finalAssets: Array<{ id: string }>;
     };
-    // The chunk records are the frozen weapon campaign's generation reports: they slice
-    // the pre-integration weapon roster, without the four integration daggers OR the
-    // world-boss maul, both of which postdate the campaign and own their own art.
-    const bossWeaponIdsForChunks = (
-      weaponBatches.find(({ batchId }) => batchId === 'balgath-boss-icons-2026-08-18')?.itemIds ??
-      []
-    ).filter((id) => Object.hasOwn(ITEM_WEAPON_VARIANTS, id));
+    // The chunk records are the frozen weapon campaign's generation reports: they slice the
+    // pre-integration weapon roster, without the four integration daggers, the world-boss
+    // maul, or the Shardpike, all of which postdate the campaign and own their own art. Any
+    // weapon added from here on has to be excluded here too, or it shifts every slice
+    // boundary and all four chunk assertions fail at once.
+    const postCampaignBatchIds = new Set<string | undefined>([
+      'balgath-boss-icons-2026-08-18',
+      'shardpike-mechanic-icons-2026-08-20',
+    ]);
+    const postCampaignWeaponIds = weaponBatches
+      .filter(({ batchId }) => postCampaignBatchIds.has(batchId))
+      .flatMap(({ itemIds }) => itemIds ?? [])
+      .filter(
+        (id): id is string => typeof id === 'string' && Object.hasOwn(ITEM_WEAPON_VARIANTS, id),
+      );
     const campaignExpected = expected.filter(
-      (id) => !integrationWeaponIds.includes(id) && !bossWeaponIdsForChunks.includes(id),
+      (id) => !integrationWeaponIds.includes(id) && !postCampaignWeaponIds.includes(id),
     );
     expect(chunkA.assets.map(({ id }) => id)).toEqual(campaignExpected.slice(0, 40));
     expect(chunkB.assets.map(({ id }) => id)).toEqual(campaignExpected.slice(40, 80));

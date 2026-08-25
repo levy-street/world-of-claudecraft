@@ -321,6 +321,33 @@ export const ja_JP: EnTranslations = {
     }
   },
   "hudChrome": {
+    "shardpike": {
+      "braceLabel": "シャードパイクを構える",
+      "braceTooltip": "石突きを地面に突き立て、穂先を上げる。横移動キーがバランス棒だ：ビームは自然に流れ、彼が地面を叩くたびに弾かれる。両端に触れさせず {set} 秒保てば穂先が定まる。固い地面が必要で、騎乗中は不可。",
+      "thrustLabel": "ルームシャード・スラスト",
+      "thrustTooltip": "定まった穂先を眼に突き入れ、{damage} のダメージを与える。レベルも攻撃力もパイク自体も、何一つこの値を伸ばさない。番人を盲目にしバロウハイドを剥ぎ取るので、湿地の他のあらゆる武器がようやく通るようになる。定まったパイクだけが放てる一撃で、射程 {reach} ヤード、猶予は {seconds} 秒。",
+      "releaseLabel": "シャードパイクを下ろす",
+      "releaseTooltip": "パイクを収める。降りるのに罰則はない：失うのは構えだけで機会そのものではなく、{rest} 秒後に再び構えられる。",
+      "whyResting": "パイクを下ろしたばかりだ。アイコンの残り時間を待て。",
+      "whyAlreadyCouched": "パイクはすでに構えている。構え直す前に下ろせ。",
+      "whyNotSet": "穂先が定まっていない。まず構えて支えろ。",
+      "whyNothingCouched": "下ろすものがない：パイクを構えていない。",
+      "beamLabel": "シャードパイクの均衡",
+      "beamStatus": "パイクの均衡 {balance}、定着 {set} パーセント。",
+      "beamDanger": "パイクの均衡 {balance}、取り落としかけている。",
+      "promptStrike": "STRIKE THE EYE now, {seconds}s",
+      "promptHoldSteady": "横移動キーでパイクを支えろ",
+      "promptCatchIt": "立て直せ、パイクが倒れる",
+      "promptEyeOut": "眼が潰れた、残り {seconds} 秒：全力で叩き込め",
+      "promptSealed": "眼は閉じている。{seconds} 秒後に再び開く",
+      "promptResetting": "パイクを構え直している、{seconds} 秒",
+      "promptCloser": "番人に近づけ、あと {yards} ヤード",
+      "promptBrace": "シャードパイクを構え、そのまま支えろ",
+      "promptFindBoss": "スケリットのシャードパイク：これで番人の眼を潰せ",
+      "promptTally": "{count} put out",
+      "promptLabel": "シャードパイクの指示",
+      "blindBanner": "BARROWHIDE BROKEN"
+    },
     "warlock": {
       "doomLabel": "断罪",
       "fateThreadsLabel": "運命の糸",
@@ -11899,6 +11926,9 @@ export const ja_JP: EnTranslations = {
       "foremans_barrowmaul": {
         "name": "監督の塚砕き"
       },
+      "skerrits_shardpike": {
+        "name": "スケリットのシャードパイク"
+      },
       "loomshard_eye": {
         "name": "織機片の眼"
       },
@@ -13933,6 +13963,11 @@ export const ja_JP: EnTranslations = {
         "title": "フェンブリッジの番人",
         "greeting": "門で止まりなさい、{className}。葦の向こうでは沼が我々の代わりに命を奪います。"
       },
+      "socketwright_skerrit": {
+        "name": "マベン・スケリット",
+        "title": "嵌め込み職人",
+        "greeting": "あの眼を研いで彼の眼窩に据えてから四十年、一日分の払いももらっていない。番人に痛い目を見せたいのか、{className}？なら俺の仕事を狙え。"
+      },
       "brother_aldric_fen": {
         "name": "アルドリック修道士",
         "title": "谷の司祭",
@@ -14543,6 +14578,16 @@ export const ja_JP: EnTranslations = {
         "objectives": {
           "0": {
             "label": "フェンブリッジ召集令"
+          }
+        }
+      },
+      "q_socketwrights_due": {
+        "title": "嵌め込み職人の未払い",
+        "text": "あの眼窩にルームシャードを据えたのは俺だ。レンズを研ぎ、座らせ、楔で正しく固めた。塚の主たちは銅貨一枚も払わず、いま俺の仕事が湿地を踏み均して歩き回っている。俺のシャードパイクを持って行け。石突きを突き立て、穂先を据えて、どれだけかかろうと保て。腕が定まったら、それを眼に通せ。彼のまとう皮はあの欠片に縛られている、{playerName}：盲目にすれば、湿地のあらゆる刃がようやく通る。",
+        "completion": "手応えがあっただろう？四十年分の利息、眼窩を通して払わせた。パイクはあんたのものだ。彼は治る、いつもそうだ。だから気が向いたらまた取り立てに行けばいい。",
+        "objectives": {
+          "0": {
+            "label": "番人の眼を潰す"
           }
         }
       },

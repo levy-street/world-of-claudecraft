@@ -321,6 +321,33 @@ export const zh_CN: EnTranslations = {
     }
   },
   "hudChrome": {
+    "shardpike": {
+      "braceLabel": "架起碎晶长矛",
+      "braceTooltip": "将矛尾插入地面，矛尖朝上。你的横移键就是平衡杆：光束会自行漂移，他每次砸地都会把它踢偏。让它离开两端轨道并保持 {set} 秒即可架稳长矛。需要坚实的地面，且不能在坐骑上。",
+      "thrustLabel": "织影核心突刺",
+      "thrustTooltip": "将架稳的长矛刺入眼中，造成 {damage} 点伤害。没有任何东西能加成它：等级、攻击强度、长矛本身都不行。它会使工头失明并剥离石冢之皮，让泥沼中其他所有武器终于能咬进去。只有架稳的长矛才能送出这一击，射程 {reach} 码，窗口持续 {seconds} 秒。",
+      "releaseLabel": "放下碎晶长矛",
+      "releaseTooltip": "把长矛收起。中途放弃没有惩罚：你失去的是架势，不是这次机会，{rest} 秒后即可重新架起。",
+      "whyResting": "你刚刚放下了长矛。等图标上的计时走完。",
+      "whyAlreadyCouched": "长矛已经架起。重新架矛前先把它放下。",
+      "whyNotSet": "长矛尚未架稳。先架起它并稳住。",
+      "whyNothingCouched": "没有可放下的：长矛并未架起。",
+      "beamLabel": "碎晶长矛平衡",
+      "beamStatus": "长矛平衡 {balance}，架稳 {set}%。",
+      "beamDanger": "长矛平衡 {balance}，即将脱手。",
+      "promptStrike": "STRIKE THE EYE now, {seconds}s",
+      "promptHoldSteady": "用横移键稳住长矛",
+      "promptCatchIt": "接住，长矛快要倒了",
+      "promptEyeOut": "眼睛已经瞎了，还有 {seconds} 秒：全力打他",
+      "promptSealed": "他的眼睛闭上了。{seconds} 秒后重新睁开",
+      "promptResetting": "正在重新架矛，{seconds} 秒",
+      "promptCloser": "靠近工头，还差 {yards} 码",
+      "promptBrace": "架起碎晶长矛，然后稳住它",
+      "promptFindBoss": "斯克里特的碎晶长矛：用它戳瞎工头的眼睛",
+      "promptTally": "{count} put out",
+      "promptLabel": "碎晶长矛指示",
+      "blindBanner": "BARROWHIDE BROKEN"
+    },
     "warlock": {
       "doomLabel": "谴罪",
       "fateThreadsLabel": "命运丝线",
@@ -11899,6 +11926,9 @@ export const zh_CN: EnTranslations = {
       "foremans_barrowmaul": {
         "name": "工头的冢锤"
       },
+      "skerrits_shardpike": {
+        "name": "斯克里特的碎晶长矛"
+      },
       "loomshard_eye": {
         "name": "织机碎片之眼"
       },
@@ -13933,6 +13963,11 @@ export const zh_CN: EnTranslations = {
         "title": "芬桥守望者",
         "greeting": "在门口停下，{className}。芦苇后面的沼泽会替我们杀人。"
       },
+      "socketwright_skerrit": {
+        "name": "马本·斯克里特",
+        "title": "镶嵌匠",
+        "greeting": "四十年前我磨好那颗眼珠，把它嵌进他的眼窝，一天工钱都没拿到。你想让工头吃点苦头，{className}？那就冲着我的手艺去。"
+      },
       "brother_aldric_fen": {
         "name": "奥德里克修士",
         "title": "山谷牧师",
@@ -14543,6 +14578,16 @@ export const zh_CN: EnTranslations = {
         "objectives": {
           "0": {
             "label": "芬桥集结令"
+          }
+        }
+      },
+      "q_socketwrights_due": {
+        "title": "镶嵌匠的欠账",
+        "text": "织影核心是我亲手嵌进那眼窝的：磨好透镜，安放到位，楔紧对齐。冢主们一个铜板都没付过我，如今我的手艺却在泥沼里四处踏平一切。拿走我的碎晶长矛。矛尾插地，稳住矛尖，需要多久就撑多久，等你手臂笃定了，就把它送进那只眼睛。他披的那层皮与那块晶石相连，{playerName}：戳瞎他，泥沼里的每一把刀刃终于都能咬进去。",
+        "completion": "你感觉到它松了，是吧？四十年的利息，从那眼窝里付清了。长矛归你了，朋友。他会复原的，他总是会，所以你什么时候想再来收账都行。",
+        "objectives": {
+          "0": {
+            "label": "戳瞎工头的眼睛"
           }
         }
       },

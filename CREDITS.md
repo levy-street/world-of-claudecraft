@@ -319,6 +319,9 @@ non-commercial. For commercial use, arrange your own licence with the author.
 | Generated creature model + animations (balgath_foreman) | World of ClaudeCraft | Project-generated via scripts/asset_pipeline (Tripo AI 3D, auto-rig + preset retargets) | Project asset | With the project only |
 | Generated creature model + animations (balgath_cyclops) | World of ClaudeCraft | Project-generated via scripts/asset_pipeline (Tripo AI 3D, auto-rig + preset retargets) | Project asset | With the project only |
 | Generated weapon model + icon (balgath_barrowmaul_hammer) | World of ClaudeCraft | Project-generated via scripts/asset_pipeline (Tripo AI 3D) | Project asset | With the project only |
+| Generated weapon model + icon (shardpike_spear) | World of ClaudeCraft | Project-generated via scripts/asset_pipeline (Tripo AI 3D) | Project asset | With the project only |
+| Shardpike world-boss item and mechanic icons (`skerrits_shardpike`, `lance_brace`, `lance_thrust`, `lance_release`) | World of ClaudeCraft | Project-generated via gpt-image-2 through `scripts/asset_pipeline/lib/openai_image.mjs`, then normalized locally to 128px WebP; exact prompts and per-icon provenance are recorded in the corresponding item and skill `mapping.json` files | Project asset, rights reserved | **No, permission required** |
+| Balgath eye-ward world-boss status badges (`eye_ward_sealed`, `eye_ward_open`, `eye_ward_blinded`) | World of ClaudeCraft | Project-generated via gpt-image-2 through `scripts/asset_pipeline/lib/openai_image.mjs`, then normalized locally to 128px WebP; exact prompts and per-icon provenance are recorded in `public/ui/status/mapping.json` | Project asset, rights reserved | **No, permission required** |
 Assets were optimized for shipping (animation clip pruning, meshopt compression,
 texture resizing) via `scripts/assets/build_assets.mjs`; raw packs are not
 committed.

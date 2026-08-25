@@ -202,6 +202,7 @@ const KAYKIT_WEAPON_ACCESSORY: Record<string, string> = {
   encore_the_second_falling_star: 'VAR_CROSSBOW',
   ...KAYKIT_SHIELD_ACCESSORIES,
   balgath_barrowmaul_hammer: 'VAR_HAMMER',
+  shardpike_spear: 'VAR_POLEARM',
 };
 
 // Per-family grip for the variant pack. The model origin IS the grip, so we attach

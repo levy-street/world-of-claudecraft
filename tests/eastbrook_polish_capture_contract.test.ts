@@ -187,8 +187,12 @@ interface AttributionTargetFixture {
 // Re-minted again for the Balgath branch: prewarmDepthMaterial moved out to its own
 // module and the boss's ground-effect wiring came in, so renderer.ts moves and the
 // composite follows its bytes. No capture was retaken.
+// Re-minted again for that boss's VFX pass: the surface-to-dust colour table moved out
+// of renderer.ts into ground_puff_color_core.ts (shared with the boss's ground debris)
+// and the FX layer took a surface probe, so renderer.ts moves and the composite follows
+// its bytes. No capture was retaken.
 const PINNED_POLISH_COMPOSITE_FINGERPRINT =
-  '5ca1f19ca5c8e8279ded55b0852268b86f4fbabce2a13d8df3e8740f31cd3410';
+  '06542dff5297e0ccd09c93e8f7dfcdb7551134a2e4e7ce9dec672c598dce655b';
 
 function validPolishAttributionTargets(): AttributionTargetFixture[] {
   return [

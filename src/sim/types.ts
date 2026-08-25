@@ -915,6 +915,13 @@ interface BaseItemDef {
   // buyValue; both fields may coexist when a vendor charges both currencies.
   priceHonor?: number;
   use?: ItemUse;
+  /**
+   * A quest implement every class may equip, weapon-proficiency rules notwithstanding
+   * (equipment_rules.ts checks it before the archetype and rogue-two-hander gates). For
+   * tools whose POINT is being wielded by anyone (the Shardpike: 1-2 damage, its worth is
+   * the lance_trial verb), where a proficiency lockout would gate a mechanic, not power.
+   */
+  questTool?: true;
   sellValue: number; // copper (vendor buys at this)
   buyValue?: number; // copper (vendor sells at this)
   questId?: string;
@@ -1533,6 +1540,166 @@ export interface MobTemplate {
    * is why the entity-side field it feeds is still called `riftMechanicSpacing`.
    */
   telegraphedMechanics?: number;
+  /**
+   * Warpath: the boss walks a circuit of authored landmarks instead of parking in your
+   * melee range (mob/warpath.ts). He plants and fights (focus), runs to the next stop
+   * while backhanding whoever is near him and regenerating if nobody hurts him (travel),
+   * then slams the place he arrived at behind a telegraph ring (wreck), and repeats.
+   *
+   * Inert for every mob without it. Set it on a boss whose fight is meant to be an event
+   * that crosses the zone rather than a health bar standing in a field. Pair it with
+   * `canLeash: false` in mob_combat.ts: the shipped leash measures from the SPAWN, so a
+   * tethered boss walks two landmarks and evades home mid-circuit.
+   */
+  warpath?: {
+    /** Seconds planted and fighting before he leaves. The melee uptime window. */
+    focusSeconds: number;
+    /**
+     * Multiplier on moveSpeed while travelling. Tune it ABOVE a walking player and BELOW
+     * a running one: faster and melee can never touch him again, slower and there is no
+     * chase, only a follow.
+     */
+    travelSpeedMult: number;
+    /** Abandon the run after this long, so an unreachable landmark cannot soft-lock. */
+    travelTimeoutSeconds: number;
+    /** Close enough to the landmark to count as arrived. */
+    arriveRadius: number;
+    /** Seconds spent on the arrival set-piece, telegraph fuse included. */
+    wreckSeconds: number;
+    /**
+     * The circuit, walked IN ORDER and wrapping. Authored order is the pacing: each leg's
+     * length is how long that chase lasts. `yell` is his bark on setting off for that
+     * stop (variable-routed chat, English from content like every other boss bark).
+     */
+    destinations: Array<{ x: number; z: number; label: string; yell?: string }>;
+    /** Widen his barks past YELL_RANGE for a voice that carries across the zone. */
+    yellRange?: number;
+    /**
+     * Heals while nobody has hurt him recently: what makes the chase mandatory. `name`
+     * labels the green number, so the raid can read WHY the bar is climbing.
+     */
+    regen: { unharriedSeconds: number; pctPerSecond: number; name: string };
+    /** The travelling backhand: one random player inside `radius`, on a timer. */
+    swipe: {
+      every: number;
+      radius: number;
+      min: number;
+      max: number;
+      name: string;
+      school?: string;
+    };
+    /** The arrival slam, telegraphed for WARPATH_WRECK_FUSE_SEC before it lands. */
+    wreck: { radius: number; min: number; max: number; name: string; school?: string };
+    wreckYell?: string;
+  };
+  /**
+   * Aimed slams (mob/boss_slams.ts): a fist HAMMER dropped on a snapshot of where a
+   * player was standing, dodged by moving, and a low CLEAVE dragged across the ground in
+   * an arc in front of him, dodged by jumping and nothing else.
+   *
+   * Inert for every mob without it. They exist because the shipped boss AoE vocabulary is
+   * circles centred on the boss, all of which are dodged by walking out, so a fight built
+   * only from those teaches one skill and then repeats it.
+   */
+  slams?: {
+    /** One fist, raised and dropped where a player was standing. */
+    hammer: {
+      every: number;
+      /** Seconds the ring is shown before the fist lands. */
+      windup: number;
+      /** Small on purpose: this is dodged by stepping aside, not by leaving the fight. */
+      radius: number;
+      min: number;
+      max: number;
+      name: string;
+      school?: string;
+    };
+    /** A low arm drag across the ground in front of him. */
+    cleave: {
+      every: number;
+      windup: number;
+      /** Reach of the arc, and the max distance he will start one from. */
+      range: number;
+      /** Half-width of the arc in degrees, measured off his aim at the wind. */
+      halfArcDeg: number;
+      /** Yards per second the arm travels, which is what a player who cleared it rides. */
+      sweepSpeed: number;
+      min: number;
+      max: number;
+      name: string;
+      school?: string;
+    };
+  };
+  /**
+   * Punt, rather than shove, on every heavy slam this mob lands (mob/boss_slams.ts
+   * `launchFromSlam`, called from the telegraphed detonations, the warpath arrival, and
+   * both aimed slams above).
+   *
+   * The shipped knockback slides a victim along the ground, which reads as a push. A body
+   * thrown into the AIR reads as having been hit by something enormous, and for a boss
+   * whose whole identity is his fists that difference is the fight's texture. Set it only
+   * on a mob big enough that being launched by it is believable.
+   */
+  launch?: {
+    /** Yards of ground shove, run through the shared applyKnockback rules. */
+    distance: number;
+    /** Vertical impulse in yards/sec. GRAVITY is 16, so apex is up^2/32 yards; keep the
+     * apex under FALL_SAFE_DISTANCE (12) or the boss starts dealing fall damage too. */
+    up: number;
+    /** Outward air speed carried after the shove, so they keep travelling as they rise. */
+    outSpeed: number;
+    /** Multiplier at the blast rim, easing from 1 at the epicentre. */
+    edgeScale: number;
+  };
+  /**
+   * This mob's telegraphed blasts hurt OTHER CREATURES standing in them, not just players
+   * (mob/boss_collateral.ts `splashNearbyMobs`).
+   *
+   * For a world boss loose in an inhabited zone: he craters the road, and the boars standing
+   * in the crater die with everyone else. Inert without it, so every mob shipped before this
+   * keeps hitting exactly who it hit, in the same order, drawing the same rng.
+   */
+  /**
+   * A standing mitigation ward only a MECHANIC can remove (mob/eye_ward.ts): a permanent
+   * buff_dr aura on the mob, pried open for `blindSeconds` by the Shardpike's eye thrust
+   * (lance_trial.ts), then sealed against a re-blind for `refractorySeconds` after it
+   * re-forms. The level-spread device for a world boss: low levels open the window with a
+   * fixed-damage mechanic, high levels spend it.
+   */
+  eyeWard?: {
+    /** Buff name on his frame while the ward stands. */
+    name: string;
+    /** Fraction of incoming damage the ward turns away (a buff_dr value, 0..1). */
+    reduction: number;
+    /** Seconds the ward stays down after a successful thrust. */
+    blindSeconds: number;
+    /** Seconds after the ward RE-FORMS before it can be pried again. */
+    refractorySeconds: number;
+    /** Debuff name for the open window (its remaining time is the raid's timer). */
+    blindName: string;
+    /** Bark on being blinded, broadcast to `yellRange` (default 160). */
+    blindYell?: string;
+    yellRange?: number;
+  };
+  collateral?: {
+    /**
+     * Fraction of the blast's AUTHORED midpoint a bystander takes. Below 1 because zone
+     * wildlife has a fraction of a raider's health pool and a full-strength raid mechanic
+     * would sterilize the whole zone on the first pull.
+     */
+    mult: number;
+  };
+  /**
+   * Yards at which this mob is still VISIBLE, as a far sprite, long after the renderer has
+   * stopped drawing its rig (render/boss_impostor.ts) and the server would normally have
+   * stopped sending it (server/game.ts `interestLimitSq`).
+   *
+   * For a world boss, whose whole point is being a landmark you can see from across the zone
+   * and decide to walk toward. It costs one wire entity per viewer in range and one
+   * two-triangle draw, so it is for the one creature an hour that earns it, never for an
+   * elite. Absent means the ordinary interest and draw bands, which is every other mob.
+   */
+  landmarkRange?: number;
   ccImmune?: boolean;
   // Immune to movement-speed slow auras (kind 'slow'). Distinct from ccImmune, which
   // blocks the hard control auras (stun/root/incapacitate/polymorph) but intentionally
@@ -3774,6 +3941,10 @@ export type QuestObjective =
       targetObjectItemId?: string;
       targetNpcId?: string;
     })
+  // A named world event this player caused, credited by the owning system module (the
+  // exemplar: 'balgath_blinded' from src/sim/lance_trial.ts). Label-only in every
+  // presentation surface, so a new event costs its emitter one credit call and nothing else.
+  | (QuestObjectiveBase & { type: 'event'; eventId: string })
   | (QuestObjectiveBase & { type: 'craft'; recipeId: string })
   | (QuestObjectiveBase & { type: 'gather' } & (
         | { nodeType: GatherNodeType; itemId?: string }
@@ -4461,6 +4632,19 @@ export interface Entity extends ClientMirroredEntityFields {
   afk: boolean;
   // mob AI
   aiState: AiState;
+  /**
+   * The eye-ward clock (mob/eye_ward.ts): while `eyeWardDownUntil` is ahead of the sim
+   * clock the ward is pried open (the Blinded window); `eyeWardSealedUntil` refuses the
+   * next blind until the fight has breathed. Timestamps are the truth, the auras are
+   * presentation; only mobs whose template declares `eyeWard` ever carry them.
+   */
+  eyeWardDownUntil?: number;
+  eyeWardSealedUntil?: number;
+  /**
+   * Wire-visible: this player has the Shardpike couched (src/sim/lance_trial.ts). Other
+   * clients render the brace pose from it; the balance itself is self-only state.
+   */
+  bracing?: boolean;
   tappedById: number | null; // first player to damage this mob owns loot/xp/quest credit
   /** Classic-style hate table: attacker entity id (player or pet) -> threat.
    *  Wiped on evade/respawn/death; drives target selection with the 110%
@@ -4753,6 +4937,33 @@ export interface Entity extends ClientMirroredEntityFields {
   // samples never churn for unstamped mobs).
   stompWindupRemaining?: number;
   pulseWindupRemaining?: number;
+  // Warpath state (mob/warpath.ts). Only ever defined on a mob whose template declares
+  // `warpath`, the same defined-vs-undefined discipline as the windup fields above, so
+  // the parity golden's entity samples never churn for a mob that does not walk one.
+  warpathPhase?: 'focus' | 'travel' | 'wreck';
+  warpathTimer?: number;
+  /** Index into the template's destination list. */
+  warpathDestination?: number;
+  /** Seconds since anything reduced his health. */
+  warpathUnharried?: number;
+  /** Health observed last tick, so any damage source counts as harassment. */
+  warpathLastHp?: number;
+  warpathSwipeTimer?: number;
+  // Aimed-slam state (mob/boss_slams.ts). Only ever defined on a mob whose template
+  // declares `slams`, the same defined-vs-undefined discipline as the windup fields
+  // above, so the parity golden's entity samples never churn for a mob without them.
+  // ONE windup slot for both, deliberately: the shared mechanic spacing lock already
+  // forbids two telegraphs at once, so a second slot could only ever hold a state the
+  // fight is not allowed to reach.
+  slamKind?: 'hammer' | 'cleave';
+  slamWindup?: number;
+  /** The hammer's snapshot aim POINT; the cleave's snapshot aim DIRECTION. */
+  slamX?: number;
+  slamZ?: number;
+  hammerTimer?: number;
+  cleaveTimer?: number;
+  /** Absolute sim time the arrival slam lands; null once it has, so it fires once. */
+  warpathBlastAt?: number | null;
   // The telegraphed ring center each windup was drawn at: the detonation is
   // measured from HERE, never from the boss's live position, so the edge
   // players dodge is the edge they were shown even if the boss chased during
@@ -5195,6 +5406,11 @@ export type SimEvent = { pid?: number } & (
   // ID only, never English text; `retro` marks the on-join back-credit pass so
   // the client can batch those into one summary line instead of banner spam.
   | { type: 'deedUnlocked'; deedId: string; retro?: boolean }
+  // A Loomshard Thrust broke the world boss's ward (src/sim/lance_trial.ts). Personal
+  // (carries pid): the wielder is the one owed the feedback, and `count` is their running
+  // tally so the client can float `+N` without holding its own counter, which would drift
+  // from the character's persisted number across a relog. Id-only, no English.
+  | { type: 'lanceBlind'; pid: number; count: number; targetId: number }
   // Reliquary first fill (always personal: emitted with pid). Id-only: exactly
   // one of itemId / markId is set for a catalogued relic or authored mark.
   // pageIds list pages that list the relic; illuminatedPageId is set when a

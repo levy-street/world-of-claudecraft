@@ -11612,6 +11612,7 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'entities.items.duskthorn_mantle.name': 'Mantello di Crepuspina',
   'entities.items.fenbark_leggings.name': 'Gambali di Corteciamarcita',
   'entities.items.fenshadow_maul.name': "Maglio dell'Ombra Paludosa",
+  'entities.items.skerrits_shardpike.name': 'Picca di Schegge di Skerrit',
   'entities.items.foremans_barrowmaul.name': 'Mazza Tumulare del Caposquadra',
   'entities.items.loomshard_eye.name': 'L\'Occhio di Scheggia del Telaio',
   'entities.items.barrowhide_pauldrons.name': 'Spallacci Tumulari',

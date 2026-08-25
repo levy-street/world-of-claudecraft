@@ -596,9 +596,16 @@ describe('enchant_apply_view: preservedReplaceTraits (#2421)', () => {
   // cannot rot silently: the moment the eqi allowlist grows a bind field, the
   // worn arm is free to state the bond and this test says so.
   it('pins the eqi allowlist the worn trim mirrors', () => {
-    const wire = readFileSync(fileURLToPath(new URL('../server/game.ts', import.meta.url)), 'utf8');
+    // The projection moved out of server/game.ts into server/entity_wire.ts. Following it
+    // rather than deleting the pin: a source scrape whose subject is gone matches null and
+    // the assertion below would be the only thing standing between a silent widening and
+    // the wire, so the "moved" message is load-bearing and stays.
+    const wire = readFileSync(
+      fileURLToPath(new URL('../server/entity_wire.ts', import.meta.url)),
+      'utf8',
+    );
     const block = wire.match(
-      /for \(const \[slot, inst\] of Object\.entries\(e\.equippedInstances\)\)[\s\S]*?\n {4}\}/,
+      /for \(const \[slot, inst\] of Object\.entries\(e\.equippedInstances\)\)[\s\S]*?\n {2,6}\}/,
     );
     expect(block, 'the eqi projection loop moved').not.toBeNull();
     // Comments stripped first: a "boundTo is deliberately absent" note inside

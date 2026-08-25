@@ -1247,9 +1247,9 @@ describe('constrained entry view creation ramp', () => {
       collectionStart,
     );
     const collectionMethod = renderer.slice(collectionStart, collectionEnd);
-    expect(collectionMethod).toContain('this.collectObjectTextures(this.scene, true)');
+    expect(collectionMethod).toContain('collectObjectTextures(this.scene, true)');
     expect(collectionMethod).toContain('for (const view of this.views.values())');
-    expect(collectionMethod).toContain('this.collectObjectTextures(view.group, false, textures)');
+    expect(collectionMethod).toContain('collectObjectTextures(view.group, false, textures)');
 
     const methodStart = renderer.indexOf('private async prewarmInitialSceneTexturesBatched(');
     const methodEnd = renderer.indexOf('\n  private renderPrewarmPass(', methodStart);

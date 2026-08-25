@@ -132,15 +132,23 @@ describe('NPC voice line coverage', () => {
 
 describe('yell clip keys', () => {
   // Escort barks and encounter yells are looked up at runtime from the LIVE chat text
-  // by yellVoiceKey in src/ui/hud.ts. If that derivation and the generator's yellKey
-  // ever drift, every yell goes silent with no other symptom, so pin them together.
-  const hudSrc = readFileSync(join(repoRoot, 'src/ui/hud.ts'), 'utf8');
+  // by yellVoiceKey, which lives in src/ui/combat_sfx.ts (hud.ts imports it). If that
+  // derivation and the generator's yellKey ever drift, every yell goes silent with no other
+  // symptom, so pin them together.
+  //
+  // The path matters more than it looks: this used to read hud.ts, and when the function
+  // moved out the `indexOf` returned -1, the slice came back EMPTY, and every `toContain`
+  // below passed vacuously against ''. A scrape that cannot find its subject has to fail,
+  // which is what the explicit non-empty assertion is for.
+  const sfxSrc = readFileSync(join(repoRoot, 'src/ui/combat_sfx.ts'), 'utf8');
 
-  it('keeps src/ui/hud.ts yellVoiceKey byte-identical in shape to the generator', () => {
-    const body = hudSrc.slice(
-      hudSrc.indexOf('function yellVoiceKey'),
-      hudSrc.indexOf('}', hudSrc.indexOf('function yellVoiceKey')),
+  it('keeps yellVoiceKey byte-identical in shape to the generator', () => {
+    const at = sfxSrc.indexOf('function yellVoiceKey');
+    expect(at, 'yellVoiceKey moved again: re-point this scrape at its new home').toBeGreaterThan(
+      -1,
     );
+    const body = sfxSrc.slice(at, sfxSrc.indexOf('}', at));
+    expect(body.length).toBeGreaterThan(40);
     expect(body).toContain('.toLowerCase()');
     expect(body).toContain("replace(/[^a-z0-9]+/g, '_')");
     expect(body).toContain("replace(/^_+|_+$/g, '')");

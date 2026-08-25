@@ -22,9 +22,24 @@
 // information, and the gameplay-neutral-graphics invariant forbids hiding it.
 
 import * as THREE from 'three';
+import type { Surface } from './audio_sink';
 import {
+  auraAlphaAt,
+  type BossAuraPlan,
+  bossAuraPlan,
+  moteBudget,
+  readBossVfxState,
+} from './balgath_aura_core';
+import { BalgathDebris } from './balgath_debris';
+import {
+  BALGATH_CLEAVE_ABILITY,
+  BALGATH_CLEAVE_HALF_ARC,
+  BALGATH_CLEAVE_TRAUMA,
+  BALGATH_CRATER_FADE,
   BALGATH_CRATER_SECONDS,
   BALGATH_EYE_POOL_RADIUS,
+  BALGATH_HAMMER_ABILITY,
+  BALGATH_HAMMER_TRAUMA,
   BALGATH_RING_SECONDS,
   BALGATH_SMASH_MIN_RADIUS,
   BALGATH_SMASH_TRAUMA,
@@ -34,6 +49,7 @@ import {
   type BalgathRingPlan,
   balgathRingAlpha,
   balgathRingRadius,
+  debrisPowerForBlast,
   EYE_POOL_LEASE_SECONDS,
   planBalgathRing,
 } from './balgath_fx_core';
@@ -109,14 +125,31 @@ const SILT_DEEP = 0x4a4438;
 const FENLIGHT = 0x58d2ac;
 
 const MAX_ACTIVE_RINGS = 12;
-const MAX_ACTIVE_CRATERS = 8;
+// Craters now live for minutes rather than seconds, so the cap is what bounds a long
+// fight rather than a single slam. 28 is about two full warpath laps' worth of landmarks.
+const MAX_ACTIVE_CRATERS = 28;
 
 /** The entity shape this layer reads. Narrow on purpose: it never mutates the world. */
 export interface BalgathBody {
   id: number;
   templateId?: string;
-  pos: { x: number; z: number };
+  /**
+   * `y` matters as much as the other two here. A body wading a fen rides the WATER
+   * SURFACE rather than the bed (mob movement clamps it there), so his own displayed
+   * height is what tells the surface classifier he is in water at all: sampling the
+   * ground under him would report the bed and he would kick dust up through the lake.
+   */
+  pos: { x: number; y: number; z: number };
   castingAbility?: string | null;
+  /** Everything the phase aura reads (balgath_aura_core.ts). All optional: an ordinary
+   *  mob carries none of it and simply gets no aura. */
+  warpathPhase?: 'focus' | 'travel' | 'wreck';
+  warpathUnharried?: number;
+  auras?: { kind?: string; id?: string }[];
+  enraged?: boolean;
+  hp?: number;
+  maxHp?: number;
+  scale?: number;
 }
 
 interface ActiveRing {
@@ -149,7 +182,17 @@ interface ActiveCrater {
  * be a gameplay regression. Balgath's ring is drawn ON TOP of it, at impact.
  */
 export function routeBalgathSpellfxAt(
-  ev: { x: number; z: number; fx: string; radius?: number; sourceId?: number },
+  ev: {
+    x: number;
+    z: number;
+    fx: string;
+    radius?: number;
+    sourceId?: number;
+    ability?: string;
+    duration?: number;
+    dirX?: number;
+    dirZ?: number;
+  },
   fx: BalgathFx,
   entities: () => Iterable<{ id: number; templateId?: string }>,
 ): boolean {
@@ -157,7 +200,12 @@ export function routeBalgathSpellfxAt(
   // even reached for the overwhelming majority of effect events that are not a boss slam.
   // This sits at the top of a per-event hot path, and it also means a caller whose world
   // is not wired yet cannot be made to throw by an unrelated effect event.
-  if (ev.fx !== 'nova' || !ev.radius || ev.sourceId === undefined) return false;
+  // The cleave's telegraph is the one RUNE CIRCLE this router takes: its damage is a
+  // 120-degree wedge, so the generic full circle the renderer would draw promises four
+  // times the area it will hit. Returning true suppresses that circle in favour of the arc.
+  const telegraph = ev.fx === 'runeCircle' && ev.ability === BALGATH_CLEAVE_ABILITY;
+  if (!telegraph && (ev.fx !== 'nova' || !ev.radius || ev.sourceId === undefined)) return false;
+  if (!ev.radius || ev.sourceId === undefined) return false;
   let found = false;
   for (const e of entities()) {
     if (e.id !== ev.sourceId) continue;
@@ -165,14 +213,27 @@ export function routeBalgathSpellfxAt(
     break;
   }
   if (!found) return false;
+  const aim = Math.atan2(ev.dirX ?? 0, ev.dirZ ?? 1);
+  if (telegraph) {
+    fx.cleaveTelegraph(ev.x, ev.z, ev.radius, aim, ev.duration ?? 1.5);
+    return true;
+  }
+  if (ev.ability === BALGATH_CLEAVE_ABILITY) {
+    fx.cleaveImpact(ev.x, ev.z, ev.radius, aim);
+    return true;
+  }
+  if (ev.ability === BALGATH_HAMMER_ABILITY) {
+    fx.hammerImpact(ev.x, ev.z, ev.radius);
+    return true;
+  }
   // The two slams differ by footprint, which is also how a raid tells them apart: the
   // smash is the big telegraphed circle, the stomp the tighter shockwave.
   if (ev.radius >= BALGATH_SMASH_MIN_RADIUS) {
     fx.smashImpact(ev.x, ev.z, ev.radius);
-    fx.impactFelt(BALGATH_SMASH_TRAUMA);
+    fx.impactFelt(BALGATH_SMASH_TRAUMA, ev.x, ev.z);
   } else {
     fx.stompRing(ev.x, ev.z, ev.radius);
-    fx.impactFelt(BALGATH_STOMP_TRAUMA);
+    fx.impactFelt(BALGATH_STOMP_TRAUMA, ev.x, ev.z);
   }
   return true;
 }
@@ -188,42 +249,159 @@ export class BalgathFx {
   private quality = 1;
   /** Per-boss distance-travelled accumulator for footfall spacing. */
   private stride = new Map<number, { x: number; z: number; left: boolean }>();
+  /** Per-boss fractional mote budget, carried frame to frame so a low rate still emits. */
+  private auraCarry = new Map<number, number>();
   private seenThisFrame = new Set<number>();
+
+  private debris: BalgathDebris;
 
   constructor(
     private scene: THREE.Scene,
     private groundHeightAt: (x: number, z: number) => number,
-    /** Camera trauma for a landed slam. Optional so a headless probe needs no camera. */
-    private onImpact: (trauma: number) => void = () => {},
-  ) {}
+    /**
+     * Camera trauma for a landed slam, with the impact's own position so the consumer can
+     * weigh it by distance. Optional so a headless probe needs no camera.
+     */
+    private onImpact: (trauma: number, x: number, z: number) => void = () => {},
+    /**
+     * What the ground at a point is made of, so a slam into a reed bank and a slam into
+     * open water do not look alike. This is the renderer's own footstep classifier
+     * (world_audio.ts), passed in rather than re-derived, so the debris a fist throws and
+     * the dust a boot lifts can never disagree about the same patch of ground.
+     */
+    private surfaceAt: (x: number, z: number, y: number) => Surface = () => 'dirt',
+  ) {
+    this.debris = new BalgathDebris(scene);
+  }
 
-  /** Kick the camera for a landed slam. Reduced motion is handled by the consumer. */
-  impactFelt(trauma: number): void {
-    this.onImpact(trauma);
+  /**
+   * Kick the camera for a landed slam, at the world point it landed on.
+   *
+   * The position is REQUIRED, and that is the whole point of the signature. It defaulted to
+   * the origin while the two shipped call sites here still passed trauma alone, so every
+   * smash and stomp reported an impact 450 yards away in the corner of the world, the
+   * distance falloff correctly scored it zero, and the boss's heaviest blows landed in
+   * total silence. Nothing about that is visible: the dust, the crater and the ring all
+   * fire normally, and only the shake is missing.
+   */
+  impactFelt(trauma: number, x: number, z: number): void {
+    this.onImpact(trauma, x, z);
   }
 
   setQuality(level: number): void {
     this.quality = Math.min(1, Math.max(0, level));
+    this.debris.setQuality(this.quality);
   }
 
   /** The overhead smash landing. `radius` is the TRUE blast radius the telegraph drew. */
   smashImpact(x: number, z: number, radius: number): void {
     this.spawnRing(x, z, radius, SILT, 1);
     this.spawnCrater(x, z, radius);
+    // A fist this size turns the ground over. The dust IS the impact read at distance,
+    // where the ring is a thin line and the crater is hidden behind his own body.
+    this.throwGround(x, z, radius, 1.7);
   }
 
   /** The shockwave stomp: same shape, quicker and thinner. */
   stompRing(x: number, z: number, radius: number): void {
     this.spawnRing(x, z, radius, SILT_DEEP, 0.72);
+    this.throwGround(x, z, radius, 1.1);
+  }
+
+  /** One fist, dropped on a spot: a tight ring, a deep hole, and a column of soil. */
+  hammerImpact(x: number, z: number, radius: number): void {
+    this.spawnRing(x, z, radius, SILT, 0.9);
+    this.spawnCrater(x, z, radius * 1.15);
+    this.throwGround(x, z, radius, 1.5);
+    this.impactFelt(BALGATH_HAMMER_TRAUMA, x, z);
+  }
+
+  /**
+   * The cleave landing: material thrown along the ARC rather than out of a point.
+   *
+   * Seeding several small bursts across the sweep is what makes it read as an arm dragged
+   * through the ground instead of an explosion that happened to be arc-shaped, and it is
+   * the same trick the telegraph uses, so the promise and the payoff have the same shape.
+   */
+  cleaveImpact(x: number, z: number, radius: number, aim: number): void {
+    const steps = 5;
+    for (let i = 0; i < steps; i++) {
+      const a = aim + BALGATH_CLEAVE_HALF_ARC * (-1 + (2 * i) / (steps - 1));
+      const r = radius * 0.72;
+      const px = x + Math.sin(a) * r;
+      const pz = z + Math.cos(a) * r;
+      this.spawnRing(px, pz, radius * 0.34, SILT_DEEP, 0.5);
+      this.throwGround(px, pz, radius * 0.22, 0.5);
+    }
+    this.impactFelt(BALGATH_CLEAVE_TRAUMA, x, z);
+  }
+
+  /**
+   * The ground telegraph for the cleave: an arc, not a circle.
+   *
+   * Drawn here rather than left to the renderer's generic rune circle because the damage
+   * is a 120-degree wedge and a full circle promises four times the area it will actually
+   * hit. A telegraph that overstates itself trains the raid to ignore it, which costs more
+   * than having no telegraph at all.
+   */
+  cleaveTelegraph(x: number, z: number, radius: number, aim: number, seconds: number): void {
+    const geo = new THREE.RingGeometry(
+      radius * 0.12,
+      radius,
+      36,
+      1,
+      // three measures theta from +X counter-clockwise; the game's headings are from +Z
+      // clockwise, so the start angle is (PI/2 - aim) minus the half-width.
+      Math.PI / 2 - aim - BALGATH_CLEAVE_HALF_ARC,
+      BALGATH_CLEAVE_HALF_ARC * 2,
+    );
+    geo.rotateX(-Math.PI / 2);
+    const mat = fxMaterial(SILT, softDisc());
+    const mesh = new THREE.Mesh(geo, mat);
+    mesh.position.set(x, this.groundHeightAt(x, z) + 0.06, z);
+    mesh.renderOrder = 2;
+    this.scene.add(mesh);
+    // Reuse the crater list: it is already an age-and-fade pool with a cap, and a
+    // telegraph is a crater that lives for a second and a half.
+    this.makeCraterRoom();
+    this.craters.push({ mesh, mat, age: 0, life: Math.max(0.2, seconds) });
+  }
+
+  /**
+   * Throw whatever this patch of ground is made of.
+   *
+   * The surface is sampled at the blast's own coordinates, not the boss's, so a fist that
+   * lands in the shallows splashes while the giant standing on the bank does not.
+   */
+  private throwGround(x: number, z: number, radius: number, power: number): void {
+    const y = this.groundHeightAt(x, z);
+    this.debris.burst(
+      x,
+      y,
+      z,
+      this.surfaceAt(x, z, y),
+      power * debrisPowerForBlast(radius),
+      radius,
+    );
   }
 
   /**
    * One footfall's dust. Deliberately tiny and budget-capped: this fires twice a second
    * for the whole fight, so it must never compete with the mechanics for particles.
    */
-  footfall(x: number, z: number, power = 1): void {
+  footfall(x: number, z: number, power = 1, footY?: number): void {
     if (this.quality < 0.35) return;
+    const ground = this.groundHeightAt(x, z);
+    const surface = this.surfaceAt(x, z, footY ?? ground);
+    if (surface === 'water') {
+      // Wading. A thirteen-unit body does not leave dust on a fen: it throws the water
+      // out of its own way, and at his stride that is the loudest thing about him.
+      this.debris.burst(x, footY ?? ground, z, 'water', 0.55 * power, 1.4);
+      this.spawnRing(x, z, 2.4 + power, SILT, 0.28);
+      return;
+    }
     this.spawnRing(x, z, 1.6 + power * 0.9, SILT, 0.34);
+    this.debris.burst(x, ground, z, surface, 0.22 * power, 0.9);
   }
 
   /** Hold the eye's ground pool lit for `seconds` (the scry channel's duration). */
@@ -255,8 +433,32 @@ export class BalgathFx {
     this.rings.push({ mesh, mat, plan, age: 0 });
   }
 
+  /**
+   * Free a slot, dropping whatever has the least life LEFT rather than whatever is oldest.
+   *
+   * This pool holds two very different things: craters that live for three minutes, and
+   * cleave telegraphs that live for one and a half seconds and reuse it because a
+   * telegraph is just a crater in a hurry. Evicting the oldest entry means a busy fight's
+   * telegraphs steadily delete the earliest craters, which are exactly the ones a raid
+   * walked past and remembers. Evicting by remaining life always sacrifices a telegraph
+   * first, and can only ever reach a crater once there is nothing cheaper to give up.
+   */
+  private makeCraterRoom(): void {
+    if (this.craters.length < MAX_ACTIVE_CRATERS) return;
+    let worst = 0;
+    let leastLeft = Number.POSITIVE_INFINITY;
+    for (let i = 0; i < this.craters.length; i++) {
+      const left = this.craters[i].life - this.craters[i].age;
+      if (left < leastLeft) {
+        leastLeft = left;
+        worst = i;
+      }
+    }
+    this.retireCrater(worst);
+  }
+
   private spawnCrater(x: number, z: number, radius: number): void {
-    if (this.craters.length >= MAX_ACTIVE_CRATERS) this.retireCrater(0);
+    this.makeCraterRoom();
     const geo = new THREE.CircleGeometry(radius * 0.55, 32);
     geo.rotateX(-Math.PI / 2);
     const mat = fxMaterial(SILT_DEEP, softDisc());
@@ -275,7 +477,7 @@ export class BalgathFx {
    * Reading them here rather than from renderer.ts hooks keeps the coordinator at two
    * call sites total and puts the whole boss's presentation in one file.
    */
-  private syncBosses(bosses: Iterable<BalgathBody>): void {
+  private syncBosses(bosses: Iterable<BalgathBody>, dt: number, reducedMotion: boolean): void {
     this.seenThisFrame.clear();
     for (const e of bosses) {
       if (!e.templateId?.startsWith(BALGATH_TEMPLATE_PREFIX)) continue;
@@ -284,6 +486,8 @@ export class BalgathFx {
       // instant it stops. Re-armed every frame with a short lease rather than latched on
       // a start event, so an interrupted cast cannot leave the ground lit forever.
       if (e.castingAbility) this.eyeGlow(e.pos.x, e.pos.z, EYE_POOL_LEASE_SECONDS);
+
+      this.syncAura(e, dt, reducedMotion);
 
       // Footfall dust, spaced by DISTANCE TRAVELLED rather than by a timer: that is what
       // ties a puff to a footfall instead of to the frame rate, so it stays in step when
@@ -298,12 +502,64 @@ export class BalgathFx {
       last.x = e.pos.x;
       last.z = e.pos.z;
       last.left = !last.left;
-      this.footfall(e.pos.x, e.pos.z, 1);
+      this.footfall(e.pos.x, e.pos.z, 1, e.pos.y);
     }
     // Forget bosses that despawned, so the stride table cannot grow without bound.
     for (const id of [...this.stride.keys()]) {
       if (!this.seenThisFrame.has(id)) this.stride.delete(id);
     }
+    for (const id of [...this.auraCarry.keys()]) {
+      if (!this.seenThisFrame.has(id)) this.retireAura(id);
+    }
+  }
+
+  /**
+   * The phase indicator, worn ON HIM rather than painted on the floor.
+   *
+   * This started as a coloured disc under his feet and that was the wrong surface: a
+   * ground wash competes with the telegraph rings, which are the one thing on the floor a
+   * player must never misread, and it disappears entirely the moment he is behind a rise or
+   * the camera is low. State belongs on the body that has the state. So the phase now reads
+   * as a SHELL of motes around him, at his own height, plus the fists and the eye.
+   *
+   * Driven from the live entity rather than from events, because every one of these is a
+   * CONDITION rather than a moment (which phase, is the shield up, is he healing) and a
+   * condition pushed as an event has to be un-pushed correctly on every exit path. Read
+   * each frame, it cannot get stuck showing a heal that stopped ten seconds ago.
+   */
+  private syncAura(e: BalgathBody, dt: number, reducedMotion: boolean): void {
+    const plan = bossAuraPlan(readBossVfxState(e));
+    const scale = e.scale ?? 1;
+    const carry = this.auraCarry.get(e.id) ?? 0;
+    if (reducedMotion || this.quality < 0.4) {
+      this.auraCarry.set(e.id, 0);
+      return;
+    }
+    const [count, next] = moteBudget(plan, dt, carry);
+    this.auraCarry.set(e.id, next);
+    if (count === 0) return;
+    const ground = this.groundHeightAt(e.pos.x, e.pos.z);
+    // The shell: motes are seeded around his SILHOUETTE, from knee to shoulder, so they
+    // hug the body instead of pooling at his feet. `chest` is where the inward flow ends.
+    const chest: [number, number, number] = [e.pos.x, ground + 2.1 * scale, e.pos.z];
+    const shell = 1.15 * scale;
+    for (let i = 0; i < count; i++) {
+      const t = ((i * 2654435761) % 1000) / 1000;
+      const height = ground + (0.4 + 2.4 * t) * scale;
+      this.debris.mote(
+        e.pos.x,
+        height,
+        e.pos.z,
+        plan.moteColor,
+        0.4 + 0.3 * Math.min(1.6, scale) * 0.3,
+        plan.moteFlow === 'inward' ? chest : undefined,
+        shell,
+      );
+    }
+  }
+
+  private retireAura(id: number): void {
+    this.auraCarry.delete(id);
   }
 
   /**
@@ -316,7 +572,8 @@ export class BalgathFx {
    */
   update(dt: number, reducedMotion = false, bosses: Iterable<BalgathBody> = []): void {
     this.clock += dt;
-    this.syncBosses(bosses);
+    this.syncBosses(bosses, dt, reducedMotion);
+    this.debris.update(dt);
 
     for (let i = this.rings.length - 1; i >= 0; i--) {
       const ring = this.rings[i];
@@ -341,7 +598,11 @@ export class BalgathFx {
         this.retireCrater(i);
         continue;
       }
-      crater.mat.opacity = 0.5 * (1 - crater.age / crater.life);
+      // Hold, then fade. A crater that starts dissolving the instant it is made never
+      // reads as damage to the ground; one that sits at full strength and only gives up at
+      // the end reads as a hole that is slowly filling in.
+      const left = 1 - crater.age / crater.life;
+      crater.mat.opacity = 0.5 * Math.min(1, left / BALGATH_CRATER_FADE);
     }
 
     if (this.eyePool && this.eyePoolMat) {
@@ -372,7 +633,9 @@ export class BalgathFx {
   }
 
   clear(): void {
+    this.auraCarry.clear();
     this.stride.clear();
+    this.debris.clear();
     for (let i = this.rings.length - 1; i >= 0; i--) this.retireRing(i);
     for (let i = this.craters.length - 1; i >= 0; i--) this.retireCrater(i);
     if (this.eyePool) this.eyePool.visible = false;
@@ -381,6 +644,7 @@ export class BalgathFx {
 
   dispose(): void {
     this.clear();
+    this.debris.dispose();
     if (this.eyePool) {
       this.scene.remove(this.eyePool);
       this.eyePool.geometry.dispose();

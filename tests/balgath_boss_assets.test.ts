@@ -9,6 +9,7 @@
 import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { describe, expect, it } from 'vitest';
+import { loadRigPoser } from './helpers/gltf_pose';
 
 const ROOT = resolve(__dirname, '..');
 const RIG = resolve(ROOT, 'public/models/creatures/balgath_cyclops.glb');
@@ -69,6 +70,10 @@ const AUTHORED = [
   'Balgath_Roar', // the enrage flourish
   'Balgath_Wake', // the spawn rise
   'Balgath_Swipe', // the ORDINARY auto-attack, kept small so the slams stay rare
+  'Balgath_Barrowsweep', // the mid-run backhand: its legs are sampled off the Run cycle
+  'Balgath_Barrowfall', // the warpath arrival slam, timed to its own telegraph fuse
+  'Balgath_Hammer', // whack-a-mole: ONE fist up, held, dropped on a snapshot
+  'Balgath_Cleave', // the low arc, authored as a body twist at the root
 ];
 
 /** What the Tripo creature lane retargeted onto the rig. */
@@ -215,6 +220,252 @@ describe('balgath world boss assets', () => {
     );
     expect(walkRef).toBeGreaterThan(0);
     expect(speed / walkRef, 'walk clip would be pinned at its clamp').toBeLessThan(1.8);
+  });
+
+  it('routes each warpath cue off the ability id the sim actually emits', () => {
+    // Same weld as the telegraphed slams above, for the two mechanics his warpath owns
+    // (src/sim/mob/warpath.ts). These ids are not castable abilities: they are cue names
+    // agreed between the emitter and this map, and nothing else checks them. Disagree and
+    // the mechanic still resolves while the boss plays his ordinary swing, which is the
+    // kind of wrong that survives a playtest.
+    const map = clipMapSource();
+    const warpath = readFileSync(resolve(ROOT, 'src/sim/mob/warpath.ts'), 'utf8');
+    for (const [ability, clip] of [
+      ['mob_warpath_swipe', 'Balgath_Barrowsweep'],
+      ['mob_warpath_wreck', 'Balgath_Barrowfall'],
+    ]) {
+      expect(map, `${ability} is not mapped`).toContain(`${ability}: '${clip}'`);
+      expect(warpath, `${ability} is never emitted`).toContain(`'${ability}'`);
+    }
+  });
+
+  it('runs its warpath in the RUN gait and its combat in the walk', () => {
+    // The one thing that made him read as skating was a clip pinned at its clamp. He now
+    // has two speeds and they must land in different gait bands with the clip rate inside
+    // the clamp on BOTH sides: combat under GAIT_RUN_ENTER on the walk reference, travel
+    // above it on the run reference. Neither the sim nor the renderer can see the other
+    // half of this, so it is checked here or not at all.
+    const template = templateSource();
+    const manifest = readFileSync(MANIFEST, 'utf8');
+    const moveSpeed = Number(template.match(/moveSpeed: ([\d.]+),/)?.[1]);
+    const travelMult = Number(template.match(/travelSpeedMult: ([\d.]+),/)?.[1]);
+    const walkRef = Number(manifest.match(/const BALGATH_WALK_REF = ([\d.]+);/)?.[1]);
+    const runRef = Number(manifest.match(/const BALGATH_RUN_REF = ([\d.]+);/)?.[1]);
+    expect(moveSpeed).toBeGreaterThan(0);
+    expect(travelMult).toBeGreaterThan(1);
+    const travel = moveSpeed * travelMult;
+    // GAIT_RUN_ENTER is 5.2 (src/render/locomotion.ts): combat below it, travel above.
+    expect(moveSpeed, 'combat speed would cross into the run gait').toBeLessThan(5.2);
+    expect(travel, 'travel speed would stay in the walk gait').toBeGreaterThan(5.2);
+    // locomotionTimeScale clamps the run to [0.6, 1.6] and the walk to [0.6, 1.8]; a rate
+    // outside the clamp is a clip pinned at its limit, which is a skate by construction.
+    expect(moveSpeed / walkRef).toBeGreaterThan(0.6);
+    expect(moveSpeed / walkRef).toBeLessThan(1.8);
+    expect(travel / runRef).toBeGreaterThan(0.6);
+    expect(travel / runRef).toBeLessThan(1.6);
+    // He must also stay outrunnable: every telegraphed circle in this fight assumes a
+    // player can walk out of it, and a boss faster than a 7 u/s run cannot be left.
+    expect(travel, 'a boss nobody can outrun has no counterplay').toBeLessThan(7);
+  });
+
+  it('plays the mid-run backhand at exactly the rate its own legs were sampled at', () => {
+    // Barrowsweep is a COMPOSITE: its lower body is the Run cycle, its upper body an
+    // authored swing, because the renderer plays an attack as a full-body one-shot and an
+    // ordinary swing clip would freeze a travelling boss's legs while the sim kept sliding
+    // him. That only holds while the one-shot's timescale matches what the locomotion
+    // state machine would have picked for the run clip at travel speed. Drift them apart
+    // and the composite skates for exactly as long as the swing lasts.
+    const template = templateSource();
+    const manifest = readFileSync(MANIFEST, 'utf8');
+    const travel =
+      Number(template.match(/moveSpeed: ([\d.]+),/)?.[1]) *
+      Number(template.match(/travelSpeedMult: ([\d.]+),/)?.[1]);
+    const runRef = Number(manifest.match(/const BALGATH_RUN_REF = ([\d.]+);/)?.[1]);
+    const wired = Number(manifest.match(/mob_warpath_swipe: ([\d.]+),/)?.[1]);
+    expect(wired).toBeGreaterThan(0);
+    expect(wired).toBeCloseTo(travel / runRef, 1);
+  });
+
+  it('keeps the two aimed slams authored in Blender, not blended out of donor poses', () => {
+    // These two escalated to real keyframing for a reason the rig can be asked about: the
+    // retargeted donor set carries no horizontal swing and no one-armed gesture at all, so
+    // a hammer and a low sweep cannot be sampled out of it. The versions this replaced were
+    // built by masking half the body out of a two-armed overhead chop.
+    const data = JSON.parse(
+      readFileSync(resolve(ROOT, 'scripts/anim_data/balgath_slam_clips.json'), 'utf8'),
+    );
+    for (const clip of ['Balgath_Hammer', 'Balgath_Cleave']) {
+      expect(Object.keys(data.clips), `${clip} is not authored`).toContain(clip);
+      expect(data.clips[clip].times.length, `${clip} has no frames`).toBeGreaterThan(30);
+    }
+    // The build must SOURCE them from that data rather than re-deriving them, or the
+    // authored motion is silently replaced by whatever the pose blender produces.
+    const build = readFileSync(resolve(ROOT, 'scripts/build_balgath_anims.mjs'), 'utf8');
+    expect(build).toContain('balgath_slam_clips.json');
+    expect(build).toContain("blenderClip('Balgath_Hammer')");
+    expect(build).toContain("blenderClip('Balgath_Cleave')");
+  });
+
+  it('never authors a track on the parentless root bone', () => {
+    // The falling-forward bug, as a gate. The axis conversion bakes into the parentless
+    // bone's pose matrix, so sampling it writes a constant quarter-turn root track that
+    // pitches the whole model forward for as long as the one-shot plays. That shipped once
+    // on another rig; it is cheap to make impossible here.
+    const data = JSON.parse(
+      readFileSync(resolve(ROOT, 'scripts/anim_data/balgath_slam_clips.json'), 'utf8'),
+    );
+    const rootless = (glbJson(RIG).nodes ?? []).map((n) => n.name);
+    expect(data.bones, 'the authored bone list names the root').not.toContain('Root');
+    for (const clip of Object.values(data.clips) as { rotation: Record<string, unknown> }[]) {
+      expect(Object.keys(clip.rotation)).not.toContain('Root');
+    }
+    // ...and every bone it DOES name has to exist on the rig, or the track binds to nothing.
+    for (const bone of data.bones as string[]) {
+      expect(rootless, `authored bone '${bone}' is not on the rig`).toContain(bone);
+    }
+  });
+
+  it('lands each authored slam on its own template windup', () => {
+    // Both are wired at timeScale 1, so the clip's contact frame IS the moment the blast
+    // resolves. The clip has to be long enough to contain that frame with recovery after
+    // it; a clip shorter than its windup clamps on the last pose and the boss stands
+    // frozen through the rest of his own telegraph.
+    const template = templateSource();
+    const data = JSON.parse(
+      readFileSync(resolve(ROOT, 'scripts/anim_data/balgath_slam_clips.json'), 'utf8'),
+    );
+    const hammerWind = Number(template.match(/hammer: \{[\s\S]*?windup: ([\d.]+),/)?.[1]);
+    const cleaveWind = Number(template.match(/cleave: \{[\s\S]*?windup: ([\d.]+),/)?.[1]);
+    expect(hammerWind).toBeGreaterThan(0);
+    expect(cleaveWind).toBeGreaterThan(0);
+    expect(data.clips.Balgath_Hammer.duration).toBeGreaterThan(hammerWind);
+    expect(data.clips.Balgath_Cleave.duration).toBeGreaterThan(cleaveWind);
+  });
+
+  it('never swings the hammer arm through his own head', async () => {
+    // A defect that shipped, and a measurement that can see it. This rig has an enormous
+    // head (0.226 radius on a 0.55-tall body) and short arms, so raising the fist onto the
+    // CENTRELINE buries the forearm in the skull. The first authored cut did exactly that,
+    // on the beats that are held on screen for the whole windup, and it read as "nicely
+    // centred overhead" in every metric I had at the time.
+    //
+    // The geometric tell is simple: while the fist is above head height it must stay OFF
+    // the body axis. Nothing else in the suite can see this, because it is the composition
+    // of a raise and a lateral that is wrong, not either one.
+    const poser = await loadRigPoser(RIG, ABILITIES);
+    const dur = poser.duration('Balgath_Hammer');
+    let worst = Number.POSITIVE_INFINITY;
+    for (let i = 0; i <= 40; i++) {
+      const p = poser.pose('Balgath_Hammer', (dur * i) / 40);
+      const fist = p.at('R_Hand');
+      const head = p.at('Head');
+      const foot = p.at('R_Foot');
+      if (fist[1] < head[1]) continue; // only the raised part of the swing can reach it
+      // Horizontal distance from the body axis, taken at the head's own centre.
+      const off = Math.hypot(fist[0] - head[0], fist[2] - head[2]);
+      worst = Math.min(worst, off);
+      void foot;
+    }
+    expect(worst, 'the hammer never lifts above his head at all').toBeLessThan(9e9);
+    expect(worst, 'the raised fist crosses onto his own head').toBeGreaterThan(0.12);
+  });
+
+  it('scrapes the cleave along the ground instead of swinging it through the air', async () => {
+    // The mechanic is beaten by JUMPING, so the thing a player has to clear must be visibly
+    // ON the floor for long enough to read. A fist that whips past at hip height in three
+    // frames is a swing, and a swing teaches the raid to walk backwards instead.
+    const poser = await loadRigPoser(RIG, ABILITIES);
+    const dur = poser.duration('Balgath_Cleave');
+    const samples: { t: number; up: number; brg: number }[] = [];
+    for (let i = 0; i <= 50; i++) {
+      const t = (dur * i) / 50;
+      const p = poser.pose('Balgath_Cleave', t);
+      const fist = p.at('R_Hand');
+      const foot = p.at('R_Foot');
+      samples.push({
+        t,
+        up: fist[1] - foot[1],
+        brg: (Math.atan2(fist[2], fist[0]) * 180) / Math.PI,
+      });
+    }
+    // A contiguous stretch where the fist is genuinely low, and it has to be LONG.
+    const low = samples.filter((s) => s.up < 0.2);
+    expect(low.length, 'the fist never reaches the ground').toBeGreaterThan(6);
+    const span = Math.max(...low.map((s) => s.t)) - Math.min(...low.map((s) => s.t));
+    expect(span, 'the ground contact is a tap, not a scrape').toBeGreaterThan(0.5);
+    // ...and it must TRAVEL while it is down there, or it is a plant rather than a drag.
+    const brgs = low.map((s) => s.brg);
+    const swept = Math.max(...brgs) - Math.min(...brgs);
+    expect(swept, 'the fist sits still on the ground instead of dragging').toBeGreaterThan(60);
+  });
+
+  it('routes each AIMED slam off the ability id the sim actually emits', () => {
+    // Third weld of the same kind, for the two hand-aimed attacks. These ids are agreed
+    // between three files that cannot import each other: the sim emits them, the ClipMap
+    // picks a pose from them, and the FX router picks an arc or a crater from them. Nothing
+    // but this test can see all three at once, and a disagreement is silent in every one.
+    const map = clipMapSource();
+    const slams = readFileSync(resolve(ROOT, 'src/sim/mob/boss_slams.ts'), 'utf8');
+    const fxCore = readFileSync(resolve(ROOT, 'src/render/balgath_fx_core.ts'), 'utf8');
+    for (const [ability, clip] of [
+      ['mob_balgath_hammer', 'Balgath_Hammer'],
+      ['mob_balgath_cleave', 'Balgath_Cleave'],
+    ]) {
+      expect(map, `${ability} has no pose`).toContain(`${ability}: '${clip}'`);
+      expect(slams, `${ability} is never emitted`).toContain(`'${ability}'`);
+      expect(fxCore, `${ability} has no ground effect`).toContain(`'${ability}'`);
+    }
+  });
+
+  it('draws the cleave telegraph at the width the cleave actually hits', () => {
+    // The renderer draws the arc from its own constant and the sim damages from the
+    // template's, because src/render may not import a SimContext consumer. If they drift,
+    // the ring promises one wedge and the arm sweeps another, which is worse than no
+    // telegraph: the raid dodges the wrong way with confidence.
+    const halfDeg = Number(templateSource().match(/halfArcDeg: ([\d.]+),/)?.[1]);
+    expect(halfDeg).toBeGreaterThan(0);
+    const fxCore = readFileSync(resolve(ROOT, 'src/render/balgath_fx_core.ts'), 'utf8');
+    const drawnDeg = Number(fxCore.match(/BALGATH_CLEAVE_HALF_ARC = \((\d+) \* Math\.PI\)/)?.[1]);
+    expect(drawnDeg, 'the render half-arc constant moved or was renamed').toBeGreaterThan(0);
+    expect(drawnDeg).toBe(halfDeg);
+  });
+
+  it('lights a fist for every slam whose windup a raid has to read', () => {
+    // The glow is the only cue that says WHICH hand, and therefore whether the ring on the
+    // ground belongs to one player or to everybody. A telegraphed slam without one is a
+    // mechanic the raid can only read from the floor.
+    const map = clipMapSource();
+    for (const ability of ['mob_balgath_hammer', 'mob_balgath_cleave', 'mob_pulse_windup']) {
+      expect(map, `${ability} winds up with no fist cue`).toContain(`${ability}: { hand:`);
+    }
+  });
+
+  it('keeps the fist glow the size of a fist', () => {
+    // `radius` is BONE-LOCAL and gets multiplied twice on the way to the screen: by the
+    // visual's normScale (3.85 on this rig) and again by the entity's scale (4.2). The
+    // first cut used 0.11, which is a 3.5-unit ball across the chest of a 13-unit body; at
+    // 0.04 it measures 1.29 units in-engine, which is a fist. Nothing else can catch this
+    // because both multipliers live on the render side and neither is in the ClipMap.
+    // The glow specs live on the shared BALGATH ClipMap, not the VisualDef.
+    const radii = [...clipMapSource().matchAll(/radius: ([\d.]+) \}/g)].map((m) => Number(m[1]));
+    expect(radii.length, 'no charge-glow radii found to check').toBeGreaterThan(2);
+    for (const r of radii) {
+      expect(r, 'a bone-local glow radius this big renders as a beach ball').toBeLessThan(0.06);
+      expect(r, 'a glow this small is invisible from raid distance').toBeGreaterThan(0.02);
+    }
+  });
+
+  it('swings the Tripo rig onto the +Z facing convention', () => {
+    // The rig came off the creature lane resting facing +X, and the game sets
+    // group.rotation.y straight from the sim's facing, where 0 means +Z. Without the yaw
+    // offset the mesh is drawn a quarter turn off its own heading: he runs north with his
+    // body pointing east, feet cycling forward while he slides sideways.
+    //
+    // Nothing else can catch this. The sim's facing is exactly right (measured at 0.000
+    // rad of error against velocity over hundreds of moving ticks), the renderer's group
+    // rotation is exactly right, and a still frame of a symmetrical stone body reads fine
+    // from most angles. Only the composition of the two is wrong, and only in motion.
+    expect(defBlock('mob_balgath_cyclops')).toContain('yaw: -Math.PI / 2');
   });
 
   it('telegraphs its mechanics, which is the whole counterplay', () => {

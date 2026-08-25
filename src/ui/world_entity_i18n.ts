@@ -243,6 +243,8 @@ const NPC_IDS = [
   'foreman_odell',
   'stablemaster_marla', // the stablemaster: teaches riding lessons (Highwatch, zone 3)
   'warden_fenwick',
+  // The Mirefen world boss's level-spread mechanic: he lends the Shardpike.
+  'socketwright_skerrit',
   'brother_aldric_fen',
   'provisioner_hale',
   'herbalist_yara',
@@ -357,6 +359,7 @@ const QUEST_IDS = [
   'q_bandits',
   'q_ringleader',
   'q_fenbridge_muster',
+  'q_socketwrights_due',
   'q_prowlers',
   'q_prowler_pelts',
   'q_fen_supplies',

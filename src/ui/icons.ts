@@ -2517,6 +2517,23 @@ function r(
 }
 
 const ABILITY_RECIPES: Record<string, IconRecipe> = {
+  // The Shardpike bar's three verbs (src/ui/hud/shardpike/). Not real abilities, so the
+  // ability FALLBACK would normally paint them, and it derived three visually identical
+  // tiles from ids that differ only in their last word: a bar whose entire job is "which
+  // of these three do I press" showed the same glyph three times. Authored here instead,
+  // in the frost/ice pair the Loomshard's own teal reads as.
+  //
+  // The pike is `staff` (the closest primitive to a shaft) in all three, so the family
+  // reads as one item, and the SECOND mark is the verb: a hand gripping it to brace, the
+  // eye it goes through to thrust, a cancel cross to ground it.
+  //
+  // All three now also ship PAINTED art (ABILITY_IMAGE_IDS below), so `abilityImageUrl`
+  // wins and these are the fallback path only. They stay for the reason `intervene`'s does:
+  // every ability owes an explicit, distinct recipe (tests/ability_icons.test.ts), and a
+  // painted file failing to load must still land on three different tiles.
+  lance_brace: r('frost', 'ice', ['staff', { p: 'hand', ...BR }], ['glow']),
+  lance_thrust: r('frost', 'ice', ['staff', { p: 'eye', ...TL }], ['sparkle']),
+  lance_release: r('frost', 'ice', ['staff', { p: 'cross', ...BR }]),
   // Talents 2.0 ground-targeted spells (each aimed AoE gets a distinct recipe;
   // grouped here so the family reads together, order within the map is cosmetic).
   flamestrike: r('fire', 'ember', ['meteor', { p: 'sunburst', ...BIG }], ['glow']),
@@ -4239,6 +4256,14 @@ const WARLOCK_TALENT_IMAGE_IDS = new Set<string>([
   'wlk_r20_curse_mastery',
 ]);
 export const ABILITY_IMAGE_IDS = new Set<string>([
+  // The Shardpike bar's three verbs (src/ui/hud/shardpike/). Painted rather than procedural
+  // because the player's entire job in this mechanic is choosing between these three under
+  // pressure, and three composited tiles built from the same primitives read as one tile at
+  // the 32px they are actually seen at. They are not class abilities, so `abilityImageUrl`
+  // maps them to their own folder below rather than deriving one from ABILITIES.
+  'lance_brace',
+  'lance_thrust',
+  'lance_release',
   // paladin (original project art for the overhaul and talent abilities, plus
   // the existing CraftPix premium "RPG Paladin skill icons" base set)
   'divine_ascension',
@@ -4758,6 +4783,11 @@ export const ABILITY_IMAGE_IDS = new Set<string>([
 /** Static URL of an ability's image icon, or null if it uses a recipe. */
 export function abilityImageUrl(id: string): string | null {
   if (!ABILITY_IMAGE_IDS.has(id)) return null;
+  // The Shardpike verbs first: they are quest-tool actions with no ABILITIES row at all, so
+  // every arm below would fall through to a class that does not own them.
+  if (id === 'lance_brace' || id === 'lance_thrust' || id === 'lance_release') {
+    return `${SKILL_ICON_DIR}/shardpike/${id}.webp`;
+  }
   const cls =
     ABILITIES[id]?.class ??
     (id === 'colossal_might' ||

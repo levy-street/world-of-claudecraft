@@ -11712,6 +11712,7 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'entities.items.duskthorn_mantle.name': 'Manto de espino crepuscular',
   'entities.items.fenbark_leggings.name': 'Leotardos de corteza del pantano',
   'entities.items.fenshadow_maul.name': 'Mazo sombra del pantano',
+  'entities.items.skerrits_shardpike.name': 'Pica de Fragmentos de Skerrit',
   'entities.items.foremans_barrowmaul.name': 'Mazo Tumular del Capataz',
   'entities.items.loomshard_eye.name': 'El Ojo de Esquirla del Telar',
   'entities.items.barrowhide_pauldrons.name': 'Hombreras Tumulares',

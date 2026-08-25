@@ -224,8 +224,12 @@ describe('nythraxis hitch bench helpers', () => {
     expect(layout).toContain(
       `entry: { x: ${NYTHRAXIS_ARENA_ENTRY_LOCAL.x}, z: ${NYTHRAXIS_ARENA_ENTRY_LOCAL.z} }`,
     );
-    const server = readFileSync(new URL('../server/game.ts', import.meta.url), 'utf8');
-    expect(server).toContain(`const INTEREST_RADIUS = ${MOB_INTEREST_RADIUS}`);
+    // The radius moved out of game.ts into its own module when the world-boss landmark
+    // widening landed (server/interest_scope.ts, which now owns all three enforcement
+    // points). Still read from source rather than imported: this bench models mob interest
+    // independently, and importing the number would make the pin agree with itself.
+    const scope = readFileSync(new URL('../server/interest_scope.ts', import.meta.url), 'utf8');
+    expect(scope).toContain(`const INTEREST_RADIUS = ${MOB_INTEREST_RADIUS}`);
   });
 
   it('stands the observer on the live Aldric spawn and keeps that distance pinned to the encounter', () => {

@@ -14,6 +14,8 @@ import type {
   DailyRewardStatus,
   DelveCompanionInfo,
   DelveRunInfo,
+  LanceGuidanceView,
+  LanceTrialView,
   LockpickView,
   MountRaceView,
   PlayerProfessionsView,
@@ -276,6 +278,9 @@ import { meetsLevelRequirement } from './item_level_req';
 import { setItemLocked as setItemLockedCmd } from './item_lock';
 import * as items from './items';
 import type { JailState } from './jail';
+import * as lanceGuidanceMod from './lance_guidance';
+import * as lanceTrialMod from './lance_trial';
+import { advanceLanceBrace, type LanceSession } from './lance_trial';
 import {
   type DeedsLeaderboardPage,
   type DevLeaderboardPage,
@@ -1285,6 +1290,18 @@ export interface PlayerMeta {
   // persisted: src/sim/mount_race.ts owns the rules. Strictly per-player, so
   // simultaneous racers never share or contend on anything.
   mountRace?: MountRaceSession | null;
+  // The active Shardpike brace, or absent. Session state, never persisted (a relog is a
+  // dropped pike): src/sim/lance_trial.ts owns the rules, and the per-tick step runs in
+  // the movement ladder, so there is no separate tick phase to keep in order.
+  lance?: LanceSession;
+  // Sim-time the pike can next be braced (set by a fumble, a shove, or a thrust).
+  lanceRestUntil?: number;
+  /**
+   * Loomshard Thrusts this character has landed. Persisted with the character (unlike the
+   * session above) because it is the ONLY number telling a level 6 that the windows the
+   * raid spent were theirs, and a tally that resets on relog says the opposite.
+   */
+  lanceThrusts?: number;
   // Optional QoL preference (issue #1358): when true, every target-switch
   // selector in targeting.ts (targetEntity, tabTarget, targetNearestEnemy,
   // targetNearestFriendly, friendlyTabTarget) disengages auto-attack instead of
@@ -6825,6 +6842,11 @@ export class Sim {
     // Hold every forced/manual locomotion mode until the authoritative GO tick.
     if (meta.mountRace?.phase === 'countdown') return;
     if (advanceHeroicLeap(this.ctx, p)) return;
+    // A couched Shardpike owns movement while it holds (src/sim/lance_trial.ts): the
+    // strafe axis becomes the balance stick and locomotion is suppressed. A shove or a
+    // fumble ends the session INSIDE the call and falls through, so the tick that breaks
+    // the stance is the same tick ordinary motion (and the shove's velocities) resume.
+    if (advanceLanceBrace(this.ctx, p, meta.moveInput)) return;
     // A ledge climb owns movement while it runs, and an airborne body that
     // gets its hands on a reachable ledge starts one. Sits after the leap arc
     // (a leap has its own landing contract) and before charge/follow/fear so
@@ -12240,6 +12262,43 @@ export class Sim {
 
   get lockpickState(): LockpickView | null {
     return this.lockpickViewFor(this.primaryId);
+  }
+
+  // --- The Shardpike trial (src/sim/lance_trial.ts): facade delegates + primary view ---
+  lanceBrace(pid: number = this.primaryId): void {
+    lanceTrialMod.lanceBrace(this.ctx, pid);
+  }
+
+  lanceThrust(pid: number = this.primaryId): void {
+    lanceTrialMod.lanceThrust(this.ctx, pid);
+  }
+
+  lanceRelease(pid: number = this.primaryId): void {
+    lanceTrialMod.lanceRelease(this.ctx, pid);
+  }
+
+  lanceTrialFor(pid: number): LanceTrialView | null {
+    return lanceTrialMod.lanceTrialViewFor(this.ctx, pid);
+  }
+
+  lanceRestRemainingFor(pid: number): number {
+    return lanceTrialMod.lanceRestRemainingFor(this.ctx, pid);
+  }
+
+  lanceGuidanceFor(pid: number): LanceGuidanceView | null {
+    return lanceGuidanceMod.lanceGuidanceFor(this.ctx, pid, lanceTrialMod.LANCE_THRUST_RANGE);
+  }
+
+  get lanceTrial(): LanceTrialView | null {
+    return this.lanceTrialFor(this.primaryId);
+  }
+
+  get lanceRestRemaining(): number {
+    return this.lanceRestRemainingFor(this.primaryId);
+  }
+
+  get lanceGuidance(): LanceGuidanceView | null {
+    return this.lanceGuidanceFor(this.primaryId);
   }
 
   get delveMarks(): number {

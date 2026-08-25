@@ -668,6 +668,13 @@ const HUD_UPDATE_DRIVES: readonly DriveRow[] = [
     why: 'the pet bar; rebuilds its buttons behind a signature latch',
   },
   {
+    call: 'this.shardpikeBar.paint',
+    band: 'frame',
+    gate: '',
+    surface: 'chrome',
+    why: 'the world-boss trial\'s whole input surface: the three pike verbs, the balance beam, and the loud centre-screen instruction. Ungated and per-frame on purpose, because the beam moves every sim tick and the thrust window drains in real time; BOTH halves build once on the first visible paint and then only re-state, and the prompt additionally holds a signature latch so its text and classes are written only when the line actually changes rather than sixty times a second for a once-a-second countdown',
+  },
+  {
     call: 'this.renderStanceBar',
     band: 'frame',
     gate: '',
@@ -1644,7 +1651,7 @@ describe('Hud.update() drives exactly the registered set, on the registered band
       // release's own window/chrome churn), so it cannot be reconciled by
       // arithmetic across a merge. The numbers below were set from a suite run
       // on the merged tree, not from either side's narrative.
-    ).toEqual({ window: 47, chrome: 82, none: 17 });
+    ).toEqual({ window: 47, chrome: 83, none: 17 });
     const windows = HUD_UPDATE_DRIVES.filter((r) => r.surface === 'window');
     expect(windows.map((r) => r.call)).toContain('this.spellbookWindow.tickOpen');
     expect(windows.map((r) => r.call)).toContain('this.refreshOpenTownFocusIfChanged');

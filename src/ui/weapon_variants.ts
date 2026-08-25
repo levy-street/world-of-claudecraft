@@ -149,4 +149,9 @@ export const ITEM_WEAPON_VARIANTS: Record<string, string> = {
   tidereaver_gaff: 'spear_a', // a gaff is a hooked spear
   ironbark_boar_spear: 'spear_a', // crafted 2H spear
   fanglords_beastspear: 'spear_a', // RARE: the basin Beastmaster's boar spear
+  // Skerrit's Shardpike: a socketwright's gem-setting tool, not a soldier's spear, so it
+  // gets its own model rather than borrowing spear_a. Unmapped it fell through to the
+  // class default attach, which meant the quest tool the Mirefen world boss's whole
+  // level-spread mechanic runs on was drawn as a plain sword.
+  skerrits_shardpike: 'shardpike_spear',
 };

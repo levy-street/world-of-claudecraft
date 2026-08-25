@@ -171,6 +171,11 @@ import { renderAuraTooltipBodyHtml } from './aura_tooltip';
 import { AurasPainter, type AurasPainterDeps } from './auras_painter';
 import { type AurasDeps, auraCancelNeedsConfirm, createAurasView } from './auras_view';
 import { attachAvatarFallback } from './avatar_fallback';
+import {
+  claudiumLauncherHtml,
+  walletActionChipHtml,
+  walletBalanceChipHtml,
+} from './bag_currency_html';
 import { BagItemActionMenu, CTX_MENU_PICKER_CLASS } from './bag_item_action_menu';
 import { bagsWindowShown } from './bags_view';
 import { BagsWindow, dismissBagPrompts } from './bags_window';
@@ -220,6 +225,7 @@ import {
   shouldPlayCritSfxForTarget,
   shouldPlayMobVoiceSfxForEntity,
   spellFxCue,
+  yellVoiceKey,
 } from './combat_sfx';
 import { buildCommissionOrderBoardModel } from './commission_order_view';
 import { renderCommissionOrderWindow } from './commission_order_window';
@@ -280,6 +286,10 @@ import { DungeonFinderProposalPopup } from './dungeon_finder_proposal_popup';
 import { DungeonFinderWindow } from './dungeon_finder_window';
 import { elixirTooltipLines } from './elixir_tooltip_view';
 import { emoteIconUrl } from './emote_icons';
+import {
+  emoteWheelSlotsKey,
+  emoteWheelVersionKey as emoteWheelVersionKeyFor,
+} from './emote_wheel_keys';
 import {
   applyEnchantResultToast,
   disenchantResultToast,
@@ -461,6 +471,7 @@ import { QuestTrackerController } from './hud/quest/quest_tracker_controller';
 import { QuestLogWindow } from './hud/quest/questlog_window';
 import { RiftMapPainter } from './hud/rift';
 import { RiftFloorTrackerController } from './hud/rift/rift_floor_tracker_controller';
+import { createShardpikeBar, shardpikeBlindFeedback } from './hud/shardpike';
 import { dismissBuyQuantityPrompts } from './hud/vendor/buy_quantity_prompt_window';
 import { buildHeroicVendorView } from './hud/vendor/heroic_vendor_view';
 import { renderHeroicVendorWindow } from './hud/vendor/heroic_vendor_window';
@@ -723,9 +734,10 @@ import { targetRankView, targetUsesEliteFrame } from './target_rank_view';
 import type { PresetId, ThemeKnob, ThemeState } from './theme';
 import { toolEffectNameKey } from './tool_effect_name';
 import { toolEffectTooltipLines } from './tool_effect_tooltip';
+import { attachSharedTooltip } from './tooltip_attach';
 import { createTooltipLine } from './tooltip_line';
 import { SharedTooltipOwner } from './tooltip_owner';
-import { TOOLTIP_PEEK_MS, TouchPeekGuard } from './touch_peek';
+import { TouchPeekGuard } from './touch_peek';
 import { bindTouchDoubleTap, bindTouchTap, CLICK_SUPPRESS_MS, TAP_SLOP_PX } from './touch_tap';
 import { buildTownFocusView, stepTownFocus, townFocusRenderSig } from './town_focus_view';
 import { renderTownFocusWindow } from './town_focus_window';
@@ -1251,17 +1263,6 @@ function appendChildSpan(parent: HTMLElement, className: string): HTMLElement {
 
 function availableMobVoiceCue(templateId: string, action: MobVoiceAction): string | null {
   return mobVoiceCue(templateId, action, (key) => sfx.hasVariants(key));
-}
-
-// Stable voice-clip key for a spoken yell line. MUST match the generator slug in
-// scripts/voices/extra_lines.mjs (yellKey) so encounter dialogue (e.g. the
-// Nythraxis raid) plays the right clip from the live chat event text.
-function yellVoiceKey(text: string): string {
-  return `yell__${text
-    .toLowerCase()
-    .replace(/[^a-z0-9]+/g, '_')
-    .replace(/^_+|_+$/g, '')
-    .slice(0, 60)}`;
 }
 
 const CHEAT_DEATH_SAVE_TEXT = 'Cheat Death saves you!';
@@ -3821,11 +3822,11 @@ export class Hud {
   // -------------------------------------------------------------------------
 
   private emoteWheelKey(): string {
-    return `woc_emote_wheel_${this.sim.cfg.playerClass}_${this.sim.player.name}`;
+    return emoteWheelSlotsKey(this.sim.cfg.playerClass, this.sim.player.name);
   }
 
   private emoteWheelVersionKey(): string {
-    return `${this.emoteWheelKey()}_v2`;
+    return emoteWheelVersionKeyFor(this.sim.cfg.playerClass, this.sim.player.name);
   }
 
   private loadEmoteWheelSlots(): OverheadEmoteId[] {
@@ -4100,6 +4101,11 @@ export class Hud {
     this.paladinAscensionCharges,
     this.paladinAscensionStatusEl,
   );
+  /** The Shardpike bar: the world boss trial's only input surface (hud/shardpike/). */
+  private readonly shardpikeBar = createShardpikeBar(document, this.writerFacet, () => this.sim, {
+    attachTooltip: (el, html) => this.attachTooltip(el, html),
+    consumePeek: () => this.peekGuard.consume(),
+  });
   private readonly doomMeter = createDoomMeter(
     document,
     this.playerFrameEl.parentElement as HTMLElement,
@@ -5465,33 +5471,20 @@ export class Hud {
     if (!walletUiEnabled()) return '';
     const state = walletConnectionView();
     const bal = wocBalance();
-    if (bal === null) {
-      const label =
-        state.kind === 'linked_disconnected'
-          ? t('wallet.bagReconnect')
-          : state.kind === 'connected_unlinked' || state.kind === 'mismatched'
-            ? t('wallet.bagLink')
-            : t('wallet.bagConnect');
-      return `<button type="button" class="woc-balance woc-wallet-action" data-wallet-action aria-label="${esc(label)}"><span class="woc-coin" aria-hidden="true"></span>${esc(label)}</button>`;
-    }
-    const amount = formatNumber(bal, { maximumFractionDigits: 2 });
-    const balance = t('wallet.balanceAmount', { amount });
-    const verified = wocBalanceVerified();
-    const title = verified ? t('wallet.balanceTitle') : t('wallet.balancePreviewTitle');
-    const aria = verified
-      ? t('wallet.balanceAria', { balance })
-      : t('wallet.balancePreviewAria', { balance });
-    const tag = verified ? 'span' : 'button type="button" data-wallet-action';
-    return `<${tag} class="woc-balance ${verified ? 'is-verified' : 'is-preview'}" title="${esc(title)}" aria-label="${esc(aria)}"><span class="woc-coin" aria-hidden="true"></span>${esc(balance)}</${verified ? 'span' : 'button'}>`;
+    if (bal !== null) return walletBalanceChipHtml(bal, wocBalanceVerified());
+    return walletActionChipHtml(
+      state.kind === 'linked_disconnected'
+        ? 'reconnect'
+        : state.kind === 'connected_unlinked' || state.kind === 'mismatched'
+          ? 'link'
+          : 'connect',
+    );
   }
 
   private claudiumLauncherHtml(): string {
     if (!this.claudiumHooks) return '';
     this.claudiumBalance.refresh();
-    const balance = this.claudiumBalance.balance;
-    const label = balance === null ? '--' : formatNumber(balance, { maximumFractionDigits: 0 });
-    const aria = t('hudChrome.claudium.open');
-    return `<button type="button" class="claudium-launcher" data-claudium-launcher title="${esc(aria)}" aria-label="${esc(aria)}"><img class="claudium-coin" src="/claudium/icons/claudium_coin_64.webp" alt=""><span class="claudium-launcher-balance">${esc(label)}</span></button>`;
+    return claudiumLauncherHtml(this.claudiumBalance.balance);
   }
 
   // Complete aura tooltip body. A buff created by a known ability first shows that
@@ -5546,110 +5539,21 @@ export class Hud {
     return `<div class="tt-effect">${esc(t(effect.key as TranslationKey, values))}</div>`;
   }
 
+  /**
+   * Bind one element to the shared `#tooltip` box.
+   *
+   * The choreography itself lives in tooltip_attach.ts; this stays here because it is the
+   * seam every HUD component and sub-painter reaches for (they are handed
+   * `(el, html) => this.attachTooltip(el, html)`), and because the five things it needs are
+   * all coordinator-private state.
+   */
   attachTooltip(el: HTMLElement, html: () => string): void {
-    let touchTimer: number | undefined;
-    // tooltip box size, measured once in showAt (right after the content is set)
-    // and reused by every mousemove: the content cannot change between showAt
-    // calls, so re-reading offsetWidth/Height per mousemove only forced a reflow
-    let ttW = 0;
-    let ttH = 0;
-    const mobile = () => document.body.classList.contains('mobile-touch');
-    const clearTouchTimer = () => {
-      if (touchTimer !== undefined) window.clearTimeout(touchTimer);
-      touchTimer = undefined;
-    };
-    const showAt = (x: number, y: number, trigger: 'touch' | 'mouse' | 'focus') => {
-      if (this.mobileHotbarDrag?.active) return;
-      // Touch-only path: showing the tooltip means the held control is being
-      // inspected, so the release click should peek, not fire its action.
-      this.peekGuard.tooltipShown(trigger);
-      const size = this.paintTooltipAt(html(), x, y);
-      // cache the measured box for the mousemove clamp below (no forced reflow)
-      ttW = size.w;
-      ttH = size.h;
-      // This element now owns the shared box, so its own mousemove keeps the
-      // cheap reposition-only path and a hover onto any other element re-resolves.
-      this.tooltipOwner.claim(el);
-    };
-    const showNearElement = () => {
-      const rect = el.getBoundingClientRect();
-      showAt(rect.right, rect.top + rect.height / 2, 'focus');
-    };
-    // A mouse click or a tap focuses the button as a side effect (the browser
-    // moves focus to whatever was pressed), which used to fire showNearElement
-    // on EVERY action-bar press, not just real keyboard (Tab) navigation. Flag
-    // the pointer press so the very next focusin it causes is skipped; Tab
-    // never fires pointerdown first, so keyboard users still get the tooltip.
-    let pointerFocusPending = false;
-    el.addEventListener('pointerdown', () => {
-      pointerFocusPending = true;
-    });
-    el.addEventListener('focusin', () => {
-      if (el.dataset.suppressFocusTooltip === 'true') {
-        delete el.dataset.suppressFocusTooltip;
-        return;
-      }
-      if (pointerFocusPending) {
-        pointerFocusPending = false;
-        return;
-      }
-      showNearElement();
-    });
-    el.addEventListener('mouseenter', () => {
-      if (mobile()) return;
-      const rect = el.getBoundingClientRect();
-      showAt(rect.right, rect.top + rect.height / 2, 'mouse');
-    });
-    el.addEventListener('mousemove', (e) => {
-      if (mobile()) return;
-      // The shared box may be showing another element's content: a drag-drop
-      // that ended inside a slot fires no mouseenter, and Firefox re-enters the
-      // drag SOURCE after a native drag, so the visible tooltip can belong to a
-      // different (or no) element while the cursor sits over this one (#1626).
-      // Repaint this element's own tooltip in that case; the common in-slot move
-      // stays on the cheap reposition-only path below.
-      if (this.tooltipOwner.needsReshow(el)) {
-        showAt(e.clientX, e.clientY, 'mouse');
-        return;
-      }
-      const z = getUiScale();
-      // reuse the box size measured in showAt: same content, no forced reflow
-      const tw = ttW,
-        th = ttH;
-      this.tooltipEl.style.left = `${Math.min(window.innerWidth / z - tw - 8, e.clientX / z + 14)}px`;
-      this.tooltipEl.style.top = `${Math.max(8, e.clientY / z - th - 10)}px`;
-    });
-    el.addEventListener('mouseleave', () => {
-      clearTouchTimer();
-      this.tooltipEl.style.display = 'none';
-      // Box hidden: no element owns it, so the next move over any slot re-resolves.
-      this.tooltipOwner.release();
-    });
-    el.addEventListener('focusout', () => {
-      clearTouchTimer();
-      this.tooltipEl.style.display = 'none';
-      this.tooltipOwner.release();
-    });
-    el.addEventListener('pointerdown', (e) => {
-      if (!mobile() || e.pointerType === 'mouse') return;
-      clearTouchTimer();
-      // A fresh press: drop any stale peek and dismiss a lingering tooltip.
-      this.peekGuard.press();
-      this.tooltipEl.style.display = 'none';
-      const x = e.clientX,
-        y = e.clientY;
-      touchTimer = window.setTimeout(() => showAt(x, y, 'touch'), TOOLTIP_PEEK_MS);
-    });
-    el.addEventListener('pointerup', () => {
-      clearTouchTimer();
-      // Safari desktop never focuses a button on click, so pointerdown's flag
-      // above would otherwise never get consumed by a focusin and could wrongly
-      // swallow a later, real keyboard-focus tooltip; drop it once the press ends.
-      pointerFocusPending = false;
-    });
-    el.addEventListener('pointercancel', () => {
-      clearTouchTimer();
-      pointerFocusPending = false;
+    attachSharedTooltip(el, html, {
+      box: () => this.tooltipEl,
+      dragActive: () => !!this.mobileHotbarDrag?.active,
+      peekGuard: this.peekGuard,
+      owner: this.tooltipOwner,
+      paintAt: (content, x, y) => this.paintTooltipAt(content, x, y),
     });
   }
 
@@ -9468,6 +9372,7 @@ export class Hud {
       this.actionBarWorldInput = actionBarWorld;
     }
     this.renderPetBar(pet);
+    this.shardpikeBar.paint(p.dead);
     this.renderStanceBar();
     this.flushPendingProcAuraNotes();
     if (this.spellbookWindow.isOpen) this.spellbookWindow.tickOpen();
@@ -11850,6 +11755,9 @@ export class Hud {
           deedUnlocks.push(ev);
           break;
         }
+        case 'lanceBlind':
+          shardpikeBlindFeedback(this, ev.count);
+          break;
         case 'reliquaryUnlock': {
           reliquaryUnlocks.push(ev);
           break;

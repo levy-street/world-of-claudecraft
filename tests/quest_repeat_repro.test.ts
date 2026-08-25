@@ -75,6 +75,9 @@ describe('no quest duplicates another (same giver + identical objectives)', () =
             case 'escort':
               target = `escort ${o.escortId}`;
               break;
+            case 'event':
+              target = `event ${o.eventId}`;
+              break;
           }
           return `${target} x${o.count}`;
         })

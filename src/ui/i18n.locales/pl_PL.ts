@@ -2946,6 +2946,7 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'entities.items.duskthorn_mantle.name': 'Peleryna Zmierzczokolca',
   'entities.items.fenbark_leggings.name': 'Nogawice Bagiennej Kory',
   'entities.items.fenshadow_maul.name': 'Obuch Bagiennego Cienia',
+  'entities.items.skerrits_shardpike.name': 'Odłamkowa Pika Skerrita',
   'entities.items.foremans_barrowmaul.name': 'Kurhanowy Młot Sztygara',
   'entities.items.loomshard_eye.name': 'Oko Odłamka Krosna',
   'entities.items.barrowhide_pauldrons.name': 'Kurhanowe Naramienniki',

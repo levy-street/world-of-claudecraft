@@ -238,7 +238,7 @@ describe('BalgathFx world integration', () => {
   const body = (over: Record<string, unknown> = {}) => ({
     id: 1,
     templateId: 'balgath_cyclops',
-    pos: { x: 0, z: 0 },
+    pos: { x: 0, y: 0, z: 0 },
     castingAbility: null as string | null,
     ...over,
   });

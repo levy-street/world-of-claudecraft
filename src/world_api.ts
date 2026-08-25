@@ -47,6 +47,7 @@
 //                                            proximity-gated info + gold/item/buy-slots commands)
 //   vale_cup.ts         IWorldValeCup        Vale Cup boarball queue/roles/betting/practice
 //   mounts.ts           IWorldMounts         rideable ground mounts: pick + mount/dismount
+//   lance_trial.ts      IWorldLanceTrial     the Shardpike balance trial: self view + verbs
 //   dungeon_finder.ts   IWorldDungeonFinder  Dungeon Finder queue/proposals/premade board
 //   deeds.ts            IWorldDeeds          earned deeds, lifetime stats, renown, active title,
 //                                            rarity + the account-Renown leaderboard reads
@@ -80,6 +81,7 @@ import type { IWorldEntityRoster } from './world_api/entity_roster';
 import type { IWorldGuildBank } from './world_api/guild_bank';
 import type { IWorldInteraction } from './world_api/interaction';
 import type { IWorldInventory } from './world_api/inventory';
+import type { IWorldLanceTrial } from './world_api/lance_trial';
 import type { IWorldLoot } from './world_api/loot';
 import type { IWorldMail } from './world_api/mail';
 import type { IWorldMarket } from './world_api/market';
@@ -227,6 +229,7 @@ export type {
   CivicServicePlacement,
   WorldInteractionOutcome,
 } from './world_api/interaction';
+export type { LanceGuidanceView, LanceTrialView } from './world_api/lance_trial';
 export type { MailInfo, MailKindView, MailMessageView } from './world_api/mail';
 export type { MarketInfo, MarketListingView } from './world_api/market';
 export { queryDiffersFromEcho, searchDiffersFromEcho } from './world_api/market';
@@ -313,7 +316,8 @@ export interface IWorld
     IWorldActionBar,
     IWorldDeeds,
     IWorldReliquary,
-    IWorldMounts {}
+    IWorldMounts,
+    IWorldLanceTrial {}
 
 // ---------------------------------------------------------------------------
 // Command schema (W0b): the shared wire-token vocabulary.
@@ -461,6 +465,9 @@ export const COMMAND_NAMES = [
   'lockpick_engage',
   'lockpick_action',
   'lockpick_abort',
+  'lance_brace',
+  'lance_thrust',
+  'lance_release',
   'collect_delve_chest_loot',
   'delve_rite_choose',
   'telemetry',
@@ -696,7 +703,8 @@ export type WorldFacet =
   | 'IWorldActionBar'
   | 'IWorldDeeds'
   | 'IWorldReliquary'
-  | 'IWorldMounts';
+  | 'IWorldMounts'
+  | 'IWorldLanceTrial';
 
 export const COMMAND_FACETS = {
   // IWorldCombat: ability casts, auto-attack, spirit release.
@@ -906,6 +914,11 @@ export const COMMAND_FACETS = {
   // mount_train_begin is the legacy riding-lesson entry point; its feedback
   // rides the mountTrain* events (no snapshot field).
   mount_toggle: 'IWorldMounts',
+  // IWorldLanceTrial: the Shardpike balance trial's verbs (the beam itself is steered by
+  // ordinary movement intent, so leaning costs no command).
+  lance_brace: 'IWorldLanceTrial',
+  lance_thrust: 'IWorldLanceTrial',
+  lance_release: 'IWorldLanceTrial',
   mount_train_begin: 'IWorldMounts',
   // mount_race_start begins a show-jumping race from the glowing platform;
   // mount_race_cancel exits it. Both are validated server-side and feed the

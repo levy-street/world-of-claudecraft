@@ -2947,6 +2947,7 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'entities.items.duskthorn_mantle.name': 'Schemeringsdoorn-Mantel',
   'entities.items.fenbark_leggings.name': 'Moeraskors-Beenstukken',
   'entities.items.fenshadow_maul.name': 'Moeraschaduw-Knuppel',
+  'entities.items.skerrits_shardpike.name': 'Skerrits Splinterpiek',
   'entities.items.foremans_barrowmaul.name': 'Grafheuvelhamer van de Opzichter',
   'entities.items.loomshard_eye.name': 'Het Weefsplinter-Oog',
   'entities.items.barrowhide_pauldrons.name': 'Grafheuvelschouderstukken',

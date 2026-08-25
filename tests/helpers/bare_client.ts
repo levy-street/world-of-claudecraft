@@ -120,6 +120,11 @@ export function bareClient(pid: number, overrides: BareClientOverrides = {}): Cl
   c.riftFloor = null;
   c.riftCollisionToken = 0;
   c.lockpickState = null;
+  // The Shardpike trial's three self fields (src/sim/lance_trial.ts, lance_guidance.ts). All
+  // null/0 between pikes, which is the state almost every suite wants.
+  c.lanceTrial = null;
+  c.lanceRestRemaining = 0;
+  c.lanceGuidance = null;
   c.delveMarks = 0;
   c.companionUpgrades = {};
   c.craftSkills = emptyCraftSkills();

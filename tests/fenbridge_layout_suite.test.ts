@@ -555,6 +555,9 @@ describe('Fenbridge content projection and preservation', () => {
   it('preserves quest order and non-muster ground objects while moving exactly two orders', () => {
     expect(ZONE2_QUEST_ORDER).toEqual([
       'q_fenbridge_muster',
+      // The world boss's level-spread mechanic: Skerrit lends the Shardpike, and the quest
+      // sits second because he stands on the approach, before the prowler work in the fen.
+      'q_socketwrights_due',
       'q_prowlers',
       'q_prowler_pelts',
       'q_fen_supplies',
@@ -646,11 +649,31 @@ describe('Fenbridge content projection and preservation', () => {
   });
 
   it('pins the complete stable NPC payload while projecting only position and facing', () => {
-    expect(Object.keys(ZONE2_NPCS)).toEqual(FENBRIDGE_LAYOUT.services.npcs.map((npc) => npc.id));
+    // The layout places FENBRIDGE TOWN's service NPCs, and until now every zone-2 NPC was
+    // one. Socketwright Skerrit is the first that is not: he stands out in the fen at
+    // (-22, 358), deliberately off the boss's x=0 marching spine, so a town placement would
+    // be wrong for him. The allowlist keeps the pin's teeth: a FUTURE town NPC that forgets
+    // its placement still fails here rather than being absorbed by a loosened comparison.
+    const OUTSIDE_TOWN = new Set(['socketwright_skerrit']);
+    expect(Object.keys(ZONE2_NPCS).filter((id) => !OUTSIDE_TOWN.has(id))).toEqual(
+      FENBRIDGE_LAYOUT.services.npcs.map((npc) => npc.id),
+    );
+    // ...and every allowlisted NPC really is outside the town's own footprint, so the list
+    // cannot become a place to hide a missing placement.
+    for (const id of OUTSIDE_TOWN) {
+      expect(Object.keys(ZONE2_NPCS), id).toContain(id);
+      expect(
+        FENBRIDGE_LAYOUT.services.npcs.map((npc) => npc.id),
+        id,
+      ).not.toContain(id);
+    }
     // Re-pinned for q_rite_of_redemption joining brother_aldric_fen's quest
     // list (the only NPC-payload delta vs the prior pin; zone2.ts diff-checked).
+    // Re-pinned again for Socketwright Skerrit, the world boss's Shardpike lender: a whole
+    // new NPC record rather than a delta on an existing one. He is outside the town layout
+    // (see the allowlist above), so this payload grows while the placement list does not.
     expect(createHash('sha256').update(JSON.stringify(stableNpcPayload())).digest('hex')).toBe(
-      '7ba7c8ae4db5470fd76b7410698f113322e77df9fdad03415320a8988cccac0d',
+      '9814292c47fe6513f0711d808089739442f714310076863f74b6bcbd95190009',
     );
     for (const placement of FENBRIDGE_LAYOUT.services.npcs) {
       expect(FENBRIDGE_NPC_PLACEMENTS_BY_ID[placement.id]).toBe(placement);

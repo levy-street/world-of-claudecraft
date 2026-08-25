@@ -56,7 +56,19 @@ const MONOLITHS: MonolithRow[] = [
     // LastKeepMapPainter declarations and the two walk-in map branches on the
     // clearMapHitState pattern), riding on main's zero-slack pin. Exact merged
     // count: any further growth reds again.
-    ceiling: 19488,
+    // Lowered by the Balgath branch's Shardpike bar: the yell voice-clip slug moved
+    // to src/ui/combat_sfx.ts, beside the rest of the voice-cue vocabulary it belongs
+    // to, and the bar itself landed as its own hud/shardpike/ domain so the coordinator
+    // keeps only a factory call and a paint call.
+    // Lowered by the Shardpike guidance pass: the bag's two currency chips (the
+    // $WOC balance and the CLAUDIUM launcher, both pure value-to-markup) moved to
+    // src/ui/bag_currency_html.ts, and the trial's success feedback moved to
+    // src/ui/hud/shardpike/shardpike_feedback.ts beside the rest of that surface.
+    // Lowered again by the Shardpike hover card: binding an element to the shared
+    // #tooltip box (six listeners, three pieces of local state, a documented
+    // workaround per browser quirk) moved verbatim to src/ui/tooltip_attach.ts, and
+    // the coordinator kept the one-line seam every component is handed.
+    ceiling: 19400,
     seam: 'pure view core + thin painter on PainterHost (src/ui/CLAUDE.md)',
   },
   {
@@ -84,7 +96,23 @@ const MONOLITHS: MonolithRow[] = [
     // src/render/prewarm_depth_material.ts (it needed one cache Map, not the
     // coordinator's state), which paid for that boss's seven lines of thin FX
     // wiring and still left the file smaller than it was.
-    ceiling: 13653,
+    // Lowered again by the same branch's VFX pass: the five-deep surface-to-dust
+    // colour ternary inside emitGroundPuff moved to
+    // src/render/ground_puff_color_core.ts, where the boss's ground debris reads
+    // the same table instead of inventing a second opinion about what a patch of
+    // marsh is made of. That extraction paid for the surface probe the FX layer
+    // now takes and still left the file four lines smaller.
+    // Lowered again by the same branch's far-impostor pass: the ?perf overlay's own
+    // shape constructors and millisecond summary (roundMs, summarizeMs, and the three
+    // empty* factories) moved to src/render/renderer_frame_telemetry_core.ts, beside the
+    // interfaces they fill. That paid for the boss-impostor wiring several times over.
+    // Lowered again by the Shardpike guidance pass: `sleep` and `canvasDataUrlAsync` (a
+    // timer and a `canvas.toBlob` wrapper, neither of which touches the scene) moved to
+    // src/render/canvas_capture.ts, paying for the aim-reticle wiring with room left.
+    // Lowered again by the ward-cue pass: `collectObjectTextures` moved to
+    // renderer_diagnostics.ts, which already owned its two types and where it needs nothing
+    // from the coordinator. That paid for the badge and reticle wiring with room left.
+    ceiling: 13546,
     seam: 'a new src/render/<thing>.ts module the renderer calls (src/render/CLAUDE.md)',
   },
   {
@@ -99,7 +127,12 @@ const MONOLITHS: MonolithRow[] = [
   },
   {
     file: 'server/game.ts',
-    ceiling: 10900,
+    // Lowered by the Balgath branch: interest scoping (the radii, the hysteresis, the
+    // battleground widening and the new world-boss landmark widening) moved to
+    // server/interest_scope.ts. It went as one piece because its three enforcement points
+    // (the shared query's reach, the per-viewer cutoff, the per-entity limit) must agree,
+    // and a widening applied to one of the three is a silent no-op.
+    ceiling: 10870,
     seam: 'a sibling server module; see the hot-path seams in server/CLAUDE.md',
   },
   {

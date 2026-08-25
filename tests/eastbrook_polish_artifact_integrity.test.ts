@@ -767,9 +767,9 @@ const ACCEPTED_POLISH_V2_METADATA_PATH = path.join(REPO_ROOT, POLISH_SEAL_PATH);
 // follows renderer.ts, then this seal follows the swept evidence bytes. No
 // capture was retaken.
 const ACCEPTED_POLISH_V2_METADATA_SHA256 =
-  '663a6fe4aac5641bb6336ac2242306ec0009ee80eeddee2bb67b4db56f823ec6';
+  '809e036a788854d319079249563c3f50dd7bdf3b43a4ba5ea43ddae2f03003b9';
 const ACCEPTED_POLISH_V2_COMPOSITE_PROVENANCE =
-  '5ca1f19ca5c8e8279ded55b0852268b86f4fbabce2a13d8df3e8740f31cd3410';
+  '06542dff5297e0ccd09c93e8f7dfcdb7551134a2e4e7ce9dec672c598dce655b';
 const ACCEPTED_POLISH_V2_METADATA = readJsonFile<CaptureMetadata>(ACCEPTED_POLISH_V2_METADATA_PATH);
 const ACCEPTED_POLISH_V2_PROVENANCE = ACCEPTED_POLISH_V2_METADATA.polishProvenance;
 const ACCEPTED_POLISH_V2_TOWN_CONTRACT = ACCEPTED_POLISH_V2_METADATA.records[0]?.townContract;
@@ -1682,6 +1682,15 @@ describe('Eastbrook polish performance and contact evidence', () => {
     // KTX2 mip-release branch: the first-order composite follows both parents'
     // renderer.ts inputs, then this second-order performance seal follows the
     // swept evidence bytes. No capture was retaken.
+    // Re-minted again by the same branch's ward-cue pass: renderer.ts moved once more
+    // (the badge and reticle wiring in, collectObjectTextures out), so the first-order
+    // composite follows it and this second-order seal follows the swept evidence bytes.
+    // No capture was retaken.
+    // Re-minted on the Balgath world-boss branch: renderer.ts and
+    // entity_view_policy_core.ts both moved (the boss-impostor wiring, and the
+    // perf-stat constructors extracted out to pay the ratchet for it), so the
+    // first-order composite follows them and this second-order performance seal
+    // follows the swept evidence bytes. No capture was retaken.
     // Re-pinned for the merge of release/v0.36.0 (post PR 3222) into the
     // prewarm sky-unstarve branch: the first-order composite follows both
     // parents' renderer.ts inputs plus this branch's prewarm_policy.ts
@@ -1775,7 +1784,11 @@ describe('Eastbrook polish performance and contact evidence', () => {
     expect(
       fingerprint.digest('hex'),
       `the second-order performance digest moved; if every input moved legitimately, re-mint with: ${REMINT_COMMAND} (it recomputes this literal LAST, from the swept files)`,
-    ).toBe('e85d072fe55bdf6971155a65ed74acfcbe557fdcfada07f57699f195b683880c');
+      // Re-minted for the boss VFX pass: the surface-to-dust colour table moved out of
+      // renderer.ts into ground_puff_color_core.ts and the boss FX layer took a surface
+      // probe, so renderer.ts moves and this seal follows the swept evidence bytes. No
+      // capture was retaken.
+    ).toBe('a8663122619ca18c11880fb7bbf5d4d519e9c92708a0a156c601fff63a4ce23f');
   });
 
   it('binds every historical after record to its accepted source and asset provenance', () => {

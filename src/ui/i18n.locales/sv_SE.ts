@@ -4640,6 +4640,7 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'entities.items.fenmist_robe.name': 'Kärrdimmsrock',
   'entities.items.fenreed_staff.name': 'Kärrvasstav',
   'entities.items.fenshadow_maul.name': 'Kärrskuggans stridsklubba',
+  'entities.items.skerrits_shardpike.name': 'Skerrits Skärvpik',
   'entities.items.foremans_barrowmaul.name': 'Förmannens Gravhögshammare',
   'entities.items.loomshard_eye.name': 'Vävsplitteröga',
   'entities.items.barrowhide_pauldrons.name': 'Gravhögsaxelskydd',

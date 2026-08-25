@@ -76,6 +76,8 @@ import {
 import { groundHeight, waterLevelAt } from '../world';
 import { MAX_AGGRO_RADIUS, MAX_WANDER_RADIUS, MIN_WANDER_RADIUS } from './aggro_ranges';
 import { isAmbientMob, updateAmbientMob } from './ambient';
+import { splashNearbyMobs } from './boss_collateral';
+import { launchFromSlam, resetBossSlams, tickBossSlams } from './boss_slams';
 import {
   cancelMobChargeDash,
   resetMobCharge,
@@ -84,6 +86,7 @@ import {
 } from './charge';
 import { updateMobCombatProfile } from './combat_profile';
 import { applyBroodBurn } from './dragonkin_brood';
+import { tickEyeWard } from './eye_ward';
 import { idleRng, wanderPause } from './idle_rng';
 import {
   claimMechanicSpacing,
@@ -102,6 +105,7 @@ import {
 } from './rift_escape_window';
 import { rallyFleeingAllies } from './social_aggro';
 import { isTrivialTo, retargetMob, tickForcedTarget } from './targeting';
+import { resetWarpath, tickWarpath } from './warpath';
 import { emitMobYell } from './yells';
 
 // This module ENFORCES the aggro ceiling and the wander ring; the numbers themselves live
@@ -200,6 +204,12 @@ export function updateMob(ctx: SimContext, mob: Entity): void {
   }
 
   mob.combatTimer += DT;
+
+  // The standing eye ward, reconciled with the clock every alive tick (mob/eye_ward.ts).
+  // Before the special-template early returns on purpose: the ward must exist in every
+  // state the mob can be alive in, idle included. Guarded on the template field and
+  // draws no rng, so every other mob pays one map lookup.
+  tickEyeWard(ctx, mob);
 
   if (MOBS[mob.templateId]?.dummy) {
     // Training dummy: stays hostile/attackable so it counts for damage and shows on
@@ -505,17 +515,35 @@ export function updateMob(ctx: SimContext, mob: Entity): void {
       // countdown itself ticks inside runMobAttackMechanics with the other
       // boss mechanics (melee-gated), so a kited boss does not bank channels.
       if (updateInfernoChannel(ctx, mob)) break;
-      const result = updateMobCombatProfile(ctx, mob, () => {
-        // The anti-kite snare, loud battle cries, and the heroic charge trigger
-        // fire once per engaged tick, from either engaged state (mid-chase is
-        // the kite case they exist for). The windup ticker runs AFTER the
-        // snare: on a detonation tick the snare still sees the window open and
-        // holds, so a slow can never land the same instant as the blast.
+      // The anti-kite snare, loud battle cries, and the heroic charge trigger
+      // fire once per engaged tick, from either engaged state (mid-chase is
+      // the kite case they exist for). The windup ticker runs AFTER the
+      // snare: on a detonation tick the snare still sees the window open and
+      // holds, so a slow can never land the same instant as the blast.
+      const engagedPulse = () => {
         pulseAntiKiteSnare(ctx, mob);
         pulseLoudYell(ctx, mob);
         tryStartMobCharge(ctx, mob);
         tickRiftMechanicWindups(ctx, mob);
-      });
+        // The aimed slams ride here rather than in the melee-gated mechanics tail for the
+        // same reason the windup ticker above does: a telegraph already drawn has to
+        // resolve wherever the boss has since walked. Starting one is still melee-gated,
+        // inside the module.
+        tickBossSlams(ctx, mob);
+      };
+      // A boss walking a WARPATH owns the whole engaged tick while he travels to his next
+      // landmark and while he wrecks it: threat does not steer him through either, so the
+      // combat runner (which exists to close on the threat target) must not run at all.
+      // He falls through in his focus phase, which IS ordinary boss combat. The shared
+      // engaged pulses still fire in every phase: an in-flight telegraph ring has to
+      // count down and detonate wherever he now is, or leaving focus mid-windup would
+      // strand a ring on the ground that never resolves. Inert for every mob whose
+      // template declares no warpath, which today is every mob but one.
+      if (tickWarpath(ctx, mob) === 'handled') {
+        engagedPulse();
+        break;
+      }
+      const result = updateMobCombatProfile(ctx, mob, engagedPulse);
       if (result === 'runAttackMechanics') runMobAttackMechanics(ctx, mob);
       break;
     }
@@ -707,6 +735,8 @@ function fireAoePulse(
       ctx.dealDamage(mob, pe, dmg, false, school, pulse.name, 'hit', true);
     }
   }
+  // ...and everything else standing in it, for a template that opts in.
+  splashNearbyMobs(ctx, mob, center, pulse.radius, pulse.min, pulse.max, school, pulse.name);
 }
 
 // The War Stomp slam, extracted verbatim from the driver for the same
@@ -730,6 +760,8 @@ function fireWarStomp(
       entityId: mob.id,
     });
   const capStomp = mobInRiftInstance(ctx, mob);
+  if (stomp.min !== undefined && stomp.max !== undefined)
+    splashNearbyMobs(ctx, mob, center, stomp.radius, stomp.min, stomp.max, school, stomp.name);
   for (const meta of ctx.players.values()) {
     const pe = ctx.entities.get(meta.entityId);
     if (!pe || pe.dead || dist2d(pe.pos, center) > stomp.radius) continue;
@@ -845,6 +877,14 @@ function emitTelegraphedImpact(
     fx: 'nova',
     radius,
   });
+  // ...and PUNT everyone it caught, for a mob whose template opted into it.
+  //
+  // This sits here rather than inside fireAoePulse/fireWarStomp because those two are
+  // shared by every mob in the world and this is one boss's feel; here it is already
+  // behind the telegraphed-mechanics gate, and both detonations already route through it
+  // with the ring's true centre and radius, which is exactly what a launch needs. One
+  // hook, both slams, and nothing else in the world can reach it.
+  launchFromSlam(ctx, mob, center, radius);
 }
 
 // Tick the in-flight instant-mechanic windups and detonate at zero. Runs from
@@ -1445,6 +1485,13 @@ export function resetEvadingMob(ctx: SimContext, mob: Entity): void {
   // An in-flight instant-mechanic windup dies with the pull too: its ground
   // ring must not detonate on the next fresh engage.
   resetRiftMechanicWindups(mob);
+  // Same for a warpath circuit: the next pull opens on his focus phase from
+  // wherever he stands, not part-way through a run to a landmark nobody is
+  // fighting him at any more.
+  resetWarpath(mob);
+  // ...and for a half-wound aimed slam, whose ring must not detonate on whoever
+  // re-pulls him.
+  resetBossSlams(mob);
   // A mid-flight inferno channel dies with the pull; the cadence reseeds and
   // the hp gates re-arm alongside firedSummons above.
   mob.infernoTimer = MOBS[mob.templateId]?.infernoChannel?.every ?? 0;

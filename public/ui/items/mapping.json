@@ -6054,6 +6054,21 @@
         "barrowhide_pauldrons",
         "mirestone_stride"
       ]
+    },
+    {
+      "batchId": "shardpike-mechanic-icons-2026-08-20",
+      "source": "OpenAI gpt-image-2 via scripts/asset_pipeline/lib/openai_image.mjs",
+      "owner": "World of ClaudeCraft",
+      "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
+      "styleContract": {
+        "id": "woc-item-icon-v1",
+        "document": "docs/design/item-icon-art-style.md"
+      },
+      "styleReference": "Generated at 1024x1024 with gpt-image-2 under item-icon contract woc-item-icon-v1 after visual review of public/ui/skills/mage/ice_lance.webp, public/ui/items/kingsbane_last_oath.webp, and public/ui/items/arcanite_mining_pick.webp. The original generated PNG is retained only in ignored tmp/codex provenance staging.",
+      "commonPrompt": "Use case: stylized-concept\nAsset type: opaque square fantasy MMORPG inventory item icon\nPrimary request: paint Skerrit's Shardpike, a rare quest tool used to extinguish a stone giant's single enormous glowing eye\nScene/backdrop: wet grey barrow granite in a deep charcoal-blue painted vignette, subtle mist and grounded contact shadow, dark corners\nSubject: one complete crude improvised two-handed pike, a socketwright's field-made tool rather than a soldier's weapon; worn lashed timber haft, rough cord bindings, cold iron collar, and a single raw faceted teal Loomshard crystal as the spearhead, inner-lit in #76e0d8 and #5fe8d2\nStyle/medium: premium hand-painted classic fantasy MMO inventory art matching World of ClaudeCraft ability and item icons; tactile wood, iron, cord and crystal; crisp focal edges with softer peripheral brushwork\nComposition/framing: object portrait only, whole pike angled corner to corner from bottom-left butt to top-right crystal head, complete tip and butt visible with safe margin, strong silhouette filling about 74 percent of the square, readable at 22px and 32px\nLighting/mood: restrained warm top-left key light, cool deep bottom-right shadow, genuine teal crystal glow kept subordinate to the pike silhouette; worn and handmade but rare\nConstraints: one opaque full-square icon, one pike only, no hands, no action, no eye, no character, no text, letters, numbers, pseudo-writing, runes, border, UI frame, rarity chrome, transparency, watermark, signature, split sheet, collage, photorealism, raw 3D render, flat vector, cel shading, cartoon outline, cropped weapon, or exterior drop shadow",
+      "itemIds": [
+        "skerrits_shardpike"
+      ]
     }
   ]
 }

@@ -147,6 +147,11 @@ export const WEAPON_TYPE_BY_ITEM: Record<string, ItemWeaponType> = {
   ironbark_boar_spear: 'polearm',
   fen_reaver_glaive: 'polearm',
   fanglords_beastspear: 'polearm',
+  // A pike IS a polearm, and this row is what makes the two authorities agree: the render
+  // side already tags its model `VAR_POLEARM` (characters/assets.ts), and an unclassified
+  // weapon here reads as null, which is the mismatch tests/weapon_skins.test.ts catches. No
+  // skin targets polearms, so this is classification only, never new cosmetic surface.
+  skerrits_shardpike: 'polearm',
 };
 
 /**

@@ -48,6 +48,28 @@ Everything else is a sibling module in one of these families:
   the camera + `dnGrade.fog` per frame; `?zonehaze=off` is the A/B switch.
 - **The nameplate suite** (below) owns all overhead text and badges.
 - **Pure logic cores** (below) hold Node-tested per-frame decisions.
+- **Far-visible landmarks:** `boss_impostor.ts` (+ its `_core`) keeps a WORLD
+  BOSS on screen from across the zone, long past the 80yd entity band, by
+  baking a ring of yaw views of his real model into one atlas and drawing a
+  camera-facing quad that blends the two bracketing views. Same technique as
+  the far-foliage impostors, but the subject MOVES and TURNS, so the bearing is
+  taken relative to his own facing. Three enforcement points must agree or the
+  feature is a silent no-op: this module, the server's interest widening
+  (`server/interest_scope.ts` `landmarkRange`), and the shared candidate query
+  that would otherwise never return him. When copying the bake loop, copy the
+  `setRenderTarget`-per-cell too: three latches a target's viewport and scissor
+  at BIND time, so mutating them on an already-bound target puts every view in
+  one cell and the sprite draws as a grey rectangle.
+- **World-boss ward cues** (`eye_ward_marker_core.ts` + `characters/eye_ward_marker.ts`,
+  `eye_ward_badge.ts` + `eye_ward_badge_field.ts`, driven by
+  `eye_ward_marker_drive.ts`): the reticle on the boss's eye and the state badge
+  over his head. The split that matters is the `EyeWardMarkerRole`: "aim the pike
+  HERE" is an instruction and is gated on carrying the pike, while "his ward is
+  down, your damage lands" is the raid's damage window and shows for EVERYONE.
+  Collapsing the two is how the twenty players doing the damage ended up never
+  being told. State is read off the boss's own ward AURAS, which the sim already
+  maintains as pure presentation of two timestamps, so a second viewer needs no
+  new wire field.
 - **Perf governors:** `render_budget.ts` (adaptive frame budget, see
   Performance) and `crowd_lod.ts` (pure character LOD policy: the band plan
   `characterLodBands` returns, which pulls shadow/anim cadence in as rig counts

@@ -9,6 +9,8 @@ import { ITEMS, MOBS } from '../../sim/data';
 import { ALL_CLASSES, type Entity, isMechWearer, type PlayerClass } from '../../sim/types';
 import { ITEM_WEAPON_VARIANTS } from '../../ui/weapon_variants';
 import type { OverheadEmoteId } from '../../world_api';
+import type { ChargeGlowSpec } from './charge_glow_core';
+import type { EyeGlowSpec } from './eye_glow_core';
 
 export interface EmoteClipSpec {
   clips: readonly string[];
@@ -26,6 +28,13 @@ export interface ClipMap {
   attackByAbility?: Record<string, string>;
   /** Playback rate for authored per-ability clips that must keep exact timing. */
   attackTimeScaleByAbility?: Record<string, number>;
+  /**
+   * Which hand lights up while an ability winds, and how (render/characters/charge_glow.ts).
+   *
+   * Rides the same per-ability cue as the clip override, so the pose and the light are
+   * chosen by one row and cannot describe two different mechanics.
+   */
+  chargeGlowByAbility?: Record<string, ChargeGlowSpec>;
   /** Optional weapon-style override for plain auto attacks. */
   attackByHand?: { twohand?: string; dualwield?: string };
   death: string;
@@ -91,6 +100,11 @@ export interface VisualDef {
   hover?: number;
   /** yaw applied so the model faces +Z (facing-0 convention) */
   yaw?: number;
+  /**
+   * A permanently lit eye (render/characters/eye_glow.ts), for a creature whose eye IS its
+   * identity. Always on, independent of what it happens to be casting.
+   */
+  eyeGlow?: EyeGlowSpec;
   /** KayKit chars ship every accessory visible: non-skinned mesh nodes to KEEP.
    *  undefined = keep everything (creature GLBs have no accessories). */
   show?: string[];
@@ -313,16 +327,62 @@ const BALGATH: ClipMap = {
   attackByAbility: {
     mob_pulse_windup: 'Balgath_Smash',
     mob_stomp_windup: 'Balgath_Stomp',
+    // His warpath (src/sim/mob/warpath.ts): the backhand he throws mid-run at whoever is
+    // chasing him, and the two-fisted slam he lands on the landmark he ran to.
+    mob_warpath_swipe: 'Balgath_Barrowsweep',
+    mob_warpath_wreck: 'Balgath_Barrowfall',
+    // The two aimed slams (src/sim/mob/boss_slams.ts): one fist raised over a player, and
+    // the low arm dragged across the ground.
+    mob_balgath_hammer: 'Balgath_Hammer',
+    mob_balgath_cleave: 'Balgath_Cleave',
   },
-  // Timed so the clip's IMPACT frame lands on the detonation, not before it. The windup
-  // is 1.2s (RIFT_MECHANIC_WINDUP_SEC); the smash lands its blow 0.95s into its own
-  // 1.75s timeline and the stomp at 0.70s, so each plays at impact/1.2 and the fist and
-  // the shockwave arrive together. Left at the default 1.3x they both land early and the
-  // boss stands frozen through the rest of the ring, which is what makes a telegraph
-  // feel disconnected from its own hit.
+  // Timed so each clip's IMPACT frame lands on the moment the mechanic actually resolves,
+  // not before it. Left at the default 1.3x they all land early and the boss stands frozen
+  // through the rest of his own telegraph, which is what makes a windup feel disconnected
+  // from its hit.
+  //
+  // The two telegraphed slams divide their authored impact time by the 1.2s windup
+  // (RIFT_MECHANIC_WINDUP_SEC): the smash lands at 1.18s of its 1.75s timeline and the
+  // stomp at 0.70s of 1.30s. The smash sat at 0.79 for a while, which is 0.95/1.2, and
+  // 0.95 is where his fists reach the TOP of the raise rather than where they land: the
+  // blow arrived about a third of a second after the blast every single time.
+  //
+  // Barrowfall divides by its own fuse instead (WARPATH_WRECK_FUSE_SEC, also 1.4s) and its
+  // impact is authored at 1.4s, so it plays unscaled. Barrowsweep has no impact deadline
+  // at all (its damage resolves the instant it is emitted); its 0.75 is matched to
+  // something else entirely, the gait. Its legs are sampled off the Run cycle, and 0.75 is
+  // what the locomotion state machine independently picks for that clip at his 6.25 u/s
+  // travel speed, so the authored legs advance at exactly the rate the real run would and
+  // the composite cannot skate.
   attackTimeScaleByAbility: {
-    mob_pulse_windup: 0.79,
+    mob_pulse_windup: 0.98,
     mob_stomp_windup: 0.58,
+    mob_warpath_swipe: 0.75,
+    mob_warpath_wreck: 1,
+    // Both aimed slams are authored with their impact frame ON their template windup
+    // (1.3s and 1.5s), so they play unscaled and the blow lands with the blast.
+    mob_balgath_hammer: 1,
+    mob_balgath_cleave: 1,
+  },
+  // Which fist lights up while a slam winds, and for how long.
+  //
+  // The hand is the read. One fist means the hammer is coming down on SOMEBODY and the ring
+  // on the ground is theirs; both fists mean the ground is, and everyone should be looking
+  // at the circle. Nothing else in the fight distinguishes those two cases at a glance, and
+  // at his size the raid is usually looking at his hands rather than his feet.
+  //
+  // Every duration matches its mechanic's windup exactly, so the light going out IS the
+  // impact frame (charge_glow_core.ts holds near full and then drops off a cliff).
+  // Loomshard teal rather than fire, because it is the same power his eye burns with.
+  // `radius` is in BONE-LOCAL units, and the rig multiplies it twice on the way out: once
+  // by the visual's normScale (3.84 here) and again by the entity's own scale (4.2). A
+  // fist-sized glow is therefore about 0.04, not 0.4, and the first cut at 0.11 rendered a
+  // pair of beach balls across his chest. Target world diameter is roughly one yard.
+  chargeGlowByAbility: {
+    mob_balgath_hammer: { hand: 'r', color: 0x76e0d8, rise: 0.45, seconds: 1.3, radius: 0.04 },
+    mob_balgath_cleave: { hand: 'r', color: 0x76e0d8, rise: 0.5, seconds: 1.5, radius: 0.042 },
+    mob_pulse_windup: { hand: 'both', color: 0x76e0d8, rise: 0.5, seconds: 1.2, radius: 0.038 },
+    mob_warpath_wreck: { hand: 'both', color: 0x9ff0e6, rise: 0.45, seconds: 1.4, radius: 0.046 },
   },
   death: 'Death',
   hit: ['Hit'],
@@ -2879,6 +2939,29 @@ export const VISUALS: Record<string, VisualDef> = {
     animUrls: [`${CREATURES}/balgath_ability_anims.glb`],
     height: 3.2,
     clips: BALGATH,
+    // The Loomshard, always burning. Measured off the rig rather than guessed: the eye is
+    // the front-most head vertex resolved into the Head bone's own frame at rest, which is
+    // bone-local (0.013, 0.115, -0.085). A guessed offset puts a glowing ball behind his
+    // skull or floating off his face, and neither is obvious from the angle you happen to
+    // render a still at.
+    eyeGlow: {
+      bone: 'Head',
+      offset: [0.013, 0.115, -0.085],
+      color: 0x5fe8d2,
+      // 0.026 (a 0.84-unit ball at his 4.2x spawn scale) blew the whole socket to white:
+      // additive on top of an already-emissive eye texture, the core saturated and the one
+      // colour the encounter is named for stopped reading as a colour at all. Measured back
+      // down until the teal survives at melee range and the point still carries at 200 yards.
+      radius: 0.019,
+      pulseHz: 0.45,
+    },
+    // The Tripo creature lane rests its rigs facing +X; the game's facing-0 convention is
+    // +Z, so without this the model is drawn a quarter turn off its own heading. That is
+    // invisible in every measurement taken from the sim (facing tracked velocity exactly,
+    // to 0.000 rad) and invisible in a still, because nothing is WRONG except the mesh
+    // inside the group: he runs north with his body pointing east, feet cycling forward
+    // while he slides sideways. It is the moonwalk, and it is one field.
+    yaw: -Math.PI / 2,
     // Gait refs MEASURED, not guessed, at the scale this boss actually spawns at
     // (`node scripts/anim/measure_gait.mjs public/models/creatures/balgath_cyclops.glb
     // --height 3.2 --scale 2.8`). Re-run it if BALGATH_SCALE moves.

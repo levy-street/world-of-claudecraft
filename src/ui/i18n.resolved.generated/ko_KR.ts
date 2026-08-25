@@ -321,6 +321,33 @@ export const ko_KR: EnTranslations = {
     }
   },
   "hudChrome": {
+    "shardpike": {
+      "braceLabel": "조각창 자세 잡기",
+      "braceTooltip": "창 밑동을 땅에 박고 창끝을 세운다. 좌우 이동 키가 균형 막대다: 빔은 저절로 흐르고, 그가 땅을 내리칠 때마다 튕긴다. 양쪽 끝에 닿지 않게 {set}초간 버티면 창이 고정된다. 단단한 땅이 필요하고, 탈것에 탄 채로는 불가능하다.",
+      "thrustLabel": "룸샤드 찌르기",
+      "thrustTooltip": "고정된 창을 눈에 찔러 넣어 {damage}의 피해를 입힌다. 레벨도, 공격력도, 창 자체도 이 값을 키우지 못한다. 감독관을 실명시키고 무덤가죽을 벗겨내므로, 늪의 다른 모든 무기가 마침내 먹히기 시작한다. 고정된 창만이 이 일격을 낼 수 있고, 사거리는 {reach}야드, 기회는 {seconds}초 동안 열린다.",
+      "releaseLabel": "조각창 내리기",
+      "releaseTooltip": "창을 거둔다. 물러나도 벌칙은 없다: 잃는 것은 자세뿐이고 기회 자체는 아니며, {rest}초 후 다시 자세를 잡을 수 있다.",
+      "whyResting": "방금 창을 내렸다. 아이콘의 시간이 끝날 때까지 기다려라.",
+      "whyAlreadyCouched": "창은 이미 자세를 잡았다. 다시 잡기 전에 내려라.",
+      "whyNotSet": "창이 고정되지 않았다. 먼저 자세를 잡고 버텨라.",
+      "whyNothingCouched": "내릴 것이 없다: 창의 자세를 잡지 않았다.",
+      "beamLabel": "조각창 균형",
+      "beamStatus": "창 균형 {balance}, 고정 {set}퍼센트.",
+      "beamDanger": "창 균형 {balance}, 놓치기 직전.",
+      "promptStrike": "STRIKE THE EYE now, {seconds}s",
+      "promptHoldSteady": "좌우 이동 키로 창을 버텨라",
+      "promptCatchIt": "붙잡아라, 창이 넘어간다",
+      "promptEyeOut": "눈이 터졌다, {seconds}초 남았다: 전력으로 때려라",
+      "promptSealed": "그의 눈이 닫혔다. {seconds}초 후 다시 열린다",
+      "promptResetting": "창을 다시 잡는 중, {seconds}초",
+      "promptCloser": "감독관에게 접근하라, {yards}야드 남았다",
+      "promptBrace": "조각창 자세를 잡고, 그대로 버텨라",
+      "promptFindBoss": "스케릿의 조각창: 이것으로 감독관의 눈을 찔러라",
+      "promptTally": "{count} put out",
+      "promptLabel": "조각창 지시",
+      "blindBanner": "BARROWHIDE BROKEN"
+    },
     "warlock": {
       "doomLabel": "단죄",
       "fateThreadsLabel": "운명의 실타래",
@@ -11899,6 +11926,9 @@ export const ko_KR: EnTranslations = {
       "foremans_barrowmaul": {
         "name": "감독관의 봉분망치"
       },
+      "skerrits_shardpike": {
+        "name": "스케릿의 조각창"
+      },
       "loomshard_eye": {
         "name": "베틀조각의 눈"
       },
@@ -13933,6 +13963,11 @@ export const ko_KR: EnTranslations = {
         "title": "펜브리지 감시관",
         "greeting": "문 앞에서 멈추십시오, {className}. 갈대 너머의 수렁은 우리 대신 사람을 죽입니다."
       },
+      "socketwright_skerrit": {
+        "name": "마벤 스케릿",
+        "title": "박음 장인",
+        "greeting": "그 눈을 갈아 그의 눈구멍에 박아 넣은 지 사십 년, 하루치 값도 못 받았다. 감독관에게 아픔을 주고 싶나, {className}? 그렇다면 내 작품을 노려라."
+      },
       "brother_aldric_fen": {
         "name": "알드릭 수사",
         "title": "계곡의 사제",
@@ -14543,6 +14578,16 @@ export const ko_KR: EnTranslations = {
         "objectives": {
           "0": {
             "label": "펜브리지 소집 명령서"
+          }
+        }
+      },
+      "q_socketwrights_due": {
+        "title": "박음 장인의 미수금",
+        "text": "그 눈구멍에 룸샤드를 박은 건 나였다. 렌즈를 갈고, 앉히고, 쐐기로 곧게 고정했지. 봉분의 주인들은 동화 한 푼 주지 않았고, 이제 내 작품이 늪을 짓밟으며 돌아다닌다. 내 조각창을 가져가라. 밑동을 박고, 창끝을 세워 얼마가 걸리든 버텨라. 팔이 확실해지면 그것을 눈에 꽂아라. 그가 걸친 가죽은 그 조각에 묶여 있다, {playerName}. 그를 실명시켜라. 그러면 늪의 모든 칼날이 마침내 먹힌다.",
+        "completion": "뚫리는 느낌이 들었지? 사십 년치 이자를 눈구멍으로 받아냈다. 창은 네 것이다, 친구. 그는 낫는다, 늘 그러니까. 그러니 마음이 동할 때 또 받으러 가면 된다.",
+        "objectives": {
+          "0": {
+            "label": "감독관의 눈을 찌르기"
           }
         }
       },
