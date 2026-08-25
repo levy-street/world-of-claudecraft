@@ -62,8 +62,8 @@ import { desktopPresentationHidden } from './game/desktop_presentation';
 import { initDesktopShellIntegration } from './game/desktop_shell_integration';
 import { installDevTeleports } from './game/dev_shortcuts';
 import { desktopPresenceOnFrame, pushDiscordPresenceEnabled } from './game/discord_presence';
-import { cycleHudFocus } from './game/dpad_focus_nav';
 import { localDodgeToWorld } from './game/dodge_input';
+import { cycleHudFocus } from './game/dpad_focus_nav';
 import { takeEditorPlaytestRequest } from './game/editor_playtest';
 import {
   clearEntryProbe,

@@ -42,8 +42,8 @@ import { createMob } from '../src/sim/entity';
 import { emptySaleLog } from '../src/sim/market_sale_log';
 import { MOUNT_RACE_COUNTDOWN_TICKS } from '../src/sim/mount_race';
 import { petOf, serializePet, summonPet } from '../src/sim/pet/pet_commands';
-import { livePlaytimeSeconds } from '../src/sim/playtime';
 import { DODGE_ENDURANCE_COST, DODGE_ENDURANCE_MAX } from '../src/sim/player_dodge';
+import { livePlaytimeSeconds } from '../src/sim/playtime';
 import { noteRelicItemFind, noteRelicObtain } from '../src/sim/reliquary';
 import { Sim } from '../src/sim/sim';
 import { type Aura, DT, type PlayerClass, type WorldContent } from '../src/sim/types';
@@ -136,10 +136,7 @@ describe('dodge state over the wire', () => {
     const session = joinServer(server, fakeWs(), 1, 'Fleetfoot', 'hunter');
     const player = server.sim.entities.get(session.pid)!;
 
-    server.handleMessage(
-      session,
-      JSON.stringify({ t: 'cmd', cmd: 'dodge', x: 'right', z: null }),
-    );
+    server.handleMessage(session, JSON.stringify({ t: 'cmd', cmd: 'dodge', x: 'right', z: null }));
     expect(player.dodgeRemaining).toBeUndefined();
 
     server.handleMessage(session, JSON.stringify({ t: 'cmd', cmd: 'dodge', x: 1, z: 0 }));

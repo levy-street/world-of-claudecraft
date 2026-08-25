@@ -34,13 +34,13 @@ import { recalcPlayerStats } from '../entity';
 import { isShieldItem } from '../equipment_rules';
 import { instanceInfoAt } from '../instances/dungeons';
 import { forceDismount } from '../mounts';
-import { isPlayerDodging } from '../player_dodge';
 import {
   canActivateDivineAscension,
   hasDevotion,
   paladinExecuteWindowActive,
   spendDevotion,
 } from '../paladin_devotion';
+import { isPlayerDodging } from '../player_dodge';
 import { effectiveFishingBand, fishReelWindowSecFor } from '../professions/fishing';
 import { bestOwnedGatherToolFor } from '../professions/tools';
 import { scheduleBallisticProjectile, scheduleProjectile } from '../projectile_travel';

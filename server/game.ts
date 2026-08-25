@@ -54,13 +54,13 @@ import type { PickAction } from '../src/sim/lockpick';
 import { lootHasGoneFfa } from '../src/sim/loot/loot_ffa';
 import { type MarketQuery, sanitizeMarketQuery } from '../src/sim/market_query';
 import { parseMoveInputFrame } from '../src/sim/move_input';
-import { playerEndurance } from '../src/sim/player_dodge';
 import {
   partyFrameAbsorb,
   partyFrameAggroTargets,
   partyFrameIncomingHeals,
   partyFrameRole,
 } from '../src/sim/party_frame_info';
+import { playerEndurance } from '../src/sim/player_dodge';
 import { livePlaytimeSeconds } from '../src/sim/playtime';
 import { effectiveFishingBand } from '../src/sim/professions/fishing';
 import { RESPEC_TIER_CONFIG, type RespecPaymentTier } from '../src/sim/professions/focus';

@@ -27,8 +27,8 @@ import {
   entityCombatRadius,
   segmentCircleTimeOfImpact,
 } from './combat/directional_attack';
-import type { SimContext } from './sim_context';
 import { evadeIncomingAttack } from './player_dodge';
+import type { SimContext } from './sim_context';
 import { DT, type Entity } from './types';
 
 // Yards per second. Matches the homing projectile speed in src/render/vfx.ts so the

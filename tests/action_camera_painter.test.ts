@@ -53,10 +53,7 @@ describe('ActionCameraCrosshair', () => {
       createElement: vi.fn(() => element),
       body: { appendChild: vi.fn() },
     } as unknown as Document;
-    const crosshair = createActionCameraCrosshair(
-      { getBoundingClientRect: () => rect },
-      doc,
-    );
+    const crosshair = createActionCameraCrosshair({ getBoundingClientRect: () => rect }, doc);
 
     crosshair.setVisible(true);
     expect(element.hidden).toBe(false);

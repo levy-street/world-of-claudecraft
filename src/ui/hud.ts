@@ -380,16 +380,16 @@ import {
   ITEM_ICON_PREFIX,
 } from './hud/action_bar/action_bar_view';
 import { BarEditorWindow } from './hud/action_bar/bar_editor';
+import { CONSUMABLE_BAR_SLOTS, consumableBarItems } from './hud/action_bar/consumable_bar_view';
 import {
   buildMobileConsumableSeat,
   type MobileConsumableSeat,
 } from './hud/action_bar/consumable_seat_controller';
-import { CONSUMABLE_BAR_SLOTS, consumableBarItems } from './hud/action_bar/consumable_bar_view';
 import {
+  type AbilityPreviewKind,
   type AimPoint,
   abilityAoeRadius,
   abilityPreviewAngle,
-  type AbilityPreviewKind,
   abilityPreviewKind,
   abilityPreviewRange,
   cancelGroundAim,
