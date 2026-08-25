@@ -182,7 +182,7 @@ Three seams keep it flat; use them, never re-invent them.
 
 - **The broadcast loop builds shared things once per pass, never per session.** A
   realm-wide viewer-independent readout builds and stringifies ONCE per pass via
-  `realm_readout_memo.ts` and rides `maybeRaw(...)` (the Vale Cup and dungeon-finder
+  `realm_readout_memo.ts` and rides `maybeRaw(...)` (the dungeon-finder
   boards are the tenants); events stringify once per batch (`event_frame.ts`) and go out
   via `sendRaw`, never re-`send` per session; interest gathering scans each occupied
   grid cell once (`interest_candidates.ts`) and re-applies each viewer's exact radius.
@@ -257,11 +257,11 @@ server) verdict every inbound frame; `game.ts` is a thin consumer. The design re
   which owns the list and guards the `selfWireJson` (encode) to `applySnapshot`
   (decode) round-trip. A new heavy self field lands in `selfWireJson` (here) and
   `applySnapshot` (`online.ts`) in one commit, and is added to that registry. A value
-  already serialized once realm-wide (the Vale Cup shared fragment on `vcupb`, built
+  already serialized once realm-wide (the dungeon-finder board on `dfb`, built
   and stringified a single time per broadcast pass by the realm-readout memo) rides
   via `maybeRaw(...)` instead of `maybe(...)`, so the per-session diff reuses the one
-  memoized string rather than re-stringifying it for every viewer. The `vcup` and
-  `vcupb` keys are asserted directly in the round-trip test rather than mapped in
+  memoized string rather than re-stringifying it for every viewer. The `dfb`
+  key is asserted directly in the round-trip test rather than mapped in
   `TERSE_TO_IWORLD` (they merge back into one `cupInfo` on decode), the same way `tal`
   fans out to several members and is asserted directly.
 

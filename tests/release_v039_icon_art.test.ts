@@ -50,7 +50,12 @@ const SECOND_PASS_RECORD_SHA256 =
   // number in the sealed record (ours the hotbar census 72 to 75 for the three
   // role foods, the release the ability census 410 to 412), the record
   // auto-merged carrying BOTH, and this seal is the merged file's own bytes.
-  'd103d73d7cb6f38fa3e8935c6ceab5247e5cb0c472b40da97e4c7d6cf62460f6';
+  // RE-MINTED again at the release/v0.41.0 sync: the release moved the
+  // ability census 412 to 402 (the ten Vale Cup sport abilities retired with
+  // the Sowfield demolition), this branch holds the hotbar census at 75, the
+  // record auto-merged carrying both again, and this seal is the merged
+  // file's own bytes (shasum -a 256 of the record).
+  'a2ebdea69ee67e7448a8f0cf606a74139be11555e7d96e305e066f7e688de404';
 const EVIDENCE = {
   'icon-art-before-after-desktop.png': {
     sha256: '61d19fb321f2b30eb3749e0966f26efea0fa4df53edae4b253cfd70edb82cd7a',
@@ -72,7 +77,6 @@ const inventoryController = new ActionBarController({
   talentSpec: () => null,
   knownAbilityIds: () => [],
   hasAura: () => false,
-  isInSportMatch: () => false,
   showAttackButton: () => true,
 });
 
@@ -344,7 +348,12 @@ describe('release v0.39 icon-art second-pass lineage', () => {
         // branch: the three phase 10 role foods joined the census (see the
         // record-sha comment above). The art-subject universe, live minus
         // ITEM_ART_PENDING.
-        abilities: { live: 412, painted: 412 },
+        // 402 at the release/v0.41.0 sync: the ten Vale Cup sport abilities
+        // retired with the New Eastbrook program's Sowfield demolition, plus
+        // the release arm's two new abilities riding the v0.40.0 sync merge.
+        // The hotbar census stays at this branch's 75 (the release's own arm
+        // read 72 without the three role foods).
+        abilities: { live: 402, painted: 402 },
         hotbarItems: { live: 75, painted: 75 },
         fixedActions: { painted: 11 },
         mobAuraRouting: { paintedFamilies: 44, exactRuntimeIds: 89 },
@@ -438,7 +447,7 @@ describe('release v0.39 icon-art second-pass lineage', () => {
     expect(new Set(liveAbilityIds).size, 'live ability ids remain unique').toBe(
       liveAbilityIds.length,
     );
-    expect(liveAbilityIds, 'live production ability inventory').toHaveLength(412);
+    expect(liveAbilityIds, 'live production ability inventory').toHaveLength(402);
     expect(
       liveAbilityIds.filter((id) => !paintedAbilityIds.has(id)),
       'every live ability resolves through production to committed painted art',

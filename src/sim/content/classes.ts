@@ -21,7 +21,6 @@ import { PRIEST_ABILITIES } from './priest';
 import { MENDING_WATERS_MANA_COST, TIDECALL_MANA_COST } from './shaman_tuning';
 import { TALENT_ABILITIES_V2 } from './talent_abilities_v2';
 import type { TalentModifiers } from './talents';
-import { SPORT_ABILITIES } from './vale_cup';
 
 // ---------------------------------------------------------------------------
 // Player classes — per-level base stats follow classic-era growth curves.
@@ -8396,7 +8395,6 @@ export const ABILITIES: Record<string, AbilityDef> = {
   // so every ABILITIES consumer (casting, icons, hotbar validation, tooltips)
   // resolves sport ids; no class lists them, so abilitiesKnownAt never grants
   // them outside a match (resolveSportKit is the only entry).
-  ...SPORT_ABILITIES,
 };
 
 const PALADIN_LEGACY_ABILITY_IDS = [

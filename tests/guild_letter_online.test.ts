@@ -118,8 +118,10 @@ describe('guild letter over the live GameServer wire (session routing)', () => {
       // exhibition stages itself mid-window and its bots land in `players`.
       // The bystander sweep names the humans; bots carry no mail at all
       // (issue #3560), which the trailing loop pins on the server path.
+      // Optional: the eastbrook revamp (#3460) retires the Vale Cup, so on a
+      // post-retirement sim there is no vcup subsystem and no bots to exclude.
       const botPids = new Set(
-        (server.sim as unknown as { vcup: { botPids: number[] } }).vcup.botPids,
+        (server.sim as unknown as { vcup?: { botPids: number[] } }).vcup?.botPids ?? [],
       );
       const otherPids = [...players.keys()].filter((pid) => pid !== sc.pid && !botPids.has(pid));
       expect(otherPids.length).toBe(2);

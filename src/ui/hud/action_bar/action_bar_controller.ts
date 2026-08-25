@@ -1,4 +1,3 @@
-import { SPORT_ABILITIES } from '../../../sim/content/vale_cup';
 import { ABILITIES, ITEMS } from '../../../sim/data';
 import type { PlayerClass } from '../../../sim/types';
 import type { ActionBarLayout } from '../../../world_api/action_bar';
@@ -37,7 +36,7 @@ import {
 
 export { ACTION_BAR_ABILITY_SLOTS } from './action_bar_layout_core';
 
-export type HotbarForm = 'normal' | 'bear' | 'cat' | 'cat_stealth' | 'stealth' | 'sport';
+export type HotbarForm = 'normal' | 'bear' | 'cat' | 'cat_stealth' | 'stealth';
 
 const FORM_TOGGLE_IDS = new Set(['bear_form', 'cat_form', 'travel_form']);
 
@@ -49,7 +48,6 @@ export interface ActionBarControllerDeps {
   talentSpec(): string | null;
   knownAbilityIds(): readonly string[];
   hasAura(kind: string): boolean;
-  isInSportMatch(): boolean;
   showAttackButton(): boolean;
   // The persistence seam: called after a user-driven layout change (never during
   // initial load) with the FULL captured layout. Offline it is a no-op
@@ -137,7 +135,6 @@ export class ActionBarController {
   }
 
   resolveActiveForm(): HotbarForm {
-    if (this.deps.isInSportMatch()) return 'sport';
     if (this.deps.playerClass === 'druid') {
       if (this.deps.hasAura('form_bear')) return 'bear';
       if (this.deps.hasAura('form_cat')) {
@@ -409,8 +406,6 @@ export class ActionBarController {
   private shouldAutoPlaceOnForm(id: string, form: HotbarForm): boolean {
     // Passives never castable: keep them off every seeded/form kit bar too.
     if (!this.isAbilityPlacementAllowed(id)) return false;
-    if (form === 'sport') return !!SPORT_ABILITIES[id];
-    if (SPORT_ABILITIES[id]) return false;
     if (this.isStealthForm(form)) return false;
     if (form === 'bear' || form === 'cat') {
       return ABILITIES[id]?.requiresForm === form || FORM_TOGGLE_IDS.has(id);
@@ -427,7 +422,7 @@ export class ActionBarController {
   }
 
   private abilityDef(id: string) {
-    return ABILITIES[id] ?? SPORT_ABILITIES[id];
+    return ABILITIES[id];
   }
 
   private isAbilityPlacementAllowed(id: string): boolean {
@@ -520,7 +515,7 @@ export class ActionBarController {
     const normalActions = parseHotbarActions(
       normalRaw,
       ACTION_BAR_ABILITY_SLOTS,
-      (id) => !!ABILITIES[id] || !!SPORT_ABILITIES[id],
+      (id) => !!ABILITIES[id],
       // The stored-layout keep predicate here too: a normal bar holding an
       // unknown-id slot must still read as occupied, or the seeding decision
       // treats it as emptier than it is.
@@ -563,21 +558,6 @@ export class ActionBarController {
       } catch {
         // Storage can be unavailable in private browsing modes.
       }
-    }
-    if (this.activeFormState === 'sport') {
-      if (parsed.every((action) => action === null)) {
-        this.actionState = buildDefaultFormBar(
-          this.formKitAbilityIds('sport'),
-          ACTION_BAR_ABILITY_SLOTS,
-        );
-        this.loadedFromStorage = true;
-        this.knownAbilityIdsAtLastSync = null;
-        return;
-      }
-      this.loadedFromStorage = stored;
-      this.actionState = parsed;
-      this.knownAbilityIdsAtLastSync = null;
-      return;
     }
     if (this.isStealthForm()) {
       this.loadStealthActions(parsed, stored, storedRaw);

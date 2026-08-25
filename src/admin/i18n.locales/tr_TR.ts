@@ -7,6 +7,9 @@
 // (tests/i18n_admin_catalog.test.ts).
 
 export const tr_TR: Record<string, string> = {
+  'error.flagActiveExists': 'bu hesapta bu türden zaten açık bir işaret var',
+  'wealth.largeMovementsUnavailable':
+    'büyük banka hareketleri yüklenemedi (defter okuma zaman aşımına uğradı); yukarıdaki altın dökümü eksiksiz',
   'error.guildBankDeleting':
     'Bu lonca siliniyor, bu yüzden bankası kapatıldı. Hiçbir şey değiştirilmedi.',
   'error.guildBankItemRequired': 'O yuvada olmasını beklediğin eşyanın kimliğini gir.',

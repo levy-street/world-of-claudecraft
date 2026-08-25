@@ -192,15 +192,6 @@ describe('nameplate_view - visibility', () => {
     ).toBe(true);
   });
 
-  it('hides the Vale Cup boarball plate even with nameplates on and up close', () => {
-    // The ball is an inert mob entity (bell pattern) with a bespoke ball
-    // visual; a floating name + hp bar over it would break the toy. Pinned
-    // near, targeted, and with the toggle on, so no other arm can resurface it.
-    const ball = ent({ templateId: 'vale_cup_ball', pos: { x: 0, y: 0, z: 2 } });
-    expect(plan(ball).hidden).toBe(true);
-    expect(plan(ball, viewer({ targetId: 2 })).hidden).toBe(true);
-  });
-
   it('the mob-nameplate toggle hides live mobs only, never players/npcs/objects', () => {
     expect(plan(ent({ kind: 'mob' }), viewer(), 2, false).hidden).toBe(true);
     expect(plan(ent({ kind: 'mob', dead: true, lootable: true }), viewer(), 2, false).hidden).toBe(
@@ -339,16 +330,15 @@ describe('nameplate_view - compile-gate stand-in', () => {
   it('still hides what no gate is hiding: a looted corpse and the label-less carve-outs', () => {
     const corpse = ent({ kind: 'mob', dead: true, lootable: false });
     expect(plan(corpse, viewer(), 2, true, false, true, true).hidden).toBe(true);
-    // The sealed crypt door reads as back wall and the Vale Cup ball is a toy:
-    // both are deliberately label-less, gate or no gate.
+    // The sealed crypt door reads as back wall: deliberately label-less, gate
+    // or no gate. (The Vale Cup ball was the other carve-out until the New
+    // Eastbrook program retired it.)
     const sealed = ent({
       kind: 'object',
       templateId: 'dungeon_door',
       dungeonId: 'nythraxis_boss_arena',
     });
     expect(plan(sealed, viewer(), 2, true, false, true, true).hidden).toBe(true);
-    const ball = ent({ kind: 'mob', templateId: 'vale_cup_ball' });
-    expect(plan(ball, viewer(), 2, true, false, true, true).hidden).toBe(true);
   });
 
   it('never overrides the self plate (the local player view is never gated)', () => {

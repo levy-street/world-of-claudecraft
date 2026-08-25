@@ -27,7 +27,7 @@
 // tests/farm_patch_placement.test.ts (dry land, sea freeboard, water in
 // reach, slope, no collider overlap, a reachable stand spot, hub
 // reachability, zone containment, bed spacing, node clearance, and the camp,
-// road and Sowfield screens): move a bed rather than weaken an arm.
+// road screens): move a bed rather than weaken an arm.
 //
 // LAYOUT RULE, so the grid stays readable and the arms stay satisfiable: one
 // patch is a rectangular grid on a 5 yard pitch, filled row by row from its
@@ -71,20 +71,25 @@ export interface FarmPatchDef {
 
 const FARM_PATCH_ROWS: readonly FarmPatchDef[] = [
   {
-    // The Eastbrook allotments, on the north lane out of town: 37 yards from
-    // the hub, past the last cottage and short of the Wolf Run. The obvious
-    // farmland west of town is the Sableweb webwood, whose spider camp covers
-    // it, so the tutorial site sits north instead where nothing patrols.
+    // The Eastbrook allotments, on the open ground at the harbor town's
+    // north-east edge: 20 yards from the civic center, east of the north
+    // road between the civic ring and the chapel yard, 16 yards off every
+    // lane and 48 yards outside the nearest camp disc. The obvious farmland
+    // west of town is the Sableweb webwood, whose spider camp covers it, and
+    // the north-lane site this patch first shipped on (18.5, 32.5) went
+    // under the second wolf run when release/v0.41.0 rebuilt the vale, so
+    // the tutorial site sits inside the town's own ground where nothing
+    // patrols (compass note: +x is WEST in this world, see zone1.ts).
     id: 'patch_eastbrook',
     zoneId: 'eastbrook_vale',
     tier: 1,
-    x: 18.5,
-    z: 32.5,
+    x: -21.5,
+    z: -81.5,
     beds: [
-      { id: 'bed_eastbrook_1', x: 16, z: 30 },
-      { id: 'bed_eastbrook_2', x: 21, z: 30 },
-      { id: 'bed_eastbrook_3', x: 16, z: 35 },
-      { id: 'bed_eastbrook_4', x: 21, z: 35 },
+      { id: 'bed_eastbrook_1', x: -24, z: -84 },
+      { id: 'bed_eastbrook_2', x: -19, z: -84 },
+      { id: 'bed_eastbrook_3', x: -24, z: -79 },
+      { id: 'bed_eastbrook_4', x: -19, z: -79 },
     ],
   },
   {

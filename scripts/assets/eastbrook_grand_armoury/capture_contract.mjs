@@ -264,6 +264,9 @@ export const EASTBROOK_TOWN_CAPTURE_VIEWS = Object.freeze([
   }),
   Object.freeze({
     name: 'armoury-relation',
+    // HISTORICAL: frozen at the capture-time aim; the committed evidence
+    // records this exact view. The round-4 barracks re-aim rides the matched
+    // override table below, never this row.
     camera: Object.freeze({ x: 34, y: 15, z: 25 }),
     target: Object.freeze({ x: 10, y: 4, z: -2 }),
   }),
@@ -328,54 +331,77 @@ export const EASTBROOK_TOWN_PERF_SCENARIOS = Object.freeze([
 // The accepted rebuild evidence above is immutable. Polish evidence opts into
 // these additional views instead of replacing or renaming any of the original
 // fifteen view contracts.
+// Re-aimed 2026-08-18 for the Eastbrook harbor move (layout v3, commit
+// d19aa33f76, docs/design/eastbrook-revamp/site-plan.md): every polish subject
+// re-lotted, so each target follows its layout-derived subject point and each
+// camera was re-seated collision-clear on the subject's public side. View
+// names stay immutable evidence naming ('west-wall-quartermaster' included:
+// FURY now stands by the graveyard, wall or no wall).
+// Re-aimed for owner round 6b's world wave: the two market stalls opened out
+// across the square (world market to (-20.5, -94), provisions to (-19, -108)),
+// so each target follows its stall's derived front standing point and each
+// camera rides the same move, holding its former offset from the target. Both
+// targets and both cameras re-probed collision-clear at camera height.
 export const EASTBROOK_TOWN_POLISH_CAPTURE_VIEWS = Object.freeze([
   Object.freeze({
     name: 'stall-world-market',
     subject: 'eastbrook_market_stall_world_market',
-    camera: Object.freeze({ x: -2.54, y: 6, z: 5.47 }),
-    target: Object.freeze({ x: -4.55381837226296, y: 2.5, z: 8.20975183498178 }),
+    camera: Object.freeze({ x: -16, y: 6, z: -93 }),
+    target: Object.freeze({ x: -19.517695018376127, y: 2.5, z: -95.26296354780212 }),
   }),
   Object.freeze({
     name: 'stall-provisions',
     subject: 'eastbrook_market_stall_provisions',
-    camera: Object.freeze({ x: -3, y: 6, z: 0 }),
-    target: Object.freeze({ x: -7.421769629642221, y: 2.5, z: 0.7630378263298812 }),
+    camera: Object.freeze({ x: -14.5, y: 6, z: -109 }),
+    target: Object.freeze({ x: -18.017695018376127, y: 2.5, z: -106.73703645219788 }),
   }),
+  // Re-aimed for owner refinement round 6b: the town's NPCs were redistributed
+  // by role along the dock road and Lin moved from the civic green to the
+  // quayside home at (-72, -96). The view is re-seated, never retired: same
+  // name, same subject, target back on her authored stand and the camera 7 yd
+  // out along her derived facing (toward the civic centre), probed
+  // collision-clear at camera height.
   Object.freeze({
     name: 'apothecary-lin',
     subject: 'apothecary_lin',
-    camera: Object.freeze({ x: 1.8, y: 6, z: 6 }),
-    target: Object.freeze({ x: 2.8431593444121797, y: 2.5, z: 9.717148252611294 }),
+    camera: Object.freeze({ x: -65, y: 6, z: -96 }),
+    target: Object.freeze({ x: -72, y: 2.5, z: -96 }),
   }),
   Object.freeze({
     name: 'ravenpost-mailbox',
     subject: 'mailbox_eastbrook',
-    camera: Object.freeze({ x: 0, y: 5, z: -2 }),
-    target: Object.freeze({ x: 0, y: 2, z: -6.2 }),
+    camera: Object.freeze({ x: -10, y: 5, z: -93.5 }),
+    target: Object.freeze({ x: -10, y: 2, z: -96.7 }),
   }),
   Object.freeze({
     name: 'noticeboard',
     subject: 'eastbrook_noticeboard',
-    camera: Object.freeze({ x: 5, y: 6, z: -4 }),
-    target: Object.freeze({ x: 9.010050506338834, y: 2.2, z: -7.010050506338834 }),
+    camera: Object.freeze({ x: 1, y: 6, z: -92.5 }),
+    target: Object.freeze({ x: 3.844569834250236, y: 2.2, z: -89.79055748182878 }),
   }),
   Object.freeze({
     name: 'civic-motion',
     subject: 'eastbrook_civic_well_beacon',
-    camera: Object.freeze({ x: -10, y: 6, z: -7 }),
-    target: Object.freeze({ x: -0.75, y: 2.8, z: 0 }),
+    camera: Object.freeze({ x: -8, y: 6, z: -110 }),
+    target: Object.freeze({ x: -14.75, y: 2.8, z: -104 }),
   }),
   Object.freeze({
     name: 'ravenpost-chronicler',
     subject: 'chronicler_saul',
-    camera: Object.freeze({ x: -10, y: 6.5, z: -11 }),
-    target: Object.freeze({ x: 0, y: 2.5, z: -14.5 }),
+    camera: Object.freeze({ x: 10.5, y: 6.5, z: -85 }),
+    target: Object.freeze({ x: 10.2, y: 2.5, z: -87.5 }),
   }),
+  // Re-aimed for owner round 6b's world wave: FURY is a service NPC (the honor
+  // quartermaster), so he left the chapel step for the town's eastern edge at
+  // (16, -78). The view is re-seated, never retired: same name, same subject,
+  // target on his authored stand and the camera carrying its former 4.47 yd
+  // offset, which still lands on his (re-derived) public-facing side and probes
+  // collision-clear at camera height.
   Object.freeze({
     name: 'west-wall-quartermaster',
     subject: 'fury',
-    camera: Object.freeze({ x: -16, y: 6, z: -3 }),
-    target: Object.freeze({ x: -22.5, y: 2.5, z: -7.5 }),
+    camera: Object.freeze({ x: 12, y: 6, z: -80 }),
+    target: Object.freeze({ x: 16, y: 2.5, z: -78 }),
   }),
 ]);
 
@@ -383,30 +409,47 @@ export const EASTBROOK_TOWN_POLISH_CAPTURE_VIEWS = Object.freeze([
 // before/after evidence shares this derived list so outward service moves can
 // be framed from their public faces without invalidating accepted PR #2356
 // evidence. The matching baseline deliberately uses these same cameras.
+// Re-derived 2026-08-18 to the layout v3 harbor lots (commit d19aa33f76,
+// docs/design/eastbrook-revamp/site-plan.md): every service target sits on its
+// building's front standing point and every camera stands collision-clear on
+// the public face. 'chapel-and-weaving' keeps its historical pairing even
+// though v3 parted the two buildings by about 53 yards; the only region
+// public-side of BOTH fronts is east of the bank, so that camera is now a
+// wide establishing shot across the civic square.
 export const EASTBROOK_TOWN_POLISH_MATCHED_VIEW_OVERRIDES = Object.freeze({
+  'armoury-relation': Object.freeze({
+    // Round 4: the armoury retired from placement and the KayKit barracks
+    // garrison holds the lot; the matched view aims just off the barracks
+    // west facade (its rectangle collider owns the lot center).
+    camera: Object.freeze({ x: 34, y: 15, z: 25 }),
+    target: Object.freeze({ x: 12.5, y: 4, z: -5.5 }),
+  }),
   'bank-and-chest': Object.freeze({
-    camera: Object.freeze({ x: 5, y: 7, z: 2 }),
-    target: Object.freeze({ x: 14.156943251329539, y: 3.2, z: 8.685223202016726 }),
+    camera: Object.freeze({ x: 5, y: 7, z: -101 }),
+    target: Object.freeze({ x: 8.994796179957174, y: 3.2, z: -97.00520382004282 }),
   }),
   'smithy-and-forge': Object.freeze({
-    camera: Object.freeze({ x: 10, y: 7, z: 8 }),
-    target: Object.freeze({ x: 3.687633548766497, y: 3, z: 15.598153967032626 }),
+    camera: Object.freeze({ x: -9.5, y: 7, z: -126 }),
+    target: Object.freeze({ x: -6.293250516799596, y: 3, z: -124.1466252583998 }),
   }),
   'inn-and-kitchens': Object.freeze({
-    camera: Object.freeze({ x: 0, y: 8, z: 8 }),
-    target: Object.freeze({ x: -10.018829436136041, y: 3, z: 13.621842145917809 }),
+    camera: Object.freeze({ x: -43, y: 8, z: -94 }),
+    target: Object.freeze({ x: -42.82589170715949, y: 3, z: -90.73189846640925 }),
   }),
   'chapel-and-weaving': Object.freeze({
-    camera: Object.freeze({ x: 0, y: 12, z: 4 }),
-    target: Object.freeze({ x: -13.2, y: 3, z: -10.5 }),
+    camera: Object.freeze({ x: 26, y: 12, z: -100 }),
+    target: Object.freeze({ x: -13, y: 3, z: -100 }),
   }),
   'toolworks-service-perimeter': Object.freeze({
-    camera: Object.freeze({ x: 4, y: 7, z: -9 }),
-    target: Object.freeze({ x: 5, y: 5, z: -14.25 }),
+    camera: Object.freeze({ x: -11, y: 7, z: -120 }),
+    target: Object.freeze({ x: -13.614789156231515, y: 5, z: -124.42218373434727 }),
   }),
+  // Moved in lockstep with the polish view above for owner round 6b: this entry
+  // has always mirrored that view exactly, and a matched shot aimed at the
+  // stall's vacated ground would photograph empty square.
   'stall-world-market': Object.freeze({
-    camera: Object.freeze({ x: -6, y: 6, z: 0 }),
-    target: Object.freeze({ x: -5.75, y: 2.5, z: 7 }),
+    camera: Object.freeze({ x: -16, y: 6, z: -93 }),
+    target: Object.freeze({ x: -19.517695018376127, y: 2.5, z: -95.26296354780212 }),
   }),
 });
 

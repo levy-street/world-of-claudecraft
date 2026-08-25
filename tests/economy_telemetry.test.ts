@@ -36,7 +36,6 @@ describe('copper flow source classification', () => {
       craft_item: 'craft',
       train_recipe: 'craft',
       trade_accept: 'trade',
-      vcup_bet: 'wager',
       dev_give: 'dev',
       // The two movers the whole-branch review found booking under 'other':
       // the riding lesson is a training fee, the companion upgrade a delve
@@ -107,6 +106,7 @@ describe('harvest band classification (zone-keyed, R3)', () => {
       'evergarden',
       'galecrest',
       'farshore_isle',
+      'proving_shore', // the tutorial island: 15th zone, 15th band
     ]);
   });
 
@@ -117,10 +117,15 @@ describe('harvest band classification (zone-keyed, R3)', () => {
       expect(harvestBandForNode(node.id), node.id).toBe(node.zoneId);
       seen.add(harvestBandForNode(node.id));
     }
-    // All three bands are reachable from live content, so no exported series
-    // is permanently dead. This is the arm the old material keying failed:
-    // Thornpeak's ore priced mid, so the premium band could not see it.
-    expect(seen).toEqual(new Set(HARVEST_BANDS));
+    // Every band with authored nodes is reachable from live content, so no
+    // exported series is permanently dead. This is the arm the old material
+    // keying failed: Thornpeak's ore priced mid, so the premium band could
+    // not see it. The Proving Shore (the tutorial island) is the one
+    // deliberate absence: its professions rollout row is 'none', so it ships
+    // NO gather nodes and its band stays empty by design.
+    const bandsWithNodes = new Set([...HARVEST_BANDS].filter((b) => b !== 'proving_shore'));
+    expect(seen).toEqual(bandsWithNodes);
+    expect(GATHER_NODES.some((node) => node.zoneId === 'proving_shore')).toBe(false);
   });
 
   it('counts an unknown node id in the first zone rather than dropping it', () => {
@@ -244,7 +249,6 @@ describe('the classifier map is complete and its keys are real commands', () => 
       trade_confirm: 'trade',
       turnin: 'quest',
       unbind_item: 'craft',
-      vcup_bet: 'wager',
     });
   });
 

@@ -169,10 +169,14 @@ describe('the town wall is a vaultable parapet, not a curtain', () => {
 
 describe('interactable landmarks are solid (the v0.31 walk-through sweep)', () => {
   it('the Ravenpost pillar blocks, and its posting spot stays clear', () => {
-    // Authored at (0, -7.5); the pillar's shaft is a full-height OBB.
-    expect(isBlocked(SEED, 0, -7.5, 0.5)).toBe(true);
-    expect(isBlocked(SEED, 0, -6.4, 0.5)).toBe(false);
-    expect(supportHeightAt(SEED, 0, -7.5, 0.5, 1e9)).toBe(Number.NEGATIVE_INFINITY);
+    // Re-pinned 2026-08 for the harbor move (d19aa33f76, the New Eastbrook
+    // program, docs/design/eastbrook-revamp/site-plan.md): authored at
+    // (5, -89) on the south civic/Armoury transition, its public face toward
+    // the square. The shaft is a full-height OBB and the clear probe is the
+    // authored front standing point (3.8446, -89.7906), rounded.
+    expect(isBlocked(SEED, 5, -89, 0.5)).toBe(true);
+    expect(isBlocked(SEED, 3.84, -89.79, 0.5)).toBe(false);
+    expect(supportHeightAt(SEED, 5, -89, 0.5, 1e9)).toBe(Number.NEGATIVE_INFINITY);
   });
 
   it("the banker's strongbox blocks and is standable at its drawn 1.3 lid", () => {
@@ -236,10 +240,13 @@ describe('interactable landmarks are solid (the v0.31 walk-through sweep)', () =
 
 describe('civic bench (rebuild furniture)', () => {
   it('strides up onto the seat with no jump, and off again clean', () => {
-    // South bench at (0, -0.9), rot PI, drawn 1.8 x 0.6 x 0.40: the 0.40 seat
-    // sits inside MAX_STEP_HEIGHT, so a plain walk climbs it like a kerb.
+    // Re-pinned 2026-08 for the harbor move (d19aa33f76): the civic benches
+    // ring the market square now; this is the SOUTH bench at (-14, -104.9),
+    // rot 0, drawn 1.8 x 0.6 x 0.40: the 0.40 seat sits inside
+    // MAX_STEP_HEIGHT, so a plain walk climbs it like a kerb, and the
+    // far-side walk-off crosses toward the square and re-seats on terrain.
     const sim = makeSim();
-    teleport(sim, 0, -0.9 - 1.3, 0);
+    teleport(sim, -14, -104.9 - 1.3, 0);
     const p = sim.player;
     let stood = 0;
     for (let i = 0; i < 40; i++) {
@@ -257,11 +264,14 @@ describe('civic bench (rebuild furniture)', () => {
 });
 
 describe('rebuild market stall (flat canopy at the authored height)', () => {
-  // The World Market stall at (-5.5, 9.5): authored 2.8 x 2.2 OBB whose
-  // canopy deck is the mesh's bounding top, drawn at exactly height 2.7.
-  const sx = -5.5;
-  const sz = 9.5;
-  const srot = 2.508844;
+  // The World Market stall, re-pinned 2026-08 for the harbor move
+  // (d19aa33f76, docs/design/eastbrook-revamp/site-plan.md) to its market
+  // square placement at (-17.5, -97.5): the same authored 2.8 x 2.2 OBB
+  // whose canopy deck is the mesh's bounding top, drawn at exactly
+  // height 2.7. The rotation is the authored MARKET_STALL_SPECS literal.
+  const sx = -17.5;
+  const sz = -97.5;
+  const srot = 2.4805494847391065;
 
   it('jump at the counter grabs the canopy, stands flat at 2.7, and walks off', () => {
     const sim = makeSim();

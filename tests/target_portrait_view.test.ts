@@ -152,24 +152,6 @@ describe('targetPortraitUrl', () => {
     }
   });
 
-  it('uses dedicated static art for the procedural Vale Cup ball', async () => {
-    const url = targetPortraitUrl('vale_cup_ball', true);
-    expect(url).toBe('/ui/portraits/vale_cup_ball.webp');
-    const path = resolve(process.cwd(), `public${url}`);
-    const bytes = readFileSync(path);
-    expect(bytes.byteLength).toBe(2068);
-    expect(createHash('sha256').update(bytes).digest('hex')).toBe(
-      'a7c60d03e01897459a70d9d79aaf575ea6c12fc13db38e981fee3614a8076670',
-    );
-    expect(await sharp(bytes).metadata()).toMatchObject({
-      width: 128,
-      height: 128,
-      space: 'srgb',
-      channels: 3,
-      hasAlpha: false,
-    });
-  });
-
   it('ships a decodable portrait with an opaque backdrop for every mob template', async () => {
     const entries = Object.entries(MOBS);
     const urls = entries.map(([mobId]) => targetPortraitUrl(mobId, true));

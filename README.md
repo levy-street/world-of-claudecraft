@@ -14,7 +14,7 @@
 [![PostgreSQL](https://img.shields.io/badge/PostgreSQL-16-4169E1?logo=postgresql&logoColor=white)](https://www.postgresql.org/)
 [![Gymnasium](https://img.shields.io/badge/Gymnasium-RL%20env-0C7BDC)](https://gymnasium.farama.org/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
-[![Version](https://img.shields.io/badge/version-0.39.0-blue)](package.json)
+[![Version](https://img.shields.io/badge/version-0.40.0-blue)](package.json)
 [![PRs welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](CONTRIBUTING.md)
 [![Discord](https://img.shields.io/badge/Discord-join-5865F2?logo=discord&logoColor=white)](https://discord.com/invite/worldofclaudecraft)
 
@@ -49,7 +49,7 @@ Same seed, same world, everywhere. Much of what you see is still drawn from code
 - **The Reliquary**, a collection journal whose shelves (Conquerors, Professions, Horizons) track the boss trophies, masterwork marks, mounts, skins, and titles you bring home.
 - **Prestige ranks past the level cap**: XP keeps counting at max level and converts into a leaderboard-visible prestige rank.
 - **Ranked PvP** across two arena maps: 1v1 and 2v2 ladders, a livelier 2v2 Fiesta mode, and **Protect Yumi**, a 3v3 and 5v5 objective mode. Ranked play pays Honor, which buys a PvP-only gear set that never out-scales dungeon loot in PvE.
-- **The Vale Cup**, a boarball league played in its own stadium south of Eastbrook, and **Card Duel**, a quick head-to-head card game hosted in town.
+- **Card Duel**, a quick head-to-head card game hosted in town.
 - **A Book of Deeds**: an achievement journal of cosmetic titles, badge borders, and Renown, with per-zone Chronicles kept by in-world Chronicler NPCs and a lifetime leaderboard.
 - **A deep professions economy**: four gathering trades feed ten crafts, from cooking and alchemy to jewelcrafting, weaponcrafting, and enchanting, with tiered tools, town workstations, masterwork quality, and commissions, all feeding a player-driven **World Market** and the **Ravenpost** mail service.
 - **Real multiplayer**: parties and raids, guilds, trading, duels, tap rights, party-split XP, whispers, away status, and a **Dungeon Finder** with role queues and premade listings.
@@ -270,7 +270,7 @@ Press `G` to open the PvP window (Thornhollow Fields is its primary tab, beside 
 - **Ravenpost mail**: send items and coin to other characters, with attachments held safely until claimed.
 - **Guilds**: charters, rosters, ranks, and guild chat.
 - **The Guide**: a searchable in-site wiki at `/wiki` covering classes, creatures, zones, and deeds, generated straight from live game content so it cannot drift from the world it documents.
-- **The Vale Cup and Card Duel**: boarball at the Sowfield stadium south of Eastbrook, in formats from 1v1 to 5v5, and a quick head-to-head card game hosted by the Card Master in town.
+- **Card Duel**: a quick head-to-head card game hosted by the Card Master in town.
 - **Eating and drinking**: sit to restore, broken by damage or standing, and yes, you can eat and drink at once.
 - **Vendors** that buy food and water and sell honest white gear, with coin shown in gold, silver, and copper.
 - **A personal bank** (the Gilded Strongbox): bursars in each hub town keep a vault per character, from 24 slots up to 96 with coin-bought expansions, plus bonus slots earned online for a verified email, linked accounts, and referrals.
@@ -291,7 +291,7 @@ Press `G` to open the PvP window (Thornhollow Fields is its primary tab, beside 
 | `1`-`9`, `0`, `-`, `=` | action bar |
 | `F` | interact (loot a corpse, pick up an object, talk) |
 | `C` `P` `L` `M` `B` `N` `T` | character, spellbook, quest log, world map, bags, talents, crafting |
-| `G` `O` `K` `I` `Y` `Shift+I` `Shift+P` `Shift+Z` `Shift+X` | arena, friends and guild, leaderboard, calendar, Vale Cup, Dungeon Finder, professions, deeds, the Reliquary |
+| `G` `O` `K` `I` `Shift+I` `Shift+P` `Shift+Z` `Shift+X` | arena, friends and guild, leaderboard, calendar, Dungeon Finder, professions, deeds, the Reliquary |
 | `Z` / `X` / `` ` `` | sheath or draw your weapons, emote wheel, mount or dismount |
 | `V` / `R` / `Esc` | nameplates, autorun, close the top window (or open the game menu) |
 

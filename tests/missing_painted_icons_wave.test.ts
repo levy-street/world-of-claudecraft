@@ -305,19 +305,20 @@ describe('missing painted icon accepted-art manifest', () => {
     // heroic_duskwhisper resolver, so 209/194/90/15 became 206/190/86/16.
     // The 2026-08-09 wave adds the 13 missing overhaul ability icons plus the
     // bespoke Elemental Trance replacing its interim duplicate: 206/190/86
-    // become 220/204/100.
+    // become 220/204/100. The Sowfield demolition retires the 10 sport_*
+    // Vale Cup abilities with their art: 220/204/100 become 210/194/90.
     expect(accepted.scope).toEqual({
-      targetRows: 220,
-      rasterPaintings: 204,
-      abilities: 100,
+      targetRows: 210,
+      rasterPaintings: 194,
+      abilities: 90,
       items: 101,
       deeds: 3,
       heroicWeaponResolvers: 16,
       originalInventoryRows: 197,
       supplementalCurrentHeadRows: 12,
     });
-    expect(accepted.assets).toHaveLength(204);
-    expect(accepted.assets.filter((asset) => asset.kind === 'ability')).toHaveLength(100);
+    expect(accepted.assets).toHaveLength(194);
+    expect(accepted.assets.filter((asset) => asset.kind === 'ability')).toHaveLength(90);
     expect(accepted.assets.filter((asset) => asset.kind === 'item')).toHaveLength(101);
     expect(accepted.assets.filter((asset) => asset.kind === 'deed')).toHaveLength(3);
 
@@ -462,9 +463,9 @@ describe('missing painted icon accepted-art manifest', () => {
         ).toBe(true);
       }
     }
-    expect(shippingHashes.size).toBe(204);
-    expect(sourceHashes.size).toBe(204);
-    expect(masterHashes.size).toBe(204);
+    expect(shippingHashes.size).toBe(194);
+    expect(sourceHashes.size).toBe(194);
+    expect(masterHashes.size).toBe(194);
     expect(sorted(referenceRoles)).toEqual([...ALLOWED_REFERENCE_ROLES]);
   });
 });
@@ -472,7 +473,7 @@ describe('missing painted icon accepted-art manifest', () => {
 describe('missing painted ability integration', () => {
   it('makes every live ability image-backed while preserving non-ABILITY image ids', () => {
     const accepted = manifest();
-    expect(accepted.targetSets.abilities).toHaveLength(100);
+    expect(accepted.targetSets.abilities).toHaveLength(90);
     expect(Object.keys(ABILITIES).filter((id) => !ABILITY_IMAGE_IDS.has(id))).toEqual([]);
     expect(sorted([...ABILITY_IMAGE_IDS].filter((id) => !Object.hasOwn(ABILITIES, id)))).toEqual([
       ...PRESERVED_IMAGE_BACKED_MODIFIER_IDS,
@@ -650,7 +651,11 @@ describe('missing painted deed and Heroic weapon integration', () => {
     // under the packet's declared art park for 11e to 11k. 288 at Phase 11i,
     // whose one deed (col_deepest_cast) joins the same pending side for the
     // same reason, and 289 at Phase 11k, whose prog_field_to_feast does too.
-    expect(DEED_ORDER).toHaveLength(289);
+    // 290 at the release/v0.41.0 sync: the release's Proving Shore graduation
+    // deed (prog_ready_for_an_adventure, 273 to 274 on its own arm) joins the
+    // same pending side, riding the deed_cat_progression crest until its
+    // commissioned art lands.
+    expect(DEED_ORDER).toHaveLength(290);
     expect(DEED_ORDER.filter((id) => !DEED_IMAGE_IDS.has(id))).toEqual([...DEED_ART_PENDING]);
     const credits = readFileSync(path.join(repoRoot, 'CREDITS.md'), 'utf8');
     const provenance = readFileSync(

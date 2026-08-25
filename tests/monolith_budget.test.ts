@@ -220,7 +220,51 @@ const MONOLITHS: MonolithRow[] = [
     // window_stack_state_core import. A row whose comment says zero slack and
     // whose pin sits above the file is the defect this packet's sim.ts row
     // already named, so it is re-measured rather than left green.
-    ceiling: 18480,
+    //
+    // UPSTREAM'S OWN HALF over the release/v0.41.0 span, kept so the merge drops
+    // neither parent's record:
+    // Lowered after extracting the ability description prose (the placeholder
+    // values, the over-time string and the talent-conditional field choice) into
+    // src/ui/ability_description.ts (the ratchet's own rule: an extraction lowers
+    // the ceiling, never raises it).
+    // Raised 19420 -> 19432 (+12) for the desktop-client-update packet, a
+    // maintainer decision prepared for PR review: the branch's additions are
+    // thin-consumer wiring to extracted modules (presentation_gate,
+    // instance_music) riding on top of upstream's near-zero-slack re-pins, so
+    // no clean branch-owned extraction exists. Exact merged count: any
+    // further growth reds again.
+    // Re-pinned 19432 -> 19433: the release/v0.38.0 merge into this branch
+    // grew hud.ts by one line at HEAD without updating the row, so the gate
+    // arrived red. Same exact-count, zero-slack intent as above.
+    // Raised 19433 -> 19442 (+9) for the login preview-prewarm trim: thin-consumer
+    // wiring (a `looksModular` read plus three flag args to the pure
+    // buildPostEntryPreviewPrewarmUnits) that has no clean branch-owned
+    // extraction, landing on upstream's zero-slack re-pin. Maintainer decision,
+    // exact merged count: any further growth reds again.
+    // Re-pinned 19433 -> 19488 when the castle branch merged main: the castle
+    // additions are thin-consumer wiring to extracted modules (the two
+    // LastKeepMapPainter declarations and the two walk-in map branches on the
+    // clearMapHitState pattern), riding on main's zero-slack pin. Exact merged
+    // count: any further growth reds again.
+    // Re-pinned to the integration merge of the latest v0.40.0 (the touch UI
+    // rework); exact merged count.
+    // Re-pinned for the tutorial mobile-coach fixes that followed that merge
+    // (SCOPED_POPUP_IDS + the greeting-close window-state resync); exact count.
+    // Re-pinned to the exact merged count of the v0.40.0 sync merge that
+    // brings in the OSSBrain v0.40 batch: the merged file lands below both
+    // parent pins, so the ratchet follows it down. Exact count, zero slack.
+    // Plus 1 for the board-note soft mask: the ONE line is the leaderboard
+    // deps' maskPlayerText wiring onto the existing maskChat. Exact count.
+    // Re-pinned for the signpost guild board window: the construction bag,
+    // the openGuildBoard seam, the noticeboard-event arm, and the close and
+    // relocalize wiring (the window itself lives in
+    // src/ui/hud/guild_board/). Then down one at the controller-tutorial
+    // merge. Exact count, zero slack.
+    // RE-PINNED at the merge of release/v0.41.0 (tip ff2837da1f) into feature/masterwrought (base 9a89e3483e). BOTH parent pins for the record: ours
+    // 18480, the release 18488. Set to the exact merged count measured on the
+    // merged working tree (wc -l < src/ui/hud.ts), neither parent's literal. Exact
+    // merged count, zero slack: any further growth reds again.
+    ceiling: 18274,
     seam: 'pure view core + thin painter on PainterHost (src/ui/CLAUDE.md)',
   },
   {
@@ -497,7 +541,16 @@ const MONOLITHS: MonolithRow[] = [
     // slack under a zero-slack comment; the merge audit measured the merged
     // file at 13569 (base 13539 + 30 ours). Exact merged count, zero slack:
     // any further growth reds again.
-    ceiling: 13569,
+    //
+    // UPSTREAM'S OWN HALF over the release/v0.41.0 span, kept so the merge drops
+    // neither parent's record:
+    // Re-pinned to the integration merge of the latest v0.40.0 (the touch UI
+    // rework); exact merged count.
+    // RE-PINNED at the merge of release/v0.41.0 (tip ff2837da1f) into feature/masterwrought (base 9a89e3483e). BOTH parent pins for the record: ours
+    // 13569, the release 13329. Set to the exact merged count measured on the
+    // merged working tree (wc -l < src/render/renderer.ts), neither parent's literal. Exact
+    // merged count, zero slack: any further growth reds again.
+    ceiling: 13357,
     seam: 'a new src/render/<thing>.ts module the renderer calls (src/render/CLAUDE.md)',
   },
   {
@@ -572,7 +625,32 @@ const MONOLITHS: MonolithRow[] = [
     // 12370 + 18 (theirs) = 12388, and the merged file measures 12388. INHERITED
     // growth: Phase 11k authored nothing in sim.ts. Exact merged count, zero
     // slack.
-    ceiling: 12388,
+    //
+    // UPSTREAM'S OWN HALF over the release/v0.41.0 span, kept so the merge drops
+    // neither parent's record:
+    // Re-pinned to the eastbrook-plus-tutorial integration merge output:
+    // both parents' additions combine, so keep the exact merged count.
+    // Re-pinned for the local tutorial-tweaks merge (the staged first death and
+    // the ability drill hook into the coordinator); exact merged count.
+    // Re-pinned +14 for the guild pledge board: setPlayerPledge (the server's
+    // nameplate stamp entry) and the four IWorld facet no-op stubs, the
+    // sanctioned both-worlds implementation seam. Exact count.
+    // Re-pinned to the exact merged count of the v0.40.0 sync merge (the
+    // OSSBrain v0.40 batch on the release arm). Exact count, zero slack.
+    // Plus 7 for the guildRoster IWorld stub (guilds are online-only, so the
+    // offline arm resolves null; the sanctioned both-worlds seam). Exact
+    // count, zero slack.
+    // Plus 7 at the v0.39.3 main back-merge: the Double Honor port grew the
+    // sim arm on main while the release pin sat at zero slack (the known
+    // both-arms compound). Exact merged count, zero slack.
+    // AT THE MERGE OF release/v0.41.0 (tip ff2837da1f) into feature/masterwrought (base 9a89e3483e): BOTH parent pins for the record, ours 12388,
+    // the release 12538. The release's own value is carried as a PLACEHOLDER
+    // because src/sim/sim.ts was still mid-resolution when this row was merged; it
+    // Re-measured on the fully resolved merged tree (wc -l < src/sim/sim.ts):
+    // the merged file lands below both parent pins (the release retired the
+    // Vale Cup arms this branch had kept), so the ratchet follows it down.
+    // Exact merged count, zero slack.
+    ceiling: 12361,
     seam: 'a sim system module behind SimContext (src/sim/CLAUDE.md)',
   },
   {
@@ -674,7 +752,23 @@ const MONOLITHS: MonolithRow[] = [
     // release/v0.40.0 b39b16022e to efb1220e85): the merged file FALLS under both
     // parent pins (ours 11483, the release 11497), composing exactly as base
     // 11519 - 36 (ours) - 22 (theirs) = 11461. Exact merged count, zero slack.
-    ceiling: 11461,
+    //
+    // UPSTREAM'S OWN HALF over the release/v0.41.0 span, kept so the merge drops
+    // neither parent's record:
+    // Re-pinned to the integration merge of the latest v0.40.0 (the touch UI
+    // rework); exact merged count.
+    // Re-pinned to the exact merged count of the v0.40.0 sync merge (the
+    // OSSBrain v0.40 batch on the release arm). Exact count, zero slack.
+    // Re-pinned to the exact merged count after the controller-tutorial
+    // merge (its controller-setting dispatch extraction shrinks main.ts;
+    // the ratchet follows the merged file down). Exact count, zero slack.
+    // Re-pinned to the exact merged count of the v0.39.3 main back-merge
+    // (the utc_day import consolidation shed one line).
+    // RE-PINNED at the merge of release/v0.41.0 (tip ff2837da1f) into feature/masterwrought (base 9a89e3483e). BOTH parent pins for the record: ours
+    // 11461, the release 11566. Set to the exact merged count measured on the
+    // merged working tree (wc -l < src/main.ts), neither parent's literal. Exact
+    // merged count, zero slack: any further growth reds again.
+    ceiling: 11530,
     seam: 'a src/game/ or src/ui/ sibling module; main.ts is a firewall, not a home',
   },
   {
@@ -707,7 +801,41 @@ const MONOLITHS: MonolithRow[] = [
     // release/v0.40.0 b39b16022e to efb1220e85): the merged file FALLS under both
     // parent pins (ours 10761, the release 10837), composing exactly as base
     // 10894 - 136 (ours) - 61 (theirs) = 10697. Exact merged count, zero slack.
-    ceiling: 10697,
+    //
+    // UPSTREAM'S OWN HALF over the release/v0.41.0 span, kept so the merge drops
+    // neither parent's record:
+    // Re-pinned 10900 -> 10909 for the Proving Shore branch: the +9 is the
+    // tutorial_start dispatch case (a thin delegate onto sim.startTutorial,
+    // where the real gates live) and the firstCharacter field on the join
+    // meta plumb; the island's ferry and greeting logic itself lives in sim
+    // modules. Exact merged count.
+    // Re-pinned to the eastbrook-plus-tutorial integration merge output: the
+    // combined tree lands below the branch ceilings, so keep the exact merged
+    // count.
+    // Re-pinned +43 for the guild pledge board: four dispatch cases (thin
+    // validated delegates onto SocialService), the applyPledge transport arm,
+    // and the join-time pledge stamp in sendSocialSnapshot; the service logic
+    // itself lives in server/social.ts. Exact count.
+    // Re-pinned to the exact merged count of the v0.40.0 sync merge (the
+    // OSSBrain v0.40 batch on the release arm). Exact count, zero slack.
+    // Raised +11 for the guild-signpost fill: the noticeboardGuilds provider
+    // field and the one routeEvents call into server/noticeboard_guilds.ts
+    // (thin-consumer wiring; the mapping and fill logic live in that
+    // module). Exact count, zero slack. Plus 4 for the board-note hard-tier
+    // screen: the SocialService construction wires ChatFilter.findHardHit
+    // (the screening logic lives in chat_filter.ts and social.ts). Then
+    // LOWERED to the exact count again when the signpost fill moved out of
+    // routeEvents into the guild board window's live REST read (the
+    // noticeboard_guilds event transform is deleted). Exact count, zero
+    // slack.
+    // AT THE MERGE OF release/v0.41.0 (tip ff2837da1f) into feature/masterwrought (base 9a89e3483e): BOTH parent pins for the record, ours 10697,
+    // the release 10645. The release's own value is carried as a PLACEHOLDER
+    // because server/game.ts was still mid-resolution when this row was merged; it
+    // Re-measured on the fully resolved merged tree (wc -l < server/game.ts):
+    // below both parent pins (the Vale Cup dispatch arms left with the
+    // release, the heavy-self sets live in server/heavy_self.ts), so the
+    // ratchet follows the file down. Exact merged count, zero slack.
+    ceiling: 10509,
     seam: 'a sibling server module; see the hot-path seams in server/CLAUDE.md',
   },
   {
@@ -727,17 +855,46 @@ const MONOLITHS: MonolithRow[] = [
     // 5967, the release 5877: the union composes exactly as 5967 + 22 (theirs)
     // = 5989, and the merged file measures 5989. Phase 11k authored nothing in
     // the online mirror. Payback stays Phase 16. Exact merged count, zero slack.
-    ceiling: 5989,
+    //
+    // UPSTREAM'S OWN HALF over the release/v0.41.0 span, kept so the merge drops
+    // neither parent's record:
+    // Re-pinned to the eastbrook-plus-tutorial integration merge output:
+    // both parents' additions combine, so keep the exact merged count.
+    // Re-pinned +29 for the guild pledge board: the four one-line command
+    // senders, the entity pg/gt decode, and the social-frame pledge-field
+    // normalization (wire mirror code that must live on ClientWorld). Exact
+    // count.
+    // Re-pinned to the exact merged count of the v0.40.0 sync merge: both
+    // arms added wire-mirror code, so the merged file lands above either
+    // parent pin. Exact count, zero slack.
+    // Plus 18 for the guildRoster REST mirror (the signpost guild board's
+    // roster drill-in; the cached read lives in server/guild_roster.ts),
+    // then re-pinned when the mirror gained the trust-boundary row
+    // validation and the 404-vs-transport-failure split, plus the roster
+    // class field. Exact count, zero slack.
+    // RE-PINNED at the merge of release/v0.41.0 (tip ff2837da1f) into feature/masterwrought (base 9a89e3483e). BOTH parent pins for the record: ours
+    // 5989, the release 5855. Set to the exact merged count measured on the
+    // merged working tree (wc -l < src/net/online.ts), neither parent's literal. Exact
+    // merged count, zero slack: any further growth reds again.
+    ceiling: 5967,
     seam: 'a src/net sibling module (the refactor/net-online split is the template)',
   },
   {
     file: 'src/game/music.ts',
-    ceiling: 5470,
+    // Re-pinned for the Proving Shore dawn-cue merge, then again when the
+    // final render replaced the composed themes with a supplied stream-only
+    // track; exact merged count.
+    ceiling: 5064,
     seam: 'a src/game sibling module (the refactor/game-music split is the template)',
   },
   {
     file: 'src/sim/world.ts',
-    ceiling: 5450,
+    // Re-pinned to the eastbrook-plus-tutorial integration merge output:
+    // both parents' additions combine, so keep the exact merged count.
+    // Re-pinned again for the v0.40.0 sync merge (the release arm's
+    // gardenwalk pass rides in beside the tutorial island). Exact count,
+    // zero slack.
+    ceiling: 5347,
     seam: 'zone/terrain data as content records; logic as sim sibling modules',
   },
   {
@@ -756,7 +913,15 @@ const MONOLITHS: MonolithRow[] = [
     // = 4883, and the merged file measures 4883. Phase 11k authored nothing in
     // server/db.ts. Exact merged count, zero slack: the fix stays a domain
     // module, never a raise.
-    ceiling: 4883,
+    // RE-PINNED at the merge of release/v0.41.0 (tip ff2837da1f) into
+    // feature/masterwrought (base 9a89e3483e): RECORDED RAISE of exactly the
+    // release's own growth, on a row that did not conflict (the ratchet rows
+    // that break without conflicting). Base 4853, ours 4883 against a 4883
+    // file, the release 4864 against its own 4864 file: the union composes
+    // exactly as 4883 + 11 (theirs) = 4894, and the merged file measures 4894.
+    // The merge authored nothing in server/db.ts. Exact merged count, zero
+    // slack: the fix stays a domain module, never a raise.
+    ceiling: 4894,
     seam: 'a domain <domain>_db.ts module with its own *_SCHEMA (server/CLAUDE.md)',
   },
   {
@@ -802,7 +967,9 @@ const MONOLITHS: MonolithRow[] = [
   },
   {
     file: 'src/render/foliage.ts',
-    ceiling: 4147,
+    // Re-pinned to the eastbrook-plus-tutorial integration merge output:
+    // both parents' additions combine, so keep the exact merged count.
+    ceiling: 4121,
     seam: 'a new src/render/<thing>.ts module (src/render/CLAUDE.md)',
   },
   {
@@ -815,14 +982,25 @@ const MONOLITHS: MonolithRow[] = [
     // that re-pins it conflicts here, and a release-side growth to exactly
     // 852 (green upstream) lands red on this branch; both are loud, never a
     // skip. Resolve by keeping OURS at the exact merged count, not theirs.
-    ceiling: 851,
+    //
+    // UPSTREAM'S OWN HALF over the release/v0.41.0 span, kept so the merge drops
+    // neither parent's record:
+    // Re-pinned at the deed-cartouche base merge: the release arm's heraldry
+    // (+70, one line under the old pin on its own tree) and this branch's
+    // pledge nameplate line (+13) compound in the merged file. Exact count,
+    // zero slack.
+    // RE-PINNED at the merge of release/v0.41.0 (tip ff2837da1f) into feature/masterwrought (base 9a89e3483e). BOTH parent pins for the record: ours
+    // 851, the release 864. Set to the exact merged count measured on the
+    // merged working tree (wc -l < src/render/nameplate_canvas.ts), neither parent's literal. Exact
+    // merged count, zero slack: any further growth reds again.
+    ceiling: 864,
     seam: 'the pure src/render/nameplate_heraldry_core.ts geometry module',
   },
   {
     file: 'src/sim/colliders.ts',
-    // Lowered from 2660 after the cell-index math moved out to
-    // collider_cells.ts (the ratchet rule: extraction lowers the ceiling).
-    ceiling: 2630,
+    // Re-pinned to the integration merge of the latest v0.40.0 (the touch UI
+    // rework); exact merged count.
+    ceiling: 2621,
     seam: 'per-zone collider data beside the zone content; shared logic stays here',
   },
   {

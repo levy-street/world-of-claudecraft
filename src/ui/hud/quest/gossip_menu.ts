@@ -22,7 +22,6 @@ export interface GossipMenuContent {
    *  otherwise read as an empty menu and close itself the moment it opened. */
   hasWarfareVendor: boolean;
   hasDelveBoard: boolean;
-  hasVcup: boolean;
   hasCardMaster: boolean;
   hasTraining: boolean;
   /** A farmer NPC's husk-to-compost trade row (the farming go-live, gated on
@@ -40,7 +39,6 @@ export function gossipMenuIsEmpty(content: GossipMenuContent): boolean {
     !content.hasHeroicVendor &&
     !content.hasWarfareVendor &&
     !content.hasDelveBoard &&
-    !content.hasVcup &&
     !content.hasCardMaster &&
     !content.hasTraining &&
     !content.hasFarmer

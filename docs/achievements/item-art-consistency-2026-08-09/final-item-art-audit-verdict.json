@@ -5,8 +5,8 @@
     "baselineCommit": "aee195551b5aef628eb7a72192117d7e3079818e",
     "branch": "feature/placeholder-art-completion-v036",
     "shippingDirectory": "public/ui/items",
-    "itemArtFilesReviewed": 907,
-    "liveItemDefinitions": 922,
+    "itemArtFilesReviewed": 913,
+    "liveItemDefinitions": 928,
     "generatedHeroicDefinitions": 64,
     "heroicDefinitionsWithOwnWebp": 48,
     "heroicWeaponArtAliases": 16,
@@ -295,7 +295,7 @@
       "armor-legs": 61,
       "armor-neck": 12,
       "armor-offhand": 6,
-      "armor-ring": 25,
+      "armor-ring": 26,
       "armor-shoulder": 49,
       "armor-waist": 28,
       "bag": 7,
@@ -307,7 +307,7 @@
       "junk": 93,
       "mount": 9,
       "potion": 13,
-      "quest": 97,
+      "quest": 102,
       "recipe": 28,
       "scroll": 3,
       "tool": 51,
@@ -351,6 +351,20 @@
           "public/ui/items/mapping.json"
         ],
         "note": "The nine Masterwrought jewelcrafting placeholders (six rings and three necklaces across the copper, iron, and osmium rungs), hand-authored as original SVG rasters under woc-item-icon-v1 with woc_original_svg provenance rows in public/ui/items/mapping.json, reviewed pass on 2026-08-10; the prior 825-file review stands unchanged."
+      },
+      {
+        "reviewedAt": "2026-08-17",
+        "branch": "feature/tutorial-island",
+        "reviewer": "owner",
+        "addedIds": [
+          "ps_castaway_crate",
+          "ps_ferry_bell"
+        ],
+        "provenance": [
+          "public/ui/items/mapping.json",
+          "docs/achievements/icon-brief.md"
+        ],
+        "note": "The two Proving Shore interact-prop icons, rendered from their own shipped world models (supply_crate.glb, marsh_bell_gallows.glb) by scripts/render_island_item_icons.mjs and owner-reviewed pass on 2026-08-17; the prior reviews stand unchanged."
       }
     ]
   },
@@ -393,7 +407,7 @@
   },
   "visualVerdict": {
     "status": "pass",
-    "passCount": 907,
+    "passCount": 913,
     "passIds": [
       "abyssal_loop",
       "abysswrought_band",
@@ -906,6 +920,7 @@
       "morthens_cryptforged_hauberk",
       "mosshide_vest",
       "mossy_handwraps",
+      "mother_of_pearl",
       "mudfin_scale",
       "murloc_hut",
       "necromancers_legwraps",
@@ -988,6 +1003,11 @@
       "pristine_hide",
       "pristine_silk",
       "pristine_venom_gland",
+      "ps_briny_lure",
+      "ps_castaway_crate",
+      "ps_ferry_bell",
+      "ps_lustrous_pearl",
+      "ps_passing_stone",
       "quickening_catalyst",
       "quilted_trousers",
       "raw_bog_eel",
@@ -1307,7 +1327,7 @@
     "watch": [],
     "rejectCount": 0,
     "reject": [],
-    "summary": "All 907 shipping item-art files pass the visual contract: 817 reviewed in the 2026-08-09 campaign (documented retries included), plus the five class-overhaul integration additions owner-reviewed and passed on 2026-08-10, plus the Dawnhold posy addition (project-authored vector illustration) owner-reviewed and passed on 2026-08-12, plus the three Masterwrought material placeholders (wyrmfall_core, sundered_essence, makers_ember) flattened onto the opaque house ground and reviewed at the feature/masterwrought v0.36.0 sync on 2026-08-10, plus the nine Masterwrought jewelcrafting placeholders (hammered_copper_band, polished_copper_loop, coiled_copper_torc, riveted_iron_signet, etched_iron_loop, iron_link_choker, weighted_thorium_band, gleaming_thorium_loop, burnished_thorium_amulet) authored as original SVG rasters on the opaque house ground and reviewed at the feature/masterwrought Phase 05 jewelcrafting admission on 2026-08-10, plus the six Masterwrought inscription placeholders (silverleaf_primer, goldleaf_folio, sunpetal_grimoire, silverleaf_scroll, goldleaf_scroll, sunpetal_scroll) authored as original SVG rasters on the opaque house ground and reviewed at the feature/masterwrought Phase 06 inscription admission on 2026-08-11, plus the ten Masterwrought skill-75 intermediate placeholders (duskforged_billet, forgefold_plating, wyrmhide_cording, sunspun_bolt, prismglass_setting, precision_chassis, quickening_catalyst, seasoned_stock, lucent_reagent, sablewax_vellum) authored as original SVG rasters on the opaque house ground and reviewed at the feature/masterwrought Phase 07 intermediates admission on 2026-08-11, plus the ten Masterwrought apex armor placeholders (spiritweld_girdle, forgefold_legguards, wardspeaker_sabatons, briarstep_jerkin, fenbloom_breeches, barksong_handguards, sunspun_vestments, sunspun_leggings, sunspun_handwraps, sunspun_haversack) authored as original SVG rasters on the opaque house ground and reviewed at the feature/masterwrought Phase 08 apex armor admission on 2026-08-12, plus the ten Masterwrought apex weapon, jewelry, and tool placeholders (duskforged_warblade, duskforged_bulwark, ridgebreaker, wyrmfall_pendant, warhewn_signet, prismglass_loop, makers_charm, gyrelens_array, masters_field_forge, voidbound_grimoire) authored as original SVG rasters on the opaque house ground and reviewed at the feature/masterwrought Phase 09 apex weapons, jewelry, and tools admission on 2026-08-13, plus the eight Masterwrought apex consumable and station placeholders (ironhusk_flask, warboar_flask, runewater_flask, stonepot_stew, warspice_skewers, sageleaf_chowder, grand_cauldron, laden_hearth) authored as original SVG rasters on the opaque house ground and reviewed at the feature/masterwrought Phase 10 apex consumables admission on 2026-08-14, plus the 28 Masterwrought apex recipe pattern placeholders (pattern_barksong_handguards, pattern_briarstep_jerkin, pattern_duskforged_bulwark, pattern_duskforged_warblade, pattern_fenbloom_breeches, pattern_forgefold_legguards, pattern_grand_cauldron, pattern_gyrelens_array, pattern_ironhusk_flask, pattern_laden_hearth, pattern_makers_charm, pattern_masters_field_forge, pattern_prismglass_loop, pattern_ridgebreaker, pattern_runewater_flask, pattern_sageleaf_chowder, pattern_spiritweld_girdle, pattern_stonepot_stew, pattern_sunspun_handwraps, pattern_sunspun_haversack, pattern_sunspun_leggings, pattern_sunspun_vestments, pattern_voidbound_grimoire, pattern_warboar_flask, pattern_wardspeaker_sabatons, pattern_warhewn_signet, pattern_warspice_skewers, pattern_wyrmfall_pendant) authored as original SVG rasters on the opaque house ground and reviewed at the feature/masterwrought Phase 11 apex patterns admission on 2026-08-16."
+    "summary": "All 913 shipping item-art files pass the visual contract: 817 reviewed in the 2026-08-09 campaign (documented retries included), plus the five class-overhaul integration additions owner-reviewed and passed on 2026-08-10, plus the Dawnhold posy addition (project-authored vector illustration) owner-reviewed and passed on 2026-08-12, plus the three Masterwrought material placeholders (wyrmfall_core, sundered_essence, makers_ember) flattened onto the opaque house ground and reviewed at the feature/masterwrought v0.36.0 sync on 2026-08-10, plus the nine Masterwrought jewelcrafting placeholders (hammered_copper_band, polished_copper_loop, coiled_copper_torc, riveted_iron_signet, etched_iron_loop, iron_link_choker, weighted_thorium_band, gleaming_thorium_loop, burnished_thorium_amulet) authored as original SVG rasters on the opaque house ground and reviewed at the feature/masterwrought Phase 05 jewelcrafting admission on 2026-08-10, plus the six Masterwrought inscription placeholders (silverleaf_primer, goldleaf_folio, sunpetal_grimoire, silverleaf_scroll, goldleaf_scroll, sunpetal_scroll) authored as original SVG rasters on the opaque house ground and reviewed at the feature/masterwrought Phase 06 inscription admission on 2026-08-11, plus the ten Masterwrought skill-75 intermediate placeholders (duskforged_billet, forgefold_plating, wyrmhide_cording, sunspun_bolt, prismglass_setting, precision_chassis, quickening_catalyst, seasoned_stock, lucent_reagent, sablewax_vellum) authored as original SVG rasters on the opaque house ground and reviewed at the feature/masterwrought Phase 07 intermediates admission on 2026-08-11, plus the ten Masterwrought apex armor placeholders (spiritweld_girdle, forgefold_legguards, wardspeaker_sabatons, briarstep_jerkin, fenbloom_breeches, barksong_handguards, sunspun_vestments, sunspun_leggings, sunspun_handwraps, sunspun_haversack) authored as original SVG rasters on the opaque house ground and reviewed at the feature/masterwrought Phase 08 apex armor admission on 2026-08-12, plus the ten Masterwrought apex weapon, jewelry, and tool placeholders (duskforged_warblade, duskforged_bulwark, ridgebreaker, wyrmfall_pendant, warhewn_signet, prismglass_loop, makers_charm, gyrelens_array, masters_field_forge, voidbound_grimoire) authored as original SVG rasters on the opaque house ground and reviewed at the feature/masterwrought Phase 09 apex weapons, jewelry, and tools admission on 2026-08-13, plus the eight Masterwrought apex consumable and station placeholders (ironhusk_flask, warboar_flask, runewater_flask, stonepot_stew, warspice_skewers, sageleaf_chowder, grand_cauldron, laden_hearth) authored as original SVG rasters on the opaque house ground and reviewed at the feature/masterwrought Phase 10 apex consumables admission on 2026-08-14, plus the 28 Masterwrought apex recipe pattern placeholders (pattern_barksong_handguards, pattern_briarstep_jerkin, pattern_duskforged_bulwark, pattern_duskforged_warblade, pattern_fenbloom_breeches, pattern_forgefold_legguards, pattern_grand_cauldron, pattern_gyrelens_array, pattern_ironhusk_flask, pattern_laden_hearth, pattern_makers_charm, pattern_masters_field_forge, pattern_prismglass_loop, pattern_ridgebreaker, pattern_runewater_flask, pattern_sageleaf_chowder, pattern_spiritweld_girdle, pattern_stonepot_stew, pattern_sunspun_handwraps, pattern_sunspun_haversack, pattern_sunspun_leggings, pattern_sunspun_vestments, pattern_voidbound_grimoire, pattern_warboar_flask, pattern_wardspeaker_sabatons, pattern_warhewn_signet, pattern_warspice_skewers, pattern_wyrmfall_pendant) authored as original SVG rasters on the opaque house ground and reviewed at the feature/masterwrought Phase 11 apex patterns admission on 2026-08-16, plus the two Proving Shore prop renders (rendered from their own shipped world models) owner-reviewed and passed on 2026-08-17, plus the three pearl-detour icons (generated via the OpenAI proving-shore-mother-of-pearl-2026-08-20 batch) owner-reviewed and passed on 2026-08-20, plus the Proving Shore Passing Stone render (rendered from its own shipped world model by the same deterministic pipeline as the 2026-08-17 pair) added on 2026-08-22, machine-checked and awaiting owner visual review."
   },
   "nonVisualContentWatch": [
     {
@@ -1464,8 +1484,8 @@
   "evidence": {
     "catalog": {
       "path": "tmp/imagegen/item-art-consistency/final-audit/catalog.json",
-      "sha256": "100088198a02f7742178e322d96d722b5b1723c40b7d8269a4be5e05f335061b",
-      "bytes": 498026
+      "sha256": "3a42131ecf9206a42ba0254fab7ce31b46f58368ec617828b3357eaf2ac7a6c4",
+      "bytes": 501076
     },
     "rendererFingerprint": "84410592a4686975e13d43d4fecc88fb7eb0e3b90f27f7b7dc38498cdf7e090c",
     "sheetCount": 232,
@@ -1479,7 +1499,7 @@
       "small-multiview": 29,
       "identity": 29
     },
-    "sheetSetSha256": "667e2e02123bd6375970f1452e1dd6e9343446ebb170975d755897d37bcaec80",
+    "sheetSetSha256": "5d5a419a2dab518fee96683084742fdf17823380360a81beb32c78b1500d3054",
     "sheets": [
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/armor-chest--p01--128-color.png",
@@ -1995,64 +2015,64 @@
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/armor-ring--p01--128-color.png",
-        "sha256": "8d354a20426d95c2d8c1de88edeb89a88d0d2810f3512471447abf1dcb3f7c69",
-        "bytes": 700175,
+        "sha256": "e476c2699378c00ea0b135a5c4949b9576aef4a6629e0b9f012463dcf4ac4d70",
+        "bytes": 710239,
         "width": 1600,
         "height": 542,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/armor-ring--p01--40-color.png",
-        "sha256": "cb9b04e1aa7814be009620da6bccc265556c557b00ca16453adcaff05c2d17d0",
-        "bytes": 138900,
+        "sha256": "853f61893ebbef4f6d81420f1c635527974a35874b043ee150b5c62734ed7d6a",
+        "bytes": 142399,
         "width": 1600,
         "height": 410,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/armor-ring--p01--28-color.png",
-        "sha256": "d0cfdc09a9928b6a32c1728abb36d7e0bd6456f13d3d7c7ba2cbfc7dd926daf3",
-        "bytes": 98388,
+        "sha256": "335de035794e179ce6ecece8bbbc48d5183c65404214e8269be9b1190fa5fe28",
+        "bytes": 100983,
         "width": 1600,
         "height": 542,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/armor-ring--p01--22-color.png",
-        "sha256": "6cbbea2f737b8d616371669d592ea5b98c90444597c2649803c8cfe5787b17b7",
-        "bytes": 78790,
+        "sha256": "b2241425b24ec23922e77bccabc24a6b50b08202dcd5e51e4f05746c7a3d113c",
+        "bytes": 80759,
         "width": 1600,
         "height": 542,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/armor-ring--p01--28-grayscale.png",
-        "sha256": "aacc323f8ec83b1fff36b875a9ef8ccbbbce402c9174892d5e62af91ecdb8c7b",
-        "bytes": 74140,
+        "sha256": "eef3536ae52b387b42b31ba0345d40706c2bd288d6952e8a22587d213daef9cb",
+        "bytes": 75817,
         "width": 1600,
         "height": 542,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/armor-ring--p01--64-circle.png",
-        "sha256": "05bdae740d32890b9f48cd7c30f9184336b22d592afc8ff66dfb72ac046637b4",
-        "bytes": 241057,
+        "sha256": "9fbdf2b8d03579ca7b97ef48eb5f66a859a17583b9737e922fd2986ce8fb54e9",
+        "bytes": 245738,
         "width": 1600,
         "height": 542,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/armor-ring--p01--small-multiview.png",
-        "sha256": "9f737f4968eaace5033028924e84ad173ea80e8d28041d84cbc0cd717f979c70",
-        "bytes": 433535,
+        "sha256": "6ecd8b7b91cb2ad86d9c8c77d1b304d652c570ce648ecf13ea061389efa8a9d4",
+        "bytes": 443567,
         "width": 1800,
         "height": 698,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/armor-ring--p01--identity.png",
-        "sha256": "e947d5d4ace58e1175d348afccb158f5d376a1819b530f1843da7339b67c5fcc",
-        "bytes": 730828,
+        "sha256": "5b76f9a0ccb0d8d7242c682dd1181682e822239ae075725215946ec754021cbe",
+        "bytes": 742557,
         "width": 1800,
         "height": 656,
         "format": "png"
@@ -2827,130 +2847,130 @@
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/quest--p01--128-color.png",
-        "sha256": "3bc3ca5dfe47cd0eeea0c0c7ffb5dc5449d38ccd725779e9370ac4266f3b261a",
-        "bytes": 2468426,
+        "sha256": "1d18eb38479136f2a566cc1c8925552b92e7eff916f591c889fbd349eef66c6e",
+        "bytes": 2382756,
         "width": 1600,
         "height": 1372,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/quest--p01--40-color.png",
-        "sha256": "a304661495246f40fcbd8b2ca7466b0bbbce2ec2ec458216815d1b7b556cc831",
-        "bytes": 450475,
+        "sha256": "c670459bfb9fcfefbadaa47b91bf7fdfb21c1189e246fa11eb1455f40975ba7e",
+        "bytes": 442358,
         "width": 1600,
         "height": 1020,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/quest--p01--28-color.png",
-        "sha256": "7fc05be7773aba16ab8233f8582b4864d0b28c4dee799227ea20b0c47fff0e05",
-        "bytes": 302802,
+        "sha256": "3de8031e5414efeeeefd237da8c1d5753b9db4ecad87780cac5e23c34a22b5c5",
+        "bytes": 298910,
         "width": 1600,
         "height": 1372,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/quest--p01--22-color.png",
-        "sha256": "30b750a1beb99d4b3ab1c11ea9ae82690af33e33da3aa42835e58518863d669a",
-        "bytes": 233532,
+        "sha256": "45cfe80d3aaa422b1956683b42d2c5c7e83f797f0a64f646de5606a61e533455",
+        "bytes": 231342,
         "width": 1600,
         "height": 1372,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/quest--p01--28-grayscale.png",
-        "sha256": "8af2081b8f547d71d056647c5dd25be2ec1cd2405872bac8c4e52b036add0d0e",
-        "bytes": 214911,
+        "sha256": "3bb0233bb5424508aea40bb5eb09407bfb002e185a895698d2159e0402f76858",
+        "bytes": 213065,
         "width": 1600,
         "height": 1372,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/quest--p01--64-circle.png",
-        "sha256": "de13822a9897d4eef5c3298d705dc47738d79bdd7e35a81a789e542e84a2178c",
-        "bytes": 790148,
+        "sha256": "e222686046e6171b8904128b0ddfeaaf08d32e15f6659f65159682d9c5293661",
+        "bytes": 772526,
         "width": 1600,
         "height": 1372,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/quest--p01--small-multiview.png",
-        "sha256": "db00546272a2c65cda3f13eb4d71cd04416a53daa26b81382a9f27f988bde9e6",
-        "bytes": 1446810,
+        "sha256": "e6ef595861a4c26b44959167b5dcc99707bbdaa64606b104bb2e9c99153fdf1f",
+        "bytes": 1414898,
         "width": 1800,
         "height": 1788,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/quest--p01--identity.png",
-        "sha256": "ef26ec8c40bc95f4f6efea6b2ffec8d2e8fdd11bfd2fa50e079b7d64ac4bc75a",
-        "bytes": 2554957,
+        "sha256": "22cc36ecf88279e52d72004829c80f582578ec6742dcef9c73725b4e380881df",
+        "bytes": 2467133,
         "width": 1800,
         "height": 1676,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/quest--p02--128-color.png",
-        "sha256": "62abd0a401580da04e4b9a6edb511731a3e4c1103b16245b892583154f22d96e",
-        "bytes": 517318,
+        "sha256": "7336fff24d3eb266a8b73f0a497d5a0706fc2ecfcb696c356d2f668cfc3497e1",
+        "bytes": 682500,
         "width": 1600,
-        "height": 376,
+        "height": 542,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/quest--p02--40-color.png",
-        "sha256": "6b2ab932ceaef6b917f2ce67bb9308cd566158d962c88ca6332126f42896e878",
-        "bytes": 100230,
+        "sha256": "9c0749a07458a61a7ace9824e9448276582fbbbd62da834f0439f4ae7ac98110",
+        "bytes": 129804,
         "width": 1600,
-        "height": 288,
+        "height": 410,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/quest--p02--28-color.png",
-        "sha256": "199e905bea0a22f6c6f8966d1e851a43b65623d069fa2fb06a66e29824c35edd",
-        "bytes": 69689,
+        "sha256": "8fd91db8db618c5d3bd1420e396bbb0763cb13b9a43ff219d4b13a37dada9c70",
+        "bytes": 89455,
         "width": 1600,
-        "height": 376,
+        "height": 542,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/quest--p02--22-color.png",
-        "sha256": "031a29a12059597bce4e0d9e78e8e4be340823f9a16cec32fb09d75e326ea914",
-        "bytes": 54794,
+        "sha256": "10f231d2d6967a1c7c08e18de50b3069d3abfbfd494ddc0ff480bc92765ed739",
+        "bytes": 69962,
         "width": 1600,
-        "height": 376,
+        "height": 542,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/quest--p02--28-grayscale.png",
-        "sha256": "f66615c6226567422f5f42778400648476a5c3ab748d2e0d91fc543d6c4fd46c",
-        "bytes": 51563,
+        "sha256": "e0bd418694a23c2e021c251c6e85acf7c8bc04b4e0b859b9e5b67af6425fd726",
+        "bytes": 65610,
         "width": 1600,
-        "height": 376,
+        "height": 542,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/quest--p02--64-circle.png",
-        "sha256": "7ecff330fad88dba481e2e44ccdb21c41482d08a859ee78f40d065f9c4259b29",
-        "bytes": 168595,
+        "sha256": "30cf12076d028eed9508bc5bb2a99b396f7363104bda50254d78a3ca09b98f9f",
+        "bytes": 219682,
         "width": 1600,
-        "height": 376,
+        "height": 542,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/quest--p02--small-multiview.png",
-        "sha256": "84f4067f672f0e1f40bbdf26e949691bb4e910f19650498ddf7efc8fd47203e3",
-        "bytes": 311841,
+        "sha256": "fb29b0b874b56024c98d8369f9a3451b987e17957476fa16d59e34ad1d36a31a",
+        "bytes": 405853,
         "width": 1800,
-        "height": 480,
+        "height": 698,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/quest--p02--identity.png",
-        "sha256": "da87902ebaf25db07a6a4928bec63eecfd50430175214fc28df12a1fbdf40434",
-        "bytes": 538152,
+        "sha256": "3ac69253ccbe4c8dc547258fd10b39aa65cd4bbc97e15893bab54da80735638c",
+        "bytes": 708274,
         "width": 1800,
-        "height": 452,
+        "height": 656,
         "format": "png"
       },
       {
@@ -3338,6 +3358,6 @@
         "format": "png"
       }
     ],
-    "shippingCatalogSha256": "71d66ce297b6c82b98f27bbc8b67df042136a6e00740eef488107bb90a215a30"
+    "shippingCatalogSha256": "92e3a2f714540c3036afc85fedc0386158d4a69a5b9bf35abe6978749444289d"
   }
 }

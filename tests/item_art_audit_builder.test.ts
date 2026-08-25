@@ -822,6 +822,11 @@ describe('item-art audit builder', () => {
     expect(help).toContain('--refresh-verdict');
     expect(help).toContain('tmp/imagegen/item-art-consistency/final-audit');
 
+    // Moved by the Passing Stone icon (the death lesson's rite marker,
+    // rendered from its own shipped world model). `verdict: null` below is
+    // unchanged and is the point: the committed reviewed verdict covers the
+    // art as of its own review, and a newly added icon is deliberately NOT
+    // folded into it. It awaits an owner visual review of its own.
     const verified = JSON.parse(
       execFileSync(process.execPath, ['scripts/item_art_audit.mjs', '--verify-only'], {
         cwd: repoRoot,
@@ -861,8 +866,12 @@ describe('item-art audit builder', () => {
     expect(promoted).toHaveLength(5);
     for (const id of promoted) expect(ITEMS[id].quality, id).toBe('common');
     for (const id of ALREADY_COMMON_TROPHIES) expect(ITEMS[id].quality, id).toBe('common');
+    // Release v0.41.0 sync: the pre-phase base moves 498026 to 501066, the
+    // six Proving Shore records the release's catalog carries (3040 bytes,
+    // measured by the merged build: 501076 with the five promotions in);
+    // the promotion arithmetic on top of it is unchanged.
     expect(verified.catalogBytes).toBe(
-      498026 + promoted.length * ('common'.length - 'poor'.length),
+      501066 + promoted.length * ('common'.length - 'poor'.length),
     );
     // Re-minted a third time at the 11l QA, which excluded the cracked fetish
     // and the bogiron nugget under the tusk standard and put both defs back
@@ -871,11 +880,17 @@ describe('item-art audit builder', () => {
     // 498036), predicted and then measured, and the sha moves with them.
     expect(verified).toMatchObject({
       catalogPath: 'tmp/imagegen/item-art-consistency/final-audit/catalog.json',
-      catalogSha256: '976fb7dbec77e42235f9395cd16543ed2f2ff6cbfe946c22805003caca0f3394',
-      catalogBytes: 498036,
+      // Release v0.41.0 sync: 907 / 922 on the Masterwrought branch, 829 / 844
+      // on the release, 913 / 928 merged (the release's six art-shipping ids
+      // join both terms); the catalog bytes and sha are the merged build's
+      // own measurement. The renderer fingerprint is this branch's lib
+      // self-hash (the release left scripts/lib/item_art_audit.mjs at the
+      // base bytes, so the merge keeps the pendingArtCount-aware lib).
+      catalogSha256: '3a42131ecf9206a42ba0254fab7ce31b46f58368ec617828b3357eaf2ac7a6c4',
+      catalogBytes: 501076,
       rendererFingerprint: '84410592a4686975e13d43d4fecc88fb7eb0e3b90f27f7b7dc38498cdf7e090c',
-      catalogCount: 907,
-      liveItemCount: 922,
+      catalogCount: 913,
+      liveItemCount: 928,
       generatedHeroicDefinitions: 64,
       heroicDefinitionsWithOwnWebp: 48,
       heroicWeaponArtAliases: 16,
@@ -884,7 +899,7 @@ describe('item-art audit builder', () => {
       sheetCount: 232,
       sheetModeCounts: Object.fromEntries(ITEM_ART_AUDIT_MODES.map((mode) => [mode, 29])),
       sheetSetSha256: null,
-      shippingCatalogSha256: '71d66ce297b6c82b98f27bbc8b67df042136a6e00740eef488107bb90a215a30',
+      shippingCatalogSha256: '92e3a2f714540c3036afc85fedc0386158d4a69a5b9bf35abe6978749444289d',
       machineChecksPassed: true,
       verdict: null,
     });

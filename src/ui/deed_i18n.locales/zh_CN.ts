@@ -738,4 +738,8 @@ export const table: DeedLocaleTable = {
     desc: '铭文技能达到125点，登顶此门技艺的至高境界。',
     title: '铭文宗师',
   },
+  prog_ready_for_an_adventure: {
+    name: '整装待发',
+    desc: '从试炼之滨毕业：完成岛上的每一堂课，然后敲响渡船铃回到东溪镇。',
+  },
 };

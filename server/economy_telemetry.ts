@@ -100,7 +100,6 @@ const SOURCE_BY_COMMAND: ReadonlyMap<string, CopperFlowSource> = new Map(
     respec: 'craft',
     trade_accept: 'trade',
     trade_confirm: 'trade',
-    vcup_bet: 'wager',
     play_card: 'wager',
     dev_give: 'dev',
     dev_level: 'dev',

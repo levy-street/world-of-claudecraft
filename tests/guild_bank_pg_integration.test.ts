@@ -860,8 +860,10 @@ describeDb('guild bank persistence (REAL Postgres)', () => {
       tx as never,
       () => Date.now(),
       // Screening is irrelevant to the disband/cascade cases under test; the
-      // ctor requires it explicitly so no site fails open by omission.
+      // ctor requires both screens explicitly so no site fails open by
+      // omission.
       () => false,
+      () => null,
     );
     return { guildId, charId, tx, svc };
   }

@@ -45,11 +45,11 @@ const VIEW = MOBILE
   ? { width: 844, height: 390, isMobile: true, hasTouch: true }
   : { width: 1600, height: 900 };
 
-// Jessica stands at (24.5, 32.5) facing the beds; bed_eastbrook_1 is at
-// (16, 30). The bed arm resolves the caller's OWN nearest bed by proximity
+// Jessica stands at (-15.5, -81.5) facing the beds; bed_eastbrook_1 is at
+// (-24, -84). The bed arm resolves the caller's OWN nearest bed by proximity
 // (INTERACT_RANGE), so the journey stands the player ON the bed.
-const JESSICA_SPOT = { x: 23, z: 32.5 };
-const BED_SPOT = { x: 16, z: 30 };
+const JESSICA_SPOT = { x: -17, z: -81.5 };
+const BED_SPOT = { x: -24, z: -84 };
 
 const wait = (ms) => new Promise((r) => setTimeout(r, ms));
 

@@ -7,6 +7,9 @@
 // (tests/i18n_admin_catalog.test.ts).
 
 export const zh_TW: Record<string, string> = {
+  'error.flagActiveExists': '這個帳號已經有一筆同類型的未結案標記。',
+  'wealth.largeMovementsUnavailable':
+    '無法載入大額銀行異動紀錄（帳本讀取逾時）；上方的金幣明細仍完整無缺。',
   'error.guildBankDeleting': '此公會正在被刪除，因此其銀行已關閉。未做任何變更。',
   'error.guildBankItemRequired': '請輸入你預期該格位應持有的物品 ID。',
   'error.guildBankNoCarrier': '必須有此公會的成員在線上，變更才能被儲存。',

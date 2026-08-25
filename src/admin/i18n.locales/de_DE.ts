@@ -7,6 +7,9 @@
 // (tests/i18n_admin_catalog.test.ts).
 
 export const de_DE: Record<string, string> = {
+  'error.flagActiveExists': 'dieses Konto hat bereits eine offene Meldung dieser Art',
+  'wealth.largeMovementsUnavailable':
+    'große Bankbewegungen konnten nicht geladen werden (das Zeitlimit beim Lesen des Hauptbuchs wurde überschritten); die Goldaufschlüsselung oben ist vollständig',
   'error.guildBankDeleting':
     'Diese Gilde wird gerade gelöscht, daher ist ihre Bank geschlossen. Es wurde nichts geändert.',
   'error.guildBankItemRequired':

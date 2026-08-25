@@ -942,7 +942,10 @@ describe('registerGameStateMetrics: fishing telemetry counters', () => {
     const combos = HARVEST_BANDS.length * FISHING_BANDS.length;
     // 14 zones x 6 bands since masterwrought Phase 11i grew the catch ladder
     // (was 14 x 3 = 42 after the v0.32.0 expansion, and 3 x 3 = 9 before it).
-    expect(combos).toBe(84);
+    // The Proving Shore tutorial island (release/v0.41.0) then adds the 15th
+    // zone (the release read 15 x 3 = 45 on its own), so the merged tree is
+    // 15 zones x 6 bands.
+    expect(combos).toBe(90);
     for (const name of FISHING_COUNTER_NAMES) {
       for (const zone of HARVEST_BANDS) {
         for (const band of FISHING_BANDS) {
@@ -1094,12 +1097,14 @@ describe('registerGameStateMetrics: fishing telemetry counters', () => {
     // off-vocabulary BAND with a real zone is the arm most likely to leak.
     for (const name of FISHING_COUNTER_NAMES) {
       // 14 zones x 6 bands, doubled from 42 by the ladder growing to six bands
-      // at masterwrought Phase 11i. The zone term is the whole HARVEST_BANDS
-      // vocabulary, not the three zones with a catch table of their own (every
-      // other zone's water fishes too, on the eastbrook_vale fallback): the
-      // exporter pre-seeds the full cross product so a zone-and-band pair that
-      // never fires reads as a real zero rather than a gap.
-      expect(fishingSeries(text, name), name).toHaveLength(84);
+      // at masterwrought Phase 11i, then 15 x 6 once the Proving Shore
+      // tutorial island (release/v0.41.0) joined ZONES. The zone term is the
+      // whole HARVEST_BANDS vocabulary, not the three zones with a catch table
+      // of their own (every other zone's water fishes too, on the
+      // eastbrook_vale fallback): the exporter pre-seeds the full cross
+      // product so a zone-and-band pair that never fires reads as a real zero
+      // rather than a gap.
+      expect(fishingSeries(text, name), name).toHaveLength(90);
       for (const zone of HARVEST_BANDS) {
         for (const band of FISHING_BANDS) {
           expect(fishingValue(text, name, zone, band), `${name} ${zone} ${band}`).toBe('0');

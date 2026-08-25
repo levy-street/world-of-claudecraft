@@ -113,8 +113,8 @@ export function unstuckSicknessDuration(level: number): number {
 // undefeated), and send-home (returnFromArena, everyone the seat wrote a
 // return record for and who is still present), and which the SimContext seam
 // (ctx.resetForArena) hands to call sites that never spell readyArenaFighter:
-// the Protect Yumi match seat, and the Vale Cup (social/vale_cup.ts) kit-swap
-// seat (valeCupStandardize) and match teardown.
+// the Protect Yumi match seat (the Vale Cup's kit-swap seat and match teardown
+// were the other two until the Vale Cup retired with release/v0.41.0).
 // So an instanced match is a parenthesis for a flask: nothing carried in rides
 // through the gates, and nothing quaffed inside comes back out. The one PvP
 // path that KEEPS a flask is a Thornhollow Fields DEATH: handleDeath runs this
@@ -124,9 +124,8 @@ export function unstuckSicknessDuration(level: number): number {
 // deaths, the recorded decision), until the match ends. (An arena death keeps
 // it on the corpse the same way, until the send-home wipe.) Both halves
 // pinned: behavior per mode in tests/arena.test.ts (seat, end, send-home),
-// tests/battleground.test.ts, tests/yumi_match.test.ts, tests/fiesta.test.ts,
-// and tests/vale_cup_match.test.ts; the three caller sets, literally, in
-// tests/resurrection.test.ts.
+// tests/battleground.test.ts, tests/yumi_match.test.ts and tests/fiesta.test.ts;
+// the three caller sets, literally, in tests/resurrection.test.ts.
 export function aurasSurvivingDeath(auras: readonly Aura[]): Aura[] {
   return auras.filter(
     (a) =>

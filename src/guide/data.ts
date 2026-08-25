@@ -67,7 +67,12 @@ export interface ZoneTeaser {
 //
 // One rule when adding a zone: every stem must be unique across GUIDE_ZONES. Give any
 // zone whose biome is already spoken for a stem of its own here, and nowhere else.
-const ZONE_KEY_STEM: Record<string, string> = { farshore_isle: 'farshore' };
+const ZONE_KEY_STEM: Record<string, string> = {
+  farshore_isle: 'farshore',
+  // The tutorial island also renders in the vale biome, so it takes its own
+  // stem for the same anchor-collision reason as the Farshore above.
+  proving_shore: 'proving',
+};
 
 /** The stem that names a zone's curated catalog keys and its world-page anchor. */
 export function zoneKeyStem(zone: GuideZoneInfo): string {

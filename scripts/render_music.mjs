@@ -80,6 +80,10 @@ const browser = await puppeteer.launch({
   executablePath: BROWSER_PATH,
   headless: 'new',
   args: ['--no-sandbox', '--autoplay-policy=no-user-gesture-required'],
+  // A long theme (two loops of a 90s form) renders through the offline
+  // context for longer than puppeteer's default 180s protocol timeout, which
+  // kills the evaluate mid-render; give slow themes room instead.
+  protocolTimeout: 600_000,
 });
 try {
   const page = await browser.newPage();

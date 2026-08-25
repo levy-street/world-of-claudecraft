@@ -2092,7 +2092,8 @@ export const GUIDE_ZONES: GuideZoneInfo[] = [
       "Reliquary Hill",
       "Brightwood Glade",
       "The Sowfield",
-      "The Farshore Causeway"
+      "The Farshore Causeway",
+      "Eastbrook Docks"
     ],
     "welcome": "Find Marshal Redbrook in town - he has work for you.",
     "families": [
@@ -2413,6 +2414,25 @@ export const GUIDE_ZONES: GuideZoneInfo[] = [
       "burrower",
       "demon"
     ]
+  },
+  {
+    "id": "proving_shore",
+    "name": "The Proving Shore",
+    "min": 1,
+    "max": 2,
+    "biome": "vale",
+    "hub": "Dawnrest Camp",
+    "pois": [
+      "Dawnrest Camp",
+      "The Old Pier",
+      "The Practice Yard",
+      "The Wreck Line",
+      "The Gauntlet"
+    ],
+    "welcome": "The Proving Shore asks nothing of you but time. Learn the camp, strike the effigies, walk the wreck line, and when you are ready, Ferryman Odo will see you across to the vale.",
+    "families": [
+      "beast"
+    ]
   }
 ];
 
@@ -2521,6 +2541,17 @@ export const GUIDE_FAMILIES: GuideFamily[] = [
         "tint": "#7f8c8d",
         "tintStrength": 0.35,
         "still": "/guide-stills/mob_wolf__7f8c8d__s35.webp"
+      },
+      {
+        "name": "Shore Scuttler",
+        "min": 1,
+        "max": 2,
+        "rare": false,
+        "templateId": "shore_scuttler",
+        "model": "mob_crab",
+        "tint": "#7a5a3a",
+        "tintStrength": 0.35,
+        "still": "/guide-stills/mob_crab__7a5a3a__s35.webp"
       },
       {
         "name": "Wild Boar",
@@ -5731,6 +5762,13 @@ export const GUIDE_DEEDS: GuideDeed[] = [
   {
     "id": "prog_field_to_feast",
     "name": "From Field to Feast",
+    "category": "progression",
+    "renown": 5,
+    "feat": false
+  },
+  {
+    "id": "prog_ready_for_an_adventure",
+    "name": "Ready for an Adventure",
     "category": "progression",
     "renown": 5,
     "feat": false

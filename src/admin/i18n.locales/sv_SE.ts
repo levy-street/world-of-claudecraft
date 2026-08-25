@@ -7,6 +7,9 @@
 // (tests/i18n_admin_catalog.test.ts).
 
 export const sv_SE: Record<string, string> = {
+  'error.flagActiveExists': 'det här kontot har redan en öppen flagga av den typen',
+  'wealth.largeMovementsUnavailable':
+    'stora bankrörelser kunde inte laddas (inläsningen av liggaren tog för lång tid), guldsammanställningen ovan är fullständig',
   'error.guildBankDeleting':
     'Det här gillet håller på att raderas, så dess bank är stängd. Inget ändrades.',
   'error.guildBankItemRequired': 'Ange det föremåls-id du förväntar dig att facket innehåller.',

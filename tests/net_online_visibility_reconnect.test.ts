@@ -455,7 +455,7 @@ describe('ClientWorld onConnectionLost contract', () => {
   });
 
   it('fires with the correct attempt, maxAttempts, and an absolute nextRetryAtMs after a real drop', () => {
-    withDomStubs((doc, harness) => {
+    withDomStubs((_doc, harness) => {
       vi.spyOn(Math, 'random').mockReturnValue(0.5);
       const world = new ClientWorld('t', 1, PROBE_CLASS, 'http://localhost');
       const calls: Array<[number, number, number]> = [];
@@ -482,7 +482,7 @@ describe('ClientWorld onConnectionLost contract', () => {
   });
 
   it('fires again with an updated nextRetryAtMs on the mobile-foreground fast-retry path', () => {
-    withDomStubs((doc, harness) => {
+    withDomStubs((doc, _harness) => {
       vi.spyOn(Math, 'random').mockReturnValueOnce(0.5).mockReturnValueOnce(0.75);
       const world = new ClientWorld('t', 1, PROBE_CLASS, 'http://localhost');
       const calls: Array<[number, number, number]> = [];
@@ -505,7 +505,7 @@ describe('ClientWorld onConnectionLost contract', () => {
   });
 
   it('a throwing onConnectionLost does not prevent the already-armed retry from firing', () => {
-    withDomStubs((doc, harness) => {
+    withDomStubs((_doc, harness) => {
       const world = new ClientWorld('t', 1, PROBE_CLASS, 'http://localhost');
       world.onConnectionLost = () => {
         throw new Error('boom (e.g. a DOM write or t() lookup failing)');
@@ -550,7 +550,7 @@ describe('ClientWorld reconnect error-frame tolerance (auth timeout)', () => {
   };
 
   it('tolerates the auth-timeout rejection mid-reconnect on its own counter and resets it on hello', () => {
-    withDomStubs((doc, harness) => {
+    withDomStubs((_doc, harness) => {
       const world = new ClientWorld('t', 1, PROBE_CLASS, 'http://localhost');
       const w = world as unknown as WorldProbe;
       const first = StubWebSocket.instances[0];
@@ -575,7 +575,7 @@ describe('ClientWorld reconnect error-frame tolerance (auth timeout)', () => {
   });
 
   it('still ends the session for good on any other rejection mid-reconnect', () => {
-    withDomStubs((doc, harness) => {
+    withDomStubs((_doc, harness) => {
       const world = new ClientWorld('t', 1, PROBE_CLASS, 'http://localhost');
       const w = world as unknown as WorldProbe;
       const reasons: string[] = [];
@@ -600,7 +600,7 @@ describe('ClientWorld reconnect error-frame tolerance (auth timeout)', () => {
     });
   });
 
-  it('fails closed when an auth-world-7 client reaches an auth-world-6 server', () => {
+  it('fails closed when an auth-world-9 client reaches an auth-world-7 server', () => {
     withDomStubs((_doc, harness) => {
       const world = new ClientWorld('t', 1, PROBE_CLASS, 'http://localhost');
       const w = world as unknown as WorldProbe;
@@ -614,13 +614,13 @@ describe('ClientWorld reconnect error-frame tolerance (auth timeout)', () => {
       expect(socket.sent).toHaveLength(1);
       expect(JSON.parse(socket.sent[0])).toEqual(
         expect.objectContaining({
-          t: 'auth-world-7',
+          t: 'auth-world-9',
           token: 't',
           character: 1,
         }),
       );
 
-      // An auth-world-6 server rejects this unknown future epoch before admission.
+      // An auth-world-7 server rejects this unknown future epoch before admission.
       w.onMessage(
         JSON.stringify({
           t: 'error',

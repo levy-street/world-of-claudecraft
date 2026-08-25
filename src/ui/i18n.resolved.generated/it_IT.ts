@@ -446,7 +446,7 @@ export const it_IT: EnTranslations = {
       "remainingDaysHours": "{days} g {hours} h",
       "score": "Punteggio",
       "walletValue": "Valore del portafoglio (WOC)",
-      "usd": "{amount} USD",
+      "usd": "{amount}",
       "sol": "{amount} SOL",
       "unknown": "Sconosciuto",
       "spinTitle": "Giro giornaliero",
@@ -488,85 +488,85 @@ export const it_IT: EnTranslations = {
       }
     },
     "trade": {
-      "windowClosed": "Trade window closed.",
+      "windowClosed": "Finestra di scambio chiusa.",
       "woc": {
-        "tabGold": "Gold",
+        "tabGold": "Oro",
         "tabWoc": "$WOC",
-        "modesLabel": "Payment currency",
-        "tabWocHint": "Paying in $WOC is available when your side of the table is empty and no gold is offered.",
-        "priceLabel": "Price in USD",
-        "pricePlaceholder": "0.00",
-        "equivalent": "About {tokens} $WOC at the current rate",
-        "variableWarning": "The $WOC amount is a preview, not a fixed price. The exact number is set by a fresh quote when you pay.",
-        "feeLine": "Exchange fee {fee}, taken out of the price.",
-        "netLine": "You receive {net}",
-        "netLineBuyer": "The seller receives {net}",
-        "sendOffer": "Offer $WOC",
-        "offerSent": "Offer sent. It expires in 10 minutes unless {name} accepts.",
-        "offerSentUntil": "Offer sent. It expires at {time} unless {name} accepts.",
-        "incomingAccept": "{name} offers {price} for your items.",
-        "notInstant": "A $WOC sale is not instant. The item moves into escrow once both sides accept, and reaches the buyer once payment is verified.",
-        "blockDisabled": "The $WOC Exchange is not available on this realm.",
-        "blockNoWallet": "Link and verify a wallet to sell items for $WOC.",
-        "blockPartnerUnknown": "Checking whether that player can accept $WOC...",
-        "blockRecipientNoWallet": "That player must connect a wallet to accept $WOC payments.",
-        "hintClearYourItems": "Remove your own items: a $WOC offer buys what they are selling.",
-        "hintAwaitTheirItems": "Waiting for them to offer something that can be sold for $WOC.",
-        "hintOneItem": "A $WOC deal covers exactly one item. Only the item being sold can be on the table.",
-        "hintEnterPrice": "Enter a price in USD.",
-        "hintAcceptNeedsItem": "Add the item you are selling before accepting.",
-        "hintAcceptLocked": "That item is locked. Unlock it in your bags, then remove it from the trade and add it again.",
-        "hintGoldOffered": "Remove your gold offer first: a trade is gold or $WOC, not both.",
-        "ineligibleReason": "Soulbound, quest, and locked items, and items outside the Exchange categories, cannot be sold for $WOC.",
-        "incomingTitle": "$WOC offer from {name}",
-        "incomingBody": "{name} offers to sell you {item} for {price}.",
+        "modesLabel": "Valuta di pagamento",
+        "tabWocHint": "Pagare in $WOC è disponibile quando il tuo lato del tavolo è vuoto e non viene offerto oro.",
+        "priceLabel": "Prezzo in USD",
+        "pricePlaceholder": "0,00",
+        "equivalent": "Circa {tokens} $WOC al tasso attuale",
+        "variableWarning": "L'importo in $WOC è un'anteprima, non un prezzo fisso. Il numero esatto viene stabilito da un nuovo preventivo quando paghi.",
+        "feeLine": "Commissione della Borsa {fee}, detratta dal prezzo.",
+        "netLine": "Ricevi {net}",
+        "netLineBuyer": "Il venditore riceve {net}",
+        "sendOffer": "Offri $WOC",
+        "offerSent": "Offerta inviata. Scade tra 10 minuti a meno che {name} non accetti.",
+        "offerSentUntil": "Offerta inviata. Scade alle {time} a meno che {name} non accetti.",
+        "incomingAccept": "{name} offre {price} per i tuoi oggetti.",
+        "notInstant": "Una vendita in $WOC non è istantanea. L'oggetto passa in custodia non appena entrambe le parti accettano, e raggiunge l'acquirente una volta verificato il pagamento.",
+        "blockDisabled": "La Borsa $WOC non è disponibile su questo reame.",
+        "blockNoWallet": "Collega e verifica un portafoglio per vendere oggetti in $WOC.",
+        "blockPartnerUnknown": "Verifica in corso se quel giocatore può accettare $WOC...",
+        "blockRecipientNoWallet": "Quel giocatore deve collegare un portafoglio per accettare pagamenti in $WOC.",
+        "hintClearYourItems": "Rimuovi i tuoi oggetti: un'offerta in $WOC compra ciò che stanno vendendo loro.",
+        "hintAwaitTheirItems": "In attesa che offrano qualcosa che possa essere venduto per $WOC.",
+        "hintOneItem": "Un accordo in $WOC copre esattamente un oggetto. Solo l'oggetto in vendita può stare sul tavolo.",
+        "hintEnterPrice": "Inserisci un prezzo in USD.",
+        "hintAcceptNeedsItem": "Aggiungi l'oggetto che stai vendendo prima di accettare.",
+        "hintAcceptLocked": "Quell'oggetto è bloccato. Sbloccalo nelle tue borse, poi rimuovilo dallo scambio e aggiungilo di nuovo.",
+        "hintGoldOffered": "Rimuovi prima la tua offerta in oro: uno scambio è in oro o in $WOC, non entrambi.",
+        "ineligibleReason": "Gli oggetti vincolati all'anima, di missione o bloccati, e quelli fuori dalle categorie della Borsa, non possono essere venduti per $WOC.",
+        "incomingTitle": "Offerta in $WOC da {name}",
+        "incomingBody": "{name} ti offre di vendere {item} per {price}.",
         "moneyUsd": "{usd}",
         "moneyLine": "{usd} (~ {tokens} $WOC)",
-        "waitingOther": "Offer accepted. Waiting for the other player to accept.",
-        "payNow": "Pay {usd}",
-        "awaitingPayment": "Waiting for payment confirmation...",
-        "paying": "Confirm the payment in your wallet...",
-        "settled": "Paid. Your item is in your bags, or arrives by Ravenpost mail if they were full.",
-        "settledSeller": "Paid. The item was delivered to the buyer.",
-        "accept": "Accept offer",
-        "accepted": "Offer accepted. Your item is held until payment is verified.",
-        "decline": "Decline",
-        "withdraw": "Withdraw offer",
-        "hintInsufficientBalance": "That is more $WOC than your connected wallet holds.",
-        "statusAwaitingBuyer": "Waiting for the buyer to pay.",
-        "statusPayingBuyer": "Confirming your payment on the network...",
-        "statusPayingSeller": "The buyer's payment is confirming on the network...",
-        "statusReviewBuyer": "Your payment is under review.",
-        "statusReviewSeller": "The buyer's payment is under review.",
-        "paidSeller": "You have received a payment of {price} for your {item}.",
-        "paidBuyer": "You have sent a payment of {price} for {item}.",
-        "closedCancelled": "This sale was cancelled. The item returns to the seller by Ravenpost mail.",
-        "closedSuspended": "This sale was suspended by a Game Master. The item returns to the seller by Ravenpost mail.",
-        "closedUnpaid": "This sale ended without payment. The item returns to the seller by Ravenpost mail.",
-        "closedUnpaidBuyer": "This sale ended without your payment. The item returns to the seller by Ravenpost mail; not paying an accepted deal earns a Marketplace strike.",
-        "cancelSale": "Cancel sale",
-        "cancelPendingSeller": "Cancel requested. The sale ends on its own unless the buyer pays first.",
-        "youDeclined": "You declined the offer.",
-        "youWithdrew": "You withdrew your offer.",
-        "offerNotPending": "This offer is no longer pending.",
-        "offerDeclined": "The $WOC offer was declined.",
-        "offerWithdrawn": "The $WOC offer was withdrawn.",
-        "offerExpired": "The $WOC offer expired.",
-        "offerExpiresAt": "Offer expires at {time}.",
-        "offerStandsUntil": "Your $WOC offer still stands until {time}. Trade with the seller again to finish the deal if they accept.",
-        "dealAwaitsPayment": "Your $WOC purchase is still unpaid. Trade with the seller again to pay; the deal expires on its own if you do not, and not paying earns a Marketplace strike.",
-        "closeSellerHold": "Your item stays held for the buyer's payment. Cancel the sale from the Exchange's Activity tab if you change your mind.",
-        "closePaymentContinuesBuyer": "Your payment is still being confirmed. Delivery completes on its own.",
-        "closePaymentContinuesSeller": "The buyer's payment is still being confirmed. The sale completes on its own.",
-        "p2pBindingNote": "Once both sides accept, payment is due within {duration}, or within the shorter window that opens when you press Pay. Not paying earns a Marketplace strike.",
-        "p2pBindingNoteUntimed": "Once both sides accept, payment is due shortly after, or within the shorter window that opens when you press Pay. Not paying earns a Marketplace strike.",
-        "p2pPaymentDueAt": "Payment is due by {time}. Not paying earns a Marketplace strike.",
-        "quoteExpiredTrade": "The quote expired. Press Not now, then Pay again for a fresh one.",
-        "quoteStaged": "Payment quote ready for {usd}: {tokens} $WOC, valid until {time}.",
-        "paymentConfirmed": "Payment confirmed. Your item arrives in your bags, or by Ravenpost mail if they are full, once delivery completes.",
-        "statusConfirmedBuyer": "Payment confirmed. Delivery is completing...",
-        "statusConfirmedSeller": "Payment confirmed. The sale is completing...",
-        "hintBelowMin": "The Exchange minimum price is {usd}."
+        "waitingOther": "Offerta accettata. In attesa che l'altro giocatore accetti.",
+        "payNow": "Paga {usd}",
+        "awaitingPayment": "In attesa di conferma del pagamento...",
+        "paying": "Conferma il pagamento nel tuo portafoglio...",
+        "settled": "Pagato. Il tuo oggetto è nelle tue borse, oppure arriva tramite la Posta dei Corvi se erano piene.",
+        "settledSeller": "Pagato. L'oggetto è stato consegnato all'acquirente.",
+        "accept": "Accetta l'offerta",
+        "accepted": "Offerta accettata. Il tuo oggetto resta in custodia finché il pagamento non è verificato.",
+        "decline": "Rifiuta",
+        "withdraw": "Ritira offerta",
+        "hintInsufficientBalance": "Sono più $WOC di quanti ne detenga il tuo portafoglio collegato.",
+        "statusAwaitingBuyer": "In attesa che l'acquirente paghi.",
+        "statusPayingBuyer": "Conferma del tuo pagamento sulla rete in corso...",
+        "statusPayingSeller": "Il pagamento dell'acquirente si sta confermando sulla rete...",
+        "statusReviewBuyer": "Il tuo pagamento è in fase di revisione.",
+        "statusReviewSeller": "Il pagamento dell'acquirente è in fase di revisione.",
+        "paidSeller": "Hai ricevuto un pagamento di {price} per il tuo {item}.",
+        "paidBuyer": "Hai inviato un pagamento di {price} per {item}.",
+        "closedCancelled": "Questa vendita è stata annullata. L'oggetto torna al venditore tramite la Posta dei Corvi.",
+        "closedSuspended": "Questa vendita è stata sospesa da un Game Master. L'oggetto torna al venditore tramite la Posta dei Corvi.",
+        "closedUnpaid": "Questa vendita si è conclusa senza pagamento. L'oggetto torna al venditore tramite la Posta dei Corvi.",
+        "closedUnpaidBuyer": "Questa vendita si è conclusa senza il tuo pagamento. L'oggetto torna al venditore tramite la Posta dei Corvi; non pagare un accordo accettato comporta un richiamo del mercato.",
+        "cancelSale": "Annulla vendita",
+        "cancelPendingSeller": "Annullamento richiesto. La vendita termina da sola a meno che l'acquirente non paghi prima.",
+        "youDeclined": "Hai rifiutato l'offerta.",
+        "youWithdrew": "Hai ritirato la tua offerta.",
+        "offerNotPending": "Questa offerta non è più in sospeso.",
+        "offerDeclined": "L'offerta in $WOC è stata rifiutata.",
+        "offerWithdrawn": "L'offerta in $WOC è stata ritirata.",
+        "offerExpired": "L'offerta in $WOC è scaduta.",
+        "offerExpiresAt": "L'offerta scade alle {time}.",
+        "offerStandsUntil": "La tua offerta in $WOC resta valida fino alle {time}. Scambia di nuovo con il venditore per concludere l'accordo se accetta.",
+        "dealAwaitsPayment": "Il tuo acquisto in $WOC non è ancora stato pagato. Scambia di nuovo con il venditore per pagare; l'accordo scade da solo se non lo fai, e non pagare comporta un richiamo del mercato.",
+        "closeSellerHold": "Il tuo oggetto resta in custodia in attesa del pagamento dell'acquirente. Annulla la vendita dalla scheda Attività della Borsa se cambi idea.",
+        "closePaymentContinuesBuyer": "Il tuo pagamento è ancora in fase di conferma. La consegna si completa da sola.",
+        "closePaymentContinuesSeller": "Il pagamento dell'acquirente è ancora in fase di conferma. La vendita si completa da sola.",
+        "p2pBindingNote": "Una volta che entrambe le parti accettano, il pagamento è dovuto entro {duration}, oppure entro la finestra più breve che si apre quando premi Paga. Non pagare comporta un richiamo del mercato.",
+        "p2pBindingNoteUntimed": "Una volta che entrambe le parti accettano, il pagamento è dovuto poco dopo, oppure entro la finestra più breve che si apre quando premi Paga. Non pagare comporta un richiamo del mercato.",
+        "p2pPaymentDueAt": "Il pagamento è dovuto entro le {time}. Non pagare comporta un richiamo del mercato.",
+        "quoteExpiredTrade": "Il preventivo è scaduto. Premi Non ora, poi Paga di nuovo per ottenerne uno nuovo.",
+        "quoteStaged": "Preventivo di pagamento pronto per {usd}: {tokens} $WOC, valido fino alle {time}.",
+        "paymentConfirmed": "Pagamento confermato. Il tuo oggetto arriva nelle tue borse, o tramite la Posta dei Corvi se sono piene, una volta completata la consegna.",
+        "statusConfirmedBuyer": "Pagamento confermato. La consegna si sta completando...",
+        "statusConfirmedSeller": "Pagamento confermato. La vendita si sta completando...",
+        "hintBelowMin": "Il prezzo minimo della Borsa è {usd}."
       }
     },
     "wocStore": {
@@ -943,7 +943,7 @@ export const it_IT: EnTranslations = {
       "jump": "Salta",
       "leaderboard": "Classifica",
       "dailyRewards": "Negozio",
-      "wocMarket": "Exchange",
+      "wocMarket": "Cambio",
       "deeds": "Imprese",
       "mounts": "Cavalcature",
       "professions": "Professioni",
@@ -957,52 +957,62 @@ export const it_IT: EnTranslations = {
       "actionRing": "Azioni di combattimento",
       "actionPageToggle": "Cambia pagina di azione",
       "actionPageIndicator": "Pag. {page}",
-      "actionRadial": "Action directions",
-      "actionRadialCancel": "Cancel action",
-      "radialCenter": "Centre",
-      "radialUp": "Up",
-      "radialRight": "Right",
-      "radialDown": "Down",
-      "radialLeft": "Left",
-      "consumableSeat": "Consumables",
-      "menuControl": "Menus",
-      "menuControlAria": "Menus. Tap to open chat, or hold and swipe right for mounts, map, bags and more.",
-      "menuControlAriaTap": "Menus. Tap to open the menu row: mounts, map, bags and more. Tap again for chat.",
+      "actionRadial": "Direzioni di azione",
+      "actionRadialCancel": "Annulla azione",
+      "radialCenter": "Centro",
+      "radialUp": "Su",
+      "radialRight": "Destra",
+      "radialDown": "Giù",
+      "radialLeft": "Sinistra",
+      "consumableSeat": "Consumabili",
+      "menuControl": "Menu",
+      "menuControlAria": "Menu. Tocca per aprire la chat, oppure tieni premuto e scorri verso destra per cavalcature, mappa, borse e altro.",
+      "menuControlAriaTap": "Menu. Tocca per aprire la fila dei menu: cavalcature, mappa, borse e altro. Tocca di nuovo per la chat.",
       "menuLabel": "Menu",
-      "quickActions": "Quick Actions",
-      "quickActionsAria": "Quick Actions. Tap to open the row of mount, chat, map, bags and more, or hold and swipe right to pick one.",
-      "quickActionsAriaTap": "Quick Actions. Tap to open the row of mount, chat, map, bags and more, then tap an item. Tap the control again to close.",
-      "quickActionsLabel": "Actions",
-      "stanceRadial": "Stances",
-      "stanceAnchorAria": "Stance: {stance}. Tap to open the stance ring, then pick another stance.",
-      "stanceAnchorEmptyAria": "No stance. Tap to open the stance ring, then pick a stance.",
-      "questStripAria": "Tracked quest {position} of {total}: {title}. Activate for the next quest.",
-      "questStripAriaSingle": "Tracked quest: {title}",
+      "quickActions": "Azioni Rapide",
+      "quickActionsAria": "Azioni Rapide. Tocca per aprire la fila di cavalcatura, chat, mappa, borse e altro, oppure tieni premuto e scorri verso destra per sceglierne una.",
+      "quickActionsAriaTap": "Azioni Rapide. Tocca per aprire la fila di cavalcatura, chat, mappa, borse e altro, poi tocca un elemento. Tocca di nuovo il controllo per chiudere.",
+      "quickActionsLabel": "Azioni",
+      "stanceRadial": "Posizioni",
+      "stanceAnchorAria": "Posizione: {stance}. Tocca per aprire l'anello delle posizioni, poi scegli un'altra posizione.",
+      "stanceAnchorEmptyAria": "Nessuna posizione. Tocca per aprire l'anello delle posizioni, poi scegli una posizione.",
+      "questStripAria": "Missione tracciata {position} di {total}: {title}. Attiva per la missione successiva.",
+      "questStripAriaSingle": "Missione tracciata: {title}",
       "questStripCounter": "{position}/{total}",
-      "questStripMore": "+{count} more",
+      "questStripMore": "+{count} altre",
       "targetCycle": "Scambia bersaglio",
       "targetCycleShort": "Bersaglio",
       "spellbookPageLabel": "Pagina {page}",
       "hideKeyboard": "Nascondi tastiera",
       "chatPlaceholder": "Scrivi qualcosa...",
-      "barEditor": "Edit Bars",
-      "barEditorAria": "Edit the action bar layout"
+      "barEditor": "Modifica Barre",
+      "barEditorAria": "Modifica la disposizione della barra delle azioni"
     },
     "barEditor": {
-      "title": "Edit Action Bar",
-      "close": "Close bar editor",
-      "pages": "Action bar pages",
-      "pageTab": "Page {page}",
-      "buttonHeader": "Button {button}",
-      "cellAria": "Button {button}, {direction}: {action}",
-      "emptyCellAria": "Button {button}, {direction}: empty",
-      "hint": "Tap a slot, then another, to swap them.",
-      "armed": "Tap a slot to place {name}.",
-      "picked": "Tap another slot to swap with {name}.",
-      "locked": "Action bars are locked in Interface options.",
-      "clear": "Clear",
-      "clearAria": "Clear a slot",
-      "clearArmed": "Tap a slot to clear it."
+      "title": "Modifica Barra delle Azioni",
+      "close": "Chiudi l'editor delle barre",
+      "pages": "Pagine della barra delle azioni",
+      "pageTab": "Pagina {page}",
+      "buttonHeader": "Pulsante {button}",
+      "cellAria": "Pulsante {button}, {direction}: {action}",
+      "emptyCellAria": "Pulsante {button}, {direction}: vuoto",
+      "hint": "Tocca uno slot, poi un altro, per scambiarli.",
+      "armed": "Tocca uno slot per posizionare {name}.",
+      "picked": "Tocca un altro slot per scambiarlo con {name}.",
+      "locked": "Le barre delle azioni sono bloccate nelle opzioni dell'interfaccia.",
+      "clear": "Svuota",
+      "clearAria": "Svuota uno slot",
+      "clearArmed": "Tocca uno slot per svuotarlo."
+    },
+    "tutorialGreeting": {
+      "bodyFirst": "Non ti avevo mai visto da queste parti, amico. È tradizione in queste terre che chi inizia la propria avventura visiti la Riva della Prova, un'isola tranquilla al largo dello stretto. Lì puoi affinare le tue abilità e abituarti al mondo prima di affrontarne le sfide. Il traghetto va in entrambe le direzioni, e nessuno penserà male di te in un caso o nell'altro.",
+      "bodyRefresher": "Di nuovo qui con un volto nuovo, eh? Allora sai già come funziona. Ma se desideri un ripasso prima di partire, la Riva della Prova non respinge mai uno studente di ritorno, e il traghetto è pronto quando lo sei tu.",
+      "play": "Inizia il tutorial",
+      "skip": "Salta il tutorial",
+      "declineNote": "Come preferisci, amico. Se mai dovessi cambiare idea, la campana del traghetto accanto alla cassetta della Posta dei Corvi ti farà attraversare fino alla Riva della Prova a qualunque ora, di giorno o di notte. Sarà ancora qui quando i lupi non ci saranno più.",
+      "bellHomeNote": "Già di ritorno dalla riva? Quella era la campana del traghetto che hai suonato. La sua gemella è appesa proprio lì, accanto alla cassetta della Posta dei Corvi: suonala quando vuoi e la traversata ti riporterà alla Riva della Prova. Nessun danno in entrambi i casi.",
+      "islandArrivalNote": "Benvenuto alla Riva della Prova. Il Guardiano Tam ti aspetta poco più avanti sulla spiaggia: vai a trovarlo.",
+      "noteClose": "Capito"
     },
     "tutorial": {
       "moveBodyTouch": "Usa il joystick di movimento per muoverti e trascina lo schermo per guardarti intorno. Fai qualche passo per iniziare.",
@@ -1015,6 +1025,117 @@ export const it_IT: EnTranslations = {
       "nextTipQuestLog": "Apri il registro delle missioni ({key}) per trovare la tua prossima attività nelle vicinanze.",
       "nextTipMap": "Controlla la mappa del mondo ({key}) per vedere dove ti aspettano le missioni.",
       "nextTipSocial": "Apri la finestra Sociale ({key}) per trovare un gruppo per gli scontri più impegnativi."
+    },
+    "bootcamp": {
+      "title": "Primi Passi",
+      "talkTitle": "Parla con il Guardiano Tam",
+      "talkBody": "Il Guardiano Tam sorveglia il cancello della Prova poco più avanti. Avvicinati a lui finché non compare il suo nome, poi premi {interactKey}, oppure fai clic sinistro su di lui, per parlargli: ti assegnerà la corsa.",
+      "talkBodyTouch": "Il Guardiano Tam sorveglia il cancello della Prova poco più avanti. Avvicinati a lui finché non compare il suo nome, poi toccalo, oppure tocca il pulsante Usa, per parlargli: ti assegnerà la corsa.",
+      "talkBodyPad": "Il Guardiano Tam sorveglia il cancello della Prova poco più avanti. Avvicinati a lui finché non compare il suo nome, poi premi il pulsante di interazione per parlargli: ti assegnerà la corsa.",
+      "forwardTitle": "Percorri la prima corsia",
+      "forwardBody": "Entra nella corsia accanto a Tam e tieni premuto {forwardKey} per percorrerla verso ovest fino alla sua bandiera.",
+      "forwardBodyTouch": "Entra nella corsia accanto a Tam e spingi lo stick di movimento in avanti per percorrerla verso ovest fino alla sua bandiera.",
+      "forwardBodyPad": "Entra nella corsia accanto a Tam e spingi lo stick sinistro in avanti per percorrerla verso ovest fino alla sua bandiera.",
+      "turnwalkTitle": "Girati, poi cammina",
+      "turnwalkBody": "Prima bandiera conquistata. Tieni premuto {turnKey} per ruotare sul posto finché non guardi lungo la corsia murata diretta a sud, poi tieni di nuovo premuto {forwardKey} e percorrila fino alla seconda bandiera.",
+      "turnwalkBodyTouch": "Prima bandiera conquistata. Trascina un dito sullo schermo (non lo stick di movimento) per girarti finché non guardi lungo la corsia murata diretta a sud, poi spingi lo stick in avanti e percorrila fino alla seconda bandiera.",
+      "turnwalkBodyPad": "Prima bandiera conquistata. Muovi lo stick destro per girarti finché non guardi lungo la corsia murata diretta a sud, poi spingi lo stick sinistro in avanti e percorrila fino alla seconda bandiera.",
+      "strafeTitle": "Girati, poi cammina",
+      "strafeBody": "Un angolo rimasto. Tieni premuto {turnLeftKey} per ruotare sul posto finché non guardi lungo l'ultima corsia, poi tieni di nuovo premuto {forwardKey} e percorrila finché la bandiera rossa non è alle tue spalle.",
+      "strafeBodyTouch": "Un angolo rimasto. Trascina un dito sullo schermo (non lo stick di movimento) per girarti finché non guardi lungo l'ultima corsia, poi spingi lo stick in avanti e percorrila finché la bandiera rossa non è alle tue spalle.",
+      "strafeBodyPad": "Un angolo rimasto. Muovi lo stick destro per girarti finché non guardi lungo l'ultima corsia, poi spingi lo stick sinistro in avanti e percorrila finché la bandiera rossa non è alle tue spalle.",
+      "cameraTitle": "Ruota la telecamera",
+      "cameraBody": "Un'ultima lezione prima di consegnare la corsa: tieni premuto il tasto destro del mouse e trascina per far ruotare la telecamera tutto intorno a te. Sapere cosa hai alle spalle ti fa vincere gli scontri.",
+      "cameraBodyTouch": "Un'ultima lezione prima di consegnare la corsa: trascina un dito sullo schermo per far ruotare la telecamera tutto intorno a te. Sapere cosa hai alle spalle ti fa vincere gli scontri.",
+      "cameraBodyPad": "Un'ultima lezione prima di consegnare la corsa: muovi lo stick destro per far ruotare la telecamera tutto intorno a te. Sapere cosa hai alle spalle ti fa vincere gli scontri.",
+      "courseProgress": "Bandiera {current} di {total}",
+      "doneTitle": "Corsa completata",
+      "doneBody": "Questo è tutto ciò che le tue gambe devono sapere. Il Sorvegliante Pell si trova accanto alla bandiera rossa: premi {interactKey} su di lui, oppure fai clic sinistro su di lui, per consegnare la tua corsa e ricevere la tua prima ricompensa.",
+      "doneBodyTouch": "Questo è tutto ciò che le tue gambe devono sapere. Il Sorvegliante Pell si trova accanto alla bandiera rossa: toccalo per consegnare la tua corsa e ricevere la tua prima ricompensa.",
+      "doneBodyPad": "Questo è tutto ciò che le tue gambe devono sapere. Il Sorvegliante Pell si trova accanto alla bandiera rossa: premi il pulsante di interazione su di lui per consegnare la tua corsa e ricevere la tua prima ricompensa.",
+      "coachNextTitle": "Prossimo: {npc}",
+      "coachNextBody": "Segui il sentiero dorato fino a {npc}. Avvicinati finché non compare il nome, poi premi {interactKey}, oppure fai clic sinistro su di loro, per ricevere il tuo prossimo compito.",
+      "coachNextBodyTouch": "Segui il sentiero dorato fino a {npc}. Avvicinati finché non compare il nome, poi toccalo, oppure tocca il pulsante Usa, per ricevere il tuo prossimo compito.",
+      "coachNextBodyPad": "Segui il sentiero dorato fino a {npc}. Avvicinati finché non compare il nome, poi premi il pulsante di interazione per ricevere il tuo prossimo compito.",
+      "coachTaskBody": "Segui il sentiero dorato fino al tuo compito. Il tracciatore a destra tiene il conto, e {mapKey} apre la mappa se perdi la strada.",
+      "coachTaskBodyTouch": "Segui il sentiero dorato fino al tuo compito. Il tracciatore a destra tiene il conto, e il pulsante mappa mostra la strada se la perdi.",
+      "coachTaskBodyPad": "Segui il sentiero dorato fino al tuo compito. Il tracciatore a destra tiene il conto, e il pulsante mappa mostra la strada se la perdi.",
+      "coachReadyTitle": "Compito completato",
+      "coachReadyBody": "Vai da {npc} e premi {interactKey}, oppure fai clic sinistro su di loro, per consegnarlo e ricevere la ricompensa.",
+      "coachReadyBodyTouch": "Vai da {npc} e toccalo per consegnarlo e ricevere la ricompensa.",
+      "coachReadyBodyPad": "Vai da {npc} e premi il pulsante di interazione per consegnarlo e ricevere la ricompensa.",
+      "taskStrikeTrueBody": "Avvicinati a un manichino di paglia e fai clic sinistro su di esso per bersagliarlo: il suo nome compare in cima allo schermo. Poi premi {attackKey} per iniziare a colpire. Quel primo pulsante è il tuo attacco base, non un incantesimo. Continua a colpire finché uno di essi non cede.",
+      "taskStrikeTrueBodyTouch": "Avvicinati a un manichino di paglia e toccalo per bersagliarlo. Poi tocca il primo pulsante sulla barra delle azioni per colpire. Continua a colpire finché uno di essi non cede.",
+      "taskStrikeTrueBodyPad": "Avvicinati a un manichino di paglia e premi il tuo pulsante bersaglio per bersagliarlo. Poi premi il tuo primo pulsante azione per colpire. Continua a colpire finché uno di essi non cede.",
+      "taskHoneBody": "Fai clic sinistro su un manichino di paglia per bersagliarlo, poi premi {abilityKey} per usare {ability}. È un'abilità tua, non un semplice colpo. Vai a segno tre volte.",
+      "taskHoneBodyTouch": "Tocca un manichino di paglia per bersagliarlo, poi tocca {ability} sulla barra delle azioni. È un'abilità tua, non un semplice colpo. Vai a segno tre volte.",
+      "taskHoneBodyPad": "Bersaglia un manichino di paglia, poi premi il pulsante azione che tiene {ability}. È un'abilità tua, non un semplice colpo. Vai a segno tre volte.",
+      "taskLongWalkBody": "Premi {bagsKey} per aprire le tue borse, poi fai clic sinistro sulla Pietra del trapasso. Ti farà stendere a terra dove ti trovi. Qui nulla può farti del male, e non ti costa nulla.",
+      "taskLongWalkBodyTouch": "Apri le tue borse e tocca la Pietra del trapasso. Ti farà stendere a terra dove ti trovi. Qui nulla può farti del male, e non ti costa nulla.",
+      "taskLongWalkBodyPad": "Apri le tue borse e scegli la Pietra del trapasso. Ti farà stendere a terra dove ti trovi. Qui nulla può farti del male, e non ti costa nulla.",
+      "taskLongWalkDeadBody": "Sei morto, e non hai perso nulla: nessun oggetto, nessuna moneta, nessuna esperienza. Passo 1 di 2: clicca il pulsante Libera spirito al centro dello schermo. Risorgerai come spettro nel cimitero dietro il campo.",
+      "taskLongWalkDeadBodyTouch": "Sei morto, e non hai perso nulla: nessun oggetto, nessuna moneta, nessuna esperienza. Passo 1 di 2: tocca il pulsante Libera spirito al centro dello schermo. Risorgerai come spettro nel cimitero dietro il campo.",
+      "taskLongWalkDeadBodyPad": "Sei morto, e non hai perso nulla: nessun oggetto, nessuna moneta, nessuna esperienza. Passo 1 di 2: scegli Libera spirito al centro dello schermo. Risorgerai come spettro nel cimitero dietro il campo.",
+      "taskLongWalkGhostBody": "Passo 2 di 2: sei uno spirito, e nulla può toccarti. Il tuo corpo è il segnalino sulla minimappa. Vai verso di esso. Quando ti avvicini, appare il pulsante Risorgi al cadavere: cliccalo e sei di nuovo vivo, senza alcuna penalità. Quel tragitto è SEMPRE gratuito, ed è così che torni ogni volta che muori.",
+      "taskLongWalkGhostBodyTouch": "Passo 2 di 2: sei uno spirito, e nulla può toccarti. Il tuo corpo è il segnalino sulla minimappa. Vai verso di esso. Quando ti avvicini, appare il pulsante Risorgi al cadavere: toccalo e sei di nuovo vivo, senza alcuna penalità. Quel tragitto è SEMPRE gratuito, ed è così che torni ogni volta che muori.",
+      "taskLongWalkGhostBodyPad": "Passo 2 di 2: sei uno spirito, e nulla può toccarti. Il tuo corpo è il segnalino sulla minimappa. Vai verso di esso. Quando ti avvicini, appare il pulsante Risorgi al cadavere: selezionalo e sei di nuovo vivo, senza alcuna penalità. Quel tragitto è SEMPRE gratuito, ed è così che torni ogni volta che muori.",
+      "taskShellBody": "Gli scorridori rispondono con le chele. Fai clic sinistro su uno di essi per bersagliarlo, poi premi {abilityKey} per {ability}, e continua ad attaccare. Se troppi ti attaccano insieme, ritirati lungo il sentiero: rinunciano presto all'inseguimento, e la salute ti torna mentre riposi.",
+      "taskShellBodyTouch": "Gli scorridori rispondono con le chele. Tocca uno di essi per bersagliarlo, poi tocca {ability} sulla barra delle azioni. Se troppi ti attaccano insieme, ritirati lungo il sentiero: rinunciano presto all'inseguimento, e la salute ti torna mentre riposi.",
+      "taskShellBodyPad": "Gli scorridori rispondono con le chele. Bersaglia uno di essi, poi premi il pulsante azione che tiene {ability}. Se troppi ti attaccano insieme, ritirati lungo il sentiero: rinunciano presto all'inseguimento, e la salute ti torna mentre riposi.",
+      "taskStrikeTrueBodyCaster": "Avvicinati a un manichino di paglia e fai clic sinistro su di esso per bersagliarlo: il suo nome compare in cima allo schermo. Poi premi {attackKey}, oppure clicca il secondo pulsante sulla barra delle azioni, per lanciare il tuo incantesimo. Continua a lanciare finché uno di essi non cede.",
+      "taskStrikeTrueBodyCasterTouch": "Avvicinati a un manichino di paglia e toccalo per bersagliarlo. Poi tocca il secondo pulsante sulla barra delle azioni per lanciare il tuo incantesimo. Continua a lanciare finché uno di essi non cede.",
+      "taskStrikeTrueBodyCasterPad": "Avvicinati a un manichino di paglia e premi il tuo pulsante bersaglio per bersagliarlo. Poi premi il tuo secondo pulsante azione per lanciare il tuo incantesimo. Continua a lanciare finché uno di essi non cede.",
+      "taskShellBodyCaster": "Gli scorridori rispondono con le chele. Fai clic sinistro su uno di essi per bersagliarlo, poi premi {abilityKey} per {ability}, e continua a lanciare incantesimi a distanza. Se troppi ti attaccano insieme, ritirati lungo il sentiero: rinunciano presto all'inseguimento, e la salute ti torna mentre riposi.",
+      "taskShellBodyCasterTouch": "Gli scorridori rispondono con le chele. Tocca uno di essi per bersagliarlo, poi tocca {ability} sulla barra delle azioni, e continua a lanciare incantesimi a distanza. Se troppi ti attaccano insieme, ritirati lungo il sentiero: rinunciano presto all'inseguimento, e la salute ti torna mentre riposi.",
+      "taskShellBodyCasterPad": "Gli scorridori rispondono con le chele. Bersaglia uno di essi, poi premi il pulsante azione che tiene {ability}, e continua a lanciare incantesimi a distanza. Se troppi ti attaccano insieme, ritirati lungo il sentiero: rinunciano presto all'inseguimento, e la salute ti torna mentre riposi.",
+      "taskPearlBody": "Segui il sentiero dorato fino alla pozza di marea all'estremità ovest della spiaggia. Fermo sul bagnasciuga, premi {bagsKey} per aprire le tue borse e fai clic sinistro sull'Esca salmastra per farlo emergere. Combattilo come hai combattuto gli scorridori, e quando cade, premi {interactKey} sul suo guscio per reclamare la Perla lucente.",
+      "taskPearlBodyTouch": "Segui il sentiero dorato fino alla pozza di marea all'estremità ovest della spiaggia. Fermo sul bagnasciuga, apri le tue borse e tocca l'Esca salmastra per farlo emergere. Combattilo come hai combattuto gli scorridori, e quando cade, tocca il suo guscio per reclamare la Perla lucente.",
+      "taskPearlBodyPad": "Segui il sentiero dorato fino alla pozza di marea all'estremità ovest della spiaggia. Fermo sul bagnasciuga, apri le tue borse e scegli l'Esca salmastra per farlo emergere. Combattilo come hai combattuto gli scorridori, e quando cade, premi il pulsante di interazione sul suo guscio per reclamare la Perla lucente.",
+      "taskWreckLineBody": "Le casse dei naufraghi costeggiano il sentiero verso il Campo di Dawnrest. Avvicinati a una finché non compare il suo nome, poi premi {interactKey}, oppure fai clic sinistro sulla cassa, per raccoglierla. Sei casse completano il bottino.",
+      "taskWreckLineBodyTouch": "Le casse dei naufraghi costeggiano il sentiero verso il Campo di Dawnrest. Avvicinati a una finché non compare il suo nome, poi tocca la cassa, oppure tocca il pulsante Usa, per raccoglierla. Sei casse completano il bottino.",
+      "taskWreckLineBodyPad": "Le casse dei naufraghi costeggiano il sentiero verso il Campo di Dawnrest. Avvicinati a una finché non compare il suo nome, poi premi il pulsante di interazione per raccoglierla. Sei casse completano il bottino.",
+      "taskPouchBody": "Premi {interactKey} su {npc}, oppure fai clic sinistro su di loro, per aprire la bancarella, poi fai clic sinistro sul Borsello di lino per acquistarlo.",
+      "taskPouchBodyTouch": "Tocca {npc} per aprire la bancarella, poi tocca il Borsello di lino per acquistarlo.",
+      "taskPouchBodyPad": "Premi il pulsante di interazione su {npc} per aprire la bancarella, poi scegli il Borsello di lino per acquistarlo.",
+      "readyPouchBody": "Borsello acquistato. Premi {bagsKey} per aprire le tue borse e fai clic sinistro sul Borsello di lino per agganciarlo a uno slot libero. Poi vai da {npc} e premi {interactKey} per mostrarlo.",
+      "readyPouchBodyTouch": "Borsello acquistato. Apri le tue borse e tocca il Borsello di lino per agganciarlo a uno slot libero. Poi vai da {npc} e toccalo per mostrarlo.",
+      "readyPouchBodyPad": "Borsello acquistato. Apri le tue borse e scegli il Borsello di lino per agganciarlo a uno slot libero. Poi vai da {npc} e premi il pulsante di interazione per mostrarlo.",
+      "promptTalk": "Parla",
+      "promptTurnIn": "Consegna la missione",
+      "promptPickUp": "Raccogli",
+      "promptLootPearl": "Raccogli la perla",
+      "promptRead": "Leggi",
+      "promptRing": "Suona",
+      "promptHold": "Tieni",
+      "promptSelect": "Seleziona",
+      "promptAttack": "Attacca",
+      "promptUseAbility": "Usa abilità",
+      "promptKneel": "Inginocchiati",
+      "promptOpenBags": "Apri le tue borse",
+      "promptCharacterSheet": "Apri la tua scheda personaggio",
+      "promptLookAround": "Tieni premuto il tasto destro e trascina per guardarti intorno",
+      "promptJump": "Salta",
+      "promptSummon": "Evoca",
+      "ringEquipTitle": "Indossa il tuo premio",
+      "ringEquipBody": "Ti è stata data la Madreperla, e una ricompensa non serve a nulla se resta in una borsa. Passo 1 di 2: premi {bagsKey} per aprire le tue borse, poi fai clic sinistro sull'anello per indossarlo.",
+      "ringEquipBodyTouch": "Ti è stata data la Madreperla, e una ricompensa non serve a nulla se resta in una borsa. Passo 1 di 2: apri le tue borse e tocca l'anello per indossarlo.",
+      "ringEquipBodyPad": "Ti è stata data la Madreperla, e una ricompensa non serve a nulla se resta in una borsa. Passo 1 di 2: apri le tue borse e scegli l'anello per indossarlo.",
+      "ringAdmireTitle": "Guardati un po'",
+      "ringAdmireBody": "Passo 2 di 2: premi {charKey} per aprire la tua scheda personaggio. Quella schermata mostra tutto ciò che indossi e le statistiche che ti conferisce, e l'anello ora è al tuo dito. Controllala ogni volta che raccogli nuovo equipaggiamento.",
+      "ringAdmireBodyTouch": "Passo 2 di 2: apri la tua scheda personaggio dal menu. Quella schermata mostra tutto ciò che indossi e le statistiche che ti conferisce, e l'anello ora è al tuo dito. Controllala ogni volta che raccogli nuovo equipaggiamento.",
+      "ringAdmireBodyPad": "Passo 2 di 2: apri la tua scheda personaggio dal menu. Quella schermata mostra tutto ciò che indossi e le statistiche che ti conferisce, e l'anello ora è al tuo dito. Controllala ogni volta che raccogli nuovo equipaggiamento.",
+      "keycapThen": "poi",
+      "voiceArrival": "Piano a riva, amico. Vedi il sentiero dorato ai tuoi piedi? Conosce la strada meglio di me. Seguilo.",
+      "voiceFirstFlag": "Ecco una bandiera conquistata. Continua a muovere quelle gambe, ne restano solo due.",
+      "voiceRunDone": "Una corsa pulita, questa. Il Sorvegliante Pell tiene la tua ricompensa, vai a reclamarla.",
+      "voiceStationDoneA": "Ottimo lavoro. Avanti al prossimo, il sentiero è già illuminato per te.",
+      "voiceStationDoneB": "Ci stai prendendo la mano, non c'è dubbio.",
+      "voiceVeerOff": "Fermo lì, amico, quella è la direzione sbagliata. Il sentiero dorato è alle tue spalle.",
+      "voiceGraduate": "La campana suona per te. Eastbrook aspetta oltre l'acqua, e tu sei pronto per lei.",
+      "bellTitle": "Suona la campana",
+      "bellBody": "La tua traversata te la sei guadagnata. Vai alla campana del traghetto accanto al molo e premi {interactKey}, oppure fai clic sinistro su di essa, per salpare verso Eastbrook.",
+      "bellBodyTouch": "La tua traversata te la sei guadagnata. Vai alla campana del traghetto accanto al molo e toccala per salpare verso Eastbrook.",
+      "bellBodyPad": "La tua traversata te la sei guadagnata. Vai alla campana del traghetto accanto al molo e premi il pulsante di interazione su di essa per salpare verso Eastbrook."
     },
     "widgets": {
       "clockTitle": "Ora locale - clicca per alternare 12/24 ore",
@@ -1066,6 +1187,31 @@ export const it_IT: EnTranslations = {
       "devTierCol": "Distintivo",
       "mergedPrs": "PR integrate",
       "devEmpty": "Ancora nessun contributore in classifica."
+    },
+    "pledge": {
+      "open": "Accetta giuramenti",
+      "closed": "Non accetta giuramenti",
+      "minLevel": "Livello {level}+",
+      "action": "Giura fedeltà",
+      "actionTitle": "Giura fedeltà a {guild}",
+      "pledged": "Giurato",
+      "yourGuild": "La tua gilda",
+      "tab": "Giuramenti",
+      "tabWithCount": "Giuramenti ({count})",
+      "empty": "Nessuno ha ancora giurato fedeltà alla tua gilda.",
+      "accept": "Accetta",
+      "acceptTitle": "Accetta il giuramento di {name}",
+      "reject": "Rifiuta",
+      "rejectTitle": "Rifiuta il giuramento di {name}",
+      "settings": "Reclutamento",
+      "acceptingLabel": "Accetta giuramenti",
+      "minLevelLabel": "Livello minimo",
+      "noteLabel": "Nota della bacheca",
+      "notePlaceholder": "Racconta agli aspiranti membri cosa cerca la tua gilda",
+      "save": "Salva",
+      "yourPledge": "Il tuo giuramento: {guild}",
+      "since": "Giurato il {date}",
+      "withdraw": "Ritira il giuramento"
     },
     "raidLockout": {
       "title": "Blocchi incursione",
@@ -1158,7 +1304,6 @@ export const it_IT: EnTranslations = {
       "targetFriendlyNext": "Scorri i bersagli amici",
       "targetPrev": "Scorri i bersagli indietro",
       "discord": "Discord",
-      "valecup": "Coppa della Valle",
       "bgFlag": "Azione Bandiera del Campo di Battaglia",
       "sheathe": "Fodera/Sfodera Arma",
       "dive": "Nuota Verso il Basso",
@@ -1315,6 +1460,7 @@ export const it_IT: EnTranslations = {
       "endedForfeitLog": "La partita è stata persa a tavolino.",
       "firstWinBonusLine": "Prima vittoria del giorno: +{honor} Onore",
       "firstWinBonusLog": "Prima vittoria del giorno: guadagni {honor} Onore bonus.",
+      "doubleHonorLine": "Fine Settimana del Doppio Onore: oggi ai Campi di Thornhollow l'Onore paga {mult}x, e una sconfitta giocata fino in fondo paga come una vittoria",
       "timeWarningMinutes": "Restano {minutes} minuti",
       "timeWarningOneMinute": "Resta un minuto",
       "timeWarningMinutesLog": "Restano {minutes} minuti alla fine della battaglia.",
@@ -1324,146 +1470,6 @@ export const it_IT: EnTranslations = {
         "azureKeep": "Rocca Azzurra",
         "ruinCourtyard": "Il Cortile in Rovina",
         "graveyard": "Cimitero"
-      }
-    },
-    "vcup": {
-      "title": "La Coppa della Valle",
-      "shootPower": "POTENZA",
-      "close": "Chiudi la finestra della Coppa della Valle",
-      "offlineNote": "Il libro degli incontri è chiuso. La Coppa della Valle non è disponibile al momento.",
-      "recordLine": "Il tuo bilancio: {wins} vittorie, {losses} sconfitte, {draws} pareggi.",
-      "bracketsAria": "Formato della partita",
-      "bracketLabel": "{n}c{n}",
-      "waitingCount": "{count} in attesa",
-      "nationsHeading": "Nazione del vessillo",
-      "nation": {
-        "vale": "Valle di Eastbrook",
-        "mirefen": "Il Mirefen",
-        "thornpeak": "Thornpeak",
-        "coliseum": "Il Colosseo Cinereo",
-        "choir": "Il Coro Pallido",
-        "ogre": "I Clan degli Ogre",
-        "moon": "La Luna Pallida",
-        "copperdig": "Lo Scavo di Rame"
-      },
-      "awayNote": "Se entrambe le squadre battono lo stesso vessillo, quella in trasferta gioca con i colori invertiti.",
-      "rolesHeading": "Ruolo sportivo",
-      "rolesSmallBracketNote": "Nei formati 1c1 e 2c2 ogni giocatore usa il kit del Tuttocampista. Le imprese che richiedono il formato 3c3 o superiore non si possono ottenere qui.",
-      "role": {
-        "allrounder": {
-          "name": "Tuttocampista",
-          "desc": "Un po' di tutto: calcio, calcione e una spallata leale."
-        },
-        "striker": {
-          "name": "Attaccante",
-          "desc": "Vive per il calcione lungo e lo scatto laterale."
-        },
-        "sweeper": {
-          "name": "Libero",
-          "desc": "Sbalza gli avversari lontano dalla palla e la spazza via."
-        },
-        "keeper": {
-          "name": "Portiere",
-          "desc": "Difende l'area di porta con presa, tuffo e rinvio."
-        }
-      },
-      "queue": "Entra in coda",
-      "leaveQueue": "Lascia la coda",
-      "queueNote": "Mettiti in coda da qualsiasi luogo; il fischio ti chiamerà al Campo della Scrofa.",
-      "queuedStatus": "In coda per {bracket}: posizione {position} di {count}.",
-      "blockNation": "Scegli prima una nazione del vessillo.",
-      "blockPartySize": "Quel formato richiede un gruppo più piccolo.",
-      "blockNotLeader": "Solo il capogruppo può mettere in coda la squadra.",
-      "inMatchNote": "La tua squadra è in campo. Gioca!",
-      "deserterNote": "Il Guardacampo non dimentica. Potrai rimetterti in coda tra {seconds} sec.",
-      "liveHeading": "Ora al Campo della Scrofa",
-      "liveAria": "Coppa della Valle: {nationA} {scoreA}, {nationB} {scoreB}",
-      "walkUp": "Avvicinati al Campo della Scrofa per guardare dagli spalti.",
-      "noLive": "Il campo è tranquillo. Nessuna partita in corso.",
-      "boardHeading": "Tabellone dei vincitori",
-      "boardEmpty": "Nessun vincitore registrato finora. Il Secchio di Rame attende.",
-      "boardWins": "{count} vittorie",
-      "enterAsGuild": "Entra sotto il vessillo di {guild}",
-      "guildRecordLine": "Bilancio della tua gilda: {wins} vittorie, {losses} sconfitte.",
-      "guildBoardHeading": "Vessilli di gilda",
-      "guildBoardEmpty": "Nessuna gilda è ancora scesa in campo. Batti il tuo vessillo!",
-      "guildBoardWl": "{wins} V, {losses} S",
-      "practice": "Allenamento contro i bot",
-      "practiceNote": "Avvia subito una partita privata contro i bot sul tuo campo di allenamento.",
-      "practiceUnratedNote": "Gli incontri di allenamento non valgono per la classifica: i bilanci e i progressi del Libro delle Imprese non contano.",
-      "practicingNow": "In allenamento ora ({count}):",
-      "clock": "{minutes}:{seconds}",
-      "indicatorQueued": "Coda della Coppa della Valle: {bracket}, posizione {position} di {count}",
-      "indicatorLive": "Coppa della Valle",
-      "indicatorOpen": "Apri la finestra della Coppa della Valle",
-      "phaseCountdown": "Calcio d'inizio tra {seconds}",
-      "phaseGoal": "GOL!",
-      "phaseGolden": "GOL D'ORO",
-      "phaseOver": "FISCHIO FINALE",
-      "bannerFound": "La Coppa della Valle chiama: {nationA} contro {nationB}!",
-      "bannerCountdown": "Calcio d'inizio tra {seconds}...",
-      "bannerKickoff": "CALCIO D'INIZIO!",
-      "bannerGoal": "GOL! Segna {nation}!",
-      "bannerSave": "{name} PARA!",
-      "bannerGolden": "GOL D'ORO: il prossimo gol vince!",
-      "bannerEnd": "Fischio finale: {nationA} {scoreA}, {nationB} {scoreB}",
-      "bannerWin": "Vittoria al Campo della Scrofa!",
-      "bannerDraw": "Pareggio al Campo della Scrofa.",
-      "bannerLoss": "Sconfitta al Campo della Scrofa.",
-      "logQueued": "Entri nella coda della Coppa della Valle per {bracket} (posizione {position}).",
-      "logUnqueued": "Lasci la coda della Coppa della Valle.",
-      "logFound": "La tua partita della Coppa della Valle è pronta: {nationA} contro {nationB}.",
-      "logRoster": "La tua squadra: {allies}. La loro: {enemies}.",
-      "logGoal": "{name} segna per {nation}! {nationA} {scoreA}, {nationB} {scoreB}.",
-      "logSave": "{name} compie la parata!",
-      "logWin": "Vinci l'incontro al Campo della Scrofa.",
-      "logDraw": "L'incontro al Campo della Scrofa finisce in pareggio.",
-      "logLoss": "Perdi l'incontro al Campo della Scrofa.",
-      "gossipOpen": "Il libro degli incontri",
-      "gossipOpenAria": "Apri la finestra della Coppa della Valle",
-      "mobileLabel": "Coppa",
-      "briefing": {
-        "subtitle": "Riunione pre-partita",
-        "vs": "vs",
-        "rulesHeading": "Come si gioca",
-        "rule1": "Calcia o passa la palla nella porta avversaria per segnare.",
-        "rule2": "Vince chi per primo arriva a 5 gol, o chi ne ha di più al fischio finale.",
-        "rule3": "Una partita in parità al fischio finale va al gol d'oro: il prossimo gol vince.",
-        "rule4": "I contrasti ti fanno solo ruzzolare. Nessuno si fa male sotto la tregua del raccolto.",
-        "rule5": "Chiunque può avvicinarsi e fare il tifo dagli spalti.",
-        "kitHeading": "Il tuo kit",
-        "kitNote": "Queste mosse sostituiscono le tue abilità di classe per la partita.",
-        "unratedNote": "Ci sono bot in campo, quindi questo incontro non è valido per la classifica: i bilanci non cambiano e le imprese per gol, parate e porte inviolate non contano.",
-        "practiceUnratedNote": "Questo è un incontro di allenamento, quindi non è valido per la classifica: i bilanci non cambiano e i progressi del Libro delle Imprese non contano.",
-        "rosterHeading": "La distinta",
-        "you": "Tu",
-        "bot": "Bot",
-        "ready": "Sono pronto",
-        "readyDone": "Pronto",
-        "readyAria": "Dichiarati pronto per il calcio d'inizio",
-        "waiting": "In attesa che l'altra squadra si dichiari pronta...",
-        "whistle": "Il fischio arriva tra {seconds}s.",
-        "readyCount": "{ready} pronti su {total}"
-      },
-      "bet": {
-        "title": "Scommesse sulla partita",
-        "aria": "Scommesse sulla partita della Coppa della Valle",
-        "closesIn": "Le scommesse chiudono tra {seconds}s",
-        "closed": "Scommesse chiuse",
-        "prize": "Montepremi {amount}",
-        "splitAria": "Quota del montepremi puntata su ciascuna squadra",
-        "expand": "Vedi le scommesse e punta",
-        "collapse": "Nascondi le scommesse",
-        "oddsLabel": "Paga",
-        "back": "Punta su {team}",
-        "form": "{wins}V-{losses}S",
-        "mine": "La tua scommessa: {amount} su {team}",
-        "none": "Non hai ancora scommesso su questa partita.",
-        "record": "Bilancio scommesse: {wins}V-{losses}S, {sign}{net}",
-        "wonBanner": "La tua scommessa ha vinto!",
-        "wonLog": "La tua scommessa sulla Coppa della Valle ha vinto: {amount} restituiti.",
-        "lostLog": "Hai perso la tua scommessa sulla Coppa della Valle: {amount}.",
-        "refundLog": "Scommesse annullate, la tua puntata di {amount} è stata restituita."
       }
     },
     "options": {
@@ -1549,8 +1555,8 @@ export const it_IT: EnTranslations = {
       "showDailyRewardsChest": "Mostra forziere delle ricompense giornaliere",
       "mobileCameraJoystick": "Joystick della fotocamera",
       "mobileLeftHanded": "Disposizione per mancini",
-      "touchTapMenus": "Tap menus",
-      "touchTapMenusNote": "Open the action, consumable and menu controls with a tap instead of a swipe. Tap an item to use it, tap the control again for its usual action, or tap outside to close."
+      "touchTapMenus": "Menu al tocco",
+      "touchTapMenusNote": "Apri i controlli di azione, consumabili e menu con un tocco invece che con uno scorrimento. Tocca un elemento per usarlo, tocca di nuovo il controllo per la sua azione abituale, oppure tocca fuori per chiudere."
     },
     "talentRows": {
       "tab": "Scelte",
@@ -1575,6 +1581,11 @@ export const it_IT: EnTranslations = {
     },
     "controller": {
       "title": "Controller",
+      "glyphStyle": "Etichette dei pulsanti",
+      "glyphStyleAuto": "Auto",
+      "glyphStyleXbox": "Xbox",
+      "glyphStylePlayStation": "PlayStation",
+      "glyphStyleNintendo": "Nintendo",
       "enable": "Attiva controller",
       "invertY": "Inverti telecamera (Y)",
       "deadzone": "Zona morta dello stick",
@@ -2066,16 +2077,16 @@ export const it_IT: EnTranslations = {
         "other": "sei {rank}, {count} membri"
       },
       "wocMarketSellChoose": {
-        "one": "Choose from {count} item",
-        "few": "Choose from {count} items",
-        "many": "Choose from {count} items",
-        "other": "Choose from {count} items"
+        "one": "Scegli tra {count} oggetto",
+        "few": "Scegli tra {count} oggetti",
+        "many": "Scegli tra {count} oggetti",
+        "other": "Scegli tra {count} oggetti"
       },
       "wocTradeIneligible": {
-        "one": "{count} staged item cannot be sold for $WOC.",
-        "few": "{count} staged items cannot be sold for $WOC.",
-        "many": "{count} staged items cannot be sold for $WOC.",
-        "other": "{count} staged items cannot be sold for $WOC."
+        "one": "{count} oggetto nello scambio non può essere venduto per $WOC.",
+        "few": "{count} oggetti nello scambio non possono essere venduti per $WOC.",
+        "many": "{count} oggetti nello scambio non possono essere venduti per $WOC.",
+        "other": "{count} oggetti nello scambio non possono essere venduti per $WOC."
       },
       "finderPartySize": {
         "one": "{count} giocatore",
@@ -2657,13 +2668,14 @@ export const it_IT: EnTranslations = {
     "spellbook": {
       "addToBarAria": "Aggiungi {name} alla barra azioni",
       "removeFromBarAria": "Rimuovi {name} dalla barra azioni",
-      "assignAria": "Choose a slot for {name}"
+      "assignAria": "Scegli uno slot per {name}"
     },
     "nameplate": {
       "mobLevel": "{level}",
       "mobEliteLevel": "{level}+",
       "afkTag": "AFK",
-      "cheaterTag": "< Baro >"
+      "cheaterTag": "< Baro >",
+      "pledgeTag": "Giuramento a {guild}"
     },
     "mobTooltip": {
       "levelFamily": "{family} di livello {level}",
@@ -2990,7 +3002,12 @@ export const it_IT: EnTranslations = {
       "tip": "Ricavi di vendita o oggetti restituiti ti aspettano dal Mercante."
     },
     "noticeboard": {
-      "empty": "Non sembra esserci nulla di affisso."
+      "empty": "Non sembra esserci nulla di affisso.",
+      "subtitle": "Le gilde del reame",
+      "rosterTitle": "Visualizza l'elenco membri di {guild}",
+      "back": "Indietro",
+      "popupTitle": "Cartello della Gilda",
+      "close": "Chiudi"
     },
     "bank": {
       "title": "Banca",
@@ -3122,6 +3139,10 @@ export const it_IT: EnTranslations = {
         "arenaClash": {
           "title": "Scontro in Arena",
           "note": "I duellanti accorrono al Colosseo Cinereo. Mettiti in coda e scala la classifica."
+        },
+        "doubleHonor": {
+          "title": "Fine Settimana del Doppio Onore",
+          "note": "I campi di guerra suonano l'adunata: per tutto il fine settimana, ai Campi di Thornhollow l'Onore paga il doppio e una sconfitta giocata fino in fondo paga come una vittoria."
         },
         "fishingDerby": {
           "title": "Gara di Pesca",
@@ -3539,7 +3560,7 @@ export const it_IT: EnTranslations = {
       "reagentsNeeded": "Richiede:",
       "reagentLine": "{name}: {have}/{required}",
       "reagentFineSub": "(usa {count} di grado pregiato)",
-      "craftFeeLine": "Craft fee: {fee} each",
+      "craftFeeLine": "Tariffa di lavorazione: {fee} ciascuno",
       "empty": "Nessuna ricetta ancora conosciuta.",
       "resultAria": "Crea {name}",
       "craftedToast": "Realizzato: {name}",
@@ -4105,7 +4126,7 @@ export const it_IT: EnTranslations = {
       "unlockedBorderHint": "Nuovo bordo ottenuto: {name}. Indossalo dal Libro delle Imprese.",
       "broadcastLine": "{name} ha compiuto un'impresa: {deed}",
       "rarityLine": "Ottenuta dal {percent} degli avventurieri",
-      "stillToVisit": "Still to visit: {places}",
+      "stillToVisit": "Ancora da visitare: {places}",
       "trackerLabel": "Imprese",
       "collapseHint": "Comprimi il riquadro Imprese",
       "expandHint": "Espandi il riquadro Imprese",
@@ -4135,218 +4156,218 @@ export const it_IT: EnTranslations = {
       "minLevelNote": "Richiede il livello {level}"
     },
     "walletBridge": {
-      "cancelled": "The wallet request was cancelled. Nothing was sent.",
-      "timeout": "Your wallet did not respond in time. Open the wallet and try again.",
-      "notConnected": "Connect and verify a wallet, then try again.",
-      "unsupported": "This wallet cannot complete that action. Connect a different wallet.",
-      "unavailable": "No wallet connection is available here. Reconnect your wallet and try again.",
-      "badResponse": "Your wallet returned an unusable answer. Try again."
+      "cancelled": "La richiesta al portafoglio è stata annullata. Non è stato inviato nulla.",
+      "timeout": "Il tuo portafoglio non ha risposto in tempo. Apri il portafoglio e riprova.",
+      "notConnected": "Collega e verifica un portafoglio, poi riprova.",
+      "unsupported": "Questo portafoglio non può completare quell'azione. Collega un portafoglio diverso.",
+      "unavailable": "Qui non è disponibile alcuna connessione al portafoglio. Ricollega il tuo portafoglio e riprova.",
+      "badResponse": "Il tuo portafoglio ha restituito una risposta non utilizzabile. Riprova."
     },
     "wocMarket": {
-      "title": "$WOC Exchange",
-      "close": "Close the Exchange",
-      "launcherLabel": "$WOC Exchange",
-      "tabBrowse": "Browse",
-      "tabSell": "Sell",
-      "tabActivity": "My Activities",
-      "tabsLabel": "$WOC Exchange sections",
-      "loading": "Loading the Exchange...",
-      "loadFailed": "The Exchange could not be reached. Try again shortly.",
-      "disabledRealm": "The $WOC Exchange is not available on this realm.",
-      "pausedBanner": "Trading is paused. Auctions keep counting down; new listings, bids, offers, and payments wait until trading resumes, and a payment already sent still settles.",
-      "walletBanner": "Link and verify a wallet to bid, buy, or sell on the Exchange.",
-      "walletBannerCta": "Connect wallet",
-      "rateNote": "Rate: about {tokens} $WOC per $1.00 USD as of {time}.",
-      "rateNotePaused": "Last known rate: about {tokens} $WOC per $1.00 USD as of {time}.",
-      "estimateNote": "About {tokens} $WOC for {usd} at the current rate.",
-      "browseEmpty": "No listings right now. Check back soon.",
-      "browseError": "Listings could not be loaded.",
-      "colItem": "Item",
-      "colSeller": "Seller",
-      "colCurrentBid": "Current bid",
-      "colBuyNow": "Buy now",
-      "colTimeLeft": "Time left",
-      "reserveMet": "Reserve met",
-      "reserveNotMet": "Reserve not met",
-      "yourListing": "Your listing",
-      "buyNowLockedBadge": "Purchase in progress",
-      "reserveMetTip": "The seller set a hidden minimum price, and the current bid meets it.",
-      "reserveNotMetTip": "The seller set a hidden minimum price. If the highest bid at close is below it, the item is not sold and every bond is returned.",
-      "yourListingTip": "You listed this item. You cannot bid on your own listing; while it has no bids you can cancel it here or from Activity.",
-      "buyNowLockedTip": "Another buyer holds this listing while they pay. If they do not pay in time, it reopens.",
-      "pagePrev": "Previous page",
-      "pageNext": "Next page",
-      "pageNumber": "Page {current}",
-      "sortLabel": "Sort",
-      "sortEnding": "Ending soonest",
-      "sortNewest": "Newest",
-      "sortPriceAsc": "Price: low to high",
-      "sortPriceDesc": "Price: high to low",
-      "filterQuality": "Quality",
-      "filterFormat": "Format",
-      "filterAny": "Any",
-      "filterFormatAuction": "Auction",
-      "filterFormatBuyNow": "Buy now",
-      "filterItemLabel": "Item",
-      "filterItemPlaceholder": "Search by item name",
-      "filterCategory": "Category",
-      "filterCategoryWeapon": "Weapons",
-      "filterCategoryArmor": "Armor",
-      "filterCategoryMount": "Mounts",
-      "filterSubcategory": "Type",
-      "sellerLinkAria": "View recent trades by {name}",
-      "sellerTitle": "Recent trades by {name}",
-      "sellerBack": "Back to Browse",
-      "sellerEmpty": "No completed trades yet.",
-      "sellerError": "Recent trades could not be loaded.",
-      "sellerSaleRow": "{time}: {item} to {buyer} for {usd}",
-      "detailTitle": "Listing",
-      "detailSeller": "Sold by {name}",
-      "detailEndsAt": "Ends {utc} UTC ({local} local)",
-      "detailStartingBid": "Starting bid: {usd}",
-      "detailCurrentBid": "Current bid: {usd}",
-      "detailNoBids": "No bids yet",
-      "detailMinNext": "Minimum next bid: {usd}",
-      "detailBuyNow": "Buy now: {usd}",
-      "detailSales": "Recent sales",
-      "detailSaleRow": "{time}: {seller} sold to {buyer} for {usd}",
-      "detailNoSales": "No recorded sales for this item yet.",
-      "detailSalesLoading": "Loading recent sales...",
-      "bidLabel": "Your bid (USD)",
-      "bidPlaceholder": "Enter a USD amount",
-      "bidButton": "Place bid",
-      "bidAria": "Place a bid on {item}",
-      "bidTermsToggle": "Bid terms",
-      "rowOpenAria": "View the listing for {item}",
-      "buyNowButton": "Buy now for {usd}",
-      "buyNowAria": "Buy {item} now for {usd}",
-      "cancelButton": "Cancel listing",
-      "cancelAria": "Cancel your listing of {item}",
-      "bidBondNote": "Placing a bid holds a refundable bond in $WOC on top of the bid: {bond} for a bid of {bid}, more for a higher bid. It is returned when you are outbid or lose, or after you pay if you win; a second-chance offer holds it again.",
-      "bidBondSchedule": "The bond is {rate} percent of your bid, at least {min} and at most {max}.",
-      "bidBondPayWindow": "Pay the bond within {duration} of placing your bid, or the bid lapses.",
-      "bidBindingNote": "A bid is binding once you sign its bond transaction: it cannot be withdrawn, and if you win and do not pay, the bond is forfeited and your account earns a Marketplace strike.",
-      "bidCloseNote": "A bid whose bond confirms in the last 2 minutes extends the auction to 2 minutes after that bid, up to 30 minutes past the listed end. A bond that confirms after the auction closes does not count and is refunded.",
-      "offerNextNote": "If the winner does not pay, you may become the buyer at your own bid: your bond is held again (or asked for again if it was already returned) and payment is due within {duration}.",
-      "buyNowNote": "Buy now holds this listing for you for about four and a half minutes while you pay. If you do not pay in time, you cannot try this listing again for 30 minutes, and three unpaid Buy Nows within an hour pause Buy Now for you until the oldest is an hour old.",
-      "variableTokenWarning": "You are committing to pay a USD value in $WOC. The exact token amount is set by a fresh quote when payment is requested and may differ from the estimate.",
-      "quoteFixedNote": "This quote fixes the $WOC amount until it expires. A new quote may differ.",
-      "settlementDeadlineNote": "If you win, payment is due within {duration} of the auction closing.",
-      "claimCooldownRetry": "You recently walked away from a Buy Now. Try again in {duration}.",
-      "termsLabel": "I accept the Marketplace terms.",
-      "termsLink": "View the Marketplace terms (opens in a new tab)",
-      "quoteTitle": "Confirm payment",
-      "quoteTotal": "Total: {tokens} $WOC",
-      "quoteSeller": "Seller receives: {tokens} $WOC",
-      "quoteBurn": "Burned (removed from supply): {tokens} $WOC",
-      "quoteTreasury": "To the game treasury: {tokens} $WOC",
-      "quoteExpires": "Quote expires in {duration}",
-      "quoteExpiresAt": "Quote expires at {time}.",
-      "quoteExpired": "The quote expired. Request a fresh one.",
-      "quoteSign": "Sign and pay",
-      "quoteRefresh": "New quote",
-      "quoteCancel": "Not now",
-      "quoteBondFor": "Refundable bid bond: {usd}",
-      "quoteBondForItem": "Refundable bid bond for {item}: {usd}",
-      "quoteSettlementFor": "Settlement for {item}: {usd}",
-      "paymentDueAt": "Payment is due by {time}.",
-      "signing": "Waiting for your wallet...",
-      "signFailed": "Your wallet did not complete the payment. Check the wallet and try again.",
-      "signFailedConfirm": "Your wallet did not sign the confirmation. Check the wallet and try again.",
-      "confirming": "Confirming on chain...",
-      "listing": "Listing your item...",
-      "activityCancelPending": "Cancel pending",
-      "activityDirected": "Directed sale",
-      "bidPlacedStanding": "Your bid stands. You are the high bidder.",
-      "bidPlacedOutbid": "Your bond confirmed, but a higher bid landed first.",
-      "purchaseComplete": "Purchase complete. Your item arrives by Ravenpost mail.",
-      "paymentConfirmedDelivering": "Payment confirmed. Your item arrives by Ravenpost mail once delivery completes.",
-      "listingCreated": "Your listing is live.",
-      "listingCancelled": "Listing cancelled. Your item returns by Ravenpost mail.",
-      "listingCancelPending": "Cancel pending: a buyer holds the purchase window. Unless they pay, the listing closes and your item returns by Ravenpost mail.",
-      "sellTitle": "Create a listing",
-      "sellEmptyFloor": "No eligible items in your bags. This realm takes unbound equipment of {floor} quality or better.",
-      "sellCollectiblesBoth": "Mounts and mech chroma plates can also be listed.",
-      "sellCollectiblesMounts": "Mounts can also be listed.",
-      "sellCollectiblesChromas": "Mech chroma plates can also be listed.",
-      "sellLockedHidden": "Locked items are not listed here. Unlock them in your bags to sell them.",
-      "sellSearchPlaceholder": "Type to filter your bags",
-      "sellClear": "Clear {item} and choose another",
-      "sellChoose": "Item to list",
-      "sellNoMatches": "No items match that search",
-      "sellBuyNowAboveStart": "The buy-now price must be higher than the starting bid.",
-      "sellFormat": "Format",
-      "sellFormatAuction": "Auction",
-      "sellFormatBuyNow": "Buy now only",
-      "sellFormatAuctionBuyNow": "Auction with buy now",
-      "sellStart": "Starting bid (USD)",
-      "sellReserve": "Reserve (USD, optional)",
-      "sellReserveNote": "Optional, at least the starting bid. Bidders see only whether it is met; if the highest bid at close is below it, the item comes back to you unsold and every bond is returned.",
-      "sellBuyNowNote": "Required. A buy-now listing sells at this price with no bidding.",
-      "sellBuyNowAuctionNote": "Optional. Set a price a buyer can pay to end the auction early; it must be above the starting bid and the reserve.",
-      "sellBuyNowPrice": "Buy-now price (USD)",
-      "sellDuration": "Duration",
-      "sellOfferNext": "If the winner does not pay, sell to the next-highest bidder whose bid meets the reserve, at their bid, instead of ending unsold.",
-      "sellSubmit": "List item",
-      "sellSubmitAria": "List {item} on the Exchange",
-      "sellFeeNote": "A completed sale pays an Exchange fee out of the price: part is burned and part goes to the treasury, and you receive the remainder at your linked wallet in the settlement transaction. The fee for the price you enter is shown here; on an auction it follows the final price.",
-      "activityListings": "My listings",
-      "activityBids": "My bids",
-      "activitySettlements": "My settlements",
-      "activityEmpty": "You have no bids, listings, or settlements yet. Your Exchange activity appears here.",
-      "activityNoListings": "You have no listings.",
-      "activityNoBids": "You have no bids.",
-      "activityNoSettlements": "You have no settlements.",
-      "activityPayNow": "Pay now",
-      "activityPayNowAria": "Pay for settlement {id} now",
-      "activityPayNowItemAria": "Pay {usd} for {item} now",
-      "activityDeadline": "Payment due in {duration}",
-      "dueAt": "Due {utc} UTC ({local} local)",
-      "activityStrikes": "Marketplace strikes: {count}",
-      "activitySuspended": "Exchange suspended for {duration} after unpaid deals: no bids, purchases, listings, or $WOC trades until then.",
-      "strikesTip": "A strike is earned each time you do not pay for a deal you committed to. After the first, each strike suspends you from the Exchange for longer: 3 days, then 14, then 90, then a year.",
-      "bidStatusPending": "Awaiting bond",
-      "bidStatusActive": "High bidder",
-      "bidStatusOutbid": "Outbid",
-      "bidStatusLapsed": "Lapsed",
-      "bidStatusWon": "Won",
-      "bidStatusDefaulted": "Defaulted",
-      "bidStatusCancelled": "Cancelled",
-      "bidBondPay": "Pay bond",
-      "bidBondPayAria": "Pay the bond for your bid on listing {id}",
-      "bidBondPayItemAria": "Pay the {bond} bond for your bid on {item}",
-      "settlementOffered": "Payment due",
-      "settlementConfirming": "Confirming",
-      "settlementConfirmedDelivering": "Payment confirmed, delivering",
-      "settlementReview": "Payment under review",
-      "settlementDelivered": "Delivered",
-      "settlementExpired": "Expired unpaid",
-      "settlementFailed": "Payment failed",
-      "settlementFailBurnMissing": "The payment did not include the required token burn.",
-      "settlementFailBurnMismatch": "The payment burned the wrong token amount.",
-      "settlementFailBurnAuthority": "The token burn came from a wallet this purchase did not name.",
-      "settlementFailUnexpectedCredit": "The transaction paid a wallet outside this purchase.",
-      "settlementFailQuoteExpired": "The payment quote expired before it was used. Request a fresh one and pay again.",
-      "settlementFailTransaction": "The payment transaction failed on the network. Request a fresh quote and try again.",
-      "settlementFailRefunded": "This payment was returned to your wallet.",
-      "settlementFailSuperseded": "This payment attempt was replaced by a newer one.",
-      "settlementFailConfirmingOverdue": "This payment took too long to confirm and could not be verified.",
-      "settlementFailGeneric": "This payment could not be completed.",
-      "paymentSeenAwaitingFinality": "Payment seen on the ledger. Waiting for final confirmation.",
-      "paymentNotYetVisible": "No payment is visible on the ledger yet. It can take a moment to appear.",
-      "paymentServiceUnreachable": "The payment service is unreachable. Your payment stays recorded and will be re-checked.",
-      "paymentPendingGeneric": "Your payment is submitted and awaiting confirmation.",
-      "bondSeenAwaitingFinality": "Bond payment seen on the ledger. Waiting for final confirmation.",
-      "bondNotYetVisible": "No bond payment is visible on the ledger yet. It can take a moment to appear.",
-      "bondServiceUnreachable": "The payment service is unreachable. Your bond payment stays recorded and will be re-checked.",
-      "bondPendingGeneric": "Your bond payment is submitted and awaiting confirmation.",
-      "listingStatusActive": "Active",
-      "listingStatusSettling": "Awaiting payment",
-      "listingStatusSold": "Sold",
-      "listingStatusReturned": "Returned",
-      "listingStatusCancelled": "Cancelled",
-      "listingStatusSuspended": "Suspended",
-      "listingStatusUnsold": "Unsold"
+      "title": "Borsa $WOC",
+      "close": "Chiudi la Borsa",
+      "launcherLabel": "Borsa $WOC",
+      "tabBrowse": "Sfoglia",
+      "tabSell": "Vendi",
+      "tabActivity": "Le mie attività",
+      "tabsLabel": "Sezioni della Borsa $WOC",
+      "loading": "Caricamento della Borsa...",
+      "loadFailed": "Impossibile raggiungere la Borsa. Riprova tra poco.",
+      "disabledRealm": "La Borsa $WOC non è disponibile su questo reame.",
+      "pausedBanner": "Le contrattazioni sono in pausa. Le aste continuano il conto alla rovescia; nuove inserzioni, offerte, acquisti immediati e pagamenti attendono che le contrattazioni riprendano, e un pagamento già inviato viene comunque saldato.",
+      "walletBanner": "Collega e verifica un portafoglio per fare offerte, acquistare o vendere sulla Borsa.",
+      "walletBannerCta": "Collega portafoglio",
+      "rateNote": "Tasso: circa {tokens} $WOC per 1,00 USD al {time}.",
+      "rateNotePaused": "Ultimo tasso noto: circa {tokens} $WOC per 1,00 USD al {time}.",
+      "estimateNote": "Circa {tokens} $WOC per {usd} al tasso attuale.",
+      "browseEmpty": "Nessuna inserzione al momento. Ricontrolla tra poco.",
+      "browseError": "Non è stato possibile caricare le inserzioni.",
+      "colItem": "Oggetto",
+      "colSeller": "Venditore",
+      "colCurrentBid": "Offerta attuale",
+      "colBuyNow": "Acquisto immediato",
+      "colTimeLeft": "Tempo rimasto",
+      "reserveMet": "Riserva raggiunta",
+      "reserveNotMet": "Riserva non raggiunta",
+      "yourListing": "La tua inserzione",
+      "buyNowLockedBadge": "Acquisto in corso",
+      "reserveMetTip": "Il venditore ha impostato un prezzo minimo nascosto, e l'offerta attuale lo raggiunge.",
+      "reserveNotMetTip": "Il venditore ha impostato un prezzo minimo nascosto. Se l'offerta più alta alla chiusura è inferiore, l'oggetto non viene venduto e ogni cauzione viene restituita.",
+      "yourListingTip": "Hai messo in vendita tu questo oggetto. Non puoi fare offerte sulla tua stessa inserzione; finché non ha offerte puoi annullarla qui o dalla scheda Attività.",
+      "buyNowLockedTip": "Un altro acquirente sta trattenendo questa inserzione mentre paga. Se non paga in tempo, l'inserzione riapre.",
+      "pagePrev": "Pagina precedente",
+      "pageNext": "Pagina successiva",
+      "pageNumber": "Pagina {current}",
+      "sortLabel": "Ordina",
+      "sortEnding": "In scadenza",
+      "sortNewest": "Più recenti",
+      "sortPriceAsc": "Prezzo: dal più basso al più alto",
+      "sortPriceDesc": "Prezzo: dal più alto al più basso",
+      "filterQuality": "Qualità",
+      "filterFormat": "Formato",
+      "filterAny": "Qualsiasi",
+      "filterFormatAuction": "Asta",
+      "filterFormatBuyNow": "Acquisto immediato",
+      "filterItemLabel": "Oggetto",
+      "filterItemPlaceholder": "Cerca per nome dell'oggetto",
+      "filterCategory": "Categoria",
+      "filterCategoryWeapon": "Armi",
+      "filterCategoryArmor": "Armatura",
+      "filterCategoryMount": "Cavalcature",
+      "filterSubcategory": "Tipo",
+      "sellerLinkAria": "Visualizza le vendite recenti di {name}",
+      "sellerTitle": "Vendite recenti di {name}",
+      "sellerBack": "Torna a Sfoglia",
+      "sellerEmpty": "Ancora nessuna vendita conclusa.",
+      "sellerError": "Impossibile caricare le vendite recenti.",
+      "sellerSaleRow": "{time}: {item} a {buyer} per {usd}",
+      "detailTitle": "Inserzione",
+      "detailSeller": "Venduto da {name}",
+      "detailEndsAt": "Termina alle {utc} UTC ({local} ora locale)",
+      "detailStartingBid": "Offerta di partenza: {usd}",
+      "detailCurrentBid": "Offerta attuale: {usd}",
+      "detailNoBids": "Ancora nessuna offerta",
+      "detailMinNext": "Offerta minima successiva: {usd}",
+      "detailBuyNow": "Acquisto immediato: {usd}",
+      "detailSales": "Vendite recenti",
+      "detailSaleRow": "{time}: {seller} ha venduto a {buyer} per {usd}",
+      "detailNoSales": "Ancora nessuna vendita registrata per questo oggetto.",
+      "detailSalesLoading": "Caricamento delle vendite recenti...",
+      "bidLabel": "La tua offerta (USD)",
+      "bidPlaceholder": "Inserisci un importo in USD",
+      "bidButton": "Fai un'offerta",
+      "bidAria": "Fai un'offerta per {item}",
+      "bidTermsToggle": "Termini dell'offerta",
+      "rowOpenAria": "Visualizza l'inserzione di {item}",
+      "buyNowButton": "Compra subito per {usd}",
+      "buyNowAria": "Compra subito {item} per {usd}",
+      "cancelButton": "Annulla inserzione",
+      "cancelAria": "Annulla la tua inserzione di {item}",
+      "bidBondNote": "Fare un'offerta trattiene una cauzione rimborsabile in $WOC oltre all'offerta stessa: {bond} per un'offerta di {bid}, di più per un'offerta più alta. Viene restituita quando vieni superato o perdi, oppure dopo che paghi se vinci; un'offerta di seconda occasione la trattiene di nuovo.",
+      "bidBondSchedule": "La cauzione è pari al {rate} percento della tua offerta, almeno {min} e al massimo {max}.",
+      "bidBondPayWindow": "Paga la cauzione entro {duration} dalla tua offerta, altrimenti l'offerta decade.",
+      "bidBindingNote": "Un'offerta diventa vincolante non appena firmi la transazione della cauzione: non può essere ritirata, e se vinci e non paghi, la cauzione viene persa e il tuo account riceve un richiamo del mercato.",
+      "bidCloseNote": "Un'offerta la cui cauzione si conferma negli ultimi 2 minuti estende l'asta a 2 minuti dopo quell'offerta, fino a 30 minuti oltre la fine prevista. Una cauzione che si conferma dopo la chiusura dell'asta non conta e viene rimborsata.",
+      "offerNextNote": "Se il vincitore non paga, potresti diventare tu l'acquirente alla tua stessa offerta: la tua cauzione viene trattenuta di nuovo (o richiesta di nuovo se era già stata restituita) e il pagamento è dovuto entro {duration}.",
+      "buyNowNote": "L'Acquisto immediato ti trattiene questa inserzione per circa quattro minuti e mezzo mentre paghi. Se non paghi in tempo, non puoi riprovare su questa inserzione per 30 minuti, e tre Acquisti immediati non pagati entro un'ora sospendono l'Acquisto immediato per te finché il più vecchio non ha un'ora.",
+      "variableTokenWarning": "Ti stai impegnando a pagare un valore in USD tramite $WOC. L'importo esatto in token viene fissato da una nuova quotazione al momento della richiesta di pagamento e potrebbe differire dalla stima.",
+      "quoteFixedNote": "Questa quotazione fissa l'importo in $WOC fino alla scadenza. Una nuova quotazione potrebbe differire.",
+      "settlementDeadlineNote": "Se vinci, il pagamento è dovuto entro {duration} dalla chiusura dell'asta.",
+      "claimCooldownRetry": "Hai recentemente abbandonato un Acquisto immediato. Riprova tra {duration}.",
+      "termsLabel": "Accetto i termini della Borsa.",
+      "termsLink": "Visualizza i termini della Borsa (si apre in una nuova scheda)",
+      "quoteTitle": "Conferma il pagamento",
+      "quoteTotal": "Totale: {tokens} $WOC",
+      "quoteSeller": "Il venditore riceve: {tokens} $WOC",
+      "quoteBurn": "Bruciati (rimossi dalla circolazione): {tokens} $WOC",
+      "quoteTreasury": "Alla tesoreria di gioco: {tokens} $WOC",
+      "quoteExpires": "La quotazione scade tra {duration}",
+      "quoteExpiresAt": "La quotazione scade alle {time}.",
+      "quoteExpired": "La quotazione è scaduta. Richiedine una nuova.",
+      "quoteSign": "Firma e paga",
+      "quoteRefresh": "Nuova quotazione",
+      "quoteCancel": "Non ora",
+      "quoteBondFor": "Cauzione rimborsabile dell'offerta: {usd}",
+      "quoteBondForItem": "Cauzione rimborsabile dell'offerta per {item}: {usd}",
+      "quoteSettlementFor": "Pagamento per {item}: {usd}",
+      "paymentDueAt": "Il pagamento è dovuto entro le {time}.",
+      "signing": "In attesa del tuo portafoglio...",
+      "signFailed": "Il tuo portafoglio non ha completato il pagamento. Controlla il portafoglio e riprova.",
+      "signFailedConfirm": "Il tuo portafoglio non ha firmato la conferma. Controlla il portafoglio e riprova.",
+      "confirming": "Conferma sulla blockchain...",
+      "listing": "Messa in vendita del tuo oggetto...",
+      "activityCancelPending": "Annullamento in sospeso",
+      "activityDirected": "Vendita diretta",
+      "bidPlacedStanding": "La tua offerta resta valida. Sei il miglior offerente.",
+      "bidPlacedOutbid": "La tua cauzione è stata confermata, ma un'offerta più alta è arrivata prima.",
+      "purchaseComplete": "Acquisto completato. Il tuo oggetto arriva tramite la Posta dei Corvi.",
+      "paymentConfirmedDelivering": "Pagamento confermato. Il tuo oggetto arriva tramite la Posta dei Corvi al termine della consegna.",
+      "listingCreated": "La tua inserzione è attiva.",
+      "listingCancelled": "Inserzione annullata. Il tuo oggetto ti torna tramite la Posta dei Corvi.",
+      "listingCancelPending": "Annullamento in sospeso: un acquirente sta trattenendo la finestra d'acquisto. Se non paga, l'inserzione si chiude e il tuo oggetto ti torna tramite la Posta dei Corvi.",
+      "sellTitle": "Crea un'inserzione",
+      "sellEmptyFloor": "Nessun oggetto idoneo nelle tue borse. Questo reame accetta equipaggiamento non vincolato di qualità {floor} o superiore.",
+      "sellCollectiblesBoth": "Puoi mettere in vendita anche cavalcature e placche chroma per mech.",
+      "sellCollectiblesMounts": "Puoi mettere in vendita anche le cavalcature.",
+      "sellCollectiblesChromas": "Puoi mettere in vendita anche le placche chroma per mech.",
+      "sellLockedHidden": "Gli oggetti bloccati non sono elencati qui. Sbloccali nelle tue borse per venderli.",
+      "sellSearchPlaceholder": "Digita per filtrare le tue borse",
+      "sellClear": "Rimuovi {item} e scegline un altro",
+      "sellChoose": "Oggetto da mettere in vendita",
+      "sellNoMatches": "Nessun oggetto corrisponde a questa ricerca",
+      "sellBuyNowAboveStart": "Il prezzo di acquisto immediato deve essere superiore all'offerta di partenza.",
+      "sellFormat": "Formato",
+      "sellFormatAuction": "Asta",
+      "sellFormatBuyNow": "Solo acquisto immediato",
+      "sellFormatAuctionBuyNow": "Asta con acquisto immediato",
+      "sellStart": "Offerta di partenza (USD)",
+      "sellReserve": "Riserva (USD, facoltativa)",
+      "sellReserveNote": "Facoltativa, almeno pari all'offerta di partenza. Gli offerenti vedono solo se viene raggiunta; se l'offerta più alta alla chiusura è inferiore, l'oggetto ti torna invenduto e ogni cauzione viene restituita.",
+      "sellBuyNowNote": "Obbligatorio. Un'inserzione ad acquisto immediato si vende a questo prezzo, senza offerte.",
+      "sellBuyNowAuctionNote": "Facoltativo. Imposta un prezzo che un acquirente può pagare per concludere in anticipo l'asta; deve essere superiore sia all'offerta di partenza sia alla riserva.",
+      "sellBuyNowPrice": "Prezzo di acquisto immediato (USD)",
+      "sellDuration": "Durata",
+      "sellOfferNext": "Se il vincitore non paga, vendi al miglior offerente successivo la cui offerta raggiunge la riserva, alla sua offerta, invece di concludere l'inserzione come invenduta.",
+      "sellSubmit": "Metti in vendita",
+      "sellSubmitAria": "Metti in vendita {item} sulla Borsa",
+      "sellFeeNote": "Una vendita conclusa paga una commissione della Borsa detratta dal prezzo: una parte viene bruciata e una parte va alla tesoreria, e tu ricevi il resto sul tuo portafoglio collegato nella transazione di pagamento. La commissione per il prezzo che inserisci è mostrata qui; in un'asta segue il prezzo finale.",
+      "activityListings": "Le mie inserzioni",
+      "activityBids": "Le mie offerte",
+      "activitySettlements": "Le mie operazioni concluse",
+      "activityEmpty": "Non hai ancora offerte, inserzioni o operazioni concluse. La tua attività sulla Borsa appare qui.",
+      "activityNoListings": "Non hai inserzioni.",
+      "activityNoBids": "Non hai offerte.",
+      "activityNoSettlements": "Non hai operazioni concluse.",
+      "activityPayNow": "Paga ora",
+      "activityPayNowAria": "Paga ora l'operazione {id}",
+      "activityPayNowItemAria": "Paga ora {usd} per {item}",
+      "activityDeadline": "Pagamento dovuto tra {duration}",
+      "dueAt": "Scade alle {utc} UTC ({local} ora locale)",
+      "activityStrikes": "Richiami del mercato: {count}",
+      "activitySuspended": "Borsa sospesa per {duration} a causa di accordi non pagati: niente offerte, acquisti, inserzioni o scambi in $WOC fino ad allora.",
+      "strikesTip": "Ricevi un richiamo ogni volta che non paghi un affare a cui ti sei impegnato. Dal secondo in poi, ogni richiamo ti sospende dalla Borsa più a lungo: 3 giorni, poi 14, poi 90, poi un anno.",
+      "bidStatusPending": "In attesa di cauzione",
+      "bidStatusActive": "Miglior offerente",
+      "bidStatusOutbid": "Superata",
+      "bidStatusLapsed": "Decaduta",
+      "bidStatusWon": "Vinta",
+      "bidStatusDefaulted": "Inadempiente",
+      "bidStatusCancelled": "Annullata",
+      "bidBondPay": "Paga la cauzione",
+      "bidBondPayAria": "Paga la cauzione per la tua offerta sull'inserzione {id}",
+      "bidBondPayItemAria": "Paga la cauzione di {bond} per la tua offerta su {item}",
+      "settlementOffered": "Pagamento dovuto",
+      "settlementConfirming": "Conferma in corso",
+      "settlementConfirmedDelivering": "Pagamento confermato, in consegna",
+      "settlementReview": "Pagamento in verifica",
+      "settlementDelivered": "Consegnato",
+      "settlementExpired": "Scaduto non pagato",
+      "settlementFailed": "Pagamento non riuscito",
+      "settlementFailBurnMissing": "Il pagamento non ha bruciato la quantità di token richiesta.",
+      "settlementFailBurnMismatch": "Il pagamento ha bruciato una quantità di token errata.",
+      "settlementFailBurnAuthority": "I token sono stati bruciati da un portafoglio che questo acquisto non indicava.",
+      "settlementFailUnexpectedCredit": "La transazione ha pagato un portafoglio estraneo a questo acquisto.",
+      "settlementFailQuoteExpired": "La quotazione di pagamento è scaduta prima di essere utilizzata. Richiedine una nuova e paga di nuovo.",
+      "settlementFailTransaction": "La transazione di pagamento non è riuscita sulla rete. Richiedi una nuova quotazione e riprova.",
+      "settlementFailRefunded": "Questo pagamento è stato restituito al tuo portafoglio.",
+      "settlementFailSuperseded": "Questo tentativo di pagamento è stato sostituito da uno più recente.",
+      "settlementFailConfirmingOverdue": "Questo pagamento ha impiegato troppo tempo a confermarsi e non è stato possibile verificarlo.",
+      "settlementFailGeneric": "Non è stato possibile completare questo pagamento.",
+      "paymentSeenAwaitingFinality": "Pagamento visto sul registro. In attesa della conferma definitiva.",
+      "paymentNotYetVisible": "Nessun pagamento è ancora visibile sul registro. Potrebbe metterci un momento a comparire.",
+      "paymentServiceUnreachable": "Il servizio di pagamento non è raggiungibile. Il tuo pagamento resta registrato e verrà ricontrollato.",
+      "paymentPendingGeneric": "Il tuo pagamento è stato inviato ed è in attesa di conferma.",
+      "bondSeenAwaitingFinality": "Pagamento della cauzione visto sul registro. In attesa della conferma definitiva.",
+      "bondNotYetVisible": "Nessun pagamento della cauzione è ancora visibile sul registro. Potrebbe volerci un momento prima che compaia.",
+      "bondServiceUnreachable": "Il servizio di pagamento non è raggiungibile. Il pagamento della tua cauzione resta registrato e verrà ricontrollato.",
+      "bondPendingGeneric": "Il pagamento della tua cauzione è stato inviato ed è in attesa di conferma.",
+      "listingStatusActive": "Attiva",
+      "listingStatusSettling": "In attesa di pagamento",
+      "listingStatusSold": "Venduta",
+      "listingStatusReturned": "Restituita",
+      "listingStatusCancelled": "Annullata",
+      "listingStatusSuspended": "Sospesa",
+      "listingStatusUnsold": "Invenduta"
     }
   },
   "gatherEvent": {
@@ -4449,6 +4470,10 @@ export const it_IT: EnTranslations = {
     "deeds": {
       "invalid_input": "Dati non validi."
     },
+    "guilds": {
+      "invalid_roster_name": "Nome di gilda non valido.",
+      "unknown": "Nessuna gilda con questo nome."
+    },
     "steam": {
       "disabled": "Il collegamento a Steam non è disponibile al momento.",
       "invalid_ticket": "Steam non è riuscito a verificare questa richiesta di collegamento. Riprova dall'app desktop.",
@@ -4488,53 +4513,53 @@ export const it_IT: EnTranslations = {
       "not_marked": "Quell'account non è contrassegnato."
     },
     "woc_market": {
-      "invalid_input": "Invalid input.",
-      "disabled": "The $WOC Exchange is not available on this realm.",
-      "paused": "Exchange trading is paused. Auctions keep counting down.",
-      "wallet_required": "Link and verify a wallet before trading on the Exchange.",
-      "recipient_wallet_required": "That player must connect a wallet before they can accept $WOC payments.",
-      "self_offer": "You cannot send a $WOC offer to yourself.",
-      "offer_expired": "That $WOC offer expired. Ask for a new one.",
-      "terms_required": "Accept the Marketplace terms to continue.",
-      "totp_required": "This amount requires two-factor authentication. Enable it in account settings, then enter your code.",
-      "totp_invalid": "That two-factor code did not verify. Try again.",
-      "suspended": "Your Exchange access is suspended after unpaid deals: no bids, purchases, listings, or $WOC trades.",
-      "character_invalid": "Play the character you are listing from, and try again.",
-      "not_found": "That Exchange entry no longer exists.",
-      "not_yours": "That Exchange entry no longer exists.",
-      "not_active": "That listing is no longer open for this action.",
-      "own_listing": "You cannot bid on or buy your own listing.",
-      "has_bids": "A listing with bids cannot be withdrawn. Contact support if you must cancel.",
-      "bid_too_low": "Your bid does not clear the current bid plus its increment.",
-      "already_pending": "Confirm or abandon your pending bid on this listing first.",
-      "insufficient_balance": "Your wallet does not hold enough $WOC for this bid and its bond.",
-      "quote_unavailable": "A price quote could not be issued right now. Try again shortly.",
-      "quote_expired": "That quote expired. Request a fresh one; if none is offered, that window has closed.",
-      "not_pending": "That bid is no longer awaiting its bond.",
-      "confirm_failed": "The transaction could not be confirmed. Request a fresh quote and try again.",
-      "confirm_in_flight": "Your payment is still confirming. Try again once it resolves.",
-      "buy_now_locked": "Another buyer is completing this purchase. Try again in a moment.",
-      "cancel_pending": "The seller is cancelling this listing.",
-      "claim_cooldown": "You recently walked away from a Buy Now. Try again later.",
-      "bond_window_closed": "This bid can no longer be paid: its payment window has closed. Bid again for a fresh one.",
-      "settlement_in_flight": "A buyer is paying for this listing. Try again once the payment settles.",
-      "contended": "The Exchange is busy with this listing. Try again in a moment.",
-      "sale_conflict": "Another live sale record stands for this listing. Exclude it first.",
-      "no_buy_now": "This listing has no buy-now price.",
-      "cap_reached": "You have reached your Exchange listing limit.",
-      "stale_item": "That item changed or moved. Re-select it and try again.",
-      "item_mismatch": "That is not the exact copy the buyer agreed to, or its state changed (a lock counts). Start a fresh deal for it.",
-      "offer_pending": "You already have a deal standing with this player. Resolve it first.",
-      "not_eligible": "That item cannot be listed on the $WOC Exchange.",
-      "invalid_params": "Check the starting bid, reserve, buy-now price, and duration.",
-      "signature_reused": "That transaction was already submitted.",
-      "item_locked": "That item is locked. Unlock it in your bags before selling it.",
-      "stepup_required": "Selling on the Exchange needs a signature from your linked wallet.",
-      "stepup_challenge_invalid": "That wallet confirmation is no longer valid. Start the sale again.",
-      "stepup_challenge_expired": "The wallet confirmation expired. Start the sale again.",
-      "stepup_wallet_mismatch": "Your linked wallet changed since this confirmation was issued. Start the sale again.",
-      "stepup_binding_mismatch": "That wallet confirmation does not match this sale. Start the sale again.",
-      "stepup_signature_invalid": "The wallet signature did not verify. Start the sale again."
+      "invalid_input": "Input non valido.",
+      "disabled": "La Borsa $WOC non è disponibile su questo reame.",
+      "paused": "Le contrattazioni della Borsa sono in pausa. Le aste continuano il conto alla rovescia.",
+      "wallet_required": "Collega e verifica un portafoglio prima di scambiare sulla Borsa.",
+      "recipient_wallet_required": "Quel giocatore deve collegare un portafoglio prima di poter accettare pagamenti in $WOC.",
+      "self_offer": "Non puoi inviare un'offerta in $WOC a te stesso.",
+      "offer_expired": "Quell'offerta in $WOC è scaduta. Richiedine una nuova.",
+      "terms_required": "Accetta i termini della Borsa per continuare.",
+      "totp_required": "Questo importo richiede l'autenticazione a due fattori. Attivala nelle impostazioni dell'account, poi inserisci il tuo codice.",
+      "totp_invalid": "Quel codice di autenticazione a due fattori non è stato verificato. Riprova.",
+      "suspended": "Il tuo accesso alla Borsa è sospeso a causa di affari non pagati: niente offerte, acquisti, inserzioni o scambi in $WOC.",
+      "character_invalid": "Gioca con il personaggio da cui stai mettendo in vendita, e riprova.",
+      "not_found": "Quella voce della Borsa non esiste più.",
+      "not_yours": "Quella voce della Borsa non esiste più.",
+      "not_active": "Quell'inserzione non è più aperta per questa azione.",
+      "own_listing": "Non puoi fare offerte né acquistare la tua stessa inserzione.",
+      "has_bids": "Un'inserzione con offerte non può essere ritirata. Contatta l'assistenza se devi annullarla.",
+      "bid_too_low": "La tua offerta non supera l'offerta attuale più il suo incremento.",
+      "already_pending": "Prima conferma o abbandona la tua offerta in sospeso su questa inserzione.",
+      "insufficient_balance": "Il tuo portafoglio non contiene abbastanza $WOC per questa offerta e la sua cauzione.",
+      "quote_unavailable": "Al momento non è stato possibile emettere una quotazione di prezzo. Riprova a breve.",
+      "quote_expired": "Quella quotazione è scaduta. Richiedine una nuova; se non te ne viene offerta una, quella finestra si è chiusa.",
+      "not_pending": "Quell'offerta non è più in attesa della sua cauzione.",
+      "confirm_failed": "Non è stato possibile confermare la transazione. Richiedi una nuova quotazione e riprova.",
+      "confirm_in_flight": "Il tuo pagamento è ancora in fase di conferma. Riprova una volta che si sarà concluso.",
+      "buy_now_locked": "Un altro acquirente sta completando questo acquisto. Riprova tra un momento.",
+      "cancel_pending": "Il venditore sta annullando questa inserzione.",
+      "claim_cooldown": "Hai recentemente abbandonato un Acquisto immediato. Riprova più tardi.",
+      "bond_window_closed": "Questa offerta non può più essere pagata: la sua finestra di pagamento si è chiusa. Fai una nuova offerta per ottenerne una fresca.",
+      "settlement_in_flight": "Un acquirente sta pagando questa inserzione. Riprova una volta che il pagamento sarà saldato.",
+      "contended": "La Borsa è occupata con questa inserzione. Riprova tra un momento.",
+      "sale_conflict": "Esiste già un'altra registrazione di vendita attiva per questa inserzione. Escludila prima di continuare.",
+      "no_buy_now": "Questa inserzione non ha un prezzo di acquisto immediato.",
+      "cap_reached": "Hai raggiunto il limite di inserzioni sulla Borsa.",
+      "stale_item": "Quell'oggetto è cambiato o è stato spostato. Selezionalo di nuovo e riprova.",
+      "item_mismatch": "Non è la copia esatta su cui l'acquirente si era accordato, oppure il suo stato è cambiato (anche un blocco conta). Avvia un nuovo affare per questo oggetto.",
+      "offer_pending": "Hai già un affare in sospeso con questo giocatore. Risolvilo prima di continuare.",
+      "not_eligible": "Quell'oggetto non può essere messo in vendita sulla Borsa $WOC.",
+      "invalid_params": "Controlla l'offerta di partenza, la riserva, il prezzo di acquisto immediato e la durata.",
+      "signature_reused": "Quella transazione è già stata inviata.",
+      "item_locked": "Quell'oggetto è bloccato. Sbloccalo nelle tue borse prima di venderlo.",
+      "stepup_required": "Vendere sulla Borsa richiede una firma dal tuo portafoglio collegato.",
+      "stepup_challenge_invalid": "Quella conferma del portafoglio non è più valida. Avvia di nuovo la vendita.",
+      "stepup_challenge_expired": "La conferma del portafoglio è scaduta. Avvia di nuovo la vendita.",
+      "stepup_wallet_mismatch": "Il tuo portafoglio collegato è cambiato da quando questa conferma è stata emessa. Avvia di nuovo la vendita.",
+      "stepup_binding_mismatch": "Quella conferma del portafoglio non corrisponde a questa vendita. Avvia di nuovo la vendita.",
+      "stepup_signature_invalid": "La firma del portafoglio non è stata verificata. Avvia di nuovo la vendita."
     }
   },
   "guide": {
@@ -4572,7 +4597,6 @@ export const it_IT: EnTranslations = {
       "combat": "Combattimento",
       "talents": "Talenti",
       "arena": "Arena e PvP",
-      "valeCup": "Coppa della Valle",
       "thornhollow": "Campi di Thornhollow",
       "deeds": "Libro delle Imprese",
       "reliquary": "Il Reliquiario",
@@ -4682,6 +4706,8 @@ export const it_IT: EnTranslations = {
         "fenBlurb": "Oltre la corona di autunno, una palude luminosa di salici e acque immobili, e un paese dietro un fossato.",
         "farshoreName": "Farshore",
         "farshoreBlurb": "Un'isola oltre la barra di sabbia, dove il cielo si squarcia sopra i Campi degli Squarci e Gullhaven suona la sua campana per ogni breccia.",
+        "provingName": "La Riva della Prova",
+        "provingBlurb": "Una tranquilla isola d'addestramento al di là dello stretto, dove i nuovi avventurieri trovano il loro equilibrio prima che la valle chieda loro qualcosa.",
         "nightName": "Nightbloom",
         "nightBlurb": "Una terra di mezzanotte stellata dove i fiori illuminano i sentieri e Moonrest veglia senza sosta.",
         "hauntName": "Wraithwood",
@@ -4783,7 +4809,6 @@ export const it_IT: EnTranslations = {
       "reliquary": "Il Reliquiario",
       "sheathe": "Rinfodera/Sfodera Arma",
       "crafting": "Creazione",
-      "valeCup": "Coppa della Valle",
       "mount": "Cavalca / Smonta",
       "calendar": "Calendario degli eventi",
       "dungeonFinder": "Cercatore di Dungeon",
@@ -5645,6 +5670,10 @@ export const it_IT: EnTranslations = {
       "farshoreGreeting": "Sei venuto attraverso il Ferrywalk? Allora sei il primo in una settimana, e il Guardiano vorrà darti un'occhiata.",
       "farshoreGreeter": "Guardiano della Campana Tam, l'Approdo",
       "farshorePlaceNotes": "Gullhaven è l'unico paese dell'isola e il suo ridotto. L'Approdo è dove il Ferrywalk tocca la riva, con una campana di vedetta che sovrasta la punta; il Prato della Vedetta tiene l'altura a sud-est del paese, dove una sentinella degli squarci ascolta la prossima breccia; le Scogliere Squarciate si spaccano all'estremità meridionale dell'isola; e i Campi degli Squarci sono i filari di grano devastati a est di Gullhaven, ancora brulicanti di ciò che è passato attraverso la breccia lì.",
+      "provingBlurb": "Una tranquilla isola al di là dello stretto rispetto alla valle, tenuta come terreno d'addestramento: un accampamento, un campo d'addestramento, una spiaggia disseminata di relitti, e un traghetto che va e viene.",
+      "provingGreeting": "Ogni eroe che la valle abbia mai ringraziato è stato dove sei tu ora, e nessuno di loro sapeva da che parte impugnare una lama.",
+      "provingGreeter": "Istruttrice Maren, Campo di Dawnrest",
+      "provingPlaceNotes": "Il Campo di Dawnrest è l'intero insediamento dell'isola: qualche tenda, una bancarella, e un fuoco del raduno. Il Vecchio Molo guarda verso la valle, dove il cerchio di traversata porta i diplomati oltre lo stretto; il Campo d'Addestramento a sud del campo tiene in piedi le sue effigie di paglia per chiunque ne abbia bisogno; e la Linea dei Relitti è la spiaggia disseminata di recupero dove la marea paga l'isola in casse del naufrago.",
       "travelTitle": "Come spostarsi",
       "travelBody": "Ogni strada del reame si percorre a piedi o a cavallo. Non ci sono percorsi di volo, non ci sono taxi, e non c'è una rete di teletrasporto: la mappa è un'unica massa continentale, e ogni collegamento è qualcosa su cui puoi mettere i piedi. Le creste dividono un reame dal successivo, e dove due reami condividono una cresta la strada sale attraverso un passo. Non tutti i confini funzionano così, però. A nord una lunga strada rialzata porta la via sull'acqua dalla Valletta Velata fino alle terre innevate oltre, e più a sud un sottile banco di sabbia naturale chiamato Ferrywalk corre a est dalla costa della Valle fino all'Approdo sull'isola del Farshore, che non ha alcun confine di terra. E c'è esattamente un'unica vera porta in tutto il mondo aperto: un velo di crepuscolo alto su Thornpeak che si apre sulla Valletta Velata. Il crinale meridionale della Valletta è sigillato, senza alcun passo che lo attraversi, quindi quel velo è il modo in cui vi entri la prima volta, e si richiude alle tue spalle sulla via del ritorno.\n\nOvunque tu cada, la strada del ritorno è breve. Ogni zona custodisce almeno un cimitero con un Custode Pallido che aleggia sulle pietre, e uno spirito liberato risorge nel più vicino di essi.\n\nLa mappa non finisce contro un muro invisibile. La terra sfuma in spiagge e promontori, e poi in acque aperte. I tratti d'acqua che il mondo prevede tu attraversi a nuoto, gli stretti e i laghetti tra un reame e l'altro, sono calmi e sicuri da attraversare. Se ti spingi invece verso il mare aperto, è la distanza stessa a respingerti: vieni avvisato, e avvisato di nuovo, e se continui a nuotare il mare ti prosciuga le forze finché non ti uccide. Anche immergersi ha il proprio limite, dato che il fiato si esaurisce sott'acqua, quindi risali per respirare e torna indietro quando l'acqua te lo dice.",
       "mountsTitle": "Cavalcature",
@@ -5861,36 +5890,6 @@ export const it_IT: EnTranslations = {
       "ladderBody": "Ogni incontro muove una classifica di campo di battaglia persistente e legata al personaggio, vittoria o sconfitta, e la tabella di tutti i tempi ordina i campioni del reame.",
       "rewardsHeading": "Cosa paga una partita",
       "rewardsBody": "Ogni partita conclusa paga Onore: di più per una vittoria, una consolazione per una sconfitta o un pareggio, più una piccola quantità per ogni colpo di grazia che infliggi e ogni assistenza che fornisci, così combattere lontano dalle bandiere vale comunque la pena. La tua prima vittoria di ogni giorno paga un bonus in più, e il pannello ti avvisa finché quel bonus ti sta ancora aspettando. Quel giorno è tutto dell'Onore, e si rinnova secondo il proprio orologio anziché con il reset delle istanze del reame. Affrontare la stessa squadra più e più volte paga sempre meno per la partita in sé dopo la prima, assestandosi rapidamente su un minimo anziché scendere fino a zero, e una partita abbandonata non paga assolutamente nulla. Spendi ciò che guadagni presso uno dei due quartiermastri della Guerra."
-    },
-    "valeCupPage": {
-      "heading": "La Coppa della Valle",
-      "intro": "Palla di cinghiale al Campo della Scrofa: scegli un vessillo, scegli un ruolo e calcia una pelle di cinghiale imbottita oltre un portiere per il Secchio di Rame. Niente sangue, niente bottino, solo il boato degli spalti.",
-      "loreHeading": "La palla di cinghiale e la tregua del raccolto",
-      "loreOldSow": "Molto prima che i morti si destassero, i braccianti di Eastbrook giocavano a palla di cinghiale sui campi di stoppie dopo il raccolto: due torme, una pelle di cinghiale imbottita di paglia e due cancelli da carro trascinati ai due capi del prato. La prima palla, la Vecchia Scrofa, pende bronzata sopra il focolare della taverna.",
-      "loreTruce": "Quando il Colosseo Cinereo cominciò a patrocinare giochi di guerra, il Maresciallo Redbrook rispose con qualcosa di più gentile: una tregua del raccolto permanente sul vecchio prato. I cancelli da carro divennero pali delle porte, il prato ebbe muri, spalti e un nome, il Campo della Scrofa, e il premio fu sempre lo stesso secchio del latte ammaccato da cui bevevano i vincitori: il Secchio di Rame.",
-      "howHeading": "Come si gioca",
-      "howQueue": "Mettiti in coda da qualsiasi luogo tramite la finestra della Coppa della Valle, oppure parla con il Guardacampo Bram al cancello del Campo della Scrofa. Scegli un formato dall'uno contro uno fino al cinque contro cinque, una nazione del vessillo e un ruolo sportivo; entra in coda da solo o porta il tuo gruppo.",
-      "howMatch": "Al calcio d'inizio il tuo kit di classe viene sostituito da un kit sportivo e ripristinato esattamente alla fine. I calci mirano al reticolo a terra, la palla rimbalza sulle sponde e dribblare significa semplicemente correre con la palla. Segna più gol dell'altra squadra prima del fischio finale; un pareggio va al gol d'oro.",
-      "howTruce": "Nessuno sanguina al Campo della Scrofa: i contrasti fanno solo ruzzolare, niente fa male e i famigli restano fuori dalla partita.",
-      "spectateBody": "Allo stadio si gioca una partita alla volta, e chiunque può avvicinarsi e guardare dagli spalti.",
-      "bettingHeading": "Una puntata al parapetto",
-      "bettingBody": "Gli spettatori al Campo della Scrofa possono puntare su una squadra mentre una partita si sta formando: le poste confluiscono in un unico piatto, e al fischio finale i vincitori si spartiscono il piatto dei perdenti in proporzione a quanto hanno puntato. Una partita in pareggio, o un esito a sorpresa su cui nessuno ha puntato, rimborsa ogni moneta. I giocatori schierati nella partita non possono scommettervi, e il parapetto conserva il tuo bilancio a vita di vittorie, sconfitte e monete nette.",
-      "practiceHeading": "Incontri di allenamento e il campo inattivo",
-      "practiceBody": "La finestra della Coppa della Valle offre anche l'allenamento: una copia privata del campo dove i bot riempiono entrambe le squadre e nulla conta per il tuo bilancio. Ti manca un giocatore o due per fare sul serio? Dopo una breve attesa, i bot completano le squadre, e ogni partita con bot in campo è amichevole, mai classificata. E quando il Campo della Scrofa resta inattivo, i bot mettono in scena un'esibizione che puoi guardare, e su cui puoi scommettere, dagli spalti; nell'istante in cui giocatori veri si dichiarano pronti, l'esibizione cede il campo e ogni posta viene restituita.",
-      "nationsHeading": "Le otto nazioni del vessillo",
-      "nationsBody": "Ogni squadra gioca sotto un vessillo. Il capitano sceglie la nazione e, se entrambe le squadre battono lo stesso vessillo, quella in trasferta gioca con i colori invertiti.",
-      "nationVale": "Verde e oro, con il covone di grano al vento: la squadra di casa, braccianti fino al midollo.",
-      "nationMirefen": "Verde acqua e grigio sotto l'airone: pazienti, dalle gambe lunghe, mai frettolosi.",
-      "nationThornpeak": "Blu ghiaccio e bianco sotto la vetta: dal passo sicuro e testardi.",
-      "nationColiseum": "Rosso e nero con le spade incrociate: giocano come se fosse ancora un gioco di guerra.",
-      "nationChoir": "Azzurro pallido e argento sotto la campana: inquietanti, precisi e molto silenziosi.",
-      "nationOgre": "Arancio e terra d'ombra dietro il pugno: prima la spallata, e ne vanno fieri.",
-      "nationMoon": "Viola e argento sotto la falce di luna: giocatori notturni, leggeri sui piedi.",
-      "nationCopperdig": "Rame e marrone con il piccone: scavatori che non smettono mai di correre.",
-      "rolesHeading": "Ruoli sportivi",
-      "rolesBody": "Il tuo ruolo decide il kit che porti in campo. Tutti calciano; il resto è temperamento. Nelle categorie a uno e a due per squadra tutti giocano con il kit tuttofare, perciò le scelte di ruolo entrano in gioco davvero dalle tre per squadra in su.",
-      "rewardsHeading": "Le regole della tregua",
-      "rewardsBody": "Le regole della tregua significano niente esperienza e niente bottino: una partita decisa conta per il tuo bilancio e per il tabellone dei vincitori, e una vittoria conta anche per i compiti delle ricompense del giorno. Disertare una partita mette in panchina il tuo posto, e il Guardacampo non dimentica."
     },
     "deedsPage": {
       "intro": "Il Libro delle Imprese è il luogo dove il mondo tiene il conto di tutto ciò che hai fatto, dai primi passi fuori dalla valle iniziale agli scontri più duri che il reame possa offrire. Ottieni imprese giocando, indossa i titoli che concedono e guarda salire la tua Fama.",
@@ -6123,7 +6122,7 @@ export const it_IT: EnTranslations = {
       "deedsHeading": "Imprese che ricordano il viaggio",
       "deedsBody": "The Book of Deeds walks beside every step of this. Your first attunement earns Craftsworn and your first masterwork earns Masterwright, both wearable as titles. All ten earnable crafts mark a milestone deed at 50 skill and crown their caps with a Grandmaster title, while Fishing gets Old Salt at 100 proficiency and the Master Angler title at 200.\n\nThere are quieter pages too: deeds for your first harvest and first craft, for the rare finds luck turns up in the field, and for taking up salvage. All of it is cosmetic, titles and Renown only. A deed never grants power; it only proves you were there.",
       "startHeading": "Da dove iniziare",
-      "startBody": "Appena arrivato a Eastbrook? Trova il Caposquadra Odell e accetta Un mestiere per ogni mano: ti indicherà i filoni di minerale attorno alla Cava di Rame a sudest della città e ti regalerà i tuoi primi calli. Occhio però alla cava stessa: gli Scavatori di Deeprock accampati sopra di essa stanno qualche livello sopra un nuovo arrivato, quindi lavora prima i filoni periferici e lascia il cuore dell'accampamento a quando avrai salito qualche livello. Da lì in poi, raccogli ogni filone, boschetto di alberi e aiuola d'erbe che incontri mentre fai missioni; la competenza viene naturale ai viaggiatori.\n\nTornato in città, premi T per aprire la finestra di fabbricazione e lavora le ricette comuni che ogni personaggio conosce fin dall'inizio. Fai visita ai maestri alla forgia, alle cucine, al telaio e all'officina per vedere che cosa insegnano, e accetta i loro ordini di lavoro per monete costanti. Quando la lettera della Gilda ti raggiungerà, saprai già quale coppia ti sembra casa.",
+      "startBody": "Appena arrivato a Eastbrook? Trova il Caposquadra Odell e accetta Un mestiere per ogni mano: ti indicherà i filoni di minerale attorno alla Cava di Rame a nordest della città e ti regalerà i tuoi primi calli. Occhio però alla cava stessa: gli Scavatori di Deeprock accampati sopra di essa stanno qualche livello sopra un nuovo arrivato, quindi lavora prima i filoni periferici e lascia il cuore dell'accampamento a quando avrai salito qualche livello. Da lì in poi, raccogli ogni filone, boschetto di alberi e aiuola d'erbe che incontri mentre fai missioni; la competenza viene naturale ai viaggiatori.\n\nTornato in città, premi T per aprire la finestra di fabbricazione e lavora le ricette comuni che ogni personaggio conosce fin dall'inizio. Fai visita ai maestri alla forgia, alle cucine, al telaio e all'officina per vedere che cosa insegnano, e accetta i loro ordini di lavoro per monete costanti. Quando la lettera della Gilda ti raggiungerà, saprai già quale coppia ti sembra casa.",
       "colStation": "Stazione",
       "colHub": "Hub",
       "colMaster": "Maestro",
@@ -6217,13 +6216,13 @@ export const it_IT: EnTranslations = {
         },
         "leatherworking": {
           "identityHeading": "Cuoio per i veloci",
-          "identityBody": "La scala sale dai semplici gambali, stivali e cintura di pelle di Fenbridge attraverso il giaco, il cappuccio e le spalline da Guardapaludi non comuni fino al raro set mirewarden, il miglior cuoio che un artigiano possa tagliare. Due pezzi da incantatore completano il tutto: il campo comune Pelle da Druido di Eastbrook e i Bendaggi Duskide alla competenza 75.\n\nNell'anello si trova tra Cucina e Sartoria. La sua coppia viva e il Sarto da Campo, Lavorazione del Cuoio e Sartoria, giurata davanti alla Tessitrice Ottilie a Eastbrook; la coppia del Cacciatore con Cucina e nominata nell'anello ma non ha ancora una missione di giuramento.",
+          "identityBody": "La scala sale dai semplici gambali, stivali e cintura di pelle di Fenbridge attraverso il giaco, il cappuccio e le spalline da Guardapaludi non comuni fino al raro set mirewarden, il miglior cuoio che un artigiano possa tagliare. Due pezzi da incantatore completano il tutto: il campo comune Pelle del druido di Eastbrook e le Fasce di pelle del crepuscolo alla competenza 50.\n\nNell'anello si trova tra Cucina e Sartoria. La sua coppia viva e il Sarto da Campo, Lavorazione del Cuoio e Sartoria, giurata davanti alla Tessitrice Ottilie a Eastbrook; la coppia del Cacciatore con Cucina e nominata nell'anello ma non ha ancora una missione di giuramento.",
           "materialsHeading": "La caccia e il raccolto",
-          "materialsBody": "La Lavorazione del Cuoio è il mestiere in cui il tuo percorso di livellamento e la tua linea di rifornimento sono la stessa cosa: la Pelle ruvida si raccoglie direttamente dalle carcasse che portano pelle, lupi e cinghiali soprattutto, e ogni carcassa serve un solo raccoglitore, primo arrivato primo servito. Un tiro di raccolto raro o superiore concede anche una Pelle incontaminata, l’esemplare firmato che il Giaco del Guardiano delle Paludi richiede, quindi metti in banca ognuna di quelle che trovi.\n\nIl contorno è piccolo: zampe e seta di ragno, Panno filato in casa dagli umanoidi, un solo Minerale di Thorium in ogni pezzo raro mirewarden (sei nelle Fasce di pelle del crepuscolo, il pezzo finale), e un Agente conciante a 16 monete di rame dal bancone della conceria. Il Thorium in sé non si compra mai al bancone: estrailo tu stesso, su Thornpeak o dai filoni iniziali di quasi ogni zona più giovane (solo il Farshore scava ferro), oppure compralo da un altro giocatore.",
+          "materialsBody": "La Lavorazione del Cuoio è il mestiere in cui il tuo percorso di livellamento e la tua linea di rifornimento sono la stessa cosa: la Pelle ruvida si raccoglie direttamente dalle carcasse che portano pelle, lupi e cinghiali soprattutto, e ogni carcassa serve un solo raccoglitore, primo arrivato primo servito. Un tiro di raccolto raro o superiore concede anche una Pelle incontaminata, l’esemplare firmato che il Giaco del Guardiano delle Paludi richiede, quindi metti in banca ognuna di quelle che trovi.\n\nIl contorno è piccolo: zampe e seta di ragno, Panno filato in casa dagli umanoidi, un solo Minerale di Thorium in ogni pezzo raro mirewarden (sei nelle Fasce di pelle del crepuscolo), e un Agente conciante a 16 monete di rame dal bancone della conceria. Il Thorium in sé non si compra mai al bancone: estrailo tu stesso, su Thornpeak o dai filoni iniziali di quasi ogni zona più giovane (solo il Farshore scava ferro), oppure compralo da un altro giocatore.",
           "ladderHeading": "Addestrato a Fenbridge",
-          "ladderBody": "Ecco la particolarità: la conceria si trova a Fenbridge, sulla strada della Palude di Mirefen, il che fa della Lavorazione del Cuoio l’unico mestiere profondo che si impara fuori, nella palude. Il Conciatore Hesk insegna la scala alle sue tinozze: il gradino delle pelli di Fenbridge gratuito alla competenza 0, il gradino marshstalker a 25 monete d’argento a ricetta dalla competenza 25, e il gradino mirewarden a 1 moneta d’oro ciascuna dalla competenza 50, e ogni gradino si apre quando il tuo livello lo raggiunge.\n\nTre ricette saltano l’addestratore: i comuni da campo (il Giaco di cuoio conciato e la Pelle del druido di Eastbrook) si realizzano ovunque fin dall’inizio, e le Fasce di pelle del crepuscolo sono note a tutti ma stanno alla competenza 75, vincolate alla conceria. Nota che il giuramento del Sarto da Campo si presta comunque a Eastbrook, da Ottilie; nella palude avviene solo l’insegnamento.",
+          "ladderBody": "Ecco la particolarità: la conceria si trova a Fenbridge, sulla strada della Palude di Mirefen, il che fa della Lavorazione del Cuoio l’unico mestiere profondo che si impara fuori, nella palude. Il Conciatore Hesk insegna la scala alle sue tinozze: il gradino delle pelli di Fenbridge gratuito alla competenza 0, il gradino marshstalker a 25 monete d’argento a ricetta dalla competenza 25, e il gradino mirewarden a 1 moneta d’oro ciascuna dalla competenza 50, e ogni gradino si apre quando il tuo livello lo raggiunge.\n\nTre ricette saltano l’addestratore: i comuni da campo (il Giaco di cuoio conciato e la Pelle del druido di Eastbrook) si realizzano ovunque fin dall’inizio, e le Fasce di pelle del crepuscolo sono note a tutti alla competenza 50, vincolate alla conceria. Nota che il giuramento del Sarto da Campo si presta comunque a Eastbrook, da Ottilie; nella palude avviene solo l’insegnamento.",
           "routeHeading": "Capolavori e un percorso pratico fino a 125",
-          "routeBody": "Qualsiasi pezzo con statistiche vere tira la probabilità di capolavoro, purché la qualità superiore rientri nel tetto del tuo livello, inclusa la Pelle del druido di Eastbrook con le sue statistiche, e una Pelle incontaminata firmata dentro un Giaco del Guardiano delle Paludi fornisce automaticamente il bonus da reagente firmato; il Thorium conta come materiale di livello 1 per il risultato. I comuni di pelle senza statistiche non possono ottenerlo.\n\nFalla salire nel modo naturale: raccogli da ogni lupo e ogni cinghiale che uccidi fin dal primo livello, lascia che i due comuni da campo ti portino a 25 ovunque ti trovi, poi impara il gradino delle pelli alle tinozze quando le missioni ti trascinano comunque nella palude. Il marshstalker ti porta a 50 e il mirewarden a 75; oltre quello le Fasce di pelle del crepuscolo, una ricetta di livello 3 da sei Minerali di Thorium, tre Pelli incontaminate, due Pelli ruvide e un Agente conciante, pagano a un Sarto da Campo sintonizzato guadagno pieno fino a 99 e metà dopo, circa 75 lavorazioni per gli ultimi cinquanta punti fino al limite di 125; sotto il tetto di un mestiere principale la ricetta di livello 3 non insegna nulla.\n\nLa conceria mobile conta per questo mestiere più che per ogni altro: specializzati a 75 e una bisaccia di pelli diventa equipaggiamento finito accanto al fuoco da campo invece di una camminata di ritorno a Fenbridge. L’ordine di lavoro della conceria di Hesk compra otto Pelli ruvide ogni 30 minuti, un ritorno pulito su pelli che stavi raccogliendo comunque, e il Libro delle Imprese segna Il Mestiere del Conciatore alla competenza 50, con Grande Maestro Lavorazione del Cuoio al limite."
+          "routeBody": "Qualsiasi pezzo con statistiche vere tira la probabilità di capolavoro, purché la qualità superiore rientri nel tetto del tuo livello, inclusa la Pelle del druido di Eastbrook con le sue statistiche, e una Pelle incontaminata firmata dentro un Giaco del Guardiano delle Paludi fornisce automaticamente il bonus da reagente firmato; il Thorium conta come materiale di livello 1 per il risultato. I comuni di pelle senza statistiche non possono ottenerlo.\n\nFalla salire nel modo naturale: raccogli da ogni lupo e ogni cinghiale che uccidi fin dal primo livello, lascia che i due comuni da campo ti portino a 25 ovunque ti trovi, poi impara il gradino delle pelli alle tinozze quando le missioni ti trascinano comunque nella palude. Il marshstalker ti porta a 50, e i pezzi mirewarden insieme alle Fasce di pelle del crepuscolo ti portano dal livello raro 50 a 75. Oltre il 75 quelle ricette di livello 2 calano a metà guadagno e poi a un quarto, circa 150 lavorazioni per gli ultimi cinquanta punti fino al limite di 125; sotto il tetto di un mestiere principale corrispondono comunque al tetto di lavorazione della qualità rara, invece di azzerarsi del tutto.\n\nLa conceria mobile conta per questo mestiere più che per ogni altro: specializzati a 75 e una bisaccia di pelli diventa equipaggiamento finito accanto al fuoco da campo invece di una camminata di ritorno a Fenbridge. L’ordine di lavoro della conceria di Hesk compra otto Pelli ruvide ogni 30 minuti, un ritorno pulito su pelli che stavi raccogliendo comunque, e il Libro delle Imprese segna Il Mestiere del Conciatore alla competenza 50, con Grande Maestro Lavorazione del Cuoio al limite."
         },
         "cooking": {
           "identityHeading": "La pentola che sfama il gruppo",
@@ -7723,7 +7722,7 @@ export const it_IT: EnTranslations = {
       "portalOpens": "Uno squarcio di rango {tier} si apre in {zone}!",
       "portalSealed": "Lo squarcio di rango {tier} in {zone} è stato sigillato.",
       "portalCollapses": "Lo squarcio di rango {tier} in {zone} collassa.",
-      "lootRecoveryNotice": "The rift's entrance will hold a while yet: should your party fall, you may still walk back for what you earned.",
+      "lootRecoveryNotice": "L'ingresso dello squarcio resterà aperto ancora per un po': se il tuo gruppo dovesse cadere, potrai comunque tornare a piedi per recuperare ciò che hai guadagnato.",
       "levelGate": "Solo gli avventurieri di livello {level} o superiore possono entrare in questo squarcio.",
       "deadEntry": "Non puoi entrare in uno squarcio mentre sei morto.",
       "deadEntryCombat": "Il tuo gruppo è ancora in combattimento. I morti potranno rientrare quando la battaglia sarà finita.",
@@ -10031,7 +10030,7 @@ export const it_IT: EnTranslations = {
       },
       "ignition": {
         "name": "Ignizione",
-        "description": "Passivo: i colpi critici delle tue magie incendiano il bersaglio, infliggendo il 40% dei danni causati nell'arco di 6 s; si accumula. (Maestria del Fuoco)"
+        "description": "Passivo: i colpi critici delle tue magie incendiano il bersaglio, infliggendo il 30% dei danni causati nell'arco di 6 s; si accumula. (Maestria del Fuoco)"
       },
       "mass_barrier": {
         "name": "Barriera di massa",
@@ -10201,7 +10200,7 @@ export const it_IT: EnTranslations = {
       },
       "sap": {
         "name": "Tramortimento",
-        "description": "Incapacita il bersaglio per 8 sec. Devi essere furtivo e fuori dal combattimento. Qualsiasi danno interrompe l'effetto."
+        "description": "Incapacita il bersaglio per 8 sec senza interrompere il Velo Crepuscolare né avviare un combattimento. Devi essere furtivo e fuori dal combattimento. Qualsiasi danno interrompe l'effetto."
       },
       "crippling_poison": {
         "name": "Veleno Plumbeo",
@@ -10473,7 +10472,7 @@ export const it_IT: EnTranslations = {
       },
       "aspect_of_the_cheetah": {
         "name": "Sembianze del Corsiero",
-        "description": "Assumete l'aspetto del corsiero e aumentate la vostra velocità di movimento del 30% per 30 min."
+        "description": "Assumete l'aspetto del corsiero e aumentate la vostra velocità di movimento del 30% per 30 min. Mentre è attivo, subire danni vi frastorna, dimezzando la vostra velocità di movimento per 4 sec (ogni colpo rinnova lo stordimento)."
       },
       "aimed_shot": {
         "name": "Tiro Teso",
@@ -10637,7 +10636,7 @@ export const it_IT: EnTranslations = {
       },
       "hex_of_violence": {
         "name": "Hex of Violence",
-        "description": "Lancia un maleficio sul nemico per 8 sec. Le sue prossime 3 azioni dannose generano ciascuna 7 Condanna e lo colpiscono per 16 danni da Ombra."
+        "description": "Lancia un maleficio sul nemico per 8 sec. Le sue prossime 3 azioni dannose generano ciascuna 7 Condanna e lo colpiscono per 17 danni da Ombra."
       },
       "cruel_pact": {
         "name": "Cruel Pact",
@@ -10843,7 +10842,7 @@ export const it_IT: EnTranslations = {
       },
       "warspirit_cadence": {
         "name": "Cadenza dello Spirito Guerriero",
-        "description": "Passiva: ogni 3° attacco d'arma andato a segno attiva 2 Echi del Cuore di Bufera per il 50% di danni da Natura e concede Presagio di Tempesta per 12 s. Il Presagio di Tempesta rende istantaneo il tuo prossimo Dardo Folgorante, Scossa o Acque Risanatrici e ne riduce il costo in mana del 50%. Il Colpo Ancestrale conta come 2 attacchi. (Spirito Guerriero)"
+        "description": "Passiva: ogni 3° attacco d'arma andato a segno attiva 2 Echi del Cuore di Bufera per il 25% di danni da Natura e concede Presagio di Tempesta per 12 s. Il Presagio di Tempesta rende istantaneo il tuo prossimo Dardo Folgorante, Scossa o Acque Risanatrici e ne riduce il costo in mana del 50%. Il Colpo Ancestrale conta come 2 attacchi. (Spirito Guerriero)"
       },
       "stormsurge": {
         "name": "Mareggiata",
@@ -11055,7 +11054,7 @@ export const it_IT: EnTranslations = {
       },
       "summon_infernal": {
         "name": "Evoca Pyre Colossus",
-        "description": "Fa precipitare un Pyre Colossus nell'area bersaglio, infliggendo 58-72 danni da Fuoco all'impatto. Combatte per 30 s senza sostituire il tuo demone, brucia i nemici vicini ogni 2 s e genera 1 Rovina ogni secondo."
+        "description": "Fa precipitare un Pyre Colossus nell'area bersaglio, infliggendo 64-79 danni da Fuoco all'impatto. Combatte per 30 s senza sostituire il tuo demone, brucia i nemici vicini ogni 2 s e genera 1 Rovina ogni secondo."
       },
       "summon_doomguard": {
         "name": "Evoca Wraithborn",
@@ -11403,7 +11402,7 @@ export const it_IT: EnTranslations = {
       },
       "shadowstep": {
         "name": "Scivolo d’Ombra",
-        "description": "Avanzi attraverso le ombre verso il tuo bersaglio. (talento del Ladro)"
+        "description": "Avanzi attraverso le ombre verso il tuo bersaglio, amico o nemico, senza interrompere il Velo Crepuscolare. (talento del Ladro)"
       },
       "silence": {
         "name": "Silenzio",
@@ -13059,6 +13058,12 @@ export const it_IT: EnTranslations = {
       "pristine_claw": {
         "name": "Artiglio Immacolato"
       },
+      "ps_castaway_crate": {
+        "name": "Cassa del naufrago"
+      },
+      "ps_ferry_bell": {
+        "name": "Campana del traghetto"
+      },
       "dawnhold_posy": {
         "name": "Mazzolino del giardino di Dawnhold"
       },
@@ -13538,6 +13543,18 @@ export const it_IT: EnTranslations = {
       },
       "pattern_sageleaf_feast": {
         "name": "Recipe: Sageleaf Feast"
+      },
+      "ps_briny_lure": {
+        "name": "Esca salmastra"
+      },
+      "ps_lustrous_pearl": {
+        "name": "Perla lucente"
+      },
+      "mother_of_pearl": {
+        "name": "Madreperla"
+      },
+      "ps_passing_stone": {
+        "name": "Pietra del trapasso"
       },
       "conjured_water4": {
         "name": "Acqua sorgiva evocata"
@@ -14588,9 +14605,6 @@ export const it_IT: EnTranslations = {
       "tolling_bell": {
         "name": "Campana Rintoccante"
       },
-      "vale_cup_ball": {
-        "name": "Palla di cinghiale"
-      },
       "thunzharr_waking_peak": {
         "name": "Thunzharr, il Picco Risvegliato"
       },
@@ -14888,6 +14902,15 @@ export const it_IT: EnTranslations = {
       "fisher_bram": {
         "name": "Pescatore Bram"
       },
+      "training_effigy": {
+        "name": "Effigie d'allenamento"
+      },
+      "shore_scuttler": {
+        "name": "Scorridore della Riva"
+      },
+      "mister_crabs": {
+        "name": "Messer Granchi"
+      },
       "rift_hellguard": {
         "name": "Guardia Infernale"
       },
@@ -15046,7 +15069,7 @@ export const it_IT: EnTranslations = {
       "apothecary_lin": {
         "name": "Speziale Lin",
         "title": "Erborista",
-        "greeting": "Fai attenzione a dove metti i piedi nei boschi orientali, amico."
+        "greeting": "Fai attenzione a dove metti i piedi nei boschi nord-orientali, amico."
       },
       "brother_aldric": {
         "name": "Fratello Aldric",
@@ -15187,11 +15210,6 @@ export const it_IT: EnTranslations = {
         "name": "Il Custode Pallido",
         "title": "Guardiano dei Morti",
         "greeting": "Riposa ora, spirito. Posso restituirti al tuo corpo, ma il ritorno dalla traversata ti lascia debole."
-      },
-      "groundskeeper_bram": {
-        "name": "Guardacampo Bram",
-        "title": "Custode del Campo della Scrofa",
-        "greeting": "La tregua regge al Campo della Scrofa, {className}: solo calci e spallate. Ti va di giocare per il Secchio di Rame?"
       },
       "chronicler_saul": {
         "name": "Saul il Cronista",
@@ -15498,6 +15516,51 @@ export const it_IT: EnTranslations = {
         "title": "Parterre Gardener",
         "greeting": "Mind the edging, {playerName}, these beds are the pride of the parterre. Seed and compost are what I sell, and I will turn any withered husks you carry into more of it."
       },
+      "wayfarer_bryn": {
+        "name": "Viandante Bryn",
+        "title": "Guida del Porto",
+        "greeting": "Eastbrook accoglie chiunque arrivi, amico. E per chi non è ancora sicuro sulle gambe, c'è sempre la Riva della Prova: la campana del traghetto accanto alla cassetta della Posta dei Corvi ti porta di là in qualunque giorno dell'anno, e la sua gemella sull'isola ti riporta a casa."
+      },
+      "instructor_maren": {
+        "name": "Istruttrice Maren",
+        "title": "Maestra della Prova",
+        "greeting": "Ogni eroe che la valle abbia mai ringraziato è stato dove sei tu ora, {className}, e nessuno di loro sapeva da che parte impugnare una lama. Ecco a cosa serve questa riva. Chiedi, esercitati, e fallisci pure: qui fallire non costa nulla."
+      },
+      "quartermaster_finch": {
+        "name": "Quartiermastro Finch",
+        "title": "Fornitore del Campo",
+        "greeting": "Il mio bancone tiene esattamente una cosa in vendita, {playerName}: un borsello in più per quello che raccogli lungo la strada, quando la tua lezione lo richiede. Tutto il resto qui è recupero destinato alla valle. Le monete comprano il borsello, e il lavoro guadagna le monete. Questa è tutta l'economia, e non diventa mai più complicata. Solo più grande."
+      },
+      "ferryman_odo": {
+        "name": "Traghettatore Odo",
+        "title": "Custode della Traversata",
+        "greeting": "Appena sbarcato dalla traversata, {playerName}? Il Guardiano Tam tiene la Corsa a Ostacoli sulla spiaggia appena a sud del mio molo: percorri prima le sue corsie e le tue gambe te ne saranno grate. Ogni custode di questa riva ti affida al successivo quando il tuo compito è finito, e la scheda in cima al tuo schermo conosce sempre la strada. Quando la valle ti richiamerà, suona la campana accanto al mio molo e la traversata ti farà scendere nella città di Eastbrook."
+      },
+      "bursar_wick": {
+        "name": "Economo Wick",
+        "title": "Il Forziere Dorato",
+        "greeting": "Il Forziere Dorato tiene un banco anche qui, {playerName}. Tutto ciò che depositi presso di me attende nello stesso caveau dietro ogni economo di ogni città, al sicuro da lupi, acqua e dal tuo giudizio peggiore."
+      },
+      "warden_tam": {
+        "name": "Guardiano Tam",
+        "title": "Custode della Corsa a Ostacoli",
+        "greeting": "Queste corsie sono la Corsa a Ostacoli, {playerName}, e ogni avventuriero che la valle rispetta le ha percorse. I pali delle lanterne restano accesi tutta la notte, così le corsie non chiudono mai."
+      },
+      "overseer_pell": {
+        "name": "Sorvegliante Pell",
+        "title": "Sorvegliante della Corsa a Ostacoli",
+        "greeting": "Cronometro ogni corsa che scende lungo queste corsie, {playerName}, e ho visto ben altri passi peggiori dei tuoi. Il sentiero alle mie spalle sale fino al Campo d'Addestramento: è lì che il gioco di gambe diventa gioco di spada."
+      },
+      "drillmaster_rook": {
+        "name": "Istruttore Rook",
+        "title": "Maestro del Campo",
+        "greeting": "Prima la paglia, poi i gusci, {playerName}. Un'effigie insegna al tuo braccio il colpo; gli scorridori giù sulla spiaggia gli insegnano a colpire qualcosa che reagisce."
+      },
+      "tidewarden_nel": {
+        "name": "Guardiamarea Nel",
+        "title": "Custode della Spiaggia",
+        "greeting": "La marea prende e la marea paga, {playerName}. Io tengo il conto di entrambe le cose: quello che i granchi corridori strappano ai relitti, e quello che mani oneste riportano su per questo sentiero."
+      },
       "tidewatcher_ondrel": {
         "name": "Ondrel Vane",
         "title": "Guardamarea",
@@ -15507,7 +15570,7 @@ export const it_IT: EnTranslations = {
     "quests": {
       "q_prof_intro": {
         "title": "Un mestiere per ogni mano",
-        "text": "Ogni anima di Eastbrook lavora un mestiere oltre alla spada, {playerName}. Ci sono filoni di minerale nelle rocce intorno alla Cava di Rame, a sudest della città. Vai a dare qualche picconata e lavorane 5 tu stesso, intendiamoci; saprò vedere la differenza.",
+        "text": "Ogni anima di Eastbrook lavora un mestiere oltre alla spada, {playerName}. Ci sono filoni di minerale nelle rocce intorno alla Cava di Rame, a nordest della città, oltre i sentieri dei lupi. Vai a dare qualche picconata e lavorane 5 tu stesso, intendiamoci; saprò vedere la differenza.",
         "completion": "Visto? Minerale raccolto e calli sulle mani. Continua a scavare, tagliare legna e raccogliere erbe mentre percorri le strade, e quando sei di ritorno in città, tieni d'occhio la Bacheca del Focus della Città vicino al mercato e il banco di fabbricazione vicino. C'è un buon affare che ti aspetta in tutto ciò, se lo vuoi.",
         "objectives": {
           "0": {
@@ -15550,7 +15613,7 @@ export const it_IT: EnTranslations = {
       },
       "q_boars": {
         "title": "Pelli di cinghiale setoloso",
-        "text": "Le pelli di cinghiale fanno ottimi zaini da viaggio, e i prati ne sono pieni. Portami 5 pelli irsute.",
+        "text": "Le pelli di cinghiale fanno ottimi zaini da viaggio, e i prati a nordovest della città brulicano di quelle bestie. Portami 5 Pelli ispide di cinghiale e ne varrà la pena per te.",
         "completion": "Ah, belle pelli irsute. Frutteranno un buon prezzo.",
         "objectives": {
           "0": {
@@ -15560,7 +15623,7 @@ export const it_IT: EnTranslations = {
       },
       "q_spiders": {
         "title": "La minaccia di Sableweb",
-        "text": "I predatori dei boschi orientali filano una seta che mi serve per i miei impacchi, e per giunta sono diventati fin troppo numerosi. Elimina 6 Predatori di Sableweb e taglia 4 ghiandole di seta dai loro ventri.",
+        "text": "I predatori dei boschi nord-orientali filano una seta che mi serve per i miei impacchi, e per giunta sono diventati fin troppo numerosi. Elimina 6 Predatori di Sableweb e taglia 4 ghiandole di seta dai loro ventri.",
         "completion": "Bleah, si muovono ancora. Perfetto. Te lo sei guadagnato.",
         "objectives": {
           "0": {
@@ -15603,7 +15666,7 @@ export const it_IT: EnTranslations = {
       },
       "q_supplies": {
         "title": "Scorte rubate",
-        "text": "I banditi hanno preso il mio ultimo carro: attrezzi, sale e buon lino di Eastbrook. Riprendi 4 casse dal loro campo a sud-ovest.",
+        "text": "I banditi hanno colpito il mio ultimo carro e sono fuggiti con quattro casse di merce: attrezzi, sale, buon lino di Eastbrook. Le casse sono ammucchiate intorno al loro campo sulle colline a nord-ovest. Riprendile per me, vuoi?",
         "completion": "Le mie casse! Quasi senza graffi. Sei una meraviglia.",
         "objectives": {
           "0": {
@@ -15696,7 +15759,7 @@ export const it_IT: EnTranslations = {
       },
       "q_bandits": {
         "title": "Banditi della Valle",
-        "text": "Una banda di tagliagole si è accampata sulle colline sud-occidentali. Hanno rapinato tre carri questa settimana. Uccidi 10 banditi della Valle.",
+        "text": "Una banda di tagliagole si è accampata sulle colline nord-occidentali. Hanno rapinato tre carri questa settimana. Uccidi 10 banditi della Valle.",
         "completion": "Dieci lame in meno nel buio. Prendi questo, te lo sei guadagnato.",
         "objectives": {
           "0": {
@@ -16376,7 +16439,7 @@ export const it_IT: EnTranslations = {
       },
       "q_prof_amends_outfitter": {
         "title": "Fili riuniti",
-        "text": "Tornato al mio telaio, dopotutto. Nessun rancore, {playerName}, ma il filo ricorda una mano che lo ha lasciato andare, e il costo di riprenderlo si misura sempre piu lungo ogni volta. Abbatti i ragni della foresta di rovi che affollano i boschi orientali, e la fatica stanchera le tue mani prima che tocchino di nuovo la seta pregiata.",
+        "text": "Tornato al mio telaio, dopotutto. Nessun rancore, {playerName}, ma il filo ricorda una mano che lo ha lasciato andare, e il costo di riprenderlo si misura sempre piu lungo ogni volta. Abbatti i ragni della foresta di rovi che affollano i boschi nord-orientali, e la fatica stanchera le tue mani prima che tocchino di nuovo la seta pregiata.",
         "completion": "Di nuovo stabili. Conciatura e Sartoria tornano alle tue mani come specializzazioni principali. Misura due volte prima di vagare.",
         "objectives": {
           "0": {
@@ -16386,7 +16449,7 @@ export const it_IT: EnTranslations = {
       },
       "q_prof_amends_apothecary": {
         "title": "Tornato ai fornelli",
-        "text": "Guarda chi e tornato al mio tegame. Nessun rancore, {playerName}, una cucina ha sempre posto, ma sai che il conto cresce ogni volta che te ne vai. Vai a sfoltire i cinghiali selvatici nel prato occidentale, perche il sudore onesto e il primo ingrediente, e ricordara alle tue mani il lavoro.",
+        "text": "Guarda chi e tornato al mio tegame. Nessun rancore, {playerName}, una cucina ha sempre posto, ma sai che il conto cresce ogni volta che te ne vai. Vai a sfoltire i cinghiali selvatici nel prato nord-occidentale, perche il sudore onesto e il primo ingrediente, e ricordara alle tue mani il lavoro.",
         "completion": "Eccolo, il sapore di prima. Alchimia e Cucina tornano ai tuoi fornelli come specializzazioni principali. Resta un po' questa volta.",
         "objectives": {
           "0": {
@@ -17497,6 +17560,109 @@ export const it_IT: EnTranslations = {
           }
         }
       },
+      "q_ps_the_gauntlet": {
+        "title": "Affronta la Corsa a Ostacoli",
+        "text": "Ogni paio di gambe che la valle rispetta ha percorso per prima queste corsie, {playerName}. Percorri la prima corsia a ovest fino alla sua bandiera, giratti, percorri la corsia a sud fino alla seconda, poi spostati di lato lungo l'ultima corsia fino alla bandiera rossa. Supera le bandiere in ordine, e la scheda in cima al tuo schermo ti mostrerà ogni pulsante man mano che procedi. Il Sorvegliante Pell cronometra ogni corsa dall'estremità opposta: quando la bandiera rossa sarà alle tue spalle, lui sarà proprio lì ad accoglierti.",
+        "completion": "Ho cronometrato quella corsa, {playerName}, e ho visto piedi più veloci fallire. La Corsa a Ostacoli è tua. Il sentiero alle mie spalle sale fino al Campo d'Addestramento, dove l'Istruttore Rook trasforma il gioco di gambe in gioco di spada: ha lui il tuo prossimo compito.",
+        "objectives": {
+          "0": {
+            "label": "Bandiera della Corsa a Ostacoli superata"
+          }
+        }
+      },
+      "q_ps_strike_true": {
+        "title": "Colpisci Dritto",
+        "text": "Prima il gioco di gambe, ora il braccio, {playerName}. Il Campo d'Addestramento si trova su per il sentiero alle mie spalle, e le sue effigie di paglia sono state costruite apposta per essere colpite. Se perdi la strada, premi M per aprire la mappa: ogni compito che porti con te vi è segnato. Avvicinati a un'effigie e clicca su di essa con il tasto sinistro: così diventa il tuo bersaglio, e il suo nome comparirà in cima al tuo schermo. Solo allora premi 1, o clicca la prima icona sulla barra delle azioni in basso, per colpire. Continua a colpire finché una non cede; non colpirà mai di rimando, le effigie non lo fanno mai. L'Istruttore Rook sorveglia il campo dal suo lato ovest, da dove parte il sentiero della spiaggia: premi F su di lui per consegnare l'abbattimento.",
+        "completion": "Un colpo netto, e la tua presa già più salda. Ricorda questa sensazione, {playerName}: bersaglia, colpisci, e continua a colpire. La paglia non reagisce mai. La prossima cosa contro cui colpirai, invece, sì.",
+        "objectives": {
+          "0": {
+            "label": "Effigie d'allenamento abbattuta"
+          }
+        }
+      },
+      "q_ps_hone_the_edge": {
+        "title": "Affila la Lama",
+        "text": "Un colpo è un colpo, {playerName}, e la paglia lo incasserà tutto il giorno. Non è quello che ti fa vincere qualcosa. Guarda la fila di pulsanti lungo il fondo del tuo schermo: quella fila è la tua arte, e ognuno di essi fa qualcosa che il tuo solo braccio non può fare. Ne hai già uno. Torna dalle effigie e usalo: scegli il tuo bersaglio, poi premi il pulsante che il campo ti indica, per tre volte. Non limitarti a colpire la paglia alla cieca; fai accadere davvero ciò che sai fare. Poi torna da me.",
+        "completion": "Ora stai combattendo, non più agitando le braccia a vuoto. Quella fila si allunga a ogni livello che raggiungi, {playerName}, e chi vive più a lungo è chi la sa leggere. La paglia non si cura di quale pulsante tu abbia usato. La valle sì.",
+        "objectives": {
+          "0": {
+            "label": "Abilità andata a segno su un'effigie"
+          }
+        }
+      },
+      "q_ps_shell_and_claw": {
+        "title": "Guscio e Chela",
+        "text": "La paglia non reagisce mai, {playerName}, quindi ecco qualcosa che lo fa. Gli Scorridori della Riva frugano lungo la linea dei relitti sulla spiaggia lontana: segui il sentiero a ovest dal mio campo e ti porta dritto da loro. Pizzicano di rimando, quindi controlla la tua barra della salute e continua a colpire: clicca con il tasto sinistro su uno per farne il tuo bersaglio, poi usa l'abilità che il campo ti ha insegnato (l'istruttore ti indica il pulsante), e non fermarti finché il suo guscio non si incrina. Tre bastano. Poi risali il sentiero fino al rialzo a nord: la Guardiamarea Nel tiene il conto della spiaggia, ed è lei a contare i tuoi gusci.",
+        "completion": "Tre gusci incrinati e tutte le dita ancora al loro posto: una buona prima battaglia, {playerName}. I granchi corridori pizzicano via dai relitti più in fretta di quanto la marea porti nuovo recupero, quindi ognuno che elimini è una moneta che qualcuno si tiene.",
+        "objectives": {
+          "0": {
+            "label": "Scorridore della Riva eliminato"
+          }
+        }
+      },
+      "q_ps_mother_of_pearl": {
+        "title": "Madreperla",
+        "text": "Tre gusci incrinati, {playerName}, ma la linea dei relitti custodisce un re, e lui siede su un premio che vale più di ogni cassa su questa spiaggia. Porta questa Esca salmastra alla pozza di marea all'estremità ovest della spiaggia, oltre i relitti. Fermati sul bagnasciuga, premi B per aprire le tue borse, e clicca con il tasto sinistro sull'esca per svegliarlo. Messer Granchi pizzica molto più forte dei suoi piccoli cugini, quindi controlla la tua barra della salute, continua a colpire, e arretra su per la sabbia se ti serve fiato. Quando cade, avvicinati al suo guscio e premi F per raccogliere da lui la Perla lucente. Riportami quella perla.",
+        "completion": "La Perla lucente, strappata al vecchio re dei bassifondi in persona. Mio padre si toglieva il cappello davanti a quel granchio ogni mattina della sua vita di lavoro; un certo rispetto è dovuto. Fermo così... ecco. Infilata, montata, e tua, {playerName}: la Madreperla. Premi B per aprire le tue borse e clicca con il tasto sinistro sull'anello per infilarlo, poi premi C per aprire la tua scheda personaggio e vederlo al tuo dito. Una cosa da poco, ma ogni parte di te ne trae beneficio nell'indossarlo.",
+        "objectives": {
+          "0": {
+            "label": "Messer Granchi ucciso"
+          },
+          "1": {
+            "label": "Perla lucente ottenuta"
+          }
+        }
+      },
+      "q_ps_the_wreck_line": {
+        "title": "La Linea dei Relitti",
+        "text": "I miei portatori trasportano il recupero dai vecchi relitti e lo portano su per il rialzo verso il Campo di Dawnrest, {playerName}, e metà delle casse non finisce mai la salita: vengono posate lungo il sentiero e dimenticate. Segui il mio sentiero verso il campo e passerai proprio accanto a quelle smarrite. Aprirne una è semplice: avvicinati a una cassa finché non appare il suo nome, poi premi F, o clicca sulla cassa stessa, e ti darà ciò che contiene. Sei di esse basteranno a ripulire la linea, e ricorda che F è lo stesso tasto per ogni forziere, nodo e porta che incontrerai mai. Il Quartiermastro Finch tiene la bancarella del campo e compra ogni pezzo di recupero: consegnale il bottino.",
+        "completion": "Corda, catrame, e mezza forma di formaggio che il mare ha in qualche modo risparmiato: mi prendo tutto, {playerName}. Una schiena che porta ciò che trova vale più di qualsiasi lama per questo campo, e la tua ha appena ripulito l'intera linea in una sola salita.",
+        "objectives": {
+          "0": {
+            "label": "Cassa del naufrago aperta"
+          }
+        }
+      },
+      "q_ps_pouch_and_purse": {
+        "title": "Borsello e Borsa",
+        "text": "Un'altra lezione prima della valle, {playerName}, ed è quella che tiene in vita gli avventurieri: cosa porti con te. Il tuo zaino ha sedici spazi, e accanto ad esso attendono quattro agganci vuoti per le borse; ogni borsa che allacci aggiunge il proprio spazio al totale. Quindi: premi di nuovo F su di me per aprire la mia bancarella, clicca con il tasto sinistro sul Borsello di lino tra la mia merce per comprarlo, poi premi B per aprire le tue borse e clicca con il tasto sinistro sul borsello lì per allacciarlo in un aggancio libero. L'Istruttrice Maren addestra vicino al fuoco del raduno a pochi passi a est: mostrale il borsello alla cintura.",
+        "completion": "Un bel borsello. Allacciatelo se non l'hai già fatto: premi B per aprire le tue borse, poi clicca con il tasto sinistro sul borsello per sistemarlo in un aggancio libero, e altri sei spazi sono tuoi da riempire di guai. Ora la metà della lezione che nessuna borsa può contenere, {playerName}: quello che non puoi portare, lo custodisce il Forziere Dorato. L'Economo Wick tiene il suo banco su per il sentiero a ovest, e apre lo stesso caveau che ogni economo di ogni città condivide; più spazio nel caveau si può comprare una volta che la tua borsa sarà cresciuta abbastanza da servirtene. Tieni i tuoi oggetti di valore in banca e le tue borse spaziose. Uno zaino pieno ha posto fine a più avventure di quante ne abbia mai poste un lupo.",
+        "objectives": {
+          "0": {
+            "label": "Borsello di lino acquistato"
+          }
+        }
+      },
+      "q_ps_the_signpost": {
+        "title": "Voci nel Vento",
+        "text": "Un'ultima abitudine da imparare, {playerName}, e non serve alcuna lama: leggere le bacheche. La bacheca della gilda si trova al cancello del campo, pochi passi a sud-ovest dal mio fuoco, e gilde e compagnie itineranti vi affiggono i loro annunci. Avvicinati e premi F, oppure clicca su di essa con il tasto sinistro, per leggere cosa è affisso, poi torna e raccontami cosa ha portato il vento. Una bacheca simile si trova in ogni città in cui metterai piede.",
+        "completion": "Ora sai come si diffondono le notizie nella valle, {playerName}: non per corrieri, ma per bacheche. Controllale in ogni città in cui passi; metà delle avventure comincia con tre righe d'inchiostro su una di esse.",
+        "objectives": {
+          "0": {
+            "label": "Bacheca della gilda letta"
+          }
+        }
+      },
+      "q_ps_the_long_walk": {
+        "title": "Il Lungo Cammino",
+        "text": "Una lezione resta, {playerName}, ed è quella che non posso raccontarti: devi averla vissuta almeno una volta. Morirai, là fuori. Capita a tutti, e non è la fine di niente. Prendi questa Pietra del trapasso. Premi B per aprire le tue borse e clicca su di essa con il tasto sinistro, e ti farà stendere esattamente dove ti trovi. Poi segui le istruzioni sul tuo schermo: libera il tuo spirito, cammina fino al tuo stesso corpo, ed entraci dentro. Il tuo corpo ti aspetta, il cammino è gratuito, e non perdi nulla nel farlo.",
+        "completion": "Ed eccoti di ritorno, nessun danno. Ricorda come ci si sente, {playerName}, perché la prossima volta ci saranno di mezzo delle zanne e nessuno pronto a spiegarti tutto. Il tuo corpo ti aspetta, il cammino è gratuito, e l'unica cosa che la morte ti costa davvero è il tempo che serve per tornare.",
+        "objectives": {
+          "0": {
+            "label": "Cammino di ritorno dalla morte compiuto"
+          }
+        }
+      },
+      "q_ps_set_sail": {
+        "title": "Salpa",
+        "text": "Non è rimasto nulla su questa riva che tu non abbia già percorso, sconfitto, aperto o comprato, {playerName}. Sei pronto, e a Eastbrook ti aspetta un lavoro vero. Torna giù per la strada della riva fino al molo, premi F sul Traghettatore Odo, e digli che ho detto che ti sei guadagnato la traversata. Premi L ogni volta che perdi il conto di cosa devi a chi: quello è il tuo registro missioni.",
+        "completion": "Ha detto proprio così, Maren? Un bell'elogio, da una donna che una volta mi ha fatto esercitare per una settimana intera con i nodi da ormeggio. Suona la campana accanto al mio molo quando sarai pronto, {playerName}, e la traversata ti farà scendere nel cuore della città di Eastbrook. Occhio ai lupi.",
+        "objectives": {
+          "0": {
+            "label": "Presentati al Traghettatore Odo"
+          }
+        }
+      },
       "q_gc_down_the_windway": {
         "title": "Giù per la Via del Vento",
         "text": "Hai completato la salita, {playerName}, quindi il vento ha deciso di tenerti. Wickharbor si trova a est lungo la strada delle colline, riparata nel sottovento della sua insenatura. La Capitana di Porto Odile conta ogni anima che attraversa il passo, e vorrà contare anche te. Dille che la Via del Vento è ancora aperta.",
@@ -17694,6 +17860,9 @@ export const it_IT: EnTranslations = {
           },
           "11": {
             "label": "La Strada Rialzata di Farshore"
+          },
+          "12": {
+            "label": "Le Banchine di Eastbrook"
           }
         }
       },
@@ -18056,6 +18225,27 @@ export const it_IT: EnTranslations = {
             "label": "I Campi degli Squarci"
           }
         }
+      },
+      "proving_shore": {
+        "name": "La Riva della Prova",
+        "welcome": "La Riva della Prova non ti chiede altro che tempo. Impara a conoscere il campo, colpisci le effigie, percorri la linea dei relitti, e quando sarai pronto, il Traghettatore Odo ti farà attraversare fino alla valle.",
+        "pois": {
+          "0": {
+            "label": "Campo di Dawnrest"
+          },
+          "1": {
+            "label": "Il Vecchio Molo"
+          },
+          "2": {
+            "label": "Il Campo d'Addestramento"
+          },
+          "3": {
+            "label": "La Linea dei Relitti"
+          },
+          "4": {
+            "label": "La Corsa a Ostacoli"
+          }
+        }
       }
     },
     "dungeons": {
@@ -18304,19 +18494,19 @@ export const it_IT: EnTranslations = {
         "body": "Una tua specializzazione ha raggiunto la maestria, la CIMA assoluta, kaboom, tutta la scala, fatto. Non distribuisco elogi, distribuisco micce, ma ecco, prenditi entrambe: sei brillante e leggermente terrificante. Vai a mettere i nervi in subbuglio alle montagne."
       },
       "woc_market_delivery": {
-        "sender": "The Exchange Broker",
-        "subject": "Your Exchange purchase",
-        "body": "The sale is settled and the goods are yours. The attached parcel carries the exact item you paid for, held in escrow from the moment it was listed until your payment cleared.\n\nA record of the sale lives in the Exchange ledger.\n\n- The Exchange Broker"
+        "sender": "Il Sensale della Borsa",
+        "subject": "Il tuo acquisto sulla Borsa",
+        "body": "La vendita è saldata e i beni sono tuoi. Il pacco allegato porta esattamente l'oggetto che hai pagato, custodito in deposito dal momento in cui fu messo in vendita fino a quando il tuo pagamento non è stato confermato.\n\nUn registro della vendita resta negli archivi della Borsa.\n\n- Il Sensale della Borsa"
       },
       "woc_market_return": {
-        "sender": "The Exchange Broker",
-        "subject": "Your Exchange listing has ended",
-        "body": "Your listing ended without a completed sale: the auction found no buyer, the reserve was not met, the listing was withdrawn, or the winning bidder failed to settle. Your goods return to you unharmed with this letter, exactly as they were escrowed.\n\n- The Exchange Broker"
+        "sender": "Il Sensale della Borsa",
+        "subject": "La tua inserzione sulla Borsa si è conclusa",
+        "body": "La tua inserzione si è conclusa senza una vendita completata: l'asta non ha trovato un compratore, la riserva non è stata raggiunta, l'inserzione è stata ritirata, oppure l'offerente vincitore non ha saldato il pagamento. I tuoi beni ti tornano intatti con questa lettera, esattamente come erano stati custoditi in deposito.\n\n- Il Sensale della Borsa"
       },
       "woc_market_sold": {
-        "sender": "The Exchange Broker",
-        "subject": "Your Exchange listing sold",
-        "body": "Your listing sold and the buyer settled in full. The Exchange ledger carries the record of the sale, and your Exchange activity shows the settled amount and its breakdown.\n\n- The Exchange Broker"
+        "sender": "Il Sensale della Borsa",
+        "subject": "La tua inserzione sulla Borsa è stata venduta",
+        "body": "La tua inserzione è stata venduta e l'acquirente ha saldato per intero. Il registro della Borsa conserva la traccia della vendita, e la tua attività sulla Borsa mostra l'importo saldato e la sua ripartizione.\n\n- Il Sensale della Borsa"
       }
     },
     "itemSets": {

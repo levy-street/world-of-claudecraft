@@ -210,35 +210,75 @@ describe('kit construction', () => {
     // handling (epsilon band + identity-first tiebreak) WITHOUT moving any
     // pick, which this table proves by staying put.
     //
+    // Revisited again when the Proving Shore's Mother of Pearl landed
+    // (release/v0.41.0: +1 all stats, the tutorial quest reward every fresh
+    // 20 realistically owns). On the release alone it was the single piece
+    // of fresh-20 jewelry in the game, worn in ring1 for every class with
+    // ring2 and neck empty; on this tree it joins the nine crafted pieces,
+    // so the fresh-20 jewelry roster is pinned below and the ring table
+    // admits it where it scores in (the agility camp's ring2 only, see
+    // AGI_RINGS). The day more fresh-20 jewelry lands, the roster pin reds
+    // and the presets get revisited again.
+    //
     // The ids are pinned as literals rather than recomputed from roleItemScore, so a
     // retune of the role weights has to be admitted here instead of quietly moving
     // what every preset wears.
+    const FRESH_TWENTY_JEWELRY = [
+      'burnished_thorium_amulet',
+      'coiled_copper_torc',
+      'etched_iron_loop',
+      'gleaming_thorium_loop',
+      'hammered_copper_band',
+      'iron_link_choker',
+      'mother_of_pearl',
+      'polished_copper_loop',
+      'riveted_iron_signet',
+      'weighted_thorium_band',
+    ];
+    const jewelry = Object.values(ITEMS).filter(
+      (item) => item.slot === 'neck' || item.slot === 'ring',
+    );
+    expect(jewelry.length).toBeGreaterThan(0);
+    for (const cls of ALL_CLASSES) {
+      expect(
+        jewelry
+          .filter((item) => isFreshTwentyItem(cls, item))
+          .map((item) => item.id)
+          .sort(),
+        `${cls} fresh-20 jewelry changed: revisit the kit slots`,
+      ).toEqual(FRESH_TWENTY_JEWELRY);
+    }
     //
     // Neck is archetype-blind: burnished_thorium_amulet (agi 5, sta 3) outscores
     // iron_link_choker (agi 3, sta 1) on stamina alone, so even a pure-intellect
     // caster scoring its agility at zero still takes it.
     const NECK = 'burnished_thorium_amulet';
-    // Strength and agility roles: the rung-50 str ring, then the rung-25 str
-    // ring. For the STR camps ring2 is an outright win (str 3 at full weight
-    // clears the int loop's 3 stamina). For the AGI camps ring2 is a REAL
-    // TIE: the rung-25 str ring (str 3 x 0.4 + sta 1 x 0.6) and the rung-50
-    // int ring (sta 3 x 0.6) both score exactly 1.8 in real arithmetic, and
-    // only IEEE754 product rounding ever separated them (phase 05 QA probe).
-    // bestBy judges the tie inside an epsilon band and resolves it on the
-    // role IDENTITY sum first (riveted carries str 3 + sta 1 = 4 role stats
-    // against the loop's sta 3), so the signet wins the tie on the stats the
-    // role actually uses, never on the alphabet, and the pick is stable
-    // across any rounding-equivalent scorer refactor. A pick that moves here
-    // means a weights retune (admit it) or the tie machinery broke.
-    const PHYSICAL_RINGS = ['weighted_thorium_band', 'riveted_iron_signet'] as const;
-    // Intellect roles: the rung-50 int ring, then the rung-25 int ring.
+    // Strength roles: the rung-50 str ring, then the rung-25 str ring, an
+    // outright win for ring2 (str 3 at full weight clears the int loop's 3
+    // stamina, and the keepsake's 1/1/1 scores 2.1 against the signet's 3.6).
+    const STR_RINGS = ['weighted_thorium_band', 'riveted_iron_signet'] as const;
+    // Agility roles: the rung-50 str ring, then the tutorial keepsake. Before
+    // Mother of Pearl, ring2 here was a REAL TIE: the rung-25 str ring (str 3
+    // x 0.4 + sta 1 x 0.6) and the rung-50 int ring (sta 3 x 0.6) both score
+    // exactly 1.8 in real arithmetic, and only IEEE754 product rounding ever
+    // separated them (phase 05 QA probe); bestBy judges the tie inside an
+    // epsilon band and resolves it on the role IDENTITY sum first, so the
+    // signet won on the stats the role actually uses. The keepsake now
+    // clears both outright (agi 1 + str 1 x 0.4 + sta 1 x 0.6 = 2.0 against
+    // 1.8), a real score gap, so the tie no longer decides this camp. A pick
+    // that moves here means a weights retune (admit it) or the scorer broke.
+    const AGI_RINGS = ['weighted_thorium_band', 'mother_of_pearl'] as const;
+    // Intellect roles: the rung-50 int ring, then the rung-25 int ring (the
+    // keepsake scores 1.75 caster / 2.1 healer against the loop's 3.4).
     const CASTER_RINGS = ['gleaming_thorium_loop', 'etched_iron_loop'] as const;
-    const PHYSICAL_SPECS = [
+    const STR_SPECS = [
       'warrior/arms',
       'warrior/fury',
       'warrior/prot',
       'paladin/protection',
       'paladin/retribution',
+    ];
+    const AGI_SPECS = [
       'hunter/beast_mastery',
       'hunter/marksmanship',
       'hunter/survival',
@@ -263,17 +303,17 @@ describe('kit construction', () => {
       'druid/balance',
       'druid/restoration',
     ];
-    // druid/feral wears the same pair as the agility camp but for a different
-    // reason, and it is not a mistake. It is the one TANK_AGI role, and
-    // stamina leads outright there (sta 1.0), so after the str ring it takes
-    // the rung-50 INT ring for its 3 stamina rather than the rung-25 str
-    // ring: 3.0 against 1.9, a real score gap, not the epsilon tie above. A
-    // tank wearing an intellect ring looks wrong and is the scorer working as
-    // designed.
+    // druid/feral takes the str ring and then the rung-50 INT ring, and it is
+    // not a mistake. It is the one TANK_AGI role, and stamina leads outright
+    // there (sta 1.0), so after the str ring it takes the int loop for its 3
+    // stamina rather than the rung-25 str ring or the keepsake: 3.0 against
+    // 1.9 and 2.1, real score gaps, not the epsilon tie above. A tank wearing
+    // an intellect ring looks wrong and is the scorer working as designed.
     const FERAL_RINGS = ['weighted_thorium_band', 'gleaming_thorium_loop'] as const;
 
     const expected = new Map<string, readonly [string, string]>();
-    for (const key of PHYSICAL_SPECS) expected.set(key, PHYSICAL_RINGS);
+    for (const key of STR_SPECS) expected.set(key, STR_RINGS);
+    for (const key of AGI_SPECS) expected.set(key, AGI_RINGS);
     for (const key of CASTER_SPECS) expected.set(key, CASTER_RINGS);
     expected.set('druid/feral', FERAL_RINGS);
     // Cross-check against the role table, so a spec added there without a row here

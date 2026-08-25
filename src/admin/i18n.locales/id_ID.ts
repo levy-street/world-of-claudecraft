@@ -7,6 +7,9 @@
 // (tests/i18n_admin_catalog.test.ts).
 
 export const id_ID: Record<string, string> = {
+  'error.flagActiveExists': 'akun ini sudah memiliki penanda terbuka dari jenis tersebut',
+  'wealth.largeMovementsUnavailable':
+    'pergerakan bank berjumlah besar tidak dapat dimuat (pembacaan buku besar kehabisan waktu); rincian emas di atas tetap lengkap',
   'error.guildBankDeleting':
     'Guild ini sedang dihapus, sehingga banknya ditutup. Tidak ada yang diubah.',
   'error.guildBankItemRequired': 'Masukkan id barang yang Anda perkirakan berada di slot itu.',

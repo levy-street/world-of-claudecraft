@@ -269,12 +269,16 @@ describe('reconcile through GameServer.join', () => {
       motdSetBy: '',
       members: [],
       events: [],
+      pledgeSettings: { enabled: true, minLevel: 1, note: '' },
+      pledges: [],
+      tier: 0,
     };
     vi.spyOn(server.social, 'snapshot').mockResolvedValue({
       friends: [],
       blocks: [],
       ignores: [],
       guild,
+      myPledge: null,
     });
     const setPlayerGuild = vi.spyOn(server.sim, 'setPlayerGuild');
     const fc = fakeWs();

@@ -197,6 +197,10 @@ export function renderVendorWindow(
     // than decoration. Never disabled for it: the sale is real, the gate is
     // at the harvest.
     row.className = goods.requirementUnmet ? 'vendor-item vendor-locked' : 'vendor-item';
+    // Item identity for the island coach's press-this-next glow (bootcamp.ts
+    // toggles .qd-coach by this attribute; distinct from the focus-key
+    // namespace, which stays focus_restore's alone).
+    row.dataset.coachItem = itemId;
     // The disable state tracks the SELECTED multiple (phase 21): a count row
     // gates on the whole-count total; force-1 and custom rows keep the 1x
     // baseline (the custom prompt's typed amount decides the rest).

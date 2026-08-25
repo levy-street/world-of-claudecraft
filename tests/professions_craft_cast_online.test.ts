@@ -47,7 +47,7 @@ import { completeCraftCast } from './helpers/enchant_family_cast';
 const RECIPE_ID = 'recipe_eastbrook_arming_sword';
 // The same northern Eastbrook Vale spot the other profession wire suites use:
 // outside every station circle and clear of hostile camp pull ranges.
-const FIELD_POS = { x: 0, z: 150 };
+const FIELD_POS = { x: 40, z: 140 };
 
 type SelfWire = {
   ccast?: { r: string; rem: number; tot: number } | null;

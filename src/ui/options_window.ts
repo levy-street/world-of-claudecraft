@@ -225,7 +225,6 @@ const BIND_ACTION_LABEL_KEYS: Partial<Record<string, TranslationKey>> = {
   targetFriendlyNext: 'hudChrome.keybinds.targetFriendlyNext',
   targetPrev: 'hudChrome.keybinds.targetPrev',
   discord: 'hudChrome.keybinds.discord',
-  valecup: 'hudChrome.keybinds.valecup',
   bgFlag: 'hudChrome.keybinds.bgFlag',
   sheathe: 'hudChrome.keybinds.sheathe',
   petAttack: 'hudChrome.keybinds.petAttack',

@@ -3590,69 +3590,6 @@
     width: 34px;
     height: 34px;
   }
-  /* Vale Cup notification compaction (mobile). The desktop indicator (top:70px) and
-     in-match strip (top:64px, min-width 260px, 24px score) carry no touch rules, so
-     on a short landscape phone they float as a large upper-middle band. Compact both
-     hard and seat them against the very top edge (the #banner recipe above is the
-     precedent) so they hug the frame. Behaviour is unchanged: no dismissal is added
-     and the strip stays pointer-events:none (components.css). The arena-status
-     stacking exception (components.css #arena-status[style*="block"] ~ #vcup-indicator)
-     keeps a higher specificity, so when an arena match is live it still nudges the
-     compacted indicator below the arena banner. */
-  body.mobile-touch #vcup-indicator {
-    top: calc(env(safe-area-inset-top) + 6px);
-    gap: 4px;
-    padding: 2px 8px;
-    font-size: 10px;
-  }
-  body.mobile-touch #vcup-indicator .vcupi-title {
-    font-size: 10px;
-    letter-spacing: 0.2px;
-  }
-  body.mobile-touch #vcup-indicator .vcupi-score {
-    font-size: 12px;
-  }
-  body.mobile-touch #vcup-indicator .vcupi-clock {
-    font-size: 9.5px;
-  }
-  body.mobile-touch #vcup-match-hud {
-    top: calc(env(safe-area-inset-top) + 6px);
-    min-width: auto;
-    gap: 1px;
-    padding: 3px 10px 2px;
-  }
-  body.mobile-touch #vcup-match-hud .vcuph-row {
-    gap: 8px;
-  }
-  body.mobile-touch #vcup-match-hud .vcuph-side {
-    min-width: 0;
-    gap: 4px;
-  }
-  body.mobile-touch #vcup-match-hud .vcuph-name {
-    font-size: 10px;
-  }
-  body.mobile-touch #vcup-match-hud .vcuph-score {
-    font-size: 16px;
-    min-width: 16px;
-  }
-  body.mobile-touch #vcup-match-hud .vcuph-colon {
-    margin: 0 3px;
-    font-size: 13px;
-  }
-  body.mobile-touch #vcup-match-hud .vcuph-clock {
-    font-size: 10px;
-  }
-  body.mobile-touch #vcup-match-hud .vcuph-phase {
-    font-size: 10px;
-  }
-  /* The Vale Cup indicator/strip hug the top edge, but yield the top-centre line
-     to the pet bar when a pet is out. (The consumables row used to compete for the
-     same line; it now lives in the action ring and is transient, so it no longer
-     displaces anything.) */
-  body.mobile-touch.mobile-pet-active #vcup-indicator,
-  body.mobile-touch.mobile-pet-active #vcup-match-hud {
-    top: calc(env(safe-area-inset-top) + 64px);
-  }
   body.mobile-touch .window {
     max-width: calc(var(--app-vw, 100vw) / var(--window-scale, 1) - 20px);
     /* --window-scale, never --ui-scale: this generic rule also governs the
@@ -3688,6 +3625,7 @@
     min-height: 48px;
   }
   body.mobile-touch #leaderboard-window,
+  body.mobile-touch #guild-board-window,
   body.mobile-touch #daily-rewards-window {
     z-index: 95;
   }
@@ -3927,10 +3865,10 @@
   body.mobile-touch #emote-editor,
   body.mobile-touch #arena-window,
   body.mobile-touch #dungeon-finder-window,
-  body.mobile-touch #valecup-window,
   body.mobile-touch #card-duel-window,
   body.mobile-touch #delve-board,
   body.mobile-touch #leaderboard-window,
+  body.mobile-touch #guild-board-window,
   body.mobile-touch #loot-settings-window,
   body.mobile-touch #town-focus-window,
   body.mobile-touch #dev-command-window,
@@ -4445,7 +4383,8 @@
   }
   /* The leaderboard body (.lb-body) has its own 56vh scroll; cap the whole sheet to
      the viewport so a long board never runs the window past the bottom edge. */
-  body.mobile-touch #leaderboard-window {
+  body.mobile-touch #leaderboard-window,
+  body.mobile-touch #guild-board-window {
     max-height: calc(var(--app-vh) / var(--ui-scale, 1) - 20px);
   }
   /* Loot Settings is a small dialog; JS docks it beside the party frames on desktop
@@ -4824,10 +4763,20 @@
   }
   body.mobile-touch .soc-add input,
   body.mobile-touch .soc-billboard-edit input,
+  body.mobile-touch .soc-pledge-note-row input,
+  body.mobile-touch .soc-pledge-minlvl input,
   body.mobile-touch .trade-money input {
     min-height: 40px;
     font-size: 16px;
     box-sizing: border-box;
+  }
+  /* The pledge-settings accepting toggle and the board's Pledge button join the
+     40px touch floor (the checkbox rides its label's padded hit area). */
+  body.mobile-touch .soc-pledge-open,
+  body.mobile-touch .soc-my-pledge .btn,
+  body.mobile-touch .soc-pledge-note-row .btn,
+  body.mobile-touch .lb-pledge-btn {
+    min-height: 40px;
   }
   /* Three 16px digits did not fit the desktop 52px coin box: a five-digit gold
      value scrolled inside it. */
@@ -6501,11 +6450,6 @@
   }
   /* Vale Cup: the join/leave .btn and the guild-record toggle (its pickers already
      carry a pointer:coarse floor). */
-  body.mobile-touch #valecup-window .btn,
-  body.mobile-touch #valecup-window .vcup-guild-toggle {
-    min-height: 40px;
-    box-sizing: border-box;
-  }
   /* Mailbox: the folder tab strip and the "back to inbox" link. The Send-tab
      parcel chip is now a non-interactive span (the +/- stepper and remove
      button are the real controls); their own pointer: coarse 40x40 floor

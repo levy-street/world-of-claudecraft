@@ -85,7 +85,7 @@ describe('useGatherToolItem via Sim.useItem (the sim command body)', () => {
   });
 
   it('prefers a ready node over a nearer one still respawning for this player', () => {
-    // ore_eastbrook_1 (-70,-53) and ore_eastbrook_2 (-73,-49) sit exactly
+    // ore_eastbrook_1 (-20,153) and ore_eastbrook_2 (-23,157) sit exactly
     // 5yd apart, so standing ON node 1 keeps node 2 at INTERACT_RANGE
     // (inclusive). Harvest node 1, then click the pick again from the same
     // spot: the respawning node 1 is nearer, the ready node 2 must win.
@@ -214,7 +214,7 @@ describe('gatherToolProfessionFor (the client hook item filter)', () => {
 });
 
 describe('nearestGatherNodeForProfession (the client hook node pick)', () => {
-  const AT_NODE_1 = { x: -70, z: -53 }; // ore_eastbrook_1; node 2 is exactly 5yd away
+  const AT_NODE_1 = { x: -20, z: 153 }; // ore_eastbrook_1; node 2 is exactly 5yd away
 
   function fakeWorld(pos: { x: number; z: number }, readyIds: (id: string) => boolean) {
     return {

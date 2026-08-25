@@ -108,6 +108,8 @@ const MOBILE_WINDOW_EXCEPTIONS: Record<string, string> = {
     'small centered modal (dynamic, reused by the input dialog); the base .window centering is correct on touch',
   'profession-tutorial':
     'small centered modal (dynamic, the first-tier profession tutorial); centered and clamped by its own base #profession-tutorial rule plus the shared .window viewport clamp, with its z-index floored above the mobile sheet (96) in JS',
+  'tutorial-greeting':
+    'small centered modal (dynamic, the tutorial island spawn greeting); centered and clamped by its own base #tutorial-greeting rule plus the shared .window viewport clamp, with its z-index floored above the mobile sheet (96) in JS, the profession-tutorial precedent',
   'delve-rite-panel': 'in-run gameplay overlay, not a menu window that docks to a sheet',
   'lockpick-panel': 'in-run gameplay overlay, not a menu window that docks to a sheet',
 };
@@ -238,11 +240,13 @@ describe('mobile window coverage (Phase 5 parity)', () => {
       'dev_command_window.ts',
       'hud.ts',
       'profession_tutorial_window.ts',
+      'tutorial_greeting_window.ts',
     ]);
     expect([...dyn.ids].sort()).toEqual([
       'confirm-dialog',
       'dev-command-window',
       'profession-tutorial',
+      'tutorial-greeting',
     ]);
   });
 
@@ -339,7 +343,6 @@ describe('mobile window coverage (Phase 5 parity)', () => {
       'mailbox-window',
       'emote-editor',
       'arena-window',
-      'valecup-window',
       'delve-board',
       'leaderboard-window',
       'loot-settings-window',

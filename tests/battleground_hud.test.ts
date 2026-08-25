@@ -11,7 +11,7 @@ import {
   bgFieldPlanWalls,
 } from '../src/sim/battleground_layout';
 import { battlegroundOrigin } from '../src/sim/data';
-import { BATTLEGROUND_FIRST_WIN_BONUS_HONOR } from '../src/sim/pvp';
+import { BATTLEGROUND_FIRST_WIN_BONUS_HONOR, DOUBLE_HONOR_MULTIPLIER } from '../src/sim/pvp';
 import { BG_CAPS_TO_WIN, BG_TIME_WARNINGS } from '../src/sim/social/battleground';
 import {
   BattlegroundScoreboard,
@@ -43,6 +43,7 @@ const baseInfo = (over: Partial<BgInfo> = {}): BgInfo => ({
   queueSize: 0,
   queuedParty: 1,
   firstWinBonusReady: false,
+  doubleHonorActive: false,
   proposal: null,
   requeueIn: 0,
   match: null,
@@ -122,6 +123,7 @@ const BG_WIRE_KEYS = new Set<string>([
     'queueSize',
     'queuedParty',
     'firstWinBonusReady',
+    'doubleHonorActive',
     'match',
     'ladder',
   ].map((k) => `.${k}`),
@@ -1005,6 +1007,65 @@ describe('the first-win-of-the-day bonus chip', () => {
     // The amount goes through the house formatter like every other number here.
     expect(chip).toContain('{ honor: num(bonus.honor) }');
     // The glyph is decoration beside real text, so it is hidden, never named.
+    expect(chip).toContain('aria-hidden="true"');
+  });
+});
+
+describe('the weekly Double Honor event chip', () => {
+  const liveView = (over: Partial<BgInfo> = {}) =>
+    buildBgWindowView({
+      info: baseInfo(over),
+      playerName: 'Ravven',
+      playerLevel: 30,
+      party: null,
+      playerId: 7,
+      allTime: null,
+    }) as Extract<ReturnType<typeof buildBgWindowView>, { kind: 'live' }>;
+
+  it('offers the chip while the event runs, at the sim constant', () => {
+    const view = liveView({ doubleHonorActive: true });
+    expect(view.doubleHonor).toEqual({ multiplier: DOUBLE_HONOR_MULTIPLIER });
+    // Not a UI-side literal: retuning the sim constant moves the chip with it.
+    expect(DOUBLE_HONOR_MULTIPLIER).toBeGreaterThan(1);
+  });
+
+  it('drops the chip outside the weekend window', () => {
+    expect(liveView({ doubleHonorActive: false }).doubleHonor).toBeNull();
+  });
+
+  it('omits the chip on a snapshot from a server that predates the field', () => {
+    // Same rolling-deploy honesty as the first-win chip: undefined must read
+    // as "no event", never as a promise the server may not keep.
+    const stale = baseInfo();
+    delete (stale as Partial<BgInfo>).doubleHonorActive;
+    const view = buildBgWindowView({
+      info: stale,
+      playerName: 'Ravven',
+      playerLevel: 30,
+      party: null,
+      playerId: 7,
+      allTime: null,
+    }) as Extract<ReturnType<typeof buildBgWindowView>, { kind: 'live' }>;
+    expect(view.doubleHonor).toBeNull();
+  });
+
+  it('the chip state is in the repaint signature, so the rollover repaints it', () => {
+    expect(liveView({ doubleHonorActive: true }).sig).not.toBe(
+      liveView({ doubleHonorActive: false }).sig,
+    );
+  });
+
+  it('paints with the same visible-text accessibility posture as the first-win chip', () => {
+    const src = readFileSync(new URL('../src/ui/arena_window.ts', import.meta.url), 'utf8');
+    const chip = src.slice(
+      src.indexOf('private bgDoubleHonorChipHtml'),
+      src.indexOf('private bgActionHtml'),
+    );
+    expect(chip.length).toBeGreaterThan(0);
+    expect(chip).not.toContain('title=');
+    expect(chip).toContain("t('hudChrome.bg.doubleHonorLine'");
+    // The multiplier goes through the house formatter like every number here.
+    expect(chip).toContain('{ mult: num(event.multiplier) }');
     expect(chip).toContain('aria-hidden="true"');
   });
 });

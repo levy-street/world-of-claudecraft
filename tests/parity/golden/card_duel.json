@@ -8,13 +8,13 @@
     "createCardHand rng draw (match start, both sides)",
     "drawOne rng draw (round resolution, both sides)"
   ],
-  "draws": 44,
-  "drawDigest": "4c6a10a0",
+  "draws": 6,
+  "drawDigest": "2ea58598",
   "frames": [
     {
       "tick": 0,
       "time": 0,
-      "nextId": 971,
+      "nextId": 1001,
       "state": "5bc471b0",
       "events": "741638a5",
       "rng": {
@@ -28,100 +28,100 @@
     {
       "tick": 5,
       "time": 0.25,
-      "nextId": 973,
-      "state": "06701e78",
-      "events": "304bcde7",
+      "nextId": 1003,
+      "state": "29d879a1",
+      "events": "844c39de",
       "rng": {
-        "draws": 38,
-        "digest": "ef472e1d"
+        "draws": 0,
+        "digest": "811c9dc5"
       }
     },
     {
       "tick": 10,
       "time": 0.5,
-      "nextId": 973,
-      "state": "8155fa3f",
+      "nextId": 1003,
+      "state": "902b2874",
       "events": "741638a5",
       "rng": {
-        "draws": 38,
-        "digest": "ef472e1d"
+        "draws": 0,
+        "digest": "811c9dc5"
       }
     },
     {
       "tick": 15,
       "time": 0.75,
-      "nextId": 973,
-      "state": "16e1b535",
+      "nextId": 1003,
+      "state": "376db806",
       "events": "741638a5",
       "rng": {
-        "draws": 38,
-        "digest": "ef472e1d"
+        "draws": 0,
+        "digest": "811c9dc5"
       }
     },
     {
       "tick": 20,
       "time": 1,
-      "nextId": 973,
-      "state": "a58f6076",
-      "events": "087c89c4",
+      "nextId": 1003,
+      "state": "34987833",
+      "events": "99b0f390",
       "rng": {
-        "draws": 38,
-        "digest": "ef472e1d"
+        "draws": 0,
+        "digest": "811c9dc5"
       }
     },
     {
       "tick": 25,
       "time": 1.25,
-      "nextId": 973,
-      "state": "4f4c6be1",
+      "nextId": 1003,
+      "state": "c0cbf2ae",
       "events": "741638a5",
       "rng": {
-        "draws": 38,
-        "digest": "ef472e1d"
+        "draws": 0,
+        "digest": "811c9dc5"
       }
     },
     {
       "tick": 30,
       "time": 1.5,
-      "nextId": 973,
-      "state": "913e2618",
+      "nextId": 1003,
+      "state": "82b20585",
       "events": "741638a5",
       "rng": {
-        "draws": 38,
-        "digest": "ef472e1d"
+        "draws": 0,
+        "digest": "811c9dc5"
       }
     },
     {
       "tick": 35,
       "time": 1.75,
-      "nextId": 973,
-      "state": "82d58350",
+      "nextId": 1003,
+      "state": "6c76e0fd",
       "events": "741638a5",
       "rng": {
-        "draws": 38,
-        "digest": "ef472e1d"
+        "draws": 0,
+        "digest": "811c9dc5"
       }
     },
     {
       "tick": 40,
       "time": 2,
-      "nextId": 973,
-      "state": "cb0892ed",
+      "nextId": 1003,
+      "state": "3551307e",
       "events": "741638a5",
       "rng": {
-        "draws": 38,
-        "digest": "ef472e1d"
+        "draws": 0,
+        "digest": "811c9dc5"
       }
     },
     {
       "tick": 41,
       "time": 2.05,
-      "nextId": 973,
-      "state": "0890e62c",
+      "nextId": 1003,
+      "state": "6ef96b49",
       "events": "741638a5",
       "rng": {
-        "draws": 44,
-        "digest": "4c6a10a0"
+        "draws": 6,
+        "digest": "2ea58598"
       },
       "label": "final",
       "players": [
@@ -153,12 +153,12 @@
               "worn_sword"
             ],
             "visited": [
-              "poi:eastbrook_vale:eastbrook"
+              "poi:eastbrook_vale:wolf_run"
             ]
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 971,
+          "entityId": 1001,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword",
@@ -214,12 +214,12 @@
               "spring_water"
             ],
             "visited": [
-              "poi:eastbrook_vale:eastbrook"
+              "poi:eastbrook_vale:wolf_run"
             ]
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 972,
+          "entityId": 1002,
           "equipment": {
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
@@ -263,7 +263,7 @@
               "name": "Battle Stance",
               "remaining": 3597.95,
               "school": "physical",
-              "sourceId": 971
+              "sourceId": 1001
             }
           ],
           "blockChance": 0.05,
@@ -273,10 +273,10 @@
           "critChance": 0.06,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.06,
-          "fallStartY": 1.5,
+          "fallStartY": 5.203283,
           "fiveSecondRule": 101.05,
           "hp": 100,
-          "id": 971,
+          "id": 1001,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -289,15 +289,15 @@
           "petMode": "defensive",
           "pos": {
             "x": 13,
-            "y": 1.5,
+            "y": 5.203283,
             "z": 2
           },
           "potionCooldownUntil": -1,
           "resourceType": "rage",
           "spawnPos": {
-            "x": 2,
-            "y": 1.5,
-            "z": -2
+            "x": -94,
+            "y": -2,
+            "z": -58
           },
           "spellPower": 5,
           "stats": {
@@ -323,10 +323,10 @@
           "critChance": 0.056,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.056,
-          "fallStartY": 1.5,
+          "fallStartY": 5.203283,
           "fiveSecondRule": 101.05,
           "hp": 54,
-          "id": 972,
+          "id": 1002,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -338,16 +338,16 @@
           "petMode": "defensive",
           "pos": {
             "x": 13,
-            "y": 1.5,
+            "y": 5.203283,
             "z": 2
           },
           "potionCooldownUntil": -1,
           "resource": 195,
           "resourceType": "mana",
           "spawnPos": {
-            "x": 2,
-            "y": 1.5,
-            "z": -2
+            "x": -94,
+            "y": -2,
+            "z": -58
           },
           "spellPower": 13,
           "stats": {

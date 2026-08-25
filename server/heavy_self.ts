@@ -23,7 +23,8 @@ export const HEAVY_SELF_CMDS = new Set<string>([
   'buy',
   'sell',
   'buyback',
-  'vcup_bet', // debits copper: refresh the self snapshot so the purse updates
+  // 'vcup_bet' (a copper debit) sat here until the Vale Cup retired with
+  // release/v0.41.0 (1c74387b4c); the command no longer exists.
   // Farming's two plot mutations, added when `fplot` moved behind the heavy
   // gate. BELT AND BRACES, stated honestly rather than overclaimed: every
   // SUCCESSFUL plant spends a seed (the lock-aware walk fires
@@ -107,7 +108,8 @@ export const HEAVY_SELF_CMDS = new Set<string>([
 ]);
 export const HEAVY_SELF_EVENTS = new Set<string>([
   'loot',
-  'vcupBetSettled', // credits copper to the bettor: refresh their purse
+  // 'vcupBetSettled' (a copper credit) sat here until the Vale Cup retired with
+  // release/v0.41.0 (1c74387b4c); the event no longer exists.
   'mailArrived',
   'mailResult',
   'levelup',

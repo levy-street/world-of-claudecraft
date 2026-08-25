@@ -384,8 +384,93 @@ interface AttributionTargetFixture {
 // horizon fast path, display-pacing admission), the sliding-far-mob-freeze fix
 // and the stale remote-entity holdout repair. Every one of them retook no
 // capture and moved only the renderer/prewarm runtime leaves.
+//
+// UPSTREAM'S OWN RE-MINT HISTORY over the release/v0.41.0 span, kept rather
+// than dropped (the block that follows is the release's record verbatim).
+// Re-minted for shader-memory-probes renderer instrumentation and VFX teardown
+// extraction. The renderer leaf moved; no capture was retaken because both
+// changes are behavior-neutral for the accepted visual evidence.
+// Re-minted for the fast-loading-screen-variety merge with release/v0.40.0:
+// the renderer runtime leaf moved on both sides of the merge (this branch's
+// character asset-ready wiring, the release's shader-memory probes). No
+// capture was retaken.
+// Re-minted for the review-fix round (the nearby-view floor in
+// prewarm_policy.ts, the weapon-skin early-out wiring in renderer.ts):
+// both runtime leaves moved. No capture was retaken.
+// Re-minted for the Sowfield demolition: the Vale Cup removal strips the set
+// piece, ball, team rings, practice sky and fireworks arms from renderer.ts,
+// so the rendererIntegration leaf moves and the composite follows its bytes.
+// No capture was retaken.
+// Re-minted 2026-08-18 for the Eastbrook harbor move (layout v3, commit
+// d19aa33f76, docs/design/eastbrook-revamp/site-plan.md): the town move
+// commits the authoritativeLayout leaf (src/sim/eastbrook_layout.ts), the
+// townRuntime leaf (src/render/eastbrook_town.ts) and the rendererIntegration
+// leaf (the wave D harbor wiring in src/render/renderer.ts), and re-aiming
+// the polish views and matched-view overrides at the v3 lots moves the
+// captureContract leaf too. No capture was retaken: the accepted evidence
+// keeps its pre-move framing (frozen in the artifact-integrity suite) and
+// only the swept provenance bytes follow the merged inputs.
+// Re-minted for owner refinement round 6b: the chapel re-shell and the NPC
+// redistribution move the authoritativeLayout leaf (src/sim/eastbrook_layout.ts)
+// and re-aiming the apothecary-lin view at Lin's quayside stand moves the
+// captureContract leaf, so the composite mints anew. No capture was retaken:
+// the accepted evidence keeps its frozen framing and only the swept provenance
+// bytes follow the merged inputs.
+// Re-minted again for owner round 6b's world wave: the authoritativeLayout leaf
+// moves once more (the two market stalls opened out across the square, and
+// forgemistress_darva, tinker_gizzel and FURY moved off their neighbours), so
+// the composite mints anew. No capture was retaken: the accepted evidence keeps
+// its frozen framing and only the swept provenance bytes follow the inputs.
+// The same round re-aimed the captureContract leaf: the two market stall views
+// and FURY's portrait view follow their moved subjects, so the composite mints
+// once more on top of the layout move.
+// Re-minted for the integration merge of the eastbrook program onto the
+// release tip (spell-icon revert, sky KTX2, druid auto-unshift): both parents'
+// renderer and layout bytes combine in one tree, so the composite mints a
+// value matching neither parent. No capture was retaken.
+// Re-minted for the release/v0.39.0 base merge into feature/tutorial-island: the
+// resolved renderer.ts and prewarm_policy.ts combine the release's delve tracker,
+// mount prewarm and shadow-depth bytes with the Proving Shore island_guidance
+// call sites, so the composite matches neither parent. No capture was retaken.
+// Re-minted for the island far-shore haze band: renderer.ts passes the camera
+// to horizonHazePlan at its two call sites, so the composite follows those
+// bytes. No capture was retaken.
+// Re-minted after merging release/v0.40.0 into the loading-hitch branch:
+// renderer.ts combines mandatory entry admission with the release's rift
+// long-session resource lifecycle changes. No capture was retaken.
+// Re-minted for the v0.40 batch merge-forward over the loading review fixes:
+// renderer.ts and prewarm_policy.ts now seal the combined release-batch tree.
+// No capture was retaken.
+// Re-minted for the loading review fixes (rebuild reveal gates, inactive
+// horizon fast path, display-pacing admission, and restored rationale): the
+// renderer integration leaf moved. No capture was retaken.
+// Re-minted for the sliding-far-mob-freeze fix (the far-mesh swap now also
+// holds out a moving entity): the renderer integration leaf moved. No
+// capture was retaken.
+// Re-minted for the stale remote-entity holdout repair (renderer.ts): the
+// renderer integration leaf moved. No capture was retaken.
+// Re-minted for the v0.40.0 sync merge into the guild pledge branch (the
+// OSSBrain v0.40 batch landed on the release arm; renderer inputs moved on
+// both sides). No capture was retaken.
+//
+// RE-MINTED AT THE MERGE OF release/v0.41.0 (tip ff2837da1f) into feature/masterwrought (base 9a89e3483e). BOTH parents
+// re-minted this seal since their common base again (the release for the
+// Sowfield demolition, the Eastbrook harbor move and its owner rounds, the
+// Proving Shore island and the guild pledge sync; this branch for its farm
+// visual wiring and its own release syncs), and BOTH parents edited
+// src/render/renderer.ts, so the merged tree mints a value matching NEITHER
+// parent. Parent values for the record: ours 0e27f9ad, the release
+// b4f994b0. The release literal below is carried as a PLACEHOLDER: it
+// MUST be re-minted from the merged working tree with the repo's own tool
+// (node scripts/assets/eastbrook_grand_armoury/remint_polish_provenance.mjs)
+// and committed with exactly the bytes it read. No capture was retaken.
+// Re-minted at the merge of release/v0.41.0 (ff2837da1f) into
+// feature/masterwrought (base 9a89e3483e): both parents had re-minted, so
+// neither literal was right for the merged tree; remint_polish_provenance.mjs
+// ran over the fully resolved tree (renderer.ts, eastbrook_town.ts and
+// eastbrook_layout.ts are the drifted inputs). No capture was retaken.
 const PINNED_POLISH_COMPOSITE_FINGERPRINT =
-  '0e27f9adfaf2ef41b901c25bfc84fc5b5bcda81bb77a7c1badfba11f1e927ba7';
+  'ad463f06d9f597d8aed5b13cba23564161e09170e9cbb1dbee8a2ee5a54f67b1';
 
 function validPolishAttributionTargets(): AttributionTargetFixture[] {
   return [
@@ -763,30 +848,42 @@ describe('Eastbrook polish capture contract', () => {
   });
 
   it('literal-pins v2 service framing overrides without mutating historical rebuild views', () => {
+    // Re-pinned 2026-08-18 for the Eastbrook harbor move (layout v3, commit
+    // d19aa33f76, docs/design/eastbrook-revamp/site-plan.md): every override
+    // re-derived to the v3 lots (targets on the buildings' front standing
+    // points, cameras collision-clear on the public faces).
+    // Re-pinned for owner round 6b's world wave: the stall-world-market
+    // override moves with its stall to the opened-out market square, in
+    // lockstep with the polish view it mirrors, so the matched shot still
+    // frames the stall rather than the ground it left.
     expect(EASTBROOK_TOWN_POLISH_MATCHED_VIEW_OVERRIDES).toEqual({
+      'armoury-relation': {
+        camera: { x: 34, y: 15, z: 25 },
+        target: { x: 12.5, y: 4, z: -5.5 },
+      },
       'bank-and-chest': {
-        camera: { x: 5, y: 7, z: 2 },
-        target: { x: 14.156943251329539, y: 3.2, z: 8.685223202016726 },
+        camera: { x: 5, y: 7, z: -101 },
+        target: { x: 8.994796179957174, y: 3.2, z: -97.00520382004282 },
       },
       'smithy-and-forge': {
-        camera: { x: 10, y: 7, z: 8 },
-        target: { x: 3.687633548766497, y: 3, z: 15.598153967032626 },
+        camera: { x: -9.5, y: 7, z: -126 },
+        target: { x: -6.293250516799596, y: 3, z: -124.1466252583998 },
       },
       'inn-and-kitchens': {
-        camera: { x: 0, y: 8, z: 8 },
-        target: { x: -10.018829436136041, y: 3, z: 13.621842145917809 },
+        camera: { x: -43, y: 8, z: -94 },
+        target: { x: -42.82589170715949, y: 3, z: -90.73189846640925 },
       },
       'chapel-and-weaving': {
-        camera: { x: 0, y: 12, z: 4 },
-        target: { x: -13.2, y: 3, z: -10.5 },
+        camera: { x: 26, y: 12, z: -100 },
+        target: { x: -13, y: 3, z: -100 },
       },
       'toolworks-service-perimeter': {
-        camera: { x: 4, y: 7, z: -9 },
-        target: { x: 5, y: 5, z: -14.25 },
+        camera: { x: -11, y: 7, z: -120 },
+        target: { x: -13.614789156231515, y: 5, z: -124.42218373434727 },
       },
       'stall-world-market': {
-        camera: { x: -6, y: 6, z: 0 },
-        target: { x: -5.75, y: 2.5, z: 7 },
+        camera: { x: -16, y: 6, z: -93 },
+        target: { x: -19.517695018376127, y: 2.5, z: -95.26296354780212 },
       },
     });
     expect(EASTBROOK_TOWN_POLISH_MATCHED_CAPTURE_VIEWS).toHaveLength(23);
@@ -885,10 +982,13 @@ describe('Eastbrook polish capture contract', () => {
     expect(toolworks).toBeDefined();
     expect(toolworksView).toBeDefined();
     if (!toolworks || !toolworksView) throw new Error('missing toolworks capture seam');
+    // Re-pinned 2026-08-18 for the Eastbrook harbor move (layout v3, commit
+    // d19aa33f76, docs/design/eastbrook-revamp/site-plan.md): the toolworks
+    // was re-lotted to the crafts lane.
     expect(toolworks).toMatchObject({
-      position: { x: 6.2, z: -18 },
-      rotation: -0.3006056700423954,
-      frontStandingPoint: { x: 5.089629608322198, z: -14.4181600268458 },
+      position: { x: -16, z: -128 },
+      rotation: 0.5880026035475675,
+      frontStandingPoint: { x: -13.614789156231515, z: -124.42218373434727 },
     });
     expect(toolworksStation?.position).toEqual(toolworks?.frontStandingPoint);
     expect(
@@ -1060,21 +1160,35 @@ describe('Eastbrook polish capture contract', () => {
   });
 
   it('pins public-facing NPC portraits at Lin, Saul, and FURY authored positions', () => {
+    // Re-pinned 2026-08-18 for the Eastbrook harbor move (layout v3, commit
+    // d19aa33f76, docs/design/eastbrook-revamp/site-plan.md): Lin now serves
+    // the market square, Saul the Ravenpost mailbox lane, and FURY the
+    // graveyard approach (the view name stays immutable evidence naming).
+    // Re-pinned for owner refinement round 6b: the town's NPCs were
+    // redistributed by role along the dock road, moving Lin from the civic
+    // green to the quayside home at (-72, -96). Her portrait view follows her
+    // (target on the authored stand, camera 7 yd out along her facing);
+    // Saul and FURY did not move, so their rows are unchanged.
+    // Re-pinned again for owner round 6b's world wave: FURY moved off the
+    // chapel step out to the town's eastern edge at (16, -78), so his portrait
+    // row follows him (target on the authored stand, camera holding its former
+    // 4.47 yd offset on his re-derived public-facing side). Lin and Saul did
+    // not move this round.
     const expectedViews = {
       'apothecary-lin': {
         subject: 'apothecary_lin',
-        camera: { x: 1.8, y: 6, z: 6 },
-        target: { x: 2.8431593444121797, y: 2.5, z: 9.717148252611294 },
+        camera: { x: -65, y: 6, z: -96 },
+        target: { x: -72, y: 2.5, z: -96 },
       },
       'ravenpost-chronicler': {
         subject: 'chronicler_saul',
-        camera: { x: -10, y: 6.5, z: -11 },
-        target: { x: 0, y: 2.5, z: -14.5 },
+        camera: { x: 10.5, y: 6.5, z: -85 },
+        target: { x: 10.2, y: 2.5, z: -87.5 },
       },
       'west-wall-quartermaster': {
         subject: 'fury',
-        camera: { x: -16, y: 6, z: -3 },
-        target: { x: -22.5, y: 2.5, z: -7.5 },
+        camera: { x: 12, y: 6, z: -80 },
+        target: { x: 16, y: 2.5, z: -78 },
       },
     };
     for (const [name, expected] of Object.entries(expectedViews)) {

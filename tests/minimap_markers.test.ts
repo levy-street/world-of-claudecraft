@@ -848,7 +848,11 @@ describe('station markers (Professions 2.0)', () => {
   // beyond it. Station markers are STATIC content positions: no per-viewer
   // state, so both host shapes and any social/profession stub state must
   // produce byte-identical markers (the graphics-fairness doctrine).
-  const VIEW_POS = { x: 0, z: 10 };
+  // Re-pinned 2026-08 for the Eastbrook harbor move (d19aa33f76,
+  // docs/design/eastbrook-revamp/site-plan.md): the square is now the harbor
+  // market at the civic center (-14,-102); the four re-seated stations sit
+  // 23-31 yards out, inside the rim.
+  const VIEW_POS = { x: -14, z: -102 };
 
   function makeStationWorld(shape: 'sim' | 'client', over: Record<string, unknown> = {}): IWorld {
     const junk = shape === 'sim' ? { hp: 100, maxHp: 100, castingAbility: null } : {};
@@ -894,7 +898,7 @@ describe('station markers (Professions 2.0)', () => {
       const markers = stationMarkers(makeStationWorld(shape));
       // The four Eastbrook stations; the two other-zone stations are culled.
       expect(markers, shape).toHaveLength(4);
-      // The forge (STATIONS[0], x 7, z 16.5) lands at the projected px:
+      // The forge (STATIONS[0], x -5.80, z -123.90) lands at the projected px:
       // mx = half - dx * pxPerYard, my = half - dz * pxPerYard.
       const half = S / 2;
       const forge = STATIONS[0];
@@ -921,7 +925,7 @@ describe('station markers (Professions 2.0)', () => {
         id: 'custom_station',
         type: 'forge',
         zoneId: 'custom',
-        pos: { x: 2, z: 12 },
+        pos: { x: -12, z: -100 },
         masterNpcId: 'custom_master',
       },
     ] as const;
@@ -931,8 +935,8 @@ describe('station markers (Professions 2.0)', () => {
         kind: 'station',
         stationId: 'custom_station',
         type: 'forge',
-        mx: S / 2 - (2 - VIEW_POS.x) * PPY,
-        my: S / 2 - (12 - VIEW_POS.z) * PPY,
+        mx: S / 2 - (-12 - VIEW_POS.x) * PPY,
+        my: S / 2 - (-100 - VIEW_POS.z) * PPY,
       },
     ]);
   });
@@ -968,8 +972,9 @@ describe('station markers (Professions 2.0)', () => {
     return buildMarkers(world).filter((m) => m.kind === 'farm-patch');
   }
 
-  // The Eastbrook allotments (18.5, 32.5) sit inside the rim from (0, 10);
-  // the tier-2 Mirefen site (z 341) is far beyond it.
+  // The Eastbrook allotments (-21.5, -81.5) sit 20 yd from the civic center,
+  // inside the rim from VIEW_POS; the tier-2 Mirefen site (z 341) is far
+  // beyond it.
   const NEAR_PATCH = FARM_PATCHES.find((patch) => patch.id === 'patch_eastbrook');
   const FAR_PATCH = FARM_PATCHES.find((patch) => patch.id === 'patch_mirefen');
 

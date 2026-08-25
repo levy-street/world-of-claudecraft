@@ -45,7 +45,6 @@
 //   guild_bank.ts       IWorldGuildBank      shared guild treasury + item store (guild-wide view
 //                                            with canEdit marking officer-plus EDITS,
 //                                            proximity-gated info + gold/item/buy-slots commands)
-//   vale_cup.ts         IWorldValeCup        Vale Cup boarball queue/roles/betting/practice
 //   mounts.ts           IWorldMounts         rideable ground mounts: pick + mount/dismount
 //   dungeon_finder.ts   IWorldDungeonFinder  Dungeon Finder queue/proposals/premade board
 //   deeds.ts            IWorldDeeds          earned deeds, lifetime stats, renown, active title,
@@ -98,7 +97,6 @@ import type { IWorldTalents } from './world_api/talents';
 import type { IWorldTargeting } from './world_api/targeting';
 import type { IWorldTelemetry } from './world_api/telemetry';
 import type { IWorldTrade } from './world_api/trade';
-import type { IWorldValeCup } from './world_api/vale_cup';
 
 // --- pass-through sim re-exports: downstream imports these FROM world_api ---
 // Account flair is defined in the host-agnostic sim core (src/sim/account_flair.ts)
@@ -125,7 +123,15 @@ export type {
 // before either binary loads a character into a differently shaped world.
 // 7 = Fate Threads moved from the marked target to the Warlock. Mixed binaries
 // disagree about the authoritative resource carrier, so they must fail closed.
-export const ONLINE_WORLD_LAYOUT_VERSION = 7 as const;
+// 8 = the New Eastbrook program's Copper Dig relocation to the dig headland
+// (new coast lobe, dig terrain stamp, moved camps/props/veins and colliders;
+// docs/design/eastbrook-revamp/master-plan.md). Numbered 7 on the pre-merge
+// eastbrook branch, which forked before the Fate Threads bump.
+// 9 = phase 0b of the same program: the dig headland reverts to open sea (the
+// ferry lane), the Copper Dig cluster moves northeast past Mirror Lake onto
+// the Mirefen road, and the harbor-town plat's basin lobes and grading stamps
+// land where the Sowfield stood. (8 on the pre-merge eastbrook branch.)
+export const ONLINE_WORLD_LAYOUT_VERSION = 9 as const;
 export const ONLINE_WORLD_AUTH_TYPE = `auth-world-${ONLINE_WORLD_LAYOUT_VERSION}` as const;
 // The one wire literal both sides emit for a layout-epoch mismatch. The server
 // rejects with it, the client synthesizes it for pre-epoch servers, and the UI
@@ -252,6 +258,8 @@ export type {
 export type {
   DevLeaderboardEntry,
   GuildLeaderboardEntry,
+  GuildRosterEntry,
+  GuildRosterInfo,
   LeaderboardEntry,
 } from './world_api/progression_xp';
 export type {
@@ -267,24 +275,14 @@ export type {
   GuildEventInfo,
   GuildInfo,
   GuildMemberInfo,
+  GuildPledgeInfo,
+  GuildPledgeSettings,
   GuildRank,
+  MyPledgeInfo,
   PresenceStatus,
   SocialInfo,
 } from './world_api/social_graph';
 export type { TradeInfo, TradeOffer } from './world_api/trade';
-export type {
-  CupInfo,
-  VcBetInfo,
-  VcBetRecord,
-  VcBoardEntry,
-  VcLiveMatch,
-  VcMatchInfo,
-  VcPhase,
-  VcRosterPlayer,
-  VcSharedCupInfo,
-  VcStanding,
-  VcViewerReadout,
-} from './world_api/vale_cup';
 
 // The aggregate seam. Empty body: every member lives on exactly one facet above,
 // so `IWorld` is byte-identical to the pre-split flat interface and both the
@@ -317,7 +315,6 @@ export interface IWorld
     IWorldProfessions,
     IWorldBank,
     IWorldGuildBank,
-    IWorldValeCup,
     IWorldDungeonFinder,
     IWorldActionBar,
     IWorldDeeds,
@@ -436,6 +433,10 @@ export const COMMAND_NAMES = [
   'guild_kick',
   'guild_promote',
   'guild_demote',
+  'guild_pledge',
+  'guild_pledge_withdraw',
+  'guild_pledge_decide',
+  'guild_pledge_settings',
   'guild_transfer',
   'guild_disband',
   'arena_queue',
@@ -496,12 +497,6 @@ export const COMMAND_NAMES = [
   'set_town_focus',
   'set_dungeon_difficulty',
   'heroic_buy',
-  'vcup_queue',
-  'vcup_leave',
-  'vcup_role',
-  'vcup_ready',
-  'vcup_bet',
-  'vcup_practice',
   'mount_toggle',
   'mount_train_begin',
   'mount_train_answer',
@@ -652,6 +647,11 @@ export const COMMAND_NAMES = [
   // Appended because wire tokens are never reordered.
   'place_feast',
   'consume_feast',
+  // The tutorial greeting's accept: the ferry ride to the Proving Shore
+  // (IWorldQuests.startTutorial; sim/tutorial/greeting.ts re-validates level,
+  // life, and band server-side). Appended because wire tokens are never
+  // reordered.
+  'tutorial_start',
 ] as const;
 
 // The union both the send path (`online.ts`) and the dispatch switch
@@ -729,7 +729,6 @@ export type WorldFacet =
   | 'IWorldTelemetry'
   | 'IWorldBank'
   | 'IWorldGuildBank'
-  | 'IWorldValeCup'
   | 'IWorldDungeonFinder'
   | 'IWorldActionBar'
   | 'IWorldDeeds'
@@ -869,6 +868,10 @@ export const COMMAND_FACETS = {
   ignore_remove: 'IWorldSocialGraph',
   guild_create: 'IWorldSocialGraph',
   guild_invite: 'IWorldSocialGraph',
+  guild_pledge: 'IWorldSocialGraph',
+  guild_pledge_withdraw: 'IWorldSocialGraph',
+  guild_pledge_decide: 'IWorldSocialGraph',
+  guild_pledge_settings: 'IWorldSocialGraph',
   guild_accept: 'IWorldSocialGraph',
   guild_decline: 'IWorldSocialGraph',
   guild_leave: 'IWorldSocialGraph',
@@ -932,14 +935,6 @@ export const COMMAND_FACETS = {
   guild_bank_withdraw: 'IWorldGuildBank',
   guild_bank_buy_slots: 'IWorldGuildBank',
   guild_bank_log: 'IWorldGuildBank',
-  // IWorldValeCup: the Vale Cup boarball queue. cupInfo is a snapshot read (no
-  // send); vcup_practice starts a private instanced practice bout (online + off).
-  vcup_queue: 'IWorldValeCup',
-  vcup_leave: 'IWorldValeCup',
-  vcup_role: 'IWorldValeCup',
-  vcup_ready: 'IWorldValeCup',
-  vcup_bet: 'IWorldValeCup',
-  vcup_practice: 'IWorldValeCup',
   // IWorldMounts: pick + mount/dismount (snake_case wire strings, by design).
   // The active mount is a self-snapshot read (terse `mnt`, no send, untagged);
   // summoning one is an item use (use_item), not a mount command.

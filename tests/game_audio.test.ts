@@ -68,7 +68,6 @@ describe('sampled GameAudio facade', () => {
       ['partyInvite', 'quest_ready'],
       ['duelCountdownTick', 'ui_duel_countdown'],
       ['duelStart', 'ui_duel_start'],
-      ['vcupKickoff', 'ui_vcup_kickoff'],
       ['duelEnd', 'ui_duel_end'],
       ['readyCheck', 'ui_ready_check'],
       ['weaponSheathe', 'ui_weapon_sheathe'],
@@ -310,8 +309,8 @@ describe('sampled GameAudio facade', () => {
 });
 
 describe('deterministic UI SFX catalog', () => {
-  it('adds 21 unique UI cues to the authoritative studio inventory', () => {
-    // 14 pre-12b cues plus the Phase 12b gathering-rhythm placeholder
+  it('adds 20 unique UI cues to the authoritative studio inventory', () => {
+    // 13 pre-12b cues plus the Phase 12b gathering-rhythm placeholder
     // (ui_gather_cast) plus the Craft Cast System Phase 6 craft-family
     // cast-start placeholder (ui_craft_cast) plus the Farming render/juice
     // pair (ui_farm_plant, ui_farm_harvest) plus the farming ready notice
@@ -319,11 +318,15 @@ describe('deterministic UI SFX catalog', () => {
     // (ui_farm_golden, the celebrations phase) plus the shared-feast
     // placement (ui_farm_feast, the Phase 12 feast). ui_gather_strike/rare
     // and ui_fish_cast/bite/reel were retired once real per-node-type /
-    // rarity-tier / fishing recordings replaced them (src/game/audio.ts).
+    // rarity-tier / fishing recordings replaced them (src/game/audio.ts);
+    // ui_vcup_kickoff left with the Vale Cup minigame (the release's Sowfield
+    // demolition), which is why the branch's 21 (counted with 14 pre-12b cues)
+    // lands at 20 on the merged tree: the release's 15 plus the five farm
+    // cues, measured from UI_SFX_CATALOG on the merged tree.
     const keys = UI_SFX_CATALOG.map((cue: { key: string }) => cue.key);
     const fullCatalogKeys = new Set(SFX.map((cue: { key: string }) => cue.key));
 
-    expect(keys).toHaveLength(21);
+    expect(keys).toHaveLength(20);
     expect(keys).toContain('ui_craft_cast');
     expect(keys).toContain('ui_farm_plant');
     expect(keys).toContain('ui_farm_harvest');

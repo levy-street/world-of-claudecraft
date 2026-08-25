@@ -35,6 +35,7 @@ import { ABILITIES, BUILTIN_WORLD, ITEMS, MOBS, setActiveWorldContent } from '..
 import { createMob, type PlayerEquipment, recalcPlayerStats } from '../src/sim/entity';
 import { Sim } from '../src/sim/sim';
 import type { Entity, WorldContent } from '../src/sim/types';
+import { placePlayerInOpenField } from './helpers/open_field';
 
 const FIGHT_SECONDS = 27; // the reported Nythraxis kill length
 const SHORT_FIGHT_DPS_CEILING = 1.6; // x the sustained comparator, 27s window
@@ -120,6 +121,11 @@ function gearedMage(spec: Spec, seed = 41, rows?: Rows): { sim: Sim; p: Entity }
   if (rows) expect(sim.applyTalents({ spec, rows } as never)).toBe(true);
   else expect(sim.setSpec(spec)).toBe(true);
   sim.tick();
+  // The harbor-move quay spawn (d19aa33f76,
+  // docs/design/eastbrook-revamp/site-plan.md) puts seed-jittered harbor
+  // colliders in the 6yd LoS lane to the dummy; fight on the open-field lane
+  // like the chronomancy harness does.
+  placePlayerInOpenField(sim);
   const p = sim.player;
   const ctx = (sim as unknown as { ctx: CtxLike }).ctx;
   const meta = ctx.players.get(p.id);

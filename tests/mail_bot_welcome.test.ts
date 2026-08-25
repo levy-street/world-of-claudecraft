@@ -1,5 +1,6 @@
 // Bots must never receive mail (issue #3560): every synthetic participant the
-// sim creates (Vale Cup showcase bots, fiesta practice bots, /dev bots) is
+// sim creates (fiesta practice bots, /dev bots; the retired Vale Cup showcase
+// was the original offender) is
 // created with the Ravenpost welcome suppressed, while a real new character
 // still receives exactly one welcome letter. Before this gate existed, every
 // hourly-ish showcase minted six immortal welcome letters into the shared mail
@@ -7,9 +8,15 @@
 // 30s autosave serialized all of it on the main thread.
 
 import { describe, expect, it, vi } from 'vitest';
-import type { Sim } from '../src/sim/sim';
+import { Sim } from '../src/sim/sim';
 import { startFiestaPractice } from '../src/sim/social/fiesta_bots';
-import { makeWorld } from './vale_cup_util';
+import type { SimConfig } from '../src/sim/types';
+
+// The retired vale_cup_util factory, minus its prebuilt cup world: a plain
+// no-player Sim is all these cases need.
+function makeWorld(overrides: Partial<SimConfig> = {}): Sim {
+  return new Sim({ seed: 42, playerClass: 'warrior', noPlayer: true, ...overrides });
+}
 
 vi.setConfig({ testTimeout: 30000 });
 
@@ -28,18 +35,6 @@ describe('bot players receive no welcome mail', () => {
     const book = letters(sim);
     expect(book.length).toBe(1);
     expect(book[0].letterId).toBe('ravenpost_welcome');
-    expect(book[0].recipientName).toBe('Watcher');
-  });
-
-  it('a 3v3 bot showcase creates zero new letters', () => {
-    const sim = makeWorld({ noPlayer: false, playerName: 'Watcher' });
-    (sim as unknown as { cfg: { valeCupShowcase: boolean } }).cfg.valeCupShowcase = true;
-    for (let i = 0; i < 20 * 60 + 2 && !sim.vcup.match; i++) sim.tick();
-    // The showcase really staged: six bots are seated.
-    expect(sim.vcup.botPids.length).toBe(6);
-    // The book still holds only the human's welcome, nothing addressed to bots.
-    const book = letters(sim);
-    expect(book.length).toBe(1);
     expect(book[0].recipientName).toBe('Watcher');
   });
 

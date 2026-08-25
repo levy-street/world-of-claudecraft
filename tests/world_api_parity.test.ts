@@ -78,7 +78,6 @@ import type { IWorldTalents } from '../src/world_api/talents';
 import type { IWorldTargeting } from '../src/world_api/targeting';
 import type { IWorldTelemetry } from '../src/world_api/telemetry';
 import type { IWorldTrade } from '../src/world_api/trade';
-import type { IWorldValeCup } from '../src/world_api/vale_cup';
 import { expectScansOnlyThroughSharedWalkers } from './helpers/scan_guard_self_audit';
 import { tsFilesUnder } from './helpers/ts_files_under';
 
@@ -151,6 +150,7 @@ export const IWORLD_MEMBERS = [
   { name: 'setTownFocus', kind: 'method' },
   { name: 'acceptQuest', kind: 'method' },
   { name: 'turnInQuest', kind: 'method' },
+  { name: 'startTutorial', kind: 'method' },
   { name: 'reportTelemetry', kind: 'method' },
   { name: 'abandonQuest', kind: 'method' },
   { name: 'acceptLinkedQuest', kind: 'method' },
@@ -212,7 +212,6 @@ export const IWORLD_MEMBERS = [
   { name: 'leaveCardDuelQueue', kind: 'method' },
   { name: 'playCardInDuel', kind: 'method' },
   { name: 'forfeitCardDuel', kind: 'method' },
-  { name: 'cupInfo', kind: 'data' },
   { name: 'marketInfo', kind: 'data' },
   { name: 'marketCollectPending', kind: 'data' },
   // --- party / raid commands + marker read ---
@@ -252,6 +251,10 @@ export const IWORLD_MEMBERS = [
   { name: 'ignoreRemove', kind: 'method' },
   { name: 'guildCreate', kind: 'method' },
   { name: 'guildInvite', kind: 'method' },
+  { name: 'guildPledge', kind: 'method' },
+  { name: 'guildPledgeWithdraw', kind: 'method' },
+  { name: 'guildPledgeDecide', kind: 'method' },
+  { name: 'setGuildPledgeSettings', kind: 'method' },
   { name: 'guildAccept', kind: 'method' },
   { name: 'guildDecline', kind: 'method' },
   { name: 'guildLeave', kind: 'method' },
@@ -277,13 +280,6 @@ export const IWORLD_MEMBERS = [
   { name: 'bgQueueLeave', kind: 'method' },
   { name: 'bgRespond', kind: 'method' },
   { name: 'bgFlagAction', kind: 'method' },
-  // --- the Vale Cup boarball minigame (IWorldValeCup) ---
-  { name: 'vcupQueueJoin', kind: 'method' },
-  { name: 'vcupQueueLeave', kind: 'method' },
-  { name: 'vcupSetRole', kind: 'method' },
-  { name: 'vcupReady', kind: 'method' },
-  { name: 'vcupBet', kind: 'method' },
-  { name: 'vcupPracticeStart', kind: 'method' },
   // --- market commands ---
   { name: 'marketSearch', kind: 'method' },
   { name: 'marketSellPriceCheck', kind: 'method' },
@@ -383,6 +379,7 @@ export const IWORLD_MEMBERS = [
   { name: 'buyHeroicVendorItem', kind: 'method' },
   { name: 'leaderboard', kind: 'method' }, // async
   { name: 'guildLeaderboard', kind: 'method' }, // async
+  { name: 'guildRoster', kind: 'method' }, // async
   { name: 'devLeaderboard', kind: 'method' }, // async
   { name: 'prestige', kind: 'method' },
   // --- daily WOC-holder rewards (IWorldDailyRewards; all async) ---
@@ -657,6 +654,22 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
     // ours' 324 plus farming's eight (farmPatches and myFarmPlots as data,
     // the six farming methods), 332 members, 88 data, 244 method, and the
     // 34th facet file (farming.ts) joins FACET_MEMBER_ARRAYS.
+    // The release's own narrative for the same stretch (v0.41.0), kept whole:
+    // (data) + setActiveBorder (method), leaving 319. The v0.37.0 release's
+    // backward target cycle (Shift+Tab) adds tabTargetPrev (IWorldTargeting, a
+    // method), and its player item lock (issue #3042) adds setItemLocked
+    // (IWorldInventory, a method). The v0.38.0 release's civic service
+    // anchors add civicServicePlacements (IWorldInteraction, data), and its
+    // market Sell-tab price reference adds marketSellPriceCheck (IWorldMarket,
+    // a method). The release arm's neutral trade close (tradeClose, a sibling
+    // of tradeCancel that ends a session without calling it a cancellation)
+    // adds one command member. The signpost guild board's roster drill-in
+    // adds guildRoster (IWorldProgressionXp, a method). On the release the
+    // New Eastbrook program
+    // retires the Vale Cup facet (docs/design/eastbrook-revamp/master-plan.md),
+    // removing cupInfo (data) plus the cup methods, and the tutorial greeting
+    // adds startTutorial (IWorldQuests, a method). The merged tree carries
+    // both arms.
     //
     // NOTE for the next merge, four syncs run now: BOTH sides of this pin move
     // it independently every cycle. Twice git merged identical numbers with no
@@ -672,8 +685,15 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
     // differed, so the merged tree carries ours plus that one, 333 with the
     // method half at 245. Set from a suite run on the merged tree, never by
     // arithmetic in the diff.
-    expect(IWORLD_MEMBERS.length).toBe(333);
-    expect(DATA_MEMBERS.length).toBe(88);
+    // The v0.41.0 sync composes a SEVENTH time and CONFLICTED again: the
+    // release read 323 (85 data, 238 method) on its own after retiring the
+    // Vale Cup facet and adding guildRoster and startTutorial; ours read 333
+    // (88, 245). The merged tree carries both arms: every farming and
+    // Masterwrought member plus the release's two new methods, minus the
+    // whole vale_cup facet: 332 members, 87 data, 245 method. Set from a
+    // suite run on the merged tree, never by arithmetic in the diff.
+    expect(IWORLD_MEMBERS.length).toBe(332);
+    expect(DATA_MEMBERS.length).toBe(87);
     expect(METHOD_MEMBERS.length).toBe(245);
   });
   it('has no duplicate member names', () => {
@@ -755,7 +775,6 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'craftItem',
       'craftSkills',
       'craftingIdentity',
-      'cupInfo',
       'dailyRewardHistory',
       'dailyRewardLeaderboard',
       'dailyRewards',
@@ -828,7 +847,11 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'guildKick',
       'guildLeaderboard',
       'guildLeave',
+      'guildPledge',
+      'guildPledgeDecide',
+      'guildPledgeWithdraw',
       'guildPromote',
+      'guildRoster',
       'guildSetMotd',
       'guildTransfer',
       'harvestCorpse',
@@ -959,6 +982,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'setActiveBorder',
       'setActiveTitle',
       'setDungeonDifficulty',
+      'setGuildPledgeSettings',
       'setHelmHidden',
       'setItemLocked',
       'setMarker',
@@ -976,6 +1000,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'sortInventory',
       'spinDailyReward',
       'startAutoAttack',
+      'startTutorial',
       'stationPlacements',
       'stopAutoAttack',
       'submitLootRoll',
@@ -1010,12 +1035,6 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'unstuck',
       'upgradeRiftItem',
       'useItem',
-      'vcupBet',
-      'vcupPracticeStart',
-      'vcupQueueJoin',
-      'vcupQueueLeave',
-      'vcupReady',
-      'vcupSetRole',
       'vendorBuyback',
       'xp',
     ]);
@@ -1047,7 +1066,6 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'copper',
       'craftSkills',
       'craftingIdentity',
-      'cupInfo',
       'deedStats',
       'deedsEarned',
       'delveDaily',
@@ -1220,7 +1238,11 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'guildKick',
       'guildLeaderboard',
       'guildLeave',
+      'guildPledge',
+      'guildPledgeDecide',
+      'guildPledgeWithdraw',
       'guildPromote',
+      'guildRoster',
       'guildSetMotd',
       'guildTransfer',
       'harvestCorpse',
@@ -1313,6 +1335,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'setActiveBorder',
       'setActiveTitle',
       'setDungeonDifficulty',
+      'setGuildPledgeSettings',
       'setHelmHidden',
       'setItemLocked',
       'setMarker',
@@ -1329,6 +1352,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'sortInventory',
       'spinDailyReward',
       'startAutoAttack',
+      'startTutorial',
       'stopAutoAttack',
       'submitLootRoll',
       'switchLoadout',
@@ -1355,12 +1379,6 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'unstuck',
       'upgradeRiftItem',
       'useItem',
-      'vcupBet',
-      'vcupPracticeStart',
-      'vcupQueueJoin',
-      'vcupQueueLeave',
-      'vcupReady',
-      'vcupSetRole',
     ]);
   });
 });
@@ -1539,6 +1557,7 @@ const FACET_QUESTS = [
   'turnInQuest',
   'abandonQuest',
   'acceptLinkedQuest',
+  'startTutorial',
 ] as const satisfies readonly (keyof IWorldQuests)[];
 type _ExhaustQuests = AssertNever<Exclude<keyof IWorldQuests, (typeof FACET_QUESTS)[number]>>;
 
@@ -1553,6 +1572,7 @@ const FACET_PROGRESSION_XP = [
   'gatheringProficiency',
   'leaderboard',
   'guildLeaderboard',
+  'guildRoster',
   'devLeaderboard',
   'prestige',
 ] as const satisfies readonly (keyof IWorldProgressionXp)[];
@@ -1677,6 +1697,10 @@ const FACET_SOCIAL_GRAPH = [
   'ignoreRemove',
   'guildCreate',
   'guildInvite',
+  'guildPledge',
+  'guildPledgeWithdraw',
+  'guildPledgeDecide',
+  'setGuildPledgeSettings',
   'guildAccept',
   'guildDecline',
   'guildLeave',
@@ -1789,17 +1813,6 @@ const FACET_TELEMETRY = ['reportTelemetry'] as const satisfies readonly (keyof I
 type _ExhaustTelemetry = AssertNever<
   Exclude<keyof IWorldTelemetry, (typeof FACET_TELEMETRY)[number]>
 >;
-
-const FACET_VALE_CUP = [
-  'cupInfo',
-  'vcupQueueJoin',
-  'vcupQueueLeave',
-  'vcupSetRole',
-  'vcupReady',
-  'vcupBet',
-  'vcupPracticeStart',
-] as const satisfies readonly (keyof IWorldValeCup)[];
-type _ExhaustValeCup = AssertNever<Exclude<keyof IWorldValeCup, (typeof FACET_VALE_CUP)[number]>>;
 
 const FACET_MOUNTS = [
   'ownedMounts',
@@ -1945,7 +1958,6 @@ const FACET_MEMBER_ARRAYS: Readonly<Record<string, readonly string[]>> = {
   dailyRewards: FACET_DAILY_REWARDS,
   telemetry: FACET_TELEMETRY,
   professions: FACET_PROFESSIONS,
-  valeCup: FACET_VALE_CUP,
   mounts: FACET_MOUNTS,
   dungeonFinder: FACET_DUNGEON_FINDER,
   deeds: FACET_DEEDS,
@@ -1959,8 +1971,12 @@ describe('W1: aggregate IWorld member set equals the disjoint union of the facet
     // +1 battleground facet (Thornhollow Fields) on the release line; +1
     // Reliquary facet on the release line; +1 farming facet on this branch:
     // 34 total. (The v0.38.0 sync hit the silent-count trap here: both sides
-    // moved 32 to 33 independently and git kept a single 33.)
-    expect(Object.keys(FACET_MEMBER_ARRAYS).length).toBe(34);
+    // moved 32 to 33 independently and git kept a single 33.) The release's
+    // own count: +1 Reliquary facet, 33 total; -1 for the New Eastbrook
+    // program's Vale Cup retirement, 32 total. The v0.41.0 sync carries both
+    // arms (farming in, vale_cup out): 33 total, measured as the facet files
+    // on disk minus appearance.ts (the sweep below).
+    expect(Object.keys(FACET_MEMBER_ARRAYS).length).toBe(33);
   });
 
   it('every facet FILE on disk is a FACET_MEMBER_ARRAYS key (none can go silently unpartitioned)', () => {
@@ -1984,8 +2000,9 @@ describe('W1: aggregate IWorld member set equals the disjoint union of the facet
       .map((k) => k.replace(/[A-Z]/g, (c) => `_${c.toLowerCase()}`))
       .sort();
     expect(keys).toEqual(facetFiles);
-    // Floor: the sweep walked a real directory, not an empty one.
-    expect(facetFiles.length).toBeGreaterThanOrEqual(34);
+    // Floor: the sweep walked a real directory, not an empty one. (34 until
+    // the Vale Cup facet retired with release/v0.41.0.)
+    expect(facetFiles.length).toBeGreaterThanOrEqual(33);
   });
 
   it('scans only through the shared walkers (self-audit)', () => {
@@ -2038,8 +2055,8 @@ describe('W1: aggregate IWorld member set equals the disjoint union of the facet
 
   it('the facet union equals the pinned IWORLD_MEMBERS set', () => {
     const union = Object.values(FACET_MEMBER_ARRAYS).flatMap((arr) => [...arr]);
-    expect(union.length, 'union size before dedup (catches a duplicated member)').toBe(333);
-    expect(new Set(union).size, 'union size after dedup (catches a duplicated member)').toBe(333);
+    expect(union.length, 'union size before dedup (catches a duplicated member)').toBe(332);
+    expect(new Set(union).size, 'union size after dedup (catches a duplicated member)').toBe(332);
     const sortedUnion = [...union].sort();
     const pinned = IWORLD_MEMBERS.map((m) => m.name).sort();
     expect(sortedUnion).toEqual(pinned);

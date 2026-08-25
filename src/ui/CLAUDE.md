@@ -295,7 +295,7 @@ follow the root `extract-and-test` skill for the move-not-rewrite mechanics. The
   reads as more than it is: the scans are per FILE, so a layout read one hop away in a shared
   helper is invisible unless the helper is named as a proxy token (`getUiScale` and
   `getComputedStyle` are; a new one would have to be added), and a BARE-named per-frame module
-  (`vale_cup_hud.ts`, `dungeon_finder_proposal_popup.ts`) still escapes it entirely, held only
+  (`dungeon_finder_proposal_popup.ts`) still escapes it entirely, held only
   by the module sweep in `tests/architecture.test.ts`.
 - **Neither of the two?** A **painter-side helper**, and it is a LAST RESORT: if the DOM touch can
   live in the painter, it must. A helper is for logic a painter needs that cannot be a pure core

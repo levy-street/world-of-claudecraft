@@ -215,6 +215,9 @@ describe('v0.36 release-audit Reliquary deed art', () => {
       'col_golden_harvest',
       'col_farm_roster',
       'prog_field_to_feast',
+      // The release's Proving Shore graduation deed, appended at the
+      // release/v0.41.0 sync behind this branch's tail (DEED_ORDER position).
+      'prog_ready_for_an_adventure',
     ]);
     // 286 at the farming absorb (Phase 11d): the base 273 plus the six
     // Masterwrought milestone deeds plus farming's seven; 287 at Phase 11e,
@@ -225,7 +228,11 @@ describe('v0.36 release-audit Reliquary deed art', () => {
     // joins the pending ledger instead. The pending list above is in DEED_ORDER
     // position, which is why 11i's row sits ahead of the farming block and
     // 11k's sits behind it, at the tail.
-    expect(DEED_ORDER).toHaveLength(289);
+    // 290 at the release/v0.41.0 sync: the release appended one deed (the
+    // Proving Shore graduation, 273 to 274 on its own arm) with no crest, so
+    // it joins the pending ledger at the tail and the PAINTED count holds at
+    // 278 (the Vale Cup deed records stay in the append-only table).
+    expect(DEED_ORDER).toHaveLength(290);
     expect(DEED_IMAGE_IDS.size).toBe(278);
     expect(DEED_ORDER.filter((id) => !DEED_IMAGE_IDS.has(id))).toEqual([...DEED_ART_PENDING]);
     expect(sorted(DEED_IMAGE_IDS)).toEqual(

@@ -23,6 +23,7 @@ const {
   EASTBROOK_TOWN_CAPTURE_CONTRACTS,
   EASTBROOK_TOWN_CAPTURE_PROFILES,
   EASTBROOK_TOWN_CAPTURE_SETTLE_MS,
+  EASTBROOK_TOWN_CAPTURE_VIEWS,
   EASTBROOK_TOWN_POLISH_MATCHED_CAPTURE_VIEWS,
   EASTBROOK_TOWN_PERF_SCENARIOS,
 } = captureContract;
@@ -611,6 +612,128 @@ function readJsonFile<T>(filePath: string): T {
   return JSON.parse(readFileSync(filePath, 'utf8')) as T;
 }
 
+// FROZEN capture framing: the camera/target pairs the accepted polish captures
+// were actually taken with. The Eastbrook harbor move (layout v3, commit
+// d19aa33f76, docs/design/eastbrook-revamp/site-plan.md, re-pinned 2026-08-18)
+// re-aimed the live polish views and matched-view overrides at the new lots
+// WITHOUT retaking a capture, so the committed metadata records must keep validating
+// against the framing they were shot with, not the live one. These literals
+// move only if the captures themselves are retaken; the divergence from the
+// live views is declared as its own literal test below, mirroring how the
+// frozen townTriangles staleness is declared.
+const ACCEPTED_POLISH_V2_VIEW_OVERRIDES: Readonly<Record<string, { camera: Vec3; target: Vec3 }>> =
+  {
+    'bank-and-chest': {
+      camera: { x: 5, y: 7, z: 2 },
+      target: { x: 14.156943251329539, y: 3.2, z: 8.685223202016726 },
+    },
+    'smithy-and-forge': {
+      camera: { x: 10, y: 7, z: 8 },
+      target: { x: 3.687633548766497, y: 3, z: 15.598153967032626 },
+    },
+    'inn-and-kitchens': {
+      camera: { x: 0, y: 8, z: 8 },
+      target: { x: -10.018829436136041, y: 3, z: 13.621842145917809 },
+    },
+    'chapel-and-weaving': {
+      camera: { x: 0, y: 12, z: 4 },
+      target: { x: -13.2, y: 3, z: -10.5 },
+    },
+    'toolworks-service-perimeter': {
+      camera: { x: 4, y: 7, z: -9 },
+      target: { x: 5, y: 5, z: -14.25 },
+    },
+    'stall-world-market': {
+      camera: { x: -6, y: 6, z: 0 },
+      target: { x: -5.75, y: 2.5, z: 7 },
+    },
+  };
+const ACCEPTED_POLISH_V2_POLISH_VIEWS: ReadonlyArray<{
+  name: string;
+  camera: Vec3;
+  target: Vec3;
+}> = [
+  {
+    name: 'stall-world-market',
+    camera: { x: -2.54, y: 6, z: 5.47 },
+    target: { x: -4.55381837226296, y: 2.5, z: 8.20975183498178 },
+  },
+  {
+    name: 'stall-provisions',
+    camera: { x: -3, y: 6, z: 0 },
+    target: { x: -7.421769629642221, y: 2.5, z: 0.7630378263298812 },
+  },
+  {
+    name: 'apothecary-lin',
+    camera: { x: 1.8, y: 6, z: 6 },
+    target: { x: 2.8431593444121797, y: 2.5, z: 9.717148252611294 },
+  },
+  {
+    name: 'ravenpost-mailbox',
+    camera: { x: 0, y: 5, z: -2 },
+    target: { x: 0, y: 2, z: -6.2 },
+  },
+  {
+    name: 'noticeboard',
+    camera: { x: 5, y: 6, z: -4 },
+    target: { x: 9.010050506338834, y: 2.2, z: -7.010050506338834 },
+  },
+  {
+    name: 'civic-motion',
+    camera: { x: -10, y: 6, z: -7 },
+    target: { x: -0.75, y: 2.8, z: 0 },
+  },
+  {
+    name: 'ravenpost-chronicler',
+    camera: { x: -10, y: 6.5, z: -11 },
+    target: { x: 0, y: 2.5, z: -14.5 },
+  },
+  {
+    name: 'west-wall-quartermaster',
+    camera: { x: -16, y: 6, z: -3 },
+    target: { x: -22.5, y: 2.5, z: -7.5 },
+  },
+];
+// Composed exactly the way the live matched list is composed from its parts:
+// the immutable rebuild-v1 base views with the frozen overrides applied, then
+// the frozen polish views with the same overrides applied.
+const ACCEPTED_POLISH_V2_MATCHED_CAPTURE_VIEWS: readonly CaptureViewContract[] = [
+  ...(EASTBROOK_TOWN_CAPTURE_VIEWS as readonly CaptureViewContract[]).map((view) => ({
+    name: view.name,
+    ...(ACCEPTED_POLISH_V2_VIEW_OVERRIDES[view.name] ?? {
+      camera: view.camera,
+      target: view.target,
+    }),
+  })),
+  ...ACCEPTED_POLISH_V2_POLISH_VIEWS.map((view) => ({
+    name: view.name,
+    ...(ACCEPTED_POLISH_V2_VIEW_OVERRIDES[view.name] ?? {
+      camera: view.camera,
+      target: view.target,
+    }),
+  })),
+];
+// The views the harbor move re-aimed (13), plus armoury-relation from owner
+// refinement round 4 (the armoury retired from placement and the matched view
+// aims at the barracks garrison on its lot); every other matched view still
+// shares its live framing with the frozen records.
+const HARBOR_MOVED_VIEW_NAMES: ReadonlySet<string> = new Set([
+  'armoury-relation',
+  'bank-and-chest',
+  'smithy-and-forge',
+  'inn-and-kitchens',
+  'chapel-and-weaving',
+  'toolworks-service-perimeter',
+  'stall-world-market',
+  'stall-provisions',
+  'apothecary-lin',
+  'ravenpost-mailbox',
+  'noticeboard',
+  'civic-motion',
+  'ravenpost-chronicler',
+  'west-wall-quartermaster',
+]);
+
 // FROZEN, and no longer equal to the live town fingerprint: this is the identity of
 // the tree the v2 polish captures were taken against, not a mirror of the current
 // one. It first diverged when a lockfile-only dependency bump re-minted the town
@@ -955,10 +1078,90 @@ const ACCEPTED_POLISH_V2_METADATA_PATH = path.join(REPO_ROOT, POLISH_SEAL_PATH);
 // horizon fast path, display-pacing admission), the sliding-far-mob-freeze fix
 // and the stale remote-entity holdout repair. Every one of them retook no
 // capture and moved only the renderer/prewarm runtime leaves.
+//
+// UPSTREAM'S OWN RE-MINT HISTORY over the release/v0.41.0 span, kept rather
+// than dropped (the block that follows is the release's record verbatim).
+// Re-minted for shader-memory-probes renderer instrumentation and VFX teardown
+// extraction. The renderer leaf moved; no capture was retaken because both
+// changes are behavior-neutral for the accepted visual evidence.
+// Re-minted for the fast-loading-screen-variety merge with release/v0.40.0:
+// the renderer runtime leaf moved on both sides of the merge (this branch's
+// character asset-ready wiring, the release's shader-memory probes). No
+// capture was retaken.
+// Re-minted for the review-fix round (the nearby-view floor in
+// prewarm_policy.ts, the weapon-skin early-out wiring in renderer.ts):
+// both runtime leaves moved. No capture was retaken.
+// Re-minted for the Sowfield demolition: the Vale Cup removal moves
+// renderer.ts, the first-order composite follows it, and this seal follows
+// the swept evidence bytes. No capture was retaken.
+// Re-minted 2026-08-18 for the Eastbrook harbor move (layout v3, commit
+// d19aa33f76, docs/design/eastbrook-revamp/site-plan.md): the move commits
+// the authoritativeLayout, townRuntime and rendererIntegration leaves, and
+// the re-aimed polish views move the captureContract leaf, so the composite
+// mints anew and this metadata authority sha follows the swept bytes. No
+// capture was retaken; the records keep their frozen pre-move framing.
+// Re-minted for owner refinement round 6b: the chapel re-shell and the NPC
+// redistribution move the authoritativeLayout leaf and the re-aimed
+// apothecary-lin view moves the captureContract leaf, so the composite mints
+// anew and this metadata authority sha follows the swept bytes. No capture was
+// retaken; the records keep their frozen pre-move framing.
+// Re-minted again for owner round 6b's world wave: the authoritativeLayout leaf
+// moves once more (the two market stalls opened out across the square, and
+// forgemistress_darva, tinker_gizzel and FURY moved off their neighbours), so
+// the composite mints anew and this metadata authority sha follows the swept bytes. No capture was retaken: the accepted evidence keeps
+// its frozen framing and only the swept provenance bytes follow the inputs.
+// The same round re-aimed the captureContract leaf: the two market stall views
+// and FURY's portrait view follow their moved subjects, so the composite mints
+// once more on top of the layout move.
+// Re-minted for the integration merge of the eastbrook program onto the
+// release tip (spell-icon revert, sky KTX2, druid auto-unshift): both parents'
+// renderer and layout bytes combine in one tree, so the composite mints a
+// value matching neither parent. No capture was retaken.
+// Re-minted for the release/v0.39.0 base merge into feature/tutorial-island: the
+// first-order composite follows the resolved renderer.ts and prewarm_policy.ts
+// bytes, then these seals follow the swept evidence bytes. No capture was
+// retaken.
+// Re-minted for the island far-shore haze band (renderer.ts passes the camera
+// to horizonHazePlan): the first-order composite follows those bytes, then
+// these seals follow the swept evidence bytes. No capture was retaken.
+// Re-minted after merging release/v0.40.0 into the loading-hitch branch:
+// renderer.ts combines mandatory entry admission with the release's rift
+// long-session resource lifecycle changes. No capture was retaken.
+// Re-minted for the v0.40 batch merge-forward over the loading review fixes:
+// renderer.ts and prewarm_policy.ts now seal the combined release-batch tree.
+// No capture was retaken.
+// Re-minted for the loading review fixes (rebuild reveal gates, inactive
+// horizon fast path, display-pacing admission, and restored rationale): the
+// renderer integration leaf moved. No capture was retaken.
+// Re-minted for the sliding-far-mob-freeze fix (the far-mesh swap now also
+// holds out a moving entity): the renderer integration leaf moved. No
+// capture was retaken.
+// Re-minted for the stale remote-entity holdout repair (renderer.ts): the
+// renderer integration leaf moved. No capture was retaken.
+// Re-minted for the v0.40.0 sync merge into the guild pledge branch (the
+// OSSBrain v0.40 batch landed on the release arm; renderer inputs moved on
+// both sides). No capture was retaken.
+//
+// RE-MINTED AT THE MERGE OF release/v0.41.0 (tip ff2837da1f) into feature/masterwrought (base 9a89e3483e). BOTH parents
+// re-minted these seals since their common base again and BOTH edited
+// src/render/renderer.ts (the release also moved the authoritativeLayout,
+// townRuntime and captureContract leaves for the harbor move and its owner
+// rounds), so the merged tree mints values matching NEITHER parent. Parent
+// values for the record: metadata sha256 ours d19d1129 / theirs
+// b7f20268, composite ours 0e27f9ad / theirs b4f994b0. The release
+// literals below are carried as PLACEHOLDERS: they MUST be re-minted from the
+// merged working tree with the repo's own tool
+// (node scripts/assets/eastbrook_grand_armoury/remint_polish_provenance.mjs)
+// and committed with exactly the bytes it read. No capture was retaken.
+// Re-minted at the merge of release/v0.41.0 (ff2837da1f) into
+// feature/masterwrought (base 9a89e3483e): both parents had re-minted, so
+// neither literal was right for the merged tree; remint_polish_provenance.mjs
+// ran over the fully resolved tree (renderer.ts, eastbrook_town.ts and
+// eastbrook_layout.ts are the drifted inputs). No capture was retaken.
 const ACCEPTED_POLISH_V2_METADATA_SHA256 =
-  'd19d1129dd6468f05d808b0aa5bf01d40eb09b4a39d0be7b1d40732c88bf5ec5';
+  'a718525e4ed723cf4693d0a730191da33f0049455073704180be0cc4a931d507';
 const ACCEPTED_POLISH_V2_COMPOSITE_PROVENANCE =
-  '0e27f9adfaf2ef41b901c25bfc84fc5b5bcda81bb77a7c1badfba11f1e927ba7';
+  'ad463f06d9f597d8aed5b13cba23564161e09170e9cbb1dbee8a2ee5a54f67b1';
 const ACCEPTED_POLISH_V2_METADATA = readJsonFile<CaptureMetadata>(ACCEPTED_POLISH_V2_METADATA_PATH);
 const ACCEPTED_POLISH_V2_PROVENANCE = ACCEPTED_POLISH_V2_METADATA.polishProvenance;
 const ACCEPTED_POLISH_V2_TOWN_CONTRACT = ACCEPTED_POLISH_V2_METADATA.records[0]?.townContract;
@@ -1271,6 +1474,35 @@ describe('Eastbrook polish committed capture artifacts', () => {
     expect(EASTBROOK_TOWN_CAPTURE_CONTRACTS['polish-v2'].townTriangles).toBe(28_902);
   });
 
+  // Same pattern as the triangle declaration above: the harbor move (layout
+  // v3, commit d19aa33f76, docs/design/eastbrook-revamp/site-plan.md) re-aimed
+  // 13 live views at the new lots without retaking a capture, so the frozen
+  // framing the records validate against deliberately diverges from the live
+  // matched views for exactly those names and matches them everywhere else.
+  // If the polish captures are ever retaken at the harbor site, this test goes
+  // red first: refresh the frozen framing literals to the retake's views (and
+  // move ACCEPTED_POLISH_V2_TOWN_SOURCE_FINGERPRINT with them).
+  it('declares the frozen capture framing as deliberately stale against the re-aimed live views', () => {
+    const liveViews = EASTBROOK_TOWN_POLISH_MATCHED_CAPTURE_VIEWS as readonly CaptureViewContract[];
+    expect(ACCEPTED_POLISH_V2_MATCHED_CAPTURE_VIEWS.map((view) => view.name)).toEqual(
+      liveViews.map((view) => view.name),
+    );
+    for (const [index, frozen] of ACCEPTED_POLISH_V2_MATCHED_CAPTURE_VIEWS.entries()) {
+      const live = liveViews[index];
+      const framing = (view: CaptureViewContract) => ({ camera: view.camera, target: view.target });
+      if (HARBOR_MOVED_VIEW_NAMES.has(frozen.name)) {
+        expect(
+          framing(frozen),
+          `${frozen.name} must stay frozen at its captured framing`,
+        ).not.toEqual(framing(live));
+      } else {
+        expect(framing(frozen), `${frozen.name} still shares the live framing`).toEqual(
+          framing(live),
+        );
+      }
+    }
+  });
+
   it('pins the exact historical metadata inventory to every base capture and motion frame', () => {
     const expectedTownSourceFingerprint = ACCEPTED_POLISH_V2_TOWN_SOURCE_FINGERPRINT;
     const metadataRoot = path.join(POLISH_ROOT, 'metadata');
@@ -1320,9 +1552,10 @@ describe('Eastbrook polish committed capture artifacts', () => {
         const canonicalSource = metadata.records[0]?.source;
         if (!canonicalSource) throw new Error(`missing canonical source for ${fileName}`);
         for (const [index, record] of metadata.records.entries()) {
-          const view = (
-            EASTBROOK_TOWN_POLISH_MATCHED_CAPTURE_VIEWS as readonly CaptureViewContract[]
-          )[index];
+          // Frozen framing, not the live matched views: the records were shot
+          // before the harbor move re-aimed the live cameras (see the
+          // ACCEPTED_POLISH_V2_MATCHED_CAPTURE_VIEWS header).
+          const view = ACCEPTED_POLISH_V2_MATCHED_CAPTURE_VIEWS[index];
           if (!view) throw new Error(`missing capture view ${index} for ${fileName}`);
           expect(record).toMatchObject({
             schemaVersion: 2,
@@ -1433,9 +1666,9 @@ describe('Eastbrook polish committed capture artifacts', () => {
                 expectedTown: true,
                 expectedArmoury: true,
                 profile: contractProfile,
-                view: (
-                  EASTBROOK_TOWN_POLISH_MATCHED_CAPTURE_VIEWS as readonly CaptureViewContract[]
-                ).find((candidate) => candidate.name === 'civic-motion'),
+                view: ACCEPTED_POLISH_V2_MATCHED_CAPTURE_VIEWS.find(
+                  (candidate) => candidate.name === 'civic-motion',
+                ),
                 playerState: EASTBROOK_ARMOURY_PLAYER_STATE,
                 expectedSeed: EASTBROOK_ARMOURY_CAPTURE_SEED,
                 settleMs: EASTBROOK_TOWN_CAPTURE_SETTLE_MS,
@@ -2067,6 +2300,54 @@ describe('Eastbrook polish performance and contact evidence', () => {
     // horizon fast path, display-pacing admission), the sliding-far-mob-freeze fix
     // and the stale remote-entity holdout repair. Every one of them retook no
     // capture and moved only the renderer/prewarm runtime leaves.
+    // Upstream's own re-mints over the release/v0.41.0 span, kept rather than
+    // dropped (the release's record verbatim):
+    // Re-minted for the review-fix round (prewarm_policy.ts and renderer.ts
+    // moved): same order, the composite first, then this seal. No capture
+    // was retaken.
+    // Re-minted for the Sowfield demolition. The first-order composite follows
+    // the Vale Cup removal in renderer.ts, then this second-order performance
+    // seal follows the swept evidence bytes. No capture was retaken.
+    // Re-minted 2026-08-18 for the Eastbrook harbor move (layout v3, commit
+    // d19aa33f76, docs/design/eastbrook-revamp/site-plan.md): the first-order
+    // composite follows the moved authoritativeLayout, townRuntime and
+    // rendererIntegration leaves plus the re-aimed captureContract leaf, then
+    // this second-order performance seal follows the swept evidence bytes. No
+    // capture was retaken.
+    // Re-minted for owner refinement round 6b: the first-order composite
+    // follows the re-shelled chapel and redistributed NPCs in the
+    // authoritativeLayout leaf plus the re-aimed apothecary-lin view in the
+    // captureContract leaf, then this second-order performance seal follows the
+    // swept evidence bytes. No capture was retaken.
+    // Re-minted again for owner round 6b's world wave: the first-order
+    // composite follows the opened-out market stalls and the moved darva,
+    // gizzel and FURY anchors in the authoritativeLayout leaf, then this
+    // second-order performance seal follows the swept evidence bytes. No
+    // capture was retaken.
+    // Re-minted for the integration merge of the eastbrook program onto the
+    // release tip. The first-order composite follows both parents' combined
+    // bytes, then this second-order performance seal follows the swept
+    // evidence bytes. No capture was retaken.
+    // Re-minted for the release/v0.39.0 base merge into feature/tutorial-island.
+    // The first-order composite follows the resolved renderer.ts and
+    // prewarm_policy.ts bytes, then this second-order performance seal follows
+    // the swept evidence bytes. No capture was retaken.
+    // Re-minted for the island far-shore haze band: the first-order composite
+    // follows renderer.ts, then this second-order performance seal follows the
+    // swept evidence bytes. No capture was retaken.
+    // Re-minted after merging release/v0.40.0 into the loading-hitch branch
+    // (renderer.ts moved on both sides): same order, the composite first,
+    // then this seal. No capture was retaken.
+    // Re-minted for the loading review fixes (renderer.ts): same order, the
+    // composite first, then this seal. No capture was retaken.
+    // Re-minted for the sliding-far-mob-freeze fix (renderer.ts): same order,
+    // the composite first, then this seal. No capture was retaken.
+    // Re-minted for the stale remote-entity holdout repair (renderer.ts):
+    // same order, the composite first, then this seal. No capture was retaken.
+    // Re-minted for the v0.40.0 sync merge into the guild pledge branch (the
+    // OSSBrain v0.40 batch landed on the release arm; renderer inputs moved on
+    // both sides): same order, the composite first, then this seal. No capture
+    // was retaken.
     expect(
       fingerprint.digest('hex'),
       `the second-order performance digest moved; if every input moved legitimately, re-mint with: ${REMINT_COMMAND} (it recomputes this literal LAST, from the swept files)`,
@@ -2095,7 +2376,14 @@ describe('Eastbrook polish performance and contact evidence', () => {
       // content once more. Parent values for the record: ours 2519fee9, the
       // release 3e429f96. Same order, the composite first, then this seal.
       // No capture was retaken.
-    ).toBe('addb319d29915e53e8d9c326a697b111f6007ea21ffafd7d41afec61025f0fc0');
+      // Re-minted at the merge of release/v0.41.0 (tip ff2837da1f) into
+      // feature/masterwrought (base 9a89e3483e): both parents edited
+      // renderer.ts again and the release moved the layout, town-runtime and
+      // capture-contract leaves too, so the merged tree is a third content.
+      // Parent values for the record: ours addb319d, the release
+      // 5bae1eef. The release literal is a PLACEHOLDER: re-mint LAST per
+      // REMINT_COMMAND on the merged working tree. No capture was retaken.
+    ).toBe('407f758586fc6aeb86f388c4212cf3ae88aaeef2b6a56fa5f7d1a779b6760b73');
   });
 
   it('binds every historical after record to its accepted source and asset provenance', () => {
@@ -2157,7 +2445,12 @@ describe('Eastbrook polish performance and contact evidence', () => {
       name: string;
       viewName: string;
     }>;
-    const views = EASTBROOK_TOWN_POLISH_MATCHED_CAPTURE_VIEWS as readonly CaptureViewContract[];
+    // Frozen performance evidence validates against the ACCEPTED frozen
+    // framing, not the live matched views: a later deliberate re-aim (the
+    // round-4 armoury-relation move to the barracks garrison) diverges the
+    // live view while the recorded scenarios keep their capture-time aim.
+    // The declares-stale test above owns the divergence accounting.
+    const views = ACCEPTED_POLISH_V2_MATCHED_CAPTURE_VIEWS as readonly CaptureViewContract[];
 
     for (const prefix of ['before', 'after'] as const) {
       for (const profile of PROFILES) {

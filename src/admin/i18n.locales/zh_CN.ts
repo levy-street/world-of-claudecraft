@@ -7,6 +7,9 @@
 // (tests/i18n_admin_catalog.test.ts).
 
 export const zh_CN: Record<string, string> = {
+  'error.flagActiveExists': '该账号已经存在同类型的未处理标记。',
+  'wealth.largeMovementsUnavailable':
+    '大额银行变动未能加载（账本读取超时），上方的金币明细仍然完整。',
   'error.guildBankDeleting': '该公会正在被删除，因此其银行已关闭，未做任何更改。',
   'error.guildBankItemRequired': '请输入你预期该格子应存放的物品 ID。',
   'error.guildBankNoCarrier': '必须有该公会的成员在线，此更改才能保存。',

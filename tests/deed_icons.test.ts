@@ -385,7 +385,13 @@ describe('Book of Deeds webp icons', () => {
     // them a deed behind, which is the whole hazard of writing the working
     // out in prose beside the numbers, so it is re-derived here rather than
     // nudged.
-    expect(DEED_ORDER, 'the merged live deed catalog').toHaveLength(289);
+    // Then the release/v0.41.0 merge appends the Proving Shore graduation
+    // deed prog_ready_for_an_adventure, which ships art-pending by upstream
+    // design (the release's own chain reads 274 / 271, its painted count
+    // unmoved by the tutorial deed): LIVE 289 + 1 = 290, PAINTED unmoved at 278,
+    // PENDING 11 + 1 = 12, which is also the 290 - 278 cross-check. Measured
+    // on the merged tree rather than nudged from either parent's prose.
+    expect(DEED_ORDER, 'the merged live deed catalog').toHaveLength(290);
     expect(DEED_IMAGE_IDS.size, 'every live deed but the pending set is painted').toBe(278);
     expect(DEED_ORDER.length - DEED_IMAGE_IDS.size).toBe(DEED_ART_PENDING_IDS.length);
     for (const id of artless) {

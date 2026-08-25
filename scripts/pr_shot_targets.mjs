@@ -599,6 +599,33 @@ const fakePadSeed = async (page) => {
   );
 };
 
+// Pin the page's clock to a LOCAL Saturday noon before the app boots, so the
+// weekly Double Honor surfaces render their active state through the real code
+// path (currentResetDay reads the local clock; src/sim/pvp/honor_event.ts turns
+// Saturday reset days into the event). A Date subclass shim rather than a sim
+// poke: main.ts re-supplies resetDay every frame, so a staged write would be
+// overwritten one frame later. String form for the usual tsx keepNames reason.
+const saturdayClockSeed = async (page) => {
+  await page.evaluateOnNewDocument(
+    `(() => {
+      const RealDate = Date;
+      const offset = new RealDate(2026, 7, 22, 12, 0, 0).getTime() - RealDate.now();
+      class SaturdayDate extends RealDate {
+        constructor(...args) {
+          if (args.length === 0) super(RealDate.now() + offset);
+          else super(...args);
+        }
+        static now() {
+          return RealDate.now() + offset;
+        }
+      }
+      SaturdayDate.UTC = RealDate.UTC;
+      SaturdayDate.parse = RealDate.parse;
+      window.Date = SaturdayDate;
+    })();`,
+  );
+};
+
 export const TARGETS = [
   {
     key: 'ravenrift',
@@ -615,6 +642,9 @@ export const TARGETS = [
     ],
     variants: [
       { key: 'queue-window', scene: 'queue' },
+      // The same queue window under a Saturday clock: the weekly Double Honor
+      // chip is only honest evidence when the event decision itself ran.
+      { key: 'queue-window-double-honor', scene: 'queue', beforeLoad: saturdayClockSeed },
       // First staged scene on purpose: the match seating just placed the
       // player on their real spawn point, and the DEFAULT chase camera is the
       // honest witness for the spawn-clearance contract (no camDist override).
@@ -825,6 +855,26 @@ export const TARGETS = [
       }
       await wait(2600); // let the field build + banners settle
       return {};
+    },
+  },
+  {
+    key: 'event-calendar',
+    label: 'Event Calendar window: recurring system-event rows',
+    when: ['ui/calendar_view.ts', 'ui/calendar_window.ts'],
+    // Saturday clock on purpose: the month grid rings "today" on a Saturday,
+    // the day both weekly PvP rows (Arena Clash, Double Honor Day) land on.
+    variants: [{ key: 'calendar-window', beforeLoad: saturdayClockSeed }],
+    async capture(page) {
+      const opened = await page.evaluate(() => {
+        const game = window.__game;
+        if (!game?.hud) return { ok: false, reason: 'offline world is unavailable' };
+        game.hud.toggleCalendar();
+        return { ok: true };
+      });
+      if (!opened.ok) return { skip: opened.reason };
+      const ready = await pollForSize(page, '#calendar-window');
+      if (!ready) return { skip: 'the calendar window never became visible' };
+      return { clip: '#calendar-window' };
     },
   },
   {
@@ -1399,6 +1449,7 @@ export const TARGETS = [
         const x = Math.max(0, Math.min(spot.w - width, spot.x - width / 2));
         const y = Math.max(0, Math.min(spot.h - height, spot.y - height / 2));
         await page.screenshot({
+          // biome-ignore lint/suspicious/noUndeclaredEnvVars: Screenshot-only CLI input is not a Turbo task dependency.
           path: `${process.env.SHOTS_DIR ?? 'pr-shots'}/weapon-vfx-shed-${variant.key}-closeup.png`,
           clip: { x, y, width, height },
         });
@@ -1506,6 +1557,7 @@ export const TARGETS = [
       const panelExists = await page.evaluate(
         () => !!document.querySelector('#target-auras-window'),
       );
+      // biome-ignore lint/suspicious/noUndeclaredEnvVars: Screenshot-only CLI input is not a Turbo task dependency.
       const allowMissingPanel = process.env.PR_SHOTS_ALLOW_MISSING_TARGET_AURAS === '1';
       if (!panelExists && !allowMissingPanel) {
         throw new Error('target aura window is unavailable');
@@ -2847,8 +2899,8 @@ export const TARGETS = [
         sim.acceptQuest?.('q_prof_intro');
         if (sim.questState?.('q_prof_intro') !== 'active')
           return { ok: false, reason: `quest state ${sim.questState?.('q_prof_intro')}` };
-        p.pos.x = -84; // Copper Dig, Eastbrook Vale
-        p.pos.z = -64;
+        p.pos.x = -144; // Copper Dig, Eastbrook Vale (the dig headland)
+        p.pos.z = -88;
         const el = document.querySelector('#map-window');
         // Force hidden first so pollForSize cannot pass on a window that was already
         // up from an earlier target in the same run (the market recipe's precedent).
@@ -2925,6 +2977,7 @@ export const TARGETS = [
       // harness), where the base tree legitimately shows gold or nothing, so
       // only the settle wait applies there.
       const expected = variant.stage === 'cooldown' ? 'cooldown' : 'repeat';
+      // biome-ignore lint/suspicious/noUndeclaredEnvVars: Screenshot-only CLI input is not a Turbo task dependency.
       if (process.env.SHOT_BASELINE === '1') {
         await wait(1200);
       } else {
@@ -3340,7 +3393,7 @@ export const TARGETS = [
         try {
           // The vein sits inside the Copper Dig mob camp: silence the camp
           // FIRST (the test-suite despawnMobs idiom) or the level-1 subject
-          // dies mid-hover, then teleport beside ore_eastbrook_1 at (-70,-53).
+          // dies mid-hover, then teleport beside ore_eastbrook_1 at (-130,-77).
           for (const e of sim?.entities?.values?.() ?? []) {
             if (e.kind !== 'mob') continue;
             e.dead = true;
@@ -3350,7 +3403,7 @@ export const TARGETS = [
             e.corpseTimer = 9999;
             e.inCombat = false;
           }
-          sim?.chat?.('/dev tp -70 -52');
+          sim?.chat?.('/dev tp -130 -76');
           if (mode === 'tooled') sim?.addItem?.('copper_mining_pick', 1);
           // A tier-2 pick at mining 0: covering but unwieldable, the state
           // R22 added. The tooltip must show the wield line, not a downgrade.
@@ -9461,42 +9514,6 @@ export const TARGETS = [
     },
   },
   {
-    key: 'vale-cup-skill-deed-copy',
-    label: 'Book of Deeds: Vale Cup skill deeds spell out rated 3v3+ and the save floor (#2767)',
-    when: ['sim/content/deeds.ts', 'ui/deeds_window', 'ui/deeds_view', 'ui/deed_i18n'],
-    // Open the Book of Deeds on the pvp category and search the exact clause every
-    // silently-gated Vale Cup skill deed now shares, so the frame shows Hat Trick
-    // Hero, Safe Hands, and Nothing Gets Past Me together with their spelled-out
-    // rated/3v3+/save-floor conditions, not the whole (much longer) pvp category.
-    variants: [{ key: 'desktop' }, { key: 'mobile', mobile: true }],
-    async capture(page) {
-      // openDeeds occasionally does not stick on the very first call (seen on both
-      // a loaded shared sandbox and a clean CI runner): retry the open a few times
-      // rather than a single fire-and-poll, mirroring the p14-bag-glyphs target's
-      // check-before-toggle defensiveness above.
-      let opened = false;
-      for (let attempt = 0; attempt < 3 && !opened; attempt++) {
-        await page.evaluate(() => {
-          const el = document.querySelector('#deeds-window');
-          if (el) el.style.display = 'none';
-          window.__game?.hud?.openDeeds?.('pvp');
-        });
-        opened = await pollForSize(page, '#deeds-window', 10, 500);
-      }
-      if (!opened) {
-        throw new Error('deeds window did not open');
-      }
-      await page.evaluate(() => {
-        const input = document.querySelector('#deeds-window .deed-search');
-        if (!(input instanceof HTMLInputElement)) return;
-        input.value = '3v3 bracket or larger';
-        input.dispatchEvent(new Event('input', { bubbles: true }));
-      });
-      await wait(400);
-      return { clip: '#deeds-window' };
-    },
-  },
-  {
     key: 'deed-missing-poi-places',
     label:
       'Book of Deeds: an unearned wayfarer deed names which places are still missing, not just a bare count',
@@ -9539,68 +9556,6 @@ export const TARGETS = [
       });
       await wait(400);
       return { clip: '#deeds-window' };
-    },
-  },
-  {
-    key: 'vale-cup-unrated-notes',
-    label: 'Vale Cup window: 1v1/2v2 all-rounder note and practice unrated note (#2767)',
-    when: ['ui/vale_cup_window'],
-    // The window opens on the 1v1 bracket by default, so the small-bracket
-    // role note shows; offline enables the practice button, so the practice
-    // unrated note shows beneath it in the same frame.
-    variants: [{ key: 'desktop' }, { key: 'mobile', mobile: true }],
-    async capture(page) {
-      let opened = false;
-      for (let attempt = 0; attempt < 3 && !opened; attempt++) {
-        await page.evaluate(() => {
-          const el = document.querySelector('#valecup-window');
-          if (el) el.style.display = 'none';
-          window.__game?.hud?.toggleValeCup?.();
-        });
-        opened = await pollForSize(page, '#valecup-window', 10, 500);
-      }
-      if (!opened) throw new Error('vale cup window did not open');
-      // The two notes sit below the fold on the mobile-landscape viewport:
-      // scroll the last one into view (a no-op on desktop, where all fit).
-      await page.evaluate(() => {
-        document.getElementById('vcup-practice-unrated-note')?.scrollIntoView({ block: 'nearest' });
-      });
-      await wait(400);
-      return { clip: '#valecup-window' };
-    },
-  },
-  {
-    key: 'vale-cup-briefing-unrated',
-    label: 'Vale Cup briefing: unrated-bout note (practice / bot-backfill) (#2767)',
-    when: ['ui/vale_cup_briefing'],
-    // A private practice bout is the offline-reachable unrated bout: starting
-    // one brings up the pre-match briefing overlay, whose rules panel now ends
-    // with the unrated note (no standings, no Book of Deeds progress).
-    variants: [{ key: 'desktop' }, { key: 'mobile', mobile: true }],
-    async capture(page) {
-      // Retried: startValeCupPractice no-ops with a chat error once seated, so a
-      // repeat call after a swallowed first attempt (CI flake) is safe.
-      let up = false;
-      for (let attempt = 0; attempt < 3 && !up; attempt++) {
-        await page.evaluate(() => {
-          window.__game?.sim?.vcupPracticeStart?.(1);
-        });
-        up = await pollForSize(page, '#vcup-briefing', 10, 500);
-      }
-      if (!up) {
-        const state = await page.evaluate(() => {
-          const sim = window.__game?.sim;
-          const match = sim?.cupInfoFor?.(sim.primaryId)?.match;
-          return JSON.stringify({
-            game: Boolean(window.__game),
-            phase: match ? match.phase : null,
-            dead: Boolean(sim?.player?.dead),
-          });
-        });
-        throw new Error(`briefing overlay did not appear (${state})`);
-      }
-      await wait(400);
-      return { clip: '#vcup-briefing .vcupb-card' };
     },
   },
   {
@@ -9737,6 +9692,7 @@ export const TARGETS = [
         const p = window.__game?.sim?.player;
         return { casting: !!p?.castingAbility, ability: p?.castingAbility ?? null };
       });
+      // biome-ignore lint/suspicious/noUndeclaredEnvVars: Screenshot-only CLI input is not a Turbo task dependency.
       if (!cast.casting && process.env.SHOT_BASELINE !== '1') {
         throw new Error(`the cast never started: ${JSON.stringify(cast)}`);
       }
@@ -10730,6 +10686,7 @@ export const TARGETS = [
         });
         if (!r) continue;
         await page.screenshot({
+          // biome-ignore lint/suspicious/noUndeclaredEnvVars: Screenshot-only CLI input is not a Turbo task dependency.
           path: `${process.env.SHOTS_DIR ?? 'pr-shots'}/swing-timer-${variant.key}-t${String(shotIndex).padStart(2, '0')}.png`,
           clip: {
             x: Math.max(0, r.x - pad),
@@ -11237,15 +11194,16 @@ async function stageFarmerJessica(page) {
     const player = sim?.player;
     if (!game || !sim || !player?.pos) return { ok: false, reason: 'offline world is unavailable' };
     const jess = [...sim.entities.values()].find((e) => e.templateId === 'farmer_jessica');
-    const spot = jess ? { x: jess.pos.x, z: jess.pos.z } : { x: 24.5, z: 32.5 };
+    const spot = jess ? { x: jess.pos.x, z: jess.pos.z } : { x: -15.5, z: -81.5 };
     // Camera-forward is (sin yaw, cos yaw): stand 4.5 yd behind the spot along
     // that bearing so Jessica sits squarely ahead of the player.
     const yaw = game.input.camYaw;
     player.pos.x = spot.x - Math.sin(yaw) * 4.5;
     player.pos.z = spot.z - Math.cos(yaw) * 4.5;
     player.prevPos = { ...player.pos };
-    // The patch sits in Forest Wolf territory: shove hostiles away so nothing
-    // interrupts or walks into the frame.
+    // The patch sits at the town's edge, outside every camp disc, but shove
+    // any hostile that wandered near away so nothing interrupts or walks
+    // into the frame.
     for (const e of sim.entities.values()) {
       if (!e?.hostile || !e.pos) continue;
       const dx = e.pos.x - spot.x;
@@ -11355,7 +11313,7 @@ async function stageEastbrookBeds(page) {
   }
 }
 
-// Stand the player ON bed_eastbrook_1 (16, 30) with the tier-1 farming kit in
+// Stand the player ON bed_eastbrook_1 (-24, -84) with the tier-1 farming kit in
 // the bags and NOTHING planted, so the interact press resolves the free bed
 // and opens the plant sheet (the farm-plant-sheet target above). Compost rides
 // along so one knob paints affordable beside the two that honestly cannot pay.
@@ -11378,8 +11336,8 @@ async function stagePlantSheetBed(page) {
     const sim = window.__game?.sim;
     const player = sim?.player;
     if (!sim || !player?.pos) return { ok: false, reason: 'offline world is unavailable' };
-    player.pos.x = 16;
-    player.pos.z = 30;
+    player.pos.x = -24;
+    player.pos.z = -84;
     player.prevPos = { ...player.pos };
     sim.addItem?.('garden_hoe', 1);
     sim.addItem?.('vale_wheat_seed', 3);

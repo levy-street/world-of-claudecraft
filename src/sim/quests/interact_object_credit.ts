@@ -91,11 +91,9 @@ export function recordInteractObjectCredit(qp: QuestProgress, key: string): void
  * client. Returns the same object untouched when there is no ledger, so the
  * common case allocates nothing.
  */
-export function questProgressForWire(qp: QuestProgress): QuestProgress {
-  if (qp.creditedObjects === undefined) return qp;
-  const { creditedObjects: _dropped, ...rest } = qp;
-  return rest;
-}
+// questProgressForWire (the ledger strip) is gone: the client now READS
+// creditedObjects to hide a spent object per player (opened_object_view.ts),
+// so qlog ships the field. The bound above keeps the payload trivial.
 
 /**
  * Load-side normalization (normalize on load, never crash): a persisted ledger

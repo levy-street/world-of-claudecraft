@@ -179,7 +179,9 @@ GO-LIVE) done 2026-08-17 on fix/farming-phase-09-world-presence off
 feature/farming-plan at 26f330cea2 (merged --no-ff back into
 feature/farming-plan; hash in progress.md). FARMING IS LIVE ON THE SIM AND
 THE WIRE on the merged branch: four static farmer NPCs (Farmer Jessica 'Allotment Keeper' at
-Eastbrook (24.5, 32.5), Farmer Teasel 'Fen Paddy Farmer' at Fenbridge (-21,
+Eastbrook (24.5, 32.5; re-seated to (-15.5, -81.5) at the release/v0.41.0
+merge, when the rebuilt vale's second wolf run overran the north-lane site),
+Farmer Teasel 'Fen Paddy Farmer' at Fenbridge (-21,
 333.5) with a fenbridge_layout row, Farmer Hollis 'Highwatch Terrace Farmer'
 at Highwatch (-18, 695.5), Farmer Verbena 'Parterre Gardener' at the Evergarden
 parterre (348.5, 867); D17-audited real plant words, none a farmer NPC in

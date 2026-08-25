@@ -446,7 +446,7 @@ export const cs_CZ: EnTranslations = {
       "remainingDaysHours": "{days} d {hours} h",
       "score": "Skóre",
       "walletValue": "Hodnota peněženky (WOC)",
-      "usd": "{amount} USD",
+      "usd": "{amount}",
       "sol": "{amount} SOL",
       "unknown": "Neznámé",
       "spinTitle": "Denní zatočení",
@@ -488,85 +488,85 @@ export const cs_CZ: EnTranslations = {
       }
     },
     "trade": {
-      "windowClosed": "Trade window closed.",
+      "windowClosed": "Okno výměny bylo zavřeno.",
       "woc": {
-        "tabGold": "Gold",
+        "tabGold": "Zlato",
         "tabWoc": "$WOC",
-        "modesLabel": "Payment currency",
-        "tabWocHint": "Paying in $WOC is available when your side of the table is empty and no gold is offered.",
-        "priceLabel": "Price in USD",
-        "pricePlaceholder": "0.00",
-        "equivalent": "About {tokens} $WOC at the current rate",
-        "variableWarning": "The $WOC amount is a preview, not a fixed price. The exact number is set by a fresh quote when you pay.",
-        "feeLine": "Exchange fee {fee}, taken out of the price.",
-        "netLine": "You receive {net}",
-        "netLineBuyer": "The seller receives {net}",
-        "sendOffer": "Offer $WOC",
-        "offerSent": "Offer sent. It expires in 10 minutes unless {name} accepts.",
-        "offerSentUntil": "Offer sent. It expires at {time} unless {name} accepts.",
-        "incomingAccept": "{name} offers {price} for your items.",
-        "notInstant": "A $WOC sale is not instant. The item moves into escrow once both sides accept, and reaches the buyer once payment is verified.",
-        "blockDisabled": "The $WOC Exchange is not available on this realm.",
-        "blockNoWallet": "Link and verify a wallet to sell items for $WOC.",
-        "blockPartnerUnknown": "Checking whether that player can accept $WOC...",
-        "blockRecipientNoWallet": "That player must connect a wallet to accept $WOC payments.",
-        "hintClearYourItems": "Remove your own items: a $WOC offer buys what they are selling.",
-        "hintAwaitTheirItems": "Waiting for them to offer something that can be sold for $WOC.",
-        "hintOneItem": "A $WOC deal covers exactly one item. Only the item being sold can be on the table.",
-        "hintEnterPrice": "Enter a price in USD.",
-        "hintAcceptNeedsItem": "Add the item you are selling before accepting.",
-        "hintAcceptLocked": "That item is locked. Unlock it in your bags, then remove it from the trade and add it again.",
-        "hintGoldOffered": "Remove your gold offer first: a trade is gold or $WOC, not both.",
-        "ineligibleReason": "Soulbound, quest, and locked items, and items outside the Exchange categories, cannot be sold for $WOC.",
-        "incomingTitle": "$WOC offer from {name}",
-        "incomingBody": "{name} offers to sell you {item} for {price}.",
+        "modesLabel": "Platební měna",
+        "tabWocHint": "Platba v $WOC je dostupná, když je tvoje strana stolu prázdná a není nabídnuto žádné zlato.",
+        "priceLabel": "Cena v USD",
+        "pricePlaceholder": "0,00",
+        "equivalent": "Přibližně {tokens} $WOC podle aktuálního kurzu",
+        "variableWarning": "Množství $WOC je jen orientační náhled, ne pevná cena. Přesné číslo určí nová cenová nabídka až ve chvíli platby.",
+        "feeLine": "Poplatek burzy {fee}, odečtený z ceny.",
+        "netLine": "Obdržíš {net}",
+        "netLineBuyer": "Prodejce obdrží {net}",
+        "sendOffer": "Nabídnout $WOC",
+        "offerSent": "Nabídka odeslána. Pokud ji {name} nepřijme, vyprší za 10 minut.",
+        "offerSentUntil": "Nabídka odeslána. Pokud ji {name} nepřijme, vyprší v {time}.",
+        "incomingAccept": "{name} nabízí {price} za tvoje předměty.",
+        "notInstant": "Prodej za $WOC neproběhne okamžitě. Jakmile obě strany souhlasí, předmět putuje do úschovy a ke kupujícímu se dostane, až se ověří platba.",
+        "blockDisabled": "Burza $WOC není na tomto světě dostupná.",
+        "blockNoWallet": "Propoj a ověř peněženku, abys mohl(a) prodávat předměty za $WOC.",
+        "blockPartnerUnknown": "Zjišťuje se, jestli tento hráč může přijímat $WOC...",
+        "blockRecipientNoWallet": "Tento hráč musí připojit peněženku, aby mohl přijímat platby v $WOC.",
+        "hintClearYourItems": "Odeber vlastní předměty: nabídka v $WOC kupuje to, co nabízí protistrana.",
+        "hintAwaitTheirItems": "Čeká se, až protistrana nabídne něco, co lze prodat za $WOC.",
+        "hintOneItem": "Obchod v $WOC se týká přesně jednoho předmětu. Na stole může být jen prodávaný předmět.",
+        "hintEnterPrice": "Zadej cenu v USD.",
+        "hintAcceptNeedsItem": "Než nabídku přijmeš, přidej předmět, který prodáváš.",
+        "hintAcceptLocked": "Tento předmět je uzamčen. Odemkni ho v batozích, pak ho z výměny odeber a znovu přidej.",
+        "hintGoldOffered": "Nejdřív odeber svou nabídku ve zlatě: výměna probíhá buď za zlato, nebo za $WOC, nikdy za obojí.",
+        "ineligibleReason": "Předměty vázané na duši, úkolové a uzamčené předměty a předměty mimo kategorie burzy nelze prodat za $WOC.",
+        "incomingTitle": "Nabídka v $WOC od hráče {name}",
+        "incomingBody": "{name} ti nabízí k prodeji {item} za {price}.",
         "moneyUsd": "{usd}",
         "moneyLine": "{usd} (~ {tokens} $WOC)",
-        "waitingOther": "Offer accepted. Waiting for the other player to accept.",
-        "payNow": "Pay {usd}",
-        "awaitingPayment": "Waiting for payment confirmation...",
-        "paying": "Confirm the payment in your wallet...",
-        "settled": "Paid. Your item is in your bags, or arrives by Ravenpost mail if they were full.",
-        "settledSeller": "Paid. The item was delivered to the buyer.",
-        "accept": "Accept offer",
-        "accepted": "Offer accepted. Your item is held until payment is verified.",
-        "decline": "Decline",
-        "withdraw": "Withdraw offer",
-        "hintInsufficientBalance": "That is more $WOC than your connected wallet holds.",
-        "statusAwaitingBuyer": "Waiting for the buyer to pay.",
-        "statusPayingBuyer": "Confirming your payment on the network...",
-        "statusPayingSeller": "The buyer's payment is confirming on the network...",
-        "statusReviewBuyer": "Your payment is under review.",
-        "statusReviewSeller": "The buyer's payment is under review.",
-        "paidSeller": "You have received a payment of {price} for your {item}.",
-        "paidBuyer": "You have sent a payment of {price} for {item}.",
-        "closedCancelled": "This sale was cancelled. The item returns to the seller by Ravenpost mail.",
-        "closedSuspended": "This sale was suspended by a Game Master. The item returns to the seller by Ravenpost mail.",
-        "closedUnpaid": "This sale ended without payment. The item returns to the seller by Ravenpost mail.",
-        "closedUnpaidBuyer": "This sale ended without your payment. The item returns to the seller by Ravenpost mail; not paying an accepted deal earns a Marketplace strike.",
-        "cancelSale": "Cancel sale",
-        "cancelPendingSeller": "Cancel requested. The sale ends on its own unless the buyer pays first.",
-        "youDeclined": "You declined the offer.",
-        "youWithdrew": "You withdrew your offer.",
-        "offerNotPending": "This offer is no longer pending.",
-        "offerDeclined": "The $WOC offer was declined.",
-        "offerWithdrawn": "The $WOC offer was withdrawn.",
-        "offerExpired": "The $WOC offer expired.",
-        "offerExpiresAt": "Offer expires at {time}.",
-        "offerStandsUntil": "Your $WOC offer still stands until {time}. Trade with the seller again to finish the deal if they accept.",
-        "dealAwaitsPayment": "Your $WOC purchase is still unpaid. Trade with the seller again to pay; the deal expires on its own if you do not, and not paying earns a Marketplace strike.",
-        "closeSellerHold": "Your item stays held for the buyer's payment. Cancel the sale from the Exchange's Activity tab if you change your mind.",
-        "closePaymentContinuesBuyer": "Your payment is still being confirmed. Delivery completes on its own.",
-        "closePaymentContinuesSeller": "The buyer's payment is still being confirmed. The sale completes on its own.",
-        "p2pBindingNote": "Once both sides accept, payment is due within {duration}, or within the shorter window that opens when you press Pay. Not paying earns a Marketplace strike.",
-        "p2pBindingNoteUntimed": "Once both sides accept, payment is due shortly after, or within the shorter window that opens when you press Pay. Not paying earns a Marketplace strike.",
-        "p2pPaymentDueAt": "Payment is due by {time}. Not paying earns a Marketplace strike.",
-        "quoteExpiredTrade": "The quote expired. Press Not now, then Pay again for a fresh one.",
-        "quoteStaged": "Payment quote ready for {usd}: {tokens} $WOC, valid until {time}.",
-        "paymentConfirmed": "Payment confirmed. Your item arrives in your bags, or by Ravenpost mail if they are full, once delivery completes.",
-        "statusConfirmedBuyer": "Payment confirmed. Delivery is completing...",
-        "statusConfirmedSeller": "Payment confirmed. The sale is completing...",
-        "hintBelowMin": "The Exchange minimum price is {usd}."
+        "waitingOther": "Nabídka přijata. Čeká se, až ji přijme i druhý hráč.",
+        "payNow": "Zaplatit {usd}",
+        "awaitingPayment": "Čeká se na potvrzení platby...",
+        "paying": "Potvrď platbu ve své peněžence...",
+        "settled": "Zaplaceno. Předmět je ve tvých batozích, nebo dorazí Havraní poštou, pokud byly plné.",
+        "settledSeller": "Zaplaceno. Předmět byl doručen kupujícímu.",
+        "accept": "Přijmout nabídku",
+        "accepted": "Nabídka přijata. Tvůj předmět zůstává v úschově, dokud se neověří platba.",
+        "decline": "Odmítnout",
+        "withdraw": "Stáhnout nabídku",
+        "hintInsufficientBalance": "To je víc $WOC, než kolik drží tvá připojená peněženka.",
+        "statusAwaitingBuyer": "Čeká se, až kupující zaplatí.",
+        "statusPayingBuyer": "Tvoje platba se potvrzuje v síti...",
+        "statusPayingSeller": "Platba kupujícího se potvrzuje v síti...",
+        "statusReviewBuyer": "Tvoje platba se prověřuje.",
+        "statusReviewSeller": "Platba kupujícího se prověřuje.",
+        "paidSeller": "Obdržel(a) jsi platbu {price} za svůj {item}.",
+        "paidBuyer": "Odeslal(a) jsi platbu {price} za {item}.",
+        "closedCancelled": "Tento prodej byl zrušen. Předmět se vrátí prodejci Havraní poštou.",
+        "closedSuspended": "Tento prodej pozastavil herní mistr. Předmět se vrátí prodejci Havraní poštou.",
+        "closedUnpaid": "Tento prodej skončil bez platby. Předmět se vrátí prodejci Havraní poštou.",
+        "closedUnpaidBuyer": "Tento prodej skončil bez tvé platby. Předmět se vrátí prodejci Havraní poštou; nezaplacení přijaté nabídky ti vynese trestný bod na burze.",
+        "cancelSale": "Zrušit prodej",
+        "cancelPendingSeller": "Zrušení požadováno. Prodej sám skončí, pokud kupující nezaplatí dřív.",
+        "youDeclined": "Nabídku jsi odmítl(a).",
+        "youWithdrew": "Svou nabídku jsi stáhl(a).",
+        "offerNotPending": "Tato nabídka už nečeká na vyřízení.",
+        "offerDeclined": "Nabídka v $WOC byla odmítnuta.",
+        "offerWithdrawn": "Nabídka v $WOC byla stažena.",
+        "offerExpired": "Nabídce v $WOC vypršela platnost.",
+        "offerExpiresAt": "Nabídce vyprší platnost v {time}.",
+        "offerStandsUntil": "Tvoje nabídka v $WOC platí do {time}. Pokud ji prodejce přijme, dokonči obchod tak, že s ním znovu otevřeš výměnu.",
+        "dealAwaitsPayment": "Tvůj nákup za $WOC je stále nezaplacený. Zaplať ho tak, že s prodejcem znovu otevřeš výměnu; pokud nezaplatíš, obchod sám vyprší a nezaplacení ti vynese trestný bod na burze.",
+        "closeSellerHold": "Tvůj předmět zůstává v úschově, dokud kupující nezaplatí. Pokud si to rozmyslíš, zruš prodej na záložce Aktivita na burze.",
+        "closePaymentContinuesBuyer": "Tvoje platba se stále potvrzuje. Doručení proběhne samo.",
+        "closePaymentContinuesSeller": "Platba kupujícího se stále potvrzuje. Prodej se dokončí sám.",
+        "p2pBindingNote": "Jakmile obě strany souhlasí, platba je splatná do {duration}, nebo v kratším okně, které se otevře stisknutím Zaplatit. Nezaplacení ti vynese trestný bod na burze.",
+        "p2pBindingNoteUntimed": "Jakmile obě strany souhlasí, platba je splatná krátce poté, nebo v kratším okně, které se otevře stisknutím Zaplatit. Nezaplacení ti vynese trestný bod na burze.",
+        "p2pPaymentDueAt": "Platba je splatná do {time}. Nezaplacení ti vynese trestný bod na burze.",
+        "quoteExpiredTrade": "Platnost cenové nabídky vypršela. Stiskni Teď ne, a pak znovu Zaplatit pro novou.",
+        "quoteStaged": "Cenová nabídka platby připravena pro {usd}: {tokens} $WOC, platná do {time}.",
+        "paymentConfirmed": "Platba potvrzena. Předmět dorazí do tvých batohů, nebo Havraní poštou, pokud jsou plné, jakmile se doručení dokončí.",
+        "statusConfirmedBuyer": "Platba potvrzena. Doručení se dokončuje...",
+        "statusConfirmedSeller": "Platba potvrzena. Prodej se dokončuje...",
+        "hintBelowMin": "Minimální cena na burze je {usd}."
       }
     },
     "wocStore": {
@@ -943,7 +943,7 @@ export const cs_CZ: EnTranslations = {
       "jump": "Skok",
       "leaderboard": "Žebříčky",
       "dailyRewards": "Obchod",
-      "wocMarket": "Exchange",
+      "wocMarket": "Burza",
       "deeds": "Skutky",
       "mounts": "Jízdní zvířata",
       "professions": "Profese",
@@ -957,52 +957,62 @@ export const cs_CZ: EnTranslations = {
       "actionRing": "Bojové akce",
       "actionPageToggle": "Přepnout stránku akcí",
       "actionPageIndicator": "{page}",
-      "actionRadial": "Action directions",
-      "actionRadialCancel": "Cancel action",
-      "radialCenter": "Centre",
-      "radialUp": "Up",
-      "radialRight": "Right",
-      "radialDown": "Down",
-      "radialLeft": "Left",
-      "consumableSeat": "Consumables",
-      "menuControl": "Menus",
-      "menuControlAria": "Menus. Tap to open chat, or hold and swipe right for mounts, map, bags and more.",
-      "menuControlAriaTap": "Menus. Tap to open the menu row: mounts, map, bags and more. Tap again for chat.",
+      "actionRadial": "Směry akcí",
+      "actionRadialCancel": "Zrušit akci",
+      "radialCenter": "Střed",
+      "radialUp": "Nahoru",
+      "radialRight": "Doprava",
+      "radialDown": "Dolů",
+      "radialLeft": "Doleva",
+      "consumableSeat": "Spotřební předměty",
+      "menuControl": "Menu",
+      "menuControlAria": "Menu. Klepnutím otevřeš chat, nebo podržením a přejetím doprava zobrazíš jízdní zvířata, mapu, batohy a další.",
+      "menuControlAriaTap": "Menu. Klepnutím otevřeš řadu menu: jízdní zvířata, mapu, batohy a další. Dalším klepnutím otevřeš chat.",
       "menuLabel": "Menu",
-      "quickActions": "Quick Actions",
-      "quickActionsAria": "Quick Actions. Tap to open the row of mount, chat, map, bags and more, or hold and swipe right to pick one.",
-      "quickActionsAriaTap": "Quick Actions. Tap to open the row of mount, chat, map, bags and more, then tap an item. Tap the control again to close.",
-      "quickActionsLabel": "Actions",
-      "stanceRadial": "Stances",
-      "stanceAnchorAria": "Stance: {stance}. Tap to open the stance ring, then pick another stance.",
-      "stanceAnchorEmptyAria": "No stance. Tap to open the stance ring, then pick a stance.",
-      "questStripAria": "Tracked quest {position} of {total}: {title}. Activate for the next quest.",
-      "questStripAriaSingle": "Tracked quest: {title}",
+      "quickActions": "Rychlé akce",
+      "quickActionsAria": "Rychlé akce. Klepnutím otevřeš řadu jízdního zvířete, chatu, mapy, batohů a dalšího, nebo podržením a přejetím doprava jednu vyber.",
+      "quickActionsAriaTap": "Rychlé akce. Klepnutím otevřeš řadu jízdního zvířete, chatu, mapy, batohů a dalšího, pak klepni na položku. Dalším klepnutím na ovladač ji zavřeš.",
+      "quickActionsLabel": "Akce",
+      "stanceRadial": "Postoje",
+      "stanceAnchorAria": "Postoj: {stance}. Klepnutím otevřeš kruh postojů a vyber jiný postoj.",
+      "stanceAnchorEmptyAria": "Žádný postoj. Klepnutím otevřeš kruh postojů a vyber postoj.",
+      "questStripAria": "Sledovaný úkol {position} z {total}: {title}. Aktivací zobrazíš další úkol.",
+      "questStripAriaSingle": "Sledovaný úkol: {title}",
       "questStripCounter": "{position}/{total}",
-      "questStripMore": "+{count} more",
+      "questStripMore": "+{count} další",
       "targetCycle": "Přepnout cíl",
       "targetCycleShort": "Cíl",
       "spellbookPageLabel": "Strana {page}",
       "hideKeyboard": "Skrýt klávesnici",
       "chatPlaceholder": "Něco napiš...",
-      "barEditor": "Edit Bars",
-      "barEditorAria": "Edit the action bar layout"
+      "barEditor": "Upravit lišty",
+      "barEditorAria": "Upravit rozložení akční lišty"
     },
     "barEditor": {
-      "title": "Edit Action Bar",
-      "close": "Close bar editor",
-      "pages": "Action bar pages",
-      "pageTab": "Page {page}",
-      "buttonHeader": "Button {button}",
-      "cellAria": "Button {button}, {direction}: {action}",
-      "emptyCellAria": "Button {button}, {direction}: empty",
-      "hint": "Tap a slot, then another, to swap them.",
-      "armed": "Tap a slot to place {name}.",
-      "picked": "Tap another slot to swap with {name}.",
-      "locked": "Action bars are locked in Interface options.",
-      "clear": "Clear",
-      "clearAria": "Clear a slot",
-      "clearArmed": "Tap a slot to clear it."
+      "title": "Upravit akční lištu",
+      "close": "Zavřít editor lišt",
+      "pages": "Stránky akční lišty",
+      "pageTab": "Strana {page}",
+      "buttonHeader": "Tlačítko {button}",
+      "cellAria": "Tlačítko {button}, {direction}: {action}",
+      "emptyCellAria": "Tlačítko {button}, {direction}: prázdné",
+      "hint": "Klikni na slot a pak na další, čímž je prohodíš.",
+      "armed": "Klikni na slot a umísti {name}.",
+      "picked": "Klikni na jiný slot a prohoď ho s {name}.",
+      "locked": "Akční lišty jsou uzamčené v panelu Rozhraní.",
+      "clear": "Vymazat",
+      "clearAria": "Vymazat slot",
+      "clearArmed": "Klikni na slot a vymaž ho."
+    },
+    "tutorialGreeting": {
+      "bodyFirst": "Tebe jsem tu ještě neviděl, příteli. V těchto krajích je zvykem, že se ti, kdo se vydávají na dobrodružství, nejdřív vypraví na Zkušební pobřeží, tichý ostrůvek za úžinou. Tam si můžeš vybrousit dovednosti a zvyknout si na svět, než se pustíš do jeho výzev. Přívoz jezdí oběma směry a nikdo si o tobě nebude myslet nic zlého, ať se rozhodneš jakkoli.",
+      "bodyRefresher": "Zase tu jsi, tentokrát s novou tváří? Pak už víš, jak to tu chodí. Přesto, jestli by sis chtěl(a) před vyražením zopakovat základy, Zkušební pobřeží nikdy neodmítne vracejícího se žáka, a přívoz je připravený, kdykoli budeš chtít.",
+      "play": "Spustit tutoriál",
+      "skip": "Přeskočit tutoriál",
+      "declineNote": "Jak myslíš, příteli. Kdybys to jednou přece jen rozmyslel(a), trajektový zvon u schránky Havraní pošty tě kdykoli, ve dne v noci, převeze na Zkušební pobřeží. Bude tu čekat i ve chvíli, kdy tu vlci nebudou.",
+      "bellHomeNote": "Už jsi zpátky z pobřeží? To zvonil trajektový zvon. Jeho dvojče visí hned tamhle u schránky Havraní pošty: zazvoň na něj, kdykoli budeš chtít, a přívoz tě donese zpátky na Zkušební pobřeží. Ať se rozhodneš tak či onak, nic se tím nezkazí.",
+      "islandArrivalNote": "Vítej na Zkušebním pobřeží. Strážce Tam čeká kousek odsud na pláži: zajdi za ním.",
+      "noteClose": "Rozumím"
     },
     "tutorial": {
       "moveBodyTouch": "Pohybuj se páčkou pohybu a tažením po obrazovce se rozhlížej. Udělej pár kroků a začni.",
@@ -1015,6 +1025,117 @@ export const cs_CZ: EnTranslations = {
       "nextTipQuestLog": "Otevři deník úkolů ({key}) a najdi další úkol v okolí.",
       "nextTipMap": "Podívej se na mapu světa ({key}) a zjisti, kde čekají úkoly.",
       "nextTipSocial": "Otevři okno Společnost ({key}) a najdi skupinu pro těžší boje."
+    },
+    "bootcamp": {
+      "title": "První kroky",
+      "talkTitle": "Promluv se Strážcem Tamem",
+      "talkBody": "Strážce Tam hlídá bránu Překážkové dráhy hned před tebou. Dojdi k němu, dokud se neukáže jeho jméno, pak stiskni {interactKey}, nebo na něj klikni, a promluv si s ním: zadá ti běh.",
+      "talkBodyTouch": "Strážce Tam hlídá bránu Překážkové dráhy hned před tebou. Dojdi k němu, dokud se neukáže jeho jméno, pak na něj klepni, nebo klepni na tlačítko Použít, a promluv si s ním: zadá ti běh.",
+      "talkBodyPad": "Strážce Tam hlídá bránu Překážkové dráhy hned před tebou. Dojdi k němu, dokud se neukáže jeho jméno, pak stiskni své tlačítko interakce a promluv si s ním: zadá ti běh.",
+      "forwardTitle": "Projdi první dráhu",
+      "forwardBody": "Postav se do dráhy vedle Tama a podrž {forwardKey}, ať jí dojdeš na západ k její vlajce.",
+      "forwardBodyTouch": "Postav se do dráhy vedle Tama a zatlač páčku pohybu nahoru, ať jí dojdeš na západ k její vlajce.",
+      "forwardBodyPad": "Postav se do dráhy vedle Tama a zatlač levou páčku nahoru, ať jí dojdeš na západ k její vlajce.",
+      "turnwalkTitle": "Otoč se a jdi",
+      "turnwalkBody": "První vlajka je za tebou. Podrž {turnKey} a otoč se na místě, dokud nebudeš mířit ohrazenou dráhou vedoucí na jih, pak znovu podrž {forwardKey} a projdi ji ke druhé vlajce.",
+      "turnwalkBodyTouch": "První vlajka je za tebou. Přejeď prstem po obrazovce (ne po páčce pohybu) a otoč se, dokud nebudeš mířit ohrazenou dráhou vedoucí na jih, pak zatlač páčku nahoru a projdi ji ke druhé vlajce.",
+      "turnwalkBodyPad": "První vlajka je za tebou. Zatlač pravou páčku a otoč se, dokud nebudeš mířit ohrazenou dráhou vedoucí na jih, pak zatlač levou páčku nahoru a projdi ji ke druhé vlajce.",
+      "strafeTitle": "Otoč se a jdi",
+      "strafeBody": "Zbývá jedna zatáčka. Podrž {turnLeftKey} a otoč se na místě, dokud nebudeš mířit poslední dráhou, pak znovu podrž {forwardKey} a projdi ji, dokud nebudeš mít červenou vlajku za sebou.",
+      "strafeBodyTouch": "Zbývá jedna zatáčka. Přejeď prstem po obrazovce (ne po páčce pohybu) a otoč se, dokud nebudeš mířit poslední dráhou, pak zatlač páčku nahoru a projdi dráhu, dokud nebudeš mít červenou vlajku za sebou.",
+      "strafeBodyPad": "Zbývá jedna zatáčka. Zatlač pravou páčku a otoč se, dokud nebudeš mířit poslední dráhou, pak zatlač levou páčku nahoru a projdi ji, dokud nebudeš mít červenou vlajku za sebou.",
+      "cameraTitle": "Otoč kamerou",
+      "cameraBody": "Poslední lekce, než odevzdáš svůj běh: podrž pravé tlačítko myši a táhnutím otoč kamerou celým kruhem kolem sebe. Vědět, co stojí za tebou, vyhrává boje.",
+      "cameraBodyTouch": "Poslední lekce, než odevzdáš svůj běh: přejeď prstem po obrazovce a otoč kamerou celým kruhem kolem sebe. Vědět, co stojí za tebou, vyhrává boje.",
+      "cameraBodyPad": "Poslední lekce, než odevzdáš svůj běh: zatlač na pravou páčku a otoč kamerou celým kruhem kolem sebe. Vědět, co stojí za tebou, vyhrává boje.",
+      "courseProgress": "Vlajka {current} z {total}",
+      "doneTitle": "Běh dokončen",
+      "doneBody": "To je vše, co tvé nohy potřebují znát. Dozorce Pell stojí vedle červené vlajky: stiskni na něm {interactKey}, nebo na něj klikni, a odevzdej svůj běh pro první odměnu.",
+      "doneBodyTouch": "To je vše, co tvé nohy potřebují znát. Dozorce Pell stojí vedle červené vlajky: klepnutím na něj odevzdej svůj běh pro první odměnu.",
+      "doneBodyPad": "To je vše, co tvé nohy potřebují znát. Dozorce Pell stojí vedle červené vlajky: stiskni na něm své tlačítko interakce a odevzdej svůj běh pro první odměnu.",
+      "coachNextTitle": "Další: {npc}",
+      "coachNextBody": "Sleduj zlatou stezku k postavě {npc}. Dojdi k ní, dokud se neukáže jméno, pak stiskni {interactKey}, nebo na ni klikni, a přijmi svůj další úkol.",
+      "coachNextBodyTouch": "Sleduj zlatou stezku k postavě {npc}. Dojdi k ní, dokud se neukáže jméno, pak na ni klepni, nebo klepni na tlačítko Použít, a přijmi svůj další úkol.",
+      "coachNextBodyPad": "Sleduj zlatou stezku k postavě {npc}. Dojdi k ní, dokud se neukáže jméno, pak stiskni své tlačítko interakce a přijmi svůj další úkol.",
+      "coachTaskBody": "Sleduj zlatou stezku ke svému úkolu. Sledovač vpravo drží přehled a {mapKey} otevře mapu, kdybys ztratil(a) cestu.",
+      "coachTaskBodyTouch": "Sleduj zlatou stezku ke svému úkolu. Sledovač vpravo drží přehled a tlačítko mapy ti ukáže cestu, kdybys ji ztratil(a).",
+      "coachTaskBodyPad": "Sleduj zlatou stezku ke svému úkolu. Sledovač vpravo drží přehled a tvé tlačítko mapy ti ukáže cestu, kdybys ji ztratil(a).",
+      "coachReadyTitle": "Úkol splněn",
+      "coachReadyBody": "Zamiř k postavě {npc} a stiskni {interactKey}, nebo na ni klikni, a odevzdej úkol a vezmi si odměnu.",
+      "coachReadyBodyTouch": "Zamiř k postavě {npc} a klepnutím na ni úkol odevzdej a vezmi si odměnu.",
+      "coachReadyBodyPad": "Zamiř k postavě {npc} a stiskni své tlačítko interakce, ať úkol odevzdáš a vezmeš si odměnu.",
+      "taskStrikeTrueBody": "Dojdi ke slaměné podobizně a klikni na ni, ať se stane tvým cílem: její jméno se ukáže nahoře na obrazovce. Pak stiskni {attackKey} a začni útočit. To první tlačítko je tvůj prostý útok, ne kouzlo. Bij do ní, dokud nepadne.",
+      "taskStrikeTrueBodyTouch": "Dojdi ke slaměné podobizně a klepni na ni, ať se stane tvým cílem. Pak klepni na první tlačítko na akční liště a udeř. Bij do ní, dokud nepadne.",
+      "taskStrikeTrueBodyPad": "Dojdi ke slaměné podobizně a stiskni tlačítko zacílení, ať se stane tvým cílem. Pak stiskni své první akční tlačítko a udeř. Bij do ní, dokud nepadne.",
+      "taskHoneBody": "Klikni na podobiznu, ať ji zaměříš, pak stiskni {abilityKey} a použij {ability}. To je tvá vlastní schopnost, ne prostý úder. Zasáhni jí třikrát.",
+      "taskHoneBodyTouch": "Klepni na podobiznu, ať ji zaměříš, pak klepni na {ability} na akční liště. To je tvá vlastní schopnost, ne prostý úder. Zasáhni jí třikrát.",
+      "taskHoneBodyPad": "Zaměř podobiznu, pak stiskni akční tlačítko, na kterém máš {ability}. To je tvá vlastní schopnost, ne prostý úder. Zasáhni jí třikrát.",
+      "taskLongWalkBody": "Stiskni {bagsKey}, otevři si batohy, pak klikni na Kámen přechodu. Položí tě tam, kde stojíš. Nic tu ti nemůže ublížit a nic tě to nestojí.",
+      "taskLongWalkBodyTouch": "Otevři si batohy a klepni na Kámen přechodu. Položí tě tam, kde stojíš. Nic tu ti nemůže ublížit a nic tě to nestojí.",
+      "taskLongWalkBodyPad": "Otevři si batohy a vyber Kámen přechodu. Položí tě tam, kde stojíš. Nic tu ti nemůže ublížit a nic tě to nestojí.",
+      "taskLongWalkDeadBody": "Zemřel(a) jsi, a nic jsi neztratil(a): žádné předměty, žádné mince, žádné zkušenosti. Krok 1 ze 2: klikni na tlačítko Uvolnit ducha uprostřed obrazovky. Povstaneš jako duch na hřbitově za táborem.",
+      "taskLongWalkDeadBodyTouch": "Zemřel(a) jsi, a nic jsi neztratil(a): žádné předměty, žádné mince, žádné zkušenosti. Krok 1 ze 2: klepni na tlačítko Uvolnit ducha uprostřed obrazovky. Povstaneš jako duch na hřbitově za táborem.",
+      "taskLongWalkDeadBodyPad": "Zemřel(a) jsi, a nic jsi neztratil(a): žádné předměty, žádné mince, žádné zkušenosti. Krok 1 ze 2: vyber Uvolnit ducha uprostřed obrazovky. Povstaneš jako duch na hřbitově za táborem.",
+      "taskLongWalkGhostBody": "Krok 2 ze 2: jsi duch a nic se tě nemůže dotknout. Tvé tělo je značka na tvé minimapě. Dojdi k ní. Jakmile budeš blízko, objeví se tlačítko Vzkřísit u mrtvoly: klikni na něj a jsi znovu naživu, zcela bez postihu. Tahle chůze je VŽDY zdarma a je to způsob, jak se vracíš pokaždé, když zemřeš.",
+      "taskLongWalkGhostBodyTouch": "Krok 2 ze 2: jsi duch a nic se tě nemůže dotknout. Tvé tělo je značka na tvé minimapě. Dojdi k ní. Jakmile budeš blízko, objeví se tlačítko Vzkřísit u mrtvoly: klepni na něj a jsi znovu naživu, zcela bez postihu. Tahle chůze je VŽDY zdarma a je to způsob, jak se vracíš pokaždé, když zemřeš.",
+      "taskLongWalkGhostBodyPad": "Krok 2 ze 2: jsi duch a nic se tě nemůže dotknout. Tvé tělo je značka na tvé minimapě. Dojdi k ní. Jakmile budeš blízko, objeví se tlačítko Vzkřísit u mrtvoly: vyber ho a jsi znovu naživu, zcela bez postihu. Tahle chůze je VŽDY zdarma a je to způsob, jak se vracíš pokaždé, když zemřeš.",
+      "taskShellBody": "Pobíhalové útočí klepety. Klikni na jednoho, ať ho zaměříš, pak stiskni {abilityKey} pro {ability} a pokračuj v útoku. Pokud tě napadne příliš mnoho najednou, ustup zpátky po cestě: honičku vzdají rychle a zdraví se ti při odpočinku vrátí.",
+      "taskShellBodyTouch": "Pobíhalové útočí klepety. Klepni na jednoho, ať ho zaměříš, pak klepni na {ability} na akční liště. Pokud tě napadne příliš mnoho najednou, ustup zpátky po cestě: honičku vzdají rychle a zdraví se ti při odpočinku vrátí.",
+      "taskShellBodyPad": "Pobíhalové útočí klepety. Zaměř jednoho, pak stiskni akční tlačítko, na kterém máš {ability}. Pokud tě napadne příliš mnoho najednou, ustup zpátky po cestě: honičku vzdají rychle a zdraví se ti při odpočinku vrátí.",
+      "taskStrikeTrueBodyCaster": "Dojdi ke slaměné podobizně a klikni na ni, ať se stane tvým cílem: její jméno se ukáže nahoře na obrazovce. Pak stiskni {attackKey}, nebo klikni na druhé tlačítko na akční liště, a sešli své kouzlo. Sesílej, dokud nepadne.",
+      "taskStrikeTrueBodyCasterTouch": "Dojdi ke slaměné podobizně a klepni na ni, ať se stane tvým cílem. Pak klepni na druhé tlačítko na akční liště a sešli své kouzlo. Sesílej, dokud nepadne.",
+      "taskStrikeTrueBodyCasterPad": "Dojdi ke slaměné podobizně a stiskni tlačítko zacílení, ať se stane tvým cílem. Pak stiskni své druhé akční tlačítko a sešli své kouzlo. Sesílej, dokud nepadne.",
+      "taskShellBodyCaster": "Pobíhalové útočí klepety. Klikni na jednoho, ať ho zaměříš, pak stiskni {abilityKey} pro {ability} a dál sesílej z dálky. Pokud tě napadne příliš mnoho najednou, ustup zpátky po cestě: honičku vzdají rychle a zdraví se ti při odpočinku vrátí.",
+      "taskShellBodyCasterTouch": "Pobíhalové útočí klepety. Klepni na jednoho, ať ho zaměříš, pak klepni na {ability} na akční liště a dál sesílej z dálky. Pokud tě napadne příliš mnoho najednou, ustup zpátky po cestě: honičku vzdají rychle a zdraví se ti při odpočinku vrátí.",
+      "taskShellBodyCasterPad": "Pobíhalové útočí klepety. Zaměř jednoho, pak stiskni akční tlačítko, na kterém máš {ability}, a dál sesílej z dálky. Pokud tě napadne příliš mnoho najednou, ustup zpátky po cestě: honičku vzdají rychle a zdraví se ti při odpočinku vrátí.",
+      "taskPearlBody": "Sleduj zlatou stezku k slapové tůni na západním konci pobřeží. Stůj na okraji vody, stiskni {bagsKey}, otevři si batohy a klikni na Slanou návnadu, ať ho vyvoláš. Bojuj s ním, jak jsi bojoval(a) s pobíhaly, a až padne, stiskni {interactKey} na jeho krunýři a získej Lesklou perlu.",
+      "taskPearlBodyTouch": "Sleduj zlatou stezku k slapové tůni na západním konci pobřeží. Stůj na okraji vody, otevři si batohy a klepni na Slanou návnadu, ať ho vyvoláš. Bojuj s ním, jak jsi bojoval(a) s pobíhaly, a až padne, klepni na jeho krunýř a získej Lesklou perlu.",
+      "taskPearlBodyPad": "Sleduj zlatou stezku k slapové tůni na západním konci pobřeží. Stůj na okraji vody, otevři si batohy a vyber Slanou návnadu, ať ho vyvoláš. Bojuj s ním, jak jsi bojoval(a) s pobíhaly, a až padne, stiskni své tlačítko interakce na jeho krunýři a získej Lesklou perlu.",
+      "taskWreckLineBody": "Vyplavené bedny lemují cestu k Táboru Svítání. Dojdi k jedné, dokud se neukáže její jméno, pak stiskni {interactKey}, nebo na bednu klikni, a seber ji. Náklad naplní šest beden.",
+      "taskWreckLineBodyTouch": "Vyplavené bedny lemují cestu k Táboru Svítání. Dojdi k jedné, dokud se neukáže její jméno, pak na bednu klepni, nebo klepni na tlačítko Použít, a seber ji. Náklad naplní šest beden.",
+      "taskWreckLineBodyPad": "Vyplavené bedny lemují cestu k Táboru Svítání. Dojdi k jedné, dokud se neukáže její jméno, pak stiskni své tlačítko interakce a seber ji. Náklad naplní šest beden.",
+      "taskPouchBody": "Stiskni {interactKey} na postavě {npc}, nebo na ni klikni, a otevři stánek, pak klikni na Lněný váček a kup si ho.",
+      "taskPouchBodyTouch": "Klepni na postavu {npc} a otevři stánek, pak klepni na Lněný váček a kup si ho.",
+      "taskPouchBodyPad": "Stiskni své tlačítko interakce na postavě {npc} a otevři stánek, pak vyber Lněný váček a kup si ho.",
+      "readyPouchBody": "Váček koupen. Stiskni {bagsKey}, otevři si batohy a klikni na Lněný váček, ať ho připneš do volné poutky. Pak zamiř k postavě {npc} a stiskni {interactKey}, ať se jím pochlubíš.",
+      "readyPouchBodyTouch": "Váček koupen. Otevři si batohy a klepni na Lněný váček, ať ho připneš do volné poutky. Pak zamiř k postavě {npc} a klepnutím na ni se jím pochlub.",
+      "readyPouchBodyPad": "Váček koupen. Otevři si batohy a vyber Lněný váček, ať ho připneš do volné poutky. Pak zamiř k postavě {npc} a stiskni své tlačítko interakce, ať se jím pochlubíš.",
+      "promptTalk": "Promluvit",
+      "promptTurnIn": "Odevzdat úkol",
+      "promptPickUp": "Sebrat",
+      "promptLootPearl": "Sebrat perlu",
+      "promptRead": "Přečíst",
+      "promptRing": "Zazvonit",
+      "promptHold": "Podržet",
+      "promptSelect": "Vybrat",
+      "promptAttack": "Útočit",
+      "promptUseAbility": "Použít schopnost",
+      "promptKneel": "Pokleknout",
+      "promptOpenBags": "Otevřít batohy",
+      "promptCharacterSheet": "Otevřít panel postavy",
+      "promptLookAround": "Podržet pravé tlačítko a tažením se rozhlížet",
+      "promptJump": "Skočit",
+      "promptSummon": "Přivolat",
+      "ringEquipTitle": "Nasaď si svou odměnu",
+      "ringEquipBody": "Dostal(a) jsi Perleť, a odměna v batohu nic nezmůže. Krok 1 ze 2: stiskni {bagsKey}, otevři si batohy, pak klikni na prsten a nasaď si ho.",
+      "ringEquipBodyTouch": "Dostal(a) jsi Perleť, a odměna v batohu nic nezmůže. Krok 1 ze 2: otevři si batohy a klepni na prsten, ať si ho nasadíš.",
+      "ringEquipBodyPad": "Dostal(a) jsi Perleť, a odměna v batohu nic nezmůže. Krok 1 ze 2: otevři si batohy a vyber prsten, ať si ho nasadíš.",
+      "ringAdmireTitle": "Podívejme se na tebe",
+      "ringAdmireBody": "Krok 2 ze 2: stiskni {charKey} a otevři panel postavy. Ta obrazovka ukazuje vše, co máš na sobě, a statistiky, které ti to dává, a prsten teď nosíš na ruce. Podívej se na ni pokaždé, když sebereš novou výbavu.",
+      "ringAdmireBodyTouch": "Krok 2 ze 2: otevři panel postavy z menu. Ta obrazovka ukazuje vše, co máš na sobě, a statistiky, které ti to dává, a prsten teď nosíš na ruce. Podívej se na ni pokaždé, když sebereš novou výbavu.",
+      "ringAdmireBodyPad": "Krok 2 ze 2: otevři panel postavy z menu. Ta obrazovka ukazuje vše, co máš na sobě, a statistiky, které ti to dává, a prsten teď nosíš na ruce. Podívej se na ni pokaždé, když sebereš novou výbavu.",
+      "keycapThen": "poté",
+      "voiceArrival": "Klidně na břeh, příteli. Vidíš tu zlatou stezku pod nohama? Zná cestu líp než já. Sleduj ji.",
+      "voiceFirstFlag": "To je jedna vlajka za tebou. Ať se ty nohy hýbou dál, zbývají jen dvě.",
+      "voiceRunDone": "To byl čistý běh. Dozorce Pell drží tvou odměnu, jdi si pro ni.",
+      "voiceStationDoneA": "Pěkná práce. Dál k dalšímu, cesta je pro tebe už rozsvícená.",
+      "voiceStationDoneB": "Začínáš to chápat, o tom žádná.",
+      "voiceVeerOff": "Počkej, příteli, to je špatný směr. Zlatá stezka je za tebou.",
+      "voiceGraduate": "Zvon pro tebe zazněl. Eastbrook čeká za vodou, a ty jsi na něj připraven(a).",
+      "bellTitle": "Rozezni zvon",
+      "bellBody": "Svůj přechod sis vysloužil(a). Dojdi k přívoznímu zvonu u mola a stiskni {interactKey}, nebo na něj klikni, a vypluj do Eastbrooku.",
+      "bellBodyTouch": "Svůj přechod sis vysloužil(a). Dojdi k přívoznímu zvonu u mola a klepnutím na něj vypluj do Eastbrooku.",
+      "bellBodyPad": "Svůj přechod sis vysloužil(a). Dojdi k přívoznímu zvonu u mola a stiskni na něm své tlačítko interakce, ať vypluješ do Eastbrooku."
     },
     "widgets": {
       "clockTitle": "Místní čas - kliknutím přepneš 12/24 h",
@@ -1066,6 +1187,31 @@ export const cs_CZ: EnTranslations = {
       "devTierCol": "Odznak",
       "mergedPrs": "Sloučené PR",
       "devEmpty": "Zatím žádní hodnocení přispěvatelé."
+    },
+    "pledge": {
+      "open": "Přijímá přihlášky",
+      "closed": "Nepřijímá přihlášky",
+      "minLevel": "Úroveň {level}+",
+      "action": "Přihlásit se",
+      "actionTitle": "Přihlásit se do cechu {guild}",
+      "pledged": "Přihlášeno",
+      "yourGuild": "Tvůj cech",
+      "tab": "Přihlášky",
+      "tabWithCount": "Přihlášky ({count})",
+      "empty": "Do tvého cechu se zatím nikdo nepřihlásil.",
+      "accept": "Přijmout",
+      "acceptTitle": "Přijmout přihlášku hráče {name}",
+      "reject": "Odmítnout",
+      "rejectTitle": "Odmítnout přihlášku hráče {name}",
+      "settings": "Nábor",
+      "acceptingLabel": "Přijímat přihlášky",
+      "minLevelLabel": "Minimální úroveň",
+      "noteLabel": "Poznámka na nástěnce",
+      "notePlaceholder": "Napiš budoucím členům, koho tvůj cech hledá",
+      "save": "Uložit",
+      "yourPledge": "Tvoje přihláška: {guild}",
+      "since": "Přihlášeno {date}",
+      "withdraw": "Zrušit přihlášku"
     },
     "raidLockout": {
       "title": "Raidové zámky",
@@ -1158,7 +1304,6 @@ export const cs_CZ: EnTranslations = {
       "targetFriendlyNext": "Procházet spojenecké cíle",
       "targetPrev": "Přepínat cíl zpět",
       "discord": "Discord",
-      "valecup": "Pohár údolí",
       "bgFlag": "Akce s vlajkou na bojišti",
       "sheathe": "Zasunout/Vytasit zbraň",
       "dive": "Potopit se",
@@ -1315,6 +1460,7 @@ export const cs_CZ: EnTranslations = {
       "endedForfeitLog": "Zápas byl vzdán.",
       "firstWinBonusLine": "První výhra dne: +{honor} cti",
       "firstWinBonusLog": "První výhra dne: získáváš bonus {honor} cti.",
+      "doubleHonorLine": "Dvojnásobná čest o víkendu: Thornhollowská pole dnes vyplácejí čest {mult}x a dohraná prohra platí jako výhra",
       "timeWarningMinutes": "Zbývá {minutes} min",
       "timeWarningOneMinute": "Zbývá poslední minuta",
       "timeWarningMinutesLog": "V bitvě zbývá {minutes} min.",
@@ -1324,146 +1470,6 @@ export const cs_CZ: EnTranslations = {
         "azureKeep": "Blankytná tvrz",
         "ruinCourtyard": "Zpustlé nádvoří",
         "graveyard": "Hřbitov"
-      }
-    },
-    "vcup": {
-      "title": "Pohár údolí",
-      "shootPower": "SÍLA",
-      "close": "Zavřít okno Poháru údolí",
-      "offlineNote": "Kniha zápasů je zavřená. Pohár údolí teď není dostupný.",
-      "recordLine": "Tvá bilance: {wins} výher, {losses} proher, {draws} remíz.",
-      "bracketsAria": "Kategorie zápasu",
-      "bracketLabel": "{n} na {n}",
-      "waitingCount": "{count} čeká",
-      "nationsHeading": "Národní zástava",
-      "nation": {
-        "vale": "Eastbrookské údolí",
-        "mirefen": "Mirefen",
-        "thornpeak": "Thornpeak",
-        "coliseum": "Popelavé koloseum",
-        "choir": "Bledý chór",
-        "ogre": "Zlobří klany",
-        "moon": "Bledý měsíc",
-        "copperdig": "Měděný důl"
-      },
-      "awayNote": "Pokud obě strany hrají pod stejnou zástavou, hostující strana nastoupí v obrácených barvách.",
-      "rolesHeading": "Sportovní role",
-      "rolesSmallBracketNote": "V kategoriích 1 na 1 a 2 na 2 hraje každý bojovník s výbavou Univerzála. Skutky, které vyžadují kategorii 3 na 3 nebo větší, tu získat nelze.",
-      "role": {
-        "allrounder": {
-          "name": "Univerzál",
-          "desc": "Od všeho trochu: kop, odkop a férové rameno."
-        },
-        "striker": {
-          "name": "Útočník",
-          "desc": "Žije pro dlouhý odkop a rychlou kličku."
-        },
-        "sweeper": {
-          "name": "Zadák",
-          "desc": "Odstrkuje běžce od míče a odkopává ho do bezpečí."
-        },
-        "keeper": {
-          "name": "Brankář",
-          "desc": "Střeží brankoviště chytáním, rybičkou a výkopem."
-        }
-      },
-      "queue": "Vstoupit do fronty",
-      "leaveQueue": "Opustit frontu",
-      "queueNote": "Do fronty se zapiš odkudkoli; píšťalka tě zavolá na Prasečí pole.",
-      "queuedStatus": "Ve frontě na {bracket}: pozice {position} z {count}.",
-      "blockNation": "Nejdřív si vyber národní zástavu.",
-      "blockPartySize": "Tato kategorie vyžaduje menší skupinu.",
-      "blockNotLeader": "Tým může do fronty zapsat jen vůdce skupiny.",
-      "inMatchNote": "Tvůj tým je na hřišti. Hraje se dál!",
-      "deserterNote": "Správce hřiště si to pamatuje. Do fronty se můžeš znovu zapsat za {seconds} s.",
-      "liveHeading": "Právě na Prasečím poli",
-      "liveAria": "Pohár údolí: {nationA} {scoreA}, {nationB} {scoreB}",
-      "walkUp": "Přijď k Prasečímu poli a sleduj zápas z tribun.",
-      "noLive": "Hřiště je tiché. Žádný zápas se nehraje.",
-      "boardHeading": "Tabule vítězů",
-      "boardEmpty": "Zatím nejsou zaznamenáni žádní vítězové. Měděný kbelík čeká.",
-      "boardWins": "{count} výher",
-      "enterAsGuild": "Nastoupit pod zástavou cechu {guild}",
-      "guildRecordLine": "Bilance tvého cechu: {wins} výher, {losses} proher.",
-      "guildBoardHeading": "Cechovní zástavy",
-      "guildBoardEmpty": "Žádný cech zatím nenastoupil na hřiště. Vyvěs svou zástavu!",
-      "guildBoardWl": "{wins} V, {losses} P",
-      "practice": "Trénink proti botům",
-      "practiceNote": "Okamžitě spustí soukromý zápas s boty na tvém vlastním tréninkovém hřišti.",
-      "practiceUnratedNote": "Tréninkové zápasy jsou nehodnocené: tabulka ani postup v Knize skutků se nepočítají.",
-      "practicingNow": "Právě trénují ({count}):",
-      "clock": "{minutes}:{seconds}",
-      "indicatorQueued": "Fronta Poháru údolí: {bracket}, pozice {position} z {count}",
-      "indicatorLive": "Pohár údolí",
-      "indicatorOpen": "Otevřít okno Poháru údolí",
-      "phaseCountdown": "Výkop za {seconds}",
-      "phaseGoal": "GÓL!",
-      "phaseGolden": "ZLATÝ GÓL",
-      "phaseOver": "KONEC ZÁPASU",
-      "bannerFound": "Pohár údolí volá: {nationA} proti {nationB}!",
-      "bannerCountdown": "Výkop za {seconds}...",
-      "bannerKickoff": "VÝKOP!",
-      "bannerGoal": "GÓL! {nation} skóruje!",
-      "bannerSave": "{name} CHYTÁ!",
-      "bannerGolden": "ZLATÝ GÓL: další branka vítězí!",
-      "bannerEnd": "Konec zápasu: {nationA} {scoreA}, {nationB} {scoreB}",
-      "bannerWin": "Vítězství na Prasečím poli!",
-      "bannerDraw": "Remíza na Prasečím poli.",
-      "bannerLoss": "Porážka na Prasečím poli.",
-      "logQueued": "Zapisuješ se do fronty Poháru údolí na {bracket} (pozice {position}).",
-      "logUnqueued": "Opouštíš frontu Poháru údolí.",
-      "logFound": "Tvůj zápas Poháru údolí je připraven: {nationA} proti {nationB}.",
-      "logRoster": "Tvá strana: {allies}. Jejich strana: {enemies}.",
-      "logGoal": "{name} skóruje za {nation}! {nationA} {scoreA}, {nationB} {scoreB}.",
-      "logSave": "{name} předvádí zákrok!",
-      "logWin": "Vyhráváš zápas na Prasečím poli.",
-      "logDraw": "Zápas na Prasečím poli končí remízou.",
-      "logLoss": "Prohráváš zápas na Prasečím poli.",
-      "gossipOpen": "Kniha zápasů",
-      "gossipOpenAria": "Otevřít okno Poháru údolí",
-      "mobileLabel": "Pohár",
-      "briefing": {
-        "subtitle": "Předzápasová porada",
-        "vs": "proti",
-        "rulesHeading": "Jak hrát",
-        "rule1": "Skóruj kopnutím nebo přihrávkou míče do soupeřovy branky.",
-        "rule2": "Vyhrává, kdo první dá 5 gólů, nebo kdo jich má víc, když zazní konec.",
-        "rule3": "Nerozhodný stav na konci jde do zlatého gólu: další branka vítězí.",
-        "rule4": "Skluzy tě jen povalí. Pod žňovým příměřím se nikomu nic nestane.",
-        "rule5": "Kdokoli může přijít a fandit ti z tribun.",
-        "kitHeading": "Tvá výbava",
-        "kitNote": "Tyto dovednosti po dobu zápasu nahrazují tvé třídní schopnosti.",
-        "unratedNote": "Na hřišti jsou boti, takže je tento zápas nehodnocený: tabulkou to nepohne a skutky za góly, zákroky a čistá konta se nepočítají.",
-        "practiceUnratedNote": "Tohle je tréninkový zápas, takže je nehodnocený: tabulkou to nepohne a postup v Knize skutků se nepočítá.",
-        "rosterHeading": "Soupiska",
-        "you": "Ty",
-        "bot": "Bot",
-        "ready": "Jsem připraven(a)",
-        "readyDone": "Připraven(a)",
-        "readyAria": "Připravit se na výkop",
-        "waiting": "Čeká se, až se připraví druhá strana...",
-        "whistle": "Píšťalka zazní za {seconds} s.",
-        "readyCount": "{ready} z {total} připraveno"
-      },
-      "bet": {
-        "title": "Sázky na zápas",
-        "aria": "Sázky na zápas Poháru údolí",
-        "closesIn": "Sázky se uzavírají za {seconds} s",
-        "closed": "Sázky uzavřeny",
-        "prize": "Bank {amount}",
-        "splitAria": "Rozdělení sázkového banku mezi jednotlivé týmy",
-        "expand": "Zobrazit sázky a vsadit",
-        "collapse": "Skrýt sázky",
-        "oddsLabel": "Vyplácí",
-        "back": "Vsadit na {team}",
-        "form": "{wins}V-{losses}P",
-        "mine": "Tvá sázka: {amount} na {team}",
-        "none": "Na tento zápas zatím nemáš žádnou sázku.",
-        "record": "Sázkařská bilance: {wins}V-{losses}P, {sign}{net}",
-        "wonBanner": "Tvá sázka vyhrála!",
-        "wonLog": "Tvá sázka na Pohár údolí vyhrála: vráceno {amount}.",
-        "lostLog": "Tvá sázka na Pohár údolí prohrála: {amount}.",
-        "refundLog": "Sázky zrušeny, tvůj vklad {amount} byl vrácen."
       }
     },
     "options": {
@@ -1549,8 +1555,8 @@ export const cs_CZ: EnTranslations = {
       "showDailyRewardsChest": "Zobrazit truhlu denních odměn",
       "mobileCameraJoystick": "Joystick kamery",
       "mobileLeftHanded": "Rozvržení pro leváky",
-      "touchTapMenus": "Tap menus",
-      "touchTapMenusNote": "Open the action, consumable and menu controls with a tap instead of a swipe. Tap an item to use it, tap the control again for its usual action, or tap outside to close."
+      "touchTapMenus": "Menu klepnutím",
+      "touchTapMenusNote": "Otevírej ovladače akcí, spotřebních předmětů a menu klepnutím místo přejetím. Klepni na položku, ať ji použiješ, klepni na ovladač znovu pro jeho obvyklou akci, nebo klepni mimo něj, ať ho zavřeš."
     },
     "talentRows": {
       "tab": "Volby",
@@ -1575,6 +1581,11 @@ export const cs_CZ: EnTranslations = {
     },
     "controller": {
       "title": "Ovladač",
+      "glyphStyle": "Popisky tlačítek",
+      "glyphStyleAuto": "Automaticky",
+      "glyphStyleXbox": "Xbox",
+      "glyphStylePlayStation": "PlayStation",
+      "glyphStyleNintendo": "Nintendo",
       "enable": "Zapnout ovladač",
       "invertY": "Invertovat kameru (Y)",
       "deadzone": "Mrtvá zóna páčky",
@@ -2066,16 +2077,16 @@ export const cs_CZ: EnTranslations = {
         "other": "jste {rank}, {count} členů"
       },
       "wocMarketSellChoose": {
-        "one": "Choose from {count} item",
-        "few": "Choose from {count} items",
-        "many": "Choose from {count} items",
-        "other": "Choose from {count} items"
+        "one": "Vyber z {count} předmětu",
+        "few": "Vyber z {count} předmětů",
+        "many": "Vyber z {count} předmětu",
+        "other": "Vyber z {count} předmětů"
       },
       "wocTradeIneligible": {
-        "one": "{count} staged item cannot be sold for $WOC.",
-        "few": "{count} staged items cannot be sold for $WOC.",
-        "many": "{count} staged items cannot be sold for $WOC.",
-        "other": "{count} staged items cannot be sold for $WOC."
+        "one": "{count} vystavený předmět nelze prodat za $WOC.",
+        "few": "{count} vystavené předměty nelze prodat za $WOC.",
+        "many": "{count} vystaveného předmětu nelze prodat za $WOC.",
+        "other": "{count} vystavených předmětů nelze prodat za $WOC."
       },
       "finderPartySize": {
         "one": "{count} hráč",
@@ -2657,13 +2668,14 @@ export const cs_CZ: EnTranslations = {
     "spellbook": {
       "addToBarAria": "Přidat {name} na akční lištu",
       "removeFromBarAria": "Odebrat {name} z akční lišty",
-      "assignAria": "Choose a slot for {name}"
+      "assignAria": "Zvol slot pro {name}"
     },
     "nameplate": {
       "mobLevel": "{level}",
       "mobEliteLevel": "{level}+",
       "afkTag": "PRYČ",
-      "cheaterTag": "< Podvodník >"
+      "cheaterTag": "< Podvodník >",
+      "pledgeTag": "Přísaha cechu {guild}"
     },
     "mobTooltip": {
       "levelFamily": "Úroveň {level} {family}",
@@ -2990,7 +3002,12 @@ export const cs_CZ: EnTranslations = {
       "tip": "U Obchodníka na tebe čekají výnosy z prodeje nebo vrácené předměty."
     },
     "noticeboard": {
-      "empty": "Zdá se, že tu nic nevisí."
+      "empty": "Zdá se, že tu nic nevisí.",
+      "subtitle": "Cechy říše",
+      "rosterTitle": "Zobrazit seznam členů cechu {guild}",
+      "back": "Zpět",
+      "popupTitle": "Cechovní vývěska",
+      "close": "Zavřít"
     },
     "bank": {
       "title": "Banka",
@@ -3122,6 +3139,10 @@ export const cs_CZ: EnTranslations = {
         "arenaClash": {
           "title": "Střet v aréně",
           "note": "Duelisté míří do Popelavého kolosea. Zařaď se do fronty a stoupej v žebříčku."
+        },
+        "doubleHonor": {
+          "title": "Víkend dvojnásobné cti",
+          "note": "Válečné tábory troubí k nástupu: celý víkend Thornhollowská pole vyplácejí dvojnásobnou čest a dohraná prohra platí jako výhra."
         },
         "fishingDerby": {
           "title": "Rybářské derby",
@@ -3539,7 +3560,7 @@ export const cs_CZ: EnTranslations = {
       "reagentsNeeded": "Vyžaduje:",
       "reagentLine": "{name} x{have}/{required}",
       "reagentFineSub": "(spotřebuje {count} jemné jakosti)",
-      "craftFeeLine": "Craft fee: {fee} each",
+      "craftFeeLine": "Poplatek za výrobu: {fee} za kus",
       "empty": "Zatím nejsou známy žádné recepty.",
       "resultAria": "Vyrobit {name}",
       "craftedToast": "Vyrobeno: {name}",
@@ -4105,7 +4126,7 @@ export const cs_CZ: EnTranslations = {
       "unlockedBorderHint": "Získán nový rámeček: {name}. Nasadíš si jej v Knize skutků.",
       "broadcastLine": "{name} završuje skutek: {deed}",
       "rarityLine": "Vykonalo jej {percent} dobrodruhů",
-      "stillToVisit": "Still to visit: {places}",
+      "stillToVisit": "Zbývá navštívit: {places}",
       "trackerLabel": "Skutky",
       "collapseHint": "Sbalit panel skutků",
       "expandHint": "Rozbalit panel skutků",
@@ -4135,218 +4156,218 @@ export const cs_CZ: EnTranslations = {
       "minLevelNote": "Vyžaduje úroveň {level}"
     },
     "walletBridge": {
-      "cancelled": "The wallet request was cancelled. Nothing was sent.",
-      "timeout": "Your wallet did not respond in time. Open the wallet and try again.",
-      "notConnected": "Connect and verify a wallet, then try again.",
-      "unsupported": "This wallet cannot complete that action. Connect a different wallet.",
-      "unavailable": "No wallet connection is available here. Reconnect your wallet and try again.",
-      "badResponse": "Your wallet returned an unusable answer. Try again."
+      "cancelled": "Požadavek na peněženku byl zrušen. Nic nebylo odesláno.",
+      "timeout": "Tvoje peněženka včas neodpověděla. Otevři peněženku a zkus to znovu.",
+      "notConnected": "Připoj a ověř peněženku, pak to zkus znovu.",
+      "unsupported": "Tato peněženka nedokáže tuto akci dokončit. Připoj jinou peněženku.",
+      "unavailable": "Tady není k dispozici žádné připojení peněženky. Znovu připoj peněženku a zkus to znovu.",
+      "badResponse": "Tvoje peněženka vrátila nepoužitelnou odpověď. Zkus to znovu."
     },
     "wocMarket": {
-      "title": "$WOC Exchange",
-      "close": "Close the Exchange",
-      "launcherLabel": "$WOC Exchange",
-      "tabBrowse": "Browse",
-      "tabSell": "Sell",
-      "tabActivity": "My Activities",
-      "tabsLabel": "$WOC Exchange sections",
-      "loading": "Loading the Exchange...",
-      "loadFailed": "The Exchange could not be reached. Try again shortly.",
-      "disabledRealm": "The $WOC Exchange is not available on this realm.",
-      "pausedBanner": "Trading is paused. Auctions keep counting down; new listings, bids, offers, and payments wait until trading resumes, and a payment already sent still settles.",
-      "walletBanner": "Link and verify a wallet to bid, buy, or sell on the Exchange.",
-      "walletBannerCta": "Connect wallet",
-      "rateNote": "Rate: about {tokens} $WOC per $1.00 USD as of {time}.",
-      "rateNotePaused": "Last known rate: about {tokens} $WOC per $1.00 USD as of {time}.",
-      "estimateNote": "About {tokens} $WOC for {usd} at the current rate.",
-      "browseEmpty": "No listings right now. Check back soon.",
-      "browseError": "Listings could not be loaded.",
-      "colItem": "Item",
-      "colSeller": "Seller",
-      "colCurrentBid": "Current bid",
-      "colBuyNow": "Buy now",
-      "colTimeLeft": "Time left",
-      "reserveMet": "Reserve met",
-      "reserveNotMet": "Reserve not met",
-      "yourListing": "Your listing",
-      "buyNowLockedBadge": "Purchase in progress",
-      "reserveMetTip": "The seller set a hidden minimum price, and the current bid meets it.",
-      "reserveNotMetTip": "The seller set a hidden minimum price. If the highest bid at close is below it, the item is not sold and every bond is returned.",
-      "yourListingTip": "You listed this item. You cannot bid on your own listing; while it has no bids you can cancel it here or from Activity.",
-      "buyNowLockedTip": "Another buyer holds this listing while they pay. If they do not pay in time, it reopens.",
-      "pagePrev": "Previous page",
-      "pageNext": "Next page",
-      "pageNumber": "Page {current}",
-      "sortLabel": "Sort",
-      "sortEnding": "Ending soonest",
-      "sortNewest": "Newest",
-      "sortPriceAsc": "Price: low to high",
-      "sortPriceDesc": "Price: high to low",
-      "filterQuality": "Quality",
-      "filterFormat": "Format",
-      "filterAny": "Any",
-      "filterFormatAuction": "Auction",
-      "filterFormatBuyNow": "Buy now",
-      "filterItemLabel": "Item",
-      "filterItemPlaceholder": "Search by item name",
-      "filterCategory": "Category",
-      "filterCategoryWeapon": "Weapons",
-      "filterCategoryArmor": "Armor",
-      "filterCategoryMount": "Mounts",
-      "filterSubcategory": "Type",
-      "sellerLinkAria": "View recent trades by {name}",
-      "sellerTitle": "Recent trades by {name}",
-      "sellerBack": "Back to Browse",
-      "sellerEmpty": "No completed trades yet.",
-      "sellerError": "Recent trades could not be loaded.",
-      "sellerSaleRow": "{time}: {item} to {buyer} for {usd}",
-      "detailTitle": "Listing",
-      "detailSeller": "Sold by {name}",
-      "detailEndsAt": "Ends {utc} UTC ({local} local)",
-      "detailStartingBid": "Starting bid: {usd}",
-      "detailCurrentBid": "Current bid: {usd}",
-      "detailNoBids": "No bids yet",
-      "detailMinNext": "Minimum next bid: {usd}",
-      "detailBuyNow": "Buy now: {usd}",
-      "detailSales": "Recent sales",
-      "detailSaleRow": "{time}: {seller} sold to {buyer} for {usd}",
-      "detailNoSales": "No recorded sales for this item yet.",
-      "detailSalesLoading": "Loading recent sales...",
-      "bidLabel": "Your bid (USD)",
-      "bidPlaceholder": "Enter a USD amount",
-      "bidButton": "Place bid",
-      "bidAria": "Place a bid on {item}",
-      "bidTermsToggle": "Bid terms",
-      "rowOpenAria": "View the listing for {item}",
-      "buyNowButton": "Buy now for {usd}",
-      "buyNowAria": "Buy {item} now for {usd}",
-      "cancelButton": "Cancel listing",
-      "cancelAria": "Cancel your listing of {item}",
-      "bidBondNote": "Placing a bid holds a refundable bond in $WOC on top of the bid: {bond} for a bid of {bid}, more for a higher bid. It is returned when you are outbid or lose, or after you pay if you win; a second-chance offer holds it again.",
-      "bidBondSchedule": "The bond is {rate} percent of your bid, at least {min} and at most {max}.",
-      "bidBondPayWindow": "Pay the bond within {duration} of placing your bid, or the bid lapses.",
-      "bidBindingNote": "A bid is binding once you sign its bond transaction: it cannot be withdrawn, and if you win and do not pay, the bond is forfeited and your account earns a Marketplace strike.",
-      "bidCloseNote": "A bid whose bond confirms in the last 2 minutes extends the auction to 2 minutes after that bid, up to 30 minutes past the listed end. A bond that confirms after the auction closes does not count and is refunded.",
-      "offerNextNote": "If the winner does not pay, you may become the buyer at your own bid: your bond is held again (or asked for again if it was already returned) and payment is due within {duration}.",
-      "buyNowNote": "Buy now holds this listing for you for about four and a half minutes while you pay. If you do not pay in time, you cannot try this listing again for 30 minutes, and three unpaid Buy Nows within an hour pause Buy Now for you until the oldest is an hour old.",
-      "variableTokenWarning": "You are committing to pay a USD value in $WOC. The exact token amount is set by a fresh quote when payment is requested and may differ from the estimate.",
-      "quoteFixedNote": "This quote fixes the $WOC amount until it expires. A new quote may differ.",
-      "settlementDeadlineNote": "If you win, payment is due within {duration} of the auction closing.",
-      "claimCooldownRetry": "You recently walked away from a Buy Now. Try again in {duration}.",
-      "termsLabel": "I accept the Marketplace terms.",
-      "termsLink": "View the Marketplace terms (opens in a new tab)",
-      "quoteTitle": "Confirm payment",
-      "quoteTotal": "Total: {tokens} $WOC",
-      "quoteSeller": "Seller receives: {tokens} $WOC",
-      "quoteBurn": "Burned (removed from supply): {tokens} $WOC",
-      "quoteTreasury": "To the game treasury: {tokens} $WOC",
-      "quoteExpires": "Quote expires in {duration}",
-      "quoteExpiresAt": "Quote expires at {time}.",
-      "quoteExpired": "The quote expired. Request a fresh one.",
-      "quoteSign": "Sign and pay",
-      "quoteRefresh": "New quote",
-      "quoteCancel": "Not now",
-      "quoteBondFor": "Refundable bid bond: {usd}",
-      "quoteBondForItem": "Refundable bid bond for {item}: {usd}",
-      "quoteSettlementFor": "Settlement for {item}: {usd}",
-      "paymentDueAt": "Payment is due by {time}.",
-      "signing": "Waiting for your wallet...",
-      "signFailed": "Your wallet did not complete the payment. Check the wallet and try again.",
-      "signFailedConfirm": "Your wallet did not sign the confirmation. Check the wallet and try again.",
-      "confirming": "Confirming on chain...",
-      "listing": "Listing your item...",
-      "activityCancelPending": "Cancel pending",
-      "activityDirected": "Directed sale",
-      "bidPlacedStanding": "Your bid stands. You are the high bidder.",
-      "bidPlacedOutbid": "Your bond confirmed, but a higher bid landed first.",
-      "purchaseComplete": "Purchase complete. Your item arrives by Ravenpost mail.",
-      "paymentConfirmedDelivering": "Payment confirmed. Your item arrives by Ravenpost mail once delivery completes.",
-      "listingCreated": "Your listing is live.",
-      "listingCancelled": "Listing cancelled. Your item returns by Ravenpost mail.",
-      "listingCancelPending": "Cancel pending: a buyer holds the purchase window. Unless they pay, the listing closes and your item returns by Ravenpost mail.",
-      "sellTitle": "Create a listing",
-      "sellEmptyFloor": "No eligible items in your bags. This realm takes unbound equipment of {floor} quality or better.",
-      "sellCollectiblesBoth": "Mounts and mech chroma plates can also be listed.",
-      "sellCollectiblesMounts": "Mounts can also be listed.",
-      "sellCollectiblesChromas": "Mech chroma plates can also be listed.",
-      "sellLockedHidden": "Locked items are not listed here. Unlock them in your bags to sell them.",
-      "sellSearchPlaceholder": "Type to filter your bags",
-      "sellClear": "Clear {item} and choose another",
-      "sellChoose": "Item to list",
-      "sellNoMatches": "No items match that search",
-      "sellBuyNowAboveStart": "The buy-now price must be higher than the starting bid.",
-      "sellFormat": "Format",
-      "sellFormatAuction": "Auction",
-      "sellFormatBuyNow": "Buy now only",
-      "sellFormatAuctionBuyNow": "Auction with buy now",
-      "sellStart": "Starting bid (USD)",
-      "sellReserve": "Reserve (USD, optional)",
-      "sellReserveNote": "Optional, at least the starting bid. Bidders see only whether it is met; if the highest bid at close is below it, the item comes back to you unsold and every bond is returned.",
-      "sellBuyNowNote": "Required. A buy-now listing sells at this price with no bidding.",
-      "sellBuyNowAuctionNote": "Optional. Set a price a buyer can pay to end the auction early; it must be above the starting bid and the reserve.",
-      "sellBuyNowPrice": "Buy-now price (USD)",
-      "sellDuration": "Duration",
-      "sellOfferNext": "If the winner does not pay, sell to the next-highest bidder whose bid meets the reserve, at their bid, instead of ending unsold.",
-      "sellSubmit": "List item",
-      "sellSubmitAria": "List {item} on the Exchange",
-      "sellFeeNote": "A completed sale pays an Exchange fee out of the price: part is burned and part goes to the treasury, and you receive the remainder at your linked wallet in the settlement transaction. The fee for the price you enter is shown here; on an auction it follows the final price.",
-      "activityListings": "My listings",
-      "activityBids": "My bids",
-      "activitySettlements": "My settlements",
-      "activityEmpty": "You have no bids, listings, or settlements yet. Your Exchange activity appears here.",
-      "activityNoListings": "You have no listings.",
-      "activityNoBids": "You have no bids.",
-      "activityNoSettlements": "You have no settlements.",
-      "activityPayNow": "Pay now",
-      "activityPayNowAria": "Pay for settlement {id} now",
-      "activityPayNowItemAria": "Pay {usd} for {item} now",
-      "activityDeadline": "Payment due in {duration}",
-      "dueAt": "Due {utc} UTC ({local} local)",
-      "activityStrikes": "Marketplace strikes: {count}",
-      "activitySuspended": "Exchange suspended for {duration} after unpaid deals: no bids, purchases, listings, or $WOC trades until then.",
-      "strikesTip": "A strike is earned each time you do not pay for a deal you committed to. After the first, each strike suspends you from the Exchange for longer: 3 days, then 14, then 90, then a year.",
-      "bidStatusPending": "Awaiting bond",
-      "bidStatusActive": "High bidder",
-      "bidStatusOutbid": "Outbid",
-      "bidStatusLapsed": "Lapsed",
-      "bidStatusWon": "Won",
-      "bidStatusDefaulted": "Defaulted",
-      "bidStatusCancelled": "Cancelled",
-      "bidBondPay": "Pay bond",
-      "bidBondPayAria": "Pay the bond for your bid on listing {id}",
-      "bidBondPayItemAria": "Pay the {bond} bond for your bid on {item}",
-      "settlementOffered": "Payment due",
-      "settlementConfirming": "Confirming",
-      "settlementConfirmedDelivering": "Payment confirmed, delivering",
-      "settlementReview": "Payment under review",
-      "settlementDelivered": "Delivered",
-      "settlementExpired": "Expired unpaid",
-      "settlementFailed": "Payment failed",
-      "settlementFailBurnMissing": "The payment did not include the required token burn.",
-      "settlementFailBurnMismatch": "The payment burned the wrong token amount.",
-      "settlementFailBurnAuthority": "The token burn came from a wallet this purchase did not name.",
-      "settlementFailUnexpectedCredit": "The transaction paid a wallet outside this purchase.",
-      "settlementFailQuoteExpired": "The payment quote expired before it was used. Request a fresh one and pay again.",
-      "settlementFailTransaction": "The payment transaction failed on the network. Request a fresh quote and try again.",
-      "settlementFailRefunded": "This payment was returned to your wallet.",
-      "settlementFailSuperseded": "This payment attempt was replaced by a newer one.",
-      "settlementFailConfirmingOverdue": "This payment took too long to confirm and could not be verified.",
-      "settlementFailGeneric": "This payment could not be completed.",
-      "paymentSeenAwaitingFinality": "Payment seen on the ledger. Waiting for final confirmation.",
-      "paymentNotYetVisible": "No payment is visible on the ledger yet. It can take a moment to appear.",
-      "paymentServiceUnreachable": "The payment service is unreachable. Your payment stays recorded and will be re-checked.",
-      "paymentPendingGeneric": "Your payment is submitted and awaiting confirmation.",
-      "bondSeenAwaitingFinality": "Bond payment seen on the ledger. Waiting for final confirmation.",
-      "bondNotYetVisible": "No bond payment is visible on the ledger yet. It can take a moment to appear.",
-      "bondServiceUnreachable": "The payment service is unreachable. Your bond payment stays recorded and will be re-checked.",
-      "bondPendingGeneric": "Your bond payment is submitted and awaiting confirmation.",
-      "listingStatusActive": "Active",
-      "listingStatusSettling": "Awaiting payment",
-      "listingStatusSold": "Sold",
-      "listingStatusReturned": "Returned",
-      "listingStatusCancelled": "Cancelled",
-      "listingStatusSuspended": "Suspended",
-      "listingStatusUnsold": "Unsold"
+      "title": "Burza $WOC",
+      "close": "Zavřít Burzu",
+      "launcherLabel": "Burza $WOC",
+      "tabBrowse": "Procházet",
+      "tabSell": "Prodat",
+      "tabActivity": "Moje aktivity",
+      "tabsLabel": "Sekce Burzy $WOC",
+      "loading": "Načítání Burzy…",
+      "loadFailed": "Burzu se nepodařilo spojit. Zkus to znovu za chvíli.",
+      "disabledRealm": "Burza $WOC není na tomto realmu dostupná.",
+      "pausedBanner": "Obchodování je pozastaveno. Aukce dál odpočítávají čas; nové nabídky, příhozy, protinabídky a platby počkají, dokud se obchodování neobnoví, a už odeslaná platba se přesto vyrovná.",
+      "walletBanner": "Propoj a ověř peněženku, abys mohl(a) na Burze přihazovat, kupovat nebo prodávat.",
+      "walletBannerCta": "Připojit peněženku",
+      "rateNote": "Kurz: přibližně {tokens} $WOC za 1,00 USD k {time}.",
+      "rateNotePaused": "Poslední známý kurz: přibližně {tokens} $WOC za 1,00 USD k {time}.",
+      "estimateNote": "Přibližně {tokens} $WOC za {usd} při aktuálním kurzu.",
+      "browseEmpty": "Momentálně žádné inzeráty. Zkus to brzy znovu.",
+      "browseError": "Inzeráty se nepodařilo načíst.",
+      "colItem": "Předmět",
+      "colSeller": "Prodávající",
+      "colCurrentBid": "Aktuální příhoz",
+      "colBuyNow": "Koupit ihned",
+      "colTimeLeft": "Zbývající čas",
+      "reserveMet": "Rezerva splněna",
+      "reserveNotMet": "Rezerva nesplněna",
+      "yourListing": "Tvá nabídka",
+      "buyNowLockedBadge": "Nákup probíhá",
+      "reserveMetTip": "Prodávající nastavil(a) skrytou minimální cenu a aktuální příhoz ji splňuje.",
+      "reserveNotMetTip": "Prodávající nastavil(a) skrytou minimální cenu. Pokud je nejvyšší příhoz při uzavření nižší, předmět se neprodá a všechny kauce se vrátí.",
+      "yourListingTip": "Tento předmět jsi vystavil(a) ty. Na vlastní nabídku nemůžeš přihazovat; dokud nemá žádné příhozy, můžeš ji zrušit zde nebo v Aktivitě.",
+      "buyNowLockedTip": "Tuto nabídku právě drží jiný kupující, dokud neplatí. Pokud nezaplatí včas, nabídka se znovu otevře.",
+      "pagePrev": "Předchozí strana",
+      "pageNext": "Další strana",
+      "pageNumber": "Strana {current}",
+      "sortLabel": "Řadit",
+      "sortEnding": "Nejdříve končící",
+      "sortNewest": "Nejnovější",
+      "sortPriceAsc": "Cena: od nejnižší",
+      "sortPriceDesc": "Cena: od nejvyšší",
+      "filterQuality": "Kvalita",
+      "filterFormat": "Formát",
+      "filterAny": "Libovolné",
+      "filterFormatAuction": "Aukce",
+      "filterFormatBuyNow": "Koupit ihned",
+      "filterItemLabel": "Předmět",
+      "filterItemPlaceholder": "Hledat podle názvu předmětu",
+      "filterCategory": "Kategorie",
+      "filterCategoryWeapon": "Zbraně",
+      "filterCategoryArmor": "Brnění",
+      "filterCategoryMount": "Jízdní zvířata",
+      "filterSubcategory": "Typ",
+      "sellerLinkAria": "Zobrazit nedávné obchody hráče {name}",
+      "sellerTitle": "Nedávné obchody hráče {name}",
+      "sellerBack": "Zpět na Procházet",
+      "sellerEmpty": "Zatím žádné dokončené obchody.",
+      "sellerError": "Nedávné obchody se nepodařilo načíst.",
+      "sellerSaleRow": "{time}: {item} kupujícímu {buyer} za {usd}",
+      "detailTitle": "Nabídka",
+      "detailSeller": "Prodávající: {name}",
+      "detailEndsAt": "Končí {utc} UTC ({local} místního času)",
+      "detailStartingBid": "Vyvolávací cena: {usd}",
+      "detailCurrentBid": "Aktuální příhoz: {usd}",
+      "detailNoBids": "Zatím žádné příhozy",
+      "detailMinNext": "Minimální další příhoz: {usd}",
+      "detailBuyNow": "Koupit ihned: {usd}",
+      "detailSales": "Nedávné prodeje",
+      "detailSaleRow": "{time}: {seller} prodal(a) kupujícímu {buyer} za {usd}",
+      "detailNoSales": "K tomuto předmětu zatím nejsou zaznamenané žádné prodeje.",
+      "detailSalesLoading": "Načítání nedávných prodejů…",
+      "bidLabel": "Tvoje nabídka (USD)",
+      "bidPlaceholder": "Zadej částku v USD",
+      "bidButton": "Podat nabídku",
+      "bidAria": "Podat nabídku na {item}",
+      "bidTermsToggle": "Podmínky nabídky",
+      "rowOpenAria": "Zobrazit nabídku {item}",
+      "buyNowButton": "Koupit hned za {usd}",
+      "buyNowAria": "Koupit {item} hned za {usd}",
+      "cancelButton": "Zrušit nabídku",
+      "cancelAria": "Zrušit tvou nabídku {item}",
+      "bidBondNote": "Podání nabídky navíc zablokuje vratnou kauci v $WOC: {bond} za nabídku {bid}, u vyšší nabídky víc. Vrátí se, když tě někdo přehodí nebo prohraješ, nebo po zaplacení, pokud vyhraješ; nabídka druhé šance ji zablokuje znovu.",
+      "bidBondSchedule": "Kauce činí {rate} procent tvojí nabídky, nejméně však {min} a nejvýše {max}.",
+      "bidBondPayWindow": "Kauci zaplať do {duration} od podání nabídky, jinak nabídka propadne.",
+      "bidBindingNote": "Nabídka je závazná, jakmile podepíšeš transakci její kauce: nelze ji stáhnout, a pokud vyhraješ a nezaplatíš, kauce propadne a tvůj účet dostane trestný bod na burze.",
+      "bidCloseNote": "Nabídka, jejíž kauce se potvrdí v posledních 2 minutách, prodlouží aukci o 2 minuty od této nabídky, nejvýše však o 30 minut za plánovaný konec. Kauce potvrzená až po skončení aukce se nezapočítá a bude vrácena.",
+      "offerNextNote": "Pokud vítěz nezaplatí, můžeš se stát kupujícím za svůj vlastní příhoz: tvá kauce se znovu podrží (nebo se o ni znovu požádá, pokud už byla vrácena) a platba je splatná do {duration}.",
+      "buyNowNote": "Koupit ihned ti tuto nabídku podrží asi na čtyři a půl minuty, než zaplatíš. Pokud nezaplatíš včas, tuto nabídku nemůžeš zkusit znovu 30 minut, a tři nezaplacené nákupy Koupit ihned během hodiny ti tuto funkci pozastaví, dokud nejstaršímu z nich nebude hodina.",
+      "variableTokenWarning": "Zavazuješ se zaplatit hodnotu v USD prostřednictvím $WOC. Přesné množství tokenů určí nová cenová nabídka v okamžiku vyžádání platby a může se lišit od odhadu.",
+      "quoteFixedNote": "Tato cenová nabídka pevně stanovuje množství $WOC až do svého vypršení. Nová cenová nabídka se může lišit.",
+      "settlementDeadlineNote": "Pokud vyhraješ, platba je splatná do {duration} od uzavření aukce.",
+      "claimCooldownRetry": "Nedávno jsi odstoupil(a) od nákupu Koupit ihned. Zkus to znovu za {duration}.",
+      "termsLabel": "Souhlasím s podmínkami tržiště.",
+      "termsLink": "Zobrazit podmínky tržiště (otevře se na nové kartě)",
+      "quoteTitle": "Potvrdit platbu",
+      "quoteTotal": "Celkem: {tokens} $WOC",
+      "quoteSeller": "Prodávající obdrží: {tokens} $WOC",
+      "quoteBurn": "Spáleno (odebráno z oběhu): {tokens} $WOC",
+      "quoteTreasury": "Do pokladny hry: {tokens} $WOC",
+      "quoteExpires": "Cenová nabídka vyprší za {duration}",
+      "quoteExpiresAt": "Cenová nabídka vyprší v {time}.",
+      "quoteExpired": "Cenová nabídka vypršela. Vyžádej si novou.",
+      "quoteSign": "Podepsat a zaplatit",
+      "quoteRefresh": "Nová cenová nabídka",
+      "quoteCancel": "Teď ne",
+      "quoteBondFor": "Vratná kauce za příhoz: {usd}",
+      "quoteBondForItem": "Vratná kauce za příhoz na {item}: {usd}",
+      "quoteSettlementFor": "Vyrovnání za {item}: {usd}",
+      "paymentDueAt": "Platba je splatná do {time}.",
+      "signing": "Čeká se na tvou peněženku…",
+      "signFailed": "Tvá peněženka platbu nedokončila. Zkontroluj peněženku a zkus to znovu.",
+      "signFailedConfirm": "Tvá peněženka nepodepsala potvrzení. Zkontroluj peněženku a zkus to znovu.",
+      "confirming": "Potvrzuje se na blockchainu…",
+      "listing": "Vystavuje se tvůj předmět…",
+      "activityCancelPending": "Zrušit čekající",
+      "activityDirected": "Přímý prodej",
+      "bidPlacedStanding": "Tvoje nabídka platí. Vedeš v nabídkách.",
+      "bidPlacedOutbid": "Tvoje kauce byla potvrzena, ale vyšší nabídka přišla dřív.",
+      "purchaseComplete": "Nákup dokončen. Tvůj předmět dorazí Havraní poštou.",
+      "paymentConfirmedDelivering": "Platba potvrzena. Tvůj předmět dorazí Havraní poštou, jakmile se doručení dokončí.",
+      "listingCreated": "Tvá nabídka je zveřejněná.",
+      "listingCancelled": "Nabídka zrušena. Tvůj předmět se ti vrátí Havraní poštou.",
+      "listingCancelPending": "Zrušení čeká na vyřízení: kupující má otevřené okno k nákupu. Pokud nezaplatí, nabídka se uzavře a tvůj předmět se ti vrátí Havraní poštou.",
+      "sellTitle": "Vytvořit nabídku",
+      "sellEmptyFloor": "V tvých taškách nejsou žádné způsobilé předměty. Tento realm přijímá nevázané vybavení kvality {floor} nebo lepší.",
+      "sellCollectiblesBoth": "Vystavit lze i jízdní zvířata a mech chroma pláty.",
+      "sellCollectiblesMounts": "Vystavit lze i jízdní zvířata.",
+      "sellCollectiblesChromas": "Vystavit lze i mech chroma pláty.",
+      "sellLockedHidden": "Uzamčené předměty se zde nezobrazují. Odemkni je ve svých taškách, abys je mohl(a) prodat.",
+      "sellSearchPlaceholder": "Piš pro filtrování svých tašek",
+      "sellClear": "Zrušit výběr {item} a vybrat jiný",
+      "sellChoose": "Předmět k vystavení",
+      "sellNoMatches": "Žádné předměty neodpovídají tomuto hledání",
+      "sellBuyNowAboveStart": "Cena za okamžitý nákup musí být vyšší než vyvolávací cena.",
+      "sellFormat": "Formát",
+      "sellFormatAuction": "Aukce",
+      "sellFormatBuyNow": "Pouze okamžitý nákup",
+      "sellFormatAuctionBuyNow": "Aukce s okamžitým nákupem",
+      "sellStart": "Vyvolávací cena (USD)",
+      "sellReserve": "Rezerva (USD, volitelné)",
+      "sellReserveNote": "Volitelné, alespoň ve výši vyvolávací ceny. Přihazující vidí jen to, zda je splněna; pokud je nejvyšší příhoz při uzavření nižší, předmět se ti vrátí neprodaný a všechny kauce se vrátí.",
+      "sellBuyNowNote": "Povinné. Nabídka s okamžitým nákupem se prodá za tuto cenu bez přihazování.",
+      "sellBuyNowAuctionNote": "Volitelné. Nastav cenu, za kterou kupující může aukci předčasně ukončit; musí být vyšší než vyvolávací cena i rezerva.",
+      "sellBuyNowPrice": "Cena za okamžitý nákup (USD)",
+      "sellDuration": "Doba trvání",
+      "sellOfferNext": "Pokud vítěz nezaplatí, prodá se dalšímu nejvýše přihazujícímu, jehož příhoz splní rezervu, za jeho příhoz, místo aby nabídka skončila neprodaná.",
+      "sellSubmit": "Vystavit předmět",
+      "sellSubmitAria": "Vystavit {item} na Burze",
+      "sellFeeNote": "Dokončený prodej platí poplatek Burzy z ceny: část se spálí a část jde do pokladny, zbytek obdržíš na svou propojenou peněženku ve vyrovnávací transakci. Poplatek pro cenu, kterou zadáš, je zobrazen zde; u aukce se řídí konečnou cenou.",
+      "activityListings": "Moje inzeráty",
+      "activityBids": "Moje nabídky",
+      "activitySettlements": "Moje vyrovnání",
+      "activityEmpty": "Zatím nemáš žádné nabídky, inzeráty ani vyrovnání. Tvoje aktivita na burze se zobrazí tady.",
+      "activityNoListings": "Nemáš žádné inzeráty.",
+      "activityNoBids": "Nemáš žádné nabídky.",
+      "activityNoSettlements": "Nemáš žádná vyrovnání.",
+      "activityPayNow": "Zaplatit hned",
+      "activityPayNowAria": "Zaplatit vyrovnání {id} hned",
+      "activityPayNowItemAria": "Zaplatit {usd} za {item} hned",
+      "activityDeadline": "Platba splatná za {duration}",
+      "dueAt": "Splatné {utc} UTC ({local} místního času)",
+      "activityStrikes": "Trestné body na burze: {count}",
+      "activitySuspended": "Burza pozastavena na {duration} kvůli nezaplaceným obchodům: do té doby nelze podávat nabídky, nakupovat, inzerovat ani obchodovat v $WOC.",
+      "strikesTip": "Prohřešek získáš pokaždé, když nezaplatíš za obchod, ke kterému ses zavázal(a). Od prvního tě každý další prohřešek vyloučí z Burzy na delší dobu: na 3 dny, pak na 14, pak na 90, pak na rok.",
+      "bidStatusPending": "Čeká na kauci",
+      "bidStatusActive": "Nejvyšší nabídka",
+      "bidStatusOutbid": "Přehozeno",
+      "bidStatusLapsed": "Propadlo",
+      "bidStatusWon": "Vyhráno",
+      "bidStatusDefaulted": "Nesplněno",
+      "bidStatusCancelled": "Zrušeno",
+      "bidBondPay": "Zaplatit kauci",
+      "bidBondPayAria": "Zaplatit kauci za nabídku na inzerát {id}",
+      "bidBondPayItemAria": "Zaplatit kauci {bond} za nabídku na {item}",
+      "settlementOffered": "Platba splatná",
+      "settlementConfirming": "Potvrzuje se",
+      "settlementConfirmedDelivering": "Platba potvrzena, doručuje se",
+      "settlementReview": "Platba se kontroluje",
+      "settlementDelivered": "Doručeno",
+      "settlementExpired": "Vypršelo bez platby",
+      "settlementFailed": "Platba selhala",
+      "settlementFailBurnMissing": "Platba neobsahovala požadované spálení tokenů.",
+      "settlementFailBurnMismatch": "Platba spálila nesprávné množství tokenů.",
+      "settlementFailBurnAuthority": "Spálení tokenů proběhlo z peněženky, kterou tento nákup neuvádí.",
+      "settlementFailUnexpectedCredit": "Transakce zaplatila peněženku, která s tímto nákupem nesouvisí.",
+      "settlementFailQuoteExpired": "Cenová nabídka platby vypršela dřív, než byla použita. Vyžádej si novou a zaplať znovu.",
+      "settlementFailTransaction": "Platební transakce v síti selhala. Vyžádej si novou cenovou nabídku a zkus to znovu.",
+      "settlementFailRefunded": "Tato platba byla vrácena do tvé peněženky.",
+      "settlementFailSuperseded": "Tento pokus o platbu nahradil novější pokus.",
+      "settlementFailConfirmingOverdue": "Potvrzení této platby trvalo příliš dlouho a nepodařilo se ji ověřit.",
+      "settlementFailGeneric": "Tuto platbu se nepodařilo dokončit.",
+      "paymentSeenAwaitingFinality": "Platba byla zaznamenána na blockchainu. Čeká se na konečné potvrzení.",
+      "paymentNotYetVisible": "Na blockchainu zatím není vidět žádná platba. Může chvíli trvat, než se objeví.",
+      "paymentServiceUnreachable": "Platební služba je nedostupná. Tvá platba zůstává zaznamenaná a bude znovu zkontrolována.",
+      "paymentPendingGeneric": "Tvá platba byla odeslána a čeká na potvrzení.",
+      "bondSeenAwaitingFinality": "Platba kauce je vidět v účetní knize. Čeká se na konečné potvrzení.",
+      "bondNotYetVisible": "V účetní knize zatím není vidět žádná platba kauce. Chvíli trvá, než se objeví.",
+      "bondServiceUnreachable": "Platební služba není dostupná. Tvoje platba kauce zůstává zaznamenaná a bude znovu zkontrolována.",
+      "bondPendingGeneric": "Tvoje platba kauce byla odeslána a čeká na potvrzení.",
+      "listingStatusActive": "Aktivní",
+      "listingStatusSettling": "Čeká na platbu",
+      "listingStatusSold": "Prodáno",
+      "listingStatusReturned": "Vráceno",
+      "listingStatusCancelled": "Zrušeno",
+      "listingStatusSuspended": "Pozastaveno",
+      "listingStatusUnsold": "Neprodáno"
     }
   },
   "gatherEvent": {
@@ -4449,6 +4470,10 @@ export const cs_CZ: EnTranslations = {
     "deeds": {
       "invalid_input": "Neplatný vstup."
     },
+    "guilds": {
+      "invalid_roster_name": "Neplatný název cechu.",
+      "unknown": "Cech s tímto názvem neexistuje."
+    },
     "steam": {
       "disabled": "Propojení účtu Steam není momentálně k dispozici.",
       "invalid_ticket": "Steam nedokázal tuto žádost o propojení ověřit. Zkus to znovu z desktopové aplikace.",
@@ -4488,53 +4513,53 @@ export const cs_CZ: EnTranslations = {
       "not_marked": "Tento účet není označen."
     },
     "woc_market": {
-      "invalid_input": "Invalid input.",
-      "disabled": "The $WOC Exchange is not available on this realm.",
-      "paused": "Exchange trading is paused. Auctions keep counting down.",
-      "wallet_required": "Link and verify a wallet before trading on the Exchange.",
-      "recipient_wallet_required": "That player must connect a wallet before they can accept $WOC payments.",
-      "self_offer": "You cannot send a $WOC offer to yourself.",
-      "offer_expired": "That $WOC offer expired. Ask for a new one.",
-      "terms_required": "Accept the Marketplace terms to continue.",
-      "totp_required": "This amount requires two-factor authentication. Enable it in account settings, then enter your code.",
-      "totp_invalid": "That two-factor code did not verify. Try again.",
-      "suspended": "Your Exchange access is suspended after unpaid deals: no bids, purchases, listings, or $WOC trades.",
-      "character_invalid": "Play the character you are listing from, and try again.",
-      "not_found": "That Exchange entry no longer exists.",
-      "not_yours": "That Exchange entry no longer exists.",
-      "not_active": "That listing is no longer open for this action.",
-      "own_listing": "You cannot bid on or buy your own listing.",
-      "has_bids": "A listing with bids cannot be withdrawn. Contact support if you must cancel.",
-      "bid_too_low": "Your bid does not clear the current bid plus its increment.",
-      "already_pending": "Confirm or abandon your pending bid on this listing first.",
-      "insufficient_balance": "Your wallet does not hold enough $WOC for this bid and its bond.",
-      "quote_unavailable": "A price quote could not be issued right now. Try again shortly.",
-      "quote_expired": "That quote expired. Request a fresh one; if none is offered, that window has closed.",
-      "not_pending": "That bid is no longer awaiting its bond.",
-      "confirm_failed": "The transaction could not be confirmed. Request a fresh quote and try again.",
-      "confirm_in_flight": "Your payment is still confirming. Try again once it resolves.",
-      "buy_now_locked": "Another buyer is completing this purchase. Try again in a moment.",
-      "cancel_pending": "The seller is cancelling this listing.",
-      "claim_cooldown": "You recently walked away from a Buy Now. Try again later.",
-      "bond_window_closed": "This bid can no longer be paid: its payment window has closed. Bid again for a fresh one.",
-      "settlement_in_flight": "A buyer is paying for this listing. Try again once the payment settles.",
-      "contended": "The Exchange is busy with this listing. Try again in a moment.",
-      "sale_conflict": "Another live sale record stands for this listing. Exclude it first.",
-      "no_buy_now": "This listing has no buy-now price.",
-      "cap_reached": "You have reached your Exchange listing limit.",
-      "stale_item": "That item changed or moved. Re-select it and try again.",
-      "item_mismatch": "That is not the exact copy the buyer agreed to, or its state changed (a lock counts). Start a fresh deal for it.",
-      "offer_pending": "You already have a deal standing with this player. Resolve it first.",
-      "not_eligible": "That item cannot be listed on the $WOC Exchange.",
-      "invalid_params": "Check the starting bid, reserve, buy-now price, and duration.",
-      "signature_reused": "That transaction was already submitted.",
-      "item_locked": "That item is locked. Unlock it in your bags before selling it.",
-      "stepup_required": "Selling on the Exchange needs a signature from your linked wallet.",
-      "stepup_challenge_invalid": "That wallet confirmation is no longer valid. Start the sale again.",
-      "stepup_challenge_expired": "The wallet confirmation expired. Start the sale again.",
-      "stepup_wallet_mismatch": "Your linked wallet changed since this confirmation was issued. Start the sale again.",
-      "stepup_binding_mismatch": "That wallet confirmation does not match this sale. Start the sale again.",
-      "stepup_signature_invalid": "The wallet signature did not verify. Start the sale again."
+      "invalid_input": "Neplatný vstup.",
+      "disabled": "Burza $WOC není na tomto světě dostupná.",
+      "paused": "Obchodování na Burze je pozastaveno. Dražby dál odpočítávají čas.",
+      "wallet_required": "Než začneš obchodovat na Burze, propoj a ověř peněženku.",
+      "recipient_wallet_required": "Tento hráč musí nejprve připojit peněženku, než může přijímat platby v $WOC.",
+      "self_offer": "Nabídku $WOC nemůžeš poslat sám sobě.",
+      "offer_expired": "Platnost té nabídky $WOC vypršela. Vyžádej si novou.",
+      "terms_required": "Pro pokračování přijmi podmínky Burzy.",
+      "totp_required": "Tato částka vyžaduje dvoufaktorové ověření. Zapni ho v nastavení účtu a pak zadej svůj kód.",
+      "totp_invalid": "Tento dvoufaktorový kód se nepodařilo ověřit. Zkus to znovu.",
+      "suspended": "Tvůj přístup na Burzu je po nezaplacených obchodech pozastaven: žádné příhozy, nákupy, nabídky ani obchody v $WOC.",
+      "character_invalid": "Přepni se na postavu, ze které vystavuješ, a zkus to znovu.",
+      "not_found": "Tento záznam Burzy už neexistuje.",
+      "not_yours": "Tento záznam Burzy už neexistuje.",
+      "not_active": "Tato nabídka už pro tuto akci není otevřená.",
+      "own_listing": "Na vlastní nabídku nemůžeš přihazovat ani ji koupit.",
+      "has_bids": "Nabídku, na kterou už padly příhozy, nelze stáhnout. Pokud ji musíš zrušit, obrať se na podporu.",
+      "bid_too_low": "Tvůj příhoz nepřekonal aktuální příhoz navýšený o jeho krok.",
+      "already_pending": "Nejprve potvrď nebo zruš svůj nevyřízený příhoz na tuto nabídku.",
+      "insufficient_balance": "Tvoje peněženka nemá dost $WOC na tento příhoz a jeho kauci.",
+      "quote_unavailable": "Cenovou nabídku teď nelze vystavit. Zkus to za chvíli znovu.",
+      "quote_expired": "Platnost té cenové nabídky vypršela. Vyžádej si novou; pokud žádná nabídnuta není, toto okno se uzavřelo.",
+      "not_pending": "Tento příhoz už nečeká na svou kauci.",
+      "confirm_failed": "Transakci se nepodařilo potvrdit. Vyžádej si novou cenovou nabídku a zkus to znovu.",
+      "confirm_in_flight": "Tvoje platba se stále potvrzuje. Zkus to znovu, až se vyřídí.",
+      "buy_now_locked": "Tento nákup právě dokončuje jiný kupující. Zkus to za chvíli znovu.",
+      "cancel_pending": "Prodávající tuto nabídku ruší.",
+      "claim_cooldown": "Nedávno jsi odstoupil(a) od nákupu Koupit ihned. Zkus to znovu později.",
+      "bond_window_closed": "Tento příhoz už nelze zaplatit: jeho platební okno se uzavřelo. Přihoď znovu pro nové okno.",
+      "settlement_in_flight": "Kupující právě platí za tuto nabídku. Zkus to znovu, až se platba vypořádá.",
+      "contended": "Burza je s touto nabídkou právě zaneprázdněná. Zkus to za chvíli znovu.",
+      "sale_conflict": "Pro tuto nabídku už existuje jiný aktivní záznam o prodeji. Nejdřív ho vylouč.",
+      "no_buy_now": "Tato nabídka nemá cenu okamžitého nákupu.",
+      "cap_reached": "Dosáhl(a) jsi svého limitu nabídek na Burze.",
+      "stale_item": "Tento předmět se změnil nebo přesunul. Vyber ho znovu a zkus to znovu.",
+      "item_mismatch": "Toto není přesně ta kopie, na které se kupující dohodl, nebo se její stav změnil (počítá se i zamčení). Zahaj pro ni nový obchod.",
+      "offer_pending": "S tímto hráčem už máš rozjednaný obchod. Nejdřív ho dořeš.",
+      "not_eligible": "Tento předmět nelze vystavit na Burze $WOC.",
+      "invalid_params": "Zkontroluj vyvolávací cenu, rezervní cenu, cenu okamžitého nákupu a dobu trvání.",
+      "signature_reused": "Tato transakce už byla odeslána.",
+      "item_locked": "Tento předmět je zamčený. Než ho prodáš, odemkni ho v brašnách.",
+      "stepup_required": "Prodej na Burze vyžaduje podpis z tvé propojené peněženky.",
+      "stepup_challenge_invalid": "Toto potvrzení peněženky už není platné. Začni prodej znovu.",
+      "stepup_challenge_expired": "Platnost potvrzení peněženky vypršela. Začni prodej znovu.",
+      "stepup_wallet_mismatch": "Tvá propojená peněženka se od vydání tohoto potvrzení změnila. Začni prodej znovu.",
+      "stepup_binding_mismatch": "Toto potvrzení peněženky neodpovídá tomuto prodeji. Začni prodej znovu.",
+      "stepup_signature_invalid": "Podpis peněženky se nepodařilo ověřit. Začni prodej znovu."
     }
   },
   "guide": {
@@ -4572,7 +4597,6 @@ export const cs_CZ: EnTranslations = {
       "combat": "Boj",
       "talents": "Talenty",
       "arena": "Aréna a PvP",
-      "valeCup": "Pohár údolí",
       "thornhollow": "Thornhollowská pole",
       "deeds": "Kniha skutků",
       "reliquary": "Relikviář",
@@ -4682,6 +4706,8 @@ export const cs_CZ: EnTranslations = {
         "fenBlurb": "Za podzimní korunou jasná bažina vrb a klidné vody, a město za vodním příkopem.",
         "farshoreName": "Vzdálené pobřeží",
         "farshoreBlurb": "Ostrov za pískovou kosou, kde se nebe trhá nad Trhlinovými poli a Gullhaven zvoní na zvon při každém průlomu.",
+        "provingName": "Zkušební pobřeží",
+        "provingBlurb": "Tichý cvičný ostrov za úžinou, kde noví dobrodruzi najdou pevnou půdu pod nohama, než po nich údolí začne něco chtít.",
         "nightName": "Noční květ",
         "nightBlurb": "Kraj hvězdné půlnoci, kde cesty osvětlují květiny a Moonrest drží svou hlídku.",
         "hauntName": "Přízračný les",
@@ -4783,7 +4809,6 @@ export const cs_CZ: EnTranslations = {
       "reliquary": "Relikviář",
       "sheathe": "Zasunout/Vytasit zbraň",
       "crafting": "Výroba",
-      "valeCup": "Pohár údolí",
       "mount": "Nasednout / Sesednout",
       "calendar": "Kalendář událostí",
       "dungeonFinder": "Hledač dungeonů",
@@ -5645,6 +5670,10 @@ export const cs_CZ: EnTranslations = {
       "farshoreGreeting": "Přišel jsi přes Přívozní stezku? Pak jsi první za týden, a Strážce si tě bude chtít prohlédnout.",
       "farshoreGreeter": "Strážce zvonu Tam, Přístaviště",
       "farshorePlaceNotes": "Racčí přístav je jediné město ostrova a jeho pevnůstka. Přístaviště je místo, kde se Přívozní stezka dotýká břehu, se strážním zvonem nad výběžkem; Hlídková louka drží vysočinu jihovýchodně od města, kde trhlinohlídač naslouchá dalšímu průlomu; Rozeklané útesy se otevírají na jižním konci ostrova; a Trhlinová pole jsou zpustošené řady obilí východně od Racčího přístavu, stále se hemžící tím, co sem tím průlomem prošlo.",
+      "provingBlurb": "Tichý ostrov za úžinou naproti údolí, udržovaný jako cvičná půda: tábor, cvičiště, vraky posetá pláž a přívoz, který jezdí oběma směry.",
+      "provingGreeting": "Každý hrdina, kterému kdy údolí poděkovalo, stál tam, kde stojíš teď ty, a ani jeden z nich nevěděl, za který konec meče se chytit.",
+      "provingGreeter": "Instruktorka Maren, Tábor Svítání",
+      "provingPlaceNotes": "Tábor Svítání je celá osada ostrova: pár stanů, stánek a shromažďovací oheň. Staré molo hledí směrem k údolí, kde přívozní kruh přenáší absolventy přes úžinu; Cvičiště jižně od tábora drží své slaměné podobizny vztyčené pro kohokoli, kdo je potřebuje; a Řada vraků je troskami posetá pláž, kde příliv platí ostrovu vyplavenými bednami.",
       "travelTitle": "Cestování",
       "travelBody": "Každou cestou v říši se buď jde pěšky, nebo jede na koni. Nejsou tu žádné letecké trasy, žádná taxi a žádná teleportační síť: mapa je jedna souvislá pevnina a každé spojení je něco, na čem můžeš stát. Hřebeny oddělují jednu říši od druhé, a tam, kde si dvě říše dělí hřeben, stoupá cesta průsmykem. Ne každá hranice ale funguje takhle. Na severu vede dlouhá hráz cestu přes vodu ze Zahalené kotliny do zasněžené krajiny za ní, a zpátky na jihu vede tenká přírodní písečná kosa zvaná Přívozní stezka na východ od pobřeží Údolí k Přístavišti na ostrově Vzdáleného pobřeží, který nemá žádnou pozemní hranici vůbec. A v celém nadzemním světě existují přesně jedny opravdové dveře: závoj soumraku vysoko na Thornpeaku, který se otevírá do Zahalené kotliny. Jižní hřeben Kotliny je zapečetěný bez průsmyku skrz něj, takže tenhle závoj je způsob, jak se tam poprvé dostaneš, a za tebou se zavírá na cestě zpátky.\n\nAť padneš kdekoli, cesta zpátky je krátká. Každá zóna má aspoň jeden hřbitov, nad jehož náhrobky se vznáší Bledý strážce, a propuštěný duch povstane u toho nejbližšího z nich.\n\nMapa nekončí neviditelnou zdí. Země přechází v pláže a mysy, a pak v otevřenou vodu. Přechody, které svět zamýšlí, abys přeplaval, úžiny a jezera mezi jednou říší a druhou, jsou klidné a bezpečné k přeplavání. Vyraz místo toho na otevřené moře a sama vzdálenost tě obrátí zpátky: budeš varován, a pak znovu, a pokud budeš plavat dál, moře tě vyčerpá, dokud tě nezabije. Potápění má svůj vlastní limit, protože ti pod hladinou dojde dech, takže se vynoř na nádech a otoč se zpátky, když ti to voda řekne.",
       "mountsTitle": "Jízdní zvířata",
@@ -5861,36 +5890,6 @@ export const cs_CZ: EnTranslations = {
       "ladderBody": "Každý zápas pohne trvalým hodnocením bojiště vázaným na postavu, ať vyhraješ nebo prohraješ, a tabulka všech dob řadí šampiony říše.",
       "rewardsHeading": "Odměny za zápas",
       "rewardsBody": "Každý dokončený zápas vyplácí čest: víc za výhru, útěchu za prohru nebo remízu, a navíc drobnou částku za každý smrtící úder, který zasadíš, i za každý, na kterém se podílíš, takže boj mimo vlajky se pořád vyplácí. Tvá první výhra dne navíc vyplácí bonus a panel ti ukazuje, dokud na tebe tento bonus ještě čeká. Tento den patří jen cti a přetáčí se podle vlastních hodin, ne podle resetu instancí říše. Opakované střetnutí se stejným týmem vyplácí za samotný zápas méně po tom prvním, rychle se ustálí na dně místo toho, aby se propadlo k nule, a odstoupený zápas nevyplácí nic. Utrať, co si vyděláš, u kteréhokoli intendanta Válečnictví."
-    },
-    "valeCupPage": {
-      "heading": "Pohár údolí",
-      "intro": "Kančbal na Prasečím poli: vyber si zástavu, vyber si roli a dostaň vycpanou kančí kůži za brankáře. Hraje se o Měděný kbelík: žádná krev, žádná kořist, jen řev tribun.",
-      "loreHeading": "Kančbal a žňové příměří",
-      "loreOldSow": "Dávno předtím, než se mrtví probudili, hrávali eastbrookští čeledíni kančbal na strništích po žních: dva houfy, jedna kančí kůže vycpaná slámou a dvě vozové brány dovlečené na oba konce louky. První míč, Stará prasnice, visí pokrytý bronzem nad krbem v hospodě.",
-      "loreTruce": "Když Popelavé koloseum začalo pořádat válečné hry, maršál Redbrook odpověděl něčím laskavějším: stálým žňovým příměřím na staré louce. Z vozových bran se staly branky, louka dostala mantinely, tribuny i jméno, Prasečí pole, a cenou byl vždycky tentýž promáčklý kbelík na mléko, ze kterého vítězové pili: Měděný kbelík.",
-      "howHeading": "Jak hrát",
-      "howQueue": "Do fronty se zapiš odkudkoli přes okno Poháru údolí, nebo si promluv se správcem hřiště Bramem u brány Prasečího pole. Vyber kategorii od jednoho hráče na každé straně až po pět, národní zástavu a sportovní roli; do fronty se postav sám, nebo přiveď svou skupinu.",
-      "howMatch": "Při výkopu se tvá třídní výbava vymění za sportovní a po zápase se přesně obnoví. Kopy míří na zaměřovač na zemi, míč se odráží od mantinelů a driblink je prostě běh s míčem. Dej víc gólů než druhá strana, než zazní konec; remíza jde do zlatého gólu.",
-      "howTruce": "Na Prasečím poli nikdo nekrvácí: skluzy jen povalí, nic nebolí a mazlíčci zápas prosedí venku.",
-      "spectateBody": "Na stadionu se hraje vždy jen jeden zápas a kdokoli může přijít a sledovat ho z tribun.",
-      "bettingHeading": "Sázka u zábradlí",
-      "bettingBody": "Diváci na Prasečím poli mohou vsadit na jednu stranu, dokud se zápas teprve utváří: sázky se slévají dohromady a při závěrečném hvizdu si vítězové rozdělí balík poražených v poměru k tomu, co vsadili. Remíza, nebo překvapení, na které nikdo nevsadil, vrátí každou minci. Hráči nasazení v zápase na něj sázet nemohou a zábradlí uchovává tvou celoživotní bilanci výher, proher a čistého zisku.",
-      "practiceHeading": "Tréninkové zápasy a zahálející hřiště",
-      "practiceBody": "Okno Poháru údolí nabízí i trénink: soukromou kopii hřiště, kde obě strany zaplní boti a nic se nepočítá do tvé bilance. Chybí ti hráč nebo dva na skutečný zápas? Po krátkém čekání týmy doplní boti a jakýkoli zápas s boty na hřišti je přátelák, nikdy hodnocený. A když Prasečí pole zahálí, boti předvedou exhibici, na kterou se můžeš z tribuny dívat, i sázet; v okamžiku, kdy se skuteční hráči připraví, exhibice hřiště uvolní a každá sázka se vrátí.",
-      "nationsHeading": "Osm národních zástav",
-      "nationsBody": "Každý tým hraje pod zástavou. Národ vybírá kapitán, a pokud obě strany hrají pod stejnou, hostující strana nastoupí v obrácených barvách.",
-      "nationVale": "Zelená a zlatá pod snopem pšenice: domácí strana, čeledíni tělem i duší.",
-      "nationMirefen": "Modrozelená a šedá pod volavkou: trpěliví, dlouhonozí, nikdy ve spěchu.",
-      "nationThornpeak": "Ledově modrá a bílá pod horským štítem: jistí v kroku a tvrdohlaví.",
-      "nationColiseum": "Červená a černá se zkříženými meči: hrají, jako by to pořád byla válečná hra.",
-      "nationChoir": "Bledě modrá a stříbrná pod zvonem: strašidelní, přesní a velmi tiší.",
-      "nationOgre": "Oranžová a umbrová za pěstí: napřed ramenem a jsou na to hrdí.",
-      "nationMoon": "Fialová a stříbrná pod srpkem měsíce: noční hráči, lehcí na nohou.",
-      "nationCopperdig": "Měděná a hnědá s krumpáčem: kopáči, kteří nikdy nepřestanou běhat.",
-      "rolesHeading": "Sportovní role",
-      "rolesBody": "Tvá role určuje výbavu, kterou si neseš na hřiště. Kopou všichni; zbytek je povaha. V bracketech jeden na jednoho a dva na dva hrají všichni všestrannou výbavu, takže volba role přijde ke slovu až od tří na tři výš.",
-      "rewardsHeading": "Pravidla příměří",
-      "rewardsBody": "Pravidla příměří znamenají žádné zkušenosti a žádnou kořist: rozhodnutý zápas se počítá do tvé bilance a na tabuli vítězů a výhra se počítá i do denních úkolů o odměny. Dezerce ze zápasu ti zablokuje místo a správce hřiště si to pamatuje."
     },
     "deedsPage": {
       "intro": "Kniha skutků je místo, kde si svět počítá vše, co máš za sebou: od prvních kroků z počátečního údolí až po nejtěžší boje, jaké říše nabízí. Vykonávej skutky při hraní, nos tituly, které ti udělí, a sleduj, jak tvůj věhlas roste.",
@@ -6123,7 +6122,7 @@ export const cs_CZ: EnTranslations = {
       "deedsHeading": "Skutky, které pamatují cestu",
       "deedsBody": "The Book of Deeds walks beside every step of this. Your first attunement earns Craftsworn and your first masterwork earns Masterwright, both wearable as titles. All ten earnable crafts mark a milestone deed at 50 skill and crown their caps with a Grandmaster title, while Fishing gets Old Salt at 100 proficiency and the Master Angler title at 200.\n\nThere are quieter pages too: deeds for your first harvest and first craft, for the rare finds luck turns up in the field, and for taking up salvage. All of it is cosmetic, titles and Renown only. A deed never grants power; it only proves you were there.",
       "startHeading": "Kde začít",
-      "startBody": "Čerstvě z cesty v Eastbrooku? Najdi Předáka Odella a vezmi si Řemeslo pro každou ruku: ukáže ti rudné žíly kolem Měděné štoly jihovýchodně od města a přidá ti první mozoly. Na samotnou štolu si dej pozor: Hlubokamenní kopáči, kteří u ní táboří, stojí pár úrovní nad čerstvým příchozím, takže zpracuj nejdřív okrajové žíly a srdce tábora si nech na dobu, až trochu povyrosteš. Od té chvíle sklízej každou žílu, skupinu stromů a porost bylin, kolem kterých při úkolech projdeš; cestovatelům přichází dovednost přirozeně.\n\nZpátky ve městě zmáčkni T, otevři okno výroby a pracuj na běžných receptech, které zná od začátku každá postava. Zajdi za mistry ke kovárně, kuchyním, tkalcovskému stavu a nástrojárně, podívej se, co učí, a ber jejich pracovní příkazy kvůli stálému přísunu mincí. Než si tě najde dopis od Cechu, budeš už vědět, který pár ti připadá jako domov.",
+      "startBody": "Čerstvě z cesty v Eastbrooku? Najdi Předáka Odella a vezmi si Řemeslo pro každou ruku: ukáže ti rudné žíly kolem Měděné štoly severovýchodně od města a přidá ti první mozoly. Na samotnou štolu si dej pozor: Hlubokamenní kopáči, kteří u ní táboří, stojí pár úrovní nad čerstvým příchozím, takže zpracuj nejdřív okrajové žíly a srdce tábora si nech na dobu, až trochu povyrosteš. Od té chvíle sklízej každou žílu, skupinu stromů a porost bylin, kolem kterých při úkolech projdeš; cestovatelům přichází dovednost přirozeně.\n\nZpátky ve městě zmáčkni T, otevři okno výroby a pracuj na běžných receptech, které zná od začátku každá postava. Zajdi za mistry ke kovárně, kuchyním, tkalcovskému stavu a nástrojárně, podívej se, co učí, a ber jejich pracovní příkazy kvůli stálému přísunu mincí. Než si tě najde dopis od Cechu, budeš už vědět, který pár ti připadá jako domov.",
       "colStation": "Stanice",
       "colHub": "Centrum",
       "colMaster": "Mistr",
@@ -6217,13 +6216,13 @@ export const cs_CZ: EnTranslations = {
         },
         "leatherworking": {
           "identityHeading": "Kůže pro rychlé",
-          "identityBody": "Žebříček stoupá od prostých Fenbridgeských koženných nohavic, bot a pásu přes neobvyklý kabátec, kuklu a náramenníky z bahenního stopaře po vzácnou sadu strážce bažin, nejlepší kůži, jakou řemeslník může zhotovit. Dva kusy pro sesílatele ji zaokrouhlují: Eastbrookské Druidovy kožené nohavice jako základní polní kus a Soumračné koženné obvazy na dovednosti 75.\n\nNa kole sedí mezi Vařením a Krejčovstvím. Jeho živým párem je Krejčovský kožešník, Kožedělnictví a Krejčovství, přísaha složená před Tkadlenou Ottilie v Eastbrooku; pár Lapač s Vařením je pojmenován na kole, ale přísahový úkol ještě nemá.",
+          "identityBody": "Žebříček stoupá od prostých Fenbridgeských koženných nohavic, bot a pásu přes neobvyklý kabátec, kuklu a náramenníky z bahenního stopaře po vzácnou sadu strážce bažin, nejlepší kůži, jakou řemeslník může zhotovit. Dva kusy pro sesílatele ji zaokrouhlují: Eastbrookské Druidovy kožené nohavice jako základní polní kus a Soumračné koženné obvazy na dovednosti 50.\n\nNa kole sedí mezi Vařením a Krejčovstvím. Jeho živým párem je Krejčovský kožešník, Kožedělnictví a Krejčovství, přísaha složená před Tkadlenou Ottilie v Eastbrooku; pár Lapač s Vařením je pojmenován na kole, ale přísahový úkol ještě nemá.",
           "materialsHeading": "Lov je sklizeň",
-          "materialsBody": "Kožedělnictví je řemeslo, kde jsou tvá levelovací trasa a tvá zásobovací linka jedno a totéž: hrubá kůže se sklízí přímo z těl nesoucích kůži, především z vlků a kanců, a každé tělo obslouží jen jednoho sklízejícího, kdo první, ten bere. Hod na vzácnou nebo lepší sklizeň navíc přinese Nepoškozenou kůži, podepsaný exemplář, který si žádá Kazajka strážce močálu, takže si každou nalezenou schovej.\n\nDoprovodné obsazení je malé: pavoučí nohy a hedvábí, domácí tkanina z humanoidů, jediná thoriová ruda v každém vzácném kusu strážce močálu (šest ve vrcholových Omotávkách ze soumračné kůže) a Tříslovina za 16 mědiváků z přepážky koželužny. Samotné thorium se u přepážky nikdy nekupuje: vytěž si ho sám, na Thornpeaku nebo na začátečnických žilách skoro každé mladší zóny (jedině Vzdálené pobřeží kope železo), nebo ho kup od jiného hráče.",
+          "materialsBody": "Kožedělnictví je řemeslo, kde jsou tvá levelovací trasa a tvá zásobovací linka jedno a totéž: hrubá kůže se sklízí přímo z těl nesoucích kůži, především z vlků a kanců, a každé tělo obslouží jen jednoho sklízejícího, kdo první, ten bere. Hod na vzácnou nebo lepší sklizeň navíc přinese Nepoškozenou kůži, podepsaný exemplář, který si žádá Kazajka strážce močálu, takže si každou nalezenou schovej.\n\nDoprovodné obsazení je malé: pavoučí nohy a hedvábí, domácí tkanina z humanoidů, jediná thoriová ruda v každém vzácném kusu strážce močálu (šest v Omotávkách ze soumračné kůže) a Tříslovina za 16 mědiváků z přepážky koželužny. Samotné thorium se u přepážky nikdy nekupuje: vytěž si ho sám, na Thornpeaku nebo na začátečnických žilách skoro každé mladší zóny (jedině Vzdálené pobřeží kope železo), nebo ho kup od jiného hráče.",
           "ladderHeading": "Výuka ve Fenbridge",
-          "ladderBody": "A tady je zádrhel: koželužna stojí ve Fenbridge, na cestě Mirefenským močálem, takže Kožedělnictví je jediné hluboké řemeslo, které se vyučuje venku v močálu. Koželuh Hesk učí žebříček u svých kádí: fenbridgeský kožený stupeň zdarma na dovednosti 0, stupeň bažinného stopaře za 25 stříbrných za recept od dovednosti 25 a stupeň strážce močálu po 1 zlatém od dovednosti 50, přičemž každý stupeň se otevírá, jak ho tvá úroveň dosáhne.\n\nTři recepty trenéra přeskakují: běžné polní kusy (Kazajka z vydělané kůže a Kůže eastbrookského druida) se od začátku vyrábějí kdekoli a Omotávky ze soumračné kůže zná každý, leží však na dovednosti 75 a jsou vázané na koželužnu. Všimni si, že samotná přísaha Krejčovského kožešníka se skládá zpátky v Eastbrooku u Ottilie; v močálu se odehrává jen výuka.",
+          "ladderBody": "A tady je zádrhel: koželužna stojí ve Fenbridge, na cestě Mirefenským močálem, takže Kožedělnictví je jediné hluboké řemeslo, které se vyučuje venku v močálu. Koželuh Hesk učí žebříček u svých kádí: fenbridgeský kožený stupeň zdarma na dovednosti 0, stupeň bažinného stopaře za 25 stříbrných za recept od dovednosti 25 a stupeň strážce močálu po 1 zlatém od dovednosti 50, přičemž každý stupeň se otevírá, jak ho tvá úroveň dosáhne.\n\nTři recepty trenéra přeskakují: běžné polní kusy (Kazajka z vydělané kůže a Kůže eastbrookského druida) se od začátku vyrábějí kdekoli a Omotávky ze soumračné kůže zná každý, leží na dovednosti 50 a jsou vázané na koželužnu. Všimni si, že samotná přísaha Krejčovského kožešníka se skládá zpátky v Eastbrooku u Ottilie; v močálu se odehrává jen výuka.",
           "routeHeading": "Mistrovská díla a pracovní cesta na 125",
-          "routeBody": "Každý kus se skutečnými statistikami hází na šanci mistrovského díla, pokud se jemnější kvalita vejde pod strop tvé úrovně, včetně Kůže eastbrookského druida se statistikami, a podepsaná Nepoškozená kůže v Kazajce strážce močálu poskytne bonus za podepsaný reagent automaticky; thorium se pro proc počítá jako materiál 1. úrovně. Běžné kožené kusy bez statistik prockovat nemohou.\n\nLeveluj ho přirozeně: od první úrovně sklízej každého vlka a kance, kterého zabiješ, nech dva běžné polní kusy, ať tě donesou na 25, ať stojíš kdekoli, a pak natrénuj kožený stupeň u kádí, až tě úkoly stejně zatáhnou do močálu. Bažinný stopař tě donese na 50 a strážce močálu na 75; za tím platí Omotávky ze soumračné kůže, recept 3. úrovně za šest thoriových rud, tři Nepoškozené kůže, dvě hrubé kůže a jednu Tříslovinu, naladěnému Krejčovskému kožešníkovi plný zisk do 99 a poloviční poté, tedy asi 75 výrob na posledních padesát bodů ke stropu 125; pod stropem hlavního oboru recept 3. úrovně neučí nic.\n\nMobilní koželužna znamená pro tohle řemeslo víc než pro kterékoli jiné: specializuj se na 75 a z brašny plné kůží se stane hotová výbava u táboráku místo cesty zpátky do Fenbridge. Heskův koželužnický pracovní příkaz kupuje osm hrubých kůží každých 30 minut, pěkný výnos z kožek, které jsi sbíral tak jako tak, a Kniha skutků označuje Koželuhovo řemeslo na dovednosti 50 a Velmistra Kožedělnictví na stropu."
+          "routeBody": "Každý kus se skutečnými statistikami hází na šanci mistrovského díla, pokud se jemnější kvalita vejde pod strop tvé úrovně, včetně Kůže eastbrookského druida se statistikami, a podepsaná Nepoškozená kůže v Kazajce strážce močálu poskytne bonus za podepsaný reagent automaticky; thorium se pro proc počítá jako materiál 1. úrovně. Běžné kožené kusy bez statistik prockovat nemohou.\n\nLeveluj ho přirozeně: od první úrovně sklízej každého vlka a kance, kterého zabiješ, nech dva běžné polní kusy, ať tě donesou na 25, ať stojíš kdekoli, a pak natrénuj kožený stupeň u kádí, až tě úkoly stejně zatáhnou do močálu. Bažinný stopař tě donese na 50 a kusy strážce močálu spolu s Omotávkami ze soumračné kůže donesou vzácný stupeň z 50 na 75. Za 75 tyto recepty 2. úrovně upadají na poloviční a poté čtvrtinový zisk, tedy asi 150 výrob na posledních padesát bodů ke stropu 125; pod stropem hlavního oboru pořád odpovídají stropu výroby vzácné kvality, místo aby se úplně vynulovaly.\n\nMobilní koželužna znamená pro tohle řemeslo víc než pro kterékoli jiné: specializuj se na 75 a z brašny plné kůží se stane hotová výbava u táboráku místo cesty zpátky do Fenbridge. Heskův koželužnický pracovní příkaz kupuje osm hrubých kůží každých 30 minut, pěkný výnos z kožek, které jsi sbíral tak jako tak, a Kniha skutků označuje Koželuhovo řemeslo na dovednosti 50 a Velmistra Kožedělnictví na stropu."
         },
         "cooking": {
           "identityHeading": "Hrnec, který nakrmí skupinu",
@@ -7723,7 +7722,7 @@ export const cs_CZ: EnTranslations = {
       "portalOpens": "Trhlina stupně {tier} se protrhává v {zone}!",
       "portalSealed": "Trhlina stupně {tier} v {zone} byla zapečetěna.",
       "portalCollapses": "Trhlina stupně {tier} v {zone} se hroutí.",
-      "lootRecoveryNotice": "The rift's entrance will hold a while yet: should your party fall, you may still walk back for what you earned.",
+      "lootRecoveryNotice": "Vchod do trhliny ještě chvíli vydrží: pokud tvá skupina padne, můžeš se pro to, co sis vysloužil(a), i tak vrátit pěšky.",
       "levelGate": "Do této trhliny mohou vstoupit jen dobrodruzi na úrovni {level} nebo vyšší.",
       "deadEntry": "Nemůžeš vstoupit do trhliny, když jsi mrtvý.",
       "deadEntryCombat": "Tvá skupina je stále v boji. Mrtví mohou vstoupit znovu, jakmile boj skončí.",
@@ -10031,7 +10030,7 @@ export const cs_CZ: EnTranslations = {
       },
       "ignition": {
         "name": "Vznícení",
-        "description": "Pasivní: kritické zásahy tvých kouzel spalují cíl za 40 % způsobeného poškození během 6 s a účinek se sčítá. (mistrovství Ohně)"
+        "description": "Pasivní: kritické zásahy tvých kouzel spalují cíl za 30 % způsobeného poškození během 6 s a účinek se sčítá. (mistrovství Ohně)"
       },
       "mass_barrier": {
         "name": "Hromadná bariéra",
@@ -10201,7 +10200,7 @@ export const cs_CZ: EnTranslations = {
       },
       "sap": {
         "name": "Omráčení",
-        "description": "Vyřadí cíl na 8 s. Musíš být v plížení a mimo boj. Jakékoli poškození efekt přeruší."
+        "description": "Vyřadí cíl na 8 s, aniž by to zrušilo Závoj šera nebo zahájilo boj. Musíš být v plížení a mimo boj. Jakékoli poškození efekt přeruší."
       },
       "crippling_poison": {
         "name": "Olověný jed",
@@ -10473,7 +10472,7 @@ export const cs_CZ: EnTranslations = {
       },
       "aspect_of_the_cheetah": {
         "name": "Podoba běžce",
-        "description": "Přijmeš podobu běžce, která zvýší tvou rychlost pohybu o 30 % na 30 min."
+        "description": "Přijmeš podobu běžce, která zvýší tvou rychlost pohybu o 30 % na 30 min. Dokud je aktivní, utrpěné poškození tě omámí a na 4 s ti sníží rychlost pohybu na polovinu (každý zásah tento efekt obnoví)."
       },
       "aimed_shot": {
         "name": "Dlouhý nátah",
@@ -10637,7 +10636,7 @@ export const cs_CZ: EnTranslations = {
       },
       "hex_of_violence": {
         "name": "Hex of Violence",
-        "description": "Uhrane nepřítele na 8 s. Jeho následující 3 poškozující akce každá vygenerují 7 Odsouzení a bičem mu způsobí 16 stínového poškození."
+        "description": "Uhrane nepřítele na 8 s. Jeho následující 3 poškozující akce každá vygenerují 7 Odsouzení a bičem mu způsobí 17 stínového poškození."
       },
       "cruel_pact": {
         "name": "Cruel Pact",
@@ -10843,7 +10842,7 @@ export const cs_CZ: EnTranslations = {
       },
       "warspirit_cadence": {
         "name": "Kadence válečného ducha",
-        "description": "Pasivní: každý 3. úspěšný útok zbraní spustí 2 Ozvěny srdce vichru za 50% Přírodního poškození a udělí Znamení bouře na 12 s. Znamení bouře učiní tvůj další Bleskový šíp, Otřes nebo Léčivé vody okamžitými a sníží jejich náklady na manu o 50%. Úder předků se počítá jako 2 útoky. (Válečný duch)"
+        "description": "Pasivní: útoky při boji se zbraní v obou rukách nemají žádnou dodatečnou šanci na minutí. Každý 3. úspěšný útok zbraní spustí 2 Ozvěny srdce vichru za 25% Přírodního poškození a udělí Znamení bouře na 12 s. Znamení bouře učiní tvůj další Bleskový šíp, Otřes nebo Léčivé vody okamžitými a sníží jejich náklady na manu o 50%. Úder předků se počítá jako 2 útoky. (Válečný duch)"
       },
       "stormsurge": {
         "name": "Bouřná vlna",
@@ -11055,7 +11054,7 @@ export const cs_CZ: EnTranslations = {
       },
       "summon_infernal": {
         "name": "Vyvolat Žárového kolosa",
-        "description": "Přivolá Žárového kolosa do cílové oblasti a při dopadu způsobí 58-72 bodů ohnivého poškození. Bojuje 30 s, aniž by nahradil tvého démona, každé 2 s spaluje okolní nepřátele a každou sekundu vytváří 1 bod Zkázy."
+        "description": "Přivolá Žárového kolosa do cílové oblasti a při dopadu způsobí 64-79 bodů ohnivého poškození. Bojuje 30 s, aniž by nahradil tvého démona, každé 2 s spaluje okolní nepřátele a každou sekundu vytváří 1 bod Zkázy."
       },
       "summon_doomguard": {
         "name": "Vyvolat Zrozence přízraků",
@@ -11403,7 +11402,7 @@ export const cs_CZ: EnTranslations = {
       },
       "shadowstep": {
         "name": "Stínový skluz",
-        "description": "Vykročíte stíny směrem ke svému cíli. (lotrovský talent)"
+        "description": "Vykročíš stíny ke svému cíli, ať už jde o spojence, nebo nepřítele, aniž by to zrušilo Závoj šera. (lotrovský talent)"
       },
       "silence": {
         "name": "Umlčení",
@@ -13059,6 +13058,12 @@ export const cs_CZ: EnTranslations = {
       "pristine_claw": {
         "name": "Nedotčený dráp"
       },
+      "ps_castaway_crate": {
+        "name": "Vyplavená bedna"
+      },
+      "ps_ferry_bell": {
+        "name": "Přívozní zvon"
+      },
       "dawnhold_posy": {
         "name": "Kytička ze zahrady zámku Dawnhold"
       },
@@ -13538,6 +13543,18 @@ export const cs_CZ: EnTranslations = {
       },
       "pattern_sageleaf_feast": {
         "name": "Recipe: Sageleaf Feast"
+      },
+      "ps_briny_lure": {
+        "name": "Slaná návnada"
+      },
+      "ps_lustrous_pearl": {
+        "name": "Lesklá perla"
+      },
+      "mother_of_pearl": {
+        "name": "Perleť"
+      },
+      "ps_passing_stone": {
+        "name": "Kámen přechodu"
       },
       "conjured_water4": {
         "name": "Vyčarovaná pramenitá voda"
@@ -14588,9 +14605,6 @@ export const cs_CZ: EnTranslations = {
       "tolling_bell": {
         "name": "Zvonící zvon"
       },
-      "vale_cup_ball": {
-        "name": "Kančbal"
-      },
       "thunzharr_waking_peak": {
         "name": "Thunzharr, probouzející se štít"
       },
@@ -14888,6 +14902,15 @@ export const cs_CZ: EnTranslations = {
       "fisher_bram": {
         "name": "Rybář Bram"
       },
+      "training_effigy": {
+        "name": "Cvičná podobizna"
+      },
+      "shore_scuttler": {
+        "name": "Pobřežní pobíhal"
+      },
+      "mister_crabs": {
+        "name": "Pan Krab"
+      },
       "rift_hellguard": {
         "name": "Pekelná stráž"
       },
@@ -15046,7 +15069,7 @@ export const cs_CZ: EnTranslations = {
       "apothecary_lin": {
         "name": "Apatykářka Lin",
         "title": "Bylinkářka",
-        "greeting": "Opatrně, kam šlapeš ve východních lesích, příteli."
+        "greeting": "Opatrně, kam šlapeš v severovýchodních lesích, příteli."
       },
       "brother_aldric": {
         "name": "Bratr Aldric",
@@ -15187,11 +15210,6 @@ export const cs_CZ: EnTranslations = {
         "name": "Bledá strážkyně",
         "title": "Strážkyně mrtvých",
         "greeting": "Odpočívej, duchu. Mohu tě vrátit do těla, ale přechod zpět tě oslabí."
-      },
-      "groundskeeper_bram": {
-        "name": "Správce hřiště Bram",
-        "title": "Správce Prasečího pole",
-        "greeting": "Na Prasečím poli platí příměří, {className}: jen kopy a ramena. Chceš si zahrát o Měděný kbelík?"
       },
       "chronicler_saul": {
         "name": "Kronikář Saul",
@@ -15498,6 +15516,51 @@ export const cs_CZ: EnTranslations = {
         "title": "Parterre Gardener",
         "greeting": "Mind the edging, {playerName}, these beds are the pride of the parterre. Seed and compost are what I sell, and I will turn any withered husks you carry into more of it."
       },
+      "wayfarer_bryn": {
+        "name": "Poutnice Bryn",
+        "title": "Přístavní průvodkyně",
+        "greeting": "Eastbrook vítá každého, kdo přijde, příteli. A pro nejisté nohy je tu vždycky Zkušební pobřeží: přívozní zvon u schránky Havraní pošty tě přepraví kterýkoli den v roce a jeho dvojče na ostrově tě přiveze zpátky domů."
+      },
+      "instructor_maren": {
+        "name": "Instruktorka Maren",
+        "title": "Mistryně zkoušky",
+        "greeting": "Každý hrdina, kterému kdy údolí poděkovalo, stál tam, kde stojíš teď ty, {className}, a ani jeden z nich nevěděl, za který konec meče se chytit. Právě na to tohle pobřeží je. Ptej se, cvič a selhávej tam, kde selhání nic nestojí."
+      },
+      "quartermaster_finch": {
+        "name": "Intendantka Finch",
+        "title": "Táborová výstrojnice",
+        "greeting": "Můj pult drží na prodej přesně jednu věc, {playerName}: náhradní váček na to, co po cestě posbíráš, až si to tvá lekce vyžádá. Všechno ostatní tady je odpad určený pro údolí. Mince kupuje váček a práce vydělává minci. To je celé hospodářství, a nikdy nebude složitější. Jen větší."
+      },
+      "ferryman_odo": {
+        "name": "Převozník Odo",
+        "title": "Ochránce přívozu",
+        "greeting": "Čerstvě z přívozu, {playerName}? Strážce Tam má na pobřeží kousek jižně od mého mola Překážkovou dráhu: proběhni nejdřív jeho dráhy a tvoje nohy ti poděkují. Každý strážce na tomhle pobřeží tě předá dalšímu, jakmile je tvá práce hotová, a karta v horní části obrazovky vždy zná cestu. Až tě údolí zavolá zpátky, zazvoň na zvon stojící vedle mého mola a přívoz tě vysadí v eastbrookském městě."
+      },
+      "bursar_wick": {
+        "name": "Pokladník Wick",
+        "title": "Pozlacená truhlice",
+        "greeting": "Pozlacená truhlice má stůl i tady, {playerName}. Cokoli u mě uložíš, čeká ve stejném trezoru za zády každého pokladníka v každém městě, v bezpečí před vlky, vodou i tvým vlastním nerozvážným úsudkem."
+      },
+      "warden_tam": {
+        "name": "Strážce Tam",
+        "title": "Ochránce Překážkové dráhy",
+        "greeting": "Tyhle dráhy jsou Překážková dráha, {playerName}, a proběhl je každý dobrodruh, kterého si údolí váží. Lucernové sloupy hoří celou noc, takže se dráhy nikdy nezavírají."
+      },
+      "overseer_pell": {
+        "name": "Dozorce Pell",
+        "title": "Dozorce Překážkové dráhy",
+        "greeting": "Měřím čas každému běhu, který sjede po těchhle drahách, {playerName}, a viděl jsem už mnohem horší práci nohou. Cesta za mnou stoupá ke cvičišti: tam se z práce nohou stává práce s mečem."
+      },
+      "drillmaster_rook": {
+        "name": "Cvičitel Rook",
+        "title": "Mistr cvičiště",
+        "greeting": "Nejdřív sláma, pak krunýře, {playerName}. Podobizna naučí tvou paži máchnout; pobíhalové dole na pobřeží ji naučí trefit se do něčeho, co si to pamatuje."
+      },
+      "tidewarden_nel": {
+        "name": "Strážkyně přílivu Nel",
+        "title": "Ochránkyně pobřeží",
+        "greeting": "Příliv bere a příliv platí, {playerName}. Vedu si účet obojího: co pobíhalové ukořistí z vraků a co poctivé ruce donesou zpátky nahoru touhle cestou."
+      },
       "tidewatcher_ondrel": {
         "name": "Ondrel Vane",
         "title": "Hlídač přílivu",
@@ -15507,7 +15570,7 @@ export const cs_CZ: EnTranslations = {
     "quests": {
       "q_prof_intro": {
         "title": "Řemeslo pro každou ruku",
-        "text": "Každá duše v Eastbrooku pracuje kromě meče i v nějakém řemesle, {playerName}. V skalách kolem Měděného dolu jihovýchodně od města jsou rudné žíly. Jdi si sám zamasat krumpáčem a vytěž jich 5; věř mi, poznám rozdíl.",
+        "text": "Každá duše v Eastbrooku pracuje kromě meče i v nějakém řemesle, {playerName}. V skalách kolem Měděné štoly severovýchodně od města, za vlčími stezkami, jsou rudné žíly. Jdi si sám zamasat krumpáčem a vytěž jich 5; věř mi, poznám rozdíl.",
         "completion": "Vidíš? Ruda vytěžena a mozoly na rukách. Pokračuj v dolování, těžbě dřeva a sběru bylin cestou po silnicích, a až se vrátíš do města, mrkni na Nástěnku obecního středu u tržiště a na řemeslný stůl poblíž. Je v tom poctivý obchod, pokud ho chceš.",
         "objectives": {
           "0": {
@@ -15550,7 +15613,7 @@ export const cs_CZ: EnTranslations = {
       },
       "q_boars": {
         "title": "Štětinaté kančí kůže",
-        "text": "Z kančí kůže jsou nejlepší cestovní vaky a louky západně od města se těmi zvířaty jen hemží. Přines mi 5 štětinatých kančích kůží a vyplatí se ti to.",
+        "text": "Z kančí kůže jsou nejlepší cestovní vaky a louky severozápadně od města se těmi zvířaty jen hemží. Přines mi 5 štětinatých kančích kůží a vyplatí se ti to.",
         "completion": "Ach, krásné štětinaté kůže! Tyhle vynesou dobrou cenu.",
         "objectives": {
           "0": {
@@ -15560,7 +15623,7 @@ export const cs_CZ: EnTranslations = {
       },
       "q_spiders": {
         "title": "Hrozba Černopavučiny",
-        "text": "Číhači ve východních lesích spřádají hedvábí, které potřebuji na obklady, a navíc se příliš rozmnožili. Vybij 6 černopavučinových číhačů a vyřízni 4 hedvábné žlázy z jejich břich.",
+        "text": "Číhači v severovýchodních lesích spřádají hedvábí, které potřebuji na obklady, a navíc se příliš rozmnožili. Vybij 6 černopavučinových číhačů a vyřízni 4 hedvábné žlázy z jejich břich.",
         "completion": "Fuj, pořád se to hýbe. Dokonalé. Tady, zasloužíš si to.",
         "objectives": {
           "0": {
@@ -15603,7 +15666,7 @@ export const cs_CZ: EnTranslations = {
       },
       "q_supplies": {
         "title": "Ukradené zásoby",
-        "text": "Ti bandité přepadli můj poslední vůz a odnesli čtyři bedny zboží: nástroje, sůl, dobré eastbrookské plátno. Bedny jsou naskládané kolem jejich tábora v jihozápadních kopcích. Ukradneš je pro mě zpátky?",
+        "text": "Ti bandité přepadli můj poslední vůz a odnesli čtyři bedny zboží: nástroje, sůl, dobré eastbrookské plátno. Bedny jsou naskládané kolem jejich tábora v severozápadních kopcích. Ukradneš je pro mě zpátky?",
         "completion": "Moje bedny! Sotva škrábnutí. Jsi zázrak.",
         "objectives": {
           "0": {
@@ -15696,7 +15759,7 @@ export const cs_CZ: EnTranslations = {
       },
       "q_bandits": {
         "title": "Bandité z údolí",
-        "text": "Tlupa hrdlořezů se utábořila v jihozápadních kopcích. Tento týden oloupili tři vozy. Vyžeň je, zabij 10 banditů z údolí.",
+        "text": "Tlupa hrdlořezů se utábořila v severozápadních kopcích. Tento týden oloupili tři vozy. Vyžeň je, zabij 10 banditů z údolí.",
         "completion": "O deset nožů ve tmě méně. Vezmi si tohle, zasloužíš si to.",
         "objectives": {
           "0": {
@@ -16376,7 +16439,7 @@ export const cs_CZ: EnTranslations = {
       },
       "q_prof_amends_outfitter": {
         "title": "Opět spojená vlákna",
-        "text": "Zpátky u mého stavu po všem. Zášť nepěstuji, {playerName}, ale nit si pamatuje ruku, která ji pustila, a cena za nové uchopení se měří delší pokaždé. Vyhub pavouky lesního pavučníku přeplňující východní lesy, a práce ti usadí ruce, než se dotknou dobrého hedvábí.",
+        "text": "Zpátky u mého stavu po všem. Zášť nepěstuji, {playerName}, ale nit si pamatuje ruku, která ji pustila, a cena za nové uchopení se měří delší pokaždé. Vyhub pavouky lesního pavučníku přeplňující severovýchodní lesy, a práce ti usadí ruce, než se dotknou dobrého hedvábí.",
         "completion": "Opět stabilní. Kožedělnictví a Krejčovství se vrací do tvých rukou jako hlavní obory. Tentokrát dvakrát měř, než se zatoulá.",
         "objectives": {
           "0": {
@@ -16386,7 +16449,7 @@ export const cs_CZ: EnTranslations = {
       },
       "q_prof_amends_apothecary": {
         "title": "Zpátky na sporák",
-        "text": "No, pohleďme, kdo se vrátil k mému hrnci. Nenesu zášť, {playerName}, kuchyně má vždy místo, ale víš, že účet roste pokaždé, když odejdeš. Jdi proredukovat divoké kance na západní louce, protože poctivý pot je první přísada, a to tvým rukám připomene tu práci.",
+        "text": "No, pohleďme, kdo se vrátil k mému hrnci. Nenesu zášť, {playerName}, kuchyně má vždy místo, ale víš, že účet roste pokaždé, když odejdeš. Jdi proredukovat divoké kance na severozápadní louce, protože poctivý pot je první přísada, a to tvým rukám připomene tu práci.",
         "completion": "Tady je ta stará chuť. Alchymie a Vaření jsou zpět na tvém sporáku jako hlavní obory. Tentokrát zůstaň.",
         "objectives": {
           "0": {
@@ -17497,6 +17560,109 @@ export const cs_CZ: EnTranslations = {
           }
         }
       },
+      "q_ps_the_gauntlet": {
+        "title": "Proběhni Překážkovou dráhu",
+        "text": "Každá dvojice nohou, které si údolí váží, proběhla nejdřív tyhle dráhy, {playerName}. Projdi první dráhou na západ k její vlajce, otoč se, projdi jižní dráhou ke druhé vlajce, pak se posuň bokem poslední dráhou k červené vlajce. Projdi vlajkami v pořadí a karta v horní části obrazovky ti cestou ukáže každé tlačítko. Dozorce Pell měří čas každému běhu z druhého konce: jakmile máš červenou vlajku za sebou, čeká tam přímo na to, aby ho přijal.",
+        "completion": "Změřil jsem ten běh, {playerName}, a viděl jsem propadnout rychlejší nohy. Překážková dráha je tvoje. Cesta za mnou stoupá ke cvičišti, kde Cvičitel Rook mění práci nohou v práci s mečem: má pro tebe další úkol.",
+        "objectives": {
+          "0": {
+            "label": "Vlajka Překážkové dráhy minuta"
+          }
+        }
+      },
+      "q_ps_strike_true": {
+        "title": "Přesný úder",
+        "text": "Nejdřív práce nohou, teď paže, {playerName}. Cvičiště leží nahoře po cestě za mnou a jeho slaměné podobizny byly postaveny na to, aby se do nich bilo. Pokud ztratíš cestu, zmáčkni M pro otevření mapy: každý úkol, který neseš, je na ní vyznačený. Přejdi k podobizně a klikni na ni levým tlačítkem: tím se stane tvým cílem a její jméno se objeví v horní části obrazovky. Teprve pak zmáčkni 1, nebo klikni na první ikonu na akční liště podél spodního okraje, abys udeřil(a). Dál útoč, dokud jedna nepovolí; neopětuje úder, podobizny to nikdy nedělají. Cvičitel Rook hlídá cvičiště z jeho západního rohu, odkud vede pobřežní cesta: zmáčkni na něm F, abys mu odevzdal(a) skolenou.",
+        "completion": "Jedno čisté skolení, a tvůj úchop je už jistější. Zapamatuj si ten pocit, {playerName}: zaměř, udeř a dál udeřuj. Slámě je to jedno. Tomu příštímu, na co zaútočíš, jedno nebude.",
+        "objectives": {
+          "0": {
+            "label": "Cvičná podobizna poražena"
+          }
+        }
+      },
+      "q_ps_hone_the_edge": {
+        "title": "Nabroušení ostří",
+        "text": "Máchnutí je máchnutí, {playerName}, a sláma to snese celý den. Tím ale nic nevyhraješ. Podívej se na řadu tlačítek podél spodního okraje obrazovky: ta řada je tvé řemeslo a každé z nich udělá něco, co samotná paže nesvede. Jedno už máš. Vrať se k podobiznám a použij ho: vyber si cíl, pak zmáčkni tlačítko, které ti cvičiště označí, a to třikrát po sobě. Nesekej do slámy jen tak naslepo; přiměj to, co umíš, aby se opravdu stalo. Pak se vrať za mnou.",
+        "completion": "Teď bojuješ, místo abys jen mával. Ta řada roste s každou úrovní, kterou získáš, {playerName}, a nejdéle žijí ti, kdo ji umí číst. Slámě je jedno, které tlačítko jsi použil(a). Údolí ne.",
+        "objectives": {
+          "0": {
+            "label": "Schopnost zasáhla podobiznu"
+          }
+        }
+      },
+      "q_ps_shell_and_claw": {
+        "title": "Krunýř a dráp",
+        "text": "Slámě je to jedno, {playerName}, tak tu máš něco, čemu jedno není. Pobřežní pobíhalové se probírají Řadou vraků na vzdáleném pobřeží: sleduj cestu na západ od mého cvičiště a ta tě k nim dovede rovnou. Umí štípat, takže sleduj ukazatel zdraví a dál útoč: klikni levým tlačítkem na jednoho, aby se stal tvým cílem, pak použij schopnost, kterou tě naučilo cvičiště (cvičitel ti pojmenuje tlačítko), a nepřestávej, dokud jeho krunýř nepraskne. Tři budou stačit. Pak vystoupej cestou nahoru na severní vyvýšeninu: Strážkyně přílivu Nel vede účet pobřeží a ta ti spočítá krunýře.",
+        "completion": "Tři krunýře prasklé a všechny prsty na místě: slušný první boj, {playerName}. Pobíhalové obírají vraky rychleji, než jim příliv přináší nový lup, takže každý, kterého vyhubíš, je mince, o kterou někdo nepřijde.",
+        "objectives": {
+          "0": {
+            "label": "Pobřežní pobíhal vyhuben"
+          }
+        }
+      },
+      "q_ps_mother_of_pearl": {
+        "title": "Perleť",
+        "text": "Tři krunýře prasklé, {playerName}, ale Řada vraků skrývá krále, a ten sedí na kořisti cennější než všechny bedny na tomhle pobřeží. Vezmi tuhle Slanou návnadu k slané tůni na západním konci pobřeží, za vraky. Postav se k okraji vody, zmáčkni B pro otevření brašen a klikni levým tlačítkem na návnadu, abys ho probudil(a). Pan Krab štípe mnohem silněji než jeho drobní příbuzní, takže sleduj ukazatel zdraví, dál útoč a ustup nahoru do písku, když si potřebuješ oddechnout. Až padne, dojdi přímo k jeho krunýři a zmáčkni F, abys z něj vyloupil(a) Lesklou perlu. Tu perlu mi přines zpátky.",
+        "completion": "Lesklá perla, vypáčená ze samotného starého krále mělčin. Můj otec tomu krabovi smekal každé ráno svého pracovního života; nějaká úcta se mu patří. Vydrž chvíli... tak. Navlečená, zasazená a tvoje, {playerName}: Perleť. Zmáčkni B pro otevření brašen a klikni levým tlačítkem na prsten, abys ho nasadil(a), pak zmáčkni C pro otevření listu postavy a podívej se, jak ti sedí na ruce. Drobnost, ale s ní na sobě je z tebe kus lepší člověk.",
+        "objectives": {
+          "0": {
+            "label": "Pan Krab zabit"
+          },
+          "1": {
+            "label": "Lesklá perla získána"
+          }
+        }
+      },
+      "q_ps_the_wreck_line": {
+        "title": "Řada vraků",
+        "text": "Moji nosiči vytahují trosky ze starých vraků a nosí je nahoru do svahu k Táboru Svítání, {playerName}, a polovina beden ten výstup nikdy nedokončí: odloží se podél cesty a zapomenou se. Sleduj mou cestu směrem k táboru a projdeš přímo kolem těch zatoulaných. Otevřít jednu je jednoduché: přejdi k bedně, dokud se neukáže její jméno, pak zmáčkni F, nebo klikni na samotnou bednu, a ona vydá, co ukrývá. Šest jich vyčistí celou řadu, a nezapomeň, že F je stejná klávesa pro každou truhlu, ložisko i dveře, na které kdy narazíš. Intendantka Finch drží táborový stánek a vykoupí každý kousek trosek: předej jí úlovek.",
+        "completion": "Lano, dehet a půlku kola sýra, které nějak ušetřilo moře: to všechno beru, {playerName}. Hřbet, který unese, co najde, má pro tenhle tábor větší cenu než kterákoli čepel, a ten tvůj právě jedním výstupem vyčistil celou řadu.",
+        "objectives": {
+          "0": {
+            "label": "Vyplavená bedna otevřena"
+          }
+        }
+      },
+      "q_ps_pouch_and_purse": {
+        "title": "Váček a měšec",
+        "text": "Ještě jedna lekce před údolím, {playerName}, a je to ta, která dobrodruhy udržuje naživu: co s sebou neseš. Tvůj batoh má šestnáct míst a vedle něj čekají čtyři prázdné poutka na tašky; každá taška, kterou si připneš, přidá do zásoby vlastní místo. Takže: zmáčkni na mně znovu F, abys otevřel(a) můj stánek, klikni levým tlačítkem na Lněný váček v mém zboží a kup ho, pak zmáčkni B pro otevření brašen a klikni levým tlačítkem na váček, abys ho připnul(a) do volného poutka. Instruktorka Maren cvičí u shromažďovacího ohně pár kroků na východ: ukaž jí váček na svém opasku.",
+        "completion": "Pěkný váček. Připni si ho, pokud jsi to ještě neudělal(a): zmáčkni B pro otevření brašen, pak klikni levým tlačítkem na váček, abys ho usadil(a) do volného poutka, a šest dalších míst je tvých k naplnění průšvihy. Teď polovina lekce, kterou žádná taška neunese, {playerName}: co neuneseš, to hlídá Pozlacená truhlice. Pokladník Wick má svůj stůl u Pozlacené truhlice nahoře po západní cestě a otevírá stejný trezor, jaký sdílí každý pokladník v každém městě; víc místa v trezoru si můžeš koupit, jakmile do něj tvůj měšec doroste. Drž si cennosti v bance a brašny volné. Plný ranec ukončil víc dobrodružství než kterýkoli vlk.",
+        "objectives": {
+          "0": {
+            "label": "Lněný váček koupen"
+          }
+        }
+      },
+      "q_ps_the_signpost": {
+        "title": "Zvěsti ve větru",
+        "text": "Zbývá naučit se jeden zvyk, {playerName}, a ten nepotřebuje čepel: čti vývěsky. Cechovní vývěska stojí u táborové brány pár kroků jihozápadně od mého ohně a cechy i potulné party na ni věší svá volání. Přistup k ní a zmáčkni F, nebo na ni klikni levým tlačítkem, abys si přečetl(a), co je vyvěšené, pak se vrať a řekni mi, co přinesl vítr. Podobná vývěska stojí v každém městě, do kterého kdy vkročíš.",
+        "completion": "Takže teď víš, jak se zprávy šíří údolím, {playerName}: ne posly, ale vývěskami. Prohlížej si je v každém městě, kterým projdeš; půlka dobrodružství začíná jako tři řádky inkoustu na jedné z nich.",
+        "objectives": {
+          "0": {
+            "label": "Cechovní vývěska přečtena"
+          }
+        }
+      },
+      "q_ps_the_long_walk": {
+        "title": "Dlouhá cesta",
+        "text": "Zbývá jedna lekce, {playerName}, a je to ta, kterou ti nemůžu povědět: musíš si tím projít. Tam venku jednou zemřeš. Stává se to každému a není to konec ničeho. Vezmi si tenhle Kámen přechodu. Zmáčkni B pro otevření brašen a klikni na něj levým tlačítkem, a položí tě přesně tam, kde stojíš. Pak se řiď pokyny na obrazovce: uvolni svého ducha, dojdi zpátky ke svému tělu a vstup do něj. Tvé tělo čeká, cesta je zadarmo a nic touto cestou neztratíš.",
+        "completion": "A jsi zpátky, ani o chlup horší. Zapamatuj si, jaké to bylo, {playerName}, protože příště už u toho budou zuby a nikdo, kdo by ti to vysvětlil. Tvé tělo čeká, cesta je zadarmo, a jediné, co tě smrt doopravdy stojí, je čas, který zabere návrat.",
+        "objectives": {
+          "0": {
+            "label": "Návrat z říše mrtvých"
+          }
+        }
+      },
+      "q_ps_set_sail": {
+        "title": "Vyplutí",
+        "text": "Na tomhle pobřeží už nezbylo nic, co bys neproběhl(a), neporazil(a), neotevřel(a) nebo nekoupil(a), {playerName}. Jsi připraven(a) a Eastbrook má na tebe skutečnou práci. Sejdi po pobřežní cestě zpátky k molu, zmáčkni F na Převozníku Odovi a vyřiď mu, že jsem řekla, že sis vysloužil(a) přívoz. Zmáčkni L kdykoli ztratíš přehled, co komu dlužíš: to je tvůj úkolový deník.",
+        "completion": "To řekla Maren, jo? Vysoká chvála od ženy, která mě kdysi nechala týden cvičit uvazovací uzly. Zazvoň na zvon stojící vedle mého mola, kdykoli budeš připraven(a), {playerName}, a přívoz tě vysadí přímo uprostřed eastbrookského města. Dej si pozor na vlky.",
+        "objectives": {
+          "0": {
+            "label": "Hlášení Převozníku Odovi"
+          }
+        }
+      },
       "q_gc_down_the_windway": {
         "title": "Dolů po Větrné cestě",
         "text": "Zvládl jsi výstup, {playerName}, takže si tě vítr rozhodl nechat. Osadní přístav leží na východ podél cesty přes stráně, schovaný v závětří své zátoky. Přístavní mistr Odile počítá každou duši, která přejde přes průsmyk, a bude si chtít spočítat i tebe. Řekni jí, že Větrná cesta je stále otevřená.",
@@ -17694,6 +17860,9 @@ export const cs_CZ: EnTranslations = {
           },
           "11": {
             "label": "Hráz Vzdáleného pobřeží"
+          },
+          "12": {
+            "label": "Eastbrookské doky"
           }
         }
       },
@@ -18056,6 +18225,27 @@ export const cs_CZ: EnTranslations = {
             "label": "Trhlinová pole"
           }
         }
+      },
+      "proving_shore": {
+        "name": "Zkušební pobřeží",
+        "welcome": "Zkušební pobřeží od tebe nežádá nic než čas. Poznej tábor, udeř do podobizen, projdi Řadu vraků, a až budeš připraven(a), Převozník Odo tě přepraví přes moře do údolí.",
+        "pois": {
+          "0": {
+            "label": "Tábor Svítání"
+          },
+          "1": {
+            "label": "Staré molo"
+          },
+          "2": {
+            "label": "Cvičiště"
+          },
+          "3": {
+            "label": "Řada vraků"
+          },
+          "4": {
+            "label": "Překážková dráha"
+          }
+        }
       }
     },
     "dungeons": {
@@ -18304,19 +18494,19 @@ export const cs_CZ: EnTranslations = {
         "body": "Tvá specializace dosáhla mistrovství, samotného VRCHOLU, kabum, celý žebřík, hotovo. Chválu nerozdávám, rozdávám pojistky, ale tady, vezmi obojí: jsi skvělý(á) a trochu děsivý(á). Jdi znervóznit hory."
       },
       "woc_market_delivery": {
-        "sender": "The Exchange Broker",
-        "subject": "Your Exchange purchase",
-        "body": "The sale is settled and the goods are yours. The attached parcel carries the exact item you paid for, held in escrow from the moment it was listed until your payment cleared.\n\nA record of the sale lives in the Exchange ledger.\n\n- The Exchange Broker"
+        "sender": "Burzovní makléř",
+        "subject": "Tvůj nákup na Burze",
+        "body": "Prodej je vypořádaný a zboží je tvoje. Přiložený balík nese přesně ten předmět, za který jsi zaplatil(a), držený v úschově od chvíle, kdy byl vystaven, až do vyrovnání tvé platby.\n\nZáznam o prodeji zůstává v knize Burzy.\n\n- Burzovní makléř"
       },
       "woc_market_return": {
-        "sender": "The Exchange Broker",
-        "subject": "Your Exchange listing has ended",
-        "body": "Your listing ended without a completed sale: the auction found no buyer, the reserve was not met, the listing was withdrawn, or the winning bidder failed to settle. Your goods return to you unharmed with this letter, exactly as they were escrowed.\n\n- The Exchange Broker"
+        "sender": "Burzovní makléř",
+        "subject": "Tvá nabídka na Burze skončila",
+        "body": "Tvá nabídka skončila bez dokončeného prodeje: dražba nenašla kupce, rezervní cena nebyla dosažena, nabídka byla stažena, nebo vítězný přihazující nedokázal platbu vypořádat. Tvé zboží se ti vrací nepoškozené s tímto dopisem, přesně tak, jak bylo v úschově.\n\n- Burzovní makléř"
       },
       "woc_market_sold": {
-        "sender": "The Exchange Broker",
-        "subject": "Your Exchange listing sold",
-        "body": "Your listing sold and the buyer settled in full. The Exchange ledger carries the record of the sale, and your Exchange activity shows the settled amount and its breakdown.\n\n- The Exchange Broker"
+        "sender": "Burzovní makléř",
+        "subject": "Tvá nabídka na Burze se prodala",
+        "body": "Tvá nabídka se prodala a kupující platbu vyrovnal v plné výši. Kniha Burzy nese záznam o prodeji a tvá aktivita na Burze ukazuje vyrovnanou částku i její rozpis.\n\n- Burzovní makléř"
       }
     },
     "itemSets": {

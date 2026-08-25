@@ -208,15 +208,15 @@ describe('resurrection: aurasSurvivingCleanSlate predicate', () => {
 // down runs too); readyArenaFighter called with clearPrep: true; and
 // resetForArena, the one-line wrapper around that call, which arena.ts runs
 // itself and hands out through the SimContext seam (ctx.resetForArena) to
-// call sites that never spell readyArenaFighter (the Vale Cup's two, the Yumi
-// match seat). The phase 10 QA found this record wrong four times: on the
+// call sites that never spell readyArenaFighter (the Yumi match seat; the
+// Vale Cup's two retired with the Vale Cup, release/v0.41.0 1c74387b4c). The phase 10 QA found this record wrong four times: on the
 // readyArenaFighter route (every Yumi and Fiesta revive re-seats with
 // clearPrep: true; Thornhollow Fields seats, starts, ends, and drops a leaver
 // with clearPrep: true; ONLY its wave respawn, clearPrep: false, keeps a
 // flask, the classic-era battleground-death rule the ledger records), on the
-// resetForArena route (the Yumi match seat and the Vale Cup's kit-swap seat
-// and teardown wipe through it, and the first cut of THIS scan was blind to a
-// new ctx.resetForArena site anywhere), and twice on the SPELLING the scan
+// resetForArena route (the Yumi match seat, and until the Vale Cup retired
+// its kit-swap seat and teardown, wipe through it, and the first cut of THIS
+// scan was blind to a new ctx.resetForArena site anywhere), and twice on the SPELLING the scan
 // could see (a bare-identifier regex let `ctx.resetForArena(e as Entity)`
 // through; its widened successor still let a depth-two nested argument and an
 // optional call through, and its readyArenaFighter sibling could not cross a
@@ -227,8 +227,8 @@ describe('resurrection: aurasSurvivingCleanSlate predicate', () => {
 // under is therefore: overworld and PvE deaths keep it, a battleground or
 // arena death keeps it on the corpse, every instanced match's seat and end
 // (and each Fiesta or Yumi down and revive) clears it; each mode's behavior is
-// pinned in its own suite (arena, battleground, yumi_match, fiesta,
-// vale_cup_match). Absences cannot be asserted by driving the predicates, so
+// pinned in its own suite (arena, battleground, yumi_match, fiesta; the
+// vale_cup_match suite left with the Vale Cup). Absences cannot be asserted by driving the predicates, so
 // the three caller sets are pinned literally here.
 describe('resurrection: which sim modules wipe through aurasSurvivingCleanSlate', () => {
   const SIM_ROOT = fileURLToPath(new URL('../src/sim', import.meta.url));
@@ -451,8 +451,9 @@ describe('resurrection: which sim modules wipe through aurasSurvivingCleanSlate'
     // per file. arena.ts: its own seat (startArenaMatch, every arena-family
     // format including Fiesta and Protect Yumi), the match end (endArenaMatch,
     // the undefeated), and the send-home (returnFromArena, everyone still
-    // present). yumi.ts: the match seat. vale_cup.ts: the kit-swap seat
-    // (valeCupStandardize) and the teardown. sim.ts: the BODY of the Sim
+    // present). yumi.ts: the match seat. (vale_cup.ts carried two, the kit-swap
+    // seat and the teardown, until the Vale Cup retired with release/v0.41.0;
+    // the row left with the file.) sim.ts: the BODY of the Sim
     // delegate (`private resetForArena` forwarding to arenaMod.resetForArena),
     // so a module reaching it as ctx.resetForArena is counted at its own site
     // above and the seam's plumbing once here; the delegate's declaration line
@@ -466,7 +467,6 @@ describe('resurrection: which sim modules wipe through aurasSurvivingCleanSlate'
     expect([...wrapper.entries()].sort()).toEqual([
       ['sim.ts', 1],
       ['social/arena.ts', 3],
-      ['social/vale_cup.ts', 2],
       ['social/yumi.ts', 1],
     ]);
     // The wrapper really is the clean slate and nothing softer: its body is the

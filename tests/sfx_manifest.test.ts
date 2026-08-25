@@ -164,7 +164,7 @@ describe('buildManifest', () => {
     expect(manifest).toContain('cast_lightning_bolt');
   });
 
-  it('keeps the release catalog, all 9 mount cues, and all 68 UI cues in one 270-key inventory', () => {
+  it('keeps the release catalog, all 9 mount cues, and all 67 UI cues in one 269-key inventory', () => {
     // 265 -> 267 and 63 -> 65 UI cues with the Farming render/juice placeholder
     // pair (ui_farm_plant, ui_farm_harvest) joining UI_SFX_CATALOG, then
     // 267 -> 268 and 65 -> 66 with the ready-notice placeholder
@@ -172,9 +172,13 @@ describe('buildManifest', () => {
     // sting placeholder (ui_farm_golden, the celebrations phase), then
     // 269 -> 270 and 67 -> 68 with the shared-feast placement placeholder
     // (ui_farm_feast, the Phase 12 feast).
+    // The release meanwhile retired ui_vcup_kickoff with the Vale Cup minigame
+    // (265 -> 264 keys and 63 -> 62 UI cues on its own arm), so the merged
+    // inventory composes as 264 + 5 farm cues = 269 keys and 62 + 5 = 67 UI
+    // cues, measured from scripts/sfx/sfx_prompts.mjs on the merged tree.
     const keys = new Set(SFX.map((entry) => entry.key));
-    expect(keys.size).toBe(270);
-    expect([...keys].filter((key) => key.startsWith('ui_'))).toHaveLength(68);
+    expect(keys.size).toBe(269);
+    expect([...keys].filter((key) => key.startsWith('ui_'))).toHaveLength(67);
     expect(keys.has('ui_craft_cast')).toBe(true);
     expect(keys.has('ui_farm_plant')).toBe(true);
     expect(keys.has('ui_farm_harvest')).toBe(true);
@@ -256,7 +260,7 @@ describe('buildManifest', () => {
     // purely filesystem-discovered.
     const mobFamilyKeys = [...keys].filter((key) => key.startsWith('mob_'));
     expect(mobFamilyKeys).toHaveLength(65); // 13 families x 5 actions
-    expect(SFX_FIXED_CATALOG_KEYS).toHaveLength(270);
+    expect(SFX_FIXED_CATALOG_KEYS).toHaveLength(269);
   });
 });
 

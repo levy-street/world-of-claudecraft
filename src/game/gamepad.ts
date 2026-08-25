@@ -27,6 +27,7 @@ import {
   toggleEdit,
 } from './cross_hotbar_edit';
 import {
+  cancelPadFocus,
   clearPadFocus,
   focusFirstInWindow,
   followDomFocus,
@@ -35,6 +36,7 @@ import {
   pressDpadFocus,
   restorePadFocus,
   setPadNavSpansWindows,
+  syncStandalonePadFocus,
   syncWindowFocus,
 } from './dpad_focus_nav';
 import type { GamepadBindings } from './gamepad_bindings';
@@ -58,6 +60,7 @@ import {
   TRIGGER_THRESHOLD,
 } from './gamepad_map';
 import type { Input } from './input';
+import { markPadActivity } from './input_hint_mode';
 import { focusedPadAction } from './pad_focus_action';
 import { clickPadMouse, hidePadMouse, updatePadMouse } from './pad_mouse_cursor';
 
@@ -140,6 +143,8 @@ const DPAD_TARGET_ACTIONS: Record<number, string | undefined> = {
 export class GamepadManager {
   private index: number | null = null;
   private kind: GamepadKind = 'generic';
+  private kindOverride: GamepadKind | null = null;
+  private classifiedId = '';
   private prevPressed: boolean[] = new Array(STANDARD_BUTTON_COUNT).fill(false);
   private deadzone = 0.18;
   private camSpeed = 2.4;
@@ -215,6 +220,7 @@ export class GamepadManager {
     // re-acquires an already-connected pad on re-enable.
     this.index = null;
     this.kind = 'generic';
+    this.classifiedId = '';
     this.prevPressed.fill(false);
     this.input.clearGamepadMove();
     this.input.setGamepadLookActive(false);
@@ -236,6 +242,13 @@ export class GamepadManager {
   }
   setVibration(v: number): void {
     this.vibration = Math.min(1, Math.max(0, v));
+  }
+  /** Override the browser-detected glyph family. Null restores Auto detection. */
+  setKindOverride(kind: GamepadKind | null): void {
+    const previous = this.getKind();
+    if (this.kindOverride === kind) return;
+    this.kindOverride = kind;
+    this.announceKindChange(previous);
   }
   /** Turn the trigger-modifier cross hotbar on or off. Off restores the flat
    *  one-action-per-button layout exactly, triggers included. */
@@ -310,15 +323,21 @@ export class GamepadManager {
     return this.index !== null;
   }
 
-  /** Detected brand of the connected pad, for glyph labeling; 'generic' when
-   *  none is connected or the pad's id is unrecognized. */
+  /** Effective brand for glyph labeling: a player override, detected connected
+   *  pad brand, or generic when neither supplies one. */
   getKind(): GamepadKind {
-    return this.index === null ? 'generic' : this.kind;
+    return this.kindOverride ?? (this.index === null ? 'generic' : this.kind);
+  }
+
+  /** Set reached by an ordinary trigger hold right now, for truthful XHB hints. */
+  getCrossHotbarSet(): number {
+    return crossHotbarActiveSet(this.triggerState);
   }
 
   // Latch a pad as the active one and classify its brand from the id string.
   private acquire(pad: Gamepad): void {
     this.index = pad.index;
+    this.classifiedId = pad.id;
     this.kind = detectGamepadKind(pad.id);
     this.resetSeedRetry();
   }
@@ -334,6 +353,7 @@ export class GamepadManager {
     if (this.index === e.gamepad.index) {
       this.index = null;
       this.kind = 'generic';
+      this.classifiedId = '';
       this.prevPressed.fill(false);
       this.input.clearGamepadMove();
       this.input.setGamepadLookActive(false);
@@ -354,13 +374,35 @@ export class GamepadManager {
   private activePad(): Gamepad | null {
     if (this.index === null || typeof navigator === 'undefined') return null;
     const pad = navigator.getGamepads()[this.index];
-    return pad && pad.connected ? pad : null;
+    return pad?.connected ? pad : null;
+  }
+
+  // Some browsers expose an anonymous id on the connection event and populate
+  // the useful product/vendor string only in later gamepad snapshots. Retry only
+  // while classification is generic, then repaint the controller UI once.
+  private refreshKind(pad: Gamepad): void {
+    if (this.kind !== 'generic' || pad.id === this.classifiedId) return;
+    this.classifiedId = pad.id;
+    const kind = detectGamepadKind(pad.id);
+    if (kind === 'generic') return;
+    const previous = this.getKind();
+    this.kind = kind;
+    this.announceKindChange(previous);
+  }
+
+  // Refresh every glyph consumer, then restore the live armed layer that the
+  // general connection repaint deliberately resets to the resting bar.
+  private announceKindChange(previous: GamepadKind): void {
+    if (this.getKind() === previous) return;
+    this.cb.onConnectionChange?.();
+    if (this.crossHotbar && this.index !== null) this.notifyCrossHotbar();
   }
 
   /** Called once per animation frame from the main loop. */
   poll(dt: number): void {
     const pad = this.activePad();
     if (!pad) return;
+    this.refreshKind(pad);
     const buttons = pad.buttons;
     const pressed = (i: number): boolean => {
       const b = buttons[i];
@@ -512,16 +554,23 @@ export class GamepadManager {
     this.input.applyGamepadLook(look.yaw, look.pitch);
     this.input.setGamepadLookActive(look.active);
 
+    // Establish the last-used input family before a death action may claim
+    // focus. This lets the same first A press both reveal its pad selection and
+    // activate it, while an idle connected controller cannot steal chat focus.
+    const padActiveThisFrame =
+      cur.some(Boolean) ||
+      Math.max(Math.abs(lx), Math.abs(ly), Math.abs(rx), Math.abs(ry)) > this.deadzone;
+    if (padActiveThisFrame) markPadActivity();
+
     // Moving is playing, not pointing. Drop the pad selection the moment the stick
     // does anything, so a reflexive confirm does what the player expects instead of
     // activating whatever the cursor happened to be resting on. Only outside pointer
     // mode: with a window open the stick is not driving the character anyway.
-    if (
-      !this.cb.isPointerMode() &&
-      (move.forward || move.back || move.strafeLeft || move.strafeRight)
-    ) {
-      clearPadFocus();
-    }
+    const characterMoving = move.forward || move.back || move.strafeLeft || move.strafeRight;
+    if (characterMoving) cancelPadFocus();
+    // A corpse-run prompt waits for the ghost to stop before taking focus. This
+    // keeps movement live and avoids arming then clearing it on the appearance frame.
+    else syncStandalonePadFocus();
 
     // Real input this frame, for the activity notify below: either stick past
     // its deadzone (the flags and look.active are already the deadzone verdict,
@@ -725,7 +774,8 @@ export class GamepadManager {
     if (action === GAMEPAD_CANCEL && hasPadFocus()) {
       // Cancel backs out one step at a time, and the HUD selection is the innermost
       // step: hand the d-pad back to the world before the host clears the target.
-      clearPadFocus();
+      // Release Spirit is mandatory, though, so its selection cannot be dismissed.
+      cancelPadFocus();
       return;
     }
     if (action === GAMEPAD_CYCLE_SET) {

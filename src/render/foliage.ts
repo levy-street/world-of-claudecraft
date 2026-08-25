@@ -1,10 +1,7 @@
 import * as THREE from 'three';
 import type { GLTF } from 'three/addons/loaders/GLTFLoader.js';
 import { mergeGeometries } from 'three/examples/jsm/utils/BufferGeometryUtils.js';
-import { DRAKELANDS_FLOWER_MEADOWS } from '../sim/content/drakelands';
-import { GALECREST_FLOWER_MEADOWS } from '../sim/content/galecrest';
 import { STABLE_PADDOCK } from '../sim/content/mounts';
-import { REALM_FLOWER_MEADOWS } from '../sim/content/realm';
 import {
   BUILTIN_WORLD,
   DUNGEON_X_THRESHOLD,
@@ -17,7 +14,6 @@ import { inDawnholdBailey } from '../sim/dawnhold_layout';
 import { ROCK_SINK_UNITS, rockHeightOf } from '../sim/decoration_dims';
 import { galeDeckSurface } from '../sim/gale_harbor';
 import type { BiomeId } from '../sim/types';
-import { isInSowfieldShell } from '../sim/vale_cup_layout';
 import type { Decoration } from '../sim/world';
 import {
   generateDecorations,
@@ -30,6 +26,7 @@ import { loadGltf, releaseGltf } from './assets/loader';
 import { registerDeferredPreload } from './assets/preload';
 import { attachBiomeHaze } from './biome_haze_field';
 import { applyCanopyDetail } from './canopy_detail';
+import { flowerMeadowsInChunk } from './flower_meadows_core';
 import {
   type FoliageBucketRevealGate,
   type FoliageBucketRevealState,
@@ -98,6 +95,7 @@ import {
   shadowRowVisible,
   shadowVolumeMoved,
 } from './foliage_shadow_core';
+import { foliageShoreSkip } from './foliage_shore_gate_core';
 import {
   gardenLushGrassAt,
   gardenMeadowTintAt,
@@ -2268,7 +2266,6 @@ function generateDressing(seed: number): DressingSpot[] {
       if (roadDistance(x, z) < 4) continue;
       if (terrainHeight(x, z, seed) < WATER_LEVEL + 1.2) continue;
       if (tooSteep(x, z, seed)) continue;
-      if (isInSowfieldShell(x, z)) continue; // keep bushes/plants off the football ground
       // no scrub in the worked stable yard or up through the harbor decks
       if (biome === 'gale' && (inStableYard(x, z) || onHarborDeck(x, z, seed))) continue;
       // the fen's floor dressing grows in CLUMPED patches, not an even
@@ -2984,6 +2981,19 @@ function buildGrassRing(
     // below), so its chunks carry a near-garden flower buffer
     // the Drakelands' authored firebloom fields bloom on near-bare ground
     // (ember grass density is 0), so their chunks need a field-sized buffer
+    // authored flower meadows overlapping this chunk (flower_meadows_core
+    // owns the biome registry); resolved before the buffer so a meadow chunk
+    // gets a field-sized cap even in a sparse biome (the vale's 0.14 would
+    // clip the drifts)
+    const chunkMinX = chunk.cx * GRASS_CHUNK_SIZE;
+    const chunkMinZ = chunk.cz * GRASS_CHUNK_SIZE;
+    const meadowsInChunk = flowerMeadowsInChunk(
+      chunkBiome,
+      chunkMinX,
+      chunkMinX + GRASS_CHUNK_SIZE,
+      chunkMinZ,
+      chunkMinZ + GRASS_CHUNK_SIZE,
+    );
     const flowerCap = Math.max(
       8,
       Math.floor(
@@ -2992,7 +3002,7 @@ function buildGrassRing(
             ? 1.2
             : chunkBiome === 'fen'
               ? 0.8
-              : fieldChunk || stableBandChunk || chunkBiome === 'ember'
+              : fieldChunk || stableBandChunk || chunkBiome === 'ember' || meadowsInChunk.length > 0
                 ? 0.45
                 : 0.14),
       ),
@@ -3015,23 +3025,6 @@ function buildGrassRing(
     const i1 = Math.ceil(maxX / step) + 1;
     const j0 = Math.floor(minZ / step) - 1;
     const j1 = Math.ceil(maxZ / step) + 1;
-    // authored flower meadows overlapping this chunk (the dusk realm's
-    // meadow bowls, the Galecrest's house gardens + tarn shore rings, and
-    // the Drakelands' firebloom fields around Wyrmwatch)
-    const meadowSource =
-      chunkBiome === 'dusk'
-        ? REALM_FLOWER_MEADOWS
-        : chunkBiome === 'gale'
-          ? GALECREST_FLOWER_MEADOWS
-          : chunkBiome === 'ember'
-            ? DRAKELANDS_FLOWER_MEADOWS
-            : null;
-    const meadowsInChunk = meadowSource
-      ? meadowSource.filter(
-          (mw) =>
-            mw.x + mw.r > minX && mw.x - mw.r < maxX && mw.z + mw.r > minZ && mw.z - mw.r < maxZ,
-        )
-      : [];
     yield; // setup (buffer allocation + chunk classification) is one sub-unit
 
     for (let i = i0; i <= i1 && n < chunkCap; i++) {
@@ -3063,13 +3056,12 @@ function buildGrassRing(
           (0.25 + 1.7 * lushness * lushness);
         if (r > density) continue;
         const h = terrainHeight(x, z, seed);
-        if (h < WATER_LEVEL + 1.6) continue;
+        if (foliageShoreSkip(x, z, h, seed)) continue;
         // no blades pasted onto cliff faces
         if (tooSteep(x, z, seed)) continue;
         if (insideGrassHubExclusion(activeContent.zones, x, z)) continue;
         if (roadDistance(x, z) < 3.2) continue;
         if (insideEastbrookGrassExclusion(townExclusions, x, z, GRASS_BUILDING_PADDING)) continue;
-        if (isInSowfieldShell(x, z)) continue; // the Sowfield is a mown pitch, not meadow
         // the stable yard is worked dirt; deck planks grow nothing through
         if (tuftBiome === 'gale' && (inStableYard(x, z) || onHarborDeck(x, z, seed))) continue;
         // Dawnhold's bailey is paved wall to wall: no tuft, and so no flower
@@ -3110,7 +3102,7 @@ function buildGrassRing(
         if (FLOWERLESS_BIOMES.has(tuftBiome)) continue;
         // roughly one tuft in nine sprouts a flower cluster beside it; in
         // the field realms, coarse field cells bloom into dense drifts, and
-        // the authored meadow circles (REALM_FLOWER_MEADOWS) always bloom
+        // the authored meadow circles (flower_meadows_core) always bloom
         const fieldCell = fieldChunk ? hashAt(Math.floor(x / 22), Math.floor(z / 22), 13) : 1;
         const inMeadow = meadowsInChunk.some((mw) => {
           const mdx = x - mw.x;
@@ -3145,9 +3137,8 @@ function buildGrassRing(
             const fx = x + (hashAt(i + rep, j, 7) - 0.5) * (1.4 + rep * 1.3);
             const fz = z + (hashAt(i, j + rep, 8) - 0.5) * (1.4 + rep * 1.3);
             const fh = terrainHeight(fx, fz, seed);
-            if (fh < WATER_LEVEL + 1.6 || tooSteep(fx, fz, seed) || roadDistance(fx, fz) < 3.2) {
-              continue;
-            }
+            if (foliageShoreSkip(fx, fz, fh, seed)) continue;
+            if (tooSteep(fx, fz, seed) || roadDistance(fx, fz) < 3.2) continue;
             // a band-edge bloom must not stray into the worked yard
             if (tuftBiome === 'gale' && inStableYard(fx, fz)) continue;
             if (tuftBiome === 'garden' && inDawnholdBailey(fx, fz, 0.5)) continue;
@@ -3184,9 +3175,8 @@ function buildGrassRing(
             const mdz = fz - mw.z;
             if (mdx * mdx + mdz * mdz >= mw.r * mw.r) continue;
             const fh = terrainHeight(fx, fz, seed);
-            if (fh < WATER_LEVEL + 1.6 || tooSteep(fx, fz, seed) || roadDistance(fx, fz) < 3.2) {
-              continue;
-            }
+            if (foliageShoreSkip(fx, fz, fh, seed)) continue;
+            if (tooSteep(fx, fz, seed) || roadDistance(fx, fz) < 3.2) continue;
             const fs = 0.55 + hashAt(i + rep, j, 17) * 0.5;
             q.setFromAxisAngle(up, hashAt(i, j + rep, 18) * 12.4);
             m.compose(v.set(fx, fh, fz), q, sv.set(fs, fs, fs));
@@ -3217,7 +3207,7 @@ function buildGrassRing(
             if (tint < 0 && rep < 2) tint = gardenMeadowTintAt(fx, fz);
             if (tint < 0) continue;
             const fh = terrainHeight(fx, fz, seed);
-            if (fh < WATER_LEVEL + 1.6 || tooSteep(fx, fz, seed)) continue;
+            if (foliageShoreSkip(fx, fz, fh, seed) || tooSteep(fx, fz, seed)) continue;
             const fs = 0.6 + hashAt(i + rep, j, 17) * 0.4;
             q.setFromAxisAngle(up, hashAt(i, j, 18 + rep) * 12.4);
             m.compose(v.set(fx, fh, fz), q, sv.set(fs, fs, fs));

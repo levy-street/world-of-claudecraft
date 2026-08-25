@@ -13,6 +13,70 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const zh_CN: Partial<Record<TranslationKey, string>> = {
+  'hudChrome.barEditor.pageTab': '第{page}页',
+  'hudChrome.bootcamp.promptHold': '按住',
+  'hudChrome.bootcamp.promptJump': '跳跃',
+  'hudChrome.bootcamp.promptPickUp': '拾取',
+  'hudChrome.bootcamp.promptRead': '阅读',
+  'hudChrome.bootcamp.promptRing': '敲响',
+  'hudChrome.bootcamp.promptTalk': '交谈',
+  'hudChrome.mobile.barEditor': '编辑动作条',
+  'hudChrome.mobile.menuLabel': '菜单',
+  'hudChrome.mobile.questStripCounter': '{position}/{total}',
+  'hudChrome.mobile.radialDown': '下',
+  'hudChrome.mobile.radialLeft': '左',
+  'hudChrome.mobile.radialUp': '上',
+  'hudChrome.bootcamp.promptAttack': '攻击',
+  'hudChrome.bootcamp.keycapThen': '然后',
+  'hudChrome.bootcamp.promptSummon': '召唤',
+  'hudChrome.bootcamp.taskPearlBody':
+    '沿着金色路径走到沙滩最西端的潮池。站在水边，按 {bagsKey} 打开背包，用鼠标左键点击咸水诱饵把它引出来。像对付掠蟹那样和它战斗，等它倒下后，对着它的蟹壳按 {interactKey}，取走莹润珍珠。',
+  'hudChrome.bootcamp.taskPearlBodyTouch':
+    '沿着金色路径走到沙滩最西端的潮池。站在水边，打开背包点按咸水诱饵把它引出来。像对付掠蟹那样和它战斗，等它倒下后，点按它的蟹壳，取走莹润珍珠。',
+  'hudChrome.bootcamp.taskPearlBodyPad':
+    '沿着金色路径走到沙滩最西端的潮池。站在水边，打开背包选择咸水诱饵把它引出来。像对付掠蟹那样和它战斗，等它倒下后，对着它的蟹壳按下互动键，取走莹润珍珠。',
+  'hudChrome.bootcamp.ringEquipTitle': '戴上你的战利品',
+  'hudChrome.bootcamp.ringEquipBody':
+    '珍珠之母就在你的背包里。按 {bagsKey} 打开背包，然后用鼠标左键点击戒指，把它戴上手指。',
+  'hudChrome.bootcamp.ringEquipBodyTouch': '珍珠之母就在你的背包里。打开背包，点按戒指把它戴上手指。',
+  'hudChrome.bootcamp.ringEquipBodyPad': '珍珠之母就在你的背包里。打开背包，选择戒指把它戴上手指。',
+  'hudChrome.bootcamp.ringAdmireTitle': '瞧瞧你',
+  'hudChrome.bootcamp.ringAdmireBody':
+    '很衬你。按 {charKey} 打开角色面板，看看戴在手上的戒指，以及它提升的每一项属性。',
+  'hudChrome.bootcamp.ringAdmireBodyTouch':
+    '很衬你。从菜单打开角色面板，看看戴在手上的戒指，以及它提升的每一项属性。',
+  'hudChrome.bootcamp.ringAdmireBodyPad':
+    '很衬你。从菜单打开角色面板，看看戴在手上的戒指，以及它提升的每一项属性。',
+  'entities.mobs.mister_crabs.name': '螃蟹先生',
+  'entities.items.ps_briny_lure.name': '咸水诱饵',
+  'entities.items.ps_lustrous_pearl.name': '莹润珍珠',
+  'entities.items.mother_of_pearl.name': '珍珠之母',
+  'entities.quests.q_ps_mother_of_pearl.title': '珍珠之母',
+  'entities.quests.q_ps_mother_of_pearl.text':
+    '三只蟹壳都敲开了，{playerName}。但沉船线上还有一位王，他守着的宝贝比这片沙滩上所有木箱加起来还值钱。带上这枚咸水诱饵，穿过残骸，去沙滩最西端的潮池。站在水边，按 B 打开背包，用鼠标左键点击诱饵，把他唤醒。螃蟹先生的钳子比他那些小个子亲戚狠得多，盯紧你的生命条，别停下攻击，喘不过气就沿着沙滩往后退。等他倒下，走到他的蟹壳前直到名字浮现，按 F 或用左键点击，取走他攥着的莹润珍珠。把那颗珍珠带回来给我。',
+  'entities.quests.q_ps_mother_of_pearl.completion':
+    '莹润珍珠，还是从浅滩老王自己身上撬下来的。我父亲干活的每个清晨都会对那只螃蟹脱帽致意；该给的敬意总要给。别动... 好了。穿好线，镶好座，归你了，{playerName}：珍珠之母。按 B 打开背包，用左键点击戒指戴上它，再按 C 打开角色面板，看看它戴在你手上的样子。小小一件东西，戴上它，你的每一分都会更强。',
+  'entities.quests.q_ps_mother_of_pearl.objectives.0.label': '击败螃蟹先生',
+  'entities.quests.q_ps_mother_of_pearl.objectives.1.label': '取得莹润珍珠',
+  'hudChrome.bootcamp.taskStrikeTrueBodyCaster':
+    '走到一个草人跟前，用鼠标左键点击它，把它设为目标：它的名字会出现在屏幕上方。然后按 {attackKey}，或者点击动作条上的第二个按钮，施放你的法术。一直施放到一个散架为止。',
+  'hudChrome.bootcamp.taskStrikeTrueBodyCasterTouch':
+    '走到一个草人跟前，点按它，把它设为目标。然后点按动作条上的第二个按钮，施放你的法术。一直施放到一个散架为止。',
+  'hudChrome.bootcamp.taskStrikeTrueBodyCasterPad':
+    '走到一个草人跟前，按下目标键把它设为目标。然后按下第二个动作键，施放你的法术。一直施放到一个散架为止。',
+  'hudChrome.bootcamp.taskShellBodyCaster':
+    '掠蟹是会回击的。用鼠标左键点击一只，把它设为目标，然后按 {abilityKey} 使用{ability}，保持距离不停施放。要是一次有太多只扑上来，就沿小路往回撤：它们很快就会放弃追赶，休息时你的生命值也会慢慢回满。',
+  'hudChrome.bootcamp.taskShellBodyCasterTouch':
+    '掠蟹是会回击的。点击一只把它设为目标，然后点击动作条上的{ability}，保持距离不停施放。要是一次有太多只扑上来，就沿小路往回撤：它们很快就会放弃追赶，休息时你的生命值也会慢慢回满。',
+  'hudChrome.bootcamp.taskShellBodyCasterPad':
+    '掠蟹是会回击的。把一只设为目标，然后按放着{ability}的动作按钮，保持距离不停施放。要是一次有太多只扑上来，就沿小路往回撤：它们很快就会放弃追赶，休息时你的生命值也会慢慢回满。',
+  'hudChrome.bootcamp.voiceGraduate': '钟为你敲响了。海那头的东溪正等着你，你也准备好了。',
+  'hudChrome.bootcamp.voiceVeerOff': '慢着，朋友，走反了。金色路径在你身后呢。',
+  'hudChrome.bootcamp.voiceStationDoneB': '你越来越上手了，错不了。',
+  'hudChrome.bootcamp.voiceStationDoneA': '干得好。往下一处去吧，路已经为你点亮了。',
+  'hudChrome.bootcamp.voiceRunDone': '跑得干净利落。奖赏在监工佩尔那里，去领吧。',
+  'hudChrome.bootcamp.voiceFirstFlag': '过了一面旗了。腿别停，还剩两面。',
+  'hudChrome.bootcamp.voiceArrival': '平安上岸啦，朋友。看见脚下这条金色路径了吗？它比我还认得路，跟着走就是。',
   'hudChrome.lastkeepMap.title': '{keep}：{story}',
   'hudChrome.dawnholdMap.title': '{keep}：{story}',
   'guide.classPage.formName.form_cat': '狼形态',
@@ -65,6 +129,30 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.nameplate.mobLevel': '{level}',
   'hudChrome.nameplate.afkTag': '暂离',
   'hudChrome.nameplate.cheaterTag': '< 作弊者 >',
+  'hudChrome.nameplate.pledgeTag': '{guild}的宣誓者',
+  'hudChrome.pledge.open': '接受宣誓',
+  'hudChrome.pledge.closed': '不接受宣誓',
+  'hudChrome.pledge.minLevel': '{level}级以上',
+  'hudChrome.pledge.action': '宣誓',
+  'hudChrome.pledge.actionTitle': '向{guild}宣誓',
+  'hudChrome.pledge.pledged': '已宣誓',
+  'hudChrome.pledge.yourGuild': '你的公会',
+  'hudChrome.pledge.tab': '宣誓',
+  'hudChrome.pledge.tabWithCount': '宣誓（{count}）',
+  'hudChrome.pledge.empty': '还没有人向你的公会宣誓。',
+  'hudChrome.pledge.accept': '接受',
+  'hudChrome.pledge.acceptTitle': '接受{name}的宣誓',
+  'hudChrome.pledge.reject': '拒绝',
+  'hudChrome.pledge.rejectTitle': '拒绝{name}的宣誓',
+  'hudChrome.pledge.settings': '招募',
+  'hudChrome.pledge.acceptingLabel': '接受宣誓',
+  'hudChrome.pledge.minLevelLabel': '最低等级',
+  'hudChrome.pledge.noteLabel': '榜单留言',
+  'hudChrome.pledge.notePlaceholder': '告诉有意加入的玩家你的公会在寻找什么',
+  'hudChrome.pledge.save': '保存',
+  'hudChrome.pledge.yourPledge': '你的宣誓：{guild}',
+  'hudChrome.pledge.since': '宣誓于{date}',
+  'hudChrome.pledge.withdraw': '撤回宣誓',
   'hudChrome.discord.roleTag.legend': '传奇',
   'hudChrome.discord.roleTag.shill': '布道者',
   'guide.profPages.gainFmt': '{reduced} / {minimal} / {zero}',
@@ -519,8 +607,6 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auth.appleError': '无法通过 Apple 登录。请重试。',
   'hudChrome.auth.appleChoiceIntro': '创建新帐户，或将 Apple 关联到现有帐户。',
   'hudChrome.auth.appleChoiceExpired': 'Apple 登录已过期。请再次使用 Apple 登录。',
-  'hudChrome.vcup.guildBoardWl': '{wins} 胜，{losses} 负',
-  'hudChrome.vcup.shootPower': '力度',
   'hudChrome.discord.roleTag.coredevs': '核心开发者',
   'hudChrome.options.version': 'v{version}（{build}）',
   'auth.emailPlaceholder': 'you@example.com',
@@ -1066,6 +1152,8 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.bg.endedForfeitLog': '本场比赛以弃权告终。',
   'hudChrome.bg.firstWinBonusLine': '每日首胜:+{honor}荣誉',
   'hudChrome.bg.firstWinBonusLog': '每日首胜:你额外获得{honor}点荣誉。',
+  'hudChrome.bg.doubleHonorLine':
+    '双倍荣誉周末:今日荆谷原野荣誉奖励均为{mult}倍,打满全场的败方也按胜方奖励结算',
   'hudChrome.bg.timeWarningMinutes': '还剩{minutes}分钟',
   'hudChrome.bg.timeWarningOneMinute': '还剩一分钟',
   'hudChrome.bg.timeWarningMinutesLog': '本场战斗还剩{minutes}分钟。',
@@ -2956,7 +3044,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
     '攻击目标，造成 {damage} 点伤害，并使其昏迷 4 秒。奖励 2 个连击点。',
   'entities.abilities.sap.name': '闷棍',
   'entities.abilities.sap.description':
-    '使目标无法行动，持续 8 秒。必须处于潜行状态且不在战斗中。任何伤害都会打破效果。',
+    '使目标无法行动，持续 8 秒，且不会打破暮帷或引发战斗。必须处于潜行状态且不在战斗中。任何伤害都会打破效果。',
   'entities.abilities.crippling_poison.name': '沉铅毒液',
   'entities.abilities.crippling_poison.description':
     '以沉铅毒液打击目标，造成 {damage} 点自然伤害，并使其移动速度降低 50%，持续 12 秒。',
@@ -3031,7 +3119,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.aspect_of_the_monkey.name': '松貂之姿',
   'entities.abilities.aspect_of_the_monkey.description': '化身为貂的形态，将你的躲闪几率提高 8%，持续 30 分钟。',
   'entities.abilities.aspect_of_the_cheetah.name': '骏马之姿',
-  'entities.abilities.aspect_of_the_cheetah.description': '化身为骏马的形态，将你的移动速度提高 30%，持续 30 分钟。',
+  'entities.abilities.aspect_of_the_cheetah.description': '化身为骏马的形态，将你的移动速度提高 30%，持续 30 分钟。生效期间，受到伤害会使你昏乱，移动速度降低 50%，持续 4 秒（每次命中都会刷新昏乱状态）。',
   'entities.abilities.aimed_shot.name': '引弓长射',
   'entities.abilities.aimed_shot.description': '射击目标，造成 {damage} 点物理伤害。伤害随远程攻击强度提升。',
   'entities.abilities.rapid_fire.name': '狂热引弓',
@@ -3211,7 +3299,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.summon_felguard.description':
     '召唤一只听从术士命令的战魔。战魔是一种坚韧的近战恶魔，会冲入战斗并独当一面。召唤新的恶魔会驱散你当前的恶魔。你同时只能拥有一只恶魔。',
   'entities.abilities.summon_infernal.name': '召唤焚炎巨像',
-  'entities.abilities.summon_infernal.description': '将一尊焚炎巨像召至目标区域，落地时造成 58-72 点火焰伤害。它会战斗 30 秒且不会取代你的恶魔，每 2 秒灼烧附近的敌人，并每 1 秒产生 1 点毁坏。',
+  'entities.abilities.summon_infernal.description': '将一尊焚炎巨像召至目标区域，落地时造成 64-79 点火焰伤害。它会战斗 30 秒且不会取代你的恶魔，每 2 秒灼烧附近的敌人，并每 1 秒产生 1 点毁坏。',
   'entities.abilities.summon_doomguard.name': '召唤亡魂裔',
   'entities.abilities.summon_doomguard.description':
     '将一只亡魂裔束缚于你的意志之下，这是一种精英恶魔，会从远处倾泻沉重的暗影伤害。漫长的冷却时间限制了它的毁灭性威力。召唤新的恶魔会驱散你当前的恶魔。你同时只能拥有一只恶魔。',
@@ -3690,7 +3778,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'entities.npcs.trader_wilkes.greeting': '新鲜面包，清水，公道价格。你需要什么？',
   'entities.npcs.apothecary_lin.name': '林药剂师',
   'entities.npcs.apothecary_lin.title': '草药师',
-  'entities.npcs.apothecary_lin.greeting': '在东边林地里落脚要小心，朋友。',
+  'entities.npcs.apothecary_lin.greeting': '在东北边林地里落脚要小心，朋友。',
   'entities.npcs.brother_aldric.name': '奥德里克修士',
   'entities.npcs.brother_aldric.title': '山谷牧师',
   'entities.npcs.brother_aldric.greeting': '愿圣光护佑你。如今连死者也无法在这里安息。',
@@ -3780,7 +3868,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
     '潭水饮尽月光，{className}，又将溺者吐还。我守望那道门户已有三十夜——而今夜，它开了。',
   'entities.quests.q_prof_intro.title': '人人都有一技之长',
   'entities.quests.q_prof_intro.text':
-    '东溪人人除了舞刀弄剑，还得有门手艺，{playerName}。镇子东南的铜矿坑周围岩石里有矿脉。拿起矿镐，亲手开采5处；别想蒙我，我看得出差别。',
+    '东溪人人除了舞刀弄剑，还得有门手艺，{playerName}。镇子东北方、狼径外的铜矿坑周围岩石里有矿脉。拿起矿镐，亲手开采5处；别想蒙我，我看得出差别。',
   'entities.quests.q_prof_intro.completion':
     '看吧？矿石采到了，手上也磨出了茧。赶路时继续采矿、伐木和采药；回城后，别忘了市场旁的城镇专注告示板和附近的制作台。只要你愿意，这些手艺都能换来公道的生计。',
   'entities.quests.q_prof_intro.objectives.0.label': '已开采矿脉',
@@ -3802,12 +3890,12 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_greyjaw.completion': '那头老恶狼终于死了。马厩里的孩子能睡安稳些，我也是。',
   'entities.quests.q_greyjaw.objectives.0.label': '老灰颚的尖牙',
   'entities.quests.q_boars.title': '粗鬃野猪皮',
-  'entities.quests.q_boars.text': '野猪皮能做最好的行囊，镇外草地到处都是野猪。带回5张硬鬃野猪皮。',
+  'entities.quests.q_boars.text': '野猪皮能做最好的行囊，镇子西北的草地到处都是野猪。带回5张硬鬃野猪皮，我必有重谢。',
   'entities.quests.q_boars.completion': '好结实的硬鬃皮！这些能卖个好价钱。',
   'entities.quests.q_boars.objectives.0.label': '硬鬃野猪皮',
   'entities.quests.q_spiders.title': '墨网之患',
   'entities.quests.q_spiders.text':
-    '东部林中的潜伏者会吐出一种丝，我制作药膏正需要它，何况它们的数量也已经太过泛滥。清剿 6 只墨网潜伏者，再从它们腹中割下 4 枚丝腺。',
+    '东北部林中的潜伏者会吐出一种丝，我制作药膏正需要它，何况它们的数量也已经太过泛滥。清剿 6 只墨网潜伏者，再从它们腹中割下 4 枚丝腺。',
   'entities.quests.q_spiders.completion': '呃，还在抽动。正合适。这是你应得的。',
   'entities.quests.q_spiders.objectives.0.label': '击败墨网潜伏者',
   'entities.quests.q_spiders.objectives.1.label': '墨网丝腺',
@@ -3828,7 +3916,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_bones.objectives.0.label': '让不宁骸骨安息',
   'entities.quests.q_supplies.title': '被盗的补给',
   'entities.quests.q_supplies.text':
-    '强盗抢走了我的最后一辆货车，工具、盐和东溪亚麻都在里面。去西南山丘的营地夺回4个补给箱。',
+    '强盗抢走了我的最后一辆货车，工具、盐和东溪亚麻都在里面。去西北山丘的营地夺回4个补给箱。',
   'entities.quests.q_supplies.completion': '我的箱子！几乎没有划痕。你真让人惊喜。',
   'entities.quests.q_supplies.objectives.0.label': '被盗补给箱',
   'entities.quests.q_whispers.title': '地下低语',
@@ -3874,7 +3962,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_gravecallers_trail.objectives.0.label': '莫森的魔典',
   'entities.quests.q_bandits.title': '谷地强盗',
   'entities.quests.q_bandits.text':
-    '一群割喉强盗在西南山丘扎营，本周已经抢了三辆货车。击杀10名谷地强盗。',
+    '一群割喉强盗在西北山丘扎营，本周已经抢了三辆货车。击杀10名谷地强盗。',
   'entities.quests.q_bandits.completion': '黑夜里少了十把刀。拿着吧，这是你挣来的。',
   'entities.quests.q_bandits.objectives.0.label': '击败谷地强盗',
   'entities.quests.q_ringleader.title': '匪首',
@@ -4431,6 +4519,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'entities.zones.farshore_isle.pois.3.label': '碎裂断崖',
   'entities.zones.farshore_isle.pois.4.label': '裂野',
   'entities.zones.eastbrook_vale.pois.11.label': '远岸沙洲堤道',
+  'entities.zones.eastbrook_vale.pois.12.label': '东溪码头',
   'entities.mobs.moor_ram.name': '荒原羊',
   'entities.mobs.gale_wisp.name': '疾风精',
   'entities.mobs.shoal_scuttler.name': '浅滩蟹',
@@ -5667,6 +5756,11 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.plurals.playersOnline.many': '查询：{realm}上有{count}名玩家在线。',
   'hudChrome.plurals.playersOnline.other': '查询：{realm}上有{count}名玩家在线。',
   'hudChrome.controller.title': '手柄',
+  'hudChrome.controller.glyphStyle': '按键标签',
+  'hudChrome.controller.glyphStyleAuto': '自动',
+  'hudChrome.controller.glyphStyleXbox': 'Xbox',
+  'hudChrome.controller.glyphStylePlayStation': 'PlayStation（索尼）',
+  'hudChrome.controller.glyphStyleNintendo': '任天堂',
   'hudChrome.controller.enable': '启用手柄',
   'hudChrome.controller.invertY': '反转镜头（Y轴）',
   'hudChrome.controller.deadzone': '摇杆死区',
@@ -6097,7 +6191,6 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'guide.controls.harvestJournal': '收成日志',
   'guide.controls.sheathe': '收起/拔出武器',
   'guide.controls.crafting': '制作',
-  'guide.controls.valeCup': '溪谷杯',
   'guide.controls.mount': '骑乘 / 下骑',
   'guide.controls.calendar': '活动日历',
   'guide.controls.dungeonFinder': '地下城查找器',
@@ -8168,7 +8261,6 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'entities.mobs.rift_boss_arcane.name': '执政官尼克萨里斯',
   'entities.mobs.rift_boss_storm.name': '风暴威洛克',
   'entities.mobs.rift_boss_tide.name': '深渊之喉',
-  'entities.mobs.vale_cup_ball.name': '野猪皮球',
   'entities.npcs.brother_halven_marsh.name': '哈尔文修士',
   'entities.npcs.brother_halven_marsh.title': '圣物库守护人',
   'entities.npcs.brother_halven_marsh.greeting':
@@ -8204,6 +8296,8 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'apiError.body.too_large': '该请求过大。请减少数据后重试。',
   'apiError.body.unsupported_media_type': '不支持的请求格式。',
   'apiError.deeds.invalid_input': '输入无效。',
+  'apiError.guilds.invalid_roster_name': '公会名称无效。',
+  'apiError.guilds.unknown': '没有这个名字的公会。',
   'apiError.ota_updates.invalid_input': '输入无效。',
   'apiError.steam.disabled': 'Steam 关联当前不可用。',
   'apiError.wallet.handoff_invalid': '钱包授权已过期或无法验证。请重试。',
@@ -8289,6 +8383,11 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'apiError.discord.swag_points': '积分不足。',
   'hudChrome.mailbox.title': '邮箱',
   'hudChrome.noticeboard.empty': '看起来没有张贴任何内容。',
+  'hudChrome.noticeboard.subtitle': '本服务器的公会',
+  'hudChrome.noticeboard.rosterTitle': '查看{guild}的成员名单',
+  'hudChrome.noticeboard.back': '返回',
+  'hudChrome.noticeboard.popupTitle': '公会告示柱',
+  'hudChrome.noticeboard.close': '关闭',
   'hudChrome.mailbox.subtitle': '渡鸦邮驿',
   'hudChrome.mailbox.close': '关闭邮箱',
   'hudChrome.mailbox.tabInbox': '收件箱',
@@ -8723,6 +8822,9 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.calendar.events.marketDay.note': '商人正等着新货。今天很适合逛逛世界市场。',
   'hudChrome.calendar.events.arenaClash.title': '竞技场之战',
   'hudChrome.calendar.events.arenaClash.note': '决斗者涌向灰烬斗兽场。排队开打，向天梯进发。',
+  'hudChrome.calendar.events.doubleHonor.title': '双倍荣誉周末',
+  'hudChrome.calendar.events.doubleHonor.note':
+    '战营吹响集结号：整个周末，荆谷原野荣誉奖励翻倍，打满全场的败方也按胜方奖励结算。',
   'hudChrome.calendar.events.fishingDerby.title': '钓鱼大赛',
   'hudChrome.calendar.events.fishingDerby.note': '钓手们在湖边排开。带上鱼竿，交流钓鱼趣闻。',
   'hudChrome.calendar.events.delveDay.title': '探窟日',
@@ -9060,7 +9162,6 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.mobile.questStripAriaSingle': '追踪任务：{title}',
   'hudChrome.mobile.questStripMore': '还有 {count} 项',
   // The Vale Cup boarball minigame (docs/prd/vale-cup.md).
-  'hudChrome.keybinds.valecup': '溪谷杯',
   'hudChrome.keybinds.categoryPet': '宠物',
   'hudChrome.keybinds.petAttack': '宠物：攻击',
   'hudChrome.keybinds.petStop': '宠物：停止',
@@ -9068,173 +9169,6 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.keybinds.petTaunt': '宠物：嘲讽',
   'hudChrome.keybinds.petDefensive': '宠物：防御',
   'hudChrome.keybinds.petAggressive': '宠物：攻击性',
-  'hudChrome.vcup.title': '溪谷杯',
-  'hudChrome.vcup.close': '关闭溪谷杯窗口',
-  'hudChrome.vcup.offlineNote': '赛程簿已合上。溪谷杯目前不可用。',
-  'hudChrome.vcup.recordLine': '你的战绩：{wins} 胜，{losses} 负，{draws} 平。',
-  'hudChrome.vcup.bracketsAria': '比赛赛级',
-  'hudChrome.vcup.bracketLabel': '{n}对{n}',
-  'hudChrome.vcup.waitingCount': '{count} 人等待中',
-  'hudChrome.vcup.nationsHeading': '旗帜国度',
-  'hudChrome.vcup.nation.vale': '东溪谷',
-  'hudChrome.vcup.nation.mirefen': '泥沼',
-  'hudChrome.vcup.nation.thornpeak': '荆峰',
-  'hudChrome.vcup.nation.coliseum': '灰烬斗技场',
-  'hudChrome.vcup.nation.choir': '苍白唱诗班',
-  'hudChrome.vcup.nation.ogre': '食人魔氏族',
-  'hudChrome.vcup.nation.moon': '苍白之月',
-  'hudChrome.vcup.nation.copperdig': '铜矿坑',
-  'hudChrome.vcup.awayNote': '若双方举同一面旗帜，客队将使用反转配色。',
-  'hudChrome.vcup.rolesHeading': '运动位置',
-  'hudChrome.vcup.rolesSmallBracketNote':
-    '在1对1和2对2赛级中，所有选手都以全能型出场。要求3对3或更大赛级的功绩在此无法达成。',
-  'hudChrome.vcup.role.allrounder.name': '全能型',
-  'hudChrome.vcup.role.allrounder.desc': '样样都会：踢球、长传，还有一记正当的肩撞。',
-  'hudChrome.vcup.role.striker.name': '前锋',
-  'hudChrome.vcup.role.striker.desc': '为大脚开球和灵巧侧身而生。',
-  'hudChrome.vcup.role.sweeper.name': '清道夫',
-  'hudChrome.vcup.role.sweeper.desc': '把持球者撞开，再把球大脚解围。',
-  'hudChrome.vcup.role.keeper.name': '守门员',
-  'hudChrome.vcup.role.keeper.desc': '用抓球、扑救和长踢守住球门区。',
-  'hudChrome.vcup.queue': '加入队列',
-  'hudChrome.vcup.leaveQueue': '离开队列',
-  'hudChrome.vcup.queueNote': '随时随地排队；哨声会召唤你前往母猪场。',
-  'hudChrome.vcup.queuedStatus': '已排入 {bracket}：第 {position} 位，共 {count} 人。',
-  'hudChrome.vcup.blockNation': '请先选择一个旗帜国度。',
-  'hudChrome.vcup.blockPartySize': '这个赛级需要更小的队伍。',
-  'hudChrome.vcup.blockNotLeader': '只有队长才能为队伍排队。',
-  'hudChrome.vcup.inMatchNote': '你的队伍正在场上。继续比赛！',
-  'hudChrome.vcup.deserterNote': '场地管理员记着呢。{seconds} 秒后才能再次排队。',
-  'hudChrome.vcup.liveHeading': '母猪场现况',
-  'hudChrome.vcup.liveAria': '溪谷杯：{nationA} {scoreA}，{nationB} {scoreB}',
-  'hudChrome.vcup.walkUp': '走到母猪场，从看台上观赛。',
-  'hudChrome.vcup.noLive': '球场很安静。目前没有比赛。',
-  'hudChrome.vcup.boardHeading': '优胜者榜',
-  'hudChrome.vcup.boardEmpty': '尚无优胜记录。铜奶桶还在等待。',
-  'hudChrome.vcup.enterAsGuild': '以 {guild} 的旗号参赛',
-  'hudChrome.vcup.guildRecordLine': '你的公会战绩：{wins} 胜，{losses} 负。',
-  'hudChrome.vcup.guildBoardHeading': '公会旗帜榜',
-  'hudChrome.vcup.guildBoardEmpty': '还没有公会上场。扬起你的旗帜吧！',
-  'hudChrome.vcup.practicingNow': '正在练习（{count}）：',
-  'hudChrome.vcup.boardWins': '{count} 胜',
-  'hudChrome.vcup.practice': '与机器人练习赛',
-  'hudChrome.vcup.practiceNote': '立即在母猪场开始一场完整的机器人比赛。',
-  'hudChrome.vcup.practiceUnratedNote': '练习赛不计入评级：战绩与功绩之书进度均不计算。',
-  'hudChrome.vcup.clock': '{minutes}:{seconds}',
-  'hudChrome.vcup.indicatorQueued': '溪谷杯队列：{bracket}，第 {position} 位，共 {count} 人',
-  'hudChrome.vcup.indicatorLive': '溪谷杯',
-  'hudChrome.vcup.indicatorOpen': '打开溪谷杯窗口',
-  'hudChrome.vcup.phaseCountdown': '{seconds} 秒后开球',
-  'hudChrome.vcup.phaseGoal': '进球！',
-  'hudChrome.vcup.phaseGolden': '金球制',
-  'hudChrome.vcup.phaseOver': '全场结束',
-  'hudChrome.vcup.bannerFound': '溪谷杯开赛：{nationA} 对阵 {nationB}！',
-  'hudChrome.vcup.bannerCountdown': '{seconds} 秒后开球...',
-  'hudChrome.vcup.bannerKickoff': '开球！',
-  'hudChrome.vcup.bannerGoal': '进球！{nation} 破门！',
-  'hudChrome.vcup.bannerSave': '{name} 扑救成功！',
-  'hudChrome.vcup.bannerGolden': '金球制：下一球定胜负！',
-  'hudChrome.vcup.bannerEnd': '全场结束：{nationA} {scoreA}，{nationB} {scoreB}',
-  'hudChrome.vcup.bannerWin': '母猪场的胜利！',
-  'hudChrome.vcup.bannerDraw': '母猪场的比赛以平局收场。',
-  'hudChrome.vcup.bannerLoss': '在母猪场落败。',
-  'hudChrome.vcup.logQueued': '你加入了 {bracket} 溪谷杯队列（第 {position} 位）。',
-  'hudChrome.vcup.logUnqueued': '你离开了溪谷杯队列。',
-  'hudChrome.vcup.logFound': '你的溪谷杯比赛已就绪：{nationA} 对阵 {nationB}。',
-  'hudChrome.vcup.logRoster': '你方：{allies}。对方：{enemies}。',
-  'hudChrome.vcup.logGoal': '{name} 为 {nation} 破门！{nationA} {scoreA}，{nationB} {scoreB}。',
-  'hudChrome.vcup.logSave': '{name} 完成扑救！',
-  'hudChrome.vcup.logWin': '你赢下了母猪场的这一战。',
-  'hudChrome.vcup.logDraw': '母猪场的这一战以平局告终。',
-  'hudChrome.vcup.logLoss': '你输掉了母猪场的这一战。',
-  'hudChrome.vcup.gossipOpen': '赛程簿',
-  'hudChrome.vcup.gossipOpenAria': '打开溪谷杯窗口',
-  'hudChrome.vcup.mobileLabel': '杯赛',
-  'hudChrome.vcup.briefing.subtitle': '赛前简报',
-  'hudChrome.vcup.briefing.vs': '对',
-  'hudChrome.vcup.briefing.rulesHeading': '玩法',
-  'hudChrome.vcup.briefing.rule1': '把球踢或传进对方球门即可得分。',
-  'hudChrome.vcup.briefing.rule2': '先进 5 球者胜，或全场结束时进球最多者胜。',
-  'hudChrome.vcup.briefing.rule3': '全场打平则进入金球赛：下一个进球者获胜。',
-  'hudChrome.vcup.briefing.rule4': '铲球只会把人撞倒，没有人会受伤，丰收休战为证。',
-  'hudChrome.vcup.briefing.rule5': '任何人都可以走上前，在看台上为你助威。',
-  'hudChrome.vcup.briefing.kitHeading': '你的技能',
-  'hudChrome.vcup.briefing.kitNote': '比赛期间，这些动作将取代你的职业技能。',
-  'hudChrome.vcup.briefing.unratedNote':
-    '场上有机器人，因此本场为非评级赛：战绩不会变动，进球、扑救与零封的功绩均不计算。',
-  'hudChrome.vcup.briefing.practiceUnratedNote':
-    '这是练习赛，因此不计入评级：战绩不会变动，功绩之书进度也不计算。',
-  'hudChrome.vcup.briefing.rosterHeading': '出场名单',
-  'hudChrome.vcup.briefing.you': '你',
-  'hudChrome.vcup.briefing.bot': '电脑',
-  'hudChrome.vcup.briefing.ready': '我准备好了',
-  'hudChrome.vcup.briefing.readyDone': '已准备',
-  'hudChrome.vcup.briefing.readyAria': '准备开球',
-  'hudChrome.vcup.briefing.waiting': '正在等待对方准备……',
-  'hudChrome.vcup.briefing.whistle': '开球哨将在 {seconds} 秒后吹响。',
-  'hudChrome.vcup.briefing.readyCount': '已准备 {ready}/{total}',
-  'hudChrome.vcup.bet.title': '本场投注',
-  'hudChrome.vcup.bet.aria': '溪谷杯比赛投注',
-  'hudChrome.vcup.bet.closesIn': '{seconds} 秒后停止投注',
-  'hudChrome.vcup.bet.closed': '投注已截止',
-  'hudChrome.vcup.bet.prize': '奖池 {amount}',
-  'hudChrome.vcup.bet.splitAria': '两队投注池占比',
-  'hudChrome.vcup.bet.expand': '查看并下注',
-  'hudChrome.vcup.bet.collapse': '收起投注',
-  'hudChrome.vcup.bet.oddsLabel': '赔率',
-  'hudChrome.vcup.bet.back': '押注 {team}',
-  'hudChrome.vcup.bet.form': '{wins}胜-{losses}负',
-  'hudChrome.vcup.bet.mine': '你的投注：{amount} 押 {team}',
-  'hudChrome.vcup.bet.none': '你还没有在本场比赛下注。',
-  'hudChrome.vcup.bet.record': '投注战绩：{wins}胜-{losses}负，{sign}{net}',
-  'hudChrome.vcup.bet.wonBanner': '你赢了这注！',
-  'hudChrome.vcup.bet.wonLog': '你的溪谷杯投注赢了：返还 {amount}。',
-  'hudChrome.vcup.bet.lostLog': '你的溪谷杯投注输了：{amount}。',
-  'hudChrome.vcup.bet.refundLog': '投注作废，已退还你的 {amount} 本金。',
-  'guide.nav.valeCup': '溪谷杯',
-  'guide.valeCupPage.heading': '溪谷杯',
-  'guide.valeCupPage.intro':
-    '母猪场上的野猪球：选一面旗帜、选一个位置，把塞满稻草的野猪皮球踢过守门员，去争夺铜奶桶。不流血，无战利品，只有看台的欢呼。',
-  'guide.valeCupPage.loreHeading': '野猪球与丰收休战',
-  'guide.valeCupPage.loreOldSow':
-    '早在亡者苏醒之前，东溪的农工们就在收割后的麦茬地上玩野猪球：两群人，一张塞满稻草的野猪皮，和拖到绿地两端的两扇货车门。第一颗球，“老母猪”，如今镀铜挂在酒馆壁炉上方。',
-  'guide.valeCupPage.loreTruce':
-    '当灰烬斗技场开始批准战争竞技时，红溪元帅以更温和的方式回应：在老绿地上立下长期的丰收休战。货车门变成了球门，绿地有了围墙、看台和一个名字：母猪场。而奖品始终是优胜者们共饮的那只瘪了的奶桶：铜奶桶。',
-  'guide.valeCupPage.howHeading': '怎么玩',
-  'guide.valeCupPage.howQueue':
-    '通过溪谷杯窗口随处排队，或到母猪场大门找场地管理员布拉姆。选择从一对一到五对五的赛级、一面旗帜国度和一个运动位置；可以单排，也可以带上队伍。',
-  'guide.valeCupPage.howMatch':
-    '开球时你的职业技能会被换成运动技能，赛后原样恢复。踢球以地面准星瞄准，球会在挡板上反弹，带球就是推着球跑。在全场结束前比对方进更多球；平局进入金球制。',
-  'guide.valeCupPage.howTruce':
-    '母猪场上无人流血：铲抢只会让人翻滚，什么都不会造成伤害，宠物也会场外休息。',
-  'guide.valeCupPage.spectateBody': '球场同一时间只进行一场比赛，任何人都可以走到看台观赛。',
-  'guide.valeCupPage.nationsHeading': '八个旗帜国度',
-  'guide.valeCupPage.nationsBody':
-    '每支队伍都在一面旗帜下比赛。队长选择国度；若双方举同一面旗，客队使用反转配色。',
-  'guide.valeCupPage.nationVale': '绿与金，扬着麦捆旗：主场球队，骨子里都是农工。',
-  'guide.valeCupPage.nationMirefen': '青与灰，苍鹭旗下：耐心、腿长、从不着急。',
-  'guide.valeCupPage.nationThornpeak': '冰蓝与白，山峰旗下：步伐稳健、性子倔强。',
-  'guide.valeCupPage.nationColiseum': '红与黑，交叉双剑：他们踢起球来仍像在打仗。',
-  'guide.valeCupPage.nationChoir': '淡蓝与银，铃铛旗下：诡异、精准、非常安静。',
-  'guide.valeCupPage.nationOgre': '橙与棕，铁拳当先：肩膀开路，并引以为豪。',
-  'guide.valeCupPage.nationMoon': '紫与银，弯月旗下：夜行的球员，脚步轻盈。',
-  'guide.valeCupPage.nationCopperdig': '铜与褐，别着镐头：跑不停歇的矿工。',
-  'guide.valeCupPage.rolesHeading': '运动位置',
-  'guide.valeCupPage.rolesBody':
-    '你的位置决定你带上球场的技能。人人都会踢球；其余看性情。在一人组和二人组的对局中，所有人都使用全能型的技能套装，因此位置选择要从三人组往上才真正发挥作用。',
-  'guide.valeCupPage.rewardsHeading': '休战规矩',
-  'guide.valeCupPage.rewardsBody':
-    '休战规矩意味着没有经验也没有战利品：一场分出胜负的比赛会计入你的战绩和优胜者榜，而一场胜利也会计入当天的奖励任务。中途弃赛会让你的位置空缺，而场地管理员记着呢。',
-  'guide.valeCupPage.bettingHeading': '栏杆边的小赌怡情',
-  'guide.valeCupPage.bettingBody':
-    '比赛组建期间，母猪场的观众可以押注其中一方：赌注汇入同一个奖池，终场哨响时，赢家按各自下注的比例瓜分输家的奖池。平局，或是一场无人押中的爆冷，会退还每一枚钱币。上场比赛的球员不能给本场下注，而栏杆边会记着你终身的投注胜负与净得钱币。',
-  'guide.valeCupPage.practiceHeading': '练习赛与空闲的球场',
-  'guide.valeCupPage.practiceBody':
-    '溪谷杯窗口还提供练习：一份专属的球场副本，双方都由机器人补满，任何结果都不计入你的战绩。正式比赛还差一两个人？稍等片刻，机器人便会补齐两队，而只要场上有机器人，比赛就只是友谊赛，绝不计入评级。当母猪场空闲时，机器人还会上演一场表演赛，你可以从看台上观赛、下注；一旦有真正的玩家准备就绪，表演赛便会让出球场，所有赌注原数退还。',
-  'entities.npcs.groundskeeper_bram.name': '场地管理员布拉姆',
-  'entities.npcs.groundskeeper_bram.title': '母猪场看守',
-  'entities.npcs.groundskeeper_bram.greeting':
-    '休战约定在母猪场依然有效，{className}：只许用脚和肩膀。想为铜奶桶一战吗？',
   'entities.npcs.chronicler_saul.name': '编年史者绍尔',
   'entities.npcs.chronicler_saul.title': '东溪谷编年史',
   'entities.npcs.chronicler_saul.greeting':
@@ -9947,7 +9881,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.presence_of_mind.description':
     '使你的下一个有施法时间的法术立即完成。持续 60 秒。（法师天赋）',
   'entities.abilities.psychic_scream.description': '使 8 米内的敌人陷入恐惧，最多持续 4 秒。伤害可能打断该效果。',
-  'entities.abilities.shadowstep.description': '穿过暗影，向你的目标迈进。（潜行者天赋）',
+  'entities.abilities.shadowstep.description': '穿过暗影，向你的目标迈进，无论其是敌是友，且不会打破暮帷。（潜行者天赋）',
   'entities.abilities.silence.description': '使目标沉默4秒。（牧师天赋）',
   'entities.abilities.tranquility.description':
     '引导恢复能量4秒，每秒为30码内的盟友恢复42至52点生命值。（德鲁伊天赋）',
@@ -10043,7 +9977,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
     '你接下来两个有施法时间的法术可以在移动中施放。持续 15 秒。（法师天赋）',
   'entities.abilities.ignition.name': '点燃',
   'entities.abilities.ignition.description':
-    '被动：你的法术暴击会灼烧目标，在 6 秒内造成相当于该次伤害 40% 的伤害，可叠加。（火焰精通）',
+    '被动：你的法术暴击会灼烧目标，在 6 秒内造成相当于该次伤害 30% 的伤害，可叠加。（火焰精通）',
   'entities.abilities.mass_barrier.name': '群体屏障',
   'entities.abilities.mass_barrier.description':
     '为你和 30 米内至多 4 名附近盟友施加护盾，每个护盾吸收 130 点伤害，持续 60 秒。（法师天赋）',
@@ -11035,13 +10969,13 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_prof_amends_smith.objectives.0.label': '击败森林狼',
   'entities.quests.q_prof_amends_outfitter.title': '重续经纬',
   'entities.quests.q_prof_amends_outfitter.text':
-    '到底还是回到我的织机前了。我不记恨，{playerName}，可丝线记得那只放它走的手，而重新拾起的代价，每一次都量得更长。去剿除挤满东边树林的墨网潜伏者，这份苦工会在你的手再次触到好丝之前，先把它安顿稳当。',
+    '到底还是回到我的织机前了。我不记恨，{playerName}，可丝线记得那只放它走的手，而重新拾起的代价，每一次都量得更长。去剿除挤满东北边树林的墨网潜伏者，这份苦工会在你的手再次触到好丝之前，先把它安顿稳当。',
   'entities.quests.q_prof_amends_outfitter.completion':
     '又稳了。制皮和裁缝作为主修技艺回到你手中。这一次，在你游荡之前先量两次。',
   'entities.quests.q_prof_amends_outfitter.objectives.0.label': '已剿除墨网潜伏者',
   'entities.quests.q_prof_amends_apothecary.title': '重回灶台',
   'entities.quests.q_prof_amends_apothecary.text':
-    '瞧瞧，谁又回到我的锅边了。不计前嫌，{playerName}，厨房里总有位置，可你知道，你每撂挑子走一回，这笔账就赊得更长。去西边草地里把野猪清一清，因为实打实的汗水是第一味料，它会让你的手重新记起这份活计。',
+    '瞧瞧，谁又回到我的锅边了。不计前嫌，{playerName}，厨房里总有位置，可你知道，你每撂挑子走一回，这笔账就赊得更长。去西北边草地里把野猪清一清，因为实打实的汗水是第一味料，它会让你的手重新记起这份活计。',
   'entities.quests.q_prof_amends_apothecary.completion':
     '这才是那股老味道。炼金术和烹饪重新回到你的灶台上，成为主修技艺。这一次多留一阵吧。',
   'entities.quests.q_prof_amends_apothecary.objectives.0.label': '已猎杀野猪',
@@ -11499,7 +11433,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
     '功绩之书伴随这一切的每一步。首次调谐获得“誓艺者”，首次杰作获得“杰作锻师”，均可作为头衔佩戴。十种可修制作行业各在技能50记下一个里程碑功绩，并在各自的上限处加冕宗师头衔；钓鱼则在熟练度100获得“老渔翁”，200获得“垂钓宗师”头衔。\n\n此外还有更静默的篇章：首次采集与首次制作的功绩、野外撞见的稀罕发现，以及拾起拆解之路的功绩。这一切皆为装饰，只有头衔与名望。功绩永不赋予力量，它只证明你曾在场。',
   'guide.professions.startHeading': '从哪里开始',
   'guide.professions.startBody':
-    '初到Eastbrook？找Foreman Odell接下A Trade for Every Hand，他会指给你镇东南Copper Dig一带的矿脉。此后旅途中经过的每处矿脉、树木与草药都值得采集。回到镇上按T打开制作窗口，先做人人都会的普通配方，再去锻造坊、厨房、织机与工坊拜访诸位大师，顺便接下他们的工作订单换取稳定的铜板。等公会的信找到你时，你早已知道哪一对行业才是归宿。',
+    '初到Eastbrook？找Foreman Odell接下A Trade for Every Hand，他会指给你镇东北Copper Dig一带的矿脉，让你磨出最初的老茧。留意矿坑本身：驻扎在那里的深岩挖掘者等级比新手高出几级，所以先采外围的矿脉，等级练起来一些之后再去碰营地核心。此后旅途中经过的每处矿脉、树木与草药都值得采集，熟练度自然而然会随旅途积累。\n\n回到镇上按T打开制作窗口，先做人人都会的普通配方，再去锻造坊、厨房、织机与工坊拜访诸位大师，看看他们教些什么，顺便接下他们的工作订单换取稳定的铜板。等公会的信找到你时，你早已知道哪一对行业才是归宿。',
   'guide.profPages.yieldsHeading': '一次采集的收获',
   'guide.profPages.yieldsBody':
     '每次采集都会掷出品质，而熟练度决定一切：新手永远采到普通品，熟练度越高，权重越向高品质移动，绝不倒退。到100上限时普通品完全消失：60%优秀、30%精良、8%史诗、2%传说。品质也意味着数量：普通1个，优秀与精良2个，史诗3个，传说4个。精良及以上的收获都会以你的名字署名（Gathered by），封顶时十次采集有四次带着你的名字。',
@@ -11571,16 +11505,16 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
     '长袍里的Pristine Silk本身就补足署名材料加成，金叶与日瓣草分别算一、二级材料，精良档因此触发率最高；背包之类无属性的成品永不触发，因为杰作是对属性的提升，而背包没有属性。\n\n路线：homespun到25，鎏金织一开即练并做到50，再做精良档到75；75之后靠Wardweave Cowl（三层配方，到99全速、之后半速），最后五十点约75次，每次两块Pristine Silk、四束蛛丝、日瓣草与金叶各两、两份线。\n\n让攀升自给自足：背包卖给所有人，Ottilie的织机订单每30分钟收六束蛛丝。功业之书在技能50记下A Fine Seam，125等着Grandmaster Tailoring。',
   'guide.profPages.craftProse.leatherworking.identityHeading': '迅捷者的皮甲',
   'guide.profPages.craftProse.leatherworking.identityBody':
-    "梯子从朴素的Fenbridge硬皮件经优秀的marshstalker件爬到精良的mirewarden套装，工匠能裁出的最好皮甲。两件法系皮件补全阵容：野外普通件Eastbrook Druid's Hide与技能75的Duskhide Wraps。制皮位于烹饪与裁缝之间；制装师在Eastbrook的Weaver Ottilie处宣誓，与烹饪组成的Trapper暂无誓约任务。",
+    "梯子从朴素的Fenbridge硬皮件经优秀的marshstalker件爬到精良的mirewarden套装，工匠能裁出的最好皮甲。两件法系皮件补全阵容：野外普通件Eastbrook Druid's Hide与技能50的Duskhide Wraps。制皮位于烹饪与裁缝之间；制装师在Eastbrook的Weaver Ottilie处宣誓，与烹饪组成的Trapper暂无誓约任务。",
   'guide.profPages.craftProse.leatherworking.materialsHeading': '狩猎即收获',
   'guide.profPages.craftProse.leatherworking.materialsBody':
-    '在制皮这里，练级路线与供应线是同一条：粗皮直接从带皮尸体上剥取（狼和野猪最多），每具尸体只服务先到的一人。精良及以上的采集还会给出Pristine Hide，Mirewarden Jerkin正需要这种署名标本，见一块存一块。\n\n配角不多：蛛腿与蛛丝、人形生物的家纺布、每件mirewarden精良品一块锇矿（Duskhide Wraps顶阶要六块），以及制革坊柜台16铜的Tanning Agent。不想挖矿的话Tanner Hesk也卖锇矿。',
+    '在制皮这里，练级路线与供应线是同一条：粗皮直接从带皮尸体上剥取（狼和野猪最多），每具尸体只服务先到的一人。精良及以上的采集还会给出Pristine Hide，Mirewarden Jerkin正需要这种署名标本，见一块存一块。\n\n配角不多：蛛腿与蛛丝、人形生物的家纺布、每件mirewarden精良品一块锇矿（Duskhide Wraps要六块），以及制革坊柜台16铜的Tanning Agent。锇矿本身从不在柜台出售：只能自己开采，无论是在荆峰还是几乎任何新手区域的入门矿脉（唯独远岸只挖得到铁矿），或是向其他玩家购买。',
   'guide.profPages.craftProse.leatherworking.ladderHeading': '在Fenbridge受训',
   'guide.profPages.craftProse.leatherworking.ladderBody':
-    "特别之处：制革坊在Mirefen Marsh路上的Fenbridge，这是唯一在Eastbrook之外受训的深度行业。Tanner Hesk在他的鞣池边授课：硬皮档技能0免费，marshstalker档技能25每个25银，mirewarden档技能50每个1金。两件配方跳过训练师：野外普通件（Tanned Leather Jerkin与Druid's Hide）随处可做，Duskhide Wraps人人都会但要技能75且绑定制革坊。注意制装师誓约本身在Eastbrook的Ottilie处宣誓，只有授课在沼泽。",
+    "特别之处：制革坊在Mirefen Marsh路上的Fenbridge，这是唯一在Eastbrook之外受训的深度行业。Tanner Hesk在他的鞣池边授课：硬皮档技能0免费，marshstalker档技能25每个25银，mirewarden档技能50每个1金。三件配方跳过训练师：野外普通件（Tanned Leather Jerkin与Druid's Hide）随处可做，Duskhide Wraps人人都会，技能50起即可在制革坊制作。注意制装师誓约本身在Eastbrook的Ottilie处宣誓，只有授课在沼泽。",
   'guide.profPages.craftProse.leatherworking.routeHeading': '杰作与通往125之路',
   'guide.profPages.craftProse.leatherworking.routeBody':
-    "marshstalker档及以上都掷杰作，Mirewarden Jerkin里的Pristine Hide自动提供署名材料加成；锇矿算一级材料。无属性的硬皮普通件不会触发。\n\n自然而然地练：从一级起剥下每只狼和野猪，硬皮档随地做到25，随任务进沼泽时顺路受训；marshstalker到50，mirewarden到75，此后Duskhide Wraps（三层配方，六块锇矿、三块Pristine Hide、两块粗皮、一份Tanning Agent）到99全速、之后半速，最后五十点约75次。75专精后移动制革坊尤其宝贵：营火边就能把一袋皮子变成成品。Hesk的订单每30分钟收八张粗皮。技能50记下Tanner's Trade，上限处是Grandmaster Leatherworking。",
+    "marshstalker档及以上都掷杰作，Mirewarden Jerkin里的Pristine Hide自动提供署名材料加成；锇矿算一级材料。无属性的硬皮普通件不会触发。\n\n自然而然地练：从一级起剥下每只狼和野猪，硬皮档随地做到25，随任务进沼泽时顺路受训；marshstalker到50，而mirewarden各件与Duskhide Wraps会将稀有档从50带到75。过了75，这些二层配方的收益减半、再减至四分之一，最后五十点约需150次才能到达125点上限；未达到主修上限时，它们仍与精良品质的制作上限持平，而不会直接归零。75专精后移动制革坊尤其宝贵：营火边就能把一袋皮子变成成品。Hesk的订单每30分钟收八张粗皮。技能50记下Tanner's Trade，上限处是Grandmaster Leatherworking。",
   'guide.profPages.craftProse.cooking.identityHeading': '喂饱队伍的锅',
   'guide.profPages.craftProse.cooking.identityBody':
     "吃下熟食会在18秒的休息中治疗你，这是拉怪间隙最便宜的治疗。梯子从90点治疗的Pan-Seared River Perch经980点的Marlow's Grand Roast，一路做到其上的三道顶级分职佳肴（1392点），这是游戏中最大的坐地回复，也是吃完整盘后所能留下的最强精神饱满效果（农场厨房的增益菜肴填补其下的各级）。烹饪位于炼金术与制皮之间；药剂师（炼金术与烹饪）在Eastbrook厨房的Cook Marlow处宣誓（先为锅猎四头野猪），与制皮组成的Trapper暂无誓约任务。",
@@ -12152,7 +12086,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
     '立即向 20 米内的敌人掷出圣锤，造成 {damage} 点伤害，恢复 70 点法力，为自己恢复相当于伤害量 50% 的生命值，并在造成伤害时产生 1 点虔诚。烈阳反击会使恩典之锤无视冷却时间，并为你恢复相当于伤害量 100% 的生命值。',
   'entities.abilities.hammer_of_grace.name': '恩典之锤',
   'entities.abilities.hex_of_violence.description':
-    '诅咒敌人8秒。其接下来的3次伤害行为各生成7点谴罪，并反噬22点暗影伤害。',
+    '诅咒敌人8秒。其接下来的3次伤害行为各生成7点谴罪，并反噬17点暗影伤害。',
   'entities.abilities.hex_of_violence.name': '暴行咒',
   'entities.abilities.hour_of_judgment.description':
     '对你的主要邪眼降下持续15秒的审判，获得40点谴罪和3层命运丝线，激活附身，使通过主要邪眼生成的谴罪翻倍，并使裁决伤害提高20%。第一次裁决返还50点谴罪。',
@@ -12377,7 +12311,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
     '发动高仇恨攻击并产生 1 点虔诚。成功命中有 20% 几率获得持续 8 秒的烈阳反击；每次成功格挡有 25% 几率触发。烈阳反击会强化你的下一次向阳飞盾、恩典之锤或治愈之光。升华还会给予一个小型吸收护盾。',
   'entities.abilities.vowkeeper_strike.name': '守誓者打击',
   'entities.abilities.warspirit_cadence.description':
-    '被动：每第3次命中的武器攻击会触发2次裂风回响，各造成50%自然伤害，并获得持续12秒的风暴施法。风暴施法使下一个奥术闪电、震击或治愈之水瞬发且法力消耗降低50%。先祖打击计作2次攻击。（战魂）',
+    '被动：双持攻击不会有额外的落空几率。每第3次命中的武器攻击会触发2次裂风回响，各造成25%自然伤害，并获得持续12秒的风暴施法。风暴施法使下一个奥术闪电、震击或治愈之水瞬发且法力消耗降低50%。先祖打击计作2次攻击。（战魂）',
   'entities.abilities.warspirit_cadence.name': '战魂节律',
   'entities.abilities.wildheart.description': '立即恢复最大生命值的 30%。',
   'entities.abilities.wildheart.name': '野性之心',
@@ -13538,6 +13472,273 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.perf.diagnostics.report.notAvailable': '不可用',
   'hudChrome.perf.diagnostics.report.status.critical': '严重',
   'hudChrome.perf.diagnostics.report.status.needsAttention': '需要注意',
+  // The Proving Shore (tutorial island) + the spawn greeting dialog.
+  'hudChrome.tutorialGreeting.bodyFirst':
+    '这张面孔我可没见过，朋友。在这片土地上，初次踏上冒险之路的人照传统都会去试炼之滨走一趟，那是海峡对面的一座安静小岛。在那里你可以先磨练身手、熟悉这个世界，再去迎接它的挑战。渡船来回都通，去或不去都没人会小看你。',
+  'hudChrome.tutorialGreeting.bodyRefresher':
+    '又换了一副新面孔回来了？那你知道该怎么做。不过，出发前若想温习一遍，试炼之滨从不拒绝回炉的学生，渡船随时候着你。',
+  'hudChrome.tutorialGreeting.play': '进行新手教学',
+  'hudChrome.tutorialGreeting.skip': '跳过新手教学',
+  'hudChrome.tutorialGreeting.declineNote':
+    '随你的意，朋友。哪天改了主意，鸦邮信箱旁的渡船铃随时都能送你去试炼之滨，不分昼夜。狼群不等人，它等。',
+  'hudChrome.tutorialGreeting.bellHomeNote':
+    '这么快就从海滨回来了？你刚才敲响的正是渡船铃。它的孪生兄弟就挂在那边鸦邮信箱旁：想回试炼之滨，随时敲响它，渡航就会送你过去。敲错了也不打紧。',
+  'hudChrome.tutorialGreeting.islandArrivalNote':
+    '刚下渡船吗？欢迎来到试炼之滨。看守塔姆就在你正前方的海滩上守着试炼跑道：走到他跟前，直到他的名字显示出来，然后按 F，或者用鼠标左键点击他，他的跑道会把你双腿该会的都教给你。等你准备离开时，敲响立在我码头旁的那口铃，渡航就会送你回东溪镇。',
+  'hudChrome.tutorialGreeting.noteClose': '明白了',
+  'hudChrome.bootcamp.title': '最初的脚步',
+  'hudChrome.bootcamp.talkTitle': '与看守塔姆交谈',
+  'hudChrome.bootcamp.talkBody':
+    '看守塔姆就在前方守着试炼跑道的大门。走到他跟前，直到他的名字显示出来，然后按 {interactKey}，或者用鼠标左键点击他，与他交谈：他会给你安排这趟跑道。',
+  'hudChrome.bootcamp.talkBodyTouch':
+    '看守塔姆就在前方守着试炼跑道的大门。走到他跟前，直到他的名字显示出来，然后点按他，或点按使用按钮，与他交谈：他会给你安排这趟跑道。',
+  'hudChrome.bootcamp.talkBodyPad':
+    '看守塔姆就在前方守着试炼跑道的大门。走到他跟前，直到他的名字显示出来，然后按下互动键与他交谈：他会给你安排这趟跑道。',
+  'hudChrome.bootcamp.forwardTitle': '走过第一条跑道',
+  'hudChrome.bootcamp.forwardBody':
+    '走进塔姆身旁的跑道，按住 {forwardKey}，沿跑道向西走到旗帜处。',
+  'hudChrome.bootcamp.forwardBodyTouch':
+    '走进塔姆身旁的跑道，把移动摇杆推向上方，沿跑道向西走到旗帜处。',
+  'hudChrome.bootcamp.forwardBodyPad':
+    '走进塔姆身旁的跑道，把左摇杆推向上方，沿跑道向西走到旗帜处。',
+  'hudChrome.bootcamp.turnwalkTitle': '转身，再走',
+  'hudChrome.bootcamp.turnwalkBody':
+    '第一面旗到手。按住 {turnKey} 原地转身，直到正对向南延伸的围栏跑道，然后再次按住 {forwardKey}，沿跑道走到第二面旗。',
+  'hudChrome.bootcamp.turnwalkBodyTouch':
+    '第一面旗到手。用手指拖动世界画面（不是移动摇杆）来转身，直到正对向南延伸的围栏跑道，然后把摇杆推向上方，沿跑道走到第二面旗。',
+  'hudChrome.bootcamp.turnwalkBodyPad':
+    '第一面旗到手。推动右摇杆转身，直到正对向南延伸的围栏跑道，然后把左摇杆推向上方，沿跑道走到第二面旗。',
+  'hudChrome.bootcamp.strafeTitle':
+    '转身，然后前进',
+  'hudChrome.bootcamp.strafeBody':
+    '只剩最后一个弯。按住 {turnLeftKey} 原地转身，直到正对最后一条跑道，然后再次按住 {forwardKey}，一直走到红旗被你甩在身后。',
+  'hudChrome.bootcamp.strafeBodyTouch':
+    '只剩最后一个弯。用手指划动画面（不是移动摇杆）转身，直到正对最后一条跑道，然后把摇杆上推，一直走到红旗被你甩在身后。',
+  'hudChrome.bootcamp.strafeBodyPad':
+    '只剩最后一个弯。推动右摇杆转身，直到正对最后一条跑道，然后把左摇杆上推，一直走到红旗被你甩在身后。',
+  'hudChrome.bootcamp.cameraTitle': '转动视角',
+  'hudChrome.bootcamp.cameraBody':
+    '交上成绩之前还有最后一课：按住鼠标右键并拖动，把视角绕着自己整整转上一圈。知道身后站着什么，才能打赢仗。',
+  'hudChrome.bootcamp.cameraBodyTouch':
+    '交上成绩之前还有最后一课：用手指拖动世界画面，把视角绕着自己整整转上一圈。知道身后站着什么，才能打赢仗。',
+  'hudChrome.bootcamp.cameraBodyPad':
+    '交上成绩之前还有最后一课：推动右摇杆，把视角绕着自己整整转上一圈。知道身后站着什么，才能打赢仗。',
+  'hudChrome.bootcamp.courseProgress': '旗帜 {current}/{total}',
+  'hudChrome.bootcamp.doneTitle': '跑完全程',
+  'hudChrome.bootcamp.doneBody':
+    '腿上的功夫就这些了。监工佩尔就站在红旗旁边：对着他按 {interactKey}，或者用鼠标左键点击他，交上你的成绩，领取你的第一份报酬。',
+  'hudChrome.bootcamp.doneBodyTouch':
+    '腿上的功夫就这些了。监工佩尔就站在红旗旁边：点按他，交上你的成绩，领取你的第一份报酬。',
+  'hudChrome.bootcamp.doneBodyPad':
+    '腿上的功夫就这些了。监工佩尔就站在红旗旁边：按下互动键，交上你的成绩，领取你的第一份报酬。',
+  'hudChrome.bootcamp.coachNextTitle': '下一位：{npc}',
+  'hudChrome.bootcamp.coachNextBody':
+    '沿着金色路径去找{npc}。走到跟前直到名字显示出来，然后按 {interactKey}，或者用鼠标左键点击对方，接下你的下一件差事。',
+  'hudChrome.bootcamp.coachNextBodyTouch':
+    '沿着金色路径去找{npc}。走到跟前直到名字显示出来，然后点按对方，或点按使用按钮，接下你的下一件差事。',
+  'hudChrome.bootcamp.coachNextBodyPad':
+    '沿着金色路径去找{npc}。走到跟前直到名字显示出来，然后按下互动键，接下你的下一件差事。',
+  'hudChrome.bootcamp.coachTaskBody':
+    '沿着金色路径去完成差事。右侧的追踪栏随时记着进度，迷了路就按 {mapKey} 打开地图。',
+  'hudChrome.bootcamp.coachTaskBodyTouch':
+    '沿着金色路径去完成差事。右侧的追踪栏随时记着进度，迷了路就点按地图按钮看路。',
+  'hudChrome.bootcamp.coachTaskBodyPad':
+    '沿着金色路径去完成差事。右侧的追踪栏随时记着进度，迷了路就按下地图按钮看路。',
+  'hudChrome.bootcamp.coachReadyTitle': '差事办妥',
+  'hudChrome.bootcamp.coachReadyBody':
+    '前往{npc}身边，按 {interactKey}，或者用鼠标左键点击对方，交上差事，领取报酬。',
+  'hudChrome.bootcamp.coachReadyBodyTouch': '前往{npc}身边，点按对方，交上差事，领取报酬。',
+  'hudChrome.bootcamp.coachReadyBodyPad':
+    '前往{npc}身边，按下互动键，交上差事，领取报酬。',
+  'hudChrome.bootcamp.taskStrikeTrueBody':
+    '走到一个草人跟前，用鼠标左键点击它，把它设为目标：它的名字会出现在屏幕上方。然后按 {attackKey}，或者点击动作条上的第一个按钮，挥出这一刀。一直打到一个散架为止。',
+  'hudChrome.bootcamp.taskStrikeTrueBodyTouch':
+    '走到一个草人跟前，点按它，把它设为目标。然后点按动作条上的第一个按钮，挥出这一刀。一直打到一个散架为止。',
+  'hudChrome.bootcamp.promptTurnIn':
+    '交任务',
+  'hudChrome.bootcamp.promptSelect':
+    '选择目标',
+  'hudChrome.bootcamp.promptUseAbility':
+    '使用技能',
+  'hudChrome.bootcamp.taskHoneBody':
+    '用鼠标左键点击一个草人把它设为目标，然后按 {abilityKey} 使用{ability}。那是你自己的本事，不是随手一挥。命中三次。',
+  'hudChrome.bootcamp.taskHoneBodyTouch':
+    '点击一个草人把它设为目标，然后点击动作条上的{ability}。那是你自己的本事，不是随手一挥。命中三次。',
+  'hudChrome.bootcamp.taskHoneBodyPad':
+    '把一个草人设为目标，然后按放着{ability}的动作按钮。那是你自己的本事，不是随手一挥。命中三次。',
+  'hudChrome.bootcamp.promptOpenBags': '打开背包',
+  'hudChrome.bootcamp.promptCharacterSheet': '打开角色面板',
+  'hudChrome.bootcamp.promptLookAround': '按住右键拖动来环视四周',
+  'hudChrome.bootcamp.promptKneel':
+    '跪下',
+  'hudChrome.bootcamp.taskLongWalkBody':
+    '按 {bagsKey} 打开背包，然后点击往生石。它会让你就地倒下。这里没有任何东西能伤到你，这么做也不会让你损失什么。',
+  'hudChrome.bootcamp.taskLongWalkBodyTouch':
+    '沿着海岸路往南走到往生石前，点击它跪下。这里没有任何东西能伤到你，这么做也不会让你损失什么。',
+  'hudChrome.bootcamp.taskLongWalkBodyPad':
+    '沿着海岸路往南走到往生石前，按互动按钮跪下。这里没有任何东西能伤到你，这么做也不会让你损失什么。',
+  'hudChrome.bootcamp.taskLongWalkDeadBody':
+    '你死了。什么也没丢。按下释放灵魂，你会在营地后面的墓地化作幽魂站起来。',
+  'hudChrome.bootcamp.taskLongWalkDeadBodyTouch':
+    '你死了。什么也没丢。点击释放灵魂，你会在营地后面的墓地化作幽魂站起来。',
+  'hudChrome.bootcamp.taskLongWalkDeadBodyPad':
+    '你死了。什么也没丢。选择释放灵魂，你会在营地后面的墓地化作幽魂站起来。',
+  'hudChrome.bootcamp.taskLongWalkGhostBody':
+    '你现在是幽魂，没有东西碰得到你。你的尸体在地图上有标记：走回去，靠近之后就会出现在尸体处复活的按钮。按下它，你就完好如初，没有任何惩罚。',
+  'hudChrome.bootcamp.taskLongWalkGhostBodyTouch':
+    '你现在是幽魂，没有东西碰得到你。你的尸体在地图上有标记：走回去，靠近之后就会出现在尸体处复活的按钮。点击它，你就完好如初，没有任何惩罚。',
+  'hudChrome.bootcamp.taskLongWalkGhostBodyPad':
+    '你现在是幽魂，没有东西碰得到你。你的尸体在地图上有标记：走回去，靠近之后就会出现在尸体处复活的按钮。选择它，你就完好如初，没有任何惩罚。',
+  'hudChrome.bootcamp.promptLootPearl':
+    '拾取珍珠',
+  'hudChrome.bootcamp.taskStrikeTrueBodyPad':
+    '走到一个草人跟前，按下目标键把它设为目标。然后按下第一个动作键，挥出这一刀。一直打到一个散架为止。',
+  'hudChrome.bootcamp.taskShellBody':
+    '掠蟹是会回击的。用鼠标左键点击一只，把它设为目标，然后按 {abilityKey} 使用{ability}，不停攻击。要是一次有太多只扑上来，就沿小路往回撤：它们很快就会放弃追赶，休息时你的生命值也会慢慢回满。',
+  'hudChrome.bootcamp.taskShellBodyTouch':
+    '掠蟹是会回击的。点击一只把它设为目标，然后点击动作条上的{ability}。要是一次有太多只扑上来，就沿小路往回撤：它们很快就会放弃追赶，休息时你的生命值也会慢慢回满。',
+  'hudChrome.bootcamp.taskShellBodyPad':
+    '掠蟹是会回击的。把一只设为目标，然后按放着{ability}的动作按钮。要是一次有太多只扑上来，就沿小路往回撤：它们很快就会放弃追赶，休息时你的生命值也会慢慢回满。',
+  'hudChrome.bootcamp.taskWreckLineBody':
+    '漂流货箱沿着通往晨憩营地的小路一路排开。走到一只漂流货箱跟前，直到它的名字显示出来，然后按 {interactKey}，或者用鼠标左键点击货箱，把它捡起来。凑满六只，这批海货就齐了。',
+  'hudChrome.bootcamp.taskWreckLineBodyTouch':
+    '漂流货箱沿着通往晨憩营地的小路一路排开。走到一只漂流货箱跟前，直到它的名字显示出来，然后点按货箱，或点按使用按钮，把它捡起来。凑满六只，这批海货就齐了。',
+  'hudChrome.bootcamp.taskWreckLineBodyPad':
+    '漂流货箱沿着通往晨憩营地的小路一路排开。走到一只漂流货箱跟前，直到它的名字显示出来，然后按下互动键把它捡起来。凑满六只，这批海货就齐了。',
+  'hudChrome.bootcamp.taskPouchBody':
+    '对着{npc}按 {interactKey}，或者用鼠标左键点击对方，打开货摊，然后用鼠标左键点击亚麻小袋买下它。',
+  'hudChrome.bootcamp.taskPouchBodyTouch': '点按{npc}打开货摊，然后点按亚麻小袋买下它。',
+  'hudChrome.bootcamp.taskPouchBodyPad':
+    '对着{npc}按下互动键打开货摊，然后选中亚麻小袋买下它。',
+  'hudChrome.bootcamp.readyPouchBody':
+    '小袋已买下。按 {bagsKey} 打开背包，用鼠标左键点击亚麻小袋，把它系进一个空着的袋扣。然后前往{npc}身边，按 {interactKey}，把小袋亮给对方看。',
+  'hudChrome.bootcamp.readyPouchBodyTouch':
+    '小袋已买下。打开背包，点按亚麻小袋，把它系进一个空着的袋扣。然后前往{npc}身边，点按对方，把小袋亮给对方看。',
+  'hudChrome.bootcamp.readyPouchBodyPad':
+    '小袋已买下。打开背包，选中亚麻小袋，把它系进一个空着的袋扣。然后前往{npc}身边，按下互动键，把小袋亮给对方看。',
+  'hudChrome.bootcamp.bellTitle': '敲响渡船铃',
+  'hudChrome.bootcamp.bellBody':
+    '你的航程已经挣到了。走到码头旁的渡船铃跟前，按 {interactKey}，或者用鼠标左键点击它，扬帆前往东溪镇。',
+  'hudChrome.bootcamp.bellBodyTouch':
+    '你的航程已经挣到了。走到码头旁的渡船铃跟前，点按它，扬帆前往东溪镇。',
+  'hudChrome.bootcamp.bellBodyPad':
+    '你的航程已经挣到了。走到码头旁的渡船铃跟前，按下互动键，扬帆前往东溪镇。',
+  'entities.zones.proving_shore.pois.4.label': '试炼跑道',
+  'entities.items.ps_castaway_crate.name': '漂流货箱',
+  'entities.items.ps_ferry_bell.name': '渡船铃',
+  'entities.mobs.training_effigy.name': '训练草人',
+  'entities.mobs.shore_scuttler.name': '滩涂掠蟹',
+  'entities.npcs.wayfarer_bryn.name': '旅人布琳',
+  'entities.npcs.wayfarer_bryn.title': '港口向导',
+  'entities.npcs.wayfarer_bryn.greeting':
+    '东溪谷来者不拒，朋友。而对脚下还不稳的人来说，总还有试炼之滨：鸦邮信箱旁的渡船铃一年到头随时送你过去，岛上那口孪生铃再送你回家。',
+  'entities.npcs.instructor_maren.name': '教官玛伦',
+  'entities.npcs.instructor_maren.title': '试炼导师',
+  'entities.npcs.instructor_maren.greeting':
+    '谷地感激过的每一位英雄，都曾站在你现在站的地方，{className}，而且当时没有一个人分得清剑该握哪头。这片海滨就是为此而设。尽管问，尽管练，在失败不要紧的地方尽管失败。',
+  'entities.npcs.quartermaster_finch.name': '军需官芬奇',
+  'entities.npcs.quartermaster_finch.title': '营地补给商',
+  'entities.npcs.quartermaster_finch.greeting':
+    '我的柜台只卖一样东西，{playerName}：一只装路上零碎的备用小袋，等课业用得着它的时候才卖。这里其余的都是要运回谷地的打捞货。铜板能买下小袋，而铜板要靠干活挣来。这就是全部的经济学，它永远不会变得更复杂。只会变得更大。',
+  'entities.npcs.ferryman_odo.name': '渡船人奥多',
+  'entities.npcs.ferryman_odo.title': '渡口看守',
+  'entities.npcs.ferryman_odo.greeting':
+    '刚下渡船吗，{playerName}？看守塔姆就在码头正南的海滩上守着试炼跑道：先去跑一趟他的跑道，你的双腿会感谢你的。这片海滨的每一位看守都会在你办完差事后把你交给下一位，屏幕顶端的那张卡片永远知道下一步该往哪儿走。等谷地召唤你回去时，敲响立在我码头旁的那口铃，渡航会把你送到东溪镇上。',
+  'entities.npcs.warden_tam.name': '看守塔姆',
+  'entities.npcs.warden_tam.title': '试炼跑道的看守',
+  'entities.npcs.warden_tam.greeting':
+    '这几条跑道就是试炼跑道，{playerName}，谷地敬重的每一位冒险者都跑过它。栏杆上的灯柱整夜不灭，跑道从不打烊。',
+  'entities.npcs.overseer_pell.name': '监工佩尔',
+  'entities.npcs.overseer_pell.title': '试炼跑道监工',
+  'entities.npcs.overseer_pell.greeting':
+    '每一趟从这几条跑道下来的成绩都由我掐表，{playerName}，比这难看得多的脚步我也见过。我身后的路通往练武场：脚上功夫变成剑上功夫，就在那里。',
+  'entities.npcs.drillmaster_rook.name': '操练官鲁克',
+  'entities.npcs.drillmaster_rook.title': '练武场主管',
+  'entities.npcs.drillmaster_rook.greeting':
+    '先打稻草，再打壳，{playerName}。草人教你的手臂怎么挥刀；海滩那头的掠蟹教它落在一个会计较的对象身上。',
+  'entities.npcs.tidewarden_nel.name': '守潮人奈尔',
+  'entities.npcs.tidewarden_nel.title': '海滩的看守',
+  'entities.npcs.tidewarden_nel.greeting':
+    '潮水会拿走，潮水也会偿还，{playerName}。这两笔账都由我来记：掠蟹从残骸里夹走的，和诚实的双手沿这条路扛上来的。',
+  'entities.quests.q_ps_the_gauntlet.title': '跑过试炼跑道',
+  'entities.quests.q_ps_the_gauntlet.text':
+    '谷地敬重的每一双腿，都是先从这几条跑道跑出来的，{playerName}。沿第一条跑道向西走到旗帜处，原地转过身来，沿南边的跑道走到第二面旗，最后沿末尾的跑道横移到红旗处。旗帜要按顺序经过；屏幕上方的卡片会随时告诉你该按哪个键。监工佩尔在跑道尽头掐着每一趟的表：等红旗被你甩在身后，他就站在那里等着收你的成绩。',
+  'entities.quests.q_ps_the_gauntlet.completion':
+    '这一趟我掐了表，{playerName}，比你脚快的人我也刷下去过。试炼跑道是你的了。我身后的路通往练武场，操练官鲁克在那里把脚上功夫变成剑上功夫：你的下一件差事在他手里。',
+  'entities.quests.q_ps_the_gauntlet.objectives.0.label': '经过试炼跑道旗帜',
+  'entities.npcs.bursar_wick.name': '司库威克',
+  'entities.npcs.bursar_wick.title': '镀金保险箱',
+  'entities.npcs.bursar_wick.greeting':
+    '镀金保险箱连这里也设了一张桌子，{playerName}。凡是存到我这里的东西，都躺在每座城镇每位司库身后的同一座金库里，狼咬不着，水泡不着，连你自己的糊涂决定也碰不着。',
+  'entities.quests.q_ps_strike_true.title': '击中要害',
+  'entities.quests.q_ps_strike_true.text':
+    '练完了脚，该练手臂了，{playerName}。练武场就在我身后沿路而上的地方，那里的草人生来就是挨打的。要是找不着路，按 M 打开地图：你身上的每件差事都会标在上面。走到一个草人跟前，按 Tab 或用鼠标左键点击它，把它设为目标，然后按 1，或者点击屏幕底部动作条上的第一个图标，挥出这一刀。一直打到一个散架为止；它不会还手，草人从来不还手。操练官鲁克在练武场西侧、通往海滩的小路启程的地方看着场子：对着他按 F，交上这份战果。',
+  'entities.quests.q_ps_strike_true.completion':
+    '干净利落的一击，手也已经稳多了。记住这种感觉，{playerName}：选定目标，挥刀，然后一直打下去。稻草挨打从不计较。你下一个挥刀的对象可就计较了。',
+  'entities.quests.q_ps_strike_true.objectives.0.label': '击倒训练草人',
+  'entities.quests.q_ps_shell_and_claw.title': '甲壳与利螯',
+  'entities.quests.q_ps_shell_and_claw.text':
+    '稻草从不计较，{playerName}，所以给你找个计较的。滩涂掠蟹正在远滩的沉船滩上翻拣残骸：从我的练武场沿小路向西走，它会一直把你领到它们跟前。它们会夹回来，所以盯着你的生命条，别停下挥刀：用鼠标左键选定一只，然后使用校场教你的那个技能，打到它的壳裂开为止。三只就够。然后沿路爬上北边的坡：守潮人奈尔管着海滩的账，你的蟹壳她都记数。',
+  'entities.quests.q_ps_shell_and_claw.completion':
+    '敲开三只壳，十根手指一根没少：头一仗打得不赖，{playerName}。掠蟹从残骸里夹走东西的速度，比潮水送来的还快，所以你每除掉一只，就有人多保住一枚铜板。',
+  'entities.quests.q_ps_shell_and_claw.objectives.0.label': '除灭滩涂掠蟹',
+  'entities.quests.q_ps_the_wreck_line.title': '沉船滩',
+  'entities.quests.q_ps_the_wreck_line.text':
+    '我的搬运工把海货从旧沉船上卸下来，沿坡道扛往晨憩营地，{playerName}，可半数货箱从来到不了坡顶：它们被搁在路边，就此没人记得。沿我这条路朝营地走，你正好会从这些落单的货箱旁边经过。开箱很简单：走到货箱跟前，直到它的名字显示出来，然后按 F，或者用鼠标左键点击货箱本身，它就会把里面的东西交出来。开六只就能清完这条线，并且记住：你今后遇到的每一只箱子、每一处采集点、每一道门扉，用的都是同一个 F 键。军需官芬奇守着营地的货摊，残骸海货连一根木棍都收：把这批货交给她。',
+  'entities.quests.q_ps_the_wreck_line.completion':
+    '绳子、焦油，还有半轮大海竟然放过的奶酪：我全要了，{playerName}。一副肯弯腰扛货的脊背，对这座营地来说比任何刀剑都值钱，而你这一趟就把整条线清了个干净。',
+  'entities.quests.q_ps_the_wreck_line.objectives.0.label': '开启漂流货箱',
+  'entities.quests.q_ps_pouch_and_purse.title': '钱囊与背袋',
+  'entities.quests.q_ps_pouch_and_purse.text':
+    '去谷地之前还有最后一课，{playerName}，也是保住冒险者性命的一课：你随身带的东西。你的背包有十六格，旁边还空着四个袋扣；每系上一只袋子，它的空间就并入总容量。所以：再对我按一次 F，打开我的货摊，在我的货品里用鼠标左键点击亚麻小袋买下它，然后按 B 打开背包，再用鼠标左键点击袋中的亚麻小袋，把它系进一个空着的袋扣。教官玛伦就在东边几步外的集合篝火旁操练：把你腰带上的小袋给她看看。',
+  'entities.quests.q_ps_pouch_and_purse.completion':
+    '好袋子。要是还没系上，现在就系：按 B 打开背包，用鼠标左键点击小袋，把它系进一个空着的袋扣，多出的六格就归你装麻烦了。接下来是任何袋子都装不下的另一半课，{playerName}：背不下的，交给镀金保险箱。司库威克的保险箱桌就设在西边沿路而上的地方，他为你打开的正是每座城镇每位司库共用的同一座金库；等你的钱袋鼓起来，还能购买更多金库空间。贵重的存进金库，袋子留出空当。塞满的行囊断送过的冒险，比任何狼都多。',
+  'entities.quests.q_ps_pouch_and_purse.objectives.0.label': '购买亚麻小袋',
+  'entities.quests.q_ps_hone_the_edge.title':
+    '磨利锋刃',
+  'entities.quests.q_ps_hone_the_edge.text':
+    '挥砍就只是挥砍，{playerName}，草人能挨上一整天，可那赢不来任何东西。看看屏幕下方那一排按钮：那一排才是你的本事，每一个都能做到你光靠胳膊做不到的事。你已经有一个了。回到草人跟前用出来：选好目标，按下这座校场为你标出的那个按钮，做满三次。别只是乱砍草垛，要真正把你会的那一手打出来。做完就回来找我。',
+  'entities.quests.q_ps_hone_the_edge.completion':
+    '现在你是在战斗，而不是在瞎挥了。那一排会随着你每升一级变长，{playerName}，活得最久的，永远是会读那一排的人。草人不在乎你用了哪个按钮。山谷会在乎。',
+  'entities.quests.q_ps_hone_the_edge.objectives.0.label':
+    '对草人命中技能',
+  'entities.quests.q_ps_the_long_walk.title':
+    '漫长的归途',
+  'entities.quests.q_ps_the_long_walk.text':
+    '只剩最后一课了，{playerName}，而这一课我说不明白：你得亲自经历一次。你在外头一定会死。谁都会死，而那并不是任何事情的终点。拿上这块往生石。按 B 打开背包，用鼠标左键点它，它就会让你在原地倒下。接着照屏幕上的指示做：释放灵魂，走回你自己的尸体，再走进去。尸体会等着你，那段路不要钱，走完它你什么也不会失去。',
+  'entities.quests.q_ps_the_long_walk.completion':
+    '你就这样回来了，一点没少。记住那种感觉，{playerName}，因为下一次会牵扯到獠牙，而且没人站在旁边给你解释。尸体会等着你，那段路不要钱，死亡真正拿走的，只有你走回来的那点时间。',
+  'entities.quests.q_ps_the_long_walk.objectives.0.label':
+    '从死亡中走了回来',
+  'entities.items.ps_passing_stone.name':
+    '往生石',
+  'entities.quests.q_ps_the_signpost.title': '风中传信',
+  'entities.quests.q_ps_the_signpost.text':
+    '还剩最后一个习惯要学，{playerName}，而且用不着刀剑：读告示板。公会告示柱就立在营地大门口，离我的篝火西南边几步远，公会和过路的队伍都把召集令贴在上面。走到柱面跟前，按 F，或者用鼠标左键点击它，读一读贴着的内容，然后回来告诉我风里捎来了什么。你今后走进的每一座城镇，都立着一块这样的告示板。',
+  'entities.quests.q_ps_the_signpost.completion':
+    '这下你知道消息在谷地里是怎么传的了，{playerName}：不靠信使，靠告示板。每过一座城镇都去看看；半数冒险的开头，不过是板上三行墨字。',
+  'entities.quests.q_ps_the_signpost.objectives.0.label': '读过公会告示柱',
+  'entities.quests.q_ps_set_sail.title': '扬帆起航',
+  'entities.quests.q_ps_set_sail.text':
+    '这片海滨上已经没有你没跑过、没打倒过、没打开过、没买下过的东西了，{playerName}。你准备好了，而东溪谷有真正的差事在等着。沿海滨大道走回码头，对着渡船人奥多按 F，告诉他，就说是我说的，你挣到了这趟航程。什么时候记不清自己欠了谁什么，随时按 L：那是你的任务日志。',
+  'entities.quests.q_ps_set_sail.completion':
+    '玛伦这么说了？能从一个曾让我练了一星期系缆绳的女人嘴里说出来，这可是极高的评价。等你准备好了就敲响立在我码头旁的那口铃，{playerName}，渡航会把你送到东溪镇的正中央。当心狼群。',
+  'entities.quests.q_ps_set_sail.objectives.0.label': '向渡船人奥多报到',
+  'entities.zones.proving_shore.name': '试炼之滨',
+  'entities.zones.proving_shore.welcome':
+    '试炼之滨对你别无所求，只求时间。熟悉营地，砍倒草人，走一趟沉船滩，等你准备好了，渡船人奥多会送你过海去谷地。',
+  'entities.zones.proving_shore.pois.0.label': '晨憩营地',
+  'entities.zones.proving_shore.pois.1.label': '旧码头',
+  'entities.zones.proving_shore.pois.2.label': '练武场',
+  'entities.zones.proving_shore.pois.3.label': '沉船滩',
+  'guide.home.world.provingName': '试炼之滨',
+  'guide.home.world.provingBlurb': '海峡对面一座安静的训练之岛，新冒险者在谷地对他们提出任何要求之前，先在这里站稳脚跟。',
+  'guide.worldPage.provingBlurb':
+    '谷地海峡对面的一座安静小岛，被辟为训练场：一处营地、一片练武场、一段布满残骸的海滩，还有一班双向通行的渡船。',
+  'guide.worldPage.provingGreeting': '谷地感激过的每一位英雄，都曾站在你现在站的地方，而且当时没有一个人分得清剑该握哪头。',
+  'guide.worldPage.provingGreeter': '教官玛伦，晨憩营地',
+  'guide.worldPage.provingPlaceNotes':
+    '晨憩营地是岛上唯一的聚居点：几顶帐篷、一个货摊和一堆集合篝火。旧码头面向谷地，渡送法阵从那里送毕业生跨过海峡；营地以南的练武场为任何需要的人立着稻草人；沉船滩则是潮水用漂流货箱付账的那段满是残骸的海岸。',
   'hudChrome.perf.diagnostics.report.status.healthy': '正常',
   'hudChrome.reliquary.progressText': '{owned}/{total}',
   'guide.talentsPage.loadoutGearNote':

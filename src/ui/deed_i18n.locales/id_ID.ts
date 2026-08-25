@@ -7,6 +7,10 @@
 import type { DeedLocaleTable } from '../deed_i18n';
 
 export const table: DeedLocaleTable = {
+  prog_ready_for_an_adventure: {
+    name: 'Siap Berpetualang',
+    desc: 'Lulus dari Pesisir Pembuktian: selesaikan setiap pelajaran di pulau itu, lalu bunyikan lonceng feri pulang ke Eastbrook.',
+  },
   exp_dawnhold_castle: {
     name: 'Pintu Terbuka di Taman',
     desc: 'Kunjungi Kastil Dawnhold dan jelajahi aula tamannya yang bermandikan cahaya.',

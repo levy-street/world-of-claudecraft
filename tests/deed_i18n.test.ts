@@ -49,8 +49,8 @@ describe('deed_i18n English resolution', () => {
 
   it('manifests one row per name and desc plus one per title reward', () => {
     const manifest = deedTranslationManifest();
-    // 287 deeds x (name + desc) + the 45 shipped title rewards (both counts
-    // pinned by tests/deeds_content.test.ts, which reads 287 and 45): the
+    // Every deed x (name + desc) + every shipped title reward (both counts
+    // pinned by tests/deeds_content.test.ts against DEED_ORDER, not here): the
     // farming absorb (masterwrought Phase 11d) carried this branch's 279 and 44
     // to those figures with its seven deeds and the Harvestmaster title on
     // prog_farming_100. The chain below is the 279/44 history it extends: the
@@ -68,7 +68,13 @@ describe('deed_i18n English resolution', () => {
     // (no title reward).
     // 288 deeds since masterwrought Phase 11i: two rows each (name and desc)
     // plus the 45 title rewards, which col_deepest_cast does not join.
-    expect(manifest.length).toBe(289 * 2 + 45);
+    // 290 since the release/v0.41.0 merge appended the Proving Shore
+    // graduation deed prog_ready_for_an_adventure (no title reward): the
+    // release's own chain read 274 * 2 + 42 (its seven per-craft rare-tier
+    // profession deeds against this branch's nine, and 42 titles against
+    // this branch's 45), and the merge adds exactly that one deed to this
+    // branch's 289 while the title count stays at 45.
+    expect(manifest.length).toBe(290 * 2 + 45);
     expect(manifest.filter((row) => row.field === 'title').length).toBe(45);
     expect(manifest).toContainEqual({
       id: 'prog_veteran',

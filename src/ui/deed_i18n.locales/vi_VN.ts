@@ -7,6 +7,10 @@
 import type { DeedLocaleTable } from '../deed_i18n';
 
 export const table: DeedLocaleTable = {
+  prog_ready_for_an_adventure: {
+    name: 'Sẵn Sàng Phiêu Lưu',
+    desc: 'Tốt nghiệp Bờ Biển Thử Thách: hoàn thành mọi bài học trên đảo, rồi rung chuông phà để trở về Đông Khê.',
+  },
   exp_dawnhold_castle: {
     name: 'Cánh Cửa Mở Trong Vườn',
     desc: 'Ghé thăm Lâu Đài Dawnhold và dạo quanh những sảnh vườn ngập nắng.',

@@ -944,7 +944,7 @@ describe('icon asset audit', () => {
 
     expect(report.summary).toEqual({
       ok: true,
-      assetCount: 204,
+      assetCount: 194,
       issueCount: 0,
       exactDuplicateGroupCount: 0,
       perceptualCandidateCount: 1,

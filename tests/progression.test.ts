@@ -54,7 +54,13 @@ function collectItemAcquirable(itemId: string): boolean {
   );
   const fromHarvest = Object.values(HARVEST_COMPONENT_ITEMS).includes(itemId);
   const fromFarm = Object.values(FARM_CROPS).some((crop) => crop.produceItemId === itemId);
-  return fromLoot || fromGround || fromScript || fromNode || fromHarvest || fromFarm;
+  // A vendor's stock is an acquisition source too: the tutorial island's
+  // buy-a-pick lesson (q_ps_tools_of_the_trade) is deliberately fulfilled at
+  // a vendor stall, teaching the purchase flow itself. (Merge note: the
+  // shipped lesson is q_ps_pouch_and_purse collecting linen_pouch, the one
+  // collect objective only the vendor arm satisfies on the merged tree.)
+  const fromVendor = Object.values(NPCS).some((n) => n.vendorItems?.includes(itemId) === true);
+  return fromLoot || fromGround || fromScript || fromNode || fromHarvest || fromFarm || fromVendor;
 }
 
 describe('content referential integrity', () => {
@@ -130,12 +136,19 @@ describe('content referential integrity', () => {
     // object, scripted set, gather-node material row, corpse-harvest component
     // map, or crop produce column must still be classified unacquirable. The
     // real acquisition paths are re-proven acquirable here so a later refactor
-    // that drops a path reds this. The farm arm's negative side is a crop SEED:
-    // a seed is farming content too, but nothing harvests one out of the ground
-    // (tier 1 and 2 seeds are vendor stock, tiers 3 and 4 seed-back rolls),
-    // so it must stay unacquirable to this model.
+    // that drops a path reds this. The farm arm's negative side WAS a crop SEED
+    // (vale_wheat_seed: farming content that nothing harvests out of the
+    // ground) while vendor stock sat outside the model; the release/v0.41.0
+    // merge added the vendor arm, and every seed is farmer vendor stock (all
+    // four tiers since Phase 11e, tier 4 also boss loot), so a seed is now
+    // honestly acquirable and that negative retired. Fine produce is NOT a
+    // substitute negative either: harvestCrop grants it on the quality roll,
+    // so the model would only be recording its own blind spot. The fabricated
+    // id stays the negative control, and the vendor arm is re-proven on the
+    // one collect objective that only a stall fulfils today.
     expect(collectItemAcquirable('totally_not_a_real_item_xyz')).toBe(false);
-    expect(collectItemAcquirable('vale_wheat_seed')).toBe(false);
+    expect(collectItemAcquirable('vale_wheat_seed')).toBe(true); // farmer vendor stock
+    expect(collectItemAcquirable('linen_pouch')).toBe(true); // vendor stock only (pouch lesson)
     expect(collectItemAcquirable('copper_ore')).toBe(true); // gather-node material
     expect(collectItemAcquirable('ironbark_log')).toBe(true); // gather-node material
     expect(collectItemAcquirable('goldleaf_herb')).toBe(true); // gather-node material
@@ -234,10 +247,13 @@ describe('content referential integrity', () => {
     // and blocking the downstream Galecrest chain via requiresQuest. The
     // "every quest reference resolves" test above only checks the mob id
     // exists, never that anything spawns it, so this closes that gap.
-    // bound_guardian is a Nythraxis raid-encounter add spawned by the
-    // encounter script itself (src/sim/encounters/nythraxis.ts), not a
-    // world camp or a dungeon spawn list, so it is a documented exception.
-    const RAID_ENCOUNTER_SPAWNED = new Set(['bound_guardian']);
+    // Script-spawned quest mobs are the documented exceptions: neither a
+    // world camp nor a dungeon spawn list creates them. bound_guardian is a
+    // Nythraxis raid-encounter add (src/sim/encounters/nythraxis.ts);
+    // mister_crabs is the Proving Shore's tide-pool summon, called up by the
+    // Briny Lure through summonQuestMob (src/sim/interactions/crab_summon.ts)
+    // and re-summonable while its quest is active, so it can never strand.
+    const SCRIPT_SPAWNED = new Set(['bound_guardian', 'mister_crabs']);
     const spawning = new Set<string>();
     for (const c of CAMPS) spawning.add(c.mobId);
     for (const d of DUNGEON_LIST) for (const s of d.spawns) spawning.add(s.mobId);
@@ -248,7 +264,7 @@ describe('content referential integrity', () => {
           obj.type === 'kill' &&
           obj.targetMobId &&
           !spawning.has(obj.targetMobId) &&
-          !RAID_ENCOUNTER_SPAWNED.has(obj.targetMobId)
+          !SCRIPT_SPAWNED.has(obj.targetMobId)
         ) {
           problems.push(`${q.id}: kill target ${obj.targetMobId} has no camp/dungeon spawn source`);
         }

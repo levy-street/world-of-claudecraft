@@ -92,7 +92,7 @@ const PREFIX_CATEGORY: Record<string, DeedCategory> = {
 };
 
 describe('audited launch totals (literals: update deliberately with the catalog)', () => {
-  it('ships exactly 288 deeds worth 3285 total Renown', () => {
+  it('ships exactly 290 deeds worth 3295 total Renown', () => {
     // Release base (262 / 3145 after the WARFARE lifetime-honor ladder) plus
     // four Reliquary Curator rank bridges and the five Phase 18 completion
     // ladder deeds (all nine renown 0: catalog prestige never scores the
@@ -116,8 +116,18 @@ describe('audited launch totals (literals: update deliberately with the catalog)
     // lost row: the preceding phase's ledger recorded 288 / 3285, this phase
     // adds exactly one deed at exactly renown 5, so 289 / 3290 was written
     // BEFORE the run and matched it.
-    expect(DEED_ORDER.length).toBe(289);
-    expect(ALL.reduce((sum, d) => sum + d.renown, 0)).toBe(3290);
+    //
+    // Then the release/v0.41.0 merge. The release's own chain reads 274 / 3160
+    // (its 262 / 3145 base plus the nine zero-Renown Reliquary rows, the
+    // walk-in castle visit pair, and the Proving Shore graduation deed
+    // prog_ready_for_an_adventure at renown 5). The merge adds exactly that
+    // one deed at exactly renown 5 to this branch's 289 / 3290, so
+    // 290 / 3295 was written BEFORE the merged tree was measured and matched
+    // it; both parents' frozen catalog hashes reproduce from the merged
+    // table (see FROZEN_CATALOG_SHA256 below), which is the proof of a pure
+    // append on both sides.
+    expect(DEED_ORDER.length).toBe(290);
+    expect(ALL.reduce((sum, d) => sum + d.renown, 0)).toBe(3295);
   });
 
   it('ships the audited per-category counts', () => {
@@ -129,8 +139,11 @@ describe('audited launch totals (literals: update deliberately with the catalog)
       // jewelcrafting milestones joining their cross-craft families), then
       // +3 for the phase 06 inscription trio (rare-tier, 50-skill, and
       // Grandmaster) landing the same three families at the table tail, then
-      // +2 farming celebrations (prog_first_planting, prog_farming_100).
-      progression: 66,
+      // +2 farming celebrations (prog_first_planting, prog_farming_100), then
+      // +1 Phase 11k's cross-packet prog_field_to_feast, then
+      // +1 the Proving Shore graduation (prog_ready_for_an_adventure) at the
+      // release/v0.41.0 merge (the release's own chain read 58).
+      progression: 67,
       combat: 10,
       // +2 Rift coverage deeds (dgn_rift, dgn_rift_s_rank).
       dungeon: 31,
@@ -273,7 +286,7 @@ describe('audited launch totals (literals: update deliberately with the catalog)
       // craft milestones so the eventual release merge stays a pure tail
       // append: the Last Keep's deed retro-fixes its shipped-without-deeds
       // gap, Dawnhold's lands with its castle (both keyed on the enterDungeon
-      // markVisited emit).
+      // markVisited emit). The release's own list reads the same pair here.
       'exp_the_last_keep',
       'exp_dawnhold_castle',
       // Jewelcrafting joins the per-craft rare-tier family with the
@@ -306,10 +319,14 @@ describe('audited launch totals (literals: update deliberately with the catalog)
       'col_golden_harvest',
       'prog_farming_100',
       'col_farm_roster',
-      // Phase 11k's cross-packet deed, the tail today. Appended at the literal
-      // end under the 11b three-tier ordering rule, which keeps the farming
-      // block contiguous ahead of it.
+      // Phase 11k's cross-packet deed, the branch's tail. Appended at the
+      // literal end under the 11b three-tier ordering rule, which keeps the
+      // farming block contiguous ahead of it.
       'prog_field_to_feast',
+      // The Proving Shore graduation closes the merged tail (appended at the
+      // release/v0.41.0 merge behind the branch's rows, keeping both sides'
+      // tails in their own authored order).
+      'prog_ready_for_an_adventure',
     ]);
     expect(DEEDS.dgn_wildheart_basin.renown).toBe(10);
     expect(DEEDS.dgn_wildheart_basin_heroic.renown).toBe(10);
@@ -798,7 +815,17 @@ describe('frozen trigger + renown catalog (design rule 9: never retro-edit a tri
   // it reproduced 2b6e36a4... EXACTLY, which is what distinguishes an append
   // from an edit. Only then was the digest re-minted with the one appended
   // tuple. No shipped trigger or renown value was touched.
-  const FROZEN_CATALOG_SHA256 = '52569f4b65150f9c6d3f242e65915d99d281ebeedc34698e9c1cbcb9fe8f4066';
+  // Re-baselined at the release/v0.41.0 sync merge for the appended Proving
+  // Shore graduation deed (prog_ready_for_an_adventure, on the new
+  // tutorialGraduations stat), which the release had itself re-baselined
+  // (its own literal was 7041f4ae...) behind the walk-in castle visit pair.
+  // Re-minted THE AUDITABLE WAY again: reconstructing the merged canonical
+  // rows minus the tutorial deed (feat_book_complete's live deedIds filtered
+  // back) reproduced this branch's 52569f4b... EXACTLY, and minus this
+  // branch's sixteen appended rows reproduced the release's 7041f4ae...
+  // EXACTLY, so the merged catalog is a pure append on BOTH sides. No
+  // shipped trigger or renown changed on either side.
+  const FROZEN_CATALOG_SHA256 = '4533079d9911b8dc0e20526ca330ff41196126ee9798f216fe5900ba781b9eae';
 
   it('every shipped deed keeps its trigger and renown unchanged', () => {
     const canonical = JSON.stringify(
@@ -991,8 +1018,10 @@ describe('table shape', () => {
   it('DEED_ORDER holds the append-only authored order (first and last pinned)', () => {
     // DEED_ORDER derives from the table keys, so covering DEEDS is inherent;
     // what CAN drift is the authored order itself. Pin the endpoints as
-    // literals: prog_first_steps opens the catalog and prog_farming_100
-    // closes the tail, and either moving would signal a reorder
+    // literals: prog_first_steps opens the catalog and the release's
+    // prog_ready_for_an_adventure closes the tail (behind this branch's
+    // prog_field_to_feast since the v0.41.0 merge), and either moving would
+    // signal a reorder
     // (forbidden: the order is an append-only determinism contract; new
     // deeds append). hid_codfather's index is pinned in the refresh test.
     expect(DEED_ORDER[0]).toBe('prog_first_steps');
@@ -1001,9 +1030,11 @@ describe('table shape', () => {
     // jewelcrafting milestones and the phase 06 inscription milestones
     // append behind it, and the absorbed farming celebration block closes
     // the catalog per the 11b three-tier ordering rule, and the 11-block's own
-    // appends follow it in phase order; Phase 11k's prog_field_to_feast is the
-    // tail.
-    expect(DEED_ORDER[DEED_ORDER.length - 1]).toBe('prog_field_to_feast');
+    // appends follow it in phase order; Phase 11k's prog_field_to_feast was
+    // the branch's tail until the release/v0.41.0 merge, where the Proving
+    // Shore graduation deed closes the merged tail (appended at the release
+    // merge behind the walk-in castle visit pair and the branch's rows).
+    expect(DEED_ORDER[DEED_ORDER.length - 1]).toBe('prog_ready_for_an_adventure');
   });
 
   it('every entry key matches its id and its prefix matches its category', () => {

@@ -292,7 +292,10 @@ Notes:
   - patch_eastbrook, tier 1, anchor (18.5, 32.5), 4 beds at (16,30) (21,30) (16,35)
     (21,35): the north lane out of town. The obvious west farmland PASSED every
     physical arm but sits 8.1 yd inside the Sableweb webwood camp footprint, which
-    forced both the move and a new camp-clearance arm.
+    forced both the move and a new camp-clearance arm. Re-seated at the
+    release/v0.41.0 merge to anchor (-21.5, -81.5), beds (-24,-84) (-19,-84)
+    (-24,-79) (-19,-79), Jessica (-15.5, -81.5): the rebuilt vale's second
+    forest_wolf camp ((12, 52) r26) overran the north-lane site.
   - patch_mirefen, tier 2, anchor (-22, 341), 5 beds at (-26,339) (-21,339) (-16,339)
     (-26,344) (-21,344): drained ground south-west of Fenbridge; the no-water-in-reach
     arm forced the move off the skeleton rows.

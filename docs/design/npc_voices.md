@@ -150,8 +150,8 @@ every clause of it. Age 40s, female.
 **Voice test:** *"The forge answers to me. Bring good ore and it will answer to you too."*
 
 ### Farmer Jessica: *Allotment Keeper*
-**Visual:** villager, harvest gold (#a8843a), the Eastbrook allotments beside the
-north-east lane.
+**Visual:** villager, harvest gold (#a8843a), the Eastbrook allotments at the
+harbor town's north-east edge, between the civic ring and the chapel yard.
 
 Warm, plain-spoken, sun-and-soil mezzo, unhurried and patient, the voice of
 someone who explains a thing once and trusts you with it. Open vowels, an
@@ -375,10 +375,13 @@ the throat. Age 40s, female.
 Broad, weather-cured hill-farmer baritone, slow and even, the patience of a man
 who works stone terraces by hand. Rolling rural vowels, thin mountain air in
 the breath, gruff kindness. Age 50s to 60s, male. **No designed voice of his own
-yet:** he borrows Groundskeeper Bram's country baritone through `VOICE_ALIAS`
-(a role match, not the same character), so his lines ship in that voice until
-a key is available. Promote him to his own `VOICE_PROMPTS` entry then, quieter
-and more deliberate than Bram, with none of the referee's grin.
+yet:** he borrowed Groundskeeper Bram's country baritone through `VOICE_ALIAS`
+(a role match, not the same character) until the Sowfield and the Vale Cup
+retired with Bram's voice entry (release/v0.41.0); since the v0.41.0 merge he
+borrows Huntsman Deral's weathered, steady, rural male register instead, the
+nearest surviving role match, so his lines ship in that voice until a key is
+available. Promote him to his own `VOICE_PROMPTS` entry then, broader and
+warmer than Deral's herd-warden murmur, with the hill farmer's gruff kindness.
 
 **Voice test:** *"The terraces give what the mountain allows. I sell compost, and if a crop of yours comes up withered I will work the husks back into good soil for you."*
 

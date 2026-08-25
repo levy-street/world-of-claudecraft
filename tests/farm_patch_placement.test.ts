@@ -39,7 +39,6 @@ import {
 } from '../src/sim/data';
 import { PLAYER_BODY_RADIUS, PLAYER_MAX_CLIMB_SLOPE, PLAYER_SWIM_DEPTH } from '../src/sim/pathfind';
 import { INTERACT_RANGE } from '../src/sim/types';
-import { isOnPitch, SOWFIELD_EXCLUDE } from '../src/sim/vale_cup_layout';
 import {
   groundHeight,
   isInWaterBody,
@@ -358,15 +357,6 @@ function campFootprintMargin(x: number, z: number): { margin: number; mobId: str
   return { margin, mobId };
 }
 
-function inSowfield(x: number, z: number): boolean {
-  return (
-    x >= SOWFIELD_EXCLUDE.xMin &&
-    x <= SOWFIELD_EXCLUDE.xMax &&
-    z >= SOWFIELD_EXCLUDE.zMin &&
-    z <= SOWFIELD_EXCLUDE.zMax
-  );
-}
-
 // --- the table under test ---------------------------------------------------
 
 interface BedRow {
@@ -411,7 +401,6 @@ const ON_A_DRY_SHORE_WITH_WATER_IN_REACH = { x: 210, z: -24 }; // dry underfoot,
 const ON_MAZE_WALL_POCKET = { x: -232, z: 452 }; // steep, and encloses its own standable foot
 const DEEP_INSIDE_A_BUILDING = { x: 17, z: -6 }; // standable ground is 4.5yd out
 const ON_THE_EASTBROOK_NORTH_LANE = { x: 0, z: 10 }; // the road itself: dry, flat, unblocked
-const IN_THE_SOWFIELD_GOAL = { x: 23, z: -99 }; // where herb_eastbrook_4 once grew, on the pitch
 
 const MAZE_WALL_FLOOD_BOX = boxAround([ZONES[0].hub, ON_MAZE_WALL_POCKET]);
 const MAZE_WALL_FLOOD = floodFrom(ZONES[0].hub, MAZE_WALL_FLOOD_BOX);
@@ -800,33 +789,12 @@ describe('farm patch placement: every bed sits on ground a player can work', () 
     expect(d).toBeLessThan(BED_SPACING);
   });
 
-  it('no bed grows inside the Sowfield boarball ground', () => {
-    // SOWFIELD_EXCLUDE is the footprint world.ts already refuses to seat a
-    // world prop in: the pitch, its goal pockets, both stands, the gate
-    // approach and the terrain flatten's apron. A farm on a match venue is
-    // worked at the pitch police's pleasure (vale_cup ejects any non-fighter
-    // standing there), and the beds would grow on the playing surface. Reusing
-    // the shipped exclusion keeps ONE definition of the venue's footprint.
-    for (const bed of BEDS) {
-      expect(
-        inSowfield(bed.x, bed.z),
-        `${bed.id} at (${bed.x},${bed.z}) sits inside the Sowfield boarball ground`,
-      ).toBe(false);
-    }
-  });
-
-  it('the Sowfield arm rejects the pitch, so it can fail', () => {
-    // Not merely inside the apron: on the playing surface itself.
-    expect(inSowfield(IN_THE_SOWFIELD_GOAL.x, IN_THE_SOWFIELD_GOAL.z)).toBe(true);
-    expect(isOnPitch(IN_THE_SOWFIELD_GOAL.x, IN_THE_SOWFIELD_GOAL.z)).toBe(true);
-    // And the Eastbrook beds, the only ones near this venue, clear it by a
-    // real distance rather than sitting on its boundary.
-    const eastbrookBeds = BEDS.filter((b) => b.zoneId === 'eastbrook_vale');
-    expect(eastbrookBeds.length).toBeGreaterThan(0);
-    for (const bed of eastbrookBeds) {
-      expect(bed.z - SOWFIELD_EXCLUDE.zMax, `${bed.id} hugs the Sowfield apron`).toBeGreaterThan(2);
-    }
-  });
+  // The Sowfield arms (no bed inside the boarball ground, and the arm's own
+  // on-pitch control) left with the venue: release/v0.41.0 (1c74387b4c)
+  // demolished the Sowfield and retired the Vale Cup, so SOWFIELD_EXCLUDE and
+  // vale_cup_layout.ts no longer exist and world.ts refuses no footprint there.
+  // The Eastbrook beds sit at the harbor town's north-east edge (z -84 to
+  // -79), 45 yards from where the pitch stood.
 
   it('no bed grows inside a mob camp footprint', () => {
     // STRICTER THAN THE NODE SUITE, deliberately. That suite screens gather
@@ -859,7 +827,7 @@ describe('farm patch placement: every bed sits on ground a player can work', () 
     // The skeleton's original Eastbrook anchor. It is 8.1yd inside the
     // Sableweb webwood spider disc, and it passes every other arm in this
     // file: dry, above the sea plane, level, unblocked, standable, in its
-    // zone, off the road, out of the Sowfield and clear of every gather node.
+    // zone, off the road and clear of every gather node.
     // That is the point of asserting all of them here rather than just the
     // camp margin: this arm is the ONLY thing that rejects the site, so
     // deleting it silently reopens the placement it forced.
@@ -881,7 +849,6 @@ describe('farm patch placement: every bed sits on ground a player can work', () 
     expect(spot?.r ?? Number.POSITIVE_INFINITY).toBeLessThanOrEqual(BED_CLEARANCE);
     expect(zoneAt(OLD_WEST_SITE.x, OLD_WEST_SITE.z).id).toBe('eastbrook_vale');
     expect(roadDistance(OLD_WEST_SITE.x, OLD_WEST_SITE.z)).toBeGreaterThanOrEqual(ROAD_MARGIN);
-    expect(inSowfield(OLD_WEST_SITE.x, OLD_WEST_SITE.z)).toBe(false);
     for (const node of GATHER_NODES) {
       const d = Math.hypot(OLD_WEST_SITE.x - node.pos.x, OLD_WEST_SITE.z - node.pos.z);
       expect(d).toBeGreaterThanOrEqual(BED_SPACING);
@@ -915,7 +882,6 @@ describe('farm patch placement: every bed sits on ground a player can work', () 
     expect(nearestStandSpot(p.x, p.z)?.r ?? Number.POSITIVE_INFINITY).toBeLessThanOrEqual(
       BED_CLEARANCE,
     );
-    expect(inSowfield(p.x, p.z)).toBe(false);
     // And it is a screen, not a blanket: the authored beds are off the roads
     // without being banished from the lanes that serve them.
     const nearest = Math.min(...BEDS.map((b) => roadDistance(b.x, b.z)));

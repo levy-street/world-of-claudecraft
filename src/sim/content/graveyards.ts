@@ -24,7 +24,19 @@ export const OVERWORLD_GRAVEYARDS: GraveyardDef[] = [
     name: 'Eastbrook Rest',
     ...EASTBROOK_LAYOUT.services.graveyard.position,
   },
-  { id: 'gy_vale_chapel', name: 'Vale Chapel Yard', x: 4, z: -56 },
+  // 'Vale Chapel Yard' (4,-56) retired 2026-08. It was the OLD town's yard, left
+  // standing through the harbor move, and it ended up 15 yd from the rebuilt
+  // Eastbrook Rest. Every record here spawns a Pale Keeper, so the pair read as
+  // two angels over one churchyard, one of them outside the new railings.
+  //
+  // Eastbrook Rest sits at the Vale's far SOUTH end, and the zone runs
+  // z -180..180, so the nearest-graveyard watershed against Fenbridge Barrow
+  // (z 286) fell at about z 114: every death in the northern third of the zone
+  // released into Mirefen Marsh, a zone the dead player has usually never seen.
+  // That went unnoticed until the Copper Dig relocated from z -86 to z 144 and
+  // took the level 1-7 mine content across the line with it. The yard below
+  // covers the Vale's north and pushes the watershed past the zone border.
+  { id: 'gy_vale_north', name: 'Dig Road Graves', x: -22, z: 118 },
   // Mirefen Marsh (zone 2)
   {
     id: FENBRIDGE_LAYOUT.services.graveyard.id,
@@ -56,6 +68,10 @@ export const OVERWORLD_GRAVEYARDS: GraveyardDef[] = [
   { id: 'gy_frostveil', name: 'Frostveil Barrow', x: -34, z: 1576 },
   { id: 'gy_drakelands', name: 'Drakelands Cairns', x: 422, z: 1885 },
   { id: 'gy_amberfall', name: 'Amberfall Rest', x: -336, z: 2050 },
+  // The Proving Shore (tutorial island). Appended LAST: spirit healers spawn
+  // in this array's order, so a mid-array insert would renumber every later
+  // healer's entity id for no reason (the camps append-last discipline).
+  { id: 'gy_proving_shore', name: 'Dawnrest Graves', x: -324, z: 58 },
 ];
 
 // The Spirit Healer NPC id (one shared template; every spawned angel carries this

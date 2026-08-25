@@ -540,6 +540,7 @@ describe('hud wiring', () => {
   });
 
   it('marks the watch toggle state and names the recent-strip jump buttons', () => {
+    // biome-ignore lint/suspicious/noTemplateCurlyInString: asserts on source text that contains a template literally.
     expect(painter).toContain('aria-pressed="${entry.watched}"');
     // The strip crest is a jump button: the accessible name rides the button
     // (aria-label + title from the deed name), and the crest img inside stays
@@ -805,11 +806,10 @@ describe('renderer celebration + nameplate title', () => {
     expect(rendererSrc).toMatch(
       /this\.vfx\.fireworkBurst\(this\.tmpV, FESTIVAL_GOLD_COLORS, 46, 1\.1\);/,
     );
-    // One shared palette, two sites (the Vale Cup draw show reuses it).
     expect(rendererSrc).toContain(
       'const FESTIVAL_GOLD_COLORS: readonly number[] = [0xffd14d, 0xfff2c0];',
     );
-    expect(rendererSrc.match(/FESTIVAL_GOLD_COLORS/g)?.length).toBe(3);
+    expect(rendererSrc.match(/FESTIVAL_GOLD_COLORS/g)?.length).toBe(2);
   });
 
   it('renders the title through localized canvas state and invalidates on i18n revision', () => {

@@ -14,8 +14,8 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 972,
-      "state": "3049e94f",
+      "nextId": 1002,
+      "state": "d55c40e8",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -53,7 +53,7 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 967,
+          "entityId": 997,
           "equipment": {
             "chest": "footpad_jerkin",
             "mainhand": "rusty_dagger",
@@ -92,10 +92,10 @@
           "detonateTimer": "Infinity",
           "dodgeChance": 0.0625,
           "dualWielding": true,
-          "fallStartY": 1.5,
+          "fallStartY": -2,
           "fiveSecondRule": 99,
           "hp": 62,
-          "id": 967,
+          "id": 997,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -113,17 +113,17 @@
           "overpowerUntil": -1,
           "petMode": "defensive",
           "pos": {
-            "x": 2,
-            "y": 1.5,
-            "z": -2
+            "x": -94,
+            "y": -2,
+            "z": -58
           },
           "potionCooldownUntil": -1,
           "resource": 100,
           "resourceType": "energy",
           "spawnPos": {
-            "x": 2,
-            "y": 1.5,
-            "z": -2
+            "x": -94,
+            "y": -2,
+            "z": -58
           },
           "spellPower": 6,
           "stats": {
@@ -147,9 +147,9 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 982,
-      "state": "6ddc70c3",
-      "events": "1b6d8309",
+      "nextId": 1012,
+      "state": "5d3aaf30",
+      "events": "4265e4d6",
       "rng": {
         "draws": 1,
         "digest": "368503ad"
@@ -186,7 +186,7 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 967,
+          "entityId": 997,
           "equipment": {
             "chest": "footpad_jerkin",
             "mainhand": "rusty_dagger",
@@ -226,10 +226,10 @@
           "detonateTimer": "Infinity",
           "dodgeChance": 0.0715,
           "dualWielding": true,
-          "fallStartY": 2.077747,
+          "fallStartY": -1.952555,
           "fiveSecondRule": 99,
           "hp": 93,
-          "id": 967,
+          "id": 997,
           "kind": "player",
           "level": 7,
           "lootFfaTimer": "Infinity",
@@ -254,9 +254,9 @@
           "resource": 100,
           "resourceType": "energy",
           "spawnPos": {
-            "x": 2,
-            "y": 1.5,
-            "z": -2
+            "x": -94,
+            "y": -2,
+            "z": -58
           },
           "spellPower": 6,
           "stats": {
@@ -280,9 +280,9 @@
     {
       "tick": 2,
       "time": 0.1,
-      "nextId": 982,
-      "state": "f76ca189",
-      "events": "46f1e7ea",
+      "nextId": 1012,
+      "state": "71584c82",
+      "events": "99899366",
       "rng": {
         "draws": 1,
         "digest": "368503ad"
@@ -329,7 +329,7 @@
           ],
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 967,
+          "entityId": 997,
           "equipment": {
             "chest": "footpad_jerkin",
             "mainhand": "rusty_dagger",
@@ -370,10 +370,10 @@
           "detonateTimer": "Infinity",
           "dodgeChance": 0.0715,
           "dualWielding": true,
-          "fallStartY": 2.266438,
+          "fallStartY": -1.334391,
           "fiveSecondRule": 99.1,
           "hp": 185,
-          "id": 967,
+          "id": 997,
           "kind": "player",
           "level": 7,
           "lootFfaTimer": "Infinity",
@@ -391,17 +391,17 @@
           "overpowerUntil": -1,
           "petMode": "defensive",
           "pos": {
-            "x": -5,
-            "y": 2.266438,
-            "z": -54.044
+            "x": -136,
+            "y": -1.334391,
+            "z": 109.956
           },
           "potionCooldownUntil": -1,
           "resource": 100,
           "resourceType": "energy",
           "spawnPos": {
-            "x": 2,
-            "y": 1.5,
-            "z": -2
+            "x": -94,
+            "y": -2,
+            "z": -58
           },
           "spellPower": 6,
           "stats": {
@@ -425,8 +425,8 @@
     {
       "tick": 2,
       "time": 0.1,
-      "nextId": 982,
-      "state": "f76ca189",
+      "nextId": 1012,
+      "state": "71584c82",
       "events": "741638a5",
       "rng": {
         "draws": 1,
@@ -474,7 +474,7 @@
           ],
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 967,
+          "entityId": 997,
           "equipment": {
             "chest": "footpad_jerkin",
             "mainhand": "rusty_dagger",
@@ -515,10 +515,10 @@
           "detonateTimer": "Infinity",
           "dodgeChance": 0.0715,
           "dualWielding": true,
-          "fallStartY": 2.266438,
+          "fallStartY": -1.334391,
           "fiveSecondRule": 99.1,
           "hp": 185,
-          "id": 967,
+          "id": 997,
           "kind": "player",
           "level": 7,
           "lootFfaTimer": "Infinity",
@@ -536,17 +536,17 @@
           "overpowerUntil": -1,
           "petMode": "defensive",
           "pos": {
-            "x": -5,
-            "y": 2.266438,
-            "z": -54.044
+            "x": -136,
+            "y": -1.334391,
+            "z": 109.956
           },
           "potionCooldownUntil": -1,
           "resource": 100,
           "resourceType": "energy",
           "spawnPos": {
-            "x": 2,
-            "y": 1.5,
-            "z": -2
+            "x": -94,
+            "y": -2,
+            "z": -58
           },
           "spellPower": 6,
           "stats": {

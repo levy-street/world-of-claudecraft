@@ -87,8 +87,19 @@ const repoRoot = fileURLToPath(new URL('..', import.meta.url));
 // merged tree, never by adding the two sides' deltas on paper. They compose
 // exactly: base 199/212, ours +6 (extract_essence plus farming's five),
 // theirs +1 (the release's own pair), merged 206/219.
-const EXPECTED_SEND_COUNT = 206;
-const EXPECTED_DISPATCH_COUNT = 219;
+// The release side (v0.41.0): the New Eastbrook program then retires the
+// Vale Cup minigame, removing its six vcup_* send + dispatch pairs
+// (docs/design/eastbrook-revamp/master-plan.md); the Proving Shore tutorial
+// adds its one tutorial_start pair back on top, and the v0.40.0 sync merge
+// brings the release side's one new pair with it, so the release read
+// 199/212 on its own.
+// The v0.41.0 sync composes a SEVENTH time, and again CONFLICTED: off the
+// shared base 200/213, ours +6 (extract_essence plus farming's five), theirs
+// -1 (six vcup_* pairs out, one tutorial_start pair in), merged 205/218. The
+// numbers below were re-set from a suite run on the merged tree, never by
+// adding the two sides' deltas on paper.
+const EXPECTED_SEND_COUNT = 205;
+const EXPECTED_DISPATCH_COUNT = 218;
 const EXPECTED_DISPATCH_ONLY_COUNT = 13;
 
 // The chat sub-channel routing switch (server/game.ts `switch

@@ -36,6 +36,7 @@ import type { PlayerMeta } from '../sim';
 import type { SimContext } from '../sim_context';
 import { resolveTalentHitMult } from '../talent_hit_mult';
 import { addThreat, hasEscapeStealth } from '../threat';
+import { creditAbilityDrill } from '../tutorial/ability_drill';
 import {
   angleTo,
   armorReduction,
@@ -291,6 +292,12 @@ export function updatePlayerAutoAttack(ctx: SimContext, p: Entity, meta: PlayerM
       whiteDualWieldPenalty: dualWieldWhiteMissPenalty && abilityName === null,
       autoAttack: true,
     });
+    // The island's ability drill (tutorial/ability_drill.ts). An onNextSwing
+    // ability (Reaver Strike) rides the SWING and never reaches runEffects,
+    // where the drill's other credit site lives, so it is credited here on
+    // the swing that carried it. A plain white swing has abilityId null and
+    // credits nothing, which is the lesson.
+    if (connected && abilityId) creditAbilityDrill(ctx, p, t, abilityId);
     // Thuggery mastery (Sword Specialization shape): a landed mainhand auto has
     // a chance to swing once more. The pct gate keeps the rng stream untouched
     // for everyone without the mastery, and the extra swing cannot chain.

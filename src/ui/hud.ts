@@ -1,6 +1,7 @@
 import { audio } from '../game/audio';
 import { corpseLootAvailability, localPartyMemberIds } from '../game/corpse_loot_availability';
 import { CROSS_HOTBAR_ATTACK_ID } from '../game/cross_hotbar';
+import { syncDeathControllerHints } from '../game/death_controller_hint';
 import type { GamepadKind } from '../game/gamepad_map';
 import type { GraphicsSettingsSnapshot } from '../game/graphics_rebuild_core';
 import { InstanceMusicController, type InstanceMusicDecision } from '../game/instance_music';
@@ -51,6 +52,7 @@ import { DEED_ORDER, DEEDS } from '../sim/content/deeds';
 import { HEROIC_MARK_ITEM_ID } from '../sim/content/dungeon_difficulty';
 import { HEROIC_VENDOR_STOCK } from '../sim/content/heroic_vendor';
 import { isOnMountRaceStartPlatform, MOUNTS } from '../sim/content/mounts';
+import { PROVING_SHORE_ARRIVAL } from '../sim/content/proving_shore';
 import { recipeById } from '../sim/content/recipes';
 import { RELIQUARY_PAGES, RELIQUARY_PAGES_BY_ID } from '../sim/content/reliquary';
 import { FIRST_TALENT_LEVEL, type TalentAllocation, talentsFor } from '../sim/content/talents';
@@ -124,7 +126,6 @@ import {
   type ItemDef,
   isMechWearer,
   MAX_LEVEL,
-  MELEE_RANGE,
   MILESTONES,
   SALVAGE_CAST_ID,
   type SimEvent,
@@ -134,7 +135,6 @@ import {
   virtualLevel,
   xpUntilNextPrestige,
 } from '../sim/types';
-import { isAtSowfield } from '../sim/vale_cup_layout';
 import { maxBuyCount } from '../sim/vendor_buy_stack';
 import { worldBossIdFromLockout } from '../sim/world_boss';
 import {
@@ -187,6 +187,7 @@ import {
   bannerSubtextLines,
 } from './banner_queue';
 import { blockLandingLogKey } from './block_landing_feedback_core';
+import { BootcampOverlay } from './bootcamp';
 import { CalendarWindow } from './calendar_window';
 import { CardDuelWindow } from './card_duel_window';
 import { CastBarPainter, type CastBarPaintInput } from './cast_bar_painter';
@@ -435,7 +436,6 @@ import {
   encodeHotbarAction,
   HOTBAR_ACTION_MIME,
   type HotbarAction,
-  handleMobileAttackTap,
   isAbilityActionBarEligible,
   loadoutKnownAbilityIds,
   parseHotbarAction,
@@ -495,6 +495,7 @@ import { DelveTrackerController } from './hud/delve/delve_tracker_controller';
 import { LockpickController } from './hud/delve/lockpick_controller';
 import { RiteController } from './hud/delve/rite_controller';
 import { FiestaController } from './hud/fiesta/fiesta_controller';
+import { GuildBoardWindow } from './hud/guild_board';
 import { LootRollController } from './hud/loot/loot_roll_controller';
 import { lootSettingsView } from './hud/loot/loot_settings_view';
 import { renderLootSettingsWindow } from './hud/loot/loot_settings_window';
@@ -621,6 +622,7 @@ import { MOUNT_DESC_KEYS, mountSpecLines } from './mount_labels';
 import { MountRaceControls } from './mount_race_controls';
 import { MountRaceStrip } from './mount_race_strip';
 import { MovableFrame } from './movable_frame';
+import { NoticeboardPopup } from './noticeboard_popup';
 import { NPC_WINDOW_CLOSE_RANGE } from './npc_service_range';
 import { OptionsWindow } from './options_window';
 import {
@@ -772,6 +774,14 @@ import { renderTownFocusWindow } from './town_focus_window';
 import { installTrackerStackAnchor } from './tracker_stack_anchor';
 import { tradeOfferCeiling } from './trade_view';
 import { TutorialOverlay } from './tutorial';
+import {
+  buildFerryBellHomeNote,
+  buildFerryIslandArrivalNote,
+  buildTutorialDeclineNote,
+  buildTutorialGreetingModel,
+  type TutorialGreetingNote,
+} from './tutorial_greeting_view';
+import { renderTutorialGreeting, renderTutorialGreetingNote } from './tutorial_greeting_window';
 import { svgIcon } from './ui_icons';
 import { getUiScale } from './ui_scale';
 import { newUnitFrameBuffer, type UnitFrameDescriptor, unitFrameViewInto } from './unit_frame';
@@ -780,17 +790,7 @@ import { crestIdForEntity } from './unit_portrait';
 import { UnitPortraitPainter } from './unit_portrait_painter';
 import { knownItemIconHtml } from './unknown_item_icon';
 import { unstuckFeedback } from './unstuck_feedback';
-import { ValeCupBetting } from './vale_cup_betting';
-import { buildVcupBettingView } from './vale_cup_betting_view';
-import { ValeCupBriefing } from './vale_cup_briefing';
-import { buildVcupBriefingView } from './vale_cup_briefing_view';
-import { ValeCupCharge } from './vale_cup_charge';
-import { buildVcupChargeView } from './vale_cup_charge_view';
-import { ValeCupHud } from './vale_cup_hud';
-import { buildVcupHudView } from './vale_cup_hud_view';
-import { ValeCupIndicator } from './vale_cup_indicator';
-import { buildVcupIndicatorView } from './vale_cup_indicator_view';
-import { ValeCupWindow, vcupNationName } from './vale_cup_window';
+import { visibleVendorStock } from './vendor_stock_gate_core';
 import { nextVoicedYell, type VoicedYellState, voicedYellGain } from './voice_events';
 import { onWalletUiChange, walletConnectionView } from './wallet_balance';
 import { requestWalletVerify } from './wallet_verify_request';
@@ -872,7 +872,7 @@ export interface GamepadBindingsHooks extends CrossHotbarPanelHooks {
   // Detected brand of the connected pad, so the panel labels each button with the
   // glyph printed on that controller ('generic' combined labels when none/unknown).
   kind(): GamepadKind;
-  // The cross hotbar layout: the action-bar slot each position casts, per set.
+  crossHotbarSet(): number;
 }
 
 export interface ReportHooks {
@@ -937,29 +937,15 @@ const $ = <T extends HTMLElement = HTMLElement>(sel: string): T => document.quer
 // painter's repaint gate never fires for it; the constant just pins the key so the
 // gate stays a no-op (target/party pass a per-unit key).
 const PLAYER_PORTRAIT_KEY = 'player';
-// Vale Cup hold-to-charge shoot: full power after this long held, and the charge
-// a NON-held tap (touch / gamepad / a mouse click on the slot) fires at.
-const SHOOT_CHARGE_MS = 850;
-const SHOOT_TAP_CHARGE = 0.6;
 const MOBILE_CONTEXT_LONG_PRESS_MS = 650;
-// Vale Cup walk-up "theatre": the anchored kickoff/goal/save/golden/end/countdown
-// banners + crowd fx. The real Sowfield match's theatre is gated to the stadium
-// footprint (isAtSowfield, the same predicate that arms the stadium music), so no
-// alert leaves the football ground; a private practice pitch (a far, isolated
-// instance) shows its theatre only to someone within VCUP_THEATRE_RADIUS of that
-// pitch. Personal events (vcupFound/Result/BetSettled) are NOT here and always
-// reach their owner.
-const VCUP_WALKUP_EVENTS = new Set([
-  'vcupCountdown',
-  'vcupKickoff',
-  'vcupGoal',
-  'vcupSave',
-  'vcupGolden',
-  'vcupEnd',
+// The modal one-shots that stay above every banded window AND the mobile
+// window backdrop (z 85): the confirm/input prompt plus the confirm-dialog
+// family's once-ever explainers (the scoped-popup 96 rule).
+const SCOPED_POPUP_IDS: ReadonlySet<string> = new Set([
+  'confirm-dialog',
+  'tutorial-greeting',
+  'profession-tutorial',
 ]);
-// Stadium-scale: covers the pitch + stands + approach, but nowhere near another
-// match's pitch (the real Sowfield and practice instances are >600yd apart).
-const VCUP_THEATRE_RADIUS = 200;
 // The number of combo pips, named so the per-frame player paint carries no bare
 // literal at the call site.
 const COMBO_PIP_COUNT = 5;
@@ -1307,6 +1293,10 @@ export class Hud {
   // attack handler then falls back to the fixed attack control.
   onMobileAttackNearest: (() => void) | null = null;
   onQuestDialogStateChange: ((open: boolean) => void) | null = null;
+  // First-ever landing on the tutorial island (the sim's per-character
+  // firstVisit): main.ts wires the arrival camera cinematic here
+  // (game/arrival_cinematic.ts). The HUD owns the event arm, not the camera.
+  onIslandFirstArrival: (() => void) | null = null;
   // The healer button lives in the non-blocking ghost overlay, but successful
   // resurrection must still flow through main.ts so authoritative outcomes can
   // stop autorun without making Hud own Input or MobileControls.
@@ -1329,13 +1319,6 @@ export class Hud {
   private groundAim: GroundAimState = createGroundAimState();
   private groundAimPoint: AimPoint | null = null;
   private groundAimClamped = false;
-  // Vale Cup hold-to-charge shoot: the bar slot being held and when the hold
-  // started; the power meter fills to chargeFrac() while held and the shot fires
-  // at that fraction on release. The meter itself is the ValeCupCharge painter
-  // (declared with the other Vale Cup painters, after writerFacet) driven off
-  // the pure vale_cup_charge_view core; only the input timing state lives here.
-  private shootChargeSlot: number | null = null;
-  private shootChargeStartMs = 0;
   private empowerCharge: { slot: number; abilityId: string } | null = null;
   private dragAction: {
     action: Exclude<HotbarAction, null>;
@@ -1972,9 +1955,12 @@ export class Hud {
   private confirmOnCancel: (() => void) | null = null;
   // The first-tier tutorial modal's focus trap (#profession-tutorial).
   private professionTutorialTrap: FocusTrapHandle | null = null;
+  private tutorialGreetingTrap: FocusTrapHandle | null = null;
   private meters: Meters;
   private readonly targetAurasWindow: TargetAurasWindow;
   private tutorial = new TutorialOverlay();
+  private bootcamp = new BootcampOverlay();
+  private noticeboardPopup = new NoticeboardPopup();
   private lastPetBarSig = '';
   // Value-diffed body-class flag: true while a live pet bar is shown. The mobile
   // top-band layout reads body.mobile-pet-active to yield the top-centre line to the
@@ -2089,10 +2075,6 @@ export class Hud {
       talentSpec: () => this.sim.talentSpec,
       knownAbilityIds: () => this.sim.known.map((known) => known.def.id),
       hasAura: (kind) => this.sim.player.auras.some((aura) => aura.kind === kind),
-      isInSportMatch: () => {
-        const match = this.sim.cupInfo?.match;
-        return !!match && match.team !== null;
-      },
       showAttackButton: () => this.optionsHooks?.settings.get('showAttackButton') ?? true,
       // Persistence seam: online, the ClientWorld debounces a per-character wire
       // save; offline, Sim.saveActionBarLayout is a no-op (localStorage is the
@@ -2212,7 +2194,6 @@ export class Hud {
       openCrafting: (craftId) => this.openCrafting(craftId),
       openMarket: () => this.openMarket(),
       openDelveBoard: (npcId) => this.openDelveBoard(npcId),
-      openValeCup: () => this.toggleValeCup(),
       openCardDuel: () => this.toggleCardDuel(),
       onOpenChange: (open) => this.onQuestDialogStateChange?.(open),
       voice: {
@@ -2951,7 +2932,6 @@ export class Hud {
     $('#mm-wiki')?.addEventListener('click', () => this.openWiki());
     $('#mm-arena').addEventListener('click', () => this.toggleArena());
     $('#mm-dfinder').addEventListener('click', () => this.toggleDungeonFinder());
-    $('#mm-valecup').addEventListener('click', () => this.toggleValeCup());
     $('#mm-cardduel').addEventListener('click', () => this.toggleCardDuel());
     $('#mm-leaderboard').addEventListener('click', () => this.toggleLeaderboard());
     $('#mm-wocmarket')?.addEventListener('click', () => this.toggleWocMarket());
@@ -3214,12 +3194,13 @@ export class Hud {
   }
 
   private bringWindowToFront(el: HTMLElement): void {
-    // The confirm/input prompt is the topmost modal by definition and never
-    // joins the 50-89 window band: banding it (a pointerdown raise, or the
-    // normalize sweep) drops it BEHIND the armory inspect overlay (z 90), so a
-    // real mouse press on the dialog demotes it mid-click and its own OK
-    // button becomes unclickable (the "phantom dead confirm" bug).
-    if (el.id === 'confirm-dialog') {
+    // The scoped-popup modals are topmost by definition and never join the
+    // 50-89 window band: banding one (a pointerdown raise, or the normalize
+    // sweep) drops it BEHIND the armory inspect overlay (z 90) AND the
+    // mobile window backdrop (z 85), so its own OK button becomes
+    // unclickable (the "phantom dead confirm" bug on desktop; the
+    // untappable tutorial greeting under the mobile veil).
+    if (SCOPED_POPUP_IDS.has(el.id)) {
       el.style.zIndex = String(Math.max(this.windowZValue(el), 95));
       return;
     }
@@ -3229,7 +3210,7 @@ export class Hud {
 
   private normalizeWindowZ(): void {
     const open = [...document.querySelectorAll<HTMLElement>('.window.panel')]
-      .filter((el) => el.id !== 'confirm-dialog' && this.isWindowVisible(el))
+      .filter((el) => !SCOPED_POPUP_IDS.has(el.id) && this.isWindowVisible(el))
       .sort((a, b) => this.windowZValue(a) - this.windowZValue(b));
     this.windowZ = 50;
     for (const el of open) el.style.zIndex = String(++this.windowZ);
@@ -3372,6 +3353,11 @@ export class Hud {
         // never left hidden with a live trap (the confirm-dialog precedent).
         this.closeProfessionTutorial();
         break;
+      case 'tutorial-greeting':
+        // Route through closeTutorialGreeting so the focus trap is released
+        // and the modal is removed (the profession-tutorial precedent).
+        this.closeTutorialGreeting();
+        break;
       case 'options-menu':
         this.closeOptions();
         break;
@@ -3441,10 +3427,6 @@ export class Hud {
       case 'dungeon-finder-window':
         // Route through the painter so focus returns to the opener (WCAG 2.2 AA).
         this.dungeonFinderWindow.close();
-        break;
-      case 'valecup-window':
-        // Route through the painter so focus returns to the opener (WCAG 2.2 AA).
-        this.valeCupWindow.close();
         break;
       case 'card-duel-window':
         // Route through the painter so focus returns to the opener (WCAG 2.2 AA).
@@ -3522,6 +3504,9 @@ export class Hud {
         break;
       case 'leaderboard-window':
         this.leaderboardWindow.close();
+        break;
+      case 'guild-board-window':
+        this.guildBoardWindow.close();
         break;
       case 'daily-rewards-window':
         this.dailyRewardsWindow.close();
@@ -4929,21 +4914,11 @@ export class Hud {
     root: () => $('#bg-proposal-popup'),
     world: () => this.sim,
   });
-  // Vale Cup window painter (vale_cup_window_view.ts model + vale_cup_window.ts
-  // painter, the ArenaWindow shape). It owns the bracket / nation / role
-  // selections, the render-skip signature, and focus-return; Hud forwards the
-  // keybind toggle and drives render() from the mediumHud band.
-  private readonly valeCupWindow = new ValeCupWindow({
-    root: () => $('#valecup-window'),
-    world: () => this.sim,
-    closeOthers: () => this.closeOtherWindows('#valecup-window'),
-    ...this.windowFocus('#valecup-window'),
-  });
   // Card Duel window painter (card_duel_view.ts model + card_duel_window.ts
   // painter, the ValeCupWindow shape scaled down). The Card Master NPC's gossip
   // menu AND the persistent #mm-cardduel micromenu button (the sim allows
   // playing a card once matched without proximity, so the window must stay
-  // reachable away from the NPC too, matching the #mm-valecup family) both
+  // reachable away from the NPC too) both
   // toggle it; Hud drives render() from the mediumHud band while open, and
   // auto-opens it the moment a match starts (see the mediumHud band below).
   private readonly cardDuelWindow = new CardDuelWindow({
@@ -4951,21 +4926,6 @@ export class Hud {
     world: () => this.sim,
     closeOthers: () => this.closeOtherWindows('#card-duel-window'),
     ...this.windowFocus('#card-duel-window'),
-  });
-  // Persistent Vale Cup indicator button (queued / live-at-the-Sowfield states;
-  // hidden inside my own match). Never tier-shed: queue position and the live
-  // score are information, not cosmetics (gameplay-neutral graphics invariant).
-  private readonly vcupIndicator = new ValeCupIndicator({
-    root: () => $('#vcup-indicator'),
-    open: () => this.toggleValeCup(),
-    writers: this.writerFacet,
-  });
-  // In-match Vale Cup score strip (flags, score, count-down clock, phase line),
-  // snapshot-driven from cupInfo.match on the mediumHud band; one-shot juice
-  // (banners, horn) rides the vcup SimEvents in handleEvents.
-  private readonly vcupMatchHud = new ValeCupHud({
-    layer: () => document.getElementById('ui'),
-    writers: this.writerFacet,
   });
 
   // Thornhollow Fields in-match scoreboard strip + wave-respawn overlay (self-mounting,
@@ -4979,30 +4939,6 @@ export class Hud {
   private readonly bgKillFeed = new BattlegroundKillFeed({
     layer: () => document.getElementById('ui'),
   });
-  // Pre-match Vale Cup briefing overlay (rules + role kit + team sheet + Ready).
-  // Self-mounting full-screen card shown only while cupInfo.match.phase is
-  // 'briefing'; drives itself off view.visible (no toggle wiring), rides the
-  // mediumHud band, and readies up through the IWorld command.
-  private readonly vcupBriefing = new ValeCupBriefing({
-    layer: () => document.getElementById('ui'),
-    writers: this.writerFacet,
-    onReady: () => this.sim.vcupReady(),
-  });
-  // Spectator parimutuel betting banner + card (walk-up at the Sowfield).
-  private readonly vcupBetting = new ValeCupBetting({
-    layer: () => document.getElementById('ui'),
-    writers: this.writerFacet,
-    onBet: (side, copper) => this.sim.vcupBet(side, copper),
-  });
-  // The shoot power meter (hold-to-charge): the charge input state lives on the
-  // Hud (shootChargeSlot / shootChargeStartMs); this painter only draws it.
-  private readonly vcupCharge = new ValeCupCharge({
-    layer: () => document.getElementById('ui'),
-    rootId: 'vcup-charge',
-    writers: this.writerFacet,
-  });
-  // Latch for the kickoff auto-close of the queue window (arena pattern).
-  private vcupMatchSeen = false;
   // Character window painter (char_view.ts paperdoll core + char_window.ts painter).
   // It composes the presentation bag (icon/tooltip) for the equip slots and routes
   // the HUD-built stat / talent / progression fragments plus the unequip + drag
@@ -5175,6 +5111,16 @@ export class Hud {
     ...this.windowFocus('#leaderboard-window'),
     onVisibilityChange: () => this.syncAnyWindowOpenState(),
     showDevBadges: () => this.optionsHooks?.settings.get('showDevBadges') ?? true,
+  });
+  // The signpost guild board (src/ui/hud/guild_board/): opened by the world's
+  // noticeboard interaction, never a menu button; the board lives in the world.
+  private readonly guildBoardWindow = new GuildBoardWindow({
+    root: () => $('#guild-board-window'),
+    world: () => this.sim,
+    closeOthers: () => this.closeOtherWindows('#guild-board-window'),
+    ...this.windowFocus('#guild-board-window'),
+    onVisibilityChange: () => this.syncAnyWindowOpenState(),
+    maskPlayerText: (text) => this.maskChat(text),
   });
   // The $WOC Exchange window (docs/prd/woc/marketplace.md): online, browser-web
   // only. Openable only once main.ts attaches the hooks (attachWocMarket); the
@@ -6540,12 +6486,6 @@ export class Hud {
     this.bgProposalPopup.relocalize();
     // Same text-independent-sig contract for the Vale Cup surfaces: clear the
     // sigs so the next render/update rebuilds with fresh t().
-    this.valeCupWindow.relocalize();
-    this.vcupBetting.relocalize();
-    this.vcupIndicator.relocalize();
-    this.vcupMatchHud.relocalize();
-    this.vcupBriefing.relocalize();
-    this.vcupCharge.relocalize();
     this.questDialog.relocalize();
     // Same text-independent-sig contract, one surface at a time (#2529). Every
     // one of these was rebuilding only when its own data moved, so an open one
@@ -6559,6 +6499,9 @@ export class Hud {
     this.barEditorWindow.relocalize();
     this.lockpickController.relocalize();
     this.tutorial.relocalize(this.sim, this.keybinds);
+    this.bootcamp.relocalize(this.sim, this.keybinds);
+    this.noticeboardPopup.relocalize();
+    this.guildBoardWindow.relocalize();
     // The ring latches its page indicator on the page/count pair; dropping the
     // latch relabels it on the next paint (mobile layouts only build the ring).
     this.mobileActionRingPainter?.relocalize();
@@ -6829,79 +6772,14 @@ export class Hud {
     return { x: me.pos.x, z: me.pos.z };
   }
 
-  // The Vale Cup sport moves are AUTOCAST on press: no ground-target reticle, no
-  // point-and-click. Pressing the key fires the move at once toward where the
-  // player faces (a kick/boot/slide down the field), so the football controls are
-  // press-to-play. The sim still resolves the natural target (sport_pass seeks the
-  // selected teammate first; the kicks scale power by the aim's distance, so a
-  // facing-length aim is a full-power "empowered" kick).
-  private isSportAbilityId(id: string): boolean {
-    return id.startsWith('sport_');
-  }
-
-  private castSportMove(abilityId: string, range: number): void {
-    const me = this.sim.player;
-    const r = range > 0 ? range : MELEE_RANGE;
-    this.sim.castAbilityAt(abilityId, {
-      x: me.pos.x + Math.sin(me.facing) * r,
-      z: me.pos.z + Math.cos(me.facing) * r,
-    });
-  }
-
-  // A direct (non-held) sport cast: a Shoot fired this way (touch / gamepad /
-  // mouse click) has no charge, so it uses a medium default power instead of the
-  // full-range aim, which would balloon over the bar.
-  private castSportTap(abilityId: string, range: number): void {
-    this.castSportMove(abilityId, abilityId === 'sport_shoot' ? SHOOT_TAP_CHARGE * range : range);
-  }
-
-  // My first sport move (Shoot) while seated in a Vale Cup match, else null. The
-  // fixed primary action seat uses this same resolved record for its cast, art,
-  // cooldown, range state, accessible name, and tooltip.
-  private firstSportAbility(): ResolvedAbility | null {
-    // Seated in a match => my known list IS the sport kit (Shoot first). Keyed off
-    // cupInfo.match, not the bar form, so it holds the instant the whistle swaps
-    // the kit in (the bar-form flip can lag a frame behind).
-    if (!this.sim.cupInfo?.match) return null;
-    const first = this.sim.known[0];
-    return first && this.isSportAbilityId(first.def.id) ? first : null;
-  }
-
-  private firstSportAbilityId(): string | null {
-    return this.firstSportAbility()?.def.id ?? null;
-  }
-
-  // The ability a bar slot would cast right now (slot 0 remaps to the first sport
-  // move on the pitch). Used to decide whether a slot press charges (shoot).
-  private abilityIdForSlot(slot: number): string | null {
-    if (slot === 0) return this.firstSportAbilityId();
-    return this.abilityForSlot(slot)?.def.id ?? null;
-  }
-
   private empoweredAbilityIdForSlot(slot: number): string | null {
     const known = this.abilityForSlot(slot);
     return known?.def.empowerStages ? known.def.id : null;
   }
 
-  private shootRangeForSlot(slot: number): number {
-    if (slot === 0) return this.firstSportAbility()?.def.range ?? MELEE_RANGE;
-    return this.abilityForSlot(slot)?.def.range ?? MELEE_RANGE;
-  }
-
-  // The held-charge fraction 0..1 (time held / SHOOT_CHARGE_MS).
-  private shootChargeFrac(): number {
-    return Math.min(1, (performance.now() - this.shootChargeStartMs) / SHOOT_CHARGE_MS);
-  }
-
-  // Slot key DOWN: a shoot slot starts CHARGING (hold to build power); every
-  // other slot fires immediately (a tap is down + up, so this is the press).
+  // Slot key DOWN: every slot fires immediately (a tap is down + up, so this
+  // is the press).
   pressSlot(slot: number): void {
-    if (this.abilityIdForSlot(slot) === 'sport_shoot') {
-      this.shootChargeSlot = slot;
-      this.shootChargeStartMs = performance.now();
-      this.updateShootCharge(); // show the meter at 0 this frame
-      return;
-    }
     const empowered = this.empoweredAbilityIdForSlot(slot);
     if (empowered) {
       if (this.empowerCharge) return;
@@ -6912,8 +6790,8 @@ export class Hud {
     this.castSlot(slot);
   }
 
-  // Slot key UP: release a charging shoot at the built power (aim distance encodes
-  // the charge). A non-charging slot already fired on press, so this is a no-op.
+  // Slot key UP: release an empowered hold. A non-charging slot already fired
+  // on press, so this is a no-op.
   releaseSlot(slot: number): void {
     if (this.empowerCharge?.slot === slot) {
       const charge = this.empowerCharge;
@@ -6921,16 +6799,6 @@ export class Hud {
       this.sim.releaseEmpoweredAbility(charge.abilityId);
       this.flashActionSlot(slot);
       return;
-    }
-    if (this.shootChargeSlot !== slot) return;
-    const frac = this.shootChargeFrac();
-    const id = this.abilityIdForSlot(slot);
-    const range = this.shootRangeForSlot(slot);
-    this.shootChargeSlot = null;
-    this.updateShootCharge(); // hide the meter this frame
-    if (id === 'sport_shoot') {
-      this.castSportMove(id, Math.max(1, frac * range));
-      this.flashActionSlot(slot);
     }
   }
 
@@ -6964,21 +6832,6 @@ export class Hud {
     };
     btn.addEventListener('pointerup', (event) => release(event, true));
     btn.addEventListener('pointercancel', (event) => release(event, false));
-  }
-
-  // Per-frame: paint the power meter off the pure view core; the core's `cancel`
-  // auto-releases if I leave the match or die mid-charge so the meter never sticks.
-  private updateShootCharge(): void {
-    const charging = this.shootChargeSlot !== null;
-    const view = buildVcupChargeView(
-      charging,
-      !!this.sim.cupInfo?.match,
-      this.sim.player.dead,
-      // Only read the charge clock while a slot is actually held.
-      charging ? this.shootChargeFrac() : 0,
-    );
-    if (view.cancel) this.shootChargeSlot = null;
-    this.vcupCharge.update(view);
   }
 
   private groundReticleEnabled(abilityId: string): boolean {
@@ -7069,15 +6922,6 @@ export class Hud {
   }
 
   private activateFixedAttackSlot(): void {
-    // On the pitch, key 1 casts your first sport move (Kick) instead of the
-    // harvest-truce-inert auto-attack, which would be a dead key with no useful
-    // effect. Off the pitch it is the normal auto-attack toggle.
-    const sportFirst = this.firstSportAbility();
-    if (sportFirst) {
-      this.castSportTap(sportFirst.def.id, sportFirst.def.range);
-      this.flashActionSlot(0);
-      return;
-    }
     if (this.sim.player.autoAttack) this.sim.stopAutoAttack();
     else this.sim.startAutoAttack();
     this.flashActionSlot(0);
@@ -7160,10 +7004,7 @@ export class Hud {
         // A self-centered channel (Bladestorm) casts at the caster's own feet:
         // no ground-aim reticle, straight to the normal cast path.
         if (resolved.def.targetMode === 'position' && !resolved.def.selfCentered) {
-          if (this.isSportAbilityId(action.id)) {
-            // Sport moves autocast toward facing (no reticle, no point-and-click).
-            this.castSportTap(action.id, resolved.def.range);
-          } else if (this.groundReticleEnabled(action.id)) {
+          if (this.groundReticleEnabled(action.id)) {
             this.beginGroundAim(action.id, barSlot);
           } else {
             this.sim.castAbilityAt(action.id, this.groundTargetAim());
@@ -7404,8 +7245,6 @@ export class Hud {
       });
       this.attachTooltip(btn, () => {
         if (slot === 0 && this.attackSlotIsAttack()) {
-          const sportFirst = this.firstSportAbility();
-          if (sportFirst) return this.abilityTooltip(sportFirst);
           return `<div class="tt-title">${esc(t('abilityUi.actionBar.attackName'))}</div><div class="tt-sub">${esc(t('abilityUi.actionBar.attackTooltip'))}</div><div class="tt-sub">${esc(t('abilityUi.actionBar.attackRemoveHint'))}</div>`;
         }
         const known = this.abilityForSlot(slot);
@@ -7616,16 +7455,12 @@ export class Hud {
             slotIndex: i,
             // Live accessor: slot 0 stops being the Attack toggle when the player
             // removes it (Interface option showAttackButton off / right-click).
-            isAttack: () =>
-              i === 0 && this.attackSlotIsAttack() && this.firstSportAbility() === null,
+            isAttack: () => i === 0 && this.attackSlotIsAttack(),
             // Raw binding presence (any assigned slot, even one whose ability is
             // unlearned or item id is unknown): the many-spells count source, kept
             // byte-identical to the former hotbarActions.filter(a => a !== null).
             hasAction: () => this.actionForSlot(i) !== null,
-            ability: () =>
-              i === 0 && this.attackSlotIsAttack()
-                ? this.firstSportAbility()
-                : this.abilityForSlot(i),
+            ability: () => (i === 0 && this.attackSlotIsAttack() ? null : this.abilityForSlot(i)),
             item: () => this.itemForSlot(i),
             keybindLabel: () => keyCapLabel(this.keybinds.primaryLabel(slotKey)),
           };
@@ -7724,7 +7559,6 @@ export class Hud {
       },
       castSlot: (slot) => this.castSlot(slot),
       cyclePage: () => this.cycleMobileActionPage(),
-      firstSportAbility: () => this.firstSportAbility(),
       activateFixedAttackSlot: () => this.activateFixedAttackSlot(),
       attackNearest: this.onMobileAttackNearest,
       attackTapState: () => {
@@ -7816,7 +7650,6 @@ export class Hud {
       ['#mm-crafting', 'crafting', 'hudChrome.crafting.title'],
       ['#mm-arena', 'arena', 'hudChrome.pvp.launcherTitle'],
       ['#mm-dfinder', 'dungeonFinder', 'hudChrome.finder.title'],
-      ['#mm-valecup', 'valecup', 'hudChrome.keybinds.valecup'],
       ['#mm-leaderboard', 'leaderboard', 'game.leaderboard.title'],
       ['#mm-emote', 'emoteWheel', 'hudChrome.emoteWheel.label'],
       ['#mm-social', 'social', 'hud.social.friendsTab'],
@@ -8594,7 +8427,7 @@ export class Hud {
     this.lootRolls.update(now);
     // The zone/combat/boss music state machine, hoisted above the cut (phase 4
     // QA F1): music keeps PLAYING on hidden frames, so its transitions (combat
-    // over, zone change, boss engage, Sowfield) must keep executing or a
+    // over, zone change, boss engage) must keep executing or a
     // minimized player hears the stale track until restore. Same medium
     // cadence the painted path always drove it at; the paint half reads the
     // stored decision instead of driving the machine itself.
@@ -8608,7 +8441,6 @@ export class Hud {
         zone: zoneAt(p.pos.x, p.pos.z),
         inDungeon: p.pos.x > DUNGEON_X_THRESHOLD,
         entities: sim.entities.values(),
-        cupInfo: sim.cupInfo,
         riftFloor: sim.riftFloor,
       });
     }
@@ -8626,6 +8458,7 @@ export class Hud {
     this.mountRaceControls.update();
     this.lockpickController.repaintIfChanged();
     this.tutorial.update(sim, this.renderer, this.keybinds);
+    this.bootcamp.update(sim, this.renderer, this.keybinds, this.optionsHooks?.gamepad ?? null);
     if (slowHud) this.updateRaidLockoutBadge();
     if (slowHud) this.refreshDailyRewardsLauncher();
     this.maybeRestoreActionBarLayout();
@@ -9208,15 +9041,14 @@ export class Hud {
     // Death UI. A fresh corpse (dead, spirit not yet released) gets the full-screen
     // Release overlay (a corpse cannot move, so a modal is fine; suppressed in arena).
     // A ghost runs FREELY (no blocking overlay) and the world drains to greyscale; a
-    // small non-blocking prompt appears only when in reach of its corpse or a Spirit
-    // Healer, carrying just the relevant button. The server re-checks both ranges.
+    // A small prompt appears only in corpse/Healer reach; the server re-checks both ranges.
     const ghost = p.dead && p.ghost;
     const deadInArena = p.dead && !!this.sim.arenaInfo?.match;
-    // A battleground corpse releases like the open world (the spirit rises in
-    // the keep graveyard and waits for the wave), so the Release modal shows;
+    // A battleground corpse releases like the open world, so the Release modal shows;
     // only the corpse-run / Spirit Healer prompts are suppressed in a match
     // (the wave is the one way back, enforced server-side too).
     const ghostInBgMatch = !!this.sim.bgInfo?.match;
+    if (p.dead) syncDeathControllerHints(this.optionsHooks?.gamepad ?? null);
     if (!p.dead) this.closeResurrectionPrompt();
     document.body.classList.toggle('spirit-mode', ghost);
     this.setDisplay(this.deathOverlayEl, p.dead && !ghost && !deadInArena ? 'flex' : 'none');
@@ -9284,7 +9116,6 @@ export class Hud {
       // mediumHud divider); this half only reads its decision.
       const musicState = this.lastMusicDecision;
       const inCombat = musicState?.inCombat === true;
-      const atSowfield = musicState?.atSowfield === true;
 
       // classic combat indicator: crossed swords + red ring on the player portrait.
       // Routed through the cached ref + the elided toggleClass writer: a counted,
@@ -9319,19 +9150,11 @@ export class Hud {
       this.bgScoreboard.update(buildBgScoreboardView(this.sim.bgInfo, this.sim.playerId));
       this.bgKillFeed.update(performance.now() / 1000);
       this.yumiPainter.update(this.sim.arenaInfo);
-      // Vale Cup surfaces (mediumHud like the arena/fiesta ones): the indicator
-      // button, the in-match strip, and the open window redraw.
-      this.vcupIndicator.update(buildVcupIndicatorView(this.sim.cupInfo, atSowfield));
-      this.vcupMatchHud.update(buildVcupHudView(this.sim.cupInfo));
-      this.vcupBriefing.update(buildVcupBriefingView(this.sim.cupInfo));
-      this.vcupBetting.update(buildVcupBettingView(this.sim.cupInfo));
-      this.updateShootCharge();
       if ($('#map-window').style.display === 'block') this.updateMapWindow();
       if ($('#arena-window').style.display === 'block') this.arenaWindow.render();
       if ($('#dungeon-finder-window').style.display === 'flex') this.dungeonFinderWindow.render();
       if (this.dungeonFinderProposalPopup.isOpen) this.dungeonFinderProposalPopup.render();
       if (this.bgProposalPopup.isOpen) this.bgProposalPopup.render();
-      if ($('#valecup-window').style.display === 'block') this.valeCupWindow.render();
       // Auto-open the Card Duel window the instant a queued match starts (a
       // false->true transition on match presence), mirroring the trade window's
       // transition-based auto-open (hud/woc_trade): the sim allows playing a card from anywhere
@@ -9379,11 +9202,6 @@ export class Hud {
     this.arenaMatchSeen = inArenaMatch;
     // Same for the Vale Cup: when the whistle calls, get the queue window out of
     // the way of the pitch. Route through close() (focus-return), never a raw hide.
-    const inVcupMatch = !!this.sim.cupInfo?.match;
-    if (inVcupMatch && !this.vcupMatchSeen && $('#valecup-window').style.display === 'block') {
-      this.valeCupWindow.close();
-    }
-    this.vcupMatchSeen = inVcupMatch;
     // Same for Thornhollow Fields: when the match seats, the PvP window steps aside.
     const inBgMatch = !!this.sim.bgInfo?.match;
     if (inBgMatch && !this.bgMatchSeen && $('#arena-window').style.display === 'block') {
@@ -10418,17 +10236,8 @@ export class Hud {
     this.dungeonFinderWindow.toggle();
   }
 
-  toggleValeCup(): void {
-    this.valeCupWindow.toggle();
-  }
-
   toggleCardDuel(): void {
     this.cardDuelWindow.toggle();
-  }
-
-  /** Offline builds enable the Vale Cup practice-vs-bots button (main.ts). */
-  setVcupPracticeAvailable(on: boolean): void {
-    this.valeCupWindow.setPracticeAvailable(on);
   }
 
   // The pinned in-match banner: opponent name + countdown / live match timer.
@@ -11136,29 +10945,6 @@ export class Hud {
       // server/game.ts), so an event a bystander should see must be pid-less
       // by construction on every host.
       if (ev.pid !== undefined && ev.pid !== sim.playerId) continue;
-      // Vale Cup walk-up theatre (kickoff/goal/save/golden/end/countdown) is
-      // anchored at its own match's pitch. Only play it when that pitch is NEAR
-      // the local player, so you see the game in front of you (the Sowfield when
-      // you walk up, or your OWN private practice pitch) and never another
-      // match's alerts leaking in, e.g. a bot showcase on the main pitch spamming
-      // a player off in a distant practice instance. Offline hands the whole tick
-      // batch here, so this proximity gate is what keeps matches from crossing.
-      if (VCUP_WALKUP_EVENTS.has(ev.type)) {
-        const a = ev as unknown as { x: number; z: number };
-        if (isAtSowfield(a.x, a.z)) {
-          // Real Sowfield match: its theatre is gated to the stadium footprint,
-          // the same predicate that arms the stadium music, so no kickoff/goal
-          // banner leaks into Eastbrook or the wider map.
-          if (!isAtSowfield(sim.player.pos.x, sim.player.pos.z)) continue;
-        } else {
-          // A private practice instance (a far, isolated pitch): show its
-          // theatre only to someone standing on that same pitch, never the main
-          // match's audience.
-          const dx = a.x - sim.player.pos.x;
-          const dz = a.z - sim.player.pos.z;
-          if (dx * dx + dz * dz > VCUP_THEATRE_RADIUS * VCUP_THEATRE_RADIUS) continue;
-        }
-      }
       // visual effects (swings, projectiles, glows) — for everyone nearby,
       // not just events involving this player
       this.renderer.handleEvent(ev);
@@ -11891,6 +11677,36 @@ export class Hud {
           if (this.professionsWindow.isOpen) this.professionsWindow.render();
           break;
         }
+        case 'tutorialGreeting':
+          // The spawn greeting (tutorial island): the sim guarantees
+          // once-ever; this arm only opens the choice dialog with the
+          // first-character vs refresher copy the event decided.
+          this.openTutorialGreeting(ev.firstCharacter);
+          break;
+        case 'ferryBellHome':
+          // The island bell just set this player down in town: point out the
+          // town's twin bell ONCE per device (the ride may have been a
+          // misclick), the woc.tutorial.v1 presentation-only one-shot idiom.
+          try {
+            if (localStorage.getItem('woc.ferrybellhint.v1') !== 'seen') {
+              localStorage.setItem('woc.ferrybellhint.v1', 'seen');
+              this.openTutorialGreetingNote(buildFerryBellHomeNote());
+            }
+          } catch {
+            /* private mode: skip the hint rather than throw */
+          }
+          break;
+        case 'ferryIslandArrival':
+          // Landing on the Proving Shore with the rail not yet started:
+          // Ferryman Odo's welcome note teaches walking and talking and points
+          // up the road to Maren. Gated by the SIM's per-character firstVisit
+          // (interactions/ferry_bell.ts), not a per-device flag, so every new
+          // character is taught even on a browser that has seen it before.
+          if (ev.firstVisit) {
+            this.openTutorialGreetingNote(buildFerryIslandArrivalNote());
+            this.onIslandFirstArrival?.();
+          }
+          break;
         case 'profTrendNudge':
         case 'profTierTutorial':
         case 'attuned':
@@ -12244,15 +12060,20 @@ export class Hud {
           this.openBank();
           break;
         case 'noticeboard':
-          // The board has no posted content yet. The structured private event
-          // keeps this feedback localized and identical offline and online.
-          // Mobile keeps the chat log collapsed during normal play, so mirror
-          // the durable/live-announced log line into the shared transient
-          // banner instead of making a successful interaction look inert.
-          {
-            const message = t('hudChrome.noticeboard.empty');
-            this.showBanner(message);
-            this.log(message, '#c8b98f');
+          // The structured private event keeps this feedback localized and
+          // identical offline and online. A board carrying authored listings
+          // opens the signpost popup (guild names and notes are world data,
+          // spliced verbatim like player names); every other board opens the
+          // guild board window below.
+          if (ev.state === 'listings') {
+            this.noticeboardPopup.show(ev.listings);
+          } else {
+            // A board with no authored listings IS the guild board: the
+            // signpost opens the realm's ranked pledge surface
+            // (src/ui/hud/guild_board/). Offline the window renders its
+            // localized nothing-posted state, so the interaction never
+            // looks inert on any host.
+            this.openGuildBoard();
           }
           break;
         case 'mailArrived': {
@@ -13090,118 +12911,6 @@ export class Hud {
         // save/golden/end) are pid-LESS with a world anchor so walk-up
         // bystanders at the Sowfield see the same banners; every string here
         // reads correctly for a spectator (nations + score ride the event).
-        case 'vcupQueued':
-          this.log(
-            t('hudChrome.vcup.logQueued', {
-              bracket: t('hudChrome.vcup.bracketLabel', {
-                n: formatNumber(ev.bracket, { maximumFractionDigits: 0 }),
-              }),
-              position: formatNumber(ev.position, { maximumFractionDigits: 0 }),
-            }),
-            '#ffa040',
-          );
-          break;
-        case 'vcupUnqueued':
-          this.log(t('hudChrome.vcup.logUnqueued'), '#ffa040');
-          break;
-        case 'vcupFound': {
-          const nationA = vcupNationName(ev.nationA);
-          const nationB = vcupNationName(ev.nationB);
-          this.showBanner(t('hudChrome.vcup.bannerFound', { nationA, nationB }));
-          this.log(t('hudChrome.vcup.logFound', { nationA, nationB }), '#ffa040');
-          const allies = [t('hud.core.you'), ...ev.allies.map((c) => c.name)].join(', ');
-          const enemies = ev.enemies.map((c) => c.name).join(', ');
-          if (enemies) this.log(t('hudChrome.vcup.logRoster', { allies, enemies }), '#ffa040');
-          audio.duelChallenge();
-          break;
-        }
-        case 'vcupCountdown':
-          this.showBanner(
-            t('hudChrome.vcup.bannerCountdown', {
-              seconds: formatNumber(ev.seconds, { maximumFractionDigits: 0 }),
-            }),
-          );
-          audio.duelCountdownTick();
-          break;
-        case 'vcupKickoff':
-          this.showBanner(t('hudChrome.vcup.bannerKickoff'));
-          audio.vcupKickoff();
-          break;
-        case 'vcupGoal': {
-          const scoringNation = vcupNationName(ev.team === 'A' ? ev.nationA : ev.nationB);
-          this.showBanner(t('hudChrome.vcup.bannerGoal', { nation: scoringNation }));
-          this.combatLog(
-            t('hudChrome.vcup.logGoal', {
-              name: ev.scorerName,
-              nation: scoringNation,
-              nationA: vcupNationName(ev.nationA),
-              scoreA: formatNumber(ev.scoreA, { maximumFractionDigits: 0 }),
-              nationB: vcupNationName(ev.nationB),
-              scoreB: formatNumber(ev.scoreB, { maximumFractionDigits: 0 }),
-            }),
-            '#ffd24a',
-          );
-          this.renderer.addShake(0.4);
-          // the Sowfield's own horn + crowd (src/game/sfx.ts, render handoff)
-          sfx.goalHorn();
-          sfx.crowdRoar();
-          break;
-        }
-        case 'vcupSave':
-          this.showBanner(t('hudChrome.vcup.bannerSave', { name: ev.keeperName }));
-          this.combatLog(t('hudChrome.vcup.logSave', { name: ev.keeperName }), '#7fd4ff');
-          audio.fiestaScorePing(true);
-          sfx.crowdRoar(0.5);
-          break;
-        case 'vcupBetSettled': {
-          const amount = formatLocalizedMoney(ev.payout);
-          if (ev.outcome === 'won') {
-            this.showBanner(t('hudChrome.vcup.bet.wonBanner'));
-            this.combatLog(t('hudChrome.vcup.bet.wonLog', { amount }), '#ffd24a');
-            sfx.crowdRoar(0.5);
-          } else if (ev.outcome === 'refunded') {
-            this.combatLog(t('hudChrome.vcup.bet.refundLog', { amount }), '#7fd4ff');
-          } else {
-            this.combatLog(
-              t('hudChrome.vcup.bet.lostLog', {
-                amount: formatLocalizedMoney(ev.stake),
-              }),
-              '#fa6',
-            );
-          }
-          break;
-        }
-        case 'vcupGolden':
-          this.showBanner(t('hudChrome.vcup.bannerGolden'));
-          audio.fiestaWave();
-          break;
-        case 'vcupEnd':
-          this.showBanner(
-            t('hudChrome.vcup.bannerEnd', {
-              nationA: vcupNationName(ev.nationA),
-              scoreA: formatNumber(ev.scoreA, { maximumFractionDigits: 0 }),
-              nationB: vcupNationName(ev.nationB),
-              scoreB: formatNumber(ev.scoreB, { maximumFractionDigits: 0 }),
-            }),
-          );
-          audio.duelEnd();
-          sfx.crowdRoar();
-          break;
-        case 'vcupResult':
-          if (ev.draw) {
-            this.showBanner(t('hudChrome.vcup.bannerDraw'));
-            this.combatLog(t('hudChrome.vcup.logDraw'), '#fa6');
-            audio.duelEnd();
-          } else if (ev.won) {
-            this.showBanner(t('hudChrome.vcup.bannerWin'));
-            this.combatLog(t('hudChrome.vcup.logWin'), '#7fdc4f');
-            audio.duelEnd();
-          } else {
-            this.showBanner(t('hudChrome.vcup.bannerLoss'));
-            this.combatLog(t('hudChrome.vcup.logLoss'), '#ff7a6a');
-            audio.death();
-          }
-          break;
         case 'cardDuelMatchStart':
           audio.cardShuffle();
           break;
@@ -13797,6 +13506,79 @@ export class Hud {
     this.professionTutorialTrap?.release();
     this.professionTutorialTrap = null;
     document.getElementById('profession-tutorial')?.remove();
+  }
+
+  // The one-time spawn greeting dialog (tutorial island): fired by
+  // tutorialGreeting (the sim guarantees once-ever). Reuses the confirm-dialog
+  // modal family via the tutorial_greeting_window painter; the Hud owns the
+  // focus trap and the z-index floor, the openProfessionTutorial precedent.
+  private openTutorialGreeting(firstCharacter: boolean): void {
+    this.tutorialGreetingTrap?.release(false);
+    this.tutorialGreetingTrap = null;
+    // Warm the island WHILE the choice is read: main.ts skips the blocking
+    // loading screen entirely once renderer.isZoneReadyAt is true at the
+    // arrival, so the seconds a player spends on this dialog buy a seamless
+    // ferry ride. IDLE pace: this fires in live play behind a dialog, not a
+    // loading curtain, so the gating arm's synchronous sky PMREM and fast
+    // terrain batches would cost visible frames (the ferry-prewarm lane's
+    // rule). Fire-and-forget; an instant click degrades to the classic
+    // screen rather than a void drop.
+    void Promise.all([
+      this.renderer.prepareZoneAt(PROVING_SHORE_ARRIVAL.x, PROVING_SHORE_ARRIVAL.z, undefined, {
+        pace: 'idle',
+      }),
+      this.renderer.prewarmZoneAt(PROVING_SHORE_ARRIVAL.x, PROVING_SHORE_ARRIVAL.z, {
+        background: true,
+      }),
+    ]).catch(() => {
+      /* offline asset hiccup: the arrival falls back to the loading screen */
+    });
+    const el = renderTutorialGreeting(buildTutorialGreetingModel(firstCharacter), {
+      onPlay: () => {
+        // Fire-and-forget by design: the server re-validates and the >30 yd
+        // displacement drives the arrival flow. The Eastbrook coachmark is
+        // NOT latched here; it simply never engages while the player stands
+        // on the island (isFreshCharacter's position guard), so a dropped
+        // command costs nothing.
+        this.sim.startTutorial();
+        this.closeTutorialGreeting();
+      },
+      // Declining gets a follow-up note: the bell beside Bryn still rings
+      // the crossing any time, so a "no" is never a locked door.
+      onSkip: () => this.openTutorialGreetingNote(buildTutorialDeclineNote()),
+    });
+    this.bringWindowToFront(el);
+    // Above the mobile sheet (z-95) and the armory inspect overlay (z-90):
+    // the scoped-popup floor, so the one-shot never opens buried.
+    el.style.zIndex = String(Math.max(Number(el.style.zIndex) || 0, 96));
+    this.tutorialGreetingTrap = this.focusManager.open({ root: () => el });
+    el.querySelector<HTMLElement>('.cd-ok')?.focus();
+  }
+
+  private closeTutorialGreeting(): void {
+    this.tutorialGreetingTrap?.release();
+    this.tutorialGreetingTrap = null;
+    document.getElementById('tutorial-greeting')?.remove();
+    // The greeting is a body-appended one-shot outside the show/hide path, so
+    // removing it must resync body.mobile-window-open itself or the mobile
+    // window backdrop (z 85) stays up eating every touch until closeAll runs
+    // (the stuck-veil bug: Escape was the only way out).
+    this.syncAnyWindowOpenState();
+  }
+
+  // The greeting dialog's single-button note variant (decline follow-up,
+  // first bell homecoming): same shell, trap, and z-index floor as the
+  // two-choice dialog, so the managed-close registry covers it unchanged.
+  private openTutorialGreetingNote(note: TutorialGreetingNote): void {
+    this.tutorialGreetingTrap?.release(false);
+    this.tutorialGreetingTrap = null;
+    const el = renderTutorialGreetingNote(note, {
+      onClose: () => this.closeTutorialGreeting(),
+    });
+    this.bringWindowToFront(el);
+    el.style.zIndex = String(Math.max(Number(el.style.zIndex) || 0, 96));
+    this.tutorialGreetingTrap = this.focusManager.open({ root: () => el });
+    el.querySelector<HTMLElement>('.cd-ok')?.focus();
   }
 
   // Reliquary catalog fill: planned purely (buildReliquaryUnlockPlan). Each
@@ -14983,11 +14765,17 @@ export class Hud {
       // tick (offline has no authoritative-delta hook to ride).
       this.refreshOpenCraftingIfReagentsChanged();
     };
+    // Quest-gated rows (vendorQuestGates) hide until their quest is in the
+    // log; the sim's buyItem enforces the same gate authoritatively. Hoisted
+    // out of the call so the tool-gate source scan
+    // (tests/professions_tool_gate.test.ts) reads the buildVendorView
+    // argument list whole, with no nested call closing a line inside it.
+    const visibleStock = visibleVendorStock(npc, this.sim.questLog, this.sim.questsDone);
     renderVendorWindow(
       $('#vendor-window'),
       entityDisplayName(npc),
       buildVendorView(
-        npc.vendorItems,
+        visibleStock,
         this.sim.vendorBuyback,
         ITEMS,
         {
@@ -17099,6 +16887,12 @@ export class Hud {
   // which consumes the paged leaderboard() and owns the page index + focus.
   toggleLeaderboard(): void {
     this.leaderboardWindow.toggle();
+  }
+
+  /** The signpost guild board: opened by the world's noticeboard interaction
+   *  (and the E2E capture rigs); there is no menu launcher on purpose. */
+  openGuildBoard(): void {
+    this.guildBoardWindow.open();
   }
 
   toggleDailyRewards(): void {

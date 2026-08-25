@@ -5079,7 +5079,7 @@ function professionsGather(seed = 1): Scenario {
       // at cast completion on the tick path) plus a post-completion second
       // attempt denied by the player's own cooldown, which must add ZERO
       // draws to the digest.
-      teleport(sim, p, -70, -53); // ore_eastbrook_1
+      standOnNode(sim, p, 'ore_eastbrook_1'); // position derived, not a literal (see standOnNode)
       sim.harvestNode('ore_eastbrook_1', undefined, pid);
       rec.tick(castTicks); // the cast completes inside this window
       sim.harvestNode('ore_eastbrook_1', undefined, pid); // denied: own timer, no draw
@@ -5833,7 +5833,11 @@ function professionsFarmingSession(seed = 1): Scenario {
       sim.addItem('vale_wheat_seed', 2, pid);
       // The step-12 hoe gate: plantCrop now refuses without a wieldable hoe.
       sim.addItem('garden_hoe', 1, pid);
-      teleport(sim, p, 18.5, 30); // midway between the two beds, both in reach
+      // Midway between bed_eastbrook_1 (-24, -84) and bed_eastbrook_2 (-19, -84),
+      // both in reach. The patch moved from the north lane (beds at z 30) to the
+      // rebuilt town's north-east edge at the release/v0.41.0 merge, when the
+      // second wolf run landed on the old site.
+      teleport(sim, p, -21.5, -84);
 
       // Plant one: the first two draws of the session.
       plantCrop(sim.ctx, p, meta, BED_READY, CROP);
@@ -5951,7 +5955,7 @@ function professionsFarmingSession(seed = 1): Scenario {
       // fact: a draw or a repeat here moves the event digest and nothing
       // else in the suite would see it. ----
       sim.addItem('vale_wheat_seed', 1, pid);
-      teleport(sim, p, 18.5, 30); // back to the freed northern Eastbrook bed
+      teleport(sim, p, -21.5, -84); // back to the freed Eastbrook bed (the pair's midpoint)
       // Ride out the t3 plant's flavor cast remainder (its harvest landed
       // mid-cast and tick(8) covers only 0.4 sec), or this plant denies busy.
       rec.tick(Math.ceil(FARM_PLANT_CAST_SEC / DT) + 1);

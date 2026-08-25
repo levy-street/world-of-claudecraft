@@ -109,7 +109,6 @@ const MOB_IDS = [
   'sister_nhalia_drowned_canticle',
   'edda_reedhand',
   'tolling_bell',
-  'vale_cup_ball',
   // Thornpeak Heights world boss + its summoned adds
   'thunzharr_waking_peak',
   'thunzharr_stormling',
@@ -214,6 +213,10 @@ const MOB_IDS = [
   'void_stalker',
   'sundered_horror',
   'fisher_bram',
+  // The Proving Shore (tutorial island, src/sim/content/proving_shore.ts).
+  'training_effigy',
+  'shore_scuttler',
+  'mister_crabs',
   // The Infernal Citadel set-piece (src/sim/content/rift/infernal_citadel.ts).
   'rift_hellguard',
   'rift_pact_acolyte',
@@ -260,7 +263,6 @@ const NPC_IDS = [
   'brother_halven', // Collapsed Reliquary delve board NPC
   'brother_halven_marsh', // Drowned Litany delve board NPC (same character, marsh camp)
   'spirit_healer', // the graveyard angel (spawned at every graveyard + dungeon entry)
-  'groundskeeper_bram', // Vale Cup queue master at the Sowfield gate (docs/prd/vale-cup.md)
   'chronicler_saul', // Book of Deeds Chronicler (Eastbrook, zone 1)
   'chronicler_osric_fenn', // Book of Deeds Chronicler (Fenbridge, zone 2)
   'chronicler_edda_hartwell', // Book of Deeds Chronicler (Highwatch, zone 3)
@@ -335,6 +337,16 @@ const NPC_IDS = [
   'farmer_teasel', // Fenbridge raised beds (zone 2, tier 2)
   'farmer_hollis', // Highwatch terraces (zone 3, tier 3)
   'farmer_verbena', // the Evergarden parterre (tier 4)
+  // the Proving Shore (tutorial island) + its Eastbrook-spawn greeter
+  'wayfarer_bryn',
+  'instructor_maren',
+  'quartermaster_finch',
+  'ferryman_odo',
+  'bursar_wick',
+  'warden_tam',
+  'overseer_pell',
+  'drillmaster_rook',
+  'tidewarden_nel',
 ] as const;
 
 const QUEST_IDS = [
@@ -540,6 +552,17 @@ const QUEST_IDS = [
   'q_fs_bram_come_home',
   'q_fs_stalkers_off_the_light',
   'q_fs_the_great_break',
+  // the Proving Shore (tutorial island)
+  'q_ps_the_gauntlet',
+  'q_ps_strike_true',
+  'q_ps_hone_the_edge',
+  'q_ps_shell_and_claw',
+  'q_ps_mother_of_pearl',
+  'q_ps_the_wreck_line',
+  'q_ps_pouch_and_purse',
+  'q_ps_the_signpost',
+  'q_ps_the_long_walk',
+  'q_ps_set_sail',
   // the Galecrest
   'q_gc_down_the_windway',
   'q_gc_wool_off_the_downs',
@@ -567,6 +590,7 @@ const ZONE_IDS = [
   'evergarden',
   'galecrest',
   'farshore_isle',
+  'proving_shore',
 ] as const;
 const DUNGEON_IDS = [
   'hollow_crypt',

@@ -8,14 +8,14 @@
     "casting lifecycle (C4a)",
     "effect dispatch + spell damage (C4b/C1)"
   ],
-  "draws": 798,
-  "drawDigest": "743f161d",
+  "draws": 797,
+  "drawDigest": "cfd3edb6",
   "frames": [
     {
       "tick": 0,
       "time": 0,
-      "nextId": 972,
-      "state": "e475693e",
+      "nextId": 1002,
+      "state": "d29672e3",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -54,7 +54,7 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 967,
+          "entityId": 997,
           "equipment": {
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
@@ -95,10 +95,10 @@
           "critChance": 0.056,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.056,
-          "fallStartY": 1.5,
+          "fallStartY": -2,
           "fiveSecondRule": 99,
           "hp": 54,
-          "id": 967,
+          "id": 997,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -109,17 +109,17 @@
           "overpowerUntil": -1,
           "petMode": "defensive",
           "pos": {
-            "x": 2,
-            "y": 1.5,
-            "z": -2
+            "x": -94,
+            "y": -2,
+            "z": -58
           },
           "potionCooldownUntil": -1,
           "resource": 195,
           "resourceType": "mana",
           "spawnPos": {
-            "x": 2,
-            "y": 1.5,
-            "z": -2
+            "x": -94,
+            "y": -2,
+            "z": -58
           },
           "spellPower": 13,
           "stats": {
@@ -142,9 +142,9 @@
     {
       "tick": 20,
       "time": 1,
-      "nextId": 973,
-      "state": "7ce6c72e",
-      "events": "1472f340",
+      "nextId": 1003,
+      "state": "1abebf89",
+      "events": "5787ac33",
       "rng": {
         "draws": 2,
         "digest": "a1c65985"
@@ -153,9 +153,9 @@
     {
       "tick": 40,
       "time": 2,
-      "nextId": 973,
-      "state": "57c5e016",
-      "events": "de223d1b",
+      "nextId": 1003,
+      "state": "3f6dbfa2",
+      "events": "92c03744",
       "rng": {
         "draws": 2,
         "digest": "a1c65985"
@@ -164,9 +164,9 @@
     {
       "tick": 60,
       "time": 3,
-      "nextId": 973,
-      "state": "8fc10baf",
-      "events": "009f833c",
+      "nextId": 1003,
+      "state": "e88b0fbe",
+      "events": "b7dcc155",
       "rng": {
         "draws": 136,
         "digest": "e230e6f0"
@@ -175,9 +175,9 @@
     {
       "tick": 80,
       "time": 4,
-      "nextId": 973,
-      "state": "5b58de67",
-      "events": "851a7a71",
+      "nextId": 1003,
+      "state": "28101e5a",
+      "events": "3c0e3355",
       "rng": {
         "draws": 304,
         "digest": "1b76d31b"
@@ -186,9 +186,9 @@
     {
       "tick": 100,
       "time": 5,
-      "nextId": 973,
-      "state": "dd768ad3",
-      "events": "bb6dc687",
+      "nextId": 1003,
+      "state": "f45d2b87",
+      "events": "ccffa524",
       "rng": {
         "draws": 507,
         "digest": "7cc40d26"
@@ -197,9 +197,9 @@
     {
       "tick": 120,
       "time": 6,
-      "nextId": 973,
-      "state": "4d187277",
-      "events": "e0f3761e",
+      "nextId": 1003,
+      "state": "039f9ee1",
+      "events": "b61538df",
       "rng": {
         "draws": 714,
         "digest": "ff11f95b"
@@ -208,12 +208,12 @@
     {
       "tick": 128,
       "time": 6.4,
-      "nextId": 973,
-      "state": "f7a92fa4",
+      "nextId": 1003,
+      "state": "9153c392",
       "events": "741638a5",
       "rng": {
-        "draws": 798,
-        "digest": "743f161d"
+        "draws": 797,
+        "digest": "cfd3edb6"
       },
       "label": "final",
       "players": [
@@ -267,7 +267,7 @@
           ],
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 967,
+          "entityId": 997,
           "equipment": {
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
@@ -306,7 +306,7 @@
           "aiState": "idle",
           "attackPower": 10,
           "castRemaining": 1.7,
-          "castTargetId": 972,
+          "castTargetId": 1002,
           "castTotal": 2.5,
           "castingAbility": "frostbolt",
           "combatTimer": 0.55,
@@ -319,7 +319,7 @@
           "fiveSecondRule": 1.55,
           "gcdRemaining": 0.7,
           "hp": 49984,
-          "id": 967,
+          "id": 997,
           "inCombat": true,
           "kind": "player",
           "level": 10,
@@ -338,9 +338,9 @@
           "resource": 816,
           "resourceType": "mana",
           "spawnPos": {
-            "x": 2,
-            "y": 1.5,
-            "z": -2
+            "x": -94,
+            "y": -2,
+            "z": -58
           },
           "spellPower": 26,
           "stats": {
@@ -351,7 +351,7 @@
             "sta": 23,
             "str": 10
           },
-          "targetId": 972,
+          "targetId": 1002,
           "templateId": "mage",
           "weapon": {
             "max": 6,
@@ -360,7 +360,7 @@
           }
         },
         {
-          "aggroTargetId": 967,
+          "aggroTargetId": 997,
           "aiState": "attack",
           "auras": [
             {
@@ -370,7 +370,7 @@
               "name": "Cinderbolt",
               "remaining": 2.2,
               "school": "fire",
-              "sourceId": 967,
+              "sourceId": 997,
               "tickInterval": 2,
               "tickTimer": 0.2,
               "value": 1
@@ -382,7 +382,7 @@
               "name": "Rimelance",
               "remaining": 4.6,
               "school": "frost",
-              "sourceId": 967,
+              "sourceId": 997,
               "value": 0.6
             }
           ],
@@ -396,7 +396,7 @@
           "fiveSecondRule": 99,
           "hostile": true,
           "hp": 8912,
-          "id": 972,
+          "id": 1002,
           "inCombat": true,
           "kind": "mob",
           "leashAnchor": {
@@ -425,11 +425,11 @@
             "armor": 40
           },
           "swingTimer": 1.45,
-          "tappedById": 967,
+          "tappedById": 997,
           "templateId": "forest_wolf",
           "threat": [
             [
-              967,
+              997,
               89
             ]
           ],

@@ -42,7 +42,7 @@ const ROOT = fileURLToPath(new URL('..', import.meta.url));
 
 describe('bcastSelf per-key-group breakdown', () => {
   it('names one self.* bucket per contiguous key group and registers each in the profiler', () => {
-    expect(SELF_WIRE_PHASES).toHaveLength(16);
+    expect(SELF_WIRE_PHASES).toHaveLength(15);
     for (const name of SELF_WIRE_PHASES) expect(name.startsWith('self.')).toBe(true);
     // The corder and market groups exist by name: the two shipped incidents
     // this breakdown exists to catch must never fold into a broader bucket.

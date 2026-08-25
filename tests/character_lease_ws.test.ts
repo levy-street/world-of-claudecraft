@@ -98,6 +98,7 @@ function makeDeps(opts: { joinResult?: any; hasSession?: boolean; acquireResult?
     acquireCharacterLease: acquireSpy,
     releaseCharacterLease: releaseSpy,
     bankBonusForAccount: bankBonusSpy,
+    characterCountForAccount: vi.fn(async () => 1),
   };
   return {
     deps,

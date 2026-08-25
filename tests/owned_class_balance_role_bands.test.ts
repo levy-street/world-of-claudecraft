@@ -42,8 +42,13 @@ describe('owned-class level 20 balance harness (sustained role bands)', () => {
       // two-seed diet window amplifies it. Full actual 1.0859 (5 seeds), diet
       // actual 1.2173. Same relative margins as the prior pins: full 1.04 to
       // 1.13, diet 1.15 to 1.26.
-      expect(warspiritArea.dps / warspiritSingle.dps).toBeGreaterThanOrEqual(band(1.04, 1.15));
-      expect(warspiritArea.dps / warspiritSingle.dps).toBeLessThanOrEqual(band(1.13, 1.26));
+      // Re-measured for the v0.40.0 sync merge into the New Eastbrook branch:
+      // the harbor-town move and the release arm's content adds shift the
+      // shared rng stream, so both hunted-seed windows moved. Full actual
+      // 1.1109 (5 seeds), diet actual 1.1301 (2 seeds); same relative margins
+      // as the prior pins give full 1.06 to 1.16, diet 1.06 to 1.17.
+      expect(warspiritArea.dps / warspiritSingle.dps).toBeGreaterThanOrEqual(band(1.06, 1.06));
+      expect(warspiritArea.dps / warspiritSingle.dps).toBeLessThanOrEqual(band(1.16, 1.17));
       // Vespers area/single: full actual 1.4041, diet actual 1.4475; the diet
       // floor rises to 1.29 with the same relative margin.
       expect(vespersArea.dps / vespersSingle.dps).toBeGreaterThanOrEqual(band(1.25, 1.29));

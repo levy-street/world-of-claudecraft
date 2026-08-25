@@ -90,7 +90,6 @@ const GENERATED_ABILITY_AURAS = [
   ['hammer_of_justice_stun', 'hammer_of_justice'],
   ['kidney_shot_stun', 'kidney_shot'],
   ['pounce_stun', 'pounce'],
-  ['sport_shoulder_stun', 'sport_shoulder'],
   ['storm_bolt_stun', 'storm_bolt'],
 ] as const;
 
@@ -276,7 +275,7 @@ describe('resolveAuraIconId', () => {
   });
 
   it('recovers all unambiguous generated ability identities', () => {
-    expect(GENERATED_ABILITY_AURAS).toHaveLength(65);
+    expect(GENERATED_ABILITY_AURAS).toHaveLength(64);
     for (const [id, expected] of [...GENERATED_ABILITY_AURAS, ...SOURCE_DERIVED_AURAS]) {
       expect(resolve(id), id).toBe(expected);
     }

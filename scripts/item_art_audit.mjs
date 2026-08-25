@@ -99,15 +99,22 @@ const build = await buildItemArtAudit({
   mapping,
   pendingArtIds: [...pendingArtIds].sort(),
   expected: {
-    catalogCount: 907,
+    // 913 at the v0.41.0 release merge: the v0.39.0 823 plus the 84
+    // Masterwrought art-shipping ids (907 on the packet branch) plus the six
+    // release additions, all Proving Shore ids (the castaway crate and ferry
+    // bell pair, the passing stone, and the pearl detour's mother_of_pearl,
+    // briny lure and lustrous pearl), measured as the committed .webp count
+    // under public/ui/items.
+    catalogCount: 913,
     // The ART-SUBJECT count: live defs minus the declared procedural-art
     // debt (ITEM_ART_PENDING, exact-set-pinned in tests/item_icons.test.ts).
-    // 922 is the v0.39.0 reviewed universe (the 2026-08-09 831 plus the
+    // 922 was the v0.39.0 reviewed universe (the 2026-08-09 831 plus the
     // release's seven art-shipping additions, the Dawnhold posy last) plus
-    // the 84 Masterwrought item ids that each ship committed art, and it
-    // stays a hard literal: a new item ships art (joining this count) or
+    // the 84 Masterwrought item ids that each ship committed art; 928 adds
+    // the v0.41.0 release's six art-shipping ids at the merge. It stays a
+    // hard literal: a new item ships art (joining this count) or
     // joins the pending pin, and either move is a visible, deliberate edit.
-    liveItemCount: 922,
+    liveItemCount: 928,
     // The other half of the art-subject split: the declared procedural-art
     // debt, pinned as its own literal so the audit reds on new debt even
     // when it runs standalone (the vitest exact-set pin in

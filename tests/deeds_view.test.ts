@@ -863,10 +863,15 @@ describe('real catalog integration', () => {
     // visible non-feat collection deed and so joins both counts again.
     // 276 since masterwrought Phase 11k's prog_field_to_feast, a visible
     // non-feat PROGRESSION deed, which joins both counts for the same reason.
-    expect(view.summary.visibleTotal).toBe(276);
+    // 277 since the release/v0.41.0 merge appended prog_ready_for_an_adventure,
+    // the Proving Shore graduation deed: a visible non-feat PROGRESSION deed,
+    // so it joins both counts for the same reason again. The release's own
+    // chain read 274 - 4 - 9 = 261 and 265; the merged identity is
+    // 290 - 4 - 9 = 277 and 281, measured on the merged catalog.
+    expect(view.summary.visibleTotal).toBe(277);
     // The bucket sum adds the feat-flagged rows back on top (3 on the Feats
     // shelf plus the off-prefix capstone on Collection).
-    expect(view.categories.reduce((n, c) => n + c.visible, 0)).toBe(280);
+    expect(view.categories.reduce((n, c) => n + c.visible, 0)).toBe(281);
   });
 
   it('offers exactly the live catalog border deeds once they are earned', () => {

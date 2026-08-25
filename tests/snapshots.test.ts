@@ -2825,7 +2825,11 @@ describe('guild nameplate wire', () => {
         motdSetBy: '',
         members: [],
         events: [],
+        pledgeSettings: { enabled: true, minLevel: 1, note: '' },
+        pledges: [],
+        tier: 0,
       },
+      myPledge: null,
     };
     (client as any).socialDirty = false;
     const internals = client as unknown as { onMessage(raw: string): void };
@@ -2837,7 +2841,7 @@ describe('guild nameplate wire', () => {
       }),
     );
 
-    expect(client.socialInfo.guild?.name).toBe('Dawn Guard');
+    expect(client.socialInfo?.guild?.name).toBe('Dawn Guard');
     expect(client.consumeSocialChanged()).toBe(true);
 
     internals.onMessage(
@@ -2846,7 +2850,7 @@ describe('guild nameplate wire', () => {
         list: [{ type: 'guildRenamed', guildId: 8, newName: 'Wrong Guild' }],
       }),
     );
-    expect(client.socialInfo.guild?.name).toBe('Dawn Guard');
+    expect(client.socialInfo?.guild?.name).toBe('Dawn Guard');
     expect(client.consumeSocialChanged()).toBe(false);
   });
 
@@ -4285,11 +4289,13 @@ describe('online mount command and race-event transport', () => {
 // The pinned set of delta keys, sorted. Cross-checked below against the
 // live `maybe(...)` (and `maybeRaw(...)`) calls scraped from server/game.ts
 // source, so any unregistered delta key reddens this gate. All but three ride
-// via `maybe(...)`; `vcupb` and `dfb` are written with `maybeRaw(...)` (realm-wide
-// fragments, each serialized at most once per tick by a realm-readout memo and
-// shared across viewers), and `reliq` is `maybeRaw(...)` too but for a different
+// via `maybe(...)`; `dfb` is written with `maybeRaw(...)` (a realm-wide
+// fragment, serialized at most once per tick by a realm-readout memo and
+// shared across viewers), `reliq` is `maybeRaw(...)` too but for a different
 // memo: a PER-CHARACTER blob serialized once per state revision
-// (reliquaryWireJson), never shared across viewers. The count is the union of the
+// (reliquaryWireJson), never shared across viewers, and `app` is `maybeRaw(...)`
+// over the memoized authored-look JSON (per-viewer, re-serialized only when the
+// look changes). The count is the union of the
 // release's realm-readout keys, the procedural-dungeon branch's rift delta keys,
 // and the 16 static combat-rating/progression scalars (ap/sp/sh/crit/dodge/blk/bval/
 // crat/hrat/hirat/xp/lxp/rxp/prk/copper/ddiff) moved off the always-present self
@@ -4374,14 +4380,11 @@ const ALL_DELTA_KEYS = [
   'salv',
   'sh',
   'sp',
-  'sport',
   'stats',
   'tal',
   'tfocus',
   'trade',
   'tslot',
-  'vcup',
-  'vcupb',
   'weapon',
   'xp',
 ] as const;
@@ -4401,9 +4404,6 @@ const DENSE_DELTA_KEYS = ALL_DELTA_KEYS.filter((key) => key !== 'app');
 // carries the always-present self scalars (res/mres/rtype/lxp/rxp/prk) plus every
 // delta key whose IWorld name differs from its terse key (stats/weapon/delveDaily
 // keep their name; tal fans out to several members and is asserted directly).
-// vcup/vcupb are likewise excluded and asserted directly in the round-trip test:
-// they merge into one `cupInfo` (per-viewer remainder on vcup, realm-wide fragment
-// on vcupb), so neither key alone equals the full CupInfo target.
 const TERSE_TO_IWORLD: Record<string, string> = {
   aborder: 'activeBorder',
   achg: 'abilityCharges',
@@ -4473,7 +4473,6 @@ const TERSE_TO_IWORLD: Record<string, string> = {
   salv: 'lastSalvageResult',
   sh: 'spellHaste',
   sp: 'spellPower',
-  sport: 'sportRole',
   tfocus: 'townFocus',
   tslot: 'toolEffectSlots',
 };
@@ -4702,8 +4701,6 @@ function dirtyEveryDeltaField(): {
   // dungeonClears assignment in the deed-stats block above.)
   noteRelicItemFind(meta, 'cryptbone_helm');
   noteRelicObtain(meta, 'cryptbone_helm', 3);
-  // the Vale Cup sport kit swap ('sport' heavy key) and queue readout ('vcup')
-  meta.sportRole = 'keeper';
   meta.talentMods.spec = 'arms';
   meta.loadouts = [{ name: 'PvP', alloc: { spec: 'arms', rows: {} }, bar: [] }];
   meta.activeLoadout = 0;
@@ -4864,8 +4861,11 @@ describe('full self-state snapshot delta fixture', () => {
     meta.craftSkills.weaponcrafting = 25; // forgeguard is weaponcrafting
     meta.copper = 10000;
     // Stand at the Eastbrook forge: training is gated on the STATIC station.
+    // Re-pinned 2026-08 for the harbor move (d19aa33f76,
+    // docs/design/eastbrook-revamp/site-plan.md): station_eastbrook_forge moved
+    // with the smithy to (-5.80, -123.90); stand ~0.2yd from its center.
     const player = server.sim.entities.get(session.pid)!;
-    player.pos = { ...player.pos, x: 7, z: 16.5 };
+    player.pos = { ...player.pos, x: -6, z: -124 };
     player.prevPos = { ...player.pos };
 
     broadcast(server);
@@ -4925,8 +4925,8 @@ describe('full self-state snapshot delta fixture', () => {
     expect(client.player.cooldowns.get('heroic_strike')).toBe(5); // cds -> e.cooldowns
     expect(client.player.abilityCharges?.ice_block?.charges).toBe(1); // achg -> e.abilityCharges
     // achr -> the same records' recharge timer (legacy wire: raw [remaining, length]);
-    // like vcup/vcupb it is hand-decoded inside the achg block, so it has no
-    // TERSE_TO_IWORLD rename entry.
+    // it is hand-decoded inside the achg block, so it has no TERSE_TO_IWORLD
+    // rename entry.
     expect(client.player.abilityCharges?.ice_block?.recharge).toBe(10);
     expect(client.player.abilityCharges?.ice_block?.rechargeLength).toBe(240);
     expect(client.player.stats).toMatchObject({
@@ -5176,15 +5176,6 @@ describe('full self-state snapshot delta fixture', () => {
         forms: { normal: { bar: [{ type: 'ability', id: 'heroic_strike' }], attack: null } },
       },
     });
-
-    // vcup + vcupb -> cupInfo (merged from both fragments; neither key alone
-    // equals the full CupInfo, so both are excluded from TERSE_TO_IWORLD and
-    // asserted directly here, the same way tal is above). The reassembled client
-    // mirror must deep-equal exactly what the server computes for this viewer.
-    expect(client.cupInfo).toEqual(server.sim.cupInfoFor(leader.pid));
-    expect(client.cupInfo?.role).toBe('keeper'); // per-viewer field, arrived on vcup
-    expect(Object.keys(client.cupInfo?.queueSizes ?? {}).sort()).toEqual(['1', '2', '3', '4', '5']); // realm-wide field, arrived on vcupb
-    expect(client.cupInfo?.live).toBeNull(); // no live match in the fixture
   });
 
   it('mirrors canEdit FALSE for a member-rank viewer (the read-only arm over the real wire)', () => {
@@ -5459,7 +5450,7 @@ describe('gather node cooldown wire round trip (ncd)', () => {
 });
 
 describe('delta-key contract pins (anti-drift)', () => {
-  it('ALL_DELTA_KEYS contains exactly 87 unique keys in sorted order', () => {
+  it('ALL_DELTA_KEYS contains exactly 84 unique keys in sorted order', () => {
     // +1: guildBank (Guild Bank Phase 2), +1: the battleground bg key, +1: the
     // commission order board's corder key (issue #1298), +1: the character
     // sheet's lifetime played-time key ptime, for 67, then +16: the static
@@ -5474,9 +5465,12 @@ describe('delta-key contract pins (anti-drift)', () => {
     // for 86. Every v0.36.0 sync conflicts here because each side pins its own
     // additions alone; the merged tree carries all of them, and this number
     // came from a run on the merged tree. Plus farming's own-plot key fplot,
-    // for 87 on this branch.
-    expect(ALL_DELTA_KEYS).toHaveLength(87);
-    expect(new Set(ALL_DELTA_KEYS).size).toBe(87);
+    // for 87 on this branch. The New Eastbrook program's Vale Cup retirement
+    // (release/v0.41.0) then removes sport/vcup/vcupb, for 83 on the release
+    // alone; the v0.41.0 sync carries both arms (fplot in, the three cup keys
+    // out), for 84, measured on the merged tree.
+    expect(ALL_DELTA_KEYS).toHaveLength(84);
+    expect(new Set(ALL_DELTA_KEYS).size).toBe(84);
     expect([...ALL_DELTA_KEYS]).toEqual([...ALL_DELTA_KEYS].sort());
   });
 
@@ -5494,13 +5488,13 @@ describe('delta-key contract pins (anti-drift)', () => {
     const src = raw.replace(/\/\*[\s\S]*?\*\//g, '').replace(/(^|[^:])\/\/.*$/gm, '$1');
     // tolerate whitespace/newline between `(` and the quote so the multi-line
     // maybe('lockouts', ...) call (game.ts ~2166-2169) is captured, not undercounted;
-    // the optional `(?:Raw)?` also captures the maybeRaw realm-wide calls
-    // ('vcupb' and the multi-line 'dfb')
+    // the optional `(?:Raw)?` also captures the maybeRaw calls
+    // ('app' and the multi-line 'dfb')
     const re = /\bmaybe(?:Raw)?\(\s*['"](\w+)['"]/g;
     const scraped = new Set<string>();
     for (let m = re.exec(src); m !== null; m = re.exec(src)) scraped.add(m[1]);
     expect(scraped.has('lockouts')).toBe(true); // the multi-line call IS captured
-    expect(scraped.has('vcupb')).toBe(true); // the maybeRaw calls ARE captured by the widened regex
+    expect(scraped.has('app')).toBe(true); // the maybeRaw calls ARE captured by the widened regex
     expect(scraped.has('dfb')).toBe(true); // incl. the multi-line maybeRaw('dfb', ...) form
     expect(scraped.has('reliq')).toBe(true); // Reliquary Phase 3 sparse self blob
     // The base-merge union: v0.31's 56 (incl. the market-collect key mktU) plus
@@ -5514,8 +5508,10 @@ describe('delta-key contract pins (anti-drift)', () => {
     // (ap/sp/sh/crit/dodge/blk/bval/crat/hrat/hirat/xp/lxp/rxp/prk/copper/ddiff)
     // for 83, then reliq (Reliquary Phase 3 sparse blob) for 84, the nameplate
     // border echo aborder for 85, the authored modular look `app` for 86, and
-    // farming's own-plot key fplot for 87.
-    expect(scraped.size).toBe(87);
+    // farming's own-plot key fplot for 87. The Vale Cup retirement
+    // (release/v0.41.0) then removes sport/vcup/vcupb, for 84 on the merged
+    // tree (83 on the release alone, which never carried fplot).
+    expect(scraped.size).toBe(84);
     expect([...scraped].sort()).toEqual([...ALL_DELTA_KEYS].sort());
   });
 
@@ -5597,12 +5593,6 @@ describe('delta-key contract pins (anti-drift)', () => {
     // renown keeps the same name on both sides, so it must NEVER grow a rename
     // entry (one would imply a wire key the decoder does not read)
     expect('renown' in TERSE_TO_IWORLD).toBe(false);
-    // vcup/vcupb merge into one `cupInfo` on the client (hand-written in
-    // applySnapshot, not via this table), so neither may ever grow a rename entry.
-    // Both ARE in ALL_DELTA_KEYS, so a stale re-add of `vcup: 'cupInfo'` would slip
-    // past the sorted-membership and delta-key-or-scalar checks; pin it out here.
-    expect('vcup' in TERSE_TO_IWORLD).toBe(false);
-    expect('vcupb' in TERSE_TO_IWORLD).toBe(false);
     // reliq fans out to three IWorld members (firstFind / marks / recent), so it
     // is asserted directly and must never grow a single-target rename entry.
     expect('reliq' in TERSE_TO_IWORLD).toBe(false);
@@ -5735,7 +5725,7 @@ describe('dfb realm-readout memo (shared board bytes, per-session cadence)', () 
 
   it('keeps the cadence gate per-session: staggered sessions receive a change at their OWN ticks', () => {
     // The dfb gate is per-session state (session.lastDfWireTick), NOT a
-    // realm-global dueness tracker like vcup's: two sessions with offset gates
+    // realm-global dueness tracker: two sessions with offset gates
     // receive a board change at DIFFERENT broadcast passes, each at its own
     // next due tick. A realm-global gate would deliver the change to both
     // sessions in the SAME pass and red the not-yet-delivered assertion below.

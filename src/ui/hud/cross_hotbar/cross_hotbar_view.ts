@@ -112,4 +112,5 @@ export interface CrossHotbarPanelHooks {
   crossHotbarSets(): readonly (readonly CrossHotbarOverlayAction[])[];
   bindCrossHotbar(set: number, position: number, action: CrossHotbarOverlayAction): void;
   resetCrossHotbar(): void;
+  crossHotbarEnabled(): boolean;
 }

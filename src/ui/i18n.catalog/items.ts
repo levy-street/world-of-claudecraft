@@ -2516,6 +2516,8 @@ const ITEM_ENTITY_IDS = [
   'sharp_claw',
   'curved_tusk',
   'pristine_claw',
+  'ps_castaway_crate',
+  'ps_ferry_bell',
   'dawnhold_posy',
   'hammered_copper_band',
   'polished_copper_loop',
@@ -2696,8 +2698,8 @@ const ITEM_ENTITY_IDS = [
   // this list IS positional for its older half and a reader could reasonably
   // assume the worst. `itemTranslations` only reads names by index when it is
   // handed a full-length list (`includesAppendedNames`, below); every locale
-  // list including the English one is the LEGACY length, so all 272 ids on
-  // APPENDED_ITEM_NAMES resolve BY KEY. Both retired feast ids were appended
+  // list including the English one is the LEGACY length, so every id on
+  // APPENDED_ITEM_NAMES resolves BY KEY. Both retired feast ids were appended
   // ids, so they came out of this array and that keyed map together and no
   // positional row moved anywhere.
   // All six new names are wordy in English, so M16 non-Latin fills are owed;
@@ -2708,6 +2710,14 @@ const ITEM_ENTITY_IDS = [
   'pattern_stonepot_feast',
   'pattern_warspice_feast',
   'pattern_sageleaf_feast',
+  // The Proving Shore's pearl detour (release v0.41.0), appended behind the
+  // masterwrought tail at the release merge under the same append-only
+  // contract; every id here resolves BY KEY, so the relative order of the two
+  // tails carries no positional meaning.
+  'ps_briny_lure',
+  'ps_lustrous_pearl',
+  'mother_of_pearl',
+  'ps_passing_stone',
 ] as const;
 
 type ItemEntityId = (typeof ITEM_ENTITY_IDS)[number];
@@ -2836,6 +2846,9 @@ const APPENDED_ITEM_NAMES: Partial<Record<ItemEntityId, string>> = {
   thornhide_leggings: 'Thornhide Leggings',
   thornhide_gloves: 'Thornhide Gloves',
   thornhide_boots: 'Thornhide Boots',
+  // The Proving Shore (tutorial island), same English-appended treatment.
+  ps_castaway_crate: 'Castaway Crate',
+  ps_ferry_bell: 'Ferry Bell',
   dawnhold_posy: 'Dawnhold Garden Posy',
   // Jewelcrafting base catalog (Masterwrought phase 05): the thorium_* ids
   // display "Osmium" (the Osmium register in content/profession_items.ts).
@@ -3078,6 +3091,11 @@ const APPENDED_ITEM_NAMES: Partial<Record<ItemEntityId, string>> = {
   pattern_stonepot_feast: 'Recipe: Stonepot Feast',
   pattern_warspice_feast: 'Recipe: Warspice Feast',
   pattern_sageleaf_feast: 'Recipe: Sageleaf Feast',
+  // The Proving Shore's pearl detour (q_ps_mother_of_pearl).
+  ps_briny_lure: 'Briny Lure',
+  ps_lustrous_pearl: 'Lustrous Pearl',
+  mother_of_pearl: 'Mother of Pearl',
+  ps_passing_stone: 'Passing Stone',
 };
 
 function itemTranslations(names: readonly string[]): ItemEntityTranslations {

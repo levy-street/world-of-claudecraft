@@ -136,6 +136,9 @@ describe('FakeLeaderboardDb', () => {
         memberCount: 30,
         totalLifetimeXp: 9999,
         topLevel: 60,
+        pledgesEnabled: true,
+        pledgeMinLevel: 1,
+        pledgeNote: '',
       },
     ];
     db.seedArena(arena);

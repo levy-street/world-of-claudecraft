@@ -709,6 +709,7 @@ describe('bankBonusFactsForAccount', () => {
           discord_linked: false,
           wallet_linked: true,
           qualified_referrals: 3,
+          character_count: 2,
         },
       ],
     } as any);
@@ -742,6 +743,7 @@ describe('bankBonusFactsForAccount', () => {
       discordLinked: false,
       walletLinked: true,
       qualifiedReferrals: 3,
+      characterCount: 2,
     });
   });
 
@@ -752,6 +754,7 @@ describe('bankBonusFactsForAccount', () => {
       discordLinked: false,
       walletLinked: false,
       qualifiedReferrals: 0,
+      characterCount: 0,
     });
   });
 
@@ -771,6 +774,7 @@ describe('bankBonusFactsForAccount', () => {
       discordLinked: true,
       walletLinked: false,
       qualifiedReferrals: 0,
+      characterCount: 0,
     });
   });
 });

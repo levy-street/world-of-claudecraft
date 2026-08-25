@@ -70,7 +70,6 @@ const EXPECTED_CMDS = [
   'unequip_item',
   'unequip_mech_chroma',
   'use',
-  'vcup_bet',
 ];
 
 const EXPECTED_EVENTS = [
@@ -99,7 +98,6 @@ const EXPECTED_EVENTS = [
   'toolEffectResult',
   'tradeDone',
   'unbindResult',
-  'vcupBetSettled',
   'vendor',
   'virtualLevelUp',
 ];

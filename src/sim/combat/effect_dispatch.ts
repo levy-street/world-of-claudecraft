@@ -52,6 +52,7 @@ import {
 import { stunDrCategory } from '../stun_dr';
 import { resolveTalentHitMult } from '../talent_hit_mult';
 import { addThreat, dropThreat } from '../threat';
+import { creditAbilityDrill } from '../tutorial/ability_drill';
 import type { AbilityDef, Aura, Entity } from '../types';
 import {
   angleTo,
@@ -422,6 +423,14 @@ export function runEffects(
   facingOverride?: number,
 ): void {
   const ability = res.def;
+  // The island's ability drill (tutorial/ability_drill.ts): the lesson is
+  // "use your own button on an effigy", so it credits on DELIVERY, not on
+  // damage. Here rather than in dealDamage for two reasons: this runs once
+  // per cast instead of once per damage instance, and a hit that lands for
+  // zero (a resisted bolt, a full absorb) was still the press the coach
+  // asked for. The resist branch that returns before this point credits
+  // itself (combat/casting_lifecycle.ts). Draws no rng.
+  if (target) creditAbilityDrill(ctx, p, target, ability.id);
   const vespersGloomtitheStacks = gloomtitheStacksForCast(p, ability.id);
   const initialTarget = target;
   const ascensionFxTargetId = target?.id ?? p.id;
@@ -3951,30 +3960,6 @@ export function runEffects(
           p.resource = Math.min(p.maxResource, p.resource + amount);
         }
         ctx.enterCombat(p, target);
-        break;
-      }
-      // The Vale Cup sport moves (docs/prd/vale-cup.md). All three route to the
-      // vale_cup module through the seam and silently no-op unless the caster
-      // is seated in the live Sowfield match's play phase.
-      case 'ballKick': {
-        ctx.vcupBallKick(p, eff.power, eff.loft, ability.range);
-        break;
-      }
-      case 'ballPass': {
-        ctx.vcupBallPass(p, eff.power, eff.loft, ability.range);
-        break;
-      }
-      case 'ballShoot': {
-        ctx.vcupShoot(p, eff.power, eff.loft, ability.range);
-        break;
-      }
-      case 'sportDash': {
-        ctx.vcupSportDash(p, eff.distance, eff.catchBall === true);
-        break;
-      }
-      case 'sportShove': {
-        if (!target || target.dead) break;
-        ctx.vcupSportShove(p, target, eff.distance);
         break;
       }
       case 'sunder': {

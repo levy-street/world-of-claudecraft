@@ -8,13 +8,13 @@
     "multi-player PlayerMeta sampling",
     "classes:warrior,mage"
   ],
-  "draws": 982,
-  "drawDigest": "9ce472c2",
+  "draws": 959,
+  "drawDigest": "ee9c4e43",
   "frames": [
     {
       "tick": 0,
       "time": 0,
-      "nextId": 971,
+      "nextId": 1001,
       "state": "5bc471b0",
       "events": "741638a5",
       "rng": {
@@ -28,9 +28,9 @@
     {
       "tick": 25,
       "time": 1.25,
-      "nextId": 973,
-      "state": "96fbe0d3",
-      "events": "6e26b7a0",
+      "nextId": 1003,
+      "state": "6497fd44",
+      "events": "1332e9b6",
       "rng": {
         "draws": 0,
         "digest": "811c9dc5"
@@ -39,9 +39,9 @@
     {
       "tick": 50,
       "time": 2.5,
-      "nextId": 973,
-      "state": "709affa6",
-      "events": "94925034",
+      "nextId": 1003,
+      "state": "36337fd1",
+      "events": "24d41bca",
       "rng": {
         "draws": 70,
         "digest": "2db3d6b8"
@@ -50,9 +50,9 @@
     {
       "tick": 75,
       "time": 3.75,
-      "nextId": 973,
-      "state": "803d8d2a",
-      "events": "50c830bc",
+      "nextId": 1003,
+      "state": "1598ea47",
+      "events": "af45d864",
       "rng": {
         "draws": 292,
         "digest": "c9b87784"
@@ -61,34 +61,34 @@
     {
       "tick": 100,
       "time": 5,
-      "nextId": 973,
-      "state": "27fcd52d",
-      "events": "d51b8348",
+      "nextId": 1003,
+      "state": "d9953fc6",
+      "events": "0315818e",
       "rng": {
-        "draws": 529,
-        "digest": "e710594e"
+        "draws": 530,
+        "digest": "1cb4e884"
       }
     },
     {
       "tick": 125,
       "time": 6.25,
-      "nextId": 973,
-      "state": "4dec41e6",
-      "events": "a73a862f",
+      "nextId": 1003,
+      "state": "1d731835",
+      "events": "fa0edf99",
       "rng": {
-        "draws": 787,
-        "digest": "22f85826"
+        "draws": 781,
+        "digest": "bba8277e"
       }
     },
     {
       "tick": 142,
       "time": 7.1,
-      "nextId": 973,
-      "state": "c91b78e9",
+      "nextId": 1003,
+      "state": "aaab2912",
       "events": "741638a5",
       "rng": {
-        "draws": 982,
-        "digest": "9ce472c2"
+        "draws": 959,
+        "digest": "ee9c4e43"
       },
       "label": "final",
       "players": [
@@ -151,7 +151,7 @@
           ],
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 971,
+          "entityId": 1001,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword",
@@ -251,7 +251,7 @@
           ],
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 972,
+          "entityId": 1002,
           "equipment": {
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
@@ -306,7 +306,7 @@
               "name": "Battle Stance",
               "remaining": 3597.95,
               "school": "physical",
-              "sourceId": 971
+              "sourceId": 1001
             }
           ],
           "blockChance": 0.05,
@@ -318,7 +318,7 @@
           "dodgeChance": 0.067,
           "fiveSecondRule": 106.1,
           "hp": 632,
-          "id": 971,
+          "id": 1001,
           "kind": "player",
           "level": 15,
           "lootFfaTimer": "Infinity",
@@ -336,9 +336,9 @@
           "potionCooldownUntil": -1,
           "resourceType": "rage",
           "spawnPos": {
-            "x": 2,
-            "y": 1.5,
-            "z": -2
+            "x": -94,
+            "y": -2,
+            "z": -58
           },
           "spellPower": 5,
           "stats": {
@@ -367,7 +367,7 @@
           "dodgeChance": 0.056,
           "facing": 3.141593,
           "fiveSecondRule": 106.1,
-          "id": 972,
+          "id": 1002,
           "kind": "player",
           "level": 15,
           "lootFfaTimer": "Infinity",
@@ -385,9 +385,9 @@
           "resource": 1161,
           "resourceType": "mana",
           "spawnPos": {
-            "x": 2,
-            "y": 1.5,
-            "z": -2
+            "x": -94,
+            "y": -2,
+            "z": -58
           },
           "spellPower": 34,
           "stats": {

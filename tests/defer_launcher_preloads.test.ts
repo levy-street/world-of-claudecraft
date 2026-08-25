@@ -142,6 +142,20 @@ describe('Thornhollow intent-driven preload', () => {
     expect(src).toContain('createBattlegroundAssetPrewarm(');
   });
 
+  // dungeon.ts's kit/bits GLBs are read SYNCHRONOUSLY from the module-local
+  // cache by a build step that still runs BEFORE the first frame: dungeon's
+  // interior-shader prewarm entry in renderer.ts re-awaits
+  // ensureDungeonAssets() itself (so tagging it 'background' would buy
+  // nothing, since that await forces the fetch back before first frame
+  // anyway, just serialized after other boot work instead of overlapped with
+  // it). It must stay on the default critical lane.
+  it('keeps dungeon.ts on the critical lane', () => {
+    for (const file of ['../src/render/dungeon.ts']) {
+      const src = readFileSync(new URL(file, import.meta.url), 'utf8');
+      expect(src, file).not.toMatch(/registerDeferredPreload\([^;]*'background'/);
+    }
+  });
+
   it('starts from the resolved Thornhollow tab and commits before sending queue join', () => {
     const arena = readFileSync(new URL('../src/ui/arena_window.ts', import.meta.url), 'utf8');
     const thornhollowArm = arena.slice(

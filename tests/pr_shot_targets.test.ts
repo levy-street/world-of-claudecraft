@@ -484,27 +484,6 @@ describe('classifyDiff', () => {
     ]);
   });
 
-  it('maps the Vale Cup unrated-gates UI change to its two targets, per path (#2767)', () => {
-    // One classifyDiff per path, so each target's `when` routing is proven on
-    // its own rather than through the OR of the union.
-    const windowKeys = classifyDiff(['src/ui/vale_cup_window.ts']).specific.map(
-      (t: { key: string }) => t.key,
-    );
-    expect(windowKeys).toContain('vale-cup-unrated-notes');
-    expect(windowKeys).not.toContain('vale-cup-briefing-unrated');
-    const briefingPlan = classifyDiff(['src/ui/vale_cup_briefing.ts']);
-    const briefingKeys = briefingPlan.specific.map((t: { key: string }) => t.key);
-    expect(briefingKeys).toContain('vale-cup-briefing-unrated');
-    expect(briefingKeys).not.toContain('vale-cup-unrated-notes');
-    for (const key of ['vale-cup-unrated-notes', 'vale-cup-briefing-unrated']) {
-      const target = classifyDiff([
-        'src/ui/vale_cup_window.ts',
-        'src/ui/vale_cup_briefing.ts',
-      ]).specific.find((candidate: { key: string }) => candidate.key === key);
-      expect(target?.variants).toEqual([{ key: 'desktop' }, { key: 'mobile', mobile: true }]);
-    }
-  });
-
   it('routes the shared Reliquary label module to both Reliquary targets', () => {
     // reliquary_labels.ts resolves every relic display name AND the missing-cell
     // source line, so it changes what BOTH captures show: the Overview recent
@@ -534,6 +513,7 @@ describe('classifyDiff', () => {
     // a constant marker: the picker below reads it as a number to land the
     // shot on the richest multi-source cell, so a painter that went back to
     // "1" would leave the capture on an arbitrary one-line relic.
+    // biome-ignore lint/suspicious/noTemplateCurlyInString: asserts on source text that contains a template literally.
     expect(painterSrc).toContain('data-cell-source="${sourceLines.length}"');
     expect(script).toContain("Number.parseInt(node.getAttribute('data-cell-source')");
     expect(script).toContain('if (count > bestCount)');
@@ -580,8 +560,10 @@ describe('classifyDiff', () => {
     expect(script).toContain("indexOf('woc_reliquary_pins')");
     // The staging drives the window's markup: the pin toggle (skipped when
     // refused in EITHER form, or pressed), and the shelf rows' data-page.
+    // biome-ignore lint/suspicious/noTemplateCurlyInString: asserts on source text that contains a template literally.
     expect(windowSrc).toContain('data-pin="${esc(pageId)}"');
     expect(script).toContain('[data-pin=');
+    // biome-ignore lint/suspicious/noTemplateCurlyInString: asserts on source text that contains a template literally.
     expect(windowSrc).toContain('aria-pressed="${pinned}"');
     expect(windowSrc).toContain('aria-disabled="true"');
     expect(script).toContain("getAttribute('aria-disabled') === 'true'");
@@ -602,15 +584,10 @@ describe('classifyDiff', () => {
     }
   });
 
-  it('maps a deed catalog copy change to the Book of Deeds target (#2767)', () => {
-    const plan = classifyDiff(['src/sim/content/deeds.ts']);
-    expect(plan.isVisual).toBe(true);
-    expect(plan.specific.map((t: { key: string }) => t.key)).toContain('vale-cup-skill-deed-copy');
-    const target = plan.specific.find(
-      (candidate: { key: string }) => candidate.key === 'vale-cup-skill-deed-copy',
-    );
-    expect(target?.variants).toEqual([{ key: 'desktop' }, { key: 'mobile', mobile: true }]);
-  });
+  // The deed catalog copy case that stood here (#2767, the 'vale-cup-skill-deed-copy'
+  // target) left with the Vale Cup: the release retired that shot target with the
+  // Sowfield, so a deeds.ts copy change no longer has a dedicated Book of Deeds
+  // reshoot to map to.
 
   it('maps the plant sheet halves and the bed-interact resolver to the bed-press target (phase 9b)', () => {
     // Both sheet halves share the 'ui/farming_plant_sheet' substring; the

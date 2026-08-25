@@ -753,4 +753,8 @@ export const table: DeedLocaleTable = {
     desc: '銘文學技能達到125，此技藝的頂點。',
     title: '銘文學大宗師',
   },
+  prog_ready_for_an_adventure: {
+    name: '整裝待發',
+    desc: '從試煉之濱畢業：完成島上的每一堂課，然後敲響渡船鈴回到東溪鎮。',
+  },
 };

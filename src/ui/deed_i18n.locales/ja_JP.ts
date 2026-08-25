@@ -930,4 +930,8 @@ export const table: DeedLocaleTable = {
     desc: '銘文のスキルで125に到達し、その道の極みに立つ。',
     title: '銘文の大師',
   },
+  prog_ready_for_an_adventure: {
+    name: '冒険の準備は万端',
+    desc: '修練の浜を卒業する。島でのすべての課題を終え、渡しの鐘を鳴らしてイーストブルックへ帰る。',
+  },
 };

@@ -2516,7 +2516,7 @@ describe('Thornhollow Fields: review-hardening pins', () => {
 
   it('the honor DR window round-trips through CharacterState and clears on UTC rollover', () => {
     const { sim, pids } = tenInQueue();
-    sim.resetDay = '2026-07-26';
+    sim.resetDay = '2026-07-22';
     const match = must(sim.bgMatchFor(pids[0]), 'bg match');
     toActive(sim, match);
     const winner = match.teams[0][0];
@@ -2524,12 +2524,12 @@ describe('Thornhollow Fields: review-hardening pins', () => {
     const daily = must(must(sim.meta(winner), 'player meta').honorArenaDaily, 'honor daily');
     expect(daily.bgResultsByOpponent).toBeTruthy();
     expect(Object.values(must(daily.bgResultsByOpponent, 'bg results'))).toEqual([1]);
-    expect(daily.date).toBe('2026-07-26');
+    expect(daily.date).toBe('2026-07-22');
     // ROLLOVER: the next award on a new UTC day re-keys the window and pays
     // the full price again (the reset arm in pvp/honor.ts dailyWindow)
     const honorAfterDayOne = must(sim.meta(winner), 'player meta').honor;
     for (let i = 0; i < 20 * (BG_END_HOLD + 1); i++) sim.tick(); // run out the result screen
-    sim.resetDay = '2026-07-27';
+    sim.resetDay = '2026-07-23';
     for (const pid of pids) sim.bgQueueJoin(pid);
     sim.tick();
     acceptAllBgOffers(sim);
@@ -2539,7 +2539,7 @@ describe('Thornhollow Fields: review-hardening pins', () => {
     for (let cap = 0; cap < BG_CAPS_TO_WIN; cap++) captureOnce(sim, rematch, rematch.teams[0][0]);
     const team0Won = rematch.teams[0].includes(rewinner);
     const meta = must(sim.meta(rewinner), 'player meta');
-    expect(must(meta.honorArenaDaily, 'honor daily').date).toBe('2026-07-27'); // window re-keyed
+    expect(must(meta.honorArenaDaily, 'honor daily').date).toBe('2026-07-23'); // window re-keyed
     expect(
       Object.values(must(meta.honorArenaDaily, 'honor daily').bgResultsByOpponent ?? {}),
     ).toEqual([1]);
@@ -2973,7 +2973,7 @@ describe('Thornhollow Fields: the first win of the day pays a bonus', () => {
 
   it('pays exactly once per reset day, under its own honor reason', () => {
     const { sim, pids } = tenInQueue();
-    sim.resetDay = '2026-07-26';
+    sim.resetDay = '2026-07-22';
     const match = must(sim.bgMatchFor(pids[0]), 'bg match');
     toActive(sim, match);
     const winner = match.teams[0][0];
@@ -2999,7 +2999,7 @@ describe('Thornhollow Fields: the first win of the day pays a bonus', () => {
 
   it('a SECOND win the same day pays the base award only', () => {
     const { sim, pids } = tenInQueue();
-    sim.resetDay = '2026-07-26';
+    sim.resetDay = '2026-07-22';
     const match = must(sim.bgMatchFor(pids[0]), 'bg match');
     toActive(sim, match);
     const winner = match.teams[0][0];
@@ -3026,7 +3026,7 @@ describe('Thornhollow Fields: the first win of the day pays a bonus', () => {
 
   it('the UTC rollover re-arms it, and the claim survives a save/load round trip', () => {
     const { sim, pids } = tenInQueue();
-    sim.resetDay = '2026-07-26';
+    sim.resetDay = '2026-07-22';
     const match = must(sim.bgMatchFor(pids[0]), 'bg match');
     toActive(sim, match);
     const winner = match.teams[0][0];
@@ -3037,7 +3037,7 @@ describe('Thornhollow Fields: the first win of the day pays a bonus', () => {
     const state = must(sim.serializeCharacter(winner), 'character');
     expect(must(state.honorArenaDaily, 'honor daily').bgFirstWinClaimed).toBe(true);
     const sim2 = makeWorld();
-    sim2.resetDay = '2026-07-26';
+    sim2.resetDay = '2026-07-22';
     const reloaded = sim2.addPlayer('warrior', 'Reload', { state });
     expect(
       must(must(sim2.meta(reloaded), 'player meta').honorArenaDaily, 'honor daily')
@@ -3048,7 +3048,7 @@ describe('Thornhollow Fields: the first win of the day pays a bonus', () => {
       'still spent after a relog',
     ).toBe(false);
     // ...and the NEXT day re-arms it without any award having run.
-    sim2.resetDay = '2026-07-27';
+    sim2.resetDay = '2026-07-23';
     expect(must(sim2.bgInfoFor(reloaded), 'bg info').firstWinBonusReady).toBe(true);
 
     // A clean character writes NOTHING (byte-stable saves): absent until claimed.
@@ -3059,7 +3059,7 @@ describe('Thornhollow Fields: the first win of the day pays a bonus', () => {
     ).toBeUndefined();
 
     for (let i = 0; i < 20 * (BG_END_HOLD + 1); i++) sim.tick();
-    sim.resetDay = '2026-07-27';
+    sim.resetDay = '2026-07-23';
     expect(
       must(sim.bgInfoFor(winner), 'bg info').firstWinBonusReady,
       'a new day re-arms the chip',
@@ -3112,9 +3112,28 @@ describe('Thornhollow Fields: the first win of the day pays a bonus', () => {
     ).toBe(true);
   });
 
+  it('reports the Double Honor Weekend window on the bg readout', () => {
+    const sim = makeWorld();
+    const pid = sim.addPlayer('warrior', 'Chip');
+    sim.resetDay = '2026-08-08'; // a Saturday
+    expect(must(sim.bgInfoFor(pid), 'bg info').doubleHonorActive).toBe(true);
+    sim.resetDay = '2026-08-09'; // Sunday: still inside the weekend window
+    expect(must(sim.bgInfoFor(pid), 'bg info').doubleHonorActive).toBe(true);
+    sim.resetDay = '2026-08-10'; // Monday: the chip drops on the rollover
+    expect(must(sim.bgInfoFor(pid), 'bg info').doubleHonorActive).toBe(false);
+    // The 12-hour early open: Friday, once the host's lead probe reads Saturday.
+    sim.resetDay = '2026-08-07';
+    sim.eventLeadDay = '2026-08-08';
+    expect(must(sim.bgInfoFor(pid), 'bg info').doubleHonorActive).toBe(true);
+    // No host calendar, no event (headless and parity runs stay untouched).
+    sim.resetDay = '';
+    sim.eventLeadDay = '';
+    expect(must(sim.bgInfoFor(pid), 'bg info').doubleHonorActive).toBe(false);
+  });
+
   it('an UNRATED dev match never claims it', () => {
     const sim = makeWorld();
-    sim.resetDay = '2026-07-26';
+    sim.resetDay = '2026-07-22';
     const pids: number[] = [];
     for (let i = 0; i < 4; i++) {
       const p = sim.addPlayer('warrior', `D${i}`);
@@ -3142,7 +3161,7 @@ describe('Thornhollow Fields: the first win of the day pays a bonus', () => {
 
   it('a FORFEIT win never claims it (forfeits pay no honor at all)', () => {
     const { sim, pids } = tenInQueue();
-    sim.resetDay = '2026-07-26';
+    sim.resetDay = '2026-07-22';
     const match = must(sim.bgMatchFor(pids[0]), 'bg match');
     toActive(sim, match);
     const winner = match.teams[0][0];
@@ -3158,7 +3177,7 @@ describe('Thornhollow Fields: the first win of the day pays a bonus', () => {
 
   it('a DRAW never claims it', () => {
     const { sim, pids } = tenInQueue();
-    sim.resetDay = '2026-07-26';
+    sim.resetDay = '2026-07-22';
     const match = must(sim.bgMatchFor(pids[0]), 'bg match');
     toActive(sim, match);
     const pid = match.teams[0][0];
@@ -3173,7 +3192,7 @@ describe('Thornhollow Fields: the first win of the day pays a bonus', () => {
 
   it('the bgEnd event carries the bonus so the finish surface can name it', () => {
     const { sim, pids } = tenInQueue();
-    sim.resetDay = '2026-07-26';
+    sim.resetDay = '2026-07-22';
     const match = must(sim.bgMatchFor(pids[0]), 'bg match');
     toActive(sim, match);
     const winner = match.teams[0][0];
@@ -3200,17 +3219,17 @@ describe('Thornhollow Fields: the first win of the day pays a bonus', () => {
     // stored date reads as re-armed, and the stored date is left for the next
     // real award to roll over.
     const { sim, pids } = tenInQueue();
-    sim.resetDay = '2026-07-26';
+    sim.resetDay = '2026-07-22';
     const match = must(sim.bgMatchFor(pids[0]), 'bg match');
     toActive(sim, match);
     const winner = match.teams[0][0];
     playedOutWin(sim, match, winner);
-    sim.resetDay = '2026-07-27';
+    sim.resetDay = '2026-07-23';
     expect(must(sim.bgInfoFor(winner), 'bg info').firstWinBonusReady).toBe(true);
     expect(
       must(must(sim.meta(winner), 'player meta').honorArenaDaily, 'honor daily').date,
       'the read wrote nothing',
-    ).toBe('2026-07-26');
+    ).toBe('2026-07-22');
     expect(
       must(must(sim.meta(winner), 'player meta').honorArenaDaily, 'honor daily').bgFirstWinClaimed,
     ).toBe(true);
@@ -3533,7 +3552,7 @@ describe('Thornhollow Fields: the honor award reports what it paid', () => {
     // The bgEnd event needs the BONUS on its own (the finish surface names it),
     // and the caller needs the total to stay honest about what was credited.
     const sim = makeWorld();
-    sim.resetDay = '2026-07-26';
+    sim.resetDay = '2026-07-22';
     const pid = sim.addPlayer('warrior', 'Champ');
     const meta = must(sim.meta(pid), 'player meta');
 
@@ -3559,7 +3578,7 @@ describe('Thornhollow Fields: the honor award reports what it paid', () => {
     // grantHonor credits zero once a purse is at the honor ceiling; spending the
     // day's one bonus for zero honor is the wrong way to lose that race.
     const sim = makeWorld();
-    sim.resetDay = '2026-07-26';
+    sim.resetDay = '2026-07-22';
     const pid = sim.addPlayer('warrior', 'Capped');
     const meta = must(sim.meta(pid), 'player meta');
     meta.honor = Number.MAX_SAFE_INTEGER;

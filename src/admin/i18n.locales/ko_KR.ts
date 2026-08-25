@@ -7,6 +7,9 @@
 // (tests/i18n_admin_catalog.test.ts).
 
 export const ko_KR: Record<string, string> = {
+  'error.flagActiveExists': '이 계정에는 이미 해당 종류의 열려 있는 플래그가 있습니다.',
+  'wealth.largeMovementsUnavailable':
+    '대규모 은행 이동 내역을 불러오지 못했습니다(장부 조회 시간이 초과되었습니다). 위의 금 내역은 완전합니다.',
   'error.guildBankDeleting':
     '이 길드는 삭제되는 중이라 은행이 닫혀 있습니다. 아무것도 변경되지 않았습니다.',
   'error.guildBankItemRequired': '해당 칸에 있어야 할 아이템 ID를 입력하십시오.',

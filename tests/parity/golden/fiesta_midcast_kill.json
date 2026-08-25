@@ -10,13 +10,13 @@
     "fiesta lifesteal augment arm (~5499)",
     "multi-player fiesta meta"
   ],
-  "draws": 972,
-  "drawDigest": "fa3491de",
+  "draws": 979,
+  "drawDigest": "3ce48a54",
   "frames": [
     {
       "tick": 0,
       "time": 0,
-      "nextId": 971,
+      "nextId": 1001,
       "state": "5bc471b0",
       "events": "741638a5",
       "rng": {
@@ -30,9 +30,9 @@
     {
       "tick": 25,
       "time": 1.25,
-      "nextId": 975,
-      "state": "13c443aa",
-      "events": "6f52c7f1",
+      "nextId": 1005,
+      "state": "3ffe511b",
+      "events": "12089667",
       "rng": {
         "draws": 0,
         "digest": "811c9dc5"
@@ -41,9 +41,9 @@
     {
       "tick": 50,
       "time": 2.5,
-      "nextId": 975,
-      "state": "31cf4591",
-      "events": "eba20455",
+      "nextId": 1005,
+      "state": "a7c0a1be",
+      "events": "f63c6a15",
       "rng": {
         "draws": 64,
         "digest": "62eadef0"
@@ -52,9 +52,9 @@
     {
       "tick": 75,
       "time": 3.75,
-      "nextId": 975,
-      "state": "97470563",
-      "events": "a2d6afad",
+      "nextId": 1005,
+      "state": "99c47fb0",
+      "events": "ffdf5f85",
       "rng": {
         "draws": 280,
         "digest": "3d9b7a55"
@@ -63,20 +63,20 @@
     {
       "tick": 100,
       "time": 5,
-      "nextId": 975,
-      "state": "8e97515e",
-      "events": "82a0d955",
+      "nextId": 1005,
+      "state": "a7a3fd4b",
+      "events": "5b0d5279",
       "rng": {
-        "draws": 530,
-        "digest": "cddb4dde"
+        "draws": 531,
+        "digest": "5e5e6f86"
       }
     },
     {
       "tick": 101,
       "time": 5.05,
-      "nextId": 975,
-      "state": "3dfd43c1",
-      "events": "5e21e40e",
+      "nextId": 1005,
+      "state": "059bddba",
+      "events": "ebe37b42",
       "rng": {
         "draws": 542,
         "digest": "2db21352"
@@ -117,7 +117,7 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 971,
+          "entityId": 1001,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword",
@@ -189,7 +189,7 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 972,
+          "entityId": 1002,
           "equipment": {
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
@@ -265,7 +265,7 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 973,
+          "entityId": 1003,
           "equipment": {
             "chest": "footpad_jerkin",
             "mainhand": "rusty_dagger",
@@ -336,7 +336,7 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 974,
+          "entityId": 1004,
           "equipment": {
             "chest": "footpad_jerkin",
             "mainhand": "rusty_hatchet"
@@ -390,7 +390,7 @@
               "name": "Battle Stance",
               "remaining": 3595,
               "school": "physical",
-              "sourceId": 971
+              "sourceId": 1001
             }
           ],
           "blockChance": 0.05,
@@ -401,7 +401,7 @@
           "dodgeChance": 0.0695,
           "fiveSecondRule": 104.05,
           "hp": 822,
-          "id": 971,
+          "id": 1001,
           "inCombat": true,
           "kind": "player",
           "level": 20,
@@ -421,9 +421,9 @@
           "resource": 6.257758,
           "resourceType": "rage",
           "spawnPos": {
-            "x": 2,
-            "y": 1.5,
-            "z": -2
+            "x": -94,
+            "y": -2,
+            "z": -58
           },
           "spellPower": 5,
           "stats": {
@@ -451,7 +451,7 @@
           "dodgeChance": 0.056,
           "fiveSecondRule": 104.05,
           "hp": 418,
-          "id": 972,
+          "id": 1002,
           "kind": "player",
           "level": 20,
           "lootFfaTimer": "Infinity",
@@ -469,9 +469,9 @@
           "resource": 1581,
           "resourceType": "mana",
           "spawnPos": {
-            "x": 2,
-            "y": 1.5,
-            "z": -2
+            "x": -94,
+            "y": -2,
+            "z": -58
           },
           "spellPower": 41,
           "stats": {
@@ -503,7 +503,7 @@
           "facing": 3.141593,
           "fiveSecondRule": 104.05,
           "hp": 4950,
-          "id": 973,
+          "id": 1003,
           "inCombat": true,
           "kind": "player",
           "level": 20,
@@ -529,9 +529,9 @@
           "resource": 100,
           "resourceType": "energy",
           "spawnPos": {
-            "x": 2,
-            "y": 1.5,
-            "z": -2
+            "x": -94,
+            "y": -2,
+            "z": -58
           },
           "spellPower": 6,
           "stats": {
@@ -561,7 +561,7 @@
           "facing": 3.141593,
           "fiveSecondRule": 104.05,
           "hp": 783,
-          "id": 974,
+          "id": 1004,
           "kind": "player",
           "level": 20,
           "lootFfaTimer": "Infinity",
@@ -580,9 +580,9 @@
           "resource": 100,
           "resourceType": "focus",
           "spawnPos": {
-            "x": 2,
-            "y": 1.5,
-            "z": -2
+            "x": -94,
+            "y": -2,
+            "z": -58
           },
           "spellPower": 16,
           "stats": {
@@ -605,9 +605,9 @@
     {
       "tick": 101,
       "time": 5.05,
-      "nextId": 975,
-      "state": "b4160263",
-      "events": "f4f42d28",
+      "nextId": 1005,
+      "state": "3ecf1008",
+      "events": "f3328fb3",
       "rng": {
         "draws": 542,
         "digest": "2db21352"
@@ -648,7 +648,7 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 971,
+          "entityId": 1001,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword",
@@ -720,7 +720,7 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 972,
+          "entityId": 1002,
           "equipment": {
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
@@ -796,7 +796,7 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 973,
+          "entityId": 1003,
           "equipment": {
             "chest": "footpad_jerkin",
             "mainhand": "rusty_dagger",
@@ -867,7 +867,7 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 974,
+          "entityId": 1004,
           "equipment": {
             "chest": "footpad_jerkin",
             "mainhand": "rusty_hatchet"
@@ -921,7 +921,7 @@
               "name": "Battle Stance",
               "remaining": 3595,
               "school": "physical",
-              "sourceId": 971
+              "sourceId": 1001
             }
           ],
           "blockChance": 0.05,
@@ -932,7 +932,7 @@
           "dodgeChance": 0.0695,
           "fiveSecondRule": 104.05,
           "hp": 822,
-          "id": 971,
+          "id": 1001,
           "inCombat": true,
           "kind": "player",
           "level": 20,
@@ -952,9 +952,9 @@
           "resource": 12.515515,
           "resourceType": "rage",
           "spawnPos": {
-            "x": 2,
-            "y": 1.5,
-            "z": -2
+            "x": -94,
+            "y": -2,
+            "z": -58
           },
           "spellPower": 5,
           "stats": {
@@ -982,7 +982,7 @@
           "dodgeChance": 0.056,
           "fiveSecondRule": 104.05,
           "hp": 418,
-          "id": 972,
+          "id": 1002,
           "kind": "player",
           "level": 20,
           "lootFfaTimer": "Infinity",
@@ -1000,9 +1000,9 @@
           "resource": 1581,
           "resourceType": "mana",
           "spawnPos": {
-            "x": 2,
-            "y": 1.5,
-            "z": -2
+            "x": -94,
+            "y": -2,
+            "z": -58
           },
           "spellPower": 41,
           "stats": {
@@ -1032,7 +1032,7 @@
           "facing": 3.141593,
           "fiveSecondRule": 104.05,
           "hp": 4900,
-          "id": 973,
+          "id": 1003,
           "inCombat": true,
           "kind": "player",
           "level": 20,
@@ -1058,9 +1058,9 @@
           "resource": 100,
           "resourceType": "energy",
           "spawnPos": {
-            "x": 2,
-            "y": 1.5,
-            "z": -2
+            "x": -94,
+            "y": -2,
+            "z": -58
           },
           "spellPower": 6,
           "stats": {
@@ -1090,7 +1090,7 @@
           "facing": 3.141593,
           "fiveSecondRule": 104.05,
           "hp": 783,
-          "id": 974,
+          "id": 1004,
           "kind": "player",
           "level": 20,
           "lootFfaTimer": "Infinity",
@@ -1109,9 +1109,9 @@
           "resource": 100,
           "resourceType": "focus",
           "spawnPos": {
-            "x": 2,
-            "y": 1.5,
-            "z": -2
+            "x": -94,
+            "y": -2,
+            "z": -58
           },
           "spellPower": 16,
           "stats": {
@@ -1134,9 +1134,9 @@
     {
       "tick": 101,
       "time": 5.05,
-      "nextId": 975,
-      "state": "f73d1b60",
-      "events": "2d2958a5",
+      "nextId": 1005,
+      "state": "12560839",
+      "events": "cb25c57c",
       "rng": {
         "draws": 542,
         "digest": "2db21352"
@@ -1178,7 +1178,7 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 971,
+          "entityId": 1001,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword",
@@ -1252,7 +1252,7 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 972,
+          "entityId": 1002,
           "equipment": {
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
@@ -1329,7 +1329,7 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 973,
+          "entityId": 1003,
           "equipment": {
             "chest": "footpad_jerkin",
             "mainhand": "rusty_dagger",
@@ -1400,7 +1400,7 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 974,
+          "entityId": 1004,
           "equipment": {
             "chest": "footpad_jerkin",
             "mainhand": "rusty_hatchet"
@@ -1454,7 +1454,7 @@
               "name": "Battle Stance",
               "remaining": 3595,
               "school": "physical",
-              "sourceId": 971
+              "sourceId": 1001
             }
           ],
           "blockChance": 0.05,
@@ -1465,7 +1465,7 @@
           "dodgeChance": 0.0695,
           "fiveSecondRule": 104.05,
           "hp": 822,
-          "id": 971,
+          "id": 1001,
           "inCombat": true,
           "kind": "player",
           "level": 20,
@@ -1485,9 +1485,9 @@
           "resource": 12.515515,
           "resourceType": "rage",
           "spawnPos": {
-            "x": 2,
-            "y": 1.5,
-            "z": -2
+            "x": -94,
+            "y": -2,
+            "z": -58
           },
           "spellPower": 5,
           "stats": {
@@ -1515,7 +1515,7 @@
           "dodgeChance": 0.056,
           "fiveSecondRule": 104.05,
           "hp": 418,
-          "id": 972,
+          "id": 1002,
           "kind": "player",
           "level": 20,
           "lootFfaTimer": "Infinity",
@@ -1533,9 +1533,9 @@
           "resource": 1581,
           "resourceType": "mana",
           "spawnPos": {
-            "x": 2,
-            "y": 1.5,
-            "z": -2
+            "x": -94,
+            "y": -2,
+            "z": -58
           },
           "spellPower": 41,
           "stats": {
@@ -1565,7 +1565,7 @@
           "dualWielding": true,
           "facing": 3.141593,
           "fiveSecondRule": 104.05,
-          "id": 973,
+          "id": 1003,
           "inCombat": true,
           "kind": "player",
           "level": 20,
@@ -1591,9 +1591,9 @@
           "resource": 100,
           "resourceType": "energy",
           "spawnPos": {
-            "x": 2,
-            "y": 1.5,
-            "z": -2
+            "x": -94,
+            "y": -2,
+            "z": -58
           },
           "spellPower": 6,
           "stats": {
@@ -1623,7 +1623,7 @@
           "facing": 3.141593,
           "fiveSecondRule": 104.05,
           "hp": 783,
-          "id": 974,
+          "id": 1004,
           "kind": "player",
           "level": 20,
           "lootFfaTimer": "Infinity",
@@ -1642,9 +1642,9 @@
           "resource": 100,
           "resourceType": "focus",
           "spawnPos": {
-            "x": 2,
-            "y": 1.5,
-            "z": -2
+            "x": -94,
+            "y": -2,
+            "z": -58
           },
           "spellPower": 16,
           "stats": {
@@ -1667,23 +1667,23 @@
     {
       "tick": 125,
       "time": 6.25,
-      "nextId": 975,
-      "state": "80fe861c",
+      "nextId": 1005,
+      "state": "6fa8514d",
       "events": "741638a5",
       "rng": {
-        "draws": 788,
-        "digest": "0a152075"
+        "draws": 800,
+        "digest": "01b1b308"
       }
     },
     {
       "tick": 142,
       "time": 7.1,
-      "nextId": 975,
-      "state": "67a479d5",
+      "nextId": 1005,
+      "state": "40c8e8f2",
       "events": "741638a5",
       "rng": {
-        "draws": 972,
-        "digest": "fa3491de"
+        "draws": 979,
+        "digest": "3ce48a54"
       },
       "label": "final",
       "players": [
@@ -1722,7 +1722,7 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 971,
+          "entityId": 1001,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword",
@@ -1796,7 +1796,7 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 972,
+          "entityId": 1002,
           "equipment": {
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
@@ -1873,7 +1873,7 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 973,
+          "entityId": 1003,
           "equipment": {
             "chest": "footpad_jerkin",
             "mainhand": "rusty_dagger",
@@ -1944,7 +1944,7 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 974,
+          "entityId": 1004,
           "equipment": {
             "chest": "footpad_jerkin",
             "mainhand": "rusty_hatchet"
@@ -1998,7 +1998,7 @@
               "name": "Battle Stance",
               "remaining": 3592.95,
               "school": "physical",
-              "sourceId": 971
+              "sourceId": 1001
             }
           ],
           "blockChance": 0.05,
@@ -2010,7 +2010,7 @@
           "dodgeChance": 0.0695,
           "fiveSecondRule": 106.1,
           "hp": 822,
-          "id": 971,
+          "id": 1001,
           "inCombat": true,
           "kind": "player",
           "level": 20,
@@ -2030,9 +2030,9 @@
           "resource": 12.515515,
           "resourceType": "rage",
           "spawnPos": {
-            "x": 2,
-            "y": 1.5,
-            "z": -2
+            "x": -94,
+            "y": -2,
+            "z": -58
           },
           "spellPower": 5,
           "stats": {
@@ -2060,7 +2060,7 @@
           "dodgeChance": 0.056,
           "fiveSecondRule": 106.1,
           "hp": 418,
-          "id": 972,
+          "id": 1002,
           "kind": "player",
           "level": 20,
           "lootFfaTimer": "Infinity",
@@ -2078,9 +2078,9 @@
           "resource": 1581,
           "resourceType": "mana",
           "spawnPos": {
-            "x": 2,
-            "y": 1.5,
-            "z": -2
+            "x": -94,
+            "y": -2,
+            "z": -58
           },
           "spellPower": 41,
           "stats": {
@@ -2111,7 +2111,7 @@
           "dualWielding": true,
           "facing": 3.141593,
           "fiveSecondRule": 106.1,
-          "id": 973,
+          "id": 1003,
           "inCombat": true,
           "kind": "player",
           "level": 20,
@@ -2137,9 +2137,9 @@
           "resource": 100,
           "resourceType": "energy",
           "spawnPos": {
-            "x": 2,
-            "y": 1.5,
-            "z": -2
+            "x": -94,
+            "y": -2,
+            "z": -58
           },
           "spellPower": 6,
           "stats": {
@@ -2169,7 +2169,7 @@
           "facing": 3.141593,
           "fiveSecondRule": 106.1,
           "hp": 783,
-          "id": 974,
+          "id": 1004,
           "kind": "player",
           "level": 20,
           "lootFfaTimer": "Infinity",
@@ -2188,9 +2188,9 @@
           "resource": 100,
           "resourceType": "focus",
           "spawnPos": {
-            "x": 2,
-            "y": 1.5,
-            "z": -2
+            "x": -94,
+            "y": -2,
+            "z": -58
           },
           "spellPower": 16,
           "stats": {

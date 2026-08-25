@@ -165,6 +165,7 @@ describe('exclude lists are pinned and real (anti-loosening guard)', () => {
       'equippedItems',
       'firebottleCdRemaining', // derived display copy of PlayerMeta.firebottleReadyAt
       'guild',
+      'guildTier', // server-set display only (pledge board colour ladder)
       'holderBalance',
       'holderTier',
       'mainhandItemId',
@@ -175,6 +176,7 @@ describe('exclude lists are pinned and real (anti-loosening guard)', () => {
       'overheadEmoteId',
       'overheadEmoteSeq',
       'overheadEmoteUntil',
+      'pledgeGuild', // server-set display only (guild pledge board)
       'potionCdRemaining',
       'prevFacing',
       'prevPos',
@@ -200,6 +202,7 @@ describe('exclude lists are pinned and real (anti-loosening guard)', () => {
       'craftThrottle',
       'fiestaMods',
       'fiestaSpecial',
+      'firstCharacter',
       'guildMembership',
       'joinedAt',
       'known',

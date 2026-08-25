@@ -981,4 +981,8 @@ export const table: DeedLocaleTable = {
     desc: '각인 기술 125를 달성하여 그 기예의 정점에 오르십시오.',
     title: '각인 대가',
   },
+  prog_ready_for_an_adventure: {
+    name: '모험을 떠날 준비',
+    desc: '수련의 해안을 졸업하십시오. 섬의 모든 수업을 마친 뒤, 나룻배 종을 울려 이스트브룩으로 돌아가십시오.',
+  },
 };

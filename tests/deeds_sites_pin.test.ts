@@ -1,5 +1,5 @@
 // The bespoke Book of Deeds site helpers (the exported on*ForDeeds functions in
-// src/sim/deeds.ts) grant the 42 manual-trigger deeds directly from the gameplay
+// src/sim/deeds.ts) grant the manual-trigger deeds directly from the gameplay
 // modules. This suite drives each site through a real Sim's ctx (the deeds.test.ts
 // idiom) with decisive positive AND negative cases: every grant is asserted through
 // the player's earned set, every negative targets one exact gate condition.
@@ -8,7 +8,6 @@ import { handleDeath } from '../src/sim/combat/damage';
 import { STATION_RADIUS } from '../src/sim/content/professions';
 import { DUNGEONS, instanceOrigin, MOBS, STATIONS } from '../src/sim/data';
 import {
-  type CupMatchForDeeds,
   onArenaMatchEndForDeeds,
   onBellContactForDeeds,
   onBloatDetonatedForDeeds,
@@ -17,11 +16,6 @@ import {
   onChatRollForDeeds,
   onCheerForDeeds,
   onCompanionReviveForDeeds,
-  onCupGoalForDeeds,
-  onCupMatchEndForDeeds,
-  onCupSaveForDeeds,
-  onCupStandingForDeeds,
-  onCupTouchForDeeds,
   onDamageDealtForDeeds,
   onDeathlessRageResolvedForDeeds,
   onDelveClearForDeeds,
@@ -100,35 +94,6 @@ function encounterInstance(
     return meta;
   });
   return { boss, inst, recipients };
-}
-
-// A structural Cup match for the deed sites (vale_cup.ts owns the real VcMatch).
-function cupMatch(opts: {
-  id: number;
-  bracket?: number;
-  rated?: boolean;
-  golden?: boolean;
-  scoreA?: number;
-  scoreB?: number;
-  teamA?: number[];
-  teamB?: number[];
-  roles?: Record<number, string>;
-  benched?: Set<number>;
-  practice?: unknown | null;
-}): CupMatchForDeeds {
-  return {
-    id: opts.id,
-    bracket: opts.bracket ?? 1,
-    rated: opts.rated ?? true,
-    golden: opts.golden ?? false,
-    scoreA: opts.scoreA ?? 0,
-    scoreB: opts.scoreB ?? 0,
-    teamA: opts.teamA ?? [],
-    teamB: opts.teamB ?? [],
-    roles: opts.roles ?? {},
-    benched: opts.benched ?? new Set(),
-    practice: opts.practice ?? null,
-  };
 }
 
 function fiestaMatch(sim: Sim, teamA: number[], teamB: number[]): ArenaMatch {
@@ -656,215 +621,6 @@ describe('encounter mechanical arms (onMobKillCreditForDeeds)', () => {
     onWorldBossKilledForDeeds(sim.ctx, boss, [diver]);
     expect(diver.deedsEarned.has('cmb_thunzharr')).toBe(true);
     expect(diver.deedsEarned.has('cmb_thunzharr_unbroken')).toBe(false);
-  });
-});
-
-describe('Vale Cup sites', () => {
-  it('chr_vale_cup_debut: a queued bout and a non-bot toucher grants; practice and bots block', () => {
-    const sim = makeSim();
-    const striker = addMeta(sim, 'Striker');
-    // Practice bout: never counts.
-    onCupTouchForDeeds(
-      sim.ctx,
-      cupMatch({ id: 1, teamA: [striker.entityId], practice: {} }),
-      striker.entityId,
-    );
-    expect(striker.deedsEarned.has('chr_vale_cup_debut')).toBe(false);
-    // Queued bout, but the toucher is a backfill bot: skipped.
-    const bot = addMeta(sim, 'Bot');
-    sim.ctx.vcup.botPids.push(bot.entityId);
-    onCupTouchForDeeds(sim.ctx, cupMatch({ id: 2, teamA: [bot.entityId] }), bot.entityId);
-    expect(bot.deedsEarned.has('chr_vale_cup_debut')).toBe(false);
-    // Queued bout, human toucher: debut. (The queued gate reads practice, not rated,
-    // so even an unrated bot-backfilled bout counts for a human's debut.)
-    onCupTouchForDeeds(
-      sim.ctx,
-      cupMatch({ id: 3, rated: false, teamA: [striker.entityId] }),
-      striker.entityId,
-    );
-    expect(striker.deedsEarned.has('chr_vale_cup_debut')).toBe(true);
-  });
-
-  it('pvp_vcup_first_match: needs a personal touch, a seat, and a queued bout', () => {
-    const sim = makeSim();
-    const seated = addMeta(sim, 'Starter');
-    const untouched = addMeta(sim, 'Idle');
-    const benched = addMeta(sim, 'Sub');
-    const queued = cupMatch({
-      id: 1,
-      teamA: [seated.entityId, untouched.entityId, benched.entityId],
-      benched: new Set([benched.entityId]),
-    });
-    onCupTouchForDeeds(sim.ctx, queued, seated.entityId);
-    onCupTouchForDeeds(sim.ctx, queued, benched.entityId); // benched can still touch, stays ineligible
-    // untouched never touches the ball.
-    onCupMatchEndForDeeds(sim.ctx, queued);
-    expect(seated.deedsEarned.has('pvp_vcup_first_match')).toBe(true);
-    expect(untouched.deedsEarned.has('pvp_vcup_first_match')).toBe(false);
-    expect(benched.deedsEarned.has('pvp_vcup_first_match')).toBe(false);
-
-    // A practice bout never counts even for a seated toucher.
-    const prac = makeSim();
-    const toucher = addMeta(prac, 'Practicer');
-    const practice = cupMatch({ id: 2, teamA: [toucher.entityId], practice: {} });
-    onCupTouchForDeeds(prac.ctx, practice, toucher.entityId);
-    onCupMatchEndForDeeds(prac.ctx, practice);
-    expect(toucher.deedsEarned.has('pvp_vcup_first_match')).toBe(false);
-  });
-
-  it('onCupGoalForDeeds: gates goals on rating and a real scorer, and stacks golden', () => {
-    // Unrated bout: no goal credit.
-    const unrated = makeSim();
-    const u = addMeta(unrated, 'Scorer');
-    onCupGoalForDeeds(
-      unrated.ctx,
-      cupMatch({ id: 1, rated: false, teamA: [u.entityId] }),
-      'A',
-      u.entityId,
-    );
-    expect(u.deedsEarned.has('pvp_vcup_first_goal')).toBe(false);
-
-    // Own goal (null scorer): credits nobody.
-    const own = makeSim();
-    const o = addMeta(own, 'Scorer');
-    onCupGoalForDeeds(own.ctx, cupMatch({ id: 1, rated: true, teamA: [o.entityId] }), 'A', null);
-    expect(o.deedsEarned.has('pvp_vcup_first_goal')).toBe(false);
-
-    // Rated golden goal: first goal AND golden goal.
-    const golden = makeSim();
-    const g = addMeta(golden, 'Scorer');
-    onCupGoalForDeeds(
-      golden.ctx,
-      cupMatch({ id: 1, rated: true, golden: true, teamA: [g.entityId] }),
-      'A',
-      g.entityId,
-    );
-    expect(g.deedsEarned.has('pvp_vcup_first_goal')).toBe(true);
-    expect(g.deedsEarned.has('pvp_vcup_golden_goal')).toBe(true);
-
-    // A non-golden rated goal never earns the golden deed.
-    const plain = makeSim();
-    const p = addMeta(plain, 'Scorer');
-    onCupGoalForDeeds(
-      plain.ctx,
-      cupMatch({ id: 1, rated: true, golden: false, teamA: [p.entityId] }),
-      'A',
-      p.entityId,
-    );
-    expect(p.deedsEarned.has('pvp_vcup_first_goal')).toBe(true);
-    expect(p.deedsEarned.has('pvp_vcup_golden_goal')).toBe(false);
-  });
-
-  it('pvp_vcup_hat_trick: three goals in a bracket-3+ bout; bracket 2 and two goals fall short', () => {
-    // Bracket 2: three goals never make a hat trick.
-    const low = makeSim();
-    const l = addMeta(low, 'Hatless');
-    const lowMatch = cupMatch({ id: 1, rated: true, bracket: 2, teamA: [l.entityId] });
-    for (let i = 0; i < 3; i++) onCupGoalForDeeds(low.ctx, lowMatch, 'A', l.entityId);
-    expect(l.deedsEarned.has('pvp_vcup_hat_trick')).toBe(false);
-
-    // Bracket 3: two goals short, the third completes it.
-    const hi = makeSim();
-    const h = addMeta(hi, 'Hatful');
-    const hiMatch = cupMatch({ id: 1, rated: true, bracket: 3, teamA: [h.entityId] });
-    onCupGoalForDeeds(hi.ctx, hiMatch, 'A', h.entityId);
-    onCupGoalForDeeds(hi.ctx, hiMatch, 'A', h.entityId);
-    expect(h.deedsEarned.has('pvp_vcup_hat_trick')).toBe(false);
-    onCupGoalForDeeds(hi.ctx, hiMatch, 'A', h.entityId);
-    expect(h.deedsEarned.has('pvp_vcup_hat_trick')).toBe(true);
-  });
-
-  it('pvp_vcup_first_save: fires only in a rated, bracket-3+ bout', () => {
-    const sim = makeSim();
-    const keeper = addMeta(sim, 'Keeper');
-    onCupSaveForDeeds(
-      sim.ctx,
-      cupMatch({ id: 1, rated: false, bracket: 3, teamA: [keeper.entityId] }),
-      keeper.entityId,
-    );
-    expect(keeper.deedsEarned.has('pvp_vcup_first_save')).toBe(false);
-    // Rated but small-bracket: the description promises the 3v3 bracket or
-    // larger, enforced directly at the grant site (issue 2767 review round).
-    onCupSaveForDeeds(
-      sim.ctx,
-      cupMatch({ id: 1, rated: true, bracket: 2, teamA: [keeper.entityId] }),
-      keeper.entityId,
-    );
-    expect(keeper.deedsEarned.has('pvp_vcup_first_save')).toBe(false);
-    onCupSaveForDeeds(
-      sim.ctx,
-      cupMatch({ id: 1, rated: true, bracket: 3, teamA: [keeper.entityId] }),
-      keeper.entityId,
-    );
-    expect(keeper.deedsEarned.has('pvp_vcup_first_save')).toBe(true);
-  });
-
-  it('pvp_vcup_clean_sheet: a winning, seated keeper who conceded nothing; each field flips it off', () => {
-    const sheet = (meta: PlayerMeta, over: Partial<CupMatchForDeeds>): CupMatchForDeeds =>
-      cupMatch({
-        id: 1,
-        bracket: 3,
-        teamA: [meta.entityId],
-        roles: { [meta.entityId]: 'keeper' },
-        scoreA: 3,
-        scoreB: 0,
-        ...over,
-      });
-
-    // Loser: winner !== team.
-    const loseSim = makeSim();
-    const lose = addMeta(loseSim, 'Keeper');
-    onCupStandingForDeeds(loseSim.ctx, sheet(lose, {}), lose.entityId, 'A', 'B');
-    expect(lose.deedsEarned.has('pvp_vcup_clean_sheet')).toBe(false);
-
-    // Not a keeper.
-    const roleSim = makeSim();
-    const outfield = addMeta(roleSim, 'Striker');
-    onCupStandingForDeeds(
-      roleSim.ctx,
-      sheet(outfield, { roles: { [outfield.entityId]: 'striker' } }),
-      outfield.entityId,
-      'A',
-      'A',
-    );
-    expect(outfield.deedsEarned.has('pvp_vcup_clean_sheet')).toBe(false);
-
-    // Benched keeper.
-    const benchSim = makeSim();
-    const bench = addMeta(benchSim, 'Keeper');
-    onCupStandingForDeeds(
-      benchSim.ctx,
-      sheet(bench, { benched: new Set([bench.entityId]) }),
-      bench.entityId,
-      'A',
-      'A',
-    );
-    expect(bench.deedsEarned.has('pvp_vcup_clean_sheet')).toBe(false);
-
-    // Conceded a goal: opposing score != 0.
-    const concedeSim = makeSim();
-    const concede = addMeta(concedeSim, 'Keeper');
-    onCupStandingForDeeds(
-      concedeSim.ctx,
-      sheet(concede, { scoreB: 1 }),
-      concede.entityId,
-      'A',
-      'A',
-    );
-    expect(concede.deedsEarned.has('pvp_vcup_clean_sheet')).toBe(false);
-
-    // Small bracket: the description promises the 3v3 bracket or larger,
-    // enforced directly at the grant site (issue 2767 review round).
-    const lowSim = makeSim();
-    const low = addMeta(lowSim, 'Keeper');
-    onCupStandingForDeeds(lowSim.ctx, sheet(low, { bracket: 2 }), low.entityId, 'A', 'A');
-    expect(low.deedsEarned.has('pvp_vcup_clean_sheet')).toBe(false);
-
-    // All four satisfied: clean sheet.
-    const winSim = makeSim();
-    const win = addMeta(winSim, 'Keeper');
-    onCupStandingForDeeds(winSim.ctx, sheet(win, {}), win.entityId, 'A', 'A');
-    expect(win.deedsEarned.has('pvp_vcup_clean_sheet')).toBe(true);
   });
 });
 

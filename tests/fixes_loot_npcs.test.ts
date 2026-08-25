@@ -645,19 +645,22 @@ describe('pet heel warp', () => {
   it('keeps the spatial grid exact when a pet warps to its owner', () => {
     const sim = makeWolfSim();
     const p = sim.player;
-    // park the owner behind the spawn building, far enough that no heel route
-    // exists: the gap (87yd) exceeds the pet's A* search window and the building
-    // breaks line of sight, so the pet can only fall back to the last-resort warp.
-    teleportTo(sim, 0, 82);
+    // park the owner north of the town plat, far enough that no heel route
+    // exists: the gap (87yd) exceeds the pet's A* search window and the bank
+    // at (12,-94) breaks line of sight, so the pet can only fall back to the
+    // last-resort warp. Re-staged 2026-08-18 for the Eastbrook harbor move
+    // (d19aa33f76): the old (0,-5)/(0,82) pair spanned the vacated town
+    // ground, which is now open, so a clear line there let the pet path.
+    teleportTo(sim, 12, -48);
 
-    // adopt a wild beast as a heeling pet and strand it on the far side of the wall
+    // adopt a wild beast as a heeling pet and strand it on the far side of the bank
     const pet = [...sim.entities.values()].find((e) => e.kind === 'mob' && !e.dead)!;
     pet.ownerId = p.id;
     pet.hostile = false;
     pet.aggroTargetId = null;
     pet.inCombat = false;
     pet.petMode = 'passive';
-    pet.pos = { x: 0, z: -5, y: p.pos.y };
+    pet.pos = { x: 12, z: -135, y: p.pos.y };
     pet.prevPos = { ...pet.pos };
     (sim as any).grid.update(pet); // grid now buckets the pet at its far cell
 

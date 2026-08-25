@@ -47,7 +47,6 @@ import type { BgOutcomeRecord } from './social/battleground_outcomes';
 import type { BgProposal } from './social/battleground_proposal';
 import type { CardDuelMatch } from './social/card_duel';
 import type { FinderFormationUnit } from './social/party';
-import type { VcState } from './social/vale_cup';
 import type { SpatialGrid } from './spatial';
 import type {
   AbilityDef,
@@ -253,6 +252,12 @@ export interface SimContextPrimitives {
   // daily boundary. '' means the host set no calendar, so nothing ever rolls over
   // and same-seed replays stay reproducible.
   readonly resetDay: string;
+  // Host-supplied early-open probe for the weekend Double Honor window ('' =
+  // unknown): the reset-day key the realm will be in DOUBLE_HONOR_LEAD_HOURS
+  // from now, so the event opens that many hours before the Saturday window
+  // (src/sim/pvp/honor_event.ts). Only the event reads this; every daily
+  // rollover stays on `resetDay` above.
+  readonly eventLeadDay: string;
   // Wild-respawn queue (P1b: completeTame pushes the tamed beast's respawn). Live view;
   // the backing array stays on Sim, mutated in place (push), so read-only ref.
   readonly pendingMobRespawns: PendingMobRespawn[];
@@ -284,6 +289,10 @@ export interface SimContextPrimitives {
   // backing field stays Sim-owned (the Market instance owns it), exposed here as a live
   // read-only view (never reassigned by the readout).
   readonly devCommands: boolean;
+  // The compulsory-tutorial host opt-in (SimConfig.compulsoryTutorial): the
+  // greeting sweep only force-ferries fresh characters where a live world
+  // turned it on; tests, parity traces, and the RL env keep it off.
+  readonly compulsoryTutorial: boolean;
   readonly marketListings: MarketListing[];
   // Bank system: the live array of every `banker: true` NPC id, seeded by
   // the Sim ctor NPC loop. bank.ts reads it to gate deposit/withdraw/buy-slots on
@@ -296,11 +305,6 @@ export interface SimContextPrimitives {
   // reassigned, so a live read-only view like bankerIds. Always empty offline
   // (guilds are a server social system).
   readonly guildBanks: Map<number, GuildBankState>;
-  // The Vale Cup boarball state (social/vale_cup.ts): ONE holder object on Sim
-  // (queues/deserters/botPids mutated in place, the match slot reassigned INSIDE
-  // the holder), so a read-only live view suffices. Consumed by the vale_cup
-  // module, the damage no-damage floor, and targeting's candidate arm.
-  readonly vcup: VcState;
   // Book of Deeds: players whose deed-relevant state changed this tick,
   // evaluated and cleared at the tick tail (deeds.ts updateDeeds). Sim-owned
   // Set mutated in place, so a read-only live view.
@@ -1081,30 +1085,6 @@ export interface SimContextCallbacks {
   markDeedsDirty(pid: number): void;
   grantDeed(meta: PlayerMeta, deedId: string, opts?: { retro?: boolean }): boolean;
 
-  // Vale Cup <-> Arena queue exclusion (owned by social/vale_cup.ts). True when
-  // pid is seated in a live Vale Cup match (rated or practice) or waiting in a
-  // Vale Cup bracket queue. social/arena.ts calls this from arenaQueueJoin and
-  // the 1v1/2v2/fiesta prune predicates so a player already committed to Vale
-  // Cup can never be pulled into an Arena queue or match, and vice versa (the
-  // mirror check, isArenaQueued, is a direct import since vale_cup.ts already
-  // imports arena.ts one direction).
-  vcupSeatedOrQueued(pid: number): boolean;
-
-  // The Vale Cup sport-move arms (owned by social/vale_cup.ts; consumed by
-  // combat/effect_dispatch.ts). All three silently no-op unless the caster is
-  // seated in the live Sowfield match's play phase. vcupBallKick launches the
-  // match ball toward the caster's castAim; vcupSportDash lunges the CASTER
-  // along the aim via the applyKnockback step-walker (catchBall grips a
-  // crossing ball); vcupSportShove bumps a cup OPPONENT back the same way.
-  vcupBallKick(caster: Entity, power: number, loft: number, range: number): void;
-  // vcupBallPass auto-paces a lead pass to the caster's targeted team-mate (else
-  // the best mate toward the aim).
-  vcupBallPass(caster: Entity, power: number, loft: number, range: number): void;
-  // vcupShoot fires the ball at the enemy goal; the client-encoded charge (aim
-  // distance) scales both power and loft, so a max shot sails over the bar.
-  vcupShoot(caster: Entity, power: number, loft: number, range: number): void;
-  vcupSportDash(caster: Entity, distance: number, catchBall: boolean): void;
-  vcupSportShove(caster: Entity, target: Entity, distance: number): void;
   // Thornhollow Fields battleground (social/battleground.ts). bgOnPlayerDeath is the
   // death hook the damage hub calls for a fallen battleground player (carrier
   // death drops the flag in place; releasing sends the spirit to the warded
@@ -1356,6 +1336,9 @@ export function createSimContext(host: SimContextHost): SimContext {
     get resetDay() {
       return host.resetDay;
     },
+    get eventLeadDay() {
+      return host.eventLeadDay;
+    },
     get utcDay() {
       return host.utcDay;
     },
@@ -1389,6 +1372,9 @@ export function createSimContext(host: SimContextHost): SimContext {
     get devCommands() {
       return host.devCommands;
     },
+    get compulsoryTutorial() {
+      return host.compulsoryTutorial;
+    },
     get marketListings() {
       return host.marketListings;
     },
@@ -1397,9 +1383,6 @@ export function createSimContext(host: SimContextHost): SimContext {
     },
     get guildBanks() {
       return host.guildBanks;
-    },
-    get vcup() {
-      return host.vcup;
     },
     get deedDirtyPids() {
       return host.deedDirtyPids;
@@ -1669,14 +1652,6 @@ export function createSimContext(host: SimContextHost): SimContext {
     markVisited: host.markVisited,
     markDeedsDirty: host.markDeedsDirty,
     grantDeed: host.grantDeed,
-    // Vale Cup <-> Arena queue exclusion (points at social/vale_cup.ts).
-    vcupSeatedOrQueued: host.vcupSeatedOrQueued,
-    // The Vale Cup sport-move arms (points at social/vale_cup.ts).
-    vcupBallKick: host.vcupBallKick,
-    vcupBallPass: host.vcupBallPass,
-    vcupShoot: host.vcupShoot,
-    vcupSportDash: host.vcupSportDash,
-    vcupSportShove: host.vcupSportShove,
     // Thornhollow Fields battleground hooks (points at social/battleground.ts via Sim).
     bgOnPlayerDeath: host.bgOnPlayerDeath,
     bgOnPlayerDamaged: host.bgOnPlayerDamaged,
