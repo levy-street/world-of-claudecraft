@@ -723,7 +723,10 @@ describe('phase 11l trophy promotion: the promoted set, exactly', () => {
     expect(Object.keys(RESTORED_POOR_SELL_VALUE)).toHaveLength(3);
     for (const [id, sellValue] of Object.entries(RESTORED_POOR_SELL_VALUE)) {
       // Read off the live def, not the sibling literal (a literal-to-literal
-      // membership check reads no production state).
+      // membership check reads no production state). The frozen-21 loop
+      // above already asserts poor for these ids and fires first, so this
+      // line is documentation of the revert's quality axis beside its
+      // sellValue axis, not the load-bearing arm.
       expect(ITEMS[id]?.quality, `${id} is poor again`).toBe('poor');
       expect(ITEMS[id]?.sellValue, `${id} sellValue must stay frozen`).toBe(sellValue);
     }

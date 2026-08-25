@@ -69,7 +69,13 @@ import {
   STATION_TYPE_BY_CRAFT,
   STATIONS,
 } from '../src/sim/content/professions';
-import { ALL_RECIPES, HOE_RECIPES, LADDER_RECIPES, ROD_RECIPES } from '../src/sim/content/recipes';
+import {
+  ALL_RECIPES,
+  COMBO_RECIPES,
+  HOE_RECIPES,
+  LADDER_RECIPES,
+  ROD_RECIPES,
+} from '../src/sim/content/recipes';
 import { RELIQUARY_PAGES } from '../src/sim/content/reliquary';
 import {
   TIER2_TOOL_GATE_PROFICIENCY,
@@ -3779,15 +3785,34 @@ describe('the craft ladder prose keeps its counts derived or count-free (Masterw
     const output = ITEMS[tallowRow?.resultItemId ?? ''];
     expect(output, 'the tallow row outputs a live item').toBeDefined();
     expect(body).toContain(output.name);
+    // "a hair weaker than the goldleaf draught": derived, not asserted.
+    expect(body).toContain('a hair weaker than the goldleaf draught');
+    const lesserHp = potion(tallowRow?.resultItemId ?? '').potionHp ?? 0;
+    const goldleafHp = potion('goldleaf_healing_draught').potionHp ?? 0;
+    expect(lesserHp).toBeGreaterThan(0);
+    expect(lesserHp).toBeLessThan(goldleafHp);
     expect(body).toContain('skill 25 rung');
   });
 
-  it('the engineering ladder body spells no recipe count (the hoes and the chassis grew it)', () => {
+  it('the engineering ladder body spells no ladder count (the hoes and the chassis grew it)', () => {
     const body = t('guide.profPages.craftProse.engineering.ladderBody');
-    expect(body).not.toMatch(
-      /\b(\d+|one|two|three|four|five|six|seven|eight|nine|ten|eleven|twelve|thirteen|fourteen|fifteen|sixteen|seventeen|eighteen|nineteen|twenty) recipes\b/i,
-    );
+    // Any spelled or numeric "<count> recipes" is the retired claim; the
+    // positive control proves the matcher sees one when it is present, so
+    // the negative below is not a dead alternate.
+    const RECIPE_COUNT_RE =
+      /\b(\d+|one|two|three|four|five|six|seven|eight|nine|ten|eleven|twelve|thirteen|fourteen|fifteen|sixteen|seventeen|eighteen|nineteen|twenty) recipes\b/i;
+    expect('The ladder is seventeen recipes bound to the toolworks').toMatch(RECIPE_COUNT_RE);
+    expect('The ladder is 17 recipes').toMatch(RECIPE_COUNT_RE);
+    expect(body).not.toMatch(RECIPE_COUNT_RE);
     expect(body).toContain('toolworks');
+    // The one count the body still spells on its own line, the six land-tool
+    // recipes known automatically, is held to the auto-known engineering rows
+    // (no acquisition channel at all: the grandfathered pre-training set).
+    expect(body).toContain('The six land-tool recipes are known automatically');
+    const autoKnown = ALL_RECIPES.filter(
+      (r) => r.professionId === 'engineering' && (r.acquisition ?? []).length === 0,
+    );
+    expect(autoKnown).toHaveLength(6);
     // The two count claims the body still makes are held to the rod table:
     // three crafted rods, two of them trainer-taught (the third is drop-taught).
     expect(body).toContain('Two of the three crafted rods are the taught exception');
@@ -3805,20 +3830,42 @@ describe('the craft ladder prose keeps its counts derived or count-free (Masterw
     // pinned to those tables rather than reworded: the day either table
     // moves, this reds and the sentence is reworded count-free with its
     // overlays swept in the same change.
+    // Both arms filter ALL_RECIPES (every list), not LADDER_RECIPES: the
+    // vector that staled alchemy's sentence was a trainer row landing on an
+    // existing rung from a DIFFERENT list (a TROPHY_RECIPES row at 25), which
+    // a ladder-scoped filter cannot see. The per-rung distribution is pinned,
+    // not only the rung set, since each sentence names three items per rung.
+    const perRung = (rows: readonly { skillReq: number }[]): Record<number, number> => {
+      const counts: Record<number, number> = {};
+      for (const r of rows) counts[r.skillReq] = (counts[r.skillReq] ?? 0) + 1;
+      return counts;
+    };
+    const trainerBelowIntermediate = (craft: string) =>
+      ALL_RECIPES.filter(
+        (r) =>
+          r.professionId === craft &&
+          (r.acquisition ?? []).includes('trainer') &&
+          r.skillReq <= 50 &&
+          !COMBO_RECIPES.some((c) => c.id === r.id),
+      );
     const armor = t('guide.profPages.craftProse.armorcrafting.ladderBody');
     expect(armor).toContain('nine recipes in three rungs');
-    const armorLadder = LADDER_RECIPES.filter((r) => r.professionId === 'armorcrafting');
-    expect(armorLadder).toHaveLength(9);
-    expect(new Set(armorLadder.map((r) => r.skillReq))).toEqual(new Set([0, 25, 50]));
+    // The Boundstone Helm is the one trainer-taught armorcrafting row in the
+    // band that is NOT a ladder rung (a Smith combination recipe the sentence
+    // names separately), so it is excluded by its combo membership, pinned.
+    expect(COMBO_RECIPES.map((c) => c.id)).toContain('recipe_ironbound_warplate_helm');
+    const armorTrainer = trainerBelowIntermediate('armorcrafting');
+    expect(armorTrainer).toHaveLength(9);
+    expect(perRung(armorTrainer)).toEqual({ 0: 3, 25: 3, 50: 3 });
+    expect(armorTrainer.map((r) => r.id).sort()).toEqual(
+      LADDER_RECIPES.filter((r) => r.professionId === 'armorcrafting')
+        .map((r) => r.id)
+        .sort(),
+    );
     const jewel = t('guide.profPages.craftProse.jewelcrafting.ladderBody');
     expect(jewel).toContain('nine trainer recipes in three rungs');
-    const jewelTrainer = ALL_RECIPES.filter(
-      (r) =>
-        r.professionId === 'jewelcrafting' &&
-        (r.acquisition ?? []).includes('trainer') &&
-        r.skillReq <= 50,
-    );
+    const jewelTrainer = trainerBelowIntermediate('jewelcrafting');
     expect(jewelTrainer).toHaveLength(9);
-    expect(new Set(jewelTrainer.map((r) => r.skillReq))).toEqual(new Set([0, 25, 50]));
+    expect(perRung(jewelTrainer)).toEqual({ 0: 3, 25: 3, 50: 3 });
   });
 });

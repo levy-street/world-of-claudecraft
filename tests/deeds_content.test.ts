@@ -1895,7 +1895,8 @@ describe('col_junk_drawer stays completable after the phase 11l trophy promotion
   // premium and bountiful arms push that id unconditionally, so the id set is
   // complete while one branch is not visited; the lockpick table draws at
   // most once per call, so the same two stubs cover it a fortiori).
-  let chestEntries = 0;
+  let litanyEntries = 0;
+  let lockpickEntries = 0;
   const LOOT_TIERS = Object.keys({
     premium: true,
     medium: true,
@@ -1907,11 +1908,11 @@ describe('col_junk_drawer stays completable after the phase 11l trophy promotion
         for (const always of [true, false]) {
           const rng = { chance: () => always } as unknown as Rng;
           for (const entry of drownedLitanyChestItemsForTier(tier, cls, rng, bountiful)) {
-            chestEntries += 1;
+            litanyEntries += 1;
             note(entry.itemId);
           }
           for (const entry of delveChestItemsForTier(tier, cls, rng, bountiful)) {
-            chestEntries += 1;
+            lockpickEntries += 1;
             note(entry.itemId);
           }
         }
@@ -1939,10 +1940,13 @@ describe('col_junk_drawer stays completable after the phase 11l trophy promotion
 
   it('the chest walk visits every entry of both tables (a count that cannot rot silently)', () => {
     // 3 tiers x 9 classes x 2 bountiful arms x 2 stubs = 108 calls per table:
-    // 189 Litany entries and 166 lockpick entries at the 11l QA. A table that
-    // stopped contributing (a renamed export, a tier the satisfies clause
-    // missed) would shrink this before it could hide a poor id.
-    expect(chestEntries).toBe(355);
+    // 189 Litany entries and 166 lockpick entries at the 11l QA, pinned PER
+    // TABLE so a drift in one cannot hide behind a compensating drift in the
+    // other. A table that stopped contributing (a renamed export, a tier the
+    // satisfies clause missed) shrinks its own count before it could hide a
+    // poor id.
+    expect(litanyEntries).toBe(189);
+    expect(lockpickEntries).toBe(166);
   });
 
   it('the reachable poor set is exactly the thirteen survivors with an acquisition route', () => {

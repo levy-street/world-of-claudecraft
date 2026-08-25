@@ -8,6 +8,7 @@
 import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 import { MATERIAL_ITEM_IDS } from '../src/sim/material_taxonomy';
+import { MATERIAL_GRADES } from '../src/sim/professions/material_grades';
 import { CHROME_GUARDED_PANELS } from '../src/ui/chrome_focus_wiring';
 import { ensureLocaleLoaded, getLanguage, setLanguage, t } from '../src/ui/i18n';
 import { SUPPORTED_LANGUAGES } from '../src/ui/i18n.resolved.generated/loaders';
@@ -366,11 +367,19 @@ describe('bank_window: search / sort / deposit-all', () => {
     // fine grades are in MATERIAL_ITEM_IDS (so the sweep moves them) and their
     // line reads Fine Material, not Material, which the first reword missed
     // (in pt_BR the two labels share no word, so a player could not read
-    // through). Pinned against the live set and the live label.
-    expect(MATERIAL_ITEM_IDS.has('fine_iron_ore')).toBe(true);
-    expect(itemKindLabel('junk', 'fine_iron_ore')).toBe('Fine Material');
+    // through). Pinned against the live set and the live label for EVERY
+    // fine grade, not one exemplar: fine_iron_ore is also a recipe reagent
+    // (the tier-4 pick), so it enters the set through the recipes loop even
+    // with the grade rule deleted, and three grades no recipe consumes
+    // (fine_copper_ore, fine_ironbark_log, fine_silverleaf_herb) are what
+    // make the grade rule itself visible here.
+    const grades = Object.values(MATERIAL_GRADES);
+    expect(grades).toHaveLength(9);
+    for (const row of grades) {
+      expect(MATERIAL_ITEM_IDS.has(row.fineItemId), row.fineItemId).toBe(true);
+      expect(itemKindLabel('junk', row.fineItemId), row.fineItemId).toBe('Fine Material');
+    }
     expect(itemKindLabel('junk', 'iron_ore')).toBe('Material');
-    expect(t('hudChrome.bank.depositAllTooltip')).toContain('reads Material or Fine Material');
   });
 
   it('every locale carries both of its own kind labels inside the deposit-all tooltip', async () => {
