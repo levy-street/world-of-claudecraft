@@ -59,7 +59,7 @@ Same seed, same world, everywhere. Much of what you see is still drawn from code
 - **Native apps on every platform**: signed desktop installers for Windows, Linux, and macOS with automatic updates and optional Steam achievement mirroring, plus iOS and Android builds, all sharing the browser client and the same online world.
 - **Scales to the machine you have**: graphics presets and an automatic frame-rate governor trade visual richness for smoothness, and are held to a fairness rule that keeps them from ever hiding something a player reacts to.
 - **Headless RL environment** with Gymnasium bindings, reward shaping, and a benchmark mode.
-- **$WOC utility, fully optional**: wallet linking for holder flair, Daily Rewards, and the cosmetic WOC Store, all non-custodial and never pay-to-win; the details live in [Web3](#web3) below.
+- **$WOC utility, fully optional**: wallet linking for holder flair, Daily Rewards, the cosmetic WOC Store, and a player-to-player item marketplace (built, ships disabled), all non-custodial; the game never sells power. The details live in [Web3](#web3) below.
 
 ## Screenshots
 
@@ -188,8 +188,9 @@ $WOC also has optional utility in the live game:
 - **WOC Store**: buy Claudium, the one-way cosmetic currency, with fiat, SOL, USDC, or $WOC. The $WOC payment rail is discounted against the others.
 - **Season 1 Armory**: spend Claudium on cosmetic weapon-skin collections. Store purchases do not add stats or combat power.
 - **Daily Rewards**: eligible verified holders can earn points through a daily spin and rotating tasks, then compete for a share of the daily prize pool.
+- **$WOC Marketplace** (built, ships disabled): a player-to-player auction house and direct-trade rail where players sell eligible already-earned items, stat-bearing gear included, to each other for $WOC. Every sale settles in $WOC with a 10% fee: 7% to the treasury, 3% burned. The game itself is not a party to any marketplace sale and never sells power; enabling it on a production realm awaits legal sign-off (`docs/prd/woc/marketplace.md`).
 
-None of this is needed to play. Wallet linking is optional and non-custodial, there is no pay-to-win, and the whole game plays fine without ever connecting a wallet.
+None of this is needed to play. Wallet linking is optional and non-custodial, and the game never sells power: nothing bought from us, in any currency, grants stats, gear, or progression. The marketplace, when it enables, is players trading their own earned items with each other. The whole game plays fine without ever connecting a wallet.
 
 **$WOC contract address (Solana):**
 

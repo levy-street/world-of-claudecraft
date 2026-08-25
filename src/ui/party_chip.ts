@@ -7,11 +7,12 @@
 // primitives (createElement, className, the inline chevron SVG, the role / aria
 // attributes) the per-frame painter must not touch.
 //
-// The chevron follows the repo's existing pattern (the #mobile-consumables-toggle
-// chip): an inline .ui-icon SVG (the hand-authored `next` triangle from ui_icons.ts,
-// no unicode arrow) that CSS rotates when the container gains .party-expanded. The
-// chip is a real <button> that meets the 40px touch floor via hud.mobile.css, and
-// its click toggles the collapse state through the supplied callback.
+// The chevron follows the repo's existing pattern (the mobile "More" tray
+// toggle, #mobile-more): an inline .ui-icon SVG (the hand-authored `next`
+// triangle from ui_icons.ts, no unicode arrow) that CSS rotates when the
+// container gains .party-expanded. The chip is a real <button> that meets the
+// 40px touch floor via hud.mobile.css, and its click toggles the collapse
+// state through the supplied callback.
 
 import { svgIcon } from './ui_icons';
 
@@ -42,9 +43,9 @@ export function createPartyChip(doc: Document, onToggle: () => void): PartyChip 
   // A disclosure control: aria-expanded reflects the collapse state (the painter
   // updates it through the elided setAttr on each toggle). Starts collapsed.
   btn.setAttribute('aria-expanded', 'false');
-  // The chevron: the same inline .ui-icon SVG the consumables chip uses (the
-  // hand-authored `next` triangle), decorative (aria-hidden), rotated by CSS when
-  // the party frames expand. No unicode arrow (the repo pattern is CSS/SVG).
+  // The chevron: the same inline .ui-icon SVG the mobile More tray toggle uses
+  // (the hand-authored `next` triangle), decorative (aria-hidden), rotated by
+  // CSS when the party frames expand. No unicode arrow (the repo pattern is CSS/SVG).
   btn.insertAdjacentHTML('afterbegin', svgIcon('next'));
   const label = doc.createElement('span');
   label.className = PARTY_CHIP_LABEL_CLASS;

@@ -163,6 +163,28 @@ function prewarmStats(): NonNullable<NonNullable<PerfSnapshot['renderer']>['prew
         workDone: 12,
         workPlanned: 20,
         detail: 'uploaded=12',
+        budgetVariants: [
+          {
+            index: 0,
+            levels: { grass: 1, foliage: 0.86, vfx: 0.92, lighting: 0.9, resolution: 0.9 },
+            elapsedMs: 24,
+            syncMs: 18,
+            programsBefore: 10,
+            programsAfter: 14,
+            programDelta: 4,
+            passes: 1,
+          },
+          {
+            index: 1,
+            levels: { grass: 0.86, foliage: 0.72, vfx: 0.84, lighting: 0.78, resolution: 0.9 },
+            elapsedMs: 20,
+            syncMs: 15,
+            programsBefore: 14,
+            programsAfter: 16,
+            programDelta: 2,
+            passes: 1,
+          },
+        ],
       },
     ],
     manifestCompleted: 12,
@@ -194,6 +216,74 @@ function prewarmStats(): NonNullable<NonNullable<PerfSnapshot['renderer']>['prew
       ],
     },
     diagnosticsBaseline: null,
+    compileUnits: [
+      {
+        id: 'programs.compile:0',
+        lane: 'programs.compile',
+        submittedAtMs: 100,
+        syncEndAtMs: 112,
+        settledAtMs: 140,
+        failedAtMs: null,
+        programsBefore: 10,
+        programsAfter: 14,
+        programDelta: 4,
+        chargedLinks: 4,
+        syncMs: 12,
+        settledDurationMs: 28,
+        statusAtReveal: 'settled' as const,
+        roots: Array.from({ length: 32 }, (_, index) => `root-${index}`),
+      },
+    ],
+    prewarmPacing: {
+      available: true,
+      source: 'default' as const,
+      mode: 'adaptive' as const,
+      linksPerSecond: null,
+      burst: 8,
+      compileBatchRoots: 32,
+      hardMaxMs: 5000,
+      chargedLinks: 4,
+      scope: 'compile-unit-sync-prologue' as const,
+      submitStop: {
+        submissions: 1,
+        usefulSettles: 1,
+        zeroDeltaSettles: 0,
+        zeroDeltaStreak: 0,
+        syncEnds: 1,
+        zeroDeltaSyncEnds: 0,
+        elapsedMs: 42,
+        sinceUsefulMs: 0,
+        stopped: false,
+        reason: null,
+      },
+      adaptive: {
+        state: 'ramp' as const,
+        windowLinks: 16,
+        minWindowLinks: 8,
+        maxWindowLinks: 32,
+        maxWindowObserved: 16,
+        estimatedLinksPerUnit: 4,
+        inFlightLinks: 4,
+        inFlightUnits: 1,
+        peakInFlightLinks: 24,
+        submittedUnits: 2,
+        settledUnits: 1,
+        failedUnits: 0,
+        backoffCount: 0,
+        noProgressCount: 0,
+        lastSettlementMs: 120,
+        transitions: [
+          {
+            atMs: 120,
+            from: 'ramp' as const,
+            to: 'steady' as const,
+            reason: 'mid-settlement' as const,
+            windowLinks: 16,
+            inFlightLinks: 4,
+          },
+        ],
+      },
+    },
   };
 }
 
@@ -399,6 +489,13 @@ function snapshot(): PerfSnapshot {
             imminentHolds: 0,
           },
           gates: { spiritSpawnsRefused: 0 },
+          portraits: {
+            transferCaptures: 0,
+            readbackCaptures: 0,
+            canvasCaptures: 0,
+            transferLatches: 0,
+            readbackLatches: 0,
+          },
         },
       },
       buildLedger: { kinds: {}, worstFrame: { ms: 0, count: 0, atMs: 0 }, slowest: [] },
@@ -496,6 +593,16 @@ function snapshot(): PerfSnapshot {
       },
       renderDiagnostics: renderDiagnostics(),
       prewarm: prewarmStats(),
+      entryDetailHorizon: {
+        active: false,
+        cap: 700,
+        targetFar: 700,
+        nextCap: null,
+        stableFrames: 0,
+        armedAtMs: null,
+        holdReason: 'inactive',
+        transitions: [],
+      },
     },
     hud: null,
     assets: { preload: { tasks: 0, waitMs: 0, complete: true }, byType: {}, files: [] },
@@ -535,7 +642,14 @@ function snapshot(): PerfSnapshot {
   };
 }
 
-beforeEach(() => installBrowserGlobals());
+beforeEach(() => {
+  installBrowserGlobals();
+  // The heavy streamed-prewarm lists ride an emit-ON-CHANGE gate whose state is
+  // module-level (one per page, like the reporter itself). Reset it per case or
+  // an earlier test's identical fixture silently gates the lists off in a later
+  // one, and every length assertion below becomes order-dependent.
+  perfReporterInternalsForTest.prewarmHeavyListGate.reset();
+});
 
 describe('perf reporter payload', () => {
   it('summarizes renderer performance without copying the full user agent', () => {
@@ -595,7 +709,13 @@ describe('perf reporter payload', () => {
     const summaryEntries = (
       body.rawSummary as {
         rendererPrewarmSummary?: {
-          entries?: { id?: string; status?: string; workDone?: number; workPlanned?: number }[];
+          entries?: {
+            id?: string;
+            status?: string;
+            workDone?: number;
+            workPlanned?: number;
+            budgetVariants?: Record<string, unknown>[];
+          }[];
         };
       }
     ).rendererPrewarmSummary?.entries;
@@ -606,6 +726,28 @@ describe('perf reporter payload', () => {
       workDone: 12,
       workPlanned: 20,
     });
+    expect(summaryEntries?.[1]?.budgetVariants).toEqual([
+      {
+        index: 0,
+        levels: { grass: 1, foliage: 0.86, vfx: 0.92, lighting: 0.9, resolution: 0.9 },
+        elapsedMs: 24,
+        syncMs: 18,
+        programsBefore: 10,
+        programsAfter: 14,
+        programDelta: 4,
+        passes: 1,
+      },
+      {
+        index: 1,
+        levels: { grass: 0.86, foliage: 0.72, vfx: 0.84, lighting: 0.78, resolution: 0.9 },
+        elapsedMs: 20,
+        syncMs: 15,
+        programsBefore: 14,
+        programsAfter: 16,
+        programDelta: 2,
+        passes: 1,
+      },
+    ]);
     // The live stats object is NOT sent beside the summary. It was a second
     // copy of the same block under the ingest's 16 KB cap, and once its resume
     // getter started serializing, the copy the server rebuilds from a fixed key
@@ -629,6 +771,38 @@ describe('perf reporter payload', () => {
       failedUnitIds: ['vfx.weapon-skins:weapon-skins:compile'],
       entries: [{ id: 'vfx.weapon-skins', lane: 'cosmetic', planned: 3, started: 3, failed: 1 }],
     });
+    expect(prewarmSummary?.compileUnits).toEqual([
+      {
+        id: 'programs.compile:0',
+        lane: 'programs.compile',
+        submittedAtMs: 100,
+        syncEndAtMs: 112,
+        settledAtMs: 140,
+        failedAtMs: null,
+        programsBefore: 10,
+        programsAfter: 14,
+        programDelta: 4,
+        chargedLinks: 4,
+        syncMs: 12,
+        settledDurationMs: 28,
+        statusAtReveal: 'settled',
+      },
+    ]);
+    expect(prewarmSummary?.prewarmPacing).toMatchObject({
+      adaptive: {
+        peakInFlightLinks: 24,
+        transitions: [
+          {
+            atMs: 120,
+            from: 'ramp',
+            to: 'steady',
+            reason: 'mid-settlement',
+            windowLinks: 16,
+            inFlightLinks: 4,
+          },
+        ],
+      },
+    });
     expect(
       (body.rawSummary as { rendererFoliage?: { modelVisibleTrianglesByLod?: { core?: number } } })
         .rendererFoliage?.modelVisibleTrianglesByLod?.core,
@@ -644,6 +818,64 @@ describe('perf reporter payload', () => {
     snap.hiddenPresentSkips = 4321;
     const body = perfReporterInternalsForTest.payloadFromSnapshot(snap, settings, 'sess1', 42)!;
     expect((body.rawSummary as { hiddenPresentSkips?: number }).hiddenPresentSkips).toBe(4321);
+  });
+
+  it('bounds prewarm unit and variant telemetry without copying root labels', () => {
+    const settings = new Settings();
+    const snap = snapshot();
+    const prewarm = snap.renderer?.prewarm;
+    if (!prewarm || !prewarm.compileUnits?.[0]) throw new Error('fixture prewarm is incomplete');
+    const baseUnit = prewarm.compileUnits[0];
+    prewarm.compileUnits = Array.from({ length: 40 }, (_, index) => ({
+      ...baseUnit,
+      id: `programs.compile:${index}`,
+      roots: Array.from({ length: 32 }, (_, rootIndex) => `root-${rootIndex}`),
+    }));
+    const variants = prewarm.manifestEntries[1]?.budgetVariants?.[0];
+    if (!variants) throw new Error('fixture variants are incomplete');
+    prewarm.manifestEntries[1].budgetVariants = Array.from({ length: 20 }, (_, index) => ({
+      ...variants,
+      index,
+    }));
+
+    const body = perfReporterInternalsForTest.payloadFromSnapshot(snap, settings, 'sess1', 42)!;
+    const summary = (
+      body.rawSummary as {
+        rendererPrewarmSummary?: {
+          compileUnits?: Record<string, unknown>[];
+          entries?: { budgetVariants?: Record<string, unknown>[] }[];
+        };
+      }
+    ).rendererPrewarmSummary;
+    expect(summary?.compileUnits).toHaveLength(12);
+    expect(summary?.compileUnits?.[0]).not.toHaveProperty('roots');
+    expect(summary?.entries?.[1]?.budgetVariants).toHaveLength(8);
+  });
+
+  it('bounds adaptive transition telemetry at the literal 12-entry cap', () => {
+    const settings = new Settings();
+    const snap = snapshot();
+    const adaptive = snap.renderer?.prewarm?.prewarmPacing?.adaptive;
+    if (!adaptive || !adaptive.transitions[0])
+      throw new Error('fixture adaptive pacing is incomplete');
+    adaptive.transitions = Array.from({ length: 40 }, (_, index) => ({
+      ...adaptive.transitions[0],
+      atMs: index,
+    }));
+
+    const body = perfReporterInternalsForTest.payloadFromSnapshot(snap, settings, 'sess1', 42)!;
+    const summary = (
+      body.rawSummary as {
+        rendererPrewarmSummary?: {
+          prewarmPacing?: { adaptive?: { transitions?: Record<string, unknown>[] } };
+        };
+      }
+    ).rendererPrewarmSummary;
+    expect(summary?.prewarmPacing?.adaptive?.transitions).toHaveLength(12);
+    // The MOST RECENT ones: a pacer's end state is what a report is read for,
+    // and the fixture numbers each transition by index so this is decisive.
+    expect(summary?.prewarmPacing?.adaptive?.transitions?.[0]?.atMs).toBe(28);
+    expect(summary?.prewarmPacing?.adaptive?.transitions?.at(-1)?.atMs).toBe(39);
   });
 
   it('carries the four dropped browser longtask fields into raw summary (#2479)', () => {
@@ -1408,6 +1640,55 @@ describe('perf reporter worst-window drain', () => {
       stop();
     }
   });
+
+  // The heavy prewarm lists follow the same delivery rule as the worst window
+  // above: consulted when the payload is built, committed only when the POST
+  // lands. These arms drive the real send path rather than the payload builder,
+  // because the split only matters across a failed request.
+  async function postedPrewarmLists(fetchImpl: ReturnType<typeof vi.fn>): Promise<boolean[]> {
+    installReporterFlowGlobals(fetchImpl);
+    const { perf } = fakePerf();
+    const stop = startPerfReporter({
+      perf,
+      settings: new Settings(),
+      tokenProvider: () => null,
+      characterIdProvider: () => null,
+    });
+    try {
+      await vi.advanceTimersByTimeAsync(900_000);
+    } finally {
+      stop();
+    }
+    expect(fetchImpl.mock.calls.length).toBeGreaterThan(1);
+    return fetchImpl.mock.calls.map((call) => {
+      const body = JSON.parse((call[1] as { body: string }).body) as {
+        rawSummary: { rendererPrewarmSummary?: { compileUnits?: unknown[] } };
+      };
+      return (body.rawSummary.rendererPrewarmSummary?.compileUnits?.length ?? 0) > 0;
+    });
+  }
+
+  it('stops re-sending the prewarm lists once a report carrying them lands', async () => {
+    const carried = await postedPrewarmLists(
+      vi.fn(async () => ({ ok: true, status: 204, text: async () => '' })),
+    );
+    expect(carried[0]).toBe(true);
+    expect(carried.slice(1).some(Boolean)).toBe(false);
+  });
+
+  it('re-sends the prewarm lists after the server rejects the report', async () => {
+    const carried = await postedPrewarmLists(
+      vi.fn(async () => ({ ok: false, status: 500, text: async () => 'nope' })),
+    );
+    expect(carried.every(Boolean)).toBe(true);
+  });
+
+  it('re-sends the prewarm lists after the send fails at the network layer', async () => {
+    const carried = await postedPrewarmLists(
+      vi.fn(async () => Promise.reject(new Error('offline'))),
+    );
+    expect(carried.every(Boolean)).toBe(true);
+  });
 });
 
 describe('gpuBucket software classification', () => {
@@ -1433,5 +1714,100 @@ describe('gpuBucket software classification', () => {
         'ANGLE (Intel, Intel(R) UHD Graphics 620 (0x00003EA0) Direct3D11 vs_5_0 ps_5_0, D3D11)',
       ),
     ).toBe('intel-uhd');
+  });
+});
+
+describe('perf reporter streamed-prewarm emit-on-change gate', () => {
+  // The renderer RETAINS its boot prewarm snapshot, so without this gate every
+  // 5-minute beacon re-sends the same few KB describing the same one-time work.
+  // Measured, that repetition was most of the headroom under the server's 16 KB
+  // raw-summary cap.
+  // `delivered` stands in for the POST succeeding, which is what commits the
+  // gate. Building a payload records nothing on its own (ruling R5's rule), so
+  // an undelivered build below deliberately leaves the block still owed.
+  function summaryOf(snap: ReturnType<typeof snapshot>, delivered = true) {
+    const body = perfReporterInternalsForTest.payloadFromSnapshot(
+      snap,
+      new Settings(),
+      'sess-gate',
+      42,
+    )!;
+    if (delivered) {
+      const fingerprint = perfReporterInternalsForTest.pendingPrewarmListFingerprint();
+      if (fingerprint !== null)
+        perfReporterInternalsForTest.prewarmHeavyListGate.commit(fingerprint);
+    }
+    return (
+      body.rawSummary as {
+        rendererPrewarmSummary?: {
+          compileUnits?: unknown[];
+          prewarmListsUnchanged?: boolean;
+          prewarmPacing?: { adaptive?: { transitions?: unknown[] } };
+          entries?: { budgetVariants?: unknown[] }[];
+        };
+      }
+    ).rendererPrewarmSummary;
+  }
+
+  it('sends the lists on the first report and omits them while unchanged', () => {
+    const first = summaryOf(snapshot());
+    expect(first?.compileUnits?.length).toBeGreaterThan(0);
+    expect(first?.prewarmPacing?.adaptive?.transitions?.length).toBeGreaterThan(0);
+    expect(first?.prewarmListsUnchanged).toBeUndefined();
+
+    const second = summaryOf(snapshot());
+    expect(second?.compileUnits).toBeUndefined();
+    expect(second?.prewarmPacing?.adaptive?.transitions).toBeUndefined();
+    expect(second?.entries?.some((entry) => entry.budgetVariants !== undefined)).toBe(false);
+    // Absent BECAUSE unchanged, said explicitly: a reader must not conclude the
+    // lane did no work.
+    expect(second?.prewarmListsUnchanged).toBe(true);
+  });
+
+  it('keeps the lists owed when the report carrying them is never delivered', () => {
+    // The gate is committed by a successful POST, not by building the payload.
+    // Without that split, a first beacon that failed would suppress the block
+    // for the rest of the session and stamp `prewarmListsUnchanged` pointing a
+    // reader at a row that never landed.
+    const undelivered = summaryOf(snapshot(), false);
+    expect(undelivered?.compileUnits?.length).toBeGreaterThan(0);
+
+    const retry = summaryOf(snapshot(), false);
+    expect(retry?.compileUnits?.length).toBeGreaterThan(0);
+    expect(retry?.prewarmListsUnchanged).toBeUndefined();
+
+    const delivered = summaryOf(snapshot());
+    expect(delivered?.compileUnits?.length).toBeGreaterThan(0);
+    const afterDelivery = summaryOf(snapshot(), false);
+    expect(afterDelivery?.compileUnits).toBeUndefined();
+    expect(afterDelivery?.prewarmListsUnchanged).toBe(true);
+  });
+
+  it('sends them again when the resume lane changes the block after boot', () => {
+    // Not "first report only": the background resume lane can still finish
+    // units after the first beacon, and that genuinely changes the diagnostic.
+    summaryOf(snapshot());
+    const changed = snapshot();
+    const prewarm = changed.renderer?.prewarm;
+    if (!prewarm?.compileUnits?.[0]) throw new Error('fixture prewarm is incomplete');
+    prewarm.compileUnits = [
+      { ...prewarm.compileUnits[0], id: 'weapon-skins:compile:resumed-later' },
+      ...prewarm.compileUnits.slice(1),
+    ];
+
+    const after = summaryOf(changed);
+    expect(after?.compileUnits?.length).toBeGreaterThan(0);
+    expect(after?.prewarmListsUnchanged).toBeUndefined();
+  });
+
+  it('keeps the cheap scalar counters on every report', () => {
+    // The gate is about the LISTS. Everything a fleet query aggregates on must
+    // still ride each beacon, or the gate would be a telemetry regression.
+    summaryOf(snapshot());
+    const second = summaryOf(snapshot()) as Record<string, unknown>;
+    expect(second.manifestPlanned).toBeDefined();
+    expect(second.compileMs).toBeDefined();
+    expect(second.resume).toBeDefined();
+    expect((second.entries as unknown[]).length).toBeGreaterThan(0);
   });
 });

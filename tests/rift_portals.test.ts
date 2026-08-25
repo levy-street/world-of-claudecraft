@@ -11,6 +11,7 @@ import {
   closeNaturalRiftPortal,
   eligibleRiftZones,
   RIFT_EVENT_HISTORY_LIMIT,
+  RIFT_LOOT_RECOVERY_GRACE,
   RIFT_MIN_LEVEL,
   RIFT_PORTAL_FIRST_AT,
   RIFT_PORTAL_LIFETIME,
@@ -20,9 +21,11 @@ import {
   riftTierForZone,
   riftZoneBoundaryAfterClose,
   riftZoneNextOpenAt,
+  sealNaturalRiftPortalForRecovery,
   spawnNaturalRiftPortal,
   updateRiftPortals,
 } from '../src/sim/rift/portals';
+import { updateRiftInstances } from '../src/sim/rift/runs';
 import type { RiftEvent, RiftInstance } from '../src/sim/rift/types';
 import { Sim } from '../src/sim/sim';
 import { DT, type Entity, type SimEvent } from '../src/sim/types';
@@ -533,6 +536,54 @@ describe('rift portals: per-zone close-gated cadence (issue #2659)', () => {
     expect(stillOpen).toHaveLength(1);
     expect(stillOpen[0].eventId).toBe(openPortal.eventId);
   });
+
+  it('a recovery-only (won) portal never blocks its own zone from opening the next natural rift', () => {
+    const sim = makeSim();
+    const targetZoneId = 'willowfen';
+    let ordinal = 1000;
+    for (const zoneId of eligibleRiftZoneIds()) {
+      if (zoneId === targetZoneId) continue;
+      sim.riftEvents.push(fakeCollapsedEvent(zoneId, ordinal++, 0, 999_999));
+    }
+    expect(spawnNaturalRiftPortal(sim.ctx, 0, { zoneId: targetZoneId })).toBe(true);
+    sim.riftPortalSpawnCount = 1;
+    const portal = sim.naturalRiftPortals.find((p) => p.zoneId === targetZoneId)!;
+
+    // Win it 50s before its own hourly boundary: the run seals to
+    // recovery-only, but the entity keeps standing on RIFT_LOOT_RECOVERY_GRACE
+    // (900s from the clear), which lands well AFTER that boundary, so the old
+    // entity is still up when the zone comes due for its replacement.
+    const clearedAt = RIFT_PORTAL_ZONE_CYCLE - 50;
+    sim.time += clearedAt;
+    const event = sim.riftEvents.find((e) => e.zoneId === targetZoneId)!;
+    event.status = 'cleared';
+    event.firstClear = {
+      partyKey: 'solo:1',
+      memberIds: [],
+      memberNames: [],
+      duration: 1,
+      clearedAt: sim.time,
+    };
+    expect(sealNaturalRiftPortalForRecovery(sim.ctx, portal.id)).toBe(true);
+    expect(sim.entities.has(portal.id)).toBe(true);
+
+    // Past the boundary the clear-time schedules (riftZoneBoundaryAfterClose
+    // with openedAt=0, closedAt=clearedAt): the zone must not read as "still
+    // open" just because the recovery-only entity is physically standing.
+    const boundary = riftZoneBoundaryAfterClose(0, clearedAt);
+    advanceToScheduledTick(sim, boundary + 30);
+    updateRiftPortals(sim.ctx);
+    const zonePortals = sim.naturalRiftPortals.filter((p) => p.zoneId === targetZoneId);
+    expect(zonePortals).toHaveLength(2); // the lingering one plus the fresh one
+    expect(
+      zonePortals.some((p) => !p.recoveryOnly),
+      'a fresh portal opened',
+    ).toBe(true);
+    expect(
+      zonePortals.some((p) => p.id === portal.id),
+      'the old one is still there too',
+    ).toBe(true);
+  });
 });
 
 describe('rift portals: level 20 gate', () => {
@@ -585,7 +636,7 @@ describe('rift portals: sealing pays Heroic Marks by rank', () => {
     return { inst, boss, portalInfo: p };
   }
 
-  it('boss kill seals the portal, announces it, and pays no Heroic Marks', () => {
+  it('boss kill seals the portal to new entrants, keeps it standing for loot recovery, and pays no Heroic Marks', () => {
     const sim = makeSim();
     sim.setPlayerLevel(RIFT_MIN_LEVEL);
     sim.utcDay = '2026-07-07';
@@ -593,9 +644,14 @@ describe('rift portals: sealing pays Heroic Marks by rank', () => {
     const { inst, boss, portalInfo } = runToBossKill(sim);
     const events = tickSeconds(sim, 1.2);
     expect(inst.rewarded).toBe(true);
-    // Portal sealed: gone from the world + registry, with the world announce.
-    expect(sim.entities.has(portalInfo.id)).toBe(false);
-    expect(sim.naturalRiftPortals.find((q) => q.id === portalInfo.id)).toBeUndefined();
+    // Portal sealed to new entrants, but still standing: the winning party gets
+    // a loot-recovery grace window (RIFT_LOOT_RECOVERY_GRACE) to walk a corpse
+    // run back, so neither the entity nor its registry record disappear yet.
+    expect(sim.entities.has(portalInfo.id)).toBe(true);
+    const portal = sim.naturalRiftPortals.find((q) => q.id === portalInfo.id);
+    expect(portal?.recoveryOnly).toBe(true);
+    expect(portal?.expiresAt).toBeGreaterThan(sim.time + RIFT_LOOT_RECOVERY_GRACE - 2);
+    expect(portal?.expiresAt).toBeLessThanOrEqual(sim.time + RIFT_LOOT_RECOVERY_GRACE);
     expect(
       events.some(
         (e) =>
@@ -782,5 +838,210 @@ describe('rift entry: death rules (anti-zerg + corpse retrieval)', () => {
       sim.riftInstances.filter((i) => i.partyKey !== null).length,
       'no fresh run allocated',
     ).toBe(allocated);
+  });
+});
+
+// A clean kill on the last boss that also wipes the whole party (nobody left to
+// resurrect) must not be an unrecoverable total loss of the loot it earned.
+// These drive the REAL overworld portal entity (spawnDuePortal + the walk-in
+// trigger), unlike the sim.enterRift(...) direct-call tests above, which
+// deliberately bypass portal mechanics entirely.
+describe('rift entry: won-run loot recovery grace (the portal outlives the clear)', () => {
+  function enterAndClear(sim: Sim) {
+    const portalInfo = sim.naturalRiftPortals[0];
+    const portalEntity = sim.entities.get(portalInfo.id)!;
+    sim.player.pos = { ...portalEntity.pos };
+    sim.player.prevPos = { ...portalEntity.pos };
+    sim.tick();
+    const inst = sim.riftInstances.find((i) => i.partyKey !== null)!;
+    const boss = clearRiftToBossKill(sim, inst);
+    tickSeconds(sim, 1.2);
+    return { inst, boss, portalInfo };
+  }
+
+  it('the winning portal stays standing so a released ghost can walk back in for the boss corpse', () => {
+    const sim = makeSim();
+    sim.setPlayerLevel(RIFT_MIN_LEVEL);
+    sim.utcDay = '2026-07-10';
+    spawnDuePortal(sim);
+    const { inst, boss, portalInfo } = enterAndClear(sim);
+    expect(inst.outcome, 'the run is decided').toBe('won');
+
+    // The whole party wipes with nobody left to resurrect: die, then release.
+    sim.player.gm = false;
+    sim.dealDamage(null, sim.player, 999999, false, 'physical', 'test', 'hit');
+    expect(sim.player.dead).toBe(true);
+    sim.releaseSpirit(sim.player.id);
+    expect(sim.player.ghost).toBe(true);
+    expect(isRiftPos(sim.player.pos.x), 'released to the overworld graveyard').toBe(false);
+
+    // The overworld entrance must still be standing: this is the whole fix.
+    const portal = sim.entities.get(portalInfo.id);
+    expect(portal, 'portal entity still stands during the grace window').toBeDefined();
+
+    // Walk the ghost back onto it: the automatic overworld walk-in trigger
+    // (rift/runs.ts updateRiftTriggers) re-admits a dead member of the WON run.
+    sim.player.pos = { ...portal!.pos };
+    sim.player.prevPos = { ...portal!.pos };
+    sim.tick();
+    expect(isRiftPos(sim.player.pos.x), 'the ghost walks back into the won run').toBe(true);
+    expect(inst.memberIds.has(sim.player.id)).toBe(true);
+
+    // The earned loot is still there, waiting to be looted.
+    expect(boss.loot?.items?.length ?? 0).toBeGreaterThan(0);
+  });
+
+  it('still denies a living entrant while the recovery-grace portal stands (no farming the window)', () => {
+    const sim = makeSim();
+    sim.setPlayerLevel(RIFT_MIN_LEVEL);
+    sim.utcDay = '2026-07-10';
+    spawnDuePortal(sim);
+    const { inst, portalInfo } = enterAndClear(sim);
+    expect(inst.outcome).toBe('won');
+
+    const portal = sim.entities.get(portalInfo.id)!;
+    sim.player.pos = { ...portal.pos };
+    sim.player.prevPos = { ...portal.pos };
+    sim.drainEvents();
+    const events = sim.tick();
+    expect(isRiftPos(sim.player.pos.x), 'a living entrant is turned away').toBe(false);
+    expect(
+      events.some((e) => e.type === 'error' && (e.text ?? '').includes('already been cleared')),
+    ).toBe(true);
+  });
+
+  it('tears the portal down quietly once the recovery grace elapses, with no second world announce', () => {
+    const sim = makeSim();
+    sim.setPlayerLevel(RIFT_MIN_LEVEL);
+    sim.utcDay = '2026-07-10';
+    spawnDuePortal(sim);
+    const { portalInfo } = enterAndClear(sim);
+    expect(sim.entities.has(portalInfo.id)).toBe(true);
+
+    // Jump the clock past the grace window and pump the 1 Hz portal scheduler
+    // directly (spawnDuePortal's own technique): no need to tick 900 real seconds.
+    sim.time += RIFT_LOOT_RECOVERY_GRACE + 1;
+    sim.tickCount += (10 - (sim.tickCount % 20) + 20) % 20;
+    updateRiftPortals(sim.ctx);
+    const events = sim.drainEvents();
+    expect(sim.entities.has(portalInfo.id), 'the portal is finally torn down').toBe(false);
+    expect(sim.naturalRiftPortals.find((q) => q.id === portalInfo.id)).toBeUndefined();
+    expect(
+      events.some((e) => e.type === 'log' && (e.text ?? '').includes('collapses')),
+      'no second, confusingly-timed world announce',
+    ).toBe(false);
+  });
+
+  it('a won run outlives the ordinary empty-timeout so a corpse run has time to land', () => {
+    const sim = makeSim();
+    sim.setPlayerLevel(RIFT_MIN_LEVEL);
+    sim.utcDay = '2026-07-10';
+    spawnDuePortal(sim);
+    const { inst } = enterAndClear(sim);
+    expect(inst.outcome).toBe('won');
+
+    // Wipe and release: nobody remains physically inside the instance from here on.
+    sim.player.gm = false;
+    sim.dealDamage(null, sim.player, 999999, false, 'physical', 'test', 'hit');
+    sim.releaseSpirit(sim.player.id);
+    expect(isRiftPos(sim.player.pos.x)).toBe(false);
+
+    // Pump the 1 Hz instance reaper directly. Past the ordinary (non-won) 180s
+    // timeout the run must still be alive; past the full loot-recovery grace it
+    // is finally freed.
+    for (let sec = 1; sec <= RIFT_LOOT_RECOVERY_GRACE + 5; sec++) {
+      sim.time += 1;
+      sim.tickCount += 20 - (sim.tickCount % 20);
+      updateRiftInstances(sim.ctx);
+      if (sec === 200) {
+        expect(inst.partyKey, 'still alive well past the ordinary 180s timeout').not.toBeNull();
+      }
+    }
+    expect(inst.partyKey, 'freed once the loot-recovery grace elapses').toBeNull();
+  });
+
+  it('refreshes the portal grace window while the run stays occupied, so a straggler is never shut out', () => {
+    const sim = makeSim();
+    sim.setPlayerLevel(RIFT_MIN_LEVEL);
+    sim.utcDay = '2026-07-10';
+    spawnDuePortal(sim);
+    const { inst, portalInfo } = enterAndClear(sim);
+    expect(inst.outcome).toBe('won');
+
+    const portal = sim.naturalRiftPortals.find((p) => p.id === portalInfo.id)!;
+    const expiresAtRightAfterClear = portal.expiresAt;
+
+    // The winner never leaves and never dies: instancePlayerIds stays
+    // non-empty on every reaper pass, so occupied is true the whole time.
+    for (let sec = 1; sec <= 800; sec++) {
+      sim.time += 1;
+      sim.tickCount += 20 - (sim.tickCount % 20);
+      updateRiftInstances(sim.ctx);
+    }
+    // The portal's expiry must have been pushed forward while the run stayed
+    // occupied, not left to quietly count down toward its original deadline
+    // underneath a party that is still actively inside.
+    expect(portal.expiresAt).toBeGreaterThan(expiresAtRightAfterClear + 700);
+  });
+
+  it('sealing an already-recovery-only portal is idempotent: no re-extend, no re-announce', () => {
+    const sim = makeSim();
+    sim.setPlayerLevel(RIFT_MIN_LEVEL);
+    sim.utcDay = '2026-07-10';
+    spawnDuePortal(sim);
+    const portalInfo = sim.naturalRiftPortals[0];
+    expect(sealNaturalRiftPortalForRecovery(sim.ctx, portalInfo.id)).toBe(true);
+    const portal = sim.naturalRiftPortals.find((p) => p.id === portalInfo.id)!;
+    const expiresAt = portal.expiresAt;
+    sim.drainEvents();
+
+    sim.time += 5; // a re-extend would be observable against this
+    expect(sealNaturalRiftPortalForRecovery(sim.ctx, portalInfo.id)).toBe(true);
+    expect(portal.expiresAt).toBe(expiresAt);
+    expect(sim.drainEvents().some((e) => e.type === 'log')).toBe(false);
+  });
+
+  it('sealing an unknown or already-torn-down portal id is a safe no-op', () => {
+    const sim = makeSim();
+    expect(sealNaturalRiftPortalForRecovery(sim.ctx, 999999)).toBe(false);
+  });
+
+  it('skips the recovery notice, but still pays the win, if the portal already collapsed mid-run', () => {
+    const sim = makeSim();
+    sim.setPlayerLevel(RIFT_MIN_LEVEL);
+    sim.utcDay = '2026-07-10';
+    spawnDuePortal(sim);
+    const portalInfo = sim.naturalRiftPortals[0];
+    const portalEntity = sim.entities.get(portalInfo.id)!;
+    sim.player.pos = { ...portalEntity.pos };
+    sim.player.prevPos = { ...portalEntity.pos };
+    sim.tick();
+    const inst = sim.riftInstances.find((i) => i.partyKey !== null)!;
+    expect(inst.portalId).toBe(portalInfo.id);
+
+    // An unusually long clear: the portal collapses on its own
+    // RIFT_PORTAL_LIFETIME while the party is still actively racing inside
+    // (the design deliberately lets an in-progress run play out past this
+    // deadline: only the overworld entrance closes to new entrants).
+    sim.time += RIFT_PORTAL_LIFETIME + 1;
+    sim.tickCount += (10 - (sim.tickCount % 20) + 20) % 20;
+    updateRiftPortals(sim.ctx);
+    sim.drainEvents();
+    expect(sim.entities.has(portalInfo.id)).toBe(false);
+    const event = sim.riftEvents.find((e) => e.eventId === inst.eventId)!;
+    expect(event.status, 'still racing, not collapsed out from under them').toBe('active');
+    expect(event.portalId).toBeNull();
+
+    const boss = clearRiftToBossKill(sim, inst);
+    const events = tickSeconds(sim, 1.2);
+    expect(inst.outcome).toBe('won');
+    // The win still pays out normally...
+    expect(boss.loot?.items?.length ?? 0).toBeGreaterThan(0);
+    // ...but the notice must never promise a standing entrance that is
+    // actually already gone (the exact stale-id trap this test pins).
+    expect(
+      events.some((e) => e.type === 'log' && (e.text ?? '').includes('entrance will hold')),
+      'no false promise of a standing entrance',
+    ).toBe(false);
   });
 });

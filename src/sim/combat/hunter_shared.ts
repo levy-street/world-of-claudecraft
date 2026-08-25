@@ -26,6 +26,27 @@ const FOCUS_SPENDERS = new Set(['arcane_shot', 'aimed_shot', 'mongoose_bite']);
 const FOCUS_GENERATORS = new Set(['pack_command', 'measured_shot', 'raptor_strike']);
 export const PACK_FEROCITY_DAMAGE_PER_STACK = 0.1;
 
+// Classic Aspect of the Cheetah drawback. While Courser's Guise (the +30% speed
+// aspect, whose primary self-buff carries the bare ability id) is active, taking
+// damage dazes the hunter, cutting movement speed to half of its current total.
+// The daze is a plain multiplicative slow, so moveSpeedMult returns 0.5 * speed:
+// it halves whatever the hunter is running at (aspect included), never a flat
+// base-run figure. Self-sourced so it stays out of the enemy crowd-control DR
+// ladder, and refreshed (not stacked) by each hit.
+//
+// TWO aura ids count as "Courser's Guise active": the plain aspect, and pack_rally
+// (hun_r17_pack_rally), which resolveHunterSharedAbilityForTalents rewrites an
+// in-combat aspect cast into. Pack Rally's primary self-buff is the identical
+// buff_speed 1.3/1800s stamped under its own ability id, so without the second id
+// a Pack Rally hunter would ride a daze-free +30% (the exact battleground case
+// this drawback targets). NOT the same as GUISE_COURSER_ID (the transient Guise
+// Mastery burst above): that always rides ON TOP of one of these aspect auras, so
+// it is already covered and must not gate the daze on its own.
+const COURSER_GUISE_AURA_IDS: readonly string[] = ['aspect_of_the_cheetah', 'pack_rally'];
+export const COURSER_DAZE_AURA_ID = 'hunter_courser_daze';
+const COURSER_DAZE_SLOW = 0.5; // reduce movement speed to 50% of its current total
+const COURSER_DAZE_DURATION = 4; // seconds; each hit refreshes, never stacks
+
 function removeAura(ctx: SimContext, entity: Entity, id: string): void {
   const index = entity.auras.findIndex((aura) => aura.id === id);
   if (index < 0) return;
@@ -165,6 +186,44 @@ function triggerPredatorsPace(ctx: SimContext, hunter: Entity, meta: PlayerMeta)
   applyStateAura(ctx, hunter, PREDATOR_PACE_ICD_ID, "Predator's Pace", 8, 1);
 }
 
+// Apply or refresh the Courser's Guise daze. When it is already up, reset the
+// timer IN PLACE (the overpower_charge precedent) rather than a fresh applyAura:
+// a hit-per-tick DoT, or the once-a-second drown/fatigue pulse, would otherwise
+// pay applyAura's splice + push + aura event + recalcPlayerStats every time for a
+// value that never changes. The first application still routes through applyAura
+// so it emits the gain event and honors slow_immunity (a slow-immune hunter is
+// never dazed; applyAura refuses the 'slow' kind for them). The daze is
+// deliberately kind 'slow': that keeps slow_immunity clearing it, and it means a
+// dazed hunter reads as snared to the enemy offense predicates (isRootedOrChilled,
+// alreadySlowed), which is classic-accurate (a daze IS a snare) and the cost of
+// choosing to keep the aspect up in combat.
+export function applyCourserDaze(ctx: SimContext, hunter: Entity): void {
+  const existing = hunter.auras.find((aura) => aura.id === COURSER_DAZE_AURA_ID);
+  if (existing) {
+    existing.remaining = COURSER_DAZE_DURATION;
+    existing.duration = COURSER_DAZE_DURATION;
+    return;
+  }
+  ctx.applyAura(hunter, {
+    id: COURSER_DAZE_AURA_ID,
+    name: 'Dazed',
+    kind: 'slow',
+    remaining: COURSER_DAZE_DURATION,
+    duration: COURSER_DAZE_DURATION,
+    value: COURSER_DAZE_SLOW,
+    sourceId: hunter.id,
+    school: 'physical',
+  });
+}
+
+// Damage-taken hook: daze the victim only while Courser's Guise (the plain aspect
+// or its Pack Rally replacement) is active. Callers gate on cls === 'hunter', so
+// only a hunter running the aspect ever pays the aura scan.
+export function courserGuiseDazeOnDamage(ctx: SimContext, hunter: Entity): void {
+  if (!hunter.auras.some((aura) => COURSER_GUISE_AURA_IDS.includes(aura.id))) return;
+  applyCourserDaze(ctx, hunter);
+}
+
 export function grantHunterFocus(
   ctx: SimContext,
   hunter: Entity,
@@ -242,7 +301,16 @@ export function noteHunterFocusSpend(
   }
 }
 
-function petDamageMultiplier(ctx: SimContext, pet: Entity): number {
+// The one canonical "how hard does this pet hit" multiplier: pet_damage_pct
+// auras, the owner's petDmgPct mod (Packlord's Packbond mastery), Unleashed
+// Frenzy's +25% (owner carries hunter_frenzy while the post-Unleash-Beast
+// window runs), and Pack Ferocity's up-to-30% (hunterPetFerocityDamageMultiplier).
+// Every pet damage site (auto-attack swings, ranged bolts, cleave, Pack
+// Command/Unleash Beast/Frenzy Cleave's own strikes, Fang Chorus) must read
+// THIS function rather than a local copy: a prior drift left Unleashed
+// Frenzy's bonus applied to the ability strikes but not the pet's ordinary
+// swings, which are the bulk of its damage.
+export function hunterPetDamageMultiplier(ctx: SimContext, pet: Entity): number {
   let multiplier = 1;
   for (const aura of pet.auras) {
     if (aura.kind === 'pet_damage_pct') multiplier += pctValue(aura.value);
@@ -250,6 +318,8 @@ function petDamageMultiplier(ctx: SimContext, pet: Entity): number {
   if (pet.ownerId !== null) {
     const ownerMeta = ctx.players.get(pet.ownerId);
     if (ownerMeta) multiplier *= 1 + ctx.playerMods(ownerMeta).global.petDmgPct;
+    const owner = ctx.entities.get(pet.ownerId);
+    if (owner?.auras.some((aura) => aura.kind === 'hunter_frenzy')) multiplier *= 1.25;
   }
   multiplier *= hunterPetFerocityDamageMultiplier(ctx, pet);
   return multiplier;
@@ -270,7 +340,7 @@ function runFangChorus(ctx: SimContext, hunter: Entity, target: Entity): void {
     (ctx.rng.range(pet.weapon.min, pet.weapon.max) +
       (ctx.effectiveAttackPower(pet) / 14) * pet.weapon.speed) *
     0.5;
-  damage *= petDamageMultiplier(ctx, pet);
+  damage *= hunterPetDamageMultiplier(ctx, pet);
   const targets = clap
     ? ctx
         .hostilesInRadius(pet, target.pos, 4)

@@ -172,6 +172,24 @@ describe('ProfessionsWindow: focus and scroll survive rebuilds', () => {
     expect(document.activeElement).toBe(fresh);
   });
 
+  it('moves focus NOWHERE on a rebuild while pointer focus is parked on the root (never to Close)', () => {
+    // The pointer-only focus drop (src/ui/pointer_blur.ts) parks a mouse click's
+    // focus on the window root. The root is not a control: the ladder must not
+    // read it as "focus was inside" and fall through to Close, which would hand
+    // the player's next Enter to Close and shut the window (#2377 family).
+    const state = baseState();
+    const { w, el } = makeWindow(state);
+    w.refreshIfChanged();
+    const closeBefore = el.querySelector('[data-close]');
+    expect(closeBefore).not.toBeNull();
+    el.focus();
+    expect(document.activeElement).toBe(el);
+    state.identity.craftSkills.cooking = 40;
+    w.refreshIfChanged();
+    expect(el.querySelector('[data-close]')).not.toBe(closeBefore); // really rebuilt
+    expect(document.activeElement).toBe(el);
+  });
+
   it('keeps Close the only focusable control on the CHARM-LESS surface', () => {
     // The pre-craft default: with no charms and no slot the window has no
     // action buttons, so Close is the whole refocus story for that state.

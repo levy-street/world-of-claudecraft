@@ -14,10 +14,10 @@
 //
 // THIRD, and why the mobile half exists: fixing the second collision moved the
 // coin's desktop anchor from `right` to `left`, which silently broke its mobile
-// placement. The touch sheet re-anchors these onto `right` to line them up
+// placement. The touch sheet then re-anchored these onto `right` to line them up
 // beside the disc, and with left + width + right all non-auto the absolute
 // over-constraint rule drops `right` in LTR, pinning the coin back on the disc.
-// The other two mobile blocks already clear the desktop side (`left: auto`,
+// The other two mobile blocks already cleared the desktop side (`left: auto`,
 // `bottom: auto`); the coin did not, so a desktop-only fix regressed touch.
 import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
@@ -27,6 +27,9 @@ const read = (rel: string): string =>
 
 const css = read('src/styles/hud.css');
 const mobileCss = read('src/styles/hud.mobile.css');
+// Selector matching runs over a comment-free copy: a rule's leading comment lands
+// inside the selector capture below, and every rule here carries one.
+const uncommentedMobileCss = mobileCss.replace(/\/\*[\s\S]*?\*\//g, ' ');
 const ENTRIES = ['index.html', 'play.html'] as const;
 
 /** Every rim widget, badge or canvas. The dial's absence is what let the coin
@@ -50,13 +53,16 @@ function declarationBlock(selector: string): string {
   return match[1];
 }
 
-/** Every touch-sheet declaration for a widget, merged: the sheet re-anchors
- *  these across more than one block (a base row plus a narrow-viewport nudge),
- *  and grouped selectors mean a block can carry several widgets at once. */
+/** Every touch-sheet declaration for the widget ITSELF, merged: the sheet styles
+ *  these across more than one block (a base rule plus per-tier nudges), and
+ *  grouped selectors mean a block can carry several widgets at once. A DESCENDANT
+ *  rule is not the widget (the envelope's unread-count pip carries its own
+ *  absolute inset), so the id has to end the selector for the block to count. */
 function mobileDeclarations(selector: string): string {
   const id = selector.slice(1);
-  const blocks = [...mobileCss.matchAll(/([^{}]+)\{([^}]*)\}/g)].filter(([, selectors]) =>
-    new RegExp(`body\\.mobile-touch\\s+#${id}(?![\\w-])`).test(selectors),
+  const own = new RegExp(`^body\\.mobile-touch[\\w.-]*\\s+#${id}(:[\\w-]+)?$`);
+  const blocks = [...uncommentedMobileCss.matchAll(/([^{}]+)\{([^}]*)\}/g)].filter(
+    ([, selectors]) => selectors.split(',').some((part) => own.test(part.trim())),
   );
   return blocks.map(([, , decls]) => decls).join('\n');
 }
@@ -117,6 +123,36 @@ describe('minimap rim badges', () => {
       const present = new Set(discChildren(entry));
       for (const selector of RIM_WIDGETS) {
         expect(present.has(selector.slice(1)), `${entry} is missing ${selector}`).toBe(true);
+      }
+    }
+  });
+
+  // FOURTH: the touch sheet did not just resize these, it lifted all three badges
+  // OFF the disc into a free-floating row beside it (`right: calc(100% + 138px)`
+  // puts the coin's right edge 138px past the disc's LEFT edge), so on a phone they
+  // read as detached chrome hanging in the world. A rim satellite belongs on the
+  // rim on every host: an inset may nudge it around the disc box, never past it.
+  it('keeps every rim widget inside the disc box on touch', () => {
+    // A `100%` term in an inset is the whole disc box, so anything built on one
+    // lands the widget beyond the opposite edge; a raw px inset at or past the
+    // canvas box is the same escape spelled without the percentage.
+    const canvasBoxPx = Number(
+      /<canvas id="minimap" width="(\d+)"/.exec(read('index.html'))?.[1] ?? '0',
+    );
+    expect(canvasBoxPx, 'index.html has no sized #minimap canvas').toBeGreaterThan(0);
+    for (const selector of RIM_WIDGETS) {
+      const mobile = mobileDeclarations(selector);
+      for (const [, side, rawValue] of mobile.matchAll(
+        /(?:^|[\s;])(left|right|top|bottom)\s*:\s*([^;]+)/g,
+      )) {
+        const value = rawValue.trim();
+        const offDisc =
+          value.includes('100%') ||
+          [...value.matchAll(/(\d+(?:\.\d+)?)px/g)].some((m) => Number(m[1]) >= canvasBoxPx);
+        expect(
+          offDisc,
+          `${selector}: touch \`${side}: ${value}\` puts the satellite off the minimap disc`,
+        ).toBe(false);
       }
     }
   });

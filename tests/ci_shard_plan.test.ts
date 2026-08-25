@@ -116,6 +116,7 @@ describe('the floor union', () => {
   it('pins the invariant guard suites and prefixes', () => {
     expect([...CI_GUARD_SUITES]).toEqual([
       'tests/architecture.test.ts',
+      'tests/ci_pg_presence.test.ts',
       'tests/localization_fixes.test.ts',
       'tests/localization_coverage.test.ts',
       'tests/suite_duration_budget.test.ts',
@@ -238,11 +239,11 @@ describe('buildShardPlan: selective mode', () => {
     const plan = buildShardPlan({ ...BASE });
     // Derived from the fixture, not the implementation's own formula: FILLER
     // (FLOOR_SANITY_MIN + 20) + architecture + localization_fixes always-run,
-    // plus localization_coverage, suite_duration_budget, world_api_parity,
-    // and the parity file via the guard union = FLOOR_SANITY_MIN + 26;
-    // COLLECTED holds two more pure tests, exactly the outside-floor
-    // remainder.
-    expect(plan.floorCount).toBe(FLOOR_SANITY_MIN + 26);
+    // plus ci_pg_presence, localization_coverage, suite_duration_budget,
+    // world_api_parity, and the parity file via the guard union =
+    // FLOOR_SANITY_MIN + 27; COLLECTED holds two more pure tests, exactly
+    // the outside-floor remainder.
+    expect(plan.floorCount).toBe(FLOOR_SANITY_MIN + 27);
     expect(plan.relatedCount).toBe(1);
     expect(plan.outsideFloorCount).toBe(2);
   });
@@ -544,7 +545,7 @@ describe('the long-sims lane (Phase 4)', () => {
     // the base fixture's floor plus LANE_BLIND (added to alwaysRun above);
     // the one lane member then moves to the lane, so the seed list is back
     // at the base figure.
-    expect(plan.floorCount).toBe(FLOOR_SANITY_MIN + 26);
+    expect(plan.floorCount).toBe(FLOOR_SANITY_MIN + 27);
     expect(merged.args.join(' ')).not.toContain('--exclude');
   });
 

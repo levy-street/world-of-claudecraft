@@ -43,7 +43,7 @@ describe('Litany of Guilt ability tooltip', () => {
     const html = tooltipHarness().abilityTooltip(afflictionAbility('litany_of_guilt'));
 
     expect(html).toContain(
-      '<div class="tt-effect">Obtener Condena inflige 15 de daño de las Sombras a hasta 4 enemigos en 8 m, una vez por segundo</div>',
+      '<div class="tt-effect">Obtener Condena inflige 16 de daño de las Sombras a hasta 4 enemigos en 8 m, una vez por segundo</div>',
     );
   });
 

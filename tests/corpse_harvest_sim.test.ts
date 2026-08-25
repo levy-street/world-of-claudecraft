@@ -363,6 +363,26 @@ describe('corpse harvest: single-use, first-come (#1141)', () => {
     expect(mob.harvestClaimedBy).toBe(b);
   });
 
+  it('direct harvest refuses an owned tagged corpse without consuming or minting materials', () => {
+    const { sim, mob, a, b } = setup();
+    mob.ownerId = a;
+    mob.lootable = false;
+    sim.drainEvents();
+    let draws = 0;
+    const rng = (sim as unknown as { rng: { setObserver: (o: (() => void) | null) => void } }).rng;
+    rng.setObserver(() => {
+      draws++;
+    });
+    sim.harvestCorpse(mob.id, undefined, b);
+    rng.setObserver(null);
+
+    expect(mob.harvestClaimedBy).toBeNull();
+    expect(draws).toBe(0);
+    expect(sim.countItem('rough_hide', b)).toBe(0);
+    expect(sim.countItem('wolf_fang', b)).toBe(0);
+    expect(sim.drainEvents()).toEqual([]);
+  });
+
   it('a full-bags harvest is refused and does not consume the claim', () => {
     const { sim, internals, mob, a, b } = setup();
     fillBags(sim, internals, a);

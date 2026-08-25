@@ -63,12 +63,22 @@ export const FIRE_BUILDING_FAMILIES: ReadonlySet<MobFamily> = new Set<MobFamily>
  * Only the camps whose mob would actually build and tend a fire. `familyOf`
  * resolves a camp's mob id to its family (the sim's MOBS table at the call
  * site); an unknown id builds nothing, which is the safe reading of bad data.
+ *
+ * `isInert` is the second half of the same question. Family alone answers what
+ * a mob COULD build, and a practice dummy is family 'humanoid', so the Highwatch
+ * practice row lit one campfire per dummy: four straw targets each tending a
+ * fire. An inert mob is furniture wearing a mob's clothes and tends nothing.
+ * It defaults to "nothing is inert", the behavior every caller had before this
+ * predicate existed; the wired call site (camp_braziers.ts) passes the sim's
+ * own `dummy` flag.
  */
 export function fireBuildingCamps<T extends { mobId: string }>(
   camps: readonly T[],
   familyOf: (mobId: string) => MobFamily | undefined,
+  isInert: (mobId: string) => boolean = () => false,
 ): T[] {
   return camps.filter((camp) => {
+    if (isInert(camp.mobId)) return false;
     const family = familyOf(camp.mobId);
     return family !== undefined && FIRE_BUILDING_FAMILIES.has(family);
   });

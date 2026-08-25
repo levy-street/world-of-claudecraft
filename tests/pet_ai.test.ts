@@ -9,7 +9,6 @@ import {
   updatePet,
 } from '../src/sim/pet/pet_ai';
 import { Sim } from '../src/sim/sim';
-import { STEALTH_DETECTION_MULT } from '../src/sim/threat';
 import { type Aura, dist2d, type Entity, type SimEvent, type WorldContent } from '../src/sim/types';
 import { groundHeight } from '../src/sim/world';
 import { expectDefined } from './helpers/defined';
@@ -714,19 +713,17 @@ describe('petPickTarget: a defensive pet assists against a hostile PLAYER', () =
   });
 });
 
-// Stealth detection. petCanSeeTarget used to pass the pet's 50yd assist RANGE as the
-// stealth-detection BASE radius, which at the equal-level 0.25 multiplier let a pet
-// see a stealthed player from 12.5yd, roughly three times what any mob manages from
-// its own aggro radius. The base is the pet's aggro-radius analogue instead.
-describe('pet stealth detection sits in the mob band, not triple it', () => {
-  const PET_ASSIST_RANGE = 50; // mirrors the module constant (the old, wrong base)
-  const newRadius = PET_AGGRESSIVE_RANGE * STEALTH_DETECTION_MULT; // 4.5 at equal level
-  const oldRadius = PET_ASSIST_RANGE * STEALTH_DETECTION_MULT; // 12.5, the bug
-  const BETWEEN = 8; // a distance the old base saw and the new one must not
+// A pet perceives a stealthed enemy player EXACTLY like the enemy player its owner
+// is fighting: not at all. No close-range proximity detection (the classic model a
+// mob keeps), so a rogue's Duskveil/Smokestep and a druid's Stalk stay hidden from
+// the pet at any distance, point-blank included.
+describe('a pet never detects a stealthed player, at any range', () => {
+  const POINT_BLANK = 0.5; // right on top of the pet, yet still unseen
+  const NORMAL = 6; // an ordinary pull distance, for the unstealthed control
 
-  function stealthAura(): Aura {
+  function stealthAura(id = 'stealth'): Aura {
     return {
-      id: 'stealth',
+      id,
       name: 'Stealth',
       kind: 'stealth',
       remaining: 3600,
@@ -738,7 +735,9 @@ describe('pet stealth detection sits in the mob band, not triple it', () => {
   }
 
   // A hunter's pet and a stealthed, equal-level duel opponent it is hostile to.
-  function stealthedOpponent(): {
+  // auraId lets one fixture stand in for Rogue Duskveil ('stealth') and Druid
+  // Stalk ('prowl'); both are the same kind:'stealth' aura.
+  function stealthedOpponent(auraId = 'stealth'): {
     sim: Sim;
     owner: Entity;
     enemy: Entity;
@@ -750,8 +749,9 @@ describe('pet stealth detection sits in the mob band, not triple it', () => {
     const enemy = expectDefined(sim.entities.get(b));
     const pet = adopt(sim, a);
     pet.petMode = 'defensive';
-    pet.level = enemy.level; // equal level: the plain STEALTH_DETECTION_MULT applies
-    enemy.auras.push(stealthAura());
+    pet.level = enemy.level;
+    enemy.auras.push(stealthAura(auraId));
+    enemy.stealthed = true;
     isolate(sim, [a, b, pet.id]);
     place(owner, 0, 0);
     place(pet, 0, 0);
@@ -760,53 +760,41 @@ describe('pet stealth detection sits in the mob band, not triple it', () => {
     return { sim, owner, enemy, pet, enemyPid: b };
   }
 
-  it('spans the change: the fixture distance lies strictly between the two radii', () => {
-    // The band bounds below are DERIVED from the same two constants the production code
-    // reads, so on their own they would move with any edit to either. Pin both to their
-    // literal values so the fix's actual claim, 4.5yd rather than 12.5yd, is asserted.
-    expect(PET_AGGRESSIVE_RANGE).toBe(18);
-    expect(STEALTH_DETECTION_MULT).toBe(0.25);
-    expect(newRadius).toBe(4.5);
-    // Without this the two picks below could both pass on an unmoved radius.
-    expect(BETWEEN).toBeGreaterThan(newRadius);
-    expect(BETWEEN).toBeLessThan(oldRadius);
-  });
-
-  it('does NOT acquire a stealthed equal-level player beyond the pet aggro-radius band', () => {
+  it('does NOT acquire a stealthed rogue (Duskveil), even point-blank', () => {
     const { sim, enemy, pet, owner } = stealthedOpponent();
-    place(enemy, BETWEEN, 0);
+    place(enemy, POINT_BLANK, 0);
     syncGrid(sim);
     expect(petPickTarget(sim.ctx, pet, owner)).toBeNull();
   });
 
-  it('DOES acquire the same stealthed player once inside that band', () => {
-    const { sim, enemy, pet, owner, enemyPid } = stealthedOpponent();
-    place(enemy, newRadius - 0.5, 0);
+  it('does NOT acquire a prowling druid (Stalk) point-blank either', () => {
+    const { sim, enemy, pet, owner } = stealthedOpponent('prowl');
+    place(enemy, POINT_BLANK, 0);
     syncGrid(sim);
-    expect(petPickTarget(sim.ctx, pet, owner)?.id).toBe(enemyPid);
+    expect(petPickTarget(sim.ctx, pet, owner)).toBeNull();
   });
 
-  it('unstealthed, the same player at that distance is acquired normally', () => {
+  it('unstealthed, the same player is acquired normally', () => {
     const { sim, enemy, pet, owner, enemyPid } = stealthedOpponent();
     enemy.auras = enemy.auras.filter((a) => a.kind !== 'stealth');
-    place(enemy, BETWEEN, 0);
+    enemy.stealthed = false;
+    place(enemy, NORMAL, 0);
     syncGrid(sim);
     expect(petPickTarget(sim.ctx, pet, owner)?.id).toBe(enemyPid);
   });
 
-  // The damage path asks the same question and must answer it the same way, or a pet
-  // that cannot see a rogue could still hit them (combat/damage.ts). Probed at the
-  // picker's own boundary rather than somewhere in the band: a damage-side radius that
-  // drifted from the picker's by more than 0.02yd cannot satisfy both halves of this.
-  it('the dealDamage stealth gate turns over at the same boundary as the target picker', () => {
+  // The damage path must answer the same way, or a pet that cannot see a rogue
+  // could still hit them (combat/damage.ts).
+  it('the dealDamage stealth gate blocks a point-blank stealthed player, clears on unstealth', () => {
     const { sim, enemy, pet, owner, enemyPid } = stealthedOpponent();
     const hpBefore = enemy.hp;
-    place(enemy, newRadius + 0.01, 0); // a hair outside: neither path may touch them
+    place(enemy, POINT_BLANK, 0);
     syncGrid(sim);
     expect(petPickTarget(sim.ctx, pet, owner)).toBeNull();
     expect(sim.dealDamage(pet, enemy, 10, false, 'physical', null, 'hit')).toBe(0);
     expect(enemy.hp).toBe(hpBefore);
-    place(enemy, newRadius - 0.01, 0); // a hair inside: both paths must
+    enemy.auras = enemy.auras.filter((a) => a.kind !== 'stealth'); // step out of stealth
+    enemy.stealthed = false;
     syncGrid(sim);
     expect(petPickTarget(sim.ctx, pet, owner)?.id).toBe(enemyPid);
     expect(sim.dealDamage(pet, enemy, 10, false, 'physical', null, 'hit')).toBeGreaterThan(0);

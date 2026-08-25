@@ -86,6 +86,12 @@ export interface MailMessage {
   // parcels hold Infinity while attachments remain (their expiry exemption).
   expiresAt: number;
   read: boolean;
+  // Opaque broker reference on custody parcels (the $WOC Exchange delivery /
+  // return letters): the server-side custodian books each reference AT MOST
+  // ONCE (mailSystemParcel refuses a duplicate), so a crash-retry between
+  // "letter booked" and "settlement row advanced" reconciles to exactly one
+  // delivery. Absent on every other letter. Persisted.
+  custodyRef?: string;
   // The one return-to-sender cycle has run. The sweep's delete arm requires
   // this flag, so attachments are never destroyed without a return flight.
   returned?: boolean;
@@ -113,6 +119,7 @@ export interface MailSave {
     deliverIn: number; // seconds until delivery (0 = already delivered)
     secondsLeft: number; // seconds until expiry; -1 = never expires
     read: boolean;
+    custodyRef?: string; // broker book-once reference; absent off custody mail
     returned?: boolean; // the return cycle has run; absent = false
   }[];
   nextMailId: number;
@@ -579,8 +586,15 @@ export class PostOffice {
     }
     // Parcels respect bag capacity (#1354, the market-collect rule): a stack that
     // does not fit stays ATTACHED to the letter for a later take, never destroyed
-    // and never force-added past the bag budget. canAddItem is checked per stack
-    // against the live inventory, so cumulative capacity is honoured.
+    // and never force-added past the bag budget. Capacity is checked per stack
+    // against the live inventory, so cumulative capacity is honoured. An
+    // instanced parcel (a marketplace custody delivery or return) grants
+    // through addItemInstance so the exact payload survives. Every grant
+    // carries the slot's craftedRecipeId through, and every capacity
+    // pre-check models the identical-payload AND same-craftedRecipeId merge
+    // the grant applies (countFit, the #2139 rule: a pre-check that disagrees
+    // with the grant's merge model re-opens the overflow class), never the
+    // plain fungible model.
     const kept: InvSlot[] = [];
     for (const s of m.items) {
       // The shared payload-aware pair (bags.ts canGrantCopies + grantCopies):
@@ -692,6 +706,69 @@ export class PostOffice {
     });
   }
 
+  // Custody deliveries (the server's $WOC marketplace escrow returns and
+  // buyer deliveries): a system letter carrying EXACT item copies, instance
+  // payloads intact, unlike sendLetter's authored fungible parcels. Same
+  // service contract as sendLetter: no proximity, no postage, never refused,
+  // and the recipient may be offline (the book is keyed by stable character
+  // id). Each slot is deep-cloned (the save/load aliasing rule in types.ts)
+  // and its advisory bag cell dropped: the copy is entering the book, not a
+  // bag. System parcels hold Infinity expiry while attachments remain, so a
+  // returned or delivered copy is never destroyed by the sweep.
+  // Returns false (booking nothing) when `custodyRef` is already in the book:
+  // the custodian's crash-retry reconciliation counts on that dedupe.
+  mailSystemParcel(
+    recipient: { key: string; name: string },
+    letter: LetterDef,
+    items: InvSlot[],
+    custodyRef?: string,
+  ): boolean {
+    if (custodyRef !== undefined && this.hasCustodyParcel(custodyRef)) return false;
+    // Book-boundary validation, the mailSendResolved gate applied per slot: a
+    // slot with an unknown item def or a floored count below 1 never enters
+    // the book. Without it a zero-count or content-stale slot books a parcel
+    // whose take grants nothing and then drops the slot, silently destroying
+    // the escrowed record.
+    const booked: InvSlot[] = [];
+    for (const s of items) {
+      const count = Math.floor(s.count);
+      if (!ITEMS[s.itemId] || !Number.isFinite(count) || count < 1) continue;
+      const clone = cloneInvSlot(s);
+      clone.count = count;
+      delete clone.slot;
+      booked.push(clone);
+    }
+    // Asked to carry goods but NONE survived validation: refuse rather than
+    // book an empty letter. The custodian treats a refusal as "not booked" and
+    // releases its claim, so the item stays held and visible instead of being
+    // marked delivered against a parcel that carries nothing.
+    if (items.length > 0 && booked.length === 0) return false;
+    this.book({
+      custodyRef,
+      recipientKey: recipient.key,
+      recipientName: recipient.name,
+      senderName: letter.senderName,
+      kind: 'system',
+      letterId: letter.letterId,
+      subject: letter.subject,
+      body: letter.body,
+      copper: Math.max(0, Math.floor(letter.copper ?? 0)),
+      items: booked,
+      delaySeconds: letter.delaySeconds ?? 0,
+    });
+    return true;
+  }
+
+  // True when a custody parcel with this broker reference is in the book
+  // (delivered, still in flight, or already emptied but not yet deleted).
+  hasCustodyParcel(custodyRef: string): boolean {
+    // Rides the index, never a book scan: this is called on every Exchange
+    // delivery booking and twice per custody retry, and a grown book (the
+    // production six-figure-letter class) would put a whole-array walk on
+    // the world loop. Pinned by tests/mail_custody_parcels.test.ts.
+    return this.index.hasCustodyRef(custodyRef);
+  }
+
   // The one-time service letter; the caller flips meta.mailWelcomed.
   sendWelcome(meta: PlayerMeta): void {
     this.sendLetter(this.mailKeyFor(meta), meta.name, WELCOME_LETTER, 'system');
@@ -734,6 +811,7 @@ export class PostOffice {
     copper: number;
     items: InvSlot[];
     delaySeconds: number;
+    custodyRef?: string;
   }): void {
     const hasAttachments = opts.copper > 0 || opts.items.length > 0;
     // Player parcels ride the attachment window (one return cycle, then the
@@ -759,6 +837,7 @@ export class PostOffice {
       deliverAt: this.ctx.time + Math.max(0, opts.delaySeconds),
       expiresAt,
       read: false,
+      ...(opts.custodyRef === undefined ? {} : { custodyRef: opts.custodyRef }),
       announced: false,
     };
     this.mail.push(msg);
@@ -958,6 +1037,7 @@ export class PostOffice {
         deliverIn: Math.max(0, Math.round(m.deliverAt - now)),
         secondsLeft: Number.isFinite(m.expiresAt) ? Math.max(0, Math.round(m.expiresAt - now)) : -1,
         read: m.read,
+        custodyRef: m.custodyRef,
         returned: m.returned,
       })),
       nextMailId: this.nextMailId,
@@ -1072,6 +1152,7 @@ export class PostOffice {
         deliverAt: this.ctx.time + deliverIn,
         expiresAt,
         read: m.read === true,
+        ...(typeof m.custodyRef === 'string' ? { custodyRef: m.custodyRef } : {}),
         returned: m.returned === true,
         // Already-delivered letters never re-toast after a restart.
         announced: deliverIn <= 0,

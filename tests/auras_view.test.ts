@@ -100,6 +100,7 @@ describe('isAuraDebuff: the allowlist classification (lifted into the core)', ()
         'hex',
         'incapacitate',
         'lockout',
+        'melting_acid',
         'mortal_wound',
         'necromancy_harvest_mark',
         'polymorph',

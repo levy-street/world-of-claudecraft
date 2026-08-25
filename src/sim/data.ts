@@ -1186,9 +1186,10 @@ export function isRiftPos(x: number): boolean {
   return x >= RIFT_BAND_X_MIN && x < RIFT_BAND_X_MAX;
 }
 
-// Nearest rift-floor origin to a far-off z (all floors share RIFT_X_MIN; they
-// stack along z, slot-major then floor-minor). Mirrors arenaOriginAt: the renderer
-// uses it to place the generated interior at the same origin the sim spawned it.
+// Rift-floor origin for a far-off z, slot-major then floor-minor. Mirrors
+// arenaOriginAt: the renderer uses it to place the generated interior at the
+// same origin the sim spawned it (callers always probe positions already
+// inside a floor, where the slot-major floor() derivation is exact).
 export function riftOriginAt(z: number): { x: number; z: number } {
   const off = z - RIFT_Z0;
   const slot = Math.max(
@@ -1201,6 +1202,40 @@ export function riftOriginAt(z: number): { x: number; z: number } {
     Math.min(RIFT_MAX_FLOORS - 1, Math.round(withinSlot / RIFT_FLOOR_SPACING)),
   );
   return riftInstanceOrigin(slot, floor);
+}
+
+/** The z of the NEAREST rift floor origin to z, allocation-free. Distinct
+ * from riftOriginAt ON PURPOSE: that helper's slot-major floor() derivation
+ * maps a z just SOUTH of a slot's floor 0 into the PREVIOUS slot (whose
+ * floor index then clamps to the top floor, hundreds of yards away). Fine
+ * for its renderer callers, catastrophically wrong for the collision region
+ * lookup, where it would silently drop collision on the south half of floor
+ * 0 for every slot past 0. Two candidate slots always suffice: a region
+ * spans +-RIFT_REGION_HALF_Z (160) around its origin, floors are 340 apart,
+ * and the inter-slot gap is 540, so the containing slot is
+ * floor(off / RIFT_SLOT_SPACING) or the one after; the nearest candidate
+ * wins, and when a region contains z its own origin IS the nearest (every
+ * other origin sits at least 180 away vs at most 160). No allocation: this
+ * runs once per movement resolve and once per 0.5 yd sight sample. */
+export function riftNearestFloorOriginZ(z: number): number {
+  const s0 = Math.floor((z - RIFT_Z0) / RIFT_SLOT_SPACING);
+  let bestDistance = Number.POSITIVE_INFINITY;
+  let bestZ = RIFT_Z0;
+  for (let i = 0; i <= 1; i++) {
+    const slot = Math.max(0, Math.min(RIFT_LAYOUT_SLOT_COUNT - 1, s0 + i));
+    const floor0 = RIFT_Z0 + slot * RIFT_SLOT_SPACING;
+    const floor = Math.max(
+      0,
+      Math.min(RIFT_MAX_FLOORS - 1, Math.round((z - floor0) / RIFT_FLOOR_SPACING)),
+    );
+    const oz = floor0 + floor * RIFT_FLOOR_SPACING;
+    const d = Math.abs(z - oz);
+    if (d < bestDistance) {
+      bestDistance = d;
+      bestZ = oz;
+    }
+  }
+  return bestZ;
 }
 
 export function delveAt(x: number): DelveDef | null {

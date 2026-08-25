@@ -4,7 +4,7 @@
 import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 import {
-  initialFrameArms,
+  deferredPassArms,
   initialFrameDeferral,
   initialFrameLinkDebt,
   initialFrameShouldDefer,
@@ -47,15 +47,25 @@ describe('initialFrameDeferral', () => {
   });
 });
 
-describe('initialFrameArms', () => {
+describe('deferredPassArms', () => {
   it('reports a deferred pass as partial with the debt, and a drawn pass as complete', () => {
     let debt: ReturnType<typeof initialFrameDeferral> = null;
-    const arms = initialFrameArms(() => debt);
+    const arms = deferredPassArms(() => debt);
     expect(arms.progress()).toEqual({ done: 1, planned: 1, trimmed: false });
     expect(arms.detail()).toBe('drawn');
     debt = { deferredUnits: 3, unsettledUnits: 12 };
     expect(arms.progress()).toEqual({ done: 0, planned: 1, trimmed: true });
     expect(arms.detail()).toBe('deferred;link-debt:deferred=3,unsettled=12');
+  });
+
+  it('reports only a real deferral for an optional pass', () => {
+    let debt: ReturnType<typeof initialFrameDeferral> = null;
+    const arms = deferredPassArms(() => debt, false);
+    expect(arms.progress()).toBeNull();
+    expect(arms.detail()).toBe('eligible');
+    debt = { deferredUnits: 1, unsettledUnits: 2 };
+    expect(arms.progress()).toEqual({ done: 0, planned: 1, trimmed: true });
+    expect(arms.detail()).toBe('deferred;link-debt:deferred=1,unsettled=2');
   });
 });
 
@@ -77,8 +87,51 @@ describe('the renderer wires the policy into the world.initial-frame entry', () 
     expect(decide).toBeGreaterThan(-1);
     expect(bail).toBeGreaterThan(decide);
     expect(draw).toBeGreaterThan(bail);
-    expect(entry).toContain('...initialFrameArms(() => initialFrameDeferred),');
+    expect(entry).toContain('...deferredPassArms(() => initialFrameDeferred),');
     // still never sacrificed to the soft deadline: the decision is the policy's, not the clock's
     expect(entry).toContain('deadlineExempt: true,');
+  });
+
+  it('refuses optional sky and settle draws while compile debt is still outstanding', () => {
+    const renderer = readFileSync(
+      new URL('../src/render/renderer.ts', import.meta.url),
+      'utf8',
+    ).replace(/\r\n/g, '\n');
+    for (const [id, nextId] of [
+      ['sky.current-zone', 'render.settle-passes'],
+      ['render.settle-passes', 'diagnostics.baseline'],
+    ] as const) {
+      const start = renderer.indexOf(`id: '${id}'`);
+      const end = renderer.indexOf(`id: '${nextId}'`, start);
+      const entry = renderer.slice(start, end);
+      expect(start).toBeGreaterThan(-1);
+      expect(end).toBeGreaterThan(start);
+      expect(entry).toContain('initialFrameDeferral(compileLifecycle.records)');
+      expect(entry.indexOf('initialFrameDeferral(compileLifecycle.records)')).toBeLessThan(
+        entry.indexOf('this.renderPrewarmPass(1 / 60)'),
+      );
+    }
+  });
+
+  it('refuses the budget-variant world draw while compile debt is still outstanding', () => {
+    const renderer = readFileSync(
+      new URL('../src/render/renderer.ts', import.meta.url),
+      'utf8',
+    ).replace(/\r\n/g, '\n');
+    const start = renderer.indexOf("id: 'programs.budget-variants'");
+    const end = renderer.indexOf("id: 'sky.current-zone'", start);
+    const entry = renderer.slice(start, end);
+
+    expect(start).toBeGreaterThan(-1);
+    expect(end).toBeGreaterThan(start);
+    const decide = entry.indexOf(
+      'budgetVariantsDeferred = initialFrameDeferral(compileLifecycle.records);',
+    );
+    const guard = entry.indexOf('if (budgetVariantsDeferred) return;');
+    const draw = entry.indexOf('this.renderPrewarmPass(1 / 60);');
+    expect(decide).toBeGreaterThan(-1);
+    expect(guard).toBeGreaterThan(decide);
+    expect(draw).toBeGreaterThan(guard);
+    expect(entry).toContain('...deferredPassArms(() => budgetVariantsDeferred, false),');
   });
 });

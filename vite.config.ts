@@ -461,6 +461,10 @@ export default defineConfig({
       // the prod reverse-proxy route (nginx /wiki -> :8080). Needs the container
       // up: `docker compose up -d mediawiki mediawiki-db`.
       '/wiki': { target: 'http://127.0.0.1:8080', changeOrigin: true },
+      // No '/terms' proxy: STATIC_PAGE_ALIASES above already serves the
+      // Marketplace consent links' target from public/terms.html in dev, and a
+      // prefix proxy captured the rewritten '/terms.html' and made the page
+      // depend on a running game server with a built dist/.
     },
   },
   build: {

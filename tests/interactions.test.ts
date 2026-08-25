@@ -10,6 +10,7 @@ import {
   shouldApproachPickedEntity,
 } from '../src/game/interactions';
 import { type Entity, INTERACT_RANGE } from '../src/sim/types';
+import type { BgInfo, BgMatchInfo, BgPlayerInfo } from '../src/world_api/battleground';
 
 function stubEntity(partial: Partial<Entity> & Pick<Entity, 'id' | 'kind'>): Entity {
   return {
@@ -297,6 +298,126 @@ describe('activePvpOpponentIds', () => {
     });
 
     expect(ids.size).toBe(0);
+  });
+
+  // Thornhollow Fields (5v5 CTF). The sim's isHostileTo treats the opposing
+  // TEAM as hostile for the whole live match and resolves an owned pet to its
+  // owner, so every attack affordance this set drives (hover cursor, click
+  // marker, attack-move, attack-nearest, pad auto-target) must agree: an
+  // enemy fighter and an enemy warlock's demon are attackable, a teammate and
+  // a teammate's pet are not.
+  const bgRow = (pid: number, team: number): BgPlayerInfo => ({
+    pid,
+    name: `P${pid}`,
+    cls: 'warlock',
+    team,
+    carrying: false,
+    dead: false,
+    kills: 0,
+    deaths: 0,
+    captures: 0,
+    assists: 0,
+  });
+  const bgInfoWith = (match: BgMatchInfo | null): BgInfo => ({
+    rating: 0,
+    wins: 0,
+    losses: 0,
+    draws: 0,
+    captures: 0,
+    queued: false,
+    queueSize: 0,
+    queuedParty: 0,
+    firstWinBonusReady: false,
+    proposal: null,
+    requeueIn: 0,
+    match,
+    ladder: [],
+  });
+  const bgMatch: BgMatchInfo = {
+    state: 'active',
+    myTeam: 0,
+    capsToWin: 3,
+    scores: [0, 0],
+    flags: [
+      { state: 'home', carrierPid: null, carrierName: null, carrierTeam: null },
+      { state: 'home', carrierPid: null, carrierName: null, carrierTeam: null },
+    ],
+    players: [bgRow(1, 0), bgRow(5, 0), bgRow(6, 1), bgRow(7, 1)],
+    countdown: 0,
+    timeLeft: 600,
+    waveIn: [10, 10],
+    respawnIn: 0,
+    winner: null,
+  };
+
+  it('includes every opposing-team fighter of an active battleground match, never a teammate', () => {
+    const player = stubEntity({ id: 1, kind: 'player' });
+    const ids = activePvpOpponentIds({ playerId: 1, player, bgInfo: bgInfoWith(bgMatch) });
+    expect([...ids].sort()).toEqual([6, 7]);
+  });
+
+  it('ignores a battleground match that is not active (countdown / ended) or absent', () => {
+    const player = stubEntity({ id: 1, kind: 'player' });
+    expect(
+      activePvpOpponentIds({
+        playerId: 1,
+        player,
+        bgInfo: bgInfoWith({ ...bgMatch, state: 'countdown' }),
+      }).size,
+    ).toBe(0);
+    expect(
+      activePvpOpponentIds({
+        playerId: 1,
+        player,
+        bgInfo: bgInfoWith({ ...bgMatch, state: 'ended' }),
+      }).size,
+    ).toBe(0);
+    expect(activePvpOpponentIds({ playerId: 1, player, bgInfo: bgInfoWith(null) }).size).toBe(0);
+  });
+
+  it('includes an enemy-owned pet (the sim resolves a pet to its owner), never an ally pet', () => {
+    const player = stubEntity({ id: 1, kind: 'player' });
+    const enemyDemon = stubEntity({ id: 60, kind: 'mob', ownerId: 6, hostile: false });
+    const allyDemon = stubEntity({ id: 50, kind: 'mob', ownerId: 5, hostile: false });
+    const ownDemon = stubEntity({ id: 10, kind: 'mob', ownerId: 1, hostile: false });
+    const wildWolf = stubEntity({ id: 70, kind: 'mob', ownerId: null, hostile: true });
+    const entities = new Map<number, Entity>([
+      [1, player],
+      [60, enemyDemon],
+      [50, allyDemon],
+      [10, ownDemon],
+      [70, wildWolf],
+    ]);
+    const ids = activePvpOpponentIds({
+      playerId: 1,
+      player,
+      entities,
+      bgInfo: bgInfoWith(bgMatch),
+    });
+    expect([...ids].sort((a, b) => a - b)).toEqual([6, 7, 60]);
+    // The same verdict every consumer reads:
+    expect(isAttackableEntity(enemyDemon, 1, ids)).toBe(true);
+    expect(isAttackableEntity(allyDemon, 1, ids)).toBe(false);
+    expect(isAttackableEntity(ownDemon, 1, ids)).toBe(false);
+    expect(isAttackableEntity(wildWolf, 1, ids)).toBe(true); // wild-hostile, as before
+    expect(hoverCursorKind(enemyDemon, 1, new Set(), ids)).toBe('attack');
+    expect(hoverCursorKind(allyDemon, 1, new Set(), ids)).toBe('default');
+  });
+
+  it('includes a duel / arena opponent pet too (same owner resolution)', () => {
+    const player = stubEntity({ id: 1, kind: 'player' });
+    const rivalPet = stubEntity({ id: 20, kind: 'mob', ownerId: 2, hostile: false });
+    const entities = new Map<number, Entity>([
+      [1, player],
+      [20, rivalPet],
+    ]);
+    const ids = activePvpOpponentIds({
+      playerId: 1,
+      player,
+      entities,
+      duelInfo: { otherPid: 2, otherName: 'Duelist', state: 'active' },
+    });
+    expect([...ids].sort((a, b) => a - b)).toEqual([2, 20]);
   });
 });
 

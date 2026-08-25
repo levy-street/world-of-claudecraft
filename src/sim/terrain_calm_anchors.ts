@@ -220,8 +220,9 @@ export function collectCalmAnchorPads(): CalmPadRow[] {
       }
     }
   }
-  // Zone POIs: the Book of Deeds grants exploration marks within 20yd of
-  // each point, so every POI keeps a reachable stand.
+  // Zone POIs: the Book of Deeds grants exploration marks within
+  // deeds.ts's POI_VISIT_RADIUS of each point, so every POI keeps a
+  // reachable stand (this pad is 2.5/8, well inside that radius either way).
   for (const zone of ZONES) {
     for (const poi of zone.pois) pad('poi', poi.x, poi.z, 2.5, 8);
   }

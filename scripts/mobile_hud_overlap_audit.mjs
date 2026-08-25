@@ -3,19 +3,22 @@
 // PURPOSE
 //   Sibling gate to mobile_cluster_layout_check.mjs. The cluster check gates the
 //   thumb-control clusters in isolation; this audit gates the FULL populated HUD:
-//   the unit frames, buff/debuff bars, minimap, quest tracker, meters, and the
-//   pop-up windows, all with real state (a 4-member party, a forced target, a
-//   populated buff bar). It measures REAL getBoundingClientRect geometry (never
-//   CSS text) with the shared gap math in ./lib/overlap_geometry.mjs.
+//   the unit frames, buff/debuff bars, minimap, quest tracker, meters, the pet
+//   command bar, and the pop-up windows, all with real state (a 4-member party, a
+//   forced target, a populated buff bar, a worst-case pet). It measures REAL
+//   getBoundingClientRect geometry (never CSS text) with the shared gap math in
+//   ./lib/overlap_geometry.mjs.
 //
 // TWO PASSES
 //   A) Persistent-chrome pass (STRICT, the repeatable pre-release gate): per
 //      device profile it builds a party, forces a target (so #party-frames gains
-//      the .below-target offset), populates the buff bar, then pairwise-checks
-//      the always-on chrome (#target-frame, #party-frames, #buff-bar, #debuff-bar,
-//      #minimap-wrap, #quest-tracker, #player-frame, #meters-window) against each
-//      other and against the thumb controls. Chrome-vs-chrome readability pairs
-//      need gap >= 0; any pair where one element is interactive needs gap >= 4.
+//      the .below-target offset), populates the buff bar, gives the player its
+//      widest #petbar, then pairwise-checks the always-on chrome (#target-frame,
+//      #party-frames, #buff-bar, #debuff-bar, #minimap-wrap, #quest-tracker,
+//      #player-frame, #meters-window, #petbar) against each other and against the
+//      thumb controls (including #mobile-more, the top-left trio's dropdown to
+//      bags/spellbook/character/etc). Chrome-vs-chrome readability pairs need
+//      gap >= 0; any pair where one element is interactive needs gap >= 4.
 //      Violations exit 1 by default (like the cluster check).
 //   B) Window-open matrix (AUDIT mode by default: report + screenshots, exit 0;
 //      pass --gate to make its violations exit 1 too). For each HUD window toggle
@@ -67,6 +70,11 @@ const CONTROL_IDS = [
 // Always-on chrome measured in pass A. Frames/bars are readability surfaces;
 // #minimap-wrap hosts the interactive zoom buttons so it counts as interactive.
 // #party-chip is the mobile collapse chip (a tap target: interactive, 40px floor).
+// #petbar is the pet command bar (a tap target: interactive too, see below) --
+// centered top-of-screen, so it is the one CHROME_IDS entry that can crowd the
+// top-left #mobile-combat-controls trio (Chat/Social/Quests/Settings/More) on a
+// narrow landscape phone; giveWorstCasePet() below forces its widest button set
+// before the sweep so this check actually exercises the crowding case.
 const CHROME_IDS = [
   'target-frame',
   'party-frames',
@@ -77,12 +85,14 @@ const CHROME_IDS = [
   'quest-tracker',
   'player-frame',
   'meters-window',
+  'petbar',
 ];
 
 // Interactive classification for the >= 4px vs >= 0px rule. The thumb ring
 // controls plus minimap-zoom / minimap-wrap are things a finger taps; frames and
 // bars are read, not tapped, so two of them only need to not visually collide.
-const INTERACTIVE_IDS = new Set([...CONTROL_IDS, 'minimap-wrap', 'party-chip']);
+// #petbar's own buttons are tapped too (Attack/Feed/stance toggle/...).
+const INTERACTIVE_IDS = new Set([...CONTROL_IDS, 'minimap-wrap', 'party-chip', 'petbar']);
 // Toggled overlay PANELS (class="panel", not always-on chrome): the player opens
 // #meters-window deliberately and it has its own close button, so like a Pass-B
 // window it may legitimately sit over the passive readability frames/bars when the
@@ -427,6 +437,26 @@ async function openMeters(page) {
   });
 }
 
+// Give the audited player the WIDEST realistic #petbar: a melee_tank demon
+// (petRole:'melee_tank', which also carries a special ability, e.g. 'gloomshade')
+// summoned on a non-warlock owner renders every optional command button at once
+// (Attack, special, Taunt, Feed = 4 in the commands group) alongside the 1-button
+// stance toggle, the same worst-case width renderPetBar (src/ui/hud.ts) can ever
+// produce outside the transient mode-open menu. createDemonPet is TS-`private`
+// on Sim but callable at runtime like the existing greyjaw_pet_tap_*.mjs rigs.
+// Returns true once the pet exists and is not dead.
+async function giveWorstCasePet(page) {
+  return page.evaluate(() => {
+    const sim = window.__game.sim;
+    const p = sim.player;
+    const pet = sim.createDemonPet(p, 'gloomshade', false);
+    if (!pet) return false;
+    pet.pos = { ...p.pos };
+    pet.prevPos = { ...p.pos };
+    return !pet.dead;
+  });
+}
+
 // Find any npc entity id (for the vendor co-open pair). Returns id or null.
 async function findNpc(page) {
   return page.evaluate(() => {
@@ -664,13 +694,15 @@ try {
   const questAccepted = await acceptQuest(page);
   const debuffOk = await populateDebuffBar(page);
   const metersOpen = await openMeters(page);
+  const petGiven = await giveWorstCasePet(page);
   console.log(
     `state extras: questLog size=${questAccepted}, debuffApplied=${debuffOk}, ` +
-      `metersOpen=${metersOpen}`,
+      `metersOpen=${metersOpen}, petGiven=${petGiven}`,
   );
   if (!questAccepted) fail('pass A setup: quest injection left an empty questLog');
   if (!debuffOk) fail('pass A setup: debuff aura was not applied to the player');
   if (!metersOpen) fail('pass A setup: #meters-window did not open (hud.toggleMeters)');
+  if (!petGiven) fail('pass A setup: worst-case pet was not created (createDemonPet)');
 
   // F6: hard AGGREGATE floor for the mobile-chat cycle. Per-profile chat failures degrade
   // to a NOTE (the synthetic pointer tap can miss on a single flaky profile), but a TOTAL
@@ -682,6 +714,11 @@ try {
   // actually measured (not skipped because chat failed to open), so the run can prove the
   // pair was exercised rather than silently absent.
   let chatRestingPairsChecked = 0;
+  // Count the profiles where #petbar was actually laid out (display:flex, non-zero
+  // box) during the pairwise sweep below, so the #petbar-vs-#mobile-more CHROME_IDS/
+  // CONTROL_IDS check this PR adds cannot pass vacuously (petGiven above only proves
+  // the pet ENTITY exists, not that renderPetBar painted a measurable bar).
+  let petbarMeasuredCount = 0;
 
   for (const prof of PROFILES) {
     await flipViewport(page, media, prof.w, prof.h, prof.dsf, prof.tier);
@@ -811,6 +848,7 @@ try {
     if (process.env.DEBUG_RECTS) {
       console.log(`${prof.name} rects: ${JSON.stringify(g.rects)}`);
     }
+    if (g.rects.petbar) petbarMeasuredCount++;
 
     // Assert #party-frames carries .below-target while the target frame shows.
     const targetShown = !!g.rects['target-frame'];
@@ -1115,6 +1153,16 @@ try {
   console.log(
     `resting chat log-vs-composer HARD pair measured on ${chatRestingPairsChecked} profile(s)`,
   );
+  // Prove the #petbar-vs-top-left-trio check actually ran the pairwise sweep with a
+  // real bar on screen (else adding 'petbar' to CHROME_IDS above would pass vacuously
+  // whenever renderPetBar never painted it, defeating the point of this PR's check).
+  if (petbarMeasuredCount === 0) {
+    fail(
+      '#petbar was never laid out on ANY profile despite giveWorstCasePet ' +
+        '(the #petbar-vs-#mobile-more crowding check would pass vacuously)',
+    );
+  }
+  console.log(`#petbar measured on ${petbarMeasuredCount} profile(s)`);
 
   // ---- Chat keyboard-dismiss: drop the keyboard WITHOUT closing chat. ----
   // On the primary 844 profile: open chat, simulate the on-screen keyboard rising (the

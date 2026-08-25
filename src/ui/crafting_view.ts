@@ -10,6 +10,7 @@
 //
 // DOM-free and i18n-free so tests/crafting_view.test.ts can drive it directly.
 
+import { CRAFT_GOLD_SINK_COPPER_PER_BUDGET } from '../sim/content/professions';
 import { ALL_RECIPES } from '../sim/content/recipes';
 import { countUnlockedInSlots } from '../sim/item_lock';
 import { craftSkillGainMultiplier } from '../sim/professions/archetype';
@@ -39,6 +40,11 @@ export interface RecipeDefLike {
   resultCount: number;
   reagents: readonly { itemId: string; count: number }[];
   skillReq: number;
+  // The recipe's item-level budget, the #1301 gold-sink fee's input (see
+  // CraftingRecipeRow.craftFeeCopper below). Optional so a caller that only
+  // needs reagent/craftable/difficulty logic (most existing tests) can omit
+  // it; a recipe with no budget charges no fee.
+  itemLevelBudget?: number;
   // Station-bound recipe (Professions 2.0): craftable only at a
   // station of this type (see src/sim/professions/stations.ts).
   stationType?: StationType;
@@ -119,6 +125,14 @@ export interface CraftingRecipeRow {
    *  Content table via craftCastDurationSec; actionable info, identical on
    *  every graphics preset (duration chip is never tier-gated). */
   durationSec: number;
+  /** The #1301 gold-sink fee this craft charges, in copper: the SAME formula
+   *  crafting.ts resolveCraftForRecipe charges
+   *  (Math.ceil(itemLevelBudget * CRAFT_GOLD_SINK_COPPER_PER_BUDGET)), so the
+   *  displayed fee and the charged fee can never diverge. Zero for a recipe
+   *  with no itemLevelBudget. Previously charged silently with no line item
+   *  anywhere in the crafting window; now surfaced so a player can weigh it
+   *  against material and vendor value before crafting. */
+  craftFeeCopper: number;
 }
 
 export interface CraftingView {
@@ -299,6 +313,7 @@ export function buildCraftingView(
       station,
       commissionEligible: isCommissionEligible(items[recipe.resultItemId]),
       durationSec: recipeDurationSec(recipe),
+      craftFeeCopper: Math.ceil((recipe.itemLevelBudget ?? 0) * CRAFT_GOLD_SINK_COPPER_PER_BUDGET),
       craftable:
         reagentRows.every((r) => r.satisfied) &&
         eligibility?.ok !== false &&

@@ -26,6 +26,7 @@ import type { InvSlot } from '../src/sim/types';
 
 const makeSim = (cls = 'warrior', seed = 42) =>
   new Sim({ seed, playerClass: cls as never, autoEquip: false });
+const FRESH_CORPSE_TIMER = 60;
 
 const meta = (sim: Sim) =>
   (sim as never as { players: Map<number, never> }).players.get(sim.playerId)! as {
@@ -401,6 +402,7 @@ describe('capacity gates at the grant boundaries', () => {
     const wolf = [...sim.entities.values()].find((e) => e.kind === 'mob')!;
     wolf.hp = 0;
     wolf.dead = true;
+    wolf.corpseTimer = FRESH_CORPSE_TIMER;
     wolf.lootable = true;
     wolf.tappedById = sim.playerId;
     wolf.loot = { copper: 0, items: [{ itemId: 'wolf_fang', count: 1 }] };
@@ -434,6 +436,7 @@ describe('capacity gates at the grant boundaries', () => {
     const wolf = [...sim.entities.values()].find((e) => e.kind === 'mob')!;
     wolf.hp = 0;
     wolf.dead = true;
+    wolf.corpseTimer = FRESH_CORPSE_TIMER;
     wolf.lootable = true;
     wolf.tappedById = sim.playerId;
     wolf.loot = { copper: 0, items: [{ itemId: 'wolf_fang', count: 2 }] };

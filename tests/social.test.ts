@@ -19,6 +19,8 @@ import { dist2d, type Entity, INTERACT_RANGE, type LootSlot } from '../src/sim/t
 import type { PartyMemberInfo } from '../src/world_api';
 import { face, makeFullWorld, makeWorld, mustEntity, nearestMob, teleport } from './social_shared';
 
+const FRESH_CORPSE_TIMER = 60;
+
 function mustParty(sim: Sim, pid: number): Party {
   const party = sim.partyOf(pid);
   if (!party) throw new Error(`missing party for ${pid}`);
@@ -66,6 +68,7 @@ describe('parties', () => {
     const mob = createMob(sim.nextId++, MOBS.forest_wolf, 2, { x: 0, y: 0, z: 0 });
     mob.dead = true;
     mob.lootable = true;
+    mob.corpseTimer = FRESH_CORPSE_TIMER;
     mob.tappedById = tapper;
     mob.lootRecipientIds = recipients;
     mob.loot = loot;

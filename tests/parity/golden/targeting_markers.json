@@ -4706,7 +4706,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 973,
-      "state": "9ba7d44d",
+      "state": "b45feb54",
       "events": "bab3d652",
       "rng": {
         "draws": 5,
@@ -5150,10 +5150,6 @@
               {
                 "count": 1,
                 "itemId": "wolf_fang"
-              },
-              {
-                "count": 1,
-                "itemId": "milepost_boots"
               }
             ]
           },
@@ -5244,7 +5240,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 973,
-      "state": "9ba7d44d",
+      "state": "b45feb54",
       "events": "741638a5",
       "rng": {
         "draws": 5,
@@ -5688,10 +5684,6 @@
               {
                 "count": 1,
                 "itemId": "wolf_fang"
-              },
-              {
-                "count": 1,
-                "itemId": "milepost_boots"
               }
             ]
           },

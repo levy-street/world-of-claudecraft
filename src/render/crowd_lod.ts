@@ -189,6 +189,9 @@ export interface CharacterLodBands {
  * showed up. Anything `animatesEveryFrame` exempts therefore keeps its rig out to
  * the uncrowded base range no matter how dense the scene is (or how loaded the
  * machine is: this floor is deliberately independent of the frame budget).
+ * `showsStaticFarMesh`'s caller widens the SAME floor to a moving entity (see its
+ * own doc comment): unrelated reason, same bounded cost, so it rides this field
+ * rather than a second one.
  */
 export function characterLodBands(
   visibleRigs: number,
@@ -236,13 +239,63 @@ export function characterLodBandsInto(
   return out;
 }
 
-/** Whether a rig at `distSq` draws as the frozen far mesh instead of its rig. */
+/**
+ * Whether an entity's world position advanced since last sim tick, horizontally.
+ * This is only a raw tick-delta helper: the renderer must gate it with an active
+ * interpolation clock before using it as a far-mesh holdout. Online remote
+ * entities keep their last `pos`/`prevPos` pair after network updates stop, and
+ * the stale pair must not classify them as moving forever.
+ * Vertical-only movement (falling, jumping in place) does not count: the
+ * "sliding statue" artifact this exists to prevent is specifically a body
+ * gliding across the GROUND while its pose is frozen.
+ */
+export function positionAdvancedThisTick(
+  pos: { x: number; z: number },
+  prevPos: { x: number; z: number },
+): boolean {
+  return pos.x !== prevPos.x || pos.z !== prevPos.z;
+}
+
+/**
+ * Whether the frozen-mesh swap should hold an entity in the animated far band
+ * because it is visibly moving. A raw `pos`/`prevPos` delta counts only while
+ * the interpolation/extrapolation clock is active and has not saturated; after
+ * that, a parked online remote actor can settle back into the static far LOD.
+ */
+export function movingHoldoutActive(
+  pos: { x: number; z: number },
+  prevPos: { x: number; z: number },
+  interpolationAlpha: number,
+  saturationAlpha: number,
+  explicitMoving = false,
+): boolean {
+  return (
+    explicitMoving ||
+    (interpolationAlpha < saturationAlpha && positionAdvancedThisTick(pos, prevPos))
+  );
+}
+
+/**
+ * Whether a rig at `distSq` draws as the frozen far mesh instead of its rig.
+ *
+ * Widens the frozen-mesh edge to `bands.actionableStaticRangeSq` (the uncrowded
+ * base LOD range, immune to the crowd/tier/pressure squeeze) for two unrelated
+ * reasons that share the same floor: an ACTIONABLE pose (the fairness carve-out,
+ * see `animatesEveryFrame`) and an entity that is currently MOVING
+ * (`movingHoldoutActive`). A moving entity must never freeze: the renderer keeps
+ * advancing its `group` position every frame regardless of LOD, so a frozen
+ * idle-pose mesh reads as a statue sliding across the ground rather than a
+ * static character. A genuinely parked entity looks identical whether its mixer
+ * runs or not, so ordinary crowd-driven freezing still applies to it.
+ */
 export function showsStaticFarMesh(
   distSq: number,
   bands: CharacterLodBands,
   actionable: boolean,
+  moving = false,
 ): boolean {
-  return distSq > (actionable ? bands.actionableStaticRangeSq : bands.staticRangeSq);
+  const heldOut = actionable || moving;
+  return distSq > (heldOut ? bands.actionableStaticRangeSq : bands.staticRangeSq);
 }
 
 /**

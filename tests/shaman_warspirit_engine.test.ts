@@ -46,7 +46,7 @@ describe('Warspirit engine', () => {
       .drainEvents()
       .filter((event) => event.type === 'damage' && event.ability === 'Galeheart Echo');
     expect(echoes).toHaveLength(2);
-    expect(echoes.map((event) => (event.type === 'damage' ? event.amount : 0))).toEqual([50, 50]);
+    expect(echoes.map((event) => (event.type === 'damage' ? event.amount : 0))).toEqual([25, 25]);
     expect(shaman.auras.find((aura) => aura.id === STORMCAST_ID)?.duration).toBe(12);
     expect(shaman.auras.find((aura) => aura.id === STORMCAST_CHEAP_ID)?.value).toBe(0.5);
   });

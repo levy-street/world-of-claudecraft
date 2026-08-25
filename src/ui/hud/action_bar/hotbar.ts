@@ -230,19 +230,6 @@ export function placeItemOnSlot(
   return next;
 }
 
-// Given a completed touch drag (mobile long-press pick-up + drag-to-slot), decide
-// whether it resolves to a swap. `targetIndex` is null when the pointer released
-// outside any slot (cancel); releasing back on the source slot is also a no-op
-// cancel, not a swap-with-itself. Pure so hud.ts's pointer-event finish handler
-// stays a thin call site instead of inlining this branch.
-export function resolveMobileHotbarDrop(
-  sourceIndex: number,
-  targetIndex: number | null,
-): number | null {
-  if (targetIndex === null || targetIndex === sourceIndex) return null;
-  return targetIndex;
-}
-
 export function swapHotbarSlots(
   actions: readonly HotbarAction[],
   sourceIndex: number,

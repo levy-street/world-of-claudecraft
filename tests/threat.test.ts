@@ -3,7 +3,7 @@
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import { computeTalentModifiers } from '../src/sim/content/talents';
 import { abilitiesKnownAt, BUILTIN_WORLD, setActiveWorldContent } from '../src/sim/data';
-import { PET_AGGRESSIVE_RANGE, petPickTarget } from '../src/sim/pet/pet_ai';
+import { petPickTarget } from '../src/sim/pet/pet_ai';
 import { Sim } from '../src/sim/sim';
 import {
   addThreat,
@@ -11,7 +11,6 @@ import {
   DEFENSIVE_STANCE_THREAT_MULT,
   dropThreat,
   RIGHTEOUS_FURY_THREAT_MULT,
-  stealthDetectionRadius,
 } from '../src/sim/threat';
 import type { Entity, WorldContent } from '../src/sim/types';
 import { dist2d, SUNDER_ARMOR_PCT_PER_STACK } from '../src/sim/types';
@@ -1043,38 +1042,31 @@ describe('hunter pets', () => {
     expect(pet.inCombat).toBe(false);
   });
 
-  it('blocks hunter pet damage against an undetected stealthed enemy player', () => {
-    const { sim, pet, rogue } = activePetDuel();
-    teleport(sim, pet, 0, 0);
-    teleport(sim, rogue, 30, 0);
-    sim.castAbility('stealth', rogue.id);
-    const stealthedHp = rogue.hp;
-
-    hit(sim, pet, rogue, 100);
-    expect(rogue.hp).toBe(stealthedHp);
-
-    teleport(sim, rogue, 2, 0);
-    hit(sim, pet, rogue, 100);
-    expect(rogue.hp).toBeLessThan(stealthedHp);
-  });
-
-  it('limits pet damage detection for stealthed enemy players to close range', () => {
+  it('blocks hunter pet damage against a stealthed enemy player at ANY range', () => {
     const { sim, pet, rogue } = activePetDuel();
     teleport(sim, pet, 0, 0);
     sim.castAbility('stealth', rogue.id);
     expect(rogue.auras.some((a) => a.kind === 'stealth')).toBe(true);
+    const stealthedHp = rogue.hp;
 
-    teleport(sim, rogue, 12, 0);
-    const outsideHp = rogue.hp;
+    // Far: blocked, as before.
+    teleport(sim, rogue, 30, 0);
     hit(sim, pet, rogue, 100);
-    expect(rogue.hp).toBe(outsideHp);
+    expect(rogue.hp).toBe(stealthedHp);
 
-    teleport(sim, rogue, 4, 0);
+    // Point-blank: STILL blocked. A pet gets no close-range stealth detection.
+    teleport(sim, rogue, 1, 0);
     hit(sim, pet, rogue, 100);
-    expect(rogue.hp).toBeLessThan(outsideHp);
+    expect(rogue.hp).toBe(stealthedHp);
+
+    // Step out of stealth and the pet lands its swing.
+    rogue.auras = rogue.auras.filter((a) => a.kind !== 'stealth');
+    rogue.stealthed = false;
+    hit(sim, pet, rogue, 100);
+    expect(rogue.hp).toBeLessThan(stealthedHp);
   });
 
-  it('uses the same stealth detection boundary for pet target picks and pet damage', () => {
+  it('pet target-pick and pet damage agree: both fully block stealth, both clear on unstealth', () => {
     const { sim, pet, rogue } = activePetDuel();
     sim.setPetMode('aggressive');
     expectDefined(sim.meta(sim.playerId)).lastActiveTick = sim.tickCount;
@@ -1082,24 +1074,24 @@ describe('hunter pets', () => {
     sim.player.autoAttack = false;
     rogue.inCombat = false;
     teleport(sim, pet, 0, 0);
+    teleport(sim, rogue, 3, 0); // point-blank, well inside any aggressive range
     sim.castAbility('stealth', rogue.id);
     expect(rogue.auras.some((a) => a.kind === 'stealth')).toBe(true);
-
-    const radius = stealthDetectionRadius(pet, rogue, PET_AGGRESSIVE_RANGE);
-    teleport(sim, rogue, radius + 0.25, 0);
     sim.ctx.grid.refresh(sim.entities.values());
-    const outsideHp = rogue.hp;
+    const stealthedHp = rogue.hp;
 
+    // Hidden: neither the picker nor the damage path may touch them.
     expect(petPickTarget(sim.ctx, pet, sim.player)).toBeNull();
     hit(sim, pet, rogue, 100);
-    expect(rogue.hp).toBe(outsideHp);
+    expect(rogue.hp).toBe(stealthedHp);
 
-    teleport(sim, rogue, radius - 0.25, 0);
+    // Visible: both paths engage the same point-blank enemy.
+    rogue.auras = rogue.auras.filter((a) => a.kind !== 'stealth');
+    rogue.stealthed = false;
     sim.ctx.grid.refresh(sim.entities.values());
-
     expect(petPickTarget(sim.ctx, pet, sim.player)?.id).toBe(rogue.id);
     hit(sim, pet, rogue, 100);
-    expect(rogue.hp).toBeLessThan(outsideHp);
+    expect(rogue.hp).toBeLessThan(stealthedHp);
   });
 
   it('friendly target spells can affect controlled pets', () => {

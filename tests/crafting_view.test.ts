@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { STATIONS } from '../src/sim/content/professions';
+import { CRAFT_GOLD_SINK_COPPER_PER_BUDGET, STATIONS } from '../src/sim/content/professions';
 import { ALL_RECIPES } from '../src/sim/content/recipes';
 import { archetypeCeilingFor } from '../src/sim/professions/archetype';
 import { requiredReagentCount } from '../src/sim/professions/crafting';
@@ -432,6 +432,28 @@ describe('buildCraftingView difficulty and skillReq', () => {
     const items = table(item('recipe_sr_result'));
     const view = buildCraftingView([{ ...recipe('recipe_sr', []), skillReq: 75 }], [], items);
     expect(view.recipes[0].skillReq).toBe(75);
+  });
+
+  // The #1301 gold sink (src/sim/professions/crafting.ts resolveCraftForRecipe)
+  // charges Math.ceil(itemLevelBudget * CRAFT_GOLD_SINK_COPPER_PER_BUDGET) on
+  // every successful craft, but never surfaced it anywhere in the crafting
+  // window: a player could not see the fee before or after crafting. The
+  // itemLevelBudget of 16 below mirrors the real Marshstalker Spaulders
+  // recipe (a reported 32c fee at CRAFT_GOLD_SINK_COPPER_PER_BUDGET=2).
+  it('surfaces the craft fee using the exact sim gold-sink formula', () => {
+    const items = table(item('recipe_fee_result'));
+    const view = buildCraftingView(
+      [{ ...recipe('recipe_fee', []), itemLevelBudget: 16 }],
+      [],
+      items,
+    );
+    expect(view.recipes[0].craftFeeCopper).toBe(Math.ceil(16 * CRAFT_GOLD_SINK_COPPER_PER_BUDGET));
+  });
+
+  it('charges zero craft fee for a recipe with no itemLevelBudget', () => {
+    const items = table(item('recipe_nofee_result'));
+    const view = buildCraftingView([recipe('recipe_nofee', [])], [], items);
+    expect(view.recipes[0].craftFeeCopper).toBe(0);
   });
 
   it('surfaces content craft-cast durationSec on every row (Phase 2 chip source)', () => {

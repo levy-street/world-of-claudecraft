@@ -22,7 +22,6 @@ import {
   parseStoredHotbarAction,
   placeAbilityOnSlot,
   placeItemOnSlot,
-  resolveMobileHotbarDrop,
   saveAttackSlotAction,
   shouldSeedFormBar,
   syncHotbarActions,
@@ -663,19 +662,14 @@ describe('loadoutKnownAbilityIds', () => {
   });
 });
 
-describe('mobile touch drag drop resolution', () => {
-  it('resolves the target slot when it differs from the source', () => {
-    expect(resolveMobileHotbarDrop(2, 5)).toBe(5);
-  });
-
-  it('cancels when the pointer released outside any slot', () => {
-    expect(resolveMobileHotbarDrop(2, null)).toBeNull();
-  });
-
-  it('cancels when the pointer released back on the source slot', () => {
-    expect(resolveMobileHotbarDrop(2, 2)).toBeNull();
-  });
-});
+// The 'mobile touch drag drop resolution' suite that stood here covered
+// resolveMobileHotbarDrop, the long-press rearrange's release decision. That
+// gesture is RETIRED (it reached only the four visible ring centres and armed
+// underneath the radial, swapping slots mid-combat), and the decision it made
+// now lives in the bar editor's tap state machine: a tap on a second cell swaps,
+// a tap back on the picked-up cell cancels. The three cases moved verbatim to
+// tests/bar_editor_core.test.ts, "the retired long-press drop decision, carried
+// over".
 
 describe('desktop attack slot behavior', () => {
   const storage = () => {

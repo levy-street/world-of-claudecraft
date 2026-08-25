@@ -166,6 +166,37 @@ export const GUILD_BANK_INCIDENTS = [
 /** One of the fixed eleven guild-bank incident kinds. */
 export type GuildBankIncident = (typeof GUILD_BANK_INCIDENTS)[number];
 
+/** The marketplace escrow-queue outcomes (the per-character save FIFO's
+ *  custody entries): one counter with a fixed kind label, the guild-bank
+ *  incident idiom. 'started' is the throughput baseline the refusal kinds
+ *  and the flush failure are read against. 'realm_refused' is the
+ *  realm-global gate at cap (the write-path rider's bound; the per-character
+ *  kinds cannot see realm-wide saturation). 'settled' is the terminal
+ *  sibling: a held listing sequence released its slot, whatever the
+ *  outcome. NOTE the wedge arithmetic: 'started' is a strict SUBSET of the
+ *  sequences that settle (a deadline, depth-passed flush failure, or
+ *  books-dirty refusal settles without starting), so started-minus-settled
+ *  trends negative; (started + flush_failed + books_dirty_refused +
+ *  deadline_refused) - settled APPROXIMATES in-flight (a deadline-cancelled
+ *  sequence whose flush then rejects books two entered kinds, drifting the
+ *  difference by one per occurrence), and the gate's own stats on the ops
+ *  readout are the instantaneous truth.
+ *  'grant_busy' is the delivered-save twin's head-of-line park (the
+ *  bounded grant entry found the buyer's FIFO wedged past the deadline and
+ *  the delivery row parked): the one failure mode the FIFO close
+ *  introduced, counted so it is never silent. */
+export const WOC_ESCROW_QUEUE_OUTCOMES = [
+  'started',
+  'deadline_refused',
+  'depth_refused',
+  'books_dirty_refused',
+  'flush_failed',
+  'realm_refused',
+  'settled',
+  'grant_busy',
+] as const;
+export type WocEscrowQueueOutcome = (typeof WOC_ESCROW_QUEUE_OUTCOMES)[number];
+
 /**
  * The game-state throughput emission hooks. Implementations must never
  * throw: an observability write can never be allowed to break the message,
@@ -210,6 +241,10 @@ export interface GameMetricsCounters {
    * instead of it: the counter says how often, the log says which guild.
    */
   guildBankIncident(kind: GuildBankIncident): void;
+  /** One marketplace escrow-queue outcome (WOC_ESCROW_QUEUE_OUTCOMES): the
+   *  production readout for the listing FIFO coupling, since a refused or
+   *  slow queue is otherwise visible only as a throttled warn line. */
+  wocEscrowQueue(outcome: WocEscrowQueueOutcome): void;
   /**
    * `amount` copper (always positive) credited to the acting player during a
    * command attributed to `source`. Sampled as the player's own copper delta
@@ -290,6 +325,7 @@ export const noopGameMetricsCounters: GameMetricsCounters = {
   generalChatQuotaDbCall() {},
   characterCreated() {},
   guildBankIncident() {},
+  wocEscrowQueue() {},
   copperCredited() {},
   copperSpent() {},
   harvest() {},

@@ -23,6 +23,7 @@ import { terrainHeight } from '../src/sim/world';
 type AnySim = Sim & Record<string, any>;
 type AnyEntity = Entity & Record<string, any>;
 type LootSlotLike = { itemId: string; count: number; openToAll?: boolean; personalFor?: number[] };
+const FRESH_CORPSE_TIMER = 60;
 
 function ctxOf(sim: Sim) {
   return (sim as AnySim).ctx;
@@ -57,6 +58,7 @@ function corpse(
     z,
   }) as AnyEntity;
   mob.dead = true;
+  mob.corpseTimer = FRESH_CORPSE_TIMER;
   mob.lootable = true;
   mob.tappedById = tappedById;
   mob.loot = { copper: 0, items };
@@ -159,6 +161,27 @@ describe('interaction.lootCorpse', () => {
     expect(mob.loot).toBeNull(); // pruneCorpseLoot cleared the emptied corpse
     expect(player.targetId).toBeNull();
   });
+
+  it('keeps a fresh hand-built lootable corpse eligible before explicit corpse decay', () => {
+    const { sim, a } = twoPlayers();
+    const mob = corpse(sim, 20, 22, a, [{ itemId: 'worn_sword', count: 1 }]);
+    expect(mob.corpseTimer).toBe(FRESH_CORPSE_TIMER);
+
+    expect(interaction.lootCorpse(ctxOf(sim), mob.id, a)).toBe(true);
+
+    expect(sim.countItem('worn_sword', a)).toBe(1);
+  });
+
+  it('refuses an explicitly decayed lootable corpse', () => {
+    const { sim, a } = twoPlayers();
+    const mob = corpse(sim, 20, 22, a, [{ itemId: 'worn_sword', count: 1 }]);
+    mob.corpseTimer = 0;
+
+    expect(interaction.lootCorpse(ctxOf(sim), mob.id, a)).toBe(false);
+
+    expect(sim.countItem('worn_sword', a)).toBe(0);
+    expect(mob.loot?.items[0].count).toBe(1);
+  });
 });
 
 describe('interaction.pickUpObject', () => {
@@ -240,6 +263,39 @@ describe('interaction.interact dispatch', () => {
     expect(sim.countItem('wolf_fang', a)).toBe(1);
     expect(obj.lootable).toBe(false);
     expect(errors(sim)).not.toContain("You don't have permission to loot that.");
+  });
+
+  it('target-path: skips a decayed corpse and falls through to a nearby object', () => {
+    const { sim, a } = twoPlayers();
+    const mob = corpse(sim, 20, 21, a, [{ itemId: 'worn_sword', count: 1 }]);
+    mob.corpseTimer = 0;
+    const obj = groundObj(sim, 'wolf_fang', 20, 21.5);
+    const player = sim.entities.get(a) as AnyEntity;
+    player.targetId = mob.id;
+
+    interaction.interact(ctxOf(sim), a);
+
+    expect(sim.countItem('worn_sword', a)).toBe(0);
+    expect(sim.countItem('wolf_fang', a)).toBe(1);
+    expect(obj.lootable).toBe(false);
+  });
+
+  it('target-path: skips an owned tagged corpse and falls through to a nearby object', () => {
+    const { sim, a } = twoPlayers();
+    const mob = corpse(sim, 20, 21, a, []);
+    mob.ownerId = a;
+    mob.lootable = false;
+    mob.loot = null;
+    const obj = groundObj(sim, 'wolf_fang', 20, 21.5);
+    const player = sim.entities.get(a) as AnyEntity;
+    player.targetId = mob.id;
+
+    interaction.interact(ctxOf(sim), a);
+
+    expect(mob.harvestClaimedBy).toBeNull();
+    expect(sim.countItem('rough_hide', a)).toBe(0);
+    expect(sim.countItem('wolf_fang', a)).toBe(1);
+    expect(obj.lootable).toBe(false);
   });
 
   it('nearest-scan: with no target, picks up the nearest lootable object', () => {

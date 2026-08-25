@@ -137,12 +137,35 @@ describe('owned-class raid-level balance harness (armor and avoidance)', () => {
         // from the class owner rather than a tighter silent re-tune: the
         // 2026-08-09 vespers trim aimed at near-parity, and near-parity
         // plus 120 s draw luck is what this spread is.
+        // 2026-08-21: two Pack Command / Unleash Beast pet-damage fixes landed
+        // together, but only ONE of them moves this ratio. Isolated separately at
+        // 29_930/level 24: the Unleashed Frenzy +25% fix alone (the pet's ordinary
+        // auto-attacks/ranged bolts now get the bonus, not only its own ability
+        // strikes) reads packlord 157.6, ratio 1.074 - comfortably under the old
+        // 1.10, no re-pin needed. It is the SEPARATE meleeHaste-inheritance fix (the
+        // pet now mirrors the hunter's melee haste, PET_OWNER_HASTE_SHARE in
+        // pet_scaling.ts) that resequences the shared RNG stream within the fixed
+        // 120 s window: packlord alone drops 154.975 -> 150.633 (still bestOther,
+        // still ahead of warspirit's unaffected 153.133 once combined with the
+        // frenzy fix's own increase: 153.183 with both fixes applied). vespers
+        // itself is unchanged (169.217); the ratio moves 1.0919 -> 1.1047 purely
+        // because bestOther's denominator shrank, not a damage loss (per-hit
+        // multiplier is pinned strictly higher in spec_masteries.test.ts /
+        // hunter_spec_loops.test.ts / pet_scaling.test.ts).
+        // This is explicitly a single-seed pin, not distribution coverage: the
+        // 29_930 spot value is 1.1047, but a sweep of nearby seeds on the fixed
+        // code reads 29931 0.924, 29932 1.157, 29933 1.005 - 29932 alone already
+        // exceeds this 1.12 re-pin, unrelated to either fix (warspirit is
+        // bestOther there, and warspirit is bit-identical before/after both
+        // fixes). This ceiling was already this loose at 29930/29932 before this
+        // change; 1.12 covers the one seed the diet actually asserts, same as
+        // every prior re-pin above.
         const bestOtherDps = Math.max(
           ...levelResults.filter((result) => result.spec !== 'vespers').map((result) => result.dps),
         );
         const vespersDps = levelResults.find((result) => result.spec === 'vespers')?.dps ?? 0;
         expect(vespersDps).toBeGreaterThanOrEqual(medianDps * 0.95);
-        expect(vespersDps).toBeLessThanOrEqual(bestOtherDps * 1.1);
+        expect(vespersDps).toBeLessThanOrEqual(bestOtherDps * 1.12);
       }
       // OWNED_DPS_SPECS grew 6 -> 8 with the druid overhaul (moongrove/wildfang).
       // Long-sims lane contention (workers=2, run 31288946173) roughly doubles

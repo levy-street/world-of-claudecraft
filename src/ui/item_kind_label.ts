@@ -17,7 +17,11 @@ import { type TranslationKey, t } from './i18n';
 
 type ItemQuality = NonNullable<ItemDef['quality']>;
 
-const ITEM_QUALITY_LABEL_KEYS: Record<ItemQuality, TranslationKey> = {
+/** Exported so vocabulary consumers (the Exchange sell caption's floor
+ *  screen) derive from THIS exhaustive record: a new quality reds the
+ *  Record type here and flows everywhere, instead of drifting a hand-kept
+ *  copy. */
+export const ITEM_QUALITY_LABEL_KEYS: Record<ItemQuality, TranslationKey> = {
   poor: 'itemUi.quality.poor',
   common: 'itemUi.quality.common',
   uncommon: 'itemUi.quality.uncommon',

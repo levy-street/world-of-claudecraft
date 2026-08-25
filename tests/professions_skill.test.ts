@@ -1,6 +1,8 @@
 import { describe, expect, it } from 'vitest';
 import { CRAFT_RING } from '../src/sim/content/professions';
-import { craftSkillGainMultiplier } from '../src/sim/professions/archetype';
+import { recipeById } from '../src/sim/content/recipes';
+import { ITEMS } from '../src/sim/data';
+import { archetypeCeilingFor, craftSkillGainMultiplier } from '../src/sim/professions/archetype';
 import {
   emptyCraftSkills,
   gainCraftSkill,
@@ -153,6 +155,49 @@ describe('tier capability mapping and progress curve (#1128)', () => {
     expect(at(50, 50)).toBe(1);
     expect(at(74, 50)).toBe(1);
     expect(at(75, 75)).toBe(1);
+  });
+});
+
+describe('leatherworking recipe tier matches its own declared item quality (#3520)', () => {
+  // Bug report: leatherworking crafts stop teaching skill once a player
+  // reaches the rare-quality gear rung, even with no archetype chosen yet.
+  // Root cause: recipe_duskhide_wraps declares its OUTPUT as quality 'rare'
+  // (the same "rare" ceiling every craft carries before an archetype is
+  // picked, archetypeCeilingFor's activeArchetype===null branch), but its
+  // skillReq of 75 buckets it into recipe tier 3 (tierForSkill), one tier
+  // ABOVE the tier a rare-quality recipe should occupy per the ladder every
+  // other rare-quality leatherworking piece (mirewarden_jerkin/leggings/
+  // treads) already follows: skillReq 50 -> tier 2 -> "rare". That mismatch
+  // trips craftSkillGainMultiplier's hard recipeTier > ceilingTier gate, so
+  // the recipe can never teach skill pre-archetype, not even a diminished
+  // trickle, matching the "blue item gives no skill gain, and it stops at
+  // skill 75" report.
+  it('recipe_duskhide_wraps sits at the same tier as its declared rare quality', () => {
+    const recipe = recipeById('recipe_duskhide_wraps');
+    expect(recipe, 'recipe_duskhide_wraps is registered').not.toBeUndefined();
+    if (!recipe) return;
+    const item = ITEMS[recipe.resultItemId];
+    expect(item.quality).toBe('rare');
+    expect(tierForSkill(recipe.skillReq)).toBe(2); // rare == tier 2, see archetype.ts
+  });
+
+  it('a pre-archetype leatherworker can still learn skill from the rare-quality recipe', () => {
+    const recipe = recipeById('recipe_duskhide_wraps');
+    expect(recipe, 'recipe_duskhide_wraps is registered').not.toBeUndefined();
+    if (!recipe) return;
+    const skills = emptyCraftSkills();
+    skills.leatherworking = 60; // capability tier 2, same rung as the recipe
+    const ceilingTier = archetypeCeilingFor(null, null, 'leatherworking', null);
+    expect(tierForSkill(recipe.skillReq)).toBeLessThanOrEqual(ceilingTier);
+    const multiplier = craftSkillGainMultiplier(
+      skills,
+      null,
+      null,
+      'leatherworking',
+      null,
+      recipe.skillReq,
+    );
+    expect(multiplier).toBeGreaterThan(0);
   });
 });
 

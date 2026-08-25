@@ -176,6 +176,7 @@ const W9_TAGS: Readonly<Record<string, string>> = {
   trade_offer: 'IWorldTrade',
   trade_confirm: 'IWorldTrade',
   trade_cancel: 'IWorldTrade',
+  trade_close: 'IWorldTrade',
   duel_req: 'IWorldDuelArena',
   duel_accept: 'IWorldDuelArena',
   duel_decline: 'IWorldDuelArena',

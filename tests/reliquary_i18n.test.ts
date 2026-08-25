@@ -419,6 +419,8 @@ describe('the window paints the RESOLVED page name, never the model English', ()
       captureFocus: () => null,
       restoreFocus: () => {},
       onPinChanged: () => {},
+      trackerShown: () => true,
+      setTrackerShown: () => {},
       itemIcon: () => '',
       moneyHtml: () => '',
       itemTooltip: () => '',

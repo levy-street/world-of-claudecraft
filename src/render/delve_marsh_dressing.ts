@@ -15,6 +15,7 @@ import { hash2 } from '../sim/rng';
 import { loadGltf } from './assets/loader';
 import { registerDeferredPreload } from './assets/preload';
 import { GFX, surfaceMat } from './gfx';
+import { markSharedGeometry, markSharedMaterial } from './shared_resource';
 import { detailedSurfaceMat } from './worn_stone';
 
 // Stable seed for all hash2 calls in this module (render-only dressing, no sim state).
@@ -83,6 +84,18 @@ if (typeof window !== 'undefined') {
   for (const [kind, url] of Object.entries(MARSH_ASSET_URL) as [MarshGlbAnchorKind, string][]) {
     registerDeferredPreload(() =>
       loadGltf(url).then((gltf) => {
+        // The kit is the app-wide cache every placement clones from, and
+        // Object3D.clone(true) shares geometry and material BY REFERENCE with
+        // it. Unmarked, a retiring interior's terminal owner claims those and
+        // disposes them, taking out the geometry the next run clones and the
+        // materials anything else on screen is still drawing with. Same rule
+        // and same shape as wildheart_props.ts.
+        gltf.scene.traverse((child) => {
+          if (!(child instanceof THREE.Mesh)) return;
+          markSharedGeometry(child.geometry);
+          const materials = Array.isArray(child.material) ? child.material : [child.material];
+          for (const material of materials) markSharedMaterial(material);
+        });
         loadedMarshGltf.set(kind, gltf.scene);
       }),
     );

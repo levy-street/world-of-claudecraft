@@ -63,9 +63,11 @@ describe('soulbound: heroic_mark is bound', () => {
       1,
     );
 
-    const offered = session.offerA.items.map((s: any) => s.itemId);
-    expect(offered).toContain('minor_healing_potion');
-    expect(offered).not.toContain('heroic_mark');
+    // This decoupled ctx (counts from the bags map, no meta.inventory) is the
+    // exact reach of the staging preview's remainder fallback, so pin its
+    // FULL shape: one plain id-plus-count line, no instance, no crafted
+    // marker, the whole shortfall in one slot.
+    expect(session.offerA.items).toEqual([{ itemId: 'minor_healing_potion', count: 2 }]);
     // setting an offer resets both accept flags (guard against silent swaps)
     expect(session.acceptedA).toBe(false);
   });

@@ -27,7 +27,8 @@ const briefingSrc = strip(read('src/ui/vale_cup_briefing.ts'));
 const bettingSrc = strip(read('src/ui/vale_cup_betting.ts'));
 const chargeSrc = strip(read('src/ui/vale_cup_charge.ts'));
 const flagSrc = strip(read('src/ui/vale_cup_flag.ts'));
-const hud = read('src/ui/hud.ts');
+const hud = strip(read('src/ui/hud.ts'));
+const mobileActionRing = strip(read('src/ui/hud/action_bar/mobile_action_ring_controller.ts'));
 
 const ALL_PAINTERS: [name: string, code: string][] = [
   ['vale_cup_window.ts', windowSrc],
@@ -383,13 +384,16 @@ describe('vale_cup hud.ts call sites', () => {
     expect(hud).toContain(
       'i === 0 && this.attackSlotIsAttack() && this.firstSportAbility() === null',
     );
-    expect(hud).toContain('ability: () => this.firstSportAbility(),');
-    expect(hud).toContain('if (this.firstSportAbility()) {');
     expect(hud).toContain(
       'i === 0 && this.attackSlotIsAttack()\n                ? this.firstSportAbility()\n                : this.abilityForSlot(i)',
     );
     expect(hud).toContain(
       'const sportFirst = this.firstSportAbility();\n          if (sportFirst) return this.abilityTooltip(sportFirst);',
     );
+    // The mobile ring's own primary seat wiring extracted into
+    // mobile_action_ring_controller.ts; it paints and casts through the same
+    // deps.firstSportAbility() the desktop bar resolves via this.firstSportAbility().
+    expect(mobileActionRing).toContain('ability: () => deps.firstSportAbility(),');
+    expect(mobileActionRing).toContain('if (deps.firstSportAbility()) {');
   });
 });

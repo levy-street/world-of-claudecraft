@@ -95,7 +95,7 @@ describe('Stonebound PBE benchmark contract', () => {
       .drainEvents()
       .filter((event) => event.type === 'damage' && event.ability === 'Galeheart Echo')
       .reduce((sum, event) => sum + (event.type === 'damage' ? event.amount : 0), 0);
-    expect(galeEchoDamage).toBe(100);
+    expect(galeEchoDamage).toBe(50);
     expect(stoneEchoDamage).toBe(0);
   });
 });

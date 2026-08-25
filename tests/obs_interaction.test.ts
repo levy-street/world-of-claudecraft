@@ -11,6 +11,7 @@ const ABILITY_SLOTS = ACTIONS.length - 13;
 const INTERACTABLE_START = 16 + ABILITY_SLOTS * 2 + 9 + 5 * 6;
 const EMPTY_INTERACTABLE = [0, 1.5, 0, 0, 0];
 const FRIENDLY_QUEST_ID = 'q_nythraxis_scourges_end';
+const FRESH_CORPSE_TIMER = 60;
 
 function entityByTemplate(sim: Sim, templateId: string): Entity {
   const entity = [...sim.entities.values()].find(
@@ -77,6 +78,7 @@ function expectAdvertises(sim: Sim, entity: Entity, type: number): void {
 
 function makeLootableCorpse(sim: Sim, corpse: Entity, point: { x: number; z: number }): void {
   corpse.dead = true;
+  corpse.corpseTimer = FRESH_CORPSE_TIMER;
   corpse.hp = 0;
   corpse.hostile = true;
   corpse.lootable = true;

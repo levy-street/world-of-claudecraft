@@ -3,6 +3,7 @@ import { GPU_WORK_PRIORITY } from '../src/render/background_gpu_queue';
 import {
   type CompilePriorityNode,
   castingAtPlayerPredicate,
+  compileMayStartBeforeInitialPaint,
   compilePriorityForTarget,
 } from '../src/render/compile_priority_core';
 
@@ -84,5 +85,18 @@ describe('castingAtPlayerPredicate', () => {
     expect(isCasting(2)).toBe(false);
     expect(isCasting(3)).toBe(false);
     expect(isCasting(4)).toBe(false);
+  });
+});
+
+describe('compileMayStartBeforeInitialPaint', () => {
+  it('admits actionable views and holds ordinary live views for the first-paint release', () => {
+    expect(compileMayStartBeforeInitialPaint(GPU_WORK_PRIORITY.ACTIONABLE_VIEW)).toBe(true);
+    expect(compileMayStartBeforeInitialPaint(GPU_WORK_PRIORITY.LIVE_VIEW)).toBe(false);
+    expect(compileMayStartBeforeInitialPaint(GPU_WORK_PRIORITY.VISIBLE_PREWARM)).toBe(false);
+  });
+
+  it('admits an entry-required view without promoting ordinary live views', () => {
+    expect(compileMayStartBeforeInitialPaint(GPU_WORK_PRIORITY.LIVE_VIEW, true)).toBe(true);
+    expect(compileMayStartBeforeInitialPaint(GPU_WORK_PRIORITY.LIVE_VIEW, false)).toBe(false);
   });
 });

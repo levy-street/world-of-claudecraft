@@ -1,6 +1,7 @@
 import { CTX_MENU_PICKER_CLASS } from '../../bag_item_action_menu';
 import { esc } from '../../esc';
 import { type TranslationKey, t } from '../../i18n';
+import { blurIfPointerClick } from '../../pointer_blur';
 import { rovingTarget } from '../../roving_index';
 import { tryEncodeItemLink, tryEncodeQuestLink } from '../quest/quest_link';
 import {
@@ -255,7 +256,14 @@ export class ChatWindowController {
       button.dataset.tab = id;
       button.setAttribute('role', 'tab');
       button.textContent = label;
-      button.addEventListener('click', () => this.selectTab(id, true));
+      // Selecting a tab restyles in place (no strip rebuild), so a mouse click
+      // would leave the tab focused and the next unshielded Space would natively
+      // re-click it. Pointer-only blur; keyboard selection (a native Enter click,
+      // detail 0) keeps its focus, and onTabKeyDown's arrow roving is untouched.
+      button.addEventListener('click', (event) => {
+        this.selectTab(id, true);
+        blurIfPointerClick(event, button);
+      });
       button.addEventListener('keydown', (event) => this.onTabKeyDown(id, order, event));
       return button;
     };
@@ -319,14 +327,19 @@ export class ChatWindowController {
     add.textContent = '+';
     add.setAttribute('aria-label', t('hud.core.chatChannels.add'));
     add.title = t('hud.core.chatChannels.add');
-    add.addEventListener('click', () => {
+    add.addEventListener('click', (event) => {
       const menu = this.deps.contextMenu.element;
       if (menu.style.display === 'block' && this.deps.contextMenu.opener() === add) {
         this.deps.contextMenu.close();
+        blurIfPointerClick(event, add);
         return;
       }
       const rect = add.getBoundingClientRect();
       this.openChannelMenu(rect.left, rect.bottom, add);
+      // The "+" keeps document focus after a mouse click (the ctx menu items are
+      // not focused on pointer open), so blur it or the next unshielded Space
+      // re-toggles the channel menu. Keyboard activation keeps focus.
+      blurIfPointerClick(event, add);
     });
     // Dragging a tab onto "+" moves it to the end of the strip.
     add.addEventListener('dragover', (event) => {
@@ -354,10 +367,13 @@ export class ChatWindowController {
   // Combat never reorder (they are not entries in `chatTabs`), so Alt+Arrow on
   // either is left alone, including for the browser's own back/forward accelerator.
   private onTabKeyDown(id: ChatTabId, order: readonly ChatTabId[], event: KeyboardEvent): void {
-    if (event.key !== 'ArrowLeft' && event.key !== 'ArrowRight') return;
-    const step = event.key === 'ArrowLeft' ? -1 : 1;
+    const arrow = event.key === 'ArrowLeft' || event.key === 'ArrowRight';
+    if (!arrow && event.key !== 'Home' && event.key !== 'End') return;
     if (event.altKey) {
-      if (!isChatOpenTab(id)) return;
+      // Alt+Arrow reorders; Alt+Home/End is not a reorder gesture and falls through
+      // to nothing (never a roving move either).
+      if (!arrow || !isChatOpenTab(id)) return;
+      const step = event.key === 'ArrowLeft' ? -1 : 1;
       const next = stepChatTab(this.chatTabs, id, step);
       if (next === this.chatTabs) return;
       event.preventDefault();
@@ -370,9 +386,9 @@ export class ChatWindowController {
     }
     const index = order.indexOf(id);
     if (index < 0) return;
-    // Reuse the shared roving-index core (Home/End come along for free) instead
-    // of hand-rolled wrap math, so chat tabs stay consistent with every other
-    // tablist in the HUD. `step` is unused here; `rovingTarget` reads the key.
+    // Reuse the shared roving-index core (arrows wrap, Home/End jump to the
+    // ends) instead of hand-rolled wrap math, so chat tabs stay consistent with
+    // every other tablist in the HUD; `rovingTarget` reads the key.
     const nextIndex = rovingTarget(event.key, index, order.length, 'horizontal');
     if (nextIndex === null) return;
     event.preventDefault();

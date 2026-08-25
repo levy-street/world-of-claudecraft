@@ -205,27 +205,28 @@ describe('Android Seeker distribution boundary', () => {
     expect(existsSync('public/favicon.ico')).toBe(true);
   });
 
-  it('promotes the existing rewards button below Chat without covering mobile unit frames', () => {
+  it('promotes the existing rewards button above the menu control, clear of the unit frames', () => {
+    // The promotion target is unchanged (#mobile-combat-controls, which now holds
+    // the collapsed menu control instead of five buttons), so the same element and
+    // listener are reused; the container is a column-reverse flex, so the appended
+    // chest sits ABOVE the control in the bottom band.
     expect(main).toContain(
       "document.getElementById('mobile-combat-controls')?.appendChild(dailyRewardsButton)",
     );
     expect(mobileHudCss).toContain('#mobile-daily-rewards:not([hidden])');
     expect(mobileHudCss).not.toContain('display: flex !important;');
     expect(mobileHudCss).toContain('url("/ui/daily-rewards/treasure_chest.webp")');
-    expect(mobileHudCss).toContain('grid-column: 1;');
-    expect(mobileHudCss).toContain('grid-row: 2;');
     expect(mobileHudCss).toMatch(
-      /body\.mobile-touch\.seeker-wallet-enabled #target-frame \{[^}]*top: calc\(max\(8px, env\(safe-area-inset-top\)\) \+ 140px\);/,
+      /body\.mobile-touch #mobile-combat-controls \{[^}]*flex-direction: column-reverse;/,
     );
-    expect(mobileHudCss).toMatch(
-      /body\.mobile-touch\.seeker-wallet-enabled #party-frames \{[^}]*top: calc\(max\(8px, env\(safe-area-inset-top\)\) \+ 142px\);/,
+    // The chest no longer occupies a top-left grid row, so the Seeker build stops
+    // pushing the unit frames down for one: with the row collapsed, the target
+    // frame owns the top band on Seeker exactly as it does everywhere else.
+    expect(mobileHudCss).not.toMatch(
+      /#mobile-daily-rewards:not\(\[hidden\]\) \{[^}]*grid-column: 1;/,
     );
-    expect(mobileHudCss).toMatch(
-      /body\.mobile-touch\.seeker-wallet-enabled #target-frame \{[^}]*top: calc\(max\(6px, env\(safe-area-inset-top\)\) \+ 132px\);/,
-    );
-    expect(mobileHudCss).toMatch(
-      /body\.mobile-touch\.seeker-wallet-enabled #party-frames \{[^}]*top: calc\(max\(6px, env\(safe-area-inset-top\)\) \+ 134px\);/,
-    );
+    expect(mobileHudCss).not.toMatch(/body\.mobile-touch\.seeker-wallet-enabled #target-frame \{/);
+    expect(mobileHudCss).not.toMatch(/body\.mobile-touch\.seeker-wallet-enabled #party-frames \{/);
   });
 
   it('lays out the Seeker wallet as a header row above its actions', () => {

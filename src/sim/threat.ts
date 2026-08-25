@@ -80,6 +80,16 @@ export function canDetectStealthedTarget(
   return dist2d(observer.pos, target.pos) <= stealthDetectionRadius(observer, target, baseRadius);
 }
 
+// A PET never perceives a stealthed enemy at all (Rogue Duskveil/Smokestep and
+// Druid Stalk all apply a kind:'stealth' aura), matching exactly what an enemy
+// PLAYER sees. Deliberately NOT the classic proximity model mobs use
+// (canDetectStealthedTarget): a hunter/warlock/mage pet gets zero close-range
+// stealth detection, so a rogue's opener and Vanish work against the pair the
+// same way they work against the player. Pure: no clock, no rng.
+export function petCanSeeStealthedTarget(target: Entity): boolean {
+  return !target.auras.some((a) => a.kind === 'stealth');
+}
+
 export function addThreat(mob: Entity, sourceId: number, amount: number): void {
   if (mob.dead || amount <= 0) return;
   mob.threat.set(sourceId, (mob.threat.get(sourceId) ?? 0) + amount);

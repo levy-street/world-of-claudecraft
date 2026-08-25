@@ -154,6 +154,21 @@ function findMountShore(seed: number): { x: number; z: number; facing: number } 
   throw new Error('no mountable shore found near a deep lake');
 }
 
+// An UNDECLARED deep cell: the generator carved it below swim depth (the same
+// waterLevelAt the wall reads, via isOpenSeaAt) but it sits outside every
+// authored lake's footprint, so unlike findDeepLake's pick it never got a
+// lake's engineered, gently-graded shore approach. Its edge can instead be a
+// raw, ungraded terrain wall: the mount water wall in the main step holds a
+// rider at the boundary tick after tick (nothing analogous protects an
+// unmounted walker, which just carries on into the water instead of ever
+// pressing against the wall), and it is exactly that repeated holding that
+// presses the rider's body against the wall for the standoffPass "ease off a
+// wall" nudge to shove through. A geometry-only search (no simulation) can't
+// tell an ordinary graded shore from one of these apart, so this pins a
+// coordinate confirmed live for the fixed SEED=42 world content, the same way
+// the file already fixes SEED for every other terrain-dependent test.
+const PHANTOM_POCKET_SHORE = { x: 181, z: 200, facing: Math.PI } as const;
+
 describe('mount summon/dismount transition', () => {
   it('completes a mount summon after MOUNT_SUMMON_SECONDS of ticks, then rides', () => {
     const sim = makeSim();
@@ -335,6 +350,56 @@ describe('mounted deep-water wall (kernel)', () => {
     expect(isSwimming(mounted, SEED)).toBe(false);
     // the unmounted player crosses the same line and ends up swimming
     expect(isSwimming(unmounted, SEED)).toBe(true);
+  });
+
+  // Regression: an UNDECLARED deep pocket (open sea the generator carved
+  // below swim depth, outside every authored lake's footprint) never got a
+  // lake's smoothed shore approach, so its edge can be a raw, ungraded
+  // terrain wall. The "ease the body off a wall it's now overlapping" nudge
+  // (standoffPass) used to reposition the rider without re-checking the mount
+  // water wall, so a straight run at ordinary speed could press the body
+  // against that wall and get shoved straight through it into the deep water
+  // over one or two ticks: a mount silently vanishing while just running
+  // across ordinary-looking terrain, nowhere near a rendered lake.
+  it('walls a mounted rider out of an undeclared deep pocket even when a standoff nudge would carry them there', () => {
+    const sim = makeSim();
+    const pid = sim.addPlayer('warrior', 'Rider');
+    sim.tick();
+    sim.setPlayerLevel(60, pid);
+    const template = expectDefined(sim.entities.get(pid));
+    const shore = PHANTOM_POCKET_SHORE;
+    const groundY = groundHeight(shore.x, shore.z, SEED);
+    const clone = (mountKey: string): Entity => ({
+      ...template,
+      pos: { x: shore.x, y: groundY, z: shore.z },
+      prevPos: { x: shore.x, y: groundY, z: shore.z },
+      facing: shore.facing,
+      vx: 0,
+      vy: 0,
+      vz: 0,
+      onGround: true,
+      jumping: false,
+      fallStartY: groundY,
+      castingAbility: null,
+      sitting: false,
+      ghost: false,
+      auras: [],
+      mountKey,
+      mountCastRemaining: 0,
+      mountCastKey: '',
+    });
+
+    const deps = clientDeps(SEED);
+    const mounted = clone('grag_bear');
+    const input = mi({ forward: true });
+    for (let i = 0; i < 60; i++) {
+      mounted.prevPos = { ...mounted.pos };
+      stepPlayerMotion(deps, mounted, input);
+    }
+
+    expect(isDeep(mounted.pos.x, mounted.pos.z, SEED)).toBe(false);
+    expect(isSwimming(mounted, SEED)).toBe(false);
+    expect(mounted.mountKey).toBe('grag_bear');
   });
 });
 

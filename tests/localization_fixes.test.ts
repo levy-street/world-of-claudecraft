@@ -139,14 +139,56 @@ const ALLOW_V07_SLASH: ReadonlySet<string> = new Set<string>(
 // locale to pass the PR gate.
 const RELEASE_TIER = process.env.I18N_RELEASE_TIER === '1';
 
+// The three client-side matchers that re-localize the English src/sim and server
+// emit. They no longer share one file: localizeErrorText was extracted to its own
+// registered pure core (src/ui/error_text_i18n_core.ts) when hud.ts hit its
+// monolith ceiling, while localizeSystemText and localizeLootText are still Hud
+// methods. Every source-text guard below anchors on this table rather than
+// assuming hud.ts, so the next extraction is a one-line move here.
+const MATCHER_ARMS = [
+  {
+    fn: 'localizeErrorText',
+    file: 'src/ui/error_text_i18n_core.ts',
+    signature: 'export function localizeErrorText(',
+  },
+  {
+    fn: 'localizeSystemText',
+    file: 'src/ui/hud.ts',
+    signature: 'private localizeSystemText(text: string): string {',
+  },
+  {
+    fn: 'localizeLootText',
+    file: 'src/ui/hud.ts',
+    signature: 'private localizeLootText(text: string): string {',
+  },
+] as const;
+
+// The arm's source body, brace-matched from its signature so a class method and a
+// module-level function read identically.
+const matcherArmBody = (arm: (typeof MATCHER_ARMS)[number]): string => {
+  const src = fs.readFileSync(path.resolve(process.cwd(), arm.file), 'utf8');
+  const start = src.indexOf(arm.signature);
+  if (start < 0) throw new Error(`arm ${arm.fn} not found in ${arm.file}`);
+  let depth = 0,
+    i = src.indexOf('{', start);
+  for (; i < src.length; i++) {
+    if (src[i] === '{') depth++;
+    else if (src[i] === '}') {
+      depth--;
+      if (depth === 0) break;
+    }
+  }
+  return src.slice(start, i + 1);
+};
+
 // --- B1: the log-event path must localize server-sent friends/guild/who/world messages ---
 describe('B1: server log-type messages localize through the log path', () => {
   it('all three hud matchers call AND return the localizeServerText fallback', () => {
-    const src = fs.readFileSync(path.resolve(process.cwd(), 'src/ui/hud.ts'), 'utf8');
-    for (const fn of ['localizeSystemText', 'localizeErrorText', 'localizeLootText']) {
-      const start = src.indexOf(`private ${fn}(`);
-      expect(start, `${fn} not found`).toBeGreaterThan(0);
-      const body = src.slice(start, src.indexOf('\n  private ', start + 1));
+    for (const arm of MATCHER_ARMS) {
+      const fn = arm.fn;
+      // matcherArmBody throws (loudly, naming the arm) when the signature is
+      // missing, so the slice below is non-empty by construction.
+      const body = matcherArmBody(arm);
       // Must both compute the fallback and return it (not just mention the symbol).
       expect(body, `${fn} must call localizeServerText`).toContain('localizeServerText(text)');
       expect(
@@ -932,10 +974,10 @@ function scanEmitCandidates(simSrc: string, serverSrc: string): Cand[] {
 // --- S3: DRIFT GUARD — enumerate EVERY player-facing emit in src/sim/sim.ts and prove
 // each is recognized by the real client matcher for its event type. Unlike S1 (a curated
 // sample), this parses sim.ts at test time, so a NEW unhandled `text:`/this.error string
-// fails CI automatically. Routes through the real hud arm matchers (extracted from
-// hud.ts source) + the real localizeServerText/localizeSimText fallbacks. ---
+// fails CI automatically. Routes through the real client arm matchers (each read from
+// the file MATCHER_ARMS names, hud.ts or the extracted error-text core) + the real
+// localizeServerText/localizeSimText fallbacks. ---
 describe('S3: every sim.ts emit is recognized (drift guard)', () => {
-  const hudSrc = fs.readFileSync(path.resolve(process.cwd(), 'src/ui/hud.ts'), 'utf8');
   // Extraction sessions moved player-facing emits out of sim.ts into sibling sim
   // modules: C1 -> src/sim/combat/damage.ts (the frenzy proc + pet "<name> dies."
   // line), C4a -> src/sim/combat/casting_lifecycle.ts (the cast guards in castAbility/
@@ -1222,20 +1264,6 @@ describe('S3: every sim.ts emit is recognized (drift guard)', () => {
   // fallback in recognized() below.
   const serverSrc = fs.readFileSync(path.resolve(process.cwd(), 'server/game.ts'), 'utf8');
 
-  const armBody = (name: string): string => {
-    const start = hudSrc.indexOf(`private ${name}(text: string): string {`);
-    if (start < 0) throw new Error(`arm ${name} not found`);
-    let depth = 0,
-      i = hudSrc.indexOf('{', start);
-    for (; i < hudSrc.length; i++) {
-      if (hudSrc[i] === '{') depth++;
-      else if (hudSrc[i] === '}') {
-        depth--;
-        if (depth === 0) break;
-      }
-    }
-    return hudSrc.slice(start, i + 1);
-  };
   const armRegexes = (body: string): RegExp[] => {
     const out: RegExp[] = [];
     const re = /\/((?:\\.|[^/\\\n])+)\/([gimsuy]*)\.exec\(text\)/g;
@@ -1267,9 +1295,9 @@ describe('S3: every sim.ts emit is recognized (drift guard)', () => {
     return keys;
   };
   const arms: Record<string, { exact: Set<string>; regs: RegExp[] }> = {};
-  for (const n of ['localizeErrorText', 'localizeSystemText', 'localizeLootText']) {
-    const b = armBody(n);
-    arms[n] = { exact: armExactKeys(b), regs: armRegexes(b) };
+  for (const arm of MATCHER_ARMS) {
+    const b = matcherArmBody(arm);
+    arms[arm.fn] = { exact: armExactKeys(b), regs: armRegexes(b) };
   }
 
   const sub = (expr: string): string => {

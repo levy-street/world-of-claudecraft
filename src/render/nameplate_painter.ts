@@ -35,6 +35,7 @@ import {
 } from './nameplate_canvas';
 import { COMBO_PIP_MAX } from './nameplate_combo';
 import { declutterNameplatesInPlace, type NameplateAnchor } from './nameplate_declutter';
+import { nameplateHeraldryLift } from './nameplate_heraldry_core';
 import {
   isNameplateScreenAnchorVisible,
   isProjectedNameplateAnchorVisible,
@@ -221,16 +222,6 @@ export class NameplatePainter {
       const screenY = (-this.tmpV.y * 0.5 + 0.5) * height;
       if (!isNameplateScreenAnchorVisible(screenX, screenY, width, height)) continue;
 
-      const anchor = this.anchorScratch[this.anchorCount];
-      if (anchor) {
-        anchor.id = id;
-        anchor.sx = screenX;
-        anchor.sy = screenY;
-      } else {
-        this.anchorScratch.push({ id, sx: screenX, sy: screenY });
-      }
-      this.anchorCount++;
-
       let state = this.states.get(id);
       if (!state) {
         state = createNameplateCanvasState();
@@ -240,6 +231,18 @@ export class NameplatePainter {
       if (!state.initialized || fullPass || plan.urgent || languageChanged) {
         this.resolveContent(state, entity, player, plan, showOwnNameplate, showDevBadges);
       }
+
+      const anchor = this.anchorScratch[this.anchorCount];
+      const extraLift = nameplateHeraldryLift(state.border);
+      if (anchor) {
+        anchor.id = id;
+        anchor.sx = screenX;
+        anchor.sy = screenY;
+        anchor.extraLift = extraLift;
+      } else {
+        this.anchorScratch.push({ id, sx: screenX, sy: screenY, extraLift });
+      }
+      this.anchorCount++;
     }
 
     declutterNameplatesInPlace(this.anchorScratch, this.anchorCount);

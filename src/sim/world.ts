@@ -1381,6 +1381,32 @@ function applyGardenCoast(x: number, z: number, h: number): number {
   return h + (out - h) * seam * zSeam;
 }
 
+// The Gardenwalk pass floor, mirrored onto the Thornpeak (west/strip) side
+// of the border: applyGardenCoast's passW above only reaches the east
+// column (its blend rides "seam", the coastal cross-fade into the strip,
+// which is near zero west of the border). Without a matching flatten here
+// the peaks biome's full hill/crag/detail noise (baseHeight) runs right up
+// to the crossing: player report, a small unclimbable step around x=173,
+// z=797. A pure function of (x, z), like every applier in this file: it
+// touches no content table, so it cannot move roadDistance calming or any
+// other rng-consuming system.
+function applyGardenwalkWestPass(x: number, z: number, h: number): number {
+  // Symmetric around the border line itself (not a one-sided cutoff at
+  // STRIP_MAX_X): a hard x < STRIP_MAX_X gate left a seam exactly at the
+  // border, where this window's near-full weight met applyGardenCoast's
+  // own passW at whatever partial "seam" it had reached there, and the two
+  // land on different baseline math (this blends raw h; that blends a
+  // coastal "out" value), so the join was not even C0. Peaking gently AT the
+  // border and fading both directions instead overlaps applyGardenCoast's
+  // effect on the east side, but both blends pull the same direction (down
+  // toward the ~6 pass floor), so composing them stays smooth.
+  const w =
+    (1 - smoothstep(26, 52, Math.abs(z - 800))) *
+    (1 - smoothstep(0, 58, Math.abs(x - STRIP_MAX_X)));
+  if (w <= 0) return h;
+  return h + (6 + (h - 6) * 0.08 - h) * w;
+}
+
 // The Great Maze. '#' cells are modeled hedge walls; '.' cells are lawn
 // corridors. Row 0 is the NORTH row (the map's top): the entrance is the
 // gap in the south row, the exit the gap in the north row, and the open
@@ -4377,6 +4403,9 @@ function terrainHeightUnpadded(x: number, z: number, seed: number, skipEdits = f
   }
   if (terrainRegionHas(region, TERRAIN_APPLIER.gardenCoast)) {
     h = applyGardenCoast(x, z, h);
+  }
+  if (terrainRegionHas(region, TERRAIN_APPLIER.gardenwalkWestPass)) {
+    h = applyGardenwalkWestPass(x, z, h);
   }
   if (terrainRegionHas(region, TERRAIN_APPLIER.galeCoast)) {
     h = applyGaleCoast(x, z, h);

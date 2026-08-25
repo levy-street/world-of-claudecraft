@@ -565,6 +565,8 @@ export function buildGraphicsSections(
         // concern for touch players.
         boolToggle(s, 'mobileCameraJoystick', 'hudChrome.options.mobileCameraJoystick'),
         boolToggle(s, 'leftHandedTouch', 'hudChrome.options.mobileLeftHanded'),
+        boolToggle(s, 'touchTapMenus', 'hudChrome.options.touchTapMenus'),
+        note('hudChrome.options.touchTapMenusNote'),
       ],
     });
   }
@@ -674,6 +676,7 @@ export function buildInterfaceControls(
     boolToggle(s, 'showPlaytime', 'hudChrome.options.showPlaytime'),
     boolToggle(s, 'showDailyRewardsChest', 'hudChrome.options.showDailyRewardsChest'),
     boolToggle(s, 'showItemLevel', 'hudChrome.options.showItemLevel'),
+    boolToggle(s, 'showReliquaryTracker', 'hudChrome.options.showReliquaryTracker'),
     boolToggle(s, 'showOwnNameplate', 'hudChrome.options.showOwnNameplate'),
     boolToggle(s, 'showPlayerNameplates', 'hudChrome.options.showPlayerNameplates'),
   ];

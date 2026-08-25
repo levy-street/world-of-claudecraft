@@ -238,6 +238,7 @@ export class SpiritApparitions {
   private compileGate: SpiritCompileGate | null = null;
   private buildScheduler: SpiritBuildScheduler | null = null;
   private time = 0;
+  private disposed = false;
 
   constructor(
     private scene: THREE.Scene,
@@ -304,6 +305,7 @@ export class SpiritApparitions {
   // Called on first sighting of a player of that class; misses are harmless
   // (an unwarmed model's first cast just skips its spirit).
   warmForClass(cls: string): void {
+    if (this.disposed) return;
     const models = spiritModelsByClass().get(cls);
     if (!models) return;
     for (const model of models) this.ensureLoaded(model);
@@ -320,6 +322,7 @@ export class SpiritApparitions {
         // deferred build cannot be queued twice by a second ensureLoaded.
         const build = (): void => {
           this.loading.delete(model);
+          if (this.disposed) return;
           if (this.puppets.has(model)) return;
           this.buildPuppet(model, g.scene, g.animations);
         };
@@ -340,6 +343,7 @@ export class SpiritApparitions {
     sourceScene: THREE.Object3D,
     animations: THREE.AnimationClip[],
   ): void {
+    if (this.disposed) return;
     const root = cloneSkinned(sourceScene);
     const mat = new THREE.MeshBasicMaterial({
       color: 0xffffff,
@@ -428,6 +432,7 @@ export class SpiritApparitions {
   // silently) when the model is still loading, both slots run, or the puppet
   // is already on stage, a spirit never pops in late.
   spawn(o: SpiritSpawnOpts): boolean {
+    if (this.disposed) return false;
     const puppet = this.puppets.get(o.model);
     if (!puppet) {
       this.ensureLoaded(o.model); // warm for the next cast
@@ -529,6 +534,7 @@ export class SpiritApparitions {
   }
 
   update(dt: number): void {
+    if (this.disposed) return;
     this.time += dt;
     if (this.compileGate) this.pumpGatedCompile();
     else this.pumpVisibleCompile();
@@ -743,5 +749,30 @@ export class SpiritApparitions {
     for (const slot of this.slots) {
       if (slot.active) this.release(slot);
     }
+  }
+
+  /** Dispose only resources created by this renderer. GLB geometries are
+   * loader-cache owned and intentionally remain untouched; each puppet owns
+   * its ghost material and animation mixer, while holders are empty groups. */
+  dispose(): void {
+    if (this.disposed) return;
+    this.disposed = true;
+    this.clear();
+    this.compileQueue.length = 0;
+    this.compiling = null;
+    this.gateSettled = null;
+    for (const slot of this.slots) {
+      slot.holder.removeFromParent();
+      slot.puppet = null;
+    }
+    this.compileGroup.removeFromParent();
+    for (const puppet of this.puppets.values()) {
+      puppet.mixer.stopAllAction();
+      puppet.mixer.uncacheRoot(puppet.root);
+      puppet.root.removeFromParent();
+      puppet.mat.dispose();
+    }
+    this.puppets.clear();
+    this.loading.clear();
   }
 }

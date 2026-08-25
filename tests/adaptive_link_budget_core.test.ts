@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import {
+  ADAPTIVE_LINK_BUDGET_MAX_TRANSITIONS,
   type AdaptiveLinkBudgetClock,
   type AdaptiveLinkBudgetConfig,
   createAdaptiveLinkBudget,
@@ -52,8 +53,97 @@ describe('adaptive link budget core', () => {
       state: 'ramp',
       windowLinks: 16,
       inFlightLinks: 12,
+      peakInFlightLinks: 12,
       estimatedLinksPerUnit: 12,
       submittedUnits: 1,
+    });
+  });
+
+  it('keeps a bounded transition trace and records the peak global in-flight links', () => {
+    const clock = virtualClock();
+    const budget = createAdaptiveLinkBudget(CONFIG, clock);
+    budget.markSubmitted('scene:0');
+    budget.markSyncEnd('scene:0', 12);
+    budget.markSubmitted('scene:1');
+    budget.markSyncEnd('scene:1', 8);
+    clock.advance(CONFIG.slowSettlementMs);
+    budget.markSettled('scene:0');
+    budget.markReveal();
+
+    expect(budget.snapshot()).toMatchObject({
+      peakInFlightLinks: 24,
+      transitions: [
+        expect.objectContaining({ from: 'ramp', to: 'backoff', reason: 'slow-settlement' }),
+        expect.objectContaining({ from: 'backoff', to: 'revealed', reason: 'reveal' }),
+      ],
+    });
+    expect(budget.snapshot().transitions.length).toBeLessThanOrEqual(
+      ADAPTIVE_LINK_BUDGET_MAX_TRANSITIONS,
+    );
+  });
+
+  it('bounds transition history when the adaptive state oscillates', () => {
+    const clock = virtualClock();
+    const budget = createAdaptiveLinkBudget(CONFIG, clock);
+    let id = 0;
+    for (let cycle = 0; cycle < 20; cycle++) {
+      for (const duration of [1_500, 800, 2_500]) {
+        const unitId = `oscillating:${id++}`;
+        budget.markSubmitted(unitId);
+        budget.markSyncEnd(unitId, 8);
+        clock.advance(duration);
+        budget.markSettled(unitId);
+      }
+    }
+
+    expect(budget.snapshot().transitions).toHaveLength(ADAPTIVE_LINK_BUDGET_MAX_TRANSITIONS);
+    expect(ADAPTIVE_LINK_BUDGET_MAX_TRANSITIONS).toBe(32);
+  });
+
+  it('records the fast, mid, failed, and no-progress transition reasons', async () => {
+    const fastClock = virtualClock();
+    const fast = createAdaptiveLinkBudget({ ...CONFIG, initialWindowLinks: 28 }, fastClock);
+    fast.markSubmitted('fast');
+    fast.markSyncEnd('fast', 8);
+    fastClock.advance(800);
+    fast.markSettled('fast');
+    expect(fast.snapshot().transitions[0]).toMatchObject({
+      from: 'ramp',
+      to: 'steady',
+      reason: 'fast-settlement',
+    });
+
+    const midClock = virtualClock();
+    const mid = createAdaptiveLinkBudget(CONFIG, midClock);
+    mid.markSubmitted('mid');
+    mid.markSyncEnd('mid', 8);
+    midClock.advance(1_600);
+    mid.markSettled('mid');
+    expect(mid.snapshot().transitions[0]).toMatchObject({
+      from: 'ramp',
+      to: 'steady',
+      reason: 'mid-settlement',
+    });
+
+    const failed = createAdaptiveLinkBudget(CONFIG, virtualClock());
+    failed.markSubmitted('failed');
+    failed.markSyncEnd('failed', 8);
+    failed.markFailed('failed');
+    expect(failed.snapshot().transitions[0]).toMatchObject({
+      from: 'ramp',
+      to: 'backoff',
+      reason: 'failed',
+    });
+
+    const stalledClock = virtualClock();
+    const stalled = createAdaptiveLinkBudget(CONFIG, stalledClock);
+    stalled.markSubmitted('stalled');
+    stalled.markSyncEnd('stalled', 12);
+    await stalled.awaitSlot(() => false);
+    expect(stalled.snapshot().transitions[0]).toMatchObject({
+      from: 'ramp',
+      to: 'stalled',
+      reason: 'no-progress',
     });
   });
 

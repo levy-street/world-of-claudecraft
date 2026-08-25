@@ -240,6 +240,9 @@ interface Rig {
     /** onPinChanged: the immediate HUD-tracker nudge a pin toggle owes. */
     pinChanged: number;
   };
+  /** The host-held master switch behind the summary's eye toggle (the rig's
+   *  stand-in for the persisted showReliquaryTracker setting). */
+  tracker: { shown: boolean };
 }
 
 function makeWindow(state: WorldState, opts: { open?: boolean; nav?: ReliquaryNavId } = {}): Rig {
@@ -253,6 +256,7 @@ function makeWindow(state: WorldState, opts: { open?: boolean; nav?: ReliquaryNa
   const tooltips: Rig['tooltips'] = [];
   const restored: Rig['restored'] = [];
   const counts = { closeOthers: 0, hideTooltip: 0, captureFocus: 0, pinChanged: 0 };
+  const tracker = { shown: true };
 
   const deps: ReliquaryWindowDeps = {
     root: () => el,
@@ -331,6 +335,10 @@ function makeWindow(state: WorldState, opts: { open?: boolean; nav?: ReliquaryNa
     onPinChanged: () => {
       counts.pinChanged++;
     },
+    trackerShown: () => tracker.shown,
+    setTrackerShown: (shown) => {
+      tracker.shown = shown;
+    },
     itemIcon: (item) => `<img data-item-icon="${item.id}" alt="">`,
     moneyHtml: () => '',
     itemTooltip: (item) => `<div data-item-tooltip="${item.id}"></div>`,
@@ -341,7 +349,7 @@ function makeWindow(state: WorldState, opts: { open?: boolean; nav?: ReliquaryNa
 
   const w = new ReliquaryWindow(deps);
   if (opts.open !== false) w.open(opts.nav);
-  return { w, el, state, opener, tooltips, restored, counts };
+  return { w, el, state, opener, tooltips, restored, counts, tracker };
 }
 
 // ---------------------------------------------------------------------------
@@ -577,6 +585,24 @@ describe('ReliquaryWindow: focus survives a rebuild', () => {
     expect(document.activeElement).toBe(outside);
   });
 
+  it('moves focus NOWHERE on a rebuild while pointer focus is parked on the root (never to Close)', () => {
+    // The pointer-only focus drop (src/ui/pointer_blur.ts) parks a mouse click's
+    // focus on the window root; the root is not a control to restore, so the
+    // rebuild must leave it alone rather than fall through to Close.
+    const state = baseState();
+    const ids = relicIds(PAGE_ID);
+    for (const id of ids.slice(0, 4)) state.itemsDiscovered.add(id);
+    const rig = makeWindow(state, { nav: 'overview' });
+    const closeBefore = rig.el.querySelector('[data-close]');
+    expect(closeBefore).not.toBeNull();
+    rig.el.focus();
+    expect(document.activeElement).toBe(rig.el);
+    state.itemsDiscovered.add(ids[4] ?? '');
+    rig.w.refreshIfChanged();
+    expect(rig.el.querySelector('[data-close]')).not.toBe(closeBefore); // really rebuilt
+    expect(document.activeElement).toBe(rig.el);
+  });
+
   it('falls back to Close when the focused control is gone after the rebuild', () => {
     const state = baseState();
     const ids = relicIds(PAGE_ID);
@@ -721,6 +747,13 @@ describe('ReliquaryWindow: refreshIfChanged elision and per-dimension repaint', 
     expectDimension(rig, 'repeat obtain', () => {
       const id = relicIds(PAGE_ID)[2] ?? '';
       state.obtainCounts[id] = (state.obtainCounts[id] ?? 0) + 1;
+    });
+    // Painter-side dimension: the summary's eye renders from deps.trackerShown(),
+    // and the switch can flip OUTSIDE this window (the Options row) while it is
+    // open. Without the |t sig arm the eye would keep its stale pressed state
+    // until an unrelated dimension happened to move.
+    expectDimension(rig, 'tracker visibility switch', () => {
+      rig.tracker.shown = !rig.tracker.shown;
     });
   });
 
@@ -3457,5 +3490,72 @@ describe('population rarity', () => {
     rig.w.open();
     await landRarity(rig);
     expect(must(rig.el, '.reliquary-page-rarity').textContent).toContain('of collectors');
+  });
+});
+
+describe('ReliquaryWindow: the HUD-tracker eye toggle', () => {
+  const toggle = (el: HTMLElement): HTMLElement => must(el, '.reliquary-tracker-toggle');
+
+  it('renders on the summary band with the shown state: pressed, eye glyph, hide hint', () => {
+    const rig = makeWindow(baseState());
+    const btn = toggle(rig.el);
+    // Lives on the always-painted summary so it is reachable from every shelf.
+    expect(btn.closest('.reliquary-summary')).not.toBeNull();
+    expect(btn.getAttribute('aria-pressed')).toBe('true');
+    // The action hint rides the shared tooltip seam (this window never uses a
+    // native title attribute, the pinned contract above) and re-reads the live
+    // state, so ONE attachment serves both directions.
+    expect(tooltipFor(rig, btn)?.()).toContain('Hide the Reliquary tracker from your screen');
+    // The constant accessible name is the visible label; aria-pressed carries
+    // the state (the pressed-toggle contract, not the helm's action-label one).
+    expect(btn.textContent).toContain('HUD tracker');
+  });
+
+  it('renders the hidden state: unpressed, show hint', () => {
+    const rig = makeWindow(baseState());
+    rig.tracker.shown = false;
+    rig.w.render();
+    const btn = toggle(rig.el);
+    expect(btn.getAttribute('aria-pressed')).toBe('false');
+    expect(tooltipFor(rig, btn)?.()).toContain('Show the Reliquary tracker on your screen');
+  });
+
+  it('a click flips the host switch BOTH ways and repaints its own state', () => {
+    const rig = makeWindow(baseState());
+    toggle(rig.el).click();
+    expect(rig.tracker.shown).toBe(false);
+    expect(toggle(rig.el).getAttribute('aria-pressed')).toBe('false');
+    toggle(rig.el).click();
+    expect(rig.tracker.shown).toBe(true);
+    expect(toggle(rig.el).getAttribute('aria-pressed')).toBe('true');
+  });
+
+  it('keeps focus on the toggle across the repaint its own click triggers', () => {
+    const rig = makeWindow(baseState());
+    focusClick(rig.el, '.reliquary-tracker-toggle');
+    const focused = document.activeElement as HTMLElement | null;
+    expect(focused?.dataset.focusKey).toBe('tracker-toggle');
+    expect(focused?.getAttribute('aria-pressed')).toBe('false');
+  });
+
+  it('pinning a page while the tracker is hidden turns it back on', () => {
+    // The pin says "I want this on my screen": leaving the strip hidden would
+    // make the button look broken (the classic objective-tracker convention).
+    const rig = makeWindow(baseState(), { nav: 'conquerors' });
+    rig.tracker.shown = false;
+    must(rig.el, `.reliquary-pin[data-pin="${PAGE_ID}"]`).click();
+    expect([...rig.w.pinned]).toEqual([PAGE_ID]);
+    expect(rig.tracker.shown).toBe(true);
+  });
+
+  it('unpinning never touches the switch', () => {
+    const rig = makeWindow(baseState(), { nav: 'conquerors' });
+    must(rig.el, `.reliquary-pin[data-pin="${PAGE_ID}"]`).click();
+    expect([...rig.w.pinned]).toEqual([PAGE_ID]);
+    // Hidden AFTER the pin landed: the unpin below must leave it hidden.
+    rig.tracker.shown = false;
+    must(rig.el, `.reliquary-pin[data-pin="${PAGE_ID}"]`).click();
+    expect([...rig.w.pinned]).toEqual([]);
+    expect(rig.tracker.shown).toBe(false);
   });
 });

@@ -20,6 +20,7 @@ import {
   buildBagGrid,
   buildBagListRows,
   resolveDepositSubmit,
+  vendorSellIsInstant,
 } from '../src/ui/bags_view';
 
 // The bags core decides the mode-dependent click + tooltip (the 6-way branch) and
@@ -69,6 +70,7 @@ const ITEMS: Record<string, ItemDef> = {
     soulbound: true,
     noDiscard: true,
   } as ItemDef,
+  junk: { kind: 'junk', name: 'Vendor Trash', quality: 'poor' } as ItemDef,
 };
 const lookup: ItemLookup = (id) => ITEMS[id];
 
@@ -166,6 +168,46 @@ describe('bagItemAction priority order', () => {
     expect(bagItemAction(ITEMS.sword, { ...NO_MODE, petFeed: true })).toBe('petFeedBlocked');
     expect(bagItemAction(ITEMS.questItem, NO_MODE)).toBe('discardQuest');
     expect(bagItemAction(ITEMS.potion, NO_MODE)).toBe('use');
+  });
+});
+
+describe('vendorSellIsInstant (the plain-click vendor sale safety gate)', () => {
+  // The reported bug: selling gray junk one stack at a time (no confirm on a
+  // plain vendor click) could vendor an adjacent, unrelated, enchanted item on
+  // a single stray click, with no recourse beyond the bounded buyback list.
+  // Only true junk (poor quality, no instance payload) may sell on the spot;
+  // everything else routes the caller to a confirm prompt instead.
+  it('true junk (poor quality, no instance) sells instantly', () => {
+    expect(vendorSellIsInstant(ITEMS.junk)).toBe(true);
+    expect(vendorSellIsInstant(ITEMS.junk, undefined)).toBe(true);
+  });
+
+  it('anything above poor quality needs confirmation, even with no instance payload', () => {
+    expect(vendorSellIsInstant(ITEMS.sword)).toBe(false); // rare
+    expect(vendorSellIsInstant(ITEMS.potion)).toBe(false); // common
+    expect(vendorSellIsInstant(ITEMS.bound)).toBe(false); // uncommon
+  });
+
+  it('a poor-quality item carrying ANY instance payload also needs confirmation', () => {
+    // A poor-quality copy can still carry an enchant (professions/enchanting.ts's
+    // resolveApplyEnchantWorn gates on item kind/slot, never quality), so the
+    // instance check must stand even when quality alone would say "junk".
+    expect(vendorSellIsInstant(ITEMS.junk, { enchant: 'enchant_weapon_might' })).toBe(false);
+    expect(vendorSellIsInstant(ITEMS.junk, { boundTo: 7 })).toBe(false);
+    expect(vendorSellIsInstant(ITEMS.junk, { signer: 'Ayla' })).toBe(false);
+  });
+
+  it('an instanced non-junk copy needs confirmation on both counts', () => {
+    expect(vendorSellIsInstant(ITEMS.sword, { rolled: { stats: { str: 1 } } })).toBe(false);
+  });
+
+  it('a poor-quality PLAIN-STACK craftedRecipeId marker also needs confirmation', () => {
+    // craftedRecipeId is a SLOT-level field (InvSlot), deliberately kept off the
+    // instance payload so common crafted gear does not gain a signer/masterwork/
+    // enchant identity (types.ts). The gate must still catch it, or a poor-quality
+    // recipe-minted stack would misread as safe junk despite carrying provenance.
+    expect(vendorSellIsInstant(ITEMS.junk, undefined, 'recipe_tangled_weed')).toBe(false);
+    expect(vendorSellIsInstant(ITEMS.junk, undefined, undefined)).toBe(true);
   });
 });
 

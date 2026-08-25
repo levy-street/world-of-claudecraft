@@ -92,20 +92,82 @@ describe('mobile target-size: in-game touch controls are >=40x40 in landscape', 
     expectAtLeastFloor(toggle, 'compact #mobile-action-page-toggle');
   });
 
-  it('the left utility cluster (Autorun/Jump) and the Chat/More pair', () => {
+  it('the compact-tier tracker count chip: a 24px visual whose ::after hit extension is LIVE on all four sides', () => {
+    // The compact chip rule names both trackers in hud.mobile.css, but only
+    // #deed-tracker can be measured on touch here: body.mobile-touch hides
+    // #reliquary-tracker outright on this branch, so the deed arm is the live
+    // one. It is deliberately a 24px visual under the scaled
+    // minimap column; its 40px floor rides an invisible ::after hit extension
+    // (DESIGN.md 10.1, the char-playtime-eye idiom) instead of the box itself.
+    // getBoundingClientRect cannot see a pseudo-element, so expectAtLeastFloor
+    // would fail here on a CORRECT chip; this case proves the real geometry the
+    // other way: a hit 7px outside every edge of the visual box still lands on
+    // the button (the extension is live and unclipped), a hit 9px outside does
+    // not (the reach is bounded, so the positive hits are the extension and
+    // not some larger overlay), and visual + 2x reach clears the floor.
+    document.body.className = 'mobile-touch game-active hud-mobile-compact';
+    const stack = el('div', { id: 'right-tracker-stack' });
+    const tracker = el('div', { id: 'deed-tracker' });
+    const chip = el('button', { class: 'dt-header', 'aria-haspopup': 'dialog' });
+    const label = el('span', { class: 'dt-label' });
+    label.textContent = 'Deeds';
+    const tally = el('span', { class: 'dt-tally' });
+    tally.textContent = '(3)';
+    chip.append(el('span', { class: 'dt-chevron' }), label, tally);
+    tracker.appendChild(chip);
+    stack.appendChild(tracker);
+    document.body.appendChild(stack);
+
+    const r = chip.getBoundingClientRect();
+    // The visual box is the small chip, NOT the floor: the base sheet's
+    // pointer-coarse min-height: 40px is overridden by layer on this tier.
+    expect(r.height, `chip visual height ${r.height}`).toBeGreaterThanOrEqual(24 - EPSILON);
+    expect(r.height, `chip visual height ${r.height}`).toBeLessThan(TOUCH_FLOOR);
+    // The reach beyond the VISUAL (border) edge: an absolutely positioned
+    // pseudo-element's inset is measured from the padding edge, so the border
+    // width comes off (the probe that minted this case measured exactly that:
+    // inset -8px on the 1px-bordered chip hit-tested 7px out, a 38px box).
+    const reach =
+      Math.abs(Number.parseFloat(getComputedStyle(chip, '::after').top)) -
+      Number.parseFloat(getComputedStyle(chip).borderTopWidth);
+    expect(reach, 'the ::after reach beyond the border edge').toBe(8);
+    expect(r.height + 2 * reach, 'visual + 2x reach').toBeGreaterThanOrEqual(TOUCH_FLOOR - EPSILON);
+    const cx = r.left + r.width / 2;
+    const cy = r.top + r.height / 2;
+    const inside = reach - 1;
+    const outside = reach + 1;
+    expect(document.elementFromPoint(cx, r.top - inside), 'above').toBe(chip);
+    expect(document.elementFromPoint(cx, r.bottom + inside), 'below').toBe(chip);
+    expect(document.elementFromPoint(r.left - inside, cy), 'left').toBe(chip);
+    expect(document.elementFromPoint(r.right + inside, cy), 'right').toBe(chip);
+    expect(document.elementFromPoint(cx, r.top - outside), 'beyond the reach, above').not.toBe(
+      chip,
+    );
+    expect(document.elementFromPoint(cx, r.bottom + outside), 'beyond the reach, below').not.toBe(
+      chip,
+    );
+  });
+
+  it('the left utility cluster (Autorun/Jump) and the menu control with its strip', () => {
     const cluster = el('div', { id: 'mobile-utility-cluster' });
     const autorun = el('button', { id: 'mobile-autorun', class: 'mobile-btn' });
     const jump = el('button', { id: 'mobile-jump', class: 'mobile-btn' });
     cluster.append(autorun, jump);
     const combat = el('div', { id: 'mobile-combat-controls' });
-    const chat = el('button', { id: 'mobile-chat', class: 'mobile-btn' });
-    const more = el('button', { id: 'mobile-more', class: 'mobile-btn' });
-    combat.append(chat, more);
-    document.body.append(cluster, combat);
+    const anchor = el('button', { id: 'mobile-menu-anchor', class: 'mobile-btn' });
+    combat.append(anchor);
+    // The strip's items and its cancel target are tap targets too, and they size
+    // off --menu-btn-size rather than the retired row's 58x54 box.
+    const strip = el('div', { id: 'mobile-menu-strip', class: 'open' });
+    const item = el('button', { id: 'mobile-menu-mount', class: 'mobile-menu-item' });
+    const cancel = el('button', { id: 'mobile-menu-cancel' });
+    strip.append(item, cancel);
+    document.body.append(cluster, combat, strip);
     expectAtLeastFloor(autorun, '#mobile-autorun');
     expectAtLeastFloor(jump, '#mobile-jump');
-    expectAtLeastFloor(chat, '#mobile-chat');
-    expectAtLeastFloor(more, '#mobile-more');
+    expectAtLeastFloor(anchor, '#mobile-menu-anchor');
+    expectAtLeastFloor(item, '.mobile-menu-item');
+    expectAtLeastFloor(cancel, '#mobile-menu-cancel');
   });
 
   it('party-member rows (role=button tap targets)', () => {
@@ -297,5 +359,43 @@ describe('desktop target-size: dense list controls clear the >=24px SC 2.5.8 flo
     tab.textContent = 'Friends';
     document.body.appendChild(tab);
     expectAtLeastDesktopFloor(tab, '.soc-tab');
+  });
+
+  it("The Reliquary's HUD-tracker eye toggle: a ~20px chip whose ::after lifts it to the 36px desktop floor", () => {
+    // DESIGN.md 10.1 names a 36px minimum desktop hit target for new chrome,
+    // "via padding where the visual is smaller". The eye is a ~20px chip on the
+    // window's summary band with an invisible ::after hit extension of 8px each
+    // way (components.css); as with the compact chip above, the rect cannot see
+    // the pseudo-element, so the proof is a live hit just inside the reach on
+    // both vertical sides, a miss just beyond it, and visual + 2x reach >= 36.
+    const win = el('div', { id: 'reliquary-window', class: 'window panel' });
+    const summary = el('div', { class: 'reliquary-summary' });
+    const eye = el('button', { class: 'reliquary-tracker-toggle', 'aria-pressed': 'true' });
+    const icon = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+    icon.setAttribute('class', 'ui-icon');
+    const label = el('span', { class: 'reliquary-tracker-toggle-label' });
+    label.textContent = 'HUD tracker';
+    eye.append(icon, label);
+    summary.appendChild(eye);
+    win.appendChild(summary);
+    win.style.display = 'block';
+    document.body.appendChild(win);
+
+    const DESKTOP_CHROME_FLOOR = 36;
+    const r = eye.getBoundingClientRect();
+    expect(r.height, `eye visual height ${r.height}`).toBeLessThan(DESKTOP_CHROME_FLOOR);
+    // Reach beyond the border edge (inset is measured from the padding edge;
+    // see the compact chip case above).
+    const reach =
+      Math.abs(Number.parseFloat(getComputedStyle(eye, '::after').top)) -
+      Number.parseFloat(getComputedStyle(eye).borderTopWidth);
+    expect(reach, 'the ::after reach beyond the border edge').toBe(8);
+    expect(r.height + 2 * reach, 'visual + 2x reach').toBeGreaterThanOrEqual(
+      DESKTOP_CHROME_FLOOR - EPSILON,
+    );
+    const cx = r.left + r.width / 2;
+    expect(document.elementFromPoint(cx, r.top - (reach - 1)), 'above').toBe(eye);
+    expect(document.elementFromPoint(cx, r.bottom + (reach - 1)), 'below').toBe(eye);
+    expect(document.elementFromPoint(cx, r.top - (reach + 1)), 'beyond the reach').not.toBe(eye);
   });
 });

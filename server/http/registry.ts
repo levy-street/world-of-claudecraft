@@ -46,6 +46,7 @@ import { routes as seekerEntitlementRoutes } from '../seeker_entitlement';
 import { routes as steamRoutes } from '../steam';
 import { routes as userAssetsRoutes } from '../user_assets_routes';
 import { routes as walletRoutes } from '../wallet';
+import { routes as wocMarketRoutes } from '../woc_market_routes';
 // new:endpoint imports appear above this line (npm run new:endpoint)
 import { type CompiledPattern, compilePattern } from './path_pattern';
 import { createRouter, type MatchResult } from './router';
@@ -115,6 +116,14 @@ export interface ApiRegistry {
  *  - the secret-gated /internal ops surface (server/internal.ts:
  *    restart-countdown plus the Discord-bot routes behind
  *    requireInternalSecret);
+ *  - the $WOC Exchange family (server/woc_market_routes.ts: the bearer-gated
+ *    status/browse/detail/estimate/me/history reads, the mutating
+ *    listing/bid/bond/buy-now/settlement routes on per-action limiters with
+ *    owner loaders, and the moderation.read/act operator arms on the admin
+ *    surface; every player route and every operator WRITE answers
+ *    woc_market.disabled until WOC_MARKET_ENABLED=1, while the operator
+ *    reads, admin and internal, stay live so incident work can see residue
+ *    rows while the market is dark);
  * the oauth and internal surfaces are each served through their own flag-gated
  * dispatcher in main.ts.
  */
@@ -144,6 +153,7 @@ export const apiRoutes: readonly RouteDef[] = [
   ...otaUpdatesRoutes,
   ...reliquaryRoutes,
   ...adSpendRoutes,
+  ...wocMarketRoutes,
   // new:endpoint spreads appear above this line (npm run new:endpoint)
 ];
 

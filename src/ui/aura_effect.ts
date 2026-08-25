@@ -347,6 +347,10 @@ export function auraEffectDescriptor(a: AuraEffectInput): AuraEffectDescriptor |
     case 'faerie_fire':
       // Fixed-percent armor reduction (does not stack with Sunder).
       return { key: `${KEY}.armorPct`, nums: { pct: round(FAERIE_FIRE_ARMOR_PCT * 100) } };
+    case 'melting_acid':
+      // Percent armor reduction carried on the aura itself; shares the same
+      // max-combine group as Sunder and Faerie Fire, so it reads identically.
+      return { key: `${KEY}.armorPct`, nums: { pct: pctFromFrac(a.value) } };
     case 'corrode': {
       // Mob corrosion: a FLAT, stacking armor shred (value per stack). Keeps the
       // flat-reduction wording the old shared `sunder` kind used.

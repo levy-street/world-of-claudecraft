@@ -84,12 +84,27 @@ describe('a far re-skin swaps in only once its programs are linked', () => {
     expect(altSkinUrl).toBeTruthy();
 
     const visual = new CharacterVisual(VISUAL_KEY, 0xffffff, 0);
-    const gateCalls: { target: THREE.Object3D; settle: () => void }[] = [];
-    visual.setFarBakeGate((target, onSettled) => gateCalls.push({ target, settle: onSettled }));
     const farMesh = visual.root.getObjectByName('character_far_mesh') as THREE.Mesh;
     const farWrap = visual.root.getObjectByName('character_far_wrap') as THREE.Group;
     expect(farMesh).toBeTruthy();
     expect(farWrap).toBeTruthy();
+    // Skin atlases load on demand now (the eager boot sweep is gone), so the
+    // FIRST change to a cold atlas stages the far set twice: once from the
+    // embedded default, then again when ensureSkinTexture heals the real atlas
+    // in. That is the atlas arriving, not the compile gate's contract. Warm
+    // both atlases here, through the UNGATED path, so the accounting below
+    // measures one staging per skin change the way it always did.
+    visual.setSkin(1);
+    await vi.waitFor(() => {
+      expect(farMapName(farMesh)).toBe(altSkinUrl);
+    });
+    visual.setSkin(0);
+    await vi.waitFor(() => {
+      expect(farMapName(farMesh)).not.toBe(altSkinUrl);
+    });
+
+    const gateCalls: { target: THREE.Object3D; settle: () => void }[] = [];
+    visual.setFarBakeGate((target, onSettled) => gateCalls.push({ target, settle: onSettled }));
     // A fixed rig bakes its far mesh in the constructor, where the view's own
     // creation gate covers it: installing the gate afterwards gates nothing
     // retroactively, and the far crossing hands off immediately.

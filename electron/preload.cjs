@@ -183,6 +183,9 @@ contextBridge.exposeInMainWorld('wocDesktop', {
     if (mode !== 'borderless' && mode !== 'windowed') return Promise.resolve(false);
     return ipcRenderer.invoke('desktop-set-display-mode', mode);
   },
+  // One argument-free application exit capability. Main re-checks the sender
+  // and live window before accepting the normal app.quit lifecycle request.
+  quitApp: () => ipcRenderer.invoke('desktop-app-quit'),
   // Gamepad activity, so the shell can keep the display awake during a
   // controller-only session (gamepad input does not reset the OS idle timer).
   // Fire-and-forget from the renderer's input loop: it returns nothing and

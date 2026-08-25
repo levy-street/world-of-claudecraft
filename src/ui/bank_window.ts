@@ -51,7 +51,7 @@ import {
 import { markDialogRoot } from './dialog_root';
 import { itemDisplayName } from './entity_i18n';
 import { esc } from './esc';
-import { captureFocusKey, restoreFirstEnabled } from './focus_restore';
+import { captureFocusKey, focusedWithin, restoreFirstEnabled } from './focus_restore';
 import {
   GUILD_PANEL_ID,
   GUILD_TAB_ID,
@@ -405,7 +405,10 @@ export class BankWindow {
     // whether focus was inside the window or a prompt so it can re-land on the
     // fresh close button instead of dropping to <body> (WCAG 2.4.3).
     const active = document.activeElement as HTMLElement | null;
-    const hadFocus = el.contains(active) || active?.closest(BANK_PROMPT_SELECTOR) != null;
+    // focusedWithin, not a bare root-containment check: the pointer-only focus
+    // drop parks pointer focus on this root, and the parked root is not a control
+    // to re-land on (it resolves no key and would take the close-button fallback).
+    const hadFocus = focusedWithin(el) !== null || active?.closest(BANK_PROMPT_SELECTOR) != null;
     // Search focus survives a FULL rebuild too: the slow-band refreshIfChanged can
     // land a data repaint (a deposit's echo) moments after the player focused the
     // search box, and stealing focus to the close button mid-typing was a live bug

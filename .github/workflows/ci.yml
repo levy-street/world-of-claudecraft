@@ -552,6 +552,42 @@ jobs:
     timeout-minutes: 37
     runs-on: ubuntu-latest
 
+    # The real-SQL merge bar (ruling R16, recorded in the woc-marketplace
+    # hardening state): every shard leg gets its own Postgres so the
+    # floor-resident pg suites RUN here instead of skipping green on a
+    # missing TEST_DATABASE_URL. One isolated instance per job leg holds the
+    # suites' fixed-database-name contract (two concurrent batteries must
+    # never share a server). The health check lives in the service options
+    # so readiness needs no wait step; the password is a throwaway literal
+    # for an ephemeral loopback container, not a secret. Port 5432 on
+    # purpose: the vitest fallback DATABASE_URL names 5433 and must stay a
+    # dead letter. ACCEPTED COST, recorded: services boot before the first
+    # step regardless of the step gate, so docs-only and release-to-main
+    # legs pay a container boot to no-op, and a registry outage can red a
+    # leg that would have skipped green (the alternative, a separate
+    # DB-only job, would mint new required-check names; see
+    # docs/merge-queue.md before ever taking that trade).
+    # WOCC_EXPECT_PG arms the runtime sentinel (tests/ci_pg_presence.test.ts)
+    # on ANY runner brand: it travels in the same job-level env block the
+    # source pin fingerprints, so losing this block disarms nothing quietly.
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: wocc_ci
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres -d wocc_ci"
+          --health-interval 5s
+          --health-timeout 3s
+          --health-retries 20
+    env:
+      TEST_DATABASE_URL: postgres://postgres:postgres@127.0.0.1:5432/wocc_ci
+      WOCC_EXPECT_PG: '1'
+
     # fail-fast stays off: shards pass or fail independently, so one red shard
     # never cancels the others and a failure report always covers the whole
     # suite.
@@ -592,6 +628,7 @@ jobs:
             !/docs/screenshots/*/
             /docs/screenshots/admin-cheater-mark/
             /docs/screenshots/admin-guild-bank-panel/
+            /docs/screenshots/deed-border-cartouche/
             /docs/screenshots/eastbrook-grand-armoury/
             /docs/screenshots/eastbrook-vale-rebuild/
             /docs/screenshots/far-foliage-impostors/
@@ -606,6 +643,7 @@ jobs:
             /docs/screenshots/release-v036-skill-normalization-2026-08-10/
             /docs/screenshots/release-v039-icon-art-first-pass-2026-08-16/
             /docs/screenshots/wildheart/
+            /docs/screenshots/woc-market/
           sparse-checkout-cone-mode: false
           # Explicit for the reader; the sparse-checkout input
           # already implies it (matching the changes job's step).
@@ -804,6 +842,7 @@ jobs:
             !/docs/screenshots/*/
             /docs/screenshots/admin-cheater-mark/
             /docs/screenshots/admin-guild-bank-panel/
+            /docs/screenshots/deed-border-cartouche/
             /docs/screenshots/eastbrook-grand-armoury/
             /docs/screenshots/eastbrook-vale-rebuild/
             /docs/screenshots/far-foliage-impostors/
@@ -818,6 +857,7 @@ jobs:
             /docs/screenshots/release-v036-skill-normalization-2026-08-10/
             /docs/screenshots/release-v039-icon-art-first-pass-2026-08-16/
             /docs/screenshots/wildheart/
+            /docs/screenshots/woc-market/
           sparse-checkout-cone-mode: false
           # Explicit for the reader; the sparse-checkout input
           # already implies it (matching the changes job's step).
@@ -898,6 +938,7 @@ jobs:
             !/docs/screenshots/*/
             /docs/screenshots/admin-cheater-mark/
             /docs/screenshots/admin-guild-bank-panel/
+            /docs/screenshots/deed-border-cartouche/
             /docs/screenshots/eastbrook-grand-armoury/
             /docs/screenshots/eastbrook-vale-rebuild/
             /docs/screenshots/far-foliage-impostors/
@@ -912,6 +953,7 @@ jobs:
             /docs/screenshots/release-v036-skill-normalization-2026-08-10/
             /docs/screenshots/release-v039-icon-art-first-pass-2026-08-16/
             /docs/screenshots/wildheart/
+            /docs/screenshots/woc-market/
           sparse-checkout-cone-mode: false
           # Explicit for the reader; the sparse-checkout input
           # already implies it (matching the changes job's step).
@@ -1130,6 +1172,26 @@ jobs:
     timeout-minutes: 36
     runs-on: ubuntu-latest
 
+    # Same real-SQL wiring as pr-gate (ruling R16): a per-leg Postgres and
+    # TEST_DATABASE_URL so the pg suites run at the release bar too.
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: wocc_ci
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres -d wocc_ci"
+          --health-interval 5s
+          --health-timeout 3s
+          --health-retries 20
+    env:
+      TEST_DATABASE_URL: postgres://postgres:postgres@127.0.0.1:5432/wocc_ci
+      WOCC_EXPECT_PG: '1'
+
     # No I18N_RELEASE_TIER here BY DESIGN (D8 revised, issue #2820). This job runs
     # the suite at PR tier so a red shard always means a real regression. The
     # release tier lives in the release-i18n job below, over the tier-sensitive
@@ -1155,6 +1217,7 @@ jobs:
             !/docs/screenshots/*/
             /docs/screenshots/admin-cheater-mark/
             /docs/screenshots/admin-guild-bank-panel/
+            /docs/screenshots/deed-border-cartouche/
             /docs/screenshots/eastbrook-grand-armoury/
             /docs/screenshots/eastbrook-vale-rebuild/
             /docs/screenshots/far-foliage-impostors/
@@ -1169,6 +1232,7 @@ jobs:
             /docs/screenshots/release-v036-skill-normalization-2026-08-10/
             /docs/screenshots/release-v039-icon-art-first-pass-2026-08-16/
             /docs/screenshots/wildheart/
+            /docs/screenshots/woc-market/
           sparse-checkout-cone-mode: false
           # Explicit for the reader; the sparse-checkout input
           # already implies it (matching the changes job's step).
@@ -1247,6 +1311,7 @@ jobs:
             !/docs/screenshots/*/
             /docs/screenshots/admin-cheater-mark/
             /docs/screenshots/admin-guild-bank-panel/
+            /docs/screenshots/deed-border-cartouche/
             /docs/screenshots/eastbrook-grand-armoury/
             /docs/screenshots/eastbrook-vale-rebuild/
             /docs/screenshots/far-foliage-impostors/
@@ -1261,6 +1326,7 @@ jobs:
             /docs/screenshots/release-v036-skill-normalization-2026-08-10/
             /docs/screenshots/release-v039-icon-art-first-pass-2026-08-16/
             /docs/screenshots/wildheart/
+            /docs/screenshots/woc-market/
           sparse-checkout-cone-mode: false
           filter: blob:none
 

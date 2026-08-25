@@ -118,12 +118,14 @@ describe('Litany of Guilt covers the early Hexcraft levels', () => {
     if (rankTwo?.type !== 'afflictionLitany') throw new Error('missing rank 2 Litany');
     expect(rankTwo.maxTargets).toBe(4);
     expect(rankTwo.duration).toBe(8);
-    expect(rankTwo.damage).toBe(10);
+    // 11 and 16 below: the authored 9/14 through the 10% mastery plus the
+    // 2026-08-23 viability floor's affliction spellDmgPct 0.07.
+    expect(rankTwo.damage).toBe(11);
 
     const rankThree = knownEffects('affliction', 20, 'litany_of_guilt').find(
       (effect) => effect.type === 'afflictionLitany',
     );
     if (rankThree?.type !== 'afflictionLitany') throw new Error('missing rank 3 Litany');
-    expect(rankThree.damage).toBe(15);
+    expect(rankThree.damage).toBe(16);
   });
 });

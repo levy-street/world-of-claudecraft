@@ -1,9 +1,12 @@
+import type { ItemWeaponType } from '../sim/content/weapon_skin_rules';
 import type { WeaponSkinCollection, WeaponSkinDef } from '../sim/content/weapon_skins';
-import type { WeaponSkinType } from '../sim/types';
 import { type TranslationKey, t } from './i18n';
 import type { ArmorySkinRow } from './woc_store_view';
 
-export function weaponTypeLabel(type: WeaponSkinType): string {
+/** Widened to the full item vocabulary (WeaponSkinType plus polearm) for the
+ *  Exchange's weapon-type filter; the Armory's skin surfaces keep passing
+ *  the narrower skin type and are unaffected. */
+export function weaponTypeLabel(type: ItemWeaponType): string {
   switch (type) {
     case 'sword':
       return t('hudChrome.wocStore.wtype.sword');
@@ -21,6 +24,8 @@ export function weaponTypeLabel(type: WeaponSkinType): string {
       return t('hudChrome.wocStore.wtype.bow');
     case 'crossbow':
       return t('hudChrome.wocStore.wtype.crossbow');
+    case 'polearm':
+      return t('hudChrome.wocStore.wtype.polearm');
   }
 }
 

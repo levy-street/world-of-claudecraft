@@ -13,7 +13,8 @@ import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
 import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js';
 import { WEAPON_SKINS } from '../sim/content/weapon_skins';
 import { CharacterVisual } from './characters';
-import { weaponSkinDisplayModel } from './characters/assets';
+import { onCharacterAssetReady, weaponSkinDisplayModel } from './characters/assets';
+import { weaponSkinModelUrl } from './characters/manifest';
 import {
   appearanceSignature,
   type PreviewAppearance,
@@ -390,6 +391,25 @@ export function createArmoryPreview(
   };
   const observer = new ResizeObserver(resize);
   observer.observe(container);
+  const unsubscribeCharacterAssetReady = onCharacterAssetReady((url) => {
+    if (disposed) return;
+    for (const [id, rig] of characterRigs) {
+      if (!id || weaponSkinModelUrl(id) !== url) continue;
+      if (rig === visual && skinId === id) rig.refreshWeaponSkin();
+      else {
+        rig.dispose();
+        characterRigs.delete(id);
+      }
+    }
+    if (!skinId || weaponSkinModelUrl(skinId) !== url) return;
+    activeWeaponRig = ensureWeaponRig(skinId);
+    if (activeWeaponRig) {
+      activeWeaponRig.root.visible = true;
+      activeWeaponRig.vfx?.setPixelScale(pixelHeight());
+    }
+    applyScene();
+    frameCamera();
+  });
 
   applyScene();
   applyMode();
@@ -430,6 +450,7 @@ export function createArmoryPreview(
     dispose(): void {
       if (disposed) return;
       disposed = true;
+      unsubscribeCharacterAssetReady();
       if (raf !== null) cancelAnimationFrame(raf);
       observer.disconnect();
       disposeWeaponRigs();

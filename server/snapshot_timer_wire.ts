@@ -31,7 +31,7 @@ interface StableAuraRecord {
   unbreakableControl: boolean;
   undispellable: boolean;
   // Presence of a break threshold (Lingering Dread), never the live soak value
-  // - that decrements per hit and would churn this cache (see game.ts WireAura.bt).
+  // - that decrements per hit and would churn this cache (see WireAura.bt below).
   breakArmed: boolean;
   paused: boolean;
   permanent: boolean;
@@ -80,7 +80,7 @@ function sameStringList(
 // engine banks (druid/shaman/hunter spec engines): their badge and tooltip
 // teach the live stage including 0 and 1, and the decode side cannot tell
 // "absent because 1" from "absent because 0", so the count is always sent.
-// Mirrors the legacy wireAura stacks rule in server/game.ts exactly, so both
+// Mirrors the legacy wireAura stacks rule (wireAura below) exactly, so both
 // encoders cannot drift.
 function wireStacks(aura: Aura): number | undefined {
   if (isPersistentEngineAura(aura.id)) return aura.stacks ?? 0;
@@ -438,4 +438,115 @@ export class StableSelfTimerWireCache {
     };
     return this.chargeRechargeResult;
   }
+}
+
+export interface WireAura {
+  id: string;
+  name: string;
+  kind: string;
+  rem: number;
+  dur: number;
+  perm?: 1;
+  // The aura's magnitude, so buff/debuff hover tooltips show the REAL numbers online, exactly
+  // as offline (the descriptor in src/ui/aura_effect.ts reads value per kind: flat stat amount,
+  // slow/haste multiplier, dot/hot per-tick, absorb remaining, ...). Sent RAW (like `dur`, not
+  // round2) so the exact number and its sign survive JSON: round2 could turn a tiny negative
+  // into -0 -> 0 and flip a stat-sap's isAuraDebuff classification. Omitted only when exactly 0,
+  // which decodes back to 0, so value-less auras and an old server are unchanged.
+  value?: number;
+  // Optional secondary aura values: imbue judgement's min/max damage range and
+  // Greater Invisibility's reduction/aftereffect duration.
+  value2?: number;
+  value3?: number;
+  // dot/hot tick cadence in seconds, so the tooltip's "every N sec" is right online.
+  tickInterval?: number;
+  // damage/heal school for dot/absorb/thorns tooltips. Physical is the client's decode default,
+  // so only a non-physical school needs to ride the wire.
+  school?: string;
+  stacks?: number;
+  // Remaining charges on a charge-limited aura (Lightning Shield's reflect count). Sent only
+  // when defined, so ordinary auras stay off the wire and decode to undefined as before; the
+  // client badge prefers this over stacks (auras_view). A pure cosmetic count, not actionable
+  // information a graphics preset could hide, so it rides the wire unconditionally when present.
+  charges?: number;
+  // Next-cast empowerment scope. Omitted for unscoped empowerment auras, which match any
+  // eligible cast just like the sim helper.
+  emp?: string[];
+  // The caster's entity id, so the client's target strip can lead with and enlarge the
+  // viewer's OWN dots/hots (auras_view ownFirst). A shared per-entity value (never
+  // per-viewer), so the per-entity dyn cache keeps eliding; an old client ignores it and
+  // an old server's omission decodes to 0, which matches no player id.
+  src?: number;
+  // Encounter-owned control marker. Omitted for ordinary auras.
+  ub?: 1;
+  // No-player-counter-may-shed marker (the recovery sicknesses). Presence only: the
+  // client reads it through the same isPlayerRemovableAura predicate the sim uses, so
+  // the buff bar never offers a right-click cancel the server would refuse. Omitted for
+  // ordinary auras, and an old server's omission decodes to undefined, as before.
+  und?: 1;
+  // Break-threshold ARMED marker (Lingering Dread's soak-before-snap fear):
+  // presence only, never the live soak value - the number decrements per hit
+  // and would churn the stable aura cache, while the client (the victim-worn
+  // dread band in src/render/ability_vfx) only keys on whether the talent
+  // armed the fear at all. Omitted for ordinary auras.
+  bt?: 1;
+}
+
+// Builds one aura's wire record via direct assignment rather than chained
+// conditional spreads (`...(cond ? {...} : {})`), which allocated a throwaway
+// object literal per branch regardless of which side taken. This runs for
+// every aura on every entity every tick (dynamicFields in server/game.ts is unconditional
+// per-entity, per-tick, even when wireCacheFor's diff ends up eliding the
+// result), so at raid-sized entity/aura counts and 20 Hz the spread form was a
+// measurable source of short-lived garbage. Output is byte-identical to the
+// prior spread chain; only the allocation shape changed.
+// A pre-v3 recipient ignores `perm`. Give it a large finite timer that is
+// refreshed by ordinary legacy aura snapshots, so rolling deploys keep the
+// aura visible instead of decoding the v3 sentinel as already expired.
+const LEGACY_PERMANENT_AURA_SECONDS = 7 * 24 * 60 * 60;
+
+export function wireAura(a: Aura): WireAura {
+  const permanent = a.permanent === true;
+  const w: WireAura = {
+    id: a.id,
+    name: a.name,
+    kind: a.kind,
+    rem: permanent ? LEGACY_PERMANENT_AURA_SECONDS : round2(a.remaining),
+    dur: permanent ? LEGACY_PERMANENT_AURA_SECONDS : a.duration,
+  };
+  if (permanent) w.perm = 1;
+  // Carry the aura's magnitude so buff/debuff hover tooltips show the real numbers online,
+  // not 0 (the descriptor in src/ui/aura_effect.ts reads value per kind). Sent RAW (like
+  // `dur`, not round2) so the exact number and its sign survive JSON, keeping a negative
+  // stat-sap's isAuraDebuff classification intact (round2 could turn a tiny negative into
+  // -0 -> 0). Omitted only when exactly 0, which decodes back to 0, so value-less auras and
+  // an old server are unchanged. A hover tooltip magnitude is non-actionable cosmetic text,
+  // so sending it cannot let a graphics preset hide anything (graphics-settings fairness).
+  if (a.value !== 0) w.value = a.value;
+  // Optional secondary aura values (imbue range or Greater Invisibility aftereffect);
+  // dot/hot cadence; non-physical school. Each rides only when it carries meaning, so
+  // ordinary auras stay lean and decode to their defaults.
+  if (a.value2 !== undefined) w.value2 = a.value2;
+  if (a.value3 !== undefined) w.value3 = a.value3;
+  if (a.tickInterval !== undefined) w.tickInterval = a.tickInterval;
+  if (a.school !== 'physical') w.school = a.school;
+  // Stacks are omitted below 2 as a sparsity rule, EXCEPT for the persistent
+  // engine banks (druid/shaman/hunter spec engines): their badge and tooltip
+  // teach the live stage including 0 and 1, and the decode side cannot tell
+  // "absent because 1" from "absent because 0", so the count is always sent.
+  if (isPersistentEngineAura(a.id)) w.stacks = a.stacks ?? 0;
+  else if (a.stacks && a.stacks > 1) w.stacks = a.stacks;
+  // Carry the remaining charges only for a charge-limited aura (Lightning Shield), so the
+  // buff icon can badge the count online exactly as offline; undefined for every other aura.
+  if (a.charges !== undefined) w.charges = a.charges;
+  // Next-cast empowerment scope. Omitted for unscoped empowerment auras, which match any
+  // eligible cast just like the sim helper.
+  if (a.empowerAbilities !== undefined) w.emp = a.empowerAbilities;
+  // The caster's entity id, for the client's own-aura prominence on the target strip
+  // (auras_view ownFirst). Omitted for the rare 0/absent source, which decodes to 0.
+  if (a.sourceId) w.src = a.sourceId;
+  if (a.unbreakableControl) w.ub = 1;
+  if (a.undispellable) w.und = 1;
+  if (a.breakThreshold !== undefined) w.bt = 1;
+  return w;
 }

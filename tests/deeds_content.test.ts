@@ -829,6 +829,13 @@ describe('table shape', () => {
     }
   });
 
+  it('the Brightwood relic feat desc states the relics can no longer be found', () => {
+    // feat_brightwood_relic is permanently unobtainable by design (both source
+    // items only ever dropped from retired Brightwood content); players who
+    // read a stuck 0/1 without this caveat report it as a broken achievement.
+    expect(DEEDS.feat_brightwood_relic.desc).toContain('no longer drop');
+  });
+
   it('the Peaks chapter descs carry the renamed Thornpeak chronicler', () => {
     // The display name was renamed to Zenzie (template id retained for save
     // compatibility); the catalog must never regress to the old name.

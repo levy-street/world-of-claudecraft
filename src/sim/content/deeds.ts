@@ -1803,11 +1803,16 @@ export const DEEDS: Record<string, DeedDef> = {
   // be created. Holders earn it at login or receipt (the items are unbound,
   // so they still trade); a fresh realm can never mint a first earner. That
   // is the intended nature of this feat class, it stays visible as a history
-  // marker, and feat deeds are excluded from BOOK_COMPLETE_REQUIREMENTS.
+  // marker, and feat deeds are excluded from BOOK_COMPLETE_REQUIREMENTS. The
+  // desc states the no-longer-drops fact directly (the col_reliquary_complete
+  // caveat-sentence precedent) since players otherwise read a stuck 0/1 as a
+  // broken achievement and report it as a bug.
   feat_brightwood_relic: {
     id: 'feat_brightwood_relic',
     name: 'Brightwood Remembered',
-    desc: "Keep a relic of the old Brightwood: the Bramblehide Jerkin or the Monarch's Crown.",
+    desc:
+      "Keep a relic of the old Brightwood: the Bramblehide Jerkin or the Monarch's Crown. " +
+      'The relics no longer drop; only a trade with an existing holder can pass one on.',
     category: 'feat',
     renown: 0,
     trigger: {

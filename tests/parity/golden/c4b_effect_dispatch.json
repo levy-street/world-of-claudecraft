@@ -67,7 +67,7 @@
       "tick": 20,
       "time": 1,
       "nextId": 974,
-      "state": "ead77b93",
+      "state": "345042fe",
       "events": "d650494d",
       "rng": {
         "draws": 2,
@@ -78,7 +78,7 @@
       "tick": 25,
       "time": 1.25,
       "nextId": 974,
-      "state": "0aa5d5ca",
+      "state": "adaf4f93",
       "events": "741638a5",
       "rng": {
         "draws": 2,
@@ -89,7 +89,7 @@
       "tick": 30,
       "time": 1.5,
       "nextId": 974,
-      "state": "28909154",
+      "state": "ad7cb7f5",
       "events": "dc36a095",
       "rng": {
         "draws": 2,
@@ -100,7 +100,7 @@
       "tick": 34,
       "time": 1.7,
       "nextId": 974,
-      "state": "23b0c330",
+      "state": "cebf1d79",
       "events": "8d96cdaf",
       "rng": {
         "draws": 4,
@@ -492,6 +492,9 @@
               "footpad_jerkin",
               "gnarled_staff",
               "spring_water"
+            ],
+            "visited": [
+              "poi:eastbrook_vale:reliquary_hill"
             ]
           },
           "deedsEarned": [
@@ -1054,7 +1057,7 @@
       "tick": 35,
       "time": 1.75,
       "nextId": 974,
-      "state": "2ca92d6d",
+      "state": "6b69a740",
       "events": "d1d1291c",
       "rng": {
         "draws": 4,
@@ -1065,7 +1068,7 @@
       "tick": 40,
       "time": 2,
       "nextId": 974,
-      "state": "d6aac5f6",
+      "state": "80743017",
       "events": "741638a5",
       "rng": {
         "draws": 4,
@@ -1076,7 +1079,7 @@
       "tick": 45,
       "time": 2.25,
       "nextId": 974,
-      "state": "ba2207e9",
+      "state": "d6cf3d14",
       "events": "741638a5",
       "rng": {
         "draws": 48,
@@ -1087,7 +1090,7 @@
       "tick": 50,
       "time": 2.5,
       "nextId": 974,
-      "state": "5ead59f1",
+      "state": "0e80552c",
       "events": "741638a5",
       "rng": {
         "draws": 80,
@@ -1098,7 +1101,7 @@
       "tick": 55,
       "time": 2.75,
       "nextId": 974,
-      "state": "e0014289",
+      "state": "e8b34ab4",
       "events": "741638a5",
       "rng": {
         "draws": 113,
@@ -1109,7 +1112,7 @@
       "tick": 60,
       "time": 3,
       "nextId": 974,
-      "state": "614a007e",
+      "state": "9f4a95ef",
       "events": "741638a5",
       "rng": {
         "draws": 137,
@@ -1120,7 +1123,7 @@
       "tick": 65,
       "time": 3.25,
       "nextId": 974,
-      "state": "e1313993",
+      "state": "f10c80fe",
       "events": "741638a5",
       "rng": {
         "draws": 176,
@@ -1131,7 +1134,7 @@
       "tick": 70,
       "time": 3.5,
       "nextId": 974,
-      "state": "8e20f99e",
+      "state": "acd6968f",
       "events": "741638a5",
       "rng": {
         "draws": 221,
@@ -1142,7 +1145,7 @@
       "tick": 75,
       "time": 3.75,
       "nextId": 974,
-      "state": "39bdbf8b",
+      "state": "7a330dc6",
       "events": "741638a5",
       "rng": {
         "draws": 268,
@@ -1153,7 +1156,7 @@
       "tick": 80,
       "time": 4,
       "nextId": 974,
-      "state": "9f3617d9",
+      "state": "5d66a944",
       "events": "741638a5",
       "rng": {
         "draws": 306,
@@ -1164,7 +1167,7 @@
       "tick": 85,
       "time": 4.25,
       "nextId": 974,
-      "state": "24194b18",
+      "state": "86687451",
       "events": "741638a5",
       "rng": {
         "draws": 355,
@@ -1175,7 +1178,7 @@
       "tick": 90,
       "time": 4.5,
       "nextId": 974,
-      "state": "cea6fbfd",
+      "state": "a57faa10",
       "events": "741638a5",
       "rng": {
         "draws": 402,
@@ -1186,7 +1189,7 @@
       "tick": 95,
       "time": 4.75,
       "nextId": 974,
-      "state": "145f6fdd",
+      "state": "69cfb8f0",
       "events": "741638a5",
       "rng": {
         "draws": 455,
@@ -1197,7 +1200,7 @@
       "tick": 100,
       "time": 5,
       "nextId": 974,
-      "state": "b72801f1",
+      "state": "3e68fd2c",
       "events": "741638a5",
       "rng": {
         "draws": 514,
@@ -1208,7 +1211,7 @@
       "tick": 105,
       "time": 5.25,
       "nextId": 974,
-      "state": "972bf3e6",
+      "state": "62cf5447",
       "events": "741638a5",
       "rng": {
         "draws": 566,
@@ -1219,7 +1222,7 @@
       "tick": 110,
       "time": 5.5,
       "nextId": 974,
-      "state": "b0a5688b",
+      "state": "ddff76c6",
       "events": "741638a5",
       "rng": {
         "draws": 609,
@@ -1230,7 +1233,7 @@
       "tick": 115,
       "time": 5.75,
       "nextId": 974,
-      "state": "3cb91578",
+      "state": "b86c8e31",
       "events": "741638a5",
       "rng": {
         "draws": 662,
@@ -1241,7 +1244,7 @@
       "tick": 120,
       "time": 6,
       "nextId": 974,
-      "state": "8d659730",
+      "state": "32caf179",
       "events": "741638a5",
       "rng": {
         "draws": 718,
@@ -1252,7 +1255,7 @@
       "tick": 125,
       "time": 6.25,
       "nextId": 974,
-      "state": "3ead3db8",
+      "state": "a14fc571",
       "events": "741638a5",
       "rng": {
         "draws": 777,
@@ -1263,7 +1266,7 @@
       "tick": 130,
       "time": 6.5,
       "nextId": 974,
-      "state": "dbc3ec4e",
+      "state": "bed2813f",
       "events": "741638a5",
       "rng": {
         "draws": 825,
@@ -1274,7 +1277,7 @@
       "tick": 135,
       "time": 6.75,
       "nextId": 975,
-      "state": "a88d754a",
+      "state": "a2338f13",
       "events": "b3dd3f41",
       "rng": {
         "draws": 882,
@@ -1285,7 +1288,7 @@
       "tick": 135,
       "time": 6.75,
       "nextId": 975,
-      "state": "a88d754a",
+      "state": "a2338f13",
       "events": "741638a5",
       "rng": {
         "draws": 882,
@@ -1677,6 +1680,9 @@
               "footpad_jerkin",
               "gnarled_staff",
               "spring_water"
+            ],
+            "visited": [
+              "poi:eastbrook_vale:reliquary_hill"
             ]
           },
           "deedsEarned": [
@@ -2225,7 +2231,7 @@
       "tick": 135,
       "time": 6.75,
       "nextId": 976,
-      "state": "e12c227f",
+      "state": "22932082",
       "events": "ae49b4a0",
       "rng": {
         "draws": 883,
@@ -2617,6 +2623,9 @@
               "footpad_jerkin",
               "gnarled_staff",
               "spring_water"
+            ],
+            "visited": [
+              "poi:eastbrook_vale:reliquary_hill"
             ]
           },
           "deedsEarned": [
@@ -3234,7 +3243,7 @@
       "tick": 135,
       "time": 6.75,
       "nextId": 978,
-      "state": "0b7bea61",
+      "state": "f564f1dc",
       "events": "919256e2",
       "rng": {
         "draws": 885,
@@ -3631,6 +3640,9 @@
               "footpad_jerkin",
               "gnarled_staff",
               "spring_water"
+            ],
+            "visited": [
+              "poi:eastbrook_vale:reliquary_hill"
             ]
           },
           "deedsEarned": [
@@ -4356,7 +4368,7 @@
       "tick": 135,
       "time": 6.75,
       "nextId": 979,
-      "state": "ab51936f",
+      "state": "22e80032",
       "events": "518f1a5b",
       "rng": {
         "draws": 890,
@@ -4757,6 +4769,9 @@
               "footpad_jerkin",
               "gnarled_staff",
               "spring_water"
+            ],
+            "visited": [
+              "poi:eastbrook_vale:reliquary_hill"
             ]
           },
           "deedsEarned": [
@@ -5555,7 +5570,7 @@
       "tick": 135,
       "time": 6.75,
       "nextId": 980,
-      "state": "8e5c43a0",
+      "state": "5235c6a9",
       "events": "61a9ef0b",
       "rng": {
         "draws": 891,
@@ -5960,6 +5975,9 @@
               "footpad_jerkin",
               "gnarled_staff",
               "spring_water"
+            ],
+            "visited": [
+              "poi:eastbrook_vale:reliquary_hill"
             ]
           },
           "deedsEarned": [
@@ -6842,7 +6860,7 @@
       "tick": 135,
       "time": 6.75,
       "nextId": 981,
-      "state": "0c784e7a",
+      "state": "b12e8243",
       "events": "3f5f417b",
       "rng": {
         "draws": 891,
@@ -7247,6 +7265,9 @@
               "footpad_jerkin",
               "gnarled_staff",
               "spring_water"
+            ],
+            "visited": [
+              "poi:eastbrook_vale:reliquary_hill"
             ]
           },
           "deedsEarned": [
@@ -8184,7 +8205,7 @@
       "tick": 135,
       "time": 6.75,
       "nextId": 981,
-      "state": "c29d6c89",
+      "state": "184af4b4",
       "events": "848b8da9",
       "rng": {
         "draws": 891,
@@ -8589,6 +8610,9 @@
               "footpad_jerkin",
               "gnarled_staff",
               "spring_water"
+            ],
+            "visited": [
+              "poi:eastbrook_vale:reliquary_hill"
             ]
           },
           "deedsEarned": [
@@ -9528,7 +9552,7 @@
       "tick": 135,
       "time": 6.75,
       "nextId": 981,
-      "state": "c29d6c89",
+      "state": "184af4b4",
       "events": "741638a5",
       "rng": {
         "draws": 891,
@@ -9933,6 +9957,9 @@
               "footpad_jerkin",
               "gnarled_staff",
               "spring_water"
+            ],
+            "visited": [
+              "poi:eastbrook_vale:reliquary_hill"
             ]
           },
           "deedsEarned": [

@@ -251,8 +251,9 @@ describe('Affliction Warlock', () => {
       expect.arrayContaining([expect.objectContaining({ type: 'afflictionLitany', damage: 14 })]),
     );
     expect(litany?.duration).toBe(8);
-    // 14 authored, 15 resolved: the Hexcraft mastery covers Litany now.
-    expect(litany?.value).toBe(15);
+    // 14 authored, 16 resolved: the Hexcraft mastery covers Litany, and the
+    // 2026-08-23 viability floor adds spellDmgPct 0.07 on top.
+    expect(litany?.value).toBe(16);
     expect(litany?.value2).toBe(8);
     expect(litany?.value3).toBe(4);
     const friendly = addTarget(sim, 11.5);
@@ -273,7 +274,7 @@ describe('Affliction Warlock', () => {
 
     expect(doomValue(sim.player)).toBe(5);
     expect(litanyHits).toHaveLength(4);
-    expect(new Set(litanyHits.map((event) => event.amount))).toEqual(new Set([15]));
+    expect(new Set(litanyHits.map((event) => event.amount))).toEqual(new Set([16]));
     expect(new Set(litanyHits.map((event) => event.targetId))).toEqual(
       new Set(nearby.slice(0, 4).map((target) => target.id)),
     );
@@ -1441,8 +1442,11 @@ describe('Affliction Warlock', () => {
     ctx(sim).dealDamage(target, victim, 10, false, 'physical', 'Claw', 'hit');
 
     expect(doomValue(sim.player)).toBe(9);
-    expect(target.hp).toBe(hpBefore - 16);
-    expect(ABILITIES.hex_of_violence.description).toContain('16 Shadow damage');
+    // 16 authored, 17 dealt and advertised: the 2026-08-23 viability floor's
+    // spellDmgPct 0.07 always applies (the ability is affliction-locked), so
+    // the copy states the resolved value per the tooltip-writing rule.
+    expect(target.hp).toBe(hpBefore - 17);
+    expect(ABILITIES.hex_of_violence.description).toContain('17 Shadow damage');
   });
 
   it('safely clears Hex of Violence when its reprisal kills the acting enemy', () => {
@@ -1580,7 +1584,9 @@ describe('Affliction Warlock', () => {
       expect(doomValue(sim.player)).toBe(0);
     }
 
-    expect(losses).toEqual([83, 242, 375, 551]);
+    // The 2026-08-23 viability floor (spellDmgPct 0.07) rides the shared
+    // damage multiplier, so every anchor tier moves by the same 7%.
+    expect(losses).toEqual([89, 257, 399, 586]);
   });
 
   it('compresses Sentence and its demonic echo only across levels 17 to 20', () => {
@@ -1731,7 +1737,7 @@ describe('Affliction Warlock', () => {
     healingSim.player.hp = 1;
     gainDoom(ctx(healingSim), healingSim.player, 50);
     finishCast(healingSim, 'sentence', healingTarget);
-    expect(healingSim.player.hp).toBe(49);
+    expect(healingSim.player.hp).toBe(52);
 
     const splashSim = makeAffliction(502);
     const splashTarget = addTarget(splashSim, 8);
@@ -1742,7 +1748,7 @@ describe('Affliction Warlock', () => {
     const nearHp = nearby.hp;
     const farHp = distant.hp;
     finishCast(splashSim, 'sentence', splashTarget);
-    expect(nearHp - nearby.hp).toBe(131);
+    expect(nearHp - nearby.hp).toBe(140);
     expect(distant.hp).toBe(farHp);
 
     const bossSim = makeAffliction(503);
@@ -1767,9 +1773,9 @@ describe('Affliction Warlock', () => {
             event.type === 'damage' && event.targetId === boss.id && event.ability === 'Sentence',
         )
         .reduce((sum, event) => sum + (event.type === 'damage' ? event.amount : 0), 0),
-    ).toBe(579);
+    ).toBe(615);
     expect(boss.hp).toBeLessThan(bossHp);
-    expect(bossNearbyHp - bossNearby.hp).toBe(193);
+    expect(bossNearbyHp - bossNearby.hp).toBe(205);
 
     const executeSim = makeAffliction(504);
     const executeTarget = addTarget(executeSim);
@@ -2054,7 +2060,7 @@ describe('Affliction Warlock', () => {
     gainDoom(ctx(sim), sim.player, 13);
     const formerPrimaryHp = primary.hp;
     const events = finishCast(sim, 'sentence', secondary);
-    expect(formerPrimaryHp - primary.hp).toBe(31);
+    expect(formerPrimaryHp - primary.hp).toBe(33);
     expect(sentenceBursts(events)).toHaveLength(1);
   });
 
@@ -2082,7 +2088,7 @@ describe('Affliction Warlock', () => {
     // Coven echoes 35% of the shared mastery-adjusted verdict, not 35% of the
     // boss-only 20% amplified primary hit. Moving it out of the splash radius
     // isolates the Coven component.
-    expect(secondaryHp - secondary.hp).toBe(193);
+    expect(secondaryHp - secondary.hp).toBe(205);
   });
 
   it('requires the primary Evil Eye for Sentence and preserves resources on a secondary Eye', () => {

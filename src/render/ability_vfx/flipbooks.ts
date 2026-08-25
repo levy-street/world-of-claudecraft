@@ -32,9 +32,11 @@ export function asFlipbookStyle(s: string): FlipbookStyle {
 export class ImpactFlipbooks {
   private slots: FlipSlot[] = [];
   private next = 0;
+  private readonly geometry: THREE.PlaneGeometry;
+  private disposed = false;
 
   constructor(scene: THREE.Scene) {
-    const geo = new THREE.PlaneGeometry(1, 1);
+    this.geometry = new THREE.PlaneGeometry(1, 1);
     const proto = new THREE.ShaderMaterial({
       uniforms: {
         uMap: { value: null },
@@ -76,7 +78,7 @@ export class ImpactFlipbooks {
     });
     for (let i = 0; i < FLIP_SLOTS; i++) {
       const mat = proto.clone();
-      const mesh = new THREE.Mesh(geo, mat);
+      const mesh = new THREE.Mesh(this.geometry, mat);
       mesh.visible = false;
       mesh.renderOrder = 8; // over the shock rings: the sheet IS the impact
       mesh.userData.renderCategory = 'vfx';
@@ -95,6 +97,7 @@ export class ImpactFlipbooks {
     hdr: number,
     style: FlipbookStyle,
   ): void {
+    if (this.disposed) return;
     const slot = this.slots[this.next];
     this.next = (this.next + 1) % FLIP_SLOTS;
     slot.active = true;
@@ -118,6 +121,7 @@ export class ImpactFlipbooks {
   }
 
   update(dt: number, camQuat: THREE.Quaternion): void {
+    if (this.disposed) return;
     for (const slot of this.slots) {
       if (!slot.active) continue;
       slot.age += dt;
@@ -138,5 +142,16 @@ export class ImpactFlipbooks {
       slot.active = false;
       slot.mesh.visible = false;
     }
+  }
+
+  dispose(): void {
+    if (this.disposed) return;
+    this.disposed = true;
+    this.clear();
+    for (const slot of this.slots) {
+      slot.mesh.removeFromParent();
+      slot.mat.dispose();
+    }
+    this.geometry.dispose();
   }
 }

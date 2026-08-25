@@ -14,11 +14,13 @@ import { describe, expect, it } from 'vitest';
 import { DEED_WATCH_CAP } from '../src/ui/deeds_view';
 import {
   buildReliquaryTrackerViewInto,
+  makeReliquaryTrackerInput,
   makeReliquaryTrackerView,
   pruneReliquaryPins,
   RELIQUARY_FLASH_BUILDS,
   RELIQUARY_TRACK_CAP,
   type ReliquaryTrackerView,
+  type ReliquaryTrackerWorld,
   reliquaryTrackerOwnershipSig,
   toggleReliquaryPin,
 } from '../src/ui/reliquary_tracker_view';
@@ -52,7 +54,7 @@ function completionFrom(progress: Progress): (pageId: string) => ReliquaryPageCo
 function build(
   out: ReliquaryTrackerView,
   progress: Progress,
-  opts: { pinned?: string[]; sig?: number; collapsed?: boolean } = {},
+  opts: { pinned?: string[]; sig?: number; collapsed?: boolean; enabled?: boolean } = {},
 ): ReliquaryTrackerView {
   return buildReliquaryTrackerViewInto(out, {
     pinned: new Set(opts.pinned ?? []),
@@ -60,6 +62,7 @@ function build(
     completion: completionFrom(progress),
     ownershipSig: () => opts.sig ?? 0,
     collapsed: opts.collapsed ?? false,
+    enabled: opts.enabled ?? true,
   });
 }
 
@@ -315,6 +318,7 @@ describe('buildReliquaryTrackerViewInto: allocation contract', () => {
         pinned: new Set(),
         pageIds: Object.keys(progress),
         completion: counting,
+        enabled: true,
         ownershipSig: () => {
           sigCalls++;
           return sig;
@@ -352,6 +356,7 @@ describe('buildReliquaryTrackerViewInto: allocation contract', () => {
         pinned: new Set(['page']),
         pageIds: ['page'],
         completion: counting,
+        enabled: true,
         ownershipSig: () => {
           sigCalls++;
           return 7;
@@ -564,6 +569,121 @@ describe('pruneReliquaryPins', () => {
 });
 
 // ---------------------------------------------------------------------------
+describe('makeReliquaryTrackerInput', () => {
+  const makeWorld = (): ReliquaryTrackerWorld & {
+    itemsDiscovered: Set<string>;
+    mounts: string[];
+  } => {
+    const itemsDiscovered = new Set<string>();
+    const mounts: string[] = [];
+    return {
+      itemsDiscovered,
+      mounts,
+      reliquaryPageCompletion: (pageId) =>
+        pageId === 'page' ? { owned: 1, total: 4, complete: false } : null,
+      deedStats: { itemsDiscovered },
+      reliquaryMarks: new Set<string>(),
+      deedsEarned: new Map<string, string>(),
+      ownedMounts: () => mounts,
+      accountCosmetics: { weaponSkinIds: [] },
+    };
+  };
+
+  it('routes completion reads to the LIVE world (a swap is picked up, not the minted one)', () => {
+    let world = makeWorld();
+    const input = makeReliquaryTrackerInput(() => world);
+    expect(input.completion('page')).toEqual({ owned: 1, total: 4, complete: false });
+    // Swap the world behind the thunk (the offline-to-online transition): the
+    // REUSED input must follow without being re-minted.
+    world = makeWorld();
+    world.reliquaryPageCompletion = () => null;
+    expect(input.completion('page')).toBeNull();
+  });
+
+  it('moves the ownership signature when any surface grows', () => {
+    const world = makeWorld();
+    const input = makeReliquaryTrackerInput(() => world);
+    const before = input.ownershipSig();
+    world.itemsDiscovered.add('relic');
+    const afterItem = input.ownershipSig();
+    expect(afterItem).not.toBe(before);
+    world.mounts.push('mount');
+    expect(input.ownershipSig()).not.toBe(afterItem);
+  });
+
+  it('mints the per-build fields at their safe defaults (shown, expanded, unpinned)', () => {
+    const input = makeReliquaryTrackerInput(makeWorld);
+    expect(input.enabled).toBe(true);
+    expect(input.collapsed).toBe(false);
+    expect(input.pinned.size).toBe(0);
+  });
+});
+
+describe('the master switch (enabled)', () => {
+  it('hides the strip and pays for no world reads while disabled', () => {
+    const view = makeReliquaryTrackerView();
+    let completionCalls = 0;
+    let sigCalls = 0;
+    buildReliquaryTrackerViewInto(view, {
+      pinned: new Set(['page']),
+      pageIds: ['page'],
+      completion: (pageId) => {
+        completionCalls++;
+        return completionFrom({ page: { owned: 1, total: 4 } })(pageId);
+      },
+      ownershipSig: () => {
+        sigCalls++;
+        return 1;
+      },
+      collapsed: false,
+      enabled: false,
+    });
+    expect(view.visible).toBe(false);
+    expect(view.count).toBe(0);
+    // The whole point of the early-out: a player who turned the strip off
+    // pays nothing for it, pinned or not, every slow band.
+    expect(completionCalls).toBe(0);
+    expect(sigCalls).toBe(0);
+  });
+
+  it('still carries the collapse through, so re-enable restores the same fold state', () => {
+    const view = makeReliquaryTrackerView();
+    build(
+      view,
+      { page: { owned: 1, total: 4 } },
+      { pinned: ['page'], enabled: false, collapsed: true },
+    );
+    expect(view.collapsed).toBe(true);
+  });
+
+  it('re-enabling is a first sighting: fills that happened while hidden do not flash', () => {
+    const progress: Progress = { page: { owned: 1, total: 4 } };
+    const view = makeReliquaryTrackerView();
+    build(view, progress, { pinned: ['page'] });
+    expect(view.lines[0].flash).toBe(false);
+    // Hidden across the fill: the previous-build table is cleared, so the
+    // owned rise is invisible to the delta pass when the strip returns.
+    build(view, progress, { pinned: ['page'], enabled: false });
+    progress.page.owned = 3;
+    const shown = build(view, progress, { pinned: ['page'] });
+    expect(shown.visible).toBe(true);
+    expect(shown.lines[0].owned).toBe(3);
+    expect(shown.lines[0].flash).toBe(false);
+  });
+
+  it('a fill while VISIBLE still flashes after an enabled build (control arm)', () => {
+    // The control for the test above: same fill, no hidden build in between,
+    // so a broken prev-table clear cannot pass both.
+    const progress: Progress = { page: { owned: 1, total: 4 } };
+    const view = makeReliquaryTrackerView();
+    build(view, progress, { pinned: ['page'] });
+    progress.page.owned = 3;
+    const shown = build(view, progress, { pinned: ['page'] });
+    expect(shown.lines[0].flash).toBe(true);
+  });
+});
+
+// ---------------------------------------------------------------------------
 // Chrome the strip depends on outside this module
 // ---------------------------------------------------------------------------
 
@@ -601,17 +721,27 @@ describe('tracker chrome', () => {
     // stale ranking straight through the fill that should have re-ranked it,
     // which is invisible in the pure core (it takes the number, not the reads).
     // Pinned as five separate lines so the failure names the missing surface.
-    expect(trackerBody, 'itemsDiscovered').toContain(
-      'itemsDiscovered: this.sim.deedStats.itemsDiscovered.size,',
+    // The reads live in makeReliquaryTrackerInput (this module) since the
+    // input construction was extracted out of hud.ts; the factory body is the
+    // scope so a matching line elsewhere can never satisfy a pin.
+    const viewSrc = read('../src/ui/reliquary_tracker_view.ts');
+    const factoryBody = stripComments(
+      sliceBetween(viewSrc, 'export function makeReliquaryTrackerInput(', '\nexport function'),
     );
-    expect(trackerBody, 'reliquaryMarks').toContain('marks: this.sim.reliquaryMarks.size,');
-    // The input object is minted once and reused (the deed tracker's
-    // allocation-free drive precedent): the lazy-init spelling is the pin.
-    expect(trackerBody, 'reused input').toContain('this.reliquaryTrackerInput ??= {');
-    expect(trackerBody, 'deedsEarned').toContain('deedsEarned: this.sim.deedsEarned.size,');
-    expect(trackerBody, 'ownedMounts').toContain('mounts: this.sim.ownedMounts().length,');
-    expect(trackerBody, 'weaponSkinIds').toContain(
-      'weaponSkins: this.sim.accountCosmetics.weaponSkinIds.length,',
+    expect(factoryBody, 'itemsDiscovered').toContain(
+      'itemsDiscovered: w.deedStats.itemsDiscovered.size,',
+    );
+    expect(factoryBody, 'reliquaryMarks').toContain('marks: w.reliquaryMarks.size,');
+    expect(factoryBody, 'deedsEarned').toContain('deedsEarned: w.deedsEarned.size,');
+    expect(factoryBody, 'ownedMounts').toContain('mounts: w.ownedMounts().length,');
+    expect(factoryBody, 'weaponSkinIds').toContain(
+      'weaponSkins: w.accountCosmetics.weaponSkinIds.length,',
+    );
+    // The input object is minted once by the factory and reused (the deed
+    // tracker's allocation-free drive precedent): the lazy-init spelling over
+    // the live-world thunk is the pin.
+    expect(trackerBody, 'reused input').toContain(
+      'this.reliquaryTrackerInput ??= makeReliquaryTrackerInput(() => this.sim);',
     );
   });
 
@@ -620,6 +750,156 @@ describe('tracker chrome', () => {
     // the strip keeps showing the old set for up to a whole 500ms band, which
     // reads as the button having done nothing.
     expect(stripComments(hud)).toContain('onPinChanged: () => this.updateReliquaryTracker(),');
+  });
+
+  it('wires the master switch to the ONE persisted key, read and written alike', () => {
+    // The literal key is the contract three surfaces share (the tracker build,
+    // the window eye, the Options row): a drifted spelling on any one of them
+    // would fork the switch into two settings that both look right alone.
+    expect(trackerBody, 'enabled read').toContain(
+      "input.enabled = (settings?.get('showReliquaryTracker') ?? true) === true;",
+    );
+    // Scoped to the reliquaryWindow deps bag (the same discipline as
+    // trackerBody above): a matching line in another window's deps could not
+    // satisfy these.
+    const windowDeps = stripComments(
+      sliceBetween(hud, 'private readonly reliquaryWindow = new ReliquaryWindow({', '});'),
+    );
+    expect(windowDeps, 'window read').toContain(
+      "trackerShown: () => (this.optionsHooks?.settings.get('showReliquaryTracker') ?? true) === true,",
+    );
+    // The write routes through the options seam (the playtime-eye doctrine),
+    // never a bare settings.set, AND nudges the strip in the same handler: the
+    // whole body is the pin so dropping the immediate repaint (the onPinChanged
+    // immediacy contract) cannot pass either.
+    expect(windowDeps, 'window write plus nudge').toContain(
+      "this.optionsHooks?.onSettingChange('showReliquaryTracker', shown);\n      this.updateReliquaryTracker();",
+    );
+  });
+
+  it('couples the empty-tracker gap reclaim to the quest tracker really emptying', () => {
+    // hud.css drops an EMPTY stack child from the flex flow so the strip sits
+    // where the quest tracker would (no phantom gap with zero quests). CSS
+    // :empty matches only a childless, textless node, so the rule only works
+    // while the questless render is the empty STRING; pin both halves so
+    // either drifting alone fails here. The DECLARATION is part of the pin:
+    // an opacity/visibility swap would keep the selector while restoring the
+    // phantom gap.
+    expect(hudCss).toMatch(/#right-tracker-stack > :empty \{\s*display: none;/);
+    const questController = read('../src/ui/hud/quest/quest_tracker_controller.ts');
+    expect(stripComments(questController)).toContain("if (!view.visible) return '';");
+  });
+
+  // An invisible ::after hit extension only works while it is a live, painted
+  // box: `pointer-events: none` (the "this overlay should not eat clicks" edit
+  // a later reader is tempted into) or `display: none` keeps every geometry pin
+  // green while killing the tap target outright. Bounded to the extracted
+  // three-declaration block, with the positive `inset` match on the same
+  // string as its control, so it is not the vacuous file-wide negative shape.
+  // The inset is -9px, not -8px: an absolutely positioned pseudo-element's
+  // inset is measured from the host's PADDING edge, so on a 1px-bordered
+  // button -9px is the 8px beyond the visual edge every sum below relies on
+  // (-8px really measured 2px short in tests/browser/target_size, which pins
+  // the LIVE reach; this source pin holds the exact value beside it).
+  const expectLiveHitExtension = (afterBlock: string): void => {
+    expect(afterBlock).toMatch(/content: "";\s*position: absolute;\s*inset: -9px;/);
+    expect(afterBlock).not.toMatch(/pointer-events|display:\s*none|visibility/);
+  };
+
+  it('keeps the eye toggle a legal pointer target on desktop (DESIGN.md 10.1, 36px)', () => {
+    // The visual chip measures 20px tall in Chrome (the 14px icon is the
+    // tallest item in the centered flex row, the 11px label's line box sits
+    // under it; plus 2x2px padding and 2x1px border); the invisible ::after
+    // hit extension (the char-playtime-eye idiom) is what lifts it to the 36px
+    // desktop floor DESIGN.md 10.1 names for new chrome (20 + 2x8, the 8 being
+    // the reach beyond the 1px border, see expectLiveHitExtension), and it is
+    // inert without position: relative on the host. The first cut's -6px
+    // stopped at 30px and a naive -8px at 34px: past the WCAG 2.5.8 24px floor
+    // but under the house one, which is why the exact inset is the pin. The
+    // mobile arm keeps the 40px coarse floor instead. COMMENT-STRIPPED first:
+    // a commented-out declaration followed by
+    // a retuned one is the realistic edit shape in these heavily commented
+    // sheets, and a raw read would let the comment satisfy every pin.
+    const componentsCss = stripComments(read('../src/styles/components.css'));
+    expect(componentsCss).toMatch(/\.reliquary-tracker-toggle \{\s*position: relative;/);
+    const eyeAfter = /\.reliquary-tracker-toggle::after \{([^}]*)\}/.exec(componentsCss)?.[1] ?? '';
+    expectLiveHitExtension(eyeAfter);
+    // The mobile arm sizes the box itself to the 40px floor and zeroes the
+    // reach (the idiom scopes per pointer: a 40px box plus 8px each way would
+    // overreach the sticky panel-title row on the full-bleed phone layout).
+    expect(componentsCss).toMatch(
+      /body\.mobile-touch \.reliquary-tracker-toggle \{\s*min-height: 40px;/,
+    );
+    expect(componentsCss).toMatch(
+      /body\.mobile-touch \.reliquary-tracker-toggle::after \{\s*inset: 0;/,
+    );
+    // Not a pill: the window's button family (.reliquary-pin) is a 4px chip and
+    // DESIGN.md 14 rules out pill buttons, so the radius is pinned too, through
+    // the one named token (--radius-sm is 4px in tokens.css).
+    expect(componentsCss).toMatch(
+      /\.reliquary-tracker-toggle \{[^}]*border-radius: var\(--radius-sm\);/,
+    );
+  });
+
+  it('keeps the compact mobile chip a 40px tap target while its visual stays small', () => {
+    // The compact-tier chip (both trackers share the rule) is a 24px visual
+    // under a minimap column that renders about 82px wide; the 40px coarse
+    // floor (DESIGN.md 13.5) rides the same invisible ::after hit extension as
+    // the eye above (24 + 2x8 = 40), which is inert without position: relative
+    // on the chip. The first cut let the base sheet's pointer-coarse
+    // min-height: 40px size the chip itself (109x40, measured), which is the
+    // oversize this pin exists to keep out: the height half is min-height,
+    // the width half is the type size and padding (the first cut's 12px and
+    // 2px 12px are exactly what grew it), so both halves are pinned. The rule
+    // lives in hud.mobile.css (the hud-mobile layer), which is what lets its
+    // min-height: 24px beat the base coarse rule regardless of specificity.
+    // Comment-stripped for the same reason as the eye pin above.
+    const mobileCss = stripComments(read('../src/styles/hud.mobile.css'));
+    // Both trackers in ONE selector list (the rule spans them on purpose), so
+    // a pin over either half alone could not pass on a rule that dropped the
+    // other tracker. Resolved by selector MEMBERSHIP rather than a literal
+    // ordered list: a third tracker joining the rule, or the two swapping
+    // order, is the same rule, while dropping either tracker is not. `suffix`
+    // is '' for the chip rule and '::after' for its hit extension.
+    const chipRule = (suffix: string): string => {
+      const want = ['deed', 'reliquary'].map(
+        (id) => `body.mobile-touch.hud-mobile-compact #${id}-tracker .dt-header${suffix}`,
+      );
+      for (const m of mobileCss.matchAll(/([^{}]+)\{([^{}]*)\}/g)) {
+        const selectors = m[1].split(',').map((s) => s.trim());
+        if (want.every((w) => selectors.includes(w))) return m[2];
+      }
+      return '';
+    };
+    const chip = chipRule('');
+    expect(chip).toContain('position: relative;');
+    expect(chip).toContain('min-height: 24px;');
+    // 11px is the tracker's own mobile type size (body.mobile-touch
+    // #reliquary-tracker), not a new step.
+    expect(chip).toContain('font-size: 11px;');
+    expect(chip).toContain('padding: 2px 8px;');
+    // `auto` is the right-rail hug; the 6px is half of the inter-chip
+    // separation the ::after comment reasons about (below).
+    expect(chip).toContain('margin: 0 0 6px auto;');
+    // Clock family, not a pill (DESIGN.md 14): the #minimap-clock radius,
+    // through the one named token (--radius-md is 8px in tokens.css).
+    expect(chip).toContain('border-radius: var(--radius-md);');
+    expectLiveHitExtension(chipRule('::after'));
+    // Two stacked chips must not trade hit area: their 8px extensions (16px
+    // combined reach) clear each other only because the chips sit 6px (margin,
+    // above) plus the stack's 14px flex gap apart. That gap lives in hud.css
+    // and no mobile rule re-declares it; both halves are pinned here because
+    // the no-overlap property depends on a constant in a different sheet.
+    const hudCss = stripComments(read('../src/styles/hud.css'));
+    const stackRule = /#right-tracker-stack \{([^}]*)\}/.exec(hudCss)?.[1] ?? '';
+    expect(stackRule).toContain('gap: 14px;');
+    for (const m of mobileCss.matchAll(/([^{}]+)\{([^{}]*)\}/g)) {
+      if (/#right-tracker-stack\s*$/.test(m[1].trim())) {
+        expect(m[2], `mobile #right-tracker-stack rule must not re-declare gap`).not.toMatch(
+          /\bgap:/,
+        );
+      }
+    }
   });
 
   it('wires the tracker container in BOTH game entries, under the deed tracker', () => {
@@ -697,16 +977,20 @@ describe('tracker chrome', () => {
     );
   });
 
-  it('folds the tracker to a count chip on the compact tier', () => {
-    expect(hudMobile).toMatch(
-      /body\.mobile-touch\.hud-mobile-compact #reliquary-tracker \.dt-list \{\s*display: none;/,
-    );
-    expect(hudMobile).toMatch(
-      /body\.mobile-touch\.hud-mobile-compact #reliquary-tracker \.dt-chevron \{\s*display: none;/,
-    );
-    expect(hudMobile).toMatch(
-      /body\.mobile-touch #reliquary-tracker \.dt-list \{\s*max-height: 88px;\s*overflow: hidden;/,
-    );
+  // The tracker used to fold to a count chip on the compact touch tier. It is now
+  // hidden on touch outright: the folded line still landed directly under the
+  // minimap in #right-tracker-stack, and the Reliquary window keeps its own touch
+  // entry point in the More tray, so hiding it strands nothing.
+  it('is hidden outright on touch, and only on touch', () => {
+    expect(hudMobile).toMatch(/body\.mobile-touch #reliquary-tracker \{\s*display: none;\s*\}/);
+    // The per-tier folds went with it: a hidden element cannot fold.
+    expect(hudMobile).not.toContain('#reliquary-tracker .dt-list');
+    expect(hudMobile).not.toContain('#reliquary-tracker .dt-chevron');
+    // Desktop is untouched: the base rule still paints the strip.
+    expect(hudCss).not.toMatch(/#reliquary-tracker \{[^}]*display: none/);
+    // And the touch path to the window itself survives the hide.
+    expect(read('../index.html')).toContain('id="mobile-reliquary"');
+    expect(read('../play.html')).toContain('id="mobile-reliquary"');
   });
 
   it('never positions itself: the stack wrapper owns the placement', () => {

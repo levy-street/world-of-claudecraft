@@ -18,6 +18,7 @@
 // also wants Up/Down roving on (the same knob roving_index.ts already
 // exposes for a 2D grid or vertical stack).
 
+import { blurIfPointerClick } from './pointer_blur';
 import { type RovingOrientation, rovingTarget } from './roving_index';
 
 export function wireTabStrip(
@@ -28,7 +29,15 @@ export function wireTabStrip(
 ): void {
   const tabs = Array.from(container.querySelectorAll<HTMLElement>(`.${tabClass}`));
   tabs.forEach((tab, i) => {
-    tab.addEventListener('click', () => onSelect(tab.dataset.tab ?? '', false));
+    // A mouse click never programmatically moves focus (see above), so without
+    // the pointer-only blur the clicked tab would keep document focus after the
+    // rebuild-less selections and the next unshielded Space would re-click it.
+    // Keyboard selection (detail 0) is untouched: it refocuses the active tab
+    // after the rebuild via focusActiveTab.
+    tab.addEventListener('click', (e) => {
+      blurIfPointerClick(e, tab);
+      onSelect(tab.dataset.tab ?? '', false);
+    });
     tab.addEventListener('keydown', (e) => {
       const ke = e as KeyboardEvent;
       const next = rovingTarget(ke.key, i, tabs.length, orientation);

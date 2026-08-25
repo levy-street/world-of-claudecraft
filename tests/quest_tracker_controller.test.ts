@@ -2,7 +2,22 @@ import { describe, expect, it, vi } from 'vitest';
 import { QUESTS } from '../src/sim/data';
 import type { QuestProgress } from '../src/sim/types';
 import { QuestTrackerController } from '../src/ui/hud/quest/quest_tracker_controller';
+import { makeWriterFacet } from '../src/ui/painter_host';
+import { dropPointerFocus } from '../src/ui/pointer_blur';
 import type { IWorld } from '../src/world_api';
+
+/** A private facet per rig: the controller takes Hud's shared one in production,
+ *  and a test needs only the elision behaviour. */
+function writers() {
+  return makeWriterFacet(
+    new Map(),
+    new Map(),
+    new Map(),
+    new Map(),
+    () => {},
+    () => {},
+  );
+}
 
 function progress(questId: string, state: QuestProgress['state'] = 'active'): QuestProgress {
   return {
@@ -22,7 +37,12 @@ function harness(entries: QuestProgress[] = []) {
   const header = {
     classList: { contains: (value: string) => value === 'qt-header' },
     focus: vi.fn(),
+    // A real blur moves document focus to the body; the fake document mirrors that.
+    blur: vi.fn(() => {
+      docState.activeElement = null;
+    }),
   };
+  const docState: { activeElement: unknown } = { activeElement: header };
   const element = {
     get innerHTML() {
       return html;
@@ -33,7 +53,7 @@ function harness(entries: QuestProgress[] = []) {
     },
     querySelector: (selector: string) => (selector === '.qt-header' ? header : null),
   } as unknown as HTMLElement;
-  const document = { activeElement: header } as unknown as Document;
+  const document = docState as unknown as Document;
   const settings = {
     available: vi.fn(() => true),
     collapsed: vi.fn(() => collapsed),
@@ -43,6 +63,7 @@ function harness(entries: QuestProgress[] = []) {
   };
   const click = vi.fn();
   const controller = new QuestTrackerController({
+    writers: writers(),
     element,
     document,
     world: () => ({ questLog }) as Pick<IWorld, 'questLog'>,
@@ -70,8 +91,8 @@ describe('QuestTrackerController', () => {
   it('renders authoritative quests in acceptance order and elides an identical paint', () => {
     const test = harness([progress('q_wolves'), progress('q_boars', 'ready')]);
 
-    test.controller.update();
-    test.controller.update();
+    test.controller.update(0);
+    test.controller.update(0);
 
     expect(test.writes()).toBe(1);
     expect(test.html()).toContain('title:q_wolves');
@@ -99,7 +120,7 @@ describe('QuestTrackerController', () => {
     const proto = { questId: 'constructor', state: 'active' as const, counts: [0] };
     const test = harness([progress('q_wolves'), ghost, proto, progress('q_boars', 'ready')]);
 
-    test.controller.update();
+    test.controller.update(0);
 
     expect(test.html()).toContain('q_ghost_of_v33');
     // The title SAYS unknown (the questUi.tracker.unknownQuest sentence
@@ -122,8 +143,8 @@ describe('QuestTrackerController', () => {
     const test = harness();
     test.setCollapsed(true);
 
-    test.controller.update();
-    test.controller.update();
+    test.controller.update(0);
+    test.controller.update(0);
 
     expect(test.settings.setCollapsed).toHaveBeenCalledTimes(1);
     expect(test.settings.setCollapsed).toHaveBeenCalledWith(false);
@@ -131,9 +152,21 @@ describe('QuestTrackerController', () => {
     expect(test.writes()).toBe(0);
   });
 
+  it('renders the tracker header label through the real questUi.tracker.title key, at its runtime home', () => {
+    // The static index.html markup dropped its data-i18n="questUi.tracker.title"
+    // node (tests/localization_coverage.test.ts pins the absence): the header
+    // label is now painted here, directly via t('questUi.tracker.title')
+    // (quest_tracker_controller.ts), never through the questTitle dep (which
+    // only names individual quest rows). English source: 'Quests'
+    // (src/ui/i18n.catalog/quests.ts).
+    const test = harness([progress('q_wolves')]);
+    test.controller.update(0);
+    expect(test.html()).toContain('<span class="qt-h-label">Quests</span>');
+  });
+
   it('persists a toggle, repaints the collapsed header, and restores header focus', () => {
     const test = harness([progress('q_wolves')]);
-    test.controller.update();
+    test.controller.update(0);
 
     test.controller.toggleCollapsed();
 
@@ -143,5 +176,23 @@ describe('QuestTrackerController', () => {
     expect(test.html()).toContain('aria-expanded="false"');
     expect(test.html()).not.toContain('title:q_wolves');
     expect(test.header.focus).toHaveBeenCalledTimes(1);
+  });
+
+  it('does not restore header focus after a pointer-driven toggle (the focus drop ran first)', () => {
+    // hud.ts binds the pointer-only focus drop (src/ui/pointer_blur.ts) over
+    // #quest-tracker in the CAPTURE phase, so a mouse click drops the header's
+    // focus before the click handler toggles and repaints: the repaint's refocus
+    // check (activeElement is a .qt-header) then sees nothing to restore, and the
+    // header cannot be left holding focus for Space to re-toggle. Keyboard
+    // activation (no drop) keeps the restore above.
+    const test = harness([progress('q_wolves')]);
+    test.controller.update(0);
+
+    dropPointerFocus(test.header);
+    test.controller.toggleCollapsed();
+
+    expect(test.header.blur).toHaveBeenCalledTimes(1);
+    expect(test.collapsed()).toBe(true);
+    expect(test.header.focus).not.toHaveBeenCalled();
   });
 });

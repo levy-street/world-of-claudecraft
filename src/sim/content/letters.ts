@@ -85,6 +85,54 @@ export const MASTERY_RESET_LETTER: LetterDef = {
   delaySeconds: 0,
 };
 
+// $WOC Exchange custody letters (the server-side marketplace): the broker's
+// system mail carrying an escrowed copy back to its seller, delivering a won
+// or bought item to its buyer, or recording a completed sale for the seller.
+// Bodies stay value-free (no prices, no item names): the attachment IS the
+// payload and the Exchange window carries the numbers, so each letterId
+// localizes as one static text.
+export const WOC_MARKET_DELIVERY_LETTER: LetterDef = {
+  letterId: 'woc_market_delivery',
+  senderName: 'The Exchange Broker',
+  subject: 'Your Exchange purchase',
+  body:
+    'The sale is settled and the goods are yours. The attached parcel carries ' +
+    'the exact item you paid for, held in escrow from the moment it was ' +
+    'listed until your payment cleared.\n\n' +
+    'A record of the sale lives in the Exchange ledger.\n\n' +
+    '- The Exchange Broker',
+  delaySeconds: 0,
+};
+
+export const WOC_MARKET_RETURN_LETTER: LetterDef = {
+  letterId: 'woc_market_return',
+  senderName: 'The Exchange Broker',
+  subject: 'Your Exchange listing has ended',
+  body:
+    'Your listing ended without a completed sale: the auction found no buyer, ' +
+    'the reserve was not met, the listing was withdrawn, or the winning ' +
+    'bidder failed to settle. Your goods return to you unharmed with this ' +
+    'letter, exactly as they were escrowed.\n\n' +
+    '- The Exchange Broker',
+  delaySeconds: 0,
+};
+
+export const WOC_MARKET_SOLD_LETTER: LetterDef = {
+  letterId: 'woc_market_sold',
+  senderName: 'The Exchange Broker',
+  subject: 'Your Exchange listing sold',
+  // Payload-only, like the other two: this module is currency-blind, so the
+  // money language (the fee split, where proceeds land) belongs to the
+  // Exchange window, which can read the real figures. A letter that asserts a
+  // payment route it cannot see would also go stale the day that route changes.
+  body:
+    'Your listing sold and the buyer settled in full. The Exchange ledger ' +
+    'carries the record of the sale, and your Exchange activity shows the ' +
+    'settled amount and its breakdown.\n\n' +
+    '- The Exchange Broker',
+  delaySeconds: 0,
+};
+
 // Quest follow-up letters: the questgiver writes to you a little while after
 // the turn-in. Keyed by quest id; quests without an entry send nothing.
 export const QUEST_LETTERS: Record<string, LetterDef> = {

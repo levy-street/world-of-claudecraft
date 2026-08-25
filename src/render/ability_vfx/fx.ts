@@ -406,6 +406,7 @@ export class AbilityVfxFx implements SequencerHost {
   >();
   // Stable sink for the styled bolt heads (ribbons.drawHeads pushes through
   // it into the frame's overlay batch); one closure for the object's lifetime.
+  private disposed = false;
   private headSink = (
     x: number,
     y: number,
@@ -528,6 +529,7 @@ export class AbilityVfxFx implements SequencerHost {
   // aura). The envelope owns attack/decay; the delegate writes the rig
   // emissive. Returns the current glow intensity for the dev probe.
   bodyGlow(entityId: number, colorHex: number, strength: number, slowDecay: boolean): void {
+    if (this.disposed) return;
     let g = this.glows.get(entityId);
     if (!g) {
       if (this.glows.size >= 16) return;
@@ -550,6 +552,7 @@ export class AbilityVfxFx implements SequencerHost {
   // One-shot glow pop (instant buffs with no aura to hold, e.g. Blood Toll):
   // the level jumps to strength now and decays on the envelope.
   bodyGlowPulse(entityId: number, colorHex: number, strength: number, slowDecay: boolean): void {
+    if (this.disposed) return;
     let g = this.glows.get(entityId);
     if (!g) {
       if (this.glows.size >= 16) return;
@@ -586,6 +589,7 @@ export class AbilityVfxFx implements SequencerHost {
     tier: number,
     windupDelay = 0,
   ): void {
+    if (this.disposed) return;
     this.sequencer.start(
       this,
       abilityId,
@@ -622,6 +626,7 @@ export class AbilityVfxFx implements SequencerHost {
     tier: number,
     windupDelay = 0,
   ): void {
+    if (this.disposed) return;
     const y = this.groundY(x, z) + 0.4;
     this.sequencer.start(this, abilityId, spec, casterId, -1, colorHex, tier, false, windupDelay, {
       x,
@@ -651,6 +656,7 @@ export class AbilityVfxFx implements SequencerHost {
     volley = 1,
     headScale = 1,
   ): void {
+    if (this.disposed) return;
     // spectacle calibration: the measured crescendo gap was widest on bolts
     // (trail + head sparse inside a gallery-sized bbox), so the travel read
     // scales up at the one spawn seam every tier shares
@@ -786,6 +792,7 @@ export class AbilityVfxFx implements SequencerHost {
     volley = 1,
     headScale = 1,
   ): void {
+    if (this.disposed) return;
     width *= SPECTACLE.boltWidth;
     headScale *= SPECTACLE.boltHead;
     const y = this.groundY(x, z) + 0.4;
@@ -906,6 +913,7 @@ export class AbilityVfxFx implements SequencerHost {
   // now, and the flipbook prewarm does the same for the six impact sheets.
   // The prewarm's finally-block clear() hides everything again.
   prewarmSpawn(x: number, y: number, z: number, entityId: number): void {
+    if (this.disposed) return;
     const gy = this.groundY(x, z);
     this.rings.spawn(x, gy + 0.15, z, 2, 0.7, 0xffffff, 1, false);
     this.rings.spawn(x, gy + 1.2, z, 1.6, 0.7, 0xffffff, 1, true);
@@ -981,6 +989,7 @@ export class AbilityVfxFx implements SequencerHost {
     intensity: number,
     vertical: boolean,
   ): void {
+    if (this.disposed) return;
     this.rings.spawn(x, y, z, maxR, dur, colorHex, intensity * this.intensity(), vertical);
   }
 
@@ -992,6 +1001,7 @@ export class AbilityVfxFx implements SequencerHost {
     style: string,
     dur: number,
   ): void {
+    if (this.disposed) return;
     const s: DecalStyle =
       style === 'ember' || style === 'rime' || style === 'crack' || style === 'char'
         ? style
@@ -1008,6 +1018,7 @@ export class AbilityVfxFx implements SequencerHost {
     sheet: string,
     hdr: number,
   ): void {
+    if (this.disposed) return;
     this.flipbooks.spawn(x, y, z, size, colorHex, hdr * this.intensity(), asFlipbookStyle(sheet));
   }
 
@@ -1020,15 +1031,18 @@ export class AbilityVfxFx implements SequencerHost {
     colorHex: number,
     dur: number,
   ): void {
+    if (this.disposed) return;
     this.pillars.spawn(x, y, z, radius, height, colorHex, dur);
   }
 
   shellFlash(entityId: number, colorHex: number, dur: number): void {
+    if (this.disposed) return;
     this.shells.flash(entityId, colorHex, dur);
   }
 
   // Held barrier shell, refreshed per frame while the barrier aura lives.
   holdShell(entityId: number, colorHex: number): void {
+    if (this.disposed) return;
     this.shells.hold(entityId, colorHex, this.frame);
   }
 
@@ -1037,6 +1051,7 @@ export class AbilityVfxFx implements SequencerHost {
   // concurrent buffs. Returns true when this call created the band (the
   // aura-gain moment).
   holdGroundAura(entityId: number, band: number, colorHex: number, spin: boolean): boolean {
+    if (this.disposed) return false;
     return this.groundAuras.hold(entityId, band, colorHex, spin, this.frame);
   }
 
@@ -1044,6 +1059,7 @@ export class AbilityVfxFx implements SequencerHost {
   // in the painter, while scarce render pools are released immediately so an
   // offscreen actor consumes no overlay, shell, ground-aura, or glow work.
   sleepEntity(entityId: number): void {
+    if (this.disposed) return;
     this.ccBands.delete(entityId);
     this.windups.delete(entityId);
     const bands = this.orbits.get(entityId);
@@ -1069,6 +1085,7 @@ export class AbilityVfxFx implements SequencerHost {
     power: number,
     kind: ParticleBurstKind,
   ): void {
+    if (this.disposed) return;
     this.particleBurst?.(x, y, z, colorHex, count, power, kind);
   }
 
@@ -1079,6 +1096,7 @@ export class AbilityVfxFx implements SequencerHost {
     duration: number,
     range?: number,
   ): void {
+    if (this.disposed) return;
     this.lightPulseCb?.(entityId, palette, intensity, duration, range);
   }
 
@@ -1098,6 +1116,7 @@ export class AbilityVfxFx implements SequencerHost {
     width: number,
     jag: number,
   ): void {
+    if (this.disposed) return;
     this.ribbons.spawnBolt(sourceId, targetId, colorHex, life, width, jag);
   }
 
@@ -1113,6 +1132,7 @@ export class AbilityVfxFx implements SequencerHost {
     width: number,
     jag: number,
   ): void {
+    if (this.disposed) return;
     this.ribbons.spawnBoltPoints(fx, fy, fz, tx, ty, tz, colorHex, life, width, jag);
   }
 
@@ -1122,6 +1142,7 @@ export class AbilityVfxFx implements SequencerHost {
     style: string,
     scale = 1,
   ): void {
+    if (this.disposed) return;
     this.ribbons.spawnSlashStyled(at, colorHex, style, scale);
   }
 
@@ -1131,6 +1152,7 @@ export class AbilityVfxFx implements SequencerHost {
     life: number,
     fill: (pts: { set(x: number, y: number, z: number): unknown }[]) => number,
   ): void {
+    if (this.disposed) return;
     this.ribbons.spawnPath(colorHex, width, life, fill);
   }
 
@@ -1144,6 +1166,7 @@ export class AbilityVfxFx implements SequencerHost {
     alpha: number,
     brightness: number,
   ): void {
+    if (this.disposed) return;
     this.overlay.push(x, y, z, colorHex, size, cell, alpha, brightness);
   }
 
@@ -1155,6 +1178,7 @@ export class AbilityVfxFx implements SequencerHost {
   // instants). Safe to call from sequencer.update: it runs between the
   // overlay's beginFrame and commit, so the pushes land in this frame's batch.
   windupDraw(entityId: number, colorHex: number, progress: number, style: string): void {
+    if (this.disposed) return;
     const s: WindupStyle = WINDUP_STYLE_SET.has(style) ? (style as WindupStyle) : 'orb';
     if (s === 'none') return;
     // caster anticipation: the body eases back through the ceremony (gallery
@@ -1395,6 +1419,7 @@ export class AbilityVfxFx implements SequencerHost {
     style: DecalStyle,
     dur: number,
   ): void {
+    if (this.disposed) return;
     const at = this.anchor(entityId, 0);
     if (!at) return;
     this.decals.spawn(at.x, this.groundY(at.x, at.z), at.z, radius, colorHex, style, dur);
@@ -1413,6 +1438,7 @@ export class AbilityVfxFx implements SequencerHost {
     streams = 1,
     accentHex = colorHex,
   ): boolean {
+    if (this.disposed) return false;
     if (style === 'none') return false;
     let w = this.windups.get(entityId);
     let started = false;
@@ -1442,6 +1468,7 @@ export class AbilityVfxFx implements SequencerHost {
   // o is the spec's buff.o DNA (per-buff count/size/rate/radius/... overrides);
   // tier >= 1 halves the band's sprite count while keeping the read.
   orbit(entityId: number, style: OrbitStyle, colorHex: number, o?: OrbitDna, tier = 0): boolean {
+    if (this.disposed) return false;
     let bands = this.orbits.get(entityId);
     if (!bands) {
       bands = [];
@@ -1481,6 +1508,7 @@ export class AbilityVfxFx implements SequencerHost {
   // CC_BAND_SPECS, so a victim whose control changes kind mid-life (a stun
   // landing on a rooted target) swaps to the more severe band in place.
   holdCcBand(entityId: number, type: CcBandType, remaining: number): void {
+    if (this.disposed) return;
     let s = this.ccBands.get(entityId);
     if (!s) {
       s = { type, remaining, stamp: this.frame, hx: 0, hy: 0, hz: 0 };
@@ -1531,6 +1559,7 @@ export class AbilityVfxFx implements SequencerHost {
   // ---- frame advance ------------------------------------------------------
 
   update(dt: number, reducedMotion = false): void {
+    if (this.disposed) return;
     this.time += dt;
     this.reducedMotionActive = reducedMotion;
     this.shakeRecent = Math.max(0, this.shakeRecent - dt * 0.8);
@@ -1679,6 +1708,34 @@ export class AbilityVfxFx implements SequencerHost {
     this.ccBands.clear();
     this.ccPickCount = 0;
     for (const s of this.screenFxQueue) s.active = false;
+  }
+
+  /** Terminal cleanup for all pooled Three primitives owned by this engine.
+   * The ability texture cache remains shared and is intentionally not disposed
+   * here. Child pools own their slot materials and geometries, while Spirit
+   * puppets release only their per-renderer ghost materials and never GLB
+   * cache geometry. */
+  dispose(): void {
+    if (this.disposed) return;
+    this.clear();
+    this.disposed = true;
+    this.ribbons.dispose();
+    this.rings.dispose();
+    this.flipbooks.dispose();
+    this.decals.dispose();
+    this.pillars.dispose();
+    this.shells.dispose();
+    this.groundAuras.dispose();
+    this.spirits.dispose();
+    this.overlay.dispose();
+    this.particleBurst = null;
+    this.lightPulseCb = null;
+    this.statSink = null;
+    this.applyGlow = null;
+    this.shakeCb = null;
+    this.bodyLeanCb = null;
+    this.screenImpactCb = null;
+    this.abilityAudioCb = null;
   }
 
   private intensity(): number {

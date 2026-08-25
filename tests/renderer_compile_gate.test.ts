@@ -7,10 +7,14 @@ import { prewarmDepthMaterialKey } from '../src/render/prewarm_depth_material';
 import { type EntityView, Renderer } from '../src/render/renderer';
 
 interface CompileGateHarness {
-  gateViewOnCompile(view: EntityView, group: THREE.Group): Promise<void> | null;
+  gateViewOnCompile(
+    view: EntityView,
+    group: THREE.Group,
+    requiredForEntry?: boolean,
+  ): Promise<void> | null;
   gateSwapOnCompile(target: THREE.Object3D): void;
   gateSwapFlagOnCompile(target: THREE.Object3D, onSettled: () => void): void;
-  compileGate(target: THREE.Object3D): Promise<unknown>;
+  compileGate(target: THREE.Object3D, requiredForEntry?: boolean): Promise<unknown>;
   attachZoneFeature(
     view: { group: THREE.Group; glowLights?: THREE.PointLight[]; cullGroups?: THREE.Group[] },
     freeze?: boolean,
@@ -236,6 +240,66 @@ describe('Renderer live shader compile rejection recovery', () => {
     expect(compiled).toEqual([torso, eyes, hair]);
   });
 
+  it('holds an ordinary live gate until the initial-paint barrier settles', async () => {
+    const renderer = harness();
+    let release!: () => void;
+    renderer.initialGpuWorkStart = new Promise<void>((resolve) => (release = resolve));
+    renderer.sim = { player: { id: 1, targetId: null }, entities: new Map() };
+    const runPieces = vi.fn(() => Promise.resolve({ failed: false, timedOut: false }));
+    renderer.liveCompileGates = { runPieces };
+    renderer.compilePrewarmColorPrograms = vi.fn(() => Promise.resolve());
+    renderer.compileShadowPrograms = vi.fn(() => Promise.resolve());
+    renderer.webgl = { properties: { get: () => ({}) } };
+    renderer.uploadGateTexturesGated = vi.fn(() => Promise.resolve(0));
+    renderer.touchLinkedProgramsGated = vi.fn(() => Promise.resolve(0));
+    const target = new THREE.Mesh(new THREE.BufferGeometry(), new THREE.MeshBasicMaterial());
+
+    const pending = renderer.compileGate(target);
+    expect(runPieces).not.toHaveBeenCalled();
+    release();
+    await pending;
+    expect(runPieces).toHaveBeenCalledOnce();
+  });
+
+  it('starts a targeted live gate immediately despite the initial-paint barrier', async () => {
+    const renderer = harness();
+    renderer.initialGpuWorkStart = new Promise<void>(() => undefined);
+    renderer.sim = { player: { id: 1, targetId: 7 }, entities: new Map() };
+    const runPieces = vi.fn(() => Promise.resolve({ failed: false, timedOut: false }));
+    renderer.liveCompileGates = { runPieces };
+    renderer.compilePrewarmColorPrograms = vi.fn(() => Promise.resolve());
+    renderer.compileShadowPrograms = vi.fn(() => Promise.resolve());
+    renderer.webgl = { properties: { get: () => ({}) } };
+    renderer.uploadGateTexturesGated = vi.fn(() => Promise.resolve(0));
+    renderer.touchLinkedProgramsGated = vi.fn(() => Promise.resolve(0));
+    const target = new THREE.Mesh(new THREE.BufferGeometry(), new THREE.MeshBasicMaterial());
+    target.userData.entityId = 7;
+
+    await renderer.compileGate(target);
+    expect(runPieces).toHaveBeenCalledOnce();
+  });
+
+  it('starts an entry-required live gate before the initial-paint barrier', async () => {
+    const renderer = harness();
+    let release!: () => void;
+    renderer.initialGpuWorkStart = new Promise<void>((resolve) => (release = resolve));
+    renderer.sim = { player: { id: 1, targetId: null }, entities: new Map() };
+    const runPieces = vi.fn(() => Promise.resolve({ failed: false, timedOut: false }));
+    renderer.liveCompileGates = { runPieces };
+    renderer.compilePrewarmColorPrograms = vi.fn(() => Promise.resolve());
+    renderer.compileShadowPrograms = vi.fn(() => Promise.resolve());
+    renderer.webgl = { properties: { get: () => ({}) } };
+    renderer.uploadGateTexturesGated = vi.fn(() => Promise.resolve(0));
+    renderer.touchLinkedProgramsGated = vi.fn(() => Promise.resolve(0));
+    const target = new THREE.Mesh(new THREE.BufferGeometry(), new THREE.MeshBasicMaterial());
+
+    const pending = renderer.compileGate(target, true);
+    await flushGate();
+    expect(runPieces).toHaveBeenCalledOnce();
+    release();
+    await pending;
+  });
+
   it('never compiles a live gate at the ambient render target (colour-space cache-key trap)', () => {
     const source = readFileSync(new URL('../src/render/renderer.ts', import.meta.url), 'utf8');
     const gateStart = source.indexOf('private compileGate(');
@@ -251,6 +315,8 @@ describe('Renderer live shader compile rejection recovery', () => {
     expect(gateMethod).toContain('this.compilePrewarmColorPrograms(node, false)');
     expect(gateMethod).toContain('this.compileShadowPrograms(node)');
     expect(gateMethod).toContain('this.liveCompileGates.runPieces(');
+    expect(gateMethod).toContain('compileMayStartBeforeInitialPaint(priority, requiredForEntry)');
+    expect(gateMethod).toContain('this.initialGpuWorkStart');
     expect(gateMethod).toContain('linkPieceWork(target, color, shadow, settle),');
     expect(gateMethod).not.toContain('this.liveCompileGates.run(');
     expect(gateMethod).toContain('this.uploadGateTexturesGated(target, priority)');
@@ -316,8 +382,8 @@ describe('Renderer live shader compile rejection recovery', () => {
       new URL('../src/render/dungeon.ts', import.meta.url),
       'utf8',
     );
-    expect(dungeonSource).toContain(
-      'await attachSceneGroupGated(this.scene, group, this.compileGate)',
+    expect(dungeonSource).toMatch(
+      /await attachSceneGroupGated\(\s*this\.scene,\s*group,\s*this\.compileGate,\s*\(\) => registry\.isRetired/,
     );
   });
 
@@ -338,8 +404,7 @@ describe('Renderer live shader compile rejection recovery', () => {
     expect(start).toBeGreaterThan(-1);
     const body = dungeonSource.slice(start, dungeonSource.indexOf('\n  }', start));
     const returns = body.split('return group;').length - 1;
-    const gated =
-      body.split('await attachSceneGroupGated(this.scene, group, this.compileGate)').length - 1;
+    const gated = body.split('await attachSceneGroupGated(').length - 1;
     const bareAdds = body.split('this.scene.add(group);').length - 1;
     expect(returns).toBeGreaterThanOrEqual(3);
     expect(bareAdds).toBe(1);

@@ -63,10 +63,12 @@ const PROT_MODS = computeTalentModifiers('warrior', {
 
 describe('abilityDamageBonus (tooltip scaling mirrors combat)', () => {
   it('shows Hexcraft-resolved Litany of Guilt damage at every rank', () => {
+    // Authored 5/9/14 through the 10% Hexcraft mastery plus the 2026-08-23
+    // viability floor's affliction spellDmgPct 0.07.
     for (const [level, expectedDamage] of [
       [8, 6],
-      [11, 10],
-      [20, 15],
+      [11, 11],
+      [20, 16],
     ] as const) {
       const litany = abilitiesKnownAt('warlock', level, AFFLICTION_MODS).find(
         (ability) => ability.def.id === 'litany_of_guilt',

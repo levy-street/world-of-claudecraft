@@ -121,7 +121,6 @@
 <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
 <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
 <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
-<link rel="preload" as="image" href="/loading-screen.jpg" />
 <link rel="preload" as="image" href="./ui/cursors/gauntlet.png" />
 <link rel="preload" as="image" href="./ui/cursors/arrow.png" />
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -188,11 +187,21 @@
     <div id="target-frame" class="unitframe" role="group" data-i18n-aria="hudChrome.unitFrame.targetLabel" aria-label="Your Mark">
       <div class="portrait-wrap" id="tf-portrait-wrap">
         <div class="portrait"><canvas id="tf-portrait" width="54" height="54"></canvas></div>
+        <span class="deed-heraldry-seal" aria-hidden="true">
+          <svg class="deed-heraldry-seal-art" viewBox="0 0 24 24" focusable="false" aria-hidden="true">
+            <path id="tf-heraldry-seal-motif"></path>
+          </svg>
+        </span>
         <div class="level-chip" id="tf-level"></div>
         <div id="tf-elite-tag" data-i18n="hud.core.elite">ELITE</div>
       </div>
       <div class="uf-bars">
-        <div class="uf-name" id="tf-name"></div>
+        <div class="uf-name-header deed-heraldry-plaque deed-heraldry-plaque-mirror" id="tf-name-header">
+          <svg class="deed-heraldry-pattern" viewBox="0 0 24 24" focusable="false" aria-hidden="true">
+            <path id="tf-heraldry-pattern-motif"></path>
+          </svg>
+          <div class="uf-name" id="tf-name"></div>
+        </div>
         <div class="bar hp"><div class="bar-fill" id="tf-hp"></div><div class="bar-absorb" id="tf-absorb"></div><div class="bar-text" id="tf-hp-text"></div></div>
         <div class="bar" id="tf-resource"><div class="bar-fill" id="tf-res"></div><div class="bar-text" id="tf-res-text"></div></div>
         <div class="uf-discord" id="tf-discord"></div>
@@ -325,12 +334,22 @@
           <div id="player-frame" class="unitframe" role="group" tabindex="0" aria-haspopup="menu" data-i18n-aria="hudChrome.unitFrame.playerLabel" aria-label="Your Hero">
             <div class="portrait-wrap" id="pf-portrait-wrap">
               <div class="portrait"><canvas id="pf-portrait" width="54" height="54"></canvas></div>
+              <span class="deed-heraldry-seal" aria-hidden="true">
+                <svg class="deed-heraldry-seal-art" viewBox="0 0 24 24" focusable="false" aria-hidden="true">
+                  <path id="pf-heraldry-seal-motif"></path>
+                </svg>
+              </span>
               <div class="level-chip" id="pf-level">1</div>
               <div class="combat-flash" id="pf-combat" role="status" data-i18n-title="hud.social.status.combat" data-i18n-aria="hud.social.status.combat" title="In Combat" aria-label="In Combat"><img src="/ui/crests/status/combat.webp" data-crest-fallback-id="status_combat" data-crest-fallback-size="32" alt="" aria-hidden="true" /></div>
               <div class="rest-indicator" id="pf-rest" role="status" data-i18n-title="hudChrome.rest.resting" data-i18n-aria="hudChrome.rest.resting" title="Resting" aria-label="Resting">z</div>
             </div>
             <div class="uf-bars">
-              <div class="uf-name" id="pf-name"></div>
+              <div class="uf-name-header deed-heraldry-plaque" id="pf-name-header">
+                <svg class="deed-heraldry-pattern" viewBox="0 0 24 24" focusable="false" aria-hidden="true">
+                  <path id="pf-heraldry-pattern-motif"></path>
+                </svg>
+                <div class="uf-name" id="pf-name"></div>
+              </div>
               <div class="combo-row" id="combo-row" role="meter" aria-valuemin="0" aria-valuemax="5" aria-valuenow="0"></div>
               <div class="bar hp"><div class="bar-fill" id="pf-hp"></div><div class="bar-absorb" id="pf-absorb"></div><div class="bar-text" id="pf-hp-text"></div></div>
               <div class="bar mana" id="pf-resource"><div class="bar-fill" id="pf-res"></div><div class="bar-text" id="pf-res-text"></div><div class="low-resource-label" id="pf-low-resource"></div></div>
@@ -451,6 +470,7 @@
     <div id="inspect-window" class="window panel"></div>
     <div id="loot-settings-window" class="window panel" role="dialog" aria-labelledby="loot-settings-title"></div>
     <div id="spellbook" class="window panel"></div>
+    <div id="bar-editor" class="window panel"></div>
     <div id="talents-window" class="window panel"></div>
     <div id="quest-log-window" class="window panel"></div>
     <div id="crafting-window" class="window panel"></div>
@@ -481,6 +501,7 @@
     <div id="daily-rewards-window" class="window panel"></div>
     <div id="claudium-window" class="window panel"></div>
     <div id="market-window" class="window panel"></div>
+    <div id="woc-market-window" class="window panel"></div>
     <div id="mailbox-window" class="window panel"></div>
     <div id="bank-window" class="window panel"></div>
     <div id="deeds-window" class="window panel"></div>
@@ -514,6 +535,7 @@
         <button class="micro-btn" id="mm-valecup" data-i18n-title="hudChrome.keybinds.valecup" data-i18n-aria="hudChrome.keybinds.valecup" title="Vale Cup" aria-label="Vale Cup" data-icon="ball"><span class="keybind">y</span></button>
         <button class="micro-btn" id="mm-cardduel" data-i18n-title="cardDuel.title" data-i18n-aria="cardDuel.title" title="Card Duel" aria-label="Card Duel" data-icon="cards"></button>
         <button class="micro-btn" id="mm-leaderboard" data-i18n-title="game.leaderboard.title" data-i18n-aria="game.leaderboard.title" title="Leaderboard" aria-label="Leaderboard" data-icon="leaderboard"><span class="keybind">k</span></button>
+        <button class="micro-btn" id="mm-wocmarket" hidden data-i18n-title="hudChrome.wocMarket.launcherLabel" data-i18n-aria="hudChrome.wocMarket.launcherLabel" title="$WOC Exchange" aria-label="$WOC Exchange" data-icon="market"></button>
         <button class="micro-btn" id="mm-emote" data-i18n-aria="hudChrome.emoteWheel.label" aria-label="Emotes" data-icon="emote"><span class="keybind">x</span></button>
         <button class="micro-btn" id="mm-music" data-i18n-title="hud.options.music" data-i18n-aria="hud.options.music" title="Music" aria-label="Music" data-icon="music"></button>
         <button class="micro-btn" id="mm-social" data-i18n-title="hud.keybinds.actions.social" data-i18n-aria="hud.keybinds.actions.social" title="Friends &amp; Guild" aria-label="Friends &amp; Guild" data-icon="social"><span class="keybind">o</span></button>
@@ -671,6 +693,15 @@
 
         <div class="header-actions">
           <button type="button" class="homepage-music-btn" id="homepage-music-toggle" data-i18n-title="hud.options.music" data-i18n-aria="hud.options.music" title="Music" aria-label="Music" aria-pressed="true" data-icon="music"></button>
+          <button
+            type="button"
+            class="desktop-login-exit"
+            id="desktop-login-exit"
+            data-i18n="desktop.titlebar.exitGame"
+            data-i18n-title="desktop.titlebar.exitGame"
+            title="Exit Game"
+            hidden
+          >Exit Game</button>
           <a class="donate-cta" href="https://ko-fi.com/worldofclaudecraft" target="_blank" rel="noopener noreferrer" data-i18n-title="a11y.donateProject" data-i18n-aria="a11y.donateProject" title="Support the project" aria-label="Donate to support World of ClaudeCraft">
             <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
             <span data-i18n="nav.donate">Donate</span>
@@ -1150,39 +1181,121 @@
       <div id="mobile-camera-stick" class="mobile-stick"></div>
       <div class="mobile-joy-label" data-i18n="hud.core.mobileCamera">Camera</div>
     </div>
+    <!-- Quick Actions: ONE seat replacing the five-button row that used to sit
+         at top-left, further from either thumb than anything else in the HUD. A
+         tap opens #mobile-menu-strip; a hold or a rightward swipe opens it and
+         picks in the same gesture. The control runs no action of its own, which
+         is why a second tap closes the row again.
+         The container id is kept: the Seeker build promotes the daily chest into
+         it (src/main.ts wireWallet). -->
     <div id="mobile-combat-controls">
-      <button class="mobile-btn" type="button" id="mobile-chat" data-i18n-title="hud.keybinds.actions.chat" data-i18n-aria="hud.keybinds.actions.chat" title="Open Chat" aria-label="Open Chat" data-icon="chat"><span class="mobile-label" data-i18n="hud.core.mobileChat">Chat</span></button>
-      <button class="mobile-btn" type="button" id="mobile-social" data-i18n-title="hud.keybinds.actions.social" data-i18n-aria="hud.keybinds.actions.social" title="Friends &amp; Guild" aria-label="Friends &amp; Guild" data-icon="social"><span class="mobile-label" data-i18n="hud.core.mobileSocial">Social</span></button>
-      <button class="mobile-btn" type="button" id="mobile-quest" data-i18n-title="questUi.log.title" data-i18n-aria="questUi.log.title" title="Quest Log" aria-label="Quest Log" data-icon="questlog"><span class="mobile-label" data-i18n="questUi.tracker.title">Quests</span></button>
-      <button class="mobile-btn" type="button" id="mobile-menu" data-i18n-title="hud.options.gameMenu" data-i18n-aria="hud.options.gameMenu" title="Game Menu" aria-label="Game Menu" data-icon="menu"><span class="mobile-label" data-i18n="hud.core.mobileSettings">Settings</span></button>
-      <button class="mobile-btn" type="button" id="mobile-more" data-i18n-title="hud.core.mobileMoreAria" data-i18n-aria="hud.core.mobileMoreAria" title="Show more menus" aria-label="Show more menus" aria-controls="mobile-extra-controls" aria-expanded="false" data-icon="more"><span class="mobile-label" data-i18n="hud.core.mobileMore">More</span></button>
+      <button class="mobile-btn" type="button" id="mobile-menu-anchor" aria-expanded="false" data-i18n-title="hudChrome.mobile.quickActions" data-i18n-aria="hudChrome.mobile.quickActionsAria" title="Quick Actions" aria-label="Quick Actions. Tap to open the row of mount, chat, map, bags and more, or hold and swipe right to pick one." aria-haspopup="true" data-icon="more"><span class="mobile-label" data-i18n="hudChrome.mobile.quickActionsLabel">Actions</span></button>
     </div>
     <div id="mobile-action-ring" data-i18n-aria="hudChrome.mobile.actionRing" aria-label="Combat actions">
-      <button class="mobile-action-slot" type="button" data-mobile-index="0"></button>
-      <button class="mobile-action-slot" type="button" data-mobile-index="1"></button>
-      <button class="mobile-action-slot" type="button" data-mobile-index="2"></button>
-      <button class="mobile-action-slot" type="button" data-mobile-index="3"></button>
-      <button class="mobile-action-slot" type="button" data-mobile-index="4"></button>
+      <button class="mobile-action-slot" type="button" data-mobile-index="0" aria-haspopup="true" aria-expanded="false"></button>
+      <button class="mobile-action-slot" type="button" data-mobile-index="1" aria-haspopup="true" aria-expanded="false"></button>
+      <button class="mobile-action-slot" type="button" data-mobile-index="2" aria-haspopup="true" aria-expanded="false"></button>
+      <button class="mobile-action-slot" type="button" data-mobile-index="3" aria-haspopup="true" aria-expanded="false"></button>
+      <button type="button" id="mobile-consumable-seat" class="mobile-ring-seat" data-mobile-index="4" aria-haspopup="true" aria-expanded="false"></button>
       <button type="button" id="mobile-action-attack" data-icon="attack"></button>
       <button type="button" id="mobile-target-cycle" data-i18n-title="hudChrome.mobile.targetCycle" data-i18n-aria="hudChrome.mobile.targetCycle" title="Swap target" aria-label="Swap target" data-icon="target"><span class="mobile-label" data-i18n="hudChrome.mobile.targetCycleShort">Target</span></button>
       <button type="button" id="mobile-interact" data-i18n-title="hud.keybinds.actions.interact" data-i18n-aria="hud.keybinds.actions.interact" title="Interact / Loot" aria-label="Interact / Loot" data-icon="interact"><span class="mobile-label" data-i18n="hud.core.mobileUse">Use</span></button>
       <button type="button" id="mobile-jump" data-i18n-title="hud.keybinds.actions.jump" data-i18n-aria="hud.keybinds.actions.jump" title="Jump" aria-label="Jump" data-icon="jump"><span class="mobile-label" data-i18n="hudChrome.mobile.jump">Jump</span></button>
       <button type="button" id="mobile-action-page-toggle" data-i18n-aria="hudChrome.mobile.actionPageToggle" aria-label="Switch action page" data-icon="swap"><span class="mobile-action-page-indicator"></span></button>
+      <!-- The stance control: ONE circle on the ring's bottom row, one clear gap
+           past Jump, wearing the stance (or paladin devotion aura) the player is
+           in. It runs no action of its own: a tap opens #mobile-stance-radial and
+           the next press closes it, while a hold or a flick reaches a stance in
+           the same gesture. Warrior/paladin only; every other class never renders
+           it (the painter keeps it display:none). -->
+      <button class="mobile-btn" type="button" id="mobile-stance-anchor" aria-haspopup="true" aria-expanded="false" aria-pressed="false" data-i18n-aria="hudChrome.mobile.stanceAnchorEmptyAria" aria-label="No stance. Tap to open the stance ring, then pick a stance."><span class="icon-label"></span></button>
     </div>
-    <!-- Consumables quick bar: a slim chevron chip right of the Chat/Social/More
-         trio; tapping it expands a row of the carried potions/elixirs/food/drink
-         (auto-populated, no setup) so touch players can quaff mid-fight without
-         the More > Bags full-screen detour. Collapsed by default, session-only. -->
-    <div id="mobile-consumables" role="group" data-i18n-aria="hudChrome.bags.filterConsumable" aria-label="Consumables">
-      <button type="button" id="mobile-consumables-toggle" data-i18n-title="hudChrome.bags.filterConsumable" data-i18n-aria="hudChrome.bags.filterConsumable" title="Consumables" aria-label="Consumables" aria-expanded="false" data-icon="next"></button>
-      <div id="mobile-consumables-row">
-        <button class="mobile-consumable-slot" type="button" data-consumable-index="0"></button>
-        <button class="mobile-consumable-slot" type="button" data-consumable-index="1"></button>
-        <button class="mobile-consumable-slot" type="button" data-consumable-index="2"></button>
-        <button class="mobile-consumable-slot" type="button" data-consumable-index="3"></button>
-        <button class="mobile-consumable-slot" type="button" data-consumable-index="4"></button>
-        <button class="mobile-consumable-slot" type="button" data-consumable-index="5"></button>
-      </div>
+    <div id="mobile-action-radial" role="group" data-i18n-aria="hudChrome.mobile.actionRadial" aria-label="Action directions">
+      <button type="button" class="mobile-action-petal" data-radial-dir="up" data-mobile-index="0" tabindex="-1"></button>
+      <button type="button" class="mobile-action-petal" data-radial-dir="right" data-mobile-index="1" tabindex="-1"></button>
+      <button type="button" class="mobile-action-petal" data-radial-dir="down" data-mobile-index="2" tabindex="-1"></button>
+      <button type="button" class="mobile-action-petal" data-radial-dir="left" data-mobile-index="3" tabindex="-1"></button>
+      <button type="button" id="mobile-action-radial-cancel" data-i18n-aria="hudChrome.mobile.actionRadialCancel" aria-label="Cancel action" data-icon="close" tabindex="-1"></button>
+    </div>
+    <!-- The stance radial: the other known stances, on the same four directions
+         and the same circle the action ring's petals use, seated in viewport
+         coordinates by stance_radial_painter.ts. The cancel X sits ON the anchor,
+         so releasing where the gesture started backs out without switching. A
+         direction with no stance on it stays display:none and aria-hidden. -->
+    <div id="mobile-stance-radial" role="group" data-i18n-aria="hudChrome.mobile.stanceRadial" aria-label="Stances">
+      <button type="button" class="mobile-stance-petal" data-radial-dir="up" tabindex="-1"><span class="icon-label"></span></button>
+      <button type="button" class="mobile-stance-petal" data-radial-dir="right" tabindex="-1"><span class="icon-label"></span></button>
+      <button type="button" class="mobile-stance-petal" data-radial-dir="down" tabindex="-1"><span class="icon-label"></span></button>
+      <button type="button" class="mobile-stance-petal" data-radial-dir="left" tabindex="-1"><span class="icon-label"></span></button>
+      <button type="button" id="mobile-stance-cancel" data-i18n-aria="hudChrome.mobile.actionRadialCancel" aria-label="Cancel action" data-icon="close" tabindex="-1"></button>
+    </div>
+    <!-- Consumables row: opened by a hold or a leftward swipe on the ring's 5th
+         seat, seated in viewport coordinates by consumable_strip_painter.ts. The
+         cancel X sits ON the seat, so releasing back where the gesture started
+         backs out without quaffing anything, and ONE caption names the item the
+         finger is on, which is how a potion is told from an elixir mid-fight. -->
+    <div id="mobile-consumable-strip" role="group" data-i18n-aria="hudChrome.mobile.consumableSeat" aria-label="Consumables">
+      <button type="button" class="mobile-consumable-item" data-consumable-index="0" tabindex="-1"></button>
+      <button type="button" class="mobile-consumable-item" data-consumable-index="1" tabindex="-1"></button>
+      <button type="button" class="mobile-consumable-item" data-consumable-index="2" tabindex="-1"></button>
+      <button type="button" class="mobile-consumable-item" data-consumable-index="3" tabindex="-1"></button>
+      <button type="button" class="mobile-consumable-item" data-consumable-index="4" tabindex="-1"></button>
+      <button type="button" class="mobile-consumable-item" data-consumable-index="5" tabindex="-1"></button>
+      <button type="button" id="mobile-consumable-cancel" data-i18n-aria="hudChrome.mobile.actionRadialCancel" aria-label="Cancel action" data-icon="close" tabindex="-1"></button>
+      <div id="mobile-consumable-caption" class="panel" aria-hidden="true"><span class="tt-title"></span></div>
+    </div>
+    <!-- The Quick Actions strip: ten actions extending rightward from the control,
+         opened by a tap, a hold or a rightward swipe and seated in viewport
+         coordinates by menu_strip_painter.ts. Every item is a REAL button the
+         touch HUD binds, so a pick routes through the existing handler; Mount
+         leads the row (issue #2739) and Chat follows it. The cancel X sits ON the
+         anchor, so releasing where the gesture started backs out without opening
+         anything, and ONE caption names the live item instead of ten colliding
+         labels. -->
+    <div id="mobile-menu-strip" role="group" data-i18n-aria="hudChrome.mobile.quickActions" aria-label="Quick Actions">
+      <button type="button" class="mobile-menu-item" id="mobile-menu-mount" data-menu-index="0" data-i18n-title="hudChrome.keybinds.mount" data-i18n-aria="hudChrome.keybinds.mount" title="Mount / Dismount" aria-label="Mount / Dismount" data-icon="mount" tabindex="-1"></button>
+      <button type="button" class="mobile-menu-item" id="mobile-menu-chat" data-menu-index="1" data-i18n-title="hud.keybinds.actions.chat" data-i18n-aria="hud.keybinds.actions.chat" title="Open Chat" aria-label="Open Chat" data-icon="chat" tabindex="-1"></button>
+      <button type="button" class="mobile-menu-item" id="mobile-menu-map" data-menu-index="2" data-i18n-title="hud.keybinds.actions.map" data-i18n-aria="hud.keybinds.actions.map" title="World Map" aria-label="World Map" data-icon="map" tabindex="-1"></button>
+      <button type="button" class="mobile-menu-item" id="mobile-menu-bags" data-menu-index="3" data-i18n-title="hud.keybinds.actions.bags" data-i18n-aria="hud.keybinds.actions.bags" title="Bags" aria-label="Bags" data-icon="bags" tabindex="-1"></button>
+      <button type="button" class="mobile-menu-item" id="mobile-social" data-menu-index="4" data-i18n-title="hud.keybinds.actions.social" data-i18n-aria="hud.keybinds.actions.social" title="Friends &amp; Guild" aria-label="Friends &amp; Guild" data-icon="social" tabindex="-1"></button>
+      <button type="button" class="mobile-menu-item" id="mobile-quest" data-menu-index="5" data-i18n-title="questUi.log.title" data-i18n-aria="questUi.log.title" title="Quest Log" aria-label="Quest Log" data-icon="questlog" tabindex="-1"></button>
+      <button type="button" class="mobile-menu-item" id="mobile-menu-char" data-menu-index="6" data-i18n-title="hud.keybinds.actions.char" data-i18n-aria="hud.keybinds.actions.char" title="Character" aria-label="Character" data-icon="character" tabindex="-1"></button>
+      <button type="button" class="mobile-menu-item" id="mobile-menu-spellbook" data-menu-index="7" data-i18n-title="abilityUi.spellbook.title" data-i18n-aria="abilityUi.spellbook.title" title="Spellbook" aria-label="Spellbook" data-icon="spellbook" tabindex="-1"></button>
+      <button type="button" class="mobile-menu-item" id="mobile-menu" data-menu-index="8" data-i18n-title="hud.options.gameMenu" data-i18n-aria="hud.options.gameMenu" title="Game Menu" aria-label="Game Menu" data-icon="menu" tabindex="-1"></button>
+      <button type="button" class="mobile-menu-item" id="mobile-more" data-menu-index="9" data-i18n-title="hud.core.mobileMoreAria" data-i18n-aria="hud.core.mobileMoreAria" title="Show more menus" aria-label="Show more menus" aria-controls="mobile-extra-controls" aria-expanded="false" data-icon="more" tabindex="-1"></button>
+      <button type="button" id="mobile-menu-cancel" data-i18n-aria="hudChrome.mobile.actionRadialCancel" aria-label="Cancel action" data-icon="close" tabindex="-1"></button>
+      <div id="mobile-menu-caption" class="panel" aria-hidden="true"><span class="tt-title"></span></div>
+    </div>
+    <!-- Top-band quest strip: the touch replacement for the right-anchored
+         #quest-tracker, which is fixed-width per tier and UNBOUNDED in height
+         (measured: 122 x 42px over the action ring at only two quests). ONE
+         quest at a time with all of its objectives, so the height stops being a
+         function of the quest count. A tap or a swipe LEFT advances, a swipe
+         RIGHT goes back, and the chevrons flanking the position are a HINT, not
+         buttons. Seated by quest_strip_controller.ts against the band's measured
+         occupants; the objective lines are static because the strip caps them at
+         QUEST_STRIP_MAX_OBJECTIVES plus the overflow line. -->
+    <div id="quest-strip" class="empty">
+      <!-- Named from its own REAL nodes (title, the complete marker, the position),
+           never an aria-label: an aria-label on a button REPLACES its subtree for name
+           computation, which is what silently swallowed the objective progress a
+           sighted touch player reads. The objectives and the activation hint are the
+           button's DESCRIPTION instead, so both are announced. -->
+      <button type="button" id="quest-strip-main" aria-labelledby="quest-strip-title quest-strip-complete quest-strip-count" aria-describedby="quest-strip-objs quest-strip-hint">
+        <span class="quest-strip-title-row">
+          <span id="quest-strip-title" class="quest-strip-title"></span>
+          <span id="quest-strip-complete" class="quest-complete"></span>
+          <span id="quest-strip-cycle" class="quest-strip-cycle" aria-hidden="true"><span id="quest-strip-prev" class="quest-strip-arrow">&#8249;</span><span id="quest-strip-count" class="quest-strip-count"></span><span id="quest-strip-next" class="quest-strip-arrow">&#8250;</span></span>
+        </span>
+        <span id="quest-strip-objs" class="quest-strip-objs">
+          <span class="quest-strip-obj"></span>
+          <span class="quest-strip-obj"></span>
+          <span class="quest-strip-obj"></span>
+          <span class="quest-strip-obj"></span>
+          <span id="quest-strip-more" class="quest-strip-obj quest-strip-more"></span>
+        </span>
+      </button>
+      <span id="quest-strip-hint" class="visually-hidden"></span>
     </div>
   </div>
       <div id="mobile-extra-controls" class="window panel" role="dialog" aria-modal="true" aria-labelledby="mobile-more-title" aria-hidden="true">
@@ -1191,6 +1304,8 @@
           <button type="button" class="x-btn" id="mobile-more-close" data-i18n-title="hud.options.returnToGame" data-i18n-aria="hud.options.returnToGame" title="Return to Game" aria-label="Return to Game" data-icon="close"></button>
         </div>
         <div id="mobile-extra-grid">
+          <button type="button" class="mobile-btn" id="mobile-bar-editor" data-i18n-title="hudChrome.mobile.barEditorAria" data-i18n-aria="hudChrome.mobile.barEditorAria" title="Edit the action bar layout" aria-label="Edit the action bar layout" data-icon="swap"><span class="mobile-label" data-i18n="hudChrome.mobile.barEditor">Edit Bars</span></button>
+          <button type="button" class="mobile-btn" id="mobile-chat" data-i18n-title="hud.keybinds.actions.chat" data-i18n-aria="hud.keybinds.actions.chat" title="Open Chat" aria-label="Open Chat" data-icon="chat"><span class="mobile-label" data-i18n="hud.core.mobileChat">Chat</span></button>
           <button type="button" class="mobile-btn" id="mobile-discord" hidden data-i18n-title="hudChrome.discord.title" data-i18n-aria="hudChrome.discord.title" title="Discord" aria-label="Discord" data-icon="discord"><span class="mobile-label" data-i18n="hudChrome.discord.title">Discord</span></button>
           <button type="button" class="mobile-btn" id="mobile-donate" data-i18n-title="a11y.donateProject" data-i18n-aria="a11y.donateProject" title="Support the project" aria-label="Donate to support World of ClaudeCraft" data-icon="donate"><span class="mobile-label" data-i18n="nav.donate">Donate</span></button>
           <button type="button" class="mobile-btn" id="mobile-wiki" data-i18n-title="nav.wiki" data-i18n-aria="nav.wiki" title="Wiki" aria-label="Wiki" data-icon="wiki"><span class="mobile-label" data-i18n="nav.wiki">Wiki</span></button>
@@ -1206,6 +1321,7 @@
           <button class="mobile-btn" id="mobile-map" data-i18n-title="hud.keybinds.actions.map" data-i18n-aria="hud.keybinds.actions.map" title="World Map" aria-label="World Map" data-icon="map"><span class="mobile-label" data-i18n="hud.core.mobileMap">Map</span></button>
           <button class="mobile-btn" id="mobile-leaderboard" data-i18n-title="game.leaderboard.title" data-i18n-aria="game.leaderboard.title" title="Leaderboard" aria-label="Leaderboard" data-icon="leaderboard"><span class="mobile-label" data-i18n="hudChrome.mobile.leaderboard">Ranks</span></button>
           <button type="button" class="mobile-btn" id="mobile-daily-rewards" data-i18n-title="hudChrome.dailyRewards.title" data-i18n-aria="hudChrome.dailyRewards.title" title="Daily Rewards" aria-label="Daily Rewards" data-icon="chest"><span class="mobile-label" data-i18n="hudChrome.mobile.dailyRewards">Rewards</span></button>
+          <button type="button" class="mobile-btn" id="mobile-wocmarket" hidden data-i18n-title="hudChrome.wocMarket.launcherLabel" data-i18n-aria="hudChrome.wocMarket.launcherLabel" title="$WOC Exchange" aria-label="$WOC Exchange" data-icon="market"><span class="mobile-label" data-i18n="hudChrome.mobile.wocMarket">Exchange</span></button>
           <button type="button" class="mobile-btn" id="mobile-deeds" data-i18n-title="hudChrome.deeds.title" data-i18n-aria="hudChrome.deeds.title" title="Book of Deeds" aria-label="Book of Deeds" data-icon="book"><span class="mobile-label" data-i18n="hudChrome.mobile.deeds">Deeds</span></button>
           <button type="button" class="mobile-btn" id="mobile-reliquary" data-i18n-title="hudChrome.reliquary.title" data-i18n-aria="hudChrome.reliquary.title" title="The Reliquary" aria-label="The Reliquary" data-icon="crown"><span class="mobile-label" data-i18n="hudChrome.mobile.reliquary">Reliquary</span></button>
           <button type="button" class="mobile-btn" id="mobile-mounts" data-i18n-title="hudChrome.keybinds.mount" data-i18n-aria="hudChrome.keybinds.mount" title="Mount / Dismount" aria-label="Mount / Dismount" data-icon="mount"><span class="mobile-label" data-i18n="hudChrome.mounts.mount">Mount</span></button>

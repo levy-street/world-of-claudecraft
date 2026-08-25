@@ -4,17 +4,21 @@ import {
   BLOCKING_PREWARM_ENTRIES_WITHOUT_PARALLEL_COMPILE,
   CONSTRAINED_PREWARM_KEEP,
   CONSTRAINED_PREWARM_RESUME,
+  compileGroupRunsBeforeInitialPaint,
   constrainedEntryViewCreateBudget,
   interactionLandmarkViewPriority,
   mandatoryLandmarkViewsReady,
   materialProgramSignature,
   NEARBY_LANDMARK_STREAM_RADIUS,
+  NEARBY_VIEW_PREWARM_FLOOR,
+  nearbyPrewarmViewBudget,
   orderedPrewarmIds,
   orderPrewarmResumeEntries,
   type PrewarmPolicyInput,
   partitionMandatoryLandmarkCandidates,
   partitionResidentSkyBiomes,
   planCompileSubmission,
+  portalPrewarmViewBudget,
   prewarmBuildDeadline,
   prewarmCompileAwaitDeadline,
   prewarmEntryResumesAfterSkip,
@@ -39,12 +43,12 @@ const BASE: PrewarmPolicyInput = {
   asyncCompileSupported: true,
   lowGfx: false,
   finishFullManifestBeforeReveal: false,
-  defaultMaxMs: 12000,
-  constrainedMaxMs: 5000,
-  defaultCompileMaxMs: 10000,
-  constrainedCompileMaxMs: 2500,
-  maxViewsLow: 48,
-  maxViewsHigh: 72,
+  defaultMaxMs: 3000,
+  constrainedMaxMs: 3000,
+  defaultCompileMaxMs: 1500,
+  constrainedCompileMaxMs: 1500,
+  maxViewsLow: 12,
+  maxViewsHigh: 16,
   maxViewsConstrained: 2,
 };
 
@@ -55,6 +59,39 @@ const BASE: PrewarmPolicyInput = {
 const MAIN_SOURCE = codeWithoutLineComments(
   readFileSync(new URL('../src/main.ts', import.meta.url), 'utf8').replace(/\r\n/g, '\n'),
 );
+
+it('pins the production soft, compile, hard, and view budgets plus their policy wiring', () => {
+  const renderer = readFileSync(
+    new URL('../src/render/renderer.ts', import.meta.url),
+    'utf8',
+  ).replace(/\r\n/g, '\n');
+  for (const literal of [
+    'const VIEW_PREWARM_MAX_MS = 3000;',
+    'const VIEW_PREWARM_MAX_MS_CONSTRAINED = 3000;',
+    'const PREWARM_COMPILE_MAX_MS = 1500;',
+    'const PREWARM_COMPILE_MAX_MS_CONSTRAINED = 1500;',
+    'const VIEW_PREWARM_HARD_MAX_MS = 5000;',
+    'const VIEW_PREWARM_HARD_MAX_MS_CONSTRAINED = 5000;',
+    'const PREWARM_BUILD_RESERVE_MS = 1000;',
+    'const VIEW_PREWARM_MAX_VIEWS_LOW = 12;',
+    'const VIEW_PREWARM_MAX_VIEWS_HIGH = 16;',
+  ]) {
+    expect(renderer).toContain(literal);
+  }
+  for (const wiring of [
+    'defaultMaxMs: VIEW_PREWARM_MAX_MS,',
+    'constrainedMaxMs: VIEW_PREWARM_MAX_MS_CONSTRAINED,',
+    'defaultCompileMaxMs: PREWARM_COMPILE_MAX_MS,',
+    'constrainedCompileMaxMs: PREWARM_COMPILE_MAX_MS_CONSTRAINED,',
+    'maxViewsLow: VIEW_PREWARM_MAX_VIEWS_LOW,',
+    'maxViewsHigh: VIEW_PREWARM_MAX_VIEWS_HIGH,',
+    '? VIEW_PREWARM_HARD_MAX_MS_CONSTRAINED\n      : (pacing.knobs.hardMaxMs ?? VIEW_PREWARM_HARD_MAX_MS);',
+    'const maxMs = Math.max(0, options.maxMs ?? policy.maxMs);',
+    'const hardMaxMs = Math.max(maxMs, options.hardMaxMs ?? defaultHardMaxMs);',
+  ]) {
+    expect(renderer).toContain(wiring);
+  }
+});
 
 // The full manifest id order the renderer builds, for the reorder tests.
 // Kept in lockstep with the renderer by the "matches the renderer's real
@@ -75,11 +112,12 @@ const MANIFEST_IDS = [
   'entities.character-effect-variants',
   'foliage.materials',
   'foliage.great-tree-materials',
+  'world.settle-state',
+  'post.initial-frame',
   'programs.compile-submit',
   'surface-detail.textures',
   'weather.materials',
   'landmarks.impact-site',
-  'world.settle-state',
   'textures.scene',
   'vfx.atlas',
   'vfx.weapon-skins',
@@ -121,6 +159,48 @@ describe('graphics rebuild reveal wiring', () => {
   });
 });
 
+describe('initial entry detail admission wiring', () => {
+  it('arms the capped horizon before the manifest collects compile and texture work', () => {
+    const armAt = MAIN_SOURCE.indexOf('renderer.armEntryDetailHorizon();');
+    const prewarmAt = MAIN_SOURCE.indexOf('const prewarm = await renderer.prewarmInitialScene({');
+    const firstFrameAt = MAIN_SOURCE.indexOf('requestAnimationFrame(frame);', prewarmAt);
+    expect(armAt).toBeGreaterThan(-1);
+    expect(prewarmAt).toBeGreaterThan(armAt);
+    expect(firstFrameAt).toBeGreaterThan(prewarmAt);
+  });
+
+  it('keeps the live diagnostic marker separate from horizon admission', () => {
+    const renderer = readFileSync(
+      new URL('../src/render/renderer.ts', import.meta.url),
+      'utf8',
+    ).replace(/\r\n/g, '\n');
+    const markAt = renderer.indexOf('markGpuHitchReveal(): void {');
+    const markEnd = renderer.indexOf('\n  /**', markAt);
+    const mark = renderer.slice(markAt, markEnd);
+    expect(mark).not.toContain('entryDetailHorizon.');
+  });
+
+  it('installs the scenery reveal gates for every scene prewarm, before settle-state', () => {
+    const renderer = readFileSync(
+      new URL('../src/render/renderer.ts', import.meta.url),
+      'utf8',
+    ).replace(/\r\n/g, '\n');
+    const installAt = renderer.indexOf('private installSceneryRevealGates(): void {');
+    const prewarmAt = renderer.indexOf('async prewarmInitialScene(');
+    const policyAt = renderer.indexOf('const policy: PrewarmPolicy', prewarmAt);
+    const prewarmStart = renderer.slice(prewarmAt, policyAt);
+    const settleAt = renderer.indexOf("id: 'world.settle-state'");
+
+    expect(installAt).toBeGreaterThan(-1);
+    expect(prewarmAt).toBeGreaterThan(installAt);
+    expect(settleAt).toBeGreaterThan(prewarmAt);
+    expect(prewarmStart).toContain('this.installSceneryRevealGates();');
+    expect(renderer.slice(settleAt)).not.toContain(
+      'this.propsView.setBandRevealGate(this.propsRevealGate);',
+    );
+  });
+});
+
 /** The renderer's manifest entries parsed from source: id, and whether the
  *  literal carries required / deadlineExempt properties. */
 function parsedManifestEntries(): { id: string; required: boolean; deadlineExempt: boolean }[] {
@@ -150,13 +230,14 @@ function parsedManifestEntries(): { id: string; required: boolean; deadlineExemp
 }
 
 describe('resolvePrewarmPolicy: unconstrained desktop', () => {
-  it('runs the full manifest with generous budgets and no reordering', () => {
+  it('runs the full manifest inside a short responsive budget', () => {
     const p = resolvePrewarmPolicy(BASE);
     expect(p.minimalManifest).toBe(false);
-    expect(p.maxMs).toBe(12000);
-    expect(p.compileMaxMs).toBe(10000);
-    expect(p.maxViews).toBe(72);
-    expect(p.yieldBetweenEntries).toBe(false);
+    expect(p.maxMs).toBe(3000);
+    expect(p.compileMaxMs).toBe(1500);
+    expect(p.maxViews).toBe(16);
+    expect(p.nearbyViewFloor).toBe(NEARBY_VIEW_PREWARM_FLOOR);
+    expect(p.yieldBetweenEntries).toBe(true);
     expect(p.linkPassPerEntry).toBe(false);
     expect(p.compileBeforeFirstFrame).toBe(true);
     expect(p.skipMonolithCompile).toBe(false);
@@ -185,7 +266,7 @@ describe('resolvePrewarmPolicy: unconstrained desktop', () => {
       'this.createPersistentPortalViews(\n            createdViewTypes,\n            buildDeadline,',
     );
     expect(renderer).toContain(
-      'this.createCandidateViews(\n            remainingPrewarmViewBudget(policy.maxViews, createdViews),\n            createdViewTypes,\n            buildDeadline,',
+      'this.createCandidateViews(\n            nearbyPrewarmViewBudget(policy.maxViews, createdViews, policy.nearbyViewFloor),\n            createdViewTypes,\n            buildDeadline,',
     );
   });
 
@@ -202,6 +283,9 @@ describe('resolvePrewarmPolicy: unconstrained desktop', () => {
     expect(prewarmEntryShouldDefer(12_000, 12_000, 15_000, true, false)).toBe(false);
     expect(prewarmEntryShouldDefer(15_000, 12_000, 15_000, true, false)).toBe(true);
     expect(prewarmBuildDeadline(12_000, 15_000, 3_000, false)).toBe(9_000);
+    // The production 3 s soft budget must leave a real build slice before the
+    // 1 s reserve; otherwise nearby/persistent views all spill into gameplay.
+    expect(prewarmBuildDeadline(3_000, 5_000, 1_000, false)).toBe(2_000);
   });
 
   it('stops the compile-submit loop at the GPU submit deadline, except on the Insane arm', () => {
@@ -256,6 +340,7 @@ describe('resolvePrewarmPolicy: unconstrained desktop', () => {
     // first-draw stalls in live frames.
     expect(prewarmResumeIsDebt('programs.compile')).toBe(true);
     expect(prewarmResumeIsDebt('programs.compile-submit')).toBe(true);
+    expect(prewarmResumeIsDebt('programs.compile-post-paint')).toBe(true);
     expect(prewarmResumeIsDebt('textures.scene')).toBe(true);
     expect(prewarmResumeIsDebt('surface-detail.textures')).toBe(true);
     // The foliage species stream in with travel (ambient scene, not an
@@ -269,6 +354,29 @@ describe('resolvePrewarmPolicy: unconstrained desktop', () => {
     expect(prewarmResumeIsDebt('vfx.weapon-skins')).toBe(false);
     expect(prewarmResumeIsDebt('vfx.mount-programs')).toBe(false);
     expect(prewarmResumeIsDebt('vfx.ability-primitives')).toBe(false);
+  });
+
+  it('admits only the visible scene compile group before first paint', () => {
+    expect(compileGroupRunsBeforeInitialPaint('scene')).toBe(true);
+    for (const id of [
+      'doors',
+      'interiors',
+      'players',
+      'mobs',
+      'npcs',
+      'objects',
+      'props',
+      'ghost-fade-variants',
+      'character-effect-variants',
+      'ability-materials',
+      'foliage',
+      'great-tree',
+      'weapon-vfx',
+      'landmarks.impact-site',
+      'mounts',
+    ]) {
+      expect(compileGroupRunsBeforeInitialPaint(id), id).toBe(false);
+    }
   });
 
   it('orders resume entries program debt, upload debt, then cosmetic, stable within each class', () => {
@@ -424,7 +532,7 @@ describe('resolvePrewarmPolicy: unconstrained desktop', () => {
   });
 
   it('uses the low view cap on the low tier', () => {
-    expect(resolvePrewarmPolicy({ ...BASE, lowGfx: true }).maxViews).toBe(48);
+    expect(resolvePrewarmPolicy({ ...BASE, lowGfx: true }).maxViews).toBe(12);
   });
 
   it('keeps the full manifest and compiles before the first full-scene frame', () => {
@@ -482,9 +590,11 @@ describe('resolvePrewarmPolicy: unconstrained desktop', () => {
     // Deferred units count into the honesty gate: planned includes them and
     // the dropped count marks the entry partial, never completed.
     expect(compileEntry).toContain(
-      'compileUnitsPlanned = submittedCompileUnits.length + deferredSubmitUnits.length;',
+      'compileUnitsPlanned =\n            submittedCompileUnits.length +\n            deferredSubmitUnits.length +\n            postPaintCompileUnits.length;',
     );
-    expect(compileEntry).toContain('compileUnitsDropped = deferredSubmitUnits.length;');
+    expect(compileEntry).toContain(
+      'compileUnitsDropped = deferredSubmitUnits.length + postPaintCompileUnits.length;',
+    );
     // The await-all is bounded (see the dedicated reserve test below), so the
     // literal Promise.all is no longer the awaited expression directly; it is
     // captured and raced against the reserved deadline.
@@ -503,18 +613,32 @@ describe('resolvePrewarmPolicy: unconstrained desktop', () => {
     // without the fourth argument the Insane arm has no stop at all (the
     // 11.8 s compile-submit entry of the 17/08 production login).
     expect(renderer).toContain(
-      'prewarmSubmitShouldStop(\n          performance.now(),\n          deadlineMs,\n          policy.finishFullManifestBeforeReveal,\n          pacing.shouldStop(performance.now()),\n        )',
+      'outOfTime: () =>\n          prewarmSubmitShouldStop(\n            performance.now(),\n            deadlineMs,\n            policy.finishFullManifestBeforeReveal,\n            pacing.shouldStop(performance.now()),\n          ),',
     );
-    expect(renderer).toContain('if (!(await pacing.awaitSlot(outOfTime))) {');
+    expect(renderer).toContain('awaitSlot: (outOfTime) => pacing.awaitSlot(outOfTime),');
     expect(renderer).toContain(
-      'submitPrewarmCompileUnit(unit, lane, {\n            lifecycle: compileLifecycle,\n            pacing,',
+      'submitPrewarmCompileUnit(unit, lane, {\n              lifecycle: compileLifecycle,\n              pacing,',
     );
+    // Pushed as each unit is submitted, never collected from the loop's return:
+    // a rejection inside the loop must not lose already-submitted units from
+    // the set the compile entry awaits.
+    expect(renderer).toContain('submit: (unit) =>\n          submittedCompileUnits.push(');
+    // The loop itself is the extracted runPrewarmCompileSubmission, which owns
+    // the between-units check and the never-drop contract; the renderer keeps
+    // only the wiring above and the deferral bookkeeping below.
+    expect(renderer).toContain('await runPrewarmCompileSubmission(pending, {');
+    const submissionCore = readFileSync(
+      new URL('../src/render/prewarm_compile_submission_core.ts', import.meta.url),
+      'utf8',
+    ).replace(/\r\n/g, '\n');
+    expect(submissionCore).toContain('if (!(await host.awaitSlot(host.outOfTime))) {');
+    expect(submissionCore).toContain('const deferred = pending.slice(i);');
     // The deferral lifecycle, pinned end to end (QA finding B3): stopped
     // units are retained, drained FIRST by the next submission (their groups
     // are already marked, so the plan cannot re-collect them), any leftover
     // is handed to the resume lane under the synthetic id, and the mid-run
     // deferral withholds warm-pool publication like the whole-entry path.
-    expect(renderer).toContain('deferredSubmitUnits.push(...pending.slice(i));');
+    expect(renderer).toContain('deferredSubmitUnits.push(...(deferred as PrewarmResumeUnit[]));');
     expect(renderer).toContain(
       'const pending = [...deferredSubmitUnits.splice(0, deferredSubmitUnits.length), ...units];',
     );
@@ -770,11 +894,17 @@ describe('resolvePrewarmPolicy: unconstrained desktop', () => {
         '\n',
       ),
     );
+    const compileUnits = codeWithoutLineComments(
+      readFileSync(
+        new URL('../src/render/initial_scene_compile_units.ts', import.meta.url),
+        'utf8',
+      ).replace(/\r\n/g, '\n'),
+    );
     // The dedupe key comes from the shared pure helper, never a hand-rolled
     // string that can drift from three's cache key again.
-    expect(renderer).toContain('prewarmProgramContentKeys(');
-    expect(renderer).toContain('hasInstanceColor: ');
-    expect(renderer).toContain('morphTargetCount: ');
+    expect(compileUnits).toContain('prewarmProgramContentKeys(');
+    expect(compileUnits).toContain('hasInstanceColor: ');
+    expect(compileUnits).toContain('morphTargetCount: ');
     // The prewarm depth material must match the REAL shadow pass variant, and
     // that derivation lives in the shared factory (src/render/prewarm_depth_material.ts),
     // pinned against three's WebGLShadowMap source by its own test. The renderer
@@ -863,13 +993,43 @@ it('prewarms adaptive quality shader variants behind the desktop loading cover',
 
   expect(entryAt).toBeGreaterThan(-1);
   expect(nextEntryAt).toBeGreaterThan(entryAt);
-  expect(entry).toContain('renderBudgetShaderPrewarmLevels(originalState)');
+  expect(entry).toContain('runPrewarmBudgetVariants(');
+  expect(entry).toContain('renderBudgetShaderPrewarmLevels(');
+  expect(entry).toContain('originalState');
   expect(entry).toContain('this.renderPrewarmPass(1 / 60)');
-  expect(entry).toContain('renderPasses++');
-  expect(entry).toContain('performance.now() >= gpuSubmitDeadline');
+  // The GPU SUBMIT GUARD, never the hard deadline. Each variant runs a real
+  // prewarm pass and an already-started WebGL call cannot be cancelled, so a
+  // pass launched at hardDeadline - epsilon overshoots the wall and defers
+  // every entry behind it, the deadline-exempt debt payers included. The
+  // negative arm is the one that matters: this entry was briefly handed
+  // hardDeadline, and the pin that had guarded it was rewritten to match.
+  expect(entry).toContain('deadlineMs: gpuSubmitDeadline');
+  expect(entry).not.toContain('deadlineMs: hardDeadline');
   expect(entry).toContain('withRestoredPrewarmState(');
   expect(entry).not.toContain('compilePrewarmColorPrograms(this.scene');
   expect(entry).toContain('deadlineExempt: !constrainedPrewarm && this.asyncCompileSupported');
+});
+
+it('wires the budget-variant recorder into the manifest entry', () => {
+  // This used to grep the WHOLE of prewarm_compile_lifecycle.ts for
+  // programsBefore/programsAfter/syncMs/passes, all of which already appear in
+  // RendererPrewarmCompileUnitStats (and one of which a comment satisfied), so
+  // it stayed green with the budget-variant recorder deleted. The RECORDING
+  // behaviour is covered directly in tests/prewarm_compile_lifecycle.test.ts;
+  // what belongs here is only that the entry is wired to it and publishes the
+  // stats, bounded to the entry's own slice.
+  const renderer = readFileSync(
+    new URL('../src/render/renderer.ts', import.meta.url),
+    'utf8',
+  ).replace(/\r\n/g, '\n');
+  const entryAt = renderer.indexOf("id: 'programs.budget-variants'");
+  const entryEnd = renderer.indexOf("id: 'sky.current-zone'", entryAt);
+  expect(entryAt).toBeGreaterThan(-1);
+  expect(entryEnd).toBeGreaterThan(entryAt);
+  const entry = codeWithoutLineComments(renderer.slice(entryAt, entryEnd));
+  expect(entry).toContain('runPrewarmBudgetVariants(');
+  expect(entry).toContain('budgetVariantStats');
+  expect(entry).toContain('budgetVariants: () => budgetVariantStats');
 });
 it('settles linked desktop programs only until the independent hard deadline', () => {
   const renderer = readFileSync(
@@ -898,11 +1058,14 @@ describe('resolvePrewarmPolicy: constrained with parallel compile (the iPhone pa
   });
 
   it('caps budget, compile budget, and nearby views hard', () => {
-    expect(p.maxMs).toBe(5000);
-    expect(p.compileMaxMs).toBe(2500);
+    expect(p.maxMs).toBe(3000);
+    expect(p.compileMaxMs).toBe(1500);
     // The production-hub fix: only self plus one required/nearby view may build
     // synchronously at entry, never a crowd that reveals on the first live submit.
     expect(p.maxViews).toBe(2);
+    // No nearby floor on top of the constrained cap: 2 is a process-survival
+    // ceiling, and the deferred mob-body stream covers nearby entities.
+    expect(p.nearbyViewFloor).toBe(0);
     expect(p.finishFullManifestBeforeReveal).toBe(false);
   });
 
@@ -939,7 +1102,12 @@ describe('resolvePrewarmPolicy: constrained with parallel compile (the iPhone pa
       'utf8',
     ).replace(/\r\n/g, '\n');
     expect(renderer).toContain('const VIEW_PREWARM_MAX_VIEWS_CONSTRAINED = 2;');
-    expect(renderer).toContain('remainingPrewarmViewBudget(policy.maxViews, createdViews)');
+    expect(renderer).toContain(
+      'portalPrewarmViewBudget(policy.maxViews, createdViews, policy.nearbyViewFloor)',
+    );
+    expect(renderer).toContain(
+      'nearbyPrewarmViewBudget(policy.maxViews, createdViews, policy.nearbyViewFloor)',
+    );
   });
 
   it('moves programs.compile to just before world.initial-frame', () => {
@@ -958,7 +1126,7 @@ describe('resolvePrewarmPolicy: constrained with parallel compile (the iPhone pa
       constrainedMemory: true,
       maxViewsConstrained: 999,
     });
-    expect(highCap.maxViews).toBe(72); // tier cap still wins when it is lower
+    expect(highCap.maxViews).toBe(16); // tier cap still wins when it is lower
   });
 });
 
@@ -973,6 +1141,50 @@ describe('remainingPrewarmViewBudget', () => {
   it('normalizes fractional and invalid budgets', () => {
     expect(remainingPrewarmViewBudget(2.9, 1.2)).toBe(1);
     expect(remainingPrewarmViewBudget(-1, 0)).toBe(0);
+  });
+});
+
+describe('the nearby view floor on the shared budget (review should-fix)', () => {
+  // The reported starvation: required and landmark views drain the shared
+  // counter while bypassing the cap, and portals draw before nearby, so with
+  // the 12/16 budgets a landmark-plus-portal-heavy spawn left zero slots for
+  // the nearby entity views, the most actionable entry on the shared cap.
+  it('portals may only draw what remains past the floor', () => {
+    expect(portalPrewarmViewBudget(12, 0, 4)).toBe(8);
+    expect(portalPrewarmViewBudget(12, 5, 4)).toBe(3);
+    expect(portalPrewarmViewBudget(12, 8, 4)).toBe(0);
+    expect(portalPrewarmViewBudget(12, 20, 4)).toBe(0);
+  });
+
+  it('nearby always keeps at least the floor, even with the counter drained', () => {
+    expect(nearbyPrewarmViewBudget(12, 0, 4)).toBe(12);
+    expect(nearbyPrewarmViewBudget(12, 10, 4)).toBe(4);
+    expect(nearbyPrewarmViewBudget(12, 12, 4)).toBe(4);
+    // Required plus landmarks alone past the cap: nearby still gets the floor,
+    // so total entry views are bounded by maxViews plus the floor.
+    expect(nearbyPrewarmViewBudget(12, 20, 4)).toBe(4);
+  });
+
+  it('a zero floor reproduces the plain shared-budget draw (the constrained arm)', () => {
+    expect(portalPrewarmViewBudget(2, 2, 0)).toBe(0);
+    expect(nearbyPrewarmViewBudget(2, 2, 0)).toBe(0);
+    expect(nearbyPrewarmViewBudget(2, 1, 0)).toBe(1);
+  });
+
+  it('normalizes a fractional or negative floor', () => {
+    expect(portalPrewarmViewBudget(12, 0, 4.9)).toBe(8);
+    expect(nearbyPrewarmViewBudget(12, 12, -1)).toBe(0);
+  });
+
+  it('the unconstrained floor never exceeds the smallest tier budget', () => {
+    // resolvePrewarmPolicy clamps by min(floor, baseMaxViews); the constant
+    // itself must sit under the 12-view low tier for the clamp to be a no-op
+    // on both desktop tiers.
+    expect(NEARBY_VIEW_PREWARM_FLOOR).toBeLessThanOrEqual(12);
+    expect(NEARBY_VIEW_PREWARM_FLOOR).toBeGreaterThan(0);
+    expect(resolvePrewarmPolicy({ ...BASE, lowGfx: true }).nearbyViewFloor).toBe(
+      NEARBY_VIEW_PREWARM_FLOOR,
+    );
   });
 });
 
@@ -1085,13 +1297,13 @@ describe('archetype and scene-texture progress hooks stay honest (review round 2
 
   it('reports scene textures in matching units: initialized done against examined planned', () => {
     const entry = block('textures.scene', 'vfx.atlas');
-    expect(entry).toContain('done: batched.initialized');
-    expect(entry).toContain('planned: batched.planned');
+    expect(entry).toContain('deadlineExempt: true');
+    expect(entry).toContain('progress: () => sceneTextureAdmission?.progress() ?? null');
     // The regression shape: workDone as a GPU-residency delta an
     // already-resident texture never moves, mismatched against a planned that
     // counts every texture examined. The delta stays in detail(), labeled.
-    expect(entry).not.toContain('done: batched.uploaded');
-    expect(entry).toContain('uploadedDelta=${textureUploads}');
+    expect(entry).not.toContain('done: sceneTextureUploadDelta()');
+    expect(entry).toContain('uploadedDelta=${sceneTextureUploadDelta()}');
   });
 
   it('the portal entry details its own created count beside the labeled cumulative counter', () => {
@@ -1280,13 +1492,14 @@ describe('mandatory interaction-landmark prewarm', () => {
     const helperEnd = renderer.indexOf('\n  private createPersistentPortalViews(', helperStart);
     const helper = renderer.slice(helperStart, helperEnd);
     const partitionAt = helper.indexOf('partitionMandatoryLandmarkCandidates(');
-    const createAt = helper.indexOf('this.createView(entity)');
+    const createAt = helper.indexOf('this.createView(entity, undefined, true)');
     const compileWaitAt = helper.indexOf('await Promise.all(compileWaits)');
     const readinessAt = helper.indexOf('mandatoryLandmarkViewsReady(ids, this.views)');
     expect(helperStart).toBeGreaterThan(-1);
     expect(helperEnd).toBeGreaterThan(helperStart);
     expect(partitionAt).toBeGreaterThan(-1);
     expect(createAt).toBeGreaterThan(partitionAt);
+    expect(helper).toContain('this.createView(entity, undefined, true)');
     expect(compileWaitAt).toBeGreaterThan(createAt);
     expect(readinessAt).toBeGreaterThan(compileWaitAt);
     expect(helper).not.toContain('remainingPrewarmViewBudget');
@@ -1309,7 +1522,7 @@ describe('mandatory interaction-landmark prewarm', () => {
     expect(gateStart).toBeGreaterThan(-1);
     expect(gateEnd).toBeGreaterThan(gateStart);
     expect(gate).toContain('if (!this.asyncCompileSupported) return null;');
-    expect(gate).toContain('this.compileGate(group)');
+    expect(gate).toContain('this.compileGate(group, requiredForEntry)');
     expect(gate).toContain('view.compilePending = false;');
     expect(gate).toContain(
       'The canvas nameplate (name, target marker, health, and cast bar) keeps',
@@ -1438,47 +1651,38 @@ describe('constrained entry view creation ramp', () => {
     expect(elapsedIncrementAt).toBeGreaterThan(createAt);
   });
 
-  it('uses the bounded texture path for constrained prewarm', () => {
+  it('uses the bounded shared-cursor texture path for constrained prewarm', () => {
     const renderer = readFileSync(
       new URL('../src/render/renderer.ts', import.meta.url),
       'utf8',
     ).replace(/\r\n/g, '\n');
+    const admission = readFileSync(
+      new URL('../src/render/initial_scene_texture_admission.ts', import.meta.url),
+      'utf8',
+    ).replace(/\r\n/g, '\n');
     expect(renderer).toContain(
-      `await this.prewarmInitialSceneTexturesBatched(
-              policy.textureBatchSize,
-              policy.textureMaxMs,
-            )`,
+      'collectInitialPresentationTextures(this.scene, this.views, p.id, p.targetId)',
     );
-    const collectionStart = renderer.indexOf('private collectInitialSceneTextures(');
-    const collectionEnd = renderer.indexOf(
-      '\n  private async prewarmInitialSceneTexturesBatched(',
-      collectionStart,
-    );
-    const collectionMethod = renderer.slice(collectionStart, collectionEnd);
-    expect(collectionMethod).toContain('collectObjectTextures(this.scene, true)');
-    expect(collectionMethod).toContain('for (const view of this.views.values())');
-    expect(collectionMethod).toContain('collectObjectTextures(view.group, false, textures)');
+    expect(admission).toContain('collectObjectTextures(scene, true)');
+    expect(admission).toContain('for (const root of priorityRoots)');
+    expect(admission).toContain('collectObjectTextures(root, false, textures)');
+    expect(renderer).toContain('await ensureSceneTextureAdmission().drainBefore(');
+    expect(renderer).toContain('sceneTextureAdmission?.admitOneBefore(deadlineMs);');
+    expect(admission).toContain('while (this.cursor < this.textures.length');
+    expect(admission).toContain('this.now() < deadlineMs');
+    expect(admission).toContain('await this.yieldSlice()');
+    expect(admission).toContain('return this.textures.slice(this.cursor);');
+  });
 
-    const methodStart = renderer.indexOf('private async prewarmInitialSceneTexturesBatched(');
-    const methodEnd = renderer.indexOf('\n  private renderPrewarmPass(', methodStart);
-    const method = renderer.slice(methodStart, methodEnd);
-    const batchLoopAt = method.indexOf('for (let i = 0;');
-    const deadlineAt = method.indexOf('const deadline = performance.now() + Math.max(0, maxMs)');
-    const deadlineGuardAt = method.indexOf('performance.now() < deadline', batchLoopAt);
-    const batchStepAt = method.indexOf('i += batch', batchLoopAt);
-    const batchEndAt = method.indexOf('Math.min(textures.length, i + batch)', batchLoopAt);
-    const uploadAt = method.indexOf('this.prewarmTexture(textures[j])');
-    const yieldAt = method.indexOf('await sleep(0)');
-    expect(methodStart).toBeGreaterThan(-1);
-    expect(methodEnd).toBeGreaterThan(methodStart);
-    expect(deadlineAt).toBeGreaterThan(-1);
-    expect(batchLoopAt).toBeGreaterThan(-1);
-    expect(deadlineGuardAt).toBeGreaterThan(batchLoopAt);
-    expect(batchStepAt).toBeGreaterThan(deadlineGuardAt);
-    expect(batchEndAt).toBeGreaterThan(batchLoopAt);
-    expect(uploadAt).toBeGreaterThan(batchLoopAt);
-    expect(yieldAt).toBeGreaterThan(uploadAt);
-    expect(method.slice(yieldAt - 100, yieldAt)).toContain('performance.now() < deadline');
+  it('settles the capped world before early compile submission and texture collection', () => {
+    const entries = parsedManifestEntries();
+    const settleAt = entries.findIndex((entry) => entry.id === 'world.settle-state');
+    const submitAt = entries.findIndex((entry) => entry.id === 'programs.compile-submit');
+    const texturesAt = entries.findIndex((entry) => entry.id === 'textures.scene');
+    expect(settleAt).toBeGreaterThan(-1);
+    expect(settleAt).toBeLessThan(submitAt);
+    expect(settleAt).toBeLessThan(texturesAt);
+    expect(entries[settleAt]?.deadlineExempt).toBe(true);
   });
 });
 

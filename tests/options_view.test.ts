@@ -524,6 +524,7 @@ const GENERAL_KEYS = [
   'showPlaytime',
   'showDailyRewardsChest',
   'showItemLevel',
+  'showReliquaryTracker',
   'showOwnNameplate',
   'showPlayerNameplates',
 ];

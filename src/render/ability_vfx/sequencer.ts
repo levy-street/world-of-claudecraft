@@ -681,6 +681,7 @@ export class ArchetypeSequencer {
   }
 
   cancel(slot: SeqSlot): void {
+    if (!slot.active) return;
     slot.active = false;
   }
 

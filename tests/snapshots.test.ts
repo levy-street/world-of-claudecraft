@@ -782,6 +782,7 @@ describe('loot FFA lapse over the wire', () => {
     const mob = createMob(id, template, template.maxLevel, { x: 0, y: 0, z: 0 });
     mob.dead = true;
     mob.lootable = true;
+    mob.corpseTimer = 45;
     mob.tappedById = TAPPER;
     // claimed: keeps the harvest arm closed so canOpen isolates loot rights
     mob.harvestClaimedBy = TAPPER;
@@ -829,6 +830,60 @@ describe('loot FFA lapse over the wire', () => {
     const alive = createMob(9104, template, template.maxLevel, { x: 0, y: 0, z: 0 });
     alive.lootFfaTimer = 0;
     expect(wireEntity(alive)).not.toHaveProperty('ffa');
+  });
+});
+
+// Corpse decay over the wire, the same shape as the ffa suite above: offline
+// the Sim entity carries the real corpseTimer countdown, so online the DECAY
+// must ride the sparse terse key `cd` or a self-scheduled rare's aged-out
+// corpse (Grix the Tunnelking: a 15 to 30 minute respawnWindow far outlasts
+// his 60s corpseTimer, see tests/respawn_policy.test.ts) stays a rendered,
+// unclickable "stuck corpse" for the rest of the respawn wait, the reported
+// bug entity_view_policy_core.ts's admission check now fixes.
+describe('corpse decay over the wire', () => {
+  function deadMob(id: number, corpseTimer: number): ReturnType<typeof createMob> {
+    const template = MOBS.grix_the_tunnelking;
+    const mob = createMob(id, template, template.maxLevel, { x: 0, y: 0, z: 0 });
+    mob.dead = true;
+    mob.corpseTimer = corpseTimer;
+    mob.respawnTimer = 1800; // far outside the corpse window, like Grix's real one
+    return mob;
+  }
+
+  it('a fresh corpse stays sparse (no cd key) while inside its loot window', () => {
+    const w = wireEntity(deadMob(9201, 45));
+    // Absent, not `cd: 0`: an undecayed corpse's record must be byte-unchanged
+    // by this feature, so the per-entity delta cache keeps eliding it.
+    expect(w).not.toHaveProperty('cd');
+
+    const client = bareClient(1);
+    (client as any).applySnapshot({ t: 'snap', ents: [w] });
+    expect(client.entities.get(9201)!.corpseTimer).toBeGreaterThan(0);
+  });
+
+  it('the decay rides cd:1 once the corpse window elapses, and mirrors as decayed', () => {
+    const w = wireEntity(deadMob(9202, 0));
+    expect(w.cd).toBe(1);
+
+    const client = bareClient(1);
+    (client as any).applySnapshot({ t: 'snap', ents: [w] });
+    expect(client.entities.get(9202)!.corpseTimer).toBeLessThanOrEqual(0);
+  });
+
+  it('a record without the flag resets a stale mirrored decay (respawn reuses the id)', () => {
+    const client = bareClient(1);
+    (client as any).applySnapshot({ t: 'snap', ents: [wireEntity(deadMob(9203, 0))] });
+    expect(client.entities.get(9203)!.corpseTimer).toBeLessThanOrEqual(0);
+
+    (client as any).applySnapshot({ t: 'snap', ents: [wireEntity(deadMob(9203, 45))] });
+    expect(client.entities.get(9203)!.corpseTimer).toBeGreaterThan(0);
+  });
+
+  it('never emits cd for a live mob, even with a stale zero corpseTimer field', () => {
+    const template = MOBS.forest_wolf;
+    const alive = createMob(9204, template, template.maxLevel, { x: 0, y: 0, z: 0 });
+    alive.corpseTimer = 0;
+    expect(wireEntity(alive)).not.toHaveProperty('cd');
   });
 });
 

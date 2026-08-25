@@ -4,6 +4,8 @@ import { MECH_CHROMAS } from '../src/sim/content/skins';
 import { MOBS } from '../src/sim/data';
 import { createMob } from '../src/sim/entity';
 
+const FRESH_CORPSE_TIMER = 60;
+
 const openPlaySession = vi.fn(async () => 1);
 const closePlaySession = vi.fn(async () => {});
 const markAccountQuestComplete = vi.fn(async (_accountId: number, questId: string) => ({
@@ -617,6 +619,7 @@ describe('GameServer sessions', () => {
 
     const mob = createMob(server.sim.nextId++, MOBS.forest_wolf, 2, { x: 0, y: 0, z: 0 });
     mob.dead = true;
+    mob.corpseTimer = FRESH_CORPSE_TIMER;
     mob.lootable = true;
     mob.tappedById = leaver.pid;
     mob.lootRecipientIds = [leaver.pid, stayer.pid, third.pid];
@@ -628,6 +631,7 @@ describe('GameServer sessions', () => {
       z: 0,
     });
     lateMob.dead = true;
+    lateMob.corpseTimer = FRESH_CORPSE_TIMER;
     lateMob.lootable = true;
     lateMob.tappedById = leaver.pid;
     lateMob.lootRecipientIds = [leaver.pid, stayer.pid, third.pid];
@@ -692,6 +696,7 @@ describe('GameServer sessions', () => {
 
     const mob = createMob(server.sim.nextId++, MOBS.forest_wolf, 2, { x: 0, y: 0, z: 0 });
     mob.dead = true;
+    mob.corpseTimer = FRESH_CORPSE_TIMER;
     mob.lootable = true;
     mob.tappedById = leaver.pid;
     mob.lootRecipientIds = [leaver.pid, stayer.pid, third.pid];

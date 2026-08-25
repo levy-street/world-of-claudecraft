@@ -11,7 +11,11 @@
 // one. A first-cleared (sealed) zone stays empty until the first boundary at
 // or after the seal and is never instantly refarmed, while an uncleared portal
 // collapses at RIFT_PORTAL_LIFETIME (an exact multiple of the cycle), which
-// lands on a boundary, so its replacement is due immediately.
+// lands on a boundary, so its replacement is due immediately. "Still open"
+// for this scheduling purpose excludes a WON portal standing only for its
+// loot-recovery grace (activeRiftZoneIds skips recoveryOnly entries): the
+// zone's next rift is never delayed by a lingering, already-decided entrance,
+// even though that entity is still physically standing in the world.
 //
 // Determinism: portal placement uses streams derived only from the realm seed
 // and spawn ordinal. They never consume ctx.rng, so enabling Rifts cannot
@@ -50,6 +54,17 @@ export const RIFT_PORTAL_RETRY_DELAY = 60;
  * (riftZoneNextOpenAt). Must stay comfortably above the eligible-zone count or
  * a sealed zone's newest event could be trimmed and instantly refarm. */
 export const RIFT_EVENT_HISTORY_LIMIT = 64;
+
+/** How long a WON rift's portal keeps standing after the clear, so a party that
+ * wipes on (or just after) the killing blow with nobody left to resurrect can
+ * still release, run back, and walk a ghost in to loot the corpse they already
+ * earned (sealNaturalRiftPortalForRecovery). No living entrant can abuse this
+ * window to farm the event: enterRift already turns away every living entrant
+ * the instant the shared event reads 'cleared', whether or not the portal is
+ * still standing; only a dead MEMBER of the winning instance can walk back
+ * through it. rift/runs.ts mirrors this as the won-instance empty-timeout, so
+ * neither the entrance nor the loot inside it outlives the other. */
+export const RIFT_LOOT_RECOVERY_GRACE = 15 * 60;
 
 /** Rank tuning. Rifts pay NO Heroic Marks at any rank (maintainer decision:
  * marks stay a heroic dungeon/raid currency; the rift prize is the clear-time
@@ -94,6 +109,15 @@ export interface NaturalRiftPortal {
   openedAt: number;
   expiresAt: number;
   position: { x: number; z: number };
+  /** Set once this portal's event has been WON: it no longer accepts new
+   * instance entrants (enforced by enterRift's cleared-event check, not by
+   * this flag) and its remaining `expiresAt` is the RIFT_LOOT_RECOVERY_GRACE
+   * loot-recovery window, not the normal portal lifetime. The scheduler
+   * excludes it from zone occupancy (activeRiftZoneIds) so a lingering,
+   * already-decided portal never delays the zone's next natural rift, and its
+   * eventual teardown stays quiet (no second world announce; "has been
+   * sealed" already told everyone this rift is done). */
+  recoveryOnly?: boolean;
 }
 
 interface RiftPortalSpawnOptions {
@@ -345,6 +369,11 @@ export function closeNaturalRiftPortal(
       event.status = hasLiveInstance ? 'active' : 'collapsed';
     }
   }
+  // A recovery-grace portal (sealNaturalRiftPortalForRecovery) already
+  // announced "has been sealed" the instant its run was won; this later
+  // teardown (reaped by its shortened expiry in the loop below) is a quiet
+  // cleanup, never a second, confusingly-timed world announce.
+  if (portal.recoveryOnly) return;
   if (outcome === 'sealed') {
     announce(ctx, `The ${portal.tier}-rank rift in ${portal.zoneName} has been sealed.`, '#9f9');
   } else {
@@ -352,8 +381,35 @@ export function closeNaturalRiftPortal(
   }
 }
 
+/** A WON rift's portal does not vanish the instant the boss falls: it keeps
+ * standing (still an entity, still walkable) for RIFT_LOOT_RECOVERY_GRACE so
+ * the winning party can still release, run back, and walk a ghost in to loot
+ * the corpse they already earned if they wipe with nobody left to
+ * resurrect. Safe against farming: enterRift denies every LIVING entrant the
+ * instant the shared event reads 'cleared', whether or not this portal is
+ * still up; only a dead MEMBER of the winning instance can walk back through
+ * it (enterRift's own membership + eventId match). Idempotent: a second call
+ * on an already-recovery-only portal is a no-op, so a same-tick double
+ * completion can never re-extend or re-announce it.
+ *
+ * Returns whether a portal now stands in recovery-only state. False means
+ * there was nothing left to seal (its natural RIFT_PORTAL_LIFETIME already
+ * collapsed it, e.g. an unusually long clear): the caller must not promise
+ * the party an entrance that no longer exists. */
+export function sealNaturalRiftPortalForRecovery(ctx: SimContext, portalId: number): boolean {
+  const portal = ctx.naturalRiftPortals.find((candidate) => candidate.id === portalId);
+  if (!portal) return false;
+  if (portal.recoveryOnly) return true;
+  portal.recoveryOnly = true;
+  portal.expiresAt = ctx.time + RIFT_LOOT_RECOVERY_GRACE;
+  announce(ctx, `The ${portal.tier}-rank rift in ${portal.zoneName} has been sealed.`, '#9f9');
+  return true;
+}
+
 function activeRiftZoneIds(ctx: SimContext): Set<string> {
-  return new Set(ctx.naturalRiftPortals.map((portal) => portal.zoneId));
+  return new Set(
+    ctx.naturalRiftPortals.filter((portal) => !portal.recoveryOnly).map((portal) => portal.zoneId),
+  );
 }
 
 /** Once-per-second scheduler: each eligible zone is judged against its OWN

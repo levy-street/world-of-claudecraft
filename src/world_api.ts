@@ -405,6 +405,11 @@ export const COMMAND_NAMES = [
   'trade_offer',
   'trade_confirm',
   'trade_cancel',
+  // Landed beside its trade siblings rather than appended at the tail; this
+  // list feeds only KNOWN_COMMANDS (a Set) and the CommandName union, and
+  // moving an already-shipped token would be the very reorder the tail rule
+  // forbids, so it stays filed here.
+  'trade_close',
   'duel_req',
   'duel_accept',
   'duel_decline',
@@ -794,6 +799,7 @@ export const COMMAND_FACETS = {
   trade_offer: 'IWorldTrade',
   trade_confirm: 'IWorldTrade',
   trade_cancel: 'IWorldTrade',
+  trade_close: 'IWorldTrade',
   // IWorldDuelArena: duels + rated-arena queue + the 2v2 Fiesta augment pick. Fiesta
   // has no top-level member (it lives in arenaInfo.match.fiesta and flows over the
   // events queue); arena_augment is its only command. duelInfo/arenaInfo are snapshot

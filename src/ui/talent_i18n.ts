@@ -178,6 +178,17 @@ export interface TalentLocaleText {
   roleLabels: Record<'tank' | 'healer' | 'dps', string>;
   perRank: string;
   noEffect: string;
+  // Localized connector words the generator splices between two label fragments in
+  // effectDescription/procDescription and their helpers, replacing the raw ASCII
+  // shorthand (@, ->, <=, >=) those functions used to hardcode regardless of locale.
+  // Kept as plain words rather than templates, matching statLabels: the surrounding
+  // sentence order is already English-structured for every locale, so a connector
+  // function could not reorder anything a caller does not already fix in place.
+  whileWord: string;
+  vsWord: string;
+  thenWord: string;
+  upToWord: string;
+  atLeastWord: string;
   chooseOne: (name: string) => string;
   specDescription: (className: string, role: string, abilityName: string) => string;
   // Hand-authored flavor prose per spec id, keyed exactly like the English
@@ -248,6 +259,11 @@ const enText: TalentLocaleText = {
   roleLabels: { tank: 'tank', healer: 'healer', dps: 'damage' },
   perRank: ' per rank',
   noEffect: 'Provides a specialization benefit.',
+  whileWord: 'while',
+  vsWord: 'vs.',
+  thenWord: 'then',
+  upToWord: 'up to',
+  atLeastWord: 'at least',
   specDescriptions: {
     fire: 'A master of flame who chains critical strikes into devastating explosions. Fast, aggressive, and capable of igniting many enemies.',
     frost:
@@ -306,6 +322,11 @@ const localeTextByBase = {
     roleLabels: { tank: 'tanque', healer: 'sanación', dps: 'daño' },
     perRank: ' por rango',
     noEffect: 'Aporta una ventaja de especialización.',
+    whileWord: 'mientras',
+    vsWord: 'contra',
+    thenWord: 'luego',
+    upToWord: 'hasta',
+    atLeastWord: 'al menos',
     chooseOne: (name) => `Elige una opción de ${name}.`,
     specDescription: (className, role, abilityName) =>
       `Especialización de ${className} centrada en ${role}. Habilidad distintiva: ${abilityName}.`,
@@ -374,6 +395,11 @@ const localeTextByBase = {
     roleLabels: { tank: 'tank', healer: 'soigneur', dps: 'dégâts' },
     perRank: ' par rang',
     noEffect: 'Apporte un avantage de spécialisation.',
+    whileWord: 'pendant',
+    vsWord: 'contre',
+    thenWord: 'puis',
+    upToWord: "jusqu'à",
+    atLeastWord: 'au moins',
     chooseOne: (name) => `Choisissez une option de ${name}.`,
     specDescription: (className, role, abilityName) =>
       `Spécialisation de ${className} axée sur ${role}. Technique signature : ${abilityName}.`,
@@ -424,6 +450,11 @@ const localeTextByBase = {
     roleLabels: { tank: 'difesa', healer: 'cura', dps: 'danno' },
     perRank: ' per grado',
     noEffect: 'Fornisce un beneficio di specializzazione.',
+    whileWord: 'durante',
+    vsWord: 'contro',
+    thenWord: 'poi',
+    upToWord: 'fino a',
+    atLeastWord: 'almeno',
     chooseOne: (name) => `Scegli un'opzione di ${name}.`,
     specDescription: (className, role, abilityName) =>
       `Specializzazione da ${className} concentrata su ${role}. Abilità distintiva: ${abilityName}.`,
@@ -474,6 +505,11 @@ const localeTextByBase = {
     roleLabels: { tank: 'Tank', healer: 'Heilung', dps: 'Schaden' },
     perRank: ' pro Rang',
     noEffect: 'Gewährt einen Spezialisierungsvorteil.',
+    whileWord: 'während',
+    vsWord: 'gegen',
+    thenWord: 'dann',
+    upToWord: 'bis zu',
+    atLeastWord: 'mindestens',
     chooseOne: (name) => `Wähle eine Option für ${name}.`,
     specDescription: (className, role, abilityName) =>
       `${className}-Spezialisierung mit Fokus auf ${role}. Signaturfähigkeit: ${abilityName}.`,
@@ -524,6 +560,11 @@ const localeTextByBase = {
     roleLabels: { tank: '坦克', healer: '治疗', dps: '伤害输出' },
     perRank: '/每级',
     noEffect: '提供一个专精增益。',
+    whileWord: '期间',
+    vsWord: '对',
+    thenWord: '然后',
+    upToWord: '至多',
+    atLeastWord: '至少',
     chooseOne: (name) => `选择一个${name}选项。`,
     specDescription: (className, role, abilityName) =>
       `${className}专精，侧重${role}。标志技能：${abilityName}。`,
@@ -574,6 +615,11 @@ const localeTextByBase = {
     roleLabels: { tank: '坦克', healer: '治療', dps: '傷害輸出' },
     perRank: '/每級',
     noEffect: '提供一個專精增益。',
+    whileWord: '期間',
+    vsWord: '對',
+    thenWord: '然後',
+    upToWord: '至多',
+    atLeastWord: '至少',
     chooseOne: (name) => `選擇一個${name}選項。`,
     specDescription: (className, role, abilityName) =>
       `${className}專精，側重${role}。代表技能：${abilityName}。`,
@@ -624,6 +670,11 @@ const localeTextByBase = {
     roleLabels: { tank: '방어', healer: '치유', dps: '피해' },
     perRank: '/등급',
     noEffect: '전문화 보너스를 제공합니다.',
+    whileWord: '중',
+    vsWord: '대상',
+    thenWord: '그 후',
+    upToWord: '최대',
+    atLeastWord: '최소',
     chooseOne: (name) => `${name} 선택지 하나를 고르세요.`,
     specDescription: (className, role, abilityName) =>
       `${role}에 집중하는 ${className} 전문화입니다. 대표 능력: ${abilityName}.`,
@@ -674,6 +725,11 @@ const localeTextByBase = {
     roleLabels: { tank: 'タンク', healer: '回復', dps: 'ダメージ' },
     perRank: '/ランク',
     noEffect: '専門化ボーナスを提供します。',
+    whileWord: '中',
+    vsWord: '対象',
+    thenWord: 'その後',
+    upToWord: '最大',
+    atLeastWord: '最低',
     chooseOne: (name) => `${name}の選択肢を1つ選びます。`,
     specDescription: (className, role, abilityName) =>
       `${role}に重点を置く${className}専門化。シグネチャ能力: ${abilityName}。`,
@@ -724,6 +780,11 @@ const localeTextByBase = {
     roleLabels: { tank: 'tanque', healer: 'cura', dps: 'dano' },
     perRank: ' por grau',
     noEffect: 'Concede um benefício de especialização.',
+    whileWord: 'durante',
+    vsWord: 'contra',
+    thenWord: 'então',
+    upToWord: 'até',
+    atLeastWord: 'pelo menos',
     chooseOne: (name) => `Escolha uma opção de ${name}.`,
     specDescription: (className, role, abilityName) =>
       `Especialização de ${className} focada em ${role}. Habilidade assinatura: ${abilityName}.`,
@@ -774,6 +835,11 @@ const localeTextByBase = {
     roleLabels: { tank: 'защиту', healer: 'исцеление', dps: 'урон' },
     perRank: ' за ранг',
     noEffect: 'Дает бонус специализации.',
+    whileWord: 'во время',
+    vsWord: 'против',
+    thenWord: 'затем',
+    upToWord: 'до',
+    atLeastWord: 'не менее',
     chooseOne: (name) => `Выберите один вариант для ${name}.`,
     specDescription: (className, role, abilityName) =>
       `Специализация класса ${className} с упором на ${role}. Ключевая способность: ${abilityName}.`,
@@ -10772,6 +10838,13 @@ function abilityDescription(id: string): string {
 function authoredChoiceDescription(choice: TalentRowOption): string {
   const grantId = choice.effect.grant?.ability;
   if (!grantId) return choice.description;
+  // spell_lock (Abyssal Gag) is the one cross-class grant target that is ALSO already
+  // in its class's base kit (every Warlock learns it at 10 regardless of this pick):
+  // synthesizing from the granted ability's own description below drops the one fact
+  // that explains the pick (two levels early) and reads as a no-op to anyone who
+  // already sees Abyssal Gag on their action bar. The authored source carries that
+  // framing plus the real numbers, so use it verbatim instead.
+  if (grantId === 'spell_lock') return choice.description;
   const lang = getLanguage();
   const riderDescriptions = (choice.effect.ability ?? [])
     .filter((mod) => mod.ability === grantId)
@@ -10813,9 +10886,9 @@ function procTriggerDescription(
     case 'hotExpired':
       return `${abilityName(trigger.ability)}: 0 s`;
     case 'bigHitTaken':
-      return `>= ${formatPercent(trigger.hpFrac, lang)} ${text.statLabels.maxHpPct} (${seconds(trigger.icd, lang)} ${text.statLabels.cooldown})`;
+      return `${text.atLeastWord} ${formatPercent(trigger.hpFrac, lang)} ${text.statLabels.maxHpPct} (${seconds(trigger.icd, lang)} ${text.statLabels.cooldown})`;
     case 'meleeSwingWhile':
-      return `${text.statLabels.meleeDmgPct} @ ${t('hudChrome.auraEffect.imbue')}`;
+      return `${text.statLabels.meleeDmgPct} ${text.whileWord} ${t('hudChrome.auraEffect.imbue')}`;
     case 'thornsReflect':
       return `${abilityName(trigger.ability)}: ${t('guide.abilityHook.thorns')}`;
   }
@@ -10869,7 +10942,7 @@ function procResponseDescription(
         response.healPctMaxHp !== undefined
           ? `${formatPercent(response.healPctMaxHp, lang)} ${text.statLabels.maxHpPct}`
           : formatNumber(response.heal ?? 0, lang);
-      return `+${echoValue} ${t('hud.meters.healing')} @ <= ${formatPercent(response.belowFrac, lang)} ${text.statLabels.maxHpPct} (${seconds(response.window, lang)})`;
+      return `+${echoValue} ${t('hud.meters.healing')} ${text.upToWord} ${formatPercent(response.belowFrac, lang)} ${text.statLabels.maxHpPct} (${seconds(response.window, lang)})`;
     }
   }
 }
@@ -10879,7 +10952,7 @@ function procDescription(proc: ProcDef, lang: SupportedLanguage, text: TalentLoc
   const responses = proc.responses
     .map((response) => procResponseDescription(response, lang, text))
     .join('; ');
-  return `${trigger} -> ${responses}.`;
+  return `${trigger} ${text.thenWord} ${responses}.`;
 }
 
 type DescribedAddedEffect = Extract<
@@ -10944,13 +11017,13 @@ function addedEffectDescription(
       return `${name}: ${formatNumber(effect.total, lang)} ${text.statLabels.damage} / ${seconds(effect.duration, lang)} (${seconds(effect.interval, lang)}${leech}).`;
     }
     case 'extendDot':
-      return `${name} -> ${abilityName(effect.dot)}: +${seconds(effect.seconds, lang)} (<= +${seconds(effect.maxBonus, lang)}).`;
+      return `${name} ${text.thenWord} ${abilityName(effect.dot)}: +${seconds(effect.seconds, lang)} (${text.upToWord} +${seconds(effect.maxBonus, lang)}).`;
     case 'interrupt':
       return `${name}: ${t('hudChrome.auraEffect.lockout')} (${seconds(effect.lockout, lang)}).`;
     case 'silence':
       return `${name}: ${t('hudChrome.auraEffect.silence')} (${seconds(effect.duration, lang)}).`;
     case 'consumeDot':
-      return `${name} -> ${abilityName(effect.dot)}: ${formatPercent(1, lang)} ${text.statLabels.damage} / 0 s.`;
+      return `${name} ${text.thenWord} ${abilityName(effect.dot)}: ${formatPercent(1, lang)} ${text.statLabels.damage} / 0 s.`;
     case 'selfBuff': {
       // Ghostfoot Ward's shield_wall is a damage CUT, so it renders negative and
       // names the stat (rogue v0.29). Every other rider is a straight buff, and
@@ -10968,7 +11041,7 @@ function addedEffectDescription(
     case 'debuffTargetSource':
       return `${name}: +${formatPercent(effect.value, lang)} ${text.statLabels.damage} (${seconds(effect.duration, lang)}).`;
     case 'breakRoots':
-      return `${name}: ${t('hudChrome.auraEffect.root')} -> 0.`;
+      return `${name}: ${t('hudChrome.auraEffect.root')} ${text.thenWord} 0.`;
   }
 }
 
@@ -11051,22 +11124,22 @@ function effectDescription(
   if (global.warlockLeadenHex) {
     const maxStacks = tuning.maxStacks ?? 3;
     parts.push(
-      `${abilityName('curse_of_exhaustion')}: ${t('hudChrome.auraEffect.slow', { pct: formatNumber(global.warlockLeadenHex * 100, lang) })} x${formatNumber(maxStacks, lang)} (${seconds(tuning.slowDuration ?? 5, lang)}); x${formatNumber(maxStacks, lang)} -> ${t('hudChrome.auraEffect.root')} (${seconds(tuning.rootDuration ?? 1.5, lang)}; ${seconds(tuning.rootLockDuration ?? 15, lang)} ${text.statLabels.cooldown}).`,
+      `${abilityName('curse_of_exhaustion')}: ${t('hudChrome.auraEffect.slow', { pct: formatNumber(global.warlockLeadenHex * 100, lang) })} x${formatNumber(maxStacks, lang)} (${seconds(tuning.slowDuration ?? 5, lang)}); x${formatNumber(maxStacks, lang)} ${text.thenWord} ${t('hudChrome.auraEffect.root')} (${seconds(tuning.rootDuration ?? 1.5, lang)}; ${seconds(tuning.rootLockDuration ?? 15, lang)} ${text.statLabels.cooldown}).`,
     );
   }
   if (global.warlockShadowCredit) {
     parts.push(
-      `>= ${formatPercent(global.warlockShadowCredit, lang)} ${t('classDetails.labels.resource')} -> ${abilityList(['needle_of_fate', 'soul_harvest', 'shadow_bolt'])}: -${formatPercent(1, lang)} ${text.statLabels.cost} x1; >= ${formatPercent(tuning.upperThresholdPct ?? 0.8, lang)} -> x${formatNumber(tuning.maxCharges ?? 2, lang)}.`,
+      `${text.atLeastWord} ${formatPercent(global.warlockShadowCredit, lang)} ${t('classDetails.labels.resource')} ${text.thenWord} ${abilityList(['needle_of_fate', 'soul_harvest', 'shadow_bolt'])}: -${formatPercent(1, lang)} ${text.statLabels.cost} x1; ${text.atLeastWord} ${formatPercent(tuning.upperThresholdPct ?? 0.8, lang)} ${text.thenWord} x${formatNumber(tuning.maxCharges ?? 2, lang)}.`,
     );
   }
   if (global.warlockAshenFocus) {
     parts.push(
-      `${t('hud.keybinds.categories.movement')} = 0 (${seconds(tuning.stationaryDuration ?? 1, lang)}) -> ${abilityList(['needle_of_fate', 'soul_harvest', 'shadow_bolt'])}: -${formatPercent(global.warlockAshenFocus, lang)} ${text.statLabels.castTime}.`,
+      `${t('hud.keybinds.categories.movement')}: ${formatPercent(0, lang)} (${seconds(tuning.stationaryDuration ?? 1, lang)}) ${text.thenWord} ${abilityList(['needle_of_fate', 'soul_harvest', 'shadow_bolt'])}: -${formatPercent(global.warlockAshenFocus, lang)} ${text.statLabels.castTime}.`,
     );
   }
   if (global.warlockUnbrokenRitual) {
     parts.push(
-      `${text.statLabels.castTime}: ${seconds(1, lang)} -> -${seconds(global.warlockUnbrokenRitual, lang)} ${text.statLabels.cooldown}.`,
+      `${text.statLabels.castTime}: ${seconds(1, lang)} ${text.thenWord} -${seconds(global.warlockUnbrokenRitual, lang)} ${text.statLabels.cooldown}.`,
     );
   }
   if (global.warlockForbiddenReflection) {
@@ -11085,16 +11158,18 @@ function effectDescription(
   }
   if (global.critVsRooted) {
     parts.push(
-      `${text.statLabels.crit}: +${formatPercent(global.critVsRooted, lang)} @ ${t('hudChrome.auraEffect.root')}.`,
+      `${text.statLabels.crit}: +${formatPercent(global.critVsRooted, lang)} ${text.vsWord} ${t('hudChrome.auraEffect.root')}.`,
     );
   }
   if (global.cheatDeathIcd) {
     parts.push(
-      `0 HP -> 1 HP (${seconds(global.cheatDeathIcd, lang)} ${text.statLabels.cooldown}).`,
+      `0 HP ${text.thenWord} 1 HP (${seconds(global.cheatDeathIcd, lang)} ${text.statLabels.cooldown}).`,
     );
   }
   if (global.fearBreakPct) {
-    parts.push(`${formatPercent(global.fearBreakPct, lang)} ${text.statLabels.maxHpPct} -> 0 s.`);
+    parts.push(
+      `${formatPercent(global.fearBreakPct, lang)} ${text.statLabels.maxHpPct} ${text.thenWord} 0 s.`,
+    );
   }
   if (global.onKillSpeedPct) {
     parts.push(
@@ -11103,7 +11178,7 @@ function effectDescription(
   }
   if (global.bloodbathPct) {
     parts.push(
-      `${text.increase(text.statLabels.damage, formatPercent(global.bloodbathPct, lang), '')} <= ${formatPercent(global.bloodbathMaxPct ?? global.bloodbathPct, lang)} (${seconds(global.bloodbathDuration ?? 0, lang)}).`,
+      `${text.increase(text.statLabels.damage, formatPercent(global.bloodbathPct, lang), '')} ${text.upToWord} ${formatPercent(global.bloodbathMaxPct ?? global.bloodbathPct, lang)} (${seconds(global.bloodbathDuration ?? 0, lang)}).`,
     );
   }
   if (global.cdrPerRage) {
@@ -11165,18 +11240,18 @@ function effectDescription(
     if (mod.buffPct) parts.push(text.increase(name, formatPercent(mod.buffPct, lang), perRank));
     if (mod.dmgPctVsDotted) {
       parts.push(
-        `${text.increase(`${name} ${text.statLabels.damage}`, formatPercent(mod.dmgPctVsDotted, lang), perRank)} @ ${text.statLabels.dotDmgPct}.`,
+        `${text.increase(`${name} ${text.statLabels.damage}`, formatPercent(mod.dmgPctVsDotted, lang), perRank)} ${text.vsWord} ${text.statLabels.dotDmgPct}.`,
       );
     }
     if (mod.castWhileMoving) {
       parts.push(
-        `${name}: ${text.statLabels.castTime} @ ${t('hud.keybinds.categories.movement')}.`,
+        `${name}: ${text.statLabels.castTime} ${text.whileWord} ${t('hud.keybinds.categories.movement')}.`,
       );
     }
     if (mod.damagePushbackImmune) {
       parts.push(
         text.reduce(
-          `${name} ${text.statLabels.castTime} @ ${text.statLabels.damage}`,
+          `${name} ${text.statLabels.castTime} ${text.vsWord} ${text.statLabels.damage}`,
           formatPercent(1, lang),
           perRank,
         ),

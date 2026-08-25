@@ -33,6 +33,22 @@ describe('armor proficiencies', () => {
     expect(equip('shaman', 'soulflame_cowl').equipment.helmet).toBe('soulflame_cowl');
   });
 
+  it('labels the Bonewrought (crownforged) mail for every mail class, shaman included', () => {
+    // The T2 strength set is mail: excluding shamans from its tag was a
+    // labelling miss (the T1 deathlord mail already lists all three), and the
+    // top live Enhancement kits wear it. The tag drives loot targeting and the
+    // tooltip class line, so pin all four pieces.
+    for (const id of [
+      'crownforged_dreadhelm',
+      'crownforged_warspaulders',
+      'crownforged_girdle',
+      'crownforged_gauntlets',
+    ]) {
+      expect(ITEMS[id]?.requiredClass, id).toEqual(['warrior', 'paladin', 'shaman']);
+    }
+    expect(equip('shaman', 'crownforged_gauntlets').equipment.gloves).toBe('crownforged_gauntlets');
+  });
+
   it('allows leather classes to equip leather and cloth armor but not mail armor', () => {
     expect(equip('druid', 'nighttalon_crown').equipment.helmet).toBe('nighttalon_crown');
     expect(equip('druid', 'soulflame_cowl').equipment.helmet).toBe('soulflame_cowl');

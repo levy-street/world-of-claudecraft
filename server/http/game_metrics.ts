@@ -62,6 +62,7 @@ import {
   ROD_FEE_RECIPE_IDS,
   rodFeeForRecipe,
 } from '../fishing_telemetry';
+import { wocAuthGuardCacheStats } from '../woc_auth_guard_cache';
 import {
   type GameMetricsCounters,
   GENERAL_CHAT_QUOTA_DB_OUTCOMES,
@@ -70,6 +71,8 @@ import {
   type GeneralChatQuotaOutcome,
   GUILD_BANK_INCIDENTS,
   type GuildBankIncident,
+  WOC_ESCROW_QUEUE_OUTCOMES,
+  type WocEscrowQueueOutcome,
   WS_DROP_CAUSES,
   type WsDropCause,
   type WsMessageDirection,
@@ -94,6 +97,21 @@ export const WOC_SIM_TICK_HZ = 'woc_sim_tick_hz';
  *  every db-backed path, and the counter-signal for any fire-and-forget read
  *  family (a regression in its rate shows up here first in production). */
 export const WOC_DB_POOL_CLIENTS = 'woc_db_pool_clients';
+
+/** Character-save FIFO keys with a queued or running write (the per-character
+ *  serial writer's live map size). The escrow write-path rider's gauge. The
+ *  alert threshold is SUSTAINED values above the autosave wave's own
+ *  SAVE_CONCURRENCY (4): the wave bounds how many wave-driven saves run at
+ *  once, so a persistently higher reading means out-of-band writers are
+ *  queueing, the precursor the wocEscrowQueue refusal counters alert on. */
+export const WOC_SAVE_PENDING_KEYS = 'woc_character_save_pending_keys';
+
+/** The realm escrow gate's live occupancy (the write-path rider's
+ *  realm-global bound): the instantaneous truth the wocEscrowQueue counter
+ *  kinds approximate, exported to Prometheus so an alert rule can watch
+ *  sustained inFlight at the cap instead of scraping the secret-gated ops
+ *  readout. */
+export const WOC_ESCROW_GATE_IN_FLIGHT = 'woc_escrow_gate_in_flight';
 
 /** Per-phase authoritative-loop timing in SECONDS, labeled by phase and stat (p95/max). */
 export const WOC_SIM_TICK_PHASE_SECONDS = 'woc_sim_tick_phase_seconds';
@@ -134,10 +152,21 @@ export const WOC_GUILD_BANK_INCIDENTS_TOTAL = 'woc_guild_bank_incidents_total';
 /** Rift forge wire commands refused while the gate is closed (server/rift_forge_gate.ts). */
 export const WOC_RIFT_FORGE_REFUSED_TOTAL = 'woc_rift_forge_refused_total';
 
+/** Marketplace escrow-queue outcomes (the listing entry on the per-character
+ *  save FIFO), by kind. */
+export const WOC_ESCROW_QUEUE_TOTAL = 'woc_escrow_queue_total';
+
 /** Guild bank activity log cache readout, labeled by counter name. ONE metric
  *  with a `kind` label rather than six names: the vocabulary is closed and
  *  fixed, and an operator reads them together or not at all. */
 export const WOC_GUILD_BANK_LOG_CACHE = 'woc_guild_bank_log_cache';
+
+/** Marketplace auth-guard read cache readout (token and moderation arms),
+ *  labeled by arm and counter name. This is the one cache whose degradation
+ *  is a CLIFF (an over-cap working set evicts every entry before its next
+ *  poll), so the alertable series exists precisely to see the cliff form:
+ *  watch refreshes approaching reads, and evictions climbing. */
+export const WOC_AUTH_GUARD_CACHE = 'woc_auth_guard_cache';
 
 /** Total copper credited to acting players, labeled by economic surface. */
 export const WOC_COPPER_CREDITED_TOTAL = 'woc_copper_credited_total';
@@ -240,6 +269,10 @@ export interface GameStateSource {
   simEntities(): number;
   /** Achieved sim Hz, or null while the rate meter is still warming up. */
   simTickHz(): number | null;
+  /** Character-save FIFO keys with a queued or running write. */
+  savePendingKeys(): number;
+  /** The realm escrow gate's live in-flight count. */
+  escrowGateInFlight(): number;
   /** Per-phase p95/max in MILLISECONDS, keyed by phase name; missing phases are skipped. */
   tickPhaseMillis(): Record<string, TickPhaseMillis>;
   /** pg pool saturation snapshot (pg Pool totalCount/idleCount/waitingCount). */
@@ -320,6 +353,24 @@ export function registerGameStateMetrics(
     registers: [registry],
     collect() {
       this.set(source.wsConnections());
+    },
+  });
+
+  new Gauge({
+    name: WOC_SAVE_PENDING_KEYS,
+    help: 'Character-save FIFO keys with a queued or running write.',
+    registers: [registry],
+    collect() {
+      this.set(source.savePendingKeys());
+    },
+  });
+
+  new Gauge({
+    name: WOC_ESCROW_GATE_IN_FLIGHT,
+    help: 'Realm escrow gate occupancy (listing sequences holding a slot).',
+    registers: [registry],
+    collect() {
+      this.set(source.escrowGateInFlight());
     },
   });
 
@@ -498,6 +549,13 @@ export function registerGameStateMetrics(
   // operator alerts on, and an alert rule cannot fire on a series that does
   // not exist until its first incident.
   for (const kind of GUILD_BANK_INCIDENTS) guildBankIncidents.inc({ kind }, 0);
+  const wocEscrowQueue = new Counter({
+    name: WOC_ESCROW_QUEUE_TOTAL,
+    help: 'Marketplace escrow-queue outcomes on the per-character save FIFO custody entries (started, deadline_refused, depth_refused, books_dirty_refused, flush_failed, realm_refused, settled, grant_busy), by kind.',
+    labelNames: ['kind'],
+    registers: [registry],
+  });
+  for (const kind of WOC_ESCROW_QUEUE_OUTCOMES) wocEscrowQueue.inc({ kind }, 0);
   new Gauge({
     name: WOC_GUILD_BANK_LOG_CACHE,
     help: 'Guild bank activity log read cache: reads, refreshes (the query rate), evictions, busts, live entries, and guilds inside the coalescing floor.',
@@ -511,6 +569,30 @@ export function registerGameStateMetrics(
       this.set({ kind: 'busts' }, stats.busts);
       this.set({ kind: 'entries' }, stats.entries);
       this.set({ kind: 'dirty_guilds' }, stats.dirtyGuilds);
+    },
+  });
+  new Gauge({
+    name: WOC_AUTH_GUARD_CACHE,
+    help: 'Marketplace auth-guard read cache: reads, refreshes (the residual query rate), evictions, busts, and live entries, per arm (tokens, accounts), plus the two soft-bounded internal collections (arm=index and arm=recent_busts, kind=entries): their bounds are soft BY DESIGN, so an excursion must be a series, not a claim. Zero until the boot wiring arms the cache.',
+    labelNames: ['arm', 'kind'],
+    registers: [registry],
+    collect() {
+      // The process singleton's stats accessor, null before the boot wiring
+      // arms the cache: the zero fallback keeps every series alive so an
+      // alert rule can fire on its first real sample (the zero-backfill rule
+      // the counters above follow).
+      const stats = wocAuthGuardCacheStats();
+      for (const arm of ['tokens', 'accounts'] as const) {
+        const armStats = stats?.[arm] ?? null;
+        this.set({ arm, kind: 'reads' }, armStats?.reads ?? 0);
+        this.set({ arm, kind: 'refreshes' }, armStats?.refreshes ?? 0);
+        this.set({ arm, kind: 'evictions' }, armStats?.evictions ?? 0);
+        this.set({ arm, kind: 'busts' }, armStats?.busts ?? 0);
+        this.set({ arm, kind: 'entries' }, armStats?.entries ?? 0);
+      }
+      this.set({ arm: 'index', kind: 'entries' }, stats?.index ?? 0);
+      this.set({ arm: 'recent_busts', kind: 'entries' }, stats?.recentBusts ?? 0);
+      this.set({ arm: 'join_veto', kind: 'refetches' }, stats?.joinVetoRefetches ?? 0);
     },
   });
   const copperCredited = new Counter({
@@ -708,6 +790,13 @@ export function registerGameStateMetrics(
         charactersCreated.inc();
       } catch {
         // Drop the sample rather than propagate into the create path.
+      }
+    },
+    wocEscrowQueue(outcome: WocEscrowQueueOutcome): void {
+      try {
+        wocEscrowQueue.inc({ kind: outcome });
+      } catch {
+        // Observability must never fail a listing request.
       }
     },
     guildBankIncident(kind: GuildBankIncident): void {

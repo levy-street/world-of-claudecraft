@@ -114,6 +114,8 @@ import { withErrors } from '../../server/http/middleware/with_errors';
 import type { Method, Middleware } from '../../server/http/types';
 import {
   configureInternalRuntime,
+  configureInternalWocMarketReads,
+  configureInternalWocMarketStuckRead,
   handleInternalApi,
   type InternalRuntime,
   resetInternalRuntimeForTests,
@@ -146,6 +148,12 @@ const EXPECTED_ROUTES: ReadonlyArray<readonly [Method, string]> = [
   ['GET', '/internal/discord/flaired-ids'],
   ['POST', '/internal/discord/flex-batch'],
   ['GET', '/internal/discord/outbox'],
+  // The internal dashboard's read-only ops views. RouteDef-only (no legacy
+  // ladder arm), on their own secret gate rather than the Discord bot's.
+  ['GET', '/internal/woc-market/listings'],
+  ['GET', '/internal/woc-market/p2p-trades'],
+  // The stuck-custody monitor readout (woc_market_monitor.ts), same gate.
+  ['GET', '/internal/woc-market/stuck'],
 ];
 
 /** Read status/body/content-type/headers off the fakeCtx's FakeRes. */
@@ -184,7 +192,12 @@ function routeFor(method: Method, path: string) {
 async function runRoute(
   method: Method,
   path: string,
-  opts: { url?: string; body?: unknown; headers?: Record<string, string> } = {},
+  opts: {
+    url?: string;
+    body?: unknown;
+    headers?: Record<string, string>;
+    query?: Record<string, string | string[]>;
+  } = {},
 ) {
   const route = routeFor(method, path);
   let reached = false;
@@ -197,6 +210,7 @@ async function runRoute(
     url: opts.url ?? path,
     headers: opts.headers,
     body: opts.body,
+    query: opts.query,
   });
   const stack: Middleware[] = [
     withErrors({ surface: route.meta?.envelope }),
@@ -286,8 +300,8 @@ afterEach(() => {
 // ---------------------------------------------------------------------------
 
 describe('internal route registration', () => {
-  it('registers exactly 11 routes matching the legacy ladder plus the RouteDef-only pair', () => {
-    expect(routes).toHaveLength(11);
+  it('registers exactly 14 routes: the legacy ladder, the RouteDef-only pair, and the dashboard reads', () => {
+    expect(routes).toHaveLength(14);
     const actual = routes.map((r) => `${r.method} ${r.path}`).sort();
     const expected = EXPECTED_ROUTES.map(([m, p]) => `${m} ${p}`).sort();
     expect(actual).toEqual(expected);
@@ -2251,5 +2265,167 @@ describe('the internal envelope is frozen', () => {
     const gate = await runRoute('POST', '/internal/restart-countdown', { headers: DEPLOY_HEADERS });
     expect(gate.status).toBe(404);
     expect(Object.keys(gate.body as object).sort()).toEqual(only);
+  });
+});
+
+describe('the dashboard ops reads: filters and the default window', () => {
+  const SECRET = 'dashboard-secret';
+  let seen: Record<string, unknown>[] = [];
+
+  beforeEach(() => {
+    seen = [];
+    process.env.DASHBOARD_INTERNAL_SECRET = SECRET;
+    configureInternalWocMarketReads({
+      opsListings: async (q) => {
+        seen.push(q);
+        return { rows: [], hasMore: false };
+      },
+      opsP2pTrades: async (q) => {
+        seen.push(q);
+        return { rows: [], hasMore: false };
+      },
+    });
+  });
+
+  afterEach(() => {
+    delete process.env.DASHBOARD_INTERNAL_SECRET;
+    resetInternalRuntimeForTests();
+  });
+
+  const hit = (path: string, query: Record<string, string> = {}) =>
+    runRoute('GET', path, { headers: { 'x-woc-dashboard-secret': SECRET }, query });
+
+  it('defaults the window to the last 30 days, not to zero', async () => {
+    // The bug this pins returned an empty list forever without erroring:
+    // Number(null) is 0 and 0 is finite, so a "not a number, use the default"
+    // guard never fired for an ABSENT parameter and the range collapsed to
+    // fromMs === toMs === 0.
+    const before = Date.now();
+    await hit('/internal/woc-market/listings');
+    const q = seen[0] as { fromMs: number; toMs: number };
+    expect(q.toMs).toBeGreaterThanOrEqual(before);
+    const days = Math.round((q.toMs - q.fromMs) / 86_400_000);
+    expect(days).toBe(30);
+  });
+
+  it('defaults the page SIZE to 50, which the same trap silently made 1', async () => {
+    await hit('/internal/woc-market/listings');
+    expect((seen[0] as { pageSize: number }).pageSize).toBe(50);
+  });
+
+  it('carries an explicit window and page through', async () => {
+    await hit('/internal/woc-market/listings', {
+      fromMs: '1000',
+      toMs: '5000',
+      page: '2',
+      pageSize: '7',
+    });
+    expect(seen[0]).toMatchObject({ fromMs: 1000, toMs: 5000, page: 2, pageSize: 7 });
+  });
+
+  it('defaults listings to ACTIVE and p2p trades to ALL', async () => {
+    await hit('/internal/woc-market/listings');
+    expect((seen[0] as { status: string }).status).toBe('active');
+    seen = [];
+    await hit('/internal/woc-market/p2p-trades');
+    expect((seen[0] as { status: string }).status).toBe('all');
+  });
+
+  it('falls back to the default on an unrecognised status rather than refusing', async () => {
+    // An ops read answering 400 on a typo is less useful than one showing the
+    // default; the value is never interpolated, so there is nothing to injure.
+    await hit('/internal/woc-market/listings', { status: 'nonsense' });
+    expect((seen[0] as { status: string }).status).toBe('active');
+  });
+
+  it('caps the page size, so a caller cannot ask for an unbounded read', async () => {
+    await hit('/internal/woc-market/listings', { pageSize: '100000' });
+    expect((seen[0] as { pageSize: number }).pageSize).toBe(200);
+  });
+
+  it('answers 404 when the market is not wired, the same as an unset secret', async () => {
+    resetInternalRuntimeForTests();
+    const res = await hit('/internal/woc-market/listings');
+    expect(res.status).toBe(404);
+  });
+});
+
+describe('the stuck-custody readout: GET /internal/woc-market/stuck', () => {
+  const SECRET = 'dashboard-secret';
+  const READOUT = {
+    asOfMs: 5000,
+    unbookedClaims: {
+      count: 1,
+      saturated: false,
+      sample: [
+        {
+          custodyRef: 'woc_settlement:7',
+          claimedAtMs: 1000,
+          grantCharacterId: 21,
+          mailIntent: false,
+        },
+      ],
+    },
+    stuckDelivering: {
+      count: 2,
+      saturated: false,
+      sample: [{ id: 7, listingId: 3, createdAtMs: 2000, updatedAtMs: 2500 }],
+    },
+    undisposedListings: { count: 0, saturated: false, sample: [] },
+    reviewSettlements: {
+      count: 1,
+      saturated: false,
+      sample: [{ id: 9, listingId: 4, createdAtMs: 3000, updatedAtMs: 3500 }],
+    },
+    stuckBonds: {
+      count: 1,
+      saturated: false,
+      sample: [{ id: 11, listingId: 4, account: 21, placedAtMs: 1500, stuckSinceMs: 1600 }],
+    },
+  };
+  let reads = 0;
+
+  beforeEach(() => {
+    reads = 0;
+    process.env.DASHBOARD_INTERNAL_SECRET = SECRET;
+    configureInternalWocMarketStuckRead(async () => {
+      reads++;
+      return structuredClone(READOUT);
+    });
+  });
+
+  afterEach(() => {
+    delete process.env.DASHBOARD_INTERNAL_SECRET;
+    resetInternalRuntimeForTests();
+  });
+
+  const hit = (headers: Record<string, string> = { 'x-woc-dashboard-secret': SECRET }) =>
+    runRoute('GET', '/internal/woc-market/stuck', { headers });
+
+  it('serves the injected readout verbatim in the admin envelope', async () => {
+    const res = await hit();
+    expect(res.status).toBe(200);
+    expect(res.body).toEqual({ success: true, data: READOUT, error: null });
+    expect(reads, 'one thunk call per request; caching lives in the monitor').toBe(1);
+  });
+
+  it('answers 401 on a wrong dashboard secret without touching the readout', async () => {
+    const res = await hit({ 'x-woc-dashboard-secret': 'wrong' });
+    expect(res.status).toBe(401);
+    expect(reads).toBe(0);
+  });
+
+  it('answers 404 with the secret UNSET, indistinguishable from an unknown path', async () => {
+    delete process.env.DASHBOARD_INTERNAL_SECRET;
+    const res = await hit();
+    expect(res.status).toBe(404);
+    expect(reads).toBe(0);
+  });
+
+  it('answers 404 when the monitor is not wired, the same as an unset secret', async () => {
+    resetInternalRuntimeForTests();
+    const res = await hit();
+    expect(res.status).toBe(404);
+    expect(reads).toBe(0);
   });
 });

@@ -466,6 +466,11 @@ export type AuraKind =
   // Sunder Armor (effectiveArmor takes the larger of the two percents). Own kind so
   // it is never summed flat with sunder.
   | 'faerie_fire'
+  // Rogue Melting Acid: a percent armor reduction whose fraction rides the
+  // aura's own `value` (unlike faerie_fire's constant). Joins the same
+  // max-combine group in effectiveArmor, so it never stacks with Sunder Armor
+  // or Faerie Fire.
+  | 'melting_acid'
   | 'mortal_wound'
   | 'silence'
   | 'blind'
@@ -712,6 +717,7 @@ export interface DamageBreakBudget {
 
 export type CrowdControlDrCategory =
   | 'root'
+  | 'incapacitate'
   | 'polymorph'
   | 'fear'
   | 'lockout'
@@ -3240,6 +3246,12 @@ export interface AbilityDef {
    *  held still strengthen it (Redharvest: the bank is the real payment). */
   comboOptional?: boolean;
   fearDr?: boolean; // incapacitate effects that use fear diminishing returns
+  /** The cast never puts the caster or the victim into combat. Classic Sap:
+   *  the rogue stays out of combat and hidden, and the victim wakes up where
+   *  it stood instead of being handed an aggro target it never saw. Only
+   *  meaningful on an ability whose effect arm would otherwise call
+   *  `enterCombat`. */
+  noCombatEntry?: boolean;
   requiresDodgeProc?: boolean; // overpower
   requiresTargetHpBelow?: number; // execute-style (fraction)
   executeThreshold?: number; // strict execute threshold: target health must be below this fraction

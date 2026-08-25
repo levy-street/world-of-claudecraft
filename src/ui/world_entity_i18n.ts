@@ -6,6 +6,9 @@ import {
   MASTERY_RESET_LETTER,
   QUEST_LETTERS,
   WELCOME_LETTER,
+  WOC_MARKET_DELIVERY_LETTER,
+  WOC_MARKET_RETURN_LETTER,
+  WOC_MARKET_SOLD_LETTER,
 } from '../sim/content/letters';
 import { DELVES, DUNGEONS, MOBS, NPCS, QUESTS, ZONES } from '../sim/data';
 
@@ -623,6 +626,11 @@ const LETTER_IDS = [
   'prof_tier_engineering_alchemy_3',
   'prof_tier_engineering_alchemy_4',
   'prof_tier_engineering_alchemy_5',
+  // $WOC Exchange custody letters (the server-side marketplace,
+  // WOC_MARKET_*_LETTER in src/sim/content/letters.ts).
+  'woc_market_delivery',
+  'woc_market_return',
+  'woc_market_sold',
 ] as const;
 
 type MobId = (typeof MOB_IDS)[number];
@@ -760,6 +768,9 @@ function makeEnglishWorldEntities(): WorldEntityTranslations {
     [WELCOME_LETTER.letterId]: WELCOME_LETTER,
     [HEROIC_MARK_LETTER.letterId]: HEROIC_MARK_LETTER,
     [MASTERY_RESET_LETTER.letterId]: MASTERY_RESET_LETTER,
+    [WOC_MARKET_DELIVERY_LETTER.letterId]: WOC_MARKET_DELIVERY_LETTER,
+    [WOC_MARKET_RETURN_LETTER.letterId]: WOC_MARKET_RETURN_LETTER,
+    [WOC_MARKET_SOLD_LETTER.letterId]: WOC_MARKET_SOLD_LETTER,
   };
   for (const letter of Object.values(QUEST_LETTERS)) lettersById[letter.letterId] = letter;
   for (const letter of Object.values(GUILD_TREND_LETTERS)) lettersById[letter.letterId] = letter;

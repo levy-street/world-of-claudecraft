@@ -52,9 +52,13 @@ function barWidthFactor(block: string): string {
   return (m as RegExpMatchArray)[1];
 }
 
-/** The px value inside a `bottom: calc(<n>px + env(safe-area-inset-bottom));`. */
-function bottomPx(block: string): number {
-  const m = block.match(/bottom: calc\((\d+)px \+ env\(safe-area-inset-bottom\)\);/);
+/** The px OFFSET a bar's seat adds to the shared button-row token. The whole
+ *  bottom-centre column (frame, cast, swing, pet strip) is expressed against
+ *  --mobile-button-row-lift, the distance from the viewport bottom to the top
+ *  line of the touch button row, so the three stay stacked whatever a tier does
+ *  to the ring: only the offsets off that one line are tuned here. */
+function bottomOffsetPx(block: string): number {
+  const m = block.match(/bottom: calc\(var\(--mobile-button-row-lift\) \+ (\d+)px\);/);
   expect(m).not.toBeNull();
   return Number((m as RegExpMatchArray)[1]);
 }
@@ -83,11 +87,38 @@ describe('mobile swing/cast bar anchoring (issue 1577 (6))', () => {
   });
 
   it('stacks swing above cast, both above the frame, so the three never overlap (base tier)', () => {
-    // Player frame sits at bottom 14px; cast clears it, swing clears cast.
-    const castBottom = bottomPx(ruleBlock('body.mobile-touch #castbar {'));
-    const swingBottom = bottomPx(ruleBlock('body.mobile-touch #swingbar {'));
-    expect(castBottom).toBeGreaterThan(14);
+    // The frame's TOP sits exactly on the row line, so any positive offset off
+    // that same line clears it; cast takes the first slot, swing the next.
+    const frameBlock = ruleBlock('body.mobile-touch #player-frame {\n    position: fixed;');
+    expect(frameBlock).toContain(
+      'top: calc(var(--app-vh, 100dvh) - var(--mobile-button-row-lift));',
+    );
+    expect(frameBlock).toContain('transform-origin: center top;');
+    const castBottom = bottomOffsetPx(ruleBlock('body.mobile-touch #castbar {'));
+    const swingBottom = bottomOffsetPx(ruleBlock('body.mobile-touch #swingbar {'));
+    expect(castBottom).toBeGreaterThan(0);
     expect(swingBottom).toBeGreaterThan(castBottom);
+    // The pet frame is the one column member that hangs the OTHER way: it drops
+    // BELOW the player frame, into the band between that frame's bottom edge and
+    // the screen's, so it is top-seated off the same line with a positive drop
+    // rather than stacked above the two bars. It used to sit at row-lift + 24px,
+    // sharing the (now retired) touch stance row's slot.
+    const petBlock = ruleBlock('body.mobile-touch #pet-frame {');
+    expect(petBlock).toContain(
+      'top: calc(var(--app-vh, 100dvh) - var(--mobile-button-row-lift) + var(--mobile-pet-frame-drop));',
+    );
+    expect(petBlock).toContain('bottom: auto;');
+    expect(petBlock).toContain('transform-origin: center top;');
+    // The drop is measured from the SAME row line the player frame's top sits on,
+    // so it has to clear that frame's own rendered height or the two overlap.
+    const drop = mobileCss.match(
+      /--mobile-pet-frame-drop: calc\(65px \* 0\.6 \* var\(--mobile-chrome-scale, 1\) \+ (\d+)px\)/,
+    );
+    expect(
+      drop,
+      'the landscape pet-frame drop must be derived from the frame scale',
+    ).not.toBeNull();
+    expect(Number((drop as RegExpMatchArray)[1])).toBeGreaterThan(0);
   });
 
   it('matches each bar width to the shorter player frame in landscape', () => {

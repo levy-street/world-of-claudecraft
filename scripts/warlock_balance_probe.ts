@@ -1,6 +1,7 @@
 import { pathToFileURL } from 'node:url';
 import { ruinAmount } from '../src/sim/combat/destruction';
 import { addSoulFragments, soulFragmentCount } from '../src/sim/combat/necromancy';
+import { HEROIC_DUNGEON_TUNING } from '../src/sim/content/dungeon_difficulty';
 import { MOBS } from '../src/sim/data';
 import { createMob, type PlayerEquipment, recalcPlayerStats } from '../src/sim/entity';
 import { Sim } from '../src/sim/sim';
@@ -38,22 +39,44 @@ const TALENT_ROWS = {
   },
 } as const;
 
-// Canonical PBE true-BiS caster kit from server/pbe_boost.ts. Keep this
-// explicit so the benchmark neither imports the server/DB graph nor silently
-// falls back to the generic epic-only /dev bis scorer.
+// Re-anchored 2026-08-23 (warlock PVE viability round) to the kit the top
+// live warlocks actually wear on heroic Nythraxis parses: Wraithfire Regalia
+// 4pc (the Soulblaze spell-power proc), Mournweave 3pc, and hit jewelry that
+// buys back the raid boss level penalty. The prior pbe_boost caster kit
+// forfeited both set bonuses and most hit rating and benched 21 to 33% under
+// this kit at the heroic profile, so the tripwire now guards the real
+// ceiling, same as the Warspirit fixture re-anchor.
 export const WARLOCK_FULL_BIS_GEAR: PlayerEquipment = {
-  helmet: 'sunbone_oracles_crown',
+  helmet: 'heroic_soulflame_cowl',
   neck: 'zense_meridian',
-  shoulder: 'sunken_court_mantle',
-  chest: 'shroud_of_the_gravewyrm',
+  shoulder: 'heroic_soulflame_mantle',
+  chest: 'heroic_necromancers_starshroud',
   mainhand: 'heroic_deathless_heartwood',
   offhand: 'heroic_wraithfire_orb',
-  gloves: 'shadowpulse_handwraps',
-  waist: 'sash_of_the_sunken_court',
+  gloves: 'soulflame_gloves',
+  waist: 'soulflame_cord',
   legs: 'necromancers_legwraps',
-  feet: 'shadowpulse_slippers',
-  ring1: 'architects_cornerstone',
-  ring2: 'zyzzs_deathless_signet',
+  feet: 'heroic_necromancers_soulsteps',
+  ring1: 'nielas_coldlight_band',
+  ring2: 'nielas_coldlight_band',
+};
+
+// The two pinned measurement scenarios. The level-20 zero-armor dummy is the
+// historical anchor every existing band was minted on; the heroic scenario
+// mirrors the owned-class raid probes: a level-22 target wearing the real
+// Nythraxis armor curve, the profile the 2026-08-23 owner target ("about 200
+// DPS against heroic Nythraxis") is measured on.
+export interface WarlockProbeScenario {
+  targetLevel: number;
+  nythraxisArmor: boolean;
+}
+export const WARLOCK_LEVEL_20_SCENARIO: WarlockProbeScenario = {
+  targetLevel: 20,
+  nythraxisArmor: false,
+};
+export const WARLOCK_HEROIC_NYTHRAXIS_SCENARIO: WarlockProbeScenario = {
+  targetLevel: 22,
+  nythraxisArmor: true,
 };
 
 type ProbeSim = Sim & {
@@ -65,7 +88,7 @@ function face(source: Entity, target: Entity): void {
   source.prevFacing = source.facing;
 }
 
-function addBossDummy(sim: ProbeSim): Entity {
+function addBossDummy(sim: ProbeSim, scenario: WarlockProbeScenario): Entity {
   const player = sim.player;
   const templateId = 'warlock_balance_boss_dummy';
   MOBS[templateId] ??= {
@@ -74,7 +97,7 @@ function addBossDummy(sim: ProbeSim): Entity {
     name: 'Warlock Balance Dummy',
     boss: true,
   };
-  const target = createMob(99_800, MOBS[templateId], 20, {
+  const target = createMob(99_800, MOBS[templateId], scenario.targetLevel, {
     x: player.pos.x,
     y: player.pos.y,
     z: player.pos.z + 18,
@@ -83,6 +106,17 @@ function addBossDummy(sim: ProbeSim): Entity {
   target.hp = target.maxHp = 10_000_000;
   target.aiState = 'idle';
   target.aggroTargetId = null;
+  if (scenario.nythraxisArmor) {
+    // The named raid template supplies its real armor curve, scaled by the
+    // heroic tuning's armorMultiplier exactly as src/sim/instances/difficulty.ts
+    // scales the live heroic spawn, while the training-dummy shell prevents
+    // boss casts, adds, and movement.
+    const armorTemplate = MOBS.nythraxis_scourge_of_thornpeak;
+    const heroicArmorMult = HEROIC_DUNGEON_TUNING.nythraxis_boss_arena.armorMultiplier;
+    target.stats.armor = Math.round(
+      armorTemplate.armorPerLevel * heroicArmorMult * (scenario.targetLevel - 1),
+    );
+  }
   sim.addEntity(target);
   sim.targetEntity(target.id);
   face(player, target);
@@ -251,6 +285,7 @@ export function runWarlockBalanceProbe(
   spec: WarlockBalanceSpec,
   seed = 42,
   seconds = 300,
+  scenario: WarlockProbeScenario = WARLOCK_LEVEL_20_SCENARIO,
 ): WarlockBalanceResult {
   const sim = new Sim({ seed, playerClass: 'warlock', autoEquip: true }) as ProbeSim;
   sim.setPlayerLevel(20);
@@ -258,7 +293,7 @@ export function runWarlockBalanceProbe(
     throw new Error(`Could not apply ${spec} benchmark talents`);
   }
   equipFullBis(sim);
-  const target = addBossDummy(sim);
+  const target = addBossDummy(sim, scenario);
   if (spec === 'affliction') prepareAffliction(sim, target);
   else if (spec === 'destruction') prepareDestruction(sim, target);
   else prepareDemonology(sim, target);
@@ -306,8 +341,12 @@ function printResults(): void {
   const seeds = (process.env.WOC_WARLOCK_SEEDS ?? '42,1337,9001,777')
     .split(',')
     .map((seed) => Number.parseInt(seed, 10));
+  const scenario =
+    process.env.WOC_WARLOCK_SCENARIO === 'heroic'
+      ? WARLOCK_HEROIC_NYTHRAXIS_SCENARIO
+      : WARLOCK_LEVEL_20_SCENARIO;
   for (const spec of ['affliction', 'destruction', 'demonology'] as const) {
-    const rows = seeds.map((seed) => runWarlockBalanceProbe(spec, seed, seconds));
+    const rows = seeds.map((seed) => runWarlockBalanceProbe(spec, seed, seconds, scenario));
     const average = (key: 'dps' | 'manaAveragePct' | 'manaEndPct' | 'starvedPct') =>
       rows.reduce((sum, row) => sum + row[key], 0) / rows.length;
     console.log(

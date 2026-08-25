@@ -10,9 +10,15 @@
 // actually targeting (aggroTargetId). WHICH mob that is gets resolved live
 // every render by threat_subject_core.ts, never read off the encounter's
 // latched mainMobId: the latch froze the tab on the first mob of a pull and
-// then on its corpse. For a finished encounter with nothing live left, the tab
-// falls back to each member's damage on the latched mob AND says so in the
-// subtitle, because damage under a "Threat" heading reads as hate.
+// then on its corpse. A mob's hate table is wiped in place the instant it
+// dies, so the tab also keeps a per-mob snapshot of the last LIVE table it
+// saw (Encounter.threatSnapshotByMob, latched on every hit in onEvent): once
+// the subject dies, resolveThreatValues freezes on that snapshot rather than
+// recalculating the tab from damage, so a fight's real threat survives the
+// kill that just proved it. Only once no snapshot was ever taken (nothing
+// live was ever seen on this segment) does the tab fall back to each
+// member's damage on the latched mob, and say so in the subtitle, because
+// damage under a "Threat" heading reads as hate.
 //
 // The pet rule differs by TAB, and that split is the point. On damage/healing a
 // controlled pet (hunter, warlock, mage) folds into its owner's row, the way a
@@ -41,7 +47,7 @@ import { METER_FRAME_LIMITS, TABBED_METER_FRAME_LIMITS } from './meters_frame_co
 import { buildMeterTabMenu, type MeterMenuRow } from './meters_menu_view';
 import { buildMeterRows, type MeterPet, type MeterTab } from './meters_rows_view';
 import type { SimpleMenuItem } from './simple_context_menu';
-import { resolveThreatSubject } from './threat_subject_core';
+import { resolveThreatSubject, resolveThreatValues } from './threat_subject_core';
 
 const ENCOUNTER_END_SECONDS = 5;
 const HISTORY_CAP = 8;
@@ -98,6 +104,14 @@ export interface Encounter {
   mainMobTemplateId: string | null;
   /** maxHp of the biggest mob damaged — used to pick the label */
   biggestMobHp: number;
+  /**
+   * Each engaged mob's live hate table, latched on every hit while it is
+   * still readable. A mob's table is wiped the instant it dies, so without
+   * this the Threat tab would fall through to the raw-damage fallback right
+   * when a fight's real numbers matter most: at the kill. Current/previous
+   * encounters only, exactly like `dmgByMob`.
+   */
+  threatSnapshotByMob: Map<number, Map<number, number>>;
 }
 
 function newEncounter(now: number): Encounter {
@@ -110,6 +124,7 @@ function newEncounter(now: number): Encounter {
     mainMobName: '',
     mainMobTemplateId: null,
     biggestMobHp: -1,
+    threatSnapshotByMob: new Map(),
   };
 }
 
@@ -182,6 +197,32 @@ export class MeterData {
     };
   }
 
+  private threatEntryBelongsToParty(
+    world: IWorld,
+    entityId: number,
+    partyPids: Set<number>,
+  ): boolean {
+    if (partyPids.has(entityId)) return true;
+    const entity = world.entities.get(entityId);
+    return entity?.kind === 'mob' && entity.ownerId !== null && partyPids.has(entity.ownerId);
+  }
+
+  private refreshThreatSnapshots(world: IWorld, partyPids: Set<number>): void {
+    if (!this.current) return;
+    for (const entity of world.entities.values()) {
+      if (entity.kind !== 'mob' || !entity.threat || entity.threat.size === 0) continue;
+      let partyOnTable = false;
+      for (const threatEntityId of entity.threat.keys()) {
+        if (this.threatEntryBelongsToParty(world, threatEntityId, partyPids)) {
+          partyOnTable = true;
+          break;
+        }
+      }
+      if (!partyOnTable) continue;
+      this.current.threatSnapshotByMob.set(entity.id, new Map(entity.threat));
+    }
+  }
+
   /** party membership check is supplied by the caller (self + party pids) */
   onEvent(ev: SimEvent, world: IWorld, partyPids: Set<number>, now: number): void {
     if (ev.type !== 'damage' && ev.type !== 'heal2') return;
@@ -195,10 +236,22 @@ export class MeterData {
     const targetInParty = partyPids.has(ev.targetId);
     if (!sourceInParty && !targetInParty) return;
 
-    // any party-involved combat keeps the encounter alive (tanking without
+    // A HoT's periodic tick (ev.hot) is passive residual healing, not fresh party
+    // activity: left alone it holds the segment open indefinitely (a HoT still
+    // ticking down after the kill, or kept rolling by the healer into the next
+    // pull, never let the 5s inactivity clock elapse), merging pulls together
+    // instead of resetting between them. A lone tick with no segment open must
+    // not spawn one either, so residual healing between pulls stays inert; while
+    // a segment IS open its healing still tallies, just without touching the
+    // clock that closes it.
+    const isPassiveHotTick = ev.type === 'heal2' && ev.hot === true;
+    if (isPassiveHotTick && !this.current) return;
+
+    // any other party-involved combat keeps the encounter alive (tanking without
     // dealing damage must not end the segment)
     if (!this.current) this.current = newEncounter(now);
-    this.lastActivity = now;
+    if (!isPassiveHotTick) this.lastActivity = now;
+    this.refreshThreatSnapshots(world, partyPids);
 
     if (ev.type === 'damage' && sourceInParty && ev.kind === 'hit' && ev.amount > 0) {
       const target = world.entities.get(ev.targetId);
@@ -211,6 +264,16 @@ export class MeterData {
           if (enc === this.current) {
             t.dmgByMob.set(ev.targetId, (t.dmgByMob.get(ev.targetId) ?? 0) + ev.amount);
           }
+        }
+        // Latch the mob's live hate table while it is still readable, so a
+        // kill's own hit does not erase the numbers it just proved: `target.threat`
+        // is cleared in place on death, so a reference here would go empty right
+        // alongside it, and reading it only at death is already too late (the
+        // server clears the table before this event is even processed). Never
+        // overwrite a real snapshot with an empty read (target already dead, or
+        // simply out of combat with nothing on its table yet).
+        if (target.threat && target.threat.size > 0) {
+          this.current.threatSnapshotByMob.set(ev.targetId, new Map(target.threat));
         }
         // encounter label/threat subject: the beefiest mob the party fought
         if (target.maxHp > this.current.biggestMobHp) {
@@ -560,7 +623,7 @@ export class MetersPanel {
     // marker both need every member's pets, and re-walking the entity map per
     // bar is the one part of this render that scales with the world.
     const petsByOwner = isThreat ? this.host.petsByOwner() : null;
-    const { mob, liveThreat } = this.threatSubject(enc, petsByOwner);
+    const { mob, liveThreat, frozen } = this.threatSubject(enc, petsByOwner);
     const aggroPid = mob && !mob.dead ? mob.aggroTargetId : null;
     const subjectName = mob
       ? tEntity({ kind: 'mob', id: mob.templateId, field: 'name' })
@@ -573,12 +636,16 @@ export class MetersPanel {
         : enc.mainMobTemplateId
           ? tEntity({ kind: 'mob', id: enc.mainMobTemplateId, field: 'name' })
           : enc.mainMobName;
-    // Say plainly when the bars are the damage fallback rather than live hate:
-    // the numbers are honest, but under a "Threat" heading they read as hate and
-    // a player acts on them.
+    // Say plainly when the bars are the damage fallback rather than hate: the
+    // numbers are honest, but under a "Threat" heading they read as hate and a
+    // player acts on them. A FROZEN read is real hate too, just no longer
+    // live (the subject died or left mid-segment), so it gets its own line
+    // rather than reading like the damage fallback.
     this.subEl.textContent = isThreat
       ? liveThreat
-        ? t('hud.meters.target', { name: subjectName })
+        ? frozen
+          ? t('hudChrome.meters.threatFrozen', { name: subjectName })
+          : t('hud.meters.target', { name: subjectName })
         : subjectName
           ? t('hudChrome.meters.threatFallback', { name: subjectName })
           : t('hud.meters.noTargetEngaged')
@@ -657,8 +724,8 @@ export class MetersPanel {
   private threatSubject(
     enc: Encounter,
     petsByOwner: Map<number, Pet[]> | null,
-  ): { mob: Entity | null; liveThreat: Map<number, number> | null } {
-    if (this.tab !== 'threat') return { mob: null, liveThreat: null };
+  ): { mob: Entity | null; liveThreat: Map<number, number> | null; frozen: boolean } {
+    if (this.tab !== 'threat') return { mob: null, liveThreat: null, frozen: false };
     const world = this.host.world;
     const tracked = new Set(this.host.partyPids());
     for (const pets of petsByOwner?.values() ?? []) for (const pet of pets) tracked.add(pet.pid);
@@ -669,8 +736,10 @@ export class MetersPanel {
       fallbackMobId: enc.mainMobId,
     });
     const mob = subjectId !== null ? (world.entities.get(subjectId) ?? null) : null;
-    const liveThreat = mob && !mob.dead && mob.threat.size > 0 ? mob.threat : null;
-    return { mob, liveThreat };
+    const frozenSnapshot =
+      subjectId !== null ? (enc.threatSnapshotByMob.get(subjectId) ?? null) : null;
+    const { values: liveThreat, frozen } = resolveThreatValues(mob, frozenSnapshot);
+    return { mob, liveThreat, frozen };
   }
 
   /**

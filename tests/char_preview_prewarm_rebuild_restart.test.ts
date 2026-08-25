@@ -43,7 +43,7 @@ describe('post-entry preview prewarm: char family excluded only on the graphics-
     expect(restore).not.toContain('this.startPostEntryPreviewPrewarm();');
   });
 
-  it('postEntryPreviewPrewarmUnits forwards includeCharFamily into the pure-core plan builder', () => {
+  it('postEntryPreviewPrewarmUnits forwards includeCharFamily into the prewarm wiring module', () => {
     const methodAt = hud.indexOf(
       'private postEntryPreviewPrewarmUnits(includeCharFamily: boolean): PreviewPrewarmUnit[] {',
     );

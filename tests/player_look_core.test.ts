@@ -17,6 +17,9 @@ import {
   armorSetSourceFor,
   charselectLook,
   composedLook,
+  helmSlotAvailable,
+  helmSlotAvailableForEntity,
+  helmSlotAvailableForLook,
   inWorldLookFor,
   modularLookChanged,
 } from '../src/render/characters/player_look_core';
@@ -150,6 +153,59 @@ describe('armorSetSourceFor', () => {
     const kit = (): ArmorSetId => 'mage';
     expect(armorSetSourceFor(true, override, kit)('mage')).toBe('barbarian');
     expect(armorSetSourceFor(false, override, kit)('mage')).toBe('mage');
+  });
+});
+
+describe('helmSlotAvailable (issue: hide helmet does nothing)', () => {
+  it('is false for a class kit whose set ships no head geometry', () => {
+    // druid, the hunter's ranger kit, and rogue all leave ARMOR_BY_SET.head
+    // empty: the composed body has no helm to remove, so the paperdoll eye
+    // must not claim it can hide one.
+    expect(helmSlotAvailable('druid', false)).toBe(false);
+    expect(helmSlotAvailable('hunter', false)).toBe(false);
+    expect(helmSlotAvailable('rogue', false)).toBe(false);
+  });
+
+  it('is true for a class kit whose set has a head piece', () => {
+    expect(helmSlotAvailable('warrior', false)).toBe(true);
+    expect(helmSlotAvailable('mage', false)).toBe(true);
+    expect(helmSlotAvailable('paladin', false)).toBe(true);
+  });
+
+  it('is false for a Combat Mech wearer regardless of class kit', () => {
+    // A mech is a whole replacement body that never composes the kit at all
+    // (renderer.ts skips its look via the same isMechWearer guard), so even a
+    // helmed class kit has nothing the eye could hide while mech-skinned.
+    expect(helmSlotAvailable('warrior', true)).toBe(false);
+  });
+});
+
+describe('helmSlotAvailableForLook', () => {
+  it('is derived from the composed look that the renderer will draw', () => {
+    expect(helmSlotAvailableForLook(null)).toBe(false);
+    expect(helmSlotAvailableForLook(composedLook({ gender: 'male' }, 'knight', false))).toBe(true);
+    expect(helmSlotAvailableForLook(composedLook({ gender: 'male' }, 'rogue', false))).toBe(false);
+  });
+});
+
+describe('helmSlotAvailableForEntity', () => {
+  it('probes the shown look when the current player has hidden the helm', () => {
+    const hidden = playerEntity({ modularAppearance: { gender: 'male' }, helmHidden: true });
+    expect(helmSlotAvailableForEntity(hidden, (e) => inWorldLookFor(e, CLASS_KIT))).toBe(true);
+  });
+
+  it('returns false for fixed rigs and replacement bodies', () => {
+    expect(
+      helmSlotAvailableForEntity(playerEntity({ modularAppearance: null }), (e) =>
+        inWorldLookFor(e, CLASS_KIT),
+      ),
+    ).toBe(false);
+    expect(
+      helmSlotAvailableForEntity(
+        playerEntity({ modularAppearance: { gender: 'male' }, skinCatalog: 'mech' }),
+        (e) => inWorldLookFor(e, CLASS_KIT),
+      ),
+    ).toBe(false);
   });
 });
 

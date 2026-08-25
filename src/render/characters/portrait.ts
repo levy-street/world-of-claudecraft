@@ -15,6 +15,7 @@ import { type ModularLook, modularSignature } from './modular';
 import { createPortraitCaptureLane } from './portrait_capture_lane_core';
 import { type PortraitFraming, portraitFrameParams } from './portrait_framing';
 import { runPortraitPrewarm } from './portrait_prewarm_core';
+import { PortraitSnapshotTarget } from './portrait_snapshot';
 import { CharacterVisual } from './visual';
 
 export type { PortraitFraming } from './portrait_framing';
@@ -64,6 +65,9 @@ interface PortraitRig {
   scene: THREE.Scene;
   camera: THREE.PerspectiveCamera;
   mount: THREE.Group;
+  // The capture surface: a render target read back behind a GPU fence, with
+  // the old default-framebuffer toBlob as its fallback (portrait_snapshot.ts).
+  snapshot: PortraitSnapshotTarget;
 }
 
 let rig: PortraitRig | null = null;
@@ -112,6 +116,12 @@ function ensureRig(): PortraitRig {
     canvas,
     alpha: true,
     antialias: true,
+    // The cost is permanent, not conditional: the flag makes every frame this
+    // context draws survive its own composite, whether or not an arm that reads
+    // the default framebuffer back runs. TWO arms depend on it now: the
+    // transfer arm snapshots this buffer with createImageBitmap, and the
+    // synchronous fallback reads it with toBlob (portrait_snapshot.ts). Do not
+    // drop the flag when one of them is retired.
     preserveDrawingBuffer: true,
   });
   newRenderer.debug.checkShaderErrors = shaderDebugRequested();
@@ -139,7 +149,13 @@ function ensureRig(): PortraitRig {
   fill.position.set(-3, 2, -2);
   newScene.add(fill);
 
-  rig = { renderer: newRenderer, scene: newScene, camera: newCamera, mount: newMount };
+  rig = {
+    renderer: newRenderer,
+    scene: newScene,
+    camera: newCamera,
+    mount: newMount,
+    snapshot: new PortraitSnapshotTarget(PORTRAIT_SIZE),
+  };
   return rig;
 }
 
@@ -246,32 +262,6 @@ function trackSkinAtlasPending(visualKey: string, skin: number): boolean {
     );
   }
   return true;
-}
-
-/** Snapshot-encode the portrait canvas to a PNG data URL off the main thread.
- *  toBlob captures the bitmap AT CALL TIME, so a later render into the shared
- *  rig cannot bleed into this capture; the encode itself runs async (a
- *  toDataURL here would block on GPU readback plus PNG encode instead).
- *  Resolves null on an encode failure (including a synchronous toBlob throw,
- *  which must not become an unhandled rejection); the capture then commits
- *  nothing and its key backs off in the lane. */
-function encodePortraitPng(canvas: HTMLCanvasElement): Promise<string | null> {
-  return new Promise((resolve) => {
-    try {
-      canvas.toBlob((blob) => {
-        if (!blob) {
-          resolve(null);
-          return;
-        }
-        const reader = new FileReader();
-        reader.onload = () => resolve(typeof reader.result === 'string' ? reader.result : null);
-        reader.onerror = () => resolve(null);
-        reader.readAsDataURL(blob);
-      }, 'image/png');
-    } catch {
-      resolve(null);
-    }
-  });
 }
 
 /**
@@ -391,13 +381,18 @@ async function capturePortrait(request: PortraitCaptureRequest): Promise<void> {
       activeRig.mount.remove(visual.root);
       return compiled.then(() => undefined);
     },
-    // Fully synchronous window: renderPortraitFrame re-mounts and renders,
-    // and toBlob snapshots the bitmap at call time, so nothing can interleave
-    // between the draw and the capture.
+    // Fully synchronous window: renderPortraitFrame re-mounts and renders
+    // BEFORE this returns its promise (the caller releases the visual the
+    // moment it has one), and only the readback plus the PNG encode are
+    // deferred. Which is the whole point of the snapshot target: the old
+    // toBlob off the default framebuffer deferred the encode but did the GPU
+    // readback on the main thread, 67 to 118 ms per portrait.
     renderAndSnapshot: (visual) => {
-      if (!prewarmRig) return Promise.resolve(null);
-      renderPortraitFrame(prewarmRig, visual, visualKey, framing);
-      return encodePortraitPng(prewarmRig.renderer.domElement);
+      const activeRig = prewarmRig;
+      if (!activeRig) return Promise.resolve(null);
+      return activeRig.snapshot.capture(activeRig.renderer, () => {
+        renderPortraitFrame(activeRig, visual, visualKey, framing);
+      });
     },
     release: (visual) => {
       prewarmRig?.mount.remove(visual.root);
@@ -497,8 +492,9 @@ function rememberModularPortrait(key: string, url: string): void {
 }
 
 /** Mount `visual` in the offscreen rig, settle its pose, aim the camera for
- *  `framing`, and render one frame. The caller owns the readback (the async
- *  toBlob snapshot) and the visual's unmount/dispose. */
+ *  `framing`, and render one frame into whatever target is bound. The caller
+ *  owns the readback (PortraitSnapshotTarget) and the visual's
+ *  unmount/dispose. */
 function renderPortraitFrame(
   rig: PortraitRig,
   visual: CharacterVisual,
@@ -607,6 +603,7 @@ export function resetPortraitRendererForGraphicsRebuild(): void {
   // ask after the rebuild start a fresh capture instead of waiting on them.
   liveCaptures.clear();
   if (rig) {
+    rig.snapshot.dispose();
     rig.scene.remove(rig.mount);
     try {
       rig.renderer.forceContextLoss();

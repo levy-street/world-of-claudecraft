@@ -473,6 +473,46 @@ For off-box safety, sync the directory to S3 occasionally:
   economy service, use `http://host.docker.internal:8798/v1/claudium/`.
   A separately deployed economy service should use its internal or remote DNS
   URL instead.
+- **$WOC market settlement service**: `WOC_MARKET_SERVICE_URL` points at the
+  same economy service's `/v1/market/` surface and is a SEPARATE knob from the
+  claudium URL above (the market proxy refuses to fall back to it; with the
+  market knob unset the Exchange reports itself unavailable). Same host
+  guidance as above. Health: probe `GET /v1/market/price` on this base (send
+  the shared `x-woc-economy-secret` header if the service requires it; the
+  game mirrors the reading at `/api/woc-market/status`, which needs a player
+  bearer token, so the service base is the operator probe); do not key market
+  monitoring on the service's `/v1/health` rail matrix, which has no
+  market-settlement rail (its `marketplace` rail is the character-marketplace
+  rail and names keys this market never reads). Deploy coupling: the
+  bond-quote contract is service-owned (the game sends the BID, the service
+  answers the bond), so enable the market only with BOTH sides at or after
+  the contract tips: for the service, the PR #31 build whose bond-quote
+  response carries `bondCents` (the probe: quote a bond and check the field);
+  for the game, the build that sends `bidCents`. An old GAME against the new
+  service refuses bond quotes fail-safe (the service demands the bid; no
+  money moves, bids lapse on their TTL). A new game against an OLD service is
+  TOLERATED by design: a quote without `bondCents` falls back to the game's
+  ceil mirror at the same knobs, so keep the knobs in lockstep until both
+  sides are current. The contract also reserves the confirm
+  verdict word `awaiting_finality` for LEDGER-MATCHED payments (the game's
+  anti-snipe extension trusts exactly that reservation); a service build that
+  starts emitting it optimistically is a breaking change, not a copy tweak.
+  Player-visible behavior note: listing an item and the seller side of a
+  directed acceptance now require a wallet SIGNATURE (the step-up challenge;
+  no transaction, no funds), so a seller whose wallet is linked but
+  unavailable at the moment cannot list; no knob controls this and no env
+  change accompanies it (the dev economy pair alone enables the devsig arm).
+  Security framing (be precise with operators): the step-up RAISES THE BAR and
+  makes a custody move require a live, attributable wallet signature; it is not
+  by itself an absolute "a stolen session cannot move custody" guarantee,
+  because the wallet-link relink path needs only the incoming wallet's
+  signature, so a bearer thief could relink to their own wallet first. Closing
+  that (outgoing-wallet signature on relink, a link-age cooldown, or refusing
+  relink while escrow is live) is a tracked pre-enable security follow-up in
+  docs/woc-marketplace-hardening/state.md.
+- **Ops dashboard market reads**: `DASHBOARD_INTERNAL_SECRET` gates the ops
+  dashboard's `/internal/woc-market/*` reads; unset leaves them 404 (names
+  only here, the values live in deployment secrets).
 - **Never** set `ALLOW_DEV_COMMANDS=1` in production: it enables the full
   `/dev` cheat set (the level/teleport cheats the test bots use, plus item
   grants, mob spawns, instance teleports, and the dev command GUI).

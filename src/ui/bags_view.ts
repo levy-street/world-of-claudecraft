@@ -11,6 +11,7 @@
 
 import { type BagCells, layoutBagCells } from '../sim/inventory_order';
 import { isTransferLockedInstance } from '../sim/item_instance_transfer';
+import type { Quality } from '../sim/loot_master';
 import type { InvSlot, ItemInstancePayload } from '../sim/types';
 import {
   applyBagFilter,
@@ -28,6 +29,8 @@ export interface BagItemInfo {
   noMarketList?: boolean;
   /** Refused by the sim's vendor sell path (src/sim/items.ts sellItem). */
   noVendorSell?: boolean;
+  /** Rarity tier; only 'poor' is instant-sellable (vendorSellIsInstant below). */
+  quality?: Quality;
   /** Truthy when the item has a generic "use" effect (e.g. fishing). */
   use?: unknown;
   /** Protected from destruction (the sim's discardItem also no-ops these). */
@@ -211,6 +214,30 @@ export function bagUnknownAction(mode: BagMode): 'bankDeposit' | 'none' {
   // no use/equip ladder below it to fall into, so the closing 'none' is already
   // the right answer. The ITEM ladder needed an explicit rung; this one does not.
   return mode.bankDeposit ? 'bankDeposit' : 'none';
+}
+
+/** Whether a plain vendor-window click may sell `item` immediately, with no
+ *  confirm step. Only true junk qualifies: poor quality AND no instance
+ *  payload of any kind (an enchant, masterwork bake, signer, rolled stats, a
+ *  bound-to owner, or a player lock all make a copy non-interchangeable with
+ *  a plain one; item_copy_ref.ts's whole reason two copies of an id stopped
+ *  being safe to treat as one) AND no crafted-recipe marker (InvSlot's OWN
+ *  `craftedRecipeId`, kept off the instance payload on purpose so common
+ *  crafted gear does not gain a signer/masterwork/enchant identity, item
+ *  types.ts). Mirrors src/sim/items.ts junkSellableSlot's poor-quality gate,
+ *  widened to ANY instance payload or crafted marker rather than only a
+ *  bound/locked one: this gate exists to protect VALUE from an accidental
+ *  click, not merely to mirror what the sim would refuse outright. False
+ *  routes the caller to a confirm prompt instead of an instant sale, closing
+ *  the gap where selling gray junk one item at a time (no per-item
+ *  confirmation existed) could vendor an adjacent, unrelated valuable item on
+ *  a single stray click. */
+export function vendorSellIsInstant(
+  item: BagItemInfo,
+  instance?: ItemInstancePayload,
+  craftedRecipeId?: string,
+): boolean {
+  return item.quality === 'poor' && instance === undefined && craftedRecipeId === undefined;
 }
 
 /** Whether a shift-click on a bag item should link it into chat (classic

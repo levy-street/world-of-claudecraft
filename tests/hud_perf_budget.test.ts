@@ -554,6 +554,12 @@ const HOT_PAINTERS: ReadonlyArray<ScannedPainter> = [
   { file: 'paladin_devotion_painter.ts', allow: {}, reflowAllow: {} },
   { file: 'hud/action_bar/action_bar_painter.ts', allow: {}, reflowAllow: {} },
   { file: 'hud/action_bar/mobile_action_ring_painter.ts', allow: {}, reflowAllow: {} },
+  { file: 'hud/action_bar/radial_petal_painter.ts', allow: {}, reflowAllow: {} },
+  { file: 'hud/action_bar/consumable_strip_painter.ts', allow: {}, reflowAllow: {} },
+  { file: 'hud/menu/menu_strip_painter.ts', allow: {}, reflowAllow: {} },
+  { file: 'hud/strip_caption_painter.ts', allow: {}, reflowAllow: {} },
+  { file: 'hud/stance/stance_radial_painter.ts', allow: {}, reflowAllow: {} },
+  { file: 'hud/quest/quest_strip_painter.ts', allow: {}, reflowAllow: {} },
   { file: 'hud/cross_hotbar/cross_hotbar_painter.ts', allow: {}, reflowAllow: {} },
   { file: 'hud/warlock/doom_meter_painter.ts', allow: {}, reflowAllow: {} },
   { file: 'party_frames_painter.ts', allow: {}, reflowAllow: {} },
@@ -576,6 +582,19 @@ const HOT_PAINTERS: ReadonlyArray<ScannedPainter> = [
   // (one in the click handler, one in the roving-key branch, one in the Enter/Space
   // branch), never a per-frame write.
   { file: 'tab_strip_painter.ts', allow: { '.dataset': 3 }, reflowAllow: {} },
+  // The trade window's $WOC arm: cold (repainted only with the trade window,
+  // no driver of its own) but held to the full write contract like tab_strip
+  // above. Its in-place derived-line refresh (refreshWocTradeArm) reads and
+  // writes textContent through one elided setter (2), toggles the equiv line's
+  // over-balance class after a contains() read (2), and reads the mode
+  // toggle's dataset once in the click wiring (1). A third textContent or a
+  // new classList site here is a new write path, the shape this count exists
+  // to make a conscious act.
+  {
+    file: 'trade_woc_arm_painter.ts',
+    allow: { '.textContent': 2, '.classList': 2, '.dataset': 1 },
+    reflowAllow: {},
+  },
   // yumi builds its whole strip + respawn overlay once in ensureEls (14 class
   // assignments + the two role attributes + the toggle's type); every
   // per-frame write is facet-routed.
@@ -746,6 +765,45 @@ const COLD_PAINTER_ALLOWANCES: ReadonlyArray<ColdPainter> = [
   {
     file: 'bags_window.ts',
     reflowAllow: { '.getBoundingClientRect': 1, '.scrollTop': 4 },
+    driverAllow: {},
+  },
+  // The two touch gesture layers of the mobile action ring, one entry each because they
+  // are twins: ONE button/seat rect plus ONE computed-style read, taken when a press
+  // OPENS the overlay (the radial's reveal, the strip's pointerdown measure) and never
+  // again while the finger travels. Both numbers are per gesture, not per frame or per
+  // move: the painters that follow read only the cached placement.
+  {
+    file: 'hud/action_bar/radial_gesture_controller.ts',
+    reflowAllow: { '.getBoundingClientRect': 1, getComputedStyle: 1 },
+    driverAllow: {},
+  },
+  // The strip menus' SHARED gesture layer, which the consumables row and the menu
+  // control are both thin instantiations of (neither wrapper reads layout at all
+  // any more, which is why neither carries an allowance): ONE anchor rect plus
+  // ONE computed-style read taken at pointerdown, never again while the finger
+  // travels the row, and the painters that follow read only the cached placement
+  // (the menu caption included, which is why it clamps against a nominal
+  // half-width rather than measuring itself).
+  {
+    file: 'hud/strip_gesture_controller.ts',
+    reflowAllow: { '.getBoundingClientRect': 1, getComputedStyle: 1 },
+    driverAllow: {},
+  },
+  // The quest strip's width bound. Its ONE rect helper is shared by all three
+  // measures (the app-viewport container, the strip's own CSS-seated anchor,
+  // and the band's occupants). It is ENTERED on every repaint and gated inside
+  // by a cheap key built from non-layout reads: the rendered content, the
+  // viewport, the tier/scale attributes, and each band occupant's classes plus
+  // child count. On top of that key it re-measures unconditionally every
+  // SEAT_REMEASURE_TICKS tracker ticks (about once a second on the medium
+  // band), because an occupant can change WIDTH with no attribute and no child
+  // count moving (a buff's stack text, a longer zone name) and no cheap signal
+  // exists for it. So a steady HUD is bounded at roughly one measure per
+  // second, never per frame. The target frame is deliberately NOT in that key
+  // and is never measured: the anchor comes from hud.mobile.css.
+  {
+    file: 'hud/quest/quest_strip_controller.ts',
+    reflowAllow: { '.getBoundingClientRect': 1 },
     driverAllow: {},
   },
   // The gather-node hover tip (the phase 14 QA's countdown clock): pointer
@@ -947,6 +1005,15 @@ const COLD_PAINTER_ALLOWANCES: ReadonlyArray<ColdPainter> = [
     driverAllow: {},
   },
   { file: 'town_focus_window.ts', reflowAllow: { '.scrollTop': 2 }, driverAllow: {} },
+  // The scroll pair again, and TWO containers behind it (the panel body and the
+  // detail pane) rather than one, which is why the count is still 2: the painter
+  // walks a SCROLL_KEEPERS table, so both share a single read site and a single
+  // write site. A third occurrence here means someone added a second read path,
+  // which is the shape this count exists to make a conscious act. It carries more
+  // weight in this window than in most: the slow-band poll rebuilds on every
+  // countdown bucket change, once a second inside the anti-snipe window, so
+  // without the pair the browse list yanks itself to the top while it is read.
+  { file: 'woc_market_window.ts', reflowAllow: { '.scrollTop': 2 }, driverAllow: {} },
 ];
 
 function stripComments(src: string): string {

@@ -293,7 +293,21 @@ const SAUL_TALKS_REQUIRED = 9;
 // chr_peaks_waking_witness (inside interest scope, pinned literal).
 // Exported for the placement suite's mirror-lake standability arm, which used
 // to carry its own copy of this number and could drift silently.
-export const POI_VISIT_RADIUS = 20;
+// 24, not a rounder number: within a zone a single-zone all-poi 'visits' deed
+// draws from (today: Wayfarer of the Vale/Marsh/Heights), the tightest
+// as-authored gap between two of its named places is Eastbrook Vale's
+// eastbrook<->reliquary_hill pair at ~49.2yd. A visit radius has to stay
+// under half of that or two distinct places on the same checklist could both
+// grant from one spot; 24 is the most forgiving value that still clears it
+// with margin, and tests/deeds.test.ts (POI_VISIT_RADIUS describe block)
+// pins every such zone's tightest gap against it, so a content edit that
+// narrows one can't silently break this. A cross-zone deed (The Long Road
+// North) is exempt: a player occupies exactly one zone at a time, so two of
+// its marks can never be satisfied from the same spot regardless of radius.
+// Zones with no all-poi wayfarer deed (e.g. Veiled Hollow) sit closer than
+// this in places, which is harmless today since nothing reads two of their
+// poi marks together; the pinned test would catch it the day that changes.
+export const POI_VISIT_RADIUS = 24;
 const THUNZHARR_WITNESS_RADIUS = 100;
 
 // ---------------------------------------------------------------------------
@@ -1096,8 +1110,8 @@ export function updateDeeds(ctx: SimContext): void {
   }
 }
 
-// The 1 Hz sweep behind the poisVisited marks (within 20 yd of a named
-// ZoneDef poi), the Thunzharr witness mark, and the roster-restriction fold
+// The 1 Hz sweep behind the poisVisited marks (within POI_VISIT_RADIUS of a
+// named ZoneDef poi), the Thunzharr witness mark, and the roster-restriction fold
 // (every live hate-table member of a participant-tracked boss, so a non-damager
 // who leaves before the kill still counts against the trio cap). Deterministic:
 // fixed cadence on the sim clock, insertion-order iteration, zero rng.

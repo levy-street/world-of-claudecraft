@@ -387,6 +387,7 @@ describe('buildDeedsView', () => {
       titleReward: true,
       borderReward: false,
       crestId: 'deed_cat_combat',
+      missingPoiMarkIds: [],
     });
     // Unearned watched counter deed: watchable AND watched, no ribbons.
     expect(view.entries.find((e) => e.id === 'cmb_counter')).toEqual({
@@ -402,6 +403,7 @@ describe('buildDeedsView', () => {
       titleReward: false,
       borderReward: false,
       crestId: 'deed_cat_combat',
+      missingPoiMarkIds: [],
     });
   });
 
@@ -791,6 +793,46 @@ describe('buildDeedsView', () => {
 });
 
 // ---------------------------------------------------------------------------
+// missingPoiMarkIds (exploration wayfarer deeds)
+// ---------------------------------------------------------------------------
+
+describe('missing poi marks (exploration wayfarer deeds)', () => {
+  it('lists every unvisited poi mark, in trigger order, while unearned', () => {
+    const view = buildDeedsView(makeInput({ category: 'exploration' }));
+    const entry = view.entries.find((e) => e.id === 'exp_visits');
+    expect(entry?.missingPoiMarkIds).toEqual(['poi:a', 'poi:b']);
+  });
+
+  it('drops a mark from the list the moment it is visited', () => {
+    const s = stats((st) => st.visited.add('poi:a'));
+    const view = buildDeedsView(makeInput({ category: 'exploration', deedStats: s }));
+    const entry = view.entries.find((e) => e.id === 'exp_visits');
+    expect(entry?.missingPoiMarkIds).toEqual(['poi:b']);
+  });
+
+  it('is empty once every mark is visited', () => {
+    const s = stats((st) => {
+      st.visited.add('poi:a');
+      st.visited.add('poi:b');
+    });
+    const view = buildDeedsView(makeInput({ category: 'exploration', deedStats: s }));
+    const entry = view.entries.find((e) => e.id === 'exp_visits');
+    expect(entry?.missingPoiMarkIds).toEqual([]);
+  });
+
+  it('is empty once the deed is earned, even with marks never visited', () => {
+    const view = buildDeedsView(
+      makeInput({
+        category: 'exploration',
+        deedsEarned: new Map([['exp_visits', '2026-08-01']]),
+      }),
+    );
+    const entry = view.entries.find((e) => e.id === 'exp_visits');
+    expect(entry?.missingPoiMarkIds).toEqual([]);
+  });
+});
+
+// ---------------------------------------------------------------------------
 // The real catalog (drift pins)
 // ---------------------------------------------------------------------------
 
@@ -849,6 +891,65 @@ describe('real catalog integration', () => {
     for (const def of Object.values(DEEDS)) {
       expect(DEED_DISPLAY_CATEGORIES).toContain(deedDisplayCategory(def.category));
     }
+  });
+
+  it('lists the real Thornpeak wayfarer marks still outstanding at 9 of 10', () => {
+    const wayfarer = DEEDS.exp_peaks_wayfarer;
+    if (wayfarer.trigger.kind !== 'visits') throw new Error('fixture drift');
+    const markIds = wayfarer.trigger.markIds;
+    const s = stats((st) => {
+      for (const mark of markIds) {
+        if (mark !== 'poi:thornpeak_heights:gravewyrm_sanctum') st.visited.add(mark);
+      }
+    });
+    const view = buildDeedsView(
+      makeInput({ deeds: DEEDS, order: DEED_ORDER, deedStats: s, category: 'exploration' }),
+    );
+    const entry = view.entries.find((e) => e.id === 'exp_peaks_wayfarer');
+    expect(entry?.missingPoiMarkIds).toEqual(['poi:thornpeak_heights:gravewyrm_sanctum']);
+  });
+
+  it('never surfaces a missing-places list for a visits deed outside the poi: namespace', () => {
+    const view = buildDeedsView(
+      makeInput({ deeds: DEEDS, order: DEED_ORDER, category: 'chronicle' }),
+    );
+    const gatherer = view.entries.find((e) => e.id === 'chr_vale_gatherer');
+    expect(gatherer?.missingPoiMarkIds).toEqual([]);
+  });
+
+  it('pins the exact set of live deeds an all-poi visits trigger admits', () => {
+    // A literal, not a computed re-check: a content change that adds a new
+    // poi:-only visits deed (or retires one of these) should have to move
+    // this pin deliberately, so the missing-places line's real coverage is a
+    // visible decision rather than a silent side effect of a catalog edit.
+    const admitted = Object.values(DEEDS)
+      .filter((def) => {
+        if (def.trigger.kind !== 'visits') return false;
+        const marks = def.trigger.markIds;
+        return marks.length > 0 && marks.every((m) => m.startsWith('poi:'));
+      })
+      .map((def) => def.id)
+      .sort();
+    expect(admitted).toEqual([
+      'exp_long_road_north',
+      'exp_marsh_wayfarer',
+      'exp_peaks_wayfarer',
+      'exp_vale_wayfarer',
+    ]);
+  });
+
+  it('lists the missing hub settlements for the cross-zone Long Road North deed', () => {
+    const longRoad = DEEDS.exp_long_road_north;
+    if (longRoad.trigger.kind !== 'visits') throw new Error('fixture drift');
+    const s = stats((st) => st.visited.add('poi:eastbrook_vale:eastbrook'));
+    const view = buildDeedsView(
+      makeInput({ deeds: DEEDS, order: DEED_ORDER, deedStats: s, category: 'exploration' }),
+    );
+    const entry = view.entries.find((e) => e.id === 'exp_long_road_north');
+    expect(entry?.missingPoiMarkIds).toEqual([
+      'poi:mirefen_marsh:fenbridge',
+      'poi:thornpeak_heights:highwatch',
+    ]);
   });
 });
 

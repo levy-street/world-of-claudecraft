@@ -25,10 +25,12 @@ export interface WikiUrlEnv {
   origin: string;
 }
 
-/** Same-origin /wiki/ whenever the client is served by the site itself (web
- *  and the desktop shell, which loads the live site), so a dev deploy links
- *  to its own wiki; the canonical URL otherwise (a native WebView origin like
- *  capacitor://localhost is not the site and has no /wiki to serve). */
+/** Same-origin /wiki/ whenever the client is served by the site itself (the
+ *  web, or the desktop shell's dev build against the Vite server), so a dev
+ *  deploy links to its own wiki; the canonical URL otherwise (a native WebView
+ *  origin like capacitor://localhost, or the packaged desktop shell's
+ *  app://worldofclaudecraft, is not the site and has no /wiki to serve; both
+ *  fail the http(s) test below). */
 export function resolveWikiUrl(env: WikiUrlEnv): string {
   if (!env.nativeApp && /^https?:\/\//.test(env.origin)) {
     return new URL('/wiki/', env.origin).toString();

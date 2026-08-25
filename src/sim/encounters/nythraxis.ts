@@ -100,10 +100,16 @@ const NYTHRAXIS_SOUL_REND_MARKS_HEROIC = 6;
 // any topped-off health bar) and even a pair splitting takes 75% each.
 // Deathless Rage on a FAILED wardstone channel hits for 115% of max hp on
 // heroic (a raid wipe) versus 82% on normal. Both are percentage math with no
-// rng, so the normal trace and parity golden are unchanged.
+// rng, so the normal trace and parity golden are unchanged. Both dealDamage
+// calls below pass alreadyFinal for their calibrated-lethal heroic case, so a
+// source-side damage-done reduction on the boss (Direhowl) cannot pull either
+// hit back under 100%. Deathless Rage also suppresses the matching Veilbound
+// Mark reduction around its final heroic hit, because that source-side fold
+// applies before dealDamage reaches the alreadyFinal-guarded folds.
 const NYTHRAXIS_SOUL_REND_HEROIC_MULT = 1.5;
 const NYTHRAXIS_DEATHLESS_PCT = 0.82;
 const NYTHRAXIS_DEATHLESS_PCT_HEROIC = 1.15;
+const VEILBOUND_MARK_ID = 'veilbound_mark';
 
 // Whether this boss's claimed instance is heroic (the arena instance is found
 // the same way the add spawns find it: by mobIds membership).
@@ -1125,6 +1131,16 @@ export function updateNythraxisSoulRend(
       'Soul Rend',
       'hit',
       true,
+      undefined,
+      true,
+      false,
+      // alreadyFinal, but only for the same reason and under the same
+      // condition as Deathless Rage above: an unstacked heroic mark
+      // (rendMult / share > 1) is the guaranteed kill "through any
+      // topped-off health bar" this file's own comment promises; a stacked
+      // split is not, and keeps taking every source-side reduction it
+      // always did.
+      rendMult / share > 1,
     );
     p.auras = p.auras.filter((a) => a.id !== 'nythraxis_soul_rend');
     ctx.emit({
@@ -1225,22 +1241,54 @@ export function updateNythraxisDeathlessRage(
   // The cast resolved uninterrupted: the wardens task fails for this attempt.
   deedsMod.onDeathlessRageResolvedForDeeds(ctx, boss);
   for (const p of playersInNythraxisRoom(ctx, boss)) {
-    ctx.dealDamage(
-      boss,
-      p,
-      Math.ceil(p.maxHp * ragePct),
-      false,
-      'shadow',
-      'Deathless Rage',
-      'hit',
-      true,
-    );
+    dealNythraxisDeathlessRageHit(ctx, boss, p, ragePct);
   }
   // Heroic: an uninterrupted Deathless Rage (the pillar cast) raises the court
   // right after it lands, and it repeats each Deathless Rage cycle in phase 2 -
   // but only once the previous court has fallen, so the adds never stack.
   if (isHeroicNythraxis(ctx, boss) && !nythraxisHeroicCourtPending(ctx, st)) {
     startNythraxisHeroicSummon(ctx, boss, st);
+  }
+}
+
+function dealNythraxisDeathlessRageHit(
+  ctx: SimContext,
+  boss: Entity,
+  target: Entity,
+  ragePct: number,
+): void {
+  const alreadyFinal = ragePct > 1;
+  const suppressedVeilboundMarks = alreadyFinal
+    ? boss.auras.filter((aura) => aura.id === VEILBOUND_MARK_ID && aura.sourceId === target.id)
+    : [];
+  for (const aura of suppressedVeilboundMarks) aura.id = `${VEILBOUND_MARK_ID}_suppressed`;
+  try {
+    ctx.dealDamage(
+      boss,
+      target,
+      Math.ceil(target.maxHp * ragePct),
+      false,
+      'shadow',
+      'Deathless Rage',
+      'hit',
+      true,
+      undefined,
+      true,
+      false,
+      // alreadyFinal, but only when ragePct exceeds 100%: on heroic this hit
+      // is calibrated above max hp specifically so a failed channel is an
+      // unconditional wipe, and skipping the source-output fold there stops a
+      // damage-done debuff on the boss (Direhowl's aoeAttackPower pct form)
+      // from pulling it back under the raid's health pool. Normal's 82% was
+      // never a guaranteed kill by design, so it keeps taking every source-
+      // side reduction it always did (Direhowl included). The matching
+      // Veilbound Mark on the boss is suppressed for the same final heroic
+      // hit because that source-side reduction is applied before alreadyFinal
+      // in dealDamage.
+      alreadyFinal,
+    );
+  } finally {
+    for (const aura of suppressedVeilboundMarks) aura.id = VEILBOUND_MARK_ID;
   }
 }
 

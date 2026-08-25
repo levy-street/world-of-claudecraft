@@ -1,10 +1,27 @@
 import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 
-const mobileCss = readFileSync(
-  new URL('../src/styles/hud.mobile.css', import.meta.url),
-  'utf8',
-).replace(/\r\n/g, '\n');
+const mobileCss = readFileSync(new URL('../src/styles/hud.mobile.css', import.meta.url), 'utf8')
+  .replace(/\r\n/g, '\n')
+  // Comment-stripped, like every other source-text pin in the suite: without
+  // this a commented-out declaration satisfies the regex reads below, and
+  // these pins are the only automated coverage of the mobile floors and
+  // reserves (the measuring rig is manual).
+  .replace(/\/\*[\s\S]*?\*\//g, '');
+
+/** The declaration block (selector to closing brace) that carries `needle`,
+ *  optionally the one whose selector line is `selector`. Anchoring on a
+ *  declaration rather than on a line offset keeps these pins readable when the
+ *  surrounding comments move, which they do every time the reasoning is
+ *  written down. */
+function blockContaining(needle: string, selector?: string): string {
+  const blocks = mobileCss.split('\n  }');
+  const hit = blocks.find(
+    (b) => b.includes(needle) && (selector === undefined || b.includes(selector)),
+  );
+  expect(hit, `a block carrying ${needle}${selector ? ` under ${selector}` : ''}`).toBeDefined();
+  return hit ?? '';
+}
 
 describe('mobile window layout CSS', () => {
   it('clamps generic mobile windows to the app viewport and reserves bottom padding', () => {
@@ -173,6 +190,129 @@ describe('mobile window layout CSS', () => {
     expect(mobileCss).toMatch(/body\.mobile-touch \.mkt-filter \{[^}]*max-width: none;/);
     expect(mobileCss).not.toMatch(/body\.mobile-touch \.mkt-(?:search|filter) \{[^}]*\bflex:/);
     expect(mobileCss).not.toContain('body.mobile-touch .mkt-filters {');
+  });
+
+  it('floors the money-surface consent controls and the bid field on touch (the Exchange and the trade arm)', () => {
+    // A checkbox cannot be 40px without looking broken, so the LABEL is the
+    // tap target and carries the floor; the terms link beside it is the
+    // smallest money-surface tap target and gets an inline-flex floor of its
+    // own; the box itself is sized 24px; the legal caption is floored to the
+    // window's 16px button size; the bid amount field joins the 40px floor.
+    // Literal mobile layout values, pinned here like their siblings.
+    expect(mobileCss).toMatch(
+      /body\.mobile-touch #woc-market-window label\.wm-terms,\s*body\.mobile-touch #woc-market-window label\.wm-offer-next,\s*body\.mobile-touch #trade-window \.trade-woc-terms \{\s*min-height: 40px;/,
+    );
+    expect(mobileCss).toMatch(
+      /body\.mobile-touch #woc-market-window \.wm-terms-link,\s*body\.mobile-touch #trade-window \.trade-woc-terms-link \{[^}]*display: inline-flex;[^}]*min-height: 40px;/,
+    );
+    expect(mobileCss).toMatch(
+      /body\.mobile-touch #woc-market-window label\.wm-terms input,\s*body\.mobile-touch #woc-market-window label\.wm-offer-next input,\s*body\.mobile-touch #trade-window \.trade-woc-terms input \{[^}]*width: 24px;[^}]*height: 24px;/,
+    );
+    expect(mobileCss).toMatch(
+      /body\.mobile-touch #trade-window \.trade-woc-terms,\s*body\.mobile-touch #trade-window \.trade-woc-terms-link \{\s*font-size: 16px;/,
+    );
+    expect(mobileCss).toMatch(
+      /body\.mobile-touch #woc-market-window \.wm-bid-form input\[data-field="bid-usd"\] \{\s*min-height: 40px;/,
+    );
+  });
+
+  it('reserves the sticky commit row and the sticky header on the trade sheet', () => {
+    // Both reserves are load-bearing and both were wrong once. The BOTTOM one
+    // must mirror the window's own inset-aware padding-bottom (the generic rule
+    // pinned above): built on the flat --window-pad token it came up 15px short
+    // on a phone with a home indicator, and a headless capture cannot see that
+    // because it reports zero insets. The TOP one clears the sticky
+    // .window > .panel-title, which paints over the sheet scrolling beneath it.
+    const block = blockContaining('scroll-padding-bottom:', 'body.mobile-touch #trade-window {');
+    // The DECLARATION, not the block: the block also carries the prose that
+    // explains the value, and prose satisfies a substring check on its own.
+    const reserve = /scroll-padding-bottom:([^;]+);/.exec(block)?.[1] ?? '';
+    expect(reserve, 'the bottom reserve is declared').not.toBe('');
+    // Tied to the GENERIC rule's own declaration, not to a second copy of the
+    // literal: pinning each separately lets the generic padding be retuned, its
+    // own pin updated, and the reserve silently under-cover by the difference.
+    const generic = blockContaining('padding-bottom: max(', 'body.mobile-touch .window {');
+    const padding = /padding-bottom:([^;]+);/.exec(generic)?.[1]?.trim() ?? '';
+    expect(padding, 'the generic mobile window declares an inset-aware padding').not.toBe('');
+    expect(reserve.replace(/\s+/g, ' '), 'the reserve carries that exact expression').toContain(
+      padding.replace(/\s+/g, ' '),
+    );
+    expect(reserve).toContain('40px');
+    // The TOP reserve is tied to the header's own declared floor the same way,
+    // rather than repeating the number and hoping: move the floor and this
+    // reds instead of the reserve going stale 800 lines away.
+    const header = blockContaining('min-height:', 'body.mobile-touch .window > .panel-title {');
+    const headerFloor = /min-height:\s*([0-9]+px);/.exec(header)?.[1] ?? '';
+    expect(headerFloor, 'the mobile header declares a height floor').toMatch(/^\d+px$/);
+    const top = /scroll-padding-top:([^;]+);/.exec(block)?.[1] ?? '';
+    expect(top, 'the top reserve is built from that floor').toContain(headerFloor);
+    expect(top, 'and clears it rather than just meeting it').toContain('var(--spacing-sm)');
+  });
+
+  it('does not pin the money sheets to both edges (a short sheet must not stretch)', () => {
+    // A fixed element with height:auto and BOTH top and bottom set fills the
+    // screen: a two-line trade painted a 400px panel with its commit row at the
+    // bottom of an empty sheet. The inset-aware max-height is what keeps the
+    // sheet on screen; the bottom pin belongs only to the side-by-side split.
+    for (const id of ['#trade-window', '#woc-market-window']) {
+      const block = blockContaining(
+        'top: calc(max(10px, env(safe-area-inset-top)) / var(--ui-scale, 1));',
+        `body.mobile-touch ${id} {`,
+      );
+      expect(block, `${id} pins its top inset`).toContain(
+        'top: calc(max(10px, env(safe-area-inset-top))',
+      );
+      expect(block, `${id} subtracts both insets from its cap`).toContain(
+        'max(10px, env(safe-area-inset-bottom))',
+      );
+      // EVERY block that names the sheet, not only the one above: a re-added
+      // pin would most naturally land in the rule this sheet SHARES with
+      // #social-window, which sets exactly that for itself.
+      for (const other of mobileCss.split('\n  }')) {
+        if (!other.includes(`${id} {`) && !other.includes(`${id},`)) continue;
+        if (other.includes(':has(#trade-window')) continue; // the split dock, below
+        expect(other, `no block may pin ${id}'s bottom edge`).not.toMatch(/\n\s*bottom: (?!auto)/);
+      }
+    }
+    // ...and the split dock KEEPS both pins, because a side-by-side sheet is
+    // meant to be full height. That is the other half of the same decision.
+    const split = mobileCss
+      .split('\n  }')
+      .find((b) => b.includes(':has(#trade-window') && b.includes('position: fixed'));
+    expect(split, 'the side-by-side split rule exists').toBeDefined();
+    expect(split ?? '', 'the split dock pins both edges').toMatch(/\n\s*bottom: calc\(max\(10px/);
+  });
+
+  it('gives the phone Exchange rows their rhythm, first row included', () => {
+    // The 15 sign-off note: taller cells than the desktop 6px, and the first
+    // row clears the header hairline with its own top padding instead of
+    // starting flush against it.
+    const rows = blockContaining('padding-top: 12px;', '#woc-market-window .wm-table td');
+    expect(rows).toContain('padding-bottom: 12px;');
+    const first = blockContaining('padding-top: 16px;', 'tbody tr:first-child td');
+    expect(first).toContain('#woc-market-window');
+  });
+
+  it('the split dock marker is the one the HUD actually stamps', () => {
+    // The split rule keys on [data-window-open="1"] on BOTH #trade-window and
+    // #bags, and the stamp lives in hud.ts as dataset.windowOpen. Renaming
+    // either side alone would silently restore "bags covers the trade window
+    // entirely" (the blocking mobile defect this pass fixed), and only the
+    // manual BAGS_OVER E2E arm could see it; this cross-file pin is the cheap
+    // in-gate guard.
+    expect(mobileCss).toContain(
+      ':has(#trade-window[data-window-open="1"]):has(#bags[data-window-open="1"])',
+    );
+    // Comment-stripped like the CSS read above: a commented-out stamp left by
+    // a refactor must not keep this green.
+    const hud = readFileSync(new URL('../src/ui/hud.ts', import.meta.url), 'utf8').replace(
+      /\/\*[\s\S]*?\*\/|(?<!:)\/\/[^\n]*/g,
+      '',
+    );
+    expect(hud, 'the HUD stamps the marker the selector reads').toContain(
+      "dataset.windowOpen = '1'",
+    );
+    expect(hud, 'and clears it on close').toContain('delete el.dataset.windowOpen');
   });
 
   it('floors the vendor purchase-quantity controls at 40px under a coarse pointer (phase 21)', () => {

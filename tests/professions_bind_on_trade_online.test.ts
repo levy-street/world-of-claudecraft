@@ -255,7 +255,11 @@ describe('online bind-on-trade arc (two sessions, live GameServer)', () => {
     expect(eventsFor(fcA.sent, 'error').length).toBe(aErrBeforeReoffer); // no bound deny
     const aSession = tradeSessionFor(server, a.pid);
     const aOffer = aSession?.a === a.pid ? aSession?.offerA : aSession?.offerB;
-    expect(aOffer?.items).toEqual([{ itemId: SECONDARY, count: 1 }]);
+    // The staged slot carries the armed payload since the per-copy staging
+    // change: the counterparty SEES bind arming before agreeing.
+    expect(aOffer?.items).toEqual([
+      { itemId: SECONDARY, count: 1, instance: { bindOnTrade: true } },
+    ]);
     cmd(server, a, { cmd: 'trade_cancel' });
   });
 });

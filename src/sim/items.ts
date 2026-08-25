@@ -69,6 +69,7 @@ import {
   type EquipSlot,
   INTERACT_RANGE,
   type InventoryUnit,
+  type InvSlot,
   type ItemDef,
   type ItemInstancePayload,
   isNonSpellCast,
@@ -281,21 +282,25 @@ export function sellerSignedCharmDeprioritize(
 // a caller switching from those to this is a behavior-preserving swap). The
 // optional `skip` predicate spares any instanced copy it matches, same
 // contract as removePreferFungible's.
-export function removeVendorSellUnits(
-  ctx: SimContext,
+//
+// The INVENTORY-first core is exported separately so the trade window's
+// stage-time preview (social/trade.ts stagedOfferSlots) can run the EXACT
+// selection the swap will run, over a scratch copy of the bags: one walk
+// definition is what keeps the staged display and the moved copies from
+// drifting. The body is a behavior-identical move of the old ctx-taking walk
+// (meta.inventory became the inventory param; the quest hook hoisted to the
+// removeVendorSellUnits wrapper, preserving walk-then-hook order).
+export function removeSellUnitsFromInventory(
+  inventory: InvSlot[],
   itemId: string,
   count: number,
-  pid: number,
   skip?: (instance: ItemInstancePayload) => boolean,
   deprioritize?: (instance: ItemInstancePayload) => boolean,
 ): VendorRemovedUnit[] {
-  const r = ctx.resolve(pid);
-  if (!r) return [];
-  const { meta } = r;
   const consumed: VendorRemovedUnit[] = [];
   let left = count;
-  for (let i = meta.inventory.length - 1; i >= 0 && left > 0; i--) {
-    const s = meta.inventory[i];
+  for (let i = inventory.length - 1; i >= 0 && left > 0; i--) {
+    const s = inventory[i];
     if (s.itemId !== itemId || s.instance) continue;
     const take = Math.min(s.count, left);
     for (let unit = 0; unit < take; unit++) {
@@ -303,7 +308,7 @@ export function removeVendorSellUnits(
     }
     s.count -= take;
     left -= take;
-    if (s.count <= 0) meta.inventory.splice(i, 1);
+    if (s.count <= 0) inventory.splice(i, 1);
   }
   // Two instanced passes over the same highest-index-first order, mirroring
   // removePreferFungible: the preferred class first, then (only if still
@@ -311,8 +316,8 @@ export function removeVendorSellUnits(
   // self-signed charm copies exactly the way a trade does. With no predicate
   // the first pass is the whole old walk.
   const instancedWalk = (takeDeprioritized: boolean): void => {
-    for (let i = meta.inventory.length - 1; i >= 0 && left > 0; i--) {
-      const s = meta.inventory[i];
+    for (let i = inventory.length - 1; i >= 0 && left > 0; i--) {
+      const s = inventory[i];
       if (s.itemId !== itemId || !s.instance || skip?.(s.instance)) continue;
       if ((deprioritize?.(s.instance) ?? false) !== takeDeprioritized) continue;
       const take = Math.min(s.count, left);
@@ -325,12 +330,32 @@ export function removeVendorSellUnits(
       }
       s.count -= take;
       left -= take;
-      if (s.count <= 0) meta.inventory.splice(i, 1);
+      if (s.count <= 0) inventory.splice(i, 1);
     }
   };
   instancedWalk(false);
   if (deprioritize && left > 0) instancedWalk(true);
-  ctx.onInventoryChangedForQuests?.(meta);
+  return consumed;
+}
+
+export function removeVendorSellUnits(
+  ctx: SimContext,
+  itemId: string,
+  count: number,
+  pid: number,
+  skip?: (instance: ItemInstancePayload) => boolean,
+  deprioritize?: (instance: ItemInstancePayload) => boolean,
+): VendorRemovedUnit[] {
+  const r = ctx.resolve(pid);
+  if (!r) return [];
+  const consumed = removeSellUnitsFromInventory(
+    r.meta.inventory,
+    itemId,
+    count,
+    skip,
+    deprioritize,
+  );
+  ctx.onInventoryChangedForQuests?.(r.meta);
   return consumed;
 }
 

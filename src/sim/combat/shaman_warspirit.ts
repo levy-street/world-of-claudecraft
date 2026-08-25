@@ -27,7 +27,7 @@ export const STONEBOUND_DR_ID = 'shaman_stonebound_dr';
 export const STONEBOUND_WARD_SMOOTH_ID = 'shaman_stonebound_ward_smooth';
 export const WARSPIRIT_CADENCE_STEPS = 3;
 export const GALEHEART_ECHO_COUNT = 2;
-export const GALEHEART_ECHO_DAMAGE = 0.5;
+export const GALEHEART_ECHO_DAMAGE = 0.25;
 export const STORMCAST_DURATION = 12;
 // buff_armor_pct / buff_sta_pct store integer percentage points (40 = +40%).
 // v0.38 tank threat/survivability parity pass: armor 30 -> 40, stamina bonus

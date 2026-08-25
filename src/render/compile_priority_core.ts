@@ -35,6 +35,16 @@ export function compilePriorityForTarget(
   return GPU_WORK_PRIORITY.LIVE_VIEW;
 }
 
+/** Entry admission: actionable views and views the entry manifest itself
+ * awaits may compile before first paint. Ordinary live views keep their canvas
+ * stand-in until the shared first-paint gate releases. */
+export function compileMayStartBeforeInitialPaint(
+  priority: number,
+  requiredForEntry = false,
+): boolean {
+  return requiredForEntry || priority >= GPU_WORK_PRIORITY.ACTIONABLE_VIEW;
+}
+
 /** The one predicate the renderer feeds compilePriorityForTarget: casting AT
  *  the local player, never casting at all. A 20-strong crowd trading abilities
  *  among itself made every crowd view ACTIONABLE and starved the reveal lane's

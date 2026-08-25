@@ -20,6 +20,7 @@
 // the stable code + params structurally off the thrown value, never importing the
 // `net/` ApiError class (the src/ui -> net dependency ban).
 
+import { durationText } from './duration_text';
 import { formatDateTime, formatDuration, type TranslationKey, t } from './i18n';
 import { tServer } from './server_i18n';
 
@@ -62,6 +63,7 @@ export const API_ERROR_KEYS = {
   'account.characters_online': 'apiError.account.characters_online',
   'account.deactivated': 'apiError.account.deactivated',
   'account.not_found': 'apiError.account.not_found',
+  'account.password_already_set': 'apiError.account.password_already_set',
 
   // character: creation, selection, and world-entry failures.
   'character.name_invalid': 'apiError.character.name_invalid',
@@ -141,6 +143,56 @@ export const API_ERROR_KEYS = {
   'cheater_mark.reason_required': 'apiError.cheater_mark.reason_required',
   'cheater_mark.invalid_duration': 'apiError.cheater_mark.invalid_duration',
   'cheater_mark.not_marked': 'apiError.cheater_mark.not_marked',
+
+  // woc_market: the config-gated $WOC Exchange family (server/woc_market_routes.ts).
+  'woc_market.invalid_input': 'apiError.woc_market.invalid_input',
+  'woc_market.disabled': 'apiError.woc_market.disabled',
+  'woc_market.paused': 'apiError.woc_market.paused',
+  'woc_market.wallet_required': 'apiError.woc_market.wallet_required',
+  'woc_market.recipient_wallet_required': 'apiError.woc_market.recipient_wallet_required',
+  'woc_market.self_offer': 'apiError.woc_market.self_offer',
+  'woc_market.offer_expired': 'apiError.woc_market.offer_expired',
+  'woc_market.terms_required': 'apiError.woc_market.terms_required',
+  // RETIRED, never raised (B6/R1); kept with their append-only codes.
+  'woc_market.totp_required': 'apiError.woc_market.totp_required',
+  'woc_market.totp_invalid': 'apiError.woc_market.totp_invalid',
+  'woc_market.suspended': 'apiError.woc_market.suspended',
+  'woc_market.character_invalid': 'apiError.woc_market.character_invalid',
+  'woc_market.not_found': 'apiError.woc_market.not_found',
+  'woc_market.not_yours': 'apiError.woc_market.not_yours',
+  'woc_market.not_active': 'apiError.woc_market.not_active',
+  'woc_market.own_listing': 'apiError.woc_market.own_listing',
+  'woc_market.has_bids': 'apiError.woc_market.has_bids',
+  'woc_market.bid_too_low': 'apiError.woc_market.bid_too_low',
+  'woc_market.already_pending': 'apiError.woc_market.already_pending',
+  'woc_market.insufficient_balance': 'apiError.woc_market.insufficient_balance',
+  'woc_market.quote_unavailable': 'apiError.woc_market.quote_unavailable',
+  'woc_market.quote_expired': 'apiError.woc_market.quote_expired',
+  'woc_market.not_pending': 'apiError.woc_market.not_pending',
+  'woc_market.confirm_failed': 'apiError.woc_market.confirm_failed',
+  'woc_market.confirm_in_flight': 'apiError.woc_market.confirm_in_flight',
+  'woc_market.buy_now_locked': 'apiError.woc_market.buy_now_locked',
+  'woc_market.cancel_pending': 'apiError.woc_market.cancel_pending',
+  'woc_market.claim_cooldown': 'apiError.woc_market.claim_cooldown',
+  'woc_market.bond_window_closed': 'apiError.woc_market.bond_window_closed',
+  'woc_market.settlement_in_flight': 'apiError.woc_market.settlement_in_flight',
+  'woc_market.contended': 'apiError.woc_market.contended',
+  'woc_market.sale_conflict': 'apiError.woc_market.sale_conflict',
+  'woc_market.no_buy_now': 'apiError.woc_market.no_buy_now',
+  'woc_market.cap_reached': 'apiError.woc_market.cap_reached',
+  'woc_market.stale_item': 'apiError.woc_market.stale_item',
+  'woc_market.item_mismatch': 'apiError.woc_market.item_mismatch',
+  'woc_market.offer_pending': 'apiError.woc_market.offer_pending',
+  'woc_market.not_eligible': 'apiError.woc_market.not_eligible',
+  'woc_market.invalid_params': 'apiError.woc_market.invalid_params',
+  'woc_market.signature_reused': 'apiError.woc_market.signature_reused',
+  'woc_market.item_locked': 'apiError.woc_market.item_locked',
+  'woc_market.stepup_required': 'apiError.woc_market.stepup_required',
+  'woc_market.stepup_challenge_invalid': 'apiError.woc_market.stepup_challenge_invalid',
+  'woc_market.stepup_challenge_expired': 'apiError.woc_market.stepup_challenge_expired',
+  'woc_market.stepup_wallet_mismatch': 'apiError.woc_market.stepup_wallet_mismatch',
+  'woc_market.stepup_binding_mismatch': 'apiError.woc_market.stepup_binding_mismatch',
+  'woc_market.stepup_signature_invalid': 'apiError.woc_market.stepup_signature_invalid',
 } satisfies Record<string, TranslationKey>;
 
 /** The message of an Error, or the string form of any other thrown value. */
@@ -195,6 +247,25 @@ function resolveByCode(code: string, params: Record<string, unknown> | undefined
     const seconds = params?.retryAfterSeconds;
     if (typeof seconds !== 'number' || !Number.isFinite(seconds)) return null;
     return t(key, { seconds: formatDuration(seconds) });
+  }
+
+  if (code === 'woc_market.claim_cooldown') {
+    // With the server-computed remaining time, say WHEN a retry can succeed.
+    // The retry sentence lives under hudChrome (the apiError catalog is a
+    // strict bijection with the server code set, so a client-side variant
+    // leaf cannot live there); an older server sends no params and the plain
+    // apiError sentence still renders (never null: "later" is honest, just
+    // less useful).
+    // Through the shared multi-unit phrase, never a raw seconds count: the
+    // common answer is the half-hour per-listing cooldown, and formatDuration
+    // alone rendered "1,800 seconds".
+    const seconds = params?.retryAfterSeconds;
+    if (typeof seconds === 'number' && Number.isFinite(seconds) && seconds > 0) {
+      return t('hudChrome.wocMarket.claimCooldownRetry', {
+        duration: durationText(seconds),
+      });
+    }
+    return t(key);
   }
 
   return t(key);

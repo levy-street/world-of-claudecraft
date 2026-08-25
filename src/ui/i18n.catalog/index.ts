@@ -881,6 +881,8 @@ export const en = {
       portalOpens: 'A {tier}-rank rift tears open in {zone}!',
       portalSealed: 'The {tier}-rank rift in {zone} has been sealed.',
       portalCollapses: 'The {tier}-rank rift in {zone} collapses.',
+      lootRecoveryNotice:
+        "The rift's entrance will hold a while yet: should your party fall, you may still walk back for what you earned.",
       levelGate: 'Only adventurers of level {level} or higher may enter this rift.',
       deadEntry: 'You cannot enter a rift while dead.',
       deadEntryCombat:

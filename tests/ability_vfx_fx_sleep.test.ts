@@ -54,6 +54,45 @@ afterEach(() => {
 });
 
 describe('AbilityVfxFx presentation sleep', () => {
+  it('disposes every pooled primitive and ignores late updates idempotently', () => {
+    installCanvasStub();
+    const scene = new THREE.Scene();
+    const camera = new THREE.PerspectiveCamera(60, 1, 0.1, 100);
+    camera.updateMatrixWorld();
+    const fx = new AbilityVfxFx(
+      scene,
+      camera,
+      () => new THREE.Vector3(0, 0, -5),
+      () => 0,
+    );
+    fx.prewarmSpawn(0, 1, 0, 7);
+
+    const geometries = new Set<THREE.BufferGeometry>();
+    const materials = new Set<THREE.Material>();
+    scene.traverse((object) => {
+      const drawable = object as THREE.Mesh | THREE.Line | THREE.Points;
+      if (drawable.geometry) geometries.add(drawable.geometry);
+      const material = drawable.material;
+      if (material) {
+        for (const entry of Array.isArray(material) ? material : [material]) materials.add(entry);
+      }
+    });
+    const geometryDisposals = [...geometries].map((geometry) => vi.spyOn(geometry, 'dispose'));
+    const materialDisposals = [...materials].map((material) => vi.spyOn(material, 'dispose'));
+
+    fx.dispose();
+
+    expect(scene.children).toHaveLength(0);
+    for (const dispose of geometryDisposals) expect(dispose).toHaveBeenCalledOnce();
+    for (const dispose of materialDisposals) expect(dispose).toHaveBeenCalledOnce();
+
+    fx.dispose();
+    fx.update(1);
+    expect(scene.children).toHaveLength(0);
+    for (const dispose of geometryDisposals) expect(dispose).toHaveBeenCalledOnce();
+    for (const dispose of materialDisposals) expect(dispose).toHaveBeenCalledOnce();
+  });
+
   it('releases only the sleeping entity from every held render pool immediately', () => {
     installCanvasStub();
     const camera = new THREE.PerspectiveCamera(60, 1, 0.1, 100);

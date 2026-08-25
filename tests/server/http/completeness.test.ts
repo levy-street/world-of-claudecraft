@@ -120,6 +120,29 @@ const REGISTRY_ONLY_PATHS = new Set<string>([
   '/api/epic/status',
   '/api/ota/updates',
   '/api/seeker/entitlement',
+  // The $WOC Exchange family (server/woc_market_routes.ts): a brand-new,
+  // config-gated /api/woc-market/* prefix with no legacy ladder twin.
+  '/api/woc-market/status',
+  '/api/woc-market/listings',
+  '/api/woc-market/listings/:id',
+  '/api/woc-market/estimate',
+  '/api/woc-market/me',
+  '/api/woc-market/offers',
+  '/api/woc-market/offers/:id/accept',
+  '/api/woc-market/offers/:id/decline',
+  '/api/woc-market/offers/:id/withdraw',
+  '/api/woc-market/trade-partner',
+  '/api/woc-market/step-up/challenge',
+  '/api/woc-market/history/:itemId',
+  '/api/woc-market/seller-history/:name',
+  '/api/woc-market/listings/:id/cancel',
+  '/api/woc-market/listings/:id/bids',
+  '/api/woc-market/bids/:id/bond-quote',
+  '/api/woc-market/bids/:id/bond',
+  '/api/woc-market/bids/:id/abandon',
+  '/api/woc-market/listings/:id/buy-now',
+  '/api/woc-market/settlements/:id/quote',
+  '/api/woc-market/settlements/:id/confirm',
 ]);
 
 // Every legacy /api ladder row (dispatcher === main handleApi), minus the
@@ -245,6 +268,7 @@ describe('registry completeness: migrated baseline (public reads + auth + charac
     // The account portal (server/account.ts).
     { method: 'GET', path: '/api/account' },
     { method: 'POST', path: '/api/account/password' },
+    { method: 'POST', path: '/api/account/password/set-initial' },
     { method: 'POST', path: '/api/account/logout' },
     { method: 'POST', path: '/api/account/email' },
     { method: 'POST', path: '/api/account/deactivate' },
@@ -356,6 +380,31 @@ describe('registry completeness: migrated baseline (public reads + auth + charac
     { method: 'GET', path: '/api/claudium/native/balance/usdc/:owner' },
     { method: 'GET', path: '/api/claudium/store' },
     { method: 'GET', path: '/api/claudium/history' },
+    // The $WOC Exchange family (server/woc_market_routes.ts): registry-only
+    // like the Claudium family, config-gated dark until WOC_MARKET_ENABLED=1.
+    { method: 'GET', path: '/api/woc-market/status' },
+    { method: 'GET', path: '/api/woc-market/listings' },
+    { method: 'GET', path: '/api/woc-market/listings/:id' },
+    { method: 'GET', path: '/api/woc-market/estimate' },
+    { method: 'GET', path: '/api/woc-market/me' },
+    { method: 'GET', path: '/api/woc-market/offers' },
+    { method: 'GET', path: '/api/woc-market/trade-partner' },
+    { method: 'POST', path: '/api/woc-market/offers' },
+    { method: 'POST', path: '/api/woc-market/offers/:id/accept' },
+    { method: 'POST', path: '/api/woc-market/offers/:id/decline' },
+    { method: 'POST', path: '/api/woc-market/offers/:id/withdraw' },
+    { method: 'GET', path: '/api/woc-market/history/:itemId' },
+    { method: 'GET', path: '/api/woc-market/seller-history/:name' },
+    { method: 'POST', path: '/api/woc-market/step-up/challenge' },
+    { method: 'POST', path: '/api/woc-market/listings' },
+    { method: 'POST', path: '/api/woc-market/listings/:id/cancel' },
+    { method: 'POST', path: '/api/woc-market/listings/:id/bids' },
+    { method: 'POST', path: '/api/woc-market/bids/:id/bond-quote' },
+    { method: 'POST', path: '/api/woc-market/bids/:id/bond' },
+    { method: 'POST', path: '/api/woc-market/bids/:id/abandon' },
+    { method: 'POST', path: '/api/woc-market/listings/:id/buy-now' },
+    { method: 'POST', path: '/api/woc-market/settlements/:id/quote' },
+    { method: 'POST', path: '/api/woc-market/settlements/:id/confirm' },
     { method: 'POST', path: '/api/claudium/purchase' },
     { method: 'POST', path: '/api/claudium/native/quote' },
     { method: 'POST', path: '/api/claudium/native/confirm' },
@@ -592,13 +641,15 @@ describe('registry completeness: oauth + internal surfaces (server/oauth.ts, ser
   it('derives the expected non-empty ladders', () => {
     expect(oauthPostLadder.length).toBe(5);
     expect(oauthGetLadder.length).toBe(2);
-    // 18 = the handleInternalApi nine (restart-countdown + the 8 Discord-bot
+    // 21 = the handleInternalApi nine (restart-countdown + the 8 Discord-bot
     // routes, flaired-ids included; the retired relay/activity/winners GETs
     // have no rows since #2791) plus the seven-route payout and moderation ops
-    // family below, plus the two registry-only rows (POST
-    // /internal/discord/flex-batch and GET /internal/discord/outbox), which have
-    // no legacy ladder arm by design and so are the internal rows with no twin.
-    expect(internalLadder.length).toBe(18);
+    // family below, plus the FIVE registry-only rows (POST
+    // /internal/discord/flex-batch, GET /internal/discord/outbox, and the ops
+    // dashboard's three Exchange reads, the stuck-custody readout included),
+    // which have no legacy ladder arm by design and so are the internal rows
+    // with no twin.
+    expect(internalLadder.length).toBe(21);
     expect(opsFamilyRows.length).toBe(7);
   });
 

@@ -2693,6 +2693,10 @@ const ABILITY_RECIPES: Record<string, IconRecipe> = {
   vanish: r('shadow', 'shadowPurple', ['shield'], ['motion', 'glow']),
   instant_poison: r('nature', 'venom', ['droplet'], ['glow']),
   deadly_poison: r('nature', 'venom', ['fang'], ['drips']),
+  // The two utility poisons: the venom palette they share with the rest of the
+  // rogue's poisons, distinguished by what each one eats (armor / healing).
+  melting_acid: r('nature', 'venom', ['chestplate', { p: 'droplet', ...TR }], ['drips']),
+  nightshade_coating: r('nature', 'venom', ['heart', { p: 'droplet', ...TR }], ['drips']),
   blind: r('shadow', 'shadowPurple', ['eye'], ['arcs']),
   // paladin
   seal_of_righteousness: r('holy', 'holyGold', [{ p: 'sunburst', ...BIG }, 'sigil_rune'], ['glow']),
@@ -4443,6 +4447,8 @@ export const ABILITY_IMAGE_IDS = new Set<string>([
   'instant_poison',
   'adrenaline_rush',
   'deadly_poison',
+  'melting_acid',
+  'nightshade_coating',
   'stealth',
   // warrior (CraftPix premium "RPG Warrior" + "RPG Berserker" packs; rage/fury abilities
   // drew from berserker). taunt has no provoke art and stays procedural.

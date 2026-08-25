@@ -513,6 +513,56 @@
         }
       ],
       "generationPrompt": "Use case: stylized-concept\nAsset type: borderless square game ability icon for rogue\nPrimary request: fresh distinct premium hand-painted dark-fantasy MMORPG ability art for Shadow Veil (veilstrike)\nCanonical mechanic: For 6 sec your openers work without stealth and from any angle, and you deal 10% more damage.\nSubject: A dagger vanishing into a hanging curtain of living shadow.\nScene/backdrop: opaque full-square atmospheric background in the class palette\nComposition/framing: one dominant readable action or symbol, visually centered, subject fills 75 to 88 percent, safe at 32px and 48px\nLighting/mood: deep values, controlled saturated accents, crisp focal edges and softer peripheral atmosphere\nConstraints: fresh composition; no text, letters, numbers, border, frame, rarity chrome, watermark, modern graphic design or flat glyph"
+    },
+    {
+      "abilityId": "melting_acid",
+      "sourcePack": "woc_release_v040_rogue_ability_icons_2026_08_22",
+      "sourceFile": "tmp/imagegen/release-v040-rogue-ability-icons/accepted/melting_acid.png",
+      "output": "melting_acid.webp",
+      "source": "OpenAI built-in image generation",
+      "owner": "World of ClaudeCraft",
+      "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
+      "intendedVisualSubject": "A vial of bright corrosive green acid splashing across a cracked dark steel chestplate.",
+      "references": [
+        {
+          "path": "public/ui/skills/rogue/crippling_poison.webp",
+          "role": "style reference",
+          "provenance": "CraftPix Premium art licensed to Levy Street for this project",
+          "license": "CraftPix premium royalty-free commercial license, non-transferable"
+        },
+        {
+          "path": "public/ui/skills/rogue/expose_armor.webp",
+          "role": "subject reference",
+          "provenance": "CraftPix Premium art licensed to Levy Street for this project",
+          "license": "CraftPix premium royalty-free commercial license, non-transferable"
+        }
+      ],
+      "generationPrompt": "Use case: stylized-concept\nAsset type: borderless square game ability icon for a rogue class action bar\nPrimary request: fresh distinct premium hand-painted dark-fantasy MMORPG ability art for Melting Acid (melting_acid)\nCanonical mechanic: A rogue splashes the target with caustic poison, dealing Nature damage and reducing armor for 12 seconds.\nSubject: A vial of bright corrosive green acid splashing across a cracked dark steel chestplate, with tiny smoking pits and droplets.\nScene/backdrop: opaque full-square atmospheric shadowy green-black background in a rogue poison palette\nComposition/framing: one dominant readable symbol, visually centered, subject fills 75 to 88 percent, safe at 32px and 48px\nLighting/mood: deep values, controlled saturated venom-green accents, crisp focal edges, painterly fantasy item icon style\nConstraints: no text, letters, numbers, border, frame, rarity chrome, watermark, modern flat glyph, UI chrome, or character face"
+    },
+    {
+      "abilityId": "nightshade_coating",
+      "sourcePack": "woc_release_v040_rogue_ability_icons_2026_08_22",
+      "sourceFile": "tmp/imagegen/release-v040-rogue-ability-icons/accepted/nightshade_coating.png",
+      "output": "nightshade_coating.webp",
+      "source": "OpenAI built-in image generation",
+      "owner": "World of ClaudeCraft",
+      "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
+      "intendedVisualSubject": "A black dagger edge coated with dark violet nightshade poison beside a toxic bloom.",
+      "references": [
+        {
+          "path": "public/ui/skills/rogue/deadly_poison.webp",
+          "role": "style reference",
+          "provenance": "CraftPix Premium art licensed to Levy Street for this project",
+          "license": "CraftPix premium royalty-free commercial license, non-transferable"
+        },
+        {
+          "path": "public/ui/skills/rogue/instant_poison.webp",
+          "role": "composition reference",
+          "provenance": "CraftPix Premium art licensed to Levy Street for this project",
+          "license": "CraftPix premium royalty-free commercial license, non-transferable"
+        }
+      ],
+      "generationPrompt": "Use case: stylized-concept\nAsset type: borderless square game ability icon for a rogue class action bar\nPrimary request: fresh distinct premium hand-painted dark-fantasy MMORPG ability art for Nightshade Coating (nightshade_coating)\nCanonical mechanic: A rogue coats the target in nightshade poison, dealing Nature damage and reducing healing received for 12 seconds.\nSubject: A black dagger edge being coated with dark violet nightshade poison beside a small heart-shaped toxic bloom and glossy purple-green droplets.\nScene/backdrop: opaque full-square atmospheric shadowy violet-green background in a rogue poison palette\nComposition/framing: one dominant readable symbol, visually centered, subject fills 75 to 88 percent, safe at 32px and 48px\nLighting/mood: deep values, controlled saturated purple and venom-green accents, crisp focal edges, painterly fantasy item icon style\nConstraints: no text, letters, numbers, border, frame, rarity chrome, watermark, modern flat glyph, UI chrome, or character face"
     }
   ],
   "deferredStayProcedural": {},

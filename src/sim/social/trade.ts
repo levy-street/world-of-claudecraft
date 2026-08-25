@@ -4,25 +4,29 @@
 // cleanup + the joint invite-expiry sweep reach them through the same seam. The
 // inventory hub stays on Sim and is consumed via ctx. Instanced payloads cross
 // intact through removeOffer/grantOffer; Rift gear remains owner-bound and is
-// excluded explicitly. This is a MOVE: the statements, branches, and iteration order are
-// byte-identical to the pre-move methods (the immutability waiver applies, so the
-// in-place mutation of the shared TradeSession / PlayerMeta.copper is preserved).
+// excluded explicitly. (The original extraction was a byte-identical MOVE; the
+// directed-rail hardening then changed STAGING deliberately: stagedOfferSlots
+// previews the swap's own selection so the session offer carries per-copy
+// identity, and removeOffer consumes those pinned copies first. The swap's
+// removal/grant payload semantics are unchanged.)
 //
 // Sim keeps thin same-named delegates for the public methods so the IWorld + server
 // + leave-path + tick() call sites resolve unchanged; this module draws no rng.
 
 import type { TradeInfo } from '../../world_api';
-import { addStacked, bagCapacity, countFit, removeStacked } from '../bags';
+import { addStacked, bagCapacity, countFit } from '../bags';
 import { RIFT_GEAR_ITEM_IDS } from '../content/rift/items';
 import { ITEMS } from '../data';
+import { itemCopyPin } from '../item_copy_ref';
+import { itemInstancePayloadsEqual } from '../item_instance_merge';
 import {
-  removeVendorSellUnits,
+  removeSellUnitsFromInventory,
   sellerSignedCharmDeprioritize,
   type VendorRemovedUnit,
 } from '../items';
 import type { PlayerMeta, TradeSession } from '../sim';
 import type { SimContext } from '../sim_context';
-import { dist2d, type InvSlot, type ItemInstancePayload } from '../types';
+import { cloneItemInstancePayload, dist2d, type InvSlot, type ItemInstancePayload } from '../types';
 
 // A trade is only offered/kept while both parties are within this many yards;
 // the drift sweep cancels an open session once they wander past TRADE_RANGE + 4.
@@ -128,6 +132,68 @@ export function tradeAccept(ctx: SimContext, pid?: number): void {
   }
 }
 
+/**
+ * The per-copy slots a staged line really offers, resolved at STAGE time by
+ * the EXACT selection the swap will run (removeSellUnitsFromInventory with the
+ * same skip and deprioritize predicates removeOffer passes), over a scratch
+ * deep copy of the bags. This is what lets the counterparty's window show,
+ * and the $WOC directed-offer pin fingerprint, the REAL copies on the table:
+ * the old id-plus-count normalization stripped every instance payload, so a
+ * buyer could never see (nor pin) which roll, enchant, or crafted provenance
+ * they were agreeing to, and the H10 fingerprint degenerated to an item-id
+ * comparison. Consecutive identical units group back into one slot (keyed by
+ * itemCopyPin, the copy-identity rule every exchange pipe shares), so a plain
+ * stack still reads as one line. The returned payloads are the scratch's own
+ * deep clones and never alias the live bags.
+ *
+ * These slots ship to the COUNTERPARTY in full, deliberately without the
+ * anonymous-pipe publicInstanceView trim (the server's tradeWire points
+ * here): a trade is a consensual named exchange whose whole point is mutual
+ * inspection, so charges, bind arming, and rift state are facts the other
+ * player agrees TO, and the $WOC directed pin fingerprints the full
+ * identity, so a trimmed wire would let two copies differing only in hidden
+ * fields alias one agreement. The per-tick diff cost rides the change-gated
+ * wire serialization; its bound is BAG CAPACITY, not the six input lines
+ * (each staged line expands into one slot per distinct copy identity, so a
+ * line of six distinct instanced units becomes six slots), tens of rows at
+ * the worst and the window renders them all uncapped.
+ */
+function stagedOfferSlots(meta: PlayerMeta, itemId: string, count: number): InvSlot[] {
+  const scratch: InvSlot[] = (meta.inventory ?? []).map((s) => ({
+    ...s,
+    ...(s.instance === undefined ? {} : { instance: cloneItemInstancePayload(s.instance) }),
+  }));
+  const units = removeSellUnitsFromInventory(
+    scratch,
+    itemId,
+    count,
+    isTradeLocked,
+    sellerSignedCharmDeprioritize(meta.name, itemId),
+  );
+  const out: InvSlot[] = [];
+  const key = (instance: ItemInstancePayload | undefined, crafted: string | undefined): string =>
+    itemCopyPin({
+      itemId,
+      count: 1,
+      ...(instance === undefined ? {} : { instance }),
+      ...(crafted === undefined ? {} : { craftedRecipeId: crafted }),
+    });
+  for (const u of units) {
+    const prev = out[out.length - 1];
+    if (prev && key(prev.instance, prev.craftedRecipeId) === key(u.instance, u.craftedRecipeId)) {
+      prev.count += 1;
+      continue;
+    }
+    out.push({
+      itemId,
+      count: 1,
+      ...(u.instance === undefined ? {} : { instance: u.instance }),
+      ...(u.craftedRecipeId === undefined ? {} : { craftedRecipeId: u.craftedRecipeId }),
+    });
+  }
+  return out;
+}
+
 export function tradeSetOffer(
   ctx: SimContext,
   items: InvSlot[],
@@ -159,15 +225,26 @@ export function tradeSetOffer(
   // entirely when none is unbound). The def-level quest/soulbound silent drop
   // above stays exactly as-is.
   let boundDenied = false;
+  // The preview can only enrich units the INVENTORY ARRAY attributes; a
+  // decoupled hub (a ctx that models counts off meta.inventory, the
+  // boundCount contract above) validates a count the array cannot cover, and
+  // the remainder must keep the old id-plus-count shape rather than vanish
+  // from the offer the count checks just proved valid.
+  const stagedLine = (itemId: string, count: number): InvSlot[] => {
+    const staged = stagedOfferSlots(r.meta, itemId, count);
+    const attributed = staged.reduce((n, s) => n + s.count, 0);
+    if (attributed < count) staged.push({ itemId, count: count - attributed });
+    return staged;
+  };
   for (const [itemId, count] of merged) {
     if (ctx.countItem(itemId, r.meta.entityId) < count) continue;
     const unbound = offerableCount(ctx, r.meta, itemId);
     if (unbound < count) {
       boundDenied = true;
-      if (unbound > 0) cleaned.push({ itemId, count: unbound });
+      if (unbound > 0) cleaned.push(...stagedLine(itemId, unbound));
       continue;
     }
-    cleaned.push({ itemId, count });
+    cleaned.push(...stagedLine(itemId, count));
   }
   if (boundDenied) ctx.error(r.meta.entityId, 'That item is bound and cannot be traded.');
   const offer = {
@@ -213,30 +290,136 @@ type PendingGrant = { itemId: string; units: VendorRemovedUnit[] };
 // feeds the real removal AND the capacity model below.
 export { sellerSignedCharmDeprioritize };
 
-function removeOffer(ctx: SimContext, items: InvSlot[], fromPid: number): PendingGrant[] {
+/** One PLAIN unit whose crafted marker matches the staged slot's, highest
+ *  index first (the walk order every removal here shares). Local because
+ *  only the pinned-slot removal below wants marker-exact plain consumption;
+ *  fires no quest hook (removeOffer batches ONE per staged line, the
+ *  pre-preview cadence, so a 20-unit line does not emit 20 progress
+ *  events). */
+function removePlainMatchingUnit(
+  inventory: InvSlot[],
+  itemId: string,
+  craftedRecipeId: string | undefined,
+): VendorRemovedUnit | null {
+  for (let i = inventory.length - 1; i >= 0; i--) {
+    const s = inventory[i];
+    if (s.itemId !== itemId || s.instance || s.craftedRecipeId !== craftedRecipeId) continue;
+    s.count -= 1;
+    if (s.count <= 0) inventory.splice(i, 1);
+    return { instance: undefined, craftedRecipeId };
+  }
+  return null;
+}
+
+/** One INSTANCED unit payload-equal to the staged slot's, highest index
+ *  first. Local rather than the shared removeMatchingInstance because that
+ *  helper skips on the WIDER anonymous-pipe lock (bindOnTrade AND boundTo),
+ *  which would silently route every armed commission copy around the pinned
+ *  path; a trade locks boundTo alone (isTradeLocked). The crafted marker is
+ *  matched too: it is the third leg of itemCopyPin, so a payload-equal twin
+ *  differing only in provenance is a DIFFERENT staged copy (shipping it
+ *  changes the disenchant anti-farming verdict and the directed-rail
+ *  fingerprint), same as the plain twin's exact-marker rule. Same
+ *  clone-on-survival contract as every removal here; no quest hook (see the
+ *  plain twin). */
+function removeInstancedMatchingUnit(
+  inventory: InvSlot[],
+  itemId: string,
+  instance: ItemInstancePayload,
+  craftedRecipeId: string | undefined,
+): VendorRemovedUnit | null {
+  for (let i = inventory.length - 1; i >= 0; i--) {
+    const s = inventory[i];
+    if (s.itemId !== itemId || !s.instance || isTradeLocked(s.instance)) continue;
+    if (s.craftedRecipeId !== craftedRecipeId) continue;
+    if (!itemInstancePayloadsEqual(s.instance, instance)) continue;
+    const consumed = s.count === 1 ? s.instance : cloneItemInstancePayload(s.instance);
+    s.count -= 1;
+    if (s.count <= 0) inventory.splice(i, 1);
+    return { instance: consumed, craftedRecipeId };
+  }
+  return null;
+}
+
+/** The offer's unit-selection walk over a caller-supplied inventory: the ONE
+ *  definition removeOffer (the live swap) and fitsAfterSwap (the capacity
+ *  model, over scratch copies) both run, so the copies the model budgets are
+ *  the copies the swap ships BY CONSTRUCTION (the receiver-overflow class:
+ *  any second model of this walk re-opens it). Mutates `inventory`; a null
+ *  inventory (an unresolved giver) selects nothing, removeOffer's own
+ *  failure mode. */
+function shippedOfferUnits(
+  ctx: SimContext,
+  items: InvSlot[],
+  fromPid: number,
+  inventory: InvSlot[] | null,
+): PendingGrant[] {
   const grants: PendingGrant[] = [];
   // The copy-choice fix: when an instanced CHARM copy must ship, the
   // seller's own self-signed copies go last (sellerSignedCharmDeprioritize
   // above owns the predicate and its scope).
-  const sellerName = ctx.resolve(fromPid)?.meta.name;
+  const meta = ctx.resolve(fromPid)?.meta;
   for (const s of items) {
+    // The staged slots carry the EXACT copies the stage-time preview
+    // selected (stagedOfferSlots), so the swap consumes those copies first:
+    // what the counterparty saw is what ships. A copy that left the bags
+    // between staging and confirm falls back, per missing unit, to the old
+    // generic walk (same predicates), which preserves the pre-preview
+    // behavior of moving SOME eligible copy rather than failing the trade;
+    // offerCovered has already re-validated the per-id totals.
+    //
     // A trade removal NEVER consumes a trade-locked copy. The offer
     // was already clamped to the unbound count (tradeSetOffer / offerCovered),
     // so enough unbound copies exist; the skip predicate is defence in depth so
-    // removeVendorSellUnits's highest-index-first walk spares a bound copy even
-    // if one sits above an unbound one. The deprioritize second pass makes the
-    // seller's own self-signed charm copies go last; a caller passing no
-    // predicate keeps the single-pass walk byte-identical.
-    const units = removeVendorSellUnits(
-      ctx,
-      s.itemId,
-      s.count,
-      fromPid,
-      isTradeLocked,
-      sellerSignedCharmDeprioritize(sellerName, s.itemId),
-    );
+    // the highest-index-first walks spare a bound copy even if one sits above
+    // an unbound one. The deprioritize second pass makes the seller's own
+    // self-signed charm copies go last.
+    const units: VendorRemovedUnit[] = [];
+    if (meta && inventory) {
+      for (let unit = 0; unit < s.count; unit++) {
+        const matched =
+          s.instance !== undefined
+            ? removeInstancedMatchingUnit(inventory, s.itemId, s.instance, s.craftedRecipeId)
+            : removePlainMatchingUnit(inventory, s.itemId, s.craftedRecipeId);
+        if (matched) {
+          units.push(matched);
+          continue;
+        }
+        // The marker guarantee ends at the pinned match above: this generic
+        // fallback is marker-blind (plain-first, then any eligible instanced
+        // copy), so a staged copy that LEFT the bags can ship a
+        // marker-differing twin. The shipped unit still carries its own true
+        // marker, so nothing is forged; it is the documented "some eligible
+        // copy" posture, same as the plain twin's.
+        units.push(
+          ...removeSellUnitsFromInventory(
+            inventory,
+            s.itemId,
+            1,
+            isTradeLocked,
+            sellerSignedCharmDeprioritize(meta.name, s.itemId),
+          ),
+        );
+      }
+    }
     grants.push({ itemId: s.itemId, units });
   }
+  return grants;
+}
+
+function removeOffer(ctx: SimContext, items: InvSlot[], fromPid: number): PendingGrant[] {
+  const meta = ctx.resolve(fromPid)?.meta;
+  const grants = shippedOfferUnits(ctx, items, fromPid, meta ? (meta.inventory ?? []) : null);
+  // ONE quest-hook fire per removal batch: the hook is a whole-log recompute
+  // that emits only deltas, and every fire here would see the same final
+  // state, so a single call carries the same delta SET as N per-id (or
+  // per-slot) calls would, minus the wasted walks. What it does NOT preserve
+  // is the relative ORDER of per-id questProgress events for a multi-id
+  // offer (the hook walks the quest log in log order, where the old per-line
+  // fires walked in offer order); both hosts run this same code, so the
+  // reorder is cross-host consistent and accepted. Zero staged lines means
+  // zero fires.
+  if (meta && items.length > 0) ctx.onInventoryChangedForQuests?.(meta);
   return grants;
 }
 
@@ -306,100 +489,54 @@ export function tradeConfirm(ctx: SimContext, pid?: number): void {
     return;
   }
   // capacity gate: each side must fit what they RECEIVE after what they GIVE
-  // leaves their bags (simulated on a scratch copy; nothing moved yet). A
+  // leaves their bags (simulated on scratch copies; nothing moved yet). A
   // receive is not uniformly fungible: grantOffer (below) grants each
   // instanced copy via addItemInstance, which merges only into a byte-equal
-  // identical-payload stack with room and otherwise takes a fresh
-  // slot, never a plain stack of the same itemId. fitsAll alone assumes every
-  // unit of a receive can stack, which under-predicts slot usage whenever the
-  // giver's stock for that item is (partly) instanced copies, letting a
-  // receiver end up over capacity. Mirror removePreferFungible's own split
-  // here: the giver's fungible stock stacks on arrival; the instanced
-  // remainder transfers in removeOffer's EXACT walk order, highest-index
-  // -first with a charm offer's seller-signed copies consumed last (the
-  // sellerSignedCharmDeprioritize two-pass). One predicate definition feeds
-  // both the model and the removal, so the payloads modeled merge-aware
-  // against the scratch bags are the payloads the transfer actually ships.
+  // identical-payload same-marker stack with room and otherwise takes a
+  // fresh slot, never a plain stack of the same itemId. The model therefore
+  // runs the removal's OWN walk (shippedOfferUnits) over scratch bags and
+  // budgets exactly the units it returns: the copies the model lands are the
+  // copies the swap ships BY CONSTRUCTION. Every previous model here was a
+  // second description of that walk, and each description drift re-opened
+  // the receiver-overflow class (#2139, #2605, then the QA round's
+  // pinned-instanced-copy-vs-fungible-first variant); a walk cannot drift
+  // from itself. Units the walk cannot source (a decoupled inventory hub in
+  // tests, a desynced offer) ship nothing in the real swap too, so modeling
+  // no arrival for them is exact, not optimistic.
   const fitsAfterSwap = (
     meta: PlayerMeta,
     giver: PlayerMeta,
     gives: InvSlot[],
     receives: InvSlot[],
   ): boolean => {
-    const scratch = meta.inventory.map((s) => ({ ...s }));
-    for (const s of gives) removeStacked(scratch, s.itemId, s.count);
+    // What this side GIVES leaves a scratch of their own bags via the real
+    // walk (an instanced give frees exactly its own slot, which an id-keyed
+    // stack removal could miss).
+    const scratchOwn = meta.inventory.map((s) => ({ ...s }));
+    shippedOfferUnits(ctx, gives, meta.entityId, scratchOwn);
     const capacity = bagCapacity(meta.bags);
-    for (const s of receives) {
-      const plainCount = Math.min(s.count, ctx.countFungibleItem(s.itemId, giver.entityId));
-      if (plainCount > 0) {
-        // grantOffer re-grants the plain units bucketed by craftedRecipeId (a
-        // marker-free stack and a crafted stack of the same itemId never merge
-        // on arrival, bags.ts addStacked keys on the marker); model that same
-        // bucket split here, walking the giver's plain slots highest-index-
-        // first (removeVendorSellUnits's order) instead of one flat
-        // marker-free countFit/addStacked call, or this capacity pre-check
-        // can see room in a stack the real grant cannot merge into and
-        // underpredict the receiver's slot usage (#2605 review).
-        const plainByRecipe = new Map<string | undefined, number>();
-        let plainLeft = plainCount;
-        for (let i = giver.inventory.length - 1; i >= 0 && plainLeft > 0; i--) {
-          const g = giver.inventory[i];
-          if (g.itemId !== s.itemId || g.instance) continue;
-          const take = Math.min(g.count, plainLeft);
-          plainByRecipe.set(g.craftedRecipeId, (plainByRecipe.get(g.craftedRecipeId) ?? 0) + take);
-          plainLeft -= take;
+    // What the GIVER ships, resolved by the same walk over the giver's own
+    // scratch, then landed unit by unit (sequential add-then-check, so a
+    // stack with room for one of three units refuses the third, #2473).
+    const scratchGiver = giver.inventory.map((s) => ({ ...s }));
+    const shipped = shippedOfferUnits(ctx, receives, giver.entityId, scratchGiver);
+    for (const g of shipped) {
+      for (const u of g.units) {
+        // Model the payload AS IT ARRIVES: grantOffer stamps boundTo onto an
+        // armed copy on this first trade, and a stamped payload merges
+        // differently than the giver's pre-stamp copy (#2139: a capacity
+        // pre-check that disagrees with the real grant re-opens the overflow
+        // class, in both directions).
+        const arrival =
+          u.instance !== undefined &&
+          u.instance.bindOnTrade === true &&
+          u.instance.boundTo === undefined
+            ? { ...u.instance, boundTo: meta.entityId }
+            : u.instance;
+        if (countFit(scratchOwn, capacity, g.itemId, 1, arrival, u.craftedRecipeId) < 1) {
+          return false;
         }
-        for (const [craftedRecipeId, count] of plainByRecipe) {
-          if (countFit(scratch, capacity, s.itemId, count, undefined, craftedRecipeId) < count)
-            return false;
-          addStacked(scratch, s.itemId, count, undefined, craftedRecipeId);
-        }
-      }
-      let remaining = s.count - plainCount;
-      // The same predicate the removal builds, from the same RESOLVE (the
-      // fix-round review): removeOffer sources the name through
-      // ctx.resolve, which answers null when either half is missing, so
-      // the model must share that failure mode or a meta-present,
-      // entity-absent state builds a predicate the removal never applies.
-      // The model's two passes must pick the same copies in the same order
-      // or the modeled payloads diverge from the shipped ones (the phase
-      // 14 QA's proven overflow).
-      const deprioritize = sellerSignedCharmDeprioritize(
-        ctx.resolve(giver.entityId)?.meta.name,
-        s.itemId,
-      );
-      const modelPass = (takeDeprioritized: boolean): boolean => {
-        for (let i = giver.inventory.length - 1; i >= 0 && remaining > 0; i--) {
-          const g = giver.inventory[i];
-          // Skip trade-locked copies here too: the real transfer
-          // (removeOffer) spares them, so the capacity model must walk the same
-          // unbound instanced slots or it would mis-estimate the receiver's slots.
-          if (g.itemId !== s.itemId || !g.instance || isTradeLocked(g.instance)) continue;
-          if ((deprioritize?.(g.instance) ?? false) !== takeDeprioritized) continue;
-          // Model the payload AS IT ARRIVES: grantOffer stamps boundTo onto an
-          // armed copy on this first trade, and a stamped payload merges
-          // differently than the giver's pre-stamp copy (#2139: a capacity
-          // pre-check that disagrees with the real grant re-opens the overflow
-          // class, in both directions).
-          const arrival =
-            g.instance.bindOnTrade === true && g.instance.boundTo === undefined
-              ? { ...g.instance, boundTo: meta.entityId }
-              : g.instance;
-          const take = Math.min(g.count, remaining);
-          remaining -= take;
-          if (countFit(scratch, capacity, s.itemId, take, arrival) < take) return false;
-          addStacked(scratch, s.itemId, take, arrival);
-        }
-        return true;
-      };
-      if (!modelPass(false)) return false;
-      if (deprioritize && remaining > 0 && !modelPass(true)) return false;
-      // Stock the giver's inventory list does not surface (a stubbed store in
-      // tests, or a desynced offer the final validation above already
-      // covered): the conservative one-fresh-slot-per-unit model.
-      for (let i = 0; i < remaining; i++) {
-        if (scratch.length >= capacity) return false;
-        scratch.push({ itemId: s.itemId, count: 1, instance: {} });
+        addStacked(scratchOwn, g.itemId, 1, arrival, u.craftedRecipeId);
       }
     }
     return true;
@@ -447,6 +584,26 @@ export function tradeCancel(ctx: SimContext, pid?: number): void {
   if (!session) return;
   for (const tPid of [session.a, session.b]) {
     ctx.emit({ type: 'log', text: 'Trade cancelled.', color: '#8df', pid: tPid });
+  }
+  closeTrade(ctx, session);
+}
+
+/**
+ * End a trade session that nobody cancelled.
+ *
+ * Same teardown as tradeCancel, different sentence, and the difference is the
+ * whole point: a session can end because the business it existed for is DONE,
+ * and telling both players it was "cancelled" contradicts the sale that just
+ * completed. This stays deliberately generic, with no notion of what concluded
+ * outside the session, so nothing about settlement leaks into the sim.
+ */
+export function tradeClose(ctx: SimContext, pid?: number): void {
+  const r = ctx.resolve(pid);
+  if (!r) return;
+  const session = ctx.trades.get(r.meta.entityId);
+  if (!session) return;
+  for (const tPid of [session.a, session.b]) {
+    ctx.emit({ type: 'log', text: 'Trade window closed.', color: '#8df', pid: tPid });
   }
   closeTrade(ctx, session);
 }

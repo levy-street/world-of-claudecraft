@@ -80,6 +80,19 @@ export interface ArenaWindowDeps {
   restoreFocus(target: HTMLElement | null): void;
 }
 
+export interface ThornhollowPrewarmHooks {
+  startPreview(): void;
+  pausePreview(): void;
+  commit(): void;
+}
+
+let thornhollowPrewarm: ThornhollowPrewarmHooks | null = null;
+
+/** main.ts injects render ownership without making this UI painter import it. */
+export function setThornhollowPrewarmHooks(hooks: ThornhollowPrewarmHooks): void {
+  thornhollowPrewarm = hooks;
+}
+
 export class ArenaWindow {
   /** The active tab; Thornhollow Fields is the window's primary tab. */
   private tab: PvpTabId = 'ravenrift';
@@ -147,6 +160,7 @@ export class ArenaWindow {
       return;
     }
     el.style.display = 'none';
+    thornhollowPrewarm?.pausePreview();
     this.deps.restoreFocus(this.openerFocus);
     this.openerFocus = null;
   }
@@ -217,9 +231,11 @@ export class ArenaWindow {
     if (strip.commit) this.tab = strip.active;
 
     if (this.tab === 'ravenrift') {
+      thornhollowPrewarm?.startPreview();
       this.renderThornhollowFields(el, world, strip);
       return;
     }
+    thornhollowPrewarm?.pausePreview();
     this.renderArena(el, world, strip, this.tab);
   }
 
@@ -252,6 +268,7 @@ export class ArenaWindow {
     el.innerHTML = this.bgTitleHtml() + this.stripHtml(strip) + this.bgBodyHtml(view);
     this.wireChrome(el);
     el.querySelector('[data-act="queue"]')?.addEventListener('click', () => {
+      thornhollowPrewarm?.commit();
       this.deps.world().bgQueueJoin();
       audio.click();
     });

@@ -22,7 +22,7 @@ import {
   ktx2SiblingPath,
 } from '../scripts/assets/lib/standalone_texture_compression_core.mjs';
 import { MAX_LOAD_ATTEMPTS } from '../src/render/assets/load_retry';
-import { SKIN_EMISSIVE, SKINS, SKINS_DIR } from '../src/render/characters/manifest';
+import { SKIN_EMISSIVE, SKINS, SKINS_DIR, VISUALS } from '../src/render/characters/manifest';
 
 const ROOT = path.resolve(__dirname, '..');
 const SKIN_TEX_DIR = path.join(ROOT, 'public', SKINS_DIR);
@@ -192,7 +192,7 @@ describe('loadSkinTexInto routes textures/skins/ atlases through the KTX2 loader
     vi.resetModules();
   });
 
-  it('boot-loads every eager skin atlas via loadKtx2Texture with a .ktx2 url, never via loadTexture', async () => {
+  it('defers every atlas at import, then routes each on-demand load via loadKtx2Texture with a .ktx2 url, never via loadTexture', async () => {
     const ktx2Calls: string[] = [];
     const textureCalls: string[] = [];
     vi.doMock('../src/render/assets/loader', () => ({
@@ -208,16 +208,44 @@ describe('loadSkinTexInto routes textures/skins/ atlases through the KTX2 loader
       releaseGltf: vi.fn(),
     }));
 
-    await import('../src/render/characters/assets');
-    // The boot sweep is registerPreload(loadSkinTexInto(...)): loadSkinTexInto
-    // itself calls the (synchronous, already-called-by-now) loader eagerly at
-    // import; flush one microtask turn so every mocked promise settles.
+    const assets = await import('../src/render/characters/assets');
+    // Give any stray import-time load a microtask turn to land before pinning
+    // zero, so a regression cannot hide behind unsettled promises.
     await Promise.resolve();
     await Promise.resolve();
 
-    // Matches the "34 skin atlases" boot-sweep count pinned above: the mech
-    // chromas are lazyPreload and never reach this eager sweep.
-    expect(ktx2Calls.length).toBe(34);
+    // The lazy contract (eagerSkinAtlases is off on every host): importing the
+    // module must not fetch a single atlas. Entry no longer pays for other
+    // players' cosmetics before first paint.
+    expect(ktx2Calls.length).toBe(0);
+    expect(textureCalls.length).toBe(0);
+
+    // Drive the on-demand seam over every non-lazyPreload skin entry, the same
+    // set the old eager boot sweep covered (the mech chromas are lazyPreload
+    // and stay out, exactly as before).
+    const expectedKtx2 = new Set<string>();
+    const pending: Promise<void>[] = [];
+    const collect = (table: Record<string, (string | null)[]>) => {
+      for (const [key, list] of Object.entries(table)) {
+        if (VISUALS[key]?.lazyPreload) continue;
+        for (let index = 0; index < list.length; index++) {
+          const url = list[index];
+          if (url?.startsWith(`${SKINS_DIR}/`)) {
+            expectedKtx2.add(url.replace(/\.png$/, '.ktx2'));
+          }
+          const task = assets.ensureSkinTexture(key, index);
+          if (task) pending.push(task);
+        }
+      }
+    };
+    collect(SKINS);
+    collect(SKIN_EMISSIVE);
+    await Promise.all(pending);
+
+    // Tight vacuity floor (tests/CLAUDE.md): the exact atlas count the source
+    // comments cite, so a silently emptied manifest cannot pass.
+    expect(expectedKtx2.size).toBe(34);
+    expect(new Set(ktx2Calls)).toEqual(expectedKtx2);
     for (const url of ktx2Calls) {
       expect(url.startsWith(`${SKINS_DIR}/`), url).toBe(true);
       expect(url.endsWith('.ktx2'), url).toBe(true);

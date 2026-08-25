@@ -93,14 +93,26 @@ describe('far-LOD mesh follows the selected body skin', () => {
     const visual = new CharacterVisual(VISUAL_KEY, 0xffffff, 0);
     visual.setSkin(1);
 
-    // Near rig: the equipped body mesh must show the alternate atlas.
-    let nearMap: THREE.Texture | null = null;
-    visual.root.traverse((o) => {
-      const mesh = o as THREE.Mesh;
-      if (mesh.isMesh && mesh.userData.bodyMesh) {
-        nearMap = (mesh.material as THREE.MeshStandardMaterial).map;
-      }
+    // Skin atlases load on demand on every host (eagerSkinAtlases is off):
+    // setSkin applies the embedded default first, then ensureSkinTexture
+    // re-runs applySkinMaterials once the atlas arrives, rebuilding the near
+    // rig AND the far mesh. Wait for that heal before asserting either.
+    const readNearMap = (): THREE.Texture | null => {
+      let map: THREE.Texture | null = null;
+      visual.root.traverse((o) => {
+        const mesh = o as THREE.Mesh;
+        if (mesh.isMesh && mesh.userData.bodyMesh) {
+          map = (mesh.material as THREE.MeshStandardMaterial).map;
+        }
+      });
+      return map;
+    };
+    await vi.waitFor(() => {
+      expect(readNearMap()).not.toBeNull();
     });
+
+    // Near rig: the equipped body mesh must show the alternate atlas.
+    const nearMap = readNearMap();
     expect(nearMap).not.toBeNull();
     expect((nearMap as unknown as THREE.Texture).name).toBe(altSkinUrl);
 

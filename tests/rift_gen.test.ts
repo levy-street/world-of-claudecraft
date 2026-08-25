@@ -364,3 +364,25 @@ describe('rift runtime placements: exit portal and sealed cache are inside the r
     }
   });
 });
+
+describe('floor cache LRU', () => {
+  it('keeps a hot floor plan identity across an over-limit fill and evicts only cold keys', () => {
+    // Object identity IS the observable: a survivor returns the same plan
+    // object, an evicted key regenerates a fresh one. The old clear-all wiped
+    // the whole cache at the 128th distinct floor, so every live floor lost
+    // identity at once (the next tick regenerated all of them in one spike).
+    const hotSeed = 700001;
+    const coldSeed = 700002;
+    const hot = generateRiftFloor(hotSeed, 20, 0);
+    const cold = generateRiftFloor(coldSeed, 20, 0);
+    // Fill well past the limit with distinct keys, re-reading the hot floor
+    // along the way exactly as the per-tick lift/roller reads do for a live
+    // instance. The cold floor is never re-read.
+    for (let i = 0; i < 200; i++) {
+      generateRiftFloor(710000 + i, 20, 0);
+      if (i % 16 === 0) generateRiftFloor(hotSeed, 20, 0);
+    }
+    expect(generateRiftFloor(hotSeed, 20, 0)).toBe(hot);
+    expect(generateRiftFloor(coldSeed, 20, 0)).not.toBe(cold);
+  });
+});

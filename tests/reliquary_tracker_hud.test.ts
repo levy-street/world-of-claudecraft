@@ -342,3 +342,34 @@ describe('Hud.updateReliquaryTracker: the all-empty cold shape', () => {
     expect(rig.painted[1]?.visible).toBe(false);
   });
 });
+
+describe('Hud.updateReliquaryTracker: the master visibility switch', () => {
+  it('carries showReliquaryTracker into the painted view, both ways, defaulting to shown', () => {
+    const { hud, settings, painted } = makeRig();
+    hud.reliquaryWindow.pinned.add(PINNED_PAGE);
+
+    // Never stored: the strip shows (the def: true contract).
+    hud.updateReliquaryTracker();
+    expect(painted[0].visible).toBe(true);
+    expect(shown(painted[0])).toEqual([PINNED_PAGE]);
+
+    settings.showReliquaryTracker = false;
+    hud.updateReliquaryTracker();
+    expect(painted[1].visible).toBe(false);
+    expect(painted[1].count).toBe(0);
+
+    settings.showReliquaryTracker = true;
+    hud.updateReliquaryTracker();
+    expect(painted[2].visible).toBe(true);
+    expect(shown(painted[2])).toEqual([PINNED_PAGE]);
+  });
+
+  it('pays for no ownership reads while hidden (the early-out is real)', () => {
+    const { hud, settings, counts } = makeRig();
+    // Nothing pinned, so a live build would read the ownership signature
+    // (ownedMounts among it); the hidden build must not.
+    settings.showReliquaryTracker = false;
+    hud.updateReliquaryTracker();
+    expect(counts.ownedMounts).toBe(0);
+  });
+});

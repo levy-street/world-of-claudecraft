@@ -103,7 +103,11 @@ describe('shared Rift race with group-isolated dungeon instances', () => {
       expect.objectContaining({ type: 'riftRaceResult', pid: winner, outcome: 'won' }),
     );
     expect(events).toContainEqual(expect.objectContaining({ type: 'riftRaceWorld' }));
-    expect(sim.entities.has(portalInfo.id)).toBe(false);
+    // The portal seals to new entrants but keeps standing for the winning
+    // party's loot-recovery grace window (see rift_portals.test.ts for the
+    // dedicated coverage); it no longer disappears the instant the boss dies.
+    expect(sim.entities.has(portalInfo.id)).toBe(true);
+    expect(sim.naturalRiftPortals.find((p) => p.id === portalInfo.id)?.recoveryOnly).toBe(true);
     // The competing group is NOT torn down (maintainer decision, 2026-07-30):
     // no eject, no teleport, run still active, no premature loss banner.
     expect(loserRun.partyKey).not.toBeNull();

@@ -393,6 +393,28 @@ describe('ChatWindowController', () => {
       expect(harness.combatLog.classList.contains('active')).toBe(false);
     });
 
+    it('Home and End jump roving focus to the first and last tab (WAI-ARIA tablist keys)', () => {
+      const harness = makeHarness({ woc_chat_tabs: '["world","guild"]' });
+      harness.controller.init();
+
+      const end = keydown('End');
+      tabButton(harness, 'all').dispatchEvent(end);
+      expect(tabButton(harness, 'guild').focused).toBe(true);
+      expect(end.defaultPrevented).toBe(true);
+
+      const home = keydown('Home');
+      tabButton(harness, 'guild').dispatchEvent(home);
+      expect(tabButton(harness, 'all').focused).toBe(true);
+      expect(home.defaultPrevented).toBe(true);
+
+      // Alt+Home is not a reorder gesture: no move, no reorder, keystroke left alone.
+      const altHome = keydown('Home', true);
+      tabButton(harness, 'world').dispatchEvent(altHome);
+      expect(harness.storage.getItem('woc_chat_tabs')).toBe('["world","guild"]');
+      expect(tabButton(harness, 'all').focused).toBe(true);
+      expect(altHome.defaultPrevented).toBe(false);
+    });
+
     it('wraps roving focus from the last tab back to the first (and vice versa)', () => {
       const harness = makeHarness({ woc_chat_tabs: '["world"]' });
       harness.controller.init();
@@ -488,5 +510,55 @@ describe('ChatWindowController', () => {
 
       expect(tabButton(harness, 'world').draggable).toBe(false);
     });
+  });
+});
+
+describe('ChatWindowController pointer-only blur (Space must not re-click the last-used tab)', () => {
+  // The discriminator is UIEvent.detail (src/ui/pointer_blur.ts): a pointer click
+  // carries detail > 0, keyboard and programmatic activation carry 0.
+  function click(detail: number): Event {
+    const event = new Event('click', { cancelable: true });
+    Object.defineProperty(event, 'detail', { value: detail });
+    return event;
+  }
+
+  it('a mouse click selects the tab and drops its focus; a keyboard click keeps it', () => {
+    const harness = makeHarness({ woc_chat_tabs: '["world","guild"]' });
+    harness.controller.init();
+
+    const world = tabButton(harness, 'world');
+    world.focus();
+    world.dispatchEvent(click(1));
+    expect(harness.storage.getItem('woc_chat_active_tab')).toBe('world');
+    expect(world.focused).toBe(false);
+
+    const guild = tabButton(harness, 'guild');
+    guild.focus();
+    guild.dispatchEvent(click(0));
+    expect(harness.storage.getItem('woc_chat_active_tab')).toBe('guild');
+    expect(guild.focused).toBe(true);
+  });
+
+  it('the "+" channel-menu trigger drops focus after a mouse click, on open and on toggle-close', () => {
+    const harness = makeHarness({ woc_chat_tabs: '["world"]' });
+    harness.controller.init();
+
+    const add = addButton(harness);
+    const menu = harness.document.getElementById('ctx-menu');
+    if (!menu) throw new Error('missing #ctx-menu');
+    add.focus();
+    add.dispatchEvent(click(1));
+    expect(menu.style.display).toBe('block');
+    expect(add.focused).toBe(false);
+    // Second pointer click on the still-open menu's own trigger: the toggle-close arm.
+    add.focus();
+    add.dispatchEvent(click(1));
+    expect(menu.style.display).toBe('none');
+    expect(add.focused).toBe(false);
+    // Keyboard activation (detail 0) keeps its focus on either arm.
+    add.focus();
+    add.dispatchEvent(click(0));
+    expect(menu.style.display).toBe('block');
+    expect(add.focused).toBe(true);
   });
 });

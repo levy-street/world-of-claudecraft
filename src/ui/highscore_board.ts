@@ -15,6 +15,7 @@ import { CLASSES } from '../sim/data';
 import type { LeaderboardEntry } from '../world_api';
 import { classDisplayName } from './entity_i18n';
 import { esc } from './esc';
+import { guildTagHtml } from './guild_tag';
 import { formatNumber, t } from './i18n';
 import { formatXp } from './xp_bar';
 
@@ -29,13 +30,6 @@ function headHtml(): string {
     `<span class="hs-vlvl">${esc(t('game.leaderboard.vlevel'))}</span>` +
     `<span class="hs-xp">${esc(t('game.leaderboard.lifetimeXp'))}</span></div>`
   );
-}
-
-/** The `<Guild>` tag beside the name; empty for an unguilded row, so such a row
- *  renders exactly as it did before the tag existed. */
-function guildTagHtml(guild: string | undefined): string {
-  if (!guild) return '';
-  return ` <span class="hs-guild" title="${esc(t('hudChrome.leaderboard.guildName'))}">&lt;${esc(guild)}&gt;</span>`;
 }
 
 /** One ranked row. `data-label` carries the mobile stacked layout's column
@@ -55,7 +49,7 @@ export function highscoreRowHtml(r: LeaderboardEntry): string {
   return (
     `<div class="hs-row${r.rank <= 3 ? ' hs-top' : ''}">` +
     `<span class="hs-rank">${formatNumber(r.rank, { maximumFractionDigits: 0 })}</span>` +
-    `<span class="hs-name"${known ? ` title="${esc(classDisplayName(r.cls))}"` : ''}>${star}${esc(r.name)}${guildTagHtml(r.guild)}</span>` +
+    `<span class="hs-name"${known ? ` title="${esc(classDisplayName(r.cls))}"` : ''}>${star}${esc(r.name)}${guildTagHtml(r.guild, 'hs-guild')}</span>` +
     `<span class="hs-realm" data-label="${esc(realmLabel)}">${esc(r.realm ?? '')}</span>` +
     `<span class="hs-lvl" data-label="${esc(levelLabel)}">${formatNumber(r.level, { maximumFractionDigits: 0 })}</span>` +
     `<span class="hs-vlvl" data-label="${esc(virtualLevelLabel)}">${formatNumber(r.virtualLevel, { maximumFractionDigits: 0 })}</span>` +

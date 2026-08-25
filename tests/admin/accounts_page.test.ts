@@ -18,6 +18,8 @@ const directory = {
       characterCount: 2,
       maxLevel: 12,
       playtimeSeconds: 3600,
+      totalCopper: 123_456,
+      activeFlagCount: 0,
     },
   ],
   total: 50,

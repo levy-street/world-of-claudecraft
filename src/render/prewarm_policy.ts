@@ -177,6 +177,12 @@ export interface PrewarmPolicy {
   compileMaxMs: number;
   /** Cap on nearby character views built synchronously at entry. */
   maxViews: number;
+  /**
+   * Slots views.nearby may always claim, even with the shared counter drained.
+   * Zero on the constrained profile: its 2-view carve-out is a process-survival
+   * cap and admits no floor on top.
+   */
+  nearbyViewFloor: number;
   /** Yield the event loop (setTimeout 0) between manifest entries. */
   yieldBetweenEntries: boolean;
   /** Run a render (link) pass after each entry, group-by-group. */
@@ -332,6 +338,7 @@ export function prewarmSubmitShouldStop(
  */
 const PREWARM_DEBT_RESUME_IDS: ReadonlySet<string> = new Set([
   'programs.compile',
+  'programs.compile-post-paint',
   'programs.compile-submit',
   'textures.scene',
   'surface-detail.textures',
@@ -341,6 +348,13 @@ const PREWARM_DEBT_RESUME_IDS: ReadonlySet<string> = new Set([
 /** True when a dropped entry's resume units are hitch-causing debt. */
 export function prewarmResumeIsDebt(entryId: string): boolean {
   return PREWARM_DEBT_RESUME_IDS.has(entryId);
+}
+
+/** Only roots in the settled, visible scene are presentation-critical before
+ * first paint. Hidden archetype/material catalogs retain their stand-ins and
+ * enter the bounded debt lane after the curtain has produced one frame. */
+export function compileGroupRunsBeforeInitialPaint(groupId: string): boolean {
+  return groupId === 'scene';
 }
 
 /**
@@ -620,7 +634,17 @@ export function resolvePrewarmPolicy(input: PrewarmPolicyInput): PrewarmPolicy {
       maxMs: input.defaultMaxMs,
       compileMaxMs: input.defaultCompileMaxMs,
       maxViews: baseMaxViews,
-      yieldBetweenEntries: false,
+      // Required and landmark views bypass the shared cap while draining its
+      // counter, and the portal substep draws before nearby, so with the small
+      // 12/16 budgets a landmark-and-portal-heavy spawn could otherwise leave
+      // zero slots for the nearby entity views, the most actionable entry on
+      // the shared budget. The floor guarantees them a minimum slice.
+      nearbyViewFloor: Math.min(NEARBY_VIEW_PREWARM_FLOOR, baseMaxViews),
+      // A macOS Chromium cold entry reproduced the same "page is not
+      // responding" symptom as WebKit while synchronous manifest steps ran.
+      // A zero-delay event-loop handoff between steps keeps the browser alive
+      // without changing which work the deadline admits.
+      yieldBetweenEntries: true,
       linkPassPerEntry: false,
       compileBeforeFirstFrame: asyncCompileSupported,
       skipMonolithCompile: !asyncCompileSupported,
@@ -639,6 +663,9 @@ export function resolvePrewarmPolicy(input: PrewarmPolicyInput): PrewarmPolicy {
     // at entry, the spike that kills Medium on-device in production but not in an
     // empty local world. The rest stream in via the per-frame view-create budget.
     maxViews: Math.min(baseMaxViews, input.maxViewsConstrained),
+    // No floor on top of the constrained cap: 2 views is a process-survival
+    // ceiling, and the deferred mob-body stream covers nearby entities.
+    nearbyViewFloor: 0,
     yieldBetweenEntries: true,
     // A full-scene render is itself the synchronous shader-link monolith when the
     // extension is absent. Never enter that uninterruptible driver call inside the
@@ -677,6 +704,39 @@ export function constrainedEntryViewCreateBudget(
  * persistent-portal, and nearby-view substeps. */
 export function remainingPrewarmViewBudget(maxViews: number, createdViews: number): number {
   return Math.max(0, Math.floor(maxViews) - Math.max(0, Math.floor(createdViews)));
+}
+
+/**
+ * Slots views.nearby is guaranteed on the shared budget even when the earlier
+ * substeps drained the counter. The floor is the policy's `nearbyViewFloor`
+ * (zero on the constrained profile), so in the worst case, required plus
+ * landmark views alone exceeding the cap, entry-view creation is bounded by
+ * maxViews plus the floor, never unbounded and never zero for nearby.
+ */
+export const NEARBY_VIEW_PREWARM_FLOOR = 4;
+
+/**
+ * The persistent-portal substep's slice of the shared budget: whatever remains
+ * past the nearby floor. Portals are the least actionable entry drawing on the
+ * shared cap, so they can never eat the slots reserved for nearby entities.
+ */
+export function portalPrewarmViewBudget(
+  maxViews: number,
+  createdViews: number,
+  nearbyViewFloor: number,
+): number {
+  const floor = Math.max(0, Math.floor(nearbyViewFloor));
+  return Math.max(0, remainingPrewarmViewBudget(maxViews, createdViews) - floor);
+}
+
+/** The nearby substep's slice: the remaining shared budget, floored. */
+export function nearbyPrewarmViewBudget(
+  maxViews: number,
+  createdViews: number,
+  nearbyViewFloor: number,
+): number {
+  const floor = Math.max(0, Math.floor(nearbyViewFloor));
+  return Math.max(remainingPrewarmViewBudget(maxViews, createdViews), floor);
 }
 
 /** True when this manifest entry runs under the given policy. */

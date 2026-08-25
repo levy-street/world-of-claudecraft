@@ -240,6 +240,7 @@ export class AbilityVfxRibbons {
   private ordered: THREE.Vector3[] = allocPts(TRAIL_PTS + 1); // scratch, holds refs only
   private coilScratch: THREE.Vector3[] = allocPts(COIL_PTS); // reused for both helices
   private shadowHeadScratch: THREE.Vector3[] = allocPts(3); // directional fang, reused per trail
+  private disposed = false;
 
   constructor(
     scene: THREE.Scene,
@@ -883,6 +884,15 @@ export class AbilityVfxRibbons {
     for (const a of this.arcs) a.active = false;
     this.geo.setDrawRange(0, 0);
     this.wasEmpty = true;
+  }
+
+  dispose(): void {
+    if (this.disposed) return;
+    this.disposed = true;
+    this.clear();
+    this.mesh.removeFromParent();
+    this.geo.dispose();
+    this.mat.dispose();
   }
 
   private terminateTrail(t: TrailSlot): void {

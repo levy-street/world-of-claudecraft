@@ -37,6 +37,7 @@ interface DecalSlot {
 export class GroundDecals {
   private slots: DecalSlot[] = [];
   private next = 0;
+  private disposed = false;
   private maps: Record<DecalStyle, THREE.CanvasTexture>;
   // center-relative XZ of every disc vertex (all slots clone the same base)
   private localXZ: Float32Array;
@@ -148,6 +149,7 @@ export class GroundDecals {
     style: DecalStyle,
     dur: number,
   ): void {
+    if (this.disposed) return;
     const slot = this.slots[this.next];
     this.next = (this.next + 1) % DECAL_SLOTS;
     slot.active = true;
@@ -188,6 +190,7 @@ export class GroundDecals {
   }
 
   update(dt: number): void {
+    if (this.disposed) return;
     for (const slot of this.slots) {
       if (!slot.active) continue;
       slot.age += dt;
@@ -209,6 +212,17 @@ export class GroundDecals {
     for (const slot of this.slots) {
       slot.active = false;
       slot.mesh.visible = false;
+    }
+  }
+
+  dispose(): void {
+    if (this.disposed) return;
+    this.disposed = true;
+    this.clear();
+    for (const slot of this.slots) {
+      slot.mesh.removeFromParent();
+      slot.mesh.geometry.dispose();
+      slot.mat.dispose();
     }
   }
 }

@@ -203,8 +203,9 @@ exempt from the procedural rank-mechanic budget so the citadel identity is never
 - **Floor 1, The Pit.** The descent lands on a raised balcony (lift 3.2) above the temple nave
   tier (1.6); the arena where the giga-boss **Azgorath, Lord of the Pit** waits drops to the pit
   floor (0), with the Hell Forge wing (molten-runoff hazard, forge cache) off the nave. His death
-  opens the usual exit + sealed cache + the rank-gated clear loot, and the won run SEALS its
-  entry portal (dev portals included), so a cleared rift can never be re-entered.
+  opens the usual exit + sealed cache + the rank-gated clear loot, and the won run seals its entry
+  portal to new entrants (a dev portal's is torn down outright; a natural ranked one lingers for
+  the loot-recovery grace window below), so a cleared rift can never be walked into and re-farmed.
 - **Authored relief.** `AuthoredRoom` carries an optional per-room `lift`; the pure
   `authoredLiftAt(rooms, doors, x, z)` turns every lift-changing door into a linear stair ramp,
   and `riftLiftAt` is the ONE entry point read by the sim's entity lift, the movement kernel
@@ -257,6 +258,33 @@ A scheduler opens ranked portals automatically. Tuning is `RIFT_TIER_INFO` plus 
   (COLLAPSED), each with its own world announcement. The close time feeding the
   zone's hourly schedule is read straight off the event record: the first-clear
   timestamp for a sealed rift, `expiresAt` itself for a collapsed one.
+- **Loot-recovery grace.** SEALED does not mean gone: `sealNaturalRiftPortalForRecovery`
+  stops the portal admitting any LIVING entrant (enterRift already denies every one
+  once the event reads `cleared`, portal or no portal) but leaves the entity standing
+  for `RIFT_LOOT_RECOVERY_GRACE` (15 min) before its own quiet teardown, so a party
+  that wipes on or just after the killing blow, with nobody left to resurrect, can
+  still release, run back, and walk a dead member in for the corpse loot it already
+  earned. The winning `RiftInstance` mirrors the same window as its own won-outcome
+  empty-timeout (`RIFT_WON_EMPTY_TIMEOUT` in `rift/runs.ts`), and the two stay
+  COUPLED, not just equal: `updateRiftInstances` refreshes the portal's `expiresAt`
+  every second someone is actually back inside, so a staggered multi-member corpse
+  run is never split by the entrance closing on a straggler while a teammate is
+  already in the loot room. A recovery-only portal is excluded from the per-zone
+  occupancy check (`activeRiftZoneIds`), so it never delays that zone's next natural
+  rift. Sealing can no-op (`sealNaturalRiftPortalForRecovery` returns `false`) if the
+  portal's own `RIFT_PORTAL_LIFETIME` already collapsed it out from under an unusually
+  long clear; the win still pays out normally, it just skips the "the entrance will
+  hold" notice rather than promising a door that no longer exists. Heroic dungeons
+  carry the analogous fix on their own claim's empty-timeout
+  (`INSTANCE_CLEARED_EMPTY_TIMEOUT` in `instances/dungeons.ts`, gated on
+  `inst.clearedBy`, so deliberately heroic-only: normal-difficulty and raid claims
+  have no equivalent "final boss confirmed dead" signal today); their door never
+  despawns, so only the claim's own timeout needed extending.
+  **Known gap:** neither grace window survives a realm restart. Runtime `RiftInstance`
+  state (the corpse, its loot) is never persisted at all (see Known scope below), so a
+  restart inside the window already loses the recoverable loot regardless of the
+  portal; there is nothing extra this fix can do about that without persisting full
+  instance state, which stays out of scope.
 - **Rewards.** Rifts pay NO Heroic Marks at any rank (maintainer decision: marks
   stay a heroic dungeon/raid currency). The clear prize is the rank-gated gear
   ladder on the boss corpse (C a guaranteed themed rare + coin; B/A/S the epic
@@ -328,7 +356,12 @@ LETTER is a game glyph (like item-quality colour), not translated.
 - `tests/rift_portals.test.ts`: zone->rank mapping, monotonic rank tuning, the
   scheduler (cadence + world announce + determinism + collapse), the level-20
   gate (deny + admit + rank stamping), and sealing paying NO Heroic Marks at any
-  rank (the no-marks contract, incl. the untouched heroic daily ledger).
+  rank (the no-marks contract, incl. the untouched heroic daily ledger). Its
+  "won-run loot recovery grace" block covers the fix above: the portal stands
+  and stays recovery-flagged right after a clear, a dead winner walks back
+  through it, a living entrant is still denied, the quiet teardown once
+  `RIFT_LOOT_RECOVERY_GRACE` elapses (no duplicate world announce), and the won
+  instance's own empty-timeout outliving the ordinary one.
 - Cross-cutting guards that also cover rifts: `tests/world_api_parity.test.ts`
   (the `riftFloor` IWorld member), `tests/architecture.test.ts`
   (sim purity + the `rift_rank`/render pure-core registration), `tests/sim_context.test.ts`

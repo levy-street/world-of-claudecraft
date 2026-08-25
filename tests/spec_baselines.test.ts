@@ -109,13 +109,13 @@ const EXPECTED_BASELINES: Record<string, BaselineSnapshot> = {
     },
   },
   'shaman/enhancement': {
-    stats: { int: 2, ap: 24, apPct: 0.22 },
+    stats: { int: 2, ap: 24, apPct: 0.15 },
     abilities: {
       lightning_bolt: { costPct: -0.2 },
       earth_shock: { costPct: -0.2 },
       flame_shock: { costPct: -0.2 },
       rockbiter_weapon: { dmgPct: 0.4 },
-      stormstrike: { dmgPct: 0.8 },
+      stormstrike: { dmgPct: 0.6 },
     },
   },
   'shaman/restoration': {
@@ -124,6 +124,7 @@ const EXPECTED_BASELINES: Record<string, BaselineSnapshot> = {
   },
   'warlock/affliction': {
     stats: { int: 6 },
+    global: { spellDmgPct: 0.07 },
     abilities: {
       needle_of_fate: { dmgPct: 0.08, costPct: -0.08 },
       drain_life: { costPct: -0.08 },
@@ -131,6 +132,7 @@ const EXPECTED_BASELINES: Record<string, BaselineSnapshot> = {
   },
   'warlock/demonology': {
     stats: { sta: 8, armorPct: 0.06, int: 6 },
+    global: { spellDmgPct: 0.1, petDmgPct: 0.15 },
     abilities: {
       soul_harvest: { costPct: -0.08, dmgPct: 0.08 },
       bone_armor: { costPct: -0.08 },
@@ -138,6 +140,7 @@ const EXPECTED_BASELINES: Record<string, BaselineSnapshot> = {
   },
   'warlock/destruction': {
     stats: { sta: 6 },
+    global: { spellDmgPct: 0.1 },
     abilities: {
       shadow_bolt: { costPct: -0.23, castPct: -0.03 },
       immolate: { costPct: -0.23, castPct: -0.03 },

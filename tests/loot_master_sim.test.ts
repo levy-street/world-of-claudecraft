@@ -8,6 +8,7 @@ import { WORLD_SEED } from '../src/sim/world_seed';
 const SEED = WORLD_SEED;
 const PREMIUM = 'greyjaw_hide_boots'; // uncommon: opens a roll under default strategies
 const COMMON = 'worn_sword'; // common: never master-looted under a rare threshold
+const FRESH_CORPSE_TIMER = 60;
 
 function makeSim() {
   return new Sim({ seed: SEED, playerClass: 'warrior' });
@@ -31,6 +32,7 @@ function partyOnCorpse(sim: Sim, itemId: string, mobId = 990500) {
   teleportTo(sim, 21, 20, b);
   const mob = createMob(mobId, MOBS.forest_wolf, 2, { x: 20, y: 0, z: 22 });
   mob.dead = true;
+  mob.corpseTimer = FRESH_CORPSE_TIMER;
   mob.lootable = true;
   mob.tappedById = a;
   mob.loot = { copper: 0, items: [{ itemId, count: 1 }] };
@@ -527,6 +529,7 @@ describe('the master looter reconcile surface (#2526)', () => {
     // at once, so a first-match-only read would pass every other case here.
     const second = createMob(mob.id + 1, MOBS.forest_wolf, 2, { x: 20, y: 0, z: 22 });
     second.dead = true;
+    second.corpseTimer = FRESH_CORPSE_TIMER;
     second.lootable = true;
     second.tappedById = a;
     second.loot = { copper: 0, items: [{ itemId: PREMIUM, count: 1 }] };
@@ -862,6 +865,7 @@ describe('a repeated pid in a master-loot assignment (#2505)', () => {
     const rosterFor = (mobId: number) => {
       const mob = createMob(mobId, MOBS.forest_wolf, 2, { x: 20, y: 0, z: 22 });
       mob.dead = true;
+      mob.corpseTimer = FRESH_CORPSE_TIMER;
       mob.lootable = true;
       mob.tappedById = a;
       mob.loot = { copper: 0, items: [{ itemId: PREMIUM, count: 1 }] };

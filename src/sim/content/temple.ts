@@ -78,7 +78,7 @@ export const TEMPLE_MOBS: Record<string, MobTemplate> = {
       { copper: 80, chance: 1 },
       { itemId: 'drowned_offering', chance: 0.6, questId: 'q_drowned_choir' },
       { itemId: 'briny_idol', chance: 0.3 },
-      { itemId: 'tidehymn_slippers', chance: 0.1 },
+      { itemId: 'tidehymn_slippers', chance: 0.02 },
     ],
     scale: 1.0,
     color: 0x6c8f8a,

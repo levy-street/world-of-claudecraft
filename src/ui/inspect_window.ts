@@ -19,7 +19,13 @@ import type { EquipSlot, ItemInstancePayload, PlayerClass, SkinCatalog } from '.
 import { attachAvatarFallback } from './avatar_fallback';
 import type { PaperdollSlot } from './char_view';
 import { CURATOR_SIGIL_GLOW, curatorSigilBadgeClass, curatorSigilDataUrl } from './curator_sigil';
-import { deedTitleText } from './deed_i18n';
+import {
+  DEED_HERALDRY_ATTR,
+  DEED_HERALDRY_MOTIF_ATTR,
+  deedHeraldryMotifSvg,
+  deedHeraldryStyle,
+} from './deed_border_view';
+import { deedName, deedTitleText } from './deed_i18n';
 import {
   devCardBadgeClass,
   devTierBadgeDataUrl,
@@ -47,6 +53,7 @@ import {
   type InspectCuratorModel,
   type InspectDevModel,
   type InspectDiscordModel,
+  type InspectHeaderModel,
   type InspectHolderModel,
 } from './inspect_view';
 import type { PainterHostPresentation } from './painter_host';
@@ -172,6 +179,7 @@ export class InspectWindow {
         skinCatalog: e.skinCatalog ?? 'class',
         deedTitleText: e.title ? deedTitleText(e.title) : '',
         border: e.border ?? null,
+        borderDeedName: e.border ? deedName(e.border) : '',
         curatorRank: e.curatorRank ?? 0,
         relicsOwned: typeof e.relicsOwned === 'number' ? e.relicsOwned : null,
         relicsTotal: typeof e.relicsTotal === 'number' ? e.relicsTotal : null,
@@ -194,25 +202,23 @@ export class InspectWindow {
     );
     markDialogRoot(el, { labelledBy: 'inspect-window-title' });
     const { header } = model;
-    const titleHtml = header.deedTitle
-      ? `<div class="inspect-title">${esc(header.deedTitle)}</div>`
-      : '';
-    el.innerHTML =
-      this.panelTitleHtml() +
-      `<div class="inspect-card">` +
-      `<div class="inspect-name"${this.borderAttrs(header.border)}>${esc(header.name)}</div>` +
-      titleHtml +
-      `<div class="inspect-meta">${esc(
-        t('itemUi.equipment.levelClass', {
-          level: formatNumber(header.level, { maximumFractionDigits: 0 }),
-          className: classDisplayName(cls),
-        }),
-      )}</div>` +
-      this.curatorLineHtml(model.curator) +
+    const standingHtml = `<div class="inspect-meta">${esc(
+      t('itemUi.equipment.levelClass', {
+        level: formatNumber(header.level, { maximumFractionDigits: 0 }),
+        className: classDisplayName(cls),
+      }),
+    )}</div>${this.curatorLineHtml(model.curator)}`;
+    const honorHtml =
       this.holderHtml(model.badges.holder) +
       this.discordHtml(model.badges.discord) +
       this.devHtml(model.badges.dev) +
-      this.curatorHtml(model.badges.curator) +
+      this.curatorHtml(model.badges.curator);
+    el.innerHTML =
+      this.panelTitleHtml() +
+      `<div class="inspect-card">` +
+      this.headerHtml(header) +
+      `<div class="inspect-standing-row">${standingHtml}</div>` +
+      (honorHtml ? `<div class="inspect-honor-rail">${honorHtml}</div>` : '') +
       `</div>` +
       // The class-colored model stage, delivered as a CSS custom property so the
       // stylesheet paints the border / glow / haze in the inspected player's hue.
@@ -310,26 +316,37 @@ export class InspectWindow {
     return row;
   }
 
-  // The Book of Deeds border accent on the header name row: the cold-window twin
-  // of the unit-frame portrait ring, and the resting form of the same cartouche
-  // the overhead nameplate draws around a name. The SLUG rides in data-border
-  // (the stylesheet gates on a non-empty value) and the palette in the SAME three
-  // custom properties the ring uses, so one treatment and zero per-slug colors
-  // live in CSS. The pure core already gated the slug on the palette, so a
-  // borderless / stale / title-reward / drifted id arrives null and paints
-  // nothing at all, exactly like paintPortraitBorder writing ''.
+  private headerHtml(header: InspectHeaderModel): string {
+    const titleHtml = header.deedTitle
+      ? `<div class="inspect-title">${esc(header.deedTitle)}</div>`
+      : '';
+    const border = header.border;
+    if (!border) return `<div class="inspect-name">${esc(header.name)}</div>${titleHtml}`;
+    return (
+      `<div class="inspect-heraldry-banner"${this.borderAttrs(border)}>` +
+      `<div class="inspect-heraldry-face deed-heraldry-plaque deed-heraldry-plaque-ceremonial"${this.borderIdentityAttrs(border)}>` +
+      deedHeraldryMotifSvg(border.motif, 'deed-heraldry-pattern') +
+      `<div class="inspect-heraldry-copy">` +
+      `<div class="inspect-name">${esc(header.name)}</div>` +
+      titleHtml +
+      `</div></div>` +
+      `<span class="deed-heraldry-seal" aria-hidden="true">${deedHeraldryMotifSvg(border.motif, 'deed-heraldry-seal-art')}</span>` +
+      `<div class="inspect-heraldry-deed deed-heraldry-plaque deed-heraldry-plaque-tab"${this.borderIdentityAttrs(border)}>${esc(border.deedName)}</div>` +
+      `</div>`
+    );
+  }
+
+  // The pure core already palette-gated the slug. One shared style builder
+  // carries the exact material tokens every cold heraldry surface consumes.
   private borderAttrs(border: InspectBorderModel | null): string {
     if (!border) return '';
-    // The three palette values are escaped like the slug on the line above.
-    // Honest scope: esc() blocks an attribute BREAKOUT (quotes, angle
-    // brackets), which is the exploitable hole; it does NOT neutralize CSS
-    // declaration syntax inside the attribute. Today that distinction is moot
-    // (values come from the frozen deed_border_view palette and the core nulls
-    // unknown slugs); if a palette source ever becomes dynamic, validate the
-    // values against a hex pattern instead of leaning on this escape.
+    return `${this.borderIdentityAttrs(border)} style="${esc(deedHeraldryStyle(border))}"`;
+  }
+
+  private borderIdentityAttrs(border: InspectBorderModel): string {
     return (
-      ` data-border="${esc(border.slug)}"` +
-      ` style="--border-accent-frame:${esc(border.frame)};--border-accent-edge:${esc(border.edge)};--border-accent-glow:${esc(border.glow)}"`
+      ` ${DEED_HERALDRY_ATTR}="${esc(border.slug)}"` +
+      ` ${DEED_HERALDRY_MOTIF_ATTR}="${border.motif}"`
     );
   }
 

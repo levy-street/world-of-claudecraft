@@ -434,6 +434,12 @@ export class ActionBarController {
     return isAbilityActionBarEligible(this.abilityDef(id));
   }
 
+  private isAttackSlotStoredAbilityEligible(id: string): boolean {
+    const ability = this.abilityDef(id);
+    if (ability === undefined) return this.deps.knownAbilityIds().includes(id);
+    return isAbilityActionBarEligible(ability);
+  }
+
   private formBarSeededKey(form: HotbarForm = this.activeFormState): string {
     return actionBarFormSeededKey(this.slotMapKey(form));
   }
@@ -593,10 +599,20 @@ export class ActionBarController {
     let storedRaw: string | null = null;
     try {
       storedRaw = this.deps.storage.getItem(key);
+      // The freed attack slot is not scoped to any one build (unlike the 33
+      // configurable slots, a SavedLoadout never captures it), so its
+      // eligibility check must not require the ability to be granted by the
+      // CURRENTLY active build: only that it is a real, placeable ability.
+      // Requiring current-known-ness here (like isAssignableAction's strict
+      // placement gate) meant switching to a build that does not grant the
+      // assigned ability read the stored value back as garbage and deleted
+      // it outright, so switching back to the granting build could never
+      // restore it. Unknown host-provided ids are still allowed only when the
+      // current host says they are known; stale/corrupt unknown ids are dropped.
       this.attackActionState = readAttackSlotAction(
         this.deps.storage,
         key,
-        (id) => this.deps.knownAbilityIds().includes(id) && this.isAbilityPlacementAllowed(id),
+        (id) => this.isAttackSlotStoredAbilityEligible(id),
         (id) => this.keepsStoredItemId(id),
       );
       if (storedRaw !== null && this.attackActionState === null) this.deps.storage.removeItem(key);

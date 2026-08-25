@@ -5772,6 +5772,14 @@
   .crafting-reagent-line {
     line-height: 1.4;
   }
+  /* The craft fee sub-line (#1301 gold sink): previously charged with no
+     line item anywhere in this window. Same block-plus-gap treatment as
+     .crafting-skill-line below, so it reads as its own row under the
+     reagent list rather than running into it. */
+  .crafting-fee-line {
+    display: block;
+    margin-top: 2px;
+  }
   /* Unsatisfied reagents tint toward the error red; the have/required counts
      in the text are the actual signal (the tint is a redundant hint). */
   .crafting-reagent.unsat {
@@ -8021,8 +8029,12 @@
   .deeds-borders {
     display: flex;
     flex-direction: column;
-    gap: 4px;
+    /* The shell-wide 3px focus ring sits 2px outside a selected button.
+       Eight pixels leaves a visible 3px seam between that ring and both the
+       next row and the scroll shelf edge. */
+    gap: 8px;
     padding: 2px;
+    padding-inline: 8px;
   }
   /* Which picker a run of options belongs to. The two groups sit in one
      scroll column, so without a heading the border options read as more
@@ -8045,12 +8057,12 @@
     border-radius: 4px;
     border: 1px solid #4a3d26;
     background: linear-gradient(160deg, #17130c, #0c0a07);
-    color: var(--gold-dim);
+    color: var(--color-text-overlay);
     cursor: var(--cursor-point);
     min-height: 32px;
   }
   .deed-title-option:hover {
-    color: var(--gold);
+    color: var(--color-deed-banner-text);
   }
   .deed-title-option.active {
     border-color: #b8902a;
@@ -8064,6 +8076,377 @@
   body.mobile-touch .deed-title-option {
     min-width: 40px;
     min-height: 40px;
+  }
+  /* One code-native silhouette family connects the world token, unit frames,
+     picker preview, and inspect card. Fixed-pixel shoulders keep long localized
+     names from stretching the forged ends into oversized wedges. Borderless
+     hosts keep their original rectangle because clipping is earned-chrome only. */
+  .deed-heraldry-plaque {
+    --deed-heraldry-plaque-clip: polygon(
+      0 0,
+      calc(100% - 8px) 0,
+      100% 50%,
+      calc(100% - 8px) 100%,
+      0 100%,
+      4px 50%
+    );
+  }
+  .deed-heraldry-plaque-mirror {
+    --deed-heraldry-plaque-clip: polygon(
+      8px 0,
+      100% 0,
+      calc(100% - 4px) 50%,
+      100% 100%,
+      8px 100%,
+      0 50%
+    );
+  }
+  .deed-heraldry-plaque-ceremonial {
+    --deed-heraldry-plaque-clip: polygon(
+      16px 0,
+      calc(100% - 16px) 0,
+      100% 50%,
+      calc(100% - 16px) 100%,
+      16px 100%,
+      0 50%
+    );
+  }
+  .deed-heraldry-plaque-tab {
+    --deed-heraldry-plaque-clip: polygon(
+      10px 0,
+      calc(100% - 10px) 0,
+      100% 50%,
+      calc(100% - 10px) 100%,
+      10px 100%,
+      0 50%
+    );
+    --deed-heraldry-plaque-rivet-edge: transparent;
+    --deed-heraldry-plaque-rivet-frame: transparent;
+  }
+  .deed-heraldry-plaque[data-border]:not([data-border=""]),
+  .deed-heraldry-preview[data-border]:not([data-border=""]) .deed-heraldry-plaque {
+    position: relative;
+    isolation: isolate;
+    clip-path: var(--deed-heraldry-plaque-clip);
+    background-color: var(--border-accent-frame, transparent);
+  }
+  .deed-heraldry-plaque[data-border]:not([data-border=""])::before,
+  .deed-heraldry-preview[data-border]:not([data-border=""]) .deed-heraldry-plaque::before {
+    content: "";
+    position: absolute;
+    inset: 1px;
+    z-index: -1;
+    clip-path: var(--deed-heraldry-plaque-clip);
+    background:
+      radial-gradient(
+        circle at 7px 50%,
+        var(--deed-heraldry-plaque-rivet-edge, var(--border-accent-edge, transparent)) 0 1px,
+        var(--deed-heraldry-plaque-rivet-frame, var(--border-accent-frame, transparent)) 1px 2px,
+        transparent 2.5px
+      ),
+      radial-gradient(
+        circle at calc(100% - 7px) 50%,
+        var(--deed-heraldry-plaque-rivet-edge, var(--border-accent-edge, transparent)) 0 1px,
+        var(--deed-heraldry-plaque-rivet-frame, var(--border-accent-frame, transparent)) 1px 2px,
+        transparent 2.5px
+      ),
+      repeating-linear-gradient(
+        135deg,
+        transparent 0 5px,
+        color-mix(in srgb, var(--border-accent-edge, transparent) 8%, transparent) 5px 6px
+      ),
+      linear-gradient(
+        180deg,
+        var(
+            --deed-heraldry-plaque-top,
+            color-mix(
+              in srgb,
+              var(--border-accent-frame, transparent) 16%,
+              var(--deed-heraldry-plaque-fill, var(--deed-heraldry-well, transparent))
+            )
+          )
+          0%,
+        var(--deed-heraldry-plaque-fill, var(--deed-heraldry-well, transparent)) 42%,
+        var(
+            --deed-heraldry-plaque-bottom,
+            color-mix(
+              in srgb,
+              var(--border-accent-edge, transparent) 22%,
+              var(--deed-heraldry-plaque-fill, var(--deed-heraldry-well, transparent))
+            )
+          )
+          100%
+      );
+    pointer-events: none;
+  }
+  .deed-heraldry-plaque[data-border]:not([data-border=""])::after,
+  .deed-heraldry-preview[data-border]:not([data-border=""]) .deed-heraldry-plaque::after {
+    content: "";
+    position: absolute;
+    inset: 3px;
+    z-index: 0;
+    border: 1px solid color-mix(in srgb, var(--border-accent-frame, transparent) 46%, transparent);
+    clip-path: var(--deed-heraldry-plaque-clip);
+    pointer-events: none;
+  }
+  /* Shared code-native forged seal. Every surface supplies one canonical palette
+     and motif path; the round material chassis never changes by slug. */
+  .deed-heraldry-seal {
+    position: relative;
+    box-sizing: border-box;
+    display: grid;
+    place-items: center;
+    overflow: hidden;
+    border: 1px solid var(--border-accent-frame, transparent);
+    border-radius: 50%;
+    background: var(--border-accent-edge, transparent);
+    box-shadow:
+      0 0 calc(4px * var(--fx-shadow, 1)) var(--border-accent-glow, transparent),
+      inset 0 0 0 1px var(--border-accent-edge, transparent);
+  }
+  .deed-heraldry-seal::before {
+    content: "";
+    position: absolute;
+    inset: 3px;
+    border: 1px solid var(--border-accent-glow, transparent);
+    border-radius: 50%;
+    background: var(--deed-heraldry-well, transparent);
+  }
+  .deed-heraldry-seal::after {
+    content: "";
+    position: absolute;
+    inset: 5px;
+    z-index: 0;
+    border-top: 1px solid var(--border-accent-frame, transparent);
+    border-bottom: 1px solid var(--border-accent-edge, transparent);
+    border-radius: 50%;
+    pointer-events: none;
+  }
+  .deed-heraldry-seal-art {
+    position: relative;
+    z-index: 1;
+    width: 68%;
+    height: 68%;
+    fill: none;
+    stroke: var(--border-accent-frame, transparent);
+    stroke-width: 1.5;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+  .deed-heraldry-pattern {
+    fill: none;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+  /* Border picker: retain the shared option a11y/focus/tap behavior while
+     replacing anonymous stripes with the actual seal and a material strip.
+     None remains an empty footprint, never a fake earned metal. */
+  .deeds-borders .deed-title-option {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .deed-border-swatch {
+    flex: none;
+    display: inline-flex;
+    align-items: center;
+    width: 60px;
+    height: 28px;
+    border: 1px solid var(--border-accent-frame, transparent);
+    border-radius: 14px 2px 2px 14px;
+    outline: 1px solid var(--border-accent-edge, transparent);
+    outline-offset: -2px;
+    background: var(--deed-heraldry-well, transparent);
+    box-shadow: 0 0 calc(3px * var(--fx-shadow, 1)) var(--border-accent-glow, transparent);
+  }
+  .deed-border-swatch .deed-heraldry-seal {
+    flex: none;
+    width: 28px;
+    height: 28px;
+    margin: -1px 0 -1px -1px;
+  }
+  .deed-border-material {
+    position: relative;
+    flex: 1;
+    height: 18px;
+    overflow: hidden;
+    border-left: 1px solid var(--border-accent-edge, transparent);
+    background: color-mix(
+      in srgb,
+      var(--deed-heraldry-well, transparent) 82%,
+      var(--border-accent-edge, transparent)
+    );
+  }
+  .deed-border-material .deed-heraldry-pattern {
+    position: absolute;
+    top: -7px;
+    right: -2px;
+    width: 32px;
+    height: 32px;
+    opacity: 0.16;
+    stroke: var(--border-accent-frame, transparent);
+    stroke-width: 1.5;
+  }
+  .deed-border-swatch-empty {
+    background: none;
+    box-shadow: none;
+    border: 0;
+    outline: 0;
+  }
+  .deed-heraldry-preview {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 6px;
+    margin-top: 8px;
+  }
+  .deed-heraldry-preview:empty {
+    display: none;
+  }
+  .deed-heraldry-preview[data-border]:not([data-border=""]) {
+    padding: 8px;
+    border: 1px solid var(--border-accent-frame, transparent);
+    outline: 1px solid var(--border-accent-edge, transparent);
+    outline-offset: -3px;
+    background: color-mix(in srgb, var(--deed-heraldry-well, transparent) 74%, transparent);
+    box-shadow: 0 0 calc(4px * var(--fx-shadow, 1)) var(--border-accent-glow, transparent);
+  }
+  .deed-heraldry-preview-world,
+  .deed-heraldry-preview-interaction {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 0;
+  }
+  .deed-heraldry-preview-world .deed-heraldry-seal {
+    z-index: 1;
+    flex: none;
+    width: 26px;
+    height: 26px;
+  }
+  .deed-heraldry-preview-ribbon {
+    min-width: 0;
+    max-width: 220px;
+    margin-left: 2px;
+    padding: 3px 14px 3px 8px;
+    overflow: hidden;
+    border: 1px solid var(--border-accent-frame, transparent);
+    background-color: var(--border-accent-frame, transparent);
+    --deed-heraldry-plaque-fill: var(--deed-heraldry-well, transparent);
+    color: var(--color-text-overlay);
+    font-family: var(--title-font);
+    font-size: 11px;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+  }
+  .deed-heraldry-preview-portrait {
+    flex: none;
+    width: 34px;
+    height: 34px;
+    border: 1px solid var(--border-accent-frame, transparent);
+    border-radius: 50%;
+    background: var(--deed-heraldry-well, var(--panel-bg));
+    box-shadow:
+      inset 0 0 0 2px color-mix(in srgb, var(--border-accent-edge, transparent) 72%, transparent),
+      inset 0 1px var(--border-accent-glow, transparent);
+  }
+  .deed-heraldry-preview-interaction .deed-heraldry-seal {
+    z-index: 1;
+    flex: none;
+    width: 25px;
+    height: 25px;
+    margin-left: -6px;
+  }
+  .deed-heraldry-preview-header {
+    position: relative;
+    min-width: 0;
+    flex: 0 1 260px;
+    max-width: 260px;
+    margin-left: 2px;
+    padding: 4px 8px 4px 13px;
+    overflow: hidden;
+    box-shadow:
+      inset 0 1px var(--border-accent-frame, transparent),
+      inset 0 -1px var(--border-accent-edge, transparent);
+    background-color: var(--border-accent-frame, transparent);
+    --deed-heraldry-plaque-fill: var(--deed-heraldry-well, transparent);
+  }
+  .deed-heraldry-preview-header .deed-heraldry-pattern {
+    position: absolute;
+    top: 50%;
+    right: 2px;
+    width: 38px;
+    height: 38px;
+    transform: translateY(-50%);
+    opacity: 0.1;
+    stroke: var(--border-accent-frame, transparent);
+    stroke-width: 1.5;
+  }
+  .deed-heraldry-preview-name,
+  .deed-heraldry-preview-deed {
+    position: relative;
+    z-index: 1;
+    display: block;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+  }
+  .deed-heraldry-preview-name {
+    color: var(--color-text-overlay);
+    font-family: var(--title-font);
+    font-size: 11px;
+  }
+  .deed-heraldry-preview-deed {
+    color: var(--color-text-overlay);
+    font-size: 9px;
+  }
+  @media (forced-colors: active) {
+    .deed-heraldry-seal,
+    .deed-border-swatch,
+    .deed-heraldry-preview-portrait,
+    .deed-heraldry-preview[data-border]:not([data-border=""]) {
+      border-color: CanvasText;
+      outline-color: CanvasText;
+      background: Canvas;
+      box-shadow: none;
+    }
+    .deed-border-swatch-empty {
+      border: 0;
+      outline: 0;
+      background: none;
+    }
+    .deed-heraldry-seal-art,
+    .deed-heraldry-pattern {
+      stroke: CanvasText;
+    }
+    .deed-heraldry-seal::after {
+      border-color: CanvasText;
+    }
+    .deed-heraldry-preview-ribbon,
+    .deed-heraldry-preview-header {
+      border-color: CanvasText;
+      outline: 1px solid CanvasText;
+      outline-offset: -1px;
+      background-color: CanvasText;
+      color: CanvasText;
+      box-shadow: none;
+    }
+    .deed-heraldry-plaque[data-border]:not([data-border=""])::before,
+    .deed-heraldry-preview[data-border]:not([data-border=""]) .deed-heraldry-plaque::before {
+      background: Canvas;
+    }
+    .deed-heraldry-plaque[data-border]:not([data-border=""])::after,
+    .deed-heraldry-preview[data-border]:not([data-border=""]) .deed-heraldry-plaque::after {
+      border-color: CanvasText;
+      background: none;
+    }
+  }
+  body.mobile-touch .deed-heraldry-preview {
+    grid-template-columns: 1fr;
+  }
+  @media (max-width: 640px) {
+    .deed-heraldry-preview {
+      grid-template-columns: 1fr;
+    }
   }
   .deeds-filterbar {
     flex: none;
@@ -8205,6 +8588,70 @@
     font-size: 11px;
     font-weight: 400;
     color: var(--color-text-muted);
+  }
+  /* The HUD-tracker eye at the summary's right edge: a pressed toggle (the
+     paperdoll helm/playtime eye idiom) whose lit state mirrors the strip
+     being on screen. Pushed to the row's end so the readouts keep their left
+     rhythm; the pin-button chip palette AND radius keep it in the window's
+     family (.reliquary-pin is a 4px chip; DESIGN.md 14 rules out pill
+     buttons, so the toggle is not one either). */
+  .reliquary-tracker-toggle {
+    position: relative;
+    flex: none;
+    margin-left: auto;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-family: var(--ui-font);
+    font-size: 11px;
+    padding: 2px 10px;
+    border-radius: var(--radius-sm);
+    border: 1px solid #6a5320;
+    background: #241c0c;
+    color: #ffe6a8;
+    cursor: var(--cursor-point);
+    white-space: nowrap;
+  }
+  /* Invisible hit extension over the ~20px visual chip (the char-playtime-eye
+     idiom, DESIGN.md 10.1): 20px plus 8px each way is the 36px desktop hit
+     floor that section names (the WCAG 2.5.8 24px floor is the weaker bound).
+     -9px, not -8px: an absolutely positioned pseudo-element's inset is
+     measured from the host's PADDING edge, so on this 1px-bordered button
+     -9px is 8px beyond the visual edge (-8px measured as a 34px hit box in
+     the browser suite, under the floor; tests/browser/target_size pins the
+     live reach). A plain rectangle on purpose: it paints nothing, and a radius
+     on a hit box only trims corner hit area. Scoped per pointer like the idiom
+     it cites: the mobile arm below sizes the box itself to the 40px floor and
+     zeroes the reach, so the toggle never overreaches the sticky panel-title
+     row on the full-bleed phone layout. */
+  .reliquary-tracker-toggle::after {
+    content: "";
+    position: absolute;
+    inset: -9px;
+  }
+  .reliquary-tracker-toggle .ui-icon {
+    width: 14px;
+    height: 14px;
+    flex: none;
+  }
+  /* Hidden state: the eye-off glyph plus a dimmed chip, so the switch reads
+     at a glance without relying on the icon swap alone. */
+  .reliquary-tracker-toggle[aria-pressed="false"] {
+    color: var(--color-text-muted);
+    border-color: #4a3d1d;
+  }
+  .reliquary-tracker-toggle:hover {
+    filter: brightness(1.12);
+  }
+  .reliquary-tracker-toggle:focus-visible {
+    outline: 2px solid var(--color-border-focus);
+    outline-offset: 1px;
+  }
+  body.mobile-touch .reliquary-tracker-toggle {
+    min-height: 40px;
+  }
+  body.mobile-touch .reliquary-tracker-toggle::after {
+    inset: 0;
   }
   /* Phase 6: Curator rank seal chrome (cosmetic only; no combat info).
      Phase 14 removed this block's reduced-motion box-shadow suppression on
@@ -16299,6 +16746,916 @@
     padding: 36px;
     color: var(--color-text-muted);
     text-align: center;
+  }
+  /* ---------- The $WOC Exchange ---------- */
+  /* Cold window (src/ui/woc_market_window.ts): USD-denominated auctions settled
+     in $WOC, browser-web only. Store-surface grammar (DESIGN.md 8.2) on the
+     THEMED tokens: every fill, edge and text colour below is a themeCssVars
+     derivation (--panel-base / --color-bg-dark / --border / --color-accent /
+     the text pair), so the parchment and midnight presets stay readable, and
+     the one accent tint is color-mix over those (the hud.css precedent). Gold
+     is structure (edges, selection, the one primary button), never a fill;
+     spacing rides the --spacing-* scale with the dense-row 6px exception;
+     tabular numerals sit on the window root so every amount inherits them.
+     A fitted compact window (960 x 700, DESIGN.md 8.1): a five-column table
+     plus a 240 to 320px detail column, deliberately under the large-window
+     target. The mobile sheet re-pins it in hud.mobile.css. */
+  #woc-market-window {
+    /* The desktop Exchange claims its real estate (Fernando's 15 QA sign-off
+       note): a large window rather than the old fitted 960x700, which also
+       gives every column the room to sit left-aligned with its header. */
+    width: min(92vw, 1440px);
+    height: min(92vh, 920px);
+    display: none;
+    flex-direction: column;
+    overflow: hidden;
+    min-height: 0;
+    font-size: 14px;
+    line-height: 19px;
+    font-variant-numeric: tabular-nums;
+  }
+  #woc-market-window .wm-body {
+    overflow-y: auto;
+    min-height: 0;
+    padding: var(--spacing-sm) 0 0;
+  }
+  /* Section headings: the panel-title step of the type scale (display 15/20,
+     parchment not gold) and the sub-heading step under it; the shared body
+     reset zeroes their margins, so the rhythm is set here. */
+  #woc-market-window h3 {
+    margin: 0 0 var(--spacing-sm);
+    font: 700 15px / 20px var(--font-display);
+    color: var(--color-text-light);
+  }
+  #woc-market-window h4 {
+    margin: var(--spacing-md) 0 var(--spacing-xs);
+    font: 700 13px / 17px var(--font-ui);
+    color: var(--color-text-muted);
+  }
+  /* The tab strip (DESIGN.md 10.2): unselected muted, hover to parchment,
+     selected in accent text over an accent underline that sits ON the strip's
+     own hairline (the -1px margin), no boxed buttons.
+     flex: none, like .soc-tabs. The strip is a flex ITEM of the window column;
+     without it the column squeezed the strip below its own tab height and the
+     labels rendered sliced in half. */
+  #woc-market-window .wm-tabs {
+    display: flex;
+    gap: var(--spacing-xs);
+    padding: 0;
+    border-bottom: 1px solid var(--color-border-default);
+    flex: none;
+    align-items: stretch;
+  }
+  /* The banner strip under the tabs holds only the two STANDING banners (a
+     paused realm, an unlinked wallet), which move on an operator action or a
+     wallet link, never on a click. The notice and busy line live in the
+     footer bar below the body instead, in a slot that keeps its height, so a
+     toast that comes and goes never shifts the rows or the form. All three
+     share one look: a themed well inside the panel, never a second panel. */
+  #woc-market-window .wm-strip {
+    flex: none;
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-xs);
+    padding-top: var(--spacing-sm);
+  }
+  #woc-market-window .wm-foot {
+    flex: none;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--spacing-xs) var(--spacing-sm);
+    min-height: 40px;
+    margin-top: var(--spacing-sm);
+    padding-top: var(--spacing-sm);
+    border-top: 1px solid var(--color-border-default);
+  }
+  #woc-market-window .wm-foot .wm-rate {
+    margin: 0;
+  }
+  #woc-market-window .wm-banner,
+  #woc-market-window .wm-notice,
+  #woc-market-window .wm-busy {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+    margin: 0;
+    padding: 6px 10px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    background: var(--color-bg-dark);
+    color: var(--color-text-light);
+    font-size: 13px;
+    line-height: 17px;
+  }
+  /* The two states a player must not miss read as errors, on the border token
+     that carries the meaning (never the error TEXT token as an edge). The
+     words carry the state too, so nothing here rests on colour alone. */
+  #woc-market-window .wm-banner-paused,
+  #woc-market-window .wm-notice-error {
+    border-color: var(--color-border-invalid);
+  }
+  #woc-market-window .wm-banner-wallet {
+    border-color: var(--color-accent);
+  }
+  /* The banner's connect shortcut rides the flex row's far edge: the label
+     soaks the remaining width, the button keeps its own. */
+  #woc-market-window .wm-banner-wallet span {
+    flex: 1;
+  }
+  #woc-market-window .wm-banner-wallet button {
+    flex: none;
+    white-space: nowrap;
+  }
+  /* The shared ring (hud.css .woc-spinner) inside a flex line: the container's
+     gap owns the spacing. */
+  #woc-market-window .wm-busy .woc-spinner,
+  #woc-market-window .wm-inline-busy .woc-spinner,
+  #woc-market-window .wm-status .woc-spinner {
+    margin-right: 0;
+  }
+  /* Beside a single bid row rather than in the banner: the banner speaks for the
+     window, and this speaks for the one bid whose bond is being verified, which
+     is what tells the player WHICH payment they are waiting on. */
+  #woc-market-window .wm-inline-busy {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    color: var(--color-text-muted);
+    font-size: 12px;
+    line-height: 15px;
+    white-space: nowrap;
+  }
+  #woc-market-window .wm-rate {
+    margin: var(--spacing-xs) 0 0;
+    color: var(--color-text-muted);
+    font-size: 12px;
+    line-height: 15px;
+  }
+  /* The one-line faces (loading, empty, error, disabled): body type, centred,
+     with air; an error names itself in the error text token and a loading face
+     carries the shared ring, so a failed reach and an empty market never look
+     alike (DESIGN.md 12: errors are icon plus text). */
+  #woc-market-window .wm-status {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: var(--spacing-sm);
+    padding: var(--spacing-lg) var(--spacing-md);
+    color: var(--color-text-muted);
+    text-align: center;
+  }
+  #woc-market-window .wm-status-error {
+    color: var(--color-text-error);
+  }
+  #woc-market-window .wm-status-loading {
+    color: var(--color-text-muted);
+  }
+  #woc-market-window .wm-status .ui-icon {
+    width: 18px;
+    height: 18px;
+  }
+  #woc-market-window .wm-browse {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(240px, 320px);
+    grid-template-rows: auto 1fr;
+    gap: var(--spacing-sm);
+    min-height: 0;
+  }
+  #woc-market-window .wm-pager {
+    grid-column: 1 / -1;
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+    flex-wrap: wrap;
+    /* The control row breathes (the 15 QA sign-off note): top and bottom
+       padding on the whole row, with the sort control leading it. */
+    padding: var(--spacing-sm) 0;
+  }
+  #woc-market-window .wm-pager .ui-icon {
+    width: 20px;
+    height: 20px;
+  }
+  /* EVERY button in the window, not a list of the containers that happen to
+     hold one. The per-container list this replaces missed the Activity tab's
+     pay-bond and pay-settlement buttons, which are the two controls a winning
+     bidder uses to hand over real money: they rendered as unthemed browser
+     chrome under the 40px tap floor. .x-btn is excluded because the shared
+     window-chrome family already owns the close button, floor included.
+     No sheet in this tree carries a generic `button` rule, so a control with
+     no window-scoped rule gets raw UA chrome; every sibling window ships its
+     own, and this is ours. The full 10.1 state set: hover lifts the fill one
+     accent tone and moves the border to the accent, pressed drops one pixel
+     with the gold-900 inner edge (static gold on a guaranteed-dark edge),
+     disabled desaturates and dims but keeps its label, focus is the shared
+     outline ring below. Label type is the ui face at 14/700, never the
+     display face beside inputs and numbers on the same row. */
+  #woc-market-window button:not(.x-btn) {
+    min-width: 40px;
+    min-height: 40px;
+    padding: var(--spacing-sm) var(--spacing-md);
+    font: 700 14px / 17px var(--font-ui);
+    color: var(--color-text-light);
+    background: var(--color-bg-dark);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    cursor: var(--cursor-point);
+    transition:
+      background-color var(--transition-speed) var(--transition-ease),
+      border-color var(--transition-speed) var(--transition-ease);
+  }
+  #woc-market-window button:not(.x-btn):hover:enabled {
+    background: color-mix(in srgb, var(--color-accent) 10%, var(--color-bg-dark));
+    border-color: var(--color-accent);
+  }
+  #woc-market-window button:not(.x-btn):active:enabled {
+    transform: translateY(1px);
+    box-shadow: inset 0 1px 0 var(--color-gold-900);
+  }
+  #woc-market-window button:not(.x-btn):disabled {
+    color: var(--color-text-muted);
+    border-color: var(--color-border-default);
+    opacity: 0.6;
+    filter: saturate(0.6);
+    cursor: var(--cursor-arrow);
+  }
+  /* The row activator and the seller click-through are table cells wearing
+     buttons, so both opt back out of the chrome above (the transparent cell
+     look; wm-row-open's own rule below restores the rest). */
+  #woc-market-window button.wm-row-open,
+  #woc-market-window button.wm-seller-link {
+    padding: 0;
+    font-family: inherit;
+    font-size: inherit;
+    font-weight: inherit;
+    line-height: inherit;
+    background: none;
+    border: 0;
+    box-shadow: none;
+    filter: none;
+    opacity: 1;
+    transform: none;
+  }
+  /* The seller link reads as a link (the one underline in the table): the
+     affordance has to be visible, not hover-only. Inherits the row's text
+     color; the 40px touch floor above deliberately stays. */
+  #woc-market-window button.wm-seller-link {
+    color: inherit;
+    text-decoration: underline;
+    text-underline-offset: 2px;
+    cursor: var(--cursor-point);
+  }
+  /* The item filter's search box sits on the control row beside the selects,
+     at their height, sized so a name fits without owning the row. */
+  #woc-market-window .wm-filter-item input {
+    width: 180px;
+    min-height: 40px;
+    padding: var(--spacing-xs) var(--spacing-sm);
+  }
+  /* The seller pane: Back leads (the escape is never below the fold), the
+     title and rows follow, on the detail pane's list styles. */
+  #woc-market-window .wm-seller-pane {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--spacing-sm);
+    padding: var(--spacing-sm) 0;
+  }
+  #woc-market-window .wm-seller-pane h3 {
+    margin: 0;
+  }
+  /* The `<Guild>` tag beside the title (the shared guild_tag builder, the
+     hs-guild treatment) and the character-age line under it: both quiet,
+     the title keeps the weight. */
+  #woc-market-window .wm-seller-guild {
+    color: var(--color-text-muted);
+    font-size: 13px;
+    font-weight: 400;
+  }
+  /* Fixed geometry: the countdown column is rebuilt every second inside the
+     anti-snipe window and a poll can land a longer bid, so under auto layout
+     every column re-flowed and long names re-wrapped under the pointer.
+     Column widths are pinned by the header cells (table-layout: fixed reads
+     the first row), the money and time cells never wrap and align by digit
+     on the right, and a 16-character seller name breaks rather than widening
+     its column. */
+  #woc-market-window .wm-table {
+    width: 100%;
+    table-layout: fixed;
+    border-collapse: collapse;
+    /* The table is a grid item in the 1fr row, so the default stretch made it
+       as tall as the pane and a browser distributes a table's spare height
+       across its rows: one listing rendered its row pinned to the bottom, a
+       screen away from the header. Top-align it and let it size to content. */
+    align-self: start;
+  }
+  #woc-market-window .wm-table th,
+  #woc-market-window .wm-table td {
+    padding: 6px var(--spacing-sm);
+    text-align: left;
+    vertical-align: middle;
+    border-bottom: 1px solid var(--color-border-default);
+  }
+  #woc-market-window .wm-table th {
+    font: 700 12px / 15px var(--font-ui);
+    color: var(--color-text-muted);
+    border-bottom-color: var(--border);
+  }
+  #woc-market-window .wm-table th:nth-child(1) {
+    width: 42%;
+  }
+  #woc-market-window .wm-table th:nth-child(2) {
+    width: 16%;
+  }
+  #woc-market-window .wm-table th:nth-child(3) {
+    width: 18%;
+  }
+  #woc-market-window .wm-table th:nth-child(4) {
+    width: 12%;
+  }
+  #woc-market-window .wm-table th:nth-child(5) {
+    width: 12%;
+  }
+  /* Every cell sits left-aligned under its left-aligned header (the 15 QA
+     sign-off note), and a long value WRAPS to a second line rather than
+     squeezing or clipping: no nowrap, no right-aligned number columns. */
+  #woc-market-window .wm-table td {
+    overflow-wrap: anywhere;
+  }
+  /* A row is one control (the activator button carries the keyboard reach), so
+     it answers the pointer like one: the house cursor and a fill step on hover,
+     and the selected row wears the accent as a left bar plus a tint (two
+     signals, never colour alone; one tint, never five restarting gradients). */
+  #woc-market-window .wm-row {
+    cursor: var(--cursor-point);
+  }
+  #woc-market-window .wm-row:hover td {
+    background: color-mix(in srgb, var(--color-accent) 6%, transparent);
+  }
+  #woc-market-window .wm-row-selected td {
+    background: color-mix(in srgb, var(--color-accent) 12%, transparent);
+  }
+  #woc-market-window .wm-row-selected td:first-child {
+    box-shadow: inset 3px 0 0 var(--color-accent);
+  }
+  /* The item cell: the shared .item-icon quality frame (the bag, vendor and
+     trade rows' family, pulled in by class) beside a name that wraps by design
+     rather than clipping. The wm-* classes are the tooltip hooks; the family
+     rule owns the look. */
+  #woc-market-window .wm-icon,
+  #woc-market-window .wm-combo-icon {
+    flex: none;
+  }
+  #woc-market-window .wm-name,
+  #woc-market-window .wm-combo-name {
+    font-weight: 700;
+    min-width: 0;
+    overflow-wrap: anywhere;
+  }
+  /* The one icon-plus-name pair every context reuses (a row, the detail card,
+     the chosen cell, an activity row): its own flex box, so the two can never
+     wrap apart in a wrapping row, and every context spaces them alike. */
+  #woc-market-window .wm-item {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    min-width: 0;
+    vertical-align: middle;
+  }
+  /* The row activator wraps the item cell, so it must read as the cell it
+     replaced (transparent, inherited type) while staying a real focusable
+     button for keyboard and screen-reader reach. Inline-flex, so the state
+     chips that follow it in the same cell sit beside the name when there is
+     room and wrap under it only when there is not. */
+  #woc-market-window .wm-row-open {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    min-height: 40px;
+    max-width: 100%;
+    padding: 0;
+    color: inherit;
+    font: inherit;
+    text-align: left;
+    background: none;
+    border: 0;
+    cursor: var(--cursor-point);
+    vertical-align: middle;
+  }
+  /* State chips (reserve met / not met, your listing, purchase in progress):
+     the badge grammar (DESIGN.md 10.4) at the 12px floor, never a pill; the
+     figure a bidder acts on stays whole on one line. */
+  #woc-market-window .wm-reserve,
+  #woc-market-window .wm-mine,
+  #woc-market-window .wm-locked {
+    display: inline-block;
+    margin-left: var(--spacing-xs);
+    padding: 1px var(--spacing-xs);
+    border: 1px solid var(--color-border-default);
+    border-radius: var(--radius-sm);
+    font: 700 12px / 15px var(--font-ui);
+    color: var(--color-text-muted);
+    white-space: nowrap;
+    vertical-align: middle;
+  }
+  /* met vs not_met were both emitted but only the shared base was styled, so
+     the two states of a figure a bidder acts on read identically at a glance.
+     They MUST sit after that base: it sets the `border` shorthand, which resets
+     border-color, and at equal specificity the later rule wins. The text still
+     names the state, so nothing here depends on color alone. */
+  #woc-market-window .wm-reserve-met {
+    border-color: var(--color-accent);
+    color: var(--color-accent);
+  }
+  #woc-market-window .wm-reserve-not_met {
+    border-color: var(--color-border-invalid);
+  }
+  /* The detail card: a themed well with the structural edge, its content laid
+     out as one column with a single rhythm (the flex gap), so the seller line,
+     the times, the price, the estimate, the form and the two commit controls
+     never invent their own spacing. It sticks to the top of the browse pane
+     while a long page scrolls under it, so a row picked deep in the list still
+     shows its bid form in view; its own scroll keeper handles the overflow. */
+  #woc-market-window .wm-detail {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-sm);
+    align-self: start;
+    position: sticky;
+    top: 0;
+    /* The pane stops at the window's own cap minus the chrome above and below
+       it (title, tab strip, strip, foot). --app-vh, not raw vh: the file's
+       idiom, and the only one that follows the mobile browser's live viewport.
+       The 100dvh fallback is defence in depth (tokens.css seeds --app-vh on
+       :root): if the token were ever unset the declaration would go invalid
+       at computed-value time and the cap would land on its initial none,
+       losing the pane's own scroll. The mobile sheet drops the cap entirely
+       (position: static there), so this is the desktop pane's rule alone. */
+    max-height: calc(min(var(--app-vh, 100dvh) * 0.84, 700px) - 132px);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    padding: var(--window-pad);
+    overflow-y: auto;
+    min-height: 0;
+    background: color-mix(in srgb, var(--color-bg-dark) 55%, transparent);
+  }
+  #woc-market-window .wm-detail > p,
+  #woc-market-window .wm-detail > h3,
+  #woc-market-window .wm-detail > h4 {
+    margin: 0;
+  }
+  #woc-market-window .wm-detail > h4 {
+    margin-top: var(--spacing-sm);
+  }
+  /* The estimate slot keeps its height before the estimate lands (two to
+     three round trips after the row click), so the price field and the money
+     buttons never move under a hand that is already typing. */
+  #woc-market-window .wm-estimate {
+    min-height: 15px;
+  }
+  /* Buy now is a SECOND, independent way to take the same listing, not the bid
+     form's submit button: it sat flush against Place Bid, which read as one pair
+     of buttons and invited a misclick on a surface that spends money. Its own row
+     at full width, with air above and below it (the pane's rhythm plus one step),
+     separates the two decisions. */
+  #woc-market-window .wm-detail button[data-action="buy-now"] {
+    display: block;
+    width: 100%;
+    margin-top: var(--spacing-sm);
+    margin-bottom: var(--spacing-sm);
+  }
+  /* Cancel is destructive and belongs to the LISTING, not to the bid form it
+     follows: full width, a step of air, ordinary chrome (no borrowed divider),
+     and the danger colour on hover only, so a resting card carries no red. */
+  #woc-market-window .wm-detail button[data-action="cancel-listing"] {
+    display: block;
+    width: 100%;
+    margin-top: var(--spacing-md);
+    background: transparent;
+  }
+  #woc-market-window .wm-detail button[data-action="cancel-listing"]:hover:enabled {
+    color: var(--color-text-error);
+    border-color: var(--color-border-invalid);
+    background: transparent;
+  }
+  #woc-market-window .wm-bid-form,
+  #woc-market-window .wm-sell-form,
+  #woc-market-window .wm-quote {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-sm);
+    margin-top: var(--spacing-sm);
+  }
+  /* The column gap does not apply after the LAST child, so Place Bid sat flush
+     against whatever came next. This is the bid half of the same spacing fix as
+     the buy-now button above. */
+  #woc-market-window .wm-detail .wm-bid-form {
+    margin-bottom: var(--spacing-sm);
+  }
+  #woc-market-window .wm-bid-form label,
+  #woc-market-window .wm-sell-form label {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-xs);
+    font-size: 13px;
+    line-height: 17px;
+    color: var(--color-text-muted);
+  }
+  #woc-market-window .wm-bid-form p,
+  #woc-market-window .wm-sell-form p,
+  #woc-market-window .wm-quote p {
+    margin: 0;
+  }
+  /* The disclosures a player reads before the money button: one inset well of
+     13/17 secondary text (never a wall of 12px fine print), grouped so the
+     commit control below them reads as the end of one thought. */
+  #woc-market-window .wm-disclosures {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-xs);
+    padding: var(--spacing-sm);
+    border: 1px solid var(--color-border-default);
+    border-radius: var(--radius-sm);
+    background: color-mix(in srgb, var(--color-bg-dark) 70%, transparent);
+  }
+  /* The collapsed state the Bid terms toggle drives. Its own arm because the
+     flex rule above outranks the UA's [hidden] display, the same trap the
+     combo listbox answers below. */
+  #woc-market-window .wm-disclosures[hidden] {
+    display: none;
+  }
+  /* The disclosure toggle: the window's ordinary control chrome sized to its
+     label, with a caret that answers to aria-expanded so the state is visible
+     as well as spoken. */
+  #woc-market-window .wm-terms-toggle {
+    align-self: start;
+    display: inline-flex;
+    align-items: center;
+    gap: var(--spacing-xs);
+  }
+  #woc-market-window .wm-terms-toggle::before {
+    content: "";
+    border-top: 4px solid transparent;
+    border-bottom: 4px solid transparent;
+    border-left: 6px solid currentColor;
+    transition: transform var(--transition-speed) var(--transition-ease);
+  }
+  #woc-market-window .wm-terms-toggle[aria-expanded="true"]::before {
+    transform: rotate(90deg);
+  }
+  #woc-market-window .wm-note,
+  #woc-market-window .wm-sales-empty {
+    margin: 0;
+    color: var(--color-text-muted);
+    font-size: 13px;
+    line-height: 17px;
+  }
+  /* The seller's resolved fee and net for the price being typed: the figures
+     the seller commits on, so parchment, never fine print. */
+  #woc-market-window .wm-sell-fee {
+    color: var(--color-text-light);
+    font-variant-numeric: tabular-nums;
+  }
+  /* Search box, dropdown, then the chosen item. Stacked rather than the old
+     wrapped grid of every bag item: a full bag is 70+ tradable pieces and the
+     grid pushed the whole form below the fold. The sell column caps its width
+     so a price field is a field, not a nine-hundred-pixel bar. */
+  #woc-market-window .wm-sell {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-sm);
+    min-height: 0;
+    max-width: 520px;
+  }
+  #woc-market-window .wm-sell-list {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-sm);
+  }
+  #woc-market-window .wm-sell-pick {
+    font-size: 13px;
+    line-height: 17px;
+    color: var(--color-text-muted);
+  }
+  /* The combobox stacks its parts IN FLOW, and the listbox is deliberately not
+     absolutely positioned. .wm-body is an overflow-y: auto ancestor, so an
+     absolute menu was clipped to a two-pixel sliver: it still had layout, so it
+     looked open and its options reported real rects, but the pointer hit the
+     window behind it and nothing was clickable. Escaping the clip would mean
+     measuring and portalling, which is the forced-reflow read this cold window
+     may not do. In flow the form below simply shifts down while the list is open. */
+  #woc-market-window .wm-combo {
+    display: flex;
+    flex-direction: column;
+  }
+  #woc-market-window .wm-combo-input {
+    width: 100%;
+  }
+  /* The selected item lives INSIDE the control: a real cell (so the hover stats
+     card still works) plus the clear button pinned to the far right. */
+  #woc-market-window .wm-combo-chosen {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+    min-height: 40px;
+    padding: 6px var(--spacing-sm);
+    border: 1px solid var(--color-accent);
+    border-radius: var(--radius-sm);
+    background: var(--color-bg-dark);
+  }
+  #woc-market-window .wm-combo-clear {
+    margin-left: auto;
+    flex: none;
+  }
+  #woc-market-window .wm-combo-list {
+    margin-top: 2px;
+    max-height: 240px;
+    overflow-y: auto;
+    background: var(--panel-base);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    box-shadow: 0 6px calc(16px * var(--fx-shadow, 1)) var(--color-art-shadow);
+  }
+  #woc-market-window .wm-combo-list[hidden] {
+    display: none;
+  }
+  #woc-market-window .wm-combo-item {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+    min-height: 40px;
+    padding: var(--spacing-xs) var(--spacing-sm);
+    cursor: var(--cursor-point);
+  }
+  /* Hover and keyboard highlight are the SAME visual state: the active option is
+     the one Enter commits, whichever input moved it there. */
+  #woc-market-window .wm-combo-item:hover,
+  #woc-market-window .wm-combo-active {
+    background: color-mix(in srgb, var(--color-accent) 14%, transparent);
+  }
+  #woc-market-window .wm-combo-empty {
+    padding: 10px var(--spacing-sm);
+    color: var(--color-text-muted);
+    font-size: 13px;
+    line-height: 17px;
+  }
+  /* The activity lists: three sections of aligned rows. Each row is a grid
+     (item | amount | status | controls) so amounts and statuses line up down
+     the list instead of starting wherever the item name ends; the failed
+     payment's WHY sentence spans the row underneath. */
+  #woc-market-window .wm-activity ul {
+    list-style: none;
+    margin: 0 0 var(--spacing-sm);
+    padding: 0;
+  }
+  #woc-market-window .wm-activity li {
+    display: grid;
+    grid-template-columns: minmax(0, 2fr) minmax(88px, auto) minmax(0, 1.4fr) auto;
+    align-items: center;
+    gap: var(--spacing-xs) var(--spacing-sm);
+    padding: var(--spacing-xs) 0;
+    border-bottom: 1px solid var(--color-border-default);
+  }
+  #woc-market-window .wm-act-item {
+    min-width: 0;
+  }
+  #woc-market-window .wm-act-amount {
+    text-align: right;
+    white-space: nowrap;
+  }
+  #woc-market-window .wm-act-status {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--spacing-xs) var(--spacing-sm);
+    min-width: 0;
+  }
+  #woc-market-window .wm-act-actions {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    gap: var(--spacing-xs);
+    white-space: nowrap;
+  }
+  #woc-market-window .wm-act-actions:empty {
+    display: none;
+  }
+  /* The failed payment's WHY line: a full sentence, so it takes its own row
+     under the figures instead of competing with the controls. Secondary text
+     at body size: it is an outcome the buyer acts on, not metadata. */
+  #woc-market-window .wm-fail-why {
+    grid-column: 1 / -1;
+    margin: 0;
+    color: var(--color-text-light);
+    font-size: 13px;
+    line-height: 17px;
+  }
+  /* A section with nothing in it says so instead of leaving a heading over
+     empty space. */
+  #woc-market-window .wm-activity-empty {
+    margin: 0 0 var(--spacing-sm);
+    color: var(--color-text-muted);
+    font-size: 13px;
+    line-height: 17px;
+  }
+  /* The strikes / suspension notice leads the tab (it explains every refused
+     control below it) and reads at body size in the error voice, with the
+     glyph beside the words. */
+  #woc-market-window .wm-strikes {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+    margin: 0 0 var(--spacing-sm);
+    color: var(--color-text-error);
+  }
+  #woc-market-window .wm-strikes .ui-icon {
+    width: 18px;
+    height: 18px;
+  }
+  /* The quote (confirm payment) face: a confirm surface, so it wears the well
+     treatment at a reading width, with the total leading the legs at full
+     weight and the two decisions in one row below. */
+  #woc-market-window .wm-quote {
+    max-width: 480px;
+    padding: var(--spacing-md);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    background: color-mix(in srgb, var(--color-bg-dark) 55%, transparent);
+  }
+  #woc-market-window .wm-quote-total {
+    font-weight: 700;
+    color: var(--color-text-light);
+  }
+  #woc-market-window .wm-quote-actions {
+    display: flex;
+    gap: var(--spacing-sm);
+    flex-wrap: wrap;
+  }
+  /* The tab buttons, the primary action, and the row activator. These three
+     shipped with markup but no rule, so they rendered as raw browser chrome
+     (white boxes, system font) against the dark panel: the exact
+     default-browser-chrome look src/ui/CLAUDE.md forbids. */
+  /* button.wm-tab, not .wm-tab: the window-wide `button:not(.x-btn)` rule above
+     is (1,1,1) because :not() carries its argument's specificity, so a (1,1,0)
+     class selector loses to it however late it sits and the SELECTED tab stopped
+     reading as selected. Matching its specificity and coming later wins. */
+  #woc-market-window button.wm-tab {
+    flex: 1;
+    min-height: 32px;
+    margin-bottom: -1px;
+    padding: 7px 10px;
+    font: 700 14px / 17px var(--font-ui);
+    color: var(--color-text-muted);
+    cursor: var(--cursor-point);
+    background: transparent;
+    border: 0;
+    border-bottom: 2px solid transparent;
+    border-radius: 0;
+    text-align: center;
+  }
+  #woc-market-window button.wm-tab:hover {
+    color: var(--color-text-light);
+    background: transparent;
+  }
+  #woc-market-window button.wm-tab-selected {
+    color: var(--color-accent);
+    border-bottom-color: var(--color-accent);
+    background: transparent;
+  }
+  /* The one primary (gold) button per face (DESIGN.md 10.1): the accent mixed
+     toward the panel as a subdued gold-brown fill, the accent as its edge,
+     primary text; disabled it drops back to the ordinary chrome. */
+  #woc-market-window button.wm-primary {
+    color: var(--color-text-light);
+    background: color-mix(in srgb, var(--color-accent) 22%, var(--panel-base));
+    border-color: var(--color-accent);
+  }
+  #woc-market-window button.wm-primary:hover:enabled {
+    background: color-mix(in srgb, var(--color-accent) 32%, var(--panel-base));
+  }
+  #woc-market-window button.wm-primary:disabled {
+    color: var(--color-text-muted);
+    border-color: var(--color-border-default);
+    background: var(--color-bg-dark);
+  }
+  /* The money-entry controls (DESIGN.md 10.7): the strong fill with the
+     structural edge, at the 40px height of the buttons they sit beside. No
+     sheet in this tree has a generic input/select rule (base.css normalizes
+     only range/number/checkbox/radio and textarea), so every window themes its
+     own; without this the bid amount and all three dropdowns rendered as white
+     browser chrome on a dark panel. The 16px coarse-pointer font floor in
+     base.css targets these controls directly and still wins. */
+  #woc-market-window input[type="text"],
+  #woc-market-window input[type="number"],
+  #woc-market-window select {
+    min-height: 40px;
+    padding: var(--spacing-sm) 10px;
+    color: var(--color-text-light);
+    background: var(--color-bg-dark);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    font: 400 14px / 19px var(--font-ui);
+  }
+  #woc-market-window input::placeholder {
+    color: var(--color-text-muted);
+    opacity: 1;
+  }
+  #woc-market-window button.wm-tab:focus-visible,
+  #woc-market-window button.wm-primary:focus-visible,
+  #woc-market-window .wm-row-open:focus-visible,
+  #woc-market-window button:not(.x-btn):focus-visible,
+  #woc-market-window input:focus-visible,
+  #woc-market-window select:focus-visible,
+  #woc-market-window .wm-terms-link:focus-visible {
+    outline: 2px solid var(--color-border-focus);
+    outline-offset: 2px;
+  }
+  /* Written as label.<class>, not .<class>: these two ARE the labels the
+     stacking `.wm-bid-form label` / `.wm-sell-form label` rules above match, and
+     at equal specificity the later rule wins. A plain .wm-terms lost the tie and
+     the checkbox rendered on its own line above its own caption. The consent
+     row keeps the caption and its link on one line at one size. */
+  #woc-market-window .wm-terms-row {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--spacing-xs) var(--spacing-sm);
+  }
+  #woc-market-window label.wm-terms,
+  #woc-market-window label.wm-offer-next,
+  #woc-market-window .wm-sort {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 6px;
+    font-size: 13px;
+    line-height: 17px;
+    color: var(--color-text-light);
+  }
+  /* The consent box the listing and bid actions gate on, floored at the 24px
+     absolute minimum on desktop too: it shipped at the 13px UA default, which
+     is under the floor for the control that stands in for acceptance. */
+  #woc-market-window label.wm-terms input[type="checkbox"],
+  #woc-market-window label.wm-offer-next input[type="checkbox"] {
+    width: 24px;
+    height: 24px;
+    margin: 0;
+    flex: 0 0 auto;
+  }
+  #woc-market-window .wm-sort select {
+    min-width: 160px;
+  }
+  /* The terms link beside the consent checkbox (draft Terms 10.3: linked at
+     the moment of acceptance): interactive text in the themed accent. */
+  #woc-market-window .wm-terms-link {
+    font-size: 13px;
+    line-height: 17px;
+    color: var(--color-accent);
+    text-decoration: underline;
+  }
+  #woc-market-window .wm-detail-item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  #woc-market-window .wm-estimate,
+  #woc-market-window .wm-bid-equiv,
+  #woc-market-window .wm-min-next {
+    color: var(--color-text-muted);
+    font-size: 12px;
+    line-height: 15px;
+  }
+  /* A price the connected wallet cannot cover: the figure itself carries it,
+     because that is the number being typed at. The sentence below and the
+     disabled button carry the same state, so it never rests on colour alone. */
+  #woc-market-window .wm-bid-equiv.over-balance,
+  #woc-market-window .wm-over-balance {
+    color: var(--color-text-error);
+  }
+  #woc-market-window .wm-over-balance {
+    margin: 0;
+    font-size: 13px;
+    line-height: 17px;
+  }
+  /* An expired quote reads as an error at body size, never as a muted note. */
+  #woc-market-window .wm-quote-expired {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+    color: var(--color-text-error);
+  }
+  #woc-market-window .wm-quote-expired .ui-icon {
+    width: 18px;
+    height: 18px;
+  }
+  #woc-market-window .wm-sales {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    font-size: 13px;
+    line-height: 17px;
+    color: var(--color-text-muted);
   }
 }
 #talents-window .tal-rows {

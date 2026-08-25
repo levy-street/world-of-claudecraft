@@ -81,6 +81,8 @@ export const ERROR_CODES = deepFreeze({
   'account.deactivated': { params: [] },
   // identity: "account not found" (the account row vanished mid-session)
   'account.not_found': { params: [] },
+  // identity: "this account already has a password, use change password instead"
+  'account.password_already_set': { params: [] },
 
   // character: character creation, selection, and world-entry failures.
   // identity: "invalid character name (2-16 letters)"
@@ -236,6 +238,126 @@ export const ERROR_CODES = deepFreeze({
   'cheater_mark.invalid_duration': { params: [] },
   // A lift was asked for on an account that is not wearing the tag (409).
   'cheater_mark.not_marked': { params: [] },
+
+  // --- $WOC Exchange family codes (server/woc_market_routes.ts). The whole
+  // surface is config-gated: with WOC_MARKET_ENABLED unset every mutating
+  // route answers woc_market.disabled. ---
+
+  // Request failed schema validation (400).
+  'woc_market.invalid_input': { params: [] },
+  // The marketplace is not enabled on this server (feature-off 403).
+  'woc_market.disabled': { params: [] },
+  // The economy service or its price oracle is down; purchases and
+  // settlements are suspended while auctions keep counting down (503).
+  'woc_market.paused': { params: [] },
+  // A verified wallet link is required for this action (403).
+  'woc_market.wallet_required': { params: [] },
+  // A directed p2p offer's named recipient has no verified wallet, so they
+  // could not accept a $WOC payment (403).
+  'woc_market.recipient_wallet_required': { params: [] },
+  // A directed p2p offer addressed to the sender's own account (400).
+  'woc_market.self_offer': { params: [] },
+  // The directed p2p offer's acceptance window elapsed (410).
+  'woc_market.offer_expired': { params: [] },
+  // The variable-token settlement terms must be accepted first (403).
+  'woc_market.terms_required': { params: [] },
+  // RETIRED, never enforced (B6/R1): no server path has ever raised either
+  // totp code, and none ever will; the wallet step-up
+  // (woc_market.stepup_* below, server/woc_market_stepup.ts) is the real
+  // second factor on the custody movers. Both rows stay per the append-only
+  // contract above; their catalog entries stay with them (the parity test's
+  // set-equality dimension).
+  'woc_market.totp_required': { params: [] },
+  'woc_market.totp_invalid': { params: [] },
+  // The account is under a marketplace suspension from settlement defaults (403).
+  'woc_market.suspended': { params: [] },
+  // The character does not exist on this realm under this account, or the
+  // seller is not online to escrow the copy (400).
+  'woc_market.character_invalid': { params: [] },
+  // No such listing, bid, settlement, or sale (404).
+  'woc_market.not_found': { params: [] },
+  // The resource belongs to a different account (404, anti-enumeration).
+  'woc_market.not_yours': { params: [] },
+  // The listing or settlement is no longer open for this action (409).
+  'woc_market.not_active': { params: [] },
+  // Sellers cannot bid on or buy their own listings (403).
+  'woc_market.own_listing': { params: [] },
+  // A listing with a standing or pending bid cannot be cancelled (409).
+  'woc_market.has_bids': { params: [] },
+  // The bid does not clear the standing bid plus its increment (400).
+  'woc_market.bid_too_low': { params: [] },
+  // One unconfirmed bid per listing per account at a time (409).
+  'woc_market.already_pending': { params: [] },
+  // The wallet's $WOC balance does not cover the bid plus its bond (400).
+  'woc_market.insufficient_balance': { params: [] },
+  // The economy service could not issue a quote right now (503).
+  'woc_market.quote_unavailable': { params: [] },
+  // The quote or settlement window has expired; request a fresh one (409).
+  'woc_market.quote_expired': { params: [] },
+  // The bid is no longer awaiting its bond (409).
+  'woc_market.not_pending': { params: [] },
+  // The chain transaction was refused or did not match the quote (409).
+  'woc_market.confirm_failed': { params: [] },
+  // A submitted signature is still awaiting the chain's verdict: quote
+  // refreshes and abandons wait for it rather than orphan money in flight (409).
+  'woc_market.confirm_in_flight': { params: [] },
+  // Another buyer holds the short buy-now lock on this listing (409).
+  'woc_market.buy_now_locked': { params: [] },
+  // The seller stamped cancel-intent: the listing takes no new lock claims or
+  // bids and closes once the current window resolves (409).
+  'woc_market.cancel_pending': { params: [] },
+  // The claimer recently abandoned a buy-now window (per-listing re-claim
+  // cooldown, or the account-wide abandons-per-hour cap) (409).
+  'woc_market.claim_cooldown': { params: ['retryAfterSeconds'] },
+  // This bid's payment window is closing: a fresh quote would outlive the
+  // bid's own lapse deadline, inviting a payment nothing could record (409).
+  'woc_market.bond_window_closed': { params: [] },
+  // A buyer's payment for this listing is past the point of no return;
+  // cancel/suspend must wait for it to resolve (409).
+  'woc_market.settlement_in_flight': { params: [] },
+  // The listing row is briefly held by another market transaction; plain
+  // contention, retry immediately (409).
+  'woc_market.contended': { params: [] },
+  // An admin sale correction is blocked by a standing non-excluded sale row
+  // for the same listing (409).
+  'woc_market.sale_conflict': { params: [] },
+  // The listing has no buy-now price (400).
+  'woc_market.no_buy_now': { params: [] },
+  // The per-account active-listing cap is reached (409).
+  'woc_market.cap_reached': { params: [] },
+  // The referenced inventory copy changed or moved; re-select it (409).
+  'woc_market.stale_item': { params: [] },
+  // One live directed deal per (buyer, seller) pair; resolve the standing
+  // one first (the strike-farming bound) (409).
+  'woc_market.offer_pending': { params: [] },
+  // A directed acceptance offered a copy whose fingerprint does not match
+  // the one the buyer agreed to at offer time (bait-and-switch guard) (409).
+  'woc_market.item_mismatch': { params: [] },
+  // The item is not eligible for the $WOC Exchange under this server's
+  // policy (soulbound, bound, quest, below the quality floor, excluded) (400).
+  'woc_market.not_eligible': { params: [] },
+  // Listing parameters out of range (start/reserve/buy-now/duration) (400).
+  'woc_market.invalid_params': { params: [] },
+  // That transaction signature was already submitted (409).
+  'woc_market.signature_reused': { params: [] },
+  // The copy is under the owner's own item lock (issue 3042); unlocking it in
+  // the bags is the fix, so it gets its own code, not a not_eligible collapse
+  // (400).
+  'woc_market.item_locked': { params: [] },
+  // Wallet step-up on the custody movers (B6/R1): listing and directed
+  // acceptance require a fresh challenge signed by the linked wallet.
+  // Moving custody without one (403).
+  'woc_market.stepup_required': { params: [] },
+  // The challenge is unknown, already used, or not this account's (403).
+  'woc_market.stepup_challenge_invalid': { params: [] },
+  // The challenge lapsed before it was used; request a fresh one (410).
+  'woc_market.stepup_challenge_expired': { params: [] },
+  // The linked wallet changed since the challenge was issued (403).
+  'woc_market.stepup_wallet_mismatch': { params: [] },
+  // The challenge authorizes a different action, item, or price (403).
+  'woc_market.stepup_binding_mismatch': { params: [] },
+  // The wallet signature did not verify against the challenge (403).
+  'woc_market.stepup_signature_invalid': { params: [] },
 } as const);
 
 /** A stable error code: one of the keys of ERROR_CODES. */

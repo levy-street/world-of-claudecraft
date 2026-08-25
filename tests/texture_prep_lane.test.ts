@@ -296,7 +296,7 @@ describe('the gates that run the lane (source pins)', () => {
     expect(start).toBeGreaterThan(-1);
     expect(end).toBeGreaterThan(start);
     const gate = source.slice(start, end);
-    const linkAt = gate.indexOf('const linked = this.liveCompileGates.runPieces(');
+    const linkAt = gate.indexOf('this.liveCompileGates.runPieces(');
     const uploadAt = gate.indexOf(
       '.then((gate) => this.uploadGateTexturesGated(target, priority).then(() => gate))',
     );

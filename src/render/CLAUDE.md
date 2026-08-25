@@ -206,6 +206,15 @@ NEW subsystem's warm-up must land as a manifest entry, in the right lane:
   because `requestIdleCallback` cannot preempt synchronous work once it
   starts; `CONSTRAINED_PREWARM_RESUME` in `prewarm_policy.ts` names what
   constrained devices push to the background instead of the entry).
+- The initial page entry has one shared first-paint boundary. Before it,
+  `programs.compile-submit` admits only the settled visible `scene` group;
+  hidden archetype/material catalogs become bounded
+  `programs.compile-post-paint` debt. Ordinary `LIVE_VIEW` entity gates and
+  scenery reveal compiles wait on the same boundary, while target/casting
+  `ACTIONABLE_VIEW` gates still start immediately. `post.initial-frame` is the
+  presentation-owned exception: it renders the composer once with the scene
+  root hidden, so fullscreen post shaders and targets warm under the curtain
+  without turning hidden catalog debt into a whole-world draw.
 - `prewarm_pass.ts` sequences the BACKGROUND zone prewarm (live frames keep
   rendering, so its groups MUST stay invisible; hidden objects still link
   their programs because compile traverses via `scene.traverse`, not
@@ -380,7 +389,11 @@ NEW subsystem's warm-up must land as a manifest entry, in the right lane:
   carries the same counts, plus the `reveal` aggregate in
   `gpu_prep_events.ts` (keys held, roots held, roots revealed piecewise, roots
   revealed on a reach floor, roots still compiling at a watchdog), so a capture
-  can attribute a first-draw stall to the roots that never linked in time.
+  can attribute a first-draw stall to the roots that never linked in time. On
+  initial page entry, neither deadline starts while the loading curtain owns
+  presentation: `startAfterInitialPaint` starts the reveal compile and both
+  clocks together after the first painted world frame. Later arrivals read the
+  already-settled page boundary and retain the normal immediate clock.
 - **Every gate names its stand-in: NEVER LEAVE AN ENTITY WITH NO REPRESENTATION.**
   A gate hides a still-linking object so its reveal draw cannot stall the frame;
   the link is not cancellable and the gate timeout is diagnostic only, so the

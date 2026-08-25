@@ -51,16 +51,18 @@ const repoRoot = fileURLToPath(new URL('..', import.meta.url));
 // arrangement deterministically), and bg_respond as a send + dispatch pair
 // (the release's battleground queue-pop confirmation).
 // The Reliquary packet's nameplate border adds deed_set_border as a send +
-// dispatch pair, the exact sibling of deed_set_title, and this branch adds
-// tabPrev as a send + dispatch pair (the backward half of the Tab target
-// cycle, Shift+Tab by default; no payload, the sim walks the same ordered
-// list in reverse). NOTE (merge trap): both
+// dispatch pair, the exact sibling of deed_set_title. The v0.37.0 release adds
+// tabPrev as a send + dispatch pair (the backward half of the Tab target cycle,
+// Shift+Tab by default; no payload, the sim walks the same ordered list in
+// reverse), and this branch's neutral trade close adds trade_close as a send +
+// dispatch pair, the sibling of trade_cancel. The release's player item lock
+// (issue 3042) adds lock_item as a send + dispatch pair. NOTE (merge trap): both
 // sides of every v0.36.0 sync bump these counts independently, and git has
 // auto-merged identical numbers before while the real total was higher; the
 // merged tree carries BOTH sides' pairs. Only the suite says what they really
 // are, and the numbers below were set from a run, not from this narrative.
-const EXPECTED_SEND_COUNT = 199;
-const EXPECTED_DISPATCH_COUNT = 212;
+const EXPECTED_SEND_COUNT = 200;
+const EXPECTED_DISPATCH_COUNT = 213;
 const EXPECTED_DISPATCH_ONLY_COUNT = 13;
 
 // The chat sub-channel routing switch (server/game.ts `switch

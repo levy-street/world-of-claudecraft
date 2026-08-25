@@ -103,19 +103,20 @@ describe('canonical Talents V2 row registry', () => {
     // The mage rework (e0842ee38) replaced the fire crit-damage mastery with
     // Ignition: spell crits bank 40% of their damage as a stacking burn.
     expect(TALENTS.mage.specs.find((spec) => spec.id === 'fire')?.mastery.effect).toEqual({
-      global: { ignitionPct: 0.4 },
+      global: { ignitionPct: 0.3 },
       stats: { crit: 0.02 },
     });
     expect(TALENTS.paladin.specs.find((spec) => spec.id === 'holy')?.mastery.effect).toEqual({
       global: { critDmgHealPct: 0.5 },
     });
     // Balance pass: False Face is +25% crit damage plus the Duskveil
-    // stealth-speed identity.
+    // stealth-speed identity, now the full removal of the stealth slow
+    // (buffPct 1 doubles the 0.5 aura multiplier to 1.0).
     expect(TALENTS.rogue.specs.find((spec) => spec.id === 'subtlety')?.mastery.effect).toEqual({
       global: { critDmgPhysPct: 0.25 },
       ability: [
-        { ability: 'stealth', buffPct: 0.5 },
-        { ability: 'vanish', buffPct: 0.5 },
+        { ability: 'stealth', buffPct: 1 },
+        { ability: 'vanish', buffPct: 1 },
       ],
     });
 

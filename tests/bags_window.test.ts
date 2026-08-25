@@ -232,7 +232,7 @@ describe('bags_window: bank-deposit mode wiring', () => {
   it('registers the deposit prompt class so close() tears it down (no orphaned modal)', () => {
     expect(painter).toContain('.bank-deposit-prompt');
     expect(painter).toContain(
-      "'.discard-item-prompt, .sell-quantity-prompt, .bank-deposit-prompt'",
+      "'.discard-item-prompt, .sell-quantity-prompt, .sell-confirm-prompt, .bank-deposit-prompt'",
     );
   });
 
@@ -394,7 +394,7 @@ describe('bags_window: right-click uses, dragging destroys/equips', () => {
     expect(ctx).not.toContain('showDiscardItemPrompt');
     expect(ctx).not.toContain('bagDestroyAction');
     // The vendor's Ctrl/Meta split-stack sell survives untouched.
-    expect(ctx).toContain('this.sellBagItem(s, ev)');
+    expect(ctx).toContain('this.sellBagItem(item, s, ev)');
   });
 
   it('every stack is draggable outside the transactional modes (not just hotbar items)', () => {
@@ -421,6 +421,65 @@ describe('bags_window: right-click uses, dragging destroys/equips', () => {
     expect(painter).toContain("t('hudChrome.bags.dragEquipHint')");
     expect(painter).toContain("t('hudChrome.bags.dragDestroyHint')");
     expect(painter).not.toContain('rightClickDestroy');
+  });
+});
+
+describe('bags_window: a vendor click confirms before selling anything but true junk', () => {
+  // The reported bug: selling gray junk one item at a time (a plain click while
+  // the vendor is open) had no per-item confirmation, so a single stray click
+  // could vendor an adjacent, unrelated, enchanted item with no recourse beyond
+  // the bounded buyback list. vendorSellIsInstant (bags_view.ts) is the pure
+  // gate; the real dispatch (which command each modifier sends, the stale-copy
+  // refusal, the focus landing) is behaviorally pinned in
+  // tests/bags_vendor_sell_confirm.test.ts against the real BagsWindow; these
+  // source pins are the no-magic-values-file's own idiom for anchoring the
+  // wiring text they exercise.
+  it('imports vendorSellIsInstant from bags_view and gates the plain-click arm on it', () => {
+    expect(painter).toContain('vendorSellIsInstant');
+    const body = painter.slice(
+      painter.indexOf('private sellBagItem('),
+      painter.indexOf('private showSellConfirmPrompt('),
+    );
+    expect(body).toContain(
+      'const instant = vendorSellIsInstant(item, slot.instance, slot.craftedRecipeId);',
+    );
+    expect(body).toContain('!instant');
+    expect(body).toContain('this.showSellConfirmPrompt(item, slot)');
+    // Ctrl/meta and shift both still confirm a non-instant sale (the review-round
+    // fix): only the id-scoped bulk quantity prompt or the per-slot confirm
+    // prompt, never an unconfirmed instant sellItem call, for anything but junk.
+    expect(body).toMatch(/if \(instant\)[\s\S]{0,40}sellItem\(slot\.itemId, count\)/);
+    expect(body).toContain('this.showSellQuantityPrompt(slot.itemId, heldTotal);');
+  });
+
+  it('the confirm prompt re-resolves the live slot at submit and refuses on a mismatch', () => {
+    const body = painter.slice(
+      painter.indexOf('private showSellConfirmPrompt('),
+      painter.indexOf('private showSellConfirmPrompt(') + 2200,
+    );
+    // Re-resolved by reference identity at SUBMIT time, not the index captured
+    // when the dialog opened: the whole point of this fix is that a stale
+    // selection must REFUSE rather than fall back to an itemId-only sellItem
+    // guess that could vendor a different (e.g. the enchanted) copy of the id.
+    expect(body).toContain('const index = bagStackIndex(this.deps.world().inventory, slot);');
+    expect(body).toContain('if (index < 0) {');
+    expect(body).toContain("this.deps.showError(tSim('error.noItem'));");
+    expect(body).toContain('sellItem(slot.itemId, 1, { slotIndex: index })');
+    // Lands on the always-present close button, not the (about-to-detach) opener.
+    expect(body).toContain("this.deps.root().querySelector('[data-close]')");
+    expect(body).not.toContain('opener?.focus()');
+    // Reuses the existing sell-quantity wording (every locale already has it)
+    // rather than minting new i18n keys for a second sell-confirm dialog.
+    expect(body).toContain("t('itemUi.vendor.sellQuantityTitle', { item: itemName })");
+    expect(body).toContain("t('itemUi.vendor.sellQuantityConfirm')");
+    expect(body).toContain("t('itemUi.vendor.sellQuantityCancel')");
+  });
+
+  it('the pure gate itself: only poor quality with no instance or crafted marker is instant', () => {
+    expect(view).toContain('export function vendorSellIsInstant(');
+    expect(view).toContain(
+      "return item.quality === 'poor' && instance === undefined && craftedRecipeId === undefined;",
+    );
   });
 });
 

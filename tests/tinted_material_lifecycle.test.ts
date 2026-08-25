@@ -53,8 +53,28 @@ describe('tinted material cache lifecycle', () => {
       const leaseA: Set<string> = new Set();
       const leaseB: Set<string> = new Set();
 
-      const forA = assets.tintedMaterial(source, 0x336699, 0.4, null, null, 'body', leaseA);
-      const forB = assets.tintedMaterial(source, 0x336699, 0.4, null, null, 'body', leaseB);
+      const forA = assets.tintedMaterial(
+        source,
+        0x336699,
+        0.4,
+        null,
+        null,
+        'body',
+        leaseA,
+        'rig',
+        '',
+      );
+      const forB = assets.tintedMaterial(
+        source,
+        0x336699,
+        0.4,
+        null,
+        null,
+        'body',
+        leaseB,
+        'rig',
+        '',
+      );
       // Sharing pin: two visuals with the same (source, tint) share one clone.
       expect(forB).toBe(forA);
       expect(leaseA).toEqual(leaseB);
@@ -64,18 +84,40 @@ describe('tinted material cache lifecycle', () => {
       // past its bound: the claimed entry must survive untouched.
       assets.releaseTintedMaterials(leaseA);
       for (let i = 0; i < TINTED_MATERIAL_IDLE_CACHE_MAX * 2; i++) {
-        assets.tintedMaterial(new THREE.MeshStandardMaterial({ color: 0xffffff }), i, 0.4);
+        assets.tintedMaterial(
+          new THREE.MeshStandardMaterial({ color: 0xffffff }),
+          i,
+          0.4,
+          null,
+          null,
+          'body',
+          null,
+          'rig',
+          '',
+        );
       }
       expect(spy).not.toHaveBeenCalled();
       // Still served shared for a third lease.
       const leaseC: Set<string> = new Set();
-      expect(assets.tintedMaterial(source, 0x336699, 0.4, null, null, 'body', leaseC)).toBe(forA);
+      expect(
+        assets.tintedMaterial(source, 0x336699, 0.4, null, null, 'body', leaseC, 'rig', ''),
+      ).toBe(forA);
 
       // Last mounts release: the entry idles, and idle pressure disposes it.
       assets.releaseTintedMaterials(leaseB);
       assets.releaseTintedMaterials(leaseC);
       for (let i = 0; i < TINTED_MATERIAL_IDLE_CACHE_MAX * 2; i++) {
-        assets.tintedMaterial(new THREE.MeshStandardMaterial({ color: 0xffffff }), 0x1000 + i, 0.4);
+        assets.tintedMaterial(
+          new THREE.MeshStandardMaterial({ color: 0xffffff }),
+          0x1000 + i,
+          0.4,
+          null,
+          null,
+          'body',
+          null,
+          'rig',
+          '',
+        );
       }
       expect(spy).toHaveBeenCalledTimes(1);
     } finally {
@@ -91,7 +133,17 @@ describe('tinted material cache lifecycle', () => {
       // way out is the idle LRU.
       const dying = new THREE.MeshStandardMaterial({ color: 0xffffff });
       const lease: Set<string> = new Set();
-      const clone = assets.tintedMaterial(dying, 0x883311, 0.4, null, null, 'body', lease);
+      const clone = assets.tintedMaterial(
+        dying,
+        0x883311,
+        0.4,
+        null,
+        null,
+        'body',
+        lease,
+        'rig',
+        '',
+      );
       const spy = disposeSpy(clone);
       assets.releaseTintedMaterials(lease);
       dying.dispose();
@@ -99,7 +151,17 @@ describe('tinted material cache lifecycle', () => {
       const before = assets.tintedMaterialInternalsForTest.cacheSize();
       expect(before).toBe(1);
       for (let i = 0; i < TINTED_MATERIAL_IDLE_CACHE_MAX * 2; i++) {
-        assets.tintedMaterial(new THREE.MeshStandardMaterial({ color: 0xffffff }), i, 0.4);
+        assets.tintedMaterial(
+          new THREE.MeshStandardMaterial({ color: 0xffffff }),
+          i,
+          0.4,
+          null,
+          null,
+          'body',
+          null,
+          'rig',
+          '',
+        );
       }
       // The dead-source clone was disposed and the cache is bounded.
       expect(spy).toHaveBeenCalledTimes(1);
@@ -171,15 +233,37 @@ describe('tinted material cache lifecycle', () => {
         null,
         'body',
         lease,
+        'rig',
+        '',
       ) as THREE.MeshStandardMaterial;
       const firstHex = first.color.getHex();
       const firstRoughness = first.roughness;
       assets.releaseTintedMaterials(lease);
       for (let i = 0; i < TINTED_MATERIAL_IDLE_CACHE_MAX * 2; i++) {
-        assets.tintedMaterial(new THREE.MeshStandardMaterial({ color: 0xffffff }), i, 0.4);
+        assets.tintedMaterial(
+          new THREE.MeshStandardMaterial({ color: 0xffffff }),
+          i,
+          0.4,
+          null,
+          null,
+          'body',
+          null,
+          'rig',
+          '',
+        );
       }
 
-      const rebuilt = assets.tintedMaterial(source, 0x336699, 0.4) as THREE.MeshStandardMaterial;
+      const rebuilt = assets.tintedMaterial(
+        source,
+        0x336699,
+        0.4,
+        null,
+        null,
+        'body',
+        null,
+        'rig',
+        '',
+      ) as THREE.MeshStandardMaterial;
       // A genuinely fresh clone (the old one was evicted and disposed)...
       expect(rebuilt).not.toBe(first);
       // ...that is derived identically: same tint lerp, same roughness clamp.
@@ -196,8 +280,8 @@ describe('tinted material cache lifecycle', () => {
     try {
       const source = new THREE.MeshStandardMaterial({ color: 0xffffff });
       const lease: Set<string> = new Set();
-      const a = assets.tintedMaterial(source, 0x224466, 0.4, null, null, 'body', lease);
-      const b = assets.tintedMaterial(source, 0x224466, 0.4, null, null, 'body', lease);
+      const a = assets.tintedMaterial(source, 0x224466, 0.4, null, null, 'body', lease, 'rig', '');
+      const b = assets.tintedMaterial(source, 0x224466, 0.4, null, null, 'body', lease, 'rig', '');
       expect(b).toBe(a);
       expect(lease.size).toBe(1);
       const spy = disposeSpy(a);
@@ -206,7 +290,17 @@ describe('tinted material cache lifecycle', () => {
       // was not left over-pinned by the duplicate call.
       assets.releaseTintedMaterials(lease);
       for (let i = 0; i < TINTED_MATERIAL_IDLE_CACHE_MAX * 2; i++) {
-        assets.tintedMaterial(new THREE.MeshStandardMaterial({ color: 0xffffff }), i, 0.4);
+        assets.tintedMaterial(
+          new THREE.MeshStandardMaterial({ color: 0xffffff }),
+          i,
+          0.4,
+          null,
+          null,
+          'body',
+          null,
+          'rig',
+          '',
+        );
       }
       expect(spy).toHaveBeenCalledTimes(1);
     } finally {
@@ -227,6 +321,8 @@ describe('tinted material cache lifecycle', () => {
         null,
         'body',
         idleLease,
+        'rig',
+        '',
       );
       const idleSpy = disposeSpy(idleClone);
       assets.releaseTintedMaterials(idleLease);
@@ -241,6 +337,8 @@ describe('tinted material cache lifecycle', () => {
         null,
         'body',
         liveLease,
+        'rig',
+        '',
       );
       const liveSpy = disposeSpy(liveClone);
 

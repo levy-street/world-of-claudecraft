@@ -5,6 +5,7 @@
 // sim import), so a Vitest drives them directly; the HUD gates on the player's setting.
 
 import type { AbilityEffect, Entity } from '../../../sim/types';
+import type { BgInfo } from '../../../world_api/battleground';
 import type { ArenaInfo, DuelInfo } from '../../../world_api/duel_arena';
 
 // Auto-attack classification of EVERY AbilityEffect type. Because this is a Record over
@@ -213,11 +214,15 @@ export function hasAutoAttackTarget(
 }
 
 /**
- * Whether a player target is PvP-hostile right now: an active duel opponent, or an
- * active-arena opponent/enemy. Mirrors the private `isHostilePlayer` the renderer
+ * Whether a player target is PvP-hostile right now: an active duel opponent, an
+ * active-arena opponent/enemy, or an opposing-team fighter in a live Thornhollow
+ * Fields battleground match. Mirrors the private `isHostilePlayer` the renderer
  * already computes for nameplate coloring (`src/render/renderer.ts`), so the "Auto-Attack
  * on Ability Use" QoL setting recognizes the same PvP-hostile state instead of gating on
- * the mob-only `hostile` flag, which a player target never carries.
+ * the mob-only `hostile` flag, which a player target never carries. The battleground
+ * arm is the one the renderer grew and this gate did not: a hostile cast at a
+ * battleground enemy then never engaged the white swing, while the identical cast in a
+ * duel or arena did.
  *
  * Deliberately narrower than the sim's `isHostileTo`: it does not cover the jail brawl,
  * the warden arm, an enemy player's PET (resolved through `pvpController`), or the Vale
@@ -229,9 +234,17 @@ export function isPvpHostileTarget(
   targetId: number | null | undefined,
   duelInfo: DuelInfo | null | undefined,
   arenaInfo: ArenaInfo | null | undefined,
+  bgInfo?: BgInfo | null,
 ): boolean {
   if (targetId === null || targetId === undefined) return false;
   if (duelInfo?.state === 'active' && duelInfo.otherPid === targetId) return true;
+  // Thornhollow Fields: the opposing TEAM is hostile for the whole live match
+  // (the countdown and the ended hold are combat-off, so neither engages).
+  const bg = bgInfo?.match;
+  if (bg?.state === 'active') {
+    const row = bg.players.find((p) => p.pid === targetId);
+    if (row && row.team !== bg.myTeam) return true;
+  }
   const match = arenaInfo?.match;
   return (
     !!match &&

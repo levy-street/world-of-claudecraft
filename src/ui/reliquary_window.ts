@@ -144,6 +144,13 @@ export interface ReliquaryWindowDeps extends PainterHostPresentation {
   /** Repaint the HUD tracker now, so a pin toggle never waits for the slow
    *  band (the DeedsWindow onWatchChanged contract). */
   onPinChanged(): void;
+  /** The persisted master switch for the HUD tracker (showReliquaryTracker):
+   *  the summary's eye toggle reads and writes it through the host so the
+   *  window never touches the settings store directly. */
+  trackerShown(): boolean;
+  /** Persist the switch AND repaint the strip now (the onPinChanged
+   *  immediacy contract: the strip agrees with the control just pressed). */
+  setTrackerShown(shown: boolean): void;
 }
 
 export class ReliquaryWindow {
@@ -872,8 +879,13 @@ export class ReliquaryWindow {
         ownedFilter: input.ownedFilter,
         // Painter-side dimension: the rarity aggregate is window state (fetched
         // per open), not world state, so the generation rides here rather than
-        // in the pure sig fold.
-      }) + `|r${this.rarityGen}`
+        // in the pure sig fold. The tracker-visibility switch rides beside it
+        // for the same reason: the summary's eye renders from
+        // deps.trackerShown(), and without this dimension a flip landing while
+        // the window is open (today unreachable, the options window closes
+        // others, but that is a coincidence not a contract) would strand the
+        // eye's pressed state until an unrelated repaint.
+      }) + `|r${this.rarityGen}|t${this.deps.trackerShown() ? 1 : 0}`
     );
   }
 
@@ -909,6 +921,16 @@ export class ReliquaryWindow {
         : t('hudChrome.reliquary.curatorUnranked');
     const sealAttr = p.curatorSealId ? ` data-seal="${esc(p.curatorSealId)}"` : '';
     const sealClass = p.curatorSealId ? ' has-seal' : '';
+    // The HUD-tracker eye (the paperdoll helm/playtime idiom): a pressed
+    // toggle whose accessible NAME stays constant while aria-pressed carries
+    // the state; the action hint rides the shared tooltip seam in wire()
+    // (this window never uses a native title attribute, a pinned contract).
+    // Polarity is a deliberate ruling: pressed means "the tracker is SHOWN"
+    // (pressed = feature on, the standard toggle-button reading). The playtime
+    // eye inverts that (pressed = hidden); if the two are ever unified, this
+    // is the form to keep. It lives on the summary band so it is visible from
+    // every shelf, right where the tracked count the strip mirrors is read out.
+    const shown = this.deps.trackerShown();
     return (
       `<div class="reliquary-summary${sealClass}"${sealAttr}>` +
       `<span class="reliquary-count">${esc(t('hudChrome.reliquary.countLabel', { owned, total }))}</span>` +
@@ -918,6 +940,11 @@ export class ReliquaryWindow {
       `<span class="reliquary-pct" role="img" aria-label="${esc(t('hudChrome.reliquary.completionAria', { owned, total }))}">` +
       this.barHtml(pct) +
       ` ${esc(pctText)}</span>` +
+      `<button type="button" class="reliquary-tracker-toggle" data-tracker-toggle ` +
+      `data-focus-key="tracker-toggle" aria-pressed="${shown}">` +
+      `${svgIcon(shown ? 'eye' : 'eye-off')}` +
+      `<span class="reliquary-tracker-toggle-label">${esc(t('hudChrome.reliquary.trackerToggleLabel'))}</span>` +
+      `</button>` +
       `</div>`
     );
   }
@@ -1856,9 +1883,33 @@ export class ReliquaryWindow {
         }
         this.pinnedSet = new Set(result.pinned);
         this.persistPins();
+        // Pinning expresses "I want this on my screen": a pin that lands while
+        // the HUD tracker is hidden turns the master switch back on (the
+        // classic objective-tracker convention). An unpin never touches it.
+        if (result.pinned.has(pageId) && !this.deps.trackerShown()) {
+          this.deps.setTrackerShown(true);
+        }
         // The tracker repaints now rather than up to a slow band later, so the
         // strip agrees with the button the player just pressed.
         this.deps.onPinChanged();
+        audio.click();
+        this.render();
+      });
+    }
+    // The summary's HUD-tracker eye: flip the persisted master switch and
+    // rebuild so the icon, pressed state, and hint all follow. The action hint
+    // rides the shared tooltip (never a native title, a pinned contract) and
+    // re-reads the live state so it flips with the toggle.
+    const trackerToggle = el.querySelector<HTMLElement>('[data-tracker-toggle]');
+    if (trackerToggle) {
+      this.deps.attachTooltip(trackerToggle, () => {
+        const key = this.deps.trackerShown()
+          ? 'hudChrome.reliquary.trackerToggleHideHint'
+          : 'hudChrome.reliquary.trackerToggleShowHint';
+        return `<div class="tt-name">${esc(t(key))}</div>`;
+      });
+      trackerToggle.addEventListener('click', () => {
+        this.deps.setTrackerShown(!this.deps.trackerShown());
         audio.click();
         this.render();
       });

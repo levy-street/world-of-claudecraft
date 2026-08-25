@@ -75,6 +75,7 @@ function rowFor(professionId: string, recipeId: string): CraftingRecipeRow {
     station: null,
     commissionEligible: false,
     durationSec: 1.75,
+    craftFeeCopper: 0,
     craftable: false,
   };
 }
