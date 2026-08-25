@@ -1021,9 +1021,10 @@ export const PROFESSION_ITEMS: Record<string, ItemDef> = {
   // elixirs reuse the elixir_of_the_bear shape (a temporary buff_sta aura on
   // use). Every rung strictly EXCEEDS its vendor-tier equivalent in items.ts
   // (minor/lesser/healing_potion, minor/lesser/mana_potion; #1608 retuned that
-  // ladder, so this one moved in lockstep to stay a strict upgrade): heal <= 335
-  // (healing_potion's 320 + headroom), mana <= 425 (mana_potion's 410 +
-  // headroom), elixir buff_sta <= 12 for <= 900s (elixir_of_the_bear). The three
+  // ladder, and the 11n vendor floor then lowered the vendor line onto the
+  // 10/15/20 margin ladder BELOW this one, healing_potion 279 and mana_potion
+  // 354, while these crafted ceilings stayed frozen per R5): heal <= 335,
+  // mana <= 425, elixir buff_sta <= 12 for <= 900s (elixir_of_the_bear). The three
   // elixir aura display names are localized client-side through the sim_i18n
   // aura matcher (AURA_NAME_KEY), the same path as 'Might of the Bear'. Never
   // vendor-stocked (no buyValue).

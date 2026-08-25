@@ -49,9 +49,12 @@ describe('#1608: eating stacks with natural hp regen', () => {
     };
   }
 
-  // The exact foodHp tiers named in the issue (61 = baked_bread/tier 1, 117 =
-  // the best vendor/fished tier) plus the mid fished tiers and the conjured
-  // ladder, so every content/items.ts foodHp value this fix touches is covered.
+  // Representative foodHp magnitudes spanning the ladder: the issue's own tiers
+  // (61 = baked_bread/tier 1; 117, the best vendor tier when the issue was
+  // filed, is the best CRAFTED zone-1 tier since the 11n vendor food nerf moved
+  // the vendor line to 61/81/106/220/375/480/816) plus mid fished tiers and the
+  // conjured ladder. The stacks-with-regen property is magnitude-generic, so
+  // these generic rungs cover the live foodHp values without enumerating them.
   const FOOD_TIERS = [45, 61, 90, 117, 243, 552, 980];
 
   it.each(FOOD_TIERS)(
@@ -66,9 +69,9 @@ describe('#1608: eating stacks with natural hp regen', () => {
   );
 
   // The issue's own reproduction numbers: tier-1 food (61 foodHp, ~7 hp/2s) used
-  // to lose to natural regen from ~16 stamina, and the best vendor/fished tier
-  // (117 foodHp, ~13 hp/2s) from ~37 stamina. Both crossover points, and well
-  // past them, must now favor eating.
+  // to lose to natural regen from ~16 stamina, and the then-best vendor/fished
+  // tier (117 foodHp, ~13 hp/2s) from ~37 stamina. Both crossover points, and
+  // well past them, must now favor eating.
   it('the issue-reported crossover stamina values no longer favor standing idle', () => {
     for (const sta of [16, 37, 200]) {
       const idle = healOverOneTick(makeSim(), sta, null);
@@ -180,25 +183,31 @@ describe('#1608: potionHp/potionMana ladder', () => {
     ['mana_potion', ZONE3_ZONE.levelRange[1]],
   ];
 
+  // Measured fractions after the 11n vendor floor: 0.894/0.792/0.721 by rung,
+  // so the ceiling tightens to 0.95 (was 1.00) with the floor untouched.
   it.each(HP_TIERS)(
-    "%s restores a meaningful, documented fraction (0.60-1.00) of a priest's base hp pool at its bracket top",
+    "%s restores a meaningful, documented fraction (0.60-0.95) of a priest's base hp pool at its bracket top",
     (itemId, topLevel) => {
       const { maxHp } = basePoolAt('priest', topLevel);
       const fraction = potionHp(itemId) / maxHp;
       expect(fraction).toBeGreaterThanOrEqual(0.6);
-      expect(fraction).toBeLessThanOrEqual(1.0);
+      expect(fraction).toBeLessThanOrEqual(0.95);
     },
   );
 
+  // 11n re-derivation: the vendor mana rungs moved to 226 and 354, so the
+  // measured fractions are 0.662/0.545/0.536 by rung; the floor moved from 0.55
+  // to 0.50, and the ceiling tightens to 0.70 (the crafted draughts are the
+  // line above).
   it.each(MANA_TIERS)(
     // Hunters run on focus on this line (the hunter overhaul), so the potion
     // floor's subject is the smallest MANA pool: the paladin.
-    "%s restores a meaningful, documented fraction (0.55-0.85) of a paladin's base mana pool at its bracket top",
+    "%s restores a meaningful, documented fraction (0.50-0.70) of a paladin's base mana pool at its bracket top",
     (itemId, topLevel) => {
       const { maxResource } = basePoolAt('paladin', topLevel);
       const fraction = potionMana(itemId) / maxResource;
-      expect(fraction).toBeGreaterThanOrEqual(0.55);
-      expect(fraction).toBeLessThanOrEqual(0.85);
+      expect(fraction).toBeGreaterThanOrEqual(0.5);
+      expect(fraction).toBeLessThanOrEqual(0.7);
     },
   );
 
@@ -211,13 +220,15 @@ describe('#1608: potionHp/potionMana ladder', () => {
 
   // Golden pin: catches an accidental future edit to the tuned ladder without a
   // deliberate matching change to this test's target-fraction assertions above.
+  // The 11n vendor floor moved healing_potion to 279 and the two upper mana
+  // rungs to 226/354; the minor and lesser hp rungs stayed put (qr-11n-NINE).
   it('pins the exact retuned values', () => {
     expect(potionHp('minor_healing_potion')).toBe(110);
     expect(potionHp('lesser_healing_potion')).toBe(190);
-    expect(potionHp('healing_potion')).toBe(320);
+    expect(potionHp('healing_potion')).toBe(279);
     expect(potionMana('minor_mana_potion')).toBe(145);
-    expect(potionMana('lesser_mana_potion')).toBe(250);
-    expect(potionMana('mana_potion')).toBe(410);
+    expect(potionMana('lesser_mana_potion')).toBe(226);
+    expect(potionMana('mana_potion')).toBe(354);
   });
 
   // The crafted alchemy ladder (profession_items.ts) documents itself as a

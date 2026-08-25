@@ -4183,9 +4183,11 @@ export const TROPHY_RECIPES: ProfessionRecipeRecord[] = [
     // reverse: the shipped rows go dead for anyone holding tallow). The
     // lesser potion (190 HP) sits UNDER the rung-25 draught and above the
     // rung-0 pair (110 and 120 HP), so the ladder keeps its order; the
-    // vendor's own 320 HP potion at 170 already undercuts the draught's 140
+    // vendor's own 320 HP potion at 170 already undercut the draught's 140
     // bill PER POINT OF HEALING (0.53 copper an HP against 0.70), a
-    // pre-existing tension that is the maintainer's, not this row's.
+    // pre-existing tension that is the maintainer's, not this row's. (11n
+    // vendor floor: that potion is 279 HP since the nerf, 0.61 an HP, so
+    // the tension narrowed but still stands.)
     // Discounted bills (requiredReagentCountFor): specialization only, candles
     // 2 to 1, 77 vs 16; specialization plus self-signed lands on the same
     // floor, 77 vs 16 (the herb and the vial are already 1), still

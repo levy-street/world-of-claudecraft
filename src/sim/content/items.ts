@@ -1903,7 +1903,7 @@ export const BASE_ITEMS: Record<string, ItemDef> = {
   // tests/consumables.test.ts) at BASE stats (no gear) at the TOP level of its
   // intended zone bracket (ZONE1/2/3_ZONE.levelRange[1] in content/zone{1,2,3}.ts:
   // 7/13/20), the hardest point in the bracket for the tier to still feel worth
-  // the cooldown. That lands potionHp around 80-90% and potionMana around 65-70%
+  // the cooldown. That lands potionHp around 72-90% and potionMana around 53-66%
   // of the reference pool: a real, meaningful topper-upper rather than a sliver,
   // with headroom against a geared character's larger pool (gear only grows the
   // pool from here, so a geared cast of the same level sees a SMALLER fraction
@@ -1911,7 +1911,9 @@ export const BASE_ITEMS: Record<string, ItemDef> = {
   // floor itself is now generous, not that it tracks gear). Every tier in this
   // ladder must stay BELOW the matching profession_items.ts alchemy draught (the
   // crafted line is a strict upgrade over the vendor equivalent): keep the two in
-  // lockstep if either changes.
+  // lockstep if either changes. Since the 11n vendor floor, this line sits the
+  // margin ladder (10/15/20 percent by rung) below the crafted draughts, so the
+  // crafted line is the generous fraction and the vendor line is the floor.
   // Both-sourced (also crafted by recipe), magnitude-exempt per 11n-BOTH /
   // qr-11n-NINE: a nerf would hit the crafted arm. The bottom hp rung's
   // +9.1 percent vs silverleaf_healing_draught 120 is recorded EXEMPT, not a
