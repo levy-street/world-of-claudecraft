@@ -362,13 +362,13 @@ describe('generated chunk geometry is stable', () => {
     // affb4c8d6201b0832458a2c2bcd0f29b, the release
     // 1d9b0a4a7e0d97c5a11c918b1a8f29c3. MEASURED on the merged working tree
     // (npx vitest run tests/terrain_chunk_geometry.test.ts, twice in separate
-    // processes): the merged digest equals the RELEASE's literal, which is
-    // what the pin below carries. That equality means the farmer pads move no
-    // in-rect vertex on the rebuilt Eastbrook ground, a fact the farm
-    // placement owner should look at rather than take on trust (Farmer
-    // Jessica's seat at (24.5, 32.5) was sited against the old town ring; the
-    // same merge then re-seated her to (-15.5, -81.5) at the rebuilt town's
-    // north-east edge, the move the next re-mint carries).
+    // processes) AFTER the same merge re-seated Farmer Jessica from (24.5,
+    // 32.5) to (-15.5, -81.5) at the rebuilt town's north-east edge: the
+    // merged digest equals the RELEASE's literal, which is what the pin below
+    // carries. Both seats sit on ground the rebuilt town already levels (the
+    // old one under the second wolf run's ring, the new one on the plat), so
+    // her calm pad moves no in-rect vertex at either: measured on a 0.5 yd
+    // lattice at the merge, zero points moved at both sites.
     // The branch's gap super-chunk pin (c4839177e825dbcf8dc5bcf501336fc2) is
     // gone with the gap chunks themselves: the island claims the old vale gap
     // cells, and gapFill.length above pins their absence.

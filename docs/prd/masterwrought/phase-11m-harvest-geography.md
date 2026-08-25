@@ -349,3 +349,35 @@ STOPPING RULES:
 - Stop if reconciling the concentration bonus would require changing
   harvestConcentrationBonus itself: that is a mechanic change, not a data rebalance.
 ```
+
+## Corrections found at execution (2026-08-25, the 11m session; the census above is the SHAPE)
+
+Re-derived from the merged tree at 9f130d3b7c (the seventeenth release sync,
+release/v0.41.0), before any edit, as STEP 0 and STEP 1 require:
+
+- **meat is 17 templates over 10 zones, not 15 over 9** (16 over 10 on the
+  reachable subset): the release's Proving Shore added shore_scuttler (levels
+  1 to 2, three camps) and mister_crabs (summon-only, quest-gated, no camp).
+  The two are the release's, not this phase's; the "zero new mobs, zero new
+  spawn points" sweep is anchored on the merge commit, never on the 11l stamp.
+- **ZONES is 15, not 14**: proving_shore appended at levelRange 1 to 2. The
+  island is an open-world zone a player of any level can revisit (the ferry
+  bell routes either way with no graduation gate, src/sim/interactions/
+  ferry_bell.ts), so its camps count for the reachable subset.
+- **claw's shipped spread was 3 zones, not 4**: every claw carrier sits in
+  Eastbrook, Mirefen or Thornpeak; the 4 above counted a zone no carrier has
+  a camp in. The template count of 6 was right.
+- **horn's "2 templates" is 1 reachable**: wildheart_hexcaller lives only in
+  the Wildheart dungeon roster (no camp), as qr-11m-SPREAD already measured.
+- **The corpse-harvest test corpus used gills and horn as THE unmapped
+  exemplars** (about two hundred sites across eleven suites, sethrael_palecoil
+  and mudfin_murloc as the shipped mixed fixtures). Mapping the orphans
+  retires every shipped unmapped fixture, so the migration to a synthetic
+  never-mapped family (tests/helpers/unmapped_family.ts) is part of the orphan
+  commit; the phase file above did not name it. Recorded in the ledger.
+- **A premise the plan did not name**: the capacity pre-gate assumes no corpse
+  carries two specimen-less families (fang, cloth, tusk, and with this phase
+  horn and gills), pinned in tests/corpse_harvest_sim.test.ts. It refused two
+  of the settled starting candidates (dune_troll for tusk, frostmane_yeti for
+  horn, both fang carriers); the spread swapped in the Farshore's Sundered
+  Horror and held horn's floor on the six remaining carriers.

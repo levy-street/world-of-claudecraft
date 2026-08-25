@@ -260,7 +260,8 @@ const MONOLITHS: MonolithRow[] = [
     // relocalize wiring (the window itself lives in
     // src/ui/hud/guild_board/). Then down one at the controller-tutorial
     // merge. Exact count, zero slack.
-    // RE-PINNED at the merge of release/v0.41.0 (tip ff2837da1f) into feature/masterwrought (base 9a89e3483e). BOTH parent pins for the record: ours
+    // RE-PINNED at the merge of release/v0.41.0 (tip ff2837da1f) into
+    // feature/masterwrought (base 9a89e3483e). BOTH parent pins for the record: ours
     // 18480, the release 18488. Set to the exact merged count measured on the
     // merged working tree (wc -l < src/ui/hud.ts), neither parent's literal. Exact
     // merged count, zero slack: any further growth reds again.
@@ -546,9 +547,11 @@ const MONOLITHS: MonolithRow[] = [
     // neither parent's record:
     // Re-pinned to the integration merge of the latest v0.40.0 (the touch UI
     // rework); exact merged count.
-    // RE-PINNED at the merge of release/v0.41.0 (tip ff2837da1f) into feature/masterwrought (base 9a89e3483e). BOTH parent pins for the record: ours
+    // RE-PINNED at the merge of release/v0.41.0 (tip ff2837da1f) into
+    // feature/masterwrought (base 9a89e3483e). BOTH parent pins for the record: ours
     // 13569, the release 13329. Set to the exact merged count measured on the
-    // merged working tree (wc -l < src/render/renderer.ts), neither parent's literal. Exact
+    // merged working tree (wc -l < src/render/renderer.ts), neither parent's
+    // literal. Exact
     // merged count, zero slack: any further growth reds again.
     ceiling: 13357,
     seam: 'a new src/render/<thing>.ts module the renderer calls (src/render/CLAUDE.md)',
@@ -643,10 +646,11 @@ const MONOLITHS: MonolithRow[] = [
     // Plus 7 at the v0.39.3 main back-merge: the Double Honor port grew the
     // sim arm on main while the release pin sat at zero slack (the known
     // both-arms compound). Exact merged count, zero slack.
-    // AT THE MERGE OF release/v0.41.0 (tip ff2837da1f) into feature/masterwrought (base 9a89e3483e): BOTH parent pins for the record, ours 12388,
-    // the release 12538. The release's own value is carried as a PLACEHOLDER
-    // because src/sim/sim.ts was still mid-resolution when this row was merged; it
-    // Re-measured on the fully resolved merged tree (wc -l < src/sim/sim.ts):
+    // AT THE MERGE OF release/v0.41.0 (tip ff2837da1f) into feature/masterwrought
+    // (base 9a89e3483e): BOTH parent pins for the record, ours 12388, the
+    // release 12538. The release's value stood in as a placeholder while
+    // src/sim/sim.ts was still mid-resolution, then the row was re-measured on
+    // the fully resolved merged tree (wc -l < src/sim/sim.ts):
     // the merged file lands below both parent pins (the release retired the
     // Vale Cup arms this branch had kept), so the ratchet follows it down.
     // Exact merged count, zero slack.
@@ -764,7 +768,8 @@ const MONOLITHS: MonolithRow[] = [
     // the ratchet follows the merged file down). Exact count, zero slack.
     // Re-pinned to the exact merged count of the v0.39.3 main back-merge
     // (the utc_day import consolidation shed one line).
-    // RE-PINNED at the merge of release/v0.41.0 (tip ff2837da1f) into feature/masterwrought (base 9a89e3483e). BOTH parent pins for the record: ours
+    // RE-PINNED at the merge of release/v0.41.0 (tip ff2837da1f) into
+    // feature/masterwrought (base 9a89e3483e). BOTH parent pins for the record: ours
     // 11461, the release 11566. Set to the exact merged count measured on the
     // merged working tree (wc -l < src/main.ts), neither parent's literal. Exact
     // merged count, zero slack: any further growth reds again.
@@ -828,10 +833,11 @@ const MONOLITHS: MonolithRow[] = [
     // routeEvents into the guild board window's live REST read (the
     // noticeboard_guilds event transform is deleted). Exact count, zero
     // slack.
-    // AT THE MERGE OF release/v0.41.0 (tip ff2837da1f) into feature/masterwrought (base 9a89e3483e): BOTH parent pins for the record, ours 10697,
-    // the release 10645. The release's own value is carried as a PLACEHOLDER
-    // because server/game.ts was still mid-resolution when this row was merged; it
-    // Re-measured on the fully resolved merged tree (wc -l < server/game.ts):
+    // AT THE MERGE OF release/v0.41.0 (tip ff2837da1f) into feature/masterwrought
+    // (base 9a89e3483e): BOTH parent pins for the record, ours 10697, the
+    // release 10645. The release's value stood in as a placeholder while
+    // server/game.ts was still mid-resolution, then the row was re-measured on
+    // the fully resolved merged tree (wc -l < server/game.ts):
     // below both parent pins (the Vale Cup dispatch arms left with the
     // release, the heavy-self sets live in server/heavy_self.ts), so the
     // ratchet follows the file down. Exact merged count, zero slack.
@@ -872,7 +878,8 @@ const MONOLITHS: MonolithRow[] = [
     // then re-pinned when the mirror gained the trust-boundary row
     // validation and the 404-vs-transport-failure split, plus the roster
     // class field. Exact count, zero slack.
-    // RE-PINNED at the merge of release/v0.41.0 (tip ff2837da1f) into feature/masterwrought (base 9a89e3483e). BOTH parent pins for the record: ours
+    // RE-PINNED at the merge of release/v0.41.0 (tip ff2837da1f) into
+    // feature/masterwrought (base 9a89e3483e). BOTH parent pins for the record: ours
     // 5989, the release 5855. Set to the exact merged count measured on the
     // merged working tree (wc -l < src/net/online.ts), neither parent's literal. Exact
     // merged count, zero slack: any further growth reds again.
@@ -989,9 +996,11 @@ const MONOLITHS: MonolithRow[] = [
     // (+70, one line under the old pin on its own tree) and this branch's
     // pledge nameplate line (+13) compound in the merged file. Exact count,
     // zero slack.
-    // RE-PINNED at the merge of release/v0.41.0 (tip ff2837da1f) into feature/masterwrought (base 9a89e3483e). BOTH parent pins for the record: ours
+    // RE-PINNED at the merge of release/v0.41.0 (tip ff2837da1f) into
+    // feature/masterwrought (base 9a89e3483e). BOTH parent pins for the record: ours
     // 851, the release 864. Set to the exact merged count measured on the
-    // merged working tree (wc -l < src/render/nameplate_canvas.ts), neither parent's literal. Exact
+    // merged working tree (wc -l < src/render/nameplate_canvas.ts), neither
+    // parent's literal. Exact
     // merged count, zero slack: any further growth reds again.
     ceiling: 864,
     seam: 'the pure src/render/nameplate_heraldry_core.ts geometry module',

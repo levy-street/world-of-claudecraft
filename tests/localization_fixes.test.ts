@@ -1313,8 +1313,14 @@ describe('S3: every sim.ts emit is recognized (drift guard)', () => {
   // client-side by localizeServerText; previously the guard read only sim.ts, so
   // a new server emit (chat-filter notices, pet-name, etc.) could ship English to
   // every locale while the gate stayed green. Recognized via the localizeServerText
-  // fallback in recognized() below.
-  const serverSrc = fs.readFileSync(path.resolve(process.cwd(), 'server/game.ts'), 'utf8');
+  // fallback in recognized() below. server/social.ts joined the corpus at the
+  // seventeenth release sync (masterwrought Phase 11m): the guild pledge board
+  // emits its notices from there (notifyGuildOfficers), and every one is a
+  // server_i18n matcher row already, so widening the scan is what keeps the
+  // NEXT literal added to that file from shipping English to every locale.
+  const serverSrc = ['server/game.ts', 'server/social.ts']
+    .map((file) => fs.readFileSync(path.resolve(process.cwd(), file), 'utf8'))
+    .join('\n');
 
   const armRegexes = (body: string): RegExp[] => {
     const out: RegExp[] = [];

@@ -794,7 +794,10 @@ describe('farm patch placement: every bed sits on ground a player can work', () 
   // demolished the Sowfield and retired the Vale Cup, so SOWFIELD_EXCLUDE and
   // vale_cup_layout.ts no longer exist and world.ts refuses no footprint there.
   // The Eastbrook beds sit at the harbor town's north-east edge (z -84 to
-  // -79), 45 yards from where the pitch stood.
+  // -79), 13 yards north of where the retired pitch's north board stood
+  // (PITCH zMax -97) and inside what was its exclusion apron (SOWFIELD_EXCLUDE
+  // reached z -73): the venue and its rule are gone, so nothing refuses the
+  // ground.
 
   it('no bed grows inside a mob camp footprint', () => {
     // STRICTER THAN THE NODE SUITE, deliberately. That suite screens gather

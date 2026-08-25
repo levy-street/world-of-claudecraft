@@ -151,7 +151,7 @@ every clause of it. Age 40s, female.
 
 ### Farmer Jessica: *Allotment Keeper*
 **Visual:** villager, harvest gold (#a8843a), the Eastbrook allotments at the
-harbor town's north-east edge, between the civic ring and the chapel yard.
+harbor town's north-east edge, north of the civic ring and east of the chapel yard.
 
 Warm, plain-spoken, sun-and-soil mezzo, unhurried and patient, the voice of
 someone who explains a thing once and trusts you with it. Open vowels, an

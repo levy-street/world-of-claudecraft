@@ -292,3 +292,26 @@ STOPPING RULES:
 - Stop if a both-sourced id turns out to need a split with new art or new names: ledger it
   and ask, rather than minting content inside a tuning phase.
 ```
+
+## Corrections found by the 11m session's merge audit (2026-08-25): read at STEP 0
+
+Two premises above no longer hold on the tree the 11n session will inherit
+(feature/masterwrought at or after the seventeenth release sync, 9f130d3b7c):
+
+- **The both-sourced set re-derives to NINE ids, not three, so this file's own
+  STOP rule fires at STEP 0.** vendorItems intersected with every
+  ALL_RECIPES.resultItemId on the merged tree: eastbrook_arming_sword,
+  eastbrook_chain_vest, eastbrook_wool_trousers, tanned_leather_jerkin (the
+  four smith rows qr-11n-WIDE already names), elixir_of_the_bear,
+  minor_healing_potion, tough_jerky, PLUS lesser_healing_potion (the 11l QA's
+  re-picked potion row, recipe_lesser_healing_potion, sold by provisioner_hale
+  and alchemist_verane) and linen_pouch (recipe_linen_pouch, sold by
+  trader_wilkes and weaver_ottilie, and by the release's new island
+  quartermaster). Branch-caused (11l and an earlier phase), not merge-caused.
+  The 11n session re-judges the exemption over the nine as its STOP rule says,
+  rather than extending the three-id reasoning by analogy.
+- **elixir_of_the_bear's Mirefen drop is 0.8 percent, not 7 percent**
+  (src/sim/content/zone2.ts, chance 0.008, unchanged since the classic-era
+  loot-rate fix that predates the packet). The "keep its 7 percent Mirefen
+  drop" instruction above reads 0.8 percent, and the pin-per-id arm asserts
+  the real value.

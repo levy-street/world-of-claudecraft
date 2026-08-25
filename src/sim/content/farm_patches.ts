@@ -26,8 +26,8 @@
 // Every position must hold the placement arms in
 // tests/farm_patch_placement.test.ts (dry land, sea freeboard, water in
 // reach, slope, no collider overlap, a reachable stand spot, hub
-// reachability, zone containment, bed spacing, node clearance, and the camp,
-// road screens): move a bed rather than weaken an arm.
+// reachability, zone containment, bed spacing, node clearance, and the camp
+// and road screens): move a bed rather than weaken an arm.
 //
 // LAYOUT RULE, so the grid stays readable and the arms stay satisfiable: one
 // patch is a rectangular grid on a 5 yard pitch, filled row by row from its
@@ -72,9 +72,10 @@ export interface FarmPatchDef {
 const FARM_PATCH_ROWS: readonly FarmPatchDef[] = [
   {
     // The Eastbrook allotments, on the open ground at the harbor town's
-    // north-east edge: 20 yards from the civic center, east of the north
-    // road between the civic ring and the chapel yard, 16 yards off every
-    // lane and 48 yards outside the nearest camp disc. The obvious farmland
+    // north-east edge: 20 yards from the civic center, north of the civic
+    // ring and east of the chapel yard, 16 yards off every lane (the nearest
+    // bed) and 51 yards outside the nearest camp disc (the nearest bed to the
+    // wild_boar camp at (58, -72); the anchor 54). The obvious farmland
     // west of town is the Sableweb webwood, whose spider camp covers it, and
     // the north-lane site this patch first shipped on (18.5, 32.5) went
     // under the second wolf run when release/v0.41.0 rebuilt the vale, so

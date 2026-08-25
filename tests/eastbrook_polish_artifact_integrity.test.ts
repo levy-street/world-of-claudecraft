@@ -1142,17 +1142,19 @@ const ACCEPTED_POLISH_V2_METADATA_PATH = path.join(REPO_ROOT, POLISH_SEAL_PATH);
 // OSSBrain v0.40 batch landed on the release arm; renderer inputs moved on
 // both sides). No capture was retaken.
 //
-// RE-MINTED AT THE MERGE OF release/v0.41.0 (tip ff2837da1f) into feature/masterwrought (base 9a89e3483e). BOTH parents
+// RE-MINTED AT THE MERGE OF release/v0.41.0 (tip ff2837da1f) into
+// feature/masterwrought (base 9a89e3483e). BOTH parents
 // re-minted these seals since their common base again and BOTH edited
 // src/render/renderer.ts (the release also moved the authoritativeLayout,
 // townRuntime and captureContract leaves for the harbor move and its owner
 // rounds), so the merged tree mints values matching NEITHER parent. Parent
 // values for the record: metadata sha256 ours d19d1129 / theirs
-// b7f20268, composite ours 0e27f9ad / theirs b4f994b0. The release
-// literals below are carried as PLACEHOLDERS: they MUST be re-minted from the
-// merged working tree with the repo's own tool
-// (node scripts/assets/eastbrook_grand_armoury/remint_polish_provenance.mjs)
-// and committed with exactly the bytes it read. No capture was retaken.
+// b7f20268, composite ours 0e27f9ad / theirs b4f994b0. The release literals
+// stood in as placeholders while the merge was mid-resolution; the values
+// below are the re-mint (node
+// scripts/assets/eastbrook_grand_armoury/remint_polish_provenance.mjs over
+// the fully resolved tree), committed with exactly the bytes it read. No
+// capture was retaken.
 // Re-minted at the merge of release/v0.41.0 (ff2837da1f) into
 // feature/masterwrought (base 9a89e3483e): both parents had re-minted, so
 // neither literal was right for the merged tree; remint_polish_provenance.mjs
@@ -2381,8 +2383,9 @@ describe('Eastbrook polish performance and contact evidence', () => {
       // renderer.ts again and the release moved the layout, town-runtime and
       // capture-contract leaves too, so the merged tree is a third content.
       // Parent values for the record: ours addb319d, the release
-      // 5bae1eef. The release literal is a PLACEHOLDER: re-mint LAST per
-      // REMINT_COMMAND on the merged working tree. No capture was retaken.
+      // 5bae1eef; the release literal stood in as a placeholder until the
+      // re-mint below, computed LAST per REMINT_COMMAND on the merged working
+      // tree. No capture was retaken.
     ).toBe('407f758586fc6aeb86f388c4212cf3ae88aaeef2b6a56fa5f7d1a779b6760b73');
   });
 

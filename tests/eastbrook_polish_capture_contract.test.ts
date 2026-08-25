@@ -453,17 +453,19 @@ interface AttributionTargetFixture {
 // OSSBrain v0.40 batch landed on the release arm; renderer inputs moved on
 // both sides). No capture was retaken.
 //
-// RE-MINTED AT THE MERGE OF release/v0.41.0 (tip ff2837da1f) into feature/masterwrought (base 9a89e3483e). BOTH parents
+// RE-MINTED AT THE MERGE OF release/v0.41.0 (tip ff2837da1f) into
+// feature/masterwrought (base 9a89e3483e). BOTH parents
 // re-minted this seal since their common base again (the release for the
 // Sowfield demolition, the Eastbrook harbor move and its owner rounds, the
 // Proving Shore island and the guild pledge sync; this branch for its farm
 // visual wiring and its own release syncs), and BOTH parents edited
 // src/render/renderer.ts, so the merged tree mints a value matching NEITHER
 // parent. Parent values for the record: ours 0e27f9ad, the release
-// b4f994b0. The release literal below is carried as a PLACEHOLDER: it
-// MUST be re-minted from the merged working tree with the repo's own tool
-// (node scripts/assets/eastbrook_grand_armoury/remint_polish_provenance.mjs)
-// and committed with exactly the bytes it read. No capture was retaken.
+// b4f994b0. The release literal stood in as a placeholder while the merge
+// was mid-resolution; the value below is the re-mint (node
+// scripts/assets/eastbrook_grand_armoury/remint_polish_provenance.mjs over
+// the fully resolved tree), committed with exactly the bytes it read. No
+// capture was retaken.
 // Re-minted at the merge of release/v0.41.0 (ff2837da1f) into
 // feature/masterwrought (base 9a89e3483e): both parents had re-minted, so
 // neither literal was right for the merged tree; remint_polish_provenance.mjs
