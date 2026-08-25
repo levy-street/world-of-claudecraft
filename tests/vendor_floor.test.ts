@@ -166,6 +166,27 @@ function achievedMarginPct(row: VendorPair): number {
   return ((crafted as number) / (vendor as number) - 1) * 100;
 }
 
+// Every id vendor-stocked by ANY vendor, precomputed once for the derivation
+// and exhaustiveness arms below.
+const STOCKED_IDS: ReadonlySet<string> = new Set(vendorStockedIdsBy(NPCS, () => true));
+
+// R23 quantifies over EVERY crafted equivalent, not one hand-picked
+// representative, so the crafted side of each pair is DERIVED: the smallest
+// crafted-only magnitude (a recipe result no vendor stocks) at or above the
+// vendor value. Pinning the derivation to the literal craftedValue makes
+// lowering ANY unpinned crafted sibling into the band red, even though PAIRS
+// names one representative per tier.
+function minCraftedOnlyAtOrAbove(axis: MagnitudeAxis, value: number): number | undefined {
+  let best: number | undefined;
+  for (const id of RECIPE_RESULT_IDS) {
+    if (STOCKED_IDS.has(id)) continue;
+    const v = liveMagnitude(id, axis);
+    if (v === undefined || v < value) continue;
+    if (best === undefined || v < best) best = v;
+  }
+  return best;
+}
+
 describe('the ladder: every vendor/crafted pair meets its rung margin', () => {
   it.each(PAIRS)(
     '$vendorId vs $craftedId holds the $rung rung at $marginPct percent on $axis',
@@ -180,8 +201,28 @@ describe('the ladder: every vendor/crafted pair meets its rung margin', () => {
         `${row.craftedId} (${crafted}) must beat ${row.vendorId} (${vendor}) by at least ` +
           `${row.marginPct} percent; achieved ${achieved.toFixed(1)} percent`,
       ).toBe(true);
+      expect(
+        minCraftedOnlyAtOrAbove(row.axis, row.vendorValue),
+        `${row.vendorId}: the smallest crafted-only ${row.axis} at or above ` +
+          `${row.vendorValue} must still be the ${row.craftedValue} tier`,
+      ).toBe(row.craftedValue);
     },
   );
+
+  // The rung labels are not free text: each food row's tercile is re-derived
+  // from the pairing range (90 to 980, the six crafted tiers that pair with
+  // vendor food, both endpoints pinned above as craftedValue literals).
+  it('each food rung label matches the magnitude tercile of its crafted tier', () => {
+    const lo = 90;
+    const hi = 980;
+    const t1 = lo + (hi - lo) / 3;
+    const t2 = lo + (2 * (hi - lo)) / 3;
+    for (const row of PAIRS.filter((r) => r.axis === 'foodHp')) {
+      const expected =
+        row.craftedValue <= t1 ? 'bottom' : row.craftedValue <= t2 ? 'middle' : 'top';
+      expect(row.rung, `${row.vendorId} tercile over [${lo}, ${hi}]`).toBe(expected);
+    }
+  });
 });
 
 describe('the margin widens as the rungs climb', () => {
@@ -237,6 +278,16 @@ describe('the both-sourced nine (ruling qr-11n-NINE)', () => {
     ]);
   });
 
+  // The FIVE magnitude-exempt ids of ruling qr-11n-NINE (the four gear ids
+  // are stock-pulled only, never magnitude questions).
+  const EXEMPT_ALLOWLIST: ReadonlySet<string> = new Set([
+    'minor_healing_potion',
+    'lesser_healing_potion',
+    'tough_jerky',
+    'linen_pouch',
+    'elixir_of_the_bear',
+  ]);
+
   type NineClassification = 'exempt, stock kept' | 'exempt, stock pulled' | 'stock pulled';
   const HISTORICAL_NINE: { id: string; classification: NineClassification }[] = [
     // Consumable sold AND crafted: a magnitude nerf would hit the crafted arm.
@@ -266,6 +317,12 @@ describe('the both-sourced nine (ruling qr-11n-NINE)', () => {
       expect(RECIPE_RESULT_IDS.has(id), `${id} is still an ALL_RECIPES result`).toBe(true);
       const stocked = vendorStockedIdsBy(NPCS, (itemId) => itemId === id).length > 0;
       expect(stocked, `${id} vendor-stocked`).toBe(classification === 'exempt, stock kept');
+      // The exempt half of the classification asserts too: every 'exempt'
+      // row sits on the qr-11n-NINE allowlist and every plain 'stock pulled'
+      // row does not, so the three-value union never collapses to two.
+      expect(EXEMPT_ALLOWLIST.has(id), `${id} exempt allowlist membership`).toBe(
+        classification !== 'stock pulled',
+      );
     },
   );
 
@@ -286,6 +343,7 @@ describe('the both-sourced nine (ruling qr-11n-NINE)', () => {
     expect(def?.elixir?.kind, 'elixir_of_the_bear elixir kind').toBe('buff_sta');
     expect(def?.elixir?.value, 'elixir_of_the_bear elixir value').toBe(12);
     expect(def?.elixir?.duration, 'elixir_of_the_bear elixir duration').toBe(900);
+    expect(def?.elixir?.aura, 'elixir_of_the_bear elixir aura').toBe('Might of the Bear');
   });
 
   it('linen_pouch is a bag with no consumable magnitude', () => {
@@ -295,6 +353,64 @@ describe('the both-sourced nine (ruling qr-11n-NINE)', () => {
     expect(liveMagnitude('linen_pouch', 'potionMana'), 'linen_pouch potionMana').toBeUndefined();
     expect(liveMagnitude('linen_pouch', 'foodHp'), 'linen_pouch foodHp').toBeUndefined();
     expect(liveMagnitude('linen_pouch', 'drinkMana'), 'linen_pouch drinkMana').toBeUndefined();
+  });
+});
+
+describe('the classification is exhaustive over every vendor-stocked consumable', () => {
+  // A newly stocked consumable on ANY axis must land in PAIRS, the exempt
+  // allowlist, or the drink list before these arms go green again: a
+  // hand-written pairing table alone lets a one-for-one stock swap (a
+  // conjured-tier food traded in for a reagent row, say) bypass the ladder
+  // with every other arm still green.
+  it('the vendor-stocked foodHp set is exactly the eight classified foods', () => {
+    expect(vendorStockedIdsBy(NPCS, (id) => liveMagnitude(id, 'foodHp') !== undefined)).toEqual([
+      'baked_bread',
+      'brightwood_venison',
+      'fenbridge_rye',
+      'roast_mountain_goat',
+      'roasted_boar',
+      'smoked_eel',
+      'tough_jerky',
+      'trail_hardtack',
+    ]);
+  });
+
+  it('the vendor-stocked potionHp set is exactly the three classified rungs', () => {
+    expect(vendorStockedIdsBy(NPCS, (id) => liveMagnitude(id, 'potionHp') !== undefined)).toEqual([
+      'healing_potion',
+      'lesser_healing_potion',
+      'minor_healing_potion',
+    ]);
+  });
+
+  it('the vendor-stocked potionMana set is exactly the three classified rungs', () => {
+    expect(vendorStockedIdsBy(NPCS, (id) => liveMagnitude(id, 'potionMana') !== undefined)).toEqual(
+      ['lesser_mana_potion', 'mana_potion', 'minor_mana_potion'],
+    );
+  });
+
+  it('no vendor stocks an elixir: the 11n pull left zero vendor-sold buffs', () => {
+    const def = (id: string) => ITEMS[id] as ItemDef | undefined;
+    expect(vendorStockedIdsBy(NPCS, (id) => def(id)?.elixir !== undefined)).toEqual([]);
+  });
+
+  it('every magnitude-bearing stocked id is classified: paired, exempt, or a drink', () => {
+    const axes: MagnitudeAxis[] = ['potionHp', 'potionMana', 'foodHp', 'drinkMana'];
+    const stocked = vendorStockedIdsBy(NPCS, (id) =>
+      axes.some((axis) => liveMagnitude(id, axis) !== undefined),
+    );
+    const classified = new Set<string>([
+      ...PAIRS.map((r) => r.vendorId),
+      'minor_healing_potion',
+      'lesser_healing_potion',
+      'tough_jerky',
+      'spring_water',
+      'marsh_mint_tea',
+      'silvermist_cordial',
+      'meltwater_flask',
+      'glacier_melt',
+    ]);
+    expect(stocked).toEqual([...classified].sort());
   });
 });
 
@@ -327,6 +443,13 @@ describe('no crafted counterpart: the vendor drink line', () => {
   });
 
   it('zero crafted drinkMana items exist (the premise of this arm)', () => {
+    // The crafted-side filter shape is alive: the same scan on another axis
+    // finds a known crafted food, so the empty result below is a real
+    // absence, not a dead pipeline.
+    const craftedFoods = [...RECIPE_RESULT_IDS].filter(
+      (itemId) => liveMagnitude(itemId, 'foodHp') !== undefined,
+    );
+    expect(craftedFoods).toContain('pan_seared_perch');
     const craftedDrinks = [...RECIPE_RESULT_IDS]
       .filter((itemId) => liveMagnitude(itemId, 'drinkMana') !== undefined)
       .sort();
@@ -408,13 +531,39 @@ describe('stock rows: the phase 11n pulls', () => {
     expect(rows[0]?.chance, 'fen_troll elixir_of_the_bear drop chance').toBe(0.008);
   });
 
-  it('no other vendor lost a row: the total stock row count holds the post-pull ratchet', () => {
-    // Conscious ratchet, counted on the live tree: 224 (npc, itemId) vendor
-    // stock rows before phase 11n, minus the five rows the phase pulled (four
-    // gear rows on smith_haldren, elixir_of_the_bear on alchemist_verane).
-    // A future deliberate stock change updates this literal in the same diff.
-    let rowCount = 0;
-    for (const npc of Object.values(NPCS)) rowCount += (npc.vendorItems ?? []).length;
-    expect(rowCount).toBe(219);
+  it('no other vendor lost a row: per-vendor stock row counts hold the post-pull ratchet', () => {
+    // Conscious ratchet, counted on the live tree per vendor (224 rows before
+    // phase 11n, 219 after; only the two pulled vendors moved). Per-NPC so a
+    // vendor losing a row reds BY NAME, and offsetting cross-vendor changes
+    // cannot sum back to a green total the way a scalar count could. A future
+    // deliberate stock change updates its vendor's literal in the same diff.
+    const counts: Record<string, number> = {};
+    for (const [npcId, npc] of Object.entries(NPCS)) {
+      if (npc.vendorItems && npc.vendorItems.length > 0) counts[npcId] = npc.vendorItems.length;
+    }
+    expect(counts).toEqual({
+      trader_wilkes: 13,
+      cook_marlow: 6,
+      tanner_hesk: 4,
+      alchemist_verane: 5,
+      weaver_ottilie: 4,
+      quartermaster_finch: 1,
+      forgemistress_darva: 2,
+      provisioner_hale: 22,
+      quartermaster_bree: 23,
+      tinker_gizzel: 3,
+      smith_haldren: 7,
+      fisherman_brandt: 1,
+      farmer_jessica: 5,
+      farmer_teasel: 3,
+      farmer_hollis: 5,
+      farmer_verbena: 5,
+      provisioner_fenna: 6,
+      armorer_hode: 5,
+      warmarshal_draven_kole: 47,
+      fury: 47,
+      stablemaster_marla: 2,
+      wardsmith_orun: 3,
+    });
   });
 });

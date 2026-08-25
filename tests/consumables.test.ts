@@ -183,31 +183,33 @@ describe('#1608: potionHp/potionMana ladder', () => {
     ['mana_potion', ZONE3_ZONE.levelRange[1]],
   ];
 
-  // Measured fractions after the 11n vendor floor: 0.894/0.792/0.721 by rung,
-  // so the ceiling tightens to 0.95 (was 1.00) with the floor untouched.
+  // Measured fractions after the 11n vendor floor: 0.894/0.792/0.721 by rung.
+  // The band brackets the items.ts header's stated "72-90%" tightly (the
+  // golden pin below is the change detector for the values themselves; this
+  // band is what keeps the header's stated range honest against pool drift).
   it.each(HP_TIERS)(
-    "%s restores a meaningful, documented fraction (0.60-0.95) of a priest's base hp pool at its bracket top",
+    "%s restores a meaningful, documented fraction (0.70-0.90) of a priest's base hp pool at its bracket top",
     (itemId, topLevel) => {
       const { maxHp } = basePoolAt('priest', topLevel);
       const fraction = potionHp(itemId) / maxHp;
-      expect(fraction).toBeGreaterThanOrEqual(0.6);
-      expect(fraction).toBeLessThanOrEqual(0.95);
+      expect(fraction).toBeGreaterThanOrEqual(0.7);
+      expect(fraction).toBeLessThanOrEqual(0.9);
     },
   );
 
   // 11n re-derivation: the vendor mana rungs moved to 226 and 354, so the
-  // measured fractions are 0.662/0.545/0.536 by rung; the floor moved from 0.55
-  // to 0.50, and the ceiling tightens to 0.70 (the crafted draughts are the
-  // line above).
+  // measured fractions are 0.662/0.545/0.536 by rung. The band brackets the
+  // items.ts header's stated "53-66%" tightly, same division of labor as the
+  // hp band above.
   it.each(MANA_TIERS)(
     // Hunters run on focus on this line (the hunter overhaul), so the potion
     // floor's subject is the smallest MANA pool: the paladin.
-    "%s restores a meaningful, documented fraction (0.50-0.70) of a paladin's base mana pool at its bracket top",
+    "%s restores a meaningful, documented fraction (0.52-0.68) of a paladin's base mana pool at its bracket top",
     (itemId, topLevel) => {
       const { maxResource } = basePoolAt('paladin', topLevel);
       const fraction = potionMana(itemId) / maxResource;
-      expect(fraction).toBeGreaterThanOrEqual(0.5);
-      expect(fraction).toBeLessThanOrEqual(0.7);
+      expect(fraction).toBeGreaterThanOrEqual(0.52);
+      expect(fraction).toBeLessThanOrEqual(0.68);
     },
   );
 

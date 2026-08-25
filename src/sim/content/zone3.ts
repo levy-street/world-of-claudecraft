@@ -1431,16 +1431,16 @@ export const ZONE3_NPCS: Record<string, NpcDef> = {
     // Professions 2.0: the Highwatch apothecary master runs the
     // repeatable alchemy work order.
     questIds: ['q_prof_workorder_apothecary'],
+    // 11n-BOTH pulled the bear elixir stock row from this list: it exactly
+    // equalled elixir_of_the_serpent (the alchemy-50 crafted top elixir) at
+    // buff_sta 12 for 900s, a zero percent margin, R23's purest competitor,
+    // and the one vendor-sold buff in the catalog; the item, its Mirefen
+    // drop, its recipe and its buyValue stay.
     vendorItems: [
       'minor_healing_potion',
       'minor_mana_potion',
       'lesser_healing_potion',
       'lesser_mana_potion',
-      // 11n-BOTH pulled the bear elixir stock row: it exactly equalled
-      // elixir_of_the_serpent (the alchemy-50 crafted top elixir) at buff_sta
-      // 12 for 900s, a zero percent margin, R23's purest competitor, and the
-      // one vendor-sold buff in the catalog; the item, its Mirefen drop, its
-      // recipe and its buyValue stay.
       'glass_vial',
     ],
     greeting:

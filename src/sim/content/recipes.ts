@@ -4175,7 +4175,7 @@ export const TROPHY_RECIPES: ProfessionRecipeRecord[] = [
     // the rung's own register. Input 82 vs output 16 (the goldleaf_scroll
     // precedent ships 90 vs 15). 11l-OUT: trophy 5 < output 16 < input 82; no
     // prior recipe crafts it (recipeForResultItem); common, below the ceiling.
-    // Re-picked by the 11l QA from healing_potion (320 HP, sellValue 32): at
+    // Re-picked by the 11l QA from healing_potion (then 320 HP, sellValue 32): at
     // rung 25 that potion out-healed the trainer's OWN rung-25 row
     // recipe_goldleaf_healing_draught (200 HP for a 140 bill) at 82 and sat
     // within 15 HP of the rung-50 rare draught (335 HP for 344), on the one
@@ -4187,7 +4187,8 @@ export const TROPHY_RECIPES: ProfessionRecipeRecord[] = [
     // bill PER POINT OF HEALING (0.53 copper an HP against 0.70), a
     // pre-existing tension that is the maintainer's, not this row's. (11n
     // vendor floor: that potion is 279 HP since the nerf, 0.61 an HP, so
-    // the tension narrowed but still stands.)
+    // the tension narrowed but still stands, and the gap to the rung-50
+    // rare draught widened from 15 HP to 56.)
     // Discounted bills (requiredReagentCountFor): specialization only, candles
     // 2 to 1, 77 vs 16; specialization plus self-signed lands on the same
     // floor, 77 vs 16 (the herb and the vial are already 1), still
