@@ -307,11 +307,16 @@ Two premises above no longer hold on the tree the 11n session will inherit
   re-picked potion row, recipe_lesser_healing_potion, sold by provisioner_hale
   and alchemist_verane) and linen_pouch (recipe_linen_pouch, sold by
   trader_wilkes and weaver_ottilie, and by the release's new island
-  quartermaster). Branch-caused (11l and an earlier phase), not merge-caused.
+  quartermaster, Quartermaster Finch, a third seller for an id already
+  both-sourced). Branch-caused, both by 11l (the build's trophy rows landed
+  recipe_linen_pouch, the 11l QA's re-pick landed recipe_lesser_healing_potion;
+  both are in the 11l stamp 08607e5472), not merge-caused.
   The 11n session re-judges the exemption over the nine as its STOP rule says,
   rather than extending the three-id reasoning by analogy.
 - **elixir_of_the_bear's Mirefen drop is 0.8 percent, not 7 percent**
-  (src/sim/content/zone2.ts, chance 0.008, unchanged since the classic-era
-  loot-rate fix that predates the packet). The "keep its 7 percent Mirefen
-  drop" instruction above reads 0.8 percent, and the pin-per-id arm asserts
-  the real value.
+  (src/sim/content/zone2.ts, chance 0.008). The 7 percent was TRUE when this
+  file was written on 2026-08-20: the release's classic-era loot-rate fix
+  (98afdc0ec1, 2026-08-21) moved it to 0.008 and reached this branch with the
+  v0.40.0 sync on 2026-08-23, so the premise was moved by an earlier release
+  sync, not misread. The "keep its 7 percent Mirefen drop" instruction above
+  reads 0.8 percent, and the pin-per-id arm asserts the real value.

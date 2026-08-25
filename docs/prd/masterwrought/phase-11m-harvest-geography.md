@@ -353,7 +353,9 @@ STOPPING RULES:
 ## Corrections found at execution (2026-08-25, the 11m session; the census above is the SHAPE)
 
 Re-derived from the merged tree at 9f130d3b7c (the seventeenth release sync,
-release/v0.41.0), before any edit, as STEP 0 and STEP 1 require:
+release/v0.41.0), before the spread (bf4f36405d), as STEP 0 and STEP 1
+require; the bullets are anchored there and phrased in the past, and the
+numbers the spread then moved are in the state.md ledger:
 
 - **meat is 17 templates over 10 zones, not 15 over 9** (16 over 10 on the
   reachable subset): the release's Proving Shore added shore_scuttler (levels
@@ -370,7 +372,8 @@ release/v0.41.0), before any edit, as STEP 0 and STEP 1 require:
 - **horn's "2 templates" is 1 reachable**: wildheart_hexcaller lives only in
   the Wildheart dungeon roster (no camp), as qr-11m-SPREAD already measured.
 - **The corpse-harvest test corpus used gills and horn as THE unmapped
-  exemplars** (about two hundred sites across eleven suites, sethrael_palecoil
+  exemplars** (229 literal sites across fourteen suites, 239 lines retired by
+  the orphan commit, whose body undercounts them as eleven; sethrael_palecoil
   and mudfin_murloc as the shipped mixed fixtures). Mapping the orphans
   retires every shipped unmapped fixture, so the migration to a synthetic
   never-mapped family (tests/helpers/unmapped_family.ts) is part of the orphan
@@ -380,4 +383,6 @@ release/v0.41.0), before any edit, as STEP 0 and STEP 1 require:
   horn and gills), pinned in tests/corpse_harvest_sim.test.ts. It refused two
   of the settled starting candidates (dune_troll for tusk, frostmane_yeti for
   horn, both fang carriers); the spread swapped in the Farshore's Sundered
-  Horror and held horn's floor on the six remaining carriers.
+  Horror for tusk, and horn's floor holds on six reachable carriers: the
+  three settled candidates that survived, the Palecoil, and moonfleece_grazer
+  and aurelhorn, which the spread added.
