@@ -2886,16 +2886,24 @@ export const hudChromeStrings = {
     // rewording a key in place leaves every locale's reviewed fill silently
     // answering the old sentence.
     yieldTierHint: 'The fewer components a harvest takes, the higher the tier of each.',
-    // #2509: claw, tusk, gills and horn are tagged on corpses but no harvest
-    // item is wired to them yet, so a selection of nothing but those would
-    // spend the single-use corpse for nothing. The command refuses it and the
-    // picker says why, in place: a disabled button's tooltip is unreachable.
+    // #2509: a selection naming nothing but carried-but-unmapped families
+    // (tags with no harvest item wired to them) would spend the single-use
+    // corpse for nothing, so the command refuses it and the picker says why,
+    // in place: a disabled button's tooltip is unreachable. Claw, tusk,
+    // gills and horn shipped that way when this key landed; #2905 mapped the
+    // first two and Masterwrought Phase 11m the last two, so no shipped
+    // template can surface this line today. The key stays live as the
+    // defensive arm for any future unmapped tag, exercised through the
+    // retagged fixtures of tests/helpers/unmapped_family.ts.
     nothingSelectedYields: 'Nothing you selected can be harvested from this corpse.',
     alreadyHarvested: 'This corpse has already been harvested.',
     componentAria: 'Harvest {component}',
-    // #2514: the same four families, on a corpse that ALSO carries one that
-    // pays. The row stays offered (the corpse does carry it) and checking it is
-    // now free, so this marks it rather than explaining a refusal.
+    // #2514: the same carried-but-unmapped shape, on a corpse that ALSO
+    // carries a family that pays. The row stays offered (the corpse does
+    // carry it) and checking it is free, so this marks it rather than
+    // explaining a refusal. The four families #2509 names above wore this
+    // mark until #2905 and Phase 11m mapped them; no shipped row wears it
+    // today, and the key stays live for any future unmapped tag.
     //
     // Two keys, and the aria one takes the visible mark as a SECOND
     // placeholder rather than restating it. Never concatenated, and it also

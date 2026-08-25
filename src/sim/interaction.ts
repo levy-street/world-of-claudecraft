@@ -336,9 +336,14 @@ export function harvestCorpse(
   // claw) with ['claw']: the claim was spent, one tier roll was drawn, nothing
   // was granted, and the harvestResult ledger was skipped (it is gated on
   // `granted.length > 0`), so the player burned a single-use corpse for no
-  // items and NO chat line at all. Nine shipped templates mix mapped and
-  // unmapped families, and on the three `gills, hide` murlocs a single
-  // checkbox is enough to hit it.
+  // items and NO chat line at all. At the time nine shipped templates mixed
+  // mapped and unmapped families, and on the three `gills, hide` murlocs a
+  // single checkbox was enough to hit it; #2905 (claw, tusk) and
+  // Masterwrought Phase 11m (horn, gills) have since mapped every shipped
+  // family, so no shipped template mixes today and the corpse suites drive
+  // this refusal through the retagged fixtures of
+  // tests/helpers/unmapped_family.ts. The gate itself stays live for any
+  // future unmapped tag.
   //
   // Placed with the capacity gate below, for the same three reasons that one
   // is here: pre-claim (a refusal must leave the corpse for the next
@@ -364,8 +369,9 @@ export function harvestCorpse(
   //
   // Scope, the other half of the #2504 comment: that one covers a tag the
   // corpse does not CARRY, which sanitizes away and spreads. This covers a tag
-  // it carries that HARVEST_COMPONENT_ITEMS does not map (gills, horn) on a
-  // corpse that ALSO carries a mapped one. A corpse whose tags ALL map to
+  // it carries that HARVEST_COMPONENT_ITEMS does not map, on a corpse that
+  // ALSO carries a mapped one (gills and horn were the shipped such tags
+  // until Phase 11m mapped them; today only a retagged fixture carries one). A corpse whose tags ALL map to
   // nothing never reaches this gate at all any more (#2513): the
   // isHarvestableCorpse check above answers on mapped families, so such a
   // corpse is refused there with error.corpseNothingToHarvest, exactly like
