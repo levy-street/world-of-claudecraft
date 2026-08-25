@@ -6,6 +6,7 @@ import { ALL_EXTENSIONS } from '@gltf-transform/extensions';
 import { MeshoptDecoder } from 'meshoptimizer';
 import { describe, expect, it } from 'vitest';
 import { MEDIA_ASSETS } from '../src/render/assets/manifest.generated';
+import { PLAYER_DODGE_SYNTHESIZED_CLIP_SOURCES } from '../src/render/characters/assets';
 import {
   type ClipMap,
   manifestUrls,
@@ -48,6 +49,9 @@ async function loadableClipNames(visual: {
   const names = new Set<string>();
   for (const url of [visual.url, ...(visual.animUrls ?? [])]) {
     for (const name of await glbAnimationNames(`public/${url}`)) names.add(name);
+  }
+  for (const [synthesized, source] of Object.entries(PLAYER_DODGE_SYNTHESIZED_CLIP_SOURCES)) {
+    if (names.has(source)) names.add(synthesized);
   }
   return names;
 }

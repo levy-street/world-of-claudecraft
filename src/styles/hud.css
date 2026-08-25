@@ -1836,19 +1836,20 @@
   }
   .dodge-endurance {
     position: absolute;
-    right: 2px;
-    bottom: 1px;
+    right: 3px;
+    bottom: 2px;
     z-index: 2;
     display: flex;
-    width: 42px;
-    height: 3px;
-    gap: 2px;
+    width: 64px;
+    height: 6px;
+    gap: 3px;
     pointer-events: none;
   }
   .dodge-endurance > span {
     flex: 1;
     overflow: hidden;
-    background: #071b1d;
+    border-radius: 3px;
+    background: #061719;
     box-shadow: 0 0 0 1px #000c;
   }
   .dodge-endurance i {
@@ -1857,8 +1858,40 @@
     height: 100%;
     transform: scaleX(1);
     transform-origin: left;
-    background: #52e0c4;
-    box-shadow: 0 0 3px #71ffe5;
+    color: var(--color-energy);
+    background: currentColor;
+    box-shadow: 0 0 4px currentColor;
+    transition: transform 80ms linear;
+  }
+  @keyframes dodge-endurance-ready-a {
+    0%,
+    100% {
+      filter: brightness(1);
+    }
+    45% {
+      filter: brightness(1.9);
+      box-shadow: 0 0 9px currentColor;
+    }
+  }
+  @keyframes dodge-endurance-ready-b {
+    0%,
+    100% {
+      filter: brightness(1);
+    }
+    45% {
+      filter: brightness(1.9);
+      box-shadow: 0 0 9px currentColor;
+    }
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    .dodge-endurance.recovered-a[data-charges="1"] > span:first-child i,
+    .dodge-endurance.recovered-a[data-charges="2"] > span:last-child i {
+      animation: dodge-endurance-ready-a 420ms ease-out;
+    }
+    .dodge-endurance.recovered-b[data-charges="1"] > span:first-child i,
+    .dodge-endurance.recovered-b[data-charges="2"] > span:last-child i {
+      animation: dodge-endurance-ready-b 420ms ease-out;
+    }
   }
   .hp .bar-fill {
     background-color: var(--color-hp);

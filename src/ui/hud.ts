@@ -84,11 +84,6 @@ import {
 import { specialRoleColor } from '../sim/discord_roles';
 import { canEquipItem, isUniqueEquipped, weaponHand } from '../sim/equipment_rules';
 import { isItemLevelEligible, itemLevel, itemScore } from '../sim/item_level';
-import {
-  DODGE_ENDURANCE_COST,
-  DODGE_ENDURANCE_MAX,
-  playerEndurance,
-} from '../sim/player_dodge';
 import { requiredLevelFor } from '../sim/item_level_req';
 import type { Ante, PickAction } from '../sim/lockpick';
 import { petCanForceTaunt } from '../sim/pet/pet_taunt_gate';
@@ -279,6 +274,7 @@ import { bindDialogKeyActivation } from './dialog_key_activation';
 import { markDialogRoot } from './dialog_root';
 import { discordRoleTagLabel } from './discord_role_tag';
 import { discordStatusDisplayName } from './discord_tier';
+import { DodgeEndurancePainter } from './dodge_endurance_painter';
 import { dropdownKeyNav } from './dropdown_nav';
 import { DungeonFinderProposalPopup } from './dungeon_finder_proposal_popup';
 import { DungeonFinderWindow } from './dungeon_finder_window';
@@ -1466,9 +1462,6 @@ export class Hud {
   private pfResEl = $('#pf-res');
   private pfResTextEl = $('#pf-res-text');
   private pfResourceEl = $('#pf-resource');
-  private dodgeEnduranceEl = $('#dodge-endurance');
-  private dodgeEnduranceFirstEl = $('#dodge-endurance-first');
-  private dodgeEnduranceSecondEl = $('#dodge-endurance-second');
   private pfAbsorbEl = $('#pf-absorb');
   private buffBarEl = $('#buff-bar');
   private debuffBarEl = $('#debuff-bar');
@@ -4257,6 +4250,12 @@ export class Hud {
       text: this.pfResTextEl,
     },
   });
+  private readonly dodgeEndurancePainter = new DodgeEndurancePainter(
+    this.writerFacet,
+    $('#dodge-endurance'),
+    $('#dodge-endurance-first'),
+    $('#dodge-endurance-second'),
+  );
   // The two cast bars are ONE instance-parameterized painter, over the
   // castBarState core. The PLAYER instance localizes the cast id (castDisplayName),
   // layers the eat/drink overlay (consumeBarState, player-only), and clears the bar
@@ -8615,21 +8614,7 @@ export class Hud {
     playerFrame.borderSlug = deedBorderSlug(sim.activeBorder);
     playerFrame.absorb = p;
     this.playerFramePainter.paint(unitFrameViewInto(this.playerFrameBuffer, playerFrame));
-    const dodgeEndurance = playerEndurance(p);
-    this.writerFacet.setTransform(
-      this.dodgeEnduranceFirstEl,
-      `scaleX(${Math.min(1, dodgeEndurance / DODGE_ENDURANCE_COST)})`,
-    );
-    this.writerFacet.setTransform(
-      this.dodgeEnduranceSecondEl,
-      `scaleX(${Math.min(1, Math.max(0, dodgeEndurance - DODGE_ENDURANCE_COST) / DODGE_ENDURANCE_COST)})`,
-    );
-    this.writerFacet.setAttr(this.dodgeEnduranceEl, 'aria-valuenow', String(dodgeEndurance));
-    this.writerFacet.setAttr(
-      this.dodgeEnduranceEl,
-      'aria-valuetext',
-      `${Math.round(dodgeEndurance)} / ${DODGE_ENDURANCE_MAX}`,
-    );
+    this.dodgeEndurancePainter.paint(p);
     this.updateLowHealthVignette(p.hp, p.maxHp);
     this.updateLowResource(p);
     const fateThreads = this.updateWarlockDoomMeter(p);

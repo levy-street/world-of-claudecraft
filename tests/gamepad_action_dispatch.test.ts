@@ -3,7 +3,11 @@ import { dispatchGamepadAction, type GamepadActionDeps } from '../src/game/gamep
 
 function deps(): GamepadActionDeps {
   const hud = new Proxy(
-    { cancelGroundAim: vi.fn(() => false), closeAll: vi.fn(() => false) },
+    {
+      cancelGroundAim: vi.fn(() => false),
+      closeAll: vi.fn(() => false),
+      toggleMap: vi.fn(),
+    },
     { get: (target, key) => Reflect.get(target, key) ?? vi.fn() },
   );
   const world = new Proxy(

@@ -5,6 +5,7 @@ import { describe, expect, it } from 'vitest';
 import {
   applyModularSliderMorphs,
   PALADIN_SYNTHESIZED_CLIP_SOURCES,
+  PLAYER_DODGE_SYNTHESIZED_CLIP_SOURCES,
 } from '../src/render/characters/assets';
 import {
   type ClipMap,
@@ -1334,6 +1335,9 @@ describe('per-class modular defs', () => {
       for (const [synthesized, source] of Object.entries(PALADIN_SYNTHESIZED_CLIP_SOURCES)) {
         if (names.has(source)) names.add(synthesized);
       }
+    }
+    for (const [synthesized, source] of Object.entries(PLAYER_DODGE_SYNTHESIZED_CLIP_SOURCES)) {
+      if (names.has(source)) names.add(synthesized);
     }
     const missing = referencedClips(def.clips).filter((c) => !names.has(c));
     expect(missing, `unresolvable clips for ${cls}`).toEqual([]);

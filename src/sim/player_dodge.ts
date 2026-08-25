@@ -6,6 +6,8 @@ import { DT, type Entity } from './types';
 export const DODGE_ENDURANCE_MAX = 100;
 export const DODGE_ENDURANCE_COST = 50;
 export const DODGE_ENDURANCE_REGEN_PER_SECOND = 5;
+export const DODGE_ENDURANCE_RECHARGE_SECONDS =
+  DODGE_ENDURANCE_COST / DODGE_ENDURANCE_REGEN_PER_SECOND;
 export const DODGE_DURATION = 0.75;
 export const DODGE_DISTANCE = 6;
 export const DODGE_SPEED = DODGE_DISTANCE / DODGE_DURATION;

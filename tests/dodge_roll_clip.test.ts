@@ -4,7 +4,7 @@ import {
   createPlayerDodgeRollClip,
   PLAYER_DODGE_ROLL_DURATION,
 } from '../src/render/characters/dodge_roll_clip';
-import { PLAYER_DODGE_ROLL_CLIP } from '../src/render/dodge_visual_core';
+import { PLAYER_DODGE_ROLL_CLIP, PLAYER_DODGE_ROLL_CLIPS } from '../src/render/dodge_visual_core';
 
 const BONES = [
   'hips',
@@ -46,5 +46,24 @@ describe('player dodge roll clip', () => {
     const hips = clip.tracks.find((track) => track.name === 'hips.quaternion');
     expect(hips?.times.length).toBe(6);
     expect(Array.from(hips?.values ?? [])).not.toEqual(new Array(24).fill(0));
+  });
+
+  it('synthesizes a distinct full roll for every movement direction', () => {
+    const source = sourceClip();
+    const clips = (['forward', 'back', 'left', 'right'] as const).map((direction) =>
+      createPlayerDodgeRollClip(source, direction),
+    );
+
+    expect(clips.map((clip) => clip.name)).toEqual([
+      PLAYER_DODGE_ROLL_CLIPS.forward,
+      PLAYER_DODGE_ROLL_CLIPS.back,
+      PLAYER_DODGE_ROLL_CLIPS.left,
+      PLAYER_DODGE_ROLL_CLIPS.right,
+    ]);
+    const hipRotations = clips.map((clip) =>
+      JSON.stringify(clip.tracks.find((track) => track.name === 'hips.quaternion')?.values),
+    );
+    expect(new Set(hipRotations).size).toBe(4);
+    expect(clips.every((clip) => clip.duration === PLAYER_DODGE_ROLL_DURATION)).toBe(true);
   });
 });

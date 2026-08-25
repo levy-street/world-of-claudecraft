@@ -1,5 +1,5 @@
 import * as THREE from 'three';
-import { PLAYER_DODGE_ROLL_CLIP } from '../dodge_visual_core';
+import { type DodgeVisualDirection, PLAYER_DODGE_ROLL_CLIPS } from '../dodge_visual_core';
 
 export const PLAYER_DODGE_ROLL_DURATION = 0.75;
 export const PLAYER_DODGE_ROLL_TIMES = [0, 0.1, 0.23, 0.39, 0.57, 0.75] as const;
@@ -101,6 +101,12 @@ const ROTATION_OFFSETS: Readonly<Record<string, readonly EulerDegrees[]>> = {
 };
 
 const HIPS_Y_OFFSETS = [0, -0.035, -0.08, -0.085, -0.03, 0] as const;
+const DIRECTION_YAW: Readonly<Record<DodgeVisualDirection, number>> = {
+  forward: 0,
+  back: Math.PI,
+  left: -Math.PI / 2,
+  right: Math.PI / 2,
+};
 
 function sampledValues(track: THREE.KeyframeTrack, source: THREE.AnimationClip): number[] {
   const valueSize = track.getValueSize();
@@ -117,6 +123,7 @@ function quaternionValues(
   track: THREE.KeyframeTrack,
   source: THREE.AnimationClip,
   bone: string,
+  direction: DodgeVisualDirection,
 ): number[] {
   const values = sampledValues(track, source);
   const offsets = ROTATION_OFFSETS[bone];
@@ -125,6 +132,11 @@ function quaternionValues(
   const offset = new THREE.Quaternion();
   const euler = new THREE.Euler(0, 0, 0, 'XYZ');
   const previous = new THREE.Quaternion();
+  const directionYaw = new THREE.Quaternion().setFromAxisAngle(
+    new THREE.Vector3(0, 1, 0),
+    DIRECTION_YAW[direction],
+  );
+  const inverseDirectionYaw = directionYaw.clone().invert();
   for (let key = 0; key < PLAYER_DODGE_ROLL_TIMES.length; key++) {
     const valueOffset = key * 4;
     base.fromArray(values, valueOffset).normalize();
@@ -134,7 +146,11 @@ function quaternionValues(
       THREE.MathUtils.degToRad(degrees[1]),
       THREE.MathUtils.degToRad(degrees[2]),
     );
-    base.multiply(offset.setFromEuler(euler)).normalize();
+    offset.setFromEuler(euler);
+    if (direction !== 'forward') {
+      offset.premultiply(directionYaw).multiply(inverseDirectionYaw);
+    }
+    base.multiply(offset).normalize();
     if (key > 0 && previous.dot(base) < 0) base.set(-base.x, -base.y, -base.z, -base.w);
     base.toArray(values, valueOffset);
     previous.copy(base);
@@ -163,7 +179,10 @@ function positionValues(
 }
 
 /** Builds a KayKit-compatible forward roll without changing the source clip. */
-export function createPlayerDodgeRollClip(source: THREE.AnimationClip): THREE.AnimationClip {
+export function createPlayerDodgeRollClip(
+  source: THREE.AnimationClip,
+  direction: DodgeVisualDirection = 'forward',
+): THREE.AnimationClip {
   const sourceNames = new Set(source.tracks.map((track) => track.name));
   for (const bone of Object.keys(ROTATION_OFFSETS)) {
     if (!sourceNames.has(`${bone}.quaternion`)) {
@@ -179,7 +198,7 @@ export function createPlayerDodgeRollClip(source: THREE.AnimationClip): THREE.An
         new THREE.QuaternionKeyframeTrack(
           sourceTrack.name,
           PLAYER_DODGE_ROLL_TIMES,
-          quaternionValues(sourceTrack, source, bone),
+          quaternionValues(sourceTrack, source, bone, direction),
         ),
       );
     } else if (sourceTrack.name.endsWith('.position')) {
@@ -193,5 +212,9 @@ export function createPlayerDodgeRollClip(source: THREE.AnimationClip): THREE.An
       );
     }
   }
-  return new THREE.AnimationClip(PLAYER_DODGE_ROLL_CLIP, PLAYER_DODGE_ROLL_DURATION, tracks);
+  return new THREE.AnimationClip(
+    PLAYER_DODGE_ROLL_CLIPS[direction],
+    PLAYER_DODGE_ROLL_DURATION,
+    tracks,
+  );
 }

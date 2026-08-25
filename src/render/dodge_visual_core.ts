@@ -1,7 +1,13 @@
-export const PLAYER_DODGE_ROLL_CLIP = 'Player_Dodge_Roll';
-export const PLAYER_DODGE_ROLL_SOURCE = 'Running_A';
-
 export type DodgeVisualDirection = 'forward' | 'back' | 'left' | 'right';
+
+export const PLAYER_DODGE_ROLL_CLIPS: Readonly<Record<DodgeVisualDirection, string>> = {
+  forward: 'Player_Dodge_Roll_Forward',
+  back: 'Player_Dodge_Roll_Back',
+  left: 'Player_Dodge_Roll_Left',
+  right: 'Player_Dodge_Roll_Right',
+};
+export const PLAYER_DODGE_ROLL_CLIP = PLAYER_DODGE_ROLL_CLIPS.forward;
+export const PLAYER_DODGE_ROLL_SOURCE = 'Running_A';
 
 /** Maps an authoritative world-space dodge vector into the actor's local facing. */
 export function dodgeVisualDirection(

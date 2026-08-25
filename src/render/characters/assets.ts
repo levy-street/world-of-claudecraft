@@ -21,7 +21,11 @@ import { retryDelayMs as gltfRetryDelayMs } from '../assets/load_retry';
 import { loadGltf, loadKtx2Texture, loadTexture } from '../assets/loader';
 import { registerPreload } from '../assets/preload';
 import { recordBuildSpan, timeBuildSpan } from '../build_spans';
-import { PLAYER_DODGE_ROLL_CLIP, PLAYER_DODGE_ROLL_SOURCE } from '../dodge_visual_core';
+import {
+  PLAYER_DODGE_ROLL_CLIP,
+  PLAYER_DODGE_ROLL_CLIPS,
+  PLAYER_DODGE_ROLL_SOURCE,
+} from '../dodge_visual_core';
 import { addRimGlow, EMISSIVE_GLOW, GFX, type GfxSettings } from '../gfx';
 import { applySurfaceDetail, riggedWornFamilyFor } from '../worn_stone';
 import { type ArmorDyeSpec, attachArmorDye } from './armor_dye';
@@ -2221,7 +2225,10 @@ export const PALADIN_SYNTHESIZED_CLIP_SOURCES: Readonly<Record<string, string>> 
 };
 
 export const PLAYER_DODGE_SYNTHESIZED_CLIP_SOURCES: Readonly<Record<string, string>> = {
-  [PLAYER_DODGE_ROLL_CLIP]: PLAYER_DODGE_ROLL_SOURCE,
+  [PLAYER_DODGE_ROLL_CLIPS.forward]: PLAYER_DODGE_ROLL_SOURCE,
+  [PLAYER_DODGE_ROLL_CLIPS.back]: PLAYER_DODGE_ROLL_SOURCE,
+  [PLAYER_DODGE_ROLL_CLIPS.left]: PLAYER_DODGE_ROLL_SOURCE,
+  [PLAYER_DODGE_ROLL_CLIPS.right]: PLAYER_DODGE_ROLL_SOURCE,
 };
 
 /** Test-only observation window into the shared tinted-material cache. */
@@ -2245,7 +2252,9 @@ export function prepareVisual(key: string): PreparedVisual {
   if (def.clips.dodge === PLAYER_DODGE_ROLL_CLIP) {
     const source = clips.get(PLAYER_DODGE_ROLL_SOURCE);
     if (!source) throw new Error(`Player dodge roll requires ${PLAYER_DODGE_ROLL_SOURCE}`);
-    clips.set(PLAYER_DODGE_ROLL_CLIP, createPlayerDodgeRollClip(source));
+    for (const direction of ['forward', 'back', 'left', 'right'] as const) {
+      clips.set(PLAYER_DODGE_ROLL_CLIPS[direction], createPlayerDodgeRollClip(source, direction));
+    }
   }
   // The modular paladin mirrors the classic clip map (attackByAbility includes
   // the synthesized Verdict and Sweep names), so it needs the same synthesis:

@@ -10,7 +10,7 @@ import { offhandMirrorsWeaponSkin } from '../../sim/content/weapon_skin_rules';
 import { WEAPON_SKINS } from '../../sim/content/weapon_skins';
 import type { OverheadEmoteId } from '../../world_api';
 import { recordBuildSpan, timeBuildSpan } from '../build_spans';
-import type { DodgeVisualDirection } from '../dodge_visual_core';
+import { type DodgeVisualDirection, PLAYER_DODGE_ROLL_CLIPS } from '../dodge_visual_core';
 import { GFX } from '../gfx';
 import { cloneMaterialWithHooks } from '../material_clone_hooks';
 import {
@@ -153,6 +153,9 @@ const BOW_PIN_BLEND_S = 0.12; // engage/disengage fade for the orientation pins
 
 const FADE = 0.22;
 const ONESHOT_FADE = 0.1;
+const ONESHOT_RECOVERY_FADE = 0.18;
+const ATTACK_TRANSITION = { enterFade: 0.08, recoveryFade: 0.14 } as const;
+const DODGE_TRANSITION = { enterFade: 0.06, recoveryFade: 0.12 } as const;
 // Z-key sheathe gesture: the 1H chop's WINDUP raises the hand over the shoulder
 // toward the back (grabbing/planting the hilt). The held-prop swap lands at the
 // windup peak, where update() also cuts the clip so the downswing never plays.
@@ -624,6 +627,7 @@ export class CharacterVisual {
   private current: THREE.AnimationAction | null = null;
   private currentIsOneShot = false;
   private currentOneShotIsEmote = false;
+  private currentOneShotRecoveryFade = ONESHOT_RECOVERY_FADE;
   // Whether the live one-shot is the ATTACK, as opposed to a hit react, a
   // landing, the sheathe gesture or any other one-shot. Only the aim pin needs
   // the distinction (skin_attack.ts rangedSkinAiming); a stale true is harmless
@@ -864,7 +868,11 @@ export class CharacterVisual {
       const mixerStarted = performance.now();
       this.mixer = new THREE.AnimationMixer(this.model);
       this.skeletonUpdates = new SkeletonUpdateCache(this.model);
-      for (const name of [...clipNamesOf(prep.def), ...SKIN_ATTACK_CLIP_NAMES]) {
+      for (const name of [
+        ...clipNamesOf(prep.def),
+        ...Object.values(PLAYER_DODGE_ROLL_CLIPS),
+        ...SKIN_ATTACK_CLIP_NAMES,
+      ]) {
         const clip = prep.clips.get(name);
         if (clip) this.actions.set(name, this.mixer.clipAction(clip));
       }
@@ -1442,7 +1450,13 @@ export class CharacterVisual {
       const authoredTimeScale = abilityId
         ? this.def.clips.attackTimeScaleByAbility?.[abilityId]
         : undefined;
-      this.playOneShot(override, authoredTimeScale ?? this.def.attackTimeScale ?? 1.3);
+      this.playOneShot(
+        override,
+        authoredTimeScale ?? this.def.attackTimeScale ?? 1.3,
+        1,
+        null,
+        ATTACK_TRANSITION,
+      );
       this.currentOneShotIsAttack = true;
       if (override === PALADIN_TEMPLARS_VERDICT_CLIP) {
         this.templarsVerdictAction = this.action(override);
@@ -1454,14 +1468,20 @@ export class CharacterVisual {
     const style = weaponAttackStyle(this.weaponItemId, this.offhandItemId);
     const handClip = style ? this.def.clips.attackByHand?.[style] : undefined;
     if (!skinAttack && handClip && this.action(handClip)) {
-      this.playOneShot(handClip, this.def.attackTimeScale ?? 1.3);
+      this.playOneShot(handClip, this.def.attackTimeScale ?? 1.3, 1, null, ATTACK_TRANSITION);
       this.currentOneShotIsAttack = true;
       return;
     }
     const clips = skinAttack?.clips ?? this.def.clips.attack;
     if (clips.length === 0) return;
     const name = clips[this.attackIdx++ % clips.length];
-    this.playOneShot(name, skinAttack?.timeScale ?? this.def.attackTimeScale ?? 1.3);
+    this.playOneShot(
+      name,
+      skinAttack?.timeScale ?? this.def.attackTimeScale ?? 1.3,
+      1,
+      null,
+      ATTACK_TRANSITION,
+    );
     this.currentOneShotIsAttack = true;
   }
 
@@ -1472,7 +1492,13 @@ export class CharacterVisual {
     this.spinOnceTimer = SPIN_ATTACK_VISUAL_DURATION;
     const clips = this.def.clips.attack;
     if (clips.length > 0) {
-      this.playOneShot(clips[this.attackIdx++ % clips.length], SPIN_ATTACK_TIMESCALE);
+      this.playOneShot(
+        clips[this.attackIdx++ % clips.length],
+        SPIN_ATTACK_TIMESCALE,
+        1,
+        null,
+        ATTACK_TRANSITION,
+      );
     }
   }
 
@@ -1487,23 +1513,16 @@ export class CharacterVisual {
   /** Direction-specific evasive gesture, time-scaled to the server dodge window. */
   playDodge(direction: DodgeVisualDirection = 'forward'): void {
     if (this.deadLock) return;
-    const directional =
-      direction === 'back'
-        ? this.def.clips.walkBack
-        : direction === 'left'
-          ? 'Running_Strafe_Left'
-          : direction === 'right'
-            ? 'Running_Strafe_Right'
-            : this.def.clips.dodge;
+    const directional = PLAYER_DODGE_ROLL_CLIPS[direction];
     const clip =
-      (directional && this.action(directional) ? directional : this.def.clips.dodge) ??
+      (this.action(directional) ? directional : this.def.clips.dodge) ??
       this.def.clips.jump ??
       this.def.clips.run;
     if (!clip) return;
     const action = this.action(clip);
     if (!action) return;
     const timeScale = Math.min(2.5, Math.max(0.5, action.getClip().duration / 0.75));
-    this.playOneShot(clip, timeScale);
+    this.playOneShot(clip, timeScale, 1, null, DODGE_TRANSITION);
   }
 
   /** Contact-frame hitstop: hold THIS rig's animation at `scale` speed for
@@ -3308,6 +3327,7 @@ export class CharacterVisual {
     timeScale: number,
     repeats = 1,
     emoteId: OverheadEmoteId | null = null,
+    transition?: Readonly<{ enterFade: number; recoveryFade: number }>,
   ): void {
     this.currentOneShotIsAttack = false;
     const a = this.action(name);
@@ -3327,10 +3347,11 @@ export class CharacterVisual {
     // whole 0.18s hand-off fade (a visible T-pose pop after every swing)
     a.clampWhenFinished = true;
     a.timeScale = timeScale;
-    this.beginAction(a, prev, ONESHOT_FADE);
+    this.beginAction(a, prev, transition?.enterFade ?? ONESHOT_FADE);
     this.current = a;
     this.currentIsOneShot = true;
     this.currentOneShotIsEmote = emoteId !== null;
+    this.currentOneShotRecoveryFade = transition?.recoveryFade ?? ONESHOT_RECOVERY_FADE;
   }
 
   private onFinished(a: THREE.AnimationAction): void {
@@ -3342,9 +3363,10 @@ export class CharacterVisual {
       return;
     }
     if (a === this.current) {
+      const recoveryFade = this.currentOneShotRecoveryFade;
       this.currentIsOneShot = false;
       this.currentOneShotIsEmote = false;
-      this.fadeTo(this.baseAction(), 0.18, false);
+      this.fadeTo(this.baseAction(), recoveryFade, false);
     }
   }
 
@@ -3470,6 +3492,7 @@ function clipNamesOf(def: VisualDef): string[] {
     c.jump,
     c.fall,
     c.land,
+    c.dodge,
     c.walkBack,
     c.flourish,
     c.stow,
