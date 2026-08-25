@@ -31,8 +31,8 @@ src/sim/combat/set_procs.ts. Four families exist today:
 
 | Family | Sets | Pieces | Breakpoints | Source |
 |---|---|---|---|---|
-| Tier 1 | deathlord (mail, Strength), wyrmshadow (leather, Agility), necromancers (cloth, caster) | 4 | 2/3/4 (moving to 3/4, see the Prerequisite section) | Gravewyrm Sanctum bosses |
-| Tier 2 | crownforged, nighttalon, soulflame, stormcallers | 4 | 2/3/4 (moving to 3/4, see the Prerequisite section) | Nythraxis raid (helm, shoulder) + Thunzharr world boss (gloves, waist) |
+| Tier 1 | deathlord (mail, Strength), wyrmshadow (leather, Agility), necromancers (cloth, caster) | 4 | 2/3/4 (merging into a 2/4/6 lineage ladder, see the Prerequisite section) | Gravewyrm Sanctum bosses |
+| Tier 2 | crownforged, nighttalon, soulflame, stormcallers | 4 | 2/3/4 (merging into a 2/4/6 lineage ladder, see the Prerequisite section) | Nythraxis raid (helm, shoulder) + Thunzharr world boss (gloves, waist) |
 | Leveling haste kits | vale_arcanist, boundstone_vanguard, greyjaw_stalker | 3 | 3 | existing world drops, re-tagged |
 | WARFARE (PvP) | five honor families | 7 | 2/4/7 | quartermaster, honor priced, zero PvE contribution |
 
@@ -117,65 +117,80 @@ and the answer is the old stack.
    the set to wear higher item level) never occurs; the stack upgrades in
    place.
 
-### The retune: raise the breakpoints, then halve the magnitudes
+### The retune: merge each archetype into one 2/4/6 lineage, then halve
 
 Two moves, by maintainer decision, and the structural one comes first.
 
-**Move 1: breakpoints go from 2/3/4 to 3/4.** The 2-piece tier is deleted
-and every incumbent family restructures so that 3 pieces pay a modest
-stat-identity tier and the 4-piece capstone carries ALL the throughput
-(the flat attack power or spell power moves from the old 2-piece into the
-capstone). The slot math is what makes this decisive: tier 1 and tier 2
-overlap in exactly one armor slot, so 4 plus 4 pieces can never fit the
-seven armor slots and only ONE family's capstone is ever reachable. Today
-the second family's 3-piece dip pays its 2-piece AND 3-piece tiers (a
-near-full package); after the restructure that same dip pays only a small
-stat line, so the chest/legs/feet slots it occupies become honest upgrade
-targets instead of locked bonus carriers. Nobody's completed 4-piece set
-loses its capstone; only the cross-set dip stops paying.
+**Move 1: each archetype's tier-1 and tier-2 families merge into one
+counted lineage with breakpoints at 2, 4, and 6 pieces.** No single old
+family has six pieces, so the requirement raise only works by counting
+across the tiers that players already stack: deathlord plus crownforged
+(Strength), wyrmshadow plus nighttalon (Agility), and necromancers plus
+soulflame plus stormcallers (caster; the two tier-2 caster families share
+slots, so they can never be worn together and one lineage covers both).
+Every lineage unions to exactly seven wearable slots with one overlap, so
+six pieces is a real commitment of six of the seven armor slots. This is
+the WARFARE shape (2/4/7 across seven pieces) applied to the PvE
+incumbents.
 
-**Move 2: halve the surviving magnitudes** so even the one reachable
-capstone sits below the value of a full new-tier kit.
+What this does to the meta: today's stack (tier-2 four-piece plus tier-1
+three-piece) collects TWO near-full bonus packages from seven pieces.
+Under the lineage ladder those same seven pieces are simply 6-of-7 of ONE
+package, sized once, and the top of that package now requires six pieces
+where today the whole tier-2 payload arrived at four. Nothing existing
+players own is invalidated: a full old tier-1 or tier-2 four-piece still
+pays the 2-piece and 4-piece tiers, close to its retuned single-family
+value, and deep collectors keep a designed capstone instead of an
+accidental double-dip.
 
-The restructured families (constants shared in item_sets.ts; bonus text
-updates and the auto-minted i18n keys follow in the same change):
+Mechanism (a small resolver change, test-first): ItemSet gains an
+optional lineage id; recalcPlayerStats keeps counting per-family tags
+exactly as today, and aggregateSetBonuses sums the counts of families
+sharing a lineage and applies the lineage's single bonus table in place
+of the per-family tables. Item `set` tags, item ids, and family names do
+not change, so there is no shipped-id churn; the set tooltip shows
+lineage progress across both tiers.
 
-| Family | 3-piece (was 2pc + 3pc) | 4-piece capstone (was 4pc, now plus the old flat tier) |
-|---|---|---|
-| deathlord (t1 Strength) | Str 10, Sta 10 | attack power 25 + Gravemight at 40 attack power |
-| wyrmshadow (t1 Agility) | Agi 10, crit 1 percent | attack power 25 + Fangrush at 15 percent attack speed |
-| necromancers (t1 caster) | Int 10, Sta 10, 50 percent pushback | spell power 12 + Clearcasting at 6 percent chance |
-| crownforged (t2 Strength) | Str 10, Sta 10, 4 percent haste | attack power 25 + Hit 3 percent + Bonesplinter at 5 per tick |
-| nighttalon (t2 Agility) | Agi 10, crit 1 percent, 4 percent haste | attack power 25 + Hit 3 percent + Ragged Gash at 4 per tick |
-| soulflame / stormcallers (t2 caster) | Int 10, Spi 10, 4 percent haste, 50 percent pushback | spell power 12 + Soulblaze at 25 spell power |
+**Move 2: halve the magnitudes inside the merged ladder** so even the
+full six-piece capstone sits below the value of a full new-tier kit. All
+three t1 procs survive at the 4-piece tier and all three t2 procs become
+the 6-piece capstones, so no named effect is deleted:
+
+| Lineage | 2 pieces | 4 pieces | 6 pieces |
+|---|---|---|---|
+| Strength (deathlord + crownforged) | Str 10, Sta 10 | attack power 25 + Gravemight at 40 attack power | 4 percent haste + Hit 3 percent + Bonesplinter at 5 per tick |
+| Agility (wyrmshadow + nighttalon) | Agi 10, crit 1 percent | attack power 25 + Fangrush at 15 percent attack speed | 4 percent haste + Hit 3 percent + Ragged Gash at 4 per tick |
+| Caster (necromancers + soulflame + stormcallers) | Int 10, Spi 10, 50 percent pushback | spell power 12 + Clearcasting at 6 percent chance | 4 percent haste + Soulblaze at 25 spell power |
 
 Constant changes: SET_HASTE_3PC_RATING 150 to 80 (7.5 to 4 percent, with
 the test-pinned SET_HASTE_3PC literal moving in step), SET_HIT_4PC_RATING
 60 to 30. Full cast-pushback immunity leaves the incumbents (they keep 50
-percent at 3 pieces) and moves to the new tier's caster and healer
-2-piece bonuses. WARFARE families are untouched (already PvE-inert). The
-haste leveling kits keep their single 3-piece tier and ride the shared
-haste constant down, which is acceptable for leveling gear. Heroic
-set-tag inheritance stays: it is fine once the dip pays nothing, and
-stripping tags from heroic variants would invalidate loot players
-already won.
+percent at 2 pieces) and moves to the new tier's caster and healer
+2-piece bonuses. WARFARE families are untouched (already PvE-inert and
+already lineage-shaped). The haste leveling kits keep their single
+3-piece tier and ride the shared haste constant down, which is
+acceptable for leveling gear. Heroic set-tag inheritance stays:
+it is fine inside a single sized ladder, and stripping tags from heroic
+variants would invalidate loot players already won.
 
-The new tier deliberately keeps its 2/4 breakpoints. A transitional blend
-(old 4-piece capstone plus the new 2-piece from non-overlapping slots) is
-the intended migration path, not abuse: the new capstone physically
-requires breaking the old tier-2 set, and the harness guard (below) pins
-full-new above every blend.
+The new tier deliberately keeps its 2/4 breakpoints and stays outside the
+incumbent lineages. A transitional blend is the intended migration path,
+not abuse, and it tapers naturally: the new five-piece slots (helmet,
+shoulder, chest, gloves, legs) cut straight through both old tiers'
+slots, so a new four-piece leaves room for at most two or three lineage
+pieces, which pay only the 2-piece entry tier. The harness guard (below)
+pins full-new above the full six-piece capstone and every blend.
 
-After both moves the meta double stack (tier-2 four-piece plus tier-1
-three-piece) pays roughly 25 attack power, 20 primary stats, 4 percent
-haste, 3 percent Hit, and a lighter bleed, and the tier-1 dip contributes
-only 20 stat points of that. A full new kit answers with its own 2-piece
-and 4-piece, two more item levels of budget over the heroic-33 copies,
-the 60/25 ratings step, and for casters and healers the Spell Damage and
-Healing Power affix debut (a five-piece caster set carries roughly 58
-authored Spell Damage the old stack simply does not have). The intended
-outcome is a clear but not insulting upgrade path; exact margins are
-measured, not asserted (below).
+After both moves the deep seven-piece collector pays roughly 25 attack
+power plus the retuned Gravemight, 20 primary stats, 4 percent haste, 3
+percent Hit, and a lighter bleed: one halved package where today there
+are two. A full new kit answers with its own 2-piece and 4-piece, two
+more item levels of budget over the heroic-33 copies, the 60/25 ratings
+step, and for casters and healers the Spell Damage and Healing Power
+affix debut (a five-piece caster set carries roughly 58 authored Spell
+Damage the old stack simply does not have). The 6-piece capstone values
+are the numbers the harness is most likely to shave further; exact
+margins are measured, not asserted (below).
 
 ### Guard
 
@@ -680,12 +695,13 @@ Each phase is a reviewable commit (or small commit series) with its tests:
    heal paths, tooltip, parity pin); IGNIVAR_RAID_LOOT_SOURCE_LEVEL
    registration in the item-level source index; token redemption vendor seam
    (content + instances modules mirroring the heroic vendor).
-3. **Incumbent retune**: the item_sets.ts restructure (breakpoints 3/4,
-   throughput consolidated into the capstones) and constant changes from
-   "Prerequisite: retune the incumbent set stack", their bonus-text
-   updates, and the old-versus-new balance harness test (initially pinning
-   the retuned old-stack values; the new-kit comparison arm lands with
-   phase 5).
+3. **Incumbent retune**: the lineage mechanism (ItemSet lineage id plus
+   the aggregateSetBonuses cross-family count, a small sim change,
+   test-first), the merged 2/4/6 bonus tables and constant changes from
+   "Prerequisite: retune the incumbent set stack", their bonus-text and
+   set-tooltip updates, and the old-versus-new balance harness test
+   (initially pinning the retuned lineage values; the new-kit comparison
+   arm lands with phase 5).
 4. **Sets**: ITEM_SETS declarations for all 29 families with the shared
    bonus-family constants; the 145 set-piece ItemDefs in a new
    src/sim/content/ignivar_loot.ts (data-as-code, large is correct); the 15
@@ -715,9 +731,9 @@ Each phase is a reviewable commit (or small commit series) with its tests:
    clear.
 5. **Set names**: the 29 names above are proposals; vetoes are cheap until
    the art wave mints.
-6. **Retune shape and magnitudes**: the incumbent restructure (breakpoints
-   2/3/4 to 3/4, throughput consolidated into the 4-piece capstone) and
-   the halved values in "Prerequisite: retune the incumbent set stack" are
-   design targets sized to make the cross-set dip worthless and put the
-   old stack under a full new kit; the harness test measures the real
-   margin before any number ships.
+6. **Retune shape and magnitudes**: the incumbent restructure (each
+   archetype's families merged into one 2/4/6 lineage ladder, throughput
+   topped by the 6-piece capstone) and the halved values in "Prerequisite:
+   retune the incumbent set stack" are design targets sized to turn the
+   double stack into one sized package and put it under a full new kit;
+   the harness test measures the real margin before any number ships.
