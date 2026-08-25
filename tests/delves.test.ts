@@ -209,7 +209,7 @@ describe('delve spatial band', () => {
     const pid = dst.addPlayer('warrior', 'Relogged', { state });
     const e = (dst as any).entities.get(pid)!;
     const door = DELVES.collapsed_reliquary.doorPos; // Brother Halven board door {-136,112}
-    expect(Math.abs(e.pos.x - door.x)).toBeLessThan(1); // at the board door (-5), NOT a dungeon door (~80)
+    expect(Math.abs(e.pos.x - door.x)).toBeLessThan(1); // at the board door (-136), NOT a dungeon door (~80)
     expect(Math.abs(e.pos.z - (door.z - 4))).toBeLessThan(1); // z-4 eject offset
     expect(isDelvePos(e.pos.x)).toBe(false); // no longer stuck in the delve band
   });

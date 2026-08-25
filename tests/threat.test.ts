@@ -1077,7 +1077,7 @@ describe('hunter pets', () => {
     // docs/design/eastbrook-revamp/site-plan.md): the forest_wolf camp moved to
     // (-10, 6) r28.5, covering the old (0, 0) anchor, so an aggressive-stance
     // pet pick grabbed a wild wolf instead of exercising the stealth boundary.
-    // Anchor at (200, 0) — this file's "far away first" offset — where the
+    // Anchor at (200, 0), this file's "far away first" offset, where the
     // nearest wild mob sits ~52yd out, beyond PET_AGGRESSIVE_RANGE.
     teleport(sim, pet, 200, 0);
     teleport(sim, rogue, 203, 0); // point-blank, well inside any aggressive range

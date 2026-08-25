@@ -246,6 +246,8 @@ describe('simEventVerdict: the declared-but-unseen pin and the resolver backstop
       'guildRenamed',
       'motdResult',
       'reliquaryIlluminationBroadcast',
+      // The release's never-emitted declaration (see the script's note).
+      'tutorialGreeting',
     ]);
   });
 });

@@ -152,6 +152,12 @@ export const SIM_EVENT_UNION_ONLY = Object.freeze([
   'guildRenamed',
   'motdResult',
   'reliquaryIlluminationBroadcast',
+  // release/v0.41.0 (the seventeenth sync): declared in the union and handled by
+  // hud.ts, but emitted by no sim or server site on ff2837da1f itself (the
+  // tutorial greeting moved to a client-driven flow, src/sim/tutorial/greeting.ts
+  // keeps only the sent flag). A release-side dead declaration, reported upstream;
+  // pinned here so the drift guard stays honest about what the extractor sees.
+  'tutorialGreeting',
 ]);
 
 /**

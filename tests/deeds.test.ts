@@ -1172,7 +1172,7 @@ describe('persistence', () => {
     for (let i = 0; i < 25; i++) sim.tick(); // let the 1 Hz proximity sweep run
     for (const mark of meta.deedStats.visited) {
       expect(mark).toMatch(
-        /^(poi|gather|gather_event|fish|npc|slain|quality|fiesta|dungeon|witness):/,
+        /^(poi|gather|gather_event|fish|npc|slain|quality|fiesta|dungeon|witness|farm):/,
       );
     }
     // Parked on the hub POI (the harbor-town spawn quay sits outside every POI

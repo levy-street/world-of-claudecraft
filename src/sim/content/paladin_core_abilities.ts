@@ -75,7 +75,7 @@ const common: AbilityDef[] = [
     // was Mending Light (a heal) and Divine Ascension, which needs 20
     // Devotion that only healing generates, so the bar's other button did
     // nothing when a new player pressed it. Vowkeeper Strike is Protection
-    // only and Crusader Strike is level 10, which left this, already
+    // only and Oathstrike (crusader_strike) is level 10, which left this, already
     // spec-free, free to cast and ranked from here, as the honest fix. Its
     // numbers are untouched; the change is two levels of availability.
     learnLevel: 1,

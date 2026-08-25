@@ -165,14 +165,12 @@ Fenna's market patter.
 
 **Voice test:** *"Buy a seed from me, sow it in one of those beds, and go about your day. It keeps growing while you are away, and it never spoils."*
 
-### Groundskeeper Bram: *Keeper of the Sowfield*
-**Visual:** villager, field green (#3f7d34), sporting field.
-
-Broad, weather-cured country baritone, gruff and grinning: a man who referees a
-rough game and enjoys it. Rolling rural vowels, easy laugh, firm on the rules.
-Age 40s to 50s, male. (Not Keeper Bram of the Galecrest beacon.)
-
-**Voice test:** *"The truce holds at the Sowfield: boots and shoulders only. Care to play for the Copper Pail?"*
+### Groundskeeper Bram: *Keeper of the Sowfield* (retired)
+Retired with the Sowfield and the Vale Cup in release/v0.41.0 (1c74387b4c): the
+NPC, his `VOICE_PROMPTS` entry and his country baritone are gone from the world.
+His ElevenLabs id still sits in `scripts/voices/voice_ids.json`, orphaned and
+harmless. Farmer Hollis borrowed this voice until then (see his section). (Not
+Keeper Bram of the Galecrest beacon, nor Fisher Bram of the Farshore.)
 
 ### Tinker Gizzel: *Master of the Toolworks*
 **Visual:** `npc_smith`, brass (#b08d57), apron full of things that tick.

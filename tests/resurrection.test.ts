@@ -209,7 +209,8 @@ describe('resurrection: aurasSurvivingCleanSlate predicate', () => {
 // resetForArena, the one-line wrapper around that call, which arena.ts runs
 // itself and hands out through the SimContext seam (ctx.resetForArena) to
 // call sites that never spell readyArenaFighter (the Yumi match seat; the
-// Vale Cup's two retired with the Vale Cup, release/v0.41.0 1c74387b4c). The phase 10 QA found this record wrong four times: on the
+// Vale Cup's two retired with the Vale Cup, release/v0.41.0 1c74387b4c). The
+// phase 10 QA found this record wrong four times: on the
 // readyArenaFighter route (every Yumi and Fiesta revive re-seats with
 // clearPrep: true; Thornhollow Fields seats, starts, ends, and drops a leaver
 // with clearPrep: true; ONLY its wave respawn, clearPrep: false, keeps a
@@ -228,7 +229,8 @@ describe('resurrection: aurasSurvivingCleanSlate predicate', () => {
 // arena death keeps it on the corpse, every instanced match's seat and end
 // (and each Fiesta or Yumi down and revive) clears it; each mode's behavior is
 // pinned in its own suite (arena, battleground, yumi_match, fiesta; the
-// vale_cup_match suite left with the Vale Cup). Absences cannot be asserted by driving the predicates, so
+// vale_cup_match suite left with the Vale Cup). Absences cannot be asserted by
+// driving the predicates, so
 // the three caller sets are pinned literally here.
 describe('resurrection: which sim modules wipe through aurasSurvivingCleanSlate', () => {
   const SIM_ROOT = fileURLToPath(new URL('../src/sim', import.meta.url));

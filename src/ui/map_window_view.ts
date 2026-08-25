@@ -1155,6 +1155,11 @@ export function buildOverworldMapModel(input: OverworldMapInput): OverworldMapMo
   for (const patch of world.farmPatches) {
     if (patch.zoneId !== zone.id || !inVisibleRegion(patch.x, patch.z)) continue;
     const projected = toMap(patch.x, patch.z);
+    // The same world-yard nudge cap every other landmark badge takes
+    // (MAP_LANDMARK_MAX_NUDGE_YD): a farm badge that drifts off its beds is
+    // the defect the cap exists to prevent, and this call landed without it at
+    // the release/v0.41.0 merge (the cap arrived on the release while the loop
+    // was authored on the branch).
     const placed = placeLandmarkBadge(
       projected.mx,
       projected.my,
@@ -1162,6 +1167,7 @@ export function buildOverworldMapModel(input: OverworldMapInput): OverworldMapMo
       landmarks,
       S,
       landmarkPlacement,
+      landmarkMaxNudge,
     );
     const marker: MapFarmPatchMarker = {
       mx: placed.mx,

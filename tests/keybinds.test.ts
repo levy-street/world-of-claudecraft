@@ -122,8 +122,6 @@ describe('registry', () => {
       kind: 'edge',
       defaults: ['Shift+KeyJ'],
     });
-    // The Vale Cup window is a rebindable Interface toggle (default T; J and
-    // G are taken by targetFriendlyNext and the arena on this branch).
     // The Book of Deeds is a rebindable Interface toggle on the shifted layer of
     // KeyZ, like Damage Meters does on H and the Shift+digit secondary bar.
     const deeds = BIND_ACTIONS.find((a) => a.id === 'deeds');
