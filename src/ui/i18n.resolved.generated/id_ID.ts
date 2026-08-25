@@ -1398,6 +1398,7 @@ export const id_ID: EnTranslations = {
       "aurasOnPlayerFrame": "Buff pada Bingkai Pemain",
       "highContrastBackground": "Latar Kontras Tinggi",
       "actionCamera": "Action Camera (Crosshair)",
+      "doubleTapDodge": "Double-Tap Dodge",
       "startAttackOnAbility": "Serangan Otomatis Saat Memakai Kemampuan",
       "stopAutoAttackOnTargetSwitch": "Hentikan Serangan Otomatis Saat Ganti Target",
       "walkByAutoloot": "Jarah Otomatis Sambil Lewat",

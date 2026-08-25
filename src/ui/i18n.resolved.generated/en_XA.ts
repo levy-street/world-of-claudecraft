@@ -1398,6 +1398,7 @@ export const en_XA: EnTranslations = {
       "aurasOnPlayerFrame": "[Ɓúƒƒš óñ ţĥé Þļáýéŕ Ƒŕáɱé]",
       "highContrastBackground": "[Ĥíĝĥ-Çóñţŕášţ Ɓáçķĝŕóúñð]",
       "actionCamera": "[Áçţíóñ Çáɱéŕá (Çŕóššĥáíŕ)]",
+      "doubleTapDodge": "[Ðóúƀļé-Ţáþ Ðóðĝé]",
       "startAttackOnAbility": "[Áúţó-Áţţáçķ óñ Áƀíļíţý Úšé]",
       "stopAutoAttackOnTargetSwitch": "[Šţóþ Áúţó-Áţţáçķ óñ Ţáŕĝéţ Šŵíţçĥ]",
       "walkByAutoloot": "[Ŵáļķ-ƀý Áúţóļóóţ]",

@@ -693,7 +693,10 @@ export function meleeSwing(
     normalizedInstant?: boolean;
   },
 ): boolean {
-  if (evadeIncomingAttack(ctx, attacker, target, 'physical', abilityName, opts.abilityId ?? null)) {
+  if (
+    !opts.cannotBeDodged &&
+    evadeIncomingAttack(ctx, attacker, target, 'physical', abilityName, opts.abilityId ?? null)
+  ) {
     if (attacker.kind === 'player') attacker.overpowerUntil = ctx.time + 5;
     return false;
   }

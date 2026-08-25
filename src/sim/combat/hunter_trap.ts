@@ -6,6 +6,7 @@
 // this module owns the spawn and contact rules. Draws no rng.
 
 import type { GroundAoE } from '../entity_roster';
+import { evadeIncomingAttack } from '../player_dodge';
 import type { SimContext } from '../sim_context';
 import type { Entity } from '../types';
 import { DT, dist2d } from '../types';
@@ -157,8 +158,18 @@ export function tickHunterTrap(ctx: SimContext, effect: GroundAoE): void {
     if (target.dead) continue;
     if (!segmentTouchesAnnulus(target.prevPos, target.pos, effect.pos, 0, effect.radius)) continue;
     trap.triggered = true;
+    const evaded = evadeIncomingAttack(
+      ctx,
+      source,
+      target,
+      'frost',
+      effect.ability,
+      trap.abilityId,
+    );
     ctx.enterCombat(source, target);
-    if (trap.rootInstead) {
+    if (evaded) {
+      // Contact consumes the trap, but the movement remains protected.
+    } else if (trap.rootInstead) {
       const sourceMeta = ctx.players.get(source.id);
       const binding = sourceMeta ? hunterBindingPayload(sourceMeta) : false;
       const nearby = ctx

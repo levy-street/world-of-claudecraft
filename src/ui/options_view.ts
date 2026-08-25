@@ -737,6 +737,7 @@ export function buildInterfaceControls(
     ]),
     ...tag('combat', [
       boolToggle(s, 'actionCamera', 'hudChrome.options.actionCamera'),
+      boolToggle(s, 'doubleTapDodge', 'hudChrome.options.doubleTapDodge'),
       boolToggle(
         s,
         'stopAutoAttackOnTargetSwitch',

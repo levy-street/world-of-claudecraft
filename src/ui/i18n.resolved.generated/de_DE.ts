@@ -1398,6 +1398,7 @@ export const de_DE: EnTranslations = {
       "aurasOnPlayerFrame": "Stärkungszauber am Spielerfenster",
       "highContrastBackground": "Hintergrund mit hohem Kontrast",
       "actionCamera": "Action Camera (Crosshair)",
+      "doubleTapDodge": "Double-Tap Dodge",
       "startAttackOnAbility": "Auto-Angriff bei Fähigkeitseinsatz",
       "stopAutoAttackOnTargetSwitch": "Automatischen Angriff bei Zielwechsel stoppen",
       "walkByAutoloot": "Plündern im Vorbeigehen",

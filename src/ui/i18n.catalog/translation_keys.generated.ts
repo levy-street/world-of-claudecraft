@@ -9049,6 +9049,7 @@ export type TranslationKeyFlat =
   | 'hudChrome.options.clickMoveRight'
   | 'hudChrome.options.discordPresence'
   | 'hudChrome.options.discordPresenceNote'
+  | 'hudChrome.options.doubleTapDodge'
   | 'hudChrome.options.footstepSounds'
   | 'hudChrome.options.forceHighPerfGpu'
   | 'hudChrome.options.forceHighPerfGpuNote'

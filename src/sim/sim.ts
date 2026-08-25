@@ -97,11 +97,6 @@ import { type FrozenOrbState, tickFrozenOrbs } from './combat/frozen_orb';
 import { applyGreaterInvisibilityAftereffect } from './combat/greater_invisibility';
 import { updateGuardian } from './combat/guardians';
 import {
-  advancePlayerDodge,
-  evadeIncomingAttack,
-  tryStartPlayerDodge,
-} from './player_dodge';
-import {
   applyHeal as applyHealImpl,
   consumeHealAbsorb as consumeHealAbsorbImpl,
   critVulnBonus as critVulnBonusImpl,
@@ -378,6 +373,7 @@ import * as petCommands from './pet/pet_commands';
 import type { MatchPetSnapshot } from './pet/pet_match_return';
 import type { PetReturnSnapshot } from './pet/pet_return';
 import { floorHeightAt } from './physics/character';
+import { advancePlayerDodge, evadeIncomingAttack, tryStartPlayerDodge } from './player_dodge';
 import {
   isSwimming as isSwimmingImpl,
   moveSpeedMult as moveSpeedMultImpl,
@@ -6929,6 +6925,18 @@ export class Sim {
     let zoneEffectiveDamage = 0;
     for (const target of this.hostilesInRadius(source, effect.pos, effect.radius)) {
       if (!this.hasLineOfSight(source, target)) continue;
+      if (
+        evadeIncomingAttack(
+          this.ctx,
+          source,
+          target,
+          effect.school,
+          effect.ability,
+          effect.abilityId,
+        )
+      ) {
+        continue;
+      }
       zoneStruck++;
       const isSpell = effect.school !== 'physical';
       const rawDmg = this.rng.range(effect.min, effect.max) + (effect.spBonus ?? 0);

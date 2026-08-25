@@ -3,6 +3,7 @@
 // ring-specific spawn and contact rules. Each target can trigger a given ring once.
 
 import type { GroundAoE } from '../entity_roster';
+import { evadeIncomingAttack } from '../player_dodge';
 import type { SimContext } from '../sim_context';
 import type { Entity, Vec3 } from '../types';
 import { DT } from '../types';
@@ -95,6 +96,7 @@ export function tickRingOfFrost(ctx: SimContext, effect: GroundAoE): void {
       continue;
 
     ring.triggeredIds.add(target.id);
+    if (evadeIncomingAttack(ctx, source, target, 'frost', effect.ability, ring.abilityId)) continue;
     ctx.enterCombat(source, target);
     ctx.applyRootAura(
       source,

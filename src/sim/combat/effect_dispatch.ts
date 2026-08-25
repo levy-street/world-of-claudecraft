@@ -35,6 +35,7 @@ import {
   syncDivineAscensionAura,
 } from '../paladin_devotion';
 import { PLAYER_BODY_RADIUS } from '../pathfind';
+import { evadeIncomingAttack } from '../player_dodge';
 import { scheduleProjectile } from '../projectile_travel';
 import type { PlayerMeta, ResolvedAbility } from '../sim';
 import type { SimContext } from '../sim_context';
@@ -463,6 +464,16 @@ export function runEffects(
   secondaryTarget?: SecondaryTargetSnapshot,
 ): void {
   const ability = res.def;
+  const attackResolution = playerAttackResolution(ability);
+  const evadedTargetIds = new Set<number>();
+  const evadeTarget = (candidate: Entity): boolean => {
+    if (evadedTargetIds.has(candidate.id)) return true;
+    if (!evadeIncomingAttack(ctx, p, candidate, ability.school, ability.name, ability.id)) {
+      return false;
+    }
+    evadedTargetIds.add(candidate.id);
+    return true;
+  };
   const vespersGloomtitheStacks = gloomtitheStacksForCast(p, ability.id);
   const initialTarget = target;
   const ascensionFxTargetId = target?.id ?? p.id;
@@ -484,8 +495,7 @@ export function runEffects(
   // Directional player melee already resolves the authored attack against its
   // three capped cone targets. The legacy echo/sweeping fan-out must not run on
   // top of that resolver or it can damage a fourth target and duplicate hits.
-  const directionalMelee =
-    ctx.playerDirectionalCombat === true && playerAttackResolution(ability) === 'meleeCone';
+  const directionalMelee = ctx.playerDirectionalCombat === true && attackResolution === 'meleeCone';
   const areaEcho = !secondaryTarget && !directionalMelee && echoEligible && hasAreaEchoAura(p);
   const sweeping = !secondaryTarget && !directionalMelee && echoEligible && hasSweepingStrikes(p);
   let areaEchoDealt = false;
@@ -603,6 +613,25 @@ export function runEffects(
   // lands), which used to leave the gating aura alive for a same-tick second
   // cast attempt (issue #2632). Sentence is the exception: resolveSentence owns
   // consuming its Doom pool after the cast is committed.
+
+  const targetedAttack =
+    attackResolution === 'meleeCone' ||
+    attackResolution === 'ballisticProjectile' ||
+    attackResolution === 'directionalHitscan';
+  const weaponStrikes = res.effects.filter((effect) => effect.type === 'weaponStrike');
+  const activeEvadeAllowed =
+    weaponStrikes.length === 0 || weaponStrikes.some((effect) => !effect.cannotBeDodged);
+  if (
+    target &&
+    target.id !== p.id &&
+    ctx.isHostileTo(p, target) &&
+    targetedAttack &&
+    activeEvadeAllowed &&
+    evadeTarget(target)
+  ) {
+    if (weaponStrikes.length > 0 && p.kind === 'player') p.overpowerUntil = ctx.time + 5;
+    return;
+  }
 
   let targetBuffIndex = 0;
   for (const eff of res.effects) {
@@ -1652,6 +1681,7 @@ export function runEffects(
           if (hostile.dead) continue;
           if (eff.maxTargets !== undefined && feared >= eff.maxTargets) break;
           if (!ctx.hasLineOfSight(p, hostile)) continue;
+          if (evadeTarget(hostile)) continue;
           const duration = ctx.diminishedCrowdControlDuration(p, hostile, 'fear', eff.duration);
           if (duration === null) continue;
           const warlockBreakThreshold = warlockFearBreakThreshold(ability.id, hostile.maxHp);
@@ -2332,6 +2362,7 @@ export function runEffects(
             );
             if (facingDiff > (eff.frontalHalfAngle ?? MELEE_ARC)) continue;
           }
+          if (evadeTarget(m)) continue;
           aoeTargets.push(m);
         }
         // Classic AoE soft cap (Revenge): above `softCap` targets, hold the TOTAL
@@ -2833,6 +2864,7 @@ export function runEffects(
         for (const m of ctx.hostilesInRadius(p, p.pos, eff.radius)) {
           if (m.dead) continue;
           if (!ctx.hasLineOfSight(p, m)) continue;
+          if (evadeTarget(m)) continue;
           ctx.applyAura(m, {
             id: `${ability.id}_as`,
             name: ability.name,
@@ -2849,6 +2881,7 @@ export function runEffects(
       case 'aoeAttackPower': {
         for (const m of ctx.hostilesInRadius(p, p.pos, eff.radius)) {
           if (m.dead) continue;
+          if (evadeTarget(m)) continue;
           // pct form (Direhowl rework): a NEGATIVE buff_dmg_done aura cuts a
           // fraction of ALL damage the victim deals (the dealDamage amp fold
           // handles the negative side); the legacy amount form stays the flat
@@ -2897,6 +2930,7 @@ export function runEffects(
         for (const m of ctx.hostilesInRadius(p, p.pos, eff.radius)) {
           if (m.dead) continue;
           if (!ctx.hasLineOfSight(p, m)) continue;
+          if (evadeTarget(m)) continue;
           ctx.applyAura(m, {
             id: `${ability.id}_slow`,
             name: ability.name,
@@ -2940,6 +2974,7 @@ export function runEffects(
         for (const m of ctx.hostilesInRadius(p, p.pos, stage.range)) {
           if (m.dead || !ctx.hasLineOfSight(p, m)) continue;
           if (!glacialFrontContains(p.pos, p.facing, m.pos, stage.range, angle)) continue;
+          if (evadeTarget(m)) continue;
           const critRoll = ctx.rng.chance(ctx.spellCrit(p));
           const crit =
             critRoll ||
@@ -3212,6 +3247,7 @@ export function runEffects(
         // Materialize before movement so displacement cannot perturb iteration.
         for (const hostile of [...ctx.hostilesInRadius(p, p.pos, eff.radius)]) {
           if (!ctx.hasLineOfSight(p, hostile)) continue;
+          if (evadeTarget(hostile)) continue;
           ctx.applyKnockback(p, hostile, eff.distance);
           ctx.applyAura(hostile, {
             id: `${ability.id}_daze`,
@@ -3278,6 +3314,7 @@ export function runEffects(
           : 0;
         for (const m of ctx.hostilesInRadius(p, center, eff.radius)) {
           if (!ctx.hasLineOfSight(p, m)) continue;
+          if (evadeTarget(m)) continue;
           if (dealsDamage) {
             const dmg = ctx.rng.range(eff.min, eff.max) + aoeRootSp;
             ctx.dealDamage(
@@ -4073,7 +4110,9 @@ export function runEffects(
       }
       case 'aoeTaunt': {
         for (const hostile of ctx.hostilesInRadius(p, p.pos, eff.radius)) {
-          if (hostile.kind === 'mob' && !hostile.dead) ctx.applyTaunt(p, hostile);
+          if (hostile.kind === 'mob' && !hostile.dead && !evadeTarget(hostile)) {
+            ctx.applyTaunt(p, hostile);
+          }
         }
         break;
       }

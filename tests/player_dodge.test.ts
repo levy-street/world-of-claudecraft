@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { dealDamage, handleDeath } from '../src/sim/combat/damage';
+import { runEffects } from '../src/sim/combat/effect_dispatch';
 import { MOBS } from '../src/sim/data';
 import { createMob } from '../src/sim/entity';
 import {
@@ -11,8 +12,9 @@ import {
   isPlayerDodging,
   playerEndurance,
 } from '../src/sim/player_dodge';
+import type { ResolvedAbility } from '../src/sim/sim';
 import { Sim } from '../src/sim/sim';
-import { DT, type Entity, type SimEvent } from '../src/sim/types';
+import { type AbilityDef, DT, type Entity, type SimEvent } from '../src/sim/types';
 import { placePlayerInOpenField } from './helpers/open_field';
 
 function fixture(seed = 810): { sim: Sim; player: Entity; mob: Entity } {
@@ -112,6 +114,104 @@ describe('server-authoritative player dodge', () => {
     dealDamage(sim.ctx, mob, player, 7, false, 'shadow', 'Bleed', 'hit', false, undefined, false);
 
     expect(player.hp).toBe(hp - 7);
+  });
+
+  it('evades a ground pulse before its damage, snare and rng roll', () => {
+    const { sim, player } = fixture(816);
+    const sourceId = sim.addPlayer('mage', 'Ground Caster', { autoEquip: true });
+    const source = sim.entities.get(sourceId);
+    if (!source) throw new Error('missing ground caster');
+    sim.rebucket(player);
+    source.pos = { ...player.pos };
+    source.prevPos = { ...source.pos };
+    sim.rebucket(source);
+    const duel = {
+      a: sourceId,
+      b: player.id,
+      state: 'active' as const,
+      timer: 0,
+      controlled: new Map<number, Set<number>>(),
+    };
+    sim.duels.set(sourceId, duel);
+    sim.duels.set(player.id, duel);
+    const hp = player.hp;
+    sim.dodge({ x: 1, z: 0 });
+    sim.ctx.pulseGroundAoE({
+      sourceId,
+      pos: { ...player.pos },
+      radius: 8,
+      min: 50,
+      max: 50,
+      remaining: 3,
+      interval: 1,
+      tickTimer: 1,
+      school: 'frost',
+      ability: 'Test Blizzard',
+      abilityId: 'test_blizzard',
+      slowMult: 0.5,
+      slowDuration: 2,
+    });
+
+    expect(player.hp).toBe(hp);
+    expect(player.auras.some((aura) => aura.kind === 'slow')).toBe(false);
+    expect(damageEvents(sim.drainEvents())).toContainEqual(
+      expect.objectContaining({ targetId: player.id, kind: 'dodge' }),
+    );
+  });
+
+  it('evades a targeted attack as one packet including its condition', () => {
+    const { sim, player } = fixture(817);
+    const sourceId = sim.addPlayer('warlock', 'Condition Caster', { autoEquip: true });
+    const source = sim.entities.get(sourceId);
+    const sourceMeta = sim.players.get(sourceId);
+    if (!source || !sourceMeta) throw new Error('missing condition caster');
+    const duel = {
+      a: sourceId,
+      b: player.id,
+      state: 'active' as const,
+      timer: 0,
+      controlled: new Map<number, Set<number>>(),
+    };
+    sim.duels.set(sourceId, duel);
+    sim.duels.set(player.id, duel);
+    const def: AbilityDef = {
+      id: 'test_shadow_packet',
+      name: 'Test Shadow Packet',
+      class: 'warlock',
+      learnLevel: 1,
+      cost: 0,
+      castTime: 0,
+      cooldown: 0,
+      range: 30,
+      school: 'shadow',
+      requiresTarget: true,
+      effects: [
+        { type: 'directDamage', min: 20, max: 20 },
+        { type: 'dot', total: 30, duration: 3, interval: 1 },
+      ],
+      description: '',
+    };
+    const resolved: ResolvedAbility = {
+      def,
+      rank: 1,
+      cost: 0,
+      castTime: 0,
+      cooldown: 0,
+      effects: def.effects,
+      threatFlat: 0,
+      threatMult: 1,
+    };
+    const hp = player.hp;
+    sim.dodge({ x: 1, z: 0 });
+    runEffects(sim.ctx, source, sourceMeta, player, resolved);
+
+    expect(player.hp).toBe(hp);
+    expect(player.auras.some((aura) => aura.kind === 'dot')).toBe(false);
+    expect(
+      damageEvents(sim.drainEvents()).filter(
+        (event) => event.targetId === player.id && event.kind === 'dodge',
+      ),
+    ).toHaveLength(1);
   });
 
   it('rejects malformed, rooted, airborne and mounted starts', () => {

@@ -14,28 +14,32 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.calendar.events.doubleHonor.note",
     "hudChrome.calendar.events.doubleHonor.title",
     "hudChrome.keybinds.toggleActionCamera",
-    "hudChrome.options.actionCamera"
+    "hudChrome.options.actionCamera",
+    "hudChrome.options.doubleTapDodge"
   ],
   "es_ES": [
     "hudChrome.bg.doubleHonorLine",
     "hudChrome.calendar.events.doubleHonor.note",
     "hudChrome.calendar.events.doubleHonor.title",
     "hudChrome.keybinds.toggleActionCamera",
-    "hudChrome.options.actionCamera"
+    "hudChrome.options.actionCamera",
+    "hudChrome.options.doubleTapDodge"
   ],
   "fr_FR": [
     "hudChrome.bg.doubleHonorLine",
     "hudChrome.calendar.events.doubleHonor.note",
     "hudChrome.calendar.events.doubleHonor.title",
     "hudChrome.keybinds.toggleActionCamera",
-    "hudChrome.options.actionCamera"
+    "hudChrome.options.actionCamera",
+    "hudChrome.options.doubleTapDodge"
   ],
   "fr_CA": [
     "hudChrome.bg.doubleHonorLine",
     "hudChrome.calendar.events.doubleHonor.note",
     "hudChrome.calendar.events.doubleHonor.title",
     "hudChrome.keybinds.toggleActionCamera",
-    "hudChrome.options.actionCamera"
+    "hudChrome.options.actionCamera",
+    "hudChrome.options.doubleTapDodge"
   ],
   "en_CA": [],
   "it_IT": [
@@ -43,54 +47,71 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.calendar.events.doubleHonor.note",
     "hudChrome.calendar.events.doubleHonor.title",
     "hudChrome.keybinds.toggleActionCamera",
-    "hudChrome.options.actionCamera"
+    "hudChrome.options.actionCamera",
+    "hudChrome.options.doubleTapDodge"
   ],
   "de_DE": [
     "hudChrome.bg.doubleHonorLine",
     "hudChrome.calendar.events.doubleHonor.note",
     "hudChrome.calendar.events.doubleHonor.title",
     "hudChrome.keybinds.toggleActionCamera",
-    "hudChrome.options.actionCamera"
+    "hudChrome.options.actionCamera",
+    "hudChrome.options.doubleTapDodge"
   ],
-  "zh_CN": [],
-  "zh_TW": [],
-  "ko_KR": [],
-  "ja_JP": [],
+  "zh_CN": [
+    "hudChrome.options.doubleTapDodge"
+  ],
+  "zh_TW": [
+    "hudChrome.options.doubleTapDodge"
+  ],
+  "ko_KR": [
+    "hudChrome.options.doubleTapDodge"
+  ],
+  "ja_JP": [
+    "hudChrome.options.doubleTapDodge"
+  ],
   "pt_BR": [
     "hudChrome.bg.doubleHonorLine",
     "hudChrome.calendar.events.doubleHonor.note",
     "hudChrome.calendar.events.doubleHonor.title",
     "hudChrome.keybinds.toggleActionCamera",
-    "hudChrome.options.actionCamera"
+    "hudChrome.options.actionCamera",
+    "hudChrome.options.doubleTapDodge"
   ],
-  "ru_RU": [],
+  "ru_RU": [
+    "hudChrome.options.doubleTapDodge"
+  ],
   "cs_CZ": [
     "hudChrome.bg.doubleHonorLine",
     "hudChrome.calendar.events.doubleHonor.note",
     "hudChrome.calendar.events.doubleHonor.title",
     "hudChrome.keybinds.toggleActionCamera",
-    "hudChrome.options.actionCamera"
+    "hudChrome.options.actionCamera",
+    "hudChrome.options.doubleTapDodge"
   ],
   "nl_NL": [
     "hudChrome.bg.doubleHonorLine",
     "hudChrome.calendar.events.doubleHonor.note",
     "hudChrome.calendar.events.doubleHonor.title",
     "hudChrome.keybinds.toggleActionCamera",
-    "hudChrome.options.actionCamera"
+    "hudChrome.options.actionCamera",
+    "hudChrome.options.doubleTapDodge"
   ],
   "pl_PL": [
     "hudChrome.bg.doubleHonorLine",
     "hudChrome.calendar.events.doubleHonor.note",
     "hudChrome.calendar.events.doubleHonor.title",
     "hudChrome.keybinds.toggleActionCamera",
-    "hudChrome.options.actionCamera"
+    "hudChrome.options.actionCamera",
+    "hudChrome.options.doubleTapDodge"
   ],
   "id_ID": [
     "hudChrome.bg.doubleHonorLine",
     "hudChrome.calendar.events.doubleHonor.note",
     "hudChrome.calendar.events.doubleHonor.title",
     "hudChrome.keybinds.toggleActionCamera",
-    "hudChrome.options.actionCamera"
+    "hudChrome.options.actionCamera",
+    "hudChrome.options.doubleTapDodge"
   ],
   "tr_TR": [
     "hudChrome.bg.doubleHonorLine",
@@ -103,20 +124,23 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.calendar.events.doubleHonor.note",
     "hudChrome.calendar.events.doubleHonor.title",
     "hudChrome.keybinds.toggleActionCamera",
-    "hudChrome.options.actionCamera"
+    "hudChrome.options.actionCamera",
+    "hudChrome.options.doubleTapDodge"
   ],
   "vi_VN": [
     "hudChrome.bg.doubleHonorLine",
     "hudChrome.calendar.events.doubleHonor.note",
     "hudChrome.calendar.events.doubleHonor.title",
     "hudChrome.keybinds.toggleActionCamera",
-    "hudChrome.options.actionCamera"
+    "hudChrome.options.actionCamera",
+    "hudChrome.options.doubleTapDodge"
   ],
   "da_DK": [
     "hudChrome.bg.doubleHonorLine",
     "hudChrome.calendar.events.doubleHonor.note",
     "hudChrome.calendar.events.doubleHonor.title",
     "hudChrome.keybinds.toggleActionCamera",
-    "hudChrome.options.actionCamera"
+    "hudChrome.options.actionCamera",
+    "hudChrome.options.doubleTapDodge"
   ]
 };

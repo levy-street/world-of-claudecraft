@@ -1398,6 +1398,7 @@ export const tr_TR: EnTranslations = {
       "aurasOnPlayerFrame": "Oyuncu Çerçevesinde Güçlendirmeler",
       "highContrastBackground": "Yüksek Kontrastlı Arka Plan",
       "actionCamera": "Aksiyon Kamerası (Nişangâh)",
+      "doubleTapDodge": "Çift Basışla Kaçınma",
       "startAttackOnAbility": "Auto-Attack on Ability Use",
       "stopAutoAttackOnTargetSwitch": "Hedef Değiştirince Otomatik Saldırıyı Durdur",
       "walkByAutoloot": "Yanından Geçerken Otomatik Yağma",

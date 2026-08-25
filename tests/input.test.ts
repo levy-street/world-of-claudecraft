@@ -1374,6 +1374,28 @@ describe('keyboard dodge input', () => {
     now.mockRestore();
   });
 
+  it('can disable double-tap dodge without disabling the dedicated bind', () => {
+    const { input, cb, windowListeners } = makeInput();
+    const now = vi.spyOn(performance, 'now');
+    input.setDoubleTapDodgeEnabled(false);
+    now.mockReturnValue(1000);
+    windowListeners.get('keydown')!({ code: 'KeyD', repeat: false });
+    windowListeners.get('keyup')!({ code: 'KeyD' });
+    now.mockReturnValue(1100);
+    windowListeners.get('keydown')!({ code: 'KeyD', repeat: false });
+    expect(cb.onDodge).not.toHaveBeenCalled();
+    windowListeners.get('keyup')!({ code: 'KeyD' });
+
+    windowListeners.get('keydown')!({
+      code: 'KeyV',
+      repeat: false,
+      shiftKey: true,
+      preventDefault: vi.fn(),
+    });
+    expect(cb.onDodge).toHaveBeenCalledWith({ x: 0, z: -1 });
+    now.mockRestore();
+  });
+
   it('dispatches the dedicated Shift+V bind backward while idle', () => {
     const { cb, windowListeners } = makeInput();
     windowListeners.get('keydown')!({

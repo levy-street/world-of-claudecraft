@@ -1398,6 +1398,7 @@ export const fr_FR: EnTranslations = {
       "aurasOnPlayerFrame": "Améliorations sur le cadre du joueur",
       "highContrastBackground": "Arrière-plan à contraste élevé",
       "actionCamera": "Action Camera (Crosshair)",
+      "doubleTapDodge": "Double-Tap Dodge",
       "startAttackOnAbility": "Attaque auto à l'utilisation d'une compétence",
       "stopAutoAttackOnTargetSwitch": "Arrêter l'attaque auto au changement de cible",
       "walkByAutoloot": "Ramassage auto au passage",

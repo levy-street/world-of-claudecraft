@@ -88,9 +88,9 @@ export interface SpatialAudioSink {
    *  e.g. on the mountKey transition that also calls mountEngineReset. A
    *  no-op for a mount with no engine take set. */
   preloadMountEngine(mountKey: string): void;
-  /** A discrete movement event (jump / land / water entry / swim stroke). */
+  /** A discrete movement event (jump / land / dodge / water entry / swim stroke). */
   movement(
-    kind: 'jump' | 'land' | 'splash' | 'swim',
+    kind: 'jump' | 'land' | 'dodge' | 'splash' | 'swim',
     x: number,
     y: number,
     z: number,

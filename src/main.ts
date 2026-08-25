@@ -2360,6 +2360,10 @@ async function startGame(
       actionCameraCrosshair.setVisible(v && input.isActionCameraLocked());
       return;
     }
+    if (key === 'doubleTapDodge') {
+      input.setDoubleTapDodgeEnabled(settings.set('doubleTapDodge', !!value));
+      return;
+    }
     if (key === 'stopAutoAttackOnTargetSwitch') {
       // Authoritative on the sim (issue #1358): persist locally AND mirror the
       // live value onto the player, so the very next target switch honors it.

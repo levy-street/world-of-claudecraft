@@ -9,6 +9,7 @@ import { ITEMS, MOBS } from '../../sim/data';
 import { ALL_CLASSES, type Entity, isMechWearer, type PlayerClass } from '../../sim/types';
 import { ITEM_WEAPON_VARIANTS } from '../../ui/weapon_variants';
 import type { OverheadEmoteId } from '../../world_api';
+import { PLAYER_DODGE_ROLL_CLIP } from '../dodge_visual_core';
 import { NPC_PROP_SET_IDS, type NpcPropSet } from './npc_looks';
 
 export interface EmoteClipSpec {
@@ -195,6 +196,11 @@ const kaykit = (attack: string[], idle = 'Idle'): ClipMap => ({
   // shoulder toward the back, which reads as grabbing/planting the hilt.
   stow: '1H_Melee_Attack_Chop',
   emote: KAYKIT_EMOTES,
+});
+
+const playerKaykit = (attack: string[], idle = 'Idle'): ClipMap => ({
+  ...kaykit(attack, idle),
+  dodge: PLAYER_DODGE_ROLL_CLIP,
 });
 
 const skeletonClips = (attack: string[], flourish = 'Skeletons_Awaken_Standing'): ClipMap => ({
@@ -1042,7 +1048,7 @@ export const VISUALS: Record<string, VisualDef> = {
     animUrls: [`${PLAYERS}/knight_hit_variety_anims.glb`, `${PLAYERS}/warrior_ability_anims.glb`],
     height: HUMANOID_H,
     clips: {
-      ...kaykit(['1H_Melee_Attack_Chop', '1H_Melee_Attack_Slice_Diagonal']),
+      ...playerKaykit(['1H_Melee_Attack_Chop', '1H_Melee_Attack_Slice_Diagonal']),
       attackByHand: {
         twohand: '2H_Melee_Attack_Chop',
         dualwield: 'Dualwield_Melee_Attack_Chop',
@@ -1123,7 +1129,7 @@ export const VISUALS: Record<string, VisualDef> = {
     url: `${PLAYERS}/paladin.glb`,
     height: HUMANOID_H,
     clips: {
-      ...kaykit(['1H_Melee_Attack_Chop', '1H_Melee_Attack_Slice_Diagonal']),
+      ...playerKaykit(['1H_Melee_Attack_Chop', '1H_Melee_Attack_Slice_Diagonal']),
       attackByHand: { twohand: '2H_Melee_Attack_Chop' },
       // Ability-specific clips: the composed union of the overhaul's
       // Dawnreaver entries (final_edict/sunward_disc/bastion_sweep) and the
@@ -1167,7 +1173,7 @@ export const VISUALS: Record<string, VisualDef> = {
     url: `${PLAYERS}/ranger.glb`,
     height: HUMANOID_H,
     clips: {
-      ...kaykit(['2H_Ranged_Shoot']),
+      ...playerKaykit(['2H_Ranged_Shoot']),
       // Ability-specific attacks (scripts/build_hunter_ability_anims.mjs,
       // issue #2889): the hunter had zero attackByAbility overrides across
       // its kit, so every ability played the same crossbow-shoulder shot.
@@ -1218,7 +1224,7 @@ export const VISUALS: Record<string, VisualDef> = {
     url: `${PLAYERS}/rogue.glb`,
     height: HUMANOID_H,
     clips: {
-      ...kaykit(['Dualwield_Melee_Attack_Chop']),
+      ...playerKaykit(['Dualwield_Melee_Attack_Chop']),
       attackByAbility: {
         // Throat Wire is a wire strangle, not a dagger swing: the synthesized
         // two-handed choke (scripts/_add_garrote_choke_anim.mjs) reaches to
@@ -1283,7 +1289,7 @@ export const VISUALS: Record<string, VisualDef> = {
     animUrls: [`${PLAYERS}/mage_hit_variety_anims.glb`],
     height: HUMANOID_H,
     clips: {
-      ...kaykit(['2H_Melee_Attack_Chop']),
+      ...playerKaykit(['2H_Melee_Attack_Chop']),
       attackByAbility: {
         // Lingering Grace is a blessing, not a staff swing: the one-hand
         // raise (a stock mage.glb clip) reads as the priest offering the HoT.
@@ -1322,7 +1328,7 @@ export const VISUALS: Record<string, VisualDef> = {
     url: `${PLAYERS}/barbarian.glb`,
     height: HUMANOID_H,
     clips: {
-      ...kaykit(['1H_Melee_Attack_Chop', '1H_Melee_Attack_Slice_Diagonal']),
+      ...playerKaykit(['1H_Melee_Attack_Chop', '1H_Melee_Attack_Slice_Diagonal']),
       attackByHand: { twohand: '2H_Melee_Attack_Chop' },
       // Ability-specific spellcasts (scripts/build_shaman_ability_anims.mjs,
       // issue #2889): the shaman had zero attackByAbility overrides across
@@ -1388,7 +1394,7 @@ export const VISUALS: Record<string, VisualDef> = {
     url: `${PLAYERS}/mage.glb`,
     height: HUMANOID_H,
     clips: {
-      ...kaykit(['2H_Melee_Attack_Chop']),
+      ...playerKaykit(['2H_Melee_Attack_Chop']),
       // Ability-specific spellcasts (scripts/build_mage_ability_anims.mjs,
       // issue #2889): the mage had zero attackByAbility overrides across its
       // kit, so every spell played the same melee chop. Mapped by school
@@ -1442,7 +1448,7 @@ export const VISUALS: Record<string, VisualDef> = {
     url: `${PLAYERS}/mage.glb`,
     height: HUMANOID_H,
     clips: {
-      ...kaykit(['Spellcast_Shoot']), // wand zap reads better than a staff bonk
+      ...playerKaykit(['Spellcast_Shoot']), // wand zap reads better than a staff bonk
       // Ability-specific spellcasts (scripts/build_warlock_ability_anims.mjs,
       // issue #2889): the warlock had zero attackByAbility overrides across
       // its kit, so every spell played the same wand zap. Mapped by school
@@ -1497,7 +1503,7 @@ export const VISUALS: Record<string, VisualDef> = {
     url: `${PLAYERS}/druid.glb`,
     height: HUMANOID_H,
     clips: {
-      ...kaykit(['2H_Melee_Attack_Chop']),
+      ...playerKaykit(['2H_Melee_Attack_Chop']),
       // Ability-specific spellcasts (scripts/build_druid_ability_anims.mjs,
       // issue #2889): the druid's caster kit had zero attackByAbility
       // overrides, so every nature/arcane spell played the same staff chop.
@@ -1543,7 +1549,7 @@ export const VISUALS: Record<string, VisualDef> = {
     // player class; its GLB shipped with no clips, so the full KayKit set is
     // baked in from knight.glb (scripts/bake_mech_anims.mjs) — these names now
     // resolve like any other class. Lazy-loaded; see preloadMechAssets().
-    clips: kaykit(['1H_Melee_Attack_Chop']),
+    clips: playerKaykit(['1H_Melee_Attack_Chop']),
     // Same bow-draw donor the hunter loads. The mech is the one body that shows
     // a HUNTER's equipped weapon, so it is also the one body besides the hunter
     // that can display a bow skin, and Bow_Draw_Shot targets the same KayKit
