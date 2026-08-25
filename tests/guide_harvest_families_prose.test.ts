@@ -1,9 +1,11 @@
+import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 import {
   HARVEST_COMPONENT_ITEMS,
   HARVEST_COMPONENT_SPECIMENS,
 } from '../src/sim/content/professions';
 import { guideStrings } from '../src/ui/i18n.catalog/guide';
+import { stripComments } from './helpers/strip_comments';
 
 // Two guide sentences enumerate the corpse-harvest families by name:
 // guide.professions.harvestBodyFamilies lists every family a corpse can pay,
@@ -121,5 +123,24 @@ describe('guide harvest-family prose derives from the live harvest maps', () => 
 
   it('every specimen family is also a paying family (the derivation premise)', () => {
     for (const k of specimenKeys) expect(itemKeys, `specimen family ${k}`).toContain(k);
+  });
+
+  it('the gathering guide page renders the CURRENT keys, never the retired ones', () => {
+    // The pins above cover only the keys the page renders TODAY. The retired
+    // pre-#2905 values (harvestBodyChoice, specimenBody) stay in the catalog
+    // with their reviewed translations, still naming four families, so a
+    // re-point back at either would ship stale prose with every arm above
+    // green (11m QA). Comments in the page mention the retired names as
+    // history, so the scan strips comments first and harvests exact quoted
+    // key literals (specimenBody is a PREFIX of specimenBodyFamilies; a
+    // substring check could not tell them apart).
+    const src = stripComments(
+      readFileSync(new URL('../src/guide/pages/professions_gathering.ts', import.meta.url), 'utf8'),
+    );
+    const keys = [...src.matchAll(/'(guide\.[A-Za-z0-9_.]+)'/g)].map((m) => m[1]);
+    expect(keys).toContain('guide.professions.harvestBodyFamilies');
+    expect(keys).toContain('guide.profPages.specimenBodyFamilies');
+    expect(keys).not.toContain('guide.professions.harvestBodyChoice');
+    expect(keys).not.toContain('guide.profPages.specimenBody');
   });
 });

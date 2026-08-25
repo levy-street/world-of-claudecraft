@@ -221,16 +221,20 @@ describe('harvest-family trash carries usable components', () => {
     expect(governed().length).toBeGreaterThanOrEqual(21);
   });
 
+  // The ONE predicate both the sweep and its negative control run: the control
+  // is only decisive because a mutation here moves both. Its previous form
+  // re-implemented the filter inline, so flipping the sweep's `.some` to
+  // `.every` left the control green over its own copy (11m QA).
+  const isBare = (tags: readonly string[] | undefined) =>
+    !(tags ?? []).some((tag) => tag in HARVEST_COMPONENT_ITEMS);
+
   it('gives every beast, spider and reptile at least one HARVESTABLE tag', () => {
     // Mapped in HARVEST_COMPONENT_ITEMS specifically: an unmapped tag is dead
     // weight the corpse-harvest command cannot turn into an item (gills and
     // horn were the shipped examples until Phase 11m mapped both; the
     // synthetic families below are what stand in for that shape now).
     const bare = governed()
-      .filter(
-        ({ template }) =>
-          !(template.componentTags ?? []).some((tag) => tag in HARVEST_COMPONENT_ITEMS),
-      )
+      .filter(({ template }) => isBare(template.componentTags))
       .map(({ template, zoneId }) => `${template.id} (${zoneId})`);
     expect(bare).toEqual([]);
   });
@@ -239,14 +243,10 @@ describe('harvest-family trash carries usable components', () => {
     // Negative control that actually exercises the check above rather than
     // restating the map's contents: a synthetic mob carrying only unmapped tags
     // must be reported as bare, and one carrying a mapped tag must not.
-    const bareOf = (tags: string[]) =>
-      [{ componentTags: tags }].filter(
-        (t) => !(t.componentTags ?? []).some((tag) => tag in HARVEST_COMPONENT_ITEMS),
-      ).length;
-    expect(bareOf([UNMAPPED_FAMILY, UNMAPPED_FAMILY_2])).toBe(1);
-    expect(bareOf(['hide'])).toBe(0);
-    expect(bareOf([UNMAPPED_FAMILY_2, 'hide'])).toBe(0);
-    expect(bareOf([])).toBe(1);
+    expect(isBare([UNMAPPED_FAMILY, UNMAPPED_FAMILY_2])).toBe(true);
+    expect(isBare(['hide'])).toBe(false);
+    expect(isBare([UNMAPPED_FAMILY_2, 'hide'])).toBe(false);
+    expect(isBare([])).toBe(true);
   });
 
   it('keeps the hedge constructs on coin, the one sanctioned exception', () => {

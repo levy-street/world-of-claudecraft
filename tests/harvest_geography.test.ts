@@ -37,10 +37,12 @@
 // island is an ordinary revisitable zone: src/sim/interactions/ferry_bell.ts
 // tryRingFerryBell routes EITHER bell to the other shore with no graduation
 // gate (graduation only bumps a deed stat there), and the bell is the whole
-// crossing mechanism because PROVING_SHORE_PORTALS is empty: a premise this
-// file does not assert but tests/proving_shore_content.test.ts pins (its
-// crossing arm asserts PROVING_SHORE_PORTALS equals [] and one ferry bell
-// stands on each shore). A player of any level can ring back onto it, so its
+// crossing mechanism because PROVING_SHORE_PORTALS is empty: premises this
+// file does not assert but its siblings pin (tests/proving_shore_content.test.ts
+// asserts PROVING_SHORE_PORTALS equals [] and one ferry bell per shore;
+// tests/ferry_bell.test.ts rides both bells behaviorally with a zero-progress
+// character and proves combat is the only refusal, so a graduation gate added
+// later reds there). A player of any level can ring back onto it, so its
 // camps count and shore_scuttler (camped on the island only) is a reachable
 // carrier; the predicate arm below pins that.
 // THE ONE EXCLUSION is structural, not a judgment: instance, raid, delve and
@@ -328,6 +330,17 @@ describe('masterwrought R22: every mapped harvest family is reachable across the
     // The real fix for the orphan-tag class (Agent 2's pin): a tag the map
     // does not list is never harvested, never yields, and silently widens
     // the concentration-bonus denominator of every template carrying it.
+    expect(unmappedTagCarriers(MOBS, HARVEST_COMPONENT_ITEMS)).toEqual([]);
+    // The scanner is proven to PRODUCE a row before the empty sweep is
+    // trusted (11m QA): a scan whose inner loop or `tag in mapped` guard is
+    // broken returns [] on any input, and nothing above could tell. One
+    // retagged carrier must yield exactly one row naming the template and
+    // the tag.
+    withRetaggedTemplates({ warlock_imp: [UNMAPPED_FAMILY] }, () => {
+      const rows = unmappedTagCarriers(MOBS, HARVEST_COMPONENT_ITEMS);
+      expect(rows).toHaveLength(1);
+      expect(rows[0]).toContain(`warlock_imp carries the component tag '${UNMAPPED_FAMILY}'`);
+    });
     expect(unmappedTagCarriers(MOBS, HARVEST_COMPONENT_ITEMS)).toEqual([]);
   });
 

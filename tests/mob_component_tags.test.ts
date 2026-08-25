@@ -159,11 +159,15 @@ describe('mob component-type tags', () => {
     expect(2 * expectedQty(1)).toBeLessThanOrEqual(3 * expectedQty(0));
   });
 
-  it('lists which mobs are tagged so the sample stays visible in test output', () => {
-    const summary = tagged.map((mob) => `${mob.id}: ${mob.componentTags?.join(', ')}`).sort();
-    expect(summary.length).toBeGreaterThanOrEqual(10);
-    // Not a hard assertion on content, just keeps a readable record in the
-    // test report of exactly which mobs and tags were added.
-    expect(summary).toEqual(expect.arrayContaining(summary));
+  it('keeps the tagged-corpus ratchet at the measured census', () => {
+    // A ratchet at the measured count (54 tagged templates after the 11m
+    // spread, 2026-08-25): raise it when a spread lands; lowering it is a
+    // conscious edit with its ledger entry. The old >= 10 floor let a
+    // regression strip 40 templates' tags and stay green here (the exact
+    // 54 / 181 partition is pinned in gathering.test.ts; this file's own
+    // sweeps iterate `tagged`, so the ratchet is their non-vacuity floor).
+    // The arrayContaining(summary) line that used to sit here was x === x
+    // and asserted nothing; removed 2026-08-25 (11m QA).
+    expect(tagged.length).toBeGreaterThanOrEqual(54);
   });
 });

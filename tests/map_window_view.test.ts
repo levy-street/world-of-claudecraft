@@ -1998,6 +1998,12 @@ describe('zone-map farm patches', () => {
     const my = ((ZONE_CZ + FULL_SPAN / 2 - site.z) / FULL_SPAN) * CANVAS;
     // The blocker really sits on the projection (the collision is real).
     expect(Math.hypot(model.services[0].mx - mx, model.services[0].my - my)).toBeLessThan(1e-6);
+    // The cap itself is a literal pin, not only an input to the arithmetic
+    // below: every other bound in this file derives from the same constant
+    // the production code reads, so widening the cap (4 to 12 keeps 12 yd
+    // under the 24 px separation at this frame) would move both sides
+    // together and leave every arm green (11m QA).
+    expect(MAP_LANDMARK_MAX_NUDGE_YD).toBe(4);
     const maxNudgePx = MAP_LANDMARK_MAX_NUDGE_YD * (CANVAS / FULL_SPAN) + 1e-6;
     expect(maxNudgePx).toBeLessThan(MAP_LANDMARK_SEPARATION);
     const drift = Math.hypot(model.farmPatches[0].mx - mx, model.farmPatches[0].my - my);

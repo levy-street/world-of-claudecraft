@@ -362,9 +362,12 @@ describe('LootWindowController', () => {
     const shippedTest = harness([palecoil], (entry) => corpseLootAvailability(entry, 7));
     shippedTest.controller.openCorpse(22, 0, 0);
     expect(shippedTest.element.querySelector('.corpse-harvest')).not.toBeNull();
-    expect(shippedTest.element.querySelectorAll('.corpse-harvest-check')).toHaveLength(
-      MOBS.sethrael_palecoil.componentTags?.length ?? 0,
-    );
+    // 4 as a literal, not derived from the template: the view renders the
+    // same componentTags this line would read, so a derived expectation
+    // moves with a dropped tag and passes (11m QA). The Palecoil ships
+    // hide, claw, horn, venomSac since the 11m spread.
+    expect(MOBS.sethrael_palecoil.componentTags).toHaveLength(4);
+    expect(shippedTest.element.querySelectorAll('.corpse-harvest-check')).toHaveLength(4);
   });
 
   it('drops the unified-press hint on an untagged corpse too, where it was also false', () => {
