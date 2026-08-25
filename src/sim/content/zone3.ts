@@ -1436,7 +1436,11 @@ export const ZONE3_NPCS: Record<string, NpcDef> = {
       'minor_mana_potion',
       'lesser_healing_potion',
       'lesser_mana_potion',
-      'elixir_of_the_bear',
+      // 11n-BOTH pulled the bear elixir stock row: it exactly equalled
+      // elixir_of_the_serpent (the alchemy-50 crafted top elixir) at buff_sta
+      // 12 for 900s, a zero percent margin, R23's purest competitor, and the
+      // one vendor-sold buff in the catalog; the item, its Mirefen drop, its
+      // recipe and its buyValue stay.
       'glass_vial',
     ],
     greeting:
@@ -3595,12 +3599,14 @@ export const ZONE3_ITEMS: Record<string, ItemDef> = {
     requiredClass: HUNTER_ONLY,
   },
   // --- vendor food & drink (Quartermaster Bree) ---
+  // Vendor food nerf (11n-D-13): crafted 552 tier / 1.15, middle tercile;
+  // 480 * 1.15 = 552 exactly, so the crafted margin is +15.0 percent.
   trail_hardtack: {
     id: 'trail_hardtack',
     name: 'Highwatch Trail Hardtack',
     kind: 'food',
     quality: 'common',
-    foodHp: 552,
+    foodHp: 480,
     sellValue: 75,
     buyValue: 1200,
   },
@@ -3613,12 +3619,14 @@ export const ZONE3_ITEMS: Record<string, ItemDef> = {
     sellValue: 75,
     buyValue: 1200,
   },
+  // Vendor food nerf (11n-D-13): marlows_grand_roast 980 / 1.20, the top
+  // tercile's 20 percent margin, floored; crafted margin +20.1 percent.
   roast_mountain_goat: {
     id: 'roast_mountain_goat',
     name: 'Roast Mountain Goat',
     kind: 'food',
     quality: 'common',
-    foodHp: 874,
+    foodHp: 816,
     sellValue: 150,
     buyValue: 2500,
   },

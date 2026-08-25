@@ -529,10 +529,11 @@ export const BASE_ITEMS: Record<string, ItemDef> = {
   // (combat/auras.ts updateRegen), matching how drinking already stacks with
   // mana regen, so every tier below is worth sitting down for at any stamina:
   // there is no longer a crossover stamina past which it loses to standing
-  // still. The foodHp/drinkMana VALUES are unchanged: they already form a
-  // clear vendor -> fished -> conjured -> next-zone upgrade ladder (61 -> 90 ->
-  // 117 here, continuing to 243/432 in zone2 and 552/874 in zone3), and the
-  // stacking fix is what makes every rung of it worth the bag slot.
+  // still. The vendor food line after 11n sits each rung the crafted margin
+  // below its cooking counterpart (10/15/20 percent by tercile, 11n-D-13):
+  // bread 61, venison 81, boar 106 here, continuing to rye 220 and eel 375 in
+  // zone2 and hardtack 480 and goat 816 in zone3, and the stacking fix is what
+  // makes every rung of it worth the bag slot.
   baked_bread: {
     id: 'baked_bread',
     name: 'Cottage Loaf',
@@ -1882,12 +1883,15 @@ export const BASE_ITEMS: Record<string, ItemDef> = {
     quality: 'common',
     sellValue: 22,
   },
+  // Vendor food nerf (11n-D-13): crafted 117 tier (hunters_game_skewer,
+  // herbed_marsh_pike) / 1.10, the bottom food tercile's 10 percent margin,
+  // floored; crafted margin +10.4 percent.
   roasted_boar: {
     id: 'roasted_boar',
     name: 'Spitted Boar Haunch',
     kind: 'food',
     quality: 'common',
-    foodHp: 117,
+    foodHp: 106,
     sellValue: 12,
     buyValue: 100,
   },
@@ -1908,6 +1912,10 @@ export const BASE_ITEMS: Record<string, ItemDef> = {
   // ladder must stay BELOW the matching profession_items.ts alchemy draught (the
   // crafted line is a strict upgrade over the vendor equivalent): keep the two in
   // lockstep if either changes.
+  // Both-sourced (also crafted by recipe), magnitude-exempt per 11n-BOTH /
+  // qr-11n-NINE: a nerf would hit the crafted arm. The bottom hp rung's
+  // +9.1 percent vs silverleaf_healing_draught 120 is recorded EXEMPT, not a
+  // miss.
   minor_healing_potion: {
     id: 'minor_healing_potion',
     name: 'Minor Healing Potion',
@@ -1917,6 +1925,8 @@ export const BASE_ITEMS: Record<string, ItemDef> = {
     sellValue: 8,
     buyValue: 40,
   },
+  // Already clears the bottom rung's 10 percent margin vs
+  // silverleaf_mana_draught 160 (+10.3 percent); no move (11n-D-13).
   minor_mana_potion: {
     id: 'minor_mana_potion',
     name: 'Minor Mana Potion',
@@ -1928,6 +1938,9 @@ export const BASE_ITEMS: Record<string, ItemDef> = {
   },
   // --- battle elixir: a temporary stat buff on use (classic flask/elixir staple).
   // Drops from the Mirefen brutes; +Stamina helps anyone push deeper into the marsh.
+  // Both-sourced (combo recipe), magnitude-exempt per 11n-BOTH; its
+  // alchemist_verane stock row was pulled by 11n (see zone3.ts), the item, its
+  // 0.8 percent Mirefen drop, its recipe and its buyValue all stay.
   elixir_of_the_bear: {
     id: 'elixir_of_the_bear',
     name: 'Elixir of the Bear',
@@ -1945,6 +1958,8 @@ export const BASE_ITEMS: Record<string, ItemDef> = {
   // Higher tiers of the combat-potion ladder, keeping pace with the zone-2/3
   // level bands (classic Minor -> Lesser -> standard progression). Same instant,
   // in-combat, 2-minute-shared-cooldown rules as the Minor tier above.
+  // Both-sourced since the 11l QA re-pick (recipe_lesser_healing_potion),
+  // magnitude-exempt per qr-11n-NINE, exactly like minor_healing_potion above.
   lesser_healing_potion: {
     id: 'lesser_healing_potion',
     name: 'Lesser Healing Potion',
@@ -1954,30 +1969,36 @@ export const BASE_ITEMS: Record<string, ItemDef> = {
     sellValue: 16,
     buyValue: 85,
   },
+  // Vendor nerf (11n-D-13): computed as goldleaf_mana_draught 260 / 1.15 (the
+  // lesser rung's 15 percent margin), floored; crafted margin +15.0 percent.
   lesser_mana_potion: {
     id: 'lesser_mana_potion',
     name: 'Lesser Mana Potion',
     kind: 'potion',
     quality: 'common',
-    potionMana: 250,
+    potionMana: 226,
     sellValue: 16,
     buyValue: 85,
   },
+  // Vendor nerf (11n-D-13): sunpetal_healing_draught 335 / 1.20 (top rung,
+  // 20 percent), floored; crafted margin +20.1 percent.
   healing_potion: {
     id: 'healing_potion',
     name: 'Healing Potion',
     kind: 'potion',
     quality: 'common',
-    potionHp: 320,
+    potionHp: 279,
     sellValue: 32,
     buyValue: 170,
   },
+  // Vendor nerf (11n-D-13): sunpetal_mana_draught 425 / 1.20 (top rung,
+  // 20 percent), floored; crafted margin +20.1 percent.
   mana_potion: {
     id: 'mana_potion',
     name: 'Mana Potion',
     kind: 'potion',
     quality: 'common',
-    potionMana: 410,
+    potionMana: 354,
     sellValue: 32,
     buyValue: 170,
   },
@@ -2673,12 +2694,15 @@ export const BASE_ITEMS: Record<string, ItemDef> = {
     quality: 'poor',
     sellValue: 8,
   },
+  // Vendor food nerf (11n-D-13): was ABOVE crafted pan_seared_perch 90 (a
+  // negative margin); 90 / 1.10, bottom tercile, floored; crafted margin
+  // +11.1 percent.
   brightwood_venison: {
     id: 'brightwood_venison',
     name: 'Brightwood Venison',
     kind: 'food',
     quality: 'common',
-    foodHp: 92,
+    foodHp: 81,
     sellValue: 4,
     buyValue: 35,
   },
@@ -2725,6 +2749,7 @@ export const BASE_ITEMS: Record<string, ItemDef> = {
     quality: 'common',
     sellValue: 6,
   },
+  // Both-sourced, magnitude-exempt per 11n-BOTH.
   tough_jerky: {
     id: 'tough_jerky',
     name: 'Salted Jerky',

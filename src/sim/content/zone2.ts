@@ -2082,12 +2082,15 @@ export const ZONE2_ITEMS: Record<string, ItemDef> = {
     requiredClass: ROG,
   },
   // --- vendor food & drink (Provisioner Hale) ---
+  // Vendor food nerf (11n-D-13): crafted 243 tier (goldleaf_game_stew,
+  // fenbridge_rice_bowl, fenbridge_rice_pudding, ashwood_smoked_eel) / 1.10,
+  // bottom tercile, floored; crafted margin +10.5 percent.
   fenbridge_rye: {
     id: 'fenbridge_rye',
     name: 'Fenbridge Rye Loaf',
     kind: 'food',
     quality: 'common',
-    foodHp: 243,
+    foodHp: 220,
     sellValue: 25,
     buyValue: 400,
   },
@@ -2100,12 +2103,15 @@ export const ZONE2_ITEMS: Record<string, ItemDef> = {
     sellValue: 25,
     buyValue: 400,
   },
+  // Vendor food nerf (11n-D-13): crafted 432 tier (frostgill_chowder,
+  // fenbridge_beet_braise) / 1.15, the middle tercile's 15 percent margin,
+  // floored; crafted margin +15.2 percent.
   smoked_eel: {
     id: 'smoked_eel',
     name: 'Smoked Mirefen Eel',
     kind: 'food',
     quality: 'common',
-    foodHp: 432,
+    foodHp: 375,
     sellValue: 60,
     buyValue: 1000,
   },

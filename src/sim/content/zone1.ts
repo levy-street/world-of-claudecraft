@@ -783,17 +783,18 @@ export const ZONE1_NPCS: Record<string, NpcDef> = {
     color: 0x707b7c,
     questIds: ['q_prof_hobby_switch'],
     vendorItems: [
-      'eastbrook_arming_sword',
+      // qr-11n-WIDE pulled the four byte-identical crafted gear rows
+      // (eastbrook_arming_sword, eastbrook_chain_vest, eastbrook_wool_trousers,
+      // tanned_leather_jerkin): identical id, zero margin, unlimited restock,
+      // R23's purest competitor form. The recipes, items, prices and drops
+      // stay, and the smith keeps his non-crafted staples.
       'eastbrook_greatsword',
       'bronzework_mace',
       'vale_carving_knife',
       'hickory_shortstaff',
       'eastbrook_buckler',
-      'eastbrook_chain_vest',
       'valespun_robe',
-      'tanned_leather_jerkin',
       'hobnail_boots',
-      'eastbrook_wool_trousers',
     ],
     greeting: 'Mind the sparks, $C. Good steel is the difference between a scar and a grave.',
   },
