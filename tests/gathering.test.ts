@@ -15,27 +15,11 @@ import {
   yieldingFocusComponents,
 } from '../src/sim/professions/gathering';
 import { Rng } from '../src/sim/rng';
-import { UNMAPPED_FAMILY, UNMAPPED_FAMILY_2 } from './helpers/unmapped_family';
-
-/**
- * Retag real, otherwise-untagged templates for the duration of `body`,
- * restored in a finally: the corpse-harvest suites' idiom for the mixed
- * shapes shipped content no longer carries since Masterwrought Phase 11m
- * mapped gills and horn (tests/helpers/unmapped_family.ts).
- */
-function withRetaggedTemplates<T>(retags: Record<string, readonly string[]>, body: () => T): T {
-  const prior = new Map<string, string[] | undefined>();
-  for (const [id, tags] of Object.entries(retags)) {
-    const template = MOBS[id];
-    prior.set(id, template.componentTags);
-    template.componentTags = [...tags];
-  }
-  try {
-    return body();
-  } finally {
-    for (const [id, tags] of prior) MOBS[id].componentTags = tags;
-  }
-}
+import {
+  UNMAPPED_FAMILY,
+  UNMAPPED_FAMILY_2,
+  withRetaggedTemplates,
+} from './helpers/unmapped_family';
 
 /** Every subset of a corpse's tags, in tag order, the empty pick included. */
 function subsetsOf(tags: readonly string[]): string[][] {

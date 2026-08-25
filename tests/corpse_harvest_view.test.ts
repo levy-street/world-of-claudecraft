@@ -21,28 +21,13 @@ import { HARVEST_COMPONENT_ITEMS } from '../src/sim/content/professions';
 import { MOBS } from '../src/sim/data';
 import { effectiveFocusComponents } from '../src/sim/professions/gathering';
 import { corpseHarvestView } from '../src/ui/hud/loot/corpse_harvest_view';
-import { UNMAPPED_FAMILY, UNMAPPED_FAMILY_2 } from './helpers/unmapped_family';
+import {
+  UNMAPPED_FAMILY,
+  UNMAPPED_FAMILY_2,
+  withRetaggedTemplates,
+} from './helpers/unmapped_family';
 
 const pick = (...tags: string[]) => new Set(tags);
-
-/**
- * Retag real, otherwise-untagged templates for the duration of `body`,
- * restored in a finally: the corpse-harvest suites' idiom for the shapes
- * shipped content no longer carries (tests/corpse_harvest_sim.test.ts).
- */
-function withRetaggedTemplates<T>(retags: Record<string, readonly string[]>, body: () => T): T {
-  const prior = new Map<string, string[] | undefined>();
-  for (const [id, tags] of Object.entries(retags)) {
-    const template = MOBS[id];
-    prior.set(id, template.componentTags);
-    template.componentTags = [...tags];
-  }
-  try {
-    return body();
-  } finally {
-    for (const [id, tags] of prior) MOBS[id].componentTags = tags;
-  }
-}
 
 describe('corpseHarvestView: rows and the concentrate flag', () => {
   it('renders one row per tag, in order, with the checked state from the selection', () => {

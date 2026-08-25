@@ -722,19 +722,32 @@ describe('the professions blob growth bound (phase 16)', () => {
     // temporary exact pin, then the band restored by the same rule).
     //
     // AND AGAIN AT masterwrought Phase 11m: 17,120 bytes, upper edge 17,112
-    // to 17,131, floor 16,721 to 16,740. The delta is +19 and it is the
+    // to 17,121, floor 16,721 to 16,740. The delta is +19 and it is the
     // townFocus record, not knownRecipes for once: 11m mapped horn and gills
     // (state.md row 11m-ORPHAN), which appends two keys to
     // HARVEST_COMPONENT_ITEMS and so two rows to the fixture's full-budget
     // focus allocation, `,"horn":1` (9 bytes) and `,"gills":1` (10 bytes):
     // predicted 17,101 + 19 = 17,120 and measured so (the same temporary
-    // exact pin, then the band restored by the same rule, measurement plus
-    // 11 above, minus 380 below). The ten-key townFocus is the same
+    // exact pin, then the band restored). The ten-key townFocus is the same
     // content-scaled field it always was (one row per mapped family, never
     // per player action); what moved is the family count.
+    //
+    // THE UPPER EDGE IS NOW MEASUREMENT PLUS ONE, ON PURPOSE. 11l's rule
+    // (measurement plus 11 above) was sized for the knownRecipes growth
+    // class, where one recipe id costs 20-plus bytes and 11 of headroom
+    // catches any single row. It is the wrong window for the townFocus class
+    // this state now moves on: one family row costs 9 or 10 bytes (`,"<tag>":1`
+    // for a four- or five-letter tag), so an edge 11 above the measurement
+    // let an eleventh HARVEST_COMPONENT_ITEMS key land at 17,129 or 17,130 and
+    // pass. The window is exact-plus-one so that a single new family row reds
+    // here, the same day it lands, and the 11m fix round records the plus-11
+    // convention as SUPERSEDED for the townFocus growth class (the minus-380
+    // floor is unchanged; nothing about the downward headroom moved). A red
+    // here after a deliberate family add is the cue to re-measure and re-base
+    // the edge at the new measurement plus one, never to widen it.
     const bytes = professionsBytes(s2);
     expect(bytes).toBeGreaterThan(16740);
-    expect(bytes).toBeLessThan(17131);
+    expect(bytes).toBeLessThan(17121);
     // Strictly dominated by the band's upper edge while the band holds:
     // kept as documentation that the structural ceiling also bounds this
     // state, never the live guard.

@@ -36,10 +36,13 @@
 // EVERY ZONES ENTRY IS OPEN WORLD, the Proving Shore included. The tutorial
 // island is an ordinary revisitable zone: src/sim/interactions/ferry_bell.ts
 // tryRingFerryBell routes EITHER bell to the other shore with no graduation
-// gate (graduation only bumps a deed stat there; PROVING_SHORE_PORTALS is
-// empty, so the bell is the whole crossing mechanism). A player of any level
-// can ring back onto it, so its camps count and shore_scuttler (camped on the
-// island only) is a reachable carrier; the predicate arm below pins that.
+// gate (graduation only bumps a deed stat there), and the bell is the whole
+// crossing mechanism because PROVING_SHORE_PORTALS is empty: a premise this
+// file does not assert but tests/proving_shore_content.test.ts pins (its
+// crossing arm asserts PROVING_SHORE_PORTALS equals [] and one ferry bell
+// stands on each shore). A player of any level can ring back onto it, so its
+// camps count and shore_scuttler (camped on the island only) is a reachable
+// carrier; the predicate arm below pins that.
 // THE ONE EXCLUSION is structural, not a judgment: instance, raid, delve and
 // rift rosters spawn from their own DungeonDef / delve / rift spawn lists on
 // the far-east instance plane (x beyond DUNGEON_X_THRESHOLD, src/sim/data.ts:
@@ -57,7 +60,15 @@
 // Count-1 rares and elites at overworld camps ARE reachable members: the
 // settled row says count-1 named mobs are legal floor members and spawn
 // density is RECORDED in the ledger, not asserted here (qr-11m-SPREAD (3)).
-// old_greyjaw, a count-1 rare at an Eastbrook camp, pins that reading.
+// old_greyjaw, a count-1 rare at an Eastbrook camp, pins that reading. The
+// same letter admits a QUEST-GATED camp: spider_egg (requiresQuestId
+// 'q_broodmother', damageable only while that quest is active or ready,
+// src/sim/combat/quest_damage_gate.ts) is silk's sixth carrier by the camp
+// predicate alone; the settled row says nothing about quest gates, so this
+// phase admits the clutch, records the admission as hollow (one quest window
+// per character), and the quest-gated census arm below pins the admitted set
+// as LITERALS so a second such member is a conscious edit with a maintainer
+// ruling, never a silent pass.
 //
 // LEVEL BANDS are THE PHASE'S OWN QUANTIZATION (the tree has no zone-band
 // constant to import): LEVEL_BAND_WIDTH-wide buckets of a template's
@@ -110,7 +121,11 @@ import {
   zoneContaining,
 } from '../src/sim/data';
 import type { CampDef, MobTemplate, ZoneDef } from '../src/sim/types';
-import { UNMAPPED_FAMILY, UNMAPPED_FAMILY_2 } from './helpers/unmapped_family';
+import {
+  UNMAPPED_FAMILY,
+  UNMAPPED_FAMILY_2,
+  withRetaggedTemplates,
+} from './helpers/unmapped_family';
 
 const WHERE_THE_RULE_LIVES =
   'masterwrought R22, docs/prd/masterwrought/phase-11m-harvest-geography.md DECISION 12 ' +
@@ -290,6 +305,17 @@ export function unmappedTagCarriers(
 const MAPPED_TAGS = Object.keys(HARVEST_COMPONENT_ITEMS);
 
 describe('masterwrought R22: every mapped harvest family is reachable across the world', () => {
+  it('the floor IS the settled DECISION 12 triple, written as literals', () => {
+    // state.md row 11m-D-12: TARGET (6 templates, 4 zones, 2 level bands).
+    // Every other expectation in this file DERIVES from REACH_FLOOR (the
+    // shortfall clauses, the fixture sizes, the teeth arm's message), so
+    // without this one literal pin a lowered floor ({ templates: 2, zones: 1,
+    // bands: 1 }) passes every arm: the derived checks agree with whatever
+    // the constant says. This is the one place the number is written down
+    // rather than read back.
+    expect(REACH_FLOOR).toEqual({ templates: 6, zones: 4, bands: 2 });
+  });
+
   it('reports EVERY family short of the floor at once, counted over the REACHABLE subset', () => {
     // Collected and asserted as one list on purpose: the failure output is
     // the spread audit, one row per short family, not a whack-a-mole loop.
@@ -325,6 +351,38 @@ describe('the reachability predicate', () => {
     expect(camps.length).toBeGreaterThan(0);
     expect(camps.every((camp) => camp.count === 1)).toBe(true);
     expect(isReachable('old_greyjaw', LIVE_WORLD)).toBe(true);
+  });
+
+  it('admits a QUEST-GATED camp by the letter, and pins that admission as a literal census', () => {
+    // silk clears the floor only by counting spider_egg, whose damage is
+    // quest-gated: requiresQuestId 'q_broodmother', and
+    // src/sim/combat/quest_damage_gate.ts lets a player harm it only while
+    // that quest is active or ready, so each character harvests the clutch
+    // for one quest window. The settled row (farming/state.md,
+    // qr-11m-SPREAD) admits count-1 named mobs and says nothing about quest
+    // gates; this phase admits the clutch by the camp predicate, RECORDS it
+    // as hollow, and adds no requiresQuestId refusal to isReachable (that
+    // reds silk at 5 of 6 with no flavor-true candidate left: the
+    // maintainer's ruling to make, not this file's). What this arm pins is
+    // that the admission cannot WIDEN silently: the quest-gated set among
+    // tagged templates, split by the predicate, is exactly these literals,
+    // so a second quest-gated floor member is a conscious edit here with a
+    // ruling behind it, never a silent pass.
+    const questGated = Object.values(MOBS)
+      .filter((mob) => (mob.componentTags?.length ?? 0) > 0 && mob.requiresQuestId !== undefined)
+      .map((mob) => mob.id)
+      .sort();
+    expect(questGated.filter((id) => isReachable(id, LIVE_WORLD))).toEqual(['spider_egg']);
+    expect(questGated.filter((id) => !isReachable(id, LIVE_WORLD))).toEqual(['mister_crabs']);
+    // Each side is on its side for the stated reason: the clutch has a real
+    // overworld camp and carries silk (the gate named), and the crab has no
+    // camp at all (the summon-only miniboss the zero-camp arm below lists).
+    expect(MOBS.spider_egg.requiresQuestId).toBe('q_broodmother');
+    expect(MOBS.spider_egg.componentTags).toContain('silk');
+    expect(overworldCampsOf('spider_egg', LIVE_WORLD).length).toBeGreaterThan(0);
+    expect(familyReach('silk', LIVE_WORLD).reachable).toContain('spider_egg');
+    expect(MOBS.mister_crabs.requiresQuestId).toBe('q_ps_mother_of_pearl');
+    expect(CAMPS.some((camp) => camp.mobId === 'mister_crabs')).toBe(false);
   });
 
   it('admits the Proving Shore as an ordinary open-world zone: shore_scuttler counts', () => {
@@ -441,7 +499,24 @@ describe('the predicate has teeth: instance-only carriers cannot carry a family'
   const INSTANCE_SHAPES = ['wildheart_stalker', 'wildheart_ravager', 'wildheart_beastmaster'];
   const HUB_ZONES = ZONES.slice(0, REACH_FLOOR.templates);
 
-  function syntheticWorld(campedCarriers: number, tag = TAG): HarvestWorld {
+  /** Named ZONES entries in the order given; a missing id is a fixture bug, never a pass. */
+  function zonesNamed(ids: readonly string[]): ZoneDef[] {
+    return ids.map((id) => {
+      const zone = ZONES.find((candidate) => candidate.id === id);
+      if (!zone) throw new Error(`${id} is not a ZONES entry`);
+      return zone;
+    });
+  }
+
+  /** The synthetic world: the three instance-only carriers plus `campedCarriers`
+   *  camped ones, carrier i camped at hubZones[i % hubZones.length]'s hub with
+   *  that zone's level range, so the hub list decides how many zones and
+   *  bands the reachable subset spans. */
+  function syntheticWorld(
+    campedCarriers: number,
+    hubZones: readonly ZoneDef[] = HUB_ZONES,
+    tag = TAG,
+  ): HarvestWorld {
     const mobs: Record<string, MobTemplate> = {};
     const camps: CampDef[] = [];
     for (const [i, shape] of INSTANCE_SHAPES.entries()) {
@@ -451,7 +526,7 @@ describe('the predicate has teeth: instance-only carriers cannot carry a family'
       mobs[mob.id] = mob;
     }
     for (let i = 0; i < campedCarriers; i++) {
-      const zone = HUB_ZONES[i % HUB_ZONES.length];
+      const zone = hubZones[i % hubZones.length];
       const mob = structuredClone(MOBS.forest_wolf);
       mob.id = `synthetic_camped_${i}`;
       mob.minLevel = zone.levelRange[0];
@@ -493,6 +568,9 @@ describe('the predicate has teeth: instance-only carriers cannot carry a family'
           `templates ${REACH_FLOOR.templates - 1} of ${REACH_FLOOR.templates}\\. Reachable carriers`,
       ),
     );
+    // The same clause as a LITERAL beside the derived regex: the regex agrees
+    // with any REACH_FLOOR, this line agrees only with the settled floor.
+    expect(short[0]).toContain('templates 5 of 6');
     expect(short[0]).toContain('synthetic_instance_0');
     expect(familyReach(TAG, world).unreachable).toEqual([
       'synthetic_instance_0',
@@ -533,6 +611,75 @@ describe('the predicate has teeth: instance-only carriers cannot carry a family'
     expect(familyReach(TAG, planeWorld).unreachable).toContain('synthetic_plane_camper');
   });
 
+  it('FAILS on the bands clause ALONE: six carriers in six zones of one level band', () => {
+    // The bands negative, the one clause no other arm reds on by itself (the
+    // item-twin arm below fires all three at once). Six DISTINCT band-3 zones
+    // (a levelRange low of 19 or 20, so levelBandOf is 3 for each), one
+    // camped carrier per zone: templates (6) and zones (6) clear the floor by
+    // construction, and the only thing the family is short of is bands.
+    // Delete floorShortfalls' bands block and this family passes.
+    const zones = zonesNamed([
+      'willowfen',
+      'nightbloom',
+      'wraithwood',
+      'palmreach',
+      'evergarden',
+      'galecrest',
+    ]);
+    for (const zone of zones) {
+      expect(levelBandOf(zone.levelRange[0]), `${zone.id} is a band-3 zone`).toBe(3);
+      expect(zoneAt(zone.hub.x, zone.hub.z).id, `${zone.id} hub resolves`).toBe(zone.id);
+    }
+    const world = syntheticWorld(REACH_FLOOR.templates, zones);
+    const reach = familyReach(TAG, world);
+    expect(reach.reachable).toHaveLength(6);
+    expect(reach.zones).toHaveLength(6);
+    expect(reach.bands).toEqual([3]);
+    const short = floorShortfalls([TAG], world);
+    expect(short).toHaveLength(1);
+    // Exactly the one clause: the clause list is joined by ', ' and closed by
+    // '. Reachable carriers', so this anchors "bands 1 of 2" as the whole of it.
+    expect(short[0]).toMatch(
+      new RegExp(
+        `^${TAG} is short of the masterwrought R22 floor over the REACHABLE subset: ` +
+          'bands 1 of 2\\. Reachable carriers',
+      ),
+    );
+    expect(short[0]).not.toMatch(/templates \d+ of \d+/);
+    expect(short[0]).not.toMatch(/zones \d+ of \d+/);
+  });
+
+  it('FAILS on the zones clause ALONE: six carriers packed two per zone into three hubs', () => {
+    // The zones negative. Three hub zones whose level ranges start in
+    // different bands (eastbrook_vale 1 to 7, mirefen_marsh 6 to 13,
+    // thornpeak_heights 13 to 20), two camped carriers per zone: templates (6)
+    // and bands (at least the floor's 2) clear, and the only clause is zones.
+    // Narrow floorShortfalls' zones clause to `< 2` and this family passes.
+    const zones = zonesNamed(['eastbrook_vale', 'mirefen_marsh', 'thornpeak_heights']);
+    for (const zone of zones) {
+      expect(zoneAt(zone.hub.x, zone.hub.z).id, `${zone.id} hub resolves`).toBe(zone.id);
+    }
+    expect(
+      new Set(zones.map((zone) => levelBandOf(zone.levelRange[0]))).size,
+      'the three hubs span the band floor',
+    ).toBeGreaterThanOrEqual(REACH_FLOOR.bands);
+    const world = syntheticWorld(REACH_FLOOR.templates, zones);
+    const reach = familyReach(TAG, world);
+    expect(reach.reachable).toHaveLength(6);
+    expect(reach.zones).toEqual(['eastbrook_vale', 'mirefen_marsh', 'thornpeak_heights']);
+    expect(reach.bands.length).toBeGreaterThanOrEqual(REACH_FLOOR.bands);
+    const short = floorShortfalls([TAG], world);
+    expect(short).toHaveLength(1);
+    expect(short[0]).toMatch(
+      new RegExp(
+        `^${TAG} is short of the masterwrought R22 floor over the REACHABLE subset: ` +
+          'zones 3 of 4\\. Reachable carriers',
+      ),
+    );
+    expect(short[0]).not.toMatch(/templates \d+ of \d+/);
+    expect(short[0]).not.toMatch(/bands \d+ of \d+/);
+  });
+
   it('judges two tags that share one item separately: the floor is per TAG', () => {
     // horn and tusk both map to curved_tusk after 11m-ORPHAN, so an
     // item-keyed count would let tusk's carriers satisfy horn. Here one tag
@@ -566,5 +713,43 @@ describe('the never-mapped synthetic families the corpse-harvest corpus uses', (
     // Non-vacuity: the same lookup finds real carriers for a real family, so
     // the empty result above is a measurement and not a lookup that matches nothing.
     expect(carriersOf(MAPPED_TAGS[0], LIVE_WORLD).length).toBeGreaterThan(0);
+  });
+
+  it('withRetaggedTemplates puts back the absence it found, even when the body throws', () => {
+    // The corpus's one retag idiom (tests/helpers/unmapped_family.ts): a
+    // throwing arm must not leave warlock_imp tagged for every suite that
+    // runs after it, which is the cascade the finally exists to prevent.
+    expect(MOBS.warlock_imp.componentTags).toBeUndefined();
+    expect(() =>
+      withRetaggedTemplates({ warlock_imp: [UNMAPPED_FAMILY] }, () => {
+        expect(MOBS.warlock_imp.componentTags).toEqual([UNMAPPED_FAMILY]);
+        expect(carriersOf(UNMAPPED_FAMILY, LIVE_WORLD).map((mob) => mob.id)).toEqual([
+          'warlock_imp',
+        ]);
+        throw new Error('sentinel');
+      }),
+    ).toThrow('sentinel');
+    expect(MOBS.warlock_imp.componentTags).toBeUndefined();
+    expect(carriersOf(UNMAPPED_FAMILY, LIVE_WORLD)).toEqual([]);
+  });
+
+  it('withRetaggedTemplates refuses a template that ships tagged, before mutating any', () => {
+    // The premise guard: forest_wolf ships with tags and warlock_imp without.
+    // Naming both must throw on the wolf, run nothing, and leave the imp
+    // untouched (the guard runs over the whole map before the first retag).
+    expect(MOBS.forest_wolf.componentTags).toEqual(['hide', 'fang']);
+    const wolfTags = MOBS.forest_wolf.componentTags;
+    let ran = false;
+    expect(() =>
+      withRetaggedTemplates(
+        { warlock_imp: [UNMAPPED_FAMILY], forest_wolf: [UNMAPPED_FAMILY] },
+        () => {
+          ran = true;
+        },
+      ),
+    ).toThrow('forest_wolf carries component tags [hide, fang] as shipped');
+    expect(ran).toBe(false);
+    expect(MOBS.forest_wolf.componentTags).toBe(wolfTags);
+    expect(MOBS.warlock_imp.componentTags).toBeUndefined();
   });
 });

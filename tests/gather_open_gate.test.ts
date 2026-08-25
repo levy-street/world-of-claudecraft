@@ -11,7 +11,11 @@ import { tryNearbyInteraction } from '../src/game/nearby_interaction';
 import { MOBS } from '../src/sim/data';
 import { harvestFamilyYieldsItem } from '../src/sim/professions/gathering';
 import { type Entity, INTERACT_RANGE } from '../src/sim/types';
-import { UNMAPPED_FAMILY, UNMAPPED_FAMILY_2 } from './helpers/unmapped_family';
+import {
+  UNMAPPED_FAMILY,
+  UNMAPPED_FAMILY_2,
+  withRetaggedTemplates,
+} from './helpers/unmapped_family';
 
 // The open-gate flip: the hcb wire mirror (PR 2087) made online corpse
 // harvest-claim state reliable, so the helper arms main.ts calls now run with
@@ -159,13 +163,11 @@ describe('direct corpse hits over gather nodes', () => {
     // node sitting under it rather than being swallowed. Pinned with the claim
     // UNSPENT, which is the state that used to keep it open, so this is the
     // predicate talking and not the pre-existing claim arm.
-    const template = MOBS.warlock_imp;
-    const priorTags = template.componentTags;
-    template.componentTags = [UNMAPPED_FAMILY, UNMAPPED_FAMILY_2];
-    const mixedTemplate = MOBS.warlock_voidwalker;
-    const priorMixedTags = mixedTemplate.componentTags;
-    mixedTemplate.componentTags = ['hide', UNMAPPED_FAMILY];
-    try {
+    const retags = {
+      warlock_imp: [UNMAPPED_FAMILY, UNMAPPED_FAMILY_2],
+      warlock_voidwalker: ['hide', UNMAPPED_FAMILY],
+    };
+    withRetaggedTemplates(retags, () => {
       const troll = corpse({ templateId: 'warlock_imp', harvestClaimedBy: null, loot: null });
       expect(shouldDeferPickedCorpseToGatherNode(troll, 1)).toBe(true);
       // ...and click-to-walk no longer marches the player to it either: there is
@@ -195,10 +197,7 @@ describe('direct corpse hits over gather nodes', () => {
         loot: null,
       });
       expect(shouldDeferPickedCorpseToGatherNode(mixed, 1)).toBe(false);
-    } finally {
-      template.componentTags = priorTags;
-      mixedTemplate.componentTags = priorMixedTags;
-    }
+    });
     // ...and on real content: sethrael_palecoil (the shipped mixed exemplar
     // until Phase 11m mapped its horn) still carries horn, every tag it
     // carries maps now, and an empty one still opens.

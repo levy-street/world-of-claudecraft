@@ -51,7 +51,11 @@ import { Sim } from '../src/sim/sim';
 import type { Entity, SimEvent, WorldContent } from '../src/sim/types';
 import { corpseHarvestView } from '../src/ui/hud/loot/corpse_harvest_view';
 import { bareClient, broadcast, fakeWs, joinServer, lastSnap } from './helpers/bare_client';
-import { UNMAPPED_FAMILY, UNMAPPED_FAMILY_2 } from './helpers/unmapped_family';
+import {
+  UNMAPPED_FAMILY,
+  UNMAPPED_FAMILY_2,
+  withRetaggedTemplates,
+} from './helpers/unmapped_family';
 
 // End-to-end: a slain mob's corpse can be harvested for profession components
 // exactly once, first-come. This is the deliberate OPPOSITE of a world gathering
@@ -270,19 +274,11 @@ const MIXED_TEMPLATE_ID = 'warlock_voidwalker';
 const MIXED_TEMPLATE_TAGS = ['hide', 'claw', UNMAPPED_FAMILY];
 const MIXED2_TEMPLATE_ID = 'tunnel_rat';
 const MIXED2_TEMPLATE_TAGS = [UNMAPPED_FAMILY_2, 'hide'];
-function withRetaggedTemplates<T>(retags: Record<string, readonly string[]>, body: () => T): T {
-  const prior = new Map<string, string[] | undefined>();
-  for (const [id, tags] of Object.entries(retags)) {
-    const template = MOBS[id];
-    prior.set(id, template.componentTags);
-    template.componentTags = [...tags];
-  }
-  try {
-    return body();
-  } finally {
-    for (const [id, tags] of prior) MOBS[id].componentTags = tags;
-  }
-}
+// The retag itself is the corpus's ONE shared idiom, withRetaggedTemplates in
+// tests/helpers/unmapped_family.ts, which also carries the premise the three
+// fixtures rest on (each is untagged as shipped, so a retag replaces nothing
+// and a restore puts back exactly the absence it found): it throws, naming
+// the template, before mutating anything if a fixture ever ships tagged.
 function withUnmappedTemplate<T>(body: () => T): T {
   return withRetaggedTemplates({ [UNMAPPED_TEMPLATE_ID]: UNMAPPED_TEMPLATE_TAGS }, body);
 }
@@ -294,14 +290,6 @@ function withMixedTemplates<T>(body: () => T): T {
 }
 function withFixtureTemplates<T>(body: () => T): T {
   return withUnmappedTemplate(() => withMixedTemplates(body));
-}
-// The premise the three fixtures rest on, pinned once at module scope rather
-// than assumed in every arm: each is untagged as shipped, so a retag replaces
-// nothing and a restore puts back exactly the absence it found.
-for (const id of [UNMAPPED_TEMPLATE_ID, MIXED_TEMPLATE_ID, MIXED2_TEMPLATE_ID]) {
-  if (MOBS[id].componentTags !== undefined) {
-    throw new Error(`${id} carries component tags; re-pick the retag fixture`);
-  }
 }
 
 describe('corpse harvest: single-use, first-come (#1141)', () => {
@@ -706,6 +694,52 @@ describe('signed Pristine specimens (#1145)', () => {
     // tracks the ROLL rather than any constant the arm could hardcode. The
     // contrast is the point, not the pair of numbers.
     expect(sim.countItem('homespun_cloth', a)).toBe(1);
+  });
+
+  it('the gills family (no specimen, Phase 11m) mints a SIGNED mudfin_scale at rare-or-better (seed 31)', () => {
+    // The behavioural premise behind tests/recipe_economy.test.ts's reachable
+    // mudfin_scale row: 11m-ORPHAN mapped gills to mudfin_scale with NO
+    // specimen (HARVEST_COMPONENT_SPECIMENS carries no gills row, decided
+    // explicitly), so gills takes the specimen-less signed arm, the same arm
+    // fang and cloth take above. Seed 31's first draw is the tier roll (index
+    // 1 on this seed, so gills alone on the two-tag murloc, bonus 1, lands
+    // tier index 2 and three units) and its second is the rarity roll, which
+    // the fang arms at this seed pin as rare: predicted the grant shape
+    // { mudfin_scale, qty 3, rare, signed } and measured so. The ledger IS
+    // the whole grant: one signed stack, nothing minted beside it.
+    expect(HARVEST_COMPONENT_ITEMS.gills).toBe('mudfin_scale');
+    expect(HARVEST_COMPONENT_SPECIMENS.gills).toBeUndefined();
+    const { sim, internals, a } = setup(31);
+    const template = MOBS.mudfin_murloc;
+    expect(template.componentTags).toEqual(['gills', 'hide']);
+    const corpse = createMob(7774, template, template.maxLevel, { x: 0, y: 0, z: 0 });
+    corpse.dead = true;
+    corpse.aiState = 'dead';
+    corpse.corpseTimer = 9999;
+    corpse.respawnTimer = 9999;
+    internals.entities.set(corpse.id, corpse);
+    sim.drainEvents();
+    sim.harvestCorpse(corpse.id, ['gills'], a);
+    const result = sim
+      .drainEvents()
+      .find((e): e is Extract<typeof e, { type: 'harvestResult' }> => e.type === 'harvestResult');
+    expect(result?.yields).toEqual([
+      { itemId: 'mudfin_scale', qty: 3, rarity: 'rare', kind: 'signed' },
+    ]);
+    const meta = expectDefined(internals.players.get(a));
+    const scales = meta.inventory.filter((s) => s.itemId === 'mudfin_scale');
+    expect(scales).toHaveLength(1);
+    expect(scales[0].count).toBe(3);
+    expect(scales[0].instance?.signer).toBe('Alpha');
+    // No specimen was minted: nothing else in the bags carries the harvester's
+    // signature, and no specimen item of ANY family landed.
+    expect(
+      meta.inventory.filter((s) => s.instance?.signer === 'Alpha' && s.itemId !== 'mudfin_scale'),
+    ).toEqual([]);
+    for (const specimen of Object.values(HARVEST_COMPONENT_SPECIMENS)) {
+      expect(sim.countItem(specimen, a), specimen).toBe(0);
+    }
+    expect(sim.countItem('rough_hide', a)).toBe(0);
   });
 
   it('a slot-full signed-family harvest falls back to the plain stack, never over capacity (seed 23)', () => {
@@ -1554,6 +1588,9 @@ describe('a repeated component tag harvests the family once (#2474)', () => {
     const refusals: {
       label: string;
       arrange: (rig: ReturnType<typeof setup>) => number;
+      // Templates retagged for the duration of THIS arm alone (the shared
+      // withRetaggedTemplates idiom), so an earlier arm sees them as shipped.
+      retags?: Record<string, readonly string[]>;
     }[] = [
       {
         label: 'full bags (the pre-claim capacity gate)',
@@ -1603,13 +1640,12 @@ describe('a repeated component tag harvests the family once (#2474)', () => {
         // the claim. Pre-#2513 this arm did not exist: it drew a tier roll per
         // effective family and spent the claim. fen_troll (claw, tusk) was the
         // shipped fixture; claw and tusk are both mapped now, so this retags
-        // UNMAPPED_TEMPLATE_ID for the duration of the arm (restored below,
-        // after the "no component tags" arm above has already run against it
-        // untagged).
+        // UNMAPPED_TEMPLATE_ID for the duration of the arm (scoped to it, so
+        // the "no component tags" arm above runs against it untagged).
         label: 'the corpse carries only unmapped component families',
+        retags: { [UNMAPPED_TEMPLATE_ID]: UNMAPPED_TEMPLATE_TAGS },
         arrange: ({ internals }) => {
           const template = MOBS[UNMAPPED_TEMPLATE_ID];
-          template.componentTags = [...UNMAPPED_TEMPLATE_TAGS];
           const corpse = createMob(7771, template, template.maxLevel, { x: 0, y: 0, z: 0 });
           corpse.dead = true;
           corpse.aiState = 'dead';
@@ -1635,8 +1671,8 @@ describe('a repeated component tag harvests the family once (#2474)', () => {
         arrange: () => 4242,
       },
     ];
-    try {
-      for (const arm of refusals) {
+    for (const arm of refusals) {
+      withRetaggedTemplates(arm.retags ?? {}, () => {
         for (const components of [['hide', 'hide'], ['hide']]) {
           const rig = setup(153);
           const mobId = arm.arrange(rig);
@@ -1653,9 +1689,7 @@ describe('a repeated component tag harvests the family once (#2474)', () => {
           expect(draws, `${label} draws`).toBe(0);
           expect(rig.sim.countItem('rough_hide', rig.a), `${label} yield`).toBe(0);
         }
-      }
-    } finally {
-      MOBS[UNMAPPED_TEMPLATE_ID].componentTags = undefined;
+      });
     }
   });
 });
@@ -2052,6 +2086,9 @@ describe('an invalid component tag is ignored entirely (#2504)', () => {
       claimAfter?: (rig: ReturnType<typeof setup>) => number | null;
       // Overrides the shared junk picks for an arm the junk picks cannot reach.
       picks?: string[][];
+      // Templates retagged for the duration of THIS arm alone (the shared
+      // withRetaggedTemplates idiom), so an earlier arm sees them as shipped.
+      retags?: Record<string, readonly string[]>;
     }[] = [
       {
         label: 'full bags (the pre-claim capacity gate)',
@@ -2126,11 +2163,11 @@ describe('an invalid component tag is ignored entirely (#2504)', () => {
         // old_greyjaw (hide, fang, claw) was the shipped fixture until #2905
         // mapped claw, then sethrael_palecoil (hide, claw, horn) until Phase
         // 11m mapped horn; the same three-tag shape is retagged onto
-        // MIXED_TEMPLATE_ID for the duration of the arm (restored below).
+        // MIXED_TEMPLATE_ID for the duration of the arm.
         label: 'the pick names only families with no item behind them (#2509)',
+        retags: { [MIXED_TEMPLATE_ID]: MIXED_TEMPLATE_TAGS },
         arrange: ({ internals }) => {
           const template = MOBS[MIXED_TEMPLATE_ID];
-          template.componentTags = [...MIXED_TEMPLATE_TAGS];
           const corpse = createMob(7753, template, template.maxLevel, { x: 0, y: 0, z: 0 });
           corpse.dead = true;
           corpse.aiState = 'dead';
@@ -2147,13 +2184,12 @@ describe('an invalid component tag is ignored entirely (#2504)', () => {
         // full cover, a single unmapped family, and junk beside it. Every one of
         // them spent the claim pre-fix. fen_troll (claw, tusk) was the shipped
         // fixture; claw and tusk are both mapped now, so this retags
-        // UNMAPPED_TEMPLATE_ID for the duration of the arm (restored below,
-        // after the "no component tags" arm above has already run against it
-        // untagged).
+        // UNMAPPED_TEMPLATE_ID for the duration of the arm (scoped to it, so
+        // the "no component tags" arm above runs against it untagged).
         label: 'the corpse carries only unmapped component families (#2513)',
+        retags: { [UNMAPPED_TEMPLATE_ID]: UNMAPPED_TEMPLATE_TAGS },
         arrange: ({ internals }) => {
           const template = MOBS[UNMAPPED_TEMPLATE_ID];
-          template.componentTags = [...UNMAPPED_TEMPLATE_TAGS];
           const corpse = createMob(7755, template, template.maxLevel, { x: 0, y: 0, z: 0 });
           corpse.dead = true;
           corpse.aiState = 'dead';
@@ -2171,8 +2207,8 @@ describe('an invalid component tag is ignored entirely (#2504)', () => {
         ],
       },
     ];
-    try {
-      for (const arm of refusals) {
+    for (const arm of refusals) {
+      withRetaggedTemplates(arm.retags ?? {}, () => {
         for (const components of arm.picks ?? [['hide', 'junk'], ['junk'], ['junk', 'zzz']]) {
           const rig = setup(153);
           const mobId = arm.arrange(rig);
@@ -2201,10 +2237,7 @@ describe('an invalid component tag is ignored entirely (#2504)', () => {
             expect(target.corpseTimer, `${label} corpse timer`).toBe(9999);
           }
         }
-      }
-    } finally {
-      MOBS[UNMAPPED_TEMPLATE_ID].componentTags = undefined;
-      MOBS[MIXED_TEMPLATE_ID].componentTags = undefined;
+      });
     }
     // Positive control for the observer itself: every expectation above is
     // zero, so a mis-wired setObserver would make the whole sweep vacuous. The
@@ -3046,7 +3079,14 @@ describe('a pick of nothing but unmapped families is refused, claim intact (#250
     expect(hornOnly.errors).toEqual([]);
     expect(hornOnly.claimedBy).not.toBeNull();
     expect(hornOnly.draws).toBe(2);
-    expect(hornOnly.sim.countItem('curved_tusk', hornOnly.a)).toBeGreaterThan(0);
+    // The EXACT count, predicted from the roll model before it was measured:
+    // harvestTierQuantity over rollFocusTier is min(5, rolledIndex + bonus)
+    // plus one, the first draw on this rig (seed 5) is the tier roll, and
+    // horn alone on the four-tag serpent is bonus 3. The seed-5 index has no
+    // earlier literal in this file, so the prediction was parametric
+    // (index + 4, capped at 6) with index 0 as the point guess: predicted 4,
+    // measured 4.
+    expect(hornOnly.sim.countItem('curved_tusk', hornOnly.a)).toBe(4);
     expect(hornOnly.sim.countItem('rough_hide', hornOnly.a)).toBe(0);
     // ...and the same on the murloc, for gills: the single checkbox that was
     // the whole refusal on the `gills, hide` shape pays mudfin_scale now.
@@ -3056,7 +3096,10 @@ describe('a pick of nothing but unmapped families is refused, claim intact (#250
     expect(gillsOnly.errors).toEqual([]);
     expect(gillsOnly.claimedBy).not.toBeNull();
     expect(gillsOnly.draws).toBe(2);
-    expect(gillsOnly.sim.countItem('mudfin_scale', gillsOnly.a)).toBeGreaterThan(0);
+    // Same seed, same first draw, bonus 1 on the two-tag murloc: the same
+    // index 0 predicts index + 2, so 2; measured 2. The two counts differing
+    // by exactly the bonus gap (3 versus 1) is the roll model showing.
+    expect(gillsOnly.sim.countItem('mudfin_scale', gillsOnly.a)).toBe(2);
     expect(gillsOnly.sim.countItem('rough_hide', gillsOnly.a)).toBe(0);
   });
 
@@ -4092,7 +4135,12 @@ describe('the concentration bonus on a mixed corpse, moved on purpose (#2514)', 
     expect(gillsOnly.claimedByHarvester).toBe(true);
     expect(gillsOnly.draws).toBe(2);
     expect(gillsOnly.hide).toBe(0);
-    expect(gillsOnly.scale).toBeGreaterThan(0);
+    // The EXACT count, predicted before it was measured: seed 31's first
+    // draw is tier index 1 (the concentrate row above lands hide 3 at bonus
+    // 1, and the spread row lands the scale at 2 at bonus 0), gills alone is
+    // bonus 1 on the two-tag murloc, and harvestTierQuantity is index plus
+    // bonus plus one: predicted 3, measured 3.
+    expect(gillsOnly.scale).toBe(3);
     // ...and hide alone on the shipped murloc is bonus 1 (2 - 1): the SAME
     // numbers as the two-tag fixture's ['hide'] above, because the
     // denominator is 2 on both and hide's tier roll is the first draw on

@@ -21,7 +21,11 @@ import type { PlayerMeta } from '../src/sim/sim';
 import { Sim } from '../src/sim/sim';
 import type { Entity, LootEntry, LootSlot, SimEvent } from '../src/sim/types';
 import { expectDefined } from './helpers/defined';
-import { UNMAPPED_FAMILY, UNMAPPED_FAMILY_2 } from './helpers/unmapped_family';
+import {
+  UNMAPPED_FAMILY,
+  UNMAPPED_FAMILY_2,
+  withRetaggedTemplates,
+} from './helpers/unmapped_family';
 
 // Direct unit tests for the extracted loot-distribution module (L1). These drive the
 // module's exported `(ctx, ...)` functions through `sim.ctx` (the real SimContext
@@ -636,12 +640,10 @@ describe('loot_roll: corpse-loot helpers (module entry)', () => {
     // forever waiting on it, which is worse than the pre-#2513 world where a
     // player could at least burn the claim to collapse the corpse.
     const template = MOBS.warlock_imp;
-    const priorTags = template.componentTags;
-    template.componentTags = [UNMAPPED_FAMILY, UNMAPPED_FAMILY_2];
-    const sim = makeSim();
-    try {
+    const sim = withRetaggedTemplates({ warlock_imp: [UNMAPPED_FAMILY, UNMAPPED_FAMILY_2] }, () => {
+      const retaggedSim = makeSim();
       expect(isHarvestableCorpse(template.componentTags)).toBe(false);
-      const mob = createMob(sim.nextId++, template, 12, { x: 0, y: 0, z: 0 });
+      const mob = createMob(retaggedSim.nextId++, template, 12, { x: 0, y: 0, z: 0 });
       mob.dead = true;
       mob.lootable = true;
       mob.corpseTimer = 60;
@@ -649,14 +651,13 @@ describe('loot_roll: corpse-loot helpers (module entry)', () => {
       // the arm is chosen by the corpse's families, not by the claim.
       expect(mob.harvestClaimedBy).toBeNull();
       mob.loot = { copper: 0, items: [{ itemId: 'x', count: 0 }] };
-      sim.entities.set(mob.id, mob);
-      pruneCorpseLoot(sim.ctx, mob);
+      retaggedSim.entities.set(mob.id, mob);
+      pruneCorpseLoot(retaggedSim.ctx, mob);
       expect(mob.loot).toBeNull();
       expect(mob.lootable).toBe(false);
       expect(mob.corpseTimer).toBe(4);
-    } finally {
-      template.componentTags = priorTags;
-    }
+      return retaggedSim;
+    });
     // The discriminator, identical rig and identical unspent claim: a corpse
     // with a MAPPED family still takes the grace arm, so this is the predicate
     // narrowing and not the grace arm being deleted.

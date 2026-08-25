@@ -41,7 +41,11 @@ import { createMob } from '../src/sim/entity';
 import type { PlayerMeta } from '../src/sim/sim';
 import { Sim } from '../src/sim/sim';
 import type { Entity, SimEvent } from '../src/sim/types';
-import { UNMAPPED_FAMILY, UNMAPPED_FAMILY_2 } from './helpers/unmapped_family';
+import {
+  UNMAPPED_FAMILY,
+  UNMAPPED_FAMILY_2,
+  withRetaggedTemplates,
+} from './helpers/unmapped_family';
 
 type SimInternals = {
   entities: Map<number, Entity>;
@@ -434,11 +438,8 @@ describe('a harvest that lands nothing never gets that far (#2457, #2513)', () =
     // no-op it could not distinguish from a lost keypress. Now the command is
     // refused at the corpse-level gate before the claim, and the one thing the
     // player gets is the refusal.
-    const template = MOBS.warlock_imp;
-    const priorTags = template.componentTags;
-    template.componentTags = [UNMAPPED_FAMILY, UNMAPPED_FAMILY_2];
-    try {
-      expect(template.componentTags).toEqual([UNMAPPED_FAMILY, UNMAPPED_FAMILY_2]);
+    withRetaggedTemplates({ warlock_imp: [UNMAPPED_FAMILY, UNMAPPED_FAMILY_2] }, () => {
+      expect(MOBS.warlock_imp.componentTags).toEqual([UNMAPPED_FAMILY, UNMAPPED_FAMILY_2]);
       const { sim, a, mob } = setup(60, 'warlock_imp');
       const { results, loots, events } = harvest(sim, mob.id, undefined, a);
       expect(mob.harvestClaimedBy).toBeNull();
@@ -448,9 +449,7 @@ describe('a harvest that lands nothing never gets that far (#2457, #2513)', () =
       expect(events).toEqual([
         { type: 'error', pid: a, text: 'That corpse has nothing to harvest.' },
       ]);
-    } finally {
-      template.componentTags = priorTags;
-    }
+    });
   });
 
   it('still emits the ledger on the mixed corpse next door, so the gate is not a mute button', () => {

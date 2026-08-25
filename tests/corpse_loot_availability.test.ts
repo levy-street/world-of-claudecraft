@@ -3,7 +3,11 @@ import { corpseLootAvailability } from '../src/game/corpse_loot_availability';
 import { MOBS } from '../src/sim/data';
 import { harvestFamilyYieldsItem } from '../src/sim/professions/gathering';
 import type { Entity } from '../src/sim/types';
-import { UNMAPPED_FAMILY, UNMAPPED_FAMILY_2 } from './helpers/unmapped_family';
+import {
+  UNMAPPED_FAMILY,
+  UNMAPPED_FAMILY_2,
+  withRetaggedTemplates,
+} from './helpers/unmapped_family';
 
 function corpse(overrides: Partial<Entity>): Entity {
   return {
@@ -118,13 +122,11 @@ describe('corpseLootAvailability', () => {
     // reported the corpse harvestable, which kept the popup open on an empty
     // body with an enabled Harvest button whose every submit the server
     // refused. It now reads the sim's own isHarvestableCorpse.
-    const template = MOBS.warlock_imp;
-    const priorTags = template.componentTags;
-    template.componentTags = [UNMAPPED_FAMILY, UNMAPPED_FAMILY_2];
-    const mixedTemplate = MOBS.warlock_voidwalker;
-    const priorMixedTags = mixedTemplate.componentTags;
-    mixedTemplate.componentTags = ['hide', UNMAPPED_FAMILY];
-    try {
+    const retags = {
+      warlock_imp: [UNMAPPED_FAMILY, UNMAPPED_FAMILY_2],
+      warlock_voidwalker: ['hide', UNMAPPED_FAMILY],
+    };
+    withRetaggedTemplates(retags, () => {
       const depleted = corpseLootAvailability(
         corpse({ templateId: 'warlock_imp', loot: null, harvestClaimedBy: null }),
         1,
@@ -157,10 +159,7 @@ describe('corpseLootAvailability', () => {
       );
       expect(mixed.harvestable).toBe(true);
       expect(mixed.canOpen).toBe(true);
-    } finally {
-      template.componentTags = priorTags;
-      mixedTemplate.componentTags = priorMixedTags;
-    }
+    });
     // ...and on real content: sethrael_palecoil was the shipped mixed
     // exemplar (hide, claw, horn) until Phase 11m mapped horn; it still
     // carries horn, every tag it carries maps now, and it is harvestable.

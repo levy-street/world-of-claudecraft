@@ -18,7 +18,11 @@ import { isHarvestableCorpse } from '../src/sim/professions/gathering';
 import type { Entity } from '../src/sim/types';
 import { LootWindowController } from '../src/ui/hud/loot/loot_window_controller';
 import type { IWorld } from '../src/world_api';
-import { UNMAPPED_FAMILY, UNMAPPED_FAMILY_2 } from './helpers/unmapped_family';
+import {
+  UNMAPPED_FAMILY,
+  UNMAPPED_FAMILY_2,
+  withRetaggedTemplates,
+} from './helpers/unmapped_family';
 
 const itemIds = Object.keys(ITEMS);
 // isHarvestableCorpse, not a tag COUNT (#2513): a template can carry tags whose
@@ -37,27 +41,17 @@ const harvestMobTags = harvestMob.componentTags;
 // retired sethrael_palecoil, the old mixed fixture here), so the #2513 cases
 // below drive real templates retagged with the synthetic never-mapped
 // families (tests/helpers/unmapped_family.ts) for the duration of a callback:
-// the shared UNMAPPED fixture idiom of the sim suites
-// (tests/corpse_harvest_sim.test.ts). warlock_imp and warlock_voidwalker carry
-// no tags of their own (warlock_imp is this file's untagged fixture
-// elsewhere), so retagging them borrows no other case's premise, and the
-// mutation is always restored in a `finally`.
+// the corpus's one shared retag idiom, withRetaggedTemplates from that same
+// helper. warlock_imp and warlock_voidwalker carry no tags of their own
+// (warlock_imp is this file's untagged fixture elsewhere), so retagging them
+// borrows no other case's premise (the helper throws if that ever changes),
+// and the mutation is always restored in a `finally`.
 const UNMAPPED_TEMPLATE_ID = 'warlock_imp';
 const UNMAPPED_TEMPLATE_TAGS = [UNMAPPED_FAMILY, UNMAPPED_FAMILY_2];
 const MIXED_TEMPLATE_ID = 'warlock_voidwalker';
 const MIXED_TEMPLATE_TAGS = ['hide', 'claw', UNMAPPED_FAMILY];
-function withRetaggedTemplate<T>(templateId: string, tags: readonly string[], body: () => T): T {
-  const template = MOBS[templateId];
-  const prior = template.componentTags;
-  template.componentTags = [...tags];
-  try {
-    return body();
-  } finally {
-    template.componentTags = prior;
-  }
-}
 function withUnmappedTemplate<T>(body: () => T): T {
-  return withRetaggedTemplate(UNMAPPED_TEMPLATE_ID, UNMAPPED_TEMPLATE_TAGS, body);
+  return withRetaggedTemplates({ [UNMAPPED_TEMPLATE_ID]: UNMAPPED_TEMPLATE_TAGS }, body);
 }
 
 function entity(
@@ -338,7 +332,7 @@ describe('LootWindowController', () => {
     // the shape sethrael_palecoil shipped with (hide, claw, horn) until Phase
     // 11m mapped horn.
     expect(isHarvestableCorpse([UNMAPPED_FAMILY])).toBe(false);
-    withRetaggedTemplate(MIXED_TEMPLATE_ID, MIXED_TEMPLATE_TAGS, () => {
+    withRetaggedTemplates({ [MIXED_TEMPLATE_ID]: MIXED_TEMPLATE_TAGS }, () => {
       expect(MOBS[MIXED_TEMPLATE_ID].componentTags).toEqual(['hide', 'claw', UNMAPPED_FAMILY]);
       const mixed = entity(21, {
         kind: 'mob',

@@ -5,12 +5,15 @@
 
 import { describe, expect, it, vi } from 'vitest';
 import { ClientWorld } from '../src/net/online';
-import { MOBS } from '../src/sim/data';
 import { deadTargetSelectable } from '../src/sim/dead_target';
 import type { SimContext } from '../src/sim/sim_context';
 import { Targeting } from '../src/sim/targeting';
 import type { Entity } from '../src/sim/types';
-import { UNMAPPED_FAMILY, UNMAPPED_FAMILY_2 } from './helpers/unmapped_family';
+import {
+  UNMAPPED_FAMILY,
+  UNMAPPED_FAMILY_2,
+  withRetaggedTemplates,
+} from './helpers/unmapped_family';
 
 function ent(partial: Partial<Entity> & { id: number }): Entity {
   return {
@@ -144,44 +147,42 @@ describe('Targeting.targetEntity with a dead pet', () => {
     // (tests/helpers/unmapped_family.ts) for the duration of the case,
     // restored in a finally: warlock_imp all-unmapped, warlock_voidwalker
     // mixed.
-    const template = MOBS.warlock_imp;
-    const priorTags = template.componentTags;
-    template.componentTags = [UNMAPPED_FAMILY, UNMAPPED_FAMILY_2];
-    const mixedTemplate = MOBS.warlock_voidwalker;
-    const priorMixedTags = mixedTemplate.componentTags;
-    mixedTemplate.componentTags = ['hide', UNMAPPED_FAMILY];
-    const { ctx, entities } = makeCtx();
-    const player = ent({ id: 1, kind: 'player', dead: false, hostile: false });
-    // A FACTORY, not one spread object: sharing it would alias `loot` (and its
-    // slot array) across both corpses, so a future assertion that touched loot
-    // would silently be reading the other fixture.
-    const stranger = () => ({
-      kind: 'mob' as const,
-      dead: true,
-      corpseTimer: 12,
-      lootable: true,
-      tappedById: 2,
-      lootFfaTimer: 30,
-      loot: { copper: 0, items: [{ itemId: 'worn_sword', count: 1 }] },
-      harvestClaimedBy: null,
-    });
-    const troll = ent({ id: 32, templateId: 'warlock_imp', ...stranger() });
-    // The discriminator: the mixed fixture carries an unmapped family beside
-    // a mapped one, so its harvest half still says yes and its corpse is
-    // still selectable. It is the yield table talking, not the tag count:
-    // both fixtures carry exactly two tags.
-    const boar = ent({ id: 33, templateId: 'warlock_voidwalker', ...stranger() });
-    // ...and on real content, where every shipped tag maps since Phase 11m,
-    // sethrael_palecoil (the old mixed exemplar) is selectable for the same
-    // reason.
-    const palecoil = ent({ id: 34, templateId: 'sethrael_palecoil', ...stranger() });
-    entities.set(1, player);
-    entities.set(32, troll);
-    entities.set(33, boar);
-    entities.set(34, palecoil);
-    const targeting = new Targeting(ctx);
+    const retags = {
+      warlock_imp: [UNMAPPED_FAMILY, UNMAPPED_FAMILY_2],
+      warlock_voidwalker: ['hide', UNMAPPED_FAMILY],
+    };
+    withRetaggedTemplates(retags, () => {
+      const { ctx, entities } = makeCtx();
+      const player = ent({ id: 1, kind: 'player', dead: false, hostile: false });
+      // A FACTORY, not one spread object: sharing it would alias `loot` (and its
+      // slot array) across both corpses, so a future assertion that touched loot
+      // would silently be reading the other fixture.
+      const stranger = () => ({
+        kind: 'mob' as const,
+        dead: true,
+        corpseTimer: 12,
+        lootable: true,
+        tappedById: 2,
+        lootFfaTimer: 30,
+        loot: { copper: 0, items: [{ itemId: 'worn_sword', count: 1 }] },
+        harvestClaimedBy: null,
+      });
+      const troll = ent({ id: 32, templateId: 'warlock_imp', ...stranger() });
+      // The discriminator: the mixed fixture carries an unmapped family beside
+      // a mapped one, so its harvest half still says yes and its corpse is
+      // still selectable. It is the yield table talking, not the tag count:
+      // both fixtures carry exactly two tags.
+      const boar = ent({ id: 33, templateId: 'warlock_voidwalker', ...stranger() });
+      // ...and on real content, where every shipped tag maps since Phase 11m,
+      // sethrael_palecoil (the old mixed exemplar) is selectable for the same
+      // reason.
+      const palecoil = ent({ id: 34, templateId: 'sethrael_palecoil', ...stranger() });
+      entities.set(1, player);
+      entities.set(32, troll);
+      entities.set(33, boar);
+      entities.set(34, palecoil);
+      const targeting = new Targeting(ctx);
 
-    try {
       targeting.targetEntity(32, 1);
       expect(player.targetId).toBeNull();
 
@@ -190,10 +191,7 @@ describe('Targeting.targetEntity with a dead pet', () => {
 
       targeting.targetEntity(34, 1);
       expect(player.targetId).toBe(34);
-    } finally {
-      template.componentTags = priorTags;
-      mixedTemplate.componentTags = priorMixedTags;
-    }
+    });
   });
 
   it('selects a lootable corpse when the viewer owns the shared loot rights', () => {
