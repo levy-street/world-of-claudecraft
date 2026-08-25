@@ -2339,6 +2339,7 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
     'Zimnokrwiste drapieżniki o własnym syczeniu i kłapaniu, odmienne od ciepłokrwistych bestii.',
   'guide.family.reptile.name': 'Gady',
   'hudChrome.auraEffect.damageReduction': 'Zmniejsza wszelkie otrzymywane obrażenia o {pct}%',
+  'hudChrome.auraEffect.slumber': 'Śpi do świtu. Nie można go zaatakować i nie obudzi się dla nikogo.',
   'hudChrome.auraEffect.guardianWard':
     'Kolejny śmiertelny cios wroga zamiast tego przywraca cię do {pct}% zdrowia',
   'hudChrome.bags.dragDestroyHint': 'Przeciągnij poza okno, aby zniszczyć',
@@ -3781,6 +3782,8 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'hudChrome.unitFrame.durationUnitHours': 'h',
   'hudChrome.unitFrame.durationUnitMinutes': 'm',
   'hudChrome.worldBoss.spawn': '{name} wznosi się nad {zone}!',
+  'hudChrome.worldBoss.wake': '{name} budzi się nad {zone}!',
+  'hudChrome.worldBoss.sleep': '{name} śpi do świtu.',
   'itemUi.kind.bag': 'Torba',
   'itemUi.tooltip.bagSlots': 'Torba z {slots} miejscami',
   'questUi.tracker.hideFromMap': 'Ukryj {name} na mapie',
@@ -5789,6 +5792,7 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'entities.zones.mirefen_marsh.pois.6.label': 'Obozowisko Grobowych Przyzywaczy',
   'entities.zones.mirefen_marsh.pois.7.label': 'Zatopiony Bastion',
   'entities.zones.mirefen_marsh.pois.8.label': 'Włości Kurhanu',
+  'entities.zones.mirefen_marsh.pois.9.label': 'Krater Spadającej Gwiazdy',
   'entities.zones.mirefen_marsh.welcome':
     'Zamelduj się u Strażnika Fenwicka przy bramie Mostu na Trzęsawisku.',
   'entities.zones.thornpeak_heights.name': 'Wyżyny Ciernistego Szczytu',

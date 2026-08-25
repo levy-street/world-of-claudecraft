@@ -70,11 +70,15 @@ export const WORLD_BOSSES: readonly WorldBossDef[] = [
     // by INDEX into this array (`worldBossNextAt`), so reordering silently re-points every
     // live timer and every test that forces a spawn by index.
     //
-    // Barrowmound Reach, mid-Mirefen: open ground picked by measurement (60 units of
-    // clearance from every camp, 3 units of relief across the arena, none of it under
-    // water). A boss whose whole counterplay is stepping out of a circle needs room for
-    // the circle, and a sightline so a raid can see him coming.
-    pos: { x: 0, z: 390 },
+    // The Starfall Crater's western rim, east Mirefen: where Brother Aldric's fallen star
+    // came down (MIREFEN_IMPACT_CRATER in world.ts), and where he sleeps. Picked by
+    // measurement rather than by eye: dry ground, under two yards of relief across a
+    // 13-unit arena, 45+ yards clear of the Widow Thicket spider camps (MAX_AGGRO_RADIUS
+    // is 20, so a level-eight fighting spiders at the camp's edge cannot pull him), and
+    // outside the crater's bowl and rim band so his raid-floor pad never flattens the
+    // fixture. He is a daytime boss (MobTemplate.slumber): at dusk he walks back here
+    // and lies down beside the star, at dawn he rises from it.
+    pos: { x: 128, z: 262 },
     intervalSeconds: WORLD_BOSS_INTERVAL_SECONDS,
     // Deliberately a smaller pool and a gentler step than Thunzharr's. Mirefen is the zone
     // players quit in, so this boss has to be killable by whoever actually turns up rather

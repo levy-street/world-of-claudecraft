@@ -217,6 +217,7 @@ import {
   SPIRIT_HEALER_NPC_ID,
   zoneAt,
 } from './data';
+import { crossedDawn, cyclePhase, isDaylightPhase } from './day_night';
 import { refusedWhileDead } from './dead_gate';
 import * as deedsMod from './deeds';
 import {
@@ -1996,8 +1997,10 @@ export class Sim {
   readonly petSpecialCommandsSupported = true;
   // `world` stays optional (a custom map for play-test, else undefined for the
   // built-in world); everything else is defaulted to a concrete value below.
-  cfg: Required<Omit<SimConfig, 'noPlayer' | 'world' | 'perfLap' | 'respawnSeconds'>> &
-    Pick<SimConfig, 'world' | 'perfLap' | 'respawnSeconds'>;
+  cfg: Required<
+    Omit<SimConfig, 'noPlayer' | 'world' | 'perfLap' | 'respawnSeconds' | 'dayNightNowMs'>
+  > &
+    Pick<SimConfig, 'world' | 'perfLap' | 'respawnSeconds' | 'dayNightNowMs'>;
   /**
    * The authored world this simulation owns. The active registry is a host/render
    * seam and may be swapped by an editor after construction; gameplay services,
@@ -2283,6 +2286,14 @@ export class Sim {
   // the sim runs at 20 Hz wall speed, so the interval is real hours.
   private worldBossNextAt: number[] = WORLD_BOSSES.map((b) => b.intervalSeconds);
   private worldBossEntityIds: (number | null)[] = WORLD_BOSSES.map(() => null);
+  // Slumbering bosses (MobTemplate.slumber) only: set once a slain boss's corpse is gone,
+  // and held until the next DAWN spawns him again. While set, the interval cadence is
+  // ignored for that slot, so "he rises again at sunrise" is literally true: a kill at
+  // noon is a kill for the rest of the day. Never set without a day/night clock.
+  private worldBossRiseAtDawn: boolean[] = WORLD_BOSSES.map(() => false);
+  // The day/night phase observed by the previous tick's scheduler pass, for the
+  // dawn-crossing edge (null until a clocked host has ticked once).
+  private lastDayNightPhase: number | null = null;
   // One-shot gate for takeActionBarLayoutRestore (IWorldActionBar): mirrors
   // ClientWorld's null-out pattern so the offline arm honors the same
   // consumed-once contract instead of returning the 'noop' value forever.
@@ -2308,6 +2319,9 @@ export class Sim {
       riftPortals: cfg.riftPortals ?? false,
       lockoutNowMs: cfg.lockoutNowMs ?? (() => Math.floor(this.time * 1000)),
       raidResetMs: cfg.raidResetMs ?? ((nowMs: number) => nowMs + DEFAULT_RAID_LOCKOUT_MS),
+      // Deliberately NOT defaulted: undefined is the "no day/night clock" world
+      // (dayNightPhase() answers null), which tests and the RL env rely on.
+      dayNightNowMs: cfg.dayNightNowMs,
       valeCupShowcase: cfg.valeCupShowcase ?? false,
       // Carried through so the renderer (which reaches the Sim as IWorld) can read
       // the same custom world via sim.cfg.world. Undefined for the built-in world.
@@ -2737,6 +2751,15 @@ export class Sim {
     return this.cfg.raidResetMs(nowMs);
   }
 
+  // The world day/night phase (src/sim/day_night.ts) off the host clock, or null when
+  // the host supplies none: no clock means no night, so every nocturnal rule (a
+  // slumbering world boss, his dawn respawn) sees permanent day and the pre-cycle world.
+  // Public so the hosts' dev tooling and the tests can read what the sim believes.
+  dayNightPhase(): number | null {
+    const clock = this.cfg.dayNightNowMs;
+    return clock ? cyclePhase(clock()) : null;
+  }
+
   // -------------------------------------------------------------------------
   // Entity roster: every add/remove/teleport goes through these so the
   // spatial indexes always match the entities map
@@ -2782,8 +2805,19 @@ export class Sim {
   // a spawn actually fires (which never happens inside the short parity scenarios),
   // so existing determinism traces are unaffected.
   private updateWorldBosses(): void {
+    // One clock read per tick, shared by every slot. `dawn` is the sunrise EDGE since
+    // the previous pass (never true without a clock, never true twice for one sunrise).
+    const phase = this.dayNightPhase();
+    const dawn =
+      phase !== null &&
+      this.lastDayNightPhase !== null &&
+      crossedDawn(this.lastDayNightPhase, phase);
+    this.lastDayNightPhase = phase;
     for (let i = 0; i < WORLD_BOSSES.length; i++) {
       const def = WORLD_BOSSES[i];
+      // A slumbering boss keeps the interval cadence on a clockless host (tests, the RL
+      // env): with no night there is no dawn to wait for.
+      const slumbers = phase !== null && !!MOBS[def.templateId]?.slumber;
       const liveId = this.worldBossEntityIds[i];
       if (liveId !== null) {
         const boss = this.entities.get(liveId);
@@ -2801,14 +2835,20 @@ export class Sim {
             for (const addId of boss.summonedIds) this.dropEntity(addId);
             this.dropEntity(liveId);
             this.worldBossEntityIds[i] = null;
+            // A slain sleeper is gone until sunrise, whatever the interval says.
+            if (slumbers) this.worldBossRiseAtDawn[i] = true;
           }
         }
       }
       if (this.time >= this.worldBossNextAt[i]) {
         this.worldBossNextAt[i] += def.intervalSeconds;
-        if (this.worldBossEntityIds[i] === null) {
+        if (this.worldBossEntityIds[i] === null && !this.worldBossRiseAtDawn[i]) {
           this.worldBossEntityIds[i] = this.spawnWorldBoss(def);
         }
+      }
+      if (slumbers && this.worldBossRiseAtDawn[i] && dawn && this.worldBossEntityIds[i] === null) {
+        this.worldBossRiseAtDawn[i] = false;
+        this.worldBossEntityIds[i] = this.spawnWorldBoss(def);
       }
     }
   }
@@ -2827,6 +2867,14 @@ export class Sim {
     // starts at the def base rather than the template's level-formula HP.
     mob.maxHp = def.hpScale.base;
     mob.hp = def.hpScale.base;
+    // A slumbering boss spawned into the NIGHT (a realm booting after dark) is already
+    // in bed: neutral and asleep at his spawn point, with the "rises" announcement held
+    // back for the dawn wake that actually opens the fight (mob/slumber.ts). Spawned
+    // into the day he rises awake, exactly like every other world boss.
+    const phase = this.dayNightPhase();
+    const asleep = !!template.slumber && phase !== null && !isDaylightPhase(phase);
+    if (template.slumber) mob.asleep = asleep;
+    if (asleep) mob.hostile = false;
     this.addEntity(mob);
     // Anchorless log (no pid, no entityId) => routeEvents broadcasts to every
     // connected player as a system notice. Localized by sim_i18n's worldBossSpawn
@@ -2834,11 +2882,13 @@ export class Sim {
     // Name the boss's OWN zone. The literal here used to hardcode Thornpeak Heights,
     // which was harmless while Thunzharr was the only world boss and is actively wrong
     // the moment a second one rises anywhere else.
-    this.emit({
-      type: 'log',
-      text: `${template.name} rises over ${zoneAt(mob.pos.x, mob.pos.z).name}!`,
-      color: '#ffd100',
-    });
+    if (!asleep) {
+      this.emit({
+        type: 'log',
+        text: `${template.name} rises over ${zoneAt(mob.pos.x, mob.pos.z).name}!`,
+        color: '#ffd100',
+      });
+    }
     return mob.id;
   }
 
@@ -3689,6 +3739,10 @@ export class Sim {
     const mob = createMob(this.nextId++, template, template.maxLevel, this.groundPos(x, z));
     mob.facing = 0;
     mob.prevFacing = 0;
+    // A dev-spawned sleeper is dropped in awake, wherever the clock is: the slumber
+    // driver puts him to bed on its own if it is night (mob/slumber.ts), which is exactly
+    // what a test drive of the sleep set piece wants to watch happen.
+    if (template.slumber) mob.asleep = false;
     this.addEntity(mob);
     return mob.id;
   }
@@ -5565,6 +5619,7 @@ export class Sim {
       // raidResetMs is the host-owned reset boundary the lockout grant reads through.
       lockoutNowMs: sim.lockoutNowMs.bind(sim),
       raidResetMs: sim.raidResetMs.bind(sim),
+      dayNightPhase: sim.dayNightPhase.bind(sim),
       instanceKeyFor: sim.instanceKeyFor.bind(sim),
       instanceOriginOf: sim.instanceOriginOf.bind(sim),
       instanceClaimIdAt: sim.instanceClaimIdAt.bind(sim),
@@ -8193,7 +8248,16 @@ export class Sim {
       e.pos.x = nx;
       e.pos.z = nz;
       const g = groundHeight(nx, nz, this.cfg.seed);
-      e.pos.y = Math.max(g, swimSurfaceY(nx, nz, this.cfg.seed)); // ride the surface while phasing, don't sink under terrain/water
+      // Ride the surface while phasing rather than sink under terrain or water, EXCEPT
+      // a body tall enough to wade this water: its feet stay on the bed and the surface
+      // rides up its legs (MobTemplate.wadeDepth). The first Balgath floated across the
+      // Mirefen lakes at travel speed with his boots on the waterline, which is what a
+      // thirteen-yard giant in four yards of fen must never do.
+      const wadeDepth = MOBS[e.templateId]?.wadeDepth;
+      e.pos.y =
+        wadeDepth !== undefined && g >= waterLevelAt(nx, nz, this.cfg.seed) - wadeDepth
+          ? g
+          : Math.max(g, swimSurfaceY(nx, nz, this.cfg.seed));
       return d - step < 0.3;
     }
     // Mobs have no nav mesh. Try the straight path first; only if a prop or the
@@ -8268,8 +8332,12 @@ export class Sim {
       e.kind === 'player'
         ? floorHeightAt(this.cfg.seed, bestX, bestZ, BODY_RADIUS, e.pos.y + 1e-3)
         : groundHeight(bestX, bestZ, this.cfg.seed);
+    // A body with its own wade depth (MobTemplate.wadeDepth) keeps its feet on the bed
+    // through water a smaller body would already be swimming in; everyone else swims
+    // past the players' swim depth, exactly as before.
+    const wadeDepth = MOBS[e.templateId]?.wadeDepth ?? SWIM_DEPTH;
     e.pos.y =
-      canSwim && g < waterLevelAt(bestX, bestZ, this.cfg.seed) - SWIM_DEPTH
+      canSwim && g < waterLevelAt(bestX, bestZ, this.cfg.seed) - wadeDepth
         ? swimSurfaceY(bestX, bestZ, this.cfg.seed)
         : g;
     return dist2d(e.pos, dest) < 0.3;

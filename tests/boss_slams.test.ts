@@ -26,8 +26,18 @@ import { FALL_SAFE_DISTANCE, GRAVITY } from '../src/sim/player_motion';
 import { Sim } from '../src/sim/sim';
 import type { Entity } from '../src/sim/types';
 import { groundHeight } from '../src/sim/world';
+import { WORLD_BOSSES } from '../src/sim/world_boss';
 
 const BALGATH = 'balgath_cyclops';
+
+/** Where the live scheduler spawns him: the flat raid-floor pad the fight is measured on.
+ *  Spawning anywhere else measures the cleave's jump-clear height across whatever relief
+ *  happens to be there, which is what broke this file when the lair moved. */
+function lair(): { x: number; z: number } {
+  const row = WORLD_BOSSES.find((b) => b.templateId === BALGATH);
+  if (!row) throw new Error('balgath_cyclops is not in WORLD_BOSSES');
+  return row.pos;
+}
 const slams = () => {
   const d = MOBS[BALGATH]?.slams;
   if (!d) throw new Error('balgath_cyclops declares no slams');
@@ -80,11 +90,11 @@ describe('launchFromSlam', () => {
     player = sim.player;
     const id = (
       sim as unknown as { spawnDevBoss(t: string, x: number, z: number): number }
-    ).spawnDevBoss(BALGATH, 0, 390);
+    ).spawnDevBoss(BALGATH, lair().x, lair().z);
     const e = sim.entities.get(id);
     if (!e) throw new Error('no boss');
     boss = e;
-    place(player, 4, 390);
+    place(player, lair().x + 4, lair().z);
   });
 
   const place = (e: Entity, x: number, z: number) => {
@@ -137,7 +147,7 @@ describe('launchFromSlam', () => {
   });
 
   it('leaves anyone outside the blast alone', () => {
-    place(player, 60, 390);
+    place(player, lair().x + 60, lair().z);
     launchFromSlam(
       (sim as unknown as { ctx: Parameters<typeof launchFromSlam>[0] }).ctx,
       boss,
@@ -149,7 +159,7 @@ describe('launchFromSlam', () => {
   });
 
   it('hits harder at the epicentre than at the rim', () => {
-    place(player, 1, 390);
+    place(player, lair().x + 1, lair().z);
     launchFromSlam(
       (sim as unknown as { ctx: Parameters<typeof launchFromSlam>[0] }).ctx,
       boss,
@@ -157,7 +167,7 @@ describe('launchFromSlam', () => {
       14,
     );
     const near = player.vy;
-    place(player, 13.5, 390);
+    place(player, lair().x + 13.5, lair().z);
     launchFromSlam(
       (sim as unknown as { ctx: Parameters<typeof launchFromSlam>[0] }).ctx,
       boss,
@@ -203,11 +213,11 @@ describe('the aimed slams in a live fight', () => {
     player = sim.player;
     const id = (
       sim as unknown as { spawnDevBoss(t: string, x: number, z: number): number }
-    ).spawnDevBoss(BALGATH, 0, 390);
+    ).spawnDevBoss(BALGATH, lair().x, lair().z);
     const e = sim.entities.get(id);
     if (!e) throw new Error('no boss');
     boss = e;
-    place(player, 6, 390);
+    place(player, lair().x + 6, lair().z);
   });
 
   /** One tick with the subject kept alive: he is mortal (see the header) and standing

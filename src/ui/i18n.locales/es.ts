@@ -2412,6 +2412,7 @@ export const es: Partial<Record<TranslationKey, string>> = {
     'Cazadores de sangre fria con su propio silbido y mordisco, bien distintos de las bestias de sangre caliente.',
   'guide.family.reptile.name': 'Reptilidos',
   'hudChrome.auraEffect.damageReduction': 'Reduce el dano recibido en un {pct}%',
+  'hudChrome.auraEffect.slumber': 'Dormido hasta el amanecer. No puede ser atacado y no despertará por nadie.',
   'hudChrome.auraEffect.guardianWard':
     'El siguiente golpe enemigo letal te restaura al {pct}% de salud en su lugar',
   'hudChrome.bags.dragDestroyHint': 'Arrastra fuera del inventario para destruir',
@@ -6973,6 +6974,7 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'entities.zones.mirefen_marsh.pois.6.label': 'Campamento Gravecaller',
   'entities.zones.mirefen_marsh.pois.7.label': 'El Bastión Sumergido',
   'entities.zones.mirefen_marsh.pois.8.label': 'Dominio del Túmulo',
+  'entities.zones.mirefen_marsh.pois.9.label': 'Cráter de la Estrella Caída',
   'entities.zones.thornpeak_heights.name': 'Alturas de Thornpeak',
   'entities.zones.thornpeak_heights.welcome':
     'La capitana Thessaly sostiene el muro de Highwatch a duras penas.',
@@ -7548,6 +7550,8 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'entities.mobs.thunzharr_stormling.name': 'Elemental de tormenta despierto',
   'entities.mobs.stable_horse.name': 'Caballo de establo',
   'hudChrome.worldBoss.spawn': '¡{name} se alza sobre {zone}!',
+  'hudChrome.worldBoss.wake': '¡{name} despierta sobre {zone}!',
+  'hudChrome.worldBoss.sleep': '{name} duerme hasta el amanecer.',
   'entities.items.stormcallers_spaulders.name': 'Bufas de Galecall',
   'entities.items.bonewrought_greatsword.name': 'Espadón Bonewrought',
   'entities.items.direfang_greatblade.name': 'Gran hoja Direfang',

@@ -4365,6 +4365,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.zones.mirefen_marsh.pois.6.label': 'グレイブコーラーの野営地',
   'entities.zones.mirefen_marsh.pois.7.label': '沈んだ砦',
   'entities.zones.mirefen_marsh.pois.8.label': '塚山の領域',
+  'entities.zones.mirefen_marsh.pois.9.label': '星落ちのクレーター',
   'entities.zones.thornpeak_heights.name': 'ソーンピーク高地',
   'entities.zones.thornpeak_heights.welcome':
     'テサリー隊長がかろうじてハイウォッチの壁を保っています。',
@@ -5867,6 +5868,8 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.mobs.thunzharr_stormling.name': '目覚めた嵐の精',
   'entities.mobs.stable_horse.name': '厩舎の馬',
   'hudChrome.worldBoss.spawn': '{name}が{zone}にそびえ立つ！',
+  'hudChrome.worldBoss.wake': '{name}が{zone}で目を覚ました！',
+  'hudChrome.worldBoss.sleep': '{name}は夜明けまで眠っている。',
   'entities.items.stormcallers_spaulders.name': 'ゲイルコールの肩当て',
   'entities.items.bonewrought_greatsword.name': 'ボーンロートの大剣',
   'entities.items.direfang_greatblade.name': 'ダイアファングの大刀',
@@ -7507,6 +7510,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     '次の炎系ビルダーが連続でクリティカルになるとホットストリークを獲得し、クリティカルでなければヒーティングアップが解除されます',
   'hudChrome.auraEffect.tongues': '詠唱時間を{pct}%増加させる',
   'hudChrome.auraEffect.damageReduction': '受けるすべてのダメージを{pct}%軽減する',
+  'hudChrome.auraEffect.slumber': '夜明けまで眠っている。攻撃できず、誰が来ても目を覚まさない。',
   'hudChrome.auraEffect.guardianWard':
     '次に受ける敵の致死攻撃を防ぎ、代わりに体力を{pct}%まで回復する',
   'hudChrome.auraEffect.increase.ap': '攻撃力を{value}上昇させる',

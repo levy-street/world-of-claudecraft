@@ -19,16 +19,16 @@ import { itemLevel } from '../sim/item_level';
 import type { EquipSlot, ItemDef, PlayerClass } from '../sim/types';
 
 /**
- * Barrowmound Reach, mid-Mirefen: the open ground he claimed.
+ * The Starfall Crater's western rim, east Mirefen: where he sleeps and wakes.
  *
- * Chosen by measurement, not by eye (scripts scouted the zone for clearance, relief and
- * water). Every camp edge is 60 units away, the terrain moves 3 units across a 26-unit
- * arena, and none of it is under water. The Troll Mounds, where he used to stand, sits
- * between two fen-troll camps and grubjaw: a 13-unit giant there is wedged in a corridor
- * of other people's mobs, with no room for a circle-smash and no sightline to see him
- * coming.
+ * The same spot the live scheduler spawns him on (WORLD_BOSSES in src/sim/world_boss.ts),
+ * so the test drive shows the real opening: dry ground beside Brother Aldric's fallen
+ * star, 45+ yards clear of the Widow Thicket camps, with the long march west to the
+ * Drowned Chapel as his first leg. Kept as a literal rather than an import so this
+ * dev-only module never pulls the world-boss registry into the client bundle; a test
+ * welds the two.
  */
-export const BOSS_TEST_DRIVE_POS = { x: 0, z: 390 };
+export const BOSS_TEST_DRIVE_POS = { x: 128, z: 262 };
 
 /**
  * How far off the spawn point the player stands, per axis.

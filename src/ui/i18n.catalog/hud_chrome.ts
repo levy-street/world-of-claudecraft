@@ -2815,6 +2815,8 @@ export const hudChromeStrings = {
     dodge: 'Increases dodge chance by {pct}%',
     dodgeReduce: 'Reduces dodge chance by {pct}%',
     damageReduction: 'Reduces all damage taken by {pct}%',
+    // The slumbering world boss (src/sim/mob/slumber.ts): asleep from dusk to dawn.
+    slumber: 'Asleep until dawn. Cannot be attacked and will not wake for anyone.',
     guardianWard: 'The next lethal enemy hit restores you to {pct}% health instead',
     armorFlat: 'Reduces armor by {value}',
     armorFlatStacks: 'Reduces armor by {value} ({stacks} stacks)',
@@ -2914,6 +2916,10 @@ export const hudChromeStrings = {
   // the localized boss name. English-only domain so an English-only PR compiles.
   worldBoss: {
     spawn: '{name} rises over {zone}!',
+    // A slumbering world boss (src/sim/mob/slumber.ts): the dawn wake is the daily call
+    // to arms, the dusk line tells the realm he is gone for the night.
+    wake: '{name} wakes over {zone}!',
+    sleep: '{name} sleeps until dawn.',
   },
   // Password-reset ("forgot password") flow: the login-panel entry link, the
   // request-a-link panel, and the set-a-new-password panel (index.html +

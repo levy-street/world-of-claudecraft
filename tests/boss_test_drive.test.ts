@@ -15,6 +15,7 @@ import {
 } from '../src/game/boss_test_drive';
 import { MOBS } from '../src/sim/data';
 import { canEquipItem } from '../src/sim/equipment_rules';
+import { WORLD_BOSSES } from '../src/sim/world_boss';
 
 describe('parseBossTestDrive', () => {
   it('answers null for an ordinary session', () => {
@@ -154,5 +155,16 @@ describe('applyBossTestDrive', () => {
     expect(sim.player.pos.y).toBe(5);
     expect(sim.player.prevPos).toEqual(sim.player.pos);
     expect(sim.player.facing).toBeCloseTo(Math.atan2(-dx, -dz), 6);
+  });
+});
+
+describe('the test drive stands where the live world puts him', () => {
+  it('welds BOSS_TEST_DRIVE_POS to the scheduler spawn point', () => {
+    // The literal is kept out of the client bundle on purpose (the dev module must not
+    // pull the world-boss registry in), so this is the weld: a test drive that spawns him
+    // somewhere the live scheduler never would is a test drive of a different encounter.
+    const row = WORLD_BOSSES.find((b) => b.templateId === 'balgath_cyclops');
+    expect(row).toBeDefined();
+    expect(BOSS_TEST_DRIVE_POS).toEqual(row?.pos);
   });
 });

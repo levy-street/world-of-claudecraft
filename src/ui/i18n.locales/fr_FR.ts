@@ -2381,6 +2381,7 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
     "Des chasseurs à sang froid dotés d'un sifflement et d'un claquement qui leur sont propres, distincts des créatures à sang chaud.",
   'guide.family.reptile.name': 'Reptiles',
   'hudChrome.auraEffect.damageReduction': 'Réduit tous les dégâts subis de {pct} %',
+  'hudChrome.auraEffect.slumber': "Endormi jusqu'à l'aube. Ne peut pas être attaqué et ne s'éveillera pour personne.",
   'hudChrome.auraEffect.guardianWard':
     'Le prochain coup ennemi fatal vous restaure à {pct} % de vos points de vie à la place',
   'hudChrome.bags.dragDestroyHint': 'Faites glisser dans le monde pour détruire',
@@ -7379,6 +7380,7 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'entities.zones.mirefen_marsh.pois.6.label': 'Campement Gravecaller',
   'entities.zones.mirefen_marsh.pois.7.label': 'Le Bastion englouti',
   'entities.zones.mirefen_marsh.pois.8.label': 'Le Domaine des Tertres',
+  'entities.zones.mirefen_marsh.pois.9.label': "Cratère de l'Étoile tombée",
   'entities.zones.thornpeak_heights.name': 'Hauteurs de Thornpeak',
   'entities.zones.thornpeak_heights.welcome':
     'La capitaine Thessaly tient le mur de Highwatch, à peine.',
@@ -8071,6 +8073,8 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'entities.mobs.thunzharr_stormling.name': 'Élémentaire de tempête éveillé',
   'entities.mobs.stable_horse.name': "Cheval d'écurie",
   'hudChrome.worldBoss.spawn': '{name} se dresse au-dessus de {zone} !',
+  'hudChrome.worldBoss.wake': "{name} s'éveille au-dessus de {zone} !",
+  'hudChrome.worldBoss.sleep': "{name} dort jusqu'à l'aube.",
   'entities.items.stormcallers_spaulders.name': 'Spallières de Galecall',
   'entities.items.bonewrought_greatsword.name': 'Espadon Bonewrought',
   'entities.items.direfang_greatblade.name': 'Grande lame de Direfang',

@@ -2229,6 +2229,7 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
     'Studenokrevní lovci s vlastním syčením a lupem čelistí, odlišní od teplokrevných bestií.',
   'guide.family.reptile.name': 'Plazi',
   'hudChrome.auraEffect.damageReduction': 'Snižuje veškeré utrpěné poškození o {pct} %',
+  'hudChrome.auraEffect.slumber': 'Spí až do úsvitu. Nelze na něj zaútočit a pro nikoho se neprobudí.',
   'hudChrome.auraEffect.guardianWard':
     'Příští smrtící nepřátelský útok místo toho obnoví tvoje zdraví na {pct} %',
   'hudChrome.bags.dragDestroyHint': 'Přetáhni do světa a předmět bude zničen',
@@ -6150,6 +6151,8 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'hudChrome.tips.joinChannels':
     'Tip: napiš /join world nebo /join lfg a chatuj s hráči napříč světem.',
   'hudChrome.worldBoss.spawn': '{name} povstává nad {zone}!',
+  'hudChrome.worldBoss.wake': '{name} se probouzí nad {zone}!',
+  'hudChrome.worldBoss.sleep': '{name} spí až do úsvitu.',
   'editor.a11y.dialog': 'Dialog editoru',
   'editor.a11y.stage': 'Zobrazení mapy',
   'editor.a11y.toasts': 'Oznámení editoru',
@@ -7425,6 +7428,7 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'entities.zones.mirefen_marsh.pois.6.label': 'Tábor Hrobovolajících',
   'entities.zones.mirefen_marsh.pois.7.label': 'Potopená bašta',
   'entities.zones.mirefen_marsh.pois.8.label': 'Mohylové panství',
+  'entities.zones.mirefen_marsh.pois.9.label': 'Kráter padlé hvězdy',
   'entities.zones.mirefen_marsh.welcome': 'Ohlas se u strážce Fenwicka u brány Fenbridge.',
   'entities.zones.thornpeak_heights.name': 'Thornpeakské výšiny',
   'entities.zones.thornpeak_heights.pois.0.label': 'Highwatch',

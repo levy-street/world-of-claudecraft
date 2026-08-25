@@ -288,6 +288,15 @@ export function dynamicFields(e: Entity, includeAuras = true): Record<string, un
   if (e.hostile) out.h = 1;
   if (e.afk) out.ak = 1; // /afk display bit: other clients tag the nameplate + presence dot
   if (e.bracing) out.brc = 1; // Shardpike couched (lance_trial.ts): remote clients pose the brace
+  // A slumbering world boss in bed (mob/slumber.ts): remote rigs lie down and wake with him.
+  if (e.asleep) out.slp = 1;
+  // Warpath circuit phase (mob/warpath.ts), for the phase aura and travel cues a raid
+  // reads the fight by (balgath_aura_core.ts). Omitted for every mob without one; the
+  // unharried clock rides only while he travels, which is the only phase that reads it.
+  if (e.warpathPhase) {
+    out.wp = e.warpathPhase;
+    if (e.warpathPhase === 'travel' && e.warpathUnharried) out.wu = round2(e.warpathUnharried);
+  }
   // The target frame's resource bar: type + current/max, sent only for entities
   // that HAVE a resource (players and caster mobs; a resource-less wolf omits all
   // three and the frame hides its bar). The rounded res keeps an idle entity's

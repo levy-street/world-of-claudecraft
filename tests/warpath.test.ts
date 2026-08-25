@@ -8,7 +8,7 @@
 // was not the state machine but a single line that turned the body toward the player it
 // was swatting, which no unit test of a phase enum could ever have seen.
 import { beforeEach, describe, expect, it } from 'vitest';
-import { MOBS } from '../src/sim/data';
+import { BUILTIN_WORLD, MOBS } from '../src/sim/data';
 import { mobCombatProfile } from '../src/sim/mob/combat_profile';
 import {
   nextWarpathDestination,
@@ -18,11 +18,29 @@ import {
   warpathPhaseDuration,
 } from '../src/sim/mob/warpath';
 import { Sim } from '../src/sim/sim';
-import type { Entity, MobTemplate } from '../src/sim/types';
+import type { Entity, MobTemplate, WorldContent } from '../src/sim/types';
 import { groundHeight, terrainHeight, waterLevelAt } from '../src/sim/world';
+import { WORLD_BOSSES } from '../src/sim/world_boss';
 import { WORLD_SEED } from '../src/sim/world_seed';
 
 const BALGATH = 'balgath_cyclops';
+
+/** Where the live scheduler spawns him: the Starfall Crater's rim (world_boss.ts). */
+function lair(): { x: number; z: number } {
+  const row = WORLD_BOSSES.find((b) => b.templateId === BALGATH);
+  if (!row) throw new Error('balgath_cyclops is not in WORLD_BOSSES');
+  return row.pos;
+}
+
+// The live-world suites below need him, a player and the terrain, not the other
+// several hundred mobs of the continent: a camp-free world keeps every 20 Hz tick to
+// the two bodies under test, so a 200-second chase costs seconds rather than minutes.
+const WARPATH_TEST_WORLD: WorldContent = {
+  ...BUILTIN_WORLD,
+  camps: [],
+  npcs: {},
+  groundObjects: [],
+};
 
 function def(): NonNullable<MobTemplate['warpath']> {
   const d = MOBS[BALGATH]?.warpath;
@@ -81,21 +99,65 @@ describe('warpath circuit', () => {
     expect(seen.size).toBe(n);
   });
 
-  it('sends him at the town first, which is the whole promise of the fight', () => {
-    expect(def().destinations[0].label).toContain('Fenbridge');
+  it('opens on the chapel and keeps the town on the circuit', () => {
+    // He wakes on the Starfall Crater's rim at the zone's east edge, and every straight
+    // line from there to Fenbridge runs through the Widow Thicket spider camps, so the
+    // pull opens with the long march to the chapel instead. The town is still a stop: the
+    // headline promise of the encounter is that he comes for the gate every lap.
+    expect(def().destinations[0].label).toContain('Chapel');
+    expect(def().destinations.some((d) => d.label.includes('Fenbridge'))).toBe(true);
+  });
+
+  it('opens with a march long enough to be an event, inside his own patience', () => {
+    // The first leg is the advertisement: the zone watches him cross the fen. It must be
+    // the longest leg he walks, and it must still fit the travel timeout with room, or a
+    // slow (a root, a stall) on the opening leg would have him give up on the chapel and
+    // wreck a patch of empty marsh instead.
+    const spawn = lair();
+    const first = def().destinations[0];
+    const opening = Math.hypot(first.x - spawn.x, first.z - spawn.z);
+    expect(opening).toBeGreaterThan(120);
+    const travelSpeed = (MOBS[BALGATH]?.moveSpeed ?? 0) * def().travelSpeedMult;
+    expect(opening / travelSpeed).toBeLessThan(def().travelTimeoutSeconds * 0.75);
+  });
+
+  it('keeps the opening march clear of every spider camp', () => {
+    // The reason the chapel is first. A raid dragged through seven spiders on the way to
+    // the fight is not a chase for the level eights in it.
+    const spawn = lair();
+    const first = def().destinations[0];
+    for (const camp of BUILTIN_WORLD.camps) {
+      if (!camp.mobId.startsWith('mire_widow')) continue;
+      // Distance from the camp centre to the segment spawn -> first stop.
+      const dx = first.x - spawn.x;
+      const dz = first.z - spawn.z;
+      const t = Math.max(
+        0,
+        Math.min(
+          1,
+          ((camp.center.x - spawn.x) * dx + (camp.center.z - spawn.z) * dz) / (dx * dx + dz * dz),
+        ),
+      );
+      const cx = spawn.x + dx * t;
+      const cz = spawn.z + dz * t;
+      expect(
+        Math.hypot(camp.center.x - cx, camp.center.z - cz),
+        `the opening leg runs through the ${camp.mobId} camp at ${camp.center.x},${camp.center.z}`,
+      ).toBeGreaterThan(camp.radius);
+    }
   });
 
   it('never runs a leg through the water', () => {
     // The placement rule every authored coordinate in this repo carries, in the form this
-    // particular fixture needs it. He phases through obstacles and walks the STRAIGHT LINE
-    // between stops, so a leg that clips the Mirefen lake turns the chase into a swim: he
-    // rides the surface at travel speed while the raid paddles behind him, and melee
-    // cannot follow at all. The first cut of this circuit did exactly that, and it took an
+    // particular fixture needs it. He walks the STRAIGHT LINE between stops, and although
+    // he now wades (MobTemplate.wadeDepth) the raid chasing him does not: a leg that clips
+    // the Mirefen lake turns the chase into a swim for everyone but him, and melee cannot
+    // follow at all. The first cut of this circuit did exactly that, and it took an
     // in-engine capture to notice, because nothing in the sim or the content tables says a
     // straight line between two dry points is itself dry.
     const stops = def().destinations;
-    // The opening leg starts from his SPAWN, which is not necessarily on the circuit.
-    const spawn = { x: 0, z: 390 };
+    // The opening leg starts from his SPAWN (the crater rim), which is not on the circuit.
+    const spawn = lair();
     const legs = stops.map((a, i) => [a, stops[(i + 1) % stops.length]] as const);
     for (const [a, b] of [[spawn, stops[0]] as const, ...legs]) {
       const steps = Math.ceil(Math.hypot(a.x - b.x, a.z - b.z) / 2);
@@ -149,16 +211,19 @@ describe('warpath in a live world', () => {
   };
 
   beforeEach(() => {
-    sim = new Sim({ seed: 42, playerClass: 'warrior', autoEquip: true });
+    sim = new Sim({ seed: 42, playerClass: 'warrior', autoEquip: true, world: WARPATH_TEST_WORLD });
     sim.setPlayerLevel(20);
     // Godded, or he simply kills the sole tester in the first few seconds and every
     // assertion below turns into an assertion about a corpse.
     (sim as unknown as { setGm(pid?: number, on?: boolean): void }).setGm(sim.playerId, true);
     player = sim.player;
-    place(player, 0, 372);
+    // Spawned where the live scheduler spawns him, with the player standing off his lair
+    // the way a raid that walked out to the crater would.
+    const spawn = lair();
+    place(player, spawn.x, spawn.z - 18);
     const id = (
       sim as unknown as { spawnDevBoss(t: string, x: number, z: number): number }
-    ).spawnDevBoss(BALGATH, 0, 390);
+    ).spawnDevBoss(BALGATH, spawn.x, spawn.z);
     const e = sim.entities.get(id);
     if (!e) throw new Error('the dev boss did not spawn');
     boss = e;
@@ -189,9 +254,9 @@ describe('warpath in a live world', () => {
     expect(Math.hypot(boss.pos.x - stop.x, boss.pos.z - stop.z)).toBeLessThanOrEqual(
       def().arriveRadius,
     );
-    // He got there himself: the first stop is a fixed 45 yards off the mound and he stops
-    // within arriveRadius of it, so anything near that gap is a real journey rather than
-    // the shuffle he used to do.
+    // He got there himself: the first stop is the chapel, 175 yards from the crater, and
+    // he stops within arriveRadius of it, so anything near that gap is a real journey
+    // rather than the shuffle he used to do.
     expect(Math.hypot(boss.pos.x - boss.spawnPos.x, boss.pos.z - boss.spawnPos.z)).toBeGreaterThan(
       30,
     );
@@ -201,9 +266,8 @@ describe('warpath in a live world', () => {
     // The soft leash measures 45 yards from the SPAWN, so a leashed warpather evades on
     // the way to his second landmark and heals to full. The two cannot both be true, and
     // this is the pin that says which one won.
-    // Run to the THIRD landmark specifically: the first two stops both sit inside 45 yards
-    // of the mound (one IS the mound), so a leash bug would still be sitting there
-    // undetected at the end of either leg.
+    // Run to the THIRD landmark specifically, so the pin covers a full lap's worth of
+    // legs rather than the one opening march, and the arrival slam at the end of it.
     let evaded = false;
     let peak = 0;
     chase(220, () => {
@@ -285,16 +349,22 @@ describe('warpath in a live world', () => {
     expect(boss.hp).toBeGreaterThan(before);
 
     // Hit him every tick and the regen never arms: the unharried clock keeps resetting.
+    // Ten a tick, not one: his standing ward (mob/eye_ward.ts) shrugs off 60% of every hit
+    // and a single point rounds to nothing landed, which is a legitimate "unharried" (no
+    // health was lost) rather than the chip damage this is meant to measure. The old
+    // 45-yard opening leg hid that by ending travel inside the window; the crater march
+    // does not.
     const hurt = (sim as unknown as { dealDamage: (...a: unknown[]) => void }).dealDamage;
     boss.hp = boss.maxHp * 0.5;
     const held = boss.hp;
     for (let i = 0; i < 20 * 6; i++) {
-      hurt.call(sim, player, boss, 1, false, 'physical', 'probe', 'hit', true);
+      hurt.call(sim, player, boss, 10, false, 'physical', 'probe', 'hit', true);
       sim.tick();
     }
-    // Six seconds of chip damage at 1 per tick removes 120; regen at 1.5% of a world-boss
-    // pool would dwarf that, so anything at or below the starting value proves it never ran.
-    expect(boss.hp).toBeLessThanOrEqual(held);
+    // Six seconds of chip damage removes a few hundred; regen at 1.5% of a world-boss
+    // pool per second would dwarf that, so anything below the starting value proves it
+    // never ran.
+    expect(boss.hp).toBeLessThan(held);
   });
 
   it('shows the arrival ring BEFORE the arrival slam lands', () => {

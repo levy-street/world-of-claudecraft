@@ -11023,6 +11023,15 @@ const RULES: Rule[] = [
     re: /^(.+) rises over (.+)!$/,
     build: (m) => t('hudChrome.worldBoss.spawn', { name: locMob(m[1]), zone: locZone(m[2]) }),
   },
+  // A slumbering world boss's dawn wake and dusk lie-down (src/sim/mob/slumber.ts).
+  {
+    re: /^(.+) wakes over (.+)!$/,
+    build: (m) => t('hudChrome.worldBoss.wake', { name: locMob(m[1]), zone: locZone(m[2]) }),
+  },
+  {
+    re: /^(.+) sleeps until dawn\.$/,
+    build: (m) => t('hudChrome.worldBoss.sleep', { name: locMob(m[1]) }),
+  },
   {
     re: /^Fallen Captain Aldren yells, "None shall disturb the king's rest! For Thornpeak!"$/,
     build: () => tQuestExtra('aldrenYell', { name: locMob('Fallen Captain Aldren') }),

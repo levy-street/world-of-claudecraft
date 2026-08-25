@@ -1527,6 +1527,37 @@ export interface MobTemplate {
   // wedge on camp furniture while closing on a target.
   phasesThroughObstacles?: boolean;
   /**
+   * Yards of water this body walks THROUGH with its feet on the bed before it would
+   * have to swim. A giant does not float: in a fen whose lakes are a few yards deep
+   * he wades, the surface rides up his shins, and the raid on the shore watches the
+   * whole body cross rather than a head bobbing on the waterline. Above this depth he
+   * rides the surface like everyone else, so a body can never walk along the bottom of
+   * a lake deeper than it is tall. Unset keeps the shipped rule (players' swim depth
+   * for walkers, the surface for phasing movers).
+   */
+  wadeDepth?: number;
+  /**
+   * Slumber: the mob sleeps through the night (mob/slumber.ts). At dusk, once out of
+   * combat, he walks home to his spawn point and lies down; asleep he is neutral (not
+   * attackable, never aggroes) and heals; at dawn he wakes, announces himself, and is
+   * a boss again. A fight that is running at dusk is fought to its end first.
+   *
+   * Inert for every mob without it and for every host without a day/night clock
+   * (SimConfig.dayNightNowMs): with no clock there is no night, so tests and the RL
+   * env see the pre-cycle world. The world-boss scheduler reads the same field to
+   * respawn a slain slumbering boss at the next dawn rather than on the interval.
+   */
+  slumber?: {
+    /** Aura shown on his frame while he sleeps (the raid's "come back at dawn"). */
+    auraName: string;
+    /** Yell as he lies down at dusk (optional) and as he wakes at dawn. */
+    sleepYell?: string;
+    wakeYell: string;
+    yellRange?: number;
+    /** How close to the spawn point counts as "in bed": inside it he lies down. */
+    bedRadius: number;
+  };
+  /**
    * Seconds of spacing between this mob's boss mechanics, and the opt-in that turns
    * its instant AoEs (`aoePulse`, `stomp`) into TELEGRAPHED ones: a ground ring drawn
    * at the true blast radius, a windup, then the blast measured from the ring's centre
@@ -4942,6 +4973,10 @@ export interface Entity extends ClientMirroredEntityFields {
   // the parity golden's entity samples never churn for a mob that does not walk one.
   warpathPhase?: 'focus' | 'travel' | 'wreck';
   warpathTimer?: number;
+  // Slumber state (mob/slumber.ts): true while a `slumber` template sleeps through the
+  // night. Only ever defined on such a mob (the same defined-vs-undefined discipline as
+  // the warpath fields), mirrored to clients so the rig can lie down and wake with him.
+  asleep?: boolean;
   /** Index into the template's destination list. */
   warpathDestination?: number;
   /** Seconds since anything reduced his health. */
@@ -7054,6 +7089,14 @@ export interface SimConfig {
   noPlayer?: boolean; // multiplayer server: start with an empty world and addPlayer() later
   devCommands?: boolean; // local dev: /dev level|tp|give chat cheats
   lockoutNowMs?: () => number; // host wall-clock for persisted raid lockouts
+  // Host wall clock the day/night cycle is anchored to (src/sim/day_night.ts): the
+  // server's Date.now, the offline client's Date.now (or its /daynight override), so
+  // a boss who sleeps at night sleeps under the sky the renderer actually draws.
+  // Omitted (tests, the RL env): the sim has NO day/night clock, Sim.dayNightPhase()
+  // answers null, nocturnal behavior stays off and every schedule keeps its interval
+  // cadence, exactly the pre-cycle world. Only ever read through the SimContext seam,
+  // so the parity gate's rng draw order is untouched either way.
+  dayNightNowMs?: () => number;
   // Live server: schedule the first world-boss rise at boot instead of one
   // interval out, so a freshly (re)started realm has Thunzharr up immediately.
   // Offline worlds and parity traces keep the default (first rise after one

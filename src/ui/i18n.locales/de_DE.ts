@@ -2338,6 +2338,7 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
     'Kaltblutige Jaeger mit ihrem ganz eigenen Zischen und Schnappen, deutlich verschieden von den warmblutigen Bestien.',
   'guide.family.reptile.name': 'Reptilien',
   'hudChrome.auraEffect.damageReduction': 'Verringert allen erlittenen Schaden um {pct}%',
+  'hudChrome.auraEffect.slumber': 'Schläft bis zur Dämmerung. Kann nicht angegriffen werden und erwacht für niemanden.',
   'hudChrome.auraEffect.guardianWard':
     'Der naechste todliche Feindtreffer stellt stattdessen {pct}% deiner Gesundheit wieder her',
   'hudChrome.bags.dragDestroyHint': 'In die Welt ziehen, um zu vernichten',
@@ -6940,6 +6941,7 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'entities.zones.mirefen_marsh.pois.6.label': 'Gravecaller-Lager',
   'entities.zones.mirefen_marsh.pois.7.label': 'Die versunkene Bastion',
   'entities.zones.mirefen_marsh.pois.8.label': 'Hügelgrab-Revier',
+  'entities.zones.mirefen_marsh.pois.9.label': 'Sternenfall-Krater',
   'entities.zones.thornpeak_heights.name': 'Thornpeak-Höhen',
   'entities.zones.thornpeak_heights.welcome':
     'Hauptmann Thessaly hält die Mauer von Highwatch, gerade so.',
@@ -7427,6 +7429,8 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'entities.mobs.thunzharr_stormling.name': 'Geweckter Sturmling',
   'entities.mobs.stable_horse.name': 'Stallpferd',
   'hudChrome.worldBoss.spawn': '{name} erhebt sich über {zone}!',
+  'hudChrome.worldBoss.wake': '{name} erwacht über {zone}!',
+  'hudChrome.worldBoss.sleep': '{name} schläft bis zur Dämmerung.',
   'entities.items.stormcallers_spaulders.name': 'Galecall-Schulterplatten',
   'entities.items.bonewrought_greatsword.name': 'Bonewrought-Großschwert',
   'entities.items.direfang_greatblade.name': 'Direfang-Großklinge',

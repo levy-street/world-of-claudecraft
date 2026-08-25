@@ -4342,6 +4342,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.zones.mirefen_marsh.pois.6.label': '무덤부름 야영지',
   'entities.zones.mirefen_marsh.pois.7.label': '가라앉은 요새',
   'entities.zones.mirefen_marsh.pois.8.label': '봉분의 영역',
+  'entities.zones.mirefen_marsh.pois.9.label': '별똥 분화구',
   'entities.zones.thornpeak_heights.name': '쏜피크 고지',
   'entities.zones.thornpeak_heights.welcome':
     '테살리 대장이 간신히 하이워치 성벽을 지키고 있습니다.',
@@ -5852,6 +5853,8 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.mobs.thunzharr_stormling.name': '깨어난 폭풍 정령',
   'entities.mobs.stable_horse.name': '마구간 말',
   'hudChrome.worldBoss.spawn': '{name}이(가) {zone} 위로 일어섰습니다!',
+  'hudChrome.worldBoss.wake': '{name}이(가) {zone}에서 깨어났습니다!',
+  'hudChrome.worldBoss.sleep': '{name}이(가) 새벽까지 잠들었습니다.',
   'entities.items.stormcallers_spaulders.name': '강풍부름 어깨갑옷',
   'entities.items.bonewrought_greatsword.name': '뼈벼림 대검',
   'entities.items.direfang_greatblade.name': '흉포송곳니 대도',
@@ -7499,6 +7502,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '다음 화염 생성기가 연속으로 치명타를 적중하면 몰아치는 열기를 얻고, 치명타가 아니면 달아오름이 제거됩니다',
   'hudChrome.auraEffect.tongues': '시전 시간을 {pct}% 증가시킵니다',
   'hudChrome.auraEffect.damageReduction': '받는 모든 피해가 {pct}% 감소합니다',
+  'hudChrome.auraEffect.slumber': '새벽까지 잠들어 있습니다. 공격할 수 없으며 누가 와도 깨어나지 않습니다.',
   'hudChrome.auraEffect.guardianWard':
     '다음 적의 치명적인 공격을 막고 대신 생명력을 {pct}%까지 회복합니다',
   'hudChrome.auraEffect.increase.ap': '공격력을 {value} 증가시킵니다',

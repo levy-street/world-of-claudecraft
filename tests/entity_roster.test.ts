@@ -224,6 +224,7 @@ function makeCtx() {
     completeCurrentQuestsForDev: vi.fn(() => 0),
     lockoutNowMs: vi.fn(() => 0),
     raidResetMs: vi.fn((nowMs: number) => nowMs),
+    dayNightPhase: vi.fn(() => null),
     instanceKeyFor: vi.fn(() => 'solo:0'),
     instanceOriginOf: vi.fn(() => ({ x: 0, z: 0 })),
     instanceClaimIdAt: vi.fn(() => null),

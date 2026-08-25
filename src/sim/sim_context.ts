@@ -182,8 +182,10 @@ export interface SimContextPrimitives {
   // temporary host-owned tick profiler probe), and `respawnSeconds` stays
   // possibly-undefined so respawn_policy.ts can tell an explicit host-pinned
   // global base from "fall through to the zone tier"; the rest defaulted.
-  readonly cfg: Required<Omit<SimConfig, 'noPlayer' | 'world' | 'perfLap' | 'respawnSeconds'>> &
-    Pick<SimConfig, 'world' | 'perfLap' | 'respawnSeconds'>;
+  readonly cfg: Required<
+    Omit<SimConfig, 'noPlayer' | 'world' | 'perfLap' | 'respawnSeconds' | 'dayNightNowMs'>
+  > &
+    Pick<SimConfig, 'world' | 'perfLap' | 'respawnSeconds' | 'dayNightNowMs'>;
   // Per-Sim key for the rift collision registry in colliders.ts (rift/runs.ts
   // registers regions under it, rift-aware collision reads pass it). Per INSTANCE,
   // not per seed: two same-seed Sims in one process must stay isolated.
@@ -363,6 +365,11 @@ export interface SimContextCallbacks {
   // the boundary (the authoritative server uses its realm-local 3 AM daily reset), so
   // the sim core never reads a time zone; offline/headless fall back to a flat 24h day.
   raidResetMs(nowMs: number): number;
+  // The world day/night phase in [0,1) (0 midnight, 0.5 noon; src/sim/day_night.ts) off
+  // the host clock SimConfig.dayNightNowMs, or null when the host supplies no such
+  // clock (tests, the RL env): null means "there is no night", and every nocturnal
+  // rule must treat it as permanent day so those worlds stay the pre-cycle world.
+  dayNightPhase(): number | null;
   instanceKeyFor(pid: number): string;
   instanceOriginOf(inst: InstanceSlot): { x: number; z: number };
   instanceClaimIdAt(pos: Vec3): number | null;
@@ -1400,6 +1407,7 @@ export function createSimContext(host: SimContextHost): SimContext {
     error: host.error,
     lockoutNowMs: host.lockoutNowMs,
     raidResetMs: host.raidResetMs,
+    dayNightPhase: host.dayNightPhase,
     instanceKeyFor: host.instanceKeyFor,
     instanceOriginOf: host.instanceOriginOf,
     instanceClaimIdAt: host.instanceClaimIdAt,

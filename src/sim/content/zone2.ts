@@ -52,6 +52,10 @@ export const ZONE2_ZONE: ZoneDef = {
     // the locale overlays, so adding a POI anywhere but the end shifts every later label
     // onto the wrong translation and drops the last one entirely.
     { x: 0, z: 390, label: 'Barrowmound Reach', id: 'barrowmound_reach' },
+    // Where Brother Aldric's star came down (MIREFEN_IMPACT_CRATER in world.ts) and where
+    // the world boss sleeps and wakes (world_boss.ts): the map needs a name for the place
+    // the whole zone is told to come back to at dawn.
+    { x: 149.5, z: 295, label: 'Starfall Crater', id: 'starfall_crater' },
   ],
   welcome: 'Report to Warden Fenwick at the Fenbridge gate.',
 };
@@ -299,9 +303,11 @@ export const ZONE2_MOBS: Record<string, MobTemplate> = {
   // geared players back to Fenbridge, and the mechanics are shaped so the locals who
   // live here are participants rather than corpses.
   //
-  // He is in no CAMPS list: the world-boss scheduler owns his spawns (world_boss.ts), on
-  // the same cadence as Thunzharr. Structure follows that template so the two read the
-  // same to a raid.
+  // He is in no CAMPS list: the world-boss scheduler owns his spawns (world_boss.ts). He
+  // rises on the Starfall Crater's rim at the zone's east edge, and unlike Thunzharr he
+  // keeps hours (`slumber` below): awake from sunrise to sunset, asleep beside the fallen
+  // star through the night, and a kill puts him down until the next dawn. Structure
+  // otherwise follows the Thunzharr template so the two read the same to a raid.
   balgath_cyclops: {
     id: 'balgath_cyclops',
     name: 'Balgath, the One-Eyed Foreman',
@@ -315,6 +321,29 @@ export const ZONE2_MOBS: Record<string, MobTemplate> = {
     // A fen is all water and reed banks; pathing a 9-unit giant around them wedges him
     // on the first collider, so he walks the straight line as Thunzharr does.
     phasesThroughObstacles: true,
+    // He WADES. A phasing mover otherwise rides the water surface, and the first cut of
+    // this boss crossed the Mirefen lakes with his boots on the waterline like a cork:
+    // thirteen yards of granite floating in four yards of fen. With this, his feet stay
+    // on the bed and the surface climbs his shins instead. Nine is about two thirds of
+    // his 13.4-unit height, so a lake deeper than that (there is none in the marsh)
+    // would still float him rather than drown him. The circuit below still avoids the
+    // lakes for a different reason: HE can wade, the raid chasing him cannot.
+    wadeDepth: 9,
+    // A daytime boss (mob/slumber.ts). At dusk, once whatever pull is running has ended,
+    // he walks back to the crater rim he spawns on and lies down; asleep he is neutral,
+    // unattackable and a landmark; at dawn he wakes with a yell the zone hears and the
+    // realm gets the "wakes over Mirefen" call. Killed, he rises again at the next dawn
+    // (the scheduler in sim.ts reads this same field), so the fight is a once-a-day event
+    // with a window everyone can plan around rather than an hourly respawn.
+    slumber: {
+      auraName: 'Barrow Slumber',
+      sleepYell: 'Dark. The star sleeps. So does the Foreman.',
+      wakeYell: 'DAWN. The star woke me once. The sun wakes me every day.',
+      yellRange: 160,
+      // Inside this of the spawn point he lies down: his own body length, so he never
+      // paces on the spot hunting for an exact coordinate a slope or the pad denies him.
+      bedRadius: 6,
+    },
     quietMechanics: true,
     // THE mechanic of this fight. Without it his AoEs fire instantly with no warning,
     // which makes "walk out of the circle" impossible and reduces him to a damage check
@@ -338,7 +367,8 @@ export const ZONE2_MOBS: Record<string, MobTemplate> = {
       // speed stays under it and keeps the walk. One boss, two gaits, neither of them
       // near the clip clamps that made him skate.
       travelSpeedMult: 1.25,
-      // The longest authored leg is about 140 units, roughly 23s at travel speed. 45
+      // The longest leg is the opening march from the crater to the chapel, about 175
+      // units, roughly 28s at travel speed (the longest leg inside the loop is 140). 45
       // leaves room for a slow and still gives up on a landmark he cannot reach, so a
       // wedged body can never leave him travelling (and healing) forever.
       travelTimeoutSeconds: 45,
@@ -346,19 +376,25 @@ export const ZONE2_MOBS: Record<string, MobTemplate> = {
       // 1.4s of telegraph ring plus the follow-through, timed so his slam clip lands its
       // blow on the detonation rather than before it.
       wreckSeconds: 3.4,
-      // Walked IN ORDER, wrapping, starting at index 0: the first thing he does on every
-      // pull is head for the town, which is the whole promise of the encounter. His own
-      // mound is on the circuit so the fight comes home, and the two flanking sites keep
-      // the remaining legs long enough to be a chase.
+      // Walked IN ORDER, wrapping, starting at index 0. He wakes on the Starfall Crater's
+      // rim at the zone's east edge (world_boss.ts), so a pull opens with the long march
+      // west across the fen that the whole zone can watch, then the circuit brings him
+      // home to his own mound, to the town gate, and out to the gravecallers before it
+      // wraps back to the chapel; he never returns to the crater mid-fight (that is what
+      // dusk is for).
       //
-      // ORDER IS CONSTRAINED, not chosen freely, and the constraint is water. He phases
-      // through obstacles and walks the straight line between stops, so a leg that clips
-      // the Mirefen lake turns the chase into a swim: he rides the surface at travel speed
-      // while the raid paddles after him and melee simply cannot follow. That is not a
-      // theory, it is what the first cut of this circuit did, caught in an in-engine
-      // capture with the player treading water and the boss half a lake away. Every
-      // consecutive pair below is dry end to end, measured rather than eyeballed, and
-      // tests/warpath.test.ts re-measures them against the real heightfield.
+      // ORDER IS CONSTRAINED, not chosen freely, and the constraint is water. He walks the
+      // straight line between stops, and although he now WADES (wadeDepth above) the raid
+      // chasing him does not: a leg that clips a Mirefen lake still turns the chase into a
+      // swim for everyone but him, and melee simply cannot follow. The first cut of this
+      // circuit did exactly that, caught in an in-engine capture with the player treading
+      // water and the boss half a lake away. Every consecutive pair below, and the opening
+      // leg from the crater, is dry end to end, measured rather than eyeballed, and
+      // tests/warpath.test.ts re-measures them against the real heightfield. The chapel
+      // is first rather than the town for the same reason in a different shape: every
+      // straight line from the crater to Fenbridge runs through the Widow Thicket spider
+      // camps, and a raid dragged through seven spiders on the way to the fight is not a
+      // chase, it is a wipe for the level eights in it.
       //
       // The town stop sits at z 345, and that number is a blast-radius decision. Fenbridge
       // fills a 34-unit hub at z 300 with its wall near 334 and its northernmost building
@@ -368,10 +404,10 @@ export const ZONE2_MOBS: Record<string, MobTemplate> = {
       // mechanic aimed at a raid.
       destinations: [
         {
-          x: 0,
-          z: 345,
-          label: 'the Fenbridge gate',
-          yell: 'FENBRIDGE. I hauled the stone for that wall. I will have it back.',
+          x: 100,
+          z: 435,
+          label: 'the Drowned Chapel',
+          yell: 'The chapel bell woke me. Let it toll one last time.',
         },
         {
           x: 0,
@@ -380,10 +416,10 @@ export const ZONE2_MOBS: Record<string, MobTemplate> = {
           yell: 'Back to the mound. Back to the digging. ALWAYS the digging.',
         },
         {
-          x: 100,
-          z: 435,
-          label: 'the Drowned Chapel',
-          yell: 'The chapel bell woke me. Let it toll one last time.',
+          x: 0,
+          z: 345,
+          label: 'the Fenbridge gate',
+          yell: 'FENBRIDGE. I hauled the stone for that wall. I will have it back.',
         },
         {
           x: 0,

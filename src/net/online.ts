@@ -3189,6 +3189,14 @@ export class ClientWorld implements IWorld {
       e.climbProgress = typeof w.cl === 'number' && w.cl > 0 ? w.cl / 100 : undefined;
       e.afk = !!w.ak; // /afk display bit: drives the nameplate tag + social presence dot
       e.bracing = !!w.brc; // Shardpike couched: remote clients pose the brace off this bit
+      // Slumbering world boss (mob/slumber.ts): defined only once the wire has ever said
+      // so, mirroring the sim's defined-only-on-a-sleeper discipline, so the rig can lie
+      // down while the bit rides and wake on the edge where it stops.
+      if (w.slp) e.asleep = true;
+      else if (e.asleep) e.asleep = false;
+      // Warpath phase + unharried clock, for the phase aura (balgath_aura_core.ts).
+      e.warpathPhase = w.wp ?? undefined;
+      e.warpathUnharried = w.wu ?? (e.warpathPhase ? 0 : undefined);
       e.weaponStowed = !!w.ws;
       e.helmHidden = !!w.hh;
       e.aggroTargetId = w.aggro ?? null;

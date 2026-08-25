@@ -103,6 +103,7 @@ import {
   resetRiftMechanicWindups,
   riftEscapeWindowActive,
 } from './rift_escape_window';
+import { tickSlumber } from './slumber';
 import { rallyFleeingAllies } from './social_aggro';
 import { isTrivialTo, retargetMob, tickForcedTarget } from './targeting';
 import { resetWarpath, tickWarpath } from './warpath';
@@ -210,6 +211,12 @@ export function updateMob(ctx: SimContext, mob: Entity): void {
   // state the mob can be alive in, idle included. Guarded on the template field and
   // draws no rng, so every other mob pays one map lookup.
   tickEyeWard(ctx, mob);
+
+  // The night's sleep (mob/slumber.ts), decided before any AI runs: a sleeper does
+  // nothing this tick (and the hostility safety net below never re-arms him), a boss
+  // walking home to bed does nothing but walk, and everyone else falls through. Guarded
+  // on the template field and the host clock, so every other mob pays one map lookup.
+  if (tickSlumber(ctx, mob) !== 'awake') return;
 
   if (MOBS[mob.templateId]?.dummy) {
     // Training dummy: stays hostile/attackable so it counts for damage and shows on
