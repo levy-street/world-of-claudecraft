@@ -1316,6 +1316,52 @@ describe('Thornhollow Fields: the graveyard rite', () => {
     }
   });
 
+  it('Unstuck fails rather than using a generic graveyard when no battleground candidate is clear', () => {
+    const { sim, pids } = tenInQueue();
+    const match = must(sim.bgMatchFor(pids[0]), 'bg match');
+    toActive(sim, match);
+    const pid = match.teams[0][0];
+    const e = must(sim.entities.get(pid), 'entity');
+    const origin = battlegroundOrigin(match.slot);
+    e.pos = sim.ctx.groundPos(origin.x, origin.z);
+    e.prevPos = { ...e.pos };
+    e.vx = 0;
+    e.vy = 0;
+    e.vz = 0;
+    e.onGround = true;
+    e.jumping = false;
+    sim.ctx.rebucket(e);
+    const start = { ...e.pos };
+
+    const originalPlot = { ...BG_GRAVEYARDS[0] };
+    const originalSpawns = BG_BASES[0].spawns.map((spawn) => ({ ...spawn }));
+    Object.assign(BG_GRAVEYARDS[0], { x: 50, z: -140, hw: 0.25, hd: 0.25 });
+    for (const spawn of BG_BASES[0].spawns) Object.assign(spawn, { x: 50, z: -140 });
+    try {
+      expect(sim.unstuck(pid)).toBe(true);
+      sim.drainEvents();
+      const events: SimEvent[] = [];
+      for (let i = 0; i < UNSTUCK_COUNTDOWN_SECONDS * 20; i++) events.push(...sim.tick());
+
+      expect(events).toContainEqual(
+        expect.objectContaining({
+          type: 'unstuck',
+          phase: 'failed',
+          reason: 'no_safe_position',
+          pid,
+        }),
+      );
+      expect(sim.bgMatchFor(pid)).toBe(match);
+      expect(e.pos).toEqual(start);
+      expect(sim.meta(pid)?.pendingUnstuck).toBeNull();
+    } finally {
+      Object.assign(BG_GRAVEYARDS[0], originalPlot);
+      BG_BASES[0].spawns.forEach((spawn, i) => {
+        Object.assign(spawn, originalSpawns[i]);
+      });
+    }
+  });
+
   it('Unstuck relocates a fighter trapped on their indexed spawn point', () => {
     const { sim, pids } = tenInQueue();
     const match = must(sim.bgMatchFor(pids[0]), 'bg match');
