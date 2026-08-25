@@ -31,8 +31,8 @@ src/sim/combat/set_procs.ts. Four families exist today:
 
 | Family | Sets | Pieces | Breakpoints | Source |
 |---|---|---|---|---|
-| Tier 1 | deathlord (mail, Strength), wyrmshadow (leather, Agility), necromancers (cloth, caster) | 4 | 2/3/4 | Gravewyrm Sanctum bosses |
-| Tier 2 | crownforged, nighttalon, soulflame, stormcallers | 4 | 2/3/4 | Nythraxis raid (helm, shoulder) + Thunzharr world boss (gloves, waist) |
+| Tier 1 | deathlord (mail, Strength), wyrmshadow (leather, Agility), necromancers (cloth, caster) | 4 | 2/3/4 (moving to 3/4, see the Prerequisite section) | Gravewyrm Sanctum bosses |
+| Tier 2 | crownforged, nighttalon, soulflame, stormcallers | 4 | 2/3/4 (moving to 3/4, see the Prerequisite section) | Nythraxis raid (helm, shoulder) + Thunzharr world boss (gloves, waist) |
 | Leveling haste kits | vale_arcanist, boundstone_vanguard, greyjaw_stalker | 3 | 3 | existing world drops, re-tagged |
 | WARFARE (PvP) | five honor families | 7 | 2/4/7 | quartermaster, honor priced, zero PvE contribution |
 
@@ -105,8 +105,10 @@ and the answer is the old stack.
 ### Root causes
 
 1. **Cross-tier stacking.** Tier 1 and tier 2 families share an archetype
-   but not slots, so their bonuses sum. Any new tier competes with the
-   combined package of two sets, not one.
+   but not slots, so their bonuses sum, and because bonuses start at 2
+   pieces a three-piece dip into the second family pays its 2-piece AND
+   3-piece tiers. Any new tier competes with the combined package of two
+   sets, not one.
 2. **Bonus magnitudes sized like a tier, not like a bonus.** 7.5 percent
    haste at 3 pieces and 6 percent Hit at 4 pieces dwarf the per-slot
    item-level deltas (0.7 primary points per level times slot mult) and
@@ -115,43 +117,65 @@ and the answer is the old stack.
    the set to wear higher item level) never occurs; the stack upgrades in
    place.
 
-### The retune
+### The retune: raise the breakpoints, then halve the magnitudes
 
-Halve the incumbent throughput bonuses so the summed old stack sits below
-the value of a full new-tier kit, while keeping every old set worth
-completing for a fresh level-20. Exact targets (shared constants keep this
-a small diff in item_sets.ts; bonus text updates in the same change):
+Two moves, by maintainer decision, and the structural one comes first.
 
-| Bonus | Today | Retuned |
+**Move 1: breakpoints go from 2/3/4 to 3/4.** The 2-piece tier is deleted
+and every incumbent family restructures so that 3 pieces pay a modest
+stat-identity tier and the 4-piece capstone carries ALL the throughput
+(the flat attack power or spell power moves from the old 2-piece into the
+capstone). The slot math is what makes this decisive: tier 1 and tier 2
+overlap in exactly one armor slot, so 4 plus 4 pieces can never fit the
+seven armor slots and only ONE family's capstone is ever reachable. Today
+the second family's 3-piece dip pays its 2-piece AND 3-piece tiers (a
+near-full package); after the restructure that same dip pays only a small
+stat line, so the chest/legs/feet slots it occupies become honest upgrade
+targets instead of locked bonus carriers. Nobody's completed 4-piece set
+loses its capstone; only the cross-set dip stops paying.
+
+**Move 2: halve the surviving magnitudes** so even the one reachable
+capstone sits below the value of a full new-tier kit.
+
+The restructured families (constants shared in item_sets.ts; bonus text
+updates and the auto-minted i18n keys follow in the same change):
+
+| Family | 3-piece (was 2pc + 3pc) | 4-piece capstone (was 4pc, now plus the old flat tier) |
 |---|---|---|
-| SET_HASTE_3PC_RATING (t1/t2/haste kits) | 150 (7.5 percent) | 80 (4 percent) |
-| SET_HIT_4PC_RATING (t2 4-piece) | 60 (6 percent) | 30 (3 percent) |
-| Strength/Agility 2-piece attack power (t1 and t2) | 40 | 25 |
-| Caster 2-piece spell power (t1 and t2) | 20 | 12 |
-| Caster 2-piece cast pushback | full immunity | 50 percent; full immunity moves to the new tier's caster and healer 2-piece bonuses |
-| 3-piece primary stat pairs (all t1/t2) | 15/15 | 10/10 (t1 agility keeps its 1 percent crit) |
-| Gravemight proc (t1 Strength 4-piece) | 60 attack power | 40 |
-| Fangrush proc (t1 Agility 4-piece) | 25 percent attack speed | 15 percent |
-| Clearcasting proc (t1 caster 4-piece) | 10 percent chance | 6 percent chance |
-| Soulblaze proc (t2 caster 4-piece) | 40 spell power | 25 |
-| Bonesplinter bleed (t2 Strength 4-piece) | 8 per tick per stack | 5 |
-| Ragged Gash bleed (t2 Agility 4-piece) | 6 per tick per stack | 4 |
+| deathlord (t1 Strength) | Str 10, Sta 10 | attack power 25 + Gravemight at 40 attack power |
+| wyrmshadow (t1 Agility) | Agi 10, crit 1 percent | attack power 25 + Fangrush at 15 percent attack speed |
+| necromancers (t1 caster) | Int 10, Sta 10, 50 percent pushback | spell power 12 + Clearcasting at 6 percent chance |
+| crownforged (t2 Strength) | Str 10, Sta 10, 4 percent haste | attack power 25 + Hit 3 percent + Bonesplinter at 5 per tick |
+| nighttalon (t2 Agility) | Agi 10, crit 1 percent, 4 percent haste | attack power 25 + Hit 3 percent + Ragged Gash at 4 per tick |
+| soulflame / stormcallers (t2 caster) | Int 10, Spi 10, 4 percent haste, 50 percent pushback | spell power 12 + Soulblaze at 25 spell power |
 
-SET_HASTE_3PC (the test-pinned literal) moves with its rating in the same
-change. WARFARE families are untouched (already PvE-inert). The haste
-leveling kits ride the shared constant down, which is acceptable for
-leveling gear. Heroic set-tag inheritance stays: it is fine once the
-magnitudes are sane, and stripping tags from heroic variants would
-invalidate loot players already won.
+Constant changes: SET_HASTE_3PC_RATING 150 to 80 (7.5 to 4 percent, with
+the test-pinned SET_HASTE_3PC literal moving in step), SET_HIT_4PC_RATING
+60 to 30. Full cast-pushback immunity leaves the incumbents (they keep 50
+percent at 3 pieces) and moves to the new tier's caster and healer
+2-piece bonuses. WARFARE families are untouched (already PvE-inert). The
+haste leveling kits keep their single 3-piece tier and ride the shared
+haste constant down, which is acceptable for leveling gear. Heroic
+set-tag inheritance stays: it is fine once the dip pays nothing, and
+stripping tags from heroic variants would invalidate loot players
+already won.
 
-After the retune the Strength double stack pays roughly 50 attack power,
-20 stats, 4 percent haste, 3 percent Hit, and a lighter bleed. A full new
-kit answers with the 2-piece and 4-piece of its own set, two more item
-levels of budget over the heroic-33 copies, the 60/25 ratings step, and
-for casters and healers the Spell Damage and Healing Power affix debut
-(a five-piece caster set carries roughly 58 authored Spell Damage the old
-stack simply does not have). The intended outcome is a clear but not
-insulting upgrade path; exact margins are measured, not asserted (below).
+The new tier deliberately keeps its 2/4 breakpoints. A transitional blend
+(old 4-piece capstone plus the new 2-piece from non-overlapping slots) is
+the intended migration path, not abuse: the new capstone physically
+requires breaking the old tier-2 set, and the harness guard (below) pins
+full-new above every blend.
+
+After both moves the meta double stack (tier-2 four-piece plus tier-1
+three-piece) pays roughly 25 attack power, 20 primary stats, 4 percent
+haste, 3 percent Hit, and a lighter bleed, and the tier-1 dip contributes
+only 20 stat points of that. A full new kit answers with its own 2-piece
+and 4-piece, two more item levels of budget over the heroic-33 copies,
+the 60/25 ratings step, and for casters and healers the Spell Damage and
+Healing Power affix debut (a five-piece caster set carries roughly 58
+authored Spell Damage the old stack simply does not have). The intended
+outcome is a clear but not insulting upgrade path; exact margins are
+measured, not asserted (below).
 
 ### Guard
 
@@ -656,7 +680,8 @@ Each phase is a reviewable commit (or small commit series) with its tests:
    heal paths, tooltip, parity pin); IGNIVAR_RAID_LOOT_SOURCE_LEVEL
    registration in the item-level source index; token redemption vendor seam
    (content + instances modules mirroring the heroic vendor).
-3. **Incumbent retune**: the item_sets.ts constant and proc changes from
+3. **Incumbent retune**: the item_sets.ts restructure (breakpoints 3/4,
+   throughput consolidated into the capstones) and constant changes from
    "Prerequisite: retune the incumbent set stack", their bonus-text
    updates, and the old-versus-new balance harness test (initially pinning
    the retuned old-stack values; the new-kit comparison arm lands with
@@ -690,7 +715,9 @@ Each phase is a reviewable commit (or small commit series) with its tests:
    clear.
 5. **Set names**: the 29 names above are proposals; vetoes are cheap until
    the art wave mints.
-6. **Retune magnitudes**: the halved values in "Prerequisite: retune the
-   incumbent set stack" are design targets sized to put the old double
-   stack under a full new kit; the harness test measures the real margin
-   before any number ships.
+6. **Retune shape and magnitudes**: the incumbent restructure (breakpoints
+   2/3/4 to 3/4, throughput consolidated into the 4-piece capstone) and
+   the halved values in "Prerequisite: retune the incumbent set stack" are
+   design targets sized to make the cross-set dip worthless and put the
+   old stack under a full new kit; the harness test measures the real
+   margin before any number ships.
