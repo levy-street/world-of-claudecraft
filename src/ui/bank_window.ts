@@ -914,10 +914,10 @@ export class BankWindow {
     // The clarification (every item whose tooltip reads Material or Fine Material
     // moves, the honest taxonomy in src/sim/material_taxonomy.ts, and everything
     // else stays: gathering tools, quest items, consumables and gray items
-    // included; reworded at the
-    // Masterwrought 11l QA, which retired the old "junk moves too" claim) is exposed
-    // two ways so it reaches touch and keyboard users, not
-    // only a mouse-hover title: a `title` for desktop hover, PLUS a visually-hidden
+    // included; reworded at the Masterwrought 11l QA, which retired the old "junk
+    // moves too" claim) is exposed two ways so it reaches touch and keyboard
+    // users, not only a mouse-hover title: a `title` for desktop hover, PLUS a
+    // visually-hidden
     // aria-describedby span the button always carries. A screen reader announces
     // aria-describedby on both hover and keyboard focus, and reading it needs no
     // pointer at all, so it also covers touch users who tap the button directly.

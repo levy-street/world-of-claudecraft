@@ -3774,15 +3774,25 @@ describe('the craft ladder prose keeps its counts derived or count-free (Masterw
     // The tallow row the trophy economy put on the skill 25 rung, named by
     // the output's live name and rung.
     const tallowRow = ALL_RECIPES.find((r) => r.id === 'recipe_lesser_healing_potion');
+    expect(tallowRow, 'the tallow row is live').toBeDefined();
     expect(tallowRow?.skillReq).toBe(25);
-    expect(body).toContain(ITEMS[tallowRow?.resultItemId ?? ''].name);
+    const output = ITEMS[tallowRow?.resultItemId ?? ''];
+    expect(output, 'the tallow row outputs a live item').toBeDefined();
+    expect(body).toContain(output.name);
     expect(body).toContain('skill 25 rung');
   });
 
   it('the engineering ladder body spells no recipe count (the hoes and the chassis grew it)', () => {
     const body = t('guide.profPages.craftProse.engineering.ladderBody');
-    expect(body).not.toMatch(/\b(eight|nine|ten) recipes\b/i);
+    expect(body).not.toMatch(
+      /\b(\d+|one|two|three|four|five|six|seven|eight|nine|ten|eleven|twelve|thirteen|fourteen|fifteen|sixteen|seventeen|eighteen|nineteen|twenty) recipes\b/i,
+    );
     expect(body).toContain('toolworks');
+    // The two count claims the body still makes are held to the rod table:
+    // three crafted rods, two of them trainer-taught (the third is drop-taught).
+    expect(body).toContain('Two of the three crafted rods are the taught exception');
+    expect(ROD_RECIPES).toHaveLength(3);
+    expect(ROD_RECIPES.filter((r) => (r.acquisition ?? []).includes('trainer'))).toHaveLength(2);
     // The count the sentence retired is the one that keeps moving: the
     // engineering rows are well past the nine the old sentence claimed.
     expect(ALL_RECIPES.filter((r) => r.professionId === 'engineering').length).toBeGreaterThan(9);

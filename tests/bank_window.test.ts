@@ -9,7 +9,8 @@ import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 import { MATERIAL_ITEM_IDS } from '../src/sim/material_taxonomy';
 import { CHROME_GUARDED_PANELS } from '../src/ui/chrome_focus_wiring';
-import { t } from '../src/ui/i18n';
+import { ensureLocaleLoaded, getLanguage, setLanguage, t } from '../src/ui/i18n';
+import { SUPPORTED_LANGUAGES } from '../src/ui/i18n.resolved.generated/loaders';
 import { itemKindLabel } from '../src/ui/item_kind_label';
 
 const painter = readFileSync(new URL('../src/ui/bank_window.ts', import.meta.url), 'utf8');
@@ -370,6 +371,29 @@ describe('bank_window: search / sort / deposit-all', () => {
     expect(itemKindLabel('junk', 'fine_iron_ore')).toBe('Fine Material');
     expect(itemKindLabel('junk', 'iron_ore')).toBe('Material');
     expect(t('hudChrome.bank.depositAllTooltip')).toContain('reads Material or Fine Material');
+  });
+
+  it('every locale carries both of its own kind labels inside the deposit-all tooltip', async () => {
+    // The English parenthetical quotes the two kind lines a swept item can
+    // render; each locale's fill must quote ITS OWN itemUi.kind.material and
+    // itemUi.kind.fineMaterial, or the player is told to look for a word that
+    // never appears on the tooltip (the pt_BR miss the 11l QA closed, where
+    // the two labels share no word). The reword-staleness class has no hash
+    // gate; this containment is locale-agnostic and would have caught it. A
+    // locale still pending on the key resolves to English and passes on the
+    // English labels, which is the same containment.
+    const before = getLanguage();
+    try {
+      for (const lang of SUPPORTED_LANGUAGES) {
+        await ensureLocaleLoaded(lang);
+        setLanguage(lang);
+        const tooltip = t('hudChrome.bank.depositAllTooltip');
+        expect(tooltip, `${lang} material`).toContain(t('itemUi.kind.material'));
+        expect(tooltip, `${lang} fine material`).toContain(t('itemUi.kind.fineMaterial'));
+      }
+    } finally {
+      setLanguage(before);
+    }
   });
 
   it('exposes the deposit-all clarification beyond hover-only title (PR #2715 review)', () => {
