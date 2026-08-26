@@ -939,12 +939,14 @@ describe('masterwrought Phase 11h GATE D: the capstones and the tier-4 fine twin
     // they were endgame consumers already. What the twins lacked was a consumer
     // OUTSIDE farming, and a consumer at the top consumable rung.
     //
-    // AND 125 IS NOT THE CATALOG CEILING, which four comments in this phase
-    // claimed. ALL_RECIPES ships three engineering rows at skillReq 150 (the
-    // apex gathering-tool family, which the phase file itself records as Phase
-    // 11j's), and the packet's own rung census says so: "3 at 125, 3 at 150".
-    // 125 is the top of COOKING and ALCHEMY, which is the claim that matters
-    // here and the one this arm actually proves.
+    // AND, AT THIS ARM'S AUTHORING, 125 WAS NOT THE CATALOG CEILING, which
+    // four comments in this phase claimed: ALL_RECIPES then shipped three
+    // engineering rows at skillReq 150 (the apex gathering-tool family, the
+    // phase file records as Phase 11j's; census "3 at 125, 3 at 150").
+    // masterwrought Phase 11o later re-tiered those three to 125, so the
+    // whole table tops out at the cap now (the superlative arm below owns
+    // that fact). 125 as the top of COOKING and ALCHEMY is the claim that
+    // matters here and the one this arm actually proves, unchanged.
     const capstoneOf: Record<string, string> = {
       fine_gilded_sunmelon: 'recipe_grand_cauldron',
       fine_evergarden_greens: 'recipe_laden_hearth',
