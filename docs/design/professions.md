@@ -303,24 +303,29 @@ and a sickle in `TOOL_RECIPES`, a rod in `ROD_RECIPES`, and a hoe in
 its apex rung.
 
 The rung a player can REACH is the thing to read off this family, because
-its skillReq column is not uniform and the difference is history rather than
-design. The three land rows sit at engineering 150, and 150 is above
-engineering's own cap: `tierForSkill` resolves it one tier past what the cap
-resolves to, and BOTH learning channels run the same `teachTierMet` gate
+its skillReq column's history is not uniform even though the live numbers now
+are. The three land rows sat at engineering 150 from their authoring until
+masterwrought Phase 11o re-tiered them to 125, the reachable cap tier
+(AMENDED 2026-08-25, masterwrought qr-11o-150): 150 is above engineering's
+own cap, `tierForSkill` resolves it one tier past what the cap resolves to,
+and BOTH learning channels run the same `teachTierMet` gate
 (`src/sim/professions/training.ts` for a trainer, the `'tier'` deny arm in
 `src/sim/professions/pattern_items.ts` for a pattern), so a row authored
-there is permanently unlearnable through every shipped route. Those three
-escape only because they predate training and sit in the frozen
-`PRE_TRAINING_RECIPE_IDS`. The rod and hoe rows were authored after that
-switch and sit at the reachable top rung instead. That split has a COST a
-player pays and this file should say so: a grandfathered row is known from the
-start and free, while the two reachable rows are trainer-taught and charge
-`TRAINING_FEE_BY_TIER`'s top entry once each. So the completed tier-5 family is
-uniform in what it does and not in what it costs to learn, which is history
-rather than a balance statement. **150 is not a target**:
-an apex tool authored there today would be dead content that ships green,
-and `tests/professions_rod_recipes.test.ts` now walks every recipe carrying
-an acquisition list against its own craft's cap so it cannot happen twice.
+there is permanently unlearnable through every shipped route. The three
+historical rows escaped only because they predate training and sit in the
+frozen `PRE_TRAINING_RECIPE_IDS`; the re-tier changed the printed tier and
+nothing else (no admission behavior, no fee, no cast band, and the
+grandfather list is untouched). The rod and hoe rows were authored after the
+training switch and always sat at the reachable top rung. The learn-cost
+split remains and this file should say so: a grandfathered row is known from
+the start and free, while the reachable trainer rows charge
+`TRAINING_FEE_BY_TIER`'s top entry once each. So the completed tier-5 family
+is uniform in what it does and not in what it costs to learn, which is
+history rather than a balance statement. **Above-cap is not a target**:
+an apex tool authored past the cap band today would be dead content that
+ships green, and `tests/professions_rod_recipes.test.ts` walks every recipe
+carrying an acquisition list against its own craft's cap, and pins the whole
+table inside the reachable band, so it cannot happen twice.
 
 What an apex tool BUYS is narrower than its rarity suggests, and the
 honest version is worth stating because a player will ask. It opens no node
