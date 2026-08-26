@@ -338,8 +338,11 @@ describe('the both-sourced nine (ruling qr-11n-NINE)', () => {
     // The derivation basis is NPCS.vendorItems ONLY, the basis ruling
     // qr-11n-NINE used. Deliberately narrower than the classification
     // sweep's: widening it to the Merchant's house listings would add
-    // oiled_boots (a recipe result the house sells) and trip the phase's
-    // re-arms-at-nine STOP over a basis change, not a catalog change.
+    // oiled_boots (a recipe result the house sells), and widening to the
+    // delve shop would add ten more (the marks-priced crafted gathering
+    // tools on the drowned_litany stock, thorium_mining_pick through
+    // evergarden_hoe); either way a basis change, not a catalog change,
+    // and it would trip the phase's re-arms-at-nine STOP.
     const both = vendorStockedIdsBy(NPCS, (itemId) => RECIPE_RESULT_IDS.has(itemId));
     expect(both).toEqual([
       'lesser_healing_potion',
