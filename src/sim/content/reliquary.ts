@@ -285,8 +285,9 @@ export const RELIQUARY_HORIZON_MOUNTS = [
 // drakemaw_raptor and terrorspark_groundshaker are absent, and that absence IS
 // the answer: no live table awards either (drakemaw_raptor has no acquisition
 // path, terrorspark_groundshaker is dev-grant only). They are the catalog's
-// two SOURCE_PENDING_RULING mounts; masterwork:engineering on the professions
-// shelf is the third pending slot (QA ruling 2026-08-07).
+// two SOURCE_PENDING_RULING mounts; masterwork:engineering was the third
+// pending slot (QA ruling 2026-08-07) until masterwrought Phase 11o's
+// stats-bearing ocular un-pended it on that ruling's own condition.
 //
 // Keys are typed against the live mount ladder so a misspelled or renamed key
 // fails tsc at the authoring site instead of falling through to the pending
@@ -451,13 +452,16 @@ export const RELIQUARY_HORIZON_TITLES = [
 export const RELIQUARY_PROFESSION_MARKS = {
   /** First lifetime masterwork proc (any craft). */
   masterworkFirst: 'masterwork:first',
-  /** First masterwork per craft on the ring that the gallery catalogs. Every
-   *  entry but the last is gear-capable today; engineering is the exception,
-   *  because every engineering recipe produces a slotless, statless tool, so
-   *  masterworkBonusStats returns null and the engineering mark can never be
-   *  written (QA ruling 2026-08-07: the slot stays catalogued but un-hinted in
-   *  SOURCE_PENDING_RULING beside the two gap mounts, an owner call; a
-   *  stats-bearing engineering craftable would un-pend it). Jewelcrafting
+  /** First masterwork per craft on the ring that the gallery catalogs. All
+   *  seven entries are gear-capable since masterwrought Phase 11o
+   *  (2026-08-25): engineering was the exception while its every recipe
+   *  produced a slotless, statless tool or an R1-suppressed apex, so
+   *  masterworkBonusStats returned null and its mark could never be written
+   *  (QA ruling 2026-08-07: the slot stayed catalogued but un-hinted in
+   *  SOURCE_PENDING_RULING, an owner call, until "a stats-bearing
+   *  engineering craftable would un-pend it"; the 11o copperlens_ocular is
+   *  that craftable, so the slot is hinted and off the pending list).
+   *  Jewelcrafting
    *  joined the gear-capable side when its trainer ladder landed: its outputs
    *  are stats-bearing rings and necks, so the proc path writes
    *  masterwork:jewelcrafting and the gallery owes it a slot. Inscription
@@ -1256,16 +1260,17 @@ export const RELIQUARY_PAGES: readonly ReliquaryPageDef[] = freezePageTable([
     // to earn it.
     relics: marks(
       [RELIQUARY_PROFESSION_MARKS.masterworkFirst, fromActivity('masterwork_craft')],
-      // masterwork:engineering stays a BARE entry (no hint): no engineering
-      // recipe can proc a masterwork (see the masterworkByCraft comment), so
-      // a profession hint here would name a door that awards nothing. The
-      // slot rides SOURCE_PENDING_RULING with the two gap mounts; the
-      // gear-capability pin in tests/reliquary_content.test.ts derives the
-      // eligible set from masterworkBonusStats and reds if either side moves.
-      ...RELIQUARY_PROFESSION_MARKS.masterworkByCraft.map((markId) =>
-        markId === 'masterwork:engineering'
-          ? markId
-          : ([markId, fromProfession(markId.slice('masterwork:'.length))] as const),
+      // Every per-craft mark carries its profession hint. masterwork:
+      // engineering rode SOURCE_PENDING_RULING as a BARE entry (no hint)
+      // while no engineering recipe could proc a masterwork; masterwrought
+      // Phase 11o's copperlens_ocular (a stats-bearing, non-masterwrought
+      // held offhand) made the craft gear-capable, which is exactly the
+      // un-pend condition the 2026-08-07 QA ruling named, so the slot is
+      // hinted like its six siblings since 2026-08-25. The gear-capability
+      // pin in tests/reliquary_content.test.ts derives the eligible set from
+      // craftBonusStatsFor and reds if either side moves.
+      ...RELIQUARY_PROFESSION_MARKS.masterworkByCraft.map(
+        (markId) => [markId, fromProfession(markId.slice('masterwork:'.length))] as const,
       ),
     ),
   },

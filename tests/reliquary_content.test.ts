@@ -1905,17 +1905,21 @@ describe('Reliquary Professions shelf (Phase 7)', () => {
       expect(hinted, `${markId} hinted iff gear-capable`).toBe(gearCapable);
       expect(pendedMarks.has(markId), `${markId} pended iff NOT gear-capable`).toBe(!gearCapable);
     }
-    // Liveness: the derivation is worthless if it calls everything ineligible.
-    expect(gearCapableCount).toBe(6);
+    // Liveness: the derivation is worthless if it calls everything
+    // ineligible. All seven since masterwrought Phase 11o made engineering
+    // gear-capable (copperlens_ocular).
+    expect(gearCapableCount).toBe(7);
   });
 
-  it('engineering stays incapable BECAUSE of R1 suppression, not tool-only output', () => {
-    // The phase 09 premise pin: gyrelens_array is a stats-bearing,
-    // slot-bearing engineering craft output, so the old tool-only reason is
-    // dead, and only the R1 arm (craftBonusStatsFor nulling masterwrought
-    // defs) keeps the craft masterwork-incapable. When phase 12 moves
-    // suppression to the effect gate this reds on the RIGHT line, together
-    // with the gearCapableCount literal above and the pended row.
+  it('R1 still suppresses the apex def; engineering is capable through the 11o ocular alone', () => {
+    // The phase 09 premise pin, re-derived at masterwrought Phase 11o:
+    // gyrelens_array is a stats-bearing, slot-bearing engineering output and
+    // the R1 arm (craftBonusStatsFor nulling masterwrought defs) still bakes
+    // it nothing, so when Phase 12 moves suppression to the effect gate this
+    // arm reds on the RIGHT line. The craft as a whole is gear-capable now,
+    // and EXACTLY through the non-masterwrought ocular: pinning the full
+    // capable-output set keeps the R1 arm's reach visible (a second capable
+    // output, or the apex def slipping past suppression, both red here).
     const def = ITEMS.gyrelens_array;
     expect(def.stats).toBeDefined();
     expect(def.slot).toBe('offhand');
@@ -1925,7 +1929,13 @@ describe('Reliquary Professions shelf (Phase 7)', () => {
     if (!recipe) return;
     expect(recipe.professionId).toBe('engineering');
     expect(craftBonusStatsFor(def, recipe)).toBeNull();
-    expect(craftIsGearCapable('engineering')).toBe(false);
+    expect(craftIsGearCapable('engineering')).toBe(true);
+    const capableOutputs = ALL_RECIPES.filter((r) => {
+      if (r.professionId !== 'engineering') return false;
+      const out = ITEMS[r.resultItemId];
+      return !!out && craftBonusStatsFor(out, r) !== null;
+    }).map((r) => r.resultItemId);
+    expect(capableOutputs).toEqual(['copperlens_ocular']);
   });
 
   it('every gear-capable craft owns a masterwork slot (derived FROM the recipes)', () => {
@@ -1948,12 +1958,15 @@ describe('Reliquary Professions shelf (Phase 7)', () => {
       missing,
       `gear-capable crafts with no Reliquary masterwork slot: ${missing.join(', ')}`,
     ).toEqual([]);
-    // Literal, so the derivation cannot go quietly vacuous: these are the six
-    // crafts whose recipes really produce stats-bearing equipment today
-    // (inscription joined with the phase 06 tomes; its scrolls are slotless
-    // and cannot masterwork).
+    // Literal, so the derivation cannot go quietly vacuous: these are the
+    // seven crafts whose recipes really produce stats-bearing equipment today
+    // (inscription joined with the phase 06 tomes, its slotless scrolls
+    // cannot masterwork; engineering joined at masterwrought Phase 11o with
+    // the copperlens_ocular, its tools and R1-suppressed apex still bake
+    // nothing).
     expect(derivedEligible).toEqual([
       'armorcrafting',
+      'engineering',
       'inscription',
       'jewelcrafting',
       'leatherworking',
@@ -2640,19 +2653,15 @@ const SOURCE_PENDING_RULING: Readonly<Record<string, readonly string[]>> = {
   // terrorspark_groundshaker: dev-grant only, deliberately absent from vendors,
   // quests, mob loot, heroic loot, and the rift reins pools.
   horizons_mounts: ['drakemaw_raptor', 'terrorspark_groundshaker'],
-  // masterwork:engineering: unearnable, QA ruling 2026-08-07. The true gate
-  // is R1 masterwork suppression, not tool-only output (gyrelens_array is a
-  // live stats-bearing engineering craft): craftBonusStatsFor (crafting.ts)
-  // returns null for every masterwrought def, so no engineering craft can
-  // mint a masterwork instance while suppression stands and the mark can
-  // never be written. Phase 12 revisit: when suppression moves to the effect
-  // gate, craftIsGearCapable flips for engineering and three pins move
-  // together (the gearCapableCount liveness literal, the derivedEligible
-  // literal, and this pended row), and the reliquary.md feat justification
-  // must be re-judged. Until then the slot stays catalogued and un-hinted.
-  // The gear-capability pin below derives the eligible set from the live
-  // recipes and reds if either side moves.
-  professions_masterwork: ['masterwork:engineering'],
+  // masterwork:engineering rode here as unearnable (QA ruling 2026-08-07,
+  // R1 suppression on the craft's only stats-bearing output) until
+  // masterwrought Phase 11o (2026-08-25) shipped copperlens_ocular, a
+  // stats-bearing NON-masterwrought engineering offhand: craftIsGearCapable
+  // flipped through the live gate rather than through the Phase 12
+  // suppression move the old note predicted, the three pins moved together
+  // (the gearCapableCount liveness literal, the R1-premise arm, this pended
+  // row), and the slot is hinted like its six siblings. Nothing professions-
+  // side is pending any more.
 };
 
 /**
@@ -2738,9 +2747,11 @@ const EXPECTED_DISTINCT_SOURCES: Record<string, number> = {
   conquerors_set_nighttalon: 2,
   conquerors_set_soulflame: 2,
   conquerors_set_stormcallers: 2,
-  // 6 = activity (masterworkFirst) + the five gear-capable craft professions;
-  // masterwork:engineering is pended un-hinted (QA ruling 2026-08-07).
-  professions_masterwork: 7,
+  // 8 = activity (masterworkFirst) + the seven gear-capable craft
+  // professions (engineering hinted since masterwrought Phase 11o un-pended
+  // it; the count read 7 while its mark rode SOURCE_PENDING_RULING
+  // un-hinted).
+  professions_masterwork: 8,
   professions_field_notes: 4,
   // 7 = corpse_harvest + the four gathering professions with a jackpot slot
   // (mining, logging, herbalism, fishing) + the rods' engineering craft and
@@ -3643,29 +3654,25 @@ describe('Reliquary source hint coverage', () => {
     ).toBe(true);
   });
 
-  it('the surviving pending rows are the three slots content awards no route at all', () => {
+  it('the surviving pending rows are the two mounts content awards no route at all', () => {
     // The page-wide Horizons rulings are EXECUTED: mounts and skins are no
     // longer derived from the catalog lists (the derivation era ended when the
     // rulings landed), so the identity pins to RELIQUARY_HORIZON_MOUNTS and
     // RELIQUARY_HORIZON_WEAPON_SKINS are gone with them. What is left is a
     // hand-listed set of CONTENT gaps, and hand-listing is the point: a new
     // mount must now be authored or deliberately added here, never auto-enrol.
-    expect(Object.keys(SOURCE_PENDING_RULING)).toEqual([
-      'horizons_mounts',
-      'professions_masterwork',
-    ]);
+    // (masterwork:engineering was the third row until masterwrought Phase
+    // 11o's stats-bearing ocular un-pended it; see the pending-table comment.)
+    expect(Object.keys(SOURCE_PENDING_RULING)).toEqual(['horizons_mounts']);
     expect(SOURCE_PENDING_RULING.horizons_mounts).toEqual([
       'drakemaw_raptor',
       'terrorspark_groundshaker',
     ]);
-    // masterwork:engineering pended by the QA ruling 2026-08-07: no
-    // engineering recipe can proc a masterwork (see the gear-capability pin),
-    // so its former profession hint named a door that awards nothing.
-    expect(SOURCE_PENDING_RULING.professions_masterwork).toEqual(['masterwork:engineering']);
     // All are still live catalog slots, so the exclusion cannot outlive them.
     for (const mountId of SOURCE_PENDING_RULING.horizons_mounts) {
       expect(RELIQUARY_HORIZON_MOUNTS, mountId).toContain(mountId);
     }
+    // The un-pended engineering mark stays catalogued, now hinted.
     expect(RELIQUARY_PROFESSION_MARKS.masterworkByCraft).toContain('masterwork:engineering');
     // And the skins page really is fully answered now, which is the half of the
     // executed ruling this row can no longer show.
@@ -4014,25 +4021,10 @@ describe('Reliquary source hint coverage', () => {
         activity: 0,
       });
     }
-    // The pended masterwork:engineering mark makes the same claim through a
-    // different door: no family may count a live route for it (the activity
-    // family maps masterwork_craft to masterwork:first only, and the
-    // gear-capability pin above owns the "could the write site ever fire"
-    // half, which these nine families cannot see).
-    for (const markId of SOURCE_PENDING_RULING.professions_masterwork) {
-      const { counts } = judgeSlotRoutes('mark', markId, markId, []);
-      expect(counts, `${markId} has no live award route`).toEqual({
-        mob: 0,
-        heroic: 0,
-        vendor: 0,
-        quest: 0,
-        recipe: 0,
-        delveChest: 0,
-        riftReins: 0,
-        store: 0,
-        activity: 0,
-      });
-    }
+    // (The pended masterwork:engineering half of this sweep retired with its
+    // row at masterwrought Phase 11o: the mark is earnable now, its write
+    // site can fire through the copperlens_ocular, and the gear-capability
+    // pin above owns that claim in both directions.)
   });
 
   it('the named non-route exclusions still hold (self-checking, not comment-only)', () => {
