@@ -58,6 +58,9 @@ npx tsc --noEmit
 
 Run domain guards for architecture, localization, persistence, parity, or security when
 applicable. Re-run `woc_database_performance` on the finished diff when its database triggers
-match. Before declaring the implementation ready, run `npm run gate`.
+match, and `woc_server_hot_path` when the diff adds or changes per-tick, per-request,
+per-broadcast, or recurring server work (a `selfWireJson` key or the `src/sim/` read it
+calls, an autosave, sweep, or durability write, a `world_state` blob). Before declaring the
+implementation ready, run `npm run gate`.
 
 Report the selected seam, behavior covered, commands run, and remaining manual checks.

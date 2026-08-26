@@ -259,13 +259,19 @@ Use the seams this repo already has, do not invent new ones:
 - New server REST endpoint: a `RouteDef` module (`server/<domain>.ts` `export const routes`)
   registered in `server/http/registry.ts`, never an inline handler in `main.ts`. Scaffold with
   `npm run new:endpoint` (see `server/http/CLAUDE.md`).
-- New server hot-path work (a shared read, a table that grows, a broadcast payload): use
-  the performance seams in `server/CLAUDE.md` "Hot paths": cached reads with
-  single-flight and moderation busts, the retention sweep for every table that grows
-  without bound, build-once realm readouts and serialize-once events. An uncached
-  viewer-identical read or a new unbounded table without a retention story is a defect,
-  not a style choice. The `server-hot-path-reviewer` agent audits exactly these seams;
-  dispatch it on any server hot-path diff.
+- New server hot-path work (a shared read, a per-tick self-path read, a recurring
+  autosave or sweep job, a table or in-memory collection that grows, a broadcast
+  payload): use the performance seams in `server/CLAUDE.md` "Hot paths": cached reads
+  with single-flight and moderation busts, the retention sweep for every table that grows
+  without bound, build-once realm readouts and serialize-once events, and the revision
+  plus cadence gate for any per-tick read of a collection that grows with realm age. An
+  uncached viewer-identical read, a new unbounded table without a retention story, a
+  per-tick read with no named bound, or a recurring job or durability write whose cost
+  scales with a whole book instead of what changed is a defect, not a style choice; and a
+  fresh world or a
+  fresh-bot fleet is never evidence that such a read is cheap. The
+  `server-hot-path-reviewer` agent audits exactly these seams; dispatch it on any server
+  hot-path diff, including a `src/sim/` change to a read `selfWireJson` consumes.
 - New multi-file subsystem: a directory with an `index.ts` barrel exposing only its
   public surface, plus a local `CLAUDE.md` (template: `src/render/characters/`).
 

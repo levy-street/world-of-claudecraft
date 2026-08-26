@@ -136,6 +136,7 @@ describe('Codex custom agents', () => {
       'woc_persistence.toml',
       'woc_release_malware.toml',
       'woc_security.toml',
+      'woc_server_hot_path.toml',
       'woc_sim_architecture.toml',
       'woc_test_coverage.toml',
     ]);
@@ -218,6 +219,38 @@ describe('Codex custom agents', () => {
     );
     expect(read('docs/codex.md')).toContain('`woc_database_performance`');
     expect(read('docs/qa-gate.md')).toContain('| Database performance |');
+  });
+
+  it('routes server hot-path work to the dedicated reviewer', () => {
+    // The Codex mirror of server-hot-path-reviewer: the grown-collection rules
+    // (server/CLAUDE.md "Hot paths") must be routed, not only documented.
+    const agent = read('.codex/agents/woc_server_hot_path.toml');
+    expect(agent).toContain('name = "woc_server_hot_path"');
+    expect(agent).toContain('Proposed-change review:');
+    expect(agent).toContain('Finished-diff review:');
+    expect(agent).toContain('An empty diff is not a reason to exit this mode.');
+    expect(agent).toMatch(/neither the assigned proposal nor the finished diff can affect/);
+    expect(agent).toContain('no O(realm-collection) read sits on the per-tick self path');
+    expect(agent).toContain('no named bound, no per-tick key');
+    expect(agent).toMatch(/never O\(the stored book\)/);
+    expect(agent).toContain('whole-book world_state blob');
+    expect(agent).toContain('SELF_WIRE_PHASES');
+    expect(agent).toContain('seeded backing collection (1,000+ rows)');
+    expect(agent).toContain('never run a load test against production');
+    expect(agent).toContain('Verdict: `PASS`, `BLOCK`, or `OUT_OF_SCOPE`');
+    expect(agent).toContain('Required runtime proof:');
+    expect(agent).toContain('woc_database_performance');
+    expect(read('.agents/skills/woc-qa/SKILL.md')).toMatch(
+      /`woc_server_hot_path` for per-tick, per-request, per-broadcast, or recurring/,
+    );
+    expect(read('.agents/skills/woc-review-pr/SKILL.md')).toMatch(
+      /Invoke `woc_server_hot_path` when the diff adds or changes/,
+    );
+    expect(read('AGENTS.md')).toContain('`woc_server_hot_path`');
+    expect(read('docs/codex.md')).toContain('`woc_server_hot_path`');
+    expect(read('docs/qa-gate.md')).toMatch(
+      /\| Server hot-path performance \| `server-hot-path-reviewer` \| `woc_server_hot_path` \|/,
+    );
   });
 });
 
