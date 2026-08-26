@@ -213,17 +213,48 @@ describe('engineering on-ramp: the gadget honors masterwrought R14 and R23', () 
     for (const key of RATING_KEYS) {
       expect(def[key], `${key} stays off the base rung`).toBeUndefined();
     }
-    // Positive controls (the inscription_catalog R14 arm's reasoning inherited
-    // whole): content-backed carriers prove five of the six keys live, so a
-    // renamed rating field cannot leave the absence sweep vacuously green.
-    // spellPower has no static exemplar; its liveness rests on the type
-    // system (ItemDef has no index signature, so a renamed field is a tsc
-    // error, not a silently-undefined read).
-    expect(HEROIC_VENDOR_ITEMS.seal_of_the_nine_oaths.hitRating).toBeGreaterThan(0);
-    expect(HEROIC_VENDOR_ITEMS.sutils_gambit.critRating).toBeGreaterThan(0);
-    expect(HEROIC_VENDOR_ITEMS.zyzzs_deathless_signet.hasteRating).toBeGreaterThan(0);
-    expect(WARFARE_ITEMS.furyforged_warhelm.pvpOffenseRating).toBeGreaterThan(0);
-    expect(WARFARE_ITEMS.furyforged_warhelm.pvpDefenseRating).toBeGreaterThan(0);
+    // Positive controls (the inscription_catalog R14 arm's controls and its
+    // derived-set pin, both inherited): content-backed carriers prove five of
+    // the six keys live, so a renamed rating field cannot leave the absence
+    // sweep vacuously green. spellPower has no static exemplar; its liveness
+    // rests on the type system (ItemDef has no index signature, so a renamed
+    // field is a tsc error, not a silently-undefined read).
+    expect(
+      HEROIC_VENDOR_ITEMS.seal_of_the_nine_oaths.hitRating,
+      'hitRating stays live vocabulary',
+    ).toBeGreaterThan(0);
+    expect(
+      HEROIC_VENDOR_ITEMS.sutils_gambit.critRating,
+      'critRating stays live vocabulary',
+    ).toBeGreaterThan(0);
+    expect(
+      HEROIC_VENDOR_ITEMS.zyzzs_deathless_signet.hasteRating,
+      'hasteRating stays live vocabulary',
+    ).toBeGreaterThan(0);
+    expect(
+      WARFARE_ITEMS.furyforged_warhelm.pvpOffenseRating,
+      'pvpOffenseRating stays live vocabulary',
+    ).toBeGreaterThan(0);
+    expect(
+      WARFARE_ITEMS.furyforged_warhelm.pvpDefenseRating,
+      'pvpDefenseRating stays live vocabulary',
+    ).toBeGreaterThan(0);
+    // The derived-set half: liveKeys is computed by filtering RATING_KEYS
+    // over the same two catalogs, so a name dropped from the local list
+    // drops from liveKeys and reds here instead of silently narrowing the
+    // R14 claim.
+    const liveKeys = new Set(
+      [...Object.values(HEROIC_VENDOR_ITEMS), ...Object.values(WARFARE_ITEMS)].flatMap((item) =>
+        RATING_KEYS.filter((key) => (item[key] ?? 0) > 0),
+      ),
+    );
+    expect([...liveKeys].sort()).toEqual([
+      'critRating',
+      'hasteRating',
+      'hitRating',
+      'pvpDefenseRating',
+      'pvpOffenseRating',
+    ]);
     // Formula-exact at the rung convention: level 15 + uncommon bonus 1 =
     // ilvl 16 on the held 0.75 line. The LIVE item level is pinned too, so a
     // drifted recipe.level cannot leave the hardcoded 16 telling a stale
