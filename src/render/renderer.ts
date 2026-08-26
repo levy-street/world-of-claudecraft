@@ -568,6 +568,7 @@ import {
   RenderDiagnostics,
 } from './render_diagnostics';
 import { measureFeatureFootprint, setRenderCategory } from './renderer_diagnostics';
+import { enableRendererExtensions } from './renderer_extensions';
 import { snapshotRendererFrameStats } from './renderer_frame_stats_snapshot';
 import {
   beginRendererFrameTelemetry,
@@ -2096,13 +2097,12 @@ export class Renderer {
     this.webgl.shadowMap.type = THREE.PCFShadowMap;
     this.webgl.toneMapping = THREE.ACESFilmicToneMapping; // OutputPass reads this on the composer path
     this.webgl.toneMappingExposure = this.baseExposure;
-    // Only worth gating view draws on compileAsync when programs can link OFF the
-    // main thread; without the extension compileAsync compiles synchronously, so
-    // gating would just delay the same stall. Detected once here.
+    // The context's whole extension set, enabled before the first program links
+    // (renderer_extensions.ts); view draws gate on compileAsync only off-thread.
     try {
       this.asyncCompileSupported =
         typeof this.webgl.compileAsync === 'function' &&
-        this.webgl.getContext().getExtension('KHR_parallel_shader_compile') !== null;
+        enableRendererExtensions(this.webgl.getContext()).parallelCompile;
     } catch {
       this.asyncCompileSupported = false;
     }
