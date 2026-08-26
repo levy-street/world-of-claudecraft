@@ -1,0 +1,38 @@
+# Fresh European deployment. This file is intentionally separate from
+# render.yaml so creating the Frankfurt service cannot rename or tear down the
+# existing Oregon Blueprint before the replacement passes its smoke tests.
+services:
+  - type: web
+    name: woc-game-eu
+    runtime: node
+    region: frankfurt
+    plan: free
+    repo: https://github.com/lionfart/world-of-claudecraft
+    branch: main
+    autoDeployTrigger: commit
+    healthCheckPath: /livez
+    buildCommand: >-
+      npm install --global pnpm@10.34.5 &&
+      pnpm install --frozen-lockfile &&
+      export NODE_OPTIONS=--max-old-space-size=1536 &&
+      pnpm run build &&
+      pnpm run build:server &&
+      pnpm run build:bot
+    startCommand: node dist-server/server.cjs
+    envVars:
+      - key: DATABASE_URL
+        sync: false
+      - key: PUBLIC_ORIGIN
+        sync: false
+      - key: NODE_VERSION
+        value: "26"
+      - key: NODE_ENV
+        value: production
+      - key: NODE_OPTIONS
+        value: --max-old-space-size=384
+      - key: DB_POOL_MAX_CLIENTS
+        value: "5"
+      - key: REALM_NAME
+        value: Claudemoon
+      - key: PLAYER_DIRECTIONAL_COMBAT
+        value: "1"
