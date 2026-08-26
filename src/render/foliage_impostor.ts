@@ -635,7 +635,11 @@ function impostorMaterial(category: ImpostorCategory, atlas: THREE.Texture): THR
         'totalEmissiveRadiance *= impTexel.rgb;',
       );
   };
-  mat.customProgramCacheKey = () => `foliage-impostor-${CATEGORY_VIEWS[category]}`;
+  // One key for every category: the view count and the wind amplitude reach
+  // the shader as uniforms (uImpViews, uImpWind), so the GLSL is the same for
+  // all of them and a per-category key only split one program into several
+  // (two extra links per login in the 2026-08-27 program-key ledger).
+  mat.customProgramCacheKey = () => 'foliage-impostor';
   // The distant-zone air (biome_haze_field.ts), and this layer is the one that
   // most needs it: past the detail envelope the sprites ARE the trees, rocks
   // and buildings, so a sprite holding full local colour over hazed ground is

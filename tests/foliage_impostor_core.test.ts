@@ -473,3 +473,27 @@ describe('shared GLSL and constants', () => {
     expect(IMPOSTOR_SWAP_FADE).toBeLessThan(SPRITE_SWAP_MIN / 4);
   });
 });
+
+describe('the impostor material keys its program on the shader text alone', () => {
+  // The per-category view count and wind amplitude reach the shader as
+  // UNIFORMS (uImpViews, uImpWind); the GLSL is the same for every category,
+  // so a key carrying the view count split one program into one per
+  // category for nothing (two extra links per login in the 2026-08-27
+  // program-key ledger). The zone haze wraps the key afterwards and keeps it
+  // shared the same way.
+  it('uses one constant customProgramCacheKey and passes the category values as uniforms', () => {
+    const source = readFileSync(
+      new URL('../src/render/foliage_impostor.ts', import.meta.url),
+      'utf8',
+    );
+    expect(source).toContain("mat.customProgramCacheKey = () => 'foliage-impostor';");
+    expect(source).toContain('shader.uniforms.uImpViews = { value: CATEGORY_VIEWS[category] };');
+    expect(source).toContain('shader.uniforms.uImpWind = { value: windStrength };');
+    const hook = source.slice(
+      source.indexOf('mat.onBeforeCompile = (shader) => {'),
+      source.indexOf('mat.customProgramCacheKey'),
+    );
+    // No category-dependent value is ever interpolated into the shader text.
+    expect(hook).not.toMatch(/\$\{[^}]*(category|CATEGORY_|windStrength)[^}]*\}/);
+  });
+});
