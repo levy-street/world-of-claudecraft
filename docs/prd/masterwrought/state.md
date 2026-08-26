@@ -18197,3 +18197,183 @@ HANDOFF: Phase 11n QA (phase-11n-qa.md), the twin. R5's ceiling is
 untouched by construction so Phase 15 inherits no new measurement; the
 qr-11n-NINE ruling and the six-tier tercile-range reading above are the
 two records the twin should re-derive first.
+
+## Phase 11n QA ledger (2026-08-25, the vendor floor twin)
+
+STATUS: COMPLETE, VERDICT PASS. LOCAL, no push, no PR. Five parallel
+lanes re-derived the build's record with independent scripts (nothing
+shared with the pins under judgment), named reviewers after, the qa gate
+LAST: READY, zero blocking anywhere in the round.
+
+### STEP 0
+git clean at 57f1a55975 (the 11n docs stamp over the frozen eaa1dbef27);
+origin/release/v0.41.0 fetched, still at ff2837da1f and already an
+ancestor, zero new commits, no merge audit owed; DATABASE_URL unset;
+qr-11n-NINE confirmed inlined in the phase file as dated AMENDED lines.
+
+### LANE VERDICTS (all five reported; every build claim reproduced)
+1. CEILING, the load-bearing claim: VERIFIED. A fresh whole-def census
+   at 93bb9855c4 (throwaway worktree) vs tip found exactly the nine
+   vendor leaf changes, all lowered; ZERO crafted magnitudes moved in
+   any direction (crafted = the 163 recipe resultItemIds, none of the
+   nine among them); items 1006 to 1006 id-set equal, recipes 163 to
+   163, stock 224 to 219 as exactly the five pulls; the delve, heroic
+   and house tables diff empty; no sim logic file changed, so no
+   effective-magnitude shift outside defs. The differ passed injected
+   positive controls before the empty crafted diff was trusted. Pool
+   fractions re-derived from live stat code: priest 123/240/387,
+   paladin 219/415/660 exact; potionHp 0.894/0.792/0.721 and potionMana
+   0.662/0.545/0.536 exact. THE EXPLICIT STATEMENT: NO CRAFTED
+   MAGNITUDE ROSE.
+2. FLOOR-NOT-CLIFF: REPRODUCED. The band walk (1-7, 6-13, 13-20, the
+   Hollow): every band keeps a stocked heal, mana and food; the
+   smallest fractions anywhere are 72 percent hp (279/387) and 54
+   percent mana (354/660), both recomputed exactly; the bottom rung is
+   byte-identical at base; gold accessibility passes per band; the
+   Hollow line via provisioner_fenna is ungated (the portal type has no
+   gate fields). The cliff does not exist. Reads: the eel-over-hardtack
+   per-point seam inversion is the build's recorded pre-existing read;
+   raw cut sizes are NOT monotone by rung (goat -6.6 smallest, venison
+   -12.0 largest), so the weighting claim is true in the
+   resulting-margin sense only; the band map is true per level bracket,
+   not per zone (Proving Shore, Farshore and the 16-20 zones stock
+   nothing; all resolve on foot or by road to the four hubs).
+3. INVARIANT DECISIVENESS: the round's OWN kill table 18/18, zero
+   survivors, in a throwaway worktree with byte-restore and empty
+   porcelain between mutants, baseline 53/53 proven first, plain
+   reporter (the vitest unknown-reporter EXIT=0 trap avoided). The nine
+   build classes re-run with fresh variants plus seven new classes and
+   a vacuity probe (table below). Static trap audit clean: no
+   constant-self-comparison, vacuity floors near live counts (28/39/23
+   vs 25/35/20), positive controls drive the pipeline, monotonicity per
+   axis judged by worst-of-rung.
+4. PAIRING COMPLETENESS: EXACT MATCH, no misses either direction. The
+   counter census proved the four counters are ALL the stock-like
+   counters (the buy entry points: items.ts buyItem, buyHeroicVendorItem,
+   delve_buy, market.ts; ptr_dev_vendor is dev-only, map_doc custom
+   worlds ship zero vendorItems, the noticeboard ships empty, the bank
+   sells tabs not items). The full axis sweep of the item type
+   (potionHp, potionHpPctMax, potionMana, foodHp, drinkMana, elixir,
+   wellFed, feast; no ItemUse restore arm and no bandage mechanic
+   exists) found zero vendor-sold scrolls, flasks, feasts, wellFed-only
+   or pctMax items on any counter, and zero vendor-sold elixirs
+   anywhere including the house. The live post-pull both-sourced
+   intersection is exactly the FOUR on the NPCS basis; all nine ledger
+   margins and both exclusion lists reproduce; the crafted food line is
+   seven tiers with six pairing (1392 is never a counterpart under
+   smallest-at-or-above); 22 vendors / 219 rows match the pinned map on
+   every entry. New fact recorded at the arm: a basis widened to the
+   delve shop adds the drowned_litany crafted tools beyond the house's
+   oiled_boots.
+5. COPY AND SURFACES: PASS, mechanism-classified. The guide's silence
+   on the nine is CONSTRUCTION, not accident (no generic ITEMS emit;
+   the spoiler policy; magnitudes that do render are read from live
+   defs at regen time and freshness-gated); tooltips render live defs
+   through parameterized t() templates and cannot go stale;
+   wiki:content and i18n:gen both byte-identical; master-spec's four
+   rows match live; the eastbrook digest suite green standalone; zero
+   stale comments in the diff beyond the one the fix round corrected.
+
+### THE QA ROUND'S OWN KILL TABLE (18/18, every red named)
+1. healing_potion 279 to 310 (raise into band): ladder pin red by name.
+2. The same raise with the test literal moved in step: the margin arm
+   ALONE red ("sunpetal_healing_draught (335) must beat healing_potion
+   (310) by at least 20 percent; achieved 8.1 percent").
+3. glacier_melt dropped from the drink literal: the drink-set arm red.
+4. The bear elixir restored to verane: FIVE arms red.
+5. Count-preserving swap (wilkes knapsack for conjured_bread): the
+   foodHp exhaustiveness and classification-union arms red BY NAME
+   while the count map stayed GREEN (the exhaustiveness arms catch what
+   counts miss).
+6. hunters_game_skewer 117 to 110 (the pinned representative): red.
+7. herbed_marsh_pike 117 to 110 (unpinned sibling into the band): the
+   derivation arm red.
+8. herbed_marsh_pike 117 to 100 (below the vendor floor): the 26-row
+   map red.
+9. highwatch_gourd_soup 552 to 90 (onto an existing tier): the 26-row
+   map red.
+A. A NEW both-sourced id minted (sunpetal_healing_draught stocked): the
+   intersection arm refuses it BY NAME, plus four more arms.
+B. A vendor magnitude LOWERED (mana_potion 354 to 300): the literal pin
+   red; the floor is two-sided.
+C. An exempt magnitude moved (minor_healing_potion 110 to 100): the
+   exempt pin red.
+D1. A crafted food RAISED (marsh_pike 117 to 130): the 26-row map red.
+D2. A crafted POTION RAISED (sunpetal_mana_draught 425 to 450): the
+   vendor_floor ladder red while consumables.test.ts stayed GREEN:
+   crafted-side detection is OWNED by this phase's suite, not
+   inherited.
+E1. A foodHp row seeded into DELVE_SHOPS: the side-table sweep red.
+E2. A foodHp row seeded into MARKET_HOUSE_STOCK: the market-rows pin
+   red.
+F. A crafted drinkMana minted: the five-drink premise arm red.
+G. A row moved BETWEEN vendors at constant 219: the per-vendor ratchet
+   red naming both vendors.
+V. PAIRS emptied: five arms red (the endpoints, all three monotonic
+   arms, the classification); the suite cannot go green on an empty
+   pairing set.
+
+### FINDINGS AND FIXES (six commits, every finding applied)
+Zero blocking anywhere. The fix commits, each read by a fresh reviewer:
+- 0f516fdd9e docs: the reachability record's "drops" arm corrected (the
+  four pulled ids drop NOWHERE; other zone-1 drops fill the slots).
+- d786e24a13 test comment: the wider-basis note completed.
+- 8b47211aa1 test: a synthetic-shop pipeline probe (the delve sweep's
+  flatten-and-filter proven live end to end).
+- 93e8e8e655 test: the coverage audit's nits (count-free comment per
+  the shop file's own anchor rule; the shared consumableIn expression;
+  reliquary_legs as a present non-consumable probe row).
+- 9b38ceb7bb docs plus comment: the drops correction propagated to
+  zone1.ts and the phase file (dated AMENDED line).
+- 830aa28799 docs: the correction's file-list wording tightened.
+Reviewers: test-coverage-auditor (zero blocking, four nits, one
+targeted mutation proving the new probe live: 52/53 with only the probe
+red); content-obligations-reviewer (zero obligations owed, two
+should-fix on the drops premise's other homes, both applied); a fresh
+convergence reviewer (CONVERGED, two wording nits, applied); the
+qa-checklist gate LAST (READY, zero blocking; its one should-fix was
+this ledger itself). ONE finding REFUTED, do not re-raise: lane 5's
+recipes.ts vial comment (glass_vial IS in verane's post-pull stock,
+pinned in vendor_floor.test.ts, and she still teaches the recipe; both
+clauses of the comment are true).
+
+### RECORDED, NOT ACTED (this round's new reads)
+- mediawiki/seed/pages.xml carries pre-11n magnitudes for four foods
+  (rye 243, eel 432, hardtack 552, goat 874): trails-by-design per
+  tests/mediawiki_seed_visibility.test.ts, and the generator reads live
+  defs. OBLIGATION: the release-time wiki:seed regen emits the new
+  values when 0.41.0 ships; record it on the release checklist.
+- The resolved locale tooltips for useHealingPotion and useManaPotion
+  say a 1 minute cooldown in at least ten Latin locales while English
+  and the sim say 2 minutes (POTION_COOLDOWN = 120); the pct sibling
+  says 2 minutes correctly in the same locales. Pre-existing, a
+  maintainer locale-fill item (overlays are maintainer-owned); the
+  amount halves are parameterized and render 11n's values correctly.
+- The pairing table's counter note: roasted_boar and spring_water are
+  also MARKET_HOUSE_STOCK rows (700 by 5 and 160 by 5), same defs, no
+  margin impact.
+- Commit 8b47211aa1's subject overstates (the heroic arm keeps its own
+  map; the in-code comment is scoped honestly); commit text immutable.
+- consumables.test.ts does NOT pin the crafted draughts (vendor side
+  only); crafted-side detection is vendor_floor's alone (kill D2).
+
+### THE FROZEN STAMP: one run, EXIT=0 first try
+At 830aa28799, every reader idle AND reported, git status empty, zero
+vitest processes, DATABASE_URL unset; the wrapper wrote TIP first and
+SUITE_EXIT=0 before the follow-on stages, one fresh log, no commit
+anywhere between: 3191 test files passed / 21 skipped (3212), 46895
+passed / 2 expected fail / 373 skipped (47270); tsc clean; ci:changed
+EXIT=0 over 848 files with zero errors; wiki:content and i18n:gen both
+zero diff; tip and porcelain unchanged through every stage. Against the
+build stamp (eaa1dbef27, identical counts) the drift is ZERO files and
+ZERO tests: the round added asserts inside existing arms only. The
+stamp commit after the run is docs-only (this ledger, progress.md, the
+memory note), the sanctioned exception to commit-voids-the-run.
+
+HANDOFF: Phase 11o (phase-11o-leveling-crafter.md), the leveling
+crafter. The vendor floor is verified standing: ceiling unmoved (Phase
+15 inherits nothing new), floor workable in every band, invariant
+decisive at 18/18, pairing exact over all four counters, copy clean by
+construction. The 11n maintainer reads plus this round's two new ones
+(the mediawiki seed regen obligation at release, the locale potion
+cooldown mismatch) remain open.
