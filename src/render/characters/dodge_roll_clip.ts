@@ -1,8 +1,17 @@
 import * as THREE from 'three';
 import { type DodgeVisualDirection, PLAYER_DODGE_ROLL_CLIPS } from '../dodge_visual_core';
 
+// The paired test locks this authored window to the authoritative sim dodge
+// duration without pulling the full dodge behavior module into the renderer.
 export const PLAYER_DODGE_ROLL_DURATION = 0.75;
-export const PLAYER_DODGE_ROLL_TIMES = [0, 0.1, 0.23, 0.39, 0.57, 0.75] as const;
+export const PLAYER_DODGE_ROLL_TIMES = [
+  0,
+  0.1,
+  0.23,
+  0.39,
+  0.57,
+  PLAYER_DODGE_ROLL_DURATION,
+] as const;
 
 const SOURCE_FRACTIONS = [0, 0.14, 0.32, 0.54, 0.78, 0] as const;
 type EulerDegrees = readonly [x: number, y: number, z: number];

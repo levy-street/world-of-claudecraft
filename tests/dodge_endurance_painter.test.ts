@@ -4,7 +4,34 @@ import {
   DODGE_ENDURANCE_RECHARGE_SECONDS,
   DODGE_ENDURANCE_REGEN_PER_SECOND,
 } from '../src/sim/player_dodge';
-import { dodgeEnduranceView } from '../src/ui/dodge_endurance_painter';
+import type { Entity } from '../src/sim/types';
+import { DodgeEndurancePainter, dodgeEnduranceView } from '../src/ui/dodge_endurance_painter';
+import type { PainterHostWriters } from '../src/ui/painter_host';
+
+function endurancePainterFixture(): {
+  painter: DodgeEndurancePainter;
+  calls: string[];
+} {
+  const calls: string[] = [];
+  const writers: PainterHostWriters = {
+    setText: () => {},
+    setDisplay: () => {},
+    setTransform: (_el, value) => calls.push(`transform:${value}`),
+    setWidth: () => {},
+    setStyleProp: () => {},
+    toggleClass: (_el, cls, on) => calls.push(`class:${cls}:${on}`),
+    setAttr: (_el, name, value) => calls.push(`attr:${name}:${value}`),
+  };
+  return {
+    painter: new DodgeEndurancePainter(
+      writers,
+      {} as HTMLElement,
+      {} as HTMLElement,
+      {} as HTMLElement,
+    ),
+    calls,
+  };
+}
 
 describe('dodge endurance painter', () => {
   it('exposes two independently filling dodge charges', () => {
@@ -40,5 +67,20 @@ describe('dodge endurance painter', () => {
     expect(html).toContain('id="dodge-endurance-first"');
     expect(html).toContain('id="dodge-endurance-second"');
     expect(html).toContain('data-charges="2"');
+  });
+
+  it('pulses the pip that was consumed by each consecutive dodge', () => {
+    const { painter, calls } = endurancePainterFixture();
+    painter.paint({ endurance: 100 } as Entity);
+    calls.length = 0;
+
+    painter.paint({ endurance: 50 } as Entity);
+    expect(calls).toContain('attr:data-spent-slot:2');
+    expect(calls).toContain('class:spent-a:true');
+
+    calls.length = 0;
+    painter.paint({ endurance: 0 } as Entity);
+    expect(calls).toContain('attr:data-spent-slot:1');
+    expect(calls).toContain('class:spent-b:true');
   });
 });

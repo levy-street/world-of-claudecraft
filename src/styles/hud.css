@@ -1840,8 +1840,8 @@
     bottom: 2px;
     z-index: 2;
     display: flex;
-    width: 64px;
-    height: 6px;
+    width: 72px;
+    height: 7px;
     gap: 3px;
     pointer-events: none;
   }
@@ -1883,6 +1883,28 @@
       box-shadow: 0 0 9px currentColor;
     }
   }
+  @keyframes dodge-endurance-spent-a {
+    0% {
+      transform: scaleY(1.55);
+      box-shadow:
+        0 0 0 1px var(--color-energy),
+        0 0 10px var(--color-energy);
+    }
+    100% {
+      transform: scaleY(1);
+    }
+  }
+  @keyframes dodge-endurance-spent-b {
+    0% {
+      transform: scaleY(1.55);
+      box-shadow:
+        0 0 0 1px var(--color-energy),
+        0 0 10px var(--color-energy);
+    }
+    100% {
+      transform: scaleY(1);
+    }
+  }
   @media (prefers-reduced-motion: no-preference) {
     .dodge-endurance.recovered-a[data-charges="1"] > span:first-child i,
     .dodge-endurance.recovered-a[data-charges="2"] > span:last-child i {
@@ -1891,6 +1913,14 @@
     .dodge-endurance.recovered-b[data-charges="1"] > span:first-child i,
     .dodge-endurance.recovered-b[data-charges="2"] > span:last-child i {
       animation: dodge-endurance-ready-b 420ms ease-out;
+    }
+    .dodge-endurance.spent-a[data-spent-slot="1"] > span:first-child,
+    .dodge-endurance.spent-a[data-spent-slot="2"] > span:last-child {
+      animation: dodge-endurance-spent-a 260ms ease-out;
+    }
+    .dodge-endurance.spent-b[data-spent-slot="1"] > span:first-child,
+    .dodge-endurance.spent-b[data-spent-slot="2"] > span:last-child {
+      animation: dodge-endurance-spent-b 260ms ease-out;
     }
   }
   .hp .bar-fill {

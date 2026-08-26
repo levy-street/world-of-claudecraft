@@ -36,6 +36,8 @@ export function dodgeEnduranceView(rawEndurance: number): DodgeEnduranceView {
 export class DodgeEndurancePainter {
   private lastReadyCharges: number | null = null;
   private recoveryPhase: 'none' | 'a' | 'b' = 'none';
+  private spentPhase: 'none' | 'a' | 'b' = 'none';
+  private spentSlot: 0 | 1 | 2 = 0;
 
   constructor(
     private readonly writers: PainterHostWriters,
@@ -48,6 +50,12 @@ export class DodgeEndurancePainter {
     const view = dodgeEnduranceView(playerEndurance(player));
     if (this.lastReadyCharges !== null && view.readyCharges > this.lastReadyCharges) {
       this.recoveryPhase = this.recoveryPhase === 'a' ? 'b' : 'a';
+    } else if (this.lastReadyCharges !== null && view.readyCharges < this.lastReadyCharges) {
+      // The emptied fill is invisible immediately after spending, so pulse its
+      // containing pip. Alternating animation names lets consecutive dodges
+      // retrigger without forcing style/layout reads.
+      this.spentSlot = this.lastReadyCharges >= 2 ? 2 : 1;
+      this.spentPhase = this.spentPhase === 'a' ? 'b' : 'a';
     }
     this.lastReadyCharges = view.readyCharges;
 
@@ -60,7 +68,10 @@ export class DodgeEndurancePainter {
       `${Math.round(view.value)} / ${DODGE_ENDURANCE_MAX}`,
     );
     this.writers.setAttr(this.root, 'data-charges', String(view.readyCharges));
+    this.writers.setAttr(this.root, 'data-spent-slot', String(this.spentSlot));
     this.writers.toggleClass(this.root, 'recovered-a', this.recoveryPhase === 'a');
     this.writers.toggleClass(this.root, 'recovered-b', this.recoveryPhase === 'b');
+    this.writers.toggleClass(this.root, 'spent-a', this.spentPhase === 'a');
+    this.writers.toggleClass(this.root, 'spent-b', this.spentPhase === 'b');
   }
 }

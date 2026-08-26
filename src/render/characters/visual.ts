@@ -57,6 +57,7 @@ import {
   takeFarBakeBudget,
   tintedFarMaterials,
 } from './assets';
+import { PLAYER_DODGE_ROLL_DURATION } from './dodge_roll_clip';
 import {
   createGhostEffectMaterial,
   createMoonkinEffectMaterial,
@@ -1525,7 +1526,10 @@ export class CharacterVisual {
     if (!clip) return;
     const action = this.action(clip);
     if (!action) return;
-    const timeScale = Math.min(2.5, Math.max(0.5, action.getClip().duration / 0.75));
+    const timeScale = Math.min(
+      2.5,
+      Math.max(0.5, action.getClip().duration / PLAYER_DODGE_ROLL_DURATION),
+    );
     this.playOneShot(clip, timeScale, 1, null, DODGE_TRANSITION);
   }
 

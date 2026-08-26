@@ -18,6 +18,10 @@ import { enterOfflineGame } from './enter_offline_game.mjs';
 const URL = process.env.GAME_URL ?? 'http://localhost:5173';
 const OUT_DIR = 'tmp/vfx_ingame';
 const CAST_SETTLE_MS = Number(process.env.VFX_PROBE_SETTLE_MS ?? 600);
+const SKIP_SPEC_SWEEP = process.argv.includes('--real-casts-only');
+const CLASS_FILTER = process.argv
+  .find((arg) => arg.startsWith('--class='))
+  ?.slice('--class='.length);
 fs.mkdirSync(OUT_DIR, { recursive: true });
 
 const browser = await puppeteer.launch({
@@ -79,7 +83,9 @@ console.log(
 );
 await new Promise((r) => setTimeout(r, 500));
 
-const specIds = await page.evaluate(() => Object.keys(window.__game.abilityVfxProbe.specs).sort());
+const specIds = SKIP_SPEC_SWEEP
+  ? []
+  : await page.evaluate(() => Object.keys(window.__game.abilityVfxProbe.specs).sort());
 
 const results = {};
 let shot = 0;
@@ -187,15 +193,12 @@ const LONG_SILENT_BUFFS = new Set([
 ]);
 
 const REAL_CASTS = {
-  // spec: committed spec id, required for spec-gated kit (Blood Toll is
-  // arms/prot-only). crusader_strike is talent-GRANTED, not base kit, so the
-  // paladin asserts judgement instead.
-  // warrior: talent GRANTS (meta.talentMods.grants) make Blood Toll and
-  // Bladestorm castable while the base kit stays intact: committing a spec
-  // would DROP heroic_strike, which every committed spec excludes.
+  // Warrior: a talent GRANT makes Bladestorm castable while the base kit
+  // stays intact. Committing a spec would drop Heroic Strike, which every
+  // committed spec excludes.
   warrior: {
-    grants: ['bloodrage', 'bladestorm'],
-    buff: 'bloodrage',
+    grants: ['bladestorm'],
+    buff: 'battle_shout',
     strike: 'heroic_strike',
     extraSpin: 'bladestorm',
   },
@@ -205,8 +208,10 @@ const REAL_CASTS = {
   druid: { bolt: 'wrath', buff: 'mark_of_the_wild' },
   shaman: { bolt: 'lightning_bolt', buff: 'lightning_shield' },
   hunter: { bolt: 'arcane_shot', buff: 'aspect_of_the_hawk', strike: 'raptor_strike' },
-  paladin: { buff: 'seal_of_righteousness', bolt2: 'judgement' },
-  rogue: { buff: 'evasion', strike: 'sinister_strike' },
+  // v0.40 retired Judgement and Oathbrand from the authoritative kit. Hammer
+  // of Grace is the actual level-one projectile players see on a fresh bar.
+  paladin: { bolt: 'hammer_of_grace' },
+  rogue: { strike: 'sinister_strike' },
 };
 
 async function realCastClass(cls, plan) {
@@ -360,6 +365,7 @@ async function realCastClass(cls, plan) {
 
 const realCasts = [];
 for (const [cls, plan] of Object.entries(REAL_CASTS)) {
+  if (CLASS_FILTER && cls !== CLASS_FILTER) continue;
   let out = await realCastClass(cls, plan);
   if (out.error) out = await realCastClass(cls, plan); // one retry on a flaky boot
   realCasts.push(out);
@@ -455,6 +461,8 @@ const failed = Object.entries(results).filter(([, r]) => !r.claimed || r.primiti
 const report = {
   url: URL,
   when: new Date().toISOString(),
+  availableSpecCount: setup.specCount,
+  specSweepSkipped: SKIP_SPEC_SWEEP,
   specCount: specIds.length,
   claimedCount: claimed.length,
   withPrimitivesCount: withPrimitives.length,
@@ -474,7 +482,7 @@ const report = {
 };
 fs.writeFileSync(`${OUT_DIR}/report.json`, JSON.stringify(report, null, 2));
 console.log(
-  `coverage: ${specIds.length - failed.length}/${specIds.length} at the archetype bar, ` +
+  `${SKIP_SPEC_SWEEP ? 'coverage: synthetic spec sweep skipped' : `coverage: ${specIds.length - failed.length}/${specIds.length} at the archetype bar`}, ` +
     `${claimed.length} claimed, ${withPrimitives.length} with primitives, ` +
     `${failed.length} below bar, buffBand=${buffBandDelta}, ` +
     `realCastFails=${realCastFails.length}, ${pageerrors.length} pageerrors`,

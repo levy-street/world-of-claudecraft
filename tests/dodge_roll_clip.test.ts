@@ -5,6 +5,7 @@ import {
   PLAYER_DODGE_ROLL_DURATION,
 } from '../src/render/characters/dodge_roll_clip';
 import { PLAYER_DODGE_ROLL_CLIP, PLAYER_DODGE_ROLL_CLIPS } from '../src/render/dodge_visual_core';
+import { DODGE_DURATION } from '../src/sim/player_dodge';
 
 const BONES = [
   'hips',
@@ -34,6 +35,10 @@ function sourceClip(): THREE.AnimationClip {
 }
 
 describe('player dodge roll clip', () => {
+  it('shares the authoritative movement and evade duration', () => {
+    expect(PLAYER_DODGE_ROLL_DURATION).toBe(DODGE_DURATION);
+  });
+
   it('builds a root-locked full roll for the server dodge window', () => {
     const clip = createPlayerDodgeRollClip(sourceClip());
     expect(clip.name).toBe(PLAYER_DODGE_ROLL_CLIP);
