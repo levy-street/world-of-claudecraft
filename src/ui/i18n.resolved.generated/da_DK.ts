@@ -13556,6 +13556,12 @@ export const da_DK: EnTranslations = {
       "ps_passing_stone": {
         "name": "Hvilesten"
       },
+      "cogwheel_blank": {
+        "name": "Cogwheel Blank"
+      },
+      "copperlens_ocular": {
+        "name": "Copperlens Ocular"
+      },
       "conjured_water4": {
         "name": "Fremmanet kildevand"
       },

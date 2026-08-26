@@ -13556,6 +13556,12 @@ export const pt_BR: EnTranslations = {
       "ps_passing_stone": {
         "name": "Pedra de Passagem"
       },
+      "cogwheel_blank": {
+        "name": "Cogwheel Blank"
+      },
+      "copperlens_ocular": {
+        "name": "Copperlens Ocular"
+      },
       "conjured_water4": {
         "name": "Água de Nascente Conjurada"
       },

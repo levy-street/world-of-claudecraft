@@ -2091,7 +2091,10 @@ export const INTERMEDIATE_RECIPES: ProfessionRecipeRecord[] = [
   // The nine consumers, each gold-negative on the buyValue-else-sellValue
   // basis with the Catalyst priced at its 50 sellValue: billet 246 vs 45,
   // plating 256 vs 45, cording 105 vs 40, bolt 255 vs 45, setting 206 vs 45,
-  // chassis 290 vs 45, stock 130 vs 30, reagent 128 vs 40, vellum 258 vs 45.
+  // chassis 308 vs 45 (290 until masterwrought Phase 11o ADDED the
+  // cogwheel_blank row at its 18 sellValue basis, qr-11o-ENG's R18
+  // add-never-substitute shape), stock 130 vs 30, reagent 128 vs 40,
+  // vellum 258 vs 45.
   // (The stock read 98 here from Phase 07 until masterwrought Phase 11g's
   // DECISION C put marsh_rice 2 plus bog_beet 2 in that bill and left this
   // number behind. Corrected by Phase 11h's verify pass over the same row,
@@ -2189,6 +2192,12 @@ export const INTERMEDIATE_RECIPES: ProfessionRecipeRecord[] = [
       { itemId: 'ashwood_log', count: 2 },
       { itemId: 'thorium_ore', count: 2 },
       { itemId: 'quickening_catalyst', count: 1 },
+      // ADDED at masterwrought Phase 11o (qr-11o-ENG, R18 add-never-
+      // substitute): the skill-0 on-ramp part gains its real consumer inside
+      // engineering's own chain. Tier-0 material, so the bill's masterwork
+      // materialTierBonus is unchanged (the bonus is the MAX reagent tier and
+      // the Catalyst already holds it at 2; measured delta 0).
+      { itemId: 'cogwheel_blank', count: 1 },
     ],
     skillReq: 75,
     itemLevelBudget: 20,
@@ -3302,11 +3311,19 @@ export const APEX_CONSUMABLE_RECIPES: ProfessionRecipeRecord[] = [
 // All four are `acquisition: ['trainer']` per the post-freeze authoring
 // default: Tinker Gizzel at the Eastbrook toolworks teaches them with no
 // content edit (the trainer list derives from the station). skillReq
-// 25/50/75/125 resolves to trainer tiers 1/2/3/5, all inside engineering's
+// 0/50/75/125 resolves to trainer tiers 0/2/3/5, all inside engineering's
 // learnable band, honoring the ROD_RECIPES lesson (a trainer-taught recipe
 // above the cap band is permanently unlearnable). The rung-4 shape
 // (skillReq 75, itemLevelBudget 20, level 20, toolworks) matches every other
 // tier-4 tool recipe in TOOL_RECIPES.
+// AMENDED 2026-08-25 (masterwrought Phase 11o, qr-11o-ENG): recipe_bronze_hoe
+// re-tiered skillReq 25 to 0, so engineering has a learnable row at skill 0
+// (teachTierMet reads tier 0 at skill 0; the old tier-1 rung was unlearnable
+// below skill 25, which left engineering with no on-ramp at all). The bill,
+// the one-tier-below fine-twin invariant, and the ladder's shape are
+// untouched; the teach fee drops to the tier-0 fee (0 copper) by the shipped
+// fee ladder, correct for an on-ramp row. The 0-to-75 climb is completed by
+// ENGINEERING_ONRAMP_RECIPES below (the same ruling's part and gadget).
 //
 // THE APEX RUNG STAYS TRAINER-TAUGHT, and the honest statement of why is that
 // this is a CHOICE BETWEEN TWO LIVE READINGS rather than a rung the rules
@@ -3347,7 +3364,7 @@ export const HOE_RECIPES: ProfessionRecipeRecord[] = [
       { itemId: 'fine_vale_wheat', count: 4 },
       { itemId: 'garden_hoe', count: 1 },
     ],
-    skillReq: 25,
+    skillReq: 0,
     itemLevelBudget: 10,
     level: 10,
     stationType: 'toolworks',
@@ -3414,6 +3431,80 @@ export const HOE_RECIPES: ProfessionRecipeRecord[] = [
     skillReq: 125,
     itemLevelBudget: 30,
     level: 20,
+    stationType: 'toolworks',
+    acquisition: ['trainer'],
+  },
+];
+
+// The engineering on-ramp (masterwrought Phase 11o, qr-11o-ENG,
+// farming/state.md row 119). Measured before it: engineering had NOTHING
+// craftable below skillReq 75 except the two mid hoe rungs, its cheapest
+// pre-absorb recipe sat at tier 3, ABOVE the unattuned archetype ceiling of
+// 2 (archetypeCeilingFor), so an unattuned character could never gain a
+// single point of engineering, and an attuned major leveled 0 to 75 almost
+// exclusively on one recipe family. Two rows close the hole beside the
+// re-tiered recipe_bronze_hoe above:
+//
+// - The PART, a skillReq-0 junk-kind component in the mechanical-parts
+//   register (the precision_chassis materials doctrine: kind 'junk', quality
+//   'common', sellValue only, ordinary tradable). It is not a dead starter
+//   trinket: it JOINS the shipped recipe_precision_chassis bill as an ADDED
+//   reagent row (masterwrought R18's add-never-substitute shape), so the
+//   first thing a new engineer makes is a real input of engineering's own
+//   tier-3 chain, and it feeds the gadget below. Its bill keeps a
+//   no-buyValue reagent (copper_ore) so the row never joins the
+//   counterfactually-vendor-fed set. Input 56 (copper 4x4 + flux 2x20 on the
+//   buyValue-else-sellValue basis) vs output 18: gold-negative.
+// - The GADGET, a skillReq-25 uncommon caster offhand on engineering's OWN
+//   held-lens identity (gyrelens_array's int/sta dps-caster line, one
+//   register down; deliberately NOT inscription's int/spi tome identity, so
+//   the two crafts' rung-25 offhands do not collide). Pure stats on the
+//   formula budget at the rung convention (ilvl 16 held line: int 3 + sta 2
+//   = 5), no use field, no ratings (masterwrought R14 forbids procs and new
+//   combat effects, and the gyrelens comment records that no cosmetic-use
+//   family exists to reuse), and no vendor sells ANY held_offhand
+//   (masterwrought R23 clear by census). Input 44 (the cogwheel 18 + copper
+//   2x4 + dust 3x6) vs output 36: gold-negative.
+//
+// Both are trainer-taught at the toolworks (Tinker Gizzel derives them from
+// the station, no NPC edit) with skillReq 0/25 resolving to tiers 0/1, both
+// inside every ceiling. The acceptance is pinned by
+// tests/professions_engineering_onramp.test.ts: an unattuned character can
+// gain engineering 0 to 25, and the attuned 0-to-75 climb needs no
+// grandfathered tier-3 tool craft. Ids are new and append-only
+// (tests/shipped_item_ids.test.ts); art parks per ip-16-ICON.
+export const ENGINEERING_ONRAMP_RECIPES: ProfessionRecipeRecord[] = [
+  {
+    id: 'recipe_cogwheel_blank',
+    professionId: 'engineering',
+    resultItemId: 'cogwheel_blank',
+    resultCount: 1,
+    // Input 56 vs output 18 (copper_ore is the no-buyValue reagent).
+    reagents: [
+      { itemId: 'copper_ore', count: 4 },
+      { itemId: 'smithing_flux', count: 2 },
+    ],
+    skillReq: 0,
+    itemLevelBudget: 10,
+    level: 10,
+    stationType: 'toolworks',
+    acquisition: ['trainer'],
+  },
+  {
+    id: 'recipe_copperlens_ocular',
+    professionId: 'engineering',
+    resultItemId: 'copperlens_ocular',
+    resultCount: 1,
+    // Input 44 vs output 36; consumes the rung below (the cogwheel), the
+    // ladder shape every tool family here already uses.
+    reagents: [
+      { itemId: 'cogwheel_blank', count: 1 },
+      { itemId: 'copper_ore', count: 2 },
+      { itemId: 'arcane_dust', count: 3 },
+    ],
+    skillReq: 25,
+    itemLevelBudget: 16,
+    level: 15,
     stationType: 'toolworks',
     acquisition: ['trainer'],
   },
@@ -4385,6 +4476,8 @@ export const ALL_RECIPES: ProfessionRecipeRecord[] = [
   ...HOE_RECIPES,
   ...FARM_RECIPES,
   ...TROPHY_RECIPES,
+  // Appended at the END (masterwrought Phase 11o): no earlier position moves.
+  ...ENGINEERING_ONRAMP_RECIPES,
 ];
 
 // O(1) indexes for the two per-lookup resolvers below (the recipe table grows

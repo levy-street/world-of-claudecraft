@@ -2718,6 +2718,12 @@ const ITEM_ENTITY_IDS = [
   'ps_lustrous_pearl',
   'mother_of_pearl',
   'ps_passing_stone',
+  // masterwrought Phase 11o, the engineering on-ramp (qr-11o-ENG). Appended
+  // at the END under the append-only contract; both resolve BY KEY. Both
+  // names are wordy English, so M16 non-Latin fills land in the
+  // src/ui/i18n.locales overlays in the same change.
+  'cogwheel_blank',
+  'copperlens_ocular',
 ] as const;
 
 type ItemEntityId = (typeof ITEM_ENTITY_IDS)[number];
@@ -3096,6 +3102,9 @@ const APPENDED_ITEM_NAMES: Partial<Record<ItemEntityId, string>> = {
   ps_lustrous_pearl: 'Lustrous Pearl',
   mother_of_pearl: 'Mother of Pearl',
   ps_passing_stone: 'Passing Stone',
+  // masterwrought Phase 11o, the engineering on-ramp.
+  cogwheel_blank: 'Cogwheel Blank',
+  copperlens_ocular: 'Copperlens Ocular',
 };
 
 function itemTranslations(names: readonly string[]): ItemEntityTranslations {

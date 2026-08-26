@@ -1443,10 +1443,13 @@ describe('masterwrought Phase 11h: what it did NOT touch', () => {
     // again ALL_RECIPES alone, this time downward. Then 163 at the 11l QA,
     // which excluded the cracked fetish and the bogiron nugget under the same
     // standard and deleted their rows (seven trophy consumer rows):
-    // ALL_RECIPES alone, downward again.
+    // ALL_RECIPES alone, downward again. Then 165 at masterwrought Phase
+    // 11o, which minted the two engineering on-ramp rows (the skill-0
+    // cogwheel and the skill-25 ocular, qr-11o-ENG): ALL_RECIPES alone,
+    // upward, with two NEW item ids (the first mint since 11k to add ids).
     expect(APEX_CONSUMABLE_RECIPES).toHaveLength(13);
     expect(INTERMEDIATE_RECIPES).toHaveLength(10);
-    expect(ALL_RECIPES).toHaveLength(163);
+    expect(ALL_RECIPES).toHaveLength(165);
     for (const row of APEX_ROWS) {
       expect(requireRecipe(row.id).skillReq, `${row.id} rung`).toBe(row.rung);
     }

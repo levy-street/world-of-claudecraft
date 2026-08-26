@@ -99,7 +99,9 @@ describe('the crafted hoe ladder', () => {
         `${recipe.id} skillReq ${recipe.skillReq} is above the reachable tier`,
       ).toBeLessThanOrEqual(tierForSkill(cap));
     }
-    expect(HOE_RECIPES.map((r) => r.skillReq)).toEqual([25, 50, 75, 125]);
+    // Rung 1 re-tiered 25 to 0 at masterwrought Phase 11o (qr-11o-ENG): the
+    // on-ramp row must be learnable at skill 0.
+    expect(HOE_RECIPES.map((r) => r.skillReq)).toEqual([0, 50, 75, 125]);
   });
 
   it('the apex rung takes the greens at COUNT 2, both of which are arguable and neither derived', () => {

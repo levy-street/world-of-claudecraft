@@ -13556,6 +13556,12 @@ export const id_ID: EnTranslations = {
       "ps_passing_stone": {
         "name": "Batu Pelepasan"
       },
+      "cogwheel_blank": {
+        "name": "Cogwheel Blank"
+      },
+      "copperlens_ocular": {
+        "name": "Copperlens Ocular"
+      },
       "conjured_water4": {
         "name": "Air Mata Air Sihir"
       },

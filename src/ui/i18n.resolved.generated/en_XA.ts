@@ -13556,6 +13556,12 @@ export const en_XA: EnTranslations = {
       "ps_passing_stone": {
         "name": "[Þáššíñĝ Šţóñé]"
       },
+      "cogwheel_blank": {
+        "name": "[Çóĝŵĥééļ Ɓļáñķ]"
+      },
+      "copperlens_ocular": {
+        "name": "[Çóþþéŕļéñš Óçúļáŕ]"
+      },
       "conjured_water4": {
         "name": "[Çóñĵúŕéð Šþŕíñĝŵáţéŕ]"
       },

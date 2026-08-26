@@ -13556,6 +13556,12 @@ export const ja_JP: EnTranslations = {
       "ps_passing_stone": {
         "name": "たましいの石"
       },
+      "cogwheel_blank": {
+        "name": "歯車のブランク"
+      },
+      "copperlens_ocular": {
+        "name": "銅レンズの単眼鏡"
+      },
       "conjured_water4": {
         "name": "魔法の湧き水"
       },

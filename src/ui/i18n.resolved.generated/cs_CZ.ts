@@ -13556,6 +13556,12 @@ export const cs_CZ: EnTranslations = {
       "ps_passing_stone": {
         "name": "Kámen přechodu"
       },
+      "cogwheel_blank": {
+        "name": "Cogwheel Blank"
+      },
+      "copperlens_ocular": {
+        "name": "Copperlens Ocular"
+      },
       "conjured_water4": {
         "name": "Vyčarovaná pramenitá voda"
       },

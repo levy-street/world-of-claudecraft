@@ -20,6 +20,7 @@ import {
 import {
   ALL_RECIPES,
   COMBO_RECIPES,
+  ENGINEERING_ONRAMP_RECIPES,
   FARM_DROP_RUNG_FLOOR,
   FARM_RECIPES,
   HOE_RECIPES,
@@ -556,8 +557,9 @@ describe('REFERENTIAL INTEGRITY', () => {
     // masterwrought Phase 11i added is a drop, see the derived term below), the two tool-effect
     // charms, the nine jewelcrafting catalog recipes, the six inscription
     // catalog recipes, the ten Masterwrought phase 07 intermediates, the
-    // three crafted hoes, the seven Masterwrought phase 11l trophy consumers,
-    // and the farm-economy set's ON-RAMP: the
+    // four crafted hoes, the seven Masterwrought phase 11l trophy consumers,
+    // the two masterwrought Phase 11o engineering on-ramp rows, and the
+    // farm-economy set's ON-RAMP: the
     // pre-training id list is frozen, so anything authored after that switch
     // has to be learned.
     //
@@ -593,8 +595,11 @@ describe('REFERENTIAL INTEGRITY', () => {
         INTERMEDIATE_RECIPES.length +
         HOE_RECIPES.length +
         TROPHY_RECIPES.length +
+        ENGINEERING_ONRAMP_RECIPES.length +
         farmTrainerRows,
     );
+    // The sibling literal for the 11o term: two rows, both trainer-taught.
+    expect(ENGINEERING_ONRAMP_RECIPES, 'the engineering on-ramp is two rows').toHaveLength(2);
     // The sibling literal for the derived term, same reason every other term
     // has one: without it, a farm row deleted outright would shrink both sides
     // of the equality by one and the arm would pass over a smaller world.
@@ -983,6 +988,10 @@ describe('REFERENTIAL INTEGRITY', () => {
         { itemId: 'ashwood_log', count: 2 },
         { itemId: 'thorium_ore', count: 2 },
         { itemId: 'quickening_catalyst', count: 1 },
+        // ADDED at masterwrought Phase 11o (qr-11o-ENG, R18
+        // add-never-substitute): the skill-0 cogwheel joins the bill, every
+        // original row intact.
+        { itemId: 'cogwheel_blank', count: 1 },
       ],
       // THE ONE INTERMEDIATE THAT IS NOT A GEAR INTERMEDIATE, and Phase 11g's
       // choke point (masterwrought DECISION C). The two tier-2 vegetables enter

@@ -13556,6 +13556,12 @@ export const sv_SE: EnTranslations = {
       "ps_passing_stone": {
         "name": "Övergångssten"
       },
+      "cogwheel_blank": {
+        "name": "Cogwheel Blank"
+      },
+      "copperlens_ocular": {
+        "name": "Copperlens Ocular"
+      },
       "conjured_water4": {
         "name": "Frambesvärjt källvatten"
       },

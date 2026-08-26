@@ -13556,6 +13556,12 @@ export const tr_TR: EnTranslations = {
       "ps_passing_stone": {
         "name": "Geçiş Taşı"
       },
+      "cogwheel_blank": {
+        "name": "Cogwheel Blank"
+      },
+      "copperlens_ocular": {
+        "name": "Copperlens Ocular"
+      },
       "conjured_water4": {
         "name": "Sihirle Yaratılmış Kaynak Suyu"
       },

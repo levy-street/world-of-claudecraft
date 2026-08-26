@@ -14217,4 +14217,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.nightshade_coating.name': '가지독 코팅',
   'entities.abilities.nightshade_coating.description':
     '대상을 가지독으로 뒤덮어 {damage}의 자연 피해를 주고 12초 동안 받는 치유 효과를 25% 감소시킵니다.',
+  // masterwrought Phase 11o, the engineering on-ramp (M16 fills).
+  'entities.items.cogwheel_blank.name': '톱니바퀴 원판',
+  'entities.items.copperlens_ocular.name': '구리 렌즈 접안경',
 };

@@ -13556,6 +13556,12 @@ export const it_IT: EnTranslations = {
       "ps_passing_stone": {
         "name": "Pietra del trapasso"
       },
+      "cogwheel_blank": {
+        "name": "Cogwheel Blank"
+      },
+      "copperlens_ocular": {
+        "name": "Copperlens Ocular"
+      },
       "conjured_water4": {
         "name": "Acqua sorgiva evocata"
       },

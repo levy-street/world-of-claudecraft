@@ -13556,6 +13556,12 @@ export const ru_RU: EnTranslations = {
       "ps_passing_stone": {
         "name": "Камень Ухода"
       },
+      "cogwheel_blank": {
+        "name": "Заготовка шестерни"
+      },
+      "copperlens_ocular": {
+        "name": "Окуляр с медной линзой"
+      },
       "conjured_water4": {
         "name": "Сотворённая родниковая вода"
       },

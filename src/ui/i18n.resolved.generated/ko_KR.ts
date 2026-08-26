@@ -13556,6 +13556,12 @@ export const ko_KR: EnTranslations = {
       "ps_passing_stone": {
         "name": "안식의 돌"
       },
+      "cogwheel_blank": {
+        "name": "톱니바퀴 원판"
+      },
+      "copperlens_ocular": {
+        "name": "구리 렌즈 접안경"
+      },
       "conjured_water4": {
         "name": "창조된 샘물"
       },

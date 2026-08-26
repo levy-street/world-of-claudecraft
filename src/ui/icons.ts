@@ -3975,6 +3975,18 @@ const ITEM_RECIPES: Record<string, IconRecipe> = {
   // gathering tools take rather than a water radial, with the fish accent
   // naming what it is for.
   clockreel_fishing_rod: r('steel', 'steel', ['staff', { p: 'fish', pal: 'sky', ...BR }], ['glow']),
+  // The engineering on-ramp pair (masterwrought Phase 11o), the same
+  // ART_PENDING drawn stand-in treatment and the same A4 pairwise-distinctness
+  // demand as the parked families above. The blank is a bare gear on the junk
+  // ground (the material register: unfinished, no accent); the ocular is a
+  // lens seated in a brass ring on the arcane ground (the gyrelens family's
+  // register one rung down), no glow (uncommon; glow starts at rare in the
+  // tool families here).
+  cogwheel_blank: r('junk', 'steel', [{ p: 'gear', pal: 'steel', s: 1.2 }]),
+  copperlens_ocular: r('arcane', 'gold', [
+    { p: 'coin', pal: 'gold', s: 1.15 },
+    { p: 'gem', pal: 'sky', s: 0.7 },
+  ]),
   // misc UI icons (not real items)
   coin_gold: r('treasure', 'gold', ['coin'], ['sparkle']),
   slot_empty: r('junk', 'silverWhite', []),
@@ -5847,6 +5859,11 @@ export const ITEM_ART_PENDING = new Set<string>([
   'vale_wheat',
   'vale_wheat_seed',
   'withered_husks',
+  // The engineering on-ramp pair (masterwrought Phase 11o, qr-11o-ENG): the
+  // same scheduled art park as the phase 11e-11k ids above (ip-16-ICON), with
+  // authored recipes in ITEM_RECIPES and NO mapping.json row while parked.
+  'cogwheel_blank',
+  'copperlens_ocular',
 ]);
 
 /** Static URL of an item's (or a UI pseudo-item's) image icon, or null if it uses a recipe. */

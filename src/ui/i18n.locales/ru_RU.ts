@@ -14409,4 +14409,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.nightshade_coating.name': 'Покрытие паслёном',
   'entities.abilities.nightshade_coating.description':
     'Покрывает цель паслёном, нанося {damage} ед. урона от сил природы и снижая получаемое ею исцеление на 25% на 12 сек.',
+  // masterwrought Phase 11o, the engineering on-ramp (M16 fills).
+  'entities.items.cogwheel_blank.name': 'Заготовка шестерни',
+  'entities.items.copperlens_ocular.name': 'Окуляр с медной линзой',
 };

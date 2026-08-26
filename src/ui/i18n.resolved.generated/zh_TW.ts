@@ -13556,6 +13556,12 @@ export const zh_TW: EnTranslations = {
       "ps_passing_stone": {
         "name": "往生石"
       },
+      "cogwheel_blank": {
+        "name": "齒輪坯件"
+      },
+      "copperlens_ocular": {
+        "name": "銅透鏡目鏡"
+      },
       "conjured_water4": {
         "name": "魔法泉水"
       },

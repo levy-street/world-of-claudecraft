@@ -559,6 +559,48 @@ rejected).
   schematic follow the shipped pattern_<output item id> contract, so they are
   derived rather than coined, and ids are never player-visible anyway.
 
+### Phase 11o, the engineering on-ramp (web-verified 2026-08-25)
+
+Scope: the two new item ids qr-11o-ENG mints (farming/state.md row 119), a
+skill-0 mechanical component and a skill-25 crafted caster offhand. Both
+identities derive from registers this catalog already owns: the
+precision_chassis mechanical-parts doctrine for the component, and the
+gyrelens_array held-lens line, one register down, for the gadget. Method per
+the standing bar: quoted exact-phrase search, the coined half alone, and an
+adversarial pass against the wikis whose vocabulary is closest (WoW owns
+engineering socketry; FFXIV owns crafted eyewear and lens reagents).
+
+- **Cogwheel Blank** (cogwheel_blank, the skill-0 part) CLEAR with recorded
+  shared-vocabulary neighbours. Exact phrase zero-hit across the majors.
+  "Cogwheel" alone is generic mechanical English, but WoW owns a whole
+  adjective-Cogwheel family in the same craft (the cogwheel socket gems Quick,
+  Precise, Rigid, Subtle and kin, plus Earthen Cogwheel and Overclocked
+  Cogwheel), so the construction here deliberately inverts to noun-plus-Blank,
+  a machinist's term for an unfinished casting that no surveyed game uses as
+  an item name. In-repo grep: no other Cogwheel or Blank item; the nearest
+  sibling is our own Precision Chassis, the doctrine this part follows.
+- **Copperlens Ocular** (copperlens_ocular, the skill-25 gadget) CLEAR.
+  "Copperlens" as a coined token is zero-hit everywhere searched; the exact
+  phrase likewise. Nearest neighbours recorded: FFXIV's Copper Spectacles
+  (facewear, different role and different words) and its lens reagent line
+  (Clear Glass Lens, Tarnished Gordian Lens), RuneScape's Spectral lens
+  (slayer gear). No Ocular-named held offhand surfaced in the WoW sweeps; the
+  real-world Oculus brand is a different word in a different category.
+  In-repo: the name deliberately joins our own Gyrelens Array register one
+  rung down, which is the point of the family.
+
+REJECTED AT AUTHORING, recorded so none is re-proposed: any
+**adjective-plus-Cogwheel** construction (COLLISION CLASS: WoW's cogwheel
+socket-gem family owns that shape wholesale). **Copperlens Array** (in-repo:
+Array is the apex register word on Gyrelens Array; reusing it one rung down
+reads as a tier claim the item does not hold). **Tempered Pawl** (CLEAR,
+zero-hit, declined on readability: a pawl is real ratchet vocabulary no player
+parses at a glance, and the register already offers the cogwheel).
+
+- Also swept and clear: the two ids themselves and the recipe ids
+  (recipe_<output item id>, the shipped derived contract; ids are never
+  player-visible anyway).
+
 ## Recorded for the maintainer (stopping rule: no unilateral rename)
 
 STATUS 2026-08-20, SETTLED BY THE MAINTAINER, and the scope is narrow on purpose.

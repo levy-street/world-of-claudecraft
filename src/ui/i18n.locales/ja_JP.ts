@@ -14213,4 +14213,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.nightshade_coating.name': 'ナス科毒の塗布',
   'entities.abilities.nightshade_coating.description':
     '対象をナス科毒で覆い、{damage}の自然ダメージを与え、12秒間受ける回復量を25%低下させます。',
+  // masterwrought Phase 11o, the engineering on-ramp (M16 fills).
+  'entities.items.cogwheel_blank.name': '歯車のブランク',
+  'entities.items.copperlens_ocular.name': '銅レンズの単眼鏡',
 };

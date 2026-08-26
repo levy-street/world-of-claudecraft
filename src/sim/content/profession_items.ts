@@ -1564,4 +1564,34 @@ export const PROFESSION_ITEMS: Record<string, ItemDef> = {
     bagSlots: 16,
     sellValue: 180,
   },
+
+  // --- Engineering on-ramp (masterwrought Phase 11o, qr-11o-ENG) -----------
+  // The skill-0 part and the skill-25 gadget that make engineering levelable
+  // from zero (ENGINEERING_ONRAMP_RECIPES in content/recipes.ts carries the
+  // full derivation). The part follows the intermediates materials doctrine
+  // above (kind 'junk', quality 'common', sellValue only, ordinary tradable);
+  // tier 0 in material_tier.ts by omission, on purpose, so the chassis bill
+  // it joins keeps its masterwork material bonus unchanged.
+  cogwheel_blank: {
+    id: 'cogwheel_blank',
+    name: 'Cogwheel Blank',
+    kind: 'junk',
+    quality: 'common',
+    sellValue: 18,
+  },
+  // Engineering's own held-lens identity one register below gyrelens_array:
+  // pure stats on the formula at the rung-25 convention (level 15 + uncommon
+  // bonus 1 = ilvl 16; held line 0.75: int:3+sta:2 = 5), no use field, no
+  // ratings (masterwrought R14), no vendor twin (masterwrought R23; no vendor
+  // sells any held_offhand). Caster lock per the wraithfire_orb gate.
+  copperlens_ocular: {
+    id: 'copperlens_ocular',
+    name: 'Copperlens Ocular',
+    kind: 'held_offhand',
+    slot: 'offhand',
+    quality: 'uncommon',
+    stats: { int: 3, sta: 2 },
+    sellValue: 36,
+    requiredClass: ['mage', 'priest', 'warlock', 'shaman', 'paladin', 'druid'],
+  },
 };

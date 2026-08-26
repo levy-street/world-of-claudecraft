@@ -13556,6 +13556,12 @@ export const vi_VN: EnTranslations = {
       "ps_passing_stone": {
         "name": "Đá Từ Trần"
       },
+      "cogwheel_blank": {
+        "name": "Cogwheel Blank"
+      },
+      "copperlens_ocular": {
+        "name": "Copperlens Ocular"
+      },
       "conjured_water4": {
         "name": "Nước Suối Được Tạo Phép"
       },

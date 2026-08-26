@@ -13917,4 +13917,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.nightshade_coating.name': '夜影涂层',
   'entities.abilities.nightshade_coating.description':
     '用夜影覆盖目标，造成 {damage} 点自然伤害，并使其受到的治疗降低 25%，持续 12 秒。',
+  // masterwrought Phase 11o, the engineering on-ramp (M16 fills).
+  'entities.items.cogwheel_blank.name': '齿轮坯件',
+  'entities.items.copperlens_ocular.name': '铜透镜目镜',
 };
