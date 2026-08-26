@@ -11,7 +11,7 @@
 //
 // Scope: originally the common-tier path only; the module now also resolves
 // the higher-tier content that landed on it (content/recipes.ts TOOL_RECIPES
-// at skillReq 75/150, COMBO_RECIPES at skillReq 25), the #1132 combo gate,
+// at skillReq 75/125, COMBO_RECIPES at skillReq 25), the #1132 combo gate,
 // the #1129 archetype empowerment ceiling, the #1299 acquisition gate, and
 // the #1301 gold sink + output throttle. There is still NO skillReq
 // admission gate: any known recipe is attemptable on materials alone, and
@@ -750,7 +750,7 @@ export function resolveCraftForRecipe(
   // charged on every successful craft, common tier included (the free-floor
   // rule from #1126/#1127 only ever meant free of a HARD gate; a gold fee on
   // a common-tier craft was already implicit once #1301 landed a sink on
-  // every craft, TOOL_RECIPES' skillReq 75/150 included). Never blocks a
+  // every craft, TOOL_RECIPES' skillReq 75/125 included). Never blocks a
   // craft the player would otherwise be able to perform: floored at 0 copper
   // rather than denied, so a broke player still crafts, just contributes
   // nothing to the sink that trip. Content-driven via

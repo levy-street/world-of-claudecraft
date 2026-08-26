@@ -7,7 +7,9 @@
 // Scope: COMMON_RECIPES all carry skillReq 0 (the free floor: a common-tier
 // recipe is craftable with zero craft skill, gated only by having the
 // materials). The file has since grown past that floor: TOOL_RECIPES
-// (skillReq 75/150, station-bound at the toolworks) and COMBO_RECIPES
+// (skillReq 75/125 since masterwrought Phase 11o retired the fictional 150
+// rung to the reachable cap tier, station-bound at the toolworks) and
+// COMBO_RECIPES
 // (skillReq 25, the #1132 dual-craft gate) sit alongside it. There is still
 // no skillReq admission gate anywhere: crafting.ts reads skillReq only for
 // skill-gain scaling, and itemLevelBudget feeds the #1301 gold sink.
@@ -277,7 +279,7 @@ export const TOOL_RECIPES: ProfessionRecipeRecord[] = [
       { itemId: 'fine_thorium_ore', count: 2 },
       { itemId: 'thorium_mining_pick', count: 1 },
     ],
-    skillReq: 150,
+    skillReq: 125,
     itemLevelBudget: 30,
     level: 20,
     stationType: 'toolworks',
@@ -305,7 +307,7 @@ export const TOOL_RECIPES: ProfessionRecipeRecord[] = [
       { itemId: 'fine_elderwood_log', count: 2 },
       { itemId: 'ashwood_axe', count: 1 },
     ],
-    skillReq: 150,
+    skillReq: 125,
     itemLevelBudget: 30,
     level: 20,
     stationType: 'toolworks',
@@ -333,7 +335,7 @@ export const TOOL_RECIPES: ProfessionRecipeRecord[] = [
       { itemId: 'fine_sunpetal_herb', count: 2 },
       { itemId: 'goldleaf_sickle', count: 1 },
     ],
-    skillReq: 150,
+    skillReq: 125,
     itemLevelBudget: 30,
     level: 20,
     stationType: 'toolworks',
@@ -403,18 +405,25 @@ export const TOOL_RECIPES: ProfessionRecipeRecord[] = [
 //   wrong, because a market cannot carry an item no player can produce. The
 //   band-5 catch is a REWARD for owning the rod, never an input to it.
 //
-// SKILL REQUIREMENTS ARE ALL THREE INSIDE ENGINEERING'S CAP (125), unlike the
-// tier-5 land tools at 75/150. 150 resolves to tier 6 while the cap resolves
-// to tier 5, and BOTH learning channels run the same gate (teachTierMet in
+// SKILL REQUIREMENTS ARE ALL THREE INSIDE ENGINEERING'S CAP (125). The
+// STANDING RULE for every new row: a skillReq above the cap band resolves to
+// a tier no player can reach (150 resolves to tier 6 while the cap resolves
+// to tier 5), and BOTH learning channels run the same gate (teachTierMet in
 // professions/training.ts and the 'tier' deny arm in
-// professions/pattern_items.ts), so a recipe authored at 150 is permanently
-// unlearnable through a trainer AND through a pattern: dead content that no
-// test would red on, because there is no craft-time skillReq admission gate to
-// catch it. The land tools escape that only because they predate training and
-// are grandfathered known (PRE_TRAINING_RECIPE_IDS, frozen). 125 is the
+// professions/pattern_items.ts), so a recipe authored above the cap is
+// permanently unlearnable through a trainer AND through a pattern: dead
+// content that no test would red on, because there is no craft-time skillReq
+// admission gate to catch it. 125 is the
 // reachable top rung, which is exactly where APEX_CONSUMABLE_RECIPES already
 // puts its two capstones. RE-VERIFIED IN CODE at masterwrought Phase 11i and
 // handed to Phase 11j, whose apex hoe is settled on the same finding.
+// AMENDED 2026-08-25 (masterwrought Phase 11o, qr-11o-150): the historical
+// half of this lesson used to read "unlike the tier-5 land tools at 75/150",
+// which escaped the trap only by being grandfathered known
+// (PRE_TRAINING_RECIPE_IDS, frozen). Those three rows were re-tiered 150 to
+// 125 by Phase 11o: the printed tier stopped being fiction, no admission
+// behavior changed (they are acquisition-less and known to everyone), the
+// grandfather list is untouched, and the rule above STANDS for new rows.
 //
 // THE APEX RUNG IS DROP-TAUGHT, breaking the ['trainer'] pattern of the two
 // above, and that is R8 rather than convenience: an apex rung reaches players
@@ -2982,9 +2991,11 @@ export const APEX_CONSUMABLE_RECIPES: ProfessionRecipeRecord[] = [
   // phase gives both their CAPSTONE consumer at skillReq 125, the top of the
   // CONSUMABLE catalog, which is the masterwrought R20 shape the packet exists
   // to close. (Scoped at the Phase 11h QA: 125 is cooking and alchemy's
-  // ceiling. ALL_RECIPES tops out at 150, the apex tool family this phase
-  // records as out of scope, and the packet census says so: "3 at 125, 3 at
-  // 150".) Neither is a hoe twin (the hoe ladder takes fine_vale_wheat,
+  // ceiling. ALL_RECIPES topped out at 150 at that phase's own runtime, the
+  // apex tool family it recorded as out of scope, census "3 at 125, 3 at
+  // 150"; masterwrought Phase 11o later re-tiered those three to 125, so the
+  // table now tops out at the cap.) Neither is a hoe twin (the hoe ladder
+  // takes fine_vale_wheat,
   // fine_marsh_rice and fine_highland_barley under farming's deviation (ad)),
   // so nothing is double-booked.
   {

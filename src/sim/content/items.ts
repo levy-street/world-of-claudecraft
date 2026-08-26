@@ -1382,8 +1382,10 @@ export const BASE_ITEMS: Record<string, ItemDef> = {
   // recipe_grand_cauldron at skillReq 125 takes one, which is this twin's first
   // consumer outside farming and the top rung of the CONSUMABLE catalog.
   // (Scoped at the Phase 11h QA. 125 is where cooking and alchemy top out;
-  // the table itself tops out at 150, the apex gathering-tool family that
-  // is Phase 11j's, so "the whole catalog" was wrong by three rows.)
+  // the table itself topped out at 150 at that scoping's runtime, the apex
+  // gathering-tool family that is Phase 11j's, so "the whole catalog" was
+  // wrong by three rows; masterwrought Phase 11o later re-tiered those three
+  // to 125, the reachable cap.)
   //
   // CORRECTED BY masterwrought Phase 11h (11h-GATE-D, packet row N15), which
   // owns this correction because it runs before 11j and 11k. The line below is
@@ -1439,8 +1441,9 @@ export const BASE_ITEMS: Record<string, ItemDef> = {
   // masterwrought Phase 11h ALSO the cooking capstone's showcase reagent:
   // recipe_laden_hearth at skillReq 125 takes one, this twin's first consumer
   // outside farming and the top rung of the CONSUMABLE catalog
-  // (125 is cooking and alchemy's ceiling, not the table's: three
-  // engineering rows ship at 150. Scoped at the Phase 11h QA).
+  // (125 is cooking and alchemy's ceiling, and since masterwrought Phase 11o
+  // the whole table's: the three engineering rows that shipped at 150 were
+  // re-tiered to the cap. Scoped at the Phase 11h QA).
   //
   // CORRECTED BY masterwrought Phase 11h (11h-GATE-D, packet row N15), same as
   // its sunmelon sibling above and for the same reason: the line below is true

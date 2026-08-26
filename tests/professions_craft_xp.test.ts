@@ -92,10 +92,12 @@ describe('learning-coupled craft XP: taught-nothing crafts pay nothing', () => {
     expect(meta.lifetimeXp).toBe(before);
   });
 
-  it('the skillReq-150 tool chain grants zero XP at the engineering cap (the full-multiplier hole)', () => {
-    // recipe_arcanite_mining_pick is tier 6, above ANY reachable capability
-    // (cap 125 = tier 5), so the four-state curve alone reads FULL for it
-    // forever; the applied-delta coupling is what zeroes it at the cap.
+  it('the apex tool chain grants zero XP at the engineering cap (the applied-delta coupling)', () => {
+    // recipe_arcanite_mining_pick sits at tier 5, exactly the cap tier, since
+    // masterwrought Phase 11o retired its fictional 150 rung (it was tier 6
+    // before, the old full-multiplier hole). Either way the four-state curve
+    // reads FULL for a capped crafter; the applied-delta coupling is what
+    // zeroes the XP at the cap.
     const sim = makeSim();
     const pid = sim.playerId;
     sim.setPlayerLevel(20);

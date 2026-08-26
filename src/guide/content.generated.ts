@@ -7748,8 +7748,8 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
       {
         "id": "recipe_arcanite_mining_pick",
         "name": "Glyphsteel Mining Pick",
-        "skillReq": 150,
-        "tier": 6,
+        "skillReq": 125,
+        "tier": 5,
         "station": "toolworks",
         "acquisition": "known",
         "feeCopper": 0,
@@ -7775,9 +7775,9 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
         "combo": null,
         "oncePerDay": false,
         "gain": {
-          "reducedAt": 175,
-          "minimalAt": 200,
-          "zeroAt": 225
+          "reducedAt": 150,
+          "minimalAt": 175,
+          "zeroAt": 200
         }
       },
       {
@@ -7814,8 +7814,8 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
       {
         "id": "recipe_elderwood_axe",
         "name": "Highpine Axe",
-        "skillReq": 150,
-        "tier": 6,
+        "skillReq": 125,
+        "tier": 5,
         "station": "toolworks",
         "acquisition": "known",
         "feeCopper": 0,
@@ -7837,9 +7837,9 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
         "combo": null,
         "oncePerDay": false,
         "gain": {
-          "reducedAt": 175,
-          "minimalAt": 200,
-          "zeroAt": 225
+          "reducedAt": 150,
+          "minimalAt": 175,
+          "zeroAt": 200
         }
       },
       {
@@ -7876,8 +7876,8 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
       {
         "id": "recipe_sunpetal_sickle",
         "name": "Sunpetal Sickle",
-        "skillReq": 150,
-        "tier": 6,
+        "skillReq": 125,
+        "tier": 5,
         "station": "toolworks",
         "acquisition": "known",
         "feeCopper": 0,
@@ -7899,9 +7899,9 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
         "combo": null,
         "oncePerDay": false,
         "gain": {
-          "reducedAt": 175,
-          "minimalAt": 200,
-          "zeroAt": 225
+          "reducedAt": 150,
+          "minimalAt": 175,
+          "zeroAt": 200
         }
       },
       {
@@ -8024,6 +8024,10 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
           },
           {
             "name": "Quickening Catalyst",
+            "count": 1
+          },
+          {
+            "name": "Cogwheel Blank",
             "count": 1
           }
         ],
@@ -8160,11 +8164,11 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
       {
         "id": "recipe_bronze_hoe",
         "name": "Bronze Hoe",
-        "skillReq": 25,
-        "tier": 1,
+        "skillReq": 0,
+        "tier": 0,
         "station": "toolworks",
         "acquisition": "trainer",
-        "feeCopper": 2500,
+        "feeCopper": 0,
         "materials": [
           {
             "name": "Fine Vale Wheat",
@@ -8183,9 +8187,9 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
         "combo": null,
         "oncePerDay": false,
         "gain": {
-          "reducedAt": 50,
-          "minimalAt": 75,
-          "zeroAt": 100
+          "reducedAt": 25,
+          "minimalAt": 50,
+          "zeroAt": 75
         }
       },
       {
@@ -8279,6 +8283,72 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
           "reducedAt": 150,
           "minimalAt": 175,
           "zeroAt": 200
+        }
+      },
+      {
+        "id": "recipe_cogwheel_blank",
+        "name": "Cogwheel Blank",
+        "skillReq": 0,
+        "tier": 0,
+        "station": "toolworks",
+        "acquisition": "trainer",
+        "feeCopper": 0,
+        "materials": [
+          {
+            "name": "Copper Ore",
+            "count": 4
+          },
+          {
+            "name": "Smithing Flux",
+            "count": 2
+          }
+        ],
+        "output": {
+          "name": "Cogwheel Blank",
+          "count": 1,
+          "quality": "common"
+        },
+        "combo": null,
+        "oncePerDay": false,
+        "gain": {
+          "reducedAt": 25,
+          "minimalAt": 50,
+          "zeroAt": 75
+        }
+      },
+      {
+        "id": "recipe_copperlens_ocular",
+        "name": "Copperlens Ocular",
+        "skillReq": 25,
+        "tier": 1,
+        "station": "toolworks",
+        "acquisition": "trainer",
+        "feeCopper": 2500,
+        "materials": [
+          {
+            "name": "Cogwheel Blank",
+            "count": 1
+          },
+          {
+            "name": "Copper Ore",
+            "count": 2
+          },
+          {
+            "name": "Chime Dust",
+            "count": 3
+          }
+        ],
+        "output": {
+          "name": "Copperlens Ocular",
+          "count": 1,
+          "quality": "uncommon"
+        },
+        "combo": null,
+        "oncePerDay": false,
+        "gain": {
+          "reducedAt": 50,
+          "minimalAt": 75,
+          "zeroAt": 100
         }
       }
     ]

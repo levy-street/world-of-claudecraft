@@ -187,11 +187,24 @@ describe('the crafted rod ladder', () => {
     // The two rungs at 125 are the reason the fee split cannot be read off the
     // rung: only the CHANNEL separates them.
     expect(new Set(ROD_RECIPES.filter((r) => r.skillReq === 125).map((r) => r.id)).size).toBe(2);
-    // The trap this guards, stated as the arithmetic rather than as prose:
-    // the shipped land tier-5 recipes sit at 150, which resolves ABOVE the
-    // cap's tier, and they only work because they predate training.
+    // The trap this guards, stated as the arithmetic rather than as prose: a
+    // 150 rung resolves ABOVE the cap's tier, which is why the land tier-5
+    // recipes shipped unlearnable-by-fiction until masterwrought Phase 11o
+    // (qr-11o-150) re-tiered them to the cap. The arithmetic half of the
+    // lesson stands; the historical exemplar is retired, so the second arm
+    // now pins the WHOLE table inside the reachable band.
     expect(tierForSkill(150)).toBeGreaterThan(tierForSkill(cap));
-    expect(TOOL_RECIPES.some((r) => r.skillReq === 150 && !r.acquisition)).toBe(true);
+    expect(
+      TOOL_RECIPES.every((r) => tierForSkill(r.skillReq) <= tierForSkill(cap)),
+      'every land tool rung sits inside the reachable band since the 11o re-tier',
+    ).toBe(true);
+    // The three re-tiered rows sit exactly at the cap tier and stay
+    // grandfathered (no acquisition list; the frozen PRE_TRAINING record).
+    expect(
+      TOOL_RECIPES.filter((r) => r.skillReq === 125 && !r.acquisition)
+        .map((r) => r.id)
+        .sort(),
+    ).toEqual(['recipe_arcanite_mining_pick', 'recipe_elderwood_axe', 'recipe_sunpetal_sickle']);
   });
 
   it('NO recipe anywhere is authored above its craft cap AND expected to be learned', () => {
@@ -202,8 +215,9 @@ describe('the crafted rod ladder', () => {
     // is no craft-time skillReq admission gate, so the only barrier is LEARNING
     // and both learning channels run the same tier comparison.
     //
-    // The arm above proves the trap EXISTS (a 150 row that escapes only by
-    // predating training). This one proves nothing has fallen into it, which is
+    // The arm above proves the trap's arithmetic (a 150 rung resolves above
+    // the cap; the shipped exemplar retired with the masterwrought Phase 11o
+    // re-tier). This one proves nothing has fallen into it, which is
     // the direction that can actually regress. A recipe is learnable iff it is
     // grandfathered (PRE_TRAINING_RECIPE_IDS, known from the start and carrying
     // no acquisition list) or its own tier is at or below the tier its craft's
@@ -237,22 +251,21 @@ describe('the crafted rod ladder', () => {
         'channels (teachTierMet in professions/training.ts and the tier deny arm in ' +
         'professions/pattern_items.ts), so it is dead content that ships green',
     ).toEqual([]);
-    // Non-vacuity in both directions: the filter really did walk a populated
-    // catalog, and the comparison really can answer true (the grandfathered land
-    // tools at 150 are exactly the rows it would name if they were not exempt).
+    // Non-vacuity: the filter really did walk a populated catalog. (The
+    // comparison's true arm lost its shipped exemplar when masterwrought
+    // Phase 11o re-tiered the three land tools to the cap; the synthetic
+    // proof that teachTierMet really can refuse lives in the tier boundary
+    // suites, and the arithmetic arm above keeps the 150-above-cap fact.)
     expect(ALL_RECIPES.filter((r) => (r.acquisition ?? []).length > 0).length).toBeGreaterThan(20);
-    // As a SORTED SET, not in table order: the claim is WHICH rows sit above
-    // their cap, and an ordered literal over an ALL_RECIPES filter also reds on
-    // a pure table reorder, which is not the defect this guards.
+    // Since the 11o re-tier NOTHING sits above its cap, exempt or not: the
+    // whole catalog is inside the reachable band, which is the lesson's end
+    // state (the fiction is retired, the rule above still guards new rows).
     expect(
       ALL_RECIPES.filter((r) => !teachTierMet(r, atCap(r.professionId) as never))
         .map((r) => r.id)
         .sort(),
-      'the three land tier-5 tools are the only rows above their cap, and they ' +
-        'are learnable only because they predate training',
-    ).toEqual(
-      ['recipe_arcanite_mining_pick', 'recipe_elderwood_axe', 'recipe_sunpetal_sickle'].sort(),
-    );
+      'no row anywhere sits above its craft cap since the masterwrought Phase 11o re-tier',
+    ).toEqual([]);
   });
 
   it('rides ALL_RECIPES, and stays out of TOOL_RECIPES', () => {
