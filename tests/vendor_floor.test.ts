@@ -557,7 +557,9 @@ describe('the classification is exhaustive over every vendor-stocked consumable'
   // sweep covers them: no consumable-axis item may enter either table without
   // joining this suite's classification first.
   it('the delve shop and heroic vendor stock carry no consumable-axis items', () => {
-    const delveIds = Object.values(DELVE_SHOPS).flatMap((rows) => rows.map((r) => r.itemId));
+    const shopItemIds = (shops: Record<string, { itemId: string }[]>) =>
+      Object.values(shops).flatMap((rows) => rows.map((r) => r.itemId));
+    const delveIds = shopItemIds(DELVE_SHOPS);
     const heroicIds = HEROIC_VENDOR_STOCK.map((r) => r.itemId);
     // Vacuity floors near the real counts (28 delve rows over two shops and
     // 39 heroic offers today), so a whole shop key dropping out of either
@@ -575,6 +577,14 @@ describe('the classification is exhaustive over every vendor-stocked consumable'
     // the elixir arm needs its own liveness probe: the bear elixir carries
     // no magnitude axis and exercises that arm alone.
     expect(consumable('elixir_of_the_bear'), 'the elixir arm is alive').toBe(true);
+    // Positive control for the PIPELINE, not only the predicate: a
+    // synthetic shop drives the same flatten-and-filter path the real
+    // sweep below rides, so the expect-empty results are a live pipeline
+    // over real absences, not a dead flatten.
+    const probeShops = {
+      synthetic_delve: [{ itemId: 'healing_potion' }, { itemId: 'synthetic_sword' }],
+    };
+    expect(shopItemIds(probeShops).filter(consumable)).toEqual(['healing_potion']);
     expect(delveIds.filter(consumable)).toEqual([]);
     expect(heroicIds.filter(consumable)).toEqual([]);
   });
