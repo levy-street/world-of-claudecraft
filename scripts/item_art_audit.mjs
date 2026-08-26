@@ -133,7 +133,9 @@ const build = await buildItemArtAudit({
     // Phase 11k's apex feast tier parks its six ids (three feasts, three
     // patterns) while RETIRING two of 11i's (that phase's capstone feast and
     // its pattern, removed from the game rather than moved), a net plus four
-    // to 78.
+    // to 78; and Phase 11o's engineering on-ramp parks its two ids (the
+    // cogwheel_blank part and the copperlens_ocular gadget) under the same
+    // ip-16-ICON declaration, taking it to 80.
     // liveItemCount is unmoved by any of that, which is the point of the
     // split, and the 11k arithmetic is worth spelling out because "net plus
     // four" appears on BOTH terms and they are different sums. Live ITEMS defs
@@ -141,7 +143,7 @@ const build = await buildItemArtAudit({
     // six parked, the same two unparked). liveItemCount is defs MINUS debt, so
     // it holds at 922: an artless def joining the park moves the debt term and
     // the def count together and cancels out of this one.
-    pendingArtCount: 78,
+    pendingArtCount: 80,
     generatedHeroicDefinitions: 64,
     heroicDefinitionsWithOwnWebp: 48,
     heroicWeaponArtAliases: 16,
