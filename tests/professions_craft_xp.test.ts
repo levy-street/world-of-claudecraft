@@ -105,6 +105,9 @@ describe('learning-coupled craft XP: taught-nothing crafts pay nothing', () => {
     setMajors(meta, 'engineering', 'armorcrafting');
     meta.craftSkills.engineering = craftMaxSkillFor('engineering');
     const recipe = recipeById('recipe_arcanite_mining_pick')!;
+    // The mechanism claim above, pinned rather than prose: the row really
+    // sits at the cap rung since the 11o re-tier.
+    expect(recipe.skillReq).toBe(125);
     placeAtStationFor(sim, pid, recipe);
     grantItem(sim, 'arcanite_bar', 2, pid);
     // The tier-5 pick gained the thornpeak fine grade alongside the refined

@@ -487,8 +487,10 @@ describe('item level: crafted gear derives its level from the recipe (content/re
       expect(itemLevel(item), `${id} item level`).toBe(level);
       expect(primaryStatSum(item), `${id} authored stat sum`).toBe(authoredSum);
       expect(expectedStatBudget(item), `${id} live derived budget`).toBe(liveBudget);
-      expect(authoredSum, `${id} stays deliberately over the live budget`).toBeGreaterThan(
-        liveBudget,
+      // The over-budget claim reads the LIVE values, not the table's own
+      // literals, so it can fail independently of the rows above.
+      expect(primaryStatSum(item), `${id} stays deliberately over the live budget`).toBeGreaterThan(
+        expectedStatBudget(item) ?? Number.POSITIVE_INFINITY,
       );
     }
   });

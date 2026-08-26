@@ -17,7 +17,7 @@
 import { describe, expect, it } from 'vitest';
 import { ALL_RECIPES } from '../src/sim/content/recipes';
 import { ITEMS, MOBS } from '../src/sim/data';
-import { isItemLevelEligible } from '../src/sim/item_level';
+import { isItemLevelEligible, itemLevel, itemSourceLevel } from '../src/sim/item_level';
 import { requiredLevelFor } from '../src/sim/item_level_req';
 import type { ItemDef } from '../src/sim/types';
 
@@ -51,6 +51,13 @@ describe('crafted wearability: the mid-band windows (masterwrought Phase 11o)', 
     // so a filter regression cannot quietly empty a band.
     expect(band50.length).toBeGreaterThanOrEqual(21);
     expect(band75.length).toBeGreaterThanOrEqual(2);
+    // The DECISIVE-row split, pinned: the window bound can only fail for
+    // level-gated qualities (rare and up; the three uncommon trophy rows are
+    // ungated and pass at any level), so the number of rows the window arm
+    // really checks is itself a pin.
+    const gated = new Set(['rare', 'epic', 'legendary']);
+    expect(band50.filter(({ def }) => gated.has(def.quality ?? 'common')).length).toBe(18);
+    expect(band75.filter(({ def }) => gated.has(def.quality ?? 'common')).length).toBe(2);
   });
 
   it('every skip-list member really has a non-crafted source (the skip cannot hide a miss)', () => {
@@ -122,15 +129,40 @@ describe('crafted wearability: the level-20 shelf is unmoved (masterwrought R5 s
     ]);
     for (const id of apex) {
       expect(requiredLevelFor(ITEMS[id]), `${id} apex gate`).toBe(20);
+      // The ilvl half of the shelf claim: apex recipes register level 25 and
+      // epic adds 6, so the derived item level is 31, byte-unmoved.
+      expect(itemLevel(ITEMS[id]), `${id} apex item level`).toBe(31);
     }
   });
 
   it('the drop-sourced same-slot rares the hub pieces were budgeted against keep their gate', () => {
     // These share the movers' slots but derive their source from level-20
     // dungeon loot (and the combo craft path; the source index takes the max),
-    // so the re-level must not have moved them.
-    expect(requiredLevelFor(ITEMS.boundstone_helm)).toBe(20);
-    expect(requiredLevelFor(ITEMS.gravewyrm_gauntlets)).toBe(20);
-    expect(requiredLevelFor(ITEMS.gravewyrm_mantle)).toBe(20);
+    // so the re-level must not have moved them, on either axis.
+    for (const id of ['boundstone_helm', 'gravewyrm_gauntlets', 'gravewyrm_mantle'] as const) {
+      expect(requiredLevelFor(ITEMS[id]), `${id} gate`).toBe(20);
+      expect(itemLevel(ITEMS[id]), `${id} item level`).toBe(23);
+    }
+  });
+
+  it('every gated equippable sourced at 20 or above still gates at 20 (heroic, raid, vendor included)', () => {
+    // The category-free form of the shelf claim: whatever the source
+    // (dungeon and heroic loot, the raid, the marks and honor counters, the
+    // apex recipes), a rare-or-better equippable whose source level sits at
+    // or past the level cap derives requiredLevel exactly 20. The re-level
+    // only ever LOWERED crafted sources below 20, so this whole population
+    // is byte-unmoved; the floor pins the sweep near its live size (266) so
+    // a filter regression cannot quietly empty it.
+    const gated = new Set(['rare', 'epic', 'legendary']);
+    const shelf = Object.values(ITEMS).filter(
+      (d) =>
+        isItemLevelEligible(d) &&
+        gated.has(d.quality ?? 'common') &&
+        (itemSourceLevel(d.id) ?? 0) >= 20,
+    );
+    expect(shelf.length).toBeGreaterThanOrEqual(260);
+    for (const def of shelf) {
+      expect(requiredLevelFor(def), `${def.id} shelf gate`).toBe(20);
+    }
   });
 });

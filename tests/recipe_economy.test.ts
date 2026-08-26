@@ -1227,6 +1227,29 @@ describe('LADDER SHAPE PINS', () => {
     }
   });
 
+  it('every ladder recipe sits at its level convention (the 11o equippable split)', () => {
+    // The per-row recipe.level pin for the ladder, the masterwrought Phase
+    // 11o shape: equippable rung-50 outputs carry level 15 (the wearability
+    // re-level; requiredLevel derives from it), everything else keeps the
+    // original convention (0 -> 10, 25 -> 15, 50 -> 20 for consumables).
+    // This is the exact-level arm the crafted_wearability windows
+    // deliberately do not carry (its acceptance is the window, not the
+    // literal); without it 12 of the movers had no per-row level pin at all.
+    const BASE_LEVEL_BY_RUNG: Record<number, number> = { 0: 10, 25: 15, 50: 20 };
+    let equippableRung50 = 0;
+    for (const recipe of LADDER_RECIPES) {
+      const def = ITEMS[recipe.resultItemId];
+      const equippable = !!def?.slot;
+      const expected =
+        equippable && recipe.skillReq === 50 ? 15 : BASE_LEVEL_BY_RUNG[recipe.skillReq];
+      if (equippable && recipe.skillReq === 50) equippableRung50 += 1;
+      expect(recipe.level, `${recipe.id} recipe.level`).toBe(expected);
+    }
+    // The split's decisive-row count, so the equippable arm cannot go
+    // quietly vacuous: twelve rung-50 gear rows ride the 15.
+    expect(equippableRung50).toBe(12);
+  });
+
   it('each of the six ladder crafts has exactly 9 recipes, 3 per rung', () => {
     for (const craft of LADDER_CRAFTS) {
       const forCraft = LADDER_RECIPES.filter((r) => r.professionId === craft);

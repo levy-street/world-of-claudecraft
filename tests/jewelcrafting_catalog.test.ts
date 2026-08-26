@@ -259,12 +259,17 @@ describe('jewelcrafting catalog outputs', () => {
       expect(formulaBudget, `${def.id} formula budget`).toBe(BUDGET_BY_RUNG[recipe.skillReq]);
       expect(primaryStatSum(def), `${def.id} stat sum`).toBe(formulaBudget);
       // The live source index derives from the shipped recipe level: the
-      // tooltip item level and expected budget agree with the live tables.
+      // tooltip item level and expected budget agree with the live tables,
+      // AND the live budget is anchored to its own literal, so this arm
+      // cannot go self-referential against the formula it checks. At the
+      // authoring levels ring and neck agreed; at the re-leveled rung-50
+      // ilvl 18 they diverge (ring 6, neck 7), so the rung-50 literal is
+      // slot-keyed.
       const liveLevel = recipe.level + bonus;
+      const liveBudget =
+        recipe.skillReq === 50 ? (def.slot === 'neck' ? 7 : 6) : BUDGET_BY_RUNG[recipe.skillReq];
       expect(itemLevel(def), `${def.id} item level`).toBe(liveLevel);
-      expect(expectedStatBudget(def), `${def.id} expected budget`).toBe(
-        primaryStatBudget(liveLevel, def.quality, def.slot),
-      );
+      expect(expectedStatBudget(def), `${def.id} expected budget`).toBe(liveBudget);
       checked += 1;
     }
     expect(checked).toBe(9);

@@ -299,10 +299,14 @@ describe('inscription catalog outputs', () => {
       const formulaBudget = primaryStatBudget(authoredLevel, def.quality, def.slot);
       expect(formulaBudget, `${def.id} formula budget`).toBe(TOME_BUDGET_BY_RUNG[recipe.skillReq]);
       expect(primaryStatSum(def), `${def.id} authored stats`).toBe(formulaBudget);
+      // The live budget is anchored to its own literal (0/25 match the
+      // authored budgets; the re-leveled rung 50 derives 8 at ilvl 18), so
+      // this arm cannot go self-referential against the formula it checks.
+      const LIVE_BUDGET_BY_RUNG: Record<number, number> = { 0: 3, 25: 5, 50: 8 };
       const liveLevel = recipe.level + bonus;
       expect(itemLevel(def), `${def.id} item level`).toBe(liveLevel);
       expect(expectedStatBudget(def), `${def.id} live source index`).toBe(
-        primaryStatBudget(liveLevel, def.quality, def.slot),
+        LIVE_BUDGET_BY_RUNG[recipe.skillReq],
       );
       checked += 1;
     }

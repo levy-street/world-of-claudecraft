@@ -1003,19 +1003,24 @@ describe('masterwrought Phase 11h GATE D: the capstones and the tier-4 fine twin
       expect(farmCropSkillThreshold(def?.tier ?? 0), `${twin} gate`).toBe(75);
     }
     // THE SUPERLATIVE, SCOPED AND DERIVED rather than asserted in prose, which
-    // is what the four "top of the whole catalog" comments were missing. Both
-    // halves are stated: 125 really is the ceiling for cooking and alchemy, and
-    // it really is NOT the ceiling for the table, so neither claim can rot into
-    // the other. A phase that adds a cooking or alchemy row above 125 visits
-    // the first line; Phase 11j's 150 rung is already covered by the second.
+    // is what the four "top of the whole catalog" comments were missing. At
+    // this arm's authoring the two halves were DIFFERENT numbers (125 for
+    // cooking and alchemy, 150 for the table, so neither claim could rot into
+    // the other); masterwrought Phase 11o (qr-11o-150) retired the fictional
+    // 150 rung to the reachable cap, so the claims merged on purpose and the
+    // arm now states the merged fact both ways: 125 is the ceiling for
+    // cooking and alchemy AND for the whole catalog, and nothing anywhere
+    // sits above the 125 content cap (craftMaxSkillFor; the per-craft cap
+    // sweep in tests/professions_rod_recipes.test.ts owns the learnability
+    // half). A phase that re-opens a rung above the cap visits this line.
     const rungsFor = (craft: string) =>
       ALL_RECIPES.filter((r) => r.professionId === craft).map((r) => r.skillReq);
     expect(Math.max(...rungsFor('cooking')), 'the top cooking rung').toBe(125);
     expect(Math.max(...rungsFor('alchemy')), 'the top alchemy rung').toBe(125);
     expect(
       Math.max(...ALL_RECIPES.map((r) => r.skillReq)),
-      'and 125 is NOT the catalog ceiling: the apex tool family ships at 150',
-    ).toBe(150);
+      'the whole catalog tops out at the reachable cap since the 11o re-tier',
+    ).toBe(125);
   });
 
   it('the hoe twins are NOT what this phase consumed, so nothing is double-booked', () => {
