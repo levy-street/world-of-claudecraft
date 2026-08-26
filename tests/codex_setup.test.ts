@@ -246,6 +246,12 @@ describe('Codex custom agents', () => {
     expect(read('.agents/skills/woc-review-pr/SKILL.md')).toMatch(
       /Invoke `woc_server_hot_path` when the diff adds or changes/,
     );
+    expect(read('.agents/skills/woc-feature-plan/SKILL.md')).toMatch(
+      /use `woc_server_hot_path` for\s+the non-SQL budget/,
+    );
+    expect(read('.agents/skills/woc-extract-and-test/SKILL.md')).toMatch(
+      /and `woc_server_hot_path` when the diff adds or changes per-tick, per-request,/,
+    );
     expect(read('AGENTS.md')).toContain('`woc_server_hot_path`');
     expect(read('docs/codex.md')).toContain('`woc_server_hot_path`');
     expect(read('docs/qa-gate.md')).toMatch(

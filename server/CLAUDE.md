@@ -245,7 +245,8 @@ that shape.
   row) and the v0.40.1 hotfix pair (the escrow fold that JSON-parsed the same book in
   Node every 60 s, moved into Postgres by PR #3661 in `account_wealth_db.ts`; the
   custody parcel that rewrote the whole book per booking, now one overlay row via
-  PR #3663 `mail_custody_overlay.ts`) stayed undiagnosed for weeks. PR #3576 closed
+  PR #3663 `mail_custody_overlay.ts`; both reach a release branch with its v0.40.1
+  merge-down) stayed undiagnosed for weeks. PR #3576 closed
   the blind spot: the shared-blob writers (the market writer, which carries the market
   AND mail books, and the rift writer) bill their thunk's synchronous cost to the
   `saves` phase through the `createSerialWriter` observer (`serial_writer.ts`), and the
