@@ -786,8 +786,9 @@ export const ZONE1_NPCS: Record<string, NpcDef> = {
     // stock (eastbrook_arming_sword, eastbrook_chain_vest,
     // eastbrook_wool_trousers, tanned_leather_jerkin): identical id, zero
     // margin, unlimited restock, R23's purest competitor form. The recipes,
-    // items, prices and drops stay, and the smith keeps his non-crafted
-    // staples below.
+    // items and prices stay, and the smith keeps his non-crafted staples
+    // below. (The four ids drop nowhere; other zone-1 drops fill the legs
+    // and chest slots.)
     vendorItems: [
       'eastbrook_greatsword',
       'bronzework_mace',

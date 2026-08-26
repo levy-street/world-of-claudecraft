@@ -142,6 +142,10 @@ cannot create a fourth silently.
   all stay, and the smith keeps his non-crafted staples, so a no-crafter player still buys
   workable gear. The stock-row carve-out is therefore FIVE rows total, named here
   exhaustively; a sixth is still a STOP.
+  AMENDED 2026-08-25 (11n QA, the floor lane): "and drops" above was the author's
+  paraphrase, never a fact. The four ids appear in NO loot table; drops fill the gear
+  SLOTS via other zone-1 pieces (quilted_trousers, mosshide_vest and their siblings),
+  never these ids. The recipes, items and prices do stay; the pull itself is unchanged.
   WHY: elixir_of_the_bear is buff_sta 12 for 900s sold for 100 copper by Alchemist Verane,
   the alchemy master herself, and it exactly equals elixir_of_the_serpent, the alchemy-50
   crafted top elixir, at 12 for 900s. That is a zero-percent margin, worse than any potion

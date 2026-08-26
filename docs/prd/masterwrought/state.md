@@ -18044,9 +18044,10 @@ gate's read): after the pull no zone-1 vendor sells a legs item and the
 only vendor-sold zone-1 chest is cloth (valespun_robe; tanner_hesk is
 zone 2). The pieces stay reachable via crafting and the market (CORRECTED
 2026-08-25 by the 11n QA floor lane: the four pulled ids appear in NO loot
-table, only in items.ts, recipes.ts, weapon_skin_rules.ts and
-professions/training.ts, so drops fill the SLOTS via other zone-1 pieces
-such as quilted_trousers or mosshide_vest, never these ids): a
+table; their src/sim homes are items.ts, recipes.ts, weapon_skin_rules.ts
+and professions/training.ts, plus UI twins, so drops fill the SLOTS via
+other zone-1 pieces such as quilted_trousers or mosshide_vest, never
+these ids): a
 consequence of the settled pull, recorded so it is not rediscovered as a
 bug. The eastbrook town-NPC payload digest was re-minted (91e9c764 to
 a9448fdd) with a named smith_haldren row assertion BEFORE the digest,
