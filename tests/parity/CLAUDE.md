@@ -121,7 +121,11 @@ confirmed each):
   which is exactly why nothing here would notice one starting to draw, so a
   change to a gate order still needs its own suite. Farming's live coverage is
   `tests/professions_farming.test.ts` (the lifecycle plus the draw-count pins);
-  this gate pins the session, not the surface around it.
+  this gate pins the session, not the surface around it. The one exception is
+  `perfecting_walk`: it stages three of the Perfecting deny arms (skill, already
+  Perfected, missing materials) between bracketing frames, so its coverage arm
+  pins each as draw-free AND state-identical; the ladder's other arms (no item,
+  not apex, lock-only shortfall) stay with `tests/perfecting.test.ts`.
 - **Construction-time draws + ambient world mobs.** The `Rng` is born inside the Sim
   ctor, so ctor draws are not in the draw digest; ambient camp mobs are spawned but
   never tracked. A same-draw-count reorder of ctor spawns that changes only

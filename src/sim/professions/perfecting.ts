@@ -297,12 +297,12 @@ export function resolvePerfectingAttempt(
     const lockOnly = PERFECTING_ATTEMPT_COST.every(
       (c) => countRawInSlots(meta.inventory, c.itemId) >= c.count,
     );
-    ctx.error(
-      meta.entityId,
-      lockOnly
-        ? 'A material needed for perfecting is locked.'
-        : 'You lack the materials to perfect that item.',
-    );
+    // Two single-line emits, never one wrapped ternary: the S3 drift guard
+    // (tests/localization_fixes.test.ts) scans one call per line and cannot
+    // see a literal on a continuation line, so a wrapped call would let a
+    // reword of either line pass CI with no matcher.
+    if (lockOnly) ctx.error(meta.entityId, 'A material needed for perfecting is locked.');
+    else ctx.error(meta.entityId, 'You lack the materials to perfect that item.');
     return;
   }
   // Consume: fungible materials through the lock-aware id walk (the
@@ -327,10 +327,10 @@ export function resolvePerfectingAttempt(
   const roll = ctx.rng.next();
   if (roll < PERFECTING_SUCCESS_CHANCE) {
     const rank = (payload.perfecting ?? 0) + 1;
-    ctx.notice(
-      meta.entityId,
-      `Perfecting: ${def.name} advances to rank ${rank} of ${PERFECTING_RANKS}.`,
-    );
+    // The alias keeps the emit on ONE line under the 100-column width: the S3
+    // drift guard scans one call per line (see the materials arm above).
+    const ranks = PERFECTING_RANKS;
+    ctx.notice(meta.entityId, `Perfecting: ${def.name} advances to rank ${rank} of ${ranks}.`);
     if (rank >= PERFECTING_RANKS) {
       delete payload.perfecting;
       payload.perfected = true;

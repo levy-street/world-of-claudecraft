@@ -49,6 +49,10 @@ import {
 } from '../../src/sim/professions/farming';
 import { startFishing } from '../../src/sim/professions/fishing';
 import { gatherCastDurationSec, gatherNodeById } from '../../src/sim/professions/gathering';
+import {
+  PERFECTING_ATTEMPT_COST,
+  PERFECTING_SKILL_REQ,
+} from '../../src/sim/professions/perfecting';
 import { stationsOfType } from '../../src/sim/professions/stations';
 import { riftRankForBaseLevel } from '../../src/sim/rift/ranks';
 import { type ArenaMatch, type PlayerMeta, Sim } from '../../src/sim/sim';
@@ -6639,6 +6643,124 @@ function supportedElevationLineOfSight(): Scenario {
   };
 }
 
+// The Perfecting stage (Masterwrought phase 12): the apex rank walk through
+// the REAL Sim.perfectItem delegate (src/sim/professions/perfecting.ts
+// resolvePerfectingAttempt) in BOTH target shapes the ref discriminates: a
+// BAGGED apex neck walked all the way to the Perfected stamp, and a WORN apex
+// ring attempted twice in place. Exists because perfecting.ts is a NEW draw
+// site on the shared stream (its header's contract: EXACTLY one ctx.rng draw
+// per resolved attempt, ZERO on every deny arm) and nothing else in the suite
+// reaches it (no parity scenario crafts an apex recipe either, so the
+// craft-time head start is pinned only in tests/perfecting.test.ts).
+//
+// Written rng-INDEPENDENT: the bagged loop keeps attempting until the piece
+// stamps Perfected, bounded well past the expected five attempts (four
+// successes at 0.8), so whatever success/failure sequence the seed yields the
+// walk completes and every resolved attempt costs exactly one draw. The
+// coverage arm reads the ledger as arithmetic over the notices (draws equal
+// advances plus fails) rather than a band literal; the pinned seed's actual
+// sequence is what the golden records. Each staged denial is bracketed by a
+// frame on either side, so the arm can pin it as a NO-OP on every sampled
+// field (identical state digests), not merely as draw-free. Deliberately NO
+// ticks (the professions_craft idiom): a resolved attempt is instant, so
+// every draw in this trace is a perfecting draw and the ledger reads straight
+// off the labelled frames.
+const PERFECTING_BAGGED_APEX = 'wyrmfall_pendant'; // apex neck, jewelcrafting, no class gate
+const PERFECTING_WORN_APEX = 'warhewn_signet'; // apex ring, jewelcrafting, no class gate
+// The bagged walk's attempt bound. At four successes needed with a 0.8
+// chance, twelve attempts fail to complete the walk about six times in a
+// hundred thousand seeds; the recorded seed completes inside it (the coverage
+// arm pins the stamp), and the bound is what keeps the drive rng-independent.
+export const PERFECTING_WALK_ATTEMPT_CAP = 12;
+// Materials for the cap plus the two worn attempts, so no resolved attempt
+// can ever deny for want of a stack mid-walk; the materials denial at the end
+// is staged by removing the ember stack outright.
+const PERFECTING_WALK_STACK = PERFECTING_WALK_ATTEMPT_CAP + 2;
+function perfectingWalk(seed = 1): Scenario {
+  return {
+    name: 'perfecting_walk',
+    coverage: [
+      'class:warrior (perfecter, level 20 for the derived apex equip gate; setPlayerLevel draws nothing)',
+      'skill denial (jewelcrafting one under PERFECTING_SKILL_REQ): the dedicated skill line, ZERO draws, nothing consumed',
+      'bagged walk (wyrmfall_pendant via { bag }): the first resolved attempt binds the copy (the R2 boundTo stamp + the bind notice); EVERY resolved attempt draws exactly once and spends one of each material',
+      'fail-forward: a failed attempt emits the fail notice and leaves the rank untouched; the track advances only on an advance notice',
+      'the Perfected stamp: perfecting deleted, perfected true, the R5 delta merged into rolled.stats (int 1, sta 0 on the neck), the done notice',
+      'post-stamp denial: the already-Perfected line, ZERO draws, nothing consumed',
+      'worn attempts (warhewn_signet equipped through equipItem, via { slot }): two resolved attempts mutate the equipmentInstance copy in place, the bind notice, exactly two draws',
+      'materials denial (the ember stack removed): the missing-materials line, ZERO draws',
+    ],
+    build: () => new Sim({ seed, playerClass: 'warrior', autoEquip: false }),
+    drive(rec: Recorder) {
+      const sim = rec.sim;
+      const pid = sim.playerId as number;
+      const meta = sim.players.get(pid) as PlayerMeta;
+      rec.notes.pid = pid;
+
+      // Level 20 first: the apex equip gate is the DERIVED level-20
+      // requirement (item_level_req.ts), and setPlayerLevel draws nothing, so
+      // the ledger below starts from zero foreign draws. The grants are
+      // ordinary draw-free hub lines.
+      sim.setPlayerLevel(20, pid);
+      sim.addItem(PERFECTING_BAGGED_APEX, 1, pid);
+      sim.addItem(PERFECTING_WORN_APEX, 1, pid);
+      for (const c of PERFECTING_ATTEMPT_COST) {
+        sim.addItem(c.itemId, c.count * PERFECTING_WALK_STACK, pid);
+      }
+      // The bag ref names a CELL (item_copy_ref discipline); inventory cells
+      // never shift under consumption, so the index stays good for the walk.
+      const bagRef = { bag: meta.inventory.findIndex((s) => s.itemId === PERFECTING_BAGGED_APEX) };
+      if (bagRef.bag < 0) throw new Error('the bagged apex piece did not land in the bags');
+
+      // Step 1: DENIAL, one skill point short. The ladder answers before the
+      // material gates and before any draw; the staged frame right before it
+      // is the denial's no-op baseline.
+      meta.craftSkills.jewelcrafting = PERFECTING_SKILL_REQ - 1;
+      rec.snapshot('perfect-staged');
+      sim.perfectItem(bagRef, pid);
+      rec.snapshot('perfect-denied-skill');
+
+      // Step 2: the BAGGED walk to Perfected. Each resolved attempt is one
+      // draw; the loop reads the stamp off the live copy so the drive never
+      // assumes an outcome sequence.
+      meta.craftSkills.jewelcrafting = PERFECTING_SKILL_REQ;
+      let baggedAttempts = 0;
+      while (
+        baggedAttempts < PERFECTING_WALK_ATTEMPT_CAP &&
+        meta.inventory[bagRef.bag]?.instance?.perfected !== true
+      ) {
+        sim.perfectItem(bagRef, pid);
+        baggedAttempts++;
+      }
+      rec.notes.baggedAttempts = baggedAttempts;
+      rec.snapshot('perfect-bagged-walked');
+
+      // Step 3: the post-stamp DENIAL, zero draws, nothing consumed.
+      sim.perfectItem(bagRef, pid);
+      rec.snapshot('perfect-denied-perfected');
+
+      // Step 4: the WORN shape. The ring equips through the ordinary resolver
+      // (first free ring socket, ring1) and two attempts mutate the
+      // equipmentInstance copy in place: two draws, whatever they roll (four
+      // successes are needed, so the ring can never stamp here).
+      sim.equipItem(PERFECTING_WORN_APEX, pid);
+      sim.perfectItem({ slot: 'ring1' }, pid);
+      sim.perfectItem({ slot: 'ring1' }, pid);
+      rec.snapshot('perfect-worn-attempted');
+
+      // Step 5: the materials DENIAL. Removing the whole ember stack (a
+      // draw-free hub line) makes the next worn attempt a genuine shortfall;
+      // the pre-strip count is stashed so the coverage arm can bill the ember
+      // like the other two materials, and the stripped frame is the denial's
+      // no-op baseline.
+      rec.notes.emberBeforeStrip = sim.countItem('makers_ember', pid);
+      sim.removeItem('makers_ember', sim.countItem('makers_ember', pid), pid);
+      rec.snapshot('perfect-embers-stripped');
+      sim.perfectItem({ slot: 'ring1' }, pid);
+      rec.snapshot('perfect-denied-materials');
+    },
+  };
+}
+
 export const SCENARIOS: Scenario[] = [
   soloWarrior(),
   soloMage(),
@@ -6725,4 +6847,7 @@ export const SCENARIOS: Scenario[] = [
   // addition; SHARD_BOUNDS ends at SCENARIOS.length and needs no edit.
   nythraxisHeroicClaim(),
   supportedElevationLineOfSight(),
+  // The Perfecting stage (masterwrought Phase 12). Appended last, so it lands
+  // in the final shard automatically; SHARD_BOUNDS needs no edit.
+  perfectingWalk(),
 ];

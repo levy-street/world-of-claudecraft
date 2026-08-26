@@ -27,6 +27,7 @@ import {
   farmSeedIdsOfTier,
   resolveFarmHarvest,
 } from '../../src/sim/professions/farming';
+import { PERFECTING_RANKS } from '../../src/sim/professions/perfecting';
 import { riftNormalClearPool } from '../../src/sim/rift/loot_pools';
 import {
   RIFT_COIN_BONUS_A,
@@ -42,6 +43,7 @@ import {
   FARM_GOLDEN_PADDING_CYCLES,
   FARM_GOLDEN_WIN_YIELD_SEED,
   FARM_TONIC_WINNER_YIELD_SEED,
+  PERFECTING_WALK_ATTEMPT_CAP,
   SCENARIOS,
 } from './scenarios';
 
@@ -1361,5 +1363,145 @@ describe('coverage: each scenario fires its subsystem', () => {
       (event) => event.type === 'error' && event.text === 'Line of sight.',
     );
     expect(lineOfSightErrors).toHaveLength(1);
+  });
+
+  it('perfecting_walk: denials draw nothing, every resolved attempt draws once, the bagged apex stamps Perfected and the worn one binds in place', () => {
+    const { trace, rec } = record(SCENARIOS.find((s) => s.name === 'perfecting_walk')!);
+    const ev = rec.allEvents as Ev[];
+    const pid = rec.notes.pid as number;
+    const meta = (rec.sim as any).players.get(pid);
+    const errors = ev
+      .filter((e) => e.type === 'error' && e.pid === pid)
+      .map((e) => e.text as string);
+    const logs = ev.filter((e) => e.type === 'log' && e.pid === pid).map((e) => e.text as string);
+
+    // The three deny arms the drive stages, each answered by its DEDICATED
+    // line and nothing else on the error channel (no noItem, no busy).
+    expect(errors).toEqual([
+      'Perfecting that requires 125 skill in the craft that made it.',
+      'That item is already Perfected.',
+      'You lack the materials to perfect that item.',
+    ]);
+
+    // One bind per piece (the R2 stamp fires on the FIRST resolved attempt
+    // only), one done line (the neck alone can complete), and the neck's
+    // advances are the whole rank track in order; the ring's advances (zero
+    // to two) are whatever it rolled.
+    const binds = logs.filter((t) => /^Perfecting begins: .+ is now bound to you\.$/.test(t));
+    expect(binds).toEqual([
+      'Perfecting begins: Wyrmfall Pendant is now bound to you.',
+      'Perfecting begins: Warhewn Signet is now bound to you.',
+    ]);
+    expect(logs.filter((t) => /^.+ is now Perfected!$/.test(t))).toEqual([
+      'Wyrmfall Pendant is now Perfected!',
+    ]);
+    // The rank track is spelled from the module's constant on BOTH sides (the
+    // emit interpolates the same import), so pin the constant here too or the
+    // arm would follow a retuned rank count without noticing.
+    expect(PERFECTING_RANKS).toBe(4);
+    const advances = logs.filter((t) => /^Perfecting: .+ advances to rank \d+ of \d+\.$/.test(t));
+    expect(advances.filter((t) => t.startsWith('Perfecting: Wyrmfall Pendant'))).toEqual(
+      Array.from(
+        { length: PERFECTING_RANKS },
+        (_, i) => `Perfecting: Wyrmfall Pendant advances to rank ${i + 1} of ${PERFECTING_RANKS}.`,
+      ),
+    );
+    const fails = logs.filter(
+      (t) => t === 'The perfecting attempt fails; the materials are spent.',
+    );
+    // The fail-forward arm must really have fired on the pinned seed (a walk
+    // with no failure at all has about a one-in-four chance): otherwise the
+    // coverage string above would sit in the golden asserting an arm the
+    // recording never reached (the professions_craft "proc missed for the
+    // pinned seed" doctrine).
+    expect(fails.length, 'the fail-forward arm fired on the pinned seed').toBeGreaterThan(0);
+
+    // THE DRAW LEDGER, the point of this scenario: cumulative from drive
+    // start, spelled as arithmetic over the contract's own terms. Zero at the
+    // staged frame and the skill denial (nothing before them draws either:
+    // the level jump and the grants are draw-free), one per resolved attempt
+    // across the bagged walk, unchanged across the post-stamp denial, exactly
+    // two more for the worn attempts, unchanged across the ember strip and
+    // the materials denial, and NOTHING else.
+    const frameAt = (label: string) => {
+      const frame = trace.frames.find((f) => f.label === label);
+      if (!frame) throw new Error(`missing the ${label} checkpoint frame`);
+      return frame;
+    };
+    const drawsAt = (label: string): number => frameAt(label).rng.draws;
+    const stateAt = (label: string): string => frameAt(label).state;
+    const baggedAttempts = rec.notes.baggedAttempts as number;
+    // (The drive's own loop bound already caps this from above; the completed
+    // stamp below is what proves the walk finished inside it.)
+    expect(baggedAttempts).toBeGreaterThanOrEqual(PERFECTING_RANKS);
+    const WORN_ATTEMPTS = 2;
+    expect(drawsAt('perfect-staged')).toBe(0);
+    expect(drawsAt('perfect-denied-skill')).toBe(0);
+    expect(drawsAt('perfect-bagged-walked')).toBe(baggedAttempts);
+    expect(drawsAt('perfect-denied-perfected')).toBe(baggedAttempts);
+    expect(drawsAt('perfect-worn-attempted')).toBe(baggedAttempts + WORN_ATTEMPTS);
+    expect(drawsAt('perfect-embers-stripped')).toBe(baggedAttempts + WORN_ATTEMPTS);
+    expect(drawsAt('perfect-denied-materials')).toBe(baggedAttempts + WORN_ATTEMPTS);
+    expect(trace.draws).toBe(baggedAttempts + WORN_ATTEMPTS);
+    // ...and every draw is accounted for by exactly one notice: an advance or
+    // a fail, never both, never neither.
+    expect(advances.length + fails.length).toBe(trace.draws);
+
+    // Every staged denial is a NO-OP on the sampled state, not merely
+    // draw-free: the frame after each denial digests byte-identical to the
+    // frame before it (bags, payloads, skills, equipment all unmoved), so a
+    // denial that spent a material or touched the copy reds here even though
+    // the end-of-run totals below would still reconcile. (wireRev is a
+    // sampler exclusion, so a spurious wire bump on a deny arm is the one
+    // mutation this pin cannot see.)
+    expect(stateAt('perfect-denied-skill')).toBe(stateAt('perfect-staged'));
+    expect(stateAt('perfect-denied-perfected')).toBe(stateAt('perfect-bagged-walked'));
+    expect(stateAt('perfect-denied-materials')).toBe(stateAt('perfect-embers-stripped'));
+
+    // The bagged copy at rest: bound to the perfecter, the track field gone,
+    // the stamp on, the R5 delta merged (an int 8 / sta 6 neck with a +1
+    // delta: largest-remainder puts the point on int).
+    const neck = meta.inventory.find((s: any) => s.itemId === 'wyrmfall_pendant');
+    expect(neck?.instance).toEqual({
+      boundTo: meta.entityId,
+      perfected: true,
+      rolled: { stats: { int: 1, sta: 0 } },
+    });
+    // The worn copy: seated on ring1 by the resolver, bound by its first
+    // attempt, mid-track (two attempts can never stamp), never stat-baked.
+    expect(meta.equipment.ring1).toBe('warhewn_signet');
+    const ring = meta.equipmentInstance.ring1;
+    expect(ring?.boundTo).toBe(meta.entityId);
+    expect(ring?.perfected).toBeUndefined();
+    expect(ring?.rolled).toBeUndefined();
+    const ringAdvances = advances.filter((t) => t.startsWith('Perfecting: Warhewn Signet')).length;
+    expect(ringAdvances).toBeLessThanOrEqual(WORN_ATTEMPTS);
+    expect(ring?.perfecting).toBe(ringAdvances === 0 ? undefined : ringAdvances);
+
+    // The bill: one of EACH material per resolved attempt, and no denial ever
+    // spent one. The ember (the pacing lever) is billed from the count the
+    // drive stashed just before stripping the stack to stage the last denial;
+    // the other two are read off the live bags.
+    const billed: Array<[string, number]> = [
+      ['sundered_essence', (rec.sim as any).countItem('sundered_essence', pid)],
+      ['prismglass_setting', (rec.sim as any).countItem('prismglass_setting', pid)],
+      ['makers_ember', rec.notes.emberBeforeStrip as number],
+    ];
+    for (const [id, have] of billed) {
+      expect(have, id).toBe(PERFECTING_WALK_ATTEMPT_CAP + WORN_ATTEMPTS - trace.draws);
+    }
+
+    // The stamp reaches the GOLDEN, not just the live sim: the final frame's
+    // player sample carries the perfected copy and the bound worn copy
+    // (inventory and equipmentInstance are sampled, never excluded), so a
+    // sampler exclusion or a payload-shape change would move the golden
+    // rather than hide behind it.
+    const final = trace.frames[trace.frames.length - 1];
+    expect(final.label).toBe('final');
+    const sampled = (final.players as any[])[0];
+    const sampledNeck = sampled.inventory.find((s: any) => s.itemId === 'wyrmfall_pendant');
+    expect(sampledNeck?.instance?.perfected).toBe(true);
+    expect(sampledNeck?.instance?.perfecting).toBeUndefined();
+    expect(sampled.equipmentInstance?.ring1?.boundTo).toBe(meta.entityId);
   });
 });
