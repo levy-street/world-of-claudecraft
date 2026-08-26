@@ -18667,3 +18667,231 @@ fiction retired with every side effect measured nil, two new ids
 through the full obligation set plus the six partition ripples and the
 reliquary un-pend, five review rounds all applied, mutation table 4/4.
 The 11n maintainer reads plus this ledger's six new ones remain open.
+
+## Phase 11o QA ledger (2026-08-26, the twin)
+
+STATUS: COMPLETE, verdict PASS (every finding fixed in-round; zero
+blocking against the build; the code never contradicted rows 117 to
+120). LOCAL, no push, no PR. Audit baseline e46ae65a29 (docs stamp;
+frozen code tip 40ca8f87ee); release/v0.41.0 refetched, still
+ff2837da1f, already an ancestor, no merge audit owed. tsc clean,
+DATABASE_URL unset, zero vitest processes at start.
+
+### LANE VERDICTS (five lanes, independently re-derived)
+- SCOPE: all six claims CONFIRMED. The 19-mover set re-derives from
+  ALL_RECIPES exactly (missing and extra both empty); duskhide_wraps
+  at skillReq 50 (#3520) with only its level moved at 11o; the quiver
+  skip verified on all four legs including the strict-max source-index
+  no-op (the bump replaces only on strictly greater and the mob block
+  registers the level-20 drop, so a recipe move changes nothing); the
+  trophy trio and combo pair genuinely outside the mover scope
+  (precision note, judged: the trio IS inside the band50 derivation
+  and counted by the test floor; what it sits outside is the MOVER
+  set, which is the reason the record states); the whole-table recipe
+  diff vs 407dadde17 shows exactly the 19 level moves, the hoe
+  re-tier, the three 150-to-125 rows, and the two new rows; the
+  programmatic second-source sweep over every buildSourceIndex
+  registration site found zero hits for all 19 movers.
+- DERIVATION (the lane agent fragged twice; the core claims were then
+  closed by the lead directly over the rerun lane's probe artifacts):
+  all seven claims CONFIRMED. Independent whole-catalog probes at both
+  commits: requiredLevel-20 set 370 to 351, leavers EXACTLY the 19
+  movers, ZERO joins, and the independently generated id sets are
+  byte-equal to the build's shelf_before/after lists; the tree-wide
+  derived diff (quality, level, ilvl, gate, budget, stat sum per id)
+  moves ONLY the 19 movers plus the two new additions, so no apex,
+  heroic, raid or vendor value moved on either axis. Bake probe:
+  helmet delta 2 at 15/17/20 (the invariant), legs 3 to 1, shoulder
+  and held offhand 3 to 2, gloves 2 to 1, chest, mainhand, feet, neck
+  and ring unchanged over the actual movers; the masterwork pins
+  verified (cowl 13/15; the NON-invariant thoriumscale_leggings 13/15
+  with the 1-vs-3 delta recorded in-comment). craftActionXp
+  (20,20)=100, (15,20)=30, (17,20)=55; the 55/106/28/22 literals live
+  in tests/professions_craft_xp.test.ts with the arithmetic in-file.
+  Consumer sweep: recipe.level has exactly THREE consumers (the
+  item_level source-index bump, craftActionXp, craftBonusStatsFor);
+  no fourth anywhere in sim or server.
+- ON-RAMP: verified by real simulation (probes drove resolveTrain and
+  the craft lifecycle on live Sims). Unattuned full-gain set at skill
+  0 is exactly the hoe plus the cogwheel, 25 crafts to 25, no stall;
+  ceiling controls proven by real crafts both directions (a tier-3
+  craft completed with skill delta exactly 0); the attuned 0-to-75
+  walk used zero PRE_TRAINING rows (bands 0/25/50: hoe, ocular,
+  skysilver). Fee ladder 0/2500/10000 re-derived; hoe cast 1.75s
+  live. Cogwheel bill 56 vs 18 (copper_ore the no-buyValue reagent);
+  chassis superset with gold 290 to 308 (vendor basis) and 128
+  (gathered) vs output 45, gold-negative both ways; the masterwork
+  material-tier delta EXECUTED 0 (0.02 with and without the row; the
+  Catalyst holds the max). Ocular budget formula-exact. R23 swept
+  independently: 15 held_offhand ids, zero sold across NPC
+  vendorItems (22 vendors, 219 rows), the marks stock (39), the
+  honor stock (47), priceHonor, plus a FOURTH counter the pins do not
+  cover (DELVE_SHOPS, 28 rows: zero). The one mismatch was R14's
+  claimed live positive controls, absent in the test; fixed this
+  round. INFO, judged: the attuned bands lean on external supply
+  (dust, fine rice), a pre-existing shape, not 11o's.
+- RE-TIER: all eight claims verified. The three rows byte-identical to
+  baseline except skillReq; cast 4.0s at both rungs (top band); the
+  capped-major proc identical both ways (tiersAboveRecipe
+  negative-clamps to 0; precision note, judged: the recorded 0.06 is
+  the config without the material feed, the three rows' call-site
+  chance is 0.08 at BOTH rungs, the load-bearing delta-0 claim exact);
+  gain multipliers identical for every reachable identity and skill;
+  PRE_TRAINING byte-identical, its 21-id pin frozen and consumed by
+  the live load path. Amendment sweep: all seven homes exist and
+  state the current fact; the build ledger's "dated, R-numbers in
+  full" holds literally only for the ROD_RECIPES header and
+  professions.md (the other five homes carry the phase name or bare
+  corrections; substantive facts correct everywhere; THIS entry is
+  the correction of record, the homes were not churned). The QA phase
+  file's "both tool headers" clause confirmed as doc drift
+  (TOOL_RECIPES' header never carried the lesson at baseline; the
+  build ledger's account matches the tree). The above-cap sweep pins
+  the EMPTY set through teachTierMet with the synthetic refusal
+  control (placement note, judged: the control lives in the sibling
+  onramp suite; both always run); a re-added 150 row reds three
+  assertions in two files immediately. Adversarial consumer sweep:
+  fees and admission unreachable for the acquisition-less trio, the
+  feast predicate nil twice over, guide TABLES regenerated at 125;
+  the one missed surface was the hand-authored guide PROSE (the
+  round's main finding).
+- RIPPLE (the lane agent fragged twice; verdicts closed by the lead
+  over the rerun lane's probes): all seven claims verified. The six
+  by-name partitions hold as exact-set pins with the new members
+  (HONEST_MATERIALS toEqual against the derivation plus the
+  synthetic-probe positive control; recipeList spread AND sum with
+  the two-row sibling literal; arcane_dust's FOURTH consumer
+  ring-ordered engineering-first with the arcane_shard control across
+  all three affinity suites; the ocular in the held-model park beside
+  gyrelens with its reason; the cogwheel in the signing exact set;
+  the blob edge 17172 as measured 17171 plus one per the suite's own
+  convention). The reliquary un-pend: hinted-iff-gear-capable derived
+  both directions, gear-capable count 7, the capable-output set
+  exactly [copperlens_ocular], SOURCE_PENDING_RULING mounts-only, the
+  reliquary_view resolved floor 261; one MISSED tenth comment home
+  found and fixed this round. The dev-kit tiebreak verified
+  numerically: the probe's replica is faithful and the quality term
+  flips EXACTLY ONE slot (the druid/feral offhand, ocular to
+  sunpetal_grimoire). Obligations: catalog rows plus M16 fills in all
+  five non-Latin overlays, distinct icon recipes, ITEM_ART_PENDING
+  exact-set 80 with both ids and NO mapping.json row (the QA phase
+  file's "exactly one mapping.json owner" clause confirmed stale, as
+  briefed), the item_art_audit literal 80 with the arithmetic,
+  shipped-ids and guide freshness green, ALL_RECIPES pinned
+  toHaveLength(165) with the ledger comment. archetypesBody: the
+  English reword verified complete, the es overlay spot-checked clean.
+  The junk-sweep ripple probed nil (sellAllJunk keys on poor quality;
+  the cogwheel is common by doctrine).
+
+### THE QA ROUND'S OWN KILL TABLE, 7/7 (cp-backup restores, porcelain
+empty between each, tests proven run by their printed counts; classes
+1 to 6 are all classes the build's 4/4 table never ran)
+1. recipe_gyrelens_array level 25 to 19: two reds naming
+   gyrelens_array (the apex exact-set gate and ilvl pin, the
+   category-free shelf arm).
+2. recipe_cogwheel_blank skillReq 0 to 30: two reds (the skill-0
+   exact set, the band walk).
+3. The arcane_dust row removed from the ocular bill: four reds across
+   all three affinity suites.
+4. The cogwheel row removed from the chassis bill: the literal bill
+   table red.
+5. copperlens_ocular's stats stripped: four reds (the formula pin
+   plus all three reliquary gear-capable arms).
+6. The Korzul quiver drop row removed: two reds (the skip premise BY
+   NAME, the shelf population).
+7. 'critRating' dropped from the onramp RATING_KEYS list: the new
+   liveKeys derived-set pin reds (run after this round added it).
+
+### FINDINGS AND FIXES (six commits, every reviewer finding applied)
+1. c9c9f4049a (medium-high, re-tier lane): the engineering guide
+   craftProse (ladderBody, routeBody) stated skill-150 as present
+   fact, and identityBody's every-rung-above-the-ceiling claim was
+   false since the on-ramp. English reworded; surgical sentence fixes
+   in ALL 18 overlays that translate the bodies (13 Latin routeBody,
+   the 5 non-Latin all three); resolved artifacts regenerated. The
+   one skillReq consumer surface the build missed.
+2. a5d4daf260 (minor, on-ramp lane): the R14 six-rating-key absence
+   pin carried no live positive controls (the build ledger
+   overstated): the inscription_catalog controls inherited.
+3. b2f680f764 (low, ripple lane): content/reliquary.ts's insert-order
+   comment still read "the pended engineering slot" as live fact, the
+   tenth comment home the nine-home sweep missed; amended dated.
+4. 6554230af8 (should-fix, coverage auditor over the fix round): the
+   derived-set half of the inherited R14 pattern was missing (a name
+   dropped from RATING_KEYS narrowed the claim silently); the
+   liveKeys block added with per-control messages.
+5. 795c28c35b (1 critical + 3 warnings, content reviewer over the fix
+   round): the QA round's OWN reword overclaimed. "All inside every
+   ceiling" is false for a dormant craft (the ocular is tier 1
+   against a dormant common ceiling of 0, measured multiplier 0); the
+   fee clause could distribute over the list (the ocular costs 2500);
+   "tool work" widened past the ladder premise; zh carried patch-note
+   voice; nl a dangling preposition. Narrowed the English (ladder
+   scope, per-rung fees, the dormant carve-out spelled out),
+   re-synced the five non-Latin overlays, corrected the recipes.ts
+   on-ramp comment's identical overclaim, documented the liveKeys
+   pin's deliberate spellPower false-red trigger.
+6. 95d7d81097 (nit, qa gate): ladderBody's parenthetical carved out
+   only the hoes; the two starter lessons folded in (English plus the
+   five non-Latin overlays).
+
+### THE REVIEW CHAIN (a fresh reader over every fix round)
+content-obligations-reviewer over commits 1 to 4: the critical
+ceiling overclaim plus three warnings, all applied (its check-6 FAIL
+closed by round 2); it also verified the regen zero-diff, the dash
+and emoji floor, and locale quality including the ru dash policy.
+test-coverage-auditor: one should-fix (liveKeys) and one nit (control
+messages), both applied; the spellPower type-system argument verified
+on all three premises. The round-2 convergence pass was closed by the
+lead after the agent fragged (all six checks verified directly: the
+new claims measured true, the four zh patch-voice grep hits all
+REMOVAL lines, porcelain clean after regen, suites green).
+qa-checklist LAST: READY, zero blocking, zero should-fix, two nits
+(one applied as commit 6; the materialsBody on-ramp-bill omission
+recorded as judged-no-change: the gate itself graded it a
+spoiler-altitude judgment call and nothing it says is false).
+
+### JUDGED THIS ROUND, do not re-raise
+The materialsBody omission; the trophy-trio band-vs-mover precision
+note; the 0.06-vs-0.08 masterwork precision note; the refusal-control
+placement note; the amendment-dating shortfall (corrected by this
+record, the homes deliberately not churned); the liveKeys spellPower
+false-red trigger (deliberate, documented at the pin).
+
+### RECORDED, NOT ACTED (maintainer reads on top of the build's six)
+- The 18 overlay prose fixes this round are machine-anchored fills
+  for review at the 0.41.0 fill (the same lane as the 30 pending
+  rows; the alternative left 18 locales asserting a rung that does
+  not exist).
+- state.md rows 13190 and 14282, phase-11j line 537 and phase-11i
+  line 125 still carry the 150 number as dated historical records,
+  correctly; enumerated so the sweep is auditable.
+- The reader-delivery failure mode recurred on general-purpose lane
+  agents (three of seven fragged even with the delivery rule); the
+  working fallback was closing verdicts from the lane's probe
+  artifacts in the main loop (memory updated).
+
+### THE FROZEN STAMP: one run, EXIT=0 first try
+At 95d7d81097 (six QA fix commits over 40ca8f87ee), every reader idle
+AND reported or superseded, porcelain empty, zero vitest processes,
+DATABASE_URL unset; the wrapper wrote TIP first and SUITE_EXIT=0
+before the follow-on stages, one fresh log, no commit anywhere
+between: 3193 test files passed / 21 skipped (3214), 46919 passed / 2
+expected fail / 373 skipped (47294); tsc clean; ci:changed EXIT=0;
+wiki:content and i18n:gen both zero diff; tip and porcelain unchanged
+through every stage. Drift vs the 11o build stamp: ZERO files, ZERO
+tests (the round's new assertions live inside existing tests), and
+the corpse_harvest_sim flake did not fire. The commit after the run
+is docs-only (this ledger, progress.md, the memory notes), the
+sanctioned exception to commit-voids-the-run.
+
+HANDOFF: Phase 12 (phase-12-perfecting.md). The
+leveling crafter is QA-verified standing: the shelf claim proven
+three independent ways (370 to 351, exactly the 19 movers leaving,
+zero joins, byte-equal to the build's lists, the tree-wide derived
+diff clean), both walks simulated through the real gates, the 150
+retire measured nil with its last player-facing fiction (the guide
+prose) retired this round, the ripples and the un-pend all landed,
+kill table 7/7 over classes the build never ran. Open maintainer
+reads: the 11n set, the build's six, and this round's overlay
+fill-review read.
