@@ -505,6 +505,7 @@ const RENDER_PURE_CORES = [
   'src/render/characters/soul_rend_prewarm_core.ts',
   'src/render/characters/design_code_core.ts',
   'src/render/live_program_watch_core.ts',
+  'src/render/post_reveal_links_core.ts',
   'src/render/program_key_ledger_core.ts',
   'src/render/renderer_extensions.ts',
   'src/render/shader_warmup_core.ts',

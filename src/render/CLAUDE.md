@@ -556,7 +556,13 @@ GPU work signs. Each rule names its seam and its guard.
   `tests/ability_material_prewarm_sweep.test.ts`, the `buildInterior` gating pin in
   `tests/renderer_compile_gate.test.ts`, and the `live-program` events in
   `perfStats().gpuPrep`, whose count on an offline tour of the touched content is
-  the acceptance bar of a render PR.
+  the acceptance bar of a render PR. The fleet-side count of the same first seconds
+  is `post_reveal_links_core.ts`: `live_program_watch.ts` hosts one window per page,
+  armed at the first `markGpuHitchReveal` (the world entry; later arrivals only
+  count), sampled from the same present-host calls, closed 20 s later on the last
+  in-window count; `PerfMonitor` snapshots it as `postRevealLinks` and the beacon
+  ships it beside `entryReveal` (`tests/post_reveal_links_core.test.ts`, the host
+  block in `tests/live_program_watch.test.ts`).
 - **Every program-key change on a VISIBLE material rides a gated swap with a
   stand-in.** The key inputs: texture-slot presence, `transparent` / `blending` /
   `alphaToCoverage` / `alphaHash`, `defines`, `onBeforeCompile` /

@@ -7,6 +7,7 @@ import {
 } from './db';
 import type { RateLimitOutcome } from './http/types';
 import { json, readBody } from './http_util';
+import { sanitizeBootPhases, sanitizePostRevealLinks } from './perf_report_entry_blocks';
 import { rateLimitNow, requestIp, windowedRateLimitOutcome } from './ratelimit';
 import { REALM } from './realm';
 
@@ -708,6 +709,10 @@ function compactRawSummary(value: Record<string, unknown>): Record<string, unkno
     // A wedged GPU queue is exactly what a truncated report must still carry:
     // the block is small and bounded, and it is the whole signal.
     'rendererGpuQueue',
+    // The two world-entry blocks: a handful of bounded ints each, and a slow
+    // entry is exactly the report most likely to overflow into this path.
+    'postRevealLinks',
+    'bootPhases',
   ]) {
     if (value[key] !== undefined) out[key] = value[key];
   }
@@ -728,6 +733,12 @@ function rawSummary(value: unknown, devTraceAllowed = false): Record<string, unk
     const gpuQueue = sanitizeGpuQueueSummary(parsed.rendererGpuQueue);
     if (gpuQueue) parsed.rendererGpuQueue = gpuQueue;
     else delete parsed.rendererGpuQueue;
+    const postRevealLinks = sanitizePostRevealLinks(parsed.postRevealLinks);
+    if (postRevealLinks) parsed.postRevealLinks = postRevealLinks;
+    else delete parsed.postRevealLinks;
+    const bootPhases = sanitizeBootPhases(parsed.bootPhases);
+    if (bootPhases) parsed.bootPhases = bootPhases;
+    else delete parsed.bootPhases;
     // The prewarm summary rides through verbatim on this path, bounded only by
     // the body cap, so its client-supplied LISTS are bounded here explicitly.
     // Without this the resume block's entries and failed-unit ids reach storage

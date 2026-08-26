@@ -1,5 +1,7 @@
 import type { NetPipelineSummary } from '../net/net_pipeline_stats';
 import { type AssetTimingSnapshot, assetTimingSnapshot } from '../render/assets/stats';
+import { postRevealLinksSnapshot } from '../render/live_program_watch';
+import type { PostRevealLinksSnapshot } from '../render/post_reveal_links_core';
 import type { Renderer } from '../render/renderer';
 import {
   censusTableLines,
@@ -55,6 +57,10 @@ export interface PerfSnapshot {
   // frame crossed the hitch threshold stores the DIFF between its two
   // bracketing snapshots, so a production hitch carries its own diagnosis.
   hitchForensics: HitchForensicsRecord[];
+  // Always-on post-curtain program window (src/render/post_reveal_links_core.ts):
+  // how much three's program list grew in the first seconds after the reveal,
+  // the live-frame half of the prewarm's programsDelta. Null before the reveal.
+  postRevealLinks: PostRevealLinksSnapshot | null;
   input: {
     intents: number;
     lastKind: string;
@@ -1041,6 +1047,7 @@ export class PerfMonitor {
       netPipeline: this.netPipelineSource?.summary() ?? null,
       heapSawtooth: this.heapSawtooth.summary(),
       hitchForensics: this.hitchForensics.records(),
+      postRevealLinks: postRevealLinksSnapshot(),
       input: {
         intents: this.inputIntents,
         lastKind: this.lastInputKind,

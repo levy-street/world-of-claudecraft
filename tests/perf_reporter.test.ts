@@ -1,8 +1,10 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { loadSpan, resetLoadProfile } from '../src/game/load_profiler';
 import type { PerfMonitor, PerfSnapshot } from '../src/game/perf';
 import { jitteredPerfReportDelay } from '../src/game/perf_report_schedule';
 import { perfReporterInternalsForTest, startPerfReporter } from '../src/game/perf_reporter';
 import { Settings } from '../src/game/settings';
+import { POST_REVEAL_LINK_WINDOW_MS } from '../src/render/post_reveal_links_core';
 
 function installBrowserGlobals(): void {
   const map = new Map<string, string>();
@@ -317,6 +319,7 @@ function snapshot(): PerfSnapshot {
     fps: 60,
     hiddenPresentSkips: 0,
     hitchForensics: [],
+    postRevealLinks: null,
     frameMs: { avg: 16.6, p50: 16, p95: 19, p99: 28, max: 52, long50: 1 },
     windows: {
       last10s: {
@@ -1819,5 +1822,149 @@ describe('perf reporter streamed-prewarm emit-on-change gate', () => {
     expect(second.compileMs).toBeDefined();
     expect(second.resume).toBeDefined();
     expect((second.entries as unknown[]).length).toBeGreaterThan(0);
+  });
+});
+
+describe('perf reporter world-entry blocks', () => {
+  it('passes the post-reveal program window through to raw summary, null before the reveal', () => {
+    const settings = new Settings();
+    const before = perfReporterInternalsForTest.payloadFromSnapshot(snapshot(), settings, 's', 1)!;
+    expect((before.rawSummary as { postRevealLinks?: unknown }).postRevealLinks).toBeNull();
+
+    const armed = snapshot();
+    armed.postRevealLinks = {
+      reveals: 1,
+      revealsInWindow: 1,
+      windowMs: POST_REVEAL_LINK_WINDOW_MS,
+      programsAtReveal: 1187,
+      programsGained: 63,
+      samples: 1180,
+      unsampledMs: 0,
+      closed: true,
+      baselineLost: false,
+    };
+    const after = perfReporterInternalsForTest.payloadFromSnapshot(armed, settings, 's', 1)!;
+    expect((after.rawSummary as { postRevealLinks?: unknown }).postRevealLinks).toEqual(
+      armed.postRevealLinks,
+    );
+  });
+
+  it('emits the boot phases it is handed and null when none were recorded', () => {
+    const settings = new Settings();
+    const bare = perfReporterInternalsForTest.payloadFromSnapshot(snapshot(), settings, 's', 1)!;
+    expect((bare.rawSummary as { bootPhases?: unknown }).bootPhases).toBeNull();
+
+    const phases = {
+      entryMs: 6120,
+      rendererCtorMs: 813,
+      prepareZoneMs: 1500,
+      prepareNeighborsMs: 301,
+      prewarmInitialMs: 3000,
+    };
+    const body = perfReporterInternalsForTest.payloadFromSnapshot(
+      snapshot(),
+      settings,
+      's',
+      1,
+      null,
+      false,
+      phases,
+    )!;
+    expect((body.rawSummary as { bootPhases?: unknown }).bootPhases).toEqual(phases);
+  });
+
+  describe('over a real send', () => {
+    function installReporterFlowGlobals(fetchImpl: unknown): void {
+      (globalThis as any).location = { search: '' };
+      (globalThis as any).window = {
+        innerWidth: 1440,
+        innerHeight: 900,
+        setTimeout: (fn: () => void, ms: number) => setTimeout(fn, ms),
+        clearTimeout: (id: ReturnType<typeof setTimeout>) => clearTimeout(id),
+        addEventListener: () => {},
+        removeEventListener: () => {},
+      };
+      (globalThis as any).document = {
+        visibilityState: 'visible',
+        addEventListener: () => {},
+        removeEventListener: () => {},
+      };
+      (globalThis as any).sessionStorage = {
+        getItem: () => 'reporter-entry-session',
+        setItem: () => {},
+      };
+      (globalThis as any).fetch = fetchImpl;
+    }
+
+    beforeEach(() => {
+      // Timers only: the default set also fakes `performance`, whose stubbed
+      // mark/measure would leave the load profile empty.
+      vi.useFakeTimers({ toFake: ['setTimeout', 'clearTimeout'] });
+      resetLoadProfile();
+      perfReporterInternalsForTest.resetBootPhasesForTest();
+    });
+
+    afterEach(() => {
+      vi.useRealTimers();
+      vi.restoreAllMocks();
+      resetLoadProfile();
+      perfReporterInternalsForTest.resetBootPhasesForTest();
+      delete (globalThis as any).fetch;
+      delete (globalThis as any).sessionStorage;
+      delete (globalThis as any).document;
+      delete (globalThis as any).window;
+      delete (globalThis as any).location;
+    });
+
+    function sentBootPhases(fetchImpl: ReturnType<typeof vi.fn>, call: number) {
+      const [, init] = fetchImpl.mock.calls[call] as unknown as [string, { body: string }];
+      return (JSON.parse(init.body) as { rawSummary: { bootPhases: Record<string, unknown> } })
+        .rawSummary.bootPhases;
+    }
+
+    it('reads the boot phases off the load profile the entry stamped, once per session', async () => {
+      // The reporter starts at curtain-fade end, after every one of these
+      // measures landed on the performance timeline (main.ts revealWorld).
+      loadSpan('entry', () => {
+        loadSpan('renderer-ctor', () => {});
+        loadSpan('prepare-zone', () => {});
+        loadSpan('prewarm-initial', () => {});
+      });
+      const timelineReads = vi.spyOn(performance, 'getEntriesByType');
+      const fetchImpl = vi.fn(async () => ({ ok: true, status: 204, text: async () => '' }));
+      installReporterFlowGlobals(fetchImpl);
+      const perf = {
+        report: () => snapshot(),
+        drainWorstWindow: vi.fn(),
+      } as unknown as PerfMonitor;
+      const stop = startPerfReporter({
+        perf,
+        settings: new Settings(),
+        tokenProvider: () => null,
+        characterIdProvider: () => null,
+      });
+      try {
+        await vi.advanceTimersByTimeAsync(
+          jitteredPerfReportDelay(75_000, 'reporter-entry-session', 0),
+        );
+        expect(fetchImpl).toHaveBeenCalledTimes(1);
+        const readsAfterFirst = timelineReads.mock.calls.length;
+        expect(readsAfterFirst).toBeGreaterThan(0);
+        // The second beacon reuses the memoized phases: no second timeline walk.
+        await vi.advanceTimersByTimeAsync(
+          jitteredPerfReportDelay(5 * 60_000, 'reporter-entry-session', 1) + 1,
+        );
+        expect(fetchImpl).toHaveBeenCalledTimes(2);
+        expect(timelineReads.mock.calls.length).toBe(readsAfterFirst);
+      } finally {
+        stop();
+      }
+      const first = sentBootPhases(fetchImpl, 0);
+      expect(first).toMatchObject({ prepareNeighborsMs: null });
+      for (const key of ['entryMs', 'rendererCtorMs', 'prepareZoneMs', 'prewarmInitialMs']) {
+        expect(typeof first[key], key).toBe('number');
+      }
+      expect(sentBootPhases(fetchImpl, 1)).toEqual(first);
+    });
   });
 });

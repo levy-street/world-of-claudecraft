@@ -225,6 +225,7 @@ function baseSnapshot(): PerfSnapshot {
     netPipeline: null,
     heapSawtooth: null,
     hitchForensics: [],
+    postRevealLinks: null,
     input: {
       intents: 20,
       lastKind: 'move',

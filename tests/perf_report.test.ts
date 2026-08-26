@@ -1851,3 +1851,123 @@ describe('perf report ingestion', () => {
     }
   });
 });
+
+describe('world-entry raw summary blocks', () => {
+  it('bounds postRevealLinks and bootPhases on the verbatim raw path', async () => {
+    const res = fakeRes();
+
+    await handlePerfReport(
+      fakeReq({
+        sessionId: 'public-entry-blocks',
+        rawSummary: {
+          seconds: 30,
+          postRevealLinks: {
+            reveals: 1,
+            revealsInWindow: 1,
+            windowMs: 20_000,
+            programsAtReveal: 1187,
+            programsGained: 1e9,
+            samples: 1180.9,
+            unsampledMs: 250,
+            closed: true,
+            baselineLost: 'yes',
+            planted: 'x'.repeat(100),
+          },
+          bootPhases: {
+            entryMs: 6120,
+            rendererCtorMs: 813,
+            prepareZoneMs: null,
+            prepareNeighborsMs: -5,
+            prewarmInitialMs: 'later',
+          },
+        },
+      }),
+      res,
+    );
+
+    expect(res.statusCode).toBe(200);
+    const stored = vi.mocked(insertClientPerfReport).mock.calls.at(-1)![0];
+    const raw = stored.rawSummary as Record<string, unknown>;
+    expect(raw.truncated).toBeUndefined();
+    expect(raw.postRevealLinks).toEqual({
+      reveals: 1,
+      revealsInWindow: 1,
+      windowMs: 20_000,
+      programsAtReveal: 1187,
+      programsGained: 100_000,
+      samples: 1180,
+      unsampledMs: 250,
+      closed: true,
+      baselineLost: false,
+    });
+    expect(raw.bootPhases).toEqual({
+      entryMs: 6120,
+      rendererCtorMs: 813,
+      prepareZoneMs: null,
+      prepareNeighborsMs: 0,
+      prewarmInitialMs: null,
+    });
+  });
+
+  it('drops a malformed or empty block instead of storing it, and tolerates the client null', async () => {
+    const res = fakeRes();
+
+    await handlePerfReport(
+      fakeReq({
+        sessionId: 'public-entry-blocks-malformed',
+        rawSummary: {
+          seconds: 30,
+          postRevealLinks: {},
+          bootPhases: null,
+        },
+      }),
+      res,
+    );
+
+    expect(res.statusCode).toBe(200);
+    const stored = vi.mocked(insertClientPerfReport).mock.calls.at(-1)![0];
+    const raw = stored.rawSummary as Record<string, unknown>;
+    expect('postRevealLinks' in raw).toBe(false);
+    expect('bootPhases' in raw).toBe(false);
+  });
+
+  it('carries both blocks across truncation into the compact path', async () => {
+    const res = fakeRes();
+
+    await handlePerfReport(
+      fakeReq({
+        sessionId: 'public-entry-blocks-large',
+        rawSummary: {
+          seconds: 30,
+          postRevealLinks: {
+            reveals: 1,
+            revealsInWindow: 1,
+            windowMs: 20_000,
+            programsAtReveal: 900,
+            programsGained: 41,
+            samples: 1100,
+            unsampledMs: 0,
+            closed: true,
+            baselineLost: false,
+          },
+          bootPhases: {
+            entryMs: 9000,
+            rendererCtorMs: 1000,
+            prepareZoneMs: 2000,
+            prepareNeighborsMs: 500,
+            prewarmInitialMs: 4000,
+          },
+          oversized: 'x'.repeat(40_000),
+        },
+      }),
+      res,
+    );
+
+    expect(res.statusCode).toBe(200);
+    const stored = vi.mocked(insertClientPerfReport).mock.calls.at(-1)![0];
+    const raw = stored.rawSummary as Record<string, unknown>;
+    expect(raw.truncated).toBe(true);
+    expect(raw.postRevealLinks).toMatchObject({ programsGained: 41, closed: true });
+    expect(raw.bootPhases).toMatchObject({ entryMs: 9000, prewarmInitialMs: 4000 });
+  });
+});

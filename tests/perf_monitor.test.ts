@@ -1,6 +1,11 @@
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import { PerfMonitor } from '../src/game/perf';
 import type { NetPipelineSummary } from '../src/net/net_pipeline_stats';
+import {
+  armLiveProgramWatch,
+  resetLiveProgramWatchForTest,
+  setLiveProgramWatchClockForTest,
+} from '../src/render/live_program_watch';
 import type { Renderer } from '../src/render/renderer';
 import type { SceneCensusReport } from '../src/render/scene_census_core';
 
@@ -480,5 +485,28 @@ describe('perf monitor scene census wiring', () => {
     const snap = perf.snapshot(1000);
     expect(snap.census).toBeUndefined();
     expect(snap.hitches).toBeUndefined();
+  });
+});
+
+describe('post-reveal links in the snapshot', () => {
+  afterEach(() => resetLiveProgramWatchForTest());
+
+  it('carries the module window always-on: null before the reveal, the block after it', () => {
+    resetLiveProgramWatchForTest();
+    setLiveProgramWatchClockForTest(() => 1000);
+    const perf = new PerfMonitor(null);
+    expect(perf.snapshot(1000).postRevealLinks).toBeNull();
+
+    armLiveProgramWatch({ info: { programs: [{ id: 1 }, { id: 2 }], memory: { textures: 0 } } });
+    expect(perf.snapshot(2000).postRevealLinks).toMatchObject({
+      reveals: 1,
+      programsAtReveal: 2,
+      programsGained: 0,
+      closed: false,
+    });
+    // reset() runs at curtain-fade END, after the reveal armed the window: it
+    // must not disarm what the beacon is about to read.
+    perf.reset();
+    expect(perf.snapshot(3000).postRevealLinks).toMatchObject({ programsAtReveal: 2 });
   });
 });

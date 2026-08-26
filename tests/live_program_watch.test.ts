@@ -1,12 +1,14 @@
 import { readFileSync } from 'node:fs';
-import { afterEach, describe, expect, it } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import { presentFrame } from '../src/render/frame_present';
 import { gpuPrepEventsSnapshot, resetGpuPrepEventsForTest } from '../src/render/gpu_prep_events';
 import * as liveProgramWatch from '../src/render/live_program_watch';
 import {
   armLiveProgramWatch,
+  postRevealLinksSnapshot,
   recordNewLivePrograms,
   resetLiveProgramWatchForTest,
+  setLiveProgramWatchClockForTest,
 } from '../src/render/live_program_watch';
 import {
   absorbLivePrograms as absorbCore,
@@ -16,6 +18,7 @@ import {
   type LiveProgramEntry,
   liveProgramIdentity,
 } from '../src/render/live_program_watch_core';
+import { POST_REVEAL_LINK_WINDOW_MS } from '../src/render/post_reveal_links_core';
 
 const program = (id: number, name: string): LiveProgramEntry => ({
   id,
@@ -243,5 +246,137 @@ describe('the renderer-facing watch', () => {
     // And the next real draw, which links nothing of its own, reports nothing.
     expect(presentFrame(host, 1 / 60, true)).toBe(true);
     expect(gpuPrepEventsSnapshot().counts['live-program']).toBe(0);
+  });
+});
+
+describe('the post-reveal link window on the watch', () => {
+  let nowMs = 0;
+
+  beforeEach(() => {
+    nowMs = 1000;
+    resetLiveProgramWatchForTest();
+    setLiveProgramWatchClockForTest(() => nowMs);
+  });
+
+  afterEach(() => {
+    resetGpuPrepEventsForTest();
+    resetLiveProgramWatchForTest();
+  });
+
+  function presentHost(programs: LiveProgramEntry[]) {
+    return {
+      vfx: { prepareDraw(): void {} },
+      post: null,
+      webgl: { info: { programs }, render(): void {} },
+      scene: {},
+      camera: {},
+      programWatch: liveProgramWatch,
+    };
+  }
+
+  it('is null until the reveal arms it, however many programs boot links', () => {
+    const programs = [program(1, 'MeshStandardMaterial'), program(2, 'MeshBasicMaterial')];
+    presentFrame(presentHost(programs), 1 / 60, true);
+    expect(postRevealLinksSnapshot()).toBeNull();
+  });
+
+  it('never opens on a host without a program list: no baseline, no window', () => {
+    armLiveProgramWatch({ info: { programs: null, memory: { textures: 0 } } });
+    expect(postRevealLinksSnapshot()).toBeNull();
+  });
+
+  it('opens at the reveal arm on the linked count and samples once per DRAWN frame', () => {
+    const programs = [program(1, 'MeshStandardMaterial'), program(2, 'MeshBasicMaterial')];
+    armLiveProgramWatch(infoHost(programs));
+    const host = presentHost(programs);
+
+    nowMs = 1016;
+    programs.push(program(3, 'MeshLambertMaterial'));
+    presentFrame(host, 1 / 60, true);
+    nowMs = 1033;
+    programs.push(program(4, 'MeshPhongMaterial'));
+    // A skipped frame draws nothing and samples nothing (the absorb arm does
+    // not sample), so the count is one per drawn frame.
+    presentFrame(host, 1 / 60, false);
+    nowMs = 1050;
+    presentFrame(host, 1 / 60, true);
+
+    expect(postRevealLinksSnapshot()).toMatchObject({
+      reveals: 1,
+      windowMs: POST_REVEAL_LINK_WINDOW_MS,
+      programsAtReveal: 2,
+      programsGained: 2,
+      samples: 2,
+      closed: false,
+    });
+  });
+
+  it('closes 20 s after the reveal and stops reading the clock', () => {
+    const programs = [program(1, 'MeshStandardMaterial')];
+    armLiveProgramWatch(infoHost(programs));
+    const host = presentHost(programs);
+    nowMs = 15_000;
+    programs.push(program(2, 'MeshBasicMaterial'));
+    presentFrame(host, 1 / 60, true);
+    nowMs = 1000 + POST_REVEAL_LINK_WINDOW_MS;
+    programs.push(program(3, 'MeshLambertMaterial'));
+    presentFrame(host, 1 / 60, true);
+    expect(postRevealLinksSnapshot()).toMatchObject({ programsGained: 1, closed: true });
+
+    let clockReads = 0;
+    resetLiveProgramWatchForTest();
+    setLiveProgramWatchClockForTest(() => {
+      clockReads++;
+      return nowMs;
+    });
+    armLiveProgramWatch(infoHost(programs));
+    // The arm reads once; the first frame past the window reads once more
+    // and closes it; nothing after that touches the clock.
+    nowMs += POST_REVEAL_LINK_WINDOW_MS;
+    presentFrame(host, 1 / 60, true);
+    expect(clockReads).toBe(2);
+    expect(postRevealLinksSnapshot()?.closed).toBe(true);
+    presentFrame(host, 1 / 60, true);
+    presentFrame(host, 1 / 60, true);
+    expect(clockReads).toBe(2);
+  });
+
+  it('closes on a lost baseline when a rebuilt context swaps the list under it', () => {
+    const programs = Array.from({ length: 1200 }, (_, i) => program(i + 1, 'Mesh'));
+    armLiveProgramWatch(infoHost(programs));
+    const host = presentHost(programs);
+    nowMs = 2000;
+    programs.push(program(1201, 'MeshBasicMaterial'));
+    presentFrame(host, 1 / 60, true);
+    // The graphics rebuild's new WebGLRenderer starts a near-empty list; the
+    // renderer swaps it in place, so the host now hands that list over.
+    const rebuilt = Array.from({ length: 40 }, (_, i) => program(i + 1, 'Mesh'));
+    nowMs = 3000;
+    presentFrame(presentHost(rebuilt), 1 / 60, true);
+    expect(postRevealLinksSnapshot()).toMatchObject({
+      programsGained: 1,
+      closed: true,
+      baselineLost: true,
+    });
+  });
+
+  it('keeps the world entry as the window when a later arrival re-arms the watch', () => {
+    const programs = [program(1, 'MeshStandardMaterial')];
+    armLiveProgramWatch(infoHost(programs));
+    nowMs = 5000;
+    programs.push(program(2, 'MeshBasicMaterial'));
+    armLiveProgramWatch(infoHost(programs));
+    presentFrame(presentHost(programs), 1 / 60, true);
+    expect(postRevealLinksSnapshot()).toMatchObject({
+      reveals: 2,
+      revealsInWindow: 2,
+      programsAtReveal: 1,
+      programsGained: 1,
+    });
+    // An arrival after the close counts on the page arm only.
+    nowMs = 1000 + POST_REVEAL_LINK_WINDOW_MS;
+    presentFrame(presentHost(programs), 1 / 60, true);
+    armLiveProgramWatch(infoHost(programs));
+    expect(postRevealLinksSnapshot()).toMatchObject({ reveals: 3, revealsInWindow: 2 });
   });
 });
