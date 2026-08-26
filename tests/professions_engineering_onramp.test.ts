@@ -27,7 +27,11 @@ import {
 import { requiredLevelFor } from '../src/sim/item_level_req';
 import { craftSkillGainMultiplier } from '../src/sim/professions/archetype';
 import { materialTierBonusForReagents } from '../src/sim/professions/material_tier';
-import { PRE_TRAINING_RECIPE_IDS, teachTierMet } from '../src/sim/professions/training';
+import {
+  PRE_TRAINING_RECIPE_IDS,
+  teachTierMet,
+  trainingFeeFor,
+} from '../src/sim/professions/training';
 import type { ProfessionRecipeRecord } from '../src/sim/professions/types';
 import { tierForSkill, tierProgressMultiplier } from '../src/sim/professions/wheel';
 
@@ -129,6 +133,15 @@ describe('engineering on-ramp: the attuned climb needs no grandfathered tool cra
     expect(PRE_TRAINING_RECIPE_IDS.length).toBeGreaterThanOrEqual(21);
     expect(PRE_TRAINING_RECIPE_IDS).not.toContain('recipe_cogwheel_blank');
     expect(PRE_TRAINING_RECIPE_IDS).not.toContain('recipe_copperlens_ocular');
+  });
+
+  it('the on-ramp hoe teaches free (the tier-0 fee, the one derived economy delta)', () => {
+    // The 25-to-0 re-tier drops recipe_bronze_hoe's teach fee 2500 to 0 by
+    // the shipped fee ladder; pinned for symmetry with the masterwork-delta
+    // disclosure (a derived magnitude the phase moves is a pinned magnitude).
+    const hoe = recipeById('recipe_bronze_hoe');
+    expect(hoe).toBeDefined();
+    expect(trainingFeeFor(hoe!)).toBe(0);
   });
 
   it('teachTierMet really can refuse (in-file control for the empty above-cap sweep)', () => {

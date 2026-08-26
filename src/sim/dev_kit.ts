@@ -232,7 +232,10 @@ const SCORE_TIE_EPSILON = 1e-9;
 // new quality string fails tsc here instead of silently ranking below rare;
 // the scale is DERIVED from the ladder size (any value past its top rank),
 // so identity, an integer sum over integer stats, stays strictly dominant.
-const QUALITY_TIE_RANK: Record<NonNullable<ItemDef['quality']>, number> = {
+// Exported for tests: tests/dev_kit.test.ts pins the dominance property
+// (the scale strictly exceeds the ladder's top rank) beside the
+// integer-stat premise it composes with.
+export const QUALITY_TIE_RANK: Record<NonNullable<ItemDef['quality']>, number> = {
   poor: 0,
   common: 1,
   uncommon: 2,
@@ -240,7 +243,7 @@ const QUALITY_TIE_RANK: Record<NonNullable<ItemDef['quality']>, number> = {
   epic: 4,
   legendary: 5,
 };
-const QUALITY_TIE_SCALE = Object.keys(QUALITY_TIE_RANK).length;
+export const QUALITY_TIE_SCALE = Object.keys(QUALITY_TIE_RANK).length;
 
 function bestBy(
   items: readonly ItemDef[],

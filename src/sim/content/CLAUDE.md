@@ -171,7 +171,11 @@ inside the old boarball pitch.
   contract. Read the item's live name, quest/recipe relationship, set, and tier
   data before approving art; old icon subject matter is not authoritative when it
   contradicts content. Generated Heroic variants intentionally inherit their base
-  item's painting.
+  item's painting. A new rare-or-better EQUIPPABLE whose source level lands at
+  20 or above also joins the level-20 shelf sweep in
+  `tests/crafted_wearability.test.ts`, whose membership count is pinned
+  EXACTLY (its own comment says why); re-pin it deliberately in the same
+  change.
 - **Gather node:** add a `GatherNodeDef` (typed in `../types.ts`) to
   `gather_nodes.ts`; `level` is a one-time snapshot of the zone's `levelRange`
   midpoint, not a live lookup. Yield/respawn per node TYPE lives in

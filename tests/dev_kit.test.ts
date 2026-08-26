@@ -12,6 +12,8 @@ import {
   DEV_KIT_LEVEL,
   dungeonLootIds,
   isFreshTwentyItem,
+  QUALITY_TIE_RANK,
+  QUALITY_TIE_SCALE,
 } from '../src/sim/dev_kit';
 import { canDualWield, isShieldItem } from '../src/sim/equipment_rules';
 import { itemFromRaid } from '../src/sim/item_level';
@@ -391,6 +393,12 @@ describe('kit construction', () => {
     // trivially, and a role-stat edge beats any quality edge by construction;
     // the integer-stat premise that construction rests on is pinned below).
     expect(buildDevKit('mage', 'frost')?.equip.offhand).toBe('sunpetal_grimoire');
+  });
+
+  it('the tiebreak scale strictly exceeds the quality ladder top rank (dominance property)', () => {
+    // With integer identity sums (pinned below), scale > max rank is what
+    // makes a 1-point role-stat edge unbeatable by any quality gap.
+    expect(QUALITY_TIE_SCALE).toBeGreaterThan(Math.max(...Object.values(QUALITY_TIE_RANK)));
   });
 
   it('every primary stat in ITEMS is an integer (the tiebreak scale premise)', () => {
