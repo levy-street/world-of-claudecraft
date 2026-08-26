@@ -218,7 +218,29 @@ function isTwoHanded(item: ItemDef): boolean {
 // unreachable from the shipped tables whose pool order (Object.values(ITEMS))
 // is fixed and host-identical; and the unconditional first-item seed assumes
 // score never returns NaN, which no shipped scorer does.
+// AMENDED at masterwrought Phase 11o: buildDevKit's tieScore is now the
+// composite identity-then-quality (roleIdentitySum scaled above a bounded
+// quality rank), not the raw identity sum; identity stays strictly dominant
+// because stats are integers and the scale exceeds the ladder's top rank.
 const SCORE_TIE_EPSILON = 1e-9;
+
+// The quality half of buildDevKit's in-band tiebreak (masterwrought Phase
+// 11o): two dead-stat held offhands (the uncommon copperlens_ocular vs the
+// rare sunpetal_grimoire, both sta 2 to a feral druid) tie on identity, and
+// the pre-11o alphabet break silently handed the kit the strictly weaker
+// item the day a lower id shipped. Typed over the full quality union so a
+// new quality string fails tsc here instead of silently ranking below rare;
+// the scale is DERIVED from the ladder size (any value past its top rank),
+// so identity, an integer sum over integer stats, stays strictly dominant.
+const QUALITY_TIE_RANK: Record<NonNullable<ItemDef['quality']>, number> = {
+  poor: 0,
+  common: 1,
+  uncommon: 2,
+  rare: 3,
+  epic: 4,
+  legendary: 5,
+};
+const QUALITY_TIE_SCALE = Object.keys(QUALITY_TIE_RANK).length;
 
 function bestBy(
   items: readonly ItemDef[],
@@ -252,8 +274,9 @@ function bestBy(
   return best;
 }
 
-/** The raw sum of an item's values in the stats a role weights: the in-band
- *  tiebreak preference, so a tied kit pick carries the role's own stats
+/** The raw sum of an item's values in the stats a role weights: the DOMINANT
+ *  term of the in-band tiebreak (identity, then quality, then id since
+ *  masterwrought Phase 11o), so a tied kit pick carries the role's own stats
  *  rather than whatever id sorts first (a hunter never gets an intellect
  *  ring over a strength ring on an alphabet accident). */
 function roleIdentitySum(role: DevKitRole, item: ItemDef): number {
@@ -290,24 +313,8 @@ export function buildDevKit(cls: PlayerClass, spec: string): DevKit | null {
 
   const pool = Object.values(ITEMS).filter((item) => isFreshTwentyItem(cls, item));
   const score = (item: ItemDef): number => roleItemScore(role, item);
-  // The tiebreak prefers the role's own stats first, then item QUALITY, then
-  // id. The quality term landed at masterwrought Phase 11o: two dead-stat
-  // held offhands (the uncommon copperlens_ocular vs the rare
-  // sunpetal_grimoire, both sta 2 to a feral druid) tie on identity, and the
-  // pre-11o alphabet break silently handed the kit the strictly weaker item
-  // the day a lower id shipped. Identity is an integer sum and the quality
-  // rank is bounded by the ladder length, so scaling identity by 8 keeps the
-  // role's stats strictly dominant over quality.
-  const QUALITY_TIE_RANK: Record<string, number> = {
-    poor: 0,
-    common: 1,
-    uncommon: 2,
-    rare: 3,
-    epic: 4,
-    legendary: 5,
-  };
   const tie = (item: ItemDef): number =>
-    roleIdentitySum(role, item) * 8 + (QUALITY_TIE_RANK[item.quality ?? 'common'] ?? 1);
+    roleIdentitySum(role, item) * QUALITY_TIE_SCALE + QUALITY_TIE_RANK[item.quality ?? 'common'];
   const equip: Partial<Record<EquipSlot, string>> = {};
 
   for (const slot of KIT_SLOTS) {
@@ -380,11 +387,12 @@ export function buildDevKit(cls: PlayerClass, spec: string): DevKit | null {
       const held = bestBy(
         pool.filter((item) => item.kind === 'held_offhand' && canEquipItem(cls, item)),
         score,
-        // The same identity-then-id tiebreak the caster path passes: before
-        // the inscription tomes this filter never held two candidates, so the
-        // omission was unreachable; with several tomes in the pool an in-band
-        // tie here must not resolve on alphabetical id alone (the bestBy
-        // caveat block above owns the tiebreak contract).
+        // The same identity-then-quality-then-id tiebreak the caster path
+        // passes: before the inscription tomes this filter never held two
+        // candidates, so the omission was unreachable; with several offhands
+        // in the pool an in-band tie here must not resolve on alphabetical
+        // id alone (the bestBy caveat block above owns the tiebreak
+        // contract).
         tie,
       );
       if (held) equip.offhand = held.id;

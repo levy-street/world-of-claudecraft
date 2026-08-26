@@ -379,6 +379,34 @@ describe('kit construction', () => {
     }
   });
 
+  it('an in-band tie prefers quality over id (the masterwrought Phase 11o tiebreak)', () => {
+    // The regression this pins: feral weights no int or spi, so the rare
+    // sunpetal_grimoire and the uncommon copperlens_ocular tie on identity
+    // (sta 2 each) inside the epsilon band, and before the quality term the
+    // alphabet handed the kit the strictly weaker uncommon the day its lower
+    // id shipped. The tome must win on quality.
+    expect(buildDevKit('druid', 'feral')?.equip.offhand).toBe('sunpetal_grimoire');
+    // The dominance order's other half: quality never outranks identity (a
+    // caster spec whose weights the tome's int/spi DO count keeps it too,
+    // trivially, and a role-stat edge beats any quality edge by construction;
+    // the integer-stat premise that construction rests on is pinned below).
+    expect(buildDevKit('mage', 'frost')?.equip.offhand).toBe('sunpetal_grimoire');
+  });
+
+  it('every primary stat in ITEMS is an integer (the tiebreak scale premise)', () => {
+    // buildDevKit scales the identity sum above the quality rank ladder; that
+    // dominance argument is sound only while stats are integers (a fractional
+    // stat could shrink an identity edge below a quality gap). Pin the
+    // premise where it is relied on.
+    for (const def of Object.values(ITEMS)) {
+      for (const stat of ['str', 'agi', 'sta', 'int', 'spi'] as const) {
+        const value = def.stats?.[stat];
+        if (value === undefined) continue;
+        expect(Number.isInteger(value), `${def.id}.${stat} = ${value}`).toBe(true);
+      }
+    }
+  });
+
   it('gives a shield spec a one-hander so the shield actually fits', () => {
     const kit = buildDevKit('warrior', 'prot');
     const main = ITEMS[kit?.equip.mainhand ?? ''];
