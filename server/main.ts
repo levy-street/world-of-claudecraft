@@ -3366,9 +3366,10 @@ export async function startServer(): Promise<http.Server> {
   const config = activeConfig();
   // Render stops scanning for a port after five minutes, while first-boot DDL on
   // a free remote database can legitimately take longer. Bind a deliberately
-  // unavailable probe now; it exposes no game routes and returns 503 even for
-  // /livez, so the deployment cannot be promoted before every boot precondition
-  // below has completed. The real server takes this same port near the end.
+  // unavailable probe now; it exposes no game routes. /livez reports process
+  // liveness so a host's bounded deploy-health window does not kill a legitimate
+  // long first-boot schema pass; every other route stays 503 until the real server
+  // takes this same port near the end.
   const startupProbe = await listenStartupProbe(config.port);
   console.log(`startup probe listening on port ${config.port}`);
   configureCommunityTestAccounts(config.provisionTestAccounts);

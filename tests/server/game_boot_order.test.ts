@@ -71,7 +71,7 @@ describe('startServer wires the discord bot counters exporter (source pin)', () 
   });
 });
 
-describe('startServer exposes only a 503 startup probe during database boot', () => {
+describe('startServer exposes only a liveness-only startup probe during database boot', () => {
   const mainSrc = readFileSync('server/main.ts', 'utf8');
 
   it('opens the startup port before schema work and hands it over after boot preconditions', () => {

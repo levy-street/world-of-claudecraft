@@ -8,16 +8,17 @@ const STARTUP_RETRY_SECONDS = 5;
 /**
  * Bind the service port while database and world boot preconditions run, but do
  * not expose any gameplay or account route. Render's port scanner can therefore
- * distinguish a booting web service from a process that forgot to listen, while
- * its /livez health check keeps the instance out of rotation until the real
- * server takes ownership of the port.
+ * distinguish a booting web service from a process that forgot to listen. The
+ * /livez response reports only process liveness so a bounded deploy-health window
+ * cannot kill a legitimate long first-boot schema pass; all game routes stay 503.
  */
 export function listenStartupProbe(port: number, host?: string): Promise<StartupProbeServer> {
-  const server = http.createServer({ maxHeaderSize: MAX_HEADER_SIZE_BYTES }, (_req, res) => {
-    res.writeHead(503, {
+  const server = http.createServer({ maxHeaderSize: MAX_HEADER_SIZE_BYTES }, (req, res) => {
+    const isLivenessProbe = (req.url?.split('?', 1)[0] ?? '/') === '/livez';
+    res.writeHead(isLivenessProbe ? 200 : 503, {
       'Content-Type': 'text/plain; charset=utf-8',
       'Cache-Control': 'no-store',
-      'Retry-After': String(STARTUP_RETRY_SECONDS),
+      ...(isLivenessProbe ? {} : { 'Retry-After': String(STARTUP_RETRY_SECONDS) }),
       Connection: 'close',
     });
     res.end('starting');

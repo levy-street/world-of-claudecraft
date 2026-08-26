@@ -35,18 +35,22 @@ function request(
 }
 
 describe('startup probe server', () => {
-  it('opens a port immediately but keeps every route unavailable until game boot completes', async () => {
+  it('reports process liveness while keeping game routes unavailable until boot completes', async () => {
     probe = await listenStartupProbe(0, '127.0.0.1');
     const address = probe.address();
     if (address === null || typeof address === 'string') throw new Error('missing probe port');
 
-    for (const path of ['/livez', '/api/status']) {
-      const res = await request(address.port, path);
-      expect(res.status).toBe(503);
-      expect(res.body).toBe('starting');
-      expect(res.headers['cache-control']).toBe('no-store');
-      expect(res.headers['retry-after']).toBe('5');
-    }
+    const live = await request(address.port, '/livez?source=render');
+    expect(live.status).toBe(200);
+    expect(live.body).toBe('starting');
+    expect(live.headers['cache-control']).toBe('no-store');
+    expect(live.headers['retry-after']).toBeUndefined();
+
+    const gameRoute = await request(address.port, '/api/status');
+    expect(gameRoute.status).toBe(503);
+    expect(gameRoute.body).toBe('starting');
+    expect(gameRoute.headers['cache-control']).toBe('no-store');
+    expect(gameRoute.headers['retry-after']).toBe('5');
   });
 
   it('releases the port before the real server takes ownership', async () => {
