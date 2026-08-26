@@ -340,13 +340,35 @@ kills the stat as a choice and ships dead weight on mandatory pieces. So:
 - Tier set pieces NEVER carry Hit. Their primary is crit or haste per the
   spec identity, with the other as secondary.
 - Hit appears only on elective pieces: the waist off-set of each physical
-  and spell-damage variant carries Hit 60 as its primary, the physical
-  neck and the spell-damage ring carry Hit 25 as their single jewelry
-  rating, and two weapons carry Hit 30 as their secondary.
-- The result: the Normal-raid hit floor is covered by one elective piece,
-  and a deliberate full stack reaches about 170 rating, under the +3
-  heroic melee cap, so heroic five-man players still have a real chase
-  with no ambient saturation.
+  (tanking included) and spell-damage variant carries Hit 60 as its
+  primary; the physical
+  neck, the physical ring, and the spell-damage ring carry Hit 25 as
+  their single jewelry rating; and the two one-hand physical weapons
+  (Cinderfang Kris, Slagrender Cleaver) carry Hit 30 as their secondary.
+
+**Hit acquisition guarantee.** Scarce must never mean starved: every role
+covers its real window from guaranteed drops. The windows come from the
+live formulas (melee miss 5 percent at equal level plus the 10 percent
+dual-wield white penalty; spell hit 96 percent base, gear-cappable to
+100):
+
+| Role | Window vs the Normal raid | Elective sources | Reachable |
+|---|---|---|---|
+| Two-hand melee, tanks, hunters | 50 | waist 60; neck and ring 25 each; weapon 30 | one piece covers it |
+| Dual-wielders (fury, rogues, enhancement), white swings | 150 | waist 60 + neck 25 + ring 25 + both weapons 30 | 170 |
+| Damage casters | 40 | waist 60, or ring 25 + weapon 30 | one to two pieces |
+| Healers | none (heals are not resisted) | none | n/a |
+
+Every hit elective sits in a guaranteed sum-to-1 roll group (the waists
+and the two hit weapons in ignivar_offset, necks in ignivar_jewelry,
+rings in varkhul_rings), so hit is farmable, never a lucky bonus drop.
+
+Against +3 heroic content the windows are 260 melee and 250 spell.
+Blending the tier with the five-man heroic epics' 40-hit pieces (which
+keep their seeds) reaches roughly 250 melee and 235 spell at the cost of
+set pieces and budget: the intended deliberate chase. The dual-wield
+white window against +3 (360) is explicitly not a target, matching the
+classic reality that dual-wield whites never cap against bosses.
 
 These are proposed constants on the existing curve, to be confirmed in the
 tuning pass with the DPS study harness before merge.
