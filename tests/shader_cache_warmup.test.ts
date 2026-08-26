@@ -82,6 +82,11 @@ function fakeGl(options: { parallelCompile?: boolean } = {}): FakeGl & WarmupGl 
     attachShader: (program: { shaders: FakeShader[] }, shader: FakeShader) => {
       program.shaders.push(shader);
     },
+    getProgramParameter: (program: { polls?: number }, _pname: number) => {
+      // Complete on the second poll, so a test can see a pending link survive one frame.
+      program.polls = (program.polls ?? 0) + 1;
+      return program.polls >= 2;
+    },
     linkProgram: (program: { shaders: FakeShader[] }) => {
       const vertex = program.shaders.find((s) => s.type === 1)?.source ?? '';
       const fragment = program.shaders.find((s) => s.type === 2)?.source ?? '';
@@ -270,10 +275,20 @@ describe('startShaderWarmup', () => {
     expect(ctx.gl.linked).toEqual([program(1)]);
     ctx.runFrames(1);
     expect(ctx.gl.linked).toEqual([program(1), program(2)]);
-    ctx.runFrames(2);
+    ctx.runFrames(1);
     expect(ctx.gl.linked).toHaveLength(3);
     expect(shaderWarmupStats()).toMatchObject({ corpusPrograms: 3, submitted: 3, skipped: null });
-    // The last frame found the plan exhausted and scheduled nothing more.
+    // Submission done: the loop now polls each pending link's completion, one
+    // frame per round, without blocking. The fake completes on the second poll,
+    // so one round leaves every link pending and the next resolves all three;
+    // the frame that finds nothing pending schedules nothing more.
+    ctx.runFrames(1);
+    expect(shaderWarmupStats().resolved).toBe(0);
+    expect(ctx.frames).toHaveLength(1);
+    ctx.runFrames(1);
+    expect(shaderWarmupStats().resolved).toBe(3);
+    ctx.runFrames(1);
+    expect(shaderWarmupStats().resolved).toBe(3);
     expect(ctx.frames).toHaveLength(0);
   });
 

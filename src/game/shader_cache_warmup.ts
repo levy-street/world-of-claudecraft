@@ -55,6 +55,11 @@ const WARMUP_CANVAS_PX = 8;
 /** The world has been playable for a while by then, so reading every program's
  *  source costs the player nothing, and the set covers the first minutes. */
 const RECORD_DELAY_MS = 25_000;
+/** KHR_parallel_shader_compile's non-blocking link-completion query. */
+const COMPLETION_STATUS_KHR = 0x91b1;
+/** Completion polls per frame once the submission is done: a poll is one cheap
+ *  GPU-process round trip, and 32 keeps the frame short. */
+const RESOLVE_POLLS_PER_FRAME = 32;
 
 /** The WebGL surface the warm-up context needs. Structural, so a test passes a
  *  plain object and the real `WebGL2RenderingContext` satisfies it as is. */
@@ -72,6 +77,7 @@ export interface WarmupGl {
   deleteProgram(program: WebGLProgram): void;
   getExtension(name: string): unknown;
   getParameter(pname: number): unknown;
+  getProgramParameter(program: WebGLProgram, pname: number): unknown;
 }
 
 /** The extra surface the RECORDING side reads off the world context. */
@@ -109,6 +115,8 @@ export interface StoredCorpus {
 export interface ShaderWarmupStats {
   corpusPrograms: number;
   submitted: number;
+  /** Links the completion poll saw finish (each one cached by that query). */
+  resolved: number;
   elapsedMs: number;
   skipped: WarmupSkipReason | null;
   running: boolean;
@@ -120,6 +128,10 @@ interface WarmupSession {
   plan: WarmupPlan | null;
   context: WarmupContext | null;
   programs: WebGLProgram[];
+  /** Submitted programs whose link has not been observed complete yet. */
+  pending: WebGLProgram[];
+  /** Programs whose link the poll saw complete (and thereby resolved). */
+  resolved: number;
   shaders: WebGLShader[];
   frame: number | null;
   cancelFrame: (handle: number) => void;
@@ -128,6 +140,7 @@ interface WarmupSession {
   corpusPrograms: number;
   skipped: WarmupSkipReason | null;
   stopped: boolean;
+  submittedLogged: boolean;
   released: boolean;
   recorded: number | null;
 }
@@ -137,6 +150,8 @@ function freshSession(recorded: number | null): WarmupSession {
     plan: null,
     context: null,
     programs: [],
+    pending: [],
+    resolved: 0,
     shaders: [],
     frame: null,
     cancelFrame: () => {},
@@ -145,6 +160,7 @@ function freshSession(recorded: number | null): WarmupSession {
     corpusPrograms: 0,
     skipped: null,
     stopped: false,
+    submittedLogged: false,
     released: false,
     recorded,
   };
@@ -357,11 +373,36 @@ function submitProgram(gl: WarmupGl, sources: ShaderProgramSources): void {
   gl.compileShader(fragment);
   gl.attachShader(program, vertex);
   gl.attachShader(program, fragment);
-  // No getProgramParameter, no COMPLETION_STATUS poll: asking would make the
-  // driver's off-thread link synchronous, which is the cost being avoided.
+  // No LINK_STATUS query here: it would make the off-thread link synchronous.
+  // The completion poll in the frame loop resolves each link once it is done,
+  // which is what puts the program into the browser's cache (measured
+  // 2026-08-28: an unresolved parallel link never reaches the cache).
   gl.linkProgram(program);
   session.programs.push(program);
+  session.pending.push(program);
   session.shaders.push(vertex, fragment);
+}
+
+/** Poll a bounded slice of the pending links; a completed one is resolved by
+ *  the query itself, which is the moment the browser caches its binary. */
+function resolveCompletedLinks(gl: WarmupGl): void {
+  const pending = session.pending;
+  let kept = 0;
+  const limit = Math.min(pending.length, RESOLVE_POLLS_PER_FRAME);
+  for (let i = 0; i < limit; i++) {
+    const program = pending[i];
+    let done = false;
+    try {
+      done = gl.getProgramParameter(program, COMPLETION_STATUS_KHR) === true;
+    } catch {
+      done = true;
+    }
+    if (done) session.resolved++;
+    else pending[kept++] = program;
+  }
+  // The slice beyond the limit is untouched: shift it down behind the kept ones.
+  for (let i = limit; i < pending.length; i++) pending[kept++] = pending[i];
+  pending.length = kept;
 }
 
 async function runWarmup(options: StartShaderWarmupOptions): Promise<void> {
@@ -412,9 +453,20 @@ async function runWarmup(options: StartShaderWarmupOptions): Promise<void> {
     const index = nextWarmupIndex(plan);
     session.elapsedMs = now() - session.startedAt;
     if (index === null) {
-      console.info(
-        `${LOG} submitted ${plan.submitted} programs in ${Math.round(session.elapsedMs)} ms`,
-      );
+      if (!session.submittedLogged) {
+        session.submittedLogged = true;
+        console.info(
+          `${LOG} submitted ${plan.submitted} programs in ${Math.round(session.elapsedMs)} ms`,
+        );
+      }
+      resolveCompletedLinks(context.gl);
+      if (session.pending.length === 0 || session.stopped) {
+        console.info(
+          `${LOG} resolved ${session.resolved} links in ${Math.round(session.elapsedMs)} ms`,
+        );
+        return;
+      }
+      session.frame = scheduleFrame(step);
       return;
     }
     submitProgram(context.gl, record.programs[index]);
@@ -554,6 +606,7 @@ export function shaderWarmupStats(): ShaderWarmupStats {
   return {
     corpusPrograms: session.corpusPrograms,
     submitted: session.plan?.submitted ?? 0,
+    resolved: session.resolved,
     elapsedMs: session.elapsedMs,
     skipped: session.skipped,
     running: session.frame !== null,
