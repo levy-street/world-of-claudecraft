@@ -478,7 +478,9 @@ export const RELIQUARY_PROFESSION_MARKS = {
     'masterwork:leatherworking',
     'masterwork:jewelcrafting',
     // Deliberately INSERTED before engineering rather than appended: the
-    // earnable marks group ahead of the pended engineering slot on the page.
+    // earnable marks group ahead of what was then the pended engineering
+    // slot (un-pended 2026-08-25, masterwrought Phase 11o: copperlens_ocular
+    // made the craft gear-capable, so every slot here is earnable now).
     // Safe for a shipped page because marks are id-keyed in the sparse blob
     // (no persisted state is index-dependent); the page-table append-only
     // doctrine governs PAGES, and the order pin in
