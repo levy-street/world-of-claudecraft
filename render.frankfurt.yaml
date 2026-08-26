@@ -21,9 +21,20 @@ services:
     startCommand: node dist-server/server.cjs
     envVars:
       - key: DATABASE_URL
-        sync: false
+        # Reuse the proven Neon credential without exposing it in this repo or
+        # copying it through the browser. The Oregon service remains available
+        # until the Frankfurt smoke test passes.
+        fromService:
+          type: web
+          name: woc-game
+          envVarKey: DATABASE_URL
       - key: PUBLIC_ORIGIN
-        sync: false
+        # Render may add a suffix when the desired global subdomain is already
+        # taken. Self-reference its authoritative URL instead of guessing it.
+        fromService:
+          type: web
+          name: woc-game-eu
+          envVarKey: RENDER_EXTERNAL_URL
       - key: NODE_VERSION
         value: "26"
       - key: NODE_ENV
