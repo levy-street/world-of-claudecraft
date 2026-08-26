@@ -242,7 +242,9 @@ describe('engineering on-ramp: the gadget honors masterwrought R14 and R23', () 
     // The derived-set half: liveKeys is computed by filtering RATING_KEYS
     // over the same two catalogs, so a name dropped from the local list
     // drops from liveKeys and reds here instead of silently narrowing the
-    // R14 claim.
+    // R14 claim. Deliberate false-red trigger: the day a heroic or WARFARE
+    // item ships spellPower, liveKeys grows to six; re-pin the literal
+    // deliberately then (spellPower gains its static exemplar).
     const liveKeys = new Set(
       [...Object.values(HEROIC_VENDOR_ITEMS), ...Object.values(WARFARE_ITEMS)].flatMap((item) =>
         RATING_KEYS.filter((key) => (item[key] ?? 0) > 0),

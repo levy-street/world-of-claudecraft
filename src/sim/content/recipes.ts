@@ -3489,8 +3489,10 @@ export const HOE_RECIPES: ProfessionRecipeRecord[] = [
 //   ring-ordered Used-by tooltip line; the affinity pins moved with it.
 //
 // Both are trainer-taught at the toolworks (Tinker Gizzel derives them from
-// the station, no NPC edit) with skillReq 0/25 resolving to tiers 0/1, both
-// inside every ceiling. The acceptance is pinned by
+// the station, no NPC edit) with skillReq 0/25 resolving to tiers 0/1: the
+// part sits inside every ceiling, the gadget inside the unattuned and hobby
+// rare ceiling but above a dormant craft's common one (tier 1 vs 0).
+// The acceptance is pinned by
 // tests/professions_engineering_onramp.test.ts: an unattuned character can
 // gain engineering 0 to 25, and the attuned 0-to-75 climb needs no
 // grandfathered tier-3 tool craft. Ids are new and append-only
