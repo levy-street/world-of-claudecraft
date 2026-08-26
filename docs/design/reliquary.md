@@ -555,17 +555,20 @@ intentional and pinned by a test.
   rows in those lists; the suite cannot catch an author opting itself out.
 - **Uncatalogued rare-plus items remain** repo-wide, all of them open-world or
   Rift sourced. That is a known backlog, not a drift bug.
-- **Three catalog slots are permanently unfillable today** and keep 100 percent
+- **Two catalog slots are permanently unfillable today** and keep 100 percent
   catalog completion (and therefore the whole-catalog capstone deed)
-  unreachable: the engineering masterwork mark (R1 masterwork suppression:
-  craftBonusStatsFor in crafting.ts returns null for masterwrought defs, so no
-  engineering craft can mint a masterwork instance while suppression stands;
-  when phase 12 moves suppression to the effect gate, craftIsGearCapable flips
-  and this feat justification must be re-judged)
-  and two mount reins (one with no acquisition path, one dev-grant only). This
-  is why the capstone deed is marked as a feat and kept out of the Book
-  completion pair. See "Open owner calls" for the consequence that is still
-  undecided.
+  unreachable: two mount reins (one with no acquisition path, one dev-grant
+  only). The engineering masterwork mark was the third until masterwrought
+  Phase 11o (2026-08-25): its un-pend condition was met by copperlens_ocular,
+  a stats-bearing non-masterwrought engineering output, so craftIsGearCapable
+  flipped through the live gate rather than through the Phase 12 suppression
+  move the earlier note predicted, and the mark is earnable and hinted. R1
+  masterwork suppression still stands for the APEX def (craftBonusStatsFor in
+  crafting.ts returns null for masterwrought defs; gyrelens_array bakes
+  nothing), so the Phase 12 effect-gate move remains its own future event.
+  The two mount slots are why the capstone deed is marked as a feat and kept
+  out of the Book completion pair. See "Open owner calls" for the consequence
+  that is still undecided.
 - **Re-acquiring an already-discovered mount's reins never runs the completion
   ladder live**, because first-discovery fires once while mount ownership is
   possession-based. A player whose last missing relic is reins they once owned

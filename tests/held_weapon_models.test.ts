@@ -220,6 +220,10 @@ describe('held weapon models', () => {
       .map((item) => item.id)
       .sort();
     expect(unmapped).toEqual([
+      // copperlens_ocular: masterwrought Phase 11o's on-ramp gadget parks
+      // with its register sibling gyrelens_array below (the same lens-array
+      // class of gap; no shared model exists) until the art wave.
+      'copperlens_ocular',
       'cragmaw_huntquiver',
       'direfang_quiver',
       // gyrelens_array: the shared art set has no lens-array model (the orb

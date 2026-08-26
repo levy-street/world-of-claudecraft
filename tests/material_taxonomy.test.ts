@@ -58,6 +58,10 @@ const HONEST_MATERIALS = [
   'bone_fragments',
   'brook_carrot',
   'brook_carrot_seed',
+  // Masterwrought Phase 11o: the engineering on-ramp part, a junk-kind
+  // reagent of the chassis and ocular bills, derives IN like the other
+  // crafted components.
+  'cogwheel_blank',
   'compost',
   'cooking_salt',
   'copper_ore',

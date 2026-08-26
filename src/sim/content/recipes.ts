@@ -737,6 +737,14 @@ export const COMBO_RECIPES: ProfessionRecipeRecord[] = [
 // moves WHEN the gear can be worn, never how strong it is, so these pieces
 // deliberately sit above the derived budget of their new item level.
 // tests/crafted_wearability.test.ts pins the windows and the skip list.
+// One DERIVED magnitude rides the level down and is recorded rather than
+// hidden: the masterwork proc's bonus bakes from recipe.level
+// (crafting.ts craftBonusStatsFor), so future masterwork copies of the
+// re-leveled outputs carry a smaller bonus on the slots where the epic-
+// minus-rare delta shrinks at 15 (legs 3 to 1, shoulder and held offhand
+// 3 to 2, gloves 2 to 1; chest, mainhand, helmet, feet, neck and ring are
+// unchanged). Authored def stats moved nowhere; the per-slot deltas are
+// pinned in tests/professions_masterwork.test.ts.
 export const LADDER_RECIPES: ProfessionRecipeRecord[] = [
   // --- weaponcrafting ------------------------------------------------------
   {
@@ -3475,7 +3483,10 @@ export const HOE_RECIPES: ProfessionRecipeRecord[] = [
 //   combat effects, and the gyrelens comment records that no cosmetic-use
 //   family exists to reuse), and no vendor sells ANY held_offhand
 //   (masterwrought R23 clear by census). Input 44 (the cogwheel 18 + copper
-//   2x4 + dust 3x6) vs output 36: gold-negative.
+//   2x4 + dust 3x6) vs output 36: gold-negative. The dust row makes
+//   engineering arcane_dust's FOURTH consumer craft (inscription,
+//   enchanting and jewelcrafting held it at three), which moves the dust's
+//   ring-ordered Used-by tooltip line; the affinity pins moved with it.
 //
 // Both are trainer-taught at the toolworks (Tinker Gizzel derives them from
 // the station, no NPC edit) with skillReq 0/25 resolving to tiers 0/1, both

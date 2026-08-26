@@ -56,10 +56,13 @@ describe('craftIdsForMaterialItem', () => {
     expect(craftIdsForMaterialItem('game_meat')).toEqual(['cooking']);
     expect(craftIdsForMaterialItem('venom_gland')).toEqual(['alchemy']);
     // The dust left this class with the Masterwrought phase 05 jewelcrafting
-    // catalog (rung-0 recipes consume it beside enchanting), and inscription
-    // joined at phase 06 (INSCRIPTION_RECIPES). Ring order puts inscription
-    // first, before enchanting. arcane_shard stays single-craft.
+    // catalog (rung-0 recipes consume it beside enchanting), inscription
+    // joined at phase 06 (INSCRIPTION_RECIPES), and engineering joined at
+    // masterwrought Phase 11o (the copperlens_ocular bill takes dust x3), so
+    // the dust is four-craft now, ring-ordered with engineering first.
+    // arcane_shard stays single-craft.
     expect(craftIdsForMaterialItem('arcane_dust')).toEqual([
+      'engineering',
       'inscription',
       'enchanting',
       'jewelcrafting',

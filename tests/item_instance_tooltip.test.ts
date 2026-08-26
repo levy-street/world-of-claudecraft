@@ -440,6 +440,10 @@ describe('isGatheredProvenanceKind partition over the live content', () => {
         'stonepot_feast',
         'warspice_feast',
         'sageleaf_feast',
+        // masterwrought Phase 11o's on-ramp part: an ordinary crafted junk
+        // component on the intermediates' footing (common, below the signing
+        // floor, same as duskforged_billet and its siblings).
+        'cogwheel_blank',
       ].sort(),
     );
     for (const recipe of craftedJunk) {

@@ -45,7 +45,9 @@ describe('material_taxonomy as the first-evaluated sim module', () => {
     // 117 -> 115 at the 11l QA, which excluded the cracked fetish and the
     // bogiron nugget under the tusk standard (their rows deleted, the defs
     // poor again), so both derive OUT like the other survivors.
-    expect(MATERIAL_ITEM_IDS.size).toBe(115);
+    // 115 -> 116 at masterwrought Phase 11o: cogwheel_blank, the junk-kind
+    // engineering on-ramp part, derives IN as a chassis and ocular reagent.
+    expect(MATERIAL_ITEM_IDS.size).toBe(116);
     expect(MATERIAL_ITEM_IDS.has('iron_ore')).toBe(true);
     expect(MATERIAL_ITEM_IDS.has('arcanite_bar')).toBe(true);
     // The farming source specifically, because it is the newest and the one

@@ -290,7 +290,24 @@ export function buildDevKit(cls: PlayerClass, spec: string): DevKit | null {
 
   const pool = Object.values(ITEMS).filter((item) => isFreshTwentyItem(cls, item));
   const score = (item: ItemDef): number => roleItemScore(role, item);
-  const tie = (item: ItemDef): number => roleIdentitySum(role, item);
+  // The tiebreak prefers the role's own stats first, then item QUALITY, then
+  // id. The quality term landed at masterwrought Phase 11o: two dead-stat
+  // held offhands (the uncommon copperlens_ocular vs the rare
+  // sunpetal_grimoire, both sta 2 to a feral druid) tie on identity, and the
+  // pre-11o alphabet break silently handed the kit the strictly weaker item
+  // the day a lower id shipped. Identity is an integer sum and the quality
+  // rank is bounded by the ladder length, so scaling identity by 8 keeps the
+  // role's stats strictly dominant over quality.
+  const QUALITY_TIE_RANK: Record<string, number> = {
+    poor: 0,
+    common: 1,
+    uncommon: 2,
+    rare: 3,
+    epic: 4,
+    legendary: 5,
+  };
+  const tie = (item: ItemDef): number =>
+    roleIdentitySum(role, item) * 8 + (QUALITY_TIE_RANK[item.quality ?? 'common'] ?? 1);
   const equip: Partial<Record<EquipSlot, string>> = {};
 
   for (const slot of KIT_SLOTS) {

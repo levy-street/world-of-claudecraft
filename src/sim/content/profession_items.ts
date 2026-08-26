@@ -1570,8 +1570,8 @@ export const PROFESSION_ITEMS: Record<string, ItemDef> = {
   // from zero (ENGINEERING_ONRAMP_RECIPES in content/recipes.ts carries the
   // full derivation). The part follows the intermediates materials doctrine
   // above (kind 'junk', quality 'common', sellValue only, ordinary tradable);
-  // tier 0 in material_tier.ts by omission, on purpose, so the chassis bill
-  // it joins keeps its masterwork material bonus unchanged.
+  // tier 0 in professions/material_tier.ts by omission, on purpose, so the
+  // chassis bill it joins keeps its masterwork material bonus unchanged.
   cogwheel_blank: {
     id: 'cogwheel_blank',
     name: 'Cogwheel Blank',

@@ -745,9 +745,11 @@ describe('the professions blob growth bound (phase 16)', () => {
     // floor is unchanged; nothing about the downward headroom moved). A red
     // here after a deliberate family add is the cue to re-measure and re-base
     // the edge at the new measurement plus one, never to widen it.
+    // Re-based at masterwrought Phase 11o: the two on-ramp recipe ids join
+    // knownRecipes (measured 17171; edge = measurement plus one).
     const bytes = professionsBytes(s2);
     expect(bytes).toBeGreaterThan(16740);
-    expect(bytes).toBeLessThan(17121);
+    expect(bytes).toBeLessThan(17172);
     // Strictly dominated by the band's upper edge while the band holds:
     // kept as documentation that the structural ceiling also bounds this
     // state, never the live guard.

@@ -382,6 +382,15 @@ describe('masterwork stays strictly below the raid-loot band (acceptance bound)'
     const vestments = boundRow(recipeById('recipe_eastbrook_ritual_vestments')!, 1);
     expect(vestments.total).toBe(5);
     expect(vestments.floor).toBe(8);
+    // A NON-helmet 11o mover, because the helmet is the one slot whose baked
+    // epic-minus-rare delta is invariant across the re-level (2 at 20 and at
+    // 15). Legs shrink hardest: thoriumscale_leggings, def sum 12, delta 1
+    // at level 15 (3 at the pre-11o level 20; the derived masterwork resize
+    // the LADDER_RECIPES amendment records), total 13 against
+    // primaryStatBudget(15 + 6 + 3, 'epic', 'legs') = 15.
+    const leggings = boundRow(recipeById('recipe_thoriumscale_leggings')!, 1);
+    expect(leggings.total).toBe(13);
+    expect(leggings.floor).toBe(15);
   });
 
   it('the bound has teeth: a hypothetical 2-tier bump would break it for current recipes', () => {

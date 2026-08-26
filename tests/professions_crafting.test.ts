@@ -7,6 +7,7 @@ import {
   CASTER_HUB_RECIPES,
   COMBO_RECIPES,
   COMMON_RECIPES,
+  ENGINEERING_ONRAMP_RECIPES,
   FARM_RECIPES,
   HOE_RECIPES,
   INSCRIPTION_RECIPES,
@@ -455,6 +456,7 @@ describe('craftItem command (#1127)', () => {
       ...APEX_CONSUMABLE_RECIPES,
       ...FARM_RECIPES,
       ...TROPHY_RECIPES,
+      ...ENGINEERING_ONRAMP_RECIPES,
     ]
       .map((r) => r.id)
       .sort();
@@ -476,7 +478,10 @@ describe('craftItem command (#1127)', () => {
         FARM_RECIPES.length +
         // Sibling literal: expect(TROPHY_RECIPES).toHaveLength(7) in
         // tests/recipe_economy.test.ts.
-        TROPHY_RECIPES.length,
+        TROPHY_RECIPES.length +
+        // Sibling literal: the two-row on-ramp pin in
+        // tests/recipe_economy.test.ts (masterwrought Phase 11o).
+        ENGINEERING_ONRAMP_RECIPES.length,
     );
     expect(sim.recipeList.map((r) => r.id).sort()).toEqual(allIds);
   });

@@ -127,10 +127,12 @@ describe('materialProfessionHintText', () => {
     expect(materialProfessionHintText('resonant_hide')).toBe('');
     // The counterpart arm keeps the skip honest: the dust and essence LEFT
     // the enchanting-only class with the Masterwrought phase 05 jewelcrafting
-    // catalog, and inscription joined as a third consumer at phase 06, so
-    // their line comes back and names all three consumers in ring order.
+    // catalog, and inscription joined as a third consumer at phase 06. The
+    // dust gained engineering as a FOURTH consumer at masterwrought Phase
+    // 11o (the copperlens_ocular bill), so its line names four crafts in
+    // ring order; the essence stays three-craft.
     expect(materialProfessionHintText('arcane_dust')).toBe(
-      'Used by Inscription, Enchanting, and Jewelcrafting.',
+      'Used by Engineering, Inscription, Enchanting, and Jewelcrafting.',
     );
     expect(materialProfessionHintText('arcane_essence')).toBe(
       'Used by Inscription, Enchanting, and Jewelcrafting.',
@@ -265,7 +267,7 @@ describe('itemTooltip integration for profession material tags', () => {
     const dustHtml = tooltipHtml('arcane_dust');
     expect(dustHtml).toContain('Crafting reagent');
     expect(dustHtml).not.toContain('Enchanting reagent.');
-    expect(dustHtml).toContain('Used by Inscription, Enchanting, and Jewelcrafting.');
+    expect(dustHtml).toContain('Used by Engineering, Inscription, Enchanting, and Jewelcrafting.');
   });
 
   it('true grey junk still says Junk', () => {
