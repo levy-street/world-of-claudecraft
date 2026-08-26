@@ -18377,3 +18377,293 @@ decisive at 18/18, pairing exact over all four counters, copy clean by
 construction. The 11n maintainer reads plus this round's two new ones
 (the mediawiki seed regen obligation at release, the locale potion
 cooldown mismatch) remain open.
+
+## Phase 11o ledger (2026-08-25, the leveling crafter)
+
+STATUS: COMPLETE. LOCAL, no push, no PR. Rows 117 to 120 EXECUTED AS
+SETTLED (qr-11o-ADMIT/WEAR/ENG/150, farming/state.md rows 1594 to 1639;
+nothing re-decided, this ledger cites the settled rows rather than
+restating them; the stale-premise re-derivations below resolve under
+the rows' own stated rules).
+
+### STEP 0
+Clean at 407dadde17 (the 11n QA stamp; frozen code tip 830aa28799
+under it). release/v0.41.0 fetched: still ff2837da1f, already an
+ancestor, no newer release branch by version sort, no merge and no
+merge audit owed. tsc clean at start, deps present, DATABASE_URL 0.
+
+### THE SETTLED RECORD AND THE TREE THAT MOVED UNDER IT
+Three premises of the 2026-08-20 settlement were stale on the live
+tree; each resolved BY the settled rules, none re-decided:
+1. duskhide_wraps: row 118 and the phase file call it a rung-75 rare;
+   the live tree carries skillReq 50 (#3520, documented in-row). The
+   binding rule in both records is "scope is DERIVED, never
+   hand-listed", so it moved 20 to 15 with its live band; wearable by
+   16 satisfies row 118's own derived acceptance.
+2. The known-two skip list is EMPTY: boundstone_helm and
+   gravewyrm_gauntlets are skillReq-25 level-15 COMBO rows, outside
+   the derived scope entirely.
+3. The actual shared-source candidate is gravewyrm_bone_quiver (rung
+   50, level 20, Korzul 0.05 drop, dungeons.ts): SKIPPED under 11l's
+   own trophy convention (TROPHY_RECIPE_LEVELS pins its level AT the
+   drop source; a move would do nothing under the strict-max source
+   index and would break a settled pin). The skip premise is pinned in
+   tests/crafted_wearability.test.ts: the drop row must exist and the
+   gate must read 20, or the skip forces re-derivation.
+Also doc drift fixed en route: the phase file's "(c) NOTHING else"
+consumer list for recipe.level missed the third consumer the tree's
+own recipes.ts note names (masterworkBonusStats bakes from it;
+measured below), and its "a cosmetic use on the gyrelens precedent is
+legal" inverts the precedent (the gyrelens comment records NO
+cosmetic-use family exists, under masterwrought R14), so row 119's
+statted-offhand arm was taken. Row 120 locates the above-cap lesson in
+both tool headers; it lives in the ROD_RECIPES header plus the
+file-scope note (TOOL_RECIPES' own header never carried it); amended
+where it lives.
+
+### DELIVERABLE 1, THE RE-LEVEL (row 118)
+Derived scope: 19 movers. 17 rung-50 rares to level 15
+(duskhide_wraps, thorium_warblade, arcanite_war_axe,
+elderwood_battle_staff, thoriumscale_greathelm/cuirass/leggings,
+silkbinders_raiment, sunweave_mantle/treads,
+mirewarden_jerkin/leggings/treads, weighted_thorium_band,
+gleaming_thorium_loop, burnished_thorium_amulet, sunpetal_grimoire);
+wardweave_cowl and sootscale_mantle (rung 75) to 17. Skip list:
+gravewyrm_bone_quiver (above). Non-candidates recorded: the 11l trophy
+trio (fenshadow_maul 12, wildgrove_cinch 14, cragprowl_belt 16,
+drop-clamped uncommons) and the combo pair (rung 25).
+
+PREDICTED THEN OBSERVED, exact in every cell (per-id table generated
+before the edit from the live primitives, kept in the QA scratchpad):
+- rare rung-50: ilvl 23 to 18, requiredLevel 20 to 15. rung-75: 23 to
+  20, 20 to 17.
+- stat sums unchanged everywhere (independent def sweep: zero
+  magnitude edits on any pre-existing record anywhere in the diff);
+  derived budgets drop (cowl 11 to 10, wraps 9 to 7, mantle 10 to 8,
+  rings 8 to 6, neck 8 to 7, grimoire 10 to 8), so the pieces
+  deliberately sit ABOVE the derived budget of their new levels: the
+  review's intent (crafted rares top the 14-19 band tables), stated at
+  every family header and pinned per id.
+- the DERIVED masterwork resize (the third consumer): helmet is the
+  invariant slot (delta 2 both), legs shrink hardest (3 to 1:
+  thoriumscale and mirewarden leggings), shoulder and held offhand 3
+  to 2, gloves 2 to 1; chest, mainhand, feet, neck, ring unchanged.
+  Recorded in the LADDER_RECIPES amendment and pinned on a non-helmet
+  slot (leggings total 13 under floor 15) beside the cowl tripwire
+  (total 13 unchanged, floor 17 to 15).
+- craftActionXp at player 20: level-15 rows 100 to 30, level-17 rows
+  100 to 55 (mantle literals re-derived 55/106/28/22 with the
+  arithmetic in-file).
+- THE SHELF: whole-catalog requiredLevel-20 set 370 to 351, the diff
+  EXACTLY the 19 movers leaving, zero joins (script diff, both lists
+  kept for the twin). Pinned: the apex 17 at gate 20 / ilvl 31 exact
+  set, the three same-slot drop rares at 23/20, and the category-free
+  sweep (every gated equippable sourced at 20-plus gates at 20,
+  membership pinned EXACTLY 266 with the re-pin rule now pointed to
+  from content/CLAUDE.md). Phase 15 inherits no re-measurement.
+tests/crafted_wearability.test.ts owns the windows (rung 50 by 16,
+rung 75 by 18) over the derived sets with the decisive-row split
+pinned (18 gated at 50, 2 at 75); the exact per-row levels live in the
+catalog suites (jewelcrafting CONVENTION 15, inscription
+TOME_LEVEL_BY_RUNG, item_level triples, and the new recipe_economy
+ladder level-convention arm pinning the 12 ladder movers exactly).
+
+### DELIVERABLE 2, THE ON-RAMP (row 119)
+- recipe_bronze_hoe skillReq 25 to 0: fee 2500 to 0 by the shipped
+  ladder (pinned; the phase's one other derived economy delta), cast
+  2.5 to 1.75s, bill and one-tier-below invariant untouched.
+- NEW recipe_cogwheel_blank (skill 0): junk part per the intermediates
+  doctrine (sellValue 18 pinned as the load-bearing basis), bill
+  copper_ore 4 + flux 2 (input 56, gold-negative, no-buyValue reagent
+  kept so vendorFed is untouched). ADDED to the chassis bill
+  (masterwrought R18, add-never-substitute, superset pinned); chassis
+  gold 290 to 308 re-derived in the nine-consumer comment; masterwork
+  material-tier delta 0 MEASURED and pinned (0.02 literal plus
+  with-versus-without identity; the bonus is the max reagent tier and
+  the Catalyst holds it).
+- NEW recipe_copperlens_ocular (skill 25): uncommon caster held
+  offhand on engineering's own gyrelens int/sta line (int 3 + sta 2 =
+  5, formula-exact at ilvl 16 on the held 0.75 line, live level and
+  budget pinned), consumes the cogwheel (the ladder shape). R14: no
+  use, all six rating keys pinned absent with live positive controls.
+  R23: no vendor twin across ALL THREE counters (NPC vendorItems, the
+  marks stock, the honor stock) plus priceHonor, each with a populated
+  positive control; no counter anywhere sells any held offhand.
+- NAMES (R15, web-verified 2026-08-25; registry section plus rejected
+  list in naming-audit.md): Cogwheel Blank CLEAR with WoW's
+  adjective-Cogwheel socket-gem family recorded as the
+  shared-vocabulary neighbour (the construction inverts to
+  noun-plus-Blank); Copperlens Ocular CLEAR (coined token zero-hit;
+  FFXIV Copper Spectacles and the lens reagent lines nearest).
+  Rejected at authoring: any adjective-plus-Cogwheel (collision
+  class), Copperlens Array (in-repo tier claim), Tempered Pawl
+  (declined on readability).
+- Obligations, all same-change: catalog names appended under the
+  three-tier contract, M16 fills in the five non-Latin overlays,
+  resolved artifacts regenerated, art PARKED per ip-16-ICON
+  (ITEM_ART_PENDING 78 to 80 exact-set, authored distinct icon
+  recipes, NO mapping.json row, the standalone audit literal 78 to 80
+  with the arithmetic), wiki regen, ids append-only (the golden is
+  one-directional; the release re-mint owes the two ids),
+  ALL_RECIPES 163 to 165 with the apex suite's ledger comment, the
+  trainer-home census term plus its sibling two-row literal.
+- THE RIPPLES a new stats-bearing id fires, all found by review and
+  fixed in-phase: the reliquary masterwork model (the ocular is the
+  stats-bearing engineering craftable the 2026-08-07 ruling named as
+  masterwork:engineering's un-pend condition: slot hinted like its six
+  siblings, SOURCE_PENDING_RULING mounts-only, gear-capable set 6 to
+  7, the R1 premise re-pinned as the exact capable-output set
+  [copperlens_ocular], the un-pend's record swept through nine more
+  comment homes incl the reliquary_view resolved-line regime
+  re-measured 260 to 261); the six by-name partitions
+  (HONEST_MATERIALS 115 to 116 so the part tooltips as Material, the
+  IWorld recipeList partition, arcane_dust's Used-by line gaining
+  Engineering as its FOURTH consumer craft in three pins, the
+  held-offhand no-model park beside gyrelens, the crafted-junk signing
+  set, the professions blob edge re-based 17172 per its own
+  convention); and the dev kit, where the new id tied the feral
+  druid's dead-stat offhand pick into an alphabet accident: the
+  tiebreak gained a quality term (identity, then quality, then id;
+  scale derived from the typed ladder), verified to flip exactly one
+  slot, dominance property and integer-stat premise pinned.
+- ACCEPTANCE pinned (tests/professions_engineering_onramp.test.ts):
+  the unattuned learnable full-gain set at skill 0 is exactly the hoe
+  plus the cogwheel, with ceiling controls in both directions (tier
+  1/2 gain 1, tier 3 gains 0) and the band walked across its boundary
+  (0/24/25); the attuned full-gain rows at bands 0/25/50 exclude the
+  positively-controlled, untouched PRE_TRAINING list; teachTierMet's
+  refusal is proven in-file.
+- Record corrections riding along: the guide archetypesBody claim
+  ("Engineering alone has no recipe that low", false since 11j and
+  doubly false now) reworded in English AND completed in the 13 Latin
+  overlays (the parenthetical AND its "almost everything" qualifier
+  are one claim; the qa gate caught the half-finished strip as its one
+  blocker); the five non-Latin condensed translations never carried
+  the claim and were correctly untouched.
+
+### DELIVERABLE 3, THE 150 RETIRE (row 120)
+The three grandfathered land tools to skillReq 125. Side effects all
+MEASURED nil by script, predicted then observed: cast band 4.0s at
+both rungs; capped-major masterwork proc chance 0.06 at both
+(tiersAboveRecipe negative-clamps to 0 both ways, delta 0); gain
+multipliers identical everywhere (tier 5 and 6 both exceed every
+non-major ceiling; both read full for a below-cap major).
+PRE_TRAINING_RECIPE_IDS untouched (pinned, positively controlled).
+Amended in place, dated, masterwrought R-numbers in full: the
+ROD_RECIPES lesson (the rule STANDS for new rows; the historical
+exemplar retired), the recipes.ts file-scope note, crafting.ts's two
+scope comments, items.ts's two fine-twin notes, the grand_cauldron
+scoping note, docs/design/professions.md's family reading, and the
+two last 150-era test comments the second review pass found. Pins
+re-derived: the above-cap sweep pins the EMPTY set (in-file synthetic
+refusal control added), the whole TOOL_RECIPES table pinned inside the
+reachable band with the 125 grandfathered trio exact, the craft-XP
+apex arm retitled with the 125 rung pinned, and the provisioning
+catalog-ceiling arm re-authored for the merged fact (125 is the whole
+catalog's ceiling; its two-halves premise retired WITH the fiction).
+
+### THE REVIEW CHAIN (five rounds, every fix diff to a fresh reader)
+1. content-obligations, full report: 7 blocking (the reliquary
+   masterwork model, fixed mid-review as its own commit; the six
+   partitions above; the dev-kit selection regression), 4 should-fix
+   (the 13 stale overlay clauses, the masterwork resize recording plus
+   non-helmet pin, deeds.ts and reliquary.md two-slot amendments), 2
+   nits. ALL applied. INFO reads adopted: no deeds or reliquary PAGES
+   owed (trainer craft outputs are not conquerable; deeds are
+   per-craft); craft_rare:engineering does NOT become reachable
+   (masterwork no longer bumps output quality); prog_engineering_50
+   becomes genuinely reachable unattuned for the first time.
+2. test-coverage audit: 2 blocking (the provisioning ceiling arm still
+   at 150, a red outside the curated battery because that file was
+   last run pre-slice-3; the unattuned ceiling premise unpinned), 8
+   should-fix, 8 nits; ALL applied (two recorded no-change-needed by
+   the auditor itself: the dead rung-75 skip guard, the benign
+   masterwrought-filter conjunction).
+3. Second content pass (fresh): confirmed the applied batch committed,
+   endorsed the deeds/reliquary judgments and the untouched vendorFed
+   set, added the two last 150-era comments (amended).
+4. Fix-round audit (fresh): CLEAN across all eight checks except 2
+   should-fix (the un-pend's seven remaining stale-comment homes; the
+   shelf count pinned exactly) and 3 nits; ALL applied.
+5. architecture-reviewer (the dev-kit tiebreak is a real src/sim
+   behavior change, so the trigger fired): 0 blocking; parity suite
+   green, draw-free, pure, correctly placed; the flip verified
+   numerically to exactly one kit slot. 3 should-fix (contract
+   comments, behavior pins, the typed ladder with derived scale)
+   applied.
+qa-checklist LAST: NOT READY on ONE blocker (the 13-locale qualifier
+staleness), fixed with its cheap adversarial items in the final
+commit; with that fix its verdict is READY. Its independent evidence:
+a 1901-file / 31046-test vitest-related sweep green, an independent
+def sweep confirming zero authored magnitude moves, and the dash/emoji
+/.only/debugger floor clean over the whole diff.
+Reader-delivery note for the twin: the custom reviewer agent types
+repeatedly returned single-line fragments instead of reports;
+re-running the same prompts on the general-purpose type with an
+explicit "your final message must BE the report" rule delivered full
+reports every time (the original content reviewer also delivered after
+three nudges).
+
+### MUTATION KILL TABLE, 4/4 (byte-restore + empty porcelain between)
+1. thoriumscale_cuirass level 15 to 20: the rung-50 window red naming
+   the row.
+2. wardweave_cowl 17 to 20: the rung-75 window red naming the row.
+3. bronze_hoe 0 to 25: three named reds across two suites (the skill-0
+   exact set, the band walk, the hoe rung pin).
+4. sunpetal_sickle 125 to 150: two named reds (the above-cap sweep,
+   the learnable-rung arm).
+
+### EXPECTED REDS VS FOUND REDS
+The phase file's list all confirmed: the ilvl and catalog pins (slice
+1), the hoe pins (slice 2), the economy pins (the chassis bill), the
+guide freshness gate (until the regen). OUTSIDE the list, real
+findings, all fixed in-phase: the reliquary masterwork model (three
+arms), the provisioning catalog-ceiling arm, the item_art_audit CLI
+literal (78 to 80), the craft-XP falloff literals (a consequence the
+phase file's accepted clause (b) did not enumerate), the masterwork
+cowl floor, and the six by-name partitions. corpse_harvest_sim's
+heaviest arm timed out once at 22.3s under full-suite contention (the
+known flake the phase brief names); standalone re-run green, and it
+passed inside the frozen run.
+
+### RECORDED, NOT ACTED (maintainer reads)
+- The two new item-name keys ride the Latin locales' pending set (30
+  rows) for the 0.41.0 release fill; the non-Latin five landed
+  in-change per M16. Named here so the mint-time fill worklist is not
+  the first place they surface.
+- The Reliquary capstone is ONE owner decision from earnable: the two
+  pended mounts are all that remain after the un-pend. feat: true
+  still prevents a dead-end; visibility read only.
+- The five non-Latin archetypesBody translations are condensed
+  summaries predating the reword (no false claim; pre-existing drift,
+  deliberately untouched).
+- The bestBy near-tie-chain unreachability claim (dev_kit.ts) is one
+  content addition older than its last verification; the architecture
+  review's fresh 87-pair census found no reachable chain.
+- The wiki seed (mediawiki/) carries pre-11o tiers and levels for the
+  touched rows: the same release-time wiki:seed regen obligation the
+  11n QA recorded; one regen covers both.
+- The 20-shelf before/after lists and the per-id prediction table are
+  kept in the session scratchpad for the QA twin.
+
+### THE FROZEN STAMP: one run, EXIT=0 first try
+At 40ca8f87ee, every reader idle AND reported, git status empty, zero
+vitest processes, DATABASE_URL unset; the wrapper wrote TIP first and
+SUITE_EXIT=0 before the follow-on stages, one fresh log, no commit
+anywhere between: 3193 test files passed / 21 skipped (3214), 46919
+passed / 2 expected fail / 373 skipped (47294); tsc clean; ci:changed
+EXIT=0; wiki:content and i18n:gen both zero diff; tip and porcelain
+unchanged through every stage. Against the 11n QA stamp (3191/21,
+46895 passed) the drift is +2 files / +24 tests: the two new suites
+plus the arms added to existing files. The stamp commit after the run
+is docs-only (this ledger, progress.md, the farming/state.md note, the
+memory notes), the sanctioned exception to commit-voids-the-run.
+
+HANDOFF: Phase 11o QA (phase-11o-qa.md), the twin. The leveling
+crafter is verified standing: 19 movers wearable in-band with the
+shelf byte-unmoved (370 to 351 is exactly the movers leaving),
+engineering levelable from zero on both identity states, the 150
+fiction retired with every side effect measured nil, two new ids
+through the full obligation set plus the six partition ripples and the
+reliquary un-pend, five review rounds all applied, mutation table 4/4.
+The 11n maintainer reads plus this ledger's six new ones remain open.

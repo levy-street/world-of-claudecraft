@@ -4659,3 +4659,31 @@ surplus list under gathered-cost accounting (+164 and +278 after the sink, pinne
 Rows 82 to 85 and 122 to 123 stand; nothing was re-decided. ONE ROW ADDED to the
 handoff table (zone 1's loss of every poor mob drop, above); the col_junk_drawer row
 above re-reads at three of margin.
+
+## Phase 11o note (2026-08-25): rows 117 to 120 EXECUTED; three stale
+premises re-derived under the rows' own rules, none re-decided
+
+ROWS 117 TO 120 WERE EXECUTED AS SETTLED. The live tree had moved under
+three of the settlement's premises; each resolved by the rules the rows
+themselves state (full ledger: state.md, Phase 11o):
+- Row 118 names duskhide_wraps a rung-75 rare; the live tree carries it
+  at skillReq 50 (#3520, documented in-row). The row's acceptance is
+  "derived not pasted", so the wraps moved 20 to 15 with the rung-50
+  band, wearable by 16.
+- The known-two skip list (boundstone_helm, gravewyrm_gauntlets) is
+  EMPTY: both are skillReq-25 level-15 COMBO rows outside the derived
+  scope. The sweep's real shared-source candidate is
+  gravewyrm_bone_quiver (rung 50, level 20, the Korzul drop), SKIPPED
+  under 11l's trophy convention with the drop premise pinned in
+  tests/crafted_wearability.test.ts.
+- Row 120 locates the above-cap lesson in both tool headers; it lives
+  in the ROD_RECIPES header plus the file-scope note, and was amended
+  where it lives.
+Row 119's gadget: the phase file's "a cosmetic use on the gyrelens
+precedent is legal" inverts the precedent (the gyrelens comment records
+NO cosmetic-use family exists, under masterwrought R14), so the row's
+statted-offhand arm was taken (Copperlens Ocular, engineering's own
+int/sta line). One ripple the settlement could not see: the ocular is
+the stats-bearing engineering craftable the 2026-08-07 reliquary ruling
+named as masterwork:engineering's un-pend condition; the slot is hinted
+and SOURCE_PENDING_RULING is mounts-only now.
