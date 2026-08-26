@@ -101,6 +101,10 @@ const EXEMPT: ReadonlyArray<{ cmd: string; why: string }> = [
     cmd: 'market_sell_price_check',
     why: 'a read-only price lookup keyed by item id (issue 3043), not an action on a held copy: it never touches bags or escrow, so there is no copy to address',
   },
+  {
+    cmd: 'perfect_item',
+    why: 'DOES name its copy (a worn equipment slot, or a bag cell plus the item id seen there: the index-plus-id pin), but through the pure parse core server/perfect_item_ref.ts rather than an inline dispatch arm, so the inline Number.isInteger scan above cannot see it; the wire shapes, the drop matrix, and the sim-side stale-cell denial are pinned in tests/perfect_item_ref.test.ts, tests/perfecting_wire.test.ts, and tests/perfecting.test.ts',
+  },
 ];
 
 /** Sender bodies from ClientWorld, keyed by the wire token they send. */

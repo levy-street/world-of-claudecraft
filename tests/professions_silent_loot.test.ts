@@ -468,7 +468,11 @@ describe('every professions grant site is accounted for (#2430)', () => {
   const EXPECTED_GRANT_SITES: Record<string, number> = {
     'commission.ts': 1,
     'commission_order.ts': 1,
-    'crafting.ts': 6,
+    // 6 -> 9 at Masterwrought phase 12: the perfecting head-start mint arm
+    // (resolveCraftForRecipe) grants through the same silent + callerLogs
+    // discipline as the masterwork arm it sits beside: the head-started
+    // instance, its commissioned remainder copies, and the plain remainder.
+    'crafting.ts': 9,
     'enchanting.ts': 4,
     // Farming's eight grants: base produce, its fine twin, the withered-husk
     // payout on each of the two failure arms (a lost survival roll and the

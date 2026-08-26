@@ -51,6 +51,9 @@ const EXPECTED_CMDS = [
   'market_list',
   'market_list_instance',
   'mount_toggle',
+  // Masterwrought phase 12: an attempt spends materials and mutates an
+  // instance payload in place, so the inv/einst self mirrors must re-diff.
+  'perfect_item',
   'pet_feed',
   'pickup',
   'place_feast',
