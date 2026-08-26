@@ -44,7 +44,7 @@ describe('Eastbrook town preload', () => {
     ['Low', '?gfx=low'],
     ['Standard', '?gfx=ultra'],
   ] as const)(
-    'registers all nine shipping assets plus both support models on %s',
+    'registers all ten shipping assets plus both support models on %s',
     async (_materialPath, search) => {
       vi.stubGlobal('window', { location: { search } });
       vi.stubGlobal('location', { search });
@@ -61,9 +61,14 @@ describe('Eastbrook town preload', () => {
       const module = await import('../src/render/eastbrook_town');
       const allUrls = [...module.EASTBROOK_TOWN_ASSET_URLS];
       const newUrls = [...module.EASTBROOK_TOWN_NEW_ASSET_URLS];
-      expect(newUrls).toHaveLength(9);
-      expect(new Set(newUrls).size).toBe(9);
-      expect(allUrls).toHaveLength(11);
+      // Re-pinned for owner refinement round 6: the town gained three coastal
+      // buildings, and one of them seats hexb_market.glb, a kit shell
+      // Eastbrook had never used, so the deduped URL set grows by exactly one
+      // (the other two re-use hexb_home_a and hexb_home_b shells the town
+      // already loads).
+      expect(newUrls).toHaveLength(10);
+      expect(new Set(newUrls).size).toBe(10);
+      expect(allUrls).toHaveLength(12);
       expect(mocks.loadGltf.mock.calls.map(([url]) => url)).toEqual(allUrls);
       const eastbrookTextureUrls = [
         '/textures/eastbrook_surface_atlas.webp',
@@ -102,7 +107,12 @@ describe('Eastbrook town preload', () => {
       const custom = module.buildEastbrookTownView(20061);
       expect(custom.group.name).toBe(module.EASTBROOK_TOWN_ROOT_NAME);
       expect(custom.group.children).toEqual([]);
-      expect(mocks.releaseGltf.mock.calls.map(([url]) => url)).toEqual(allUrls);
+      // The five kit buildings keep their GLB cache entries resident: their
+      // clones share the decoded KTX2 palette textures, so releasing would
+      // break a later same-page rebuild (the kit-building path in
+      // eastbrook_town.ts, docs/design/eastbrook-revamp/site-plan.md).
+      const released = allUrls.filter((url) => !url.startsWith('/models/biome/'));
+      expect(mocks.releaseGltf.mock.calls.map(([url]) => url)).toEqual(released);
 
       data.setActiveWorldContent(data.BUILTIN_WORLD);
       const first = module.buildEastbrookTownView(20061);
@@ -110,7 +120,11 @@ describe('Eastbrook town preload', () => {
       expect(first.group.name).toBe(module.EASTBROOK_TOWN_ROOT_NAME);
       expect(second.group.name).toBe(module.EASTBROOK_TOWN_ROOT_NAME);
       expect(first.group).not.toBe(second.group);
-      expect(mocks.releaseGltf.mock.calls.map(([url]) => url)).toEqual(allUrls);
+      // The five kit buildings keep their GLB cache entries resident: their
+      // clones share the decoded KTX2 palette textures, so releasing would
+      // break a later same-page rebuild (the kit-building path in
+      // eastbrook_town.ts, docs/design/eastbrook-revamp/site-plan.md).
+      expect(mocks.releaseGltf.mock.calls.map(([url]) => url)).toEqual(released);
       data.setActiveWorldContent(null);
     },
   );

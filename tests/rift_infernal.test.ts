@@ -17,7 +17,12 @@ import {
   INFERNAL_PIT_ROOMS,
   INFERNAL_ROOMS,
 } from '../src/sim/content/rift/infernal_citadel';
-import { RIFT_REGION_HALF_X, RIFT_REGION_HALF_Z, riftInstanceOrigin } from '../src/sim/data';
+import {
+  isRiftPos,
+  RIFT_REGION_HALF_X,
+  RIFT_REGION_HALF_Z,
+  riftInstanceOrigin,
+} from '../src/sim/data';
 import { layoutColliders } from '../src/sim/dungeon_layout';
 import { authoredLiftAt, authoredWallSegments, inAnyRoom, roomAt } from '../src/sim/rift/authored';
 import { RIFT_TIER_INFO } from '../src/sim/rift/portals';
@@ -678,7 +683,12 @@ describe('infernal citadel: lifecycle', () => {
     e.pos = sim.groundPos(exit.pos.x, exit.pos.z);
     sim.rebucket(e);
     sim.tick();
-    expect(Math.abs(player().pos.x)).toBeLessThan(RIFT_REGION_HALF_X * 2); // back overworld
+    // Re-pinned 2026-08: the exit returns the player to the captured entry
+    // point, which after the harbor move (d19aa33f76,
+    // docs/design/eastbrook-revamp/site-plan.md) is the quay spawn at x -94,
+    // outside the old |x| < 2 * RIFT_REGION_HALF_X proxy. Assert the sim's
+    // own predicate for "back overworld, not left in the rift band" instead.
+    expect(isRiftPos(player().pos.x)).toBe(false); // back overworld
     expect(sim.riftFloor).toBeNull(); // the run is over for this player
   });
 

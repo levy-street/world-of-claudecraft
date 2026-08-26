@@ -122,14 +122,15 @@ cross-reference it; do not invent costs/levels/damage.
 FIXTURE, not just data, so it inherits the screens `generateDecorations`
 (`src/sim/world.ts`) applies to procedurally seated props: a yard of freeboard
 over the water surface, walkable slope, no collider overlap, clear of a road, and
-outside a reserved venue footprint such as `SOWFIELD_EXCLUDE` (the boarball
-ground). Two guards own parts of that: `tests/placement_integrity.test.ts` walks
-the calm-pad roster for classic ground and road reachability, and
+outside a reserved venue footprint (the retired Sowfield's exclusion shell was
+the exemplar; the New Eastbrook town reserve is the successor). Two guards own
+parts of that: `tests/placement_integrity.test.ts` walks the calm-pad roster
+for classic ground and road reachability, and
 `tests/gather_node_placement.test.ts` holds every gather-node coordinate to the
 full list. Neither covers a NEW fixture category by itself, so a new authored
 placement type needs its own coordinate arm in the same change. Skipping this has
 shipped twice: six herb patches on a lake floor, and a sheenleaf patch growing
-inside the Vale Cup pitch.
+inside the old boarball pitch.
 - **Quest:** add to the owning zone module's `<NAME>_QUESTS` (legacy trio:
   `ZONE{N}_QUESTS`) with `giverNpcId`, `turnInNpcId` (or `turnInNpcIds`
   for multiple valid turn-ins), `text`, `objectives[]` of `{type:'kill',targetMobId}`,
@@ -172,7 +173,7 @@ inside the Vale Cup pitch.
   `tests/gather_node_placement.test.ts` holds it to dry ground both under the
   prop AND across its whole `INTERACT_RANGE` harvest reach (a gatherer never
   wades to work a patch), plus slope, burial, hub reachability, zone containment,
-  spacing, named-mob clearance, and the Sowfield screen. Run it after moving any
+  spacing, and named-mob clearance. Run it after moving any
   `pos`. Tests: `tests/gather_nodes.test.ts`, `tests/gather_node_harvest.test.ts`,
   `tests/gather_node_placement.test.ts`.
 

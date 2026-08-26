@@ -196,8 +196,12 @@ describe('v0.36 release-audit Reliquary deed art', () => {
     // visit pair) ride the DEED_ART_PENDING ledger until their art lands;
     // the audit holds exactly when the pending set and the artless set are
     // the same post-audit appends and every other deed is painted.
-    expect([...DEED_ART_PENDING]).toEqual(['exp_the_last_keep', 'exp_dawnhold_castle']);
-    expect(DEED_ORDER).toHaveLength(273);
+    expect([...DEED_ART_PENDING]).toEqual([
+      'exp_the_last_keep',
+      'exp_dawnhold_castle',
+      'prog_ready_for_an_adventure',
+    ]);
+    expect(DEED_ORDER).toHaveLength(274);
     expect(DEED_IMAGE_IDS.size).toBe(271);
     expect(DEED_ORDER.filter((id) => !DEED_IMAGE_IDS.has(id))).toEqual([...DEED_ART_PENDING]);
     expect(sorted(DEED_IMAGE_IDS)).toEqual(

@@ -18,7 +18,7 @@
 // the painter localizes; CLASSES is read here only to decide that flag.
 
 import { CLASSES } from '../../../sim/data';
-import { BATTLEGROUND_FIRST_WIN_BONUS_HONOR } from '../../../sim/pvp';
+import { BATTLEGROUND_FIRST_WIN_BONUS_HONOR, DOUBLE_HONOR_MULTIPLIER } from '../../../sim/pvp';
 import { BG_MIN_LEVEL } from '../../../sim/social/battleground';
 import type { BgInfo, PartyInfo } from '../../../world_api';
 
@@ -86,6 +86,10 @@ export type BgWindowView =
        *  claimed it. `honor` is the sim's own constant, imported here the same
        *  way BG_MIN_LEVEL is, rather than shipped as a second wire field. */
       firstWinBonus: { honor: number } | null;
+      /** The Double Honor Weekend event chip, or null outside the weekend
+       *  window. `multiplier` is the sim's own constant, imported the same way
+       *  the first-win chip's honor amount is. */
+      doubleHonor: { multiplier: number } | null;
       /** Rated champions online right now, best first (BgInfo.ladder). */
       ladder: BgLadderRow[];
       allTime: BgAllTimeRow[] | null;
@@ -179,6 +183,10 @@ export function buildBgWindowView(input: BgWindowViewInput): BgWindowView {
     // that side may not pay. Same guard shape as the `b.ladder ?? []` arm below.
     firstWinBonus:
       b.firstWinBonusReady === true ? { honor: BATTLEGROUND_FIRST_WIN_BONUS_HONOR } : null,
+    // Same `=== true` rolling-deploy guard as the first-win chip above: a
+    // snapshot from a server that predates the field omits the chip rather
+    // than promising an event that side may not be running.
+    doubleHonor: b.doubleHonorActive === true ? { multiplier: DOUBLE_HONOR_MULTIPLIER } : null,
     ladder,
     allTime: allTimeRows,
     // The live rows go in whole (rank, identity, rating, record), so any move
@@ -196,6 +204,9 @@ export function buildBgWindowView(input: BgWindowViewInput): BgWindowView {
       // field moved (and the very win that claims it also moves the record, so
       // the bug would hide behind that until a draw or a rollover).
       b.firstWinBonusReady === true,
+      // Same reason as the first-win flag above: the event chip must appear
+      // and disappear on the reset-day rollover even when nothing else moves.
+      b.doubleHonorActive === true,
       partySize,
       ladder,
       allTimeRows?.map((r) => [r.name, r.rating, r.wins, r.losses]) ?? null,

@@ -105,3 +105,23 @@ Exploration (the walk-in castles):
 
 - [v1] `exp_the_last_keep`, The Quiet Halls: the Last Keep's gatehouse arch half in shadow, one banner stirring in a cold draught, dusk grey on ember red.
 - [v1] `exp_dawnhold_castle`, An Open Door in the Garden: Dawnhold's garden gate standing open, petals drifting across the threshold, warm morning gold on hedge green.
+
+## The Proving Shore graduation crest (2026-08-17)
+
+One new id from the tutorial island pass, same delivery contract as above: a
+512x512 RGBA PNG named exactly by deed id, ingested with
+`npm run assets:deeds <source-dir>`. It rides the procedural progression
+category crest until the painting lands (enumerated in `DEED_ART_PENDING`,
+`src/ui/icons.ts`).
+
+Progression (the tutorial island):
+
+- [v1] `prog_ready_for_an_adventure`, Ready for an Adventure: the island ferry bell mid-swing against a dawn strait, the Proving Shore small behind it, rope trailing toward an unseen hand, sea teal on brass gold.
+
+Item icons (the tutorial island's two interact props): shipped as renders of
+their own world models (`scripts/render_island_item_icons.mjs`), so no
+commission is outstanding. Optional repaint briefs if the set ever gets a
+painted pass:
+
+- [v1] `ps_castaway_crate`, Castaway Crate: a salt-bleached slat crate bound in tarred rope, one plank sprung, sand still in its seams.
+- [v1] `ps_ferry_bell`, Ferry Bell: a brass dockside bell on a weathered post bracket, rope pull knotted twice, morning light off the rim.

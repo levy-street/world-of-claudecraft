@@ -3482,9 +3482,14 @@ describe('a corpse whose EVERY family is unmapped is never offered a harvest (#2
     // every-beast-pays-in-components rule then owes it hide/fang/meat, and three
     // mapped families contribute all 8 of its masks to spent and none to
     // refused (all three are mapped), exactly +8/+0.
-    expect(spent).toBe(196);
+    // 196 to 200 for the Proving Shore: shore_scuttler AND its tide-pool king
+    // mister_crabs each carry the meat tag the tide_scuttler twin already has,
+    // so all four of their subsets spend and none refuse, exactly +2/+0 per
+    // template (training_effigy has no tags and never enters the sweep, and
+    // neither do the Highwatch practice dummies).
+    expect(spent).toBe(200);
     expect(refused).toBe(6);
-    expect(spent + refused).toBe(202);
+    expect(spent + refused).toBe(206);
   });
 
   // The eight mapped families and their item ids, spelled out. Deriving them
@@ -3578,7 +3583,9 @@ describe('a corpse whose EVERY family is unmapped is never offered a harvest (#2
     // to beast then adds its hide/fang/meat subsets to `extracted` (286 to 301)
     // and nothing to `unmappedOffered`, since all three tags are mapped.
     expect(unmappedOffered).toBe(14);
-    expect(extracted).toBe(301);
+    // 301 to 305 with the Proving Shore's two meat-tagged templates
+    // (shore_scuttler and mister_crabs) and their mapped-family extractions.
+    expect(extracted).toBe(305);
   });
 
   it('keeps every mixed template harvestable, so the gate is not a blanket refusal', () => {

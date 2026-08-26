@@ -41,10 +41,6 @@ describe('remastered soundtrack catalog', () => {
     }
   });
 
-  it('leaves vale_cup streamless: the Sowfield mp3 pair owns that mix', () => {
-    expect(ZONE_STREAM_URLS.vale_cup).toBeNull();
-  });
-
   it('routes each supplied new-zone remaster to its matching music cue', () => {
     const supplied = {
       amber: [
@@ -78,6 +74,10 @@ describe('remastered soundtrack catalog', () => {
       night: [
         '/audio/music/night.mp3',
         '44f582c437208d480fc0cb828e1ed91f254ccd4cd0236a0815c97e76fb75394e',
+      ],
+      proving_shore: [
+        '/audio/music/proving_shore.mp3',
+        '51e9b5a6c01f1e7ef1c7f602875de81f50a21d7e6428e9335e828897bb478b7c',
       ],
     } as const satisfies Partial<Record<MusicZone, readonly [string, string]>>;
 
@@ -127,7 +127,7 @@ describe('remastered soundtrack catalog', () => {
       'garden',
       'gale',
       'farshore',
-      'vale_cup',
+      'proving_shore',
       'dungeon_hollow_crypt',
       'dungeon_sunken_bastion',
       'dungeon_gravewyrm_sanctum',

@@ -7,6 +7,7 @@ import * as path from 'node:path';
 import { pipeline } from 'node:stream';
 import { WebSocketServer } from 'ws';
 import { DEEDS } from '../src/sim/content/deeds';
+import { PROVING_SHORE_ARRIVAL } from '../src/sim/content/proving_shore';
 import {
   LEADERBOARD_MAX,
   LEADERBOARD_PAGE_SIZE,
@@ -543,8 +544,20 @@ function initialCharacterState(
   sim.setPlayerSkin(sim.playerId, skin);
   const character = sim.serializeCharacter(sim.playerId);
   if (!character) throw new Error('failed to serialize initial character');
+  // A newborn begins ON the Proving Shore (the coached tutorial), no opt-in
+  // ferry ride: the persisted row is what decides an online spawn (addPlayer
+  // prefers savedPos over playerStart), so island entry costs no sim change,
+  // keeps the offline default spawn untouched, and leaves every parity
+  // golden byte-identical. The greeting sweep sees the fresh character
+  // already ashore and plays Odo's arrival instead of Bryn's ferry offer.
+  character.pos = { x: PROVING_SHORE_ARRIVAL.x, z: PROVING_SHORE_ARRIVAL.z };
+  character.facing = PROVING_SHORE_ARRIVAL.facing;
   return character;
 }
+
+// Newborn-state seam for tests (the boardReadTestSeam precedent): pins that
+// a created character's persisted row starts on the Proving Shore.
+export const characterCreationTestSeam = { initialCharacterState };
 
 // ---------------------------------------------------------------------------
 // Lifetime-XP leaderboard cache (Max-Level XP Overflow, FR-4.2 / PR-3).
@@ -648,6 +661,13 @@ async function refreshGuildLeaderboard(
     memberCount: r.memberCount,
     totalLifetimeXp: r.totalLifetimeXp,
     topLevel: r.topLevel,
+    // The pledge-board recruiting status (docs/prd/guild-pledge-board.md).
+    // pledgesOpen always rides (its presence is how the client knows this
+    // server HAS a pledge board); the optional fields keep the '' / 1
+    // defaults off the wire, the `guild` treatment on the player board.
+    pledgesOpen: r.pledgesEnabled,
+    ...(r.pledgeMinLevel > 1 ? { pledgeMinLevel: r.pledgeMinLevel } : {}),
+    ...(r.pledgeNote ? { pledgeNote: r.pledgeNote } : {}),
     ...(scope === 'global' ? { realm: r.realm } : {}),
   }));
   // Skip the install if a moderation bust landed mid-refresh (see boardEpoch).
@@ -3531,7 +3551,14 @@ export async function startServer(): Promise<http.Server> {
     maxPlayersPerRealm: config.maxPlayersPerRealm,
     acquireCharacterLease,
     releaseCharacterLease,
-    bankBonusForAccount: async (id) => computeBankBonus(await bankBonusFactsForAccount(id)),
+    bankBonusForAccount: async (id) => {
+      // One round trip serves both fresh-join account facts: the entitlement
+      // inputs and the tutorial greeting's character count (PR #3467 review:
+      // a separate characterCountForAccount await lengthened every handshake
+      // for a fact only newborn characters use).
+      const facts = await bankBonusFactsForAccount(id);
+      return { ...computeBankBonus(facts), characterCount: facts.characterCount };
+    },
   });
   wsAuth.attachUpgrade(server, wss);
 

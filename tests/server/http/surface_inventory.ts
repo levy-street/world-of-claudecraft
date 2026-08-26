@@ -1161,6 +1161,18 @@ export const SURFACE_INVENTORY: readonly SurfaceRoute[] = [
     limiter: 'publicReadRateLimited',
     requireOwnedExpected: null,
   },
+  // The signpost guild board's roster drill-in: registry-only RouteDef born
+  // after the migration, no legacy ladder arm (server/http/CLAUDE.md).
+  {
+    dispatcher: DISPATCH.mainApi,
+    method: 'GET',
+    path: '/api/guilds/roster',
+    handler: 'server/guild_roster.ts rosterHandler (registry-only RouteDef)',
+    contentType: PROBLEM_JSON,
+    authScope: AUTH_SCOPE.public,
+    limiter: 'publicReadRateLimited',
+    requireOwnedExpected: null,
+  },
   {
     dispatcher: DISPATCH.mainApi,
     method: 'GET',

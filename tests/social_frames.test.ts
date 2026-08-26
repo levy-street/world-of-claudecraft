@@ -124,7 +124,14 @@ describe('W9 socialInfo via the social/socialpos frames (non-snapshot)', () => {
           },
         ],
         events: [],
+        // The pledge-board normalization defaults (an older server's frame
+        // carries none of these): settings read as accepting, no open
+        // pledges, tier 0.
+        pledgeSettings: { enabled: true, minLevel: 1, note: '' },
+        pledges: [],
+        tier: 0,
       },
+      myPledge: null,
     });
     // the dirty flag flips true once, then back to false (HUD re-render poll)
     expect(c.consumeSocialChanged()).toBe(true);
@@ -134,7 +141,13 @@ describe('W9 socialInfo via the social/socialpos frames (non-snapshot)', () => {
   it('the `social` frame applies the `?? []` / `?? null` defaults when fields are absent', () => {
     const c = bareClient(7);
     feed(c, { t: 'social' }); // no friends/blocks/guild
-    expect(c.socialInfo).toEqual({ friends: [], blocks: [], ignores: [], guild: null });
+    expect(c.socialInfo).toEqual({
+      friends: [],
+      blocks: [],
+      ignores: [],
+      guild: null,
+      myPledge: null,
+    });
   });
 
   it('the `social` frame carries each guild member last_login through unchanged', () => {
@@ -255,6 +268,9 @@ describe('W9 socialInfo via the social/socialpos frames (non-snapshot)', () => {
         rank: 'leader',
         motd: '',
         motdSetBy: '',
+        pledgeSettings: { enabled: true, minLevel: 1, note: '' },
+        pledges: [],
+        tier: 0,
         members: [
           {
             id: 4,
@@ -271,6 +287,7 @@ describe('W9 socialInfo via the social/socialpos frames (non-snapshot)', () => {
         ],
         events: [],
       },
+      myPledge: null,
     };
     c.socialInfo = social;
 
@@ -328,7 +345,13 @@ describe('W9 socialInfo is NOT snapshot-driven', () => {
     expect(snap.self).not.toHaveProperty('social');
 
     const c = bareClient(session.pid);
-    const sentinel: SocialInfo = { friends: [], blocks: [], ignores: [], guild: null };
+    const sentinel: SocialInfo = {
+      friends: [],
+      blocks: [],
+      ignores: [],
+      guild: null,
+      myPledge: null,
+    };
     c.socialInfo = sentinel;
     (c as any).applySnapshot(snap);
     // reference identity preserved => applySnapshot did not write socialInfo

@@ -6037,6 +6037,33 @@
       ]
     },
     {
+      "batchId": "proving-shore-prop-renders-2026-08-17",
+      "source": "In-engine render of the committed world models (scripts/render_island_item_icons.mjs: quest/supply_crate.glb, props/marsh_bell_gallows.glb and props/gravestone_round.glb through the shared stills entry, composited on the item-icon vignette)",
+      "owner": "World of ClaudeCraft",
+      "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
+      "styleReference": "existing painted WebP catalog in public/ui/items/; subjects are the exact world props the tutorial island player clicks",
+      "provenanceRecord": "scripts/render_island_item_icons.mjs",
+      "itemIds": [
+        "ps_castaway_crate",
+        "ps_ferry_bell",
+        "ps_passing_stone"
+      ],
+      "commonPrompt": "Not a text-to-image prompt: deterministic in-engine still of the committed world model (three-quarter yaw, portrait lighting rig, trimmed and centered with safe margins) composited on the item-icon radial vignette at 128px."
+    },
+    {
+      "batchId": "proving-shore-mother-of-pearl-2026-08-20",
+      "source": "OpenAI built-in image generation",
+      "owner": "World of ClaudeCraft",
+      "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
+      "styleReference": "existing painted WebP catalog in public/ui/items/",
+      "commonPrompt": "Painted dark-fantasy MMORPG inventory icon, one centered item, clear silhouette, atmospheric dark background, no text or watermark",
+      "itemIds": [
+        "mother_of_pearl",
+        "ps_briny_lure",
+        "ps_lustrous_pearl"
+      ]
+    },
+    {
       "batchId": "goblin-rocket-sled-icon-2026-08-12",
       "source": "OpenAI image generation (user-supplied accepted result; exact generator surface and prompt not supplied)",
       "owner": "World of ClaudeCraft",

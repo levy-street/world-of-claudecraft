@@ -12,7 +12,6 @@ import { createMobScanCounters } from '../src/sim/mob/scan_counters';
 import { Rng } from '../src/sim/rng';
 import { Sim } from '../src/sim/sim';
 import { createSimContext, type SimContextHost } from '../src/sim/sim_context';
-import { createVcState } from '../src/sim/social/vale_cup';
 import { SpatialGrid } from '../src/sim/spatial';
 import type { Entity, SimEvent } from '../src/sim/types';
 
@@ -244,14 +243,9 @@ const CALLBACK_KEYS = [
   'applySetProcs',
   // Book of Deeds lifetime-counter bump (deeds.ts owns the body).
   'bumpDeedStat',
-  // Vale Cup <-> Arena queue exclusion (social/vale_cup.ts).
-  'vcupSeatedOrQueued',
-  // The Vale Cup sport-move arms (social/vale_cup.ts).
-  'vcupBallKick',
-  'vcupBallPass',
-  'vcupShoot',
-  'vcupSportDash',
-  'vcupSportShove',
+  // The six vcup* callbacks were removed here with the Vale Cup retirement
+  // (docs/design/eastbrook-revamp/master-plan.md), the sanctioned exception to
+  // this list's append-only rule.
   // Thornhollow Fields battleground hooks (social/battleground.ts).
   'bgOnPlayerDeath',
 ] as const;
@@ -332,6 +326,7 @@ function makeFakeHost() {
     delvePetStash: new Map(),
     utcDay: '',
     resetDay: '',
+    eventLeadDay: '',
     pendingMobRespawns: [],
     partyInvites: new Map(),
     readyChecks: new Map(),
@@ -341,12 +336,12 @@ function makeFakeHost() {
     pendingLootRolls: new Map(),
     nextLootRollId: 1,
     devCommands: false,
+    compulsoryTutorial: false,
     marketListings: [],
     commissionOrderBoard: [],
     nextCommissionOrderId: 1,
     bankerIds: [],
     guildBanks: new Map(),
-    vcup: createVcState(),
     deedDirtyPids: new Set<number>(),
     deedDirtyKeys: new Map<number, Set<string>>(),
     worldBossEntityIds: [],
@@ -581,14 +576,6 @@ function makeFakeHost() {
     mailAuthoredLetter: vi.fn(),
     mailboxHoldsItem: vi.fn(() => false),
     applySetProcs: vi.fn(),
-    // Vale Cup <-> Arena queue exclusion.
-    vcupSeatedOrQueued: vi.fn(() => false),
-    // The Vale Cup sport-move arms.
-    vcupBallKick: vi.fn(),
-    vcupBallPass: vi.fn(),
-    vcupShoot: vi.fn(),
-    vcupSportDash: vi.fn(),
-    vcupSportShove: vi.fn(),
     // Thornhollow Fields battleground hooks.
     bgOnPlayerDeath: vi.fn(),
     bgOnPlayerDamaged: vi.fn(),

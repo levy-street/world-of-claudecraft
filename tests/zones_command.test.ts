@@ -47,8 +47,14 @@ describe('/zones command', () => {
   it('tags the zone the player is currently standing in', () => {
     const sim = makeWorld();
     const a = sim.addPlayer('warrior', 'Aleph');
-    // Stand deep in the last zone, then read.
-    const last = ZONES[ZONES.length - 1];
+    // Stand deep in the READOUT-order last zone, then read. The readout lists
+    // travel order (south to north, west to east), and the Proving Shore
+    // tutorial island appends LAST in ZONES while rendering FIRST (it sits in
+    // the southwest corner), so append order no longer matches line order.
+    const ordered = [...ZONES].sort(
+      (a, b) => a.zMin - b.zMin || (a.xMin ?? -180) - (b.xMin ?? -180),
+    );
+    const last = ordered[ordered.length - 1];
     teleport(sim, a, last.hub.x, last.hub.z); // inside the zone's own rect (columns!)
     sim.tick();
     expect(zoneAt(sim.entities.get(a)!.pos.x, sim.entities.get(a)!.pos.z).name).toBe(last.name);
@@ -56,7 +62,7 @@ describe('/zones command', () => {
     const text = errorText(sim.tick())!;
     // The current-zone marker sits on the last zone's line, not the first.
     const here = text.indexOf('here');
-    expect(here).toBeGreaterThan(text.indexOf(ZONES[0].name));
+    expect(here).toBeGreaterThan(text.indexOf(ordered[0].name));
     expect(here).toBeGreaterThan(text.indexOf(last.name));
   });
 

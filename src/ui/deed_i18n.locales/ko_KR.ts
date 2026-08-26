@@ -956,4 +956,8 @@ export const table: DeedLocaleTable = {
     name: '완벽을 향한 판금',
     desc: '방어구 제작에서 처음으로 희귀 등급 아이템을 제작하십시오.',
   },
+  prog_ready_for_an_adventure: {
+    name: '모험을 떠날 준비',
+    desc: '수련의 해안을 졸업하십시오. 섬의 모든 수업을 마친 뒤, 나룻배 종을 울려 이스트브룩으로 돌아가십시오.',
+  },
 };

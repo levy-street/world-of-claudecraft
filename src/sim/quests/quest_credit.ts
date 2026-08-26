@@ -23,8 +23,15 @@ import {
   type QuestProgress,
   questObjectiveRequired,
 } from '../types';
+import { ownedItemCount } from './quest_owned_count';
 
-function emitQuestProgress(
+/** The one questProgress emit: `${label}: ${cur}/${req}` text (matched by the
+ *  client i18n re-localizer, so every credit path must go through here rather
+ *  than hand-rolling the string) plus the wire fields the HUD tracker reads.
+ *  Exported for the island's sentinel-objective credit modules
+ *  (tutorial/gauntlet_run.ts, tutorial/signpost_read.ts), which bump their
+ *  count outside the discrete-objective walk below. */
+export function emitQuestProgress(
   ctx: SimContext,
   meta: PlayerMeta,
   qp: QuestProgress,
@@ -126,9 +133,13 @@ export function onInventoryChangedForQuests(ctx: SimContext, meta: PlayerMeta): 
         // "Copper Ore delivered" objective sit at 0 while their bags filled
         // with fine copper ore, since eastbrook_vale is all tier-1 nodes and
         // the plain grade stops dropping for them entirely.
+        const carried = countAcrossGrades(obj.itemId, (id) => ctx.countItem(id, meta.entityId));
+        // An ownership objective (QuestDef.keepsCollectedItems) also counts
+        // copies worn in a bag socket, so following the quest's own "buckle it
+        // on" instruction cannot un-complete it.
         const have = Math.min(
           required,
-          countAcrossGrades(obj.itemId, (id) => ctx.countItem(id, meta.entityId)),
+          quest.keepsCollectedItems ? ownedItemCount(carried, meta, obj.itemId) : carried,
         );
         if (have !== qp.counts[i]) {
           if (have > qp.counts[i]) meta.counters.questProgress += have - qp.counts[i];

@@ -186,6 +186,15 @@ export const MAP_LANDMARK_SEPARATION = MAP_LANDMARK_PLACEMENT_BY_PROFILE.standar
 export const MAP_STATION_NPC_SEPARATION = MAP_LANDMARK_SEPARATION;
 
 const MAP_LANDMARK_PLACEMENT_STEPS = 48;
+
+/** Hard bound on how far the de-overlap allocator may move a landmark badge
+ *  from its authored projection, in WORLD yards. The separation rule works in
+ *  constant canvas pixels while the view's scale varies 6x with zoom, so at
+ *  the full-zone frame an unbounded search could carry a badge tens of yards
+ *  from the thing it marks (the Eastbrook toolworks badge landed on a player
+ *  26 yards away). Inside the cap badges still spread; past it they stay put
+ *  and overlap honestly. */
+export const MAP_LANDMARK_MAX_NUDGE_YD = 4;
 const MAP_LANDMARK_DIRECTION_X = Object.freeze([
   1,
   Math.SQRT1_2,
@@ -528,6 +537,7 @@ function placeLandmarkBadge(
   landmarks: readonly MapLandmarkPosition[],
   canvasSize: number,
   placement: Readonly<{ separation: number; edgeInset: number }>,
+  maxNudgeRadius: number = MAP_LANDMARK_PLACEMENT_STEPS,
 ): { mx: number; my: number } {
   const max = canvasSize - placement.edgeInset;
   const minDistance2 = placement.separation * placement.separation;
@@ -535,7 +545,8 @@ function placeLandmarkBadge(
   if (inside && landmarkPositionClears(mx, my, npcs, landmarks, minDistance2)) {
     return { mx, my };
   }
-  for (let step = 1; step <= MAP_LANDMARK_PLACEMENT_STEPS; step++) {
+  const stepLimit = Math.min(MAP_LANDMARK_PLACEMENT_STEPS, Math.max(1, Math.round(maxNudgeRadius)));
+  for (let step = 1; step <= stepLimit; step++) {
     const radius = step;
     for (let angleIndex = 0; angleIndex < 8; angleIndex++) {
       const candidateX = mx + MAP_LANDMARK_DIRECTION_X[angleIndex] * radius;
@@ -552,8 +563,9 @@ function placeLandmarkBadge(
     }
   }
 
-  // Content is comfortably inside the canvas today and always finds a free
-  // badge position above. Keep a bounded defensive fallback for custom maps.
+  // No clear spot inside the nudge cap: keep the badge at its authored
+  // projection (edge-clamped). An overlapping badge at its true position
+  // beats a clear badge that lies about where the thing is.
   return {
     mx: Math.max(placement.edgeInset, Math.min(canvasSize - placement.edgeInset, mx)),
     my: Math.max(placement.edgeInset, Math.min(canvasSize - placement.edgeInset, my)),
@@ -836,6 +848,10 @@ export function buildOverworldMapModel(input: OverworldMapInput): OverworldMapMo
     mx: ((region.maxX - x) / spanX) * S,
     my: ((region.maxZ - z) / spanZ) * S,
   });
+  // The de-overlap allocator's reach, converted to canvas pixels at the live
+  // scale so a badge can never drift more than MAP_LANDMARK_MAX_NUDGE_YD from
+  // what it marks (at zoom 1 the old constant-pixel search spanned 30 yards).
+  const landmarkMaxNudge = Math.max(1, (MAP_LANDMARK_MAX_NUDGE_YD / spanX) * S);
   const inView = (x: number, z: number): boolean =>
     x >= region.minX - MARKER_VIEW_MARGIN &&
     x <= region.maxX + MARKER_VIEW_MARGIN &&
@@ -873,6 +889,11 @@ export function buildOverworldMapModel(input: OverworldMapInput): OverworldMapMo
   if (labels) {
     for (let poiIndex = 0; poiIndex < zone.pois.length; poiIndex++) {
       const poi = zone.pois[poiIndex];
+      // A hidden POI keeps its record and its deed mark, it just stops drawing
+      // a label; the index is NOT skipped, because poi labels resolve through
+      // POSITIONAL locale keys and renumbering would mistranslate every later
+      // landmark in the zone.
+      if (poi.hideOnMap) continue;
       if (!inView(poi.x, poi.z)) continue;
       const { mx, my } = toMap(poi.x, poi.z);
       pois.push({ mx, my, zoneId: zone.id, poiIndex });
@@ -981,6 +1002,7 @@ export function buildOverworldMapModel(input: OverworldMapInput): OverworldMapMo
       landmarks,
       S,
       landmarkPlacement,
+      landmarkMaxNudge,
     );
     landmarks.push(placed);
     return placed;
@@ -1037,6 +1059,7 @@ export function buildOverworldMapModel(input: OverworldMapInput): OverworldMapMo
       landmarks,
       S,
       landmarkPlacement,
+      landmarkMaxNudge,
     );
     const marker: MapServiceMarker = { mx: placed.mx, my: placed.my, kind };
     services.push(marker);
@@ -1050,8 +1073,10 @@ export function buildOverworldMapModel(input: OverworldMapInput): OverworldMapMo
   // the built-in station table. Their masters are quest givers and stand only a
   // few yards away, which projects to 2 to 5px at the full-zone scale. The same
   // bounded radial allocation keeps each station clear of NPCs, civic services,
-  // earlier stations, and the canvas edge. At closer zoom the authored distance
-  // already exceeds the threshold and no nudge occurs.
+  // earlier stations, and the canvas edge, within the world-yard nudge cap;
+  // clustered badges past the cap overlap at their true spots instead. At
+  // closer zoom the authored distance exceeds the threshold and no nudge
+  // occurs.
   const stations: MapStationMarker[] = [];
   for (const station of world.stationPlacements) {
     if (station.zoneId !== zone.id || !inVisibleRegion(station.pos.x, station.pos.z)) continue;
@@ -1063,6 +1088,7 @@ export function buildOverworldMapModel(input: OverworldMapInput): OverworldMapMo
       landmarks,
       S,
       landmarkPlacement,
+      landmarkMaxNudge,
     );
     const marker: MapStationMarker = {
       mx: placed.mx,

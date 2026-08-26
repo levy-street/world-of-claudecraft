@@ -33,7 +33,6 @@ export const arena: GuidePage = {
         )}
         ${related([
           { href: hrefFor('thornhollow-fields'), key: 'guide.nav.thornhollow' },
-          { href: hrefFor('vale-cup'), key: 'guide.nav.valeCup' },
           { href: hrefFor('gear'), key: 'guide.nav.gear' },
           { href: hrefFor('dungeons'), key: 'guide.nav.dungeons' },
           { href: hrefFor('classes'), key: 'guide.nav.classes' },

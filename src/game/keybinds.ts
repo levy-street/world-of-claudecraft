@@ -260,13 +260,6 @@ export const BIND_ACTIONS: BindAction[] = [
     kind: 'edge',
     defaults: ['Shift+KeyI'],
   },
-  {
-    id: 'valecup',
-    label: 'Vale Cup',
-    category: 'Interface',
-    kind: 'edge',
-    defaults: ['KeyY'],
-  },
   // Mount / dismount toggle: Backquote avoids the release-owned KeyZ layers
   // for weapon sheathing and the Book of Deeds.
   {
@@ -636,7 +629,8 @@ export class Keybinds {
     for (const a of BIND_ACTIONS) {
       if (Array.isArray(obj[a.id])) continue;
       if (actionAllowsShared(a.id)) continue; // keep its (intentionally shared) default
-      const slots = this.map.get(a.id)!;
+      const slots = this.map.get(a.id);
+      if (!slots) continue;
       for (let i = 0; i < slots.length; i++) {
         const c = slots[i];
         if (c === null) continue;

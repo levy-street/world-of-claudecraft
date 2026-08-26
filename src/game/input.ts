@@ -91,7 +91,6 @@ export interface InputCallbacks {
       | 'targetAuras'
       | 'social'
       | 'arena'
-      | 'valecup'
       | 'bgFlag'
       | 'dungeonFinder'
       | 'leaderboard'
@@ -1186,9 +1185,6 @@ export class Input {
         return;
       case 'mount':
         this.cb.onUiKey('mount');
-        return;
-      case 'valecup':
-        this.cb.onUiKey('valecup');
         return;
       case 'bgFlag':
         this.cb.onUiKey('bgFlag');

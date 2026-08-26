@@ -4924,7 +4924,7 @@ function professionsGather(seed = 1): Scenario {
       // at cast completion on the tick path) plus a post-completion second
       // attempt denied by the player's own cooldown, which must add ZERO
       // draws to the digest.
-      teleport(sim, p, -70, -53); // ore_eastbrook_1
+      standOnNode(sim, p, 'ore_eastbrook_1'); // position derived, not a literal (see standOnNode)
       sim.harvestNode('ore_eastbrook_1', undefined, pid);
       rec.tick(castTicks); // the cast completes inside this window
       sim.harvestNode('ore_eastbrook_1', undefined, pid); // denied: own timer, no draw

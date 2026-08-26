@@ -25,7 +25,7 @@ import {
   stackSizeOf,
 } from './bags';
 import { isRawCookingCatch } from './content/items';
-import { ITEMS } from './data';
+import { ITEMS, NPCS } from './data';
 import { markItemDiscovered } from './deeds';
 import { recalcPlayerStats } from './entity';
 import {
@@ -42,6 +42,7 @@ import {
   weaponHand,
 } from './equipment_rules';
 import { formatMoney } from './format_money';
+import { useBrinyLure } from './interactions/crab_summon';
 import { throwFirebottleAtNearestHut } from './interactions/firebottle_hut';
 import { moveStackToCell } from './inventory_order';
 import { sortInventoryStacks } from './inventory_sort';
@@ -59,6 +60,7 @@ import { battlefieldExperienceTrickle } from './professions/battlefield_xp';
 import { useGatherToolItem } from './professions/gathering';
 import type { ItemUseResult, PlayerMeta } from './sim';
 import type { SimContext } from './sim_context';
+import { usePassingStone } from './tutorial/death_lesson';
 import {
   ALL_EQUIP_SLOTS,
   CONSUME_DURATION,
@@ -791,6 +793,14 @@ export function useItem(
     throwFirebottleAtNearestHut(ctx, p, meta);
     return;
   }
+  if (def.use?.type === 'summon') {
+    useBrinyLure(ctx, p, meta);
+    return;
+  }
+  if (def.use?.type === 'passingStone') {
+    usePassingStone(ctx, p, meta);
+    return;
+  }
   if (def.kind === 'food' || def.kind === 'drink') {
     if (p.inCombat) {
       ctx.error(meta.entityId, "You can't do that while in combat.");
@@ -971,6 +981,16 @@ export function buyItem(
   }
   if (!npc.vendorItems.includes(itemId)) {
     ctx.error(meta.entityId, 'That item is not sold here.');
+    return;
+  }
+  // Quest-gated stock (NpcDef.vendorQuestGates): the row is sold only once
+  // the gating quest is in the buyer's log or done, so a tutorial purchase
+  // cannot be made early and strand the lesson's copper. The vendor window
+  // hides the row off the same def (ui/vendor_stock_gate_core.ts); this is
+  // the authoritative half.
+  const gateQuest = NPCS[npc.templateId ?? '']?.vendorQuestGates?.[itemId];
+  if (gateQuest && !meta.questLog.has(gateQuest) && !meta.questsDone.has(gateQuest)) {
+    ctx.error(meta.entityId, 'That item is not for sale to you yet.');
     return;
   }
   // Dev free-epic vendor: on a dev-command realm this vendor sells its whole

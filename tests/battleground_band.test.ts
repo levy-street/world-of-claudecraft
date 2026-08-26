@@ -730,9 +730,10 @@ describe('Thornhollow Fields layout: the combat shape the dressing is laid over'
     // deleting the isBgPos guard would leave this green. At seed 42 this span
     // runs into a world prop whose top sits just above the ground eye line and
     // well under a lifted one, so the two arms are only equal because the open
-    // world ignores y.
-    const OPEN_A = { x: -186, z: 168 };
-    const OPEN_B = { x: -166, z: 168 };
+    // world ignores y. (Re-sited from the Eastbrook strait when the Proving
+    // Shore island reshaped that shoreline and cleared the old span's prop.)
+    const OPEN_A = { x: -10, z: 303 };
+    const OPEN_B = { x: 10, z: 303 };
     expect(isBgPos(OPEN_A.x), 'the open-world probe must not be in the band').toBe(false);
     const openGround = lineOfSightClear(
       SEED,

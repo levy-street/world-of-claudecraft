@@ -13,6 +13,70 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const zh_TW: Partial<Record<TranslationKey, string>> = {
+  'hudChrome.barEditor.pageTab': '第 {page} 頁',
+  'hudChrome.bootcamp.promptHold': '按住',
+  'hudChrome.bootcamp.promptJump': '跳躍',
+  'hudChrome.bootcamp.promptPickUp': '拾取',
+  'hudChrome.bootcamp.promptRead': '閱讀',
+  'hudChrome.bootcamp.promptRing': '敲響',
+  'hudChrome.bootcamp.promptTalk': '交談',
+  'hudChrome.mobile.barEditor': '編輯動作列',
+  'hudChrome.mobile.menuLabel': '選單',
+  'hudChrome.mobile.questStripCounter': '{position}/{total}',
+  'hudChrome.mobile.radialDown': '下',
+  'hudChrome.mobile.radialLeft': '左',
+  'hudChrome.mobile.radialUp': '上',
+  'hudChrome.bootcamp.promptAttack': '攻擊',
+  'hudChrome.bootcamp.keycapThen': '然後',
+  'hudChrome.bootcamp.promptSummon': '召喚',
+  'hudChrome.bootcamp.taskPearlBody':
+    '沿著金色路徑走到沙灘最西端的潮池。站在水邊，按 {bagsKey} 打開背包，用滑鼠左鍵點擊鹹水誘餌把牠引出來。像對付掠蟹那樣和牠戰鬥，等牠倒下後，對著牠的蟹殼按 {interactKey}，取走瑩潤珍珠。',
+  'hudChrome.bootcamp.taskPearlBodyTouch':
+    '沿著金色路徑走到沙灘最西端的潮池。站在水邊，打開背包點按鹹水誘餌把牠引出來。像對付掠蟹那樣和牠戰鬥，等牠倒下後，點按牠的蟹殼，取走瑩潤珍珠。',
+  'hudChrome.bootcamp.taskPearlBodyPad':
+    '沿著金色路徑走到沙灘最西端的潮池。站在水邊，打開背包選擇鹹水誘餌把牠引出來。像對付掠蟹那樣和牠戰鬥，等牠倒下後，對著牠的蟹殼按下互動鍵，取走瑩潤珍珠。',
+  'hudChrome.bootcamp.ringEquipTitle': '戴上你的戰利品',
+  'hudChrome.bootcamp.ringEquipBody':
+    '珍珠之母就在你的背包裡。按 {bagsKey} 打開背包，然後用滑鼠左鍵點擊戒指，把它戴上手指。',
+  'hudChrome.bootcamp.ringEquipBodyTouch': '珍珠之母就在你的背包裡。打開背包，點按戒指把它戴上手指。',
+  'hudChrome.bootcamp.ringEquipBodyPad': '珍珠之母就在你的背包裡。打開背包，選擇戒指把它戴上手指。',
+  'hudChrome.bootcamp.ringAdmireTitle': '瞧瞧你',
+  'hudChrome.bootcamp.ringAdmireBody':
+    '很襯你。按 {charKey} 打開角色面板，看看戴在手上的戒指，以及它提升的每一項屬性。',
+  'hudChrome.bootcamp.ringAdmireBodyTouch':
+    '很襯你。從選單打開角色面板，看看戴在手上的戒指，以及它提升的每一項屬性。',
+  'hudChrome.bootcamp.ringAdmireBodyPad':
+    '很襯你。從選單打開角色面板，看看戴在手上的戒指，以及它提升的每一項屬性。',
+  'entities.mobs.mister_crabs.name': '螃蟹先生',
+  'entities.items.ps_briny_lure.name': '鹹水誘餌',
+  'entities.items.ps_lustrous_pearl.name': '瑩潤珍珠',
+  'entities.items.mother_of_pearl.name': '珍珠之母',
+  'entities.quests.q_ps_mother_of_pearl.title': '珍珠之母',
+  'entities.quests.q_ps_mother_of_pearl.text':
+    '三隻蟹殼都敲開了，{playerName}。但沉船線上還有一位王，他守著的寶貝比這片沙灘上所有木箱加起來還值錢。帶上這枚鹹水誘餌，穿過殘骸，去沙灘最西端的潮池。站在水邊，按 B 打開背包，用滑鼠左鍵點擊誘餌，把他喚醒。螃蟹先生的鉗子比他那些小個子親戚狠得多，盯緊你的生命條，別停下攻擊，喘不過氣就沿著沙灘往後退。等他倒下，走到他的蟹殼前直到名字浮現，按 F 或用左鍵點擊，取走他攥著的瑩潤珍珠。把那顆珍珠帶回來給我。',
+  'entities.quests.q_ps_mother_of_pearl.completion':
+    '瑩潤珍珠，還是從淺灘老王自己身上撬下來的。我父親幹活的每個清晨都會對那隻螃蟹脫帽致意；該給的敬意總要給。別動... 好了。穿好線，鑲好座，歸你了，{playerName}：珍珠之母。按 B 打開背包，用左鍵點擊戒指戴上它，再按 C 打開角色面板，看看它戴在你手上的樣子。小小一件東西，戴上它，你的每一分都會更強。',
+  'entities.quests.q_ps_mother_of_pearl.objectives.0.label': '擊敗螃蟹先生',
+  'entities.quests.q_ps_mother_of_pearl.objectives.1.label': '取得瑩潤珍珠',
+  'hudChrome.bootcamp.taskStrikeTrueBodyCaster':
+    '走到一個草人跟前，用滑鼠左鍵點擊它，把它設為目標：它的名字會出現在螢幕上方。然後按 {attackKey}，或點擊動作列上的第二個按鈕，施放你的法術。一直施放到一個散架為止。',
+  'hudChrome.bootcamp.taskStrikeTrueBodyCasterTouch':
+    '走到一個草人跟前，點按它，把它設為目標。然後點按動作列上的第二個按鈕，施放你的法術。一直施放到一個散架為止。',
+  'hudChrome.bootcamp.taskStrikeTrueBodyCasterPad':
+    '走到一個草人跟前，按下目標鍵把它設為目標。然後按下第二個動作鍵，施放你的法術。一直施放到一個散架為止。',
+  'hudChrome.bootcamp.taskShellBodyCaster':
+    '掠蟹是會回擊的。用滑鼠左鍵點擊一隻，把牠設為目標，然後按 {abilityKey} 使用{ability}，保持距離不停施放。要是一次有太多隻撲上來，就沿小路往回撤：牠們很快就會放棄追趕，休息時你的生命值也會慢慢回滿。',
+  'hudChrome.bootcamp.taskShellBodyCasterTouch':
+    '掠蟹是會回擊的。點擊一隻把牠設為目標，然後點擊動作列上的{ability}，保持距離不停施放。要是一次有太多隻撲上來，就沿小路往回撤：牠們很快就會放棄追趕，休息時你的生命值也會慢慢回滿。',
+  'hudChrome.bootcamp.taskShellBodyCasterPad':
+    '掠蟹是會回擊的。把一隻設為目標，然後按放著{ability}的動作按鈕，保持距離不停施放。要是一次有太多隻撲上來，就沿小路往回撤：牠們很快就會放棄追趕，休息時你的生命值也會慢慢回滿。',
+  'hudChrome.bootcamp.voiceGraduate': '鐘為你敲響了。海那頭的東溪正等著你，你也準備好了。',
+  'hudChrome.bootcamp.voiceVeerOff': '慢著，朋友，走反了。金色路徑在你身後呢。',
+  'hudChrome.bootcamp.voiceStationDoneB': '你越來越上手了，錯不了。',
+  'hudChrome.bootcamp.voiceStationDoneA': '幹得好。往下一處去吧，路已經為你點亮了。',
+  'hudChrome.bootcamp.voiceRunDone': '跑得乾淨俐落。獎賞在監工佩爾那裡，去領吧。',
+  'hudChrome.bootcamp.voiceFirstFlag': '過了一面旗了。腿別停，還剩兩面。',
+  'hudChrome.bootcamp.voiceArrival': '平安上岸啦，朋友。看見腳下這條金色路徑了嗎？它比我還認得路，跟著走就是。',
   'hudChrome.lastkeepMap.title': '{keep}：{story}',
   'hudChrome.dawnholdMap.title': '{keep}：{story}',
   'guide.classPage.formName.form_cat': '狼形態',
@@ -65,6 +129,30 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.nameplate.mobLevel': '{level}',
   'hudChrome.nameplate.afkTag': '暫離',
   'hudChrome.nameplate.cheaterTag': '< 作弊者 >',
+  'hudChrome.nameplate.pledgeTag': '{guild}的宣誓者',
+  'hudChrome.pledge.open': '接受宣誓',
+  'hudChrome.pledge.closed': '不接受宣誓',
+  'hudChrome.pledge.minLevel': '{level}級以上',
+  'hudChrome.pledge.action': '宣誓',
+  'hudChrome.pledge.actionTitle': '向{guild}宣誓',
+  'hudChrome.pledge.pledged': '已宣誓',
+  'hudChrome.pledge.yourGuild': '你的公會',
+  'hudChrome.pledge.tab': '宣誓',
+  'hudChrome.pledge.tabWithCount': '宣誓（{count}）',
+  'hudChrome.pledge.empty': '還沒有人向你的公會宣誓。',
+  'hudChrome.pledge.accept': '接受',
+  'hudChrome.pledge.acceptTitle': '接受{name}的宣誓',
+  'hudChrome.pledge.reject': '拒絕',
+  'hudChrome.pledge.rejectTitle': '拒絕{name}的宣誓',
+  'hudChrome.pledge.settings': '招募',
+  'hudChrome.pledge.acceptingLabel': '接受宣誓',
+  'hudChrome.pledge.minLevelLabel': '最低等級',
+  'hudChrome.pledge.noteLabel': '榜單留言',
+  'hudChrome.pledge.notePlaceholder': '告訴有意加入的玩家你的公會在尋找什麼',
+  'hudChrome.pledge.save': '儲存',
+  'hudChrome.pledge.yourPledge': '你的宣誓：{guild}',
+  'hudChrome.pledge.since': '宣誓於{date}',
+  'hudChrome.pledge.withdraw': '撤回宣誓',
   'hudChrome.discord.roleTag.legend': '傳奇',
   'hudChrome.discord.roleTag.shill': '擁護者',
   'guide.profPages.gainFmt': '{reduced} / {minimal} / {zero}',
@@ -519,8 +607,6 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auth.appleError': '無法透過 Apple 登入。請再試一次。',
   'hudChrome.auth.appleChoiceIntro': '建立新帳戶，或將 Apple 連結到現有帳戶。',
   'hudChrome.auth.appleChoiceExpired': 'Apple 登入已過期。請再次使用 Apple 登入。',
-  'hudChrome.vcup.guildBoardWl': '{wins} 勝，{losses} 敗',
-  'hudChrome.vcup.shootPower': '力道',
   'hudChrome.discord.roleTag.coredevs': '核心開發者',
   'hudChrome.options.version': 'v{version}（{build}）',
   'auth.emailPlaceholder': 'you@example.com',
@@ -1066,6 +1152,8 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.bg.endedForfeitLog': '本場比賽以棄權告終。',
   'hudChrome.bg.firstWinBonusLine': '每日首勝:+{honor}榮譽',
   'hudChrome.bg.firstWinBonusLog': '每日首勝:你額外獲得{honor}點榮譽。',
+  'hudChrome.bg.doubleHonorLine':
+    '雙倍榮譽週末:今日荊谷原野榮譽獎勵均為{mult}倍,打滿全場的敗方也按勝方獎勵結算',
   'hudChrome.bg.timeWarningMinutes': '還剩{minutes}分鐘',
   'hudChrome.bg.timeWarningOneMinute': '還剩一分鐘',
   'hudChrome.bg.timeWarningMinutesLog': '本場戰鬥還剩{minutes}分鐘。',
@@ -2938,7 +3026,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
     '攻擊目標，造成 {damage} 點傷害，使其昏迷 4 秒。獎勵 2 個連擊點。',
   'entities.abilities.sap.name': '悶棍',
   'entities.abilities.sap.description':
-    '使目標無法行動，持續 8 秒。必須處於潛行狀態且脫離戰鬥。任何傷害都會破除此效果。',
+    '使目標無法行動，持續 8 秒，且不會打破暮紗或引發戰鬥。必須處於潛行狀態且脫離戰鬥。任何傷害都會破除此效果。',
   'entities.abilities.crippling_poison.name': '沉鉛之毒',
   'entities.abilities.crippling_poison.description':
     '用沉鉛之毒攻擊目標，造成 {damage} 點自然傷害，並使其移動速度降低 50%，持續 12 秒。',
@@ -3013,7 +3101,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.aspect_of_the_monkey.name': '靈貂之姿',
   'entities.abilities.aspect_of_the_monkey.description': '化身為貂的形態，將你的閃避機率提高 8%，持續 30 分鐘。',
   'entities.abilities.aspect_of_the_cheetah.name': '駿馬之姿',
-  'entities.abilities.aspect_of_the_cheetah.description': '化身為駿馬的形態，將你的移動速度提高 30%，持續 30 分鐘。',
+  'entities.abilities.aspect_of_the_cheetah.description': '化身為駿馬的形態，將你的移動速度提高 30%，持續 30 分鐘。生效期間，受到傷害會使你昏亂，移動速度降低 50%，持續 4 秒（每次受擊都會重新觸發昏亂）。',
   'entities.abilities.aimed_shot.name': '長弓引射',
   'entities.abilities.aimed_shot.description': '射擊目標，造成 {damage} 點物理傷害。傷害隨遠程攻擊強度提升。',
   'entities.abilities.rapid_fire.name': '狂熱連射',
@@ -3193,7 +3281,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.summon_felguard.description':
     '召喚一隻聽從術士命令的戰魔。戰魔是一種堅韌的近戰惡魔，會衝入戰鬥並獨當一面。召喚新的惡魔會驅散你目前的惡魔。你同時只能擁有一隻惡魔。',
   'entities.abilities.summon_infernal.name': '召喚烈焰巨像',
-  'entities.abilities.summon_infernal.description': '將一尊烈焰巨像召至目標區域，落地時造成 58-72 點火焰傷害。它會戰鬥 30 秒且不會取代你的惡魔，每 2 秒灼燒附近的敵人，並每 1 秒產生 1 點摧殘。',
+  'entities.abilities.summon_infernal.description': '將一尊烈焰巨像召至目標區域，落地時造成 64-79 點火焰傷害。它會戰鬥 30 秒且不會取代你的惡魔，每 2 秒灼燒附近的敵人，並每 1 秒產生 1 點摧殘。',
   'entities.abilities.summon_doomguard.name': '召喚怨魂裔',
   'entities.abilities.summon_doomguard.description':
     '將一隻怨魂裔束縛於你的意志之下，這是一種精英惡魔，會從遠處降下沉重的暗影傷害。漫長的冷卻時間限制了牠的毀滅性力量。召喚新的惡魔會驅散你目前的惡魔。你同時只能擁有一隻惡魔。',
@@ -3673,7 +3761,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'entities.npcs.trader_wilkes.greeting': '新鮮麵包，清水，公道價格。你需要什麼？',
   'entities.npcs.apothecary_lin.name': '林藥劑師',
   'entities.npcs.apothecary_lin.title': '草藥師',
-  'entities.npcs.apothecary_lin.greeting': '在東邊林地裡落腳要小心，朋友。',
+  'entities.npcs.apothecary_lin.greeting': '在東北邊林地裡落腳要小心，朋友。',
   'entities.npcs.brother_aldric.name': '奧德里克修士',
   'entities.npcs.brother_aldric.title': '山谷牧師',
   'entities.npcs.brother_aldric.greeting': '願聖光護佑你。如今連死者也無法在這裡安息。',
@@ -3763,7 +3851,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
     '湖水飲盡了月光，{className}，再將溺者吐還。我已守望那道門三十夜——而今夜，它開了。',
   'entities.quests.q_prof_intro.title': '人人都有一技之長',
   'entities.quests.q_prof_intro.text':
-    '東溪人人除了舞刀弄劍，還得有門手藝，{playerName}。鎮子東南的銅礦坑周圍岩石裡有礦脈。拿起礦鎬，親手開採5處；別想蒙我，我看得出差別。',
+    '東溪人人除了舞刀弄劍，還得有門手藝，{playerName}。鎮子東北方、過了狼徑之後的銅礦坑周圍岩石裡有礦脈。拿起礦鎬，親手開採5處；別想蒙我，我看得出差別。',
   'entities.quests.q_prof_intro.completion':
     '看吧？礦石採到了，手上也磨出了繭。趕路時繼續採礦、伐木和採藥；回城後，別忘了市場旁的城鎮專注告示板和附近的製作台。只要你願意，這些手藝都能換來公道的生計。',
   'entities.quests.q_prof_intro.objectives.0.label': '已開採礦脈',
@@ -3778,12 +3866,12 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_greyjaw.completion': '那頭老惡狼終於死了。馬廄裡的孩子能睡安穩些，我也是。',
   'entities.quests.q_greyjaw.objectives.0.label': '老灰顎的尖牙',
   'entities.quests.q_boars.title': '粗鬃野豬皮',
-  'entities.quests.q_boars.text': '野豬皮能做最好的行囊，鎮外草地到處都是野豬。帶回5張硬鬃野豬皮。',
+  'entities.quests.q_boars.text': '野豬皮能做最好的行囊，鎮子西北的草地到處都是野豬。帶回5張硬鬃野豬皮。',
   'entities.quests.q_boars.completion': '好結實的硬鬃皮！這些能賣個好價錢。',
   'entities.quests.q_boars.objectives.0.label': '硬鬃野豬皮',
   'entities.quests.q_spiders.title': '玄網之患',
   'entities.quests.q_spiders.text':
-    '東方林地裡的潛伏者吐出的絲正是我藥敷所需，而牠們的數量也已多得過分。剷除 6 隻玄網潛伏者，並從牠們的腹部割下 4 枚絲腺。',
+    '東北方林地裡的潛伏者吐出的絲正是我藥敷所需，而牠們的數量也已多得過分。剷除 6 隻玄網潛伏者，並從牠們的腹部割下 4 枚絲腺。',
   'entities.quests.q_spiders.completion': '呃，還在抽動。正合適。這是你應得的。',
   'entities.quests.q_spiders.objectives.0.label': '擊敗玄網潛伏者',
   'entities.quests.q_spiders.objectives.1.label': '玄網絲腺',
@@ -3804,7 +3892,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_bones.objectives.0.label': '讓不寧骸骨安息',
   'entities.quests.q_supplies.title': '被盜的補給',
   'entities.quests.q_supplies.text':
-    '強盜搶走了我的最後一輛貨車，工具、鹽和東溪亞麻都在裡面。去西南山丘的營地奪回4個補給箱。',
+    '強盜搶走了我的最後一輛貨車，工具、鹽和東溪亞麻都在裡面。去西北山丘的營地奪回4個補給箱。',
   'entities.quests.q_supplies.completion': '我的箱子！幾乎沒有刮痕。你真讓人驚喜。',
   'entities.quests.q_supplies.objectives.0.label': '被盜補給箱',
   'entities.quests.q_whispers.title': '地下低語',
@@ -3850,7 +3938,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_gravecallers_trail.objectives.0.label': '莫森的魔典',
   'entities.quests.q_bandits.title': '谷地強盜',
   'entities.quests.q_bandits.text':
-    '一群割喉強盜在西南山丘紮營，本週已經搶了三輛貨車。擊殺10名谷地強盜。',
+    '一群割喉強盜在西北山丘紮營，本週已經搶了三輛貨車。擊殺10名谷地強盜。',
   'entities.quests.q_bandits.completion': '黑夜裡少了十把刀。拿著吧，這是你掙來的。',
   'entities.quests.q_bandits.objectives.0.label': '擊敗谷地強盜',
   'entities.quests.q_ringleader.title': '匪首',
@@ -4407,6 +4495,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'entities.zones.farshore_isle.pois.3.label': '碎裂斷崖',
   'entities.zones.farshore_isle.pois.4.label': '裂隙原野',
   'entities.zones.eastbrook_vale.pois.11.label': '遠岸沙洲堤道',
+  'entities.zones.eastbrook_vale.pois.12.label': '東溪碼頭',
   'entities.mobs.moor_ram.name': '荒原羊',
   'entities.mobs.gale_wisp.name': '疾風精',
   'entities.mobs.shoal_scuttler.name': '淺灘蟹',
@@ -5630,6 +5719,11 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.plurals.playersOnline.many': '查詢：{realm} 上有 {count} 名玩家在線上。',
   'hudChrome.plurals.playersOnline.other': '查詢：{realm} 上有 {count} 名玩家在線上。',
   'hudChrome.controller.title': '手把',
+  'hudChrome.controller.glyphStyle': '按鍵標籤',
+  'hudChrome.controller.glyphStyleAuto': '自動',
+  'hudChrome.controller.glyphStyleXbox': 'Xbox',
+  'hudChrome.controller.glyphStylePlayStation': 'PlayStation（索尼）',
+  'hudChrome.controller.glyphStyleNintendo': '任天堂',
   'hudChrome.controller.enable': '啟用手把',
   'hudChrome.controller.invertY': '反轉鏡頭（Y軸）',
   'hudChrome.controller.deadzone': '搖桿死區',
@@ -6059,7 +6153,6 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'guide.controls.reliquary': '聖物庫',
   'guide.controls.sheathe': '收起/拔出武器',
   'guide.controls.crafting': '製作',
-  'guide.controls.valeCup': '溪谷盃',
   'guide.controls.mount': '騎乘 / 下騎',
   'guide.controls.calendar': '活動日曆',
   'guide.controls.dungeonFinder': '地城搜尋器',
@@ -8124,7 +8217,6 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'entities.mobs.rift_boss_arcane.name': '執政官尼克薩里斯',
   'entities.mobs.rift_boss_storm.name': '風暴威洛克',
   'entities.mobs.rift_boss_tide.name': '深淵之喉',
-  'entities.mobs.vale_cup_ball.name': '野豬皮球',
   'entities.npcs.brother_halven_marsh.name': '哈爾文修士',
   'entities.npcs.brother_halven_marsh.title': '聖物庫守護人',
   'entities.npcs.brother_halven_marsh.greeting':
@@ -8160,6 +8252,8 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'apiError.body.too_large': '該請求過大。請減少資料後再試一次。',
   'apiError.body.unsupported_media_type': '不支援的請求格式。',
   'apiError.deeds.invalid_input': '輸入無效。',
+  'apiError.guilds.invalid_roster_name': '公會名稱無效。',
+  'apiError.guilds.unknown': '沒有這個名字的公會。',
   'apiError.ota_updates.invalid_input': '輸入無效。',
   'apiError.steam.disabled': 'Steam 連結目前無法使用。',
   'apiError.wallet.handoff_invalid': '錢包授權已過期或無法驗證。請再試一次。',
@@ -8245,6 +8339,11 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'apiError.discord.swag_points': '點數不足。',
   'hudChrome.mailbox.title': '郵箱',
   'hudChrome.noticeboard.empty': '看起來沒有張貼任何內容。',
+  'hudChrome.noticeboard.subtitle': '本世界的公會',
+  'hudChrome.noticeboard.rosterTitle': '查看{guild}的成員名單',
+  'hudChrome.noticeboard.back': '返回',
+  'hudChrome.noticeboard.popupTitle': '公會告示柱',
+  'hudChrome.noticeboard.close': '關閉',
   'hudChrome.mailbox.subtitle': '渡鴉郵驛',
   'hudChrome.mailbox.close': '關閉郵箱',
   'hudChrome.mailbox.tabInbox': '收件匣',
@@ -8674,6 +8773,9 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.calendar.events.marketDay.note': '商人正等著新貨。今天很適合逛逛世界市場。',
   'hudChrome.calendar.events.arenaClash.title': '競技場之戰',
   'hudChrome.calendar.events.arenaClash.note': '決鬥者湧向灰燼鬥獸場。排隊開打，向天梯進發。',
+  'hudChrome.calendar.events.doubleHonor.title': '雙倍榮譽週末',
+  'hudChrome.calendar.events.doubleHonor.note':
+    '戰營吹響集結號：整個週末，荊谷原野榮譽獎勵加倍，打滿全場的敗方也按勝方獎勵結算。',
   'hudChrome.calendar.events.fishingDerby.title': '釣魚大賽',
   'hudChrome.calendar.events.fishingDerby.note': '釣手們在湖邊排開。帶上魚竿，交流釣魚趣聞。',
   'hudChrome.calendar.events.delveDay.title': '探窟日',
@@ -8869,7 +8971,6 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.mobile.questStripAriaSingle': '追蹤任務：{title}',
   'hudChrome.mobile.questStripMore': '還有 {count} 項',
   // The Vale Cup boarball minigame (docs/prd/vale-cup.md).
-  'hudChrome.keybinds.valecup': '溪谷盃',
   'hudChrome.keybinds.categoryPet': '寵物',
   'hudChrome.keybinds.petAttack': '寵物：攻擊',
   'hudChrome.keybinds.petStop': '寵物：停止',
@@ -8877,173 +8978,6 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.keybinds.petTaunt': '寵物：嘲諷',
   'hudChrome.keybinds.petDefensive': '寵物：防禦',
   'hudChrome.keybinds.petAggressive': '寵物：攻擊性',
-  'hudChrome.vcup.title': '溪谷盃',
-  'hudChrome.vcup.close': '關閉溪谷盃視窗',
-  'hudChrome.vcup.offlineNote': '賽程簿已闔上。溪谷盃目前無法使用。',
-  'hudChrome.vcup.recordLine': '你的戰績：{wins} 勝，{losses} 敗，{draws} 平。',
-  'hudChrome.vcup.bracketsAria': '比賽賽級',
-  'hudChrome.vcup.bracketLabel': '{n}對{n}',
-  'hudChrome.vcup.waitingCount': '{count} 人等待中',
-  'hudChrome.vcup.nationsHeading': '旗幟國度',
-  'hudChrome.vcup.nation.vale': '東溪谷',
-  'hudChrome.vcup.nation.mirefen': '泥沼',
-  'hudChrome.vcup.nation.thornpeak': '荊峰',
-  'hudChrome.vcup.nation.coliseum': '灰燼競技場',
-  'hudChrome.vcup.nation.choir': '蒼白唱詩班',
-  'hudChrome.vcup.nation.ogre': '食人魔氏族',
-  'hudChrome.vcup.nation.moon': '蒼白之月',
-  'hudChrome.vcup.nation.copperdig': '銅礦坑',
-  'hudChrome.vcup.awayNote': '若雙方舉同一面旗幟，客隊將使用反轉配色。',
-  'hudChrome.vcup.rolesHeading': '運動位置',
-  'hudChrome.vcup.rolesSmallBracketNote':
-    '在1對1和2對2賽級中，所有選手都以全能型出賽。要求3對3或更大賽級的功績在此無法達成。',
-  'hudChrome.vcup.role.allrounder.name': '全能型',
-  'hudChrome.vcup.role.allrounder.desc': '樣樣都會：踢球、長傳，還有一記正當的肩撞。',
-  'hudChrome.vcup.role.striker.name': '前鋒',
-  'hudChrome.vcup.role.striker.desc': '為大腳開球和靈巧側身而生。',
-  'hudChrome.vcup.role.sweeper.name': '清道夫',
-  'hudChrome.vcup.role.sweeper.desc': '把持球者撞開，再把球大腳解圍。',
-  'hudChrome.vcup.role.keeper.name': '守門員',
-  'hudChrome.vcup.role.keeper.desc': '用抓球、撲救和長踢守住球門區。',
-  'hudChrome.vcup.queue': '加入佇列',
-  'hudChrome.vcup.leaveQueue': '離開佇列',
-  'hudChrome.vcup.queueNote': '隨時隨地排隊；哨聲會召喚你前往母豬場。',
-  'hudChrome.vcup.queuedStatus': '已排入 {bracket}：第 {position} 位，共 {count} 人。',
-  'hudChrome.vcup.blockNation': '請先選擇一個旗幟國度。',
-  'hudChrome.vcup.blockPartySize': '這個賽級需要更小的隊伍。',
-  'hudChrome.vcup.blockNotLeader': '只有隊長才能為隊伍排隊。',
-  'hudChrome.vcup.inMatchNote': '你的隊伍正在場上。繼續比賽！',
-  'hudChrome.vcup.deserterNote': '場地管理員記著呢。{seconds} 秒後才能再次排隊。',
-  'hudChrome.vcup.liveHeading': '母豬場現況',
-  'hudChrome.vcup.liveAria': '溪谷盃：{nationA} {scoreA}，{nationB} {scoreB}',
-  'hudChrome.vcup.walkUp': '走到母豬場，從看台上觀賽。',
-  'hudChrome.vcup.noLive': '球場很安靜。目前沒有比賽。',
-  'hudChrome.vcup.boardHeading': '優勝者榜',
-  'hudChrome.vcup.boardEmpty': '尚無優勝紀錄。銅奶桶還在等待。',
-  'hudChrome.vcup.enterAsGuild': '以 {guild} 的旗號參賽',
-  'hudChrome.vcup.guildRecordLine': '你的公會戰績：{wins} 勝，{losses} 敗。',
-  'hudChrome.vcup.guildBoardHeading': '公會旗幟榜',
-  'hudChrome.vcup.guildBoardEmpty': '還沒有公會上場。揚起你的旗幟吧！',
-  'hudChrome.vcup.practicingNow': '正在練習（{count}）：',
-  'hudChrome.vcup.boardWins': '{count} 勝',
-  'hudChrome.vcup.practice': '與機器人練習賽',
-  'hudChrome.vcup.practiceNote': '立即在母豬場開始一場完整的機器人比賽。',
-  'hudChrome.vcup.practiceUnratedNote': '練習賽不計入積分：戰績與功績之書進度均不計算。',
-  'hudChrome.vcup.clock': '{minutes}:{seconds}',
-  'hudChrome.vcup.indicatorQueued': '溪谷盃佇列：{bracket}，第 {position} 位，共 {count} 人',
-  'hudChrome.vcup.indicatorLive': '溪谷盃',
-  'hudChrome.vcup.indicatorOpen': '開啟溪谷盃視窗',
-  'hudChrome.vcup.phaseCountdown': '{seconds} 秒後開球',
-  'hudChrome.vcup.phaseGoal': '進球！',
-  'hudChrome.vcup.phaseGolden': '黃金進球',
-  'hudChrome.vcup.phaseOver': '全場結束',
-  'hudChrome.vcup.bannerFound': '溪谷盃開賽：{nationA} 對戰 {nationB}！',
-  'hudChrome.vcup.bannerCountdown': '{seconds} 秒後開球...',
-  'hudChrome.vcup.bannerKickoff': '開球！',
-  'hudChrome.vcup.bannerGoal': '進球！{nation} 破門！',
-  'hudChrome.vcup.bannerSave': '{name} 撲救成功！',
-  'hudChrome.vcup.bannerGolden': '黃金進球：下一球定勝負！',
-  'hudChrome.vcup.bannerEnd': '全場結束：{nationA} {scoreA}，{nationB} {scoreB}',
-  'hudChrome.vcup.bannerWin': '母豬場的勝利！',
-  'hudChrome.vcup.bannerDraw': '母豬場的比賽以平手收場。',
-  'hudChrome.vcup.bannerLoss': '在母豬場落敗。',
-  'hudChrome.vcup.logQueued': '你加入了 {bracket} 溪谷盃佇列（第 {position} 位）。',
-  'hudChrome.vcup.logUnqueued': '你離開了溪谷盃佇列。',
-  'hudChrome.vcup.logFound': '你的溪谷盃比賽已就緒：{nationA} 對戰 {nationB}。',
-  'hudChrome.vcup.logRoster': '你方：{allies}。對方：{enemies}。',
-  'hudChrome.vcup.logGoal': '{name} 為 {nation} 破門！{nationA} {scoreA}，{nationB} {scoreB}。',
-  'hudChrome.vcup.logSave': '{name} 完成撲救！',
-  'hudChrome.vcup.logWin': '你贏下了母豬場的這一戰。',
-  'hudChrome.vcup.logDraw': '母豬場的這一戰以平手告終。',
-  'hudChrome.vcup.logLoss': '你輸掉了母豬場的這一戰。',
-  'hudChrome.vcup.gossipOpen': '賽程簿',
-  'hudChrome.vcup.gossipOpenAria': '開啟溪谷盃視窗',
-  'hudChrome.vcup.mobileLabel': '盃賽',
-  'hudChrome.vcup.briefing.subtitle': '賽前簡報',
-  'hudChrome.vcup.briefing.vs': '對',
-  'hudChrome.vcup.briefing.rulesHeading': '玩法',
-  'hudChrome.vcup.briefing.rule1': '把球踢或傳進對方球門即可得分。',
-  'hudChrome.vcup.briefing.rule2': '先進 5 球者勝，或全場結束時進球最多者勝。',
-  'hudChrome.vcup.briefing.rule3': '全場打平則進入金球賽：下一個進球者獲勝。',
-  'hudChrome.vcup.briefing.rule4': '鏟球只會把人撞倒，沒有人會受傷，豐收休戰為證。',
-  'hudChrome.vcup.briefing.rule5': '任何人都可以走上前，在看台上為你加油。',
-  'hudChrome.vcup.briefing.kitHeading': '你的技能',
-  'hudChrome.vcup.briefing.kitNote': '比賽期間，這些動作將取代你的職業技能。',
-  'hudChrome.vcup.briefing.unratedNote':
-    '場上有機器人，因此本場為非積分賽：戰績不會變動，進球、撲救與零封的功績均不計算。',
-  'hudChrome.vcup.briefing.practiceUnratedNote':
-    '這是練習賽，因此不計入積分：戰績不會變動，功績之書進度也不計算。',
-  'hudChrome.vcup.briefing.rosterHeading': '出場名單',
-  'hudChrome.vcup.briefing.you': '你',
-  'hudChrome.vcup.briefing.bot': '電腦',
-  'hudChrome.vcup.briefing.ready': '我準備好了',
-  'hudChrome.vcup.briefing.readyDone': '已準備',
-  'hudChrome.vcup.briefing.readyAria': '準備開球',
-  'hudChrome.vcup.briefing.waiting': '正在等待對方準備……',
-  'hudChrome.vcup.briefing.whistle': '開球哨將在 {seconds} 秒後吹響。',
-  'hudChrome.vcup.briefing.readyCount': '已準備 {ready}/{total}',
-  'hudChrome.vcup.bet.title': '本場投注',
-  'hudChrome.vcup.bet.aria': '溪谷盃比賽投注',
-  'hudChrome.vcup.bet.closesIn': '{seconds} 秒後停止投注',
-  'hudChrome.vcup.bet.closed': '投注已截止',
-  'hudChrome.vcup.bet.prize': '獎池 {amount}',
-  'hudChrome.vcup.bet.splitAria': '兩隊投注池佔比',
-  'hudChrome.vcup.bet.expand': '查看並下注',
-  'hudChrome.vcup.bet.collapse': '收起投注',
-  'hudChrome.vcup.bet.oddsLabel': '賠率',
-  'hudChrome.vcup.bet.back': '押注 {team}',
-  'hudChrome.vcup.bet.form': '{wins}勝-{losses}負',
-  'hudChrome.vcup.bet.mine': '你的投注：{amount} 押 {team}',
-  'hudChrome.vcup.bet.none': '你還沒有在本場比賽下注。',
-  'hudChrome.vcup.bet.record': '投注戰績：{wins}勝-{losses}負，{sign}{net}',
-  'hudChrome.vcup.bet.wonBanner': '你贏了這注！',
-  'hudChrome.vcup.bet.wonLog': '你的溪谷盃投注贏了：返還 {amount}。',
-  'hudChrome.vcup.bet.lostLog': '你的溪谷盃投注輸了：{amount}。',
-  'hudChrome.vcup.bet.refundLog': '投注作廢，已退還你的 {amount} 本金。',
-  'guide.nav.valeCup': '溪谷盃',
-  'guide.valeCupPage.heading': '溪谷盃',
-  'guide.valeCupPage.intro':
-    '母豬場上的野豬球：選一面旗幟、選一個位置，把塞滿稻草的野豬皮球踢過守門員，去爭奪銅奶桶。不流血，無戰利品，只有看台的歡呼。',
-  'guide.valeCupPage.loreHeading': '野豬球與豐收休戰',
-  'guide.valeCupPage.loreOldSow':
-    '早在亡者甦醒之前，東溪的農工們就在收割後的麥茬地上玩野豬球：兩群人，一張塞滿稻草的野豬皮，和拖到綠地兩端的兩扇貨車門。第一顆球「老母豬」，如今鍍銅掛在酒館壁爐上方。',
-  'guide.valeCupPage.loreTruce':
-    '當灰燼競技場開始批准戰爭競技時，紅溪元帥以更溫和的方式回應：在老綠地上立下長期的豐收休戰。貨車門變成了球門，綠地有了圍牆、看台和一個名字：母豬場。而獎品始終是優勝者們共飲的那只癟了的奶桶：銅奶桶。',
-  'guide.valeCupPage.howHeading': '怎麼玩',
-  'guide.valeCupPage.howQueue':
-    '透過溪谷盃視窗隨處排隊，或到母豬場大門找場地管理員布拉姆。選擇從一對一到五對五的賽級、一面旗幟國度和一個運動位置；可以單排，也可以帶上隊伍。',
-  'guide.valeCupPage.howMatch':
-    '開球時你的職業技能會被換成運動技能，賽後原樣恢復。踢球以地面準星瞄準，球會在擋板上反彈，帶球就是推著球跑。在全場結束前比對方進更多球；平手進入黃金進球。',
-  'guide.valeCupPage.howTruce':
-    '母豬場上無人流血：鏟搶只會讓人翻滾，什麼都不會造成傷害，寵物也會場外休息。',
-  'guide.valeCupPage.spectateBody': '球場同一時間只進行一場比賽，任何人都可以走到看台觀賽。',
-  'guide.valeCupPage.nationsHeading': '八個旗幟國度',
-  'guide.valeCupPage.nationsBody':
-    '每支隊伍都在一面旗幟下比賽。隊長選擇國度；若雙方舉同一面旗，客隊使用反轉配色。',
-  'guide.valeCupPage.nationVale': '綠與金，揚著麥捆旗：主場球隊，骨子裡都是農工。',
-  'guide.valeCupPage.nationMirefen': '青與灰，蒼鷺旗下：耐心、腿長、從不著急。',
-  'guide.valeCupPage.nationThornpeak': '冰藍與白，山峰旗下：步伐穩健、性子倔強。',
-  'guide.valeCupPage.nationColiseum': '紅與黑，交叉雙劍：他們踢起球來仍像在打仗。',
-  'guide.valeCupPage.nationChoir': '淡藍與銀，鈴鐺旗下：詭異、精準、非常安靜。',
-  'guide.valeCupPage.nationOgre': '橙與棕，鐵拳當先：肩膀開路，並引以為傲。',
-  'guide.valeCupPage.nationMoon': '紫與銀，彎月旗下：夜行的球員，腳步輕盈。',
-  'guide.valeCupPage.nationCopperdig': '銅與褐，別著鎬頭：跑不停歇的礦工。',
-  'guide.valeCupPage.rolesHeading': '運動位置',
-  'guide.valeCupPage.rolesBody':
-    '你的位置決定你帶上球場的技能。人人都會踢球；其餘看性情。在一人制與二人制的級別中，每個人都使用全能配套，因此位置的選擇要從三人制起才真正發揮作用。',
-  'guide.valeCupPage.rewardsHeading': '休戰規矩',
-  'guide.valeCupPage.rewardsBody':
-    '休戰規矩意味著沒有經驗也沒有戰利品：一場分出勝負的比賽會計入你的戰績和優勝者榜，而一場勝利也會計入當日的獎勵任務。中途棄賽會讓你的位置空缺，而場地管理員可記著呢。',
-  'guide.valeCupPage.bettingHeading': '欄杆邊的小賭一把',
-  'guide.valeCupPage.bettingBody':
-    '比賽成形期間，母豬場的觀眾可以押注其中一方：賭注匯成獎池，終場哨響時，勝方按各自押注的比例瓜分敗方的獎池。平局，或是無人押中的冷門，會退還每一枚錢幣。上場比賽的球員不得押注自己的比賽，而欄杆邊會記下你勝、負與淨賺錢幣的生涯紀錄。',
-  'guide.valeCupPage.practiceHeading': '練習賽與閒置的球場',
-  'guide.valeCupPage.practiceBody':
-    '溪谷盃視窗也提供練習：一座球場的私人複本，由機器人補滿雙方，任何內容都不計入你的戰績。正式比賽還差一兩個人？稍候片刻，機器人便會補齊隊伍，而任何有機器人上場的比賽都是友誼賽，絕不計入排名。而當母豬場閒置時，機器人會上演一場表演賽，你可以從看台上觀賞、也可以下注；一旦真正的玩家準備就緒，表演賽便會讓出球場，所有賭注全數退還。',
-  'entities.npcs.groundskeeper_bram.name': '場地管理員布拉姆',
-  'entities.npcs.groundskeeper_bram.title': '母豬場看守',
-  'entities.npcs.groundskeeper_bram.greeting':
-    '休戰約定在母豬場依然有效，{className}：只許用腳和肩膀。想為銅奶桶一戰嗎？',
   'entities.npcs.chronicler_saul.name': '編年史者紹爾',
   'entities.npcs.chronicler_saul.title': '東溪谷編年史',
   'entities.npcs.chronicler_saul.greeting':
@@ -9752,7 +9686,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.presence_of_mind.description':
     '使你的下一個有施法時間的法術立即完成。持續 60 秒。（法師天賦）',
   'entities.abilities.psychic_scream.description': '使 8 公尺內的敵人陷入恐懼，最多持續 4 秒。傷害可能打斷該效果。',
-  'entities.abilities.shadowstep.description': '穿過暗影，向你的目標邁進。（潛行者天賦）',
+  'entities.abilities.shadowstep.description': '穿過暗影，向你的目標邁進，無論敵友，且不會打破暮紗。（潛行者天賦）',
   'entities.abilities.silence.description': '使目標沉默4秒。（牧師天賦）',
   'entities.abilities.tranquility.description':
     '引導恢復能量4秒，每秒為30碼內的盟友恢復42至52點生命值。（德魯伊天賦）',
@@ -9848,7 +9782,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
     '你接下來兩個有施法時間的法術可以在移動中施放。持續 15 秒。（法師天賦）',
   'entities.abilities.ignition.name': '點燃',
   'entities.abilities.ignition.description':
-    '被動：你的法術致命一擊會灼燒目標，在 6 秒內造成相當於該次傷害 40% 的傷害，可堆疊。（火焰精通）',
+    '被動：你的法術致命一擊會灼燒目標，在 6 秒內造成相當於該次傷害 30% 的傷害，可堆疊。（火焰精通）',
   'entities.abilities.mass_barrier.name': '群體屏障',
   'entities.abilities.mass_barrier.description':
     '為你與 30 公尺內至多 4 名附近盟友施加護盾，每個護盾吸收 130 點傷害，持續 60 秒。（法師天賦）',
@@ -10725,13 +10659,13 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_prof_amends_smith.objectives.0.label': '已擊殺森林狼',
   'entities.quests.q_prof_amends_outfitter.title': '重接的線',
   'entities.quests.q_prof_amends_outfitter.text':
-    '終究還是回到我的織機前了。我不記恨，{playerName}，但線記得曾放手的那雙手，而重新拾起它的代價，每一次都量得更長。去剿除擠滿東邊林子的玄網潛伏者，這番勞作會先安定你的雙手，然後才讓它們再碰上好絲。',
+    '終究還是回到我的織機前了。我不記恨，{playerName}，但線記得曾放手的那雙手，而重新拾起它的代價，每一次都量得更長。去剿除擠滿東北邊林子的玄網潛伏者，這番勞作會先安定你的雙手，然後才讓它們再碰上好絲。',
   'entities.quests.q_prof_amends_outfitter.completion':
     '又穩住了。製皮與裁縫作為主修重回你的手中。這一次，在你動念遊蕩之前，先量兩遍。',
   'entities.quests.q_prof_amends_outfitter.objectives.0.label': '已剿除玄網潛伏者',
   'entities.quests.q_prof_amends_apothecary.title': '重回爐灶',
   'entities.quests.q_prof_amends_apothecary.text':
-    '瞧瞧，這不是又回到我的鍋邊了嗎。不記仇，{playerName}，廚房裡總有位子，但你也清楚，你每撂下它一次，這筆帳就記得更長。去把西邊草地上的野豬清一清，因為踏實的汗水才是第一味食材，它會讓你的雙手重新記起這門活計。',
+    '瞧瞧，這不是又回到我的鍋邊了嗎。不記仇，{playerName}，廚房裡總有位子，但你也清楚，你每撂下它一次，這筆帳就記得更長。去把西北邊草地上的野豬清一清，因為踏實的汗水才是第一味食材，它會讓你的雙手重新記起這門活計。',
   'entities.quests.q_prof_amends_apothecary.completion':
     '這才是熟悉的老味道。鍊金術與烹飪作為主修回到了你的爐灶上。這一回，多留一陣子吧。',
   'entities.quests.q_prof_amends_apothecary.objectives.0.label': '已獵殺野豬',
@@ -11145,7 +11079,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
     '每次製作都有一個小機率（3%起，上限15%）產出品質高一層的成品，但絕不會超過團隊副本的底線。',
   'guide.profPages.faq.q6': '「由某某製作」是什麼意思？',
   'guide.profPages.faq.a6':
-    '九種通用的野外配方與工具配方人人從一開始便已知曉，三種綁定作業台的上級配方（窯鱗披肩、織衛兜帽、暮影裹手）也是如此，它們無需訓練師，只需對應的作業台。其餘一切都由三座樞紐城鎮中各作業台旁的常駐師傅傳授：多數在東溪，製革師守著芬橋的製革場，煉金師守著高望的藥房。\n\n訓練師配方分為技能0、25、50三檔，作為一次性費用分別是免費、25銀和1金。當你在該行業的檔位達到配方自身的檔位時，師傅便會傳授，而且學習時你必須站在其作業台旁：移動作業台不算數。',
+    '九種通用的野外配方與工具配方人人從一開始便已知曉，三種綁定作業台的配方（窯鱗披肩、織衛兜帽、暮影裹手）也是如此，它們無需訓練師，只需對應的作業台。其餘一切都由三座樞紐城鎮中各作業台旁的常駐師傅傳授：多數在東溪，製革師守著芬橋的製革場，煉金師守著高望的藥房。\n\n訓練師配方分為技能0、25、50三檔，作為一次性費用分別是免費、25銀和1金。當你在該行業的檔位達到配方自身的檔位時，師傅便會傳授，而且學習時你必須站在其作業台旁：移動作業台不算數。',
   'guide.profPages.faq.q7': '什麼是製作者之約？',
   'guide.profPages.faq.a7':
     '委託製品會綁定給交易中收到它的人，而任意工位大師都可按層級費用為其解綁。',
@@ -11163,7 +11097,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
     '功業之書伴隨這一切：首次調諧獲得Craftsworn，首次傑作獲得Masterwright，均可作為頭銜佩戴。八種可修行業各在技能50設有里程碑功業，並在上限125加冕Grandmaster頭銜；釣魚在100熟練獲得Old Salt，200獲得Master Angler頭銜。此外還有首次採集、首次製作、野外奇遇與拆解回收的功業。這一切皆為裝飾：只有頭銜與聲望，功業永不賦予力量。',
   'guide.professions.startHeading': '從哪裡開始',
   'guide.professions.startBody':
-    '初到Eastbrook？找Foreman Odell接下A Trade for Every Hand，他會指給你鎮東南Copper Dig一帶的礦脈。此後旅途中經過的每處礦脈、樹木與藥草都值得採集。回到鎮上按T打開製作視窗，先做人人都會的普通配方，再去鍛造坊、廚房、織布機與工坊拜訪諸位大師，順便接下他們的工作訂單換取穩定的銅板。等公會的信找到你時，你早已知道哪一對行業才是歸宿。',
+    '初到Eastbrook？找Foreman Odell接下A Trade for Every Hand，他會指給你鎮東北Copper Dig一帶的礦脈。此後旅途中經過的每處礦脈、樹木與藥草都值得採集。回到鎮上按T打開製作視窗，先做人人都會的普通配方，再去鍛造坊、廚房、織布機與工坊拜訪諸位大師，順便接下他們的工作訂單換取穩定的銅板。等公會的信找到你時，你早已知道哪一對行業才是歸宿。',
   'guide.profPages.yieldsHeading': '一次採集的收穫',
   'guide.profPages.yieldsBody':
     '每次採集都會擲出品質，而熟練度決定一切：新手永遠採到普通品，熟練度越高，權重越向高品質移動，絕不倒退。到100上限時普通品完全消失：60%優秀、30%精良、8%史詩、2%傳說。品質也意味著數量：普通1個，優秀與精良2個，史詩3個，傳說4個。精良及以上的收穫都會以你的名字署名（Gathered by），封頂時十次採集有四次帶著你的名字。',
@@ -11229,16 +11163,16 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
     '長袍裡的Pristine Silk本身就補足署名材料加成，金葉與日瓣草分別算一、二級材料，精良檔因此觸發率最高；背包之類無屬性的成品永不觸發。路線：homespun到25，gildenweave到50，精良檔到75；75之後靠Wardweave Cowl（三層配方，到99全速、之後半速），最後五十點約75次，每次兩塊Pristine Silk、四束蛛絲、日瓣草與金葉各兩、兩份線。背包賣給所有人，Ottilie的訂單每30分鐘收六束蛛絲。技能50記下A Fine Seam，125等著Grandmaster Tailoring。',
   'guide.profPages.craftProse.leatherworking.identityHeading': '迅捷者的皮甲',
   'guide.profPages.craftProse.leatherworking.identityBody':
-    "梯子從樸素的Fenbridge硬皮件經優秀的marshstalker件爬到精良的mirewarden套裝，工匠能裁出的最好皮甲。兩件法系皮件補全陣容：野外普通件Eastbrook Druid's Hide與技能75的Duskhide Wraps。製皮位於烹飪與裁縫之間；製裝師在Eastbrook的Weaver Ottilie處宣誓，與烹飪組成的Trapper暫無誓約任務。",
+    "梯子從樸素的Fenbridge硬皮件經優秀的marshstalker件爬到精良的mirewarden套裝，工匠能裁出的最好皮甲。兩件法系皮件補全陣容：野外普通件Eastbrook Druid's Hide與技能50的Duskhide Wraps。製皮位於烹飪與裁縫之間；製裝師在Eastbrook的Weaver Ottilie處宣誓，與烹飪組成的Trapper暫無誓約任務。",
   'guide.profPages.craftProse.leatherworking.materialsHeading': '狩獵即收穫',
   'guide.profPages.craftProse.leatherworking.materialsBody':
-    '在製皮這裡，練級路線與供應線是同一條：粗皮直接從帶皮屍體上剝取（狼和野豬最多），每具屍體只服務先到的一人。精良及以上的採集還會給出Pristine Hide，Mirewarden Jerkin正需要這種署名標本，見一塊存一塊。配角不多：蛛腿與蛛絲、人形生物的家紡布、每件mirewarden精良品一塊鋨礦（Duskhide Wraps頂階要六塊），以及製革坊櫃檯16銅的Tanning Agent。不想挖礦的話Tanner Hesk也賣鋨礦。',
+    '在製皮這裡，練級路線與供應線是同一條：粗皮直接從帶皮屍體上剝取（狼和野豬最多），每具屍體只服務先到的一人。精良及以上的採集還會給出Pristine Hide，Mirewarden Jerkin正需要這種署名標本，見一塊存一塊。配角不多：蛛腿與蛛絲、人形生物的家紡布、每件mirewarden精良品一塊鋨礦（Duskhide Wraps要六塊），以及製革坊櫃檯16銅的Tanning Agent。鋨礦本身絕不會在櫃檯出售：你得自行開採，無論是在Thornpeak，還是幾乎任何新手區的入門礦脈都行（唯獨Farshore只產鐵礦），不然就只能向其他玩家收購。',
   'guide.profPages.craftProse.leatherworking.ladderHeading': '在Fenbridge受訓',
   'guide.profPages.craftProse.leatherworking.ladderBody':
-    "特別之處：製革坊在Mirefen Marsh路上的Fenbridge，這是唯一在Eastbrook之外受訓的深度行業。Tanner Hesk在他的鞣池邊授課：硬皮檔技能0免費，marshstalker檔技能25每個25銀，mirewarden檔技能50每個1金。兩件配方跳過訓練師：野外普通件（Tanned Leather Jerkin與Druid's Hide）隨處可做，Duskhide Wraps人人都會但要技能75且綁定製革坊。注意製裝師誓約本身在Eastbrook的Ottilie處宣誓，只有授課在沼澤。",
+    "特別之處：製革坊在Mirefen Marsh路上的Fenbridge，這是唯一在Eastbrook之外受訓的深度行業。Tanner Hesk在他的鞣池邊授課：硬皮檔技能0免費，marshstalker檔技能25每個25銀，mirewarden檔技能50每個1金。三件配方跳過訓練師：野外普通件（Tanned Leather Jerkin與Druid's Hide）隨處可做，Duskhide Wraps人人都會，技能50即綁定製革坊。注意製裝師誓約本身在Eastbrook的Ottilie處宣誓，只有授課在沼澤。",
   'guide.profPages.craftProse.leatherworking.routeHeading': '傑作與通往125之路',
   'guide.profPages.craftProse.leatherworking.routeBody':
-    "marshstalker檔及以上都擲傑作，Mirewarden Jerkin裡的Pristine Hide自動提供署名材料加成；鋨礦算一級材料。無屬性的硬皮普通件不會觸發。自然而然地練：從一級起剝下每隻狼和野豬，硬皮檔隨地做到25，隨任務進沼澤時順路受訓；marshstalker到50，mirewarden到75，此後Duskhide Wraps（三層配方，六塊鋨礦、三塊Pristine Hide、兩塊粗皮、一份Tanning Agent）帶你走完最後五十點（約75次）。75專精後移動製革坊尤其寶貴：營火邊就能把一袋皮子變成成品。Hesk的訂單每30分鐘收八張粗皮。技能50記下Tanner's Trade，上限處是Grandmaster Leatherworking。",
+    "marshstalker檔及以上都擲傑作，Mirewarden Jerkin裡的Pristine Hide自動提供署名材料加成；鋨礦算一級材料。無屬性的硬皮普通件不會觸發。自然而然地練：從一級起剝下每隻狼和野豬，硬皮檔隨地做到25，隨任務進沼澤時順路受訓；marshstalker到50，而mirewarden系列與Duskhide Wraps（皆為二層配方）則帶你從50的精良階段練到75。過了75，這些二層配方的收益會先減半、再降至四分之一，約150次才能練完到125上限的最後五十點；未達主修上限時，它們仍與精良品質的製作上限持平，不會直接歸零。75專精後移動製革坊尤其寶貴：營火邊就能把一袋皮子變成成品。Hesk的訂單每30分鐘收八張粗皮。技能50記下Tanner's Trade，上限處是Grandmaster Leatherworking。",
   'guide.profPages.craftProse.cooking.identityHeading': '餵飽隊伍的鍋',
   'guide.profPages.craftProse.cooking.identityBody':
     "吃下熟食會在18秒的休息中治療你，這是拉怪間隙最便宜的治療。梯子從90點治療的Pan-Seared River Perch一路做到980點的Marlow's Grand Roast，現存最大的坐地回復。烹飪位於鍊金術與製皮之間；藥劑師（鍊金術與烹飪）在Eastbrook廚房的Cook Marlow處宣誓（先為鍋獵四頭野豬），與製皮組成的Trapper暫無誓約任務。",
@@ -11781,7 +11715,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
     '立即向 20 公尺內的敵人擲出聖錘，造成 {damage} 點傷害，恢復 70 點法力，為自己恢復相當於傷害量 50% 的生命值，並在造成傷害時產生 1 點虔誠。烈陽反擊會使恩典之錘無視冷卻時間，並為你恢復相當於傷害量 100% 的生命值。',
   'entities.abilities.hammer_of_grace.name': '恩典之錘',
   'entities.abilities.hex_of_violence.description':
-    '詛咒敵人8秒。其接下來的3次傷害行動各產生7點譴罪，並反噬22點暗影傷害。',
+    '詛咒敵人8秒。其接下來的3次傷害行動各產生7點譴罪，並反噬17點暗影傷害。',
   'entities.abilities.hex_of_violence.name': '暴行咒',
   'entities.abilities.hour_of_judgment.description':
     '對你的主要邪眼降下持續15秒的審判，獲得40點譴罪和3層命運絲線，啟動附身，使透過主要邪眼產生的譴罪加倍，並使裁決傷害提高20%。第一次裁決返還50點譴罪。',
@@ -12006,7 +11940,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
     '發動高仇恨攻擊並產生 1 點虔誠。成功命中有 20% 機率獲得持續 8 秒的烈陽反擊；每次成功格擋有 25% 機率觸發。烈陽反擊會強化你的下一次向陽飛盾、恩典之錘或治癒之光。昇華還會給予一個小型吸收護盾。',
   'entities.abilities.vowkeeper_strike.name': '守誓者打擊',
   'entities.abilities.warspirit_cadence.description':
-    '被動：每第3次命中的武器攻擊會觸發2次裂風迴響，各造成50%自然傷害，並獲得持續12秒的風暴施法。風暴施法使下一個奧術閃電、震擊或治癒之水瞬發且法力消耗降低50%。先祖打擊視為2次攻擊。（戰魂）',
+    '被動：每第3次命中的武器攻擊會觸發2次風心回響，各造成25%自然傷害，並獲得持續12秒的風暴施法。風暴施法使下一個奧術閃電、震擊或治癒之水瞬發且法力消耗降低50%。先祖打擊視為2次攻擊。（戰魂）',
   'entities.abilities.warspirit_cadence.name': '戰魂節律',
   'entities.abilities.wildheart.description': '立即恢復最大生命值的 30%。',
   'entities.abilities.wildheart.name': '野性之心',
@@ -13170,6 +13104,273 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.perf.diagnostics.report.notAvailable': '無法使用',
   'hudChrome.perf.diagnostics.report.status.critical': '嚴重',
   'hudChrome.perf.diagnostics.report.status.needsAttention': '需要注意',
+  // The Proving Shore (tutorial island) + the spawn greeting dialog.
+  'hudChrome.tutorialGreeting.bodyFirst':
+    '這張面孔我可沒見過，朋友。在這片土地上，初次踏上冒險之路的人照傳統都會去試煉之濱走一趟，那是海峽對面的一座安靜小島。在那裡你可以先磨練身手、熟悉這個世界，再去迎接它的挑戰。渡船來回都通，去或不去都沒人會小看你。',
+  'hudChrome.tutorialGreeting.bodyRefresher':
+    '又換了一副新面孔回來了？那你知道該怎麼做。不過，出發前若想溫習一遍，試煉之濱從不拒絕回爐的學生，渡船隨時候著你。',
+  'hudChrome.tutorialGreeting.play': '進行新手教學',
+  'hudChrome.tutorialGreeting.skip': '跳過新手教學',
+  'hudChrome.tutorialGreeting.declineNote':
+    '隨你的意，朋友。哪天改了主意，鴉郵信箱旁的渡船鈴隨時都能送你去試煉之濱，不分晝夜。狼群不等人，它等。',
+  'hudChrome.tutorialGreeting.bellHomeNote':
+    '這麼快就從海濱回來了？你剛才敲響的正是渡船鈴。它的孿生兄弟就掛在那邊鴉郵信箱旁：想回試煉之濱，隨時敲響它，渡航就會送你過去。敲錯了也不打緊。',
+  'hudChrome.tutorialGreeting.islandArrivalNote':
+    '剛下渡船嗎？歡迎來到試煉之濱。看守塔姆就在你正前方的海灘上守著試煉跑道：走到他跟前，直到他的名字顯示出來，然後按 F，或用滑鼠左鍵點擊他，他的跑道會把你雙腿該會的都教給你。等你準備離開時，敲響立在我碼頭旁的那口鈴，渡航就會送你回東溪鎮。',
+  'hudChrome.tutorialGreeting.noteClose': '明白了',
+  'hudChrome.bootcamp.title': '最初的腳步',
+  'hudChrome.bootcamp.talkTitle': '與看守塔姆交談',
+  'hudChrome.bootcamp.talkBody':
+    '看守塔姆就在前方守著試煉跑道的大門。走到他跟前，直到他的名字顯示出來，然後按 {interactKey}，或用滑鼠左鍵點擊他，與他交談：他會給你安排這趟跑道。',
+  'hudChrome.bootcamp.talkBodyTouch':
+    '看守塔姆就在前方守著試煉跑道的大門。走到他跟前，直到他的名字顯示出來，然後點按他，或點按使用按鈕，與他交談：他會給你安排這趟跑道。',
+  'hudChrome.bootcamp.talkBodyPad':
+    '看守塔姆就在前方守著試煉跑道的大門。走到他跟前，直到他的名字顯示出來，然後按下互動鍵與他交談：他會給你安排這趟跑道。',
+  'hudChrome.bootcamp.forwardTitle': '走過第一條跑道',
+  'hudChrome.bootcamp.forwardBody':
+    '走進塔姆身旁的跑道，按住 {forwardKey}，沿跑道向西走到旗幟處。',
+  'hudChrome.bootcamp.forwardBodyTouch':
+    '走進塔姆身旁的跑道，把移動搖桿推向上方，沿跑道向西走到旗幟處。',
+  'hudChrome.bootcamp.forwardBodyPad':
+    '走進塔姆身旁的跑道，把左搖桿推向上方，沿跑道向西走到旗幟處。',
+  'hudChrome.bootcamp.turnwalkTitle': '轉身，再走',
+  'hudChrome.bootcamp.turnwalkBody':
+    '第一面旗到手。按住 {turnKey} 原地轉身，直到正對向南延伸的圍欄跑道，然後再次按住 {forwardKey}，沿跑道走到第二面旗。',
+  'hudChrome.bootcamp.turnwalkBodyTouch':
+    '第一面旗到手。用手指拖動世界畫面（不是移動搖桿）來轉身，直到正對向南延伸的圍欄跑道，然後把搖桿推向上方，沿跑道走到第二面旗。',
+  'hudChrome.bootcamp.turnwalkBodyPad':
+    '第一面旗到手。推動右搖桿轉身，直到正對向南延伸的圍欄跑道，然後把左搖桿推向上方，沿跑道走到第二面旗。',
+  'hudChrome.bootcamp.strafeTitle':
+    '轉身，然後前進',
+  'hudChrome.bootcamp.strafeBody':
+    '只剩最後一個彎。按住 {turnLeftKey} 原地轉身，直到正對最後一條跑道，然後再次按住 {forwardKey}，一直走到紅旗被你甩在身後。',
+  'hudChrome.bootcamp.strafeBodyTouch':
+    '只剩最後一個彎。用手指劃動畫面（不是移動搖桿）轉身，直到正對最後一條跑道，然後把搖桿上推，一直走到紅旗被你甩在身後。',
+  'hudChrome.bootcamp.strafeBodyPad':
+    '只剩最後一個彎。推動右搖桿轉身，直到正對最後一條跑道，然後把左搖桿上推，一直走到紅旗被你甩在身後。',
+  'hudChrome.bootcamp.cameraTitle': '轉動視角',
+  'hudChrome.bootcamp.cameraBody':
+    '交上成績之前還有最後一課：按住滑鼠右鍵並拖動，把視角繞著自己整整轉上一圈。知道身後站著什麼，才能打贏仗。',
+  'hudChrome.bootcamp.cameraBodyTouch':
+    '交上成績之前還有最後一課：用手指拖動世界畫面，把視角繞著自己整整轉上一圈。知道身後站著什麼，才能打贏仗。',
+  'hudChrome.bootcamp.cameraBodyPad':
+    '交上成績之前還有最後一課：推動右搖桿，把視角繞著自己整整轉上一圈。知道身後站著什麼，才能打贏仗。',
+  'hudChrome.bootcamp.courseProgress': '旗幟 {current}/{total}',
+  'hudChrome.bootcamp.doneTitle': '跑完全程',
+  'hudChrome.bootcamp.doneBody':
+    '腿上的功夫就這些了。監工佩爾就站在紅旗旁邊：對著他按 {interactKey}，或用滑鼠左鍵點擊他，交上你的成績，領取你的第一份報酬。',
+  'hudChrome.bootcamp.doneBodyTouch':
+    '腿上的功夫就這些了。監工佩爾就站在紅旗旁邊：點按他，交上你的成績，領取你的第一份報酬。',
+  'hudChrome.bootcamp.doneBodyPad':
+    '腿上的功夫就這些了。監工佩爾就站在紅旗旁邊：按下互動鍵，交上你的成績，領取你的第一份報酬。',
+  'hudChrome.bootcamp.coachNextTitle': '下一位：{npc}',
+  'hudChrome.bootcamp.coachNextBody':
+    '沿著金色路徑去找{npc}。走到跟前直到名字顯示出來，然後按 {interactKey}，或用滑鼠左鍵點擊對方，接下你的下一件差事。',
+  'hudChrome.bootcamp.coachNextBodyTouch':
+    '沿著金色路徑去找{npc}。走到跟前直到名字顯示出來，然後點按對方，或點按使用按鈕，接下你的下一件差事。',
+  'hudChrome.bootcamp.coachNextBodyPad':
+    '沿著金色路徑去找{npc}。走到跟前直到名字顯示出來，然後按下互動鍵，接下你的下一件差事。',
+  'hudChrome.bootcamp.coachTaskBody':
+    '沿著金色路徑去完成差事。右側的追蹤欄隨時記著進度，迷了路就按 {mapKey} 打開地圖。',
+  'hudChrome.bootcamp.coachTaskBodyTouch':
+    '沿著金色路徑去完成差事。右側的追蹤欄隨時記著進度，迷了路就點按地圖按鈕看路。',
+  'hudChrome.bootcamp.coachTaskBodyPad':
+    '沿著金色路徑去完成差事。右側的追蹤欄隨時記著進度，迷了路就按下地圖按鈕看路。',
+  'hudChrome.bootcamp.coachReadyTitle': '差事辦妥',
+  'hudChrome.bootcamp.coachReadyBody':
+    '前往{npc}身邊，按 {interactKey}，或用滑鼠左鍵點擊對方，交上差事，領取報酬。',
+  'hudChrome.bootcamp.coachReadyBodyTouch': '前往{npc}身邊，點按對方，交上差事，領取報酬。',
+  'hudChrome.bootcamp.coachReadyBodyPad':
+    '前往{npc}身邊，按下互動鍵，交上差事，領取報酬。',
+  'hudChrome.bootcamp.taskStrikeTrueBody':
+    '走到一個草人跟前，用滑鼠左鍵點擊它，把它設為目標：它的名字會出現在螢幕上方。然後按 {attackKey}，或點擊動作列上的第一個按鈕，揮出這一刀。一直打到一個散架為止。',
+  'hudChrome.bootcamp.taskStrikeTrueBodyTouch':
+    '走到一個草人跟前，點按它，把它設為目標。然後點按動作列上的第一個按鈕，揮出這一刀。一直打到一個散架為止。',
+  'hudChrome.bootcamp.promptTurnIn':
+    '交任務',
+  'hudChrome.bootcamp.promptSelect':
+    '選擇目標',
+  'hudChrome.bootcamp.promptUseAbility':
+    '使用技能',
+  'hudChrome.bootcamp.taskHoneBody':
+    '用滑鼠左鍵點擊一個草人把它設為目標，然後按 {abilityKey} 使用{ability}。那是你自己的本事，不是隨手一揮。命中三次。',
+  'hudChrome.bootcamp.taskHoneBodyTouch':
+    '點擊一個草人把它設為目標，然後點擊動作列上的{ability}。那是你自己的本事，不是隨手一揮。命中三次。',
+  'hudChrome.bootcamp.taskHoneBodyPad':
+    '把一個草人設為目標，然後按放著{ability}的動作按鈕。那是你自己的本事，不是隨手一揮。命中三次。',
+  'hudChrome.bootcamp.promptOpenBags': '打開背包',
+  'hudChrome.bootcamp.promptCharacterSheet': '打開角色面板',
+  'hudChrome.bootcamp.promptLookAround': '按住右鍵拖曳來環視四周',
+  'hudChrome.bootcamp.promptKneel':
+    '跪下',
+  'hudChrome.bootcamp.taskLongWalkBody':
+    '按 {bagsKey} 打開背包，然後點擊往生石。它會讓你就地倒下。這裡沒有任何東西能傷到你，這麼做也不會讓你損失什麼。',
+  'hudChrome.bootcamp.taskLongWalkBodyTouch':
+    '沿著海岸路往南走到往生石前，點擊它跪下。這裡沒有任何東西能傷到你，這麼做也不會讓你損失什麼。',
+  'hudChrome.bootcamp.taskLongWalkBodyPad':
+    '沿著海岸路往南走到往生石前，按互動按鈕跪下。這裡沒有任何東西能傷到你，這麼做也不會讓你損失什麼。',
+  'hudChrome.bootcamp.taskLongWalkDeadBody':
+    '你死了。什麼也沒丟。按下釋放靈魂，你會在營地後面的墓地化作幽魂站起來。',
+  'hudChrome.bootcamp.taskLongWalkDeadBodyTouch':
+    '你死了。什麼也沒丟。點擊釋放靈魂，你會在營地後面的墓地化作幽魂站起來。',
+  'hudChrome.bootcamp.taskLongWalkDeadBodyPad':
+    '你死了。什麼也沒丟。選擇釋放靈魂，你會在營地後面的墓地化作幽魂站起來。',
+  'hudChrome.bootcamp.taskLongWalkGhostBody':
+    '你現在是幽魂，沒有東西碰得到你。你的屍體在地圖上有標記：走回去，靠近之後就會出現在屍體處復活的按鈕。按下它，你就完好如初，沒有任何懲罰。',
+  'hudChrome.bootcamp.taskLongWalkGhostBodyTouch':
+    '你現在是幽魂，沒有東西碰得到你。你的屍體在地圖上有標記：走回去，靠近之後就會出現在屍體處復活的按鈕。點擊它，你就完好如初，沒有任何懲罰。',
+  'hudChrome.bootcamp.taskLongWalkGhostBodyPad':
+    '你現在是幽魂，沒有東西碰得到你。你的屍體在地圖上有標記：走回去，靠近之後就會出現在屍體處復活的按鈕。選擇它，你就完好如初，沒有任何懲罰。',
+  'hudChrome.bootcamp.promptLootPearl':
+    '拾取珍珠',
+  'hudChrome.bootcamp.taskStrikeTrueBodyPad':
+    '走到一個草人跟前，按下目標鍵把它設為目標。然後按下第一個動作鍵，揮出這一刀。一直打到一個散架為止。',
+  'hudChrome.bootcamp.taskShellBody':
+    '掠蟹是會回擊的。用滑鼠左鍵點擊一隻，把牠設為目標，然後按 {abilityKey} 使用{ability}，不停攻擊。要是一次有太多隻撲上來，就沿小路往回撤：牠們很快就會放棄追趕，休息時你的生命值也會慢慢回滿。',
+  'hudChrome.bootcamp.taskShellBodyTouch':
+    '掠蟹是會回擊的。點擊一隻把牠設為目標，然後點擊動作列上的{ability}。要是一次有太多隻撲上來，就沿小路往回撤：牠們很快就會放棄追趕，休息時你的生命值也會慢慢回滿。',
+  'hudChrome.bootcamp.taskShellBodyPad':
+    '掠蟹是會回擊的。把一隻設為目標，然後按放著{ability}的動作按鈕。要是一次有太多隻撲上來，就沿小路往回撤：牠們很快就會放棄追趕，休息時你的生命值也會慢慢回滿。',
+  'hudChrome.bootcamp.taskWreckLineBody':
+    '漂流貨箱沿著通往晨憩營地的小路一路排開。走到一只漂流貨箱跟前，直到它的名字顯示出來，然後按 {interactKey}，或用滑鼠左鍵點擊貨箱，把它撿起來。湊滿六只，這批海貨就齊了。',
+  'hudChrome.bootcamp.taskWreckLineBodyTouch':
+    '漂流貨箱沿著通往晨憩營地的小路一路排開。走到一只漂流貨箱跟前，直到它的名字顯示出來，然後點按貨箱，或點按使用按鈕，把它撿起來。湊滿六只，這批海貨就齊了。',
+  'hudChrome.bootcamp.taskWreckLineBodyPad':
+    '漂流貨箱沿著通往晨憩營地的小路一路排開。走到一只漂流貨箱跟前，直到它的名字顯示出來，然後按下互動鍵把它撿起來。湊滿六只，這批海貨就齊了。',
+  'hudChrome.bootcamp.taskPouchBody':
+    '對著{npc}按 {interactKey}，或用滑鼠左鍵點擊對方，打開貨攤，然後用滑鼠左鍵點擊亞麻小袋買下它。',
+  'hudChrome.bootcamp.taskPouchBodyTouch': '點按{npc}打開貨攤，然後點按亞麻小袋買下它。',
+  'hudChrome.bootcamp.taskPouchBodyPad':
+    '對著{npc}按下互動鍵打開貨攤，然後選中亞麻小袋買下它。',
+  'hudChrome.bootcamp.readyPouchBody':
+    '小袋已買下。按 {bagsKey} 打開背包，用滑鼠左鍵點擊亞麻小袋，把它繫進一個空著的袋扣。然後前往{npc}身邊，按 {interactKey}，把小袋亮給對方看。',
+  'hudChrome.bootcamp.readyPouchBodyTouch':
+    '小袋已買下。打開背包，點按亞麻小袋，把它繫進一個空著的袋扣。然後前往{npc}身邊，點按對方，把小袋亮給對方看。',
+  'hudChrome.bootcamp.readyPouchBodyPad':
+    '小袋已買下。打開背包，選中亞麻小袋，把它繫進一個空著的袋扣。然後前往{npc}身邊，按下互動鍵，把小袋亮給對方看。',
+  'hudChrome.bootcamp.bellTitle': '敲響渡船鈴',
+  'hudChrome.bootcamp.bellBody':
+    '你的航程已經掙到了。走到碼頭旁的渡船鈴跟前，按 {interactKey}，或用滑鼠左鍵點擊它，揚帆前往東溪鎮。',
+  'hudChrome.bootcamp.bellBodyTouch':
+    '你的航程已經掙到了。走到碼頭旁的渡船鈴跟前，點按它，揚帆前往東溪鎮。',
+  'hudChrome.bootcamp.bellBodyPad':
+    '你的航程已經掙到了。走到碼頭旁的渡船鈴跟前，按下互動鍵，揚帆前往東溪鎮。',
+  'entities.zones.proving_shore.pois.4.label': '試煉跑道',
+  'entities.items.ps_castaway_crate.name': '漂流貨箱',
+  'entities.items.ps_ferry_bell.name': '渡船鈴',
+  'entities.mobs.training_effigy.name': '訓練草人',
+  'entities.mobs.shore_scuttler.name': '灘塗掠蟹',
+  'entities.npcs.wayfarer_bryn.name': '旅人布琳',
+  'entities.npcs.wayfarer_bryn.title': '港口嚮導',
+  'entities.npcs.wayfarer_bryn.greeting':
+    '東溪谷來者不拒，朋友。而對腳下還不穩的人來說，總還有試煉之濱：鴉郵信箱旁的渡船鈴一年到頭隨時送你過去，島上那口孿生鈴再送你回家。',
+  'entities.npcs.instructor_maren.name': '教官瑪倫',
+  'entities.npcs.instructor_maren.title': '試煉導師',
+  'entities.npcs.instructor_maren.greeting':
+    '谷地感激過的每一位英雄，都曾站在你現在站的地方，{className}，而且當時沒有一個人分得清劍該握哪頭。這片海濱就是為此而設。儘管問，儘管練，在失敗不要緊的地方儘管失敗。',
+  'entities.npcs.quartermaster_finch.name': '軍需官芬奇',
+  'entities.npcs.quartermaster_finch.title': '營地補給商',
+  'entities.npcs.quartermaster_finch.greeting':
+    '我的櫃檯只賣一樣東西，{playerName}：一只裝路上零碎的備用小袋，等課業用得著它的時候才賣。這裡其餘的都是要運回谷地的打撈貨。銅板能買下小袋，而銅板要靠幹活掙來。這就是全部的經濟學，它永遠不會變得更複雜。只會變得更大。',
+  'entities.npcs.ferryman_odo.name': '渡船人奧多',
+  'entities.npcs.ferryman_odo.title': '渡口看守',
+  'entities.npcs.ferryman_odo.greeting':
+    '剛下渡船嗎，{playerName}？看守塔姆就在碼頭正南的海灘上守著試煉跑道：先去跑一趟他的跑道，你的雙腿會感謝你的。這片海濱的每一位看守都會在你辦完差事後把你交給下一位，螢幕頂端的那張卡片永遠知道下一步該往哪兒走。等谷地召喚你回去時，敲響立在我碼頭旁的那口鈴，渡航會把你送到東溪鎮上。',
+  'entities.npcs.warden_tam.name': '看守塔姆',
+  'entities.npcs.warden_tam.title': '試煉跑道的看守',
+  'entities.npcs.warden_tam.greeting':
+    '這幾條跑道就是試煉跑道，{playerName}，谷地敬重的每一位冒險者都跑過它。欄杆上的燈柱整夜不滅，跑道從不打烊。',
+  'entities.npcs.overseer_pell.name': '監工佩爾',
+  'entities.npcs.overseer_pell.title': '試煉跑道監工',
+  'entities.npcs.overseer_pell.greeting':
+    '每一趟從這幾條跑道下來的成績都由我掐錶，{playerName}，比這難看得多的腳步我也見過。我身後的路通往練武場：腳上功夫變成劍上功夫，就在那裡。',
+  'entities.npcs.drillmaster_rook.name': '操練官魯克',
+  'entities.npcs.drillmaster_rook.title': '練武場主管',
+  'entities.npcs.drillmaster_rook.greeting':
+    '先打稻草，再打殼，{playerName}。草人教你的手臂怎麼揮刀；海灘那頭的掠蟹教它落在一個會計較的對象身上。',
+  'entities.npcs.tidewarden_nel.name': '守潮人奈爾',
+  'entities.npcs.tidewarden_nel.title': '海灘的看守',
+  'entities.npcs.tidewarden_nel.greeting':
+    '潮水會拿走，潮水也會償還，{playerName}。這兩筆帳都由我來記：掠蟹從殘骸裡夾走的，和誠實的雙手沿這條路扛上來的。',
+  'entities.quests.q_ps_the_gauntlet.title': '跑過試煉跑道',
+  'entities.quests.q_ps_the_gauntlet.text':
+    '谷地敬重的每一雙腿，都是先從這幾條跑道跑出來的，{playerName}。沿第一條跑道向西走到旗幟處，原地轉過身來，沿南邊的跑道走到第二面旗，最後沿末尾的跑道橫移到紅旗處。旗幟要按順序經過；螢幕上方的卡片會隨時告訴你該按哪個鍵。監工佩爾在跑道盡頭掐著每一趟的錶：等紅旗被你甩在身後，他就站在那裡等著收你的成績。',
+  'entities.quests.q_ps_the_gauntlet.completion':
+    '這一趟我掐了錶，{playerName}，比你腳快的人我也刷下去過。試煉跑道是你的了。我身後的路通往練武場，操練官魯克在那裡把腳上功夫變成劍上功夫：你的下一件差事在他手裡。',
+  'entities.quests.q_ps_the_gauntlet.objectives.0.label': '經過試煉跑道旗幟',
+  'entities.npcs.bursar_wick.name': '司庫威克',
+  'entities.npcs.bursar_wick.title': '鍍金保險箱',
+  'entities.npcs.bursar_wick.greeting':
+    '鍍金保險箱連這裡也設了一張桌子，{playerName}。凡是存到我這裡的東西，都躺在每座城鎮每位司庫身後的同一座金庫裡，狼咬不著，水泡不著，連你自己的糊塗決定也碰不著。',
+  'entities.quests.q_ps_strike_true.title': '擊中要害',
+  'entities.quests.q_ps_strike_true.text':
+    '練完了腳，該練手臂了，{playerName}。練武場就在我身後沿路而上的地方，那裡的草人生來就是挨打的。要是找不著路，按 M 打開地圖：你身上的每件差事都會標在上面。走到一個草人跟前，按 Tab 或用滑鼠左鍵點擊它，把它設為目標，接著按 1，或點擊畫面底部動作列上的第一個圖示，揮出這一刀。一直打到一個散架為止；它不會還手，草人從來不還手。操練官魯克在練武場西側、通往海灘的小路啟程的地方看著場子：對著他按 F，交上這份戰果。',
+  'entities.quests.q_ps_strike_true.completion':
+    '乾淨俐落的一擊，手也已經穩多了。記住這種感覺，{playerName}：選定目標，揮刀，然後一直打下去。稻草挨打從不計較。你下一個揮刀的對象可就計較了。',
+  'entities.quests.q_ps_strike_true.objectives.0.label': '擊倒訓練草人',
+  'entities.quests.q_ps_shell_and_claw.title': '甲殼與利螯',
+  'entities.quests.q_ps_shell_and_claw.text':
+    '稻草從不計較，{playerName}，所以給你找個計較的。灘塗掠蟹正在遠灘的沉船灘上翻揀殘骸：從我的練武場沿小路向西走，它會一直把你領到牠們跟前。牠們會夾回來，所以盯著你的生命條，別停下揮刀：用滑鼠左鍵選定一隻，然後使用校場教你的那個技能，打到牠的殼裂開為止。三隻就夠。然後沿路爬上北邊的坡：守潮人奈爾管著海灘的帳，你的蟹殼她都記數。',
+  'entities.quests.q_ps_shell_and_claw.completion':
+    '敲開三隻殼，十根手指一根沒少：頭一仗打得不賴，{playerName}。掠蟹從殘骸裡夾走東西的速度，比潮水送來的還快，所以你每除掉一隻，就有人多保住一枚銅板。',
+  'entities.quests.q_ps_shell_and_claw.objectives.0.label': '除滅灘塗掠蟹',
+  'entities.quests.q_ps_the_wreck_line.title': '沉船灘',
+  'entities.quests.q_ps_the_wreck_line.text':
+    '我的搬運工把海貨從舊沉船上卸下來，沿坡道扛往晨憩營地，{playerName}，可半數貨箱從來到不了坡頂：它們被擱在路邊，就此沒人記得。沿我這條路朝營地走，你正好會從這些落單的貨箱旁邊經過。開箱很簡單：走到貨箱跟前，直到它的名字顯示出來，然後按 F，或用滑鼠左鍵點擊貨箱本身，它就會把裡面的東西交出來。開六只就能清完這條線，並且記住：你今後遇到的每一只箱子、每一處採集點、每一道門扉，用的都是同一個 F 鍵。軍需官芬奇守著營地的貨攤，殘骸海貨連一根木棍都收：把這批貨交給她。',
+  'entities.quests.q_ps_the_wreck_line.completion':
+    '繩子、焦油，還有半輪大海竟然放過的乳酪：我全要了，{playerName}。一副肯彎腰扛貨的脊背，對這座營地來說比任何刀劍都值錢，而你這一趟就把整條線清了個乾淨。',
+  'entities.quests.q_ps_the_wreck_line.objectives.0.label': '開啟漂流貨箱',
+  'entities.quests.q_ps_pouch_and_purse.title': '錢囊與背袋',
+  'entities.quests.q_ps_pouch_and_purse.text':
+    '去谷地之前還有最後一課，{playerName}，也是保住冒險者性命的一課：你隨身帶的東西。你的背包有十六格，旁邊還空著四個袋扣；每繫上一只袋子，它的空間就併入總容量。所以：再對我按一次 F，打開我的貨攤，在我的貨品裡用滑鼠左鍵點擊亞麻小袋買下它，然後按 B 打開背包，再用滑鼠左鍵點擊袋中的亞麻小袋，把它繫進一個空著的袋扣。教官瑪倫就在東邊幾步外的集合篝火旁操練：把你腰帶上的小袋給她看看。',
+  'entities.quests.q_ps_pouch_and_purse.completion':
+    '好袋子。要是還沒繫上，現在就繫：按 B 打開背包，用滑鼠左鍵點擊小袋，把它繫進一個空著的袋扣，多出的六格就歸你裝麻煩了。接下來是任何袋子都裝不下的另一半課，{playerName}：背不下的，交給鍍金保險箱。司庫威克的保險箱桌就設在西邊沿路而上的地方，他為你打開的正是每座城鎮每位司庫共用的同一座金庫；等你的錢袋鼓起來，還能購買更多金庫空間。貴重的存進金庫，袋子留出空當。塞滿的行囊斷送過的冒險，比任何狼都多。',
+  'entities.quests.q_ps_pouch_and_purse.objectives.0.label': '購買亞麻小袋',
+  'entities.quests.q_ps_hone_the_edge.title':
+    '磨利鋒刃',
+  'entities.quests.q_ps_hone_the_edge.text':
+    '揮砍就只是揮砍，{playerName}，草人能挨上一整天，可那贏不來任何東西。看看螢幕下方那一排按鈕：那一排才是你的本事，每一個都能做到你光靠胳膊做不到的事。你已經有一個了。回到草人跟前用出來：選好目標，按下這座校場為你標出的那個按鈕，做滿三次。別只是亂砍草垛，要真正把你會的那一手打出來。做完就回來找我。',
+  'entities.quests.q_ps_hone_the_edge.completion':
+    '現在你是在戰鬥，而不是在瞎揮了。那一排會隨著你每升一級變長，{playerName}，活得最久的，永遠是會讀那一排的人。草人不在乎你用了哪個按鈕。山谷會在乎。',
+  'entities.quests.q_ps_hone_the_edge.objectives.0.label':
+    '對草人命中技能',
+  'entities.quests.q_ps_the_long_walk.title':
+    '漫長的歸途',
+  'entities.quests.q_ps_the_long_walk.text':
+    '只剩最後一課了，{playerName}，而這一課我說不明白：你得親自經歷一次。你在外頭一定會死。誰都會死，而那並不是任何事情的終點。拿上這塊往生石。按 B 打開背包，用滑鼠左鍵點它，它就會讓你在原地倒下。接著照螢幕上的指示做：釋放靈魂，走回你自己的屍體，再走進去。屍體會等著你，那段路不要錢，走完它你什麼也不會失去。',
+  'entities.quests.q_ps_the_long_walk.completion':
+    '你就這樣回來了，一點沒少。記住那種感覺，{playerName}，因為下一次會牽扯到獠牙，而且沒人站在旁邊給你解釋。屍體會等著你，那段路不要錢，死亡真正拿走的，只有你走回來的那點時間。',
+  'entities.quests.q_ps_the_long_walk.objectives.0.label':
+    '從死亡中走了回來',
+  'entities.items.ps_passing_stone.name':
+    '往生石',
+  'entities.quests.q_ps_the_signpost.title': '風中傳信',
+  'entities.quests.q_ps_the_signpost.text':
+    '還剩最後一個習慣要學，{playerName}，而且用不著刀劍：讀告示板。公會告示柱就立在營地大門口，離我的篝火西南邊幾步遠，公會和過路的隊伍都把召集令貼在上面。走到柱面跟前，按 F，或用滑鼠左鍵點擊它，讀一讀貼著的內容，然後回來告訴我風裡捎來了什麼。你今後走進的每一座城鎮，都立著一塊這樣的告示板。',
+  'entities.quests.q_ps_the_signpost.completion':
+    '這下你知道消息在谷地裡是怎麼傳的了，{playerName}：不靠信使，靠告示板。每過一座城鎮都去看看；半數冒險的開頭，不過是板上三行墨字。',
+  'entities.quests.q_ps_the_signpost.objectives.0.label': '讀過公會告示柱',
+  'entities.quests.q_ps_set_sail.title': '揚帆起航',
+  'entities.quests.q_ps_set_sail.text':
+    '這片海濱上已經沒有你沒跑過、沒打倒過、沒打開過、沒買下過的東西了，{playerName}。你準備好了，而東溪谷有真正的差事在等著。沿海濱大道走回碼頭，對著渡船人奧多按 F，告訴他，就說是我說的，你掙到了這趟航程。什麼時候記不清自己欠了誰什麼，隨時按 L：那是你的任務日誌。',
+  'entities.quests.q_ps_set_sail.completion':
+    '瑪倫這麼說了？能從一個曾讓我練了一星期繫纜繩的女人嘴裡說出來，這可是極高的評價。等你準備好了就敲響立在我碼頭旁的那口鈴，{playerName}，渡航會把你送到東溪鎮的正中央。當心狼群。',
+  'entities.quests.q_ps_set_sail.objectives.0.label': '向渡船人奧多報到',
+  'entities.zones.proving_shore.name': '試煉之濱',
+  'entities.zones.proving_shore.welcome':
+    '試煉之濱對你別無所求，只求時間。熟悉營地，砍倒草人，走一趟沉船灘，等你準備好了，渡船人奧多會送你過海去谷地。',
+  'entities.zones.proving_shore.pois.0.label': '晨憩營地',
+  'entities.zones.proving_shore.pois.1.label': '舊碼頭',
+  'entities.zones.proving_shore.pois.2.label': '練武場',
+  'entities.zones.proving_shore.pois.3.label': '沉船灘',
+  'guide.home.world.provingName': '試煉之濱',
+  'guide.home.world.provingBlurb': '海峽對面一座安靜的訓練之島，新冒險者在谷地對他們提出任何要求之前，先在這裡站穩腳跟。',
+  'guide.worldPage.provingBlurb':
+    '谷地海峽對面的一座安靜小島，被闢為訓練場：一處營地、一片練武場、一段佈滿殘骸的海灘，還有一班雙向通行的渡船。',
+  'guide.worldPage.provingGreeting': '谷地感激過的每一位英雄，都曾站在你現在站的地方，而且當時沒有一個人分得清劍該握哪頭。',
+  'guide.worldPage.provingGreeter': '教官瑪倫，晨憩營地',
+  'guide.worldPage.provingPlaceNotes':
+    '晨憩營地是島上唯一的聚居點：幾頂帳篷、一個貨攤和一堆集合篝火。舊碼頭面向谷地，渡送法陣從那裡送畢業生跨過海峽；營地以南的練武場為任何需要的人立著稻草人；沉船灘則是潮水用漂流貨箱付賬的那段滿是殘骸的海岸。',
   'hudChrome.perf.diagnostics.report.status.healthy': '正常',
   'hudChrome.reliquary.progressText': '{owned}/{total}',
   'guide.talentsPage.loadoutGearNote':

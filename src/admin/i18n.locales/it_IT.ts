@@ -7,6 +7,9 @@
 // (tests/i18n_admin_catalog.test.ts).
 
 export const it_IT: Record<string, string> = {
+  'error.flagActiveExists': 'questo account ha già una segnalazione aperta di quel tipo',
+  'wealth.largeMovementsUnavailable':
+    "i movimenti bancari di grande entità non sono stati caricati (la lettura del registro è scaduta); la ripartizione dell'oro qui sopra è comunque completa",
   'error.guildBankDeleting':
     'Questa gilda è in fase di eliminazione, quindi la sua banca è chiusa. Nessuna modifica è stata effettuata.',
   'error.guildBankItemRequired':

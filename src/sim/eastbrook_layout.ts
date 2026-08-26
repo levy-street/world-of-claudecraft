@@ -257,6 +257,19 @@ function deepFreeze<T>(value: T): T {
 export const REMOVED_EASTBROOK_PLACEMENTS = deepFreeze({
   buildings: [
     {
+      // Round 6 (owner): the house crowded the chapel green, standing between
+      // Brother Aldric and the graves where the churchyard wall now runs. Its
+      // lot is the north half of the new enclosure.
+      id: 'eastbrook_home_rise',
+      disposition: 'removed_after_live_review',
+      kind: 'house',
+      x: -8,
+      z: -82,
+      width: 6.9,
+      depth: 5.6,
+      rotation: 1.17,
+    },
+    {
       id: 'legacy_eastbrook_house_northeast',
       disposition: 'removed',
       kind: 'house',
@@ -530,11 +543,11 @@ export const REMOVED_EASTBROOK_PLACEMENTS = deepFreeze({
   ],
 } as const);
 
-const CIVIC_CENTER = { x: 0, z: 2 } as const;
+const CIVIC_CENTER = { x: -14, z: -102 } as const;
 // Keep the feature visually central while leaving the default spawn's east-side
 // lane through the square clear for player and pet bodies. The old exact-center
 // placement made x=2 a tangent for the player and an overlap for larger movers.
-const CIVIC_FEATURE_CENTER = { x: -0.75, z: 2 } as const;
+const CIVIC_FEATURE_CENTER = { x: -14.75, z: -102 } as const;
 const FRONT_CLEARANCE = 1.5;
 
 function makeBuilding(
@@ -568,91 +581,158 @@ function makeBuilding(
   };
 }
 
-const PRESERVED_ARMOURY = {
-  id: 'eastbrook_grand_armoury',
-  assetId: '/models/props/eastbrook_grand_armoury.glb',
-  landmark: 'eastbrook_grand_armoury',
-  kind: 'house',
-  position: { x: 17.5, z: -5.5 },
-  nativeDimensions: { width: 13, height: 16.35, depth: 9 },
-  aboveGradeHeight: 15,
-  foundationDepth: 1.35,
-  rotation: -Math.PI / 2,
-  footprint: {
-    id: 'eastbrook_grand_armoury',
-    center: { x: 17.5, z: -5.5 },
-    halfWidth: 6.5,
-    halfDepth: 4.5,
-    rotation: -Math.PI / 2,
-  },
-  maxCornerRadius: Math.hypot(6.5, 4.5),
-  frontStandingPoint: { x: 12, z: -5.5 },
-} as const;
+// Round 4: the preserved Grand Armoury leaves its Wolf Run lot. The KayKit
+// barracks and a watch tower take over the (17.5, -5.5) ground as the Wolf
+// Run garrison (zone1 decorProps rows own those placements); the armoury GLB
+// and its render adapter stay shipped for custom worlds. preservedBuildings
+// keeps its API shape as an empty list so every spread/map consumer holds.
+export interface PreservedBuildingPlacement {
+  id: string;
+  assetId: string;
+  landmark: string;
+  kind: 'house' | 'inn' | 'chapel';
+  position: Point2;
+  nativeDimensions: { width: number; height: number; depth: number };
+  aboveGradeHeight: number;
+  foundationDepth: number;
+  rotation: number;
+  footprint: Obb2;
+  maxCornerRadius: number;
+  frontStandingPoint: Point2;
+}
 
+// Round 3 (owner): every kit building grew so its door reads at player
+// height (uniform per-building factors, aspect kept: homes 1.25x, the
+// workshop 1.2x, the tall civic pair 1.15x). The chapel is a bespoke asset
+// with authored proportions and stays as shipped. The extra trio of homes
+// that used to be zone1 decor props are first-class houses now, with lots,
+// foundation skirts, and the same warm lit panes as the rest of the town.
 const BUILDINGS = [
   makeBuilding(
     'eastbrook_bank',
-    '/models/props/eastbrook_bank.glb',
+    '/models/biome/hexb_townhall.glb',
     'house',
-    { x: 18, z: 10.5 },
-    7,
-    7.8,
-    5.5,
-    Math.atan2(-18, -8.5),
+    { x: 12, z: -94 },
+    8.6,
+    12.7,
+    6.9,
+    -2.356194490192345,
   ),
   makeBuilding(
     'eastbrook_smithy',
-    '/models/props/eastbrook_smithy.glb',
+    '/models/biome/hexb_workshop.glb',
     'house',
-    { x: 4.8, z: 19.7 },
-    7,
-    7.5,
-    5.5,
-    -2.876775,
+    { x: -2, z: -122 },
+    8.4,
+    9.6,
+    6.6,
+    -2.0344439357957027,
   ),
   makeBuilding(
     'eastbrook_inn',
-    '/models/props/eastbrook_inn.glb',
+    '/models/biome/hexb_tavern.glb',
     'inn',
-    { x: -12.5, z: 16.5 },
-    7.5,
-    8.5,
-    6,
-    Math.atan2(12.5, -14.5),
+    { x: -38, z: -88 },
+    8.6,
+    11.5,
+    6.9,
+    -2.5535900500422257,
     0.8,
   ),
+  // Round 6b (owner): re-shelled as the KayKit church. The bespoke
+  // eastbrook_chapel.glb was the last pre-kit building in town and read as an
+  // odd grey leftover beside the coloured kit shells. The building ID is kept
+  // deliberately: Brother Aldric's stand and facing, FURY's anchor and the
+  // chapel capture view all resolve through it, so re-shelling changes the mesh
+  // without disturbing any of them. Footprint is unchanged (nothing new can
+  // collide with the churchyard rails), height raised so the spire reads, and
+  // the kit shell is 2,519 triangles lighter than the bespoke one.
   makeBuilding(
     'eastbrook_chapel',
-    '/models/props/eastbrook_chapel.glb',
+    '/models/biome/hex_church.glb',
     'chapel',
-    { x: -21, z: -2.3 },
+    { x: 2, z: -78 },
     5.5,
-    7,
+    9,
     6,
-    1.368826,
+    0.7853981633974483,
   ),
   makeBuilding(
     'eastbrook_weaving_workshop',
-    '/models/props/eastbrook_weaving_workshop.glb',
+    '/models/biome/hexb_home_a.glb',
     'house',
-    { x: -7.2, z: -21 },
-    5.5,
-    5.8,
-    4.5,
-    0.30338,
+    { x: -28, z: -122 },
+    6.9,
+    9.4,
+    5.6,
+    2.5535900500422257,
   ),
   makeBuilding(
     'eastbrook_toolworks',
-    '/models/props/eastbrook_toolworks.glb',
+    '/models/biome/hexb_home_b.glb',
     'house',
-    // Keep the long-established (2,-21) deterministic combat/open-field seam
-    // and the southeast gate road clear while still moving the workshop
-    // outward from its rebuild-v1 lot.
-    { x: 6.2, z: -18 },
-    5.5,
-    5.8,
-    4.5,
-    -0.3006056700423954,
+    { x: -16, z: -128 },
+    6.9,
+    10.6,
+    5.6,
+    0.5880026035475675,
+  ),
+  makeBuilding(
+    'eastbrook_home_market',
+    '/models/biome/hexb_home_a.glb',
+    'house',
+    { x: -33, z: -111 },
+    6.9,
+    9.4,
+    5.6,
+    0.2,
+  ),
+  makeBuilding(
+    'eastbrook_home_east',
+    '/models/biome/hexb_home_b.glb',
+    'house',
+    { x: 22, z: -106 },
+    6.9,
+    10.6,
+    5.6,
+    -1.46,
+  ),
+  // Round 6 (owner + team): the harbour quarter. The town used to stop dead at
+  // the inn and leave sixty yards of empty road between it and the quay, which
+  // read as a village with a dock bolted on rather than a harbour town. These
+  // six lots line the dock road out to the headland, alternating sides the way
+  // a real street grows, each seated on ground probed level (slope under 0.06)
+  // and dry, set back from the road centreline and clear of every neighbour.
+  // APPENDED, never inserted: zone1 spreads this array by index.
+  makeBuilding(
+    'eastbrook_quayside_home',
+    '/models/biome/hexb_home_b.glb',
+    'house',
+    { x: -82, z: -102 },
+    6.9,
+    10.6,
+    5.6,
+    -2.2,
+  ),
+  makeBuilding(
+    'eastbrook_harbour_market',
+    '/models/biome/hexb_market.glb',
+    'house',
+    { x: -68, z: -108 },
+    8.6,
+    7.5,
+    7,
+    -2.2,
+  ),
+  makeBuilding(
+    'eastbrook_dock_home',
+    '/models/biome/hexb_home_a.glb',
+    'house',
+    { x: -50, z: -112 },
+    6.9,
+    9.4,
+    5.6,
+    -2.2,
   ),
 ] as const;
 
@@ -693,7 +773,7 @@ const BENCHES = [
   makeObbPlacement(
     'eastbrook_civic_bench_north',
     '/models/dungeon/bench.glb',
-    { x: 0, z: 4.9 },
+    { x: -14, z: -99.1 },
     1.8,
     0.6,
     Math.PI,
@@ -701,7 +781,7 @@ const BENCHES = [
   makeObbPlacement(
     'eastbrook_civic_bench_south',
     '/models/dungeon/bench.glb',
-    { x: 0, z: -0.9 },
+    { x: -14, z: -104.9 },
     1.8,
     0.6,
     0,
@@ -709,7 +789,7 @@ const BENCHES = [
   makeObbPlacement(
     'eastbrook_civic_bench_west',
     '/models/dungeon/bench.glb',
-    { x: -2.9, z: 2 },
+    { x: -11.1, z: -102 },
     1.8,
     0.6,
     Math.PI / 2,
@@ -717,8 +797,11 @@ const BENCHES = [
 ];
 
 const MARKET_STALL_SPECS = [
-  ['eastbrook_market_stall_world_market', 'gold', { x: -5.5, z: 9.5 }, 2.508844],
-  ['eastbrook_market_stall_provisions', 'green', { x: -9, z: 0.5 }, 1.405648],
+  // Round 6b (owner): the two stalls stood 9 yd apart on one line, which put
+  // their keepers 6 yd apart, the tightest pair in town. Opened out across the
+  // square instead, so the market reads as a square rather than a queue.
+  ['eastbrook_market_stall_world_market', 'gold', { x: -20.5, z: -94 }, 2.4805494847391065],
+  ['eastbrook_market_stall_provisions', 'green', { x: -19, z: -108 }, 0.6610431688506869],
 ] as const;
 const MARKET_STALLS = MARKET_STALL_SPECS.map(([id, canopyVariant, position, rotation]) => {
   const base = makeObbPlacement(
@@ -759,28 +842,30 @@ function makeFence(
 }
 
 const SMITHY = buildingById('eastbrook_smithy');
+// Yard locals track the grown smithy footprint (halfWidth 4.2, halfDepth
+// 3.3): posts stay a clear step outside the walls so no fence end embeds.
 const FENCES = [
   makeFence(
     'eastbrook_fence_smithy_west',
     'smithy_yard',
-    localToWorld(SMITHY.position, SMITHY.rotation, -4.5, -4.9),
-    localToWorld(SMITHY.position, SMITHY.rotation, -4.5, -3.2),
+    localToWorld(SMITHY.position, SMITHY.rotation, -5.0, -5.5),
+    localToWorld(SMITHY.position, SMITHY.rotation, -5.0, -3.7),
     0.28,
     0.9,
   ),
   makeFence(
     'eastbrook_fence_smithy_outer',
     'smithy_yard',
-    localToWorld(SMITHY.position, SMITHY.rotation, -4.2, -5.2),
-    localToWorld(SMITHY.position, SMITHY.rotation, 4.2, -5.2),
+    localToWorld(SMITHY.position, SMITHY.rotation, -4.7, -5.8),
+    localToWorld(SMITHY.position, SMITHY.rotation, 4.7, -5.8),
     0.28,
     0.9,
   ),
   makeFence(
     'eastbrook_fence_smithy_east',
     'smithy_yard',
-    localToWorld(SMITHY.position, SMITHY.rotation, 4.5, -4.9),
-    localToWorld(SMITHY.position, SMITHY.rotation, 4.5, -3.2),
+    localToWorld(SMITHY.position, SMITHY.rotation, 5.0, -5.5),
+    localToWorld(SMITHY.position, SMITHY.rotation, 5.0, -3.7),
     0.28,
     0.9,
   ),
@@ -800,32 +885,11 @@ function wallPoint(x: number, z: number): Point2 {
   return { x: x * scale, z: z * scale };
 }
 
-const WALL_GATES = [
-  makeCircularWallGate(WALL_CONFIG, 'eastbrook_gate_east', 'east', wallPoint(28.506, 7.593), 5),
-  makeCircularWallGate(
-    WALL_CONFIG,
-    'eastbrook_gate_northeast',
-    'northeast',
-    wallPoint(20.348, 21.359),
-    5,
-  ),
-  makeCircularWallGate(WALL_CONFIG, 'eastbrook_gate_north', 'north', wallPoint(-7.469, 28.539), 5),
-  makeCircularWallGate(
-    WALL_CONFIG,
-    'eastbrook_gate_northwest',
-    'northwest',
-    wallPoint(-23.95, 17.224),
-    5,
-  ),
-  makeCircularWallGate(
-    WALL_CONFIG,
-    'eastbrook_gate_southwest',
-    'southwest',
-    wallPoint(-21.495, -20.204),
-    5,
-  ),
-  makeCircularWallGate(WALL_CONFIG, 'eastbrook_gate_bandit', 'bandit', wallPoint(20.86, -20.86), 5),
-] as const;
+// The harbor town has NO ring wall (site-plan.md section 2: a town grown
+// along streets, open to its quay and beach). Gates and segments are empty
+// on purpose; the machinery stays so the API and its consumers (renderer
+// instancing, wall-pillar colliders, wallSegmentMirrored) hold their shape.
+const WALL_GATES: ReturnType<typeof makeCircularWallGate>[] = [];
 
 const WALL_SEGMENTS = generateCircularWallSegments(WALL_CONFIG, WALL_GATES);
 
@@ -853,84 +917,109 @@ function gateCrossing(id: string): Point2 {
 const ROADS = [
   {
     id: 'north',
-    existingRoadPoint: { x: 0, z: 8 },
-    gateId: 'eastbrook_gate_north',
+    existingRoadPoint: { x: 6, z: -72 },
+    gateId: null,
     halfWidth: 1.5,
     points: [
-      { x: 0, z: 6.75 },
-      { x: 0, z: 8 },
-      gateCrossing('eastbrook_gate_north'),
-      { x: -7.469, z: 28.539 },
+      { x: 14.6, z: -88.6 },
+      { x: 12, z: -85 },
+      { x: 10, z: -80 },
+      { x: 6, z: -72 },
+      { x: 0, z: -58 },
     ],
   },
   {
     id: 'east',
-    existingRoadPoint: { x: 8, z: 2 },
-    gateId: 'eastbrook_gate_east',
-    halfWidth: 1.5,
+    existingRoadPoint: { x: -44, z: -98 },
+    gateId: null,
+    // The main street: a touch wider than the side lanes so the walk from
+    // the square to the quay reads as the town's spine (owner refinement
+    // round 3, tidier pathways).
+    halfWidth: 2,
     points: [
-      { x: 4.75, z: 2 },
-      { x: 8, z: 2 },
-      { x: 15, z: 3.5 },
-      { x: 23, z: 4.5 },
-      gateCrossing('eastbrook_gate_east'),
-      { x: 28.506, z: 7.593 },
+      { x: -20, z: -102 },
+      { x: -26, z: -101 },
+      { x: -44, z: -98 },
+      { x: -56, z: -88 },
+      { x: -62, z: -76 },
+      { x: -70, z: -68 },
+      { x: -80, z: -66 },
+      { x: -88, z: -60 },
+      { x: -92, z: -56 },
     ],
   },
   {
     id: 'bandit',
-    existingRoadPoint: { x: 6, z: -6 },
-    gateId: 'eastbrook_gate_bandit',
+    existingRoadPoint: { x: -10, z: -112 },
+    gateId: null,
     halfWidth: 1.5,
     points: [
-      pointAtYaw(CIVIC_CENTER, Math.atan2(6, -8), 4.75),
-      { x: 6, z: -6 },
-      { x: 8, z: -12 },
-      gateCrossing('eastbrook_gate_bandit'),
-      { x: 20.86, z: -20.86 },
+      { x: -11, z: -105.5 },
+      { x: -10, z: -112 },
+      { x: -9, z: -119 },
+      { x: -12, z: -123 },
+      { x: -22, z: -120.5 },
     ],
   },
   {
     id: 'northwest',
-    existingRoadPoint: { x: -8, z: 6 },
-    gateId: 'eastbrook_gate_northwest',
+    existingRoadPoint: { x: -9.2, z: -132 },
+    gateId: null,
     halfWidth: 1.5,
+    // Shifted a step east of the grown toolworks lot (round 3) and trimmed
+    // to end on the new strand, short of the pulled-in waterline.
     points: [
-      pointAtYaw(CIVIC_CENTER, Math.atan2(-8, 4), 4.75),
-      { x: -8, z: 6 },
-      { x: -15, z: 8 },
-      { x: -21, z: 11 },
-      gateCrossing('eastbrook_gate_northwest'),
-      { x: -23.95, z: 17.224 },
+      { x: -12, z: -107.5 },
+      { x: -10.8, z: -118 },
+      { x: -9.2, z: -132 },
+      { x: -9.2, z: -134 },
     ],
   },
   {
     id: 'southwest',
-    existingRoadPoint: { x: -6, z: -6 },
-    gateId: 'eastbrook_gate_southwest',
+    existingRoadPoint: { x: 0, z: -99 },
+    gateId: null,
     halfWidth: 1.5,
     points: [
-      pointAtYaw(CIVIC_CENTER, Math.atan2(-6, -8), 4.75),
-      { x: -6, z: -6 },
-      { x: -10, z: -8 },
-      { x: -20, z: -9 },
-      { x: -22, z: -12 },
-      { x: -17.851916681798443, z: -16.779722011586674 },
-      gateCrossing('eastbrook_gate_southwest'),
-      { x: -21.495, z: -20.204 },
+      { x: 7, z: -97.4 },
+      { x: 0, z: -99 },
+      { x: -9, z: -100.4 },
     ],
   },
   {
     id: 'northeast',
-    existingRoadPoint: { x: 6, z: 8 },
-    gateId: 'eastbrook_gate_northeast',
+    existingRoadPoint: { x: -92, z: -54 },
+    gateId: null,
+    halfWidth: 1.5,
+    // Round 5 (owner): the dock read too dark at night. The lamp planner
+    // samples every 26 yd of arc and alternates roadside, so the quay walk
+    // serpentines the full pad (the pad ground holds near -2, above the
+    // planner floor, so BOTH sides plant): the long run plus the swings
+    // buys 3 lamp samples where the straight stub earned one.
+    points: [
+      { x: -92, z: -32 },
+      { x: -92, z: -56 },
+      { x: -96, z: -61 },
+      { x: -92, z: -66 },
+      { x: -92, z: -74 },
+      { x: -96.5, z: -78 },
+      { x: -92, z: -82 },
+      { x: -92, z: -92 },
+    ],
+  },
+  // A short lane from the inn's door down to the main street, so the inn
+  // square joins the town's spine instead of floating beside it (owner
+  // refinement round 3). APPENDED last: zone1's ZONE1_ROADS spreads these
+  // entries by index, so new roads never land mid-array.
+  {
+    id: 'inn_lane',
+    existingRoadPoint: { x: -44, z: -98 },
+    gateId: null,
     halfWidth: 1.5,
     points: [
-      pointAtYaw(CIVIC_CENTER, Math.atan2(6, 6), 4.75),
-      { x: 6, z: 8 },
-      { x: 12, z: 14 },
-      gateCrossing('eastbrook_gate_northeast'),
-      { x: 20.348, z: 21.359 },
+      { x: -40.8, z: -92.2 },
+      { x: -42, z: -95 },
+      { x: -44, z: -98 },
     ],
   },
 ] as const;
@@ -995,44 +1084,94 @@ const TRADER_POSITION = localToWorld(
 );
 // Lin is a quest herbalist, not a merchant. Keep her already-clear civic-green
 // position without inventing a replacement stall or blocking the smithy sightline.
-const APOTHECARY_POSITION = { x: 2.8431593444121797, z: 9.717148252611294 } as const;
-const SMITH_POSITION = localToWorld(FORGE_STATION.position, SMITHY.rotation, -2, 0);
-const DARVA_POSITION = localToWorld(FORGE_STATION.position, SMITHY.rotation, 2, 0);
-const COOK_POSITION = localToWorld(KITCHENS_STATION.position, INN.rotation, 1.75, 0);
+const APOTHECARY_POSITION = { x: -72, z: -96 } as const;
+// Station cluster props sit at station + world-axis offsets (town_props.ts,
+// no rotation), so the smith's and cook's work points derive the same way.
+// Round 4: the smith stands on the yard's open corner, half a stride clear
+// of the crate that his old derived spot nearly touched, facing the anvil.
+// Round 5 (owner): Smith Haldren works his own KayKit blacksmith on the green
+// between the civic square and the crafts lane (the zone1 decor prop at
+// (2, -112), west face at x -2.2), standing a stride off its door and facing
+// the shop. Forgemistress Darva keeps the crafting station.
+const BLACKSMITH_SHOP_CENTER = { x: 2, z: -112 } as const;
+const SMITH_POSITION = { x: -3.4, z: -112.5 } as const;
+// Round 6b (owner): the forge and toolworks benches sit close together in the
+// crafts lane, so their masters stand out to OPPOSITE sides of their own
+// stations rather than both toward the middle. Each still works its bench;
+// they just stop reading as one huddle.
+const DARVA_POSITION = localToWorld(FORGE_STATION.position, SMITHY.rotation, 4.2, 0);
+// Round 4: the cook works the prep side, a stride clear of the open flame
+// (the kitchens campfire, the town's only open fire, burns at station +
+// (-1.7, +0.9)). The prep offset holds z at -1.5 rather than the drafted
+// -1.4 so the cook also keeps the full anchor clearance (0.85) plus a body
+// radius (0.6) off the station point that service routes end on.
+const KITCHENS_FIRE_POINT = {
+  x: KITCHENS_STATION.position.x - 1.7,
+  z: KITCHENS_STATION.position.z + 0.9,
+} as const;
+const COOK_POSITION = {
+  x: KITCHENS_STATION.position.x + 0.2,
+  z: KITCHENS_STATION.position.z - 1.5,
+} as const;
 const WEAVER_POSITION = localToWorld(LOOM_STATION.position, WEAVING_HOUSE.rotation, 2, 0);
-const TINKER_POSITION = localToWorld(TOOLWORKS_STATION.position, TOOLWORKS.rotation, 2, 0);
-const SAUL_POSITION = { x: 0, z: -14.5 } as const;
-const FURY_POSITION = { x: -22.5, z: -7.5 } as const;
+const TINKER_POSITION = localToWorld(TOOLWORKS_STATION.position, TOOLWORKS.rotation, -3.2, 0);
+const SAUL_POSITION = { x: 10.2, z: -87.5 } as const;
+// Round 6b (owner): off the chapel step, where he stood 7 yd from Brother
+// Aldric. FURY is a service NPC (the honor quartermaster), so he belongs on
+// the town's edge rather than in the churchyard approach.
+const FURY_POSITION = { x: 16, z: -78 } as const;
+
+// Round 4: the marshal keeps watch beside his notice board, a clear stride
+// from the bursar's queue and outside the board's posting envelope (the
+// board's body and posting point both stay a full interact range away, the
+// board comment's rule). The drafted spot at (9, -92.5) sat INSIDE the
+// bank's rotated lot (the 45-degree townhall footprint owns that corner),
+// so the watch stands on the green south of the board instead: outside the
+// envelope, off the posting lane, facing the civic square he polices.
+// Round 6b (owner): the town's NPCs are laid out by ROLE along the dockside
+// road. Quest givers sit nearest the quay, because a new character spawns
+// there and the zone's welcome line sends them to Redbrook: he used to be an
+// eighty yard walk inland. Profession masters stay mid-town with their
+// crafting stations (a forge master cannot leave the forge), and service NPCs
+// sit out on the edges. Each group is spread, not clustered.
+const MARSHAL_POSITION = { x: -58, z: -102 } as const;
 
 const NPCS = [
   makeNpc('the_merchant', MERCHANT_POSITION, MARKET_STALLS[0].rotation, MARKET_STALLS[0].id),
   makeNpc(
     'marshal_redbrook',
-    { x: 4.5, z: 5.5 },
-    facingToward({ x: 4.5, z: 5.5 }, CIVIC_CENTER),
-    'eastbrook_civic_well_beacon',
+    MARSHAL_POSITION,
+    facingToward(MARSHAL_POSITION, CIVIC_CENTER),
+    'eastbrook_harbour_market',
   ),
   makeNpc('trader_wilkes', TRADER_POSITION, MARKET_STALLS[1].rotation, MARKET_STALLS[1].id),
-  makeNpc('apothecary_lin', APOTHECARY_POSITION, -2.788602, 'eastbrook_gate_northeast'),
+  makeNpc(
+    'apothecary_lin',
+    APOTHECARY_POSITION,
+    facingToward(APOTHECARY_POSITION, CIVIC_CENTER),
+    'eastbrook_quayside_home',
+  ),
   makeNpc('brother_aldric', CHAPEL.frontStandingPoint, CHAPEL.rotation, CHAPEL.id),
-  makeNpc('smith_haldren', SMITH_POSITION, SMITHY.rotation, FORGE_STATION.id),
   makeNpc(
-    'fisherman_brandt',
-    { x: -22, z: 4 },
-    facingToward({ x: -22, z: 4 }, CIVIC_CENTER),
-    'eastbrook_gate_northwest',
+    'smith_haldren',
+    SMITH_POSITION,
+    // Round 5 (owner): the smith looks OUT from his shop door over the green
+    // toward the crafts lane, never at his own wall.
+    facingToward(BLACKSMITH_SHOP_CENTER, SMITH_POSITION),
+    'eastbrook_blacksmith',
   ),
-  makeNpc('foreman_odell', { x: -8, z: -9.5 }, 0.607802, 'eastbrook_gate_southwest'),
+  makeNpc('fisherman_brandt', { x: -95, z: -50 }, -1.5707963267948966, 'eastbrook_quay'),
+  makeNpc('foreman_odell', { x: -84, z: -63 }, 0.6747409422235526, 'eastbrook_quay'),
   makeNpc('bursar_fernando', BANK.frontStandingPoint, BANK.rotation, BANK.id),
-  makeNpc(
-    'card_master',
-    { x: 10.5, z: 1 },
-    facingToward({ x: 10.5, z: 1 }, CIVIC_CENTER),
-    PRESERVED_ARMOURY.id,
-  ),
+  makeNpc('card_master', { x: 20, z: -98 }, -2.677945044588987, 'eastbrook_bank'),
   makeNpc('chronicler_saul', SAUL_POSITION, TOOLWORKS.rotation, 'mailbox_eastbrook'),
   makeNpc('forgemistress_darva', DARVA_POSITION, SMITHY.rotation, FORGE_STATION.id),
-  makeNpc('cook_marlow', COOK_POSITION, INN.rotation, KITCHENS_STATION.id),
+  makeNpc(
+    'cook_marlow',
+    COOK_POSITION,
+    facingToward(COOK_POSITION, KITCHENS_FIRE_POINT),
+    KITCHENS_STATION.id,
+  ),
   makeNpc('weaver_ottilie', WEAVER_POSITION, WEAVING_HOUSE.rotation, LOOM_STATION.id),
   makeNpc('tinker_gizzel', TINKER_POSITION, TOOLWORKS.rotation, TOOLWORKS_STATION.id),
   makeNpc('fury', FURY_POSITION, facingToward(FURY_POSITION, CIVIC_CENTER), 'eastbrook_chapel'),
@@ -1062,7 +1201,7 @@ for (let column = 0; column < 9; column++) {
 // Keep both its body and standing point outside F-range of every service NPC:
 // proximity interaction prioritizes lootable objects before NPCs, so a closer
 // placement could otherwise steal the player's service interaction.
-const NOTICEBOARD_POSITION = { x: 10, z: -8 } as const;
+const NOTICEBOARD_POSITION = { x: 5, z: -89 } as const;
 const NOTICEBOARD_ROTATION = facingToward(NOTICEBOARD_POSITION, CIVIC_CENTER);
 const NOTICEBOARD_WIDTH = 2.4;
 const NOTICEBOARD_DEPTH = 0.6;
@@ -1076,19 +1215,19 @@ const NOTICEBOARD_FRONT_STANDING_POINT = localToWorld(
 const SERVICES = {
   playerStart: {
     id: 'eastbrook_player_start',
-    position: { x: 2, z: -2 },
+    position: { x: -94, z: -58 },
     bodyRadius: 0.5,
   },
   mailbox: {
     id: 'mailbox_eastbrook',
     templateId: 'mailbox',
     assetId: '/models/props/mailbox_pillar.glb',
-    position: { x: 0, z: -7.5 },
+    position: { x: -10, z: -98 },
     bodyRadius: 0.8,
     interactionRadius: 7,
     // The pillar is a solid collider (the noticeboard pattern), so walkers
     // aim for the posting spot in front of it, not the pillar's own point.
-    frontStandingPoint: { x: 0, z: -6.4 },
+    frontStandingPoint: { x: -10, z: -96.9 },
   },
   noticeboard: {
     id: 'eastbrook_noticeboard',
@@ -1113,17 +1252,17 @@ const SERVICES = {
   },
   graveyard: {
     id: 'gy_eastbrook',
-    position: { x: -14, z: -14 },
-    legacyReleasePoint: { x: -12, z: -14 },
+    position: { x: -2, z: -70 },
+    legacyReleasePoint: { x: 0, z: -70 },
     healerTemplateId: 'spirit_healer',
     healerFacing: Math.PI,
     headstones: [
-      { id: 'gy_eastbrook_headstone_0', position: { x: -14, z: -14 } },
-      { id: 'gy_eastbrook_headstone_1', position: { x: -11.8, z: -14 } },
-      { id: 'gy_eastbrook_headstone_2', position: { x: -9.6, z: -14 } },
-      { id: 'gy_eastbrook_headstone_3', position: { x: -14, z: -11.4 } },
-      { id: 'gy_eastbrook_headstone_4', position: { x: -11.8, z: -11.4 } },
-      { id: 'gy_eastbrook_headstone_5', position: { x: -9.6, z: -11.4 } },
+      { id: 'gy_eastbrook_headstone_0', position: { x: -2, z: -70 } },
+      { id: 'gy_eastbrook_headstone_1', position: { x: 0.2, z: -70 } },
+      { id: 'gy_eastbrook_headstone_2', position: { x: 2.4, z: -70 } },
+      { id: 'gy_eastbrook_headstone_3', position: { x: -2, z: -67.4 } },
+      { id: 'gy_eastbrook_headstone_4', position: { x: 0.2, z: -67.4 } },
+      { id: 'gy_eastbrook_headstone_5', position: { x: 2.4, z: -67.4 } },
     ],
   },
   rest: { id: 'eastbrook_inn_rest', buildingId: 'eastbrook_inn' },
@@ -1134,9 +1273,9 @@ const SERVICES = {
       id: 'eastbrook_player_start_to_square',
       bodyRadius: 0.8,
       points: [
-        { x: 2, z: -2 },
-        { x: 2, z: 0 },
-        { x: 2, z: 2 },
+        { x: -94, z: -58 },
+        { x: -92, z: -56 },
+        { x: -90, z: -57 },
       ],
     },
     {
@@ -1145,15 +1284,15 @@ const SERVICES = {
       // Ends at the pillar's standing point, not inside it: the Ravenpost
       // is a solid collider now, and mail opens from interactionRadius 7.
       points: [
-        { x: 2, z: -2 },
-        { x: 1, z: -5 },
-        { x: 0, z: -6.4 },
+        { x: -12, z: -97.5 },
+        { x: -10.8, z: -95.8 },
+        { x: -10, z: -96.9 },
       ],
     },
     {
       id: 'eastbrook_noticeboard_route',
       bodyRadius: 0.5,
-      points: [{ x: 2.85, z: -1.8 }, { x: 6, z: -6 }, NOTICEBOARD_FRONT_STANDING_POINT],
+      points: [{ x: 4.5, z: -95 }, { x: 5, z: -92.5 }, NOTICEBOARD_FRONT_STANDING_POINT],
     },
     {
       id: 'eastbrook_graveyard_route',
@@ -1163,21 +1302,24 @@ const SERVICES = {
       // may no longer run down the x -14 column straight through the middle
       // stone. The Spirit Healer's anchor stone itself stays scenery.
       points: [
-        { x: -2.85, z: -1.8 },
-        { x: -6, z: -6 },
-        { x: -10, z: -8 },
-        { x: -12.9, z: -10 },
-        { x: -12.9, z: -12.6 },
-        { x: -14, z: -14 },
+        { x: 14, z: -89 },
+        { x: 12, z: -85 },
+        { x: 9, z: -79 },
+        { x: 3, z: -72.5 },
+        { x: -1, z: -71.4 },
       ],
     },
     {
       id: 'eastbrook_armoury_approach',
       bodyRadius: 0.8,
+      // Round 4: the barracks approach. The Grand Armoury left the Wolf Run
+      // lot and the KayKit barracks garrison stands on its ground, so the
+      // walk still leaves the north road at the old town's heart and ends
+      // at the same lot front. The route id stays for save/route stability.
       points: [
-        { x: 4.75, z: 2 },
-        { x: 8, z: 0 },
-        { x: 10, z: -3 },
+        { x: 2, z: -4 },
+        { x: 8, z: -4.5 },
+        { x: 10, z: -5 },
         { x: 12, z: -5.5 },
       ],
     },
@@ -1197,7 +1339,7 @@ const SERVICES = {
 
 export const EASTBROOK_LAYOUT = deepFreeze({
   id: 'eastbrook_civic_layout_v2',
-  preservedBuildings: [PRESERVED_ARMOURY],
+  preservedBuildings: [] as readonly PreservedBuildingPlacement[],
   buildings: BUILDINGS,
   civic: {
     center: CIVIC_CENTER,

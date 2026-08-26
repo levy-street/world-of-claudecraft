@@ -4,6 +4,7 @@ import { NodeIO } from '@gltf-transform/core';
 import { ALL_EXTENSIONS } from '@gltf-transform/extensions';
 import { MeshoptDecoder } from 'meshoptimizer';
 import * as THREE from 'three';
+import { mergeGeometries } from 'three/examples/jsm/utils/BufferGeometryUtils.js';
 import { afterEach, describe, expect, it } from 'vitest';
 import {
   EASTBROOK_TOWN_ASSET_INSTANCE_COUNTS,
@@ -45,7 +46,44 @@ function sourceAsset(withEmissive: boolean): THREE.Group {
   const source = new THREE.Group();
   const opaque = new THREE.MeshStandardMaterial({ color: 0x789abc });
   opaque.name = 'TownOpaque';
-  source.add(new THREE.Mesh(new THREE.BoxGeometry(2, 3, 4), opaque));
+  // Round 5: kit fixtures carry a window-assembly component INSIDE the first
+  // mesh's geometry, merged into the shell the way the single-mesh hexb GLBs
+  // model their windows: a frame box at mid-height on the +z face PLUS a
+  // recessed pane box sharing one exact corner vertex (max corner
+  // (0.8, 1.5, 2.0)), so the pane detector (kit_window_panes_core.ts, read
+  // from the source's first Mesh in buildKitBuilding) finds exactly one
+  // window per kit building and emits the pane box's back face (z 1.98) as
+  // its recessed glass plane. The template-path fixtures share the shape;
+  // their extra 24 triangles ride the opaque merge and stay inside the
+  // shell's bounding box.
+  const shell = withEmissive
+    ? mergeGeometries(
+        [
+          new THREE.BoxGeometry(2, 3, 4),
+          new THREE.BoxGeometry(0.4, 0.6, 0.08).translate(0.6, 1.2, 1.96),
+          new THREE.BoxGeometry(0.2, 0.3, 0.02).translate(0.7, 1.35, 1.99),
+        ],
+        false,
+      )
+    : new THREE.BoxGeometry(2, 3, 4);
+  if (!shell) throw new Error('failed to merge the kit fixture shell');
+  if (withEmissive) {
+    // The shipped kit GLBs decode their meshopt streams into INTERLEAVED
+    // position attributes (stride 4 with a pad lane). Model that layout in
+    // the kit fixture so the pane detector's adapter is exercised against
+    // the real runtime shape: reading the shared array as tight per-vertex
+    // triples silently found zero windows on every real model (round 4).
+    const tight = shell.getAttribute('position');
+    const interleavedArray = new Float32Array(tight.count * 4);
+    for (let vertex = 0; vertex < tight.count; vertex++) {
+      interleavedArray[vertex * 4] = tight.getX(vertex);
+      interleavedArray[vertex * 4 + 1] = tight.getY(vertex);
+      interleavedArray[vertex * 4 + 2] = tight.getZ(vertex);
+    }
+    const buffer = new THREE.InterleavedBuffer(interleavedArray, 4);
+    shell.setAttribute('position', new THREE.InterleavedBufferAttribute(buffer, 3, 0));
+  }
+  source.add(new THREE.Mesh(shell, opaque));
   if (withEmissive) {
     const emissive = new THREE.MeshStandardMaterial({
       color: 0xffb45a,
@@ -64,6 +102,16 @@ function fixtureSources(): Map<string, THREE.Object3D> {
       sourceAsset(EASTBROOK_TOWN_NEW_ASSET_URLS.includes(assetUrl)),
     ]),
   );
+}
+
+// Added 2026-08 for the KTX2 kit-building path (buildKitBuilding in
+// src/render/eastbrook_town.ts, docs/design/eastbrook-revamp/site-plan.md):
+// the five Galecrest hexb service buildings render as raw GLB scene clones
+// with their OWN materials (their color lives in KTX2 palette textures the
+// atlas bake cannot read), while the chapel stays on the template pipeline.
+// Per-building assertions branch on this split.
+function isKitBuildingAsset(assetUrl: string): boolean {
+  return assetUrl.startsWith('/models/biome/');
 }
 
 function meshesOf(root: THREE.Object3D): THREE.Mesh[] {
@@ -157,6 +205,83 @@ describe('Eastbrook town renderer', () => {
       expect(group?.userData.assetUrl).toBe(building.assetId);
       expect(group?.userData.target).toBe(building.nativeDimensions);
       expect(group?.userData.front).toBe(building.frontStandingPoint);
+      if (isKitBuildingAsset(building.assetId)) {
+        // Re-staged 2026-08 for the KTX2 kit-building path (buildKitBuilding
+        // in src/render/eastbrook_town.ts,
+        // docs/design/eastbrook-revamp/site-plan.md), then for owner
+        // refinement rounds 4 and 5: a kit group carries no merged
+        // eastbrookBuildingOpaque mesh; it holds a wrap group of raw GLB
+        // scene clones scaled to nativeDimensions (every cloned mesh casting
+        // shadows) PLUS one merged amber window-pane mesh under the
+        // shape-path emissive name. The panes are the models' own recessed
+        // glass planes, lifted verbatim from the detected window assemblies
+        // (kit_window_panes_core.ts) so the glow fits the openings exactly,
+        // and parented inside the wrap AS A SIBLING of the clone, after the
+        // shadow traverse, so they never cast shadows, inherit the wrap's
+        // scale-to-dimensions transform, and share the clone's centering
+        // offset. Flat ground grows no foundation skirt.
+        expect(group?.getObjectByName(`eastbrookBuildingOpaque:${building.id}`)).toBeUndefined();
+        const panes = group?.getObjectByName(`eastbrookBuildingEmissive:${building.id}`);
+        expect(panes, `${building.id} window panes`).toBeInstanceOf(THREE.Mesh);
+        if (!(panes instanceof THREE.Mesh)) throw new Error(`missing panes for ${building.id}`);
+        expect(panes.castShadow, `${building.id} panes cast no shadow`).toBe(false);
+        expect(panes.receiveShadow, `${building.id} panes receive no shadow`).toBe(false);
+        expect((panes.material as THREE.Material).name).toBe(
+          `eastbrookTownKitPanes:${building.id}`,
+        );
+        // A pane sits mid-opening and must read from both approaches.
+        expect((panes.material as THREE.Material).side, `${building.id} pane sidedness`).toBe(
+          THREE.DoubleSide,
+        );
+        // The pane triangles are coplanar with the model's own glass
+        // geometry (round 5): the polygon offset wins the depth fight
+        // without geometric displacement.
+        expect(
+          (panes.material as THREE.Material).polygonOffset,
+          `${building.id} pane polygon offset`,
+        ).toBe(true);
+        expect((panes.material as THREE.Material).polygonOffsetFactor).toBe(-2);
+        expect((panes.material as THREE.Material).polygonOffsetUnits).toBe(-2);
+        const wrap = group?.children.find(
+          (child): child is THREE.Group => child instanceof THREE.Group,
+        );
+        expect(wrap, building.id).toBeInstanceOf(THREE.Group);
+        if (!wrap) throw new Error(`missing kit wrap group for ${building.id}`);
+        // Sibling-of-the-clone contract: the pane mesh rides the wrap (so it
+        // scales with the model) beside the clone, sharing its centering
+        // offset, and its geometry is exactly the fixture pane box's back
+        // face (round 5): two triangles at z 1.98 spanning x 0.6..0.8 and
+        // y 1.2..1.5 in raw model space.
+        expect(panes.parent, `${building.id} pane parent`).toBe(wrap);
+        const clone = wrap.children.find((child) => child !== panes);
+        if (!clone) throw new Error(`missing kit clone for ${building.id}`);
+        expect(panes.position.toArray(), `${building.id} pane offset`).toEqual(
+          clone.position.toArray(),
+        );
+        expect(panes.geometry.getAttribute('position').count, `${building.id} pane face`).toBe(6);
+        panes.geometry.computeBoundingBox();
+        const paneBounds = panes.geometry.boundingBox;
+        expect(paneBounds?.min.x, building.id).toBeCloseTo(0.6, 6);
+        expect(paneBounds?.max.x, building.id).toBeCloseTo(0.8, 6);
+        expect(paneBounds?.min.y, building.id).toBeCloseTo(1.2, 6);
+        expect(paneBounds?.max.y, building.id).toBeCloseTo(1.5, 6);
+        expect(paneBounds?.min.z, building.id).toBeCloseTo(1.98, 6);
+        expect(paneBounds?.max.z, building.id).toBeCloseTo(1.98, 6);
+        const kitMeshes = meshesOf(wrap).filter((mesh) => mesh !== panes);
+        expect(kitMeshes.length, building.id).toBeGreaterThan(0);
+        expect(
+          kitMeshes.every((mesh) => mesh.castShadow),
+          building.id,
+        ).toBe(true);
+        // Measured on a parentless clone so the wrap's local transform is the
+        // whole matrixWorld chain (this headless build never composes the
+        // live group's world matrices).
+        const size = new THREE.Box3().setFromObject(wrap.clone(true)).getSize(new THREE.Vector3());
+        expect(size.x, building.id).toBeCloseTo(building.nativeDimensions.width, 5);
+        expect(size.y, building.id).toBeCloseTo(building.nativeDimensions.height, 5);
+        expect(size.z, building.id).toBeCloseTo(building.nativeDimensions.depth, 5);
+        continue;
+      }
       expect(group?.getObjectByName(`eastbrookBuildingOpaque:${building.id}`)).toBeInstanceOf(
         THREE.Mesh,
       );
@@ -178,17 +303,22 @@ describe('Eastbrook town renderer', () => {
     const wallBatches = meshesOf(view.group).filter(
       (mesh) => mesh.userData.eastbrookWallInstances,
     ) as THREE.InstancedMesh[];
-    expect(wallBatches).toHaveLength(4);
+    // Re-pinned 2026-08 for the Eastbrook harbor move (d19aa33f76,
+    // docs/design/eastbrook-revamp/site-plan.md): layout v3 deliberately
+    // retired the ring wall (WALL_SEGMENTS and WALL_GATES are empty while the
+    // batching machinery stays), so zero wall batches and zero gates are the
+    // authored state.
+    expect(wallBatches).toHaveLength(0);
     expect(wallBatches.every((mesh) => mesh instanceof THREE.InstancedMesh)).toBe(true);
-    expect(wallBatches.filter((mesh) => mesh.userData.handedness === 'mirrored')).toHaveLength(2);
-    expect(wallBatches.filter((mesh) => mesh.userData.handedness === 'original')).toHaveLength(2);
+    expect(wallBatches.filter((mesh) => mesh.userData.handedness === 'mirrored')).toHaveLength(0);
+    expect(wallBatches.filter((mesh) => mesh.userData.handedness === 'original')).toHaveLength(0);
     expect(
       wallBatches
         .filter((mesh) => !mesh.name.includes('Emissive'))
         .reduce((sum, mesh) => sum + mesh.count, 0),
     ).toBe(EASTBROOK_LAYOUT.wall.segments.length);
     expect(view.group.userData.wallSegmentCount).toBe(EASTBROOK_LAYOUT.wall.segments.length);
-    expect(view.group.userData.gateCount).toBe(6);
+    expect(view.group.userData.gateCount).toBe(0);
     expect(view.group.userData.roofHideTargetCount).toBe(EASTBROOK_LAYOUT.buildings.length);
     expect(view.group.userData.microPlacementIds).toEqual([
       EASTBROOK_LAYOUT.civic.wellBeacon.id,
@@ -198,15 +328,34 @@ describe('Eastbrook town renderer', () => {
       ...EASTBROOK_LAYOUT.wall.segments.map((segment) => segment.id),
     ]);
     expect(view.group.userData.microPlacementIds).not.toContain('eastbrook_market_stall_artisans');
+    // Draw stats re-pinned 2026-08 for the KTX2 kit-building path, then for
+    // owner refinement round 4 (nine buildings, kit windows derived from the
+    // models' own window assemblies): the eight kit instances' raw clones
+    // cast shadows from EVERY cloned mesh, so the two-mesh fixtures give 16
+    // kit shadow draws plus the chapel opaque and the micro opaque batch
+    // (18); colorDraws is 28 (16 kit clone materials + 8 window-pane meshes,
+    // one detected assembly per kit fixture, which never cast + the chapel
+    // opaque+emissive pair + the 2 micro batches). Re-pinned again for round
+    // 6: the town gained the harbour quarter's three coastal buildings, so the
+    // ten kit instances give 20 kit shadow draws plus the chapel opaque and
+    // the micro opaque batch (22), and colorDraws is 34 (20 kit clone
+    // materials + 10 window panes + the chapel pair + the 2 micro batches).
+    // Round 6b (owner) re-shelled the chapel onto the KayKit church, so it
+    // leaves the template pipeline and joins the kit path: all ELEVEN lots are
+    // kit instances now. The chapel's single opaque template mesh plus its
+    // emissive mesh become two clone materials plus one window pane, so
+    // colorDraws goes 34 to 35 (22 clone materials + 11 window panes + the 2
+    // micro batches) and shadowDraws 22 to 23 (the 22 clones + the micro
+    // opaque batch). The panes still never cast.
     expect(eastbrookTownDrawStats(view.group)).toMatchObject({
-      colorDraws: 18,
-      shadowDraws: 9,
-      buildingCount: 6,
-      roofHideTargetCount: 6,
+      colorDraws: 35,
+      shadowDraws: 23,
+      buildingCount: 11,
+      roofHideTargetCount: 11,
       microBatchCount: 2,
-      wallBatchCount: 4,
-      wallSegmentCount: 26,
-      gateCount: 6,
+      wallBatchCount: 0,
+      wallSegmentCount: 0,
+      gateCount: 0,
     });
   });
 
@@ -223,11 +372,6 @@ describe('Eastbrook town renderer', () => {
     for (const building of EASTBROOK_LAYOUT.buildings) {
       const group = view.group.getObjectByName(`eastbrookBuilding:${building.id}`);
       if (!group) throw new Error(`missing rendered building ${building.id}`);
-      const opaque = group.getObjectByName(`eastbrookBuildingOpaque:${building.id}`) as THREE.Mesh;
-      const flatOpaque = flatView.group.getObjectByName(
-        `eastbrookBuildingOpaque:${building.id}`,
-      ) as THREE.Mesh;
-      if (!opaque || !flatOpaque) throw new Error(`missing opaque geometry for ${building.id}`);
       const { width, depth } = building.nativeDimensions;
       const xSteps = Math.max(1, Math.ceil(width / BUILDING_TERRAIN_SAMPLE_STEP));
       const zSteps = Math.max(1, Math.ceil(depth / BUILDING_TERRAIN_SAMPLE_STEP));
@@ -250,17 +394,62 @@ describe('Eastbrook town renderer', () => {
       expect(group.position.y, `${building.id} entrance grade`).toBeCloseTo(entranceY, 10);
       expect(group.userData.foundationDepth, building.id).toBeCloseTo(foundationDepth, 10);
       expect(foundationDepth, `${building.id} real-terrain foundation branch`).toBeGreaterThan(0);
-      const opaqueTriangles =
-        (opaque.geometry.index?.count ?? opaque.geometry.getAttribute('position').count) / 3;
-      const flatOpaqueTriangles =
-        (flatOpaque.geometry.index?.count ?? flatOpaque.geometry.getAttribute('position').count) /
-        3;
-      expect(opaqueTriangles, `${building.id} foundation geometry`).toBe(flatOpaqueTriangles + 12);
-      opaque.geometry.computeBoundingBox();
-      expect(
-        opaque.geometry.boundingBox?.min.y,
-        `${building.id} foundation mesh bottom`,
-      ).toBeCloseTo(-foundationDepth, 5);
+      if (isKitBuildingAsset(building.assetId)) {
+        // Re-staged 2026-08 for the KTX2 kit-building path (buildKitBuilding
+        // in src/render/eastbrook_town.ts,
+        // docs/design/eastbrook-revamp/site-plan.md): a kit building seats
+        // the raw GLB clone at the entrance grade and closes the terrain gap
+        // with a dedicated 12-triangle foundation skirt mesh (the same box
+        // the template path merges into its opaque batch); flat ground grows
+        // no skirt at all.
+        // The window-pane mesh lives inside the wrap group (round 4), so the
+        // skirt is found by its material name, never by "first Mesh child".
+        const skirt = group.children.find(
+          (child): child is THREE.Mesh =>
+            child instanceof THREE.Mesh &&
+            (child.material as THREE.Material).name === `eastbrookTownKitSkirt:${building.id}`,
+        );
+        if (!skirt) throw new Error(`missing foundation skirt for ${building.id}`);
+        const skirtTriangles =
+          (skirt.geometry.index?.count ?? skirt.geometry.getAttribute('position').count) / 3;
+        expect(skirtTriangles, `${building.id} foundation geometry`).toBe(12);
+        skirt.geometry.computeBoundingBox();
+        expect(
+          skirt.geometry.boundingBox?.min.y,
+          `${building.id} foundation mesh bottom`,
+        ).toBeCloseTo(-foundationDepth, 5);
+        const flatGroup = flatView.group.getObjectByName(`eastbrookBuilding:${building.id}`);
+        if (!flatGroup) throw new Error(`missing flat rendered building ${building.id}`);
+        expect(
+          flatGroup.children.find(
+            (child) =>
+              child instanceof THREE.Mesh &&
+              (child.material as THREE.Material).name === `eastbrookTownKitSkirt:${building.id}`,
+          ),
+          `${building.id} flat-ground skirt`,
+        ).toBeUndefined();
+      } else {
+        const opaque = group.getObjectByName(
+          `eastbrookBuildingOpaque:${building.id}`,
+        ) as THREE.Mesh;
+        const flatOpaque = flatView.group.getObjectByName(
+          `eastbrookBuildingOpaque:${building.id}`,
+        ) as THREE.Mesh;
+        if (!opaque || !flatOpaque) throw new Error(`missing opaque geometry for ${building.id}`);
+        const opaqueTriangles =
+          (opaque.geometry.index?.count ?? opaque.geometry.getAttribute('position').count) / 3;
+        const flatOpaqueTriangles =
+          (flatOpaque.geometry.index?.count ?? flatOpaque.geometry.getAttribute('position').count) /
+          3;
+        expect(opaqueTriangles, `${building.id} foundation geometry`).toBe(
+          flatOpaqueTriangles + 12,
+        );
+        opaque.geometry.computeBoundingBox();
+        expect(
+          opaque.geometry.boundingBox?.min.y,
+          `${building.id} foundation mesh bottom`,
+        ).toBeCloseTo(-foundationDepth, 5);
+      }
       const foundationBottom = group.position.y - foundationDepth;
       for (const sample of samples) {
         expect(
@@ -454,14 +643,72 @@ describe('Eastbrook town renderer', () => {
     setStandardMaterials(false);
     const view = eastbrookTownInternalsForTest.buildFromSources(fixtureSources(), () => 0, true);
     const meshes = meshesOf(view.group);
-    expect(meshes).toHaveLength(18);
-    expect(
-      meshes.every((mesh) => (mesh.material as THREE.Material).type === 'MeshLambertMaterial'),
-    ).toBe(true);
-    expect(meshes.every((mesh) => (mesh.material as THREE.MeshLambertMaterial).vertexColors)).toBe(
-      true,
+    // Re-pinned 2026-08 for the harbor move's wall retirement (d19aa33f76,
+    // docs/design/eastbrook-revamp/site-plan.md), the KTX2 kit-building path
+    // (buildKitBuilding in src/render/eastbrook_town.ts), and owner
+    // refinement round 4 (nine buildings, kit windows derived from the
+    // models' own assemblies): 28 meshes are the 8 kit instances' 16 raw GLB
+    // clones, their 8 window-pane meshes (one detected assembly per kit
+    // fixture), the chapel opaque+emissive pair, and the 2 micro batches;
+    // the 4 wall InstancedMeshes no longer exist. Round 6 grew every count by
+    // the harbour quarter's three coastal buildings: 34 meshes are the 10 kit
+    // instances' 20 raw GLB clones, their 10 window-pane meshes, the chapel
+    // pair, and the 2 micro batches. Round 6b re-shelled the chapel onto the
+    // KayKit church, which moves the last template-pipeline building onto the
+    // kit path: 35 meshes are the 11 kit instances' 22 raw GLB clones, their 11
+    // window-pane meshes, and the 2 micro batches, with no template building
+    // mesh left at all.
+    expect(meshes).toHaveLength(35);
+    const kitBuildings = EASTBROOK_LAYOUT.buildings.filter((building) =>
+      isKitBuildingAsset(building.assetId),
     );
-    expect(eastbrookTownDrawStats(view.group)).toMatchObject({ colorDraws: 18, shadowDraws: 9 });
+    const paneMeshes = kitBuildings.map(
+      (building) =>
+        view.group.getObjectByName(`eastbrookBuildingEmissive:${building.id}`) as THREE.Mesh,
+    );
+    const kitMeshes = kitBuildings
+      .flatMap((building) =>
+        meshesOf(view.group.getObjectByName(`eastbrookBuilding:${building.id}`) as THREE.Object3D),
+      )
+      .filter((mesh) => !paneMeshes.includes(mesh as THREE.Mesh));
+    const templateMeshes = meshes.filter(
+      (mesh) => !kitMeshes.includes(mesh) && !paneMeshes.includes(mesh as THREE.Mesh),
+    );
+    expect(kitMeshes).toHaveLength(22);
+    expect(paneMeshes).toHaveLength(11);
+    // Round 6b: the only template-path meshes left in town are the 2 micro
+    // batches; the chapel pair that used to join them is a kit clone now.
+    expect(templateMeshes).toHaveLength(2);
+    // The template pipeline swaps to shared Lambert vertex-color materials on
+    // Low. The kit clones keep their OWN authored GLB materials on every tier
+    // (their color is in KTX2 palette textures, not vertex colors), cloned
+    // per building so a fade cannot bleed across instances: each clone still
+    // carries its source's material name, and no two kit meshes share one.
+    // The window panes ride the town's vertex-color emissive pipeline, so on
+    // Low they downgrade to Lambert like the template meshes, one
+    // independent material per building.
+    expect(
+      templateMeshes.every(
+        (mesh) => (mesh.material as THREE.Material).type === 'MeshLambertMaterial',
+      ),
+    ).toBe(true);
+    expect(
+      templateMeshes.every((mesh) => (mesh.material as THREE.MeshLambertMaterial).vertexColors),
+    ).toBe(true);
+    expect(
+      kitMeshes.every((mesh) =>
+        ['TownOpaque', 'TownEmissive'].includes((mesh.material as THREE.Material).name),
+      ),
+    ).toBe(true);
+    expect(new Set(kitMeshes.map((mesh) => mesh.material)).size).toBe(22);
+    expect(
+      paneMeshes.every((mesh) => (mesh.material as THREE.Material).type === 'MeshLambertMaterial'),
+    ).toBe(true);
+    expect(
+      paneMeshes.every((mesh) => (mesh.material as THREE.MeshLambertMaterial).vertexColors),
+    ).toBe(true);
+    expect(new Set(paneMeshes.map((mesh) => mesh.material)).size).toBe(11);
+    expect(eastbrookTownDrawStats(view.group)).toMatchObject({ colorDraws: 35, shadowDraws: 23 });
   });
 
   it('mirrors exactly the first real wall chord after each asymmetric gate socket', async () => {
@@ -496,31 +743,16 @@ describe('Eastbrook town renderer', () => {
       ).toBe(true);
     }
 
+    // Re-pinned 2026-08 for the Eastbrook harbor move (d19aa33f76,
+    // docs/design/eastbrook-revamp/site-plan.md): with the ring wall retired
+    // (zero segments, zero gates) the mirror machinery selects zero chords and
+    // buildWallBatches creates no instanced meshes at all, so the group carries
+    // no mirroredWallSegmentIds and neither wall batch exists. The GLB socket
+    // asymmetry contract on eastbrook_wall_wing.glb stays pinned above.
     const view = eastbrookTownInternalsForTest.buildFromSources(fixtureSources(), () => 0, true);
-    expect(view.group.userData.mirroredWallSegmentIds).toEqual(
-      expectedMirrored.map((segment) => segment.id),
-    );
-    const mirrored = view.group.getObjectByName(
-      'eastbrookTownWallOpaqueMirroredInstances',
-    ) as THREE.InstancedMesh;
-    const original = view.group.getObjectByName(
-      'eastbrookTownWallOpaqueInstances',
-    ) as THREE.InstancedMesh;
-    expect(mirrored.count).toBe(6);
-    expect(original.count).toBe(EASTBROOK_LAYOUT.wall.segments.length - 6);
-    expect(mirrored.geometry).not.toBe(original.geometry);
-
-    const position = mirrored.geometry.getAttribute('position');
-    const normal = mirrored.geometry.getAttribute('normal');
-    const index = mirrored.geometry.getIndex();
-    const a = new THREE.Vector3().fromBufferAttribute(position, index?.getX(0) ?? 0);
-    const b = new THREE.Vector3().fromBufferAttribute(position, index?.getX(1) ?? 1);
-    const c = new THREE.Vector3().fromBufferAttribute(position, index?.getX(2) ?? 2);
-    const faceNormal = b.clone().sub(a).cross(c.clone().sub(a)).normalize();
-    const storedNormal = new THREE.Vector3()
-      .fromBufferAttribute(normal, index?.getX(0) ?? 0)
-      .normalize();
-    expect(faceNormal.dot(storedNormal)).toBeGreaterThan(0);
+    expect(view.group.userData.mirroredWallSegmentIds).toBeUndefined();
+    expect(view.group.getObjectByName('eastbrookTownWallOpaqueMirroredInstances')).toBeUndefined();
+    expect(view.group.getObjectByName('eastbrookTownWallOpaqueInstances')).toBeUndefined();
   });
 
   it('keeps pitched wall and fence spans terrain-supported across their full footprints', () => {
@@ -608,7 +840,10 @@ describe('Eastbrook town renderer', () => {
     const staticBatches = meshesOf(view.group).filter(
       (mesh) => mesh.userData.eastbrookMicroBatch || mesh.userData.eastbrookWallInstances,
     );
-    expect(staticBatches).toHaveLength(6);
+    // Re-pinned 2026-08: only the 2 micro batches remain after the harbor
+    // move's wall retirement (d19aa33f76,
+    // docs/design/eastbrook-revamp/site-plan.md).
+    expect(staticBatches).toHaveLength(2);
     view.update(1000, 5, 1000, 1000, 5, 1000, 100, 1);
     expect(staticBatches.every((mesh) => !mesh.visible)).toBe(true);
     view.update(0, 5, 0, 0, 5, 0, 100, 1);
@@ -706,9 +941,13 @@ describe('Eastbrook repeated placement triangle budget', () => {
     }
 
     const budget = eastbrookTownTriangleBudget(triangleCountByAsset);
+    // Re-pinned 2026-08 for the Eastbrook harbor move (d19aa33f76,
+    // docs/design/eastbrook-revamp/site-plan.md): the wall wing stays
+    // registered and preloaded with zero placements, so the budget carries its
+    // zero-instance row while the placement-derived constant omits the key.
     expect(
       Object.fromEntries(budget.assets.map((asset) => [asset.assetUrl, asset.instances])),
-    ).toEqual(EASTBROOK_TOWN_ASSET_INSTANCE_COUNTS);
+    ).toEqual({ ...EASTBROOK_TOWN_ASSET_INSTANCE_COUNTS, [EASTBROOK_LAYOUT.wall.assetId]: 0 });
     expect(
       budget.assets.find((asset) => asset.assetUrl.endsWith('eastbrook_market_stall.glb')),
     ).toMatchObject({ instances: 2 });
@@ -716,12 +955,28 @@ describe('Eastbrook repeated placement triangle budget', () => {
       budget.assets.find((asset) => asset.assetUrl.endsWith('eastbrook_wall_wing.glb')),
     ).toMatchObject({ instances: EASTBROOK_LAYOUT.wall.segments.length });
     expect(budget.maximumFoundationTriangles).toBe(EASTBROOK_LAYOUT.buildings.length * 12);
-    expect(budget.assetTriangles).toBe(28_830);
-    expect(budget.maximumFoundationTriangles).toBe(72);
+    // Re-minted 2026-08: the 26 retired wall instances took 5,356 triangles
+    // with them in the harbor move (d19aa33f76,
+    // docs/design/eastbrook-revamp/site-plan.md), then the owner's Galecrest
+    // building mix swapped five shells for the lighter hexb kit models, then
+    // round 3 promoted the trio of decor homes into kit lots (two more
+    // hexb_home_a instances and one hexb_home_b, plus their skirts). Round 6
+    // took eastbrook_home_rise back out (one hexb_home_a and its skirt), then
+    // appended the harbour quarter's three coastal buildings: the first
+    // hexb_market lot the town has ever seated (3,125), one more hexb_home_b
+    // (1,393), and one more hexb_home_a (1,011), plus a 12-triangle skirt
+    // each. Round 6b (owner) re-shelled the chapel onto the KayKit church:
+    // the bespoke eastbrook_chapel.glb (4,120) leaves the town's asset set and
+    // hex_church.glb (1,601) takes its one instance, so the aggregate DROPS by
+    // 2,519 with the building count and the 132-triangle skirt allowance
+    // unchanged. 29,203 becomes 26,684 and the runtime total 29,335 becomes
+    // 26,816, further under the 30,000 target than before.
+    expect(budget.assetTriangles).toBe(26_684);
+    expect(budget.maximumFoundationTriangles).toBe(132);
     expect(budget.maximumRuntimeTriangles).toBe(
       budget.assetTriangles + budget.maximumFoundationTriangles,
     );
-    expect(budget.maximumRuntimeTriangles).toBe(28_902);
+    expect(budget.maximumRuntimeTriangles).toBe(26_816);
     expect(
       budget.maximumRuntimeTriangles,
       JSON.stringify({

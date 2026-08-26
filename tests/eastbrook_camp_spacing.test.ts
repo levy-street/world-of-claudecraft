@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { campSpawnOffset } from '../src/sim/camp_scatter';
 import { isBlocked } from '../src/sim/colliders';
-import { LAKE, ZONE1_CAMPS } from '../src/sim/content/zone1';
+import { LAKE, ZONE1_CAMPS, ZONE1_ZONE } from '../src/sim/content/zone1';
 import { QUESTS } from '../src/sim/data';
 import { PLAYER_SWIM_DEPTH } from '../src/sim/pathfind';
 import { rideSteepnessAt } from '../src/sim/ride_height';
@@ -31,7 +31,7 @@ const NOMINAL_SPACING = (camp: CampDef) => camp.radius / Math.sqrt(camp.count);
 
 // Floors this suite enforces.
 const MIN_NEIGHBOUR_SPACING = 11.5; // yd between adjacent mobs in one camp
-const MIN_TOWN_CLEARANCE = 38; // yd from the town hub at origin to a camp's disc edge
+const MIN_TOWN_CLEARANCE = 38; // yd from the LIVE town hub to a camp's disc edge
 const CROSS_POPULATION_GAP = 2; // yd of clear ground between two DIFFERENT families
 const SAME_POPULATION_SLOPE = 0.75; // one family split in two may still abut
 const SAME_POPULATION_INTERCEPT = 8;
@@ -40,6 +40,16 @@ const MAX_BEARING_DRIFT_DEG = 15; // camps push outward, they do not relocate ac
 
 const centerDistance = (c: CampDef) => Math.hypot(c.center.x, c.center.z);
 const discEdgeToTown = (c: CampDef) => centerDistance(c) - c.radius;
+// Re-anchored 2026-08: the town hub moved from the origin to the harbor site
+// (-14,-100) with the Eastbrook harbor move (d19aa33f76,
+// docs/design/eastbrook-revamp/site-plan.md), and the Wolf Run deliberately
+// parked on the vacated origin ground. The "calm ground around town" rule
+// therefore reads the LIVE hub. The origin frame above stays as the historical
+// starter-field frame on purpose: the starter-band derivation and the shipped
+// bearings below are pinned against it, and re-anchoring them would silently
+// re-derive the governed set.
+const discEdgeToHub = (c: CampDef) =>
+  Math.hypot(c.center.x - ZONE1_ZONE.hub.x, c.center.z - ZONE1_ZONE.hub.z) - c.radius;
 const campDistance = (a: CampDef, b: CampDef) =>
   Math.hypot(a.center.x - b.center.x, a.center.z - b.center.z);
 
@@ -84,20 +94,42 @@ const PINNED_ROSTER: { mobId: string; count: number }[] = [
 // silently shrink when a camp is pushed past the starter band. A packed camp is one
 // with at least two mobs (a named rare spawns alone, so it has no intra-camp
 // spacing to fix) whose disc reaches into the starter band.
-const GOVERNED_INDICES = [0, 1, 3, 4, 6, 7, 8, 9, 12];
+// Camp 8 (tunnel_rat) left this set 2026-08: the Copper Dig cluster relocated
+// to the dig headland for the New Eastbrook program (a 5.9 degree, 63 yd
+// outward move along its shipped bearing; docs/design/eastbrook-revamp/
+// master-plan.md), which carries its disc out of the starter band entirely.
+const GOVERNED_INDICES = [0, 1, 3, 4, 6, 7, 9, 12];
 
 // Where each governed camp sat BEFORE this retune, so the fix is provably an
 // outward push along the same bearing rather than a relocation. Index-aligned with
 // GOVERNED_INDICES.
 const SHIPPED_PLACEMENT: { x: number; z: number }[] = [
-  { x: -15, z: 55 },
+  // Camp 0 (forest_wolf) re-pinned 2026-08: the west Wolf Run rotated onto the
+  // vacated old-town ground when Eastbrook moved to its harbor site
+  // (d19aa33f76, docs/design/eastbrook-revamp/site-plan.md), a
+  // maintainer-approved relocation rather than a spacing push, so the baseline
+  // follows it (was { x: -15, z: 55 }, the pre-move north-woods spot).
+  { x: -10, z: 6 },
   { x: 20, z: 70 },
-  { x: 55, z: 12 },
-  { x: 80, z: -15 },
+  // Camps 3, 4 (wild_boar) and 9 (vale_bandit) re-pinned 2026-08 for the
+  // owner-approved population swap: the bandit camp sat closer to the town gate
+  // than any other hostile camp while the harmless boars held the far meadow,
+  // so the two traded ground and both stepped north. Like camp 0 above this is
+  // a maintainer-approved RELOCATION, not a spacing push, so the baselines
+  // follow the move rather than the bearing guard vetoing it (were
+  // { x: 55, z: 12 }, { x: 80, z: -15 } and { x: 65, z: -65 }). Both boar rows
+  // travelled because the bandit disc does not fit the meadow while the second
+  // boar camp holds its corner. The guard keeps its teeth for every later
+  // change: any drift from THESE spots still has to stay inside 15 degrees.
+  // Camps 3 and 4 re-pinned again in round 6c: the owner sited the meadow at
+  // the west road's END so the path leads somewhere, another deliberate
+  // relocation on the camp-0 precedent. The guard keeps its teeth from
+  // THESE spots: any later drift still has to stay inside 15 degrees.
+  { x: 58, z: -72 },
+  { x: 97, z: -43 },
   { x: -60, z: 5 },
   { x: -75, z: 57 },
-  { x: -82, z: -62 },
-  { x: 65, z: -65 },
+  { x: 80, z: 15 },
   { x: 80, z: 78 },
 ];
 
@@ -269,9 +301,10 @@ describe('eastbrook starter camp spacing', () => {
         ).toBeGreaterThanOrEqual(CROSS_POPULATION_GAP);
       }
     }
-    // 9 governed camps, 2 same-mobId pairs, so 34 cross pairs. If this drops the
-    // loop above went partly vacuous.
-    expect(crossPairs).toBe(34);
+    // 8 governed camps (the Copper Dig camp left for the dig headland), 2
+    // same-mobId pairs, so 26 cross pairs. If this drops the loop above went
+    // partly vacuous.
+    expect(crossPairs).toBe(26);
   });
 
   it('keeps two camps of the same population from interleaving', () => {
@@ -295,8 +328,8 @@ describe('eastbrook starter camp spacing', () => {
   it('leaves the road ring out of town calm', () => {
     for (const camp of governed()) {
       expect(
-        discEdgeToTown(camp),
-        `${label(camp)} disc reaches ${discEdgeToTown(camp).toFixed(2)} yd from the town hub`,
+        discEdgeToHub(camp),
+        `${label(camp)} disc reaches ${discEdgeToHub(camp).toFixed(2)} yd from the town hub`,
       ).toBeGreaterThanOrEqual(MIN_TOWN_CLEARANCE);
     }
   });

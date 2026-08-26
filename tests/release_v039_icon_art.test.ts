@@ -38,7 +38,7 @@ const ACCEPTED_ART_SHA256 = '3d8cb36726050e3a708720b650744005f4ce23d3ac49c032376
 const SECOND_PASS_RECORD =
   'docs/achievements/release-v039-icon-art-second-pass-2026-08-16/accepted-art.json';
 const SECOND_PASS_RECORD_SHA256 =
-  'addc216370868a1cd885ed7ffef1582e1e1d8c515d6159295f7b0f18f0c13f90';
+  'f675f2439b8b83b59f47f168eca58d6d88c73457ba7fc33ef46d5a2e431fe95f';
 const EVIDENCE = {
   'icon-art-before-after-desktop.png': {
     sha256: '61d19fb321f2b30eb3749e0966f26efea0fa4df53edae4b253cfd70edb82cd7a',
@@ -60,7 +60,6 @@ const inventoryController = new ActionBarController({
   talentSpec: () => null,
   knownAbilityIds: () => [],
   hasAura: () => false,
-  isInSportMatch: () => false,
   showAttackButton: () => true,
 });
 
@@ -328,7 +327,10 @@ describe('release v0.39 icon-art second-pass lineage', () => {
         retriedAssets: ['dismiss_pet'],
       },
       runtimeClosure: {
-        abilities: { live: 412, painted: 412 },
+        // 402: the ten Vale Cup sport abilities retired with the New
+        // Eastbrook program's Sowfield demolition, plus the release arm's
+        // two new abilities riding the v0.40.0 sync merge.
+        abilities: { live: 402, painted: 402 },
         hotbarItems: { live: 74, painted: 74 },
         fixedActions: { painted: 11 },
         mobAuraRouting: { paintedFamilies: 44, exactRuntimeIds: 89 },
@@ -412,7 +414,7 @@ describe('release v0.39 icon-art second-pass lineage', () => {
     expect(new Set(liveAbilityIds).size, 'live ability ids remain unique').toBe(
       liveAbilityIds.length,
     );
-    expect(liveAbilityIds, 'live production ability inventory').toHaveLength(412);
+    expect(liveAbilityIds, 'live production ability inventory').toHaveLength(402);
     expect(
       liveAbilityIds.filter((id) => !paintedAbilityIds.has(id)),
       'every live ability resolves through production to committed painted art',

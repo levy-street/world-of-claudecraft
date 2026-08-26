@@ -59,8 +59,12 @@ function duelRig(foeClass: 'warlock' | 'hunter' = 'warlock'): {
   const rogue = sim.entities.get(rogueId)!;
   const foe = sim.entities.get(foeId)!;
   sim.setPlayerLevel(20, rogueId);
-  teleport(sim, rogue, 0, 0);
-  teleport(sim, foe, 6, 0);
+  // Anchored at (200, 0) rather than the origin: the harbor-town move
+  // (d19aa33f76, docs/design/eastbrook-revamp/site-plan.md) put the forest_wolf
+  // camp at (-10, 6) r28.5 and harbor structures over the old open ground, so
+  // origin-anchored rigs pick up wild aggro and line-of-sight refusals.
+  teleport(sim, rogue, 200, 0);
+  teleport(sim, foe, 206, 0);
   rogue.resource = rogue.maxResource;
   return { sim, rogue, foe, rogueId };
 }
@@ -82,7 +86,7 @@ describe('entering Duskveil clears every hostile lock on the rogue', () => {
     const { sim, rogue, foe, rogueId } = duelRig('warlock');
     summonPet(internals(sim).ctx, foe, DEMON_TEMPLATE);
     const pet = sim.petOf(foe.id)!;
-    teleport(sim, pet, 4, 0);
+    teleport(sim, pet, 204, 0);
 
     // The pet is locked on, well inside its own detection radius (4 yd against
     // the 18 yd base), which is exactly the case that used to survive stealth.
@@ -116,7 +120,7 @@ describe('entering Duskveil clears every hostile lock on the rogue', () => {
     const { sim, rogue, foe, rogueId } = duelRig();
     summonPet(internals(sim).ctx, rogue, DEMON_TEMPLATE);
     const pet = sim.petOf(rogue.id)!;
-    teleport(sim, pet, 2, 0);
+    teleport(sim, pet, 202, 0);
     foe.targetId = pet.id;
     foe.autoAttack = true;
     foe.queuedOnSwing = 'heroic_strike';
@@ -139,11 +143,11 @@ describe('entering Duskveil clears every hostile lock on the rogue', () => {
     const sim = new Sim({ seed: 17, playerClass: 'rogue', autoEquip: true });
     sim.setPlayerLevel(20);
     const rogue = sim.player;
-    teleport(sim, rogue, 0, 0);
-    const mob = createMob(33_000, MOBS.forest_wolf, 10, { x: 0, y: 0, z: 0 });
+    teleport(sim, rogue, 200, 0);
+    const mob = createMob(33_000, MOBS.forest_wolf, 10, { x: 200, y: 0, z: 0 });
     mob.hostile = true;
     internals(sim).addEntity(mob);
-    teleport(sim, mob, 5, 0);
+    teleport(sim, mob, 205, 0);
     mob.aiState = 'chase';
     mob.aggroTargetId = rogue.id;
     mob.forcedTargetId = rogue.id;
@@ -167,11 +171,11 @@ describe('entering Duskveil clears every hostile lock on the rogue', () => {
       const sim = new Sim({ seed: 17, playerClass: 'rogue', autoEquip: true });
       sim.setPlayerLevel(20);
       const rogue = sim.player;
-      teleport(sim, rogue, 0, 0);
-      const mob = createMob(33_100, MOBS.forest_wolf, 10, { x: 0, y: 0, z: 0 });
+      teleport(sim, rogue, 200, 0);
+      const mob = createMob(33_100, MOBS.forest_wolf, 10, { x: 200, y: 0, z: 0 });
       mob.hostile = true;
       internals(sim).addEntity(mob);
-      teleport(sim, mob, 5, 0);
+      teleport(sim, mob, 205, 0);
       mob.aiState = 'chase';
       mob.aggroTargetId = rogue.id;
       addThreat(mob, rogue.id, 40);
@@ -204,11 +208,11 @@ describe('entering Duskveil clears every hostile lock on the rogue', () => {
     const sim = new Sim({ seed: 17, playerClass: 'rogue', autoEquip: true });
     sim.setPlayerLevel(20);
     const rogue = sim.player;
-    teleport(sim, rogue, 0, 0);
-    const mob = createMob(33_200, MOBS.forest_wolf, 10, { x: 0, y: 0, z: 0 });
+    teleport(sim, rogue, 200, 0);
+    const mob = createMob(33_200, MOBS.forest_wolf, 10, { x: 200, y: 0, z: 0 });
     mob.hostile = true;
     internals(sim).addEntity(mob);
-    teleport(sim, mob, 5, 0);
+    teleport(sim, mob, 205, 0);
     mob.aiState = 'chase';
     mob.aggroTargetId = rogue.id;
     mob.forcedTargetId = rogue.id;

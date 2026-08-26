@@ -165,6 +165,9 @@ const NON_PROFESSIONS_BLOB_FIELDS = [
   'delveDaily',
   'heroicDaily',
   'mailWelcomed',
+  // The tutorial island's one-shot spawn-greeting latch (sim/tutorial/
+  // greeting.ts): a boolean with zero-default omission, bounded by nature.
+  'tutorialGreetingSent',
   'deeds',
   'deedStats',
   'activeTitle',

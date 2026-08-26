@@ -68,8 +68,19 @@ describe('blocker wall colliders', () => {
   });
 
   it('a player walking into the wall across ticks stops at it', () => {
+    // Re-pinned 2026-08 for the harbor move (d19aa33f76, the New Eastbrook
+    // program, docs/design/eastbrook-revamp/site-plan.md): the spawn moved to
+    // the harbor quay, so the wall's x span anchors to PLAYER_START like its
+    // z always has, instead of the old spawn's hardcoded -10..10.
     const content = world({
-      blockers: [{ x1: -10, z1: PLAYER_START.z + 4, x2: 10, z2: PLAYER_START.z + 4 }],
+      blockers: [
+        {
+          x1: PLAYER_START.x - 10,
+          z1: PLAYER_START.z + 4,
+          x2: PLAYER_START.x + 10,
+          z2: PLAYER_START.z + 4,
+        },
+      ],
     });
     setActiveWorldContent(content);
     const sim = new Sim({ seed: SEED, playerClass: 'warrior', world: content });

@@ -115,7 +115,6 @@ plausibly covers means the table needs a new row in the same change.
 | `social/dungeon_finder.ts` | the Dungeon Finder (`docs/prd/dungeon-finder.md`): the automatic role queue plus the leader-run premade board; only FORMS groups (via `PartyMachine.formDungeonFinderGroup`), draws no rng; pinned by `tests/dungeon_finder.test.ts` |
 | `social/duel.ts` + `social/arena.ts` | duels + ranked arena (Elo, matchmaking) |
 | `social/fiesta.ts` + `social/fiesta_bots.ts` | fiesta match logic + offline bots |
-| `social/vale_cup.ts` + `social/vale_cup_bots.ts` | Vale Cup boarball: brackets, the one match slot, the `vcup*` seam arms (pure ball math in the `vale_cup_ball.ts`/`vale_cup_layout.ts` leaves); its tick phase draws ZERO shared rng |
 | `social/yumi.ts` | Protect Yumi 3v3/5v5 maze mode (layout leaf `yumi_maze_layout.ts`) |
 | `social/battleground.ts` | Thornhollow Fields 5v5 capture-the-flag (layout leaf `battleground_layout.ts`; resolved-match records in the `battleground_outcomes.ts` leaf) and its siblings: `battleground_proposal.ts` (the timed queue-pop Accept/Decline between the matchmaker's pick and the seating, so a walked-away player never gets seated), `battleground_party.ts` (each team of five fights as ONE party, formed through the same dungeon-finder formation seam manual groups use and unwound at match end or desertion), `battleground_backfill.ts` (the pure half of "a fighter left, can a queued player take the seat") |
 | `social/ready_check.ts` | `/ready`: the `readyChecks` primitive + the `updateReadyChecks` phase |
@@ -240,7 +239,8 @@ re-bucketing LAST, then drain + return the `SimEvent[]`. The authoritative phase
 `tick()` itself: most phases carry a self-naming `lap?('...')` marker (a few adjacent
 calls share one, e.g. trades + ready checks), so read those,
 not a doc copy. Phase ORDER is rng-draw-order load-bearing (see Determinism); a
-zero-rng phase (Vale Cup) may append, anything else must not reorder.
+zero-rng phase (the retired Vale Cup was the precedent) may append, anything
+else must not reorder.
 
 Beyond `tick()`, `sim.ts` legitimately keeps: the `IWorld` facade delegates, the
 back-compat accessors (`player`/`inventory`/`xp`/`equipment`/`questLog`/`talents`/... that

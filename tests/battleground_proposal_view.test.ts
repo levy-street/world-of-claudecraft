@@ -12,6 +12,7 @@ const info = (proposal: BgProposalInfo | null): BgInfo => ({
   queueSize: 0,
   queuedParty: 1,
   firstWinBonusReady: false,
+  doubleHonorActive: false,
   proposal,
   requeueIn: 0,
   match: null,

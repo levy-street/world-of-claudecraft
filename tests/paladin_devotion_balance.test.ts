@@ -19,12 +19,25 @@ const PRIORITY: Readonly<Record<PaladinSpec, readonly string[]>> = {
 // Re-pinned for the v0.36 composition: holy 41.25 to 42.45, protection 38.65
 // to 38.1, retribution 54.35 to 48.35. Re-pinned again on the v0.37.0 castle
 // base, whose world content forks the shared stream: holy 42.45 to 41.25,
-// protection 38.1 to 38.65, retribution 48.35 to 55.75. The wide 35-65s
-// design band still holds.
+// protection 38.1 to 38.65, retribution 48.35 to 55.75. Re-pinned 2026-08 on
+// the v0.39 Eastbrook harbor move (d19aa33f76,
+// docs/design/eastbrook-revamp/site-plan.md), whose world content forks the
+// shared stream again: holy 41.25 to 42.45; protection and retribution
+// unmoved. Re-pinned for owner refinement round 3 (the coastline pulled to
+// the town, re-threaded streets, three promoted home lots), which forks the
+// shared stream once more: retribution 55.75 to 52.45; holy and protection
+// unmoved. Re-pinned for owner refinement rounds 6 and 6b (the camps traded
+// ground, the harbour quarter and churchyard landed, the delve and its POI
+// moved to the Mirror Lake shore, three town NPCs were redistributed), which
+// forks the shared stream again: protection 38.65 to 42.7; holy and
+// retribution unmoved. Re-pinned on the eastbrook-plus-tutorial integration
+// merge (the harbor town and the Proving Shore island land in one world),
+// which forks the shared stream again: holy 42.45 to 41.25, protection 42.7
+// to 41.7; retribution unmoved. The wide 35-65s design band still holds.
 const EXPECTED_SECONDS: Readonly<Record<PaladinSpec, number>> = {
   holy: 41.25,
-  protection: 38.65,
-  retribution: 55.75,
+  protection: 41.7,
+  retribution: 52.45,
 };
 
 function addDummy(sim: Sim): Entity {

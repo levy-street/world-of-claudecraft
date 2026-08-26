@@ -63,22 +63,23 @@ const PREFIX_CATEGORY: Record<string, DeedCategory> = {
 };
 
 describe('audited launch totals (literals: update deliberately with the catalog)', () => {
-  it('ships exactly 273 deeds worth 3155 total Renown', () => {
+  it('ships exactly 274 deeds worth 3160 total Renown', () => {
     // Release base (262 / 3145 after the WARFARE lifetime-honor ladder) plus
     // four Reliquary Curator rank bridges and the five Phase 18 completion
-    // ladder deeds (all nine renown 0, so the Renown sum is UNCHANGED from
-    // the release base: catalog prestige never scores the board), plus the
-    // walk-in castle visit pair (exp_the_last_keep, exp_dawnhold_castle,
-    // renown 5 each).
-    expect(DEED_ORDER.length).toBe(273);
-    expect(ALL.reduce((sum, d) => sum + d.renown, 0)).toBe(3155);
+    // ladder deeds (all nine renown 0: catalog prestige never scores the
+    // board), the walk-in castle visit pair (exp_the_last_keep,
+    // exp_dawnhold_castle, renown 5 each), and the Proving Shore graduation
+    // deed (prog_ready_for_an_adventure, renown 5).
+    expect(DEED_ORDER.length).toBe(274);
+    expect(ALL.reduce((sum, d) => sum + d.renown, 0)).toBe(3160);
   });
 
   it('ships the audited per-category counts', () => {
     const byCategory: Record<string, number> = {};
     for (const d of ALL) byCategory[d.category] = (byCategory[d.category] ?? 0) + 1;
     expect(byCategory).toEqual({
-      progression: 57,
+      // +1 the Proving Shore graduation (prog_ready_for_an_adventure).
+      progression: 58,
       combat: 10,
       // +2 Rift coverage deeds (dgn_rift, dgn_rift_s_rank).
       dungeon: 31,
@@ -216,11 +217,13 @@ describe('audited launch totals (literals: update deliberately with the catalog)
       'col_reliquary_illum_nythraxis_heroic',
       'col_reliquary_illum_thunzharr',
       'col_reliquary_illum_gravewyrm_heroic',
-      // The walk-in castle visit pair appends last: the Last Keep's deed
-      // retro-fixes its shipped-without-deeds gap, Dawnhold's lands with
-      // its castle (both keyed on the enterDungeon markVisited emit).
+      // The walk-in castle visit pair: the Last Keep's deed retro-fixes its
+      // shipped-without-deeds gap, Dawnhold's lands with its castle (both
+      // keyed on the enterDungeon markVisited emit).
       'exp_the_last_keep',
       'exp_dawnhold_castle',
+      // The Proving Shore graduation closes the merged tail.
+      'prog_ready_for_an_adventure',
     ]);
     expect(DEEDS.dgn_wildheart_basin.renown).toBe(10);
     expect(DEEDS.dgn_wildheart_basin_heroic.renown).toBe(10);
@@ -578,11 +581,12 @@ describe('frozen trigger + renown catalog (design rule 9: never retro-edit a tri
   // dead-end The Whole Book; see the reachability pin below). No other
   // trigger or renown changed (verified by reconstructing the pre-phase
   // catalog, which reproduces the previous literal exactly).
-  // Re-baselined for the walk-in castle visit pair (exp_the_last_keep,
-  // exp_dawnhold_castle), which appends last; no shipped trigger or renown
-  // changed (the pair is new, every prior row reproduces the previous
-  // literal exactly).
-  const FROZEN_CATALOG_SHA256 = '36e9f3077709035c6f617f355572d5d911a0bde1ff6dd2676aace5505dd70a21';
+  // Re-baselined at the release/v0.39.0 sync merge, which interleaves the
+  // walk-in castle visit pair (exp_the_last_keep, exp_dawnhold_castle) and
+  // the Proving Shore graduation deed (prog_ready_for_an_adventure, on the
+  // new tutorialGraduations stat) at the tail; no shipped trigger or renown
+  // changed on either side.
+  const FROZEN_CATALOG_SHA256 = '7041f4aec1341ec1d5eded75768567af4b5ab12f22745a7807811da40b6add61';
 
   it('every shipped deed keeps its trigger and renown unchanged', () => {
     const canonical = JSON.stringify(
@@ -780,9 +784,9 @@ describe('table shape', () => {
     // (forbidden: the order is an append-only determinism contract; new
     // deeds append). hid_codfather's index is pinned in the refresh test.
     expect(DEED_ORDER[0]).toBe('prog_first_steps');
-    // The walk-in castle visit pair appends after the Phase 18 Reliquary
-    // completion ladder; Dawnhold's deed closes the tail.
-    expect(DEED_ORDER[DEED_ORDER.length - 1]).toBe('exp_dawnhold_castle');
+    // The Proving Shore graduation deed closes the merged tail (appended at
+    // the release merge behind the walk-in castle visit pair).
+    expect(DEED_ORDER[DEED_ORDER.length - 1]).toBe('prog_ready_for_an_adventure');
   });
 
   it('every entry key matches its id and its prefix matches its category', () => {

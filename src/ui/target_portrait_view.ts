@@ -10,12 +10,11 @@ export const TRANSIENT_MOB_PORTRAIT_SOURCE_IDS: Readonly<Record<string, string>>
   guardian_stampede_2: 'gloam_strider',
 });
 
-const STATIC_MOB_PORTRAIT_URLS: Readonly<Record<string, string>> = Object.freeze({
-  // The Vale Cup ball uses a procedural world renderer rather than the creature
-  // manifest. Keep its hand-painted portrait outside the deterministic mob-render
-  // ledger instead of accepting the manifest's unrelated wolf fallback.
-  vale_cup_ball: '/ui/portraits/vale_cup_ball.webp',
-});
+// A mob whose visual comes from a procedural world renderer rather than the
+// creature manifest keeps its hand-painted portrait here, outside the
+// deterministic mob-render ledger (the retired Vale Cup ball was the one
+// occupant; the seam stays for the next bespoke-visual mob).
+const STATIC_MOB_PORTRAIT_URLS: Readonly<Record<string, string>> = Object.freeze({});
 
 export function targetPortraitSourceId(templateId: string, isMobEntity: boolean): string | null {
   if (!isMobEntity) return null;

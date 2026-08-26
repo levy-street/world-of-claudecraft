@@ -7,6 +7,9 @@
 // (tests/i18n_admin_catalog.test.ts).
 
 export const vi_VN: Record<string, string> = {
+  'error.flagActiveExists': 'Tài khoản này đã có một đánh dấu đang mở thuộc loại đó.',
+  'wealth.largeMovementsUnavailable':
+    'Không thể tải các khoản chuyển ngân hàng lớn (việc đọc sổ cái đã hết thời gian chờ). Bảng chi tiết vàng ở trên vẫn đầy đủ.',
   'error.guildBankDeleting':
     'Bang hội này đang bị xóa, nên ngân hàng của nó đã bị đóng. Không có gì được thay đổi.',
   'error.guildBankItemRequired': 'Nhập mã vật phẩm mà bạn cho rằng ô đó đang chứa.',

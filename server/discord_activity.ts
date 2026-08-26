@@ -9,14 +9,7 @@
 // outbox drain resolves accountIds to Discord identities; this layer is just the
 // in-memory hand-off, mirroring discord_relay.ts.
 
-export type ActivityKind =
-  | 'levelup'
-  | 'rareloot'
-  | 'duel'
-  | 'arena'
-  | 'vale_cup'
-  | 'masterwork'
-  | 'deed';
+export type ActivityKind = 'levelup' | 'rareloot' | 'duel' | 'arena' | 'masterwork' | 'deed';
 
 export interface QueuedActivity {
   kind: ActivityKind;
@@ -35,10 +28,6 @@ export interface QueuedActivity {
   winnerName?: string; // duel
   loserName?: string; // duel
   ratingDelta?: number; // arena (signed)
-  bracket?: number; // vale_cup (1..5, an NvN bout)
-  scoreA?: number; // vale_cup
-  scoreB?: number; // vale_cup
-  winnerNation?: string; // vale_cup (VcNationId banner of the winning side)
   deedId?: string; // deed
   deedName?: string; // deed (English deed name; the bot posts English)
   deedTitle?: string; // deed, when the deed rewards a title
@@ -56,7 +45,7 @@ const MAX_QUEUE = ACTIVITY_MAX_QUEUE;
 const DEDUPE_TTL_MS = 30_000;
 // Sized for the 1,000-concurrent load target the packet was measured
 // against, not for comfort at today's population: the map is SHARED across
-// every activity kind (rareloot per roll id, duel, vale_cup, deed,
+// every activity kind (rareloot per roll id, duel, deed,
 // masterwork per account), so at the old 512 cap a sustained rate above
 // about 17 keyed events per second would keep the live set at the cap and
 // the oldest-first backstop would evict aged masterwork windows still

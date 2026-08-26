@@ -175,6 +175,12 @@ export const apiErrorStrings = {
   deeds: {
     invalid_input: 'Invalid input.',
   },
+  // The public guild roster read behind the signpost guild board
+  // (server/guild_roster.ts).
+  guilds: {
+    invalid_roster_name: 'Invalid guild name.',
+    unknown: 'No guild by that name.',
+  },
   // steam: the env-gated Steam link family (server/steam/). Linking mirrors
   // deed unlocks to Steam achievements; it is never a sign-in method.
   steam: {

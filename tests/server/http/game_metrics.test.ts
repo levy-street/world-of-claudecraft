@@ -939,8 +939,9 @@ describe('registerGameStateMetrics: fishing telemetry counters', () => {
 
     expect([...FISHING_BANDS]).toEqual(['0', '1', '2']);
     const combos = HARVEST_BANDS.length * FISHING_BANDS.length;
-    // 14 zones x 3 bands since the v0.32.0 expansion (was 3 x 3 = 9).
-    expect(combos).toBe(42);
+    // 15 zones x 3 bands since the Proving Shore tutorial island (was 14 x 3
+    // since the v0.32.0 expansion, 3 x 3 before that).
+    expect(combos).toBe(45);
     for (const name of FISHING_COUNTER_NAMES) {
       for (const zone of HARVEST_BANDS) {
         for (const band of FISHING_BANDS) {
@@ -1091,7 +1092,7 @@ describe('registerGameStateMetrics: fishing telemetry counters', () => {
     // A dropped sample must not have moved a real series on the way out: an
     // off-vocabulary BAND with a real zone is the arm most likely to leak.
     for (const name of FISHING_COUNTER_NAMES) {
-      expect(fishingSeries(text, name), name).toHaveLength(42);
+      expect(fishingSeries(text, name), name).toHaveLength(45);
       for (const zone of HARVEST_BANDS) {
         for (const band of FISHING_BANDS) {
           expect(fishingValue(text, name, zone, band), `${name} ${zone} ${band}`).toBe('0');

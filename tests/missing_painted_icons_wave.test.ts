@@ -305,19 +305,20 @@ describe('missing painted icon accepted-art manifest', () => {
     // heroic_duskwhisper resolver, so 209/194/90/15 became 206/190/86/16.
     // The 2026-08-09 wave adds the 13 missing overhaul ability icons plus the
     // bespoke Elemental Trance replacing its interim duplicate: 206/190/86
-    // become 220/204/100.
+    // become 220/204/100. The Sowfield demolition retires the 10 sport_*
+    // Vale Cup abilities with their art: 220/204/100 become 210/194/90.
     expect(accepted.scope).toEqual({
-      targetRows: 220,
-      rasterPaintings: 204,
-      abilities: 100,
+      targetRows: 210,
+      rasterPaintings: 194,
+      abilities: 90,
       items: 101,
       deeds: 3,
       heroicWeaponResolvers: 16,
       originalInventoryRows: 197,
       supplementalCurrentHeadRows: 12,
     });
-    expect(accepted.assets).toHaveLength(204);
-    expect(accepted.assets.filter((asset) => asset.kind === 'ability')).toHaveLength(100);
+    expect(accepted.assets).toHaveLength(194);
+    expect(accepted.assets.filter((asset) => asset.kind === 'ability')).toHaveLength(90);
     expect(accepted.assets.filter((asset) => asset.kind === 'item')).toHaveLength(101);
     expect(accepted.assets.filter((asset) => asset.kind === 'deed')).toHaveLength(3);
 
@@ -462,9 +463,9 @@ describe('missing painted icon accepted-art manifest', () => {
         ).toBe(true);
       }
     }
-    expect(shippingHashes.size).toBe(204);
-    expect(sourceHashes.size).toBe(204);
-    expect(masterHashes.size).toBe(204);
+    expect(shippingHashes.size).toBe(194);
+    expect(sourceHashes.size).toBe(194);
+    expect(masterHashes.size).toBe(194);
     expect(sorted(referenceRoles)).toEqual([...ALLOWED_REFERENCE_ROLES]);
   });
 });
@@ -472,7 +473,7 @@ describe('missing painted icon accepted-art manifest', () => {
 describe('missing painted ability integration', () => {
   it('makes every live ability image-backed while preserving non-ABILITY image ids', () => {
     const accepted = manifest();
-    expect(accepted.targetSets.abilities).toHaveLength(100);
+    expect(accepted.targetSets.abilities).toHaveLength(90);
     expect(Object.keys(ABILITIES).filter((id) => !ABILITY_IMAGE_IDS.has(id))).toEqual([]);
     expect(sorted([...ABILITY_IMAGE_IDS].filter((id) => !Object.hasOwn(ABILITIES, id)))).toEqual([
       ...PRESERVED_IMAGE_BACKED_MODIFIER_IDS,
@@ -641,7 +642,7 @@ describe('missing painted deed and Heroic weapon integration', () => {
     // DEED_ART_PENDING, the one enumeration of that debt (src/ui/icons.ts),
     // so this file cannot end up naming a different pending set than the
     // other two art suites. Exhaustive: a third artless deed still reds here.
-    expect(DEED_ORDER).toHaveLength(273);
+    expect(DEED_ORDER).toHaveLength(274);
     expect(DEED_ORDER.filter((id) => !DEED_IMAGE_IDS.has(id))).toEqual([...DEED_ART_PENDING]);
     const credits = readFileSync(path.join(repoRoot, 'CREDITS.md'), 'utf8');
     const provenance = readFileSync(

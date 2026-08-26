@@ -22,14 +22,23 @@ export interface DockSurfaceLine {
   slope: number;
 }
 
+/** The dock's uniform size multiplier (1 for every classic pier). */
+export function dockScale(dock: DockDef): number {
+  return dock.scale ?? 1;
+}
+
+/** World point -> UNIT-local dock space: rotated AND divided by the dock's
+ *  scale, so every section constant below keeps meaning "one plank" and no
+ *  consumer needs to know a pier was enlarged. */
 export function dockLocalPoint(dock: DockDef, x: number, z: number): { x: number; z: number } {
   const dx = x - dock.x;
   const dz = z - dock.z;
   const cos = Math.cos(dock.rot);
   const sin = Math.sin(dock.rot);
+  const s = dockScale(dock);
   return {
-    x: dx * cos - dz * sin,
-    z: dx * sin + dz * cos,
+    x: (dx * cos - dz * sin) / s,
+    z: (dx * sin + dz * cos) / s,
   };
 }
 
@@ -57,7 +66,7 @@ export function dockSectionWorldCenter(
   dock: DockDef,
   sectionIndex: number,
 ): { x: number; z: number } {
-  const localZ = DOCK_SECTION_LOCAL_Z[sectionIndex];
+  const localZ = DOCK_SECTION_LOCAL_Z[sectionIndex] * dockScale(dock);
   return {
     x: dock.x + localZ * Math.sin(dock.rot),
     z: dock.z + localZ * Math.cos(dock.rot),
@@ -72,11 +81,12 @@ export function dockSurfaceLine(
   terrainAt: (x: number, z: number) => number,
 ): DockSurfaceLine {
   const anchorY = terrainAt(dock.x, dock.z);
+  const s = dockScale(dock);
   const sectionSurfaceY = (sectionIndex: number): number => {
     const center = dockSectionWorldCenter(dock, sectionIndex);
     const centerY = terrainAt(center.x, center.z);
-    const baseY = anchorY + Math.min(0, centerY - anchorY + DOCK_SECTION_TERRAIN_CLEARANCE);
-    return baseY + DOCK_SECTION_SURFACE_Y;
+    const baseY = anchorY + Math.min(0, centerY - anchorY + DOCK_SECTION_TERRAIN_CLEARANCE * s);
+    return baseY + DOCK_SECTION_SURFACE_Y * s;
   };
   const farIndex = DOCK_SECTION_LOCAL_Z.length - 1;
   const nearLocalZ = DOCK_SECTION_LOCAL_Z[0];

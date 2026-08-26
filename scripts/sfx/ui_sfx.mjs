@@ -15,7 +15,6 @@ const MASTER_GAINS_DB = {
   ui_quest_done: 0.8,
   ui_level_up: -0.37,
   ui_death: 5.58,
-  ui_vcup_kickoff: 0.46,
   ui_fiesta_word_0: 2.68,
   ui_fiesta_word_1: 2.55,
   ui_fiesta_word_2: 0.09,
@@ -96,14 +95,6 @@ export const UI_SFX_SPECS = [
   cue('ui_death', 1.5, 'Somber descending player defeat sting with a dark soft impact.', [
     tone(220, 0, 1.4, 0.2, { wave: 'saw', endFrequency: 55 }),
     noise('brown', 0, 1.2, 0.12, { lowpass: 360 }),
-  ]),
-  // Placeholder: split off ui_duel_start so Vale Cup kickoff can get its own
-  // cue distinct from a real duel/arena start. Swap for a real recording
-  // whenever it's ready, same as every other custom cue here started out.
-  cue('ui_vcup_kickoff', 0.8, 'Bright arcade referee whistle and crowd swell kickoff cue.', [
-    tone(1600, 0, 0.14, 0.22, { wave: 'square' }),
-    tone(1900, 0.1, 0.14, 0.2, { wave: 'square' }),
-    noise('white', 0.2, 0.4, 0.05, { highpass: 1200 }),
   ]),
   fiestaWord(0, 523),
   fiestaWord(1, 587),

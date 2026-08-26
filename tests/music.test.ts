@@ -188,14 +188,6 @@ describe('MusicDirector streamed combat / background mix', () => {
     expect(el.currentTime).toBe(55);
     expect(el.play).toHaveBeenCalledTimes(2);
   });
-
-  it('plays the vale_cup zone as silence on the zone bus (the Sowfield mp3s own it)', () => {
-    director.update('vale', false);
-    director.update('vale_cup', false);
-    expect(internals(director).zoneStreams.vale?.target).toBe(0);
-    expect(internals(director).zoneStreams.vale_cup).toBeUndefined();
-    expect(FakeAudio.instances.map((el) => el.src)).not.toContain('/audio/music/vale_cup.mp3');
-  });
 });
 
 describe('MusicDirector random combat theme pick', () => {
@@ -587,6 +579,27 @@ describe('world music zone selection', () => {
 
   it('keeps Gullhaven (the Farshore hub, no town theme) on the vigil too', () => {
     expect(musicZoneForLocation('farshore_isle', 'vale', true, false)).toBe('farshore');
+  });
+
+  it('gives the Proving Shore its own cue, camp included, not the vale loop', () => {
+    // The island paints as vale, so without its own ZONE_MUSIC row the first
+    // music a new player ever hears would be the mainland's. Dawnrest Camp is
+    // a hub with no town theme, which is the path that falls through to
+    // ZONE_MUSIC, so one row has to cover both the strand and the camp.
+    expect(musicZoneForLocation('proving_shore', 'vale', false, false)).toBe('proving_shore');
+    expect(musicZoneForLocation('proving_shore', 'vale', true, false)).toBe('proving_shore');
+    // ...and a dungeon still outranks it, exactly as everywhere else.
+    expect(musicZoneForLocation('proving_shore', 'vale', false, true, 'hollow_crypt')).toBe(
+      'dungeon_hollow_crypt',
+    );
+  });
+
+  it('streams the island cue rather than composing it', () => {
+    // The one supplied track with no composed counterpart: it was written for
+    // the island, not remastered from the procedural score. Pinned so the
+    // absence reads as deliberate and nobody "fixes" it by inventing a theme.
+    expect(ZONE_STREAM_URLS.proving_shore).toBe('/audio/music/proving_shore.mp3?v=51e9b5a6c01f');
+    expect(buildMusicThemes().proving_shore).toBeUndefined();
   });
 
   it('borrows the nearest-mood cue for paint-only biomes', () => {

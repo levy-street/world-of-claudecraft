@@ -79,7 +79,7 @@ export function cardDuelMatchFor(ctx: SimContext, pid: number): CardDuelMatch | 
 
 // At least one other QUEUEABLE HUMAN must be present to ever pair off the
 // queue. Fiesta and Vale Cup bots share the offline Sim's players map
-// (fiesta_bots.ts / vale_cup_bots.ts both reach Sim.addPlayer), but they
+// (fiesta_bots.ts reaches Sim.addPlayer), but they
 // never call joinCardDuelQueue, so counting them here would let the gate
 // read "available" while a bot match is live offline, and the human queues
 // into a FIFO that can never pair (finding: bots defeat the offline gate).
@@ -87,7 +87,6 @@ export function cardMinigameAvailable(ctx: SimContext, pid?: number): boolean {
   for (const [otherPid, meta] of ctx.players) {
     if (otherPid === pid) continue;
     if (meta.isFiestaBot) continue;
-    if (ctx.vcup.botPids.includes(otherPid)) continue;
     return true;
   }
   return false;
@@ -194,7 +193,7 @@ export function updateCardDuelQueue(ctx: SimContext): void {
   // other side of a pair (finding: stale pairing ejects the survivor). Mirrors
   // joinCardMinigameQueue's join-time r.e.dead gate: a queued player who dies
   // before pairing (not just one who disconnects) is dropped too, matching
-  // every sibling PvP system (duel.ts forfeits on death; arena.ts/vale_cup.ts
+  // every sibling PvP system (duel.ts forfeits on death; arena.ts
   // resolve desertion) rather than pairing a ghost off the queue.
   for (const pid of [...ctx.cardDuelQueue]) {
     const e = ctx.entities.get(pid);

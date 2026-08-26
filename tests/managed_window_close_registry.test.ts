@@ -42,6 +42,7 @@ const playHtml = readFileSync(`${root}play.html`, 'utf8');
 const CODE_BUILT: Record<string, string> = {
   'confirm-dialog': 'src/ui/hud.ts (confirmDialog + inputDialog share the one id)',
   'profession-tutorial': 'src/ui/profession_tutorial_window.ts',
+  'tutorial-greeting': 'src/ui/tutorial_greeting_window.ts',
   'dev-command-window': 'src/ui/dev_command_window.ts',
 };
 
@@ -153,7 +154,7 @@ function readPanelIds(html: string): string[] {
 // The two populations on the day this was written. They are equal by coincidence, not by
 // construction (37 cases = 34 markup panels with a case + 3 code-built; 37 markup ids = those
 // 34 + the 3 without one), so they get two names and must be bumped independently.
-const CASE_COUNT = 38;
+const CASE_COUNT = 39; // +1: the tutorial island's #tutorial-greeting (code-built)
 const MARKUP_COUNT = 38;
 
 const closeSwitch = readCloseManagedWindowSwitch(hudTs);
@@ -332,6 +333,10 @@ describe('closeManagedWindow case registry', () => {
     // EXACT, not a floor: a floor cannot notice a new module joining.
     expect(sites).toEqual({
       'ui/dev_command_window.ts': 1,
+      // Two build sites, one element id: the two-choice greeting and its
+      // single-button note variant (decline follow-up, bell homecoming) both
+      // mint #tutorial-greeting, and one closeTutorialGreeting covers both.
+      'ui/tutorial_greeting_window.ts': 2,
       'ui/hud.ts': 2, // confirmDialog + inputDialog share the one #confirm-dialog id
       'ui/profession_tutorial_window.ts': 1,
     });

@@ -78,6 +78,9 @@ describe('terrain region index', () => {
       TERRAIN_APPLIER.columnStraits,
       TERRAIN_APPLIER.rowMeres,
       TERRAIN_APPLIER.northBay,
+      // The Proving Shore tutorial island's moat: like starterMoat, its open
+      // sea band has unbounded z support, so it is deliberately always-run.
+      TERRAIN_APPLIER.provingMoat,
     ]);
     for (let id = 0; id < TERRAIN_APPLIER_BOUNDS.length; id++) {
       expect(terrainRegionHas(far, id), `production applier ${id}`).toBe(always.has(id));
@@ -104,7 +107,10 @@ describe('terrain region index', () => {
     expect(heightBody).toContain('let h = baseHeight(x, z, seed, region);');
     expect(heightBody).toContain('for (const campIndex of region.campIndices)');
     expect(heightBody).not.toContain('for (const camp of CAMPS)');
-    expect(heightBody.match(/terrainRegionHas\(region, TERRAIN_APPLIER\./g)).toHaveLength(36);
+    // 37 = the 34 post-Sowfield appliers plus the Proving Shore tutorial
+    // island's provingCoast and provingMoat, plus the release arm's
+    // gardenwalkWestPass riding the v0.40.0 sync merge.
+    expect(heightBody.match(/terrainRegionHas\(region, TERRAIN_APPLIER\./g)).toHaveLength(37);
   });
 
   it('falls back to the full ordered scan for non-finite query coordinates', () => {

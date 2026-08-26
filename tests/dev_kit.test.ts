@@ -198,20 +198,28 @@ describe('kit construction', () => {
     }
   });
 
-  it('leaves neck and rings empty, because no fresh-20 jewelry exists', () => {
-    // Not a filter bug: every neck/ring in the game is either Heroic-badge-vendor
-    // stock or source level 22+, so a genuinely fresh 20 wears none. Documented as a
-    // test so the day content adds fresh-20 jewelry, this reds and the presets get
-    // revisited rather than silently continuing to ship three empty slots.
+  it('wears the tutorial keepsake as the ONE fresh-20 ring, neck empty', () => {
+    // Revisited when the Proving Shore's Mother of Pearl landed (+1 all
+    // stats, the tutorial quest reward every fresh 20 realistically owns):
+    // it is the single piece of fresh-20 jewelry in the game, worn in ring1
+    // for every class. Every OTHER neck/ring stays Heroic-badge-vendor stock
+    // or source level 22+, so ring2 and neck stay empty. The day more
+    // fresh-20 jewelry lands, this reds and the presets get revisited again.
     const jewelry = Object.values(ITEMS).filter(
       (item) => item.slot === 'neck' || item.slot === 'ring',
     );
     expect(jewelry.length).toBeGreaterThan(0);
     for (const cls of ALL_CLASSES) {
       expect(
-        jewelry.filter((item) => isFreshTwentyItem(cls, item)),
-        `${cls} has fresh-20 jewelry now: revisit the kit slots`,
-      ).toEqual([]);
+        jewelry.filter((item) => isFreshTwentyItem(cls, item)).map((item) => item.id),
+        `${cls} fresh-20 jewelry changed: revisit the kit slots`,
+      ).toEqual(['mother_of_pearl']);
+    }
+    for (const { cls, spec } of everySpec()) {
+      const kit = buildDevKit(cls, spec);
+      expect(kit?.equip.ring1, `${cls}/${spec} ring1`).toBe('mother_of_pearl');
+      expect(kit?.equip.ring2, `${cls}/${spec} ring2`).toBeUndefined();
+      expect(kit?.equip.neck, `${cls}/${spec} neck`).toBeUndefined();
     }
   });
 

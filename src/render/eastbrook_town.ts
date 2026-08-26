@@ -14,6 +14,7 @@ import {
   setEastbrookCivicMask,
   updateEastbrookCivicBeaconMotion,
 } from './eastbrook_civic_beacon';
+import { buildEastbrookHarbor } from './eastbrook_harbor';
 import {
   applyEastbrookTownSurfaceDetail,
   EASTBROOK_SURFACE_ATLAS_URL,
@@ -33,6 +34,7 @@ import {
 } from './eastbrook_town_visibility_core';
 import { indexExactVertexTuples } from './exact_index_geometry';
 import { EMISSIVE_GLOW, GFX, surfaceMat } from './gfx';
+import { type KitWindowPane, kitWindowPanes } from './kit_window_panes_core';
 import { cloneMaterialWithHooks } from './material_clone_hooks';
 import { applyOccluderFade, type OccluderFadeMat, occluderFadeMat } from './occluder_fade';
 import { occluderFadeSettled, stepOccluderFade } from './occluder_fade_core';
@@ -49,16 +51,29 @@ import { modulateEmissiveByVertexColor } from './vertex_color_emissive';
 const ROOT_NAME = 'eastbrookTownRebuild';
 const FOUNDATION_OVERLAP = 0.03;
 const FOUNDATION_COLOR = 0x46505e;
+// Warm interior light for the kit buildings (owner refinement round 4): the
+// hexb GLBs carry no emissive materials (their windows are palette texels in
+// the KTX2 atlas), so each kit building gets one amber pane quad per window
+// assembly detected in the model's own geometry (kit_window_panes_core.ts),
+// riding the same vertex-color emissive ladder as the shape buildings'
+// authored windows. Panes derived from the real window frames sit exactly in
+// the models' openings; the earlier bounding-box guesses floated off walls.
+const KIT_WINDOW_AMBER = 0xffb45a;
 const TOWN_CULL_RADIUS =
   EASTBROOK_LAYOUT.wall.radius + EASTBROOK_LAYOUT.wall.maximumSegmentSpan / 2;
 /** The one reveal-gate key of the town's static content. */
 const STATIC_REVEAL_KEY = 'eastbrook-town-static';
 
+// Deduped: since round 3 the layout re-uses kit shells across buildings
+// (three hexb_home_a lots, two hexb_home_b), and this list is a set of
+// URLs to load, never a per-building roster.
 const NEW_ASSET_URLS = Object.freeze([
-  ...EASTBROOK_LAYOUT.buildings.map((building) => building.assetId),
-  EASTBROOK_LAYOUT.civic.wellBeacon.assetId,
-  EASTBROOK_LAYOUT.market.stalls[0].assetId,
-  EASTBROOK_LAYOUT.wall.assetId,
+  ...new Set([
+    ...EASTBROOK_LAYOUT.buildings.map((building) => building.assetId),
+    EASTBROOK_LAYOUT.civic.wellBeacon.assetId,
+    EASTBROOK_LAYOUT.market.stalls[0].assetId,
+    EASTBROOK_LAYOUT.wall.assetId,
+  ]),
 ]);
 const SUPPORT_ASSET_URLS = Object.freeze([
   EASTBROOK_LAYOUT.civic.benches[0].assetId,
@@ -107,6 +122,7 @@ export function prepareEastbrookTownProfileAssets(): Promise<void> {
 
 export function resetEastbrookTownProfileCaches(): void {
   preparedTemplates.clear();
+  kitWindowPaneCache.clear();
 }
 
 if (typeof window !== 'undefined') {
@@ -121,6 +137,9 @@ interface TownAssetTemplate {
   opaque: THREE.BufferGeometry | null;
   emissive: THREE.BufferGeometry | null;
   size: THREE.Vector3;
+  /** Kit buildings only: the raw GLB scene, rendered with its own materials
+   *  (KTX2 palette textures the atlas bake cannot read on the CPU). */
+  raw?: THREE.Object3D;
 }
 
 interface RoofHideTarget extends EastbrookRoofVisibilityTarget {
@@ -303,6 +322,19 @@ function prepareTemplates(
     if (cache.has(url)) continue;
     const source = sources.get(url);
     if (!source) throw new Error(`Eastbrook town asset was not preloaded: ${url}`);
+    // Kit buildings (the Galecrest hexb mix) render with their OWN GLB
+    // materials: their color lives in KTX2 palette textures the GPU samples,
+    // which the atlas vertex-color pipeline cannot bake (a compressed image
+    // is not CPU-readable; sampling it crashed the renderer). The raw scene
+    // rides the template cache for buildKitBuilding, and its GLB cache entry
+    // is never released (the clones share its textures).
+    if (isKitBuildingAsset(url)) {
+      const box = new THREE.Box3().setFromObject(source);
+      const kitSize = new THREE.Vector3();
+      box.getSize(kitSize);
+      cache.set(url, { opaque: null, emissive: null, size: kitSize, raw: source });
+      continue;
+    }
     cache.set(url, extractTemplate(source, url));
     if (release) {
       loadedSources.delete(url);
@@ -310,6 +342,260 @@ function prepareTemplates(
     }
   }
   return cache;
+}
+
+function isKitBuildingAsset(url: string): boolean {
+  return url.startsWith('/models/biome/');
+}
+
+// Kit materials keep their GLB textures; on the Lambert tiers they downgrade
+// like every town material (the Low-tier contract the surface-atlas suite
+// audits), carrying map, color, and emissive across.
+function kitMaterial(source: THREE.Material): THREE.Material {
+  if (GFX.standardMaterials) return cloneMaterialWithHooks(source);
+  const from = source as THREE.Material & {
+    map?: THREE.Texture | null;
+    color?: THREE.Color;
+    emissive?: THREE.Color;
+    emissiveMap?: THREE.Texture | null;
+  };
+  const lambert = new THREE.MeshLambertMaterial({
+    map: from.map ?? null,
+    color: from.color?.clone() ?? new THREE.Color(0xffffff),
+  });
+  if (from.emissive) lambert.emissive = from.emissive.clone();
+  if (from.emissiveMap) lambert.emissiveMap = from.emissiveMap;
+  lambert.name = source.name;
+  return lambert;
+}
+
+// Window panes per kit asset URL, derived once from the model's own window
+// assemblies (kit_window_panes_core.ts) in the raw attribute units of the
+// GLB's single mesh. Filled lazily by the first buildKitBuilding for an URL.
+const kitWindowPaneCache = new Map<string, KitWindowPane[]>();
+
+// The shipped kit GLBs decode their meshopt streams into INTERLEAVED
+// attributes (stride 4 with one pad lane), so the raw shared array is never
+// a tight per-vertex scan target. This copies the position lanes into a
+// tight typed array of the SAME element class, preserving the exact raw
+// (quantized) values the detector's exact-position vertex merge relies on.
+// A plain tight BufferAttribute passes its array through untouched.
+function tightRawPositions(
+  attribute: THREE.BufferAttribute | THREE.InterleavedBufferAttribute,
+): ArrayLike<number> {
+  if (attribute instanceof THREE.InterleavedBufferAttribute) {
+    const data = attribute.data;
+    const src = data.array as unknown as ArrayLike<number> & {
+      constructor: new (length: number) => number[];
+    };
+    const out = new src.constructor(attribute.count * 3);
+    for (let vertex = 0; vertex < attribute.count; vertex++) {
+      const base = vertex * data.stride + attribute.offset;
+      out[vertex * 3] = src[base];
+      out[vertex * 3 + 1] = src[base + 1];
+      out[vertex * 3 + 2] = src[base + 2];
+    }
+    return out;
+  }
+  return attribute.array as ArrayLike<number>;
+}
+
+function kitPanesForAsset(url: string, source: THREE.Object3D): KitWindowPane[] {
+  const cached = kitWindowPaneCache.get(url);
+  if (cached) return cached;
+  let firstMesh: THREE.Mesh | null = null;
+  source.traverse((child) => {
+    if (firstMesh === null && child instanceof THREE.Mesh) firstMesh = child;
+  });
+  // The closure assignment defeats narrowing: name the found mesh explicitly.
+  const first = firstMesh as THREE.Mesh | null;
+  const position = first?.geometry.getAttribute('position');
+  const panes =
+    position && first
+      ? kitWindowPanes(
+          tightRawPositions(position),
+          position.count,
+          (first.geometry.index?.array as ArrayLike<number> | undefined) ?? null,
+        )
+      : [];
+  kitWindowPaneCache.set(url, panes);
+  return panes;
+}
+
+// KHR_mesh_quantization: a normalized attribute renders as value / range on
+// the GPU, so pane quads authored in the raw attribute units the detector
+// scanned need the same factor to land in the mesh node's local space.
+// Interleaved attributes read their element class off the shared buffer.
+function normalizedAttributeScale(
+  attribute: THREE.BufferAttribute | THREE.InterleavedBufferAttribute,
+): number {
+  if (!attribute.normalized) return 1;
+  const array =
+    attribute instanceof THREE.InterleavedBufferAttribute ? attribute.data.array : attribute.array;
+  if (array instanceof Int8Array) return 1 / 127;
+  if (array instanceof Uint8Array) return 1 / 255;
+  if (array instanceof Int16Array) return 1 / 32767;
+  if (array instanceof Uint16Array) return 1 / 65535;
+  return 1;
+}
+
+// The merged lit-window geometry for one kit building, in raw model space:
+// each detected assembly's recessed glass plane as the model's own triangles
+// (kit_window_panes_core.ts), concatenated into one soup, dequantized and
+// moved by the mesh node's model-root transform (the caller settles
+// matrixWorld while the clone is parentless at the origin). A uniform amber
+// vertex color rides the same vertex-color emissive ladder as the shape
+// buildings' authored windows.
+function kitWindowPaneGeometry(
+  mesh: THREE.Mesh,
+  panes: readonly KitWindowPane[],
+): THREE.BufferGeometry | null {
+  const position = mesh.geometry.getAttribute('position');
+  if (panes.length === 0 || !position) return null;
+  let total = 0;
+  for (const pane of panes) total += pane.positions.length;
+  if (total === 0) return null;
+  const soup = new Float32Array(total);
+  let cursor = 0;
+  for (const pane of panes) {
+    soup.set(pane.positions, cursor);
+    cursor += pane.positions.length;
+  }
+  const merged = new THREE.BufferGeometry();
+  merged.setAttribute('position', new THREE.Float32BufferAttribute(soup, 3));
+  merged.computeVertexNormals();
+  const count = merged.getAttribute('position').count;
+  const tint = new THREE.Color(KIT_WINDOW_AMBER);
+  const colors = new Float32Array(count * 3);
+  for (let index = 0; index < count; index++) {
+    colors[index * 3] = tint.r;
+    colors[index * 3 + 1] = tint.g;
+    colors[index * 3 + 2] = tint.b;
+  }
+  merged.setAttribute('color', new THREE.BufferAttribute(colors, 3));
+  const scale = normalizedAttributeScale(position);
+  merged.scale(scale, scale, scale);
+  merged.applyMatrix4(mesh.matrixWorld);
+  return merged;
+}
+
+// A kit building: the raw GLB scene cloned with its own materials, scaled to
+// the layout's native dimensions and seated like every template building; the
+// roof-hide contract is identical so camera ghosting keeps working.
+function buildKitBuilding(
+  building: (typeof EASTBROOK_LAYOUT.buildings)[number],
+  source: THREE.Object3D,
+  groundAt: GroundAt,
+): { group: THREE.Group; hideTarget: RoofHideTarget } {
+  const dimensions = building.nativeDimensions;
+  const terrain = buildingTerrain(building, groundAt);
+  const foundationDepth = Math.max(0, terrain.entranceY - terrain.minimumY);
+
+  const clone = source.clone(true);
+  // World matrices settle while the clone is parentless at the origin: the
+  // window-pane bake below reads the mesh node's matrixWorld as its
+  // transform relative to the model root.
+  clone.updateMatrixWorld(true);
+  const box = new THREE.Box3().setFromObject(clone);
+  const size = new THREE.Vector3();
+  box.getSize(size);
+  const scaleX = dimensions.width / Math.max(size.x, 1e-4);
+  const scaleY = dimensions.height / Math.max(size.y, 1e-4);
+  const scaleZ = dimensions.depth / Math.max(size.z, 1e-4);
+  const mats: THREE.Material[] = [];
+  let firstKitMesh: THREE.Mesh | null = null;
+  clone.traverse((child) => {
+    if (!(child instanceof THREE.Mesh)) return;
+    if (firstKitMesh === null) firstKitMesh = child;
+    child.castShadow = true;
+    child.receiveShadow = true;
+    const list = Array.isArray(child.material) ? child.material : [child.material];
+    const cloned = list.map((m) => kitMaterial(m));
+    child.material = Array.isArray(child.material) ? cloned : cloned[0];
+    mats.push(...cloned);
+  });
+  const wrap = new THREE.Group();
+  wrap.add(clone);
+  // center the model on its footprint and rest its base at y 0 of the wrap
+  clone.position.set(-(box.min.x + size.x / 2), -box.min.y, -(box.min.z + size.z / 2));
+  wrap.scale.set(scaleX, scaleY, scaleZ);
+  // Lit window panes (owner refinement round 5): each assembly's recessed
+  // glass plane, lifted verbatim from the model's own window assemblies
+  // (kit_window_panes_core.ts) so the glow fits the openings exactly, baked
+  // into raw model space, added AFTER the shadow traverse and AS A SIBLING of
+  // the clone inside the wrap, so the panes keep castShadow false, inherit
+  // the wrap's scale-to-dimensions transform, and share the clone's centering
+  // offset. matrixWorld still holds the parentless-origin update from above:
+  // repositioning the clone does not recompute it.
+  const paneGeometry = firstKitMesh
+    ? kitWindowPaneGeometry(firstKitMesh, kitPanesForAsset(building.assetId, source))
+    : null;
+  if (paneGeometry) {
+    const paneMaterial = townMaterial(true, undefined, true);
+    paneMaterial.name = `eastbrookTownKitPanes:${building.id}`;
+    // A pane sits mid-opening and must read from both approaches.
+    paneMaterial.side = THREE.DoubleSide;
+    // The pane triangles are coplanar with the model's own glass geometry;
+    // the polygon offset wins the depth fight without geometric displacement.
+    paneMaterial.polygonOffset = true;
+    paneMaterial.polygonOffsetFactor = -2;
+    paneMaterial.polygonOffsetUnits = -2;
+    const panes = new THREE.Mesh(paneGeometry, paneMaterial);
+    panes.name = `eastbrookBuildingEmissive:${building.id}`;
+    panes.castShadow = false;
+    panes.receiveShadow = false;
+    panes.position.copy(clone.position);
+    wrap.add(panes);
+    mats.push(paneMaterial);
+  }
+
+  const group = new THREE.Group();
+  group.name = `eastbrookBuilding:${building.id}`;
+  group.userData.eastbrookBuildingId = building.id;
+  group.userData.assetId = building.assetId;
+  group.userData.assetUrl = building.assetId;
+  group.userData.position = building.position;
+  group.userData.rotation = building.rotation;
+  group.userData.target = building.nativeDimensions;
+  group.userData.front = building.frontStandingPoint;
+  group.userData.foundationDepth = foundationDepth;
+  group.position.set(building.position.x, terrain.entranceY, building.position.z);
+  group.rotation.y = building.rotation;
+  group.add(wrap);
+  if (foundationDepth > 1e-4) {
+    const height = foundationDepth + FOUNDATION_OVERLAP;
+    const skirtGeometry = coloredBox(
+      dimensions.width,
+      height,
+      dimensions.depth,
+      (FOUNDATION_OVERLAP - foundationDepth) / 2,
+    );
+    const skirtMaterial = townMaterial(false, undefined, true);
+    skirtMaterial.name = `eastbrookTownKitSkirt:${building.id}`;
+    const skirt = new THREE.Mesh(skirtGeometry, skirtMaterial);
+    skirt.castShadow = false;
+    skirt.receiveShadow = true;
+    group.add(skirt);
+    mats.push(skirtMaterial);
+  }
+
+  return {
+    group,
+    hideTarget: {
+      group,
+      mats: mats.map(occluderFadeMat),
+      hidden: false,
+      alpha: 1,
+      x: building.position.x,
+      z: building.position.z,
+      halfWidth: dimensions.width / 2,
+      halfDepth: dimensions.depth / 2,
+      cosine: Math.cos(building.rotation),
+      sine: Math.sin(building.rotation),
+      topY: terrain.entranceY + dimensions.height,
+      cullRadius: building.maxCornerRadius,
+    },
+  };
 }
 
 function materialOptions(emissive: boolean, atlas = eastbrookSurfaceAtlasTexture()) {
@@ -911,6 +1197,17 @@ function buildFromTemplates(
   const roofHideTargets: RoofHideTarget[] = [];
   const buildingGroups: THREE.Object3D[] = [];
   for (const building of EASTBROOK_LAYOUT.buildings) {
+    const kitTemplate = templates.get(building.assetId);
+    if (kitTemplate?.raw) {
+      const built = buildKitBuilding(building, kitTemplate.raw, groundAt);
+      group.add(built.group);
+      roofHideTargets.push(built.hideTarget);
+      // A kit building is a reveal root like any other: its kit materials are
+      // unshared with the batches, and roofHideTargets stays index-aligned
+      // with buildingGroups (the footprint anchors are built from that pair).
+      buildingGroups.push(built.group);
+      continue;
+    }
     const template = templates.get(building.assetId);
     if (!template) throw new Error(`Eastbrook town template is missing: ${building.assetId}`);
     const built = buildBuilding(building, template, groundAt, atlas);
@@ -1071,12 +1368,18 @@ export function buildEastbrookTownView(seed: number): EastbrookTownView {
     return buildFromTemplates(preparedTemplates, () => 0, false, undefined);
   }
   prepareTemplates(loadedSources, preparedTemplates, true);
-  return buildFromTemplates(
+  const view = buildFromTemplates(
     preparedTemplates,
     (x, z) => terrainHeight(x, z, seed),
     true,
     eastbrookSurfaceAtlasTexture(),
   );
+  // The harbor waterfront rides the town view's group: quay boardwalk and
+  // piers from the same deck rectangles groundHeight walks
+  // (render/eastbrook_harbor.ts), so the parent's category tag and matrix
+  // freeze cover it.
+  view.group.add(buildEastbrookHarbor(seed));
+  return view;
 }
 
 function sameNumber(left: number, right: number): boolean {

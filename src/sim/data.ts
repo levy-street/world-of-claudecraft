@@ -166,6 +166,19 @@ import {
 import { PRACTICE_DUMMY_CAMPS, PRACTICE_DUMMY_MOBS } from './content/practice_dummies';
 import { STATIONS } from './content/professions';
 import {
+  PROVING_SHORE_CAMPS,
+  PROVING_SHORE_ITEMS,
+  PROVING_SHORE_MOBS,
+  PROVING_SHORE_NPCS,
+  PROVING_SHORE_OBJECTS,
+  PROVING_SHORE_PORTALS,
+  PROVING_SHORE_PROPS,
+  PROVING_SHORE_QUEST_ORDER,
+  PROVING_SHORE_QUESTS,
+  PROVING_SHORE_ROADS,
+  PROVING_SHORE_ZONE,
+} from './content/proving_shore';
+import {
   REALM_CAMPS,
   REALM_ITEMS,
   REALM_MOBS,
@@ -197,7 +210,6 @@ import {
   TEMPLE_QUEST_ORDER,
   TEMPLE_QUESTS,
 } from './content/temple';
-import { VALE_CUP_BALL_MOB, VALE_CUP_BALL_TEMPLATE_ID } from './content/vale_cup';
 import { WARLOCK_PET_MOBS } from './content/warlock_pets';
 import { WILDHEART_DUNGEON_DEFS, WILDHEART_ITEMS, WILDHEART_MOBS } from './content/wildheart';
 import {
@@ -230,8 +242,14 @@ import {
 } from './content/wraithwood';
 import { YUMI_MOBS } from './content/yumi';
 import {
+  COPPER_DIG_TERRAIN_EDITS,
+  EASTBROOK_QUAY_TERRAIN_EDITS,
   GRAVEYARD_POS,
+  HARBOR_SAND_TERRAIN_EDITS,
   LAKE,
+  SOWFIELD_BEACH_TERRAIN_EDITS,
+  SOWFIELD_SEABED_TERRAIN_EDITS,
+  TOWN_PLAT_TERRAIN_EDITS,
   TOWN_RADIUS,
   ZONE1_CAMPS,
   ZONE1_CHAPEL_CAMPS,
@@ -350,6 +368,7 @@ export const ITEMS: Record<string, ItemDef> = mergeItems(
   GALECREST_ITEMS,
   FARSHORE_ITEMS,
   WILDHEART_ITEMS,
+  PROVING_SHORE_ITEMS,
   DUNGEON_KEEPSAKE_ITEMS,
 );
 
@@ -382,9 +401,7 @@ export const MOBS: Record<string, MobTemplate> = {
   ...EVERGARDEN_MOBS,
   ...GALECREST_MOBS,
   ...FARSHORE_MOBS,
-  // The Vale Cup boarball: an inert, non-hostile ball entity (never camp-spawned;
-  // the match driver in social/vale_cup.ts spawns and despawns it).
-  [VALE_CUP_BALL_TEMPLATE_ID]: VALE_CUP_BALL_MOB,
+  ...PROVING_SHORE_MOBS,
 };
 
 // Heroic upgraded drop variants: generated from the base item + mob loot tables and
@@ -413,6 +430,9 @@ export const NPCS: Record<string, NpcDef> = {
   ...EVERGARDEN_NPCS,
   ...GALECREST_NPCS,
   ...FARSHORE_NPCS,
+  // The Proving Shore cast (tutorial island) appends after every shipped NPC
+  // for the same insertion-order stability reason as the realms above.
+  ...PROVING_SHORE_NPCS,
   // The Spirit Healer template (dynamic: true, so the ctor's surface-placement
   // loop skips it). Kept in NPCS so the online client and world_entity_i18n can
   // resolve its name; spirit.ts spawns a copy at every graveyard.
@@ -439,6 +459,7 @@ export const QUESTS: Record<string, QuestDef> = {
   ...EVERGARDEN_QUESTS,
   ...GALECREST_QUESTS,
   ...FARSHORE_QUESTS,
+  ...PROVING_SHORE_QUESTS,
 };
 
 export const QUEST_ORDER: string[] = [
@@ -457,6 +478,7 @@ export const QUEST_ORDER: string[] = [
   ...EVERGARDEN_QUEST_ORDER,
   ...GALECREST_QUEST_ORDER,
   ...FARSHORE_QUEST_ORDER,
+  ...PROVING_SHORE_QUEST_ORDER,
 ];
 
 // The Book of Deeds catalog (content/deeds.ts) is deliberately NOT re-exported
@@ -476,7 +498,7 @@ export const CAMPS: CampDef[] = [
   ...ZONE3_CAMPS,
   ...TEMPLE_CAMPS,
   ...ZONE1_CHAPEL_CAMPS,
-  { mobId: 'grix_the_tunnelking', center: { x: -95, z: -78 }, radius: 4, count: 1 },
+  { mobId: 'grix_the_tunnelking', center: { x: -45, z: 128 }, radius: 4, count: 1 },
   // Veiled Hollow camps stay LAST for the same draw-order reason; the two
   // northern realms append after it in registration order.
   ...REALM_CAMPS,
@@ -506,12 +528,19 @@ export const CAMPS: CampDef[] = [
   // The Drakelands dragonkin brood belt (v0.35 rework) arrived after the
   // knights: same append-last rule, so every camp above keeps its draws.
   ...DRAKELANDS_BROOD_CAMPS,
-  // The Highwatch practice row (content/practice_dummies.ts) is last of all,
-  // same append-last rule. These three draw no world-gen rng at all (the spawn
+  // The Highwatch practice row (content/practice_dummies.ts) follows, same
+  // append-last rule. These three draw no world-gen rng at all (the spawn
   // loop's dummy branch is rng-free), so they cannot move an earlier camp even
   // in principle; they sit here so the array's one ordering rule has no
   // exceptions to remember.
   ...PRACTICE_DUMMY_CAMPS,
+  // The Proving Shore's camps are all offStream (private rng sub-streams), so
+  // their position in this array cannot shift any earlier camp's SHARED-STREAM
+  // draws; they still append LAST by the standing rule. Entity ids after the
+  // camps loop DO shift (+1 per new construction-time entity), so id-seeded
+  // private streams (mob/idle_rng.ts) move: a content append like this one
+  // legitimately re-mints the parity goldens without touching a draw digest.
+  ...PROVING_SHORE_CAMPS,
 ];
 
 // Escort quest runs (src/sim/escort.ts): defs authored per realm, merged here
@@ -539,6 +568,7 @@ export const GROUND_OBJECTS: GroundObjectDef[] = [
   ...EVERGARDEN_OBJECTS,
   ...GALECREST_OBJECTS,
   ...FARSHORE_OBJECTS,
+  ...PROVING_SHORE_OBJECTS,
 ];
 
 export const GATHER_NODES: GatherNodeDef[] = [...GATHER_NODES_CONTENT];
@@ -565,6 +595,7 @@ export const ROADS: { x: number; z: number }[][] = [
   ...EVERGARDEN_ROADS,
   ...GALECREST_ROADS,
   ...FARSHORE_ROADS,
+  ...PROVING_SHORE_ROADS,
 ];
 
 // Paired overworld portals (src/sim/portals.ts checks these each tick).
@@ -579,6 +610,7 @@ export const PORTALS: PortalDef[] = [
   ...EVERGARDEN_PORTALS,
   ...GALECREST_PORTALS,
   ...FARSHORE_PORTALS,
+  ...PROVING_SHORE_PORTALS,
 ];
 
 export const PROPS: ZonePropsDef = mergeProps([
@@ -597,6 +629,7 @@ export const PROPS: ZonePropsDef = mergeProps([
   EVERGARDEN_PROPS,
   GALECREST_PROPS,
   FARSHORE_PROPS,
+  PROVING_SHORE_PROPS,
 ]);
 
 function mergeProps(sets: ZonePropsDef[]): ZonePropsDef {
@@ -678,6 +711,7 @@ export const ZONES: ZoneDef[] = [
   EVERGARDEN_ZONE,
   GALECREST_ZONE,
   FARSHORE_ZONE,
+  PROVING_SHORE_ZONE,
 ];
 
 export const WORLD_SIZE = 360; // the original strip's width (one grid column)
@@ -728,7 +762,15 @@ export const BUILTIN_WORLD: WorldContent = {
   // invisible collision walls: the moderation cage plus the Last Keep's
   // sealed building slot (castle_layout.ts CASTLE_BLOCKERS)
   blockers: [...JAIL_BLOCKERS, ...CASTLE_BLOCKERS],
-  terrainEdits: JAIL_TERRAIN_EDITS,
+  terrainEdits: [
+    ...JAIL_TERRAIN_EDITS,
+    ...COPPER_DIG_TERRAIN_EDITS,
+    ...TOWN_PLAT_TERRAIN_EDITS,
+    ...SOWFIELD_BEACH_TERRAIN_EDITS,
+    ...EASTBROOK_QUAY_TERRAIN_EDITS,
+    ...HARBOR_SAND_TERRAIN_EDITS,
+    ...SOWFIELD_SEABED_TERRAIN_EDITS,
+  ],
 };
 
 let activeWorld: WorldContent = BUILTIN_WORLD;
@@ -1109,30 +1151,11 @@ export function delveOrigin(delveIndex: number, slot: number): { x: number; z: n
   return { x: DELVE_X_MIN + delveIndex * 600, z: DELVE_Z0 + slot * DELVE_SLOT_SPACING };
 }
 
-// ---------------------------------------------------------------------------
-// Vale Cup practice pitches: private instanced copies of the Sowfield football
-// pitch, one per slot stacked along z at a single far-east x. They sit in the
-// flat instance plane (x > DUNGEON_X_THRESHOLD, so groundHeight returns the flat
-// instance floor) in a band BETWEEN the delve band and the rift band, so no
-// delve/rift detector claims them. Real matches play on the actual overworld
-// Sowfield; only private practice runs use this band (vale_cup_layout
-// .vcPracticeOrigin). The world-grid work moved the whole instance plane east to
-// INSTANCE_X_BASE, so this had to move with it (it was a bare x=30000 before,
-// which is real-terrain ground now that the grid delve band sits far higher).
-// ---------------------------------------------------------------------------
-// Band lower edge: delve rooms (which reach ~INSTANCE_X_BASE + 5400) end below
-// this, and the rift band begins above VC_PRACTICE_X.
-export const VC_PRACTICE_BAND_X_MIN = INSTANCE_X_BASE + 6000;
-export const VC_PRACTICE_X = INSTANCE_X_BASE + 7000;
-
+// The delve band's upper edge is the rift band directly: the Vale Cup practice
+// band that used to sit between them left with the minigame (the New Eastbrook
+// program), and its x-range stays empty instance plane.
 export function isDelvePos(x: number): boolean {
-  return x >= DELVE_BAND_X_MIN && x < VC_PRACTICE_BAND_X_MIN;
-}
-
-// True inside the Vale Cup practice band (flat instance ground, not a delve or
-// rift). Real matches are on the overworld Sowfield, not here.
-export function isVcPracticePos(x: number): boolean {
-  return x >= VC_PRACTICE_BAND_X_MIN && x < RIFT_BAND_X_MIN;
+  return x >= DELVE_BAND_X_MIN && x < RIFT_BAND_X_MIN;
 }
 
 // ---------------------------------------------------------------------------

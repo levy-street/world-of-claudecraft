@@ -2817,17 +2817,6 @@ const ABILITY_RECIPES: Record<string, IconRecipe> = {
     ['tendrils', { p: 'claw_slash', ...BR }],
     ['motion', 'crack'],
   ),
-  // the Vale Cup sport kit (boarball): the 'coin' disc reads as the ball
-  sport_kick: r('earth', 'leather', ['coin', { p: 'boot', ...BR }]),
-  sport_shoot: r('fury', 'ember', ['coin', { p: 'boot', ...BR }], ['motion']),
-  sport_pass: r('nature', 'gold', ['coin', { p: 'boot', ...TL }], ['motion']),
-  sport_boot: r('fury', 'gold', ['coin', { p: 'boot', ...BR }], ['motion']),
-  sport_hoof: r('fury', 'steel', ['boot', { p: 'coin', ...TR }], ['arcs']),
-  sport_punt: r('nature', 'leafGreen', ['coin', { p: 'sunburst', ...TL }], ['motion']),
-  sport_feint: r('shadow', 'steel', ['boot'], ['arcs']),
-  sport_dive: r('earth', 'leather', ['gauntlet', { p: 'coin', ...TR }], ['motion']),
-  sport_shoulder: r('fury', 'steel', ['pauldron', { p: 'claw_slash', ...BR }]),
-  sport_second_wind: r('nature', 'leafGreen', ['boot', { p: 'leaf', ...TR }], ['glow']),
   // priest
   smite: r('holy', 'holyGold', ['bolt', { p: 'sunburst', ...TL }], ['glow']),
   lesser_heal: r('holy', 'silverWhite', ['cross'], ['glow']),
@@ -4755,16 +4744,6 @@ export const ABILITY_IMAGE_IDS = new Set<string>([
   'enrage_passive',
   'measured_fury',
   'seasoned_soldier',
-  'sport_boot',
-  'sport_dive',
-  'sport_feint',
-  'sport_hoof',
-  'sport_kick',
-  'sport_pass',
-  'sport_punt',
-  'sport_second_wind',
-  'sport_shoot',
-  'sport_shoulder',
   'sudden_death',
 ]);
 
@@ -5303,7 +5282,11 @@ export const UI_ITEM_IMAGE_IDS = new Set<string>(['backpack']);
 // future development-only item may still use it temporarily. tests/item_icons.test.ts holds
 // the line from both sides: it rejects stale entries after art lands and unenumerated art
 // debt. Do not add to this list merely to silence that failure; commission the art.
-// Empty again after the hunter quiver art landed in the same branch that enumerated it.
+// Empty again after the hunter quiver art landed in the same branch that enumerated it,
+// and still empty with the Proving Shore pair: the island's castaway crate and ferry
+// bell icons are rendered from their own world models
+// (scripts/render_island_item_icons.mjs), so they ship with committed art like
+// every other item.
 export const ITEM_ART_PENDING = new Set<string>();
 
 /** Static URL of an item's (or a UI pseudo-item's) image icon, or null if it uses a recipe. */
@@ -5334,6 +5317,9 @@ export const DEED_ART_PENDING: ReadonlySet<string> = new Set([
   // (docs/achievements/icon-brief.md).
   'exp_the_last_keep',
   'exp_dawnhold_castle',
+  // The Proving Shore graduation deed rides the deed_cat_progression crest
+  // until its commissioned art lands (docs/achievements/icon-brief.md).
+  'prog_ready_for_an_adventure',
 ]);
 /** Static URL of a deed crest's painted art, or null when the crest id has no committed image. */
 export function deedImageUrl(crestId: string): string | null {

@@ -148,6 +148,7 @@ import { type AugmentSpecial, type AugmentTier, POWERUPS_BY_ID } from './content
 import { applyTalentMods } from './content/classes';
 import { DEFAULT_MOUNT, type MountKey } from './content/mounts';
 import { GATHERING_PROFESSION_IDS, type GatheringProfessionId } from './content/professions';
+import { PROVING_SHORE_ARRIVAL } from './content/proving_shore';
 import { PTR_DEV_VENDOR_DEF } from './content/ptr_dev_vendor';
 import { FURY_ENTITY_ID, FURY_NPC_ID } from './content/pvp_honor';
 import {
@@ -281,6 +282,7 @@ import {
   type DeedsLeaderboardPage,
   type DevLeaderboardPage,
   type GuildLeaderboardPage,
+  type GuildRosterInfo,
   LEADERBOARD_PAGE_SIZE,
   type LeaderboardPage,
   paginateDeedsLeaderboard,
@@ -567,6 +569,9 @@ import {
   CURRENT_CHARACTER_CONTENT_REVISION,
   migrateCharacterTalentsV2,
 } from './talent_save_migration';
+import { updateAbilityDrill } from './tutorial/ability_drill';
+import { updateGauntletRuns } from './tutorial/gauntlet_run';
+import { resolveStartTutorial, updateTutorialGreeting } from './tutorial/greeting';
 import * as unstuckMod from './unstuck';
 import {
   rollWorldBossLoot as rollWorldBossLootImpl,
@@ -694,9 +699,6 @@ import {
 import * as fiestaBotsMod from './social/fiesta_bots';
 import { PartyMachine } from './social/party';
 import * as readyCheckMod from './social/ready_check';
-import * as valeCupMod from './social/vale_cup';
-import { createVcState, type VcState } from './social/vale_cup';
-import * as valeCupBotsMod from './social/vale_cup_bots';
 import { SpatialGrid } from './spatial';
 import { diminishedCrowdControlDuration as diminishedCrowdControlDurationImpl } from './stun_dr';
 import { Targeting } from './targeting';
@@ -783,12 +785,9 @@ import {
   type SimEvent,
   type SkinCatalog,
   type SkinRank,
-  type SportRole,
   SUNDER_ARMOR_PCT_PER_STACK,
   steadyAngleTo,
   swingMissChance,
-  type VcBracket,
-  type VcNationId,
   type Vec3,
   virtualLevel,
   type WeaponSkinLoadout,
@@ -1469,12 +1468,11 @@ export interface PlayerMeta {
   bgLosses: number;
   bgDraws: number;
   bgCaptures: number;
-  // The Vale Cup (docs/prd/vale-cup.md). `sportRole` is the temporary sport-kit
-  // role while seated in a Sowfield match: SESSION-ONLY, never serialized
-  // (known is derived on load, so persistence is naturally safe with no restore
-  // snapshot). The W/L/D standing persists in CharacterState, absent until the
-  // first result so pre-cup saves and the parity samples are untouched.
-  sportRole: SportRole | null;
+  // The retired Vale Cup's persisted standings (the minigame left with the
+  // New Eastbrook program; docs/design/eastbrook-revamp/master-plan.md). The
+  // W/L/D standing persists in CharacterState, absent until the first result,
+  // so historical earners keep their record and the retired deed catalog rows
+  // keep reading real progress.
   vcupWins: number;
   vcupLosses: number;
   vcupDraws: number;
@@ -1605,6 +1603,16 @@ export interface PlayerMeta {
   // Persisted in CharacterState so no later load can re-fire it (the
   // guildLetterSent idiom).
   profTierTutorialSent: boolean;
+  // One-time spawn greeting sent (tutorial island; sim/tutorial/greeting.ts):
+  // flipped on a character's first swept tick, silently for established
+  // characters. Persisted in CharacterState so no later load can re-fire it
+  // (the guildLetterSent idiom).
+  tutorialGreetingSent: boolean;
+  // Whether this is the account's FIRST character. TRANSIENT: never
+  // serialized; the server recomputes it from the character table at every
+  // join (the bankBonus idiom) and the offline Sim, which is stateless by
+  // design, is always a first character. Read only by the tutorial greeting.
+  firstCharacter: boolean;
   // In-memory trend-nudge cadence (Professions 2.0). TRANSIENT: never
   // serialized (a restart reopens the window, deliberately: the nudge is a hint,
   // not an award), and empty at construction and on load, so the parity sampler
@@ -1870,6 +1878,10 @@ export interface CharacterState {
   // so older saves load cleanly and fire it once when they first qualify).
   // Written only when true (zero-default omission).
   profTierTutorialSent?: boolean;
+  // Spawn greeting already sent (tutorial island; JSONB, optional so older
+  // saves load cleanly and latch silently on their next swept tick).
+  // Written only when true (zero-default omission).
+  tutorialGreetingSent?: boolean;
   // World-boss loot lockouts now ride `raidLockouts` (keyed worldboss:<mobId>). The
   // legacy per-day `worldBossDaily` field is intentionally dropped: pre-migration saves
   // that still carry it just ignore it (a player locked at deploy may loot once more, a
@@ -2047,6 +2059,12 @@ export class Sim {
   readonly playerGrid = new SpatialGrid();
   private engagedPids = new Set<number>();
   primaryId = -1; // the local/RL player in single-player contexts
+  // The pid of the player the CONSTRUCTOR itself created (cfg.noPlayer false),
+  // -1 on a server-shaped sim. The compulsory-tutorial sweep ferries only this
+  // player or persisted-row characters; the first addPlayer on a noPlayer sim
+  // claims primaryId too, and a test fixture's probe character must never be
+  // mistaken for the offline player (tutorial/greeting.ts).
+  private ownPlayerPid = -1;
   nextId = 1;
   events: SimEvent[] = [];
   // Owned by E1 (entity_roster drains it); stays on Sim because N1/M3 schedule into
@@ -2107,10 +2125,6 @@ export class Sim {
   readonly bgProposals: bgProposalMod.BgProposal[] = [];
   readonly bgProposalLockouts = new Map<number, number>();
   nextBgProposalId = 1;
-  // The Vale Cup boarball state (social/vale_cup.ts): ONE holder object (the
-  // per-bracket queues, the single Sowfield match slot, the Groundskeeper's
-  // deserter book, and the live bot pids), exposed as the live ctx.vcup view.
-  vcup: VcState = createVcState();
   // per-player chat token bucket (anti-spam); refilled lazily by sim time
   private chatTokens = new Map<number, { tokens: number; at: number }>();
   // per-player set of opt-in global channels (world, lfg) joined via /join
@@ -2152,6 +2166,10 @@ export class Sim {
   // local one, so a daily never rolls over mid-evening the way midnight UTC did.
   // Empty string = "no calendar known" (headless/replay), same contract as utcDay.
   resetDay = '';
+  // The weekend event early-open probe: the reset-day key DOUBLE_HONOR_LEAD_HOURS
+  // ahead of now, fed by the host beside resetDay (server: `eventLeadDayKey`;
+  // offline: `feedSimCalendar`). '' = no calendar, the event never opens early.
+  eventLeadDay = '';
   // the World Market (the Merchant's auction house): the Market instance owns the
   // listing book, per-seller collections, the id counter, and the Merchant entity
   // id. Constructed in the ctor after the SimContext (it consumes the seam); Sim
@@ -2298,9 +2316,9 @@ export class Sim {
       devCommands: this.devCommands,
       worldBossAtBoot: cfg.worldBossAtBoot ?? false,
       riftPortals: cfg.riftPortals ?? false,
+      compulsoryTutorial: cfg.compulsoryTutorial ?? false,
       lockoutNowMs: cfg.lockoutNowMs ?? (() => Math.floor(this.time * 1000)),
       raidResetMs: cfg.raidResetMs ?? ((nowMs: number) => nowMs + DEFAULT_RAID_LOCKOUT_MS),
-      valeCupShowcase: cfg.valeCupShowcase ?? false,
       // Carried through so the renderer (which reaches the Sim as IWorld) can read
       // the same custom world via sim.cfg.world. Undefined for the built-in world.
       world: cfg.world,
@@ -2492,6 +2510,7 @@ export class Sim {
       box.templateId = 'mailbox';
       box.objectItemId = null;
       box.lootable = true; // interactable
+      if (boxDef.facing !== undefined) box.facing = boxDef.facing;
       this.addEntity(box);
       this.postOffice.mailboxIds.push(box.id);
     }
@@ -2553,19 +2572,6 @@ export class Sim {
     // Per-instance dungeon/raid healers spawn on claim (instances/dungeons.ts).
     // createNpc draws no rng, so world-gen determinism is preserved.
     spawnOverworldSpiritHealers(this.ctx, worldContent.services?.graveyards ?? []);
-
-    // Groundskeeper Bram at the Sowfield gate (Vale Cup). Placed through the
-    // SAME findSafePos path as the generic NPC loop above, but under a RESERVED
-    // entity id outside the nextId sequence (and after the rng-drawing camp
-    // loop), so world-gen determinism AND the parity goldens' pinned id
-    // sequence are both preserved. See social/vale_cup.ts VALE_CUP_BRAM_ID.
-    {
-      const bramDef = worldContent.npcs.groundskeeper_bram;
-      if (bramDef) {
-        const safe = this.findSafePos(bramDef.pos.x, bramDef.pos.z, waterLevel() + 0.6);
-        valeCupMod.spawnGroundskeeper(this.ctx, bramDef, safe);
-      }
-    }
 
     // FURY uses a reserved id and spawns after the rng-driven world roster, so
     // the Honor Quartermaster cannot perturb existing entity ids or replay RNG.
@@ -2703,7 +2709,26 @@ export class Sim {
     if (cfg.noPlayer && this.devCommands) this.spawnHealerPracticeDummy();
 
     if (!cfg.noPlayer) {
-      this.addPlayer(this.cfg.playerClass, this.cfg.playerName, { autoEquip: this.cfg.autoEquip });
+      this.ownPlayerPid = this.addPlayer(this.cfg.playerClass, this.cfg.playerName, {
+        autoEquip: this.cfg.autoEquip,
+      });
+      // The compulsory tutorial starts ASHORE, not one greeting sweep later.
+      // An offline session is always a fresh character, so landing at the
+      // mainland spawn first would stream Eastbrook behind the loading screen
+      // and then teleport away from it a second afterwards, paying for both
+      // worlds to show one. The greeting sweep's already-ashore arm then just
+      // plays Odo's welcome. Online is unaffected: the server rolls the
+      // newborn row at the same arrival (server/main.ts initialCharacterState).
+      const ownPlayer = this.cfg.compulsoryTutorial
+        ? this.entities.get(this.ownPlayerPid)
+        : undefined;
+      if (ownPlayer) {
+        ownPlayer.pos = this.groundPos(PROVING_SHORE_ARRIVAL.x, PROVING_SHORE_ARRIVAL.z);
+        ownPlayer.prevPos = { ...ownPlayer.pos };
+        ownPlayer.facing = PROVING_SHORE_ARRIVAL.facing;
+        ownPlayer.prevFacing = ownPlayer.facing;
+        this.rebucket(ownPlayer);
+      }
     }
 
     // Escort quest NPCs (src/sim/escort.ts). Last on purpose: the spawns draw
@@ -2847,6 +2872,12 @@ export class Sim {
       autoEquip?: boolean;
       state?: CharacterState;
       characterId?: number;
+      // Pre-latch the compulsory-tutorial one-shot (sim/tutorial/greeting.ts):
+      // the server passes true for a BARE join (null character state), which
+      // is the test-harness shape, so a fixture character is never ferried
+      // off the spot its test put it on. A real character row always carries
+      // creation state and rides the ferry normally.
+      tutorialGreetingSent?: boolean;
       // Server-stamped bank bonus slots, recomputed from account facts at every
       // join (email/Discord/wallet/referrals). Overrides the persisted value so
       // unlinking lowers capacity at the next login; a shrink below the used slot
@@ -2854,6 +2885,11 @@ export class Sim {
       // deposits refuse, nothing is destroyed). Never passed offline (bonusSlots
       // stays the sanitized save value, [] breakdown).
       bankBonus?: { bonusSlots: number; sources: BankBonusSource[] };
+      // Server-stamped account fact, recomputed at every join like bankBonus:
+      // whether this is the account's first character. Never persisted; the
+      // offline Sim omits it and defaults to true (offline is stateless).
+      // Read only by the tutorial greeting (sim/tutorial/greeting.ts).
+      firstCharacter?: boolean;
       // The character's authored modular look (characters.appearance column,
       // normalized at write; NOT part of CharacterState, so serializeCharacter
       // never re-emits it). Stamped onto the entity so it rides the identity
@@ -3009,7 +3045,6 @@ export class Sim {
       bgCaptures: Number.isFinite(savedState?.bgCaptures)
         ? Math.max(0, savedState?.bgCaptures as number)
         : 0,
-      sportRole: null,
       vcupWins: savedState?.vcupWins ?? 0,
       vcupLosses: savedState?.vcupLosses ?? 0,
       vcupDraws: savedState?.vcupDraws ?? 0,
@@ -3054,6 +3089,8 @@ export class Sim {
       tierMailSent: new Map(),
       questedHobbies: new Map(),
       profTierTutorialSent: false,
+      tutorialGreetingSent: opts?.tutorialGreetingSent === true,
+      firstCharacter: opts?.firstCharacter ?? true,
       profNudgeCadence: new Map(),
       archetype: emptyArchetypeState(),
       delveMarks: 0,
@@ -3458,6 +3495,7 @@ export class Sim {
       // character left the pair is the entire point (professions/hobby_memory.ts).
       meta.questedHobbies = normalizeHobbyMemoryOnLoad(s.questedHobbies);
       meta.profTierTutorialSent = s.profTierTutorialSent === true;
+      meta.tutorialGreetingSent = s.tutorialGreetingSent === true;
       meta.delveMarks = s.delveMarks ?? 0;
       meta.delveClears = { ...(s.delveClears ?? {}) };
       meta.companionUpgrades = { ...(s.companionUpgrades ?? {}) };
@@ -3909,12 +3947,6 @@ export class Sim {
     // the offline Sim / headless env from leaking cardDuels/cardDuelQueue
     // entries for a departed pid).
     this.leaveCardMinigameEntirely(pid);
-    // Vale Cup: leaving the queue is free; deserting a counted match benches
-    // the fighter (the team plays short), takes the loss, and arms the
-    // Groundskeeper's lockout. Idempotent: the server already resolved it
-    // before the leave save (vcupResolveDesertion is a public delegate).
-    valeCupMod.vcupDequeue(this.ctx, pid);
-    valeCupMod.vcupResolveDesertion(this.ctx, pid);
     this.party.partyInvites.delete(pid);
     this.tradeInvites.delete(pid);
     this.duelInvites.delete(pid);
@@ -4046,11 +4078,6 @@ export class Sim {
     // forces a fresh re-summon instead of laundering the summon cooldown for free.
     // Hunter pets (non-demon) persist. See pet_commands.isDemonPetState.
     const petSnapshot = this.serializePet(pid);
-    // Seated in a Vale Cup match: persist the pre-match RETURN spot, never a
-    // mid-pitch position (a mid-match save or desertion must not strand the
-    // character on the Sowfield). The stowed pet persists via serializePet's
-    // delvePetStash fallback; known/sportRole are session-derived, not saved.
-    const cupReturn = valeCupMod.vcupReturnFor(this.ctx, pid);
     // One fold serves both persisted proficiency keys below: the live counters
     // plus any still-queued grants (foldPendingGatherGrants), so a leave-time
     // save landing between the tick that queued a grant and the tick that
@@ -4123,8 +4150,8 @@ export class Sim {
         e.resource,
         e.savedMana,
       ),
-      pos: cupReturn ? { x: cupReturn.x, z: cupReturn.z } : { x: e.pos.x, z: e.pos.z },
-      facing: cupReturn ? cupReturn.facing : e.facing,
+      pos: { x: e.pos.x, z: e.pos.z },
+      facing: e.facing,
       // Death state: a released spirit resumes its corpse run on relog, and a
       // dead-but-unreleased corpse auto-releases on load (see addPlayer).
       dead: e.dead,
@@ -4297,6 +4324,7 @@ export class Sim {
           }
         : {}),
       ...(meta.profTierTutorialSent ? { profTierTutorialSent: true } : {}),
+      ...(meta.tutorialGreetingSent ? { tutorialGreetingSent: true } : {}),
       townFocus: { ...meta.townFocus },
       // World-boss lockouts serialize via raidLockouts (above), not a separate field.
       // Book of Deeds: every field conditional (absent while empty/null/zero)
@@ -4552,6 +4580,16 @@ export class Sim {
    *  full retro pass grants exactly that one deed and re-checks the rest as
    *  no-ops. Any later membership change is a genuine live join: mark dirty for
    *  the normal unlock path (banner, audio, broadcast gate). */
+  /** Server-stamped guild pledge presentation (docs/prd/guild-pledge-board.md):
+   *  the pledged guild's name ('' for none) and the guild colour tier for the
+   *  nameplate line. Display only; membership stays setPlayerGuild's. */
+  setPlayerPledge(pid: number, pledgeGuild: string, guildTier: number): void {
+    const e = this.entities.get(pid);
+    if (!e) return;
+    e.pledgeGuild = pledgeGuild;
+    e.guildTier = guildTier;
+  }
+
   setPlayerGuild(pid: number, guild: string, opts: { retroDeeds?: boolean } = {}): void {
     const e = this.entities.get(pid);
     if (!e) return;
@@ -4573,7 +4611,6 @@ export class Sim {
   renamePlayerGuild(pid: number, oldName: string, newName: string): void {
     const e = this.entities.get(pid);
     if (!e || e.guild !== oldName) return;
-    valeCupMod.vcupRenameGuild(this.ctx, pid, oldName, newName);
     e.guild = newName;
   }
 
@@ -4791,6 +4828,12 @@ export class Sim {
   // state. Online play overrides this with the cached, realm-scoped server query.
   guildLeaderboard(page = 0, pageSize = LEADERBOARD_PAGE_SIZE): Promise<GuildLeaderboardPage> {
     return Promise.resolve(paginateGuildLeaderboard([], page, pageSize));
+  }
+  // Same server-only reasoning as the board above: the offline world has no
+  // guild to drill into, so the roster read resolves null and the signpost
+  // window renders its localized empty state.
+  guildRoster(_name: string): Promise<GuildRosterInfo | null> {
+    return Promise.resolve(null);
   }
   // The developer board is sourced from GitHub's contributor stats, which the
   // offline world cannot fetch, so it ranks none: an empty page through the same
@@ -5290,6 +5333,9 @@ export class Sim {
       get resetDay() {
         return sim.resetDay;
       },
+      get eventLeadDay() {
+        return sim.eventLeadDay;
+      },
       get utcDay() {
         return sim.utcDay;
       },
@@ -5331,6 +5377,9 @@ export class Sim {
       get devCommands() {
         return sim.devCommands;
       },
+      get compulsoryTutorial() {
+        return sim.cfg.compulsoryTutorial;
+      },
       get marketListings() {
         return sim.marketListings;
       },
@@ -5354,11 +5403,6 @@ export class Sim {
       // through the guild_bank.ts helpers. Sim-owned, never reassigned.
       get guildBanks() {
         return sim.guildBanks;
-      },
-      // The Vale Cup holder (queues/deserters/botPids mutated in place; the
-      // match slot reassigned inside the holder, so no setter is needed).
-      get vcup() {
-        return sim.vcup;
       },
       // Book of Deeds live views (all mutated in place, never reassigned).
       get deedDirtyPids() {
@@ -5773,21 +5817,6 @@ export class Sim {
       markVisited: (meta, markId) => deedsMod.markVisited(sim.ctx, meta, markId),
       markDeedsDirty: (pid) => deedsMod.markDeedsDirty(sim.ctx, pid),
       grantDeed: (meta, deedId, opts) => deedsMod.grantDeed(sim.ctx, meta, deedId, opts),
-      // Vale Cup <-> Arena queue exclusion (owned by social/vale_cup.ts).
-      // Late-bound arrow so sim.ctx resolves at call time (the Q1 pattern).
-      vcupSeatedOrQueued: (pid) => valeCupMod.vcupSeatedOrQueued(sim.ctx, pid),
-      // The Vale Cup sport-move arms (owned by social/vale_cup.ts). Late-bound
-      // arrows so sim.ctx resolves at call time (the Q1 pattern).
-      vcupBallKick: (caster, power, loft, range) =>
-        valeCupMod.vcupBallKick(sim.ctx, caster, power, loft, range),
-      vcupBallPass: (caster, power, loft, range) =>
-        valeCupMod.vcupBallPass(sim.ctx, caster, power, loft, range),
-      vcupShoot: (caster, power, loft, range) =>
-        valeCupMod.vcupShoot(sim.ctx, caster, power, loft, range),
-      vcupSportDash: (caster, distance, catchBall) =>
-        valeCupMod.vcupSportDash(sim.ctx, caster, distance, catchBall),
-      vcupSportShove: (caster, target, distance) =>
-        valeCupMod.vcupSportShove(sim.ctx, caster, target, distance),
       // Thornhollow Fields battleground hooks (social/battleground.ts).
       bgOnPlayerDeath: (e, killer) => bgMod.bgOnPlayerDeath(sim.ctx, e, killer),
       bgOnPlayerDamaged: (victim, source) => bgMod.bgOnPlayerDamaged(sim.ctx, victim, source),
@@ -6324,10 +6353,6 @@ export class Sim {
     lap?.('instances');
     this.updateDelveRuns();
     lap?.('delves');
-    // The Vale Cup phase draws ZERO shared rng (pure ball physics + timers +
-    // tick-staggered bots), so appending it here cannot fork the draw order.
-    this.updateValeCup();
-    lap?.('valecup');
     // Thornhollow Fields' ACTIVE phase draws ZERO rng (queue-order matchmaking,
     // tick-math wave and rune clocks; the one seeded draw is the power-rune
     // face at match START), so its tick position cannot fork the draw order
@@ -6357,6 +6382,19 @@ export class Sim {
     // first-tier tutorial personal events. Draws ZERO rng (it only emits events,
     // which draw nothing), so its mail-phase position cannot fork the draw order.
     updateProfNudges(this.ctx);
+    // The spawn greeting sweep (tutorial island): the one-shot compulsory
+    // ferry for fresh characters. Draws ZERO rng (it emits events and
+    // displaces, and displacePlayer itself draws nothing), so its
+    // mail-phase position cannot fork the draw order.
+    updateTutorialGreeting(this.ctx, this.ownPlayerPid);
+    // The Gauntlet run sweep (tutorial island): per-tick flag credit for
+    // q_ps_the_gauntlet, the same zero-rng argument as the greeting above.
+    updateGauntletRuns(this.ctx);
+    // The ability drill's rage loan (tutorial island): keeps a warrior
+    // standing in the effigy yard able to press the button the coach is
+    // naming. Draws ZERO rng (it clamps one resource bar and emits nothing),
+    // so its position cannot fork the draw order.
+    updateAbilityDrill(this.ctx);
     // The one-time mastery reset notice (Professions 2.0): drains
     // the transient pendingMasteryResetNotice flag the load-time reset branch
     // set. Draws ZERO rng and emits nothing itself (it only books a letter
@@ -9367,6 +9405,17 @@ export class Sim {
     return this.players.get(this.primaryId)?.lastMasterwork ?? null;
   }
 
+  // The tutorial greeting's accept button (IWorldQuests.startTutorial): the
+  // ferry ride to the Proving Shore. All gates (alive, out of combat, level 1,
+  // overworld) re-run here on the authoritative copy; the client never
+  // predicts it.
+  startTutorial(pid?: number): void {
+    if (refusedWhileDead(this.ctx, pid)) return;
+    const r = this.ctx.resolve(pid);
+    if (!r) return;
+    resolveStartTutorial(this.ctx, r.e, r.meta);
+  }
+
   // Mobile crafting station command (Professions 2.0, wiring #1134):
   // a thin delegate onto professions/mobile_station.ts, resolved on the
   // deterministic tick the command arrives on, same shape as craftItem
@@ -10172,16 +10221,7 @@ export class Sim {
       // bounces off GM invulnerability. Audited punishment stays /kill; this
       // is for roughing up the cellblock.
       if (attackerPlayer.gm && target.jailed) return true;
-      // The Vale Cup: opposing fighters are hostile only while play is live so
-      // the harvest-truce Shoulder can land on them (targeting also opens during
-      // the countdown via targeting.ts; damage between seated fighters is
-      // floored to 0 in combat/damage.ts, boots and shoulders only).
-      const cupMatch = this.vcup.match;
-      return (
-        !!cupMatch &&
-        (cupMatch.phase === 'active' || cupMatch.phase === 'golden') &&
-        valeCupMod.isVcupCrossTeam(cupMatch, attackerPlayer.id, target.id)
-      );
+      return false;
     }
     return false;
   }
@@ -10493,6 +10533,10 @@ export class Sim {
   ignoreRemove(_name: string): void {}
   guildCreate(_name: string): void {}
   guildInvite(_name: string): void {}
+  guildPledge(_name: string): void {}
+  guildPledgeWithdraw(): void {}
+  guildPledgeDecide(_name: string, _accept: boolean): void {}
+  setGuildPledgeSettings(_enabled: boolean, _minLevel: number, _note: string): void {}
   guildAccept(): void {}
   guildDecline(): void {}
   guildLeave(): void {}
@@ -10887,77 +10931,6 @@ export class Sim {
 
   updateFiestaBots(): void {
     fiestaBotsMod.updateFiestaBots(this);
-  }
-
-  // -------------------------------------------------------------------------
-  // The Vale Cup: boarball at the Sowfield (social/vale_cup.ts +
-  // social/vale_cup_bots.ts). State stays on Sim (`this.vcup`); Sim keeps thin
-  // same-named delegates for the IWorld facet, the server, and tests. The bots
-  // are driven inside the same tick phase (they need Sim-only affordances), so
-  // the server's queue backfill and the offline Practice run identical code.
-  // -------------------------------------------------------------------------
-
-  private updateValeCup(): void {
-    valeCupMod.updateValeCup(this.ctx);
-    valeCupBotsMod.updateValeCupBots(this);
-  }
-
-  vcupQueueJoin(
-    bracket: VcBracket,
-    nation: VcNationId,
-    role: SportRole,
-    enterAsGuild = false,
-    pid?: number,
-  ): void {
-    valeCupMod.vcupQueueJoin(this.ctx, bracket, nation, role, enterAsGuild, pid);
-  }
-
-  vcupQueueLeave(pid?: number): void {
-    valeCupMod.vcupQueueLeave(this.ctx, pid);
-  }
-
-  vcupSetRole(role: SportRole, pid?: number): void {
-    valeCupMod.vcupSetRole(this.ctx, role, pid);
-  }
-
-  vcupReady(pid?: number): void {
-    valeCupMod.vcupReady(this.ctx, pid);
-  }
-
-  vcupBet(side: 'A' | 'B', amount: number, pid?: number): void {
-    valeCupMod.vcupPlaceBet(this.ctx, pid ?? this.primaryId, side, amount);
-  }
-
-  // Private practice bout vs bots on an instanced pitch copy (parallel to the
-  // real match). Runs identically offline and on the server (via vcup_practice).
-  vcupPracticeStart(bracket: VcBracket, pid?: number): void {
-    valeCupBotsMod.startValeCupPractice(this, bracket, pid);
-  }
-
-  /** The live cup match this pid is seated in, if any (server helpers). */
-  vcupMatchOf(pid: number): valeCupMod.VcMatch | null {
-    return valeCupMod.vcupMatchOf(this.ctx, pid);
-  }
-
-  /** Idempotent desertion resolution; the server calls it BEFORE the leave
-   *  save so the counted loss reaches the persisted standing. */
-  vcupResolveDesertion(pid: number): void {
-    valeCupMod.vcupResolveDesertion(this.ctx, pid);
-  }
-
-  cupInfoFor(
-    pid: number,
-    shared?: import('../world_api/vale_cup').VcSharedCupInfo,
-  ): import('../world_api/vale_cup').CupInfo | null {
-    return valeCupMod.cupInfoFor(this.ctx, pid, shared);
-  }
-
-  cupSharedInfoFor(): import('../world_api/vale_cup').VcSharedCupInfo {
-    return valeCupMod.cupSharedInfoFor(this.ctx);
-  }
-
-  get cupInfo(): import('../world_api/vale_cup').CupInfo | null {
-    return this.primaryId === -1 ? null : this.cupInfoFor(this.primaryId);
   }
 
   private fiestaMatchInfo(

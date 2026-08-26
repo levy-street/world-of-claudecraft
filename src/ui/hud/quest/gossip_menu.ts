@@ -22,7 +22,6 @@ export interface GossipMenuContent {
    *  otherwise read as an empty menu and close itself the moment it opened. */
   hasWarfareVendor: boolean;
   hasDelveBoard: boolean;
-  hasVcup: boolean;
   hasCardMaster: boolean;
   hasTraining: boolean;
 }
@@ -36,7 +35,6 @@ export function gossipMenuIsEmpty(content: GossipMenuContent): boolean {
     !content.hasHeroicVendor &&
     !content.hasWarfareVendor &&
     !content.hasDelveBoard &&
-    !content.hasVcup &&
     !content.hasCardMaster &&
     !content.hasTraining
   );

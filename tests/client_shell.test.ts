@@ -98,6 +98,10 @@ const padTargetPickTs = readFileSync(
   new URL('../src/game/pad_target_pick.ts', import.meta.url),
   'utf8',
 ).replace(/\r\n/g, '\n');
+const gamepadSettingsTs = readFileSync(
+  new URL('../src/game/gamepad_settings.ts', import.meta.url),
+  'utf8',
+).replace(/\r\n/g, '\n');
 // A raw source pin is satisfied by a commented-out occurrence, so the pad pins
 // below read a comment-stripped view (the tests/pad_reel.test.ts idiom).
 const stripLineComments = (source: string) => source.replace(/^\s*\/\/.*$/gm, '');
@@ -386,7 +390,7 @@ describe('client HTML shell', () => {
   });
 
   it('keeps live graphics rebuilds bound to the existing world and online session', () => {
-    const buildAt = mainTs.indexOf('buildRenderer: (target, recycled) => {');
+    const buildAt = mainTs.indexOf('buildRenderer: (_target, recycled) => {');
     const prepareAt = mainTs.indexOf('prepareCurrentZone:', buildAt);
     const build = mainTs.slice(buildAt, prepareAt);
     expect(buildAt).toBeGreaterThan(-1);
@@ -1785,6 +1789,19 @@ describe('client HTML shell', () => {
     );
   });
 
+  it('ships both death action groups as standalone controller-navigation surfaces', () => {
+    for (const [entry, source] of [
+      ['index.html', html],
+      ['play.html', playHtml],
+    ] as const) {
+      expect(source, entry).toMatch(
+        /<div id="death-overlay" data-pad-nav-root data-pad-nav-required>/,
+      );
+      expect(source, entry).toMatch(/<div id="ghost-prompt" data-pad-nav-root>/);
+    }
+    expect(hudCss).toContain('content: attr(data-gamepad-confirm-label);');
+  });
+
   it('keeps desktop community links open after HUD clicks', () => {
     expect(mainTs).toContain('communityMenu.open = !(NATIVE_APP || useTouchInterface());');
     expect(hudTs).toMatch(
@@ -2823,13 +2840,11 @@ describe('client HTML shell', () => {
     expect(mainTsCode).toContain(
       'const padTargetPick = createPadTargetPick({ world, interactKey });',
     );
-    // Pad mode is a body class only syncPadMode writes, and gamepad.stop() releases
-    // the pad without an onConnectionChange, so the Controller settings arm has to
-    // re-read it: otherwise turning the setting off leaves the desktop rows hidden
-    // behind a cross hotbar no longer driven by anything.
-    expect(mainTsCode).toMatch(
-      /else gamepad\.stop\(\);[\s\S]{0,400}?crossHotbar\.syncPadMode\(gamepad\);/,
-    );
+    // Pad mode is a body class only syncPadMode writes, and pad.stop() releases
+    // the pad without an onConnectionChange, so the extracted Controller settings
+    // arm has to re-read it: otherwise turning the setting off leaves the desktop
+    // rows hidden behind a cross hotbar no longer driven by anything.
+    expect(gamepadSettingsTs).toMatch(/else pad\.stop\(\);[\s\S]{0,100}?syncPadMode\(\);/);
     // The pad layout is per character, like the keybinds it is scoped alongside.
     expect(mainTsCode).toContain('createCrossHotbar(() => hud, keybindScope)');
     expect(mainTs).toContain('const interactionOutcome = handlePickedEntity(');

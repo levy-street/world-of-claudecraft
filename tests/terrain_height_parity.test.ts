@@ -29,8 +29,6 @@ import {
   riftInstanceOrigin,
   STRIP_MAX_X,
   STRIP_MIN_X,
-  VC_PRACTICE_BAND_X_MIN,
-  VC_PRACTICE_X,
   WORLD_MAX_X,
   WORLD_MAX_Z,
   WORLD_MIN_X,
@@ -43,7 +41,6 @@ import {
 } from '../src/sim/data';
 import { GALE_HARBOR_DECKS, type GaleDeckDef } from '../src/sim/gale_harbor';
 import { REACH_DECKS } from '../src/sim/reach_decks';
-import { SOWFIELD_FLAT, STAND_NORTH, STAND_SOUTH } from '../src/sim/vale_cup_layout';
 import {
   computeBorderEdges,
   GARDEN_BED_PADS,
@@ -224,27 +221,6 @@ function buildPoints(): HeightPoint[] {
   addRect('Last Keep castle pad', CASTLE.pad.x0, CASTLE.pad.x1, CASTLE.pad.z0, CASTLE.pad.z1);
   addRect('Last Keep inner ward', CASTLE.ward.x0, CASTLE.ward.x1, CASTLE.ward.z0, CASTLE.ward.z1);
   addRect(
-    'Sowfield level pad',
-    SOWFIELD_FLAT.xMin - SOWFIELD_FLAT.falloff,
-    SOWFIELD_FLAT.xMax + SOWFIELD_FLAT.falloff,
-    SOWFIELD_FLAT.zMin - SOWFIELD_FLAT.falloff,
-    SOWFIELD_FLAT.zMax + SOWFIELD_FLAT.falloff,
-  );
-  addRect(
-    'Sowfield north stand',
-    STAND_NORTH.xMin,
-    STAND_NORTH.xMax,
-    STAND_NORTH.zMin,
-    STAND_NORTH.zMax,
-  );
-  addRect(
-    'Sowfield south stand',
-    STAND_SOUTH.xMin,
-    STAND_SOUTH.xMax,
-    STAND_SOUTH.zMin,
-    STAND_SOUTH.zMax,
-  );
-  addRect(
     'Highwatch stable pad',
     STABLE_FLAT.x1 - STABLE_FLAT.falloff,
     STABLE_FLAT.x2 + STABLE_FLAT.falloff,
@@ -275,8 +251,6 @@ function buildPoints(): HeightPoint[] {
     ARENA_X_MAX,
     DELVE_BAND_X_MIN,
     DELVE_X_MIN,
-    VC_PRACTICE_BAND_X_MIN,
-    VC_PRACTICE_X,
     RIFT_BAND_X_MIN,
     RIFT_X_MIN,
     RIFT_BAND_X_MAX,

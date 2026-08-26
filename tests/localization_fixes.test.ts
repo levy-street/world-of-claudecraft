@@ -611,6 +611,30 @@ describe('S1: sim event-text pipeline is localized in every locale', () => {
     setLanguage('en');
   });
 
+  it('matches every tide-pool summon emit (crab_summon + the Mister Crabs yell)', () => {
+    // The four emits added with the island miniboss: the three REASON_MESSAGE
+    // toasts (src/sim/interactions/crab_summon.ts) and the summon yell
+    // (src/sim/encounters/quest_summon.ts). Each must round-trip through the
+    // matcher, or every non-English locale ships raw English.
+    setLanguage('de_DE');
+    // The toasts route through EXACT rows (English until the release fill,
+    // so only non-null is asserted); the yell has real per-locale rows in
+    // QUEST_EXTRA and must come back re-localized.
+    const toasts = [
+      'You have what you came for. Tidewarden Nel waits on your prize.',
+      'Carry the lure to the tide pool west of the wreck line.',
+      'Mister Crabs already prowls the pool!',
+    ];
+    for (const text of toasts) {
+      expect(localizeSimText(text), text).not.toBeNull();
+    }
+    const yell = 'Mister Crabs yells, "MINE! The pearl is mine, and mine she stays!"';
+    const out = localizeSimText(yell);
+    expect(out).not.toBeNull();
+    expect(out).not.toBe(yell);
+    setLanguage('en');
+  });
+
   it('localizes the flavor aura name Tamed and reuses talent/ability titles', () => {
     setLanguage('de_DE');
     expect(localizeSimAuraName('Tamed')).not.toBeNull();
@@ -1050,6 +1074,23 @@ describe('S3: every sim.ts emit is recognized (drift guard)', () => {
     // sim_i18n EXACT map via log.veilEnter/log.veilLeave); scanning the module
     // keeps any FUTURE literal emit added here under the drift guard.
     fs.readFileSync(path.resolve(process.cwd(), 'src/sim/portals.ts'), 'utf8'),
+    // The tutorial greeting (spawn greeting event + the startTutorial ferry):
+    // the ferry log line and the two gate denials are matched by the sim_i18n
+    // EXACT map (log.provingFerry, error.tutorialFromHere,
+    // error.tutorialOutleveled); scanning keeps future literal emits guarded.
+    fs.readFileSync(path.resolve(process.cwd(), 'src/sim/tutorial/greeting.ts'), 'utf8'),
+    // The clicked ferry bells (tutorial island): the two crossing lines and
+    // the combat denial are matched by the sim_i18n EXACT map
+    // (log.provingEnter, log.provingLeave, error.tutorialFromHere).
+    fs.readFileSync(path.resolve(process.cwd(), 'src/sim/interactions/ferry_bell.ts'), 'utf8'),
+    // The death lesson (tutorial island): the rite's kneel line and refusal,
+    // and the two resurrection notes, matched by the sim_i18n EXACT map
+    // (log.passingStoneKneel, error.passingStoneCold, log.longWalkCorpse,
+    // log.longWalkHealer). Scanning keeps future literal emits guarded.
+    fs.readFileSync(path.resolve(process.cwd(), 'src/sim/tutorial/death_lesson.ts'), 'utf8'),
+    // The ability drill (tutorial island): it emits no literals of its own
+    // (credit rides emitQuestProgress), and scanning keeps that true.
+    fs.readFileSync(path.resolve(process.cwd(), 'src/sim/tutorial/ability_drill.ts'), 'utf8'),
     // Swim fatigue (the Hollow's open-sea turn-back): the warning literal is
     // variable-routed via FATIGUE_WARNING but matched by the sim_i18n EXACT
     // map (log.seaFatigue); scanning keeps future literal emits guarded.
@@ -1084,6 +1125,13 @@ describe('S3: every sim.ts emit is recognized (drift guard)', () => {
     // the "<name> awakens!" summon log; the boss yells are variable-routed chat, not
     // scanned). Literals are byte-identical after the move so their matchers are unchanged.
     fs.readFileSync(path.resolve(process.cwd(), 'src/sim/encounters/nythraxis.ts'), 'utf8'),
+    // N2: the shared quest-mob summon, moved verbatim OUT of nythraxis.ts (the
+    // "<name> awakens!" log and the four boss yells live here now, so the guard
+    // follows the emits to their new home instead of going quietly blind).
+    fs.readFileSync(path.resolve(process.cwd(), 'src/sim/encounters/quest_summon.ts'), 'utf8'),
+    // N3: the tide-pool summon's refusal toasts (crab_summon.ts REASON_MESSAGE)
+    // plus any future island summon emits.
+    fs.readFileSync(path.resolve(process.cwd(), 'src/sim/interactions/crab_summon.ts'), 'utf8'),
     // H1 (#1141): the interaction command bodies (corpse harvest + loot/pickup). The two
     // corpse-harvest deny strings ("That corpse has nothing to harvest." / "This corpse
     // has already been harvested.") have their ONLY emitter occurrences here; the file's
@@ -1458,8 +1506,6 @@ describe('S3: every sim.ts emit is recognized (drift guard)', () => {
       'party.ts',
       'ready_check.ts',
       'trade.ts',
-      'vale_cup.ts',
-      'vale_cup_bots.ts',
       'yumi.ts',
     ]);
     expect(

@@ -24,12 +24,16 @@ import type { BankBonusSource } from '../src/world_api';
 
 /** The raw account facts the entitlement math reads. Populated by one parameterized
  *  query (server/db.ts bankBonusFactsForAccount); a missing account is all-false/0.
- *  qualifiedReferrals is the UNCAPPED count (the cap is registry data, applied here). */
+ *  qualifiedReferrals is the UNCAPPED count (the cap is registry data, applied here).
+ *  characterCount rides the same single round trip because the fresh-join handshake
+ *  is the one consumer of both (the tutorial greeting's firstCharacter fact); no
+ *  registry row reads it. */
 export interface BankBonusFacts {
   emailVerified: boolean;
   discordLinked: boolean;
   walletLinked: boolean;
   qualifiedReferrals: number;
+  characterCount: number;
 }
 
 /** One entitlement source as data: how many slots a unit is worth, how many units

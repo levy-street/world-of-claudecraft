@@ -123,10 +123,6 @@ const AUTHENTICATED_NODE_CLIENTS = [
     authSend: 'ws.send(JSON.stringify(worldAuthMessage(token, characterId)));',
   },
   {
-    path: 'scripts/vale_cup_online_probe.mjs',
-    authSend: 'this.ws.send(JSON.stringify(worldAuthMessage(token, characterId)))',
-  },
-  {
     path: 'scripts/woc_market_shot.mjs',
     authSend: 'ws.send(JSON.stringify(worldAuthMessage(token, characterId)));',
   },
@@ -165,9 +161,9 @@ function nodeWebSocketSources(dir = SCRIPTS_ROOT): Array<[string, string]> {
 
 describe('standalone world WebSocket auth', () => {
   it('keeps the Node discriminator fresh with the authoritative world layout epoch', () => {
-    expect(ONLINE_WORLD_LAYOUT_VERSION).toBe(7);
+    expect(ONLINE_WORLD_LAYOUT_VERSION).toBe(9);
     expect(ONLINE_WORLD_AUTH_TYPE).toBe(`auth-world-${ONLINE_WORLD_LAYOUT_VERSION}`);
-    expect(SCRIPT_WORLD_AUTH_TYPE).toBe('auth-world-7');
+    expect(SCRIPT_WORLD_AUTH_TYPE).toBe('auth-world-9');
     expect(SCRIPT_WORLD_AUTH_TYPE).toBe(ONLINE_WORLD_AUTH_TYPE);
     expect(readFileSync(join(ROOT, 'scripts/lib/world_auth.d.mts'), 'utf8')).toContain(
       `export const ONLINE_WORLD_AUTH_TYPE: '${ONLINE_WORLD_AUTH_TYPE}';`,

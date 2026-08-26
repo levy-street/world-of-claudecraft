@@ -88,10 +88,44 @@ const MONOLITHS: MonolithRow[] = [
     // overhaul extracted marker interaction out of the coordinator, so the
     // merged file landed SMALLER and the ratchet follows it down.
     file: 'src/ui/hud.ts',
-    // Re-pinned to the exact merged count after reconciling the OSSBrain
-    // v0.40 batch with the current release branch. The merged file is smaller
-    // than both parent pins, so the ratchet follows it down with zero slack.
-    ceiling: 18694,
+    // Lowered after extracting the ability description prose (the placeholder
+    // values, the over-time string and the talent-conditional field choice) into
+    // src/ui/ability_description.ts (the ratchet's own rule: an extraction lowers
+    // the ceiling, never raises it).
+    // Raised 19420 -> 19432 (+12) for the desktop-client-update packet, a
+    // maintainer decision prepared for PR review: the branch's additions are
+    // thin-consumer wiring to extracted modules (presentation_gate,
+    // instance_music) riding on top of upstream's near-zero-slack re-pins, so
+    // no clean branch-owned extraction exists. Exact merged count: any
+    // further growth reds again.
+    // Re-pinned 19432 -> 19433: the release/v0.38.0 merge into this branch
+    // grew hud.ts by one line at HEAD without updating the row, so the gate
+    // arrived red. Same exact-count, zero-slack intent as above.
+    // Raised 19433 -> 19442 (+9) for the login preview-prewarm trim: thin-consumer
+    // wiring (a `looksModular` read plus three flag args to the pure
+    // buildPostEntryPreviewPrewarmUnits) that has no clean branch-owned
+    // extraction, landing on upstream's zero-slack re-pin. Maintainer decision,
+    // exact merged count: any further growth reds again.
+    // Re-pinned 19433 -> 19488 when the castle branch merged main: the castle
+    // additions are thin-consumer wiring to extracted modules (the two
+    // LastKeepMapPainter declarations and the two walk-in map branches on the
+    // clearMapHitState pattern), riding on main's zero-slack pin. Exact merged
+    // count: any further growth reds again.
+    // Re-pinned to the integration merge of the latest v0.40.0 (the touch UI
+    // rework); exact merged count.
+    // Re-pinned for the tutorial mobile-coach fixes that followed that merge
+    // (SCOPED_POPUP_IDS + the greeting-close window-state resync); exact count.
+    // Re-pinned to the exact merged count of the v0.40.0 sync merge that
+    // brings in the OSSBrain v0.40 batch: the merged file lands below both
+    // parent pins, so the ratchet follows it down. Exact count, zero slack.
+    // Plus 1 for the board-note soft mask: the ONE line is the leaderboard
+    // deps' maskPlayerText wiring onto the existing maskChat. Exact count.
+    // Re-pinned for the signpost guild board window: the construction bag,
+    // the openGuildBoard seam, the noticeboard-event arm, and the close and
+    // relocalize wiring (the window itself lives in
+    // src/ui/hud/guild_board/). Then down one at the controller-tutorial
+    // merge. Exact count, zero slack.
+    ceiling: 18488,
     seam: 'pure view core + thin painter on PainterHost (src/ui/CLAUDE.md)',
   },
   {
@@ -145,153 +179,11 @@ const MONOLITHS: MonolithRow[] = [
     // Lowered again by the castle branch's interior_light_rig.ts extraction;
     // after merging main the merged file lands below both prior pins, so the
     // ceiling is the exact merged count.
-    // Merging approved PRs #3425 and #3447 into the moved-base v0.39 wrapper
-    // keeps the delve tracker and mount prewarm extractions while preserving
-    // the wrapper's later renderer wiring, so the ceiling is the exact
-    // resolved count.
-    // PR #3468 changes the shadow-depth prewarm material contract, but this
-    // wrapper's combined renderer remains at the same resolved count.
-    // Lowered again on the integration branch, which combines three extractions
-    // out of the renderer: the shadow-depth prewarm material factory
-    // (src/render/prewarm_depth_material.ts, PR #3468), the character-visual
-    // pool take/store halves (src/render/characters/pooled_visual_lifecycle.ts,
-    // PR #3473) and the material texture-slot walk
-    // (src/render/material_texture_slots.ts, the streamed-decor reveal gate).
-    // The merged file lands below all three branches' own pins, so the ceiling
-    // is the exact merged count per the ratchet's rule: any growth reds again.
-    // Lowered again by the foliage reveal-gate wiring, which paid for its four
-    // lines by extracting the millisecond rollup into
-    // src/render/frame_ms_stats_core.ts (net -15).
-    // Lowered again by the GPU-preparation admission wiring, which paid for its
-    // lines by extracting the perfStats return-type literal and the renderer's
-    // frame/phase stat shapes into src/render/renderer_perf_stats.ts, so the
-    // report's contract is nameable instead of inline (net -32).
-    // The compile-gate stand-in wiring paid for itself in place: the form/base
-    // visibility fan-out moved to src/render/entity_gate_stand_in_core.ts, which
-    // covers the lines the shapeshift and base-swap stand-ins added (net 0).
-    // Lowered again by the piecewise reveal-gate wiring, which paid for its
-    // soft-deadline binding by extracting the shared reveal compile host
-    // (link, shadow arm, touch tail, learned soft deadline) into
-    // src/render/reveal_compile_host.ts (net -15).
-    // Lowered again by the prewarm slot generalization: the landmark and
-    // weather manifest entries became createPrewarmGroupSlot bindings and the
-    // impact-site prewarm clone moved to its own subsystem module,
-    // buildImpactSitePrewarmGroup in src/render/impact_site.ts (net -2).
-    // Lowered again by the GPU-preparation pacing fixes: three dead type
-    // imports went, and moving the budget's frame boundary into the sync
-    // prologue traded a five-line rationale in the governor for the one that
-    // now sits beside the queue's own noteFrame (net -3).
-    // Lowered again by the live-program telemetry, which paid for its arm by
-    // extracting the renderer's info.programs readouts into
-    // src/render/live_program_watch.ts; the per-draw bracket lives in
-    // frame_present.ts, where the draw is (net -5).
-    // Lowered again when the watch moved onto the injected present host: the
-    // host's placeholder fields went with it (net -1 with the zero-env
-    // prefilter size comment).
-    // Lowered again by the production-named coverage fixes, which paid their
-    // wiring by moving the empty phase-ms fixtures into
-    // renderer_frame_telemetry_core.ts and canvasDataUrlAsync into
-    // canvas_data_url.ts (net -26); the post-effect prewarm lane was then
-    // removed after the bench (its entry never ran inside the boot budget and
-    // resumed live), keeping the extraction (net -24).
-    // The touch tail's readiness threading (the gate result down to
-    // src/render/linked_program_readiness.ts) paid for itself in place: the
-    // single-use compilePriorityFor wrapper folded into the one gate that
-    // called it, the core it delegated to being its whole body (net 0).
-    // Lowered again by the build-ledger instrumentation, which paid for its
-    // producers (timed view and zone feature builds, the arrival mark, the
-    // hitch sample's two new fields) by moving the zone prepare report and its
-    // stat shapes into src/render/zone_prepare_stats.ts and the hitch scratch
-    // factory into scene_census_core.ts (net -1).
-    // Lowered again by the composed-look pieces hold (the live candidate path
-    // consults characters/look_pieces.ts), which paid for its wiring by moving
-    // the zero foliage readout into renderer_frame_telemetry_core.ts beside
-    // the other zero fixtures and the created-view type sampler into
-    // view_candidate_pool_core.ts (net -16).
-    // Lowered again by the gc hitch cause, whose heap read (heap_sample.ts)
-    // paid for its import and sample line by folding the key-light follow
-    // beside it onto its single statement (net -1).
-    // Lowered again by the deferred-decal stand-in (the live candidate path
-    // builds the body without its face decals and attaches them on the
-    // pieces' arrival), which paid for its wiring by moving the mobile
-    // opening render scale into dynamic_resolution_core.ts (net -1).
-    // Lowered again by the compile gate's piece cut (one queue unit per
-    // material group of the target, compile_gate_pieces.ts): the enumeration
-    // and the per-piece work live in that module, and the gate's rationale
-    // comment was rewritten to the design that ships (net -10).
-    // Lowered again by the hitch sample alignment (hitch_frame_align_core.ts:
-    // the start-of-sync reading and the aligned end-of-sync sample), which
-    // paid for its wiring by extracting the perfStats last-frame deep copy
-    // into src/render/renderer_frame_stats_snapshot.ts (net -21).
-    // Lowered again by the compile gate's variant settle
-    // (program_variant_settle.ts, the third piece arm both gates bind), which
-    // paid for its wiring by moving the open-air fog predicate beside the
-    // FogSceneState it classifies (interior_light_rig.ts isOpenAirFogState),
-    // landing with the shadow arm's every-mesh twin swap in the same change
-    // (net -3).
-    // Lowered again when the world gates' touch tail moved behind
-    // linked_program_touch_lane.ts runWorldGateTouchLane (no walk mark, the
-    // unproven walk recorded as a touch-unproven event) (net -2).
-    // The upstream/main merge landed upstream's own growth (the mount-program
-    // prewarm entry, the delve tracker extraction) on top of this branch's
-    // extractions, so the pin is the exact merged count, still lower than
-    // upstream main's own (13744), and any growth reds again.
-    // RAISED 13546 -> 13548 (+2) by the streamed-prewarm branch. A raise, not a
-    // lowering, and stated as one: the branch extracts the compile SUBMIT LOOP
-    // with its deadline rule and never-drop contract
-    // (runPrewarmCompileSubmission, src/render/prewarm_compile_submission_core.ts,
-    // beside the per-unit submit that module already owned) and the weapon-skin
-    // resume unit PLAN (weaponVfxPrewarmUnits, src/render/weapon_vfx_prewarm.ts,
-    // beside the stage whose failure boundary shares its unit ids), and those
-    // two extractions still do not quite cover what it adds.
-    //
-    // The history matters because it is the failure mode this ratchet exists to
-    // catch. An earlier revision of this branch reported a NET REDUCTION while
-    // deleting 41 lines of load-bearing comments, 11 blank lines and folding
-    // three `let` declarations into one comma statement: the extractions were
-    // real but the number was bought with formatting. Every comment is restored,
-    // the blank lines are back, the declarations are separate again, and the
-    // count below is what the extractions alone earn. Maintainer decision, and
-    // deliberately a visible +2 rather than an invisible -9.
-    // Re-pinned 13548 -> 13551 when the rift long-session perf branch merged
-    // this base: both parents grew the file independently (upstream's interior
-    // resource registry wiring, this branch's object-view material disposal,
-    // sparkle tags and the rift build-key cooldown, all thin consumers of
-    // extracted modules). Exact merged count, zero slack: any further growth
-    // reds again.
-    // Raised +8 in the same branch's review round: the rift build-failure
-    // cooldown swapped its untracked setTimeout (a handle that outlives
-    // teardown and can fire into a recycled renderer) for a timestamp gate.
-    // The gate logic lives in src/render/build_retry_gate.ts; this is the
-    // coordinator's thin-wiring cost (import, field + rationale comment, the
-    // wrapped attempt condition). Exact count, zero slack.
-    // Meanwhile on the release base: re-pinned 13548 -> 13563 (+15) when the
-    // fast-loading-screen-variety branch merged release/v0.40.0 (thin-consumer
-    // wiring to the onCharacterAssetReady seam; substance in
-    // src/render/characters/assets.ts and visual.ts), then 13563 -> 13573
-    // (+10) for its review-fix round (the nearby-view floor on the shared
-    // prewarm budget, decision in src/render/prewarm_policy.ts, and the
-    // weapon-skin early-out predicate in characters/assets.ts).
-    // Re-pinned to the exact count of the merged file: the base's 13573 plus
-    // this branch's +11 across its two arms above. Exact merged count, zero
-    // slack: any further growth reds again.
-    // Entry-detail admission moved the settle step ahead of compile/texture
-    // collection while deleting the old reveal-time arm: exact count, no slack.
-    // Lowered by extracting the initial-scene texture collection and shared
-    // admission cursor into initial_scene_texture_admission.ts.
-    // Lowered again by extracting the compile-root collection, near-first
-    // ordering and program-content dedupe into initial_scene_compile_units.ts.
-    // The release's rift lifecycle wiring brings the combined renderer to this
-    // exact count after formatting, with zero slack.
-    // Review hardening restores the measured residency rationale at its live
-    // call site and adds only thin wiring for rebuild reveal-gate installation,
-    // entry-barrier cleanup and observed display pacing; the policy and timer
-    // ownership remain in sibling modules. Exact count, zero slack.
-    // Merging release/v0.40.0 into the mounts branch: the cart's own renderer
-    // additions live in mount_presentation.ts and the vehicle modules, so the
-    // merged file lands between the two parent pins. Pinned to the exact merged
-    // count, the zero-slack rule both parents already follow.
-    ceiling: 13561,
+    // Re-pinned to the integration merge of the latest v0.40.0 (the touch UI
+    // rework); exact merged count.
+    // Merging release/v0.41.0 into the mounts branch: the merged file measures
+    // 13349. Pinned to the exact merged count, keeping the zero-slack posture.
+    ceiling: 13349,
     seam: 'a new src/render/<thing>.ts module the renderer calls (src/render/CLAUDE.md)',
   },
   {
@@ -325,7 +217,22 @@ const MONOLITHS: MonolithRow[] = [
     // Exact merged count against release/v0.40.0 (tip eb20752e9e), still
     // far under the pre-marketplace 12660 row.
     file: 'src/sim/sim.ts',
-    ceiling: 12570,
+    // Re-pinned to the eastbrook-plus-tutorial integration merge output:
+    // both parents' additions combine, so keep the exact merged count.
+    // Re-pinned for the local tutorial-tweaks merge (the staged first death and
+    // the ability drill hook into the coordinator); exact merged count.
+    // Re-pinned +14 for the guild pledge board: setPlayerPledge (the server's
+    // nameplate stamp entry) and the four IWorld facet no-op stubs, the
+    // sanctioned both-worlds implementation seam. Exact count.
+    // Re-pinned to the exact merged count of the v0.40.0 sync merge (the
+    // OSSBrain v0.40 batch on the release arm). Exact count, zero slack.
+    // Plus 7 for the guildRoster IWorld stub (guilds are online-only, so the
+    // offline arm resolves null; the sanctioned both-worlds seam). Exact
+    // count, zero slack.
+    // Plus 7 at the v0.39.3 main back-merge: the Double Honor port grew the
+    // sim arm on main while the release pin sat at zero slack (the known
+    // both-arms compound). Exact merged count, zero slack.
+    ceiling: 12538,
     seam: 'a sim system module behind SimContext (src/sim/CLAUDE.md)',
   },
   {
@@ -336,10 +243,16 @@ const MONOLITHS: MonolithRow[] = [
     // b650d9d7d2): release-side growth only (its own row went to 11490); the
     // branch's main.ts lines are unchanged. Exact merged count, zero headroom.
     file: 'src/main.ts',
-    // Re-pinned to the exact merged count after reconciling the OSSBrain
-    // v0.40 batch with the current release branch. This preserves the branch
-    // wiring and the release-side More-tray launcher without adding slack.
-    ceiling: 11497,
+    // Re-pinned to the integration merge of the latest v0.40.0 (the touch UI
+    // rework); exact merged count.
+    // Re-pinned to the exact merged count of the v0.40.0 sync merge (the
+    // OSSBrain v0.40 batch on the release arm). Exact count, zero slack.
+    // Re-pinned to the exact merged count after the controller-tutorial
+    // merge (its controller-setting dispatch extraction shrinks main.ts;
+    // the ratchet follows the merged file down). Exact count, zero slack.
+    // Re-pinned to the exact merged count of the v0.39.3 main back-merge
+    // (the utc_day import consolidation shed one line).
+    ceiling: 11566,
     seam: 'a src/game/ or src/ui/ sibling module; main.ts is a firewall, not a home',
   },
   {
@@ -358,25 +271,68 @@ const MONOLITHS: MonolithRow[] = [
     // in the self-snapshot build plus its wireParkedMana import); the
     // branch's own surface is unchanged (exact merged count, zero headroom).
     file: 'server/game.ts',
-    // Re-pinned to the exact merged count after reconciling the OSSBrain
-    // v0.40 batch with the current release branch. This conflict resolution
-    // did not alter server/game.ts beyond the merged parents.
-    ceiling: 10837,
+    // Re-pinned 10900 -> 10909 for the Proving Shore branch: the +9 is the
+    // tutorial_start dispatch case (a thin delegate onto sim.startTutorial,
+    // where the real gates live) and the firstCharacter field on the join
+    // meta plumb; the island's ferry and greeting logic itself lives in sim
+    // modules. Exact merged count.
+    // Re-pinned to the eastbrook-plus-tutorial integration merge output: the
+    // combined tree lands below the branch ceilings, so keep the exact merged
+    // count.
+    // Re-pinned +43 for the guild pledge board: four dispatch cases (thin
+    // validated delegates onto SocialService), the applyPledge transport arm,
+    // and the join-time pledge stamp in sendSocialSnapshot; the service logic
+    // itself lives in server/social.ts. Exact count.
+    // Re-pinned to the exact merged count of the v0.40.0 sync merge (the
+    // OSSBrain v0.40 batch on the release arm). Exact count, zero slack.
+    // Raised +11 for the guild-signpost fill: the noticeboardGuilds provider
+    // field and the one routeEvents call into server/noticeboard_guilds.ts
+    // (thin-consumer wiring; the mapping and fill logic live in that
+    // module). Exact count, zero slack. Plus 4 for the board-note hard-tier
+    // screen: the SocialService construction wires ChatFilter.findHardHit
+    // (the screening logic lives in chat_filter.ts and social.ts). Then
+    // LOWERED to the exact count again when the signpost fill moved out of
+    // routeEvents into the guild board window's live REST read (the
+    // noticeboard_guilds event transform is deleted). Exact count, zero
+    // slack.
+    ceiling: 10645,
     seam: 'a sibling server module; see the hot-path seams in server/CLAUDE.md',
   },
   {
     file: 'src/net/online.ts',
-    ceiling: 5950,
+    // Re-pinned to the eastbrook-plus-tutorial integration merge output:
+    // both parents' additions combine, so keep the exact merged count.
+    // Re-pinned +29 for the guild pledge board: the four one-line command
+    // senders, the entity pg/gt decode, and the social-frame pledge-field
+    // normalization (wire mirror code that must live on ClientWorld). Exact
+    // count.
+    // Re-pinned to the exact merged count of the v0.40.0 sync merge: both
+    // arms added wire-mirror code, so the merged file lands above either
+    // parent pin. Exact count, zero slack.
+    // Plus 18 for the guildRoster REST mirror (the signpost guild board's
+    // roster drill-in; the cached read lives in server/guild_roster.ts),
+    // then re-pinned when the mirror gained the trust-boundary row
+    // validation and the 404-vs-transport-failure split, plus the roster
+    // class field. Exact count, zero slack.
+    ceiling: 5855,
     seam: 'a src/net sibling module (the refactor/net-online split is the template)',
   },
   {
     file: 'src/game/music.ts',
-    ceiling: 5470,
+    // Re-pinned for the Proving Shore dawn-cue merge, then again when the
+    // final render replaced the composed themes with a supplied stream-only
+    // track; exact merged count.
+    ceiling: 5064,
     seam: 'a src/game sibling module (the refactor/game-music split is the template)',
   },
   {
     file: 'src/sim/world.ts',
-    ceiling: 5450,
+    // Re-pinned to the eastbrook-plus-tutorial integration merge output:
+    // both parents' additions combine, so keep the exact merged count.
+    // Re-pinned again for the v0.40.0 sync merge (the release arm's
+    // gardenwalk pass rides in beside the tutorial island). Exact count,
+    // zero slack.
+    ceiling: 5347,
     seam: 'zone/terrain data as content records; logic as sim sibling modules',
   },
   {
@@ -427,19 +383,25 @@ const MONOLITHS: MonolithRow[] = [
   },
   {
     file: 'src/render/foliage.ts',
-    ceiling: 4147,
+    // Re-pinned to the eastbrook-plus-tutorial integration merge output:
+    // both parents' additions combine, so keep the exact merged count.
+    ceiling: 4121,
     seam: 'a new src/render/<thing>.ts module (src/render/CLAUDE.md)',
   },
   {
     file: 'src/render/nameplate_canvas.ts',
-    ceiling: 852,
+    // Re-pinned at the deed-cartouche base merge: the release arm's heraldry
+    // (+70, one line under the old pin on its own tree) and this branch's
+    // pledge nameplate line (+13) compound in the merged file. Exact count,
+    // zero slack.
+    ceiling: 864,
     seam: 'the pure src/render/nameplate_heraldry_core.ts geometry module',
   },
   {
     file: 'src/sim/colliders.ts',
-    // Lowered from 2660 after the cell-index math moved out to
-    // collider_cells.ts (the ratchet rule: extraction lowers the ceiling).
-    ceiling: 2630,
+    // Re-pinned to the integration merge of the latest v0.40.0 (the touch UI
+    // rework); exact merged count.
+    ceiling: 2621,
     seam: 'per-zone collider data beside the zone content; shared logic stays here',
   },
   {

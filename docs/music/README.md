@@ -1,13 +1,16 @@
 # New-environment soundtrack (v0.24 world grid + rifts)
 
-Nineteen through-composed cues covering every environment the world-grid and
-procedural-rift work added, all synthesized in-engine by `src/game/music.ts`
-(no audio files ship; the game builds every note in WebAudio at runtime).
+The through-composed cues covering every environment the world-grid and
+procedural-rift work added, plus the tutorial island. Every cue is authored as
+note data in `src/game/music.ts` and its sibling theme modules (the authoring
+source for the music editor and the offline render pipeline); the shipped game
+streams the remastered mp3 renders under `public/audio/music/` (catalog:
+`src/game/music_tracks.ts`).
 
 ## The cues
 
-Overworld zones (played by `musicZoneForLocation` via the zone's biome, or the
-`farshore_isle` zone override):
+Overworld zones (played by `musicZoneForLocation` via the zone's biome, or a
+zone override such as `farshore_isle` and `proving_shore`):
 
 | Theme | Zone | Title and register |
 |---|---|---|
@@ -22,6 +25,17 @@ Overworld zones (played by `musicZoneForLocation` via the zone's biome, or the
 | `jungle` | The Palmreach | "The Emerald Tangle": G mixolydian groove; three-hand percussion, marimba-style dulcimer, bird flourishes |
 | `garden` | The Evergarden | "Still Trimmed": A major minuet gone uncanny; F# minor Great Maze middle with shear-snip percussion |
 | `gale` | The Galecrest | "The Beacon Never Dies": D mixolydian sea-ballad over an unstopping open-fifth gale |
+| `proving_shore` | The Proving Shore | "First Light at Dawnrest": D major dawn hymn; harp tide, flute call, horn promise, the ferry bell tolling once at each turn of the form |
+
+The tutorial island's cue was chosen from three composed candidates that share
+one leitmotif (the Proving call, degrees 1 5 6 5 3); the alternates stay
+registered in `buildMusicThemes()` as `proving_shore_b` ("The Gauntlet at
+Sunrise", a G major 100 bpm drill march) and `proving_shore_c` ("Across the
+Morning Water", a D major 12/8 barcarolle). Their briefs live in
+`src/game/music_themes_proving_shore.ts`, and their mastered audition mp3s are
+committed under `docs/music/proving-shore-candidates/` (unlike the
+regeneratable listening renders below, these are the decision record for which
+cue ships).
 
 Rift crawls (played per floor by `riftMusicZoneForTheme` from the floor's
 `RiftTheme`):

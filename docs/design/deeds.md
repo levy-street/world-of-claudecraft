@@ -181,6 +181,14 @@ Every new piece of conquerable content (a dungeon, delve, raid, world boss,
 zone, or rare) authors its deeds in the SAME change that adds the content;
 the root `CLAUDE.md` content rule points here.
 
+One named exemption: **the Proving Shore** (`proving_shore`, the tutorial
+island). It is deliberately not conquerable content: a zero-XP training
+ground whose whole chain exists to be outgrown in twenty minutes, so a deed
+there would either be noise (granted to everyone by the rails) or a
+completionist trap that drags veterans back through the tutorial. If the
+island ever gains real conquerable content (a rare, a delve), that content
+authors deeds like any other.
+
 ## Deliberately deferred (do not "fix" these by shipping them)
 
 - **Account-level deeds** (`prog_three_paths`, `prog_ninefold`, and the

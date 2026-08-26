@@ -92,7 +92,9 @@ describe('grounded line-of-sight elevation', () => {
 
     expect(stall.id).toBe('eastbrook_market_stall_world_market');
     expect(stall.height).toBe(2.7);
-    expect(terrainY).toBeCloseTo(1.5);
+    // The stall tracks EASTBROOK_LAYOUT, so the New Eastbrook rebuild moved it
+    // into the harbor basin; the terrain sanity pin follows the new site.
+    expect(terrainY).toBeCloseTo(-0.64);
     expect(canopyY).toBeCloseTo(terrainY + stall.height);
     const stallCollider = colliderInternalsForTest
       .staticWorldColliders(WORLD_SEED)
@@ -368,8 +370,12 @@ describe('grounded line-of-sight elevation', () => {
     const allyId = sim.addPlayer('warrior', 'Ally');
     const healer = player(sim, healerId);
     const ally = player(sim, allyId);
-    const from = { x: -186, z: 168 };
-    const to = { x: -168, z: 168 };
+    // Re-anchored for the New Eastbrook rebuild: the old cover at (-186, 168)
+    // now sits inside the Proving Shore tutorial island's flattened window, so
+    // the pair moved to mid-vale cover that still blocks a grounded ray while
+    // a trusted airborne eye would clear it.
+    const from = { x: 114, z: 48 };
+    const to = { x: 132, z: 48 };
 
     place(sim, healer, { x: from.x, y: groundHeight(from.x, from.z, seed) + 3, z: from.z }, false);
     place(sim, ally, { x: to.x, y: groundHeight(to.x, to.z, seed), z: to.z }, true);

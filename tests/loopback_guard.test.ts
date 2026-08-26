@@ -156,6 +156,7 @@ const GUARDED_SCRIPTS = [
   'scripts/catalog_program_census.mjs',
   'scripts/chat_mute_resume_shot.mjs',
   'scripts/geared_arrival_bench.mjs',
+  'scripts/guild_pledge_shot.mjs',
   'scripts/nythraxis_hitch_bench.mjs',
   'scripts/lib/perf_hitch_scenarios.mjs',
   'scripts/load_players.mjs',

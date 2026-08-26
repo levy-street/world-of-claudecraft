@@ -41,7 +41,7 @@ or pure leaves, never a `Sim` import, randomness only via `ctx.rng` (guarded by
   together on every cast exit path.
 - `session_teardown.ts`: the ONE displacement cancel for a live gather or
   fishing session (`cancelProfessionSessionOnDisplacement`), called from every
-  hard-displacement site: the sim and server teleport paths, the Vale Cup
+  hard-displacement site: the sim and server teleport paths, the
   pitch eject and kickoff placements, and the `/follow` zone-line crossing;
   gated on `isNonSpellCast`, delegates to `ctx.cancelCast`.
 - `wheel.ts`: flat per-craft skills (`CraftSkills`, `gainCraftSkill`,

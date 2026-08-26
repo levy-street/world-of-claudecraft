@@ -86,6 +86,11 @@ describe('Chronomancy Phase 3 balance targets', () => {
       runRotation('arcane', conservativeOffensive, 200, false, 1).oom,
       runRotation('arcane', conservativeOffensive, 200, false, 3).oom,
     ].sort((a, b) => a - b);
+    // Re-anchored for the harbor-town move (d19aa33f76 + the street and camp
+    // fixes riding it): the seed-trio median reads 98.7 on the moved world
+    // stream; same band width recentered. The v0.40.0 sync merge keeps the
+    // union of both arms' bands (the release arm re-anchored to 92..104 for
+    // its own content adds on the shared rng stream).
     expect(ooms[1]).toBeGreaterThanOrEqual(92);
     expect(ooms[1]).toBeLessThanOrEqual(104);
     // 60s budget: the seed-trio median runs three 200s-cap rotations in one

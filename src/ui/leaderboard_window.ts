@@ -73,7 +73,7 @@ export interface LeaderboardWindowDeps {
 /** Where focus should land after a (re)render: into the window on open, back onto
  *  the page control the keyboard user just activated, or onto the freshly active
  *  tab (a tab switch rebuilds the strip, so the roving focus must follow). */
-type FocusTarget = 'open' | 'prev' | 'next' | 'tab' | null;
+type FocusTarget = 'open' | 'prev' | 'next' | 'tab' | 'action' | null;
 
 export class LeaderboardWindow {
   // The current tab + a page index PER board. The server clamps the requested
@@ -92,7 +92,6 @@ export class LeaderboardWindow {
   // pager state (this.page dispatches on the CURRENT this.board).
   private renderSeq = 0;
   private openerFocus: HTMLElement | null = null;
-
   constructor(private readonly deps: LeaderboardWindowDeps) {}
 
   private get page(): number {
@@ -268,8 +267,11 @@ export class LeaderboardWindow {
     const body = el.querySelector('.lb-body');
     if (!body) return;
 
+    // The plain ranking: the recruiting column and the pledge affordances
+    // moved to the signpost guild board (src/ui/hud/guild_board/), so this
+    // tab passes no viewer facts and renders the bare ranked rows.
     const view = buildGuildLeaderboardView(
-      result === null ? { kind: 'error' } : { kind: 'page', page: result },
+      result === null ? { kind: 'error' } : { kind: 'page', page: result, viewer: null },
     );
 
     if (view.kind === 'error') {
@@ -537,10 +539,13 @@ export class LeaderboardWindow {
     );
   }
 
+  // One guild entry: the bare ranked grid row. The recruiting sub-line and
+  // the pledge affordance moved to the signpost guild board window; the name
+  // keeps the guild's lifetime-XP colour tier (the nameplate ladder).
   private guildRowHtml(r: GuildLeaderboardRow): string {
     return (
       `<div class="lb-row lb-row-guild"><span class="lb-rank">${formatNumber(r.rank, { maximumFractionDigits: 0 })}</span>` +
-      `<span class="lb-name">${esc(r.name)}</span>` +
+      `<span class="lb-name guild-tier-${r.tier}">${esc(r.name)}</span>` +
       `<span class="lb-members">${formatNumber(r.memberCount, { maximumFractionDigits: 0 })}</span>` +
       `<span class="lb-vlvl">${formatNumber(r.topLevel, { maximumFractionDigits: 0 })}</span>` +
       `<span class="lb-xp">${formatXp(r.totalLifetimeXp)}</span></div>`
@@ -731,11 +736,12 @@ export class LeaderboardWindow {
     }
   }
 
-  // After an async page-change swap that has no pager (the error / empty / single-page
-  // states), keep keyboard focus inside the window by landing it on the close button
-  // rather than letting it fall to <body> (WCAG 2.4.3).
+  // After an async swap that destroyed the activated control (a page change
+  // with no pager in the error / empty / single-page states), keep keyboard
+  // focus inside the window by landing it on the close button rather than
+  // letting it fall to <body> (WCAG 2.4.3).
   private focusCloseAfterPage(focus: FocusTarget): void {
-    if (focus !== 'prev' && focus !== 'next') return;
+    if (focus !== 'prev' && focus !== 'next' && focus !== 'action') return;
     (this.deps.root().querySelector('[data-close]') as HTMLElement | null)?.focus();
   }
 }

@@ -1,11 +1,13 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import {
+  cancelPadFocus,
   clearPadFocus,
   focusFirstInWindow,
   followDomFocus,
   moveDpadFocus,
   pressDpadFocus,
   restorePadFocus,
+  syncStandalonePadFocus,
   syncWindowFocus,
 } from '../src/game/dpad_focus_nav';
 
@@ -87,6 +89,9 @@ function el(
 
 // Only the two selectors the module actually passes.
 function matches(node: FakeEl, selector: string): boolean {
+  if (selector.includes('data-pad-nav-root')) {
+    return node.attrs?.['data-pad-nav-root'] !== undefined;
+  }
   if (selector.includes('role="dialog"')) {
     return node.role === 'dialog' || (node.cls.includes('window') && node.cls.includes('panel'));
   }
@@ -106,10 +111,11 @@ function within(container: FakeEl | null, node: FakeEl): boolean {
   );
 }
 
-function install(): void {
+function install(padActive = false): void {
   const queryAll = (root: FakeEl | null, selector: string): FakeEl[] =>
     allEls.filter((n) => matches(n, selector) && within(root, n));
   const bodyClasses = new Set<string>();
+  if (padActive) bodyClasses.add('pad-active');
   const docLike = {
     querySelectorAll: (selector: string) => queryAll(null, selector),
     get activeElement() {
@@ -122,6 +128,7 @@ function install(): void {
           if (on) bodyClasses.add(c);
           else bodyClasses.delete(c);
         },
+        contains: (c: string) => bodyClasses.has(c),
       },
       appendChild: () => {},
     },
@@ -163,7 +170,7 @@ describe('moveDpadFocus', () => {
     const a = el('BUTTON', 0, 0);
     const b = el('BUTTON', 0, 50);
     allEls = [a, b];
-    install();
+    install(true);
     a.focus();
 
     const moved = moveDpadFocus('down');
@@ -178,7 +185,7 @@ describe('moveDpadFocus', () => {
     const a = el('BUTTON', 0, 0);
     const b = el('BUTTON', 0, 50);
     allEls = [a, b];
-    install();
+    install(true);
     a.focus();
     moveDpadFocus('down');
     expect(b.classes.has('pad-focus')).toBe(true);
@@ -194,7 +201,7 @@ describe('moveDpadFocus', () => {
     const a = el('BUTTON', 0, 0);
     const b = el('BUTTON', 0, 50); // right 40, bottom 70
     allEls = [a, b];
-    install();
+    install(true);
     a.focus();
     moveDpadFocus('down');
     const style = padCursorStyle as Record<string, string>;
@@ -209,7 +216,7 @@ describe('moveDpadFocus', () => {
     const a = el('BUTTON', 0, 0);
     const b = el('BUTTON', 0, 50);
     allEls = [a, b];
-    install();
+    install(true);
     a.focus();
     moveDpadFocus('down');
     expect(padCursorClasses.has('pad-nav')).toBe(true);
@@ -221,7 +228,7 @@ describe('moveDpadFocus', () => {
     const a = el('BUTTON', 0, 0);
     const b = el('BUTTON', 0, 50);
     allEls = [a, b];
-    install();
+    install(true);
     a.focus();
     moveDpadFocus('down');
     clearPadFocus();
@@ -231,7 +238,7 @@ describe('moveDpadFocus', () => {
   it('answers null when nothing lies that way, so the caller nudges the cursor', () => {
     const a = el('BUTTON', 0, 0);
     allEls = [a];
-    install();
+    install(true);
     a.focus();
     expect(moveDpadFocus('down')).toBeNull();
   });
@@ -312,6 +319,92 @@ describe('focusFirstInWindow', () => {
     allEls = [dialog, el('DIV', 10, 10)];
     install();
     expect(focusFirstInWindow()).toBe(false);
+  });
+});
+
+describe('syncStandalonePadFocus', () => {
+  function standaloneRoot(...buttons: FakeEl[]): FakeEl {
+    const root = el('DIV', 0, 0);
+    root.rect = { left: 0, top: 0, right: 300, bottom: 300 };
+    root.attrs = { 'data-pad-nav-root': '' };
+    allEls = [root, ...buttons];
+    return root;
+  }
+
+  it('takes focus from stale HUD chrome when the death action appears and confirms it', () => {
+    const staleMenuItem = el('BUTTON', 500, 20);
+    const release = el('BUTTON', 20, 100);
+    standaloneRoot(release);
+    allEls.unshift(staleMenuItem);
+    install(true);
+    staleMenuItem.focus();
+
+    expect(syncStandalonePadFocus()).toBe(true);
+    expect(active).toBe(release);
+    expect(release.classes.has('pad-focus')).toBe(true);
+    expect(pressDpadFocus()).toBe(true);
+    expect(release.clicks).toBe(1);
+    expect(staleMenuItem.clicks).toBe(0);
+  });
+
+  it('prefers the first visible action, lets movement relinquish focus, and rearms on re-entry', () => {
+    const corpse = el('BUTTON', 20, 100);
+    const healer = el('BUTTON', 20, 150);
+    const root = standaloneRoot(corpse, healer);
+    install(true);
+
+    expect(syncStandalonePadFocus()).toBe(true);
+    expect(active).toBe(corpse);
+
+    // Moving as a ghost clears the pad selection. The still-visible prompt must
+    // not steal it back every frame and trap the player inside resurrection range.
+    clearPadFocus();
+    active = null;
+    expect(syncStandalonePadFocus()).toBe(false);
+    expect(active).toBeNull();
+
+    // Leaving range resets the appearance latch; returning focuses the safe,
+    // penalty-free corpse action again rather than the healer alternative.
+    root.visible = false;
+    expect(syncStandalonePadFocus()).toBe(false);
+    root.visible = true;
+    expect(syncStandalonePadFocus()).toBe(true);
+    expect(active).toBe(corpse);
+  });
+
+  it('lands on the healer when it is the only visible ghost action', () => {
+    const corpse = el('BUTTON', 20, 100, { visible: false });
+    const healer = el('BUTTON', 20, 150);
+    standaloneRoot(corpse, healer);
+    install(true);
+
+    expect(syncStandalonePadFocus()).toBe(true);
+    expect(active).toBe(healer);
+  });
+
+  it('does not steal keyboard or screen-reader focus from an idle connected pad', () => {
+    const chat = el('INPUT', 500, 20);
+    const release = el('BUTTON', 20, 100);
+    standaloneRoot(release);
+    allEls.unshift(chat);
+    install();
+    chat.focus();
+
+    expect(syncStandalonePadFocus()).toBe(false);
+    expect(active).toBe(chat);
+    expect(release.classes.has('pad-focus')).toBe(false);
+  });
+
+  it('keeps the mandatory Release Spirit action selected when Cancel is pressed', () => {
+    const release = el('BUTTON', 20, 100);
+    const root = standaloneRoot(release);
+    root.attrs = { 'data-pad-nav-root': '', 'data-pad-nav-required': '' };
+    install(true);
+
+    expect(syncStandalonePadFocus()).toBe(true);
+    expect(cancelPadFocus()).toBe(false);
+    expect(pressDpadFocus()).toBe(true);
+    expect(release.clicks).toBe(1);
   });
 });
 

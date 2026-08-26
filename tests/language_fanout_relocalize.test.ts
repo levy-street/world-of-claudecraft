@@ -26,6 +26,7 @@
 import { afterEach, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest';
 import type { Keybinds } from '../src/game/keybinds';
 import type { Renderer } from '../src/render/renderer';
+import { PLAYER_START } from '../src/sim/data';
 import type { InvSlot } from '../src/sim/types';
 import { CalendarWindow, type CalendarWindowDeps } from '../src/ui/calendar_window';
 import { CardDuelWindow, type CardDuelWindowDeps } from '../src/ui/card_duel_window';
@@ -718,9 +719,20 @@ describe('#2529 lockpick: both halves of the panel re-localize', () => {
 // ---------------------------------------------------------------------------
 
 function tutorialWorld(over: Record<string, unknown> = {}): IWorld {
+  // The player stands AT the spawn so computeTutorialStep reads 'move', not
+  // 'seek'. Derived from PLAYER_START rather than a literal, mirroring
+  // tutorial.ts's own SPAWN derivation, so a moved spawn cannot desync this
+  // fixture again. Re-pinned 2026-08 for the Eastbrook harbor move
+  // (d19aa33f76, docs/design/eastbrook-revamp/site-plan.md): the spawn left
+  // (0,0) for the harbor quay.
   return {
     playerId: 7,
-    player: { id: 7, level: 1, name: 'Aleron', pos: { x: 0, y: 0, z: 0 } },
+    player: {
+      id: 7,
+      level: 1,
+      name: 'Aleron',
+      pos: { x: PLAYER_START.x, y: 0, z: PLAYER_START.z },
+    },
     questsDone: new Set<string>(),
     questLog: new Map(),
     questState: () => null,

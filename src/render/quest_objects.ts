@@ -37,6 +37,9 @@ const QUEST_OBJECT_URLS: Record<string, string> = {
   grave_sir_aldren: '/models/dungeon/gravestone.glb',
   grave_high_priest_malric: '/models/dungeon/gravestone.glb',
   grave_captain_voss: '/models/dungeon/gravestone.glb',
+  // The Proving Shore ferry bells (a clicked travel object, not a pickup):
+  // the standing bell-on-frame prop the marsh dressing already ships.
+  ps_ferry_bell: '/models/props/marsh_bell_gallows.glb',
 };
 
 const QUEST_OBJECT_HEIGHTS: Record<string, number> = {
@@ -51,6 +54,9 @@ const QUEST_OBJECT_HEIGHTS: Record<string, number> = {
   // A closed tome resting on the ground: shorter than the scroll/sigil
   // pickups, since it lies flat rather than standing upright.
   royal_seal: 1.5,
+  // A standing bell frame players travel by: tall enough to read at range,
+  // shy of the 3.4 the raid wardstones claim.
+  ps_ferry_bell: 2.6,
 };
 
 const SCROLL_ITEM_IDS = new Set(['weathered_ledger_page', 'fen_muster_order', 'highwatch_summons']);

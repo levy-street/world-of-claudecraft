@@ -144,12 +144,6 @@ const FANOUT_ARMS: readonly string[] = [
   'this.dungeonFinderWindow.relocalize|',
   'this.dungeonFinderProposalPopup.relocalize|',
   'this.bgProposalPopup.relocalize|',
-  'this.valeCupWindow.relocalize|',
-  'this.vcupBetting.relocalize|',
-  'this.vcupIndicator.relocalize|',
-  'this.vcupMatchHud.relocalize|',
-  'this.vcupBriefing.relocalize|',
-  'this.vcupCharge.relocalize|',
   'this.questDialog.relocalize|',
   'this.calendarWindow.relocalize|',
   'this.mailboxWindow.relocalize|',
@@ -159,6 +153,9 @@ const FANOUT_ARMS: readonly string[] = [
   'this.barEditorWindow.relocalize|',
   'this.lockpickController.relocalize|',
   'this.tutorial.relocalize|',
+  'this.bootcamp.relocalize|',
+  'this.noticeboardPopup.relocalize|',
+  'this.guildBoardWindow.relocalize|',
   'this.mobileActionRingPainter.relocalize|',
   'this.mountRaceStrip.relocalize|',
   'this.mountRaceControls.relocalize|',
@@ -234,6 +231,12 @@ const ANSWERED: readonly AnsweredSurface[] = [
     memos: ['lastRaceId', 'lastPhase', 'lastSecond'],
     answer: 'this.mountRaceStrip.relocalize',
     why: 'the race id, the phase and the whole second remaining, so the time-left line never moves with the locale',
+  },
+  {
+    file: 'bootcamp.ts',
+    memos: ['lastCounts'],
+    answer: 'this.bootcamp.relocalize',
+    why: 'the gauntlet flag tally that keys the ferryman guide reactions; the locale never moves a flag count, and relocalize() repaints the card and clears the interact bubble memo so every localized string re-renders',
   },
   {
     file: 'arena_window.ts',
@@ -355,36 +358,6 @@ const ANSWERED: readonly AnsweredSurface[] = [
     answer: 'this.spellbookWindow.relocalize',
     why: 'the resolved ability ids and their rank/cost/cast/cooldown numbers, plus the hotbar toggle state (#2529)',
   },
-  {
-    file: 'vale_cup_betting.ts',
-    memos: ['lastSig'],
-    answer: 'this.vcupBetting.relocalize',
-    why: 'the match id, the two nation ids, the away-palette flag and a skeleton of each team roster',
-  },
-  {
-    file: 'vale_cup_briefing.ts',
-    memos: ['lastSig'],
-    answer: 'this.vcupBriefing.relocalize',
-    why: 'the two nation ids, the away-palette flag, the local team and role, the format and a skeleton of each roster',
-  },
-  {
-    file: 'vale_cup_hud.ts',
-    memos: ['lastSig'],
-    answer: 'this.vcupMatchHud.relocalize',
-    why: 'the match id, the two nation ids, the away-palette flag and the local team, pipe-joined',
-  },
-  {
-    file: 'vale_cup_indicator.ts',
-    memos: ['lastSig'],
-    answer: 'this.vcupIndicator.relocalize',
-    why: 'a hidden sentinel or the bracket, queue position and waiting count. The clock is deliberately out of it and rides the elided setText instead',
-  },
-  {
-    file: 'vale_cup_window.ts',
-    memos: ['lastSig'],
-    answer: 'this.valeCupWindow.relocalize',
-    why: 'standing, queue state, bracket, position, queue sizes, the deserter timer, nation, role and the live match scores',
-  },
 ];
 
 /**
@@ -410,6 +383,12 @@ const NOT_A_LANGUAGE_GATE: ReadonlyArray<{
     memos: ['lastHash', 'lastLanguage'],
     reason:
       'lastHash retains the text-independent marker summary signature, while lastLanguage is compared against getLanguage() in the same early-return guard. A locale switch always moves lastLanguage and rebuilds every localized label on the next map paint, so the gate is explicitly locale-aware rather than a stale-language hazard.',
+  },
+  {
+    file: 'hud/quest/quest_tracker_controller.ts',
+    memos: ['lastHtml'],
+    reason:
+      'lastHtml retains the last BUILT html (the repaint memo compares against it rather than the live innerHTML, so the island coach decorating painted rows in place no longer forces a rewrite-and-strobe every update). The built html embeds every localized string through t(), so a locale switch changes the freshly built side of the comparison and the tracker repaints by itself. Write-elision, not a data signature.',
   },
   {
     file: 'claudium_window.ts',
@@ -741,7 +720,11 @@ describe('language fan-out: half 2, every signature-gated src/ui surface is clas
       // localized summary without a separate fan-out arm. Each side of the
       // merge had added one row (woc_trade above, the map core here), so the
       // merged list carries both.
-    ).toBe(10);
+      // 11 as of the quest tracker's lastHtml repaint memo (the island coach
+      // glow strobe fix): the memo holds the freshly BUILT html, which
+      // embeds every t() string, so a locale switch moves the comparison
+      // itself and the tracker repaints with no fan-out arm.
+    ).toBe(11);
   });
 
   it('gives every relocalize() in src/ui a caller in the fan-out', () => {

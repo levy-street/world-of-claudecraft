@@ -887,6 +887,9 @@ export class BagsWindow {
       const questReady = questMark === 'questReady';
       const fineMark = bagFineMark(item.id);
       row.className = `bag-item q-${bagQualityKey(item)}${bagRimClasses(questMark, fineMark)}`;
+      // Item identity for the island coach's press-this-next glow
+      // (bootcamp.ts; distinct from the focus-key namespace).
+      row.dataset.coachItem = item.id;
       // The stack's live inventory INDEX, resolved by REFERENCE (duplicate stacks and
       // instanced copies share an itemId): that is what the move command sends as `from`.
       const index = bagStackIndex(world.inventory, s);

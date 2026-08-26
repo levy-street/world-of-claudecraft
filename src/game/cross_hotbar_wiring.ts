@@ -87,6 +87,7 @@ export interface CrossHotbarPanelHooks {
   crossHotbarSets(): readonly (readonly CrossHotbarAction[])[];
   bindCrossHotbar(set: number, position: number, action: CrossHotbarAction): void;
   resetCrossHotbar(): void;
+  crossHotbarEnabled(): boolean;
 }
 
 export interface CrossHotbarWiring {
@@ -327,6 +328,7 @@ export function createCrossHotbar(
       crossHotbarSets: () => bindings.all(),
       bindCrossHotbar: (set, position, action) => bindings.bind(set, position, action),
       resetCrossHotbar: () => bindings.reset(),
+      crossHotbarEnabled: () => enabled,
     },
   };
 }

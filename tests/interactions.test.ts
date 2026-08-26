@@ -328,6 +328,7 @@ describe('activePvpOpponentIds', () => {
     queueSize: 0,
     queuedParty: 0,
     firstWinBonusReady: false,
+    doubleHonorActive: false,
     proposal: null,
     requeueIn: 0,
     match,

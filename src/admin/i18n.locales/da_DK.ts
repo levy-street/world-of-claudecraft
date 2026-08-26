@@ -7,6 +7,9 @@
 // (tests/i18n_admin_catalog.test.ts).
 
 export const da_DK: Record<string, string> = {
+  'error.flagActiveExists': 'denne konto har allerede en åben markering af den type',
+  'wealth.largeMovementsUnavailable':
+    'store bankbevægelser kunne ikke indlæses (læsningen af hovedbogen fik timeout); guldopgørelsen ovenfor er fuldstændig',
   'error.guildBankDeleting':
     'Dette laug er ved at blive slettet, så dets bank er lukket. Intet blev ændret.',
   'error.guildBankItemRequired':

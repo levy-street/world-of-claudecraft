@@ -22,8 +22,8 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 968,
-      "state": "2deb07bc",
+      "nextId": 998,
+      "state": "8249773b",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -60,7 +60,7 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 963,
+          "entityId": 993,
           "equipment": {
             "chest": "footpad_jerkin",
             "mainhand": "rusty_hatchet"
@@ -96,10 +96,10 @@
           "critChance": 0.0625,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.0625,
-          "fallStartY": 1.5,
+          "fallStartY": -2,
           "fiveSecondRule": 99,
           "hp": 69,
-          "id": 963,
+          "id": 993,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -110,18 +110,18 @@
           "overpowerUntil": -1,
           "petMode": "defensive",
           "pos": {
-            "x": 2,
-            "y": 1.5,
-            "z": -2
+            "x": -94,
+            "y": -2,
+            "z": -58
           },
           "potionCooldownUntil": -1,
           "rangedPower": 50,
           "resource": 100,
           "resourceType": "focus",
           "spawnPos": {
-            "x": 2,
-            "y": 1.5,
-            "z": -2
+            "x": -94,
+            "y": -2,
+            "z": -58
           },
           "spellPower": 7,
           "stats": {
@@ -144,9 +144,9 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 970,
-      "state": "575279a7",
-      "events": "1eb0a908",
+      "nextId": 1000,
+      "state": "3dd94c85",
+      "events": "20b7ee6c",
       "rng": {
         "draws": 0,
         "digest": "811c9dc5"
@@ -182,7 +182,7 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 963,
+          "entityId": 993,
           "equipment": {
             "chest": "footpad_jerkin",
             "mainhand": "rusty_hatchet"
@@ -219,10 +219,10 @@
           "critChance": 0.079,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.079,
-          "fallStartY": 1.5,
+          "fallStartY": -2,
           "fiveSecondRule": 99,
           "hp": 50000,
-          "id": 963,
+          "id": 993,
           "kind": "player",
           "level": 12,
           "lootFfaTimer": "Infinity",
@@ -233,18 +233,18 @@
           "overpowerUntil": -1,
           "petMode": "defensive",
           "pos": {
-            "x": 2,
-            "y": 1.5,
-            "z": -2
+            "x": -94,
+            "y": -2,
+            "z": -58
           },
           "potionCooldownUntil": -1,
           "rangedPower": 116,
           "resource": 100,
           "resourceType": "focus",
           "spawnPos": {
-            "x": 2,
-            "y": 1.5,
-            "z": -2
+            "x": -94,
+            "y": -2,
+            "z": -58
           },
           "spellPower": 12,
           "stats": {
@@ -270,10 +270,10 @@
           "critChance": 0.05,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.05,
-          "fallStartY": 1.5,
+          "fallStartY": -2,
           "fiveSecondRule": 99,
           "hp": 12694,
-          "id": 969,
+          "id": 999,
           "kind": "mob",
           "level": 12,
           "lootFfaTimer": "Infinity",
@@ -281,19 +281,19 @@
           "moveSpeed": 8,
           "onGround": true,
           "overpowerUntil": -1,
-          "ownerId": 963,
+          "ownerId": 993,
           "petMode": "passive",
           "petOwnerHpBonus": 12500,
           "pos": {
-            "x": 4,
-            "y": 1.5,
-            "z": -1
+            "x": -92,
+            "y": -2,
+            "z": -57
           },
           "potionCooldownUntil": -1,
           "spawnPos": {
-            "x": 4,
-            "y": 1.5,
-            "z": -1
+            "x": -92,
+            "y": -2,
+            "z": -57
           },
           "stats": {
             "armor": 202
@@ -310,9 +310,9 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 970,
-      "state": "f9bf5e6b",
-      "events": "efd5dee5",
+      "nextId": 1000,
+      "state": "803207ea",
+      "events": "efd0eab2",
       "rng": {
         "draws": 0,
         "digest": "811c9dc5"
@@ -348,7 +348,7 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 963,
+          "entityId": 993,
           "equipment": {
             "chest": "footpad_jerkin",
             "mainhand": "rusty_hatchet"
@@ -385,10 +385,10 @@
           "critChance": 0.079,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.079,
-          "fallStartY": 1.5,
+          "fallStartY": -2,
           "fiveSecondRule": 99,
           "hp": 50000,
-          "id": 963,
+          "id": 993,
           "kind": "player",
           "level": 12,
           "lootFfaTimer": "Infinity",
@@ -399,18 +399,18 @@
           "overpowerUntil": -1,
           "petMode": "defensive",
           "pos": {
-            "x": 2,
-            "y": 1.5,
-            "z": -2
+            "x": -94,
+            "y": -2,
+            "z": -58
           },
           "potionCooldownUntil": -1,
           "rangedPower": 116,
           "resource": 100,
           "resourceType": "focus",
           "spawnPos": {
-            "x": 2,
-            "y": 1.5,
-            "z": -2
+            "x": -94,
+            "y": -2,
+            "z": -58
           },
           "spellPower": 12,
           "stats": {
@@ -439,7 +439,7 @@
               "name": "Fed",
               "remaining": 5,
               "school": "nature",
-              "sourceId": 963,
+              "sourceId": 993,
               "tickInterval": 1,
               "tickTimer": 1,
               "value": 13
@@ -450,10 +450,10 @@
           "critChance": 0.05,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.05,
-          "fallStartY": 1.5,
+          "fallStartY": -2,
           "fiveSecondRule": 99,
           "hp": 6347,
-          "id": 969,
+          "id": 999,
           "kind": "mob",
           "level": 12,
           "lootFfaTimer": "Infinity",
@@ -461,19 +461,19 @@
           "moveSpeed": 8,
           "onGround": true,
           "overpowerUntil": -1,
-          "ownerId": 963,
+          "ownerId": 993,
           "petMode": "defensive",
           "petOwnerHpBonus": 12500,
           "pos": {
-            "x": 4,
-            "y": 1.5,
-            "z": -1
+            "x": -92,
+            "y": -2,
+            "z": -57
           },
           "potionCooldownUntil": -1,
           "spawnPos": {
-            "x": 4,
-            "y": 1.5,
-            "z": -1
+            "x": -92,
+            "y": -2,
+            "z": -57
           },
           "stats": {
             "armor": 202
@@ -490,9 +490,9 @@
     {
       "tick": 20,
       "time": 1,
-      "nextId": 970,
-      "state": "8ebdb3fb",
-      "events": "1e1fb82b",
+      "nextId": 1000,
+      "state": "a2060527",
+      "events": "8a2cfccf",
       "rng": {
         "draws": 0,
         "digest": "811c9dc5"
@@ -501,9 +501,9 @@
     {
       "tick": 40,
       "time": 2,
-      "nextId": 970,
-      "state": "76886a75",
-      "events": "fe7adc77",
+      "nextId": 1000,
+      "state": "81c516b7",
+      "events": "7180a531",
       "rng": {
         "draws": 0,
         "digest": "811c9dc5"
@@ -512,8 +512,8 @@
     {
       "tick": 40,
       "time": 2,
-      "nextId": 971,
-      "state": "2b5afd7b",
+      "nextId": 1001,
+      "state": "199e070f",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -548,7 +548,7 @@
               "rusty_hatchet"
             ],
             "visited": [
-              "poi:eastbrook_vale:eastbrook"
+              "poi:eastbrook_vale:eastbrook_docks"
             ]
           },
           "deedsEarned": [
@@ -567,7 +567,7 @@
           ],
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 963,
+          "entityId": 993,
           "equipment": {
             "chest": "footpad_jerkin",
             "mainhand": "rusty_hatchet"
@@ -605,10 +605,10 @@
           "critChance": 0.079,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.079,
-          "fallStartY": 1.5,
+          "fallStartY": -2,
           "fiveSecondRule": 101,
           "hp": 50000,
-          "id": 963,
+          "id": 993,
           "kind": "player",
           "level": 12,
           "lootFfaTimer": "Infinity",
@@ -619,18 +619,18 @@
           "overpowerUntil": -1,
           "petMode": "defensive",
           "pos": {
-            "x": 2,
-            "y": 1.5,
-            "z": -2
+            "x": -94,
+            "y": -2,
+            "z": -58
           },
           "potionCooldownUntil": -1,
           "rangedPower": 116,
           "resource": 100,
           "resourceType": "focus",
           "spawnPos": {
-            "x": 2,
-            "y": 1.5,
-            "z": -2
+            "x": -94,
+            "y": -2,
+            "z": -58
           },
           "spellPower": 12,
           "stats": {
@@ -649,7 +649,7 @@
           }
         },
         {
-          "aggroTargetId": 970,
+          "aggroTargetId": 1000,
           "aiState": "idle",
           "attackPower": 26,
           "auras": [
@@ -660,7 +660,7 @@
               "name": "Fed",
               "remaining": 3,
               "school": "nature",
-              "sourceId": 963,
+              "sourceId": 993,
               "tickInterval": 1,
               "tickTimer": 1,
               "value": 13
@@ -670,10 +670,10 @@
           "critChance": 0.05,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.05,
-          "fallStartY": 1.5,
+          "fallStartY": -2,
           "fiveSecondRule": 99,
           "hp": 6627,
-          "id": 969,
+          "id": 999,
           "inCombat": true,
           "kind": "mob",
           "level": 12,
@@ -682,20 +682,20 @@
           "moveSpeed": 8,
           "onGround": true,
           "overpowerUntil": -1,
-          "ownerId": 963,
+          "ownerId": 993,
           "petMode": "defensive",
           "petOwnerHpBonus": 12500,
           "petTauntTimer": 10,
           "pos": {
-            "x": 4,
-            "y": 1.5,
-            "z": -1
+            "x": -92,
+            "y": -2,
+            "z": -57
           },
           "potionCooldownUntil": -1,
           "spawnPos": {
-            "x": 4,
-            "y": 1.5,
-            "z": -1
+            "x": -92,
+            "y": -2,
+            "z": -57
           },
           "stats": {
             "armor": 202
@@ -708,25 +708,25 @@
           }
         },
         {
-          "aggroTargetId": 969,
+          "aggroTargetId": 999,
           "aiState": "chase",
           "comboUntil": -1,
           "critChance": 0.05,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.05,
-          "fallStartY": 1.5,
+          "fallStartY": -2,
           "fiveSecondRule": 99,
-          "forcedTargetId": 969,
+          "forcedTargetId": 999,
           "forcedTargetTimer": 3,
           "hostile": true,
           "hp": 50000,
-          "id": 970,
+          "id": 1000,
           "inCombat": true,
           "kind": "mob",
           "leashAnchor": {
-            "x": 5,
-            "y": 1.5,
-            "z": -1
+            "x": -91,
+            "y": -2,
+            "z": -57
           },
           "level": 8,
           "lootFfaTimer": "Infinity",
@@ -736,28 +736,28 @@
           "overpowerUntil": -1,
           "petMode": "defensive",
           "pos": {
-            "x": 5,
-            "y": 1.5,
-            "z": -1
+            "x": -91,
+            "y": -2,
+            "z": -57
           },
           "potionCooldownUntil": -1,
           "spawnPos": {
-            "x": 5,
-            "y": 1.5,
-            "z": -1
+            "x": -91,
+            "y": -2,
+            "z": -57
           },
           "stats": {
             "armor": 70
           },
-          "targetId": 969,
+          "targetId": 999,
           "templateId": "forest_wolf",
           "threat": [
             [
-              963,
+              993,
               30
             ],
             [
-              969,
+              999,
               52
             ]
           ],
@@ -772,9 +772,9 @@
     {
       "tick": 40,
       "time": 2,
-      "nextId": 971,
-      "state": "12498bae",
-      "events": "5fcbbafc",
+      "nextId": 1001,
+      "state": "79d906a2",
+      "events": "a5cd6cc5",
       "rng": {
         "draws": 0,
         "digest": "811c9dc5"
@@ -808,7 +808,7 @@
               "rusty_hatchet"
             ],
             "visited": [
-              "poi:eastbrook_vale:eastbrook"
+              "poi:eastbrook_vale:eastbrook_docks"
             ]
           },
           "deedsEarned": [
@@ -827,7 +827,7 @@
           ],
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 963,
+          "entityId": 993,
           "equipment": {
             "chest": "footpad_jerkin",
             "mainhand": "rusty_hatchet"
@@ -865,10 +865,10 @@
           "critChance": 0.079,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.079,
-          "fallStartY": 1.5,
+          "fallStartY": -2,
           "fiveSecondRule": 101,
           "hp": 50000,
-          "id": 963,
+          "id": 993,
           "kind": "player",
           "level": 12,
           "lootFfaTimer": "Infinity",
@@ -879,18 +879,18 @@
           "overpowerUntil": -1,
           "petMode": "defensive",
           "pos": {
-            "x": 2,
-            "y": 1.5,
-            "z": -2
+            "x": -94,
+            "y": -2,
+            "z": -58
           },
           "potionCooldownUntil": -1,
           "rangedPower": 116,
           "resource": 100,
           "resourceType": "focus",
           "spawnPos": {
-            "x": 2,
-            "y": 1.5,
-            "z": -2
+            "x": -94,
+            "y": -2,
+            "z": -58
           },
           "spellPower": 12,
           "stats": {
@@ -909,25 +909,25 @@
           }
         },
         {
-          "aggroTargetId": 963,
+          "aggroTargetId": 993,
           "aiState": "chase",
           "comboUntil": -1,
           "critChance": 0.05,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.05,
-          "fallStartY": 1.5,
+          "fallStartY": -2,
           "fiveSecondRule": 99,
-          "forcedTargetId": 969,
+          "forcedTargetId": 999,
           "forcedTargetTimer": 3,
           "hostile": true,
           "hp": 50000,
-          "id": 970,
+          "id": 1000,
           "inCombat": true,
           "kind": "mob",
           "leashAnchor": {
-            "x": 5,
-            "y": 1.5,
-            "z": -1
+            "x": -91,
+            "y": -2,
+            "z": -57
           },
           "level": 8,
           "lootFfaTimer": "Infinity",
@@ -937,24 +937,24 @@
           "overpowerUntil": -1,
           "petMode": "defensive",
           "pos": {
-            "x": 5,
-            "y": 1.5,
-            "z": -1
+            "x": -91,
+            "y": -2,
+            "z": -57
           },
           "potionCooldownUntil": -1,
           "spawnPos": {
-            "x": 5,
-            "y": 1.5,
-            "z": -1
+            "x": -91,
+            "y": -2,
+            "z": -57
           },
           "stats": {
             "armor": 70
           },
-          "targetId": 969,
+          "targetId": 999,
           "templateId": "forest_wolf",
           "threat": [
             [
-              963,
+              993,
               30
             ]
           ],
@@ -969,9 +969,9 @@
     {
       "tick": 40,
       "time": 2,
-      "nextId": 973,
-      "state": "f8f66096",
-      "events": "2474bfb9",
+      "nextId": 1003,
+      "state": "d641b713",
+      "events": "dac77577",
       "rng": {
         "draws": 0,
         "digest": "811c9dc5"
@@ -1005,7 +1005,7 @@
               "rusty_hatchet"
             ],
             "visited": [
-              "poi:eastbrook_vale:eastbrook"
+              "poi:eastbrook_vale:eastbrook_docks"
             ]
           },
           "deedsEarned": [
@@ -1024,7 +1024,7 @@
           ],
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 963,
+          "entityId": 993,
           "equipment": {
             "chest": "footpad_jerkin",
             "mainhand": "rusty_hatchet"
@@ -1062,10 +1062,10 @@
           "critChance": 0.079,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.079,
-          "fallStartY": 1.5,
+          "fallStartY": -2,
           "fiveSecondRule": 101,
           "hp": 50000,
-          "id": 963,
+          "id": 993,
           "kind": "player",
           "level": 12,
           "lootFfaTimer": "Infinity",
@@ -1076,18 +1076,18 @@
           "overpowerUntil": -1,
           "petMode": "defensive",
           "pos": {
-            "x": 2,
-            "y": 1.5,
-            "z": -2
+            "x": -94,
+            "y": -2,
+            "z": -58
           },
           "potionCooldownUntil": -1,
           "rangedPower": 116,
           "resource": 100,
           "resourceType": "focus",
           "spawnPos": {
-            "x": 2,
-            "y": 1.5,
-            "z": -2
+            "x": -94,
+            "y": -2,
+            "z": -58
           },
           "spellPower": 12,
           "stats": {
@@ -1106,25 +1106,25 @@
           }
         },
         {
-          "aggroTargetId": 963,
+          "aggroTargetId": 993,
           "aiState": "chase",
           "comboUntil": -1,
           "critChance": 0.05,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.05,
-          "fallStartY": 1.5,
+          "fallStartY": -2,
           "fiveSecondRule": 99,
-          "forcedTargetId": 969,
+          "forcedTargetId": 999,
           "forcedTargetTimer": 3,
           "hostile": true,
           "hp": 50000,
-          "id": 970,
+          "id": 1000,
           "inCombat": true,
           "kind": "mob",
           "leashAnchor": {
-            "x": 5,
-            "y": 1.5,
-            "z": -1
+            "x": -91,
+            "y": -2,
+            "z": -57
           },
           "level": 8,
           "lootFfaTimer": "Infinity",
@@ -1134,24 +1134,24 @@
           "overpowerUntil": -1,
           "petMode": "defensive",
           "pos": {
-            "x": 5,
-            "y": 1.5,
-            "z": -1
+            "x": -91,
+            "y": -2,
+            "z": -57
           },
           "potionCooldownUntil": -1,
           "spawnPos": {
-            "x": 5,
-            "y": 1.5,
-            "z": -1
+            "x": -91,
+            "y": -2,
+            "z": -57
           },
           "stats": {
             "armor": 70
           },
-          "targetId": 969,
+          "targetId": 999,
           "templateId": "forest_wolf",
           "threat": [
             [
-              963,
+              993,
               30
             ]
           ],
@@ -1170,9 +1170,9 @@
           "dead": true,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.05,
-          "fallStartY": 1.5,
+          "fallStartY": -2,
           "fiveSecondRule": 99,
-          "id": 972,
+          "id": 1002,
           "kind": "mob",
           "level": 12,
           "lootFfaTimer": "Infinity",
@@ -1180,19 +1180,19 @@
           "moveSpeed": 8,
           "onGround": true,
           "overpowerUntil": -1,
-          "ownerId": 963,
+          "ownerId": 993,
           "petMode": "defensive",
           "petOwnerHpBonus": 12500,
           "pos": {
-            "x": 4,
-            "y": 1.5,
-            "z": -1
+            "x": -92,
+            "y": -2,
+            "z": -57
           },
           "potionCooldownUntil": -1,
           "spawnPos": {
-            "x": 4,
-            "y": 1.5,
-            "z": -1
+            "x": -92,
+            "y": -2,
+            "z": -57
           },
           "stats": {
             "armor": 202
@@ -1209,9 +1209,9 @@
     {
       "tick": 40,
       "time": 2,
-      "nextId": 973,
-      "state": "a7b2c1d3",
-      "events": "e722b014",
+      "nextId": 1003,
+      "state": "89ed2178",
+      "events": "a131e657",
       "rng": {
         "draws": 0,
         "digest": "811c9dc5"
@@ -1245,7 +1245,7 @@
               "rusty_hatchet"
             ],
             "visited": [
-              "poi:eastbrook_vale:eastbrook"
+              "poi:eastbrook_vale:eastbrook_docks"
             ]
           },
           "deedsEarned": [
@@ -1264,7 +1264,7 @@
           ],
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 963,
+          "entityId": 993,
           "equipment": {
             "chest": "footpad_jerkin",
             "mainhand": "rusty_hatchet"
@@ -1302,10 +1302,10 @@
           "critChance": 0.079,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.079,
-          "fallStartY": 1.5,
+          "fallStartY": -2,
           "fiveSecondRule": 101,
           "hp": 50000,
-          "id": 963,
+          "id": 993,
           "kind": "player",
           "level": 12,
           "lootFfaTimer": "Infinity",
@@ -1316,18 +1316,18 @@
           "overpowerUntil": -1,
           "petMode": "defensive",
           "pos": {
-            "x": 2,
-            "y": 1.5,
-            "z": -2
+            "x": -94,
+            "y": -2,
+            "z": -58
           },
           "potionCooldownUntil": -1,
           "rangedPower": 116,
           "resource": 100,
           "resourceType": "focus",
           "spawnPos": {
-            "x": 2,
-            "y": 1.5,
-            "z": -2
+            "x": -94,
+            "y": -2,
+            "z": -58
           },
           "spellPower": 12,
           "stats": {
@@ -1346,25 +1346,25 @@
           }
         },
         {
-          "aggroTargetId": 963,
+          "aggroTargetId": 993,
           "aiState": "chase",
           "comboUntil": -1,
           "critChance": 0.05,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.05,
-          "fallStartY": 1.5,
+          "fallStartY": -2,
           "fiveSecondRule": 99,
-          "forcedTargetId": 969,
+          "forcedTargetId": 999,
           "forcedTargetTimer": 3,
           "hostile": true,
           "hp": 50000,
-          "id": 970,
+          "id": 1000,
           "inCombat": true,
           "kind": "mob",
           "leashAnchor": {
-            "x": 5,
-            "y": 1.5,
-            "z": -1
+            "x": -91,
+            "y": -2,
+            "z": -57
           },
           "level": 8,
           "lootFfaTimer": "Infinity",
@@ -1374,24 +1374,24 @@
           "overpowerUntil": -1,
           "petMode": "defensive",
           "pos": {
-            "x": 5,
-            "y": 1.5,
-            "z": -1
+            "x": -91,
+            "y": -2,
+            "z": -57
           },
           "potionCooldownUntil": -1,
           "spawnPos": {
-            "x": 5,
-            "y": 1.5,
-            "z": -1
+            "x": -91,
+            "y": -2,
+            "z": -57
           },
           "stats": {
             "armor": 70
           },
-          "targetId": 969,
+          "targetId": 999,
           "templateId": "forest_wolf",
           "threat": [
             [
-              963,
+              993,
               30
             ]
           ],
@@ -1409,10 +1409,10 @@
           "critChance": 0.05,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.05,
-          "fallStartY": 1.5,
+          "fallStartY": -2,
           "fiveSecondRule": 99,
           "hp": 4443,
-          "id": 972,
+          "id": 1002,
           "kind": "mob",
           "level": 12,
           "lootFfaTimer": "Infinity",
@@ -1420,19 +1420,19 @@
           "moveSpeed": 8,
           "onGround": true,
           "overpowerUntil": -1,
-          "ownerId": 963,
+          "ownerId": 993,
           "petMode": "defensive",
           "petOwnerHpBonus": 12500,
           "pos": {
-            "x": 4,
-            "y": 1.5,
-            "z": -1
+            "x": -92,
+            "y": -2,
+            "z": -57
           },
           "potionCooldownUntil": -1,
           "spawnPos": {
-            "x": 4,
-            "y": 1.5,
-            "z": -1
+            "x": -92,
+            "y": -2,
+            "z": -57
           },
           "stats": {
             "armor": 202
@@ -1449,8 +1449,8 @@
     {
       "tick": 40,
       "time": 2,
-      "nextId": 973,
-      "state": "12498bae",
+      "nextId": 1003,
+      "state": "79d906a2",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -1485,7 +1485,7 @@
               "rusty_hatchet"
             ],
             "visited": [
-              "poi:eastbrook_vale:eastbrook"
+              "poi:eastbrook_vale:eastbrook_docks"
             ]
           },
           "deedsEarned": [
@@ -1504,7 +1504,7 @@
           ],
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 963,
+          "entityId": 993,
           "equipment": {
             "chest": "footpad_jerkin",
             "mainhand": "rusty_hatchet"
@@ -1542,10 +1542,10 @@
           "critChance": 0.079,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.079,
-          "fallStartY": 1.5,
+          "fallStartY": -2,
           "fiveSecondRule": 101,
           "hp": 50000,
-          "id": 963,
+          "id": 993,
           "kind": "player",
           "level": 12,
           "lootFfaTimer": "Infinity",
@@ -1556,18 +1556,18 @@
           "overpowerUntil": -1,
           "petMode": "defensive",
           "pos": {
-            "x": 2,
-            "y": 1.5,
-            "z": -2
+            "x": -94,
+            "y": -2,
+            "z": -58
           },
           "potionCooldownUntil": -1,
           "rangedPower": 116,
           "resource": 100,
           "resourceType": "focus",
           "spawnPos": {
-            "x": 2,
-            "y": 1.5,
-            "z": -2
+            "x": -94,
+            "y": -2,
+            "z": -58
           },
           "spellPower": 12,
           "stats": {
@@ -1586,25 +1586,25 @@
           }
         },
         {
-          "aggroTargetId": 963,
+          "aggroTargetId": 993,
           "aiState": "chase",
           "comboUntil": -1,
           "critChance": 0.05,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.05,
-          "fallStartY": 1.5,
+          "fallStartY": -2,
           "fiveSecondRule": 99,
-          "forcedTargetId": 969,
+          "forcedTargetId": 999,
           "forcedTargetTimer": 3,
           "hostile": true,
           "hp": 50000,
-          "id": 970,
+          "id": 1000,
           "inCombat": true,
           "kind": "mob",
           "leashAnchor": {
-            "x": 5,
-            "y": 1.5,
-            "z": -1
+            "x": -91,
+            "y": -2,
+            "z": -57
           },
           "level": 8,
           "lootFfaTimer": "Infinity",
@@ -1614,24 +1614,24 @@
           "overpowerUntil": -1,
           "petMode": "defensive",
           "pos": {
-            "x": 5,
-            "y": 1.5,
-            "z": -1
+            "x": -91,
+            "y": -2,
+            "z": -57
           },
           "potionCooldownUntil": -1,
           "spawnPos": {
-            "x": 5,
-            "y": 1.5,
-            "z": -1
+            "x": -91,
+            "y": -2,
+            "z": -57
           },
           "stats": {
             "armor": 70
           },
-          "targetId": 969,
+          "targetId": 999,
           "templateId": "forest_wolf",
           "threat": [
             [
-              963,
+              993,
               30
             ]
           ],
@@ -1646,8 +1646,8 @@
     {
       "tick": 40,
       "time": 2,
-      "nextId": 974,
-      "state": "12498bae",
+      "nextId": 1004,
+      "state": "79d906a2",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -1682,7 +1682,7 @@
               "rusty_hatchet"
             ],
             "visited": [
-              "poi:eastbrook_vale:eastbrook"
+              "poi:eastbrook_vale:eastbrook_docks"
             ]
           },
           "deedsEarned": [
@@ -1701,7 +1701,7 @@
           ],
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 963,
+          "entityId": 993,
           "equipment": {
             "chest": "footpad_jerkin",
             "mainhand": "rusty_hatchet"
@@ -1739,10 +1739,10 @@
           "critChance": 0.079,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.079,
-          "fallStartY": 1.5,
+          "fallStartY": -2,
           "fiveSecondRule": 101,
           "hp": 50000,
-          "id": 963,
+          "id": 993,
           "kind": "player",
           "level": 12,
           "lootFfaTimer": "Infinity",
@@ -1753,18 +1753,18 @@
           "overpowerUntil": -1,
           "petMode": "defensive",
           "pos": {
-            "x": 2,
-            "y": 1.5,
-            "z": -2
+            "x": -94,
+            "y": -2,
+            "z": -58
           },
           "potionCooldownUntil": -1,
           "rangedPower": 116,
           "resource": 100,
           "resourceType": "focus",
           "spawnPos": {
-            "x": 2,
-            "y": 1.5,
-            "z": -2
+            "x": -94,
+            "y": -2,
+            "z": -58
           },
           "spellPower": 12,
           "stats": {
@@ -1783,25 +1783,25 @@
           }
         },
         {
-          "aggroTargetId": 963,
+          "aggroTargetId": 993,
           "aiState": "chase",
           "comboUntil": -1,
           "critChance": 0.05,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.05,
-          "fallStartY": 1.5,
+          "fallStartY": -2,
           "fiveSecondRule": 99,
-          "forcedTargetId": 969,
+          "forcedTargetId": 999,
           "forcedTargetTimer": 3,
           "hostile": true,
           "hp": 50000,
-          "id": 970,
+          "id": 1000,
           "inCombat": true,
           "kind": "mob",
           "leashAnchor": {
-            "x": 5,
-            "y": 1.5,
-            "z": -1
+            "x": -91,
+            "y": -2,
+            "z": -57
           },
           "level": 8,
           "lootFfaTimer": "Infinity",
@@ -1811,24 +1811,24 @@
           "overpowerUntil": -1,
           "petMode": "defensive",
           "pos": {
-            "x": 5,
-            "y": 1.5,
-            "z": -1
+            "x": -91,
+            "y": -2,
+            "z": -57
           },
           "potionCooldownUntil": -1,
           "spawnPos": {
-            "x": 5,
-            "y": 1.5,
-            "z": -1
+            "x": -91,
+            "y": -2,
+            "z": -57
           },
           "stats": {
             "armor": 70
           },
-          "targetId": 969,
+          "targetId": 999,
           "templateId": "forest_wolf",
           "threat": [
             [
-              963,
+              993,
               30
             ]
           ],
@@ -1843,9 +1843,9 @@
     {
       "tick": 40,
       "time": 2,
-      "nextId": 976,
-      "state": "70040445",
-      "events": "b0fefd8f",
+      "nextId": 1006,
+      "state": "75d25ea3",
+      "events": "1ba59e63",
       "rng": {
         "draws": 0,
         "digest": "811c9dc5"
@@ -1879,7 +1879,7 @@
               "rusty_hatchet"
             ],
             "visited": [
-              "poi:eastbrook_vale:eastbrook"
+              "poi:eastbrook_vale:eastbrook_docks"
             ]
           },
           "deedsEarned": [
@@ -1898,7 +1898,7 @@
           ],
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 963,
+          "entityId": 993,
           "equipment": {
             "chest": "footpad_jerkin",
             "mainhand": "rusty_hatchet"
@@ -1955,7 +1955,7 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 974,
+          "entityId": 1004,
           "equipment": {
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
@@ -1996,10 +1996,10 @@
           "critChance": 0.079,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.079,
-          "fallStartY": 1.5,
+          "fallStartY": -2,
           "fiveSecondRule": 101,
           "hp": 50000,
-          "id": 963,
+          "id": 993,
           "kind": "player",
           "level": 12,
           "lootFfaTimer": "Infinity",
@@ -2010,18 +2010,18 @@
           "overpowerUntil": -1,
           "petMode": "defensive",
           "pos": {
-            "x": 2,
-            "y": 1.5,
-            "z": -2
+            "x": -94,
+            "y": -2,
+            "z": -58
           },
           "potionCooldownUntil": -1,
           "rangedPower": 116,
           "resource": 100,
           "resourceType": "focus",
           "spawnPos": {
-            "x": 2,
-            "y": 1.5,
-            "z": -2
+            "x": -94,
+            "y": -2,
+            "z": -58
           },
           "spellPower": 12,
           "stats": {
@@ -2040,25 +2040,25 @@
           }
         },
         {
-          "aggroTargetId": 963,
+          "aggroTargetId": 993,
           "aiState": "chase",
           "comboUntil": -1,
           "critChance": 0.05,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.05,
-          "fallStartY": 1.5,
+          "fallStartY": -2,
           "fiveSecondRule": 99,
-          "forcedTargetId": 969,
+          "forcedTargetId": 999,
           "forcedTargetTimer": 3,
           "hostile": true,
           "hp": 50000,
-          "id": 970,
+          "id": 1000,
           "inCombat": true,
           "kind": "mob",
           "leashAnchor": {
-            "x": 5,
-            "y": 1.5,
-            "z": -1
+            "x": -91,
+            "y": -2,
+            "z": -57
           },
           "level": 8,
           "lootFfaTimer": "Infinity",
@@ -2068,24 +2068,24 @@
           "overpowerUntil": -1,
           "petMode": "defensive",
           "pos": {
-            "x": 5,
-            "y": 1.5,
-            "z": -1
+            "x": -91,
+            "y": -2,
+            "z": -57
           },
           "potionCooldownUntil": -1,
           "spawnPos": {
-            "x": 5,
-            "y": 1.5,
-            "z": -1
+            "x": -91,
+            "y": -2,
+            "z": -57
           },
           "stats": {
             "armor": 70
           },
-          "targetId": 969,
+          "targetId": 999,
           "templateId": "forest_wolf",
           "threat": [
             [
-              963,
+              993,
               30
             ]
           ],
@@ -2109,10 +2109,10 @@
           "critChance": 0.056,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.056,
-          "fallStartY": 0.587177,
+          "fallStartY": -3.159738,
           "gcdRemaining": 1.5,
           "hp": 50000,
-          "id": 974,
+          "id": 1004,
           "kind": "player",
           "level": 12,
           "lootFfaTimer": "Infinity",
@@ -2123,17 +2123,17 @@
           "overpowerUntil": -1,
           "petMode": "defensive",
           "pos": {
-            "x": 32,
-            "y": 0.587177,
-            "z": -2
+            "x": -64,
+            "y": -3.159738,
+            "z": -58
           },
           "potionCooldownUntil": -1,
           "resource": 870,
           "resourceType": "mana",
           "spawnPos": {
-            "x": 2,
-            "y": 1.5,
-            "z": -2
+            "x": -94,
+            "y": -2,
+            "z": -58
           },
           "spellPower": 28,
           "stats": {
@@ -2158,10 +2158,10 @@
           "critChance": 0.05,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.05,
-          "fallStartY": -0.218583,
+          "fallStartY": -3.170041,
           "fiveSecondRule": 99,
           "hp": 90,
-          "id": 975,
+          "id": 1005,
           "kind": "mob",
           "level": 12,
           "lootFfaTimer": "Infinity",
@@ -2169,19 +2169,19 @@
           "moveSpeed": 5.2,
           "onGround": true,
           "overpowerUntil": -1,
-          "ownerId": 974,
+          "ownerId": 1004,
           "petAutoSkill": true,
           "petMode": "defensive",
           "pos": {
-            "x": 34,
-            "y": -0.218583,
-            "z": -1
+            "x": -62,
+            "y": -3.170041,
+            "z": -57
           },
           "potionCooldownUntil": -1,
           "spawnPos": {
-            "x": 34,
-            "y": -0.218583,
-            "z": -1
+            "x": -62,
+            "y": -3.170041,
+            "z": -57
           },
           "stats": {
             "armor": 132
@@ -2198,9 +2198,9 @@
     {
       "tick": 60,
       "time": 3,
-      "nextId": 976,
-      "state": "1e07f21f",
-      "events": "edc83589",
+      "nextId": 1006,
+      "state": "c14f8a49",
+      "events": "fdd84c48",
       "rng": {
         "draws": 151,
         "digest": "1e93d795"
@@ -2209,9 +2209,9 @@
     {
       "tick": 80,
       "time": 4,
-      "nextId": 976,
-      "state": "23387c32",
-      "events": "1139fef4",
+      "nextId": 1006,
+      "state": "e882b1cc",
+      "events": "2c347020",
       "rng": {
         "draws": 286,
         "digest": "a616493f"
@@ -2220,8 +2220,8 @@
     {
       "tick": 80,
       "time": 4,
-      "nextId": 976,
-      "state": "23387c32",
+      "nextId": 1006,
+      "state": "e882b1cc",
       "events": "741638a5",
       "rng": {
         "draws": 286,
@@ -2256,7 +2256,7 @@
               "rusty_hatchet"
             ],
             "visited": [
-              "poi:eastbrook_vale:eastbrook"
+              "poi:eastbrook_vale:eastbrook_docks"
             ]
           },
           "deedsEarned": [
@@ -2275,7 +2275,7 @@
           ],
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 963,
+          "entityId": 993,
           "equipment": {
             "chest": "footpad_jerkin",
             "mainhand": "rusty_hatchet"
@@ -2346,7 +2346,7 @@
           ],
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 974,
+          "entityId": 1004,
           "equipment": {
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
@@ -2388,10 +2388,10 @@
           "critChance": 0.079,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.079,
-          "fallStartY": 1.5,
+          "fallStartY": -2,
           "fiveSecondRule": 103,
           "hp": 50000,
-          "id": 963,
+          "id": 993,
           "inCombat": true,
           "kind": "player",
           "level": 12,
@@ -2403,18 +2403,18 @@
           "overpowerUntil": -1,
           "petMode": "defensive",
           "pos": {
-            "x": 2,
-            "y": 1.5,
-            "z": -2
+            "x": -94,
+            "y": -2,
+            "z": -58
           },
           "potionCooldownUntil": -1,
           "rangedPower": 116,
           "resource": 100,
           "resourceType": "focus",
           "spawnPos": {
-            "x": 2,
-            "y": 1.5,
-            "z": -2
+            "x": -94,
+            "y": -2,
+            "z": -58
           },
           "spellPower": 12,
           "stats": {
@@ -2433,7 +2433,7 @@
           }
         },
         {
-          "aggroTargetId": 963,
+          "aggroTargetId": 993,
           "aiState": "attack",
           "combatTimer": 2,
           "comboUntil": -1,
@@ -2441,19 +2441,19 @@
           "detonateTimer": "Infinity",
           "dodgeChance": 0.05,
           "facing": -1.892547,
-          "fallStartY": 1.5,
+          "fallStartY": -2,
           "fiveSecondRule": 99,
-          "forcedTargetId": 969,
+          "forcedTargetId": 999,
           "forcedTargetTimer": 1,
           "hostile": true,
           "hp": 50000,
-          "id": 970,
+          "id": 1000,
           "inCombat": true,
           "kind": "mob",
           "leashAnchor": {
-            "x": 5,
-            "y": 1.5,
-            "z": -1
+            "x": -91,
+            "y": -2,
+            "z": -57
           },
           "level": 8,
           "lootFfaTimer": "Infinity",
@@ -2463,25 +2463,25 @@
           "overpowerUntil": -1,
           "petMode": "defensive",
           "pos": {
-            "x": 5,
-            "y": 1.5,
-            "z": -1
+            "x": -91,
+            "y": -2,
+            "z": -57
           },
           "potionCooldownUntil": -1,
           "spawnPos": {
-            "x": 5,
-            "y": 1.5,
-            "z": -1
+            "x": -91,
+            "y": -2,
+            "z": -57
           },
           "stats": {
             "armor": 70
           },
           "swingTimer": 0.05,
-          "targetId": 969,
+          "targetId": 999,
           "templateId": "forest_wolf",
           "threat": [
             [
-              963,
+              993,
               30
             ]
           ],
@@ -2505,10 +2505,10 @@
           "critChance": 0.056,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.056,
-          "fallStartY": 0.587177,
+          "fallStartY": -3.159738,
           "fiveSecondRule": 2,
           "hp": 50000,
-          "id": 974,
+          "id": 1004,
           "kind": "player",
           "level": 12,
           "lootFfaTimer": "Infinity",
@@ -2519,17 +2519,17 @@
           "overpowerUntil": -1,
           "petMode": "defensive",
           "pos": {
-            "x": 32,
-            "y": 0.587177,
-            "z": -2
+            "x": -64,
+            "y": -3.159738,
+            "z": -58
           },
           "potionCooldownUntil": -1,
           "resource": 876,
           "resourceType": "mana",
           "spawnPos": {
-            "x": 2,
-            "y": 1.5,
-            "z": -2
+            "x": -94,
+            "y": -2,
+            "z": -58
           },
           "spellPower": 28,
           "stats": {
@@ -2554,10 +2554,10 @@
           "critChance": 0.05,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.05,
-          "fallStartY": -0.218583,
+          "fallStartY": -3.170041,
           "fiveSecondRule": 99,
           "hp": 133,
-          "id": 975,
+          "id": 1005,
           "kind": "mob",
           "level": 12,
           "lootFfaTimer": "Infinity",
@@ -2565,19 +2565,19 @@
           "moveSpeed": 5.2,
           "onGround": true,
           "overpowerUntil": -1,
-          "ownerId": 974,
+          "ownerId": 1004,
           "petAutoSkill": true,
           "petMode": "defensive",
           "pos": {
-            "x": 34,
-            "y": -0.218583,
-            "z": -1
+            "x": -62,
+            "y": -3.170041,
+            "z": -57
           },
           "potionCooldownUntil": -1,
           "spawnPos": {
-            "x": 34,
-            "y": -0.218583,
-            "z": -1
+            "x": -62,
+            "y": -3.170041,
+            "z": -57
           },
           "stats": {
             "armor": 132
@@ -2594,9 +2594,9 @@
     {
       "tick": 80,
       "time": 4,
-      "nextId": 978,
-      "state": "0c366993",
-      "events": "caa10dee",
+      "nextId": 1008,
+      "state": "60b7c165",
+      "events": "e81ef396",
       "rng": {
         "draws": 286,
         "digest": "a616493f"
@@ -2630,7 +2630,7 @@
               "rusty_hatchet"
             ],
             "visited": [
-              "poi:eastbrook_vale:eastbrook"
+              "poi:eastbrook_vale:eastbrook_docks"
             ]
           },
           "deedsEarned": [
@@ -2649,7 +2649,7 @@
           ],
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 963,
+          "entityId": 993,
           "equipment": {
             "chest": "footpad_jerkin",
             "mainhand": "rusty_hatchet"
@@ -2720,7 +2720,7 @@
           ],
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 974,
+          "entityId": 1004,
           "equipment": {
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
@@ -2762,10 +2762,10 @@
           "critChance": 0.079,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.079,
-          "fallStartY": 1.5,
+          "fallStartY": -2,
           "fiveSecondRule": 103,
           "hp": 50000,
-          "id": 963,
+          "id": 993,
           "inCombat": true,
           "kind": "player",
           "level": 12,
@@ -2777,18 +2777,18 @@
           "overpowerUntil": -1,
           "petMode": "defensive",
           "pos": {
-            "x": 2,
-            "y": 1.5,
-            "z": -2
+            "x": -94,
+            "y": -2,
+            "z": -58
           },
           "potionCooldownUntil": -1,
           "rangedPower": 116,
           "resource": 100,
           "resourceType": "focus",
           "spawnPos": {
-            "x": 2,
-            "y": 1.5,
-            "z": -2
+            "x": -94,
+            "y": -2,
+            "z": -58
           },
           "spellPower": 12,
           "stats": {
@@ -2807,7 +2807,7 @@
           }
         },
         {
-          "aggroTargetId": 963,
+          "aggroTargetId": 993,
           "aiState": "attack",
           "combatTimer": 2,
           "comboUntil": -1,
@@ -2815,19 +2815,19 @@
           "detonateTimer": "Infinity",
           "dodgeChance": 0.05,
           "facing": -1.892547,
-          "fallStartY": 1.5,
+          "fallStartY": -2,
           "fiveSecondRule": 99,
-          "forcedTargetId": 969,
+          "forcedTargetId": 999,
           "forcedTargetTimer": 1,
           "hostile": true,
           "hp": 50000,
-          "id": 970,
+          "id": 1000,
           "inCombat": true,
           "kind": "mob",
           "leashAnchor": {
-            "x": 5,
-            "y": 1.5,
-            "z": -1
+            "x": -91,
+            "y": -2,
+            "z": -57
           },
           "level": 8,
           "lootFfaTimer": "Infinity",
@@ -2837,25 +2837,25 @@
           "overpowerUntil": -1,
           "petMode": "defensive",
           "pos": {
-            "x": 5,
-            "y": 1.5,
-            "z": -1
+            "x": -91,
+            "y": -2,
+            "z": -57
           },
           "potionCooldownUntil": -1,
           "spawnPos": {
-            "x": 5,
-            "y": 1.5,
-            "z": -1
+            "x": -91,
+            "y": -2,
+            "z": -57
           },
           "stats": {
             "armor": 70
           },
           "swingTimer": 0.05,
-          "targetId": 969,
+          "targetId": 999,
           "templateId": "forest_wolf",
           "threat": [
             [
-              963,
+              993,
               30
             ]
           ],
@@ -2879,10 +2879,10 @@
           "critChance": 0.056,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.056,
-          "fallStartY": 0.587177,
+          "fallStartY": -3.159738,
           "fiveSecondRule": 2,
           "hp": 50000,
-          "id": 974,
+          "id": 1004,
           "kind": "player",
           "level": 12,
           "lootFfaTimer": "Infinity",
@@ -2893,17 +2893,17 @@
           "overpowerUntil": -1,
           "petMode": "defensive",
           "pos": {
-            "x": 32,
-            "y": 0.587177,
-            "z": -2
+            "x": -64,
+            "y": -3.159738,
+            "z": -58
           },
           "potionCooldownUntil": -1,
           "resource": 876,
           "resourceType": "mana",
           "spawnPos": {
-            "x": 2,
-            "y": 1.5,
-            "z": -2
+            "x": -94,
+            "y": -2,
+            "z": -58
           },
           "spellPower": 28,
           "stats": {
@@ -2928,10 +2928,10 @@
           "critChance": 0.05,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.05,
-          "fallStartY": -0.218583,
+          "fallStartY": -3.170041,
           "fiveSecondRule": 99,
           "hp": 378,
-          "id": 977,
+          "id": 1007,
           "kind": "mob",
           "level": 12,
           "lootFfaTimer": "Infinity",
@@ -2939,20 +2939,20 @@
           "moveSpeed": 5,
           "onGround": true,
           "overpowerUntil": -1,
-          "ownerId": 974,
+          "ownerId": 1004,
           "petAutoSkill": true,
           "petAutoTaunt": true,
           "petMode": "defensive",
           "pos": {
-            "x": 34,
-            "y": -0.218583,
-            "z": -1
+            "x": -62,
+            "y": -3.170041,
+            "z": -57
           },
           "potionCooldownUntil": -1,
           "spawnPos": {
-            "x": 34,
-            "y": -0.218583,
-            "z": -1
+            "x": -62,
+            "y": -3.170041,
+            "z": -57
           },
           "stats": {
             "armor": 495
@@ -2969,9 +2969,9 @@
     {
       "tick": 80,
       "time": 4,
-      "nextId": 980,
-      "state": "cc3fc6a3",
-      "events": "d77682e5",
+      "nextId": 1010,
+      "state": "c1cddeb3",
+      "events": "72e1057d",
       "rng": {
         "draws": 286,
         "digest": "a616493f"
@@ -3005,7 +3005,7 @@
               "rusty_hatchet"
             ],
             "visited": [
-              "poi:eastbrook_vale:eastbrook"
+              "poi:eastbrook_vale:eastbrook_docks"
             ]
           },
           "deedsEarned": [
@@ -3024,7 +3024,7 @@
           ],
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 963,
+          "entityId": 993,
           "equipment": {
             "chest": "footpad_jerkin",
             "mainhand": "rusty_hatchet"
@@ -3095,7 +3095,7 @@
           ],
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 974,
+          "entityId": 1004,
           "equipment": {
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
@@ -3137,10 +3137,10 @@
           "critChance": 0.079,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.079,
-          "fallStartY": 1.5,
+          "fallStartY": -2,
           "fiveSecondRule": 103,
           "hp": 50000,
-          "id": 963,
+          "id": 993,
           "inCombat": true,
           "kind": "player",
           "level": 12,
@@ -3152,18 +3152,18 @@
           "overpowerUntil": -1,
           "petMode": "defensive",
           "pos": {
-            "x": 2,
-            "y": 1.5,
-            "z": -2
+            "x": -94,
+            "y": -2,
+            "z": -58
           },
           "potionCooldownUntil": -1,
           "rangedPower": 116,
           "resource": 100,
           "resourceType": "focus",
           "spawnPos": {
-            "x": 2,
-            "y": 1.5,
-            "z": -2
+            "x": -94,
+            "y": -2,
+            "z": -58
           },
           "spellPower": 12,
           "stats": {
@@ -3182,7 +3182,7 @@
           }
         },
         {
-          "aggroTargetId": 963,
+          "aggroTargetId": 993,
           "aiState": "attack",
           "combatTimer": 2,
           "comboUntil": -1,
@@ -3190,19 +3190,19 @@
           "detonateTimer": "Infinity",
           "dodgeChance": 0.05,
           "facing": -1.892547,
-          "fallStartY": 1.5,
+          "fallStartY": -2,
           "fiveSecondRule": 99,
-          "forcedTargetId": 969,
+          "forcedTargetId": 999,
           "forcedTargetTimer": 1,
           "hostile": true,
           "hp": 50000,
-          "id": 970,
+          "id": 1000,
           "inCombat": true,
           "kind": "mob",
           "leashAnchor": {
-            "x": 5,
-            "y": 1.5,
-            "z": -1
+            "x": -91,
+            "y": -2,
+            "z": -57
           },
           "level": 8,
           "lootFfaTimer": "Infinity",
@@ -3212,25 +3212,25 @@
           "overpowerUntil": -1,
           "petMode": "defensive",
           "pos": {
-            "x": 5,
-            "y": 1.5,
-            "z": -1
+            "x": -91,
+            "y": -2,
+            "z": -57
           },
           "potionCooldownUntil": -1,
           "spawnPos": {
-            "x": 5,
-            "y": 1.5,
-            "z": -1
+            "x": -91,
+            "y": -2,
+            "z": -57
           },
           "stats": {
             "armor": 70
           },
           "swingTimer": 0.05,
-          "targetId": 969,
+          "targetId": 999,
           "templateId": "forest_wolf",
           "threat": [
             [
-              963,
+              993,
               30
             ]
           ],
@@ -3254,10 +3254,10 @@
           "critChance": 0.056,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.056,
-          "fallStartY": 0.587177,
+          "fallStartY": -3.159738,
           "fiveSecondRule": 2,
           "hp": 50000,
-          "id": 974,
+          "id": 1004,
           "kind": "player",
           "level": 12,
           "lootFfaTimer": "Infinity",
@@ -3268,17 +3268,17 @@
           "overpowerUntil": -1,
           "petMode": "defensive",
           "pos": {
-            "x": 32,
-            "y": 0.587177,
-            "z": -2
+            "x": -64,
+            "y": -3.159738,
+            "z": -58
           },
           "potionCooldownUntil": -1,
           "resource": 876,
           "resourceType": "mana",
           "spawnPos": {
-            "x": 2,
-            "y": 1.5,
-            "z": -2
+            "x": -94,
+            "y": -2,
+            "z": -58
           },
           "spellPower": 28,
           "stats": {
@@ -3297,18 +3297,18 @@
           }
         },
         {
-          "aggroTargetId": 974,
+          "aggroTargetId": 1004,
           "aiState": "chase",
           "combatTimer": 99,
           "comboUntil": -1,
           "critChance": 0.05,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.05,
-          "fallStartY": -0.218583,
+          "fallStartY": -3.170041,
           "fiveSecondRule": 99,
           "hostile": true,
           "hp": 50000,
-          "id": 979,
+          "id": 1009,
           "inCombat": true,
           "kind": "mob",
           "level": 8,
@@ -3319,24 +3319,24 @@
           "overpowerUntil": -1,
           "petMode": "defensive",
           "pos": {
-            "x": 35,
-            "y": -0.218583,
-            "z": -1
+            "x": -61,
+            "y": -3.170041,
+            "z": -57
           },
           "potionCooldownUntil": -1,
           "spawnPos": {
-            "x": 35,
-            "y": -0.218583,
-            "z": -1
+            "x": -61,
+            "y": -3.170041,
+            "z": -57
           },
           "stats": {
             "armor": 70
           },
-          "targetId": 978,
+          "targetId": 1008,
           "templateId": "forest_wolf",
           "threat": [
             [
-              974,
+              1004,
               20
             ]
           ],
@@ -3351,8 +3351,8 @@
     {
       "tick": 80,
       "time": 4,
-      "nextId": 980,
-      "state": "cc3fc6a3",
+      "nextId": 1010,
+      "state": "c1cddeb3",
       "events": "741638a5",
       "rng": {
         "draws": 286,
@@ -3387,7 +3387,7 @@
               "rusty_hatchet"
             ],
             "visited": [
-              "poi:eastbrook_vale:eastbrook"
+              "poi:eastbrook_vale:eastbrook_docks"
             ]
           },
           "deedsEarned": [
@@ -3406,7 +3406,7 @@
           ],
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 963,
+          "entityId": 993,
           "equipment": {
             "chest": "footpad_jerkin",
             "mainhand": "rusty_hatchet"
@@ -3477,7 +3477,7 @@
           ],
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 974,
+          "entityId": 1004,
           "equipment": {
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
@@ -3519,10 +3519,10 @@
           "critChance": 0.079,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.079,
-          "fallStartY": 1.5,
+          "fallStartY": -2,
           "fiveSecondRule": 103,
           "hp": 50000,
-          "id": 963,
+          "id": 993,
           "inCombat": true,
           "kind": "player",
           "level": 12,
@@ -3534,18 +3534,18 @@
           "overpowerUntil": -1,
           "petMode": "defensive",
           "pos": {
-            "x": 2,
-            "y": 1.5,
-            "z": -2
+            "x": -94,
+            "y": -2,
+            "z": -58
           },
           "potionCooldownUntil": -1,
           "rangedPower": 116,
           "resource": 100,
           "resourceType": "focus",
           "spawnPos": {
-            "x": 2,
-            "y": 1.5,
-            "z": -2
+            "x": -94,
+            "y": -2,
+            "z": -58
           },
           "spellPower": 12,
           "stats": {
@@ -3564,7 +3564,7 @@
           }
         },
         {
-          "aggroTargetId": 963,
+          "aggroTargetId": 993,
           "aiState": "attack",
           "combatTimer": 2,
           "comboUntil": -1,
@@ -3572,19 +3572,19 @@
           "detonateTimer": "Infinity",
           "dodgeChance": 0.05,
           "facing": -1.892547,
-          "fallStartY": 1.5,
+          "fallStartY": -2,
           "fiveSecondRule": 99,
-          "forcedTargetId": 969,
+          "forcedTargetId": 999,
           "forcedTargetTimer": 1,
           "hostile": true,
           "hp": 50000,
-          "id": 970,
+          "id": 1000,
           "inCombat": true,
           "kind": "mob",
           "leashAnchor": {
-            "x": 5,
-            "y": 1.5,
-            "z": -1
+            "x": -91,
+            "y": -2,
+            "z": -57
           },
           "level": 8,
           "lootFfaTimer": "Infinity",
@@ -3594,25 +3594,25 @@
           "overpowerUntil": -1,
           "petMode": "defensive",
           "pos": {
-            "x": 5,
-            "y": 1.5,
-            "z": -1
+            "x": -91,
+            "y": -2,
+            "z": -57
           },
           "potionCooldownUntil": -1,
           "spawnPos": {
-            "x": 5,
-            "y": 1.5,
-            "z": -1
+            "x": -91,
+            "y": -2,
+            "z": -57
           },
           "stats": {
             "armor": 70
           },
           "swingTimer": 0.05,
-          "targetId": 969,
+          "targetId": 999,
           "templateId": "forest_wolf",
           "threat": [
             [
-              963,
+              993,
               30
             ]
           ],
@@ -3636,10 +3636,10 @@
           "critChance": 0.056,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.056,
-          "fallStartY": 0.587177,
+          "fallStartY": -3.159738,
           "fiveSecondRule": 2,
           "hp": 50000,
-          "id": 974,
+          "id": 1004,
           "kind": "player",
           "level": 12,
           "lootFfaTimer": "Infinity",
@@ -3650,17 +3650,17 @@
           "overpowerUntil": -1,
           "petMode": "defensive",
           "pos": {
-            "x": 32,
-            "y": 0.587177,
-            "z": -2
+            "x": -64,
+            "y": -3.159738,
+            "z": -58
           },
           "potionCooldownUntil": -1,
           "resource": 876,
           "resourceType": "mana",
           "spawnPos": {
-            "x": 2,
-            "y": 1.5,
-            "z": -2
+            "x": -94,
+            "y": -2,
+            "z": -58
           },
           "spellPower": 28,
           "stats": {
@@ -3679,18 +3679,18 @@
           }
         },
         {
-          "aggroTargetId": 974,
+          "aggroTargetId": 1004,
           "aiState": "chase",
           "combatTimer": 99,
           "comboUntil": -1,
           "critChance": 0.05,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.05,
-          "fallStartY": -0.218583,
+          "fallStartY": -3.170041,
           "fiveSecondRule": 99,
           "hostile": true,
           "hp": 50000,
-          "id": 979,
+          "id": 1009,
           "inCombat": true,
           "kind": "mob",
           "level": 8,
@@ -3701,24 +3701,24 @@
           "overpowerUntil": -1,
           "petMode": "defensive",
           "pos": {
-            "x": 35,
-            "y": -0.218583,
-            "z": -1
+            "x": -61,
+            "y": -3.170041,
+            "z": -57
           },
           "potionCooldownUntil": -1,
           "spawnPos": {
-            "x": 35,
-            "y": -0.218583,
-            "z": -1
+            "x": -61,
+            "y": -3.170041,
+            "z": -57
           },
           "stats": {
             "armor": 70
           },
-          "targetId": 978,
+          "targetId": 1008,
           "templateId": "forest_wolf",
           "threat": [
             [
-              974,
+              1004,
               20
             ]
           ],

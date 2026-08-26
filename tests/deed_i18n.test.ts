@@ -56,9 +56,10 @@ describe('deed_i18n English resolution', () => {
     // deeds, the twelve remaining starter-zone chronicle pairs, the four
     // Reliquary Curator rank bridges (3 titles + 1 border; the border has no
     // title manifest row), the three WARFARE lifetime-honor rank titles, the
-    // five Phase 18 Reliquary completion-ladder titles, and the walk-in
-    // castle visit pair (no title reward).
-    expect(manifest.length).toBe(273 * 2 + 42);
+    // five Phase 18 Reliquary completion-ladder titles, the walk-in castle
+    // visit pair (no title reward), and the Proving Shore graduation deed
+    // (no title reward).
+    expect(manifest.length).toBe(274 * 2 + 42);
     expect(manifest.filter((row) => row.field === 'title').length).toBe(42);
     expect(manifest).toContainEqual({
       id: 'prog_veteran',

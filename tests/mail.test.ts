@@ -942,6 +942,11 @@ describe('purgeMailOwner - deleting a character', () => {
     const aliceMeta = sim.meta(alice);
     if (!bobMeta || !aliceMeta) throw new Error('no meta');
     aliceMeta.copper = 10_000; // coin for the escrow and postage
+    // Re-pinned 2026-08 for the harbor move (d19aa33f76,
+    // docs/design/eastbrook-revamp/site-plan.md): the new-character spawn moved
+    // to the quay, ~93yd from the mailbox, so the sender must walk to the box
+    // (the nearMailbox gate) like every other sending test does.
+    moveToMailbox(sim, alice);
 
     sim.mailSendResolved(
       { key: DOOMED_KEY, name: 'Doomed' },
@@ -1043,6 +1048,10 @@ describe('purgeMailOwner - deleting a character', () => {
     const bobMeta = sim.meta(bob);
     if (!aliceMeta || !bobMeta) throw new Error('no meta');
     aliceMeta.copper = 10_000;
+    // Re-pinned 2026-08 for the harbor move (d19aa33f76,
+    // docs/design/eastbrook-revamp/site-plan.md): spawn moved to the quay, out
+    // of the nearMailbox gate; walk the sender to the box before sending.
+    moveToMailbox(sim, alice);
     sim.mailSendResolved(
       { key: sim.postOffice.mailKeyFor(bobMeta), name: 'Bob' },
       'FromAlice',

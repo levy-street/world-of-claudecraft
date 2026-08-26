@@ -23,7 +23,6 @@ import type { PendingProjectile } from '../src/sim/projectile_travel';
 import { Rng } from '../src/sim/rng';
 import { Sim } from '../src/sim/sim';
 import { createSimContext, type SimContextHost } from '../src/sim/sim_context';
-import { createVcState } from '../src/sim/social/vale_cup';
 import { SpatialGrid } from '../src/sim/spatial';
 import type { Entity } from '../src/sim/types';
 
@@ -148,6 +147,7 @@ function makeCtx() {
     delvePetStash: new Map(),
     utcDay: '',
     resetDay: '',
+    eventLeadDay: '',
     pendingMobRespawns: [],
     partyInvites: new Map(),
     readyChecks: new Map(),
@@ -252,12 +252,12 @@ function makeCtx() {
     pendingLootRolls: new Map(),
     nextLootRollId: 1,
     devCommands: false,
+    compulsoryTutorial: false,
     marketListings: [],
     commissionOrderBoard: [],
     nextCommissionOrderId: 1,
     bankerIds: [],
     guildBanks: new Map(),
-    vcup: createVcState(),
     deedDirtyPids: new Set<number>(),
     deedDirtyKeys: new Map<number, Set<string>>(),
     worldBossEntityIds: [],
@@ -400,14 +400,6 @@ function makeCtx() {
     mailAuthoredLetter: vi.fn(),
     mailboxHoldsItem: vi.fn(() => false),
     applySetProcs: vi.fn(),
-    // Vale Cup <-> Arena queue exclusion.
-    vcupSeatedOrQueued: vi.fn(() => false),
-    // The Vale Cup sport-move arms.
-    vcupBallKick: vi.fn(),
-    vcupBallPass: vi.fn(),
-    vcupShoot: vi.fn(),
-    vcupSportDash: vi.fn(),
-    vcupSportShove: vi.fn(),
     // Thornhollow Fields battleground hooks.
     bgOnPlayerDeath: vi.fn(),
     bgOnPlayerDamaged: vi.fn(),

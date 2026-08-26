@@ -138,6 +138,44 @@ CREATE UNIQUE INDEX IF NOT EXISTS guilds_realm_name ON guilds(realm, name);
 ALTER TABLE guilds ADD COLUMN IF NOT EXISTS motd TEXT NOT NULL DEFAULT '';
 ALTER TABLE guilds ADD COLUMN IF NOT EXISTS motd_set_by TEXT NOT NULL DEFAULT '';
 
+-- Guild pledge board (docs/prd/guild-pledge-board.md): per-guild recruiting
+-- settings ride the guilds row like the motd.
+ALTER TABLE guilds ADD COLUMN IF NOT EXISTS pledges_enabled BOOLEAN NOT NULL DEFAULT TRUE;
+ALTER TABLE guilds ADD COLUMN IF NOT EXISTS pledge_min_level INT NOT NULL DEFAULT 1;
+ALTER TABLE guilds ADD COLUMN IF NOT EXISTS pledge_note TEXT NOT NULL DEFAULT '';
+
+-- One active pledge per character (the pledge is a public line on the
+-- character, singular by construction). Bounded at one row per character, so
+-- no retention sweep is needed.
+CREATE TABLE IF NOT EXISTS guild_pledges (
+  character_id INT PRIMARY KEY REFERENCES characters(id) ON DELETE CASCADE,
+  guild_id INT NOT NULL REFERENCES guilds(id) ON DELETE CASCADE,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+CREATE INDEX IF NOT EXISTS guild_pledges_guild ON guild_pledges(guild_id);
+
+-- The re-pledge cooldown stamp, per character: the last time they PLEDGED,
+-- SURVIVING withdraw (which deletes the pledge row itself), so
+-- withdraw-and-re-pledge cannot dodge the anti-spam window
+-- (server/social.ts PLEDGE_REPLEDGE_COOLDOWN_MS). Bounded at one row per
+-- character, so no retention sweep is needed.
+CREATE TABLE IF NOT EXISTS guild_pledge_cooldowns (
+  character_id INT PRIMARY KEY REFERENCES characters(id) ON DELETE CASCADE,
+  pledged_at TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+
+-- The rejection ladder, per (guild, ACCOUNT): 1 day, then 1 week, then
+-- forever (sim/guild_pledge_ladder.ts owns the arithmetic). KEEP FOREVER by
+-- design: the third tier is permanent, so rows must outlive every sweep; the
+-- table is bounded by guilds x accounts that were actually rejected.
+CREATE TABLE IF NOT EXISTS guild_pledge_ladder (
+  guild_id INT NOT NULL REFERENCES guilds(id) ON DELETE CASCADE,
+  account_id INT NOT NULL REFERENCES accounts(id) ON DELETE CASCADE,
+  reject_count INT NOT NULL DEFAULT 0,
+  rejected_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+  PRIMARY KEY (guild_id, account_id)
+);
+
 CREATE TABLE IF NOT EXISTS guild_members (
   character_id INT PRIMARY KEY REFERENCES characters(id) ON DELETE CASCADE,
   guild_id INT NOT NULL REFERENCES guilds(id) ON DELETE CASCADE,
@@ -535,6 +573,143 @@ export class PgSocialDb implements SocialDb {
     );
     const row = res.rows[0];
     return { motd: row?.motd ?? '', motdSetBy: row?.motdSetBy ?? '' };
+  }
+
+  // ---- guild pledges (docs/prd/guild-pledge-board.md) ----
+
+  async guildByName(name: string): Promise<{ id: number; name: string } | null> {
+    const res = await this.pool.query(
+      'SELECT id, name FROM guilds WHERE realm = $1 AND lower(name) = lower($2)',
+      [REALM, name],
+    );
+    return res.rows[0] ?? null;
+  }
+
+  async guildPledgeSettings(
+    guildId: number,
+  ): Promise<{ enabled: boolean; minLevel: number; note: string }> {
+    const res = await this.pool.query(
+      'SELECT pledges_enabled AS enabled, pledge_min_level AS "minLevel", pledge_note AS note FROM guilds WHERE id = $1',
+      [guildId],
+    );
+    const row = res.rows[0];
+    return { enabled: row?.enabled ?? true, minLevel: row?.minLevel ?? 1, note: row?.note ?? '' };
+  }
+
+  async setGuildPledgeSettings(
+    guildId: number,
+    settings: { enabled: boolean; minLevel: number; note: string },
+  ): Promise<void> {
+    await this.pool.query(
+      'UPDATE guilds SET pledges_enabled = $2, pledge_min_level = $3, pledge_note = $4 WHERE id = $1',
+      [guildId, settings.enabled, settings.minLevel, settings.note],
+    );
+  }
+
+  async guildPledges(guildId: number): Promise<(CharInfo & { sinceMs: number })[]> {
+    const res = await this.pool.query(
+      `SELECT c.id, c.name, c.class AS cls, c.level, c.realm,
+              (EXTRACT(EPOCH FROM p.created_at) * 1000)::float8 AS "sinceMs"
+         FROM guild_pledges p JOIN characters c ON c.id = p.character_id
+        WHERE p.guild_id = $1
+        ORDER BY p.created_at ASC`,
+      [guildId],
+    );
+    return res.rows;
+  }
+
+  async pledgeOf(
+    charId: number,
+  ): Promise<{ guildId: number; guildName: string; sinceMs: number } | null> {
+    const res = await this.pool.query(
+      `SELECT p.guild_id AS "guildId", g.name AS "guildName",
+              (EXTRACT(EPOCH FROM p.created_at) * 1000)::float8 AS "sinceMs"
+         FROM guild_pledges p JOIN guilds g ON g.id = p.guild_id
+        WHERE p.character_id = $1`,
+      [charId],
+    );
+    return res.rows[0] ?? null;
+  }
+
+  async upsertPledge(charId: number, guildId: number): Promise<void> {
+    await this.pool.query(
+      `INSERT INTO guild_pledges (character_id, guild_id) VALUES ($1, $2)
+       ON CONFLICT (character_id) DO UPDATE SET guild_id = EXCLUDED.guild_id, created_at = now()`,
+      [charId, guildId],
+    );
+  }
+
+  async deletePledge(charId: number): Promise<void> {
+    await this.pool.query('DELETE FROM guild_pledges WHERE character_id = $1', [charId]);
+  }
+
+  async lastPledgeAtMs(charId: number): Promise<number | null> {
+    const res = await this.pool.query(
+      `SELECT (EXTRACT(EPOCH FROM pledged_at) * 1000)::float8 AS ms
+         FROM guild_pledge_cooldowns WHERE character_id = $1`,
+      [charId],
+    );
+    return res.rows[0]?.ms ?? null;
+  }
+
+  async touchPledgeCooldown(charId: number): Promise<void> {
+    await this.pool.query(
+      `INSERT INTO guild_pledge_cooldowns (character_id) VALUES ($1)
+       ON CONFLICT (character_id) DO UPDATE SET pledged_at = now()`,
+      [charId],
+    );
+  }
+
+  async accountIdForCharacter(charId: number): Promise<number | null> {
+    const res = await this.pool.query('SELECT account_id AS id FROM characters WHERE id = $1', [
+      charId,
+    ]);
+    return res.rows[0]?.id ?? null;
+  }
+
+  async pledgeLadder(
+    guildId: number,
+    accountId: number,
+  ): Promise<{ rejectCount: number; rejectedAtMs: number } | null> {
+    const res = await this.pool.query(
+      `SELECT reject_count AS "rejectCount",
+              (EXTRACT(EPOCH FROM rejected_at) * 1000)::float8 AS "rejectedAtMs"
+         FROM guild_pledge_ladder WHERE guild_id = $1 AND account_id = $2`,
+      [guildId, accountId],
+    );
+    return res.rows[0] ?? null;
+  }
+
+  async bumpPledgeLadder(guildId: number, accountId: number): Promise<number> {
+    const res = await this.pool.query(
+      `INSERT INTO guild_pledge_ladder (guild_id, account_id, reject_count, rejected_at)
+       VALUES ($1, $2, 1, now())
+       ON CONFLICT (guild_id, account_id)
+       DO UPDATE SET reject_count = guild_pledge_ladder.reject_count + 1, rejected_at = now()
+       RETURNING reject_count AS "rejectCount"`,
+      [guildId, accountId],
+    );
+    return res.rows[0]?.rejectCount ?? 1;
+  }
+
+  async wipePledgeLadder(guildId: number, accountId: number): Promise<void> {
+    await this.pool.query(
+      'DELETE FROM guild_pledge_ladder WHERE guild_id = $1 AND account_id = $2',
+      [guildId, accountId],
+    );
+  }
+
+  async guildLifetimeXpTotal(guildId: number): Promise<number> {
+    // The same per-member expression the guild high-score board sums
+    // (db.ts LIFETIME_XP_EXPR family); one indexed aggregate per call site
+    // (join-time stamping), never per frame.
+    const res = await this.pool.query(
+      `SELECT COALESCE(SUM(COALESCE((c.state->>'lifetimeXp')::float8, 0)), 0) AS total
+         FROM guild_members m JOIN characters c ON c.id = m.character_id
+        WHERE m.guild_id = $1`,
+      [guildId],
+    );
+    return Number(res.rows[0]?.total ?? 0);
   }
 
   // Cached: see server/guild_roster_cache.ts. The raw JOIN lives in

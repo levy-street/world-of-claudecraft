@@ -122,8 +122,7 @@ export function pruneYumiQueue(ctx: SimContext, fmt: YumiFormat): void {
         !e.dead &&
         !ctx.arenaMatches.has(id) &&
         !ctx.bgMatches.has(id) &&
-        e.pos.x <= DUNGEON_X_THRESHOLD &&
-        !ctx.vcupSeatedOrQueued(id)
+        e.pos.x <= DUNGEON_X_THRESHOLD
       );
     });
   if (fmt === 'yumi3') ctx.arenaQueueYumi3 = ctx.arenaQueueYumi3.filter(keep);

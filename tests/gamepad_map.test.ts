@@ -8,6 +8,7 @@ import {
   GAMEPAD_ZOOM_OUT,
   GP,
   gamepadButtonLabel,
+  gamepadKindOverride,
   risingEdges,
   stickToLook,
   stickToMoveFlags,
@@ -145,7 +146,8 @@ describe('default layout', () => {
     // bare d-pad cycles.
     expect(DEFAULT_GAMEPAD_BINDINGS[GP.X]).toBe('subcommands');
     expect(DEFAULT_GAMEPAD_BINDINGS[GP.B]).toBe('cancel');
-    expect(DEFAULT_GAMEPAD_BINDINGS[GP.BACK]).toBe('cycleHud');
+    expect(DEFAULT_GAMEPAD_BINDINGS[GP.BACK]).toBe('bags');
+    expect(DEFAULT_GAMEPAD_BINDINGS[GP.R3]).toBe('cycleHud');
     expect(DEFAULT_GAMEPAD_BINDINGS[GP.START]).toBe('escape');
     for (const idx of Object.keys(DEFAULT_GAMEPAD_BINDINGS).map(Number)) {
       expect(BINDABLE_BUTTONS).toContain(idx);
@@ -164,16 +166,9 @@ describe('default layout', () => {
     for (const b of unbound) expect(DEFAULT_GAMEPAD_BINDINGS[b]).toBeUndefined();
   });
 
-  it('covers its action-bar slots exactly once (catches a dropped or duplicated slotN)', () => {
+  it('reserves abilities for the cross hotbar instead of shipping a misleading bare slot', () => {
     const values = Object.values(DEFAULT_GAMEPAD_BINDINGS);
-    // Only the LEFT bumper still carries a bare slot; the right one took the set
-    // switch a console pad puts there. Every cross-hotbar button (the d-pad and
-    // the face four) is reserved for system verbs and its sixteen trigger-held
-    // slots, and the triggers themselves are the modifiers, so the flat layout
-    // deliberately reaches no other slot.
-    // Exactly once: count 0 = a dropped slot, count >= 2 = a duplicated slot.
-    expect(values.filter((v) => v === 'slot2').length, 'slot2').toBe(1);
-    for (const slot of [0, 1, 3, 4, 5, 6, 7, 8]) {
+    for (const slot of [0, 1, 2, 3, 4, 5, 6, 7, 8]) {
       expect(values.filter((v) => v === `slot${slot}`).length, `slot${slot}`).toBe(0);
     }
   });
@@ -217,6 +212,13 @@ describe('detectGamepadKind', () => {
   it('classifies Xbox pads reported with hyphenated or XInput-only names', () => {
     expect(detectGamepadKind('Xbox 360 Controller (XInput STANDARD GAMEPAD)')).toBe('xbox');
     expect(detectGamepadKind('Microsoft X-Box 360 pad')).toBe('xbox');
+    expect(detectGamepadKind('Microsoft Controller')).toBe('xbox');
+  });
+
+  it('accepts decimal vendor ids used by some platform game-controller layers', () => {
+    expect(detectGamepadKind('Controller (Vendor: 1118 Product: 2835)')).toBe('xbox');
+    expect(detectGamepadKind('Controller (Vendor: 1356 Product: 3302)')).toBe('playstation');
+    expect(detectGamepadKind('Controller (Vendor: 1406 Product: 8201)')).toBe('nintendo');
   });
 
   it('reads the vendor id from the Firefox "vendor-product-name" id format', () => {
@@ -249,6 +251,16 @@ describe('detectGamepadKind', () => {
   it('falls back to generic for an unknown or empty id', () => {
     expect(detectGamepadKind('Some Random Pad (Vendor: 1234 Product: 5678)')).toBe('generic');
     expect(detectGamepadKind('')).toBe('generic');
+  });
+});
+
+describe('gamepadKindOverride', () => {
+  it('keeps Auto on detected labels and maps each explicit controller family', () => {
+    expect(gamepadKindOverride(0)).toBeNull();
+    expect(gamepadKindOverride(1)).toBe('xbox');
+    expect(gamepadKindOverride(2)).toBe('playstation');
+    expect(gamepadKindOverride(3)).toBe('nintendo');
+    expect(gamepadKindOverride(99)).toBeNull();
   });
 });
 

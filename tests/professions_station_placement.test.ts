@@ -97,6 +97,23 @@ function safetyBuffer(): number {
   return buffer;
 }
 
+// How far past a hub circle's authored radius a station or its master may
+// stand. Re-pinned 2026-08 for the Eastbrook harbor move (d19aa33f76,
+// docs/design/eastbrook-revamp/site-plan.md): the harbor-site layout spreads
+// Eastbrook into districts around the hub at (-14,-100) while the zone's
+// TOWN_RADIUS stayed 26 (the old compact town's footprint, and a
+// world-shaping knob: terrain blends, decoration keep-out and the town
+// collider circle all read it, so this suite must not move it). The
+// owner-approved site plan deliberately parks the inn at the harbor end of
+// main street with the kitchens station and Cook Marlow at its yard, so the
+// district fronts sit past the bare circle. Measured at re-pin time (worst
+// first): cook_marlow 31.85, kitchens station 30.16, weaver_ottilie 29.54,
+// loom station 27.80, tinker_gizzel 26.05; the forge pair and both
+// out-of-zone stations sit inside their bare hub radii. A pad of 7 bounds
+// the worst by 1.15 yd, tight enough that a lot drifting one district
+// further out reds here.
+const DISTRICT_PAD = 7;
+
 describe('station and master placement safety (derived from content)', () => {
   it('every station and master clears the strictest existing town-NPC camp margin', () => {
     const buffer = safetyBuffer();
@@ -131,16 +148,21 @@ describe('station and master placement safety (derived from content)', () => {
       // Beside, not merely near: the master is the station's one visible
       // anchor today, so they must read as attached to it (and trivially
       // stand inside its STATION_RADIUS gate circle).
+      // Band widened from 3 to 4.5 for owner round 6b: forgemistress_darva now
+      // stands 4.2 yd out and tinker_gizzel 3.2 yd out, on opposite sides of
+      // their adjacent benches, so the crafts lane stops reading as one huddle.
+      // Each master still works their own station and still stands well inside
+      // its STATION_RADIUS gate circle, which is what this bound guards.
       expect(distTo(master.pos, station.pos), `${station.masterNpcId} strayed`).toBeLessThanOrEqual(
-        3,
+        4.5,
       );
       expect(distTo(station.pos, entry.zone.hub), `${station.id} outside hub`).toBeLessThanOrEqual(
-        entry.zone.hub.radius,
+        entry.zone.hub.radius + DISTRICT_PAD,
       );
       expect(
         distTo(master.pos, entry.zone.hub),
         `${station.masterNpcId} outside hub`,
-      ).toBeLessThanOrEqual(entry.zone.hub.radius);
+      ).toBeLessThanOrEqual(entry.zone.hub.radius + DISTRICT_PAD);
       expect(STATION_RADIUS).toBeGreaterThan(3);
     }
   });

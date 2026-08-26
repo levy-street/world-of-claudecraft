@@ -105,6 +105,8 @@ const KNOWN_CODES = [
   'two_factor.setup_required',
   'validation.failed',
   'deeds.invalid_input',
+  'guilds.invalid_roster_name',
+  'guilds.unknown',
   'steam.disabled',
   'steam.invalid_ticket',
   'steam.banned',

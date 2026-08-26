@@ -179,6 +179,9 @@ export const ERROR_CODES = deepFreeze({
   // identity: "points" (not enough reward points to claim this swag reward)
   'discord.swag_points': { params: [] },
   'deeds.invalid_input': { params: [] },
+  // The public guild roster read (server/guild_roster.ts).
+  'guilds.invalid_roster_name': { params: [] },
+  'guilds.unknown': { params: [] },
 
   // --- Steam link family codes (server/steam/). The whole surface is
   // env-gated: with STEAM_ENABLED unset every route answers steam.disabled.

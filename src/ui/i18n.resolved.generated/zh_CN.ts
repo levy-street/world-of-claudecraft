@@ -955,15 +955,15 @@ export const zh_CN: EnTranslations = {
       "actionRadial": "技能方向",
       "actionRadialCancel": "取消动作",
       "radialCenter": "中心",
-      "radialUp": "Up",
+      "radialUp": "上",
       "radialRight": "右",
-      "radialDown": "Down",
-      "radialLeft": "Left",
+      "radialDown": "下",
+      "radialLeft": "左",
       "consumableSeat": "消耗品",
       "menuControl": "菜单",
       "menuControlAria": "菜单。点按打开聊天，或按住并向右滑动以使用坐骑、地图、背包等。",
       "menuControlAriaTap": "菜单。点按打开菜单行：坐骑、地图、背包等。再次点按可打开聊天。",
-      "menuLabel": "Menu",
+      "menuLabel": "菜单",
       "quickActions": "快捷操作",
       "quickActionsAria": "快捷操作。点按打开坐骑、聊天、地图、背包等操作行，或按住并向右滑动进行选择。",
       "quickActionsAriaTap": "快捷操作。点按打开坐骑、聊天、地图、背包等操作行，然后点按其中一项。再次点按该控件可关闭。",
@@ -980,14 +980,14 @@ export const zh_CN: EnTranslations = {
       "spellbookPageLabel": "页{page}",
       "hideKeyboard": "隐藏键盘",
       "chatPlaceholder": "说点什么...（! 显示社区指令）",
-      "barEditor": "Edit Bars",
+      "barEditor": "编辑动作条",
       "barEditorAria": "编辑动作条布局"
     },
     "barEditor": {
       "title": "编辑动作条",
       "close": "关闭动作条编辑器",
       "pages": "动作条页面",
-      "pageTab": "Page {page}",
+      "pageTab": "第{page}页",
       "buttonHeader": "按钮{button}",
       "cellAria": "按钮{button}，{direction}：{action}",
       "emptyCellAria": "按钮{button}，{direction}：空",
@@ -998,6 +998,16 @@ export const zh_CN: EnTranslations = {
       "clear": "清除",
       "clearAria": "清除一个槽位",
       "clearArmed": "点击一个槽位即可清除。"
+    },
+    "tutorialGreeting": {
+      "bodyFirst": "这张面孔我可没见过，朋友。在这片土地上，初次踏上冒险之路的人照传统都会去试炼之滨走一趟，那是海峡对面的一座安静小岛。在那里你可以先磨练身手、熟悉这个世界，再去迎接它的挑战。渡船来回都通，去或不去都没人会小看你。",
+      "bodyRefresher": "又换了一副新面孔回来了？那你知道该怎么做。不过，出发前若想温习一遍，试炼之滨从不拒绝回炉的学生，渡船随时候着你。",
+      "play": "进行新手教学",
+      "skip": "跳过新手教学",
+      "declineNote": "随你的意，朋友。哪天改了主意，鸦邮信箱旁的渡船铃随时都能送你去试炼之滨，不分昼夜。狼群不等人，它等。",
+      "bellHomeNote": "这么快就从海滨回来了？你刚才敲响的正是渡船铃。它的孪生兄弟就挂在那边鸦邮信箱旁：想回试炼之滨，随时敲响它，渡航就会送你过去。敲错了也不打紧。",
+      "islandArrivalNote": "刚下渡船吗？欢迎来到试炼之滨。看守塔姆就在你正前方的海滩上守着试炼跑道：走到他跟前，直到他的名字显示出来，然后按 F，或者用鼠标左键点击他，他的跑道会把你双腿该会的都教给你。等你准备离开时，敲响立在我码头旁的那口铃，渡航就会送你回东溪镇。",
+      "noteClose": "明白了"
     },
     "tutorial": {
       "moveBodyTouch": "使用摇杆移动，拖动屏幕环顾四周。先走几步开始吧。",
@@ -1010,6 +1020,117 @@ export const zh_CN: EnTranslations = {
       "nextTipQuestLog": "打开任务日志（{key}）查找附近的下一个任务。",
       "nextTipMap": "查看世界地图（{key}）了解任务所在位置。",
       "nextTipSocial": "打开社交面板（{key}）寻找队伍应对更强的战斗。"
+    },
+    "bootcamp": {
+      "title": "最初的脚步",
+      "talkTitle": "与看守塔姆交谈",
+      "talkBody": "看守塔姆就在前方守着试炼跑道的大门。走到他跟前，直到他的名字显示出来，然后按 {interactKey}，或者用鼠标左键点击他，与他交谈：他会给你安排这趟跑道。",
+      "talkBodyTouch": "看守塔姆就在前方守着试炼跑道的大门。走到他跟前，直到他的名字显示出来，然后点按他，或点按使用按钮，与他交谈：他会给你安排这趟跑道。",
+      "talkBodyPad": "看守塔姆就在前方守着试炼跑道的大门。走到他跟前，直到他的名字显示出来，然后按下互动键与他交谈：他会给你安排这趟跑道。",
+      "forwardTitle": "走过第一条跑道",
+      "forwardBody": "走进塔姆身旁的跑道，按住 {forwardKey}，沿跑道向西走到旗帜处。",
+      "forwardBodyTouch": "走进塔姆身旁的跑道，把移动摇杆推向上方，沿跑道向西走到旗帜处。",
+      "forwardBodyPad": "走进塔姆身旁的跑道，把左摇杆推向上方，沿跑道向西走到旗帜处。",
+      "turnwalkTitle": "转身，再走",
+      "turnwalkBody": "第一面旗到手。按住 {turnKey} 原地转身，直到正对向南延伸的围栏跑道，然后再次按住 {forwardKey}，沿跑道走到第二面旗。",
+      "turnwalkBodyTouch": "第一面旗到手。用手指拖动世界画面（不是移动摇杆）来转身，直到正对向南延伸的围栏跑道，然后把摇杆推向上方，沿跑道走到第二面旗。",
+      "turnwalkBodyPad": "第一面旗到手。推动右摇杆转身，直到正对向南延伸的围栏跑道，然后把左摇杆推向上方，沿跑道走到第二面旗。",
+      "strafeTitle": "转身，然后前进",
+      "strafeBody": "只剩最后一个弯。按住 {turnLeftKey} 原地转身，直到正对最后一条跑道，然后再次按住 {forwardKey}，一直走到红旗被你甩在身后。",
+      "strafeBodyTouch": "只剩最后一个弯。用手指划动画面（不是移动摇杆）转身，直到正对最后一条跑道，然后把摇杆上推，一直走到红旗被你甩在身后。",
+      "strafeBodyPad": "只剩最后一个弯。推动右摇杆转身，直到正对最后一条跑道，然后把左摇杆上推，一直走到红旗被你甩在身后。",
+      "cameraTitle": "转动视角",
+      "cameraBody": "交上成绩之前还有最后一课：按住鼠标右键并拖动，把视角绕着自己整整转上一圈。知道身后站着什么，才能打赢仗。",
+      "cameraBodyTouch": "交上成绩之前还有最后一课：用手指拖动世界画面，把视角绕着自己整整转上一圈。知道身后站着什么，才能打赢仗。",
+      "cameraBodyPad": "交上成绩之前还有最后一课：推动右摇杆，把视角绕着自己整整转上一圈。知道身后站着什么，才能打赢仗。",
+      "courseProgress": "旗帜 {current}/{total}",
+      "doneTitle": "跑完全程",
+      "doneBody": "腿上的功夫就这些了。监工佩尔就站在红旗旁边：对着他按 {interactKey}，或者用鼠标左键点击他，交上你的成绩，领取你的第一份报酬。",
+      "doneBodyTouch": "腿上的功夫就这些了。监工佩尔就站在红旗旁边：点按他，交上你的成绩，领取你的第一份报酬。",
+      "doneBodyPad": "腿上的功夫就这些了。监工佩尔就站在红旗旁边：按下互动键，交上你的成绩，领取你的第一份报酬。",
+      "coachNextTitle": "下一位：{npc}",
+      "coachNextBody": "沿着金色路径去找{npc}。走到跟前直到名字显示出来，然后按 {interactKey}，或者用鼠标左键点击对方，接下你的下一件差事。",
+      "coachNextBodyTouch": "沿着金色路径去找{npc}。走到跟前直到名字显示出来，然后点按对方，或点按使用按钮，接下你的下一件差事。",
+      "coachNextBodyPad": "沿着金色路径去找{npc}。走到跟前直到名字显示出来，然后按下互动键，接下你的下一件差事。",
+      "coachTaskBody": "沿着金色路径去完成差事。右侧的追踪栏随时记着进度，迷了路就按 {mapKey} 打开地图。",
+      "coachTaskBodyTouch": "沿着金色路径去完成差事。右侧的追踪栏随时记着进度，迷了路就点按地图按钮看路。",
+      "coachTaskBodyPad": "沿着金色路径去完成差事。右侧的追踪栏随时记着进度，迷了路就按下地图按钮看路。",
+      "coachReadyTitle": "差事办妥",
+      "coachReadyBody": "前往{npc}身边，按 {interactKey}，或者用鼠标左键点击对方，交上差事，领取报酬。",
+      "coachReadyBodyTouch": "前往{npc}身边，点按对方，交上差事，领取报酬。",
+      "coachReadyBodyPad": "前往{npc}身边，按下互动键，交上差事，领取报酬。",
+      "taskStrikeTrueBody": "走到一个草人跟前，用鼠标左键点击它，把它设为目标：它的名字会出现在屏幕上方。然后按 {attackKey}，或者点击动作条上的第一个按钮，挥出这一刀。一直打到一个散架为止。",
+      "taskStrikeTrueBodyTouch": "走到一个草人跟前，点按它，把它设为目标。然后点按动作条上的第一个按钮，挥出这一刀。一直打到一个散架为止。",
+      "taskStrikeTrueBodyPad": "走到一个草人跟前，按下目标键把它设为目标。然后按下第一个动作键，挥出这一刀。一直打到一个散架为止。",
+      "taskHoneBody": "用鼠标左键点击一个草人把它设为目标，然后按 {abilityKey} 使用{ability}。那是你自己的本事，不是随手一挥。命中三次。",
+      "taskHoneBodyTouch": "点击一个草人把它设为目标，然后点击动作条上的{ability}。那是你自己的本事，不是随手一挥。命中三次。",
+      "taskHoneBodyPad": "把一个草人设为目标，然后按放着{ability}的动作按钮。那是你自己的本事，不是随手一挥。命中三次。",
+      "taskLongWalkBody": "按 {bagsKey} 打开背包，然后点击往生石。它会让你就地倒下。这里没有任何东西能伤到你，这么做也不会让你损失什么。",
+      "taskLongWalkBodyTouch": "沿着海岸路往南走到往生石前，点击它跪下。这里没有任何东西能伤到你，这么做也不会让你损失什么。",
+      "taskLongWalkBodyPad": "沿着海岸路往南走到往生石前，按互动按钮跪下。这里没有任何东西能伤到你，这么做也不会让你损失什么。",
+      "taskLongWalkDeadBody": "你死了。什么也没丢。按下释放灵魂，你会在营地后面的墓地化作幽魂站起来。",
+      "taskLongWalkDeadBodyTouch": "你死了。什么也没丢。点击释放灵魂，你会在营地后面的墓地化作幽魂站起来。",
+      "taskLongWalkDeadBodyPad": "你死了。什么也没丢。选择释放灵魂，你会在营地后面的墓地化作幽魂站起来。",
+      "taskLongWalkGhostBody": "你现在是幽魂，没有东西碰得到你。你的尸体在地图上有标记：走回去，靠近之后就会出现在尸体处复活的按钮。按下它，你就完好如初，没有任何惩罚。",
+      "taskLongWalkGhostBodyTouch": "你现在是幽魂，没有东西碰得到你。你的尸体在地图上有标记：走回去，靠近之后就会出现在尸体处复活的按钮。点击它，你就完好如初，没有任何惩罚。",
+      "taskLongWalkGhostBodyPad": "你现在是幽魂，没有东西碰得到你。你的尸体在地图上有标记：走回去，靠近之后就会出现在尸体处复活的按钮。选择它，你就完好如初，没有任何惩罚。",
+      "taskShellBody": "掠蟹是会回击的。用鼠标左键点击一只，把它设为目标，然后按 {abilityKey} 使用{ability}，不停攻击。要是一次有太多只扑上来，就沿小路往回撤：它们很快就会放弃追赶，休息时你的生命值也会慢慢回满。",
+      "taskShellBodyTouch": "掠蟹是会回击的。点击一只把它设为目标，然后点击动作条上的{ability}。要是一次有太多只扑上来，就沿小路往回撤：它们很快就会放弃追赶，休息时你的生命值也会慢慢回满。",
+      "taskShellBodyPad": "掠蟹是会回击的。把一只设为目标，然后按放着{ability}的动作按钮。要是一次有太多只扑上来，就沿小路往回撤：它们很快就会放弃追赶，休息时你的生命值也会慢慢回满。",
+      "taskStrikeTrueBodyCaster": "走到一个草人跟前，用鼠标左键点击它，把它设为目标：它的名字会出现在屏幕上方。然后按 {attackKey}，或者点击动作条上的第二个按钮，施放你的法术。一直施放到一个散架为止。",
+      "taskStrikeTrueBodyCasterTouch": "走到一个草人跟前，点按它，把它设为目标。然后点按动作条上的第二个按钮，施放你的法术。一直施放到一个散架为止。",
+      "taskStrikeTrueBodyCasterPad": "走到一个草人跟前，按下目标键把它设为目标。然后按下第二个动作键，施放你的法术。一直施放到一个散架为止。",
+      "taskShellBodyCaster": "掠蟹是会回击的。用鼠标左键点击一只，把它设为目标，然后按 {abilityKey} 使用{ability}，保持距离不停施放。要是一次有太多只扑上来，就沿小路往回撤：它们很快就会放弃追赶，休息时你的生命值也会慢慢回满。",
+      "taskShellBodyCasterTouch": "掠蟹是会回击的。点击一只把它设为目标，然后点击动作条上的{ability}，保持距离不停施放。要是一次有太多只扑上来，就沿小路往回撤：它们很快就会放弃追赶，休息时你的生命值也会慢慢回满。",
+      "taskShellBodyCasterPad": "掠蟹是会回击的。把一只设为目标，然后按放着{ability}的动作按钮，保持距离不停施放。要是一次有太多只扑上来，就沿小路往回撤：它们很快就会放弃追赶，休息时你的生命值也会慢慢回满。",
+      "taskPearlBody": "沿着金色路径走到沙滩最西端的潮池。站在水边，按 {bagsKey} 打开背包，用鼠标左键点击咸水诱饵把它引出来。像对付掠蟹那样和它战斗，等它倒下后，对着它的蟹壳按 {interactKey}，取走莹润珍珠。",
+      "taskPearlBodyTouch": "沿着金色路径走到沙滩最西端的潮池。站在水边，打开背包点按咸水诱饵把它引出来。像对付掠蟹那样和它战斗，等它倒下后，点按它的蟹壳，取走莹润珍珠。",
+      "taskPearlBodyPad": "沿着金色路径走到沙滩最西端的潮池。站在水边，打开背包选择咸水诱饵把它引出来。像对付掠蟹那样和它战斗，等它倒下后，对着它的蟹壳按下互动键，取走莹润珍珠。",
+      "taskWreckLineBody": "漂流货箱沿着通往晨憩营地的小路一路排开。走到一只漂流货箱跟前，直到它的名字显示出来，然后按 {interactKey}，或者用鼠标左键点击货箱，把它捡起来。凑满六只，这批海货就齐了。",
+      "taskWreckLineBodyTouch": "漂流货箱沿着通往晨憩营地的小路一路排开。走到一只漂流货箱跟前，直到它的名字显示出来，然后点按货箱，或点按使用按钮，把它捡起来。凑满六只，这批海货就齐了。",
+      "taskWreckLineBodyPad": "漂流货箱沿着通往晨憩营地的小路一路排开。走到一只漂流货箱跟前，直到它的名字显示出来，然后按下互动键把它捡起来。凑满六只，这批海货就齐了。",
+      "taskPouchBody": "对着{npc}按 {interactKey}，或者用鼠标左键点击对方，打开货摊，然后用鼠标左键点击亚麻小袋买下它。",
+      "taskPouchBodyTouch": "点按{npc}打开货摊，然后点按亚麻小袋买下它。",
+      "taskPouchBodyPad": "对着{npc}按下互动键打开货摊，然后选中亚麻小袋买下它。",
+      "readyPouchBody": "小袋已买下。按 {bagsKey} 打开背包，用鼠标左键点击亚麻小袋，把它系进一个空着的袋扣。然后前往{npc}身边，按 {interactKey}，把小袋亮给对方看。",
+      "readyPouchBodyTouch": "小袋已买下。打开背包，点按亚麻小袋，把它系进一个空着的袋扣。然后前往{npc}身边，点按对方，把小袋亮给对方看。",
+      "readyPouchBodyPad": "小袋已买下。打开背包，选中亚麻小袋，把它系进一个空着的袋扣。然后前往{npc}身边，按下互动键，把小袋亮给对方看。",
+      "promptTalk": "交谈",
+      "promptTurnIn": "交任务",
+      "promptPickUp": "拾取",
+      "promptLootPearl": "拾取珍珠",
+      "promptRead": "阅读",
+      "promptRing": "敲响",
+      "promptHold": "按住",
+      "promptSelect": "选择目标",
+      "promptAttack": "攻击",
+      "promptUseAbility": "使用技能",
+      "promptKneel": "跪下",
+      "promptOpenBags": "打开背包",
+      "promptCharacterSheet": "打开角色面板",
+      "promptLookAround": "按住右键拖动来环视四周",
+      "promptJump": "跳跃",
+      "promptSummon": "召唤",
+      "ringEquipTitle": "戴上你的战利品",
+      "ringEquipBody": "珍珠之母就在你的背包里。按 {bagsKey} 打开背包，然后用鼠标左键点击戒指，把它戴上手指。",
+      "ringEquipBodyTouch": "珍珠之母就在你的背包里。打开背包，点按戒指把它戴上手指。",
+      "ringEquipBodyPad": "珍珠之母就在你的背包里。打开背包，选择戒指把它戴上手指。",
+      "ringAdmireTitle": "瞧瞧你",
+      "ringAdmireBody": "很衬你。按 {charKey} 打开角色面板，看看戴在手上的戒指，以及它提升的每一项属性。",
+      "ringAdmireBodyTouch": "很衬你。从菜单打开角色面板，看看戴在手上的戒指，以及它提升的每一项属性。",
+      "ringAdmireBodyPad": "很衬你。从菜单打开角色面板，看看戴在手上的戒指，以及它提升的每一项属性。",
+      "keycapThen": "然后",
+      "voiceArrival": "平安上岸啦，朋友。看见脚下这条金色路径了吗？它比我还认得路，跟着走就是。",
+      "voiceFirstFlag": "过了一面旗了。腿别停，还剩两面。",
+      "voiceRunDone": "跑得干净利落。奖赏在监工佩尔那里，去领吧。",
+      "voiceStationDoneA": "干得好。往下一处去吧，路已经为你点亮了。",
+      "voiceStationDoneB": "你越来越上手了，错不了。",
+      "voiceVeerOff": "慢着，朋友，走反了。金色路径在你身后呢。",
+      "voiceGraduate": "钟为你敲响了。海那头的东溪正等着你，你也准备好了。",
+      "bellTitle": "敲响渡船铃",
+      "bellBody": "你的航程已经挣到了。走到码头旁的渡船铃跟前，按 {interactKey}，或者用鼠标左键点击它，扬帆前往东溪镇。",
+      "bellBodyTouch": "你的航程已经挣到了。走到码头旁的渡船铃跟前，点按它，扬帆前往东溪镇。",
+      "bellBodyPad": "你的航程已经挣到了。走到码头旁的渡船铃跟前，按下互动键，扬帆前往东溪镇。"
     },
     "widgets": {
       "clockTitle": "本地时间 - 点击切换 12/24 小时制",
@@ -1061,6 +1182,31 @@ export const zh_CN: EnTranslations = {
       "devTierCol": "徽章",
       "mergedPrs": "已合并 PR",
       "devEmpty": "还没有上榜的贡献者。"
+    },
+    "pledge": {
+      "open": "接受宣誓",
+      "closed": "不接受宣誓",
+      "minLevel": "{level}级以上",
+      "action": "宣誓",
+      "actionTitle": "向{guild}宣誓",
+      "pledged": "已宣誓",
+      "yourGuild": "你的公会",
+      "tab": "宣誓",
+      "tabWithCount": "宣誓（{count}）",
+      "empty": "还没有人向你的公会宣誓。",
+      "accept": "接受",
+      "acceptTitle": "接受{name}的宣誓",
+      "reject": "拒绝",
+      "rejectTitle": "拒绝{name}的宣誓",
+      "settings": "招募",
+      "acceptingLabel": "接受宣誓",
+      "minLevelLabel": "最低等级",
+      "noteLabel": "榜单留言",
+      "notePlaceholder": "告诉有意加入的玩家你的公会在寻找什么",
+      "save": "保存",
+      "yourPledge": "你的宣誓：{guild}",
+      "since": "宣誓于{date}",
+      "withdraw": "撤回宣誓"
     },
     "raidLockout": {
       "title": "团队副本锁定",
@@ -1153,7 +1299,6 @@ export const zh_CN: EnTranslations = {
       "targetFriendlyNext": "切换友方目标",
       "targetPrev": "反向切换目标",
       "discord": "Discord",
-      "valecup": "溪谷杯",
       "bgFlag": "战场夺旗动作",
       "sheathe": "收起/拔出武器",
       "dive": "下潜",
@@ -1314,6 +1459,7 @@ export const zh_CN: EnTranslations = {
       "endedForfeitLog": "本场比赛以弃权告终。",
       "firstWinBonusLine": "每日首胜:+{honor}荣誉",
       "firstWinBonusLog": "每日首胜:你额外获得{honor}点荣誉。",
+      "doubleHonorLine": "双倍荣誉周末:今日荆谷原野荣誉奖励均为{mult}倍,打满全场的败方也按胜方奖励结算",
       "timeWarningMinutes": "还剩{minutes}分钟",
       "timeWarningOneMinute": "还剩一分钟",
       "timeWarningMinutesLog": "本场战斗还剩{minutes}分钟。",
@@ -1323,146 +1469,6 @@ export const zh_CN: EnTranslations = {
         "azureKeep": "蔚蓝要塞",
         "ruinCourtyard": "废墟庭院",
         "graveyard": "墓地"
-      }
-    },
-    "vcup": {
-      "title": "溪谷杯",
-      "shootPower": "力度",
-      "close": "关闭溪谷杯窗口",
-      "offlineNote": "赛程簿已合上。溪谷杯目前不可用。",
-      "recordLine": "你的战绩：{wins} 胜，{losses} 负，{draws} 平。",
-      "bracketsAria": "比赛赛级",
-      "bracketLabel": "{n}对{n}",
-      "waitingCount": "{count} 人等待中",
-      "nationsHeading": "旗帜国度",
-      "nation": {
-        "vale": "东溪谷",
-        "mirefen": "泥沼",
-        "thornpeak": "荆峰",
-        "coliseum": "灰烬斗技场",
-        "choir": "苍白唱诗班",
-        "ogre": "食人魔氏族",
-        "moon": "苍白之月",
-        "copperdig": "铜矿坑"
-      },
-      "awayNote": "若双方举同一面旗帜，客队将使用反转配色。",
-      "rolesHeading": "运动位置",
-      "rolesSmallBracketNote": "在1对1和2对2赛级中，所有选手都以全能型出场。要求3对3或更大赛级的功绩在此无法达成。",
-      "role": {
-        "allrounder": {
-          "name": "全能型",
-          "desc": "样样都会：踢球、长传，还有一记正当的肩撞。"
-        },
-        "striker": {
-          "name": "前锋",
-          "desc": "为大脚开球和灵巧侧身而生。"
-        },
-        "sweeper": {
-          "name": "清道夫",
-          "desc": "把持球者撞开，再把球大脚解围。"
-        },
-        "keeper": {
-          "name": "守门员",
-          "desc": "用抓球、扑救和长踢守住球门区。"
-        }
-      },
-      "queue": "加入队列",
-      "leaveQueue": "离开队列",
-      "queueNote": "随时随地排队；哨声会召唤你前往母猪场。",
-      "queuedStatus": "已排入 {bracket}：第 {position} 位，共 {count} 人。",
-      "blockNation": "请先选择一个旗帜国度。",
-      "blockPartySize": "这个赛级需要更小的队伍。",
-      "blockNotLeader": "只有队长才能为队伍排队。",
-      "inMatchNote": "你的队伍正在场上。继续比赛！",
-      "deserterNote": "场地管理员记着呢。{seconds} 秒后才能再次排队。",
-      "liveHeading": "母猪场现况",
-      "liveAria": "溪谷杯：{nationA} {scoreA}，{nationB} {scoreB}",
-      "walkUp": "走到母猪场，从看台上观赛。",
-      "noLive": "球场很安静。目前没有比赛。",
-      "boardHeading": "优胜者榜",
-      "boardEmpty": "尚无优胜记录。铜奶桶还在等待。",
-      "boardWins": "{count} 胜",
-      "enterAsGuild": "以 {guild} 的旗号参赛",
-      "guildRecordLine": "你的公会战绩：{wins} 胜，{losses} 负。",
-      "guildBoardHeading": "公会旗帜榜",
-      "guildBoardEmpty": "还没有公会上场。扬起你的旗帜吧！",
-      "guildBoardWl": "{wins} 胜，{losses} 负",
-      "practice": "与机器人练习赛",
-      "practiceNote": "立即在母猪场开始一场完整的机器人比赛。",
-      "practiceUnratedNote": "练习赛不计入评级：战绩与功绩之书进度均不计算。",
-      "practicingNow": "正在练习（{count}）：",
-      "clock": "{minutes}:{seconds}",
-      "indicatorQueued": "溪谷杯队列：{bracket}，第 {position} 位，共 {count} 人",
-      "indicatorLive": "溪谷杯",
-      "indicatorOpen": "打开溪谷杯窗口",
-      "phaseCountdown": "{seconds} 秒后开球",
-      "phaseGoal": "进球！",
-      "phaseGolden": "金球制",
-      "phaseOver": "全场结束",
-      "bannerFound": "溪谷杯开赛：{nationA} 对阵 {nationB}！",
-      "bannerCountdown": "{seconds} 秒后开球...",
-      "bannerKickoff": "开球！",
-      "bannerGoal": "进球！{nation} 破门！",
-      "bannerSave": "{name} 扑救成功！",
-      "bannerGolden": "金球制：下一球定胜负！",
-      "bannerEnd": "全场结束：{nationA} {scoreA}，{nationB} {scoreB}",
-      "bannerWin": "母猪场的胜利！",
-      "bannerDraw": "母猪场的比赛以平局收场。",
-      "bannerLoss": "在母猪场落败。",
-      "logQueued": "你加入了 {bracket} 溪谷杯队列（第 {position} 位）。",
-      "logUnqueued": "你离开了溪谷杯队列。",
-      "logFound": "你的溪谷杯比赛已就绪：{nationA} 对阵 {nationB}。",
-      "logRoster": "你方：{allies}。对方：{enemies}。",
-      "logGoal": "{name} 为 {nation} 破门！{nationA} {scoreA}，{nationB} {scoreB}。",
-      "logSave": "{name} 完成扑救！",
-      "logWin": "你赢下了母猪场的这一战。",
-      "logDraw": "母猪场的这一战以平局告终。",
-      "logLoss": "你输掉了母猪场的这一战。",
-      "gossipOpen": "赛程簿",
-      "gossipOpenAria": "打开溪谷杯窗口",
-      "mobileLabel": "杯赛",
-      "briefing": {
-        "subtitle": "赛前简报",
-        "vs": "对",
-        "rulesHeading": "玩法",
-        "rule1": "把球踢或传进对方球门即可得分。",
-        "rule2": "先进 5 球者胜，或全场结束时进球最多者胜。",
-        "rule3": "全场打平则进入金球赛：下一个进球者获胜。",
-        "rule4": "铲球只会把人撞倒，没有人会受伤，丰收休战为证。",
-        "rule5": "任何人都可以走上前，在看台上为你助威。",
-        "kitHeading": "你的技能",
-        "kitNote": "比赛期间，这些动作将取代你的职业技能。",
-        "unratedNote": "场上有机器人，因此本场为非评级赛：战绩不会变动，进球、扑救与零封的功绩均不计算。",
-        "practiceUnratedNote": "这是练习赛，因此不计入评级：战绩不会变动，功绩之书进度也不计算。",
-        "rosterHeading": "出场名单",
-        "you": "你",
-        "bot": "电脑",
-        "ready": "我准备好了",
-        "readyDone": "已准备",
-        "readyAria": "准备开球",
-        "waiting": "正在等待对方准备……",
-        "whistle": "开球哨将在 {seconds} 秒后吹响。",
-        "readyCount": "已准备 {ready}/{total}"
-      },
-      "bet": {
-        "title": "本场投注",
-        "aria": "溪谷杯比赛投注",
-        "closesIn": "{seconds} 秒后停止投注",
-        "closed": "投注已截止",
-        "prize": "奖池 {amount}",
-        "splitAria": "两队投注池占比",
-        "expand": "查看并下注",
-        "collapse": "收起投注",
-        "oddsLabel": "赔率",
-        "back": "押注 {team}",
-        "form": "{wins}胜-{losses}负",
-        "mine": "你的投注：{amount} 押 {team}",
-        "none": "你还没有在本场比赛下注。",
-        "record": "投注战绩：{wins}胜-{losses}负，{sign}{net}",
-        "wonBanner": "你赢了这注！",
-        "wonLog": "你的溪谷杯投注赢了：返还 {amount}。",
-        "lostLog": "你的溪谷杯投注输了：{amount}。",
-        "refundLog": "投注作废，已退还你的 {amount} 本金。"
       }
     },
     "options": {
@@ -1574,6 +1580,11 @@ export const zh_CN: EnTranslations = {
     },
     "controller": {
       "title": "手柄",
+      "glyphStyle": "按键标签",
+      "glyphStyleAuto": "自动",
+      "glyphStyleXbox": "Xbox",
+      "glyphStylePlayStation": "PlayStation（索尼）",
+      "glyphStyleNintendo": "任天堂",
       "enable": "启用手柄",
       "invertY": "反转镜头（Y轴）",
       "deadzone": "摇杆死区",
@@ -2661,7 +2672,8 @@ export const zh_CN: EnTranslations = {
       "mobLevel": "{level}",
       "mobEliteLevel": "{level}+",
       "afkTag": "暂离",
-      "cheaterTag": "< 作弊者 >"
+      "cheaterTag": "< 作弊者 >",
+      "pledgeTag": "{guild}的宣誓者"
     },
     "mobTooltip": {
       "levelFamily": "等级 {level} {family}",
@@ -2985,7 +2997,12 @@ export const zh_CN: EnTranslations = {
       "tip": "销售收益或退回物品正在商人处等待你领取。"
     },
     "noticeboard": {
-      "empty": "看起来没有张贴任何内容。"
+      "empty": "看起来没有张贴任何内容。",
+      "subtitle": "本服务器的公会",
+      "rosterTitle": "查看{guild}的成员名单",
+      "back": "返回",
+      "popupTitle": "公会告示柱",
+      "close": "关闭"
     },
     "bank": {
       "title": "银行",
@@ -3117,6 +3134,10 @@ export const zh_CN: EnTranslations = {
         "arenaClash": {
           "title": "竞技场之战",
           "note": "决斗者涌向灰烬斗兽场。排队开打，向天梯进发。"
+        },
+        "doubleHonor": {
+          "title": "双倍荣誉周末",
+          "note": "战营吹响集结号：整个周末，荆谷原野荣誉奖励翻倍，打满全场的败方也按胜方奖励结算。"
         },
         "fishingDerby": {
           "title": "钓鱼大赛",
@@ -4322,6 +4343,10 @@ export const zh_CN: EnTranslations = {
     "deeds": {
       "invalid_input": "输入无效。"
     },
+    "guilds": {
+      "invalid_roster_name": "公会名称无效。",
+      "unknown": "没有这个名字的公会。"
+    },
     "steam": {
       "disabled": "Steam 关联当前不可用。",
       "invalid_ticket": "Steam 无法验证此关联请求。请在桌面客户端中重试。",
@@ -4445,7 +4470,6 @@ export const zh_CN: EnTranslations = {
       "combat": "战斗",
       "talents": "天赋",
       "arena": "竞技场与 PvP",
-      "valeCup": "溪谷杯",
       "thornhollow": "荆谷原野",
       "deeds": "功绩之书",
       "reliquary": "圣物库",
@@ -4555,6 +4579,8 @@ export const zh_CN: EnTranslations = {
         "fenBlurb": "越过秋色之冠，是一片垂柳与静水的明亮沼泽，还有一座护城河环绕的小镇。",
         "farshoreName": "远岸",
         "farshoreBlurb": "沙洲另一头的一座岛屿，天空在裂野之上撕裂开来，而鸥港为每一次破口鸣响它的钟。",
+        "provingName": "试炼之滨",
+        "provingBlurb": "海峡对面一座安静的训练之岛，新冒险者在谷地对他们提出任何要求之前，先在这里站稳脚跟。",
         "nightName": "夜绽花野",
         "nightBlurb": "一片繁星午夜的国度，花朵照亮小径，月栖镇彻夜守望。",
         "hauntName": "怨灵林",
@@ -4655,7 +4681,6 @@ export const zh_CN: EnTranslations = {
       "reliquary": "圣物库",
       "sheathe": "收起/拔出武器",
       "crafting": "制作",
-      "valeCup": "溪谷杯",
       "mount": "骑乘 / 下骑",
       "calendar": "活动日历",
       "dungeonFinder": "地下城查找器",
@@ -5517,6 +5542,10 @@ export const zh_CN: EnTranslations = {
       "farshoreGreeting": "你是从沙洲堤道过来的？那你是这一周里的头一个，守望者肯定想亲眼瞧瞧你。",
       "farshoreGreeter": "守钟人塔姆，登岸口",
       "farshorePlaceNotes": "鸥港是岛上唯一的城镇，也是它的堡垒。登岸口是沙洲堤道上岸的地方，岬角上立着一口警钟；守望草甸占着镇子东南的高地，一位裂察在那里聆听下一次裂开；碎裂断崖在岛的南端豁然裂开；裂野则是鸥港以东那片被摧残的麦田，至今仍爬满了从那道裂口涌出来的东西。",
+      "provingBlurb": "谷地海峡对面的一座安静小岛，被辟为训练场：一处营地、一片练武场、一段布满残骸的海滩，还有一班双向通行的渡船。",
+      "provingGreeting": "谷地感激过的每一位英雄，都曾站在你现在站的地方，而且当时没有一个人分得清剑该握哪头。",
+      "provingGreeter": "教官玛伦，晨憩营地",
+      "provingPlaceNotes": "晨憩营地是岛上唯一的聚居点：几顶帐篷、一个货摊和一堆集合篝火。旧码头面向谷地，渡送法阵从那里送毕业生跨过海峡；营地以南的练武场为任何需要的人立着稻草人；沉船滩则是潮水用漂流货箱付账的那段满是残骸的海岸。",
       "travelTitle": "四处走动",
       "travelBody": "王国里的每一条路，都得靠走或者骑。这里没有飞行路线，没有马车，也没有传送网络：地图是一整块相连的陆地，每一处连接都是你可以踩上去的东西。山脊把一片土地与下一片隔开，两地共享一道山脊时，道路便会翻过一处山口。不过并非每一处边界都是这样。北面有一条长长的堤道，载着道路从帷幕幽谷跨过水面，通往更北的雪国；而回到南边，有一道细细的天然沙洲，名叫沙洲堤道，自东溪谷海岸向东延伸，直抵远岸岛上的登岸口，那座岛根本没有陆上边界。整个地表世界里恰好只有一道真正的门户：荆峰高处的一层暮色之幕，通往帷幕幽谷。幽谷的南侧山脊被封死，没有山口可以穿过，所以那层幕正是你最初进去的方式，而回程时它会在你身后合上。\n\n无论你倒在哪里，走回来的路都不长。每一片区域至少有一座墓地，一位灵魂医者悬在墓碑上方，释放出的灵魂会在最近的那一座升起。\n\n地图不会终结于一堵看不见的墙。陆地会一路铺展成海滩与岬角，然后没入开阔的水面。世界本就打算让你游过去的那些地方，也就是两片土地之间的海峡与湖泊，都平静而安全。若你偏要向外海进发，距离本身会把你劝回来：你会被警告一次，再警告一次，而如果你还继续游，大海就会把你耗到死。下潜也有它自己的限度，因为你的气在水下会用尽，所以水一提醒你，就浮上来换口气、掉头回去吧。",
       "mountsTitle": "坐骑",
@@ -5733,36 +5762,6 @@ export const zh_CN: EnTranslations = {
       "ladderBody": "每场比赛都会牵动一份与角色绑定的持久战场评级，无论胜负，而历代榜单则为国度的勇士们排定名次。",
       "rewardsHeading": "一场比赛给什么",
       "rewardsBody": "每一场打完的比赛都会给荣誉：获胜给得更多，落败或平局也有一份安慰；此外你每拿下一个击杀、每协助一次，都会额外得到少量荣誉，所以在远离旗帜的地方厮杀同样值得。每天的首胜还会额外给一份奖励，只要这份奖励还等着你，面板就会告诉你。这个“每天”属于荣誉自己，它按自己的时钟翻篇，而不跟着王国的副本重置走。反复遇上同一支队伍，从第二次起比赛本身给的荣誉会减少，但很快就会稳定在一个下限，而不会一路跌到零；被判弃权的比赛则一点都不给。赚到的荣誉可以在任意一位战争军需官处消费。"
-    },
-    "valeCupPage": {
-      "heading": "溪谷杯",
-      "intro": "母猪场上的野猪球：选一面旗帜、选一个位置，把塞满稻草的野猪皮球踢过守门员，去争夺铜奶桶。不流血，无战利品，只有看台的欢呼。",
-      "loreHeading": "野猪球与丰收休战",
-      "loreOldSow": "早在亡者苏醒之前，东溪的农工们就在收割后的麦茬地上玩野猪球：两群人，一张塞满稻草的野猪皮，和拖到绿地两端的两扇货车门。第一颗球，“老母猪”，如今镀铜挂在酒馆壁炉上方。",
-      "loreTruce": "当灰烬斗技场开始批准战争竞技时，红溪元帅以更温和的方式回应：在老绿地上立下长期的丰收休战。货车门变成了球门，绿地有了围墙、看台和一个名字：母猪场。而奖品始终是优胜者们共饮的那只瘪了的奶桶：铜奶桶。",
-      "howHeading": "怎么玩",
-      "howQueue": "通过溪谷杯窗口随处排队，或到母猪场大门找场地管理员布拉姆。选择从一对一到五对五的赛级、一面旗帜国度和一个运动位置；可以单排，也可以带上队伍。",
-      "howMatch": "开球时你的职业技能会被换成运动技能，赛后原样恢复。踢球以地面准星瞄准，球会在挡板上反弹，带球就是推着球跑。在全场结束前比对方进更多球；平局进入金球制。",
-      "howTruce": "母猪场上无人流血：铲抢只会让人翻滚，什么都不会造成伤害，宠物也会场外休息。",
-      "spectateBody": "球场同一时间只进行一场比赛，任何人都可以走到看台观赛。",
-      "bettingHeading": "栏杆边的小赌怡情",
-      "bettingBody": "比赛组建期间，母猪场的观众可以押注其中一方：赌注汇入同一个奖池，终场哨响时，赢家按各自下注的比例瓜分输家的奖池。平局，或是一场无人押中的爆冷，会退还每一枚钱币。上场比赛的球员不能给本场下注，而栏杆边会记着你终身的投注胜负与净得钱币。",
-      "practiceHeading": "练习赛与空闲的球场",
-      "practiceBody": "溪谷杯窗口还提供练习：一份专属的球场副本，双方都由机器人补满，任何结果都不计入你的战绩。正式比赛还差一两个人？稍等片刻，机器人便会补齐两队，而只要场上有机器人，比赛就只是友谊赛，绝不计入评级。当母猪场空闲时，机器人还会上演一场表演赛，你可以从看台上观赛、下注；一旦有真正的玩家准备就绪，表演赛便会让出球场，所有赌注原数退还。",
-      "nationsHeading": "八个旗帜国度",
-      "nationsBody": "每支队伍都在一面旗帜下比赛。队长选择国度；若双方举同一面旗，客队使用反转配色。",
-      "nationVale": "绿与金，扬着麦捆旗：主场球队，骨子里都是农工。",
-      "nationMirefen": "青与灰，苍鹭旗下：耐心、腿长、从不着急。",
-      "nationThornpeak": "冰蓝与白，山峰旗下：步伐稳健、性子倔强。",
-      "nationColiseum": "红与黑，交叉双剑：他们踢起球来仍像在打仗。",
-      "nationChoir": "淡蓝与银，铃铛旗下：诡异、精准、非常安静。",
-      "nationOgre": "橙与棕，铁拳当先：肩膀开路，并引以为豪。",
-      "nationMoon": "紫与银，弯月旗下：夜行的球员，脚步轻盈。",
-      "nationCopperdig": "铜与褐，别着镐头：跑不停歇的矿工。",
-      "rolesHeading": "运动位置",
-      "rolesBody": "你的位置决定你带上球场的技能。人人都会踢球；其余看性情。在一人组和二人组的对局中，所有人都使用全能型的技能套装，因此位置选择要从三人组往上才真正发挥作用。",
-      "rewardsHeading": "休战规矩",
-      "rewardsBody": "休战规矩意味着没有经验也没有战利品：一场分出胜负的比赛会计入你的战绩和优胜者榜，而一场胜利也会计入当天的奖励任务。中途弃赛会让你的位置空缺，而场地管理员记着呢。"
     },
     "deedsPage": {
       "intro": "功绩之书记录着你在这个世界所做的一切，从走出新手山谷的第一步，到王国所能提供的最艰难的战斗。一边游玩一边赢得功绩，佩戴它们授予的头衔，看着你的名望不断攀升。",
@@ -5993,7 +5992,7 @@ export const zh_CN: EnTranslations = {
       "deedsHeading": "铭记旅程的功业",
       "deedsBody": "功业之书伴随这一切：首次调谐获得Craftsworn，首次杰作获得Masterwright，均可作为头衔佩戴。八种可修行业各在技能50设有里程碑功业，并在上限125加冕Grandmaster头衔；钓鱼在100熟练获得Old Salt，200获得Master Angler头衔。\n\n此外还有更静默的篇章：首次采集与首次制作的功业、野外奇遇中的意外收获，以及拾起拆解之路的印记。这一切皆为装饰，只有头衔与声望。功业永不赋予力量，它只证明你曾在场。",
       "startHeading": "从哪里开始",
-      "startBody": "初到Eastbrook？找Foreman Odell接下A Trade for Every Hand，他会指给你镇东南Copper Dig一带的矿脉。此后旅途中经过的每处矿脉、树木与草药都值得采集。回到镇上按T打开制作窗口，先做人人都会的普通配方，再去锻造坊、厨房、织机与工坊拜访诸位大师，顺便接下他们的工作订单换取稳定的铜板。等公会的信找到你时，你早已知道哪一对行业才是归宿。",
+      "startBody": "初到Eastbrook？找Foreman Odell接下A Trade for Every Hand，他会指给你镇东北Copper Dig一带的矿脉，让你磨出最初的老茧。留意矿坑本身：驻扎在那里的深岩挖掘者等级比新手高出几级，所以先采外围的矿脉，等级练起来一些之后再去碰营地核心。此后旅途中经过的每处矿脉、树木与草药都值得采集，熟练度自然而然会随旅途积累。\n\n回到镇上按T打开制作窗口，先做人人都会的普通配方，再去锻造坊、厨房、织机与工坊拜访诸位大师，看看他们教些什么，顺便接下他们的工作订单换取稳定的铜板。等公会的信找到你时，你早已知道哪一对行业才是归宿。",
       "colStation": "工位",
       "colHub": "主城",
       "colMaster": "大师",
@@ -6078,13 +6077,13 @@ export const zh_CN: EnTranslations = {
         },
         "leatherworking": {
           "identityHeading": "迅捷者的皮甲",
-          "identityBody": "梯子从朴素的Fenbridge硬皮件经优秀的marshstalker件爬到精良的mirewarden套装，工匠能裁出的最好皮甲。两件法系皮件补全阵容：野外普通件Eastbrook Druid's Hide与技能75的Duskhide Wraps。制皮位于烹饪与裁缝之间；制装师在Eastbrook的Weaver Ottilie处宣誓，与烹饪组成的Trapper暂无誓约任务。",
+          "identityBody": "梯子从朴素的Fenbridge硬皮件经优秀的marshstalker件爬到精良的mirewarden套装，工匠能裁出的最好皮甲。两件法系皮件补全阵容：野外普通件Eastbrook Druid's Hide与技能50的Duskhide Wraps。制皮位于烹饪与裁缝之间；制装师在Eastbrook的Weaver Ottilie处宣誓，与烹饪组成的Trapper暂无誓约任务。",
           "materialsHeading": "狩猎即收获",
-          "materialsBody": "在制皮这里，练级路线与供应线是同一条：粗皮直接从带皮尸体上剥取（狼和野猪最多），每具尸体只服务先到的一人。精良及以上的采集还会给出Pristine Hide，Mirewarden Jerkin正需要这种署名标本，见一块存一块。\n\n配角不多：蛛腿与蛛丝、人形生物的家纺布、每件mirewarden精良品一块锇矿（Duskhide Wraps顶阶要六块），以及制革坊柜台16铜的Tanning Agent。不想挖矿的话Tanner Hesk也卖锇矿。",
+          "materialsBody": "在制皮这里，练级路线与供应线是同一条：粗皮直接从带皮尸体上剥取（狼和野猪最多），每具尸体只服务先到的一人。精良及以上的采集还会给出Pristine Hide，Mirewarden Jerkin正需要这种署名标本，见一块存一块。\n\n配角不多：蛛腿与蛛丝、人形生物的家纺布、每件mirewarden精良品一块锇矿（Duskhide Wraps要六块），以及制革坊柜台16铜的Tanning Agent。锇矿本身从不在柜台出售：只能自己开采，无论是在荆峰还是几乎任何新手区域的入门矿脉（唯独远岸只挖得到铁矿），或是向其他玩家购买。",
           "ladderHeading": "在Fenbridge受训",
-          "ladderBody": "特别之处：制革坊在Mirefen Marsh路上的Fenbridge，这是唯一在Eastbrook之外受训的深度行业。Tanner Hesk在他的鞣池边授课：硬皮档技能0免费，marshstalker档技能25每个25银，mirewarden档技能50每个1金。两件配方跳过训练师：野外普通件（Tanned Leather Jerkin与Druid's Hide）随处可做，Duskhide Wraps人人都会但要技能75且绑定制革坊。注意制装师誓约本身在Eastbrook的Ottilie处宣誓，只有授课在沼泽。",
+          "ladderBody": "特别之处：制革坊在Mirefen Marsh路上的Fenbridge，这是唯一在Eastbrook之外受训的深度行业。Tanner Hesk在他的鞣池边授课：硬皮档技能0免费，marshstalker档技能25每个25银，mirewarden档技能50每个1金。三件配方跳过训练师：野外普通件（Tanned Leather Jerkin与Druid's Hide）随处可做，Duskhide Wraps人人都会，技能50起即可在制革坊制作。注意制装师誓约本身在Eastbrook的Ottilie处宣誓，只有授课在沼泽。",
           "routeHeading": "杰作与通往125之路",
-          "routeBody": "marshstalker档及以上都掷杰作，Mirewarden Jerkin里的Pristine Hide自动提供署名材料加成；锇矿算一级材料。无属性的硬皮普通件不会触发。\n\n自然而然地练：从一级起剥下每只狼和野猪，硬皮档随地做到25，随任务进沼泽时顺路受训；marshstalker到50，mirewarden到75，此后Duskhide Wraps（三层配方，六块锇矿、三块Pristine Hide、两块粗皮、一份Tanning Agent）到99全速、之后半速，最后五十点约75次。75专精后移动制革坊尤其宝贵：营火边就能把一袋皮子变成成品。Hesk的订单每30分钟收八张粗皮。技能50记下Tanner's Trade，上限处是Grandmaster Leatherworking。"
+          "routeBody": "marshstalker档及以上都掷杰作，Mirewarden Jerkin里的Pristine Hide自动提供署名材料加成；锇矿算一级材料。无属性的硬皮普通件不会触发。\n\n自然而然地练：从一级起剥下每只狼和野猪，硬皮档随地做到25，随任务进沼泽时顺路受训；marshstalker到50，而mirewarden各件与Duskhide Wraps会将稀有档从50带到75。过了75，这些二层配方的收益减半、再减至四分之一，最后五十点约需150次才能到达125点上限；未达到主修上限时，它们仍与精良品质的制作上限持平，而不会直接归零。75专精后移动制革坊尤其宝贵：营火边就能把一袋皮子变成成品。Hesk的订单每30分钟收八张粗皮。技能50记下Tanner's Trade，上限处是Grandmaster Leatherworking。"
         },
         "cooking": {
           "identityHeading": "喂饱队伍的锅",
@@ -6284,7 +6283,7 @@ export const zh_CN: EnTranslations = {
         "q5": "什么是杰作？",
         "a5": "每次制作都有一个小几率（3%起，上限15%）产出品质高一层的成品，但绝不会超过团队副本的底线。",
         "q6": "“由某某制作”是什么意思？",
-        "a6": "九种通用的野外配方与工具配方人人从一开始便已知晓，三种绑定作业台的三层压轴配方（Kilnscale Mantle、Wardweave Cowl与Duskhide Wraps）也是如此，它们无需训练师，只需对应的作业台。其余一切都由三座枢纽城镇中各作业台旁的常驻师傅传授：多数在东溪，制革师守着芬桥的制革场，炼金师守着高望的药房。\n\n训练师配方分为技能0、25、50三档，作为一次性费用分别是免费、25银和1金。当你在该行业的档位达到配方自身的档位时，师傅便会传授，而且学习时你必须站在其作业台旁：移动作业台不算数。",
+        "a6": "九种通用的野外配方与工具配方人人从一开始便已知晓，三种绑定作业台的配方（Kilnscale Mantle、Wardweave Cowl与Duskhide Wraps）也是如此，它们无需训练师，只需对应的作业台。其余一切都由三座枢纽城镇中各作业台旁的常驻师傅传授：多数在东溪，制革师守着芬桥的制革场，炼金师守着高望的药房。\n\n训练师配方分为技能0、25、50三档，作为一次性费用分别是免费、25银和1金。当你在该行业的档位达到配方自身的档位时，师傅便会传授，而且学习时你必须站在其作业台旁：移动作业台不算数。",
         "q7": "什么是制作者之约？",
         "a7": "委托制品会绑定给交易中收到它的人，而任意工位大师都可按层级费用为其解绑。",
         "q8": "我能更换命途吗？",
@@ -9827,7 +9826,7 @@ export const zh_CN: EnTranslations = {
       },
       "ignition": {
         "name": "点燃",
-        "description": "被动：你的法术暴击会灼烧目标，在 6 秒内造成相当于该次伤害 40% 的伤害，可叠加。（火焰精通）"
+        "description": "被动：你的法术暴击会灼烧目标，在 6 秒内造成相当于该次伤害 30% 的伤害，可叠加。（火焰精通）"
       },
       "mass_barrier": {
         "name": "群体屏障",
@@ -9997,7 +9996,7 @@ export const zh_CN: EnTranslations = {
       },
       "sap": {
         "name": "闷棍",
-        "description": "使目标无法行动，持续 8 秒。必须处于潜行状态且不在战斗中。任何伤害都会打破效果。"
+        "description": "使目标无法行动，持续 8 秒，且不会打破暮帷或引发战斗。必须处于潜行状态且不在战斗中。任何伤害都会打破效果。"
       },
       "crippling_poison": {
         "name": "沉铅毒液",
@@ -10269,7 +10268,7 @@ export const zh_CN: EnTranslations = {
       },
       "aspect_of_the_cheetah": {
         "name": "骏马之姿",
-        "description": "化身为骏马的形态，将你的移动速度提高 30%，持续 30 分钟。"
+        "description": "化身为骏马的形态，将你的移动速度提高 30%，持续 30 分钟。生效期间，受到伤害会使你昏乱，移动速度降低 50%，持续 4 秒（每次命中都会刷新昏乱状态）。"
       },
       "aimed_shot": {
         "name": "引弓长射",
@@ -10433,7 +10432,7 @@ export const zh_CN: EnTranslations = {
       },
       "hex_of_violence": {
         "name": "暴行咒",
-        "description": "诅咒敌人8秒。其接下来的3次伤害行为各生成7点谴罪，并反噬22点暗影伤害。"
+        "description": "诅咒敌人8秒。其接下来的3次伤害行为各生成7点谴罪，并反噬17点暗影伤害。"
       },
       "cruel_pact": {
         "name": "残酷契约",
@@ -10639,7 +10638,7 @@ export const zh_CN: EnTranslations = {
       },
       "warspirit_cadence": {
         "name": "战魂节律",
-        "description": "被动：每第3次命中的武器攻击会触发2次裂风回响，各造成50%自然伤害，并获得持续12秒的风暴施法。风暴施法使下一个奥术闪电、震击或治愈之水瞬发且法力消耗降低50%。先祖打击计作2次攻击。（战魂）"
+        "description": "被动：双持攻击不会有额外的落空几率。每第3次命中的武器攻击会触发2次裂风回响，各造成25%自然伤害，并获得持续12秒的风暴施法。风暴施法使下一个奥术闪电、震击或治愈之水瞬发且法力消耗降低50%。先祖打击计作2次攻击。（战魂）"
       },
       "stormsurge": {
         "name": "风暴涌动",
@@ -10851,7 +10850,7 @@ export const zh_CN: EnTranslations = {
       },
       "summon_infernal": {
         "name": "召唤焚炎巨像",
-        "description": "将一尊焚炎巨像召至目标区域，落地时造成 58-72 点火焰伤害。它会战斗 30 秒且不会取代你的恶魔，每 2 秒灼烧附近的敌人，并每 1 秒产生 1 点毁坏。"
+        "description": "将一尊焚炎巨像召至目标区域，落地时造成 64-79 点火焰伤害。它会战斗 30 秒且不会取代你的恶魔，每 2 秒灼烧附近的敌人，并每 1 秒产生 1 点毁坏。"
       },
       "summon_doomguard": {
         "name": "召唤亡魂裔",
@@ -11199,7 +11198,7 @@ export const zh_CN: EnTranslations = {
       },
       "shadowstep": {
         "name": "影步",
-        "description": "穿过暗影，向你的目标迈进。（潜行者天赋）"
+        "description": "穿过暗影，向你的目标迈进，无论其是敌是友，且不会打破暮帷。（潜行者天赋）"
       },
       "silence": {
         "name": "沉默",
@@ -12861,8 +12860,26 @@ export const zh_CN: EnTranslations = {
       "pristine_claw": {
         "name": "完美的爪"
       },
+      "ps_castaway_crate": {
+        "name": "漂流货箱"
+      },
+      "ps_ferry_bell": {
+        "name": "渡船铃"
+      },
       "dawnhold_posy": {
         "name": "晨曦堡花园小花束"
+      },
+      "ps_briny_lure": {
+        "name": "咸水诱饵"
+      },
+      "ps_lustrous_pearl": {
+        "name": "莹润珍珠"
+      },
+      "mother_of_pearl": {
+        "name": "珍珠之母"
+      },
+      "ps_passing_stone": {
+        "name": "往生石"
       },
       "conjured_water4": {
         "name": "魔法泉水"
@@ -13904,9 +13921,6 @@ export const zh_CN: EnTranslations = {
       "tolling_bell": {
         "name": "鸣钟"
       },
-      "vale_cup_ball": {
-        "name": "野猪皮球"
-      },
       "thunzharr_waking_peak": {
         "name": "桑扎尔，觉醒之峰"
       },
@@ -14204,6 +14218,15 @@ export const zh_CN: EnTranslations = {
       "fisher_bram": {
         "name": "渔民布拉姆"
       },
+      "training_effigy": {
+        "name": "训练草人"
+      },
+      "shore_scuttler": {
+        "name": "滩涂掠蟹"
+      },
+      "mister_crabs": {
+        "name": "螃蟹先生"
+      },
       "rift_hellguard": {
         "name": "地狱卫士"
       },
@@ -14362,7 +14385,7 @@ export const zh_CN: EnTranslations = {
       "apothecary_lin": {
         "name": "林药剂师",
         "title": "草药师",
-        "greeting": "在东边林地里落脚要小心，朋友。"
+        "greeting": "在东北边林地里落脚要小心，朋友。"
       },
       "brother_aldric": {
         "name": "奥德里克修士",
@@ -14503,11 +14526,6 @@ export const zh_CN: EnTranslations = {
         "name": "灵魂医者",
         "title": "亡者的守护者",
         "greeting": "安息吧，灵魂。我可以让你重返躯体，但归途会让你变得虚弱。"
-      },
-      "groundskeeper_bram": {
-        "name": "场地管理员布拉姆",
-        "title": "母猪场看守",
-        "greeting": "休战约定在母猪场依然有效，{className}：只许用脚和肩膀。想为铜奶桶一战吗？"
       },
       "chronicler_saul": {
         "name": "编年史者绍尔",
@@ -14794,6 +14812,51 @@ export const zh_CN: EnTranslations = {
         "title": "药坊大师",
         "greeting": "量两次，倒一次，{className}。药坊里容不得洒掉的药剂。"
       },
+      "wayfarer_bryn": {
+        "name": "旅人布琳",
+        "title": "港口向导",
+        "greeting": "东溪谷来者不拒，朋友。而对脚下还不稳的人来说，总还有试炼之滨：鸦邮信箱旁的渡船铃一年到头随时送你过去，岛上那口孪生铃再送你回家。"
+      },
+      "instructor_maren": {
+        "name": "教官玛伦",
+        "title": "试炼导师",
+        "greeting": "谷地感激过的每一位英雄，都曾站在你现在站的地方，{className}，而且当时没有一个人分得清剑该握哪头。这片海滨就是为此而设。尽管问，尽管练，在失败不要紧的地方尽管失败。"
+      },
+      "quartermaster_finch": {
+        "name": "军需官芬奇",
+        "title": "营地补给商",
+        "greeting": "我的柜台只卖一样东西，{playerName}：一只装路上零碎的备用小袋，等课业用得着它的时候才卖。这里其余的都是要运回谷地的打捞货。铜板能买下小袋，而铜板要靠干活挣来。这就是全部的经济学，它永远不会变得更复杂。只会变得更大。"
+      },
+      "ferryman_odo": {
+        "name": "渡船人奥多",
+        "title": "渡口看守",
+        "greeting": "刚下渡船吗，{playerName}？看守塔姆就在码头正南的海滩上守着试炼跑道：先去跑一趟他的跑道，你的双腿会感谢你的。这片海滨的每一位看守都会在你办完差事后把你交给下一位，屏幕顶端的那张卡片永远知道下一步该往哪儿走。等谷地召唤你回去时，敲响立在我码头旁的那口铃，渡航会把你送到东溪镇上。"
+      },
+      "bursar_wick": {
+        "name": "司库威克",
+        "title": "镀金保险箱",
+        "greeting": "镀金保险箱连这里也设了一张桌子，{playerName}。凡是存到我这里的东西，都躺在每座城镇每位司库身后的同一座金库里，狼咬不着，水泡不着，连你自己的糊涂决定也碰不着。"
+      },
+      "warden_tam": {
+        "name": "看守塔姆",
+        "title": "试炼跑道的看守",
+        "greeting": "这几条跑道就是试炼跑道，{playerName}，谷地敬重的每一位冒险者都跑过它。栏杆上的灯柱整夜不灭，跑道从不打烊。"
+      },
+      "overseer_pell": {
+        "name": "监工佩尔",
+        "title": "试炼跑道监工",
+        "greeting": "每一趟从这几条跑道下来的成绩都由我掐表，{playerName}，比这难看得多的脚步我也见过。我身后的路通往练武场：脚上功夫变成剑上功夫，就在那里。"
+      },
+      "drillmaster_rook": {
+        "name": "操练官鲁克",
+        "title": "练武场主管",
+        "greeting": "先打稻草，再打壳，{playerName}。草人教你的手臂怎么挥刀；海滩那头的掠蟹教它落在一个会计较的对象身上。"
+      },
+      "tidewarden_nel": {
+        "name": "守潮人奈尔",
+        "title": "海滩的看守",
+        "greeting": "潮水会拿走，潮水也会偿还，{playerName}。这两笔账都由我来记：掠蟹从残骸里夹走的，和诚实的双手沿这条路扛上来的。"
+      },
       "tidewatcher_ondrel": {
         "name": "翁德雷尔·凡恩",
         "title": "守潮者",
@@ -14803,7 +14866,7 @@ export const zh_CN: EnTranslations = {
     "quests": {
       "q_prof_intro": {
         "title": "人人都有一技之长",
-        "text": "东溪人人除了舞刀弄剑，还得有门手艺，{playerName}。镇子东南的铜矿坑周围岩石里有矿脉。拿起矿镐，亲手开采5处；别想蒙我，我看得出差别。",
+        "text": "东溪人人除了舞刀弄剑，还得有门手艺，{playerName}。镇子东北方、狼径外的铜矿坑周围岩石里有矿脉。拿起矿镐，亲手开采5处；别想蒙我，我看得出差别。",
         "completion": "看吧？矿石采到了，手上也磨出了茧。赶路时继续采矿、伐木和采药；回城后，别忘了市场旁的城镇专注告示板和附近的制作台。只要你愿意，这些手艺都能换来公道的生计。",
         "objectives": {
           "0": {
@@ -14833,7 +14896,7 @@ export const zh_CN: EnTranslations = {
       },
       "q_boars": {
         "title": "粗鬃野猪皮",
-        "text": "野猪皮能做最好的行囊，镇外草地到处都是野猪。带回5张硬鬃野猪皮。",
+        "text": "野猪皮能做最好的行囊，镇子西北的草地到处都是野猪。带回5张硬鬃野猪皮，我必有重谢。",
         "completion": "好结实的硬鬃皮！这些能卖个好价钱。",
         "objectives": {
           "0": {
@@ -14843,7 +14906,7 @@ export const zh_CN: EnTranslations = {
       },
       "q_spiders": {
         "title": "墨网之患",
-        "text": "东部林中的潜伏者会吐出一种丝，我制作药膏正需要它，何况它们的数量也已经太过泛滥。清剿 6 只墨网潜伏者，再从它们腹中割下 4 枚丝腺。",
+        "text": "东北部林中的潜伏者会吐出一种丝，我制作药膏正需要它，何况它们的数量也已经太过泛滥。清剿 6 只墨网潜伏者，再从它们腹中割下 4 枚丝腺。",
         "completion": "呃，还在抽动。正合适。这是你应得的。",
         "objectives": {
           "0": {
@@ -14886,7 +14949,7 @@ export const zh_CN: EnTranslations = {
       },
       "q_supplies": {
         "title": "被盗的补给",
-        "text": "强盗抢走了我的最后一辆货车，工具、盐和东溪亚麻都在里面。去西南山丘的营地夺回4个补给箱。",
+        "text": "强盗抢走了我的最后一辆货车，工具、盐和东溪亚麻都在里面。去西北山丘的营地夺回4个补给箱。",
         "completion": "我的箱子！几乎没有划痕。你真让人惊喜。",
         "objectives": {
           "0": {
@@ -14979,7 +15042,7 @@ export const zh_CN: EnTranslations = {
       },
       "q_bandits": {
         "title": "谷地强盗",
-        "text": "一群割喉强盗在西南山丘扎营，本周已经抢了三辆货车。击杀10名谷地强盗。",
+        "text": "一群割喉强盗在西北山丘扎营，本周已经抢了三辆货车。击杀10名谷地强盗。",
         "completion": "黑夜里少了十把刀。拿着吧，这是你挣来的。",
         "objectives": {
           "0": {
@@ -15659,7 +15722,7 @@ export const zh_CN: EnTranslations = {
       },
       "q_prof_amends_outfitter": {
         "title": "重续经纬",
-        "text": "到底还是回到我的织机前了。我不记恨，{playerName}，可丝线记得那只放它走的手，而重新拾起的代价，每一次都量得更长。去剿除挤满东边树林的墨网潜伏者，这份苦工会在你的手再次触到好丝之前，先把它安顿稳当。",
+        "text": "到底还是回到我的织机前了。我不记恨，{playerName}，可丝线记得那只放它走的手，而重新拾起的代价，每一次都量得更长。去剿除挤满东北边树林的墨网潜伏者，这份苦工会在你的手再次触到好丝之前，先把它安顿稳当。",
         "completion": "又稳了。制皮和裁缝作为主修技艺回到你手中。这一次，在你游荡之前先量两次。",
         "objectives": {
           "0": {
@@ -15669,7 +15732,7 @@ export const zh_CN: EnTranslations = {
       },
       "q_prof_amends_apothecary": {
         "title": "重回灶台",
-        "text": "瞧瞧，谁又回到我的锅边了。不计前嫌，{playerName}，厨房里总有位置，可你知道，你每撂挑子走一回，这笔账就赊得更长。去西边草地里把野猪清一清，因为实打实的汗水是第一味料，它会让你的手重新记起这份活计。",
+        "text": "瞧瞧，谁又回到我的锅边了。不计前嫌，{playerName}，厨房里总有位置，可你知道，你每撂挑子走一回，这笔账就赊得更长。去西北边草地里把野猪清一清，因为实打实的汗水是第一味料，它会让你的手重新记起这份活计。",
         "completion": "这才是那股老味道。炼金术和烹饪重新回到你的灶台上，成为主修技艺。这一次多留一阵吧。",
         "objectives": {
           "0": {
@@ -16760,6 +16823,109 @@ export const zh_CN: EnTranslations = {
           }
         }
       },
+      "q_ps_the_gauntlet": {
+        "title": "跑过试炼跑道",
+        "text": "谷地敬重的每一双腿，都是先从这几条跑道跑出来的，{playerName}。沿第一条跑道向西走到旗帜处，原地转过身来，沿南边的跑道走到第二面旗，最后沿末尾的跑道横移到红旗处。旗帜要按顺序经过；屏幕上方的卡片会随时告诉你该按哪个键。监工佩尔在跑道尽头掐着每一趟的表：等红旗被你甩在身后，他就站在那里等着收你的成绩。",
+        "completion": "这一趟我掐了表，{playerName}，比你脚快的人我也刷下去过。试炼跑道是你的了。我身后的路通往练武场，操练官鲁克在那里把脚上功夫变成剑上功夫：你的下一件差事在他手里。",
+        "objectives": {
+          "0": {
+            "label": "经过试炼跑道旗帜"
+          }
+        }
+      },
+      "q_ps_strike_true": {
+        "title": "击中要害",
+        "text": "练完了脚，该练手臂了，{playerName}。练武场就在我身后沿路而上的地方，那里的草人生来就是挨打的。要是找不着路，按 M 打开地图：你身上的每件差事都会标在上面。走到一个草人跟前，按 Tab 或用鼠标左键点击它，把它设为目标，然后按 1，或者点击屏幕底部动作条上的第一个图标，挥出这一刀。一直打到一个散架为止；它不会还手，草人从来不还手。操练官鲁克在练武场西侧、通往海滩的小路启程的地方看着场子：对着他按 F，交上这份战果。",
+        "completion": "干净利落的一击，手也已经稳多了。记住这种感觉，{playerName}：选定目标，挥刀，然后一直打下去。稻草挨打从不计较。你下一个挥刀的对象可就计较了。",
+        "objectives": {
+          "0": {
+            "label": "击倒训练草人"
+          }
+        }
+      },
+      "q_ps_hone_the_edge": {
+        "title": "磨利锋刃",
+        "text": "挥砍就只是挥砍，{playerName}，草人能挨上一整天，可那赢不来任何东西。看看屏幕下方那一排按钮：那一排才是你的本事，每一个都能做到你光靠胳膊做不到的事。你已经有一个了。回到草人跟前用出来：选好目标，按下这座校场为你标出的那个按钮，做满三次。别只是乱砍草垛，要真正把你会的那一手打出来。做完就回来找我。",
+        "completion": "现在你是在战斗，而不是在瞎挥了。那一排会随着你每升一级变长，{playerName}，活得最久的，永远是会读那一排的人。草人不在乎你用了哪个按钮。山谷会在乎。",
+        "objectives": {
+          "0": {
+            "label": "对草人命中技能"
+          }
+        }
+      },
+      "q_ps_shell_and_claw": {
+        "title": "甲壳与利螯",
+        "text": "稻草从不计较，{playerName}，所以给你找个计较的。滩涂掠蟹正在远滩的沉船滩上翻拣残骸：从我的练武场沿小路向西走，它会一直把你领到它们跟前。它们会夹回来，所以盯着你的生命条，别停下挥刀：用鼠标左键选定一只，然后使用校场教你的那个技能，打到它的壳裂开为止。三只就够。然后沿路爬上北边的坡：守潮人奈尔管着海滩的账，你的蟹壳她都记数。",
+        "completion": "敲开三只壳，十根手指一根没少：头一仗打得不赖，{playerName}。掠蟹从残骸里夹走东西的速度，比潮水送来的还快，所以你每除掉一只，就有人多保住一枚铜板。",
+        "objectives": {
+          "0": {
+            "label": "除灭滩涂掠蟹"
+          }
+        }
+      },
+      "q_ps_mother_of_pearl": {
+        "title": "珍珠之母",
+        "text": "三只蟹壳都敲开了，{playerName}。但沉船线上还有一位王，他守着的宝贝比这片沙滩上所有木箱加起来还值钱。带上这枚咸水诱饵，穿过残骸，去沙滩最西端的潮池。站在水边，按 B 打开背包，用鼠标左键点击诱饵，把他唤醒。螃蟹先生的钳子比他那些小个子亲戚狠得多，盯紧你的生命条，别停下攻击，喘不过气就沿着沙滩往后退。等他倒下，走到他的蟹壳前直到名字浮现，按 F 或用左键点击，取走他攥着的莹润珍珠。把那颗珍珠带回来给我。",
+        "completion": "莹润珍珠，还是从浅滩老王自己身上撬下来的。我父亲干活的每个清晨都会对那只螃蟹脱帽致意；该给的敬意总要给。别动... 好了。穿好线，镶好座，归你了，{playerName}：珍珠之母。按 B 打开背包，用左键点击戒指戴上它，再按 C 打开角色面板，看看它戴在你手上的样子。小小一件东西，戴上它，你的每一分都会更强。",
+        "objectives": {
+          "0": {
+            "label": "击败螃蟹先生"
+          },
+          "1": {
+            "label": "取得莹润珍珠"
+          }
+        }
+      },
+      "q_ps_the_wreck_line": {
+        "title": "沉船滩",
+        "text": "我的搬运工把海货从旧沉船上卸下来，沿坡道扛往晨憩营地，{playerName}，可半数货箱从来到不了坡顶：它们被搁在路边，就此没人记得。沿我这条路朝营地走，你正好会从这些落单的货箱旁边经过。开箱很简单：走到货箱跟前，直到它的名字显示出来，然后按 F，或者用鼠标左键点击货箱本身，它就会把里面的东西交出来。开六只就能清完这条线，并且记住：你今后遇到的每一只箱子、每一处采集点、每一道门扉，用的都是同一个 F 键。军需官芬奇守着营地的货摊，残骸海货连一根木棍都收：把这批货交给她。",
+        "completion": "绳子、焦油，还有半轮大海竟然放过的奶酪：我全要了，{playerName}。一副肯弯腰扛货的脊背，对这座营地来说比任何刀剑都值钱，而你这一趟就把整条线清了个干净。",
+        "objectives": {
+          "0": {
+            "label": "开启漂流货箱"
+          }
+        }
+      },
+      "q_ps_pouch_and_purse": {
+        "title": "钱囊与背袋",
+        "text": "去谷地之前还有最后一课，{playerName}，也是保住冒险者性命的一课：你随身带的东西。你的背包有十六格，旁边还空着四个袋扣；每系上一只袋子，它的空间就并入总容量。所以：再对我按一次 F，打开我的货摊，在我的货品里用鼠标左键点击亚麻小袋买下它，然后按 B 打开背包，再用鼠标左键点击袋中的亚麻小袋，把它系进一个空着的袋扣。教官玛伦就在东边几步外的集合篝火旁操练：把你腰带上的小袋给她看看。",
+        "completion": "好袋子。要是还没系上，现在就系：按 B 打开背包，用鼠标左键点击小袋，把它系进一个空着的袋扣，多出的六格就归你装麻烦了。接下来是任何袋子都装不下的另一半课，{playerName}：背不下的，交给镀金保险箱。司库威克的保险箱桌就设在西边沿路而上的地方，他为你打开的正是每座城镇每位司库共用的同一座金库；等你的钱袋鼓起来，还能购买更多金库空间。贵重的存进金库，袋子留出空当。塞满的行囊断送过的冒险，比任何狼都多。",
+        "objectives": {
+          "0": {
+            "label": "购买亚麻小袋"
+          }
+        }
+      },
+      "q_ps_the_signpost": {
+        "title": "风中传信",
+        "text": "还剩最后一个习惯要学，{playerName}，而且用不着刀剑：读告示板。公会告示柱就立在营地大门口，离我的篝火西南边几步远，公会和过路的队伍都把召集令贴在上面。走到柱面跟前，按 F，或者用鼠标左键点击它，读一读贴着的内容，然后回来告诉我风里捎来了什么。你今后走进的每一座城镇，都立着一块这样的告示板。",
+        "completion": "这下你知道消息在谷地里是怎么传的了，{playerName}：不靠信使，靠告示板。每过一座城镇都去看看；半数冒险的开头，不过是板上三行墨字。",
+        "objectives": {
+          "0": {
+            "label": "读过公会告示柱"
+          }
+        }
+      },
+      "q_ps_the_long_walk": {
+        "title": "漫长的归途",
+        "text": "只剩最后一课了，{playerName}，而这一课我说不明白：你得亲自经历一次。你在外头一定会死。谁都会死，而那并不是任何事情的终点。拿上这块往生石。按 B 打开背包，用鼠标左键点它，它就会让你在原地倒下。接着照屏幕上的指示做：释放灵魂，走回你自己的尸体，再走进去。尸体会等着你，那段路不要钱，走完它你什么也不会失去。",
+        "completion": "你就这样回来了，一点没少。记住那种感觉，{playerName}，因为下一次会牵扯到獠牙，而且没人站在旁边给你解释。尸体会等着你，那段路不要钱，死亡真正拿走的，只有你走回来的那点时间。",
+        "objectives": {
+          "0": {
+            "label": "从死亡中走了回来"
+          }
+        }
+      },
+      "q_ps_set_sail": {
+        "title": "扬帆起航",
+        "text": "这片海滨上已经没有你没跑过、没打倒过、没打开过、没买下过的东西了，{playerName}。你准备好了，而东溪谷有真正的差事在等着。沿海滨大道走回码头，对着渡船人奥多按 F，告诉他，就说是我说的，你挣到了这趟航程。什么时候记不清自己欠了谁什么，随时按 L：那是你的任务日志。",
+        "completion": "玛伦这么说了？能从一个曾让我练了一星期系缆绳的女人嘴里说出来，这可是极高的评价。等你准备好了就敲响立在我码头旁的那口铃，{playerName}，渡航会把你送到东溪镇的正中央。当心狼群。",
+        "objectives": {
+          "0": {
+            "label": "向渡船人奥多报到"
+          }
+        }
+      },
       "q_gc_down_the_windway": {
         "title": "沿风道而下",
         "text": "你爬上来了，{playerName}，看来风决定留下你了。烛港在丘陵路的东头，藏在小湾的背风处。港务长奥黛尔清点每一个翻过隘口的人，她也会想把你点上一笔。告诉她风道还开着。",
@@ -16957,6 +17123,9 @@ export const zh_CN: EnTranslations = {
           },
           "11": {
             "label": "远岸沙洲堤道"
+          },
+          "12": {
+            "label": "东溪码头"
           }
         }
       },
@@ -17317,6 +17486,27 @@ export const zh_CN: EnTranslations = {
           },
           "4": {
             "label": "裂野"
+          }
+        }
+      },
+      "proving_shore": {
+        "name": "试炼之滨",
+        "welcome": "试炼之滨对你别无所求，只求时间。熟悉营地，砍倒草人，走一趟沉船滩，等你准备好了，渡船人奥多会送你过海去谷地。",
+        "pois": {
+          "0": {
+            "label": "晨憩营地"
+          },
+          "1": {
+            "label": "旧码头"
+          },
+          "2": {
+            "label": "练武场"
+          },
+          "3": {
+            "label": "沉船滩"
+          },
+          "4": {
+            "label": "试炼跑道"
           }
         }
       }

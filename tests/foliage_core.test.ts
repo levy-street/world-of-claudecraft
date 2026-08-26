@@ -23,9 +23,36 @@ const BUILTIN_NOTICEBOARDS = BUILTIN_WORLD.services?.noticeboards ?? [];
 describe('Eastbrook town grass exclusion', () => {
   it('snapshots every built-in town footprint, service apron, civic prop, and wall chord', () => {
     const exclusions = eastbrookGrassExclusions(PROPS.buildings, true, BUILTIN_NOTICEBOARDS);
-    expect(BUILTIN_NOTICEBOARDS).toHaveLength(1);
+    // Eastbrook's board plus the Proving Shore tutorial island's camp
+    // signpost (content/noticeboards.ts): the island board rides the same
+    // canonical def, so it enters the built-in service list and earns its
+    // own grass exclusion like any other civic prop.
+    expect(BUILTIN_NOTICEBOARDS).toHaveLength(15);
     // Includes Eastbrook footprints plus Fenbridge rebuild aprons (see fenbridge_layout).
-    expect(exclusions).toHaveLength(113);
+    // Re-pinned 2026-08: the harbor-move layout v3 retired the ring wall
+    // (d19aa33f76, docs/design/eastbrook-revamp/site-plan.md), dropping the
+    // 26 wall-chord OBB exclusions. Re-pinned again for round 3: the grown
+    // lots and the inn lane left the count alone, but the three promoted
+    // homes (eastbrook_home_market, eastbrook_home_east, eastbrook_home_rise)
+    // each add a footprint OBB and an apron circle (64 obb + 29 circle).
+    // Re-pinned for round 4: the preserved Grand Armoury retired from
+    // placement (preservedBuildings is empty), so its footprint OBB and
+    // service-apron circle left the snapshot (63 obb + 28 circle). The
+    // barracks garrison that took the lot is a zone1 decor prop, outside
+    // this layout-derived snapshot by design.
+    // Re-pinned for round 6: eastbrook_home_rise was removed from the layout
+    // after live review, taking its footprint OBB and service-apron circle
+    // with it (62 obb + 27 circle). The wrought-iron churchyard enclosure
+    // that now holds its lot is a zone1 decor prop, so it does not come back
+    // into this snapshot. Re-pinned again for the same round's harbour
+    // quarter: the town gained three coastal buildings along the dock road,
+    // and each one contributes exactly two rows, a footprint OBB and a
+    // service-apron circle (65 obb + 30 circle). The island signpost's board
+    // and reading-spot exclusions add two more on top.
+    // The 13 town guild boards (content/noticeboards.ts, one per hub
+    // settlement) each add a footprint and a reading-spot exclusion: 26 more.
+    expect(exclusions).toHaveLength(123);
+    expect(exclusions.some((item) => item.id.startsWith('eastbrook_grand_armoury'))).toBe(false);
     for (const building of [
       ...EASTBROOK_LAYOUT.preservedBuildings,
       ...EASTBROOK_LAYOUT.buildings,
@@ -54,14 +81,26 @@ describe('Eastbrook town grass exclusion', () => {
   it('pins the literal exclusion dimensions for the complete replacement layout', () => {
     const exclusions = eastbrookGrassExclusions(PROPS.buildings, true, BUILTIN_NOTICEBOARDS);
     const byId = new Map(exclusions.map((exclusion) => [exclusion.id, exclusion]));
+    // Re-pinned 2026-08 round 3: every kit building grew so its door reads
+    // at player height (the chapel is a bespoke asset and stays as shipped),
+    // and the three promoted homes carry first-class lots of their own now.
+    // Round 4 retired the Grand Armoury row with its placement, and round 6
+    // retired the eastbrook_home_rise row the same way when the house came
+    // out of the layout after live review. Round 6 also grew the table by
+    // three rows when the town gained the coastal harbour-quarter buildings,
+    // including the first hexb_market lot Eastbrook has ever seated.
     const expectedObbDimensions = {
-      eastbrook_grand_armoury: [6.5, 4.5],
-      eastbrook_bank: [3.5, 2.75],
-      eastbrook_smithy: [3.5, 2.75],
-      eastbrook_inn: [3.75, 3],
+      eastbrook_bank: [4.3, 3.45],
+      eastbrook_smithy: [4.2, 3.3],
+      eastbrook_inn: [4.3, 3.45],
       eastbrook_chapel: [2.75, 3],
-      eastbrook_weaving_workshop: [2.75, 2.25],
-      eastbrook_toolworks: [2.75, 2.25],
+      eastbrook_weaving_workshop: [3.45, 2.8],
+      eastbrook_toolworks: [3.45, 2.8],
+      eastbrook_home_market: [3.45, 2.8],
+      eastbrook_home_east: [3.45, 2.8],
+      eastbrook_quayside_home: [3.45, 2.8],
+      eastbrook_harbour_market: [4.3, 3.5],
+      eastbrook_dock_home: [3.45, 2.8],
     } as const;
     for (const [id, [halfWidth, halfDepth]] of Object.entries(expectedObbDimensions)) {
       expect(byId.get(id)).toMatchObject({ kind: 'obb', halfWidth, halfDepth });
@@ -75,7 +114,9 @@ describe('Eastbrook town grass exclusion', () => {
       kind: 'obb',
       halfWidth: 1.2,
       halfDepth: 0.3,
-      rotation: -0.7853981633974483,
+      // Re-pinned 2026-08: the noticeboard was re-laid with the harbor move
+      // (d19aa33f76, docs/design/eastbrook-revamp/site-plan.md).
+      rotation: -2.17084654019665,
     });
     expect(byId.get('eastbrook_noticeboard:serviceApron')).toMatchObject({
       kind: 'circle',
@@ -99,28 +140,23 @@ describe('Eastbrook town grass exclusion', () => {
       [1.4, 1.1],
     ]);
     const fenceDimensions = dimensionsFor(EASTBROOK_LAYOUT.fences.map((fence) => fence.id));
+    // Re-pinned 2026-08: the smithy fences moved with the smithy in the
+    // harbor move (d19aa33f76, docs/design/eastbrook-revamp/site-plan.md),
+    // then re-derived again in round 3 when the yard widened around the
+    // grown smithy lot, so the half widths carry fresh float noise.
     expect(fenceDimensions.map(([halfWidth]) => halfWidth)).toEqual([
-      0.8499999999999994, 4.200000000000001, 0.8499999999999995,
+      0.9000000000000008, 4.7000000000000055, 0.9000000000000008,
     ]);
     expect(fenceDimensions.map(([, halfDepth]) => halfDepth)).toEqual([0.14, 0.14, 0.14]);
 
     const wallDimensions = dimensionsFor(
       EASTBROOK_LAYOUT.wall.segments.map((segment) => segment.id),
     );
-    expect(wallDimensions).toHaveLength(26);
+    // Re-pinned 2026-08: the harbor-move layout v3 retired the ring wall
+    // (d19aa33f76, docs/design/eastbrook-revamp/site-plan.md); WALL_SEGMENTS
+    // is empty, so there are no wall-chord OBBs left to pin.
+    expect(wallDimensions).toHaveLength(0);
     expect(wallDimensions.every(([, halfDepth]) => halfDepth === 0.325)).toBe(true);
-    const expectedWallHalfWidths = [
-      2.6446667111981697, 2.6446667111981723, 2.979520542277603, 2.9795205422776054,
-      2.979520542277606, 2.9795205422776063, 2.4349948994293773, 2.434994899429382,
-      2.4349948994293755, 2.8391225437014658, 2.8391225437014667, 2.8391225437014724,
-      2.8391225437014658, 2.8391225437014658, 2.8391225437014667, 2.8866575680317688,
-      2.886657568031776, 2.886657568031762, 2.8866575680317634, 2.8866575680317754,
-      2.8866575680317763, 2.8866575680317617, 3.0804197164194327, 3.0804197164194336,
-      3.0804197164194336, 3.080419716419433,
-    ];
-    for (const [index, [halfWidth]] of wallDimensions.entries()) {
-      expect(halfWidth).toBeCloseTo(expectedWallHalfWidths[index], 12);
-    }
   });
 
   it('keeps every exclusion just inside its padded boundary and rejects just outside', () => {
@@ -168,14 +204,6 @@ describe('Eastbrook town grass exclusion', () => {
         `${exclusion.id} OBB outside`,
       ).toBe(false);
     }
-
-    // Keep the original Armoury regression pin literal: its 4.85-yard padded
-    // world-X edge is rotated from the footprint's local depth axis. Isolate
-    // that OBB because its service apron intentionally overlaps the outer edge.
-    const armoury = exclusions.find((exclusion) => exclusion.id === 'eastbrook_grand_armoury');
-    if (!armoury) throw new Error('missing Armoury exclusion');
-    expect(insideEastbrookGrassExclusion([armoury], 12.66, -5.5, PADDING)).toBe(true);
-    expect(insideEastbrookGrassExclusion([armoury], 12.64, -5.5, PADDING)).toBe(false);
   });
 
   it('keeps grass out of the well and wall while preserving every exact gate opening', () => {
@@ -205,9 +233,33 @@ describe('Eastbrook town grass exclusion', () => {
 
   it('never injects the canonical layout into a custom world snapshot', () => {
     expect(eastbrookGrassExclusions([], false, [])).toEqual([]);
-    const explicitLandmarkOnly = eastbrookGrassExclusions(PROPS.buildings, false);
-    expect(explicitLandmarkOnly).toHaveLength(1);
-    expect(explicitLandmarkOnly[0].id).toBe('eastbrook_grand_armoury');
+    // Round 4: the built-in world no longer places the armoury landmark, so
+    // the shipped building table contributes nothing to a custom snapshot.
+    // A custom world that places the landmark itself still earns exactly its
+    // own exclusion, never the fixed canonical coordinates.
+    expect(eastbrookGrassExclusions(PROPS.buildings, false)).toHaveLength(0);
+    const customArmoury = {
+      id: 'eastbrook_grand_armoury',
+      kind: 'house',
+      landmark: 'eastbrook_grand_armoury',
+      x: 140,
+      z: 60,
+      w: 13,
+      d: 9,
+      rot: -Math.PI / 2,
+    } as const;
+    const explicitLandmarkOnly = eastbrookGrassExclusions([customArmoury], false);
+    expect(explicitLandmarkOnly).toEqual([
+      {
+        kind: 'obb',
+        id: 'eastbrook_grand_armoury',
+        x: 140,
+        z: 60,
+        halfWidth: 6.5,
+        halfDepth: 4.5,
+        rotation: -Math.PI / 2,
+      },
+    ]);
     const bank = EASTBROOK_LAYOUT.buildings[0];
     expect(
       insideEastbrookGrassExclusion(

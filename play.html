@@ -496,8 +496,8 @@
     <div id="dungeon-finder-window" class="window panel"></div>
     <div id="dfinder-proposal-popup" class="panel"></div>
     <div id="bg-proposal-popup" class="panel"></div>
-    <div id="valecup-window" class="window panel"></div>
     <div id="leaderboard-window" class="window panel"></div>
+    <div id="guild-board-window" class="window panel"></div>
     <div id="daily-rewards-window" class="window panel"></div>
     <div id="claudium-window" class="window panel"></div>
     <div id="market-window" class="window panel"></div>
@@ -509,7 +509,6 @@
     <div id="professions-window" class="window panel"></div>
     <div id="calendar-window" class="window panel"></div>
     <div id="arena-status"></div>
-    <button type="button" id="vcup-indicator" data-i18n-title="hudChrome.vcup.indicatorOpen" data-i18n-aria="hudChrome.vcup.indicatorOpen" title="Open the Vale Cup window" aria-label="Open the Vale Cup window"></button>
     <div id="options-menu" class="window panel"></div>
     <div id="emote-editor" class="window panel"></div>
     <div id="social-window" class="window panel"></div>
@@ -532,7 +531,6 @@
         <button id="daily-rewards-button" type="button" data-i18n-title="hudChrome.wocStore.title" data-i18n-aria="hudChrome.wocStore.title" title="WOC Store" aria-label="WOC Store"></button>
         <button class="micro-btn" id="mm-arena" data-i18n-title="hudChrome.pvp.launcherTitle" data-i18n-aria="hudChrome.pvp.launcherTitle" title="PvP: Thornhollow Fields and the Arenas" aria-label="PvP: Thornhollow Fields and the Arenas" data-icon="arena"><span class="keybind">g</span></button>
         <button class="micro-btn" id="mm-dfinder" data-i18n-title="hudChrome.finder.title" data-i18n-aria="hudChrome.finder.title" title="Dungeon Finder" aria-label="Dungeon Finder" data-icon="dfinder"><span class="keybind">Shift+I</span></button>
-        <button class="micro-btn" id="mm-valecup" data-i18n-title="hudChrome.keybinds.valecup" data-i18n-aria="hudChrome.keybinds.valecup" title="Vale Cup" aria-label="Vale Cup" data-icon="ball"><span class="keybind">y</span></button>
         <button class="micro-btn" id="mm-cardduel" data-i18n-title="cardDuel.title" data-i18n-aria="cardDuel.title" title="Card Duel" aria-label="Card Duel" data-icon="cards"></button>
         <button class="micro-btn" id="mm-leaderboard" data-i18n-title="game.leaderboard.title" data-i18n-aria="game.leaderboard.title" title="Leaderboard" aria-label="Leaderboard" data-icon="leaderboard"><span class="keybind">k</span></button>
         <button class="micro-btn" id="mm-wocmarket" hidden data-i18n-title="hudChrome.wocMarket.launcherLabel" data-i18n-aria="hudChrome.wocMarket.launcherLabel" title="$WOC Exchange" aria-label="$WOC Exchange" data-icon="market"></button>
@@ -552,13 +550,13 @@
     <div id="low-health-vignette"></div>
     <div id="subzone-banner"></div>
 
-    <div id="death-overlay">
+    <div id="death-overlay" data-pad-nav-root data-pad-nav-required>
       <h2 data-i18n="hud.core.deathTitle">You have died.</h2>
       <button class="btn" id="release-btn" data-i18n="hud.core.releaseSpirit">Release Spirit</button>
     </div>
     <!-- Ghost (spirit released): runs freely; this small non-blocking prompt appears
          only when in reach of the corpse or the Pale Keeper. Mirrors index.html. -->
-    <div id="ghost-prompt">
+    <div id="ghost-prompt" data-pad-nav-root>
       <button type="button" class="btn" id="resurrect-corpse-btn" data-i18n="hudChrome.death.resurrectAtCorpse">Resurrect at Corpse</button>
       <button type="button" class="btn" id="resurrect-healer-btn" data-i18n="hudChrome.death.resurrectAtHealer">The Pale Keeper (Keeper's Toll)</button>
     </div>
@@ -1084,13 +1082,13 @@
             <a
               class="btn btn-primary desktop-download-link"
               data-platform="mac"
-              href="https://updates.worldofclaudecraft.com/desktop/world-of-claudecraft-0.39.0-mac-universal.dmg"
+              href="https://updates.worldofclaudecraft.com/desktop/world-of-claudecraft-0.40.0-mac-universal.dmg"
               data-i18n="download.macCta"
             >Download for macOS</a>
             <a
               class="btn btn-primary desktop-download-link"
               data-platform="win"
-              href="https://updates.worldofclaudecraft.com/desktop/world-of-claudecraft-0.39.0-win-x64.exe"
+              href="https://updates.worldofclaudecraft.com/desktop/world-of-claudecraft-0.40.0-win-x64.exe"
               data-i18n="download.windowsCta"
             >Download for Windows</a>
           </div>
@@ -1130,7 +1128,7 @@
           <span data-i18n="nav.donate">Donate</span>
         </a>
       </div>
-      <div id="game-version">v0.39.0</div>
+      <div id="game-version">v0.40.0</div>
       </div>
       <div class="footer-legal-row">
         <a href="/terms" class="footer-link" data-i18n="footer.terms">Terms of Service</a>
@@ -1312,7 +1310,6 @@
           <button class="mobile-btn" id="mobile-emote" data-i18n-title="hudChrome.emoteWheel.label" data-i18n-aria="hudChrome.emoteWheel.label" title="Emotes" aria-label="Emotes" data-icon="emote"><span class="mobile-label" data-i18n="hudChrome.emoteWheel.label">Emotes</span></button>
           <button class="mobile-btn" id="mobile-arena" data-i18n-title="hudChrome.pvp.launcherTitle" data-i18n-aria="hudChrome.pvp.launcherTitle" title="PvP: Thornhollow Fields and the Arenas" aria-label="PvP: Thornhollow Fields and the Arenas" data-icon="arena"><span class="mobile-label" data-i18n="hudChrome.pvp.mobileLabel">PvP</span></button>
           <button class="mobile-btn" id="mobile-dfinder" data-i18n-title="hudChrome.finder.title" data-i18n-aria="hudChrome.finder.title" title="Dungeon Finder" aria-label="Dungeon Finder" data-icon="dfinder"><span class="mobile-label" data-i18n="hudChrome.finder.title">Dungeon Finder</span></button>
-          <button class="mobile-btn" id="mobile-valecup" data-i18n-title="hudChrome.keybinds.valecup" data-i18n-aria="hudChrome.keybinds.valecup" title="Vale Cup" aria-label="Vale Cup" data-icon="ball"><span class="mobile-label" data-i18n="hudChrome.vcup.mobileLabel">Cup</span></button>
           <button class="mobile-btn" id="mobile-char" data-i18n-title="hud.keybinds.actions.char" data-i18n-aria="hud.keybinds.actions.char" title="Character" aria-label="Character" data-icon="character"><span class="mobile-label" data-i18n="hud.keybinds.actions.char">Character</span></button>
           <button class="mobile-btn" id="mobile-bags" data-i18n-title="hud.keybinds.actions.bags" data-i18n-aria="hud.keybinds.actions.bags" title="Bags" aria-label="Bags" data-icon="bags"><span class="mobile-label" data-i18n="hud.keybinds.actions.bags">Bags</span></button>
           <button class="mobile-btn" id="mobile-crafting" data-i18n-title="hudChrome.crafting.title" data-i18n-aria="hudChrome.crafting.title" title="Crafting" aria-label="Crafting" data-icon="crafting"><span class="mobile-label" data-i18n="hudChrome.crafting.title">Crafting</span></button>

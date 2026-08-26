@@ -746,6 +746,11 @@ describe('item-art audit builder', () => {
     expect(help).toContain('--refresh-verdict');
     expect(help).toContain('tmp/imagegen/item-art-consistency/final-audit');
 
+    // Moved by the Passing Stone icon (the death lesson's rite marker,
+    // rendered from its own shipped world model). `verdict: null` below is
+    // unchanged and is the point: the committed reviewed verdict covers the
+    // art as of its own review, and a newly added icon is deliberately NOT
+    // folded into it. It awaits an owner visual review of its own.
     const verified = JSON.parse(
       execFileSync(process.execPath, ['scripts/item_art_audit.mjs', '--verify-only'], {
         cwd: repoRoot,
@@ -755,11 +760,11 @@ describe('item-art audit builder', () => {
     ) as Record<string, unknown>;
     expect(verified).toMatchObject({
       catalogPath: 'tmp/imagegen/item-art-consistency/final-audit/catalog.json',
-      catalogSha256: '958a434b81ee3d91c807ba83cc1b93a4a505493b3d4cf8104282e8b5c9ceb640',
-      catalogBytes: 452836,
+      catalogSha256: '9d45b9f36472a8c6f88ffab5c95e172197ec82d0f32456ef3efd4d0229727a34',
+      catalogBytes: 455876,
       rendererFingerprint: 'fd92c41a206cd55b05a1de94c4789f6eb6ca4200d063f4bbd284c21ae03b6082',
-      catalogCount: 825,
-      liveItemCount: 840,
+      catalogCount: 831,
+      liveItemCount: 846,
       generatedHeroicDefinitions: 64,
       heroicDefinitionsWithOwnWebp: 48,
       heroicWeaponArtAliases: 16,
@@ -768,7 +773,7 @@ describe('item-art audit builder', () => {
       sheetCount: 208,
       sheetModeCounts: Object.fromEntries(ITEM_ART_AUDIT_MODES.map((mode) => [mode, 26])),
       sheetSetSha256: null,
-      shippingCatalogSha256: '956bfefd62ed5d5eb154ab90c8b0f28031f95d84bac4f30fa4b85cf1b3eeefa9',
+      shippingCatalogSha256: 'ac5078fc4ac7737abb855a2f2092448324ca82d611817cb4695f99b4f15c693a',
       machineChecksPassed: true,
       verdict: null,
     });

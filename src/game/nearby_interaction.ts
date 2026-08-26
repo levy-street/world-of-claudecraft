@@ -1,4 +1,5 @@
 import { isQuestGatedGroundObjectHidden } from '../sim/quest_gated_entity';
+import { isObjectOpenedByViewer } from '../sim/quests/opened_object_view';
 import {
   dist2d,
   type Entity,
@@ -131,8 +132,12 @@ export function tryNearbyInteraction(
       // Nothing the viewer cannot see may win the press. An off-quest quest
       // collectable is withheld from the scene entirely (the renderer's gate), so
       // selecting it here would spend the interact on an invisible object and let
-      // it outrank a visible NPC or node standing further away.
-      !isQuestGatedGroundObjectHidden(entity, world.questLog)
+      // it outrank a visible NPC or node standing further away. The same rule
+      // covers an interact-objective object this player already credited (an
+      // opened castaway crate): the renderer hides it for them, so the press
+      // must not target it either.
+      !isQuestGatedGroundObjectHidden(entity, world.questLog) &&
+      !isObjectOpenedByViewer(entity, world.questLog)
     ) {
       if (distance <= objectInteractionRange(entity) && distance < bestObjectDistance) {
         bestObject = entity.id;

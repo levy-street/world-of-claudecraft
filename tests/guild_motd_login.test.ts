@@ -18,7 +18,11 @@ const online = (motd: string): SocialInfo => ({
     motdSetBy: 'Aria',
     members: [],
     events: [],
+    pledgeSettings: { enabled: true, minLevel: 1, note: '' },
+    pledges: [],
+    tier: 0,
   },
+  myPledge: null,
 });
 
 describe('guild motd login line decision', () => {
