@@ -3770,7 +3770,8 @@ export const cs_CZ: EnTranslations = {
       "notBound": "Tento předmět není vázaný.",
       "cannotAfford": "Na odpoutání nemáš dostatek prostředků.",
       "outOfRange": "Pro odpoutání musíš být u příslušného mistra.",
-      "noSpace": "Nemáš místo pro odpoutaný předmět."
+      "noSpace": "Nemáš místo pro odpoutaný předmět.",
+      "perfecting": "A piece on the Perfecting track stays bound."
     },
     "commissionBoard": {
       "title": "Zakázky",

@@ -4447,7 +4447,7 @@ export class ClientWorld implements IWorld {
   // mirrors re-diffing (perfect_item is a HEAVY_SELF_CMDS member).
   perfectItem(ref: PerfectItemRef): void {
     if ('slot' in ref) this.cmd({ cmd: 'perfect_item', slot: ref.slot });
-    else this.cmd({ cmd: 'perfect_item', bag: ref.bag });
+    else this.cmd({ cmd: 'perfect_item', bag: ref.bag, item: ref.itemId });
   }
   // The one shared view builder the offline Sim also answers through
   // (perfectingInfoFrom), fed the self mirrors: the whole `inv` array, the

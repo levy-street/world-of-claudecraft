@@ -3770,7 +3770,8 @@ export const da_DK: EnTranslations = {
       "notBound": "Den genstand er ikke bundet.",
       "cannotAfford": "Du har ikke råd til aflæsningsgebyret.",
       "outOfRange": "Du skal være ved en håndværksstation for at aflæse.",
-      "noSpace": "Du har ikke plads til det aflæste eksemplar."
+      "noSpace": "Du har ikke plads til det aflæste eksemplar.",
+      "perfecting": "A piece on the Perfecting track stays bound."
     },
     "commissionBoard": {
       "title": "Bestillinger",

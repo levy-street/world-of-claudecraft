@@ -11869,6 +11869,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.unbind.cannotAfford': 'Вам не хватает денег на снятие привязки.',
   'hudChrome.unbind.outOfRange': 'Для снятия привязки нужно стоять у мастерской.',
   'hudChrome.unbind.noSpace': 'В сумках нет места для предмета со снятой привязкой.',
+  'hudChrome.unbind.perfecting': 'Предмет на пути совершенствования остаётся привязанным.',
   // Commission order board (issue #1298, M16 non-Latin fills added with the keys).
   'hudChrome.commissionBoard.title': 'Доска заказов',
   'hudChrome.commissionBoard.close': 'Закрыть доску заказов',

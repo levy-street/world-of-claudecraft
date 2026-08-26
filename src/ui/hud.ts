@@ -519,7 +519,7 @@ import { renderHeroicVendorWindow } from './hud/vendor/heroic_vendor_window';
 import { TrainLearnTracker } from './hud/vendor/train_learn_core';
 import { buildTrainView, isRecipeKnownForViewer } from './hud/vendor/train_view';
 import { renderTrainWindow } from './hud/vendor/train_window';
-import { buildUnbindView } from './hud/vendor/unbind_view';
+import { buildUnbindView, unbindDenyKey } from './hud/vendor/unbind_view';
 import { renderUnbindWindow } from './hud/vendor/unbind_window';
 import {
   buildVendorView,
@@ -11484,21 +11484,10 @@ export class Hud {
             );
           } else if (ev.reason) {
             // A reason-less deny is the malformed-item-id probe arm
-            // (resolveUnbind's silent arm): nothing legible to render.
-            this.log(
-              t(
-                ev.reason === 'unbind_not_eligible'
-                  ? 'hudChrome.unbind.notEligible'
-                  : ev.reason === 'unbind_not_bound'
-                    ? 'hudChrome.unbind.notBound'
-                    : ev.reason === 'unbind_cannot_afford'
-                      ? 'hudChrome.unbind.cannotAfford'
-                      : ev.reason === 'unbind_no_space'
-                        ? 'hudChrome.unbind.noSpace'
-                        : 'hudChrome.unbind.outOfRange',
-              ),
-              '#ff6b6b',
-            );
+            // (resolveUnbind's silent arm): nothing legible to render. The
+            // reason-to-key pairing is the total UNBIND_DENY_KEY record in
+            // hud/vendor/unbind_view.ts, never a chain here.
+            this.log(t(unbindDenyKey(ev.reason)), '#ff6b6b');
           }
           // Refresh the service rows and the bags (the single-copy unbind
           // clears boundTo in place, so no loot event repaints them for us).

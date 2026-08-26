@@ -265,7 +265,12 @@ const MONOLITHS: MonolithRow[] = [
     // 18480, the release 18488. Set to the exact merged count measured on the
     // merged working tree (wc -l < src/ui/hud.ts), neither parent's literal. Exact
     // merged count, zero slack: any further growth reds again.
-    ceiling: 18274,
+    // LOWERED 18274 -> 18263 at Masterwrought phase 12 (2026-08-26): the
+    // unbindResult arm's reason-to-key ternary chain moved into the total
+    // UNBIND_DENY_KEY record in src/ui/hud/vendor/unbind_view.ts (the
+    // unbind_perfecting deny joined the vocabulary there, never here). Exact
+    // count, zero slack.
+    ceiling: 18263,
     seam: 'pure view core + thin painter on PainterHost (src/ui/CLAUDE.md)',
   },
   {
@@ -858,7 +863,11 @@ const MONOLITHS: MonolithRow[] = [
     // case (+22 incl. its validation comment). Extraction first, then the
     // phase's lines, netting 8 UNDER the old ceiling; the ceiling follows the
     // file down. Exact count, zero slack.
-    ceiling: 10501,
+    // LOWERED 10501 -> 10492 in the phase 12 review round (2026-08-26): the
+    // perfect_item ref parse (its slot/bag/item validation and the XOR drop)
+    // moved into the pure core server/perfect_item_ref.ts, leaving the case a
+    // one-line parse and a one-line dispatch. Exact count, zero slack.
+    ceiling: 10492,
     seam: 'a sibling server module; see the hot-path seams in server/CLAUDE.md',
   },
   {

@@ -66,10 +66,10 @@ function perfecter(seed = 5, materials = 8): ReturnType<typeof world> {
   return w;
 }
 
-function bagRefOf(meta: PlayerMeta, itemId: string): { bag: number } {
+function bagRefOf(meta: PlayerMeta, itemId: string): { bag: number; itemId: string } {
   const bag = meta.inventory.findIndex((s) => s.itemId === itemId);
   expect(bag, `${itemId} is really in the bags`).toBeGreaterThanOrEqual(0);
-  return { bag };
+  return { bag, itemId };
 }
 
 function errorsOf(sim: Sim): string[] {
@@ -153,11 +153,24 @@ describe('the deny ladder: order, zero draws, zero consumption', () => {
   it('an invalid ref denies with the noItem line, on every malformed shape', () => {
     const { sim, pid } = perfecter(12);
     sim.drainEvents();
-    for (const ref of [{ bag: 999 }, { bag: -1 }, { bag: 1.5 }, { slot: 'neck' as const }]) {
+    // A STALE cell too: the index of a material stack named as the apex piece
+    // (the shape a shift between click and command produces) resolves to
+    // nothing through the index-plus-id pin, never to whatever sits there.
+    const staleCell = sim.players.get(pid)!.inventory.findIndex((s) => s.itemId === EMBER);
+    expect(staleCell).toBeGreaterThanOrEqual(0);
+    for (const ref of [
+      { bag: 999, itemId: APEX_NECK },
+      { bag: -1, itemId: APEX_NECK },
+      { bag: 1.5, itemId: APEX_NECK },
+      { bag: staleCell, itemId: APEX_NECK },
+      { slot: 'neck' as const },
+    ]) {
       const draws = drawsDuring(sim, () => sim.perfectItem(ref, pid));
       expect(draws, JSON.stringify(ref)).toBe(0);
       expect(errorsOf(sim), JSON.stringify(ref)).toEqual(["You don't have that item."]);
     }
+    // Nothing was spent by the stale ref: the material stack it named is intact.
+    expect(sim.players.get(pid)!.inventory[staleCell]?.itemId).toBe(EMBER);
   });
 
   it('ownership is presence-only: a FOREIGN boundTo value in the own bags still accepts', () => {
@@ -345,7 +358,7 @@ describe('the rank walk to Perfected', () => {
     // The R5 bonus rides rolled.stats additively; rolled.masterwork is NEVER
     // set by this path. wyrmfall_pendant is int 8 / sta 6 with a +1 neck
     // delta, so largest-remainder puts the whole point on int.
-    expect(slot.instance?.rolled?.stats).toEqual({ int: 1, sta: 0 });
+    expect(slot.instance?.rolled?.stats).toEqual({ int: 1 });
     expect(slot.instance?.rolled?.masterwork).toBeUndefined();
     expect(materialCounts(sim, pid)).toEqual([4, 4, 4]);
     expect(noticesOf(sim)).toEqual([
@@ -387,7 +400,7 @@ describe('the rank walk to Perfected', () => {
     forceRoll(sim, 0);
     for (let i = 0; i < PERFECTING_RANKS; i++) sim.perfectItem({ slot: 'neck' }, pid);
     expect(meta.equipmentInstance.neck?.perfected).toBe(true);
-    expect(meta.equipmentInstance.neck?.rolled?.stats).toEqual({ int: 1, sta: 0 });
+    expect(meta.equipmentInstance.neck?.rolled?.stats).toEqual({ int: 1 });
     expect(e.stats.int, 'the +1 int delta is live on the wearer').toBe(intBefore + 1);
   });
 });
@@ -522,7 +535,7 @@ describe('perfectingInfoFrom: the shared both-hosts view', () => {
     });
     expect(
       perfectingInfoFrom({
-        ref: { bag: 999 },
+        ref: { bag: 999, itemId: APEX_NECK },
         inventory: meta.inventory,
         equipment: meta.equipment,
         equipmentInstances: meta.equipmentInstance,
@@ -581,7 +594,7 @@ describe('persistence: round-trips, pre-phase saves, and the load bound', () => 
     const loadedPid = fresh.addPlayer('warrior', 'Reloaded', { state: state ?? undefined });
     const loadedMeta = fresh.players.get(loadedPid) as PlayerMeta;
     expect(loadedMeta.equipmentInstance.neck?.perfected).toBe(true);
-    expect(loadedMeta.equipmentInstance.neck?.rolled?.stats).toEqual({ int: 1, sta: 0 });
+    expect(loadedMeta.equipmentInstance.neck?.rolled?.stats).toEqual({ int: 1 });
     expect(
       (fresh.entities.get(loadedPid) as Entity).stats.int,
       'the load recalc carries the Perfected bonus',
@@ -672,14 +685,16 @@ describe('the phase 01 cap interlock: a Perfected piece still counts', () => {
 });
 
 describe('the crafting.ts head start (R1) over a real Sim', () => {
-  it('a forced proc on an apex recipe mints masterwork:true + perfecting 1, one draw', () => {
-    const sim = new Sim({ seed: 7, playerClass: 'warrior', autoEquip: false });
+  /** An apex crafter at the recipe's station with the bill in hand; the
+   *  archetype decides the ceiling term of the effect gate (a major reads
+   *  Infinity, no archetype reads the rare ceiling). */
+  const apexCrafter = (seed: number, activeArchetype: string | null) => {
+    const sim = new Sim({ seed, playerClass: 'warrior', autoEquip: false });
     const pid = sim.playerId;
     const meta = sim.players.get(pid) as PlayerMeta;
-    meta.archetype.activeArchetype = 'jewelcrafting';
+    meta.archetype.activeArchetype = activeArchetype;
     const recipe = recipeById(`recipe_${APEX_NECK}`);
-    expect(recipe).toBeTruthy();
-    if (!recipe) return;
+    if (!recipe) throw new Error('the apex neck recipe exists');
     if (recipe.stationType) {
       const station = stationsOfType(STATIONS, recipe.stationType as StationType)[0];
       const e = sim.entities.get(pid) as Entity;
@@ -689,6 +704,11 @@ describe('the crafting.ts head start (R1) over a real Sim', () => {
     }
     meta.knownRecipes?.add(recipe.id);
     for (const g of recipe.reagents) sim.addItem(g.itemId, g.count, pid);
+    return { sim, pid, meta, recipe };
+  };
+
+  it('a forced proc on an apex recipe mints masterwork:true + perfecting 1, one draw', () => {
+    const { sim, pid, meta, recipe } = apexCrafter(7, 'jewelcrafting');
     // Force the single output-side proc draw to hit; the counter pins the
     // one-draw contract on the apex path (the head start gates the EFFECT,
     // never the draw).
@@ -703,5 +723,152 @@ describe('the crafting.ts head start (R1) over a real Sim', () => {
     expect(slot?.instance?.perfecting).toBe(PERFECTING_HEADSTART_RANK);
     expect(slot?.instance?.rolled, 'no quality bump is baked').toBeUndefined();
     expect(slot?.instance?.perfected).toBeUndefined();
+    expect(slot?.instance?.bindOnTrade, 'an uncommissioned craft arms no bond').toBeUndefined();
+  });
+
+  it('a forced MISS mints the plain signed copy: no rank, no masterwork flag, still one draw', () => {
+    const { sim, pid, meta, recipe } = apexCrafter(8, 'jewelcrafting');
+    // 0.999 sits above MASTERWORK_CHANCE_CAP (0.15), so no composition of the
+    // chance terms can turn it into a hit.
+    const draws = forceRoll(sim, 0.999);
+    runCraft(sim, recipe.id, false, pid);
+    const result = meta.lastCraftResult;
+    expect(result?.ok).toBe(true);
+    expect(result?.masterwork).toBeUndefined();
+    expect(draws(), 'the miss still spends the one draw').toBe(1);
+    const slot = meta.inventory.find((s) => s.itemId === APEX_NECK);
+    expect(slot?.instance?.signer).toBeTruthy();
+    expect(slot?.instance?.perfecting).toBeUndefined();
+    expect(slot?.instance?.rolled).toBeUndefined();
+  });
+
+  it('the ceiling term holds: a forced hit on a craft under the rare ceiling grants no head start', () => {
+    // No archetype: archetypeCeilingFor answers the RARE ceiling (tier 2), and
+    // the apex def's bumped tier is legendary (4), so the SAME gate that keeps
+    // a dormant or hobby craft from bumping keeps it from a head start. The
+    // draw still happens (the gate is on the effect); the copy lands plain.
+    const { sim, pid, meta, recipe } = apexCrafter(9, null);
+    const draws = forceRoll(sim, 0);
+    runCraft(sim, recipe.id, false, pid);
+    expect(meta.lastCraftResult?.ok).toBe(true);
+    expect(meta.lastCraftResult?.masterwork).toBeUndefined();
+    expect(draws()).toBe(1);
+    const slot = meta.inventory.find((s) => s.itemId === APEX_NECK);
+    expect(slot?.instance?.perfecting).toBeUndefined();
+  });
+
+  it("a commissioned head-start copy carries the Maker's Bond arm beside its rank", () => {
+    const { sim, pid, meta, recipe } = apexCrafter(10, 'jewelcrafting');
+    forceRoll(sim, 0);
+    runCraft(sim, recipe.id, true, pid);
+    expect(meta.lastCraftResult?.masterwork).toBe(true);
+    const slot = meta.inventory.find((s) => s.itemId === APEX_NECK);
+    expect(slot?.instance?.perfecting).toBe(PERFECTING_HEADSTART_RANK);
+    expect(slot?.instance?.bindOnTrade).toBe(true);
+    expect(slot?.instance?.boundTo, 'armed, not yet bound').toBeUndefined();
+  });
+});
+
+describe('the R5 merge is ADDITIVE, the two-hand line is priced, and failure leaves the copy byte-identical', () => {
+  it('merges the delta ON TOP of a rolled record the copy already carries', () => {
+    // A copy enchanted before it is Perfected carries rolled.stats already;
+    // the stamp must ADD the R5 delta to it, never overwrite (an overwrite
+    // survived every earlier pin, the coverage audit's P5 probe). The pre-
+    // existing record is an explicit marker enchant so the copy still reads
+    // as enchanted afterwards (apex gear post-dates the marker; no apex copy
+    // can be a bare-stats legacy enchant).
+    const { sim, pid, meta } = perfecter(31);
+    sim.addItemInstance(
+      APEX_NECK,
+      {
+        signer: 'Crafter',
+        enchant: 'enchant_chest_stamina',
+        rolled: { stats: { sta: 4, int: 2 } },
+      },
+      pid,
+      1,
+    );
+    const ref = bagRefOf(meta, APEX_NECK);
+    forceRoll(sim, 0);
+    for (let i = 0; i < PERFECTING_RANKS; i++) sim.perfectItem(ref, pid);
+    const copy = meta.inventory[ref.bag];
+    expect(copy.instance?.perfected).toBe(true);
+    // The neck's R5 record is { int: 1 } (the shipped literal pinned above):
+    // int climbs 2 -> 3, sta keeps its enchant value, nothing else appears.
+    expect(copy.instance?.rolled?.stats).toEqual({ sta: 4, int: 3 });
+    expect(copy.instance?.enchant).toBe('enchant_chest_stamina');
+    expect(copy.instance?.rolled?.masterwork).toBeUndefined();
+  });
+
+  it('prices a two-hander through the two-hand mult, at a level where rounding makes it count', () => {
+    // At source 24 the mainhand line is 21 -> 24 (+3) but the two-hand line
+    // is round(21 x 1.3) = 27 -> round(24 x 1.3) = 31 (+4), so the mult is
+    // decisive here (the shipped ridgebreaker at level 25 answers 2 either
+    // way, which is why the roster pin alone could not see a dropped mult).
+    const twoHand = {
+      id: 'qa_p12_twohand_probe',
+      name: 'Probe Greatsword',
+      kind: 'weapon',
+      hand: 'twohand',
+      slot: 'mainhand',
+      quality: 'epic',
+      masterwrought: true,
+      stats: { str: 10 },
+      weapon: { min: 1, max: 2, speed: 3 },
+    } as unknown as ItemDef;
+    expect(perfectedBonusStats(twoHand, { level: 24 })).toEqual({ str: 4 });
+    const oneHand = { ...twoHand, hand: 'mainhand' } as unknown as ItemDef;
+    expect(perfectedBonusStats(oneHand, { level: 24 })).toEqual({ str: 3 });
+  });
+
+  it('a failed attempt leaves a mid-track copy BYTE-IDENTICAL and a worn one recalculated to the same stats', () => {
+    const { sim, pid, meta, e } = perfecter(32);
+    sim.setPlayerLevel(20);
+    sim.addItemInstance(APEX_RING, { signer: 'Crafter', boundTo: pid, perfecting: 2 }, pid, 1);
+    sim.equipItem(APEX_RING, pid);
+    expect(meta.equipment.ring1).toBe(APEX_RING);
+    const beforeInstance = JSON.stringify(meta.equipmentInstance.ring1);
+    const beforeStats = { maxHp: e.maxHp, attackPower: e.attackPower };
+    forceRoll(sim, 0.99);
+    sim.perfectItem({ slot: 'ring1' }, pid);
+    expect(noticesOf(sim)).toContain('The perfecting attempt fails; the materials are spent.');
+    expect(JSON.stringify(meta.equipmentInstance.ring1), 'the payload is untouched').toBe(
+      beforeInstance,
+    );
+    expect({ maxHp: e.maxHp, attackPower: e.attackPower }).toEqual(beforeStats);
+    expect(materialCounts(sim, pid)).toEqual([7, 7, 7]);
+  });
+});
+
+describe('perfectedBonusStats null arms and the mixed shortfall', () => {
+  it('answers null for a slotless def, a profile with no primary stat, and a non-positive delta', () => {
+    const neck = ITEMS[APEX_NECK];
+    const recipe = recipeById(`recipe_${APEX_NECK}`);
+    if (!recipe) throw new Error('the apex neck recipe exists');
+    expect(perfectedBonusStats(neck, recipe), 'the live pair really bakes').not.toBeNull();
+    expect(perfectedBonusStats({ ...neck, slot: undefined } as ItemDef, recipe)).toBeNull();
+    expect(perfectedBonusStats({ ...neck, stats: { armor: 40 } } as ItemDef, recipe)).toBeNull();
+    // A recipe already at or past the Perfected source level has nothing to
+    // climb to: the delta is zero or negative and no record is minted.
+    expect(perfectedBonusStats(neck, { level: PERFECTED_SOURCE_LEVEL })).toBeNull();
+    expect(perfectedBonusStats(neck, { level: PERFECTED_SOURCE_LEVEL + 3 })).toBeNull();
+  });
+
+  it('a MIXED shortfall (one material lock-only, another genuinely short) reads as missing, not locked', () => {
+    const { sim, pid } = perfecter(30);
+    const meta = sim.players.get(pid) as PlayerMeta;
+    sim.addItem(APEX_NECK, 1, pid);
+    const ember = meta.inventory.find((s) => s.itemId === EMBER);
+    if (!ember) throw new Error('the fixture holds embers');
+    ember.instance = { locked: true };
+    sim.removeItem(ESSENCE, sim.countItem(ESSENCE, pid), pid);
+    sim.drainEvents();
+    const before = materialCounts(sim, pid);
+    const draws = drawsDuring(sim, () => sim.perfectItem(bagRefOf(meta, APEX_NECK), pid));
+    expect(draws).toBe(0);
+    // The locked line is reserved for the case where UNLOCKING alone would
+    // satisfy the bill; with the essence genuinely gone it would mislead.
+    expect(errorsOf(sim)).toEqual(['You lack the materials to perfect that item.']);
+    expect(materialCounts(sim, pid)).toEqual(before);
   });
 });

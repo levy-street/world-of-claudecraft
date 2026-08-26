@@ -330,6 +330,7 @@ import {
 } from './parse';
 import { PartyFrameProjectionCache } from './party_frame_projection';
 import { applyBoostKitToPlayer, pbeBoostEnabled } from './pbe_boost';
+import { parsePerfectItemRef } from './perfect_item_ref';
 import { recordFtueDeath, recordFtueQuest, recordLevelUp } from './progress_events';
 import { eventLeadDayKey, nextRaidResetMs, resetDayKey } from './raid_reset';
 import { REALM, REALM_PUBLIC_ORIGIN, REALM_RESET_TIME_ZONE } from './realm';
@@ -6809,25 +6810,15 @@ export class GameServer {
         if (typeof msg.item === 'string') sim.unbindItem(msg.item, pid);
         break;
       case 'perfect_item': {
-        // The Perfecting stage (Masterwrought phase 12): the target is a
-        // passed selection, never an id. `slot` is accepted only when it names
-        // a real equipment key (the 'equip' case's untrusted-input rule),
-        // `bag` only as a non-negative integer cell index (the 'use' case's
-        // rule); EXACTLY ONE of the two must be usable, or the frame drops
-        // whole (a frame naming both, neither, or a malformed ref is never
-        // laundered into a guess the sim did not see). The sim re-validates
-        // the ref against ITS OWN bags and paperdoll and resolves the whole
-        // deny ladder and the one roll itself; the outcome reaches this client
-        // as the sim's own error/log lines plus the heavy self re-diff
-        // (perfect_item is a HEAVY_SELF_CMDS member: an attempt spends
-        // materials and mutates an instance payload in place).
-        const slot = typeof msg.slot === 'string' && isEquipSlot(msg.slot) ? msg.slot : undefined;
-        const bag =
-          typeof msg.bag === 'number' && Number.isInteger(msg.bag) && msg.bag >= 0
-            ? msg.bag
-            : undefined;
-        if ((slot === undefined) === (bag === undefined)) break;
-        sim.perfectItem(slot !== undefined ? { slot } : { bag: bag as number }, pid);
+        // The Perfecting stage (Masterwrought phase 12): the untrusted ref
+        // parse is the pure core in server/perfect_item_ref.ts (a null drops
+        // the frame whole); the sim re-validates the ref against its own bags
+        // and paperdoll and resolves the deny ladder and the one roll itself;
+        // the outcome reaches this client as the sim's own error/log lines
+        // plus the heavy self re-diff (perfect_item is a HEAVY_SELF_CMDS
+        // member: an attempt spends materials and mutates a payload in place).
+        const ref = parsePerfectItemRef(msg);
+        if (ref) sim.perfectItem(ref, pid);
         break;
       }
       // Commission order board (Professions 2.0, issue #1298): the sim

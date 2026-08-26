@@ -11669,6 +11669,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.unbind.cannotAfford': 'バインド解除の手数料を支払えません。',
   'hudChrome.unbind.outOfRange': 'バインド解除するには作業台のそばにいる必要があります。',
   'hudChrome.unbind.noSpace': 'バッグにバインド解除したアイテムを入れる空きがありません。',
+  'hudChrome.unbind.perfecting': '完全化の途中にあるアイテムは束縛されたままです。',
   // Commission order board (issue #1298, M16 non-Latin fills added with the keys).
   'hudChrome.commissionBoard.title': '依頼ボード',
   'hudChrome.commissionBoard.close': '依頼ボードを閉じる',

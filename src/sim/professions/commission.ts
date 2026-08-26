@@ -35,7 +35,12 @@ import { bagCapacity, countFit } from '../bags';
 import { ITEMS } from '../data';
 import type { PlayerMeta } from '../sim';
 import type { SimContext } from '../sim_context';
-import { cloneItemInstancePayload, type ItemDef, type StationDef } from '../types';
+import {
+  cloneItemInstancePayload,
+  type ItemDef,
+  type ItemInstancePayload,
+  type StationDef,
+} from '../types';
 import { MASTERWORK_QUALITY_LADDER } from './masterwork';
 import { isAtAnyStation } from './stations';
 
@@ -73,9 +78,22 @@ export function unbindFeeFor(def: ItemDef): number {
 export type UnbindDenyReason =
   | 'unbind_not_eligible'
   | 'unbind_not_bound'
+  // Masterwrought phase 12: the bound copy is on the Perfecting track or
+  // Perfected (masterwrought R2 binds a piece the moment Perfecting begins,
+  // and that bind is not the fee-reversible Maker's Bond even though it
+  // rides the same boundTo lock).
+  | 'unbind_perfecting'
   | 'unbind_out_of_range'
   | 'unbind_no_space'
   | 'unbind_cannot_afford';
+
+/** A copy whose boundTo is the Perfecting bind (Masterwrought phase 12):
+ *  mid-track (`perfecting`) or Perfected. Shared by resolveUnbind's deny arm
+ *  and the unbind window's row predicate (src/ui/hud/vendor/unbind_view.ts),
+ *  so the listed rows and the resolver refuse the same copies. */
+export function isPerfectingBound(instance: ItemInstancePayload | undefined): boolean {
+  return instance?.perfecting !== undefined || instance?.perfected === true;
+}
 
 export interface UnbindResult {
   ok: boolean;
@@ -113,6 +131,16 @@ function firstBoundSlotIndex(meta: PlayerMeta, itemId: string): number {
  * 3. no bound copy of itemId held (boundTo presence is the lock, its value
  *    is never compared: entity ids are not stable cross-session identities):
  *    unbind_not_bound;
+ * 3b. the bound copy the resolver would clear carries the Perfecting track
+ *    (`perfecting`) or the Perfected stamp (Masterwrought phase 12,
+ *    professions/perfecting.ts): unbind_perfecting. masterwrought R2 binds a
+ *    piece the moment Perfecting begins, and that bind holds for good: a
+ *    fee-reversible unbind would let a Perfected copy (its R5 bonus merged
+ *    into rolled.stats) re-enter trade and the market, handing another
+ *    character above-raid power without spending the Maker's Embers that
+ *    pace the stage (qr-12-CADENCE). Placed after unbind_not_bound so a
+ *    duplicate command still resolves not_bound first, and before the range
+ *    and fee arms so the refusal never depends on where the player stands;
  * 4. not within STATION_RADIUS of ANY static station (stations.ts
  *    isAtAnyStation; every station master offers the service, and a mobile
  *    station NEVER satisfies it, the training precedent): unbind_out_of_range;
@@ -140,6 +168,9 @@ export function resolveUnbind(
   const boundIdx = meta ? firstBoundSlotIndex(meta, itemId) : -1;
   if (!meta || boundIdx === -1) {
     return { ok: false, itemId, reason: 'unbind_not_bound', fee };
+  }
+  if (isPerfectingBound(meta.inventory[boundIdx].instance)) {
+    return { ok: false, itemId, reason: 'unbind_perfecting', fee };
   }
   if (!pos || !isAtAnyStation(stations, pos)) {
     return { ok: false, itemId, reason: 'unbind_out_of_range', fee };

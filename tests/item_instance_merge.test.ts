@@ -38,6 +38,29 @@ describe('itemInstancePayloadsEqual', () => {
     ).toBe(false);
   });
 
+  it('the Perfecting fields participate: a rank or the Perfected stamp never equals its absence (phase 12)', () => {
+    // Every present key compares, so a copy one rank along the Perfecting
+    // track, or one carrying the Perfected stamp, is its own identity: a bagged
+    // head-started copy never folds into a plain signed stack of the same
+    // apex id, and two mid-track copies at different ranks stay apart.
+    const signed: ItemInstancePayload = { signer: 'Ana' };
+    expect(itemInstancePayloadsEqual(signed, { signer: 'Ana', perfecting: 1 })).toBe(false);
+    expect(itemInstancePayloadsEqual(signed, { signer: 'Ana', perfected: true })).toBe(false);
+    expect(
+      itemInstancePayloadsEqual({ signer: 'Ana', perfecting: 1 }, { signer: 'Ana', perfecting: 2 }),
+    ).toBe(false);
+    expect(
+      itemInstancePayloadsEqual({ signer: 'Ana', perfecting: 2 }, { signer: 'Ana', perfecting: 2 }),
+    ).toBe(true);
+    expect(canStackInstancePayloads(signed, { signer: 'Ana', perfecting: 1 })).toBe(false);
+    // The header's forward-compatibility claim, pinned: a field this binary
+    // has never heard of is still an identity term (an older binary can never
+    // fold a newer copy into an older-shaped stack).
+    expect(
+      itemInstancePayloadsEqual(signed, { signer: 'Ana', futureField: 1 } as ItemInstancePayload),
+    ).toBe(false);
+  });
+
   it('the nested rolled record compares per-key: quality, stats, masterwork all participate', () => {
     const mw: ItemInstancePayload = {
       signer: 'Ana',

@@ -5367,6 +5367,9 @@ export const hudChromeStrings = {
     // #2350: unbinding one copy out of a bound stack needs room for the
     // unbound copy it peels off.
     noSpace: 'You do not have room for the unbound copy.',
+    // Masterwrought phase 12: the Perfecting bind (masterwrought R2) is not
+    // a fee-reversible Maker's Bond; the resolver refuses unbind_perfecting.
+    perfecting: 'A piece on the Perfecting track stays bound.',
   },
   // Commission order board (issue #1298): a lightweight job board layered
   // on the Maker's Bond above. Opened from a button in the crafting

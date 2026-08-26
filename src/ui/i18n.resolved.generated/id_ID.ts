@@ -3770,7 +3770,8 @@ export const id_ID: EnTranslations = {
       "notBound": "Barang itu tidak terikat.",
       "cannotAfford": "Kamu tidak mampu membayar biaya pelepasan ikat.",
       "outOfRange": "Kamu harus berada di stasiun kerajinan untuk melepas ikat.",
-      "noSpace": "Kamu tidak punya ruang untuk salinan yang sudah dilepas ikatnya."
+      "noSpace": "Kamu tidak punya ruang untuk salinan yang sudah dilepas ikatnya.",
+      "perfecting": "A piece on the Perfecting track stays bound."
     },
     "commissionBoard": {
       "title": "Pesanan Komisi",

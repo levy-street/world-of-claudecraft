@@ -1474,9 +1474,11 @@ export interface ItemInstancePayload {
    *  professions/enchanting.ts) reads it. Only ever `true`; absent is an
    *  ordinary copy, so pre-phase saves load clean. Deliberately kept OFF the
    *  server's `eqi` peer wire allowlist (the phase 12 decision, executed:
-   *  an INSPECTING viewer cannot see another player's Perfected state); the
-   *  OWNER sees it via the wholesale `inv` mirror and the whole `einst` self
-   *  mirror. */
+   *  an INSPECTING viewer cannot see another player's Perfected MARKER; the
+   *  R5 bonus merged into rolled.stats rides `eqi` unlabeled, exactly as a
+   *  masterwork roll does, so the stats are visible and the stamp is not);
+   *  the OWNER sees it via the wholesale `inv` mirror and the whole `einst`
+   *  self mirror. */
   perfected?: true;
   /** Player-toggled safety mark (issue 3042, item_lock.ts isItemLocked): while
    *  true this specific copy refuses salvage, profession-craft reagent
@@ -6428,6 +6430,7 @@ export type SimEvent = { pid?: number } & (
       reason?:
         | 'unbind_not_eligible'
         | 'unbind_not_bound'
+        | 'unbind_perfecting'
         | 'unbind_out_of_range'
         | 'unbind_no_space'
         | 'unbind_cannot_afford';

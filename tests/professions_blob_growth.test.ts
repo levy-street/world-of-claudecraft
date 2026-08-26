@@ -283,8 +283,14 @@ const NON_PROFESSIONS_BLOB_FIELDS = [
 // instances: the professions-CRAFT worst case, not the rift endgame's.
 // F3, DECIDED at Masterwrought Phase 12 (the bound-as-policy work): the
 // bound's scope FORMALLY EXCLUDES rift-forged payloads, which belong to
-// their own bound (the per-slot clamps in src/sim/item_instance_load.ts are
-// the backstop for every payload whatever wrote it). The fixture models the
+// their own bound: a rift payload is REBUILT from bounded progression inputs
+// (rift/progression.ts sanitizeRiftGearInstance, about 461 B per legal copy)
+// before the load bound runs, and the src/sim/item_instance_load.ts clamps
+// bound the LEGAL shapes (string, key-count, key-length, and the rolled/
+// charges subtree ceilings). They are NOT a byte bound for a tampered row:
+// an unknown top-level OBJECT key survives whole under the key arms alone,
+// the forward-compatibility surface that file deliberately refuses to
+// size-police (its header records the doctrine). The fixture models the
 // professions-craft worst case, and since Phase 12 that case INCLUDES
 // Perfecting: the two Masterwrought cap slots carry the Perfected stamp, the
 // R2 bind, and the R5 bonus merged into their rolled stats (ceilingSim

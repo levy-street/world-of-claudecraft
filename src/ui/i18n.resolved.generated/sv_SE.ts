@@ -3770,7 +3770,8 @@ export const sv_SE: EnTranslations = {
       "notBound": "Det föremålet är inte bundet.",
       "cannotAfford": "Du har inte råd med upplösningsavgiften.",
       "outOfRange": "Du måste vara vid en hantverksstation för att lösa upp.",
-      "noSpace": "Du har inte plats för den obundna kopian."
+      "noSpace": "Du har inte plats för den obundna kopian.",
+      "perfecting": "A piece on the Perfecting track stays bound."
     },
     "commissionBoard": {
       "title": "Beställningsordrar",

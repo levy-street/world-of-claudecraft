@@ -769,8 +769,10 @@ export const COMMAND_FACETS = {
   // IWorldInventory: non-fungible Rift gear progression. These mutate the
   // authoritative inventory copy; every cost and payload is validated again
   // in the sim before the item instance is changed. (salvage_item rides the
-  // professions surface and, like the other enchanting-family commands, has
-  // no facet row here.)
+  // professions surface and, like the other enchanting-family commands and
+  // perfect_item, has no facet row here: the IWorldProfessions surface is
+  // row-less by the W6 PARTIAL design, its members pinned by
+  // tests/world_api_parity.test.ts FACET_PROFESSIONS instead.)
   rift_upgrade_item: 'IWorldInventory',
   rift_enchant_item: 'IWorldInventory',
   rift_socket_gem: 'IWorldInventory',

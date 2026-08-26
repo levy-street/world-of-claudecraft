@@ -74,10 +74,20 @@ function seedPerfecter(server: GameServer, pid: number): void {
   server.sim.addItem(APEX_NECK, 1, pid);
 }
 
-function bagRefOf(server: GameServer, pid: number, itemId: string): { bag: number } {
+function bagRefOf(
+  server: GameServer,
+  pid: number,
+  itemId: string,
+): { bag: number; itemId: string } {
   const bag = serverMeta(server, pid).inventory.findIndex((s) => s.itemId === itemId);
   expect(bag, `${itemId} is really in the bags`).toBeGreaterThanOrEqual(0);
-  return { bag };
+  return { bag, itemId };
+}
+
+/** The facet ref as the WIRE spells it (online.ts perfectItem: `item`, not
+ *  `itemId`), for the raw-frame arms that bypass ClientWorld. */
+function wireOf(ref: { bag: number; itemId: string }): { bag: number; item: string } {
+  return { bag: ref.bag, item: ref.itemId };
 }
 
 function materialCounts(server: GameServer, pid: number): number[] {
@@ -183,10 +193,10 @@ describe('ClientWorld emits the perfect_item frames the protocol declares', () =
   it('a worn ref rides as `slot` alone and a bagged ref as `bag` alone, nothing else', () => {
     const { client, sent } = sendingClient(1);
     client.perfectItem({ slot: 'neck' });
-    client.perfectItem({ bag: 3 });
+    client.perfectItem({ bag: 3, itemId: APEX_NECK });
     expect(sent).toEqual([
       { t: 'cmd', cmd: 'perfect_item', slot: 'neck' },
-      { t: 'cmd', cmd: 'perfect_item', bag: 3 },
+      { t: 'cmd', cmd: 'perfect_item', bag: 3, item: APEX_NECK },
     ]);
   });
 
@@ -302,14 +312,18 @@ describe('perfect_item over the real online dispatch path', () => {
     const before = materialCounts(server, pid);
     const spy = vi.spyOn(server.sim, 'perfectItem');
     const malformed: Record<string, unknown>[] = [
-      { cmd: 'perfect_item', slot: 'neck', bag: 0 }, // both refs usable
+      { cmd: 'perfect_item', slot: 'neck', bag: 0, item: APEX_NECK }, // both refs usable
       { cmd: 'perfect_item' }, // neither
-      { cmd: 'perfect_item', bag: 1.5 }, // non-integer bag
-      { cmd: 'perfect_item', bag: -1 }, // negative bag
-      { cmd: 'perfect_item', bag: '0' }, // a numeric STRING is not a cell
+      { cmd: 'perfect_item', bag: 1.5, item: APEX_NECK }, // non-integer bag
+      { cmd: 'perfect_item', bag: -1, item: APEX_NECK }, // negative bag
+      { cmd: 'perfect_item', bag: '0', item: APEX_NECK }, // a numeric STRING is not a cell
+      { cmd: 'perfect_item', bag: 0 }, // a cell with no item id is not a bagged ref
+      { cmd: 'perfect_item', bag: 0, item: 7 }, // a non-string item id
+      { cmd: 'perfect_item', bag: 0, item: '' }, // an empty item id
+      { cmd: 'perfect_item', bag: 0, item: 'x'.repeat(65) }, // over the string ceiling
       { cmd: 'perfect_item', slot: 'hat' }, // bogus slot string
       { cmd: 'perfect_item', slot: 3 }, // a number is not a slot
-      { cmd: 'perfect_item', slot: 'hat', bag: 'x' }, // both malformed
+      { cmd: 'perfect_item', slot: 'hat', bag: 'x', item: APEX_NECK }, // both malformed
     ];
     const draws = drawsDuring(server.sim, () => {
       for (const body of malformed) cmd(server, session, body);
@@ -319,10 +333,11 @@ describe('perfect_item over the real online dispatch path', () => {
     expect(materialCounts(server, pid)).toEqual(before);
     // The two tokens are validated independently (the apply_enchant case's
     // documented shape): an unusable slot beside a usable bag dispatches the
-    // BAGGED ref, which the sim then re-validates against its own bags.
-    cmd(server, session, { cmd: 'perfect_item', slot: 'hat', bag: 0 });
+    // BAGGED ref (cell plus the named item id), which the sim then
+    // re-validates against its own bags.
+    cmd(server, session, { cmd: 'perfect_item', slot: 'hat', bag: 0, item: APEX_NECK });
     expect(spy).toHaveBeenCalledTimes(1);
-    expect(spy).toHaveBeenLastCalledWith({ bag: 0 }, pid);
+    expect(spy).toHaveBeenLastCalledWith({ bag: 0, itemId: APEX_NECK }, pid);
     spy.mockRestore();
   });
 
@@ -337,7 +352,7 @@ describe('perfect_item over the real online dispatch path', () => {
     server.sim.drainEvents();
     fc.sent.length = 0; // drop the join notice
     const draws = drawsDuring(server.sim, () => {
-      cmd(server, session, { cmd: 'perfect_item', ...bagRefOf(server, pid, NON_APEX) });
+      cmd(server, session, { cmd: 'perfect_item', ...wireOf(bagRefOf(server, pid, NON_APEX)) });
     });
     expect(draws).toBe(0);
     expect(materialCounts(server, pid)).toEqual(before);
@@ -359,7 +374,7 @@ describe('perfect_item over the real online dispatch path', () => {
     expect(serverMeta(server, pid).equipment.ring1).toBe('warhewn_signet');
     const bagged = bagRefOf(server, pid, APEX_NECK);
     withForcedRoll(server.sim, 0, () => {
-      for (let i = 0; i < 2; i++) cmd(server, session, { cmd: 'perfect_item', ...bagged });
+      for (let i = 0; i < 2; i++) cmd(server, session, { cmd: 'perfect_item', ...wireOf(bagged) });
     });
     // Then the whole ember stack locks: the third attempt is refused on the
     // ladder's dedicated line (nothing spent), so the mirrored `have` really
@@ -369,9 +384,20 @@ describe('perfect_item over the real online dispatch path', () => {
     if (ember) ember.instance = { locked: true };
     server.sim.drainEvents();
     fc.sent.length = 0;
-    cmd(server, session, { cmd: 'perfect_item', ...bagged });
+    cmd(server, session, { cmd: 'perfect_item', ...wireOf(bagged) });
     routePending(server);
     expect(textEvents(fc.sent)).toContain('A material needed for perfecting is locked.');
+
+    // One WORN attempt too, so the einst mirror carries a real bound payload
+    // (rank 0 or 1 by the roll, bound either way) and the worn arm of the
+    // equality loop below is not two default views agreeing.
+    const ringBefore = materialCounts(server, pid);
+    if (ember) delete ember.instance;
+    cmd(server, session, { cmd: 'perfect_item', slot: 'ring1' });
+    expect(materialCounts(server, pid)).toEqual(ringBefore.map((n) => n - 1));
+    expect(serverMeta(server, pid).equipmentInstance.ring1?.boundTo).toBe(pid);
+    // Re-lock the ember stack so the bagged view below still reads have 0.
+    if (ember) ember.instance = { locked: true };
 
     // Every snapshot frame, in order, onto a bare ClientWorld: the mirrors
     // converge the way a live client's do.
@@ -401,5 +427,10 @@ describe('perfect_item over the real online dispatch path', () => {
       bound: true,
     });
     expect(walked?.materials.find((m) => m.itemId === 'makers_ember')?.have).toBe(0);
+    // The worn view is the attempted one: bound through the einst mirror, at
+    // rank 0 or 1 (the roll), never Perfected after one attempt.
+    const wornView = client.perfectingInfo({ slot: 'ring1' });
+    expect(wornView).toMatchObject({ itemId: 'warhewn_signet', bound: true, perfected: false });
+    expect([0, 1]).toContain(wornView?.rank);
   });
 });

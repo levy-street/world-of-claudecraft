@@ -614,6 +614,52 @@ describe('unbind service deny order and mutation', () => {
     expect(copperOf(sim, pid)).toBe(50000);
   });
 
+  it('a Perfecting-bound copy denies unbind_perfecting BEFORE the range and fee arms, clears nothing', () => {
+    // Masterwrought phase 12 (R2): the Perfecting bind rides boundTo but is
+    // not a fee-reversible Maker's Bond. Standing in the WILDS with an empty
+    // purse proves the placement: neither out_of_range nor cannot_afford gets
+    // to answer, and the bind survives untouched on both track states.
+    const sim = makeSim();
+    const pid = sim.playerId;
+    sim.ctx.addItemInstance(SWORD, { boundTo: pid, perfecting: 2 }, pid);
+    standInWilds(sim, pid);
+    setCopper(sim, pid, 0);
+    const midTrack = unbindItemMod(sim.ctx, SWORD, pid);
+    expect(midTrack.ok).toBe(false);
+    expect(midTrack.reason).toBe('unbind_perfecting');
+    expect(midTrack.fee).toBe(2500);
+    expect(slotsOf(sim, pid, SWORD)[0].instance).toEqual({ boundTo: pid, perfecting: 2 });
+
+    // The Perfected stamp (the track's top) refuses the same way, at a
+    // station with the fee in hand, so the refusal is not the range's or the
+    // purse's doing either.
+    const done = makeSim();
+    const dp = done.playerId;
+    done.ctx.addItemInstance(
+      SWORD,
+      { boundTo: dp, perfected: true, rolled: { stats: { str: 2 } } },
+      dp,
+    );
+    standAtStation(done, dp);
+    setCopper(done, dp, 50000);
+    const stamped = unbindItemMod(done.ctx, SWORD, dp);
+    expect(stamped.ok).toBe(false);
+    expect(stamped.reason).toBe('unbind_perfecting');
+    expect(copperOf(done, dp)).toBe(50000);
+    expect(slotsOf(done, dp, SWORD)[0].instance?.boundTo).toBe(dp);
+    expect(slotsOf(done, dp, SWORD)[0].instance?.perfected).toBe(true);
+
+    // The control: the same copy with the Perfecting fields stripped is an
+    // ordinary Maker's Bond and unbinds at the station for the fee.
+    const plain = makeSim();
+    const pp = plain.playerId;
+    plain.ctx.addItemInstance(SWORD, { boundTo: pp, bindOnTrade: true }, pp);
+    standAtStation(plain, pp);
+    setCopper(plain, pp, 50000);
+    expect(unbindItemMod(plain.ctx, SWORD, pp).ok).toBe(true);
+    expect(copperOf(plain, pp)).toBe(47500);
+  });
+
   it('away from every static station: unbind_out_of_range, no charge, no clear', () => {
     const sim = makeSim();
     const pid = sim.playerId;

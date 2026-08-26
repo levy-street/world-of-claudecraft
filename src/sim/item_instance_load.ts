@@ -1,10 +1,10 @@
 // The load-side shape bound for a persisted per-instance item payload
-// (`ItemInstancePayload`, types.ts). ONE sanitizer, six call sites: the
+// (`ItemInstancePayload`, types.ts). ONE sanitizer, seven call sites: the
 // equipment map, the carried bags and the vendor buyback rows (all in
-// Sim.addPlayer), the bank inventory (bank.ts sanitizeBankState), and the
-// two persisted escrow books (item_instance_transfer.ts sanitizeEscrowSlot
-// for mail attachments and market collections, plus market.ts's listing
-// arm). Phase 16's first cut clamped only `signer`, and only on two of the
+// Sim.addPlayer), the bank inventory (bank.ts sanitizeBankState), the guild
+// bank store (guild_bank.ts sanitizeGuildBankState), and the two persisted
+// escrow books (item_instance_transfer.ts sanitizeEscrowSlot for mail
+// attachments and market collections, plus market.ts's listing arm). Phase 16's first cut clamped only `signer`, and only on two of the
 // character containers, so a signed copy loaded through the bank or the
 // buyback list kept an unbounded name, and every OTHER payload string
 // stayed unbounded everywhere. A

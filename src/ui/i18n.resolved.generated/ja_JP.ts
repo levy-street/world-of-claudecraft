@@ -3770,7 +3770,8 @@ export const ja_JP: EnTranslations = {
       "notBound": "そのアイテムはバインドされていません。",
       "cannotAfford": "バインド解除の手数料を支払えません。",
       "outOfRange": "バインド解除するには作業台のそばにいる必要があります。",
-      "noSpace": "バッグにバインド解除したアイテムを入れる空きがありません。"
+      "noSpace": "バッグにバインド解除したアイテムを入れる空きがありません。",
+      "perfecting": "完全化の途中にあるアイテムは束縛されたままです。"
     },
     "commissionBoard": {
       "title": "依頼ボード",

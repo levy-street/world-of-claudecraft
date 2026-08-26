@@ -10674,6 +10674,7 @@ export type TranslationKeyFlat =
   | 'hudChrome.unbind.notBound'
   | 'hudChrome.unbind.notEligible'
   | 'hudChrome.unbind.outOfRange'
+  | 'hudChrome.unbind.perfecting'
   | 'hudChrome.unbind.rowSub'
   | 'hudChrome.unbind.title'
   | 'hudChrome.unbind.unbindAria'

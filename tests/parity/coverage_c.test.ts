@@ -1465,7 +1465,7 @@ describe('coverage: each scenario fires its subsystem', () => {
     expect(neck?.instance).toEqual({
       boundTo: meta.entityId,
       perfected: true,
-      rolled: { stats: { int: 1, sta: 0 } },
+      rolled: { stats: { int: 1 } },
     });
     // The worn copy: seated on ring1 by the resolver, bound by its first
     // attempt, mid-track (two attempts can never stamp), never stat-baked.

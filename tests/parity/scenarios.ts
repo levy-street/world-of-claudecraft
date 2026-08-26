@@ -6706,9 +6706,15 @@ function perfectingWalk(seed = 1): Scenario {
       for (const c of PERFECTING_ATTEMPT_COST) {
         sim.addItem(c.itemId, c.count * PERFECTING_WALK_STACK, pid);
       }
-      // The bag ref names a CELL (item_copy_ref discipline); inventory cells
-      // never shift under consumption, so the index stays good for the walk.
-      const bagRef = { bag: meta.inventory.findIndex((s) => s.itemId === PERFECTING_BAGGED_APEX) };
+      // The bag ref names a CELL plus the item id seen there (item_copy_ref
+      // discipline). Cells DO shift when a stack empties (removeUnlockedFromSlots
+      // splices it out), but this drive's material stacks sit ABOVE the apex
+      // cell and never empty inside the walk, so the index stays good; had it
+      // shifted, the id pin would deny noItem rather than target another piece.
+      const bagRef = {
+        bag: meta.inventory.findIndex((s) => s.itemId === PERFECTING_BAGGED_APEX),
+        itemId: PERFECTING_BAGGED_APEX,
+      };
       if (bagRef.bag < 0) throw new Error('the bagged apex piece did not land in the bags');
 
       // Step 1: DENIAL, one skill point short. The ladder answers before the

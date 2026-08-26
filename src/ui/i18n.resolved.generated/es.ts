@@ -3770,7 +3770,8 @@ export const es: EnTranslations = {
       "notBound": "Ese objeto no está vinculado.",
       "cannotAfford": "No puedes permitirte la tarifa de desvinculación.",
       "outOfRange": "Debes estar en una estación artesanal para desvincular.",
-      "noSpace": "No tienes espacio para la copia desvinculada."
+      "noSpace": "No tienes espacio para la copia desvinculada.",
+      "perfecting": "A piece on the Perfecting track stays bound."
     },
     "commissionBoard": {
       "title": "Pedidos de Encargo",

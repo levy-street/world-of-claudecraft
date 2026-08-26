@@ -74,8 +74,12 @@ export const PERFECTING_ATTEMPT_COST: readonly Readonly<{ itemId: string; count:
 
 /** The target piece: a passed selection, never id-only (the item_copy_ref
  *  discipline). A worn ref names an equipment slot; a bagged ref names a bag
- *  CELL index (validated server-side and re-validated here). */
-export type PerfectItemRef = { slot: EquipSlot } | { bag: number };
+ *  CELL index AND the item id the caller saw there (validated server-side and
+ *  re-validated here through selectedInventorySlot's index-plus-id pin, so a
+ *  cell that shifted under a consumption or a sort between the click and the
+ *  command resolves to nothing rather than to whatever apex piece now sits
+ *  there and binding it). */
+export type PerfectItemRef = { slot: EquipSlot } | { bag: number; itemId: string };
 
 export interface PerfectingMaterialView {
   itemId: string;
@@ -86,7 +90,12 @@ export interface PerfectingMaterialView {
 
 /** The both-hosts view of one piece's Perfecting state, built ONLY by
  *  perfectingInfoFrom below so the offline Sim and the online ClientWorld
- *  mirrors cannot drift. */
+ *  mirrors cannot drift. ONLINE CAVEAT for a consumer (phase 14 owns the
+ *  UI): `skillMet` reads the crafting-identity mirror, which is all-zero
+ *  until the first cprof frame lands, so a consumer gates its skill line on
+ *  IWorld.craftingIdentity.synced exactly as the Apply Enchant picker's
+ *  viewer.synced does, rather than painting a false "skill unmet" at
+ *  startup. */
 export interface PerfectingInfoView {
   itemId: string;
   /** Mid-track rank in [0, PERFECTING_RANKS - 1]; 0 for an untouched piece. */
@@ -161,13 +170,10 @@ export function perfectedBonusStats(
 }
 
 /** Resolve a bagged ref through the shared selection walk
- *  (item_copy_ref.ts): a bag ref names a CELL, not an id, so the id
- *  selectedInventorySlot matches against is the named slot's own (the id-match
- *  arm is then vacuously true and the index validation stays in one place).
- *  Null for any invalid index. */
-function baggedSlotAt(inventory: InvSlot[], bag: number): InvSlot | null {
-  const itemId =
-    Number.isInteger(bag) && bag >= 0 && bag < inventory.length ? inventory[bag].itemId : '';
+ *  (item_copy_ref.ts): the named cell must exist AND hold the item id the
+ *  caller named (the index-plus-id pin every selected-copy consumer in this
+ *  repo makes), so a stale cell answers null, never a different item. */
+function baggedSlotAt(inventory: InvSlot[], bag: number, itemId: string): InvSlot | null {
   return selectedInventorySlot(inventory, itemId, bag) ?? null;
 }
 
@@ -190,7 +196,7 @@ export function perfectingInfoFrom(inputs: PerfectingInfoInputs): PerfectingInfo
     itemId = inputs.equipment[ref.slot];
     payload = inputs.equipmentInstances[ref.slot];
   } else {
-    const slot = baggedSlotAt(inputs.inventory, ref.bag);
+    const slot = baggedSlotAt(inputs.inventory, ref.bag, ref.itemId);
     itemId = slot?.itemId;
     payload = slot?.instance;
   }
@@ -260,7 +266,7 @@ export function resolvePerfectingAttempt(
     payload = meta.equipmentInstance[ref.slot];
     wornSlot = itemId ? ref.slot : null;
   } else {
-    bagged = baggedSlotAt(meta.inventory, ref.bag);
+    bagged = baggedSlotAt(meta.inventory, ref.bag, ref.itemId);
     itemId = bagged?.itemId;
     payload = bagged?.instance;
   }
@@ -341,7 +347,12 @@ export function resolvePerfectingAttempt(
         // enchantedPayloadFor shape; rolled.masterwork is never set here.
         const stats: Record<string, number> = { ...payload.rolled?.stats };
         for (const [stat, value] of Object.entries(bonus)) {
-          if (value === undefined) continue;
+          // normalizePrimaryStats writes a 0 for a present axis the delta's
+          // largest-remainder pass never reaches; a zero key is never written
+          // here (item_instance_merge.ts's structural equality treats a
+          // present zero as distinct from absent, and the tooltip would
+          // render "+0"), the enchanting.ts replace-arm prune's rule.
+          if (value === undefined || value === 0) continue;
           stats[stat] = (stats[stat] ?? 0) + value;
         }
         payload.rolled = { ...payload.rolled, stats };

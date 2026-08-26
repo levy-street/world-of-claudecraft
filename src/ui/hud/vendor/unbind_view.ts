@@ -17,8 +17,31 @@
 // row is the honest rendering. The service is master-independent (any
 // station master offers every row), so the view needs no masterNpcId input.
 
-import { isCommissionEligible, unbindFeeFor } from '../../../sim/professions/commission';
+import {
+  isCommissionEligible,
+  isPerfectingBound,
+  type UnbindDenyReason,
+  unbindFeeFor,
+} from '../../../sim/professions/commission';
 import type { InvSlot, ItemDef, ItemInstancePayload } from '../../../sim/types';
+import type { TranslationKey } from '../../i18n.catalog';
+
+/** The one reason-to-copy map for the unbindResult deny line (rendered by
+ *  the hud's event arm). A total Record, so a reason the sim can emit with no
+ *  key here is a type error rather than a silent fallback; the hud arm reads
+ *  it through unbindDenyKey below and carries no chain of its own. */
+export const UNBIND_DENY_KEY: Readonly<Record<UnbindDenyReason, TranslationKey>> = {
+  unbind_not_eligible: 'hudChrome.unbind.notEligible',
+  unbind_not_bound: 'hudChrome.unbind.notBound',
+  unbind_perfecting: 'hudChrome.unbind.perfecting',
+  unbind_out_of_range: 'hudChrome.unbind.outOfRange',
+  unbind_no_space: 'hudChrome.unbind.noSpace',
+  unbind_cannot_afford: 'hudChrome.unbind.cannotAfford',
+};
+
+export function unbindDenyKey(reason: UnbindDenyReason): TranslationKey {
+  return UNBIND_DENY_KEY[reason];
+}
 
 export interface UnbindRow {
   itemId: string;
@@ -57,6 +80,10 @@ export function buildUnbindView(deps: UnbindViewDeps): UnbindView {
   const byItemId = new Map<string, UnbindRow>();
   for (const slot of deps.inventory) {
     if (slot.instance?.boundTo === undefined) continue;
+    // A Perfecting bind (Masterwrought phase 12) is not a Maker's Bond: the
+    // resolver refuses it (unbind_perfecting) whatever the station or fee,
+    // and an unlisted row is the honest rendering, the ineligible-kind rule.
+    if (isPerfectingBound(slot.instance)) continue;
     const def = deps.items[slot.itemId];
     if (!isCommissionEligible(def)) continue;
     const existing = byItemId.get(slot.itemId);

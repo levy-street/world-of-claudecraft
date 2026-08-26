@@ -359,9 +359,17 @@ describe('provenance survives every container boundary', () => {
     const pid = sim.playerId;
     // The pre-enchant shape a masterwork proc mints (professions/crafting.ts):
     // instance payload for the seal, craftedRecipeId on the slot.
+    // Plus both Perfecting markers (Masterwrought phase 12; a contradictory
+    // pair on one fixture, deliberately, so ONE transform proves each rides
+    // the enchanted re-mint independently).
     sim.addItemInstance(
       GEAR,
-      { signer: SIGNER, rolled: { masterwork: true, stats: { sta: 5 } } },
+      {
+        signer: SIGNER,
+        rolled: { masterwork: true, stats: { sta: 5 } },
+        perfecting: 2,
+        perfected: true,
+      },
       pid,
       1,
       { craftedRecipeId: GEAR_RECIPE },
@@ -375,6 +383,8 @@ describe('provenance survives every container boundary', () => {
     expect(after?.instance?.signer, 'signer').toBe(SIGNER);
     expect(after?.instance?.rolled?.masterwork, 'masterwork seal').toBe(true);
     expect(after?.instance?.enchant, 'enchant').toBe('enchant_chest_stamina');
+    expect(after?.instance?.perfecting, 'perfecting rank').toBe(2);
+    expect(after?.instance?.perfected, 'perfected marker').toBe(true);
     expect(after?.craftedRecipeId ?? after?.instance?.craftedRecipeId, 'craftedRecipeId').toBe(
       GEAR_RECIPE,
     );
@@ -431,6 +441,8 @@ describe('provenance survives every container boundary', () => {
       // Everything BUT the signer is untouched by the sweep.
       expect(slot?.instance?.rolled?.masterwork, `${where}: masterwork seal`).toBe(true);
       expect(slot?.instance?.enchant, `${where}: enchant`).toBe('enchant_chest_stamina');
+      expect(slot?.instance?.perfecting, `${where}: perfecting rank`).toBe(2);
+      expect(slot?.instance?.perfected, `${where}: perfected marker`).toBe(true);
     }
     expect(state.inventory?.[0].craftedRecipeId).toBe(GEAR_RECIPE);
     expect(state.vendorBuyback?.[0].craftedRecipeId).toBe(GEAR_RECIPE);

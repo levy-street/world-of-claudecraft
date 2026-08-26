@@ -3770,7 +3770,8 @@ export const pl_PL: EnTranslations = {
       "notBound": "Ten przedmiot nie jest przywiązany.",
       "cannotAfford": "Nie stać cię na opłatę za odwiązanie.",
       "outOfRange": "Musisz być przy stanowisku rzemieślniczym, by odwiązać.",
-      "noSpace": "Nie masz miejsca na odwiązaną kopię."
+      "noSpace": "Nie masz miejsca na odwiązaną kopię.",
+      "perfecting": "A piece on the Perfecting track stays bound."
     },
     "commissionBoard": {
       "title": "Zamówienia",

@@ -3770,7 +3770,8 @@ export const de_DE: EnTranslations = {
       "notBound": "Dieser Gegenstand ist nicht gebunden.",
       "cannotAfford": "Du kannst die Entbindungsgebühr nicht bezahlen.",
       "outOfRange": "Du musst dich an einer Handwerksstation befinden, um zu entbinden.",
-      "noSpace": "Du hast keinen Platz für die entbundene Kopie."
+      "noSpace": "Du hast keinen Platz für die entbundene Kopie.",
+      "perfecting": "A piece on the Perfecting track stays bound."
     },
     "commissionBoard": {
       "title": "Aufträge",

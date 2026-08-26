@@ -57,6 +57,11 @@ export function decodeMountRaceView(raw: unknown, nowMs: number): MountRaceMirro
 export function applyMountRaceEventToMirror(
   mirror: MountRaceMirror | null,
   ev: SimEvent,
+  // The caller's clock, sampled once per call. The pre-extraction body read
+  // performance.now() inside the countdown and start arms alone; sampling it
+  // per call is one extra wall-clock read on the other event types, a
+  // recorded cost-only deviation from a pure move (the deadlines are built
+  // from the same instant either way).
   nowMs: number,
 ): MountRaceMirror | null {
   if (ev.type === 'mountRaceCountdown') {

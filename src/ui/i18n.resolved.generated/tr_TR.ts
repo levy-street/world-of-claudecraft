@@ -3770,7 +3770,8 @@ export const tr_TR: EnTranslations = {
       "notBound": "O eşya bağlı değil.",
       "cannotAfford": "Çözüm ücretini karşılayamazsınız.",
       "outOfRange": "Bağ çözmek için bir zanaat tezgahında olmanız gerekir.",
-      "noSpace": "Çantanızda bağı çözülmüş kopya için yer yok."
+      "noSpace": "Çantanızda bağı çözülmüş kopya için yer yok.",
+      "perfecting": "A piece on the Perfecting track stays bound."
     },
     "commissionBoard": {
       "title": "Komisyon Siparişleri",

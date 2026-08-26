@@ -3817,8 +3817,10 @@ describe('equipped instance wire (eqi)', () => {
     // 10 QA's third option). The OWNER sees both through the whole self `inv`
     // array and the untrimmed `einst` self mirror, which is what the Apply
     // Enchant picker's worn arm reads since phase 12 (IWorld.equipmentInstances,
-    // never this trimmed peer mirror); an INSPECTING viewer cannot see
-    // Perfected state at all, and that is recorded rather than accidental.
+    // never this trimmed peer mirror); an INSPECTING viewer cannot see the
+    // Perfected MARKER or the rank, while the R5 bonus merged into rolled.stats
+    // rides `rolled` unlabeled exactly as a masterwork roll does (the stats
+    // show, the stamp does not), and that is recorded rather than accidental.
     // Pinned by NAME so widening the wire is a deliberate edit.
     expect(wired.chest.perfected).toBeUndefined();
     expect(wired.chest.perfecting).toBeUndefined();

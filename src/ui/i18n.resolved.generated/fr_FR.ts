@@ -3770,7 +3770,8 @@ export const fr_FR: EnTranslations = {
       "notBound": "Cet objet n'est pas lié.",
       "cannotAfford": "Vous n'avez pas les moyens de payer les frais de déliage.",
       "outOfRange": "Vous devez être à un établi pour délier.",
-      "noSpace": "Vous n'avez pas de place pour l'exemplaire délié."
+      "noSpace": "Vous n'avez pas de place pour l'exemplaire délié.",
+      "perfecting": "A piece on the Perfecting track stays bound."
     },
     "commissionBoard": {
       "title": "Commandes",
