@@ -1304,7 +1304,11 @@ existing row that was wrong is AMENDED IN PLACE with a dated line rather than re
      rules, and the three reliquary pins move with it. The other two of the standing three stay as
      ruled at Phase 10 QA. WHY: the feat justification cites engineering's gear-capability, and
      craftIsGearCapable('engineering') flips, so holding the slot unfillable on an unstated ground
-     is the drift the anchor rule exists to stop.
+     is the drift the anchor rule exists to stop. EXECUTED 2026-08-26 (Phase 12): the un-pend
+     itself had landed at 11o; Phase 12 moved the R1 suppression's effect to the crafting.ts
+     effect gate and amended docs/design/reliquary.md dated in the same change, and the three
+     pins did NOT move (the craftBonusStatsFor bake is byte-identical, so the derivation
+     cannot).
 102. state-OPEN-WELLFED. DISSOLVED by 11c: after the unification there is ONE Well Fed (one aura
      id, one mechanic, one ladder), so neither mechanic is renamed and Phase 16 amends the naming
      registry row to say the GENERIC-with-caveat caveat is RETIRED by the 11c unification, with
@@ -1757,7 +1761,9 @@ daily gate anywhere in professions is out of ruling and STOPS.
      ember faucet, banked-ember behavior, the head-start size), and the resulting counts
      are recorded in state.md by the phase 12 session. WHY: attempts-per-rank against a
      weekly keystone IS the endgame's whole cadence; seed prices got a delegation row and
-     the packet's largest pacing lever had none.
+     the packet's largest pacing lever had none. RECORDED 2026-08-26: the Phase 12 ledger
+     (state.md) holds the derivation; the adopted counts are 4 ranks at 0.8 success
+     chance, one of each material per attempt, head start rank 1.
 130. qr-CENSUS. CENSUS ERRATA, amended in place where each number lives: fishing's endgame
      bill count measures 2, not 1 (recipe_stormreel_fishing_rod at 75 also consumes
      glimmerfin_koi; both rows are rods, so "fishing feeds only itself" stands); mining

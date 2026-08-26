@@ -18895,3 +18895,287 @@ prose) retired this round, the ripples and the un-pend all landed,
 kill table 7/7 over classes the build never ran. Open maintainer
 reads: the 11n set, the build's six, and this round's overlay
 fill-review read.
+
+## Phase 12 ledger (2026-08-26, the Perfecting stage)
+
+STATUS: COMPLETE. LOCAL, no push, no PR. The packet's highest-risk phase
+(sim + world_api + net + server + persisted item state at once), built as
+the phase file's three-agent fan-out with six fresh reviewers over the
+build, three over the fix round, and the qa gate LAST.
+
+### STEP 0
+Clean at cdc5e39971 (the 11o QA stamp; frozen code tip 95d7d81097 under
+it). release/v0.41.0 refetched: still ff2837da1f, already an ancestor, no
+merge and no merge audit owed. tsc clean at start, DATABASE_URL unset.
+Doc drift found and folded before any edit: qr-12-CADENCE lives at
+farming/state.md row 129 (the phase file says state.md); the world_api
+pin prediction in the phase file (332/88/244) was 11d-era, and the counts
+were read from tests/world_api_parity.test.ts FIRST (332/87/245/33 at the
+base tip; v0.41.0 had retired a facet and moved a member) with this
+phase's delta predicted BEFORE running.
+
+### THE RANK-COUNT DERIVATION (qr-12-CADENCE, farming/state.md row 129)
+Inputs: the ember faucet is 1 per week per character (R4 untouched; the
+reference character banks nothing); an attempt costs exactly 1
+makers_ember (the pacing lever) plus 1 sundered_essence (1:1 from
+sundering any raid epic; 2 would out-pace a weekly raider's spare epics)
+plus 1 prismglass_setting (a jewelcrafting intermediate, craftable at
+will), so attempts per week = 1; fail-forward per R1 (success advances
+one rank, failure advances nothing and never harms the piece); the
+masterwork head start stamps rank 1 at craft time (R1).
+Derived counts: PERFECTING_RANKS = 4 (rank 4 is Perfected), success
+chance 0.8, PERFECTING_HEADSTART_RANK = 1, skill masterwrought R13 = 125.
+E[attempts to Perfected] = 4 / 0.8 = 5 weeks, the mid-band of the 4-to-6
+target. Negative binomial (r = 4, p = 0.8): P(N=4) = 0.4096, P(N=5) =
+0.3277, P(N=6) = 0.1638, so P(4 <= N <= 6) = 0.9011: nine in ten
+reference characters finish a first piece inside the window. Both cap
+slots: r = 8, E = 10 weeks, P(N <= 12) = 0.9274, inside the 10-to-12
+target. The head start leaves three ranks, E = 3.75, saving 1.25
+attempts: "about one week". Rejected: 5 ranks at p = 1 (fail-forward
+meaningless, nothing to draw), 5 at 0.85 (E = 5.88 rides the top edge,
+P(N <= 6) = 0.78), 3 at 0.6 (E = 5 but a 40 percent weekly failure rate,
+P(N <= 6) = 0.82). Constants and the cost bill pinned in
+tests/perfecting.test.ts; every behavioral case consumes them through the
+module.
+
+### THE BUILT SHAPE
+- src/sim/professions/perfecting.ts behind SimContext: the deny ladder
+  (dead gate on the Sim wrapper; noItem for an unresolvable ref; not
+  apex; already Perfected; skill; the lock-only shortfall on its
+  DEDICATED line vs the genuine shortfall, counted through the merged
+  countRawInSlots/countUnlockedInSlots family), consume-then-bind-then-
+  roll (the documented rng position: EXACTLY ONE ctx.rng draw per
+  resolved attempt, ZERO on every deny arm, stated in the module header
+  the farming.ts way), the presence-only R2 bind (boundTo stamped only
+  when absent; values never compared, entity ids are not session-stable:
+  the trade.ts/commission.ts doctrine; the contract's original
+  compare-to-pid arm was the build's own first fix), and the Perfected
+  stamp (perfecting deleted, perfected true, the R5 bonus merged
+  additively into rolled.stats with zero-valued shares skipped, worn
+  copies recalculated in place).
+- The R5 delta is FORMULA-DERIVED per slot: source 28 minus the making
+  recipe's own level at epic through the item_level composition (ilvl =
+  source + quality bonus, slotStatMultForItem, the two-hand mult). At the
+  shipped apex level 25: chest/mainhand/helmet/shoulder/held-offhand/
+  gloves/waist +2, legs/feet/neck/ring +1, a two-hander +2, "one to two
+  points over the raid chest per slot" exactly as the Power placement
+  states. This is a FOURTH recipe.level consumer (the 11o QA's "exactly
+  three" was a probe of its day, not a pin); recorded at the derivation
+  site and in the memory note.
+- The head start rides the crafting.ts EFFECT GATE beside the masterwork
+  boolean (def.masterwrought standing in for the bonus-record term, same
+  roll, no new draw, the ceiling term identical); a hit mints
+  { signer, perfecting: 1 } and reports CraftResult.masterwork. The bake
+  (craftBonusStatsFor) is byte-identical, masterwork.ts is byte-untouched
+  (absent from the whole phase diff), and the per-slot tripwires (cowl
+  13/15, thoriumscale_leggings 13/15), the bound-has-teeth arm, and the
+  reliquary gear-capable pins (7, exactly ['copperlens_ocular']) all
+  stand unmoved. The Jack 'worse' term on the head start is dead code (a
+  Jack's rare ceiling refuses first); kept for gate symmetry, recorded.
+- ItemInstancePayload gains `perfecting` (integer 1..3; deleted at the
+  stamp) beside the phase-10 `perfected`; item_instance_load.ts gains
+  drop-only arms for both (an integer in [1, RANKS-1]; the literal true).
+  The Lucent guard's minting tripwire retired in the same change that
+  minted; its whole-catalog 800-floor refusal arm KEPT (fresh grants
+  still carry no marker).
+- Facet: IWorldProfessions gains perfectingInfo(ref) and perfectItem(ref)
+  (both methods; PerfectingInfoView built by the ONE shared
+  perfectingInfoFrom in both hosts; the view documents the online
+  craftingIdentity.synced caveat for the phase 14 consumer). The bagged
+  ref names its CELL PLUS THE ITEM ID seen there (the index-plus-id pin;
+  a shifted cell denies noItem rather than binding whatever moved in),
+  a review-round hardening over the contract's bare-cell shape. Wire:
+  'perfect_item' with slot, or bag plus item; the server parse is the
+  pure core server/perfect_item_ref.ts; perfect_item joined
+  HEAVY_SELF_CMDS so the owner's inv/einst mirrors re-diff.
+- THE WIRE-VISIBILITY DECISION (phase 10 carry 1, executed as the QA's
+  third option): perfected AND perfecting stay OFF the eqi peer
+  allowlist, both pinned absent by name; the OWNER reads both through the
+  wholesale inv mirror and the whole einst self mirror, and the Apply
+  Enchant picker's worn arm now reads IWorld.equipmentInstances, moving
+  the wornEnchantTargets wireTrimmed pin cluster deliberately. An
+  INSPECTING viewer cannot see the marker or the rank, while the R5 bonus
+  rides `rolled` unlabeled exactly as a masterwork roll does (the stats
+  show, the stamp does not; recorded, not accidental). The public display
+  trim is NOT widened (a head-started unbound copy lists blind on the
+  anonymous pipes; phase 14 owns surfacing it), and two peer surfaces
+  show a head-started copy whole by their own standing doctrine (the
+  trade offer wire's mutual inspection; the guild bank view's
+  co-ownership): the "owner-only" sentence names the peer INSPECT wire.
+- Phase 10 carries 2-4 executed: the guard's bagged arm narrowed to the
+  exact copy the apply would SPEND (baggedEnchantVictim: a plain copy
+  first, then the newest unenchanted instanced copy, or the pinned
+  enchanted copy on a confirmed replace; the picker gates each row family
+  on its own arm's victim and a 155-holding enumeration against the real
+  resolvers found zero mismatches); the Infusion KEEPS chest sta 13 (the
+  ladder shape over enchant_chest_lucent_stamina, 10 to 13, not a
+  conflict); the not_perfected-before-wrong_slot order stays as pinned
+  and the notPerfected copy re-read and kept. state-OPEN-MASTERWORK
+  (farming/state.md row 101) executed: docs/design/reliquary.md amended
+  dated (the effect-gate move landed; the craftIsGearCapable derivation
+  cannot move because the bake did not).
+- i18n: nine sim lines (five EXACT refusals incl. the dedicated locked
+  line, the fail notice, and three {item} RULES placed ahead of the
+  pet-mode catch-all that would swallow the bind line; the advance rule
+  accepts n == total because the terminal advance emits beside the done
+  line) with rows in all 20 non-en BASE_DICT blocks reusing the locked
+  glossary nouns; the three line-wrapped emits collapsed to single lines
+  (the S3 scanner is single-line-blind; both formerly invisible strings
+  mutation-proven red); the guard sweeps the module by its professions
+  glob. The unbind refusal's catalog key (hudChrome.unbind.perfecting,
+  naming the track AND Perfected) ships with its five non-Latin fills; 15
+  Latin rows ride the release fill (the 0.41.0 worklist).
+- Parity: the perfecting_walk scenario drives the real Sim delegate
+  (denials bracketed by frames and pinned draw-free AND state-identical;
+  the draw ledger as arithmetic), 40 KB golden, minted once and re-minted
+  once for its coverage sentence alone; farming_session and every other
+  golden BYTE-UNMOVED across the whole phase, farming's draw-count
+  contract untouched, no new PlayerMeta/Entity fields.
+
+### REVIEW ROUNDS (six fresh over the build; three fresh over the fix round; qa LAST)
+- BLOCKING (architecture; the database reviewer hit it independently):
+  isEnchantedInstance read a bare rolled.stats record as a LEGACY
+  enchant, the exact shape the walk mints, so every real Perfected copy
+  was refused by the Lucent Infusion and a confirmed replace WIPED the R5
+  bonus. Fixed (01c43c3d69): a `perfected` copy with no `enchant` reads
+  unenchanted; a guard arm walks a copy through the REAL stage and
+  applies the Infusion bagged and worn with the bonus surviving. The
+  build's hand-stamped { perfected: true } fixtures were symmetric-blind
+  to the rolled.stats qualifier (memory updated: at least one fixture per
+  suite must be minted by the real producer).
+- The Maker's Bond unbind service could clear a Perfecting bind for a
+  copper fee and put a Perfected copy back into trade and the market,
+  undoing the ember pacing R2 protects. Fixed across two commits: the
+  dedicated unbind_perfecting refusal (after not_bound, before the range
+  and fee arms), the window omitting such copies, the hud rendering every
+  deny through the total UNBIND_DENY_KEY record in unbind_view.ts
+  (hud.ts 18274 to 18263), and, from the second fresh pass, the
+  first-bound walk SKIPPING Perfecting-bound copies so a mixed holding
+  unbinds its ordinary Maker's Bond copy in either bag order (both
+  pinned) instead of refusing the whole id.
+- The rest of the applied set: the bag ref's item id (above); zero stat
+  shares never written (the merge skips them; the parity sampler omits
+  zero defaults, so the golden was structurally blind to the class and
+  coverage_c's direct pin is the guard: the 5d1ffa8f0a body's re-mint
+  claim was wrong and is corrected here); the head-start gate's miss,
+  ceiling, and commissioned arms pinned (the coverage audit's surviving
+  probes P2/P5/P7 each red now: the two-hand mult at a level where
+  rounding makes it count, the additive merge onto an existing rolled
+  record, the ceiling term); failure leaving a worn copy byte-identical;
+  the mixed shortfall and null delta arms; the merge predicate's
+  Perfecting rows plus the forward-compat unknown-key arm; both markers
+  at every provenance boundary incl. the apply-enchant transform and
+  rename rows; a forced worn attempt in the wire mirror-equality arm;
+  already_enchanted precedence restored for an enchanted-only Perfected
+  holding (the actionable reason; the first cut's not_perfected
+  contradicted the holding); isSpecialCopy counts Perfecting by contract;
+  comment truths (the sanitizer's seventh call site, the F3 clamp scope
+  overclaim, the row-less professions facet beside COMMAND_FACETS, the
+  bagged-ref docs, the scenario's cells-never-shift claim, the mount-race
+  extraction's once-per-call clock read recorded as cost-only). qa's one
+  nit: the unbind arm's reason-rewrite pin widened to every assignment
+  spelling (065416e8f4).
+- Judged, do not re-raise: the load bound keeps the fields on a non-apex
+  id (per-field drop-only doctrine; the sanitizer never sees the def);
+  the Jack 'worse' head-start term (dead code, kept for symmetry); the
+  trade-offer and guild-bank head-start visibility (each pipe's standing
+  doctrine); the enchanted-only unconfirmed deny reading
+  already_enchanted; the golden's structural blindness to zero keys.
+
+### PINS (predicted before running, observed after)
+world_api_parity 332/87/245/33 -> 334/87/247/33 (both union arms 334);
+command_schema 205/218/13 -> 206/219/13; COMMAND_FACETS deliberately
+row-less for the professions surface (noted in src/world_api.ts).
+Monolith, all extraction-first, never raised: sim.ts 12361 -> 12326 (the
+commission-order command bodies to professions/commission_order_commands.ts),
+game.ts 10509 -> 10501 (the three social self rows to
+server/self_social_wire.ts) -> 10492 (the perfect_item parse to
+server/perfect_item_ref.ts), online.ts 5967 -> 5926 (the mount-race wire
+decode to src/net/mount_race_wire.ts), hud.ts 18274 -> 18263 (the unbind
+deny chain to the unbind_view record). professions_blob_growth: measured
+17171 -> 17263 (= 2 x 46, predicted exactly: the two Masterwrought cap
+slots now instanced as Perfected, the professions-CRAFT worst case), edge
+17264, floor 16883, the 17408 ceiling HOLDS with 145 B headroom (4 to 6
+recipe ids; a phase-sized batch re-mints at 18 KiB). 11d's F3 decided:
+rift-forged payloads are formally scoped OUT to their own bound (rebuilt
+from bounded inputs; the load clamps bound LEGAL shapes and are not a
+byte bound for a tampered row, by doctrine). F6: a no-op (the oncePerDay
+set is still exactly recipe_quickening_catalyst).
+
+### THE MERGED characters.state BOUND (farming's measurement + counted costs)
+Farming baseline (PG16, 2026-08-19, pg_column_size): empty 1,499 B
+compressed / 2,059 raw; 23 beds 3,261 / 7,831 (ratio 2.4:1). Per-copy
+cost measured through the real serializer on a FRESH apex copy (JSON
+text; JSONB runs higher by its per-key overhead, the estimator calibrates
+within about 20 percent): first attempt (the bind) 27-30 B; mid-track
+42-45; Perfected at the widest shipped record 88-91; a head-started
+signed copy 15. Carriers: worn 12 (Perfected capped at 2 by R6/R16), bags
+80, bank 112, buyback 12 (head-start copies only; bound copies never
+vendor). Absurd census (194 cells at the dearest shape): about 17.7 KB
+text, about 30 KB JSONB raw, about 12.7 KB compressed; merged with 23
+beds about 38 KB raw / 16 KB compressed; unreachable in practice (E[5]
+embers per Perfected copy at 1/week is about ten copies per
+character-year). Realistic heavy case (two Perfected worn, two mid-track
+bagged, ten head-started in stock): about 420 B text / 0.7 KB JSONB raw /
+0.3 KB compressed. TOAST: the planted blob is already out of line at 2
+chunks; realistic stays 2; the crossing population is unchanged. WAL: the
+save always re-toasts, so the per-autosave delta is the COMPRESSED delta:
+realistic +0.1-0.3 KB per save, 3-10 KB/s at 1,000 online (farming's own
+class was +60 KB/s); at rest 10,000 characters about +3 MB compressed
+(farming +17.6 MB). No fresh Postgres measurement was needed; the
+database reviewer re-derived the bound independently.
+
+### THE REVERT DIRECTION (an older server on a both-writers blob)
+item_instance_load.ts is drop-only and NOT a whitelist: an older binary
+keeps `perfecting`, `perfected`, `boundTo`, and the merged rolled.stats
+verbatim (the merge predicate compares every present key, so an older
+binary can never fold a newer copy into an older-shaped stack), the R5
+bonus keeps applying (rolled.stats is the generic recalc channel), the
+bind keeps holding (presence-only), farmPlots rides beside them, and
+nothing corrupts on re-upgrade (a mid-track copy re-saved old keeps its
+rank). What a player LOSES on revert: the perfect_item command (unknown,
+dropped; on the old binary it also books a command-lane token and an
+unknown_command anomaly to the bot-detector seam, a no-op in the open
+stub); an apex craft proc is silently wasted (the old gate needs the bake);
+and the OLD holding-scan guard makes the "one Perfected copy licenses an
+ordinary one" Infusion hole live again while Perfected copies now exist.
+Forward: pre-phase saves carry neither field and load as rank 0.
+
+### THE FROZEN STAMP: one run at the final tip, EXIT=0
+At b08774277d, every reader idle AND reported, porcelain empty, zero
+vitest processes, DATABASE_URL unset; the wrapper wrote TIP first and
+SUITE_EXIT=0 before the follow-on stages, one fresh log, no commit
+anywhere between: 3198 test files passed / 21 skipped (3219), 46990
+passed / 2 expected fail / 373 skipped (47365); tsc clean; ci:changed
+EXIT=0; wiki:content and i18n:gen both zero diff; tip and porcelain
+unchanged through every stage. Drift vs the 11o QA stamp (3193/21,
+46919): +5 files / +71 tests, exactly the five new suites (perfecting,
+perfecting_wire, perfect_item_ref, mount_race_wire, self_social_wire)
+plus the arms added to existing files. The FIRST freeze (tip 065416e8f4)
+had surfaced the phase's three registry ripples (item_copy_addressing_
+guard, professions_silent_loot, server/heavy_self: the new-command
+classification suites the curated battery never names); classified in
+b08774277d and re-frozen clean. The commit after the run is docs-only
+(this ledger, progress.md, the farming/state.md row notes, the memory
+notes), the sanctioned exception to commit-voids-the-run.
+
+### RECORDED, NOT ACTED (maintainer reads on top of the standing sets)
+- The 15 Latin locales of hudChrome.unbind.perfecting and the nine sim
+  DICT keys ride the 0.41.0 release fill worklist.
+- The owner's own paperdoll tooltip reads the trimmed self entity mirror
+  in both hosts and cannot show Perfected yet; the head-started copy's
+  rank is invisible on market browse rows; both are phase 14 surfacing.
+- Two pre-existing S3 single-line blind spots OUTSIDE the phase
+  (src/sim/instances/dungeons.ts's heroic lock line, ready_check.ts's
+  readout), found by the matcher review's scanner probe.
+- PerfectingInfoView.skillMet needs the craftingIdentity.synced gate in
+  the phase 14 consumer (documented on the view).
+
+HANDOFF: Phase 12 QA (phase-12-qa.md), the twin. The Perfecting stage is
+verified standing: the cadence derived and pinned, the R5 delta
+formula-exact per slot, the head start at the effect gate with the bake
+byte-identical, the bind permanent (the unbind service refuses it), the
+interlock proven on walk-minted copies bagged and worn, both wire
+directions decided and pinned, the blob bounds stated with their
+arithmetic in both units, the revert direction recorded, and the frozen
+suite green at the tip first try.
