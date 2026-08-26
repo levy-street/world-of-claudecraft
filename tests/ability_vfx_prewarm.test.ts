@@ -149,10 +149,10 @@ describe('collectAbilityVfxCompileTargets', () => {
   });
 });
 
-describe('the renderer wires the units into the prewarm resume lane', () => {
+describe('the renderer wires the units into boot and resume prewarm', () => {
   const renderer = readFileSync(new URL('../src/render/renderer.ts', import.meta.url), 'utf8');
   const entryStart = renderer.indexOf("id: 'vfx.ability-primitives'");
-  const entry = renderer.slice(renderer.lastIndexOf('{', entryStart), entryStart + 2000);
+  const entry = renderer.slice(renderer.lastIndexOf('{', entryStart), entryStart + 4000);
 
   it('retains texture and program units, never the visible spawn', () => {
     expect(entryStart).toBeGreaterThan(-1);
@@ -161,10 +161,26 @@ describe('the renderer wires the units into the prewarm resume lane', () => {
     const units = entry.slice(unitsStart, entry.indexOf('\n        ],', unitsStart));
     expect(units).toContain('abilityVfxTexturePrewarmSteps()');
     expect(units).toContain('this.prewarmTexture(texture)');
-    expect(units).toContain('collectAbilityVfxCompileTargets(this.scene)');
-    expect(units).toContain('this.compilePrewarmColorPrograms(target.object, false)');
+    expect(units).toContain('abilityPrimitiveProgramUnits()');
+    expect(units).toContain('combatSkillMaterialSlot.resumeUnits()');
     // Replaying prewarmSpawn live would pop a white primitive burst.
     expect(units).not.toContain('prewarmSpawn');
+  });
+
+  it('links permanent range, pooled VFX, lazy spell and combat-effect programs behind the cover', () => {
+    expect(renderer).toContain('collectAbilityVfxCompileTargets(this.scene)');
+    expect(renderer).toContain(
+      'this.compilePrewarmColorPrograms(this.abilityRangeReticle.group, false)',
+    );
+    expect(renderer).toContain('buildCombatSkillMaterialPrewarmGroup');
+
+    const runStart = entry.indexOf('run: async () => {');
+    expect(runStart).toBeGreaterThan(-1);
+    const run = entry.slice(runStart, entry.indexOf('\n        },', runStart));
+    expect(run).toContain('abilityMaterialSlot.run();');
+    expect(run).toContain('combatSkillMaterialSlot.run();');
+    expect(run).toContain('await Promise.all([');
+    expect(run).toContain('...abilityPrimitiveProgramUnits().map((unit) => unit.run()),');
   });
 
   it('hands a policy-skipped entry its units instead of dropping them', () => {

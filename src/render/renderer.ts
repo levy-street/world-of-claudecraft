@@ -195,6 +195,7 @@ import { attackAbilityId, isSpinAttackAbility } from './characters/weapon_attack
 import { fogFarForBuiltGround, groundViewConeHalfAngle } from './chunk_residency_core';
 import { CLICK_MARKER_LIFETIME, clickMarkerAnim, clickMarkerColor } from './click_marker';
 import { buildCliffScree, type CliffScreeView } from './cliff_scree';
+import { buildCombatSkillMaterialPrewarmGroup } from './combat_skill_material_prewarm';
 import type { CompileGateResult } from './compile_gate';
 import { CompileGateQueue, SerialGateLane, settlePendingSwap } from './compile_gate';
 import { linkPieceWork } from './compile_gate_pieces';
@@ -5771,6 +5772,21 @@ export class Renderer {
       'ability-materials',
       buildAbilityMaterialPrewarmGroup,
     );
+    const combatSkillMaterialSlot = createVariantPrewarmSlot(
+      variantSlotHost,
+      'combat-skill-materials',
+      buildCombatSkillMaterialPrewarmGroup,
+    );
+    const abilityPrimitiveProgramUnits = (): PrewarmResumeUnit[] => [
+      ...collectAbilityVfxCompileTargets(this.scene).map((target) => ({
+        id: `program:${target.id}`,
+        run: () => this.compilePrewarmColorPrograms(target.object, false),
+      })),
+      {
+        id: 'program:ability-range-reticle',
+        run: () => this.compilePrewarmColorPrograms(this.abilityRangeReticle.group, false),
+      },
+    ];
     let mountPrewarmGroup: THREE.Group | null = null;
     const mountPrewarmPlannedKeys = mountPrewarmKeys(this.sim.ownedMounts());
     const mountPrewarmPendingKeys = new Set(mountPrewarmPlannedKeys);
@@ -5894,7 +5910,6 @@ export class Renderer {
       ['props', propMaterialPrewarmGroup],
       ghostVariantSlot.staged(),
       characterEffectSlot.staged(),
-      abilityMaterialSlot.staged(),
       ['foliage', foliagePrewarmGroup],
       ['great-tree', greatTreePrewarmGroup],
       ['weapon-vfx', weaponVfxPrewarmGroup],
@@ -6130,6 +6145,8 @@ export class Renderer {
       }
       ghostVariantSlot.hide();
       characterEffectSlot.hide();
+      abilityMaterialSlot.hide();
+      combatSkillMaterialSlot.hide();
       landmarkSlot.hide();
       weatherSlot.hide();
     };
@@ -6170,6 +6187,8 @@ export class Renderer {
       if (propMaterialPrewarmGroup) this.scene.remove(propMaterialPrewarmGroup);
       ghostVariantSlot.cleanup();
       characterEffectSlot.cleanup();
+      abilityMaterialSlot.cleanup();
+      combatSkillMaterialSlot.cleanup();
       if (foliagePrewarmGroup) this.scene.remove(foliagePrewarmGroup);
       if (greatTreePrewarmGroup) this.scene.remove(greatTreePrewarmGroup);
       // Removed, never disposed: disposing a material releases its linked
@@ -6728,16 +6747,23 @@ export class Renderer {
             },
           })),
           ...abilityMaterialSlot.resumeUnits(),
-          ...collectAbilityVfxCompileTargets(this.scene).map((target) => ({
-            id: `program:${target.id}`,
-            run: () => this.compilePrewarmColorPrograms(target.object, false),
-          })),
+          ...combatSkillMaterialSlot.resumeUnits(),
+          ...abilityPrimitiveProgramUnits(),
         ],
-        run: () => {
+        run: async () => {
           this.abilityVfxFx.prewarmSpawn(p.pos.x, p.pos.y, p.pos.z - 5, p.id);
-          // The lazily-minted spell materials (ability_material_prewarm.ts):
-          // staged hidden here, linked by the compile lane with the rest.
+          // Compile the exact hidden spell, range-guide and structural combat
+          // materials now. Staging alone left them outside the visible-scene
+          // compile and moved their first link into the player's first cast.
           abilityMaterialSlot.run();
+          combatSkillMaterialSlot.run();
+          const slotGroups = [abilityMaterialSlot.group, combatSkillMaterialSlot.group].filter(
+            (group): group is THREE.Group => group !== null,
+          );
+          await Promise.all([
+            ...slotGroups.map((group) => this.compilePrewarmColorPrograms(group, false)),
+            ...abilityPrimitiveProgramUnits().map((unit) => unit.run()),
+          ]);
           this.scene.traverse((child) => {
             const renderable = child as RenderableDiagnosticObject;
             if (renderable.userData.renderCategory !== 'vfx' || !renderable.material) return;

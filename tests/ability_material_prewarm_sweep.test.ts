@@ -315,10 +315,13 @@ describe('the manifest wiring (source pins)', () => {
     expect(entry).toContain('...abilityMaterialSlot.resumeUnits(),');
   });
 
-  it('is a staged compile group, so the boot compile lane links it', () => {
+  it('links the real visual group explicitly before the first cast can reveal it', () => {
     expect(renderer).toContain(
       "const abilityMaterialSlot = createVariantPrewarmSlot(\n      variantSlotHost,\n      'ability-materials',\n      buildAbilityMaterialPrewarmGroup,\n    );",
     );
-    expect(renderer).toContain('abilityMaterialSlot.staged(),');
+    expect(renderer).toContain(
+      '...slotGroups.map((group) => this.compilePrewarmColorPrograms(group, false)),',
+    );
+    expect(renderer).not.toContain('abilityMaterialSlot.staged(),');
   });
 });

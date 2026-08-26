@@ -97,6 +97,10 @@ import { soulRendPrewarmTargets } from './soul_rend_prewarm_core';
 import { createStowTransition, forceStow, requestStow, tickStow } from './stow_transition';
 import { SPIN_ATTACK_VISUAL_DURATION, weaponAttackStyle } from './weapon_attack_style_core';
 import {
+  createStoneboundArmorShardMaterial,
+  createStoneboundWeaponShellMaterial,
+} from './weapon_aura_materials';
+import {
   disposeOwnedWeaponSkinMaterials,
   markOwnedWeaponSkinMaterials,
 } from './weapon_skin_materials';
@@ -2547,18 +2551,7 @@ export class CharacterVisual {
         holder?.traverse((o) => {
           const mesh = o as THREE.Mesh;
           if (!mesh.isMesh || !mesh.userData.weaponMesh || !mesh.parent) return;
-          const aura = new THREE.Mesh(
-            mesh.geometry,
-            new THREE.MeshBasicMaterial({
-              color: 0x9a9384,
-              transparent: true,
-              opacity: 0.72,
-              depthWrite: false,
-              blending: THREE.NormalBlending,
-              side: THREE.DoubleSide,
-              wireframe: true,
-            }),
-          );
+          const aura = new THREE.Mesh(mesh.geometry, createStoneboundWeaponShellMaterial());
           aura.position.copy(mesh.position);
           aura.quaternion.copy(mesh.quaternion);
           aura.scale.copy(mesh.scale).multiplyScalar(1.14);
@@ -2612,16 +2605,7 @@ export class CharacterVisual {
       { x: 0, y: this.height * 0.53, z: 0.2, sx: 0.24, sy: 0.18, rz: 0 },
     ];
     for (const placement of placements) {
-      const shard = new THREE.Mesh(
-        STONEBOUND_SHARD_GEOMETRY,
-        new THREE.MeshBasicMaterial({
-          color: 0x777065,
-          transparent: true,
-          opacity: 0.82,
-          wireframe: true,
-          depthWrite: false,
-        }),
-      );
+      const shard = new THREE.Mesh(STONEBOUND_SHARD_GEOMETRY, createStoneboundArmorShardMaterial());
       shard.position.set(placement.x, placement.y, placement.z);
       shard.rotation.z = placement.rz;
       shard.scale.set(placement.sx, placement.sy, 0.11);

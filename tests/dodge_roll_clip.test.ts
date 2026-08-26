@@ -66,4 +66,17 @@ describe('player dodge roll clip', () => {
     expect(new Set(hipRotations).size).toBe(4);
     expect(clips.every((clip) => clip.duration === PLAYER_DODGE_ROLL_DURATION)).toBe(true);
   });
+
+  it('rolls forward and backward around the matching KayKit pitch axis', () => {
+    const source = sourceClip();
+    const forward = createPlayerDodgeRollClip(source, 'forward');
+    const back = createPlayerDodgeRollClip(source, 'back');
+    const forwardHips = forward.tracks.find((track) => track.name === 'hips.quaternion');
+    const backHips = back.tracks.find((track) => track.name === 'hips.quaternion');
+
+    // Key 2 is inside the tuck, before the full turn crosses the quaternion
+    // half-way point. KayKit faces +Z, where a forward somersault is +X.
+    expect(forwardHips?.values[2 * 4]).toBeGreaterThan(0);
+    expect(backHips?.values[2 * 4]).toBeLessThan(0);
+  });
 });

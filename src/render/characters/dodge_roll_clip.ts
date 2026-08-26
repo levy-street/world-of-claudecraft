@@ -102,8 +102,10 @@ const ROTATION_OFFSETS: Readonly<Record<string, readonly EulerDegrees[]>> = {
 
 const HIPS_Y_OFFSETS = [0, -0.035, -0.08, -0.085, -0.03, 0] as const;
 const DIRECTION_YAW: Readonly<Record<DodgeVisualDirection, number>> = {
-  forward: 0,
-  back: Math.PI,
+  // KayKit faces +Z. The authored negative-X curl therefore needs a half-turn
+  // for a forward somersault; leaving it unrotated produces a backward flip.
+  forward: Math.PI,
+  back: 0,
   left: -Math.PI / 2,
   right: Math.PI / 2,
 };
@@ -147,9 +149,7 @@ function quaternionValues(
       THREE.MathUtils.degToRad(degrees[2]),
     );
     offset.setFromEuler(euler);
-    if (direction !== 'forward') {
-      offset.premultiply(directionYaw).multiply(inverseDirectionYaw);
-    }
+    offset.premultiply(directionYaw).multiply(inverseDirectionYaw);
     base.multiply(offset).normalize();
     if (key > 0 && previous.dot(base) < 0) base.set(-base.x, -base.y, -base.z, -base.w);
     base.toArray(values, valueOffset);
