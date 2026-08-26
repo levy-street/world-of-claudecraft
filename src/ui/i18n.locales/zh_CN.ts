@@ -11135,7 +11135,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.unbind.cannotAfford': '你付不起解绑费用。',
   'hudChrome.unbind.outOfRange': '你必须站在工作台旁才能解绑。',
   'hudChrome.unbind.noSpace': '背包空间不足，无法存放解绑后的物品。',
-  'hudChrome.unbind.perfecting': '处于完美化过程中的物品会保持绑定。',
+  'hudChrome.unbind.perfecting': '处于完美化过程中或已臻至完美的物品会保持绑定。',
   // Commission order board (issue #1298, M16 non-Latin fills added with the keys).
   'hudChrome.commissionBoard.title': '委托订单',
   'hudChrome.commissionBoard.close': '关闭委托订单',

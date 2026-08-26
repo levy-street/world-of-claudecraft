@@ -3771,7 +3771,7 @@ export const pt_BR: EnTranslations = {
       "cannotAfford": "Você não pode pagar a taxa de desvincular.",
       "outOfRange": "Você deve estar em uma bancada de artesanato para desvincular.",
       "noSpace": "Você não tem espaço para a cópia desvinculada.",
-      "perfecting": "A piece on the Perfecting track stays bound."
+      "perfecting": "A piece on the Perfecting track, or already Perfected, stays bound."
     },
     "commissionBoard": {
       "title": "Encomendas",

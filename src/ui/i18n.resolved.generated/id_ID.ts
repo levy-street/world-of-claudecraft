@@ -3771,7 +3771,7 @@ export const id_ID: EnTranslations = {
       "cannotAfford": "Kamu tidak mampu membayar biaya pelepasan ikat.",
       "outOfRange": "Kamu harus berada di stasiun kerajinan untuk melepas ikat.",
       "noSpace": "Kamu tidak punya ruang untuk salinan yang sudah dilepas ikatnya.",
-      "perfecting": "A piece on the Perfecting track stays bound."
+      "perfecting": "A piece on the Perfecting track, or already Perfected, stays bound."
     },
     "commissionBoard": {
       "title": "Pesanan Komisi",

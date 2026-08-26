@@ -3771,7 +3771,7 @@ export const nl_NL: EnTranslations = {
       "cannotAfford": "Je kunt de ontbindingskosten niet betalen.",
       "outOfRange": "Je moet bij een ambachtsstation zijn om te ontbinden.",
       "noSpace": "Je hebt geen ruimte voor het ontbonden exemplaar.",
-      "perfecting": "A piece on the Perfecting track stays bound."
+      "perfecting": "A piece on the Perfecting track, or already Perfected, stays bound."
     },
     "commissionBoard": {
       "title": "Opdrachten",

@@ -127,12 +127,20 @@ export interface BagCopy {
 }
 
 /** Whether destroying this specific copy loses something irreplaceable: it was
- *  signed/crafted, is a masterwork proc, or is enchanted (isEnchantedInstance:
- *  the explicit marker or a legacy bare rolled.stats without masterwork). A
- *  plain fungible copy is never special. */
+ *  signed/crafted, is a masterwork proc, is enchanted (isEnchantedInstance:
+ *  the explicit marker or a legacy bare rolled.stats without masterwork), or
+ *  carries Perfecting progress or the Perfected stamp (Masterwrought phase
+ *  12: by contract, not by the signer every live Perfected copy happens to
+ *  carry). A plain fungible copy is never special. */
 export function isSpecialCopy(instance: ItemInstancePayload | undefined): boolean {
   if (!instance) return false;
-  return !!instance.signer || !!instance.rolled?.masterwork || isEnchantedInstance(instance);
+  return (
+    !!instance.signer ||
+    !!instance.rolled?.masterwork ||
+    isEnchantedInstance(instance) ||
+    instance.perfected === true ||
+    instance.perfecting !== undefined
+  );
 }
 
 /** Whether the copy the destructive action WOULD consume is special, so the

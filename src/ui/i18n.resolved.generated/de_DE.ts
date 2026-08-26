@@ -3771,7 +3771,7 @@ export const de_DE: EnTranslations = {
       "cannotAfford": "Du kannst die Entbindungsgebühr nicht bezahlen.",
       "outOfRange": "Du musst dich an einer Handwerksstation befinden, um zu entbinden.",
       "noSpace": "Du hast keinen Platz für die entbundene Kopie.",
-      "perfecting": "A piece on the Perfecting track stays bound."
+      "perfecting": "A piece on the Perfecting track, or already Perfected, stays bound."
     },
     "commissionBoard": {
       "title": "Aufträge",

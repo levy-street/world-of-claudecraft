@@ -614,6 +614,42 @@ describe('unbind service deny order and mutation', () => {
     expect(copperOf(sim, pid)).toBe(50000);
   });
 
+  it("a MIXED holding unbinds the ordinary Maker's Bond copy and skips the Perfecting-bound one, in either bag order", () => {
+    // The resolver's walk and the unbind window's rows must agree: a
+    // Perfecting-bound copy is never the pick, whatever its index, so the
+    // ordinary bound copy of the same id beside it unbinds for the fee exactly
+    // once, and the Perfecting bind is never cleared.
+    for (const perfectingFirst of [true, false]) {
+      const sim = makeSim();
+      const pid = sim.playerId;
+      const ordinary = { boundTo: pid, bindOnTrade: true };
+      const onTrack = { boundTo: pid, perfecting: 2 };
+      sim.ctx.addItemInstance(SWORD, perfectingFirst ? onTrack : ordinary, pid);
+      sim.ctx.addItemInstance(SWORD, perfectingFirst ? ordinary : onTrack, pid);
+      standAtStation(sim, pid);
+      setCopper(sim, pid, 50000);
+      const result = unbindItemMod(sim.ctx, SWORD, pid);
+      expect(result.ok, `perfectingFirst=${perfectingFirst}`).toBe(true);
+      expect(copperOf(sim, pid)).toBe(47500);
+      const slots = slotsOf(sim, pid, SWORD);
+      const stillOnTrack = slots.filter((s) => s.instance?.perfecting === 2);
+      expect(stillOnTrack, 'the Perfecting copy keeps its bind').toHaveLength(1);
+      expect(stillOnTrack[0].instance?.boundTo).toBe(pid);
+      expect(
+        slots.filter(
+          (s) => s.instance?.boundTo === undefined && s.instance?.perfecting === undefined,
+        ),
+        'the ordinary copy is the one cleared',
+      ).toHaveLength(1);
+      // A second command finds no serviceable bound copy: the refusal names the
+      // Perfecting bind that remains, and charges nothing.
+      const again = unbindItemMod(sim.ctx, SWORD, pid);
+      expect(again.ok).toBe(false);
+      expect(again.reason).toBe('unbind_perfecting');
+      expect(copperOf(sim, pid)).toBe(47500);
+    }
+  });
+
   it('a Perfecting-bound copy denies unbind_perfecting BEFORE the range and fee arms, clears nothing', () => {
     // Masterwrought phase 12 (R2): the Perfecting bind rides boundTo but is
     // not a fee-reversible Maker's Bond. Standing in the WILDS with an empty

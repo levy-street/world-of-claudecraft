@@ -190,7 +190,7 @@ afterAll(() => {
 });
 
 describe('ClientWorld emits the perfect_item frames the protocol declares', () => {
-  it('a worn ref rides as `slot` alone and a bagged ref as `bag` alone, nothing else', () => {
+  it('a worn ref rides as `slot` alone and a bagged ref as `bag` plus `item`, nothing else', () => {
     const { client, sent } = sendingClient(1);
     client.perfectItem({ slot: 'neck' });
     client.perfectItem({ bag: 3, itemId: APEX_NECK });
@@ -388,12 +388,14 @@ describe('perfect_item over the real online dispatch path', () => {
     routePending(server);
     expect(textEvents(fc.sent)).toContain('A material needed for perfecting is locked.');
 
-    // One WORN attempt too, so the einst mirror carries a real bound payload
-    // (rank 0 or 1 by the roll, bound either way) and the worn arm of the
-    // equality loop below is not two default views agreeing.
+    // One WORN attempt too, forced to succeed, so the einst mirror carries a
+    // real bound payload at rank 1 and the worn arm of the equality loop below
+    // is not two default views agreeing.
     const ringBefore = materialCounts(server, pid);
     if (ember) delete ember.instance;
-    cmd(server, session, { cmd: 'perfect_item', slot: 'ring1' });
+    withForcedRoll(server.sim, 0, () => {
+      cmd(server, session, { cmd: 'perfect_item', slot: 'ring1' });
+    });
     expect(materialCounts(server, pid)).toEqual(ringBefore.map((n) => n - 1));
     expect(serverMeta(server, pid).equipmentInstance.ring1?.boundTo).toBe(pid);
     // Re-lock the ember stack so the bagged view below still reads have 0.
@@ -428,9 +430,13 @@ describe('perfect_item over the real online dispatch path', () => {
     });
     expect(walked?.materials.find((m) => m.itemId === 'makers_ember')?.have).toBe(0);
     // The worn view is the attempted one: bound through the einst mirror, at
-    // rank 0 or 1 (the roll), never Perfected after one attempt.
+    // exactly rank 1 (the forced success), never Perfected after one attempt.
     const wornView = client.perfectingInfo({ slot: 'ring1' });
-    expect(wornView).toMatchObject({ itemId: 'warhewn_signet', bound: true, perfected: false });
-    expect([0, 1]).toContain(wornView?.rank);
+    expect(wornView).toMatchObject({
+      itemId: 'warhewn_signet',
+      bound: true,
+      perfected: false,
+      rank: 1,
+    });
   });
 });

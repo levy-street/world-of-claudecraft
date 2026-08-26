@@ -3771,7 +3771,7 @@ export const zh_CN: EnTranslations = {
       "cannotAfford": "你付不起解绑费用。",
       "outOfRange": "你必须站在工作台旁才能解绑。",
       "noSpace": "背包空间不足，无法存放解绑后的物品。",
-      "perfecting": "处于完美化过程中的物品会保持绑定。"
+      "perfecting": "处于完美化过程中或已臻至完美的物品会保持绑定。"
     },
     "commissionBoard": {
       "title": "委托订单",

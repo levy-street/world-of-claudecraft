@@ -3771,7 +3771,7 @@ export const pl_PL: EnTranslations = {
       "cannotAfford": "Nie stać cię na opłatę za odwiązanie.",
       "outOfRange": "Musisz być przy stanowisku rzemieślniczym, by odwiązać.",
       "noSpace": "Nie masz miejsca na odwiązaną kopię.",
-      "perfecting": "A piece on the Perfecting track stays bound."
+      "perfecting": "A piece on the Perfecting track, or already Perfected, stays bound."
     },
     "commissionBoard": {
       "title": "Zamówienia",

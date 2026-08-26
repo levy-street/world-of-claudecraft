@@ -3771,7 +3771,7 @@ export const it_IT: EnTranslations = {
       "cannotAfford": "Non puoi permetterti la tariffa di scioglimento.",
       "outOfRange": "Devi essere a una stazione artigianale per sciogliere.",
       "noSpace": "Non hai spazio per la copia sciolta.",
-      "perfecting": "A piece on the Perfecting track stays bound."
+      "perfecting": "A piece on the Perfecting track, or already Perfected, stays bound."
     },
     "commissionBoard": {
       "title": "Ordini di Commissione",

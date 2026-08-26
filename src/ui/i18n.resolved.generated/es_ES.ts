@@ -3771,7 +3771,7 @@ export const es_ES: EnTranslations = {
       "cannotAfford": "No puedes permitirte la tarifa de desvinculación.",
       "outOfRange": "Debes estar en una estación artesanal para desvincular.",
       "noSpace": "No tienes espacio para la copia desvinculada.",
-      "perfecting": "A piece on the Perfecting track stays bound."
+      "perfecting": "A piece on the Perfecting track, or already Perfected, stays bound."
     },
     "commissionBoard": {
       "title": "Pedidos de Encargo",

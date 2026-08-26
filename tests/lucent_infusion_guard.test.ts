@@ -236,6 +236,27 @@ describe('holdsPerfectedTarget refuses every PLAIN copy (only the Perfecting wal
     }
   });
 
+  it('an enchanted-only Perfected holding, unconfirmed, is refused as already_enchanted, not not_perfected', () => {
+    // The remover's third pass names the enchanted Perfected copy as the
+    // victim, so the Perfected gate passes (the player really holds one) and
+    // the apply's own already_enchanted deny names the actionable reason
+    // (confirm the replace); nothing is spent either way. A not_perfected here
+    // would contradict the holding.
+    const only = apexEnchanter(20);
+    only.sim.addItemInstance(
+      CHEST_ITEM,
+      { perfected: true, enchant: 'enchant_chest_lucent_stamina', rolled: { stats: { int: 1 } } },
+      only.pid,
+      1,
+    );
+    expect(holdsPerfectedTarget(only.meta, CHEST_ITEM)).toBe(true);
+    const before = only.meta.inventory.filter((s) => s.itemId === CHEST_ITEM).length;
+    expect(resolveApplyEnchant(only.sim.ctx, only.pid, CHEST_ITEM, INFUSION).reason).toBe(
+      'already_enchanted',
+    );
+    expect(only.meta.inventory.filter((s) => s.itemId === CHEST_ITEM)).toHaveLength(before);
+  });
+
   it('a PLAIN copy shadows a newer Perfected one: the remover spends plain first', () => {
     // The shape the first narrowing cut missed: removeEnchantableItem's first
     // pass takes a plain fungible copy whatever its index, so a Perfected copy

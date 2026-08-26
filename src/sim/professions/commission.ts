@@ -87,10 +87,12 @@ export type UnbindDenyReason =
   | 'unbind_no_space'
   | 'unbind_cannot_afford';
 
-/** A copy whose boundTo is the Perfecting bind (Masterwrought phase 12):
- *  mid-track (`perfecting`) or Perfected. Shared by resolveUnbind's deny arm
- *  and the unbind window's row predicate (src/ui/hud/vendor/unbind_view.ts),
- *  so the listed rows and the resolver refuse the same copies. */
+/** A copy carrying the Perfecting fields (Masterwrought phase 12): mid-track
+ *  (`perfecting`) or Perfected. Says nothing about boundTo by itself (a
+ *  head-started craft carries `perfecting: 1` unbound); every caller checks
+ *  the bind first. Shared by the resolver's serviceable-copy walk and the
+ *  unbind window's row predicate (src/ui/hud/vendor/unbind_view.ts), so the
+ *  listed rows and the resolver skip the same copies. */
 export function isPerfectingBound(instance: ItemInstancePayload | undefined): boolean {
   return instance?.perfecting !== undefined || instance?.perfected === true;
 }
@@ -108,15 +110,37 @@ export interface UnbindResult {
 }
 
 /** The first (lowest bag index) inventory slot holding a bound copy of
- *  `itemId`, or -1. Deterministic selection: when several bound copies of the
- *  same item exist, the earliest slot is always the one unbound. */
+ *  `itemId` that the service can clear, or -1. Deterministic selection: when
+ *  several bound copies of the same item exist, the earliest slot is always
+ *  the one unbound. A Perfecting-bound copy (Masterwrought phase 12,
+ *  isPerfectingBound) is SKIPPED, never picked: its bind is not serviceable,
+ *  so an ordinary Maker's Bond copy of the same id behind it still unbinds
+ *  (the unbind window omits the Perfecting copies and lists that one). */
 function firstBoundSlotIndex(meta: PlayerMeta, itemId: string): number {
   const inventory = meta.inventory ?? [];
   for (let i = 0; i < inventory.length; i++) {
     const slot = inventory[i];
-    if (slot.itemId === itemId && slot.instance?.boundTo !== undefined) return i;
+    if (
+      slot.itemId === itemId &&
+      slot.instance?.boundTo !== undefined &&
+      !isPerfectingBound(slot.instance)
+    ) {
+      return i;
+    }
   }
   return -1;
+}
+
+/** Whether the player holds ANY bound copy of `itemId` carrying the
+ *  Perfecting fields: with no serviceable bound copy, this splits the
+ *  unbind_perfecting refusal from unbind_not_bound. */
+function holdsPerfectingBoundCopy(meta: PlayerMeta, itemId: string): boolean {
+  return (meta.inventory ?? []).some(
+    (slot) =>
+      slot.itemId === itemId &&
+      slot.instance?.boundTo !== undefined &&
+      isPerfectingBound(slot.instance),
+  );
 }
 
 /**
@@ -131,16 +155,20 @@ function firstBoundSlotIndex(meta: PlayerMeta, itemId: string): number {
  * 3. no bound copy of itemId held (boundTo presence is the lock, its value
  *    is never compared: entity ids are not stable cross-session identities):
  *    unbind_not_bound;
- * 3b. the bound copy the resolver would clear carries the Perfecting track
- *    (`perfecting`) or the Perfected stamp (Masterwrought phase 12,
- *    professions/perfecting.ts): unbind_perfecting. masterwrought R2 binds a
- *    piece the moment Perfecting begins, and that bind holds for good: a
+ * 3b. no SERVICEABLE bound copy, but a bound copy carrying the Perfecting
+ *    track (`perfecting`) or the Perfected stamp is held (Masterwrought phase
+ *    12, professions/perfecting.ts): unbind_perfecting. masterwrought R2 binds
+ *    a piece the moment Perfecting begins, and that bind holds for good: a
  *    fee-reversible unbind would let a Perfected copy (its R5 bonus merged
  *    into rolled.stats) re-enter trade and the market, handing another
  *    character above-raid power without spending the Maker's Embers that
- *    pace the stage (qr-12-CADENCE). Placed after unbind_not_bound so a
- *    duplicate command still resolves not_bound first, and before the range
- *    and fee arms so the refusal never depends on where the player stands;
+ *    pace the stage (qr-12-CADENCE). firstBoundSlotIndex never picks such a
+ *    copy, so an ordinary Maker's Bond copy of the same id beside it still
+ *    unbinds (the window lists exactly that copy); the refusal fires only
+ *    when EVERY bound copy of the id is Perfecting-bound. Sharing rung 3's
+ *    position keeps a duplicate command charge-free, and it sits before the
+ *    range and fee arms so the refusal never depends on where the player
+ *    stands;
  * 4. not within STATION_RADIUS of ANY static station (stations.ts
  *    isAtAnyStation; every station master offers the service, and a mobile
  *    station NEVER satisfies it, the training precedent): unbind_out_of_range;
@@ -167,10 +195,15 @@ export function resolveUnbind(
   }
   const boundIdx = meta ? firstBoundSlotIndex(meta, itemId) : -1;
   if (!meta || boundIdx === -1) {
-    return { ok: false, itemId, reason: 'unbind_not_bound', fee };
-  }
-  if (isPerfectingBound(meta.inventory[boundIdx].instance)) {
-    return { ok: false, itemId, reason: 'unbind_perfecting', fee };
+    // No serviceable bound copy: the refusal names the Perfecting bind when
+    // that is the only bind held, else plain not_bound.
+    return {
+      ok: false,
+      itemId,
+      reason:
+        meta && holdsPerfectingBoundCopy(meta, itemId) ? 'unbind_perfecting' : 'unbind_not_bound',
+      fee,
+    };
   }
   if (!pos || !isAtAnyStation(stations, pos)) {
     return { ok: false, itemId, reason: 'unbind_out_of_range', fee };

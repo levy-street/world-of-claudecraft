@@ -3771,7 +3771,7 @@ export const sv_SE: EnTranslations = {
       "cannotAfford": "Du har inte råd med upplösningsavgiften.",
       "outOfRange": "Du måste vara vid en hantverksstation för att lösa upp.",
       "noSpace": "Du har inte plats för den obundna kopian.",
-      "perfecting": "A piece on the Perfecting track stays bound."
+      "perfecting": "A piece on the Perfecting track, or already Perfected, stays bound."
     },
     "commissionBoard": {
       "title": "Beställningsordrar",

@@ -3771,7 +3771,7 @@ export const ko_KR: EnTranslations = {
       "cannotAfford": "귀속 해제 수수료를 지불할 수 없습니다.",
       "outOfRange": "귀속을 해제하려면 작업대 옆에 있어야 합니다.",
       "noSpace": "가방에 귀속 해제한 아이템을 넣을 공간이 없습니다.",
-      "perfecting": "완전화 과정에 있는 아이템은 귀속 상태로 유지됩니다."
+      "perfecting": "완전화 과정에 있거나 이미 완전해진 아이템은 귀속 상태로 유지됩니다."
     },
     "commissionBoard": {
       "title": "의뢰 게시판",

@@ -751,12 +751,14 @@ export function baggedEnchantVictim(
     if (idx >= 0) return inventory[idx].instance;
   }
   const scratch = inventory.map((s) => ({ ...s }));
-  const victim = consumeOneScratch(scratch, itemId, isEnchantedInstance);
-  // consumeOneScratch's third pass falls back to an EXCLUDED (enchanted) copy,
-  // modeling the plain removeItem walk the disenchant split takes; the
-  // unconfirmed apply has no such fallback (it denies already_enchanted with
-  // nothing spent), so an enchanted-only holding has NO victim here.
-  return victim !== undefined && isEnchantedInstance(victim) ? undefined : victim;
+  // consumeOneScratch's third pass falls back to an EXCLUDED (enchanted) copy
+  // where the unconfirmed apply itself spends nothing (it denies
+  // already_enchanted). That fallback is KEPT on purpose: with only enchanted
+  // copies held, the Perfected gate then answers about a Perfected copy the
+  // player really holds and the apply's own already_enchanted deny names the
+  // actionable reason (confirm the replace), rather than a not_perfected the
+  // holding contradicts. Either way nothing is spent.
+  return consumeOneScratch(scratch, itemId, isEnchantedInstance);
 }
 
 /** Does this player hold a copy of `itemId` the Perfected guard would accept?

@@ -147,6 +147,13 @@ describe('bag_item_context_menu: special-copy classification', () => {
     expect(isSpecialCopy({ enchant: 'enchant_weapon_might' } as ItemInstancePayload)).toBe(true);
     // Legacy enchanted marker: bare rolled.stats without masterwork.
     expect(isSpecialCopy({ rolled: { stats: { str: 5 } } } as ItemInstancePayload)).toBe(true);
+    // Masterwrought phase 12: Perfecting progress and the Perfected stamp are
+    // special BY CONTRACT, with no signer and (for the stamp) a bare R5 record
+    // that isEnchantedInstance deliberately does not read as an enchant.
+    expect(isSpecialCopy({ perfecting: 1 } as ItemInstancePayload)).toBe(true);
+    expect(
+      isSpecialCopy({ perfected: true, rolled: { stats: { int: 1 } } } as ItemInstancePayload),
+    ).toBe(true);
     // A legacy rolled.quality-only copy is NOT special (never signed/mw/enchanted).
     expect(isSpecialCopy({ rolled: { quality: 'rare' } } as ItemInstancePayload)).toBe(false);
   });

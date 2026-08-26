@@ -4440,8 +4440,8 @@ export class ClientWorld implements IWorld {
     this.cmd({ cmd: 'unbind_item', item: itemId });
   }
   // The Perfecting stage (Masterwrought phase 12): command only, never
-  // predicted. Exactly one of `slot` (a worn ref) or `bag` (a bagged ref)
-  // rides, the absent one omitted (the craftItem `commission` idiom); the
+  // predicted. Exactly one of `slot` (worn) or `bag` plus `item` (the bagged
+  // cell and the id seen there) rides, the absent arm omitted; the
   // server re-validates the shape and the sim resolves every gate and the one
   // roll. Feedback is the sim's own error/log lines plus the self inv/einst
   // mirrors re-diffing (perfect_item is a HEAVY_SELF_CMDS member).

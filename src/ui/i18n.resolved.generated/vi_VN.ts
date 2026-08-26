@@ -3771,7 +3771,7 @@ export const vi_VN: EnTranslations = {
       "cannotAfford": "Bạn không đủ tiền để trả phí gỡ ràng buộc.",
       "outOfRange": "Bạn phải ở tại bàn chế tác để gỡ ràng buộc.",
       "noSpace": "Túi của bạn không còn chỗ cho bản đã gỡ ràng buộc.",
-      "perfecting": "A piece on the Perfecting track stays bound."
+      "perfecting": "A piece on the Perfecting track, or already Perfected, stays bound."
     },
     "commissionBoard": {
       "title": "Đơn Ủy Thác",

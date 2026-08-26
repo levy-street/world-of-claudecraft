@@ -3771,7 +3771,7 @@ export const cs_CZ: EnTranslations = {
       "cannotAfford": "Na odpoutání nemáš dostatek prostředků.",
       "outOfRange": "Pro odpoutání musíš být u příslušného mistra.",
       "noSpace": "Nemáš místo pro odpoutaný předmět.",
-      "perfecting": "A piece on the Perfecting track stays bound."
+      "perfecting": "A piece on the Perfecting track, or already Perfected, stays bound."
     },
     "commissionBoard": {
       "title": "Zakázky",

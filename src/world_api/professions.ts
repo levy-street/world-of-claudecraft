@@ -476,7 +476,9 @@ export interface IWorldProfessions {
   // (masterwrought-flagged) piece the viewer OWNS, worn or bagged, up the rank
   // track to Perfected. `ref` is a passed selection, never an id (the
   // item_copy_ref discipline): a worn ref names the equipment slot, a bagged
-  // ref the bag CELL index. Server-authoritative end to end: the Sim resolves
+  // ref the bag CELL index plus the item id seen there (the index-plus-id
+  // pin: a shifted cell resolves to nothing). Server-authoritative end to
+  // end: the Sim resolves
   // the whole deny ladder and the one success roll in
   // src/sim/professions/perfecting.ts (skill in the craft that made it,
   // lock-aware materials, the first-attempt Maker's Bond stamp, fail-forward);

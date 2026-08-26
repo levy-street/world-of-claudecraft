@@ -3771,7 +3771,7 @@ export const da_DK: EnTranslations = {
       "cannotAfford": "Du har ikke råd til aflæsningsgebyret.",
       "outOfRange": "Du skal være ved en håndværksstation for at aflæse.",
       "noSpace": "Du har ikke plads til det aflæste eksemplar.",
-      "perfecting": "A piece on the Perfecting track stays bound."
+      "perfecting": "A piece on the Perfecting track, or already Perfected, stays bound."
     },
     "commissionBoard": {
       "title": "Bestillinger",

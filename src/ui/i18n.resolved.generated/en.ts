@@ -3771,7 +3771,7 @@ export const en: EnTranslations = {
       "cannotAfford": "You cannot afford the unbinding fee.",
       "outOfRange": "You must be at a crafting station to unbind.",
       "noSpace": "You do not have room for the unbound copy.",
-      "perfecting": "A piece on the Perfecting track stays bound."
+      "perfecting": "A piece on the Perfecting track, or already Perfected, stays bound."
     },
     "commissionBoard": {
       "title": "Commission Orders",

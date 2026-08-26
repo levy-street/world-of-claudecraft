@@ -1578,6 +1578,25 @@ describe('enchant_apply_view: perfectedMet on the step-one row', () => {
     );
   });
 
+  it('a copy in the shape the Perfecting walk really mints is a plain-row candidate', () => {
+    // The walk stamps `perfected` beside a bare R5 record in rolled.stats with
+    // no masterwork flag: exactly the shape isEnchantedInstance once misread
+    // as a legacy enchant. The picker must list it as a PLAIN row (one
+    // unenchanted copy), never a replace row, and clear the flag.
+    const walked: InvSlot[] = [
+      ...BILL,
+      {
+        itemId: CHEST,
+        count: 1,
+        instance: { signer: 'Crafter', perfected: true, rolled: { stats: { int: 1 } } },
+      },
+    ];
+    expect(rowFor(walked, viewerAt(CAP))?.perfectedMet).toBe(true);
+    expect(enchantTargets(walked, INFUSION, [], viewerAt(CAP))).toEqual([
+      { itemId: CHEST, count: 1 },
+    ]);
+  });
+
   it('sets ONLY the skill dimension aside: a short applier still reads a Perfected copy as met', () => {
     // perfectedMet must not fold the skill floor in (each unmet gate paints its
     // own line), so a Perfected copy clears it at any skill while skillMet
@@ -1663,9 +1682,10 @@ describe('enchant_apply_view: perfectedMet on the step-one row', () => {
     expect(enchantTargets(splitArms, INFUSION, [], viewerAt(CAP))).toEqual([
       { itemId: CHEST, count: 1 },
     ]);
-    // And with the enchanted Perfected copy alone, the plain apply has no
-    // victim at all (the remover's third pass is the disenchant split's, not
-    // the apply's), so only the replace arm clears it: still true.
+    // And with the enchanted Perfected copy alone, the plain victim falls to
+    // that same copy (the remover's third pass), so both arms clear it; the
+    // plain apply then denies already_enchanted, and the replace row is the
+    // actionable path: still true.
     expect(
       rowFor([...BILL, enchantedShadow[enchantedShadow.length - 1]], viewerAt(CAP))?.perfectedMet,
     ).toBe(true);

@@ -61,6 +61,10 @@ describe('hud.ts unbindResult event arm (source pins)', () => {
       expect(arm, `${key} must not be re-inlined beside the map`).not.toContain(key);
     }
     expect(arm).not.toMatch(/unbind_[a-z_]+'\s*\?/);
+    // Nor a rewrite of the reason ahead of the map (the coverage audit's
+    // surviving shape: `ev.reason = 'unbind_not_bound'` before the one call
+    // would re-route a refusal with no key literal and no chain).
+    expect(arm).not.toMatch(/ev\.reason\s*=[^=]/);
   });
 
   it('derives the item name from static content and formats the fee locally (text-free event)', () => {

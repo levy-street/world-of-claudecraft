@@ -3771,7 +3771,7 @@ export const tr_TR: EnTranslations = {
       "cannotAfford": "Çözüm ücretini karşılayamazsınız.",
       "outOfRange": "Bağ çözmek için bir zanaat tezgahında olmanız gerekir.",
       "noSpace": "Çantanızda bağı çözülmüş kopya için yer yok.",
-      "perfecting": "A piece on the Perfecting track stays bound."
+      "perfecting": "A piece on the Perfecting track, or already Perfected, stays bound."
     },
     "commissionBoard": {
       "title": "Komisyon Siparişleri",
