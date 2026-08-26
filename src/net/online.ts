@@ -13,7 +13,7 @@ import {
 import { bagCapacity } from '../sim/bags';
 import { signChallenge } from '../sim/client_challenge';
 import { FARM_PATCHES } from '../sim/content/farm_patches';
-import { MOUNT_RACE_COURSE, type MountKey, normalizeMountKey } from '../sim/content/mounts';
+import { type MountKey, normalizeMountKey } from '../sim/content/mounts';
 import { mechChromaSkinIndex } from '../sim/content/skins';
 import {
   computeTalentModifiers,
@@ -47,6 +47,7 @@ import { isPrimaryOwnedPetEntity } from '../sim/pet/pet_selection';
 import { getArchetypeTitle, getHobbyCraft } from '../sim/professions/archetype';
 import type { RespecPaymentTier } from '../sim/professions/focus';
 import type { MaterialRarity } from '../sim/professions/gathering';
+import { perfectingInfoFrom } from '../sim/professions/perfecting';
 import { emptyCraftSkills } from '../sim/professions/wheel';
 import {
   catalogRankOwned,
@@ -162,6 +163,8 @@ import type {
   CommissionOrderView,
   DisenchantResultView,
   MasterworkView,
+  PerfectItemRef,
+  PerfectingInfoView,
   SalvageResultView,
 } from '../world_api/professions';
 import { normalizeAccountCosmetics } from './account_cosmetics_wire';
@@ -172,6 +175,11 @@ import {
 } from './civic_service_placements';
 import { decodeGuildBankLogFrame, GUILD_BANK_LOG_TTL_MS } from './guild_bank_log_wire';
 import { INPUT_SEND_TIMER_INTERVAL_MS, inputFlushGateOpen } from './input_send_cadence';
+import {
+  applyMountRaceEventToMirror,
+  decodeMountRaceView,
+  type MountRaceMirror,
+} from './mount_race_wire';
 import { createNativeAttestationProof } from './native_attestation';
 import { createNetPipelineStats, type NetPipelineStats } from './net_pipeline_stats';
 import { optimisticQuestState } from './quest_state_optimistic';
@@ -1708,21 +1716,10 @@ export class ClientWorld implements IWorld {
   // Holds only the fog-windowed cells the server discloses.
   lockpickState: LockpickView | null = null;
   // Show-jumping race: updated immediately from mountRace* events and reconciled
-  // from the authoritative self snapshot after reconnects. Internal shape carries
-  // wall-clock anchors (performance.now scale, render-interpolation timing only):
-  // goDeadlineMs for the 3..2..1 countdown and deadlineMs for the timed lap, so
-  // mountRaceView() can count both down; the server stays authoritative (its end
-  // event clears the mirror). clearedMask/cleared mirror the any-order jump progress.
-  private mountRaceMirror: {
-    raceId: string;
-    phase: 'countdown' | 'racing';
-    clearedMask: number;
-    cleared: number;
-    jumpsTotal: number;
-    goDeadlineMs: number;
-    deadlineMs: number;
-    timeLimitTicks: number;
-  } | null = null;
+  // from the authoritative self snapshot after reconnects. The mirror shape and
+  // both decodes live in mount_race_wire.ts (performance.now scale anchors,
+  // render-interpolation timing only; the server stays authoritative).
+  private mountRaceMirror: MountRaceMirror | null = null;
   // Riding lesson liveness, mirrored from mountTrain* events and reconciled from
   // the authoritative self snapshot for legacy mountLessonActive() consumers.
   private mountLessonActiveMirror = false;
@@ -3674,26 +3671,7 @@ export class ClientWorld implements IWorld {
       }
       if (s.mntRtd !== undefined) this.selfRidingTrained = s.mntRtd === true;
       if (s.mntLesson !== undefined) this.mountLessonActiveMirror = s.mntLesson === true;
-      if (s.mntRace !== undefined) {
-        const view = s.mntRace as MountRaceView | null;
-        if (!view) {
-          this.mountRaceMirror = null;
-        } else {
-          const goTicksLeft = Math.max(0, Number(view.goTicksLeft) || 0);
-          const ticksLeft = Math.max(0, Number(view.ticksLeft) || 0);
-          const timeLimitTicks = Math.max(0, Number(view.timeLimitTicks) || 0);
-          this.mountRaceMirror = {
-            raceId: String(view.raceId),
-            phase: view.phase === 'racing' ? 'racing' : 'countdown',
-            clearedMask: Math.max(0, Number(view.clearedMask) || 0),
-            cleared: Math.max(0, Number(view.cleared) || 0),
-            jumpsTotal: Math.max(0, Number(view.jumpsTotal) || 0),
-            goDeadlineMs: now + (goTicksLeft / TICK_RATE) * 1000,
-            deadlineMs: now + (ticksLeft / TICK_RATE) * 1000,
-            timeLimitTicks,
-          };
-        }
-      }
+      if (s.mntRace !== undefined) this.mountRaceMirror = decodeMountRaceView(s.mntRace, now);
       if (s.ddiff === 'normal' || s.ddiff === 'heroic') this.selectedDungeonDifficulty = s.ddiff;
       if (s.qlog !== undefined || s.qdone !== undefined) this.pendingQuestCommands?.clear();
       // IWorldTalents facet (W7) self-decode: tal is delta-guarded (omitted keeps
@@ -4461,6 +4439,30 @@ export class ClientWorld implements IWorld {
   unbindItem(itemId: string): void {
     this.cmd({ cmd: 'unbind_item', item: itemId });
   }
+  // The Perfecting stage (Masterwrought phase 12): command only, never
+  // predicted. Exactly one of `slot` (a worn ref) or `bag` (a bagged ref)
+  // rides, the absent one omitted (the craftItem `commission` idiom); the
+  // server re-validates the shape and the sim resolves every gate and the one
+  // roll. Feedback is the sim's own error/log lines plus the self inv/einst
+  // mirrors re-diffing (perfect_item is a HEAVY_SELF_CMDS member).
+  perfectItem(ref: PerfectItemRef): void {
+    if ('slot' in ref) this.cmd({ cmd: 'perfect_item', slot: ref.slot });
+    else this.cmd({ cmd: 'perfect_item', bag: ref.bag });
+  }
+  // The one shared view builder the offline Sim also answers through
+  // (perfectingInfoFrom), fed the self mirrors: the whole `inv` array, the
+  // `equip`/`einst` worn set, and the cprof craft skills. A pure read over
+  // mirrored state, so under snapshot lag it can trail the server by a
+  // snapshot; the server still resolves every attempt authoritatively.
+  perfectingInfo(ref: PerfectItemRef): PerfectingInfoView | null {
+    return perfectingInfoFrom({
+      ref,
+      inventory: this.inventory,
+      equipment: this.equipment,
+      equipmentInstances: this.equipmentInstances,
+      craftSkills: this.craftingIdentity.craftSkills,
+    });
+  }
   // Commission order board (Professions 2.0, issue #1298): command only,
   // never predicted. The server re-validates every field in
   // src/sim/professions/commission_order.ts and answers with the personal
@@ -4580,54 +4582,11 @@ export class ClientWorld implements IWorld {
       timeLimitTicks: s.timeLimitTicks,
     };
   }
-  // Mirror the authoritative race lifecycle into mountRaceMirror. Gate positions
-  // never ride the wire (the racing line derives from the shared
-  // MOUNT_RACE_COURSE content); the events still flow to the HUD (drainEvents)
-  // for the countdown/banners.
+  // Mirror the authoritative race lifecycle into mountRaceMirror (the fold
+  // itself lives in mount_race_wire.ts); the events still flow to the HUD
+  // (drainEvents) for the countdown/banners.
   private applyMountRaceEvent(ev: SimEvent): void {
-    if (ev.type === 'mountRaceCountdown') {
-      this.mountRaceMirror = {
-        raceId: ev.raceId,
-        phase: 'countdown',
-        clearedMask: 0,
-        cleared: 0,
-        jumpsTotal: MOUNT_RACE_COURSE.jumps.length,
-        goDeadlineMs: performance.now() + (ev.countdownTicks / TICK_RATE) * 1000,
-        deadlineMs: 0,
-        timeLimitTicks: 0,
-      };
-    } else if (ev.type === 'mountRaceStart') {
-      const s = this.mountRaceMirror;
-      const deadlineMs = performance.now() + (ev.timeLimitTicks / TICK_RATE) * 1000;
-      if (s && s.raceId === ev.raceId) {
-        s.phase = 'racing';
-        s.jumpsTotal = ev.jumpsTotal;
-        s.timeLimitTicks = ev.timeLimitTicks;
-        s.deadlineMs = deadlineMs;
-      } else {
-        // A start without a preceding countdown mirror (late join / dropped
-        // event): build the racing mirror straight from the start event.
-        this.mountRaceMirror = {
-          raceId: ev.raceId,
-          phase: 'racing',
-          clearedMask: 0,
-          cleared: 0,
-          jumpsTotal: ev.jumpsTotal,
-          goDeadlineMs: 0,
-          deadlineMs,
-          timeLimitTicks: ev.timeLimitTicks,
-        };
-      }
-    } else if (ev.type === 'mountRaceJump') {
-      const s = this.mountRaceMirror;
-      if (s && s.raceId === ev.raceId) {
-        s.clearedMask = ev.mask;
-        s.cleared = ev.cleared;
-        s.jumpsTotal = ev.jumpsTotal;
-      }
-    } else if (ev.type === 'mountRaceEnd') {
-      if (this.mountRaceMirror?.raceId === ev.raceId) this.mountRaceMirror = null;
-    }
+    this.mountRaceMirror = applyMountRaceEventToMirror(this.mountRaceMirror, ev, performance.now());
   }
   // Mirror riding-lesson liveness for legacy mountLessonActive() consumers.
   private applyMountTrainEvent(ev: SimEvent): void {

@@ -29,6 +29,7 @@ import {
   GATHERING_PROFESSIONS,
   HARVEST_COMPONENT_ITEMS,
 } from '../src/sim/content/professions';
+import { recipeById } from '../src/sim/content/recipes';
 import { ALL_RECIPES, ITEMS, QUESTS } from '../src/sim/data';
 import {
   ARCHETYPE_PAIR_TARGETS,
@@ -37,10 +38,11 @@ import {
 } from '../src/sim/professions/archetype';
 import { FARM_MAX_GROW_MS } from '../src/sim/professions/farm_persist';
 import { NODE_HARVEST_TABLE } from '../src/sim/professions/gathering';
+import { perfectedBonusStats } from '../src/sim/professions/perfecting';
 import { MAX_CRAFTED_BY_LENGTH, slotToolEffectRefused } from '../src/sim/professions/tools';
 import { MAX_KNOWN_RECIPE_ID_LENGTH, MAX_KNOWN_RECIPE_IDS } from '../src/sim/professions/training';
 import { type CharacterState, type PlayerMeta, Sim } from '../src/sim/sim';
-import { ALL_EQUIP_SLOTS, type InvSlot } from '../src/sim/types';
+import { ALL_EQUIP_SLOTS, type EquipSlot, type InvSlot } from '../src/sim/types';
 import { stripComments } from './helpers/strip_comments';
 import { EMPTY_TEST_WORLD } from './sim_shared';
 
@@ -274,12 +276,21 @@ const NON_PROFESSIONS_BLOB_FIELDS = [
 // 16,727, and the band re-centers on the new measurement. Two terms
 // stay DELIBERATELY unmeasured and recorded instead: the rift-forged
 // equipmentInstance payload (~354 B per slot on legitimate endgame copies,
-// bounded separately by src/sim/item_instance_load.ts; measuring it is
-// Phase 12 bound-policy work, F3) and craftDaily's structural clamp bound
-// (32 ids x 64 chars, ~2.1 KB, far above the one oncePerDay recipe content
-// funds today; re-mint when the gated set grows, F6). The fixture measures
-// crafted, signed, enchanted, stat-rolled instances: the professions-CRAFT
-// worst case, not the rift endgame's.
+// bounded separately by src/sim/item_instance_load.ts; F3) and craftDaily's
+// structural clamp bound (32 ids x 64 chars, ~2.1 KB, far above the one
+// oncePerDay recipe content funds today; re-mint when the gated set grows,
+// F6). The fixture measures crafted, signed, enchanted, stat-rolled
+// instances: the professions-CRAFT worst case, not the rift endgame's.
+// F3, DECIDED at Masterwrought Phase 12 (the bound-as-policy work): the
+// bound's scope FORMALLY EXCLUDES rift-forged payloads, which belong to
+// their own bound (the per-slot clamps in src/sim/item_instance_load.ts are
+// the backstop for every payload whatever wrote it). The fixture models the
+// professions-craft worst case, and since Phase 12 that case INCLUDES
+// Perfecting: the two Masterwrought cap slots carry the Perfected stamp, the
+// R2 bind, and the R5 bonus merged into their rolled stats (ceilingSim
+// below). F6, the same phase: a NO-OP, recorded as such. Perfecting mints no
+// recipe and gates no craft per day, so the oncePerDay set did not grow and
+// craftDaily's structural bound stands exactly as F6 left it.
 const PROFESSIONS_BYTE_CEILING = 17408;
 
 function ceilingSim(nowMs?: number): Sim {
@@ -360,6 +371,44 @@ function ceilingSim(nowMs?: number): Sim {
       enchant: 'enchant_weapon_might',
       rolled: { stats: { str: 2, agi: 2, sta: 2 } },
       signer: longName,
+    };
+  }
+  // The TWO Masterwrought cap slots (R6/R16: at most two apex pieces worn)
+  // carry the Perfecting worst case on top (Masterwrought phase 12, the
+  // bound-as-policy work): the Perfected stamp, the R2 bind (the wearer's
+  // own entity id), and the R5 bonus record MERGED into the rolled stats the
+  // way perfecting.ts merges it (additively, new keys appended). Derived from
+  // the LIVE bake over the two shipped apex defs whose primary profiles add
+  // the most keys to the fixture's {str, agi, sta} record (int and spi: the
+  // grimoire's int/spi/sta, the vestments' int/spi), so every slot-keyed
+  // payload here is one the professions-craft path can really produce. Both
+  // ids are pinned: a re-profiled or retired apex def moves the fixture and
+  // forces this ceiling re-read rather than silently narrowing it.
+  const PERFECTED_CAP_SLOTS: readonly (readonly [EquipSlot, string])[] = [
+    ['chest', 'sunspun_vestments'],
+    ['offhand', 'voidbound_grimoire'],
+  ];
+  for (const [slot, apexId] of PERFECTED_CAP_SLOTS) {
+    const def = ITEMS[apexId];
+    const recipe = recipeById(`recipe_${apexId}`);
+    if (def?.masterwrought !== true || !recipe) {
+      throw new Error(`apex fixture id ${apexId} is no longer an apex recipe output; re-mint`);
+    }
+    const bonus = perfectedBonusStats(def, recipe);
+    if (!bonus || !('int' in bonus) || !('spi' in bonus)) {
+      throw new Error(`apex fixture id ${apexId} no longer bakes an int/spi delta; re-mint`);
+    }
+    const stats: Record<string, number> = { str: 2, agi: 2, sta: 2 };
+    for (const [stat, value] of Object.entries(bonus)) {
+      if (value === undefined) continue;
+      stats[stat] = (stats[stat] ?? 0) + value;
+    }
+    meta.equipmentInstance[slot] = {
+      enchant: 'enchant_weapon_might',
+      rolled: { stats },
+      signer: longName,
+      perfected: true,
+      boundTo: meta.entityId,
     };
   }
   // Every repeatable cadence window live (the first mint never set the field,
@@ -747,9 +796,31 @@ describe('the professions blob growth bound (phase 16)', () => {
     // the edge at the new measurement plus one, never to widen it.
     // Re-based at masterwrought Phase 11o: the two on-ramp recipe ids join
     // knownRecipes (measured 17171; edge = measurement plus one).
+    //
+    // AND AGAIN AT masterwrought Phase 12 (the Perfecting stage, the
+    // bound-as-policy work): 17,263 bytes, upper edge 17,172 to 17,264, floor
+    // 16,740 to 16,883. The delta is +92 and it is the equipmentInstance
+    // record, not knownRecipes (Perfecting mints no recipe): the two
+    // Masterwrought cap slots now carry the Perfecting worst case, and each
+    // costs exactly 46 bytes on top of its crafted-signed-enchanted row:
+    // `,"perfected":true` (17), `,"boundTo":43` (13; the wearer's own entity
+    // id, two digits in this fixture, the R2 bind stamp) and the R5 bonus
+    // merged into rolled.stats, `,"int":1,"spi":1` (16; the two keys the
+    // {str, agi, sta} record did not already carry, from the live bake over
+    // sunspun_vestments {int 1, spi 1} and voidbound_grimoire {sta 0, int 1,
+    // spi 1}, whose sta 0 changes no byte). Predicted 17,171 + 2 x 46 = 17,263
+    // before the run and measured so (the same temporary exact pin, then the
+    // band restored). The edge stays measurement plus one (the 11m rule) and
+    // the floor measurement minus 380. The 17 KiB structural ceiling HOLDS
+    // with 145 bytes of headroom at this measurement: thinner than any prior
+    // phase's, and the first measurement the professions-CRAFT worst case
+    // has been complete for (F3 above); the next authored growth of any size
+    // is likely to cross it, and per the standing precedent that is a
+    // re-mint at the next round step with its measured value, never a
+    // squeeze.
     const bytes = professionsBytes(s2);
-    expect(bytes).toBeGreaterThan(16740);
-    expect(bytes).toBeLessThan(17172);
+    expect(bytes).toBeGreaterThan(16883);
+    expect(bytes).toBeLessThan(17264);
     // Strictly dominated by the band's upper edge while the band holds:
     // kept as documentation that the structural ceiling also bounds this
     // state, never the live guard.

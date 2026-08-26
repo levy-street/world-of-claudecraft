@@ -369,6 +369,10 @@ export const IWORLD_MEMBERS = [
   { name: 'toolEffectSlots', kind: 'data' },
   { name: 'slotToolEffect', kind: 'method' },
   { name: 'rechargeToolEffect', kind: 'method' },
+  // The Perfecting stage (Masterwrought phase 12): the attempt command and
+  // the shared both-hosts state read (perfectingInfoFrom).
+  { name: 'perfectItem', kind: 'method' },
+  { name: 'perfectingInfo', kind: 'method' }, // read-returning
   { name: 'raidLockouts', kind: 'method' }, // read-returning (5/6)
   { name: 'riftFloor', kind: 'data' }, // active procedural rift floor (null outside)
   { name: 'riftCollisionToken', kind: 'data' }, // per-Sim rift collision registry key
@@ -692,9 +696,13 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
     // Masterwrought member plus the release's two new methods, minus the
     // whole vale_cup facet: 332 members, 87 data, 245 method. Set from a
     // suite run on the merged tree, never by arithmetic in the diff.
-    expect(IWORLD_MEMBERS.length).toBe(332);
+    // The Perfecting stage (Masterwrought phase 12) adds perfectItem and
+    // perfectingInfo (IWorldProfessions, both methods): 334 members, 87 data,
+    // 247 method. PREDICTED 334/87/247 by the phase's contract before the
+    // members landed, then set from a suite run.
+    expect(IWORLD_MEMBERS.length).toBe(334);
     expect(DATA_MEMBERS.length).toBe(87);
-    expect(METHOD_MEMBERS.length).toBe(245);
+    expect(METHOD_MEMBERS.length).toBe(247);
   });
   it('has no duplicate member names', () => {
     const names = IWORLD_MEMBERS.map((m) => m.name);
@@ -921,6 +929,8 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'partyKick',
       'partyLeave',
       'partyPromote',
+      'perfectItem',
+      'perfectingInfo',
       'petAttack',
       'petSpecial',
       'petSpecialCommandsSupported',
@@ -1292,6 +1302,8 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'partyKick',
       'partyLeave',
       'partyPromote',
+      'perfectItem',
+      'perfectingInfo',
       'petAttack',
       'petSpecial',
       'petTaunt',
@@ -1875,6 +1887,8 @@ const FACET_PROFESSIONS = [
   'toolEffectSlots',
   'slotToolEffect',
   'rechargeToolEffect',
+  'perfectItem',
+  'perfectingInfo',
 ] as const satisfies readonly (keyof IWorldProfessions)[];
 type _ExhaustProfessions = AssertNever<
   Exclude<keyof IWorldProfessions, (typeof FACET_PROFESSIONS)[number]>
@@ -2055,8 +2069,8 @@ describe('W1: aggregate IWorld member set equals the disjoint union of the facet
 
   it('the facet union equals the pinned IWORLD_MEMBERS set', () => {
     const union = Object.values(FACET_MEMBER_ARRAYS).flatMap((arr) => [...arr]);
-    expect(union.length, 'union size before dedup (catches a duplicated member)').toBe(332);
-    expect(new Set(union).size, 'union size after dedup (catches a duplicated member)').toBe(332);
+    expect(union.length, 'union size before dedup (catches a duplicated member)').toBe(334);
+    expect(new Set(union).size, 'union size after dedup (catches a duplicated member)').toBe(334);
     const sortedUnion = [...union].sort();
     const pinned = IWORLD_MEMBERS.map((m) => m.name).sort();
     expect(sortedUnion).toEqual(pinned);

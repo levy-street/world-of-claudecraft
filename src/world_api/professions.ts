@@ -3,11 +3,12 @@ import type {
   CommissionOrderStatus,
 } from '../sim/professions/commission_order';
 import type { MaterialRarity } from '../sim/professions/gathering';
+import type { PerfectItemRef, PerfectingInfoView } from '../sim/professions/perfecting';
 import type { PlayerProfessionSkill, ProfessionRecipeRecord } from '../sim/professions/types';
 import type { EquipSlot, StationDef } from '../sim/types';
 import type { WorldInteractionOutcome } from './interaction';
 
-export type { CommissionOrderScope, CommissionOrderStatus };
+export type { CommissionOrderScope, CommissionOrderStatus, PerfectItemRef, PerfectingInfoView };
 
 // Render-safe projection of a player's professions standing. Stub as of
 // #1164, now real for the gathering professions (#1119): `skills` carries one
@@ -471,4 +472,24 @@ export interface IWorldProfessions {
   // and the server still prices authoritatively (the toolEffectResult event
   // carries the price actually paid).
   rechargeToolEffect(professionId: string): void;
+  // The Perfecting stage (Masterwrought phase 12): walk an apex
+  // (masterwrought-flagged) piece the viewer OWNS, worn or bagged, up the rank
+  // track to Perfected. `ref` is a passed selection, never an id (the
+  // item_copy_ref discipline): a worn ref names the equipment slot, a bagged
+  // ref the bag CELL index. Server-authoritative end to end: the Sim resolves
+  // the whole deny ladder and the one success roll in
+  // src/sim/professions/perfecting.ts (skill in the craft that made it,
+  // lock-aware materials, the first-attempt Maker's Bond stamp, fail-forward);
+  // ClientWorld sends the perfect_item command and never decides the outcome.
+  // Feedback is the sim's own error/log lines plus the self inv/einst mirrors
+  // re-diffing (the command is a HEAVY_SELF_CMDS member), no result event.
+  perfectItem(ref: PerfectItemRef): void;
+  // The piece's Perfecting state as ONE shared view (rank, ranks, perfected,
+  // the gating craft and skill verdict, the bind, and the lock-aware material
+  // counts), or null when the ref resolves to no item. Both hosts build it
+  // through the same pure function (perfectingInfoFrom): offline over live
+  // PlayerMeta, online over the inventory/equipment/equipmentInstances/
+  // craftingIdentity mirrors, so the two cannot drift. A pure read: no wire
+  // round trip, nothing predicted.
+  perfectingInfo(ref: PerfectItemRef): PerfectingInfoView | null;
 }

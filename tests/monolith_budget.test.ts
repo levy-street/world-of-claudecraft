@@ -850,7 +850,15 @@ const MONOLITHS: MonolithRow[] = [
     // below both parent pins (the Vale Cup dispatch arms left with the
     // release, the heavy-self sets live in server/heavy_self.ts), so the
     // ratchet follows the file down. Exact merged count, zero slack.
-    ceiling: 10509,
+    // RE-PINNED 10509 -> 10501 at Masterwrought Phase 12 (the Perfecting
+    // stage, 2026-08-26): the three pure self-snapshot social rows
+    // (markersWire/tradeWire/duelWire, plain Sim readers) moved whole to
+    // server/self_social_wire.ts (-31 incl. their comments, +1 import, +1
+    // call-site note); the phase's own addition is the perfect_item dispatch
+    // case (+22 incl. its validation comment). Extraction first, then the
+    // phase's lines, netting 8 UNDER the old ceiling; the ceiling follows the
+    // file down. Exact count, zero slack.
+    ceiling: 10501,
     seam: 'a sibling server module; see the hot-path seams in server/CLAUDE.md',
   },
   {
@@ -892,7 +900,15 @@ const MONOLITHS: MonolithRow[] = [
     // 5989, the release 5855. Set to the exact merged count measured on the
     // merged working tree (wc -l < src/net/online.ts), neither parent's literal. Exact
     // merged count, zero slack: any further growth reds again.
-    ceiling: 5967,
+    // RE-PINNED 5967 -> 5926 at Masterwrought Phase 12 (the Perfecting stage,
+    // 2026-08-26): the show-jumping race mirror (its shape, the `mntRace`
+    // self-snapshot decode, and the four-event fold) moved whole to
+    // src/net/mount_race_wire.ts (-73 incl. comments, +5 import and one-line
+    // delegates); the phase's own additions are the two IWorldProfessions
+    // members perfectItem/perfectingInfo (+27 incl. comments and the two type
+    // imports). Extraction first, then the phase's lines, netting 41 UNDER the
+    // old ceiling; the ceiling follows the file down. Exact count, zero slack.
+    ceiling: 5926,
     seam: 'a src/net sibling module (the refactor/net-online split is the template)',
   },
   {

@@ -610,10 +610,13 @@ describe('enchant_apply_view: preservedReplaceTraits (#2421)', () => {
     expect(preservedReplaceTraits({ boundTo: 3, bindOnTrade: true })).toEqual(['bond']);
   });
 
-  it('drops both bind facts on the wire-trimmed (WORN) arm, keeping signature and masterwork', () => {
-    // The public eqi wire carries signer/enchant/rolled ONLY, so an online
-    // client cannot see a worn copy's bond while the offline Sim can. Claiming
-    // it on this arm would make one dialog say different things per host.
+  it('drops both bind facts on the wire-trimmed arm, keeping signature and masterwork', () => {
+    // The public eqi wire carries signer/enchant/rolled ONLY, so a reader of
+    // that mirror cannot see a copy's bond while the offline Sim can. Claiming
+    // it on such an arm would make one dialog say different things per host.
+    // Since Masterwrought phase 12 NO live picker arm passes true (the worn
+    // family reads the whole self einst mirror, the case below), so this pins
+    // the guard itself, kept for any future eqi reader.
     const victim = {
       signer: 'Tester',
       rolled: { masterwork: true },
@@ -621,14 +624,18 @@ describe('enchant_apply_view: preservedReplaceTraits (#2421)', () => {
       bindOnTrade: true,
     };
     expect(preservedReplaceTraits(victim, true)).toEqual(['signer', 'masterwork']);
-    // ...and the bagged arm, reading the full self inv mirror, still states it.
+    // ...and the untrimmed arm, reading a whole self mirror (the `inv` array
+    // for the bags, the `einst` payloads for the body), states it.
     expect(preservedReplaceTraits(victim, false)).toEqual(['signer', 'masterwork', 'bond']);
   });
 
   // The premise the wireTrimmed arm rests on, pinned against the SERVER so it
-  // cannot rot silently: the moment the eqi allowlist grows a bind field, the
-  // worn arm is free to state the bond and this test says so.
-  it('pins the eqi allowlist the worn trim mirrors', () => {
+  // cannot rot silently. Since Masterwrought phase 12 the picker's worn arm
+  // no longer reads this projection (it reads the self einst mirror), so the
+  // pin now guards the INSPECT-side trim the paperdoll tooltip mirrors
+  // (wornTooltipInstance, cross-pinned below): the moment the eqi allowlist
+  // grows a field, both consumers of the one policy must move together.
+  it('pins the eqi allowlist the inspect-side trim mirrors', () => {
     const wire = readFileSync(fileURLToPath(new URL('../server/game.ts', import.meta.url)), 'utf8');
     const block = wire.match(
       /for \(const \[slot, inst\] of Object\.entries\(e\.equippedInstances\)\)[\s\S]*?\n {4}\}/,
@@ -801,10 +808,12 @@ describe('enchant_apply_view: preserved facts on the replace rows (#2421)', () =
     expect(targets[0].replace?.preserved).toEqual(['masterwork', 'bond']);
   });
 
-  it('carries traits on a LEGACY victim read off the WORN mirror too', () => {
-    // The uncovered cross of the two arms: no enchant marker AND wire-trimmed.
-    // The signature still survives and is still visible on the eqi wire; the
-    // bond is dropped like every other worn victim.
+  it('carries traits on a LEGACY victim read off the WORN mirror too, the bond included', () => {
+    // The cross of the two arms: no enchant marker AND the worn family. Since
+    // Masterwrought phase 12 the worn family reads IWorld.equipmentInstances,
+    // the whole self einst mirror in both hosts, so the bond is stated here
+    // exactly as on a bagged victim (before the switch this arm read the
+    // trimmed eqi entity mirror and pinned ['signer'] alone).
     const rows = wornEnchantTargets(
       { mainhand: SWORD },
       { mainhand: { signer: 'Tester', rolled: { stats: { agi: 2 } }, boundTo: 4 } },
@@ -814,12 +823,12 @@ describe('enchant_apply_view: preserved facts on the replace rows (#2421)', () =
       {
         itemId: SWORD,
         slot: 'mainhand',
-        replace: { stats: { agi: 2 }, sameEnchant: false, preserved: ['signer'] },
+        replace: { stats: { agi: 2 }, sameEnchant: false, preserved: ['signer', 'bond'] },
       },
     ]);
   });
 
-  it('the WORN row states signature and masterwork but never a bind state', () => {
+  it('the WORN row states signature, masterwork AND the bind state (the self einst mirror)', () => {
     const rows = wornEnchantTargets(
       { mainhand: SWORD },
       {
@@ -832,8 +841,10 @@ describe('enchant_apply_view: preserved facts on the replace rows (#2421)', () =
       },
       WEAPON_ENCHANT,
     );
-    // The offline Sim holds boundTo here; the online eqi mirror never does.
-    // Both hosts must produce this same row (see preservedReplaceTraits).
+    // Both hosts hold boundTo on this surface (the server ships
+    // meta.equipmentInstance whole under `einst`; the offline Sim reads it
+    // live), so both produce this same row (see preservedReplaceTraits). The
+    // pre-phase-12 pin read the trimmed eqi entity mirror and dropped the bond.
     expect(rows).toEqual([
       {
         itemId: SWORD,
@@ -841,7 +852,7 @@ describe('enchant_apply_view: preserved facts on the replace rows (#2421)', () =
         replace: {
           enchantId: AGILITY,
           sameEnchant: false,
-          preserved: ['signer', 'masterwork'],
+          preserved: ['signer', 'masterwork', 'bond'],
         },
       },
     ]);
@@ -1581,6 +1592,59 @@ describe('enchant_apply_view: perfectedMet on the step-one row', () => {
     const bare = rowFor([...BILL, { itemId: CHEST, count: 1 }], viewerAt(CAP - 1));
     expect(bare?.skillMet).toBe(false);
     expect(bare?.perfectedMet).toBe(false);
+  });
+
+  it('models the sim exactly: a Perfected copy the apply would not SPEND is no candidate', () => {
+    // The sim's bagged gate (professions/enchanting.ts holdsPerfectedTarget)
+    // peeks the exact copy an id-only apply would spend (baggedEnchantVictim:
+    // a plain copy before any instanced one, then the newest unenchanted
+    // instanced copy) and refuses not_perfected unless THAT copy carries the
+    // marker. A some()-over-holding would clear this row (a Perfected copy IS
+    // in the bags) while every apply the player then sends is refused; the row
+    // must read unmet exactly when the sim refuses.
+    const disagreeing: InvSlot[] = [
+      ...BILL,
+      { itemId: CHEST, count: 1, instance: { perfected: true } },
+      { itemId: CHEST, count: 1 }, // plain: the first copy the remover spends
+    ];
+    expect(rowFor(disagreeing, viewerAt(CAP))?.perfectedMet).toBe(false);
+    expect(enchantTargets(disagreeing, INFUSION, [], viewerAt(CAP))).toEqual([]);
+    // A plain copy shadows a NEWER Perfected one too: the remover's first pass
+    // takes plain copies whatever their index (the shape a newest-copy peek
+    // got wrong).
+    const shadowed: InvSlot[] = [
+      ...BILL,
+      { itemId: CHEST, count: 1 },
+      { itemId: CHEST, count: 1, instance: { perfected: true } },
+    ];
+    expect(rowFor(shadowed, viewerAt(CAP))?.perfectedMet).toBe(false);
+    expect(enchantTargets(shadowed, INFUSION, [], viewerAt(CAP))).toEqual([]);
+    // With both copies instanced the newest unenchanted one is the victim: the
+    // row clears, and step two lists exactly the ONE copy the gate admits (the
+    // ordinary older copy is no target).
+    const agreeing: InvSlot[] = [
+      ...BILL,
+      { itemId: CHEST, count: 1, instance: { signer: 'Crafter' } },
+      { itemId: CHEST, count: 1, instance: { perfected: true } },
+    ];
+    expect(rowFor(agreeing, viewerAt(CAP))?.perfectedMet).toBe(true);
+    expect(enchantTargets(agreeing, INFUSION, [], viewerAt(CAP))).toEqual([
+      { itemId: CHEST, count: 1 },
+    ]);
+    // An already-enchanted Perfected copy is skipped for an ordinary
+    // unenchanted one (the remover's second pass), so the row reads unmet.
+    const enchantedShadow: InvSlot[] = [
+      ...BILL,
+      { itemId: CHEST, count: 1, instance: { signer: 'Crafter' } },
+      { itemId: CHEST, count: 1, instance: { perfected: true, enchant: 'enchant_chest_stamina' } },
+    ];
+    expect(rowFor(enchantedShadow, viewerAt(CAP))?.perfectedMet).toBe(false);
+    // The rule is the CAPSTONE'S alone: an ordinary chest enchant lists both
+    // copies of the same disagreeing holding.
+    const plain = 'enchant_chest_stamina';
+    expect(enchantTargets(disagreeing, plain, [], viewerAt(CAP))).toEqual([
+      { itemId: CHEST, count: 2 },
+    ]);
   });
 
   it('is true on every enchant that requires nothing, so it gates only the capstone', () => {

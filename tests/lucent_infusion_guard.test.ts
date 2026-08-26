@@ -10,9 +10,11 @@
 //     is really held before the guard is read, so a refusal can never be
 //     confused with an absence), and only the hand-stamped control flips it;
 //   - the bagged arm is NARROWED to the exact copy an id-only apply would
-//     consume (newestMatchingSlot, the phase 12 obligation the phase 10 doc
-//     recorded), so one Perfected copy can no longer license spending an
-//     ordinary one;
+//     SPEND (baggedEnchantVictim, the remover's own victim order: a plain copy
+//     first, then the newest unenchanted instanced copy, or the pinned
+//     enchanted copy on a confirmed replace; the phase 12 obligation the
+//     phase 10 doc recorded), so one Perfected copy can no longer license
+//     spending an ordinary one;
 //   - the deny ladder's ORDER, all three pairwise ways (not_perfected before
 //     wrong_slot, and each of those before insufficient_skill), at BOTH
 //     twins: the resolver and the cast-start admission mirror (a gate present
@@ -132,15 +134,17 @@ describe('holdsPerfectedTarget refuses every PLAIN copy (only the Perfecting wal
   });
 
   it('the bagged arm answers about the copy the apply would CONSUME, not the holding', () => {
-    // The phase 12 narrowing: an id-only apply consumes newest-first, so the
-    // guard peeks the newest matching copy (newestMatchingSlot). Holding a
-    // Perfected copy in an OLDER slot with an ordinary copy newer must refuse:
+    // The phase 12 narrowing: the guard peeks the exact VICTIM
+    // removeEnchantableItem would spend (baggedEnchantVictim: a plain copy
+    // before any instanced one, then the newest unenchanted instanced copy),
+    // never the holding and never the bare newest copy. Holding a Perfected
+    // copy in an OLDER slot with an ordinary instanced copy newer must refuse:
     // accepting would spend the ordinary copy under a licence the stamped one
     // earned.
     const older = apexEnchanter(16);
     older.sim.addItemInstance(CHEST_ITEM, { perfected: true }, older.pid, 1);
-    older.sim.addItem(CHEST_ITEM, 1, older.pid);
-    // The premise, proven on the real bag order: the plain copy sits in the
+    older.sim.addItemInstance(CHEST_ITEM, { signer: 'Crafter' }, older.pid, 1);
+    // The premise, proven on the real bag order: the ordinary copy sits in the
     // higher (newer) slot.
     const slots = older.meta.inventory.filter((s) => s.itemId === CHEST_ITEM);
     expect(slots).toHaveLength(2);
@@ -151,13 +155,71 @@ describe('holdsPerfectedTarget refuses every PLAIN copy (only the Perfecting wal
       'not_perfected',
     );
 
-    // The reverse order accepts: the stamped copy IS the newest, i.e. the one
-    // the apply consumes.
+    // The reverse order accepts: the stamped copy is the newest UNENCHANTED
+    // instanced copy, i.e. the one the apply consumes, and the apply really
+    // spends it (the enchanted re-mint carries the marker forward).
     const newer = apexEnchanter(17);
-    newer.sim.addItem(CHEST_ITEM, 1, newer.pid);
+    newer.sim.addItemInstance(CHEST_ITEM, { signer: 'Crafter' }, newer.pid, 1);
     newer.sim.addItemInstance(CHEST_ITEM, { perfected: true }, newer.pid, 1);
     expect(holdsPerfectedTarget(newer.meta, CHEST_ITEM), 'stamped copy is newest').toBe(true);
     expect(resolveApplyEnchant(newer.sim.ctx, newer.pid, CHEST_ITEM, INFUSION).ok).toBe(true);
+    const spent = newer.meta.inventory.filter((s) => s.itemId === CHEST_ITEM);
+    expect(spent.map((s) => s.instance?.perfected === true).sort()).toEqual([false, true]);
+    expect(spent.find((s) => s.instance?.enchant === INFUSION)?.instance?.perfected).toBe(true);
+  });
+
+  it('a PLAIN copy shadows a newer Perfected one: the remover spends plain first', () => {
+    // The shape the first narrowing cut missed: removeEnchantableItem's first
+    // pass takes a plain fungible copy whatever its index, so a Perfected copy
+    // that is the NEWEST slot still is not the victim. A newest-copy peek
+    // accepted here while the apply spent the plain copy.
+    const shadowed = apexEnchanter(18);
+    shadowed.sim.addItem(CHEST_ITEM, 1, shadowed.pid);
+    shadowed.sim.addItemInstance(CHEST_ITEM, { perfected: true }, shadowed.pid, 1);
+    const slots = shadowed.meta.inventory.filter((s) => s.itemId === CHEST_ITEM);
+    expect(slots).toHaveLength(2);
+    expect(slots[0].instance).toBeUndefined();
+    expect(slots[1].instance?.perfected).toBe(true);
+    expect(holdsPerfectedTarget(shadowed.meta, CHEST_ITEM), 'the plain copy is the victim').toBe(
+      false,
+    );
+    expect(resolveApplyEnchant(shadowed.sim.ctx, shadowed.pid, CHEST_ITEM, INFUSION).reason).toBe(
+      'not_perfected',
+    );
+    // Nothing was spent: the plain copy and the stamped copy both survive.
+    expect(shadowed.meta.inventory.filter((s) => s.itemId === CHEST_ITEM)).toHaveLength(2);
+  });
+
+  it('an already-ENCHANTED Perfected copy is skipped for an ordinary one, unless the replace is confirmed', () => {
+    // The second missed shape: the remover's second pass skips an enchanted
+    // instanced copy for an unenchanted one, so [ordinary older, Perfected AND
+    // enchanted newer] spends the ordinary copy on a plain apply. The confirmed
+    // replace arm pins the enchanted copy instead (replaceVictimIndex), which
+    // IS the Perfected one, so the guard follows the arm split exactly.
+    const held = apexEnchanter(19);
+    held.sim.addItemInstance(CHEST_ITEM, { signer: 'Crafter' }, held.pid, 1);
+    held.sim.addItemInstance(
+      CHEST_ITEM,
+      { perfected: true, enchant: 'enchant_chest_lucent_stamina' },
+      held.pid,
+      1,
+    );
+    expect(
+      holdsPerfectedTarget(held.meta, CHEST_ITEM),
+      'plain apply spends the ordinary copy',
+    ).toBe(false);
+    expect(resolveApplyEnchant(held.sim.ctx, held.pid, CHEST_ITEM, INFUSION).reason).toBe(
+      'not_perfected',
+    );
+    expect(
+      holdsPerfectedTarget(held.meta, CHEST_ITEM, undefined, true),
+      'the confirmed replace pins the enchanted, Perfected copy',
+    ).toBe(true);
+    // Both twins carry the flag: the confirmed apply passes the Perfected gate
+    // and proceeds into the replace arm (whatever that arm then answers).
+    expect(
+      resolveApplyEnchant(held.sim.ctx, held.pid, CHEST_ITEM, INFUSION, undefined, true).reason,
+    ).not.toBe('not_perfected');
   });
 });
 

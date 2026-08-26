@@ -652,6 +652,11 @@ export const COMMAND_NAMES = [
   // life, and band server-side). Appended because wire tokens are never
   // reordered.
   'tutorial_start',
+  // The Perfecting stage (Masterwrought phase 12, IWorldProfessions.perfectItem):
+  // one attempt on a worn (`slot`) or bagged (`bag`) apex piece; the server
+  // validates the ref shape and the sim resolves every gate and the one roll.
+  // Appended because wire tokens are never reordered.
+  'perfect_item',
 ] as const;
 
 // The union both the send path (`online.ts`) and the dispatch switch

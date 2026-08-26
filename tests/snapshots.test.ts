@@ -3794,6 +3794,10 @@ describe('equipped instance wire (eqi)', () => {
         charges: { mend: 2 },
         bindOnTrade: true,
         perfected: true,
+        // Both Perfecting fields at once (a contradictory live state, since
+        // the Perfected stamp deletes the rank; deliberate here, so ONE fixture
+        // proves the trim drops each independently).
+        perfecting: 2,
       },
       pid,
     );
@@ -3807,13 +3811,17 @@ describe('equipped instance wire (eqi)', () => {
     expect(wired.chest.boundTo).toBeUndefined();
     expect(wired.chest.charges).toBeUndefined();
     expect(wired.chest.bindOnTrade).toBeUndefined();
-    // The Masterwrought Perfected marker stays server-and-owner-side too
-    // (Masterwrought phase 10 authored the field; phase 12 mints it and owns
-    // the decision about what an INSPECTING viewer may see). Pinned here so
-    // widening the wire is a deliberate edit: the Apply Enchant picker's worn
-    // arm reads this same trimmed mirror, so the answer decides whether an
-    // online client can offer a Perfected target at all.
+    // The Masterwrought Perfecting state stays server-and-owner-side too:
+    // BOTH the mid-track rank (`perfecting`) and the Perfected marker
+    // (`perfected`), the DECISION Masterwrought phase 12 executed (the phase
+    // 10 QA's third option). The OWNER sees both through the whole self `inv`
+    // array and the untrimmed `einst` self mirror, which is what the Apply
+    // Enchant picker's worn arm reads since phase 12 (IWorld.equipmentInstances,
+    // never this trimmed peer mirror); an INSPECTING viewer cannot see
+    // Perfected state at all, and that is recorded rather than accidental.
+    // Pinned by NAME so widening the wire is a deliberate edit.
     expect(wired.chest.perfected).toBeUndefined();
+    expect(wired.chest.perfecting).toBeUndefined();
     expect(Object.keys(wired.chest).sort()).toEqual(['rolled', 'signer']);
   });
 

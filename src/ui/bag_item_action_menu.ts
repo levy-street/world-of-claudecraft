@@ -251,9 +251,10 @@ export class BagItemActionMenu {
       // on the body must keep the capstone row live, since the target step
       // lists worn copies beside bagged ones. The same two reads
       // openTargetPicker makes for the worn family, so one open cannot see two
-      // different bodies.
+      // different bodies: IWorld.equipmentInstances, the SELF `einst` mirror
+      // (whole in both hosts), never the trimmed peer entity mirror.
       equipment: world.equipment,
-      equippedInstances: world.entities.get(world.playerId)?.equippedInstances ?? {},
+      equippedInstances: world.equipmentInstances,
     };
   }
 
@@ -472,26 +473,23 @@ export class BagItemActionMenu {
   // never offered).
   private openTargetPicker(enchantId: string, x: number, y: number): void {
     const world = this.deps.world();
-    // The self entity mirror carries equippedInstances in BOTH worlds (offline
-    // Sim and online ClientWorld), the same read the paperdoll tooltip uses.
-    // KNOWN LIMIT, and phase 12's to settle: its ONLINE form is the trimmed
-    // `eqi` peer mirror, so it cannot carry the Perfected marker. The self
-    // surface IWorld.equipmentInstances is untrimmed in both hosts and would
-    // remove that limit with no wire change (see copyMeetsPerfectedGate in
-    // enchant_apply_view.ts, option 3), but the same read feeds the replace
-    // confirm's wireTrimmed arm, so switching it is a wider change than a
-    // picker fix. Inert until something mints the marker.
+    // The worn family reads IWorld.equipmentInstances, the SELF `einst` mirror:
+    // the whole meta.equipmentInstance payload in BOTH hosts (the server ships
+    // it untrimmed on the self snapshot and ClientWorld mirrors it; the
+    // paperdoll reads the same surface). Switched here at Masterwrought phase
+    // 12 from the self ENTITY mirror, whose online form is the trimmed `eqi`
+    // peer projection (signer/enchant/rolled only) and so could never carry
+    // the Perfected marker the Lucent tier gates on. A player enchants their
+    // own gear, never an inspected peer's, so the picker is a self surface and
+    // the `eqi` trim now concerns inspecting viewers alone (pinned in
+    // tests/snapshots.test.ts). The replace confirm's worn arm moved with it:
+    // it now states the bond it can see (preservedReplaceTraits).
     //
     // The viewer projection carries the rest: the Enchanting skill for the
     // Lucent tier's floor, and the `synced` flag that keeps an online client's
     // all-zero startup mirror from reading as a real shortfall.
     const viewer = this.enchantViewer();
-    const worn = wornEnchantTargets(
-      world.equipment,
-      world.entities.get(world.playerId)?.equippedInstances ?? {},
-      enchantId,
-      viewer,
-    );
+    const worn = wornEnchantTargets(world.equipment, world.equipmentInstances, enchantId, viewer);
     // Worn FIRST, because the bagged family needs it: an enchanted copy on the
     // body leaves a bagged plain copy of the same id just as ambiguous as an
     // enchanted bagged one would (#2421), and both paint into the one list a

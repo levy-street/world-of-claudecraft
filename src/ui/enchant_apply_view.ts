@@ -39,7 +39,11 @@
 import { ENCHANTS, type EnchantDef } from '../sim/content/enchants';
 import { ITEMS } from '../sim/data';
 import { countRawInSlots } from '../sim/item_lock';
-import { isEnchantedInstance, replaceVictimIndex } from '../sim/professions/enchanting';
+import {
+  baggedEnchantVictim,
+  isEnchantedInstance,
+  replaceVictimIndex,
+} from '../sim/professions/enchanting';
 import {
   ALL_EQUIP_SLOTS,
   type EquipSlot,
@@ -108,14 +112,15 @@ export interface EnchantViewerInput {
   /** The viewer's flat Enchanting skill
    *  (craftingIdentity.craftSkills.enchanting). Read only while `synced`. */
   enchantingSkill: number;
-  /** The worn set (IWorld.equipment) and its per-slot payload mirror, read by
-   *  the PERFECTED candidate scan alone (perfectedCandidateExists below): the
-   *  target step lists the bagged and the worn families as one list, so a
-   *  Perfected copy on the BODY has to keep the capstone row live exactly as a
-   *  bagged one does. Omitted (the default) scans the bags only. The worn
-   *  BUILDER takes its own copies positionally, since resolving worn ROWS is its
-   *  whole job; it is the step-one row model that has no other way to see the
-   *  body. */
+  /** The worn set (IWorld.equipment) and its per-slot payload mirror
+   *  (IWorld.equipmentInstances, the SELF `einst` mirror, whole in both hosts),
+   *  read by the PERFECTED candidate scan alone (perfectedCandidateExists
+   *  below): the target step lists the bagged and the worn families as one
+   *  list, so a Perfected copy on the BODY has to keep the capstone row live
+   *  exactly as a bagged one does. Omitted (the default) scans the bags only.
+   *  The worn BUILDER takes its own copies positionally, since resolving worn
+   *  ROWS is its whole job; it is the step-one row model that has no other
+   *  way to see the body. */
   equipment?: Partial<Record<EquipSlot, string>>;
   equippedInstances?: Partial<Record<EquipSlot, ItemInstancePayload>>;
 }
@@ -321,46 +326,47 @@ function skillMeetsEnchant(enchant: EnchantDef, viewer: EnchantViewerInput): boo
 
 /** Whether one specific copy may take `enchant`, on the sim's `not_perfected`
  *  gate alone: a requiresPerfected enchant needs the copy's Perfected marker,
- *  and everything else takes any copy. Nothing mints that marker before phase
- *  12, so today this hides the Lucent Infusion's target list entirely, exactly
- *  as the sim refuses every attempt.
+ *  and everything else takes any copy. Masterwrought phase 12 mints the marker
+ *  (professions/perfecting.ts, the rank walk's top stamp).
  *
- *  KNOWN LIMIT, and a phase 12 obligation: the WORN family is fed the trimmed
- *  `eqi` peer mirror online (signer/enchant/rolled only, server/game.ts data
- *  minimization), which does not carry `perfected`. When phase 12 starts
- *  minting the marker, an online client fed that mirror will hide a worn
- *  Perfected copy the sim would accept. Inert today (no copy carries the marker
- *  in either host).
- *
- *  THREE ways out, and only the first two touch the wire, which is why this is
- *  not automatically a server change:
- *    1. widen the `eqi` allowlist to carry `perfected`;
- *    2. leave the wire alone and accept the hidden worn target;
- *    3. feed this arm the SELF mirror instead. `IWorld.equipmentInstances` is
- *       the whole `meta.equipmentInstance` payload in BOTH hosts (the server
- *       ships it under `einst` on the self snapshot, untrimmed, and ClientWorld
- *       mirrors it; char_window.ts already reads it for the paperdoll), so it
- *       carries every field this gate wants with no wire change at all. The
- *       picker's worn arm is a SELF surface: a player enchants their own gear,
- *       never an inspected peer's. Taken that way, the `eqi` decision concerns
- *       INSPECTING viewers only and this gate stops depending on it.
- *  Option 3 is the recommendation for phase 12 and deliberately NOT taken here:
- *  the entity-mirror read this picker makes today also feeds
- *  preservedReplaceTraits' `wireTrimmed` arm, whose trimmed answer and its pins
- *  (below, plus the eqi allowlist pin) would all have to move with it, which is
- *  a wider change than a picker fix.
- *
- *  The exclusion is pinned by NAME in tests/snapshots.test.ts, in the eqi wire
- *  suite: it equips a copy stamped `perfected` and asserts the wired payload's
- *  key set is exactly signer and rolled. That is the pin to satisfy when phase
- *  12 revisits this; the picker's own suite pins something different and weaker
- *  (that the server's eqi projection assigns only signer/enchant/rolled), so it
- *  would catch the widening without ever naming this field. */
+ *  The WORN family is fed IWorld.equipmentInstances since phase 12: the whole
+ *  `meta.equipmentInstance` payload in BOTH hosts (the server ships it under
+ *  `einst` on the self snapshot, untrimmed, and ClientWorld mirrors it), so
+ *  this gate sees the marker on the body exactly as it does in the bags. That
+ *  was the phase 10 QA's third option, taken over widening the `eqi` peer
+ *  wire: a player enchants their own gear, never an inspected peer's, so the
+ *  picker is a SELF surface and the `eqi` trim (signer/enchant/rolled only,
+ *  server/game.ts data minimization) now concerns INSPECTING viewers alone.
+ *  That exclusion stays pinned by NAME in tests/snapshots.test.ts (the eqi
+ *  wire suite equips a copy stamped with both Perfecting fields and asserts
+ *  neither rides), and the picker's own suite pins the projection's
+ *  signer/enchant/rolled allowlist as the trim the paperdoll tooltip mirrors. */
 function copyMeetsPerfectedGate(
   enchant: EnchantDef,
   instance: ItemInstancePayload | undefined,
 ): boolean {
   return !enchant.requiresPerfected || instance?.perfected === true;
+}
+
+/** The sim's BAGGED Perfected gate, exactly (professions/enchanting.ts
+ *  holdsPerfectedTarget): an id-only apply names no cell, so the sim peeks the
+ *  exact copy the apply would SPEND (baggedEnchantVictim: a plain copy before
+ *  any instanced one, then the newest unenchanted instanced copy, the
+ *  removeEnchantableItem order) and refuses unless THAT copy carries the
+ *  marker. A Perfected copy shadowed by a plain one, or behind a newer
+ *  ordinary one, is therefore no candidate at all, whatever
+ *  copyMeetsPerfectedGate says of it alone: offering it would promise an apply
+ *  the sim denies not_perfected. The picker models the plain-apply arm (no
+ *  confirmed replace: that dialog is its own surface). Trivially true for
+ *  every enchant that requires nothing. The worn family needs no twin: a worn
+ *  ref names its slot, so the per-copy gate IS the sim's gate there. */
+function baggedIdMeetsPerfectedGate(
+  enchant: EnchantDef,
+  inventory: readonly InvSlot[],
+  itemId: string,
+): boolean {
+  if (!enchant.requiresPerfected) return true;
+  return baggedEnchantVictim(inventory, itemId)?.perfected === true;
 }
 
 /** Whether step two would list ANY target for `enchant`, the skill dimension
@@ -498,19 +504,17 @@ export function preservedTraitKey(trait: EnchantPreservedTrait): TranslationKey 
  *  `boundTo` on PRESENCE, because entity id 0 is a real player and truthiness
  *  would lose the very first character in a world its line.
  *
- *  `wireTrimmed` marks a victim read off the WORN mirror. The public `eqi` wire
- *  carries signer/enchant/rolled ONLY (server/game.ts data minimization, the
- *  same trim wornTooltipInstance applies), so an online client cannot see a worn
- *  copy's boundTo/bindOnTrade while the offline Sim holds the full payload.
- *  Dropping the bond on that arm is what keeps the two hosts saying the same
- *  thing; the bond is a bag-surface fact by construction, and the item tooltip
- *  already goes silent about it on worn gear for exactly this reason.
- *
- *  ACCEPTED CONSEQUENCE: the bond DOES survive a worn replace (the sim clones
- *  the payload whole), so this arm under-states rather than lying. Saying more
- *  would need boundTo/bindOnTrade on the eqi wire, which is a server data-
- *  minimization change well outside a picker fix; the trim is pinned by
- *  tests/enchant_apply_view.test.ts so widening the wire re-opens this. */
+ *  `wireTrimmed` marks a victim read off a TRIMMED mirror: the public `eqi`
+ *  peer wire carries signer/enchant/rolled ONLY (server/game.ts data
+ *  minimization, the same trim wornTooltipInstance applies), so a reader of
+ *  that mirror cannot see a copy's boundTo/bindOnTrade while the offline Sim
+ *  holds the full payload, and dropping the bond on such an arm is what keeps
+ *  the two hosts saying the same thing. Since Masterwrought phase 12 NO live
+ *  picker arm reads a trimmed mirror: the worn family moved onto
+ *  IWorld.equipmentInstances (the whole self `einst` mirror in both hosts), so
+ *  both target families pass false and the worn confirm states the bond it
+ *  can now see. The arm stays, required and pinned, as the truthfulness guard
+ *  for any future reader of the `eqi` projection (an inspect-side surface). */
 export function preservedReplaceTraits(
   victim: ItemInstancePayload,
   wireTrimmed = false,
@@ -675,6 +679,9 @@ export function enchantTargets(
     const def = ITEMS[slot.itemId];
     if (!def || def.slot !== enchant.itemSlot) continue;
     if (!copyMeetsPerfectedGate(enchant, slot.instance)) continue;
+    // Both halves of the sim's bagged verdict: the copy carries the marker AND
+    // the id's newest copy (the one an id-only apply is judged on) does.
+    if (!baggedIdMeetsPerfectedGate(enchant, inventory, slot.itemId)) continue;
     if (slot.instance && isEnchantedInstance(slot.instance)) {
       enchantedByItem.set(slot.itemId, (enchantedByItem.get(slot.itemId) ?? 0) + slot.count);
       continue;
@@ -752,12 +759,14 @@ export interface WornEnchantTargetRow {
  *  where the item borrows its name from a base item (#2466).
  *
  *  `equipment` and `equippedInstances` are read straight off the two worlds'
- *  shared surfaces (IWorld.equipment and the self entity mirror
- *  Entity.equippedInstances), so this decides identically offline and online.
+ *  shared SELF surfaces (IWorld.equipment and IWorld.equipmentInstances, the
+ *  whole `einst` mirror in both hosts since Masterwrought phase 12; before it,
+ *  the trimmed self entity mirror), so this decides identically offline and
+ *  online, the Perfected marker and the bind state included.
  *
  *  `viewer` gates exactly as it does on the bagged family above, same offer-less
  *  default and same unsynced skip, and the per-copy Perfected gate runs here too
- *  (with the worn-mirror limit copyMeetsPerfectedGate documents). Its own
+ *  (a worn ref names its slot, so that gate IS the sim's worn gate). Its own
  *  `equipment` / `equippedInstances` fields are NOT read here: this builder is
  *  handed the worn set positionally, because resolving worn ROWS is its job. */
 export function wornEnchantTargets(
@@ -778,11 +787,11 @@ export function wornEnchantTargets(
     const instance = equippedInstances[slot];
     if (!copyMeetsPerfectedGate(enchant, instance)) continue;
     if (instance && isEnchantedInstance(instance)) {
-      // wireTrimmed: this arm reads the WORN mirror, whose online form is the
-      // stripped eqi allowlist (signer/enchant/rolled). See
-      // preservedReplaceTraits: claiming a bind state here would make the
-      // confirm dialog say different things offline and online.
-      const replace = replaceInfoFor(instance, enchantId, true);
+      // false: this arm reads the self `einst` mirror, the FULL payload in both
+      // hosts (Masterwrought phase 12; it read the trimmed eqi entity mirror
+      // before, and passed true), so the confirm can state the bond honestly
+      // here exactly as the bagged arm does. See preservedReplaceTraits.
+      const replace = replaceInfoFor(instance, enchantId, false);
       if (replace) rows.push({ itemId, slot, replace });
       continue;
     }

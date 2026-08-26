@@ -98,8 +98,12 @@ const repoRoot = fileURLToPath(new URL('..', import.meta.url));
 // -1 (six vcup_* pairs out, one tutorial_start pair in), merged 205/218. The
 // numbers below were re-set from a suite run on the merged tree, never by
 // adding the two sides' deltas on paper.
-const EXPECTED_SEND_COUNT = 205;
-const EXPECTED_DISPATCH_COUNT = 218;
+// Masterwrought phase 12 (the Perfecting stage) adds the perfect_item command
+// (client-sent, so both counts move together): 206/219, dispatch-only
+// unchanged at 13. PREDICTED by the phase's contract before the token landed,
+// then set from a suite run.
+const EXPECTED_SEND_COUNT = 206;
+const EXPECTED_DISPATCH_COUNT = 219;
 const EXPECTED_DISPATCH_ONLY_COUNT = 13;
 
 // The chat sub-channel routing switch (server/game.ts `switch

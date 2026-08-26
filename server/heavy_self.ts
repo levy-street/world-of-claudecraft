@@ -63,6 +63,17 @@ export const HEAVY_SELF_CMDS = new Set<string>([
   // (charges and the ledger are feast state, and the buff rides the aura
   // wire), so there is nothing heavy to refresh.
   'place_feast',
+  // The Perfecting stage (Masterwrought phase 12): a resolved attempt spends
+  // the three materials through the lock-aware bag walk and mutates the
+  // target's instance payload IN PLACE (the bind stamp, the rank, the
+  // Perfected marker and its stat merge), on a bagged copy (the `inv` mirror)
+  // or a worn one (the `einst` mirror). No loot event fires on any arm, so
+  // membership here is what re-diffs both mirrors on the next snapshot; the
+  // sim's wireRev bump on the material spend covers the same path, and the
+  // entry keeps the guarantee LOCAL to the command per the farming ledger
+  // above. Cost: one spurious heavy re-serialize per REFUSED attempt, the
+  // family's standing trade.
+  'perfect_item',
   'loot',
   'harvestCorpse',
   'pickup',

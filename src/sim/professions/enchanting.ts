@@ -723,22 +723,55 @@ export interface ApplyEnchantResult {
     | 'busy';
 }
 
+/** The exact bagged copy an id-only apply of `itemId` would spend, PEEKED
+ *  without consuming: with a confirmed replace and an enchanted copy held it
+ *  is the replace arm's pinned victim (replaceVictimIndex, the same walk
+ *  resolveReplaceEnchantBagged consumes through); otherwise it is
+ *  removeEnchantableItem's victim, modeled by consumeOneScratch with the
+ *  isEnchantedInstance exclusion over a scratch copy, the SAME mirror the
+ *  #2350 capacity gate trusts (#2139: a model must match the remover it
+ *  stands in for). A plain fungible victim reads as undefined. Shared by the
+ *  Perfected guard below and the Apply Enchant picker's bagged candidate scan
+ *  (src/ui/enchant_apply_view.ts), so the row a player sees and the copy the
+ *  sim judges are one selection by construction. */
+export function baggedEnchantVictim(
+  inventory: readonly InvSlot[],
+  itemId: string,
+  confirmReplace = false,
+): ItemInstancePayload | undefined {
+  if (confirmReplace) {
+    const idx = replaceVictimIndex(inventory, itemId);
+    if (idx >= 0) return inventory[idx].instance;
+  }
+  const scratch = inventory.map((s) => ({ ...s }));
+  return consumeOneScratch(scratch, itemId, isEnchantedInstance);
+}
+
 /** Does this player hold a copy of `itemId` the Perfected guard would accept?
  *  With `slot` named it is the worn copy in that exact equipment slot; without
- *  one it is the exact bagged copy an id-only apply would consume.
+ *  one it is the exact bagged copy the apply would consume.
  *
  *  The bagged arm is NARROWED (phase 12, the obligation the pre-minting
- *  version of this doc recorded): it peeks through newestMatchingSlot, the
- *  non-consuming twin of the newest-first walk every id-only remover in this
- *  repo uses, never a holding scan, so one Perfected copy can no longer
- *  license spending an ordinary one (a `.some()` over the bags would accept
- *  while the apply consumed the newest, unstamped copy). Exported for the
- *  guard tests. */
-export function holdsPerfectedTarget(meta: PlayerMeta, itemId: string, slot?: EquipSlot): boolean {
+ *  version of this doc recorded): it peeks the VICTIM through
+ *  baggedEnchantVictim, never a holding scan and never the bare newest copy.
+ *  The newest-copy peek the first cut took was wrong in two shapes the live
+ *  remover produces: removeEnchantableItem spends a PLAIN copy before any
+ *  instanced one, and skips an already-enchanted copy for an unenchanted one,
+ *  so a Perfected copy that is newest but plain-shadowed or already carrying
+ *  an enchant would have licensed the apply while an ordinary copy was the one
+ *  spent. `confirmReplace` selects the replace arm's victim exactly as the
+ *  resolver's arm split does (confirmReplace AND an enchanted copy held).
+ *  Exported for the guard tests. */
+export function holdsPerfectedTarget(
+  meta: PlayerMeta,
+  itemId: string,
+  slot?: EquipSlot,
+  confirmReplace?: boolean,
+): boolean {
   if (slot) {
     return meta.equipment[slot] === itemId && meta.equipmentInstance?.[slot]?.perfected === true;
   }
-  return newestMatchingSlot(meta.inventory, itemId)?.instance?.perfected === true;
+  return baggedEnchantVictim(meta.inventory, itemId, confirmReplace === true)?.perfected === true;
 }
 
 /** The exact instance payload an apply-enchant mints from the copy it
@@ -1134,7 +1167,10 @@ export function resolveApplyEnchant(
   // arm: a missing meta refuses the same way a marker-less copy and a skill-0
   // character do, and neither gate touches state or draws rng.
   const applier = ctx.resolve(pid)?.meta;
-  if (enchant.requiresPerfected && !(applier && holdsPerfectedTarget(applier, itemId, slot))) {
+  if (
+    enchant.requiresPerfected &&
+    !(applier && holdsPerfectedTarget(applier, itemId, slot, confirmReplace))
+  ) {
     return { ok: false, itemId, enchantId, reason: 'not_perfected' };
   }
   // The slot-kind gate is shared by both arms: an item declares its slot KIND
@@ -1265,7 +1301,10 @@ export function evaluateApplyEnchantAdmission(
   // ORDER is unchanged: the two gates still answer before not_held.
   const r = ctx.resolve(pid);
   const applier = r?.meta;
-  if (enchant.requiresPerfected && !(applier && holdsPerfectedTarget(applier, itemId, slot))) {
+  if (
+    enchant.requiresPerfected &&
+    !(applier && holdsPerfectedTarget(applier, itemId, slot, confirmReplace))
+  ) {
     return { ok: false, itemId, enchantId, reason: 'not_perfected' };
   }
   if (itemDef.slot !== enchant.itemSlot) {

@@ -100,11 +100,15 @@ function harness(innerHeight: number, stubOrInventory: WorldStub | InvSlot[] = {
   // countable for that contract to be pinnable at all.
   let afterActions = 0;
   let activate: ((act: string) => void) | null = null;
-  // The self entity mirror carries equippedInstances in both worlds, which is
-  // where the painter reads the worn payloads from.
+  // The painter reads the worn payloads off IWorld.equipmentInstances, the
+  // whole self `einst` mirror in both worlds (Masterwrought phase 12; before
+  // it, the trimmed self ENTITY mirror, so the stub carried an `entities`
+  // map instead). The stub key keeps its old name on purpose: the cases
+  // below describe the paperdoll, not which surface serves it.
   const world = {
     inventory: stub.inventory ?? [{ itemId: DUST, count: 99 }],
     equipment: stub.equipment ?? {},
+    equipmentInstances: stub.equippedInstances ?? {},
     // The atomic crafting mirror both real worlds implement; the picker reads
     // Enchanting off it to mirror the sim's skill gate, and `synced` to tell a
     // real skill of 0 apart from an online client's not-yet-arrived mirror.
@@ -113,7 +117,8 @@ function harness(innerHeight: number, stubOrInventory: WorldStub | InvSlot[] = {
       craftSkills: { enchanting: stub.enchantingSkill ?? 0 },
     },
     playerId: 1,
-    entities: new Map([[1, { equippedInstances: stub.equippedInstances ?? {} }]]),
+    // No `entities` map at all: a painter that reached back for the trimmed
+    // entity mirror would throw here rather than quietly read an empty body.
     disenchantItem: (itemId: string, target?: { slotIndex: number }) => {
       disenchanted.push({ itemId, target });
     },
@@ -916,7 +921,7 @@ describe('BagItemActionMenu target step: destructive-path communication (#2421)'
     expect(lines[2].toLowerCase()).not.toContain('bindontrade');
   });
 
-  it('the WORN confirm states signature and masterwork but claims no bind state', () => {
+  it('the WORN confirm states signature, masterwork AND the bind state (the self einst mirror)', () => {
     const h = harness(768, {
       inventory: [{ itemId: DUST, count: 99 }],
       equipment: { mainhand: SWORD },
@@ -925,8 +930,11 @@ describe('BagItemActionMenu target step: destructive-path communication (#2421)'
           enchant: AGILITY,
           signer: 'Tester',
           rolled: { masterwork: true, stats: { agi: 2 } },
-          // Offline the self entity holds this; the online eqi mirror never
-          // does. The dialog has to read the same on both hosts.
+          // Both hosts hold this on IWorld.equipmentInstances (the server
+          // ships meta.equipmentInstance whole under `einst`), the surface the
+          // worn arm reads since Masterwrought phase 12, so the dialog states
+          // the bond on both. Before the switch it read the trimmed eqi entity
+          // mirror and this case pinned the bond ABSENT.
           boundTo: 3,
         },
       },
@@ -934,10 +942,9 @@ describe('BagItemActionMenu target step: destructive-path communication (#2421)'
     h.openTargets(WEAPON_ENCHANT);
     h.click('worn:mainhand');
     const lines = h.confirms[0].body.split('\n');
-    expect(lines[2]).toBe("Kept: Maker's mark, Masterwork bonus");
     // Named against the label this dialog ACTUALLY emits. An earlier draft
     // asserted a string no catalog row carries, which could never have failed.
-    expect(h.confirms[0].body).not.toContain('Commission bond');
+    expect(lines[2]).toBe("Kept: Maker's mark, Masterwork bonus, Commission bond");
   });
 
   it('states survivors on a LEGACY victim too, whose stat lines name what dies', () => {

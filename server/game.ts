@@ -337,6 +337,7 @@ import { createRealmReadoutMemo, realmReadoutJson, realmReadoutObject } from './
 import { RiftAssetCoordinator, riftAssetConfigFromEnv } from './rift_assets';
 import { refusedRiftForgeCommand } from './rift_forge_gate';
 import { RiftUpgradeCoordinator, riftUpgraderConfigFromEnv } from './rift_upgrader';
+import { duelWire, markersWire, tradeWire } from './self_social_wire';
 import {
   createDepthWarnedSerialWriter,
   createKeyedSerialWriter,
@@ -6807,6 +6808,28 @@ export class GameServer {
         // inv/purse mirrors on the next snapshot.
         if (typeof msg.item === 'string') sim.unbindItem(msg.item, pid);
         break;
+      case 'perfect_item': {
+        // The Perfecting stage (Masterwrought phase 12): the target is a
+        // passed selection, never an id. `slot` is accepted only when it names
+        // a real equipment key (the 'equip' case's untrusted-input rule),
+        // `bag` only as a non-negative integer cell index (the 'use' case's
+        // rule); EXACTLY ONE of the two must be usable, or the frame drops
+        // whole (a frame naming both, neither, or a malformed ref is never
+        // laundered into a guess the sim did not see). The sim re-validates
+        // the ref against ITS OWN bags and paperdoll and resolves the whole
+        // deny ladder and the one roll itself; the outcome reaches this client
+        // as the sim's own error/log lines plus the heavy self re-diff
+        // (perfect_item is a HEAVY_SELF_CMDS member: an attempt spends
+        // materials and mutates an instance payload in place).
+        const slot = typeof msg.slot === 'string' && isEquipSlot(msg.slot) ? msg.slot : undefined;
+        const bag =
+          typeof msg.bag === 'number' && Number.isInteger(msg.bag) && msg.bag >= 0
+            ? msg.bag
+            : undefined;
+        if ((slot === undefined) === (bag === undefined)) break;
+        sim.perfectItem(slot !== undefined ? { slot } : { bag: bag as number }, pid);
+        break;
+      }
       // Commission order board (Professions 2.0, issue #1298): the sim
       // resolvers re-validate every field (recipe/eligibility/scope/state/
       // range/space, nothing trusted from the client); the outcome reaches
@@ -8873,9 +8896,10 @@ export class GameServer {
     maybe('weapon', p.weapon);
     selfLap?.('self.timers');
     maybe('party', this.partyWire(anchorSession.pid));
-    maybe('marks', this.markersWire(anchorSession.pid));
-    maybe('trade', this.tradeWire(anchorSession.pid));
-    maybe('duel', this.duelWire(anchorSession.pid));
+    // The three pure social rows live in server/self_social_wire.ts.
+    maybe('marks', markersWire(this.sim, anchorSession.pid));
+    maybe('trade', tradeWire(this.sim, anchorSession.pid));
+    maybe('duel', duelWire(this.sim, anchorSession.pid));
     maybe('cardDuel', this.sim.cardMinigameInfoFor(anchorSession.pid));
     // Small PvP-ledger scalars. Delta-guarded like delve marks: a fresh
     // session receives both, then they ride only on earn/spend changes.
@@ -9285,38 +9309,6 @@ export class GameServer {
         };
       },
     );
-  }
-
-  // Raid markers the player's party can see, as { entityId: markerId }; null
-  // when the player is in no party. Pure read — the sim owns marker cleanup.
-  private markersWire(pid: number): unknown {
-    const party = this.sim.partyOf(pid);
-    if (!party) return null;
-    return this.sim.markersFor(pid);
-  }
-
-  private tradeWire(pid: number): unknown {
-    const t = this.sim.tradeFor(pid);
-    if (!t) return null;
-    const mine = t.a === pid;
-    const otherPid = mine ? t.b : t.a;
-    const other = this.sim.meta(otherPid);
-    // FULL payloads on purpose, no publicInstanceView trim: see stagedOfferSlots (trade.ts).
-    return {
-      otherPid,
-      otherName: other?.name ?? '?',
-      myOffer: mine ? t.offerA : t.offerB,
-      theirOffer: mine ? t.offerB : t.offerA,
-      myAccepted: mine ? t.acceptedA : t.acceptedB,
-      theirAccepted: mine ? t.acceptedB : t.acceptedA,
-    };
-  }
-
-  private duelWire(pid: number): unknown {
-    const d = this.sim.duelFor(pid);
-    if (!d) return null;
-    const otherPid = d.a === pid ? d.b : d.a;
-    return { otherPid, otherName: this.sim.meta(otherPid)?.name ?? '?', state: d.state };
   }
 
   // Public profile URL for a character name, or null when no public origin is set.
