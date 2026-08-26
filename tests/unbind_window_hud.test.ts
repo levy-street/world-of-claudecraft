@@ -63,8 +63,12 @@ describe('hud.ts unbindResult event arm (source pins)', () => {
     expect(arm).not.toMatch(/unbind_[a-z_]+'\s*\?/);
     // Nor a rewrite of the reason ahead of the map (the coverage audit's
     // surviving shape: `ev.reason = 'unbind_not_bound'` before the one call
-    // would re-route a refusal with no key literal and no chain).
-    expect(arm).not.toMatch(/ev\.reason\s*=[^=]/);
+    // would re-route a refusal with no key literal and no chain). The pin
+    // covers every assignment spelling on ANY receiver (compound assignments
+    // and an aliased `(ev as ...)` or destructured receiver included), so a
+    // re-route cannot hide behind `&&=` or a cast.
+    expect(arm).not.toMatch(/\.reason\s*(\|\|=|&&=|\?\?=|=[^=])/);
+    expect(arm).not.toMatch(/reason\s*:\s*['"]/);
   });
 
   it('derives the item name from static content and formats the fee locally (text-free event)', () => {
