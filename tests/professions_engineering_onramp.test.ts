@@ -14,8 +14,8 @@
 // The learnable sets below are DERIVED from ALL_RECIPES, so a future re-tier
 // that reopens the hole reds these arms by name.
 import { describe, expect, it } from 'vitest';
-import { HEROIC_VENDOR_STOCK } from '../src/sim/content/heroic_vendor';
-import { FURY_STOCK } from '../src/sim/content/pvp_honor';
+import { HEROIC_VENDOR_ITEMS, HEROIC_VENDOR_STOCK } from '../src/sim/content/heroic_vendor';
+import { FURY_STOCK, WARFARE_ITEMS } from '../src/sim/content/pvp_honor';
 import { ALL_RECIPES, recipeById } from '../src/sim/content/recipes';
 import { ITEMS, NPCS } from '../src/sim/data';
 import {
@@ -213,6 +213,17 @@ describe('engineering on-ramp: the gadget honors masterwrought R14 and R23', () 
     for (const key of RATING_KEYS) {
       expect(def[key], `${key} stays off the base rung`).toBeUndefined();
     }
+    // Positive controls (the inscription_catalog R14 arm's reasoning inherited
+    // whole): content-backed carriers prove five of the six keys live, so a
+    // renamed rating field cannot leave the absence sweep vacuously green.
+    // spellPower has no static exemplar; its liveness rests on the type
+    // system (ItemDef has no index signature, so a renamed field is a tsc
+    // error, not a silently-undefined read).
+    expect(HEROIC_VENDOR_ITEMS.seal_of_the_nine_oaths.hitRating).toBeGreaterThan(0);
+    expect(HEROIC_VENDOR_ITEMS.sutils_gambit.critRating).toBeGreaterThan(0);
+    expect(HEROIC_VENDOR_ITEMS.zyzzs_deathless_signet.hasteRating).toBeGreaterThan(0);
+    expect(WARFARE_ITEMS.furyforged_warhelm.pvpOffenseRating).toBeGreaterThan(0);
+    expect(WARFARE_ITEMS.furyforged_warhelm.pvpDefenseRating).toBeGreaterThan(0);
     // Formula-exact at the rung convention: level 15 + uncommon bonus 1 =
     // ilvl 16 on the held 0.75 line. The LIVE item level is pinned too, so a
     // drifted recipe.level cannot leave the hardcoded 16 telling a stale
