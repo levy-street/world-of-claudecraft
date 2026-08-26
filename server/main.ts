@@ -360,6 +360,7 @@ import { resolveSfxOverlayFile } from './sfx_overlay';
 import { captureSignupContext, parseSignupProfile } from './signup_attribution';
 import { handleSitePresenceHeartbeat } from './site_presence';
 import { adminRolesForAccount } from './staff_db';
+import { closeStartupProbe, listenStartupProbe } from './startup_probe';
 import {
   cacheControlFor,
   etagFor,
@@ -3363,6 +3364,13 @@ export async function startServer(): Promise<http.Server> {
   // primes activeConfig() for the request path (a request-time read returns this
   // same memoized Config).
   const config = activeConfig();
+  // Render stops scanning for a port after five minutes, while first-boot DDL on
+  // a free remote database can legitimately take longer. Bind a deliberately
+  // unavailable probe now; it exposes no game routes and returns 503 even for
+  // /livez, so the deployment cannot be promoted before every boot precondition
+  // below has completed. The real server takes this same port near the end.
+  const startupProbe = await listenStartupProbe(config.port);
+  console.log(`startup probe listening on port ${config.port}`);
   configureCommunityTestAccounts(config.provisionTestAccounts);
   // Point the contributor-stats reader at the one boot Config, replacing its former
   // duplicate GITHUB_REPO/GITHUB_TOKEN module reads (configure<Domain>Runtime).
@@ -3619,6 +3627,7 @@ export async function startServer(): Promise<http.Server> {
   const businessMetrics = registerBusinessMetrics(httpMetrics.registry);
   businessMetrics.start();
 
+  await closeStartupProbe(startupProbe);
   game.start();
   server.listen(config.port, () => {
     console.log(`World of ClaudeCraft server listening on http://localhost:${config.port}`);

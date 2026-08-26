@@ -70,3 +70,22 @@ describe('startServer wires the discord bot counters exporter (source pin)', () 
     expect(mainSrc).toMatch(/^\s*registerDiscordBotMetrics\(httpMetrics\.registry\);/m);
   });
 });
+
+describe('startServer exposes only a 503 startup probe during database boot', () => {
+  const mainSrc = readFileSync('server/main.ts', 'utf8');
+
+  it('opens the startup port before schema work and hands it over after boot preconditions', () => {
+    const startProbeAt = mainSrc.indexOf('const startupProbe = await listenStartupProbe(');
+    const schemaAt = mainSrc.indexOf('await ensureSchema()');
+    const orphanCleanupAt = mainSrc.indexOf('await closeOrphanSessions()');
+    const closeProbeAt = mainSrc.indexOf('await closeStartupProbe(startupProbe)');
+    const gameStartAt = mainSrc.indexOf('game.start()');
+    const listenAt = mainSrc.indexOf('server.listen(');
+
+    expect(startProbeAt).toBeGreaterThan(-1);
+    expect(startProbeAt).toBeLessThan(schemaAt);
+    expect(closeProbeAt).toBeGreaterThan(orphanCleanupAt);
+    expect(closeProbeAt).toBeLessThan(gameStartAt);
+    expect(closeProbeAt).toBeLessThan(listenAt);
+  });
+});
