@@ -180,9 +180,36 @@ and nighttalon to critRating 20, soulflame to hasteRating 20); the
 heroic variants then derive 55 crit or haste through the existing rule
 with no variant-code change. After the flip, the retuned 6-piece
 lineage bonus (3 percent) is the only Hit the old stack provides, and
-old kits stop carrying mostly-dead Hit into Normal content. The
-five-man heroic epics' Hit seeds (40 rating on about half that set) are
-correctly aimed at the +3 content they drop in and stay unchanged. WARFARE families are untouched (already PvE-inert and
+old kits stop carrying mostly-dead Hit into Normal content.
+
+**The Hit program is ladder-wide, not raid-only.** Player feedback on the
+earlier set-bonus pass called the catch-22 exactly: when the raid tier,
+the five-man heroic off-pieces, AND the mark-vendor jewelry all carry
+Hit, no gearing path avoids it and no slot presents a choice. The audit
+confirms it for the physical slots: both non-tank heroic chests
+(morthens_cryptforged_hauberk, basin_stalkers_tunic), both dps heroic
+legs (tidewoven_trousers, bloodmane_war_legguards), both heroic feet
+(bonechill_striders, tideworn_warboots), and both heroic waists
+(bonechill_cord, gravescale_girdle) are Hit; the Strength jewelry lane
+is Hit across the board, including oath_of_the_round_table, a Hit ring
+wearable twice. So the retune adopts one rule for the whole ladder:
+
+- **Every physical slot family keeps at least one Hit and one non-Hit
+  option at comparable power.** Where both options are Hit today, one
+  flips to crit or haste: morthens_cryptforged_hauberk (chest),
+  bloodmane_war_legguards (legs), tideworn_warboots (feet), and
+  gravescale_girdle (waist) flip to crit; basin_stalkers_tunic,
+  tidewoven_trousers, bonechill_striders, and bonechill_cord keep Hit
+  as the deliberate +3 answers. Helmet, gloves, and weapon pairs
+  already offer both and stay.
+- **Vendor jewelry keeps exactly one Hit neck and one Hit ring per role
+  lane**: seal_of_the_nine_oaths and oath_of_the_round_table remain the
+  Strength Hit pair; swiftfang_talisman flips to haste so the melee
+  lane gains a non-Hit alternative. Caster five-man pieces already mix
+  4 Hit / 8 crit / 6 haste and stay.
+
+These are live-gear changes like the rest of the retune and ship in the
+same release as the new loot. WARFARE families are untouched (already PvE-inert and
 already lineage-shaped). The haste leveling kits keep their single
 3-piece tier and ride the shared haste constant down, which is
 acceptable for leveling gear. Heroic set-tag inheritance stays:
@@ -363,12 +390,14 @@ Every hit elective sits in a guaranteed sum-to-1 roll group (the waists
 and the two hit weapons in ignivar_offset, necks in ignivar_jewelry,
 rings in varkhul_rings), so hit is farmable, never a lucky bonus drop.
 
-Against +3 heroic content the windows are 260 melee and 250 spell.
-Blending the tier with the five-man heroic epics' 40-hit pieces (which
-keep their seeds) reaches roughly 250 melee and 235 spell at the cost of
-set pieces and budget: the intended deliberate chase. The dual-wield
-white window against +3 (360) is explicitly not a target, matching the
-classic reality that dual-wield whites never cap against bosses.
+Against +3 heroic content the windows are 260 melee and 250 spell. After
+the ladder-wide diversification (below), one deliberate Hit piece
+remains in each five-man heroic slot family: blending the tier's 170 of
+electives with the surviving 40-hit chest, legs, or feet reaches the 260
+melee window at the cost of two to three set pieces and their budget,
+which is the intended deliberate chase. The dual-wield white window
+against +3 (360) is explicitly not a target, matching the classic
+reality that dual-wield whites never cap against bosses.
 
 These are proposed constants on the existing curve, to be confirmed in the
 tuning pass with the DPS study harness before merge.
@@ -804,8 +833,10 @@ Each phase is a reviewable commit (or small commit series) with its tests:
 3. **Incumbent retune**: the lineage mechanism (ItemSet lineage id plus
    the aggregateSetBonuses cross-family count, a small sim change,
    test-first), the merged 2/4/6 bonus tables and constant changes from
-   "Prerequisite: retune the incumbent set stack", the tier-2 Hit seed
-   flip to crit and haste, their bonus-text and set-tooltip updates, and
+   "Prerequisite: retune the incumbent set stack", the ladder-wide Hit
+   program (tier-2 seed flips, the five-man heroic per-slot
+   diversification, the vendor jewelry lane fix), their bonus-text and
+   set-tooltip updates, and
    the old-versus-new balance harness test (initially pinning the retuned
    lineage values; the new-kit comparison arm lands with phase 5).
 4. **Sets**: ITEM_SETS declarations for all 29 families with the shared
