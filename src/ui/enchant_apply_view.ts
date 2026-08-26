@@ -356,17 +356,41 @@ function copyMeetsPerfectedGate(
  *  marker. A Perfected copy shadowed by a plain one, or behind a newer
  *  ordinary one, is therefore no candidate at all, whatever
  *  copyMeetsPerfectedGate says of it alone: offering it would promise an apply
- *  the sim denies not_perfected. The picker models the plain-apply arm (no
- *  confirmed replace: that dialog is its own surface). Trivially true for
- *  every enchant that requires nothing. The worn family needs no twin: a worn
- *  ref names its slot, so the per-copy gate IS the sim's gate there. */
+ *  the sim denies not_perfected. Both arms the picker can lead into are
+ *  modeled, each through the victim the sim's guard peeks for it: the plain
+ *  apply (no confirm) and the confirmed replace (the already-enchanted copy
+ *  replaceVictimIndex pins, which step two lists as a replace row), so a
+ *  Perfected copy carrying a live enchant still clears the row. Trivially
+ *  true for every enchant that requires nothing. The worn family needs no
+ *  twin: a worn ref names its slot, so the per-copy gate IS the sim's gate
+ *  there. */
 function baggedIdMeetsPerfectedGate(
   enchant: EnchantDef,
   inventory: readonly InvSlot[],
   itemId: string,
 ): boolean {
+  return (
+    baggedArmMeetsPerfectedGate(enchant, inventory, itemId, false) ||
+    baggedArmMeetsPerfectedGate(enchant, inventory, itemId, true)
+  );
+}
+
+/** ONE arm of the sim's bagged Perfected gate: the copy the plain apply would
+ *  spend (`replace` false) or the copy a confirmed replace pins (`replace`
+ *  true), each peeked through baggedEnchantVictim exactly as
+ *  holdsPerfectedTarget peeks it for that arm. The target builder gates its
+ *  plain rows on the first and its replace rows on the second, so a replace
+ *  row is offered only when the sim's confirmed replace would pass the gate
+ *  on THAT victim (a plain-victim gate over a replace row could list a replace
+ *  the sim refuses, or hide one it accepts). */
+function baggedArmMeetsPerfectedGate(
+  enchant: EnchantDef,
+  inventory: readonly InvSlot[],
+  itemId: string,
+  replace: boolean,
+): boolean {
   if (!enchant.requiresPerfected) return true;
-  return baggedEnchantVictim(inventory, itemId)?.perfected === true;
+  return baggedEnchantVictim(inventory, itemId, replace)?.perfected === true;
 }
 
 /** Whether step two would list ANY target for `enchant`, the skill dimension
@@ -680,9 +704,12 @@ export function enchantTargets(
     if (!def || def.slot !== enchant.itemSlot) continue;
     if (!copyMeetsPerfectedGate(enchant, slot.instance)) continue;
     // Both halves of the sim's bagged verdict: the copy carries the marker AND
-    // the id's newest copy (the one an id-only apply is judged on) does.
-    if (!baggedIdMeetsPerfectedGate(enchant, inventory, slot.itemId)) continue;
-    if (slot.instance && isEnchantedInstance(slot.instance)) {
+    // the copy the sim would judge for THIS row's arm does (the plain apply's
+    // victim for a plain row, the confirmed replace's pinned victim for a
+    // replace row), each through baggedArmMeetsPerfectedGate.
+    const enchanted = !!slot.instance && isEnchantedInstance(slot.instance);
+    if (!baggedArmMeetsPerfectedGate(enchant, inventory, slot.itemId, enchanted)) continue;
+    if (enchanted) {
       enchantedByItem.set(slot.itemId, (enchantedByItem.get(slot.itemId) ?? 0) + slot.count);
       continue;
     }

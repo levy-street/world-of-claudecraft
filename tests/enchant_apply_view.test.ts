@@ -1631,14 +1631,44 @@ describe('enchant_apply_view: perfectedMet on the step-one row', () => {
     expect(enchantTargets(agreeing, INFUSION, [], viewerAt(CAP))).toEqual([
       { itemId: CHEST, count: 1 },
     ]);
-    // An already-enchanted Perfected copy is skipped for an ordinary
-    // unenchanted one (the remover's second pass), so the row reads unmet.
+    // An already-enchanted Perfected copy beside an ordinary unenchanted one:
+    // the PLAIN apply would spend the ordinary copy (the remover's second
+    // pass skips the enchanted one), but step two lists the enchanted
+    // Perfected copy as a REPLACE row, and the sim's confirmed replace peeks
+    // exactly that copy (replaceVictimIndex), so the row still clears. Its
+    // plain-apply half alone would refuse: pinned through the sim guard in
+    // tests/lucent_infusion_guard.test.ts.
     const enchantedShadow: InvSlot[] = [
       ...BILL,
       { itemId: CHEST, count: 1, instance: { signer: 'Crafter' } },
       { itemId: CHEST, count: 1, instance: { perfected: true, enchant: 'enchant_chest_stamina' } },
     ];
-    expect(rowFor(enchantedShadow, viewerAt(CAP))?.perfectedMet).toBe(false);
+    expect(rowFor(enchantedShadow, viewerAt(CAP))?.perfectedMet).toBe(true);
+    // Each ROW family is gated on its own arm's victim: [enchanted Perfected
+    // A, enchanted ordinary D newer, unenchanted Perfected B] pins the replace
+    // victim D (replaceVictimIndex, the highest enchanted copy) as NOT
+    // Perfected, so no replace row is offered (the sim's confirmed replace
+    // would refuse not_perfected on D), while the plain victim B still lists.
+    const splitArms: InvSlot[] = [
+      ...BILL,
+      { itemId: CHEST, count: 1, instance: { perfected: true, enchant: 'enchant_chest_stamina' } },
+      {
+        itemId: CHEST,
+        count: 1,
+        instance: { signer: 'Crafter', enchant: 'enchant_chest_stamina' },
+      },
+      { itemId: CHEST, count: 1, instance: { perfected: true } },
+    ];
+    expect(rowFor(splitArms, viewerAt(CAP))?.perfectedMet).toBe(true);
+    expect(enchantTargets(splitArms, INFUSION, [], viewerAt(CAP))).toEqual([
+      { itemId: CHEST, count: 1 },
+    ]);
+    // And with the enchanted Perfected copy alone, the plain apply has no
+    // victim at all (the remover's third pass is the disenchant split's, not
+    // the apply's), so only the replace arm clears it: still true.
+    expect(
+      rowFor([...BILL, enchantedShadow[enchantedShadow.length - 1]], viewerAt(CAP))?.perfectedMet,
+    ).toBe(true);
     // The rule is the CAPSTONE'S alone: an ordinary chest enchant lists both
     // copies of the same disagreeing holding.
     const plain = 'enchant_chest_stamina';

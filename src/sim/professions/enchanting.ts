@@ -135,13 +135,20 @@ export { DISENCHANT_MATERIAL_BY_QUALITY };
  *  rolled.masterwork (before the masterwork model, applyEnchant was
  *  the ONLY writer of rolled.stats, so bare stats meant enchanted; a
  *  masterwork copy carries rolled.stats without being enchanted and must stay
- *  enchantable exactly like a plain copy). This is what the
- *  countEnchantableItem/removeEnchantableItem guards (sim.ts) key on, so
- *  double-enchant prevention holds for both legacy and marker-carrying
- *  copies. */
+ *  enchantable exactly like a plain copy). A PERFECTED copy (Masterwrought
+ *  phase 12) is the second non-enchant writer of bare rolled.stats: the
+ *  Perfecting walk merges the R5 bonus there and never sets rolled.masterwork,
+ *  and every Perfected copy post-dates the marker, so a `perfected` copy with
+ *  no `enchant` field is unenchanted by construction (reading it as a legacy
+ *  enchant refused the Lucent Infusion, the marker's only consumer, on every
+ *  real Perfected copy and let a confirmed replace wipe the bonus). This is
+ *  what the countEnchantableItem/removeEnchantableItem guards (sim.ts) key
+ *  on, so double-enchant prevention holds for both legacy and
+ *  marker-carrying copies. */
 export function isEnchantedInstance(instance: ItemInstancePayload): boolean {
   return (
-    instance.enchant !== undefined || (!!instance.rolled?.stats && !instance.rolled.masterwork)
+    instance.enchant !== undefined ||
+    (!!instance.rolled?.stats && !instance.rolled.masterwork && instance.perfected !== true)
   );
 }
 
@@ -744,7 +751,12 @@ export function baggedEnchantVictim(
     if (idx >= 0) return inventory[idx].instance;
   }
   const scratch = inventory.map((s) => ({ ...s }));
-  return consumeOneScratch(scratch, itemId, isEnchantedInstance);
+  const victim = consumeOneScratch(scratch, itemId, isEnchantedInstance);
+  // consumeOneScratch's third pass falls back to an EXCLUDED (enchanted) copy,
+  // modeling the plain removeItem walk the disenchant split takes; the
+  // unconfirmed apply has no such fallback (it denies already_enchanted with
+  // nothing spent), so an enchanted-only holding has NO victim here.
+  return victim !== undefined && isEnchantedInstance(victim) ? undefined : victim;
 }
 
 /** Does this player hold a copy of `itemId` the Perfected guard would accept?
@@ -849,7 +861,10 @@ export function replacedEnchantPayloadFor(
 ): ItemInstancePayload {
   const merged = cloneItemInstancePayload(victim);
   const old = victim.enchant !== undefined ? ENCHANTS[victim.enchant] : undefined;
-  // Legacy arm: no marker means the whole stats map is the old enchant.
+  // Legacy arm: no marker means the whole stats map is the old enchant. A
+  // Perfected copy never reaches this arm without a marker (isEnchantedInstance
+  // reads its bare R5 record as unenchanted), so the wipe cannot touch the
+  // bonus; with a marker its stats ride the marker arm's surgical peel.
   const stats: Record<string, number> =
     victim.enchant !== undefined ? { ...merged.rolled?.stats } : {};
   if (old) {

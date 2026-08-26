@@ -30,8 +30,16 @@ import { ITEMS } from '../src/sim/data';
 import {
   evaluateApplyEnchantAdmission,
   holdsPerfectedTarget,
+  isEnchantedInstance,
   resolveApplyEnchant,
 } from '../src/sim/professions/enchanting';
+import {
+  craftForApexItem,
+  PERFECTING_ATTEMPT_COST,
+  PERFECTING_RANKS,
+  PERFECTING_SKILL_REQ,
+  resolvePerfectingAttempt,
+} from '../src/sim/professions/perfecting';
 import { type PlayerMeta, Sim } from '../src/sim/sim';
 import type { Entity, SimEvent } from '../src/sim/types';
 import { runApplyEnchant, runDisenchant } from './helpers/enchant_family_cast';
@@ -166,6 +174,66 @@ describe('holdsPerfectedTarget refuses every PLAIN copy (only the Perfecting wal
     const spent = newer.meta.inventory.filter((s) => s.itemId === CHEST_ITEM);
     expect(spent.map((s) => s.instance?.perfected === true).sort()).toEqual([false, true]);
     expect(spent.find((s) => s.instance?.enchant === INFUSION)?.instance?.perfected).toBe(true);
+  });
+
+  it('a copy walked to Perfected by the REAL stage applies the Infusion and keeps its R5 bonus', () => {
+    // The interlock end to end: the Perfecting walk merges the R5 delta into
+    // bare rolled.stats with no rolled.masterwork, the shape isEnchantedInstance
+    // used to read as a LEGACY enchant (refusing the Infusion unconfirmed and
+    // wiping the bonus on a confirmed replace). Bagged and worn arms, both
+    // unconfirmed, both must APPLY with the bonus and the enchant side by side.
+    const walk = (seed: number) => {
+      const w = apexEnchanter(seed);
+      w.sim.setPlayerLevel(20);
+      w.meta.craftSkills[craftForApexItem(CHEST_ITEM) as string] = PERFECTING_SKILL_REQ;
+      for (const c of PERFECTING_ATTEMPT_COST) w.sim.addItem(c.itemId, c.count * 8, w.pid);
+      w.sim.addItemInstance(CHEST_ITEM, { signer: 'Crafter' }, w.pid, 1);
+      const bag = w.meta.inventory.findIndex((s) => s.itemId === CHEST_ITEM);
+      // Force every roll to succeed so the walk is exactly PERFECTING_RANKS long.
+      (w.sim.ctx.rng as { next: () => number }).next = () => 0;
+      for (let i = 0; i < PERFECTING_RANKS; i++) {
+        resolvePerfectingAttempt(w.sim.ctx, w.pid, { bag, itemId: CHEST_ITEM });
+      }
+      const copy = w.meta.inventory[bag];
+      expect(copy.itemId).toBe(CHEST_ITEM);
+      expect(copy.instance?.perfected).toBe(true);
+      expect(copy.instance?.enchant).toBeUndefined();
+      const bonus = { ...copy.instance?.rolled?.stats };
+      expect(Object.keys(bonus).length, 'the walk really merged an R5 record').toBeGreaterThan(0);
+      return { ...w, bag, bonus };
+    };
+    const infusionBonus = ENCHANTS[INFUSION].statBonus;
+
+    const bagged = walk(21);
+    expect(isEnchantedInstance(bagged.meta.inventory[bagged.bag].instance!)).toBe(false);
+    const applied = resolveApplyEnchant(bagged.sim.ctx, bagged.pid, CHEST_ITEM, INFUSION);
+    expect(applied.ok, `bagged unconfirmed apply: ${applied.reason}`).toBe(true);
+    const after = bagged.meta.inventory.find((s) => s.instance?.enchant === INFUSION);
+    expect(after?.instance?.perfected).toBe(true);
+    for (const [stat, value] of Object.entries(bagged.bonus)) {
+      expect(after?.instance?.rolled?.stats?.[stat]).toBe(
+        value + (infusionBonus[stat as keyof typeof infusionBonus] ?? 0),
+      );
+    }
+    for (const [stat, value] of Object.entries(infusionBonus)) {
+      if (value === undefined) continue;
+      expect(after?.instance?.rolled?.stats?.[stat]).toBe((bagged.bonus[stat] ?? 0) + value);
+    }
+
+    const worn = walk(22);
+    worn.sim.equipItem(CHEST_ITEM, worn.pid);
+    expect(worn.meta.equipment.chest).toBe(CHEST_ITEM);
+    expect(worn.meta.equipmentInstance.chest?.perfected).toBe(true);
+    const wornApplied = resolveApplyEnchant(worn.sim.ctx, worn.pid, CHEST_ITEM, INFUSION, 'chest');
+    expect(wornApplied.ok, `worn unconfirmed apply: ${wornApplied.reason}`).toBe(true);
+    const wornAfter = worn.meta.equipmentInstance.chest;
+    expect(wornAfter?.enchant).toBe(INFUSION);
+    expect(wornAfter?.perfected).toBe(true);
+    for (const [stat, value] of Object.entries(worn.bonus)) {
+      expect(wornAfter?.rolled?.stats?.[stat]).toBe(
+        value + (infusionBonus[stat as keyof typeof infusionBonus] ?? 0),
+      );
+    }
   });
 
   it('a PLAIN copy shadows a newer Perfected one: the remover spends plain first', () => {
