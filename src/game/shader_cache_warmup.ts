@@ -1,0 +1,571 @@
+// The self-warming shader cache: a hidden webgl2 context in THIS page links
+// the programs the last session recorded, so the world entry's links are cache
+// hits instead of driver work inside the first live frames.
+//
+// The decisions (corpus identity, dedupe and cap, pacing, the skip reasons)
+// live in the pure ../render/shader_warmup_core; this host only carries the
+// WebGL, storage and scheduling calls, and it never throws to its caller: a
+// warm-up that fails is a session that runs exactly as it did before.
+//
+// THE THREE WIRING POINTS, and why they sit where they do (src/main.ts):
+// - start at the character-select screen. That is the one long, idle,
+//   pre-entry moment every online path passes through, and the submission
+//   needs it: about 19 ms of main-thread submission per program on the
+//   2026-08-27 RTX 3090 measurement, one program per animation frame.
+// - stop at the top of enterWorld. From the click on, every main-thread ms
+//   belongs to the world build.
+// - finish after the world's reveal: release the hidden context (the game
+//   context has linked its programs by then, and the measurement deliberately
+//   kept the hidden one alive until that point, since a lost context can take
+//   its cached translations with it), then record the session's own program
+//   set for the next boot, about 25 s later on an idle callback so the corpus
+//   covers the first minutes of play and costs nothing during them.
+//
+// The corpus is stored gzipped (about 35 MB of GLSL for a full ultra set,
+// a few MB compressed) under one key in one IndexedDB store.
+//
+// The graphics tier read here is the LIVE `GFX.tier` at record time and the
+// import-time guess at warm-up time; when the two disagree the identity simply
+// does not match and the warm-up skips, which is the fail-safe direction.
+
+import { GFX } from '../render/gfx';
+import { enableRendererExtensions } from '../render/renderer_extensions';
+import {
+  createShaderCorpusRecord,
+  createWarmupPlan,
+  isShaderCorpusRecord,
+  nextWarmupIndex,
+  readWarmupQuery,
+  type ShaderCorpusRecord,
+  type ShaderProgramSources,
+  shaderCorpusIdentity,
+  stopWarmup,
+  type WarmupPlan,
+  type WarmupSkipReason,
+  warmupApplies,
+} from '../render/shader_warmup_core';
+
+declare const __APP_BUILD_ID__: string;
+
+const LOG = '[shader-warmup]';
+const DB_NAME = 'woc-shader-warmup';
+const STORE_NAME = 'corpus';
+const CORPUS_KEY = 'corpus';
+const WARMUP_CANVAS_PX = 8;
+/** The world has been playable for a while by then, so reading every program's
+ *  source costs the player nothing, and the set covers the first minutes. */
+const RECORD_DELAY_MS = 25_000;
+
+/** The WebGL surface the warm-up context needs. Structural, so a test passes a
+ *  plain object and the real `WebGL2RenderingContext` satisfies it as is. */
+export interface WarmupGl {
+  VERTEX_SHADER: number;
+  FRAGMENT_SHADER: number;
+  RENDERER: number;
+  createShader(type: number): WebGLShader | null;
+  shaderSource(shader: WebGLShader, source: string): void;
+  compileShader(shader: WebGLShader): void;
+  createProgram(): WebGLProgram | null;
+  attachShader(program: WebGLProgram, shader: WebGLShader): void;
+  linkProgram(program: WebGLProgram): void;
+  deleteShader(shader: WebGLShader): void;
+  deleteProgram(program: WebGLProgram): void;
+  getExtension(name: string): unknown;
+  getParameter(pname: number): unknown;
+}
+
+/** The extra surface the RECORDING side reads off the world context. */
+export interface CorpusGl extends WarmupGl {
+  SHADER_TYPE: number;
+  getAttachedShaders(program: WebGLProgram): WebGLShader[] | null;
+  getShaderParameter(shader: WebGLShader, pname: number): unknown;
+  getShaderSource(shader: WebGLShader): string | null;
+  getContextAttributes(): Record<string, unknown> | null;
+}
+
+/** What `recordShaderCorpus` needs from the three renderer, structurally. */
+export interface ShaderCorpusRenderer {
+  info: { programs?: readonly unknown[] | null };
+  getContext(): unknown;
+}
+
+export interface WarmupContext {
+  gl: WarmupGl;
+  /** Called on release: loses the context and drops the canvas. */
+  dispose(): void;
+}
+
+/** The storage seam. IndexedDB in the browser, a Map in tests. */
+export interface KeyValueStore {
+  get(key: string): Promise<unknown>;
+  set(key: string, value: unknown): Promise<void>;
+}
+
+export interface StoredCorpus {
+  gzip: boolean;
+  bytes: Uint8Array;
+}
+
+export interface ShaderWarmupStats {
+  corpusPrograms: number;
+  submitted: number;
+  elapsedMs: number;
+  skipped: WarmupSkipReason | null;
+  running: boolean;
+  released: boolean;
+  recorded: number | null;
+}
+
+interface WarmupSession {
+  plan: WarmupPlan | null;
+  context: WarmupContext | null;
+  programs: WebGLProgram[];
+  shaders: WebGLShader[];
+  frame: number | null;
+  cancelFrame: (handle: number) => void;
+  startedAt: number;
+  elapsedMs: number;
+  corpusPrograms: number;
+  skipped: WarmupSkipReason | null;
+  stopped: boolean;
+  released: boolean;
+  recorded: number | null;
+}
+
+function freshSession(recorded: number | null): WarmupSession {
+  return {
+    plan: null,
+    context: null,
+    programs: [],
+    shaders: [],
+    frame: null,
+    cancelFrame: () => {},
+    startedAt: 0,
+    elapsedMs: 0,
+    corpusPrograms: 0,
+    skipped: null,
+    stopped: false,
+    released: false,
+    recorded,
+  };
+}
+
+let session: WarmupSession = freshSession(null);
+let started = false;
+
+// -- storage ---------------------------------------------------------------
+
+export function createMemoryStore(seed?: Map<string, unknown>): KeyValueStore {
+  const values = seed ?? new Map<string, unknown>();
+  return {
+    get: (key) => Promise.resolve(values.get(key)),
+    set: (key, value) => {
+      values.set(key, value);
+      return Promise.resolve();
+    },
+  };
+}
+
+function openCorpusDb(): Promise<IDBDatabase | null> {
+  return new Promise((resolve) => {
+    const factory = (globalThis as { indexedDB?: IDBFactory }).indexedDB;
+    if (!factory) {
+      resolve(null);
+      return;
+    }
+    try {
+      const request = factory.open(DB_NAME, 1);
+      request.onupgradeneeded = () => {
+        const db = request.result;
+        if (!db.objectStoreNames.contains(STORE_NAME)) db.createObjectStore(STORE_NAME);
+      };
+      request.onsuccess = () => resolve(request.result);
+      request.onerror = () => resolve(null);
+      request.onblocked = () => resolve(null);
+    } catch {
+      resolve(null);
+    }
+  });
+}
+
+/** One object store, one key, every failure resolved rather than thrown. */
+export function createIndexedDbStore(): KeyValueStore {
+  const run = <T>(
+    mode: IDBTransactionMode,
+    body: (store: IDBObjectStore) => IDBRequest,
+    fallback: T,
+  ): Promise<T> =>
+    openCorpusDb().then(
+      (db) =>
+        new Promise<T>((resolve) => {
+          if (!db) {
+            resolve(fallback);
+            return;
+          }
+          try {
+            const tx = db.transaction(STORE_NAME, mode);
+            const request = body(tx.objectStore(STORE_NAME));
+            request.onsuccess = () => resolve(request.result as T);
+            request.onerror = () => resolve(fallback);
+            tx.oncomplete = () => db.close();
+            tx.onabort = () => resolve(fallback);
+          } catch {
+            resolve(fallback);
+          }
+        }),
+    );
+  return {
+    get: (key) => run<unknown>('readonly', (store) => store.get(key), undefined),
+    set: (key, value) =>
+      run<unknown>('readwrite', (store) => store.put(value, key), undefined).then(() => undefined),
+  };
+}
+
+function bytesStream(bytes: Uint8Array): ReadableStream<BufferSource> {
+  return new ReadableStream<BufferSource>({
+    start(controller) {
+      controller.enqueue(bytes as BufferSource);
+      controller.close();
+    },
+  });
+}
+
+async function gzip(bytes: Uint8Array): Promise<Uint8Array> {
+  const compressed = bytesStream(bytes).pipeThrough(new CompressionStream('gzip'));
+  return new Uint8Array(await new Response(compressed).arrayBuffer());
+}
+
+async function gunzip(bytes: Uint8Array): Promise<Uint8Array> {
+  const plain = bytesStream(bytes).pipeThrough(new DecompressionStream('gzip'));
+  return new Uint8Array(await new Response(plain).arrayBuffer());
+}
+
+/** Gzip when the platform has `CompressionStream`, raw with the flag down
+ *  otherwise, so a browser without it still warms. */
+export async function encodeCorpus(record: ShaderCorpusRecord): Promise<StoredCorpus> {
+  const bytes = new TextEncoder().encode(JSON.stringify(record));
+  if (typeof CompressionStream === 'undefined') return { gzip: false, bytes };
+  return { gzip: true, bytes: await gzip(bytes) };
+}
+
+export async function decodeCorpus(stored: unknown): Promise<ShaderCorpusRecord | null> {
+  if (typeof stored !== 'object' || stored === null) return null;
+  const entry = stored as Partial<StoredCorpus>;
+  if (!(entry.bytes instanceof Uint8Array)) return null;
+  try {
+    const plain =
+      entry.gzip === true
+        ? typeof DecompressionStream === 'undefined'
+          ? null
+          : await gunzip(entry.bytes)
+        : entry.bytes;
+    if (!plain) return null;
+    const parsed: unknown = JSON.parse(new TextDecoder().decode(plain));
+    return isShaderCorpusRecord(parsed) ? parsed : null;
+  } catch {
+    return null;
+  }
+}
+
+// -- context ---------------------------------------------------------------
+
+function adapterStringOf(gl: WarmupGl): string {
+  try {
+    const debug = gl.getExtension('WEBGL_debug_renderer_info') as {
+      UNMASKED_RENDERER_WEBGL: number;
+    } | null;
+    return String(
+      debug ? gl.getParameter(debug.UNMASKED_RENDERER_WEBGL) : gl.getParameter(gl.RENDERER),
+    );
+  } catch {
+    return '';
+  }
+}
+
+function createWarmupContext(attributes: Record<string, unknown> | null): WarmupContext | null {
+  if (typeof document === 'undefined') return null;
+  try {
+    const canvas = document.createElement('canvas');
+    canvas.width = WARMUP_CANVAS_PX;
+    canvas.height = WARMUP_CANVAS_PX;
+    const gl = canvas.getContext('webgl2', (attributes ?? undefined) as WebGLContextAttributes);
+    if (!gl) return null;
+    return {
+      gl,
+      dispose: () => {
+        (gl.getExtension('WEBGL_lose_context') as { loseContext(): void } | null)?.loseContext();
+      },
+    };
+  } catch {
+    return null;
+  }
+}
+
+function currentSearch(): string {
+  const location = (globalThis as { location?: { search?: string } }).location;
+  return location?.search ?? '';
+}
+
+function appBuildId(): string {
+  return typeof __APP_BUILD_ID__ !== 'undefined' ? __APP_BUILD_ID__ : 'dev';
+}
+
+function defaultScheduleFrame(callback: () => void): number {
+  const raf = (globalThis as { requestAnimationFrame?: (cb: () => void) => number })
+    .requestAnimationFrame;
+  return raf ? raf(callback) : 0;
+}
+
+function defaultCancelFrame(handle: number): void {
+  const cancel = (globalThis as { cancelAnimationFrame?: (handle: number) => void })
+    .cancelAnimationFrame;
+  cancel?.(handle);
+}
+
+function defaultScheduleIdle(callback: () => void, delayMs: number): void {
+  const scope = globalThis as {
+    setTimeout?: (cb: () => void, ms: number) => unknown;
+    requestIdleCallback?: (cb: () => void, options?: { timeout: number }) => unknown;
+  };
+  scope.setTimeout?.(() => {
+    if (scope.requestIdleCallback) scope.requestIdleCallback(callback, { timeout: 10_000 });
+    else callback();
+  }, delayMs);
+}
+
+// -- the warm-up -----------------------------------------------------------
+
+export interface StartShaderWarmupOptions {
+  search?: string;
+  store?: KeyValueStore;
+  buildId?: string;
+  tier?: string;
+  createContext?: (attributes: Record<string, unknown> | null) => WarmupContext | null;
+  scheduleFrame?: (callback: () => void) => number;
+  cancelFrame?: (handle: number) => void;
+  now?: () => number;
+}
+
+function submitProgram(gl: WarmupGl, sources: ShaderProgramSources): void {
+  const vertex = gl.createShader(gl.VERTEX_SHADER);
+  const fragment = gl.createShader(gl.FRAGMENT_SHADER);
+  const program = gl.createProgram();
+  if (!vertex || !fragment || !program) return;
+  gl.shaderSource(vertex, sources.vertex);
+  gl.compileShader(vertex);
+  gl.shaderSource(fragment, sources.fragment);
+  gl.compileShader(fragment);
+  gl.attachShader(program, vertex);
+  gl.attachShader(program, fragment);
+  // No getProgramParameter, no COMPLETION_STATUS poll: asking would make the
+  // driver's off-thread link synchronous, which is the cost being avoided.
+  gl.linkProgram(program);
+  session.programs.push(program);
+  session.shaders.push(vertex, fragment);
+}
+
+async function runWarmup(options: StartShaderWarmupOptions): Promise<void> {
+  const query = readWarmupQuery(options.search ?? currentSearch());
+  const store = options.store ?? createIndexedDbStore();
+  const record = query.enabled ? await decodeCorpus(await store.get(CORPUS_KEY)) : null;
+  // The player can have clicked through to the world while the corpus loaded.
+  if (session.stopped) return;
+  const hasCorpus = record !== null && record.programs.length > 0;
+  const context =
+    query.enabled && hasCorpus
+      ? (options.createContext ?? createWarmupContext)(record?.contextAttributes ?? null)
+      : null;
+  const sweep = context ? enableRendererExtensions(context.gl) : null;
+  const identity =
+    context && sweep
+      ? shaderCorpusIdentity({
+          buildId: options.buildId ?? appBuildId(),
+          tier: options.tier ?? String(GFX.tier),
+          adapter: adapterStringOf(context.gl),
+          extensions: sweep.enabled,
+        })
+      : '';
+  const decision = warmupApplies({
+    enabled: query.enabled,
+    parallelCompile: sweep?.parallelCompile ?? false,
+    hasCorpus,
+    identityMatches: record !== null && record.identity === identity,
+  });
+  if (!decision.applies || !record || !context) {
+    context?.dispose();
+    session.skipped = decision.reason;
+    console.info(`${LOG} skipped: ${decision.reason ?? 'no context'}`);
+    return;
+  }
+  const now = options.now ?? (() => Date.now());
+  const scheduleFrame = options.scheduleFrame ?? defaultScheduleFrame;
+  const plan = createWarmupPlan(record.programs.length);
+  session.plan = plan;
+  session.context = context;
+  session.cancelFrame = options.cancelFrame ?? defaultCancelFrame;
+  session.corpusPrograms = record.programs.length;
+  session.startedAt = now();
+  console.info(`${LOG} warming ${record.programs.length} programs, one per frame`);
+  const step = (): void => {
+    if (session.plan !== plan) return;
+    session.frame = null;
+    const index = nextWarmupIndex(plan);
+    session.elapsedMs = now() - session.startedAt;
+    if (index === null) {
+      console.info(
+        `${LOG} submitted ${plan.submitted} programs in ${Math.round(session.elapsedMs)} ms`,
+      );
+      return;
+    }
+    submitProgram(context.gl, record.programs[index]);
+    session.frame = scheduleFrame(step);
+  };
+  session.frame = scheduleFrame(step);
+}
+
+/** Load the stored corpus and start paying it out, one program per frame.
+ *  Fire and forget: every failure ends as a console line and a skip reason.
+ *  Idempotent: the character-select screen is shown again on the way back from
+ *  character creation, and restarting would resubmit the whole corpus. */
+export function startShaderWarmup(options: StartShaderWarmupOptions = {}): void {
+  // The one handle a browser perf probe has on this feature.
+  (globalThis as { __shaderWarmup?: () => ShaderWarmupStats }).__shaderWarmup = shaderWarmupStats;
+  if (started) return;
+  started = true;
+  const recorded = session.recorded;
+  releaseShaderWarmup();
+  session = freshSession(recorded);
+  void runWarmup(options).catch((error: unknown) => {
+    console.warn(`${LOG} warm-up failed`, error);
+  });
+}
+
+/** The player clicked enter: from here the main thread belongs to the world. */
+export function stopShaderWarmup(): void {
+  session.stopped = true;
+  const plan = session.plan;
+  if (plan && plan.submitted < plan.total) {
+    console.info(`${LOG} stopped after ${plan.submitted}/${plan.total} programs`);
+  }
+  if (plan) stopWarmup(plan);
+  if (session.frame !== null) {
+    session.cancelFrame(session.frame);
+    session.frame = null;
+  }
+}
+
+/** Drop the hidden context. Deliberately NOT called at stop: the game context
+ *  links its own programs during the entry, and the measurement kept the
+ *  warm-up context alive until the world was revealed. */
+export function releaseShaderWarmup(): void {
+  stopShaderWarmup();
+  const context = session.context;
+  if (context) {
+    for (const program of session.programs) context.gl.deleteProgram(program);
+    for (const shader of session.shaders) context.gl.deleteShader(shader);
+    context.dispose();
+  }
+  session.programs = [];
+  session.shaders = [];
+  session.context = null;
+  session.released = true;
+}
+
+// -- recording -------------------------------------------------------------
+
+export interface RecordShaderCorpusOptions {
+  store?: KeyValueStore;
+  buildId?: string;
+  tier?: string;
+  now?: () => number;
+}
+
+function programSourcesOf(gl: CorpusGl, entries: readonly unknown[]): ShaderProgramSources[] {
+  const sources: ShaderProgramSources[] = [];
+  for (const entry of entries) {
+    const program = (entry as { program?: unknown } | null)?.program;
+    if (!program) continue;
+    const shaders = gl.getAttachedShaders(program as WebGLProgram);
+    if (!shaders) continue;
+    let vertex = '';
+    let fragment = '';
+    for (const shader of shaders) {
+      const source = gl.getShaderSource(shader) ?? '';
+      if (gl.getShaderParameter(shader, gl.SHADER_TYPE) === gl.VERTEX_SHADER) vertex = source;
+      else fragment = source;
+    }
+    if (vertex && fragment) sources.push({ vertex, fragment });
+  }
+  return sources;
+}
+
+/** Read this session's whole program set off the world renderer and store it
+ *  for the next boot. Never throws: a failed record is one console line. */
+export async function recordShaderCorpus(
+  renderer: ShaderCorpusRenderer,
+  options: RecordShaderCorpusOptions = {},
+): Promise<number> {
+  try {
+    const gl = renderer.getContext() as CorpusGl;
+    const entries = renderer.info.programs ?? [];
+    const sweep = enableRendererExtensions(gl);
+    const record = createShaderCorpusRecord({
+      identity: shaderCorpusIdentity({
+        buildId: options.buildId ?? appBuildId(),
+        tier: options.tier ?? String(GFX.tier),
+        adapter: adapterStringOf(gl),
+        extensions: sweep.enabled,
+      }),
+      savedAt: (options.now ?? (() => Date.now()))(),
+      contextAttributes: gl.getContextAttributes(),
+      sources: programSourcesOf(gl, entries),
+    });
+    const store = options.store ?? createIndexedDbStore();
+    await store.set(CORPUS_KEY, await encodeCorpus(record));
+    session.recorded = record.programs.length;
+    console.info(`${LOG} recorded ${record.programs.length} programs for the next boot`);
+    return record.programs.length;
+  } catch (error) {
+    console.warn(`${LOG} recording failed`, error);
+    return 0;
+  }
+}
+
+export interface FinishShaderWarmupOptions extends RecordShaderCorpusOptions {
+  delayMs?: number;
+  scheduleIdle?: (callback: () => void, delayMs: number) => void;
+}
+
+/** The world is revealed: let the hidden context go, then record this
+ *  session's own program set once the first minutes of play have run. */
+export function finishShaderWarmup(
+  renderer: ShaderCorpusRenderer,
+  options: FinishShaderWarmupOptions = {},
+): void {
+  releaseShaderWarmup();
+  const schedule = options.scheduleIdle ?? defaultScheduleIdle;
+  schedule(() => {
+    void recordShaderCorpus(renderer, options);
+  }, options.delayMs ?? RECORD_DELAY_MS);
+}
+
+/** What happened, for the perf probes. */
+export function shaderWarmupStats(): ShaderWarmupStats {
+  return {
+    corpusPrograms: session.corpusPrograms,
+    submitted: session.plan?.submitted ?? 0,
+    elapsedMs: session.elapsedMs,
+    skipped: session.skipped,
+    running: session.frame !== null,
+    released: session.released,
+    recorded: session.recorded,
+  };
+}
+
+export const shaderWarmupInternalsForTest = {
+  reset: (): void => {
+    session = freshSession(null);
+    started = false;
+  },
+  corpusKey: CORPUS_KEY,
+};

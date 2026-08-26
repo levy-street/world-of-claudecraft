@@ -166,6 +166,11 @@ import {
   Settings,
 } from './game/settings';
 import { sfx } from './game/sfx';
+import {
+  finishShaderWarmup,
+  startShaderWarmup,
+  stopShaderWarmup,
+} from './game/shader_cache_warmup';
 import { initSoftwareRenderNotice } from './game/software_render_notice';
 import {
   decideSpawnCinematic,
@@ -5148,6 +5153,7 @@ async function startGame(
         loadPhaseEnd('settle-cover');
         loadPhaseStart('curtain-fade');
         renderer.markGpuHitchReveal();
+        finishShaderWarmup(renderer.webgl);
         hideLoadingScreen();
         // Start the intro clock as the loading screen begins to fade: the camera
         // holds the opening pose until now, so the fade doubles as the cut in.
@@ -5933,12 +5939,10 @@ function show(el: string): void {
     authModeApply?.('login');
   }
 
+  const isPlayPanel =
+    el === '#charselect-panel' || el === '#charcreate-panel' || el === '#offline-select';
   const logoImg = $('#title-logo');
-  if (logoImg) {
-    const shouldHideLogo =
-      el === '#charselect-panel' || el === '#charcreate-panel' || el === '#offline-select';
-    logoImg.toggleAttribute('hidden', shouldHideLogo);
-  }
+  if (logoImg) logoImg.toggleAttribute('hidden', isPlayPanel);
 
   if (
     document.activeElement instanceof HTMLInputElement ||
@@ -5951,6 +5955,7 @@ function show(el: string): void {
   // moment the player can actually read it, and the NEW-badge marker should
   // advance only then.
   if (el === '#charselect-panel') {
+    startShaderWarmup();
     void loadCharselectNews($('#charselect-news-feed'), () => api.releases(20));
   }
 
@@ -5995,9 +6000,7 @@ function show(el: string): void {
     for (const id of panels) {
       document.querySelector(id)?.toggleAttribute('hidden', id !== el);
     }
-    if (el === '#charselect-panel' || el === '#charcreate-panel' || el === '#offline-select') {
-      updatePreviewContainer(el);
-    }
+    if (isPlayPanel) updatePreviewContainer(el);
     return;
   }
 
@@ -6018,9 +6021,7 @@ function show(el: string): void {
   if (isReducedMotion) {
     fromPanel.toggleAttribute('hidden', true);
     toPanel.toggleAttribute('hidden', false);
-    if (el === '#charselect-panel' || el === '#charcreate-panel' || el === '#offline-select') {
-      updatePreviewContainer(el);
-    }
+    if (isPlayPanel) updatePreviewContainer(el);
     return;
   }
 
@@ -6042,9 +6043,7 @@ function show(el: string): void {
     // Set initial state for fade-in
     toPanel.classList.add('panel-transition', 'panel-fade-in-start');
     toPanel.toggleAttribute('hidden', false);
-    if (el === '#charselect-panel' || el === '#charcreate-panel' || el === '#offline-select') {
-      updatePreviewContainer(el);
-    }
+    if (isPlayPanel) updatePreviewContainer(el);
 
     // Force layout reflow
     void toPanel.offsetHeight;
@@ -7074,6 +7073,7 @@ function syncCharselectEnterButton(): void {
 }
 
 async function enterWorld(c: CharacterSummary, button?: HTMLButtonElement): Promise<void> {
+  stopShaderWarmup();
   try {
     if (button) {
       button.disabled = true;

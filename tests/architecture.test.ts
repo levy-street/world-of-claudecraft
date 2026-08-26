@@ -507,6 +507,7 @@ const RENDER_PURE_CORES = [
   'src/render/live_program_watch_core.ts',
   'src/render/program_key_ledger_core.ts',
   'src/render/renderer_extensions.ts',
+  'src/render/shader_warmup_core.ts',
   'src/render/reveal_gate_core.ts',
   'src/render/town_reveal_core.ts',
   'src/render/foliage_bucket_reveal_core.ts',
