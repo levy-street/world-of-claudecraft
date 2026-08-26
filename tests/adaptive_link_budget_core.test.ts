@@ -301,6 +301,33 @@ describe('adaptive link budget core', () => {
     expect(budget.snapshot()).toMatchObject({ state: 'backoff', backoffCount: 3 });
   });
 
+  it('reopens a stalled lane on the next settle, halved, and grows it again after', async () => {
+    const clock = virtualClock();
+    const budget = createAdaptiveLinkBudget(CONFIG, clock);
+    budget.markSubmitted('slow:0');
+    budget.markSyncEnd('slow:0', 12);
+    expect(await budget.awaitSlot(() => false)).toBe(false);
+    expect(budget.snapshot()).toMatchObject({ state: 'stalled', noProgressCount: 1 });
+    expect(budget.canSubmit()).toBe(false);
+    // The settle arrives after the stall: the driver was slow, not wedged.
+    clock.advance(500);
+    budget.markSettled('slow:0');
+    expect(budget.snapshot()).toMatchObject({ state: 'backoff', windowLinks: 8, settledUnits: 1 });
+    expect(budget.canSubmit()).toBe(true);
+    expect(await budget.awaitSlot(() => false)).toBe(true);
+    budget.markSubmitted('fast:0');
+    budget.markSyncEnd('fast:0', 4);
+    clock.advance(100);
+    budget.markSettled('fast:0');
+    expect(budget.snapshot()).toMatchObject({ state: 'ramp', windowLinks: 12 });
+    const reasons = budget.snapshot().transitions.map((t) => `${t.from}>${t.to}:${t.reason}`);
+    expect(reasons).toEqual([
+      'ramp>stalled:no-progress',
+      'stalled>backoff:slow-settlement',
+      'backoff>ramp:fast-settlement',
+    ]);
+  });
+
   it('stops admission after bounded no-progress waits', async () => {
     const clock = virtualClock();
     const budget = createAdaptiveLinkBudget(CONFIG, clock);
@@ -328,10 +355,12 @@ describe('adaptive link budget core', () => {
     expect(await budget.awaitSlot(() => false)).toBe(false);
     expect(budget.snapshot()).toMatchObject({ state: 'stalled', noProgressCount: 1 });
 
+    // The old tail's settle is the progress the stall waited for: the lane
+    // reopens on the halved window (the settle was slow by definition).
     clock.advance(1_000);
     budget.markSettled('ghost-fade-variants:1');
-    expect(budget.canSubmit()).toBe(false);
-    expect(budget.snapshot()).toMatchObject({ state: 'stalled', settledUnits: 1 });
+    expect(budget.canSubmit()).toBe(true);
+    expect(budget.snapshot()).toMatchObject({ state: 'backoff', settledUnits: 1, windowLinks: 16 });
   });
 
   it('rechecks the caller deadline during a capacity wait', async () => {

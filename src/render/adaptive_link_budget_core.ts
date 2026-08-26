@@ -180,19 +180,32 @@ export function createAdaptiveLinkBudget(
   const finish = (id: string, failed: boolean): void => {
     const unit = inFlight.get(id);
     if (!unit) return;
-    const admissionClosed = state === 'stalled' || state === 'revealed';
+    const revealed = state === 'revealed';
+    const stalled = state === 'stalled';
     inFlight.delete(id);
     const now = clock.now();
     lastProgressAtMs = now;
     if (failed) {
       failedUnits++;
-      if (!admissionClosed) backoff('failed');
+      if (!revealed) backoff('failed');
       return;
     }
     settledUnits++;
     const settlementMs = Math.max(0, now - unit.submittedAtMs);
     lastSettlementMs = settlementMs;
-    if (admissionClosed) return;
+    if (revealed) return;
+    // A settle REFUTES the stall: the driver was slow, not wedged. The stall
+    // closed admission while nothing settled (a wedged link must not pile
+    // units behind it); with progress back, the lane reopens on the halved
+    // window, which is what a settlement past noProgressMs is anyway, and
+    // the next settles re-grow it. Terminal, the stall killed the whole
+    // compile lane after ONE unit on the Intel iGPU (a 16-root unit settles
+    // in more than 3 s there), on every login: 1 unit settled, 22 deferred
+    // to the live resume lane, in the 2026-08-26 arrival matrix.
+    if (stalled) {
+      backoff();
+      return;
+    }
     if (settlementMs <= config.fastSettlementMs) {
       // The cheap-unit discount. A unit that linked no program settles
       // instantly whatever the driver is doing, so its speed is not headroom:
