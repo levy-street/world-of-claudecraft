@@ -12,6 +12,10 @@
 // State is module-owned rather than a renderer field on purpose: the renderer
 // is under a line ratchet, the arm is idempotent, and a graphics rebuild
 // re-arms at its own reveal, which re-seats the baseline for the new context.
+//
+// Every readout here also sweeps the program-key ledger (program_key_ledger.ts,
+// off without `?perf`), which is how the ledger sees every program without the
+// renderer gaining a call site.
 
 import { recordGpuPrepEvent } from './gpu_prep_events';
 import {
@@ -22,6 +26,7 @@ import {
   disarmLiveProgramWatch,
   type LiveProgramEntry,
 } from './live_program_watch_core';
+import { sweepProgramKeyLedger } from './program_key_ledger';
 
 interface ProgramInfoHost {
   info: { programs?: LiveProgramEntry[] | null; memory: { textures: number } };
@@ -38,6 +43,7 @@ const labels: string[] = [];
 
 /** Linked programs and resident textures, as three reports them. */
 export function programCounts(webgl: ProgramInfoHost): { programs: number; textures: number } {
+  sweepProgramKeyLedger(webgl, performance.now());
   return {
     programs: webgl.info.programs?.length ?? 0,
     textures: webgl.info.memory.textures,
@@ -46,6 +52,7 @@ export function programCounts(webgl: ProgramInfoHost): { programs: number; textu
 
 /** Curtain-fade boundary: everything linked so far is prep, not an escape. */
 export function armLiveProgramWatch(webgl: ProgramInfoHost): void {
+  sweepProgramKeyLedger(webgl, performance.now());
   armWatch(watch, webgl.info.programs ?? undefined);
 }
 
@@ -53,6 +60,7 @@ export function armLiveProgramWatch(webgl: ProgramInfoHost): void {
  *  prep (compileAsync prologues push programs too), so it is adopted, not
  *  reported. */
 export function absorbLivePrograms(webgl: ProgramListHost): void {
+  sweepProgramKeyLedger(webgl, performance.now());
   absorbPrograms(watch, webgl.info?.programs ?? undefined);
 }
 
@@ -63,6 +71,7 @@ export function absorbLivePrograms(webgl: ProgramListHost): void {
  * frames after it.
  */
 export function recordNewLivePrograms(webgl: ProgramListHost): void {
+  sweepProgramKeyLedger(webgl, performance.now());
   const found = collectNewLivePrograms(watch, webgl.info?.programs ?? undefined, labels);
   for (let i = 0; i < found; i++) {
     recordGpuPrepEvent({ kind: 'live-program', key: labels[i], ageMs: 0 });
