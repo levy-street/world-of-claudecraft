@@ -339,10 +339,11 @@ describe('the both-sourced nine (ruling qr-11n-NINE)', () => {
     // qr-11n-NINE used. Deliberately narrower than the classification
     // sweep's: widening it to the Merchant's house listings would add
     // oiled_boots (a recipe result the house sells), and widening to the
-    // delve shop would add ten more (the marks-priced crafted gathering
-    // tools on the drowned_litany stock, thorium_mining_pick through
-    // evergarden_hoe); either way a basis change, not a catalog change,
-    // and it would trip the phase's re-arms-at-nine STOP.
+    // delve shop would add the marks-priced crafted gathering tools on
+    // the drowned_litany stock (thorium_mining_pick through
+    // evergarden_hoe; no count here on purpose, per that file's own
+    // anchor rule); either way a basis change, not a catalog change, and
+    // it would trip the phase's re-arms-at-nine STOP.
     const both = vendorStockedIdsBy(NPCS, (itemId) => RECIPE_RESULT_IDS.has(itemId));
     expect(both).toEqual([
       'lesser_healing_potion',
@@ -578,14 +579,23 @@ describe('the classification is exhaustive over every vendor-stocked consumable'
     // no magnitude axis and exercises that arm alone.
     expect(consumable('elixir_of_the_bear'), 'the elixir arm is alive').toBe(true);
     // Positive control for the PIPELINE, not only the predicate: a
-    // synthetic shop drives the same flatten-and-filter path the real
-    // sweep below rides, so the expect-empty results are a live pipeline
-    // over real absences, not a dead flatten.
+    // synthetic shop drives the WHOLE shared expression (flatten plus
+    // filter) the real delve sweep below rides, so its expect-empty
+    // result is a live pipeline over a real absence, not a dead flatten.
+    // The rejected rows model both real absence shapes: a present
+    // non-consumable def (reliquary_legs, a live delve-shop armor row)
+    // and an id with no def at all.
+    const consumableIn = (shops: Record<string, { itemId: string }[]>) =>
+      shopItemIds(shops).filter(consumable);
     const probeShops = {
-      synthetic_delve: [{ itemId: 'healing_potion' }, { itemId: 'synthetic_sword' }],
+      synthetic_delve: [
+        { itemId: 'healing_potion' },
+        { itemId: 'reliquary_legs' },
+        { itemId: 'synthetic_sword' },
+      ],
     };
-    expect(shopItemIds(probeShops).filter(consumable)).toEqual(['healing_potion']);
-    expect(delveIds.filter(consumable)).toEqual([]);
+    expect(consumableIn(probeShops)).toEqual(['healing_potion']);
+    expect(consumableIn(DELVE_SHOPS)).toEqual([]);
     expect(heroicIds.filter(consumable)).toEqual([]);
   });
 });
