@@ -763,7 +763,8 @@ describe('frozen trigger + renown catalog (design rule 9: never retro-edit a tri
   // and ONE deliberate shipped-trigger change the hash correctly caught:
   // feat_book_complete's meta list gained the FOUR earnable ladder deeds and
   // deliberately did NOT gain the capstone, which took feat: true (unearnable
-  // while three catalog slots stay owner-pended; a non-feat capstone would
+  // while catalog slots stay owner-pended, three then, two since the
+  // masterwrought Phase 11o un-pend; a non-feat capstone would
   // dead-end The Whole Book; see the reachability pin below). No other
   // trigger or renown changed (verified by reconstructing the pre-phase
   // catalog, which reproduces the previous literal exactly).
@@ -1055,8 +1056,9 @@ describe('table shape', () => {
     // keeps its col_ id and Collection shelf beside its ladder, but carries
     // feat: true because it is a dynamic meta over a growing catalog (the
     // feat_book_complete class) and the flag is what keeps it out of
-    // BOOK_COMPLETE_REQUIREMENTS: three catalog slots are owner-pended today
-    // (masterwork:engineering, both pending reins), so a non-feat capstone
+    // BOOK_COMPLETE_REQUIREMENTS: two catalog slots are owner-pended today
+    // (both pending reins; masterwork:engineering was the third until the
+    // masterwrought Phase 11o un-pend), so a non-feat capstone
     // would dead-end The Whole Book for every player. Growing this set is a
     // deliberate design act; prefer the feat_ prefix for anything new.
     const OFF_PREFIX_FEATS = new Set(['col_reliquary_complete']);
@@ -1811,9 +1813,10 @@ describe('the completionist feat', () => {
   });
 
   it('stays reachable: the unearnable Reliquary capstone is OUT, its earnable ladder is IN', () => {
-    // col_reliquary_complete is unearnable while three catalog slots stay
-    // owner-pended (masterwork:engineering, reins_drakemaw_raptor,
-    // reins_terrorspark_groundshaker); as a Book requirement it would
+    // col_reliquary_complete is unearnable while two catalog slots stay
+    // owner-pended (reins_drakemaw_raptor, reins_terrorspark_groundshaker;
+    // masterwork:engineering left the list at the masterwrought Phase 11o
+    // un-pend); as a Book requirement it would
     // dead-end The Whole Book for every player, the exact failure the
     // retroFallbackGrants stranded-heal doctrine names. The feat flag is the
     // exclusion mechanism; this arm reds the moment anyone drops it. The

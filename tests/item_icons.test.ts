@@ -320,10 +320,12 @@ describe('item webp icons', () => {
     // farming PATTERNS its rung climb minted (56 -> 62), and Phase 11i added
     // the angler's endgame's eleven (62 -> 73: three high-band catches, the
     // apex rod, two dishes, the capstone feast and four patterns), and Phase
-    // 11j added the apex hoe (73 -> 74), all under
+    // 11j added the apex hoe (73 -> 74), Phase 11k added its apex feast
+    // tier while retiring two 11i ids (74 -> 78), and Phase 11o added the
+    // engineering on-ramp pair (78 -> 80), all under
     // the same reasoning: their art is scheduled as its own later phase, a
-    // deliberate ART PARK running Phases 11e to 11k. It must fall back to 0 as
-    // that art lands. CORRECTED at the Phase 11e QA: this used to add "all are dormant
+    // deliberate ART PARK running Phases 11e onward (ip-16-ICON). It must
+    // fall back to 0 as that art lands. CORRECTED at the Phase 11e QA: this used to add "all are dormant
     // online (no faucet for any exists yet)", which was already false when it
     // was written (farmer_jessica has stocked the Vale seeds, brook_carrot and
     // the garden hoe since the growth engine shipped) and is doubly false now

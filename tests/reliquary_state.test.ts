@@ -3415,9 +3415,10 @@ describe('Reliquary completion ladder deeds (Phase 18)', () => {
    * the slots named in `skip`. The four on-page ladder titles are never
    * granted directly: the sync under test is their only legitimate writer, so
    * the rig earning them by hand would vacuous-green every assertion below.
-   * masterwork:engineering is granted directly like every other mark: its
-   * live write site is pended (13b QA owner ruling), and direct mark grants
-   * are the sanctioned test route to owned === total.
+   * masterwork:engineering is granted directly like every other mark:
+   * direct mark grants are the sanctioned test route to owned === total
+   * (its live write site has been earnable since the masterwrought Phase
+   * 11o un-pend; the direct grant stays the route regardless).
    */
   function grantWholeCharacterCatalog(sim: Sim, skip: ReadonlySet<string> = new Set()): void {
     const { meta } = primary(sim);

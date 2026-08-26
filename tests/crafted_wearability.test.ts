@@ -151,8 +151,11 @@ describe('crafted wearability: the level-20 shelf is unmoved (masterwrought R5 s
     // apex recipes), a rare-or-better equippable whose source level sits at
     // or past the level cap derives requiredLevel exactly 20. The re-level
     // only ever LOWERED crafted sources below 20, so this whole population
-    // is byte-unmoved; the floor pins the sweep near its live size (266) so
-    // a filter regression cannot quietly empty it.
+    // is byte-unmoved. The membership count is pinned EXACTLY: for a row
+    // with no explicit requiredLevel the gate below is arithmetic on the
+    // same source read as the filter, so a source dropping under 20 would
+    // exit the population instead of redding; the exact count is what makes
+    // a single silent exit loud (re-pin deliberately when content ships).
     const gated = new Set(['rare', 'epic', 'legendary']);
     const shelf = Object.values(ITEMS).filter(
       (d) =>
@@ -160,7 +163,7 @@ describe('crafted wearability: the level-20 shelf is unmoved (masterwrought R5 s
         gated.has(d.quality ?? 'common') &&
         (itemSourceLevel(d.id) ?? 0) >= 20,
     );
-    expect(shelf.length).toBeGreaterThanOrEqual(260);
+    expect(shelf.length).toBe(266);
     for (const def of shelf) {
       expect(requiredLevelFor(def), `${def.id} shelf gate`).toBe(20);
     }

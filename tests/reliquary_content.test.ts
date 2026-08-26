@@ -1884,14 +1884,14 @@ describe('Reliquary Professions shelf (Phase 7)', () => {
 
   it('a masterwork craft is hinted iff it is gear-capable (derived, not ring membership)', () => {
     // Ring membership alone let masterwork:engineering ship an unearnable
-    // hint. Since phase 09 the reason is R1 suppression, not tool-only
-    // output (gyrelens_array is a stats-bearing engineering craft):
-    // craftBonusStatsFor (the SAME gate the proc path consults in
-    // crafting.ts, R1 arm included) returns null for every masterwrought
-    // def, so the mark can never be written while suppression stands.
-    // Deriving gear-capability through that gate reds both drifts: a
-    // tool-only craft gaining a hint, and a craft becoming gear-capable while
-    // its slot still sits pended (QA ruling 2026-08-07).
+    // hint. From phase 09 to masterwrought Phase 11o the reason was R1
+    // suppression, not tool-only output (gyrelens_array is a stats-bearing
+    // engineering craft that craftBonusStatsFor nulls as masterwrought);
+    // the 11o copperlens_ocular then made the craft capable through the
+    // same live gate, which is exactly the drift this arm exists to catch
+    // in BOTH directions: a tool-only craft gaining a hint, and a craft
+    // becoming gear-capable while its slot still sits pended (QA ruling
+    // 2026-08-07; its un-pend condition fired 2026-08-25).
     const page = RELIQUARY_PAGES_BY_ID.professions_masterwork;
     const pendedMarks = new Set(SOURCE_PENDING_RULING.professions_masterwork);
     let gearCapableCount = 0;
@@ -3590,9 +3590,11 @@ describe('Reliquary source hint coverage', () => {
     }
     expect([...actuallyUnhinted].sort()).toEqual([...PENDING_KEYS].sort());
     // Vacuity floor: this suite is worth nothing if almost everything is
-    // excluded. Literal: tighten as rulings land. 368 = 375 slots minus the
-    // four retired vault slots minus the two gap mounts minus the pended
-    // masterwork:engineering. It tracks the slot total, so it moved with the
+    // excluded. Literal: tighten as rulings land. 368 was 375 slots minus
+    // the four retired vault slots minus the two gap mounts minus the then
+    // pended masterwork:engineering; the masterwrought Phase 11o un-pend
+    // hinted that slot, so the live hinted count sits one above the floor.
+    // It tracks the slot total, so it moved with the
     // three daggers the v0.36.0 release merge added, keeping the original slack.
     const hinted = RELIC_SLOTS.length - retiredSlots - actuallyUnhinted.size;
     expect(hinted).toBeGreaterThanOrEqual(368);

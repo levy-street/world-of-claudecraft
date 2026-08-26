@@ -588,7 +588,7 @@ intentional and pinned by a test.
   shipping binary, because the join-time retro pass grants every qualifying
   rank deed in the same session that then feeds the reconcile push.
   - **HOLD the registration of the whole-catalog capstone achievement** until
-    the three unfillable slots above land. The deed is unearnable until then,
+    the two unfillable slots above land. The deed is unearnable until then,
     and a registered impossible achievement is player-visible on both
     storefronts as a permanent 0.0 percent unlock rate.
   - Both mirrors default OFF, so nothing is live until they are enabled.
