@@ -449,10 +449,14 @@ describe('heroic set: class coverage', () => {
 });
 
 describe('item level: crafted gear derives its level from the recipe (content/recipes.ts)', () => {
-  // The three level-20, hub-gated caster pieces (issue #1965 review): budgeted at
-  // ITEM level (recipe level 20 + the rare QUALITY_ILVL_BONUS of 3 = 23), matching
-  // the level-20 rares in the same slots (boundstone_helm, gravewyrm_gauntlets,
-  // gravewyrm_mantle).
+  // The three hub caster pieces (issue #1965 review): STATS budgeted at their
+  // authoring-time ITEM level (recipe level 20 + the rare QUALITY_ILVL_BONUS
+  // of 3 = 23), matching the level-20 rares in the same slots
+  // (boundstone_helm, gravewyrm_gauntlets, gravewyrm_mantle). Since
+  // masterwrought Phase 11o (qr-11o-WEAR) the recipes carry level 17
+  // (cowl, mantle) and 15 (wraps), so the LIVE item levels read 20/20/18 and
+  // the pieces deliberately sit above the derived budget of the new levels:
+  // the re-level moved WHEN they can be worn, never their stats.
   const CASTER_HUB_IDS = ['wardweave_cowl', 'duskhide_wraps', 'sootscale_mantle'];
   const CASTER_COMMON_IDS = [
     'eastbrook_ritual_vestments',
@@ -467,13 +471,25 @@ describe('item level: crafted gear derives its level from the recipe (content/re
     }
   });
 
-  it('the hub caster pieces land at item level 23 and carry their exact stat budget', () => {
+  it('the hub caster pieces land at their re-leveled item levels and keep their authored budgets', () => {
+    // Per id: [live item level, authored stat sum (the ilvl-23 budget), live
+    // derived budget at the new level]. The authored sum sitting ABOVE the
+    // live budget is the 11o design, asserted explicitly so a well-meaning
+    // re-budget to the new level reads as the nerf it would be.
+    const EXPECTED: Record<string, [number, number, number]> = {
+      wardweave_cowl: [20, 11, 10],
+      duskhide_wraps: [18, 9, 7],
+      sootscale_mantle: [20, 10, 8],
+    };
     for (const id of CASTER_HUB_IDS) {
       const item = ITEMS[id];
-      expect(itemLevel(item), `${id} item level`).toBe(23);
-      const budget = expectedStatBudget(item);
-      expect(budget, `${id} has a derivable budget`).not.toBeUndefined();
-      expect(primaryStatSum(item), `${id} stat sum == budget`).toBe(budget);
+      const [level, authoredSum, liveBudget] = EXPECTED[id];
+      expect(itemLevel(item), `${id} item level`).toBe(level);
+      expect(primaryStatSum(item), `${id} authored stat sum`).toBe(authoredSum);
+      expect(expectedStatBudget(item), `${id} live derived budget`).toBe(liveBudget);
+      expect(authoredSum, `${id} stays deliberately over the live budget`).toBeGreaterThan(
+        liveBudget,
+      );
     }
   });
 

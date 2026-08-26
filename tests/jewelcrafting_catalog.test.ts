@@ -25,12 +25,24 @@ import { trainingFeeFor } from '../src/sim/professions/training';
 import type { ItemDef } from '../src/sim/types';
 
 // The cross-craft scaffolding convention (recipes.ts LADDER_RECIPES header):
-// skillReq 0 -> level 10 / budget 10, 25 -> 15/16, 50 -> 20/20.
+// skillReq 0 -> level 10 / budget 10, 25 -> 15/16, 50 -> 20/20 until
+// masterwrought Phase 11o (qr-11o-WEAR) moved every EQUIPPABLE rung-50 output
+// to level 15 so the rare tier is wearable inside the 14-19 band; all three
+// rung-50 jewelry rows are equippable, so the whole rung reads 15 here. The
+// budget field and the authored stats did not move (see AUTHORED_LEVEL_BY_RUNG
+// below).
 const CONVENTION: Record<number, { level: number; itemLevelBudget: number }> = {
   0: { level: 10, itemLevelBudget: 10 },
   25: { level: 15, itemLevelBudget: 16 },
-  50: { level: 20, itemLevelBudget: 20 },
+  50: { level: 15, itemLevelBudget: 20 },
 };
+
+// The level each rung's STATS were budgeted at (the pre-11o convention).
+// Phase 11o moved the rung-50 recipe level without moving stats, so the rare
+// rung deliberately sits above the derived budget of its new item level; the
+// budget arm below pins the authored sum against the formula at THIS level
+// while the item level and expected budget derive from the live recipe level.
+const AUTHORED_LEVEL_BY_RUNG: Record<number, number> = { 0: 10, 25: 15, 50: 20 };
 
 // Quality per rung (the phase 05 ledger deviation): uncommon at BOTH leveling
 // rungs (common quality carries no primary-stat budget and jewelry has no
@@ -229,24 +241,30 @@ describe('jewelcrafting catalog outputs', () => {
     }
   });
 
-  it('every output carries EXACTLY its formula budget, derived at the recipe level', () => {
+  it('every output carries EXACTLY its formula budget, derived at the authoring level', () => {
     let checked = 0;
     for (const recipe of JEWELCRAFTING_RECIPES) {
       const def = output(recipe);
-      // Derive from the FORMULA at the recipe level (recipes register their
-      // output's source level in item_level.buildSourceIndex), never from a
-      // copied stat literal: recipe.level + quality bump through
-      // primaryStatBudget is the independent arm the authored stats must hit.
+      // Derive from the FORMULA at the authoring level (AUTHORED_LEVEL_BY_RUNG
+      // above), never from a copied stat literal: authoring level + quality
+      // bump through primaryStatBudget is the independent arm the authored
+      // stats must hit. Since masterwrought Phase 11o the rung-50 recipe
+      // level sits BELOW the authoring level (wearability moved, stats did
+      // not), so the live item level and expected budget derive from
+      // recipe.level while the stat sum stays pinned at the authoring budget.
       const bonus = QUALITY_ILVL_BONUS[def.quality ?? 'common'];
       expect(bonus, `${def.id} quality bump`).toBeGreaterThan(0);
-      const level = recipe.level + bonus;
-      const formulaBudget = primaryStatBudget(level, def.quality, def.slot);
+      const authoredLevel = AUTHORED_LEVEL_BY_RUNG[recipe.skillReq] + bonus;
+      const formulaBudget = primaryStatBudget(authoredLevel, def.quality, def.slot);
       expect(formulaBudget, `${def.id} formula budget`).toBe(BUDGET_BY_RUNG[recipe.skillReq]);
       expect(primaryStatSum(def), `${def.id} stat sum`).toBe(formulaBudget);
-      // The live source index agrees: the tooltip item level and expected
-      // budget derive the same numbers from the shipped tables.
-      expect(itemLevel(def), `${def.id} item level`).toBe(level);
-      expect(expectedStatBudget(def), `${def.id} expected budget`).toBe(formulaBudget);
+      // The live source index derives from the shipped recipe level: the
+      // tooltip item level and expected budget agree with the live tables.
+      const liveLevel = recipe.level + bonus;
+      expect(itemLevel(def), `${def.id} item level`).toBe(liveLevel);
+      expect(expectedStatBudget(def), `${def.id} expected budget`).toBe(
+        primaryStatBudget(liveLevel, def.quality, def.slot),
+      );
       checked += 1;
     }
     expect(checked).toBe(9);
@@ -295,13 +313,14 @@ describe('jewelcrafting catalog outputs', () => {
   it('derives equip level requirements from the recipe registration (rare gate only)', () => {
     // item_level.buildSourceIndex registers every recipe output at
     // recipe.level, and requiredLevelFor gates rare-and-up from that source:
-    // the three rung-50 rares therefore require character level 20, while the
+    // the three rung-50 rares therefore require character level 15 (the
+    // masterwrought Phase 11o wearability re-level; 20 before it), while the
     // six uncommon pieces stay ungated (leveling greens are never gated).
     // Derived behavior the ledger records as intended; pinned so a recipe
     // level or quality retune surfaces the equip-gate consequence here.
     for (const recipe of JEWELCRAFTING_RECIPES) {
       const def = output(recipe);
-      const expected = def.quality === 'rare' ? 20 : 1;
+      const expected = def.quality === 'rare' ? 15 : 1;
       expect(requiredLevelFor(def), `${def.id} equip level`).toBe(expected);
     }
   });

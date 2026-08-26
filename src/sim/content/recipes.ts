@@ -561,6 +561,12 @@ export const TOOL_EFFECT_RECIPES: ProfessionRecipeRecord[] = [
 // gold-negative (input above output under the recipe_economy rule).
 // skillReq-75 recipes may consume rare-band materials; the plain volume-based
 // shapes were used (the resonant-consumer variant was deliberately not taken).
+// AMENDED 2026-08-25 (masterwrought Phase 11o, qr-11o-WEAR): the three rows
+// shipped level 20, which gated their rare outputs behind character level 20,
+// where the epic shelf obsoletes them on arrival. The two rung-75 rows now
+// carry level 17 (wearable by 18) and the rung-50 wraps carry level 15
+// (wearable by 16, the band its #3520 re-tier already placed it in). Stats
+// are untouched; see the LADDER_RECIPES amendment for the full rule.
 export const CASTER_HUB_RECIPES: ProfessionRecipeRecord[] = [
   {
     id: 'recipe_wardweave_cowl',
@@ -578,7 +584,7 @@ export const CASTER_HUB_RECIPES: ProfessionRecipeRecord[] = [
     ],
     skillReq: 75,
     itemLevelBudget: 20,
-    level: 20,
+    level: 17,
     stationType: 'loom',
   },
   {
@@ -606,7 +612,7 @@ export const CASTER_HUB_RECIPES: ProfessionRecipeRecord[] = [
     // (mirewarden_jerkin/leggings/treads).
     skillReq: 50,
     itemLevelBudget: 20,
-    level: 20,
+    level: 15,
     stationType: 'tannery',
   },
   {
@@ -626,7 +632,7 @@ export const CASTER_HUB_RECIPES: ProfessionRecipeRecord[] = [
     ],
     skillReq: 75,
     itemLevelBudget: 20,
-    level: 20,
+    level: 17,
     stationType: 'forge',
   },
 ];
@@ -713,6 +719,15 @@ export const COMBO_RECIPES: ProfessionRecipeRecord[] = [
 // (skillReq 0 -> 10/10, skillReq 25 -> 16/15, skillReq 50 -> 20/20); the outputs'
 // stats and values were budgeted against real comparables and are authored
 // unchanged in profession_items.ts.
+// AMENDED 2026-08-25 (masterwrought Phase 11o, qr-11o-WEAR): the rung-50
+// convention above now splits by output kind. Every EQUIPPABLE rung-50 output
+// carries level 15 (budget field unchanged at 20), so the crafted rares derive
+// requiredLevel 15 and are wearable inside the 14-19 band their stats compete
+// in; consumable rung-50 outputs keep level 20 (their pacing was tuned
+// elsewhere). Stats stay authored at the original budget on purpose: the fix
+// moves WHEN the gear can be worn, never how strong it is, so these pieces
+// deliberately sit above the derived budget of their new item level.
+// tests/crafted_wearability.test.ts pins the windows and the skip list.
 export const LADDER_RECIPES: ProfessionRecipeRecord[] = [
   // --- weaponcrafting ------------------------------------------------------
   {
@@ -828,7 +843,7 @@ export const LADDER_RECIPES: ProfessionRecipeRecord[] = [
     ],
     skillReq: 50,
     itemLevelBudget: 20,
-    level: 20,
+    level: 15,
     acquisition: ['trainer'],
     stationType: 'forge',
   },
@@ -845,7 +860,7 @@ export const LADDER_RECIPES: ProfessionRecipeRecord[] = [
     ],
     skillReq: 50,
     itemLevelBudget: 20,
-    level: 20,
+    level: 15,
     acquisition: ['trainer'],
     stationType: 'forge',
   },
@@ -862,7 +877,7 @@ export const LADDER_RECIPES: ProfessionRecipeRecord[] = [
     ],
     skillReq: 50,
     itemLevelBudget: 20,
-    level: 20,
+    level: 15,
     acquisition: ['trainer'],
     stationType: 'forge',
   },
@@ -976,7 +991,7 @@ export const LADDER_RECIPES: ProfessionRecipeRecord[] = [
     ],
     skillReq: 50,
     itemLevelBudget: 20,
-    level: 20,
+    level: 15,
     acquisition: ['trainer'],
     stationType: 'forge',
   },
@@ -993,7 +1008,7 @@ export const LADDER_RECIPES: ProfessionRecipeRecord[] = [
     ],
     skillReq: 50,
     itemLevelBudget: 20,
-    level: 20,
+    level: 15,
     acquisition: ['trainer'],
     stationType: 'forge',
   },
@@ -1010,7 +1025,7 @@ export const LADDER_RECIPES: ProfessionRecipeRecord[] = [
     ],
     skillReq: 50,
     itemLevelBudget: 20,
-    level: 20,
+    level: 15,
     acquisition: ['trainer'],
     stationType: 'forge',
   },
@@ -1123,7 +1138,7 @@ export const LADDER_RECIPES: ProfessionRecipeRecord[] = [
     ],
     skillReq: 50,
     itemLevelBudget: 20,
-    level: 20,
+    level: 15,
     acquisition: ['trainer'],
     stationType: 'loom',
   },
@@ -1139,7 +1154,7 @@ export const LADDER_RECIPES: ProfessionRecipeRecord[] = [
     ],
     skillReq: 50,
     itemLevelBudget: 20,
-    level: 20,
+    level: 15,
     acquisition: ['trainer'],
     stationType: 'loom',
   },
@@ -1156,7 +1171,7 @@ export const LADDER_RECIPES: ProfessionRecipeRecord[] = [
     ],
     skillReq: 50,
     itemLevelBudget: 20,
-    level: 20,
+    level: 15,
     acquisition: ['trainer'],
     stationType: 'loom',
   },
@@ -1269,7 +1284,7 @@ export const LADDER_RECIPES: ProfessionRecipeRecord[] = [
     ],
     skillReq: 50,
     itemLevelBudget: 20,
-    level: 20,
+    level: 15,
     acquisition: ['trainer'],
     stationType: 'tannery',
   },
@@ -1285,7 +1300,7 @@ export const LADDER_RECIPES: ProfessionRecipeRecord[] = [
     ],
     skillReq: 50,
     itemLevelBudget: 20,
-    level: 20,
+    level: 15,
     acquisition: ['trainer'],
     stationType: 'tannery',
   },
@@ -1309,7 +1324,7 @@ export const LADDER_RECIPES: ProfessionRecipeRecord[] = [
     ],
     skillReq: 50,
     itemLevelBudget: 20,
-    level: 20,
+    level: 15,
     acquisition: ['trainer'],
     stationType: 'tannery',
   },
@@ -1702,8 +1717,11 @@ export const LADDER_RECIPES: ProfessionRecipeRecord[] = [
 //   list mining-plus-disenchant rather than crossing into the
 //   enchant-exclusive resonant secondaries.
 // - Scaffolding follows the cross-craft convention above (skillReq 0 -> 10/10,
-//   25 -> 16/15, 50 -> 20/20); acquisition is ['trainer'] on every record (the
-//   grandfather list is frozen). Every reagent list is authored gold-negative
+//   25 -> 16/15, 50 -> 20/20; since masterwrought Phase 11o the equippable
+//   rung-50 rows carry level 15, see the LADDER_RECIPES amendment, and all
+//   three rung-50 jewelry rows are equippable); acquisition is ['trainer'] on
+//   every record (the grandfather list is frozen). Every reagent list is
+//   authored gold-negative
 //   under the recipe_economy rule, and every rung keeps at least one
 //   no-buyValue reagent (the ores/dust/essence) so no record joins the
 //   counterfactually-vendor-fed set.
@@ -1828,7 +1846,7 @@ export const JEWELCRAFTING_RECIPES: ProfessionRecipeRecord[] = [
     ],
     skillReq: 50,
     itemLevelBudget: 20,
-    level: 20,
+    level: 15,
     acquisition: ['trainer'],
     stationType: 'forge',
   },
@@ -1846,7 +1864,7 @@ export const JEWELCRAFTING_RECIPES: ProfessionRecipeRecord[] = [
     ],
     skillReq: 50,
     itemLevelBudget: 20,
-    level: 20,
+    level: 15,
     acquisition: ['trainer'],
     stationType: 'forge',
   },
@@ -1864,7 +1882,7 @@ export const JEWELCRAFTING_RECIPES: ProfessionRecipeRecord[] = [
     ],
     skillReq: 50,
     itemLevelBudget: 20,
-    level: 20,
+    level: 15,
     acquisition: ['trainer'],
     stationType: 'forge',
   },
@@ -1896,8 +1914,10 @@ export const JEWELCRAFTING_RECIPES: ProfessionRecipeRecord[] = [
 //   consumption pool via materialGradeIds; the disjointness invariant in
 //   tests/material_grades.test.ts pins it).
 // - Scaffolding follows the cross-craft convention above (skillReq 0 -> 10/10,
-//   25 -> 16/15, 50 -> 20/20); acquisition is ['trainer'] on every record.
-//   Every reagent list is authored gold-negative under the recipe_economy
+//   25 -> 16/15, 50 -> 20/20; since masterwrought Phase 11o the equippable
+//   rung-50 grimoire carries level 15 while the consumable scroll keeps 20,
+//   see the LADDER_RECIPES amendment); acquisition is ['trainer'] on every
+//   record. Every reagent list is authored gold-negative under the recipe_economy
 //   rule, and every rung keeps at least one no-buyValue reagent (the
 //   dust/essence ink lines) so no record joins the counterfactually-
 //   vendor-fed set.
@@ -1984,7 +2004,7 @@ export const INSCRIPTION_RECIPES: ProfessionRecipeRecord[] = [
     ],
     skillReq: 50,
     itemLevelBudget: 20,
-    level: 20,
+    level: 15,
     acquisition: ['trainer'],
     stationType: 'apothecary',
   },
@@ -2028,8 +2048,10 @@ export const INSCRIPTION_RECIPES: ProfessionRecipeRecord[] = [
 //   six-craft shape is pinned as the Professions 2.0 ladder
 //   (tests/ladder_crafting.test.ts), the jewelcrafting/inscription precedent.
 // - Scaffolding is the shipped 75-band convention (skillReq 75,
-//   itemLevelBudget 20, level 20: CASTER_HUB_RECIPES, the 75-skill
-//   TOOL_RECIPES, recipe_stormreel_fishing_rod); acquisition ['trainer'] on
+//   itemLevelBudget 20, level 20: the 75-skill TOOL_RECIPES,
+//   recipe_stormreel_fishing_rod; CASTER_HUB_RECIPES was the third exemplar
+//   until masterwrought Phase 11o moved its equippable outputs to level 17,
+//   which does not touch these junk-output rows); acquisition ['trainer'] on
 //   every record (the grandfather list is frozen), tier-3 teaches at the
 //   crafts' own stations. The three station-less crafts bind a foreign
 //   station per record, the recipe's teaching home: jewelcrafting 'forge'

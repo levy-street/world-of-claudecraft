@@ -29,12 +29,26 @@ import { trainingFeeFor } from '../src/sim/professions/training';
 import type { ItemDef } from '../src/sim/types';
 
 // The cross-craft scaffolding convention (recipes.ts LADDER_RECIPES header):
-// skillReq 0 -> level 10 / budget 10, 25 -> 15/16, 50 -> 20/20.
+// skillReq 0 -> level 10 / budget 10, 25 -> 15/16, 50 -> 20/20. Since
+// masterwrought Phase 11o (qr-11o-WEAR) the rung-50 convention splits by
+// output kind: the EQUIPPABLE tome carries level 15 (wearable inside the
+// 14-19 band) while the consumable scroll keeps 20; TOME_LEVEL_BY_RUNG below
+// carries the equippable side. Budgets and authored stats did not move (see
+// AUTHORED_LEVEL_BY_RUNG).
 const CONVENTION: Record<number, { level: number; itemLevelBudget: number }> = {
   0: { level: 10, itemLevelBudget: 10 },
   25: { level: 15, itemLevelBudget: 16 },
   50: { level: 20, itemLevelBudget: 20 },
 };
+
+// The recipe level per TOME rung (the 11o wearability re-level applies to
+// equippable outputs only).
+const TOME_LEVEL_BY_RUNG: Record<number, number> = { 0: 10, 25: 15, 50: 15 };
+
+// The level each tome rung's STATS were budgeted at (the pre-11o convention):
+// Phase 11o moved the rung-50 recipe level without moving stats, so the rare
+// tome deliberately sits above the derived budget of its new item level.
+const AUTHORED_LEVEL_BY_RUNG: Record<number, number> = { 0: 10, 25: 15, 50: 20 };
 
 // TOME quality per rung (the phase 06 ledger's extension of the approved
 // phase 05 deviation): uncommon at BOTH leveling rungs (common quality
@@ -134,7 +148,10 @@ describe('inscription catalog shape', () => {
     for (const recipe of INSCRIPTION_RECIPES) {
       const convention = CONVENTION[recipe.skillReq];
       expect(convention, `${recipe.id} rung ${recipe.skillReq}`).toBeDefined();
-      expect(recipe.level, `${recipe.id} level`).toBe(convention.level);
+      const expectedLevel = TOME_IDS.has(recipe.resultItemId)
+        ? TOME_LEVEL_BY_RUNG[recipe.skillReq]
+        : convention.level;
+      expect(recipe.level, `${recipe.id} level`).toBe(expectedLevel);
       expect(recipe.itemLevelBudget, `${recipe.id} budget`).toBe(convention.itemLevelBudget);
       const defs = byRung.get(recipe.skillReq) ?? [];
       defs.push(output(recipe));
@@ -267,19 +284,26 @@ describe('inscription catalog outputs', () => {
     expect(CASTER_ALL).toEqual(['mage', 'priest', 'warlock', 'shaman', 'paladin', 'druid']);
   });
 
-  it('every tome carries EXACTLY its formula budget, derived at the recipe level', () => {
+  it('every tome carries EXACTLY its formula budget, derived at the authoring level', () => {
     let checked = 0;
     for (const recipe of INSCRIPTION_RECIPES) {
       const def = output(recipe);
       if (!TOME_IDS.has(def.id)) continue;
+      // The authored stats hit the formula at the authoring level; since
+      // masterwrought Phase 11o the rung-50 recipe level sits below it
+      // (wearability moved, stats did not), so the live item level and
+      // expected budget derive from recipe.level separately.
       const bonus = QUALITY_ILVL_BONUS[def.quality ?? 'common'];
       expect(bonus, `${def.id} quality bump`).toBeGreaterThan(0);
-      const level = recipe.level + bonus;
-      const formulaBudget = primaryStatBudget(level, def.quality, def.slot);
+      const authoredLevel = AUTHORED_LEVEL_BY_RUNG[recipe.skillReq] + bonus;
+      const formulaBudget = primaryStatBudget(authoredLevel, def.quality, def.slot);
       expect(formulaBudget, `${def.id} formula budget`).toBe(TOME_BUDGET_BY_RUNG[recipe.skillReq]);
       expect(primaryStatSum(def), `${def.id} authored stats`).toBe(formulaBudget);
-      expect(itemLevel(def), `${def.id} item level`).toBe(level);
-      expect(expectedStatBudget(def), `${def.id} live source index`).toBe(formulaBudget);
+      const liveLevel = recipe.level + bonus;
+      expect(itemLevel(def), `${def.id} item level`).toBe(liveLevel);
+      expect(expectedStatBudget(def), `${def.id} live source index`).toBe(
+        primaryStatBudget(liveLevel, def.quality, def.slot),
+      );
       checked += 1;
     }
     expect(checked).toBe(3);
@@ -322,8 +346,9 @@ describe('inscription catalog outputs', () => {
       const def = output(recipe);
       if (TOME_IDS.has(def.id)) {
         // The jewelcrafting arm exactly: rare-and-up gates at the registered
-        // recipe level, leveling greens stay ungated.
-        const expected = def.quality === 'rare' ? 20 : 1;
+        // recipe level (15 since the masterwrought Phase 11o re-level),
+        // leveling greens stay ungated.
+        const expected = def.quality === 'rare' ? 15 : 1;
         expect(requiredLevelFor(def), `${def.id} equip level`).toBe(expected);
       } else {
         // A scroll is consumed, not equipped, and nothing gates USE on this

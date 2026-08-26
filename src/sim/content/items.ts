@@ -2256,12 +2256,17 @@ export const BASE_ITEMS: Record<string, ItemDef> = {
     sellValue: 105,
     buyValue: 2200,
   },
-  // Hub-tier (level-20, crafting-hub-gated) caster pieces, one per craft,
-  // mirroring TOOL_RECIPES' osmium tier. Budgeted at the recipe's resulting ITEM
-  // level (source level 20 + the rare QUALITY_ILVL_BONUS of 3 = 23, see
-  // item_budget.ts and item_level.ts), matching the level-20 rares in the same
-  // slots (boundstone_helm, gravewyrm_gauntlets, gravewyrm_mantle; pinned by
+  // Hub-tier caster pieces, one per craft, mirroring TOOL_RECIPES' osmium
+  // tier. Budgeted at authoring (2026 pre-11o) against ITEM level 23 (the then
+  // recipe level 20 + the rare QUALITY_ILVL_BONUS of 3, see item_budget.ts and
+  // item_level.ts), matching the level-20 rares in the same slots
+  // (boundstone_helm, gravewyrm_gauntlets, gravewyrm_mantle; pinned by
   // tests/item_level.test.ts): helmet 11, gloves 9, shoulder 10.
+  // AMENDED 2026-08-25 (masterwrought Phase 11o, qr-11o-WEAR): the recipes now
+  // carry level 17 (cowl, mantle) and 15 (wraps), so the derived item levels
+  // read 20/20/18 and the gates 17/17/15, while these stats stay authored at
+  // the original ilvl-23 budget. The over-budget is the point: crafted rares
+  // top the 14-19 band tables instead of arriving pre-obsolete at 20.
   wardweave_cowl: {
     id: 'wardweave_cowl',
     name: 'Wardweave Cowl',

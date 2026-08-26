@@ -263,7 +263,10 @@ export const PROFESSION_ITEMS: Record<string, ItemDef> = {
   // All mail. Armor and primary stats sit on the repo budget formula
   // (src/sim/item_budget.ts) per the ladder design notes; common-rung pieces
   // are armor-only (common quality carries no primary-stat budget). Never
-  // vendor-stocked, sellValue below summed reagent value.
+  // vendor-stocked, sellValue below summed reagent value. Since masterwrought
+  // Phase 11o the rare rung-50 pieces keep these authored ilvl-23 budgets over
+  // a level-15 recipe (derived ilvl 18), deliberately over-budget: see the
+  // LADDER_RECIPES amendment in content/recipes.ts.
   riveted_copper_girdle: {
     id: 'riveted_copper_girdle',
     name: 'Riveted Copper Girdle',
@@ -361,7 +364,9 @@ export const PROFESSION_ITEMS: Record<string, ItemDef> = {
   // plus one bag upgrade; common-rung pieces are armor-only (common quality
   // carries no primary-stat budget). Never vendor-stocked (no buyValue), and
   // every crafted output's sellValue clears strictly below its summed reagent
-  // value per the economy invariant. Budgets read from src/sim/item_budget.ts.
+  // value per the economy invariant. Budgets read from src/sim/item_budget.ts;
+  // since masterwrought Phase 11o the rare rung-50 pieces keep their authored
+  // ilvl-23 budgets over a level-15 recipe (see the LADDER_RECIPES amendment).
   homespun_hood: {
     id: 'homespun_hood',
     name: 'Homespun Hood',
@@ -456,7 +461,9 @@ export const PROFESSION_ITEMS: Record<string, ItemDef> = {
   // tannery-bound at tanner_hesk. Agi/sta melee leather, complementing the
   // existing int/spi leather pieces. Common-rung pieces are armor-only. Never
   // vendor-stocked, sellValue below summed reagent value; budgets read from
-  // src/sim/item_budget.ts.
+  // src/sim/item_budget.ts (the rare rung-50 pieces keep their authored
+  // ilvl-23 budgets over a level-15 recipe since masterwrought Phase 11o, see
+  // the LADDER_RECIPES amendment).
   fenbridge_hide_leggings: {
     id: 'fenbridge_hide_leggings',
     name: 'Fenbridge Hide Leggings',
@@ -1158,7 +1165,10 @@ export const PROFESSION_ITEMS: Record<string, ItemDef> = {
   // No armorType (every class wears jewelry) and no combat rating of any kind:
   // ratings are jewelry's ENDGAME identity (heroic_vendor.ts), and the base
   // rungs stay rating-free per ruling R14. Stats sit exactly on the repo
-  // budget formula (src/sim/item_budget.ts). Never vendor-stocked (no
+  // budget formula (src/sim/item_budget.ts) at their authoring-time item
+  // levels; since masterwrought Phase 11o the rare rung-50 pieces keep those
+  // ilvl-23 budgets over a level-15 recipe (see the LADDER_RECIPES
+  // amendment). Never vendor-stocked (no
   // buyValue), and every output's sellValue clears strictly below its summed
   // reagent value per the economy invariant. Display names follow the Osmium
   // register (the thorium_* ids display "Osmium", the originality-sweep
@@ -1254,7 +1264,10 @@ export const PROFESSION_ITEMS: Record<string, ItemDef> = {
   // for the jewelry ladder's reason: common quality carries no primary-stat
   // budget and held_offhand has no armor axis, so a common tome would carry
   // literally nothing. Stats sit exactly on the repo budget formula
-  // (src/sim/item_budget.ts, held line 0.75). Zero combat ratings per ruling
+  // (src/sim/item_budget.ts, held line 0.75) at their authoring-time item
+  // levels; since masterwrought Phase 11o the rare rung-50 grimoire keeps its
+  // ilvl-23 budget over a level-15 recipe (see the LADDER_RECIPES amendment).
+  // Zero combat ratings per ruling
   // R14. SCROLLS are the ALTERNATIVE SOURCE of the battle-elixir stamina
   // family (R14 corollary): each rung carries the SAME aura name, value, and
   // duration as its band's elixir, so either source grants the

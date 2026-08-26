@@ -369,15 +369,16 @@ describe('masterwork stays strictly below the raid-loot band (acceptance bound)'
 
   it('pins the concrete numbers for a hub rare-def recipe and a common-band recipe (drift tripwires)', () => {
     // Even if no content change ever crosses the bound, these two literal rows
-    // trip on any budget/tuning drift. wardweave_cowl: rare helmet, band 20,
-    // def sum 11 plus the baked epic-minus-rare delta 2 at level 20, against
-    // raid floor primaryStatBudget(20 + 6 + 3, 'epic', 'helmet') = 17
-    // (margin 4). eastbrook_ritual_vestments: uncommon chest, band 9, def sum
+    // trip on any budget/tuning drift. wardweave_cowl: rare helmet, band 17
+    // since the masterwrought Phase 11o re-level (20 before it), def sum 11
+    // plus the baked epic-minus-rare delta 2 at level 17, against raid floor
+    // primaryStatBudget(17 + 6 + 3, 'epic', 'helmet') = 15 (margin 2).
+    // eastbrook_ritual_vestments: uncommon chest, band 9, def sum
     // 3 plus delta 2, against primaryStatBudget(9 + 3 + 3, 'rare', 'chest')
     // = 8 (margin 3).
     const cowl = boundRow(recipeById('recipe_wardweave_cowl')!, 1);
     expect(cowl.total).toBe(13);
-    expect(cowl.floor).toBe(17);
+    expect(cowl.floor).toBe(15);
     const vestments = boundRow(recipeById('recipe_eastbrook_ritual_vestments')!, 1);
     expect(vestments.total).toBe(5);
     expect(vestments.floor).toBe(8);
