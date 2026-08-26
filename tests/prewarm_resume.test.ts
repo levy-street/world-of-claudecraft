@@ -539,6 +539,16 @@ describe('resumeDroppedPrewarmEntries', () => {
     expect(unitsSlice).toContain('compileShadow: (root) => this.compileShadowPrograms(root)');
     expect(compileUnitsSource).toContain('await options.compileColor(root)');
     expect(compileUnitsSource).toContain('await options.compileShadow(root)');
+    // ...and the lane ends where the live gates and the reveal host end: the
+    // piece settle over every program variant, then the per-program touch tail.
+    // Without it every boot-linked program paid the driver's uniform-table
+    // round trip at its FIRST LIVE DRAW (shader-program audit F15).
+    expect(unitsSlice).toContain(
+      'tail: entryCompileTail(this.webgl, this.prewarmDepthMaterials, this.backgroundGpuWork)',
+    );
+    expect(compileUnitsSource).toContain(
+      'if (options.tail) await runInitialSceneCompileTail(options.tail, root)',
+    );
     expect(compileEntry).not.toContain('compileAsync(this.scene');
     // The resume lane specifically must never race a scene-wide compileAsync
     // call away (the old bug this pin guards): resuming already-submitted

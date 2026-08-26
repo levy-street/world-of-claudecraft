@@ -233,9 +233,12 @@ NEW subsystem's warm-up must land as a manifest entry, in the right lane:
   the old ADMISSION only (every unit admitted at once, the ledger still
   learning); the reveal-gate policy has no legacy arm and keeps revealing
   piecewise under its soft deadline whatever that flag says. The touch tail runs as one budgeted queue
-  unit PER PROGRAM (`linked_program_touch_lane.ts`) on the live gates AND on the
-  reveal host, which previously ended at the shadow arm and left streamed decor
-  paying the uniform-table round trip on its reveal draw. Its readiness comes
+  unit PER PROGRAM (`linked_program_touch_lane.ts`) on the live gates, on the
+  reveal host, and on the world-entry compile lane. Each of those three once
+  ended at the shadow arm and left its programs paying the uniform-table round
+  trip on their first live draw; the boot lane opts in through the `tail` of
+  `initial_scene_compile_units.ts`, whose `entryCompileTail` binds the same
+  settle and touch arms the gates use. Its readiness comes
   from the SETTLE and never from a driver query: a settled gate records its
   target's current programs in `linked_program_readiness.ts` and the walk reads
   that record, because three latches `programReady` false after one missed poll,

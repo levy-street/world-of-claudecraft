@@ -359,7 +359,7 @@ import { type IceBlockVisual, syncIceBlockVisual } from './ice_block_visual';
 import { idleSlot } from './idle_queue';
 import { buildImpactSite, buildImpactSitePrewarmGroup, type ImpactSiteView } from './impact_site';
 import { deferredPassArms, initialFrameDeferral, type LinkDebt } from './initial_frame_core';
-import { buildInitialSceneCompileUnits } from './initial_scene_compile_units';
+import { buildInitialSceneCompileUnits, entryCompileTail } from './initial_scene_compile_units';
 import {
   collectInitialPresentationTextures,
   InitialSceneTextureAdmission,
@@ -5904,23 +5904,23 @@ export class Renderer {
         compileColor: (root) => this.compilePrewarmColorPrograms(root, false),
         compileShadow: (root) => this.compileShadowPrograms(root),
         onCompiledRoot: () => compiledPrewarmRoots++,
+        tail: entryCompileTail(this.webgl, this.prewarmDepthMaterials, this.backgroundGpuWork),
       });
       for (const unit of units) compileLifecycle.recordFor(unit, lifecycleLane);
       return units;
     };
 
-    // Early compile submission: compileAsync links settle off-thread, so the
-    // sooner a unit is SUBMITTED the more of its link time overlaps the other
-    // manifest entries (surface-detail plus textures.scene alone are ~4.5 s of
-    // uploads on the reference desktop). 'programs.compile-submit' fires every
-    // visible-scene units right after they exist; hidden staged catalogs are
-    // classified as post-paint debt and retain their stand-ins. The final
-    // compile entry submits the visible remainder and then awaits it so
-    // all of their programs are READY before world.initial-frame renders; a
-    // program not ready by then links synchronously inside that frame, the
-    // measured first-draw stall class. Which groups each call collects is the
-    // pure planCompileSubmission (prewarm_policy.ts); the submit LOOP, its
-    // deadline rule and its never-drop contract are
+    // Early compile submission: compileAsync links settle off-thread, so the sooner
+    // a unit is SUBMITTED the more of its link time overlaps the other manifest
+    // entries (surface-detail plus textures.scene alone are ~4.5 s of uploads on the
+    // reference desktop). 'programs.compile-submit' fires every visible-scene unit
+    // right after it exists; hidden staged catalogs are classified as post-paint
+    // debt and retain their stand-ins. The final compile entry submits the visible
+    // remainder and then awaits it so all of their programs are READY before
+    // world.initial-frame renders; a program not ready by then links synchronously
+    // inside that frame, the measured first-draw stall class. Which groups each call
+    // collects is the pure planCompileSubmission (prewarm_policy.ts); the submit
+    // LOOP, its deadline rule and its never-drop contract are
     // runPrewarmCompileSubmission (prewarm_compile_submission_core.ts).
     const submittedCompileUnits: { id: string; done: Promise<void> }[] = [];
     const submittedCompileGroups = new Set<string>();
