@@ -60,7 +60,7 @@ import { ENCHANTS, type EnchantDef } from '../content/enchants';
 import { ENCHANT_FAMILY_CAST_DURATION_SEC } from '../content/professions';
 import { ITEMS } from '../data';
 import { recalcPlayerStats } from '../entity';
-import { consumeSelectedInventorySlot, itemCopyPin } from '../item_copy_ref';
+import { consumeSelectedInventorySlot, itemCopyPin, newestMatchingSlot } from '../item_copy_ref';
 import { requiredLevelFor } from '../item_level_req';
 import { forceDismount } from '../mounts';
 import type { Rng } from '../rng';
@@ -725,21 +725,20 @@ export interface ApplyEnchantResult {
 
 /** Does this player hold a copy of `itemId` the Perfected guard would accept?
  *  With `slot` named it is the worn copy in that exact equipment slot; without
- *  one it is any bagged copy carrying the marker.
+ *  one it is the exact bagged copy an id-only apply would consume.
  *
- *  The bagged arm answers about the HOLDING, not about the one copy the apply
- *  would consume, and that is a phase 12 obligation rather than an accident:
- *  the guard runs before the arm split (so the refusal is stable whatever the
- *  slot), and while nothing mints `perfected` both readings refuse identically.
- *  When phase 12 starts stamping copies, this has to narrow to the victim the
- *  apply actually spends (the item_copy_ref pin discipline the disenchant path
- *  already follows), or a player holding one Perfected copy could spend an
- *  ordinary one. Exported for that phase's tests. */
+ *  The bagged arm is NARROWED (phase 12, the obligation the pre-minting
+ *  version of this doc recorded): it peeks through newestMatchingSlot, the
+ *  non-consuming twin of the newest-first walk every id-only remover in this
+ *  repo uses, never a holding scan, so one Perfected copy can no longer
+ *  license spending an ordinary one (a `.some()` over the bags would accept
+ *  while the apply consumed the newest, unstamped copy). Exported for the
+ *  guard tests. */
 export function holdsPerfectedTarget(meta: PlayerMeta, itemId: string, slot?: EquipSlot): boolean {
   if (slot) {
     return meta.equipment[slot] === itemId && meta.equipmentInstance?.[slot]?.perfected === true;
   }
-  return meta.inventory.some((s) => s.itemId === itemId && s.instance?.perfected === true);
+  return newestMatchingSlot(meta.inventory, itemId)?.instance?.perfected === true;
 }
 
 /** The exact instance payload an apply-enchant mints from the copy it

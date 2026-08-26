@@ -40,6 +40,7 @@ import {
   materialTierBonusForReagents,
   materialTierForItem,
 } from '../src/sim/professions/material_tier';
+import { PERFECTING_HEADSTART_RANK } from '../src/sim/professions/perfecting';
 import { type StationType, stationsOfType } from '../src/sim/professions/stations';
 import type { ProfessionRecipeRecord } from '../src/sim/professions/types';
 import type { Rng } from '../src/sim/rng';
@@ -951,13 +952,12 @@ describe('material-tier masterwork feed (material_tier.ts)', () => {
   });
 });
 
-describe('R1: the masterwork proc never mints a quality bump on an APEX craft', () => {
-  // The ruling: on a masterwrought output the craft-time proc grants a
-  // Perfecting head start (phase 12) INSTEAD OF a quality bump; the epic to
-  // legendary stat cliff is exactly what fork B exists to avoid, so phase 08
-  // ships the suppression the moment the first epic slotted crafted outputs
-  // exist. The roll is FORCED to 0 (below every reachable chance) so the
-  // suppression is the only thing standing between the proc and the bump,
+describe('R1: the masterwork proc on an APEX craft grants a head start, never a quality bump', () => {
+  // The ruling, as built since phase 12: on a masterwrought output the
+  // craft-time proc grants a Perfecting head start INSTEAD OF a quality bump
+  // (the epic to legendary stat cliff is exactly what fork B exists to
+  // avoid). The roll is FORCED to 0 (below every reachable chance) so the
+  // head-start arm is the only thing standing between the proc and the bump,
   // and the control arm proves the forcing genuinely forces.
   const craftForced = (recipeId: string, activeArchetype: string | null) => {
     const sim = new Sim({ seed: 7, playerClass: 'warrior', autoEquip: false });
@@ -992,18 +992,25 @@ describe('R1: the masterwork proc never mints a quality bump on an APEX craft', 
     return { meta, result: { ...(sim as any).lastCraftResult }, draws: () => draws };
   };
 
-  it('a forced proc on a masterwrought output grants a plain signed copy, never a bump', () => {
+  it('a forced proc on a masterwrought output mints the head start, never a bump', () => {
     const apex = craftForced('recipe_spiritweld_girdle', 'armorcrafting');
     expect(apex.result.ok).toBe(true);
-    expect(apex.result.masterwork).toBeUndefined();
-    expect(apex.draws(), 'exactly one draw on the suppressed apex craft').toBe(1);
+    // The proc EFFECT applied (R1's replacement effect), so the result says
+    // masterwork:true and the deed/announce arms downstream fire; what the
+    // apex path never mints is the quality bump's rolled record.
+    expect(apex.result.masterwork).toBe(true);
+    expect(apex.draws(), 'exactly one draw on the apex craft').toBe(1);
     const slot = apex.meta.inventory.find(
       (s: { itemId: string }) => s.itemId === 'spiritweld_girdle',
     );
     expect(slot, 'the apex piece was granted').toBeTruthy();
-    // Epic def quality still signs the instance (#1149); the R1 guard only
-    // removes the rolled masterwork record.
+    // Epic def quality still signs the instance (#1149); the head start rides
+    // the Perfecting track field at the literal rank 1
+    // (PERFECTING_HEADSTART_RANK), with NO rolled record baked.
     expect(slot.instance?.signer).toBeTruthy();
+    expect(slot.instance?.perfecting).toBe(1);
+    expect(slot.instance?.perfecting).toBe(PERFECTING_HEADSTART_RANK);
+    expect(slot.instance?.perfected).toBeUndefined();
     expect(slot.instance?.rolled).toBeUndefined();
   });
 

@@ -1,27 +1,27 @@
 // The Masterwrought phase 10 Lucent Infusion guard: the one requiresPerfected
 // enchant in the table, plus the skill gates the whole Lucent tier introduced.
 //
-// The claim this file exists to hold is a REFUSAL over the entire live
-// catalog: nothing in the game mints ItemInstancePayload.perfected until phase
-// 12, so holdsPerfectedTarget answers false for every copy a player can hold
-// today, and the Infusion is therefore unreachable BY CONSTRUCTION rather than
-// by being hidden from the picker. The sweep below drives every merged item id
-// through the real grant path (a bagged copy is really held before the guard is
-// read, so a refusal can never be confused with an absence), and the
-// hand-stamped arm is the phase 12 flip direction: stamp the marker and the
-// same call goes through, spending exactly the authored bill.
-//
-// The deny ladder's ORDER is pinned too, all three pairwise ways
-// (not_perfected before wrong_slot, and each of those before
-// insufficient_skill), at BOTH twins: the resolver and the cast-start
-// admission mirror. Both twins are checked separately, because a gate present
-// in one and missing in the other is exactly the shape that lets a refused
-// enchant buy a cast bar. Every refusal arm is also checked for zero rng draws
-// behind a positive control, so a mis-wired observer cannot make those zeros
-// vacuous. The picker mirror (src/ui/enchant_apply_view.ts) is pinned in
+// Since phase 12 the game MINTS ItemInstancePayload.perfected (the Perfecting
+// rank walk, src/sim/professions/perfecting.ts; the pre-minting version of
+// this file carried a source-scan tripwire against any mint, deleted in the
+// same change that minted). The claims this file holds now:
+//   - a PLAIN granted copy never reads as Perfected: the whole-catalog sweep
+//     drives every merged item id through the real grant path (a bagged copy
+//     is really held before the guard is read, so a refusal can never be
+//     confused with an absence), and only the hand-stamped control flips it;
+//   - the bagged arm is NARROWED to the exact copy an id-only apply would
+//     consume (newestMatchingSlot, the phase 12 obligation the phase 10 doc
+//     recorded), so one Perfected copy can no longer license spending an
+//     ordinary one;
+//   - the deny ladder's ORDER, all three pairwise ways (not_perfected before
+//     wrong_slot, and each of those before insufficient_skill), at BOTH
+//     twins: the resolver and the cast-start admission mirror (a gate present
+//     in one and missing in the other is exactly the shape that lets a
+//     refused enchant buy a cast bar);
+//   - every refusal arm draws zero rng, behind a positive control, so a
+//     mis-wired observer cannot make those zeros vacuous.
+// The picker mirror (src/ui/enchant_apply_view.ts) is pinned in
 // tests/enchant_apply_view.test.ts and deliberately not repeated here.
-import { readFileSync } from 'node:fs';
-import { fileURLToPath } from 'node:url';
 import { describe, expect, it } from 'vitest';
 import { ENCHANTS } from '../src/sim/content/enchants';
 import { ITEMS } from '../src/sim/data';
@@ -33,8 +33,6 @@ import {
 import { type PlayerMeta, Sim } from '../src/sim/sim';
 import type { Entity, SimEvent } from '../src/sim/types';
 import { runApplyEnchant, runDisenchant } from './helpers/enchant_family_cast';
-import { expectScansOnlyThroughSharedWalkers } from './helpers/scan_guard_self_audit';
-import { tsFilesUnder } from './helpers/ts_files_under';
 import { EMPTY_TEST_WORLD } from './sim_shared';
 
 const INFUSION = 'enchant_lucent_infusion'; // chest, requiresPerfected, skillReq 125
@@ -90,7 +88,7 @@ function drawsDuring(sim: Sim, run: () => void): number {
   return draws;
 }
 
-describe('holdsPerfectedTarget refuses the entire live catalog (nothing mints the marker yet)', () => {
+describe('holdsPerfectedTarget refuses every PLAIN copy (only the Perfecting walk stamps it)', () => {
   it('every merged item id, held as a real bagged copy, reads as not Perfected', () => {
     const { sim, pid, meta } = world();
     let swept = 0;
@@ -129,8 +127,37 @@ describe('holdsPerfectedTarget refuses the entire live catalog (nothing mints th
     meta.equipmentInstance.chest = { ...meta.equipmentInstance.chest, perfected: true };
     expect(holdsPerfectedTarget(meta, CHEST_ITEM, 'chest'), 'the stamped worn copy').toBe(true);
     // Named-slot means named: the same stamped copy does not answer for a
-    // different slot, which is what keeps a phase 12 slot move honest.
+    // different slot, which is what keeps any future Infusion slot move honest.
     expect(holdsPerfectedTarget(meta, CHEST_ITEM, 'feet'), 'a different slot').toBe(false);
+  });
+
+  it('the bagged arm answers about the copy the apply would CONSUME, not the holding', () => {
+    // The phase 12 narrowing: an id-only apply consumes newest-first, so the
+    // guard peeks the newest matching copy (newestMatchingSlot). Holding a
+    // Perfected copy in an OLDER slot with an ordinary copy newer must refuse:
+    // accepting would spend the ordinary copy under a licence the stamped one
+    // earned.
+    const older = apexEnchanter(16);
+    older.sim.addItemInstance(CHEST_ITEM, { perfected: true }, older.pid, 1);
+    older.sim.addItem(CHEST_ITEM, 1, older.pid);
+    // The premise, proven on the real bag order: the plain copy sits in the
+    // higher (newer) slot.
+    const slots = older.meta.inventory.filter((s) => s.itemId === CHEST_ITEM);
+    expect(slots).toHaveLength(2);
+    expect(slots[0].instance?.perfected).toBe(true);
+    expect(slots[1].instance?.perfected).toBeUndefined();
+    expect(holdsPerfectedTarget(older.meta, CHEST_ITEM), 'ordinary copy is newest').toBe(false);
+    expect(resolveApplyEnchant(older.sim.ctx, older.pid, CHEST_ITEM, INFUSION).reason).toBe(
+      'not_perfected',
+    );
+
+    // The reverse order accepts: the stamped copy IS the newest, i.e. the one
+    // the apply consumes.
+    const newer = apexEnchanter(17);
+    newer.sim.addItem(CHEST_ITEM, 1, newer.pid);
+    newer.sim.addItemInstance(CHEST_ITEM, { perfected: true }, newer.pid, 1);
+    expect(holdsPerfectedTarget(newer.meta, CHEST_ITEM), 'stamped copy is newest').toBe(true);
+    expect(resolveApplyEnchant(newer.sim.ctx, newer.pid, CHEST_ITEM, INFUSION).ok).toBe(true);
   });
 });
 
@@ -244,9 +271,10 @@ describe('the Infusion refuses every reachable copy, at both twins', () => {
   });
 
   it('a hand-stamped Perfected copy APPLIES, spending exactly the authored bill', () => {
-    // The phase 12 flip direction, and the proof that the guard reads the
-    // marker and nothing else: the only difference from the refusing arm above
-    // is the payload stamp.
+    // The accept direction (live since phase 12's Perfecting walk started
+    // minting the stamp), and the proof that the guard reads the marker and
+    // nothing else: the only difference from the refusing arm above is the
+    // payload stamp.
     const { sim, pid, meta } = apexEnchanter(8);
     sim.addItemInstance(CHEST_ITEM, { perfected: true }, pid, 1);
     expect(holdsPerfectedTarget(meta, CHEST_ITEM)).toBe(true);
@@ -319,512 +347,6 @@ describe('the Lucent skill gates bind at their exact rungs', () => {
     expect(holdsPerfectedTarget(at.meta, CHEST_ITEM)).toBe(false);
     expect(resolveApplyEnchant(at.sim.ctx, at.pid, CHEST_ITEM, APEX_CHEST).ok).toBe(true);
     expect(ENCHANTS[APEX_CHEST].skillReq).toBe(100);
-  });
-});
-
-// The MINT-SIDE tripwire. Every arm above proves the Infusion refuses what a
-// player can hold; this proves the premise underneath them, that nothing in
-// production can hand a player a Perfected copy in the first place. Without it
-// the whole file rests on a claim no assertion makes: one line stamping the
-// marker anywhere in the shipped trees would quietly turn every refusal above
-// into a statement about a marker the game now mints.
-//
-// It is an OCCURRENCE ALLOWLIST, not a search for mint shapes, and that is the
-// whole design. Enumerating the ways to write a mint is a losing game: the first
-// version of this guard matched three shapes and a later count found eight more
-// that walked straight past it (a bracket string `inst['perfected']`, a computed
-// key `{ [KEY]: true }`, a template literal, Object.defineProperty, a
-// comment-prefixed line, a colon that wrapped onto the next line, and so on).
-// So the direction is inverted: collect EVERY occurrence of the identifier in
-// the corpus and require each one to match a known-legal class. A mint written
-// in any spelling THAT NAMES THE FIELD (or brackets a key spelled from an
-// identifier that starts with it) matches no class and fails with its line
-// printed. What it cannot see, and says so: a key assembled at runtime from
-// string parts, or a key literal that lives outside the scanned trees (a JSON
-// asset, a tests/ fixture); those are the boundary of any source-text guard.
-//
-// PHASE 12 REMOVES THIS TEST, in the same change that mints the marker, and that
-// change must also take the eqi wire-visibility decision: the public equipped
-// wire deliberately drops `perfected` today (pinned by name in
-// tests/snapshots.test.ts), so a worn Perfected copy is invisible on that wire.
-// The Apply Enchant picker's worn arm reads exactly that mirror right now
-// (src/ui/bag_item_action_menu.ts hands it Entity.equippedInstances), so online
-// it would hide a worn Perfected copy the sim accepts.
-//
-// That is a choice of THREE, not the two copyMeetsPerfectedGate names: the
-// picker's worn arm can instead read IWorld.equipmentInstances, which carries
-// meta.equipmentInstance WHOLE in both hosts (the offline Sim getter, and the
-// self `einst` key online, server/game.ts). Only an INSPECTING viewer rides the
-// trimmed eqi peer mirror, so the picker can see the marker without eqi moving
-// at all, and what eqi actually decides is what a viewer may learn about
-// SOMEONE ELSE'S Perfected state.
-describe('every `perfected` occurrence in the shipped trees is a READ, never a mint', () => {
-  // The three trees that ship. server/ and headless/ carry no occurrence at all
-  // today, and sweeping them anyway is the point: the marker reaching the
-  // authoritative host or the RL env is exactly the drift worth catching early.
-  const TREES = ['src', 'server', 'headless'] as const;
-
-  // Machine-generated and translator-owned string tables are OUT, stated here
-  // rather than silently filtered. They are regenerated from the catalog below
-  // them, so no code path can live there, while the English prose word
-  // "Perfected" appears in every Latin locale slice: including them would turn
-  // this guard into a rename detector that churns on every i18n:gen. The
-  // hand-authored catalog itself stays IN, covered by the prose class.
-  const EXCLUDED_PREFIXES = ['ui/i18n.resolved.generated/', 'ui/i18n.locales/'];
-
-  /** One legal way the identifier may appear, with the floor proving it was
-   *  really seen. A floor of 0 marks a class that may legitimately empty out
-   *  (prose gets reworded); every load-bearing class carries a real floor. */
-  interface LegalClass {
-    name: string;
-    floor: number;
-    matches: (line: string, file: string) => boolean;
-  }
-
-  // Ordered: the first matching class wins, so a line carrying two legal forms
-  // is counted once. Every class is a READ, a DECLARATION, or player copy.
-  // Nothing here can write the marker onto an instance.
-  const LEGAL_CLASSES: LegalClass[] = [
-    {
-      name: 'the ItemInstancePayload declaration',
-      floor: 1,
-      matches: (line) => /^perfected\?: true;$/.test(line),
-    },
-    {
-      name: 'the EnchantDef requiresPerfected declaration',
-      floor: 1,
-      matches: (line) => /^requiresPerfected\?: true;$/.test(line),
-    },
-    {
-      name: 'the authored requiresPerfected def flag',
-      floor: 1,
-      matches: (line) => /^requiresPerfected: true,$/.test(line),
-    },
-    {
-      name: 'a requiresPerfected def read',
-      floor: 1,
-      matches: (line) => /\.requiresPerfected\b/.test(line),
-    },
-    {
-      name: 'a guard READ of the marker (=== true)',
-      floor: 1,
-      matches: (line) => /\?\.perfected === true/.test(line),
-    },
-    {
-      name: 'the guard functions, declared or called',
-      floor: 1,
-      matches: (line) => /\b(holdsPerfectedTarget|copyMeetsPerfectedGate)\b/.test(line),
-    },
-    {
-      name: "the 'not_perfected' deny reason",
-      floor: 1,
-      matches: (line) => /'not_perfected'/.test(line),
-    },
-    {
-      name: 'the notPerfected toast key',
-      floor: 1,
-      matches: (line) => /\bnotPerfected\b/.test(line),
-    },
-    {
-      // The FIELD is exactly `perfected`; an identifier that merely begins with
-      // the word (perfectedMet, perfectedCandidateExists, perfectedOnly on the
-      // picker and the guide) is a different name, the same argument the two
-      // capital-P families rest on. Safe as a shape rather than a name list
-      // because nothing here decides a line on its own: a write still vetoes
-      // first, and the residue rule below still demands that every EXACT
-      // `perfected` token on the line be a legal read. Floor 0: it describes a
-      // naming shape, and the identifiers that populate it today belong to the
-      // picker's view core, which may rename them without touching this guard.
-      name: 'an identifier that only begins with the word (not the field)',
-      floor: 0,
-      matches: (line) => /(?:^|[^\w])perfected[\w$]+/.test(line),
-    },
-    {
-      name: 'player prose in a hand-authored i18n catalog',
-      floor: 0,
-      matches: (line, file) => file.startsWith('ui/i18n.catalog/') && /Perfected/.test(line),
-    },
-  ];
-
-  /** The CODE half of one line: a trailing `//` comment cut off, and any
-   *  block comment (`/*` through its terminator) removed, so nothing a comment
-   *  says can decide a classification. Quote-aware, because a `//` inside a
-   *  string literal is code and truncating there would hide the rest of the
-   *  line.
-   *
-   *  Both halves matter, and each was a live escape. Comment text that
-   *  PARTICIPATES lends a mint a legal token to be classified by
-   *  (`inst.perfected = true; // notPerfected` read as the toast key), and a
-   *  line DROPPED for opening a block comment takes its code with it
-   *  (`/* phase 12 *\/ inst.perfected = true;` never reached the classifier at
-   *  all). Line by line and quote-aware is the honest middle: a `/* ... *\/`
-   *  regex over a whole source tree misfires on string and regex literals. */
-  function codeOf(raw: string): string {
-    let out = '';
-    let quote: string | null = null;
-    for (let i = 0; i < raw.length; i += 1) {
-      const ch = raw[i];
-      if (quote) {
-        out += ch;
-        if (ch === '\\') {
-          out += raw[i + 1] ?? '';
-          i += 1;
-          continue;
-        }
-        if (ch === quote) quote = null;
-        continue;
-      }
-      if (ch === '"' || ch === "'" || ch === '`') {
-        quote = ch;
-        out += ch;
-        continue;
-      }
-      if (ch === '/' && raw[i + 1] === '/') break;
-      if (ch === '/' && raw[i + 1] === '*') {
-        const end = raw.indexOf('*/', i + 2);
-        // An opener with no terminator on this line: everything after it is
-        // comment, and a continuation line is dropped whole by occurrences.
-        if (end === -1) break;
-        i = end + 1;
-        continue;
-      }
-      out += ch;
-    }
-    return out.trim();
-  }
-
-  /** Every line of `source` whose CODE half carries the identifier in any case,
-   *  trimmed. A block-comment CONTINUATION (a line starting with `*`) is the one
-   *  line shape that carries no code at all, so it is dropped whole; every other
-   *  line goes through codeOf, which strips whatever comment it does carry. */
-  function occurrences(source: string): string[] {
-    const hits: string[] = [];
-    for (const raw of source.split('\n')) {
-      const line = raw.trim();
-      // Cheap pre-filter: stripping comments only ever REMOVES the identifier,
-      // never introduces one, so a line without it needs no character scan.
-      if (!/perfected/i.test(line)) continue;
-      if (line.startsWith('*')) continue;
-      const code = codeOf(line);
-      if (/perfected/i.test(code)) hits.push(code);
-    }
-    return hits;
-  }
-
-  /** A WRITE of the marker field, in any spelling, anywhere on the line.
-   *
-   *  This runs BEFORE class matching and vetoes it, because classification is
-   *  per LINE and first-match-wins: without the veto a mint that SHARES a line
-   *  with a legal read is classified by the read and passes. That is not
-   *  hypothetical, it is how the previous version of this guard was defeated:
-   *  `if (enchant.requiresPerfected) inst.perfected = true;` matched the
-   *  def-read class and went green.
-   *
-   *  The arms are STRUCTURAL, not a list of spellings: the field bound by a
-   *  colon to ANY value, the field on the left of ANY assignment (plain or
-   *  compound), the shorthand property forms, and the one write that names the
-   *  field only as an argument. Enumerating values (`: true` alone) or
-   *  operators (`=` and `??=` alone) is the losing game this file's header
-   *  describes: `perfected: flag`, `||=` and `&&=` all walked past that.
-   *
-   *  Case-SENSITIVE on the lowercase field name, which is what makes the two
-   *  declaration families legal WITHOUT a path-scoped carve-out:
-   *   - `requiresPerfected?: true` / `requiresPerfected: true` spell a capital
-   *     P, so they are a different identifier and never match here at all;
-   *   - `perfected?: true` (the payload declaration) puts a `?` between the
-   *     name and the colon, which none of the write shapes admit.
-   *  Deriving the exemption structurally rather than by file path is the
-   *  stronger option: a real mint added INSIDE types.ts or enchants.ts is still
-   *  caught, where a path carve-out would have waved it through.
-   *
-   *  `=(?!=)` is what keeps the guard READ (`?.perfected === true`) legal while
-   *  catching the assignment; the preceding `[^\w]` keeps `not_perfected` from
-   *  reading as a write to the field. */
-  const WRITE_SHAPES: RegExp[] = [
-    // A colon binding of ANY value: `{ perfected: true }`, `{ perfected: flag }`,
-    // `{ 'perfected': x }`. Never the `perfected?:` declaration (the `?`).
-    /(?:^|[^\w])perfected["'`\]]*\s*:/,
-    // Assignment, plain or compound: `=`, `||=`, `&&=`, `??=`, including the
-    // bracket-string and template spellings. `==` / `===` stay reads.
-    /(?:^|[^\w])perfected["'`\]]*\s*(?:\|\||&&|\?\?)?=(?!=)/,
-    // Shorthand property: `{ perfected }`, `{ perfected,`, `, perfected }`,
-    // `, perfected,`, and the same token alone on its own wrapped line.
-    /(?:^|[{,])\s*perfected\s*(?:[,}]|$)/,
-    // A COMPUTED key spelled from an identifier that starts with the field
-    // (`inst[perfectedKey] = true`, `{ [perfectedKey]: true }`): the prefixed-
-    // identifier legal class exists for the picker's `perfectedMet` family, and
-    // a bracketed one is how that class would otherwise become a hiding place.
-    // The key's own definition line (`const perfectedKey = 'perfected'`) is a
-    // residue hit as well, while it lives in a scanned tree. This arm vetoes
-    // ON PURPOSE a legitimate bracketed key spelled from any perfected-prefixed
-    // identifier, UI code included (`cache[perfectedMetKey] = row.perfectedMet`
-    // reads as a mint here): the remedy is to name such a key from a different
-    // stem, never to teach this guard a new legal class.
-    /\[\s*perfected[\w$]*\s*\]\s*(?:\|\||&&|\?\?)?=(?!=)/,
-    /\[\s*perfected[\w$]*\s*\]\s*:/,
-    // The one write that names the field only as an argument.
-    /defineProperty\([^)]*["'`]perfected["'`]/,
-  ];
-
-  function writesTheMarker(line: string): boolean {
-    return WRITE_SHAPES.some((re) => re.test(line));
-  }
-
-  /** Every legal READ spelling, each one the thing some LEGAL_CLASSES entry is
-   *  about, removed from a line before the residue check below. */
-  const LEGAL_READS: RegExp[] = [
-    /\??\.perfected\s*===\s*true/g,
-    /perfected\?:\s*true;?/g,
-    /not_perfected/g,
-    /notPerfected/g,
-    /requiresPerfected/g,
-    /holdsPerfectedTarget|copyMeetsPerfectedGate/g,
-  ];
-
-  /** Is there still a `perfected` token on the line once every legal read is
-   *  removed? That residue is the general case the veto arms above are only
-   *  the named instances of: a line may match a legal class on one token and
-   *  carry a SECOND, unexplained one (`if (enchant.requiresPerfected)
-   *  stamp(inst, perfected);` classified as a def read), and no list of write
-   *  shapes can be relied on to have foreseen the spelling.
-   *
-   *  Case-sensitive on the lowercase field, so the capitalized prose noun
-   *  ("a piece that has been Perfected") is not residue. The English catalog
-   *  spells the game term that way throughout; a reword to a lowercase
-   *  `perfected` fails here on purpose, with the line printed, rather than
-   *  quietly widening what this guard lets past. */
-  function residualMarkerToken(line: string): boolean {
-    let rest = line;
-    for (const re of LEGAL_READS) rest = rest.replace(re, ' ');
-    // Token-EXACT on both sides: `perfectedMet` and `perfectedCandidateExists`
-    // are other identifiers (see the class above), and only a bare `perfected`
-    // can be the field a mint writes.
-    return /(?:^|[^\w])perfected(?![\w$])/.test(rest);
-  }
-
-  /** The legal class for one occurrence, or undefined when nothing covers it,
-   *  INCLUDING when a write shares the line with something that would, and
-   *  when a class matched but the line carries a marker token that class does
-   *  not account for. */
-  function classify(line: string, file: string): string | undefined {
-    if (writesTheMarker(line)) return undefined;
-    const cls = LEGAL_CLASSES.find((c) => c.matches(line, file))?.name;
-    if (!cls) return undefined;
-    if (residualMarkerToken(line)) return undefined;
-    return cls;
-  }
-
-  it('classifies every occurrence, and an unclassified one is a mint', () => {
-    const unclassified: string[] = [];
-    const seen = new Map<string, number>();
-    let files = 0;
-    let sawNestedPath = false;
-    for (const tree of TREES) {
-      const root = fileURLToPath(new URL(`../${tree}`, import.meta.url));
-      for (const { file, full } of tsFilesUnder(root)) {
-        if (EXCLUDED_PREFIXES.some((p) => file.startsWith(p))) continue;
-        files += 1;
-        if (file === 'sim/professions/enchanting.ts') sawNestedPath = true;
-        for (const line of occurrences(readFileSync(full, 'utf8'))) {
-          const cls = classify(line, file);
-          if (!cls) unclassified.push(`${tree}/${file}: ${line}`);
-          else seen.set(cls, (seen.get(cls) ?? 0) + 1);
-        }
-      }
-    }
-    // The walk really covered the deep trees, not one flat level of each.
-    expect(files, 'the three-tree walk found the real corpus').toBeGreaterThanOrEqual(600);
-    expect(sawNestedPath, 'the walk recursed into src/sim/professions').toBe(true);
-
-    expect(
-      unclassified,
-      'an occurrence of `perfected` matches no legal READ class, which is what a MINT looks ' +
-        'like. If this is phase 12, delete this whole describe and take the eqi ' +
-        'wire-visibility decision with it (tests/snapshots.test.ts pins the exclusion). ' +
-        'If it is a bracketed key spelled from a perfected-prefixed identifier ' +
-        '(`cache[perfectedMetKey] = ...`), the veto is deliberate: rename the key from ' +
-        'a different stem rather than widening a legal class.',
-    ).toEqual([]);
-
-    // Per-class floors: the classification above is only meaningful if the scan
-    // actually met each class in the live tree. Without these an import that
-    // resolved to nothing, or an over-broad class that swallowed everything,
-    // would report zero unclassified lines and pass.
-    for (const legal of LEGAL_CLASSES) {
-      expect(
-        seen.get(legal.name) ?? 0,
-        `class "${legal.name}" was never seen`,
-      ).toBeGreaterThanOrEqual(legal.floor);
-    }
-  });
-
-  it('an unclassified mint fails in every spelling that names the field (positive controls)', () => {
-    // Each of these is a real way to stamp the field. None matches a legal
-    // class, so each must come back unclassified. The bracket string, the
-    // computed key and defineProperty are the three the previous mint-shape
-    // version of this guard walked straight past.
-    const MINTS = [
-      'const payload = { perfected: true };',
-      'inst.perfected = true;',
-      "inst['perfected'] = true;",
-      'const out = { ...inst, perfected };',
-      "Object.defineProperty(inst, 'perfected', { value: true });",
-      "const KEY = 'perfected';",
-      'const out = { [PERFECTED_KEY]: true, perfected: true };',
-      'payload.perfected ??= true;',
-      'inst[`perfected`] = true;',
-      // The SHARED-LINE family, one entry per veto arm: a mint riding along
-      // with something that classifies as legal. Every one of these went green
-      // against a guard that enumerated write SHAPES (`=`, `??=`, `: true`)
-      // and stopped at the first legal class the line matched.
-      // Assignment, plain and in each compound spelling:
-      'if (enchant.requiresPerfected) inst.perfected = true;',
-      'if (holdsPerfectedTarget(meta, itemId)) inst.perfected = true;',
-      'if (enchant.requiresPerfected) inst.perfected ||= true;',
-      'if (enchant.requiresPerfected) inst.perfected &&= true;',
-      'if (enchant.requiresPerfected) inst.perfected ??= true;',
-      // A colon binding whose VALUE is anything but the literal true:
-      'const next = { ...inst, perfected: enchant.requiresPerfected };',
-      'if (holdsPerfectedTarget(meta, id)) slot.instance = { ...inst, perfected: flag };',
-      "const next = { ...inst, perfected: flag && !!'not_perfected' };",
-      // The shorthand property, beside a legal call:
-      'if (holdsPerfectedTarget(meta, id)) Object.assign(inst, { perfected });',
-      // defineProperty, beside a legal def read:
-      "if (enchant.requiresPerfected) Object.defineProperty(inst, 'perfected', { value: true });",
-      // Beside a `perfected`-prefixed identifier, so the newest legal class is
-      // no more a hiding place than the older ones:
-      'if (row.perfectedOnly) inst.perfected = true;',
-      'const out = { perfectedMet, perfected };',
-      // The RESIDUE arm: no write shape matches this line at all and it does
-      // match a legal class, but it carries a SECOND marker token nothing legal
-      // explains. The named shapes above are only instances of that.
-      'if (enchant.requiresPerfected) stamp(inst, perfected);',
-      // A key spelled from a `perfected`-prefixed identifier and bracketed in:
-      // the newest legal class must not license the write it names.
-      'inst[perfectedKey] = true;',
-      'inst[perfectedField] ??= true;',
-      'Object.assign(inst, { [perfectedKey]: true });',
-      "const perfectedKey = 'perfected';",
-    ];
-    for (const mint of MINTS) {
-      expect(classify(mint, 'sim/professions/perfecting.ts'), mint).toBeUndefined();
-      expect(occurrences(mint), mint).toEqual([mint]);
-    }
-  });
-
-  it('each veto ARM is pinned on its own, apart from the residue rule', () => {
-    // Pinned directly, not only through classify, and in its OWN case: the
-    // residue rule catches every line below on its own, so without this block
-    // an arm could be deleted with the whole file still green, and the guard
-    // would be one general net where it reads as two layers. Its own it() so a
-    // red here is never hidden behind the positive-controls loop above.
-    for (const write of [
-      'inst.perfected = true;',
-      'inst.perfected ||= true;',
-      'inst.perfected &&= true;',
-      'inst.perfected ??= true;',
-      "inst['perfected'] = flag;",
-      'const next = { ...inst, perfected: flag };',
-      "const next = { ...inst, 'perfected': flag };",
-      'Object.assign(inst, { perfected });',
-      'const out = { ...inst, perfected };',
-      'const out = { ...inst, perfected, enchant };',
-      'perfected,',
-      "Object.defineProperty(inst, 'perfected', { value: true });",
-      'inst[perfectedKey] = true;',
-      'inst[perfectedField] ??= true;',
-      'const out = { [perfectedKey]: true };',
-    ]) {
-      expect(writesTheMarker(write), `${write} is a write of the marker`).toBe(true);
-    }
-
-    // ...and the residue arm really is the residue rule doing the work: no
-    // write shape fires on it, and a legal class DOES match it, so without the
-    // residue check it would have classified as a requiresPerfected def read.
-    const residueOnly = 'if (enchant.requiresPerfected) stamp(inst, perfected);';
-    expect(writesTheMarker(residueOnly), 'no write shape matches the residue arm').toBe(false);
-    expect(
-      LEGAL_CLASSES.some((c) => c.matches(residueOnly, 'sim/professions/perfecting.ts')),
-      'the residue arm matches a legal class, and is a mint anyway',
-    ).toBe(true);
-
-    // The COMMENT-HIDDEN family: classification reads the CODE half, so a mint
-    // can neither borrow a legal token from a trailing comment nor vanish
-    // because a block comment opened its line (both were live escapes: the
-    // trailing text participated, and a `/* ... */` opener dropped the whole
-    // line). Each pair is the source line and the code half it must reduce to.
-    const HIDDEN: Array<[string, string]> = [
-      ['inst.perfected = true; // notPerfected, unlike this line', 'inst.perfected = true;'],
-      ["inst.perfected = true; // the 'not_perfected' deny", 'inst.perfected = true;'],
-      ['/* phase 12 */ inst.perfected = true;', 'inst.perfected = true;'],
-      [
-        'if (holdsPerfectedTarget(meta, id)) inst.perfected = flag; // requiresPerfected',
-        'if (holdsPerfectedTarget(meta, id)) inst.perfected = flag;',
-      ],
-    ];
-    for (const [raw, code] of HIDDEN) {
-      expect(occurrences(raw), raw).toEqual([code]);
-      expect(classify(code, 'sim/professions/perfecting.ts'), raw).toBeUndefined();
-    }
-  });
-
-  it('the legal forms really are classified (negative controls)', () => {
-    const LEGAL: Array<[string, string]> = [
-      ['perfected?: true;', 'sim/types.ts'],
-      ['requiresPerfected?: true;', 'sim/content/enchants.ts'],
-      ['requiresPerfected: true,', 'sim/content/enchants.ts'],
-      ['return !enchant.requiresPerfected || instance?.perfected === true;', 'ui/x.ts'],
-      [
-        'return meta.equipment[slot] === itemId && meta.equipmentInstance?.[slot]?.perfected === true;',
-        'sim/professions/enchanting.ts',
-      ],
-      ["return { ok: false, reason: 'not_perfected' };", 'sim/professions/enchanting.ts'],
-      ["return { key: 'hudChrome.enchanting.notPerfected', sink: 'error' };", 'ui/x.ts'],
-      ['takes hold only on a piece that has been Perfected.', 'ui/i18n.catalog/guide.ts'],
-      ['perfectedMet: boolean;', 'ui/enchant_apply_view.ts'],
-      [
-        'perfectedMet: perfectedCandidateExists(enchant, inventory, viewer),',
-        'ui/enchant_apply_view.ts',
-      ],
-      ['function perfectedCandidateExists(', 'ui/enchant_apply_view.ts'],
-      ['row.perfectedOnly', 'guide/pages/professions_craft.ts'],
-    ];
-    for (const [line, file] of LEGAL) expect(classify(line, file), line).toBeDefined();
-    // The write veto must not swallow the two DECLARATION families, which is
-    // what lets it run without a path-scoped carve-out. Asserted against the
-    // veto directly, not just through classify, so a future widening of the
-    // write shapes fails here rather than silently reclassifying a declaration.
-    for (const decl of [
-      'perfected?: true;',
-      'requiresPerfected?: true;',
-      'requiresPerfected: true,',
-    ]) {
-      expect(writesTheMarker(decl), `${decl} is a declaration, not a write`).toBe(false);
-    }
-    // ...and the guard READ stays a read: `===` must not read as `=`.
-    expect(writesTheMarker('return instance?.perfected === true;')).toBe(false);
-    // The deny reason is not a write to the field either (the `[^\w]` guard).
-    expect(writesTheMarker("return { ok: false, reason: 'not_perfected' };")).toBe(false);
-    // The prose class is PATH-SCOPED: the same sentence in a code file is not
-    // covered by it, so a mint cannot hide behind prose-looking text.
-    expect(
-      classify('takes hold only on a piece that has been Perfected.', 'sim/professions/x.ts'),
-    ).toBeUndefined();
-    // Comment text is stripped before classification, so prose about a mint is
-    // never itself reported as one, whichever comment shape carries it.
-    expect(occurrences('  // perfected: true would be a mint, and this is not one')).toEqual([]);
-    expect(occurrences('   * `perfected`, minted by the phase 12 Perfecting stage')).toEqual([]);
-    expect(occurrences('const ok = true; // perfected: true would be a mint')).toEqual([]);
-    expect(occurrences('/* perfected: true would be a mint */')).toEqual([]);
-    // ...and the strip is quote-aware, so a `//` inside a string literal is
-    // code: truncating there would hide whatever the rest of the line does.
-    expect(occurrences("const doc = 'https://example.test/perfected';")).toEqual([
-      "const doc = 'https://example.test/perfected';",
-    ]);
-  });
-
-  it('reads the trees only through the shared walker', () => {
-    expectScansOnlyThroughSharedWalkers(import.meta.url, ['ts_files_under']);
   });
 });
 

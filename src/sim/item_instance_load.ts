@@ -31,6 +31,7 @@
 // no rng, no clock. Total on `unknown`, so a corrupt row can never throw
 // inside a character load.
 
+import { PERFECTING_RANKS } from './professions/perfecting';
 import { isLegalCrafterName } from './professions/tools';
 import { MAX_KNOWN_RECIPE_ID_LENGTH } from './professions/training';
 import type { ItemInstancePayload } from './types';
@@ -201,6 +202,32 @@ export function sanitizeItemInstancePayloadOnLoad(payload: unknown): SanitizedIt
       // ecosystem compares it against live player names, and a value no
       // account can hold is corruption by definition.
       if (!isLegalCrafterName(value)) {
+        delete record[key];
+        dropped.push(key);
+      }
+      continue;
+    }
+    if (key === 'perfecting') {
+      // The Perfecting mid-track rank (professions/perfecting.ts): kept only
+      // as an integer in [1, PERFECTING_RANKS - 1]. Absent is rank 0 and rank
+      // PERFECTING_RANKS is the `perfected` stamp, so no legal writer ever
+      // stores anything else; a dropped rank only costs progress a corrupt
+      // row could never legally have carried (drop-only doctrine).
+      if (
+        typeof value !== 'number' ||
+        !Number.isInteger(value) ||
+        value < 1 ||
+        value > PERFECTING_RANKS - 1
+      ) {
+        delete record[key];
+        dropped.push(key);
+      }
+      continue;
+    }
+    if (key === 'perfected') {
+      // Kept only as the literal `true`, the one value any legal writer mints
+      // (types.ts declares `perfected?: true`); anything else drops alone.
+      if (value !== true) {
         delete record[key];
         dropped.push(key);
       }

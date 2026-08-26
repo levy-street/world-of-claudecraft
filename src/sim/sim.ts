@@ -421,16 +421,18 @@ import {
 } from './professions/cadence';
 import { unbindItem as unbindItemImpl } from './professions/commission';
 import {
-  acceptCommissionOrder as acceptCommissionOrderImpl,
   type CommissionOrder,
   type CommissionOrderRow,
   type CommissionOrderScope,
-  cancelCommissionOrder as cancelCommissionOrderImpl,
   commissionOrdersFor as commissionOrderRowsFor,
-  deliverCommissionOrder as deliverCommissionOrderImpl,
-  openCommissionOrder as openCommissionOrderImpl,
   updateCommissionOrders,
 } from './professions/commission_order';
+import {
+  acceptCommissionOrderCommand,
+  cancelCommissionOrderCommand,
+  deliverCommissionOrderCommand,
+  openCommissionOrderCommand,
+} from './professions/commission_order_commands';
 import {
   type AcquireRecipeResult,
   acquireRecipe as acquireRecipeImpl,
@@ -501,6 +503,12 @@ import {
   isLiveGatherNodeId,
   serializeNodeReadiness,
 } from './professions/node_persist';
+import {
+  type PerfectItemRef,
+  type PerfectingInfoView,
+  perfectingInfoFrom,
+  resolvePerfectingAttempt,
+} from './professions/perfecting';
 import { updateProfNudges } from './professions/prof_nudges';
 import { healDisplayRoundedProficiency } from './professions/proficiency_display_heal';
 import {
@@ -9199,99 +9207,56 @@ export class Sim {
     });
   }
 
+  // The Perfecting stage (Masterwrought phase 12): two thin delegates onto
+  // professions/perfecting.ts. perfectItem rides the shared profession-action
+  // dead gate (dead_gate.ts) like craftItem/trainRecipe/unbindItem above;
+  // every other denial is the module's own draw-free ladder (its header owns
+  // the draw contract: exactly one draw per resolved attempt, zero on every
+  // denial). perfectingInfo is a pure read built by the SAME shared view
+  // builder ClientWorld consumes (perfectingInfoFrom), so the hosts cannot
+  // drift.
+  perfectItem(ref: PerfectItemRef, pid?: number): void {
+    if (refusedWhileDead(this.ctx, pid)) return;
+    resolvePerfectingAttempt(this.ctx, pid, ref);
+  }
+
+  perfectingInfo(ref: PerfectItemRef, pid?: number): PerfectingInfoView | null {
+    const meta = this.players.get(pid ?? this.primaryId);
+    if (!meta) return null;
+    return perfectingInfoFrom({
+      ref,
+      inventory: meta.inventory,
+      equipment: meta.equipment,
+      equipmentInstances: meta.equipmentInstance,
+      craftSkills: meta.craftSkills,
+    });
+  }
+
   // Commission order board (Professions 2.0, issue #1298): four thin
-  // entries beside unbindItem above, one per verb (open/cancel/accept/
-  // deliver). Each resolves through professions/commission_order.ts (the
-  // pure validator + mutator) and emits ONE personal, text-free
-  // commissionOrderResult event; the client renders localized copy off
-  // action/reason. The durable order state itself converges through the
-  // per-viewer commissionOrders read below, which re-diffs for every
-  // affected player on the very next snapshot (no extra fan-out needed).
-  // The item id of a still-tracked order (open/accepted/or a terminal order
-  // still inside its retention window), for the open/cancel/accept success
-  // lines below: those three result shapes carry only orderId (deliver's
-  // own DeliverOrderResult is the one that already returns itemId), so this
-  // resolves it off the live board the same tick the mutation applied.
-  private commissionOrderItemId(orderId: number | undefined): string | undefined {
-    if (orderId === undefined) return undefined;
-    return this.commissionOrderBoard.find((o) => o.id === orderId)?.itemId;
-  }
-
-  // The requester's display name off the same still-retained board entry, for
-  // the 'deliver' success line (the acting pid is the CRAFTER there, not the
-  // requester the "You deliver X to {name}" copy needs to name).
-  private commissionOrderRequesterName(orderId: number | undefined): string | undefined {
-    if (orderId === undefined) return undefined;
-    return this.commissionOrderBoard.find((o) => o.id === orderId)?.requesterName;
-  }
-
+  // delegates beside unbindItem above, one per verb (open/cancel/accept/
+  // deliver). The command emit bodies live in
+  // professions/commission_order_commands.ts (extracted at Masterwrought
+  // phase 12, the monolith ratchet); the durable order state converges
+  // through the per-viewer commissionOrders read below.
   openCommissionOrder(
     recipeId: string,
     scope: CommissionOrderScope,
     crafterName?: string,
     pid?: number,
   ): void {
-    const result = openCommissionOrderImpl(this.ctx, recipeId, scope, crafterName, pid);
-    const meta = this.players.get(pid ?? this.primaryId);
-    this.emit({
-      type: 'commissionOrderResult',
-      action: 'open',
-      ok: result.ok,
-      orderId: result.orderId,
-      itemId: result.ok ? this.commissionOrderItemId(result.orderId) : undefined,
-      reason: result.reason,
-      pid: meta?.entityId,
-    });
+    openCommissionOrderCommand(this.ctx, recipeId, scope, crafterName, pid);
   }
 
   cancelCommissionOrder(orderId: number, pid?: number): void {
-    const itemId = this.commissionOrderItemId(orderId);
-    const result = cancelCommissionOrderImpl(this.ctx, orderId, pid);
-    const meta = this.players.get(pid ?? this.primaryId);
-    this.emit({
-      type: 'commissionOrderResult',
-      action: 'cancel',
-      ok: result.ok,
-      orderId: result.orderId,
-      itemId: result.ok ? itemId : undefined,
-      reason: result.reason,
-      pid: meta?.entityId,
-    });
+    cancelCommissionOrderCommand(this.ctx, orderId, pid);
   }
 
   acceptCommissionOrder(orderId: number, pid?: number): void {
-    const itemId = this.commissionOrderItemId(orderId);
-    const result = acceptCommissionOrderImpl(this.ctx, orderId, pid);
-    const meta = this.players.get(pid ?? this.primaryId);
-    this.emit({
-      type: 'commissionOrderResult',
-      action: 'accept',
-      ok: result.ok,
-      orderId: result.orderId,
-      itemId: result.ok ? itemId : undefined,
-      reason: result.reason,
-      pid: meta?.entityId,
-    });
+    acceptCommissionOrderCommand(this.ctx, orderId, pid);
   }
 
   deliverCommissionOrder(orderId: number, pid?: number): void {
-    // Resolve the requester's name off the board BEFORE the mutation (deliver
-    // moves the order to 'delivered', so a post-mutation lookup would still
-    // find it inside its retention window, but resolve pre-mutation to match
-    // the itemId precedent above and stay correct if retention ever shrinks).
-    const requesterName = this.commissionOrderRequesterName(orderId);
-    const result = deliverCommissionOrderImpl(this.ctx, orderId, pid);
-    const meta = this.players.get(pid ?? this.primaryId);
-    this.emit({
-      type: 'commissionOrderResult',
-      action: 'deliver',
-      ok: result.ok,
-      orderId: result.orderId,
-      itemId: result.itemId,
-      requesterName: result.ok ? requesterName : undefined,
-      reason: result.reason,
-      pid: meta?.entityId,
-    });
+    deliverCommissionOrderCommand(this.ctx, orderId, pid);
   }
 
   // IWorld read surface (IWorldProfessions): the local viewer's projection of

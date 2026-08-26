@@ -18,10 +18,15 @@ import {
   sanitizeItemInstancePayloadOnLoad,
   warnDroppedInstanceKeys,
 } from '../src/sim/item_instance_load';
+import { PERFECTING_RANKS } from '../src/sim/professions/perfecting';
 import { isLegalCrafterName, MAX_CRAFTED_BY_LENGTH } from '../src/sim/professions/tools';
 
-/** A payload carrying one legal value of every declared field, in the
- *  declaration order of ItemInstancePayload. */
+/** A payload carrying one legal value per declared field, in the declaration
+ *  order of ItemInstancePayload, for the identity claim. Per FIELD, not a
+ *  reachable game state (a live copy never holds `perfecting` and `perfected`
+ *  together: the stamp deletes the track field; the sanitizer judges each
+ *  field alone). `rift` is deliberately absent here: it is never descended
+ *  into and has its own no-descent arm below. */
 const legalPayload = () => ({
   signer: 'Loggerholm',
   charges: { gatherers_cache: 3 },
@@ -30,6 +35,9 @@ const legalPayload = () => ({
   craftedRecipeId: 'recipe_tough_jerky',
   boundTo: 41,
   bindOnTrade: true,
+  perfecting: 2,
+  perfected: true,
+  locked: true,
 });
 
 const atLimit = 'e'.repeat(MAX_INSTANCE_STRING_LENGTH);
@@ -53,6 +61,9 @@ describe('sanitizeItemInstancePayloadOnLoad: identity on legal data', () => {
       'craftedRecipeId',
       'boundTo',
       'bindOnTrade',
+      'perfecting',
+      'perfected',
+      'locked',
     ]);
     expect(out.payload).toEqual(legalPayload());
   });
@@ -165,6 +176,51 @@ describe('sanitizeItemInstancePayloadOnLoad: the signer name shape', () => {
     for (const bad of [41, null, true, { name: 'Elsewhere' }, ['Elsewhere']]) {
       expect(load(bad).dropped, `signer ${JSON.stringify(bad)}`).toEqual(['signer']);
       expect(load(bad).payload).toEqual({ enchant: 'enchant_weapon_might' });
+    }
+  });
+});
+
+describe('sanitizeItemInstancePayloadOnLoad: the Perfecting field shapes (phase 12)', () => {
+  it('keeps every legal mid-track rank and the literal perfected stamp', () => {
+    for (let rank = 1; rank <= PERFECTING_RANKS - 1; rank++) {
+      const out = sanitizeItemInstancePayloadOnLoad({ perfecting: rank, signer: 'Loggerholm' });
+      expect(out.dropped, `rank ${rank}`).toEqual([]);
+      expect(out.payload).toEqual({ perfecting: rank, signer: 'Loggerholm' });
+    }
+    const stamped = sanitizeItemInstancePayloadOnLoad({ perfected: true, boundTo: 7 });
+    expect(stamped.dropped).toEqual([]);
+    expect(stamped.payload).toEqual({ perfected: true, boundTo: 7 });
+  });
+
+  it('drops a perfecting value outside integer [1, PERFECTING_RANKS - 1], alone', () => {
+    // Rank 0 is spelled by ABSENCE and rank PERFECTING_RANKS by the
+    // `perfected` stamp, so neither is a legal stored value; nor is any
+    // non-integer or non-number shape.
+    for (const bad of [
+      0,
+      PERFECTING_RANKS,
+      PERFECTING_RANKS + 5,
+      -2,
+      2.5,
+      Number.NaN,
+      '2',
+      true,
+      null,
+      { rank: 2 },
+    ]) {
+      const out = sanitizeItemInstancePayloadOnLoad({ perfecting: bad, boundTo: 7 });
+      expect(out.dropped, `perfecting ${JSON.stringify(bad)}`).toEqual(['perfecting']);
+      // ALONE: the payload around the junk field survives.
+      expect(out.payload).toEqual({ boundTo: 7 });
+    }
+    expect(PERFECTING_RANKS).toBe(4);
+  });
+
+  it('drops any perfected value that is not the literal true, alone', () => {
+    for (const bad of [false, 1, 0, 'true', null, {}]) {
+      const out = sanitizeItemInstancePayloadOnLoad({ perfected: bad, boundTo: 7 });
+      expect(out.dropped, `perfected ${JSON.stringify(bad)}`).toEqual(['perfected']);
+      expect(out.payload).toEqual({ boundTo: 7 });
     }
   });
 });

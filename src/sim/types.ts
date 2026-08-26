@@ -1458,16 +1458,25 @@ export interface ItemInstancePayload {
    *  boundTo, nothing item-specific. Additive and JSONB-safe: an absent flag is
    *  an ordinary freely-tradeable instance. */
   bindOnTrade?: boolean;
+  /** Mid-track Perfecting rank (Masterwrought phase 12,
+   *  professions/perfecting.ts): an integer in [1, PERFECTING_RANKS - 1],
+   *  absent = rank 0, DELETED when `perfected` below stamps (rank
+   *  PERFECTING_RANKS is Perfected itself, never a `perfecting` value).
+   *  Written by resolvePerfectingAttempt and by the crafting.ts masterwork
+   *  head start (PERFECTING_HEADSTART_RANK). A plain number, so
+   *  cloneItemInstancePayload's spread covers it; the load bound keeps only a
+   *  legal in-range integer (item_instance_load.ts, drop-only). */
+  perfecting?: number;
   /** Marks a copy that has completed the Perfecting stage (Masterwrought R1).
-   *  Minted by phase 12; NOTHING writes it yet, which is exactly why the
+   *  Minted by phase 12's rank walk (professions/perfecting.ts
+   *  resolvePerfectingAttempt, when the track reaches PERFECTING_RANKS); the
    *  phase 10 Lucent Infusion guard (content/enchants.ts requiresPerfected,
-   *  professions/enchanting.ts) refuses every item that exists today. Only
-   *  ever `true`; absent is an ordinary copy, so pre-phase saves load clean.
-   *  Deliberately NOT on the server's `eqi` wire allowlist: phase 12 decides
-   *  what a viewer may see of another player's Perfected state, so the field
-   *  stays server-and-owner-side until then (the picker's worn arm reads the
-   *  trimmed mirror and will need that decision, see
-   *  src/ui/enchant_apply_view.ts). */
+   *  professions/enchanting.ts) reads it. Only ever `true`; absent is an
+   *  ordinary copy, so pre-phase saves load clean. Deliberately kept OFF the
+   *  server's `eqi` peer wire allowlist (the phase 12 decision, executed:
+   *  an INSPECTING viewer cannot see another player's Perfected state); the
+   *  OWNER sees it via the wholesale `inv` mirror and the whole `einst` self
+   *  mirror. */
   perfected?: true;
   /** Player-toggled safety mark (issue 3042, item_lock.ts isItemLocked): while
    *  true this specific copy refuses salvage, profession-craft reagent

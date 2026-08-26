@@ -102,6 +102,7 @@ import {
 import { countAcrossGrades, materialGradeIds, planGradeRemoval } from './material_grades';
 import { materialTierBonusForReagents } from './material_tier';
 import { isStationActive, partySharedStationSatisfies } from './mobile_station';
+import { PERFECTING_HEADSTART_RANK } from './perfecting';
 import { craftActionXp } from './profession_xp';
 import { isAtStation, stationTypeForCraft } from './stations';
 import type { ProfessionReagent, ProfessionRecipeRecord } from './types';
@@ -131,9 +132,10 @@ const CRAFT_SKILL_GAIN = 1;
 // stat cliff is exactly what fork B exists to avoid), so a masterwrought def
 // never bakes a bonus record, which starves both consumers at once. The proc
 // DRAW stays unconditional at its site (draw order is load-bearing). Phase 12
-// wires the head start at the EFFECT GATE (the `masterwork` boolean in
-// resolveCraftForRecipe), where procRoll < procChance is actually known; this
-// helper runs before the draw and cannot see the outcome.
+// wired the head start at the EFFECT GATE (the `perfectingHeadStart` boolean
+// beside `masterwork` in resolveCraftForRecipe), where procRoll < procChance
+// is actually known; this helper runs before the draw and cannot see the
+// outcome, so it stays the bake's null for every apex def.
 // Exported for tests: the reliquary gear-capable model must consult the SAME
 // gate as the proc path or the drift detector goes blind to the R1 arm (a
 // craft whose only stat-bearing output is apex must read as masterwork-
@@ -849,6 +851,20 @@ export function resolveCraftForRecipe(
     bonusStats !== null &&
     bumped !== null &&
     bumped.tier <= ceilingTier;
+  // The Masterwrought R1 head start (phase 12), wired at this same effect
+  // gate with def.masterwrought standing in for the bonus-record term: an
+  // apex def bakes NO bonus record (craftBonusStatsFor above returns null),
+  // so the two booleans are mutually exclusive by construction, and a proc on
+  // an apex craft grants a Perfecting head start INSTEAD OF a quality bump
+  // (R1's own words). Reads the SAME procRoll: the single unconditional draw
+  // above never moves and nothing here rolls again.
+  const perfectingHeadStart =
+    !!meta &&
+    jackVariance !== 'worse' &&
+    procRoll < procChance &&
+    !!def?.masterwrought &&
+    bumped !== null &&
+    bumped.tier <= ceilingTier;
   // Deterministic grant: every successful craft yields recipe.resultItemId.
   // #1149 signing rule preserved on the DEF quality: an output whose def is
   // rare-or-better is a signed instance so it carries an attribution target
@@ -896,6 +912,41 @@ export function resolveCraftForRecipe(
     const payload: ItemInstancePayload = {
       signer: meta.name,
       rolled: { masterwork: true, stats: bonusStats },
+    };
+    if (commissioned) payload.bindOnTrade = true;
+    ctx.addItemInstance(recipe.resultItemId, payload, pid, 1, {
+      silent: true,
+      callerLogs: true,
+      craftedRecipeId,
+    });
+    if (recipe.resultCount > 1) {
+      if (commissioned) {
+        for (let i = 1; i < recipe.resultCount; i++) {
+          ctx.addItemInstance(recipe.resultItemId, { bindOnTrade: true }, pid, 1, {
+            silent: true,
+            callerLogs: true,
+            craftedRecipeId,
+          });
+        }
+      } else {
+        ctx.addItem(recipe.resultItemId, recipe.resultCount - 1, pid, {
+          silent: true,
+          callerLogs: true,
+          craftedRecipeId,
+        });
+      }
+    }
+  } else if (meta && perfectingHeadStart) {
+    // The head-start mint (phase 12): ONE signed instance stamped at
+    // PERFECTING_HEADSTART_RANK on the Perfecting track, no rolled record
+    // (the apex def bakes none; professions/perfecting.ts owns the walk from
+    // here). The #2350 admission above needs no new shape for this copy: it
+    // occupies the same one slot the plain signed shape already models.
+    // Remainder copies (no shipped apex recipe has any) land exactly as the
+    // masterwork arm's do.
+    const payload: ItemInstancePayload = {
+      signer: meta.name,
+      perfecting: PERFECTING_HEADSTART_RANK,
     };
     if (commissioned) payload.bindOnTrade = true;
     ctx.addItemInstance(recipe.resultItemId, payload, pid, 1, {
@@ -986,7 +1037,11 @@ export function resolveCraftForRecipe(
     quality: outputQuality,
     selfSignedBonusApplied,
   };
-  if (masterwork) result.masterwork = true;
+  // The head start reports masterwork:true too: it IS the proc effect applied
+  // (R1: the proc grants a head start instead of a quality bump), so the
+  // deed/reliquary/announce arms downstream fire for an apex proc exactly as
+  // they do for a bump.
+  if (masterwork || perfectingHeadStart) result.masterwork = true;
   if (commissioned) result.commission = true;
   if (jackVariance !== null) result.variance = jackVariance;
   return result;

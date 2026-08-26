@@ -654,7 +654,16 @@ const MONOLITHS: MonolithRow[] = [
     // the merged file lands below both parent pins (the release retired the
     // Vale Cup arms this branch had kept), so the ratchet follows it down.
     // Exact merged count, zero slack.
-    ceiling: 12361,
+    //
+    // RE-PINNED 12361 -> 12326 at Masterwrought Phase 12 (the Perfecting
+    // stage): the commission-order command emit bodies (the four verbs plus
+    // their two private board lookups) moved to
+    // src/sim/professions/commission_order_commands.ts, leaving four one-line
+    // delegates; the phase's own additions here are the two thin Perfecting
+    // delegates (perfectItem/perfectingInfo onto professions/perfecting.ts).
+    // Extraction first, then the phase's lines, netting 35 UNDER the old
+    // ceiling; the ceiling follows the file down. Exact count, zero slack.
+    ceiling: 12326,
     seam: 'a sim system module behind SimContext (src/sim/CLAUDE.md)',
   },
   {

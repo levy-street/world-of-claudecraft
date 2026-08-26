@@ -565,7 +565,13 @@ intentional and pinned by a test.
   move the earlier note predicted, and the mark is earnable and hinted. R1
   masterwork suppression still stands for the APEX def (craftBonusStatsFor in
   crafting.ts returns null for masterwrought defs; gyrelens_array bakes
-  nothing), so the Phase 12 effect-gate move remains its own future event.
+  nothing). AMENDED 2026-08-26 (Masterwrought Phase 12): the effect-gate move
+  landed. A proc on an apex craft now grants a Perfecting head start
+  (perfectingHeadStart in resolveCraftForRecipe, stamping
+  ItemInstancePayload.perfecting) and reports CraftResult.masterwork, so the
+  masterwork mark family credits apex procs too; craftBonusStatsFor itself is
+  byte-unchanged (an apex def still bakes nothing), so the craftIsGearCapable
+  derivation and its pins do not move.
   The two mount slots are why the capstone deed is marked as a feat and kept
   out of the Book completion pair. See "Open owner calls" for the consequence
   that is still undecided.
