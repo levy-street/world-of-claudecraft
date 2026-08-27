@@ -31,19 +31,27 @@ function hudMethod(opener: string): string {
 
 function trainResultArm(): string {
   const start = hudSource.indexOf("case 'trainResult': {");
-  // The unbindResult arm sits between trainResult and
-  // masterwork; the slice ends at the NEXT case so the single-surface pins
-  // below stay scoped to the trainResult arm alone.
-  const end = hudSource.indexOf("case 'unbindResult': {", start);
+  // The recipeScrollResult arm now sits between trainResult and unbindResult;
+  // the slice ends at the NEXT case so the single-surface pins below stay
+  // scoped to the trainResult arm alone.
+  const end = hudSource.indexOf("case 'recipeScrollResult': {", start);
   expect(start, 'trainResult case arm present in handleEvents').toBeGreaterThan(-1);
-  expect(end, 'trainResult arm precedes the unbindResult arm').toBeGreaterThan(start);
+  expect(end, 'trainResult arm precedes the recipeScrollResult arm').toBeGreaterThan(start);
   return hudSource.slice(start, end);
 }
 
+// The line BUILDING lives in the extracted recipe_learn_lines_view pure core
+// (behavior pinned in tests/recipe_learn_lines.test.ts); the key-mapping
+// source pins below scan the core, while the arm pins scope to what the hud
+// arm still owns: the learn flight, one guarded log, and the repaints.
+const lineCoreSource = stripComments(
+  readFileSync(resolve(__dirname, '../src/ui/recipe_learn_lines_view.ts'), 'utf8'),
+);
+
 describe('hud.ts trainResult event arm (source pins)', () => {
   it('logs the learned line on ok and maps all five deny reasons to training keys', () => {
-    const arm = trainResultArm();
-    expect(arm).toContain("t('hudChrome.training.learned'");
+    expect(trainResultArm()).toContain('trainResultLine(ev)');
+    expect(lineCoreSource).toContain("t('hudChrome.training.learned'");
     for (const key of [
       'hudChrome.training.tierUnmet',
       'hudChrome.training.cannotAfford',
@@ -51,7 +59,7 @@ describe('hud.ts trainResult event arm (source pins)', () => {
       'hudChrome.training.alreadyKnown',
       'hudChrome.training.outOfRange',
     ]) {
-      expect(arm, key).toContain(key);
+      expect(lineCoreSource, key).toContain(key);
     }
     for (const reason of [
       'train_tier_unmet',
@@ -59,7 +67,7 @@ describe('hud.ts trainResult event arm (source pins)', () => {
       'train_not_taught_here',
       'train_already_known',
     ]) {
-      expect(arm, reason).toContain(reason);
+      expect(lineCoreSource, reason).toContain(reason);
     }
   });
 
@@ -69,36 +77,43 @@ describe('hud.ts trainResult event arm (source pins)', () => {
     // pin each reason-to-key pairing. train_out_of_range is deliberately the
     // fallback arm (its literal never appears in hud.ts), so its pairing is
     // pinned as the else branch of the alreadyKnown arm.
-    const arm = trainResultArm();
-    expect(arm).toMatch(/'train_tier_unmet'\s*\?\s*t\('hudChrome\.training\.tierUnmet'/);
-    expect(arm).toMatch(/'train_cannot_afford'\s*\?\s*'hudChrome\.training\.cannotAfford'/);
-    expect(arm).toMatch(/'train_not_taught_here'\s*\?\s*'hudChrome\.training\.notTaughtHere'/);
-    expect(arm).toMatch(
+    expect(lineCoreSource).toMatch(/'train_tier_unmet'\)\s*return tierUnmetLine/);
+    expect(lineCoreSource).toMatch(/hudChrome\.training\.tierUnmet/);
+    expect(lineCoreSource).toMatch(
+      /'train_cannot_afford'\s*\?\s*'hudChrome\.training\.cannotAfford'/,
+    );
+    expect(lineCoreSource).toMatch(
+      /'train_not_taught_here'\s*\?\s*'hudChrome\.training\.notTaughtHere'/,
+    );
+    expect(lineCoreSource).toMatch(
       /'train_already_known'\s*\?\s*'hudChrome\.training\.alreadyKnown'\s*:\s*'hudChrome\.training\.outOfRange'/,
     );
   });
 
   it('derives the tierUnmet craft and threshold from recipeId plus static content', () => {
-    const arm = trainResultArm();
     // The event is text-free: the threshold is tier * step from the recipe
-    // record, localized craft name via the craft-name helper.
-    expect(arm).toContain('tierForSkill');
-    expect(arm).toContain('TIER_SKILL_STEP');
-    expect(arm).toContain('craftNameText');
-    expect(arm).toContain('formatNumber');
+    // record, localized craft name via the craft-name helper (all in the
+    // extracted core).
+    expect(lineCoreSource).toContain('tierForSkill');
+    expect(lineCoreSource).toContain('TIER_SKILL_STEP');
+    expect(lineCoreSource).toContain('craftNameText');
+    expect(lineCoreSource).toContain('formatNumber');
   });
 
   it('stays single-surface: chat log only, no banner, toast, or audio cue in the arm', () => {
     const arm = trainResultArm();
-    expect(arm.match(/this\.log\(/g)?.length, 'exactly the ok + deny log call sites').toBe(2);
+    expect(
+      arm.match(/this\.log\(/g)?.length,
+      'exactly the one guarded log call (the core returns null for silent arms)',
+    ).toBe(1);
     expect(arm).not.toMatch(/showBanner|showToast|this\.audio|playSfx|playCue|celebrat/i);
   });
 
   it('renders nothing for a reason-less deny (the malformed-recipe-id probe arm)', () => {
-    const arm = trainResultArm();
-    // resolveTrain's silent arm emits ok:false with reason undefined; the deny
-    // log call must be guarded on ev.reason so that arm stays render-free.
-    expect(arm).toContain('else if (ev.reason)');
+    // resolveTrain's silent arm emits ok:false with reason undefined; the
+    // core answers null there and the hud arm guards the log on it.
+    expect(lineCoreSource).toContain('if (!ev.reason) return null;');
+    expect(trainResultArm()).toContain('if (trainLine)');
   });
 
   it('repaints the open train window AND the open crafting window', () => {

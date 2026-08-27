@@ -66,6 +66,9 @@ const HONEST_MATERIALS = [
   'homespun_cloth',
   'iron_ore',
   'ironbark_log',
+  // Crucible raid professions: the core reagent (a recipe-consumed epic
+  // material).
+  'lastflame_core',
   'linen_scrap',
   'prime_cut',
   'pristine_claw',

@@ -214,11 +214,13 @@ export class BagItemActionMenu {
   private openEnchantPicker(reagentItemId: string, x: number, y: number): void {
     const world = this.deps.world();
     // knownRecipes gates acquisition-gated formulas out of the picker (the
-    // crafting window's drop-recipe hide, applied to the enchant list).
+    // crafting window's drop-recipe hide, applied to the enchant list). The
+    // optional chain is the safe default: a world exposing no identity (the
+    // paint-test stubs) hides every gated formula rather than leaking one.
     const sections = enchantSectionsForReagent(
       world.inventory,
       reagentItemId,
-      world.craftingIdentity.knownRecipes,
+      world.craftingIdentity?.knownRecipes ?? [],
     );
     const title = esc(t('hudChrome.enchanting.pickerTitle'));
     if (sections.length === 0) {

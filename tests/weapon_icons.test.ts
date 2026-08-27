@@ -38,8 +38,10 @@ describe('painted weapon inventory icons', () => {
 
   it('covers every authored base weapon exactly once', () => {
     // 123 with the class-overhaul integration daggers (rimefang, marrowpoint,
-    // duskwhisper, boneglass_shiv), painted in integration-dagger-icons-2026-08-10.
-    expect(baseWeapons).toHaveLength(123);
+    // duskwhisper, boneglass_shiv), painted in integration-dagger-icons-2026-08-10;
+    // 124 with the Crucible legendary hammer (forgefathers_requiem,
+    // crucible-raid-professions-2026-08-28).
+    expect(baseWeapons).toHaveLength(124);
     expect([...WEAPON_IMAGE_IDS].sort()).toEqual(baseWeapons);
     expect(Object.keys(ITEM_WEAPON_VARIANTS).sort()).toEqual(baseWeapons);
     for (const id of baseWeapons) {
@@ -68,7 +70,9 @@ describe('painted weapon inventory icons', () => {
     const weaponBatches = batches.filter((batch) =>
       batch.itemIds.some((id) => Object.hasOwn(ITEM_WEAPON_VARIANTS, id)),
     );
-    expect(weaponBatches).toHaveLength(3);
+    // 3 historical/replacement/dagger batches plus the Crucible batch,
+    // whose one weapon id (forgefathers_requiem) it owns outright.
+    expect(weaponBatches).toHaveLength(4);
     const historicalBatch = weaponBatches.find(
       ({ batchId }) => batchId === 'placeholder-art-completion-weapons-2026-08-09',
     );
@@ -119,9 +123,22 @@ describe('painted weapon inventory icons', () => {
       'marrowpoint',
       'rimefang',
     ]);
+    // The Crucible batch owns its one weapon (the self-crafted legendary
+    // hammer) the same way.
+    const crucibleBatch = weaponBatches.find(
+      ({ batchId }) => batchId === 'crucible-raid-professions-2026-08-28',
+    );
+    expect(crucibleBatch).toBeDefined();
+    const crucibleWeaponIds = (crucibleBatch?.itemIds ?? [])
+      .filter((id) => Object.hasOwn(ITEM_WEAPON_VARIANTS, id))
+      .sort();
+    expect(crucibleWeaponIds).toEqual(['forgefathers_requiem']);
     expect(historicalBatch?.itemIds).toEqual(
       expected.filter(
-        (id) => !replacementWeaponIds.includes(id) && !integrationWeaponIds.includes(id),
+        (id) =>
+          !replacementWeaponIds.includes(id) &&
+          !integrationWeaponIds.includes(id) &&
+          !crucibleWeaponIds.includes(id),
       ),
     );
     expect(
@@ -162,8 +179,10 @@ describe('painted weapon inventory icons', () => {
     };
     // The chunk records are the frozen weapon campaign's generation reports:
     // they slice the pre-integration weapon roster, without the four
-    // integration daggers that postdate the campaign.
-    const campaignExpected = expected.filter((id) => !integrationWeaponIds.includes(id));
+    // integration daggers and the Crucible hammer that postdate the campaign.
+    const campaignExpected = expected.filter(
+      (id) => !integrationWeaponIds.includes(id) && !crucibleWeaponIds.includes(id),
+    );
     expect(chunkA.assets.map(({ id }) => id)).toEqual(campaignExpected.slice(0, 40));
     expect(chunkB.assets.map(({ id }) => id)).toEqual(campaignExpected.slice(40, 80));
     expect(chunkC).toEqual(campaignExpected.slice(80, 100));

@@ -64,6 +64,10 @@ describe('Ignivar raid lore content', () => {
       IGNIVAR_LORE_QUEST_IDS.echoesInIron,
       IGNIVAR_LORE_QUEST_IDS.heraldsHeart,
       IGNIVAR_LORE_QUEST_IDS.forgefather,
+      // The professions hammer chain rides behind the lore chapters
+      // (docs/prd/ignivar-raid-professions.md).
+      'q_forgefathers_requiem',
+      'q_requiem_at_the_forge',
     ]);
     expect(QUESTS[IGNIVAR_LORE_QUEST_IDS.echoesInIron]).toMatchObject({
       giverNpcId: IGNIVAR_MAELIN_NPC_ID,
@@ -108,9 +112,13 @@ describe('Ignivar raid lore content', () => {
     expect(QUESTS[IGNIVAR_LORE_QUEST_IDS.forgefather].objectives).toEqual([
       expect.objectContaining({ type: 'kill', targetMobId: VARKHUL_BOSS_ID, count: 1 }),
     ]);
-    for (const questId of IGNIVAR_RAID_LORE_QUEST_ORDER) {
+    // The LORE chapters are kill-only; the hammer chain rides the same order
+    // list but is a professions chain (collect, then craft) by design.
+    for (const questId of Object.values(IGNIVAR_LORE_QUEST_IDS)) {
       expect(QUESTS[questId].objectives.every((objective) => objective.type === 'kill')).toBe(true);
     }
+    expect(QUESTS.q_forgefathers_requiem.objectives.map((o) => o.type)).toEqual(['collect']);
+    expect(QUESTS.q_requiem_at_the_forge.objectives.map((o) => o.type)).toEqual(['craft']);
     expect(Object.keys(IGNIVAR_LORE_OBJECTS)).toEqual(Object.values(IGNIVAR_RECORD_IDS));
   });
 

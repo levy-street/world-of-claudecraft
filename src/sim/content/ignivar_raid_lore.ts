@@ -165,7 +165,6 @@ export const IGNIVAR_RAID_LORE_QUESTS: Record<string, QuestDef> = {
     completionText:
       'It still sings. This is no reagent, smith: it is the voice of the spring he chained. I will show you the shaping, and your hands will do what his never could.',
     rev: 1,
-    xpReward: 2500,
     objectives: [
       {
         type: 'collect',
@@ -187,7 +186,6 @@ export const IGNIVAR_RAID_LORE_QUESTS: Record<string, QuestDef> = {
     completionText:
       'So the requiem is sung in iron. Carry it well, smith: no other hands will ever shape its equal.',
     rev: 1,
-    xpReward: 2500,
     objectives: [
       {
         type: 'craft',
