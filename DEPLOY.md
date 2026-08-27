@@ -283,6 +283,20 @@ For off-box safety, sync the directory to S3 occasionally:
   masterwrought material release to EVERY realm process in one pass for the same
   reason the farming bullet gives, and treat a rollback across it as an economy
   event: it needs a restore-from-backup plan, not just a release note.
+- **Perfecting rollback (a pre-Perfecting binary DESTROYS Perfected bonuses through
+  normal play)**: the per-copy `perfecting`/`perfected` markers themselves survive an
+  older binary (its instance load bound is drop-only, not a whitelist), but that
+  binary's `isEnchantedInstance` reads a Perfected copy's bare `rolled.stats` record
+  as a LEGACY ENCHANT. One ordinary confirmed replace-enchant on such a copy then
+  takes the legacy wipe arm and replaces `rolled.stats` wholesale with the new
+  enchant's bonus: the R5 Perfected bonus is gone, permanently, because the copy
+  still carries `perfected: true` and refuses re-earning it. The same misread also
+  re-opens the pre-fix Lucent Infusion holding-scan hole while Perfected copies now
+  exist. So a rollback across the Perfecting release is NOT merely lossy: leave it
+  running only with apply-enchant replace disabled, or accept that every Perfected
+  unenchanted copy a player confirms a replace onto loses its bonus until
+  restore-from-backup. Deploy the Perfecting release fleet-wide in one pass like the
+  two bullets above.
 - **Client/server deploy order for content releases**: deploy the SERVER first, then
   let clients update. Web and desktop bundles refresh on their next load. The iOS
   binary rides App Store review and cannot pick up a same-day bundle (LiveUpdates
