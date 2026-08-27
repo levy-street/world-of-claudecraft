@@ -13929,4 +13929,11 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   // masterwrought Phase 11o, the engineering on-ramp (M16 fills).
   'entities.items.cogwheel_blank.name': '齒輪坯件',
   'entities.items.copperlens_ocular.name': '銅透鏡目鏡',
+  // masterwrought Phase 13, the orange promotion (M16 fills). The Deed of
+  // Making noun matches the sim_i18n.ts error.legendaryDeed row.
+  'entities.items.deed_of_making.name': '造物契據',
+  'hudChrome.materialHint.deedOfMaking':
+    '銘文契據。由完美化的最終階段消耗，為已臻至完美的作品命名，使其成為傳說。',
+  'hudChrome.crafting.legendaryLine': '{item}以{name}之名重生，成為傳說！',
+  'hudChrome.crafting.legendaryZoneLine': '{player}將{item}鍛造成了傳說{name}！',
 };

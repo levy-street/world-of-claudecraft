@@ -2724,6 +2724,14 @@ const ITEM_ENTITY_IDS = [
   // src/ui/i18n.locales overlays in the same change.
   'cogwheel_blank',
   'copperlens_ocular',
+  // masterwrought Phase 13, the orange promotion: the inscription recipe's
+  // consumable that names a Perfected work a legend. Appended at the END
+  // under the append-only contract, behind the prior masterwrought appends;
+  // resolves BY KEY. The name is wordy English, so M16 non-Latin fills land
+  // in the src/ui/i18n.locales overlays in the same change, and the
+  // 'Deed of Making' noun there must match the sim_i18n.ts
+  // error.legendaryDeed rows.
+  'deed_of_making',
 ] as const;
 
 type ItemEntityId = (typeof ITEM_ENTITY_IDS)[number];
@@ -3105,6 +3113,9 @@ const APPENDED_ITEM_NAMES: Partial<Record<ItemEntityId, string>> = {
   // masterwrought Phase 11o, the engineering on-ramp.
   cogwheel_blank: 'Cogwheel Blank',
   copperlens_ocular: 'Copperlens Ocular',
+  // masterwrought Phase 13 (the orange promotion). The noun is shared with
+  // the sim_i18n.ts error.legendaryDeed refusal rows in every locale.
+  deed_of_making: 'Deed of Making',
 };
 
 function itemTranslations(names: readonly string[]): ItemEntityTranslations {

@@ -2747,7 +2747,8 @@ export const da_DK: EnTranslations = {
       "resonantTimber": "Fortryllelsesreagens. Fås ved affortryllelse af stave, tryllestave, buer og armbrøster af sjælden kvalitet eller bedre.",
       "masterwroughtIntermediate": "Masterwrought crafting component.",
       "quickeningCatalyst": "Crafting catalyst. An alchemist can craft only one each day.",
-      "growthTonic": "Farming supply. Spent when you plant a crop for a chance of a slightly larger harvest. If the crop withers, the tonic is lost with it."
+      "growthTonic": "Farming supply. Spent when you plant a crop for a chance of a slightly larger harvest. If the crop withers, the tonic is lost with it.",
+      "deedOfMaking": "Inscription writ. Consumed by the final Perfecting rank to name a Perfected work and make it a legend."
     },
     "discord": {
       "title": "Discord",
@@ -3633,6 +3634,8 @@ export const da_DK: EnTranslations = {
       "learnMoreAtStation": "{master} ved {station} kan lære dig flere {craft}-opskrifter.",
       "masterworkToast": "Mesterværk! {name}",
       "masterworkZoneLine": "{crafter} lavede et mesterværk {name}!",
+      "legendaryLine": "{item} is reborn as {name}, a legend!",
+      "legendaryZoneLine": "{player} forged {item} into the legend {name}!",
       "tierUpToast": "{craft} avanceret til niveau {tier}!",
       "skillUpToast": "{skill}-færdighed øget til {level}!",
       "skillUpSubtext": "Færdighed øget til {level}!",
@@ -13564,6 +13567,9 @@ export const da_DK: EnTranslations = {
       },
       "copperlens_ocular": {
         "name": "Copperlens Ocular"
+      },
+      "deed_of_making": {
+        "name": "Deed of Making"
       },
       "conjured_water4": {
         "name": "Fremmanet kildevand"

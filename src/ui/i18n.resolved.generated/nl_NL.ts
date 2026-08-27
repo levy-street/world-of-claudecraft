@@ -2747,7 +2747,8 @@ export const nl_NL: EnTranslations = {
       "resonantTimber": "Betoveringsreagens. Verkregen door het onbetoveren van zeldzame of betere staven, stokken, bogen en kruisbogen.",
       "masterwroughtIntermediate": "Masterwrought crafting component.",
       "quickeningCatalyst": "Crafting catalyst. An alchemist can craft only one each day.",
-      "growthTonic": "Farming supply. Spent when you plant a crop for a chance of a slightly larger harvest. If the crop withers, the tonic is lost with it."
+      "growthTonic": "Farming supply. Spent when you plant a crop for a chance of a slightly larger harvest. If the crop withers, the tonic is lost with it.",
+      "deedOfMaking": "Inscription writ. Consumed by the final Perfecting rank to name a Perfected work and make it a legend."
     },
     "discord": {
       "title": "Discord",
@@ -3633,6 +3634,8 @@ export const nl_NL: EnTranslations = {
       "learnMoreAtStation": "{master} bij {station} kan je meer {craft}-recepten leren.",
       "masterworkToast": "Meesterwerk! {name}",
       "masterworkZoneLine": "{crafter} heeft het meesterwerk {name} gemaakt!",
+      "legendaryLine": "{item} is reborn as {name}, a legend!",
+      "legendaryZoneLine": "{player} forged {item} into the legend {name}!",
       "tierUpToast": "{craft} is doorgegaan naar niveau {tier}!",
       "skillUpToast": "{skill}-vaardigheid verhoogd naar {level}!",
       "skillUpSubtext": "Vaardigheid verhoogd naar {level}!",
@@ -13564,6 +13567,9 @@ export const nl_NL: EnTranslations = {
       },
       "copperlens_ocular": {
         "name": "Copperlens Ocular"
+      },
+      "deed_of_making": {
+        "name": "Deed of Making"
       },
       "conjured_water4": {
         "name": "Getoverd bronwater"

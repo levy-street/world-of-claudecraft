@@ -2747,7 +2747,8 @@ export const id_ID: EnTranslations = {
       "resonantTimber": "Reagen Pemantraan. Dihasilkan dari menghancurkan pemantraan staf, tongkat sihir, busur, dan busur silang langka atau lebih baik.",
       "masterwroughtIntermediate": "Masterwrought crafting component.",
       "quickeningCatalyst": "Crafting catalyst. An alchemist can craft only one each day.",
-      "growthTonic": "Farming supply. Spent when you plant a crop for a chance of a slightly larger harvest. If the crop withers, the tonic is lost with it."
+      "growthTonic": "Farming supply. Spent when you plant a crop for a chance of a slightly larger harvest. If the crop withers, the tonic is lost with it.",
+      "deedOfMaking": "Inscription writ. Consumed by the final Perfecting rank to name a Perfected work and make it a legend."
     },
     "discord": {
       "title": "Discord",
@@ -3633,6 +3634,8 @@ export const id_ID: EnTranslations = {
       "learnMoreAtStation": "{master} di {station} dapat mengajarkan lebih banyak resep {craft} padamu.",
       "masterworkToast": "Karya besar! {name}",
       "masterworkZoneLine": "{crafter} membuat karya besar {name}!",
+      "legendaryLine": "{item} is reborn as {name}, a legend!",
+      "legendaryZoneLine": "{player} forged {item} into the legend {name}!",
       "tierUpToast": "{craft} maju ke tingkat {tier}!",
       "skillUpToast": "Keahlian {skill} meningkat ke {level}!",
       "skillUpSubtext": "Keahlian meningkat ke {level}!",
@@ -13564,6 +13567,9 @@ export const id_ID: EnTranslations = {
       },
       "copperlens_ocular": {
         "name": "Copperlens Ocular"
+      },
+      "deed_of_making": {
+        "name": "Deed of Making"
       },
       "conjured_water4": {
         "name": "Air Mata Air Sihir"

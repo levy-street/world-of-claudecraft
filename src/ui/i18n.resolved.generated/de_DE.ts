@@ -2747,7 +2747,8 @@ export const de_DE: EnTranslations = {
       "resonantTimber": "Verzauberungsreagenz. Entzaubert aus seltenen oder besseren Stäben, Zauberstäben, Bögen und Armbrüsten.",
       "masterwroughtIntermediate": "Masterwrought crafting component.",
       "quickeningCatalyst": "Crafting catalyst. An alchemist can craft only one each day.",
-      "growthTonic": "Farming supply. Spent when you plant a crop for a chance of a slightly larger harvest. If the crop withers, the tonic is lost with it."
+      "growthTonic": "Farming supply. Spent when you plant a crop for a chance of a slightly larger harvest. If the crop withers, the tonic is lost with it.",
+      "deedOfMaking": "Inscription writ. Consumed by the final Perfecting rank to name a Perfected work and make it a legend."
     },
     "discord": {
       "title": "Discord",
@@ -3633,6 +3634,8 @@ export const de_DE: EnTranslations = {
       "learnMoreAtStation": "{master} an der {station} kann dir weitere {craft}-Rezepte beibringen.",
       "masterworkToast": "Meisterwerk! {name}",
       "masterworkZoneLine": "{crafter} hat das Meisterwerk {name} hergestellt!",
+      "legendaryLine": "{item} is reborn as {name}, a legend!",
+      "legendaryZoneLine": "{player} forged {item} into the legend {name}!",
       "tierUpToast": "{craft} auf Stufe {tier} aufgestiegen!",
       "skillUpToast": "{skill}-Fertigkeit auf {level} gestiegen!",
       "skillUpSubtext": "Fertigkeit auf {level} gestiegen!",
@@ -13564,6 +13567,9 @@ export const de_DE: EnTranslations = {
       },
       "copperlens_ocular": {
         "name": "Copperlens Ocular"
+      },
+      "deed_of_making": {
+        "name": "Deed of Making"
       },
       "conjured_water4": {
         "name": "Herbeigezaubertes Quellwasser"

@@ -2747,7 +2747,8 @@ export const vi_VN: EnTranslations = {
       "resonantTimber": "Nguyên liệu pháp khắc. Nhận được khi hủy pháp khắc trượng, đũa phép, cung, và nỏ hiếm trở lên.",
       "masterwroughtIntermediate": "Masterwrought crafting component.",
       "quickeningCatalyst": "Crafting catalyst. An alchemist can craft only one each day.",
-      "growthTonic": "Farming supply. Spent when you plant a crop for a chance of a slightly larger harvest. If the crop withers, the tonic is lost with it."
+      "growthTonic": "Farming supply. Spent when you plant a crop for a chance of a slightly larger harvest. If the crop withers, the tonic is lost with it.",
+      "deedOfMaking": "Inscription writ. Consumed by the final Perfecting rank to name a Perfected work and make it a legend."
     },
     "discord": {
       "title": "Discord",
@@ -3633,6 +3634,8 @@ export const vi_VN: EnTranslations = {
       "learnMoreAtStation": "{master} tại {station} có thể dạy bạn thêm công thức {craft}.",
       "masterworkToast": "Tuyệt tác! {name}",
       "masterworkZoneLine": "{crafter} đã tạo ra một kiệt tác {name}!",
+      "legendaryLine": "{item} is reborn as {name}, a legend!",
+      "legendaryZoneLine": "{player} forged {item} into the legend {name}!",
       "tierUpToast": "{craft} đã thăng cấp lên cấp {tier}!",
       "skillUpToast": "Kỹ năng {skill} tăng lên {level}!",
       "skillUpSubtext": "Kỹ năng tăng lên {level}!",
@@ -13564,6 +13567,9 @@ export const vi_VN: EnTranslations = {
       },
       "copperlens_ocular": {
         "name": "Copperlens Ocular"
+      },
+      "deed_of_making": {
+        "name": "Deed of Making"
       },
       "conjured_water4": {
         "name": "Nước Suối Được Tạo Phép"

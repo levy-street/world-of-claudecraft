@@ -2747,7 +2747,8 @@ export const ru_RU: EnTranslations = {
       "resonantTimber": "Реагент для наложения чар. Выпадает при распылении посохов, жезлов, луков и арбалетов редкого качества и выше.",
       "masterwroughtIntermediate": "Компонент ковки мастера.",
       "quickeningCatalyst": "Катализатор для ремесла. Алхимик может создать лишь один в день.",
-      "growthTonic": "Принадлежность для фермерства. Расходуется при посадке и даёт шанс собрать чуть больший урожай. Если растение засохнет, тоник пропадает вместе с ним."
+      "growthTonic": "Принадлежность для фермерства. Расходуется при посадке и даёт шанс собрать чуть больший урожай. Если растение засохнет, тоник пропадает вместе с ним.",
+      "deedOfMaking": "Каллиграфическая грамота. Расходуется на последнем ранге совершенствования, чтобы дать имя доведённому до совершенства творению и сделать его легендой."
     },
     "discord": {
       "title": "Discord",
@@ -3633,6 +3634,8 @@ export const ru_RU: EnTranslations = {
       "learnMoreAtStation": "{master} у станции «{station}» научит вас новым рецептам ремесла «{craft}».",
       "masterworkToast": "Шедевр! {name}",
       "masterworkZoneLine": "Шедевр от {crafter}: {name}!",
+      "legendaryLine": "{item} перерождается как {name} и становится легендой!",
+      "legendaryZoneLine": "{player} перековывает {item} в легенду: {name}!",
       "tierUpToast": "{craft}: достигнут ранг {tier}!",
       "skillUpToast": "{skill}: навык повышен до {level}!",
       "skillUpSubtext": "Навык повышен до {level}!",
@@ -13564,6 +13567,9 @@ export const ru_RU: EnTranslations = {
       },
       "copperlens_ocular": {
         "name": "Окуляр с медной линзой"
+      },
+      "deed_of_making": {
+        "name": "Грамота созидания"
       },
       "conjured_water4": {
         "name": "Сотворённая родниковая вода"

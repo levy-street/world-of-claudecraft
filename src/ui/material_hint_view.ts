@@ -75,6 +75,12 @@ export const MATERIAL_HINT_KEYS: Readonly<Record<string, TranslationKey>> = {
   // 'junk' with no def-level use because plant_crop consumes it as the
   // plant-time yield knob, so the purpose line is the one place that says so.
   growth_tonic: 'hudChrome.materialHint.growthTonic',
+  // The Deed of Making (masterwrought Phase 13): the promotion writ is a
+  // recipe output (recipe_deed_of_making), kind 'junk' with no def-level use
+  // because the final Perfecting rank consumes it (perfecting.ts
+  // LEGENDARY_PROMOTION_COST), so this purpose line is the one place its
+  // tooltip says what it is for (the growth_tonic precedent).
+  deed_of_making: 'hudChrome.materialHint.deedOfMaking',
 };
 
 /** The hint key for one item id, or undefined for every other item. */

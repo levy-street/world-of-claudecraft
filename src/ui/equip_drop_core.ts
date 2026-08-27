@@ -16,6 +16,7 @@ import {
   canEquipItem,
   canEquipItemInSlot,
   displacedSlotForEquip,
+  equipCandidateInstance,
   equipCandidateQuality,
   masterwroughtConflictSlot,
   slotAcceptsItem,
@@ -77,7 +78,21 @@ export function paperdollDropAction(
     // coexists with the incoming one.
     const displaced = displacedSlotForEquip(item, slot, equipment, (id) => ITEMS[id], cls, spec);
     const ignore = displaced ? [slot, displaced] : [slot];
-    if (uniqueEquipConflictSlot(item, equipment, (id) => ITEMS[id], ignore)) {
+    // Instance-aware since phase 13 (the sim's own call shape in items.ts
+    // equipItem): the worn payloads and the PREDICTED candidate copy's payload
+    // ride along, so a promoted legendary-rolled copy counts on either side.
+    // The candidate is the same highest-index unit-selection peek the
+    // Masterwrought sub-cap below makes over the mirrored bags.
+    if (
+      uniqueEquipConflictSlot(
+        item,
+        equipment,
+        (id) => ITEMS[id],
+        ignore,
+        instances,
+        inventory ? equipCandidateInstance(inventory, item.id) : undefined,
+      )
+    ) {
       return 'blockedUnique';
     }
     // The Masterwrought counted family, over the same exempt slots. The

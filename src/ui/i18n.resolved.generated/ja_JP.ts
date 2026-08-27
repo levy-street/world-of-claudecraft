@@ -2747,7 +2747,8 @@ export const ja_JP: EnTranslations = {
       "resonantTimber": "エンチャントの材料。レア以上の杖、ワンド、弓、クロスボウを魔力分解して得られる。",
       "masterwroughtIntermediate": "名匠鍛造の製作部材。",
       "quickeningCatalyst": "製作用の触媒。錬金術師は1日に1個しか作れません。",
-      "growthTonic": "農業用品。作付け時に消費され、収穫がやや増えることがある。作物が枯れるとトニックも失われる。"
+      "growthTonic": "農業用品。作付け時に消費され、収穫がやや増えることがある。作物が枯れるとトニックも失われる。",
+      "deedOfMaking": "銘刻の証書。完全化の最終段階で消費され、完全化された作品に名前を与えて伝説にします。"
     },
     "discord": {
       "title": "Discord",
@@ -3633,6 +3634,8 @@ export const ja_JP: EnTranslations = {
       "learnMoreAtStation": "{station}の{master}が{craft}のレシピをさらに教えてくれます。",
       "masterworkToast": "傑作！{name}",
       "masterworkZoneLine": "{crafter}が傑作{name}を作り上げました！",
+      "legendaryLine": "{item}は{name}として生まれ変わり、伝説となりました！",
+      "legendaryZoneLine": "{player}が{item}を鍛え上げ、伝説{name}を生み出しました！",
       "tierUpToast": "{craft}がティア {tier} に到達しました！",
       "skillUpToast": "{skill}の技能が {level} に上がりました！",
       "skillUpSubtext": "技能が {level} に上がりました！",
@@ -13564,6 +13567,9 @@ export const ja_JP: EnTranslations = {
       },
       "copperlens_ocular": {
         "name": "銅レンズの単眼鏡"
+      },
+      "deed_of_making": {
+        "name": "創造の証書"
       },
       "conjured_water4": {
         "name": "魔法の湧き水"

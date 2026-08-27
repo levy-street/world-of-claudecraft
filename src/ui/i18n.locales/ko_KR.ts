@@ -14223,4 +14223,11 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   // masterwrought Phase 11o, the engineering on-ramp (M16 fills).
   'entities.items.cogwheel_blank.name': '톱니바퀴 원판',
   'entities.items.copperlens_ocular.name': '구리 렌즈 접안경',
+  // masterwrought Phase 13, the orange promotion (M16 fills). The Deed of
+  // Making noun matches the sim_i18n.ts error.legendaryDeed row.
+  'entities.items.deed_of_making.name': '창조의 증서',
+  'hudChrome.materialHint.deedOfMaking':
+    '명각 증서. 완전화의 마지막 단계에서 소모되어, 완전해진 작품에 이름을 붙여 전설로 만듭니다.',
+  'hudChrome.crafting.legendaryLine': '{item}이(가) {name}(으)로 다시 태어나 전설이 되었습니다!',
+  'hudChrome.crafting.legendaryZoneLine': '{player}님이 {item}을(를) 전설 {name}(으)로 벼려냈습니다!',
 };

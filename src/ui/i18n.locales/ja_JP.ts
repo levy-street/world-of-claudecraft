@@ -14219,4 +14219,11 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   // masterwrought Phase 11o, the engineering on-ramp (M16 fills).
   'entities.items.cogwheel_blank.name': '歯車のブランク',
   'entities.items.copperlens_ocular.name': '銅レンズの単眼鏡',
+  // masterwrought Phase 13, the orange promotion (M16 fills). The Deed of
+  // Making noun matches the sim_i18n.ts error.legendaryDeed row.
+  'entities.items.deed_of_making.name': '創造の証書',
+  'hudChrome.materialHint.deedOfMaking':
+    '銘刻の証書。完全化の最終段階で消費され、完全化された作品に名前を与えて伝説にします。',
+  'hudChrome.crafting.legendaryLine': '{item}は{name}として生まれ変わり、伝説となりました！',
+  'hudChrome.crafting.legendaryZoneLine': '{player}が{item}を鍛え上げ、伝説{name}を生み出しました！',
 };

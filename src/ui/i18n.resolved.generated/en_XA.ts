@@ -2747,7 +2747,8 @@ export const en_XA: EnTranslations = {
       "resonantTimber": "[Éñçĥáñţíñĝ ŕéáĝéñţ. Ðíšéñçĥáñţéð ƒŕóɱ ŕáŕé áñð ƀéţţéŕ šţáʋéš, ŵáñðš, ƀóŵš, áñð çŕóššƀóŵš.]",
       "masterwroughtIntermediate": "[Ɱášţéŕŵŕóúĝĥţ çŕáƒţíñĝ çóɱþóñéñţ.]",
       "quickeningCatalyst": "[Çŕáƒţíñĝ çáţáļýšţ. Áñ áļçĥéɱíšţ çáñ çŕáƒţ óñļý óñé éáçĥ ðáý.]",
-      "growthTonic": "[Ƒáŕɱíñĝ šúþþļý. Šþéñţ ŵĥéñ ýóú þļáñţ á çŕóþ ƒóŕ á çĥáñçé óƒ á šļíĝĥţļý ļáŕĝéŕ ĥáŕʋéšţ. Íƒ ţĥé çŕóþ ŵíţĥéŕš, ţĥé ţóñíç íš ļóšţ ŵíţĥ íţ.]"
+      "growthTonic": "[Ƒáŕɱíñĝ šúþþļý. Šþéñţ ŵĥéñ ýóú þļáñţ á çŕóþ ƒóŕ á çĥáñçé óƒ á šļíĝĥţļý ļáŕĝéŕ ĥáŕʋéšţ. Íƒ ţĥé çŕóþ ŵíţĥéŕš, ţĥé ţóñíç íš ļóšţ ŵíţĥ íţ.]",
+      "deedOfMaking": "[Íñšçŕíþţíóñ ŵŕíţ. Çóñšúɱéð ƀý ţĥé ƒíñáļ Þéŕƒéçţíñĝ ŕáñķ ţó ñáɱé á Þéŕƒéçţéð ŵóŕķ áñð ɱáķé íţ á ļéĝéñð.]"
     },
     "discord": {
       "title": "[Ðíšçóŕð]",
@@ -3633,6 +3634,8 @@ export const en_XA: EnTranslations = {
       "learnMoreAtStation": "[{master} áţ ţĥé {station} çáñ ţéáçĥ ýóú ɱóŕé {craft} ŕéçíþéš.]",
       "masterworkToast": "[Ɱášţéŕŵóŕķ! {name}]",
       "masterworkZoneLine": "[{crafter} çŕáƒţéð á ɱášţéŕŵóŕķ {name}!]",
+      "legendaryLine": "[{item} íš ŕéƀóŕñ áš {name}, á ļéĝéñð!]",
+      "legendaryZoneLine": "[{player} ƒóŕĝéð {item} íñţó ţĥé ļéĝéñð {name}!]",
       "tierUpToast": "[{craft} áðʋáñçéð ţó ţíéŕ {tier}!]",
       "skillUpToast": "[{skill} šķíļļ íñçŕéášéð ţó {level}!]",
       "skillUpSubtext": "[Šķíļļ íñçŕéášéð ţó {level}!]",
@@ -13564,6 +13567,9 @@ export const en_XA: EnTranslations = {
       },
       "copperlens_ocular": {
         "name": "[Çóþþéŕļéñš Óçúļáŕ]"
+      },
+      "deed_of_making": {
+        "name": "[Ðééð óƒ Ɱáķíñĝ]"
       },
       "conjured_water4": {
         "name": "[Çóñĵúŕéð Šþŕíñĝŵáţéŕ]"

@@ -167,7 +167,6 @@ const baseEnTable = {
   // plain numeric captures; the terminal advance emits n equal to total and is
   // followed by the separate done line.
   'error.perfectNotApex': 'Only Masterwrought items can be perfected.',
-  'error.perfectAlready': 'That item is already Perfected.',
   'error.perfectSkill': 'Perfecting that requires 125 skill in the craft that made it.',
   'error.perfectMaterialLocked': 'A material needed for perfecting is locked.',
   'error.perfectMaterials': 'You lack the materials to perfect that item.',
@@ -175,6 +174,21 @@ const baseEnTable = {
   'log.perfectAdvance': 'Perfecting: {item} advances to rank {n} of {total}.',
   'log.perfectFail': 'The perfecting attempt fails; the materials are spent.',
   'log.perfectDone': '{item} is now Perfected!',
+  // The orange promotion's deny ladder (Masterwrought phase 13,
+  // src/sim/professions/perfecting.ts resolveLegendaryPromotion). Four
+  // placeholder-free EXACT refusal rows; there is deliberately NO success
+  // text line (the legendaryForged / legendaryForgedZone events drive the
+  // client copy instead). This block RETIRED error.perfectAlready ('That item
+  // is already Perfected.'): the promotion made an already-Perfected copy a
+  // valid target, so the sim no longer emits it anywhere, and a dead matcher
+  // row would ship 21 locale strings free to drift. legendaryAlready is its
+  // successor at the ladder's top. The 'Deed of Making' noun must match the
+  // items catalog row (i18n.catalog/items.ts APPENDED_ITEM_NAMES) and its
+  // non-Latin overlay fills.
+  'error.legendaryAlready': 'That work is already legendary.',
+  'error.legendaryName': 'That work needs a name to become a legend.',
+  'error.legendaryNameShape': 'That name cannot be inscribed on the work.',
+  'error.legendaryDeed': 'You need a Deed of Making to make that work a legend.',
   // Refusal when an aimed equip slot (a paperdoll drop target) does not accept the
   // dragged piece, e.g. a helm dropped on a ring finger (src/sim/items.ts equipItem).
   'error.wrongEquipSlot': 'That does not go in that slot.',
@@ -1523,7 +1537,6 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'error.sunderMoved': 'El objeto se movió; rotura cancelada.',
     'log.sunderResult': 'Rompes {item} y obtienes Esencia Escindida.',
     'error.perfectNotApex': 'Solo los objetos maestroforjados se pueden perfeccionar.',
-    'error.perfectAlready': 'Ese objeto ya está perfeccionado.',
     'error.perfectSkill': 'Perfeccionarlo requiere 125 de habilidad en el oficio que lo creó.',
     'error.perfectMaterialLocked': 'Un material necesario para perfeccionar está bloqueado.',
     'error.perfectMaterials': 'Te faltan los materiales para perfeccionar ese objeto.',
@@ -1531,6 +1544,11 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'log.perfectAdvance': 'Perfeccionamiento: {item} avanza al rango {n} de {total}.',
     'log.perfectFail': 'El intento de perfeccionamiento falla; los materiales se consumen.',
     'log.perfectDone': '¡{item} ahora está perfeccionado!',
+    'error.legendaryAlready': 'Esa obra ya es legendaria.',
+    'error.legendaryName': 'Esa obra necesita un nombre para convertirse en leyenda.',
+    'error.legendaryNameShape': 'Ese nombre no se puede inscribir en la obra.',
+    'error.legendaryDeed':
+      'Necesitas una Escritura de Creación para convertir esa obra en leyenda.',
     'error.patternKnown': 'Ya conoces esa receta.',
     'error.patternProfession': 'No has practicado esa profesión.',
     'error.patternSkill': 'Tu habilidad es demasiado baja para aprender ese patrón.',
@@ -2008,7 +2026,6 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'error.sunderMoved': 'El objeto se ha movido; rotura cancelada.',
     'log.sunderResult': 'Rompes {item} y obtienes Esencia Escindida.',
     'error.perfectNotApex': 'Solo los objetos maestroforjados pueden perfeccionarse.',
-    'error.perfectAlready': 'Ese objeto ya está perfeccionado.',
     'error.perfectSkill': 'Perfeccionarlo requiere 125 de habilidad en el oficio que lo creó.',
     'error.perfectMaterialLocked': 'Un material necesario para perfeccionar está bloqueado.',
     'error.perfectMaterials': 'Te faltan los materiales para perfeccionar ese objeto.',
@@ -2017,6 +2034,11 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'log.perfectFail':
       'El intento de perfeccionamiento ha fallado; los materiales se han consumido.',
     'log.perfectDone': '¡{item} ha alcanzado la perfección!',
+    'error.legendaryAlready': 'Esa obra ya es legendaria.',
+    'error.legendaryName': 'Esa obra necesita un nombre para convertirse en leyenda.',
+    'error.legendaryNameShape': 'Ese nombre no puede inscribirse en la obra.',
+    'error.legendaryDeed':
+      'Necesitas una Escritura de Creación para convertir esa obra en leyenda.',
     'error.patternKnown': 'Ya conoces esa receta.',
     'error.patternProfession': 'No has practicado esa profesión.',
     'error.patternSkill': 'Tu nivel de habilidad es demasiado bajo para aprender ese patrón.',
@@ -2504,7 +2526,6 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'error.sunderMoved': 'L’objet a bougé, brisage annulé.',
     'log.sunderResult': 'Vous brisez {item} en Essence fendue.',
     'error.perfectNotApex': 'Seuls les objets forgés de maître peuvent être perfectionnés.',
-    'error.perfectAlready': 'Cet objet est déjà perfectionné.',
     'error.perfectSkill':
       'Perfectionner cet objet requiert 125 de compétence dans le métier qui l’a fabriqué.',
     'error.perfectMaterialLocked': 'Un matériau nécessaire au perfectionnement est verrouillé.',
@@ -2513,6 +2534,11 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'log.perfectAdvance': 'Perfectionnement : {item} passe au rang {n} sur {total}.',
     'log.perfectFail': 'La tentative de perfectionnement échoue ; les matériaux sont dépensés.',
     'log.perfectDone': '{item} est désormais perfectionné !',
+    'error.legendaryAlready': 'Cette œuvre est déjà légendaire.',
+    'error.legendaryName': "Cette œuvre a besoin d'un nom pour devenir une légende.",
+    'error.legendaryNameShape': "Ce nom ne peut pas être inscrit sur l'œuvre.",
+    'error.legendaryDeed':
+      'Il vous faut un Acte de Façonnage pour faire de cette œuvre une légende.',
     'error.patternKnown': 'Vous connaissez déjà cette recette.',
     'error.patternProfession': "Vous n'avez pas pratiqué cette profession.",
     'error.patternSkill': 'Votre compétence est trop faible pour apprendre ce patron.',
@@ -3000,7 +3026,6 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'error.sunderMoved': 'L’objet a bougé, brisage annulé.',
     'log.sunderResult': 'Vous brisez {item} en Essence fendue.',
     'error.perfectNotApex': 'Seuls les objets forgés de maître peuvent être perfectionnés.',
-    'error.perfectAlready': 'Cet objet est déjà perfectionné.',
     'error.perfectSkill':
       'Perfectionner cet objet exige 125 de compétence dans le métier qui l’a fabriqué.',
     'error.perfectMaterialLocked': 'Un matériau requis pour le perfectionnement est verrouillé.',
@@ -3009,6 +3034,11 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'log.perfectAdvance': 'Perfectionnement : {item} passe au rang {n} de {total}.',
     'log.perfectFail': 'La tentative de perfectionnement échoue ; les matériaux sont dépensés.',
     'log.perfectDone': '{item} est maintenant perfectionné !',
+    'error.legendaryAlready': 'Cette œuvre est déjà légendaire.',
+    'error.legendaryName': "Cette œuvre a besoin d'un nom pour devenir une légende.",
+    'error.legendaryNameShape': "Ce nom ne peut pas être inscrit sur l'œuvre.",
+    'error.legendaryDeed':
+      "Vous avez besoin d'un Acte de Façonnage pour faire de cette œuvre une légende.",
     'error.patternKnown': 'Vous connaissez déjà cette recette.',
     'error.patternProfession': "Vous n'avez pas pratiqué cette profession.",
     'error.patternSkill': 'Votre compétence est trop faible pour apprendre ce patron.',
@@ -3696,7 +3726,6 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'error.sunderMoved': 'L’oggetto si è spostato; frantumazione annullata.',
     'log.sunderResult': 'Infrangi {item} in Essenza Infranta.',
     'error.perfectNotApex': 'Solo gli oggetti maestroforgiati possono essere perfezionati.',
-    'error.perfectAlready': 'Quell’oggetto è già perfezionato.',
     'error.perfectSkill': 'Perfezionarlo richiede 125 di abilità nel mestiere che lo ha creato.',
     'error.perfectMaterialLocked': 'Un materiale necessario al perfezionamento è bloccato.',
     'error.perfectMaterials': 'Ti mancano i materiali per perfezionare quell’oggetto.',
@@ -3704,6 +3733,10 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'log.perfectAdvance': 'Perfezionamento: {item} avanza al grado {n} di {total}.',
     'log.perfectFail': 'Il tentativo di perfezionamento fallisce; i materiali sono consumati.',
     'log.perfectDone': '{item} è ora perfezionato!',
+    'error.legendaryAlready': 'Quell’opera è già leggendaria.',
+    'error.legendaryName': 'Quell’opera ha bisogno di un nome per diventare leggenda.',
+    'error.legendaryNameShape': 'Quel nome non può essere inciso sull’opera.',
+    'error.legendaryDeed': 'Ti serve un Atto di Creazione per rendere quell’opera una leggenda.',
     'error.patternKnown': 'Conosci già quella ricetta.',
     'error.patternProfession': 'Non hai praticato quella professione.',
     'error.patternSkill': 'La tua abilità è troppo bassa per imparare quello schema.',
@@ -4187,7 +4220,6 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'error.sunderMoved': 'Der Gegenstand wurde verschoben; Zerschlagen abgebrochen.',
     'log.sunderResult': 'Du zerschlägst {item} zu Geborstener Essenz.',
     'error.perfectNotApex': 'Nur meistergeschmiedete Gegenstände können vollendet werden.',
-    'error.perfectAlready': 'Dieser Gegenstand ist bereits vollendet.',
     'error.perfectSkill':
       'Die Vollendung erfordert 125 Fertigkeit in dem Handwerk, das ihn geschaffen hat.',
     'error.perfectMaterialLocked': 'Ein für die Vollendung benötigtes Material ist gesperrt.',
@@ -4196,6 +4228,11 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'log.perfectAdvance': 'Vollendung: {item} steigt auf Rang {n} von {total}.',
     'log.perfectFail': 'Der Vollendungsversuch schlägt fehl; die Materialien sind verbraucht.',
     'log.perfectDone': '{item} ist nun vollendet!',
+    'error.legendaryAlready': 'Dieses Werk ist bereits legendär.',
+    'error.legendaryName': 'Dieses Werk braucht einen Namen, um zur Legende zu werden.',
+    'error.legendaryNameShape': 'Dieser Name kann dem Werk nicht eingeschrieben werden.',
+    'error.legendaryDeed':
+      'Du brauchst eine Urkunde der Erschaffung, um dieses Werk zur Legende zu machen.',
     'error.patternKnown': 'Das Rezept kennen Sie bereits.',
     'error.patternProfession': 'Du hast diesen Beruf nicht ausgeübt.',
     'error.patternSkill': 'Deine Fertigkeit ist zu gering, um dieses Muster zu erlernen.',
@@ -4659,7 +4696,6 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'error.sunderMoved': '物品已移动，裂断已取消。',
     'log.sunderResult': '你将{item}裂断为断裂精华。',
     'error.perfectNotApex': '只有大师锻造物品才能进行完美化。',
-    'error.perfectAlready': '该物品已臻至完美。',
     'error.perfectSkill': '完美化需要在制作该物品的工艺上达到125点技能。',
     'error.perfectMaterialLocked': '完美化所需的一种材料已被锁定。',
     'error.perfectMaterials': '你缺少将该物品完美化所需的材料。',
@@ -4667,6 +4703,10 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'log.perfectAdvance': '完美化：{item}提升至第{n}阶，共{total}阶。',
     'log.perfectFail': '完美化尝试失败，材料已被消耗。',
     'log.perfectDone': '{item}已臻至完美！',
+    'error.legendaryAlready': '该作品已是传说。',
+    'error.legendaryName': '该作品需要一个名字才能成为传说。',
+    'error.legendaryNameShape': '该名字无法铭刻在作品上。',
+    'error.legendaryDeed': '你需要一份造物契据才能让该作品成为传说。',
     'error.patternKnown': '你已经学会了该配方。',
     'error.patternProfession': '你尚未修习该专业。',
     'error.patternSkill': '你的技能不足以学习该图样。',
@@ -5130,7 +5170,6 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'error.sunderMoved': '物品已移動，裂斷已取消。',
     'log.sunderResult': '你將{item}裂斷為斷裂精華。',
     'error.perfectNotApex': '只有大師鍛造物品才能進行完美化。',
-    'error.perfectAlready': '該物品已臻至完美。',
     'error.perfectSkill': '完美化需要在製作該物品的工藝上達到125點技能。',
     'error.perfectMaterialLocked': '完美化所需的一種材料已被鎖定。',
     'error.perfectMaterials': '你缺少將該物品完美化所需的材料。',
@@ -5138,6 +5177,10 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'log.perfectAdvance': '完美化：{item}提升至第{n}階，共{total}階。',
     'log.perfectFail': '完美化嘗試失敗，材料已被消耗。',
     'log.perfectDone': '{item}已臻至完美！',
+    'error.legendaryAlready': '該作品已是傳說。',
+    'error.legendaryName': '該作品需要一個名字才能成為傳說。',
+    'error.legendaryNameShape': '該名字無法銘刻在作品上。',
+    'error.legendaryDeed': '你需要一份造物契據才能讓該作品成為傳說。',
     'error.patternKnown': '你已經學會了該配方。',
     'error.patternProfession': '你尚未修習該專業。',
     'error.patternSkill': '你的技能不足以學習該圖樣。',
@@ -5611,7 +5654,6 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'error.sunderMoved': '아이템이 이동하여 가르기가 취소되었습니다.',
     'log.sunderResult': '{item}을(를) 갈라 갈라진 정수를 얻었습니다.',
     'error.perfectNotApex': '명장 제작 아이템만 완전하게 만들 수 있습니다.',
-    'error.perfectAlready': '해당 아이템은 이미 완전해졌습니다.',
     'error.perfectSkill':
       '완전하게 만들려면 해당 아이템을 만든 기술의 숙련도가 125 이상이어야 합니다.',
     'error.perfectMaterialLocked': '완전화에 필요한 재료가 잠겨 있습니다.',
@@ -5620,6 +5662,10 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'log.perfectAdvance': '완전화: {item}이(가) {total}단계 중 {n}단계로 올라갔습니다.',
     'log.perfectFail': '완전화 시도에 실패하여 재료가 소모되었습니다.',
     'log.perfectDone': '{item}이(가) 이제 완전해졌습니다!',
+    'error.legendaryAlready': '해당 작품은 이미 전설입니다.',
+    'error.legendaryName': '해당 작품이 전설이 되려면 이름이 필요합니다.',
+    'error.legendaryNameShape': '해당 이름은 작품에 새길 수 없습니다.',
+    'error.legendaryDeed': '해당 작품을 전설로 만들려면 창조의 증서가 필요합니다.',
     'error.patternKnown': '이미 알고 있는 제조법입니다.',
     'error.patternProfession': '해당 전문 기술을 수련한 적이 없습니다.',
     'error.patternSkill': '숙련도가 낮아 그 도안을 배울 수 없습니다.',
@@ -6102,7 +6148,6 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'error.sunderMoved': 'アイテムが移動したため、断ちは中止されました。',
     'log.sunderResult': '{item}を断ち、断たれし精髄を得ました。',
     'error.perfectNotApex': '名匠鍛造アイテムだけを完全化することができます。',
-    'error.perfectAlready': 'そのアイテムはすでに完全化されています。',
     'error.perfectSkill': '完全化するには、そのアイテムを作った製作スキルが125必要です。',
     'error.perfectMaterialLocked': '完全化に必要な素材がロックされています。',
     'error.perfectMaterials': 'そのアイテムを完全化するための素材が足りません。',
@@ -6110,6 +6155,10 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'log.perfectAdvance': '完全化：{item}が{total}段階中の第{n}段階に進みました。',
     'log.perfectFail': '完全化の試みは失敗し、素材は消費されました。',
     'log.perfectDone': '{item}は完全化されました！',
+    'error.legendaryAlready': 'その作品はすでに伝説となっています。',
+    'error.legendaryName': 'その作品が伝説となるには名前が必要です。',
+    'error.legendaryNameShape': 'その名前は作品に刻むことができません。',
+    'error.legendaryDeed': 'その作品を伝説にするには創造の証書が必要です。',
     'error.patternKnown': 'そのレシピはすでに習得しています。',
     'error.patternProfession': 'その職業を修めていません。',
     'error.patternSkill': '技能が足りないため、その図案を習得できません。',
@@ -6584,7 +6633,6 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'error.sunderMoved': 'O item foi movido; rompimento cancelado.',
     'log.sunderResult': 'Você rompe {item} em Essência Rompida.',
     'error.perfectNotApex': 'Somente itens forjados por mestre podem ser aperfeiçoados.',
-    'error.perfectAlready': 'Esse item já está aperfeiçoado.',
     'error.perfectSkill': 'Aperfeiçoá-lo exige 125 de habilidade no ofício que o criou.',
     'error.perfectMaterialLocked': 'Um material necessário ao aperfeiçoamento está bloqueado.',
     'error.perfectMaterials': 'Você não tem os materiais para aperfeiçoar esse item.',
@@ -6592,6 +6640,11 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'log.perfectAdvance': 'Aperfeiçoamento: {item} avança para o grau {n} de {total}.',
     'log.perfectFail': 'A tentativa de aperfeiçoamento falha; os materiais são gastos.',
     'log.perfectDone': '{item} agora está aperfeiçoado!',
+    'error.legendaryAlready': 'Essa obra já é lendária.',
+    'error.legendaryName': 'Essa obra precisa de um nome para se tornar uma lenda.',
+    'error.legendaryNameShape': 'Esse nome não pode ser inscrito na obra.',
+    'error.legendaryDeed':
+      'Você precisa de uma Escritura da Criação para tornar essa obra uma lenda.',
     'error.patternKnown': 'Você já conhece essa receita.',
     'error.patternProfession': 'Você não praticou essa profissão.',
     'error.patternSkill': 'Sua habilidade é baixa demais para aprender esse molde.',
@@ -7075,7 +7128,6 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'error.sunderMoved': 'Предмет переместился, раскалывание отменено.',
     'log.sunderResult': 'Вы раскалываете {item} и получаете Расколотую эссенцию.',
     'error.perfectNotApex': 'Довести до совершенства можно только предметы «Ковка мастера».',
-    'error.perfectAlready': 'Этот предмет уже доведён до совершенства.',
     'error.perfectSkill':
       'Чтобы довести его до совершенства, нужен навык 125 в ремесле, которым он создан.',
     'error.perfectMaterialLocked':
@@ -7086,6 +7138,10 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'log.perfectAdvance': 'Совершенствование: {item} переходит на ранг {n} из {total}.',
     'log.perfectFail': 'Попытка совершенствования не удалась; материалы потрачены.',
     'log.perfectDone': 'Предмет {item} доведён до совершенства!',
+    'error.legendaryAlready': 'Это творение уже легендарно.',
+    'error.legendaryName': 'Этому творению нужно имя, чтобы стать легендой.',
+    'error.legendaryNameShape': 'Это имя нельзя начертать на творении.',
+    'error.legendaryDeed': 'Чтобы сделать это творение легендой, нужна Грамота созидания.',
     'error.patternKnown': 'Вы уже знаете этот рецепт.',
     'error.patternProfession': 'Вы не занимались этой профессией.',
     'error.patternSkill': 'Ваш навык слишком низок, чтобы изучить эту схему.',
@@ -7250,7 +7306,6 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'aura.icicles': 'Rampouchy',
     'aura.perfectMoment': 'Dokonalý okamžik',
     'error.perfectNotApex': 'Zdokonalit lze jen mistrovsky kované předměty.',
-    'error.perfectAlready': 'Tento předmět už je zdokonalený.',
     'error.perfectSkill': 'Zdokonalení vyžaduje dovednost 125 v řemesle, které předmět vytvořilo.',
     'error.perfectMaterialLocked': 'Materiál potřebný ke zdokonalení je zamčený.',
     'error.perfectMaterials': 'Nemáte materiály potřebné ke zdokonalení tohoto předmětu.',
@@ -7258,6 +7313,10 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'log.perfectAdvance': 'Zdokonalování: {item} postupuje na stupeň {n} z {total}.',
     'log.perfectFail': 'Pokus o zdokonalení selhal; materiály byly spotřebovány.',
     'log.perfectDone': 'Předmět {item} je nyní zdokonalený!',
+    'error.legendaryAlready': 'Toto dílo už je legendární.',
+    'error.legendaryName': 'Toto dílo potřebuje jméno, aby se stalo legendou.',
+    'error.legendaryNameShape': 'Toto jméno nelze do díla vepsat.',
+    'error.legendaryDeed': 'Abyste z tohoto díla udělali legendu, potřebujete Listinu stvoření.',
   },
   nl_NL: {
     'log.passingStoneKneel': 'Je sluit je hand om de Doorgangssteen, en het strand laat je gaan.',
@@ -7418,7 +7477,6 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'aura.icicles': 'IJspegels',
     'aura.perfectMoment': 'Volmaakt Ogenblik',
     'error.perfectNotApex': 'Alleen meestergesmede voorwerpen kunnen worden vervolmaakt.',
-    'error.perfectAlready': 'Dat voorwerp is al vervolmaakt.',
     'error.perfectSkill':
       'Dat vervolmaken vereist 125 vaardigheid in het ambacht waarmee het is gemaakt.',
     'error.perfectMaterialLocked': 'Een materiaal dat nodig is om te vervolmaken is vergrendeld.',
@@ -7427,6 +7485,11 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'log.perfectAdvance': 'Vervolmaken: {item} stijgt naar rang {n} van {total}.',
     'log.perfectFail': 'De vervolmakingspoging mislukt; de materialen zijn verbruikt.',
     'log.perfectDone': '{item} is nu vervolmaakt!',
+    'error.legendaryAlready': 'Dat werkstuk is al legendarisch.',
+    'error.legendaryName': 'Dat werkstuk heeft een naam nodig om een legende te worden.',
+    'error.legendaryNameShape': 'Die naam kan niet in het werkstuk worden gegraveerd.',
+    'error.legendaryDeed':
+      'Je hebt een Scheppingsakte nodig om van dat werkstuk een legende te maken.',
   },
   pl_PL: {
     'log.passingStoneKneel': 'Zaciskasz dłoń na Kamieniu Przejścia, a wybrzeże pozwala ci odejść.',
@@ -7588,7 +7651,6 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'aura.icicles': 'Sople lodu',
     'aura.perfectMoment': 'Idealna chwila',
     'error.perfectNotApex': 'Udoskonalić można tylko mistrzowsko kute przedmioty.',
-    'error.perfectAlready': 'Ten przedmiot jest już udoskonalony.',
     'error.perfectSkill': 'Udoskonalenie wymaga 125 umiejętności w rzemiośle, które go stworzyło.',
     'error.perfectMaterialLocked': 'Materiał potrzebny do udoskonalenia jest zablokowany.',
     'error.perfectMaterials': 'Brakuje ci materiałów, by udoskonalić ten przedmiot.',
@@ -7596,6 +7658,10 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'log.perfectAdvance': 'Udoskonalanie: {item} awansuje na stopień {n} z {total}.',
     'log.perfectFail': 'Próba udoskonalenia nie powiodła się; materiały zostały zużyte.',
     'log.perfectDone': 'Przedmiot {item} jest teraz udoskonalony!',
+    'error.legendaryAlready': 'To dzieło jest już legendarne.',
+    'error.legendaryName': 'To dzieło potrzebuje imienia, by stać się legendą.',
+    'error.legendaryNameShape': 'Tego imienia nie można wyryć na dziele.',
+    'error.legendaryDeed': 'Potrzebujesz Aktu stworzenia, by uczynić to dzieło legendą.',
   },
   id_ID: {
     'log.passingStoneKneel':
@@ -7756,7 +7822,6 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'aura.icicles': 'Kerucut Es',
     'aura.perfectMoment': 'Momen Sempurna',
     'error.perfectNotApex': 'Hanya benda Tempaan Empu yang dapat disempurnakan.',
-    'error.perfectAlready': 'Benda itu sudah disempurnakan.',
     'error.perfectSkill':
       'Menyempurnakannya memerlukan keahlian 125 dalam kerajinan yang membuatnya.',
     'error.perfectMaterialLocked': 'Sebuah bahan yang diperlukan untuk penyempurnaan terkunci.',
@@ -7765,6 +7830,10 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'log.perfectAdvance': 'Penyempurnaan: {item} naik ke tingkat {n} dari {total}.',
     'log.perfectFail': 'Upaya penyempurnaan gagal; bahan-bahannya habis terpakai.',
     'log.perfectDone': '{item} kini telah disempurnakan!',
+    'error.legendaryAlready': 'Karya itu sudah legendaris.',
+    'error.legendaryName': 'Karya itu membutuhkan nama untuk menjadi legenda.',
+    'error.legendaryNameShape': 'Nama itu tidak dapat diukir pada karya tersebut.',
+    'error.legendaryDeed': 'Anda memerlukan Akta Penciptaan untuk menjadikan karya itu legenda.',
   },
   tr_TR: {
     'log.passingStoneKneel':
@@ -7925,7 +7994,6 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'aura.icicles': 'Buz Sarkıtları',
     'aura.perfectMoment': 'Mükemmel An',
     'error.perfectNotApex': 'Yalnızca Usta İşi eşyalar mükemmelleştirilebilir.',
-    'error.perfectAlready': 'O eşya zaten mükemmelleştirilmiş.',
     'error.perfectSkill': 'Bunu mükemmelleştirmek için onu yapan zanaatta 125 beceri gerekir.',
     'error.perfectMaterialLocked': 'Mükemmelleştirme için gereken bir malzeme kilitli.',
     'error.perfectMaterials': 'O eşyayı mükemmelleştirecek malzemelerin yok.',
@@ -7933,6 +8001,10 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'log.perfectAdvance': 'Mükemmelleştirme: {item} {total} kademeden {n}. kademeye yükseldi.',
     'log.perfectFail': 'Mükemmelleştirme denemesi başarısız oldu; malzemeler harcandı.',
     'log.perfectDone': '{item} artık mükemmelleştirildi!',
+    'error.legendaryAlready': 'O eser zaten efsanevi.',
+    'error.legendaryName': 'O eserin efsane olabilmesi için bir isme ihtiyacı var.',
+    'error.legendaryNameShape': 'O isim esere yazılamaz.',
+    'error.legendaryDeed': 'O eseri efsaneye dönüştürmek için bir Yaratım Senedi gerekir.',
   },
   sv_SE: {
     'log.passingStoneKneel': 'Du sluter handen om Övergångsstenen, och stranden släpper dig.',
@@ -8091,7 +8163,6 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'aura.icicles': 'Istappar',
     'aura.perfectMoment': 'Perfekt ögonblick',
     'error.perfectNotApex': 'Endast mästersmidda föremål kan fulländas.',
-    'error.perfectAlready': 'Det föremålet är redan fulländat.',
     'error.perfectSkill': 'Att fullända det kräver 125 i färdighet i det hantverk som skapade det.',
     'error.perfectMaterialLocked': 'Ett material som krävs för fulländningen är låst.',
     'error.perfectMaterials': 'Du saknar materialen för att fullända det föremålet.',
@@ -8099,6 +8170,10 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'log.perfectAdvance': 'Fulländning: {item} stiger till rang {n} av {total}.',
     'log.perfectFail': 'Fulländningsförsöket misslyckas; materialen är förbrukade.',
     'log.perfectDone': '{item} är nu fulländat!',
+    'error.legendaryAlready': 'Det verket är redan legendariskt.',
+    'error.legendaryName': 'Det verket behöver ett namn för att bli en legend.',
+    'error.legendaryNameShape': 'Det namnet kan inte ristas in i verket.',
+    'error.legendaryDeed': 'Du behöver en Skapelseurkund för att göra det verket till en legend.',
   },
   vi_VN: {
     'log.passingStoneKneel': 'Bạn siết chặt tay quanh Đá Từ Trần, và bờ biển để bạn ra đi.',
@@ -8256,7 +8331,6 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'aura.icicles': 'Nhũ Băng',
     'aura.perfectMoment': 'Khoảnh Khắc Hoàn Hảo',
     'error.perfectNotApex': 'Chỉ có thể hoàn thiện các món Rèn Bởi Danh Sư.',
-    'error.perfectAlready': 'Vật phẩm đó đã được Hoàn Thiện.',
     'error.perfectSkill': 'Hoàn thiện món này cần 125 kỹ năng trong nghề đã chế tạo ra nó.',
     'error.perfectMaterialLocked': 'Một nguyên liệu cần cho việc hoàn thiện đang bị khóa.',
     'error.perfectMaterials': 'Bạn thiếu nguyên liệu để hoàn thiện vật phẩm đó.',
@@ -8264,6 +8338,10 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'log.perfectAdvance': 'Hoàn thiện: {item} tiến lên bậc {n} trên {total}.',
     'log.perfectFail': 'Lần thử hoàn thiện thất bại; nguyên liệu đã bị tiêu hao.',
     'log.perfectDone': '{item} giờ đã được Hoàn Thiện!',
+    'error.legendaryAlready': 'Tác phẩm đó đã là huyền thoại.',
+    'error.legendaryName': 'Tác phẩm đó cần một cái tên để trở thành huyền thoại.',
+    'error.legendaryNameShape': 'Cái tên đó không thể khắc lên tác phẩm.',
+    'error.legendaryDeed': 'Bạn cần một Chứng thư Tạo tác để biến tác phẩm đó thành huyền thoại.',
   },
   da_DK: {
     'log.passingStoneKneel': 'Du lukker hånden om Hvilestenen, og kysten lader dig gå.',
@@ -8423,7 +8501,6 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'aura.icicles': 'Istapper',
     'aura.perfectMoment': 'Perfekt Øjeblik',
     'error.perfectNotApex': 'Kun mestersmedede genstande kan fuldendes.',
-    'error.perfectAlready': 'Den genstand er allerede fuldendt.',
     'error.perfectSkill': 'At fuldende den kræver 125 i færdighed i det håndværk, der skabte den.',
     'error.perfectMaterialLocked': 'Et materiale, der kræves til fuldendelsen, er låst.',
     'error.perfectMaterials': 'Du mangler materialerne til at fuldende den genstand.',
@@ -8431,6 +8508,10 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'log.perfectAdvance': 'Fuldendelse: {item} stiger til rang {n} af {total}.',
     'log.perfectFail': 'Fuldendelsesforsøget mislykkes; materialerne er brugt.',
     'log.perfectDone': '{item} er nu fuldendt!',
+    'error.legendaryAlready': 'Det værk er allerede legendarisk.',
+    'error.legendaryName': 'Det værk har brug for et navn for at blive en legende.',
+    'error.legendaryNameShape': 'Det navn kan ikke indgraveres i værket.',
+    'error.legendaryDeed': 'Du skal bruge et Skabelsesskøde for at gøre det værk til en legende.',
   },
 };
 

@@ -10,12 +10,16 @@
 // lines it actually caused (instanceBonusStatLines), which is the fact a player
 // is reading the tooltip for.
 import { ENCHANTS } from '../sim/content/enchants';
+import { effectiveQuality } from '../sim/equipment_rules';
 import { isCommissionEligibleKind } from '../sim/professions/commission';
 import { isEnchantedInstance } from '../sim/professions/enchanting';
+import { LEGENDARY_PROMOTION_COST } from '../sim/professions/perfecting';
 import type { ItemDef, ItemInstancePayload, Stats } from '../sim/types';
 import { esc } from './esc';
 import { formatNumber, type TranslationKey, t } from './i18n';
 import { QUALITY_COLOR } from './icons';
+import { ITEM_QUALITY_LABEL_KEYS } from './item_kind_label';
+import { itemNameColor } from './item_name_color';
 import { MASTERWORK_SEAL_IMAGE_URL } from './profession_art';
 import { svgIcon } from './ui_icons';
 
@@ -45,9 +49,9 @@ export function itemNumber(value: number, fractionDigits = 0): string {
 }
 
 /** The WORN-slot tooltip payload (Professions 2.0): exactly the
- *  fields the public eqi wire carries (signer/enchant/rolled, the
- *  worn-identity trim), so the offline paperdoll and the online mirror
- *  render identical worn tooltips. Online, equippedInstances is decoded from
+ *  fields the public eqi wire carries (signer/enchant/rolled, plus the
+ *  phase 13 legendary name; the worn-identity trim), so the offline
+ *  paperdoll and the online mirror render identical worn tooltips. Online, equippedInstances is decoded from
  *  the stripped eqi allowlist and never carries bindOnTrade/boundTo/charges;
  *  offline the self entity holds the FULL payload, so without this trim the
  *  Maker's Bond lines would render on worn gear in one host only. The bond
@@ -61,7 +65,50 @@ export function wornTooltipInstance(
   if (instance.signer !== undefined) worn.signer = instance.signer;
   if (instance.enchant !== undefined) worn.enchant = instance.enchant;
   if (instance.rolled !== undefined) worn.rolled = instance.rolled;
+  // The player-chosen legendary name (Masterwrought phase 13): the one
+  // cosmetic field to JOIN the eqi allowlist since it was written, so the
+  // offline paperdoll title matches what an online inspector sees.
+  if (instance.name !== undefined) worn.name = instance.name;
   return worn;
+}
+
+/** The tooltip's EFFECTIVE quality for a copy (Masterwrought phase 13): the
+ *  copy's own rolled quality wins over its def's (the equipment_rules.ts
+ *  precedence the equip caps already read), narrowed back to the def's
+ *  quality when the rolled string is not a known tier, so the label lookup
+ *  stays total against a hostile or future-tier wire string (the
+ *  itemNameColor Object.hasOwn doctrine). */
+export function tooltipEffectiveQuality(
+  def: ItemDef,
+  instance: ItemInstancePayload | undefined,
+): ItemDef['quality'] {
+  const quality = effectiveQuality(def, instance);
+  return quality !== undefined && Object.hasOwn(ITEM_QUALITY_LABEL_KEYS, quality)
+    ? (quality as NonNullable<ItemDef['quality']>)
+    : def.quality;
+}
+
+/** The tooltip TITLE block (Masterwrought phase 13). A promoted copy's
+ *  player-chosen name becomes the title, colored by the EFFECTIVE quality
+ *  (legendary orange for a promoted copy), with the def's own localized name
+ *  on the line below so the item's identity is never lost; an unnamed copy
+ *  keeps the classic one-line title. The chosen name is PLAYER-AUTHORED text:
+ *  esc'd raw (the entity-name path), never through t(). `defName` is the
+ *  caller's already-localized def name (itemDisplayName), passed in so this
+ *  module stays a pure string builder. */
+export function instanceTitleHtml(
+  def: ItemDef,
+  instance: ItemInstancePayload | undefined,
+  defName: string,
+): string {
+  const color = itemNameColor({ kind: def.kind, quality: tooltipEffectiveQuality(def, instance) });
+  if (instance?.name === undefined) {
+    return `<div class="tt-title" style="color:${color}">${esc(defName)}</div>`;
+  }
+  return (
+    `<div class="tt-title" style="color:${color}">${esc(instance.name)}</div>` +
+    `<div class="tt-sub">${esc(defName)}</div>`
+  );
 }
 
 /** The Maker's Bond lines (Professions 2.0), rendered in the def
@@ -210,11 +257,27 @@ function isCraftedPlaceable(def: ItemDef | undefined): boolean {
   return !!def && 'feast' in def && def.feast !== undefined;
 }
 
+/** THE PROMOTION-BILL CARVE-OUT (masterwrought phase 13), the feast lesson's
+ *  exact sibling one phase on: the Deed of Making is kind 'junk' at quality
+ *  'rare' ON PURPOSE (the tradable-writ arm; rare keeps it out of the Sell
+ *  Junk sweep), so mintsSignerPayload's rarity arm signs a scribed copy, and
+ *  the kind-only read would call an inscriptionist's own writ "Gathered by".
+ *  A promotion-bill consumable is only ever CRAFTED (inscription's 125 rung)
+ *  or traded for, so its provenance is a craft by construction. Keyed on the
+ *  promotion bill itself (perfecting.ts LEGENDARY_PROMOTION_COST), never an
+ *  id list here, so a future bill line is covered without an edit (the
+ *  feast-payload doctrine: derive from the owning mechanic). */
+function isPromotionBillItem(def: ItemDef | undefined): boolean {
+  return !!def && LEGENDARY_PROMOTION_COST.some((c) => c.itemId === def.id);
+}
+
 /** Does this DEF read as gathered provenance? The kind-level rule above, minus
- *  the crafted placeables. Prefer this over the kind-only predicate at any call
- *  site that has the def in hand. */
+ *  the crafted placeables and the promotion-bill writs. Prefer this over the
+ *  kind-only predicate at any call site that has the def in hand. */
 export function isGatheredProvenance(def: ItemDef | undefined): boolean {
-  return isGatheredProvenanceKind(def?.kind) && !isCraftedPlaceable(def);
+  return (
+    isGatheredProvenanceKind(def?.kind) && !isCraftedPlaceable(def) && !isPromotionBillItem(def)
+  );
 }
 
 /** The classic "Crafted by X" flavor line for a signed copy, or "Gathered by

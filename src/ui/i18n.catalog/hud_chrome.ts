@@ -3606,6 +3606,12 @@ export const hudChromeStrings = {
     growthTonic:
       'Farming supply. Spent when you plant a crop for a chance of a slightly larger ' +
       'harvest. If the crop withers, the tonic is lost with it.',
+    // The Deed of Making (masterwrought Phase 13): written from the live
+    // mechanic (perfecting.ts resolveLegendaryPromotion consumes exactly one
+    // at the final rank, on an already-Perfected copy, with a chosen name).
+    deedOfMaking:
+      'Inscription writ. Consumed by the final Perfecting rank to name a ' +
+      'Perfected work and make it a legend.',
   },
   discord: {
     title: 'Discord',
@@ -5066,6 +5072,14 @@ export const hudChromeStrings = {
     learnMoreAtStation: '{master} at the {station} can teach you more {craft} recipes.',
     masterworkToast: 'Masterwork! {name}',
     masterworkZoneLine: '{crafter} crafted a masterwork {name}!',
+    // Masterwrought phase 13, the orange promotion celebration
+    // (craft_celebration_text_view.ts). {name} is the PLAYER-CHOSEN legendary
+    // name and {player} the owner's character name: both interpolated VALUES,
+    // never keys (the feast/makers-mark precedent). legendaryLine is the
+    // personal line; legendaryZoneLine the soft zone-broadcast sibling on the
+    // masterworkZoneLine sentence shape.
+    legendaryLine: '{item} is reborn as {name}, a legend!',
+    legendaryZoneLine: '{player} forged {item} into the legend {name}!',
     tierUpToast: '{craft} advanced to tier {tier}!',
     // Profession skill level-up (skill_level_toast_view.ts). skillUpToast is
     // the per-point chat line (and the polite announcer line) for every

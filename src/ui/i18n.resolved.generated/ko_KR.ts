@@ -2747,7 +2747,8 @@ export const ko_KR: EnTranslations = {
       "resonantTimber": "마법부여 재료. 희귀 이상 지팡이, 마법봉, 활, 석궁의 마력을 추출해 얻습니다.",
       "masterwroughtIntermediate": "명장 제작용 재료.",
       "quickeningCatalyst": "제작용 촉매. 연금술사는 하루에 하나만 제작할 수 있습니다.",
-      "growthTonic": "농사 용품. 심을 때 소모되며 수확이 조금 늘어날 수 있습니다. 작물이 시들면 토닉도 함께 사라집니다."
+      "growthTonic": "농사 용품. 심을 때 소모되며 수확이 조금 늘어날 수 있습니다. 작물이 시들면 토닉도 함께 사라집니다.",
+      "deedOfMaking": "명각 증서. 완전화의 마지막 단계에서 소모되어, 완전해진 작품에 이름을 붙여 전설로 만듭니다."
     },
     "discord": {
       "title": "Discord",
@@ -3633,6 +3634,8 @@ export const ko_KR: EnTranslations = {
       "learnMoreAtStation": "{station}의 {master}이(가) 더 많은 {craft} 제작법을 가르쳐 줄 수 있습니다.",
       "masterworkToast": "걸작! {name}",
       "masterworkZoneLine": "{crafter}님이 걸작 {name}을(를) 제작했습니다!",
+      "legendaryLine": "{item}이(가) {name}(으)로 다시 태어나 전설이 되었습니다!",
+      "legendaryZoneLine": "{player}님이 {item}을(를) 전설 {name}(으)로 벼려냈습니다!",
       "tierUpToast": "{craft} 티어 {tier} 달성!",
       "skillUpToast": "{skill} 기술 {level} 달성!",
       "skillUpSubtext": "기술 {level} 달성!",
@@ -13564,6 +13567,9 @@ export const ko_KR: EnTranslations = {
       },
       "copperlens_ocular": {
         "name": "구리 렌즈 접안경"
+      },
+      "deed_of_making": {
+        "name": "창조의 증서"
       },
       "conjured_water4": {
         "name": "창조된 샘물"

@@ -242,6 +242,15 @@ import {
   craftCastActivitySig,
 } from './craft_cast_view';
 import {
+  craftBannerIcon,
+  craftBannerText,
+  legendaryForgedLine,
+  legendaryZoneLine,
+  masterworkToastText,
+  masterworkZoneLine,
+  tierUpToastText,
+} from './craft_celebration_text_view';
+import {
   buildCraftCelebrationPlan,
   CRAFT_TIER_UP_DRAIN_WINDOW,
   type CraftTierUp,
@@ -555,8 +564,10 @@ import {
   instanceBonusStatLines,
   instanceLockLine,
   instanceMakersMarkLine,
+  instanceTitleHtml,
   itemNumber,
   itemStatName,
+  tooltipEffectiveQuality,
 } from './item_instance_tooltip';
 import { itemKindLabel, itemQualityLabel } from './item_kind_label';
 import { itemNameColor } from './item_name_color';
@@ -675,7 +686,7 @@ import {
   procOverlayState,
 } from './proc_overlay_view';
 import { maskProfanity } from './profanity';
-import { MASTERWORK_SEAL_IMAGE_URL, professionImageUrl } from './profession_art';
+import { professionImageUrl } from './profession_art';
 import { type ProfessionEventInput, planProfessionEvent } from './profession_event_lines_core';
 import {
   buildProfessionIdentityView,
@@ -5843,9 +5854,9 @@ export class Hud {
     // Item"). Story lines (related quest, progress, rules, orphaned) come from
     // the pure model; escape and tEntity stay in this host.
     const questModel = this.questItemTooltipFor(item);
-    // Shared helper: quest kind paints quest gold; all other kinds use quality.
-    const qColor = itemNameColor(item);
-    let html = `<div class="tt-title" style="color:${qColor}">${esc(itemDisplayName(item))}</div>`;
+    // Title: quest gold for quest kinds, else the copy's EFFECTIVE quality; a
+    // named copy titles the card (item_instance_tooltip.ts owns the rules).
+    let html = instanceTitleHtml(item, instance, itemDisplayName(item));
     // Quality/kind line, e.g. "Epic Armor". Heroic items (dungeon upgraded variants
     // via heroicOf, bespoke heroic-tier raid gear via heroic) append a gold
     // "[HEROIC]" tag here (never in the name) so the drop reads "Epic Armor [HEROIC]".
@@ -5858,7 +5869,7 @@ export class Hud {
     } else {
       let qualityKindHtml = esc(
         t('itemUi.tooltip.qualityKind', {
-          quality: itemQualityLabel(item.quality),
+          quality: itemQualityLabel(tooltipEffectiveQuality(item, instance)),
           kind: itemKindLabel(item.kind, item.id),
         }),
       );
@@ -5890,12 +5901,12 @@ export class Hud {
           ? t('itemUi.slots.twoHand')
           : itemSlotName(item.slot);
       const armorTypeKey = itemArmorTypeLabelKey(item);
-      // Unique-equipped tag (every legendary with a slot; one worn copy per
-      // item family): rendered like the armor-weight indicator, right-aligned
-      // in the slot row's type seat, in the soulbound gold. With an armor
-      // weight already in that seat (a future legendary armor piece) the tag
-      // falls back to its own gold line so neither indicator is lost.
-      const uniqueTag = isUniqueEquipped(item) ? t('hudChrome.itemUniqueEquipped') : null;
+      // Unique-equipped tag (every EFFECTIVE legendary with a slot, a phase 13
+      // promoted copy included; one worn copy per item family): rendered in
+      // the armor-weight indicator's type seat, soulbound gold; with an armor
+      // weight already there it takes its own gold line so neither is lost.
+      const unique = isUniqueEquipped(item, instance);
+      const uniqueTag = unique ? t('hudChrome.itemUniqueEquipped') : null;
       if (armorTypeKey) {
         // Red armor type = the viewing player's class cannot wear this armor weight
         // (e.g. a mage hovering Mail), so they know it is not for them at a glance.
@@ -11507,19 +11518,26 @@ export class Hud {
           break;
         }
         case 'masterworkZone': {
-          // Soft zone broadcast: every recipient in the crafter's zone,
-          // INCLUDING the crafter, logs the localized line; NO audio cue for
-          // anyone (the crafter's own celebration sound rides the personal
-          // 'masterwork' plan above). The gatherRareEvent render pattern.
-          const item = ITEMS[ev.itemId];
-          this.log(
-            t('hudChrome.crafting.masterworkZoneLine', {
-              crafter: ev.crafterName,
-              name: item ? itemDisplayName(item) : ev.itemId,
-            }),
-            QUALITY_COLOR.epic,
-            MASTERWORK_SEAL_IMAGE_URL,
-          );
+          // Soft zone broadcast (the gatherRareEvent pattern): every recipient
+          // in zone INCLUDING the crafter logs the line; NO audio cue for
+          // anyone (the crafter's cue rides the personal 'masterwork' plan).
+          const l = masterworkZoneLine(ev.crafterName, ev.itemId);
+          this.log(l.text, l.color, l.icon);
+          break;
+        }
+        case 'legendaryForged': {
+          // The orange promotion's personal celebration (Masterwrought phase
+          // 13): one chat line plus the one achievement cue.
+          const l = legendaryForgedLine(ev.itemId, ev.name);
+          this.log(l.text, l.color, l.icon);
+          audio.achievement();
+          break;
+        }
+        case 'legendaryForgedZone': {
+          // The masterworkZone rule: every recipient INCLUDING the owner logs
+          // the line, no audio for anyone (the owner's cue is personal above).
+          const l = legendaryZoneLine(ev.ownerName, ev.itemId, ev.itemName);
+          this.log(l.text, l.color, l.icon);
           break;
         }
         case 'commissionOrderResult': {
@@ -13378,32 +13396,14 @@ export class Hud {
       tierUps,
       reducedMotion,
     });
-    const masterworkText = (itemId: string) => {
-      const item = ITEMS[itemId];
-      return t('hudChrome.crafting.masterworkToast', {
-        name: item ? itemDisplayName(item) : itemId,
-      });
-    };
-    const tierUpText = (up: CraftTierUp) =>
-      t('hudChrome.crafting.tierUpToast', {
-        craft: craftNameText(up.craftId),
-        tier: formatNumber(up.toTier, { maximumFractionDigits: 0 }),
-      });
     if (plan.masterworkLogItemId !== null)
-      this.log(masterworkText(plan.masterworkLogItemId), '#ffd100');
-    for (const up of plan.tierUpLogs) this.log(tierUpText(up), '#ffd100');
+      this.log(masterworkToastText(plan.masterworkLogItemId), '#ffd100');
+    for (const up of plan.tierUpLogs) this.log(tierUpToastText(up), '#ffd100');
     if (plan.banner !== null) {
-      const text =
-        plan.banner.kind === 'masterwork'
-          ? masterworkText(plan.banner.itemId)
-          : tierUpText(plan.banner);
+      const text = craftBannerText(plan.banner);
       // plan.motion trims the banner fade only; the announcer push below is
       // the polite #combat-live ARIA region (accessibility, never gated).
-      this.showBanner(
-        text,
-        plan.motion,
-        plan.banner.kind === 'masterwork' ? MASTERWORK_SEAL_IMAGE_URL : undefined,
-      );
+      this.showBanner(text, plan.motion, craftBannerIcon(plan.banner));
       // The banner div carries no live semantics (the handleDeedUnlocks
       // precedent), so the polite #combat-live region carries the copy.
       this.combatAnnouncer.push(text, performance.now());

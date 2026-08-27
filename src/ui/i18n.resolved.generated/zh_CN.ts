@@ -2747,7 +2747,8 @@ export const zh_CN: EnTranslations = {
       "resonantTimber": "附魔材料。分解精良及以上品质的法杖、魔杖、弓和弩可得。",
       "masterwroughtIntermediate": "大师锻造制作部件。",
       "quickeningCatalyst": "制作催化剂。炼金术士每天只能制作一个。",
-      "growthTonic": "农用品。种植时消耗，有机会获得略多的收成。若作物枯萎，滋补剂也会随之失去。"
+      "growthTonic": "农用品。种植时消耗，有机会获得略多的收成。若作物枯萎，滋补剂也会随之失去。",
+      "deedOfMaking": "铭文契据。由完美化的最终阶段消耗，为已臻至完美的作品命名，使其成为传说。"
     },
     "discord": {
       "title": "Discord",
@@ -3633,6 +3634,8 @@ export const zh_CN: EnTranslations = {
       "learnMoreAtStation": "{station}的{master}可以教你更多{craft}配方。",
       "masterworkToast": "杰作！{name}",
       "masterworkZoneLine": "{crafter}制作出了杰作{name}！",
+      "legendaryLine": "{item}以{name}之名重生，成为传说！",
+      "legendaryZoneLine": "{player}将{item}锻造成了传说{name}！",
       "tierUpToast": "{craft}提升至阶级 {tier}！",
       "skillUpToast": "{skill}技能提升至 {level}！",
       "skillUpSubtext": "技能提升至 {level}！",
@@ -13564,6 +13567,9 @@ export const zh_CN: EnTranslations = {
       },
       "copperlens_ocular": {
         "name": "铜透镜目镜"
+      },
+      "deed_of_making": {
+        "name": "造物契据"
       },
       "conjured_water4": {
         "name": "魔法泉水"

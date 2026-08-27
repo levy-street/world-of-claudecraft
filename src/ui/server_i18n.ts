@@ -144,6 +144,7 @@ export const DICT: Record<string, Record<string, string>> = {
     'chat.filterMuted': "That language isn't allowed here. You're muted for {duration}.",
     'chat.filterWarning': "Warning: that language isn't allowed here. Continued use will mute you.",
     'pet.nameNotAllowed': 'Pet name is not allowed.',
+    'legendary.nameNotAllowed': 'That name is not allowed.',
     'chat.muted': 'You are muted from chat for {minutes} more minutes.{reason}',
     'chat.mutedOne': 'You are muted from chat for {minutes} more minute.{reason}',
     'chat.muteReason': ' Reason: {reason}',
@@ -162,6 +163,7 @@ export const DICT: Record<string, Record<string, string>> = {
     'chat.filterMuted': "That language isn't allowed here. You're muted for {duration}.",
     'chat.filterWarning': "Warning: that language isn't allowed here. Continued use will mute you.",
     'pet.nameNotAllowed': 'Pet name is not allowed.',
+    'legendary.nameNotAllowed': 'That name is not allowed.',
     'chat.muted': 'You are muted from chat for {minutes} more minutes.{reason}',
     'chat.mutedOne': 'You are muted from chat for {minutes} more minute.{reason}',
     'chat.muteReason': ' Reason: {reason}',
@@ -298,6 +300,7 @@ export const DICT: Record<string, Record<string, string>> = {
     'chat.filterWarning':
       'Advertencia: ese lenguaje no está permitido aquí. Si continúas, se te silenciará.',
     'pet.nameNotAllowed': 'Ese nombre de mascota no está permitido.',
+    'legendary.nameNotAllowed': 'Ese nombre no está permitido.',
     'chat.muted': 'Estás silenciado en el chat durante {minutes} minutos más.{reason}',
     'chat.mutedOne': 'Estás silenciado en el chat durante {minutes} minuto más.{reason}',
     'chat.muteReason': ' Motivo: {reason}',
@@ -443,6 +446,7 @@ export const DICT: Record<string, Record<string, string>> = {
     'chat.filterWarning':
       'Advertencia: ese lenguaje no está permitido aquí. Si continúas, se te silenciará.',
     'pet.nameNotAllowed': 'Ese nombre de mascota no está permitido.',
+    'legendary.nameNotAllowed': 'Ese nombre no está permitido.',
     'chat.muted': 'Estás silenciado en el chat durante {minutes} minutos más.{reason}',
     'chat.mutedOne': 'Estás silenciado en el chat durante {minutes} minuto más.{reason}',
     'chat.muteReason': ' Motivo: {reason}',
@@ -606,6 +610,7 @@ export const DICT: Record<string, Record<string, string>> = {
     'chat.filterWarning':
       "Avertissement : ce langage n'est pas autorisé ici. Continuer entraînera une coupure de votre accès au chat.",
     'pet.nameNotAllowed': "Ce nom de familier n'est pas autorisé.",
+    'legendary.nameNotAllowed': "Ce nom n'est pas autorisé.",
     'chat.muted': 'Votre accès au chat est coupé pour encore {minutes} minutes.{reason}',
     'chat.mutedOne': 'Votre accès au chat est coupé pour encore {minutes} minute.{reason}',
     'chat.muteReason': ' Motif : {reason}',
@@ -750,6 +755,7 @@ export const DICT: Record<string, Record<string, string>> = {
     'chat.filterWarning':
       "Avertissement : ce langage n'est pas autorisé ici. Continuer entraînera une coupure de votre accès au chat.",
     'pet.nameNotAllowed': "Ce nom de familier n'est pas autorisé.",
+    'legendary.nameNotAllowed': "Ce nom n'est pas autorisé.",
     'chat.muted': 'Votre accès au chat est coupé pour encore {minutes} minutes.{reason}',
     'chat.mutedOne': 'Votre accès au chat est coupé pour encore {minutes} minute.{reason}',
     'chat.muteReason': ' Motif : {reason}',
@@ -878,6 +884,7 @@ export const DICT: Record<string, Record<string, string>> = {
     'chat.filterWarning':
       'Avvertimento: quel linguaggio non è consentito qui. Continuando verrai silenziato.',
     'pet.nameNotAllowed': 'Questo nome per la mascotte non è consentito.',
+    'legendary.nameNotAllowed': 'Questo nome non è consentito.',
     'chat.muted': 'Sei silenziato dalla chat per altri {minutes} minuti.{reason}',
     'chat.mutedOne': 'Sei silenziato dalla chat per ancora {minutes} minuto.{reason}',
     'chat.muteReason': ' Motivo: {reason}',
@@ -1019,6 +1026,7 @@ export const DICT: Record<string, Record<string, string>> = {
     'chat.filterWarning':
       'Warnung: Diese Sprache ist hier nicht erlaubt. Weitere Verwendung schaltet Euch stumm.',
     'pet.nameNotAllowed': 'Dieser Begleitername ist nicht erlaubt.',
+    'legendary.nameNotAllowed': 'Dieser Name ist nicht erlaubt.',
     'chat.muted': 'Ihr seid noch {minutes} Minuten lang vom Chat stummgeschaltet.{reason}',
     'chat.mutedOne': 'Ihr seid noch {minutes} Minute lang vom Chat stummgeschaltet.{reason}',
     'chat.muteReason': ' Grund: {reason}',
@@ -1161,6 +1169,7 @@ export const DICT: Record<string, Record<string, string>> = {
     'chat.filterMuted': '此处不允许这种言论。你已被禁言 {duration}。',
     'chat.filterWarning': '警告：此处不允许这种言论。继续使用将会被禁言。',
     'pet.nameNotAllowed': '该宠物名称不可使用。',
+    'legendary.nameNotAllowed': '该名称不可使用。',
     'chat.muted': '你已被禁言，还需 {minutes} 分钟才能聊天。{reason}',
     'chat.mutedOne': '你已被禁言，还需 {minutes} 分钟才能聊天。{reason}',
     'chat.muteReason': ' 原因：{reason}',
@@ -1294,6 +1303,7 @@ export const DICT: Record<string, Record<string, string>> = {
     'chat.filterMuted': '此處不允許這種言語。你已被禁言 {duration}。',
     'chat.filterWarning': '警告：此處不允許這種言語。繼續使用將會被禁言。',
     'pet.nameNotAllowed': '此寵物名稱不可使用。',
+    'legendary.nameNotAllowed': '該名稱不可使用。',
     'chat.muted': '你已被禁言，還有 {minutes} 分鐘無法聊天。{reason}',
     'chat.mutedOne': '你已被禁言，還有 {minutes} 分鐘無法聊天。{reason}',
     'chat.muteReason': ' 原因：{reason}',
@@ -1428,6 +1438,7 @@ export const DICT: Record<string, Record<string, string>> = {
     'chat.filterWarning':
       '경고: 여기서는 허용되지 않는 표현입니다. 계속 사용하면 채팅이 금지됩니다.',
     'pet.nameNotAllowed': '사용할 수 없는 소환수 이름입니다.',
+    'legendary.nameNotAllowed': '사용할 수 없는 이름입니다.',
     'chat.muted': '채팅이 금지되어 {minutes}분 더 채팅할 수 없습니다.{reason}',
     'chat.mutedOne': '채팅이 금지되어 {minutes}분 더 채팅할 수 없습니다.{reason}',
     'chat.muteReason': ' 사유: {reason}',
@@ -1563,6 +1574,7 @@ export const DICT: Record<string, Record<string, string>> = {
     'chat.filterWarning':
       '警告：その言葉はここでは使用できません。使い続けると発言禁止になります。',
     'pet.nameNotAllowed': 'そのペット名は使用できません。',
+    'legendary.nameNotAllowed': 'その名前は使用できません。',
     'chat.muted': '発言禁止中です。あと{minutes}分間チャットできません。{reason}',
     'chat.mutedOne': '発言禁止中です。あと{minutes}分間チャットできません。{reason}',
     'chat.muteReason': ' 理由：{reason}',
@@ -1702,6 +1714,7 @@ export const DICT: Record<string, Record<string, string>> = {
     'chat.filterWarning':
       'Aviso: esse tipo de linguagem não é permitido aqui. Continuar fará com que você seja silenciado.',
     'pet.nameNotAllowed': 'Esse nome de mascote não é permitido.',
+    'legendary.nameNotAllowed': 'Esse nome não é permitido.',
     'chat.muted': 'Você está silenciado no chat por mais {minutes} minutos.{reason}',
     'chat.mutedOne': 'Você está silenciado no chat por mais {minutes} minuto.{reason}',
     'chat.muteReason': ' Motivo: {reason}',
@@ -1843,6 +1856,7 @@ export const DICT: Record<string, Record<string, string>> = {
     'chat.filterWarning':
       'Предупреждение: такие выражения здесь запрещены. Продолжение приведёт к мьюту.',
     'pet.nameNotAllowed': 'Такое имя питомца недопустимо.',
+    'legendary.nameNotAllowed': 'Такое имя недопустимо.',
     'chat.muted': 'Вам выдан мьют в чате ещё на {minutes} мин.{reason}',
     'chat.mutedOne': 'Вам выдан мьют в чате ещё на {minutes} мин.{reason}',
     'chat.muteReason': ' Причина: {reason}',

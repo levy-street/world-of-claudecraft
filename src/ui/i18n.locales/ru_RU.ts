@@ -14416,4 +14416,11 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   // masterwrought Phase 11o, the engineering on-ramp (M16 fills).
   'entities.items.cogwheel_blank.name': 'Заготовка шестерни',
   'entities.items.copperlens_ocular.name': 'Окуляр с медной линзой',
+  // masterwrought Phase 13, the orange promotion (M16 fills). The Deed of
+  // Making noun matches the sim_i18n.ts error.legendaryDeed row.
+  'entities.items.deed_of_making.name': 'Грамота созидания',
+  'hudChrome.materialHint.deedOfMaking':
+    'Каллиграфическая грамота. Расходуется на последнем ранге совершенствования, чтобы дать имя доведённому до совершенства творению и сделать его легендой.',
+  'hudChrome.crafting.legendaryLine': '{item} перерождается как {name} и становится легендой!',
+  'hudChrome.crafting.legendaryZoneLine': '{player} перековывает {item} в легенду: {name}!',
 };
