@@ -19108,7 +19108,12 @@ compressed / 2,059 raw; 23 beds 3,261 / 7,831 (ratio 2.4:1). Per-copy
 cost measured through the real serializer on a FRESH apex copy (JSON
 text; JSONB runs higher by its per-key overhead, the estimator calibrates
 within about 20 percent): first attempt (the bind) 27-30 B; mid-track
-42-45; Perfected at the widest shipped record 88-91; a head-started
+42-45; Perfected at the widest shipped record 88-91 (CORRECTED at the
+Phase 12 QA, 2026-08-27: that figure modeled a three-key merged record,
+but the bake yields at most two non-zero axes and the stamp skips zero
+shares, so the widest shipped bag-slot delta is 81 B at a 3-digit
+boundTo to 84 at 6 digits; conservative direction, no bound at risk,
+every downstream census stays valid as an over-estimate); a head-started
 signed copy 15. Carriers: worn 12 (Perfected capped at 2 by R6/R16), bags
 80, bank 112, buyback 12 (head-start copies only; bound copies never
 vendor). Absurd census (194 cells at the dearest shape): about 17.7 KB
@@ -19140,6 +19145,18 @@ stub); an apex craft proc is silently wasted (the old gate needs the bake);
 and the OLD holding-scan guard makes the "one Perfected copy licenses an
 ordinary one" Infusion hole live again while Perfected copies now exist.
 Forward: pre-phase saves carry neither field and load as rank 0.
+AMENDED at the Phase 12 QA (2026-08-27): the section above audited the
+old GUARD but missed an old MUTATION path, found by the QA
+migration-safety re-proof from the cdc5e39971 sources. The old
+isEnchantedInstance reads a Perfected copy's bare rolled.stats record
+(no enchant, never rolled.masterwork: apex defs bake no masterwork
+record) as a LEGACY ENCHANT, so on the old binary one ordinary
+CONFIRMED replace-enchant routes it into replacedEnchantPayloadFor's
+legacy branch and replaces rolled.stats wholesale: the R5 bonus is
+destroyed, permanently, because the copy keeps perfected: true and the
+new binary refuses re-earning it. A rollback across this phase is
+therefore NOT merely lossy; DEPLOY.md's Perfecting rollback bullet
+(added by the QA round) carries the operational consequence.
 
 ### THE FROZEN STAMP: one run at the final tip, EXIT=0
 At b08774277d, every reader idle AND reported, porcelain empty, zero
@@ -19179,3 +19196,218 @@ interlock proven on walk-minted copies bagged and worn, both wire
 directions decided and pinned, the blob bounds stated with their
 arithmetic in both units, the revert direction recorded, and the frozen
 suite green at the tip first try.
+
+## Phase 12 QA ledger (2026-08-27, the twin)
+
+STATUS: PASS. LOCAL, no push, no PR. The strictest audit of the packet:
+every build-ledger claim re-derived, never trusted, by an eight-agent
+fan-out (the five phase-file lanes: correctness, authority-and-wire,
+determinism on architecture-reviewer, test-decisiveness on
+test-coverage-auditor, cleanup; plus cross-platform-sync,
+privacy-security-review, and migration-safety with the farming
+amendment's twin obligations), a fresh reviewer over the fix round, a
+fresh micro-reviewer over the nit round, qa-checklist LAST (READY,
+zero blocking), and the QA round's own 10/10 kill table.
+
+### STEP 0 (the seventeenth-plus sync, and the pre-flight)
+Clean at 8fa7f8f07d (the Phase 12 docs stamp; frozen code tip
+b08774277d under it). origin/release/v0.41.0 had MOVED: ff2837da1f to
+b02da096dd (PR 3681 Exchange wallet balance card, PR 3683 client perf
+Prometheus exporter; same minor version, so a merge step, not its own
+phase). Merged as 101cc5ceb2 with two conflicts: the monolith rows
+re-pinned to the exact merged counts (hud.ts 18263 unchanged, the
+release's +2 landing against its own comment shrink; main.ts DOWN
+11530 to 11528, the ratchet following the merged file), and the
+resolved-i18n pending.ts regenerated via i18n:gen, never hand-merged.
+The release-merge-audit skill ran as its own step: both sides intact in
+all 9 substantive overlap files (verified against both parents), no
+legacy-arm divergence, the perf exporter is a metrics registrar with
+its own suite (not a RouteDef), refreshWocBalance(force?) re-bound at
+every injection site by the release itself (woc_trade's zero-arg dep
+still satisfied), the one new vi.mock('../server/db') site is a
+targeted three-key mock that drives no GameServer, and no premise of
+this packet moved beyond the baselines. No incoming file touched
+src/sim/professions/ or the item wire path (the stopping rule never
+armed). tsc clean and 13 merge-affected suites (377 tests) green at
+the merge before the audit fan-out ran. DATABASE_URL unset throughout.
+
+### LANE VERDICTS (all eight re-derived the build independently)
+- CORRECTNESS: all 8 duties HELD. The negative binomial recomputed
+  (P(4..6) = 0.90112, both slots P(N<=12) = 0.927445, head start
+  E = 1.25); every one of the 17 shipped apex defs' R5 deltas
+  recomputed from item_budget.ts/item_level.ts alone and matching
+  (+2 / +1 exactly as recorded, the two-hand mult proven decisive at
+  source 24); masterwork.ts EMPTY across cdc5e39971..HEAD and the bake
+  byte-identical; the interlock fix verified with a sibling hunt over
+  every rolled.stats/enchant-presence reader finding no remaining
+  misclassifier; both caps unmoved by either marker. Its two nits both
+  mapped to recorded rulings (anonymous-pipe blindness = the ledger's
+  own display-trim decision; the missing owner mark = phase 14).
+- AUTHORITY-AND-WIRE: all 7 duties HELD. The client sends and mirrors
+  only; the sanitizer's seven call sites re-censused true; every egress
+  pipe deliberate (eqi allowlist, publicInstanceView, einst/inv self
+  mirrors, the guild-bank degrade arm, character_sheet clean); the
+  206/219/13 schema triple re-derived; perfect_item in HEAVY_SELF_CMDS
+  with the parse through the pure core (huge-integer probe was its one
+  actionable nit, applied); fplot intact on the merged tree; pre-phase
+  saves load rank 0; no unbounded interest-scoped payload.
+- DETERMINISM (architecture-reviewer): PASS everywhere it looked. The
+  proc site draws once in the same order (no rng hunk in the whole
+  crafting.ts diff); the module's one draw at line 333 with every deny
+  returning before it; the perfecting_walk scenario drives the real
+  delegate and reds on any draw move it can see (its two structural
+  blindnesses stated: a no-op move inside the success path, a deny-arm
+  wireRev bump, the latter verified absent by reading); the farming
+  draw contract and farming_session golden untouched BY CONSTRUCTION
+  (empty diffs); the commission-command extraction proven a
+  statement-by-statement move with faithful ctx rebindings; sim.ts
+  tick() has zero hunks. Full parity suite green on the merged tree
+  (238 passed / 1 conditional skip, correct: no existing golden was
+  re-minted).
+- TEST-DECISIVENESS (test-coverage-auditor): every pin re-counted and
+  agreeing (334/87/247/33 both union arms; 206/219/13; the blob band
+  floor 16883 / edge 17264 / measured 17263 by running the suite's own
+  measurement out of tree; both parity arms host-symmetric and
+  one-host-drop-failing). 3 should-fix and 7 nits, all applied or
+  judged (below); its no-change-needed list (the two unreachable
+  defense-in-depth head-start terms, the rolled-spread distinguisher no
+  shipped content can produce, the shared-constant boundary pins with
+  their literal mitigations) is JUDGED and binds.
+- CLEANUP: two phase dead-code items (the orphaned
+  baggedIdMeetsPerfectedGate wrapper, the unused newestMatchingSlot
+  import), both applied; architecture 109/109; no debris, no banned
+  characters, commit hygiene clean; the three registry-ripple
+  classifications each verified true against the code they classify.
+- CROSS-PLATFORM-SYNC: zero critical; both facet members real on both
+  hosts through the ONE builder; no new delta key; all 11 emits matched
+  in order (the three {item} rules at indices 37/38/39 ahead of the
+  pet-mode catch-all, empirically over all 233 parsed rules); the
+  20-block DICT coverage confirmed; RL surface untouched. Its skillMet
+  pre-sync warning is the ledger's standing phase 14 read (kept
+  recorded, not restructured: adding a discriminator now churns the
+  facet for a consumer that does not exist); its hardcoded-125 warning
+  was applied as the emit-to-constant chain pin.
+- PRIVACY-SECURITY: zero critical over ten categories. Its one warning
+  is the PRE-EXISTING mid-trade payload-mutation substitution class
+  (the trade fallback's documented posture; lock_item and the rift
+  forge ops are already in it; perfect_item joins as an instant
+  mutator and raises what the bait is worth). Recorded as a maintainer
+  read with the trade layer named as the fix home, per the standing
+  fallback-site ruling. Its stack-cap-1 observation was applied as the
+  content guard.
+- MIGRATION-SAFETY: the audit's biggest find, a CRITICAL against the
+  build ledger's REVERT DIRECTION record (the old-binary confirmed
+  replace destroying the R5 bonus; the amendment above and the
+  DEPLOY.md bullet are the fix; the shipped code is correct). Its
+  byte-figure warning was applied as the dated 81-84 correction above.
+  Forward direction, drop-only-not-whitelist, the old merge predicate,
+  the R5 recalc channel, the presence-only bind, re-upgrade safety,
+  and the whole blob/TOAST/WAL arithmetic all independently confirmed
+  (the 194-cell census resolving as 2 + 80 + 112, the 46-byte per-slot
+  decomposition, the band arithmetic exact).
+
+### FINDINGS AND FIXES (11 commits on top of the merge, every finding applied)
+- 5920c2fb30 the orphaned wrapper removed; 92a271126d the dead import
+  plus three trued comments; f09d3bb299 eight new perfecting arms (the
+  failing-direction view pair, the exact-0.8 boundary, the verbatim
+  boundTo, the exact wireRev pair, the synthetic-quest consume resync,
+  the two Jack arms with their two-draw order, the stack-cap-1 content
+  guard) plus the skill-emit-to-constant chain; 18940e623f the parser
+  ceiling probe and both markers pinned by name on both trims;
+  fa975d633b the requiresPerfected admission-drift rows (the
+  confirmReplace forwarding's first decisive pin), the blob fixture's
+  settle-content assertions, the per-cost-table material bill;
+  f77d2e61f9 the PARSE_CORE_COMMANDS table (perfect_item out of the
+  prose EXEMPT row, the teeth moving with the parse); 058f26910a +
+  c71878d629 the widened-then-honest unbind rewrite pins; a7614d080d
+  the DEPLOY.md Perfecting rollback bullet; b160d49578 the fix-round
+  review's three nits; 24123a0227 the qa gate's two (PERFECTED_CAP_SLOTS
+  hoisted so the settle pin derives from the fixture's own list; the
+  rollback bullet naming its no-masterwork-record dependency).
+
+### THE REVIEW CHAIN (a fresh reader over every fix round)
+The eight-lane audit, then the fix round reviewed FRESH (sound; three
+nits, all applied), then the nit round micro-reviewed FRESH (clean; one
+comment overclaim, softened to exactly what the pin proves), then
+qa-checklist LAST over the QA round's own diff plus the merge
+resolution: READY, zero blocking, the sim side proven comment-only by
+minified byte-comparison, ci:changed 0, the copy scan over all added
+lines clean.
+
+### THE QA ROUND'S OWN KILL TABLE (10/10, git-restore between, porcelain 0 after each)
+K1 admission confirmReplace forwarding dropped: drift row red (1).
+K2 perfected hardcoded false in the view builder: view pin red (1).
+K3 wireRev bump deleted: exact-pair pin red (1). K4 quest hook
+deleted: resync pin red (2). K5 success <= widening: boundary pin red
+(1). K6 parser integer check weakened: guard + parser suites red (2).
+K7 publicInstanceView widened with perfected: fixture + name ban red
+(2). K8 bracket-keyed reason rewrite injected into the hud arm:
+quoted-literal ban red (1). K9 ceiling term dropped from the head-start
+gate: ceiling AND Jack cases red (2). K10 PERFECTED_SOURCE_LEVEL zeroed
+to the recipe level: the blob fixture's positive-bake guard throws by
+name. Every mutant restored; porcelain verified empty after each and at
+the end.
+
+### JUDGED THIS ROUND, do not re-raise
+- The trade-substitution class (mid-trade instant payload mutators
+  shipping a marker-differing twin through the documented fallback):
+  pre-existing posture, fix home is the trade layer, recorded below.
+- The skillMet view discriminator: stays prose-plus-ledger until the
+  phase 14 consumer exists.
+- The parity walk staging three of six deny arms (its coverage sentence
+  is honest; all seven arms carry direct draw counters; re-minting the
+  golden for optional coverage is churn the re-mint discipline avoids).
+- item_instance_load.ts's heavier import graph (no cycle, call-time
+  read; recorded as a weight note only).
+- perfecting+perfected coexistence surviving the per-field load bound
+  (no legal writer, no corrupting consumer, cross-field arms would
+  break the drop-only doctrine); boundTo digit-width floor; the
+  apexRecipeFor linear find (behind the O(1) def gate and the command
+  lane).
+- The test lane's no-change-needed list and the five build-ledger
+  judged rulings, all honored unbroken.
+
+### RECORDED, NOT ACTED (maintainer reads on top of the standing sets)
+- The trade layer fix for the substitution class (reset accept flags
+  when a staged copy's live payload stops matching, or re-pin at
+  confirm); Perfecting raised the stakes without creating the class.
+- The 145-byte blob-ceiling headroom is now a CONSCIOUS position going
+  into phase 13 (the next authored growth re-mints at 18 KiB).
+- A source pin of the reason-rewrite class cannot close deliberate
+  evasion (keys minted outside the arm or by concatenation); recorded
+  at the pin so nobody reads it as more.
+- The build's four open reads stand (the Latin fills on the 0.41.0
+  worklist, the phase 14 surfacing pair, the two pre-existing S3
+  single-line blind spots, PerfectingInfoView.skillMet's synced gate).
+
+### THE FROZEN STAMP: one run at the final tip, EXIT=0 first try
+At 24123a0227 (the QA round's final code tip), every reader idle AND
+reported, porcelain 0, zero vitest processes, DATABASE_URL unset; the
+wrapper wrote TIP first and SUITE_EXIT=0 before the follow-on stages;
+one fresh log, no commit anywhere between: 3201 test files passed / 21
+skipped (3222), 47045 passed / 2 expected fail / 373 skipped (47420);
+tsc clean; ci:changed EXIT=0; wiki:content and i18n:gen both zero-diff
+(porcelain 0 after both); tip and porcelain unchanged through every
+stage. Drift vs the build stamp b08774277d (3198/21, 46990): +3 files
+/ +55 tests, attributed EXACTLY: the three genuinely new release
+suites (client_perf_scene_parity, server/http/client_perf_metrics,
+wallet_card_keys: 21 tests), the case arms the release span added to
+ten existing suites (+22 net, the moved countdown case netting zero),
+and this QA round's own arms (+12: eight perfecting, two
+admission-drift rows, one parse-core row, one parser probe). The
+pre-run prediction missed twice (it read all six release suites as new
+and double-counted one perfecting case); the miss is diagnosed above
+and the measured composition closes exactly. The commit after the run
+is docs-only (this ledger, progress.md, the memory notes), the
+sanctioned exception.
+
+HANDOFF: Phase 13 (phase-13-orange-promotion.md), the orange promotion,
+building on a Perfecting stage that is now verified twice over: the
+build's record re-derived claim by claim, its one record error (the
+revert direction's old-mutation path) found and corrected in every
+home, the fix surface hardened with twelve new decisive arms and a
+toothed parse-core guard family, and the frozen suite green first try
+at 24123a0227 on a tree that now includes release/v0.41.0 at
+b02da096dd. Phase 13's base is this tip; the open maintainer reads are
+the standing sets plus this round's (the trade-layer substitution fix,
+the conscious 145-byte headroom).
