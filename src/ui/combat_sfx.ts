@@ -323,6 +323,7 @@ const SUBFAMILY_ALIAS: Record<string, string> = {
   ridge_stalker: 'wolf',
   mire_prowler: 'wolf',
   old_greyjaw: 'wolf',
+  ignivar_herald_of_the_last_flame: 'ignivar',
 };
 
 function magicSchool(value: string | null | undefined): MagicSchool | null {

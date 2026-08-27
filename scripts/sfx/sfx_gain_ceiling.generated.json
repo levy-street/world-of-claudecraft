@@ -1820,6 +1820,91 @@
       }
     ]
   },
+  "mob_elemental_ignivar_aggro": {
+    "ceilingDb": 6.2,
+    "tracks": [
+      {
+        "filename": "mob_elemental_ignivar_aggro_1.mp3",
+        "sha256": "d9c35f4a7b2c4d8279ac2194fa3810aa00cce26233251e133cd034696c03e045",
+        "size": 90322,
+        "peakDb": -7.2
+      }
+    ]
+  },
+  "mob_elemental_ignivar_attack": {
+    "ceilingDb": 6,
+    "tracks": [
+      {
+        "filename": "mob_elemental_ignivar_attack_1.mp3",
+        "sha256": "7092bb488cde68442a06a55486b1ba9c969ab99146f3c83ab5345d1377f0bdb8",
+        "size": 45138,
+        "peakDb": -7
+      },
+      {
+        "filename": "mob_elemental_ignivar_attack_2.mp3",
+        "sha256": "ddcf75358d9f9fe0dda27a4a86b327360cc52962a78b4ea2a1ebe4361884be70",
+        "size": 43257,
+        "peakDb": -7.5
+      },
+      {
+        "filename": "mob_elemental_ignivar_attack_3.mp3",
+        "sha256": "e342ef94b70170c5bdc0103ed3b046124da9ef2262535e9c0d04f32e16d2a293",
+        "size": 45182,
+        "peakDb": -7.2
+      },
+      {
+        "filename": "mob_elemental_ignivar_attack_4.mp3",
+        "sha256": "441fd90565e1e79f5751d1a904aa73ac7759f9329be2f8e2c5c4387512c83c1f",
+        "size": 52661,
+        "peakDb": -7.9
+      }
+    ]
+  },
+  "mob_elemental_ignivar_death": {
+    "ceilingDb": 6.2,
+    "tracks": [
+      {
+        "filename": "mob_elemental_ignivar_death_1.mp3",
+        "sha256": "d3fc81b369d92e91dbf8f4dfca3465c7e20ac9f18d15b93f9963caae42da05fa",
+        "size": 79664,
+        "peakDb": -7.2
+      }
+    ]
+  },
+  "mob_elemental_ignivar_hurt": {
+    "ceilingDb": 5.1,
+    "tracks": [
+      {
+        "filename": "mob_elemental_ignivar_hurt_1.mp3",
+        "sha256": "b84156be8c44e8052d22d63409e6fd437178def73ec1db63815b287cbddddc9e",
+        "size": 40750,
+        "peakDb": -6.1
+      },
+      {
+        "filename": "mob_elemental_ignivar_hurt_2.mp3",
+        "sha256": "764f2f8d0f504339463622017d2abf4ce7c72603990ad0f471ab2083a47c284e",
+        "size": 43257,
+        "peakDb": -7.2
+      }
+    ]
+  },
+  "mob_elemental_ignivar_idle": {
+    "ceilingDb": 4.5,
+    "tracks": [
+      {
+        "filename": "mob_elemental_ignivar_idle_1.mp3",
+        "sha256": "9cc22896d5b6e3779546f65d1f59fa69e3a7b417378137f727be9f656e05027d",
+        "size": 61439,
+        "peakDb": -6.4
+      },
+      {
+        "filename": "mob_elemental_ignivar_idle_2.mp3",
+        "sha256": "8fe0d9d17e016532caf2e6a2f38eea2a246b2658b2ad1a503ddc0d7bf4ae1180",
+        "size": 91532,
+        "peakDb": -5.5
+      }
+    ]
+  },
   "mob_humanoid_aggro": {
     "ceilingDb": 5.5,
     "tracks": [

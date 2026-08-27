@@ -1,7 +1,7 @@
 {
   "format": "woc-sfx-runtime-pack",
   "version": 1,
-  "bundleId": "75161a3d97b57b528d1f944c8dc76785862414b34f39fc57458bd20d92839943",
+  "bundleId": "45cb30ed2732cff7289616570b5ffda7b89f41d367c61b86de71574f8d840924",
   "catalogHash": "9a31e1e35398a332b675f1ecf36e40f0dc1ba69f58328d4f34e5d094bec9c93f",
   "clips": {
     "amb_birds": {
@@ -2108,6 +2108,96 @@
         }
       ],
       "gain": 1.840772,
+      "playbackRate": 1
+    },
+    "mob_elemental_ignivar_aggro": {
+      "variants": [
+        {
+          "id": "1",
+          "url": "/audio/sfx/mob_elemental_ignivar_aggro_1.mp3?v=d9c35f4a7b2c",
+          "bytes": 90322,
+          "sha256": "d9c35f4a7b2c4d8279ac2194fa3810aa00cce26233251e133cd034696c03e045"
+        }
+      ],
+      "gain": 2.041738,
+      "playbackRate": 1
+    },
+    "mob_elemental_ignivar_attack": {
+      "variants": [
+        {
+          "id": "1",
+          "url": "/audio/sfx/mob_elemental_ignivar_attack_1.mp3?v=7092bb488cde",
+          "bytes": 45138,
+          "sha256": "7092bb488cde68442a06a55486b1ba9c969ab99146f3c83ab5345d1377f0bdb8"
+        },
+        {
+          "id": "2",
+          "url": "/audio/sfx/mob_elemental_ignivar_attack_2.mp3?v=ddcf75358d9f",
+          "bytes": 43257,
+          "sha256": "ddcf75358d9f9fe0dda27a4a86b327360cc52962a78b4ea2a1ebe4361884be70"
+        },
+        {
+          "id": "3",
+          "url": "/audio/sfx/mob_elemental_ignivar_attack_3.mp3?v=e342ef94b701",
+          "bytes": 45182,
+          "sha256": "e342ef94b70170c5bdc0103ed3b046124da9ef2262535e9c0d04f32e16d2a293"
+        },
+        {
+          "id": "4",
+          "url": "/audio/sfx/mob_elemental_ignivar_attack_4.mp3?v=441fd90565e1",
+          "bytes": 52661,
+          "sha256": "441fd90565e1e79f5751d1a904aa73ac7759f9329be2f8e2c5c4387512c83c1f"
+        }
+      ],
+      "gain": 1.995262,
+      "playbackRate": 1
+    },
+    "mob_elemental_ignivar_death": {
+      "variants": [
+        {
+          "id": "1",
+          "url": "/audio/sfx/mob_elemental_ignivar_death_1.mp3?v=d3fc81b369d9",
+          "bytes": 79664,
+          "sha256": "d3fc81b369d92e91dbf8f4dfca3465c7e20ac9f18d15b93f9963caae42da05fa"
+        }
+      ],
+      "gain": 2.041738,
+      "playbackRate": 1
+    },
+    "mob_elemental_ignivar_hurt": {
+      "variants": [
+        {
+          "id": "1",
+          "url": "/audio/sfx/mob_elemental_ignivar_hurt_1.mp3?v=b84156be8c44",
+          "bytes": 40750,
+          "sha256": "b84156be8c44e8052d22d63409e6fd437178def73ec1db63815b287cbddddc9e"
+        },
+        {
+          "id": "2",
+          "url": "/audio/sfx/mob_elemental_ignivar_hurt_2.mp3?v=764f2f8d0f50",
+          "bytes": 43257,
+          "sha256": "764f2f8d0f504339463622017d2abf4ce7c72603990ad0f471ab2083a47c284e"
+        }
+      ],
+      "gain": 1.798871,
+      "playbackRate": 1
+    },
+    "mob_elemental_ignivar_idle": {
+      "variants": [
+        {
+          "id": "1",
+          "url": "/audio/sfx/mob_elemental_ignivar_idle_1.mp3?v=9cc22896d5b6",
+          "bytes": 61439,
+          "sha256": "9cc22896d5b6e3779546f65d1f59fa69e3a7b417378137f727be9f656e05027d"
+        },
+        {
+          "id": "2",
+          "url": "/audio/sfx/mob_elemental_ignivar_idle_2.mp3?v=8fe0d9d17e01",
+          "bytes": 91532,
+          "sha256": "8fe0d9d17e016532caf2e6a2f38eea2a246b2658b2ad1a503ddc0d7bf4ae1180"
+        }
+      ],
+      "gain": 1.678804,
       "playbackRate": 1
     },
     "mob_humanoid_aggro": {
