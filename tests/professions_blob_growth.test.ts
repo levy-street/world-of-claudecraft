@@ -299,6 +299,24 @@ const NON_PROFESSIONS_BLOB_FIELDS = [
 // craftDaily's structural bound stands exactly as F6 left it.
 const PROFESSIONS_BYTE_CEILING = 17408;
 
+// The TWO Masterwrought cap slots (R6/R16: at most two apex pieces worn)
+// carry the Perfecting worst case on top (Masterwrought phase 12, the
+// bound-as-policy work): the Perfected stamp, the R2 bind (the wearer's
+// own entity id), and the R5 bonus record MERGED into the rolled stats the
+// way perfecting.ts merges it (additively, new keys appended). Derived from
+// the LIVE bake over the two shipped apex defs whose primary profiles add
+// the most keys to the fixture's {str, agi, sta} record (int and spi: the
+// grimoire's int/spi/sta, the vestments' int/spi), so every slot-keyed
+// payload here is one the professions-craft path can really produce. Both
+// ids are pinned: a re-profiled or retired apex def moves the fixture and
+// forces this ceiling re-read rather than silently narrowing it. Module
+// scope so the settle-content pin below derives its slots from the SAME
+// list the fixture stamps, instead of restating them.
+const PERFECTED_CAP_SLOTS: readonly (readonly [EquipSlot, string])[] = [
+  ['chest', 'sunspun_vestments'],
+  ['offhand', 'voidbound_grimoire'],
+];
+
 function ceilingSim(nowMs?: number): Sim {
   const sim = makeSim(31, nowMs);
   const meta = sim.players.get(sim.playerId) as PlayerMeta;
@@ -379,21 +397,6 @@ function ceilingSim(nowMs?: number): Sim {
       signer: longName,
     };
   }
-  // The TWO Masterwrought cap slots (R6/R16: at most two apex pieces worn)
-  // carry the Perfecting worst case on top (Masterwrought phase 12, the
-  // bound-as-policy work): the Perfected stamp, the R2 bind (the wearer's
-  // own entity id), and the R5 bonus record MERGED into the rolled stats the
-  // way perfecting.ts merges it (additively, new keys appended). Derived from
-  // the LIVE bake over the two shipped apex defs whose primary profiles add
-  // the most keys to the fixture's {str, agi, sta} record (int and spi: the
-  // grimoire's int/spi/sta, the vestments' int/spi), so every slot-keyed
-  // payload here is one the professions-craft path can really produce. Both
-  // ids are pinned: a re-profiled or retired apex def moves the fixture and
-  // forces this ceiling re-read rather than silently narrowing it.
-  const PERFECTED_CAP_SLOTS: readonly (readonly [EquipSlot, string])[] = [
-    ['chest', 'sunspun_vestments'],
-    ['offhand', 'voidbound_grimoire'],
-  ];
   for (const [slot, apexId] of PERFECTED_CAP_SLOTS) {
     const def = ITEMS[apexId];
     const recipe = recipeById(`recipe_${apexId}`);
@@ -677,7 +680,7 @@ describe('the professions blob growth bound (phase 16)', () => {
     // settle: the SHRINK side of the band (the floor sits 380 under the
     // measurement, so deleting the PERFECTED_CAP_SLOTS fixture loop would
     // still pass the band; the content pin here is what reds on that loss).
-    for (const slot of ['chest', 'offhand'] as const) {
+    for (const [slot] of PERFECTED_CAP_SLOTS) {
       const inst = s2.equipmentInstance?.[slot];
       expect(inst?.perfected, `${slot} keeps the Perfected stamp`).toBe(true);
       expect(typeof inst?.boundTo, `${slot} keeps the R2 bind`).toBe('number');

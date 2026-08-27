@@ -287,7 +287,9 @@ For off-box safety, sync the directory to S3 occasionally:
   normal play)**: the per-copy `perfecting`/`perfected` markers themselves survive an
   older binary (its instance load bound is drop-only, not a whitelist), but that
   binary's `isEnchantedInstance` reads a Perfected copy's bare `rolled.stats` record
-  as a LEGACY ENCHANT. One ordinary confirmed replace-enchant on such a copy then
+  as a LEGACY ENCHANT (apex defs never bake a masterwork record, so no Perfected
+  copy can carry the `rolled.masterwork` flag that would exempt it from that old
+  read). One ordinary confirmed replace-enchant on such a copy then
   takes the legacy wipe arm and replaces `rolled.stats` wholesale with the new
   enchant's bonus: the R5 Perfected bonus is gone, permanently, because the copy
   still carries `perfected: true` and refuses re-earning it. The same misread also
