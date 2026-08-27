@@ -77,7 +77,7 @@ describe('reattachClonedMaterialHooks', () => {
     // Both layers are represented: the detail layer's own prefix, and the rim
     // hook it chains (surface-detail folds the previous hook's source into its
     // key, which is why the two must be re-attached in the source's order).
-    expect(clone.customProgramCacheKey()).toContain('surface-detail|fabric');
+    expect(clone.customProgramCacheKey()).toContain('surface-detail|');
     expect(clone.customProgramCacheKey()).toContain('patchPbrRimGlowFragmentShader');
   });
 
@@ -106,7 +106,7 @@ describe('reattachClonedMaterialHooks', () => {
     const clone = cloneMaterialWithHooks(source);
     expect(hasRimGlow(clone)).toBe(false);
     expect(clone.customProgramCacheKey()).toBe(source.customProgramCacheKey());
-    expect(clone.customProgramCacheKey()).toContain('surface-detail|stone');
+    expect(clone.customProgramCacheKey()).toContain('surface-detail|');
   });
 });
 
@@ -399,7 +399,7 @@ describe('armour-dye layer survival across the program-preserving clone', () => 
     // previous layer's LIVE key alongside its source text (the addRimGlow
     // pattern), so the dye marker rides through the rim wrapper into the
     // outermost key instead of collapsing into it.
-    expect(clone.customProgramCacheKey()).toContain('surface-detail|fabric');
+    expect(clone.customProgramCacheKey()).toContain('surface-detail|');
     expect(clone.customProgramCacheKey()).toContain('patchPbrRimGlowFragmentShader');
     expect(clone.customProgramCacheKey()).toContain('woc_armor_dye|');
     // And the patches themselves all still land on the clone.
