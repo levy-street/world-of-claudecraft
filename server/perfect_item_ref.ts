@@ -16,6 +16,7 @@
 // never a guess). The sim re-validates the ref against ITS OWN bags and
 // paperdoll and resolves the whole deny ladder and the one roll itself.
 import { MAX_INSTANCE_STRING_LENGTH } from '../src/sim/item_instance_load';
+import { normalizeLegendaryName } from '../src/sim/professions/legendary_name';
 import type { PerfectItemRef } from '../src/sim/professions/perfecting';
 import { isEquipSlot } from '../src/sim/types';
 
@@ -48,11 +49,38 @@ export function parsePerfectItemRef(msg: {
 // (src/sim/professions/legendary_name.ts: trim, collapse, alphabet, max 32);
 // this bound only keeps a flood-sized or non-string token from crossing the
 // dispatch boundary. The server-side CONTENT screen (offensiveName) runs in
-// the game.ts arm on what this returns, the pet_rename split.
+// resolvePerfectItemName below, the pet_rename split.
 export function parsePerfectItemName(msg: { name?: unknown }): string | undefined {
   return typeof msg.name === 'string' &&
     msg.name.length > 0 &&
     msg.name.length <= MAX_INSTANCE_STRING_LENGTH
     ? msg.name
     : undefined;
+}
+
+/**
+ * The whole naming decision for one perfect_item frame, shape-first so the
+ * content screen only ever prices shape-valid names (32 chars or less at the
+ * command-lane rate, never a raw wire token up to the payload ceiling):
+ *  - no usable name field: pass undefined (an unnamed attempt);
+ *  - shape-INVALID (normalizeLegendaryName null): skip the screen entirely
+ *    and pass the RAW name through; the sim's own shape arm refuses it with
+ *    its inscription line, so nothing is silently laundered;
+ *  - shape-valid: screen the NORMALIZED value (no hidden coupling to the
+ *    censorship normalizer's whitespace stripping), refuse on a match, and
+ *    otherwise pass the normalized value to the sim.
+ * Judged note: an offensive name on an UNPERFECTED copy refuses the whole
+ * frame, ahead of every sim cost gate (conservative-safe; the UI only sends
+ * a name from the promote flow).
+ */
+export function resolvePerfectItemName(
+  msg: { name?: unknown },
+  offensive: (name: string) => boolean,
+): { refused: boolean; name?: string } {
+  const raw = parsePerfectItemName(msg);
+  if (raw === undefined) return { refused: false };
+  const normalized = normalizeLegendaryName(raw);
+  if (normalized === null) return { refused: false, name: raw };
+  if (offensive(normalized)) return { refused: true };
+  return { refused: false, name: normalized };
 }

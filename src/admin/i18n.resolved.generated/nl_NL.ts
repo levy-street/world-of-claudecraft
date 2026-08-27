@@ -425,6 +425,7 @@ export const nl_NL: AdminTranslations = {
   "moderationHistory.actionGeneralChatRateLimit": "Algemene chatlimiet gewijzigd",
   "moderationHistory.actionRestoreItem": "Voorwerpherstel",
   "moderationHistory.actionRestoreSlot": "Sleufherstel",
+  "moderationHistory.actionClearItemName": "Item name cleared",
   "moderationHistory.actionCheaterMark": "Valsspelersmarkering toegepast",
   "moderationHistory.actionCheaterMarkLift": "Valsspelersmarkering opgeheven",
   "moderationHistory.actionGuildRename": "Gilde hernoemd",

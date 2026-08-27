@@ -10,25 +10,65 @@
 // and `pretest`). Reproducibility is checked by tests/i18n_admin_catalog.test.ts.
 
 export const pending: Record<string, readonly string[]> = {
-  "es": [],
-  "es_ES": [],
-  "fr_FR": [],
-  "fr_CA": [],
+  "es": [
+    "moderationHistory.actionClearItemName"
+  ],
+  "es_ES": [
+    "moderationHistory.actionClearItemName"
+  ],
+  "fr_FR": [
+    "moderationHistory.actionClearItemName"
+  ],
+  "fr_CA": [
+    "moderationHistory.actionClearItemName"
+  ],
   "en_CA": [],
-  "it_IT": [],
-  "de_DE": [],
-  "zh_CN": [],
-  "zh_TW": [],
-  "ko_KR": [],
-  "ja_JP": [],
-  "pt_BR": [],
-  "ru_RU": [],
-  "cs_CZ": [],
-  "nl_NL": [],
-  "pl_PL": [],
-  "id_ID": [],
-  "tr_TR": [],
-  "sv_SE": [],
-  "vi_VN": [],
-  "da_DK": []
+  "it_IT": [
+    "moderationHistory.actionClearItemName"
+  ],
+  "de_DE": [
+    "moderationHistory.actionClearItemName"
+  ],
+  "zh_CN": [
+    "moderationHistory.actionClearItemName"
+  ],
+  "zh_TW": [
+    "moderationHistory.actionClearItemName"
+  ],
+  "ko_KR": [
+    "moderationHistory.actionClearItemName"
+  ],
+  "ja_JP": [
+    "moderationHistory.actionClearItemName"
+  ],
+  "pt_BR": [
+    "moderationHistory.actionClearItemName"
+  ],
+  "ru_RU": [
+    "moderationHistory.actionClearItemName"
+  ],
+  "cs_CZ": [
+    "moderationHistory.actionClearItemName"
+  ],
+  "nl_NL": [
+    "moderationHistory.actionClearItemName"
+  ],
+  "pl_PL": [
+    "moderationHistory.actionClearItemName"
+  ],
+  "id_ID": [
+    "moderationHistory.actionClearItemName"
+  ],
+  "tr_TR": [
+    "moderationHistory.actionClearItemName"
+  ],
+  "sv_SE": [
+    "moderationHistory.actionClearItemName"
+  ],
+  "vi_VN": [
+    "moderationHistory.actionClearItemName"
+  ],
+  "da_DK": [
+    "moderationHistory.actionClearItemName"
+  ]
 };

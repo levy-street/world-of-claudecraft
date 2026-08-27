@@ -2052,6 +2052,52 @@ describe('chat moderation', () => {
   });
 });
 
+describe('legendary celebration events reach the client (phase 13)', () => {
+  // End-to-end pass-through pin: the two orange-promotion celebration events
+  // ride the generic pid-scoped fan-out (routeEvents), so ONE arm proves both
+  // reach the recipient session's events frame, and pid-scoping keeps another
+  // session from receiving a copy addressed elsewhere.
+  it('legendaryForged and legendaryForgedZone route to their pid, and only their pid', () => {
+    const server = new GameServer();
+    const fcOwner = fakeWs();
+    const owner = joinServer(server, fcOwner, 1, 'Forger');
+    const fcOnlooker = fakeWs();
+    const onlooker = joinServer(server, fcOnlooker, 2, 'Onlooker');
+    fcOwner.sent.length = 0;
+    fcOnlooker.sent.length = 0;
+    const zoneCopy = (pid: number) => ({
+      type: 'legendaryForgedZone' as const,
+      pid,
+      ownerPid: owner.pid as number,
+      ownerName: 'Forger',
+      itemId: 'wyrmfall_pendant',
+      itemName: 'Dawnbreaker',
+      zoneId: 'eastbrook_vale',
+    });
+    (server as any).routeEvents([
+      {
+        type: 'legendaryForged',
+        itemId: 'wyrmfall_pendant',
+        name: 'Dawnbreaker',
+        owner: owner.pid as number,
+        pid: owner.pid as number,
+      },
+      zoneCopy(owner.pid as number),
+      zoneCopy(onlooker.pid as number),
+    ]);
+    const typesFor = (sent: any[]) =>
+      sent.flatMap((msg) => (msg.t === 'events' ? msg.list : [])).map((ev: any) => ev.type);
+    // The owner's frame carries the personal event AND their own zone copy.
+    expect(typesFor(fcOwner.sent)).toEqual(['legendaryForged', 'legendaryForgedZone']);
+    const ownerEvents = fcOwner.sent.flatMap((msg) => (msg.t === 'events' ? msg.list : []));
+    expect(ownerEvents[0]).toMatchObject({ name: 'Dawnbreaker', itemId: 'wyrmfall_pendant' });
+    expect(ownerEvents[1]).toMatchObject({ itemName: 'Dawnbreaker', ownerName: 'Forger' });
+    // The onlooker gets exactly their own zone copy: the personal event and
+    // the owner-addressed zone copy never cross sessions.
+    expect(typesFor(fcOnlooker.sent)).toEqual(['legendaryForgedZone']);
+  });
+});
+
 describe('autosaves', () => {
   beforeEach(() => {
     vi.mocked(saveCharacterState).mockReset();

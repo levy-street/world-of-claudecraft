@@ -4201,6 +4201,117 @@ describe('R35 GM restores: refusal prose arms', () => {
   });
 });
 
+describe('phase 13 legendary-name strip (clear-item-name)', () => {
+  // The endpoint body's decision matrix lives in tests/server/
+  // clear_item_name.test.ts over the deps bag; this slice pins the RouteDef
+  // binder: the real middleware chain, the real bundle members it wires, and
+  // the restore family's envelope prose.
+  const NAMED_STATE = () =>
+    ({
+      level: 20,
+      inventory: [
+        {
+          itemId: 'wyrmfall_pendant',
+          count: 1,
+          instance: { rolled: { quality: 'legendary' }, name: 'Slurname', signer: 'Forger' },
+        },
+      ],
+      questLog: [],
+    }) as never;
+
+  it('audits FIRST, then strips the offline blob and saves it', async () => {
+    const state = NAMED_STATE() as { level: number; inventory: { instance?: { name?: string } }[] };
+    const recordItemNameClear = vi.fn(async () => ({ accountId: 9 }));
+    const getCharacterById = vi.fn(async () => ({ id: 5, level: 20, state }) as never);
+    const saveCharacterState = vi.fn(async () => true);
+    authedAdminDb({ recordItemNameClear, getCharacterById, saveCharacterState } as never);
+    installAdminRuntime({ adminCharacterOnline: vi.fn(() => false) });
+    const r = await runRoute('POST', '/admin/api/moderation/characters/:id/clear-item-name', {
+      headers: { authorization: BEARER },
+      params: { id: '5' },
+      body: { bag: 0, itemId: 'wyrmfall_pendant', reason: 'reported slur in the stamped name' },
+    });
+    expect(r.status).toBe(200);
+    expect(r.body).toEqual({ success: true, data: { ok: true, cleared: 1 }, error: null });
+    expect(recordItemNameClear).toHaveBeenCalledWith({
+      characterId: 5,
+      adminAccountId: ADMIN_ACCOUNT_ID,
+      detail: 'bag 0 wyrmfall_pendant',
+      reason: 'reported slur in the stamped name',
+    });
+    expect(saveCharacterState).toHaveBeenCalledWith(5, 20, state);
+    expect(state.inventory[0].instance?.name).toBeUndefined();
+    // A strip may never exist unaudited: the audit row precedes the save.
+    expect(recordItemNameClear.mock.invocationCallOrder[0]).toBeLessThan(
+      saveCharacterState.mock.invocationCallOrder[0],
+    );
+  });
+
+  it('refuses an ONLINE character before any audit write (kick first, then clear)', async () => {
+    const recordItemNameClear = vi.fn(async () => ({ accountId: 9 }));
+    const saveCharacterState = vi.fn(async () => true);
+    authedAdminDb({ recordItemNameClear, saveCharacterState } as never);
+    const rt = installAdminRuntime({ adminCharacterOnline: vi.fn(() => true) });
+    const r = await runRoute('POST', '/admin/api/moderation/characters/:id/clear-item-name', {
+      headers: { authorization: BEARER },
+      params: { id: '5' },
+      body: { reason: 'slur' },
+    });
+    expect(r.status).toBe(400);
+    expect(r.body).toEqual({
+      success: false,
+      data: null,
+      error: 'character is online on this realm; disconnect them first',
+    });
+    expect(rt.adminCharacterOnline).toHaveBeenCalledWith(5);
+    expect(recordItemNameClear).not.toHaveBeenCalled();
+    expect(saveCharacterState).not.toHaveBeenCalled();
+  });
+
+  it('surfaces a missing reason as the audited write refusal, and never saves', async () => {
+    const saveCharacterState = vi.fn(async () => true);
+    authedAdminDb({
+      recordItemNameClear: vi.fn(async () => {
+        throw new Error('moderation reason is required');
+      }),
+      saveCharacterState,
+    } as never);
+    installAdminRuntime({ adminCharacterOnline: vi.fn(() => false) });
+    const r = await runRoute('POST', '/admin/api/moderation/characters/:id/clear-item-name', {
+      headers: { authorization: BEARER },
+      params: { id: '5' },
+      body: { bag: 0, itemId: 'wyrmfall_pendant' },
+    });
+    expect(r.status).toBe(400);
+    expect(r.body).toEqual({ success: false, data: null, error: 'moderation reason is required' });
+    expect(saveCharacterState).not.toHaveBeenCalled();
+  });
+
+  it('a no-match strip answers honestly after the audit, without a save', async () => {
+    const recordItemNameClear = vi.fn(async () => ({ accountId: 9 }));
+    const saveCharacterState = vi.fn(async () => true);
+    authedAdminDb({
+      recordItemNameClear,
+      saveCharacterState,
+      getCharacterById: vi.fn(async () => ({ id: 5, level: 20, state: NAMED_STATE() }) as never),
+    } as never);
+    installAdminRuntime({ adminCharacterOnline: vi.fn(() => false) });
+    const r = await runRoute('POST', '/admin/api/moderation/characters/:id/clear-item-name', {
+      headers: { authorization: BEARER },
+      params: { id: '5' },
+      body: { slot: 'neck', reason: 'nothing worn there' },
+    });
+    expect(r.status).toBe(400);
+    expect(r.body).toEqual({
+      success: false,
+      data: null,
+      error: 'no named copy matched that target',
+    });
+    expect(recordItemNameClear).toHaveBeenCalled();
+    expect(saveCharacterState).not.toHaveBeenCalled();
+  });
+});
+
 describe('R35 professions inspector: fix-round edge pins', () => {
   it('survives a NULL characters.state row (created but never entered)', async () => {
     authedAdminDb({

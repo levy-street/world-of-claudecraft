@@ -604,6 +604,33 @@ function qualityColor(quality: string | undefined): number {
   return quality === 'legendary' ? 0xff8000 : 0xa335ee;
 }
 
+/** Character cap on a legendary card's item name, mirroring the game's mint
+ *  shape (src/sim/professions/legendary_name.ts MAX_LEGENDARY_NAME_LENGTH; a
+ *  copy pinned in tests/discord_bot.test.ts, not an import, so logic.ts stays
+ *  free of src/ imports). */
+export const LEGENDARY_CARD_NAME_MAX = 32;
+
+/**
+ * Bot-side defense for the one PLAYER-AUTHORED string this feed interpolates:
+ * the legendary card's item name crosses two processes as unchecked JSON, and
+ * the game's persisted-load shape for it is deliberately wider than the mint
+ * alphabet (the signer doctrine), so nothing upstream structurally guarantees
+ * what arrives here. Hold it to the MINT alphabet before it touches an embed:
+ * strip everything outside [A-Za-z' -], collapse whitespace runs, trim, and
+ * bound at LEGENDARY_CARD_NAME_MAX. A name emptied by the filter degrades to
+ * the generic title through the caller's `||` fallback.
+ */
+export function sanitizeLegendaryItemName(raw: string | undefined): string {
+  if (!raw) return '';
+  const cleaned = raw
+    .replace(/[^A-Za-z' -]/g, '')
+    .replace(/\s+/g, ' ')
+    .trim();
+  return cleaned.length > LEGENDARY_CARD_NAME_MAX
+    ? cleaned.slice(0, LEGENDARY_CARD_NAME_MAX).trimEnd()
+    : cleaned;
+}
+
 // Resolve a character name to its Discord mention (when linked) or plain name.
 function mentionFor(name: string, parts: readonly ActivityParticipant[]): string {
   const p = parts.find((x) => x.name === name);
@@ -678,18 +705,21 @@ export function buildActivityMessage(item: ActivityItem): Record<string, unknown
         `${mentionFor(subjectName, item.participants)} on ${item.realm}!`;
       color = 0xd9a334;
       break;
-    case 'legendary':
+    case 'legendary': {
       // The orange promotion (Masterwrought phase 13). itemName is the
-      // PLAYER-CHOSEN legendary name: interpolated as plain text at
+      // PLAYER-CHOSEN legendary name: held to the mint alphabet by
+      // sanitizeLegendaryItemName above, then interpolated as plain text at
       // masterwork parity (no markdown of our own around it), with the ||
-      // fallback so an empty name degrades to the generic title.
+      // fallback so an empty or emptied name degrades to the generic title.
+      const legendName = sanitizeLegendaryItemName(item.itemName);
       author = ':fire: Legend Forged';
-      title = item.itemName || 'A legend';
+      title = legendName || 'A legend';
       description =
-        `${item.itemName || 'A legend'} was forged by ` +
+        `${legendName || 'A legend'} was forged by ` +
         `${mentionFor(subjectName, item.participants)} on ${item.realm}!`;
       color = 0xff8000;
       break;
+    }
     case 'deed':
       if (item.deedId === FIRST_KOI_DEED_ID) {
         // The first-koi moment reads as a catch, not a deed record.

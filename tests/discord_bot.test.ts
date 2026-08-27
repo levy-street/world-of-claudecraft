@@ -21,6 +21,7 @@ import {
   indexSpecialRoleIds,
   interactionFailureFallback,
   isSlashCommand,
+  LEGENDARY_CARD_NAME_MAX,
   levelNickSuffix,
   MEMBERS_META_BATCH,
   memberRolesFromPayload,
@@ -31,6 +32,7 @@ import {
   relayRespondUrl,
   requestGuildMembersPayload,
   rosterComplete,
+  sanitizeLegendaryItemName,
   staleFlairedIds,
   stripLevelSuffix,
   tierRoleName,
@@ -644,6 +646,54 @@ describe('significant-activity cards', () => {
     // Legendary orange, the qualityColor legendary accent.
     expect(msg.embeds[0].color).toBe(0xff8000);
     expect(msg.allowed_mentions.users).toEqual(['111']);
+  });
+
+  // The legendary card's itemName is the ONE player-authored string this feed
+  // interpolates, it crosses two processes as unchecked JSON, and the game's
+  // persisted-load shape for it is wider than the mint alphabet, so the card
+  // carries its own conservative filter (sanitizeLegendaryItemName) rather
+  // than resting on the sim emitting only freshly normalized names.
+  describe('legendary card item-name filter', () => {
+    it('mirrors the mint length cap (src/sim/professions/legendary_name.ts, copy not import)', () => {
+      expect(LEGENDARY_CARD_NAME_MAX).toBe(32);
+    });
+
+    it('passes a mint-shaped name through unchanged', () => {
+      expect(sanitizeLegendaryItemName("Vel'tara's Oath")).toBe("Vel'tara's Oath");
+      expect(sanitizeLegendaryItemName('Dawn-breaker of Eastbrook')).toBe(
+        'Dawn-breaker of Eastbrook',
+      );
+    });
+
+    it('strips everything outside the mint alphabet, collapses, and bounds at the cap', () => {
+      expect(sanitizeLegendaryItemName('@everyone **Doom** `rm -rf`')).toBe('everyone Doom rm -rf');
+      expect(sanitizeLegendaryItemName('<@&123> [link](https://x.test)')).toBe('linkhttpsxtest');
+      expect(sanitizeLegendaryItemName('  Dawn \n\t breaker  ')).toBe('Dawn breaker');
+      const bounded = sanitizeLegendaryItemName(`${'A'.repeat(31)} ${'B'.repeat(40)}`);
+      expect(bounded.length).toBeLessThanOrEqual(LEGENDARY_CARD_NAME_MAX);
+      expect(bounded).toBe('A'.repeat(31));
+      expect(sanitizeLegendaryItemName(undefined)).toBe('');
+    });
+
+    it('the legendary CARD routes itemName through the filter, and an emptied name degrades', () => {
+      const cardOf = (itemName: string) =>
+        buildActivityMessage({
+          kind: 'legendary',
+          realm: 'Claudemoon',
+          profileUrl: null,
+          itemName,
+          participants: [linked('Aldric', '111')],
+        }) as { embeds: Array<Record<string, any>> };
+      const hostile = cardOf('**@everyone** _Doom_');
+      expect(hostile.embeds[0].title).toBe('everyone Doom');
+      expect(hostile.embeds[0].description).toContain('everyone Doom was forged by');
+      expect(hostile.embeds[0].description).not.toContain('*');
+      expect(hostile.embeds[0].description).not.toContain('@everyone');
+      // A name the filter empties (nothing in the mint alphabet) falls to the
+      // generic title through the || fallback, never a blank embed.
+      const emptied = cardOf('本物の伝説 123');
+      expect(emptied.embeds[0].title).toBe('A legend');
+    });
   });
 
   it('deed-title card names the deed and the earned title', () => {

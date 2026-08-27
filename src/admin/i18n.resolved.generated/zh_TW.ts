@@ -425,6 +425,7 @@ export const zh_TW: AdminTranslations = {
   "moderationHistory.actionGeneralChatRateLimit": "綜合聊天上限已變更",
   "moderationHistory.actionRestoreItem": "物品恢復",
   "moderationHistory.actionRestoreSlot": "鑲嵌槽恢復",
+  "moderationHistory.actionClearItemName": "Item name cleared",
   "moderationHistory.actionCheaterMark": "已套用作弊者標記",
   "moderationHistory.actionCheaterMarkLift": "已移除作弊者標記",
   "moderationHistory.actionGuildRename": "公會更名",

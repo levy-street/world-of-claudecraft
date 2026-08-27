@@ -1,5 +1,5 @@
 import { randomBytes, scrypt, timingSafeEqual } from 'node:crypto';
-import { readFileSync } from 'node:fs';
+import { readFileSync, statSync } from 'node:fs';
 import { englishDataset, englishRecommendedTransformers, RegExpMatcher } from 'obscenity';
 
 const SCRYPT_N = 16384,
@@ -76,7 +76,19 @@ let banlistCacheTerms: string[] = [];
 function bannedUsernameTerms(): string[] {
   const rawList = process.env.USERNAME_BANLIST ?? '';
   const file = process.env.USERNAME_BANLIST_FILE ?? '';
-  const cacheKey = `${rawList}\0${file}`;
+  // The file's mtime rides the cache key so EDITING the banlist file takes
+  // effect without a process restart (a stat per check, a read only per
+  // change); a stat failure collapses to a sentinel so the read arm below
+  // still owns the one warn-and-retry path for an unreadable file.
+  let fileStamp = '';
+  if (file) {
+    try {
+      fileStamp = String(statSync(file).mtimeMs);
+    } catch {
+      fileStamp = 'unreadable';
+    }
+  }
+  const cacheKey = `${rawList}\0${file}\0${fileStamp}`;
   if (cacheKey === banlistCacheKey) return banlistCacheTerms;
 
   const terms = BUILT_IN_BANNED_NAME_TERMS.concat(parseBanlist(rawList));

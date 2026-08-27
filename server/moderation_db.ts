@@ -66,6 +66,11 @@ export const MODERATION_ACTIONS = [
   // folded into the stored reason text.
   'restore_item',
   'restore_slot',
+  // Stamped-legendary-name removal (Masterwrought phase 13,
+  // server/clear_item_name.ts): moderation of PLAYER-AUTHORED content on an
+  // item copy, so the reason is REQUIRED and the stripped target is folded
+  // into the stored reason text, the restore recipe.
+  'clear_item_name',
   // The Cheater mark (src/sim/moderation/). Punitive and visible to every player
   // in range, so the reason is REQUIRED on both arms: who branded an account, for
   // how long, and why has to be recoverable long after the tag has worn off.
@@ -1332,6 +1337,39 @@ export async function recordProfessionsRestore(input: {
     accountId,
     adminAccountId: input.adminAccountId,
     reason: `[requested ${detail} for character ${input.characterId}] ${reason}`,
+  });
+  return { accountId };
+}
+
+/**
+ * Legendary-name strip audit row (server/clear_item_name.ts): the
+ * recordProfessionsRestore recipe verbatim, under its own action so the
+ * unified history distinguishes a content strip from a value mint. Same
+ * ordering contract: this lands BEFORE the blob write, so a strip can never
+ * exist unaudited, and "requested" is honest about a post-audit refusal (a
+ * deleted character, no matching named copy), which the handler surfaces to
+ * the operator as a 400.
+ */
+export async function recordItemNameClear(input: {
+  characterId: number;
+  adminAccountId: number;
+  detail: string;
+  reason: unknown;
+}): Promise<{ accountId: number }> {
+  const reason = cleanText(input.reason, ACTION_REASON_MAX);
+  if (!reason) throw new Error('moderation reason is required');
+  // The same bounded-prefix enforcement as the restores: today's one caller
+  // passes a slot key, a cell index plus an item id, or 'all copies'.
+  const detail = cleanText(input.detail, 128);
+  const character = await pool.query('SELECT account_id FROM characters WHERE id = $1', [
+    input.characterId,
+  ]);
+  const accountId = character.rows[0]?.account_id;
+  if (!accountId) throw new Error('character not found');
+  await recordModerationAction(pool, 'clear_item_name', {
+    accountId,
+    adminAccountId: input.adminAccountId,
+    reason: `[requested clear_item_name ${detail} for character ${input.characterId}] ${reason}`,
   });
   return { accountId };
 }

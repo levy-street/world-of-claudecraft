@@ -425,6 +425,7 @@ export const sv_SE: AdminTranslations = {
   "moderationHistory.actionGeneralChatRateLimit": "Hastighetsbegränsning för Allmänt-chatt ändrad",
   "moderationHistory.actionRestoreItem": "Föremålsåterställning",
   "moderationHistory.actionRestoreSlot": "Platsåterställning",
+  "moderationHistory.actionClearItemName": "Item name cleared",
   "moderationHistory.actionCheaterMark": "Fuskarstämpel satt",
   "moderationHistory.actionCheaterMarkLift": "Fuskarstämpel borttagen",
   "moderationHistory.actionGuildRename": "Gillesnamn ändrat",

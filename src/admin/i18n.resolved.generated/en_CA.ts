@@ -425,6 +425,7 @@ export const en_CA: AdminTranslations = {
   "moderationHistory.actionGeneralChatRateLimit": "General chat rate limit changed",
   "moderationHistory.actionRestoreItem": "Item restore",
   "moderationHistory.actionRestoreSlot": "Slot restore",
+  "moderationHistory.actionClearItemName": "Item name cleared",
   "moderationHistory.actionCheaterMark": "Cheater mark applied",
   "moderationHistory.actionCheaterMarkLift": "Cheater mark lifted",
   "moderationHistory.actionGuildRename": "Guild rename",

@@ -1,5 +1,5 @@
 import { EventEmitter } from 'node:events';
-import { mkdtempSync, rmSync, writeFileSync } from 'node:fs';
+import { mkdtempSync, rmSync, utimesSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
@@ -641,7 +641,7 @@ describe('username censorship', () => {
     }
   });
 
-  it('caches file-backed banned terms until banlist env changes', () => {
+  it('re-reads the banlist file when its mtime changes, without an env change or restart', () => {
     const dir = mkdtempSync(join(tmpdir(), 'woc-banlist-'));
     const firstFile = join(dir, 'first.txt');
     const secondFile = join(dir, 'second.txt');
@@ -649,14 +649,29 @@ describe('username censorship', () => {
     writeFileSync(secondFile, 'otherterm\n');
 
     try {
+      // Mint the baseline stamp with utimesSync itself: a filesystem stamp can
+      // carry sub-millisecond precision a Date round-trip truncates, so a
+      // statSync-read original would not restore byte-identical.
+      const baseline = new Date(Date.now() - 5000);
+      utimesSync(firstFile, baseline, baseline);
       withUsernameBanlist({ file: firstFile }, () => {
         expect(offensiveName('fileterm')).toBe(true);
+        // The cache is keyed on the file's MTIME, never its content: new
+        // content rolled back to the baseline stamp still serves the cached
+        // terms (the read-once-per-change contract) ...
         writeFileSync(firstFile, 'changedterm\n');
+        utimesSync(firstFile, baseline, baseline);
         expect(offensiveName('fileterm')).toBe(true);
         expect(offensiveName('changedterm')).toBe(false);
+        // ... and a moved stamp on the SAME path re-reads, so an edited
+        // banlist takes effect with no restart and no env change.
+        const bumped = new Date(baseline.getTime() + 2000);
+        utimesSync(firstFile, bumped, bumped);
+        expect(offensiveName('changedterm')).toBe(true);
+        expect(offensiveName('fileterm')).toBe(false);
 
         process.env.USERNAME_BANLIST_FILE = secondFile;
-        expect(offensiveName('fileterm')).toBe(false);
+        expect(offensiveName('changedterm')).toBe(false);
         expect(offensiveName('otherterm')).toBe(true);
 
         delete process.env.USERNAME_BANLIST_FILE;

@@ -425,6 +425,7 @@ export const pl_PL: AdminTranslations = {
   "moderationHistory.actionGeneralChatRateLimit": "Zmieniono limit czatu Ogólnego",
   "moderationHistory.actionRestoreItem": "Przywrócenie przedmiotu",
   "moderationHistory.actionRestoreSlot": "Przywrócenie slotu",
+  "moderationHistory.actionClearItemName": "Item name cleared",
   "moderationHistory.actionCheaterMark": "Nałożono znacznik oszusta",
   "moderationHistory.actionCheaterMarkLift": "Zdjęto znacznik oszusta",
   "moderationHistory.actionGuildRename": "Zmiana nazwy gildii",

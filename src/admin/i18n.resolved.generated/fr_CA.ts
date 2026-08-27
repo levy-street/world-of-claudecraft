@@ -425,6 +425,7 @@ export const fr_CA: AdminTranslations = {
   "moderationHistory.actionGeneralChatRateLimit": "Limite de clavardage Général modifiée",
   "moderationHistory.actionRestoreItem": "Objet restauré",
   "moderationHistory.actionRestoreSlot": "Emplacement restauré",
+  "moderationHistory.actionClearItemName": "Item name cleared",
   "moderationHistory.actionCheaterMark": "Marque de tricheur appliquée",
   "moderationHistory.actionCheaterMarkLift": "Marque de tricheur retirée",
   "moderationHistory.actionGuildRename": "Renommage de guilde",

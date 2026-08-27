@@ -425,6 +425,7 @@ export const da_DK: AdminTranslations = {
   "moderationHistory.actionGeneralChatRateLimit": "Hastighedsbegrænsning for Generelt-chat ændret",
   "moderationHistory.actionRestoreItem": "Vare gendannet",
   "moderationHistory.actionRestoreSlot": "Plads gendannet",
+  "moderationHistory.actionClearItemName": "Item name cleared",
   "moderationHistory.actionCheaterMark": "Snydermærke påført",
   "moderationHistory.actionCheaterMarkLift": "Snydermærke fjernet",
   "moderationHistory.actionGuildRename": "Laug omdøbt",

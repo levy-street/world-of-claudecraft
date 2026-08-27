@@ -331,7 +331,7 @@ import {
 } from './parse';
 import { PartyFrameProjectionCache } from './party_frame_projection';
 import { applyBoostKitToPlayer, pbeBoostEnabled } from './pbe_boost';
-import { parsePerfectItemName, parsePerfectItemRef } from './perfect_item_ref';
+import { parsePerfectItemRef, resolvePerfectItemName } from './perfect_item_ref';
 import { recordFtueDeath, recordFtueQuest, recordLevelUp } from './progress_events';
 import { eventLeadDayKey, nextRaidResetMs, resetDayKey } from './raid_reset';
 import { REALM, REALM_PUBLIC_ORIGIN, REALM_RESET_TIME_ZONE } from './realm';
@@ -6821,18 +6821,18 @@ export class GameServer {
         // the outcome reaches this client as the sim's own error/log lines
         // plus the heavy self re-diff (perfect_item is a HEAVY_SELF_CMDS
         // member: an attempt spends materials and mutates a payload in place).
-        // Phase 13: an optional legendary name rides the frame (a bad name
-        // drops the FIELD, never the frame); the server owns the CONTENT
-        // screen (the pet_rename split), the sim the SHAPE screen.
+        // Phase 13: the optional legendary name's whole decision is the pure
+        // core resolvePerfectItemName (shape-first, screen NORMALIZED; the
+        // rationale and the judged unperfected-copy note live on the core).
         const ref = parsePerfectItemRef(msg);
         if (ref) {
-          const name = parsePerfectItemName(msg);
-          if (name !== undefined && offensiveName(name))
+          const named = resolvePerfectItemName(msg, offensiveName);
+          if (named.refused)
             this.send(session, {
               t: 'events',
               list: [{ type: 'error', text: 'That name is not allowed.' }],
             });
-          else sim.perfectItem(ref, pid, name);
+          else sim.perfectItemAs(pid, ref, named.name);
         }
         break;
       }

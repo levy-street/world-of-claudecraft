@@ -299,6 +299,12 @@ For off-box safety, sync the directory to S3 occasionally:
   unenchanted copy a player confirms a replace onto loses its bonus until
   restore-from-backup. Deploy the Perfecting release fleet-wide in one pass like the
   two bullets above.
+- **Orange-promotion rolling window (cosmetic)**: the promotion release RETIRES the
+  sim's "That item is already Perfected." line (its client matcher row was removed
+  with it), so during a realm-by-realm roll an OLD server still emits that line to
+  a NEW client, which renders it untranslated English. Cosmetic only and confined
+  to the mixed window; fleet-wide-in-one-pass (the Perfecting bullet above) also
+  makes it a non-event.
 - **Client/server deploy order for content releases**: deploy the SERVER first, then
   let clients update. Web and desktop bundles refresh on their next load. The iOS
   binary rides App Store review and cannot pick up a same-day bundle (LiveUpdates

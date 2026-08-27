@@ -425,6 +425,7 @@ export const ja_JP: AdminTranslations = {
   "moderationHistory.actionGeneralChatRateLimit": "一般チャットのレート制限変更",
   "moderationHistory.actionRestoreItem": "アイテム復元",
   "moderationHistory.actionRestoreSlot": "スロット復元",
+  "moderationHistory.actionClearItemName": "Item name cleared",
   "moderationHistory.actionCheaterMark": "チーターマークを適用",
   "moderationHistory.actionCheaterMarkLift": "チーターマークを解除",
   "moderationHistory.actionGuildRename": "ギルド名変更",

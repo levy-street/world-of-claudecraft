@@ -425,6 +425,7 @@ export const ko_KR: AdminTranslations = {
   "moderationHistory.actionGeneralChatRateLimit": "일반 채팅 속도 제한 변경",
   "moderationHistory.actionRestoreItem": "아이템 복구",
   "moderationHistory.actionRestoreSlot": "슬롯 복구",
+  "moderationHistory.actionClearItemName": "Item name cleared",
   "moderationHistory.actionCheaterMark": "부정행위자 표식 부여됨",
   "moderationHistory.actionCheaterMarkLift": "부정행위자 표식 해제됨",
   "moderationHistory.actionGuildRename": "길드 이름 변경",

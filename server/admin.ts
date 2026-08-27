@@ -99,6 +99,7 @@ import {
   liftCheaterMarkBodySchema,
   rethrowCheaterMarkRefusal,
 } from './cheater_mark_api';
+import { runClearItemName } from './clear_item_name';
 import { cleanContentModerationReason } from './content_moderation_db';
 import { currentDailyRewardDay } from './daily_rewards';
 import {
@@ -106,10 +107,12 @@ import {
   accountById,
   accountMailTarget,
   findAccount,
+  getCharacterById,
   isAdminAccount,
   loadAccountFlair,
   pool,
   revokeTokensExcept,
+  saveCharacterState,
   saveToken,
   touchLogin,
   updatePasswordHash,
@@ -145,6 +148,7 @@ import {
   moderationReportsForAccount,
   muteAccountChat,
   reactivateAccountAudited,
+  recordItemNameClear,
   recordPasswordReset,
   recordProfessionsRestore,
   resetChatStrikesAudited,
@@ -2126,6 +2130,13 @@ function makeRealAdminDb() {
     updatePasswordHash,
     revokeTokensExcept,
     recordPasswordReset,
+    // The legendary-name strip (server/clear_item_name.ts): the offline blob
+    // read/write pair plus its audit row. saveCharacterState is the no-nonce
+    // offline save; the handler's offline pre-check is what makes that safe
+    // (the renameHandler doctrine).
+    getCharacterById,
+    saveCharacterState,
+    recordItemNameClear,
     setDailyRewardsBan,
     setDailyRewardsIpBan,
     // Account flair: the two audited writes plus the read-back the live push sends
@@ -3208,6 +3219,38 @@ async function restoreSlotHandler(ctx: Ctx): Promise<void> {
   }
 }
 
+/** POST /admin/api/moderation/characters/:id/clear-item-name: strip a stamped
+ *  legendary name (ItemInstancePayload.name) from an OFFLINE character's copy,
+ *  the phase 13 remediation arm. The whole decision (target validation, the
+ *  audit-first ordering, the offline requirement, the blob region walk) is
+ *  server/clear_item_name.ts runClearItemName; this binder wires the real
+ *  runtime + db seams and maps the typed outcome onto the restore family's
+ *  English admin error model. Registry-only (the cheater-mark precedent). */
+async function clearItemNameHandler(ctx: Ctx): Promise<void> {
+  const rt = useAdminRuntime();
+  const id = adminTargetId(ctx);
+  const body = await readBody(ctx.req);
+  try {
+    const outcome = await runClearItemName(
+      {
+        characterOnline: (characterId) => rt.adminCharacterOnline(characterId),
+        loadCharacter: async (characterId) => {
+          const row = await adminDb().getCharacterById(characterId);
+          return row ? { level: row.level, state: row.state } : null;
+        },
+        saveCharacterState: (characterId, level, state) =>
+          adminDb().saveCharacterState(characterId, level, state),
+        recordAudit: (input) => adminDb().recordItemNameClear(input),
+      },
+      { characterId: id, adminAccountId: ctxAccountId(ctx), body },
+    );
+    if (!outcome.ok) return fail(ctx.res, 400, outcome.error);
+    return ok(ctx.res, { ok: true, cleared: outcome.cleared });
+  } catch (err) {
+    return fail(ctx.res, 400, err instanceof Error ? err.message : 'item name clear failed');
+  }
+}
+
 /** GET /admin/api/accounts/:id/daily-rewards-events: bounded point-award ledger. */
 async function dailyRewardPointEventsHandler(ctx: Ctx): Promise<void> {
   const day = await dailyRewardEventDay(ctx.url.searchParams.get('day'));
@@ -3693,6 +3736,14 @@ export const routes: RouteDef[] = [
     middleware: [requireAdmin, requireAdminTarget('character')],
     meta: adminTargetMeta('character'),
     handler: restoreSlotHandler,
+  },
+  {
+    method: 'POST',
+    path: '/admin/api/moderation/characters/:id/clear-item-name',
+    surface: 'admin',
+    middleware: [requireAdmin, requireAdminTarget('character')],
+    meta: adminTargetMeta('character'),
+    handler: clearItemNameHandler,
   },
   {
     method: 'GET',

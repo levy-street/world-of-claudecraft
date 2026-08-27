@@ -170,6 +170,8 @@ const REGISTRY_ONLY_PARAM_PATHS = new Set([
   // surface, so admin.ts holds no `*Match` regex for them either.
   '/admin/api/moderation/accounts/:id/cheater-mark',
   '/admin/api/moderation/accounts/:id/lift-cheater-mark',
+  // The phase 13 legendary-name strip, same registry-only shape.
+  '/admin/api/moderation/characters/:id/clear-item-name',
 ]);
 const registryExactPaths = new Set(
   apiRoutes

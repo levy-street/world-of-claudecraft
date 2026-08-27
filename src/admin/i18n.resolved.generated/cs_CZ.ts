@@ -425,6 +425,7 @@ export const cs_CZ: AdminTranslations = {
   "moderationHistory.actionGeneralChatRateLimit": "Limit chatu Obecného změněn",
   "moderationHistory.actionRestoreItem": "Obnovení předmětu",
   "moderationHistory.actionRestoreSlot": "Obnovení slotu",
+  "moderationHistory.actionClearItemName": "Item name cleared",
   "moderationHistory.actionCheaterMark": "Označení podvodníka použito",
   "moderationHistory.actionCheaterMarkLift": "Označení podvodníka zrušeno",
   "moderationHistory.actionGuildRename": "Přejmenování cechu",

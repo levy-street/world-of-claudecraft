@@ -425,6 +425,7 @@ export const en_XA: AdminTranslations = {
   "moderationHistory.actionGeneralChatRateLimit": "[Ĝéñéŕáļ çĥáţ ŕáţé ļíɱíţ çĥáñĝéð]",
   "moderationHistory.actionRestoreItem": "[Íţéɱ ŕéšţóŕé]",
   "moderationHistory.actionRestoreSlot": "[Šļóţ ŕéšţóŕé]",
+  "moderationHistory.actionClearItemName": "[Íţéɱ ñáɱé çļéáŕéð]",
   "moderationHistory.actionCheaterMark": "[Çĥéáţéŕ ɱáŕķ áþþļíéð]",
   "moderationHistory.actionCheaterMarkLift": "[Çĥéáţéŕ ɱáŕķ ļíƒţéð]",
   "moderationHistory.actionGuildRename": "[Ĝúíļð ŕéñáɱé]",

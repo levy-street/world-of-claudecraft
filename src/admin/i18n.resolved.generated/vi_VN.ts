@@ -425,6 +425,7 @@ export const vi_VN: AdminTranslations = {
   "moderationHistory.actionGeneralChatRateLimit": "Đã thay đổi giới hạn chat Chung",
   "moderationHistory.actionRestoreItem": "Đã khôi phục vật phẩm",
   "moderationHistory.actionRestoreSlot": "Đã khôi phục ô",
+  "moderationHistory.actionClearItemName": "Item name cleared",
   "moderationHistory.actionCheaterMark": "Đã gắn dấu gian lận",
   "moderationHistory.actionCheaterMarkLift": "Đã gỡ dấu gian lận",
   "moderationHistory.actionGuildRename": "Đổi tên bang hội",

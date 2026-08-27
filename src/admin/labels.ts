@@ -74,6 +74,7 @@ export const MODERATION_ACTION_LABEL_KEYS: Record<string, string> = {
   // badge variant (the set_ai / note reasoning).
   restore_item: 'moderationHistory.actionRestoreItem',
   restore_slot: 'moderationHistory.actionRestoreSlot',
+  clear_item_name: 'moderationHistory.actionClearItemName',
   cheater_mark: 'moderationHistory.actionCheaterMark',
   cheater_mark_lift: 'moderationHistory.actionCheaterMarkLift',
   // Realm-scoped rather than account-scoped: written by the guild backoffice into

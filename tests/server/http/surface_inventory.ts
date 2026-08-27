@@ -1890,6 +1890,19 @@ export const SURFACE_INVENTORY: readonly SurfaceRoute[] = [
     requireOwnedExpected: REQUIRE_OWNED.operator404,
     match: /^\/admin\/api\/moderation\/characters\/(\d+)\/restore-slot$/,
   },
+  // The phase 13 legendary-name strip: registry-only like the cheater-mark
+  // pair (no legacy *Match regex; the RouteDef path template is its one
+  // dispatch source, listed in REGISTRY_ONLY_PARAM_PATHS).
+  {
+    dispatcher: DISPATCH.admin,
+    method: 'POST',
+    path: '/admin/api/moderation/characters/:id/clear-item-name',
+    handler: 'server/admin.ts clearItemNameHandler (registry-only RouteDef)',
+    contentType: PROBLEM_JSON,
+    authScope: AUTH_SCOPE.admin,
+    limiter: null,
+    requireOwnedExpected: REQUIRE_OWNED.operator404,
+  },
   {
     dispatcher: DISPATCH.admin,
     method: 'POST',

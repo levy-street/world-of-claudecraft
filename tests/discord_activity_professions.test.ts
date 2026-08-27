@@ -7,6 +7,8 @@
 // the queue's dedupe keys are account-scoped and its recent-key map is
 // module-global wall-clock state, so a shared account would collapse cards
 // across tests.
+import { readFileSync } from 'node:fs';
+import { join } from 'node:path';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 vi.mock('../server/db', () => ({
@@ -578,5 +580,30 @@ describe('dedupe key semantics (the pure claim/release layer, R60)', () => {
     // And a population UNDER the cap never evicts: key 200 was claimed after
     // the flood start yet inside the TTL, so it still dedupes.
     expect(claimDedupeKey('r60:ov:200', base + 4300)).toBe(false);
+  });
+});
+
+// The Discord card's safety chain starts at the SIM emit: the bot-side filter
+// (bot/logic.ts sanitizeLegendaryItemName) is defense in depth, and the first
+// link is that both promotion celebration events carry the NORMALIZED name
+// (src/sim/professions/legendary_name.ts), never the raw wire string. The
+// emit lives in src/sim, outside this lane's editable files, so this is a
+// deliberate source-level pin on the two emit sites; if promotePerfectedCopy
+// is refactored, re-point the pin at the new emit sites rather than deleting it.
+describe('the promotion emits pass the normalized name (source pin)', () => {
+  it('legendaryForged and legendaryForgedZone both carry the normalized local', () => {
+    const source = readFileSync(
+      join(__dirname, '..', 'src', 'sim', 'professions', 'perfecting.ts'),
+      'utf8',
+    );
+    // The normalization gate exists and refuses a null shape before any emit.
+    expect(source).toContain('const normalized = normalizeLegendaryName(name);');
+    expect(source).toContain('if (normalized === null) {');
+    // The personal event's name field is the normalized value...
+    expect(source).toMatch(/emit\(\{\s*type: 'legendaryForged',\s*itemId,\s*name: normalized,/);
+    // ...and the zone fan-out's itemName is too.
+    expect(source).toMatch(/itemName: normalized,/);
+    // No emit in the module carries the RAW name field.
+    expect(source).not.toMatch(/name: name,|itemName: name,/);
   });
 });

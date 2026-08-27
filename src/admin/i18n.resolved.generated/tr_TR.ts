@@ -425,6 +425,7 @@ export const tr_TR: AdminTranslations = {
   "moderationHistory.actionGeneralChatRateLimit": "Genel sohbet sınırı değiştirildi",
   "moderationHistory.actionRestoreItem": "Eşya geri yüklendi",
   "moderationHistory.actionRestoreSlot": "Yuva geri yüklendi",
+  "moderationHistory.actionClearItemName": "Item name cleared",
   "moderationHistory.actionCheaterMark": "Hileci işareti uygulandı",
   "moderationHistory.actionCheaterMarkLift": "Hileci işareti kaldırıldı",
   "moderationHistory.actionGuildRename": "Lonca yeniden adlandırma",

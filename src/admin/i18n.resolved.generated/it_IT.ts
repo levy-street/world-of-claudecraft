@@ -425,6 +425,7 @@ export const it_IT: AdminTranslations = {
   "moderationHistory.actionGeneralChatRateLimit": "Limite della chat Generale modificato",
   "moderationHistory.actionRestoreItem": "Oggetto ripristinato",
   "moderationHistory.actionRestoreSlot": "Slot ripristinato",
+  "moderationHistory.actionClearItemName": "Item name cleared",
   "moderationHistory.actionCheaterMark": "Marchio di baro applicato",
   "moderationHistory.actionCheaterMarkLift": "Marchio di baro rimosso",
   "moderationHistory.actionGuildRename": "Rinomina gilda",
