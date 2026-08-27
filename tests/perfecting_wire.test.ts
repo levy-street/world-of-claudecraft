@@ -98,6 +98,21 @@ function cmd(server: GameServer, session: ClientSession, body: Record<string, un
   server.handleMessage(session, JSON.stringify({ t: 'cmd', ...body }));
 }
 
+/** A Date.now spy that steps the wall clock a whole second per tick(), so a
+ *  run of NAMED perfect_item frames refills the name-screen lane between
+ *  frames (server/msg_lanes.ts: burst 5, one token per second) instead of
+ *  tripping it: the dispatch tests here are about the halves after the lane. */
+function namedFrameClock(): { tick(): void; restore(): void } {
+  let now = Date.now();
+  const spy = vi.spyOn(Date, 'now').mockImplementation(() => now);
+  return {
+    tick: () => {
+      now += 1000;
+    },
+    restore: () => spy.mockRestore(),
+  };
+}
+
 /** Route the sim's pending events to the sessions WITHOUT a tick, so an
  *  attempt's own error/log lines reach the client with the world clock held. */
 function routePending(server: GameServer): void {
@@ -356,16 +371,29 @@ describe('perfect_item over the real online dispatch path', () => {
     const pid = session.pid as number;
     seedPerfecter(server, pid);
     const spy = vi.spyOn(server.sim, 'perfectItemAs');
-    // Per-dimension malformed names: each still dispatches, nameless.
-    for (const name of [7, '', 'x'.repeat(65), ['a'], null, true]) {
+    // Every NAMED frame rides the name-screen lane (burst 5, one per second),
+    // so the clock advances a second per frame here: this test is about the
+    // dispatch halves, and the lane's own refusal is pinned separately below.
+    const clock = namedFrameClock();
+    // Per-dimension non-string or empty names: each still dispatches, nameless.
+    for (const name of [7, '', ['a'], null, true]) {
+      clock.tick();
       cmd(server, session, { cmd: 'perfect_item', slot: 'neck', name });
       expect(spy).toHaveBeenLastCalledWith(pid, { slot: 'neck' }, undefined);
     }
+    // An OVERSIZED string is cut to the payload ceiling and rides RAW (still
+    // past the live shape, so the sim's inscription arm answers it; the
+    // host-parity pin below drives that line on both hosts).
+    clock.tick();
+    cmd(server, session, { cmd: 'perfect_item', slot: 'neck', name: 'x'.repeat(65) });
+    expect(spy).toHaveBeenLastCalledWith(pid, { slot: 'neck' }, 'x'.repeat(64));
     // A well-formed name rides through to the sim, which owns the SHAPE rule.
+    clock.tick();
     cmd(server, session, { cmd: 'perfect_item', slot: 'neck', name: 'Dawnbreaker' });
     expect(spy).toHaveBeenLastCalledWith(pid, { slot: 'neck' }, 'Dawnbreaker');
     // The dispatch normalizes FIRST: the sim receives the NORMALIZED value
     // (trimmed, inner whitespace collapsed), never the raw wire spelling.
+    clock.tick();
     cmd(server, session, { cmd: 'perfect_item', slot: 'neck', name: '  Dawn   breaker  ' });
     expect(spy).toHaveBeenLastCalledWith(pid, { slot: 'neck' }, 'Dawn breaker');
     // A shape-INVALID name (the digit) skips the content screen entirely and
@@ -373,6 +401,7 @@ describe('perfect_item over the real online dispatch path', () => {
     // event even when the raw string would match the profanity screen, so
     // the matcher only ever prices shape-valid names.
     fc.sent.length = 0;
+    clock.tick();
     cmd(server, session, { cmd: 'perfect_item', slot: 'neck', name: 'fuck123' });
     expect(spy).toHaveBeenLastCalledWith(pid, { slot: 'neck' }, 'fuck123');
     const shapeInvalidErrors = fc.sent
@@ -387,6 +416,7 @@ describe('perfect_item over the real online dispatch path', () => {
     for (const name of ['fuck', 'f   u   u   u   ck']) {
       const callsBefore = spy.mock.calls.length;
       fc.sent.length = 0;
+      clock.tick();
       cmd(server, session, { cmd: 'perfect_item', slot: 'neck', name });
       expect(spy.mock.calls.length, name).toBe(callsBefore);
       const errors = fc.sent
@@ -396,6 +426,90 @@ describe('perfect_item over the real online dispatch path', () => {
         .map((e: any) => e.text);
       expect(errors, name).toContain('That name is not allowed.');
     }
+    spy.mockRestore();
+    clock.restore();
+  });
+
+  it('a shape-invalid raw name never lands on the copy online (the end-to-end pin)', () => {
+    // The two halves above (the raw ride-through, and the sim's shape arm in
+    // tests/orange_promotion.test.ts) compose into one claim worth one
+    // assertion of its own: after a shape-invalid name rides RAW to the
+    // online sim on a Perfected copy, that copy carries no name and no
+    // legendary quality, and the player read the inscription line.
+    const server = new GameServer();
+    const fc = fakeWs();
+    const session = joinServer(server, fc, 904, 'RawRide');
+    const pid = session.pid as number;
+    seedPerfecter(server, pid);
+    const bagged = bagRefOf(server, pid, APEX_NECK);
+    withForcedRoll(server.sim, 0, () => {
+      for (let i = 0; i < 4; i++) cmd(server, session, { cmd: 'perfect_item', ...wireOf(bagged) });
+    });
+    const copy = () => serverMeta(server, pid).inventory[bagged.bag].instance;
+    expect(copy()?.perfected).toBe(true);
+    server.sim.addItem('deed_of_making', 1, pid);
+    server.sim.drainEvents();
+    fc.sent.length = 0;
+    cmd(server, session, { cmd: 'perfect_item', ...wireOf(bagged), name: 'fuck123' });
+    routePending(server);
+    expect(textEvents(fc.sent)).toEqual(['That name cannot be inscribed on the work.']);
+    expect(copy()?.name).toBeUndefined();
+    expect(copy()?.rolled?.quality).toBeUndefined();
+    expect(server.sim.countItem('deed_of_making', pid)).toBe(1);
+  });
+
+  it('an oversized name answers the SAME line on both hosts (the parity pin)', () => {
+    // Online the dispatch cuts a too-long string to the payload ceiling;
+    // offline the Sim takes it raw. Either way the sim's shape arm is what
+    // answers, with one line, so the player cannot tell the hosts apart.
+    const server = new GameServer();
+    const fc = fakeWs();
+    const session = joinServer(server, fc, 904, 'LongName');
+    const pid = session.pid as number;
+    seedPerfecter(server, pid);
+    const bagged = bagRefOf(server, pid, APEX_NECK);
+    withForcedRoll(server.sim, 0, () => {
+      for (let i = 0; i < 4; i++) cmd(server, session, { cmd: 'perfect_item', ...wireOf(bagged) });
+    });
+    server.sim.addItem('deed_of_making', 1, pid);
+    const tooLong = 'A'.repeat(100);
+    // The offline host's shape: the RAW string straight into the sim, exactly
+    // as Sim.perfectItem hands it (no dispatch cut in between).
+    server.sim.drainEvents();
+    server.sim.perfectItemAs(pid, bagged, tooLong);
+    const offline = server.sim
+      .drainEvents()
+      .filter((ev) => ev.type === 'error')
+      .map((ev) => (ev as { text: string }).text);
+    // Online host: the dispatch path over the same sim.
+    fc.sent.length = 0;
+    cmd(server, session, { cmd: 'perfect_item', ...wireOf(bagged), name: tooLong });
+    routePending(server);
+    const online = textEvents(fc.sent);
+    expect(offline).toEqual(['That name cannot be inscribed on the work.']);
+    expect(online).toEqual(offline);
+    expect(server.sim.countItem('deed_of_making', pid)).toBe(1);
+  });
+
+  it('the name-screen lane refuses the sixth named frame at one instant and never calls the sim', () => {
+    // The phase 13 QA hot-path review: the obscenity matcher costs about 25
+    // microseconds and used to ride the 30/s command lane ahead of every sim
+    // gate. Named frames now take the name-screen lane (burst 5, refill one
+    // per second), so a flood of hand-crafted named frames is shed before the
+    // screen runs; an unnamed attempt stays on the command lane.
+    const server = new GameServer();
+    const fc = fakeWs();
+    const session = joinServer(server, fc, 904, 'Flooder');
+    const pid = session.pid as number;
+    seedPerfecter(server, pid);
+    const spy = vi.spyOn(server.sim, 'perfectItemAs');
+    for (let i = 0; i < 6; i++) {
+      cmd(server, session, { cmd: 'perfect_item', slot: 'neck', name: `Oath ${'a'.repeat(i)}` });
+    }
+    expect(spy).toHaveBeenCalledTimes(5);
+    // Unnamed attempts are untouched by the name lane.
+    for (let i = 0; i < 3; i++) cmd(server, session, { cmd: 'perfect_item', slot: 'neck' });
+    expect(spy).toHaveBeenCalledTimes(8);
     spy.mockRestore();
   });
 

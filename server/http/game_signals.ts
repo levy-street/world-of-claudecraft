@@ -74,9 +74,10 @@ export const WS_DROP_CAUSES = [
   'list_read',
   'guild_bank',
   'cosmetic',
+  'lane_name_screen',
 ] as const;
 
-/** One of the fixed eight inbound drop causes. */
+/** One of the fixed nine inbound drop causes. */
 export type WsDropCause = (typeof WS_DROP_CAUSES)[number];
 
 /**

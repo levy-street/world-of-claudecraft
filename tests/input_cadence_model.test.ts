@@ -166,7 +166,7 @@ function mergeStreams(...streams: SendEvent[][]): SendEvent[] {
 // R6, exempt frames never lane-checked, a kick tearing the session down).
 // ---------------------------------------------------------------------------
 
-type DropCause = MsgDropCause | 'lane_movement' | 'lane_command' | 'lane_chat';
+type DropCause = MsgDropCause | 'lane_movement' | 'lane_command' | 'lane_chat' | 'lane_name_screen';
 
 interface DropRecord {
   atMs: number;

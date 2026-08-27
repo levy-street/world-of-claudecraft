@@ -55,6 +55,7 @@ import {
   MSG_LANE_CHAT_BURST,
   MSG_LANE_COMMAND_BURST,
   MSG_LANE_MOVEMENT_BURST,
+  MSG_LANE_NAME_SCREEN_BURST,
 } from '../server/msg_lanes';
 import {
   MSG_ABUSE_SECOND_DROP_FLOOR,
@@ -664,6 +665,25 @@ describe('inbound drop, kick, and seq-gap counters at their emission sites', () 
       server.handleMessage(session, chatFrame(`line ${i}`));
     }
     expect(rec.dropped).toEqual(['lane_chat']);
+    expect(rec.rateKicks()).toBe(0);
+    server.stop();
+  });
+
+  it('emits cause lane name screen for a named-frame lane drop', () => {
+    // The phase 13 QA hot-path review: the two handlers that run the
+    // obscenity matcher (pet_rename, and perfect_item carrying a name) ride
+    // their own lane, so a flood of them is shed with its own cause before
+    // the screen runs; one past the burst at one instant is the lane's drop.
+    const server = new GameServer();
+    const rec = recordingSink();
+    setGameMetricsCounters(rec.sink);
+    const session = join(server, fakeWs(), 100, 1, 'Ayla');
+
+    const renameFrame = JSON.stringify({ t: 'cmd', cmd: 'pet_rename', name: 'Rex' });
+    for (let i = 0; i < MSG_LANE_NAME_SCREEN_BURST + 1; i++) {
+      server.handleMessage(session, renameFrame);
+    }
+    expect(rec.dropped).toEqual(['lane_name_screen']);
     expect(rec.rateKicks()).toBe(0);
     server.stop();
   });

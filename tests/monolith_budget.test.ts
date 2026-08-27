@@ -915,7 +915,14 @@ const MONOLITHS: MonolithRow[] = [
     // content screen, and the eqi `name` allowlist line. Extraction first,
     // then the phase's lines, netting 1 under the old ceiling; the ceiling
     // follows the file down. Exact count, zero slack.
-    ceiling: 10491,
+    // LOWERED 10491 -> 10475 at the Masterwrought Phase 13 QA (2026-08-27):
+    // the name-screen lane (server/msg_lanes.ts) costs the dispatch one line
+    // (the classified lane is consumed instead of a hard-wired 'command'),
+    // paid for by the two biome correctness findings the QA's cleanup lane
+    // named (the unused bgOriginAt import and the never-called private
+    // replaceLiveAccountCosmetics member). Extraction first, then the line;
+    // the ceiling follows the file down. Exact count, zero slack.
+    ceiling: 10475,
     seam: 'a sibling server module; see the hot-path seams in server/CLAUDE.md',
   },
   {
@@ -1020,7 +1027,13 @@ const MONOLITHS: MonolithRow[] = [
     // exactly as 4883 + 11 (theirs) = 4894, and the merged file measures 4894.
     // The merge authored nothing in server/db.ts. Exact merged count, zero
     // slack: the fix stays a domain module, never a raise.
-    ceiling: 4894,
+    // LOWERED 4894 -> 4877 at the Masterwrought Phase 13 QA (2026-08-27): the
+    // character UPDATE statement builder (the lease fence shapes plus the
+    // size signal) moved whole to server/character_save_statement.ts, paying
+    // for the lease-fenced offline writer saveOfflineCharacterState that the
+    // clear-item-name strip now rides (the reconnect-window closure). Exact
+    // merged count, zero slack.
+    ceiling: 4877,
     seam: 'a domain <domain>_db.ts module with its own *_SCHEMA (server/CLAUDE.md)',
   },
   {

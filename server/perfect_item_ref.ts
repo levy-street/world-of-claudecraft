@@ -41,21 +41,24 @@ export function parsePerfectItemRef(msg: {
 }
 
 // The optional legendary name riding a perfect_item frame (Masterwrought
-// phase 13): accepted only as a non-empty string under the payload string
-// ceiling, and ANYTHING else drops the FIELD, never the frame, so a malformed
-// name degrades to an unnamed attempt the sim's own deny ladder answers
-// ('That work needs a name to become a legend.' at the final rank) instead of
-// a silent drop the player cannot read. The sim owns the tighter live shape
-// (src/sim/professions/legendary_name.ts: trim, collapse, alphabet, max 32);
-// this bound only keeps a flood-sized or non-string token from crossing the
-// dispatch boundary. The server-side CONTENT screen (offensiveName) runs in
+// phase 13): accepted only as a non-empty string; a non-string drops the
+// FIELD, never the frame, so a malformed name degrades to an unnamed attempt
+// the sim's own deny ladder answers ('That work needs a name to become a
+// legend.' at the final rank) instead of a silent drop the player cannot
+// read. An OVERSIZED string is CUT to the payload string ceiling rather than
+// dropped (the phase 13 QA parity finding): the offline host hands the raw
+// string to the same sim, whose shape arm refuses anything past 32 with its
+// inscription line, so cutting keeps both hosts answering the identical
+// line while still keeping a flood-sized token from crossing the dispatch
+// boundary. The sim owns the tighter live shape
+// (src/sim/professions/legendary_name.ts: trim, collapse, alphabet, max 32).
+// The server-side CONTENT screen (offensiveName) runs in
 // resolvePerfectItemName below, the pet_rename split.
 export function parsePerfectItemName(msg: { name?: unknown }): string | undefined {
-  return typeof msg.name === 'string' &&
-    msg.name.length > 0 &&
-    msg.name.length <= MAX_INSTANCE_STRING_LENGTH
+  if (typeof msg.name !== 'string' || msg.name.length === 0) return undefined;
+  return msg.name.length <= MAX_INSTANCE_STRING_LENGTH
     ? msg.name
-    : undefined;
+    : msg.name.slice(0, MAX_INSTANCE_STRING_LENGTH);
 }
 
 /**

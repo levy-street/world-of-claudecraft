@@ -4,12 +4,21 @@
 // replace it ('already legendary'), so a name that later needs removing (a
 // banlist addition, uncovered language, contextual offense) previously had
 // only forbidden hand SQL. A promoted copy is permanently SOULBOUND, never
-// tradable: Perfecting binds it at rank 1 (the R2 Maker's Bond stamp) and
-// the unbind service refuses a Perfecting-bound copy outright
-// (commission.ts, unbind_perfecting), which is what makes the five-region
-// character walk below provably exhaustive: no guild bank, market listing,
-// mail parcel, or other character can ever hold a named copy, so stripping
-// the one character strips every copy there is.
+// tradable: Perfecting binds it on the first resolved ATTEMPT (the R2
+// Maker's Bond boundTo stamp in perfecting.ts; a craft-time head start is
+// unbound but never Perfected, so every Perfected copy is bound) and the
+// unbind service refuses a Perfecting-bound copy outright (commission.ts,
+// unbind_perfecting), which is what makes the five-region character walk
+// below provably exhaustive for every legal writer: no guild bank, market
+// listing, mail parcel, or other character can ever hold a named copy, so
+// stripping the one character strips every copy there is. (The proof's
+// boundary: a hand-edited blob carrying perfected plus name with no boundTo
+// sits outside it; the per-field drop-only load doctrine deliberately does
+// not couple those fields.) What the strip CANNOT reach is the Discord
+// activity card the promotion already published (server/craft_activity.ts):
+// that embed is durable in the third-party channel and has no in-repo
+// takedown arm, so an operator handling a name report owes a manual Discord
+// removal as a separate step (DEPLOY.md, the clear-item-name runbook).
 // This module is the pure decision-and-strip core
 // behind the audited admin endpoint (server/admin.ts clearItemNameHandler,
 // POST /admin/api/moderation/characters/:id/clear-item-name): validate the
@@ -31,14 +40,35 @@
 // unswept: the soulbound argument above proves a named copy can never sit in
 // them, so the omission is completeness, not the rename sweep's scoping limit
 // this header once cited.
+//
+// The reconnect window (the phase 13 QA, three reviewers converging): the two
+// in-process online checks below answer a session this process can see, but
+// a fresh login re-reads the blob BEFORE game.join registers it, and a
+// session on a peer process is invisible to the map entirely. So the blob
+// write itself is fenced on the character_leases table
+// (server/db.ts saveOfflineCharacterState): the handshake claims the lease
+// before its blob read, so any login that could hold the pre-strip state has
+// a live lease by the time the write runs, and the fenced UPDATE touches
+// nothing and reports false, which surfaces as a refusal to retry. A kicked
+// session releases its lease after its leave flush lands (server/game.ts
+// leave), so the decided kick-then-clear flow lands on the first retry; a
+// crashed process's orphan lease expires (LEASE_TTL_SECONDS) and the retry
+// lands after it.
 
 import { ITEMS } from '../src/sim/data';
 import type { CharacterState } from '../src/sim/sim';
 import { type EquipSlot, isEquipSlot } from '../src/sim/types';
+import { CHARACTER_SAVE_LEASED_LINE } from './character_save_statement';
 
 /** What the operator asked to strip: one worn slot, one bag cell (the
  *  index-plus-id pin, so a shifted stack is never stripped by accident), or
- *  every named copy on the character. */
+ *  every named copy on the character. The bag target is the persisted
+ *  inventory ARRAY index, not the cell the client displays (InvSlot.cell is a
+ *  separate, optional dragged-into position), and it reaches the carried
+ *  bags only (a banked or buyback-ring copy needs `all: true`); with two
+ *  same-id named copies in the bags, an index read off a screenshot rather
+ *  than the blob can strip the other one, so the runbook (DEPLOY.md) says to
+ *  target by `all: true` unless the index came from the blob itself. */
 export type ClearItemNameTarget =
   | { kind: 'slot'; slot: string }
   | { kind: 'bag'; bag: number; itemId: string }
@@ -174,7 +204,10 @@ export interface ClearItemNameDeps {
   loadCharacter(
     characterId: number,
   ): Promise<{ level: number; state: CharacterState | null } | null>;
-  saveCharacterState(characterId: number, level: number, state: CharacterState): Promise<unknown>;
+  /** The lease-fenced offline save (server/db.ts saveOfflineCharacterState):
+   *  resolves false when a live load lease exists, in which case the strip
+   *  did NOT land and the endpoint refuses (the reconnect-window closure). */
+  saveCharacterState(characterId: number, level: number, state: CharacterState): Promise<boolean>;
   recordAudit(input: {
     characterId: number;
     adminAccountId: number;
@@ -218,20 +251,23 @@ export async function runClearItemName(
     reason: input.body.reason,
   });
   const row = await deps.loadCharacter(input.characterId);
-  if (!row || !row.state) return { ok: false, error: 'character not found' };
+  if (!row?.state) return { ok: false, error: 'character not found' };
   const cleared = stripLegendaryNames(row.state, target);
   if (cleared === 0) return { ok: false, error: 'no named copy matched that target' };
-  // Close the login race: a character who came online between the pre-check
+  // Narrow the login race: a character who came online between the pre-check
   // and here would have a live session whose next autosave clobbers this
   // write, so re-check IMMEDIATELY before the save and refuse without
-  // writing (the restore family's self-detecting shape). The audit row above
-  // already recorded the REQUEST honestly, "requested" prose and all.
+  // writing (the restore family's self-detecting shape). This check answers
+  // the sessions this process can see; the fenced save below answers the
+  // rest (a login mid-handshake, a session on a peer process). The audit row
+  // above already recorded the REQUEST honestly, "requested" prose and all.
   if (deps.characterOnline(input.characterId)) {
     return {
       ok: false,
       error: 'character came online before the strip landed; kick them and retry',
     };
   }
-  await deps.saveCharacterState(input.characterId, row.level, row.state);
+  const landed = await deps.saveCharacterState(input.characterId, row.level, row.state);
+  if (!landed) return { ok: false, error: CHARACTER_SAVE_LEASED_LINE };
   return { ok: true, cleared };
 }

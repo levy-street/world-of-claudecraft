@@ -25,6 +25,9 @@
 //   cmd 'telemetry', and cmd 'challengeResponse'. Defense-in-depth token
 //   accounting: beats and challenge replies never compete for command-lane
 //   tokens, and never spend or refill lane state at all.
+// - name_screen: cmd 'pet_rename', and cmd 'perfect_item' carrying a `name`
+//   field: the two handlers that run the obscenity matcher on player text
+//   before any sim gate (see the lane's constants below).
 // - command: every OTHER parsed shape. All remaining commands, plus the
 //   garbage shapes (non-object JSON, unknown t, unknown cmd), so sub-ceiling
 //   garbage is bounded to the lane rate and anything above it becomes
@@ -52,8 +55,21 @@ export const MSG_LANE_COMMAND_BURST = 60;
 export const MSG_LANE_CHAT_REFILL_PER_SECOND = 4;
 export const MSG_LANE_CHAT_BURST = 8;
 
-/** The three metered lanes. */
-export type MsgLane = 'movement' | 'command' | 'chat';
+// Name-screen lane (the Masterwrought phase 13 QA hot-path review): the two
+// commands that run the obscenity matcher on player text BEFORE any sim gate
+// (pet_rename, and perfect_item when it carries a legendary name) cost about
+// 25 microseconds each on the event loop, and an ALLOWED under-ceiling frame
+// books no drop, so on the 30/s command lane a hostile client could spend
+// 0.8 ms/s per session on screens for frames naming an empty slot. Both are
+// dialog actions at single digits per minute for a real player, so the lane
+// is sized far above human rate and far below the command lane; refusals
+// drop and tally like every other lane drop. An UNNAMED perfect_item frame
+// stays on the command lane: it runs no screen.
+export const MSG_LANE_NAME_SCREEN_REFILL_PER_SECOND = 1;
+export const MSG_LANE_NAME_SCREEN_BURST = 5;
+
+/** The four metered lanes. */
+export type MsgLane = 'movement' | 'command' | 'chat' | 'name_screen';
 
 /** A metered lane, or exempt: never lane-checked, spends nothing. */
 export type MsgLaneClass = MsgLane | 'exempt';
@@ -62,6 +78,7 @@ export interface MsgLaneState {
   movementTokens: number;
   commandTokens: number;
   chatTokens: number;
+  nameScreenTokens: number;
   lastRefillSec: number;
 }
 
@@ -70,8 +87,17 @@ export function createMsgLanes(nowSec: number): MsgLaneState {
     movementTokens: MSG_LANE_MOVEMENT_BURST,
     commandTokens: MSG_LANE_COMMAND_BURST,
     chatTokens: MSG_LANE_CHAT_BURST,
+    nameScreenTokens: MSG_LANE_NAME_SCREEN_BURST,
     lastRefillSec: nowSec,
   };
+}
+
+/** The two commands whose handler screens player text through the obscenity
+ *  matcher ahead of every sim gate; perfect_item only when a name field rides
+ *  (the promotion), never for a plain attempt. */
+function isNameScreenCommand(record: Record<string, unknown>): boolean {
+  if (record.cmd === 'pet_rename') return true;
+  return record.cmd === 'perfect_item' && record.name !== undefined;
 }
 
 /**
@@ -88,13 +114,14 @@ export function classifyMsgLane(msg: unknown): MsgLaneClass {
   if (record.t !== 'cmd') return 'command';
   if (record.cmd === 'chat') return 'chat';
   if (record.cmd === 'telemetry' || record.cmd === 'challengeResponse') return 'exempt';
+  if (isNameScreenCommand(record)) return 'name_screen';
   return 'command';
 }
 
 /**
  * Mutates `state` in place and returns whether this frame may proceed down
  * its lane. A dropped frame spends nothing, mirroring the pre-parse gate. All
- * three lanes refill off one shared clock on every call, which is equivalent
+ * four lanes refill off one shared clock on every call, which is equivalent
  * to lazy per-lane refill because the refill math composes over time splits.
  */
 export function consumeLaneToken(
@@ -115,6 +142,10 @@ export function consumeLaneToken(
     MSG_LANE_CHAT_BURST,
     state.chatTokens + elapsed * MSG_LANE_CHAT_REFILL_PER_SECOND,
   );
+  state.nameScreenTokens = Math.min(
+    MSG_LANE_NAME_SCREEN_BURST,
+    state.nameScreenTokens + elapsed * MSG_LANE_NAME_SCREEN_REFILL_PER_SECOND,
+  );
   state.lastRefillSec = nowSec;
   if (lane === 'movement') {
     if (state.movementTokens < 1) return 'drop';
@@ -122,6 +153,9 @@ export function consumeLaneToken(
   } else if (lane === 'command') {
     if (state.commandTokens < 1) return 'drop';
     state.commandTokens -= 1;
+  } else if (lane === 'name_screen') {
+    if (state.nameScreenTokens < 1) return 'drop';
+    state.nameScreenTokens -= 1;
   } else {
     if (state.chatTokens < 1) return 'drop';
     state.chatTokens -= 1;

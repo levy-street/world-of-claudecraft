@@ -25,11 +25,11 @@ import {
   tokenInfoFromRow,
 } from './auth_guard_core';
 import type { BankBonusFacts } from './bank_entitlements';
-import { reportCharacterBlobSize } from './character_blob_size';
 import {
   configureLifetimeXpRankCache,
   readLifetimeXpRankForCharacter,
 } from './character_rank_cache';
+import { type CharacterSaveFence, characterUpdateStatement } from './character_save_statement';
 import { seedChatFilterDefaults } from './chat_filter_db';
 import type { ChatLogRow } from './chat_log';
 import {
@@ -3387,61 +3387,14 @@ export async function renameCharacter(
 // pair would race the takeover that steals the lease between the two. The no-nonce path
 // (tests, resumes, meta-less sessions) writes unconditionally and returns true, exactly
 // as before.
-// The ONE fenced character UPDATE the whole save family issues
-// (saveCharacterState, saveCharacterAndMarketState, and the guild bank escrow
-// sibling). Extracted so the lease fence stays byte-identical across the
-// family: the fence rides the write statement itself (never a separate
-// pre-check that would race a takeover), and a nonce that matches no lease row
-// touches nothing, which every caller must treat as "persist NOTHING".
-function characterUpdateStatement(
-  characterId: number,
-  level: number,
-  stateJson: string,
-  leaseNonce: string | undefined,
-): { text: string; values: unknown[] } {
-  // The blob size signal lives HERE rather than in each caller, for the same
-  // reason the lease fence does: this is the one statement the whole save family
-  // issues, so measuring at the chokepoint covers the autosave, the market/mail
-  // escrow flush and the guild bank escrow flush at once, and a future fourth
-  // save path inherits it instead of quietly becoming a blind spot. Putting it
-  // in the callers would mean N places to remember and N chances to miss one.
-  //
-  // Yes, this makes an otherwise pure statement builder log. That is the
-  // deliberate trade: every call site is a real write attempt (there is no path
-  // that builds this statement and discards it unused).
-  //
-  // What a line here does NOT promise is that the row landed. The statement can
-  // still be rolled back for reasons unrelated to size: a lease-fence miss rolls
-  // back both escrow transactions below, a refused guild bank escrow aborts the
-  // whole transaction, and saveCharacterOnLeave retries up to
-  // LEAVE_SAVE_MAX_ATTEMPTS times with every attempt but the last having failed.
-  // The message says "attempted" for exactly that reason.
-  //
-  // WARN-ONLY, and the write is never gated on size: see
-  // server/character_blob_size.ts for why a character blob gets a signal where a
-  // guild bank book gets a hard bound. Nothing about the size can refuse,
-  // truncate, or skip the write. The reporter also dampens to one line per
-  // window, so a fleet-wide crossing cannot drown the log.
-  const sizeWarning = reportCharacterBlobSize(
-    characterId,
-    Buffer.byteLength(stateJson, 'utf8'),
-    Date.now(),
-  );
-  if (sizeWarning !== null) console.warn(sizeWarning);
+// The statement builder itself (the fence shapes and the size signal) lives in
+// server/character_save_statement.ts since the Masterwrought phase 13 QA (the
+// monolith ratchet); every save-family member below builds through it so the
+// fence stays byte-identical across the family.
+function liveSaveFence(leaseNonce: string | undefined): CharacterSaveFence {
   return leaseNonce === undefined
-    ? {
-        text: 'UPDATE characters SET level = $2, state = $3, updated_at = now() WHERE id = $1',
-        values: [characterId, level, stateJson],
-      }
-    : {
-        text: `UPDATE characters SET level = $2, state = $3, updated_at = now()
-            WHERE id = $1
-              AND EXISTS (
-                SELECT 1 FROM character_leases
-                 WHERE character_id = $1 AND holder = $4 AND nonce = $5
-              )`,
-        values: [characterId, level, stateJson, PROCESS_LEASE_HOLDER, leaseNonce],
-      };
+    ? { kind: 'none' }
+    : { kind: 'nonce', holder: PROCESS_LEASE_HOLDER, nonce: leaseNonce };
 }
 
 export async function saveCharacterState(
@@ -3454,11 +3407,41 @@ export async function saveCharacterState(
   // A character save should wait out a slow database rather than lose state, so
   // run it on the raised heavy allowance; still bounded so a leave / shutdown
   // flush cannot hang past the container stop grace.
-  const stmt = characterUpdateStatement(characterId, level, JSON.stringify(cleanState), leaseNonce);
+  const stmt = characterUpdateStatement(
+    characterId,
+    level,
+    JSON.stringify(cleanState),
+    liveSaveFence(leaseNonce),
+  );
   const res = await runWithStatementTimeout(DB_HEAVY_STATEMENT_TIMEOUT_MS, (query) =>
     query(stmt.text, stmt.values),
   );
   return leaseNonce === undefined ? true : (res.rowCount ?? 0) > 0;
+}
+
+// Persist a character row from an OFFLINE writer (the admin clear-item-name
+// strip, server/clear_item_name.ts): fenced in the SAME statement on the
+// ABSENCE of a live load lease, so a login that has already claimed the lease
+// (the handshake acquires it before it re-reads the blob, server/ws_auth.ts)
+// makes this write touch nothing and return false, which the caller surfaces
+// as a refusal instead of landing a write the session's next autosave would
+// clobber. The offline pre-checks in the caller answer the common case; this
+// fence answers the reconnect window a per-process session map cannot see
+// (including a session on a peer process). Same chokepoints as the live save
+// (the zone-1 sanitize, the heavy allowance, the size signal).
+export async function saveOfflineCharacterState(
+  characterId: number,
+  level: number,
+  state: CharacterState,
+): Promise<boolean> {
+  const cleanState = sanitizeRemovedZone1Content(state).state;
+  const stmt = characterUpdateStatement(characterId, level, JSON.stringify(cleanState), {
+    kind: 'unleased',
+  });
+  const res = await runWithStatementTimeout(DB_HEAVY_STATEMENT_TIMEOUT_MS, (query) =>
+    query(stmt.text, stmt.values),
+  );
+  return (res.rowCount ?? 0) > 0;
 }
 
 // Persist a character row AND this realm's World Market + Ravenpost mail blobs
@@ -3508,7 +3491,7 @@ export async function saveCharacterAndMarketState(
       characterId,
       level,
       JSON.stringify(cleanState),
-      leaseNonce,
+      liveSaveFence(leaseNonce),
     );
     const charRes = await client.query(stmt.text, stmt.values);
     if (leaseNonce !== undefined && (charRes.rowCount ?? 0) === 0) {
@@ -3680,7 +3663,7 @@ export async function saveCharacterAndGuildBankState(
       characterId,
       level,
       JSON.stringify(cleanState),
-      leaseNonce,
+      liveSaveFence(leaseNonce),
     );
     const charRes = (await client.query(stmt.text, stmt.values)) as { rowCount: number | null };
     if (leaseNonce !== undefined && (charRes.rowCount ?? 0) === 0) {

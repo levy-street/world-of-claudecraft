@@ -20,7 +20,6 @@ import { MECH_CHROMAS, mechChromaSkinIndex } from '../src/sim/content/skins';
 import { withWeaponSkinApplied } from '../src/sim/content/weapon_skin_rules';
 import { isWeaponSkinType, WEAPON_SKINS } from '../src/sim/content/weapon_skins';
 import {
-  bgOriginAt,
   DELVES,
   DUNGEON_X_THRESHOLD,
   DUNGEONS,
@@ -770,6 +769,7 @@ const LANE_DROP_CAUSE = {
   movement: 'lane_movement',
   command: 'lane_command',
   chat: 'lane_chat',
+  name_screen: 'lane_name_screen',
 } as const satisfies Record<MsgLane, WsDropCause>;
 const JAILED_BLOCKED_COMMANDS = new Set<string>([
   'arena_queue',
@@ -3278,23 +3278,6 @@ export class GameServer {
       live.accountCosmetics = merged;
       this.applyAccountQuestLockouts(live.pid, merged);
       this.sim.setWeaponSkinLoadout(live.pid, this.ownedWeaponSkinLoadout(merged));
-      this.resyncQuests(live);
-    }
-  }
-
-  private replaceLiveAccountCosmetics(accountId: number, cosmetics: AccountCosmetics): void {
-    const exact = {
-      completedQuestIds: [...new Set(cosmetics.completedQuestIds)],
-      mechChromaIds: [...new Set(cosmetics.mechChromaIds)],
-      weaponSkinIds: [...new Set(cosmetics.weaponSkinIds ?? [])],
-      weaponSkinLoadout: { ...(cosmetics.weaponSkinLoadout ?? {}) },
-    };
-    this.accountCosmeticsByAccount.set(accountId, exact);
-    for (const live of this.clients.values()) {
-      if (live.accountId !== accountId) continue;
-      live.accountCosmetics = exact;
-      this.applyAccountQuestLockouts(live.pid, exact);
-      this.sim.setWeaponSkinLoadout(live.pid, this.ownedWeaponSkinLoadout(exact));
       this.resyncQuests(live);
     }
   }
@@ -6402,10 +6385,11 @@ export class GameServer {
     // BEFORE the jailed notice and the HEAVY_SELF_CMDS dirty flag below: a
     // lane-dropped frame must neither send a jailed notice nor force a heavy
     // self re-diff (drops are drops).
+    const lane = classifyMsgLane(msg);
     if (
-      classifyMsgLane(msg) === 'command' &&
+      (lane === 'command' || lane === 'name_screen') &&
       KNOWN_COMMANDS.has(String(msg.cmd)) &&
-      !this.consumeLane(session, 'command', receivedAtMs / 1000)
+      !this.consumeLane(session, lane, receivedAtMs / 1000)
     ) {
       return;
     }

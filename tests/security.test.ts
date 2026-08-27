@@ -9,6 +9,7 @@ import {
   normalizeEmail,
   offensiveName,
   offensiveUsername,
+  USERNAME_BANLIST_FILE_MAX_BYTES,
   validCharName,
   validEmail,
   validUsername,
@@ -693,7 +694,7 @@ describe('username censorship', () => {
     }
   });
 
-  it('retries file-backed banned terms after a failed read', () => {
+  it('retries file-backed banned terms after a failed read, warning ONCE per failure state', () => {
     const dir = mkdtempSync(join(tmpdir(), 'woc-banlist-missing-'));
     const missingFile = join(dir, 'missing.txt');
     const warn = vi.spyOn(console, 'warn').mockImplementation(() => undefined);
@@ -702,9 +703,76 @@ describe('username censorship', () => {
       withUsernameBanlist({ file: missingFile }, () => {
         expect(offensiveName('laterterm')).toBe(false);
         expect(warn).toHaveBeenCalledOnce();
+        // The failure is cached under its own key (stale-on-error): the next
+        // calls neither re-stat, re-read, nor re-warn (the phase 13 QA hot-path
+        // finding: the old shape paid all three, synchronously, per name screen).
+        expect(offensiveName('laterterm')).toBe(false);
+        expect(offensiveName('otherterm')).toBe(false);
+        expect(warn).toHaveBeenCalledOnce();
 
+        // The file appearing moves the stamp off the sentinel: one fresh read.
         writeFileSync(missingFile, 'laterterm\n');
         expect(offensiveName('laterterm')).toBe(true);
+        expect(warn).toHaveBeenCalledOnce();
+      });
+    } finally {
+      warn.mockRestore();
+      rmSync(dir, { force: true, recursive: true });
+    }
+  });
+
+  it('keeps enforcing the last good file terms while the file is unreadable (stale-on-error)', () => {
+    const dir = mkdtempSync(join(tmpdir(), 'woc-banlist-stale-'));
+    const file = join(dir, 'banlist.txt');
+    writeFileSync(file, 'goneterm\n');
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => undefined);
+
+    try {
+      withUsernameBanlist({ file }, () => {
+        expect(offensiveName('goneterm')).toBe(true);
+        expect(warn).not.toHaveBeenCalled();
+        // The mount vanishes: the operator list is NOT dropped (the old shape
+        // fell back to the built-ins alone), one warn marks the transition,
+        // and repeated screens pay nothing more.
+        rmSync(file, { force: true });
+        expect(offensiveName('goneterm')).toBe(true);
+        expect(offensiveName('goneterm')).toBe(true);
+        expect(warn).toHaveBeenCalledOnce();
+        // The file returning with a new list is picked up on the next call.
+        writeFileSync(file, 'backterm\n');
+        expect(offensiveName('backterm')).toBe(true);
+        expect(offensiveName('goneterm')).toBe(false);
+        expect(warn).toHaveBeenCalledOnce();
+      });
+    } finally {
+      warn.mockRestore();
+      rmSync(dir, { force: true, recursive: true });
+    }
+  });
+
+  it('refuses to read a banlist file past the byte ceiling, keeping the last good list', () => {
+    const dir = mkdtempSync(join(tmpdir(), 'woc-banlist-huge-'));
+    const file = join(dir, 'banlist.txt');
+    writeFileSync(file, 'smallterm\n');
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => undefined);
+
+    try {
+      withUsernameBanlist({ file }, () => {
+        expect(USERNAME_BANLIST_FILE_MAX_BYTES).toBe(1_048_576);
+        expect(offensiveName('smallterm')).toBe(true);
+        // A regrown or mistaken file one byte past the ceiling is the
+        // unreadable class: warned once, never read whole, the last good
+        // list still enforced and its own terms never admitted.
+        writeFileSync(file, `hugeterm\n${'z'.repeat(USERNAME_BANLIST_FILE_MAX_BYTES)}`);
+        expect(offensiveName('hugeterm')).toBe(false);
+        expect(offensiveName('smallterm')).toBe(true);
+        expect(offensiveName('hugeterm')).toBe(false);
+        expect(warn).toHaveBeenCalledOnce();
+        expect(String(warn.mock.calls[0][0])).toContain('ceiling');
+        // Exactly AT the ceiling still reads.
+        writeFileSync(file, `atterm\n${'z'.repeat(USERNAME_BANLIST_FILE_MAX_BYTES - 7)}`);
+        expect(offensiveName('atterm')).toBe(true);
+        expect(warn).toHaveBeenCalledOnce();
       });
     } finally {
       warn.mockRestore();

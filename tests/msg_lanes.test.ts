@@ -49,6 +49,8 @@ import {
   MSG_LANE_COMMAND_REFILL_PER_SECOND,
   MSG_LANE_MOVEMENT_BURST,
   MSG_LANE_MOVEMENT_REFILL_PER_SECOND,
+  MSG_LANE_NAME_SCREEN_BURST,
+  MSG_LANE_NAME_SCREEN_REFILL_PER_SECOND,
 } from '../server/msg_lanes';
 import { COMMAND_NAMES } from '../src/world_api';
 
@@ -60,6 +62,38 @@ describe('lane constants hold the R5 budget literals', () => {
     expect(MSG_LANE_COMMAND_BURST).toBe(60);
     expect(MSG_LANE_CHAT_REFILL_PER_SECOND).toBe(4);
     expect(MSG_LANE_CHAT_BURST).toBe(8);
+    // The name-screen lane (the phase 13 QA hot-path review): far above a
+    // human's dialog cadence, far below the command lane the obscenity
+    // matcher used to ride.
+    expect(MSG_LANE_NAME_SCREEN_REFILL_PER_SECOND).toBe(1);
+    expect(MSG_LANE_NAME_SCREEN_BURST).toBe(5);
+    expect(MSG_LANE_NAME_SCREEN_REFILL_PER_SECOND).toBeLessThan(MSG_LANE_COMMAND_REFILL_PER_SECOND);
+  });
+});
+
+describe('the name-screen lane takes exactly the two matcher-running commands', () => {
+  it('pet_rename always, perfect_item only when a name field rides', () => {
+    expect(classifyMsgLane({ t: 'cmd', cmd: 'pet_rename', name: 'Rex' })).toBe('name_screen');
+    expect(classifyMsgLane({ t: 'cmd', cmd: 'pet_rename' })).toBe('name_screen');
+    expect(classifyMsgLane({ t: 'cmd', cmd: 'perfect_item', slot: 'neck', name: 'Oath' })).toBe(
+      'name_screen',
+    );
+    // A non-string name still classifies here: the lane is the cheap
+    // pre-parse approximation of "this frame will run a screen", and the
+    // handler's own field drop answers the malformed case after it.
+    expect(classifyMsgLane({ t: 'cmd', cmd: 'perfect_item', slot: 'neck', name: 7 })).toBe(
+      'name_screen',
+    );
+  });
+
+  it('an UNNAMED perfect_item attempt stays on the command lane, as does everything else', () => {
+    // pet_rename is the one command name that classifies here on its own (it
+    // always screens); the every-other-command sweep below excludes it by name.
+    expect(classifyMsgLane({ t: 'cmd', cmd: 'perfect_item', slot: 'neck' })).toBe('command');
+    expect(classifyMsgLane({ t: 'cmd', cmd: 'perfect_item', bag: 0, item: 'x' })).toBe('command');
+    // A name field on a command that runs no screen changes nothing.
+    expect(classifyMsgLane({ t: 'cmd', cmd: 'equip', name: 'Oath' })).toBe('command');
+    expect(classifyMsgLane({ t: 'cmd', cmd: 'chat', name: 'Oath' })).toBe('chat');
   });
 });
 
@@ -91,6 +125,10 @@ describe('classifyMsgLane mirrors the dispatch switch', () => {
   it('classifies every other dispatched command into the command lane', () => {
     for (const name of COMMAND_NAMES) {
       if (name === 'chat' || name === 'telemetry' || name === 'challengeResponse') continue;
+      // pet_rename always screens player text, so it owns the name-screen lane
+      // (pinned by name above); every other command, perfect_item included
+      // when it carries no name, is the command lane.
+      if (name === 'pet_rename') continue;
       expect(classifyMsgLane({ t: 'cmd', cmd: name })).toBe('command');
     }
   });
@@ -117,6 +155,7 @@ describe('per-lane budget arithmetic', () => {
       ['movement', MSG_LANE_MOVEMENT_BURST],
       ['command', MSG_LANE_COMMAND_BURST],
       ['chat', MSG_LANE_CHAT_BURST],
+      ['name_screen', MSG_LANE_NAME_SCREEN_BURST],
     ] as const) {
       const state = createMsgLanes(1000);
       for (let i = 0; i < burst; i++) {
@@ -131,6 +170,7 @@ describe('per-lane budget arithmetic', () => {
       ['movement', MSG_LANE_MOVEMENT_BURST, MSG_LANE_MOVEMENT_REFILL_PER_SECOND],
       ['command', MSG_LANE_COMMAND_BURST, MSG_LANE_COMMAND_REFILL_PER_SECOND],
       ['chat', MSG_LANE_CHAT_BURST, MSG_LANE_CHAT_REFILL_PER_SECOND],
+      ['name_screen', MSG_LANE_NAME_SCREEN_BURST, MSG_LANE_NAME_SCREEN_REFILL_PER_SECOND],
     ] as const) {
       const state = createMsgLanes(1000);
       for (let i = 0; i < burst; i++) consumeLaneToken(state, lane, 1000);

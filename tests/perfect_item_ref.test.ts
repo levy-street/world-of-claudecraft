@@ -3,9 +3,14 @@
 // the real dispatch) lives in tests/perfecting_wire.test.ts; this pins the
 // decision table directly, shape by shape, so the drop rules are readable
 // without a server.
-import { describe, expect, it } from 'vitest';
-import { parsePerfectItemName, parsePerfectItemRef } from '../server/perfect_item_ref';
+import { describe, expect, it, vi } from 'vitest';
+import {
+  parsePerfectItemName,
+  parsePerfectItemRef,
+  resolvePerfectItemName,
+} from '../server/perfect_item_ref';
 import { MAX_INSTANCE_STRING_LENGTH } from '../src/sim/item_instance_load';
+import { MAX_LEGENDARY_NAME_LENGTH } from '../src/sim/professions/legendary_name';
 
 const ITEM = 'wyrmfall_pendant';
 
@@ -78,12 +83,27 @@ describe('parsePerfectItemName (Masterwrought phase 13)', () => {
     expect(parsePerfectItemName({ name: '!!' })).toBe('!!');
   });
 
-  it('every malformed shape drops the FIELD, never the frame, per dimension', () => {
+  it('an OVERSIZED string is cut to the ceiling, never dropped (the host-parity rule)', () => {
+    // The offline host hands the raw string to the sim, whose shape arm
+    // refuses anything past MAX_LEGENDARY_NAME_LENGTH with the inscription
+    // line; dropping the field here would make the online host answer the
+    // needs-a-name line instead for the same input. Cutting keeps the token
+    // bounded AND the two hosts on one line (pinned end to end in
+    // tests/perfecting_wire.test.ts).
+    const cut = parsePerfectItemName({ name: 'x'.repeat(MAX_INSTANCE_STRING_LENGTH + 1) });
+    expect(cut).toBe('x'.repeat(MAX_INSTANCE_STRING_LENGTH));
+    expect(parsePerfectItemName({ name: 'y'.repeat(4096) })).toHaveLength(
+      MAX_INSTANCE_STRING_LENGTH,
+    );
+    // Any cut is still past the live shape, so the sim's shape arm owns it.
+    expect(MAX_INSTANCE_STRING_LENGTH).toBeGreaterThan(MAX_LEGENDARY_NAME_LENGTH);
+  });
+
+  it('every non-string or empty shape drops the FIELD, never the frame, per dimension', () => {
     for (const name of [
       undefined, // absent: the ordinary unnamed attempt
       7, // non-string
       '', // empty
-      'x'.repeat(MAX_INSTANCE_STRING_LENGTH + 1), // over the ceiling
       ['a'], // array smuggle
       { toString: () => 'a' }, // object smuggle
       Number.MAX_SAFE_INTEGER, // huge-integer abuse
@@ -97,5 +117,49 @@ describe('parsePerfectItemName (Masterwrought phase 13)', () => {
     expect(parsePerfectItemRef({ slot: 'neck', name: 7 } as Record<string, unknown>)).toEqual({
       slot: 'neck',
     });
+  });
+});
+
+describe('resolvePerfectItemName: the whole naming decision (the phase 13 QA K17 pin)', () => {
+  it('screens the NORMALIZED value, never the raw wire spelling, and passes it on', () => {
+    // D13-5: the content screen prices the trimmed, whitespace-collapsed name,
+    // so a spelling only normalization exposes cannot slip past a raw-token
+    // screen, and there is no hidden coupling to the censorship normalizer's
+    // own whitespace stripping.
+    const screen = vi.fn((_name: string) => false);
+    expect(resolvePerfectItemName({ name: '  Oath   of  Vale ' }, screen)).toEqual({
+      refused: false,
+      name: 'Oath of Vale',
+    });
+    expect(screen).toHaveBeenCalledTimes(1);
+    expect(screen).toHaveBeenCalledWith('Oath of Vale');
+  });
+
+  it('refuses the frame on a match, with no name passed on', () => {
+    const screen = vi.fn((name: string) => name === 'Bad Word');
+    expect(resolvePerfectItemName({ name: 'Bad   Word' }, screen)).toEqual({ refused: true });
+    expect(screen).toHaveBeenCalledWith('Bad Word');
+  });
+
+  it('a shape-INVALID name skips the screen entirely and rides RAW for the sim to refuse', () => {
+    const screen = vi.fn(() => true);
+    expect(resolvePerfectItemName({ name: '1Blade' }, screen)).toEqual({
+      refused: false,
+      name: '1Blade',
+    });
+    expect(
+      resolvePerfectItemName({ name: 'z'.repeat(MAX_LEGENDARY_NAME_LENGTH + 1) }, screen),
+    ).toEqual({ refused: false, name: 'z'.repeat(MAX_LEGENDARY_NAME_LENGTH + 1) });
+    expect(screen).not.toHaveBeenCalled();
+  });
+
+  it('no usable name field passes undefined without touching the screen', () => {
+    const screen = vi.fn(() => true);
+    for (const msg of [{}, { name: 7 }, { name: '' }, { name: null }]) {
+      expect(resolvePerfectItemName(msg as { name?: unknown }, screen)).toEqual({
+        refused: false,
+      });
+    }
+    expect(screen).not.toHaveBeenCalled();
   });
 });

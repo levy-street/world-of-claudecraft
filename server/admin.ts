@@ -112,7 +112,7 @@ import {
   loadAccountFlair,
   pool,
   revokeTokensExcept,
-  saveCharacterState,
+  saveOfflineCharacterState,
   saveToken,
   touchLogin,
   updatePasswordHash,
@@ -2131,11 +2131,12 @@ function makeRealAdminDb() {
     revokeTokensExcept,
     recordPasswordReset,
     // The legendary-name strip (server/clear_item_name.ts): the offline blob
-    // read/write pair plus its audit row. saveCharacterState is the no-nonce
-    // offline save; the handler's offline pre-check is what makes that safe
-    // (the renameHandler doctrine).
+    // read/write pair plus its audit row. saveOfflineCharacterState is the
+    // lease-fenced offline save (the phase 13 QA login-race closure): the
+    // handler's offline pre-checks answer the common case and the in-statement
+    // fence answers the reconnect window the session map cannot see.
     getCharacterById,
-    saveCharacterState,
+    saveOfflineCharacterState,
     recordItemNameClear,
     setDailyRewardsBan,
     setDailyRewardsIpBan,
@@ -3239,7 +3240,7 @@ async function clearItemNameHandler(ctx: Ctx): Promise<void> {
           return row ? { level: row.level, state: row.state } : null;
         },
         saveCharacterState: (characterId, level, state) =>
-          adminDb().saveCharacterState(characterId, level, state),
+          adminDb().saveOfflineCharacterState(characterId, level, state),
         recordAudit: (input) => adminDb().recordItemNameClear(input),
       },
       { characterId: id, adminAccountId: ctxAccountId(ctx), body },

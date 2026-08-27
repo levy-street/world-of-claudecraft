@@ -385,6 +385,7 @@ describe('registerGameStateMetrics: throughput counters via the returned sink', 
       'list_read',
       'guild_bank',
       'cosmetic',
+      'lane_name_screen',
     ]);
     for (const cause of WS_DROP_CAUSES) {
       expect(

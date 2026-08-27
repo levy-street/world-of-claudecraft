@@ -4223,8 +4223,8 @@ describe('phase 13 legendary-name strip (clear-item-name)', () => {
     const state = NAMED_STATE() as { level: number; inventory: { instance?: { name?: string } }[] };
     const recordItemNameClear = vi.fn(async () => ({ accountId: 9 }));
     const getCharacterById = vi.fn(async () => ({ id: 5, level: 20, state }) as never);
-    const saveCharacterState = vi.fn(async () => true);
-    authedAdminDb({ recordItemNameClear, getCharacterById, saveCharacterState } as never);
+    const saveOfflineCharacterState = vi.fn(async () => true);
+    authedAdminDb({ recordItemNameClear, getCharacterById, saveOfflineCharacterState } as never);
     installAdminRuntime({ adminCharacterOnline: vi.fn(() => false) });
     const r = await runRoute('POST', '/admin/api/moderation/characters/:id/clear-item-name', {
       headers: { authorization: BEARER },
@@ -4239,18 +4239,18 @@ describe('phase 13 legendary-name strip (clear-item-name)', () => {
       detail: 'bag 0 wyrmfall_pendant',
       reason: 'reported slur in the stamped name',
     });
-    expect(saveCharacterState).toHaveBeenCalledWith(5, 20, state);
+    expect(saveOfflineCharacterState).toHaveBeenCalledWith(5, 20, state);
     expect(state.inventory[0].instance?.name).toBeUndefined();
     // A strip may never exist unaudited: the audit row precedes the save.
     expect(recordItemNameClear.mock.invocationCallOrder[0]).toBeLessThan(
-      saveCharacterState.mock.invocationCallOrder[0],
+      saveOfflineCharacterState.mock.invocationCallOrder[0],
     );
   });
 
   it('refuses an ONLINE character before any audit write (kick first, then clear)', async () => {
     const recordItemNameClear = vi.fn(async () => ({ accountId: 9 }));
-    const saveCharacterState = vi.fn(async () => true);
-    authedAdminDb({ recordItemNameClear, saveCharacterState } as never);
+    const saveOfflineCharacterState = vi.fn(async () => true);
+    authedAdminDb({ recordItemNameClear, saveOfflineCharacterState } as never);
     const rt = installAdminRuntime({ adminCharacterOnline: vi.fn(() => true) });
     const r = await runRoute('POST', '/admin/api/moderation/characters/:id/clear-item-name', {
       headers: { authorization: BEARER },
@@ -4265,16 +4265,16 @@ describe('phase 13 legendary-name strip (clear-item-name)', () => {
     });
     expect(rt.adminCharacterOnline).toHaveBeenCalledWith(5);
     expect(recordItemNameClear).not.toHaveBeenCalled();
-    expect(saveCharacterState).not.toHaveBeenCalled();
+    expect(saveOfflineCharacterState).not.toHaveBeenCalled();
   });
 
   it('surfaces a missing reason as the audited write refusal, and never saves', async () => {
-    const saveCharacterState = vi.fn(async () => true);
+    const saveOfflineCharacterState = vi.fn(async () => true);
     authedAdminDb({
       recordItemNameClear: vi.fn(async () => {
         throw new Error('moderation reason is required');
       }),
-      saveCharacterState,
+      saveOfflineCharacterState,
     } as never);
     installAdminRuntime({ adminCharacterOnline: vi.fn(() => false) });
     const r = await runRoute('POST', '/admin/api/moderation/characters/:id/clear-item-name', {
@@ -4284,7 +4284,7 @@ describe('phase 13 legendary-name strip (clear-item-name)', () => {
     });
     expect(r.status).toBe(400);
     expect(r.body).toEqual({ success: false, data: null, error: 'moderation reason is required' });
-    expect(saveCharacterState).not.toHaveBeenCalled();
+    expect(saveOfflineCharacterState).not.toHaveBeenCalled();
   });
 
   it('refuses a moderator-role token at the central gate (superadmin-only permission)', async () => {
@@ -4293,10 +4293,10 @@ describe('phase 13 legendary-name strip (clear-item-name)', () => {
     // moderation.act: a moderator's full bundle must bounce off the gate
     // before the handler or any db member is reached.
     const recordItemNameClear = vi.fn(async () => ({ accountId: 9 }));
-    const saveCharacterState = vi.fn(async () => true);
+    const saveOfflineCharacterState = vi.fn(async () => true);
     authedAdminDb({
       recordItemNameClear,
-      saveCharacterState,
+      saveOfflineCharacterState,
       adminRolesForAccount: async () => ({ username: 'op', roles: ['moderator'] }),
     } as never);
     installAdminRuntime({ adminCharacterOnline: vi.fn(() => false) });
@@ -4312,15 +4312,15 @@ describe('phase 13 legendary-name strip (clear-item-name)', () => {
       error: 'you do not have permission to do this',
     });
     expect(recordItemNameClear).not.toHaveBeenCalled();
-    expect(saveCharacterState).not.toHaveBeenCalled();
+    expect(saveOfflineCharacterState).not.toHaveBeenCalled();
   });
 
   it('a no-match strip answers honestly after the audit, without a save', async () => {
     const recordItemNameClear = vi.fn(async () => ({ accountId: 9 }));
-    const saveCharacterState = vi.fn(async () => true);
+    const saveOfflineCharacterState = vi.fn(async () => true);
     authedAdminDb({
       recordItemNameClear,
-      saveCharacterState,
+      saveOfflineCharacterState,
       getCharacterById: vi.fn(async () => ({ id: 5, level: 20, state: NAMED_STATE() }) as never),
     } as never);
     installAdminRuntime({ adminCharacterOnline: vi.fn(() => false) });
@@ -4336,7 +4336,7 @@ describe('phase 13 legendary-name strip (clear-item-name)', () => {
       error: 'no named copy matched that target',
     });
     expect(recordItemNameClear).toHaveBeenCalled();
-    expect(saveCharacterState).not.toHaveBeenCalled();
+    expect(saveOfflineCharacterState).not.toHaveBeenCalled();
   });
 });
 

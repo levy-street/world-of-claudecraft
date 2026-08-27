@@ -4,7 +4,10 @@
 // ordering contract (validate, offline, audit, load-strip, the pre-save
 // online re-check, save) over an injected deps bag. The RouteDef arm rides
 // the admin.test.ts rig ('phase 13 legendary-name strip' there).
+import { readFileSync } from 'node:fs';
+import { join } from 'node:path';
 import { describe, expect, it, vi } from 'vitest';
+import { CHARACTER_SAVE_LEASED_LINE } from '../../server/character_save_statement';
 import {
   type ClearItemNameDeps,
   clearItemNameBodyError,
@@ -283,13 +286,87 @@ describe('runClearItemName (the endpoint body over injected deps)', () => {
   });
 
   it('a vanished character answers character not found after the audit', async () => {
-    const { deps, saveCharacterState } = makeDeps({ loadCharacter: vi.fn(async () => null) });
+    const { deps, recordAudit, saveCharacterState } = makeDeps({
+      loadCharacter: vi.fn(async () => null),
+    });
     const outcome = await runClearItemName(deps, {
       characterId: 5,
       adminAccountId: 7,
       body: { all: true, reason: 'slur' },
     });
     expect(outcome).toEqual({ ok: false, error: 'character not found' });
+    // "after the audit" is a claim of its own: the request row landed first.
+    expect(recordAudit).toHaveBeenCalledTimes(1);
     expect(saveCharacterState).not.toHaveBeenCalled();
+  });
+
+  it('a live lease at the write refuses with the lease line (the fenced save said no)', async () => {
+    // The reconnect-window closure (the phase 13 QA): both in-process online
+    // checks passed, but the lease-fenced save (server/db.ts
+    // saveOfflineCharacterState) found a live lease and touched nothing, so the
+    // strip did NOT land and the endpoint must say so rather than report the
+    // stripped count as success. The audit row honestly records the request.
+    const { deps, state, recordAudit, saveCharacterState } = makeDeps({
+      saveCharacterState: vi.fn(async () => false),
+    });
+    const outcome = await runClearItemName(deps, {
+      characterId: 5,
+      adminAccountId: 7,
+      body: { all: true, reason: 'slur' },
+    });
+    expect(outcome).toEqual({ ok: false, error: CHARACTER_SAVE_LEASED_LINE });
+    expect(recordAudit).toHaveBeenCalledTimes(1);
+    // The fenced write was attempted exactly once with the stripped blob; the
+    // refusal is the statement's own 0-row answer, never a skipped call.
+    expect(deps.saveCharacterState).toHaveBeenCalledTimes(1);
+    expect(deps.saveCharacterState).toHaveBeenCalledWith(5, 20, state);
+    expect(saveCharacterState).not.toHaveBeenCalled();
+  });
+});
+
+describe('the strip walks exactly the payload-bearing regions the rename sweep walks', () => {
+  // The five-region claim, tied MECHANICALLY to its precedent rather than
+  // restated as a hand count: a sixth payload-bearing CharacterState region
+  // added to rekeyInstanceSigner (src/sim/character_rename.ts) without a
+  // matching arm here reds this, where the hand-counted sweep test above
+  // would stay green at five. toolEffectSlots is the rename walk's one
+  // non-payload region (it rekeys a craftedBy string), excluded by name.
+  const regionReads = (source: string): string[] =>
+    Array.from(
+      new Set(
+        Array.from(
+          source.matchAll(
+            /\bstate\.(inventory|bank\??\.inventory|vendorBuyback|equipmentInstances?|toolEffectSlots)\b/g,
+          ),
+        )
+          .map((m) => m[1].replace('?', ''))
+          .sort(),
+      ),
+    );
+  const stripSource = readFileSync(
+    join(__dirname, '..', '..', 'server', 'clear_item_name.ts'),
+    'utf8',
+  );
+  const renameSource = readFileSync(
+    join(__dirname, '..', '..', 'src', 'sim', 'character_rename.ts'),
+    'utf8',
+  );
+  const PAYLOAD_REGIONS = [
+    'bank.inventory',
+    'equipmentInstance',
+    'equipmentInstances',
+    'inventory',
+    'vendorBuyback',
+  ];
+
+  it('the strip reads the five payload regions, and the rename walk reads those plus toolEffectSlots', () => {
+    const stripBody = stripSource.slice(
+      stripSource.indexOf('export function stripLegendaryNames('),
+    );
+    expect(regionReads(stripBody)).toEqual(PAYLOAD_REGIONS);
+    const renameBody = renameSource.slice(
+      renameSource.indexOf('export function rekeyInstanceSigner('),
+    );
+    expect(regionReads(renameBody)).toEqual([...PAYLOAD_REGIONS, 'toolEffectSlots'].sort());
   });
 });

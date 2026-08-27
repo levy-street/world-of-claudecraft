@@ -72,6 +72,19 @@ function parseBanlist(raw: string | undefined): string[] {
 
 let banlistCacheKey: string | null = null;
 let banlistCacheTerms: string[] = [];
+// The terms of the last banlist file read that SUCCEEDED (stale-on-error,
+// the cached_read contract): an unreadable or oversized file keeps serving
+// these until the file comes back, so a bad mount degrades to "yesterday's
+// list", never to "no operator list at all".
+let banlistLastGoodFileTerms: string[] = [];
+// ...keyed to the PATH they came from: a re-pointed USERNAME_BANLIST_FILE
+// that cannot be read serves NO stale terms from the previous path.
+let banlistLastGoodFile = '';
+
+/** Ceiling on the banlist file the server will read whole (the statSync
+ *  result is already in hand, so the bound is free). A file past it is
+ *  treated exactly like an unreadable one: warned once, last-good served. */
+export const USERNAME_BANLIST_FILE_MAX_BYTES = 1 << 20;
 
 function bannedUsernameTerms(): string[] {
   const rawList = process.env.USERNAME_BANLIST ?? '';
@@ -82,17 +95,20 @@ function bannedUsernameTerms(): string[] {
   // (a same-mtime same-length rewrite is the accepted residual: only the
   // content hash could see it, and that costs the read this cache elides).
   // The per-call statSync is bounded: it fires only when
-  // USERNAME_BANLIST_FILE is set, and the hot caller (the perfect_item name
-  // screen) is command-lane metered, so it can never become an unmetered
+  // USERNAME_BANLIST_FILE is set, and every caller that a client can drive
+  // (the pet_rename and perfect_item name screens) sits on the name-screen
+  // lane (server/msg_lanes.ts), so it can never become an unmetered
   // per-frame stat. A stat failure collapses to a sentinel so the read arm
-  // below still owns the one warn-and-retry path for an unreadable file,
-  // which stays FAIL-OPEN by decision: a bad mount must not block every
-  // signup, and the warn line is the operator's signal.
+  // below still owns the one warn path for an unreadable file, which stays
+  // FAIL-OPEN by decision: a bad mount must not block every signup, and the
+  // warn line is the operator's signal.
   let fileStamp = '';
+  let fileSize = -1;
   if (file) {
     try {
       const stat = statSync(file);
       fileStamp = `${stat.mtimeMs}:${stat.size}`;
+      fileSize = stat.size;
     } catch {
       fileStamp = 'unreadable';
     }
@@ -106,12 +122,31 @@ function bannedUsernameTerms(): string[] {
     banlistCacheKey = cacheKey;
     return banlistCacheTerms;
   }
-  try {
-    banlistCacheTerms = terms.concat(parseBanlist(readFileSync(file, 'utf8')));
-  } catch (err) {
-    console.warn(`could not read USERNAME_BANLIST_FILE (${file}):`, err);
-    return terms;
+  // A failed read (missing, unreadable, or past the ceiling) is paid ONCE per
+  // state transition, never per call: the outcome is cached under this key
+  // too, and the key moves the moment the file returns or changes (its stamp
+  // leaves the 'unreadable' sentinel, or its size crosses back), so the cache
+  // self-heals with no restart. Until then the last good file terms keep
+  // being enforced (the phase 13 QA hot-path finding: the old shape re-ran the
+  // stat, the read, AND a synchronous warn on every name screen while serving
+  // no file terms at all).
+  if (fileSize > USERNAME_BANLIST_FILE_MAX_BYTES) {
+    console.warn(
+      `USERNAME_BANLIST_FILE (${file}) is ${fileSize} bytes, past the ${USERNAME_BANLIST_FILE_MAX_BYTES} byte ceiling; keeping the last good list`,
+    );
+  } else {
+    try {
+      banlistLastGoodFileTerms = parseBanlist(readFileSync(file, 'utf8'));
+      banlistLastGoodFile = file;
+    } catch (err) {
+      console.warn(
+        `could not read USERNAME_BANLIST_FILE (${file}); keeping the last good list:`,
+        err,
+      );
+    }
   }
+  const stale = banlistLastGoodFile === file ? banlistLastGoodFileTerms : [];
+  banlistCacheTerms = terms.concat(stale);
   banlistCacheKey = cacheKey;
   return banlistCacheTerms;
 }
