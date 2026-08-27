@@ -80,6 +80,18 @@ export const ko_KR: Record<string, string> = {
   'detail.dailyRewardsUnban': '일일 보상 이용 권한 복구',
   'moderationHistory.actionRestoreItem': '아이템 복구',
   'moderationHistory.actionRestoreSlot': '슬롯 복구',
+  'moderationHistory.actionClearItemName': '아이템 이름 삭제',
+  'error.clearItemNameTargetForms': '대상을 정확히 하나만 지정하세요. 착용 슬롯, 가방 칸, 또는 all: true',
+  'error.clearItemNameUnknownSlot': '알 수 없는 장비 슬롯입니다',
+  'error.clearItemNameAllLiteral': 'all 은 리터럴 true 여야 합니다',
+  'error.clearItemNameBagPair': '가방 대상에는 칸 번호와 아이템 ID가 모두 필요합니다',
+  'error.clearItemNameBagIndex': 'bag 은 0 이상의 정수여야 합니다',
+  'error.clearItemNameOnline': '캐릭터가 이 렐름에서 온라인 상태입니다. 먼저 접속을 끊으세요',
+  'error.clearItemNameNoMatch': '해당 대상과 일치하는 이름 붙은 사본이 없습니다',
+  'error.clearItemNameCameOnline':
+    '삭제가 반영되기 전에 캐릭터가 온라인 상태가 되었습니다. 킥한 뒤 다시 시도하세요',
+  'error.clearItemNameLeased':
+    '캐릭터가 활성 세션 임대를 보유 중입니다. 킥하거나 임대 만료를 기다린 뒤 다시 시도하세요',
   'characters.colTools': '전문 기술',
   'characters.professionsButton': '조회',
   'profInspect.title': '전문 기술: {name}',

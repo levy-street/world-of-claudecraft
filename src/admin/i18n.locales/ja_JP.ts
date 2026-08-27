@@ -80,6 +80,19 @@ export const ja_JP: Record<string, string> = {
   'detail.dailyRewardsUnban': 'デイリー報酬へのアクセスを復元',
   'moderationHistory.actionRestoreItem': 'アイテム復元',
   'moderationHistory.actionRestoreSlot': 'スロット復元',
+  'moderationHistory.actionClearItemName': 'アイテム名を削除',
+  'error.clearItemNameTargetForms':
+    '対象をひとつだけ指定してください。装備スロット、バッグのセル、または all: true',
+  'error.clearItemNameUnknownSlot': '不明な装備スロットです',
+  'error.clearItemNameAllLiteral': 'all はリテラルの true でなければなりません',
+  'error.clearItemNameBagPair': 'バッグ対象にはセル番号とアイテムIDの両方が必要です',
+  'error.clearItemNameBagIndex': 'bag は0以上の整数でなければなりません',
+  'error.clearItemNameOnline': 'キャラクターはこのレルムでオンラインです。先に切断してください',
+  'error.clearItemNameNoMatch': 'その対象に一致する名前付きのコピーはありません',
+  'error.clearItemNameCameOnline':
+    '削除が反映される前にキャラクターがオンラインになりました。キックして再試行してください',
+  'error.clearItemNameLeased':
+    'キャラクターは有効なセッションリースを保持しています。キックするかリースの失効を待ってから再試行してください',
   'characters.colTools': '専門技能',
   'characters.professionsButton': '詳細',
   'profInspect.title': '専門技能：{name}',

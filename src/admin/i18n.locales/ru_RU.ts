@@ -81,6 +81,20 @@ export const ru_RU: Record<string, string> = {
   'detail.dailyRewardsUnban': 'Восстановить доступ к ежедневным наградам',
   'moderationHistory.actionRestoreItem': 'Восстановление предмета',
   'moderationHistory.actionRestoreSlot': 'Восстановление слота',
+  'moderationHistory.actionClearItemName': 'Удаление имени предмета',
+  'error.clearItemNameTargetForms':
+    'укажите ровно одну цель: надетый слот, ячейку сумки или all: true',
+  'error.clearItemNameUnknownSlot': 'неизвестный слот экипировки',
+  'error.clearItemNameAllLiteral': 'all должно быть литералом true',
+  'error.clearItemNameBagPair':
+    'для цели в сумке нужны и индекс ячейки, и идентификатор предмета',
+  'error.clearItemNameBagIndex': 'bag должно быть целым неотрицательным числом',
+  'error.clearItemNameOnline': 'персонаж в сети на этом мире; сначала отключите его',
+  'error.clearItemNameNoMatch': 'ни одна именованная копия не подошла под эту цель',
+  'error.clearItemNameCameOnline':
+    'персонаж вошёл в сеть до применения удаления; кикните его и повторите',
+  'error.clearItemNameLeased':
+    'персонаж удерживает активную аренду сессии; кикните его (или дождитесь её истечения) и повторите',
   'characters.colTools': 'Профессии',
   'characters.professionsButton': 'Осмотр',
   'profInspect.title': 'Профессии: {name}',

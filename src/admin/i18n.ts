@@ -270,6 +270,22 @@ export const ADMIN_ERROR_KEYS: Record<string, string> = {
   'slot restore failed': 'error.restoreSlotFailed',
   // The phase 13 legendary-name strip's catch fallback (clearItemNameHandler).
   'item name clear failed': 'error.itemNameClearFailed',
+  // The strip's typed outcome proses (server/clear_item_name.ts runClearItemName
+  // plus the lease-fenced save's refusal): surfaced through a VARIABLE, so the
+  // fail() scan above cannot see them; the reverse-map pin in
+  // tests/admin/professions_restore.test.ts holds every one to a key here.
+  'name exactly one target: a worn slot, a bag cell, or all: true':
+    'error.clearItemNameTargetForms',
+  'unknown equipment slot': 'error.clearItemNameUnknownSlot',
+  'all must be the literal true': 'error.clearItemNameAllLiteral',
+  'a bag target needs both the cell index and its item id': 'error.clearItemNameBagPair',
+  'bag must be a non-negative whole number': 'error.clearItemNameBagIndex',
+  'character is online on this realm; disconnect them first': 'error.clearItemNameOnline',
+  'no named copy matched that target': 'error.clearItemNameNoMatch',
+  'character came online before the strip landed; kick them and retry':
+    'error.clearItemNameCameOnline',
+  'character holds a live session lease; kick them (or wait out the lease) and retry':
+    'error.clearItemNameLeased',
   // Named-constant, multi-line, and `err.message ?? literal` fallback prose the
   // widened phase 15 scan guard surfaced (it now flattens the source, resolves
   // single-identifier arguments through server/admin.ts's own constants, and

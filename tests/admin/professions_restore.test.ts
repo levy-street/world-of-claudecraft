@@ -7,6 +7,7 @@ import {
   restoreSlotBodyError,
   RESTORE_ITEM_MAX_COUNT as SERVER_RESTORE_ITEM_MAX_COUNT,
 } from '../../server/character_professions';
+import { CHARACTER_SAVE_LEASED_LINE } from '../../server/character_save_statement';
 import { ADMIN_ERROR_KEYS, t } from '../../src/admin/i18n';
 import { en } from '../../src/admin/i18n.en';
 import {
@@ -174,6 +175,31 @@ describe('server prose coupling (the count clamp and the error reverse map)', ()
     // Three copies of the clamp exist (server validator, client mirror, the
     // matcher key below); this pin makes a move in one drag the others.
     expect(RESTORE_ITEM_MAX_COUNT).toBe(SERVER_RESTORE_ITEM_MAX_COUNT);
+  });
+
+  it('reverse-maps EVERY typed outcome prose of the clear-item-name strip to a real catalog key', () => {
+    // The phase 13 strip surfaces its proses through fail(ctx.res, 400,
+    // outcome.error), a VARIABLE the fail() scan below cannot resolve, so the
+    // module's own literals are scanned instead: every `error: '...'` the
+    // endpoint body returns, every `return '...'` of the body validator, and
+    // the lease-fenced save's exported refusal line. Unmapped, an operator
+    // would read raw English through localizeAdminError's fallback.
+    const source = readServerSource('server/clear_item_name.ts');
+    const proses = Array.from(source.matchAll(/error: '((?:[^'\\]|\\.)*)'/g)).map((m) => m[1]);
+    const validator = source.slice(
+      source.indexOf('export function clearItemNameBodyError('),
+      source.indexOf('export function clearItemNameTarget('),
+    );
+    for (const m of validator.matchAll(/return '((?:[^'\\]|\\.)*)';/g)) proses.push(m[1]);
+    proses.push(CHARACTER_SAVE_LEASED_LINE);
+    // Liveness: the validator's five refusals, the body's four, the lease line.
+    expect(new Set(proses).size).toBeGreaterThanOrEqual(10);
+    for (const prose of proses) {
+      expect(
+        ADMIN_ERROR_KEYS[prose.toLowerCase()],
+        `unmatched clear-item-name prose: ${prose}`,
+      ).toBeTruthy();
+    }
   });
 
   it('reverse-maps EVERY fail() prose in server/admin.ts to a real catalog key', () => {

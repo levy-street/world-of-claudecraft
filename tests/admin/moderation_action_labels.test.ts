@@ -74,6 +74,10 @@ describe('moderation action labels', () => {
   it('keeps the sanction/relief badge variants', () => {
     expect(moderationActionVariant('ban')).toBe('bad');
     expect(moderationActionVariant('daily_rewards_ip_ban')).toBe('bad');
+    // The phase 13 legendary-name strip destroys player property with no
+    // undo (its own superadmin-only permission): a sanction badge, never the
+    // neutral one a note or a flair set wears.
+    expect(moderationActionVariant('clear_item_name')).toBe('bad');
     expect(moderationActionVariant('suspend')).toBe('warn');
     expect(moderationActionVariant('unban')).toBe('success');
     expect(moderationActionVariant('unblock')).toBe('success');
