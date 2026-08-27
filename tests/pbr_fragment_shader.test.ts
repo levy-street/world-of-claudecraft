@@ -56,7 +56,11 @@ describe('PBR point-light fragment pruning', () => {
     const init = gfx.indexOf('export function initGfxTier');
     const install = gfx.indexOf('installPbrPointLightShaderPruning();', init);
     const probe = gfx.indexOf('const hints =', init);
-    const rendererCreated = renderer.indexOf('this.webgl = new THREE.WebGLRenderer');
+    // The context is created through the power-preference fallback
+    // (src/render/webgl_context_fallback.ts); the renderer still owns the site.
+    const rendererCreated = renderer.indexOf(
+      'const created = createRendererWebGL(canvas, options.context);',
+    );
     const rendererInit = renderer.indexOf('initGfxTier(this.webgl)', rendererCreated);
     const firstCompile = renderer.indexOf('this.webgl.compile', rendererCreated);
     const firstRender = renderer.indexOf('this.webgl.render', rendererCreated);

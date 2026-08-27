@@ -101,6 +101,8 @@ export interface RendererPerfStats {
   foliage: FoliagePerfStats;
   glVendor: string;
   glRenderer: string;
+  /** The power preference the context was created with; null for a supplied context. */
+  glPowerPreference?: 'high-performance' | 'low-power' | 'default' | null;
   contextLost: number;
   contextRestored: number;
   /** 0 = full day, 1 = deep night; the night-visibility layers key off it. */
