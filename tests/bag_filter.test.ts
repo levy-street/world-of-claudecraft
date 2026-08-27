@@ -519,6 +519,11 @@ describe('chip reachability census: the All-only set, pinned', () => {
     'chipped_tusk',
     'cracked_fetish',
     'dawnhold_posy',
+    // Masterwrought Phase 13 (2026-08-27): the promotion writ, rare
+    // kind-junk consumed by the promotion itself (no use/equip/place
+    // predicate claims it), so it reads under All exactly like the other
+    // ruled junk; the Materials chip correctly skips a non-material.
+    'deed_of_making',
     'deepfen_pearl',
     'frayed_prayer_beads',
     'gleamstag_charm',

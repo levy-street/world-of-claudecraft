@@ -23,9 +23,10 @@
 // (server/characters.ts renameHandler: an online character's live session
 // would clobber the stripped blob on its next autosave, so the endpoint
 // refuses while online and the operator disconnects first via the existing
-// moderation surface). The LIVE-session arm needs a sim-side action mirroring
-// restoreToolEffectSlotAction (the R35 server-admin-only precedent); until it
-// lands, kick-then-clear is the recorded operator flow. The world-state books
+// moderation surface). The LIVE-session arm would need a sim-side action on
+// the R35 tool-effect GM-restore precedent (named there, deliberately not
+// spelled here: its importer guard scans source TEXT for the identifier);
+// kick-then-clear is the recorded operator flow instead. The world-state books
 // (market listings, mail parcels) and foreign characters are deliberately
 // unswept: the soulbound argument above proves a named copy can never sit in
 // them, so the omission is completeness, not the rename sweep's scoping limit

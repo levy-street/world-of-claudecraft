@@ -217,6 +217,12 @@ const HONEST_MATERIALS = [
 // non-material with the maintainer's sign-off.
 const ALLOWED_UNCLASSIFIED_JUNK = [
   'dawnhold_posy',
+  // Masterwrought Phase 13 (2026-08-27): the promotion writ. Rare kind-junk
+  // by decision (it is a consumed capstone, not gear, and rare protects it
+  // from the junk vendor sweep); nothing crafts FROM it (the promotion
+  // consumes it directly through LEGENDARY_PROMOTION_COST), so it is a
+  // deliberate non-material on the harvest_feast footing.
+  'deed_of_making',
   // Masterwrought phase 11l's second review round removed
   // emberwing_cinderscale and old_cragmaws_pelt: the two leather trophy
   // recipes (recipe_cragprowl_belt, recipe_wildgrove_cinch) are their

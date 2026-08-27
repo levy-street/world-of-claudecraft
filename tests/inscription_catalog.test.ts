@@ -75,6 +75,9 @@ const HERB_BY_RUNG: Record<number, string> = {
   0: 'silverleaf_herb',
   25: 'goldleaf_herb',
   50: 'sunpetal_herb',
+  // The phase 13 writ mills the apex craft's own herb (rung 125 has no herb
+  // of its own; sunpetal is the top of the pigment ladder).
+  125: 'sunpetal_herb',
 };
 
 // The COMPLETE shipped reagent line per recipe, id and count, pinned as
@@ -115,11 +118,21 @@ const REAGENTS_BY_RECIPE: Record<string, Record<string, number>> = {
   // own. The options are to re-price the scroll, to move the elixir's produce,
   // or to accept a 7 percent split; whoever picks one should pin it afterwards.
   recipe_sunpetal_scroll: { sunpetal_herb: 1, arcane_essence: 2, glass_vial: 1, arcane_dust: 1 },
+  // Phase 13: the promotion writ's bill ("Input 553 (buyValue basis) vs
+  // output 50" at the recipe), the consumed-capstone idiom.
+  recipe_deed_of_making: {
+    sablewax_vellum: 3,
+    wyrmfall_core: 1,
+    sunpetal_herb: 2,
+    arcane_essence: 2,
+    glass_vial: 1,
+  },
 };
 
 // The one-time training fee per rung in copper (TRAINING_FEE_BY_TIER tiers
-// 0/1/2, which is where skillReq 0/25/50 land through tierForSkill).
-const FEE_BY_RUNG: Record<number, number> = { 0: 0, 25: 2500, 50: 10000 };
+// 0/1/2 for skillReq 0/25/50 through tierForSkill; the phase 13 writ's rung
+// 125 is tier 5, clamped to the table's last entry).
+const FEE_BY_RUNG: Record<number, number> = { 0: 0, 25: 2500, 50: 10000, 125: 160000 };
 
 // Every rating key an ItemDef can carry (src/sim/types.ts). Ruling R14: the
 // base-rung catalog is rating-free.
@@ -135,6 +148,15 @@ const RATING_KEYS = [
 const TOME_IDS = new Set(['silverleaf_primer', 'goldleaf_folio', 'sunpetal_grimoire']);
 const SCROLL_IDS = new Set(['silverleaf_scroll', 'goldleaf_scroll', 'sunpetal_scroll']);
 
+// Masterwrought Phase 13 (2026-08-27) appended recipe_deed_of_making, the
+// promotion writ: inscription's first 125 rung and deliberately OUTSIDE the
+// base tome/scroll pair convention this suite owns (a rare consumable
+// capstone; its own shape and economy are pinned by orange_promotion,
+// recipe_economy, and professions_crafting_hub). The exact-roster pin below
+// keeps whole-array teeth; the pair-convention arms walk BASE_CATALOG.
+const WRIT_ID = 'recipe_deed_of_making';
+const BASE_CATALOG = INSCRIPTION_RECIPES.filter((r) => r.id !== WRIT_ID);
+
 function output(recipe: (typeof INSCRIPTION_RECIPES)[number]): ItemDef {
   const def = ITEMS[recipe.resultItemId];
   expect(def, `${recipe.id} result ${recipe.resultItemId}`).toBeDefined();
@@ -142,10 +164,20 @@ function output(recipe: (typeof INSCRIPTION_RECIPES)[number]): ItemDef {
 }
 
 describe('inscription catalog shape', () => {
-  it('ships exactly six recipes, one tome and one scroll per rung, on the convention pairs', () => {
-    expect(INSCRIPTION_RECIPES).toHaveLength(6);
+  it('ships the six base pairs plus the phase 13 writ, on the convention pairs', () => {
+    // The whole-roster identity pin: any append or removal moves this first.
+    expect(INSCRIPTION_RECIPES.map((r) => r.id)).toEqual([
+      'recipe_silverleaf_primer',
+      'recipe_silverleaf_scroll',
+      'recipe_goldleaf_folio',
+      'recipe_goldleaf_scroll',
+      'recipe_sunpetal_grimoire',
+      'recipe_sunpetal_scroll',
+      WRIT_ID,
+    ]);
+    expect(BASE_CATALOG).toHaveLength(6);
     const byRung = new Map<number, ItemDef[]>();
-    for (const recipe of INSCRIPTION_RECIPES) {
+    for (const recipe of BASE_CATALOG) {
       const convention = CONVENTION[recipe.skillReq];
       expect(convention, `${recipe.id} rung ${recipe.skillReq}`).toBeDefined();
       const expectedLevel = TOME_IDS.has(recipe.resultItemId)
@@ -190,7 +222,7 @@ describe('inscription catalog shape', () => {
     }
   });
 
-  it('charges the tier training fee ladder 0 / 2500 / 10000 per rung', () => {
+  it('charges the tier training fee ladder 0 / 2500 / 10000 / 160000 per rung', () => {
     // Liveness: the ladder really rises, or the table was flattened.
     expect(FEE_BY_RUNG[0]).toBe(0);
     expect(FEE_BY_RUNG[50]).toBeGreaterThan(FEE_BY_RUNG[25]);
@@ -201,7 +233,7 @@ describe('inscription catalog shape', () => {
   });
 
   it('consumes EXACTLY the shipped reagent table, every line of every recipe', () => {
-    expect(Object.keys(REAGENTS_BY_RECIPE)).toHaveLength(6);
+    expect(Object.keys(REAGENTS_BY_RECIPE)).toHaveLength(7);
     for (const recipe of INSCRIPTION_RECIPES) {
       const shipped = Object.fromEntries(recipe.reagents.map((r) => [r.itemId, r.count]));
       // Distinct-lines control: the object collapse above must not hide a
@@ -237,7 +269,7 @@ describe('inscription catalog outputs', () => {
   it('maps tome quality uncommon/uncommon/rare and scroll quality common/uncommon/rare', () => {
     let tomes = 0;
     let scrolls = 0;
-    for (const recipe of INSCRIPTION_RECIPES) {
+    for (const recipe of BASE_CATALOG) {
       const def = output(recipe);
       if (TOME_IDS.has(def.id)) {
         expect(def.quality, def.id).toBe(TOME_QUALITY_BY_RUNG[recipe.skillReq]);
@@ -249,15 +281,23 @@ describe('inscription catalog outputs', () => {
     }
     expect(tomes).toBe(3);
     expect(scrolls).toBe(3);
-    // Rare stays exclusive to rung 50 on both ladders (the deed rare-tier
-    // derivation keys off it).
-    for (const recipe of INSCRIPTION_RECIPES) {
+    // The phase 13 writ sits outside both ladders: rare, at the 125 rung.
+    expect(ITEMS.deed_of_making.quality).toBe('rare');
+    // Rare stays exclusive to rung 50 on both BASE ladders (the deed
+    // rare-tier derivation keys off it); the 125-rung writ is the recorded
+    // exception.
+    for (const recipe of BASE_CATALOG) {
       if (output(recipe).quality === 'rare') expect(recipe.skillReq).toBe(50);
     }
   });
 
   it('each rung yields one HELD caster tome and one stackable scroll', () => {
-    for (const recipe of INSCRIPTION_RECIPES) {
+    // The phase 13 writ first: a slotless stackable consumable, never gear.
+    expect(ITEMS.deed_of_making.kind).toBe('junk');
+    expect((ITEMS.deed_of_making as { slot?: string }).slot).toBeUndefined();
+    expect(ITEMS.deed_of_making.stats).toBeUndefined();
+    expect(ITEMS.deed_of_making.requiredClass).toBeUndefined();
+    for (const recipe of BASE_CATALOG) {
       const def = output(recipe);
       if (TOME_IDS.has(def.id)) {
         expect(def.kind, def.id).toBe('held_offhand');
@@ -346,7 +386,7 @@ describe('inscription catalog outputs', () => {
   });
 
   it('derives equip level requirements from the recipe registration (rare tome gate only)', () => {
-    for (const recipe of INSCRIPTION_RECIPES) {
+    for (const recipe of BASE_CATALOG) {
       const def = output(recipe);
       if (TOME_IDS.has(def.id)) {
         // The jewelcrafting arm exactly: rare-and-up gates at the registered
