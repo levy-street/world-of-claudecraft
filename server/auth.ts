@@ -76,14 +76,23 @@ let banlistCacheTerms: string[] = [];
 function bannedUsernameTerms(): string[] {
   const rawList = process.env.USERNAME_BANLIST ?? '';
   const file = process.env.USERNAME_BANLIST_FILE ?? '';
-  // The file's mtime rides the cache key so EDITING the banlist file takes
-  // effect without a process restart (a stat per check, a read only per
-  // change); a stat failure collapses to a sentinel so the read arm below
-  // still owns the one warn-and-retry path for an unreadable file.
+  // The file's mtime AND size ride the cache key (one stat call) so EDITING
+  // the banlist file takes effect without a process restart, and a rewrite
+  // that lands inside the same timestamp still busts when its length moved
+  // (a same-mtime same-length rewrite is the accepted residual: only the
+  // content hash could see it, and that costs the read this cache elides).
+  // The per-call statSync is bounded: it fires only when
+  // USERNAME_BANLIST_FILE is set, and the hot caller (the perfect_item name
+  // screen) is command-lane metered, so it can never become an unmetered
+  // per-frame stat. A stat failure collapses to a sentinel so the read arm
+  // below still owns the one warn-and-retry path for an unreadable file,
+  // which stays FAIL-OPEN by decision: a bad mount must not block every
+  // signup, and the warn line is the operator's signal.
   let fileStamp = '';
   if (file) {
     try {
-      fileStamp = String(statSync(file).mtimeMs);
+      const stat = statSync(file);
+      fileStamp = `${stat.mtimeMs}:${stat.size}`;
     } catch {
       fileStamp = 'unreadable';
     }

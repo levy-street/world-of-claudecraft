@@ -717,6 +717,7 @@ export const ru_RU: AdminTranslations = {
   "error.restoreWentOffline": "персонаж вышел из сети до завершения восстановления",
   "error.restoreItemFailed": "не удалось восстановить предмет",
   "error.restoreSlotFailed": "не удалось восстановить слот",
+  "error.itemNameClearFailed": "item name clear failed",
   "error.chatMuteFailed": "не удалось замьютить чат",
   "error.chatUnmuteFailed": "не удалось включить звук в чате",
   "error.accountNotChatMuted": "в аккаунте не отключен чат",

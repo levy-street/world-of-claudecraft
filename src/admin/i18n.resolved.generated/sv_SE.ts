@@ -717,6 +717,7 @@ export const sv_SE: AdminTranslations = {
   "error.restoreWentOffline": "karaktären gick offline innan återställningen hann slutföras",
   "error.restoreItemFailed": "föremålsåterställningen misslyckades",
   "error.restoreSlotFailed": "platsåterställningen misslyckades",
+  "error.itemNameClearFailed": "item name clear failed",
   "error.chatMuteFailed": "chatt-tystning misslyckades",
   "error.chatUnmuteFailed": "det gick inte att stänga av ljudet för chatten",
   "error.accountNotChatMuted": "kontot är inte avstängt för chatten",

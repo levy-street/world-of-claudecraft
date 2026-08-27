@@ -77,7 +77,13 @@ export function wornTooltipInstance(
  *  precedence the equip caps already read), narrowed back to the def's
  *  quality when the rolled string is not a known tier, so the label lookup
  *  stays total against a hostile or future-tier wire string (the
- *  itemNameColor Object.hasOwn doctrine). */
+ *  itemNameColor Object.hasOwn doctrine).
+ *  DECIDED 2026-08-27, display vs equip: a LEGACY legendary-rolled copy (an
+ *  old masterwork bump, no `perfected` stamp) reads legendary HERE, its
+ *  honest roll, while isUniqueEquipped (src/sim/equipment_rules.ts) stays
+ *  promotion-scoped and does not count it, for migration safety. The
+ *  disagreement is a decision, not drift; the twin comment lives on
+ *  isUniqueEquipped. */
 export function tooltipEffectiveQuality(
   def: ItemDef,
   instance: ItemInstancePayload | undefined,

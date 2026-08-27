@@ -12,6 +12,7 @@ import { normalizeCheaterMarkSeconds } from '../src/sim/moderation';
 // pure leaf (schemas + codes, no db), so importing it here adds no cycle.
 import { CheaterMarkRefused } from './cheater_mark_api';
 import { pool, runWithStatementTimeout } from './db';
+import { REALM } from './realm';
 import { flagRegistrationBurst } from './suspicion_flags';
 import { bustWocAuthGuardAccount } from './woc_auth_guard_cache';
 
@@ -1348,7 +1349,9 @@ export async function recordProfessionsRestore(input: {
  * ordering contract: this lands BEFORE the blob write, so a strip can never
  * exist unaudited, and "requested" is honest about a post-audit refusal (a
  * deleted character, no matching named copy), which the handler surfaces to
- * the operator as a 400.
+ * the operator as a 400. Realm-scoped like getCharacterById, so a
+ * cross-realm character id resolves to no account here rather than writing
+ * this realm's audit row against another realm's account.
  */
 export async function recordItemNameClear(input: {
   characterId: number;
@@ -1361,9 +1364,10 @@ export async function recordItemNameClear(input: {
   // The same bounded-prefix enforcement as the restores: today's one caller
   // passes a slot key, a cell index plus an item id, or 'all copies'.
   const detail = cleanText(input.detail, 128);
-  const character = await pool.query('SELECT account_id FROM characters WHERE id = $1', [
-    input.characterId,
-  ]);
+  const character = await pool.query(
+    'SELECT account_id FROM characters WHERE id = $1 AND realm = $2',
+    [input.characterId, REALM],
+  );
   const accountId = character.rows[0]?.account_id;
   if (!accountId) throw new Error('character not found');
   await recordModerationAction(pool, 'clear_item_name', {

@@ -717,6 +717,7 @@ export const fr_CA: AdminTranslations = {
   "error.restoreWentOffline": "le personnage s'est déconnecté avant que la restauration n'aboutisse",
   "error.restoreItemFailed": "échec de la restauration de l'objet",
   "error.restoreSlotFailed": "échec de la restauration de l'emplacement",
+  "error.itemNameClearFailed": "item name clear failed",
   "error.chatMuteFailed": "la coupure du chat a échoué",
   "error.chatUnmuteFailed": "échec de la restauration du chat",
   "error.accountNotChatMuted": "le compte n'est pas désactivé",

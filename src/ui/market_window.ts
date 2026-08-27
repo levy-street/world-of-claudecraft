@@ -72,6 +72,7 @@ import {
 } from './market_view';
 import type { PainterHostPresentation } from './painter_host';
 import { svgIcon } from './ui_icons';
+import { knownItemIconHtml } from './unknown_item_icon';
 
 // The filter dropdown's natural size (mirrors .mkt-select-menu's max-height/gap in
 // components.css). #market-window clips with overflow: hidden on mobile, and a menu
@@ -735,12 +736,13 @@ export class MarketWindow {
     for (const { listing: l, item } of page.items) {
       // The Browse-row NAME uses the market-readable quality color (rare/epic
       // lifted to clear WCAG AA on the panel; market_name_color.ts). The icon
-      // border below keeps the shipped hue via its own q-<quality> class, so
-      // quality still reads on the icon at full saturation while the name stays
-      // legible. Instance-effective (the all-surfaces item-cell rule): the
-      // listing's publicInstanceView carries rolled, so a promoted legendary
-      // listing reads legendary here, not its def tier.
-      const qColor = marketNameColor(tooltipEffectiveQuality(item, l.instance));
+      // keeps the shipped hue at full saturation via its q-<quality> class,
+      // driven by the SAME instance-effective quality as the name (the
+      // all-surfaces item-cell rule): the listing's publicInstanceView
+      // carries rolled, so a promoted legendary listing reads legendary on
+      // both the name and the icon rim, not its def tier.
+      const effQuality = tooltipEffectiveQuality(item, l.instance);
+      const qColor = marketNameColor(effQuality);
       const row = document.createElement('div');
       row.className = 'mkt-row';
       const itemName = itemDisplayName(item);
@@ -778,7 +780,7 @@ export class MarketWindow {
         esc(formatLocalizedMoney(l.price, 'long')),
       );
       row.innerHTML =
-        `<span class="mkt-ico">${this.deps.itemIcon(item)}${badge}${heroicStar}</span>` +
+        `<span class="mkt-ico">${knownItemIconHtml(item, effQuality)}${badge}${heroicStar}</span>` +
         `<span class="mkt-name"><span class="nm" style="color:${qColor}">${esc(itemName)}${stack}</span>` +
         `<span class="seller${l.house ? ' house' : ''}">${esc(l.house ? t('itemUi.market.merchantStock') : l.sellerName)}</span></span>` +
         `<span class="mkt-price">${priceHtml}${each}</span>`;
@@ -918,12 +920,14 @@ export class MarketWindow {
     // Keep the release Sell-tab lowest-price fields (priceRef, stagedItemId) AND
     // the redesign's market-scoped WCAG name color (marketNameColor), not raw QUALITY_COLOR.
     const { item, have, suggested, priceRef, itemId: stagedItemId } = view.form;
-    // The staged copy's own payload decides the name color too (an instanced
-    // staging is single-copy, so the color and the tooltip describe one unit).
-    const qColor = marketNameColor(tooltipEffectiveQuality(item, view.form.instance));
+    // The staged copy's own payload decides the name color AND the icon's
+    // q-<quality> rim (an instanced staging is single-copy, so the color,
+    // the rim, and the tooltip all describe one unit).
+    const stagedQuality = tooltipEffectiveQuality(item, view.form.instance);
+    const qColor = marketNameColor(stagedQuality);
     const pick = document.createElement('div');
     pick.className = 'mkt-sell-pick';
-    pick.innerHTML = `${this.deps.itemIcon(item)}<span class="ps-name" style="color:${qColor}">${esc(itemDisplayName(item))}</span>`;
+    pick.innerHTML = `${knownItemIconHtml(item, stagedQuality)}<span class="ps-name" style="color:${qColor}">${esc(itemDisplayName(item))}</span>`;
     // The staged copy's tooltip carries its payload, so a player holding plain
     // AND special copies can see WHICH one is staged (the mail chip precedent).
     this.deps.attachTooltip(pick, () => this.deps.itemTooltip(item, view.form.instance));
@@ -1023,14 +1027,17 @@ export class MarketWindow {
     }
     this.renderCollectSales(body, view.sales, view.salesOmitted);
     for (const { item, count, instance } of view.rows) {
-      const qColor = marketNameColor(tooltipEffectiveQuality(item, instance));
+      // Returned goods keep their copy identity: the name color and the icon
+      // rim both read the instance-effective quality (the all-surfaces rule).
+      const returnedQuality = tooltipEffectiveQuality(item, instance);
+      const qColor = marketNameColor(returnedQuality);
       const row = document.createElement('div');
       row.className = 'mkt-collect';
       const stack =
         count > 1
           ? ` ${t('itemUi.market.stackCount', { count: formatNumber(count, { maximumFractionDigits: 0 }) })}`
           : '';
-      row.innerHTML = `<span class="mkt-collect-item">${this.deps.itemIcon(item)}<span class="mkt-collect-name" style="color:${qColor}">${esc(itemDisplayName(item))}${esc(stack)}</span></span>`;
+      row.innerHTML = `<span class="mkt-collect-item">${knownItemIconHtml(item, returnedQuality)}<span class="mkt-collect-name" style="color:${qColor}">${esc(itemDisplayName(item))}${esc(stack)}</span></span>`;
       this.deps.attachTooltip(row, () => this.deps.itemTooltip(item, instance));
       body.appendChild(row);
     }

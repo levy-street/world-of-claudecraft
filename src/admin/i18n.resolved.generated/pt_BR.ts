@@ -717,6 +717,7 @@ export const pt_BR: AdminTranslations = {
   "error.restoreWentOffline": "o personagem ficou offline antes de a restauração ser aplicada",
   "error.restoreItemFailed": "falha ao restaurar o item",
   "error.restoreSlotFailed": "falha ao restaurar o encaixe",
+  "error.itemNameClearFailed": "item name clear failed",
   "error.chatMuteFailed": "falha ao silenciar o chat",
   "error.chatUnmuteFailed": "falha ao ativar o bate-papo",
   "error.accountNotChatMuted": "a conta não está com o bate-papo silenciado",

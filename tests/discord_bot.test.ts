@@ -675,6 +675,18 @@ describe('significant-activity cards', () => {
       expect(sanitizeLegendaryItemName(undefined)).toBe('');
     });
 
+    it('enforces the full mint shape: leading non-letters drop, under 2 letters empties', () => {
+      // The mint shape starts with a LETTER (legendary_name.ts); a surviving
+      // "- " head would render as a Discord bullet in the description, so the
+      // filter drops leading hyphens, apostrophes, and spaces outright.
+      expect(sanitizeLegendaryItemName('- Doom')).toBe('Doom');
+      expect(sanitizeLegendaryItemName("'-'Doom")).toBe('Doom');
+      // A result under the mint's 2-character floor degrades to '' (the
+      // caller's || fallback takes over), never a one-letter title.
+      expect(sanitizeLegendaryItemName('X')).toBe('');
+      expect(sanitizeLegendaryItemName("--''  ")).toBe('');
+    });
+
     it('the legendary CARD routes itemName through the filter, and an emptied name degrades', () => {
       const cardOf = (itemName: string) =>
         buildActivityMessage({

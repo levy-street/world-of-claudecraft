@@ -717,6 +717,7 @@ export const cs_CZ: AdminTranslations = {
   "error.restoreWentOffline": "postava se odpojila dřív, než obnovení proběhlo",
   "error.restoreItemFailed": "obnovení předmětu selhalo",
   "error.restoreSlotFailed": "obnovení slotu selhalo",
+  "error.itemNameClearFailed": "item name clear failed",
   "error.chatMuteFailed": "umlčení chatu selhalo",
   "error.chatUnmuteFailed": "zrušení umlčení chatu selhalo",
   "error.accountNotChatMuted": "účet nemá umlčený chat",

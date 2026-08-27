@@ -141,6 +141,18 @@ export interface PerfectingInfoView {
   skillMet: boolean;
   /** boundTo present on the copy (the R2 bind has happened). */
   bound: boolean;
+  /** The promotion's equip-legality deny arm (arm 4 of promotePerfectedCopy),
+   *  pre-answered for the view (the affordance rule: no view may promise what
+   *  the path refuses). True ONLY for a `perfected && !promoted` copy whose
+   *  promotion the deny arm would refuse right now, judged by the SAME two
+   *  rules with the same inputs: a worn copy answers uniqueEquipConflictSlot
+   *  then masterwroughtConflictSlot with its own slot excluded, a bagged copy
+   *  the unique rule alone. False everywhere else (nothing is pending). The
+   *  phase 14 window gates its promote affordance on this rather than
+   *  re-deriving the rules; like `skillMet` above it reads live mirrors, so
+   *  online it is only as fresh as the last snapshot and the command's own
+   *  deny arm stays the authority. */
+  equipBlocked: boolean;
   /** The NEXT act's bill, lock-aware: the three attempt materials while the
    *  copy is unperfected, and the promotion's Deed of Making once
    *  `perfected && !promoted` (the phase 14 window renders whichever rows
@@ -266,12 +278,48 @@ export function perfectingInfoFrom(inputs: PerfectingInfoInputs): PerfectingInfo
   if (!itemId) return null;
   const craftId = craftForApexItem(itemId);
   const perfected = payload?.perfected === true;
+  const promoted = payload?.rolled?.quality === 'legendary';
+  // The promotion's equip-legality arm, re-run over the view's own mirrors
+  // (see the field doc on PerfectingInfoView): the same synthetic as-promoted
+  // payload, the same own-slot exclusion for a worn ref, the same worn-only
+  // masterwrought check as promotePerfectedCopy's arm 4. Zero rng, pure reads.
+  let equipBlocked = false;
+  if (perfected && !promoted && payload !== undefined) {
+    const def = ITEMS[itemId];
+    if (def) {
+      const asPromoted: ItemInstancePayload = {
+        ...payload,
+        rolled: { ...payload.rolled, quality: 'legendary' },
+      };
+      const wornSlot = 'slot' in ref ? ref.slot : null;
+      const ignoreSlots: readonly EquipSlot[] = wornSlot ? [wornSlot] : [];
+      equipBlocked =
+        uniqueEquipConflictSlot(
+          def,
+          inputs.equipment,
+          (id) => ITEMS[id],
+          ignoreSlots,
+          inputs.equipmentInstances,
+          asPromoted,
+        ) !== null ||
+        (wornSlot !== null &&
+          masterwroughtConflictSlot(
+            def,
+            inputs.equipment,
+            (id) => ITEMS[id],
+            ignoreSlots,
+            inputs.equipmentInstances,
+            'legendary',
+          ) !== null);
+    }
+  }
   return {
     itemId,
     rank: payload?.perfecting ?? 0,
     ranks: PERFECTING_RANKS,
     perfected,
-    promoted: payload?.rolled?.quality === 'legendary',
+    promoted,
+    equipBlocked,
     craftId,
     skillReq: PERFECTING_SKILL_REQ,
     skillMet: craftId !== null && (inputs.craftSkills[craftId] ?? 0) >= PERFECTING_SKILL_REQ,

@@ -717,6 +717,7 @@ export const id_ID: AdminTranslations = {
   "error.restoreWentOffline": "karakter menjadi luring sebelum pemulihan selesai",
   "error.restoreItemFailed": "pemulihan barang gagal",
   "error.restoreSlotFailed": "pemulihan slot gagal",
+  "error.itemNameClearFailed": "item name clear failed",
   "error.chatMuteFailed": "pembisuan obrolan gagal",
   "error.chatUnmuteFailed": "suara obrolan gagal",
   "error.accountNotChatMuted": "akun tidak dibisukan obrolan",

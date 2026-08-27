@@ -717,6 +717,7 @@ export const tr_TR: AdminTranslations = {
   "error.restoreWentOffline": "geri yükleme tamamlanmadan karakter çevrimdışı oldu",
   "error.restoreItemFailed": "eşya geri yükleme başarısız oldu",
   "error.restoreSlotFailed": "yuva geri yükleme başarısız oldu",
+  "error.itemNameClearFailed": "item name clear failed",
   "error.chatMuteFailed": "sohbet susturma başarısız oldu",
   "error.chatUnmuteFailed": "sohbetin sesinin açılması başarısız oldu",
   "error.accountNotChatMuted": "hesap sohbetin sesi kapatılmamış",

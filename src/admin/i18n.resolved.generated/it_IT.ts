@@ -717,6 +717,7 @@ export const it_IT: AdminTranslations = {
   "error.restoreWentOffline": "il personaggio è andato offline prima che il ripristino andasse a buon fine",
   "error.restoreItemFailed": "ripristino dell'oggetto non riuscito",
   "error.restoreSlotFailed": "ripristino dello slot non riuscito",
+  "error.itemNameClearFailed": "item name clear failed",
   "error.chatMuteFailed": "silenziamento chat non riuscito",
   "error.chatUnmuteFailed": "attivazione dell'audio della chat non riuscita",
   "error.accountNotChatMuted": "l'account non ha la chat disattivata",

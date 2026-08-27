@@ -717,6 +717,7 @@ export const zh_TW: AdminTranslations = {
   "error.restoreWentOffline": "恢復生效前該角色已離線",
   "error.restoreItemFailed": "物品恢復失敗",
   "error.restoreSlotFailed": "鑲嵌槽恢復失敗",
+  "error.itemNameClearFailed": "item name clear failed",
   "error.chatMuteFailed": "聊天禁言失敗",
   "error.chatUnmuteFailed": "聊天取消靜音失敗",
   "error.accountNotChatMuted": "帳戶未靜音聊天",

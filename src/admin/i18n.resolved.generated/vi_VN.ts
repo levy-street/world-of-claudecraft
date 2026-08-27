@@ -717,6 +717,7 @@ export const vi_VN: AdminTranslations = {
   "error.restoreWentOffline": "nhân vật đã ngoại tuyến trước khi việc khôi phục hoàn tất",
   "error.restoreItemFailed": "khôi phục vật phẩm thất bại",
   "error.restoreSlotFailed": "khôi phục ô thất bại",
+  "error.itemNameClearFailed": "item name clear failed",
   "error.chatMuteFailed": "cấm chat thất bại",
   "error.chatUnmuteFailed": "bật tiếng trò chuyện không thành công",
   "error.accountNotChatMuted": "tài khoản không bị tắt tiếng trò chuyện",

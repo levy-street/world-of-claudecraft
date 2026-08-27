@@ -4255,7 +4255,7 @@ describe('phase 13 legendary-name strip (clear-item-name)', () => {
     const r = await runRoute('POST', '/admin/api/moderation/characters/:id/clear-item-name', {
       headers: { authorization: BEARER },
       params: { id: '5' },
-      body: { reason: 'slur' },
+      body: { all: true, reason: 'slur' },
     });
     expect(r.status).toBe(400);
     expect(r.body).toEqual({
@@ -4284,6 +4284,34 @@ describe('phase 13 legendary-name strip (clear-item-name)', () => {
     });
     expect(r.status).toBe(400);
     expect(r.body).toEqual({ success: false, data: null, error: 'moderation reason is required' });
+    expect(saveCharacterState).not.toHaveBeenCalled();
+  });
+
+  it('refuses a moderator-role token at the central gate (superadmin-only permission)', async () => {
+    // The strip destroys a player-authored name with no undo, so it carries
+    // its own superadmin-only permission (moderation.clearItemName), never
+    // moderation.act: a moderator's full bundle must bounce off the gate
+    // before the handler or any db member is reached.
+    const recordItemNameClear = vi.fn(async () => ({ accountId: 9 }));
+    const saveCharacterState = vi.fn(async () => true);
+    authedAdminDb({
+      recordItemNameClear,
+      saveCharacterState,
+      adminRolesForAccount: async () => ({ username: 'op', roles: ['moderator'] }),
+    } as never);
+    installAdminRuntime({ adminCharacterOnline: vi.fn(() => false) });
+    const r = await runRoute('POST', '/admin/api/moderation/characters/:id/clear-item-name', {
+      headers: { authorization: BEARER },
+      params: { id: '5' },
+      body: { all: true, reason: 'slur' },
+    });
+    expect(r.status).toBe(403);
+    expect(r.body).toEqual({
+      success: false,
+      data: null,
+      error: 'you do not have permission to do this',
+    });
+    expect(recordItemNameClear).not.toHaveBeenCalled();
     expect(saveCharacterState).not.toHaveBeenCalled();
   });
 

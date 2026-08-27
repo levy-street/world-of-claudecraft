@@ -33,17 +33,25 @@ export const BLANK_PIXEL =
  *  swallow as the unknown arm below, because every guarded surface paints at
  *  least one known item, and without this a canvas-exhausted host threw on
  *  the known arm first and the fallback family's never-a-throw contract was
- *  unreachable in practice. The def's own quality feeds the class, so no
- *  allowlist is needed on this arm (the union is bundle-local). */
-export function knownItemIconHtml(item: { id: string; quality?: string }): string {
-  const q = item.quality ?? 'common';
+ *  unreachable in practice. `effectiveQuality` (Masterwrought phase 13) lets
+ *  an instance-aware surface drive the q-<quality> class off the COPY (the
+ *  tooltipEffectiveQuality read: a promoted legendary paints the orange rim
+ *  its name and glow already claim); omitted, the def's own quality rules,
+ *  byte for byte the old markup. The class rides itemIconImgHtml's rung
+ *  guard, so a wire-borne rolled quality can never inject a second class
+ *  token (the def union is bundle-local and always passes it unchanged). */
+export function knownItemIconHtml(
+  item: { id: string; quality?: string },
+  effectiveQuality?: string,
+): string {
+  const q = effectiveQuality ?? item.quality ?? 'common';
   let src = BLANK_PIXEL;
   try {
     src = iconDataUrl('item', item.id);
   } catch {
     // Canvas-less host: blank art, never a throw.
   }
-  return `<img class="item-icon q-${q}" src="${esc(src)}" alt="" draggable="false">`;
+  return itemIconImgHtml(src, q);
 }
 
 /** The `<img>` for an item id with no local ItemDef: the procedural fallback

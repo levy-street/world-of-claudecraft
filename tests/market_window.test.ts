@@ -36,14 +36,20 @@ describe('market_window: no magic values', () => {
     // as CSS custom properties, so the painter holds no color literal. The resolver's
     // own tests pin that every quality maps to a var(--mkt-name-*) token.
     expect(painter).toContain("import { marketNameColor } from './market_name_color';");
-    // Instance-bearing rows resolve INSTANCE-effective quality first (phase
-    // 13, the all-surfaces item-cell rule): the browse row reads the listing's
+    // Instance-bearing rows resolve INSTANCE-effective quality ONCE per row
+    // (phase 13, the all-surfaces item-cell rule) and feed BOTH the name
+    // color and the icon rim from it: the browse row reads the listing's
     // publicInstanceView payload, the staged sell pick and the returned-goods
-    // rows their own copies, so a promoted legendary colors legendary. The
+    // rows their own copies, so a promoted legendary reads legendary. The
     // sale ledger's rows carry no payload in their model and stay def-only.
-    expect(painter).toContain('marketNameColor(tooltipEffectiveQuality(item, l.instance))');
-    expect(painter).toContain('marketNameColor(tooltipEffectiveQuality(item, view.form.instance))');
-    expect(painter).toContain('marketNameColor(tooltipEffectiveQuality(item, instance))');
+    expect(painter).toContain('const effQuality = tooltipEffectiveQuality(item, l.instance);');
+    expect(painter).toContain('marketNameColor(effQuality)');
+    expect(painter).toContain(
+      'const stagedQuality = tooltipEffectiveQuality(item, view.form.instance);',
+    );
+    expect(painter).toContain('marketNameColor(stagedQuality)');
+    expect(painter).toContain('const returnedQuality = tooltipEffectiveQuality(item, instance);');
+    expect(painter).toContain('marketNameColor(returnedQuality)');
     expect(painter).toContain('const qColor = marketNameColor(item.quality);');
     const core = readFileSync(new URL('../src/ui/market_name_color.ts', import.meta.url), 'utf8');
     expect(core).toContain('var(--mkt-name-');
@@ -63,6 +69,29 @@ describe('market_window: no magic values', () => {
   it('uses no em or en dashes (ASCII separators only)', () => {
     expect(painter.includes('—'), 'em dash found').toBe(false);
     expect(painter.includes('–'), 'en dash found').toBe(false);
+  });
+});
+
+describe('market_window: instance-effective icon rims (phase 13 fix round)', () => {
+  it('all three instance-bearing rows drive the icon q-class off the copy', () => {
+    // Browse, the staged sell pick, and the returned-goods rows each hold a
+    // per-copy payload, so their icons paint through knownItemIconHtml with
+    // the SAME effective quality that colors the name: a promoted legendary
+    // shows the orange rim, never its def tier's purple.
+    expect(painter).toContain('knownItemIconHtml(item, effQuality)');
+    expect(painter).toContain('knownItemIconHtml(item, stagedQuality)');
+    expect(painter).toContain('knownItemIconHtml(item, returnedQuality)');
+  });
+
+  it('the def-only negative: the sale LEDGER row has no payload and keeps the def icon', () => {
+    // renderCollectSales rows are historical records whose model carries no
+    // instance, so they stay on the def-driven presentation icon dep.
+    const ledger = painter.slice(
+      painter.indexOf('private renderCollectSales('),
+      painter.indexOf('private fungibleBagCount('),
+    );
+    expect(ledger).toContain('this.deps.itemIcon(item)');
+    expect(ledger).not.toContain('knownItemIconHtml(');
   });
 });
 

@@ -11,64 +11,84 @@
 
 export const pending: Record<string, readonly string[]> = {
   "es": [
+    "error.itemNameClearFailed",
     "moderationHistory.actionClearItemName"
   ],
   "es_ES": [
+    "error.itemNameClearFailed",
     "moderationHistory.actionClearItemName"
   ],
   "fr_FR": [
+    "error.itemNameClearFailed",
     "moderationHistory.actionClearItemName"
   ],
   "fr_CA": [
+    "error.itemNameClearFailed",
     "moderationHistory.actionClearItemName"
   ],
   "en_CA": [],
   "it_IT": [
+    "error.itemNameClearFailed",
     "moderationHistory.actionClearItemName"
   ],
   "de_DE": [
+    "error.itemNameClearFailed",
     "moderationHistory.actionClearItemName"
   ],
   "zh_CN": [
+    "error.itemNameClearFailed",
     "moderationHistory.actionClearItemName"
   ],
   "zh_TW": [
+    "error.itemNameClearFailed",
     "moderationHistory.actionClearItemName"
   ],
   "ko_KR": [
+    "error.itemNameClearFailed",
     "moderationHistory.actionClearItemName"
   ],
   "ja_JP": [
+    "error.itemNameClearFailed",
     "moderationHistory.actionClearItemName"
   ],
   "pt_BR": [
+    "error.itemNameClearFailed",
     "moderationHistory.actionClearItemName"
   ],
   "ru_RU": [
+    "error.itemNameClearFailed",
     "moderationHistory.actionClearItemName"
   ],
   "cs_CZ": [
+    "error.itemNameClearFailed",
     "moderationHistory.actionClearItemName"
   ],
   "nl_NL": [
+    "error.itemNameClearFailed",
     "moderationHistory.actionClearItemName"
   ],
   "pl_PL": [
+    "error.itemNameClearFailed",
     "moderationHistory.actionClearItemName"
   ],
   "id_ID": [
+    "error.itemNameClearFailed",
     "moderationHistory.actionClearItemName"
   ],
   "tr_TR": [
+    "error.itemNameClearFailed",
     "moderationHistory.actionClearItemName"
   ],
   "sv_SE": [
+    "error.itemNameClearFailed",
     "moderationHistory.actionClearItemName"
   ],
   "vi_VN": [
+    "error.itemNameClearFailed",
     "moderationHistory.actionClearItemName"
   ],
   "da_DK": [
+    "error.itemNameClearFailed",
     "moderationHistory.actionClearItemName"
   ]
 };

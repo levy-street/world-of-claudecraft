@@ -717,6 +717,7 @@ export const pl_PL: AdminTranslations = {
   "error.restoreWentOffline": "postać przeszła w tryb offline, zanim przywracanie doszło do skutku",
   "error.restoreItemFailed": "przywrócenie przedmiotu nie powiodło się",
   "error.restoreSlotFailed": "przywrócenie slotu nie powiodło się",
+  "error.itemNameClearFailed": "item name clear failed",
   "error.chatMuteFailed": "wyciszenie czatu nie powiodło się",
   "error.chatUnmuteFailed": "wyłączenie wyciszenia czatu nie powiodło się",
   "error.accountNotChatMuted": "konto nie jest wyciszone na czacie",

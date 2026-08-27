@@ -613,6 +613,7 @@ describe('perfectingInfoFrom: the shared both-hosts view', () => {
       ranks: PERFECTING_RANKS,
       perfected: false,
       promoted: false,
+      equipBlocked: false,
       craftId: 'jewelcrafting',
       skillReq: PERFECTING_SKILL_REQ,
       skillMet: true,
@@ -666,6 +667,42 @@ describe('perfectingInfoFrom: the shared both-hosts view', () => {
     });
     expect(view?.skillMet).toBe(false);
     expect(view?.skillReq).toBe(PERFECTING_SKILL_REQ);
+  });
+
+  it('equipBlocked pre-answers the promotion equip-legality arm, drawing zero rng', () => {
+    // The affordance rule: the view may not promise a promotion arm 4 of
+    // promotePerfectedCopy would refuse. Worn fixture: a perfected (pending)
+    // neck beside a worn ALREADY-legendary masterwrought ring trips the
+    // legendary sub-cap, so the pending copy reads equipBlocked true; the
+    // clean fixture (nothing else worn) reads false, and the promoted ring
+    // itself reads false (nothing is pending on it).
+    const { sim, pid, meta } = perfecter(45);
+    sim.setPlayerLevel(20);
+    sim.addItemInstance(APEX_NECK, { perfected: true, boundTo: meta.entityId }, pid, 1);
+    sim.equipItem(APEX_NECK, pid);
+    const wornView = (slot: 'neck' | 'ring1') =>
+      perfectingInfoFrom({
+        ref: { slot },
+        inventory: meta.inventory,
+        equipment: meta.equipment,
+        equipmentInstances: meta.equipmentInstance,
+        craftSkills: meta.craftSkills,
+      });
+    expect(
+      drawsDuring(sim, () => {
+        expect(wornView('neck')?.equipBlocked, 'clean fixture').toBe(false);
+      }),
+    ).toBe(0);
+    sim.addItemInstance(APEX_RING, { perfected: true, rolled: { quality: 'legendary' } }, pid, 1);
+    sim.equipItem(APEX_RING, pid);
+    expect(meta.equipment.ring1, 'the legendary ring is really worn').toBe(APEX_RING);
+    expect(
+      drawsDuring(sim, () => {
+        expect(wornView('neck')?.equipBlocked, 'blocked beside a worn legendary').toBe(true);
+        expect(wornView('ring1')?.promoted).toBe(true);
+        expect(wornView('ring1')?.equipBlocked, 'a promoted copy has nothing pending').toBe(false);
+      }),
+    ).toBe(0);
   });
 
   it('the Sim facade delegate answers through the same builder (worn arm)', () => {

@@ -51,12 +51,13 @@ export const ADMIN_ROUTE_PERMISSIONS: readonly AdminRouteRule[] = [
     pattern: /^\/admin\/api\/moderation\/characters\/(\d+)\/restore-slot$/,
     permission: 'moderation.act',
   },
-  // The phase 13 legendary-name strip: moderation of player-authored content
-  // on an item copy, audited like the restores above.
+  // The phase 13 legendary-name strip: it DESTROYS a player-authored name
+  // with no in-game undo, so like the guild bank purge below it carries its
+  // OWN superadmin-only permission, never moderation.act.
   {
     method: 'POST',
     pattern: /^\/admin\/api\/moderation\/characters\/(\d+)\/clear-item-name$/,
-    permission: 'moderation.act',
+    permission: 'moderation.clearItemName',
   },
   { method: 'GET', pattern: '/admin/api/guilds', permission: 'accounts.read' },
   { method: 'GET', pattern: /^\/admin\/api\/guilds\/(\d+)$/, permission: 'accounts.read' },

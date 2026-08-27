@@ -34,18 +34,24 @@ export interface CompareEquipmentSource {
 export type CompareTooltipRenderer = (item: ItemDef, instance?: ItemInstancePayload) => string;
 
 /** The whole comparison block for a hovered `item`, or '' when it has no slot
- *  or nothing relevant is worn. */
+ *  or nothing relevant is worn. `candidateInstance` is the hovered COPY's own
+ *  payload (the bag cell's instance) when the caller has one: the delta lines
+ *  then compare merged def + rolled stats on BOTH sides, so a per-copy bake
+ *  on either copy moves the numbers the way the swap really would. */
 export function itemCompareBlocksHtml(
   item: ItemDef,
   source: CompareEquipmentSource,
   lookup: (id: string) => ItemDef | undefined,
   tooltipHtml: CompareTooltipRenderer,
+  candidateInstance?: ItemInstancePayload,
 ): string {
   if (!item.slot) return '';
   // A hovered ring compares against BOTH worn rings (classic behavior); every
   // other slot kind is its own single equipment key.
   const slots: readonly EquipSlot[] = item.slot === 'ring' ? ['ring1', 'ring2'] : [item.slot];
-  return slots.map((slot) => compareBlockForSlot(item, slot, source, lookup, tooltipHtml)).join('');
+  return slots
+    .map((slot) => compareBlockForSlot(item, slot, source, lookup, tooltipHtml, candidateInstance))
+    .join('');
 }
 
 function compareBlockForSlot(
@@ -54,12 +60,15 @@ function compareBlockForSlot(
   source: CompareEquipmentSource,
   lookup: (id: string) => ItemDef | undefined,
   tooltipHtml: CompareTooltipRenderer,
+  candidateInstance?: ItemInstancePayload,
 ): string {
   const equippedId = source.equipment[slot];
   if (!equippedId || equippedId === item.id) return '';
   const equipped = lookup(equippedId);
   if (!equipped) return '';
-  const deltas = itemStatDeltas(item, equipped)
+  // Both sides' per-copy payloads feed the delta math: the hovered candidate
+  // copy and the worn slot's own instance (its rolled.stats carry the bakes).
+  const deltas = itemStatDeltas(item, equipped, candidateInstance, source.instances?.[slot])
     .map((d) => {
       const cls = d.delta > 0 ? 'tt-green' : 'tt-red';
       const sign = d.delta > 0 ? '+' : '−'; // proper minus sign

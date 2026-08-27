@@ -128,6 +128,29 @@ describe('itemCompareBlocksHtml', () => {
     expect(html).toContain('+4');
   });
 
+  it('the delta lines account for per-copy stats on BOTH sides (the net-loss case)', () => {
+    const { render } = recordingRenderer();
+    // The worn copy's bake (rolled sta 8 atop def sta 6 = 14) beats the
+    // hovered def's flat 10: the swap is a NET LOSS and must read a red -4,
+    // where the def-only compare (the chrome test above) showed +4 green.
+    const wornSource = {
+      equipment: { helmet: WORN_HELM.id },
+      instances: { helmet: { rolled: { quality: 'legendary' as const, stats: { sta: 8 } } } },
+    };
+    const html = itemCompareBlocksHtml(HOVERED_HELM, wornSource, lookup, render);
+    expect(html).toContain('tt-red');
+    expect(html).toContain('−4'); // proper minus, the view's own sign
+    expect(html).not.toContain('+4');
+    // The hovered COPY's own bake rides the candidate argument: 10 + 5 = 15
+    // against the worn 14 flips it back to a +1 gain.
+    const withCandidate = itemCompareBlocksHtml(HOVERED_HELM, wornSource, lookup, render, {
+      rolled: { stats: { sta: 5 } },
+    });
+    expect(withCandidate).toContain('tt-green');
+    expect(withCandidate).toContain('+1');
+    expect(withCandidate).not.toContain('tt-red');
+  });
+
   it('is empty for a slotless item, an empty slot, and the same worn id', () => {
     const { calls, render } = recordingRenderer();
     const potion = { id: 'cmp_test_potion', name: 'P', kind: 'potion' } as ItemDef;

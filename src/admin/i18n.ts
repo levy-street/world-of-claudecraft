@@ -268,6 +268,8 @@ export const ADMIN_ERROR_KEYS: Record<string, string> = {
   'character went offline before the restore landed': 'error.restoreWentOffline',
   'item restore failed': 'error.restoreItemFailed',
   'slot restore failed': 'error.restoreSlotFailed',
+  // The phase 13 legendary-name strip's catch fallback (clearItemNameHandler).
+  'item name clear failed': 'error.itemNameClearFailed',
   // Named-constant, multi-line, and `err.message ?? literal` fallback prose the
   // widened phase 15 scan guard surfaced (it now flattens the source, resolves
   // single-identifier arguments through server/admin.ts's own constants, and

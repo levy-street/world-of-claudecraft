@@ -54,6 +54,27 @@ describe('itemStatDeltas', () => {
     expect(itemStatDeltas(same, dup)).toEqual([]);
   });
 
+  it('merges per-copy rolled.stats on BOTH sides (the worn-bake net-loss case)', () => {
+    // The reviewer's scenario: the worn copy's bake (def sta 6 + rolled sta 8
+    // = 14) beats the hovered def's flat 10, so the honest delta is -4, where
+    // the def-only compare claimed +4. The candidate side merges the same way.
+    const candidate = armor('cand', { sta: 10 });
+    const worn = armor('worn', { sta: 6 });
+    const wornBake = { rolled: { quality: 'legendary' as const, stats: { sta: 8 } } };
+    expect(itemStatDeltas(candidate, worn)).toEqual([{ stat: 'sta', delta: 4, decimals: 0 }]);
+    expect(itemStatDeltas(candidate, worn, undefined, wornBake)).toEqual([
+      { stat: 'sta', delta: -4, decimals: 0 },
+    ]);
+    // The hovered copy's own bake rides the candidate side: 10 + 5 vs 14 = +1.
+    expect(itemStatDeltas(candidate, worn, { rolled: { stats: { sta: 5 } } }, wornBake)).toEqual([
+      { stat: 'sta', delta: 1, decimals: 0 },
+    ]);
+    // A bake that exactly cancels the def gap yields no line at all.
+    expect(itemStatDeltas(candidate, worn, undefined, { rolled: { stats: { sta: 4 } } })).toEqual(
+      [],
+    );
+  });
+
   it('computes a fractional weapon DPS delta at one decimal of precision', () => {
     // 10-20 @ 2.0s = 7.5 dps vs 8-12 @ 2.0s = 5.0 dps -> +2.5
     const candidate = weapon('big', 10, 20, 2.0);

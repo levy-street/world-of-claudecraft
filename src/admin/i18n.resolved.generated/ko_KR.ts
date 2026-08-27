@@ -717,6 +717,7 @@ export const ko_KR: AdminTranslations = {
   "error.restoreWentOffline": "복구가 적용되기 전에 캐릭터가 접속을 종료했습니다",
   "error.restoreItemFailed": "아이템 복구에 실패했습니다",
   "error.restoreSlotFailed": "슬롯 복구에 실패했습니다",
+  "error.itemNameClearFailed": "item name clear failed",
   "error.chatMuteFailed": "채팅 음소거에 실패했습니다",
   "error.chatUnmuteFailed": "채팅 음소거 해제 실패",
   "error.accountNotChatMuted": "계정이 채팅 음소거되지 않았습니다",

@@ -717,6 +717,7 @@ export const ja_JP: AdminTranslations = {
   "error.restoreWentOffline": "復元が反映される前にキャラクターがオフラインになりました",
   "error.restoreItemFailed": "アイテムの復元に失敗しました",
   "error.restoreSlotFailed": "スロットの復元に失敗しました",
+  "error.itemNameClearFailed": "item name clear failed",
   "error.chatMuteFailed": "チャットミュートに失敗しました",
   "error.chatUnmuteFailed": "チャットのミュート解除に失敗しました",
   "error.accountNotChatMuted": "アカウントはチャットをミュートされていません",

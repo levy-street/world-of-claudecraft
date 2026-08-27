@@ -397,8 +397,11 @@ describe('paperdollDropAction promoted-copy unique mirror (Masterwrought phase 1
         0,
       ),
     ).toBe('equip');
-    // An index that no longer names a matching cell falls back to the
-    // highest-index rule rather than judging a stranger's payload.
+    // An index that no longer names a matching cell is REFUSED outright,
+    // mirroring the sim's early invalid-selection gate (items.ts equipItem:
+    // "You don't have that item." before the first write); it must never
+    // light green off a fallback unit's payload. The highest-index fallback
+    // survives for an ABSENT slotIndex only (the id-only pin above).
     expect(
       paperdollDropAction(
         RING,
@@ -411,7 +414,7 @@ describe('paperdollDropAction promoted-copy unique mirror (Masterwrought phase 1
         bagsPromotedOnTop,
         7,
       ),
-    ).toBe('blockedUnique');
+    ).toBe('blockedSelection');
   });
 
   it('agrees with the sim on the promoted duplicate (the authority check)', () => {

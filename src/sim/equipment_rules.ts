@@ -96,6 +96,12 @@ export function slotAcceptsItem(item: ItemDef, slot: EquipSlot): boolean {
 // them), so a live character legally wearing two legacy legendary-rolled
 // copies is not retroactively captured and benched at login. A def-only
 // caller passes nothing and keeps the def-quality answer unchanged.
+// DECIDED 2026-08-27, display vs equip: a legacy legendary-rolled copy
+// deliberately KEEPS its legendary DISPLAY (tooltipEffectiveQuality in
+// src/ui/item_instance_tooltip.ts renders the copy's honest roll) while THIS
+// rule stays promotion-scoped for migration safety. The two reads
+// disagreeing about a legacy copy is a decision, not drift; do not "fix"
+// either side to match the other.
 export function isUniqueEquipped(item: ItemDef, instance?: ItemInstancePayload): boolean {
   if (item.quality === 'legendary') return true;
   return instance?.perfected === true && instance.rolled?.quality === 'legendary';
@@ -153,6 +159,12 @@ export function uniqueEquipConflictSlot(
 // copy's rolled quality than the one it ends up wearing would be gameable by
 // stack ordering alone (and, before 2026-08-27, WAS: a slotIndex equip
 // consumed the named cell while the peek judged the highest-index one).
+// The invalid-index case (a slotIndex that names no valid cell of this id)
+// falls back to the highest-index unit HERE while
+// consumeSelectedInventorySlot refuses it outright; what keeps peek and
+// consume agreeing anyway is equipItem's early invalid-selection gate
+// (src/sim/items.ts, the selectedInventorySlot null check before the first
+// write), which refuses the whole equip before either is consulted.
 export function equipCandidateIndex(
   inventory: readonly InvSlot[],
   itemId: string,

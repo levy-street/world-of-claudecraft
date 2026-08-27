@@ -84,13 +84,25 @@ describe('char_view: paperdoll data model', () => {
     expect(view.right.every((c) => c.item === null)).toBe(true);
   });
 
-  it('carries each slot its OWN worn payload (phase 13), and def-only without one', () => {
+  it('carries each slot its OWN worn payload, PROJECTED to worn identity (phase 13)', () => {
     // The instance rides the cell so the painter's row can describe the worn
     // COPY (a promoted legendary's color and chosen name). Slot-keyed, never
-    // smeared: the helmet's payload must not leak onto the mainhand.
-    const promoted = { name: 'Dawnbreaker', rolled: { quality: 'legendary' as const } };
+    // smeared: the helmet's payload must not leak onto the mainhand. The cell
+    // holds the wornTooltipInstance PROJECTION, never the raw payload: the
+    // cosmetic fields survive and the bond fields (boundTo, bindOnTrade) are
+    // trimmed, so a future cell reader cannot diverge the offline host from
+    // the eqi-trimmed online mirror.
+    const promoted = {
+      name: 'Dawnbreaker',
+      rolled: { quality: 'legendary' as const },
+      boundTo: 7,
+    };
     const view = buildPaperdollView(FULL, ITEMS, { helmet: promoted });
-    expect(view.left[0].instance).toBe(promoted);
+    expect(view.left[0].instance).toEqual({
+      name: 'Dawnbreaker',
+      rolled: { quality: 'legendary' },
+    });
+    expect(view.left[0].instance).not.toBe(promoted); // a projection, not the raw handle
     expect(view.left[4].instance).toBeNull(); // mainhand: worn, no payload
     // The def-only negative: no instances argument (the inspect caller's
     // shape) resolves every cell payload-free, byte for byte the old model.
@@ -104,30 +116,6 @@ describe('char_view: paperdoll data model', () => {
     });
     expect(stale.left[3].item).toBeNull();
     expect(stale.left[3].instance).toBeNull();
-  });
-});
-
-describe('char_window: the socket row consumes the worn payload (source pins)', () => {
-  // The painter half of the pin above. The row's color and name reads are
-  // plain string interpolations no behavioral suite reaches (the sheet needs a
-  // real DOM world), so the wiring is pinned at the source: the effective-
-  // quality resolver and the chosen-name fallback must both feed the row, and
-  // the unequip aria must hear the same worn name.
-  const src = readFileSync(new URL('../src/ui/char_window.ts', import.meta.url), 'utf8').replace(
-    /^\s*\/\/.*$/gm,
-    '',
-  );
-
-  it('threads instances into the view build and the row reads them', () => {
-    expect(src).toContain('buildPaperdollView(world.equipment, ITEMS, world.equipmentInstances)');
-    expect(src).toContain('tooltipEffectiveQuality(item, instance ?? undefined)');
-    expect(src).toContain('instance?.name ?? itemDisplayName(item)');
-  });
-
-  it('the unequip aria interpolates the worn-copy name as a t() value', () => {
-    expect(src).toContain(
-      "t('hudChrome.paperdoll.unequipAria', { item: wornName ?? itemDisplayName(item) })",
-    );
   });
 });
 

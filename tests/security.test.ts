@@ -656,22 +656,33 @@ describe('username censorship', () => {
       utimesSync(firstFile, baseline, baseline);
       withUsernameBanlist({ file: firstFile }, () => {
         expect(offensiveName('fileterm')).toBe(true);
-        // The cache is keyed on the file's MTIME, never its content: new
-        // content rolled back to the baseline stamp still serves the cached
-        // terms (the read-once-per-change contract) ...
-        writeFileSync(firstFile, 'changedterm\n');
+        // The cache is keyed on the file's (mtime, size) pair, never its
+        // content: a SAME-LENGTH rewrite rolled back to the baseline stamp
+        // still serves the cached terms (the accepted residual; only a
+        // content hash could see it, and that costs the read the cache
+        // elides) ...
+        writeFileSync(firstFile, 'wxyzterm\n');
         utimesSync(firstFile, baseline, baseline);
         expect(offensiveName('fileterm')).toBe(true);
-        expect(offensiveName('changedterm')).toBe(false);
-        // ... and a moved stamp on the SAME path re-reads, so an edited
-        // banlist takes effect with no restart and no env change.
-        const bumped = new Date(baseline.getTime() + 2000);
-        utimesSync(firstFile, bumped, bumped);
+        expect(offensiveName('wxyzterm')).toBe(false);
+        // ... while a same-mtime rewrite whose LENGTH moved busts: size rides
+        // the key beside mtimeMs, so a copy landed inside one timestamp
+        // still takes effect without a restart ...
+        writeFileSync(firstFile, 'changedterm\n');
+        utimesSync(firstFile, baseline, baseline);
         expect(offensiveName('changedterm')).toBe(true);
         expect(offensiveName('fileterm')).toBe(false);
+        // ... and a moved stamp alone (same length as the write above)
+        // re-reads too, so an edited banlist takes effect with no restart
+        // and no env change.
+        const bumped = new Date(baseline.getTime() + 2000);
+        writeFileSync(firstFile, 'flippedterm\n');
+        utimesSync(firstFile, bumped, bumped);
+        expect(offensiveName('flippedterm')).toBe(true);
+        expect(offensiveName('changedterm')).toBe(false);
 
         process.env.USERNAME_BANLIST_FILE = secondFile;
-        expect(offensiveName('changedterm')).toBe(false);
+        expect(offensiveName('flippedterm')).toBe(false);
         expect(offensiveName('otherterm')).toBe(true);
 
         delete process.env.USERNAME_BANLIST_FILE;

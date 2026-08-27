@@ -717,6 +717,7 @@ export const zh_CN: AdminTranslations = {
   "error.restoreWentOffline": "补发生效前该角色已下线",
   "error.restoreItemFailed": "物品补发失败",
   "error.restoreSlotFailed": "槽位补发失败",
+  "error.itemNameClearFailed": "item name clear failed",
   "error.chatMuteFailed": "聊天禁言失败",
   "error.chatUnmuteFailed": "聊天取消静音失败",
   "error.accountNotChatMuted": "帐户未静音聊天",

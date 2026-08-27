@@ -6144,7 +6144,7 @@ export class Hud {
     // player actively tries to sell back.
     if (item.sellValue > 0 && !item.noVendorSell && !item.soulbound)
       html += `<div class="tt-sub">${esc(t('itemUi.tooltip.sellPrice', { money: formatLocalizedMoney(item.sellValue) }))}</div>`;
-    if (compare) html += this.itemCompareBlock(item);
+    if (compare) html += this.itemCompareBlock(item, instance);
     return html;
   }
 
@@ -6245,16 +6245,16 @@ export class Hud {
     return html;
   }
 
-  // Classic-style item comparison (the item_compare_view pure core): Hud only
-  // supplies its world's equipment reads and the tooltip renderer, so the worn
-  // side carries its per-copy payload and a promoted copy titles the
-  // "Currently Equipped" card with its legendary color and chosen name.
-  private itemCompareBlock(item: ItemDef): string {
+  // Classic-style item comparison (the item_compare_view pure core): Hud
+  // supplies its world's equipment reads, the hovered copy's payload, and the
+  // tooltip renderer, so BOTH sides carry per-copy stats and titles.
+  private itemCompareBlock(item: ItemDef, instance?: ItemInstancePayload): string {
     return itemCompareBlocksHtml(
       item,
       { equipment: this.sim.equipment, instances: this.sim.equipmentInstances },
       (id) => ITEMS[id],
       (equipped, worn) => this.itemTooltip(equipped, false, worn),
+      instance,
     );
   }
 

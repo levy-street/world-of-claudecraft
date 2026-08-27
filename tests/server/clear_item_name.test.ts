@@ -1,7 +1,8 @@
 // The legendary-name strip core (server/clear_item_name.ts): target
-// validation, the blob region walk (the rekeyInstanceSigner regions), and the
-// runClearItemName endpoint body's ordering contract (validate, offline,
-// audit, load-strip-save) over an injected deps bag. The RouteDef arm rides
+// validation (explicit-sweep, allowlisted bag id), the blob region walk (the
+// rekeyInstanceSigner regions), and the runClearItemName endpoint body's
+// ordering contract (validate, offline, audit, load-strip, the pre-save
+// online re-check, save) over an injected deps bag. The RouteDef arm rides
 // the admin.test.ts rig ('phase 13 legendary-name strip' there).
 import { describe, expect, it, vi } from 'vitest';
 import {
@@ -43,9 +44,7 @@ function stateWith(overrides: Partial<CharacterState>): CharacterState {
 }
 
 describe('clearItemNameBodyError / clearItemNameTarget', () => {
-  it('accepts the three target shapes and maps them', () => {
-    expect(clearItemNameBodyError({})).toBeNull();
-    expect(clearItemNameTarget({})).toEqual({ kind: 'all' });
+  it('accepts the three EXPLICIT target shapes and maps them', () => {
     expect(clearItemNameBodyError({ slot: 'neck' })).toBeNull();
     expect(clearItemNameTarget({ slot: 'neck' })).toEqual({ kind: 'slot', slot: 'neck' });
     expect(clearItemNameBodyError({ bag: 3, itemId: 'wyrmfall_pendant' })).toBeNull();
@@ -54,13 +53,36 @@ describe('clearItemNameBodyError / clearItemNameTarget', () => {
       bag: 3,
       itemId: 'wyrmfall_pendant',
     });
+    // The whole-character sweep is opt-in: the literal `all: true`, never an
+    // empty body (a reason-only request must not quietly strip everything).
+    expect(clearItemNameBodyError({ all: true })).toBeNull();
+    expect(clearItemNameTarget({ all: true })).toEqual({ kind: 'all' });
+  });
+
+  it('refuses a body naming no target (reason-only included), naming the three forms', () => {
+    const threeForms = 'name exactly one target: a worn slot, a bag cell, or all: true';
+    expect(clearItemNameBodyError({})).toBe(threeForms);
+    // The reason field is not a target; a reason-only body is the exact
+    // request the explicit sweep exists to refuse.
+    expect(clearItemNameBodyError({ reason: 'slur' } as never)).toBe(threeForms);
+  });
+
+  it('refuses a non-literal all and any mixed target', () => {
+    const threeForms = 'name exactly one target: a worn slot, a bag cell, or all: true';
+    expect(clearItemNameBodyError({ all: 'yes' })).toBe('all must be the literal true');
+    expect(clearItemNameBodyError({ all: 1 })).toBe('all must be the literal true');
+    expect(clearItemNameBodyError({ all: false })).toBe('all must be the literal true');
+    expect(clearItemNameBodyError({ all: true, slot: 'neck' })).toBe(threeForms);
+    expect(clearItemNameBodyError({ all: true, bag: 0, itemId: 'wyrmfall_pendant' })).toBe(
+      threeForms,
+    );
   });
 
   it('refuses each malformed dimension with its own prose', () => {
     expect(clearItemNameBodyError({ slot: 'hat' })).toBe('unknown equipment slot');
     expect(clearItemNameBodyError({ slot: 3 })).toBe('unknown equipment slot');
     expect(clearItemNameBodyError({ slot: 'neck', bag: 0, itemId: 'x' })).toBe(
-      'name a worn slot or a bag cell, not both',
+      'name exactly one target: a worn slot, a bag cell, or all: true',
     );
     expect(clearItemNameBodyError({ bag: 0 })).toBe(
       'a bag target needs both the cell index and its item id',
@@ -80,6 +102,11 @@ describe('clearItemNameBodyError / clearItemNameTarget', () => {
     expect(clearItemNameBodyError({ bag: 0, itemId: '' })).toBe('unknown item id');
     expect(clearItemNameBodyError({ bag: 0, itemId: 7 })).toBe('unknown item id');
     expect(clearItemNameBodyError({ bag: 0, itemId: 'x'.repeat(65) })).toBe('unknown item id');
+    // The allowlist arm (the restoreItemBodyError precedent): a well-shaped id
+    // the ITEMS table does not carry is refused, so free text never reaches
+    // the audit reason's folded detail.
+    expect(clearItemNameBodyError({ bag: 0, itemId: 'not_a_real_item' })).toBe('unknown item id');
+    expect(clearItemNameBodyError({ bag: 0, itemId: 'hasOwnProperty' })).toBe('unknown item id');
   });
 
   it('describes each target for the audit detail', () => {
@@ -197,13 +224,38 @@ describe('runClearItemName (the endpoint body over injected deps)', () => {
     const outcome = await runClearItemName(deps, {
       characterId: 5,
       adminAccountId: 7,
-      body: { reason: 'slur' },
+      body: { all: true, reason: 'slur' },
     });
     expect(outcome).toEqual({
       ok: false,
       error: 'character is online on this realm; disconnect them first',
     });
     expect(recordAudit).not.toHaveBeenCalled();
+    expect(saveCharacterState).not.toHaveBeenCalled();
+  });
+
+  it('re-checks online IMMEDIATELY before the save and refuses without writing (the login race)', async () => {
+    // The online check flips between the pre-check (false, so the strip
+    // proceeds) and the pre-save re-check (true: the character logged in
+    // mid-strip). The save must not land: the live session's autosave would
+    // clobber it anyway, so the refusal names the kick-and-retry flow. The
+    // audit row already recorded the REQUEST honestly ("requested" prose).
+    const online = vi
+      .fn(() => false)
+      .mockReturnValueOnce(false)
+      .mockReturnValue(true);
+    const { deps, recordAudit, saveCharacterState } = makeDeps({ characterOnline: online });
+    const outcome = await runClearItemName(deps, {
+      characterId: 5,
+      adminAccountId: 7,
+      body: { bag: 0, itemId: 'wyrmfall_pendant', reason: 'slur' },
+    });
+    expect(outcome).toEqual({
+      ok: false,
+      error: 'character came online before the strip landed; kick them and retry',
+    });
+    expect(online).toHaveBeenCalledTimes(2);
+    expect(recordAudit).toHaveBeenCalledTimes(1);
     expect(saveCharacterState).not.toHaveBeenCalled();
   });
 
@@ -235,7 +287,7 @@ describe('runClearItemName (the endpoint body over injected deps)', () => {
     const outcome = await runClearItemName(deps, {
       characterId: 5,
       adminAccountId: 7,
-      body: { reason: 'slur' },
+      body: { all: true, reason: 'slur' },
     });
     expect(outcome).toEqual({ ok: false, error: 'character not found' });
     expect(saveCharacterState).not.toHaveBeenCalled();

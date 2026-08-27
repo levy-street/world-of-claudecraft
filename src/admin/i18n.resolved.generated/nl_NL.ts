@@ -717,6 +717,7 @@ export const nl_NL: AdminTranslations = {
   "error.restoreWentOffline": "het personage ging offline voordat het herstel doorkwam",
   "error.restoreItemFailed": "voorwerpherstel mislukt",
   "error.restoreSlotFailed": "sleufherstel mislukt",
+  "error.itemNameClearFailed": "item name clear failed",
   "error.chatMuteFailed": "chatdemping mislukt",
   "error.chatUnmuteFailed": "chat opheffen mislukt",
   "error.accountNotChatMuted": "account is niet gedempt",

@@ -717,6 +717,7 @@ export const da_DK: AdminTranslations = {
   "error.restoreWentOffline": "karakteren gik offline, før gendannelsen nåede frem",
   "error.restoreItemFailed": "gendannelse af vare mislykkedes",
   "error.restoreSlotFailed": "gendannelse af plads mislykkedes",
+  "error.itemNameClearFailed": "item name clear failed",
   "error.chatMuteFailed": "chatdæmpning mislykkedes",
   "error.chatUnmuteFailed": "chatten blev slået til",
   "error.accountNotChatMuted": "kontoen er ikke slået fra i chatten",

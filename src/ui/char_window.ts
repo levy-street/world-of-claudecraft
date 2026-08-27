@@ -45,11 +45,12 @@ import {
   onPortraitUpdate,
   portraitChipHtml,
 } from './portrait_chip';
-import { archetypeImageUrl, professionImageUrl } from './profession_art';
+import { archetypeImageUrl } from './profession_art';
 import { qualityGlowShadow } from './quality_glow';
 import { tSim } from './sim_i18n';
 import type { StatId } from './stat_tooltip';
 import { svgIcon } from './ui_icons';
+import { knownItemIconHtml } from './unknown_item_icon';
 
 // Quality / empty-slot colors as CSS custom properties: the shared
 // QUALITY_COLOR map carries the per-quality hex, and these tokens cover the
@@ -426,16 +427,18 @@ export class CharWindow {
     row.dataset.equipSlot = slot;
     this.bindEquipDropTarget(row, slot);
     // The row describes the worn COPY, not just its def (the all-surfaces
-    // item-cell rule): instance-effective quality colors the line and a
-    // promoted copy's player-chosen name replaces the def name. The chosen
-    // name is player-authored text, so it is esc'd raw, never through t().
+    // item-cell rule): instance-effective quality colors the line, drives the
+    // icon's q-<quality> rim (so a promoted copy's orange glow never sits on
+    // a purple def rim), and a promoted copy's player-chosen name replaces
+    // the def name. The chosen name is player-authored text, so it is esc'd
+    // raw, never through t().
     const wornName = item ? (instance?.name ?? itemDisplayName(item)) : null;
+    const effQuality = item ? tooltipEffectiveQuality(item, instance ?? undefined) : undefined;
     const qColor = !item
       ? SLOT_EMPTY_TEXT_COLOR
-      : (QUALITY_COLOR[tooltipEffectiveQuality(item, instance ?? undefined) ?? 'common'] ??
-        QUALITY_DEFAULT_COLOR);
+      : (QUALITY_COLOR[effQuality ?? 'common'] ?? QUALITY_DEFAULT_COLOR);
     const icon = item
-      ? this.deps.itemIcon(item)
+      ? knownItemIconHtml(item, effQuality)
       : `<img class="item-icon" style="border-color:${SLOT_EMPTY_BORDER_COLOR}" src="${iconDataUrl('item', 'slot_empty')}" alt="" draggable="false">`;
     row.innerHTML = `${icon}
         <div><div class="slot-name">${esc(this.deps.slotName(slot))}</div><div class="slot-item" style="color:${qColor}">${wornName !== null ? esc(wornName) : esc(t('itemUi.equipment.empty'))}</div></div>`;
@@ -545,6 +548,11 @@ export class CharWindow {
         target?.slotIndex,
       )
     ) {
+      case 'blockedSelection':
+        // The sim's early invalid-selection gate answers "You don't have that
+        // item." (items.ts equipItem); the mirror pre-empts with the same key.
+        this.deps.showError(tSim('error.noItem'));
+        return;
       case 'blockedSlot':
         this.deps.showError(tSim('error.wrongEquipSlot'));
         return;

@@ -615,17 +615,22 @@ export const LEGENDARY_CARD_NAME_MAX = 32;
  * the legendary card's item name crosses two processes as unchecked JSON, and
  * the game's persisted-load shape for it is deliberately wider than the mint
  * alphabet (the signer doctrine), so nothing upstream structurally guarantees
- * what arrives here. Hold it to the MINT alphabet before it touches an embed:
- * strip everything outside [A-Za-z' -], collapse whitespace runs, trim, and
- * bound at LEGENDARY_CARD_NAME_MAX. A name emptied by the filter degrades to
- * the generic title through the caller's `||` fallback.
+ * what arrives here. Hold it to the full MINT shape before it touches an
+ * embed (legendary_name.ts: starts with a letter, then [A-Za-z' -], at least
+ * 2 characters): strip everything outside the alphabet, collapse whitespace
+ * runs, trim, drop any leading non-letters (a surviving "- " head would
+ * render as a Discord bullet), require length >= 2, and bound at
+ * LEGENDARY_CARD_NAME_MAX. A name emptied or left under the floor degrades
+ * to the generic title through the caller's `||` fallback.
  */
 export function sanitizeLegendaryItemName(raw: string | undefined): string {
   if (!raw) return '';
   const cleaned = raw
     .replace(/[^A-Za-z' -]/g, '')
+    .replace(/^[^A-Za-z]+/, '')
     .replace(/\s+/g, ' ')
     .trim();
+  if (cleaned.length < 2) return '';
   return cleaned.length > LEGENDARY_CARD_NAME_MAX
     ? cleaned.slice(0, LEGENDARY_CARD_NAME_MAX).trimEnd()
     : cleaned;

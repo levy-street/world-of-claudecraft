@@ -15,12 +15,18 @@
 // overlay, never here.
 
 import type { EquipSlot, ItemDef, ItemInstancePayload } from '../sim/types';
+import { wornTooltipInstance } from './item_instance_tooltip';
 
 /** One paperdoll cell: a slot, the item equipped there (null when empty), and
  *  the worn copy's per-copy payload (null when absent or when the caller has
  *  none, e.g. inspect). The payload rides the cell so the row's name and
  *  quality color can describe the COPY (a promoted legendary), the same
- *  instance-effective rule the tooltip reads. */
+ *  instance-effective rule the tooltip reads. PROJECTED through
+ *  wornTooltipInstance (signer/enchant/rolled/name, the eqi worn-identity
+ *  trim), so the one worn-copy handle the view hands out carries only the
+ *  cosmetic projection: a future reader of a non-cosmetic field (bindOnTrade,
+ *  boundTo) cannot reintroduce the offline-vs-online host divergence the trim
+ *  exists to prevent. */
 export interface PaperdollSlot {
   slot: EquipSlot;
   item: ItemDef | null;
@@ -73,7 +79,10 @@ export function buildPaperdollView(
     slots.map((slot) => {
       const itemId = equipment[slot];
       const item = itemId ? (items[itemId] ?? null) : null;
-      return { slot, item, instance: item ? (instances?.[slot] ?? null) : null };
+      // The worn-identity projection (see PaperdollSlot): the cell never
+      // carries more of the payload than the eqi wire would show a peer.
+      const instance = item ? wornTooltipInstance(instances?.[slot]) : undefined;
+      return { slot, item, instance: instance ?? null };
     });
   return { left: column(PAPERDOLL_LEFT_SLOTS), right: column(PAPERDOLL_RIGHT_SLOTS) };
 }

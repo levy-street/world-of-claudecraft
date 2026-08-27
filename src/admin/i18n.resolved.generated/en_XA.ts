@@ -717,6 +717,7 @@ export const en_XA: AdminTranslations = {
   "error.restoreWentOffline": "[ţĥé çĥáŕáçţéŕ ŵéñţ óƒƒļíñé ƀéƒóŕé ţĥé ŕéšţóŕé ļáñðéð]",
   "error.restoreItemFailed": "[íţéɱ ŕéšţóŕé ƒáíļéð]",
   "error.restoreSlotFailed": "[šļóţ ŕéšţóŕé ƒáíļéð]",
+  "error.itemNameClearFailed": "[íţéɱ ñáɱé çļéáŕ ƒáíļéð]",
   "error.chatMuteFailed": "[çĥáţ ɱúţé ƒáíļéð]",
   "error.chatUnmuteFailed": "[çĥáţ úñɱúţé ƒáíļéð]",
   "error.accountNotChatMuted": "[áççóúñţ íš ñóţ çĥáţ ɱúţéð]",

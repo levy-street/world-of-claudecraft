@@ -16,6 +16,7 @@ import {
   canEquipItem,
   canEquipItemInSlot,
   displacedSlotForEquip,
+  equipCandidateIndex,
   equipCandidateInstance,
   equipCandidateQuality,
   masterwroughtConflictSlot,
@@ -27,13 +28,16 @@ import type { EquipSlot, InvSlot, ItemDef, ItemInstancePayload, PlayerClass } fr
 
 /** What dropping a bag item on a paperdoll slot does. The blocked* variants are
  *  refusals the painter surfaces (a rejecting drop target + an error toast), and
- *  each names the ONE reason, checked in the sim's own order: wrong socket first
- *  (a helm on a ring finger), then class proficiency, then the level gate, then
- *  the unique-equipped rule (a second worn copy of a legendary), then the two
- *  Masterwrought counted-family caps (the family's worn budget, then the one
- *  legendary allowed inside it). */
+ *  each names the ONE reason, checked in the sim's own order: a named bag cell
+ *  that no longer holds this item (the sim's early invalid-selection gate in
+ *  items.ts equipItem, checked before everything else the mirror can see),
+ *  then wrong socket (a helm on a ring finger), then class proficiency, then
+ *  the level gate, then the unique-equipped rule (a second worn copy of a
+ *  legendary), then the two Masterwrought counted-family caps (the family's
+ *  worn budget, then the one legendary allowed inside it). */
 export type PaperdollDropAction =
   | 'equip'
+  | 'blockedSelection'
   | 'blockedSlot'
   | 'blockedClass'
   | 'blockedLevel'
@@ -70,6 +74,19 @@ export function paperdollDropAction(
   // a bag equips into its own bar socket, never the paperdoll.
   if (item.kind !== 'weapon' && item.kind !== 'armor' && item.kind !== 'held_offhand')
     return 'blockedSlot';
+  // A drag that NAMES a bag cell which no longer holds a valid copy of this
+  // item id is refused outright, mirroring the sim's own early gate (items.ts
+  // equipItem refuses before its first write): equipCandidateIndex answers
+  // the named index only for a valid cell, so any other answer means the
+  // selection is stale. Never fall back to the highest-index unit here; the
+  // fallback is for an ABSENT slotIndex only (the id-only click path).
+  if (
+    slotIndex !== undefined &&
+    inventory &&
+    equipCandidateIndex(inventory, item.id, slotIndex) !== slotIndex
+  ) {
+    return 'blockedSelection';
+  }
   if (!slotAcceptsItem(item, slot)) return 'blockedSlot';
   if (!canEquipItem(cls, item)) return 'blockedClass';
   if (!meetsLevelRequirement(level, item)) return 'blockedLevel';

@@ -865,6 +865,40 @@ describe('char_window: lifetime Time Played line (issue: character-sheet playtim
   });
 });
 
+describe('char_window: the socket row consumes the worn payload (source pins)', () => {
+  // Moved here from tests/char_view.test.ts beside the painter's other pins
+  // (they pin char_window.ts source, not the pure core). The row's color,
+  // name, and icon-rim reads are plain string interpolations no behavioral
+  // suite reaches (the sheet needs a real DOM world), so the wiring is pinned
+  // at the source: the effective-quality resolver feeds the row color AND the
+  // icon's q-<quality> class, the chosen-name fallback feeds the line, and
+  // the unequip aria hears the same worn name.
+  const src = painter.replace(/^\s*\/\/.*$/gm, '');
+
+  it('threads instances into the view build and the row reads them', () => {
+    expect(src).toContain('tooltipEffectiveQuality(item, instance ?? undefined)');
+    expect(src).toContain('instance?.name ?? itemDisplayName(item)');
+  });
+
+  it('drives the socket icon rim off the same instance-effective quality', () => {
+    // The orange-glow-purple-rim fix: the icon paints through
+    // knownItemIconHtml with the row's own effective quality, never the
+    // def-only deps.itemIcon.
+    expect(src).toContain('knownItemIconHtml(item, effQuality)');
+  });
+
+  it('the unequip aria interpolates the worn-copy name as a t() value', () => {
+    expect(src).toContain(
+      "t('hudChrome.paperdoll.unequipAria', { item: wornName ?? itemDisplayName(item) })",
+    );
+  });
+
+  it('maps the stale-selection refusal onto the sim-worded noItem toast', () => {
+    expect(src).toContain("case 'blockedSelection':");
+    expect(src).toContain("this.deps.showError(tSim('error.noItem'));");
+  });
+});
+
 describe('char_window: own-paperdoll per-copy tooltip threading', () => {
   it('resolves the worn instance from the self entity mirror inside the tooltip closure', () => {
     // Both worlds mirror the own worn set on the self entity
