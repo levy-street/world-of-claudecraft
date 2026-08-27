@@ -31,6 +31,7 @@ describe('interior encounter prewarm spec', () => {
       soulRendVfxWeaponSkins: false,
       soulRendLivePlayerVisuals: false,
       varkhulVisuals: true,
+      ignivarAshcallerVfx: true,
     });
     expect(encounterPrewarmForInterior('ignivar_depths')).toEqual(spec);
     expect(

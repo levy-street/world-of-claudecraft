@@ -401,7 +401,7 @@ export const MEDIA_ASSETS: Record<string, string> =
   "models/creatures/greyjaw_ability_anims.glb": "/media/models/creatures/greyjaw_ability_anims.dfa720196375.glb",
   "models/creatures/grix.glb": "/media/models/creatures/grix.224bc3592577.glb",
   "models/creatures/grubjaw.glb": "/media/models/creatures/grubjaw.6d109e187a99.glb",
-  "models/creatures/ignivar_heart_of_the_end.glb": "/media/models/creatures/ignivar_heart_of_the_end.3ff28f2bdb65.glb",
+  "models/creatures/ignivar_heart_of_the_end.glb": "/media/models/creatures/ignivar_heart_of_the_end.85e34614b340.glb",
   "models/creatures/ignivar_herald.glb": "/media/models/creatures/ignivar_herald.0d522fe4bb33.glb",
   "models/creatures/kobold.glb": "/media/models/creatures/kobold.1cb4fe6907ed.glb",
   "models/creatures/kobold_ability_anims.glb": "/media/models/creatures/kobold_ability_anims.f2d51c66b479.glb",

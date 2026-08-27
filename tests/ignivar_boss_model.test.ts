@@ -43,7 +43,7 @@ const SHIPPED_CLIPS = [
   'Run',
   'Walk',
 ];
-const HEART_SHIPPED_CLIPS = ['Attack', 'Cast', 'Death', 'Hit', 'Idle', 'Jump', 'Run', 'Walk'];
+const HEART_SHIPPED_CLIPS = ['Cast', 'Channel', 'ChannelStart', 'Death', 'Idle', 'Move'];
 
 describe('Ignivar boss model', () => {
   it('routes the raid boss to the contributor Colossus and its authored clips', () => {
@@ -67,19 +67,24 @@ describe('Ignivar boss model', () => {
     expect(manifestUrls()).toContain('models/creatures/ignivar_herald.glb');
   });
 
-  it('routes Heart of the End to its stationary automaton visual', () => {
+  it('routes Heart of the End to the contributor Ashcaller and its authored clips', () => {
     const key = visualKeyFor({ kind: 'mob', templateId: IGNIVAR_APOCALYPSE_ADD_ID } as never);
 
     expect(key).toBe('mob_ignivar_heart_of_the_end');
     expect(VISUALS.mob_ignivar_heart_of_the_end).toMatchObject({
       url: 'models/creatures/ignivar_heart_of_the_end.glb',
       height: 1.8,
-      yaw: -Math.PI / 2,
-      selfIllumination: 0.1,
-      deathTimeScale: 3,
+      yaw: Math.PI,
+      selfIllumination: 0.2,
+      attackTimeScale: 1,
       clips: {
         idle: 'Idle',
-        cast: 'Cast',
+        walk: 'Move',
+        run: 'Move',
+        // The 20s Apocalypse channel loops 'Channel'; the 'Cast' staff slam
+        // fires as the attack one-shot when the wipe damage lands.
+        attack: ['Cast'],
+        cast: 'Channel',
         death: 'Death',
       },
     });
@@ -91,15 +96,17 @@ describe('Ignivar boss model', () => {
     expect(VISUALS.mob_ignivar_cinder_artificer.envMapIntensity).toBeUndefined();
     expect(VISUALS.mob_ignivar_ember_sentinel.envMapIntensity).toBeUndefined();
     expect(VISUALS.mob_ignivar_crucible_warden.envMapIntensity).toBeUndefined();
+    // The placeholder's stretch hacks retired with the authored clips.
+    expect(VISUALS.mob_ignivar_heart_of_the_end.deathTimeScale).toBeUndefined();
     expect(manifestUrls()).toContain('models/creatures/ignivar_heart_of_the_end.glb');
   });
 
-  it('ships Heart of the End as a compressed rig with cast and death clips', async () => {
+  it('ships Heart of the End as the compressed Ashcaller rig with its authored clips', async () => {
     await MeshoptDecoder.ready;
     const bytes = readFileSync(HEART_ASSET_PATH);
-    expect(bytes.byteLength).toBeLessThan(1_000_000);
+    expect(bytes.byteLength).toBeLessThan(2_300_000);
     expect(MEDIA_ASSETS['models/creatures/ignivar_heart_of_the_end.glb']).toBe(
-      '/media/models/creatures/ignivar_heart_of_the_end.3ff28f2bdb65.glb',
+      '/media/models/creatures/ignivar_heart_of_the_end.85e34614b340.glb',
     );
 
     const io = new NodeIO()
@@ -108,14 +115,15 @@ describe('Ignivar boss model', () => {
     const root = (await io.readBinary(bytes)).getRoot();
     expect(bytes.toString('utf8')).toContain('EXT_meshopt_compression');
     expect(bytes.toString('utf8')).toContain('KHR_texture_basisu');
+    // The authored molten-crack emissive rides the glTF emissive strength
+    // extension; losing it in a recompress dims the whole furnace read.
+    expect(bytes.toString('utf8')).toContain('KHR_materials_emissive_strength');
     expect(root.listSkins()).toHaveLength(1);
-    expect(root.listSkins()[0].listJoints()).toHaveLength(41);
-    expect(root.listTextures()).toHaveLength(3);
-    expect(root.listTextures().map((texture) => texture.getMimeType())).toEqual([
-      'image/ktx2',
-      'image/ktx2',
-      'image/ktx2',
-    ]);
+    expect(root.listSkins()[0].listJoints()).toHaveLength(51);
+    expect(root.listTextures()).toHaveLength(7);
+    expect(new Set(root.listTextures().map((texture) => texture.getMimeType()))).toEqual(
+      new Set(['image/ktx2']),
+    );
     expect(
       root
         .listAnimations()
@@ -123,10 +131,14 @@ describe('Ignivar boss model', () => {
         .sort(),
     ).toEqual([...HEART_SHIPPED_CLIPS].sort());
 
-    for (const clipName of ['Cast', 'Death']) {
+    for (const [clipName, clipSeconds] of [
+      ['Cast', 2],
+      ['Channel', 3],
+      ['Death', 3.33],
+    ] as const) {
       const animation = root.listAnimations().find((clip) => clip.getName() === clipName);
       expect(animation, `${clipName} clip`).toBeDefined();
-      expect(animation?.listChannels()).toHaveLength(126);
+      expect(animation?.listChannels()).toHaveLength(153);
       const samplers = animation?.listSamplers() ?? [];
       expect(
         samplers.reduce((count, sampler) => count + (sampler.getInput()?.getCount() ?? 0), 0),
@@ -148,21 +160,55 @@ describe('Ignivar boss model', () => {
           }
         }
       }
-      expect(duration).toBeGreaterThan(5);
+      expect(duration).toBeCloseTo(clipSeconds, 1);
       expect(maxPoseDelta, `${clipName} must contain authored pose motion`).toBeGreaterThan(0.01);
     }
 
+    // Body and staff: one primitive per material.
     const primitives = root.listMeshes().flatMap((mesh) => mesh.listPrimitives());
-    expect(primitives).toHaveLength(1);
-    expect(primitives[0].getMode()).toBe(Primitive.Mode.TRIANGLES);
-    expect(primitives[0].listSemantics().sort()).toEqual([
-      'JOINTS_0',
-      'NORMAL',
-      'POSITION',
-      'TEXCOORD_0',
-      'WEIGHTS_0',
-    ]);
-    expect((primitives[0].getIndices()?.getCount() ?? 0) / 3).toBeLessThanOrEqual(4_000);
+    expect(primitives).toHaveLength(2);
+    for (const primitive of primitives) {
+      expect(primitive.getMode()).toBe(Primitive.Mode.TRIANGLES);
+      expect(primitive.listSemantics().sort()).toEqual([
+        'JOINTS_0',
+        'NORMAL',
+        'POSITION',
+        'TEXCOORD_0',
+        'WEIGHTS_0',
+      ]);
+    }
+    expect(
+      primitives.reduce((sum, primitive) => sum + (primitive.getIndices()?.getCount() ?? 0), 0) / 3,
+    ).toBeLessThanOrEqual(11_000);
+
+    // The VFX socket bones the ember/absorb/nova module hangs off.
+    const nodes = new Set(root.listNodes().map((node) => node.getName()));
+    for (const socket of [
+      'vfx_core',
+      'vfx_belt',
+      'vfx_eyes',
+      'vfx_staff',
+      'vfx_hand.r',
+      'handslot.r',
+    ]) {
+      expect(nodes.has(socket), socket).toBe(true);
+    }
+
+    // Geometry ships in REAL model units (float, unquantized), because the far
+    // bake, the height normalization and the click capsule all read POSITION on
+    // the CPU: a quantized-space rig renders correctly through its bind
+    // matrices but bakes a collapsed far mesh that vanishes at range.
+    const positions = root
+      .listMeshes()
+      .flatMap((mesh) => mesh.listPrimitives())
+      .map((primitive) => primitive.getAttribute('POSITION'));
+    for (const position of positions) {
+      expect(position?.getComponentType()).toBe(5126);
+      expect(position?.getNormalized()).toBe(false);
+    }
+    const bounds = getBounds(root.listScenes()[0]);
+    expect(bounds.min[1]).toBeCloseTo(0.01255, 4);
+    expect(bounds.max[1]).toBeCloseTo(1.227, 3);
   });
 
   it('applies its readability controls without mutating the source material', () => {
