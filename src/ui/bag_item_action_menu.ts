@@ -57,6 +57,7 @@ import { itemDisplayName } from './entity_i18n';
 import { esc } from './esc';
 import { formatNumber, t } from './i18n';
 import { itemNumber, itemStatName } from './item_instance_tooltip';
+import { wornItemCellParts } from './worn_item_cell_view';
 
 /** Modifier class the picker states set on the shared #ctx-menu element: the
  *  Apply Enchant pickers size differently from every other menu in the family
@@ -177,8 +178,10 @@ export class BagItemActionMenu {
   ): void {
     const world = this.deps.world();
     const def = ITEMS[itemId];
-    const name = def ? itemDisplayName(def) : itemId;
     const selected = slotIndex === undefined ? undefined : world.inventory[slotIndex];
+    // A destroy prompt names the COPY it destroys (its chosen name when the
+    // selected cell carries one), never only the def.
+    const name = def ? wornItemCellParts(def, selected?.instance).name : itemId;
     const copies =
       (action === 'disenchant' || action === 'sunder') && selected?.itemId === itemId
         ? [selected]
@@ -419,7 +422,11 @@ export class BagItemActionMenu {
   ): void {
     const world = this.deps.world();
     const def = ITEMS[itemId];
-    const name = def ? itemDisplayName(def) : itemId;
+    // The worn victim's chosen name when it has one; a bagged victim is
+    // named by its def (the target rows group bagged copies by item id).
+    const name = def
+      ? wornItemCellParts(def, slot ? world.equipmentInstances?.[slot] : undefined).name
+      : itemId;
     const oldText = this.replacedEnchantText(replace);
     const newText = t(enchantNameKey(enchantId));
     const costText = (ENCHANTS[enchantId]?.reagents ?? [])
@@ -507,9 +514,13 @@ export class BagItemActionMenu {
       );
       return;
     }
-    const nameOf = (itemId: string): string => {
+    // A worn row names the worn COPY (its chosen legendary name when it has
+    // one: Lucent Infusion targets promoted copies by design, and the chosen
+    // name is the discriminator that tells two byte-identical rows apart);
+    // bagged rows are grouped by item id and keep the def name.
+    const nameOf = (itemId: string, instance?: ItemInstancePayload): string => {
       const def = ITEMS[itemId];
-      return esc(def ? itemDisplayName(def) : itemId);
+      return esc(def ? wornItemCellParts(def, instance).name : itemId);
     };
     // A row that will DESTROY an enchant must not read like the purely
     // informational Worn tag beside it (#2421), so the replace flag takes the
@@ -559,11 +570,13 @@ export class BagItemActionMenu {
               index: itemNumber(target.slotIndex),
             }),
       )}</span>`;
-    const identityOf = (target: { itemId: string; heroic?: true }): string =>
-      `${nameOf(target.itemId)}${target.heroic ? heroicMeta() : ''}`;
+    const identityOf = (
+      target: { itemId: string; heroic?: true },
+      instance?: ItemInstancePayload,
+    ): string => `${nameOf(target.itemId, instance)}${target.heroic ? heroicMeta() : ''}`;
     const rows = [
       ...worn.map((target) => {
-        const html = `${identityOf(target)}${wornMeta(target)}${
+        const html = `${identityOf(target, this.deps.world().equipmentInstances?.[target.slot])}${wornMeta(target)}${
           target.replace ? replaceMeta(target.replace) : ''
         }`;
         return target.replace?.sameEnchant

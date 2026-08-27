@@ -20,6 +20,9 @@ export interface DelveBoardControllerDeps {
   closeOtherWindows(selector: string): void;
   hideTooltip(): void;
   attachTooltip(element: HTMLElement, html: () => string): void;
+  /** The PainterHostPresentation.itemIcon shape; the quality parameter is
+   *  shape uniformity only here, since no copy payload reaches this surface
+   *  (the rim is the def's), and it is never passed. */
   itemIcon(item: ItemDef, quality?: ItemDef['quality']): string;
   itemTooltip(item: ItemDef): string;
   delveName(delveId: string): string;

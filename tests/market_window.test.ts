@@ -99,12 +99,13 @@ describe('market_window: instance-effective icon rims (phase 13 fix round)', () 
 
   it('the def-only negative: the sale LEDGER row has no payload and keeps the def icon', () => {
     // renderCollectSales rows are historical records whose model carries no
-    // instance, so they stay on the def-driven presentation icon dep.
+    // instance, so the rim is the def's, stated rather than defaulted.
     const ledger = painter.slice(
       painter.indexOf('private renderCollectSales('),
       painter.indexOf('private fungibleBagCount('),
     );
-    expect(ledger).toContain('this.deps.itemIcon(item)');
+    expect(ledger).toContain('this.deps.itemIcon(item, item.quality)');
+    expect(ledger).not.toContain('this.deps.itemIcon(item)}');
     expect(ledger).not.toContain('knownItemIconHtml(');
   });
 });

@@ -26,6 +26,9 @@ export interface LootWindowControllerDeps {
   entityName(entity: Entity): string;
   money(copper: number): string;
   coinIconUrl(): string;
+  /** The PainterHostPresentation.itemIcon shape; the quality parameter is
+   *  shape uniformity only here, since no copy payload reaches this surface
+   *  (the rim is the def's), and it is never passed. */
   itemIcon(item: ItemDef, quality?: ItemDef['quality']): string;
   itemTooltip(item: ItemDef): string;
   attachTooltip(element: HTMLElement, html: () => string): void;

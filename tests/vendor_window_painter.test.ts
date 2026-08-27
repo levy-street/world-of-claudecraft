@@ -239,6 +239,47 @@ describe('renderVendorWindow: goods/buyback grid wrapping', () => {
     expect(rows[0].parentElement).toBe(grids[0]);
   });
 
+  it('a vendored promoted copy sits in buyback under its chosen name with its own rim', () => {
+    // The all-surfaces item-cell rule on the one vendor row a bound copy can
+    // reach (a bound copy CAN be vendored): the row reads the cell authority
+    // for the accessible name, the label, and the quality it asks the icon
+    // dep for (the phase 13 QA round-2 frontend finding).
+    const buyback: VendorBuybackRow[] = [
+      {
+        itemId: 'sword',
+        item: item('sword'),
+        count: 1,
+        price: 100,
+        index: 0,
+        instance: { rolled: { quality: 'legendary' }, name: 'Dawn Oath' },
+      },
+    ];
+    const view: VendorView = {
+      goods: [],
+      buyback,
+      honorBalance: 0,
+      hasHonorGoods: false,
+      multiple: 1,
+    };
+    const qualities: (string | undefined)[] = [];
+    const el = document.createElement('div');
+    renderVendorWindow(
+      el,
+      'Vendor',
+      view,
+      deps({
+        itemIcon: (_item, quality) => {
+          qualities.push(quality);
+          return '<img>';
+        },
+      }),
+    );
+    const row = el.querySelector('.vendor-item');
+    expect(row?.getAttribute('aria-label')).toContain('Dawn Oath');
+    expect(row?.querySelector('.vi-name')?.textContent).toContain('Dawn Oath');
+    expect(qualities).toEqual(['legendary']);
+  });
+
   it('paints a requirement-unmet row ENABLED with its advisory line and the buy aria-label (R22)', () => {
     // The advisory contract, driven through the real painter: the row stays
     // in the grid, it SELLS (never disabled for proficiency; the wield gate

@@ -19,13 +19,11 @@ import { ITEMS } from '../../../sim/data';
 import type { InvSlot, ItemDef, ItemInstancePayload } from '../../../sim/types';
 import type { IWorld } from '../../../world_api';
 import { userFacingApiError } from '../../api_error_i18n';
-import { bagQualityKey } from '../../bags_view';
 import { itemDisplayName } from '../../entity_i18n';
 import { esc } from '../../esc';
 import { captureFocusKey } from '../../focus_restore';
 import { formatDateTime, formatMoney as formatLocalizedMoney, t } from '../../i18n';
 import type { TranslationKey } from '../../i18n.catalog';
-import { tooltipEffectiveQuality } from '../../item_instance_tooltip';
 import { itemNameColor } from '../../item_name_color';
 import { knownItemDef } from '../../known_item';
 
@@ -58,6 +56,7 @@ import { WOC_LOG_BAD, WOC_LOG_GOOD, WOC_LOG_NOTE } from '../../woc_log_tones';
 import { wocPaymentPendingText } from '../../woc_market_reason_text';
 import type { WocMarketHooks } from '../../woc_market_window';
 import { wocTokensText } from '../../woc_tokens_text';
+import { wornItemCellParts } from '../../worn_item_cell_view';
 import {
   adoptedWocOffer,
   selectStandingWocOffer,
@@ -1426,10 +1425,17 @@ export class WocTradeController {
         // The staged COPY's own quality (a legacy legendary-rolled copy is
         // tradable and reads legendary here, the all-surfaces item-cell rule;
         // a promoted copy is bound and never reaches the table).
-        const qColor = item
-          ? itemNameColor({ kind: item.kind, quality: bagQualityKey(item, s.instance) })
-          : QUALITY_DEFAULT_COLOR;
-        const inner = `${item ? this.itemIcon(item, tooltipEffectiveQuality(item, s.instance)) : unknownItemIconHtml(s.itemId)}<span style="color:${qColor}">${esc(label)}</span>`;
+        // One cell-authority read for the color AND the rim (the label keeps
+        // the def name plus count from buildTradeItemRow: a promoted copy is
+        // bound and never reaches the table, so only a persisted named-but-
+        // unbound payload, which the load arm admits but the live shape never
+        // mints, would show the def here beside the chosen name in its tooltip).
+        const parts = item ? wornItemCellParts(item, s.instance) : null;
+        const qColor =
+          item && parts
+            ? itemNameColor({ kind: item.kind, quality: parts.quality ?? 'common' })
+            : QUALITY_DEFAULT_COLOR;
+        const inner = `${item && parts ? this.itemIcon(item, parts.quality) : unknownItemIconHtml(s.itemId)}<span style="color:${qColor}">${esc(label)}</span>`;
         return mine
           ? `<button type="button" class="trade-item mine" data-item="${esc(s.itemId)}">${inner}</button>`
           : `<div class="trade-item">${inner}</div>`;

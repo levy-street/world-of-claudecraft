@@ -76,6 +76,7 @@ import { focusActiveTab, wireTabStrip } from './tab_strip_painter';
 import { tabStripHtml, tabStripModel } from './tab_strip_view';
 import { svgIcon } from './ui_icons';
 import { unknownItemIconHtml } from './unknown_item_icon';
+import { wornItemCellParts } from './worn_item_cell_view';
 
 // The unranked quality fallback as a CSS custom property. The shared QUALITY_COLOR
 // map carries the real per-quality hex; this token covers an item with no quality
@@ -751,9 +752,13 @@ export class BankWindow {
       // server resolves it by slotIndex, no def needed; only the def-derived
       // tooltip body is replaced.
       const countLabel = this.fmt(slot.count);
+      // The cell authority (worn_item_cell_view.ts) for a known def: the
+      // chosen name for the accessible name, the copy's effective quality
+      // for the icon rim (the q-<key> class above keeps its string key).
+      const parts = item ? wornItemCellParts(item, slot.instance) : null;
       cell.setAttribute(
         'aria-label',
-        item
+        parts
           ? t(
               locked
                 ? 'hudChrome.bags.itemAriaLocked'
@@ -761,7 +766,7 @@ export class BankWindow {
                   ? INSTANCE_GLYPH_ARIA_KEYS[glyphKind]
                   : 'itemUi.bags.itemAria',
               {
-                item: slot.instance?.name ?? itemDisplayName(item),
+                item: parts.name,
                 count: countLabel,
               },
             )
@@ -772,7 +777,7 @@ export class BankWindow {
               { id: slot.itemId, count: countLabel },
             ),
       );
-      cell.innerHTML = `${item ? this.deps.itemIcon(item) : unknownItemIconHtml(slot.itemId)}${instanceMark}${lockSeal}<span class="bank-count">${slot.showCount ? esc(t('itemUi.bags.stackCount', { count: countLabel })) : ''}</span>`;
+      cell.innerHTML = `${item && parts ? this.deps.itemIcon(item, parts.quality) : unknownItemIconHtml(slot.itemId)}${instanceMark}${lockSeal}<span class="bank-count">${slot.showCount ? esc(t('itemUi.bags.stackCount', { count: countLabel })) : ''}</span>`;
       cell.addEventListener('click', (ev) => {
         // On touch, the click that ends a long-press peek inspects the slot (its
         // tooltip is already shown) instead of withdrawing: the release dismisses

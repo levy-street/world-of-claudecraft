@@ -40,7 +40,12 @@ describe('char_window: no magic values', () => {
     // map's common rung, never the old var() token, since the inspect nameplate
     // and the player-card canvas consume the same value); the empty-slot pair
     // stays here.
-    const cellView = readFileSync(join(__dirname, '../src/ui/worn_item_cell_view.ts'), 'utf8');
+    // Comment-stripped both ways: a comment quoting the expression must not
+    // satisfy the positive pin, and one naming the retired token must not
+    // fail the negative (the source-text pin trap).
+    const cellView = readFileSync(join(__dirname, '../src/ui/worn_item_cell_view.ts'), 'utf8')
+      .replace(/\/\*[\s\S]*?\*\//g, '')
+      .replace(/(^|[^:'"`])\/\/.*$/gm, '$1');
     expect(cellView).toContain("QUALITY_COLOR[quality ?? 'common'] ?? QUALITY_COLOR.common");
     expect(cellView).not.toContain('var(--color-quality-default)');
     expect(painter).not.toContain('QUALITY_DEFAULT_COLOR');

@@ -37,6 +37,7 @@ interface Rig {
       theirAccepted: boolean;
     } | null;
     logs: string[];
+    iconQualities: (string | undefined)[];
     pushed: number;
     bagRenders: number;
     setStagedCalls: number;
@@ -55,6 +56,7 @@ function rig(marketHooks: WocMarketHooks | null = null): Rig {
     inventory: [],
     tradeInfo: null,
     logs: [],
+    iconQualities: [] as (string | undefined)[],
     pushed: 0,
     bagRenders: 0,
     setStagedCalls: 0,
@@ -98,7 +100,10 @@ function rig(marketHooks: WocMarketHooks | null = null): Rig {
     log: (text) => {
       host.logs.push(text);
     },
-    itemIcon: () => '<span class="icon"></span>',
+    itemIcon: (_item, quality) => {
+      host.iconQualities.push(quality);
+      return '<span class="icon"></span>';
+    },
     attachTooltip: () => {},
     itemTooltip: () => '',
     renderBags: () => {
@@ -493,6 +498,9 @@ describe('a staged item renders its name in the quality colour', () => {
       document.querySelector<HTMLElement>('#trade-window .trade-item span[style*="color"]') ?? null;
     expect(span, 'the name span carries an inline colour').not.toBeNull();
     expect(span?.style.color.replace(/\s/g, '')).toBe(QUALITY_COLOR.legendary);
+    // The icon rim asks the dep for the same copy quality the colour read
+    // (the round-2 frontend finding: the 1-ary dep swallowed it).
+    expect(r.host.iconQualities).toContain('legendary');
   });
 });
 

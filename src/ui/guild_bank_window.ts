@@ -63,6 +63,7 @@ import { tSim } from './sim_i18n';
 import { focusActiveTab, wireTabStrip } from './tab_strip_painter';
 import { tabStripHtml, tabStripModel } from './tab_strip_view';
 import { svgIcon } from './ui_icons';
+import { wornItemCellParts } from './worn_item_cell_view';
 
 // The unranked quality fallback as a CSS custom property (mirrors bank_window's
 // QUALITY_DEFAULT_COLOR; kept local so the pane stays independently importable).
@@ -462,9 +463,11 @@ export class GuildBankTab {
     // namespace inside the one module that imports focus_restore (the guard in
     // tests/focus_restore.test.ts pins that single-reader rule).
     const dormantClass = slot.dormant ? ' gbank-dormant' : '';
-    const itemName = item
-      ? (slot.instance?.name ?? itemDisplayName(item))
-      : t('hudChrome.bank.guildUnknownItem');
+    // The cell authority (worn_item_cell_view.ts): no promoted copy reaches
+    // this grid today (bound copies are refused at the anonymous pipe), but
+    // the cell describes its copy the same way every other grid does.
+    const parts = item ? wornItemCellParts(item, slot.instance) : null;
+    const itemName = parts ? parts.name : t('hudChrome.bank.guildUnknownItem');
     const count = this.fmt(slot.count);
     // Corner marks share the bags/personal-bank helpers and priority core
     // (bag_corner_mark_view.ts) so a guild-banked masterwork or fine stack
@@ -489,7 +492,7 @@ export class GuildBankTab {
       const qColor = QUALITY_COLOR[slot.qualityKey] ?? QUALITY_DEFAULT_COLOR;
       cell.style.setProperty('--bank-slot-quality', qColor);
       const mark = slot.dormant ? `<span class="gbank-dormant-mark">${svgIcon('lock')}</span>` : '';
-      cell.innerHTML = `${this.deps.itemIcon(item)}${instanceMark}${lockSeal}<span class="bank-count">${
+      cell.innerHTML = `${this.deps.itemIcon(item, parts?.quality)}${instanceMark}${lockSeal}<span class="bank-count">${
         slot.showCount ? esc(t('itemUi.bags.stackCount', { count })) : ''
       }</span>${mark}`;
       this.deps.attachTooltip(cell, () => {

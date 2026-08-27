@@ -72,6 +72,7 @@ import {
 } from './market_view';
 import type { PainterHostPresentation } from './painter_host';
 import { svgIcon } from './ui_icons';
+import { wornItemCellParts } from './worn_item_cell_view';
 
 // The filter dropdown's natural size (mirrors .mkt-select-menu's max-height/gap in
 // components.css). #market-window clips with overflow: hidden on mobile, and a menu
@@ -744,7 +745,7 @@ export class MarketWindow {
       const qColor = marketNameColor(effQuality);
       const row = document.createElement('div');
       row.className = 'mkt-row';
-      const itemName = itemDisplayName(item);
+      const itemName = wornItemCellParts(item, l.instance).name;
       const each =
         l.count > 1
           ? `<br><span class="seller">${esc(t('itemUi.market.each', { money: formatLocalizedMoney(Math.ceil(l.price / l.count)) }))}</span>`
@@ -926,7 +927,7 @@ export class MarketWindow {
     const qColor = marketNameColor(stagedQuality);
     const pick = document.createElement('div');
     pick.className = 'mkt-sell-pick';
-    pick.innerHTML = `${this.deps.itemIcon(item, stagedQuality)}<span class="ps-name" style="color:${qColor}">${esc(itemDisplayName(item))}</span>`;
+    pick.innerHTML = `${this.deps.itemIcon(item, stagedQuality)}<span class="ps-name" style="color:${qColor}">${esc(wornItemCellParts(item, view.form.instance).name)}</span>`;
     // The staged copy's tooltip carries its payload, so a player holding plain
     // AND special copies can see WHICH one is staged (the mail chip precedent).
     this.deps.attachTooltip(pick, () => this.deps.itemTooltip(item, view.form.instance));
@@ -1036,7 +1037,7 @@ export class MarketWindow {
         count > 1
           ? ` ${t('itemUi.market.stackCount', { count: formatNumber(count, { maximumFractionDigits: 0 }) })}`
           : '';
-      row.innerHTML = `<span class="mkt-collect-item">${this.deps.itemIcon(item, returnedQuality)}<span class="mkt-collect-name" style="color:${qColor}">${esc(itemDisplayName(item))}${esc(stack)}</span></span>`;
+      row.innerHTML = `<span class="mkt-collect-item">${this.deps.itemIcon(item, returnedQuality)}<span class="mkt-collect-name" style="color:${qColor}">${esc(wornItemCellParts(item, instance).name)}${esc(stack)}</span></span>`;
       this.deps.attachTooltip(row, () => this.deps.itemTooltip(item, instance));
       body.appendChild(row);
     }
@@ -1071,8 +1072,10 @@ export class MarketWindow {
           : '';
       // esc on the buyer: a player-authored name reaching innerHTML raw is the
       // exact hole src/ui/CLAUDE.md names.
+      // The sale ledger carries no copy payload (what sold is gone), so the
+      // row describes the def on both halves, stated rather than defaulted.
       row.innerHTML =
-        `<span class="mkt-collect-item">${this.deps.itemIcon(item)}` +
+        `<span class="mkt-collect-item">${this.deps.itemIcon(item, item.quality)}` +
         `<span class="mkt-sale-name"><span style="color:${qColor}">${esc(itemDisplayName(item))}${esc(stack)}</span>` +
         `<span class="mkt-sale-buyer">${esc(t('itemUi.market.saleBuyer', { buyer: buyerName }))}</span></span></span>` +
         `<span class="mkt-price">${this.deps.moneyHtml(proceeds)}</span>`;

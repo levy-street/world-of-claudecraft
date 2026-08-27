@@ -93,6 +93,7 @@ import { svgIcon } from './ui_icons';
 import { unknownItemIconHtml } from './unknown_item_icon';
 import { totalHeldCount } from './vendor_sell_quantity';
 import { dropOnWorld } from './world_drop_target';
+import { wornItemCellParts } from './worn_item_cell_view';
 
 const BAG_FILTER_KEY = 'woc_bag_filter';
 
@@ -908,7 +909,11 @@ export class BagsWindow {
       row.dataset.focusKey = `bag:${s.itemId}:${this.stackOrdinal(world.inventory, s)}`;
       this.bindBagCellDrop(row, cell);
       const qColor = QUALITY_COLOR[bagQualityKey(item, s.instance)] ?? QUALITY_DEFAULT_COLOR;
-      const itemName = s.instance?.name ?? itemDisplayName(item);
+      // The cell authority (worn_item_cell_view.ts): the chosen name for the
+      // accessible name and the copy's effective quality for the icon rim,
+      // the same pair every other item cell reads.
+      const parts = wornItemCellParts(item, s.instance);
+      const itemName = parts.name;
       // Corner-glyph priority (bag_corner_mark_view.ts, composed from
       // bag_instance_glyph_view + bag_quest_mark_view + bag_fine_mark_view):
       // masterwork > quest seal > fine seal > enchanted / signed / bound >
@@ -950,7 +955,7 @@ export class BagsWindow {
       // .bi-quest-seal-ready (static; optional pulse is CSS-only).
       const cornerSeal = cornerMarkHtml(cornerMark, { questReady });
       const lockSeal = lockMarkHtml(locked);
-      row.innerHTML = `${this.deps.itemIcon(item)}${cornerSeal}${lockSeal}<span class="bi-count">${s.count > 1 ? esc(t('itemUi.bags.stackCount', { count: formatNumber(s.count, { maximumFractionDigits: 0 }) })) : ''}</span>`;
+      row.innerHTML = `${this.deps.itemIcon(item, parts.quality)}${cornerSeal}${lockSeal}<span class="bi-count">${s.count > 1 ? esc(t('itemUi.bags.stackCount', { count: formatNumber(s.count, { maximumFractionDigits: 0 }) })) : ''}</span>`;
       // A firebottle mid-throw-cooldown paints a draining curtain on its slot so the
       // 5s throw pacing is visible in the bag. The bag is a cold window with no
       // per-frame driver, so the sweep is a self-contained CSS animation seeded from
@@ -1119,7 +1124,7 @@ export class BagsWindow {
                 count: Math.max(1, Math.floor(s.count)),
                 index: index >= 0 ? index : null,
               },
-        ghostHtml: () => this.deps.itemIcon(item),
+        ghostHtml: () => this.deps.itemIcon(item, wornItemCellParts(item, s.instance).quality),
         onStart: () => {
           this.hideTooltipClearingTracker();
           this.deps.markEquipDropTargets(s.itemId, index >= 0 ? index : undefined);

@@ -414,16 +414,28 @@ describe('elision key composition stays banished (hud.ts + painter_host.ts sourc
     // fell back to the def's tier on every surface while the pure-core suites
     // stayed green (the seam under test lives in the Hud, which no rig
     // constructs). Comment-stripped so a commented-out arrow cannot count.
-    const hud = read('../src/ui/hud.ts')
-      .replace(/\/\*[\s\S]*?\*\//g, '')
-      .replace(/(^|[^:'"`])\/\/.*$/gm, '$1');
+    const strip = (source: string): string =>
+      source.replace(/\/\*[\s\S]*?\*\//g, '').replace(/(^|[^:'"`])\/\/.*$/gm, '$1');
+    const hud = strip(read('../src/ui/hud.ts'));
     const forwarding = hud.match(
       /itemIcon: \(item, quality\) => this\.itemIcon\(item, quality\),/g,
     );
+    // Every itemIcon KEY in the Hud is one of the forwarding arrows: the total
+    // bounds the set, so an adapter spelled with other parameter names cannot
+    // sit beside the six and escape both the count and the negative below.
+    expect(hud.match(/\bitemIcon:/g), 'every itemIcon key is an adapter').toHaveLength(
+      forwarding?.length ?? 0,
+    );
     expect(forwarding, 'the six adapter arrows all forward the quality').toHaveLength(6);
     expect(hud).not.toMatch(/itemIcon: \(item\) =>/);
-    // The dep the adapters satisfy really declares the second parameter.
-    expect(read('../src/ui/painter_host.ts')).toContain(
+    // The one adapter outside the Hud (the bank window wiring its guild tab)
+    // forwards the same way; it is the same 1-ary-swallow class one file over.
+    const bank = strip(read('../src/ui/bank_window.ts'));
+    expect(bank).toContain('itemIcon: (item, quality) => this.deps.itemIcon(item, quality),');
+    expect(bank).not.toMatch(/itemIcon: \(item\) =>/);
+    // The dep the adapters satisfy really declares the second parameter (over
+    // comment-stripped source, like the arrows).
+    expect(strip(read('../src/ui/painter_host.ts'))).toContain(
       "itemIcon(item: ItemDef, quality?: ItemDef['quality']): string;",
     );
   });
