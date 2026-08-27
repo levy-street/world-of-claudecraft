@@ -19411,3 +19411,300 @@ at 24123a0227 on a tree that now includes release/v0.41.0 at
 b02da096dd. Phase 13's base is this tip; the open maintainer reads are
 the standing sets plus this round's (the trade-layer substitution fix,
 the conscious 145-byte headroom).
+
+## Phase 13 ledger (2026-08-27, the orange promotion)
+
+STATUS: COMPLETE. LOCAL, no push, no PR. The legendary capstone as
+process and prestige (R3), built as the phase file's three-agent
+fan-out with the farming arm folded per step, five fresh reviewers over
+the build, three fresh readers over the fix round, a micro round with
+its own fresh reader, qa-checklist LAST (READY, zero blocking), a
+post-qa host-parity fix with its own fresh reader, and the freeze's own
+census-repair round.
+
+### STEP 0
+Clean at 740effed61 (the Phase 12 QA docs stamp; frozen code tip
+24123a0227 under it). origin/release/v0.41.0 refetched: still
+b02da096dd, already an ancestor (101cc5ceb2), no merge and no merge
+audit owed. tsc clean at start, DATABASE_URL unset. GATE 1 confirmed
+DISCHARGED in CODE, never a ledger row: both farmers' merged
+vendorItems carry the eight tier 3/4 seed rows at 32/64
+(zone3.ts:1472-1478, evergarden.ts:336-342), and the inverted honesty
+arm stands green-means-earnable, so no dormant deed was ever at risk.
+Doc drift found and folded before any edit: the phase file's deed
+baselines were 11d/11e-era (the merged literals are DEED_ORDER 290 /
+renown 3295 / manifest 625 / DEED_ART_PENDING 12 rows, with the
+release's prog_ready_for_an_adventure at the tail, a recorded ordering
+deviation); "the codex naming flow" DOES NOT EXIST (docs/codex.md is
+the Codex-agent operator guide; the real reusable surface is
+offensiveName plus the pet_rename server-screen/sim-shape split, so
+the stopping rule never armed); inscription's live ceiling was skillReq
+100, making recipe_deed_of_making its first 125 rung (the 11h scope
+comment amended dated); and equipment_rules.ts:183 recorded the
+def-only isUniqueEquipped disagreement as deliberate, which the phase
+file's own acceptance overturns (retired dated, D13-4).
+
+### DECISIONS (the phase's rulings)
+- D13-1 THE PROMOTION IS A SEPARATE, DETERMINISTIC ACT on an
+  already-Perfected copy, never folded into the rank-4 stamp: Phase
+  12's cadence targets BOTH cap slots Perfected while the legendary
+  sub-cap is 1, so folding would strand the second slot. Zero rng draws
+  on every promotion arm, deny and success alike (the module header's
+  draw table restated whole); consumes exactly 1 deed_of_making and no
+  attempt materials; the retired 'That item is already Perfected.'
+  line is replaced by the promotion routing (DEPLOY.md carries the
+  rolling-window note).
+- D13-2 THE CANONICAL PLAYER-AUTHORED-TEXT PATTERN (the farming-arm
+  ruling, judged against "{name}'s Harvest Feast"): player text is
+  always a VALUE, never a key. Standalone (a name) it renders raw
+  through the entity-name path, esc'd, never through t(); composed
+  into a sentence, the sentence is a t() template with the name
+  interpolated as a value (the feast / makers-mark precedent, which
+  are ONE pattern, not two). Phase 13 conforms on both halves (tooltip
+  title raw; celebration lines templated); NO third plumbing exists.
+- D13-3 THE NAME RIDES THE PUBLIC VIEWS: payload.name JOINS the eqi
+  peer allowlist, publicInstanceView, and wornTooltipInstance beside
+  signer/enchant/rolled (an inspecting viewer seeing the name is the
+  point), the first cosmetic JOIN since the exclusion rule was
+  written; boundTo/bindOnTrade/charges/perfecting/perfected stay
+  excluded by name in the pins. perfected stays OFF the peer wire (the
+  Phase 12 judged decision, undisturbed); the SELF projection
+  wornTooltipInstance keeps perfected by ruling (client-side only),
+  and self-inspect hands IWorld.equipmentInstances through
+  openInspect's fourth parameter so both hosts agree; a peer's card
+  deliberately shows no Unique-Equipped tag for an instance-legendary
+  copy, the recorded consequence.
+- D13-4 isUniqueEquipped IS INSTANCE-AWARE, ADD-ONLY,
+  PROMOTION-SCOPED: def legendary OR (perfected AND rolled legendary).
+  The "first legal legendary-rolled instance" claim was FALSE (legacy
+  masterwork bumps wrote rolled.quality) and was corrected in every
+  home; legacy legendary-rolled copies keep their legendary DISPLAY
+  (the honest roll) while the equip rule spares them (dated at both
+  homes): display-vs-equip is a decision, not drift.
+- D13-5 MODERATION: the server screens CONTENT via offensiveName on
+  the NORMALIZED name (shape-invalid skips the matcher and rides to
+  the sim's refusal); the sim owns SHAPE (legendary_name.ts,
+  ^[A-Za-z][A-Za-z' -]{1,31}$ after trim+collapse, load bound 48
+  printable ASCII on the signer doctrine) and state. Remediation is
+  POST /admin/api/moderation/characters/:id/clear-item-name on its own
+  SUPERADMIN-ONLY permission moderation.clearItemName (the
+  guildbank.purge destroys-player-property doctrine), audited
+  clear_item_name with a required reason, an explicit target (slot |
+  bag+itemId | all: true), the offline strip across the five payload
+  regions (provably exhaustive: promoted copies are permanently
+  soulbound), online refusal with KICK-THEN-CLEAR as the decided
+  operator flow (a live-session sim action was considered and CUT),
+  and a pre-save online re-check closing the reconnect race. The
+  banlist stays operator-tunable (USERNAME_BANLIST/_FILE; the cache
+  key folds mtime+size so an edited file takes effect without a
+  restart; fail-open on an unreadable file by decision). The Discord
+  card sanitizes itemName to the mint shape as defense in depth.
+- D13-6 recipe_deed_of_making at inscription 125 (trainer,
+  apothecary), the craft's first 125 rung per R13 and the phase file;
+  bill 3 sablewax_vellum + 1 wyrmfall_core + 2 sunpetal_herb +
+  2 arcane_essence + 1 glass_vial ("Input 553 (buyValue basis) vs
+  output 50", the consumed-capstone idiom); deed_of_making is a rare
+  tradable stackable kind-junk (the wyrmfall_core arm: an
+  inscriptionist scribes it FOR the promoter), NOT oncePerDay (blob F6
+  stays a no-op), no noDiscard (judged: matches its named arm), a
+  deliberate non-material (the taxonomy and bag-census allowlists
+  carry the rationale).
+- D13-7 THE DEED: prog_legendmaker ("The Legendmaker",
+  naming-audit-cleared), progression, renown 50 (top-band prestige:
+  the capstone chain on top of the masterwork moment; effort-paced
+  fail-forward, never luck-gated; the 50-vs-masterwright-25 doubling
+  recorded as a maintainer read), stat trigger legendariesForged
+  count 1, NO title (so DEED_ART_PENDING is legitimate), appended at
+  the table tail after prog_ready_for_an_adventure.
+
+### THE BUILT SHAPE
+- perfecting.ts: resolvePerfectingAttempt's perfected branch DELEGATES
+  to the exported resolveLegendaryPromotion over one shared deny head
+  (resolvePerfectingHead), then promotePerfectedCopy: already
+  legendary / name missing / name shape / equip legality (worn:
+  unique + sub-cap with own slot excluded; bagged: unique only; the
+  equip literals reused byte-exact) / deed lock-only / deed shortfall;
+  then consume, stamp rolled.quality 'legendary' + payload.name (stats
+  byte-identical, signer retained), bumpDeedStat legendariesForged,
+  markItemDiscovered at the stamp (the legendary discovery lands
+  same-tick, not next login), recalcPlayerStats on the worn arm (the
+  peer eqi mirror rebuild the first review round caught by probe),
+  legendaryForged personal + legendaryForgedZone via the NEW shared
+  announceZoneCelebration (the rule-of-three extraction all three zone
+  producers ride), wireRev++. perfectingInfo gains promoted,
+  equipBlocked (the affordance rule: no view promises what the arm
+  refuses), and the deed bill on materials once perfected.
+- Sim entries split: perfectItem(ref, name?) IWorld-facing,
+  perfectItemAs(pid, ref, name?) server-facing (the typeof
+  discriminator retired); refusedWhileDead on both. The candidate peek
+  family honors an explicit slotIndex so the copy judged and the copy
+  consumed can never differ (probe-confirmed exploitable both
+  directions pre-fix); the UI drop predictor threads the drag source
+  cell and refuses an invalid selection (blockedSelection).
+- Wire: perfect_item gains optional name (parse core
+  resolvePerfectItemName normalizes first; senderFields
+  slot/bag/item/name; command counts UNMOVED 206/219/13; world_api
+  counts UNMOVED 334/87/247/33, no new facet member). Discord:
+  ActivityKind gains 'legendary' in both closed unions; the card-emit
+  body moved whole to server/craft_activity.ts parameterized by kind
+  (move-not-rewrite: every pre-existing masterwork observer pin passed
+  unmodified); dedupe key legendary:<accountId>, deed_broadcasts
+  opt-out, R60 release.
+- Client: tooltip title = the chosen name esc'd raw with the def name
+  beneath; title color, quality label, unique tag, bag/bank/guild
+  rims, paperdoll socket row + unequip aria, market
+  browse/staged/returned rows + icon rims, the inspect card row, and
+  the compare card (the NEW item_compare_view pure core; deltas merge
+  rolled.stats per side with the Number.isFinite parity guard) all
+  read instance-effective values: the ALL-SURFACES item-cell rule.
+  Celebration text lives in the NEW craft_celebration_text_view pure
+  core (masterwork text moved out of hud.ts; playCue decided there);
+  both legendary chat lines are plainText (the [[i: token hole pinned
+  shut). i18n: four new sim deny keys x21 blocks; error.perfectAlready
+  RETIRED whole; legendary.nameNotAllowed x22 server blocks;
+  hudChrome.crafting.legendaryLine/legendaryZoneLine +
+  materialHint.deedOfMaking (reworded to the live promotion-time
+  mechanic with all five non-Latin fills re-worded same change) +
+  entities.items.deed_of_making, each with five non-Latin fills (M16).
+- Content and admin: the writ, recipe, and deed per DECISIONS; item
+  art parked (ITEM_ART_PENDING + authored ITEM_RECIPES stand-in +
+  audit literals 80 to 81; committed art needs the maintainer's master
+  SHA per ip-16-ICON); deed art parked (DEED_ART_PENDING tail,
+  12 to 13); the remediation endpoint with the dashboard label row and
+  moderation-history key; the sibling restore-family audit lookups
+  realm-scoped in the same sweep.
+
+### REVIEW ROUNDS (five fresh over the build; three over the fix
+round; a micro round; qa LAST; a post-qa parity fix; every round read
+fresh)
+- The build round's three BLOCKING: a worn promotion never rebuilt
+  e.equippedInstances so peers never saw the name (probe-confirmed;
+  the recalc fix is pinned on the mirror); no remediation path for a
+  stamped name (the D13-5 endpoint closed it); a red
+  material_hint_view pin. Plus probe-confirmed sub-cap bypasses (the
+  worn promotion minting equip-illegal states; the slotIndex
+  peek/consume divergence minting a second worn legendary), the
+  legacy-capture hazard, the duplicated deny ladder, the
+  discovery-mark timing, the price-basis and apothecary-count prose,
+  and the presentation set: ALL applied across three lane commits.
+- The fix-round readers' one BLOCKING: the endpoint rode
+  moderation.act where the repo's own guildbank.purge doctrine demands
+  its own SUPERADMIN-ONLY permission (applied), plus the explicit
+  all: true contract, the pre-save online re-check, and the icon
+  q-class / compare-delta / blockedSelection set (applied in the micro
+  commit, whose own fresh reader was clean with three nits: the
+  actionable one, realm-scoping the sibling audit lookups, applied).
+- qa-checklist LAST: READY, zero blocking; its should-fix set (the
+  inspect card row, the tag ruling, this stamp) applied, and the
+  post-qa fresh reader's find (the ONLINE self entity's eqi-shaped
+  mirror diverging self-inspect between hosts) fixed by the
+  IWorld.equipmentInstances hand-through, pinned both directions.
+- Judged this phase, do not re-raise: the phase 14 naming window (the
+  phase file's own out-of-scope; perfectItem has no UI caller yet);
+  the Latin-locale noun mismatch (rides the 0.41.0 release fill); no
+  client-side soft-masking of the name (the character-name
+  precedent); the masterwork seal on the legendary lines (phase 16
+  owns the orange art); the offline host running shape-only (an
+  offline name never reaches another player); the market Collect-tab
+  sale LEDGER rows staying def-only (a past transaction, not a held
+  copy); the name screen refusing the whole frame on an unperfected
+  copy (conservative-safe, commented); the itemName computed before
+  the dedupe claim (pure lookup); the double deny-head run per
+  promotion (pure, draw-free); the two markItemDiscovered routes (the
+  established idiom); the equipCandidateIndex count-0 theoretical; the
+  retired-id per-cell targeting consequence (commented at the
+  validator); the peer card showing no unique tag (the D13-3
+  consequence); deed_of_making without noDiscard; the writ outside the
+  inscription pair convention (the exact-roster pin owns the census).
+
+### PINS (predicted before running, observed after)
+world_api 334/87/247/33 UNMOVED; command schema 206/219/13 UNMOVED.
+Deeds: DEED_ORDER 290 to 291, renown 3295 to 3345, progression 67 to
+68, tail prog_legendmaker, deed_i18n manifest 625 to 627 (291*2+45),
+DEED_IMAGE_IDS 278 UNMOVED, DEED_ART_PENDING 12 to 13 (four art
+files), deeds_view 277/281 to 278/282, FROZEN_CATALOG_SHA256 re-minted
+THE AUDITABLE WAY (the pre-append reconstruction reproduced
+4533079d... exactly; new digest d69e3def57...). DEED_STAT_KEYS 27 to
+28. Item art pendingArtCount 80 to 81 (liveItemCount 928 and
+catalogCount 913 hold: def +1 and debt +1 cancel).
+INSCRIPTION_RECIPES 6 to 7 (the exact-roster identity pin; fee ladder
+gains the 125-rung 160000); ALL_RECIPES 165 to 166; sunpetal_herb
+total 44 to 46; the taxonomy and bag-census allowlists gain the writ.
+Monolith, all extraction-first: game.ts 10492 to 10491 (the craft-card
+body to server/craft_activity.ts; ceiling LOWERED), hud.ts 18263 to
+18245 (the compare card to item_compare_view.ts; ceiling LOWERED),
+sim.ts 12326 EXACT (zero slack recorded), online.ts 5926 EXACT. Blob:
+predicted 17263 + 88 = 17351 from merged literals BEFORE any run (24
+recipe id + 22 quality + 42 name at the 32 ceiling on the ONE legal
+worn promoted slot), observed 17351, DRIFT ZERO; ceiling re-minted
+17408 to 18432 (18 KiB, the recorded conscious position executed,
+never a squeeze), band floor 16971 / edge 17352. Parity:
+perfecting_walk re-recorded ONCE for the retired perfectAlready arm
+alone (a two-line golden diff: the coverage sentence + one events
+digest; state, draws, digest byte-unmoved; no seed churn); every other
+golden byte-unmoved through the whole phase including the
+announceZoneCelebration extraction; farming_session untouched.
+
+### THE FROZEN STAMP: the census repair, then one clean run, EXIT=0
+The FIRST freeze (tip 27dbac17d2) surfaced ELEVEN reds in five suites
+the curated battery never names, the recorded content-id-ripple class:
+the inscription catalog's exactly-six and reagent-table pins, the
+bag-filter All-only census, the material-taxonomy junk allowlist, the
+professions-restore importer guard (tripped by a COMMENT naming the
+guarded identifier: the comment now cites the precedent without
+spelling it), and the recordProfessionsRestore owner-lookup pin behind
+the realm-scoping sweep. Repaired as 8f5c25957f (pins only, zero new
+tests) and re-frozen at that tip: every reader idle AND reported,
+porcelain 0, zero vitest processes, DATABASE_URL unset; the wrapper
+wrote TIP first and SUITE_EXIT=0 before the follow-on stages; one
+fresh log, no commit anywhere between: 3206 test files passed / 21
+skipped (3227), 47177 passed / 2 expected fail / 373 skipped (47552);
+tsc clean; ci:changed EXIT=0; wiki:content and i18n:gen both zero-diff
+(porcelain 0 after both); tip and porcelain unchanged through every
+stage. Drift vs the Phase 12 QA stamp 24123a0227 (3201/21, 47045): +5
+files / +132 tests. The five files are exactly the five new suites
+(orange_promotion, craft_celebration_text_view, item_compare_view,
+legendary_chat_plaintext, server/clear_item_name); the pre-run static
+prediction (+127, net it-line census 137 minus 10 over the phase diff)
+missed five dynamically registered cases the static count cannot see;
+the first run measured the composition (47166 passed + 11 failed) and
+the re-run closed on it exactly. The commit after the run is docs-only
+(this ledger, progress.md, the memory notes), the sanctioned
+exception.
+
+### RECORDED, NOT ACTED (maintainer reads on top of the standing sets)
+- Renown 50 for prog_legendmaker doubles the prog_masterwright 25
+  precedent (band-legal; rationale at the row; a balance number).
+- The per-call statSync on the banlist file (only when configured;
+  command-lane metered) and the per-broadcast eqi name field: named
+  for the Phase 13 QA hot-path lane.
+- The RL/headless host cannot complete Perfecting (the ember faucet
+  needs resetDay), so the deed is unearnable there (a pre-existing
+  property; deeds are not an RL surface).
+- The invalid-index UI mirror can still light-then-refuse on a STALE
+  drag when bags shift mid-drag (the sim refuses authoritatively).
+- maybeAutoEquip stays def-only on the unique peek (no reachable state
+  hits the gap: promoted copies are bound and never arrive via a
+  granting channel).
+- Phase 16 owes the orange render visuals, the legendary card art, and
+  the bot union's farming member (the handed list); phase 14 owes the
+  naming window UX (the prompt_dialog recipe, the 16px mobile floor,
+  the client length cap) and the perfectingInfo consumers (promoted,
+  equipBlocked, skillMet's synced gate).
+- The visual-change screenshots ride the eventual PR
+  (docs/screenshots, the pr-screenshots skill, lowest graphics).
+- The Phase 13 QA twin should dispatch the lanes this round did not
+  run fresh: migration-safety, database-performance, server-hot-path,
+  test-coverage-auditor.
+- The sunpetal-scroll/serpent-elixir parity note in
+  inscription_catalog stands unchanged (11g's drift, not this
+  phase's).
+
+HANDOFF: Phase 13 QA (phase-13-qa.md), the twin. The orange promotion
+is standing: deterministic and draw-free on every arm, presentation
+only with stats proven byte-identical, the name server-screened,
+self-remediable by superadmin, and visible on every surface the copy
+appears; both rules count a promoted copy and the equip paths cannot
+be gamed by stack ordering; the frozen suite is green at 8f5c25957f
+with the drift attributed exactly. The open maintainer reads are the
+standing sets plus this round's list above.
