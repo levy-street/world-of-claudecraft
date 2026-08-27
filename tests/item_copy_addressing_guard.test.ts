@@ -101,9 +101,33 @@ const EXEMPT: ReadonlyArray<{ cmd: string; why: string }> = [
     cmd: 'market_sell_price_check',
     why: 'a read-only price lookup keyed by item id (issue 3043), not an action on a held copy: it never touches bags or escrow, so there is no copy to address',
   },
+];
+
+/**
+ * Item commands whose untrusted-input parse lives in a PURE CORE module the
+ * dispatch arm consumes (server/CLAUDE.md module-first), so the inline
+ * Number.isInteger scan above cannot see them. An entry here is NOT an
+ * exemption: the teeth move with the parse. The arm must CALL the named
+ * parser, the parser module must carry the integer check on the named cell
+ * field, and the parsed ref must reach the sim call in the same arm, so a
+ * command in this family keeps the whole addressed contract. (perfect_item
+ * was first classified EXEMPT with a prose pointer at its pins; the QA
+ * test-decisiveness lane flagged that precedent as eroding the guard for
+ * every future parse-core command, hence this table.)
+ */
+const PARSE_CORE_COMMANDS: ReadonlyArray<{
+  cmd: string;
+  parser: string;
+  module: string;
+  cellField: string;
+  senderFields: string[];
+}> = [
   {
     cmd: 'perfect_item',
-    why: 'DOES name its copy (a worn equipment slot, or a bag cell plus the item id seen there: the index-plus-id pin), but through the pure parse core server/perfect_item_ref.ts rather than an inline dispatch arm, so the inline Number.isInteger scan above cannot see it; the wire shapes, the drop matrix, and the sim-side stale-cell denial are pinned in tests/perfect_item_ref.test.ts, tests/perfecting_wire.test.ts, and tests/perfecting.test.ts',
+    parser: 'parsePerfectItemRef',
+    module: '../server/perfect_item_ref.ts',
+    cellField: 'bag',
+    senderFields: ['slot', 'bag', 'item'],
   },
 ];
 
@@ -159,16 +183,46 @@ describe('every item command can name the copy it acts on', () => {
     );
   });
 
-  it('exempts only commands with a written reason, and no command is in both lists', () => {
+  it.each(PARSE_CORE_COMMANDS)(
+    '$cmd names its copy through the $parser parse core, with teeth',
+    ({ cmd, parser, module, cellField, senderFields }) => {
+      const body = senderBodyFor(cmd);
+      expect(body, `no ClientWorld sender found for ${cmd}`).not.toBe('');
+      for (const f of senderFields) {
+        expect(body, `${cmd} must be able to send ${f}`).toContain(f);
+      }
+      const at = SERVER.indexOf(`case '${cmd}':`);
+      expect(at, `no dispatch arm for ${cmd}`).toBeGreaterThan(-1);
+      const rest = SERVER.slice(at + `case '${cmd}':`.length);
+      const nextCase = rest.indexOf("case '");
+      const arm = nextCase === -1 ? rest : rest.slice(0, nextCase);
+      expect(arm, `${cmd} must parse through ${parser} in its OWN arm`).toContain(`${parser}(`);
+      const parserSource = readFileSync(new URL(module, import.meta.url), 'utf8');
+      expect(parserSource, `${parser} must carry the integer check on msg.${cellField}`).toContain(
+        `Number.isInteger(msg.${cellField})`,
+      );
+      const simCall = arm.slice(arm.indexOf('sim.'));
+      expect(simCall, `${cmd} must forward the parsed ref to the sim call`).toMatch(/\bref\b/);
+    },
+  );
+
+  it('exempts only commands with a written reason, and no command is in two lists', () => {
     // Guards the guard. An exemption with no reason, or a command quietly living
-    // in both tables, would let a surface escape while the file still looked
+    // in two tables, would let a surface escape while the file still looked
     // complete.
     for (const row of EXEMPT) {
       expect(row.why.length, `${row.cmd} needs a real reason`).toBeGreaterThan(30);
     }
     const addressed = new Set(ADDRESSED_COMMANDS.map((r) => r.cmd));
+    const parseCore = new Set(PARSE_CORE_COMMANDS.map((r) => r.cmd));
     for (const row of EXEMPT) {
       expect(addressed.has(row.cmd), `${row.cmd} cannot be both addressed and exempt`).toBe(false);
+      expect(parseCore.has(row.cmd), `${row.cmd} cannot be both parse-core and exempt`).toBe(false);
+    }
+    for (const row of PARSE_CORE_COMMANDS) {
+      expect(addressed.has(row.cmd), `${row.cmd} cannot be both addressed and parse-core`).toBe(
+        false,
+      );
     }
   });
 
@@ -188,6 +242,7 @@ describe('every item command can name the copy it acts on', () => {
 
     const classified = new Set([
       ...ADDRESSED_COMMANDS.map((r) => r.cmd),
+      ...PARSE_CORE_COMMANDS.map((r) => r.cmd),
       ...EXEMPT.map((r) => r.cmd),
     ]);
     const unclassified = [...sending].filter((c) => !classified.has(c)).sort();
