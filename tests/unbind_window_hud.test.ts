@@ -68,9 +68,11 @@ describe('hud.ts unbindResult event arm (source pins)', () => {
     // receiver (casts and aliases included); the QUOTED 'reason' literal
     // banned from the arm in every quote form, which covers bracket-keyed
     // writes, defineProperty('reason', ...) by name, AND the variable-key
-    // spelling (const k = 'reason'; ev[k] = ...), since minting the key
-    // needs the literal somewhere in the arm (the live arm only ever reads
-    // ev.reason dotted, so the ban costs nothing); a quoted object-literal
+    // spelling minted IN the arm (const k = 'reason'; ev[k] = ...): the
+    // plain spellings all carry the literal in the arm (a key minted
+    // outside the slice or by concatenation would not, and no source pin
+    // of this class closes deliberate evasion; the live arm only ever
+    // reads ev.reason dotted, so the ban costs nothing); a quoted object-literal
     // binding; and the dynamic write channels (defineProperty / Reflect.set
     // / Object.assign) banned outright since an Object.assign from a
     // variable would carry no quoted key for the literal ban to see.
