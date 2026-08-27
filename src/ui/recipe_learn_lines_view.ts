@@ -8,10 +8,12 @@
 // authoring error content guards pin out of shipped scrolls, never a
 // player-actionable state).
 
+import { ENCHANTS } from '../sim/content/enchants';
 import { recipeById } from '../sim/content/recipes';
 import { ITEMS } from '../sim/data';
 import { TIER_SKILL_STEP, tierForSkill } from '../sim/professions/wheel';
 import { craftNameText } from './craft_name_view';
+import { enchantNameKey } from './enchant_apply_view';
 import { itemDisplayName } from './entity_i18n';
 import { formatNumber, t } from './i18n';
 
@@ -24,14 +26,17 @@ const SUCCESS_COLOR = '#7fdc4f';
 const DENY_COLOR = '#ff6b6b';
 
 /** The ONE success surface for both learn paths: a chat line, no toast, no
- *  sound cue (the trainResult single-surface rule). The recipe name derives
- *  from the result item; an unresolvable id falls back to the raw id. */
+ *  sound cue (the trainResult single-surface rule). A recipe id names its
+ *  result item; an enchant FORMULA id (a scroll may teach either table)
+ *  names the enchant through its enchantNameKey sink; an id neither table
+ *  resolves falls back to the raw id. */
 function learnedLine(recipeId: string): LearnResultLine {
   const recipe = recipeById(recipeId);
   const item = recipe ? ITEMS[recipe.resultItemId] : undefined;
+  const formula = recipe ? undefined : ENCHANTS[recipeId];
   return {
     text: t('hudChrome.training.learned', {
-      recipe: item ? itemDisplayName(item) : recipeId,
+      recipe: item ? itemDisplayName(item) : formula ? t(enchantNameKey(formula.id)) : recipeId,
     }),
     color: SUCCESS_COLOR,
   };
@@ -39,10 +44,13 @@ function learnedLine(recipeId: string): LearnResultLine {
 
 function tierUnmetLine(recipeId: string): LearnResultLine {
   const recipe = recipeById(recipeId);
+  const formula = recipe ? undefined : ENCHANTS[recipeId];
+  const professionId = recipe?.professionId ?? (formula ? 'enchanting' : null);
+  const skillReq = recipe?.skillReq ?? formula?.skillReq ?? 0;
   return {
     text: t('hudChrome.training.tierUnmet', {
-      craft: craftNameText(recipe?.professionId ?? null),
-      skill: formatNumber(tierForSkill(recipe?.skillReq ?? 0) * TIER_SKILL_STEP, {
+      craft: craftNameText(professionId),
+      skill: formatNumber(tierForSkill(skillReq) * TIER_SKILL_STEP, {
         maximumFractionDigits: 0,
       }),
     }),

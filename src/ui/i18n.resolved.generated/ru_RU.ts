@@ -3610,6 +3610,7 @@ export const ru_RU: EnTranslations = {
       "yieldLineRange": "{item}: {min}-{max}",
       "alreadyEnchanted": "Этот предмет уже зачарован.",
       "sameEnchant": "На этом предмете уже есть эти чары.",
+      "formulaNotLearned": "You have not learned that formula.",
       "replaceTag": "Заменяет «{enchant}»",
       "sameEnchantTag": "Уже наложено",
       "plainTag": "Без чар",

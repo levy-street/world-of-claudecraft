@@ -19,14 +19,17 @@
 // Host-agnostic sim logic behind the SimContext seam: no Sim import, no
 // DOM, no rng draws in any arm.
 
+import { ENCHANTS, type EnchantDef } from '../content/enchants';
 import { recipeById } from '../content/recipes';
 // Type-only import (the crafting.ts idiom): PlayerMeta is a shape, never the
 // Sim class, so this module stays host-agnostic.
 import type { PlayerMeta } from '../sim';
 import type { SimContext } from '../sim_context';
 import { acquireRecipeForRecipe, isRecipeKnown } from './crafting';
+import { isEnchantKnown } from './enchanting';
 import { teachTierMet } from './training';
 import type { ProfessionRecipeRecord } from './types';
+import { tierForSkill } from './wheel';
 
 export type RecipeScrollDenyReason =
   | 'scroll_already_known'
@@ -88,9 +91,55 @@ export function useRecipeScrollForRecipe(
   ctx.emit({ type: 'recipeScrollResult', ok: true, recipeId: recipe.id, pid: meta.entityId });
 }
 
-/** The items.ts use-arm entry: resolves the recipe id and delegates. An
- *  unknown id emits the silent-deny arm (ok:false, no reason) and never
- *  consumes, exactly like resolveTrain's malformed-id arm. */
+/** The pure teach decision for an ENCHANT FORMULA scroll: the recipe rule
+ *  transposed onto the enchant table. The floor mirrors teachTierMet
+ *  directly (the learner's enchanting tier must reach the formula's
+ *  skillReq tier); it is inlined rather than shared because teachTierMet's
+ *  signature is a full recipe record and a formula is not one. */
+export function resolveFormulaTeach(
+  meta: PlayerMeta,
+  enchant: EnchantDef,
+): RecipeScrollDenyReason | null {
+  if (isEnchantKnown(meta, enchant)) return 'scroll_already_known';
+  if (tierForSkill(meta.craftSkills.enchanting ?? 0) < tierForSkill(enchant.skillReq ?? 0)) {
+    return 'scroll_tier_unmet';
+  }
+  if (!enchant.acquisition?.includes('drop')) return 'scroll_wrong_source';
+  return null;
+}
+
+/** The scroll-use command body for an already-resolved enchant formula: the
+ *  ForRecipe arm's mirror. On success the formula id lands in the SAME
+ *  knownRecipes set recipe ids use (both are content-table ids; the
+ *  load-side sanitizer passes either), which is what isEnchantKnown reads
+ *  at apply time. */
+export function useRecipeScrollForFormula(
+  ctx: SimContext,
+  meta: PlayerMeta,
+  enchant: EnchantDef,
+  consume: () => void,
+): void {
+  const denied = resolveFormulaTeach(meta, enchant);
+  if (denied) {
+    ctx.emit({
+      type: 'recipeScrollResult',
+      ok: false,
+      recipeId: enchant.id,
+      reason: denied,
+      pid: meta.entityId,
+    });
+    return;
+  }
+  meta.knownRecipes.add(enchant.id);
+  consume();
+  ctx.emit({ type: 'recipeScrollResult', ok: true, recipeId: enchant.id, pid: meta.entityId });
+}
+
+/** The items.ts use-arm entry: resolves the id against the recipe table
+ *  first, then the enchant table (a teachRecipe scroll may carry either),
+ *  and delegates. An id neither table resolves emits the silent-deny arm
+ *  (ok:false, no reason) and never consumes, exactly like resolveTrain's
+ *  malformed-id arm. */
 export function useRecipeScroll(
   ctx: SimContext,
   meta: PlayerMeta,
@@ -98,9 +147,14 @@ export function useRecipeScroll(
   consume: () => void,
 ): void {
   const recipe = recipeById(recipeId);
-  if (!recipe) {
-    ctx.emit({ type: 'recipeScrollResult', ok: false, recipeId, pid: meta.entityId });
+  if (recipe) {
+    useRecipeScrollForRecipe(ctx, meta, recipe, consume);
     return;
   }
-  useRecipeScrollForRecipe(ctx, meta, recipe, consume);
+  const enchant = ENCHANTS[recipeId];
+  if (enchant) {
+    useRecipeScrollForFormula(ctx, meta, enchant, consume);
+    return;
+  }
+  ctx.emit({ type: 'recipeScrollResult', ok: false, recipeId, pid: meta.entityId });
 }

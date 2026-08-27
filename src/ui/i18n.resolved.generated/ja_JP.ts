@@ -3610,6 +3610,7 @@ export const ja_JP: EnTranslations = {
       "yieldLineRange": "{item} {min}から{max}個",
       "alreadyEnchanted": "そのアイテムにはすでにエンチャントが付与されています。",
       "sameEnchant": "そのアイテムにはすでに同じエンチャントが付与されています。",
+      "formulaNotLearned": "You have not learned that formula.",
       "replaceTag": "{enchant}を置き換え",
       "sameEnchantTag": "付与済み",
       "plainTag": "エンチャントなし",

@@ -3610,6 +3610,7 @@ export const pt_BR: EnTranslations = {
       "yieldLineRange": "{min} a {max} {item}",
       "alreadyEnchanted": "Esse item já está encantado.",
       "sameEnchant": "Esse item já tem esse encantamento.",
+      "formulaNotLearned": "You have not learned that formula.",
       "replaceTag": "Substitui {enchant}",
       "sameEnchantTag": "Já aplicado",
       "plainTag": "Sem encantamento",

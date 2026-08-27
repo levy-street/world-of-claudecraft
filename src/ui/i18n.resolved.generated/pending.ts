@@ -54,7 +54,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.auraEffect.makersBrand",
     "hudChrome.auraEffect.sharedPyre",
     "hudChrome.auraEffect.varkhulMoltenCore",
-    "hudChrome.auraEffect.varkhulSentinelsGaze"
+    "hudChrome.auraEffect.varkhulSentinelsGaze",
+    "hudChrome.enchanting.formulaNotLearned"
   ],
   "es_ES": [
     "entities.dungeons.ignivar_forge_approach.enterText",
@@ -101,7 +102,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.auraEffect.makersBrand",
     "hudChrome.auraEffect.sharedPyre",
     "hudChrome.auraEffect.varkhulMoltenCore",
-    "hudChrome.auraEffect.varkhulSentinelsGaze"
+    "hudChrome.auraEffect.varkhulSentinelsGaze",
+    "hudChrome.enchanting.formulaNotLearned"
   ],
   "fr_FR": [
     "entities.dungeons.ignivar_forge_approach.enterText",
@@ -153,6 +155,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.auraEffect.varkhulForgeLink",
     "hudChrome.auraEffect.varkhulMoltenCore",
     "hudChrome.auraEffect.varkhulSentinelsGaze",
+    "hudChrome.enchanting.formulaNotLearned",
     "hudChrome.varkhulCallout.addsDefeated",
     "hudChrome.varkhulCallout.bothPillars",
     "hudChrome.varkhulCallout.bothPillarsCharging",
@@ -217,6 +220,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.auraEffect.varkhulForgeLink",
     "hudChrome.auraEffect.varkhulMoltenCore",
     "hudChrome.auraEffect.varkhulSentinelsGaze",
+    "hudChrome.enchanting.formulaNotLearned",
     "hudChrome.varkhulCallout.addsDefeated",
     "hudChrome.varkhulCallout.bothPillars",
     "hudChrome.varkhulCallout.bothPillarsCharging",
@@ -282,6 +286,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.auraEffect.varkhulForgeLink",
     "hudChrome.auraEffect.varkhulMoltenCore",
     "hudChrome.auraEffect.varkhulSentinelsGaze",
+    "hudChrome.enchanting.formulaNotLearned",
     "hudChrome.varkhulCallout.addsDefeated",
     "hudChrome.varkhulCallout.bothPillars",
     "hudChrome.varkhulCallout.bothPillarsCharging",
@@ -346,6 +351,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.auraEffect.varkhulForgeLink",
     "hudChrome.auraEffect.varkhulMoltenCore",
     "hudChrome.auraEffect.varkhulSentinelsGaze",
+    "hudChrome.enchanting.formulaNotLearned",
     "hudChrome.varkhulCallout.addsDefeated",
     "hudChrome.varkhulCallout.bothPillars",
     "hudChrome.varkhulCallout.bothPillarsCharging",
@@ -360,10 +366,18 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.varkhulCallout.worldfireClosing",
     "hudChrome.varkhulCallout.worldfireConsumed"
   ],
-  "zh_CN": [],
-  "zh_TW": [],
-  "ko_KR": [],
-  "ja_JP": [],
+  "zh_CN": [
+    "hudChrome.enchanting.formulaNotLearned"
+  ],
+  "zh_TW": [
+    "hudChrome.enchanting.formulaNotLearned"
+  ],
+  "ko_KR": [
+    "hudChrome.enchanting.formulaNotLearned"
+  ],
+  "ja_JP": [
+    "hudChrome.enchanting.formulaNotLearned"
+  ],
   "pt_BR": [
     "entities.dungeons.ignivar_forge_approach.enterText",
     "entities.dungeons.ignivar_forge_approach.leaveText",
@@ -414,6 +428,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.auraEffect.varkhulForgeLink",
     "hudChrome.auraEffect.varkhulMoltenCore",
     "hudChrome.auraEffect.varkhulSentinelsGaze",
+    "hudChrome.enchanting.formulaNotLearned",
     "hudChrome.varkhulCallout.addsDefeated",
     "hudChrome.varkhulCallout.bothPillars",
     "hudChrome.varkhulCallout.bothPillarsCharging",
@@ -428,7 +443,9 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.varkhulCallout.worldfireClosing",
     "hudChrome.varkhulCallout.worldfireConsumed"
   ],
-  "ru_RU": [],
+  "ru_RU": [
+    "hudChrome.enchanting.formulaNotLearned"
+  ],
   "cs_CZ": [
     "entities.dungeons.ignivar_forge_approach.enterText",
     "entities.dungeons.ignivar_forge_approach.leaveText",
@@ -479,6 +496,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.auraEffect.varkhulForgeLink",
     "hudChrome.auraEffect.varkhulMoltenCore",
     "hudChrome.auraEffect.varkhulSentinelsGaze",
+    "hudChrome.enchanting.formulaNotLearned",
     "hudChrome.varkhulCallout.addsDefeated",
     "hudChrome.varkhulCallout.bothPillars",
     "hudChrome.varkhulCallout.bothPillarsCharging",
@@ -543,6 +561,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.auraEffect.varkhulForgeLink",
     "hudChrome.auraEffect.varkhulMoltenCore",
     "hudChrome.auraEffect.varkhulSentinelsGaze",
+    "hudChrome.enchanting.formulaNotLearned",
     "hudChrome.varkhulCallout.addsDefeated",
     "hudChrome.varkhulCallout.bothPillars",
     "hudChrome.varkhulCallout.bothPillarsCharging",
@@ -607,6 +626,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.auraEffect.varkhulForgeLink",
     "hudChrome.auraEffect.varkhulMoltenCore",
     "hudChrome.auraEffect.varkhulSentinelsGaze",
+    "hudChrome.enchanting.formulaNotLearned",
     "hudChrome.varkhulCallout.addsDefeated",
     "hudChrome.varkhulCallout.bothPillars",
     "hudChrome.varkhulCallout.bothPillarsCharging",
@@ -671,6 +691,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.auraEffect.varkhulForgeLink",
     "hudChrome.auraEffect.varkhulMoltenCore",
     "hudChrome.auraEffect.varkhulSentinelsGaze",
+    "hudChrome.enchanting.formulaNotLearned",
     "hudChrome.varkhulCallout.addsDefeated",
     "hudChrome.varkhulCallout.bothPillars",
     "hudChrome.varkhulCallout.bothPillarsCharging",
@@ -735,6 +756,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.auraEffect.varkhulForgeLink",
     "hudChrome.auraEffect.varkhulMoltenCore",
     "hudChrome.auraEffect.varkhulSentinelsGaze",
+    "hudChrome.enchanting.formulaNotLearned",
     "hudChrome.varkhulCallout.addsDefeated",
     "hudChrome.varkhulCallout.bothPillars",
     "hudChrome.varkhulCallout.bothPillarsCharging",
@@ -799,6 +821,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.auraEffect.varkhulForgeLink",
     "hudChrome.auraEffect.varkhulMoltenCore",
     "hudChrome.auraEffect.varkhulSentinelsGaze",
+    "hudChrome.enchanting.formulaNotLearned",
     "hudChrome.varkhulCallout.addsDefeated",
     "hudChrome.varkhulCallout.bothPillars",
     "hudChrome.varkhulCallout.bothPillarsCharging",
@@ -863,6 +886,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.auraEffect.varkhulForgeLink",
     "hudChrome.auraEffect.varkhulMoltenCore",
     "hudChrome.auraEffect.varkhulSentinelsGaze",
+    "hudChrome.enchanting.formulaNotLearned",
     "hudChrome.varkhulCallout.addsDefeated",
     "hudChrome.varkhulCallout.bothPillars",
     "hudChrome.varkhulCallout.bothPillarsCharging",
@@ -927,6 +951,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.auraEffect.varkhulForgeLink",
     "hudChrome.auraEffect.varkhulMoltenCore",
     "hudChrome.auraEffect.varkhulSentinelsGaze",
+    "hudChrome.enchanting.formulaNotLearned",
     "hudChrome.varkhulCallout.addsDefeated",
     "hudChrome.varkhulCallout.bothPillars",
     "hudChrome.varkhulCallout.bothPillarsCharging",

@@ -3610,6 +3610,7 @@ export const cs_CZ: EnTranslations = {
       "yieldLineRange": "{min} až {max} {item}",
       "alreadyEnchanted": "Tento předmět je již okouzlený.",
       "sameEnchant": "Tento předmět už má toto okouzlení.",
+      "formulaNotLearned": "You have not learned that formula.",
       "replaceTag": "Nahradí {enchant}",
       "sameEnchantTag": "Již aplikováno",
       "plainTag": "Bez okouzlení",

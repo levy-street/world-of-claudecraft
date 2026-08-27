@@ -177,6 +177,8 @@ export interface ApplyEnchantResultView {
     // re-apply whose accept would be pure reagent loss.
     | 'already_enchanted'
     | 'same_enchant'
+    // Raid formula gate: a gated formula this character has not learned.
+    | 'formula_not_learned'
     | 'busy';
 }
 

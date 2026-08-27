@@ -6331,6 +6331,8 @@ export type SimEvent = { pid?: number } & (
         // and the identical-enchant-id re-apply denied on every arm.
         | 'already_enchanted'
         | 'same_enchant'
+        // Raid formula gate: a gated formula this character has not learned.
+        | 'formula_not_learned'
         | 'busy';
     }
   // Outcome of applying a loadout's saved gear set. TEXT-FREE on purpose: the sim

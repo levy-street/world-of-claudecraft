@@ -3610,6 +3610,7 @@ export const en_XA: EnTranslations = {
       "yieldLineRange": "[{min} ţó {max} {item}]",
       "alreadyEnchanted": "[Ţĥáţ íţéɱ íš áļŕéáðý éñçĥáñţéð.]",
       "sameEnchant": "[Ţĥáţ íţéɱ áļŕéáðý ĥáš ţĥáţ éñçĥáñţ.]",
+      "formulaNotLearned": "[Ýóú ĥáʋé ñóţ ļéáŕñéð ţĥáţ ƒóŕɱúļá.]",
       "replaceTag": "[Ŕéþļáçéš {enchant}]",
       "sameEnchantTag": "[Áļŕéáðý áþþļíéð]",
       "plainTag": "[Ñóţ éñçĥáñţéð]",

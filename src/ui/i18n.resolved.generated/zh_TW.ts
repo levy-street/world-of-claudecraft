@@ -3610,6 +3610,7 @@ export const zh_TW: EnTranslations = {
       "yieldLineRange": "{item} {min} 至 {max} 個",
       "alreadyEnchanted": "那件物品已經附魔。",
       "sameEnchant": "那件物品已經擁有該附魔。",
+      "formulaNotLearned": "You have not learned that formula.",
       "replaceTag": "替換{enchant}",
       "sameEnchantTag": "已施加",
       "plainTag": "未附魔",

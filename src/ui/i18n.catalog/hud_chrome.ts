@@ -4929,6 +4929,9 @@ export const hudChromeStrings = {
     // ruling; the cost line states the reagents being paid before they are.
     alreadyEnchanted: 'That item is already enchanted.',
     sameEnchant: 'That item already has that enchant.',
+    // Raid formula gate deny (docs/prd/ignivar-raid-professions.md): a
+    // gated formula this character has not learned from its dropped scroll.
+    formulaNotLearned: 'You have not learned that formula.',
     replaceTag: 'Replaces {enchant}',
     sameEnchantTag: 'Already applied',
     // The tag on the PLAIN twin of a mixed holding (#2421): one item id held

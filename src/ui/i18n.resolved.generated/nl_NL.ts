@@ -3610,6 +3610,7 @@ export const nl_NL: EnTranslations = {
       "yieldLineRange": "{min} tot {max} {item}",
       "alreadyEnchanted": "Dat voorwerp is al betoverd.",
       "sameEnchant": "Dat voorwerp heeft die betovering al.",
+      "formulaNotLearned": "You have not learned that formula.",
       "replaceTag": "Vervangt {enchant}",
       "sameEnchantTag": "Al toegepast",
       "plainTag": "Niet betoverd",

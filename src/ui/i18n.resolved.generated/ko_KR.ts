@@ -3610,6 +3610,7 @@ export const ko_KR: EnTranslations = {
       "yieldLineRange": "{item} {min}~{max}개",
       "alreadyEnchanted": "해당 아이템에는 이미 마법부여가 되어 있습니다.",
       "sameEnchant": "해당 아이템에는 이미 같은 마법부여가 되어 있습니다.",
+      "formulaNotLearned": "You have not learned that formula.",
       "replaceTag": "{enchant} 대체",
       "sameEnchantTag": "이미 적용됨",
       "plainTag": "마법부여 없음",

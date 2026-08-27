@@ -3610,6 +3610,7 @@ export const id_ID: EnTranslations = {
       "yieldLineRange": "{min} hingga {max} {item}",
       "alreadyEnchanted": "Barang itu sudah dimantrai.",
       "sameEnchant": "Barang itu sudah memiliki mantra itu.",
+      "formulaNotLearned": "You have not learned that formula.",
       "replaceTag": "Menggantikan {enchant}",
       "sameEnchantTag": "Sudah diterapkan",
       "plainTag": "Belum dimantrai",

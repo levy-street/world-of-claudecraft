@@ -8872,6 +8872,7 @@ export type TranslationKeyFlat =
   | 'hudChrome.enchanting.enchantNoSpace'
   | 'hudChrome.enchanting.enchantUnknown'
   | 'hudChrome.enchanting.enchantWrongSlot'
+  | 'hudChrome.enchanting.formulaNotLearned'
   | 'hudChrome.enchanting.noEnchants'
   | 'hudChrome.enchanting.noTargets'
   | 'hudChrome.enchanting.notDisenchantable'

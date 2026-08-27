@@ -681,7 +681,23 @@ export interface ApplyEnchantResult {
     // because its accept would be pure reagent loss with zero state change.
     | 'already_enchanted'
     | 'same_enchant'
+    // Raid formula gate: the enchant carries a non-empty acquisition list
+    // and this character has not learned it (isEnchantKnown below). Denied
+    // on EVERY arm, since bagged, worn, and both replace arms all route
+    // through resolveApplyEnchant's shared prologue.
+    | 'formula_not_learned'
     | 'busy';
+}
+
+/** Whether `meta` currently knows `enchant`: an enchant with no acquisition
+ *  list (or an empty one) is grandfathered, known to everyone with no learn
+ *  step (every pre-raid enchant); otherwise `meta` must hold its id in
+ *  `knownRecipes` (formula ids share the one set with recipe ids: both are
+ *  content-table ids, and the load-side sanitizer passes either). The exact
+ *  isRecipeKnown rule, applied to the enchant table. */
+export function isEnchantKnown(meta: PlayerMeta | undefined, enchant: EnchantDef): boolean {
+  if (!enchant.acquisition || enchant.acquisition.length === 0) return true;
+  return !!meta && meta.knownRecipes.has(enchant.id);
 }
 
 /** The exact instance payload an apply-enchant mints from the copy it
@@ -1049,6 +1065,14 @@ export function resolveApplyEnchant(
   if (!itemDef) return { ok: false, itemId, enchantId, reason: 'unknown_item' };
   const enchant = ENCHANTS[enchantId];
   if (!enchant) return { ok: false, itemId, enchantId, reason: 'unknown_enchant' };
+  // Raid formula gate (docs/prd/ignivar-raid-professions.md): a gated
+  // formula must be learned before it applies, checked in this shared
+  // prologue so the bagged, worn, and both replace arms all inherit it.
+  // Knowledge precedes the slot gate: "you do not know this formula" is the
+  // more fundamental answer, and the picker never offers unlearned ones.
+  if (!isEnchantKnown(ctx.players.get(pid), enchant)) {
+    return { ok: false, itemId, enchantId, reason: 'formula_not_learned' };
+  }
   // The slot-kind gate is shared by both arms: an item declares its slot KIND
   // ('ring' for either finger, 'mainhand' for a one-hand weapon worn in either
   // hand), which is what an enchant's itemSlot names.

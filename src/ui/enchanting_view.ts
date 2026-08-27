@@ -77,6 +77,8 @@ export interface ApplyEnchantResultEvent {
     // identical-enchant-id re-apply denied on every arm.
     | 'already_enchanted'
     | 'same_enchant'
+    // Raid formula gate: a gated formula this character has not learned.
+    | 'formula_not_learned'
     | 'busy';
 }
 
@@ -176,6 +178,8 @@ export function applyEnchantResultToast(ev: ApplyEnchantResultEvent): Enchanting
       return { key: 'hudChrome.enchanting.alreadyEnchanted', sink: 'error' };
     case 'same_enchant':
       return { key: 'hudChrome.enchanting.sameEnchant', sink: 'error' };
+    case 'formula_not_learned':
+      return { key: 'hudChrome.enchanting.formulaNotLearned', sink: 'error' };
     default:
       return { key: 'hudChrome.enchanting.notHeld', sink: 'error' };
   }

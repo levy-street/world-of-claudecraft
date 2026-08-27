@@ -57,6 +57,19 @@ export interface EnchantDef {
   itemSlot: ItemSlot;
   reagents: readonly EnchantReagent[];
   statBonus: Partial<Record<'str' | 'agi' | 'sta' | 'int' | 'spi' | 'armor', number>>;
+  // Learn gating (raid formulas, docs/prd/ignivar-raid-professions.md): the
+  // ProfessionRecipeRecord.acquisition semantics exactly. Absent or empty
+  // means grandfathered, known to everyone (every enchant above in this
+  // file); non-empty means the formula must be learned into knownRecipes
+  // through one of the listed sources before applyEnchant accepts it
+  // (../professions/enchanting.ts isEnchantKnown; formula ids share the one
+  // knownRecipes set with recipe ids).
+  acquisition?: readonly ('trainer' | 'drop' | 'quest')[];
+  // Learn floor for a gated formula: the enchanting skill whose TIER the
+  // learner must reach to learn it from a scroll (the recipe skillReq rule,
+  // resolved by the same tierForSkill ladder). Absent means 0, no floor.
+  // Meaningless while acquisition is absent.
+  skillReq?: number;
 }
 
 export const ENCHANTS: Record<string, EnchantDef> = {

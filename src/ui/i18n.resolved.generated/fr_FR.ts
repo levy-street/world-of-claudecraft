@@ -3610,6 +3610,7 @@ export const fr_FR: EnTranslations = {
       "yieldLineRange": "{min} à {max} {item}",
       "alreadyEnchanted": "Cet objet est déjà enchanté.",
       "sameEnchant": "Cet objet a déjà cet enchantement.",
+      "formulaNotLearned": "You have not learned that formula.",
       "replaceTag": "Remplace {enchant}",
       "sameEnchantTag": "Déjà appliqué",
       "plainTag": "Non enchanté",

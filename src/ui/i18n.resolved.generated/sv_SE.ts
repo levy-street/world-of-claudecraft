@@ -3610,6 +3610,7 @@ export const sv_SE: EnTranslations = {
       "yieldLineRange": "{min} till {max} {item}",
       "alreadyEnchanted": "Det föremålet är redan förtrollat.",
       "sameEnchant": "Det föremålet har redan den förtrollningen.",
+      "formulaNotLearned": "You have not learned that formula.",
       "replaceTag": "Ersätter {enchant}",
       "sameEnchantTag": "Redan applicerad",
       "plainTag": "Inte förtrollad",
