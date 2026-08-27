@@ -1,15 +1,21 @@
 import { EventEmitter } from 'node:events';
-import { mkdtempSync, rmSync, utimesSync, writeFileSync } from 'node:fs';
+import { mkdtempSync, readFileSync, rmSync, utimesSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import {
+  hasBannedTerm,
+  indexBannedTerms,
   MAX_EMAIL_LENGTH,
   normalizeCharName,
   normalizeEmail,
   offensiveName,
   offensiveUsername,
+  setUsernameBanlistStatHoldMsForTest,
   USERNAME_BANLIST_FILE_MAX_BYTES,
+  USERNAME_BANLIST_STAT_HOLD_MS,
+  usernameBanlistBootLine,
+  usernameBanlistStatus,
   validCharName,
   validEmail,
   validUsername,
@@ -74,6 +80,10 @@ function fakeReq(headers: Record<string, string>, remoteAddress: string) {
   req.socket = { remoteAddress };
   return req;
 }
+
+// The banlist tests below edit the file and screen in the same millisecond, so
+// they run with no stat hold; the hold itself is proven by its own case.
+setUsernameBanlistStatHoldMsForTest(0);
 
 function withUsernameBanlist(env: { inline?: string; file?: string }, test: () => void): void {
   const prevInline = process.env.USERNAME_BANLIST;
@@ -761,10 +771,10 @@ describe('username censorship', () => {
       withUsernameBanlist({ file }, () => {
         expect(USERNAME_BANLIST_FILE_MAX_BYTES).toBe(65_536);
         expect(offensiveName('smallterm')).toBe(true);
-        // A regrown or mistaken file one byte past the ceiling is the
+        // A regrown or mistaken file exactly ONE byte past the ceiling is the
         // unreadable class: warned once, never read whole, the last good
         // list still enforced and its own terms never admitted.
-        writeFileSync(file, `hugeterm\n${'z'.repeat(USERNAME_BANLIST_FILE_MAX_BYTES)}`);
+        writeFileSync(file, `hugeterm\n${'z'.repeat(USERNAME_BANLIST_FILE_MAX_BYTES - 8)}`);
         expect(offensiveName('hugeterm')).toBe(false);
         expect(offensiveName('smallterm')).toBe(true);
         expect(offensiveName('hugeterm')).toBe(false);
@@ -793,6 +803,61 @@ describe('username censorship', () => {
     }
   });
 
+  it('usernameBanlistBootLine spells both arms from the status alone', () => {
+    expect(usernameBanlistBootLine({ file: '/x/ban.txt', loaded: true, fileTerms: 12 })).toBe(
+      '  name banlist: /x/ban.txt loaded (12 file terms)',
+    );
+    expect(usernameBanlistBootLine({ file: '/x/ban.txt', loaded: false, fileTerms: 0 })).toBe(
+      '  name banlist: /x/ban.txt NOT READABLE (its terms are not enforced; the built-in and USERNAME_BANLIST terms still are; see the warn above)',
+    );
+  });
+
+  it('DEPLOY.md states the live file ceiling', () => {
+    // A doc figure with no code pin rots at the next constant move.
+    const deploy = readFileSync(join(__dirname, '../DEPLOY.md'), 'utf8');
+    expect(deploy).toContain(`over-${USERNAME_BANLIST_FILE_MAX_BYTES / 1024}-KiB`);
+  });
+
+  it('hasBannedTerm answers exactly terms.some(includes), by a walk bounded by the longest term', () => {
+    const terms = ['ab', 'xyz', 'hitler', 'q'];
+    const index = indexBannedTerms(terms);
+    expect(index.maxLen).toBe(6);
+    for (const name of ['', 'a', 'ab', 'cab', 'xy', 'wxyzw', 'hitle', 'ahitlerb', 'pq', 'zzzz']) {
+      expect(hasBannedTerm(name, index), name).toBe(terms.some((term) => name.includes(term)));
+    }
+    // The term COUNT does not price a screen: a nine-thousand-term list
+    // answers a miss by the same substring walk (name length x longest term).
+    const many = indexBannedTerms(Array.from({ length: 9000 }, (_, i) => `t${i.toString(36)}z`));
+    expect(hasBannedTerm('a'.repeat(32), many)).toBe(false);
+    expect(hasBannedTerm('xxt1zxx', many)).toBe(true);
+  });
+
+  it('holds the file stat to one per USERNAME_BANLIST_STAT_HOLD_MS, then sees the edit', () => {
+    expect(USERNAME_BANLIST_STAT_HOLD_MS).toBe(1000);
+    const dir = mkdtempSync(join(tmpdir(), 'woc-banlist-hold-'));
+    const file = join(dir, 'banlist.txt');
+    writeFileSync(file, 'firstterm\n');
+    try {
+      setUsernameBanlistStatHoldMsForTest(60_000);
+      withUsernameBanlist({ file }, () => {
+        expect(offensiveName('firstterm')).toBe(true);
+        // An edit inside the hold is invisible: no stat runs, the stamp is held.
+        writeFileSync(file, 'secondterm\n');
+        const later = new Date(Date.now() + 5000);
+        utimesSync(file, later, later);
+        expect(offensiveName('secondterm')).toBe(false);
+        expect(offensiveName('firstterm')).toBe(true);
+        // Past the hold (dropped to zero here) the stat runs and the edit lands.
+        setUsernameBanlistStatHoldMsForTest(0);
+        expect(offensiveName('secondterm')).toBe(true);
+        expect(offensiveName('firstterm')).toBe(false);
+      });
+    } finally {
+      setUsernameBanlistStatHoldMsForTest(0);
+      rmSync(dir, { force: true, recursive: true });
+    }
+  });
+
   it('warmUsernameBanlist reports the served file for the boot line: loaded, or not readable', () => {
     // The boot-time voice (the phase 13 QA hot-path review): an operator whose
     // configured file cannot be read learns it at listen time, not from one
@@ -813,6 +878,8 @@ describe('username censorship', () => {
       withUsernameBanlist({ file }, () => {
         // The file's OWN contribution (two), never the built-in term.
         expect(warmUsernameBanlist()).toEqual({ file, loaded: true, fileTerms: 2 });
+        // The pure readout answers the same without a stat or a read.
+        expect(usernameBanlistStatus()).toEqual({ file, loaded: true, fileTerms: 2 });
         expect(offensiveName('warmterm')).toBe(true);
       });
       // `loaded` is the CURRENT read's outcome: after the file breaks, the

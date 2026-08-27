@@ -56,6 +56,7 @@ import {
   WOC_SIM_TICK_HZ,
   WOC_SIM_TICK_PHASE_SECONDS,
   WOC_TICK_PHASES,
+  WOC_USERNAME_BANLIST_FILE_LOADED,
   WOC_WS_CONNECTIONS,
   WOC_WS_MESSAGES_DROPPED_TOTAL,
   WOC_WS_MESSAGES_TOTAL,
@@ -75,6 +76,7 @@ import {
 /** A GameStateSource returning fixed values; override any field per test. */
 function stubSource(overrides: Partial<GameStateSource> = {}): GameStateSource {
   return {
+    usernameBanlistLoaded: () => true,
     playersOnline: () => 3,
     accountsOnline: () => 2,
     wsConnections: () => 5,
@@ -145,8 +147,10 @@ describe('registerGameStateMetrics: gauges read the source at scrape time', () =
     expect(WOC_SIM_TICK_HZ).toBe('woc_sim_tick_hz');
     expect(WOC_SAVE_PENDING_KEYS).toBe('woc_character_save_pending_keys');
     expect(WOC_ESCROW_GATE_IN_FLIGHT).toBe('woc_escrow_gate_in_flight');
+    expect(WOC_USERNAME_BANLIST_FILE_LOADED).toBe('woc_username_banlist_file_loaded');
 
     for (const name of [
+      WOC_USERNAME_BANLIST_FILE_LOADED,
       WOC_PLAYERS_ONLINE,
       WOC_ACCOUNTS_ONLINE,
       WOC_WS_CONNECTIONS,
@@ -431,6 +435,21 @@ describe('registerGameStateMetrics: throughput counters via the returned sink', 
     );
     expect(sampleValue(text, /^woc_ws_rate_kicks_total (\d+)$/m)).toBe('1');
     expect(sampleValue(text, /^woc_input_frames_missed_total (\d+)$/m)).toBe('9');
+  });
+
+  it('reads woc_username_banlist_file_loaded from the source at scrape time, both values', async () => {
+    // The scrape-visible twin of the banlist warn line (the phase 13 QA
+    // hot-path review): a mount that fails hours after boot flips it to 0.
+    const registry = new Registry();
+    let loaded = true;
+    registerGameStateMetrics(registry, stubSource({ usernameBanlistLoaded: () => loaded }));
+    expect(sampleValue(await registry.metrics(), /^woc_username_banlist_file_loaded (\d+)$/m)).toBe(
+      '1',
+    );
+    loaded = false;
+    expect(sampleValue(await registry.metrics(), /^woc_username_banlist_file_loaded (\d+)$/m)).toBe(
+      '0',
+    );
   });
 
   it('keeps the cause label bounded to the closed WS_DROP_CAUSES set', async () => {

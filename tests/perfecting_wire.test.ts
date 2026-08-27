@@ -465,9 +465,9 @@ describe('perfect_item over the real online dispatch path', () => {
   });
 
   it('an oversized name answers the SAME line on both hosts (the parity pin)', () => {
-    // Online the dispatch cuts a too-long string to the payload ceiling;
-    // offline the Sim takes it raw. Either way the sim's shape arm is what
-    // answers, with one line, so the player cannot tell the hosts apart.
+    // Both hosts hand the sim the RAW string (the online dispatch neither
+    // drops nor cuts it), so the sim's shape arm answers with one line on
+    // both and the player cannot tell the hosts apart.
     const server = new GameServer();
     const fc = fakeWs();
     const session = joinServer(server, fc, 904, 'LongName');
@@ -495,12 +495,16 @@ describe('perfect_item over the real online dispatch path', () => {
     expect(offline).toEqual(['That name cannot be inscribed on the work.']);
     expect(online).toEqual(offline);
     expect(server.sim.countItem('deed_of_making', pid)).toBe(1);
+    // Neither host let the oversized raw name LAND: no name, no promotion.
+    const copy = serverMeta(server, pid).inventory.find((s) => s.itemId === APEX_NECK)?.instance;
+    expect(copy?.name).toBeUndefined();
+    expect(copy?.rolled?.quality).toBeUndefined();
   });
 
   it('the name-screen lane refuses the sixth named frame at one instant and never calls the sim', () => {
     // The phase 13 QA hot-path review: the obscenity matcher costs about 25
     // microseconds and used to ride the 30/s command lane ahead of every sim
-    // gate. Named frames now take the name-screen lane (burst 5, refill one
+    // gate. Named frames now take the name-screen lane (burst 5, refill two
     // per second), so a flood of hand-crafted named frames is shed before the
     // screen runs; an unnamed attempt stays on the command lane.
     const server = new GameServer();

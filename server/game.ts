@@ -7260,13 +7260,13 @@ export class GameServer {
         break;
       case 'pet_rename':
         if (typeof msg.name === 'string') {
-          // Shape-first like perfect_item: the matcher prices the sim's own
-          // 16-character normalized value (cleanPetName), never the raw token,
-          // so a 16 KiB frame costs the screen nothing (the phase 13 QA
-          // hot-path review); a name the sim would refuse anyway skips it.
-          if (offensiveName(cleanPetName(msg.name) ?? ''))
+          // Shape-first like perfect_item: a name the sim's 16-character shape
+          // (cleanPetName) refuses skips the matcher and rides raw for the sim's
+          // own refusal; a valid one is screened and stored as that one value.
+          const clean = cleanPetName(msg.name);
+          if (clean !== null && offensiveName(clean))
             this.sendChatNotice(session, 'Pet name is not allowed.');
-          else sim.renamePet(msg.name, pid);
+          else sim.renamePet(clean ?? msg.name, pid);
         }
         break;
       case 'pet_revive':

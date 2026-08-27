@@ -9,6 +9,8 @@
 // list-read guard's seam pins (server/list_read_guard.ts, the phase 06
 // maintainer ruling) live here too, beside the other chat-surface pins.
 
+import { readFileSync } from 'node:fs';
+import { join as joinPath } from 'node:path';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 // Mock the db layer so no Postgres is needed (the
@@ -70,6 +72,18 @@ describe('lane constants hold the R5 budget literals', () => {
     expect(MSG_LANE_NAME_SCREEN_REFILL_PER_SECOND).toBe(2);
     expect(MSG_LANE_NAME_SCREEN_BURST).toBe(5);
     expect(MSG_LANE_NAME_SCREEN_REFILL_PER_SECOND).toBeLessThan(MSG_LANE_COMMAND_REFILL_PER_SECOND);
+    // ...and below the chat lane it was sized from (half its human-dialog rate).
+    expect(MSG_LANE_NAME_SCREEN_REFILL_PER_SECOND).toBeLessThan(MSG_LANE_CHAT_REFILL_PER_SECOND);
+  });
+
+  it('the design record states the live name-screen sizing', () => {
+    // A doc figure with no code pin rots at the next constant move.
+    const doc = readFileSync(
+      joinPath(__dirname, '../docs/design/player-performance/packet-3-input-cadence.md'),
+      'utf8',
+    );
+    expect(doc).toContain(`refill ${MSG_LANE_NAME_SCREEN_REFILL_PER_SECOND}/s`);
+    expect(doc).toContain(`burst ${MSG_LANE_NAME_SCREEN_BURST}.`);
   });
 });
 

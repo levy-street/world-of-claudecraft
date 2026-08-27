@@ -91,6 +91,8 @@ import {
   normalizeCharName,
   normalizeEmail,
   offensiveName,
+  usernameBanlistBootLine,
+  usernameBanlistStatus,
   validUsernameShape,
   verifyPassword,
   warmUsernameBanlist,
@@ -3586,6 +3588,7 @@ export async function startServer(): Promise<http.Server> {
   // gauges read live state at scrape time; ws_connections is the raw open-socket
   // count (joined or not), distinct from players_online (joined sessions).
   const gameStateSource: GameStateSource = {
+    usernameBanlistLoaded: () => usernameBanlistStatus().loaded,
     playersOnline: () => game.clients.size,
     accountsOnline: () => game.liveAccountIds().size,
     wsConnections: () => wss.clients.size,
@@ -3640,15 +3643,14 @@ export async function startServer(): Promise<http.Server> {
   const businessMetrics = registerBusinessMetrics(httpMetrics.registry);
   businessMetrics.start();
 
+  // The banlist warm runs BEFORE the loop starts: its stat and read are
+  // synchronous, and a hung network mount must stall a boot, never a realm
+  // that is already ticking (the phase 13 QA hot-path review).
+  const banlist = warmUsernameBanlist();
   game.start();
   server.listen(config.port, () => {
     console.log(`World of ClaudeCraft server listening on http://localhost:${config.port}`);
-    const banlist = warmUsernameBanlist();
-    if (banlist.file) {
-      console.log(
-        `  name banlist: ${banlist.file} ${banlist.loaded ? `loaded (${banlist.fileTerms} file terms)` : 'NOT READABLE (its terms are not enforced; the built-in and USERNAME_BANLIST terms still are; see the warn above)'}`,
-      );
-    }
+    if (banlist.file) console.log(usernameBanlistBootLine(banlist));
     console.log(`  REST: /api/register /api/login /api/characters /api/status`);
     console.log(`  WS:   /ws, then first message {t:"${ONLINE_WORLD_AUTH_TYPE}",token,character}`);
   });

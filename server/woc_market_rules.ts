@@ -6,6 +6,7 @@
 // deeds_board.ts split. Every USD value is INTEGER CENTS; token amounts never
 // appear here (the economy service owns all token math).
 
+import { effectiveQuality } from '../src/sim/equipment_rules';
 import {
   exchangeCategoryUsesQualityFloor,
   exchangeHardLock,
@@ -603,7 +604,10 @@ export function listingEligibility(
   // The floor is the EQUIPMENT floor and reaches only equipment; the collectible
   // categories trade at every tier (see the policy fields).
   if (exchangeCategoryUsesQualityFloor(category)) {
-    const quality = instance?.rolled?.quality ?? def.quality ?? 'common';
+    // The sim's one precedence rule (src/sim/equipment_rules.ts), the same
+    // call the client's sell pre-filter makes (src/ui/woc_market_view.ts), so
+    // an unknown-tier legacy copy ranks the same on both sides.
+    const quality = effectiveQuality(def, instance) ?? 'common';
     const floor = QUALITY_RANK[policy.equipmentQualityFloor];
     if ((QUALITY_RANK[quality] ?? 0) < floor) {
       return { ok: false, reason: 'below_quality_floor' };

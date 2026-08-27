@@ -53,7 +53,10 @@ export function parsePerfectItemRef(msg: {
 // answered "needs a name" where offline says "cannot be inscribed"; a cut
 // landing on a whitespace run normalized to a short VALID name the player
 // never typed, stamped online and refused offline). The flood ceiling is the
-// frame itself (WS maxPayload); a raw token is priced once by the normalizer
+// frame itself (WS maxPayload, 16 KiB) under the pre-parse byte budget
+// (server/msg_rate_limit.ts: 64 KiB/s sustained, 128 KiB burst, so at most
+// four maximal frames a second before the name-screen lane's own 2/s), which
+// is what makes raw pass-through safe; a raw token is priced once by the normalizer
 // (linear) and never stored, since a shape-invalid one is refused and a
 // shape-valid one is stamped only as its normalized form. The server-side
 // CONTENT screen (offensiveName) runs in resolvePerfectItemName below on the

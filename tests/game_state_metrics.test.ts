@@ -99,6 +99,7 @@ function join(
  *  session count; the exporter unit test pins its independent mapping. */
 function sourceOver(server: GameServer): GameStateSource {
   return {
+    usernameBanlistLoaded: () => true,
     playersOnline: () => server.clients.size,
     accountsOnline: () => server.liveAccountIds().size,
     wsConnections: () => server.clients.size,
@@ -687,8 +688,40 @@ describe('inbound drop, kick, and seq-gap counters at their emission sites', () 
     expect(rec.dropped).toEqual(['lane_name_screen']);
     // The burst's worth reached the handler (the lane shed the last frame
     // only, not the whole run), so the drop is the lane's, not a refusal.
+    // (The burst's literal value is pinned in tests/msg_lanes.test.ts; this
+    // compares against the constant the lane itself reads.)
     expect(renamed).toHaveBeenCalledTimes(MSG_LANE_NAME_SCREEN_BURST);
     expect(rec.rateKicks()).toBe(0);
+    renamed.mockRestore();
+    server.stop();
+  });
+
+  it('screens a pet name shape-first: a shape-invalid raw name skips the matcher and rides to the sim', () => {
+    // The phase 13 QA hot-path review, pinned by the one input that tells the
+    // arms apart: 'Hitler2' matches the built-in banned term once the digit is
+    // stripped (server/auth.ts normalizedUsernameForCensorship), so the OLD
+    // raw screen refused it and never called the sim, while cleanPetName
+    // refuses the digit outright (src/sim/pet/pet_commands.ts PET_NAME_RE), so
+    // the matcher never runs and the sim answers its own shape line. Beside
+    // it: a shape-VALID spelling of the same term ('  Hitler  ' cleans to
+    // 'Hitler') is screened and never reaches the sim, and a clean padded name
+    // reaches it as the ONE normalized value the screen priced.
+    const server = new GameServer();
+    const rec = recordingSink();
+    setGameMetricsCounters(rec.sink);
+    const session = join(server, fakeWs(), 100, 1, 'Ayla');
+    const renamed = vi.spyOn(server.sim, 'renamePet');
+    const rename = (name: string) =>
+      server.handleMessage(session, JSON.stringify({ t: 'cmd', cmd: 'pet_rename', name }));
+    rename('Hitler2');
+    expect(renamed).toHaveBeenCalledTimes(1);
+    expect(renamed).toHaveBeenLastCalledWith('Hitler2', session.pid);
+    rename('  Hitler  ');
+    expect(renamed).toHaveBeenCalledTimes(1);
+    rename('  Rex   Two ');
+    expect(renamed).toHaveBeenCalledTimes(2);
+    expect(renamed).toHaveBeenLastCalledWith('Rex Two', session.pid);
+    expect(rec.dropped).toEqual([]);
     renamed.mockRestore();
     server.stop();
   });

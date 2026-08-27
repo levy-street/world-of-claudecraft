@@ -82,6 +82,7 @@ import {
 
 /** Live characters online (joined sessions). */
 export const WOC_PLAYERS_ONLINE = 'woc_players_online';
+export const WOC_USERNAME_BANLIST_FILE_LOADED = 'woc_username_banlist_file_loaded';
 
 /** Distinct accounts online (a single account may hold several sessions). */
 export const WOC_ACCOUNTS_ONLINE = 'woc_accounts_online';
@@ -261,6 +262,14 @@ export interface TickPhaseMillis {
  * fixed values. Every method is a cheap live read: it must not block or throw.
  */
 export interface GameStateSource {
+  /**
+   * Whether the configured USERNAME_BANLIST_FILE built the name-screen list
+   * now being served (true with no file configured). A mount that fails
+   * hours after boot leaves the moderation screen serving stale terms with
+   * only a one-shot warn line to say so; this is the scrape-visible twin
+   * (server/auth.ts usernameBanlistStatus, the phase 13 QA hot-path review).
+   */
+  usernameBanlistLoaded(): boolean;
   /** Live characters online. */
   playersOnline(): number;
   /** Distinct accounts online. */
@@ -337,6 +346,15 @@ export function registerGameStateMetrics(
     registers: [registry],
     collect() {
       this.set(source.playersOnline());
+    },
+  });
+
+  new Gauge({
+    name: WOC_USERNAME_BANLIST_FILE_LOADED,
+    help: '1 when the configured USERNAME_BANLIST_FILE built the served name-screen term list (or no file is configured); 0 while a stale or empty list is served in its place.',
+    registers: [registry],
+    collect() {
+      this.set(source.usernameBanlistLoaded() ? 1 : 0);
     },
   });
 

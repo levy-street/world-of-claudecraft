@@ -283,9 +283,14 @@ function buildMix(mix: MixName, hz: number, offsetMs: number): SendEvent[] {
         () => TELEMETRY_RAW,
       );
       const challenge: SendEvent[] = [{ atMs: 13_700, kind: 'challenge', raw: CHALLENGE_RAW }];
-      // Pet renames at a mashing human's dialog cadence (one per 4 s, far
-      // above real use), on the name-screen lane: never a drop.
-      const rename = everyMs(4000, 4000, MATRIX_DURATION_MS - 1, 'rename', () => RENAME_RAW);
+      // Pet renames on the name-screen lane: one per 4 s (an ADMISSION check
+      // at a dialog cadence, not a refill pin; the literal lives in
+      // tests/msg_lanes.test.ts) plus one burst-sized mash of five inside a
+      // second on a full bucket, which pins the burst: a smaller one drops one.
+      const rename = mergeStreams(
+        everyMs(4000, 4000, MATRIX_DURATION_MS - 1, 'rename', () => RENAME_RAW),
+        everyMs(22_000, 10, 22_040, 'rename', () => RENAME_RAW),
+      );
       const logout: SendEvent[] = [{ atMs: MATRIX_DURATION_MS, kind: 'logout', raw: LOGOUT_RAW }];
       return mergeStreams(input, gcd, mash, chat, telemetry, challenge, rename, logout);
     }
