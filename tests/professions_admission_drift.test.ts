@@ -467,6 +467,50 @@ describe('apply-enchant admission matches its resolver (bagged replace arm)', ()
   ]);
 });
 
+describe('apply-enchant admission matches its resolver (the requiresPerfected gate)', () => {
+  // The Lucent Infusion holding both rows share: a PLAIN unenchanted copy of
+  // the apex chest (the unconfirmed walk's victim) shadowing an enchanted
+  // Perfected copy (the replace walk's victim), with the bill and the skill
+  // met so only the marker gate can answer.
+  const lucentHolding = (sim: Sim, meta: PlayerMeta, pid: number): void => {
+    meta.craftSkills.enchanting = 125;
+    sim.addItem('briarstep_jerkin', 1, pid);
+    sim.addItemInstance(
+      'briarstep_jerkin',
+      {
+        perfected: true,
+        enchant: 'enchant_chest_lucent_stamina',
+        rolled: { stats: { sta: 10 } },
+      },
+      pid,
+      1,
+    );
+    sim.addItem('lucent_reagent', 6, pid);
+    sim.addItem('arcane_shard', 4, pid);
+  };
+  runApplyRows([
+    {
+      name: 'a confirmed replace peeks the REPLACE victim, the enchanted Perfected copy',
+      // Dropping the confirmReplace forwarding into the admission's
+      // not_perfected gate makes the admission judge the plain shadow copy
+      // and refuse a cast the resolver accepts: this row reds on the
+      // admission side alone (the drift the file exists to catch).
+      expected: null,
+      itemId: 'briarstep_jerkin',
+      enchantId: 'enchant_lucent_infusion',
+      confirmReplace: true,
+      setup: lucentHolding,
+    },
+    {
+      name: 'the unconfirmed apply on the same holding judges the plain copy and denies not_perfected',
+      expected: 'not_perfected',
+      itemId: 'briarstep_jerkin',
+      enchantId: 'enchant_lucent_infusion',
+      setup: lucentHolding,
+    },
+  ]);
+});
+
 // ---------------------------------------------------------------------------
 // Tool recharge: the admission emits its denial instead of returning it, so
 // both halves are read off the toolEffectResult event stream.

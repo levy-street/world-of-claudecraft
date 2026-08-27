@@ -665,6 +665,21 @@ describe('the professions blob growth bound (phase 16)', () => {
     // Content-scaled like the node cooldowns: one row per authored bed, so
     // the field grows with the FARM_PATCHES table, never per player action.
     expect(Object.keys(s2.farmPlots ?? {})).toHaveLength(FARM_BED_IDS.size);
+    // The two Perfecting cap-slot rows keep their worst case through the
+    // settle: the SHRINK side of the band (the floor sits 380 under the
+    // measurement, so deleting the PERFECTED_CAP_SLOTS fixture loop would
+    // still pass the band; the content pin here is what reds on that loss).
+    for (const slot of ['chest', 'offhand'] as const) {
+      const inst = s2.equipmentInstance?.[slot];
+      expect(inst?.perfected, `${slot} keeps the Perfected stamp`).toBe(true);
+      expect(typeof inst?.boundTo, `${slot} keeps the R2 bind`).toBe('number');
+      expect(inst?.rolled?.stats?.int, `${slot} keeps the merged int share`).toBeGreaterThanOrEqual(
+        1,
+      );
+      expect(inst?.rolled?.stats?.spi, `${slot} keeps the merged spi share`).toBeGreaterThanOrEqual(
+        1,
+      );
+    }
 
     // The byte bound itself, on the settled state: the two-sided tracking
     // band around the production-shape measurement (every bed planted

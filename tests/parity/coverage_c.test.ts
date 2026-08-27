@@ -27,7 +27,7 @@ import {
   farmSeedIdsOfTier,
   resolveFarmHarvest,
 } from '../../src/sim/professions/farming';
-import { PERFECTING_RANKS } from '../../src/sim/professions/perfecting';
+import { PERFECTING_ATTEMPT_COST, PERFECTING_RANKS } from '../../src/sim/professions/perfecting';
 import { riftNormalClearPool } from '../../src/sim/rift/loot_pools';
 import {
   RIFT_COIN_BONUS_A,
@@ -1482,13 +1482,20 @@ describe('coverage: each scenario fires its subsystem', () => {
     // spent one. The ember (the pacing lever) is billed from the count the
     // drive stashed just before stripping the stack to stage the last denial;
     // the other two are read off the live bags.
-    const billed: Array<[string, number]> = [
-      ['sundered_essence', (rec.sim as any).countItem('sundered_essence', pid)],
-      ['prismglass_setting', (rec.sim as any).countItem('prismglass_setting', pid)],
-      ['makers_ember', rec.notes.emberBeforeStrip as number],
-    ];
-    for (const [id, have] of billed) {
-      expect(have, id).toBe(PERFECTING_WALK_ATTEMPT_CAP + WORN_ATTEMPTS - trace.draws);
+    // Billed PER COST-TABLE ENTRY (c.count, not an assumed 1), so a retuned
+    // per-attempt count reds here for the right reason, and a NEW material
+    // joining the table fails loudly until the readings map names it.
+    const haveById: Record<string, number> = {
+      sundered_essence: (rec.sim as any).countItem('sundered_essence', pid),
+      prismglass_setting: (rec.sim as any).countItem('prismglass_setting', pid),
+      makers_ember: rec.notes.emberBeforeStrip as number,
+    };
+    const remainingAttempts = PERFECTING_WALK_ATTEMPT_CAP + WORN_ATTEMPTS - trace.draws;
+    expect(Object.keys(haveById).sort()).toEqual(
+      PERFECTING_ATTEMPT_COST.map((c) => c.itemId).sort(),
+    );
+    for (const c of PERFECTING_ATTEMPT_COST) {
+      expect(haveById[c.itemId], c.itemId).toBe(c.count * remainingAttempts);
     }
 
     // The stamp reaches the GOLDEN, not just the live sim: the final frame's
