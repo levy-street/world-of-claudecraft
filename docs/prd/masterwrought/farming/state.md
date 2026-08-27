@@ -1819,6 +1819,21 @@ daily gate anywhere in professions is out of ruling and STOPS.
      every number from the tree rather than pasting these. The STOP rule RE-ARMS at
      NINE: if the set re-derives to anything else, or a sixth stock row seems needed,
      or closing any gap would require raising a crafted magnitude, STOP.
+135. p13-OPEN-RELIQUARY (2026-08-27, Phase 13; RECORDED as an open item, deliberately
+     NOT decided). Whether a player-named legendary INSTANCE triggers the Reliquary
+     same-change obligation is unaddressed in both packets: masterwrought's open
+     decision covers four crafted-primary epic tools, and farming concluded no farming
+     item qualifies today. Phase 13 shipped the orange promotion (a Perfected copy
+     consumes a deed_of_making and takes rolled.quality 'legendary' plus a
+     player-chosen payload.name) WITHOUT authoring a Reliquary page for the promoted
+     instance class: the reliquary model is keyed on ITEM DEFS and the promotion mints
+     no def (no shipped id changes, R3), so the pinned gear-capable set
+     (['copperlens_ocular'], 7) stood unmoved and the content-obligations sweep ran
+     against the merged Reliquary pins with no demand. The open question for the
+     maintainer: should a FUTURE reliquary rung exist for promoted instances (an
+     instance-class page, not a def page), or is the Book of Deeds credit
+     (prog_legendmaker) the complete cosmetic record? Owner: maintainer; until ruled,
+     no phase may author an instance-keyed reliquary page.
 
 ## Locked design decisions
 

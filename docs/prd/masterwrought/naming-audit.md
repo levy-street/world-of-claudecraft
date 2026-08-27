@@ -173,6 +173,11 @@ Vellum.
   armor base AND a WoW arena-set family: cross-franchise material vocabulary,
   full name unused anywhere); **Sunspun Bolt** (Sunspun's only usage is FFXIV's
   cash-shop Sunspun Cumulus mount; transparent compound, full name unused).
+- ADDED at Phase 13 (2026-08-27): **The Legendmaker** (the orange-promotion
+  deed's name, prog_legendmaker). CLEAR: zero-hit in-repo and on the web
+  (nearest neighbors are GW2's "Legendary Weapons" achievement category and
+  generic legendary-collection achievements; no game ships the coin). Checked
+  against the Masterwright-collision rule before authoring.
 - MINTED AT PHASE 07: **Sablewax Vellum** (inscription's skill-75 intermediate;
   the registry carried no inscription name). CLEAR, web-verified 2026-08-11:
   zero exact hits for the compound and for the coin Sablewax (searches
