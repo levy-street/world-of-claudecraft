@@ -9,6 +9,7 @@ import { GPU_WORK_PRIORITY } from './background_gpu_queue';
 import { type CharacterVisual, createCharacterVisual } from './characters';
 import { GFX } from './gfx';
 import { idleSlot, runIdleQueue } from './idle_queue';
+import { buildAshcallerVfxPrewarmVisual } from './ignivar_ashcaller_vfx';
 import {
   encounterPrewarmDisabled,
   encounterPrewarmForInterior,
@@ -228,6 +229,24 @@ async function runInteriorEncounterPrewarm(
               worldfire,
             );
             varkhulPortalKeepAlive.push(forgePortals);
+          },
+        ]
+      : []),
+    ...(spec.ignivarAshcallerVfx
+      ? [
+          () => {
+            // The Ashcaller's socket VFX ride the same group keep-alive as the
+            // Varkhul visuals: held per host, never disposed, so the programs
+            // stay linked for the add's mid-fight spawn.
+            const ashcaller = buildAshcallerVfxPrewarmVisual();
+            // Inside the +-12 band the other prewarm visuals stand in: the
+            // pass's bounded render pays first draws only for what sits near
+            // the group origin, and everything here is frustumCulled false
+            // today, but a future culled child parked farther out would
+            // silently skip its first draw.
+            ashcaller.position.set(-12, 0, -12);
+            group.add(ashcaller);
+            varkhulKeepAlive.push(ashcaller);
           },
         ]
       : []),

@@ -71,6 +71,7 @@ import {
 } from '../src/render/raid_encounter_visuals';
 import type { Vfx } from '../src/render/vfx';
 import {
+  IGNIVAR_APOCALYPSE_ADD_ID,
   IGNIVAR_BRAND_AURA_ID,
   IGNIVAR_BRAND_RADIUS,
   IGNIVAR_FORGE_WAVE_CAST_ID,
@@ -858,6 +859,25 @@ describe('Ignivar encounter renderer', () => {
         kind: 'mob',
         templateId: 'another_boss',
         castingAbility: IGNIVAR_FRONTAL_CAST_ID,
+        auras: [],
+      }),
+    ).toBe(false);
+    // The Apocalypse add is an arena-wide kill timer: its body never culls at
+    // range while it stands, and releases the exemption once it dies.
+    expect(
+      ignivarEncounterBypassesCharacterCulling({
+        kind: 'mob',
+        templateId: IGNIVAR_APOCALYPSE_ADD_ID,
+        castingAbility: null,
+        auras: [],
+      }),
+    ).toBe(true);
+    expect(
+      ignivarEncounterBypassesCharacterCulling({
+        kind: 'mob',
+        templateId: IGNIVAR_APOCALYPSE_ADD_ID,
+        castingAbility: null,
+        dead: true,
         auras: [],
       }),
     ).toBe(false);
@@ -1685,6 +1705,9 @@ describe('Ignivar encounter renderer', () => {
 
   it('keeps the Ignivar telegraph anchor visible while the cosmetic rig compiles', () => {
     expect(ignivarEncounterViewVisibleDuringCompile(IGNIVAR_BOSS_ID, true)).toBe(true);
+    // The Apocalypse add is actionable arena-wide: the compile gate must never
+    // hide its anchor while the rig links.
+    expect(ignivarEncounterViewVisibleDuringCompile(IGNIVAR_APOCALYPSE_ADD_ID, true)).toBe(true);
     expect(ignivarEncounterViewVisibleDuringCompile('fire_elemental', true)).toBe(false);
     expect(ignivarEncounterViewVisibleDuringCompile('fire_elemental', false)).toBe(true);
   });

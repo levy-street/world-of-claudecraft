@@ -6,7 +6,7 @@
     "bytes": 1510,
     "sha256": "bb0b6bacba9acb12568c3bbbe536e4442cb2964266cffef890f27ee4915dcf2a"
   },
-  "rendererFingerprint": "a602730e660ca981807d949b5a251200a8d68bd01d3b76771b58f0d0e46e0a21",
+  "rendererFingerprint": "4b2f5ac243cc4ddd5a227aa509da19d10d0285d9faa5f4b0286562ae7b56ce13",
   "renderer": {
     "trackedFiles": [
       {
@@ -27,8 +27,8 @@
     ],
     "browserBundle": {
       "entry": "scripts/wiki/stills_render_entry.js",
-      "bytes": 4345176,
-      "sha256": "eaf3208b0d720e0575e725a82d418c32383d4f34f4538074815d15a2b68633e0",
+      "bytes": 4345927,
+      "sha256": "9fec19b89d90f4eb1a568cfdc8202f8ad02f9719b505edd27800bef69f821251",
       "esbuildVersion": "0.28.1"
     },
     "output": {
@@ -3273,12 +3273,12 @@
         "model": {
           "url": "models/creatures/ignivar_heart_of_the_end.glb",
           "path": "public/models/creatures/ignivar_heart_of_the_end.glb",
-          "bytes": 666744,
-          "sha256": "3ff28f2bdb651aea141f089b50c0bc3c656b0c970e8c6a99ce43eba39c676a5e"
+          "bytes": 2223748,
+          "sha256": "85e34614b340030afc7a009865048da22d5e9d5a7c9a397180ee8e50e2f02639"
         },
         "idle": "Idle",
         "height": 1.8,
-        "yaw": -1.5707963267948966,
+        "yaw": 3.141592653589793,
         "hover": null,
         "show": null,
         "attach": [],
@@ -3291,11 +3291,11 @@
         "resolved": null,
         "strength": null
       },
-      "sourceFingerprint": "3239dbd8b4243000ad983722a8a16a445ef1ebef58ead3cf5bad93d85a422d07",
+      "sourceFingerprint": "7fe56b13bab7fa180f479766d64e85a820100be3d66f0bd67bdbbbf78e689637",
       "output": {
         "path": "public/ui/mobs/ignivar_heart_of_the_end.webp",
-        "bytes": 2396,
-        "sha256": "00163a575e33213eedfedafb0bed38808035ea8c3353bee8429e982a00ce35f6"
+        "bytes": 2614,
+        "sha256": "89a30019d30646e0a549888ab76be704cc7bc5bbe1036eea62d0de3005dbf4f9"
       }
     },
     {

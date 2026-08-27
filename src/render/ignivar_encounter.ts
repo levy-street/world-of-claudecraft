@@ -1,5 +1,6 @@
 import * as THREE from 'three';
 import {
+  IGNIVAR_APOCALYPSE_ADD_ID,
   IGNIVAR_BRAND_RADIUS,
   IGNIVAR_SKYFIRE_CONE_COUNT,
   IGNIVAR_SKYFIRE_HALF_ANGLE,
@@ -8,6 +9,7 @@ import {
   IGNIVAR_SOAK_REQUIRED_PLAYERS,
 } from '../sim/encounters/ignivar';
 import { IGNIVAR_BOSS_ID } from '../sim/types';
+import { disposeAshcallerVfx, syncAshcallerVfx } from './ignivar_ashcaller_vfx';
 import {
   buildIgnivarBrandTelegraph,
   IGNIVAR_BRAND_VISUAL_NAME,
@@ -148,6 +150,7 @@ export function buildIgnivarSkyfireTelegraph(): THREE.Group {
 /** Releases the per-entity encounter overlays before a character view is pooled. */
 export function disposeIgnivarEncounterVisuals(group: THREE.Group): void {
   disposeIgnivarModelVfx(group);
+  disposeAshcallerVfx(group);
   const chain = group.getObjectByName(IGNIVAR_FORGE_CHAIN_VISUAL_NAME);
   if (chain) disposeIgnivarForgeChainVisual(chain);
   for (const name of [
@@ -217,6 +220,15 @@ export function syncIgnivarEncounterVisuals(
   >,
   reducedMotion = false,
 ): void {
+  if (entity.templateId === IGNIVAR_APOCALYPSE_ADD_ID) {
+    // The Apocalypse add (the Ashcaller): its bespoke socket VFX attach
+    // lazily on the first frame the view exists (the ignivar_depths interior
+    // prewarm already linked these programs) and follow the channel state.
+    // Runs EVERY frame: syncModelVfx is the real frustum answer and gates
+    // only the emitters' draw, so the wipe edge is never replayed late.
+    syncAshcallerVfx(group, entity, dt, syncModelVfx, reducedMotion);
+    return;
+  }
   if (entity.templateId !== IGNIVAR_BOSS_ID && entity.kind !== 'player') return;
   const plan = ignivarEncounterVisualPlan(entity);
   if (entity.templateId === IGNIVAR_BOSS_ID) {

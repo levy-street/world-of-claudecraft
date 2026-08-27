@@ -113,6 +113,20 @@ const PROVEN_SAFE_BASES: ProvenSafeBase[] = [
     anchor: /uniforms\.uProgress\.value = easeOutQuart\(/,
     why: 'uProgress is written from JS as easeOutQuart(min(1, age / dur)), never above 1',
   },
+  {
+    file: 'src/render/ignivar_ashcaller_vfx.ts',
+    base: 'life',
+    sites: 1,
+    anchor: /float life += fract\(uTime \* speed/,
+    why: 'life is fract(...), defined as x - floor(x) in [0, 1) on every lowering',
+  },
+  {
+    file: 'src/render/ignivar_ashcaller_vfx.ts',
+    base: 'rim',
+    sites: 1,
+    anchor: /float rim += pow\(max\(band, 0\.0\), 1\.6\);/,
+    why: 'rim is a pow() of a max(_, 0.0) base, read a few lines above the raise',
+  },
 ];
 
 /** Every file that currently holds at least one pow(), and how many. Pinned as a
@@ -129,6 +143,7 @@ const POW_SITES_PER_FILE: Record<string, number> = {
   'src/render/characters/armor_dye.ts': 2,
   'src/render/dungeon.ts': 1,
   'src/render/foliage_shader_core.ts': 1,
+  'src/render/ignivar_ashcaller_vfx.ts': 5,
   'src/render/ignivar_fire_vfx.ts': 10,
   'src/render/ignivar_model_vfx.ts': 1,
   'src/render/pbr_fragment_shader.ts': 1,

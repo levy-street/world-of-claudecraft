@@ -15,6 +15,10 @@ export interface InteriorEncounterPrewarmSpec {
   soulRendVfxWeaponSkins: boolean;
   soulRendLivePlayerVisuals: boolean;
   varkhulVisuals?: boolean;
+  /** The Ashcaller (Apocalypse add) socket VFX: its add spawns mid-fight at
+   *  65% boss hp, so its ShaderMaterial programs must link at interior attach,
+   *  never on the spawn frame. */
+  ignivarAshcallerVfx?: boolean;
 }
 
 export const INTERIOR_ENCOUNTER_PREWARM: Record<string, InteriorEncounterPrewarmSpec> = {
@@ -28,6 +32,7 @@ export const INTERIOR_ENCOUNTER_PREWARM: Record<string, InteriorEncounterPrewarm
     soulRendVfxWeaponSkins: false,
     soulRendLivePlayerVisuals: false,
     varkhulVisuals: true,
+    ignivarAshcallerVfx: true,
   },
 };
 

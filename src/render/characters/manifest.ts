@@ -771,14 +771,18 @@ const IGNIVAR: ClipMap = {
 
 // Heart of the End is stationary in the encounter. Its generated Hit clip stays
 // unmapped so raid damage cannot interrupt the sustained Apocalypse cast pose.
+// The contributor Ashcaller rig: 'Channel' loops for the whole 20s Apocalypse
+// wind-up (the sim holds the add channeling), and the 'Cast' staff slam fires
+// as the attack one-shot when the wipe damage lands (the encounter clears
+// castingAbility before dealing it, so the damage-attack gate admits the clip).
+// 'ChannelStart' stays unmapped: the base machine has no channel intro state.
 const IGNIVAR_HEART: ClipMap = {
   idle: 'Idle',
-  walk: 'Walk',
-  run: 'Run',
-  attack: ['Attack'],
+  walk: 'Move',
+  run: 'Move',
+  attack: ['Cast'],
   death: 'Death',
-  cast: 'Cast',
-  jump: 'Jump',
+  cast: 'Channel',
 };
 
 const IGNIVAR_CRUCIBLE_WARDEN: ClipMap = {
@@ -2392,14 +2396,22 @@ export const VISUALS: Record<string, VisualDef> = {
   },
   mob_ignivar_heart_of_the_end: {
     url: `${CREATURES}/ignivar_heart_of_the_end.glb`,
+    // The bind-pose bounds include the staff raised to ~1.23 of the 1.0 body
+    // crown, so the body lands at ~82% of this at e.scale 1; the sim record's
+    // scale 2.25 composes on top.
     height: 1.8,
-    // Tripo authored the rig facing +X; character visuals face +Z at world facing 0.
-    yaw: -Math.PI / 2,
-    // Toned down with the sunset forge rig, same story as mob_ignivar above.
-    selfIllumination: 0.1,
+    // The contributor Ashcaller rig is authored facing -Z (verified against the
+    // handoff's own front-view render); this flips it onto the +Z facing-0
+    // convention.
+    yaw: Math.PI,
+    // The authored emissive maps survive (tintedMaterial borrows basecolor as
+    // emissive only when a rig ships none), so this lift carries only the
+    // low-tier Lambert rebuild. No envMapIntensity boost: the sunset forge
+    // rig retired the IBL crutch across the raid defs.
+    selfIllumination: 0.2,
     clips: IGNIVAR_HEART,
-    attackTimeScale: 6,
-    deathTimeScale: 3,
+    // Authored timing is exact: the 2s Cast slam plays as shipped.
+    attackTimeScale: 1,
   },
   mob_ignivar_crucible_warden: {
     url: `${CREATURES}/crucible_warden.glb`,

@@ -1,4 +1,5 @@
 import {
+  IGNIVAR_APOCALYPSE_ADD_ID,
   IGNIVAR_BRAND_AURA_ID,
   IGNIVAR_FORGE_WAVE_CAST_ID,
   IGNIVAR_FRONTAL_CAST_ID,
@@ -63,12 +64,16 @@ export interface IgnivarEncounterVisualPlan {
   inverseEntityScale: number;
 }
 
-/** Keeps the boss anchor alive while only its cold-loaded cosmetic rig is gated. */
+/** Keeps the boss and Apocalypse-add anchors alive while only their cold-loaded
+ *  cosmetic rigs are gated: both are actionable arena-wide, so the compile gate
+ *  must never leave them with no representation. */
 export function ignivarEncounterViewVisibleDuringCompile(
   templateId: string,
   compilePending: boolean,
 ): boolean {
-  return templateId === IGNIVAR_BOSS_ID || !compilePending;
+  return (
+    templateId === IGNIVAR_BOSS_ID || templateId === IGNIVAR_APOCALYPSE_ADD_ID || !compilePending
+  );
 }
 
 /** Ignivar's authored rig and flames stay readable without a generic body tint while casting. */
@@ -121,6 +126,10 @@ export function ignivarEncounterBypassesCharacterCulling(entity: IgnivarVisualEn
         aura.id === IGNIVAR_SOAK_AURA_ID,
     );
   }
+  // The Apocalypse add is an arena-wide kill timer: every ranged player burns
+  // it from across the room, so its body must never cull at range while it
+  // stands (actionable information, per the graphics-fairness rule).
+  if (entity.templateId === IGNIVAR_APOCALYPSE_ADD_ID) return entity.dead !== true;
   if (entity.templateId !== IGNIVAR_BOSS_ID) return false;
   return (
     entity.castingAbility === IGNIVAR_FRONTAL_CAST_ID ||
