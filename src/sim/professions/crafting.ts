@@ -858,10 +858,13 @@ export function resolveCraftForRecipe(
   // an apex craft grants a Perfecting head start INSTEAD OF a quality bump
   // (R1's own words). Reads the SAME procRoll: the single unconditional draw
   // above never moves and nothing here rolls again. The bumped and
-  // ceilingTier terms survive from the quality-bump gate DELIBERATELY: they
-  // are the archetype empowerment gate (a dormant, hobby, or unattuned craft
-  // earns no head start, exactly as it earned no bump), even though this arm
-  // grants a rank rather than the quality those names describe.
+  // ceilingTier terms survive from the quality-bump gate DELIBERATELY, each
+  // for its own reason: `bumped !== null` is the quality-ladder bound (a
+  // poor or legendary def has no bump target, archetype-independent), and
+  // `bumped.tier <= ceilingTier` is the archetype empowerment gate (a
+  // dormant, hobby, unattuned, or Jack craft earns no head start, exactly
+  // as it earned no bump), even though this arm grants a rank rather than
+  // the quality those names describe.
   const perfectingHeadStart =
     !!meta &&
     jackVariance !== 'worse' &&

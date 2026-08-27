@@ -65,13 +65,17 @@ describe('hud.ts unbindResult event arm (source pins)', () => {
     // surviving shape: `ev.reason = 'unbind_not_bound'` before the one call
     // would re-route a refusal with no key literal and no chain). Four pins
     // cover the write spellings: dotted plain and compound assignment on any
-    // receiver (casts and aliases included), bracket-keyed access in string
-    // or template form, a quoted object-literal binding, and the dynamic
-    // write channels (defineProperty / Reflect.set / Object.assign, banned
-    // from the arm outright since an Object.assign from a VARIABLE would
-    // carry no quoted key for the other pins to see).
+    // receiver (casts and aliases included); the QUOTED 'reason' literal
+    // banned from the arm in every quote form, which covers bracket-keyed
+    // writes, defineProperty('reason', ...) by name, AND the variable-key
+    // spelling (const k = 'reason'; ev[k] = ...), since minting the key
+    // needs the literal somewhere in the arm (the live arm only ever reads
+    // ev.reason dotted, so the ban costs nothing); a quoted object-literal
+    // binding; and the dynamic write channels (defineProperty / Reflect.set
+    // / Object.assign) banned outright since an Object.assign from a
+    // variable would carry no quoted key for the literal ban to see.
     expect(arm).not.toMatch(/\.reason\s*(\|\|=|&&=|\?\?=|=[^=])/);
-    expect(arm).not.toMatch(/\[\s*['"`]reason['"`]\s*\]/);
+    expect(arm).not.toMatch(/['"`]reason['"`]/);
     expect(arm).not.toMatch(/reason\s*:\s*['"]/);
     expect(arm).not.toMatch(/defineProperty|Reflect\.set|Object\.assign/);
   });

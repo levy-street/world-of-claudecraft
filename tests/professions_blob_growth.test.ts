@@ -401,12 +401,20 @@ function ceilingSim(nowMs?: number): Sim {
       throw new Error(`apex fixture id ${apexId} is no longer an apex recipe output; re-mint`);
     }
     const bonus = perfectedBonusStats(def, recipe);
-    if (!bonus || !('int' in bonus) || !('spi' in bonus)) {
-      throw new Error(`apex fixture id ${apexId} no longer bakes an int/spi delta; re-mint`);
+    // POSITIVE int/spi required, not mere key presence: the live stamp skips
+    // zero-valued shares, so a zero-bake would make this fixture write a
+    // payload the real path cannot produce (and red the settle-content pins
+    // with a misleading message) rather than failing here by name.
+    if (!bonus || (bonus.int ?? 0) < 1 || (bonus.spi ?? 0) < 1) {
+      throw new Error(
+        `apex fixture id ${apexId} no longer bakes a positive int/spi delta; re-mint`,
+      );
     }
     const stats: Record<string, number> = { str: 2, agi: 2, sta: 2 };
     for (const [stat, value] of Object.entries(bonus)) {
-      if (value === undefined) continue;
+      // The live merge's own rule (perfecting.ts): zero shares are never
+      // written, so the fixture skips them identically.
+      if (value === undefined || value === 0) continue;
       stats[stat] = (stats[stat] ?? 0) + value;
     }
     meta.equipmentInstance[slot] = {
