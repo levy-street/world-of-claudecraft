@@ -1274,6 +1274,97 @@
       }
     ]
   },
+  "mob_beast_wolf_aggro": {
+    "ceilingDb": 5.3,
+    "tracks": [
+      {
+        "filename": "mob_beast_wolf_aggro_1.mp3",
+        "sha256": "684aa1870453b0456d1ea9dc7665bd230b84c54cbace6c1d2ec12aad7a44be05",
+        "size": 21985,
+        "peakDb": -6.3
+      },
+      {
+        "filename": "mob_beast_wolf_aggro_2.mp3",
+        "sha256": "79a5446a4f5f51f0df90780735dc9568f31a27710a8c6e99aa83428eb58d6eb4",
+        "size": 31390,
+        "peakDb": -7.2
+      }
+    ]
+  },
+  "mob_beast_wolf_attack": {
+    "ceilingDb": 5.3,
+    "tracks": [
+      {
+        "filename": "mob_beast_wolf_attack_1.mp3",
+        "sha256": "089d846728360d4a6f99439e91f83a36762a26bc7278a3379ee1deab8e87a748",
+        "size": 11954,
+        "peakDb": -6.3
+      },
+      {
+        "filename": "mob_beast_wolf_attack_2.mp3",
+        "sha256": "4a7339c69b1ccebf2ee127c2bc7f4db5aa86190e1cfd652c54972a8c0a7bcc7d",
+        "size": 27001,
+        "peakDb": -7.2
+      },
+      {
+        "filename": "mob_beast_wolf_attack_3.mp3",
+        "sha256": "fc36fbcbc87e3fe79e256cfe7b97dac94e64cdc9f09abfa8dd8334384dbcc25b",
+        "size": 28882,
+        "peakDb": -7.1
+      }
+    ]
+  },
+  "mob_beast_wolf_death": {
+    "ceilingDb": 5.3,
+    "tracks": [
+      {
+        "filename": "mob_beast_wolf_death_1.mp3",
+        "sha256": "15112666002dc1a4b58a2182ee094e96a2610c3f69b7cd104dc3bb61b4a13116",
+        "size": 23866,
+        "peakDb": -6.3
+      },
+      {
+        "filename": "mob_beast_wolf_death_2.mp3",
+        "sha256": "fc8fc5ec4b8bb9c28cd4771dd7d36418cb4b49a71a495034fad98c68fb5a17ad",
+        "size": 18224,
+        "peakDb": -6.3
+      }
+    ]
+  },
+  "mob_beast_wolf_hurt": {
+    "ceilingDb": 5.3,
+    "tracks": [
+      {
+        "filename": "mob_beast_wolf_hurt_1.mp3",
+        "sha256": "d064f15ee60db824af96ec0d95b47deb2ef5c21632bf4392ec3c0b5738b5bb3e",
+        "size": 19478,
+        "peakDb": -6.3
+      }
+    ]
+  },
+  "mob_beast_wolf_idle": {
+    "ceilingDb": 5.2,
+    "tracks": [
+      {
+        "filename": "mob_beast_wolf_idle_1.mp3",
+        "sha256": "fa09aa28d9bc9dbcd431a6ce5022760dbeb3a4359c9bb36d8804b9d99158eff6",
+        "size": 21315,
+        "peakDb": -6.3
+      },
+      {
+        "filename": "mob_beast_wolf_idle_2.mp3",
+        "sha256": "b5f16c423562e438097b1f5cea6a015bc8c1b3b075bcbfabaa51c92df9022217",
+        "size": 15045,
+        "peakDb": -6.2
+      },
+      {
+        "filename": "mob_beast_wolf_idle_3.mp3",
+        "sha256": "f9a4d112d8bb95f715eaa02f0fd87488c281621f561759a62d961508e01a995e",
+        "size": 6895,
+        "peakDb": -6.3
+      }
+    ]
+  },
   "mob_boar_aggro": {
     "ceilingDb": 5.6,
     "tracks": [
@@ -2345,6 +2436,91 @@
         "sha256": "0202bfb645158cba35b8360a88ce2f9fafda4a151ecb1d3d2b54affd7fbe6067",
         "size": 20061,
         "peakDb": -9.6
+      }
+    ]
+  },
+  "mob_undead_skeleton_aggro": {
+    "ceilingDb": 5.2,
+    "tracks": [
+      {
+        "filename": "mob_undead_skeleton_aggro_1.mp3",
+        "sha256": "cec491803713760f5949de10eac354e46468f9c4f2a1c36a6a6bcd6363d5c9d0",
+        "size": 18224,
+        "peakDb": -6.3
+      },
+      {
+        "filename": "mob_undead_skeleton_aggro_2.mp3",
+        "sha256": "6fe7c55a1423e539d1086397e181f472b4c3491bee8bdbc5967b71aef5349594",
+        "size": 18224,
+        "peakDb": -6.2
+      }
+    ]
+  },
+  "mob_undead_skeleton_attack": {
+    "ceilingDb": 5.3,
+    "tracks": [
+      {
+        "filename": "mob_undead_skeleton_attack_1.mp3",
+        "sha256": "4dbde52a85da9b5f78478f1fa3a687f932d33b348df696e874efc96c05035eb3",
+        "size": 20105,
+        "peakDb": -6.3
+      },
+      {
+        "filename": "mob_undead_skeleton_attack_2.mp3",
+        "sha256": "e4c7ac794ca71c35f8142bd9634568a7e46ba9140f3278ec6531e953c0399f3e",
+        "size": 14462,
+        "peakDb": -6.3
+      },
+      {
+        "filename": "mob_undead_skeleton_attack_3.mp3",
+        "sha256": "515826ecbacaca2798bc8b3203a7a1a1663e698c87c20ac3df4009ec171c93a6",
+        "size": 11954,
+        "peakDb": -6.3
+      }
+    ]
+  },
+  "mob_undead_skeleton_death": {
+    "ceilingDb": 5.3,
+    "tracks": [
+      {
+        "filename": "mob_undead_skeleton_death_1.mp3",
+        "sha256": "0a1fdc0a1adc67086af5e1d0619d87080ccf8bb4a4d022d332aba1d13494efcf",
+        "size": 18224,
+        "peakDb": -6.3
+      },
+      {
+        "filename": "mob_undead_skeleton_death_2.mp3",
+        "sha256": "6885875dc6ea0d10257c73d9ebcfeff8d836833ea742f62339a5de273b675461",
+        "size": 20732,
+        "peakDb": -6.3
+      }
+    ]
+  },
+  "mob_undead_skeleton_hurt": {
+    "ceilingDb": 5.3,
+    "tracks": [
+      {
+        "filename": "mob_undead_skeleton_hurt_1.mp3",
+        "sha256": "f824c62233e15f3a1869a9510a4dc1afc1652c32e8d0f146ff2c66b86321862d",
+        "size": 14462,
+        "peakDb": -6.3
+      }
+    ]
+  },
+  "mob_undead_skeleton_idle": {
+    "ceilingDb": 5.5,
+    "tracks": [
+      {
+        "filename": "mob_undead_skeleton_idle_1.mp3",
+        "sha256": "d2979dfd11629ad69ef4cab049391b8bf58fa8ff57791eaf4d3b685bb9027e40",
+        "size": 25120,
+        "peakDb": -7
+      },
+      {
+        "filename": "mob_undead_skeleton_idle_2.mp3",
+        "sha256": "832ad6e9f349dd100b92908f059cfb3971e4a653ad8405239fb35530cfb78ac8",
+        "size": 15045,
+        "peakDb": -6.5
       }
     ]
   },

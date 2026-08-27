@@ -788,3 +788,43 @@ describe('shared conform command: channel downmix', () => {
     }
   });
 });
+
+// A mob subfamily cue (mob_<family>_<subfamily>_<action>_<N>.mp3) is discovered
+// by the manifest builder's extension pass and deliberately has no catalog row,
+// so neither catalog lookup in isCustomMaster can ever match one. Before this
+// was handled, every hand-recorded subfamily take read as custom: false, which
+// let conform re-target its loudness toward the generated-content LUFS target
+// and overwrite the author's own mix.
+describe('conform policy: mob subfamily custom-master inheritance', () => {
+  const catalog = (custom: boolean) => [{ key: 'mob_elemental_aggro', custom }];
+  const discovered = {
+    mob_elemental_aggro: {
+      key: 'mob_elemental_aggro',
+      tracks: [{ filename: 'mob_elemental_aggro_1.mp3' }],
+    },
+  };
+
+  it('treats a subfamily take as a custom master when its family row is custom', () => {
+    const policy = buildSfxConformPolicy(catalog(true), discovered);
+    expect(policy.isCustomMaster('mob_elemental_ignivar_aggro_1.mp3')).toBe(true);
+  });
+
+  it('inherits a non-custom family row rather than assuming custom', () => {
+    const policy = buildSfxConformPolicy(catalog(false), discovered);
+    expect(policy.isCustomMaster('mob_elemental_ignivar_aggro_1.mp3')).toBe(false);
+  });
+
+  it('still resolves the family key itself, and its numbered variants', () => {
+    const policy = buildSfxConformPolicy(catalog(true), discovered);
+    expect(policy.isCustomMaster('mob_elemental_aggro.mp3')).toBe(true);
+    expect(policy.isCustomMaster('mob_elemental_aggro_1.mp3')).toBe(true);
+  });
+
+  it('leaves a filename that is not a valid subfamily take alone', () => {
+    const policy = buildSfxConformPolicy(catalog(true), discovered);
+    // No trailing variant number, so the extension pass never claims it.
+    expect(policy.isCustomMaster('mob_elemental_ignivar_aggro.mp3')).toBe(false);
+    // Unknown family.
+    expect(policy.isCustomMaster('mob_notafamily_ignivar_aggro_1.mp3')).toBe(false);
+  });
+});

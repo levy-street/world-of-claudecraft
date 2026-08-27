@@ -152,17 +152,13 @@ export function sfxTrackDescriptors(source) {
 }
 
 function playbackProfileForKey(key, playbackProfile) {
-  if (CATALOG_KEYS.has(key)) return resolveSfxPlaybackProfile(key, playbackProfile);
-  // Mob subfamily extensions are intentionally absent from the fixed catalog.
-  // They inherit their family category baseline and remain neutral for key trim
-  // and playback rate until explicitly promoted into the catalog.
-  const category = categoryForSfx(key);
-  const gainDb = playbackProfile.gainMap.categoryBaselineDb[category] ?? 0;
-  return {
-    gainDb,
-    gain: Number((10 ** (gainDb / 20)).toFixed(6)),
-    playbackRate: 1,
-  };
+  // One resolution rule for catalog keys and mob subfamily extension keys
+  // alike: category baseline plus key trim, held to the key's computed
+  // headroom ceiling (sfx_gain_ceiling.mjs, which grants extension keys of a
+  // custom family their own measured ceilings). An extension key with no trim
+  // and no ceiling record resolves exactly as before: family category
+  // baseline, flat 0dB cap, neutral playback rate.
+  return resolveSfxPlaybackProfile(key, playbackProfile);
 }
 
 export function catalogHashForEntries() {
@@ -333,12 +329,11 @@ export function serializeSfxManifest(entries) {
     `export const SFX_MAX_TRACK_BYTES = ${SFX_MAX_TRACK_BYTES};`,
     `export const SFX_MAX_TOTAL_AUDIO_BYTES = ${SFX_MAX_TOTAL_AUDIO_BYTES};`,
     `export const SFX_MAX_RUNTIME_PACK_BYTES = ${SFX_MAX_RUNTIME_PACK_BYTES};`,
-    // Fixed catalog keys only: mob subfamily extension keys are purely
-    // filesystem-discovered (never in the static SFX catalog array) and so
-    // cannot have an individual computed ceiling; sfx_runtime_pack.ts's
-    // lookup falls back to the flat 1.0 (0dB) default for any key not here,
-    // which is correct for them too (no custom-ceiling mechanism covers them
-    // yet, see the wolf/skeleton subfamily gap documented in sfx_gain_ceiling.mjs).
+    // Every manifest key, mob subfamily extensions included: an extension key
+    // of a custom family carries its own computed headroom ceiling
+    // (sfx_gain_ceiling.mjs inherits the family row's custom-master flag), and
+    // sfx_runtime_pack.ts's lookup falls back to the flat 1.0 (0dB) default
+    // for any key without one.
     `export const SFX_GAIN_LIMITS = ${JSON.stringify(gainLimits)} as const satisfies Record<string, number>;`,
     'export const SFX_CLIPS =',
     `${JSON.stringify(entries, null, 2)} satisfies Record<string, SfxEntry>;`,

@@ -12,9 +12,9 @@ import {
 } from './sfx_manifest.generated';
 
 // A custom key's own computed headroom ceiling (see sfx_gain_ceiling.mjs) may
-// exceed the flat 1.0 (0dB) default every other key is bound to; a key with
-// no entry here (mob subfamily extensions, not yet covered by that
-// mechanism) keeps the original flat ceiling.
+// exceed the flat 1.0 (0dB) default every other key is bound to. Mob subfamily
+// extension keys of a custom family carry computed ceilings too (inherited
+// from the family row); a key with no entry here keeps the flat ceiling.
 function maxGainForKey(key: string): number {
   return (SFX_GAIN_LIMITS as Record<string, number>)[key] ?? 1;
 }

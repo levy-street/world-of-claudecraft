@@ -116,6 +116,49 @@ describe('computeSfxGainCeilings', () => {
       rmSync(root, { force: true, recursive: true });
     }
   });
+
+  // Mob subfamily takes (mob_<family>_<subfamily>_<action>_<N>.mp3) have no
+  // catalog row of their own, so before the inheritance below they silently
+  // kept the flat 0dB cap and a gain-map trim on one could never validate.
+  // They inherit the family row's custom-master flag, the same resolution
+  // sfx_conform_inventory.mjs's isCustomMaster applies.
+  it('computes a ceiling for a subfamily take of a custom family, worst take wins', () => {
+    const root = mkdtempSync(join(tmpdir(), 'wocc-gain-ceiling-'));
+    try {
+      const sfxDir = join(root, 'public/audio/sfx');
+      mkdirSync(sfxDir, { recursive: true });
+      // mob_elemental_* rows are custom in the real catalog; the testsub
+      // subfamily exists only in this fixture. Take 1 quiet, take 2 hot: the
+      // ceiling must reflect the hot take, since one trim covers every take.
+      synthesizeTone(join(sfxDir, 'mob_elemental_testsub_aggro_1.mp3'), 0.1);
+      synthesizeTone(join(sfxDir, 'mob_elemental_testsub_aggro_2.mp3'), 0.9);
+
+      const ceilings = computeSfxGainCeilings(root, ffmpegPath as string);
+      expect(ceilings.mob_elemental_testsub_aggro).toBeLessThan(3);
+      expect(ceilings.mob_elemental_testsub_aggro).toBeGreaterThanOrEqual(0);
+    } finally {
+      rmSync(root, { force: true, recursive: true });
+    }
+  });
+
+  // End-to-end property pin, not a unit pin of one guard: the unknown family
+  // is refused at DISCOVERY (parseMobSfxVariantStem), so it never reaches the
+  // ceiling module's own isSfxMobExtensionKey gate. What this holds is the
+  // user-visible guarantee that no such file can ever gain a ceiling record,
+  // whichever layer refuses it.
+  it('never grants a ceiling to a mob-looking file outside the known voice families', () => {
+    const root = mkdtempSync(join(tmpdir(), 'wocc-gain-ceiling-'));
+    try {
+      const sfxDir = join(root, 'public/audio/sfx');
+      mkdirSync(sfxDir, { recursive: true });
+      synthesizeTone(join(sfxDir, 'mob_notafamily_testsub_aggro_1.mp3'), 0.5);
+
+      const ceilings = computeSfxGainCeilings(root, ffmpegPath as string);
+      expect(ceilings.mob_notafamily_testsub_aggro).toBeUndefined();
+    } finally {
+      rmSync(root, { force: true, recursive: true });
+    }
+  });
 });
 
 describe('skip-unchanged fingerprint cache', () => {

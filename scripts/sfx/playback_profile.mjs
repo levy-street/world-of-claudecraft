@@ -8,6 +8,7 @@ import { existsSync, mkdirSync, readFileSync, renameSync, rmSync, writeFileSync 
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { readSfxGainCeilings } from './sfx_gain_ceiling.mjs';
+import { isSfxMobExtensionKey } from './sfx_manifest_builder.mjs';
 import { SFX } from './sfx_prompts.mjs';
 
 export const DEFAULT_SFX_PROFILE_REPO_ROOT = fileURLToPath(new URL('../..', import.meta.url));
@@ -33,6 +34,19 @@ const PLAYBACK_RATE_MIN = 0.25;
 const PLAYBACK_RATE_MAX = 4;
 const SFX_KEYS = new Set(SFX.map((entry) => entry.key));
 const CATEGORY_SET = new Set(SFX_PLAYBACK_CATEGORIES);
+
+// The addressable key universe for the runtime-only profile maps: the fixed
+// catalog plus the filesystem-discovered mob subfamily extension keys
+// (mob_<family>_<subfamily>_<action>), which deliberately have no catalog row
+// but are real, loadable manifest keys a trim may target. An extension key
+// with no computed ceiling record still resolves under the flat 0dB cap, so
+// accepting it here can never smuggle in a boost the ceiling did not grant.
+// The deliberate trade: a grammar-valid key with no files on disk is accepted
+// too, so a ZERO or NEGATIVE trim on a typo of one sits as a dead entry (a
+// positive trim still fails loudly against the 0dB cap).
+function isAddressableSfxKey(key) {
+  return SFX_KEYS.has(key) || isSfxMobExtensionKey(key);
+}
 // Computed per-key headroom for custom (hand-mastered) keys only, see
 // sfx_gain_ceiling.mjs: a key with a real generated entry here may resolve
 // ABOVE RESOLVED_GAIN_MAX_DB, up to its own measured-headroom ceiling. Every
@@ -146,7 +160,7 @@ export function normalizeSfxGainMap(raw) {
 
   const keyTrimDb = {};
   for (const key of Object.keys(rawTrims).sort()) {
-    if (!SFX_KEYS.has(key)) throw new Error(`unknown SFX gain key: ${key}`);
+    if (!isAddressableSfxKey(key)) throw new Error(`unknown SFX gain key: ${key}`);
     keyTrimDb[key] = boundedNumber(
       rawTrims[key],
       KEY_TRIM_MIN_DB,
@@ -157,6 +171,13 @@ export function normalizeSfxGainMap(raw) {
 
   const normalized = { version: 1, categoryBaselineDb, keyTrimDb };
   for (const { key } of SFX) resolvedGainDb(key, normalized);
+  // Catalog keys were all resolution-checked above; extension keys exist only
+  // as trim targets, so check exactly the trimmed ones. This is what holds an
+  // extension-key boost to its own computed ceiling (or the flat 0dB cap when
+  // the key has no ceiling record) the same way catalog keys are held.
+  for (const key of Object.keys(keyTrimDb)) {
+    if (!SFX_KEYS.has(key)) resolvedGainDb(key, normalized);
+  }
   return normalized;
 }
 
@@ -167,7 +188,7 @@ export function normalizeSfxSpeedMap(raw) {
   const rawRates = assertObject(value.rateByKey, 'rateByKey');
   const rateByKey = {};
   for (const key of Object.keys(rawRates).sort()) {
-    if (!SFX_KEYS.has(key)) throw new Error(`unknown SFX speed key: ${key}`);
+    if (!isAddressableSfxKey(key)) throw new Error(`unknown SFX speed key: ${key}`);
     rateByKey[key] = boundedNumber(
       rawRates[key],
       PLAYBACK_RATE_MIN,
@@ -216,7 +237,7 @@ export function readSfxPlaybackProfile(repoRoot = DEFAULT_SFX_PROFILE_REPO_ROOT)
 }
 
 export function resolveSfxPlaybackProfile(key, rawProfile = {}) {
-  if (!SFX_KEYS.has(key)) throw new Error(`unknown SFX playback key: ${key}`);
+  if (!isAddressableSfxKey(key)) throw new Error(`unknown SFX playback key: ${key}`);
   const gainMap = normalizeSfxGainMap(rawProfile.gainMap ?? DEFAULT_SFX_GAIN_MAP);
   const speedMap = normalizeSfxSpeedMap(rawProfile.speedMap ?? DEFAULT_SFX_SPEED_MAP);
   const gainDb = resolvedGainDb(key, gainMap);

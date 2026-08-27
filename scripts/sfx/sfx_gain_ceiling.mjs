@@ -33,7 +33,11 @@ import { createHash } from 'node:crypto';
 import { existsSync, readFileSync, renameSync, rmSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { measureSfxTruePeakDb } from './conform_audio.mjs';
-import { discoverSfxTracks } from './sfx_manifest_builder.mjs';
+import {
+  discoverSfxTracks,
+  isSfxMobExtensionKey,
+  SFX_MOB_EXTENSION_KEY_PATTERN,
+} from './sfx_manifest_builder.mjs';
 import { SFX } from './sfx_prompts.mjs';
 
 export const SFX_GAIN_CEILING_PATH = 'scripts/sfx/sfx_gain_ceiling.generated.json';
@@ -90,6 +94,25 @@ export function computeSfxGainCeilingRecords(repoRoot, ffmpegPath) {
   const customKeys = new Set(
     SFX.filter((entry) => entry.custom === true).map((entry) => entry.key),
   );
+  // Discovered mob subfamily keys (mob_<family>_<subfamily>_<action>) come from
+  // the manifest extension pass and deliberately have no catalog row, so the
+  // catalog filter above can never include one. They are hand-recorded
+  // overrides of a family voice, so they inherit the family row's
+  // custom-master flag (the same one-source-of-truth resolution conform's
+  // isCustomMaster applies): a custom family's subfamily takes get real
+  // measured ceilings instead of silently keeping the flat 0dB cap.
+  const catalogByKey = new Map(SFX.map((entry) => [entry.key, entry]));
+  for (const key of Object.keys(discovered.entries)) {
+    if (customKeys.has(key)) continue;
+    // isSfxMobExtensionKey holds the family-membership gate locally (discovery
+    // upstream already refuses unknown families, and the family-row catalog
+    // lookup below would miss on one too; three gates on purpose so no single
+    // caller change can widen this).
+    if (!isSfxMobExtensionKey(key)) continue;
+    const match = key.match(SFX_MOB_EXTENSION_KEY_PATTERN);
+    if (!match) continue;
+    if (catalogByKey.get(`mob_${match[1]}_${match[3]}`)?.custom === true) customKeys.add(key);
+  }
   const stored = readStoredGainCeilingRecordsTolerant(repoRoot);
   const records = {};
   for (const key of [...customKeys].sort()) {
