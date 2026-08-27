@@ -154,10 +154,10 @@ export interface PerfectingInfoView {
    *  deny arm stays the authority. */
   equipBlocked: boolean;
   /** The NEXT act's bill, lock-aware: the three attempt materials while the
-   *  copy is unperfected, and the promotion's Deed of Making once
-   *  `perfected && !promoted` (the phase 14 window renders whichever rows
-   *  arrive; a promoted copy keeps the deed row at have-counts, its
-   *  requirement moot). Minimal on purpose: one field, one row shape. */
+   *  copy is unperfected, the promotion's Deed of Making once
+   *  `perfected && !promoted`, and EMPTY once promoted (no act is left, so no
+   *  row is promised; the phase 14 window renders whichever rows arrive).
+   *  Minimal on purpose: one field, one row shape. */
   materials: PerfectingMaterialView[];
 }
 
@@ -324,11 +324,17 @@ export function perfectingInfoFrom(inputs: PerfectingInfoInputs): PerfectingInfo
     skillReq: PERFECTING_SKILL_REQ,
     skillMet: craftId !== null && (inputs.craftSkills[craftId] ?? 0) >= PERFECTING_SKILL_REQ,
     bound: payload?.boundTo !== undefined,
-    materials: (perfected ? LEGENDARY_PROMOTION_COST : PERFECTING_ATTEMPT_COST).map((c) => ({
-      itemId: c.itemId,
-      required: c.count,
-      have: countUnlockedInSlots(inputs.inventory, c.itemId),
-    })),
+    // The NEXT act's bill, or NO bill once promoted: a legendary copy has no
+    // act left (arm 1 of the promotion ladder refuses it), and the affordance
+    // rule says a view promises nothing the path refuses, so the deed row is
+    // not listed at have-counts on a finished legend (the phase 13 QA).
+    materials: promoted
+      ? []
+      : (perfected ? LEGENDARY_PROMOTION_COST : PERFECTING_ATTEMPT_COST).map((c) => ({
+          itemId: c.itemId,
+          required: c.count,
+          have: countUnlockedInSlots(inputs.inventory, c.itemId),
+        })),
   };
 }
 
@@ -538,6 +544,10 @@ export function resolvePerfectingAttempt(
  * (resolvePerfectingAttempt owns that routing and sends an unperfected copy
  * down the attempt ladder instead), so a direct call on one is a caller bug
  * and no-ops: nothing consumed, nothing drawn, no invented player line.
+ * CALLERS SIT BEHIND THE DEAD GATE: this export runs no refusedWhileDead of
+ * its own; the two Sim wrappers (perfectItem / perfectItemAs) own it, and a
+ * new server or headless caller reaching this export directly must gate
+ * first, or a dead player's copy promotes (the phase 13 QA note).
  */
 export function resolveLegendaryPromotion(
   ctx: SimContext,

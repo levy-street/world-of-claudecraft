@@ -6529,9 +6529,10 @@ export type SimEvent = { pid?: number } & (
   // The soft zone-wide copy, one per overworld player currently in the owner's
   // zone INCLUDING the owner, `pid` being the RECIPIENT (the masterworkZone
   // idiom above; a SEPARATE type for the same own-mirror reason). itemName is
-  // the player-chosen legendary name; the FIRST event type carrying TWO pieces
-  // of player-authored text (ownerName and itemName), both VALUES the client
-  // interpolates, never keys.
+  // the player-chosen legendary name; the first event type carrying a
+  // player-authored ITEM name beside a character name (ownerName and
+  // itemName; duelEnd and guildInvite already carry two player-chosen names),
+  // both VALUES the client interpolates, never keys.
   | {
       type: 'legendaryForgedZone';
       pid: number;

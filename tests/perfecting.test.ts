@@ -164,6 +164,22 @@ describe('the deny ladder: order, zero draws, zero consumption', () => {
     expect(materialCounts(sim, pid)).toEqual(before);
   });
 
+  it('the IWorld arm (perfectItem, the offline host) runs the same dead gate', () => {
+    // The phase 13 QA mutation lane: deleting the guard on this arm alone
+    // survived every suite (the case above drives the server arm only), and
+    // the IWorld arm is the offline browser host's ONLY path.
+    const { sim, pid, meta, e } = perfecter(11);
+    sim.addItem(APEX_NECK, 1, pid);
+    e.dead = true;
+    const before = materialCounts(sim, pid);
+    sim.drainEvents();
+    const draws = drawsDuring(sim, () => sim.perfectItem(bagRefOf(meta, APEX_NECK)));
+    expect(errorsOf(sim)).toContain("You can't do that while dead.");
+    expect(draws).toBe(0);
+    expect(materialCounts(sim, pid)).toEqual(before);
+    expect(meta.inventory.find((s) => s.itemId === APEX_NECK)?.instance).toBeUndefined();
+  });
+
   it('an invalid ref denies with the noItem line, on every malformed shape', () => {
     const { sim, pid } = perfecter(12);
     sim.drainEvents();

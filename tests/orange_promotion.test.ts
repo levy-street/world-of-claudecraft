@@ -9,7 +9,8 @@
 // technique), never hand-stamped wholesale, except where an arm explicitly
 // needs a second Perfected copy and says so.
 import { describe, expect, it } from 'vitest';
-import { ITEMS } from '../src/sim/data';
+import { DEEDS } from '../src/sim/content/deeds';
+import { DUNGEON_X_THRESHOLD, ITEMS, zoneAt } from '../src/sim/data';
 import { isUniqueEquipped } from '../src/sim/equipment_rules';
 import {
   MAX_LEGENDARY_NAME_LENGTH,
@@ -143,6 +144,21 @@ describe('the content the promotion consumes', () => {
     expect(def.soulbound).toBeUndefined();
     expect(def.quality).toBe('rare');
   });
+
+  it('pins the D13-7 deed row BY NAME (renown 50, the legendariesForged count-1 trigger)', () => {
+    // The catalog sha and the total-renown literal both move on any edit, but
+    // neither names this row: a compensating edit elsewhere could keep the
+    // total while this row drifted. Named, the row is decisive on its own.
+    expect(DEEDS.prog_legendmaker).toMatchObject({
+      id: 'prog_legendmaker',
+      category: 'progression',
+      renown: 50,
+      trigger: { kind: 'stat', stat: 'legendariesForged', count: 1 },
+    });
+    expect(DEEDS.prog_legendmaker.reward).toBeUndefined();
+    expect(DEEDS.prog_legendmaker.hidden).toBeFalsy();
+    expect(DEEDS.prog_legendmaker.feat).toBeFalsy();
+  });
 });
 
 describe('the promotion success path (the real producer end to end)', () => {
@@ -185,7 +201,9 @@ describe('the promotion success path (the real producer end to end)', () => {
       (ev): ev is Extract<SimEvent, { type: 'legendaryForgedZone' }> =>
         ev.type === 'legendaryForgedZone',
     );
-    expect(zone.length).toBeGreaterThanOrEqual(1);
+    // Exactly one zone copy in a one-player world: a duplicate fan-out to the
+    // same recipient would read as a second line in chat.
+    expect(zone.length).toBe(1);
     expect(zone[0]).toMatchObject({
       pid,
       ownerPid: pid,
@@ -244,11 +262,21 @@ describe('the promotion success path (the real producer end to end)', () => {
     sim.addItem(APEX_NECK, 1, pid);
     sim.equipItem(APEX_NECK, pid);
     expect(meta.equipment.neck).toBe(APEX_NECK);
-    walkToPerfected(w, { slot: 'neck' });
+    const draws = walkToPerfected(w, { slot: 'neck' });
+    const base = draws();
+    const before = JSON.parse(JSON.stringify(meta.equipmentInstance.neck));
     const statsBefore = { int: e.stats.int, maxHp: e.maxHp, attackPower: e.attackPower };
     sim.perfectItemAs(pid, { slot: 'neck' }, NAME);
-    expect(meta.equipmentInstance.neck?.rolled?.quality).toBe('legendary');
-    expect(meta.equipmentInstance.neck?.name).toBe(NAME);
+    // The WORN arm's byte-identity proof, the bagged case's twin (the phase 13
+    // QA mutation lane: a worn-arm-only stat slip survived every pin): the
+    // payload is the pre-promotion payload plus EXACTLY the quality override
+    // and the name, and the arm drew nothing.
+    expect(meta.equipmentInstance.neck).toEqual({
+      ...before,
+      rolled: { ...before.rolled, quality: 'legendary' },
+      name: NAME,
+    });
+    expect(draws(), 'zero draws across the worn promotion').toBe(base);
     // Presentation only (R3): the wearer's derived stats never move.
     expect({ int: e.stats.int, maxHp: e.maxHp, attackPower: e.attackPower }).toEqual(statsBefore);
     // But the worn promotion DOES rerun recalcPlayerStats: it is the ONE
@@ -273,9 +301,96 @@ describe('the promotion success path (the real producer end to end)', () => {
     sim.perfectItemAs(pid, ref, NAME);
     expect(meta.deedStats.visited.has('quality:legendary'), 'marked at the stamp').toBe(true);
     expect(draws(), 'the mark costs zero draws').toBe(base);
-    // The dirty-key evaluator grants at the tick tail, not only after reload.
+    // The dirty-key evaluator grants at the tick tail, not only after reload:
+    // the discovery deed AND the phase's own capstone (the D13-7 row on the
+    // legendariesForged stat) both land this tick.
     sim.tick();
     expect(meta.deedsEarned.has('col_first_legendary')).toBe(true);
+    expect(meta.deedsEarned.has('prog_legendmaker')).toBe(true);
+  });
+
+  it('the shared view empties the bill once promoted (no act is left to promise)', () => {
+    const w = promoter(78);
+    const { sim, pid, meta } = w;
+    sim.addItemInstance(APEX_NECK, {}, pid, 1);
+    const ref = bagRefOf(meta, APEX_NECK);
+    walkToPerfected(w, ref);
+    // Perfected, not yet promoted: the bill is the promotion's Deed of Making.
+    expect(sim.perfectingInfo(ref, pid)).toMatchObject({
+      perfected: true,
+      promoted: false,
+      materials: [{ itemId: DEED, required: 1, have: 2 }],
+    });
+    sim.perfectItemAs(pid, ref, NAME);
+    // Promoted: no next act, so no row (the affordance rule: arm 1 refuses a
+    // re-promotion, and a view may not promise what the path refuses).
+    expect(sim.perfectingInfo(ref, pid)).toMatchObject({
+      perfected: true,
+      promoted: true,
+      equipBlocked: false,
+      materials: [],
+    });
+  });
+
+  it('an INSTANCED owner keeps only the personal event: no zone copies at all', () => {
+    const w = promoter(79);
+    const { sim, pid, meta, e } = w;
+    sim.addItemInstance(APEX_NECK, {}, pid, 1);
+    const ref = bagRefOf(meta, APEX_NECK);
+    const draws = walkToPerfected(w, ref);
+    const base = draws();
+    e.pos.x = DUNGEON_X_THRESHOLD + 100;
+    sim.drainEvents();
+    sim.perfectItemAs(pid, ref, NAME);
+    const events = sim.drainEvents() as SimEvent[];
+    expect(events.filter((ev) => ev.type === 'legendaryForged')).toHaveLength(1);
+    expect(events.filter((ev) => ev.type === 'legendaryForgedZone')).toHaveLength(0);
+    expect(draws(), 'the instance skip draws nothing either').toBe(base);
+    expect(meta.inventory[ref.bag].instance?.name, 'the promotion itself still landed').toBe(NAME);
+  });
+
+  it('fans one zone copy to every overworld player in the zone, the owner first, far zones excluded', () => {
+    const w = promoter(80);
+    const { sim, pid, meta, e } = w;
+    const near = sim.addPlayer('mage', 'Nearby');
+    const far = sim.addPlayer('priest', 'Farhand');
+    const nearE = sim.entities.get(near) as Entity;
+    const farE = sim.entities.get(far) as Entity;
+    nearE.pos.x = e.pos.x;
+    nearE.pos.z = e.pos.z;
+    // Walk the far peer out of the owner's zone (the masterwork_zone_broadcast
+    // idiom); the world's zone map decides where the border is.
+    const zoneId = zoneAt(e.pos.x, e.pos.z).id;
+    let z = e.pos.z;
+    for (let i = 0; i < 400 && zoneAt(e.pos.x, z).id === zoneId; i++) z += 50;
+    if (zoneAt(e.pos.x, z).id === zoneId) {
+      z = e.pos.z;
+      for (let i = 0; i < 400 && zoneAt(e.pos.x, z).id === zoneId; i++) z -= 50;
+    }
+    expect(zoneAt(e.pos.x, z).id, 'a second zone exists to place the far peer in').not.toBe(zoneId);
+    farE.pos.x = e.pos.x;
+    farE.pos.z = z;
+    sim.addItemInstance(APEX_NECK, {}, pid, 1);
+    const ref = bagRefOf(meta, APEX_NECK);
+    walkToPerfected(w, ref);
+    sim.drainEvents();
+    sim.perfectItemAs(pid, ref, NAME);
+    const events = sim.drainEvents() as SimEvent[];
+    const celebration = events.filter(
+      (ev) => ev.type === 'legendaryForged' || ev.type === 'legendaryForgedZone',
+    );
+    // Personal first, then exactly the owner's and the same-zone peer's copies.
+    expect(celebration.map((ev) => ev.type)).toEqual([
+      'legendaryForged',
+      'legendaryForgedZone',
+      'legendaryForgedZone',
+    ]);
+    const recipients = celebration
+      .filter((ev) => ev.type === 'legendaryForgedZone')
+      .map((ev) => ev.pid)
+      .sort((a, b) => (a ?? 0) - (b ?? 0));
+    expect(recipients).toEqual([pid, near].sort((a, b) => a - b));
+    expect(recipients).not.toContain(far);
   });
 
   it('promotes a Perfected copy with NO rolled record: a stats-free { quality } mints', () => {
@@ -307,21 +422,38 @@ describe('the promotion deny ladder: each arm red-direction, zero draws, nothing
     ref: { bag: number; itemId: string };
     draws: () => number;
     base: number;
+    rev: number;
+    forged: number;
   } {
     const w = promoter(seed);
     w.sim.addItemInstance(APEX_NECK, { signer: 'Crafter' }, w.pid, 1);
     const ref = bagRefOf(w.meta, APEX_NECK);
     const draws = walkToPerfected(w, ref);
     w.sim.drainEvents();
-    return { ...w, ref, draws, base: draws() };
+    return {
+      ...w,
+      ref,
+      draws,
+      base: draws(),
+      rev: w.meta.wireRev,
+      forged: w.meta.deedStats.counters.legendariesForged ?? 0,
+    };
   }
 
+  /** Every deny arm's shared contract: the one line, zero draws, the deed
+   *  count, no stamp, no wireRev bump, and the deed stat untouched (`rev` and
+   *  `forged` are the values captured at the walk, re-captured by a test
+   *  that promotes first). */
   function expectDenied(w: ReturnType<typeof walked>, line: string, deedsExpected: number): void {
     expect(errorsOf(w.sim)).toEqual([line]);
     expect(w.draws(), 'zero draws on the deny arm').toBe(w.base);
     expect(w.sim.countItem(DEED, w.pid)).toBe(deedsExpected);
     expect(w.meta.inventory[w.ref.bag].instance?.rolled?.quality).toBeUndefined();
     expect(w.meta.inventory[w.ref.bag].instance?.name).toBeUndefined();
+    expect(w.meta.wireRev, 'a denial never bumps wireRev').toBe(w.rev);
+    expect(w.meta.deedStats.counters.legendariesForged ?? 0, 'a denial never bumps the stat').toBe(
+      w.forged,
+    );
   }
 
   it('a missing name (undefined and empty) refuses with the needs-a-name line', () => {
@@ -347,6 +479,8 @@ describe('the promotion deny ladder: each arm red-direction, zero draws, nothing
     // discipline this fixture itself relies on).
     w.sim.removeItem(DEED, 2, w.pid);
     w.ref = bagRefOf(w.meta, APEX_NECK);
+    // The setup's own bag mutation bumped wireRev; the deny must not.
+    w.rev = w.meta.wireRev;
     w.sim.drainEvents();
     w.sim.perfectItemAs(w.pid, w.ref, NAME);
     expectDenied(w, NEEDS_DEED_LINE, 0);
@@ -369,12 +503,18 @@ describe('the promotion deny ladder: each arm red-direction, zero draws, nothing
     const w = walked(85);
     w.sim.perfectItemAs(w.pid, w.ref, NAME);
     expect(w.sim.countItem(DEED, w.pid), 'the promotion itself spent one').toBe(1);
+    expect(w.meta.deedStats.counters.legendariesForged).toBe(1);
     w.sim.drainEvents();
+    const revAfterPromotion = w.meta.wireRev;
     w.sim.perfectItemAs(w.pid, w.ref, 'Second Name');
     expect(errorsOf(w.sim)).toEqual([ALREADY_LINE]);
     expect(w.draws()).toBe(w.base);
     expect(w.sim.countItem(DEED, w.pid)).toBe(1);
     expect(w.meta.inventory[w.ref.bag].instance?.name, 'the first name stands').toBe(NAME);
+    // A refused re-promotion is a denial like any other: no wireRev bump and
+    // the forging count stays at the one real promotion.
+    expect(w.meta.wireRev).toBe(revAfterPromotion);
+    expect(w.meta.deedStats.counters.legendariesForged).toBe(1);
   });
 
   it('the skill gate guards the promotion too (one gate, both acts)', () => {
@@ -389,12 +529,13 @@ describe('the promotion deny ladder: each arm red-direction, zero draws, nothing
     expect(w.sim.countItem(DEED, w.pid)).toBe(2);
   });
 
-  it('a denial never bumps wireRev; the success pair is pinned above', () => {
+  it('a denial never bumps wireRev on ANY arm; the success pair is pinned above', () => {
+    // Every arm in this describe asserts it through expectDenied; this case
+    // keeps the two cheapest arms back to back so the claim reads in one place.
     const w = walked(87);
-    const revBefore = w.meta.wireRev;
     w.sim.perfectItemAs(w.pid, w.ref); // needs-a-name
     w.sim.perfectItemAs(w.pid, w.ref, '1Blade'); // bad shape
-    expect(w.meta.wireRev).toBe(revBefore);
+    expect(w.meta.wireRev).toBe(w.rev);
   });
 });
 

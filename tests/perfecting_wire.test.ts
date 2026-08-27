@@ -611,4 +611,91 @@ describe('perfect_item over the real online dispatch path', () => {
       rank: 1,
     });
   });
+
+  it('the phase 13 view fields cross the wire: perfected, promoted, equipBlocked, the emptied bill', () => {
+    // The phase 13 QA architecture review: the equality case above never
+    // reaches a Perfected copy, so `promoted`, `equipBlocked`, and the bill
+    // switching to the deed were only ever compared at their defaults. This
+    // case walks three copies to the states those fields exist for and pins
+    // both hosts on each, over a real snapshot.
+    const server = new GameServer();
+    const fc = fakeWs();
+    const session = joinServer(server, fc, 906, 'MirrorLegend');
+    const pid = session.pid as number;
+    seedPerfecter(server, pid);
+    server.sim.setPlayerLevel(20, pid);
+    // Twelve attempts across three copies: top the seeded eight of each material up.
+    for (const c of PERFECTING_ATTEMPT_COST) server.sim.addItem(c.itemId, MATERIALS, pid);
+    server.sim.addItem('deed_of_making', 2, pid);
+    // (1) A WORN signet walked to Perfected and PROMOTED: the legendary sub-cap
+    // slot, promoted true, equipBlocked false (nothing is pending), no bill.
+    server.sim.addItem('warhewn_signet', 1, pid);
+    server.sim.equipItem('warhewn_signet', pid);
+    expect(serverMeta(server, pid).equipment.ring1).toBe('warhewn_signet');
+    withForcedRoll(server.sim, 0, () => {
+      for (let i = 0; i < PERFECTING_RANKS; i++) {
+        cmd(server, session, { cmd: 'perfect_item', slot: 'ring1' });
+      }
+    });
+    cmd(server, session, { cmd: 'perfect_item', slot: 'ring1', name: 'Mirror Oath' });
+    expect(serverMeta(server, pid).equipmentInstance.ring1?.name).toBe('Mirror Oath');
+    // (2) A BAGGED signet twin walked to Perfected but NOT promoted: its
+    // promotion would mint a unique-equip conflict with the worn twin, so
+    // equipBlocked reads true, with the deed bill still listed.
+    server.sim.addItem('warhewn_signet', 1, pid);
+    const twin = bagRefOf(server, pid, 'warhewn_signet');
+    withForcedRoll(server.sim, 0, () => {
+      for (let i = 0; i < PERFECTING_RANKS; i++) {
+        cmd(server, session, { cmd: 'perfect_item', ...wireOf(twin) });
+      }
+    });
+    // (3) The BAGGED neck walked to Perfected and promoted: promoted true, no bill.
+    const neck = bagRefOf(server, pid, APEX_NECK);
+    withForcedRoll(server.sim, 0, () => {
+      for (let i = 0; i < PERFECTING_RANKS; i++) {
+        cmd(server, session, { cmd: 'perfect_item', ...wireOf(neck) });
+      }
+    });
+    cmd(server, session, { cmd: 'perfect_item', ...wireOf(neck), name: 'Second Oath' });
+    expect(serverMeta(server, pid).inventory[neck.bag].instance?.name).toBe('Second Oath');
+    expect(server.sim.countItem('deed_of_making', pid)).toBe(0);
+
+    // The last deed cell emptied above, so the bagged refs are re-resolved
+    // (the index-plus-id pin means a stale index answers null, never a
+    // neighbour): the neck sits below the deed cell, the twin above it.
+    const neckNow = bagRefOf(server, pid, APEX_NECK);
+    const twinNow = bagRefOf(server, pid, 'warhewn_signet');
+    fc.sent.length = 0;
+    broadcast(server);
+    const client = bareClient(pid);
+    for (const frame of fc.sent) {
+      if (frame.t === 'snap')
+        (client as unknown as { applySnapshot(s: unknown): void }).applySnapshot(frame);
+    }
+    for (const ref of [neckNow, twinNow, { slot: 'ring1' }] as PerfectItemRef[]) {
+      const online = client.perfectingInfo(ref);
+      const offline = server.sim.perfectingInfo(ref, pid);
+      expect(online, JSON.stringify(ref)).toEqual(offline);
+      expect(offline, 'the fixture really resolved a view').not.toBeNull();
+    }
+    // The values themselves, so the equality above is not two defaults agreeing.
+    expect(client.perfectingInfo({ slot: 'ring1' })).toMatchObject({
+      perfected: true,
+      promoted: true,
+      equipBlocked: false,
+      materials: [],
+    });
+    expect(client.perfectingInfo(twinNow)).toMatchObject({
+      perfected: true,
+      promoted: false,
+      equipBlocked: true,
+      materials: [{ itemId: 'deed_of_making', required: 1, have: 0 }],
+    });
+    expect(client.perfectingInfo(neckNow)).toMatchObject({
+      perfected: true,
+      promoted: true,
+      equipBlocked: false,
+      materials: [],
+    });
+  });
 });
