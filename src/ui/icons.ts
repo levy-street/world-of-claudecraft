@@ -3987,6 +3987,14 @@ const ITEM_RECIPES: Record<string, IconRecipe> = {
     { p: 'coin', pal: 'gold', s: 1.15 },
     { p: 'gem', pal: 'sky', s: 0.7 },
   ]),
+  // The Deed of Making (masterwrought phase 13): the same ART_PENDING drawn
+  // stand-in treatment as the parked families above. A sealed writ: the
+  // parchment ground plus a 'scroll' primary say DOCUMENT (the pattern-family
+  // register), the gold sigil-rune accent is the maker's seal that tells it
+  // apart from every pattern_* scroll (those carry item glyph accents), and
+  // the glow carries its rare quality (glow starts at rare in these
+  // families).
+  deed_of_making: r('parchment', 'gold', ['scroll', { p: 'sigil_rune', ...BR }], ['glow']),
   // misc UI icons (not real items)
   coin_gold: r('treasure', 'gold', ['coin'], ['sparkle']),
   slot_empty: r('junk', 'silverWhite', []),
@@ -5864,6 +5872,12 @@ export const ITEM_ART_PENDING = new Set<string>([
   // authored recipes in ITEM_RECIPES and NO mapping.json row while parked.
   'cogwheel_blank',
   'copperlens_ocular',
+  // The orange promotion's writ (masterwrought phase 13): the same ip-16-ICON
+  // scheduled park, for the same reason as every entry above: committed WebP
+  // art needs the maintainer's master SHA, which a phase session cannot
+  // produce. Authored recipe in ITEM_RECIPES; no mapping.json row while
+  // parked.
+  'deed_of_making',
 ]);
 
 /** Static URL of an item's (or a UI pseudo-item's) image icon, or null if it uses a recipe. */
@@ -5935,6 +5949,12 @@ export const DEED_ART_PENDING: ReadonlySet<string> = new Set([
   // appended it to the deeds table behind this branch's farming rows, so
   // DEED_ORDER lists it last.
   'prog_ready_for_an_adventure',
+  // Phase 13's promotion capstone, falling back to deed_cat_progression until
+  // its commissioned art lands (docs/achievements/icon-brief.md), appended at
+  // the TAIL to match its DEED_ORDER position (the load-bearing note above).
+  // It carries NO title, so the Reliquary title-shelf rule that forced
+  // prog_farming_100's crest to ship committed does not apply here.
+  'prog_legendmaker',
 ]);
 /** Static URL of a deed crest's painted art, or null when the crest id has no committed image. */
 export function deedImageUrl(crestId: string): string | null {

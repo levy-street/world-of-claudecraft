@@ -1418,6 +1418,24 @@ export const PROFESSION_ITEMS: Record<string, ItemDef> = {
     quality: 'common',
     sellValue: 45,
   },
+  // The orange promotion's writ (Masterwrought phase 13, R3/R13): inscription's
+  // first 125-rung output (recipe_deed_of_making), consumed 1:1 by the
+  // legendary promotion of an already-Perfected apex copy
+  // (professions/perfecting.ts LEGENDARY_PROMOTION_COST). A consumable
+  // document, never gear: no slot, no stats, never masterwrought. Of the
+  // perfecting-bill family it takes the TRADABLE arm (the wyrmfall_core
+  // shape: 'junk' reuse, quality above poor so sellAllJunk never touches it),
+  // not the soulbound token arm, because an inscriptionist scribes it FOR the
+  // promoter; soulbound would dead-end the design. Price basis: input 313 vs
+  // output 50 (the recipe row spells the arithmetic).
+  deed_of_making: {
+    id: 'deed_of_making',
+    name: 'Deed of Making',
+    kind: 'junk',
+    quality: 'rare',
+    stackSize: 20,
+    sellValue: 50,
+  },
 
   // --- Masterwrought apex armor (Phase 08, R13/R14) --------------------------
   // The skill-100 rung for the three armor crafts: nine ilvl-31 epics (recipe

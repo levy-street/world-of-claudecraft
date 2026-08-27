@@ -2049,6 +2049,35 @@ export const INSCRIPTION_RECIPES: ProfessionRecipeRecord[] = [
     acquisition: ['trainer'],
     stationType: 'apothecary',
   },
+  // The Deed of Making (Masterwrought phase 13, R3/R13): inscription's FIRST
+  // and only 125 rung, the writ the orange promotion consumes 1:1
+  // (professions/perfecting.ts LEGENDARY_PROMOTION_COST). Trainer-taught, NOT
+  // a drop row like the apex arrays: the promotion's real gates are the
+  // Perfected copy and the deed's bill, so the pattern itself stays a
+  // teachable service any 125 inscriptionist sells. The bill is the consumed-
+  // capstone idiom (the apex feast shape): 3 of the craft's own intermediate,
+  // ONE Wyrmfall Core because the output is spent, plus the craft's gathered
+  // family (the voidbound grimoire's own lines). Input 313 (vellum 3x45, core
+  // 50, sunpetal 2x40, essence 2x18, vial 12) vs output 50. NOT oncePerDay:
+  // promotion pacing lives in the Perfected walk, never in a craft gate.
+  {
+    id: 'recipe_deed_of_making',
+    professionId: 'inscription',
+    resultItemId: 'deed_of_making',
+    resultCount: 1,
+    reagents: [
+      { itemId: 'sablewax_vellum', count: 3 },
+      { itemId: 'wyrmfall_core', count: 1 },
+      { itemId: 'sunpetal_herb', count: 2 },
+      { itemId: 'arcane_essence', count: 2 },
+      { itemId: 'glass_vial', count: 1 },
+    ],
+    skillReq: 125,
+    itemLevelBudget: 25,
+    level: 25,
+    acquisition: ['trainer'],
+    stationType: 'apothecary',
+  },
 ];
 
 // The Masterwrought intermediates rung (Phase 07, R13): one intermediate
@@ -3002,7 +3031,9 @@ export const APEX_CONSUMABLE_RECIPES: ProfessionRecipeRecord[] = [
   // ceiling. ALL_RECIPES topped out at 150 at that phase's own runtime, the
   // apex tool family it recorded as out of scope, census "3 at 125, 3 at
   // 150"; masterwrought Phase 11o later re-tiered those three to 125, so the
-  // table now tops out at the cap.) Neither is a hoe twin (the hoe ladder
+  // table now tops out at the cap. 2026-08-27, phase 13 / R13: INSCRIPTION
+  // joins the 125 rung with recipe_deed_of_making, its first, a trainer row
+  // in INSCRIPTION_RECIPES rather than a drop.) Neither is a hoe twin (the hoe ladder
   // takes fine_vale_wheat,
   // fine_marsh_rice and fine_highland_barley under farming's deviation (ad)),
   // so nothing is double-booked.
