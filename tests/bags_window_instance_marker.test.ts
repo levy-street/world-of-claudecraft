@@ -15,6 +15,7 @@ import { describe, expect, it } from 'vitest';
 import type { InvSlot, QuestProgress } from '../src/sim/types';
 import { bagInstanceGlyphKind } from '../src/ui/bag_instance_glyph_view';
 import { BagsWindow, type BagsWindowDeps } from '../src/ui/bags_window';
+import { QUALITY_COLOR } from '../src/ui/icons';
 import { ItemDragState } from '../src/ui/item_drag_state';
 import type { IWorld } from '../src/world_api';
 
@@ -153,6 +154,26 @@ describe('bags grid instanced-slot marker', () => {
     // cell uses the maker-marked label, the plain cell keeps the pre-12d one.
     expect(cells[0].getAttribute('aria-label')).toContain('maker-marked copy');
     expect(cells[1].getAttribute('aria-label')).not.toContain('maker-marked copy');
+  });
+
+  it('a promoted copy paints the legendary rim; the plain copy of the same def keeps its tier', () => {
+    // The all-surfaces item-cell rule (phase 13): the q-<quality> class and the
+    // quality color var read INSTANCE-effective quality (bagQualityKey), so a
+    // promoted legendary keeps its rim in the grid, and the def-only sibling
+    // is the negative that proves the def alone decides nothing here.
+    const root = windowFor([
+      { itemId: 'copper_ore', count: 1, instance: { rolled: { quality: 'legendary' } } },
+      { itemId: 'copper_ore', count: 1 },
+    ]);
+    const cells = root.querySelectorAll('button.bag-item');
+    expect(cells.length).toBe(2);
+    expect(cells[0].classList.contains('q-legendary')).toBe(true);
+    expect(cells[0].classList.contains('q-common')).toBe(false);
+    expect((cells[0] as HTMLElement).style.getPropertyValue('--bag-slot-quality')).toBe(
+      QUALITY_COLOR.legendary,
+    );
+    expect(cells[1].classList.contains('q-common')).toBe(true);
+    expect(cells[1].classList.contains('q-legendary')).toBe(false);
   });
 
   it('every glyph kind gives the CELL its own accessible name, never one label for all', () => {

@@ -54,15 +54,21 @@ const MASTERWROUGHT_IDS = [
 // recipe output (crafted_item_tooltip_coverage demands purpose text and its
 // junk kind has no def-level use line to provide it).
 const FARM_SUPPLY_HINT_IDS = ['growth_tonic'];
+// The promotion writ (Masterwrought phase 13): the Deed of Making is a recipe
+// output (recipe_deed_of_making) whose junk kind carries no def-level use
+// because the final Perfecting rank consumes it, so the purpose line is the
+// one place its tooltip says what it is for (the growth_tonic precedent).
+const PROMOTION_WRIT_HINT_IDS = ['deed_of_making'];
 const EXPECTED_IDS = [
   ...ENCHANTING_IDS,
   ...FINE_IDS,
   ...MASTERWROUGHT_IDS,
   ...FARM_SUPPLY_HINT_IDS,
+  ...PROMOTION_WRIT_HINT_IDS,
 ].sort();
 
 describe('material_hint_view', () => {
-  it('covers exactly the enchanting materials, fine grades, masterwrought intermediates, and farm supplies, no more and no less', () => {
+  it('covers exactly the enchanting materials, fine grades, masterwrought intermediates, farm supplies, and the promotion writ, no more and no less', () => {
     expect(Object.keys(MATERIAL_HINT_KEYS).slice().sort()).toEqual(EXPECTED_IDS);
     expect(FINE_IDS).toHaveLength(9);
     expect(MASTERWROUGHT_IDS).toHaveLength(10);

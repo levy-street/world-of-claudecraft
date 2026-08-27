@@ -719,6 +719,22 @@ describe('bagQualityKey', () => {
     expect(bagQualityKey({ quality: 'epic' })).toBe('epic');
     expect(bagQualityKey({})).toBe('common');
   });
+
+  it('reads instance-effective quality: a promoted copy outranks its def, a plain copy does not', () => {
+    // The all-surfaces item-cell rule (phase 13): the rim describes the COPY.
+    expect(bagQualityKey({ quality: 'epic' }, { rolled: { quality: 'legendary' } })).toBe(
+      'legendary',
+    );
+    // Def-only negatives: no payload, and a payload with no rolled quality,
+    // both keep the def tier.
+    expect(bagQualityKey({ quality: 'epic' }, undefined)).toBe('epic');
+    expect(bagQualityKey({ quality: 'epic' }, { signer: 'Ana' })).toBe('epic');
+    // An unrecognized rolled string narrows back to the def tier (the
+    // tooltipEffectiveQuality hostile-wire doctrine), never leaks into a class.
+    expect(bagQualityKey({ quality: 'epic' }, { rolled: { quality: 'mythic' } } as never)).toBe(
+      'epic',
+    );
+  });
 });
 
 describe('bagStackIndex (bank-deposit target resolution)', () => {

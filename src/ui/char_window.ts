@@ -35,7 +35,7 @@ import { buildGatheringProficiencyRows } from './gathering_view';
 import { formatNumber, type TranslationKey, t, tPlural } from './i18n';
 import { iconDataUrl, professionIconUrl, QUALITY_COLOR } from './icons';
 import type { ItemDragState } from './item_drag_state';
-import { wornTooltipInstance } from './item_instance_tooltip';
+import { tooltipEffectiveQuality, wornTooltipInstance } from './item_instance_tooltip';
 import type { PainterHostPresentation } from './painter_host';
 import { playtimeParts, playtimeShape } from './playtime_view';
 import {
@@ -336,7 +336,7 @@ export class CharWindow {
         );
       });
     }
-    const view = buildPaperdollView(world.equipment, ITEMS);
+    const view = buildPaperdollView(world.equipment, ITEMS, world.equipmentInstances);
     const leftCol = el.querySelector('#equip-col-left');
     const rightCol = el.querySelector('#equip-col-right');
     for (const cell of view.left) leftCol?.appendChild(this.buildSlotRow(cell));
@@ -414,7 +414,7 @@ export class CharWindow {
   }
 
   private buildSlotRow(cell: PaperdollSlot): HTMLElement {
-    const { slot, item } = cell;
+    const { slot, item, instance } = cell;
     const row = document.createElement('div');
     row.className = 'equip-slot';
     // Stable id + programmatic focusability so the corner-x rebuild can hand focus
@@ -425,14 +425,20 @@ export class CharWindow {
     // the touch hit test (item_drop_hit_test.ts), which has no drop event to read.
     row.dataset.equipSlot = slot;
     this.bindEquipDropTarget(row, slot);
+    // The row describes the worn COPY, not just its def (the all-surfaces
+    // item-cell rule): instance-effective quality colors the line and a
+    // promoted copy's player-chosen name replaces the def name. The chosen
+    // name is player-authored text, so it is esc'd raw, never through t().
+    const wornName = item ? (instance?.name ?? itemDisplayName(item)) : null;
     const qColor = !item
       ? SLOT_EMPTY_TEXT_COLOR
-      : (QUALITY_COLOR[item.quality ?? 'common'] ?? QUALITY_DEFAULT_COLOR);
+      : (QUALITY_COLOR[tooltipEffectiveQuality(item, instance ?? undefined) ?? 'common'] ??
+        QUALITY_DEFAULT_COLOR);
     const icon = item
       ? this.deps.itemIcon(item)
       : `<img class="item-icon" style="border-color:${SLOT_EMPTY_BORDER_COLOR}" src="${iconDataUrl('item', 'slot_empty')}" alt="" draggable="false">`;
     row.innerHTML = `${icon}
-        <div><div class="slot-name">${esc(this.deps.slotName(slot))}</div><div class="slot-item" style="color:${qColor}">${item ? esc(itemDisplayName(item)) : esc(t('itemUi.equipment.empty'))}</div></div>`;
+        <div><div class="slot-name">${esc(this.deps.slotName(slot))}</div><div class="slot-item" style="color:${qColor}">${wornName !== null ? esc(wornName) : esc(t('itemUi.equipment.empty'))}</div></div>`;
     // The helmet-visibility eye (head socket only): a standing wardrobe control,
     // so unlike the corner x it is always visible, and it rides the socket
     // because that is where the player looks for "my helmet". State + side
@@ -482,9 +488,11 @@ export class CharWindow {
       unequip.type = 'button';
       unequip.className = 'equip-unequip-btn';
       unequip.innerHTML = svgIcon('close');
+      // The aria interpolates the same worn-copy name the row shows (a named
+      // legendary hears its chosen name), still as a t() VALUE.
       unequip.setAttribute(
         'aria-label',
-        t('hudChrome.paperdoll.unequipAria', { item: itemDisplayName(item) }),
+        t('hudChrome.paperdoll.unequipAria', { item: wornName ?? itemDisplayName(item) }),
       );
       unequip.addEventListener('click', (ev) => {
         ev.stopPropagation();
@@ -534,6 +542,7 @@ export class CharWindow {
         world.equipment,
         world.equipmentInstances,
         world.inventory,
+        target?.slotIndex,
       )
     ) {
       case 'blockedSlot':
@@ -569,8 +578,10 @@ export class CharWindow {
 
   /** Light up every socket that would ACCEPT the stack in flight (null clears them).
    *  Only the accepting sockets light: the feedback is the same pure decision the
-   *  drop itself runs, so a lit socket always takes the piece. */
-  markDropTargets(itemId: string | null): void {
+   *  drop itself runs, so a lit socket always takes the piece. `slotIndex` names
+   *  the drag source's bag cell (the copy the drop would consume), threaded so
+   *  the lit set matches the drop verdict for a named copy too. */
+  markDropTargets(itemId: string | null, slotIndex?: number): void {
     const el = this.deps.root();
     const world = this.deps.world();
     const item = itemId ? ITEMS[itemId] : undefined;
@@ -588,6 +599,7 @@ export class CharWindow {
           world.equipment,
           world.equipmentInstances,
           world.inventory,
+          slotIndex,
         ) === 'equip';
       row.classList.toggle('drop-target', accepts);
     }
@@ -613,6 +625,7 @@ export class CharWindow {
           world.equipment,
           world.equipmentInstances,
           world.inventory,
+          drag.index ?? undefined,
         ) !== 'equip'
       )
         return;

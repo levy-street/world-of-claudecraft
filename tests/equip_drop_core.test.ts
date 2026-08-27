@@ -284,12 +284,15 @@ afterAll(() => {
 });
 
 describe('paperdollDropAction promoted-copy unique mirror (Masterwrought phase 13)', () => {
-  // The orange promotion stamps rolled.quality = 'legendary' on an EPIC def's
-  // copy, so the unique-equipped rule reads EFFECTIVE quality on both sides:
-  // the worn payloads (instances) and the sim's own highest-index candidate
-  // peek over the mirrored bags (equipCandidateInstance). RING is epic by
-  // def, so every verdict below is instance-driven.
-  const PROMOTED = { rolled: { quality: 'legendary' as const } };
+  // The orange promotion stamps rolled.quality = 'legendary' on a PERFECTED
+  // copy of an EPIC def, so the unique-equipped rule is promotion-scoped and
+  // add-only (isUniqueEquipped: def legendary OR perfected + rolled
+  // legendary), read on both sides: the worn payloads (instances) and the
+  // sim's own candidate peek over the mirrored bags (equipCandidateInstance).
+  // RING is epic by def, so every verdict below is instance-driven; the
+  // fixture carries `perfected` because a bare rolled-legendary payload (no
+  // promotion behind it) deliberately does NOT count.
+  const PROMOTED = { perfected: true as const, rolled: { quality: 'legendary' as const } };
 
   it('the fixture def is epic, so the def-only read alone decides nothing here', () => {
     expect(RING.quality).toBe('epic');
@@ -333,9 +336,9 @@ describe('paperdollDropAction promoted-copy unique mirror (Masterwrought phase 1
     ).toBe('equip');
   });
 
-  it('the candidate peek is the sim selection rule: the HIGHEST-index unit decides', () => {
-    // A promoted copy sitting UNDER a plain one is not what the sim would
-    // consume, so the feedback must read the plain top copy and allow.
+  it('the candidate peek is the sim selection rule: id-only, the HIGHEST-index unit decides', () => {
+    // A promoted copy sitting UNDER a plain one is not what an id-only equip
+    // would consume, so the feedback must read the plain top copy and allow.
     expect(
       paperdollDropAction(
         RING,
@@ -351,6 +354,64 @@ describe('paperdollDropAction promoted-copy unique mirror (Masterwrought phase 1
         ],
       ),
     ).toBe('equip');
+  });
+
+  it('a drag NAMING a cell judges exactly that copy, both directions (the slotIndex peek)', () => {
+    // The premise of the highest-index pin above changed: since the sim's
+    // equip honors the drag's own cell selection, the mirror threads the SAME
+    // slotIndex into the peek. Direction one: the named LOWER-index copy is
+    // promoted, so the drop is refused even though the top copy is plain.
+    const bags = [
+      { itemId: RING.id, count: 1, instance: PROMOTED },
+      { itemId: RING.id, count: 1 },
+    ];
+    expect(
+      paperdollDropAction(
+        RING,
+        'ring2',
+        'warrior',
+        20,
+        null,
+        { ring1: RING.id },
+        { ring1: PROMOTED },
+        bags,
+        0,
+      ),
+    ).toBe('blockedUnique');
+    // Direction two: naming the PLAIN copy equips even with a promoted copy
+    // sitting at a higher index (the copy the id-only rule would have read).
+    const bagsPromotedOnTop = [
+      { itemId: RING.id, count: 1 },
+      { itemId: RING.id, count: 1, instance: PROMOTED },
+    ];
+    expect(
+      paperdollDropAction(
+        RING,
+        'ring2',
+        'warrior',
+        20,
+        null,
+        { ring1: RING.id },
+        { ring1: PROMOTED },
+        bagsPromotedOnTop,
+        0,
+      ),
+    ).toBe('equip');
+    // An index that no longer names a matching cell falls back to the
+    // highest-index rule rather than judging a stranger's payload.
+    expect(
+      paperdollDropAction(
+        RING,
+        'ring2',
+        'warrior',
+        20,
+        null,
+        { ring1: RING.id },
+        { ring1: PROMOTED },
+        bagsPromotedOnTop,
+        7,
+      ),
+    ).toBe('blockedUnique');
   });
 
   it('agrees with the sim on the promoted duplicate (the authority check)', () => {
@@ -482,13 +543,43 @@ describe('paperdollDropAction Masterwrought counted-family mirror', () => {
       ]),
     ).toBe('blockedMasterwroughtLegendary');
     // The same two units the other way round: the legendary one is no longer
-    // the copy an equip would lift, so the drop is legal again. This is the
-    // assertion that fails if the mirror ever reads "any matching unit".
+    // the copy an id-only equip would lift, so the drop is legal again. This is
+    // the assertion that fails if the mirror ever reads "any matching unit".
     expect(
       paperdollDropAction(ITEMS[MW_BAND], 'ring2', 'warrior', 20, null, worn, {}, [
         legendaryUnit,
         plainUnit,
       ]),
+    ).toBe('equip');
+    // And a drag NAMING a cell flips both verdicts (the slotIndex peek, the
+    // sub-cap's twin of the unique-mirror direction pair): the named
+    // lower-index legendary copy blocks, the named plain copy equips even with
+    // the legendary one sitting at the higher index.
+    expect(
+      paperdollDropAction(
+        ITEMS[MW_BAND],
+        'ring2',
+        'warrior',
+        20,
+        null,
+        worn,
+        {},
+        [legendaryUnit, plainUnit],
+        0,
+      ),
+    ).toBe('blockedMasterwroughtLegendary');
+    expect(
+      paperdollDropAction(
+        ITEMS[MW_BAND],
+        'ring2',
+        'warrior',
+        20,
+        null,
+        worn,
+        {},
+        [plainUnit, legendaryUnit],
+        0,
+      ),
     ).toBe('equip');
   });
 
@@ -554,6 +645,47 @@ describe('paperdollDropAction Masterwrought counted-family mirror', () => {
     const refusals: string[] = [];
     for (const ev of sim.tick()) if (ev.type === 'error') refusals.push(ev.text);
     expect(refusals).toContain('You can only equip one legendary Masterwrought item.');
+  });
+
+  it('agrees with the sim when the drag NAMES the plain lower-index copy (the slotIndex arm)', () => {
+    // The named-cell twin of the case above: same bags, but the equip carries
+    // the plain copy's own cell, so BOTH sides let it through, and the worn
+    // payload proves the sim consumed the named unit, not the legendary top.
+    const sim = new Sim({ seed: 13, playerClass: 'warrior', noPlayer: true }) as Sim &
+      Record<string, any>;
+    const pid = sim.addPlayer('warrior', 'Wend');
+    sim.setPlayerLevel(20, pid);
+    sim.addItem(MW_SIGNET, 1, pid);
+    sim.equipItemToSlot(MW_SIGNET, 'ring1', pid);
+    expect(equipmentOf(sim, pid).ring1).toBe(MW_SIGNET);
+    const meta = sim.players.get(pid)!;
+    meta.inventory.push({ itemId: MW_BAND, count: 1 });
+    meta.inventory.push({
+      itemId: MW_BAND,
+      count: 1,
+      instance: { rolled: { quality: 'legendary' } },
+    });
+    const named = meta.inventory.findIndex(
+      (s: { itemId: string; instance?: unknown }) => s.itemId === MW_BAND && !s.instance,
+    );
+    expect(named).toBeGreaterThanOrEqual(0);
+    expect(
+      paperdollDropAction(
+        ITEMS[MW_BAND],
+        'ring2',
+        'warrior',
+        20,
+        null,
+        equipmentOf(sim, pid),
+        meta.equipmentInstance,
+        meta.inventory,
+        named,
+      ),
+    ).toBe('equip');
+    sim.equipItemToSlot(MW_BAND, 'ring2', pid, named);
+    expect(equipmentOf(sim, pid).ring2).toBe(MW_BAND);
+    // The named plain unit is what got worn: no legendary payload rode along.
+    expect(meta.equipmentInstance?.ring2?.rolled?.quality).toBeUndefined();
   });
 });
 

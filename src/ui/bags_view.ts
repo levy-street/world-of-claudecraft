@@ -12,7 +12,7 @@
 import { type BagCells, layoutBagCells } from '../sim/inventory_order';
 import { isTransferLockedInstance } from '../sim/item_instance_transfer';
 import type { Quality } from '../sim/loot_master';
-import type { InvSlot, ItemInstancePayload } from '../sim/types';
+import type { InvSlot, ItemDef, ItemInstancePayload } from '../sim/types';
 import {
   applyBagFilter,
   type BagFilterState,
@@ -20,6 +20,7 @@ import {
   bagOrderIsManual,
   type ItemLookup,
 } from './bag_filter';
+import { tooltipEffectiveQuality } from './item_instance_tooltip';
 
 export type { BagCells };
 
@@ -477,11 +478,17 @@ function isToolEffectBagUse(use: unknown): boolean {
   );
 }
 
-/** The quality key into QUALITY_COLOR for an item ('common' when unspecified).
- *  The painter maps this to a color token; centralizing the default here keeps
- *  the fallback out of the painter as a magic string. */
-export function bagQualityKey(item: { quality?: string }): string {
-  return item.quality ?? 'common';
+/** The quality key into QUALITY_COLOR for an item cell ('common' when
+ *  unspecified). Instance-aware since phase 13 (the all-surfaces item-cell
+ *  rule: a mark describes the ITEM): the copy's rolled quality wins over its
+ *  def's through the tooltip's ONE effective-quality rule, so a promoted
+ *  legendary keeps its rim in the bag, bank, and guild bank grids alike. The
+ *  painter maps this to a color token; centralizing the default here keeps the
+ *  fallback out of the painter as a magic string. */
+export function bagQualityKey(item: { quality?: string }, instance?: ItemInstancePayload): string {
+  // tooltipEffectiveQuality reads only `quality`, so the narrow cell shape the
+  // bank rows pass (a def that may be gone resolves to {}) is safe to hand it.
+  return tooltipEffectiveQuality(item as ItemDef, instance) ?? 'common';
 }
 
 /** The three grid states: the whole bag is empty, the filter matched nothing, or

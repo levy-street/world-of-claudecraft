@@ -25,11 +25,16 @@ import { formatNumber, t } from './i18n';
 import { QUALITY_COLOR } from './icons';
 import { MASTERWORK_SEAL_IMAGE_URL } from './profession_art';
 
-/** One chat-line bundle: exactly the Hud.log(text, color, icon) arguments. */
+/** One chat-line bundle: the Hud.log(text, color, icon) arguments plus the
+ *  audio decision. `playCue` is whether THIS line's recipient hears the one
+ *  achievement cue: true only for the personal legendary forging line; every
+ *  zone broadcast is silent for everyone (the masterworkZone rule), and the
+ *  hud switch consumes the flag rather than re-deciding it inline. */
 export interface CraftLogLine {
   text: string;
   color: string;
   icon: string;
+  playCue: boolean;
 }
 
 /** The def's localized display name, or the raw id for one this client cannot
@@ -66,7 +71,8 @@ export function craftBannerIcon(banner: CraftCelebrationBanner): string | undefi
   return banner.kind === 'masterwork' ? MASTERWORK_SEAL_IMAGE_URL : undefined;
 }
 
-/** The masterworkZone soft zone-broadcast chat line. */
+/** The masterworkZone soft zone-broadcast chat line (no cue for anyone; the
+ *  crafter's own cue rides the personal masterwork celebration plan). */
 export function masterworkZoneLine(crafterName: string, itemId: string): CraftLogLine {
   return {
     text: t('hudChrome.crafting.masterworkZoneLine', {
@@ -75,11 +81,13 @@ export function masterworkZoneLine(crafterName: string, itemId: string): CraftLo
     }),
     color: QUALITY_COLOR.epic,
     icon: MASTERWORK_SEAL_IMAGE_URL,
+    playCue: false,
   };
 }
 
 /** The personal legendary forging line (Masterwrought phase 13): the base
- *  item reborn under the player-chosen name. */
+ *  item reborn under the player-chosen name, and the ONE line whose recipient
+ *  hears the achievement cue. */
 export function legendaryForgedLine(itemId: string, chosenName: string): CraftLogLine {
   return {
     text: t('hudChrome.crafting.legendaryLine', {
@@ -88,6 +96,7 @@ export function legendaryForgedLine(itemId: string, chosenName: string): CraftLo
     }),
     color: QUALITY_COLOR.legendary,
     icon: MASTERWORK_SEAL_IMAGE_URL,
+    playCue: true,
   };
 }
 
@@ -107,5 +116,6 @@ export function legendaryZoneLine(
     }),
     color: QUALITY_COLOR.legendary,
     icon: MASTERWORK_SEAL_IMAGE_URL,
+    playCue: false,
   };
 }

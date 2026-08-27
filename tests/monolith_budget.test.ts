@@ -281,7 +281,17 @@ const MONOLITHS: MonolithRow[] = [
     // (+2) land against its own comment shrink (-2), so the merged file
     // measures the same 18263 (wc -l < src/ui/hud.ts). Exact merged count,
     // zero slack.
-    ceiling: 18263,
+    // Masterwrought phase 13 landed NET ZERO at 18263: the celebration text
+    // moved out to craft_celebration_text_view.ts while the two legendary
+    // event cases and their imports moved in.
+    // LOWERED 18263 -> 18245 at the phase 13 review round: the item-comparison
+    // card (itemCompareBlock plus its per-slot body) moved into the
+    // item_compare_view.ts pure core so the compare card's worn-instance
+    // threading is unit-testable, and Hud keeps a thin consumer; the round's
+    // own additions (the log plainText opt-out, the celebration playCue
+    // consumption, the compare-card wiring) land inside that extraction.
+    // Exact count, zero slack.
+    ceiling: 18245,
     seam: 'pure view core + thin painter on PainterHost (src/ui/CLAUDE.md)',
   },
   {

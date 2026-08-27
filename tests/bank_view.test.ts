@@ -75,6 +75,20 @@ describe('buildBankView', () => {
     expect(view.slots[1].instance).toBeUndefined();
   });
 
+  it('keys the rim off instance-effective quality: a promoted copy reads legendary in the bank too', () => {
+    // The all-surfaces item-cell rule (phase 13): a mark describes the ITEM,
+    // so depositing a promoted copy must not strip its legendary rim.
+    const slots: InvSlot[] = [
+      { itemId: 'sword', count: 1, instance: { rolled: { quality: 'legendary' } } },
+      { itemId: 'sword', count: 1 },
+    ];
+    const view = buildBankView(bankInfo({ slots, capacity: 24 }), lookup);
+    if (view.kind !== 'bank') throw new Error('expected bank');
+    expect(view.slots[0].qualityKey).toBe('legendary');
+    // The def-only negative: the plain copy of the same def keeps its def tier.
+    expect(view.slots[1].qualityKey).toBe('rare');
+  });
+
   it('projects the occupied grid preserving order, count display, and quality', () => {
     const slots: InvSlot[] = [
       { itemId: 'sword', count: 1 }, // count 1 -> showCount false, quality rare

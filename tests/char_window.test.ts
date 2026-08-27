@@ -419,7 +419,11 @@ describe('char_window: paperdoll core + HUD-owned preview boundary', () => {
   });
 
   it('drives the paperdoll off the pure char_view core', () => {
-    expect(painter).toContain('buildPaperdollView(world.equipment, ITEMS)');
+    // The instances argument rides along since phase 13 so each socket row can
+    // describe the worn COPY (color and chosen name).
+    expect(painter).toContain(
+      'buildPaperdollView(world.equipment, ITEMS, world.equipmentInstances)',
+    );
   });
 
   it('preserves the unequip / drag / context-menu dispatch', () => {

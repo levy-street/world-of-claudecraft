@@ -33,6 +33,7 @@ import { computeDropdownPlacement } from './dropdown_position';
 import { itemDisplayName } from './entity_i18n';
 import { esc } from './esc';
 import { formatMoney as formatLocalizedMoney, formatNumber, t } from './i18n';
+import { tooltipEffectiveQuality } from './item_instance_tooltip';
 import { marketArmorBadge, marketArmorPips, marketHeroicStar } from './market_armor_badge';
 import {
   type MarketBuyConfirm,
@@ -736,8 +737,10 @@ export class MarketWindow {
       // lifted to clear WCAG AA on the panel; market_name_color.ts). The icon
       // border below keeps the shipped hue via its own q-<quality> class, so
       // quality still reads on the icon at full saturation while the name stays
-      // legible.
-      const qColor = marketNameColor(item.quality);
+      // legible. Instance-effective (the all-surfaces item-cell rule): the
+      // listing's publicInstanceView carries rolled, so a promoted legendary
+      // listing reads legendary here, not its def tier.
+      const qColor = marketNameColor(tooltipEffectiveQuality(item, l.instance));
       const row = document.createElement('div');
       row.className = 'mkt-row';
       const itemName = itemDisplayName(item);
@@ -915,7 +918,9 @@ export class MarketWindow {
     // Keep the release Sell-tab lowest-price fields (priceRef, stagedItemId) AND
     // the redesign's market-scoped WCAG name color (marketNameColor), not raw QUALITY_COLOR.
     const { item, have, suggested, priceRef, itemId: stagedItemId } = view.form;
-    const qColor = marketNameColor(item.quality);
+    // The staged copy's own payload decides the name color too (an instanced
+    // staging is single-copy, so the color and the tooltip describe one unit).
+    const qColor = marketNameColor(tooltipEffectiveQuality(item, view.form.instance));
     const pick = document.createElement('div');
     pick.className = 'mkt-sell-pick';
     pick.innerHTML = `${this.deps.itemIcon(item)}<span class="ps-name" style="color:${qColor}">${esc(itemDisplayName(item))}</span>`;
@@ -1018,7 +1023,7 @@ export class MarketWindow {
     }
     this.renderCollectSales(body, view.sales, view.salesOmitted);
     for (const { item, count, instance } of view.rows) {
-      const qColor = marketNameColor(item.quality);
+      const qColor = marketNameColor(tooltipEffectiveQuality(item, instance));
       const row = document.createElement('div');
       row.className = 'mkt-collect';
       const stack =

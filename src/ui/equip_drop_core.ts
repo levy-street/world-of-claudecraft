@@ -50,10 +50,11 @@ export type PaperdollDropAction =
  *  worn Masterwrought piece counts as legendary; `inventory` is the mirrored
  *  bags, from which this PREDICTS the copy the sim will actually consume by
  *  running the sim's own selection rule (equipCandidateQuality) over it. That
- *  prediction is the whole point: the sim consumes the HIGHEST-index matching
- *  unit regardless of which stack the player dragged, so reading the dragged
- *  unit instead would disagree with the authority in both directions. Omitted,
- *  the def's quality rules. */
+ *  prediction is the whole point: the sim consumes the dragged bag copy when
+ *  the drag names one (`slotIndex`, the same optional selection the equip
+ *  command sends) and the highest-index matching unit otherwise, so reading
+ *  any other unit would disagree with the authority in both directions.
+ *  Omitted, the def's quality rules. */
 export function paperdollDropAction(
   item: ItemDef,
   slot: EquipSlot,
@@ -63,6 +64,7 @@ export function paperdollDropAction(
   equipment?: Partial<Record<EquipSlot, string>>,
   instances?: Partial<Record<EquipSlot, ItemInstancePayload>>,
   inventory?: readonly InvSlot[],
+  slotIndex?: number,
 ): PaperdollDropAction {
   // Only real gear equips; a consumable or material declares no slot at all, and
   // a bag equips into its own bar socket, never the paperdoll.
@@ -81,8 +83,11 @@ export function paperdollDropAction(
     // Instance-aware since phase 13 (the sim's own call shape in items.ts
     // equipItem): the worn payloads and the PREDICTED candidate copy's payload
     // ride along, so a promoted legendary-rolled copy counts on either side.
-    // The candidate is the same highest-index unit-selection peek the
-    // Masterwrought sub-cap below makes over the mirrored bags.
+    // The candidate is the same slotIndex-honoring unit-selection peek the
+    // Masterwrought sub-cap below makes over the mirrored bags. The peek runs
+    // unguarded for EVERY item on purpose (mirror parity with the sim's own
+    // call; a masterwrought-only guard would desync the mirror on def-legendary
+    // items).
     if (
       uniqueEquipConflictSlot(
         item,
@@ -90,7 +95,7 @@ export function paperdollDropAction(
         (id) => ITEMS[id],
         ignore,
         instances,
-        inventory ? equipCandidateInstance(inventory, item.id) : undefined,
+        inventory ? equipCandidateInstance(inventory, item.id, slotIndex) : undefined,
       )
     ) {
       return 'blockedUnique';
@@ -108,7 +113,9 @@ export function paperdollDropAction(
       (id) => ITEMS[id],
       ignore,
       instances,
-      item.masterwrought && inventory ? equipCandidateQuality(inventory, item.id, item) : undefined,
+      item.masterwrought && inventory
+        ? equipCandidateQuality(inventory, item.id, item, slotIndex)
+        : undefined,
     );
     if (mw) {
       return mw.reason === 'cap' ? 'blockedMasterwroughtCap' : 'blockedMasterwroughtLegendary';

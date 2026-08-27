@@ -25,7 +25,7 @@ export interface BankSlotModel {
   itemId: string;
   count: number;
   showCount: boolean; // count > 1 (a lone item hides its "1")
-  qualityKey: string; // item quality ?? 'common' (bagQualityKey semantics)
+  qualityKey: string; // instance-effective quality ?? 'common' (bagQualityKey semantics)
   /** Per-copy payload passthrough for the tooltip's instance lines (seal,
    *  enchanted marker, bonus stats, maker's mark). */
   instance?: ItemInstancePayload;
@@ -99,7 +99,7 @@ export function buildBankView(info: BankInfo | null, lookup: BankItemLookup): Ba
     itemId: slot.itemId,
     count: slot.count,
     showCount: slot.count > 1,
-    qualityKey: bagQualityKey(lookup(slot.itemId) ?? {}),
+    qualityKey: bagQualityKey(lookup(slot.itemId) ?? {}, slot.instance),
     instance: slot.instance,
   }));
   return {

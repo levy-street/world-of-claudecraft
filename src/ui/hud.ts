@@ -556,7 +556,7 @@ import { iconDataUrl, QUALITY_COLOR, raidMarkerDataUrl } from './icons';
 import { InspectWindow } from './inspect_window';
 import { itemArmorTypeLabelKey } from './item_armor_type';
 import { requiredClassesForTooltip } from './item_class_restriction';
-import { itemStatDeltas } from './item_compare';
+import { itemCompareBlocksHtml } from './item_compare_view';
 import { ItemDragState } from './item_drag_state';
 import {
   instanceBadgeLines,
@@ -4664,7 +4664,7 @@ export class Hud {
     clearActionDropTargets: () => this.clearActionDropTargets(),
     dragState: this.itemDragState,
     isTouchHud: () => document.body.classList.contains('mobile-touch'),
-    markEquipDropTargets: (itemId) => this.charWindow.markDropTargets(itemId),
+    markEquipDropTargets: (itemId, slotIndex) => this.charWindow.markDropTargets(itemId, slotIndex),
     dropOnEquipSlot: (itemId, slot, target) =>
       this.charWindow.dropOnEquipSlot(itemId, slot, target),
     dropOnActionSlot: (itemId, slot) => this.placeHotbarItemFromTouch(itemId, slot),
@@ -6245,42 +6245,17 @@ export class Hud {
     return html;
   }
 
-  // Classic-style item comparison: when hovering an equippable item, append the
-  // item currently worn in that slot plus the stat change you'd see if you
-  // swapped to it (green = gain, red = loss). Reads IWorld.equipment, so it
-  // works identically offline and online.
+  // Classic-style item comparison (the item_compare_view pure core): Hud only
+  // supplies its world's equipment reads and the tooltip renderer, so the worn
+  // side carries its per-copy payload and a promoted copy titles the
+  // "Currently Equipped" card with its legendary color and chosen name.
   private itemCompareBlock(item: ItemDef): string {
-    if (!item.slot) return '';
-    // A hovered ring compares against BOTH worn rings (classic behavior); every
-    // other slot kind is its own single equipment key.
-    const slots: readonly EquipSlot[] = item.slot === 'ring' ? ['ring1', 'ring2'] : [item.slot];
-    return slots.map((slot) => this.itemCompareBlockForSlot(item, slot)).join('');
-  }
-
-  private itemCompareBlockForSlot(item: ItemDef, slot: EquipSlot): string {
-    const equippedId = this.sim.equipment[slot];
-    if (!equippedId || equippedId === item.id) return '';
-    const equipped = ITEMS[equippedId];
-    if (!equipped) return '';
-    const deltas = itemStatDeltas(item, equipped)
-      .map((d) => {
-        const cls = d.delta > 0 ? 'tt-green' : 'tt-red';
-        const sign = d.delta > 0 ? '+' : '−'; // proper minus sign
-        const magnitude = formatNumber(Math.abs(d.delta), {
-          minimumFractionDigits: d.decimals,
-          maximumFractionDigits: d.decimals,
-        });
-        return `<div class="${cls}">${sign}${magnitude} ${esc(
-          t(statNameKey(d.stat) as TranslationKey),
-        )}</div>`;
-      })
-      .join('');
-    let html = `<div class="tt-cmp"><div class="tt-cmp-head">${esc(t('itemUi.tooltip.currentlyEquipped'))}</div>`;
-    html += `<div class="tt-cmp-body">${this.itemTooltip(equipped, false)}</div>`;
-    if (deltas)
-      html += `<div class="tt-cmp-head">${esc(t('itemUi.tooltip.ifYouEquip'))}</div>${deltas}`;
-    html += `</div>`;
-    return html;
+    return itemCompareBlocksHtml(
+      item,
+      { equipment: this.sim.equipment, instances: this.sim.equipmentInstances },
+      (id) => ITEMS[id],
+      (equipped, worn) => this.itemTooltip(equipped, false, worn),
+    );
   }
 
   // Build the pure stat-breakdown model for the currently-shown player, the bridge
@@ -11527,17 +11502,21 @@ export class Hud {
         }
         case 'legendaryForged': {
           // The orange promotion's personal celebration (Masterwrought phase
-          // 13): one chat line plus the one achievement cue.
+          // 13). The line interpolates the player-chosen name, so plainText
+          // keeps a name carrying chat tokens ([[i:) verbatim, never a link;
+          // the cue decision rides the view bundle like its siblings.
           const l = legendaryForgedLine(ev.itemId, ev.name);
-          this.log(l.text, l.color, l.icon);
-          audio.achievement();
+          this.log(l.text, l.color, l.icon, ERROR_LOG_CHAN, false, true);
+          if (l.playCue) audio.achievement();
           break;
         }
         case 'legendaryForgedZone': {
           // The masterworkZone rule: every recipient INCLUDING the owner logs
-          // the line, no audio for anyone (the owner's cue is personal above).
+          // the line (plainText: it carries the chosen name too); the view
+          // bundle decides no cue for anyone (the owner's is personal above).
           const l = legendaryZoneLine(ev.ownerName, ev.itemId, ev.itemName);
-          this.log(l.text, l.color, l.icon);
+          this.log(l.text, l.color, l.icon, ERROR_LOG_CHAN, false, true);
+          if (l.playCue) audio.achievement();
           break;
         }
         case 'commissionOrderResult': {
@@ -13801,6 +13780,9 @@ export class Hud {
     decorativeIconUrl?: string,
     channel = ERROR_LOG_CHAN,
     announceWhenFiltered = false,
+    // The appendLog plainText opt-out for lines interpolating player-authored
+    // text (a chosen legendary name): tokens render verbatim, never as links.
+    plainText = false,
   ): void {
     this.appendLog(
       this.chatLogEl,
@@ -13809,7 +13791,7 @@ export class Hud {
       true,
       channel,
       decorativeIconUrl,
-      false,
+      plainText,
       undefined,
       announceWhenFiltered,
     );

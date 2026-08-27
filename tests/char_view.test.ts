@@ -83,6 +83,52 @@ describe('char_view: paperdoll data model', () => {
     // every right-column slot is empty when nothing is equipped there
     expect(view.right.every((c) => c.item === null)).toBe(true);
   });
+
+  it('carries each slot its OWN worn payload (phase 13), and def-only without one', () => {
+    // The instance rides the cell so the painter's row can describe the worn
+    // COPY (a promoted legendary's color and chosen name). Slot-keyed, never
+    // smeared: the helmet's payload must not leak onto the mainhand.
+    const promoted = { name: 'Dawnbreaker', rolled: { quality: 'legendary' as const } };
+    const view = buildPaperdollView(FULL, ITEMS, { helmet: promoted });
+    expect(view.left[0].instance).toBe(promoted);
+    expect(view.left[4].instance).toBeNull(); // mainhand: worn, no payload
+    // The def-only negative: no instances argument (the inspect caller's
+    // shape) resolves every cell payload-free, byte for byte the old model.
+    const defOnly = buildPaperdollView(FULL, ITEMS);
+    expect(defOnly.left.every((c) => c.instance === null)).toBe(true);
+    expect(defOnly.right.every((c) => c.instance === null)).toBe(true);
+    // An empty slot never carries a payload, even if the record has a stale
+    // entry for it (the item gate runs first).
+    const stale = buildPaperdollView({ chest: 'no_such_item' }, ITEMS, {
+      chest: promoted,
+    });
+    expect(stale.left[3].item).toBeNull();
+    expect(stale.left[3].instance).toBeNull();
+  });
+});
+
+describe('char_window: the socket row consumes the worn payload (source pins)', () => {
+  // The painter half of the pin above. The row's color and name reads are
+  // plain string interpolations no behavioral suite reaches (the sheet needs a
+  // real DOM world), so the wiring is pinned at the source: the effective-
+  // quality resolver and the chosen-name fallback must both feed the row, and
+  // the unequip aria must hear the same worn name.
+  const src = readFileSync(new URL('../src/ui/char_window.ts', import.meta.url), 'utf8').replace(
+    /^\s*\/\/.*$/gm,
+    '',
+  );
+
+  it('threads instances into the view build and the row reads them', () => {
+    expect(src).toContain('buildPaperdollView(world.equipment, ITEMS, world.equipmentInstances)');
+    expect(src).toContain('tooltipEffectiveQuality(item, instance ?? undefined)');
+    expect(src).toContain('instance?.name ?? itemDisplayName(item)');
+  });
+
+  it('the unequip aria interpolates the worn-copy name as a t() value', () => {
+    expect(src).toContain(
+      "t('hudChrome.paperdoll.unequipAria', { item: wornName ?? itemDisplayName(item) })",
+    );
+  });
 });
 
 describe('char_view: determinism + ClientWorld-vs-Sim parity', () => {

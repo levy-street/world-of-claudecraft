@@ -36,6 +36,14 @@ describe('market_window: no magic values', () => {
     // as CSS custom properties, so the painter holds no color literal. The resolver's
     // own tests pin that every quality maps to a var(--mkt-name-*) token.
     expect(painter).toContain("import { marketNameColor } from './market_name_color';");
+    // Instance-bearing rows resolve INSTANCE-effective quality first (phase
+    // 13, the all-surfaces item-cell rule): the browse row reads the listing's
+    // publicInstanceView payload, the staged sell pick and the returned-goods
+    // rows their own copies, so a promoted legendary colors legendary. The
+    // sale ledger's rows carry no payload in their model and stay def-only.
+    expect(painter).toContain('marketNameColor(tooltipEffectiveQuality(item, l.instance))');
+    expect(painter).toContain('marketNameColor(tooltipEffectiveQuality(item, view.form.instance))');
+    expect(painter).toContain('marketNameColor(tooltipEffectiveQuality(item, instance))');
     expect(painter).toContain('const qColor = marketNameColor(item.quality);');
     const core = readFileSync(new URL('../src/ui/market_name_color.ts', import.meta.url), 'utf8');
     expect(core).toContain('var(--mkt-name-');

@@ -5,6 +5,7 @@
 // legendary pins hold the phase 13 doctrine: the player-chosen name is a
 // VALUE spliced into the template as data, never a key, and the zone line
 // reads the name off the EVENT payload, never a def lookup.
+import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 import { ITEMS } from '../src/sim/data';
 import {
@@ -78,5 +79,39 @@ describe('legendary lines (Masterwrought phase 13)', () => {
     // as itself (the value path); a t() re-resolution would throw or swap it.
     const line = legendaryForgedLine(ITEM_ID, 'hudChrome.crafting.legendaryLine');
     expect(line.text).toContain('reborn as hudChrome.crafting.legendaryLine');
+  });
+
+  it('the cue decision rides the bundle: personal forged line only, every zone line silent', () => {
+    // The review-round extraction: the hud switch consumes playCue instead of
+    // deciding the achievement cue inline, so which recipient hears it is a
+    // pure-core fact pinned here for all three chat-line builders.
+    expect(legendaryForgedLine(ITEM_ID, 'Oath').playCue).toBe(true);
+    expect(legendaryZoneLine('Ayla', ITEM_ID, 'Oath').playCue).toBe(false);
+    expect(masterworkZoneLine('Ayla', ITEM_ID).playCue).toBe(false);
+  });
+});
+
+describe('the hud switch consumes the bundle decisions (source pins)', () => {
+  // The consumer half: string interpolation in the event switch that no
+  // behavioral suite drives (the celebration arms need a full Hud world), so
+  // the wiring is pinned at source with comments stripped.
+  const hud = readFileSync(new URL('../src/ui/hud.ts', import.meta.url), 'utf8').replace(
+    /^\s*\/\/.*$/gm,
+    '',
+  );
+
+  it('both legendary arms gate the achievement cue on playCue, never inline', () => {
+    const arms = hud.match(/if \(l\.playCue\) audio\.achievement\(\);/g);
+    expect(arms).toHaveLength(2);
+  });
+
+  it('both legendary log calls opt out of chat item-link parsing (plainText)', () => {
+    // The chosen name is player-authored and the load bound deliberately
+    // admits [[i: shapes from persistence, so both lines must render verbatim:
+    // the 6th log argument (plainText) is spelled true on each.
+    const calls = hud.match(
+      /this\.log\(l\.text, l\.color, l\.icon, ERROR_LOG_CHAN, false, true\);/g,
+    );
+    expect(calls).toHaveLength(2);
   });
 });

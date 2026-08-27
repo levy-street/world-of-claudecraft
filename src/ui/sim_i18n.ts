@@ -175,7 +175,9 @@ const baseEnTable = {
   'log.perfectFail': 'The perfecting attempt fails; the materials are spent.',
   'log.perfectDone': '{item} is now Perfected!',
   // The orange promotion's deny ladder (Masterwrought phase 13,
-  // src/sim/professions/perfecting.ts resolveLegendaryPromotion). Four
+  // src/sim/professions/perfecting.ts: the shared resolvePerfectingAttempt
+  // entry delegates to resolveLegendaryPromotion, whose success arm stamps
+  // the copy via promotePerfectedCopy). Four
   // placeholder-free EXACT refusal rows; there is deliberately NO success
   // text line (the legendaryForged / legendaryForgedZone events drive the
   // client copy instead). This block RETIRED error.perfectAlready ('That item

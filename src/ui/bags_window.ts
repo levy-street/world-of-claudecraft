@@ -238,8 +238,10 @@ export interface BagsWindowDeps extends PainterHostPresentation {
   /** True on the touch HUD: the pointer drag replaces HTML5 drag-and-drop there. */
   isTouchHud(): boolean;
   /** Light up (or clear) the paperdoll sockets that accept the stack in flight, so
-   *  the drag advertises where it can land. Cleared on every drag teardown. */
-  markEquipDropTargets(itemId: string | null): void;
+   *  the drag advertises where it can land. Cleared on every drag teardown.
+   *  `slotIndex` names the drag source's bag cell, so the lit set judges the
+   *  exact copy the drop would consume (the dropOnEquipSlot target). */
+  markEquipDropTargets(itemId: string | null, slotIndex?: number): void;
   /** Equip a touch-dragged stack into the socket it was released on. The character
    *  window owns the paperdoll drop (and its refusals); this is the touch arm's way
    *  in, since a finger release has no drop event to land on that window. */
@@ -886,7 +888,7 @@ export class BagsWindow {
       const questMark = bagQuestMarkKind(item, this.questMarkProgress(item));
       const questReady = questMark === 'questReady';
       const fineMark = bagFineMark(item.id);
-      row.className = `bag-item q-${bagQualityKey(item)}${bagRimClasses(questMark, fineMark)}`;
+      row.className = `bag-item q-${bagQualityKey(item, s.instance)}${bagRimClasses(questMark, fineMark)}`;
       // Item identity for the island coach's press-this-next glow
       // (bootcamp.ts; distinct from the focus-key namespace).
       row.dataset.coachItem = item.id;
@@ -905,7 +907,7 @@ export class BagsWindow {
       // shared miss value.
       row.dataset.focusKey = `bag:${s.itemId}:${this.stackOrdinal(world.inventory, s)}`;
       this.bindBagCellDrop(row, cell);
-      const qColor = QUALITY_COLOR[bagQualityKey(item)] ?? QUALITY_DEFAULT_COLOR;
+      const qColor = QUALITY_COLOR[bagQualityKey(item, s.instance)] ?? QUALITY_DEFAULT_COLOR;
       const itemName = itemDisplayName(item);
       // Corner-glyph priority (bag_corner_mark_view.ts, composed from
       // bag_instance_glyph_view + bag_quest_mark_view + bag_fine_mark_view):
@@ -1088,7 +1090,7 @@ export class BagsWindow {
           e.dataTransfer.setData('text/plain', s.itemId);
           e.dataTransfer.effectAllowed = 'copyMove';
         }
-        this.deps.markEquipDropTargets(s.itemId);
+        this.deps.markEquipDropTargets(s.itemId, index >= 0 ? index : undefined);
         // Drag dismisses the tooltip without mouseleave; clear the tracker glow too.
         this.hideTooltipClearingTracker();
       });
@@ -1120,7 +1122,7 @@ export class BagsWindow {
         ghostHtml: () => this.deps.itemIcon(item),
         onStart: () => {
           this.hideTooltipClearingTracker();
-          this.deps.markEquipDropTargets(s.itemId);
+          this.deps.markEquipDropTargets(s.itemId, index >= 0 ? index : undefined);
         },
         onMove: () => {
           /* the paperdoll sockets are already lit; the ghost tracks the finger */

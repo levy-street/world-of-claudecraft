@@ -298,6 +298,7 @@ const UI_PURE_CORES = [
   'src/ui/bag_quest_tracker_highlight_view.ts',
   'src/ui/quest_item_tooltip_view.ts',
   'src/ui/item_name_color.ts',
+  'src/ui/item_compare_view.ts',
   'src/ui/item_slot_labels.ts',
   'src/ui/bank_view.ts',
   'src/ui/guild_bank_log_view.ts',
