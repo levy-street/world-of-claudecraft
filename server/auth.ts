@@ -83,8 +83,25 @@ let banlistLastGoodFile = '';
 
 /** Ceiling on the banlist file the server will read whole (the statSync
  *  result is already in hand, so the bound is free). A file past it is
- *  treated exactly like an unreadable one: warned once, last-good served. */
-export const USERNAME_BANLIST_FILE_MAX_BYTES = 1 << 20;
+ *  treated exactly like an unreadable one: warned once, last-good served.
+ *  64 KiB, not larger, because the ceiling SANCTIONS a list size and every
+ *  name screen runs an O(terms) substring scan over the parsed list (a
+ *  1 MiB file is 150k to 350k short terms, about two milliseconds per screen
+ *  on every signup, character create, guild name, and rename, measured at
+ *  the phase 13 QA); 64 KiB is about nine thousand hand-maintained terms at
+ *  under a tenth of a millisecond, far past any real operator word list. */
+export const USERNAME_BANLIST_FILE_MAX_BYTES = 1 << 16;
+
+/** Load (or re-validate) the configured banlist once, for the boot log: an
+ *  operator whose USERNAME_BANLIST_FILE cannot be read must learn it at boot,
+ *  loudly, not from one warn line buried at the first name screen hours
+ *  later (the phase 13 QA hot-path review). Returns whether the configured
+ *  file is the list being served and how many terms are live. */
+export function warmUsernameBanlist(): { file: string; loaded: boolean; terms: number } {
+  const file = process.env.USERNAME_BANLIST_FILE ?? '';
+  const terms = bannedUsernameTerms().length;
+  return { file, loaded: file === '' || banlistLastGoodFile === file, terms };
+}
 
 function bannedUsernameTerms(): string[] {
   const rawList = process.env.USERNAME_BANLIST ?? '';
@@ -95,20 +112,27 @@ function bannedUsernameTerms(): string[] {
   // (a same-mtime same-length rewrite is the accepted residual: only the
   // content hash could see it, and that costs the read this cache elides).
   // The per-call statSync is bounded: it fires only when
-  // USERNAME_BANLIST_FILE is set, and every caller that a client can drive
-  // (the pet_rename and perfect_item name screens) sits on the name-screen
-  // lane (server/msg_lanes.ts), so it can never become an unmetered
-  // per-frame stat. A stat failure collapses to a sentinel so the read arm
-  // below still owns the one warn path for an unreadable file, which stays
-  // FAIL-OPEN by decision: a bad mount must not block every signup, and the
-  // warn line is the operator's signal.
+  // USERNAME_BANLIST_FILE is set, and every caller a client can drive is
+  // shape-first and metered (the pet_rename and perfect_item name screens on
+  // the name-screen lane, server/msg_lanes.ts; the guild-name screen on the
+  // command lane behind validateGuildName's 3 to 24 letters), so it can never
+  // become an unmetered per-frame stat. A missing file is the cheap
+  // no-throw arm (throwIfNoEntry: false, a fraction of a throwing stat: the
+  // steady state a bad mount lives in); any other stat failure collapses to
+  // the same sentinel so the read arm below still owns the one warn path for
+  // an unreadable file, which stays FAIL-OPEN by decision: a bad mount must
+  // not block every signup, and the warn line plus the boot-time
+  // warmUsernameBanlist line are the operator's signals.
   let fileStamp = '';
   let fileSize = -1;
   if (file) {
     try {
-      const stat = statSync(file);
-      fileStamp = `${stat.mtimeMs}:${stat.size}`;
-      fileSize = stat.size;
+      const stat = statSync(file, { throwIfNoEntry: false });
+      if (stat === undefined) fileStamp = 'unreadable';
+      else {
+        fileStamp = `${stat.mtimeMs}:${stat.size}`;
+        fileSize = stat.size;
+      }
     } catch {
       fileStamp = 'unreadable';
     }
@@ -136,7 +160,13 @@ function bannedUsernameTerms(): string[] {
     );
   } else {
     try {
-      banlistLastGoodFileTerms = parseBanlist(readFileSync(file, 'utf8'));
+      const text = readFileSync(file, 'utf8');
+      // The stat above and this read are two syscalls; a file regrown past
+      // the ceiling between them is refused on what was actually read.
+      if (Buffer.byteLength(text, 'utf8') > USERNAME_BANLIST_FILE_MAX_BYTES) {
+        throw new Error(`grew past the ${USERNAME_BANLIST_FILE_MAX_BYTES} byte ceiling mid-read`);
+      }
+      banlistLastGoodFileTerms = parseBanlist(text);
       banlistLastGoodFile = file;
     } catch (err) {
       console.warn(

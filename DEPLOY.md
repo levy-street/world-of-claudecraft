@@ -455,9 +455,11 @@ For off-box safety, sync the directory to S3 occasionally:
   spaces, apostrophes, and hyphens), so seed the file with the slur and hate-group
   residual the built-in word list does not carry before that feature is live. An
   edited file takes effect without a restart (the cache is keyed on the file's
-  mtime and size); a missing, unreadable, or over-one-MiB file warns once and keeps
-  serving the last list it read successfully (fail-open by decision: it never
-  blocks a signup).
+  mtime and size, so a permissions-only repair, a bare `chmod`, needs a `touch` too);
+  a missing, unreadable, or over-64-KiB file (about nine thousand terms; the screen
+  scans every term per name) warns once and keeps serving the last list it read
+  successfully (fail-open by decision: it never blocks a signup), and the boot log
+  prints one `name banlist:` line saying whether the configured file loaded.
 - **Clearing a stamped legendary name** (`POST
   /admin/api/moderation/characters/:id/clear-item-name`, permission
   `moderation.clearItemName`, SUPERADMIN only, API-only: the dashboard has no

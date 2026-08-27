@@ -13,6 +13,7 @@ import {
   validCharName,
   validEmail,
   validUsername,
+  warmUsernameBanlist,
 } from '../server/auth';
 import {
   consumeDesktopLoginCode,
@@ -758,7 +759,7 @@ describe('username censorship', () => {
 
     try {
       withUsernameBanlist({ file }, () => {
-        expect(USERNAME_BANLIST_FILE_MAX_BYTES).toBe(1_048_576);
+        expect(USERNAME_BANLIST_FILE_MAX_BYTES).toBe(65_536);
         expect(offensiveName('smallterm')).toBe(true);
         // A regrown or mistaken file one byte past the ceiling is the
         // unreadable class: warned once, never read whole, the last good
@@ -773,6 +774,33 @@ describe('username censorship', () => {
         writeFileSync(file, `atterm\n${'z'.repeat(USERNAME_BANLIST_FILE_MAX_BYTES - 7)}`);
         expect(offensiveName('atterm')).toBe(true);
         expect(warn).toHaveBeenCalledOnce();
+      });
+    } finally {
+      warn.mockRestore();
+      rmSync(dir, { force: true, recursive: true });
+    }
+  });
+
+  it('warmUsernameBanlist reports the served file for the boot line: loaded, or not readable', () => {
+    // The boot-time voice (the phase 13 QA hot-path review): an operator whose
+    // configured file cannot be read learns it at listen time, not from one
+    // warn line at the first name screen hours later.
+    const dir = mkdtempSync(join(tmpdir(), 'woc-banlist-warm-'));
+    const file = join(dir, 'banlist.txt');
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => undefined);
+    try {
+      withUsernameBanlist({}, () => {
+        expect(warmUsernameBanlist()).toEqual({ file: '', loaded: true, terms: 1 });
+      });
+      withUsernameBanlist({ file }, () => {
+        const missing = warmUsernameBanlist();
+        expect(missing).toEqual({ file, loaded: false, terms: 1 });
+        expect(warn).toHaveBeenCalledOnce();
+      });
+      writeFileSync(file, 'warmterm\nother\n');
+      withUsernameBanlist({ file }, () => {
+        expect(warmUsernameBanlist()).toEqual({ file, loaded: true, terms: 3 });
+        expect(offensiveName('warmterm')).toBe(true);
       });
     } finally {
       warn.mockRestore();
