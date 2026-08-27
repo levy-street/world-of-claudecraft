@@ -94,7 +94,9 @@ export function matchesCategory(item: ItemDef, category: BagCategory): boolean {
     case 'material':
       return isMaterialItem(item);
     case 'tool':
-      return item.kind === 'tool';
+      // Recipe scrolls ride the tools chip: durable profession goods the
+      // sort ladder already seats together.
+      return item.kind === 'tool' || item.kind === 'recipe';
     case 'quest':
       return item.kind === 'quest';
     case 'mount':

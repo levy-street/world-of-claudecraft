@@ -179,6 +179,9 @@ export function enchantTier(enchantId: string): EnchantTier {
   let runed = false;
   for (const reagent of enchant.reagents) {
     if (reagent.itemId === GREATER_TIER_REAGENT) return 'greater';
+    // The raid core (the Crucible formula's reagent) sits at the top of the
+    // ladder with the shard it accompanies.
+    if (reagent.itemId === 'lastflame_core') return 'greater';
     if (reagent.itemId.startsWith(RUNED_TIER_REAGENT_PREFIX)) runed = true;
   }
   return runed ? 'runed' : 'base';

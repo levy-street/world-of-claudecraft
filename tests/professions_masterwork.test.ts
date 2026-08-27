@@ -291,8 +291,15 @@ describe('masterworkBonusStats (the baked tier-delta budget)', () => {
 // strongest source for a dual-source output like boundstone_helm, which also
 // drops in the level-20 dungeon).
 describe('masterwork stays strictly below the raid-loot band (acceptance bound)', () => {
+  // The Crucible raid recipes are exempt from the below-raid-floor bound BY
+  // MAINTAINER DECISION (docs/prd/ignivar-raid-professions.md): the crafted
+  // tier deliberately sits TWO item levels above the dropped raid tier, so
+  // profession work is the chase and not the consolation. The bound still
+  // holds for every trainer-taught and grandfathered recipe: ordinary
+  // crafting can never quietly outgrow raid loot.
   const equippable = ALL_RECIPES.filter((r) => {
     const def = ITEMS[r.resultItemId];
+    if (r.acquisition?.some((a) => a === 'drop' || a === 'quest')) return false;
     return !!def && isItemLevelEligible(def);
   });
 

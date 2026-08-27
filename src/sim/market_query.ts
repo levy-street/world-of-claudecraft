@@ -207,9 +207,11 @@ function itemMatchesType(item: ItemDef, filter: MarketItemTypeFilter): boolean {
   // The catch-all for catalog kinds with no browse category of their own. Mount
   // reins join quest items here: quest items are never listable, and reins
   // (listable now that they are unbound) are too few to earn a filter chip.
-  // Neither may be left reachable through 'All' alone
-  // (tests/market_filters.test.ts).
-  if (filter === 'other') return item.kind === 'quest' || item.kind === 'mount';
+  // Recipe scrolls (the raid professions drops) join them on the same
+  // too-few-for-a-chip grounds. None may be left reachable through 'All'
+  // alone (tests/market_filters.test.ts).
+  if (filter === 'other')
+    return item.kind === 'quest' || item.kind === 'mount' || item.kind === 'recipe';
   // Exhaustive on purpose: a future MARKET_ITEM_TYPE_FILTERS entry with no arm above
   // reddens tsc here instead of silently inheriting the 'other' predicate, which is
   // how `bag` browsed as nothing at all for its whole life before this arm existed.

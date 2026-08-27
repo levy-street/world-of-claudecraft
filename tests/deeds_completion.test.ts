@@ -120,6 +120,7 @@ describe('the real catalog', () => {
       // Reliquary Curator rank bridges (col_reliquary_rank_*) are also zero
       // Renown: catalog prestige never scores the board.
       'col_ancient_heartwood',
+      'col_crucible_wrought',
       'col_first_epic',
       'col_first_legendary',
       'col_first_rare',

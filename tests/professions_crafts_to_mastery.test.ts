@@ -509,8 +509,14 @@ describe('armorcrafting mastery derives from the live tables (R13)', () => {
     );
     expect(rungs.size).toBeGreaterThanOrEqual(3);
     // And the top rung is genuinely reached: the climb does not plateau on
-    // mid-tier recipes and coast to the cap.
-    expect(Math.max(...rungs)).toBe(Math.max(...ARMORCRAFTING_RECIPES.map((r) => r.skillReq)));
+    // mid-tier recipes and coast to the cap. Scoped to the trainer-reachable
+    // ladder: the Crucible raid recipes (drop/quest acquisition,
+    // docs/prd/ignivar-raid-professions.md) sit above it behind their scroll
+    // and reagent gates, outside what this mastery-climb bill models.
+    const trainerReachable = ARMORCRAFTING_RECIPES.filter(
+      (r) => !r.acquisition || r.acquisition.length === 0 || r.acquisition.includes('trainer'),
+    );
+    expect(Math.max(...rungs)).toBe(Math.max(...trainerReachable.map((r) => r.skillReq)));
   });
 
   it('the bill draws on several distinct gathered materials and on non-gathered ones too', () => {

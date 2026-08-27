@@ -11,6 +11,12 @@
 import type { ReliquaryLocaleTable } from '../reliquary_i18n';
 
 export const table: ReliquaryLocaleTable = {
+  // Crucible raid professions: the crafted-tier page
+  // (docs/prd/ignivar-raid-professions.md), on the shipped Last Spring
+  // glossary.
+  professions_crucible_craft: {
+    name: '最後の泉より鍛えしもの',
+  },
   // Dungeon, delve and world-boss pages: entities.* names verbatim.
   conquerors_hollow_crypt: {
     name: '虚ろの墓所',

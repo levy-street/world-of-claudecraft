@@ -5320,6 +5320,10 @@ export const DEED_ART_PENDING: ReadonlySet<string> = new Set([
   // The Proving Shore graduation deed rides the deed_cat_progression crest
   // until its commissioned art lands (docs/achievements/icon-brief.md).
   'prog_ready_for_an_adventure',
+  // The Crucible raid-professions pair ride their category crests until the
+  // tier's art wave (docs/prd/ignivar-raid-professions.md).
+  'col_crucible_wrought',
+  'chr_forgefathers_requiem',
 ]);
 /** Static URL of a deed crest's painted art, or null when the crest id has no committed image. */
 export function deedImageUrl(crestId: string): string | null {

@@ -184,6 +184,7 @@ describe('enchant_apply_view: tier classification', () => {
     for (const enchant of Object.values(ENCHANTS)) {
       for (const { itemId } of enchant.reagents) {
         if (itemId === 'arcane_shard') continue;
+        if (itemId === 'lastflame_core') continue;
         if (itemId.startsWith('resonant_')) continue;
         if (KNOWN_BASE_REAGENTS.has(itemId)) continue;
         unclassifiable.push(`${enchant.id} -> ${itemId}`);

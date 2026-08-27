@@ -416,11 +416,22 @@ describe('the tool ladder the grades exist to build', () => {
     ]);
   });
 
-  it('a fine grade is only ever a tool-recipe reagent (nothing else was re-specced)', () => {
+  it('a fine grade is only ever a tool- or raid-recipe reagent (nothing else was re-specced)', () => {
+    // The Crucible raid recipes are the ONE deliberate widening of the fine
+    // grade's consumer set (docs/prd/ignivar-raid-professions.md, Gathering
+    // materials): the crafted best-in-slot tier consumes fine grades so the
+    // gathering game feeds the raid economy. Everything else keeps the
+    // tool-recipe-only rule.
     const fineIds = new Set(Object.values(MATERIAL_GRADES).map((row) => row.fineItemId));
     const toolRecipeIds = new Set(TOOL_RECIPES.map((r) => r.id));
+    const raidRecipeIds = new Set(
+      ALL_RECIPES.filter((r) => r.acquisition?.some((a) => a === 'drop' || a === 'quest')).map(
+        (r) => r.id,
+      ),
+    );
     for (const recipe of ALL_RECIPES) {
       if (toolRecipeIds.has(recipe.id)) continue;
+      if (raidRecipeIds.has(recipe.id)) continue;
       for (const reagent of recipe.reagents) {
         expect(
           fineIds.has(reagent.itemId),

@@ -20,6 +20,7 @@ vi.mock('../server/db', () => ({
 
 import { GameServer } from '../server/game';
 import { applyBoostKitToPlayer } from '../server/pbe_boost';
+import { ITEMS } from '../src/sim/data';
 import { markItemDiscovered } from '../src/sim/deeds';
 import {
   isCataloguedRelicItem,
@@ -409,9 +410,19 @@ describe('Reliquary movement flag on the server-only grant paths', () => {
     );
     expect(seededRelics.length).toBeGreaterThan(0);
     // The alt-role BAGGED loop is a distinct grant site inside the kit: prove
-    // it handed over a catalogued relic of its own, so dropping only ITS
+    // it handed over a relic-crediting item of its own, so dropping only ITS
     // movement flag cannot stay green on the equipped items' content alone.
-    expect(meta.inventory.some((s) => isCataloguedRelicItem(s.itemId))).toBe(true);
+    // Heroic variants count: they are deliberately uncatalogued, but their
+    // discovery credits the BASE id (the crafted Crucible tier re-ranked the
+    // alt kits, so the bagged picks are now heroic upgrades of catalogued
+    // bases rather than the bases themselves).
+    expect(
+      meta.inventory.some(
+        (s) =>
+          isCataloguedRelicItem(s.itemId) ||
+          isCataloguedRelicItem((ITEMS[s.itemId] as { heroicOf?: string })?.heroicOf ?? ''),
+      ),
+    ).toBe(true);
     // Discovery fills the catalog, as on every movement path...
     for (const id of seededRelics) expect(meta.reliquary.firstFind[id]).toBeDefined();
     // ...and not one of them counts as something the world handed the player.
