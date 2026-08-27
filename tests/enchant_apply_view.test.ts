@@ -652,7 +652,7 @@ describe('enchant_apply_view: preservedReplaceTraits (#2421)', () => {
     // assignment, so a widening written as pub['boundTo'] = inst.boundTo or an
     // Object.assign spread would slip past it. Pin the FIELD NAMES out of the
     // loop body entirely, which no assignment shape can dodge.
-    for (const field of ['boundTo', 'bindOnTrade', 'charges']) {
+    for (const field of ['boundTo', 'bindOnTrade', 'charges', 'perfecting', 'perfected']) {
       expect(body, `${field} must not ride the public eqi wire`).not.toContain(field);
     }
   });

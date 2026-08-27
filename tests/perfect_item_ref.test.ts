@@ -23,6 +23,18 @@ describe('parsePerfectItemRef', () => {
     });
   });
 
+  it('a huge integer cell parses and is left to the sim, which denies it out of range', () => {
+    // The parser deliberately carries no upper bound: the sim resolves through
+    // selectedInventorySlot, which refuses any index at or past
+    // inventory.length with no allocation and no draw, so a 2^53 cell is a
+    // clean noItem denial rather than a parse rule the two layers could
+    // disagree on. Pinned so a future parser ceiling is a conscious change.
+    expect(parsePerfectItemRef({ bag: Number.MAX_SAFE_INTEGER, item: ITEM })).toEqual({
+      bag: Number.MAX_SAFE_INTEGER,
+      itemId: ITEM,
+    });
+  });
+
   it('drops both-usable, neither, and every malformed single token', () => {
     for (const msg of [
       { slot: 'neck', bag: 0, item: ITEM }, // both usable: never a guess

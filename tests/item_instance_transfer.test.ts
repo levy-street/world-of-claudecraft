@@ -38,6 +38,9 @@ describe('isTransferLockedInstance', () => {
 
 describe('publicInstanceView: the display trim', () => {
   it('projects exactly signer/enchant/rolled and drops the rest', () => {
+    // The fixture carries EVERY dropped field by name, the Perfecting pair
+    // included, so the exclusion is pinned directly here rather than only
+    // transitively through the eqi cross-pin below.
     const full: ItemInstancePayload = {
       signer: 'Ayla',
       enchant: 'ench_stat_str',
@@ -45,6 +48,8 @@ describe('publicInstanceView: the display trim', () => {
       charges: { zap: 3 },
       bindOnTrade: true,
       boundTo: 12,
+      perfecting: 2,
+      perfected: true,
     };
     expect(publicInstanceView(full)).toEqual({
       signer: 'Ayla',
@@ -72,7 +77,7 @@ describe('publicInstanceView: the display trim', () => {
     );
     const trimmed = [...transfer.matchAll(/pub\.(\w+) = /g)].map((m) => m[1]);
     expect([...new Set(trimmed)].sort()).toEqual(['enchant', 'rolled', 'signer']);
-    for (const banned of ['boundTo', 'bindOnTrade', 'charges']) {
+    for (const banned of ['boundTo', 'bindOnTrade', 'charges', 'perfecting', 'perfected']) {
       expect(transfer.includes(`pub.${banned}`), `${banned} must never project`).toBe(false);
     }
   });
