@@ -44,12 +44,18 @@ export const SHADER_WARM_WINDOW_CONFIG: AdaptiveLinkBudgetConfig = {
 export const SHADER_WARM_MAX_WINDOW_DESKTOP = 4;
 export const SHADER_WARM_MAX_WINDOW_MOBILE = 2;
 
-/** Programs the worker keeps alive after their resolve, per platform class.
- *  Whether the browser's cache survives a deleteProgram is unmeasured, so a
- *  bounded set stays linked (the game links a warmed program soon after);
- *  a phone's GPU memory is shared with the compositor, so it keeps fewer. */
-export const SHADER_WARM_RETAINED_DESKTOP = 256;
-export const SHADER_WARM_RETAINED_MOBILE = 64;
+/** Programs the worker keeps alive after their resolve, per platform class:
+ *  none. Measured on 2026-08-28 (tmp/hitch-inventory/rig/eviction_poc.mjs,
+ *  Intel Mesa and NVIDIA 3090, every cache the flags can disable disabled):
+ *  a program the worker deleted right after its resolve, and one whose
+ *  worker context was lost, link on the main context as fast as one the
+ *  worker kept (10 ms against 283 ms cold on the iGPU, 6 against 140 on the
+ *  3090). The hit lives in the driver's in-memory cache, keyed on the
+ *  source, not in the program object. Keeping programs would only hold GPU
+ *  memory in a second context. The cap stays a knob (the init message) for a
+ *  platform that proves otherwise (the shareable test asks the testers). */
+export const SHADER_WARM_RETAINED_DESKTOP = 0;
+export const SHADER_WARM_RETAINED_MOBILE = 0;
 
 /** A link in flight past this is failed and dropped: the driver never
  *  flipped its completion, or a throttled worker timer stopped polling it.

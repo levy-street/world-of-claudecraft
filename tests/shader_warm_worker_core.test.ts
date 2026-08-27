@@ -69,13 +69,13 @@ describe('the window the worker paces itself with', () => {
     expect(SHADER_WARM_MAX_WINDOW_MOBILE).toBeLessThan(SHADER_WARM_MAX_WINDOW_DESKTOP);
   });
 
-  it('pins the retention caps, the phone keeping the smaller set', () => {
+  it('pins the retention caps at none, on either platform, after the eviction measurement', () => {
     // The worker keeps a linked program alive after its resolve (whether the
     // browser cache survives a deleteProgram is unmeasured); a phone's GPU
     // memory is shared with the compositor, so it holds far fewer.
-    expect(SHADER_WARM_RETAINED_DESKTOP).toBe(256);
-    expect(SHADER_WARM_RETAINED_MOBILE).toBe(64);
-    expect(SHADER_WARM_RETAINED_MOBILE).toBeLessThan(SHADER_WARM_RETAINED_DESKTOP);
+    expect(SHADER_WARM_RETAINED_DESKTOP).toBe(0);
+    expect(SHADER_WARM_RETAINED_MOBILE).toBe(0);
+    expect(SHADER_WARM_RETAINED_MOBILE).toBe(SHADER_WARM_RETAINED_DESKTOP);
   });
 
   it('drops a wedged link at the AIMD own no-progress bound, not a bound of its own', () => {

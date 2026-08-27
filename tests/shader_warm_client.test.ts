@@ -188,7 +188,7 @@ describe('starting the shader warm worker', () => {
         'KHR_parallel_shader_compile',
       ],
       maxWindow: 4,
-      retain: 256,
+      retain: 0,
     });
     // Asked over the renderer's own list, in the renderer's own order.
     expect(stub.asked.slice(0, 3)).toEqual([
@@ -199,11 +199,11 @@ describe('starting the shader warm worker', () => {
     expect(stub.asked).toContain('KHR_parallel_shader_compile');
   });
 
-  it('gives a phone the smaller window and the smaller retention', () => {
+  it('gives a phone the smaller window, and no retention like the desktop', () => {
     // A phone's GPU is shared with the compositor: fewer links in flight and
     // fewer programs held after their resolve.
     const { worker } = start({ mobile: true });
-    expect(worker().ofKind('init')[0]).toMatchObject({ maxWindow: 2, retain: 64 });
+    expect(worker().ofKind('init')[0]).toMatchObject({ maxWindow: 2, retain: 0 });
   });
 
   it('reads the mobile class off the page when the caller names no platform', () => {
@@ -225,7 +225,7 @@ describe('starting the shader warm worker', () => {
       armShaderWarm();
       shaderWarmDecide(contextStub(GRANTED).context, GPU_WORK_PRIORITY.VISIBLE_PREWARM, false);
 
-      expect(worker.ofKind('init')[0]).toMatchObject({ maxWindow: 2, retain: 64 });
+      expect(worker.ofKind('init')[0]).toMatchObject({ maxWindow: 2, retain: 0 });
     } finally {
       if (original === undefined) delete scope.document;
       else scope.document = original;
