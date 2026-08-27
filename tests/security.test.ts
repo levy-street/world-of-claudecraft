@@ -774,6 +774,18 @@ describe('username censorship', () => {
         writeFileSync(file, `atterm\n${'z'.repeat(USERNAME_BANLIST_FILE_MAX_BYTES - 7)}`);
         expect(offensiveName('atterm')).toBe(true);
         expect(warn).toHaveBeenCalledOnce();
+        // The bound is bytes ON DISK: a non-UTF-8 (latin-1) file exactly at
+        // the ceiling decodes with three-byte U+FFFD substitutions past it,
+        // and must still read (a re-encoded-length check refused it).
+        writeFileSync(
+          file,
+          Buffer.concat([
+            Buffer.from('lat1term\n'),
+            Buffer.alloc(USERNAME_BANLIST_FILE_MAX_BYTES - 9, 0xe9),
+          ]),
+        );
+        expect(offensiveName('lat1term')).toBe(true);
+        expect(warn).toHaveBeenCalledOnce();
       });
     } finally {
       warn.mockRestore();
@@ -790,16 +802,25 @@ describe('username censorship', () => {
     const warn = vi.spyOn(console, 'warn').mockImplementation(() => undefined);
     try {
       withUsernameBanlist({}, () => {
-        expect(warmUsernameBanlist()).toEqual({ file: '', loaded: true, terms: 1 });
+        expect(warmUsernameBanlist()).toEqual({ file: '', loaded: true, fileTerms: 0 });
       });
       withUsernameBanlist({ file }, () => {
         const missing = warmUsernameBanlist();
-        expect(missing).toEqual({ file, loaded: false, terms: 1 });
+        expect(missing).toEqual({ file, loaded: false, fileTerms: 0 });
         expect(warn).toHaveBeenCalledOnce();
       });
       writeFileSync(file, 'warmterm\nother\n');
       withUsernameBanlist({ file }, () => {
-        expect(warmUsernameBanlist()).toEqual({ file, loaded: true, terms: 3 });
+        // The file's OWN contribution (two), never the built-in term.
+        expect(warmUsernameBanlist()).toEqual({ file, loaded: true, fileTerms: 2 });
+        expect(offensiveName('warmterm')).toBe(true);
+      });
+      // `loaded` is the CURRENT read's outcome: after the file breaks, the
+      // stale list still serves but the readout says so (an earlier success
+      // on the same path is not "loaded").
+      rmSync(file);
+      withUsernameBanlist({ file }, () => {
+        expect(warmUsernameBanlist()).toEqual({ file, loaded: false, fileTerms: 2 });
         expect(offensiveName('warmterm')).toBe(true);
       });
     } finally {

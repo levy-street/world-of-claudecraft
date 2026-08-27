@@ -1,5 +1,5 @@
 import { randomBytes, scrypt, timingSafeEqual } from 'node:crypto';
-import { readFileSync, statSync } from 'node:fs';
+import { closeSync, fstatSync, openSync, readSync, statSync } from 'node:fs';
 import { englishDataset, englishRecommendedTransformers, RegExpMatcher } from 'obscenity';
 
 const SCRYPT_N = 16384,
@@ -80,6 +80,11 @@ let banlistLastGoodFileTerms: string[] = [];
 // ...keyed to the PATH they came from: a re-pointed USERNAME_BANLIST_FILE
 // that cannot be read serves NO stale terms from the previous path.
 let banlistLastGoodFile = '';
+// Whether the CURRENT cache entry was built from a successful file read (as
+// opposed to a stale-serve after a failed one): what warmUsernameBanlist
+// reports, since "some earlier read of this path succeeded" is the wrong
+// answer over a mount that just broke.
+let banlistFileReadOk = false;
 
 /** Ceiling on the banlist file the server will read whole (the statSync
  *  result is already in hand, so the bound is free). A file past it is
@@ -95,12 +100,39 @@ export const USERNAME_BANLIST_FILE_MAX_BYTES = 1 << 16;
 /** Load (or re-validate) the configured banlist once, for the boot log: an
  *  operator whose USERNAME_BANLIST_FILE cannot be read must learn it at boot,
  *  loudly, not from one warn line buried at the first name screen hours
- *  later (the phase 13 QA hot-path review). Returns whether the configured
- *  file is the list being served and how many terms are live. */
-export function warmUsernameBanlist(): { file: string; loaded: boolean; terms: number } {
+ *  later (the phase 13 QA hot-path review). `loaded` is the outcome of the
+ *  read that built the list now being served (not "some earlier read of this
+ *  path once worked"), and `fileTerms` is the FILE's own contribution, never
+ *  the built-in or USERNAME_BANLIST terms, which stay enforced either way. */
+export function warmUsernameBanlist(): { file: string; loaded: boolean; fileTerms: number } {
   const file = process.env.USERNAME_BANLIST_FILE ?? '';
-  const terms = bannedUsernameTerms().length;
-  return { file, loaded: file === '' || banlistLastGoodFile === file, terms };
+  bannedUsernameTerms();
+  const loaded = file === '' || banlistFileReadOk;
+  const fileTerms =
+    file !== '' && banlistLastGoodFile === file ? banlistLastGoodFileTerms.length : 0;
+  return { file, loaded, fileTerms };
+}
+
+/** Read the banlist file whole, bounded on the OPEN descriptor's own size:
+ *  fstat after open closes the stat-then-read window (a file regrown past
+ *  the ceiling between the two syscalls is refused before any byte is
+ *  allocated, and a grow after the fstat reads only `size` bytes), and the
+ *  bound is bytes on disk, never a re-encoding of the decoded text, so a
+ *  non-UTF-8 file under the ceiling is not refused for its U+FFFD inflation
+ *  (the phase 13 QA security read of the first fix). */
+function readBanlistBounded(file: string): string {
+  const fd = openSync(file, 'r');
+  try {
+    const size = fstatSync(fd).size;
+    if (size > USERNAME_BANLIST_FILE_MAX_BYTES) {
+      throw new Error(`grew past the ${USERNAME_BANLIST_FILE_MAX_BYTES} byte ceiling mid-read`);
+    }
+    const buf = Buffer.allocUnsafe(size);
+    const read = readSync(fd, buf, 0, size, 0);
+    return buf.toString('utf8', 0, read);
+  } finally {
+    closeSync(fd);
+  }
 }
 
 function bannedUsernameTerms(): string[] {
@@ -142,6 +174,7 @@ function bannedUsernameTerms(): string[] {
 
   const terms = BUILT_IN_BANNED_NAME_TERMS.concat(parseBanlist(rawList));
   if (!file) {
+    banlistFileReadOk = false;
     banlistCacheTerms = terms;
     banlistCacheKey = cacheKey;
     return banlistCacheTerms;
@@ -155,20 +188,17 @@ function bannedUsernameTerms(): string[] {
   // stat, the read, AND a synchronous warn on every name screen while serving
   // no file terms at all).
   if (fileSize > USERNAME_BANLIST_FILE_MAX_BYTES) {
+    banlistFileReadOk = false;
     console.warn(
       `USERNAME_BANLIST_FILE (${file}) is ${fileSize} bytes, past the ${USERNAME_BANLIST_FILE_MAX_BYTES} byte ceiling; keeping the last good list`,
     );
   } else {
     try {
-      const text = readFileSync(file, 'utf8');
-      // The stat above and this read are two syscalls; a file regrown past
-      // the ceiling between them is refused on what was actually read.
-      if (Buffer.byteLength(text, 'utf8') > USERNAME_BANLIST_FILE_MAX_BYTES) {
-        throw new Error(`grew past the ${USERNAME_BANLIST_FILE_MAX_BYTES} byte ceiling mid-read`);
-      }
-      banlistLastGoodFileTerms = parseBanlist(text);
+      banlistLastGoodFileTerms = parseBanlist(readBanlistBounded(file));
       banlistLastGoodFile = file;
+      banlistFileReadOk = true;
     } catch (err) {
+      banlistFileReadOk = false;
       console.warn(
         `could not read USERNAME_BANLIST_FILE (${file}); keeping the last good list:`,
         err,

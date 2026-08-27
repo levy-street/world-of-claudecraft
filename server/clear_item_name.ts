@@ -281,7 +281,9 @@ export async function runClearItemName(
     // write (a deleted character, which no retry can cure). One extra load on
     // the refusal path only, so the operator reads the true cause.
     const still = await deps.loadCharacter(input.characterId);
-    return { ok: false, error: still ? CHARACTER_SAVE_LEASED_LINE : 'character not found' };
+    // The same predicate the first load answers not-found on (a row with a
+    // null state is a vanished character too, never a lease).
+    return { ok: false, error: still?.state ? CHARACTER_SAVE_LEASED_LINE : 'character not found' };
   }
   return { ok: true, cleared };
 }

@@ -3646,7 +3646,7 @@ export async function startServer(): Promise<http.Server> {
     const banlist = warmUsernameBanlist();
     if (banlist.file) {
       console.log(
-        `  name banlist: ${banlist.file} ${banlist.loaded ? `loaded (${banlist.terms} terms)` : 'NOT READABLE (built-in terms only; see the warn above)'}`,
+        `  name banlist: ${banlist.file} ${banlist.loaded ? `loaded (${banlist.fileTerms} file terms)` : 'NOT READABLE (its terms are not enforced; the built-in and USERNAME_BANLIST terms still are; see the warn above)'}`,
       );
     }
     console.log(`  REST: /api/register /api/login /api/characters /api/status`);

@@ -328,24 +328,28 @@ describe('runClearItemName (the endpoint body over injected deps)', () => {
     // The fenced UPDATE's 0-row answer has two causes; a deleted character is
     // the one no retry can cure, so the endpoint distinguishes it with one
     // extra load on the refusal path only (the fresh reader's finding on the
-    // first QA fix, which read every 0-row answer as a lease).
-    const state = stateWith({ equipmentInstances: { neck: namedCopy() } });
-    const { deps, recordAudit } = makeDeps({
-      loadCharacter: vi
-        .fn<ClearItemNameDeps['loadCharacter']>()
-        .mockResolvedValueOnce({ level: 20, state })
-        .mockResolvedValueOnce(null),
-      saveCharacterState: vi.fn(async () => false),
-    });
-    const outcome = await runClearItemName(deps, {
-      characterId: 5,
-      adminAccountId: 7,
-      body: { all: true, reason: 'slur' },
-    });
-    expect(outcome).toEqual({ ok: false, error: 'character not found' });
-    expect(recordAudit).toHaveBeenCalledTimes(1);
-    expect(deps.saveCharacterState).toHaveBeenCalledTimes(1);
-    expect(deps.loadCharacter).toHaveBeenCalledTimes(2);
+    // first QA fix, which read every 0-row answer as a lease). Both shapes
+    // the first load calls not-found (no row, a row with a null state) are
+    // not-found here too, never the kick-and-retry line.
+    for (const gone of [null, { level: 20, state: null as unknown as CharacterState }]) {
+      const state = stateWith({ equipmentInstances: { neck: namedCopy() } });
+      const { deps, recordAudit } = makeDeps({
+        loadCharacter: vi
+          .fn<ClearItemNameDeps['loadCharacter']>()
+          .mockResolvedValueOnce({ level: 20, state })
+          .mockResolvedValueOnce(gone),
+        saveCharacterState: vi.fn(async () => false),
+      });
+      const outcome = await runClearItemName(deps, {
+        characterId: 5,
+        adminAccountId: 7,
+        body: { all: true, reason: 'slur' },
+      });
+      expect(outcome, JSON.stringify(gone)).toEqual({ ok: false, error: 'character not found' });
+      expect(recordAudit).toHaveBeenCalledTimes(1);
+      expect(deps.saveCharacterState).toHaveBeenCalledTimes(1);
+      expect(deps.loadCharacter).toHaveBeenCalledTimes(2);
+    }
   });
 });
 
