@@ -7,9 +7,10 @@
 // Masterwrought-cap interlock, and the crafting.ts head-start arm over a real
 // Sim.
 import { describe, expect, it } from 'vitest';
+import { stackSizeOf } from '../src/sim/bags';
 import { STATIONS } from '../src/sim/content/professions';
 import { recipeById } from '../src/sim/content/recipes';
-import { ITEMS } from '../src/sim/data';
+import { ITEMS, QUESTS } from '../src/sim/data';
 import {
   PRIMARY_STATS,
   primaryStatBudget,
@@ -135,6 +136,19 @@ describe('the attempt cost table and rank constants (locked tuning)', () => {
     expect(craftForApexItem('briarstep_jerkin')).toBe('leatherworking');
     expect(craftForApexItem(NON_APEX), 'a non-apex id is off-track').toBeNull();
   });
+
+  it('every masterwrought def is stack-cap 1 (the in-place payload mutation premise)', () => {
+    // The success path writes the slot's shared payload object in place
+    // (perfecting.ts: "apex gear is stack-cap 1, so the named cell IS the
+    // copy"). A stackable apex def would bind and advance EVERY unit in the
+    // cell for one attempt's bill, so the premise is enforced here: a future
+    // stackable masterwrought def fails loudly instead of minting free binds.
+    const apex = Object.values(ITEMS).filter((d) => d.masterwrought === true);
+    expect(apex.length, 'the roster is non-empty (the guard is not vacuous)').toBeGreaterThan(0);
+    for (const def of apex) {
+      expect(stackSizeOf(def), `${def.id} is stack-cap 1`).toBe(1);
+    }
+  });
 });
 
 describe('the deny ladder: order, zero draws, zero consumption', () => {
@@ -232,9 +246,12 @@ describe('the deny ladder: order, zero draws, zero consumption', () => {
     sim.drainEvents();
     const draws = drawsDuring(sim, () => sim.perfectItem(bagRefOf(meta, APEX_NECK), pid));
     expect(draws).toBe(0);
-    expect(errorsOf(sim)).toEqual([
-      'Perfecting that requires 125 skill in the craft that made it.',
-    ]);
+    const errs = errorsOf(sim);
+    expect(errs).toEqual(['Perfecting that requires 125 skill in the craft that made it.']);
+    // The number in the LIVE emit is chained to the constant: a retune of
+    // PERFECTING_SKILL_REQ that leaves the sentence (and, through the EXACT
+    // matcher, its 21 locale rows) saying the old number fails here.
+    expect(errs[0]).toContain(String(PERFECTING_SKILL_REQ));
   });
 
   it('a lock-only shortfall denies with the DEDICATED locked line', () => {
@@ -273,6 +290,52 @@ describe('the deny ladder: order, zero draws, zero consumption', () => {
     expect(draws, 'one draw per resolved attempt, the whole system').toBe(1);
     // ...and it really resolved: the bill was spent, whatever the outcome.
     expect(materialCounts(sim, pid)).toEqual([7, 7, 7]);
+  });
+
+  it('a resolved attempt bumps wireRev once; a denial leaves it untouched', () => {
+    // The bump is the owner's heavy-mirror re-diff signal (the rift forge
+    // ops' recipe); it is redundant with HEAVY_SELF_CMDS for this command
+    // TODAY, so this pin is what keeps a future removal of either mechanism
+    // a conscious choice rather than a silent loss of the last one.
+    const { sim, pid, meta } = perfecter(26);
+    sim.addItem(APEX_NECK, 1, pid);
+    const ref = bagRefOf(meta, APEX_NECK);
+    const revBefore = meta.wireRev;
+    sim.perfectItem({ bag: 999, itemId: APEX_NECK }, pid);
+    expect(meta.wireRev, 'a denial re-diffs nothing').toBe(revBefore);
+    sim.perfectItem(ref, pid);
+    // Exactly TWO: the quest-resync hook's own bump (quest_credit.ts) plus
+    // the module's payload-mutation bump. Deleting either fails this.
+    expect(meta.wireRev, 'a resolved attempt re-diffs the self mirrors').toBe(revBefore + 2);
+  });
+
+  it('the material consume re-syncs an active collect objective (the quest hook)', () => {
+    // The bank suite's synthetic-collect idiom: no shipped quest counts an
+    // attempt material, so pin the consume -> onInventoryChangedForQuests
+    // wiring with a synthetic collect quest over the ember.
+    const { sim, pid, meta } = perfecter(27);
+    sim.addItem(APEX_NECK, 1, pid);
+    QUESTS.__perfect_resync = {
+      ...QUESTS.q_widows,
+      id: '__perfect_resync',
+      objectives: [{ type: 'collect', itemId: EMBER, count: 9, label: "Maker's Ember" }],
+    };
+    try {
+      meta.questLog.set('__perfect_resync', {
+        questId: '__perfect_resync',
+        counts: [0],
+        state: 'active',
+      });
+      sim.addItem(EMBER, 1, pid); // the add-side recompute credits 9 of 9
+      expect(meta.questLog.get('__perfect_resync')?.counts).toEqual([9]);
+      sim.perfectItem(bagRefOf(meta, APEX_NECK), pid);
+      expect(
+        meta.questLog.get('__perfect_resync')?.counts,
+        'the spent ember un-credits through the consume hook',
+      ).toEqual([8]);
+    } finally {
+      delete QUESTS.__perfect_resync;
+    }
   });
 });
 
@@ -323,6 +386,24 @@ describe('R2: the piece binds on the FIRST attempt, success and failure alike', 
     expect(noticesOf(sim)).toEqual([
       'Perfecting begins: Wyrmfall Pendant is now bound to you.',
       'Perfecting: Wyrmfall Pendant advances to rank 1 of 4.',
+    ]);
+  });
+
+  it('a roll of exactly PERFECTING_SUCCESS_CHANCE takes the fail arm (strict less-than)', () => {
+    // The skill boundary is pinned on both sides above; this is the success
+    // boundary's twin. roll < chance succeeds, so roll == chance fails: a
+    // <= regression widens the real success rate and fails here.
+    const { sim, pid, meta } = perfecter(25);
+    sim.addItem(APEX_NECK, 1, pid);
+    const ref = bagRefOf(meta, APEX_NECK);
+    sim.drainEvents();
+    const draws = forceRoll(sim, PERFECTING_SUCCESS_CHANCE);
+    sim.perfectItem(ref, pid);
+    expect(draws()).toBe(1);
+    expect(meta.inventory[ref.bag].instance?.perfecting, 'no rank advanced').toBeUndefined();
+    expect(noticesOf(sim)).toEqual([
+      'Perfecting begins: Wyrmfall Pendant is now bound to you.',
+      'The perfecting attempt fails; the materials are spent.',
     ]);
   });
 
@@ -545,6 +626,39 @@ describe('perfectingInfoFrom: the shared both-hosts view', () => {
     ).toBeNull();
   });
 
+  it('a Perfected copy reads perfected: true (the view arm a hardcoded false would break)', () => {
+    // Every other view assertion in this file reads perfected over an
+    // unfinished copy, so a literal `false` at the builder would have
+    // survived the suite; this is the failing-direction twin.
+    const { sim, pid, meta } = perfecter(43);
+    sim.addItemInstance(APEX_NECK, { perfected: true, boundTo: meta.entityId }, pid, 1);
+    const view = perfectingInfoFrom({
+      ref: bagRefOf(meta, APEX_NECK),
+      inventory: meta.inventory,
+      equipment: meta.equipment,
+      equipmentInstances: meta.equipmentInstance,
+      craftSkills: meta.craftSkills,
+    });
+    expect(view?.perfected).toBe(true);
+    expect(view?.rank, 'the deleted track field reads rank 0').toBe(0);
+    expect(view?.bound).toBe(true);
+  });
+
+  it('a skill of PERFECTING_SKILL_REQ - 1 reads skillMet: false (the failing direction)', () => {
+    const { sim, pid, meta } = perfecter(44);
+    meta.craftSkills.jewelcrafting = PERFECTING_SKILL_REQ - 1;
+    sim.addItem(APEX_NECK, 1, pid);
+    const view = perfectingInfoFrom({
+      ref: bagRefOf(meta, APEX_NECK),
+      inventory: meta.inventory,
+      equipment: meta.equipment,
+      equipmentInstances: meta.equipmentInstance,
+      craftSkills: meta.craftSkills,
+    });
+    expect(view?.skillMet).toBe(false);
+    expect(view?.skillReq).toBe(PERFECTING_SKILL_REQ);
+  });
+
   it('the Sim facade delegate answers through the same builder (worn arm)', () => {
     const { sim, pid, meta } = perfecter(42);
     sim.setPlayerLevel(20);
@@ -576,7 +690,10 @@ describe('persistence: round-trips, pre-phase saves, and the load bound', () => 
     const loadedMeta = fresh.players.get(loadedPid) as PlayerMeta;
     const loaded = loadedMeta.inventory.find((s) => s.itemId === APEX_NECK);
     expect(loaded?.instance?.perfecting).toBe(2);
-    expect(loaded?.instance?.boundTo).toBeDefined();
+    // The bind value round-trips VERBATIM (drop-only load, presence-only
+    // ownership): a load path that re-stamped it to the loading character's
+    // id, or any other number, fails here.
+    expect(loaded?.instance?.boundTo).toBe(meta.entityId);
   });
 
   it('a Perfected WORN copy round-trips with its stats recalculated on load', () => {
@@ -766,6 +883,50 @@ describe('the crafting.ts head start (R1) over a real Sim', () => {
     expect(slot?.instance?.perfecting).toBe(PERFECTING_HEADSTART_RANK);
     expect(slot?.instance?.bindOnTrade).toBe(true);
     expect(slot?.instance?.boundTo, 'armed, not yet bound').toBeUndefined();
+  });
+
+  /** Force a SEQUENCE of draws (call N answers values[N], the last value
+   *  repeating): the Jack arm draws twice per craft, so a single forced value
+   *  cannot stage a normal-variance proc hit. */
+  function forceRollSequence(sim: Sim, values: number[]): () => number {
+    let draws = 0;
+    (sim.rng as { next: () => number }).next = () => {
+      const v = values[Math.min(draws, values.length - 1)];
+      draws += 1;
+      return v;
+    };
+    return () => draws;
+  }
+
+  it('a Jack of All Trades draws TWO on an apex craft; the ceiling denies the head start even on a hit', () => {
+    // The Jack arm is the one arm where draws-per-successful-craft is 2 (the
+    // variance roll, then the proc roll), so it is where a draw-order
+    // regression would hide. Stage variance 'normal' (0.5) then a proc HIT
+    // (0): the head start is STILL denied, by the same ceiling term that
+    // denies the no-archetype crafter above (a Jack's breadth ceiling is the
+    // rare tier, under the apex def's legendary bumped tier).
+    const { sim, pid, meta, recipe } = apexCrafter(11, null);
+    meta.archetype.isJackOfAllTrades = true;
+    const draws = forceRollSequence(sim, [0.5, 0]);
+    runCraft(sim, recipe.id, false, pid);
+    expect(meta.lastCraftResult?.ok).toBe(true);
+    expect(draws(), 'exactly two draws for a Jack, in order').toBe(2);
+    expect(meta.lastCraftResult?.masterwork).toBeUndefined();
+    const slot = meta.inventory.find((s) => s.itemId === APEX_NECK);
+    expect(slot?.instance?.perfecting).toBeUndefined();
+  });
+
+  it("a Jack 'worse' variance also draws two and mints the plain signed copy", () => {
+    const { sim, pid, meta, recipe } = apexCrafter(12, null);
+    meta.archetype.isJackOfAllTrades = true;
+    const draws = forceRollSequence(sim, [0, 0]); // variance 'worse', proc hit
+    runCraft(sim, recipe.id, false, pid);
+    expect(meta.lastCraftResult?.ok).toBe(true);
+    expect(draws()).toBe(2);
+    const slot = meta.inventory.find((s) => s.itemId === APEX_NECK);
+    expect(slot?.instance?.signer).toBeTruthy();
+    expect(slot?.instance?.perfecting).toBeUndefined();
+    expect(slot?.instance?.rolled).toBeUndefined();
   });
 });
 
