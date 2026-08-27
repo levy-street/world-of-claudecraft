@@ -830,6 +830,38 @@ describe('username censorship', () => {
     const many = indexBannedTerms(Array.from({ length: 9000 }, (_, i) => `t${i.toString(36)}z`));
     expect(hasBannedTerm('a'.repeat(32), many)).toBe(false);
     expect(hasBannedTerm('xxt1zxx', many)).toBe(true);
+    // The one input class where the walk and `includes` would part ways, an
+    // EMPTY term, is dropped at the index so the exported pair holds for any
+    // caller (the round-3 security read); duplicates are absorbed.
+    expect(hasBannedTerm('abc', indexBannedTerms(['']))).toBe(false);
+    expect(indexBannedTerms(['', 'ab', 'ab']).maxLen).toBe(2);
+    expect(indexBannedTerms(['', 'ab', 'ab']).set.size).toBe(1);
+  });
+
+  it('refuses a non-regular file (a device reads as empty) and keeps the last good list', () => {
+    // A FIFO, a device, or a procfs-style file reports size 0 while holding
+    // content; the old whole-file read recorded an EMPTY list as a success
+    // (loaded, 0 file terms). The fd-bounded read refuses anything but a
+    // regular file onto the warn plus last-good arm (the round-3 security read).
+    const dir = mkdtempSync(join(tmpdir(), 'woc-banlist-dev-'));
+    const file = join(dir, 'banlist.txt');
+    writeFileSync(file, 'goodterm\n');
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => undefined);
+    try {
+      withUsernameBanlist({ file }, () => {
+        expect(offensiveName('goodterm')).toBe(true);
+      });
+      withUsernameBanlist({ file: '/dev/null' }, () => {
+        expect(warmUsernameBanlist()).toEqual({ file: '/dev/null', loaded: false, fileTerms: 0 });
+        expect(warn).toHaveBeenCalledOnce();
+        expect(String(warn.mock.calls[0][1])).toContain('not a regular file');
+        // The other path's last-good terms are NOT served under this path.
+        expect(offensiveName('goodterm')).toBe(false);
+      });
+    } finally {
+      warn.mockRestore();
+      rmSync(dir, { force: true, recursive: true });
+    }
   });
 
   it('holds the file stat to one per USERNAME_BANLIST_STAT_HOLD_MS, then sees the edit', () => {
@@ -881,6 +913,15 @@ describe('username censorship', () => {
         // The pure readout answers the same without a stat or a read.
         expect(usernameBanlistStatus()).toEqual({ file, loaded: true, fileTerms: 2 });
         expect(offensiveName('warmterm')).toBe(true);
+      });
+      // `loaded` is keyed to the PATH it was read for: a re-pointed env with
+      // no screen since must not inherit the old path's flag.
+      withUsernameBanlist({ file: `${file}.other` }, () => {
+        expect(usernameBanlistStatus()).toEqual({
+          file: `${file}.other`,
+          loaded: false,
+          fileTerms: 0,
+        });
       });
       // `loaded` is the CURRENT read's outcome: after the file breaks, the
       // stale list still serves but the readout says so (an earlier success

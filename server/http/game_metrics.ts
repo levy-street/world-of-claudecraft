@@ -268,6 +268,9 @@ export interface GameStateSource {
    * hours after boot leaves the moderation screen serving stale terms with
    * only a one-shot warn line to say so; this is the scrape-visible twin
    * (server/auth.ts usernameBanlistStatus, the phase 13 QA hot-path review).
+   * A pure readout as of the LAST name screen or the boot warm: a scrape
+   * never stats or reads the file, so a break on a quiet realm shows at the
+   * next screen, not at the next scrape.
    */
   usernameBanlistLoaded(): boolean;
   /** Live characters online. */
@@ -351,7 +354,7 @@ export function registerGameStateMetrics(
 
   new Gauge({
     name: WOC_USERNAME_BANLIST_FILE_LOADED,
-    help: '1 when the configured USERNAME_BANLIST_FILE built the served name-screen term list (or no file is configured); 0 while a stale or empty list is served in its place.',
+    help: '1 when the configured USERNAME_BANLIST_FILE built the served name-screen term list (or no file is configured); 0 while a stale or empty list is served in its place. Reflects the state as of the last name screen or the boot warm (a scrape never stats or reads the file).',
     registers: [registry],
     collect() {
       this.set(source.usernameBanlistLoaded() ? 1 : 0);

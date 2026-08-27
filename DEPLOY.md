@@ -459,7 +459,11 @@ For off-box safety, sync the directory to S3 occasionally:
   a missing, unreadable, or over-64-KiB file (about nine thousand terms; the screen
   scans every term per name) warns once and keeps serving the last list it read
   successfully (fail-open by decision: it never blocks a signup), and the boot log
-  prints one `name banlist:` line saying whether the configured file loaded.
+  prints one `name banlist:` line saying whether the configured file loaded (the
+  `woc_username_banlist_file_loaded` gauge is its scrape-visible twin, as of the last
+  name screen). Keep the file on LOCAL disk: the server stats it once a second at most
+  and reads it on change, synchronously on the loop that runs the realm, so a hung
+  network mount stalls a name screen for the mount's timeout.
 - **Clearing a stamped legendary name** (`POST
   /admin/api/moderation/characters/:id/clear-item-name`, permission
   `moderation.clearItemName`, SUPERADMIN only, API-only: the dashboard has no

@@ -81,10 +81,12 @@ let banlistLastGoodFileTerms: string[] = [];
 // that cannot be read serves NO stale terms from the previous path.
 let banlistLastGoodFile = '';
 // Whether the CURRENT cache entry was built from a successful file read (as
-// opposed to a stale-serve after a failed one): what the status readout
-// reports, since "some earlier read of this path succeeded" is the wrong
-// answer over a mount that just broke.
+// opposed to a stale-serve after a failed one), and for which PATH: what the
+// status readout reports, since "some earlier read of this path succeeded"
+// is the wrong answer over a mount that just broke, and a flag for one path
+// must not answer for a re-pointed one.
 let banlistFileReadOk = false;
+let banlistFileReadOkFor = '';
 
 /** Ceiling on the banlist file the server will read whole. A file past it is
  *  treated exactly like an unreadable one: warned once, last-good served.
@@ -106,7 +108,13 @@ export const USERNAME_BANLIST_FILE_MAX_BYTES = 1 << 16;
  *  on a network-mounted file that is the realm stalling behind the mount at
  *  the screen rate. One second keeps the no-restart property at human
  *  timescale and bounds the stat to one per second per process whatever the
- *  screen rate. */
+ *  screen rate. The residual, stated: the hold bounds the FREQUENCY of the
+ *  synchronous syscalls, never their duration, so a mount that hangs hours
+ *  after boot still blocks the loop once per hold on a name screen (the
+ *  boot-time warm covers only a mount already hung at boot); an operator
+ *  who must keep a banlist on a network mount copies it to local disk at
+ *  deploy (DEPLOY.md). Clocked on performance.now (monotonic): a backward
+ *  wall-clock step must not freeze the hold and hide an edit mid-incident. */
 export const USERNAME_BANLIST_STAT_HOLD_MS = 1000;
 let banlistStatHoldMs = USERNAME_BANLIST_STAT_HOLD_MS;
 let banlistStatHold = { file: '', atMs: Number.NEGATIVE_INFINITY, stamp: '', size: -1 };
@@ -118,26 +126,37 @@ export function setUsernameBanlistStatHoldMsForTest(ms: number): void {
   banlistStatHold = { file: '', atMs: Number.NEGATIVE_INFINITY, stamp: '', size: -1 };
 }
 
-/** The banned-term index: the terms as parsed, the Set of them, and the
- *  longest term's length (the walk bound in hasBannedTerm). */
+/** The banned-term index: the Set of terms and the longest term's length
+ *  (the walk bound in hasBannedTerm). */
 export interface BanlistIndex {
-  terms: string[];
   set: Set<string>;
   maxLen: number;
 }
 
+/** Empty terms are dropped here as well as in parseBanlist, so the exported
+ *  pair keeps its `some(includes)` equivalence for ANY caller: the one input
+ *  class where a substring walk of lengths one and up would diverge from
+ *  `includes('')` (always true) is the empty term, which no list can mean. */
 export function indexBannedTerms(terms: string[]): BanlistIndex {
   let maxLen = 0;
-  for (const term of terms) if (term.length > maxLen) maxLen = term.length;
-  return { terms, set: new Set(terms), maxLen };
+  const set = new Set<string>();
+  for (const term of terms) {
+    if (term.length === 0) continue;
+    set.add(term);
+    if (term.length > maxLen) maxLen = term.length;
+  }
+  return { set, maxLen };
 }
 
 /** Whether any banned term is a substring of `normalized`: exactly
  *  `terms.some((term) => normalized.includes(term))`, evaluated as a walk
  *  over the substrings of the NAME (lengths one through the longest term)
  *  against the Set, so a screen costs O(name length x longest term) whatever
- *  the list size, instead of O(terms) per screen. Every term is non-empty
- *  (parseBanlist drops empties), so length one is the honest floor. */
+ *  the list size, instead of O(terms) per screen: sized for a real operator
+ *  list (a few hundred terms and up), and at the default single built-in
+ *  term it does a handful more operations than one `includes`, immaterial
+ *  beside the two obscenity-matcher passes in the same screen. Every term is
+ *  non-empty (indexBannedTerms drops empties), so length one is the floor. */
 export function hasBannedTerm(normalized: string, index: BanlistIndex): boolean {
   const n = normalized.length;
   const maxLen = Math.min(index.maxLen, n);
@@ -160,10 +179,13 @@ export interface UsernameBanlistStatus {
 }
 
 /** A pure readout of the served list's state (no stat, no read): what the
- *  boot line and the woc_username_banlist_file_loaded gauge report. */
+ *  boot line and the woc_username_banlist_file_loaded gauge report. It
+ *  reflects the state as of the LAST name screen or the boot warm: a mount
+ *  that breaks on a quiet realm is seen at the next screen, since only a
+ *  screen (or the warm) stats and reads. */
 export function usernameBanlistStatus(): UsernameBanlistStatus {
   const file = process.env.USERNAME_BANLIST_FILE ?? '';
-  const loaded = file === '' || banlistFileReadOk;
+  const loaded = file === '' || (banlistFileReadOk && banlistFileReadOkFor === file);
   const fileTerms =
     file !== '' && banlistLastGoodFile === file ? banlistLastGoodFileTerms.length : 0;
   return { file, loaded, fileTerms };
@@ -197,12 +219,20 @@ export function usernameBanlistBootLine(status: UsernameBanlistStatus): string {
 function readBanlistBounded(file: string): string {
   const fd = openSync(file, 'r');
   try {
-    const size = fstatSync(fd).size;
+    const stat = fstatSync(fd);
+    // A FIFO, a device, or a procfs-style file reports size 0 while holding
+    // content: reading it "whole" would record an EMPTY list as a success.
+    // Only a regular file's size is its content's size.
+    if (!stat.isFile()) throw new Error('not a regular file');
+    const size = stat.size;
     if (size > USERNAME_BANLIST_FILE_MAX_BYTES) {
       throw new Error(`grew past the ${USERNAME_BANLIST_FILE_MAX_BYTES} byte ceiling mid-read`);
     }
     const buf = Buffer.allocUnsafe(size);
     const read = readSync(fd, buf, 0, size, 0);
+    // A short read (a truncating rewrite between the fstat and the pread)
+    // must not pass a PREFIX of the list off as the whole list.
+    if (read !== size) throw new Error(`read ${read} of ${size} bytes`);
     return buf.toString('utf8', 0, read);
   } finally {
     closeSync(fd);
@@ -232,7 +262,7 @@ function bannedUsernameTerms(): BanlistIndex {
   let fileStamp = '';
   let fileSize = -1;
   if (file) {
-    const nowMs = Date.now();
+    const nowMs = performance.now();
     if (banlistStatHold.file === file && nowMs - banlistStatHold.atMs < banlistStatHoldMs) {
       fileStamp = banlistStatHold.stamp;
       fileSize = banlistStatHold.size;
@@ -278,6 +308,7 @@ function bannedUsernameTerms(): BanlistIndex {
       banlistLastGoodFileTerms = parseBanlist(readBanlistBounded(file));
       banlistLastGoodFile = file;
       banlistFileReadOk = true;
+      banlistFileReadOkFor = file;
     } catch (err) {
       banlistFileReadOk = false;
       console.warn(
