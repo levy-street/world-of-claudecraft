@@ -13,15 +13,18 @@ import { ALL_RECIPES } from '../src/sim/content/recipes';
 import { ITEMS } from '../src/sim/data';
 import { isSignableMaterialRarity, NODE_MATERIAL_TABLE } from '../src/sim/professions/gathering';
 import { masterworkBonusStats } from '../src/sim/professions/masterwork';
+import { LEGENDARY_PROMOTION_COST } from '../src/sim/professions/perfecting';
 import {
   instanceBadgeLines,
   instanceBindingLines,
   instanceBonusStatLines,
   instanceMakersMarkLine,
+  instanceTitleHtml,
   isGatheredProvenance,
   isGatheredProvenanceKind,
   itemNumber,
   itemStatName,
+  tooltipEffectiveQuality,
   wornTooltipInstance,
 } from '../src/ui/item_instance_tooltip';
 import { svgIcon } from '../src/ui/ui_icons';
@@ -300,12 +303,13 @@ describe('instanceBindingLines (commission lines)', () => {
 // full payload can never show the bond lines on worn gear that the online
 // eqi-trimmed mirror lacks. char_window.ts is pinned to route through it.
 describe('wornTooltipInstance (the eqi-mirror worn projection)', () => {
-  it('keeps exactly signer/enchant/rolled and drops the bond and charges fields', () => {
+  it('keeps exactly signer/enchant/rolled/name and drops the bond and charges fields', () => {
     expect(
       wornTooltipInstance({
         signer: 'Aldric',
         enchant: 'ench_x',
         rolled: { masterwork: true, stats: { str: 2 } },
+        name: "Vel'tara's Oath",
         bindOnTrade: true,
         boundTo: 7,
         charges: { fireball: 2 },
@@ -314,6 +318,7 @@ describe('wornTooltipInstance (the eqi-mirror worn projection)', () => {
       signer: 'Aldric',
       enchant: 'ench_x',
       rolled: { masterwork: true, stats: { str: 2 } },
+      name: "Vel'tara's Oath",
     });
     expect(wornTooltipInstance(undefined)).toBeUndefined();
     // A bond-only payload projects to an EMPTY worn payload: no line renders.
@@ -331,6 +336,59 @@ describe('wornTooltipInstance (the eqi-mirror worn projection)', () => {
     expect(site).toBeGreaterThan(-1);
     const before = charWindow.slice(Math.max(0, site - 220), site);
     expect(before).toContain('wornTooltipInstance(');
+  });
+});
+
+describe('tooltipEffectiveQuality and instanceTitleHtml (Masterwrought phase 13)', () => {
+  const def = {
+    id: 'test_apex_ring',
+    name: 'Test Apex Ring',
+    kind: 'armor',
+    slot: 'ring',
+    quality: 'epic',
+  } as import('../src/sim/types').ItemDef;
+
+  it('effective quality: the rolled override wins, unknown strings fall back to the def', () => {
+    expect(tooltipEffectiveQuality(def, undefined)).toBe('epic');
+    expect(tooltipEffectiveQuality(def, { rolled: { quality: 'legendary' } })).toBe('legendary');
+    // A hostile or future-tier wire string never reaches the label lookup:
+    // the def's own quality answers instead of a throw.
+    expect(tooltipEffectiveQuality(def, { rolled: { quality: 'mythic' } })).toBe('epic');
+    expect(tooltipEffectiveQuality(def, { rolled: { quality: 'hasOwnProperty' } })).toBe('epic');
+  });
+
+  it('an unnamed copy keeps the one-line title, colored by EFFECTIVE quality', () => {
+    const plain = instanceTitleHtml(def, undefined, 'Test Apex Ring');
+    expect(plain).toBe('<div class="tt-title" style="color:#a335ee">Test Apex Ring</div>');
+    // A promoted-but-unnamed shape (defensive: the sim always names on
+    // promotion) still recolors to legendary orange.
+    const promotedUnnamed = instanceTitleHtml(
+      def,
+      { rolled: { quality: 'legendary' } },
+      'Test Apex Ring',
+    );
+    expect(promotedUnnamed).toContain('#ff8000');
+    expect(promotedUnnamed).not.toContain('tt-sub');
+  });
+
+  it('a named copy titles the card with the ESCAPED chosen name and keeps the def name below', () => {
+    const html = instanceTitleHtml(
+      def,
+      { rolled: { quality: 'legendary' }, name: '<b>Oath</b> of "Vel\'tara"' },
+      'Test Apex Ring',
+    );
+    // Player-authored text renders escaped, raw, never through t().
+    expect(html).toContain('&lt;b&gt;Oath&lt;/b&gt;');
+    expect(html).not.toContain('<b>Oath</b>');
+    // Legendary orange title plus the identity line below it.
+    expect(html).toContain('style="color:#ff8000"');
+    expect(html).toContain('<div class="tt-sub">Test Apex Ring</div>');
+  });
+
+  it('quest purpose still outranks quality in the title color', () => {
+    const questDef = { ...def, kind: 'quest' } as import('../src/sim/types').ItemDef;
+    const html = instanceTitleHtml(questDef, { rolled: { quality: 'legendary' } }, 'Sealed Writ');
+    expect(html).toContain('var(--color-quest)');
   });
 });
 
@@ -444,6 +502,11 @@ describe('isGatheredProvenanceKind partition over the live content', () => {
         // component on the intermediates' footing (common, below the signing
         // floor, same as duskforged_billet and its siblings).
         'cogwheel_blank',
+        // masterwrought Phase 13's promotion writ: junk-kind at RARE on the
+        // tradable-writ arm, so it sits ABOVE the signing floor like the
+        // feasts and carries its own carve-out (isPromotionBillItem, derived
+        // from perfecting.ts LEGENDARY_PROMOTION_COST).
+        'deed_of_making',
       ].sort(),
     );
     for (const recipe of craftedJunk) {
@@ -457,7 +520,15 @@ describe('isGatheredProvenanceKind partition over the live content', () => {
       // because a slot or stats gain would open a SECOND signing channel and
       // change what the def is. Every other crafted junk output must stay below
       // the floor.
-      if (!PLACEABLE_FEASTS.includes(recipe.resultItemId)) {
+      // The Deed of Making joins the feasts on the above-floor side (rare on
+      // the tradable-writ arm, masterwrought Phase 13): a scribed copy IS
+      // signed, and its promotion-bill carve-out is what keeps the signed
+      // writ reading "Crafted by" (asserted with the feasts below). Every
+      // other crafted junk output must stay below the floor.
+      if (
+        !PLACEABLE_FEASTS.includes(recipe.resultItemId) &&
+        recipe.resultItemId !== 'deed_of_making'
+      ) {
         expect(
           signableQuality(def.quality),
           `${recipe.resultItemId} must stay below signable rarity while kind junk`,
@@ -512,6 +583,18 @@ describe('isGatheredProvenanceKind partition over the live content', () => {
       );
       expect(isGatheredProvenance(ITEMS[id]), `${id} def-level provenance is CRAFTED`).toBe(false);
     }
+    // The promotion writ's own wording rule (masterwrought Phase 13): the
+    // carve-out is DERIVED from the promotion bill, so pin the derivation
+    // (the bill really names the id) beside the def-level verdict.
+    expect(
+      LEGENDARY_PROMOTION_COST.some((c) => c.itemId === 'deed_of_making'),
+      'the promotion bill must name the writ the carve-out derives from',
+    ).toBe(true);
+    expect(isGatheredProvenanceKind(ITEMS.deed_of_making.kind)).toBe(true);
+    expect(
+      isGatheredProvenance(ITEMS.deed_of_making),
+      'a signed Deed of Making reads Crafted by, never Gathered by',
+    ).toBe(false);
   });
 });
 

@@ -15,6 +15,7 @@ import {
   MAX_INSTANCE_PAYLOAD_KEYS,
   MAX_INSTANCE_STRING_LENGTH,
   MAX_INSTANCE_SUBTREE_JSON_LENGTH,
+  MAX_LEGENDARY_NAME_LOAD_LENGTH,
   sanitizeItemInstancePayloadOnLoad,
   warnDroppedInstanceKeys,
 } from '../src/sim/item_instance_load';
@@ -37,6 +38,7 @@ const legalPayload = () => ({
   bindOnTrade: true,
   perfecting: 2,
   perfected: true,
+  name: 'Sunrise Vow',
   locked: true,
 });
 
@@ -63,6 +65,7 @@ describe('sanitizeItemInstancePayloadOnLoad: identity on legal data', () => {
       'bindOnTrade',
       'perfecting',
       'perfected',
+      'name',
       'locked',
     ]);
     expect(out.payload).toEqual(legalPayload());
@@ -221,6 +224,38 @@ describe('sanitizeItemInstancePayloadOnLoad: the Perfecting field shapes (phase 
       const out = sanitizeItemInstancePayloadOnLoad({ perfected: bad, boundTo: 7 });
       expect(out.dropped, `perfected ${JSON.stringify(bad)}`).toEqual(['perfected']);
       expect(out.payload).toEqual({ boundTo: 7 });
+    }
+  });
+});
+
+describe('sanitizeItemInstancePayloadOnLoad: the legendary name bound (phase 13)', () => {
+  const load = (name: unknown) =>
+    sanitizeItemInstancePayloadOnLoad({ name, enchant: 'enchant_weapon_might' });
+
+  it('keeps a legal name, up to the LOAD ceiling (looser than the live shape)', () => {
+    // The signer doctrine: the live shape (legendary_name.ts) is 32 letters/
+    // spaces/apostrophes/hyphens, and this bound deliberately admits MORE
+    // (any printable ASCII to 48) so shipped names outlive a live-shape
+    // widening; the survivor set here includes strings the live validator
+    // would refuse today, which is exactly the doctrine under test.
+    for (const legal of ['Sunrise Vow', "D'arna-Vel", 'A', 'Vow #7 (true)', 'e'.repeat(48)]) {
+      const out = load(legal);
+      expect(out.dropped, JSON.stringify(legal)).toEqual([]);
+      expect(out.payload?.name).toBe(legal);
+    }
+    expect(MAX_LEGENDARY_NAME_LOAD_LENGTH).toBe(48);
+  });
+
+  it('drops a junk name alone, per dimension', () => {
+    // One probe per dimension of the bound: type, emptiness, byte ceiling,
+    // alphabet (multi-byte), alphabet (control char).
+    const overlong = 'e'.repeat(MAX_LEGENDARY_NAME_LOAD_LENGTH + 1);
+    const accented = `Bl${String.fromCharCode(0xe9)}de`;
+    for (const bad of [41, null, true, ['Vow'], { text: 'Vow' }, '', overlong, accented, 'A\nB']) {
+      const out = load(bad);
+      expect(out.dropped, `name ${JSON.stringify(bad)}`).toEqual(['name']);
+      // ALONE: the payload around the junk field survives.
+      expect(out.payload).toEqual({ enchant: 'enchant_weapon_might' });
     }
   });
 });

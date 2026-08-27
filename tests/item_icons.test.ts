@@ -321,8 +321,9 @@ describe('item webp icons', () => {
     // the angler's endgame's eleven (62 -> 73: three high-band catches, the
     // apex rod, two dishes, the capstone feast and four patterns), and Phase
     // 11j added the apex hoe (73 -> 74), Phase 11k added its apex feast
-    // tier while retiring two 11i ids (74 -> 78), and Phase 11o added the
-    // engineering on-ramp pair (78 -> 80), all under
+    // tier while retiring two 11i ids (74 -> 78), Phase 11o added the
+    // engineering on-ramp pair (78 -> 80), and masterwrought Phase 13 added
+    // the Deed of Making (80 -> 81), all under
     // the same reasoning: their art is scheduled as its own later phase, a
     // deliberate ART PARK running Phases 11e onward (ip-16-ICON). It must
     // fall back to 0 as that art lands. CORRECTED at the Phase 11e QA: this used to add "all are dormant
@@ -344,6 +345,7 @@ describe('item webp icons', () => {
       'cogwheel_blank',
       'compost',
       'copperlens_ocular',
+      'deed_of_making',
       'eastbrook_glazed_carrots',
       'eastbrook_root_pottage',
       'evergarden_braised_greens',

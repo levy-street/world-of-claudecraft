@@ -646,8 +646,10 @@ describe('enchant_apply_view: preservedReplaceTraits (#2421)', () => {
     // not read as coverage either.
     const body = (block?.[0] ?? '').replace(/\/\*[\s\S]*?\*\//g, '').replace(/^\s*\/\/.*$/gm, '');
     const projected = [...body.matchAll(/pub\.(\w+) = inst\.\w+/g)].map((m) => m[1]);
-    // Exactly the cosmetic inspect fields, and NOTHING that carries bind state.
-    expect(projected.sort()).toEqual(['enchant', 'rolled', 'signer']);
+    // Exactly the cosmetic inspect fields, and NOTHING that carries bind
+    // state. `name` (the player-chosen legendary name) joined at Masterwrought
+    // phase 13, the first cosmetic widening since the allowlist was written.
+    expect(projected.sort()).toEqual(['enchant', 'name', 'rolled', 'signer']);
     // Syntax-independent backstop: the extractor above only sees dot-notation
     // assignment, so a widening written as pub['boundTo'] = inst.boundTo or an
     // Object.assign spread would slip past it. Pin the FIELD NAMES out of the
@@ -668,6 +670,7 @@ describe('enchant_apply_view: preservedReplaceTraits (#2421)', () => {
       signer: 'Tester',
       enchant: 'enchant_chest_stamina',
       rolled: { masterwork: true, stats: { sta: 4 } },
+      name: "Vel'tara's Oath",
       boundTo: 7,
       bindOnTrade: true,
       charges: { some_effect: 2 },
@@ -675,7 +678,7 @@ describe('enchant_apply_view: preservedReplaceTraits (#2421)', () => {
     expect(
       Object.keys(worn ?? {}).sort(),
       'wornTooltipInstance and the eqi wire encode one policy: widen both or neither',
-    ).toEqual(['enchant', 'rolled', 'signer']);
+    ).toEqual(['enchant', 'name', 'rolled', 'signer']);
   });
 
   // The exported sweep list claims two things about itself: that it is the

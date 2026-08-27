@@ -127,7 +127,10 @@ const PARSE_CORE_COMMANDS: ReadonlyArray<{
     parser: 'parsePerfectItemRef',
     module: '../server/perfect_item_ref.ts',
     cellField: 'bag',
-    senderFields: ['slot', 'bag', 'item'],
+    // `name` is the phase 13 optional legendary name riding the same frame
+    // (parsed by the sibling parsePerfectItemName in the same module; a bad
+    // name drops the FIELD, never the frame).
+    senderFields: ['slot', 'bag', 'item', 'name'],
   },
 ];
 

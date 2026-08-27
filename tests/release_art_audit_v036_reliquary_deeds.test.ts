@@ -218,6 +218,9 @@ describe('v0.36 release-audit Reliquary deed art', () => {
       // The release's Proving Shore graduation deed, appended at the
       // release/v0.41.0 sync behind this branch's tail (DEED_ORDER position).
       'prog_ready_for_an_adventure',
+      // The masterwrought Phase 13 promotion capstone, appended at the tail
+      // (DEED_ORDER position); no title, so no committed crest is forced.
+      'prog_legendmaker',
     ]);
     // 286 at the farming absorb (Phase 11d): the base 273 plus the six
     // Masterwrought milestone deeds plus farming's seven; 287 at Phase 11e,
@@ -232,7 +235,10 @@ describe('v0.36 release-audit Reliquary deed art', () => {
     // Proving Shore graduation, 273 to 274 on its own arm) with no crest, so
     // it joins the pending ledger at the tail and the PAINTED count holds at
     // 278 (the Vale Cup deed records stay in the append-only table).
-    expect(DEED_ORDER).toHaveLength(290);
+    // 291 at masterwrought Phase 13: the promotion capstone prog_legendmaker
+    // ships no crest either (no title, so none is forced), joining the
+    // pending ledger at the tail with the PAINTED count still at 278.
+    expect(DEED_ORDER).toHaveLength(291);
     expect(DEED_IMAGE_IDS.size).toBe(278);
     expect(DEED_ORDER.filter((id) => !DEED_IMAGE_IDS.has(id))).toEqual([...DEED_ART_PENDING]);
     expect(sorted(DEED_IMAGE_IDS)).toEqual(

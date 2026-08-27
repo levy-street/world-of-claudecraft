@@ -1454,9 +1454,12 @@ describe('masterwrought Phase 11h: what it did NOT touch', () => {
     // 11o, which minted the two engineering on-ramp rows (the skill-0
     // cogwheel and the skill-25 ocular, qr-11o-ENG): ALL_RECIPES alone,
     // upward, with two NEW item ids (the first mint since 11k to add ids).
+    // Then 166 at masterwrought phase 13, which minted recipe_deed_of_making
+    // (inscription's first 125 rung, the orange promotion's writ) with ONE
+    // new item id: ALL_RECIPES alone, upward.
     expect(APEX_CONSUMABLE_RECIPES).toHaveLength(13);
     expect(INTERMEDIATE_RECIPES).toHaveLength(10);
-    expect(ALL_RECIPES).toHaveLength(165);
+    expect(ALL_RECIPES).toHaveLength(166);
     for (const row of APEX_ROWS) {
       expect(requireRecipe(row.id).skillReq, `${row.id} rung`).toBe(row.rung);
     }

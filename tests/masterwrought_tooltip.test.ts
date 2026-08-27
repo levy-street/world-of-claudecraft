@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { MASTERWROUGHT_EQUIP_CAP } from '../src/sim/equipment_rules';
-import type { ItemDef } from '../src/sim/types';
+import type { ItemDef, ItemInstancePayload } from '../src/sim/types';
 import { Hud } from '../src/ui/hud';
 
 // The Masterwrought tooltip tag is an arm of a private Hud method that only
@@ -14,7 +14,7 @@ interface TooltipHarness {
     cfg: { playerClass: string };
     equipment: Record<string, string>;
   };
-  itemTooltip(item: ItemDef, compare?: boolean): string;
+  itemTooltip(item: ItemDef, compare?: boolean, instance?: ItemInstancePayload): string;
 }
 
 function harness(): TooltipHarness {
@@ -61,5 +61,15 @@ describe('masterwrought tag on the item tooltip', () => {
     const html = harness().itemTooltip(legendary, false);
     expect(html).toContain(TAG_LINE);
     expect(html).toContain('tt-unique');
+  });
+
+  it('a promoted (legendary-rolled) copy of an EPIC def earns the unique tag from its instance', () => {
+    // Masterwrought phase 13: isUniqueEquipped reads EFFECTIVE quality, so
+    // the tooltip tag follows the copy, not just the def. The def-only render
+    // of the same epic piece stays tag-free, which is what makes this arm
+    // instance-driven rather than a restatement of the case above.
+    const html = harness().itemTooltip(FLAGGED_RING, false, { rolled: { quality: 'legendary' } });
+    expect(html).toContain('tt-unique');
+    expect(harness().itemTooltip(FLAGGED_RING, false)).not.toContain('tt-unique');
   });
 });

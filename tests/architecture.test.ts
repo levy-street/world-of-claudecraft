@@ -319,6 +319,7 @@ const UI_PURE_CORES = [
   'src/ui/hud/loot/loot_roll_status_view.ts',
   'src/ui/hud/loot/loot_settings_view.ts',
   'src/ui/craft_celebration_view.ts',
+  'src/ui/craft_celebration_text_view.ts',
   'src/ui/skill_level_toast_view.ts',
   'src/ui/grant_line_view.ts',
   'src/ui/farming_view.ts',

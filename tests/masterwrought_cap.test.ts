@@ -805,13 +805,19 @@ describe('masterwrought sub-cap reads the copy being worn', () => {
     expect(stillCarried).toBeDefined();
   });
 
-  it('wears a legendary roll of an epic def (not unique-equipped) and it then holds the sub-cap', () => {
-    // The deliberate disagreement documented in equipment_rules.ts: the
-    // unique-equipped rule reads DEF quality only, so a legendary-ROLLED copy
-    // of an epic def is never unique-equipped, while this counted family reads
-    // that same copy as legendary-effective. Both halves through the REAL
-    // path: the copy equips beside a plain copy of its own id, and once worn
-    // its live payload is what the sub-cap counts.
+  it('wears a legendary roll of an epic def beside a plain copy and it then holds the sub-cap', () => {
+    // This block used to document the deliberate disagreement recorded in
+    // equipment_rules.ts (the unique-equipped rule read DEF quality only, so
+    // a legendary-ROLLED copy of an epic def was never unique-equipped).
+    // 2026-08-27, phase 13: the orange promotion mints the first legal
+    // legendary-rolled instance and the phase file's acceptance requires
+    // BOTH rules to count it, so isUniqueEquipped is instance-aware now and
+    // the disagreement is retired. The BEHAVIOR here still holds: the rolled
+    // copy equips BESIDE A PLAIN COPY of its own id (the worn plain copy is
+    // not legendary-effective, so no family conflict exists; a second ROLLED
+    // copy is what the unique rule now refuses, pinned in
+    // tests/orange_promotion.test.ts), and once worn its live payload is
+    // what the sub-cap counts.
     const sim = makeWarrior(7112);
     grant(sim, RING_ID);
     sim.equipItemToSlot(RING_ID, 'ring1');

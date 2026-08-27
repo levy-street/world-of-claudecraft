@@ -884,7 +884,15 @@ const MONOLITHS: MonolithRow[] = [
     // perfect_item ref parse (its slot/bag/item validation and the XOR drop)
     // moved into the pure core server/perfect_item_ref.ts, leaving the case a
     // one-line parse and a one-line dispatch. Exact count, zero slack.
-    ceiling: 10492,
+    // LOWERED 10492 -> 10491 at Masterwrought Phase 13 (the orange promotion,
+    // 2026-08-27): the masterwork activity-card emit body (dedupe claim,
+    // opt-out read, R60 release) moved whole to server/craft_activity.ts,
+    // parameterized by kind; the phase's own additions are the legendary
+    // observer arm (a second thin call), the perfect_item name parse and
+    // content screen, and the eqi `name` allowlist line. Extraction first,
+    // then the phase's lines, netting 1 under the old ceiling; the ceiling
+    // follows the file down. Exact count, zero slack.
+    ceiling: 10491,
     seam: 'a sibling server module; see the hot-path seams in server/CLAUDE.md',
   },
   {

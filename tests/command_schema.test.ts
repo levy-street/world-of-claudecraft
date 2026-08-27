@@ -102,6 +102,11 @@ const repoRoot = fileURLToPath(new URL('..', import.meta.url));
 // (client-sent, so both counts move together): 206/219, dispatch-only
 // unchanged at 13. PREDICTED by the phase's contract before the token landed,
 // then set from a suite run.
+// Masterwrought phase 13 (the orange promotion) adds NO command: the optional
+// legendary name rides the existing perfect_item frame as a new FIELD
+// (parsePerfectItemName in server/perfect_item_ref.ts), so all three counts
+// stay 206/219/13. Stated so the next sync does not misread the phase as a
+// missing pair.
 const EXPECTED_SEND_COUNT = 206;
 const EXPECTED_DISPATCH_COUNT = 219;
 const EXPECTED_DISPATCH_ONLY_COUNT = 13;

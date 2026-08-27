@@ -337,7 +337,43 @@ describe('perfect_item over the real online dispatch path', () => {
     // re-validates against its own bags.
     cmd(server, session, { cmd: 'perfect_item', slot: 'hat', bag: 0, item: APEX_NECK });
     expect(spy).toHaveBeenCalledTimes(1);
-    expect(spy).toHaveBeenLastCalledWith({ bag: 0, itemId: APEX_NECK }, pid);
+    // The third argument is the phase 13 optional legendary name: absent on
+    // an unnamed frame, so the sim sees exactly the phase 12 call.
+    expect(spy).toHaveBeenLastCalledWith({ bag: 0, itemId: APEX_NECK }, pid, undefined);
+    spy.mockRestore();
+  });
+
+  it('the name FIELD drops independently of the ref, and a screened name never reaches the sim', () => {
+    // Phase 13, the two dispatch halves of the naming arm. A malformed name
+    // beside a usable ref degrades to an UNNAMED attempt (field-drop, never a
+    // frame drop); a well-formed but offensive name is refused by the server
+    // content screen with its own error event and the sim is never called.
+    const server = new GameServer();
+    const fc = fakeWs();
+    const session = joinServer(server, fc, 904, 'Namer');
+    const pid = session.pid as number;
+    seedPerfecter(server, pid);
+    const spy = vi.spyOn(server.sim, 'perfectItem');
+    // Per-dimension malformed names: each still dispatches, nameless.
+    for (const name of [7, '', 'x'.repeat(65), ['a'], null, true]) {
+      cmd(server, session, { cmd: 'perfect_item', slot: 'neck', name });
+      expect(spy).toHaveBeenLastCalledWith({ slot: 'neck' }, pid, undefined);
+    }
+    // A well-formed name rides through to the sim, which owns the SHAPE rule.
+    cmd(server, session, { cmd: 'perfect_item', slot: 'neck', name: 'Dawnbreaker' });
+    expect(spy).toHaveBeenLastCalledWith({ slot: 'neck' }, pid, 'Dawnbreaker');
+    // The content screen (offensiveName, the pet_rename split): the frame is
+    // answered with the refusal event and the sim is NEVER called.
+    const callsBefore = spy.mock.calls.length;
+    fc.sent.length = 0;
+    cmd(server, session, { cmd: 'perfect_item', slot: 'neck', name: 'fuck' });
+    expect(spy.mock.calls.length).toBe(callsBefore);
+    const errors = fc.sent
+      .filter((m: any) => m.t === 'events')
+      .flatMap((m: any) => m.list)
+      .filter((e: any) => e.type === 'error')
+      .map((e: any) => e.text);
+    expect(errors).toContain('That name is not allowed.');
     spy.mockRestore();
   });
 

@@ -38,6 +38,7 @@ import {
 } from '../src/sim/professions/archetype';
 import { FARM_MAX_GROW_MS } from '../src/sim/professions/farm_persist';
 import { NODE_HARVEST_TABLE } from '../src/sim/professions/gathering';
+import { MAX_LEGENDARY_NAME_LENGTH } from '../src/sim/professions/legendary_name';
 import { perfectedBonusStats } from '../src/sim/professions/perfecting';
 import { MAX_CRAFTED_BY_LENGTH, slotToolEffectRefused } from '../src/sim/professions/tools';
 import { MAX_KNOWN_RECIPE_ID_LENGTH, MAX_KNOWN_RECIPE_IDS } from '../src/sim/professions/training';
@@ -297,7 +298,19 @@ const NON_PROFESSIONS_BLOB_FIELDS = [
 // below). F6, the same phase: a NO-OP, recorded as such. Perfecting mints no
 // recipe and gates no craft per day, so the oncePerDay set did not grow and
 // craftDaily's structural bound stands exactly as F6 left it.
-const PROFESSIONS_BYTE_CEILING = 17408;
+// Masterwrought phase 13 (the orange promotion) is the "next authored
+// growth" the Phase 12 note predicted, and it re-minted the ceiling exactly
+// as that note recorded: measured 17,351 (prediction 17,263 + 88 = 17,351,
+// drift ZERO; the arithmetic is 24 bytes of `"recipe_deed_of_making",` in
+// knownRecipes, 22 of `,"quality":"legendary"` inside the promoted cap
+// slot's rolled record, and 42 of `,"name":"A..."` at the full 32-char name
+// width), which left 57 bytes under the 17 KiB structural ceiling, thinner
+// than one recipe id; per the standing precedent the ceiling re-mints at the
+// next round step, 18 KiB = 18432, never a squeeze. F6 stays a no-op at
+// phase 13 too: recipe_deed_of_making is deliberately NOT oncePerDay
+// (promotion pacing lives in the Perfected walk), so the craftDaily
+// structural bound still stands exactly as F6 left it.
+const PROFESSIONS_BYTE_CEILING = 18432;
 
 // The TWO Masterwrought cap slots (R6/R16: at most two apex pieces worn)
 // carry the Perfecting worst case on top (Masterwrought phase 12, the
@@ -316,6 +329,13 @@ const PERFECTED_CAP_SLOTS: readonly (readonly [EquipSlot, string])[] = [
   ['chest', 'sunspun_vestments'],
   ['offhand', 'voidbound_grimoire'],
 ];
+
+// Phase 13: EXACTLY ONE of the two Perfected cap slots also carries the
+// orange promotion, the LEGAL worst case (MASTERWROUGHT_LEGENDARY_CAP is 1,
+// so a second promoted worn copy cannot exist): rolled.quality 'legendary'
+// plus the player-chosen name at its full MAX_LEGENDARY_NAME_LENGTH width.
+const PROMOTED_CAP_SLOT: EquipSlot = PERFECTED_CAP_SLOTS[0][0];
+const PROMOTED_CAP_NAME = 'A'.repeat(MAX_LEGENDARY_NAME_LENGTH);
 
 function ceilingSim(nowMs?: number): Sim {
   const sim = makeSim(31, nowMs);
@@ -422,10 +442,15 @@ function ceilingSim(nowMs?: number): Sim {
     }
     meta.equipmentInstance[slot] = {
       enchant: 'enchant_weapon_might',
-      rolled: { stats },
+      // The promoted slot carries the phase 13 stamp the live promotion
+      // writes: the quality override inside the SAME rolled record the R5
+      // stats live on, plus the full-width name (stats untouched, the
+      // promotion's own byte-identity rule).
+      rolled: slot === PROMOTED_CAP_SLOT ? { stats, quality: 'legendary' } : { stats },
       signer: longName,
       perfected: true,
       boundTo: meta.entityId,
+      ...(slot === PROMOTED_CAP_SLOT ? { name: PROMOTED_CAP_NAME } : {}),
     };
   }
   // Every repeatable cadence window live (the first mint never set the field,
@@ -691,6 +716,13 @@ describe('the professions blob growth bound (phase 16)', () => {
         1,
       );
     }
+    // The phase 13 promotion worst case survives the settle too (the same
+    // shrink-side reasoning: the floor sits 380 under the measurement, so
+    // losing the 88 promotion bytes alone would still pass the band).
+    const promoted = s2.equipmentInstance?.[PROMOTED_CAP_SLOT];
+    expect(promoted?.rolled?.quality, 'the promoted slot keeps its quality').toBe('legendary');
+    expect(promoted?.name, 'the promoted slot keeps its full-width name').toBe(PROMOTED_CAP_NAME);
+    expect(PROMOTED_CAP_NAME).toHaveLength(32);
 
     // The byte bound itself, on the settled state: the two-sided tracking
     // band around the production-shape measurement (every bed planted
@@ -850,9 +882,25 @@ describe('the professions blob growth bound (phase 16)', () => {
     // is likely to cross it, and per the standing precedent that is a
     // re-mint at the next round step with its measured value, never a
     // squeeze.
+    //
+    // AND AGAIN AT masterwrought Phase 13 (the orange promotion): 17,351
+    // bytes, upper edge 17,264 to 17,352, floor 16,883 to 16,971. The delta
+    // is +88, predicted from the merged literals BEFORE the run and measured
+    // EXACTLY (drift zero), in three accounted terms: the deed recipe id in
+    // knownRecipes, `"recipe_deed_of_making",` (21 characters, 24 quoted
+    // plus comma); the promoted cap slot's quality override inside its
+    // rolled record, `,"quality":"legendary"` (22); and the full-width
+    // player name, `,"name":"` plus 32 plus the closing quote (42). Exactly
+    // ONE cap slot carries the promotion (PROMOTED_CAP_SLOT: the legendary
+    // sub-cap is 1, so a second promoted worn copy is not a LEGAL state and
+    // the fixture never writes one). The edge stays measurement plus one
+    // (the 11m rule) and the floor measurement minus 380. The 17 KiB
+    // structural ceiling fell to 57 bytes of headroom at this measurement,
+    // thinner than one recipe id, and re-minted at 18 KiB = 18432 per the
+    // Phase 12 note's own standing precedent (narrative at the bound above).
     const bytes = professionsBytes(s2);
-    expect(bytes).toBeGreaterThan(16883);
-    expect(bytes).toBeLessThan(17264);
+    expect(bytes).toBeGreaterThan(16971);
+    expect(bytes).toBeLessThan(17352);
     // Strictly dominated by the band's upper edge while the band holds:
     // kept as documentation that the structural ceiling also bounds this
     // state, never the live guard.

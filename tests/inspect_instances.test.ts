@@ -150,6 +150,44 @@ describe('eqi over a real server broadcast into applySnapshot (liveness, not sha
   });
 });
 
+describe('eqi carries the player-chosen legendary name (Masterwrought phase 13)', () => {
+  it('an inspected promoted copy ships its name; the Perfected marker still never rides', () => {
+    const server = new GameServer();
+    const fcA = fakeWs();
+    const a = joinServer(server, fcA, 3, 'Namer');
+    const fcB = fakeWs();
+    const b = joinServer(server, fcB, 4, 'Inspector');
+
+    // The promoted shape the sim mints (rolled quality override plus the
+    // chosen name plus the Perfected stamp); the server is the only place
+    // payloads are born, the suite header's rule.
+    const promoted = {
+      rolled: { quality: 'legendary', masterwork: true, stats: { int: 3 } },
+      signer: 'Namer',
+      name: "Vel'tara's Oath",
+      perfected: true as const,
+    };
+    server.sim.addItemInstance(ITEM_ID, structuredClone(promoted), a.pid);
+    cmd(server, a, { cmd: 'equip', item: ITEM_ID });
+    fcB.sent.length = 0;
+    server.sim.tick();
+    broadcast(server);
+    const snap = lastSnap(fcB.sent);
+    const rec = snap?.ents.find((r: any) => r.id === a.pid);
+    // The cosmetic allowlist: name joins signer/enchant/rolled; the Perfected
+    // marker and bind state stay data-minimized off the peer wire.
+    expect(rec?.eqi?.chest?.name).toBe("Vel'tara's Oath");
+    expect(rec?.eqi?.chest?.rolled?.quality).toBe('legendary');
+    expect(rec?.eqi?.chest?.perfected).toBeUndefined();
+
+    // Liveness through the real decode: the inspecting client's mirror
+    // carries the name for the inspect window's widened itemTooltip.
+    const client = bareClient(b.pid);
+    (client as any).applySnapshot(snap);
+    expect(client.entities.get(a.pid)?.equippedInstances?.chest?.name).toBe("Vel'tara's Oath");
+  });
+});
+
 describe('server authority over instance payloads', () => {
   it('a client-supplied instance on a trade_offer wire message is stripped, never granted', () => {
     // Equip/craft/use commands carry only string ids, so an instance payload is

@@ -92,7 +92,7 @@ const PREFIX_CATEGORY: Record<string, DeedCategory> = {
 };
 
 describe('audited launch totals (literals: update deliberately with the catalog)', () => {
-  it('ships exactly 290 deeds worth 3295 total Renown', () => {
+  it('ships exactly 291 deeds worth 3345 total Renown', () => {
     // Release base (262 / 3145 after the WARFARE lifetime-honor ladder) plus
     // four Reliquary Curator rank bridges and the five Phase 18 completion
     // ladder deeds (all nine renown 0: catalog prestige never scores the
@@ -126,8 +126,14 @@ describe('audited launch totals (literals: update deliberately with the catalog)
     // it; both parents' frozen catalog hashes reproduce from the merged
     // table (see FROZEN_CATALOG_SHA256 below), which is the proof of a pure
     // append on both sides.
-    expect(DEED_ORDER.length).toBe(290);
-    expect(ALL.reduce((sum, d) => sum + d.renown, 0)).toBe(3295);
+    //
+    // Then masterwrought Phase 13 appends the promotion capstone
+    // prog_legendmaker at exactly renown 50 (the deliberate-prestige band;
+    // effort-gated, never luck-gated, so positive Renown is legitimate under
+    // rule 2): 290 / 3295 plus one deed at 50 gives 291 / 3345, written
+    // BEFORE the run from the merged literals and matched by it.
+    expect(DEED_ORDER.length).toBe(291);
+    expect(ALL.reduce((sum, d) => sum + d.renown, 0)).toBe(3345);
   });
 
   it('ships the audited per-category counts', () => {
@@ -142,8 +148,9 @@ describe('audited launch totals (literals: update deliberately with the catalog)
       // +2 farming celebrations (prog_first_planting, prog_farming_100), then
       // +1 Phase 11k's cross-packet prog_field_to_feast, then
       // +1 the Proving Shore graduation (prog_ready_for_an_adventure) at the
-      // release/v0.41.0 merge (the release's own chain read 58).
-      progression: 67,
+      // release/v0.41.0 merge (the release's own chain read 58), then
+      // +1 the Phase 13 promotion capstone prog_legendmaker.
+      progression: 68,
       combat: 10,
       // +2 Rift coverage deeds (dgn_rift, dgn_rift_s_rank).
       dungeon: 31,
@@ -323,10 +330,13 @@ describe('audited launch totals (literals: update deliberately with the catalog)
       // literal end under the 11b three-tier ordering rule, which keeps the
       // farming block contiguous ahead of it.
       'prog_field_to_feast',
-      // The Proving Shore graduation closes the merged tail (appended at the
+      // The Proving Shore graduation closed the merged tail (appended at the
       // release/v0.41.0 merge behind the branch's rows, keeping both sides'
       // tails in their own authored order).
       'prog_ready_for_an_adventure',
+      // The Phase 13 promotion capstone closes the tail (append-only:
+      // DEED_ORDER cannot seat it beside its progression siblings).
+      'prog_legendmaker',
     ]);
     expect(DEEDS.dgn_wildheart_basin.renown).toBe(10);
     expect(DEEDS.dgn_wildheart_basin_heroic.renown).toBe(10);
@@ -826,7 +836,15 @@ describe('frozen trigger + renown catalog (design rule 9: never retro-edit a tri
   // branch's sixteen appended rows reproduced the release's 7041f4ae...
   // EXACTLY, so the merged catalog is a pure append on BOTH sides. No
   // shipped trigger or renown changed on either side.
-  const FROZEN_CATALOG_SHA256 = '4533079d9911b8dc0e20526ca330ff41196126ee9798f216fe5900ba781b9eae';
+  // Re-baselined at masterwrought Phase 13 (2026-08-27) for the appended
+  // promotion capstone prog_legendmaker (renown 50, on the new
+  // legendariesForged stat), and re-minted THE AUDITABLE WAY: the pre-append
+  // row list was reconstructed first (every row minus prog_legendmaker, with
+  // feat_book_complete's live deedIds filtered back to exclude it) and it
+  // reproduced 4533079d... EXACTLY, which is what distinguishes an append
+  // from an edit. Only then was the digest re-minted with the one appended
+  // tuple. No shipped trigger or renown value was touched.
+  const FROZEN_CATALOG_SHA256 = 'd69e3def57ec7bfb8d6dd71d674af29f76930718c57b7b960d7a620c680fc33e';
 
   it('every shipped deed keeps its trigger and renown unchanged', () => {
     const canonical = JSON.stringify(
@@ -1019,10 +1037,10 @@ describe('table shape', () => {
   it('DEED_ORDER holds the append-only authored order (first and last pinned)', () => {
     // DEED_ORDER derives from the table keys, so covering DEEDS is inherent;
     // what CAN drift is the authored order itself. Pin the endpoints as
-    // literals: prog_first_steps opens the catalog and the release's
-    // prog_ready_for_an_adventure closes the tail (behind this branch's
-    // prog_field_to_feast since the v0.41.0 merge), and either moving would
-    // signal a reorder
+    // literals: prog_first_steps opens the catalog and Phase 13's
+    // prog_legendmaker closes the tail (behind the release's
+    // prog_ready_for_an_adventure since the promotion capstone appended), and
+    // either moving would signal a reorder
     // (forbidden: the order is an append-only determinism contract; new
     // deeds append). hid_codfather's index is pinned in the refresh test.
     expect(DEED_ORDER[0]).toBe('prog_first_steps');
@@ -1033,9 +1051,10 @@ describe('table shape', () => {
     // the catalog per the 11b three-tier ordering rule, and the 11-block's own
     // appends follow it in phase order; Phase 11k's prog_field_to_feast was
     // the branch's tail until the release/v0.41.0 merge, where the Proving
-    // Shore graduation deed closes the merged tail (appended at the release
-    // merge behind the walk-in castle visit pair and the branch's rows).
-    expect(DEED_ORDER[DEED_ORDER.length - 1]).toBe('prog_ready_for_an_adventure');
+    // Shore graduation deed closed the merged tail (appended at the release
+    // merge behind the walk-in castle visit pair and the branch's rows), and
+    // Phase 13's promotion capstone prog_legendmaker now closes it.
+    expect(DEED_ORDER[DEED_ORDER.length - 1]).toBe('prog_legendmaker');
   });
 
   it('every entry key matches its id and its prefix matches its category', () => {
@@ -1366,6 +1385,11 @@ describe('trigger references resolve against the real content tables', () => {
       'feat_brightwood_relic:Bramblehide Jerkin',
       "feat_brightwood_relic:Monarch's Crown",
       'hid_codfather:The Codfather',
+      // Reviewed at masterwrought Phase 13: the promotion capstone's desc
+      // names the Deed of Making, and resolveLegendaryPromotion really does
+      // consume exactly that item (LEGENDARY_PROMOTION_COST names
+      // deed_of_making), so the desc names the RIGHT one.
+      'prog_legendmaker:Deed of Making',
     ]);
     // NON-VACUITY: the sweep must actually be able to see a name, or the
     // expectation above is a list of five things it never looked for.

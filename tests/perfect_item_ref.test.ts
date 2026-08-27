@@ -4,7 +4,7 @@
 // decision table directly, shape by shape, so the drop rules are readable
 // without a server.
 import { describe, expect, it } from 'vitest';
-import { parsePerfectItemRef } from '../server/perfect_item_ref';
+import { parsePerfectItemName, parsePerfectItemRef } from '../server/perfect_item_ref';
 import { MAX_INSTANCE_STRING_LENGTH } from '../src/sim/item_instance_load';
 
 const ITEM = 'wyrmfall_pendant';
@@ -63,5 +63,39 @@ describe('parsePerfectItemRef', () => {
     });
     expect(parsePerfectItemRef({ slot: 'neck', bag: 'x', item: ITEM })).toEqual({ slot: 'neck' });
     expect(parsePerfectItemRef({ slot: 'neck', bag: 0 })).toEqual({ slot: 'neck' });
+  });
+});
+
+describe('parsePerfectItemName (Masterwrought phase 13)', () => {
+  it('a bounded non-empty string rides; the sim owns the tighter live shape', () => {
+    expect(parsePerfectItemName({ name: 'Dawnbreaker' })).toBe('Dawnbreaker');
+    expect(parsePerfectItemName({ name: 'x'.repeat(MAX_INSTANCE_STRING_LENGTH) })).toBe(
+      'x'.repeat(MAX_INSTANCE_STRING_LENGTH),
+    );
+    // Deliberately looser than the sim's 32-char alphabet shape: the field
+    // bound is the flood ceiling only, and the sim's shape validation is the
+    // one refusal the player can read.
+    expect(parsePerfectItemName({ name: '!!' })).toBe('!!');
+  });
+
+  it('every malformed shape drops the FIELD, never the frame, per dimension', () => {
+    for (const name of [
+      undefined, // absent: the ordinary unnamed attempt
+      7, // non-string
+      '', // empty
+      'x'.repeat(MAX_INSTANCE_STRING_LENGTH + 1), // over the ceiling
+      ['a'], // array smuggle
+      { toString: () => 'a' }, // object smuggle
+      Number.MAX_SAFE_INTEGER, // huge-integer abuse
+      null,
+      true,
+    ]) {
+      expect(parsePerfectItemName({ name }), JSON.stringify({ name })).toBeUndefined();
+    }
+    // The field-drop DIRECTION: the ref beside a malformed name still parses,
+    // so the frame survives as an unnamed attempt.
+    expect(parsePerfectItemRef({ slot: 'neck', name: 7 } as Record<string, unknown>)).toEqual({
+      slot: 'neck',
+    });
   });
 });

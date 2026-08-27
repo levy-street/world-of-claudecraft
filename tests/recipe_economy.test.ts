@@ -618,7 +618,10 @@ describe('REFERENTIAL INTEGRITY', () => {
     expect(COMBO_RECIPES).toHaveLength(3);
     expect(LADDER_RECIPES).toHaveLength(54);
     expect(JEWELCRAFTING_RECIPES).toHaveLength(9);
-    expect(INSCRIPTION_RECIPES).toHaveLength(6);
+    // SEVEN since masterwrought phase 13 added recipe_deed_of_making,
+    // inscription's first 125 rung (trainer-taught, so the whole list still
+    // feeds the sum above; no channel split).
+    expect(INSCRIPTION_RECIPES).toHaveLength(7);
     expect(INTERMEDIATE_RECIPES).toHaveLength(10);
     expect(ROD_RECIPES).toHaveLength(3);
     expect(TOOL_EFFECT_RECIPES).toHaveLength(2);

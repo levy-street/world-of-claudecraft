@@ -194,7 +194,9 @@ describe('station content', () => {
     // decision, Sablewax Vellum at the apothecary), and the Masterwrought
     // phase 09 apex gear rows for the station-less crafts (the three
     // jewelcrafting apex pieces at the forge, inscription's Voidbound
-    // Grimoire at the apothecary), pinned literally so a
+    // Grimoire at the apothecary), and the Masterwrought phase 13 Deed of
+    // Making (inscription home, the same apothecary binding as the rest of
+    // its craft's rows), pinned literally so a
     // new foreign binding is a deliberate edit here, not a drive-by. The
     // pin carries id:station PAIRS (review round; the Masterwrought phase 11l
     // trophy rows all bind their own craft's station and ride the equality
@@ -216,6 +218,7 @@ describe('station content', () => {
       'recipe_artisans_eye:toolworks',
       'recipe_burnished_thorium_amulet:forge',
       'recipe_coiled_copper_torc:forge',
+      'recipe_deed_of_making:apothecary',
       'recipe_etched_iron_loop:forge',
       'recipe_gatherers_cache:toolworks',
       'recipe_gleaming_thorium_loop:forge',

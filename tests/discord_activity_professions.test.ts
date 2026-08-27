@@ -289,6 +289,97 @@ describe('detectActivity: professions arms (GameServer)', () => {
     expect(drainActivity()).toHaveLength(0);
   });
 
+  it('legendaryForged enqueues one legendary card carrying the PLAYER-CHOSEN name', async () => {
+    // Masterwrought phase 13, the masterwork arm's parity sibling
+    // (server/craft_activity.ts): personal event only, opt-out gated, and the
+    // card's itemName is the player-authored legendary name as data.
+    const session = joinServer(server, fakeWs(), 121, 'Forgemaster');
+    (server as any).detectActivity([
+      {
+        type: 'legendaryForged',
+        itemId: 'eastbrook_arming_sword',
+        name: "Vel'tara's Oath",
+        owner: session.pid,
+        pid: session.pid,
+      },
+    ]);
+    // Same consent discipline as masterwork: nothing enqueues synchronously.
+    expect(drainActivity()).toHaveLength(0);
+    await flushAsync();
+    const cards = drainActivity();
+    expect(cards).toHaveLength(1);
+    expect(cards[0]).toMatchObject({
+      kind: 'legendary',
+      accountIds: [121],
+      names: ['Forgemaster'],
+      itemName: "Vel'tara's Oath",
+    });
+  });
+
+  it('the legendary dedupe window is kind-scoped: a masterwork does not eat the promotion card', async () => {
+    // The two arms share the account-scoped dedupe SHAPE but not the key
+    // (`masterwork:<id>` vs `legendary:<id>`), so a proc and a promotion in
+    // one TTL window each card once, while a same-account legendary burst
+    // still collapses to one.
+    const session = joinServer(server, fakeWs(), 122, 'Twice');
+    const legendary = (name: string) => ({
+      type: 'legendaryForged',
+      itemId: 'eastbrook_arming_sword',
+      name,
+      owner: session.pid,
+      pid: session.pid,
+    });
+    (server as any).detectActivity([
+      {
+        type: 'masterwork',
+        recipeId: 'recipe_eastbrook_arming_sword',
+        itemId: 'eastbrook_arming_sword',
+        crafter: session.pid,
+        pid: session.pid,
+      },
+    ]);
+    (server as any).detectActivity([legendary('Dawnbreaker')]);
+    (server as any).detectActivity([legendary('Duskbreaker')]);
+    await flushAsync();
+    const kinds = drainActivity()
+      .map((c) => c.kind)
+      .sort();
+    expect(kinds).toEqual(['legendary', 'masterwork']);
+  });
+
+  it('a legendaryForged with no session (a bot owner) enqueues nothing', async () => {
+    (server as any).detectActivity([
+      {
+        type: 'legendaryForged',
+        itemId: 'eastbrook_arming_sword',
+        name: 'Ghostwork',
+        owner: 424242,
+        pid: 424242,
+      },
+    ]);
+    await flushAsync();
+    expect(drainActivity()).toHaveLength(0);
+  });
+
+  it('a legendaryForgedZone bystander copy never enqueues a card', async () => {
+    // The masterworkZone rule: only the personal event may card, or every
+    // bystander would card under their own account.
+    const session = joinServer(server, fakeWs(), 123, 'Onlooker');
+    (server as any).detectActivity([
+      {
+        type: 'legendaryForgedZone',
+        ownerPid: 424242,
+        ownerName: 'SomeoneElse',
+        itemId: 'eastbrook_arming_sword',
+        itemName: 'Dawnbreaker',
+        zoneId: 'eastbrook_vale',
+        pid: session.pid,
+      },
+    ]);
+    await flushAsync();
+    expect(drainActivity()).toHaveLength(0);
+  });
+
   it('a title-deed unlock enqueues a deed card behind the opt-out read', async () => {
     const session = joinServer(server, fakeWs(), 103, 'Chronicler');
     (server as any).detectActivity([

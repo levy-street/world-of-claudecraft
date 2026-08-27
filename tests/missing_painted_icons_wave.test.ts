@@ -654,8 +654,11 @@ describe('missing painted deed and Heroic weapon integration', () => {
     // 290 at the release/v0.41.0 sync: the release's Proving Shore graduation
     // deed (prog_ready_for_an_adventure, 273 to 274 on its own arm) joins the
     // same pending side, riding the deed_cat_progression crest until its
-    // commissioned art lands.
-    expect(DEED_ORDER).toHaveLength(290);
+    // commissioned art lands. 291 at masterwrought Phase 13, whose promotion
+    // capstone (prog_legendmaker) joins the same pending side on the same
+    // crest: no title, so the Reliquary title-shelf rule does not force a
+    // committed crest.
+    expect(DEED_ORDER).toHaveLength(291);
     expect(DEED_ORDER.filter((id) => !DEED_IMAGE_IDS.has(id))).toEqual([...DEED_ART_PENDING]);
     const credits = readFileSync(path.join(repoRoot, 'CREDITS.md'), 'utf8');
     const provenance = readFileSync(

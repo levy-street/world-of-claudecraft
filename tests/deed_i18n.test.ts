@@ -74,7 +74,10 @@ describe('deed_i18n English resolution', () => {
     // profession deeds against this branch's nine, and 42 titles against
     // this branch's 45), and the merge adds exactly that one deed to this
     // branch's 289 while the title count stays at 45.
-    expect(manifest.length).toBe(290 * 2 + 45);
+    // 291 since masterwrought Phase 13 (2026-08-27) appended the promotion
+    // capstone prog_legendmaker, which carries NO title reward (R3 gives the
+    // prestige to the named item itself), so the title count stays at 45.
+    expect(manifest.length).toBe(291 * 2 + 45);
     expect(manifest.filter((row) => row.field === 'title').length).toBe(45);
     expect(manifest).toContainEqual({
       id: 'prog_veteran',

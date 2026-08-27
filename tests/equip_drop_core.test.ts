@@ -283,6 +283,110 @@ afterAll(() => {
   delete ITEMS[MW_BULWARK];
 });
 
+describe('paperdollDropAction promoted-copy unique mirror (Masterwrought phase 13)', () => {
+  // The orange promotion stamps rolled.quality = 'legendary' on an EPIC def's
+  // copy, so the unique-equipped rule reads EFFECTIVE quality on both sides:
+  // the worn payloads (instances) and the sim's own highest-index candidate
+  // peek over the mirrored bags (equipCandidateInstance). RING is epic by
+  // def, so every verdict below is instance-driven.
+  const PROMOTED = { rolled: { quality: 'legendary' as const } };
+
+  it('the fixture def is epic, so the def-only read alone decides nothing here', () => {
+    expect(RING.quality).toBe('epic');
+  });
+
+  it('refuses a second promoted copy when one is worn on the other finger', () => {
+    expect(
+      paperdollDropAction(
+        RING,
+        'ring2',
+        'warrior',
+        20,
+        null,
+        { ring1: RING.id },
+        { ring1: PROMOTED },
+        [{ itemId: RING.id, count: 1, instance: PROMOTED }],
+      ),
+    ).toBe('blockedUnique');
+  });
+
+  it('a PLAIN incoming copy beside a worn promoted one still equips (only unique blocks unique)', () => {
+    expect(
+      paperdollDropAction(
+        RING,
+        'ring2',
+        'warrior',
+        20,
+        null,
+        { ring1: RING.id },
+        { ring1: PROMOTED },
+        [{ itemId: RING.id, count: 1 }],
+      ),
+    ).toBe('equip');
+  });
+
+  it('a promoted incoming copy beside a worn PLAIN one equips too', () => {
+    expect(
+      paperdollDropAction(RING, 'ring2', 'warrior', 20, null, { ring1: RING.id }, {}, [
+        { itemId: RING.id, count: 1, instance: PROMOTED },
+      ]),
+    ).toBe('equip');
+  });
+
+  it('the candidate peek is the sim selection rule: the HIGHEST-index unit decides', () => {
+    // A promoted copy sitting UNDER a plain one is not what the sim would
+    // consume, so the feedback must read the plain top copy and allow.
+    expect(
+      paperdollDropAction(
+        RING,
+        'ring2',
+        'warrior',
+        20,
+        null,
+        { ring1: RING.id },
+        { ring1: PROMOTED },
+        [
+          { itemId: RING.id, count: 1, instance: PROMOTED },
+          { itemId: RING.id, count: 1 },
+        ],
+      ),
+    ).toBe('equip');
+  });
+
+  it('agrees with the sim on the promoted duplicate (the authority check)', () => {
+    const sim = new Sim({ seed: 8, playerClass: 'warrior', noPlayer: true }) as Sim &
+      Record<string, any>;
+    const pid = sim.addPlayer('warrior', 'Promoter');
+    sim.setPlayerLevel(20, pid);
+    sim.addItemInstance(RING.id, structuredClone(PROMOTED), pid);
+    sim.equipItemToSlot(RING.id, 'ring1', pid);
+    sim.addItemInstance(RING.id, structuredClone(PROMOTED), pid);
+    const meta = sim.players.get(pid);
+    if (!meta) throw new Error(`no player ${pid}`);
+    expect(meta.equipmentInstance?.ring1?.rolled?.quality).toBe('legendary');
+    expect(
+      paperdollDropAction(
+        RING,
+        'ring2',
+        'warrior',
+        20,
+        null,
+        equipmentOf(sim, pid),
+        meta.equipmentInstance,
+        meta.inventory,
+      ),
+    ).toBe('blockedUnique');
+    // The authority refuses the same drop with its own unique-equipped line.
+    sim.tick();
+    sim.equipItemToSlot(RING.id, 'ring2', pid);
+    const events = sim.tick();
+    expect(equipmentOf(sim, pid).ring2).toBeUndefined();
+    expect(
+      events.some((e: any) => e.type === 'error' && e.text === 'You can only equip one of those.'),
+    ).toBe(true);
+  });
+});
+
 describe('paperdollDropAction Masterwrought counted-family mirror', () => {
   it('refuses a third flagged piece once two are already worn', () => {
     expect(

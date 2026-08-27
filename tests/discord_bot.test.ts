@@ -623,6 +623,29 @@ describe('significant-activity cards', () => {
     expect(msg.allowed_mentions.users).toEqual(['111']);
   });
 
+  it('legendary card renders the player-chosen name as plain data at masterwork parity', () => {
+    // The name is PLAYER-AUTHORED text (Masterwrought phase 13): it must land
+    // in the embed verbatim as data, with no markdown of our own wrapped
+    // around it, exactly the way the masterwork card treats itemName.
+    const msg = buildActivityMessage({
+      kind: 'legendary',
+      realm: 'Claudemoon',
+      profileUrl: 'https://woc.test/c/Aldric',
+      itemName: "Vel'tara's Oath",
+      participants: [linked('Aldric', '111')],
+    }) as {
+      content: string;
+      allowed_mentions: { users: string[] };
+      embeds: Array<Record<string, any>>;
+    };
+    expect(msg.embeds[0].title).toBe("Vel'tara's Oath");
+    expect(msg.embeds[0].description).toContain("Vel'tara's Oath was forged by");
+    expect(msg.embeds[0].description).toContain('<@111>');
+    // Legendary orange, the qualityColor legendary accent.
+    expect(msg.embeds[0].color).toBe(0xff8000);
+    expect(msg.allowed_mentions.users).toEqual(['111']);
+  });
+
   it('deed-title card names the deed and the earned title', () => {
     const msg = buildActivityMessage({
       kind: 'deed',
@@ -664,6 +687,7 @@ describe('significant-activity cards', () => {
     const base = { realm: 'Claudemoon', profileUrl: null, participants: [linked('Aldric', '111')] };
     expect(titleOf({ ...base, kind: 'rareloot', itemName: '' })).toBe('A rare item');
     expect(titleOf({ ...base, kind: 'masterwork', itemName: '' })).toBe('A masterwork piece');
+    expect(titleOf({ ...base, kind: 'legendary', itemName: '' })).toBe('A legend');
     expect(titleOf({ ...base, kind: 'deed', deedId: 'col_glimmerfin', deedName: '' })).toBe(
       'A rare catch',
     );
@@ -698,6 +722,7 @@ describe('significant-activity cards', () => {
     'duel',
     'arena',
     'masterwork',
+    'legendary',
     'deed',
   ] as const satisfies readonly ActivityKind[];
   type MissingServerKind = Exclude<ActivityKind, (typeof SERVER_KINDS)[number]>;

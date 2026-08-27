@@ -391,7 +391,12 @@ describe('Book of Deeds webp icons', () => {
     // unmoved by the tutorial deed): LIVE 289 + 1 = 290, PAINTED unmoved at 278,
     // PENDING 11 + 1 = 12, which is also the 290 - 278 cross-check. Measured
     // on the merged tree rather than nudged from either parent's prose.
-    expect(DEED_ORDER, 'the merged live deed catalog').toHaveLength(290);
+    // Then masterwrought Phase 13 appends the promotion capstone
+    // prog_legendmaker, which joins the PENDING side (no title, so the
+    // Reliquary title-shelf rule does not force a committed crest): LIVE
+    // 290 + 1 = 291, PAINTED unmoved at 278, PENDING 12 + 1 = 13, which is
+    // also the 291 - 278 cross-check.
+    expect(DEED_ORDER, 'the merged live deed catalog').toHaveLength(291);
     expect(DEED_IMAGE_IDS.size, 'every live deed but the pending set is painted').toBe(278);
     expect(DEED_ORDER.length - DEED_IMAGE_IDS.size).toBe(DEED_ART_PENDING_IDS.length);
     for (const id of artless) {

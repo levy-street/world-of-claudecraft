@@ -880,13 +880,17 @@ describe('masterwrought R18 and farming D24: the displacement guard', () => {
     // 29 to 30 while the other two hold (32 at the 11l build, whose Valefire
     // Lantern row carried 2 more until the 11l QA excluded it: a row the
     // phase authored and withdrew, not a reduction on any shipped bill).
+    // RE-MEASURED AT masterwrought phase 13: recipe_deed_of_making (the
+    // orange promotion's writ, inscription 125) carries sunpetal 2 and
+    // reduces nothing anywhere, so sunpetal goes 44 to 46 while the other
+    // two hold.
     // The claim this arm makes has never been "the numbers do not move"; it is
     // "herbalism loses nothing", and a total that only ever climbs is what says
     // so.
     expect(totals).toEqual({
       silverleaf_herb: 28,
       goldleaf_herb: 30,
-      sunpetal_herb: 44,
+      sunpetal_herb: 46,
     });
   });
 

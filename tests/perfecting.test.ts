@@ -224,15 +224,21 @@ describe('the deny ladder: order, zero draws, zero consumption', () => {
     expect(errorsOf(sim)).toEqual(['Only Masterwrought items can be perfected.']);
   });
 
-  it('already-Perfected answers BEFORE the skill gate', () => {
+  it('the skill gate answers BEFORE the perfected split (phase 13: one gate, both acts)', () => {
+    // Until phase 13 the already-Perfected refusal answered ahead of skill;
+    // the promotion replaced that arm and moved the ONE skill gate above the
+    // split, so an unskilled owner of a Perfected copy hears the skill line,
+    // never a promotion arm.
     const { sim, pid, meta } = perfecter(15);
-    meta.craftSkills.jewelcrafting = 0; // the skill gate is armed and must not answer
+    meta.craftSkills.jewelcrafting = 0; // the skill gate must answer, not the promotion ladder
     sim.addItemInstance(APEX_NECK, { perfected: true, boundTo: pid }, pid, 1);
     const before = materialCounts(sim, pid);
     sim.drainEvents();
     const draws = drawsDuring(sim, () => sim.perfectItem(bagRefOf(meta, APEX_NECK), pid));
     expect(draws).toBe(0);
-    expect(errorsOf(sim)).toEqual(['That item is already Perfected.']);
+    expect(errorsOf(sim)).toEqual([
+      'Perfecting that requires 125 skill in the craft that made it.',
+    ]);
     expect(materialCounts(sim, pid)).toEqual(before);
   });
 
@@ -451,10 +457,12 @@ describe('the rank walk to Perfected', () => {
       'Wyrmfall Pendant is now Perfected!',
     ]);
 
-    // The perfected copy refuses further attempts, spending nothing.
+    // A perfected copy routes further nameless attempts to the promotion
+    // ladder (phase 13), which refuses for the missing name and spends
+    // nothing; tests/orange_promotion.test.ts owns that ladder in full.
     sim.drainEvents();
     sim.perfectItem(ref, pid);
-    expect(errorsOf(sim)).toEqual(['That item is already Perfected.']);
+    expect(errorsOf(sim)).toEqual(['That work needs a name to become a legend.']);
     expect(materialCounts(sim, pid)).toEqual([4, 4, 4]);
   });
 
@@ -604,6 +612,7 @@ describe('perfectingInfoFrom: the shared both-hosts view', () => {
       rank: 2,
       ranks: PERFECTING_RANKS,
       perfected: false,
+      promoted: false,
       craftId: 'jewelcrafting',
       skillReq: PERFECTING_SKILL_REQ,
       skillMet: true,

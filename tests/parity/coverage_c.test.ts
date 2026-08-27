@@ -1376,10 +1376,14 @@ describe('coverage: each scenario fires its subsystem', () => {
     const logs = ev.filter((e) => e.type === 'log' && e.pid === pid).map((e) => e.text as string);
 
     // The three deny arms the drive stages, each answered by its DEDICATED
-    // line and nothing else on the error channel (no noItem, no busy).
+    // line and nothing else on the error channel (no noItem, no busy). The
+    // post-stamp denial changed lines at phase 13: a nameless perfect_item on
+    // a Perfected copy now routes to the promotion ladder, whose first
+    // answer here is the missing-name refusal (the perfectAlready line is
+    // retired from the sim).
     expect(errors).toEqual([
       'Perfecting that requires 125 skill in the craft that made it.',
-      'That item is already Perfected.',
+      'That work needs a name to become a legend.',
       'You lack the materials to perfect that item.',
     ]);
 

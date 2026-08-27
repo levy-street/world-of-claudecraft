@@ -868,10 +868,14 @@ describe('real catalog integration', () => {
     // so it joins both counts for the same reason again. The release's own
     // chain read 274 - 4 - 9 = 261 and 265; the merged identity is
     // 290 - 4 - 9 = 277 and 281, measured on the merged catalog.
-    expect(view.summary.visibleTotal).toBe(277);
+    // 278 since masterwrought Phase 13 appended prog_legendmaker, the
+    // promotion capstone: another visible non-feat PROGRESSION deed, so it
+    // joins both counts too; 291 - 4 - 9 = 278, and the bucket sum adds the
+    // 4 feat rows back = 282.
+    expect(view.summary.visibleTotal).toBe(278);
     // The bucket sum adds the feat-flagged rows back on top (3 on the Feats
     // shelf plus the off-prefix capstone on Collection).
-    expect(view.categories.reduce((n, c) => n + c.visible, 0)).toBe(281);
+    expect(view.categories.reduce((n, c) => n + c.visible, 0)).toBe(282);
   });
 
   it('offers exactly the live catalog border deeds once they are earned', () => {

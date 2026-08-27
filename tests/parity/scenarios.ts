@@ -6685,7 +6685,7 @@ function perfectingWalk(seed = 1): Scenario {
       'bagged walk (wyrmfall_pendant via { bag }): the first resolved attempt binds the copy (the R2 boundTo stamp + the bind notice); EVERY resolved attempt draws exactly once and spends one of each material',
       'fail-forward: a failed attempt emits the fail notice and leaves the rank untouched; the track advances only on an advance notice',
       'the Perfected stamp: perfecting deleted, perfected true, the R5 delta merged into rolled.stats (int 1 on the neck; a zero share is never written), the done notice',
-      'post-stamp denial: the already-Perfected line, ZERO draws, nothing consumed',
+      'post-stamp denial: a NAMELESS perfect_item on the Perfected copy routes to the phase 13 promotion ladder and refuses with the missing-name line, ZERO draws, nothing consumed',
       'worn attempts (warhewn_signet equipped through equipItem, via { slot }): two resolved attempts mutate the equipmentInstance copy in place, the bind notice, exactly two draws',
       'materials denial (the ember stack removed): the missing-materials line, ZERO draws',
     ],
