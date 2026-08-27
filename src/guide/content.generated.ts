@@ -5772,6 +5772,13 @@ export const GUIDE_DEEDS: GuideDeed[] = [
     "category": "progression",
     "renown": 5,
     "feat": false
+  },
+  {
+    "id": "prog_legendmaker",
+    "name": "The Legendmaker",
+    "category": "progression",
+    "renown": 50,
+    "feat": false
   }
 ];
 
@@ -12296,6 +12303,49 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
           "reducedAt": 75,
           "minimalAt": 100,
           "zeroAt": 125
+        }
+      },
+      {
+        "id": "recipe_deed_of_making",
+        "name": "Deed of Making",
+        "skillReq": 125,
+        "tier": 5,
+        "station": "apothecary",
+        "acquisition": "trainer",
+        "feeCopper": 160000,
+        "materials": [
+          {
+            "name": "Sablewax Vellum",
+            "count": 3
+          },
+          {
+            "name": "Wyrmfall Core",
+            "count": 1
+          },
+          {
+            "name": "Sunpetal Herb",
+            "count": 2
+          },
+          {
+            "name": "Chime Essence",
+            "count": 2
+          },
+          {
+            "name": "Glass Vial",
+            "count": 1
+          }
+        ],
+        "output": {
+          "name": "Deed of Making",
+          "count": 1,
+          "quality": "rare"
+        },
+        "combo": null,
+        "oncePerDay": false,
+        "gain": {
+          "reducedAt": 150,
+          "minimalAt": 175,
+          "zeroAt": 200
         }
       },
       {

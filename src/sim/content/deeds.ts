@@ -3177,6 +3177,31 @@ export const DEEDS: Record<string, DeedDef> = {
     renown: 5,
     trigger: { kind: 'stat', stat: 'tutorialGraduations', count: 1 },
   },
+  // THE PACKET'S CAPSTONE (masterwrought Phase 13): the first legendary. The
+  // stat is bumped once per orange promotion at the resolveLegendaryPromotion
+  // site (professions/perfecting.ts): a Perfected apex copy plus one Deed of
+  // Making plus a valid player-chosen name, raised to legendary presentation.
+  //
+  // Renown 50 is the deliberate-prestige band (deeds.md rule 7: sub-1%
+  // unlocks are deliberate prestige only), and positive Renown is legitimate
+  // under rule 2 because the earn is EFFORT-gated, not luck-gated: the
+  // fail-forward Perfecting rank track paces the road here (roughly five
+  // weeks at one Maker's Ember per week), and the promotion act itself never
+  // rolls, the prog_masterwright precedent.
+  //
+  // NO title and no border, deliberately: R3 gives the prestige to the ITEM
+  // (the named legendary IS the trophy), and a title deed would also force
+  // committed crest art under the Reliquary title-shelf rule
+  // (tests/reliquary_cell_art.test.ts), where this deed rides the
+  // DEED_ART_PENDING ledger until its commissioned art lands.
+  prog_legendmaker: {
+    id: 'prog_legendmaker',
+    name: 'The Legendmaker',
+    desc: 'Raise a Perfected work to legend with a Deed of Making, and grant it a name all its own.',
+    category: 'progression',
+    renown: 50,
+    trigger: { kind: 'stat', stat: 'legendariesForged', count: 1 },
+  },
 };
 
 for (const def of Object.values(DEEDS)) {
