@@ -9395,6 +9395,7 @@ export const sv_SE: EnTranslations = {
       "material": "Material",
       "food": "Mat",
       "drink": "Dryck",
+      "recipe": "Recipe",
       "tool": "Verktyg",
       "potion": "Trolldryck",
       "elixir": "Elixir",

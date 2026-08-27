@@ -9395,6 +9395,7 @@ export const id_ID: EnTranslations = {
       "material": "Bahan",
       "food": "Makanan",
       "drink": "Minuman",
+      "recipe": "Recipe",
       "tool": "Perkakas",
       "potion": "Ramuan",
       "elixir": "Eliksir",

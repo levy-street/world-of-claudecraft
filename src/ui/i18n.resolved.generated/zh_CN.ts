@@ -9395,6 +9395,7 @@ export const zh_CN: EnTranslations = {
       "material": "材料",
       "food": "食物",
       "drink": "饮料",
+      "recipe": "Recipe",
       "tool": "工具",
       "potion": "药水",
       "elixir": "药剂",

@@ -911,7 +911,11 @@ export type ItemKind =
   | 'potion'
   | 'elixir'
   | 'bag'
-  | 'mount';
+  | 'mount'
+  // Recipe scrolls (raid professions): a use-to-learn item carrying the
+  // teachRecipe ItemUse. Stacks like a plain good (a scroll is fungible; the
+  // learn gate is per character, not per copy).
+  | 'recipe';
 
 interface BaseItemDef {
   id: string;

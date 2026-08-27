@@ -65,18 +65,21 @@ const KIND_RANK: Record<ItemKind, number> = {
   drink: 7,
   tool: 8,
   mount: 9,
-  junk: 10,
-  quest: 11,
+  // Recipe scrolls ride with tools and reins: durable non-consumables a
+  // player acts on deliberately, ahead of the material pile in junk.
+  recipe: 10,
+  junk: 11,
+  quest: 12,
 };
-const TRASH_RANK = 12; // any poor-quality item, regardless of kind
+const TRASH_RANK = 13; // any poor-quality item, regardless of kind
 // The two defensive tails are DISTINCT ranks on purpose (comparator
 // transitivity): a missing-def stack compares by raw id while a known def
 // compares by the name/quality chain, and if the two populations could tie on
 // category the mixed bucket would order inconsistently (an intransitive
 // comparator makes Array.prototype.sort implementation-defined, a cross-host
 // hazard). Distinct ranks mean the buckets never meet in a tie.
-const UNRANKED_KIND_RANK = 13; // a known def whose kind escaped KIND_RANK (unreachable while the Record is total)
-const MISSING_DEF_RANK = 14; // a def the lookup cannot resolve (defensive; the sim's table is complete)
+const UNRANKED_KIND_RANK = 14; // a known def whose kind escaped KIND_RANK (unreachable while the Record is total)
+const MISSING_DEF_RANK = 15; // a def the lookup cannot resolve (defensive; the sim's table is complete)
 
 // Lower rank sorts first, so the grid reads legendary down to poor. Mirrors
 // the UI's bag_filter.ts ranks. Record<Quality, number> for the same reason

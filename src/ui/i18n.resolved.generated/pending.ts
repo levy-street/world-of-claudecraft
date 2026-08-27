@@ -57,7 +57,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.auraEffect.varkhulSentinelsGaze",
     "hudChrome.enchanting.formulaNotLearned",
     "hudChrome.itemProc.selfBuff",
-    "hudChrome.itemProc.selfHeal"
+    "hudChrome.itemProc.selfHeal",
+    "itemUi.kind.recipe"
   ],
   "es_ES": [
     "entities.dungeons.ignivar_forge_approach.enterText",
@@ -107,7 +108,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.auraEffect.varkhulSentinelsGaze",
     "hudChrome.enchanting.formulaNotLearned",
     "hudChrome.itemProc.selfBuff",
-    "hudChrome.itemProc.selfHeal"
+    "hudChrome.itemProc.selfHeal",
+    "itemUi.kind.recipe"
   ],
   "fr_FR": [
     "entities.dungeons.ignivar_forge_approach.enterText",
@@ -174,7 +176,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.varkhulCallout.rightPillarCharging",
     "hudChrome.varkhulCallout.worldfireBegins",
     "hudChrome.varkhulCallout.worldfireClosing",
-    "hudChrome.varkhulCallout.worldfireConsumed"
+    "hudChrome.varkhulCallout.worldfireConsumed",
+    "itemUi.kind.recipe"
   ],
   "fr_CA": [
     "entities.dungeons.ignivar_forge_approach.enterText",
@@ -241,7 +244,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.varkhulCallout.rightPillarCharging",
     "hudChrome.varkhulCallout.worldfireBegins",
     "hudChrome.varkhulCallout.worldfireClosing",
-    "hudChrome.varkhulCallout.worldfireConsumed"
+    "hudChrome.varkhulCallout.worldfireConsumed",
+    "itemUi.kind.recipe"
   ],
   "en_CA": [],
   "it_IT": [
@@ -309,7 +313,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.varkhulCallout.rightPillarCharging",
     "hudChrome.varkhulCallout.worldfireBegins",
     "hudChrome.varkhulCallout.worldfireClosing",
-    "hudChrome.varkhulCallout.worldfireConsumed"
+    "hudChrome.varkhulCallout.worldfireConsumed",
+    "itemUi.kind.recipe"
   ],
   "de_DE": [
     "entities.dungeons.ignivar_forge_approach.enterText",
@@ -376,27 +381,32 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.varkhulCallout.rightPillarCharging",
     "hudChrome.varkhulCallout.worldfireBegins",
     "hudChrome.varkhulCallout.worldfireClosing",
-    "hudChrome.varkhulCallout.worldfireConsumed"
+    "hudChrome.varkhulCallout.worldfireConsumed",
+    "itemUi.kind.recipe"
   ],
   "zh_CN": [
     "hudChrome.enchanting.formulaNotLearned",
     "hudChrome.itemProc.selfBuff",
-    "hudChrome.itemProc.selfHeal"
+    "hudChrome.itemProc.selfHeal",
+    "itemUi.kind.recipe"
   ],
   "zh_TW": [
     "hudChrome.enchanting.formulaNotLearned",
     "hudChrome.itemProc.selfBuff",
-    "hudChrome.itemProc.selfHeal"
+    "hudChrome.itemProc.selfHeal",
+    "itemUi.kind.recipe"
   ],
   "ko_KR": [
     "hudChrome.enchanting.formulaNotLearned",
     "hudChrome.itemProc.selfBuff",
-    "hudChrome.itemProc.selfHeal"
+    "hudChrome.itemProc.selfHeal",
+    "itemUi.kind.recipe"
   ],
   "ja_JP": [
     "hudChrome.enchanting.formulaNotLearned",
     "hudChrome.itemProc.selfBuff",
-    "hudChrome.itemProc.selfHeal"
+    "hudChrome.itemProc.selfHeal",
+    "itemUi.kind.recipe"
   ],
   "pt_BR": [
     "entities.dungeons.ignivar_forge_approach.enterText",
@@ -463,12 +473,14 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.varkhulCallout.rightPillarCharging",
     "hudChrome.varkhulCallout.worldfireBegins",
     "hudChrome.varkhulCallout.worldfireClosing",
-    "hudChrome.varkhulCallout.worldfireConsumed"
+    "hudChrome.varkhulCallout.worldfireConsumed",
+    "itemUi.kind.recipe"
   ],
   "ru_RU": [
     "hudChrome.enchanting.formulaNotLearned",
     "hudChrome.itemProc.selfBuff",
-    "hudChrome.itemProc.selfHeal"
+    "hudChrome.itemProc.selfHeal",
+    "itemUi.kind.recipe"
   ],
   "cs_CZ": [
     "entities.dungeons.ignivar_forge_approach.enterText",
@@ -535,7 +547,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.varkhulCallout.rightPillarCharging",
     "hudChrome.varkhulCallout.worldfireBegins",
     "hudChrome.varkhulCallout.worldfireClosing",
-    "hudChrome.varkhulCallout.worldfireConsumed"
+    "hudChrome.varkhulCallout.worldfireConsumed",
+    "itemUi.kind.recipe"
   ],
   "nl_NL": [
     "entities.dungeons.ignivar_forge_approach.enterText",
@@ -602,7 +615,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.varkhulCallout.rightPillarCharging",
     "hudChrome.varkhulCallout.worldfireBegins",
     "hudChrome.varkhulCallout.worldfireClosing",
-    "hudChrome.varkhulCallout.worldfireConsumed"
+    "hudChrome.varkhulCallout.worldfireConsumed",
+    "itemUi.kind.recipe"
   ],
   "pl_PL": [
     "entities.dungeons.ignivar_forge_approach.enterText",
@@ -669,7 +683,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.varkhulCallout.rightPillarCharging",
     "hudChrome.varkhulCallout.worldfireBegins",
     "hudChrome.varkhulCallout.worldfireClosing",
-    "hudChrome.varkhulCallout.worldfireConsumed"
+    "hudChrome.varkhulCallout.worldfireConsumed",
+    "itemUi.kind.recipe"
   ],
   "id_ID": [
     "entities.dungeons.ignivar_forge_approach.enterText",
@@ -736,7 +751,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.varkhulCallout.rightPillarCharging",
     "hudChrome.varkhulCallout.worldfireBegins",
     "hudChrome.varkhulCallout.worldfireClosing",
-    "hudChrome.varkhulCallout.worldfireConsumed"
+    "hudChrome.varkhulCallout.worldfireConsumed",
+    "itemUi.kind.recipe"
   ],
   "tr_TR": [
     "entities.dungeons.ignivar_forge_approach.enterText",
@@ -803,7 +819,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.varkhulCallout.rightPillarCharging",
     "hudChrome.varkhulCallout.worldfireBegins",
     "hudChrome.varkhulCallout.worldfireClosing",
-    "hudChrome.varkhulCallout.worldfireConsumed"
+    "hudChrome.varkhulCallout.worldfireConsumed",
+    "itemUi.kind.recipe"
   ],
   "sv_SE": [
     "entities.dungeons.ignivar_forge_approach.enterText",
@@ -870,7 +887,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.varkhulCallout.rightPillarCharging",
     "hudChrome.varkhulCallout.worldfireBegins",
     "hudChrome.varkhulCallout.worldfireClosing",
-    "hudChrome.varkhulCallout.worldfireConsumed"
+    "hudChrome.varkhulCallout.worldfireConsumed",
+    "itemUi.kind.recipe"
   ],
   "vi_VN": [
     "entities.dungeons.ignivar_forge_approach.enterText",
@@ -937,7 +955,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.varkhulCallout.rightPillarCharging",
     "hudChrome.varkhulCallout.worldfireBegins",
     "hudChrome.varkhulCallout.worldfireClosing",
-    "hudChrome.varkhulCallout.worldfireConsumed"
+    "hudChrome.varkhulCallout.worldfireConsumed",
+    "itemUi.kind.recipe"
   ],
   "da_DK": [
     "entities.dungeons.ignivar_forge_approach.enterText",
@@ -1004,6 +1023,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.varkhulCallout.rightPillarCharging",
     "hudChrome.varkhulCallout.worldfireBegins",
     "hudChrome.varkhulCallout.worldfireClosing",
-    "hudChrome.varkhulCallout.worldfireConsumed"
+    "hudChrome.varkhulCallout.worldfireConsumed",
+    "itemUi.kind.recipe"
   ]
 };

@@ -9395,6 +9395,7 @@ export const vi_VN: EnTranslations = {
       "material": "Nguyên Liệu",
       "food": "Thức Ăn",
       "drink": "Đồ Uống",
+      "recipe": "Recipe",
       "tool": "Dụng Cụ",
       "potion": "Thuốc",
       "elixir": "Tiên Dược",

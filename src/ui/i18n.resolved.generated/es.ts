@@ -9395,6 +9395,7 @@ export const es: EnTranslations = {
       "material": "Materia",
       "food": "Comida",
       "drink": "Bebida",
+      "recipe": "Recipe",
       "tool": "Herramienta",
       "potion": "Poción",
       "elixir": "Elixir",

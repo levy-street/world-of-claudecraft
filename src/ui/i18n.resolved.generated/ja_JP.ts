@@ -9395,6 +9395,7 @@ export const ja_JP: EnTranslations = {
       "material": "素材",
       "food": "食べ物",
       "drink": "飲み物",
+      "recipe": "Recipe",
       "tool": "道具",
       "potion": "ポーション",
       "elixir": "エリクサー",

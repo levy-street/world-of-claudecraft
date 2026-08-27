@@ -9395,6 +9395,7 @@ export const en_XA: EnTranslations = {
       "material": "[Ɱáţéŕíáļ]",
       "food": "[Ƒóóð]",
       "drink": "[Ðŕíñķ]",
+      "recipe": "[Ŕéçíþé]",
       "tool": "[Ţóóļ]",
       "potion": "[Þóţíóñ]",
       "elixir": "[Éļíẋíŕ]",

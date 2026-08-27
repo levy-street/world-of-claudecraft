@@ -10862,6 +10862,7 @@ export type TranslationKeyFlat =
   | 'itemUi.kind.mount'
   | 'itemUi.kind.potion'
   | 'itemUi.kind.quest'
+  | 'itemUi.kind.recipe'
   | 'itemUi.kind.tool'
   | 'itemUi.kind.weapon'
   | 'itemUi.logs.boughtBackItem'

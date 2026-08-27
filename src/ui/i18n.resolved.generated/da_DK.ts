@@ -9395,6 +9395,7 @@ export const da_DK: EnTranslations = {
       "material": "Materiale",
       "food": "Mad",
       "drink": "Drikke",
+      "recipe": "Recipe",
       "tool": "Værktøj",
       "potion": "Eliksir",
       "elixir": "Eliksir",

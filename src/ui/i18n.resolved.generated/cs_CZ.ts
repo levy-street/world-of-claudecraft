@@ -9395,6 +9395,7 @@ export const cs_CZ: EnTranslations = {
       "material": "Materiál",
       "food": "Jídlo",
       "drink": "Nápoj",
+      "recipe": "Recipe",
       "tool": "Nástroj",
       "potion": "Lektvar",
       "elixir": "Elixír",

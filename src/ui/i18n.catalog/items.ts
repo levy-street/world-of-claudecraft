@@ -54,6 +54,8 @@ const itemStringsEn = {
       material: 'Material',
       food: 'Food',
       drink: 'Drink',
+      // Recipe scrolls (raid professions): the use-to-learn tooltip kind line.
+      recipe: 'Recipe',
     },
     stats: {
       armor: 'Armor',

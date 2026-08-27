@@ -9395,6 +9395,7 @@ export const tr_TR: EnTranslations = {
       "material": "Malzeme",
       "food": "Yiyecek",
       "drink": "İçecek",
+      "recipe": "Recipe",
       "tool": "Alet",
       "potion": "Şifa İksiri",
       "elixir": "İksir",

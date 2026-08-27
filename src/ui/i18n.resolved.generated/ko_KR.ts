@@ -9395,6 +9395,7 @@ export const ko_KR: EnTranslations = {
       "material": "재료",
       "food": "음식",
       "drink": "음료",
+      "recipe": "Recipe",
       "tool": "도구",
       "potion": "물약",
       "elixir": "비약",
