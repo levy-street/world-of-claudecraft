@@ -105,16 +105,33 @@ export interface EnchantPickRow {
   affordable: boolean;
 }
 
+/** Viewer-side mirror of professions/enchanting.ts isEnchantKnown (the
+ *  isRecipeKnownForViewer pattern): grandfathered when the def carries no
+ *  acquisition list, otherwise known only while the id sits in the viewer's
+ *  mirrored knownRecipes. Kept here beside the one list it filters. */
+function isEnchantKnownForViewer(
+  enchant: (typeof ENCHANTS)[string],
+  known: ReadonlySet<string>,
+): boolean {
+  return !enchant.acquisition || enchant.acquisition.length === 0 || known.has(enchant.id);
+}
+
 /** The enchants that consume `reagentItemId`, in ENCHANTS declaration order,
  *  each with its effect facts, per-reagent affordability from the viewer's
- *  inventory, and its target slot. */
+ *  inventory, and its target slot. An acquisition-gated formula the viewer
+ *  has not learned is HIDDEN outright (the crafting window's drop-recipe
+ *  rule): omitting `knownRecipes` therefore hides every gated formula,
+ *  the safe default. */
 export function enchantsForReagent(
   inventory: readonly InvSlot[],
   reagentItemId: string,
+  knownRecipes: readonly string[] = [],
 ): EnchantPickRow[] {
+  const known = new Set(knownRecipes);
   const rows: EnchantPickRow[] = [];
   for (const enchant of Object.values(ENCHANTS)) {
     if (!enchant.reagents.some((reagent) => reagent.itemId === reagentItemId)) continue;
+    if (!isEnchantKnownForViewer(enchant, known)) continue;
     const reagents = enchant.reagents.map((reagent) => ({
       itemId: reagent.itemId,
       required: reagent.count,
@@ -207,9 +224,10 @@ export interface EnchantPickSection {
 export function enchantSectionsForReagent(
   inventory: readonly InvSlot[],
   reagentItemId: string,
+  knownRecipes: readonly string[] = [],
 ): EnchantPickSection[] {
   const byTier = new Map<EnchantTier, EnchantPickRow[]>();
-  for (const row of enchantsForReagent(inventory, reagentItemId)) {
+  for (const row of enchantsForReagent(inventory, reagentItemId, knownRecipes)) {
     const tier = enchantTier(row.enchantId);
     const bucket = byTier.get(tier);
     if (bucket) bucket.push(row);
