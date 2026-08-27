@@ -2748,7 +2748,7 @@ export const zh_CN: EnTranslations = {
       "masterwroughtIntermediate": "大师锻造制作部件。",
       "quickeningCatalyst": "制作催化剂。炼金术士每天只能制作一个。",
       "growthTonic": "农用品。种植时消耗，有机会获得略多的收成。若作物枯萎，滋补剂也会随之失去。",
-      "deedOfMaking": "铭文契据。由完美化的最终阶段消耗，为已臻至完美的作品命名，使其成为传说。"
+      "deedOfMaking": "铭文契据。消耗后将一件已臻至完美的大师锻造作品提升为传说，并为其命名。"
     },
     "discord": {
       "title": "Discord",

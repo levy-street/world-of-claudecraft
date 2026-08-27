@@ -664,21 +664,26 @@ describe('enchant_apply_view: preservedReplaceTraits (#2421)', () => {
   // for the identical reason. Both are pinned in their own files, but nothing
   // linked them, so widening the wire would fail only the pin above and leave
   // the tooltip copy to be found later. Cross-pinned here instead: the two
-  // consumers of one policy must agree, mechanically.
-  it('pins wornTooltipInstance to that same allowlist, so both consumers move together', () => {
+  // consumers of one policy must agree, mechanically. ONE recorded exception
+  // since 2026-08-27: the projection keeps `perfected`, a SELF-side fact the
+  // owner's own paperdoll needs for the promotion-scoped Unique-Equipped tag,
+  // while the wire pin above still refuses it on the peer eqi lane. So the
+  // projection is exactly wire-allowlist plus perfected, nothing else.
+  it('pins wornTooltipInstance to the wire allowlist plus the self-only perfected stamp', () => {
     const worn = wornTooltipInstance({
       signer: 'Tester',
       enchant: 'enchant_chest_stamina',
       rolled: { masterwork: true, stats: { sta: 4 } },
       name: "Vel'tara's Oath",
+      perfected: true,
       boundTo: 7,
       bindOnTrade: true,
       charges: { some_effect: 2 },
     });
     expect(
       Object.keys(worn ?? {}).sort(),
-      'wornTooltipInstance and the eqi wire encode one policy: widen both or neither',
-    ).toEqual(['enchant', 'name', 'rolled', 'signer']);
+      'wornTooltipInstance is the eqi allowlist plus perfected: widen both or neither',
+    ).toEqual(['enchant', 'name', 'perfected', 'rolled', 'signer']);
   });
 
   // The exported sweep list claims two things about itself: that it is the

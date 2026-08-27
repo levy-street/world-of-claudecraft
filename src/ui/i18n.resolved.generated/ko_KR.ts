@@ -2748,7 +2748,7 @@ export const ko_KR: EnTranslations = {
       "masterwroughtIntermediate": "명장 제작용 재료.",
       "quickeningCatalyst": "제작용 촉매. 연금술사는 하루에 하나만 제작할 수 있습니다.",
       "growthTonic": "농사 용품. 심을 때 소모되며 수확이 조금 늘어날 수 있습니다. 작물이 시들면 토닉도 함께 사라집니다.",
-      "deedOfMaking": "명각 증서. 완전화의 마지막 단계에서 소모되어, 완전해진 작품에 이름을 붙여 전설로 만듭니다."
+      "deedOfMaking": "명각 증서. 소모하면 완전해진 명장 제작 작품을 전설로 승격시키고 이름을 붙입니다."
     },
     "discord": {
       "title": "Discord",

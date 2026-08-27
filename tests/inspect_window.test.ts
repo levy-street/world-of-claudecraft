@@ -3,11 +3,14 @@
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { afterEach, describe, expect, it, vi } from 'vitest';
+import { ITEMS } from '../src/sim/data';
 import type { PlayerClass } from '../src/sim/types';
 import { borderAccent, borderMotifPrimitives } from '../src/ui/deed_border_view';
 import { deedName, deedTitleText } from '../src/ui/deed_i18n';
+import { QUALITY_COLOR } from '../src/ui/icons';
 import { classColorCss } from '../src/ui/inspect_view';
 import { type InspectEntity, InspectWindow } from '../src/ui/inspect_window';
+import { qualityGlowShadow } from '../src/ui/quality_glow';
 
 // The inspect ("Profile") window painter is a DOM module. Most guards below are
 // source scans, the char_window suite's shape: they pin the WCAG focus-trap the
@@ -569,5 +572,47 @@ describe('inspect_window: the real painter over a Sim-shaped and a ranked entity
       root.querySelector('.inspect-curator-halo'),
       'a live rank 2 must not wear the rank-5 sigil the stale wire claimed',
     ).toBeNull();
+  });
+
+  // The 2026-08-27 QA round: the inspect equipment row was the one item-cell
+  // surface still def-only. These two drive the REAL row over the same worn
+  // payload shape the eqi mirror delivers, instance-driven and def-only.
+  const mainhandRow = (root: HTMLElement): HTMLElement => {
+    const row = [...root.querySelectorAll<HTMLElement>('.equip-slot')].find(
+      (r) => r.querySelector('.slot-name')?.textContent === 'mainhand',
+    );
+    expect(row, 'the mainhand socket row must render').toBeDefined();
+    return row as HTMLElement;
+  };
+
+  it('drives the equipment row off the worn copy: chosen name, legendary color, rim, glow', () => {
+    const root = openWith({
+      ...baseEntity,
+      equippedItems: { mainhand: 'worn_sword' },
+      equippedInstances: {
+        mainhand: { name: "Vel'tara's Oath", rolled: { quality: 'legendary' } },
+      },
+    });
+    const row = mainhandRow(root);
+    const label = row.querySelector<HTMLElement>('.slot-item');
+    expect(label?.textContent).toBe("Vel'tara's Oath");
+    expect(label?.getAttribute('style')).toContain(QUALITY_COLOR.legendary);
+    const icon = row.querySelector<HTMLElement>('.item-icon');
+    expect(icon?.className).toContain('q-legendary');
+    // The glow follows the effective quality too: compare through a probe so
+    // happy-dom's own style serialization judges both sides.
+    const probe = document.createElement('div');
+    probe.style.boxShadow = qualityGlowShadow(QUALITY_COLOR.legendary);
+    expect(probe.style.boxShadow).not.toBe('');
+    expect(icon?.style.boxShadow).toBe(probe.style.boxShadow);
+  });
+
+  it('a def-only row keeps the def name and def quality (the negative)', () => {
+    const root = openWith({ ...baseEntity, equippedItems: { mainhand: 'worn_sword' } });
+    const row = mainhandRow(root);
+    const label = row.querySelector<HTMLElement>('.slot-item');
+    expect(label?.textContent).toBe(ITEMS.worn_sword.name);
+    expect(label?.getAttribute('style')).toContain(QUALITY_COLOR.common);
+    expect(row.querySelector<HTMLElement>('.item-icon')?.className).toContain('q-common');
   });
 });

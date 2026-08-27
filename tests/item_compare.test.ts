@@ -75,6 +75,21 @@ describe('itemStatDeltas', () => {
     );
   });
 
+  it('drops a non-finite rolled value cleanly (the recalcPlayerStats guard parity)', () => {
+    // A corrupted or hostile persisted rolled value contributes ZERO, exactly
+    // as recalcPlayerStats treats the same field: the honest def-only delta
+    // (+4 sta) survives instead of the whole row vanishing behind a NaN.
+    const candidate = armor('cand', { sta: 10 });
+    const worn = armor('worn', { sta: 6 });
+    const honest = [{ stat: 'sta', delta: 4, decimals: 0 }];
+    const poisoned = { rolled: { stats: { sta: 'oops' as unknown as number } } };
+    expect(itemStatDeltas(candidate, worn, undefined, poisoned)).toEqual(honest);
+    expect(itemStatDeltas(candidate, worn, poisoned, undefined)).toEqual(honest);
+    expect(
+      itemStatDeltas(candidate, worn, undefined, { rolled: { stats: { sta: Number.NaN } } }),
+    ).toEqual(honest);
+  });
+
   it('computes a fractional weapon DPS delta at one decimal of precision', () => {
     // 10-20 @ 2.0s = 7.5 dps vs 8-12 @ 2.0s = 5.0 dps -> +2.5
     const candidate = weapon('big', 10, 20, 2.0);

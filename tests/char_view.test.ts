@@ -104,8 +104,8 @@ describe('char_view: paperdoll data model', () => {
     });
     expect(view.left[0].instance).not.toBe(promoted); // a projection, not the raw handle
     expect(view.left[4].instance).toBeNull(); // mainhand: worn, no payload
-    // The def-only negative: no instances argument (the inspect caller's
-    // shape) resolves every cell payload-free, byte for byte the old model.
+    // The def-only negative: no instances argument (a caller with no payloads
+    // in hand) resolves every cell payload-free, byte for byte the old model.
     const defOnly = buildPaperdollView(FULL, ITEMS);
     expect(defOnly.left.every((c) => c.instance === null)).toBe(true);
     expect(defOnly.right.every((c) => c.instance === null)).toBe(true);

@@ -48,8 +48,8 @@ export function itemNumber(value: number, fractionDigits = 0): string {
   });
 }
 
-/** The WORN-slot tooltip payload (Professions 2.0): exactly the
- *  fields the public eqi wire carries (signer/enchant/rolled, plus the
+/** The WORN-slot tooltip payload (Professions 2.0): the fields
+ *  the public eqi wire carries (signer/enchant/rolled, plus the
  *  phase 13 legendary name; the worn-identity trim), so the offline
  *  paperdoll and the online mirror render identical worn tooltips. Online, equippedInstances is decoded from
  *  the stripped eqi allowlist and never carries bindOnTrade/boundTo/charges;
@@ -69,6 +69,16 @@ export function wornTooltipInstance(
   // cosmetic field to JOIN the eqi allowlist since it was written, so the
   // offline paperdoll title matches what an online inspector sees.
   if (instance.name !== undefined) worn.name = instance.name;
+  // The Perfected stamp (2026-08-27): the one DELIBERATE divergence from the
+  // eqi allowlist, and a CLIENT-SIDE SELF projection only. The owner's own
+  // paperdoll may know the copy is Perfected (einst carries the full payload
+  // on both hosts), and the promotion-scoped isUniqueEquipped needs the stamp
+  // or a promoted copy's own worn tooltip drops its Unique-Equipped tag. The
+  // PEER inspect card deliberately shows no Unique-Equipped tag for an
+  // instance-legendary copy: `perfected` stays OFF the eqi wire (the phase 12
+  // data-minimization decision, pinned in tests/enchant_apply_view.test.ts),
+  // and that missing tag is the recorded consequence.
+  if (instance.perfected !== undefined) worn.perfected = instance.perfected;
   return worn;
 }
 

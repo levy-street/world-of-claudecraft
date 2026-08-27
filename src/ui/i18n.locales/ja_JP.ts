@@ -14223,7 +14223,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   // Making noun matches the sim_i18n.ts error.legendaryDeed row.
   'entities.items.deed_of_making.name': '創造の証書',
   'hudChrome.materialHint.deedOfMaking':
-    '銘刻の証書。完全化の最終段階で消費され、完全化された作品に名前を与えて伝説にします。',
+    '銘刻の証書。消費すると、完全化された名匠鍛造の作品を伝説へと昇格させ、名前を与えます。',
   'hudChrome.crafting.legendaryLine': '{item}は{name}として生まれ変わり、伝説となりました！',
   'hudChrome.crafting.legendaryZoneLine': '{player}が{item}を鍛え上げ、伝説{name}を生み出しました！',
 };

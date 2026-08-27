@@ -14227,7 +14227,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   // Making noun matches the sim_i18n.ts error.legendaryDeed row.
   'entities.items.deed_of_making.name': '창조의 증서',
   'hudChrome.materialHint.deedOfMaking':
-    '명각 증서. 완전화의 마지막 단계에서 소모되어, 완전해진 작품에 이름을 붙여 전설로 만듭니다.',
+    '명각 증서. 소모하면 완전해진 명장 제작 작품을 전설로 승격시키고 이름을 붙입니다.',
   'hudChrome.crafting.legendaryLine': '{item}이(가) {name}(으)로 다시 태어나 전설이 되었습니다!',
   'hudChrome.crafting.legendaryZoneLine': '{player}님이 {item}을(를) 전설 {name}(으)로 벼려냈습니다!',
 };

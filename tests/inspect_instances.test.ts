@@ -240,13 +240,22 @@ describe('inspect_window painter instance threading (source pins)', () => {
   const painter = readFileSync(new URL('../src/ui/inspect_window.ts', import.meta.url), 'utf8');
   const hud = readFileSync(new URL('../src/ui/hud.ts', import.meta.url), 'utf8');
 
-  it('threads the inspected entity payload per slot into both paperdoll columns', () => {
-    expect(painter).toContain('this.buildSlotRow(cell, e.equippedInstances[cell.slot])');
+  it('threads the inspected entity payloads through the pure core into the paperdoll cells', () => {
+    // Since the 2026-08-27 QA round the payloads ride the VIEW MODEL: the
+    // painter hands equippedInstances to buildInspectView, and the core
+    // threads them into buildPaperdollView (third argument), whose cells carry
+    // each slot's eqi-projected instance for the row AND the tooltip.
+    expect(painter).toContain('equippedInstances: e.equippedInstances');
+    const view = readFileSync(new URL('../src/ui/inspect_view.ts', import.meta.url), 'utf8');
+    expect(view).toContain(
+      'buildPaperdollView(input.equippedItems, items, input.equippedInstances)',
+    );
   });
 
-  it('the slot row forwards the instance into the tooltip builder', () => {
+  it('the slot row reads the cell payload and forwards it into the tooltip builder', () => {
+    expect(painter).toContain('const { slot, item, instance } = cell;');
     expect(painter).toContain(
-      'this.deps.attachTooltip(row, () => this.deps.itemTooltip(item, instance))',
+      'this.deps.attachTooltip(row, () => this.deps.itemTooltip(item, instance ?? undefined))',
     );
   });
 

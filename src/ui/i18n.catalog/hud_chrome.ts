@@ -3608,10 +3608,12 @@ export const hudChromeStrings = {
       'harvest. If the crop withers, the tonic is lost with it.',
     // The Deed of Making (masterwrought Phase 13): written from the live
     // mechanic (perfecting.ts resolveLegendaryPromotion consumes exactly one
-    // at the final rank, on an already-Perfected copy, with a chosen name).
+    // at the PROMOTION, the step after Perfecting completes: it stamps an
+    // already-Perfected copy legendary under a chosen name; no Perfecting
+    // rank attempt touches it).
     deedOfMaking:
-      'Inscription writ. Consumed by the final Perfecting rank to name a ' +
-      'Perfected work and make it a legend.',
+      'Inscription writ. Consumed to raise a Perfected Masterwrought work ' +
+      'to legendary and give it a name.',
   },
   discord: {
     title: 'Discord',

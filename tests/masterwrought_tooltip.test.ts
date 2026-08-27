@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 import { MASTERWROUGHT_EQUIP_CAP } from '../src/sim/equipment_rules';
 import type { ItemDef, ItemInstancePayload } from '../src/sim/types';
 import { Hud } from '../src/ui/hud';
+import { wornTooltipInstance } from '../src/ui/item_instance_tooltip';
 
 // The Masterwrought tooltip tag is an arm of a private Hud method that only
 // builds an HTML string, so exercise it on a prototype-only instance the way
@@ -76,5 +77,23 @@ describe('masterwrought tag on the item tooltip', () => {
     expect(harness().itemTooltip(FLAGGED_RING, false)).not.toContain('tt-unique');
     const legacy = harness().itemTooltip(FLAGGED_RING, false, { rolled: { quality: 'legendary' } });
     expect(legacy).not.toContain('tt-unique');
+  });
+
+  it('the OWN paperdoll tooltip of a promoted worn copy keeps the tag (bags and paperdoll agree)', () => {
+    // The paperdoll routes its payload through wornTooltipInstance; until
+    // 2026-08-27 that projection dropped `perfected`, so the same copy showed
+    // the Unique-Equipped tag in the bags and lost it the moment it was worn.
+    // The projection now keeps the stamp (a self-side fact; einst carries the
+    // full payload in both hosts), so both surfaces render the same tag.
+    const full: ItemInstancePayload = {
+      perfected: true,
+      rolled: { quality: 'legendary' },
+      name: "Vel'tara's Oath",
+      boundTo: 7,
+    };
+    const bags = harness().itemTooltip(FLAGGED_RING, false, full);
+    const paperdoll = harness().itemTooltip(FLAGGED_RING, false, wornTooltipInstance(full));
+    expect(bags).toContain('tt-unique');
+    expect(paperdoll).toContain('tt-unique');
   });
 });

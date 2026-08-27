@@ -2748,7 +2748,7 @@ export const zh_TW: EnTranslations = {
       "masterwroughtIntermediate": "大師鍛造製作部件。",
       "quickeningCatalyst": "製作催化劑。鍊金術士每天只能製作一個。",
       "growthTonic": "農用品。種植時消耗，有機會獲得略多的收成。若作物枯萎，滋補劑也會隨之失去。",
-      "deedOfMaking": "銘文契據。由完美化的最終階段消耗，為已臻至完美的作品命名，使其成為傳說。"
+      "deedOfMaking": "銘文契據。消耗後將一件已臻至完美的大師鍛造作品提升為傳說，並為其命名。"
     },
     "discord": {
       "title": "Discord",

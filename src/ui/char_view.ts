@@ -66,9 +66,9 @@ export const PAPERDOLL_RIGHT_SLOTS: readonly EquipSlot[] = [
  * Build the paperdoll view from the player's equipment and the item table. A
  * slot resolves to its item only when the id is present AND the item still
  * exists in the table; otherwise the cell is empty. `instances` is the worn
- * per-copy payloads (IWorld equipmentInstances); a caller without them (the
- * inspect card) omits it and every cell reads def-only, byte for byte the old
- * behavior.
+ * per-copy payloads (IWorld equipmentInstances for the sheet, the entity eqi
+ * mirror for the inspect card); a caller without them omits it and every cell
+ * reads def-only, byte for byte the old behavior.
  */
 export function buildPaperdollView(
   equipment: Partial<Record<EquipSlot, string>>,

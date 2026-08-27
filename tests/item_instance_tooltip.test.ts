@@ -298,18 +298,22 @@ describe('instanceBindingLines (commission lines)', () => {
   });
 });
 
-// The worn-slot projection: the paperdoll renders exactly the
-// public eqi allowlist (signer/enchant/rolled) in BOTH hosts, so the offline
-// full payload can never show the bond lines on worn gear that the online
-// eqi-trimmed mirror lacks. char_window.ts is pinned to route through it.
+// The worn-slot projection: the paperdoll renders the public eqi allowlist
+// (signer/enchant/rolled/name) in BOTH hosts, so the offline full payload can
+// never show the bond lines on worn gear that the online eqi-trimmed mirror
+// lacks, PLUS the one deliberate self-side addition (2026-08-27): `perfected`,
+// which never rides the peer eqi wire but which the owner's own paperdoll
+// needs for the promotion-scoped Unique-Equipped tag. char_window.ts is pinned
+// to route through it.
 describe('wornTooltipInstance (the eqi-mirror worn projection)', () => {
-  it('keeps exactly signer/enchant/rolled/name and drops the bond and charges fields', () => {
+  it('keeps exactly signer/enchant/rolled/name/perfected and drops the bond and charges fields', () => {
     expect(
       wornTooltipInstance({
         signer: 'Aldric',
         enchant: 'ench_x',
         rolled: { masterwork: true, stats: { str: 2 } },
         name: "Vel'tara's Oath",
+        perfected: true,
         bindOnTrade: true,
         boundTo: 7,
         charges: { fireball: 2 },
@@ -319,6 +323,7 @@ describe('wornTooltipInstance (the eqi-mirror worn projection)', () => {
       enchant: 'ench_x',
       rolled: { masterwork: true, stats: { str: 2 } },
       name: "Vel'tara's Oath",
+      perfected: true,
     });
     expect(wornTooltipInstance(undefined)).toBeUndefined();
     // A bond-only payload projects to an EMPTY worn payload: no line renders.

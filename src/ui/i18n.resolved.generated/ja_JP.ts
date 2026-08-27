@@ -2748,7 +2748,7 @@ export const ja_JP: EnTranslations = {
       "masterwroughtIntermediate": "名匠鍛造の製作部材。",
       "quickeningCatalyst": "製作用の触媒。錬金術師は1日に1個しか作れません。",
       "growthTonic": "農業用品。作付け時に消費され、収穫がやや増えることがある。作物が枯れるとトニックも失われる。",
-      "deedOfMaking": "銘刻の証書。完全化の最終段階で消費され、完全化された作品に名前を与えて伝説にします。"
+      "deedOfMaking": "銘刻の証書。消費すると、完全化された名匠鍛造の作品を伝説へと昇格させ、名前を与えます。"
     },
     "discord": {
       "title": "Discord",

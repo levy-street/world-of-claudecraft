@@ -13933,7 +13933,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   // Making noun matches the sim_i18n.ts error.legendaryDeed row.
   'entities.items.deed_of_making.name': '造物契據',
   'hudChrome.materialHint.deedOfMaking':
-    '銘文契據。由完美化的最終階段消耗，為已臻至完美的作品命名，使其成為傳說。',
+    '銘文契據。消耗後將一件已臻至完美的大師鍛造作品提升為傳說，並為其命名。',
   'hudChrome.crafting.legendaryLine': '{item}以{name}之名重生，成為傳說！',
   'hudChrome.crafting.legendaryZoneLine': '{player}將{item}鍛造成了傳說{name}！',
 };

@@ -2748,7 +2748,7 @@ export const pl_PL: EnTranslations = {
       "masterwroughtIntermediate": "Masterwrought crafting component.",
       "quickeningCatalyst": "Crafting catalyst. An alchemist can craft only one each day.",
       "growthTonic": "Farming supply. Spent when you plant a crop for a chance of a slightly larger harvest. If the crop withers, the tonic is lost with it.",
-      "deedOfMaking": "Inscription writ. Consumed by the final Perfecting rank to name a Perfected work and make it a legend."
+      "deedOfMaking": "Inscription writ. Consumed to raise a Perfected Masterwrought work to legendary and give it a name."
     },
     "discord": {
       "title": "Discord",

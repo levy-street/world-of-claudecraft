@@ -14420,7 +14420,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   // Making noun matches the sim_i18n.ts error.legendaryDeed row.
   'entities.items.deed_of_making.name': 'Грамота созидания',
   'hudChrome.materialHint.deedOfMaking':
-    'Каллиграфическая грамота. Расходуется на последнем ранге совершенствования, чтобы дать имя доведённому до совершенства творению и сделать его легендой.',
+    'Каллиграфическая грамота. Расходуется, чтобы возвысить доведённое до совершенства творение Ковки мастера до легендарного и дать ему имя.',
   'hudChrome.crafting.legendaryLine': '{item} перерождается как {name} и становится легендой!',
   'hudChrome.crafting.legendaryZoneLine': '{player} перековывает {item} в легенду: {name}!',
 };

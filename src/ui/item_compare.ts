@@ -28,7 +28,8 @@ function weaponDps(w: ItemDef['weapon']): number {
 }
 
 // One side's effective core stat: the def's line plus the copy's baked
-// rolled.stats bonus (the recalcPlayerStats merge semantics), so a per-copy
+// rolled.stats bonus (the recalcPlayerStats merge semantics, including its
+// Number.isFinite guard over the persisted rolled values), so a per-copy
 // bake (masterwork, enchant, the Perfected R5 delta) moves the delta the same
 // way it moves the worn numbers.
 function effectiveStat(
@@ -36,7 +37,8 @@ function effectiveStat(
   instance: ItemInstancePayload | undefined,
   stat: keyof CoreStats,
 ): number {
-  return (def.stats?.[stat] ?? 0) + (instance?.rolled?.stats?.[stat] ?? 0);
+  const rolled = instance?.rolled?.stats?.[stat];
+  return (def.stats?.[stat] ?? 0) + (Number.isFinite(rolled) ? (rolled as number) : 0);
 }
 
 // Ordered, human-readable stat lines. Only changes worth showing are returned:
