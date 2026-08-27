@@ -16,7 +16,6 @@ import type {
   WocActivityView,
   WocEstimateView,
   WocListingView,
-  WocMarketClient,
   WocMarketStatus,
   WocQuoteView,
   WocSaleView,
@@ -67,6 +66,7 @@ import {
   wocSpinnerHtml,
   wocWalletCardSig,
 } from './woc_market_chrome';
+import type { WocMarketHooks } from './woc_market_hooks';
 import { anyBondAwaitingChain, shouldPollWocMarket } from './woc_market_poll_core';
 import {
   wocBondPendingText,
@@ -86,25 +86,9 @@ import {
 } from './woc_market_view';
 import { wocTokensText } from './woc_tokens_text';
 
-/** Online-only glue main.ts wires (the ClaudiumHooks pattern): the typed SDK,
- *  the session identity, and the wallet signer. Absent hooks = the window is
- *  never openable (the platform gate). */
-export interface WocMarketHooks {
-  client: WocMarketClient;
-  characterId(): number;
-  walletLinked(): boolean;
-  /** Sign and broadcast a service-built transaction through the reviewed
-   *  wallet bridge (the src/net/wallet.ts signAndSendTransactionBase64
-   *  vocabulary; the payload is always a server-authorized quote, never
-   *  client-assembled). Resolves the signature; throws an Error whose
-   *  message is already player-facing. */
-  signAndSendTransactionBase64(transactionBase64: string): Promise<string>;
-  /** Sign the SERVER-BUILT step-up challenge message (B6/R1) with the linked
-   *  wallet (no transaction, no funds). Same bridge and same contract as the
-   *  transaction signer: resolves the base58 signature; throws an Error whose
-   *  message is already player-facing. */
-  signMessageBase58(message: string): Promise<string>;
-}
+// The hooks contract lives in its own leaf module (wiring, window, and the
+// trade arm all consume it); re-exported here so importers keep one home.
+export type { WocMarketHooks } from './woc_market_hooks';
 
 export interface WocMarketWindowDeps {
   root(): HTMLElement;
@@ -2235,7 +2219,10 @@ export class WocMarketWindow {
         this.busyLabel = 'hudChrome.wocMarket.signing';
         this.render();
         try {
-          stepUpSignature = await hooks.signMessageBase58(issued.challenge.message);
+          stepUpSignature = await hooks.signMessageBase58(
+            issued.challenge.message,
+            issued.challenge.nonce,
+          );
         } catch (err) {
           // Dev channel keeps the raw error; the player line is CLASSIFIED
           // (decline, timeout, missing wallet), never err.message raw (the
@@ -2417,6 +2404,7 @@ export class WocMarketWindow {
         try {
           signature = await hooks.signAndSendTransactionBase64(
             pending.quote.transactionBase64 ?? '',
+            pending.quote.reference ?? null,
           );
         } catch (err) {
           // Same classification rule as the step-up arm, payment-flavored.

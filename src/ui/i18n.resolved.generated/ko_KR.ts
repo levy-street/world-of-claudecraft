@@ -7538,6 +7538,7 @@ export const ko_KR: EnTranslations = {
       "title": "Solana 지갑 연결",
       "linkBody": "이 브라우저에서 지갑 확장 프로그램을 선택하세요. 인증 메시지에 서명한 뒤 데스크톱 앱으로 돌아갑니다.",
       "paymentBody": "계정에 연결된 지갑을 선택하고 이 브라우저에서 거래를 승인하세요.",
+      "stepUpBody": "계정에 연결된 지갑을 선택하고 $WOC 거래소 승인 메시지에 서명하세요. 서명은 무료이며 자금이 이동하지 않습니다.",
       "extensionHelp": "호환되는 지갑 확장 프로그램을 찾지 못했습니다. Phantom, Solflare 또는 다른 Solana 브라우저 지갑을 설치하거나 잠금 해제한 뒤 다시 시도하세요.",
       "safety": "World of ClaudeCraft는 복구 문구나 개인 키를 요청하지 않습니다.",
       "continueWith": "{wallet}(으)로 계속",

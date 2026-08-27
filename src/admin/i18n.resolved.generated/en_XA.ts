@@ -178,6 +178,8 @@ export const en_XA: AdminTranslations = {
   "usage.cacheColEvictions": "[Éʋíçţíóñš]",
   "usage.cacheEntriesOfMax": "[{entries} / {max}]",
   "usage.notAvailable": "[ñ/á]",
+  "usage.metric.walletHandoffAuthorizationEvicted": "[Ðéšķţóþ ŵáļļéţ ĥáñðóƒƒ éʋíçţíóñš]",
+  "usage.metric.walletHandoffCreateRejected": "[Ðéšķţóþ ŵáļļéţ ĥáñðóƒƒ ŕéĵéçţíóñš]",
   "usage.metric.wocBalanceApi": "[$ŴÓÇ ƀáļáñçé ÁÞÍ ŕéɋúéšţš]",
   "usage.metric.wocBalanceRateLimited": "[$ŴÓÇ ƀáļáñçé ţĥŕóţţļéð ŕéɋúéšţš]",
   "usage.metric.wocBalanceRpc": "[Šóļáñá ŔÞÇ ƀáļáñçé ŕéáðš]",

@@ -178,6 +178,8 @@ export const sv_SE: AdminTranslations = {
   "usage.cacheColEvictions": "Vräkningar",
   "usage.cacheEntriesOfMax": "{entries} / {max}",
   "usage.notAvailable": "ej tillg.",
+  "usage.metric.walletHandoffAuthorizationEvicted": "Desktop wallet handoff evictions",
+  "usage.metric.walletHandoffCreateRejected": "Desktop wallet handoff rejections",
   "usage.metric.wocBalanceApi": "API-begäranden om $WOC-saldo",
   "usage.metric.wocBalanceRateLimited": "Strypta begäranden om $WOC-saldo",
   "usage.metric.wocBalanceRpc": "Solana RPC-saldoläsningar",

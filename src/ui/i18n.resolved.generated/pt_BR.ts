@@ -7538,6 +7538,7 @@ export const pt_BR: EnTranslations = {
       "title": "Conectar uma Carteira Solana",
       "linkBody": "Escolha uma extensão de carteira neste navegador. Você assinará uma mensagem de verificação e depois retornará ao aplicativo para desktop.",
       "paymentBody": "Escolha a carteira vinculada à sua conta e aprove a transação neste navegador.",
+      "stepUpBody": "Choose the wallet linked to your account and sign the $WOC Exchange authorization message. Signing is free and moves no funds.",
       "extensionHelp": "Nenhuma extensão de carteira compatível foi encontrada. Instale ou desbloqueie Phantom, Solflare ou outra carteira Solana para navegador e tente novamente.",
       "safety": "O World of ClaudeCraft nunca pede sua frase de recuperação nem sua chave privada.",
       "continueWith": "Continuar com {wallet}",

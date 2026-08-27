@@ -178,6 +178,8 @@ export const pt_BR: AdminTranslations = {
   "usage.cacheColEvictions": "Expulsões",
   "usage.cacheEntriesOfMax": "{entries} / {max}",
   "usage.notAvailable": "n/d",
+  "usage.metric.walletHandoffAuthorizationEvicted": "Desktop wallet handoff evictions",
+  "usage.metric.walletHandoffCreateRejected": "Desktop wallet handoff rejections",
   "usage.metric.wocBalanceApi": "Solicitações API de saldo $WOC",
   "usage.metric.wocBalanceRateLimited": "Solicitações de saldo $WOC limitadas",
   "usage.metric.wocBalanceRpc": "Leituras RPC de saldo na Solana",

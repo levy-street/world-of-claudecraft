@@ -12,83 +12,123 @@
 export const pending: Record<string, readonly string[]> = {
   "es": [
     "error.itemNameClearFailed",
-    "moderationHistory.actionClearItemName"
+    "moderationHistory.actionClearItemName",
+    "usage.metric.walletHandoffAuthorizationEvicted",
+    "usage.metric.walletHandoffCreateRejected"
   ],
   "es_ES": [
     "error.itemNameClearFailed",
-    "moderationHistory.actionClearItemName"
+    "moderationHistory.actionClearItemName",
+    "usage.metric.walletHandoffAuthorizationEvicted",
+    "usage.metric.walletHandoffCreateRejected"
   ],
   "fr_FR": [
     "error.itemNameClearFailed",
-    "moderationHistory.actionClearItemName"
+    "moderationHistory.actionClearItemName",
+    "usage.metric.walletHandoffAuthorizationEvicted",
+    "usage.metric.walletHandoffCreateRejected"
   ],
   "fr_CA": [
     "error.itemNameClearFailed",
-    "moderationHistory.actionClearItemName"
+    "moderationHistory.actionClearItemName",
+    "usage.metric.walletHandoffAuthorizationEvicted",
+    "usage.metric.walletHandoffCreateRejected"
   ],
   "en_CA": [],
   "it_IT": [
     "error.itemNameClearFailed",
-    "moderationHistory.actionClearItemName"
+    "moderationHistory.actionClearItemName",
+    "usage.metric.walletHandoffAuthorizationEvicted",
+    "usage.metric.walletHandoffCreateRejected"
   ],
   "de_DE": [
     "error.itemNameClearFailed",
-    "moderationHistory.actionClearItemName"
+    "moderationHistory.actionClearItemName",
+    "usage.metric.walletHandoffAuthorizationEvicted",
+    "usage.metric.walletHandoffCreateRejected"
   ],
   "zh_CN": [
     "error.itemNameClearFailed",
-    "moderationHistory.actionClearItemName"
+    "moderationHistory.actionClearItemName",
+    "usage.metric.walletHandoffAuthorizationEvicted",
+    "usage.metric.walletHandoffCreateRejected"
   ],
   "zh_TW": [
     "error.itemNameClearFailed",
-    "moderationHistory.actionClearItemName"
+    "moderationHistory.actionClearItemName",
+    "usage.metric.walletHandoffAuthorizationEvicted",
+    "usage.metric.walletHandoffCreateRejected"
   ],
   "ko_KR": [
     "error.itemNameClearFailed",
-    "moderationHistory.actionClearItemName"
+    "moderationHistory.actionClearItemName",
+    "usage.metric.walletHandoffAuthorizationEvicted",
+    "usage.metric.walletHandoffCreateRejected"
   ],
   "ja_JP": [
     "error.itemNameClearFailed",
-    "moderationHistory.actionClearItemName"
+    "moderationHistory.actionClearItemName",
+    "usage.metric.walletHandoffAuthorizationEvicted",
+    "usage.metric.walletHandoffCreateRejected"
   ],
   "pt_BR": [
     "error.itemNameClearFailed",
-    "moderationHistory.actionClearItemName"
+    "moderationHistory.actionClearItemName",
+    "usage.metric.walletHandoffAuthorizationEvicted",
+    "usage.metric.walletHandoffCreateRejected"
   ],
   "ru_RU": [
     "error.itemNameClearFailed",
-    "moderationHistory.actionClearItemName"
+    "moderationHistory.actionClearItemName",
+    "usage.metric.walletHandoffAuthorizationEvicted",
+    "usage.metric.walletHandoffCreateRejected"
   ],
   "cs_CZ": [
     "error.itemNameClearFailed",
-    "moderationHistory.actionClearItemName"
+    "moderationHistory.actionClearItemName",
+    "usage.metric.walletHandoffAuthorizationEvicted",
+    "usage.metric.walletHandoffCreateRejected"
   ],
   "nl_NL": [
     "error.itemNameClearFailed",
-    "moderationHistory.actionClearItemName"
+    "moderationHistory.actionClearItemName",
+    "usage.metric.walletHandoffAuthorizationEvicted",
+    "usage.metric.walletHandoffCreateRejected"
   ],
   "pl_PL": [
     "error.itemNameClearFailed",
-    "moderationHistory.actionClearItemName"
+    "moderationHistory.actionClearItemName",
+    "usage.metric.walletHandoffAuthorizationEvicted",
+    "usage.metric.walletHandoffCreateRejected"
   ],
   "id_ID": [
     "error.itemNameClearFailed",
-    "moderationHistory.actionClearItemName"
+    "moderationHistory.actionClearItemName",
+    "usage.metric.walletHandoffAuthorizationEvicted",
+    "usage.metric.walletHandoffCreateRejected"
   ],
   "tr_TR": [
     "error.itemNameClearFailed",
-    "moderationHistory.actionClearItemName"
+    "moderationHistory.actionClearItemName",
+    "usage.metric.walletHandoffAuthorizationEvicted",
+    "usage.metric.walletHandoffCreateRejected"
   ],
   "sv_SE": [
     "error.itemNameClearFailed",
-    "moderationHistory.actionClearItemName"
+    "moderationHistory.actionClearItemName",
+    "usage.metric.walletHandoffAuthorizationEvicted",
+    "usage.metric.walletHandoffCreateRejected"
   ],
   "vi_VN": [
     "error.itemNameClearFailed",
-    "moderationHistory.actionClearItemName"
+    "moderationHistory.actionClearItemName",
+    "usage.metric.walletHandoffAuthorizationEvicted",
+    "usage.metric.walletHandoffCreateRejected"
   ],
   "da_DK": [
     "error.itemNameClearFailed",
-    "moderationHistory.actionClearItemName"
+    "moderationHistory.actionClearItemName",
+    "usage.metric.walletHandoffAuthorizationEvicted",
+    "usage.metric.walletHandoffCreateRejected"
   ]
 };

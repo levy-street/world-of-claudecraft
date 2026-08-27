@@ -7538,6 +7538,7 @@ export const zh_CN: EnTranslations = {
       "title": "连接 Solana 钱包",
       "linkBody": "在此浏览器中选择钱包扩展。签署验证消息后返回桌面应用。",
       "paymentBody": "选择已关联到账号的钱包，并在此浏览器中批准交易。",
+      "stepUpBody": "选择已关联到账号的钱包，并签署 $WOC 交易所的授权消息。签名免费，不会转移任何资金。",
       "extensionHelp": "未找到兼容的钱包扩展。请安装或解锁 Phantom、Solflare 或其他 Solana 浏览器钱包，然后重试。",
       "safety": "World of ClaudeCraft 绝不会索要助记词或私钥。",
       "continueWith": "使用 {wallet} 继续",

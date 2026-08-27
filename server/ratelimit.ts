@@ -284,12 +284,18 @@ export function resetRateLimits(): void {
 
 export const CARD_UPLOAD_MAX_PER_MINUTE = 10;
 export const WALLET_LINK_MAX_PER_MINUTE = 10;
+// The desktop handoff result poll runs at 1 Hz per signing attempt (60/min),
+// woken early by the deep-link return; this cap admits two concurrent
+// handoffs plus headroom while ending an unmetered poll loop.
+export const WALLET_HANDOFF_RESULT_MAX_PER_MINUTE = 150;
 export const SEEKER_SPIN_VERIFY_MAX_PER_MINUTE = 5;
 
 const cardUploadIpAttempts = new Map<string, number[]>();
 const cardUploadAccountAttempts = new Map<number, number[]>();
 const walletLinkIpAttempts = new Map<string, number[]>();
 const walletLinkAccountAttempts = new Map<number, number[]>();
+const walletHandoffResultIpAttempts = new Map<string, number[]>();
+const walletHandoffResultAccountAttempts = new Map<number, number[]>();
 const seekerSpinVerifyIpAttempts = new Map<string, number[]>();
 const seekerSpinVerifyAccountAttempts = new Map<number, number[]>();
 
@@ -494,6 +500,29 @@ export function walletLinkRateLimited(
     WALLET_LINK_MAX_PER_MINUTE,
   );
   return mergeFusedOutcomes(ip, account);
+}
+
+export function walletHandoffResultRateLimited(
+  req: http.IncomingMessage,
+  accountId: number,
+): RateLimitOutcome {
+  const ip = recordSlidingWindowAttempt(
+    walletHandoffResultIpAttempts,
+    requestIp(req),
+    WALLET_HANDOFF_RESULT_MAX_PER_MINUTE,
+  );
+  const account = recordSlidingWindowAttempt(
+    walletHandoffResultAccountAttempts,
+    accountId,
+    WALLET_HANDOFF_RESULT_MAX_PER_MINUTE,
+  );
+  return mergeFusedOutcomes(ip, account);
+}
+
+/** Reset the desktop handoff result-poll throttle. Test-only. */
+export function resetWalletHandoffResultRateLimits(): void {
+  walletHandoffResultIpAttempts.clear();
+  walletHandoffResultAccountAttempts.clear();
 }
 
 /** Reset wallet-link verification throttles. Test-only: keeps scoped buckets isolated. */

@@ -16,7 +16,8 @@
 
 ## What
 
-An optional, browser-only auction house where eligible items are sold for $WOC.
+An optional auction house, on browser web and the website-distributed desktop
+app, where eligible items are sold for $WOC.
 Sellers and bidders agree on a USD value; the number of $WOC tokens required is
 calculated only when payment is requested, from a quote issued by the economy
 service. The game is not pegging $WOC to USD: a $100 auction stays a $100
@@ -293,9 +294,20 @@ bank gate on.
 
 ### Platforms, realms, configuration
 
-- Browser web only (website desktop and mobile web). Electron desktop, Steam,
-  and Capacitor iOS/Android stay fail-closed, tighter than the wallet-link
-  gate, matching the proposal's browser-only scope.
+- Browser web (desktop and mobile web) plus the website-distributed Electron
+  desktop app, which is functionally a desktop browser we ship ourselves.
+  Steam and Epic desktop builds and Capacitor iOS/Android stay fail-closed:
+  tradeable-token functionality is against both stores' terms of service, so
+  those builds must never show any Exchange surface, even disabled or teased.
+  The desktop gate reads the shell's distribution stamp through the preload
+  bridge (`wocExchangeSupported`) and fails closed when the stamp is absent,
+  unknown, or unreadable, treating such a build as a store build. On the
+  website desktop build both Exchange signatures (the step-up challenge and
+  the payment transaction) ride the existing external-browser wallet handoff:
+  the server pre-registers each issued challenge and payable quote, the
+  desktop app opens the player's browser with a single-use code, and the
+  browser wallet signs the server-stored bytes (never renderer-supplied
+  ones). Browser web keeps the in-page wallet flow unchanged.
 - Listings, custody, and sales history are realm-scoped like the World Market;
   wallets, bonds, strikes, and suspensions are account-scoped.
 - The service is configurable by server: the existing server runs the

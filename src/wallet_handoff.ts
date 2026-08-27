@@ -6,7 +6,11 @@ import {
   onBrowserWalletRegistered,
 } from './net/wallet_handoff_browser';
 import { ensureLocaleLoaded, getLanguage, languageTag, t } from './ui/i18n';
-import { authorizeWalletHandoff, type WalletHandoffClaim } from './wallet_handoff_authorization';
+import {
+  authorizeWalletHandoff,
+  type WalletHandoffClaim,
+  walletHandoffBodyKey,
+} from './wallet_handoff_authorization';
 import { replaceWalletHandoffContent } from './wallet_handoff_focus';
 
 const root = document.querySelector<HTMLElement>('#wallet-handoff-root');
@@ -67,9 +71,7 @@ function renderWallets(): void {
       `<img class="wallet-handoff-logo" src="/woc_logo_square.webp" alt="">` +
       `<p class="wallet-handoff-eyebrow">${escapeHtml(t('wallet.browser.eyebrow'))}</p>` +
       `<h1>${escapeHtml(t('wallet.browser.title'))}</h1>` +
-      `<p>${escapeHtml(
-        claim.kind === 'link' ? t('wallet.browser.linkBody') : t('wallet.browser.paymentBody'),
-      )}</p>` +
+      `<p>${escapeHtml(t(walletHandoffBodyKey(claim.kind)))}</p>` +
       `<div class="wallet-handoff-options">${buttons}</div>` +
       (wallets.length === 0
         ? `<p class="wallet-handoff-help">${escapeHtml(t('wallet.browser.extensionHelp'))}</p>`

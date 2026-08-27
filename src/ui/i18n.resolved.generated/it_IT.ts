@@ -7538,6 +7538,7 @@ export const it_IT: EnTranslations = {
       "title": "Connetti un portafoglio Solana",
       "linkBody": "Scegli un'estensione portafoglio in questo browser. Firmerai un messaggio di verifica, poi tornerai all'app desktop.",
       "paymentBody": "Scegli il portafoglio collegato al tuo account e approva la transazione in questo browser.",
+      "stepUpBody": "Choose the wallet linked to your account and sign the $WOC Exchange authorization message. Signing is free and moves no funds.",
       "extensionHelp": "Nessuna estensione portafoglio compatibile trovata. Installa o sblocca Phantom, Solflare o un altro portafoglio Solana per browser, poi riprova.",
       "safety": "World of ClaudeCraft non chiede mai la tua frase di recupero o chiave privata.",
       "continueWith": "Continua con {wallet}",

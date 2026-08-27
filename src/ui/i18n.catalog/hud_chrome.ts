@@ -5947,7 +5947,8 @@ export const hudChromeStrings = {
     minLevelNote: 'Requires level {level}',
   },
   // The $WOC Exchange window (docs/prd/woc/marketplace.md): USD-denominated
-  // auctions settled in $WOC, browser-web only, config-gated server-side.
+  // auctions settled in $WOC, browser web + website desktop only,
+  // config-gated server-side.
   // Every USD amount renders through formatNumber currency options and every
   // timestamp through formatDateTime (UTC plus local, per the PRD); the
   // window never composes numbers into these strings by concatenation.

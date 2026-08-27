@@ -129,6 +129,8 @@ describe('the drift pin: every mapped literal exists verbatim in a bridge source
     // The desktop shell's browser hand-off (the Claudium checkout rides it on
     // Electron).
     'src/net/desktop_wallet_handoff.ts',
+    // The Exchange signers' desktop arm rides the same hand-off.
+    'src/game/woc_market_wiring.ts',
   ];
   // main.ts owns two more of the hand-off's throw strings; it joins RAW (the
   // judged main.ts-pin posture: its glob strings carry comment markers no

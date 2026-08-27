@@ -178,6 +178,8 @@ export const ja_JP: AdminTranslations = {
   "usage.cacheColEvictions": "削除",
   "usage.cacheEntriesOfMax": "{entries} / {max}",
   "usage.notAvailable": "なし",
+  "usage.metric.walletHandoffAuthorizationEvicted": "Desktop wallet handoff evictions",
+  "usage.metric.walletHandoffCreateRejected": "Desktop wallet handoff rejections",
   "usage.metric.wocBalanceApi": "$WOC残高APIリクエスト",
   "usage.metric.wocBalanceRateLimited": "$WOC残高の制限リクエスト",
   "usage.metric.wocBalanceRpc": "Solana RPC残高読み取り",

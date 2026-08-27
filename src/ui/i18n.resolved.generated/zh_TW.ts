@@ -7538,6 +7538,7 @@ export const zh_TW: EnTranslations = {
       "title": "連接 Solana 錢包",
       "linkBody": "在此瀏覽器中選擇錢包擴充功能。簽署驗證訊息後返回桌面應用程式。",
       "paymentBody": "選擇已連結至帳號的錢包，並在此瀏覽器中核准交易。",
+      "stepUpBody": "選擇已連結至帳號的錢包，並簽署 $WOC 交易所的授權訊息。簽署免費，不會轉移任何資金。",
       "extensionHelp": "找不到相容的錢包擴充功能。請安裝或解鎖 Phantom、Solflare 或其他 Solana 瀏覽器錢包，然後再試一次。",
       "safety": "World of ClaudeCraft 絕不會要求復原短語或私鑰。",
       "continueWith": "使用 {wallet} 繼續",

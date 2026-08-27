@@ -178,6 +178,8 @@ export const cs_CZ: AdminTranslations = {
   "usage.cacheColEvictions": "Vyřazení",
   "usage.cacheEntriesOfMax": "{entries} / {max}",
   "usage.notAvailable": "není k dispozici",
+  "usage.metric.walletHandoffAuthorizationEvicted": "Desktop wallet handoff evictions",
+  "usage.metric.walletHandoffCreateRejected": "Desktop wallet handoff rejections",
   "usage.metric.wocBalanceApi": "Požadavky API na zůstatek $WOC",
   "usage.metric.wocBalanceRateLimited": "Požadavky na zůstatek $WOC omezené limitem",
   "usage.metric.wocBalanceRpc": "Čtení zůstatku přes Solana RPC",

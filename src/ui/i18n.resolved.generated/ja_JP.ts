@@ -7538,6 +7538,7 @@ export const ja_JP: EnTranslations = {
       "title": "Solanaウォレットを接続",
       "linkBody": "このブラウザでウォレット拡張機能を選択してください。確認メッセージに署名した後、デスクトップアプリに戻ります。",
       "paymentBody": "アカウントにリンクされたウォレットを選択し、このブラウザで取引を承認してください。",
+      "stepUpBody": "アカウントにリンクされたウォレットを選択し、$WOC 取引所の承認メッセージに署名してください。署名は無料で、資金は移動しません。",
       "extensionHelp": "対応するウォレット拡張機能が見つかりません。Phantom、Solflare、または別のSolanaブラウザウォレットをインストールまたはロック解除して、再試行してください。",
       "safety": "World of ClaudeCraftがリカバリーフレーズや秘密鍵を求めることはありません。",
       "continueWith": "{wallet}で続行",

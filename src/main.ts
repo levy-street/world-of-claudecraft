@@ -197,7 +197,11 @@ import {
   sortCharacters,
 } from './net/char_sort';
 import { charselectPrimaryAction } from './net/charselect_action';
-import { performDesktopWalletHandoff } from './net/desktop_wallet_handoff';
+import {
+  authorizeDesktopWalletHandoff,
+  type DesktopWalletBrowserAction,
+  desktopWalletHandoffAvailable,
+} from './net/desktop_wallet_handoff';
 import {
   desktopWalletManagerAction,
   desktopWalletManagerView,
@@ -3380,8 +3384,12 @@ async function startGame(
       hud,
       api,
       online,
-      wallet: { linkedPubkey: () => linkedWalletPubkey, load: loadWallet },
-    });
+      wallet: {
+        linkedPubkey: () => linkedWalletPubkey,
+        load: loadWallet,
+        desktopAuthorize: desktopWalletBrowserHandoffAvailable() ? wocDesktopAuthorize : null,
+      },
+    }).catch((err) => console.warn('[woc] exchange attach failed', err));
     if (!NATIVE_APP) {
       hud.attachClaudium(claudiumHooks);
       if (
@@ -7934,25 +7942,16 @@ let walletHiddenNoticeTimeout: number | null = null;
 let desktopWalletBrowserSessionActive = false;
 
 function desktopWalletBrowserHandoffAvailable(): boolean {
-  const bridge = DESKTOP_APP ? desktopBridge() : null;
-  return !!bridge?.openWalletBrowser;
+  return desktopWalletHandoffAvailable(DESKTOP_APP, DESKTOP_APP ? desktopBridge() : null);
 }
-
-async function authorizeDesktopWalletInBrowser(
-  action: { kind: 'link' } | { kind: 'transaction'; reference: string; expectedAddress: string },
-) {
-  const bridge = desktopBridge();
-  const openWalletBrowser = bridge?.openWalletBrowser;
-  if (!openWalletBrowser) throw new Error('desktop wallet browser is unavailable');
-  const takeWalletHandoffCode = bridge.takeWalletHandoffCode;
-  const onWalletHandoffCode = bridge.onWalletHandoffCode;
-  const result = await performDesktopWalletHandoff(action, api, {
-    openWalletBrowser: (code) => openWalletBrowser(code),
-    takeWalletHandoffCode: takeWalletHandoffCode ? () => takeWalletHandoffCode() : undefined,
-    onWalletHandoffCode: onWalletHandoffCode
-      ? (callback) => onWalletHandoffCode(callback)
-      : undefined,
-  });
+function authorizeDesktopWalletInBrowser(action: DesktopWalletBrowserAction) {
+  return authorizeDesktopWalletHandoff(action, api, desktopBridge());
+}
+// Exchange signers' desktop arm (woc_market_wiring.ts): handoff + session flag.
+async function wocDesktopAuthorize(action: DesktopWalletBrowserAction) {
+  const result = await authorizeDesktopWalletInBrowser(action);
+  desktopWalletBrowserSessionActive = true;
+  updateWalletButton();
   return result;
 }
 

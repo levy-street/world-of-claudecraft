@@ -986,8 +986,12 @@ describe('woc_market_window: listing requires the wallet step-up (B6/R1)', () =>
       'private async payBond(',
     );
     const iChallenge = submit.indexOf('client.stepUpChallenge({');
-    const iSign = submit.indexOf('hooks.signMessageBase58(issued.challenge.message)');
+    const iSign = submit.indexOf('hooks.signMessageBase58(');
     const iCreate = submit.indexOf('client.createListing({');
+    // The signer receives the SERVER message and the challenge nonce (the
+    // desktop arm resolves the server-stored message by that nonce).
+    expect(submit).toContain('issued.challenge.message,');
+    expect(submit).toContain('issued.challenge.nonce,');
     expect(iChallenge, 'the challenge mint').toBeGreaterThanOrEqual(0);
     expect(iSign, 'the wallet signs the server message, never client text').toBeGreaterThan(
       iChallenge,

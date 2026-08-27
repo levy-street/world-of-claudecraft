@@ -7538,6 +7538,7 @@ export const nl_NL: EnTranslations = {
       "title": "Een Solana-portemonnee verbinden",
       "linkBody": "Kies een portemonnee-extensie in deze browser. Je tekent een verificatiebericht en keert dan terug naar de desktop-app.",
       "paymentBody": "Kies de aan je account gekoppelde portemonnee en keur de transactie goed in deze browser.",
+      "stepUpBody": "Choose the wallet linked to your account and sign the $WOC Exchange authorization message. Signing is free and moves no funds.",
       "extensionHelp": "Geen compatibele portemonnee-extensie gevonden. Installeer of ontgrendel Phantom, Solflare of een andere Solana-browserportemonnee en probeer het opnieuw.",
       "safety": "World of ClaudeCraft vraagt nooit naar je herstelzin of privésleutel.",
       "continueWith": "Doorgaan met {wallet}",

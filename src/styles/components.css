@@ -16187,7 +16187,7 @@
   }
   /* ---------- The $WOC Exchange ---------- */
   /* Cold window (src/ui/woc_market_window.ts): USD-denominated auctions settled
-     in $WOC, browser-web only. Store-surface grammar (DESIGN.md 8.2) on the
+     in $WOC, browser web + website desktop only. Store-surface grammar (DESIGN.md 8.2) on the
      THEMED tokens: every fill, edge and text colour below is a themeCssVars
      derivation (--panel-base / --color-bg-dark / --border / --color-accent /
      the text pair), so the parchment and midnight presets stay readable, and

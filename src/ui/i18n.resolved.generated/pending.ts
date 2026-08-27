@@ -475,6 +475,7 @@ export const pending: Record<string, readonly string[]> = {
     "itemUi.tooltip.useFeastBuffAura",
     "itemUi.tooltip.wellFed",
     "itemUi.tooltip.wellFedAura",
+    "wallet.browser.stepUpBody",
     "worldContent.farmPatchName"
   ],
   "es_ES": [
@@ -943,6 +944,7 @@ export const pending: Record<string, readonly string[]> = {
     "itemUi.tooltip.useFeastBuffAura",
     "itemUi.tooltip.wellFed",
     "itemUi.tooltip.wellFedAura",
+    "wallet.browser.stepUpBody",
     "worldContent.farmPatchName"
   ],
   "fr_FR": [
@@ -1426,6 +1428,7 @@ export const pending: Record<string, readonly string[]> = {
     "itemUi.tooltip.useFeastBuffAura",
     "itemUi.tooltip.wellFed",
     "itemUi.tooltip.wellFedAura",
+    "wallet.browser.stepUpBody",
     "worldContent.farmPatchName"
   ],
   "fr_CA": [
@@ -1909,6 +1912,7 @@ export const pending: Record<string, readonly string[]> = {
     "itemUi.tooltip.useFeastBuffAura",
     "itemUi.tooltip.wellFed",
     "itemUi.tooltip.wellFedAura",
+    "wallet.browser.stepUpBody",
     "worldContent.farmPatchName"
   ],
   "en_CA": [],
@@ -2397,6 +2401,7 @@ export const pending: Record<string, readonly string[]> = {
     "itemUi.tooltip.useFeastBuffAura",
     "itemUi.tooltip.wellFed",
     "itemUi.tooltip.wellFedAura",
+    "wallet.browser.stepUpBody",
     "worldContent.farmPatchName"
   ],
   "de_DE": [
@@ -2893,6 +2898,7 @@ export const pending: Record<string, readonly string[]> = {
     "itemUi.tooltip.useFeastBuffAura",
     "itemUi.tooltip.wellFed",
     "itemUi.tooltip.wellFedAura",
+    "wallet.browser.stepUpBody",
     "worldContent.farmPatchName"
   ],
   "zh_CN": [
@@ -3410,6 +3416,7 @@ export const pending: Record<string, readonly string[]> = {
     "itemUi.tooltip.useFeastBuffAura",
     "itemUi.tooltip.wellFed",
     "itemUi.tooltip.wellFedAura",
+    "wallet.browser.stepUpBody",
     "worldContent.farmPatchName"
   ],
   "ru_RU": [
@@ -3913,6 +3920,7 @@ export const pending: Record<string, readonly string[]> = {
     "itemUi.tooltip.useFeastBuffAura",
     "itemUi.tooltip.wellFed",
     "itemUi.tooltip.wellFedAura",
+    "wallet.browser.stepUpBody",
     "worldContent.farmPatchName"
   ],
   "nl_NL": [
@@ -4409,6 +4417,7 @@ export const pending: Record<string, readonly string[]> = {
     "itemUi.tooltip.useFeastBuffAura",
     "itemUi.tooltip.wellFed",
     "itemUi.tooltip.wellFedAura",
+    "wallet.browser.stepUpBody",
     "worldContent.farmPatchName"
   ],
   "pl_PL": [
@@ -4891,6 +4900,7 @@ export const pending: Record<string, readonly string[]> = {
     "itemUi.tooltip.useFeastBuffAura",
     "itemUi.tooltip.wellFed",
     "itemUi.tooltip.wellFedAura",
+    "wallet.browser.stepUpBody",
     "worldContent.farmPatchName"
   ],
   "id_ID": [
@@ -5361,6 +5371,7 @@ export const pending: Record<string, readonly string[]> = {
     "itemUi.tooltip.useFeastBuffAura",
     "itemUi.tooltip.wellFed",
     "itemUi.tooltip.wellFedAura",
+    "wallet.browser.stepUpBody",
     "worldContent.farmPatchName"
   ],
   "tr_TR": [
@@ -5842,6 +5853,7 @@ export const pending: Record<string, readonly string[]> = {
     "itemUi.tooltip.useFeastBuffAura",
     "itemUi.tooltip.wellFed",
     "itemUi.tooltip.wellFedAura",
+    "wallet.browser.stepUpBody",
     "worldContent.farmPatchName"
   ],
   "sv_SE": [
@@ -6336,6 +6348,7 @@ export const pending: Record<string, readonly string[]> = {
     "itemUi.tooltip.useFeastBuffAura",
     "itemUi.tooltip.wellFed",
     "itemUi.tooltip.wellFedAura",
+    "wallet.browser.stepUpBody",
     "worldContent.farmPatchName"
   ],
   "vi_VN": [
@@ -6812,6 +6825,7 @@ export const pending: Record<string, readonly string[]> = {
     "itemUi.tooltip.useFeastBuffAura",
     "itemUi.tooltip.wellFed",
     "itemUi.tooltip.wellFedAura",
+    "wallet.browser.stepUpBody",
     "worldContent.farmPatchName"
   ],
   "da_DK": [
@@ -7315,6 +7329,7 @@ export const pending: Record<string, readonly string[]> = {
     "itemUi.tooltip.useFeastBuffAura",
     "itemUi.tooltip.wellFed",
     "itemUi.tooltip.wellFedAura",
+    "wallet.browser.stepUpBody",
     "worldContent.farmPatchName"
   ]
 };

@@ -1772,6 +1772,8 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     'このブラウザでウォレット拡張機能を選択してください。確認メッセージに署名した後、デスクトップアプリに戻ります。',
   'wallet.browser.paymentBody':
     'アカウントにリンクされたウォレットを選択し、このブラウザで取引を承認してください。',
+  'wallet.browser.stepUpBody':
+    'アカウントにリンクされたウォレットを選択し、$WOC 取引所の承認メッセージに署名してください。署名は無料で、資金は移動しません。',
   'wallet.browser.extensionHelp':
     '対応するウォレット拡張機能が見つかりません。Phantom、Solflare、または別のSolanaブラウザウォレットをインストールまたはロック解除して、再試行してください。',
   'wallet.browser.safety':

@@ -5134,8 +5134,8 @@ export class Hud {
     onVisibilityChange: () => this.syncAnyWindowOpenState(),
     maskPlayerText: (text) => this.maskChat(text),
   });
-  // The $WOC Exchange is online and browser-web only. Its launcher stays hidden until
-  // main.ts attaches hooks, excluding Steam/Electron/Capacitor and offline play.
+  // The $WOC Exchange is online-only, browser web + website desktop. Its launcher
+  // stays hidden until main.ts attaches hooks (no Steam/Epic/Capacitor/offline).
   private wocMarketHooks: WocMarketHooks | null = null;
 
   // The trade window and its $WOC arm live in the woc_trade domain
@@ -16881,8 +16881,8 @@ export class Hud {
     this.refreshDailyRewardsLauncher(true);
   }
 
-  /** Inject the $WOC Exchange hooks (main.ts, online + browser-web only) and
-   *  reveal its launcher; without this call the surface stays fully absent. */
+  /** Inject the $WOC Exchange hooks (main.ts, online, browser web + website
+   *  desktop only) and reveal its launcher; else the surface stays absent. */
   attachWocMarket(hooks: WocMarketHooks): void {
     this.wocMarketHooks = hooks;
     for (const id of ['mm-wocmarket', 'mobile-wocmarket']) {
