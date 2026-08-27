@@ -2046,7 +2046,9 @@ export const en: EnTranslations = {
       "chainArc": "blasts the target with a {school} {name} ({damage}) that leaps to {jumps} nearby foes for decaying damage",
       "attackSlow": "and slows the target attack speed by {pct}% for {duration} sec",
       "dot": "festers {name}, a {school} damage-over-time dealing {total} over {duration} sec",
-      "hot": "blooms {name}, a heal-over-time restoring {total} over {duration} sec"
+      "hot": "blooms {name}, a heal-over-time restoring {total} over {duration} sec",
+      "selfBuff": "grants you {name} ({value}) for {duration} sec",
+      "selfHeal": "and restores {total} health to you"
     },
     "questShare": {
       "notShareable": "This quest can't be shared.",

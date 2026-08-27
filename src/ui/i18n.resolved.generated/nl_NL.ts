@@ -2046,7 +2046,9 @@ export const nl_NL: EnTranslations = {
       "chainArc": "treft het doelwit met een {school} {name} ({damage}) die naar {jumps} nabije vijanden springt voor afnemende schade",
       "attackSlow": "en verlaagt de aanvalssnelheid van het doelwit met {pct}% gedurende {duration} sec",
       "dot": "laat {name} etteren, een {school} schade-over-tijd die {total} toebrengt gedurende {duration} sec",
-      "hot": "laat {name} ontluiken, een genezing-over-tijd die {total} herstelt gedurende {duration} sec"
+      "hot": "laat {name} ontluiken, een genezing-over-tijd die {total} herstelt gedurende {duration} sec",
+      "selfBuff": "grants you {name} ({value}) for {duration} sec",
+      "selfHeal": "and restores {total} health to you"
     },
     "questShare": {
       "notShareable": "Deze queeste kan niet gedeeld worden.",

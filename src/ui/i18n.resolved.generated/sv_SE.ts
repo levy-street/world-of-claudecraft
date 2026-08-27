@@ -2046,7 +2046,9 @@ export const sv_SE: EnTranslations = {
       "chainArc": "träffar målet med en {school} {name} ({damage}) som hoppar till {jumps} närliggande fiender med avtagande skada",
       "attackSlow": "och saktar målets attackhastighet med {pct}% i {duration} sek",
       "dot": "sätter {name}, en {school} skada över tid som vållar {total} över {duration} sek",
-      "hot": "blommar {name}, en läkning över tid som återställer {total} över {duration} sek"
+      "hot": "blommar {name}, en läkning över tid som återställer {total} över {duration} sek",
+      "selfBuff": "grants you {name} ({value}) for {duration} sec",
+      "selfHeal": "and restores {total} health to you"
     },
     "questShare": {
       "notShareable": "Det här uppdraget kan inte delas.",

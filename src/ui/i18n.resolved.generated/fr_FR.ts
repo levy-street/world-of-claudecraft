@@ -2046,7 +2046,9 @@ export const fr_FR: EnTranslations = {
       "chainArc": "frappe la cible avec un {name} {school} ({damage}) qui bondit sur {jumps} ennemis proches pour des dégâts décroissants",
       "attackSlow": "et ralentit la vitesse d'attaque de la cible de {pct}% pendant {duration} s",
       "dot": "provoque {name}, des dégâts de {school} sur la durée infligeant {total} sur {duration} s",
-      "hot": "fait éclore {name}, un soin sur la durée restaurant {total} sur {duration} s"
+      "hot": "fait éclore {name}, un soin sur la durée restaurant {total} sur {duration} s",
+      "selfBuff": "grants you {name} ({value}) for {duration} sec",
+      "selfHeal": "and restores {total} health to you"
     },
     "questShare": {
       "notShareable": "Cette quête ne peut pas être partagée.",

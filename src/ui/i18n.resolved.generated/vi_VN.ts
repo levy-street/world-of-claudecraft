@@ -2046,7 +2046,9 @@ export const vi_VN: EnTranslations = {
       "chainArc": "oanh kích mục tiêu bằng một {name} hệ {school} ({damage}) nảy sang {jumps} kẻ địch gần đó với sát thương giảm dần",
       "attackSlow": "và làm chậm tốc độ tấn công của mục tiêu thêm {pct}% trong {duration} giây",
       "dot": "gieo rắc {name}, một hiệu ứng sát thương theo thời gian hệ {school} gây {total} trong {duration} giây",
-      "hot": "làm nở rộ {name}, một hiệu ứng hồi máu theo thời gian phục hồi {total} trong {duration} giây"
+      "hot": "làm nở rộ {name}, một hiệu ứng hồi máu theo thời gian phục hồi {total} trong {duration} giây",
+      "selfBuff": "grants you {name} ({value}) for {duration} sec",
+      "selfHeal": "and restores {total} health to you"
     },
     "questShare": {
       "notShareable": "Nhiệm vụ này không thể chia sẻ.",

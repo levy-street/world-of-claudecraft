@@ -9103,6 +9103,8 @@ export type TranslationKeyFlat =
   | 'hudChrome.itemProc.onHeal'
   | 'hudChrome.itemProc.onMeleeHit'
   | 'hudChrome.itemProc.onSpellDamage'
+  | 'hudChrome.itemProc.selfBuff'
+  | 'hudChrome.itemProc.selfHeal'
   | 'hudChrome.itemSet.bonusLine'
   | 'hudChrome.itemSet.header'
   | 'hudChrome.itemShare.linkHint'

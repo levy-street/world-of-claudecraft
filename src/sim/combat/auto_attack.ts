@@ -687,12 +687,13 @@ export function meleeSwing(
       );
     }
   }
-  // Legendary on-hit weapon procs (e.g. Thronebane's Chain Arc). No-op (no rng
-  // draw) unless the SWINGING hand's weapon carries a weaponHit proc: an
-  // off-hand swing rolls the OFF-HAND weapon's procs, not the mainhand's (the
-  // dual-wield bug). Ability strikes (autoAttackHand undefined) use the mainhand.
-  const procWeaponId =
-    opts.autoAttackHand === 'offhand' ? attacker.offhandItemId : attacker.mainhandItemId;
-  runWeaponProcs(ctx, attacker, target, 'weaponHit', procWeaponId);
+  // On-hit weapon procs (legendary weaponProcs plus a proc enchant on the
+  // swinging hand's worn copy). No-op (no rng draw) unless that hand carries
+  // one: an off-hand swing rolls the OFF-HAND weapon's procs and enchant,
+  // not the mainhand's (the dual-wield bug). Ability strikes (autoAttackHand
+  // undefined) use the mainhand.
+  const procHand = opts.autoAttackHand === 'offhand' ? 'offhand' : 'mainhand';
+  const procWeaponId = procHand === 'offhand' ? attacker.offhandItemId : attacker.mainhandItemId;
+  runWeaponProcs(ctx, attacker, target, 'weaponHit', procWeaponId, procHand);
   return true;
 }

@@ -2046,7 +2046,9 @@ export const tr_TR: EnTranslations = {
       "chainArc": "hedefi, {jumps} yakındaki düşmana sıçrayıp azalan hasar veren bir {school} {name} ({damage}) ile vurur",
       "attackSlow": "ve hedefin saldırı hızını {duration} sn boyunca %{pct} yavaşlatır",
       "dot": "{name} yaratır, {duration} sn boyunca {total} veren bir {school} zamana yayılı hasar etkisi",
-      "hot": "{name} açtırır, {duration} sn boyunca {total} geri kazandıran zamana yayılı bir iyileştirme"
+      "hot": "{name} açtırır, {duration} sn boyunca {total} geri kazandıran zamana yayılı bir iyileştirme",
+      "selfBuff": "grants you {name} ({value}) for {duration} sec",
+      "selfHeal": "and restores {total} health to you"
     },
     "questShare": {
       "notShareable": "Bu görev paylaşılamaz.",

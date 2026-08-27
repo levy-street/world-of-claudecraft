@@ -2046,7 +2046,9 @@ export const zh_CN: EnTranslations = {
       "chainArc": "以{school}{name}（{damage}）轰击目标，并跳跃至{jumps}个附近敌人，造成递减伤害",
       "attackSlow": "并使目标攻击速度降低{pct}%，持续{duration}秒",
       "dot": "引发{name}，一种{school}持续伤害效果，在{duration}秒内造成{total}点伤害",
-      "hot": "绽放{name}，一种持续治疗效果，在{duration}秒内恢复{total}点生命"
+      "hot": "绽放{name}，一种持续治疗效果，在{duration}秒内恢复{total}点生命",
+      "selfBuff": "grants you {name} ({value}) for {duration} sec",
+      "selfHeal": "and restores {total} health to you"
     },
     "questShare": {
       "notShareable": "该任务无法分享。",

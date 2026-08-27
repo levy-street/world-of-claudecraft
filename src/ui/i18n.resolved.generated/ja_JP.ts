@@ -2046,7 +2046,9 @@ export const ja_JP: EnTranslations = {
       "chainArc": "{school}の{name}（{damage}）で対象を撃ち、近くの敵{jumps}体に減衰しながら連鎖する",
       "attackSlow": "対象の攻撃速度を{pct}%低下させる（{duration}秒）",
       "dot": "{name}を植え付け、{school}の継続ダメージで{duration}秒かけて{total}を与える",
-      "hot": "{name}を咲かせ、継続回復で{duration}秒かけて{total}を回復する"
+      "hot": "{name}を咲かせ、継続回復で{duration}秒かけて{total}を回復する",
+      "selfBuff": "grants you {name} ({value}) for {duration} sec",
+      "selfHeal": "and restores {total} health to you"
     },
     "questShare": {
       "notShareable": "このクエストは共有できません。",

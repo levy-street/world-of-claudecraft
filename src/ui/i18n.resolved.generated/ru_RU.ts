@@ -2046,7 +2046,9 @@ export const ru_RU: EnTranslations = {
       "chainArc": "поражает цель эффектом «{name}» ({school}, {damage}) и перескакивает на {jumps} ближайших врагов с затухающим уроном",
       "attackSlow": "и снижает скорость атаки цели на {pct}% на {duration} сек",
       "dot": "вызывает «{name}», периодический урон ({school}), нанося {total} за {duration} сек",
-      "hot": "распускает «{name}», периодическое исцеление, восполняя {total} за {duration} сек"
+      "hot": "распускает «{name}», периодическое исцеление, восполняя {total} за {duration} сек",
+      "selfBuff": "grants you {name} ({value}) for {duration} sec",
+      "selfHeal": "and restores {total} health to you"
     },
     "questShare": {
       "notShareable": "Этим заданием нельзя поделиться.",

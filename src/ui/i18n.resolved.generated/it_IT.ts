@@ -2046,7 +2046,9 @@ export const it_IT: EnTranslations = {
       "chainArc": "colpisce il bersaglio con {name} ({school}, {damage}) che rimbalza su {jumps} nemici vicini infliggendo danno decrescente",
       "attackSlow": "e rallenta la velocità d'attacco del bersaglio del {pct}% per {duration} sec",
       "dot": "provoca {name}, un danno nel tempo di tipo {school} che infligge {total} in {duration} sec",
-      "hot": "fa sbocciare {name}, una cura nel tempo che ripristina {total} in {duration} sec"
+      "hot": "fa sbocciare {name}, una cura nel tempo che ripristina {total} in {duration} sec",
+      "selfBuff": "grants you {name} ({value}) for {duration} sec",
+      "selfHeal": "and restores {total} health to you"
     },
     "questShare": {
       "notShareable": "Questa missione non può essere condivisa.",

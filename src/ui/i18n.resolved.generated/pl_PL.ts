@@ -2046,7 +2046,9 @@ export const pl_PL: EnTranslations = {
       "chainArc": "razi cel czarem {school} {name} ({damage}), który przeskakuje na {jumps} pobliskich wrogów, zadając malejące obrażenia",
       "attackSlow": "i spowalnia szybkość ataku celu o {pct}% na {duration} s",
       "dot": "wywołuje {name}, obrażenia od {school} w czasie zadające łącznie {total} przez {duration} s",
-      "hot": "rozkwita {name}, leczenie w czasie przywracające {total} przez {duration} s"
+      "hot": "rozkwita {name}, leczenie w czasie przywracające {total} przez {duration} s",
+      "selfBuff": "grants you {name} ({value}) for {duration} sec",
+      "selfHeal": "and restores {total} health to you"
     },
     "questShare": {
       "notShareable": "Tego zadania nie można udostępnić.",

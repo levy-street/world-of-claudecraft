@@ -2046,7 +2046,9 @@ export const en_XA: EnTranslations = {
       "chainArc": "[ƀļášţš ţĥé ţáŕĝéţ ŵíţĥ á {school} {name} ({damage}) ţĥáţ ļéáþš ţó {jumps} ñéáŕƀý ƒóéš ƒóŕ ðéçáýíñĝ ðáɱáĝé]",
       "attackSlow": "[áñð šļóŵš ţĥé ţáŕĝéţ áţţáçķ šþééð ƀý {pct}% ƒóŕ {duration} šéç]",
       "dot": "[ƒéšţéŕš {name}, á {school} ðáɱáĝé-óʋéŕ-ţíɱé ðéáļíñĝ {total} óʋéŕ {duration} šéç]",
-      "hot": "[ƀļóóɱš {name}, á ĥéáļ-óʋéŕ-ţíɱé ŕéšţóŕíñĝ {total} óʋéŕ {duration} šéç]"
+      "hot": "[ƀļóóɱš {name}, á ĥéáļ-óʋéŕ-ţíɱé ŕéšţóŕíñĝ {total} óʋéŕ {duration} šéç]",
+      "selfBuff": "[ĝŕáñţš ýóú {name} ({value}) ƒóŕ {duration} šéç]",
+      "selfHeal": "[áñð ŕéšţóŕéš {total} ĥéáļţĥ ţó ýóú]"
     },
     "questShare": {
       "notShareable": "[Ţĥíš ɋúéšţ çáñ'ţ ƀé šĥáŕéð.]",

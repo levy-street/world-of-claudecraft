@@ -22,7 +22,12 @@ function fakeCtx(rollResult: boolean, nearby: any[] = []) {
     emit: (e: any) => calls.push({ fn: 'emit', args: [e] }),
     dealDamage: (...args: any[]) => calls.push({ fn: 'dealDamage', args }),
     applyAura: (...args: any[]) => calls.push({ fn: 'applyAura', args }),
+    applyHeal: (...args: any[]) => calls.push({ fn: 'applyHeal', args }),
     hostilesInRadius: (_src: any, _pos: any, _r: number) => nearby,
+    // The enchant-proc read (raid formulas): these stub wielders carry no
+    // PlayerMeta, so the striking hand can never resolve a proc enchant,
+    // exactly like a mob in the live sim.
+    resolve: (_pid?: number) => null,
   };
   return { ctx: ctx as any, calls, rolls: () => chanceRolls };
 }

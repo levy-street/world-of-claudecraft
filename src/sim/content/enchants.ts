@@ -44,7 +44,7 @@
 // per-instance data, and wiring that is a larger, separate change. `itemSlot`
 // matches ItemDef['slot'] (see src/sim/types.ts): rings declare slot 'ring',
 // every other slot names its EquipSlot directly, exactly as items do.
-import type { ItemSlot } from '../types';
+import type { ItemSlot, WeaponProc } from '../types';
 
 export interface EnchantReagent {
   itemId: string;
@@ -70,6 +70,15 @@ export interface EnchantDef {
   // resolved by the same tierForSkill ladder). Absent means 0, no floor.
   // Meaningless while acquisition is absent.
   skillReq?: number;
+  // Proc enchants (raid formulas): a chance-on-action proc carried by the
+  // ENCHANT rather than the weapon def, sharing the legendary WeaponProc
+  // shape end to end. Combat resolves it from the worn copy's instance
+  // payload (ItemInstancePayload.enchant names this def) in
+  // src/sim/combat/equip_procs.ts, rolled AFTER any legendary weaponProcs
+  // on the same swing so existing draw positions never move. Weapon-slot
+  // enchants only today (the swing/spell/heal triggers all read the
+  // striking hand).
+  proc?: WeaponProc;
 }
 
 export const ENCHANTS: Record<string, EnchantDef> = {

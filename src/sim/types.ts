@@ -1168,7 +1168,23 @@ export type WeaponProcEffect =
       perTick: number;
       interval: number;
       duration: number;
-    };
+    }
+  // A temporary buff aura on the WIELDER (the classic crusader shape: the
+  // proc empowers the striker, not the victim). `buff` names the aura kind
+  // it grants (buff_ap and friends), applied under the proc's own aura id
+  // so re-procs refresh rather than stack.
+  | {
+      kind: 'selfBuff';
+      name: string;
+      buff: AuraKind;
+      school: Aura['school'];
+      value: number;
+      duration: number;
+    }
+  // A flat instant heal on the WIELDER. Applied crit-free (draws no rng) and
+  // proc-free (never re-enters runWeaponProcs), so a heal-trigger proc can
+  // never recurse.
+  | { kind: 'selfHeal'; amount: number };
 
 export interface WeaponProc {
   id: string; // unique per item; used for the applied aura ids

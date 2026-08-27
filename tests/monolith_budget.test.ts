@@ -132,10 +132,13 @@ const MONOLITHS: MonolithRow[] = [
     // follows it down. Exact count, zero slack.
     // Lowered 18379 -> 18352: the recipe-scroll learn arm paid for its new
     // recipeScrollResult case by extracting the trainResult line building
-    // into the shared src/ui/recipe_learn_lines.ts pure core, so both learn
-    // paths render through one module and the coordinator shrank. Exact
-    // count, zero slack.
-    ceiling: 18352,
+    // into the shared src/ui/recipe_learn_lines_view.ts pure core, so both
+    // learn paths render through one module and the coordinator shrank.
+    // Exact count, zero slack.
+    // Lowered 18352 -> 18320: the proc-enchant tooltip arms paid the same
+    // way, moving procEffectText into src/ui/weapon_proc_view.ts beside the
+    // descriptors it renders. Exact count, zero slack.
+    ceiling: 18320,
     seam: 'pure view core + thin painter on PainterHost (src/ui/CLAUDE.md)',
   },
   {

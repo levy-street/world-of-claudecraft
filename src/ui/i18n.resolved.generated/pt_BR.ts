@@ -2046,7 +2046,9 @@ export const pt_BR: EnTranslations = {
       "chainArc": "atinge o alvo com um {name} de {school} ({damage}) que salta para {jumps} inimigos próximos com dano decrescente",
       "attackSlow": "e reduz a velocidade de ataque do alvo em {pct}% por {duration} s",
       "dot": "apodrece o alvo com {name}, um dano contínuo de {school} causando {total} ao longo de {duration} s",
-      "hot": "faz florescer {name}, uma cura contínua restaurando {total} ao longo de {duration} s"
+      "hot": "faz florescer {name}, uma cura contínua restaurando {total} ao longo de {duration} s",
+      "selfBuff": "grants you {name} ({value}) for {duration} sec",
+      "selfHeal": "and restores {total} health to you"
     },
     "questShare": {
       "notShareable": "Esta missão não pode ser compartilhada.",

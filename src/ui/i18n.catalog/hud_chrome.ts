@@ -2535,6 +2535,10 @@ export const hudChromeStrings = {
     attackSlow: 'and slows the target attack speed by {pct}% for {duration} sec',
     dot: 'festers {name}, a {school} damage-over-time dealing {total} over {duration} sec',
     hot: 'blooms {name}, a heal-over-time restoring {total} over {duration} sec',
+    // The self-targeted pair (proc enchants, the crusader shape): fragments
+    // compose after the trigger line like the four above.
+    selfBuff: 'grants you {name} ({value}) for {duration} sec',
+    selfHeal: 'and restores {total} health to you',
   },
   // Quest-link sharing: the chat-link affordance and its sim-emitted notices
   // (re-localized through the hud-local localizeErrorText/localizeSystemText arms).

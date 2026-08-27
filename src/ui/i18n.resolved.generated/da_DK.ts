@@ -2046,7 +2046,9 @@ export const da_DK: EnTranslations = {
       "chainArc": "rammer målet med en {school} {name} ({damage}), der springer til {jumps} nærliggende fjender for aftagende skade",
       "attackSlow": "og sænker målets angrebshastighed med {pct}% i {duration} sek.",
       "dot": "fremkalder {name}, en {school} skade-over-tid der volder {total} over {duration} sek.",
-      "hot": "udløser {name}, en helbredelse-over-tid der genopretter {total} over {duration} sek."
+      "hot": "udløser {name}, en helbredelse-over-tid der genopretter {total} over {duration} sek.",
+      "selfBuff": "grants you {name} ({value}) for {duration} sec",
+      "selfHeal": "and restores {total} health to you"
     },
     "questShare": {
       "notShareable": "Denne opgave kan ikke deles.",

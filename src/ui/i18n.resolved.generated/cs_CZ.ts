@@ -2046,7 +2046,9 @@ export const cs_CZ: EnTranslations = {
       "chainArc": "zasáhne cíl {school} kouzlem {name} ({damage}), které přeskočí na {jumps} nedalekých nepřátel se slábnoucím poškozením",
       "attackSlow": "a zpomalí rychlost útoku cíle o {pct} % na {duration} s",
       "dot": "rozjitří {name}, {school} poškození v čase, které způsobí {total} během {duration} s",
-      "hot": "rozkvete {name}, léčení v čase, které obnoví {total} během {duration} s"
+      "hot": "rozkvete {name}, léčení v čase, které obnoví {total} během {duration} s",
+      "selfBuff": "grants you {name} ({value}) for {duration} sec",
+      "selfHeal": "and restores {total} health to you"
     },
     "questShare": {
       "notShareable": "Tento úkol nelze sdílet.",

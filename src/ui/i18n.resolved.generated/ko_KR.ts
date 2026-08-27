@@ -2046,7 +2046,9 @@ export const ko_KR: EnTranslations = {
       "chainArc": "{school} {name}({damage})으로 대상을 강타하고 주변의 적 {jumps}명에게 감소하는 피해로 도약합니다",
       "attackSlow": "대상의 공격 속도를 {duration}초 동안 {pct}% 감소시킵니다",
       "dot": "{name}을 유발하여 {duration}초 동안 {total}의 {school} 지속 피해를 입힙니다",
-      "hot": "{name}을 피워 {duration}초 동안 {total}의 생명력을 회복시킵니다"
+      "hot": "{name}을 피워 {duration}초 동안 {total}의 생명력을 회복시킵니다",
+      "selfBuff": "grants you {name} ({value}) for {duration} sec",
+      "selfHeal": "and restores {total} health to you"
     },
     "questShare": {
       "notShareable": "이 퀘스트는 공유할 수 없습니다.",

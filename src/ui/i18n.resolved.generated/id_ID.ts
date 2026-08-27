@@ -2046,7 +2046,9 @@ export const id_ID: EnTranslations = {
       "chainArc": "menghantam target dengan {name} {school} ({damage}) yang melompat ke {jumps} musuh terdekat dengan kerusakan yang kian melemah",
       "attackSlow": "dan memperlambat kecepatan serangan target sebesar {pct}% selama {duration} dtk",
       "dot": "menjangkitkan {name}, kerusakan berkala {school} yang memberikan {total} selama {duration} dtk",
-      "hot": "memekarkan {name}, penyembuhan berkala yang memulihkan {total} selama {duration} dtk"
+      "hot": "memekarkan {name}, penyembuhan berkala yang memulihkan {total} selama {duration} dtk",
+      "selfBuff": "grants you {name} ({value}) for {duration} sec",
+      "selfHeal": "and restores {total} health to you"
     },
     "questShare": {
       "notShareable": "Misi ini tidak dapat dibagikan.",
