@@ -507,8 +507,6 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'hudChrome.wocMarket.termsLink': 'Die Marktplatz-Bedingungen ansehen (öffnet in einem neuen Tab)',
   'hudChrome.wocMarket.title': '$WOC-Börse',
   'hudChrome.wocMarket.variableTokenWarning': 'Du verpflichtest dich, einen USD-Wert in $WOC zu bezahlen. Der genaue Token-Betrag wird bei Zahlungsanforderung durch ein neues Angebot festgelegt und kann von der Schätzung abweichen.',
-  'hudChrome.wocMarket.walletBanner': 'Verknüpfe und verifiziere eine Wallet, um auf der Börse zu bieten, zu kaufen oder zu verkaufen.',
-  'hudChrome.wocMarket.walletBannerCta': 'Wallet verbinden',
   'hudChrome.wocMarket.yourListing': 'Dein Angebot',
   'hudChrome.wocMarket.yourListingTip': 'Du hast diesen Gegenstand eingestellt. Du kannst nicht auf dein eigenes Angebot bieten; solange es keine Gebote hat, kannst du es hier oder unter Aktivitäten zurückziehen.',
   'apiError.guilds.invalid_roster_name': 'Ungültiger Gildenname.',

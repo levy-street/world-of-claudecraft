@@ -835,7 +835,7 @@ export interface OptionsHooks {
   // Re-fetch the connected/linked wallet's $WOC balance (server cache-bypassed) so the
   // bag footer and player card reflect on-chain token changes. No-op when the wallet
   // feature is off or no wallet is connected/linked.
-  refreshWocBalance(): void;
+  refreshWocBalance(force?: boolean): void;
   // Account deed-broadcast opt-out seam (accounts.deed_broadcasts): whether a
   // marquee deed unlock fans out to guildmates and followers, and whether the
   // Discord activity feed posts the account's deed and masterwork cards (R58).
@@ -2347,6 +2347,7 @@ export class Hud {
       if (bagsWindowShown($('#bags').style.display)) this.bagsWindow.refreshMoneyRow();
       this.playerCard.refresh();
       this.claudiumWindow.onWalletChanged();
+      this.wocMarketWindow.onWalletChanged();
     });
     $('#pf-name').textContent = sim.player.name;
     this.drawPlayerFramePortrait();
@@ -5122,10 +5123,8 @@ export class Hud {
     onVisibilityChange: () => this.syncAnyWindowOpenState(),
     maskPlayerText: (text) => this.maskChat(text),
   });
-  // The $WOC Exchange window (docs/prd/woc/marketplace.md): online, browser-web
-  // only. Openable only once main.ts attaches the hooks (attachWocMarket); the
-  // launcher button stays hidden until then, so Steam/Electron/Capacitor and
-  // offline play never see the surface.
+  // The $WOC Exchange is online and browser-web only. Its launcher stays hidden until
+  // main.ts attaches hooks, excluding Steam/Electron/Capacitor and offline play.
   private wocMarketHooks: WocMarketHooks | null = null;
 
   // The trade window and its $WOC arm live in the woc_trade domain
@@ -5160,6 +5159,7 @@ export class Hud {
     closeOthers: () => this.closeOtherWindows('#woc-market-window'),
     hideTooltip: () => this.hideTooltip(),
     openWallet: requestWalletVerify,
+    refreshWocBalance: (force) => this.optionsHooks?.refreshWocBalance(force),
     ...this.windowFocus('#woc-market-window'),
   });
   // Daily rewards window painter. It owns the async rewards reads, spin action,

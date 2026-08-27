@@ -496,8 +496,6 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'hudChrome.wocMarket.termsLink': 'Zobrazit podmínky tržiště (otevře se na nové kartě)',
   'hudChrome.wocMarket.title': 'Burza $WOC',
   'hudChrome.wocMarket.variableTokenWarning': 'Zavazuješ se zaplatit hodnotu v USD prostřednictvím $WOC. Přesné množství tokenů určí nová cenová nabídka v okamžiku vyžádání platby a může se lišit od odhadu.',
-  'hudChrome.wocMarket.walletBanner': 'Propoj a ověř peněženku, abys mohl(a) na Burze přihazovat, kupovat nebo prodávat.',
-  'hudChrome.wocMarket.walletBannerCta': 'Připojit peněženku',
   'hudChrome.wocMarket.yourListing': 'Tvá nabídka',
   'hudChrome.wocMarket.yourListingTip': 'Tento předmět jsi vystavil(a) ty. Na vlastní nabídku nemůžeš přihazovat; dokud nemá žádné příhozy, můžeš ji zrušit zde nebo v Aktivitě.',
   'apiError.guilds.invalid_roster_name': 'Neplatný název cechu.',

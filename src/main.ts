@@ -502,6 +502,7 @@ import {
   setWalletUiEnabled,
   setWocBalance,
   shouldDisconnectUnverifiedWallet,
+  WocBalanceRefreshOrder,
 } from './ui/wallet_balance';
 import { claudiumCheckoutErrorText } from './ui/wallet_bridge_reason_text';
 import { buildWalletConnectionView } from './ui/wallet_connection_view';
@@ -3056,7 +3057,7 @@ async function startGame(
       },
     },
     changeLanguage: (lang, onStatus) => changeLanguage(lang, onStatus),
-    refreshWocBalance: () => refreshWocBalanceOnDemand(),
+    refreshWocBalance: (force) => refreshWocBalanceOnDemand(force),
     // Deed-broadcast opt-out: online only (an offline character has no account
     // row); the options row hides itself when this seam is absent.
     ...(online
@@ -7918,6 +7919,7 @@ function wireHomepageMusicToggle(): void {
 let linkedWalletPubkey: string | null = null;
 let linkedWocBalance: number | null = null;
 let connectedWocBalance: number | null = null;
+const wocBalanceRefreshOrder = new WocBalanceRefreshOrder();
 let walletVerifyPending = false;
 let walletVerifyInProgress = false;
 // True from when a logged-in session starts loading its linked-wallet status until
@@ -8481,12 +8483,10 @@ async function disconnectUnverifiedWalletIfIdle(): Promise<void> {
   await disconnectUnverifiedWallet();
 }
 
-// Read the connected wallet's $WOC balance and re-render. Ignores a stale
-// response if the connected wallet changed while the RPC call was in flight.
-// `fresh` bypasses the server's per-wallet cache (used when the player opens a
-// surface that shows the balance, so an on-chain token change shows up); an
-// initial (non-fresh) read clears the prior value first to show a loading state.
+// Read and repaint the connected wallet's $WOC balance. `fresh` bypasses the
+// server cache; an initial non-fresh read first shows a loading state.
 async function refreshWocBalance(address: string, fresh = false): Promise<void> {
+  const request = wocBalanceRefreshOrder.start();
   if (!fresh) {
     connectedWocBalance = null;
     updateWalletButton();
@@ -8502,27 +8502,25 @@ async function refreshWocBalance(address: string, fresh = false): Promise<void> 
     currentAddress: wallet.currentWallet().address,
     linkedAddress: linkedWalletPubkey,
   });
-  if (!apply) return;
+  if (!apply || !wocBalanceRefreshOrder.claim(request)) return;
   connectedWocBalance = balance;
   if (setLinked) linkedWocBalance = balance;
   updateWalletButton();
 }
 
-// Re-fetch the connected/linked wallet's balance on demand (server cache
-// bypassed) so surfaces that display it, the bag footer and the player card,
-// reflect on-chain changes. No-op when the wallet feature is off or nothing is
-// connected/linked. Prefers the account-LINKED wallet (whose balance the badge
-// shows) over a merely-connected one, and a short throttle coalesces rapid
-// bag/card toggles so they don't burn the per-IP fresh-read budget.
+// Re-fetch the linked/connected wallet for visible balance surfaces. Prefer
+// the linked wallet and throttle ordinary toggles to protect the fresh-read
+// budget; a confirmed payment forces the post-spend read through.
 let lastOnDemandRefreshAddress: string | null = null;
 let lastOnDemandRefreshAt = 0;
 const ON_DEMAND_REFRESH_THROTTLE_MS = 5000;
-function refreshWocBalanceOnDemand(): void {
+function refreshWocBalanceOnDemand(force = false): void {
   if (!WALLET_ENABLED) return;
   const address = linkedWalletPubkey ?? walletMod?.currentWallet().address ?? null;
   if (!address) return;
   const now = Date.now();
   if (
+    !force &&
     address === lastOnDemandRefreshAddress &&
     now - lastOnDemandRefreshAt < ON_DEMAND_REFRESH_THROTTLE_MS
   )

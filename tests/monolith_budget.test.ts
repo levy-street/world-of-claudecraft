@@ -83,6 +83,11 @@ const MONOLITHS: MonolithRow[] = [
     // window carries only state, handler arms and passthroughs. Exact
     // count, zero headroom; the sell-tab combobox block is the next
     // standing extraction candidate.
+    // Held at 2487 for the Solana wallet card (the Claudium card above the
+    // Browse filters): the card's markup landed in the chrome builder, and
+    // the window's gated wallet fan-out arm was paid for by moving the quote
+    // countdown key's arithmetic to the view core (wocQuoteCountdownSig).
+    // Exact count, zero headroom.
     file: 'src/ui/woc_market_window.ts',
     ceiling: 2487,
     seam: 'a pure view-core module beside it (src/ui/woc_market_view.ts) that this window renders from',
@@ -270,6 +275,12 @@ const MONOLITHS: MonolithRow[] = [
     // UNBIND_DENY_KEY record in src/ui/hud/vendor/unbind_view.ts (the
     // unbind_perfecting deny joined the vocabulary there, never here). Exact
     // count, zero slack.
+    // RE-PINNED at the merge of release/v0.41.0 (tip b02da096dd) into
+    // feature/masterwrought. BOTH parent pins for the record: ours 18263, the
+    // release 18488. The release side's wallet-card fan-out and refresh hook
+    // (+2) land against its own comment shrink (-2), so the merged file
+    // measures the same 18263 (wc -l < src/ui/hud.ts). Exact merged count,
+    // zero slack.
     ceiling: 18263,
     seam: 'pure view core + thin painter on PainterHost (src/ui/CLAUDE.md)',
   },
@@ -787,7 +798,13 @@ const MONOLITHS: MonolithRow[] = [
     // 11461, the release 11566. Set to the exact merged count measured on the
     // merged working tree (wc -l < src/main.ts), neither parent's literal. Exact
     // merged count, zero slack: any further growth reds again.
-    ceiling: 11530,
+    // RE-PINNED at the merge of release/v0.41.0 (tip b02da096dd) into
+    // feature/masterwrought. BOTH parent pins for the record: ours 11530, the
+    // release 11564. The release span's balance-refresh rework sheds comment
+    // lines against its additions, so the merged file measures 11528
+    // (wc -l < src/main.ts), under both parents; the ratchet follows it down.
+    // Exact merged count, zero slack.
+    ceiling: 11528,
     seam: 'a src/game/ or src/ui/ sibling module; main.ts is a firewall, not a home',
   },
   {

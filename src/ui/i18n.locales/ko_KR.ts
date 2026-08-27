@@ -8951,9 +8951,11 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.wocMarket.disabledRealm': '이 서버에서는 $WOC 거래소를 이용할 수 없습니다.',
   'hudChrome.wocMarket.pausedBanner':
     '거래가 일시 중지되었습니다. 경매 카운트다운은 계속됩니다. 새 등록, 입찰, 제안, 결제는 거래가 재개될 때까지 대기하지만, 이미 전송된 결제는 그대로 정산됩니다.',
-  'hudChrome.wocMarket.walletBanner':
-    '지갑을 연동하고 인증하면 거래소에서 입찰, 구매, 판매할 수 있습니다.',
-  'hudChrome.wocMarket.walletBannerCta': '지갑 연결',
+  'hudChrome.wocMarket.walletLinkedDisconnected':
+    '공개 주소가 연결되어 있습니다. $WOC로 결제하려면 해당 지갑 앱을 다시 연결하세요.',
+  'hudChrome.wocMarket.walletLinkedConnected':
+    '연결된 지갑 앱이 접속되어 $WOC로 결제할 준비가 되었습니다.',
+  'hudChrome.wocMarket.walletUsdUnknown': '알 수 없음',
   'hudChrome.wocMarket.rateNote': '환율: {time} 기준 1 USD당 약 {tokens} $WOC.',
   'hudChrome.wocMarket.estimateNote': '{usd}는 현재 환율로 약 {tokens} $WOC입니다.',
   'hudChrome.wocMarket.browseEmpty': '지금은 등록된 물품이 없습니다. 나중에 다시 확인하세요.',

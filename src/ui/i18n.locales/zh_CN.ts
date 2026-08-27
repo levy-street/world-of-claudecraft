@@ -8574,8 +8574,10 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.wocMarket.loadFailed': '无法连接交易所，请稍后再试。',
   'hudChrome.wocMarket.disabledRealm': '本服务器未开放 $WOC 交易所。',
   'hudChrome.wocMarket.pausedBanner': '交易已暂停。拍卖倒计时照常进行；新的挂单、出价、报价和付款需等交易恢复后再进行，已发出的付款仍会照常结算。',
-  'hudChrome.wocMarket.walletBanner': '绑定并验证钱包后即可在交易所出价、购买或出售。',
-  'hudChrome.wocMarket.walletBannerCta': '连接钱包',
+  'hudChrome.wocMarket.walletLinkedDisconnected':
+    '您的公开地址已关联。需要使用 $WOC 付款时，请重新连接该钱包应用。',
+  'hudChrome.wocMarket.walletLinkedConnected': '已关联的钱包应用已连接，可用于 $WOC 付款。',
+  'hudChrome.wocMarket.walletUsdUnknown': '未知',
   'hudChrome.wocMarket.rateNote': '汇率：截至 {time}，约每美元 {tokens} $WOC。',
   'hudChrome.wocMarket.estimateNote': '{usd} 按当前汇率约合 {tokens} $WOC。',
   'hudChrome.wocMarket.browseEmpty': '目前没有挂单，稍后再来看看。',

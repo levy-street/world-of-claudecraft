@@ -496,8 +496,6 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.wocMarket.termsLink': 'Borsa koşullarını görüntüle (yeni sekmede açılır)',
   'hudChrome.wocMarket.title': '$WOC Borsası',
   'hudChrome.wocMarket.variableTokenWarning': '$WOC cinsinden bir USD değeri ödemeyi taahhüt ediyorsun. Kesin token miktarı, ödeme istendiğinde yeni bir fiyat teklifiyle belirlenir ve tahminden farklı olabilir.',
-  'hudChrome.wocMarket.walletBanner': "Borsa'da teklif vermek, satın almak veya satmak için bir cüzdan bağla ve doğrula.",
-  'hudChrome.wocMarket.walletBannerCta': 'Cüzdanı bağla',
   'hudChrome.wocMarket.yourListing': 'İlanın',
   'hudChrome.wocMarket.yourListingTip': "Bu eşyayı sen ilan ettin. Kendi ilanına teklif veremezsin; henüz teklif almadığı sürece burada veya Hareketlerim'den iptal edebilirsin.",
   'apiError.guilds.invalid_roster_name': 'Geçersiz lonca adı.',

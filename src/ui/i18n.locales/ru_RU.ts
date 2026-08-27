@@ -9168,9 +9168,11 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.wocMarket.disabledRealm': 'Биржа $WOC недоступна в этом мире.',
   'hudChrome.wocMarket.pausedBanner':
     'Торги приостановлены. Отсчёт аукционов продолжается; новые лоты, ставки, предложения и платежи ждут возобновления торгов, а уже отправленный платёж всё равно будет проведён.',
-  'hudChrome.wocMarket.walletBanner':
-    'Привяжите и подтвердите кошелёк, чтобы делать ставки, покупать и продавать на бирже.',
-  'hudChrome.wocMarket.walletBannerCta': 'Подключить кошелёк',
+  'hudChrome.wocMarket.walletLinkedDisconnected':
+    'Ваш публичный адрес привязан. Чтобы платить в $WOC, снова подключите это приложение-кошелёк.',
+  'hudChrome.wocMarket.walletLinkedConnected':
+    'Привязанное приложение-кошелёк подключено и готово к платежам в $WOC.',
+  'hudChrome.wocMarket.walletUsdUnknown': 'Неизвестно',
   'hudChrome.wocMarket.rateNote': 'Курс: около {tokens} $WOC за доллар США по состоянию на {time}.',
   'hudChrome.wocMarket.estimateNote': '{usd} по текущему курсу составляет около {tokens} $WOC.',
   'hudChrome.wocMarket.browseEmpty': 'Лотов пока нет. Загляните позже.',

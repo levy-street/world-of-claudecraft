@@ -174,4 +174,15 @@ describe('woc_market_wiring: main.ts stays a firewall', () => {
     expect(main).not.toContain('hud.attachWocMarket(');
     expect(main).not.toContain('woc_market_sdk');
   });
+
+  it('lets confirmed payments bypass the ordinary on-demand balance throttle', () => {
+    const main = stripComments(readFileSync(new URL('../src/main.ts', import.meta.url), 'utf8'));
+    expect(main).toContain('refreshWocBalance: (force) => refreshWocBalanceOnDemand(force)');
+    expect(main).toContain('function refreshWocBalanceOnDemand(force = false)');
+    expect(main).toContain('const request = wocBalanceRefreshOrder.start()');
+    expect(main).toContain('!wocBalanceRefreshOrder.claim(request)');
+    expect(main).toMatch(
+      /if \(\s*!force &&\s*address === lastOnDemandRefreshAddress &&\s*now - lastOnDemandRefreshAt < ON_DEMAND_REFRESH_THROTTLE_MS\s*\)/,
+    );
+  });
 });

@@ -496,8 +496,6 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'hudChrome.wocMarket.termsLink': 'Visa marknadsplatsens villkor (öppnas i en ny flik)',
   'hudChrome.wocMarket.title': '$WOC-börsen',
   'hudChrome.wocMarket.variableTokenWarning': 'Du åtar dig att betala ett USD-värde i $WOC. Den exakta tokenmängden fastställs av en ny prisuppgift när betalning begärs och kan skilja sig från uppskattningen.',
-  'hudChrome.wocMarket.walletBanner': 'Länka och verifiera en plånbok för att bjuda, köpa eller sälja på $WOC-börsen.',
-  'hudChrome.wocMarket.walletBannerCta': 'Anslut plånbok',
   'hudChrome.wocMarket.yourListing': 'Din annons',
   'hudChrome.wocMarket.yourListingTip': 'Du annonserade det här föremålet. Du kan inte bjuda på din egen annons; så länge den saknar bud kan du avbryta den här eller från Aktivitet.',
   'apiError.guilds.invalid_roster_name': 'Ogiltigt gillesnamn.',

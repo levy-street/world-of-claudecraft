@@ -20,6 +20,10 @@ import { formatDateTime, formatDuration, formatNumber, t } from './i18n';
 import { ITEM_QUALITY_LABEL_KEYS, itemQualityLabel } from './item_kind_label';
 import { itemSlotLabel } from './item_slot_labels';
 import { svgIcon } from './ui_icons';
+import { usdDollarsText } from './usd_text';
+import { walletCardKeys } from './wallet_card_keys';
+import type { WalletConnectionView } from './wallet_connection_view';
+import { wocTokensText } from './woc_tokens_text';
 
 /** The browse faces' control row: the sort control LEADS the row (the 15 QA
  *  sign-off note), the filters follow it, the pager closes the row. Pure
@@ -242,25 +246,68 @@ export function wocBondScheduleNotesHtml(args: {
 }
 
 /**
- * The two standing banners under the tab strip (a paused realm, an unlinked
- * wallet): they change on an operator action or a wallet link, never on a
- * click, so the tab panel does not shift under the pointer. The wallet banner
- * carries its own way in: the same shared connect flow the store and daily
- * rewards buttons open (the window's connect-wallet click action), one click
- * from where the player was told to link.
+ * The standing banners under the tab strip, above the Browse filters: a paused
+ * realm, and the "Solana wallet" card. Both change on an operator action or a
+ * wallet event, never on a click, so the tab panel does not shift under the
+ * pointer. The wallet card is the Claudium panel's card (the same title, the
+ * same per-state sentence, the same Connect / Verify / Reconnect / Manage
+ * button via wallet_card_keys), so a player sees one wallet story across the
+ * two windows; it stands whenever the wallet feature is on, a linked and
+ * connected wallet included, because "Manage wallet" is the way to change or
+ * unlink it from here. The button rides the window's connect-wallet click
+ * action into the shared flow the store and daily rewards buttons open, one
+ * click from where the player was told to link.
  */
-export function wocMarketBannersHtml(args: { paused: boolean; walletLinked: boolean }): string {
+export function wocMarketBannersHtml(args: {
+  paused: boolean;
+  wallet: WalletConnectionView | null;
+  tokensPerUsd?: number | null;
+}): string {
   const banners =
     (args.paused
       ? `<div class="wm-banner wm-banner-paused">${esc(t('hudChrome.wocMarket.pausedBanner'))}</div>`
-      : '') +
-    (args.walletLinked
-      ? ''
-      : `<div class="wm-banner wm-banner-wallet"><span>${esc(t('hudChrome.wocMarket.walletBanner'))}</span>` +
-        `<button type="button" data-action="connect-wallet" ${FOCUS_KEY_ATTR}="wm-connect-wallet">${esc(
-          t('hudChrome.wocMarket.walletBannerCta'),
-        )}</button></div>`);
+      : '') + wocWalletCardHtml(args.wallet, args.tokensPerUsd ?? null);
   return banners === '' ? '' : `<div class="wm-strip">${banners}</div>`;
+}
+
+export function wocWalletCardSig(wallet: WalletConnectionView): string {
+  return `${wallet.kind}|${wallet.balanceVerified ? wallet.balance : ''}`;
+}
+
+function wocWalletCardHtml(
+  wallet: WalletConnectionView | null,
+  tokensPerUsd: number | null,
+): string {
+  if (wallet === null || !wallet.enabled) return '';
+  const sharedKeys = walletCardKeys(wallet.kind);
+  const bodyKey =
+    wallet.kind === 'linked_disconnected'
+      ? 'hudChrome.wocMarket.walletLinkedDisconnected'
+      : wallet.kind === 'linked_connected'
+        ? 'hudChrome.wocMarket.walletLinkedConnected'
+        : sharedKeys.bodyKey;
+  const balance = wocWalletBalanceHtml(wallet, tokensPerUsd);
+  return (
+    `<div class="wm-banner wm-banner-wallet" data-wallet-kind="${esc(wallet.kind)}">` +
+    `<strong>${esc(t('hudChrome.wocStore.wallet.title'))}</strong>` +
+    `<p>${esc(t(bodyKey))}</p>` +
+    balance +
+    `<button type="button" data-action="connect-wallet" ${FOCUS_KEY_ATTR}="wm-connect-wallet">${esc(
+      t(sharedKeys.actionKey),
+    )}</button></div>`
+  );
+}
+
+function wocWalletBalanceHtml(wallet: WalletConnectionView, tokensPerUsd: number | null): string {
+  if (!wallet.balanceVerified || wallet.balance === null) return '';
+  const tokens = t('wallet.balanceAmount', { amount: wocTokensText(wallet.balance) });
+  const usd =
+    tokensPerUsd !== null && Number.isFinite(tokensPerUsd) && tokensPerUsd > 0
+      ? t('hudChrome.wocMarket.walletUsdBalance', {
+          amount: usdDollarsText(wallet.balance / tokensPerUsd),
+        })
+      : t('hudChrome.wocMarket.walletUsdUnknown');
+  return `<span class="wm-wallet-balance"><strong>${esc(tokens)}</strong><span>${esc(usd)}</span></span>`;
 }
 
 /**

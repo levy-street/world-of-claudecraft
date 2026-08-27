@@ -3899,6 +3899,23 @@
     position: static;
     max-height: none;
   }
+  /* The Solana wallet card stacks on the phone sheet (the Claudium card's own
+     touch rule): the button drops under the sentence at the 44px floor rather
+     than squeezing the copy into half the width. */
+  body.mobile-touch #woc-market-window .wm-banner-wallet {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  body.mobile-touch #woc-market-window .wm-banner-wallet button {
+    grid-column: 1;
+    grid-row: auto;
+    min-height: 44px;
+  }
+  body.mobile-touch #woc-market-window .wm-wallet-balance {
+    grid-column: 1;
+    grid-row: auto;
+    align-items: flex-start;
+    text-align: left;
+  }
   /* Row rhythm on the phone sheet (the 15 QA sign-off note): taller cells
      than the desktop 6px, and the FIRST row clears the header hairline with
      its own top padding instead of starting flush against it. */

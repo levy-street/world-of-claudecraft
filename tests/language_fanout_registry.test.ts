@@ -343,9 +343,9 @@ const ANSWERED: readonly AnsweredSurface[] = [
   },
   {
     file: 'woc_market_window.ts',
-    memos: ['lastSig'],
+    memos: ['lastSig', 'paintedWalletSig'],
     answer: 'this.wocMarketWindow.relocalize',
-    why: 'the Exchange listing rows, statuses and countdowns digest into lastSig; relocalize() self-gates on isOpen, rebuilds once, and render() re-latches the signature',
+    why: "the Exchange listing rows, statuses and countdowns digest into lastSig; relocalize() self-gates on isOpen, rebuilds once, and render() re-latches the signature. paintedWalletSig is the Solana wallet card's locale-free connection and balance state that gates onWalletChanged(); the same render() repaints the card in the current language and re-latches the signature, so the one relocalize() arm answers both memos",
   },
   {
     file: 'professions_window.ts',

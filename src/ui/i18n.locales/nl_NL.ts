@@ -496,8 +496,6 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'hudChrome.wocMarket.termsLink': 'Bekijk de voorwaarden van de Beurs (opent in een nieuw tabblad)',
   'hudChrome.wocMarket.title': '$WOC-beurs',
   'hudChrome.wocMarket.variableTokenWarning': 'Je verbindt je ertoe een USD-waarde in $WOC te betalen. Het exacte aantal tokens wordt bepaald door een nieuwe prijsopgave op het moment dat de betaling wordt aangevraagd, en kan afwijken van de schatting.',
-  'hudChrome.wocMarket.walletBanner': 'Koppel en verifieer een portemonnee om te bieden, kopen of verkopen op de Beurs.',
-  'hudChrome.wocMarket.walletBannerCta': 'Portemonnee koppelen',
   'hudChrome.wocMarket.yourListing': 'Jouw aanbieding',
   'hudChrome.wocMarket.yourListingTip': 'Je hebt dit voorwerp aangeboden. Je kunt niet bieden op je eigen aanbieding; zolang er geen biedingen op staan, kun je ze hier of via Activiteiten annuleren.',
   'apiError.guilds.invalid_roster_name': 'Ongeldige gildenaam.',
