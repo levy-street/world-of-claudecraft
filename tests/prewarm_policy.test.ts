@@ -1555,7 +1555,7 @@ describe('mandatory interaction-landmark prewarm', () => {
     // ...each piece the colour arm, the shadow arm, then the settle over every
     // program variant its materials carry (program_variant_settle.ts), bound to
     // this renderer's material properties and depth-twin cache.
-    expect(compileGate).toContain('linkPieceWork(target, color, shadow, settle, expect)');
+    expect(compileGate).toContain('linkPieceWork(target, color, shadow, settle)');
     expect(compileGate).toContain(
       'const settle = pieceProgramSettle(this.webgl.properties, this.prewarmDepthMaterials);',
     );

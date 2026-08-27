@@ -10,15 +10,23 @@
 // one gate.
 
 import * as THREE from 'three';
-import { describe, expect, it } from 'vitest';
+import { afterEach, describe, expect, it } from 'vitest';
 import { GPU_WORK_PRIORITY } from '../src/render/background_gpu_queue';
+import type { CompileArmHost } from '../src/render/compile_arms';
 import type {
   CompileGatePiece,
   CompileGateResult,
   PieceDeadline,
 } from '../src/render/compile_gate';
+import type { DryProgramSource } from '../src/render/program_sources';
 import { createRevealCompileHost, REVEAL_GATE_PREP_KIND } from '../src/render/reveal_compile_host';
 import { REVEAL_GATE_WATCHDOG_MS, REVEAL_SOFT_DEADLINE_MIN_MS } from '../src/render/reveal_gate';
+import {
+  armShaderWarm,
+  resetShaderWarmForTest,
+  shaderWarmSnapshot,
+} from '../src/render/shader_warm_client';
+import type { ShaderWarmWorkerMessage } from '../src/render/shader_warm_protocol';
 
 const SETTLED: CompileGateResult = { failed: false, timedOut: false };
 
@@ -300,5 +308,208 @@ describe('reveal compile host announcement arm', () => {
     // Both announcements landed before the gate was even handed its pieces.
     expect(gateSeenAt).toBe(2);
     expect(gatePieces).toBe(2);
+  });
+});
+
+describe('reveal compile host shader warm arm', () => {
+  // The host routes its pieces through the warm worker when it is given the
+  // compile arms (src/render/shader_warm_gate.ts). Both ends of that are
+  // load-bearing: with the worker off the reveal must submit exactly as it
+  // always did, and with the worker on each piece must wait for its own
+  // programs rather than the whole root's.
+  afterEach(() => {
+    resetShaderWarmForTest();
+  });
+
+  interface WarmWorkerStub {
+    postMessage(message: unknown): void;
+    terminate(): void;
+    onmessage: ((event: MessageEvent<ShaderWarmWorkerMessage>) => void) | null;
+    onerror: ((event: unknown) => void) | null;
+    posted: Record<string, unknown>[];
+    emit(message: ShaderWarmWorkerMessage): void;
+  }
+
+  function warmWorkerStub(): WarmWorkerStub {
+    const worker: WarmWorkerStub = {
+      posted: [],
+      onmessage: null,
+      onerror: null,
+      postMessage(message) {
+        worker.posted.push(message as Record<string, unknown>);
+      },
+      terminate() {},
+      emit(message) {
+        worker.onmessage?.({ data: message } as MessageEvent<ShaderWarmWorkerMessage>);
+      },
+    };
+    return worker;
+  }
+
+  /** Compile arms whose dry compile serves one program per representative,
+   *  named after the node, so a piece's warm can be answered on its own. */
+  function warmArms(): CompileArmHost {
+    const scene = new THREE.Scene();
+    let current: THREE.WebGLRenderTarget | null = null;
+    const webgl = {
+      getRenderTarget: () => current,
+      setRenderTarget: (target: THREE.WebGLRenderTarget | null) => {
+        current = target;
+      },
+      compileAsync: () => Promise.resolve(scene),
+      collectProgramSources: (node: THREE.Object3D): DryProgramSource[] => [
+        {
+          cacheKey: `key:${node.name}`,
+          name: 'physical',
+          vertexGlsl: `vertex:${node.name}`,
+          fragmentGlsl: 'precision highp float;',
+          index0Attribute: 'position',
+        },
+      ],
+    };
+    return {
+      webgl: () => webgl,
+      context: () => ({
+        getContextAttributes: () => ({ antialias: false }),
+        getExtension: (name: string) => (name === 'KHR_parallel_shader_compile' ? { name } : null),
+      }),
+      camera: () => new THREE.PerspectiveCamera(),
+      scene: () => scene,
+      shadowCamera: () => new THREE.OrthographicCamera(),
+      offscreen: () => false,
+      offscreenTarget: () => ({}) as THREE.WebGLRenderTarget,
+      depthMaterials: () => new Map(),
+      shadowArm: () => false,
+    };
+  }
+
+  /** Two material groups: two pieces, two representatives. */
+  function twoPieceKit(): THREE.Group {
+    const kit = new THREE.Group();
+    kit.name = 'eastbrookTownKit';
+    const stone = new THREE.Mesh(new THREE.BufferGeometry(), new THREE.MeshStandardMaterial());
+    stone.name = 'stone';
+    const glass = new THREE.Mesh(new THREE.BufferGeometry(), new THREE.MeshBasicMaterial());
+    glass.name = 'glass';
+    kit.add(stone, glass);
+    return kit;
+  }
+
+  /** The gate arms, recorded: one entry per gate call with its piece count,
+   *  and the per-piece arms in the order the host drove them. */
+  function warmRig(arms: CompileArmHost) {
+    const gateCalls: number[] = [];
+    const armCalls: string[] = [];
+    const host = createRevealCompileHost({
+      gate(pieces, options, firstIndex) {
+        gateCalls.push(pieces.length);
+        armCalls.push(`gate:${options.label}:${firstIndex ?? 'none'}`);
+        return pieces
+          .reduce<Promise<unknown>>(
+            (chain, piece) => chain.then(() => piece({ fired: false })),
+            Promise.resolve(),
+          )
+          .then(() => SETTLED);
+      },
+      compileColor(node: THREE.Object3D) {
+        armCalls.push(`color:${node.name}`);
+        return Promise.resolve();
+      },
+      compileShadow(node: THREE.Object3D) {
+        armCalls.push(`shadow:${node.name}`);
+        return Promise.resolve();
+      },
+      settle(node: THREE.Object3D) {
+        armCalls.push(`settle:${node.name}`);
+        return Promise.resolve();
+      },
+      arms,
+      upload() {
+        armCalls.push('upload');
+        return Promise.resolve();
+      },
+      touch(_target: object, _priority: number, gate: CompileGateResult) {
+        armCalls.push('touch');
+        return Promise.resolve(gate);
+      },
+      predictRevealMs: () => 0,
+    });
+    return { gateCalls, armCalls, host };
+  }
+
+  /** Let the warm promises and the submissions they trigger run out. */
+  async function flush(): Promise<void> {
+    for (let tick = 0; tick < 4; tick++) await Promise.resolve();
+  }
+
+  it('submits the whole gate at once when the worker is off, exactly as before', async () => {
+    resetShaderWarmForTest({ search: '?shaderwarm=off', schedule: () => () => {} });
+    armShaderWarm();
+    const rig = warmRig(warmArms());
+
+    await rig.host.compile(twoPieceKit(), false);
+
+    expect(rig.gateCalls).toEqual([2]);
+    expect(rig.armCalls).toEqual([
+      `gate:${REVEAL_GATE_PREP_KIND}:eastbrookTownKit:0`,
+      'color:stone',
+      'shadow:stone',
+      'settle:stone',
+      'color:glass',
+      'shadow:glass',
+      'settle:glass',
+      'upload',
+      'touch',
+    ]);
+    expect(shaderWarmSnapshot().bypassed['mode-off']).toBe(1);
+  });
+
+  it('gates each piece dry assembly first, then the piece once its programs are warm', async () => {
+    const worker = warmWorkerStub();
+    resetShaderWarmForTest({
+      search: '?shaderwarm=reveal',
+      mobile: false,
+      spawn: () => worker,
+      schedule: () => () => {},
+    });
+    armShaderWarm();
+    const label = `gate:${REVEAL_GATE_PREP_KIND}:eastbrookTownKit`;
+    const rig = warmRig(warmArms());
+
+    const compiled = rig.host.compile(twoPieceKit(), false);
+    // The assembly units go to the queue at once, each at its piece's own
+    // index, so the labels are the ones one whole submission would have.
+    expect(rig.armCalls).toEqual([`${label}:0`, `${label}:1`]);
+    await flush();
+    worker.emit({ kind: 'ready', ok: true, reason: null, extensions: [], adapter: 'test' });
+    await flush();
+    // Both pieces are still waiting on the worker: no piece has been gated.
+    expect(rig.armCalls).toEqual([`${label}:0`, `${label}:1`]);
+
+    worker.emit({ kind: 'warmed', id: 1, linkMs: 4 });
+    await flush();
+    // The first piece is linking; the second has not been handed over.
+    expect(rig.armCalls).toContain('color:stone');
+    expect(rig.armCalls).not.toContain('color:glass');
+
+    worker.emit({ kind: 'warmed', id: 2, linkMs: 4 });
+    await compiled;
+
+    expect(rig.gateCalls).toEqual([1, 1, 1, 1]);
+    expect(rig.armCalls).toEqual([
+      `${label}:0`,
+      `${label}:1`,
+      `${label}:0`,
+      'color:stone',
+      'shadow:stone',
+      'settle:stone',
+      `${label}:1`,
+      'color:glass',
+      'shadow:glass',
+      'settle:glass',
+      'upload',
+      'touch',
+    ]);
+    expect(shaderWarmSnapshot()).toMatchObject({ held: 2, heldWarm: 2, sent: 2 });
   });
 });

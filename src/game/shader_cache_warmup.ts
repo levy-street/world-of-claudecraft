@@ -45,6 +45,12 @@ import {
   warmupApplies,
   warmupExtensionsMatch,
 } from '../render/shader_warmup_core';
+import {
+  pollWarmProgram,
+  submitWarmProgram,
+  type WarmProgramHandle,
+  type WarmupGl,
+} from '../render/shader_warmup_gl_core';
 
 declare const __APP_BUILD_ID__: string;
 
@@ -56,32 +62,13 @@ const WARMUP_CANVAS_PX = 8;
 /** The world has been playable for a while by then, so reading every program's
  *  source costs the player nothing, and the set covers the first minutes. */
 const RECORD_DELAY_MS = 25_000;
-/** KHR_parallel_shader_compile's non-blocking link-completion query. */
-const COMPLETION_STATUS_KHR = 0x91b1;
 /** Completion polls per frame once the submission is done: a poll is one cheap
  *  GPU-process round trip, and 32 keeps the frame short. */
 const RESOLVE_POLLS_PER_FRAME = 32;
 
-/** The WebGL surface the warm-up context needs. Structural, so a test passes a
- *  plain object and the real `WebGL2RenderingContext` satisfies it as is. */
-export interface WarmupGl {
-  VERTEX_SHADER: number;
-  FRAGMENT_SHADER: number;
-  RENDERER: number;
-  LINK_STATUS: number;
-  createShader(type: number): WebGLShader | null;
-  shaderSource(shader: WebGLShader, source: string): void;
-  compileShader(shader: WebGLShader): void;
-  createProgram(): WebGLProgram | null;
-  attachShader(program: WebGLProgram, shader: WebGLShader): void;
-  bindAttribLocation(program: WebGLProgram, index: number, name: string): void;
-  linkProgram(program: WebGLProgram): void;
-  deleteShader(shader: WebGLShader): void;
-  deleteProgram(program: WebGLProgram): void;
-  getExtension(name: string): unknown;
-  getParameter(pname: number): unknown;
-  getProgramParameter(program: WebGLProgram, pname: number): unknown;
-}
+/** The WebGL surface the warm-up context needs: the one every warming
+ *  context shares (../render/shader_warmup_gl_core, with the worker). */
+export type { WarmupGl } from '../render/shader_warmup_gl_core';
 
 /** The extra surface the RECORDING side reads off the world context. */
 export interface CorpusGl extends WarmupGl {
@@ -135,7 +122,7 @@ interface WarmupSession {
   context: WarmupContext | null;
   programs: WebGLProgram[];
   /** Submitted programs whose link has not been observed complete yet. */
-  pending: WebGLProgram[];
+  pending: WarmProgramHandle[];
   /** Programs whose link the poll saw complete (and thereby resolved). */
   resolved: number;
   shaders: WebGLShader[];
@@ -368,54 +355,29 @@ export interface StartShaderWarmupOptions {
   now?: () => number;
 }
 
+/** The shared GL discipline (../render/shader_warmup_gl_core): the bind three
+ *  made before ITS link replayed, and no LINK_STATUS query at submission. */
 function submitProgram(gl: WarmupGl, sources: ShaderProgramSources): void {
-  const vertex = gl.createShader(gl.VERTEX_SHADER);
-  const fragment = gl.createShader(gl.FRAGMENT_SHADER);
-  const program = gl.createProgram();
-  if (!vertex || !fragment || !program) return;
-  gl.shaderSource(vertex, sources.vertex);
-  gl.compileShader(vertex);
-  gl.shaderSource(fragment, sources.fragment);
-  gl.compileShader(fragment);
-  gl.attachShader(program, vertex);
-  gl.attachShader(program, fragment);
-  // The bind three made before ITS link, replayed here: the program cache key
-  // carries the explicit attribute-location bindings, so the same GLSL linked
-  // without this bind lands under a key the game never asks for (see the WHY
-  // THE ATTRIBUTE BIND note in ../render/shader_warmup_core).
-  if (sources.index0Attribute) gl.bindAttribLocation(program, 0, sources.index0Attribute);
-  // No LINK_STATUS query at submission: it would make the off-thread link
-  // synchronous. The frame loop reads it only once the completion query says
-  // the link is done, and a resolved link is what the browser caches (measured
-  // 2026-08-28: an unresolved parallel link never reaches the cache).
-  gl.linkProgram(program);
-  session.programs.push(program);
-  session.pending.push(program);
-  session.shaders.push(vertex, fragment);
+  const handle = submitWarmProgram(gl, sources);
+  if (!handle) return;
+  session.programs.push(handle.program);
+  session.pending.push(handle);
+  session.shaders.push(handle.vertex, handle.fragment);
 }
 
 /** Poll a bounded slice of the pending links; a completed one is resolved by
- *  the query itself, which is the moment the browser caches its binary. */
+ *  the LINK_STATUS read that follows, which is the moment the browser caches
+ *  its binary (measured on the 3090 rig: 164 programs linked at the reveal
+ *  with that read against 157 without it). */
 function resolveCompletedLinks(gl: WarmupGl): void {
   const pending = session.pending;
   let kept = 0;
   const limit = Math.min(pending.length, RESOLVE_POLLS_PER_FRAME);
   for (let i = 0; i < limit; i++) {
-    const program = pending[i];
-    let done = false;
-    try {
-      done = gl.getProgramParameter(program, COMPLETION_STATUS_KHR) === true;
-      // The completion query answers WITHOUT resolving the link; the first
-      // LINK_STATUS read is what resolves it, and a resolved link is what the
-      // browser caches. It costs nothing here because the link is already done
-      // (measured on the 3090 rig: 164 programs linked at the reveal with this
-      // read against 157 without it).
-      if (done) gl.getProgramParameter(program, gl.LINK_STATUS);
-    } catch {
-      done = true;
-    }
+    const handle = pending[i];
+    const done = pollWarmProgram(gl, handle) !== 'pending';
     if (done) session.resolved++;
-    else pending[kept++] = program;
+    else pending[kept++] = handle;
   }
   // The slice beyond the limit is untouched: shift it down behind the kept ones.
   for (let i = limit; i < pending.length; i++) pending[kept++] = pending[i];

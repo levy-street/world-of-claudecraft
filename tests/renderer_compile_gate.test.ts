@@ -319,8 +319,9 @@ describe('Renderer live shader compile rejection recovery', () => {
     expect(gateMethod).toContain('this.initialGpuWorkStart');
     // The announcement arm rides the same piece cut, at gate creation
     // (shader_warm_audit.ts dry-assembles each piece's programs there).
-    expect(gateMethod).toContain('linkPieceWork(target, color, shadow, settle, expect),');
-    expect(gateMethod).toContain('expectRootProgramSources(this.compileArms, node)');
+    expect(gateMethod).toContain('linkPieceWork(target, color, shadow, settle), {');
+    expect(gateMethod).toContain('runPiecesWarmed(this.compileArms, target,');
+    expect(gateMethod).toContain('firstIndex,');
     expect(gateMethod).not.toContain('this.liveCompileGates.run(');
     expect(gateMethod).toContain('this.uploadGateTexturesGated(target, priority)');
     // The tail carries the GATE's result: a timed-out or failed link proved

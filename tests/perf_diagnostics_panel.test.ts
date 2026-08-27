@@ -9,6 +9,7 @@ import {
   PerfDiagnosticsPanel,
 } from '../src/game/perf_diagnostics_panel';
 import { shaderWarmAuditSnapshot } from '../src/render/shader_warm_audit';
+import { shaderWarmSnapshot } from '../src/render/shader_warm_client';
 
 function digest(value = 0) {
   return { count: 600, avg: value, p95: value, max: value };
@@ -46,6 +47,7 @@ function snapshot(): PerfSnapshot {
     hitchForensics: [],
     postRevealLinks: null,
     shaderWarmAudit: shaderWarmAuditSnapshot(),
+    shaderWarm: shaderWarmSnapshot(),
     input: {
       intents: 0,
       lastKind: '',

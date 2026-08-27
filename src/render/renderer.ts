@@ -607,7 +607,7 @@ import { type SelfMotionFrame, SelfMotionPredictor, updateSelfRenderFallback } f
 import { SelfSpiritPrewarmer } from './self_spirit_prewarm';
 import { SentenceVfx } from './sentence_vfx';
 import { sentenceImpactPlan } from './sentence_vfx_core';
-import { expectRootProgramSources } from './shader_warm_audit';
+import { runPiecesWarmed } from './shader_warm_gate';
 import {
   createShadowCadenceState,
   resetShadowCadence,
@@ -2526,12 +2526,12 @@ export class Renderer {
     // only the hard watchdog ever reveals an unlinked root (reveal_gate.ts).
     if (this.asyncCompileSupported) {
       const revealHost = createRevealCompileHost({
-        gate: (pieces, options) =>
-          this.liveCompileGates.runPieces(pieces, VIEW_COMPILE_GATE_MAX_MS, options),
+        gate: (pieces, options, firstIndex) =>
+          this.liveCompileGates.runPieces(pieces, VIEW_COMPILE_GATE_MAX_MS, options, firstIndex),
         compileColor: (target) => this.compilePrewarmColorPrograms(target, false),
         compileShadow: (target) => this.compileShadowPrograms(target),
         settle: pieceProgramSettle(this.webgl.properties, this.prewarmDepthMaterials),
-        expect: (target) => expectRootProgramSources(this.compileArms, target),
+        arms: this.compileArms,
         upload: (target, priority) => this.uploadGateTexturesGated(target, priority),
         touch: (target, priority, gate) => this.touchLinkedProgramsGated(target, priority, gate),
         predictRevealMs: () => this.gpuPrepBudget.predictMs(REVEAL_GATE_PREP_KIND),
@@ -5357,8 +5357,9 @@ export class Renderer {
    *  on first use, so a harness over the prototype gets one too. */
   private get compileArms(): CompileArmHost {
     if (this.compileArmHost) return this.compileArmHost;
-    this.compileArmHost = {
+    const host: CompileArmHost = {
       webgl: () => this.webgl,
+      context: () => this.webgl.getContext(),
       camera: () => this.camera,
       scene: () => this.scene,
       shadowCamera: () => this.sun.shadow.camera,
@@ -5370,7 +5371,8 @@ export class Renderer {
       depthMaterials: () => this.prewarmDepthMaterials,
       shadowArm: () => GFX.dynamicShadows && this.asyncCompileSupported,
     };
-    return this.compileArmHost;
+    this.compileArmHost = host;
+    return host;
   }
 
   /** Link a root's exact live colour-program variant before a bounded upload. */
@@ -8545,25 +8547,24 @@ export class Renderer {
     const lookup = (id: number) => this.sim.entities.get(id);
     const isCasting = castingAtPlayerPredicate(lookup, this.sim.player.id);
     const priority = compilePriorityForTarget(target, this.sim.player.targetId, isCasting);
-    // Compile the variant pair the boot prewarm proved out, never a bare
-    // compileAsync at the ambient render target: three keys a program on the
-    // bound target's output colour space, so on composer tiers an unbound
-    // compile links the canvas srgb variant while the scene pass draws the
-    // linear one, and the first visible frame still linked the real program
-    // synchronously (the measured 300-500 ms border-crossing stall). The
-    // colour pass binds the tier-correct target; the skinned depth pass covers
-    // the renderer-owned shadow material the colour walk cannot enumerate; the
-    // touch tail warms the linked programs' uniform tables (no reveal query).
+    // The colour and shadow arms (compile_arms.ts owns why each binds what it
+    // binds); each piece asks the shader warm worker before it links, when
+    // the policy holds it (shader_warm_gate.ts), then rides this gate queue.
     const color = (node: THREE.Object3D) => this.compilePrewarmColorPrograms(node, false);
     const shadow = (node: THREE.Object3D) => this.compileShadowPrograms(node);
     const settle = pieceProgramSettle(this.webgl.properties, this.prewarmDepthMaterials);
-    const expect = (node: THREE.Object3D) => expectRootProgramSources(this.compileArms, node);
     const submit = () =>
-      this.liveCompileGates.runPieces(
-        linkPieceWork(target, color, shadow, settle, expect),
-        VIEW_COMPILE_GATE_MAX_MS,
-        { priority, label: `live-gate:${target.name || target.type}` },
-      );
+      runPiecesWarmed(this.compileArms, target, linkPieceWork(target, color, shadow, settle), {
+        priority,
+        imminent: false,
+        submit: (pieces, firstIndex) =>
+          this.liveCompileGates.runPieces(
+            pieces,
+            VIEW_COMPILE_GATE_MAX_MS,
+            { priority, label: `live-gate:${target.name || target.type}` },
+            firstIndex,
+          ),
+      });
     const startAfterInitialPaint = compileMayStartBeforeInitialPaint(priority, requiredForEntry)
       ? null
       : this.initialGpuWorkStart;

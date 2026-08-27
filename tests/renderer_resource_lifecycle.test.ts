@@ -12,9 +12,16 @@ import {
   resetShaderWarmAuditForTest,
   shaderWarmAuditSnapshot,
 } from '../src/render/shader_warm_audit';
+import {
+  resetShaderWarmForTest,
+  shaderWarmDecide,
+  shaderWarmSnapshot,
+} from '../src/render/shader_warm_client';
+import type { ShaderWarmWorkerMessage } from '../src/render/shader_warm_protocol';
 
 afterEach(() => {
   resetShaderWarmAuditForTest();
+  resetShaderWarmForTest();
   setCompileArmObserver(null);
 });
 
@@ -114,6 +121,59 @@ describe('renderer resource lifecycle', () => {
     expect(vfx.dispose).toHaveBeenCalledOnce();
     expect(abilityVfxFx.dispose).toHaveBeenCalledOnce();
     expect(errors).toHaveLength(1);
+  });
+
+  it('lets the shader warm worker go with the renderer whose contract it mirrors', () => {
+    // The worker's context contract (attributes, extension set) was THIS
+    // renderer's; kept alive across a rebuild it would warm keys the new
+    // context never asks for. Read through the client's own readout: a
+    // lifecycle that forgets the release leaves it ready, not idle.
+    const posted: Record<string, unknown>[] = [];
+    let terminations = 0;
+    const worker = {
+      posted,
+      postMessage(message: unknown) {
+        posted.push(message as Record<string, unknown>);
+      },
+      terminate() {
+        terminations++;
+      },
+      onmessage: null as ((event: MessageEvent<ShaderWarmWorkerMessage>) => void) | null,
+      onerror: null as ((event: unknown) => void) | null,
+    };
+    resetShaderWarmForTest({
+      search: '?shaderwarm=reveal',
+      mobile: false,
+      spawn: () => worker,
+      schedule: () => () => {},
+    });
+    shaderWarmDecide({ getContextAttributes: () => ({}), getExtension: () => null }, 0, false);
+    const ready: ShaderWarmWorkerMessage = {
+      kind: 'ready',
+      ok: true,
+      reason: null,
+      extensions: [],
+      adapter: 'test',
+    };
+    worker.onmessage?.({ data: ready } as MessageEvent<ShaderWarmWorkerMessage>);
+    expect(shaderWarmSnapshot().worker).toBe('ready');
+
+    const errors: unknown[] = [];
+    disposeRendererPrewarmAndGroundFx({ prewarmDepthMaterials: new Map() }, (cleanup) => {
+      try {
+        cleanup();
+      } catch (error) {
+        errors.push(error);
+      }
+    });
+
+    expect(errors).toEqual([]);
+    expect(shaderWarmSnapshot().worker).toBe('idle');
+    // Terminated without a word: a dispose message could not run before the
+    // terminate that follows it, and the browser reclaims the worker's
+    // context with the worker itself.
+    expect(posted.map((message) => message.kind)).toEqual(['init']);
+    expect(terminations).toBe(1);
   });
 
   it('lets the shader warm audit go with the renderer it was listening to', async () => {

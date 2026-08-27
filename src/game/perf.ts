@@ -10,6 +10,11 @@ import {
 } from '../render/scene_census_core';
 import { type ShaderWarmAuditSnapshot, shaderWarmAuditSnapshot } from '../render/shader_warm_audit';
 import {
+  noteShaderWarmFrameMs,
+  type ShaderWarmSnapshot,
+  shaderWarmSnapshot,
+} from '../render/shader_warm_client';
+import {
   createHeapSawtooth,
   type HeapFloorTrend,
   type HeapFloorValley,
@@ -70,6 +75,9 @@ export interface PerfSnapshot {
   // much, so a capture taken with it on is read net of it, never compared
   // raw to one taken without.
   shaderWarmAudit: ShaderWarmAuditSnapshot;
+  // The shader warm worker's readout (src/render/shader_warm_client.ts):
+  // what the gates asked, held, bypassed and got. Local-only, like the audit.
+  shaderWarm: ShaderWarmSnapshot;
   input: {
     intents: number;
     lastKind: string;
@@ -523,6 +531,8 @@ export class PerfMonitor {
     const ms = Math.min(250, Math.max(0, dt * 1000));
     this.lastFrameMs = ms;
     this.frameMs.push(ms);
+    // The warm worker's pause signal rides the same reading.
+    noteShaderWarmFrameMs(ms);
     this.frameWindow.push(now, ms);
     this.frameWindow.pruneBefore(now - MAX_WINDOW_MS);
   }
@@ -1058,6 +1068,7 @@ export class PerfMonitor {
       hitchForensics: this.hitchForensics.records(),
       postRevealLinks: postRevealLinksSnapshot(),
       shaderWarmAudit: shaderWarmAuditSnapshot(),
+      shaderWarm: shaderWarmSnapshot(),
       input: {
         intents: this.inputIntents,
         lastKind: this.lastInputKind,

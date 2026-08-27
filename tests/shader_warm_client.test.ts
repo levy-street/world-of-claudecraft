@@ -1,0 +1,776 @@
+// The main thread's side of the shader warm worker
+// (src/render/shader_warm_client.ts): it spawns the worker once, hands it the
+// game context's own contract, dedupes and routes the programs the gates ask
+// for, forwards the pause signal, gives up on a worker that stops delivering,
+// and reads out. Driven here through an injected spawn and an injected
+// timer, so every message the host sends and every deadline it arms is a
+// line in the case rather than a real Worker and a real clock.
+
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { GPU_WORK_PRIORITY } from '../src/render/background_gpu_queue';
+import {
+  armShaderWarm,
+  disposeShaderWarm,
+  noteShaderWarmFrameMs,
+  noteShaderWarmHold,
+  resetShaderWarmForTest,
+  SHADER_WARM_READY_DEADLINE_MS,
+  shaderWarmAvailable,
+  shaderWarmDecide,
+  shaderWarmSnapshot,
+  warmShaderPrograms,
+} from '../src/render/shader_warm_client';
+import { SHADER_WARM_TIMEOUT_BREAKER } from '../src/render/shader_warm_client_core';
+import type { ShaderWarmWorkerMessage } from '../src/render/shader_warm_protocol';
+
+let warned: string[] = [];
+
+beforeEach(() => {
+  warned = [];
+  vi.spyOn(console, 'warn').mockImplementation((...args: unknown[]) => {
+    warned.push(args.map((arg) => String(arg)).join(' '));
+  });
+});
+
+afterEach(() => {
+  resetShaderWarmForTest();
+  vi.restoreAllMocks();
+});
+
+interface FakeWorker {
+  postMessage(message: unknown): void;
+  terminate(): void;
+  onmessage: ((event: MessageEvent<ShaderWarmWorkerMessage>) => void) | null;
+  onerror: ((event: ErrorEvent) => void) | null;
+  posted: Record<string, unknown>[];
+  terminations: number;
+  emit(message: ShaderWarmWorkerMessage): void;
+  fail(): void;
+  ofKind(kind: string): Record<string, unknown>[];
+  kinds(): string[];
+}
+
+function fakeWorker(): FakeWorker {
+  const worker: FakeWorker = {
+    posted: [],
+    terminations: 0,
+    onmessage: null,
+    onerror: null,
+    postMessage(message) {
+      worker.posted.push(message as Record<string, unknown>);
+    },
+    terminate() {
+      worker.terminations++;
+    },
+    emit(message) {
+      worker.onmessage?.({ data: message } as MessageEvent<ShaderWarmWorkerMessage>);
+    },
+    fail() {
+      worker.onerror?.(new Error('module load failed') as unknown as ErrorEvent);
+    },
+    ofKind(kind) {
+      return worker.posted.filter((message) => message.kind === kind);
+    },
+    kinds() {
+      return worker.posted.map((message) => String(message.kind));
+    },
+  };
+  return worker;
+}
+
+/** The extensions the stub context answers for; everything else is null,
+ *  the way an adapter without the extension answers. */
+function contextStub(granted: string[], attributes: object | null = { antialias: false }) {
+  const asked: string[] = [];
+  return {
+    asked,
+    context: {
+      getContextAttributes: () => attributes,
+      getExtension: (name: string) => {
+        asked.push(name);
+        return granted.includes(name) ? { name } : null;
+      },
+    },
+  };
+}
+
+const GRANTED = [
+  'KHR_parallel_shader_compile',
+  'WEBGL_debug_renderer_info',
+  'EXT_color_buffer_float',
+];
+
+interface FakeTimer {
+  ms: number;
+  fire: () => void;
+  cancels: number;
+}
+
+interface StartOptions {
+  search?: string;
+  mobile?: boolean;
+  granted?: string[];
+  priority?: number;
+  imminent?: boolean;
+  armed?: boolean;
+}
+
+/** Reset the client onto fake workers and a fake timer, then make the first
+ *  decide, which is what spawns one. */
+function start(options: StartOptions = {}) {
+  const workers: FakeWorker[] = [];
+  const timers: FakeTimer[] = [];
+  resetShaderWarmForTest({
+    search: options.search ?? '?shaderwarm=reveal',
+    mobile: options.mobile ?? false,
+    spawn: () => {
+      const worker = fakeWorker();
+      workers.push(worker);
+      return worker;
+    },
+    schedule: (callback, ms) => {
+      const timer: FakeTimer = { ms, fire: callback, cancels: 0 };
+      timers.push(timer);
+      return () => {
+        timer.cancels++;
+      };
+    },
+  });
+  if (options.armed !== false) armShaderWarm();
+  const stub = contextStub(options.granted ?? GRANTED);
+  const decision = shaderWarmDecide(
+    stub.context,
+    options.priority ?? GPU_WORK_PRIORITY.VISIBLE_PREWARM,
+    options.imminent ?? false,
+  );
+  return {
+    workers,
+    timers,
+    decision,
+    stub,
+    context: stub.context,
+    worker: () => workers[0],
+    latest: () => workers[workers.length - 1],
+    ready: (adapter = 'Test Adapter') =>
+      workers[workers.length - 1]?.emit({
+        kind: 'ready',
+        ok: true,
+        reason: null,
+        extensions: GRANTED,
+        adapter,
+      }),
+  };
+}
+
+const SOURCE = {
+  vertex: 'void main() {}',
+  fragment: 'void main() {}',
+  index0Attribute: 'position',
+};
+const OTHER = { vertex: 'void main() {}', fragment: 'float f;', index0Attribute: 'position' };
+
+describe('starting the shader warm worker', () => {
+  it('hands the worker the game context own attributes, extensions and caps', () => {
+    // The worker's context must be created the same way and enable exactly
+    // the same set, in the same order: the browser's program cache key
+    // carries both, so a different contract warms keys the game never asks
+    // for. The window and retention caps are the platform's.
+    const { worker, stub } = start();
+    const init = worker().ofKind('init');
+
+    expect(init).toHaveLength(1);
+    expect(init[0]).toEqual({
+      kind: 'init',
+      contextAttributes: { antialias: false },
+      extensions: [
+        'EXT_color_buffer_float',
+        'WEBGL_debug_renderer_info',
+        'KHR_parallel_shader_compile',
+      ],
+      maxWindow: 4,
+      retain: 256,
+    });
+    // Asked over the renderer's own list, in the renderer's own order.
+    expect(stub.asked.slice(0, 3)).toEqual([
+      'EXT_color_buffer_float',
+      'WEBGL_clip_cull_distance',
+      'OES_texture_float_linear',
+    ]);
+    expect(stub.asked).toContain('KHR_parallel_shader_compile');
+  });
+
+  it('gives a phone the smaller window and the smaller retention', () => {
+    // A phone's GPU is shared with the compositor: fewer links in flight and
+    // fewer programs held after their resolve.
+    const { worker } = start({ mobile: true });
+    expect(worker().ofKind('init')[0]).toMatchObject({ maxWindow: 2, retain: 64 });
+  });
+
+  it('reads the mobile class off the page when the caller names no platform', () => {
+    // The client's own signal is the body class the mobile controls set, not
+    // a user-agent sniff and not the FPS governor.
+    const scope = globalThis as { document?: unknown };
+    const original = scope.document;
+    scope.document = {
+      body: { classList: { contains: (name: string) => name === 'mobile-touch' } },
+    };
+    try {
+      const worker = fakeWorker();
+      resetShaderWarmForTest({
+        search: '?shaderwarm=reveal',
+        mobile: undefined,
+        spawn: () => worker,
+        schedule: () => () => {},
+      });
+      armShaderWarm();
+      shaderWarmDecide(contextStub(GRANTED).context, GPU_WORK_PRIORITY.VISIBLE_PREWARM, false);
+
+      expect(worker.ofKind('init')[0]).toMatchObject({ maxWindow: 2, retain: 64 });
+    } finally {
+      if (original === undefined) delete scope.document;
+      else scope.document = original;
+    }
+  });
+
+  it('spawns once however many gates decide', () => {
+    const { worker, workers, context } = start();
+    shaderWarmDecide(context, GPU_WORK_PRIORITY.VISIBLE_PREWARM, false);
+    shaderWarmDecide(context, GPU_WORK_PRIORITY.BACKGROUND, false);
+
+    expect(workers).toHaveLength(1);
+    expect(worker().ofKind('init')).toHaveLength(1);
+  });
+
+  it('is off by default: no mode named, no worker, no hold', () => {
+    // The worker ships opt-in until a cell shows the win, so a player who
+    // named nothing runs the pre-worker path to the byte.
+    const { decision, workers } = start({ search: '' });
+
+    expect(decision).toEqual({ hold: false, bypass: 'mode-off' });
+    expect(workers).toEqual([]);
+    expect(shaderWarmSnapshot()).toMatchObject({ mode: 'off', worker: 'idle' });
+  });
+
+  it('never spawns a worker in mode off', () => {
+    const { decision, workers } = start({ search: '?shaderwarm=off' });
+
+    expect(decision).toEqual({ hold: false, bypass: 'mode-off' });
+    expect(workers).toEqual([]);
+    expect(shaderWarmSnapshot()).toMatchObject({ mode: 'off', worker: 'idle' });
+  });
+
+  it('warns once for the probe arm that holds live entity views', () => {
+    // Mode `all` holds gates a player is looking at; nobody should be able to
+    // leave a session on it without the console saying so.
+    start({ search: '?shaderwarm=all' });
+    expect(warned).toHaveLength(1);
+    expect(warned[0]).toContain('all');
+
+    warned.length = 0;
+    start({ search: '?shaderwarm=reveal' });
+    start({ search: '?shaderwarm=off' });
+    expect(warned).toEqual([]);
+  });
+
+  it('reports refused with no worker at all, and fails what it was asked for', async () => {
+    // Wherever module workers or OffscreenCanvas are missing, every gate
+    // keeps its own path: the client says so instead of throwing.
+    resetShaderWarmForTest({
+      search: '?shaderwarm=reveal',
+      spawn: () => null,
+      schedule: () => () => {},
+    });
+    armShaderWarm();
+    const stub = contextStub(GRANTED);
+    const decision = shaderWarmDecide(stub.context, GPU_WORK_PRIORITY.VISIBLE_PREWARM, false);
+
+    expect(decision).toEqual({ hold: false, bypass: 'unavailable' });
+    expect(shaderWarmSnapshot()).toMatchObject({ worker: 'refused', refusal: 'no-worker' });
+    expect(await warmShaderPrograms([SOURCE], GPU_WORK_PRIORITY.VISIBLE_PREWARM)).toEqual([
+      'failed',
+    ]);
+  });
+
+  it('routes the queue own floors into the policy', () => {
+    // The floors are the queue's (GPU_WORK_PRIORITY), not a copy: a gate at
+    // the actionable floor must never be held, whatever the mode.
+    const { context } = start({ search: '?shaderwarm=reveal' });
+
+    expect(shaderWarmDecide(context, GPU_WORK_PRIORITY.ACTIONABLE_VIEW, false)).toEqual({
+      hold: false,
+      bypass: 'actionable',
+    });
+    expect(shaderWarmDecide(context, GPU_WORK_PRIORITY.LIVE_VIEW, false)).toEqual({
+      hold: false,
+      bypass: 'live-view',
+    });
+    expect(shaderWarmDecide(context, GPU_WORK_PRIORITY.VISIBLE_PREWARM, false)).toEqual({
+      hold: true,
+    });
+  });
+
+  it('holds nothing before the first reveal', () => {
+    const { decision } = start({ armed: false });
+    expect(decision).toEqual({ hold: false, bypass: 'before-reveal' });
+    expect(shaderWarmSnapshot().armed).toBe(false);
+    // The worker is still started there: it is the reveal that is missing,
+    // not the worker.
+    expect(shaderWarmAvailable()).toBe(true);
+  });
+});
+
+describe('the deadline a spawned worker has to answer ready', () => {
+  it('pins the bound a silent worker is given', () => {
+    // A module worker loads and creates its context in well under a second
+    // on every tested platform; past this it is treated as absent.
+    expect(SHADER_WARM_READY_DEADLINE_MS).toBe(3_000);
+  });
+
+  it('arms the deadline at the spawn, for that bound', () => {
+    const { timers } = start();
+    expect(timers).toHaveLength(1);
+    expect(timers[0].ms).toBe(SHADER_WARM_READY_DEADLINE_MS);
+  });
+
+  it('retires a worker that never answers, and fails what gates asked for', async () => {
+    const { worker, timers, context } = start();
+    const settled = warmShaderPrograms([SOURCE], GPU_WORK_PRIORITY.VISIBLE_PREWARM);
+
+    timers[0].fire();
+
+    expect(await settled).toEqual(['failed']);
+    expect(shaderWarmSnapshot()).toMatchObject({ worker: 'refused', refusal: 'ready-timeout' });
+    expect(worker().terminations).toBe(1);
+    expect(shaderWarmDecide(context, GPU_WORK_PRIORITY.VISIBLE_PREWARM, false)).toEqual({
+      hold: false,
+      bypass: 'unavailable',
+    });
+  });
+
+  it('cancels the deadline when the worker answers in time, and ignores it if it fires late', () => {
+    const { timers, ready } = start();
+    ready();
+    expect(timers[0].cancels).toBe(1);
+
+    // A timer that fires anyway (a cancel the host could not reach) must not
+    // retire a worker that is up and serving.
+    timers[0].fire();
+    expect(shaderWarmSnapshot()).toMatchObject({ worker: 'ready', refusal: null });
+  });
+});
+
+describe('sending programs to the worker', () => {
+  it('queues what a gate asks for before ready, and sends it once ready', async () => {
+    const { worker, ready } = start();
+    const settled = warmShaderPrograms([SOURCE, OTHER], GPU_WORK_PRIORITY.VISIBLE_PREWARM);
+
+    expect(worker().ofKind('warm')).toHaveLength(0);
+    ready();
+    const warm = worker().ofKind('warm');
+    expect(warm).toHaveLength(1);
+    expect(warm[0].sources).toEqual([
+      { id: 1, ...SOURCE, priority: GPU_WORK_PRIORITY.VISIBLE_PREWARM },
+      { id: 2, ...OTHER, priority: GPU_WORK_PRIORITY.VISIBLE_PREWARM },
+    ]);
+
+    worker().emit({ kind: 'warmed', id: 1, linkMs: 12 });
+    worker().emit({ kind: 'failed', id: 2, reason: 'link-failed' });
+    expect(await settled).toEqual(['warmed', 'failed']);
+    expect(shaderWarmSnapshot()).toMatchObject({
+      sent: 2,
+      warmed: 1,
+      failed: 1,
+      adapter: 'Test Adapter',
+      // Only a warm carries a link time; a failure has none to report.
+      links: { count: 1, sumMs: 12, maxMs: 12 },
+    });
+  });
+
+  it('sends straight through once the worker answered ready', async () => {
+    const { worker, ready } = start();
+    ready();
+    const settled = warmShaderPrograms([SOURCE], GPU_WORK_PRIORITY.BACKGROUND);
+
+    expect(worker().ofKind('warm')).toHaveLength(1);
+    worker().emit({ kind: 'warmed', id: 1, linkMs: 5 });
+    expect(await settled).toEqual(['warmed']);
+  });
+
+  it('asks the worker once for a program two gates want', async () => {
+    const { worker, ready } = start();
+    ready();
+    const first = warmShaderPrograms([SOURCE], GPU_WORK_PRIORITY.VISIBLE_PREWARM);
+    const second = warmShaderPrograms([SOURCE], GPU_WORK_PRIORITY.LIVE_VIEW);
+
+    expect(worker().ofKind('warm')).toHaveLength(1);
+    worker().emit({ kind: 'warmed', id: 1, linkMs: 5 });
+    expect(await Promise.all([first, second])).toEqual([['warmed'], ['warmed']]);
+    expect(shaderWarmSnapshot()).toMatchObject({ asked: 2, sent: 1, deduped: 1 });
+  });
+
+  it('keeps the longest link the worker reported, and the sum', () => {
+    const { worker, ready } = start();
+    ready();
+    warmShaderPrograms([SOURCE], GPU_WORK_PRIORITY.VISIBLE_PREWARM);
+    warmShaderPrograms([OTHER], GPU_WORK_PRIORITY.VISIBLE_PREWARM);
+    worker().emit({ kind: 'warmed', id: 1, linkMs: 140 });
+    worker().emit({ kind: 'warmed', id: 2, linkMs: 20 });
+
+    expect(shaderWarmSnapshot().links).toEqual({ count: 2, sumMs: 160, maxMs: 140 });
+  });
+
+  it('retires a worker that refuses, and every later gate bypasses as unavailable', async () => {
+    // The refusal is the worker saying its context cannot reproduce the
+    // contract; nothing it links after that would be a cache hit.
+    const { worker, context } = start();
+    const settled = warmShaderPrograms([SOURCE], GPU_WORK_PRIORITY.VISIBLE_PREWARM);
+    worker().emit({
+      kind: 'ready',
+      ok: false,
+      reason: 'extension-mismatch',
+      extensions: [],
+      adapter: '',
+    });
+
+    expect(await settled).toEqual(['failed']);
+    // Terminate only: a dispose message could not run before the terminate
+    // that follows it, and the browser reclaims the context with the worker.
+    expect(worker().kinds()).toEqual(['init']);
+    expect(worker().terminations).toBe(1);
+    expect(shaderWarmSnapshot()).toMatchObject({
+      worker: 'refused',
+      refusal: 'extension-mismatch',
+      adapter: '',
+    });
+    expect(shaderWarmDecide(context, GPU_WORK_PRIORITY.VISIBLE_PREWARM, false)).toEqual({
+      hold: false,
+      bypass: 'unavailable',
+    });
+  });
+
+  it('fails everything and marks the worker dead when its context is lost', async () => {
+    const { worker, ready } = start();
+    ready();
+    const settled = warmShaderPrograms([SOURCE, OTHER], GPU_WORK_PRIORITY.VISIBLE_PREWARM);
+    worker().emit({ kind: 'warmed', id: 1, linkMs: 8 });
+    worker().emit({ kind: 'lost' });
+
+    expect(await settled).toEqual(['warmed', 'failed']);
+    expect(shaderWarmSnapshot()).toMatchObject({ worker: 'dead', refusal: 'context-lost' });
+    expect(shaderWarmAvailable()).toBe(false);
+    expect(worker().terminations).toBe(1);
+  });
+
+  it('fails everything when the worker module itself blows up', async () => {
+    const { worker } = start();
+    const settled = warmShaderPrograms([SOURCE], GPU_WORK_PRIORITY.VISIBLE_PREWARM);
+    worker().fail();
+
+    expect(await settled).toEqual(['failed']);
+    expect(shaderWarmSnapshot()).toMatchObject({ worker: 'dead', refusal: 'worker-error' });
+  });
+
+  it('keeps the worker last readout for the snapshot', () => {
+    const { worker, ready } = start();
+    ready();
+    worker().emit({
+      kind: 'stats',
+      pending: 4,
+      inFlight: 2,
+      windowLinks: 3,
+      state: 'ramp',
+      warmed: 11,
+      failed: 1,
+      retained: 12,
+    });
+
+    expect(shaderWarmSnapshot().workerStats).toEqual({
+      pending: 4,
+      inFlight: 2,
+      windowLinks: 3,
+      state: 'ramp',
+      warmed: 11,
+      failed: 1,
+      retained: 12,
+    });
+  });
+});
+
+describe('the breaker on held gates that keep expiring', () => {
+  it('retires the worker after three expiries in a row', () => {
+    // Each expiry is a reveal delayed by the whole hold cap: a worker that
+    // does that three times running is worse than no worker, so the rest of
+    // the renderer's life runs the pre-worker path.
+    const { worker, ready, context } = start();
+    ready();
+
+    for (let expiry = 0; expiry < SHADER_WARM_TIMEOUT_BREAKER - 1; expiry++) {
+      noteShaderWarmHold(false, true, 5_000);
+    }
+    expect(shaderWarmSnapshot().worker).toBe('ready');
+
+    noteShaderWarmHold(false, true, 5_000);
+    expect(shaderWarmSnapshot()).toMatchObject({
+      worker: 'dead',
+      refusal: 'hold-timeouts',
+      heldTimedOut: SHADER_WARM_TIMEOUT_BREAKER,
+    });
+    expect(worker().terminations).toBe(1);
+    expect(shaderWarmDecide(context, GPU_WORK_PRIORITY.VISIBLE_PREWARM, false)).toEqual({
+      hold: false,
+      bypass: 'unavailable',
+    });
+  });
+
+  it('counts expiries in a ROW: a hold that came back warm clears the streak', () => {
+    const { ready } = start();
+    ready();
+
+    noteShaderWarmHold(false, true, 10);
+    noteShaderWarmHold(false, true, 10);
+    noteShaderWarmHold(true, false, 10);
+    noteShaderWarmHold(false, true, 10);
+    noteShaderWarmHold(false, true, 10);
+
+    expect(shaderWarmSnapshot()).toMatchObject({
+      worker: 'ready',
+      held: 5,
+      heldWarm: 1,
+      heldTimedOut: 4,
+    });
+  });
+});
+
+describe('the pause signal the client forwards', () => {
+  it('stands a ready worker down when the frames are late and nothing waits on it', () => {
+    const { worker, ready } = start();
+    ready();
+    for (let frame = 0; frame < 9; frame++) noteShaderWarmFrameMs(40);
+    expect(worker().ofKind('pause')).toHaveLength(1);
+    expect(shaderWarmSnapshot().paused).toBe(true);
+
+    // Already stood down: more late frames are not a second message.
+    for (let frame = 0; frame < 4; frame++) noteShaderWarmFrameMs(40);
+    expect(worker().ofKind('pause')).toHaveLength(1);
+
+    for (let frame = 0; frame < 6; frame++) noteShaderWarmFrameMs(16);
+    expect(worker().ofKind('resume')).toHaveLength(1);
+    expect(shaderWarmSnapshot()).toMatchObject({ paused: false });
+    expect(shaderWarmSnapshot().frameEmaMs).toBeLessThan(25);
+  });
+
+  it('never pauses the worker while a held gate is waiting on a program', () => {
+    // The pause is for BACKGROUND warming. A request that is out has a gate
+    // holding its link behind it, and pausing there only delays that gate:
+    // the first iGPU cell expired 35 of 57 held pieces at the hold cap.
+    const { worker, ready } = start();
+    ready();
+    warmShaderPrograms([SOURCE], GPU_WORK_PRIORITY.VISIBLE_PREWARM);
+    for (let frame = 0; frame < 9; frame++) noteShaderWarmFrameMs(40);
+
+    expect(shaderWarmSnapshot().paused).toBe(true);
+    expect(worker().ofKind('pause')).toHaveLength(0);
+  });
+
+  it('pauses when the LAST waiting request settles, not the first', () => {
+    const { worker, ready } = start();
+    ready();
+    warmShaderPrograms([SOURCE], GPU_WORK_PRIORITY.VISIBLE_PREWARM);
+    warmShaderPrograms([OTHER], GPU_WORK_PRIORITY.VISIBLE_PREWARM);
+    for (let frame = 0; frame < 9; frame++) noteShaderWarmFrameMs(40);
+
+    worker().emit({ kind: 'warmed', id: 1, linkMs: 5 });
+    expect(worker().ofKind('pause')).toHaveLength(0);
+
+    // A failure ends a wait as surely as a warm does.
+    worker().emit({ kind: 'failed', id: 2, reason: 'link-failed' });
+    expect(worker().ofKind('pause')).toHaveLength(1);
+  });
+
+  it('resumes the moment a gate asks for a program under a paused average', () => {
+    // And says each thing once: the worker is never sent the same message
+    // twice in a row, whatever the frames and the requests do.
+    const { worker, ready } = start();
+    ready();
+    for (let frame = 0; frame < 9; frame++) noteShaderWarmFrameMs(40);
+    expect(worker().ofKind('pause')).toHaveLength(1);
+
+    warmShaderPrograms([SOURCE], GPU_WORK_PRIORITY.VISIBLE_PREWARM);
+    expect(worker().ofKind('resume')).toHaveLength(1);
+    warmShaderPrograms([OTHER], GPU_WORK_PRIORITY.VISIBLE_PREWARM);
+    expect(worker().ofKind('resume')).toHaveLength(1);
+
+    worker().emit({ kind: 'warmed', id: 1, linkMs: 5 });
+    expect(worker().ofKind('pause')).toHaveLength(1);
+    worker().emit({ kind: 'warmed', id: 2, linkMs: 5 });
+    expect(worker().ofKind('pause')).toHaveLength(2);
+
+    expect(worker().kinds()).toEqual(['init', 'pause', 'warm', 'resume', 'warm', 'pause']);
+  });
+
+  it('posts nothing to a worker that is not ready, and hands it the pause on ready', () => {
+    // The frames are late while the worker is still starting: it must not
+    // begin linking the moment it comes up.
+    const { worker, ready } = start();
+    for (let frame = 0; frame < 9; frame++) noteShaderWarmFrameMs(40);
+    expect(worker().ofKind('pause')).toHaveLength(0);
+
+    ready();
+    expect(worker().ofKind('pause')).toHaveLength(1);
+  });
+
+  it('lets a worker that comes up with work queued get straight to it', () => {
+    const { worker, ready } = start();
+    warmShaderPrograms([SOURCE], GPU_WORK_PRIORITY.VISIBLE_PREWARM);
+    for (let frame = 0; frame < 9; frame++) noteShaderWarmFrameMs(40);
+
+    ready();
+    expect(worker().ofKind('warm')).toHaveLength(1);
+    expect(worker().ofKind('pause')).toHaveLength(0);
+  });
+
+  it('reads frames after the worker is gone without touching it', () => {
+    const { worker, ready } = start();
+    ready();
+    const posted = worker().posted.length;
+    disposeShaderWarm();
+    for (let frame = 0; frame < 9; frame++) noteShaderWarmFrameMs(40);
+
+    expect(worker().posted).toHaveLength(posted);
+    expect(shaderWarmSnapshot().paused).toBe(true);
+  });
+});
+
+describe('disposing the shader warm client', () => {
+  it('terminates the worker without a word, and comes back idle', async () => {
+    // The worker's context contract was this renderer's; the next
+    // renderer's first gate spawns its own.
+    const { worker, ready } = start();
+    ready();
+    const settled = warmShaderPrograms([SOURCE], GPU_WORK_PRIORITY.VISIBLE_PREWARM);
+    disposeShaderWarm();
+
+    expect(await settled).toEqual(['failed']);
+    expect(worker().kinds()).toEqual(['init', 'warm']);
+    expect(worker().terminations).toBe(1);
+    expect(shaderWarmSnapshot()).toMatchObject({
+      worker: 'idle',
+      refusal: null,
+      adapter: '',
+      armed: false,
+      workerStats: null,
+    });
+  });
+
+  it('starts the request book over: the counters and what was asked are the new renderer own', () => {
+    const { worker, ready } = start();
+    ready();
+    warmShaderPrograms([SOURCE], GPU_WORK_PRIORITY.VISIBLE_PREWARM);
+    worker().emit({ kind: 'warmed', id: 1, linkMs: 7 });
+    expect(shaderWarmSnapshot()).toMatchObject({ asked: 1, sent: 1, warmed: 1 });
+
+    disposeShaderWarm();
+
+    expect(shaderWarmSnapshot()).toMatchObject({
+      asked: 0,
+      sent: 0,
+      warmed: 0,
+      failed: 0,
+      deduped: 0,
+      held: 0,
+      links: { count: 0, sumMs: 0, maxMs: 0 },
+    });
+  });
+
+  it('asks the next worker again for a program the last one warmed', async () => {
+    // The warmed programs went with the old worker's context, so a dedupe
+    // across the dispose would leave the new renderer's gate waiting on an
+    // id no worker will ever answer.
+    const { workers, ready, context } = start();
+    ready();
+    const first = warmShaderPrograms([SOURCE], GPU_WORK_PRIORITY.VISIBLE_PREWARM);
+    workers[0].emit({ kind: 'warmed', id: 1, linkMs: 7 });
+    expect(await first).toEqual(['warmed']);
+
+    disposeShaderWarm();
+    armShaderWarm();
+    shaderWarmDecide(context, GPU_WORK_PRIORITY.VISIBLE_PREWARM, false);
+    expect(workers).toHaveLength(2);
+    const again = warmShaderPrograms([SOURCE], GPU_WORK_PRIORITY.VISIBLE_PREWARM);
+    workers[1].emit({ kind: 'ready', ok: true, reason: null, extensions: [], adapter: 'second' });
+
+    expect(workers[1].ofKind('warm')[0].sources).toEqual([
+      { id: 1, ...SOURCE, priority: GPU_WORK_PRIORITY.VISIBLE_PREWARM },
+    ]);
+    workers[1].emit({ kind: 'warmed', id: 1, linkMs: 7 });
+    expect(await again).toEqual(['warmed']);
+    expect(shaderWarmSnapshot()).toMatchObject({ asked: 1, sent: 1, deduped: 0 });
+  });
+
+  it('spawns a fresh worker for the next renderer', () => {
+    const { context, workers } = start();
+    disposeShaderWarm();
+    armShaderWarm();
+    const decision = shaderWarmDecide(context, GPU_WORK_PRIORITY.VISIBLE_PREWARM, false);
+
+    expect(decision).toEqual({ hold: true });
+    expect(workers).toHaveLength(2);
+    expect(shaderWarmSnapshot().worker).toBe('starting');
+  });
+
+  it('terminates the worker when the page goes away', async () => {
+    // The worker holds one of the GPU process's handful of contexts, and it
+    // lives in the worker, so the page's own release hook cannot reach it.
+    const scope = globalThis as { addEventListener?: (type: string, cb: () => void) => void };
+    const original = scope.addEventListener;
+    const listeners = new Map<string, Array<() => void>>();
+    scope.addEventListener = (type: string, callback: () => void) => {
+      const forType = listeners.get(type) ?? [];
+      forType.push(callback);
+      listeners.set(type, forType);
+    };
+    try {
+      const { worker, ready } = start();
+      ready();
+      const settled = warmShaderPrograms([SOURCE], GPU_WORK_PRIORITY.VISIBLE_PREWARM);
+
+      const pagehide = listeners.get('pagehide') ?? [];
+      expect(pagehide).toHaveLength(1);
+      for (const listener of pagehide) listener();
+
+      expect(worker().terminations).toBe(1);
+      expect(await settled).toEqual(['failed']);
+    } finally {
+      scope.addEventListener = original;
+    }
+  });
+
+  it('reads out the mode, the arm, the worker state and every counter', () => {
+    const { ready } = start({ search: '?shaderwarm=all' });
+    ready('Adapter 9000');
+
+    expect(shaderWarmSnapshot()).toMatchObject({
+      mode: 'all',
+      armed: true,
+      worker: 'ready',
+      refusal: null,
+      adapter: 'Adapter 9000',
+      paused: false,
+      asked: 0,
+      sent: 0,
+      held: 0,
+      dryAssembleMs: 0,
+      links: { count: 0, sumMs: 0, maxMs: 0 },
+      bypassed: {
+        'mode-off': 0,
+        unavailable: 0,
+        'before-reveal': 0,
+        actionable: 0,
+        'live-view': 0,
+        imminent: 0,
+        'piece-mismatch': 0,
+        'nothing-to-warm': 0,
+      },
+    });
+  });
+});

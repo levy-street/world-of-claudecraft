@@ -6,6 +6,7 @@ import { perfReporterInternalsForTest, startPerfReporter } from '../src/game/per
 import { Settings } from '../src/game/settings';
 import { POST_REVEAL_LINK_WINDOW_MS } from '../src/render/post_reveal_links_core';
 import { shaderWarmAuditSnapshot } from '../src/render/shader_warm_audit';
+import { shaderWarmSnapshot } from '../src/render/shader_warm_client';
 
 function installBrowserGlobals(): void {
   const map = new Map<string, string>();
@@ -322,6 +323,7 @@ function snapshot(): PerfSnapshot {
     hitchForensics: [],
     postRevealLinks: null,
     shaderWarmAudit: shaderWarmAuditSnapshot(),
+    shaderWarm: shaderWarmSnapshot(),
     frameMs: { avg: 16.6, p50: 16, p95: 19, p99: 28, max: 52, long50: 1 },
     windows: {
       last10s: {
@@ -1907,6 +1909,46 @@ describe('perf reporter world-entry blocks', () => {
     expect(serialized).not.toContain('shaderWarmAudit');
     expect(serialized).not.toContain('shader-warm-audit-sentinel');
     expect(serialized).not.toContain('shader-warm-audit-sentinel-key');
+  });
+
+  it('never ships the shader warm worker readout either, for the same reason', () => {
+    // Same rule as the audit above, and the same failure mode: the payload
+    // is built field by field, so a new PerfSnapshot block must not reach
+    // the beacon by simply existing. This one names the adapter and carries
+    // per-gate counts from the machine.
+    const snap = snapshot();
+    snap.shaderWarm = {
+      ...shaderWarmSnapshot(),
+      mode: 'all',
+      armed: true,
+      worker: 'ready',
+      refusal: 'shader-warm-client-sentinel-refusal',
+      adapter: 'shader-warm-client-sentinel-adapter',
+      asked: 12,
+      sent: 9,
+      warmed: 8,
+      failed: 1,
+      held: 4,
+      heldWarm: 3,
+      heldTimedOut: 1,
+      holdMs: 120,
+      workerStats: {
+        pending: 2,
+        inFlight: 1,
+        windowLinks: 3,
+        state: 'ramp',
+        warmed: 8,
+        failed: 1,
+        retained: 9,
+      },
+    };
+    const body = perfReporterInternalsForTest.payloadFromSnapshot(snap, new Settings(), 's', 1)!;
+    expect(Object.keys(body)).not.toContain('shaderWarm');
+    expect(Object.keys(body.rawSummary as Record<string, unknown>)).not.toContain('shaderWarm');
+    const serialized = JSON.stringify(body);
+    expect(serialized).not.toContain('shaderWarm');
+    expect(serialized).not.toContain('shader-warm-client-sentinel-adapter');
+    expect(serialized).not.toContain('shader-warm-client-sentinel-refusal');
   });
 
   describe('over a real send', () => {

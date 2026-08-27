@@ -22,6 +22,7 @@
 
 import type * as THREE from 'three';
 import { GPU_WORK_PRIORITY } from './background_gpu_queue';
+import type { CompileArmHost } from './compile_arms';
 import type { CompileGatePiece, CompileGateResult } from './compile_gate';
 import {
   linkPiecesOf,
@@ -30,6 +31,7 @@ import {
   type PieceSettle,
 } from './compile_gate_pieces';
 import { type RevealCompileHost, revealSoftDeadlineMs } from './reveal_gate';
+import { runPiecesWarmed } from './shader_warm_gate';
 
 /** The gpu-prep label prefix, and therefore the budget's cost KIND, of every
  *  reveal compile. One constant so the label and the cost lookup cannot
@@ -44,6 +46,9 @@ export interface RevealCompileHostDeps {
   gate(
     pieces: CompileGatePiece[],
     options: { priority: number; label: string },
+    /** The index of `pieces[0]` in the root's cut, when the warm gate submits
+     *  the root piece by piece; the unit labels stay one submission's. */
+    firstIndex?: number,
   ): Promise<CompileGateResult>;
   compileColor(target: THREE.Object3D): Promise<unknown>;
   compileShadow(target: THREE.Object3D): Promise<unknown>;
@@ -55,6 +60,10 @@ export interface RevealCompileHostDeps {
   /** The announcement arm (compile_gate_pieces.ts), when the host has one:
    *  told each piece's representative at gate creation. */
   expect?: PieceExpect;
+  /** The compile arms, when the host has them: each piece asks the shader
+   *  warm worker before it links (shader_warm_gate.ts); without them the
+   *  pieces go to the gate at once, as before. */
+  arms?: CompileArmHost;
   /** Every cold texture under the root, one budgeted queue unit each. Between
    *  the link and the touch: the touch's driver round trip flushes behind
    *  everything already queued, so uploads paid after it are measured by it. */
@@ -101,10 +110,15 @@ export function createRevealCompileHost(deps: RevealCompileHostDeps): RevealComp
         deps.expect,
       );
       submittedPieces.set(target, pieces.length);
-      const linked = deps.gate(pieces, {
-        priority,
-        label: `${REVEAL_GATE_PREP_KIND}:${target.name || target.type}`,
-      });
+      const options = { priority, label: `${REVEAL_GATE_PREP_KIND}:${target.name || target.type}` };
+      const arms = deps.arms;
+      const linked = arms
+        ? runPiecesWarmed(arms, target, pieces, {
+            priority,
+            imminent,
+            submit: (some, firstIndex) => deps.gate(some, options, firstIndex),
+          })
+        : deps.gate(pieces, options);
       return linked
         .then((gate) => deps.upload(target, priority).then(() => gate))
         .then((gate) => deps.touch(target, priority, gate));

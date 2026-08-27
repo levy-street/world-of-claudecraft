@@ -1,5 +1,6 @@
 import { uninstallOccluderFadeGate } from './occluder_fade_gate';
 import { disposeShaderWarmAudit } from './shader_warm_audit';
+import { disposeShaderWarm } from './shader_warm_client';
 
 export interface RendererDisposable {
   dispose(): void;
@@ -35,4 +36,7 @@ export function disposeRendererPrewarmAndGroundFx(
   // The shader warm audit holds this renderer's compile arms and listens to
   // its links; the next renderer's first announcement binds its own.
   bestEffort(() => disposeShaderWarmAudit());
+  // The warm worker's context contract (attributes, extensions) was this
+  // renderer's; the next renderer's first gate spawns its own.
+  bestEffort(() => disposeShaderWarm());
 }

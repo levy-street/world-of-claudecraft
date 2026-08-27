@@ -30,7 +30,7 @@
 
 import type * as THREE from 'three';
 import { type CompileArmHost, setCompileArmObserver } from './compile_arms';
-import { collectRootProgramSources } from './program_sources';
+import { collectRootProgramSources, type ProgramSourceEntry } from './program_sources';
 import {
   createShaderWarmAudit,
   expectProgramSource,
@@ -157,6 +157,27 @@ export function expectRootProgramSources(
 ): number {
   if (!state.enabled) return 0;
   const started = now();
+  let sources: ProgramSourceEntry[] = [];
+  try {
+    sources = collectRootProgramSources(host, root);
+  } catch {
+    state.failures++;
+  }
+  state.selfCostMs.announceMs += now() - started;
+  return announceProgramSources(host, root, sources, atMs);
+}
+
+/** The announcement for sources a caller already dry-assembled (the warm
+ *  gate, shader_warm_gate.ts, assembles once for the worker and the audit
+ *  alike). Same bookkeeping as expectRootProgramSources, no second dry pass. */
+export function announceProgramSources(
+  host: CompileArmHost,
+  root: THREE.Object3D,
+  sources: readonly ProgramSourceEntry[],
+  atMs: number = now(),
+): number {
+  if (!state.enabled) return 0;
+  const started = now();
   state.armHost = host;
   if (!state.observerInstalled) {
     state.observerInstalled = true;
@@ -165,7 +186,6 @@ export function expectRootProgramSources(
   state.announcedRoots.add(root);
   let announced = 0;
   try {
-    const sources = collectRootProgramSources(host, root);
     if (sources.length > 0) state.dryCompile = true;
     const label = announcementLabel(root);
     for (const source of sources) {

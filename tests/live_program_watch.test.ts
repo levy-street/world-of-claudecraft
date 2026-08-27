@@ -19,6 +19,7 @@ import {
   liveProgramIdentity,
 } from '../src/render/live_program_watch_core';
 import { POST_REVEAL_LINK_WINDOW_MS } from '../src/render/post_reveal_links_core';
+import { resetShaderWarmForTest, shaderWarmSnapshot } from '../src/render/shader_warm_client';
 
 const program = (id: number, name: string): LiveProgramEntry => ({
   id,
@@ -129,6 +130,7 @@ describe('the renderer-facing watch', () => {
     // The watch is module state: without the disarm, the next case's arm sits
     // on the previous case's baseline.
     resetLiveProgramWatchForTest();
+    resetShaderWarmForTest();
   });
 
   it('records one live-program event per program minted after the reveal', () => {
@@ -180,6 +182,18 @@ describe('the renderer-facing watch', () => {
     expect(source.slice(reveal, source.indexOf('\n  }', reveal))).toContain(
       'armLiveProgramWatch(this.webgl)',
     );
+  });
+
+  it('arms the shader warm client at the same reveal', () => {
+    // The worker is worth asking from the first reveal on: before it, the
+    // light census and the post pipeline are still moving, so a gate held
+    // there would warm keys the link never asks for.
+    resetShaderWarmForTest();
+    expect(shaderWarmSnapshot().armed).toBe(false);
+
+    armLiveProgramWatch(infoHost([program(1, 'MeshStandardMaterial')]));
+
+    expect(shaderWarmSnapshot().armed).toBe(true);
   });
 
   it('brackets exactly the render call: prologue mints are prep, draw mints are escapes', () => {

@@ -24,11 +24,21 @@ export interface CompileArmRenderer {
   ): Promise<THREE.Object3D>;
 }
 
+/** The game context's own contract, as the shader warm worker needs it
+ *  (its attributes and the extensions it enabled). */
+export interface CompileArmGlContext {
+  getContextAttributes(): object | null;
+  getExtension(name: string): unknown;
+}
+
 /** What the arms read off the renderer. Read-through closures, not a
  *  snapshot: the post pipeline is rebuilt on a graphics change, the depth
  *  cache fills during the session and the offscreen target is minted lazily. */
 export interface CompileArmHost {
   webgl(): CompileArmRenderer;
+  /** The raw GL context, when the host has one (a test stub need not): the
+   *  warm worker reproduces its contract. */
+  context?(): CompileArmGlContext | null;
   camera(): THREE.Camera;
   scene(): THREE.Scene;
   /** The sun's shadow camera: the view the shadow pass keys its programs on. */

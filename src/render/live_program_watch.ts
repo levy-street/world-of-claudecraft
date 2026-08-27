@@ -39,6 +39,7 @@ import {
 } from './post_reveal_links_core';
 import { sweepProgramKeyLedger } from './program_key_ledger';
 import { armShaderWarmAudit, sweepShaderWarmAudit } from './shader_warm_audit';
+import { armShaderWarm } from './shader_warm_client';
 
 interface ProgramInfoHost {
   info: { programs?: LiveProgramEntry[] | null; memory: { textures: number } };
@@ -85,6 +86,9 @@ export function programCounts(webgl: ProgramInfoHost): { programs: number; textu
 export function armLiveProgramWatch(webgl: ProgramInfoHost): void {
   sweepProgramKeyLedger(webgl, performance.now());
   armShaderWarmAudit(webgl);
+  // The worker is worth asking from the first reveal on: the light census
+  // and the post pipeline are settled, and a held link is felt.
+  armShaderWarm();
   armWatch(watch, webgl.info.programs ?? undefined);
   // The escape watch re-baselines on EVERY arm (an arrival's prep is prep);
   // the link window is anchored to the FIRST arm on purpose, the world entry,
