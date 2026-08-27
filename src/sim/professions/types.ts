@@ -34,6 +34,16 @@ export interface ProfessionNodeRecord {
 export interface ProfessionReagent {
   itemId: string;
   count: number;
+  // Discount-exempt: this reagent is charged at its authored count for every
+  // crafter, skipping ALL quantity reductions (the #1134 specialization
+  // discount, the #1145 self-signed minus-one, the #1296 Jack synergy).
+  // Exists for the raid core reagents: every crafter eligible to LEARN a
+  // raid recipe is specialized in its craft by construction (the learn floor
+  // sits above the perk threshold), so without this flag the discount would
+  // reprice the core for literally everyone who can craft and the authored
+  // numbers would never be the real economy
+  // (docs/prd/ignivar-raid-professions.md, The discount exemption).
+  noDiscount?: true;
 }
 
 // A static recipe a crafting profession can learn: what it consumes, what it
