@@ -934,6 +934,14 @@ describe('moderation report helpers', () => {
     });
 
     expect(result).toEqual({ accountId: 2 });
+    // The gating account lookup is realm-scoped (the phase 13 micro-review
+    // sweep), pinned as SQL text plus the literal realm like its two siblings,
+    // so the qual cannot be dropped again with a green suite: a foreign
+    // realm's character id must resolve to no account here.
+    expect(query.mock.calls[0][0]).toContain(
+      'SELECT account_id FROM characters WHERE id = $1 AND realm = $2',
+    );
+    expect(query.mock.calls[0][1]).toEqual([20, 'Claudemoon']);
     // The whole transaction must run on one pinned client, not arbitrary pooled
     // connections, otherwise BEGIN/…/COMMIT are not actually atomic.
     expect(connect).toHaveBeenCalledTimes(1);
@@ -1422,7 +1430,10 @@ describe('recordItemNameClear (the legendary-name strip audit row)', () => {
     ).resolves.toEqual({ accountId: 9 });
     const [lookupSql, lookupParams] = query.mock.calls[0];
     expect(lookupSql).toContain('SELECT account_id FROM characters WHERE id = $1 AND realm = $2');
-    expect(lookupParams).toEqual([5, REALM]);
+    // The realm as a LITERAL (the admin_professions_db sibling's shape): the
+    // imported constant on both sides would move together.
+    expect(lookupParams).toEqual([5, 'Claudemoon']);
+    expect(REALM).toBe('Claudemoon');
     const [insertSql, insertParams] = query.mock.calls[1];
     expect(insertSql).toContain('INSERT INTO account_moderation_actions');
     expect(insertParams?.[0]).toBe(9);

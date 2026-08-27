@@ -859,6 +859,41 @@ describe('frozen trigger + renown catalog (design rule 9: never retro-edit a tri
         'FROZEN_CATALOG_SHA256 with the one-liner in the comment above and commit it here.',
     ).toBe(FROZEN_CATALOG_SHA256);
   });
+
+  // The AUDITABLE re-mint, made mechanical (the phase 13 QA test-coverage
+  // audit): the previous digest stays beside the current one together with
+  // the ids appended since, and the pre-append catalog is RECONSTRUCTED (every
+  // row minus the appended ids, with the one dynamic meta's live deedIds
+  // filtered back) and re-digested. Equal means the change since the previous
+  // mint was a pure tail append; a retro-edit of any older row moves this
+  // digest too, which the comment-only proof above could not show. Re-minting:
+  // move FROZEN_CATALOG_SHA256 down into PRE_APPEND_CATALOG_SHA256, list the
+  // new ids in APPENDED_SINCE, then mint the new frozen literal.
+  const PRE_APPEND_CATALOG_SHA256 =
+    '4533079d9911b8dc0e20526ca330ff41196126ee9798f216fe5900ba781b9eae';
+  const APPENDED_SINCE: readonly string[] = ['prog_legendmaker'];
+
+  it('the catalog minus the ids appended since the previous mint reproduces the previous digest', () => {
+    const appended = new Set(APPENDED_SINCE);
+    for (const id of APPENDED_SINCE) {
+      expect(DEED_ORDER.includes(id), `${id} is in the live catalog`).toBe(true);
+    }
+    // The appended rows sit at the TAIL, in order: an append, never an insert.
+    expect(DEED_ORDER.slice(-APPENDED_SINCE.length)).toEqual([...APPENDED_SINCE]);
+    const priorRows = DEED_ORDER.filter((id) => !appended.has(id)).map((id) => {
+      const trigger = DEEDS[id].trigger;
+      const priorTrigger =
+        trigger.kind === 'meta'
+          ? { ...trigger, deedIds: trigger.deedIds.filter((dep) => !appended.has(dep)) }
+          : trigger;
+      return [id, priorTrigger, DEEDS[id].renown];
+    });
+    const digest = createHash('sha256').update(JSON.stringify(priorRows), 'utf8').digest('hex');
+    expect(digest, 'the pre-append catalog is byte-identical to the previous mint').toBe(
+      PRE_APPEND_CATALOG_SHA256,
+    );
+    expect(PRE_APPEND_CATALOG_SHA256).not.toBe(FROZEN_CATALOG_SHA256);
+  });
 });
 
 describe('retro fallback proof sets stay anchored to the real tables', () => {

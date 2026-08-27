@@ -31,6 +31,7 @@ import {
 } from '../src/sim/content/professions';
 import { recipeById } from '../src/sim/content/recipes';
 import { ALL_RECIPES, ITEMS, QUESTS } from '../src/sim/data';
+import { MASTERWROUGHT_LEGENDARY_CAP } from '../src/sim/equipment_rules';
 import {
   ARCHETYPE_PAIR_TARGETS,
   craftsForPairTarget,
@@ -622,6 +623,11 @@ describe('the professions blob growth bound (phase 16)', () => {
   });
 
   it('the settled ceiling honors the byte bound and every entry cap', () => {
+    // The fixture promotes exactly ONE cap slot on the strength of the worn
+    // legendary sub-cap being 1; pin that premise, or a widened sub-cap would
+    // silently understate the worst case by one promotion's bytes (the phase
+    // 13 QA test-coverage audit).
+    expect(MASTERWROUGHT_LEGENDARY_CAP).toBe(1);
     const sim = ceilingSim(CEILING_EPOCH_MS);
     const s1 = sim.serializeCharacter(sim.playerId) as CharacterState;
     // Settle through one real load (normalizers, one-shot transforms), then

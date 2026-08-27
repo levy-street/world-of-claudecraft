@@ -672,6 +672,10 @@ describe('significant-activity cards', () => {
       const bounded = sanitizeLegendaryItemName(`${'A'.repeat(31)} ${'B'.repeat(40)}`);
       expect(bounded.length).toBeLessThanOrEqual(LEGENDARY_CARD_NAME_MAX);
       expect(bounded).toBe('A'.repeat(31));
+      // The cap boundary itself (a golden cannot pin a boundary): exactly the
+      // cap survives whole, one past it loses exactly one character.
+      expect(sanitizeLegendaryItemName('A'.repeat(32))).toBe('A'.repeat(32));
+      expect(sanitizeLegendaryItemName('A'.repeat(33))).toBe('A'.repeat(32));
       expect(sanitizeLegendaryItemName(undefined)).toBe('');
     });
 

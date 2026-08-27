@@ -347,6 +347,10 @@ describe('detectActivity: professions arms (GameServer)', () => {
       .map((c) => c.kind)
       .sort();
     expect(kinds).toEqual(['legendary', 'masterwork']);
+    // The DB read the synchronous claim exists to bound: one opt-out read per
+    // kind per window, so the same-account legendary burst cost NO third read
+    // (the masterwork sibling's pin, carried onto the legendary arm).
+    expect(optOutReads()).toBe(2);
   });
 
   it('a legendaryForged with no session (a bot owner) enqueues nothing', async () => {
@@ -592,10 +596,15 @@ describe('dedupe key semantics (the pure claim/release layer, R60)', () => {
 // is refactored, re-point the pin at the new emit sites rather than deleting it.
 describe('the promotion emits pass the normalized name (source pin)', () => {
   it('legendaryForged and legendaryForgedZone both carry the normalized local', () => {
+    // CODE only: block and line comments stripped first, so a commented-out
+    // normalization gate cannot keep this pin green (the phase 13 QA
+    // test-coverage audit; the source-text-pin trap).
     const source = readFileSync(
       join(__dirname, '..', 'src', 'sim', 'professions', 'perfecting.ts'),
       'utf8',
-    );
+    )
+      .replace(/\/\*[\s\S]*?\*\//g, '')
+      .replace(/(^|[^:])\/\/.*$/gm, '$1');
     // The normalization gate exists and refuses a null shape before any emit.
     expect(source).toContain('const normalized = normalizeLegendaryName(name);');
     expect(source).toContain('if (normalized === null) {');
@@ -603,7 +612,10 @@ describe('the promotion emits pass the normalized name (source pin)', () => {
     expect(source).toMatch(/emit\(\{\s*type: 'legendaryForged',\s*itemId,\s*name: normalized,/);
     // ...and the zone fan-out's itemName is too.
     expect(source).toMatch(/itemName: normalized,/);
-    // No emit in the module carries the RAW name field.
-    expect(source).not.toMatch(/name: name,|itemName: name,/);
+    // No emit in the module carries the RAW name field. The negative pin
+    // carries its own positive control so it can never pass vacuously.
+    const rawShape = /name: name,|itemName: name,/;
+    expect("ctx.emit({ type: 'legendaryForged', itemId, name: name, owner })").toMatch(rawShape);
+    expect(source).not.toMatch(rawShape);
   });
 });
