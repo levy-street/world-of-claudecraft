@@ -117,6 +117,7 @@ category crest until the painting lands (enumerated in `DEED_ART_PENDING`,
 Progression (the tutorial island):
 
 - [v1] `prog_ready_for_an_adventure`, Ready for an Adventure: the island ferry bell mid-swing against a dawn strait, the Proving Shore small behind it, rope trailing toward an unseen hand, sea teal on brass gold.
+- [v1] `prog_legendmaker`, The Legendmaker (Masterwrought, the orange promotion): a finished apex piece on an anvil catching a legendary orange glow, a signed Deed of Making beneath it with its wax seal cracked, a quill laid across the parchment, ember orange on iron black.
 
 Item icons (the tutorial island's two interact props): shipped as renders of
 their own world models (`scripts/render_island_item_icons.mjs`), so no

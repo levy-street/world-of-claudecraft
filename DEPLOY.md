@@ -310,7 +310,19 @@ For off-box safety, sync the directory to S3 occasionally:
   login after the roll-forward benches one back to the bags via
   `benchDuplicateUniqueEquipped` (src/sim/items.ts) with its Unequipped notice,
   payload intact and nothing lost; fleet-wide-in-one-pass avoids that window
-  entirely too.
+  entirely too. The promotion's own persisted fields are SAFE across an older
+  binary, unlike the Perfecting bonus above: the stamped `name`, its
+  `rolled.quality` of legendary, and the `perfected` marker all survive a
+  pre-promotion binary's load, save, and even a confirmed replace-enchant (the
+  instance load bound is drop-only and the enchant paths clone the payload
+  through). What an older binary DOES erase is the `legendariesForged` deed
+  counter: it reads only the counter keys it knows and its next autosave writes
+  the rest away, so a roll-back-then-forward restarts every promoter's count at 0
+  (the deed itself keeps its earn row; the character reads 50 Renown lighter on
+  the old binary and recovers it on roll-forward). Under `API_DISPATCH=legacy`
+  the clear-item-name remediation endpoint is unavailable (registry-only, no
+  legacy arm; it 404s rather than serving unauthorized), so a rollback that
+  coincides with a name report waits for the roll-forward.
 - **Client/server deploy order for content releases**: deploy the SERVER first, then
   let clients update. Web and desktop bundles refresh on their next load. The iOS
   binary rides App Store review and cannot pick up a same-day bundle (LiveUpdates
@@ -437,7 +449,40 @@ For off-box safety, sync the directory to S3 occasionally:
   and exits non-zero on any discrepancy. Run it after an economy incident or a restore.
 - **Username bans**: set `USERNAME_BANLIST_FILE=/opt/eastbrook/username-banlist.txt`
   to load blocked username terms from a private newline- or comma-separated
-  file. `USERNAME_BANLIST` can also provide a comma-separated inline list.
+  file. `USERNAME_BANLIST` can also provide a comma-separated inline list. The same
+  screen prices every player-chosen legendary item name (the Masterwrought orange
+  promotion), a surface wider than a character name (up to 32 characters with
+  spaces, apostrophes, and hyphens), so seed the file with the slur and hate-group
+  residual the built-in word list does not carry before that feature is live. An
+  edited file takes effect without a restart (the cache is keyed on the file's
+  mtime and size); a missing, unreadable, or over-one-MiB file warns once and keeps
+  serving the last list it read successfully (fail-open by decision: it never
+  blocks a signup).
+- **Clearing a stamped legendary name** (`POST
+  /admin/api/moderation/characters/:id/clear-item-name`, permission
+  `moderation.clearItemName`, SUPERADMIN only, API-only: the dashboard has no
+  button for it): the remediation for a reported player-chosen name on a promoted
+  copy. The body names EXACTLY one target plus a required `reason`: `{"slot":
+  "neck"}` for a worn copy, `{"bag": <inventory array index>, "itemId": "<id>"}`
+  for one carried cell, or `{"all": true}` for every named copy the character
+  holds (carried bags, bank, the buyback ring, and both equipment maps). Prefer
+  `all: true` unless the index was read from the blob itself: `bag` is the
+  persisted array index, not the cell the client displays, it reaches the carried
+  bags only, and with two same-id named copies a screenshot's index can strip the
+  other one. The flow is KICK, THEN CLEAR: the endpoint refuses while the
+  character is online on this realm (disconnect them with the in-game `/kick`
+  command or a dashboard suspension first) and its blob write is fenced on the
+  character's load lease, so a login racing the strip makes the write touch
+  nothing and the endpoint answers with a retry line rather than reporting a
+  strip that did not land; a player contesting the strip by reconnect-spamming is
+  answered by suspending the account first. The audit row (`clear_item_name`, a
+  sanction badge in the moderation history) lands before the write, so a refused
+  request still records what was asked. The strip removes ONLY the name: the
+  promotion, its stats, signer, and bind stand, and the copy is a permanently
+  nameless legendary (the game offers no re-name). What the strip CANNOT reach:
+  the Discord activity card the promotion published is durable in the community
+  channel and has no in-repo takedown, so a name report also owes a manual Discord
+  message removal.
 - **Chat filter**: the word lists are now **managed live from the admin
   dashboard** (Chat Filter tab), stored in the database and seeded with sensible
   defaults on first boot. Two tiers: *soft* words are masked client-side with

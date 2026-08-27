@@ -267,6 +267,28 @@ fails if the faucet is ever removed again and green means earnable rather than
 - **For the next author:** a growing-requirement deed is still the wrong default.
   Take this exception only where the earn is sticky and the score cannot fall.
 
+### A recorded rule-2 reading (Masterwrought Phase 13, `prog_legendmaker`)
+
+- **`prog_legendmaker` ("The Legendmaker") carries Renown 50 on a feeder whose
+  ATTEMPTS roll.** The deed counts orange promotions, and a promotion needs a
+  Perfected copy, which is reached through a four-rank fail-forward track at 0.8
+  per attempt: a failed attempt spends materials and never loses a rank, so the
+  OUTCOME is certain under effort and only the attempt count varies (expected
+  five attempts for four ranks). The promotion itself draws nothing. Rule 2's
+  "luck-dependent" set is the one whose outcome hinges on a roll with an
+  unbounded expected time (`col_first_rare`, `col_golden_harvest`,
+  `hid_roll_hundred`); this is luck-PACED, not luck-gated, the same reading that
+  scores `prog_masterwright` (a rolled proc) at 25.
+- **The honest weak clause:** rule 2 also says the luck-free guarantee covers the
+  board's completion-time tie-break, and this deed's earn DATE varies with the
+  rolls in week-sized units (the ember faucet is weekly), larger than a
+  masterwork proc's minutes. Recorded here so the next rolled-feeder deed is
+  judged against the same distinction rather than re-deriving it.
+- **The storefront decision** for this deed is the packet-wide one (no Steam or
+  Epic achievement row for any deed the Masterwrought packet adds; recorded in
+  the packet's Phase 16 file), so its absence from `achievement_map.ts` is
+  deliberate, not an omission against step 7 above.
+
 The reviewed design blocks for all of these live in the deed catalog's
 authoring history; a deferred deed stays out of `DEED_ORDER` and off Steam
 until its blocker actually lands.

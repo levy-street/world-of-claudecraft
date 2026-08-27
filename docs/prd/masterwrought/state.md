@@ -19103,6 +19103,16 @@ byte bound for a tampered row, by doctrine). F6: a no-op (the oncePerDay
 set is still exactly recipe_quickening_catalyst).
 
 ### THE MERGED characters.state BOUND (farming's measurement + counted costs)
+AMENDED 2026-08-27 (Phase 13 QA, migration-safety lane): the absurd
+census arm below is STALE by the promotion's per-copy text (up to 64
+bytes: 22 for the quality override, 42 for a full-width name), and
+since the legendary sub-cap binds WORN copies only, the 194-cell absurd
+arm can in principle carry a promoted copy in every cell, about +12.4 KB
+text: roughly 30 KB text / 51 KB JSONB raw / 21 KB compressed, merged
+with the 23 beds about 59 KB raw / 24 KB compressed. Nothing about
+safety moves (still far under the 131,072-byte warn threshold, TOAST
+chunking unchanged, the realistic heavy case grows by about 64 bytes);
+recorded so the next phase does not inherit an understated figure.
 Farming baseline (PG16, 2026-08-19, pg_column_size): empty 1,499 B
 compressed / 2,059 raw; 23 beds 3,261 / 7,831 (ratio 2.4:1). Per-copy
 cost measured through the real serializer on a FRESH apex copy (JSON
@@ -19499,6 +19509,23 @@ file's own acceptance overturns (retired dated, D13-4).
   key folds mtime+size so an edited file takes effect without a
   restart; fail-open on an unreadable file by decision). The Discord
   card sanitizes itemName to the mint shape as defense in depth.
+  AMENDED 2026-08-27 (Phase 13 QA, three reviewers converging): the
+  pre-save online re-check NARROWS the reconnect race to the commit
+  window and cannot close it (a fresh login re-reads the blob before
+  game.join registers it; a session on a peer process is invisible to
+  the map); what closes it is the blob write itself being fenced on the
+  character_leases table (db.ts saveOfflineCharacterState, the
+  handshake claims the lease BEFORE its blob read), with the 0-row
+  result surfaced as a retry line. The decided kick-then-clear flow is
+  unchanged. Two recorded consequences the decision did not spell: the
+  Discord activity card the promotion already published is OUT OF REACH
+  of the strip (durable in the third-party channel, no in-repo takedown:
+  a name report also owes a manual Discord removal, DEPLOY.md), and a
+  stripped copy is a PERMANENTLY nameless legendary (arm 1 refuses a
+  re-promotion; whether a re-name affordance should exist is a
+  maintainer read, see the Phase 13 QA ledger). Fail-open on the banlist
+  file is now stale-on-error: a missing, unreadable, or over-ceiling file
+  keeps serving the last list read, warned once per state transition.
 - D13-6 recipe_deed_of_making at inscription 125 (trainer,
   apothecary), the craft's first 125 rung per R13 and the phase file;
   bill 3 sablewax_vellum + 1 wyrmfall_core + 2 sunpetal_herb +
@@ -19516,6 +19543,15 @@ file's own acceptance overturns (retired dated, D13-4).
   recorded as a maintainer read), stat trigger legendariesForged
   count 1, NO title (so DEED_ART_PENDING is legitimate), appended at
   the table tail after prog_ready_for_an_adventure.
+  AMENDED 2026-08-27 (Phase 13 QA): no ACHIEVEMENT_MAP row on either
+  storefront per the packet-wide DECISION 8 (phase-16-polish.md: no
+  storefront entry for any deed this packet adds; Phase 16 writes the
+  record); the rule-2 luck-paced-vs-luck-gated reading now lives beside
+  the rule in docs/design/deeds.md; the crest brief is filed in
+  docs/achievements/icon-brief.md. The promotion ALSO grants the
+  pre-existing col_first_legendary through its quality:legendary
+  discovery mark, so ACH_FIRST_LEGENDARY gained a crafted earn path (a
+  maintainer read, recorded in the QA ledger).
 
 ### THE BUILT SHAPE
 - perfecting.ts: resolvePerfectingAttempt's perfected branch DELEGATES
@@ -19633,7 +19669,10 @@ total 44 to 46; the taxonomy and bag-census allowlists gain the writ.
 Monolith, all extraction-first: game.ts 10492 to 10491 (the craft-card
 body to server/craft_activity.ts; ceiling LOWERED), hud.ts 18263 to
 18245 (the compare card to item_compare_view.ts; ceiling LOWERED),
-sim.ts 12326 EXACT (zero slack recorded), online.ts 5926 EXACT. Blob:
+sim.ts 12326 EXACT (zero slack recorded), online.ts 5926 EXACT (at the
+frozen tip 49e5cd7823; re-pinned 5926 to 5888 at the Phase 13 QA's
+release/v0.41.0 sync 171db92c33, the release span's 38-line shed, still
+exact, and main.ts 11528 to 11527 there too). Blob:
 predicted 17263 + 88 = 17351 from merged literals BEFORE any run (24
 recipe id + 22 quality + 42 name at the 32 ceiling on the ONE legal
 worn promoted slot), observed 17351, DRIFT ZERO; ceiling re-minted

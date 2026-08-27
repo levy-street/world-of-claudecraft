@@ -116,6 +116,18 @@ or pure leaves, never a `Sim` import, randomness only via `ctx.rng` (guarded by
   `already_enchanted` reason on both arms. The identical-id re-apply denies
   `same_enchant` on both arms WITH the flag; unconfirmed it reads
   `already_enchanted`, because the flag check precedes the id compare.
+- `perfecting.ts`: the Perfecting stage (Masterwrought phase 12) and the orange
+  promotion (phase 13) on one shared deny head: a four-rank fail-forward track over
+  an apex copy with exactly one rng draw per resolved attempt (zero on every
+  denial), binding on the first attempt and stamping `perfected` plus the R5 bonus
+  at the top; then the SEPARATE, draw-free promotion on an already-Perfected copy
+  (one Deed of Making plus a player-chosen name) that overrides `rolled.quality` to
+  legendary and stamps `payload.name`, presentation only. `perfectingInfoFrom` is
+  the one view builder both hosts answer through.
+- `legendary_name.ts`: the pure SHAPE leaf for a player-chosen legendary name
+  (trim, collapse, `[A-Za-z' -]`, 2 to 32); the online server screens CONTENT
+  before the command reaches the sim, and the load bound in
+  `item_instance_load.ts` is deliberately looser (the signer doctrine).
 - `commission.ts`: the Maker's Bond (commission opt-in mints `bindOnTrade`,
   `resolveUnbind` + the quality-tier fee ladder).
 - `commission_order.ts`: the commission order board (#1298) layered on the
