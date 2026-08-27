@@ -1,4 +1,4 @@
-// The native/OTA bundle carried every hashed media asset twice: `emit` copies
+// Shipping bundles carried every hashed media asset twice: `emit` copies
 // public/<logical> to dist/media/<name>.<hash><ext> and leaves the source, while
 // vite copies all of public/ into dist/ separately. That duplication pushed the
 // Play base module past its 500 MB compressed download ceiling.
@@ -93,17 +93,22 @@ describe('planMediaDuplicatePrune', () => {
   });
 });
 
-describe('native build wiring', () => {
-  it('prunes only in build:native, never in the web build', async () => {
+describe('shipping build wiring', () => {
+  it('prunes duplicate originals in the shared web bundle used by Render and native', async () => {
     const pkg = (await import('../package.json')) as unknown as {
       default: { scripts: Record<string, string> };
     };
     const scripts = pkg.default.scripts;
-    expect(scripts['build:native']).toContain('build_media_manifest.mjs prune');
-    // The web deploy serves public/ verbatim, so the originals must stay there.
-    expect(scripts.build).not.toContain('prune');
-    // Order matters: prune reads dist/media, which `emit` (end of build) creates.
-    const native = scripts['build:native'];
-    expect(native.indexOf('npm run build')).toBeLessThan(native.indexOf('prune'));
+    const bundle = scripts['build:bundle'];
+    expect(bundle).toContain('build_media_manifest.mjs emit');
+    expect(bundle).toContain('build_media_manifest.mjs prune');
+    // Order matters: prune reads the hashed twins that emit creates.
+    expect(bundle.indexOf('build_media_manifest.mjs emit')).toBeLessThan(
+      bundle.indexOf('build_media_manifest.mjs prune'),
+    );
+    // Native delegates to the same shipping build instead of running a second,
+    // redundant prune after the originals are already gone.
+    expect(scripts['build:native']).toContain('npm run build');
+    expect(scripts['build:native']).not.toContain('build_media_manifest.mjs prune');
   });
 });

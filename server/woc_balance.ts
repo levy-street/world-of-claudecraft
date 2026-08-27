@@ -153,6 +153,11 @@ export function wocBalanceCacheStats(): UsageCacheSnapshot {
  * keep the last known value.
  */
 export async function fetchWocBalance(pubkey: string): Promise<number | null> {
+  // The built-in economy is intentionally points-only for $WOC: Devnet has no
+  // canonical mainnet mint to query. Return the fixed test balance before any
+  // network work so every wallet/card refresh does not issue a known-failing
+  // getTokenAccountsByOwner call against the test cluster.
+  if ((process.env.WOC_TEST_ECONOMY ?? '').trim() === '1') return 0;
   recordUsageMetric('woc.balance.rpc');
   try {
     const res = await fetch(SOLANA_RPC_URL, {

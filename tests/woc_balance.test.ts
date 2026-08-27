@@ -1,15 +1,15 @@
 import { readFileSync } from 'node:fs';
-import { afterEach, describe, expect, it, vi } from 'vitest';
 import bs58 from 'bs58';
+import { afterEach, describe, expect, it, vi } from 'vitest';
 import {
   CACHE_TTL_MS,
-  WOC_BALANCE_CACHE_MAX_ENTRIES,
-  fetchWocBalance,
-  holderInfoForPubkey,
   cachedWocBalance,
+  fetchWocBalance,
   handleWocBalance,
+  holderInfoForPubkey,
   parseWocBalanceQuery,
   resetWocBalanceCacheForTests,
+  WOC_BALANCE_CACHE_MAX_ENTRIES,
   wocBalanceCacheStats,
 } from '../server/woc_balance';
 
@@ -18,9 +18,16 @@ const VALID_ADDR = bs58.encode(Uint8Array.from({ length: 32 }, (_, i) => i + 1))
 
 function makeRes(): any {
   return {
-    statusCode: 0, body: '',
-    writeHead(s: number) { this.statusCode = s; return this; },
-    end(d: string) { this.body = d ?? ''; return this; },
+    statusCode: 0,
+    body: '',
+    writeHead(s: number) {
+      this.statusCode = s;
+      return this;
+    },
+    end(d: string) {
+      this.body = d ?? '';
+      return this;
+    },
   };
 }
 const callBalance = async (owner: string, fresh = false) => {
@@ -37,7 +44,11 @@ function mockRpc(uiAmounts: number[]) {
   return vi.fn(async () => ({
     ok: true,
     json: async () => ({
-      result: { value: uiAmounts.map((ui) => ({ account: { data: { parsed: { info: { tokenAmount: { uiAmount: ui } } } } } })) },
+      result: {
+        value: uiAmounts.map((ui) => ({
+          account: { data: { parsed: { info: { tokenAmount: { uiAmount: ui } } } } },
+        })),
+      },
     }),
   }));
 }
@@ -72,6 +83,7 @@ afterEach(() => {
   resetWocBalanceCacheForTests();
   vi.useRealTimers();
   vi.unstubAllGlobals();
+  vi.unstubAllEnvs();
 });
 
 describe('server import boundary', () => {
@@ -83,41 +95,67 @@ describe('server import boundary', () => {
 });
 
 describe('fetchWocBalance', () => {
+  it('returns the test-mode zero balance without calling the mainnet WOC mint RPC', async () => {
+    vi.stubEnv('WOC_TEST_ECONOMY', '1');
+    const fetchMock = vi.fn();
+    vi.stubGlobal('fetch', fetchMock);
+
+    expect(await fetchWocBalance('testEconomyWallet')).toBe(0);
+    expect(fetchMock).not.toHaveBeenCalled();
+  });
+
   it('sums uiAmount across all of the owner’s token accounts', async () => {
     vi.stubGlobal('fetch', mockRpc([1000, 250.5]));
     expect(await fetchWocBalance('AAA')).toBe(1250.5);
   });
 
   it('uses uiAmountString when uiAmount is null', async () => {
-    vi.stubGlobal('fetch', mockTokenAmountRpc([
-      { uiAmount: null, uiAmountString: '1000.25' },
-      { uiAmount: null, uiAmountString: '0.75' },
-    ]));
+    vi.stubGlobal(
+      'fetch',
+      mockTokenAmountRpc([
+        { uiAmount: null, uiAmountString: '1000.25' },
+        { uiAmount: null, uiAmountString: '0.75' },
+      ]),
+    );
     expect(await fetchWocBalance('AA2')).toBe(1001);
   });
 
   it('uses raw amount and decimals when uiAmount is null and uiAmountString is unavailable', async () => {
-    vi.stubGlobal('fetch', mockTokenAmountRpc([
-      { uiAmount: null, amount: '123456789', decimals: 6 },
-      { uiAmount: null, amount: '1000000000000000000', decimals: 9 },
-    ]));
+    vi.stubGlobal(
+      'fetch',
+      mockTokenAmountRpc([
+        { uiAmount: null, amount: '123456789', decimals: 6 },
+        { uiAmount: null, amount: '1000000000000000000', decimals: 9 },
+      ]),
+    );
     expect(await fetchWocBalance('AA3')).toBeCloseTo(1_000_000_123.456789, 6);
   });
 
   it('falls back from an invalid uiAmountString to raw amount and decimals', async () => {
-    vi.stubGlobal('fetch', mockTokenAmountRpc([
-      { uiAmount: null, uiAmountString: 'not-a-number', amount: '2500000', decimals: 6 },
-    ]));
+    vi.stubGlobal(
+      'fetch',
+      mockTokenAmountRpc([
+        { uiAmount: null, uiAmountString: 'not-a-number', amount: '2500000', decimals: 6 },
+      ]),
+    );
     expect(await fetchWocBalance('AA4')).toBe(2.5);
   });
 
   it('returns null on a non-ok RPC response', async () => {
-    vi.stubGlobal('fetch', vi.fn(async () => ({ ok: false, json: async () => ({}) })));
+    vi.stubGlobal(
+      'fetch',
+      vi.fn(async () => ({ ok: false, json: async () => ({}) })),
+    );
     expect(await fetchWocBalance('BBB')).toBeNull();
   });
 
   it('returns null when the RPC throws (no token accounts / network error)', async () => {
-    vi.stubGlobal('fetch', vi.fn(async () => { throw new Error('network'); }));
+    vi.stubGlobal(
+      'fetch',
+      vi.fn(async () => {
+        throw new Error('network');
+      }),
+    );
     expect(await fetchWocBalance('CCC')).toBeNull();
   });
 
@@ -137,30 +175,40 @@ describe('fetchWocBalance', () => {
   });
 
   it('skips a token account missing tokenAmount/uiAmount (summed as 0)', async () => {
-    vi.stubGlobal('fetch', mockRawRpc({
-      result: {
-        value: [
-          { account: { data: { parsed: { info: { tokenAmount: { uiAmount: 42 } } } } } },
-          { account: { data: { parsed: { info: {} } } } }, // no tokenAmount → skipped
-          {}, // no account at all → skipped
-        ],
-      },
-    }));
+    vi.stubGlobal(
+      'fetch',
+      mockRawRpc({
+        result: {
+          value: [
+            { account: { data: { parsed: { info: { tokenAmount: { uiAmount: 42 } } } } } },
+            { account: { data: { parsed: { info: {} } } } }, // no tokenAmount → skipped
+            {}, // no account at all → skipped
+          ],
+        },
+      }),
+    );
     expect(await fetchWocBalance('GGG')).toBe(42);
   });
 
   it('skips malformed token amount fields, summing only parseable balances', async () => {
-    vi.stubGlobal('fetch', mockRawRpc({
-      result: {
-        value: [
-          { account: { data: { parsed: { info: { tokenAmount: { uiAmount: '500' } } } } } },
-          { account: { data: { parsed: { info: { tokenAmount: { uiAmount: null } } } } } },
-          { account: { data: { parsed: { info: { tokenAmount: { uiAmountString: '1e9' } } } } } },
-          { account: { data: { parsed: { info: { tokenAmount: { amount: '2500000.5', decimals: 6 } } } } } },
-          { account: { data: { parsed: { info: { tokenAmount: { uiAmount: 7.5 } } } } } },
-        ],
-      },
-    }));
+    vi.stubGlobal(
+      'fetch',
+      mockRawRpc({
+        result: {
+          value: [
+            { account: { data: { parsed: { info: { tokenAmount: { uiAmount: '500' } } } } } },
+            { account: { data: { parsed: { info: { tokenAmount: { uiAmount: null } } } } } },
+            { account: { data: { parsed: { info: { tokenAmount: { uiAmountString: '1e9' } } } } } },
+            {
+              account: {
+                data: { parsed: { info: { tokenAmount: { amount: '2500000.5', decimals: 6 } } } },
+              },
+            },
+            { account: { data: { parsed: { info: { tokenAmount: { uiAmount: 7.5 } } } } } },
+          ],
+        },
+      }),
+    );
     expect(await fetchWocBalance('HHH')).toBe(7.5);
   });
 });
@@ -180,7 +228,12 @@ describe('holderTierForPubkey', () => {
   });
 
   it('returns 0 for a never-seen wallet when the RPC fails', async () => {
-    vi.stubGlobal('fetch', vi.fn(async () => { throw new Error('rpc down'); }));
+    vi.stubGlobal(
+      'fetch',
+      vi.fn(async () => {
+        throw new Error('rpc down');
+      }),
+    );
     expect(await holderTierForPubkey('tierUnseen')).toBe(0);
   });
 
@@ -213,7 +266,12 @@ describe('holderTierForPubkey', () => {
     // After the TTL the entry is stale, so the next call must re-fetch, but the
     // RPC now fails, so it keeps the last known tier rather than dropping to 0.
     vi.advanceTimersByTime(CACHE_TTL_MS + 1);
-    vi.stubGlobal('fetch', vi.fn(async () => { throw new Error('rpc down'); }));
+    vi.stubGlobal(
+      'fetch',
+      vi.fn(async () => {
+        throw new Error('rpc down');
+      }),
+    );
     expect(await holderTierForPubkey('tierKeepLast')).toBe(5);
   });
 
@@ -241,7 +299,12 @@ describe('holderInfoForPubkey (tier + exact balance)', () => {
   });
 
   it('returns {tier:0, balance:0} for a never-seen wallet when the RPC fails', async () => {
-    vi.stubGlobal('fetch', vi.fn(async () => { throw new Error('rpc down'); }));
+    vi.stubGlobal(
+      'fetch',
+      vi.fn(async () => {
+        throw new Error('rpc down');
+      }),
+    );
     expect(await holderInfoForPubkey('infoUnseen')).toEqual({ tier: 0, balance: 0 });
   });
 
@@ -253,7 +316,12 @@ describe('holderInfoForPubkey (tier + exact balance)', () => {
     // Past the TTL the cache is stale, so the next call re-fetches, but the RPC
     // now fails, so it must keep the last known {tier, balance}, not drop to 0.
     vi.advanceTimersByTime(CACHE_TTL_MS + 1);
-    vi.stubGlobal('fetch', vi.fn(async () => { throw new Error('rpc down'); }));
+    vi.stubGlobal(
+      'fetch',
+      vi.fn(async () => {
+        throw new Error('rpc down');
+      }),
+    );
     expect(await holderInfoForPubkey('infoKeepLast')).toEqual({ tier: 5, balance: 12_345 });
   });
 });
@@ -289,9 +357,14 @@ describe('cachedWocBalance', () => {
     // The fresh bypass of a still-in-TTL entry is a deliberate skip, NOT a stale
     // refresh — it must not inflate the stale-refresh metric (only genuine TTL
     // expiry does). Two hits, one initial miss, two stores (initial + fresh).
-    expect(wocBalanceCacheStats()).toEqual(expect.objectContaining({
-      hits: 2, misses: 1, stores: 2, staleRefreshes: 0,
-    }));
+    expect(wocBalanceCacheStats()).toEqual(
+      expect.objectContaining({
+        hits: 2,
+        misses: 1,
+        stores: 2,
+        staleRefreshes: 0,
+      }),
+    );
   });
 
   it('tracks cache hits, misses, stores and current cache size', async () => {
@@ -300,16 +373,18 @@ describe('cachedWocBalance', () => {
     expect(await cachedWocBalance('cacheStats')).toBe(2_500);
     expect(await cachedWocBalance('cacheStats')).toBe(2_500);
 
-    expect(wocBalanceCacheStats()).toEqual(expect.objectContaining({
-      entries: 1,
-      maxEntries: WOC_BALANCE_CACHE_MAX_ENTRIES,
-      hits: 1,
-      misses: 1,
-      stores: 1,
-      failures: 0,
-      staleRefreshes: 0,
-      evictions: 0,
-    }));
+    expect(wocBalanceCacheStats()).toEqual(
+      expect.objectContaining({
+        entries: 1,
+        maxEntries: WOC_BALANCE_CACHE_MAX_ENTRIES,
+        hits: 1,
+        misses: 1,
+        stores: 1,
+        failures: 0,
+        staleRefreshes: 0,
+        evictions: 0,
+      }),
+    );
   });
 
   it('keeps the last known balance when a refresh fails after the TTL', async () => {
@@ -317,17 +392,30 @@ describe('cachedWocBalance', () => {
     vi.stubGlobal('fetch', mockRpc([777]));
     expect(await cachedWocBalance('cacheKeep')).toBe(777);
     vi.advanceTimersByTime(CACHE_TTL_MS + 1);
-    vi.stubGlobal('fetch', vi.fn(async () => { throw new Error('rpc down'); }));
+    vi.stubGlobal(
+      'fetch',
+      vi.fn(async () => {
+        throw new Error('rpc down');
+      }),
+    );
     expect(await cachedWocBalance('cacheKeep')).toBe(777); // last known, not null
     // The TTL-expired entry triggered exactly one GENUINE stale refresh, which then
     // failed — so the stale-refresh and failure metrics each count once.
-    expect(wocBalanceCacheStats()).toEqual(expect.objectContaining({
-      staleRefreshes: 1, failures: 1,
-    }));
+    expect(wocBalanceCacheStats()).toEqual(
+      expect.objectContaining({
+        staleRefreshes: 1,
+        failures: 1,
+      }),
+    );
   });
 
   it('returns null for a never-seen wallet when the RPC fails', async () => {
-    vi.stubGlobal('fetch', vi.fn(async () => { throw new Error('rpc down'); }));
+    vi.stubGlobal(
+      'fetch',
+      vi.fn(async () => {
+        throw new Error('rpc down');
+      }),
+    );
     expect(await cachedWocBalance('cacheUnseen')).toBeNull();
   });
 
@@ -388,7 +476,12 @@ describe('handleWocBalance (GET /api/woc/balance proxy)', () => {
   });
 
   it('returns 200 with balance:null when the RPC fails for an unseen wallet (UI omits it)', async () => {
-    vi.stubGlobal('fetch', vi.fn(async () => { throw new Error('rpc down'); }));
+    vi.stubGlobal(
+      'fetch',
+      vi.fn(async () => {
+        throw new Error('rpc down');
+      }),
+    );
     const other = bs58.encode(Uint8Array.from({ length: 32 }, (_, i) => i + 40));
     const { status, data } = await callBalance(other);
     expect(status).toBe(200);
@@ -398,9 +491,18 @@ describe('handleWocBalance (GET /api/woc/balance proxy)', () => {
 
 describe('parseWocBalanceQuery (the route-level query parse)', () => {
   it('extracts the owner and treats only fresh=1 as a forced refresh', () => {
-    expect(parseWocBalanceQuery('/api/woc/balance?owner=ABC&fresh=1')).toEqual({ owner: 'ABC', fresh: true });
-    expect(parseWocBalanceQuery('/api/woc/balance?owner=ABC')).toEqual({ owner: 'ABC', fresh: false });
-    expect(parseWocBalanceQuery('/api/woc/balance?owner=ABC&fresh=0')).toEqual({ owner: 'ABC', fresh: false });
+    expect(parseWocBalanceQuery('/api/woc/balance?owner=ABC&fresh=1')).toEqual({
+      owner: 'ABC',
+      fresh: true,
+    });
+    expect(parseWocBalanceQuery('/api/woc/balance?owner=ABC')).toEqual({
+      owner: 'ABC',
+      fresh: false,
+    });
+    expect(parseWocBalanceQuery('/api/woc/balance?owner=ABC&fresh=0')).toEqual({
+      owner: 'ABC',
+      fresh: false,
+    });
     // Any non-1 value (incl. truthy-looking strings) is NOT a forced refresh, so a
     // stray param can't be used to bypass the cache and hammer the RPC.
     expect(parseWocBalanceQuery('/api/woc/balance?owner=ABC&fresh=true').fresh).toBe(false);
@@ -410,7 +512,10 @@ describe('parseWocBalanceQuery (the route-level query parse)', () => {
   it('defaults a missing owner to the empty string (handler then 400s) and order-independently', () => {
     expect(parseWocBalanceQuery('/api/woc/balance')).toEqual({ owner: '', fresh: false });
     expect(parseWocBalanceQuery('/api/woc/balance?fresh=1')).toEqual({ owner: '', fresh: true });
-    expect(parseWocBalanceQuery('/api/woc/balance?fresh=1&owner=ABC')).toEqual({ owner: 'ABC', fresh: true });
+    expect(parseWocBalanceQuery('/api/woc/balance?fresh=1&owner=ABC')).toEqual({
+      owner: 'ABC',
+      fresh: true,
+    });
   });
 
   it('URL-decodes the owner value', () => {

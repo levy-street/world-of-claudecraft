@@ -240,11 +240,10 @@ describe('preload registry retains no resolution values', () => {
 
 describe('post-entry mob-body streaming', () => {
   // The heaviest character content (creatures + the skeleton family, embedded
-  // 1024-class atlases) is carved out of the boot gate on every iOS WebKit host
-  // (Safari, other iOS browsers, and the packaged app) and streamed after prewarm,
-  // through the fail-soft view-create seam (#2079).
-  // Measured before this: WebContent at 1.54 GB pre-renderer on an iPhone 17 Pro.
-  it('keeps desktop mobs critical, bulk-streams only iOS mobs, and leaves skins on demand', () => {
+  // 1024-class atlases) is carved out of the boot gate on every host and streamed
+  // after first paint through the fail-soft view-create seam (#2079). This avoids
+  // the measured desktop boot burst too: 47 creature GLBs were fetched together.
+  it('streams mobs on every host with bounded concurrency and leaves skins on demand', () => {
     expect(assetsSource).toContain(
       "const STREAMED_URL_PREFIXES = ['models/creatures/', 'models/chars/enemies/'];",
     );
@@ -258,16 +257,18 @@ describe('post-entry mob-body streaming', () => {
       'const preloadUrls = allPreloadUrls.filter((url) => !streamedUrlSet.has(url));',
     );
     expect(assetsSource).toContain(
-      'streamedSkinUrls.has(url) ||\n      (profile.iosMemoryProfile && STREAMED_URL_PREFIXES.some((prefix) => url.includes(prefix)))',
+      'streamedSkinUrls.has(url) || STREAMED_URL_PREFIXES.some((prefix) => url.includes(prefix))',
     );
-    expect(assetsSource).toContain('let streamedUrls = streamedCharacterUrlsFor(GFX);');
+    expect(assetsSource).toContain('let streamedUrls = streamedCharacterUrlsFor();');
     expect(assetsSource).toContain(
       'let postEntryStreamUrls = postEntryStreamUrlsFor(streamedUrls);',
     );
-    expect(assetsSource).toContain(
-      'return urls.filter((url) => STREAMED_URL_PREFIXES.some((prefix) => url.includes(prefix)));',
-    );
-    expect(assetsSource).toContain('for (const url of postEntryStreamUrls) {');
+    expect(assetsSource).toContain('const dummyUrl = VISUALS.mob_training_dummy?.url;');
+    expect(assetsSource).toContain('STREAMED_URL_PREFIXES.some((prefix) => url.includes(prefix))');
+    expect(assetsSource).toContain('const POST_ENTRY_CHARACTER_STREAM_CONCURRENCY = 2;');
+    expect(assetsSource).toContain('void runBoundedLane(');
+    expect(assetsSource).toContain('POST_ENTRY_CHARACTER_STREAM_CONCURRENCY');
+    expect(assetsSource).toContain('preloadTrainingDummyAssets');
     expect(assetsSource).toContain('return postEntryStreamUrls.length;');
     expect(assetsSource).not.toContain('for (const url of streamedUrls) {');
   });

@@ -99,11 +99,10 @@ function emit() {
  * Decide which hashed-media ORIGINALS a bundle can drop.
  *
  * `emit` COPIES public/<logical> to dist/media/<name>.<hash><ext> and leaves the
- * source in place, while vite separately copies all of public/ into dist/. A web
- * deploy does not care (a CDN only transfers what is requested), but the native
- * shells package the whole of dist/ into the app, and the OTA publisher zips it,
- * so both carried every models/textures/env/vfx asset TWICE. That is what pushed
- * the Play base module past its 500 MB compressed download ceiling.
+ * source in place, while vite separately copies all of public/ into dist/. The
+ * web server image and native shells both package the whole of dist/, so leaving
+ * the originals there duplicates hundreds of MB even though the runtime requests
+ * only the hashed paths. Native also crossed the Play base-module ceiling.
  *
  * Production runtime resolves these through assetUrl() (src/render/assets/media.ts),
  * which returns MEDIA_ASSETS[logical] and only falls back to the original path for a

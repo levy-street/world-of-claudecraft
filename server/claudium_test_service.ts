@@ -35,6 +35,7 @@ const QUOTE_TTL_MS = 90_000; // legacy-tx blockhash validity window
 const RPC_TIMEOUT_MS = 8000;
 const SYSTEM_PROGRAM_ID = '11111111111111111111111111111111';
 const MEMO_PROGRAM_ID = 'MemoSq4gqABAXKb96qnH8TysNcWxMyWCqXgDLGmfcHr';
+export const DEVNET_GENESIS_HASH = 'EtWTRABZaYq6iMfeYKouRu166VU2xqa1';
 
 function treasuryAddress(): string {
   return (process.env.WOC_TEST_TREASURY ?? '').trim();
@@ -105,9 +106,9 @@ async function cachedSolBalance(owner: string): Promise<string> {
   return lamports;
 }
 
-/** Test mode is on only when explicitly requested AND a treasury address exists. */
+/** Test mode is on only when explicitly requested AND a valid treasury address exists. */
 export function testEconomyEnabled(): boolean {
-  return (process.env.WOC_TEST_ECONOMY ?? '').trim() === '1' && treasuryAddress() !== '';
+  return (process.env.WOC_TEST_ECONOMY ?? '').trim() === '1' && isSolanaAddress(treasuryAddress());
 }
 
 // ── Solana wire helpers (no @solana/web3.js server dependency) ────────────────
@@ -226,7 +227,7 @@ function buildLegacyTransferTxBase64(input: LegacyTransferTxInput): string | nul
   return Buffer.from(wire).toString('base64');
 }
 
-async function rpc<T>(method: string, params: unknown[]): Promise<T> {
+async function rawRpc<T>(method: string, params: unknown[]): Promise<T> {
   const res = await fetch(rpcUrl(), {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
@@ -237,6 +238,36 @@ async function rpc<T>(method: string, params: unknown[]): Promise<T> {
   const data = (await res.json()) as { result?: T; error?: { message?: string } };
   if (data.error) throw new Error(`${method}: ${data.error.message ?? 'rpc error'}`);
   return data.result as T;
+}
+
+let devnetVerification: Promise<void> | null = null;
+
+/**
+ * Fail closed if the TEST rail is pointed at anything other than Solana
+ * Devnet. Checking the genesis hash works with the public endpoint and with
+ * private Devnet RPC providers whose hostnames do not contain "devnet".
+ */
+export function verifyTestEconomyDevnet(): Promise<void> {
+  if (devnetVerification) return devnetVerification;
+  devnetVerification = rawRpc<string>('getGenesisHash', []).then((genesisHash) => {
+    if (genesisHash !== DEVNET_GENESIS_HASH) {
+      throw new Error('test economy RPC is not Solana Devnet');
+    }
+  });
+  devnetVerification = devnetVerification.catch((error) => {
+    devnetVerification = null;
+    throw error;
+  });
+  return devnetVerification;
+}
+
+export function resetTestEconomyRpcForTests(): void {
+  devnetVerification = null;
+}
+
+async function rpc<T>(method: string, params: unknown[]): Promise<T> {
+  await verifyTestEconomyDevnet();
+  return rawRpc<T>(method, params);
 }
 
 // ── Lazy schema ──────────────────────────────────────────────────────────────

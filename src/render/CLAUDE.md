@@ -171,8 +171,10 @@ rules, all CI-enforced:
     `startGame` calls `beginDeferredPreloads()`. The thunk must CREATE the promise
     when invoked, never close over one already in flight.
   - `registerPreload(promise)` stays eager, for the few assets the LAUNCHER itself
-    draws. Today that is `characters/assets.ts` (the character-creation preview) and
-    `placed_assets.ts` (which runs during world build, not at import).
+    draws. Today that is the critical player/NPC/base-weapon subset in
+    `characters/assets.ts` (the character-creation preview; creature/enemy bodies
+    stream after first paint through a bounded lane) and `placed_assets.ts` (which
+    runs during world build, not at import).
   Fetching world content at import meant merely reaching the home screen decoded the
   whole set, and the spike crossed WKWebView's per-process ceiling: a 12 GB iPhone 17
   Pro was killed 1.6s in and reloaded forever, unseen by the entry crash guard (it

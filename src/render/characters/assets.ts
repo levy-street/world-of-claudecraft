@@ -20,6 +20,7 @@ import { WEAPON_SKINS } from '../../sim/content/weapon_skins';
 import { retryDelayMs as gltfRetryDelayMs } from '../assets/load_retry';
 import { loadGltf, loadKtx2Texture, loadTexture } from '../assets/loader';
 import { registerPreload } from '../assets/preload';
+import { runBoundedLane } from '../build_lane_core';
 import { recordBuildSpan, timeBuildSpan } from '../build_spans';
 import {
   PLAYER_DODGE_ROLL_CLIP,
@@ -528,8 +529,8 @@ function assetUrl(url: string): string {
 // world entry crashes (the character-side twin of the v0.16.0 props P0).
 const allPreloadUrls = characterPreloadUrls(false);
 
-// Every iOS WebKit host carves the mob bodies out of the boot gate and STREAMS
-// them after first frame instead. They are the
+// Every host carves the mob bodies out of the boot gate and STREAMS them after
+// first frame instead. They are the
 // heaviest character content (creature + skeleton-family GLBs with embedded
 // 1024-class atlases; 47 files, and by far the largest share of the decoded
 // character residency) and nothing on the launcher, the character-select
@@ -538,9 +539,11 @@ const allPreloadUrls = characterPreloadUrls(false);
 // the #2079 seam; mounts already stream exactly this way), so a mob whose GLB
 // is still arriving pops in a beat later instead of crashing anything.
 // Measured on an iPhone 17 Pro, decoding the full set inside the entry gate put
-// WebContent at 1.54 GB before the renderer ever existed. Desktop keeps these
-// actionable bodies critical: until a creature GLB arrives, its view, nameplate,
-// and click target do not exist. Weapons and NPC bodies also stay in the gate:
+// WebContent at 1.54 GB before the renderer ever existed; desktop fetched 47
+// heavy creature GLBs in the same boot burst. Until a creature GLB arrives its
+// view, nameplate, and click target do not exist, so visible bodies still kick
+// their own on-demand load before the background stream reaches them. Weapons
+// and NPC bodies stay in the gate:
 // the char-select preview builds CharacterVisual DIRECTLY (not through the
 // fail-soft factory), so a missing held-weapon GLB there would throw.
 const STREAMED_URL_PREFIXES = ['models/creatures/', 'models/chars/enemies/'];
@@ -558,17 +561,22 @@ const streamedSkinUrls = new Set(weaponSkinModelUrls());
 export function isWeaponSkinModelUrl(url: string): boolean {
   return streamedSkinUrls.has(url);
 }
-function streamedCharacterUrlsFor(profile: Readonly<GfxSettings>): string[] {
+function streamedCharacterUrlsFor(): string[] {
   return allPreloadUrls.filter(
     (url) =>
-      streamedSkinUrls.has(url) ||
-      (profile.iosMemoryProfile && STREAMED_URL_PREFIXES.some((prefix) => url.includes(prefix))),
+      streamedSkinUrls.has(url) || STREAMED_URL_PREFIXES.some((prefix) => url.includes(prefix)),
   );
 }
 function postEntryStreamUrlsFor(urls: readonly string[]): string[] {
-  return urls.filter((url) => STREAMED_URL_PREFIXES.some((prefix) => url.includes(prefix)));
+  const dummyUrl = VISUALS.mob_training_dummy?.url;
+  return [
+    ...(dummyUrl ? [dummyUrl] : []),
+    ...urls.filter(
+      (url) => url !== dummyUrl && STREAMED_URL_PREFIXES.some((prefix) => url.includes(prefix)),
+    ),
+  ];
 }
-let streamedUrls = streamedCharacterUrlsFor(GFX);
+let streamedUrls = streamedCharacterUrlsFor();
 let streamedUrlSet = new Set(streamedUrls);
 let postEntryStreamUrls = postEntryStreamUrlsFor(streamedUrls);
 const preloadUrls = allPreloadUrls.filter((url) => !streamedUrlSet.has(url));
@@ -642,10 +650,14 @@ for (const url of preloadUrls) {
 }
 
 let streamedStarted = false;
+const POST_ENTRY_CHARACTER_STREAM_CONCURRENCY = 2;
 /**
  * Start the post-entry mob-body stream (idempotent; returns how many fetches
- * this call started). main.ts calls it after the first painted world frame,
- * once the entry allocation spike has cleared. A failed fetch re-arms
+ * this call scheduled). main.ts calls it after the first painted world frame,
+ * once the entry allocation spike has cleared. The Training Dummy is first so
+ * its one hub placement is resident before ordinary background catalog work.
+ * Bounded concurrency avoids a second network/decode burst after boot. A failed
+ * fetch re-arms
  * when a visual build next needs the body: resolvedGltf kicks
  * ensureCharacterUrl for a non-resident streamed url before its fail-soft
  * throw, and the view-create retry gate re-attempts the build.
@@ -653,9 +665,9 @@ let streamedStarted = false;
 export function startStreamedCharacterPreloads(): number {
   if (streamedStarted) return 0;
   streamedStarted = true;
-  for (const url of postEntryStreamUrls) {
-    void prepareCharacterUrl(url).catch(() => undefined);
-  }
+  void runBoundedLane(postEntryStreamUrls, POST_ENTRY_CHARACTER_STREAM_CONCURRENCY, (url) =>
+    prepareCharacterUrl(url),
+  );
   return postEntryStreamUrls.length;
 }
 
@@ -713,7 +725,7 @@ if (eagerSkinAtlases) {
 
 /** Prepare character sources and cosmetic atlases selected by an explicit target profile. */
 export async function prepareCharacterProfileAssets(target: Readonly<GfxSettings>): Promise<void> {
-  const nextStreamedUrls = streamedCharacterUrlsFor(target);
+  const nextStreamedUrls = streamedCharacterUrlsFor();
   const nextStreamedSet = new Set(nextStreamedUrls);
   const requiredGltf = manifestUrlsForGraphics(target.standardMaterials).filter(
     (url) => !nextStreamedSet.has(url),
@@ -850,11 +862,7 @@ export function preloadTrainingDummyAssets(): Promise<void> {
   if (trainingDummyAssetsPromise) return trainingDummyAssetsPromise;
   const def = VISUALS.mob_training_dummy;
   if (!def) return Promise.resolve();
-  trainingDummyAssetsPromise = loadGltf(def.url)
-    .then((g) => {
-      gltfByUrl.set(def.url, g);
-    })
-    .then(() => undefined);
+  trainingDummyAssetsPromise = prepareCharacterUrl(def.url);
   return trainingDummyAssetsPromise;
 }
 

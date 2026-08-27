@@ -45,3 +45,16 @@ services:
       # resolution.
       - key: PLAYER_DIRECTIONAL_COMBAT
         value: "1"
+      # Built-in points/test economy. SOL transfers are accepted only after the
+      # server verifies the configured RPC's Solana Devnet genesis hash.
+      - key: WOC_TEST_ECONOMY
+        value: "1"
+      - key: SOLANA_RPC_URL
+        value: https://api.devnet.solana.com
+      - key: WOC_TEST_TREASURY
+        # Public Devnet treasury recovered from the old marketplace dry-run
+        # roster; private key material is never stored in this Blueprint.
+        value: 9fzukogxcT5c113MA7gNSeP1UMsc3eH27BXbBihWaUqf
+      # Keep the free realm inside the measured small-realm target.
+      - key: MAX_PLAYERS_PER_REALM
+        value: "25"

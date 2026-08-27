@@ -47,3 +47,18 @@ services:
         value: Claudemoon
       - key: PLAYER_DIRECTIONAL_COMBAT
         value: "1"
+      # Built-in points/test economy. SOL transfers are constructed only after
+      # the server verifies this RPC's Devnet genesis hash. The treasury below
+      # is public Devnet data, never key material.
+      - key: WOC_TEST_ECONOMY
+        value: "1"
+      - key: SOLANA_RPC_URL
+        value: https://api.devnet.solana.com
+      - key: WOC_TEST_TREASURY
+        # Public Devnet treasury recovered from the old marketplace dry-run
+        # roster (docs/woc-marketplace-hardening/devnet.md). No private key is
+        # stored in the repository or Render configuration.
+        value: 9fzukogxcT5c113MA7gNSeP1UMsc3eH27BXbBihWaUqf
+      # Keep the free 512 MB / fractional-CPU realm inside its measured target.
+      - key: MAX_PLAYERS_PER_REALM
+        value: "25"

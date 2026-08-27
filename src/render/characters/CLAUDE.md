@@ -15,10 +15,13 @@ no procedural-rig path here anymore. Reads the world; never mutates the sim.
 - `anim_state.ts`: pure, three-free pose math: the `AnimState` (renderer-derived
   input) + `BaseState` types and `desiredBaseState()`/`locomotionTimeScale()` that
   `visual.ts` delegates to.
-- `assets.ts`: eager `registerPreload` of `characterPreloadUrls()`, the
-  tier-INDEPENDENT union of every graphics tier's URL set (the why lives in
-  the Asset loading section of `src/render/CLAUDE.md` and the P0 comment in
-  `manifest.ts`). `prepareVisual(key)` memoizes normalize transform, resolved
+- `assets.ts`: eager `registerPreload` of the tier-independent critical subset
+  of `characterPreloadUrls()` (player/NPC/base-weapon content). Creature and
+  enemy bodies stream after first paint on every host through a bounded lane,
+  with visible bodies retaining the fail-soft on-demand priority path. The full
+  catalog is still the tier-INDEPENDENT union of every graphics tier's URL set
+  (the why lives in the Asset loading section of `src/render/CLAUDE.md` and the
+  P0 comment in `manifest.ts`). `prepareVisual(key)` memoizes normalize transform, resolved
   clips, click-capsule radius, and a baked idle-pose geo (far-LOD/shadow
   proxy). `charactersReady()` is deliberately NARROWER than the site-wide
   `assetsReady()`: only this file's boot GLBs (the skin atlases defer on every
