@@ -8331,7 +8331,9 @@ export const tr_TR: EnTranslations = {
       "updateReadyTitleNoVersion": "Güncelleme hazır",
       "updateReadyBody": "Güncellemeyi uygulamak için World of ClaudeCraft'ı yeniden başlat.",
       "partyInviteTitle": "Grup daveti",
-      "partyInviteBody": "{name} seni grubuna davet etti."
+      "partyInviteBody": "{name} seni grubuna davet etti.",
+      "readyCheckTitle": "Ready check",
+      "readyCheckBody": "{name} started a ready check."
     },
     "crash": {
       "title": "World of ClaudeCraft",

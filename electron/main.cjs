@@ -1110,7 +1110,7 @@ ipcMain.handle('desktop-show-notification', (event, payload) => {
   if (!trustedSender(event)) return false;
   if (!payload || typeof payload !== 'object') return false;
   const kind = payload.kind;
-  if (kind !== 'update-ready' && kind !== 'party-invite') return false;
+  if (kind !== 'update-ready' && kind !== 'party-invite' && kind !== 'ready-check') return false;
   if (typeof payload.title !== 'string' || typeof payload.body !== 'string') return false;
   const title = clampText(payload.title, 120);
   const body = clampText(payload.body, 240);

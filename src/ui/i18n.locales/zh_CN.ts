@@ -7736,6 +7736,8 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'desktop.notify.updateReadyBody': '重启 World of ClaudeCraft 以应用更新。',
   'desktop.notify.partyInviteTitle': '组队邀请',
   'desktop.notify.partyInviteBody': '{name} 邀请你加入队伍。',
+  'desktop.notify.readyCheckTitle': '准备确认',
+  'desktop.notify.readyCheckBody': '{name} 发起了准备确认。',
   'desktop.crash.title': 'World of ClaudeCraft',
   'desktop.crash.body': '游戏画面已停止响应。要重新加载吗？',
   'desktop.crash.reload': '重新加载',

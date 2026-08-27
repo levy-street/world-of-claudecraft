@@ -8331,7 +8331,9 @@ export const en_XA: EnTranslations = {
       "updateReadyTitleNoVersion": "[Úþðáţé íš ŕéáðý]",
       "updateReadyBody": "[Ŕéšţáŕţ Ŵóŕļð óƒ ÇļáúðéÇŕáƒţ ţó áþþļý ţĥé úþðáţé.]",
       "partyInviteTitle": "[Þáŕţý íñʋíţé]",
-      "partyInviteBody": "[{name} íñʋíţéð ýóú ţó á þáŕţý.]"
+      "partyInviteBody": "[{name} íñʋíţéð ýóú ţó á þáŕţý.]",
+      "readyCheckTitle": "[Ŕéáðý çĥéçķ]",
+      "readyCheckBody": "[{name} šţáŕţéð á ŕéáðý çĥéçķ.]"
     },
     "crash": {
       "title": "[Ŵóŕļð óƒ ÇļáúðéÇŕáƒţ]",

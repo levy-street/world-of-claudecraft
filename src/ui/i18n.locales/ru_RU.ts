@@ -8159,6 +8159,8 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'desktop.notify.updateReadyBody': 'Перезапустите World of ClaudeCraft, чтобы применить обновление.',
   'desktop.notify.partyInviteTitle': 'Приглашение в группу',
   'desktop.notify.partyInviteBody': '{name} приглашает вас в группу.',
+  'desktop.notify.readyCheckTitle': 'Проверка готовности',
+  'desktop.notify.readyCheckBody': '{name} начал проверку готовности.',
   'desktop.crash.title': 'World of ClaudeCraft',
   'desktop.crash.body': 'Игровой экран перестал отвечать. Перезагрузить его?',
   'desktop.crash.reload': 'Перезагрузить',

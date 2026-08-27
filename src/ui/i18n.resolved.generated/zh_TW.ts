@@ -8331,7 +8331,9 @@ export const zh_TW: EnTranslations = {
       "updateReadyTitleNoVersion": "更新已就緒",
       "updateReadyBody": "重新啟動 World of ClaudeCraft 以套用更新。",
       "partyInviteTitle": "組隊邀請",
-      "partyInviteBody": "{name} 邀請你加入隊伍。"
+      "partyInviteBody": "{name} 邀請你加入隊伍。",
+      "readyCheckTitle": "準備確認",
+      "readyCheckBody": "{name} 發起了準備確認。"
     },
     "crash": {
       "title": "World of ClaudeCraft",

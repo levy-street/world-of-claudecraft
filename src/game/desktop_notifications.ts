@@ -1,7 +1,7 @@
 // OS notifications posted through the desktop shell: the player alt-tabbed away
 // (or minimized the window) and something happened that is worth pulling them
-// back for. Two triggers today: a downloaded update becoming restart-ready, and
-// an incoming party invite.
+// back for. Three triggers today: a downloaded update becoming restart-ready,
+// an incoming party invite, and the party leader starting a ready check.
 //
 // Lives in src/game so main.ts stays a firewall and so the decision half stays
 // DOM-free and directly Node-testable (tests/desktop_notifications.test.ts).
@@ -21,6 +21,7 @@ import { desktopPresentationHidden } from './desktop_presentation';
 
 export interface DesktopNotifyCore {
   partyInvite(event: SimEvent, localPid: number): { name: string } | null;
+  readyCheckStart(event: SimEvent, localPid: number): { name: string } | null;
   updateReady(
     prevMode: UpdateToastState['mode'],
     state: UpdateToastState,
@@ -45,6 +46,13 @@ export function createDesktopNotifyCore(): DesktopNotifyCore {
       // (src/sim/social/party.ts): offline it equals the local player's id,
       // online the server routes each event to its addressee. The undefined
       // arm is shape robustness, not the offline case.
+      if (event.pid !== undefined && event.pid !== localPid) return null;
+      return { name: event.fromName };
+    },
+    readyCheckStart(event, localPid) {
+      if (event.type !== 'readyCheckStart') return null;
+      // Same addressing gate as partyInvite: the sim stamps each member's pid
+      // (src/sim/social/ready_check.ts) and never emits to the leader.
       if (event.pid !== undefined && event.pid !== localPid) return null;
       return { name: event.fromName };
     },
@@ -136,22 +144,32 @@ export function initDesktopNotifications(bridge: DesktopBridge): void {
 /**
  * Scan one frame's sim events for anything worth a notification. Called from
  * the frame path in both modes, so it early-outs before touching anything and
- * allocates only on a matching invite, never on the empty-batch or no-match
- * frames. (tests/client_frame_allocations.test.ts scans the caller, src/main.ts
- * frame(), not this module; the per-match allocation here is the notification
- * itself, off the steady-state path.)
- * Deliberately unthrottled: each invite is a discrete act by another player.
+ * allocates only on a matching invite or ready check, never on the empty-batch
+ * or no-match frames. (tests/client_frame_allocations.test.ts scans the caller,
+ * src/main.ts frame(), not this module; the per-match allocation here is the
+ * notification itself, off the steady-state path.)
+ * Deliberately unthrottled: each match is a discrete act by another player.
  */
 export function desktopNotifyOnSimEvents(events: readonly SimEvent[], localPid: number): void {
   if (send === null || core === null || events.length === 0) return;
   for (let i = 0; i < events.length; i++) {
     const invite = core.partyInvite(events[i], localPid);
-    if (invite === null) continue;
+    if (invite !== null) {
+      if (!playerIsAway()) continue;
+      send({
+        kind: 'party-invite',
+        title: t('desktop.notify.partyInviteTitle'),
+        body: t('desktop.notify.partyInviteBody', { name: invite.name }),
+      });
+      continue;
+    }
+    const readyCheck = core.readyCheckStart(events[i], localPid);
+    if (readyCheck === null) continue;
     if (!playerIsAway()) continue;
     send({
-      kind: 'party-invite',
-      title: t('desktop.notify.partyInviteTitle'),
-      body: t('desktop.notify.partyInviteBody', { name: invite.name }),
+      kind: 'ready-check',
+      title: t('desktop.notify.readyCheckTitle'),
+      body: t('desktop.notify.readyCheckBody', { name: readyCheck.name }),
     });
   }
 }

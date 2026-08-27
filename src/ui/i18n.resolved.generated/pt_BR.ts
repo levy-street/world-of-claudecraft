@@ -8331,7 +8331,9 @@ export const pt_BR: EnTranslations = {
       "updateReadyTitleNoVersion": "A atualização está pronta",
       "updateReadyBody": "Reinicie o World of ClaudeCraft para aplicar a atualização.",
       "partyInviteTitle": "Convite de grupo",
-      "partyInviteBody": "{name} convidou você para um grupo."
+      "partyInviteBody": "{name} convidou você para um grupo.",
+      "readyCheckTitle": "Ready check",
+      "readyCheckBody": "{name} started a ready check."
     },
     "crash": {
       "title": "World of ClaudeCraft",

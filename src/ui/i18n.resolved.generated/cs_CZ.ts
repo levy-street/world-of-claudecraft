@@ -8331,7 +8331,9 @@ export const cs_CZ: EnTranslations = {
       "updateReadyTitleNoVersion": "Aktualizace je připravena",
       "updateReadyBody": "Restartuj World of ClaudeCraft, aby se aktualizace použila.",
       "partyInviteTitle": "Pozvánka do skupiny",
-      "partyInviteBody": "{name} tě pozval(a) do skupiny."
+      "partyInviteBody": "{name} tě pozval(a) do skupiny.",
+      "readyCheckTitle": "Ready check",
+      "readyCheckBody": "{name} started a ready check."
     },
     "crash": {
       "title": "World of ClaudeCraft",

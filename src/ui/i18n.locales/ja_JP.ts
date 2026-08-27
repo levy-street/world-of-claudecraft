@@ -8043,6 +8043,8 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'desktop.notify.updateReadyBody': 'アップデートを適用するには World of ClaudeCraft を再起動してください。',
   'desktop.notify.partyInviteTitle': 'パーティ招待',
   'desktop.notify.partyInviteBody': '{name}があなたをパーティに招待しています。',
+  'desktop.notify.readyCheckTitle': '準備確認',
+  'desktop.notify.readyCheckBody': '{name}が準備確認を開始しました。',
   'desktop.crash.title': 'World of ClaudeCraft',
   'desktop.crash.body': 'ゲーム画面が停止しました。再読み込みしますか？',
   'desktop.crash.reload': '再読み込み',

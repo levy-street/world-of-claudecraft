@@ -60,7 +60,7 @@ export interface DesktopUpdateEvent {
 // (coalescing, click routing) off it, and the two strings arrive already
 // localized because the main process has no i18n runtime.
 export interface DesktopNotificationRequest {
-  kind: 'update-ready' | 'party-invite';
+  kind: 'update-ready' | 'party-invite' | 'ready-check';
   title: string;
   body: string;
 }

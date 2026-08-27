@@ -8331,7 +8331,9 @@ export const id_ID: EnTranslations = {
       "updateReadyTitleNoVersion": "Pembaruan siap",
       "updateReadyBody": "Mulai ulang World of ClaudeCraft untuk menerapkan pembaruan.",
       "partyInviteTitle": "Undangan Kelompok",
-      "partyInviteBody": "{name} telah mengundangmu ke kelompoknya."
+      "partyInviteBody": "{name} telah mengundangmu ke kelompoknya.",
+      "readyCheckTitle": "Ready check",
+      "readyCheckBody": "{name} started a ready check."
     },
     "crash": {
       "title": "World of ClaudeCraft",

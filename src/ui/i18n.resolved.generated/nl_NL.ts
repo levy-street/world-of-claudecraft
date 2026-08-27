@@ -8331,7 +8331,9 @@ export const nl_NL: EnTranslations = {
       "updateReadyTitleNoVersion": "Update is klaar",
       "updateReadyBody": "Herstart World of ClaudeCraft om de update toe te passen.",
       "partyInviteTitle": "Groepsuitnodiging",
-      "partyInviteBody": "{name} heeft je uitgenodigd voor een groep."
+      "partyInviteBody": "{name} heeft je uitgenodigd voor een groep.",
+      "readyCheckTitle": "Ready check",
+      "readyCheckBody": "{name} started a ready check."
     },
     "crash": {
       "title": "World of ClaudeCraft",

@@ -8331,7 +8331,9 @@ export const ko_KR: EnTranslations = {
       "updateReadyTitleNoVersion": "업데이트 준비 완료",
       "updateReadyBody": "업데이트를 적용하려면 World of ClaudeCraft를 다시 시작하세요.",
       "partyInviteTitle": "파티 초대",
-      "partyInviteBody": "{name}님이 파티에 초대했습니다."
+      "partyInviteBody": "{name}님이 파티에 초대했습니다.",
+      "readyCheckTitle": "준비 확인",
+      "readyCheckBody": "{name}님이 준비 확인을 시작했습니다."
     },
     "crash": {
       "title": "World of ClaudeCraft",

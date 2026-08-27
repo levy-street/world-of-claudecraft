@@ -198,7 +198,7 @@ contextBridge.exposeInMainWorld('wocDesktop', {
     ipcRenderer.invoke('desktop-gamepad-activity').catch(() => {});
   },
   // An OS notification, with both strings already rendered by the renderer's
-  // t(). Refused here unless it is one of the two kinds main will accept, and
+  // t(). Refused here unless it is one of the kinds main will accept, and
   // rebuilt into a fresh object so no renderer prototype crosses the bridge,
   // pre-capped so a hostile page cannot ship unbounded strings across the IPC
   // (main re-clamps to the visible 120/240 without trusting these caps).
@@ -208,7 +208,7 @@ contextBridge.exposeInMainWorld('wocDesktop', {
   showNotification: (payload) => {
     if (!payload || typeof payload !== 'object') return;
     const kind = payload.kind;
-    if (kind !== 'update-ready' && kind !== 'party-invite') return;
+    if (kind !== 'update-ready' && kind !== 'party-invite' && kind !== 'ready-check') return;
     if (typeof payload.title !== 'string' || typeof payload.body !== 'string') return;
     const message = { kind, title: payload.title.slice(0, 512), body: payload.body.slice(0, 1024) };
     try {
