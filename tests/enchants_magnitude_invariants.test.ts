@@ -52,6 +52,17 @@ function bestValue(slot: string, axis: Axis, include: (e: EnchantDef) => boolean
 describe('enchant table magnitude invariants', () => {
   it('every enchant grants exactly one stat axis (the tier and stack sweeps below rely on it)', () => {
     for (const e of Object.values(ENCHANTS)) {
+      // Proc enchants (the raid formulas) deliberately carry NO flat axis:
+      // the proc IS the payload, and this exclusivity is what keeps every
+      // flat-axis sweep below honest, so pin it as zero axes rather than
+      // exempting silently.
+      if (e.proc) {
+        expect(
+          AXES.filter((a) => (e.statBonus[a] ?? 0) !== 0),
+          e.id,
+        ).toHaveLength(0);
+        continue;
+      }
       // Nonzero, not positive: a negative side axis would slip past the
       // positive-only filters in axisOf and bestPerSlotTotal unseen.
       const axes = AXES.filter((a) => (e.statBonus[a] ?? 0) !== 0);
@@ -84,8 +95,12 @@ describe('enchant table magnitude invariants', () => {
 
   it('every Greater enchant beats the best base option on its slot and axis by at least 3', () => {
     // If the shard tier collapses to a point or two over base, nobody
-    // disenchants an epic and the arcane_shard sink dies.
-    const greaters = Object.values(ENCHANTS).filter(isGreater);
+    // disenchants an epic and the arcane_shard sink dies. Proc enchants sit
+    // outside the flat-axis ladder entirely (the raid formulas consume
+    // shards but carry no axis to compare).
+    const greaters = Object.values(ENCHANTS)
+      .filter((e) => !e.proc)
+      .filter(isGreater);
     expect(greaters.map((e) => e.id).sort()).toEqual([
       'enchant_chest_greater_stamina',
       'enchant_gloves_greater_agility',
@@ -197,6 +212,9 @@ describe('frozen enchant magnitudes (the #2415 replace-exactness premise)', () =
     expect(all).toEqual({
       enchant_weapon_might: { str: 2 },
       enchant_weapon_intellect: { int: 2 },
+      // The raid proc formula: deliberately axis-free (the proc is the
+      // payload; magnitudes live on the proc def, frozen the same way).
+      enchant_weapon_lastflame_zeal: {},
       enchant_offhand_stamina: { sta: 3 },
       enchant_helmet_fortitude: { sta: 3 },
       enchant_neck_spirit: { spi: 3 },

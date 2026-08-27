@@ -1536,6 +1536,24 @@ export const RELIQUARY_PAGES: readonly ReliquaryPageDef[] = freezePageTable([
       ...RIFT_GEAR_ITEM_IDS.map((id) => [id, fromActivity('rift_first_clear')] as const),
     ),
   },
+  // ---- Crucible raid professions: the crafted best-in-slot tier ----
+  // (docs/prd/ignivar-raid-professions.md). The scrolls and the core are
+  // materials, not catalogued relics; the four OUTPUTS are the conquerable
+  // uniques. Each names its craft: the profession door is what a collector
+  // walks through, whichever raid the reagents came from.
+  {
+    id: 'professions_crucible_craft',
+    shelf: 'professions',
+    name: 'Wrought of the Last Spring',
+    desc: 'The crafted masterpieces of the Crucible tier: recipes wrested from the raid, shaped at the town stations by committed hands.',
+    clearSource: { kind: 'none' },
+    relics: items(
+      ['cruciblewrought_warhelm', fromProfession('armorcrafting')],
+      ['emberveil_legguards', fromProfession('leatherworking')],
+      ['vestment_of_the_last_spring', fromProfession('tailoring')],
+      ['forgefathers_requiem', fromProfession('weaponcrafting')],
+    ),
+  },
 ]);
 
 /** Append-only page order (table order). */

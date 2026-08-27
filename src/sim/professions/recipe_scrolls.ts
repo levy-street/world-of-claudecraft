@@ -135,6 +135,47 @@ export function useRecipeScrollForFormula(
   ctx.emit({ type: 'recipeScrollResult', ok: true, recipeId: enchant.id, pid: meta.entityId });
 }
 
+/** Whether a quest carrying `recipeId` as its recipeReward may turn in for
+ *  `meta`: the SAME tier floor the scroll path applies, so the quest chain
+ *  can never bypass the learn gate (the hammer chain's 125 floor is the
+ *  point). Already-known ids and ids neither table resolves return true:
+ *  the turn-in completes and the teach arm below simply no-ops (a repeat
+ *  turn-in must never wedge on knowledge, and a dangling id is an authoring
+ *  bug for the content guards, not a player-facing wall). */
+export function canTeachQuestRecipeReward(meta: PlayerMeta, recipeId: string): boolean {
+  const recipe = recipeById(recipeId);
+  if (recipe) {
+    if (isRecipeKnown(meta, recipe)) return true;
+    return teachTierMet(recipe, meta.craftSkills);
+  }
+  const enchant = ENCHANTS[recipeId];
+  if (enchant) {
+    if (isEnchantKnown(meta, enchant)) return true;
+    return tierForSkill(meta.craftSkills.enchanting ?? 0) >= tierForSkill(enchant.skillReq ?? 0);
+  }
+  return true;
+}
+
+/** The quest turn-in teach arm (the 'quest' acquisition source): teaches the
+ *  id through the same tables the scroll path resolves, emitting the learned
+ *  line on success and NOTHING otherwise (already known and dangling ids are
+ *  silent no-ops; the floor was checked by canTeachQuestRecipeReward before
+ *  the turn-in committed). */
+export function teachQuestRecipeReward(ctx: SimContext, meta: PlayerMeta, recipeId: string): void {
+  const recipe = recipeById(recipeId);
+  if (recipe) {
+    if (acquireRecipeForRecipe(ctx, meta.entityId, recipe, 'quest').ok) {
+      ctx.emit({ type: 'recipeScrollResult', ok: true, recipeId, pid: meta.entityId });
+    }
+    return;
+  }
+  const enchant = ENCHANTS[recipeId];
+  if (!enchant?.acquisition?.includes('quest')) return;
+  if (isEnchantKnown(meta, enchant)) return;
+  meta.knownRecipes.add(recipeId);
+  ctx.emit({ type: 'recipeScrollResult', ok: true, recipeId, pid: meta.entityId });
+}
+
 /** The items.ts use-arm entry: resolves the id against the recipe table
  *  first, then the enchant table (a teachRecipe scroll may carry either),
  *  and delegates. An id neither table resolves emits the silent-deny arm

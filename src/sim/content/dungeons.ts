@@ -91,7 +91,24 @@ export const DUNGEON_MOBS: Record<string, MobTemplate> = {
     armorPerLevel: 46,
     moveSpeed: 6.8,
     aggroRadius: 30,
-    loot: [],
+    // Raid professions arm (docs/prd/ignivar-raid-professions.md): 1 core
+    // guaranteed + a 50 percent second (the 1-to-2 band), the scroll roll
+    // group shared with Ignivar (0.24 total: about one scroll somewhere per
+    // two full clears), and the hammer chain's starter, gated on the active
+    // quest. Gear rows land with the loot plan's own table re-cut.
+    loot: [
+      { itemId: 'lastflame_core', chance: 1 },
+      { itemId: 'lastflame_core', chance: 0.5 },
+      { itemId: 'plans_cruciblewrought_warhelm', chance: 0.06, rollGroup: 'crucible_scrolls' },
+      { itemId: 'pattern_emberveil_legguards', chance: 0.06, rollGroup: 'crucible_scrolls' },
+      {
+        itemId: 'pattern_vestment_of_the_last_spring',
+        chance: 0.06,
+        rollGroup: 'crucible_scrolls',
+      },
+      { itemId: 'formula_lastflame_zeal', chance: 0.06, rollGroup: 'crucible_scrolls' },
+      { itemId: 'forgefathers_ember', chance: 1, questId: 'q_forgefathers_requiem' },
+    ],
     scale: 3.2,
     color: 0x9f351c,
   },
@@ -125,7 +142,11 @@ export const DUNGEON_MOBS: Record<string, MobTemplate> = {
         school: 'fire',
       },
     },
-    loot: [],
+    // Raid trash core arm: tuned so a full clear expects 1 to 2 cores
+    // beyond the boss guarantees (the approach packs plus the Varkhul-phase
+    // adds reuse these templates). Retune the rate with live trash counts,
+    // not by feel.
+    loot: [{ itemId: 'lastflame_core', chance: 0.05 }],
     scale: 1.45,
     color: 0xb94b23,
   },
@@ -155,7 +176,8 @@ export const DUNGEON_MOBS: Record<string, MobTemplate> = {
       max: 38,
       school: 'fire',
     },
-    loot: [],
+    // Raid trash core arm (see the sentinel's note above).
+    loot: [{ itemId: 'lastflame_core', chance: 0.05 }],
     scale: 1.7,
     color: 0x7c4529,
   },
@@ -195,7 +217,8 @@ export const DUNGEON_MOBS: Record<string, MobTemplate> = {
       name: 'Recalibrate',
       school: 'fire',
     },
-    loot: [],
+    // Raid trash core arm (see the sentinel's note above).
+    loot: [{ itemId: 'lastflame_core', chance: 0.05 }],
     scale: 1.55,
     color: 0xd17936,
   },
@@ -223,7 +246,21 @@ export const DUNGEON_MOBS: Record<string, MobTemplate> = {
     // base, and a heroic-claim kill substitutes the shared 20g raid base on
     // the same single draw (tests/heroic_finale_gold.test.ts). Item drops are
     // still to be authored for the development raid tier.
-    loot: [{ copper: 150000, heroicCopper: NYTHRAXIS_HEROIC_COPPER, chance: 1 }],
+    loot: [
+      { copper: 150000, heroicCopper: NYTHRAXIS_HEROIC_COPPER, chance: 1 },
+      // Raid professions arm: the same core band and scroll group as
+      // Varkhul (docs/prd/ignivar-raid-professions.md).
+      { itemId: 'lastflame_core', chance: 1 },
+      { itemId: 'lastflame_core', chance: 0.5 },
+      { itemId: 'plans_cruciblewrought_warhelm', chance: 0.06, rollGroup: 'crucible_scrolls' },
+      { itemId: 'pattern_emberveil_legguards', chance: 0.06, rollGroup: 'crucible_scrolls' },
+      {
+        itemId: 'pattern_vestment_of_the_last_spring',
+        chance: 0.06,
+        rollGroup: 'crucible_scrolls',
+      },
+      { itemId: 'formula_lastflame_zeal', chance: 0.06, rollGroup: 'crucible_scrolls' },
+    ],
     scale: 3.4,
     color: 0xd64316,
     // Deliberately NO hasteMult: the encounter script owns Ignivar's frenzy.

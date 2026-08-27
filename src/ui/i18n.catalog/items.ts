@@ -2454,6 +2454,17 @@ const ITEM_ENTITY_IDS = [
   'ps_lustrous_pearl',
   'mother_of_pearl',
   'ps_passing_stone',
+  // Crucible raid professions (docs/prd/ignivar-raid-professions.md).
+  'lastflame_core',
+  'forgefathers_ember',
+  'cruciblewrought_warhelm',
+  'emberveil_legguards',
+  'vestment_of_the_last_spring',
+  'forgefathers_requiem',
+  'plans_cruciblewrought_warhelm',
+  'pattern_emberveil_legguards',
+  'pattern_vestment_of_the_last_spring',
+  'formula_lastflame_zeal',
 ] as const;
 
 type ItemEntityId = (typeof ITEM_ENTITY_IDS)[number];
@@ -2591,6 +2602,18 @@ const APPENDED_ITEM_NAMES: Partial<Record<ItemEntityId, string>> = {
   ps_lustrous_pearl: 'Lustrous Pearl',
   mother_of_pearl: 'Mother of Pearl',
   ps_passing_stone: 'Passing Stone',
+  // Crucible raid professions, English-appended like the waves above (the
+  // maintainer fills every locale at release).
+  lastflame_core: 'Core of the Last Flame',
+  forgefathers_ember: "Forgefather's Ember",
+  cruciblewrought_warhelm: 'Crucible-Wrought Warhelm',
+  emberveil_legguards: 'Emberveil Legguards',
+  vestment_of_the_last_spring: 'Vestment of the Last Spring',
+  forgefathers_requiem: "Forgefather's Requiem",
+  plans_cruciblewrought_warhelm: 'Plans: Crucible-Wrought Warhelm',
+  pattern_emberveil_legguards: 'Pattern: Emberveil Legguards',
+  pattern_vestment_of_the_last_spring: 'Pattern: Vestment of the Last Spring',
+  formula_lastflame_zeal: "Formula: Last Flame's Zeal",
 };
 
 function itemTranslations(names: readonly string[]): ItemEntityTranslations {

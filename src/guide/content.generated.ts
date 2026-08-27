@@ -5625,6 +5625,20 @@ export const GUIDE_DEEDS: GuideDeed[] = [
     "category": "progression",
     "renown": 5,
     "feat": false
+  },
+  {
+    "id": "col_crucible_wrought",
+    "name": "Wrought of the Last Spring",
+    "category": "collection",
+    "renown": 0,
+    "feat": false
+  },
+  {
+    "id": "chr_forgefathers_requiem",
+    "name": "The Requiem Sung in Iron",
+    "category": "chronicle",
+    "renown": 25,
+    "feat": false
   }
 ];
 
@@ -7373,6 +7387,29 @@ export const GUIDE_RELIQUARY: GuideReliquaryPage[] = [
       {
         "kind": "item",
         "name": "Riftbound Band of Guile"
+      }
+    ]
+  },
+  {
+    "id": "professions_crucible_craft",
+    "shelf": "professions",
+    "name": "Wrought of the Last Spring",
+    "relics": [
+      {
+        "kind": "item",
+        "name": "Crucible-Wrought Warhelm"
+      },
+      {
+        "kind": "item",
+        "name": "Emberveil Legguards"
+      },
+      {
+        "kind": "item",
+        "name": "Vestment of the Last Spring"
+      },
+      {
+        "kind": "item",
+        "name": "Forgefather's Requiem"
       }
     ]
   }

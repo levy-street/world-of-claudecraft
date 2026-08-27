@@ -471,4 +471,44 @@ export const ENCHANTS: Record<string, EnchantDef> = {
     ],
     statBonus: { sta: 5 },
   },
+  // The raid formula (Crucible of the Last Spring, the tier's weapon enchant
+  // ceiling; docs/prd/ignivar-raid-professions.md): the FIRST
+  // acquisition-gated enchant, taught by its dropped formula scroll at the
+  // enchanting skill-100 floor, and the first PROC enchant (the crusader
+  // shape: an on-hit surge on the WIELDER, resolved through the
+  // combat/equip_procs.ts seam). Its application consumes cores at the
+  // PRD's authored price: the apply path charges reagent counts raw (no
+  // discount machinery exists on it), so the 3-core cost needs no exempt
+  // flag. Magnitudes are opening numbers sized against the level-20 pools
+  // (a 40 AP surge at 8 percent per swing, a 35-point mend against pools of
+  // roughly 400 to 600): retune with parse evidence, never by feel.
+  enchant_weapon_lastflame_zeal: {
+    id: 'enchant_weapon_lastflame_zeal',
+    name: "Enchant Weapon - Last Flame's Zeal",
+    itemSlot: 'mainhand',
+    reagents: [
+      { itemId: 'lastflame_core', count: 3 },
+      { itemId: 'arcane_shard', count: 2 },
+    ],
+    statBonus: {},
+    acquisition: ['drop'],
+    skillReq: 100,
+    proc: {
+      id: 'lastflame_zeal',
+      name: "Last Flame's Zeal",
+      trigger: 'weaponHit',
+      chance: 0.08,
+      effects: [
+        {
+          kind: 'selfBuff',
+          name: "Last Flame's Zeal",
+          buff: 'buff_ap',
+          school: 'fire',
+          value: 40,
+          duration: 8,
+        },
+        { kind: 'selfHeal', amount: 35 },
+      ],
+    },
+  },
 };

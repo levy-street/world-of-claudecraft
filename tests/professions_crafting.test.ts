@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest';
+import { CRUCIBLE_RECIPES } from '../src/sim/content/crucible_professions';
 import { STATION_TYPE_BY_CRAFT } from '../src/sim/content/professions';
 import {
   CASTER_HUB_RECIPES,
@@ -428,6 +429,7 @@ describe('craftItem command (#1127)', () => {
       ...COMMON_RECIPES,
       ...TOOL_RECIPES,
       ...ROD_RECIPES,
+      ...CRUCIBLE_RECIPES,
       ...TOOL_EFFECT_RECIPES,
       ...CASTER_HUB_RECIPES,
       ...COMBO_RECIPES,
@@ -439,6 +441,7 @@ describe('craftItem command (#1127)', () => {
       COMMON_RECIPES.length +
         TOOL_RECIPES.length +
         ROD_RECIPES.length +
+        CRUCIBLE_RECIPES.length +
         TOOL_EFFECT_RECIPES.length +
         CASTER_HUB_RECIPES.length +
         COMBO_RECIPES.length +

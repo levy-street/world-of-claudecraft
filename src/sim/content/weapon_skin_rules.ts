@@ -81,6 +81,7 @@ export const WEAPON_TYPE_BY_ITEM: Record<string, ItemWeaponType> = {
   // Maces
   training_mace: 'mace',
   copper_flanged_mace: 'mace',
+  forgefathers_requiem: 'mace',
   ironshod_maul: 'mace',
   bristleback_maul: 'mace',
   moggers_copper_cudgel: 'mace',

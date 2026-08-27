@@ -33,6 +33,17 @@ export const IGNIVAR_LORE_QUEST_IDS = {
   forgefather: 'q_ignivar_the_forgefather',
 } as const;
 
+// The legendary hammer chain (raid professions,
+// docs/prd/ignivar-raid-professions.md): recover the Forgefather's Ember
+// from Varkhul (a quest-gated drop), learn the recipe on turn-in through
+// the 'quest' acquisition source, then forge the hammer yourself at the
+// forge (the craft objective). The turn-in refuses below the
+// weaponcrafting-125 floor, so the reward is never lost to an early hand-in.
+export const CRUCIBLE_HAMMER_QUEST_IDS = {
+  requiem: 'q_forgefathers_requiem',
+  forging: 'q_requiem_at_the_forge',
+} as const;
+
 export const IGNIVAR_RAID_LORE_NPCS: Record<string, NpcDef> = {
   [IGNIVAR_MAELIN_NPC_ID]: {
     id: IGNIVAR_MAELIN_NPC_ID,
@@ -55,7 +66,10 @@ export const IGNIVAR_RAID_LORE_NPCS: Record<string, NpcDef> = {
     pos: { x: 0, z: 0 },
     facing: 0,
     color: 0xff6a2a,
-    questIds: Object.values(IGNIVAR_LORE_QUEST_IDS),
+    questIds: [
+      ...Object.values(IGNIVAR_LORE_QUEST_IDS),
+      ...Object.values(CRUCIBLE_HAMMER_QUEST_IDS),
+    ],
     greeting: "The embers carry Maelin's voice forward through the forge.",
     dynamic: true,
   },
@@ -141,6 +155,52 @@ export const IGNIVAR_RAID_LORE_QUESTS: Record<string, QuestDef> = {
     ],
     requiresQuest: IGNIVAR_LORE_QUEST_IDS.heraldsHeart,
   },
+  [CRUCIBLE_HAMMER_QUEST_IDS.requiem]: {
+    ...DEV_RAID_QUEST,
+    id: CRUCIBLE_HAMMER_QUEST_IDS.requiem,
+    giverNpcId: IGNIVAR_MAELIN_PROJECTION_NPC_ID,
+    turnInNpcId: IGNIVAR_MAELIN_PROJECTION_NPC_ID,
+    name: "The Forgefather's Requiem",
+    text: "Varkhul's own hammer answered to something he kept at his heart: an ember of the Last Spring itself, still burning. Bring me that ember. A smith at the height of the craft could shape what he never dared.",
+    completionText:
+      'It still sings. This is no reagent, smith: it is the voice of the spring he chained. I will show you the shaping, and your hands will do what his never could.',
+    rev: 1,
+    xpReward: 2500,
+    objectives: [
+      {
+        type: 'collect',
+        itemId: 'forgefathers_ember',
+        count: 1,
+        label: "Forgefather's Ember recovered",
+      },
+    ],
+    recipeReward: 'recipe_forgefathers_requiem',
+    requiresQuest: IGNIVAR_LORE_QUEST_IDS.forgefather,
+  },
+  [CRUCIBLE_HAMMER_QUEST_IDS.forging]: {
+    ...DEV_RAID_QUEST,
+    id: CRUCIBLE_HAMMER_QUEST_IDS.forging,
+    giverNpcId: IGNIVAR_MAELIN_PROJECTION_NPC_ID,
+    turnInNpcId: IGNIVAR_MAELIN_PROJECTION_NPC_ID,
+    name: 'Requiem at the Forge',
+    text: 'The shaping is yours alone: fifteen cores of the last flame, the finest thorium and elderwood, and the ember at the heart of it. Forge the Requiem at a forge worthy of the name, and let the spring answer its jailer.',
+    completionText:
+      'So the requiem is sung in iron. Carry it well, smith: no other hands will ever shape its equal.',
+    rev: 1,
+    xpReward: 2500,
+    objectives: [
+      {
+        type: 'craft',
+        recipeId: 'recipe_forgefathers_requiem',
+        count: 1,
+        label: "Forgefather's Requiem forged",
+      },
+    ],
+    requiresQuest: CRUCIBLE_HAMMER_QUEST_IDS.requiem,
+  },
 };
 
-export const IGNIVAR_RAID_LORE_QUEST_ORDER = Object.values(IGNIVAR_LORE_QUEST_IDS);
+export const IGNIVAR_RAID_LORE_QUEST_ORDER = [
+  ...Object.values(IGNIVAR_LORE_QUEST_IDS),
+  ...Object.values(CRUCIBLE_HAMMER_QUEST_IDS),
+];

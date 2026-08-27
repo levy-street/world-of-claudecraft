@@ -30,6 +30,7 @@ import { removePreferFungible } from '../items';
 import type { ArchetypeState } from '../professions/archetype';
 import { armCadence, cadenceBlockedKeys } from '../professions/cadence';
 import { planGradeRemoval } from '../professions/material_grades';
+import { canTeachQuestRecipeReward, teachQuestRecipeReward } from '../professions/recipe_scrolls';
 import { questFallbackGrants } from '../quest_fallback';
 import type { PlayerMeta } from '../sim';
 import type { SimContext } from '../sim_context';
@@ -409,6 +410,20 @@ export function turnInQuestCore(
   const qp = meta.questLog.get(questId);
   if (!qp) return false;
   if (!applyProfessionQuestEffect(ctx, quest, qp, meta)) return false;
+  // A recipeReward below the learner's tier floor refuses the whole turn-in
+  // BEFORE anything is consumed: the quest stays ready and the reward can
+  // never be silently lost (the tier line renders client-side off the same
+  // event the scroll path uses).
+  if (quest.recipeReward && !canTeachQuestRecipeReward(meta, quest.recipeReward)) {
+    ctx.emit({
+      type: 'recipeScrollResult',
+      ok: false,
+      recipeId: quest.recipeReward,
+      reason: 'scroll_tier_unmet',
+      pid: meta.entityId,
+    });
+    return false;
+  }
   for (const [index, obj] of quest.objectives.entries()) {
     // An ownership objective (QuestDef.keepsCollectedItems) proves the player
     // HAS the thing; the turn-in leaves it with them, so nothing is consumed.
@@ -453,6 +468,9 @@ export function turnInQuestCore(
   }
   const rewardItem = questRewardItemId(quest, meta.cls);
   if (rewardItem) ctx.addItem(rewardItem, 1, meta.entityId);
+  // Recipe reward (raid professions): teach through the 'quest' acquisition
+  // source; the floor was checked before anything was consumed, above.
+  if (quest.recipeReward) teachQuestRecipeReward(ctx, meta, quest.recipeReward);
   ctx.grantXp(quest.xpReward, meta);
   // Arm the repeat-cadence window (work orders): the quest stays
   // unavailable (computeQuestState) until now + repeatCadenceTicks, server-

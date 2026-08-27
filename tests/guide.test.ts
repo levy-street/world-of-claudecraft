@@ -1667,7 +1667,14 @@ describe('Guide professions generated content accuracy', () => {
 
   it('maps every recipe row back to the sim def with matching numbers', () => {
     for (const c of GUIDE_PROF_CRAFTS) {
-      const simIds = ALL_RECIPES.filter((r) => r.professionId === c.id)
+      // The guide is spoiler-safe: drop- and quest-taught recipes (the raid
+      // tier) are discovery content and stay out of the wiki, mirroring the
+      // generator's filter.
+      const simIds = ALL_RECIPES.filter(
+        (r) =>
+          r.professionId === c.id &&
+          (!r.acquisition || r.acquisition.length === 0 || r.acquisition.includes('trainer')),
+      )
         .map((r) => r.id)
         .sort();
       expect(c.recipes.map((r) => r.id).sort()).toEqual(simIds);
@@ -2157,7 +2164,13 @@ describe('Guide professions gathering accuracy', () => {
 describe('Guide professions enchanting and economy accuracy', () => {
   it('mirrors the enchant table, tiered structurally from the reagents', () => {
     const e = GUIDE_PROF_ENCHANTING;
-    expect(e.enchants.map((row) => row.id).sort()).toEqual(Object.keys(ENCHANTS).sort());
+    // Gated formulas (the raid tier) are discovery content and stay out of
+    // the wiki, mirroring the generator's filter.
+    const visibleEnchantIds = Object.values(ENCHANTS)
+      .filter((def) => !def.acquisition || def.acquisition.length === 0)
+      .map((def) => def.id)
+      .sort();
+    expect(e.enchants.map((row) => row.id).sort()).toEqual(visibleEnchantIds);
     for (const row of e.enchants) {
       const def = ENCHANTS[row.id];
       expect(row.name).toBe(def.name);

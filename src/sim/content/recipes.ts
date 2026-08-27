@@ -45,6 +45,7 @@
 // the field doc in ../professions/types.ts).
 
 import type { ProfessionRecipeRecord } from '../professions/types';
+import { CRUCIBLE_RECIPES } from './crucible_professions';
 
 // Economy invariant: the reagent lists of the former
 // LEGACY_GOLD_POSITIVE_RECIPE_IDS members below were reworked so
@@ -1548,6 +1549,7 @@ export const ALL_RECIPES: ProfessionRecipeRecord[] = [
   ...COMMON_RECIPES,
   ...TOOL_RECIPES,
   ...ROD_RECIPES,
+  ...CRUCIBLE_RECIPES,
   ...TOOL_EFFECT_RECIPES,
   ...CASTER_HUB_RECIPES,
   ...COMBO_RECIPES,

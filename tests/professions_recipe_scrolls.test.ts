@@ -163,3 +163,85 @@ describe('recipe scrolls: the use command body', () => {
     }
   });
 });
+
+// The quest recipeReward arm (the 'quest' acquisition source, the hammer
+// chain): the turn-in refuses below the tier floor so the reward is never
+// lost, teaches on success through the same learned-line event, and no-ops
+// silently on a repeat turn-in.
+describe('quest recipeReward', () => {
+  const QUEST_RECIPE: ProfessionRecipeRecord = {
+    id: 'test_quest_reward_recipe',
+    professionId: 'weaponcrafting',
+    resultItemId: 'iron_ore',
+    resultCount: 1,
+    reagents: [],
+    skillReq: 125,
+    itemLevelBudget: 29,
+    level: 29,
+    acquisition: ['quest'],
+  };
+
+  function questFor(recipeId: string) {
+    return {
+      id: 'q_test_recipe_reward',
+      name: 'Test Reward',
+      giverNpcId: 'x',
+      turnInNpcId: 'x',
+      text: '',
+      completionText: '',
+      objectives: [],
+      xpReward: 0,
+      copperReward: 0,
+      itemRewards: {},
+      recipeReward: recipeId,
+    } as any;
+  }
+
+  function readyQuest(sim: Sim, questId: string) {
+    const meta = metaOf(sim);
+    meta.questLog.set(questId, { questId, counts: [], state: 'ready' });
+    return meta;
+  }
+
+  it('refuses the turn-in below the floor and leaves the quest ready', async () => {
+    const { ALL_RECIPES } = await import('../src/sim/content/recipes');
+    ALL_RECIPES.push(QUEST_RECIPE);
+    try {
+      const { turnInQuestCore } = await import('../src/sim/quests/quest_commands');
+      const sim = makeSim();
+      const meta = readyQuest(sim, 'q_test_recipe_reward');
+      meta.craftSkills.weaponcrafting = 100;
+      const quest = questFor(QUEST_RECIPE.id);
+      expect(turnInQuestCore(sim.ctx, quest.id, quest, meta)).toBe(false);
+      expect(meta.questLog.has(quest.id)).toBe(true);
+      expect(meta.knownRecipes.has(QUEST_RECIPE.id)).toBe(false);
+      const events = scrollEvents(sim);
+      expect(events[0]).toMatchObject({ ok: false, reason: 'scroll_tier_unmet' });
+    } finally {
+      ALL_RECIPES.splice(ALL_RECIPES.indexOf(QUEST_RECIPE), 1);
+    }
+  });
+
+  it('teaches at the floor and completes; a repeat turn-in stays silent', async () => {
+    const { ALL_RECIPES } = await import('../src/sim/content/recipes');
+    ALL_RECIPES.push(QUEST_RECIPE);
+    try {
+      const { turnInQuestCore } = await import('../src/sim/quests/quest_commands');
+      const sim = makeSim();
+      const meta = readyQuest(sim, 'q_test_recipe_reward');
+      meta.craftSkills.weaponcrafting = 125;
+      const quest = questFor(QUEST_RECIPE.id);
+      expect(turnInQuestCore(sim.ctx, quest.id, quest, meta)).toBe(true);
+      expect(meta.knownRecipes.has(QUEST_RECIPE.id)).toBe(true);
+      const events = scrollEvents(sim);
+      expect(events.filter((ev) => ev.ok)).toHaveLength(1);
+      // Second completion (repeatable shape): already known teaches nothing
+      // and blocks nothing.
+      readyQuest(sim, 'q_test_recipe_reward');
+      expect(turnInQuestCore(sim.ctx, quest.id, quest, meta)).toBe(true);
+      expect(scrollEvents(sim).some((ev) => ev.type === 'recipeScrollResult')).toBe(false);
+    } finally {
+      ALL_RECIPES.splice(ALL_RECIPES.indexOf(QUEST_RECIPE), 1);
+    }
+  });
+});

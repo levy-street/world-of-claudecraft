@@ -3974,6 +3974,13 @@ export interface QuestDef {
   xpReward: number;
   copperReward: number;
   itemRewards: Partial<Record<PlayerClass, string>>;
+  /** Recipe (or enchant formula) id taught on turn-in through the 'quest'
+   *  acquisition source (raid professions: the hammer chain). The learn
+   *  floor still applies: a turn-in below the recipe's tier floor is
+   *  REFUSED (the quest stays ready, nothing is consumed) so the reward can
+   *  never be silently lost; an already-known recipe turn-in completes and
+   *  simply teaches nothing. See professions/recipe_scrolls.ts. */
+  recipeReward?: string;
   requiresQuest?: string; // prerequisite quest id (must be turned in)
   // Acceptance requires the purchased riding skill (PlayerMeta.ridingTrained).
   // Enforced in finalizeQuestAccept so every accept path (npc, linked share,

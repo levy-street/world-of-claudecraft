@@ -3360,7 +3360,8 @@ export const it_IT: EnTranslations = {
       "enchant_weapon_runed_focus": "Incanta Arma - Concentrazione Runica",
       "enchant_chest_runeweave": "Incanta Petto - Tessiturarunica",
       "enchant_legs_runed_hide": "Incanta Gambe - Pelle Runica",
-      "enchant_helmet_runed_links": "Incanta Elmo - Maglie Runiche"
+      "enchant_helmet_runed_links": "Incanta Elmo - Maglie Runiche",
+      "enchant_weapon_lastflame_zeal": "Enchant Weapon - Last Flame's Zeal"
     },
     "professions": {
       "title": "Professioni",
@@ -12896,6 +12897,36 @@ export const it_IT: EnTranslations = {
       "ps_passing_stone": {
         "name": "Pietra del trapasso"
       },
+      "lastflame_core": {
+        "name": "Core of the Last Flame"
+      },
+      "forgefathers_ember": {
+        "name": "Forgefather's Ember"
+      },
+      "cruciblewrought_warhelm": {
+        "name": "Crucible-Wrought Warhelm"
+      },
+      "emberveil_legguards": {
+        "name": "Emberveil Legguards"
+      },
+      "vestment_of_the_last_spring": {
+        "name": "Vestment of the Last Spring"
+      },
+      "forgefathers_requiem": {
+        "name": "Forgefather's Requiem"
+      },
+      "plans_cruciblewrought_warhelm": {
+        "name": "Plans: Crucible-Wrought Warhelm"
+      },
+      "pattern_emberveil_legguards": {
+        "name": "Pattern: Emberveil Legguards"
+      },
+      "pattern_vestment_of_the_last_spring": {
+        "name": "Pattern: Vestment of the Last Spring"
+      },
+      "formula_lastflame_zeal": {
+        "name": "Formula: Last Flame's Zeal"
+      },
       "conjured_water4": {
         "name": "Acqua sorgiva evocata"
       },
@@ -15739,6 +15770,26 @@ export const it_IT: EnTranslations = {
         "objectives": {
           "0": {
             "label": "Varkhul defeated"
+          }
+        }
+      },
+      "q_forgefathers_requiem": {
+        "title": "The Forgefather's Requiem",
+        "text": "Varkhul's own hammer answered to something he kept at his heart: an ember of the Last Spring itself, still burning. Bring me that ember. A smith at the height of the craft could shape what he never dared.",
+        "completion": "It still sings. This is no reagent, smith: it is the voice of the spring he chained. I will show you the shaping, and your hands will do what his never could.",
+        "objectives": {
+          "0": {
+            "label": "Forgefather's Ember recovered"
+          }
+        }
+      },
+      "q_requiem_at_the_forge": {
+        "title": "Requiem at the Forge",
+        "text": "The shaping is yours alone: fifteen cores of the last flame, the finest thorium and elderwood, and the ember at the heart of it. Forge the Requiem at a forge worthy of the name, and let the spring answer its jailer.",
+        "completion": "So the requiem is sung in iron. Carry it well, smith: no other hands will ever shape its equal.",
+        "objectives": {
+          "0": {
+            "label": "Forgefather's Requiem forged"
           }
         }
       },

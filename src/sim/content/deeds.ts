@@ -2860,6 +2860,31 @@ export const DEEDS: Record<string, DeedDef> = {
     renown: 5,
     trigger: { kind: 'stat', stat: 'tutorialGraduations', count: 1 },
   },
+  // Crucible raid professions (docs/prd/ignivar-raid-professions.md),
+  // appended per the header contract. The crafted-tier collection counts the
+  // three scroll-taught epics (holding, not wearing: one collector can carry
+  // all three armor classes); the hammer stands alone because its quest
+  // chain IS the deed, and quest completion is the honest trigger for a
+  // soulbound self-crafted piece.
+  col_crucible_wrought: {
+    id: 'col_crucible_wrought',
+    name: 'Wrought of the Last Spring',
+    desc: 'Discover every scroll-taught masterpiece of the Crucible tier: the warhelm, the legguards, and the vestment.',
+    category: 'collection',
+    renown: 0,
+    trigger: {
+      kind: 'collectItems',
+      itemIds: ['cruciblewrought_warhelm', 'emberveil_legguards', 'vestment_of_the_last_spring'],
+    },
+  },
+  chr_forgefathers_requiem: {
+    id: 'chr_forgefathers_requiem',
+    name: 'The Requiem Sung in Iron',
+    desc: "Forge the Forgefather's Requiem with your own hands at the height of the weaponcrafting art.",
+    category: 'chronicle',
+    renown: 25,
+    trigger: { kind: 'quest', questId: 'q_requiem_at_the_forge' },
+  },
 };
 
 for (const def of Object.values(DEEDS)) {

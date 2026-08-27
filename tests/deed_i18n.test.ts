@@ -58,8 +58,9 @@ describe('deed_i18n English resolution', () => {
     // title manifest row), the three WARFARE lifetime-honor rank titles, the
     // five Phase 18 Reliquary completion-ladder titles, the walk-in castle
     // visit pair (no title reward), and the Proving Shore graduation deed
-    // (no title reward).
-    expect(manifest.length).toBe(274 * 2 + 42);
+    // (no title reward), and the Crucible raid-professions pair (no title
+    // rewards).
+    expect(manifest.length).toBe(276 * 2 + 42);
     expect(manifest.filter((row) => row.field === 'title').length).toBe(42);
     expect(manifest).toContainEqual({
       id: 'prog_veteran',

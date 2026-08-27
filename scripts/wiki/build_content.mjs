@@ -756,7 +756,15 @@ const profCrafts = profRing
         at: perk.specializedSkillThreshold,
         materialDiscountPct: pct(perk.materialDiscountPct),
       },
-      recipes: ALL_RECIPES.filter((r) => r.professionId === c.id).map(profRecipeRow),
+      // Drop- and quest-taught recipes (the raid tier) are DISCOVERY
+      // content: the spoiler-safe guide lists trainer-taught and
+      // grandfathered recipes only, the same invisibility the crafting
+      // window gives an unlearned scroll recipe.
+      recipes: ALL_RECIPES.filter(
+        (r) =>
+          r.professionId === c.id &&
+          (!r.acquisition || r.acquisition.length === 0 || r.acquisition.includes('trainer')),
+      ).map(profRecipeRow),
     };
   });
 
@@ -970,14 +978,18 @@ const profEnchanting = {
     },
     counts: { rare: 1, epicMin: 1, epicMax: 2 },
   },
-  enchants: Object.values(ENCHANTS).map((e) => ({
-    id: e.id,
-    name: e.name,
-    slot: e.itemSlot,
-    tier: enchantTier(e),
-    reagents: e.reagents.map((g) => ({ name: itemName(g.itemId), count: g.count })),
-    bonus: Object.entries(e.statBonus).map(([stat, value]) => ({ stat, value })),
-  })),
+  // Acquisition-gated formulas (the raid tier) stay out of the guide for the
+  // same spoiler-safe reason the drop recipes do.
+  enchants: Object.values(ENCHANTS)
+    .filter((e) => !e.acquisition || e.acquisition.length === 0)
+    .map((e) => ({
+      id: e.id,
+      name: e.name,
+      slot: e.itemSlot,
+      tier: enchantTier(e),
+      reagents: e.reagents.map((g) => ({ name: itemName(g.itemId), count: g.count })),
+      bonus: Object.entries(e.statBonus).map(([stat, value]) => ({ stat, value })),
+    })),
   salvageByQuality: Object.entries(SALVAGE_MATERIAL_BY_QUALITY).map(([quality, m]) => ({
     quality,
     material: itemName(m),

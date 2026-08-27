@@ -4439,6 +4439,8 @@ export const hudChromeStrings = {
     enchant_chest_runeweave: 'Enchant Chest - Runed Weave',
     enchant_legs_runed_hide: 'Enchant Legs - Runed Hide',
     enchant_helmet_runed_links: 'Enchant Helmet - Runed Links',
+    // The Crucible raid formula (docs/prd/ignivar-raid-professions.md).
+    enchant_weapon_lastflame_zeal: "Enchant Weapon - Last Flame's Zeal",
   },
   // Professions window (Professions 2.0): the read-only craft-wheel
   // window. Craft and pair NAMES resolve through craftName / archetypePair

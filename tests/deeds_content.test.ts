@@ -70,8 +70,8 @@ describe('audited launch totals (literals: update deliberately with the catalog)
     // board), the walk-in castle visit pair (exp_the_last_keep,
     // exp_dawnhold_castle, renown 5 each), and the Proving Shore graduation
     // deed (prog_ready_for_an_adventure, renown 5).
-    expect(DEED_ORDER.length).toBe(274);
-    expect(ALL.reduce((sum, d) => sum + d.renown, 0)).toBe(3160);
+    expect(DEED_ORDER.length).toBe(276);
+    expect(ALL.reduce((sum, d) => sum + d.renown, 0)).toBe(3185);
   });
 
   it('ships the audited per-category counts', () => {
@@ -84,10 +84,10 @@ describe('audited launch totals (literals: update deliberately with the catalog)
       // +2 Rift coverage deeds (dgn_rift, dgn_rift_s_rank).
       dungeon: 31,
       delve: 13,
-      chronicle: 49,
+      chronicle: 50,
       // +4 Reliquary Curator rank bridges and +5 Phase 18 completion ladder
       // deeds on top of the release collection set.
-      collection: 37,
+      collection: 38,
       // Release's Thornhollow battlegrounds plus the WARFARE honor ladder.
       pvp: 35,
       social: 18,
@@ -224,6 +224,10 @@ describe('audited launch totals (literals: update deliberately with the catalog)
       'exp_dawnhold_castle',
       // The Proving Shore graduation closes the merged tail.
       'prog_ready_for_an_adventure',
+      // The Crucible raid-professions pair (docs/prd/ignivar-raid-professions.md):
+      // the crafted-tier collection and the hammer chronicle.
+      'col_crucible_wrought',
+      'chr_forgefathers_requiem',
     ]);
     expect(DEEDS.dgn_wildheart_basin.renown).toBe(10);
     expect(DEEDS.dgn_wildheart_basin_heroic.renown).toBe(10);
@@ -586,7 +590,10 @@ describe('frozen trigger + renown catalog (design rule 9: never retro-edit a tri
   // the Proving Shore graduation deed (prog_ready_for_an_adventure, on the
   // new tutorialGraduations stat) at the tail; no shipped trigger or renown
   // changed on either side.
-  const FROZEN_CATALOG_SHA256 = '7041f4aec1341ec1d5eded75768567af4b5ab12f22745a7807811da40b6add61';
+  // Re-baselined for the Crucible raid-professions pair (col_crucible_wrought,
+  // chr_forgefathers_requiem), appended at the tail; no shipped trigger or
+  // renown changed.
+  const FROZEN_CATALOG_SHA256 = 'fc7e274f3c484c7da9c53538b7c6bc1990839d7a6ad581a5a16b5d6f9a58c040';
 
   it('every shipped deed keeps its trigger and renown unchanged', () => {
     const canonical = JSON.stringify(
@@ -784,9 +791,9 @@ describe('table shape', () => {
     // (forbidden: the order is an append-only determinism contract; new
     // deeds append). hid_codfather's index is pinned in the refresh test.
     expect(DEED_ORDER[0]).toBe('prog_first_steps');
-    // The Proving Shore graduation deed closes the merged tail (appended at
-    // the release merge behind the walk-in castle visit pair).
-    expect(DEED_ORDER[DEED_ORDER.length - 1]).toBe('prog_ready_for_an_adventure');
+    // The Crucible raid-professions hammer chronicle closes the tail
+    // (appended behind the crafted-tier collection).
+    expect(DEED_ORDER[DEED_ORDER.length - 1]).toBe('chr_forgefathers_requiem');
   });
 
   it('every entry key matches its id and its prefix matches its category', () => {
