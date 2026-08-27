@@ -462,7 +462,9 @@ export class GuildBankTab {
     // namespace inside the one module that imports focus_restore (the guard in
     // tests/focus_restore.test.ts pins that single-reader rule).
     const dormantClass = slot.dormant ? ' gbank-dormant' : '';
-    const itemName = item ? itemDisplayName(item) : t('hudChrome.bank.guildUnknownItem');
+    const itemName = item
+      ? (slot.instance?.name ?? itemDisplayName(item))
+      : t('hudChrome.bank.guildUnknownItem');
     const count = this.fmt(slot.count);
     // Corner marks share the bags/personal-bank helpers and priority core
     // (bag_corner_mark_view.ts) so a guild-banked masterwork or fine stack

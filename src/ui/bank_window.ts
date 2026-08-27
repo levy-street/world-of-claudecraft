@@ -273,7 +273,7 @@ export class BankWindow {
     this.guildPane = new GuildBankTab({
       root: () => this.deps.root(),
       world: () => this.deps.world(),
-      itemIcon: (item) => this.deps.itemIcon(item),
+      itemIcon: (item, quality) => this.deps.itemIcon(item, quality),
       moneyHtml: (copper) => this.deps.moneyHtml(copper),
       itemTooltip: (item, instance) => this.deps.itemTooltip(item, instance),
       attachTooltip: (el, html) => this.deps.attachTooltip(el, html),
@@ -761,7 +761,7 @@ export class BankWindow {
                   ? INSTANCE_GLYPH_ARIA_KEYS[glyphKind]
                   : 'itemUi.bags.itemAria',
               {
-                item: itemDisplayName(item),
+                item: slot.instance?.name ?? itemDisplayName(item),
                 count: countLabel,
               },
             )

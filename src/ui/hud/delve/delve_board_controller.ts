@@ -20,7 +20,7 @@ export interface DelveBoardControllerDeps {
   closeOtherWindows(selector: string): void;
   hideTooltip(): void;
   attachTooltip(element: HTMLElement, html: () => string): void;
-  itemIcon(item: ItemDef): string;
+  itemIcon(item: ItemDef, quality?: ItemDef['quality']): string;
   itemTooltip(item: ItemDef): string;
   delveName(delveId: string): string;
   preloadInterior(event: Extract<SimEvent, { type: 'delveEntered' }>): void;

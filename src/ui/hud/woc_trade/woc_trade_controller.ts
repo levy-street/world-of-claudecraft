@@ -25,6 +25,7 @@ import { esc } from '../../esc';
 import { captureFocusKey } from '../../focus_restore';
 import { formatDateTime, formatMoney as formatLocalizedMoney, t } from '../../i18n';
 import type { TranslationKey } from '../../i18n.catalog';
+import { tooltipEffectiveQuality } from '../../item_instance_tooltip';
 import { itemNameColor } from '../../item_name_color';
 import { knownItemDef } from '../../known_item';
 
@@ -110,7 +111,7 @@ export interface WocTradeControllerDeps {
   /** Re-read the wallet footer balance after tokens moved on-chain. */
   refreshWocBalance(): void;
   log(text: string, color?: string): void;
-  itemIcon(item: ItemDef): string;
+  itemIcon(item: ItemDef, quality?: ItemDef['quality']): string;
   attachTooltip(el: HTMLElement, html: () => string): void;
   itemTooltip(item: ItemDef, compare?: boolean, instance?: ItemInstancePayload): string;
   renderBags(): void;
@@ -245,8 +246,8 @@ export class WocTradeController {
   private log(text: string, color?: string): void {
     this.deps.log(text, color);
   }
-  private itemIcon(item: ItemDef): string {
-    return this.deps.itemIcon(item);
+  private itemIcon(item: ItemDef, quality?: ItemDef['quality']): string {
+    return this.deps.itemIcon(item, quality);
   }
   private attachTooltip(el: HTMLElement, html: () => string): void {
     this.deps.attachTooltip(el, html);
@@ -1428,7 +1429,7 @@ export class WocTradeController {
         const qColor = item
           ? itemNameColor({ kind: item.kind, quality: bagQualityKey(item, s.instance) })
           : QUALITY_DEFAULT_COLOR;
-        const inner = `${item ? this.itemIcon(item) : unknownItemIconHtml(s.itemId)}<span style="color:${qColor}">${esc(label)}</span>`;
+        const inner = `${item ? this.itemIcon(item, tooltipEffectiveQuality(item, s.instance)) : unknownItemIconHtml(s.itemId)}<span style="color:${qColor}">${esc(label)}</span>`;
         return mine
           ? `<button type="button" class="trade-item mine" data-item="${esc(s.itemId)}">${inner}</button>`
           : `<div class="trade-item">${inner}</div>`;

@@ -54,7 +54,7 @@ export interface QuestDialogControllerDeps {
   openFocusTrap(root: () => HTMLElement | null): FocusTrapHandle;
   closeTransient(): void;
   hideTooltip(): void;
-  itemIcon(item: ItemDef): string;
+  itemIcon(item: ItemDef, quality?: ItemDef['quality']): string;
   itemTooltip(item: ItemDef): string;
   attachTooltip(element: HTMLElement, html: () => string): void;
   openChronicles(): void;

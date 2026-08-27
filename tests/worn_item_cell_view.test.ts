@@ -6,7 +6,7 @@ import { describe, expect, it } from 'vitest';
 import { ITEMS } from '../src/sim/data';
 import { itemDisplayName } from '../src/ui/entity_i18n';
 import { QUALITY_COLOR } from '../src/ui/icons';
-import { QUALITY_DEFAULT_COLOR, wornItemCellParts } from '../src/ui/worn_item_cell_view';
+import { wornItemCellParts } from '../src/ui/worn_item_cell_view';
 
 const APEX_NECK = 'wyrmfall_pendant'; // an epic apex def
 
@@ -59,11 +59,20 @@ describe('wornItemCellParts', () => {
     expect(parts.name).toBe('Odd');
   });
 
-  it('a def with no quality falls to the default token, never undefined', () => {
+  it('a def with no quality falls to the common hex, never undefined and never a CSS token', () => {
+    // The color is consumed by the inspect nameplate and the player-card
+    // canvas as well as by DOM style, so it is always a literal from the map
+    // (the fresh-reader finding on the first QA fix, which exported the old
+    // var() token as the fallback).
     const def = { ...ITEMS[APEX_NECK], quality: undefined } as never;
     const parts = wornItemCellParts(def, undefined);
     expect(parts.quality).toBeUndefined();
-    expect(parts.color).toBe(QUALITY_COLOR.common ?? QUALITY_DEFAULT_COLOR);
-    expect(QUALITY_DEFAULT_COLOR).toBe('var(--color-quality-default)');
+    expect(parts.color).toBe(QUALITY_COLOR.common);
+    expect(parts.color).toMatch(/^#[0-9a-f]{6}$/i);
+    const unknownTier = wornItemCellParts(
+      { ...ITEMS[APEX_NECK], quality: 'mythic' } as never,
+      undefined,
+    );
+    expect(unknownTier.color).toBe(QUALITY_COLOR.common);
   });
 });

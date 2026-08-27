@@ -26,7 +26,7 @@ export interface LootWindowControllerDeps {
   entityName(entity: Entity): string;
   money(copper: number): string;
   coinIconUrl(): string;
-  itemIcon(item: ItemDef): string;
+  itemIcon(item: ItemDef, quality?: ItemDef['quality']): string;
   itemTooltip(item: ItemDef): string;
   attachTooltip(element: HTMLElement, html: () => string): void;
   centerPopup(element: HTMLElement): void;

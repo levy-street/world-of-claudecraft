@@ -38,7 +38,7 @@ export interface LootRollControllerDeps {
   world(): LootRollWorld;
   now(): number;
   isMobileLayout(): boolean;
-  itemIcon(item: ItemDef): string;
+  itemIcon(item: ItemDef, quality?: ItemDef['quality']): string;
   itemTooltip(item: ItemDef): string;
   attachTooltip(element: HTMLElement, html: () => string): void;
   // Dismisses the shared #tooltip box immediately. render() tears down and

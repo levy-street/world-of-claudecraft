@@ -404,4 +404,27 @@ describe('elision key composition stays banished (hud.ts + painter_host.ts sourc
     expect(hud).toContain("shouldWriteSingleSlot(this.hotWriteCache, el, 'text', text)");
     expect(hud).toContain("shouldWriteSingleSlot(this.hotWriteCache, el, 'display', display)");
   });
+
+  it('every Hud itemIcon adapter forwards the quality the PainterHost dep declares', () => {
+    // The phase 13 QA fresh-reader regression: the cell authority
+    // (worn_item_cell_view.ts) hands each painter the copy's EFFECTIVE quality
+    // and the painter asks its `itemIcon` dep for the rim with it, but the
+    // Hud's adapter arrows were written 1-ary (`(item) => this.itemIcon(item)`)
+    // and silently swallowed the argument, so every promoted copy's icon rim
+    // fell back to the def's tier on every surface while the pure-core suites
+    // stayed green (the seam under test lives in the Hud, which no rig
+    // constructs). Comment-stripped so a commented-out arrow cannot count.
+    const hud = read('../src/ui/hud.ts')
+      .replace(/\/\*[\s\S]*?\*\//g, '')
+      .replace(/(^|[^:'"`])\/\/.*$/gm, '$1');
+    const forwarding = hud.match(
+      /itemIcon: \(item, quality\) => this\.itemIcon\(item, quality\),/g,
+    );
+    expect(forwarding, 'the six adapter arrows all forward the quality').toHaveLength(6);
+    expect(hud).not.toMatch(/itemIcon: \(item\) =>/);
+    // The dep the adapters satisfy really declares the second parameter.
+    expect(read('../src/ui/painter_host.ts')).toContain(
+      "itemIcon(item: ItemDef, quality?: ItemDef['quality']): string;",
+    );
+  });
 });

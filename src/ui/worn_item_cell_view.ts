@@ -17,10 +17,6 @@ import { itemDisplayName } from './entity_i18n';
 import { QUALITY_COLOR } from './icons';
 import { tooltipEffectiveQuality } from './item_instance_tooltip';
 
-/** The name color for a quality the map does not carry (the styles token the
- *  character sheet and the mailbox chips carried as private copies). */
-export const QUALITY_DEFAULT_COLOR = 'var(--color-quality-default)';
-
 export interface WornItemCellParts {
   /** The chosen legendary name when the copy carries one, else the def's
    *  localized display name. Player-authored when it is the former: esc it. */
@@ -28,7 +24,10 @@ export interface WornItemCellParts {
   /** The copy's effective quality (the rolled override narrowed to a known
    *  tier, else the def's), the value the icon rim and the label share. */
   quality: ItemDef['quality'];
-  /** The name color that quality maps to. */
+  /** The name color that quality maps to: always a hex literal from
+   *  QUALITY_COLOR (the common rung when the map has no entry), never a CSS
+   *  token, because the inspect card's nameplate and the player card's canvas
+   *  consume it where a var() would not resolve. */
   color: string;
 }
 
@@ -40,6 +39,6 @@ export function wornItemCellParts(
   return {
     name: instance?.name ?? itemDisplayName(item),
     quality,
-    color: QUALITY_COLOR[quality ?? 'common'] ?? QUALITY_DEFAULT_COLOR,
+    color: QUALITY_COLOR[quality ?? 'common'] ?? QUALITY_COLOR.common,
   };
 }

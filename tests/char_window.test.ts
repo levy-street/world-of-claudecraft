@@ -34,14 +34,15 @@ describe('char_window: no magic values', () => {
     );
   });
 
-  it('routes the quality + empty-slot colors through CSS tokens', () => {
-    // The unranked-item token moved with the cell color into the shared cell
-    // authority (worn_item_cell_view.ts, the phase 13 QA); the empty-slot
-    // pair stays here.
+  it('routes the empty-slot colors through CSS tokens and the cell color through the hex map', () => {
+    // The cell color moved into the shared cell authority (worn_item_cell_view.ts,
+    // the phase 13 QA), which answers a HEX literal always (its fallback is the
+    // map's common rung, never the old var() token, since the inspect nameplate
+    // and the player-card canvas consume the same value); the empty-slot pair
+    // stays here.
     const cellView = readFileSync(join(__dirname, '../src/ui/worn_item_cell_view.ts'), 'utf8');
-    expect(cellView).toContain(
-      "export const QUALITY_DEFAULT_COLOR = 'var(--color-quality-default)'",
-    );
+    expect(cellView).toContain("QUALITY_COLOR[quality ?? 'common'] ?? QUALITY_COLOR.common");
+    expect(cellView).not.toContain('var(--color-quality-default)');
     expect(painter).not.toContain('QUALITY_DEFAULT_COLOR');
     expect(painter).toContain("const SLOT_EMPTY_TEXT_COLOR = 'var(--color-slot-empty-text)'");
     expect(painter).toContain("const SLOT_EMPTY_BORDER_COLOR = 'var(--color-slot-empty-border)'");
@@ -523,8 +524,11 @@ describe('char_window: focus carried across the 2 Hz rebuild', () => {
     // tooltip closure must read IWorld.equipmentInstances (full on both
     // hosts, `perfected` included) rather than the self entity mirror, which
     // online is the eqi-trimmed peer projection and dropped the Unique-Equipped
-    // tag on one host only. The rig's world carries NO entity mirror at all,
-    // so a painter that reached for it would build a def-only tooltip here.
+    // tag on one host only. The rig's world carries BOTH: the full worn copy
+    // on equipmentInstances and the online-shaped eqi-trimmed self entity
+    // mirror (no `perfected`, no bond), so a painter that reached for the
+    // mirror would hand the tooltip a copy WITHOUT the stamp and fail the
+    // whole-payload assertion below, rather than passing by absence.
     canvasStub();
     const root = document.createElement('div');
     document.body.appendChild(root);
@@ -533,6 +537,7 @@ describe('char_window: focus carried across the 2 Hz rebuild', () => {
     try {
       const win = makeWin(root, {
         world: {
+          playerId: 1,
           equipment: { neck: 'wyrmfall_pendant' },
           equipmentInstances: {
             neck: {
@@ -543,6 +548,21 @@ describe('char_window: focus carried across the 2 Hz rebuild', () => {
               signer: 'Forger',
             },
           },
+          entities: new Map([
+            [
+              1,
+              {
+                id: 1,
+                equippedInstances: {
+                  neck: {
+                    rolled: { quality: 'legendary', stats: { int: 2 } },
+                    name: 'Dawn Oath',
+                    signer: 'Forger',
+                  },
+                },
+              },
+            ],
+          ]),
         },
         deps: {
           itemTooltip: (_item: unknown, instance: unknown) => {
@@ -992,8 +1012,13 @@ describe('char_window: own-paperdoll per-copy tooltip threading', () => {
     // copy's own Unique-Equipped tag vanished on one host only (the phase 13
     // QA parity finding). Dropping either line reverts the own paperdoll to
     // def-only tooltips while every pure-core suite stays green.
-    expect(painter).toContain('wornTooltipInstance(world.equipmentInstances?.[slot])');
-    expect(painter).toContain('this.deps.itemTooltip(item, instance)');
-    expect(painter).not.toContain('world.entities.get(world.playerId)?.equippedInstances');
+    // Comment-stripped: a pin over raw source is satisfied by a comment that
+    // quotes the line (the source-text pin trap), so the code alone answers.
+    const painterCode = painter
+      .replace(/\/\*[\s\S]*?\*\//g, '')
+      .replace(/(^|[^:'"`])\/\/.*$/gm, '$1');
+    expect(painterCode).toContain('wornTooltipInstance(world.equipmentInstances?.[slot])');
+    expect(painterCode).toContain('this.deps.itemTooltip(item, instance)');
+    expect(painterCode).not.toContain('world.entities.get(world.playerId)?.equippedInstances');
   });
 });

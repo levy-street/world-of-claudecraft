@@ -908,7 +908,7 @@ export class BagsWindow {
       row.dataset.focusKey = `bag:${s.itemId}:${this.stackOrdinal(world.inventory, s)}`;
       this.bindBagCellDrop(row, cell);
       const qColor = QUALITY_COLOR[bagQualityKey(item, s.instance)] ?? QUALITY_DEFAULT_COLOR;
-      const itemName = itemDisplayName(item);
+      const itemName = s.instance?.name ?? itemDisplayName(item);
       // Corner-glyph priority (bag_corner_mark_view.ts, composed from
       // bag_instance_glyph_view + bag_quest_mark_view + bag_fine_mark_view):
       // masterwork > quest seal > fine seal > enchanted / signed / bound >
