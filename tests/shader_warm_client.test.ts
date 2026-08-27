@@ -190,8 +190,11 @@ describe('starting the shader warm worker', () => {
       maxWindow: 4,
       retain: 0,
     });
-    // Asked over the renderer's own list, in the renderer's own order.
-    expect(stub.asked.slice(0, 3)).toEqual([
+    // The sweep asks over the renderer's own list, in the renderer's order
+    // (the backend read also asks for the debug-renderer extension; it is
+    // not part of the sweep's order).
+    const sweep = stub.asked.filter((name) => name !== 'WEBGL_debug_renderer_info');
+    expect(sweep.slice(0, 3)).toEqual([
       'EXT_color_buffer_float',
       'WEBGL_clip_cull_distance',
       'OES_texture_float_linear',
@@ -772,5 +775,109 @@ describe('disposing the shader warm client', () => {
         'nothing-to-warm': 0,
       },
     });
+  });
+});
+
+describe('the auto setting follows the GPU backend', () => {
+  const D3D11 =
+    'ANGLE (NVIDIA, NVIDIA GeForce RTX 3060 (0x00002504) Direct3D11 vs_5_0 ps_5_0, D3D11)';
+  const OPENGL = 'ANGLE (NVIDIA Corporation, NVIDIA GeForce RTX 3090/PCIe/SSE2, OpenGL 4.5.0)';
+  function backendContext(renderer: string) {
+    return {
+      getContextAttributes: () => ({ antialias: false }),
+      getExtension: (name: string) =>
+        name === 'WEBGL_debug_renderer_info' ? { UNMASKED_RENDERER_WEBGL: 0x9246 } : null,
+      getParameter: (name: number) => (name === 0x9246 ? renderer : ''),
+    };
+  }
+
+  it('is OFF until a context is seen, then reveal on D3D11', () => {
+    const worker = fakeWorker();
+    resetShaderWarmForTest({ spawn: () => worker, search: '', stored: 'auto' });
+    expect(shaderWarmSnapshot()).toMatchObject({ setting: 'auto', mode: 'off', backend: null });
+    const decision = shaderWarmDecide(
+      backendContext(D3D11),
+      GPU_WORK_PRIORITY.VISIBLE_PREWARM,
+      false,
+    );
+    expect(shaderWarmSnapshot()).toMatchObject({
+      setting: 'auto',
+      mode: 'reveal',
+      backend: 'd3d11',
+    });
+    // Not armed yet: the first policy call still bypasses, but the worker
+    // is starting for the arms to come.
+    expect(decision).toEqual({ hold: false, bypass: 'before-reveal' });
+    expect(shaderWarmAvailable()).toBe(true);
+  });
+
+  it('stays OFF on an OpenGL backend and never spawns the worker', () => {
+    let spawned = 0;
+    resetShaderWarmForTest({
+      spawn: () => {
+        spawned++;
+        return fakeWorker();
+      },
+      search: '',
+      stored: 'auto',
+    });
+    const decision = shaderWarmDecide(
+      backendContext(OPENGL),
+      GPU_WORK_PRIORITY.VISIBLE_PREWARM,
+      false,
+    );
+    expect(decision).toEqual({ hold: false, bypass: 'mode-off' });
+    expect(shaderWarmSnapshot()).toMatchObject({ setting: 'auto', mode: 'off', backend: 'opengl' });
+    expect(spawned).toBe(0);
+  });
+
+  it('takes the stored graphics option, and lets the query pin an arm over it', () => {
+    resetShaderWarmForTest({ spawn: () => fakeWorker(), search: '', stored: 'off' });
+    shaderWarmDecide(backendContext(D3D11), GPU_WORK_PRIORITY.VISIBLE_PREWARM, false);
+    expect(shaderWarmSnapshot()).toMatchObject({ setting: 'off', mode: 'off', backend: 'd3d11' });
+
+    resetShaderWarmForTest({
+      spawn: () => fakeWorker(),
+      search: '?shaderwarm=reveal',
+      stored: 'off',
+    });
+    shaderWarmDecide(backendContext(OPENGL), GPU_WORK_PRIORITY.VISIBLE_PREWARM, false);
+    expect(shaderWarmSnapshot()).toMatchObject({
+      setting: 'reveal',
+      mode: 'reveal',
+      backend: 'opengl',
+    });
+  });
+});
+
+describe('the backend class follows the renderer across rebuilds', () => {
+  const D3D11 =
+    'ANGLE (NVIDIA, NVIDIA GeForce RTX 3060 (0x00002504) Direct3D11 vs_5_0 ps_5_0, D3D11)';
+  const WARP = 'ANGLE (Microsoft, Microsoft Basic Render Driver Direct3D11 vs_5_0 ps_5_0, D3D11)';
+  function backendContext(renderer: string | null) {
+    return {
+      getContextAttributes: () => ({ antialias: false }),
+      getExtension: (name: string) =>
+        name === 'WEBGL_debug_renderer_info' ? { UNMASKED_RENDERER_WEBGL: 0x9246 } : null,
+      getParameter: (name: number) => (name === 0x9246 ? (renderer ?? '') : ''),
+    };
+  }
+
+  it('reads again while the class is unknown, so one lost read never latches OFF', () => {
+    resetShaderWarmForTest({ spawn: () => fakeWorker(), search: '', stored: 'auto' });
+    shaderWarmDecide(backendContext(null), GPU_WORK_PRIORITY.VISIBLE_PREWARM, false);
+    expect(shaderWarmSnapshot()).toMatchObject({ backend: 'unknown', mode: 'off' });
+    shaderWarmDecide(backendContext(D3D11), GPU_WORK_PRIORITY.VISIBLE_PREWARM, false);
+    expect(shaderWarmSnapshot()).toMatchObject({ backend: 'd3d11', mode: 'reveal' });
+  });
+
+  it('forgets the class on dispose, so a rebuilt renderer on software reads OFF', () => {
+    resetShaderWarmForTest({ spawn: () => fakeWorker(), search: '', stored: 'auto' });
+    shaderWarmDecide(backendContext(D3D11), GPU_WORK_PRIORITY.VISIBLE_PREWARM, false);
+    expect(shaderWarmSnapshot()).toMatchObject({ backend: 'd3d11', mode: 'reveal' });
+    disposeShaderWarm();
+    expect(shaderWarmSnapshot()).toMatchObject({ backend: null, mode: 'off' });
+    shaderWarmDecide(backendContext(WARP), GPU_WORK_PRIORITY.VISIBLE_PREWARM, false);
+    expect(shaderWarmSnapshot()).toMatchObject({ backend: 'software', mode: 'off' });
   });
 });

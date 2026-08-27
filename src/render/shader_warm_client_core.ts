@@ -17,11 +17,13 @@
 // so the readout says how often the worker was NOT the path.
 //
 // The modes exist so the policy can be measured rather than believed:
-// `?shaderwarm=off` (the default) never asks the worker, `reveal` holds every
+// the setting is `auto` by default (the mode follows the GPU backend, see
+// shaderWarmModeFor), `off` never asks the worker, `reveal` holds every
 // requester below the live view (the reveal gates and, since every producer
 // became a requester, the zone, resume and self-spirit lanes), `all` holds
-// every gate below the actionable floor.
+// every gate below the actionable floor; `?shaderwarm=` pins any of them.
 
+import { compilesOffThread, type GpuBackendClass } from './gpu_backend_class_core';
 import { programSourceHash } from './shader_warm_audit_core';
 import type { ShaderWarmSource } from './shader_warm_protocol';
 
@@ -70,16 +72,42 @@ export function shaderWarmDecision(inputs: ShaderWarmPolicyInputs): ShaderWarmDe
   return { hold: true };
 }
 
-/** `?shaderwarm=off|reveal|all`; anything else is the default, OFF: the
- *  first measured cell (tmp/REPORT_worker-step2_2026-08-28.md) showed every
- *  held piece warm but no frame gain while the catalogs and the zone
- *  prepares still link cold, so the worker ships opt-in until every producer
- *  is a requester and a cell shows the win. */
-export function readShaderWarmMode(search: string): ShaderWarmMode {
+/** The player's setting: a mode, or `auto`, which follows the GPU backend. */
+export type ShaderWarmSetting = 'auto' | ShaderWarmMode;
+
+export const SHADER_WARM_SETTINGS: readonly ShaderWarmSetting[] = ['auto', 'off', 'reveal', 'all'];
+
+function asShaderWarmSetting(value: string | null | undefined): ShaderWarmSetting | null {
+  return value === 'auto' || value === 'off' || value === 'reveal' || value === 'all'
+    ? value
+    : null;
+}
+
+/** `?shaderwarm=auto|off|reveal|all` pins an arm for a probe and wins over
+ *  the stored graphics option. No stored option at all (an entry that never
+ *  registered the store: the editor, the guide viewer, a test) is OFF, never
+ *  auto: only the game entry owns the option and the worker context it costs. */
+export function readShaderWarmSetting(
+  search: string,
+  stored: string | null | undefined = null,
+): ShaderWarmSetting {
   const match = /[?&]shaderwarm=([^&]*)/.exec(search);
-  const value = match ? decodeURIComponent(match[1] ?? '') : '';
-  if (value === 'off' || value === 'all' || value === 'reveal') return value;
-  return 'off';
+  const query = match ? asShaderWarmSetting(decodeURIComponent(match[1] ?? '')) : null;
+  return query ?? asShaderWarmSetting(stored) ?? 'off';
+}
+
+/** `auto` resolves once the backend is known: the worker holds links only
+ *  where the backend compiles off the presenting thread (D3D11, Vulkan,
+ *  Metal; measured 2026-08-28, tmp/REPORT_worker-step3_2026-08-28.md). On
+ *  ANGLE's OpenGL backends (Linux and Android Chrome) the worker only
+ *  relocates the stall into the GPU process, so `auto` is OFF there, and
+ *  OFF while the backend is still unknown. */
+export function shaderWarmModeFor(
+  setting: ShaderWarmSetting,
+  backend: GpuBackendClass | null,
+): ShaderWarmMode {
+  if (setting !== 'auto') return setting;
+  return backend !== null && compilesOffThread(backend) ? 'reveal' : 'off';
 }
 
 export interface ShaderWarmRequestSource {

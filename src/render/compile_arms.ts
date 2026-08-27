@@ -29,6 +29,8 @@ export interface CompileArmRenderer {
 export interface CompileArmGlContext {
   getContextAttributes(): object | null;
   getExtension(name: string): unknown;
+  /** The renderer string read (the warm client's backend class). */
+  getParameter?(name: number): unknown;
 }
 
 /** What the arms read off the renderer. Read-through closures, not a

@@ -202,6 +202,11 @@ export interface OptionsEnv {
    *  shells, and is true for a desktop shell too old to have the preference).
    *  Absent (the web/offline callers) means the row never renders. */
   desktopGpuPref?: boolean;
+  /** desktopGpuBackendSupported() AND the shell's platform answer: reveals
+   *  the Linux graphics backend row (Auto / Vulkan / OpenGL). A bridge
+   *  capability plus a platform gate: Windows and macOS shells expose the
+   *  methods but have no choice to make, so they show no row. */
+  desktopGpuBackend?: boolean;
   /** desktopDisplayModeSupported(): the shell owns the window, so the Display
    *  card shows a windowed/borderless picker INSTEAD of the browser Fullscreen
    *  toggle (asking the browser for fullscreen inside an already-fullscreen
@@ -274,6 +279,23 @@ const choice = (
 });
 
 const note = (textKey: TranslationKey): NoteControl => ({ control: 'note', textKey });
+
+// The shader warm-up worker: auto follows the GPU backend (on where the
+// compile runs off the presenting thread, off on OpenGL); the stored numbers
+// are src/game/shader_warm_setting.ts SHADER_WARM_SETTING_VALUES.
+const shaderWarmOptions: ChoiceOption[] = [
+  { value: 0, labelKey: 'hudChrome.options.shaderWarmAuto' },
+  { value: 1, labelKey: 'hudChrome.options.shaderWarmOff' },
+  { value: 2, labelKey: 'hudChrome.options.shaderWarmOn' },
+];
+
+// The desktop shell's graphics backend on Linux; the stored numbers are
+// src/game/desktop_gpu_backend_sync.ts GPU_BACKEND_SETTING_VALUES.
+const gpuBackendOptions: ChoiceOption[] = [
+  { value: 0, labelKey: 'hudChrome.options.gpuBackendAuto' },
+  { value: 1, labelKey: 'hudChrome.options.gpuBackendVulkan' },
+  { value: 2, labelKey: 'hudChrome.options.gpuBackendOpenGL' },
+];
 
 // The desktop shell's window modes, in the order a player reads them: the
 // smaller window first, the default (borderless fullscreen) second, matching
@@ -511,6 +533,8 @@ export function buildGraphicsSections(
       { value: 3, labelKey: 'hudChrome.options.browserEffectsMinimal' },
     ]),
     note('hudChrome.options.browserEffectsNote'),
+    choice(s, 'shaderWarm', 'hudChrome.options.shaderWarm', shaderWarmOptions),
+    note('hudChrome.options.shaderWarmNote'),
   ];
   // Desktop vs on-screen touch controls. Hidden in the native shell (forces touch).
   if (!env.nativeShell) {
@@ -694,6 +718,14 @@ export function buildInterfaceControls(
     general.push(
       boolToggle(s, 'forceHighPerfGpu', 'hudChrome.options.forceHighPerfGpu'),
       note('hudChrome.options.forceHighPerfGpuNote'),
+    );
+  }
+  // The Linux graphics backend (the Vulkan trial), behind its own capability
+  // AND the shell's platform answer; its note carries the next-launch caveat.
+  if (env?.desktopGpuBackend) {
+    general.push(
+      choice(s, 'gpuBackend', 'hudChrome.options.gpuBackend', gpuBackendOptions),
+      note('hudChrome.options.gpuBackendNote'),
     );
   }
   // Discord Rich Presence, behind its own bridge capability (an older shell has

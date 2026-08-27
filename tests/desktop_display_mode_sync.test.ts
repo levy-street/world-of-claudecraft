@@ -305,7 +305,7 @@ describe('desktop_display_mode_sync: wiring pins', () => {
       'const settingsForShellReflection = (): Settings => liveSettings ?? new Settings();',
     );
     expect(mainSource).toContain(
-      'if (DESKTOP_APP) void syncDesktopDisplayModeSetting(desktopBridge(), settingsForShellReflection);',
+      'if (DESKTOP_APP) syncDesktopShellSettings(desktopBridge(), settingsForShellReflection);',
     );
     // startGame publishes its long-lived store into the holder the factory reads.
     expect(mainSource).toContain('liveSettings = settings;');

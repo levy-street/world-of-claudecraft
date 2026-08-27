@@ -1426,6 +1426,18 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.options.forceHighPerfGpu': '専用ゲーミングGPUを使用',
   'hudChrome.options.forceHighPerfGpuNote':
     '既定でオン：デスクトップ版はこのコンピューターの専用ゲーミングGPUを要求します。ゲームが起動しない、起動後に画面が真っ暗になる、またはノートパソコンの画面が映らない場合はオフにしてください。この設定は次回ゲームを起動したときに反映されます。',
+  'hudChrome.options.shaderWarm': 'シェーダー事前ウォームアップ ワーカー',
+  'hudChrome.options.shaderWarmAuto': '自動',
+  'hudChrome.options.shaderWarmOff': 'オフ',
+  'hudChrome.options.shaderWarmOn': 'オン',
+  'hudChrome.options.shaderWarmNote':
+    '自動：グラフィックスバックエンドが対応している場合（Direct3D 11、Vulkan）、バックグラウンドワーカーでシェーダーを事前にリンクします。効果のないOpenGLではオフのままです。オンはフレームが悪化する環境も含めてすべてでワーカーを強制し、オフは一切使いません。次回ゲームを起動したときに反映されます。',
+  'hudChrome.options.gpuBackend': 'グラフィックスバックエンド（Linux）',
+  'hudChrome.options.gpuBackendAuto': '自動（Vulkanを一度試す）',
+  'hudChrome.options.gpuBackendVulkan': 'Vulkan',
+  'hudChrome.options.gpuBackendOpenGL': 'OpenGL',
+  'hudChrome.options.gpuBackendNote':
+    '自動：起動時にVulkanを一度試し、動作すればそのまま使います。そこではシェーダー読み込みによるカクつきが大きく減ります。ドライバーが対応していない場合はOpenGLに戻ります。次回ゲームを起動したときに反映されます。',
   'hudChrome.options.discordPresence': 'Discord リッチプレゼンス',
   'hudChrome.options.discordPresenceNote':
     'プレイ中、現在いるゾーンとこのセッションのプレイ時間をDiscordのアクティビティとして表示します。あなたのDiscordプロフィールを見られる人は誰でもその両方を見られます。共有されるのはゾーン名、このセッションのプレイ時間、ゲーム名だけで、キャラクターやアカウント、一緒に遊んでいる相手が共有されることはありません。このコンピューターでDiscordアプリが起動している必要があります。',

@@ -1801,6 +1801,22 @@ export const hudChromeStrings = {
     forceHighPerfGpu: 'Use the Dedicated Gaming GPU',
     forceHighPerfGpuNote:
       'On by default: the desktop app asks this computer for its dedicated gaming GPU. Turn this off if the game will not start, opens to a black screen, or the laptop display goes blank. Takes effect the next time the game starts.',
+    // Graphics System card: the shader warm-up worker (auto follows the GPU
+    // backend). Interface General tab: the Linux graphics backend row
+    // (desktop app, Linux only; the shell applies it at the next launch).
+    // Wordy values, M16: the five non-Latin fills land in this same change.
+    shaderWarm: 'Shader Warm-up Worker',
+    shaderWarmAuto: 'Auto',
+    shaderWarmOff: 'Off',
+    shaderWarmOn: 'On',
+    shaderWarmNote:
+      'Auto links shaders ahead of use in a background worker where the graphics backend allows it (Direct3D 11, Vulkan) and stays off on OpenGL, where it cannot help. On forces the worker everywhere, including where it makes frames worse; Off never uses it. Takes effect the next time the game starts.',
+    gpuBackend: 'Graphics Backend (Linux)',
+    gpuBackendAuto: 'Auto (try Vulkan once)',
+    gpuBackendVulkan: 'Vulkan',
+    gpuBackendOpenGL: 'OpenGL',
+    gpuBackendNote:
+      'Auto tries Vulkan once at startup and keeps it when it works, where shader loading hitches drop sharply. Falls back to OpenGL when the driver cannot do it. Takes effect the next time the game starts.',
     // Interface panel toggle: publish the current zone to Discord as an
     // activity (desktop app only, on by default).
     discordPresence: 'Discord Rich Presence',

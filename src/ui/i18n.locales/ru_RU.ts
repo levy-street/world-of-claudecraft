@@ -1444,6 +1444,18 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.options.forceHighPerfGpu': 'Использовать дискретную игровую видеокарту',
   'hudChrome.options.forceHighPerfGpuNote':
     'Включено по умолчанию: настольное приложение запрашивает у компьютера дискретную игровую видеокарту. Отключите, если игра не запускается, показывает черный экран или экран ноутбука гаснет. Настройка применится при следующем запуске игры.',
+  'hudChrome.options.shaderWarm': 'Фоновый прогрев шейдеров',
+  'hudChrome.options.shaderWarmAuto': 'Авто',
+  'hudChrome.options.shaderWarmOff': 'Выкл.',
+  'hudChrome.options.shaderWarmOn': 'Вкл.',
+  'hudChrome.options.shaderWarmNote':
+    'Авто: шейдеры заранее компонуются в фоновом воркере там, где это позволяет графический бэкенд (Direct3D 11, Vulkan), и остаются выключенными на OpenGL, где это не помогает. Вкл. принудительно включает воркер везде, в том числе там, где кадры становятся хуже; Выкл. никогда его не использует. Вступает в силу при следующем запуске игры.',
+  'hudChrome.options.gpuBackend': 'Графический бэкенд (Linux)',
+  'hudChrome.options.gpuBackendAuto': 'Авто (один раз попробовать Vulkan)',
+  'hudChrome.options.gpuBackendVulkan': 'Vulkan',
+  'hudChrome.options.gpuBackendOpenGL': 'OpenGL',
+  'hudChrome.options.gpuBackendNote':
+    'Авто: при запуске один раз пробует Vulkan и оставляет его, если он работает: подтормаживания из-за загрузки шейдеров там заметно уменьшаются. Если драйвер не справляется, возвращается к OpenGL. Вступает в силу при следующем запуске игры.',
   'hudChrome.options.discordPresence': 'Статус в Discord',
   'hudChrome.options.discordPresenceNote':
     'Показывает зону, в которой вы находитесь, и время этой игровой сессии как вашу активность в Discord, и это видит любой, кому доступен ваш профиль Discord. Передаются только название зоны, время сессии и название игры, но никогда ваш персонаж, ваша учетная запись или те, с кем вы играете. Требуется запущенное приложение Discord на этом компьютере.',

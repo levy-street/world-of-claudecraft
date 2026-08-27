@@ -124,6 +124,14 @@ export interface DesktopDiscordActivity {
   timestamps?: { start: number };
 }
 
+export type DesktopGpuBackendSetting = 'auto' | 'vulkan' | 'opengl';
+/** The shell answers more (the last trial's verdict, the platform answer);
+ *  the renderer reads only what a surface consumes: the platform gate is the
+ *  synchronous hasGpuBackendChoice below, never an awaited field. */
+export interface DesktopGpuBackendState {
+  setting: DesktopGpuBackendSetting;
+}
+
 export interface DesktopBridge {
   openBrowserLogin(): Promise<void>;
   takeLoginCode(): Promise<string | null>;
@@ -182,6 +190,14 @@ export interface DesktopBridge {
   // before use, like the other post-trio methods.
   getGpuForceOptOut?(): Promise<boolean>;
   setGpuForceOptOut?(optOut: boolean): Promise<boolean>;
+  // The persisted graphics backend choice (Linux: the Vulkan trial). The shell
+  // prefs store is the source of truth; the getter returns the STORED setting
+  // and the setter persists for the next launch; hasGpuBackendChoice is the
+  // platform answer, a synchronous value so the options row can be gated when
+  // the window opens. Absent on older shells: feature-check before use.
+  getGpuBackend?(): Promise<DesktopGpuBackendState>;
+  setGpuBackend?(setting: DesktopGpuBackendSetting): Promise<boolean>;
+  hasGpuBackendChoice?: boolean;
   // The persisted display mode. The shell prefs store is the source of truth;
   // the setter persists AND applies it to the live window (unlike the GPU
   // pref, which only takes effect next launch), the getter returns the stored

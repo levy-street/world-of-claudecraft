@@ -173,6 +173,7 @@ describe('i18n whole-catalog completeness', () => {
       'hudChrome.keybinds.discord', // "Discord" - brand (Key Bindings action label)
       'hudChrome.claudium.title', // "Claudium" - in-game currency brand
       'hudChrome.claudium.balanceUnit', // "{amount} Claudium" - currency brand
+      'hudChrome.options.gpuBackendVulkan', // "Vulkan" - the graphics API's name
       'hudChrome.claudium.storeCost', // "{amount} Claudium" - currency brand
       'guide.controls.discord', // "Discord" - brand (Guide controls-page action label)
       'guide.glossary.claudiumTerm', // "Claudium" - the same currency brand as hudChrome.claudium.*

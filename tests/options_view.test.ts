@@ -199,6 +199,8 @@ describe('options_view: graphics dispatch matrix (cluster 3)', () => {
       // System card (full width).
       'browserEffects',
       'note:hudChrome.options.browserEffectsNote',
+      'shaderWarm',
+      'note:hudChrome.options.shaderWarmNote',
       'interfaceMode',
       'note:hudChrome.options.interfaceModeNote',
     ]);
@@ -678,6 +680,48 @@ describe('options_view: interface dispatch matrix (cluster 5)', () => {
         'forceHighPerfGpu',
       ),
     ).toBeUndefined();
+  });
+
+  it('appends the graphics backend row + note ONLY with its own capability (Linux shells)', () => {
+    // The capability is the bridge methods AND the shell's platform answer,
+    // folded into one env flag by the options window; the GPU preference
+    // flag never stands in for it (Windows and macOS shells have the first
+    // and not the second).
+    const withBackend = buildInterfaceControls(makeSource(), {
+      ...WEB_ENV,
+      desktopGpuBackend: true,
+    });
+    const row = find(withBackend, 'gpuBackend');
+    expect(row).toBeTruthy();
+    expect(row?.control).toBe('choice');
+    expect(withBackend[withBackend.indexOf(row as OptionsControl) + 1]).toMatchObject({
+      control: 'note',
+      textKey: 'hudChrome.options.gpuBackendNote',
+    });
+    expect(find(buildInterfaceControls(makeSource(), DESKTOP_ENV), 'gpuBackend')).toBeUndefined();
+    expect(find(buildInterfaceControls(makeSource(), WEB_ENV), 'gpuBackend')).toBeUndefined();
+    // The real Linux shell has all three capabilities: the tail keeps its
+    // order, GPU preference, then backend, then Discord.
+    const allKeys = keysOf(
+      buildInterfaceControls(makeSource(), {
+        ...WEB_ENV,
+        desktopGpuPref: true,
+        desktopGpuBackend: true,
+        desktopDiscordPresence: true,
+      }),
+    );
+    const tail = allKeys.slice(
+      allKeys.indexOf('forceHighPerfGpu'),
+      allKeys.indexOf('forceHighPerfGpu') + 6,
+    );
+    expect(tail).toEqual([
+      'forceHighPerfGpu',
+      'note:hudChrome.options.forceHighPerfGpuNote',
+      'gpuBackend',
+      'note:hudChrome.options.gpuBackendNote',
+      'discordPresence',
+      'note:hudChrome.options.discordPresenceNote',
+    ]);
   });
 
   it('appends the Discord presence row + note ONLY with its own bridge capability', () => {

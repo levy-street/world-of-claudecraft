@@ -1383,6 +1383,18 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.options.forceHighPerfGpu': '使用獨立遊戲顯示卡',
   'hudChrome.options.forceHighPerfGpuNote':
     '預設開啟：桌面版會向本機要求使用獨立遊戲顯示卡。若遊戲無法啟動、啟動後黑屏，或筆記型電腦螢幕沒有畫面，請關閉此選項。此設定會在下次啟動遊戲時生效。',
+  'hudChrome.options.shaderWarm': '著色器預熱工作執行緒',
+  'hudChrome.options.shaderWarmAuto': '自動',
+  'hudChrome.options.shaderWarmOff': '關閉',
+  'hudChrome.options.shaderWarmOn': '開啟',
+  'hudChrome.options.shaderWarmNote':
+    '自動：在圖形後端支援時（Direct3D 11、Vulkan）由背景工作執行緒提前連結著色器；在無法發揮作用的 OpenGL 上保持關閉。開啟會在所有環境中強制使用工作執行緒，包括會讓畫面更卡的環境；關閉則完全不使用。下次啟動遊戲時生效。',
+  'hudChrome.options.gpuBackend': '圖形後端（Linux）',
+  'hudChrome.options.gpuBackendAuto': '自動（嘗試一次 Vulkan）',
+  'hudChrome.options.gpuBackendVulkan': 'Vulkan',
+  'hudChrome.options.gpuBackendOpenGL': 'OpenGL',
+  'hudChrome.options.gpuBackendNote':
+    '自動：啟動時嘗試一次 Vulkan，可用則保留，此時著色器載入造成的卡頓會大幅減少。驅動程式不支援時退回 OpenGL。下次啟動遊戲時生效。',
   'hudChrome.options.discordPresence': 'Discord 遊戲狀態',
   'hudChrome.options.discordPresenceNote':
     '遊玩時將你目前所在的區域以及本次遊戲時長顯示為你的 Discord 活動狀態，任何能看到你 Discord 個人資料的人都能看到這兩項。只會分享區域名稱、本次遊戲時長和遊戲名稱，絕不會分享你的角色、帳號或與你同行的人。需要本機正在執行 Discord 應用程式。',

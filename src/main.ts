@@ -52,15 +52,14 @@ import { setDisplayChangeTarget } from './game/desktop_display_change';
 import {
   desktopDisplayModeSupported,
   pushDesktopDisplayMode,
-  syncDesktopDisplayModeSetting,
 } from './game/desktop_display_mode_sync';
 import { initDesktopDownload } from './game/desktop_download';
-import { pushDesktopGpuPref, syncDesktopGpuPrefSetting } from './game/desktop_gpu_pref_sync';
 import { desktopNotifyOnSimEvents } from './game/desktop_notifications';
 import { desktopPresentationHidden } from './game/desktop_presentation';
 import { initDesktopShellIntegration } from './game/desktop_shell_integration';
+import { applyDesktopShellSetting, syncDesktopShellSettings } from './game/desktop_shell_settings';
 import { installDevTeleports } from './game/dev_shortcuts';
-import { desktopPresenceOnFrame, pushDiscordPresenceEnabled } from './game/discord_presence';
+import { desktopPresenceOnFrame } from './game/discord_presence';
 import { cycleHudFocus } from './game/dpad_focus_nav';
 import { takeEditorPlaytestRequest } from './game/editor_playtest';
 import {
@@ -171,6 +170,7 @@ import {
   startShaderWarmup,
   stopShaderWarmup,
 } from './game/shader_cache_warmup';
+import { registerShaderWarmSetting } from './game/shader_warm_setting';
 import { initSoftwareRenderNotice } from './game/software_render_notice';
 import {
   decideSpawnCinematic,
@@ -553,8 +553,8 @@ if (DESKTOP_APP) initDesktopShellIntegration();
 // whole-blob rewrite) would silently revert it.
 let liveSettings: Settings | null = null;
 const settingsForShellReflection = (): Settings => liveSettings ?? new Settings();
-if (DESKTOP_APP) void syncDesktopGpuPrefSetting(desktopBridge(), settingsForShellReflection);
-if (DESKTOP_APP) void syncDesktopDisplayModeSetting(desktopBridge(), settingsForShellReflection);
+if (DESKTOP_APP) syncDesktopShellSettings(desktopBridge(), settingsForShellReflection);
+registerShaderWarmSetting(() => settingsForShellReflection().get('shaderWarm'));
 // Free every WebGL context (game renderer, character preview, portrait rig) when
 // the page is torn down, so logout/login reload cycles don't exhaust the GPU
 // context pool and break the next renderer with "Error creating WebGL context".
@@ -2660,18 +2660,8 @@ async function startGame(
       hud.renderCharIfOpen();
       return;
     }
-    if (key === 'forceHighPerfGpu') {
-      // The push owns the inversion (the shell stores the opt-out) and swallows
-      // a failed write; the shell applies it at its next launch, so nothing in
-      // the running session changes.
-      pushDesktopGpuPref(desktopBridge(), settings.set('forceHighPerfGpu', !!value));
-      return;
-    }
-    if (key === 'discordPresence') {
-      // Same polarity on both sides: the shell drops its RPC connection on false.
-      pushDiscordPresenceEnabled(desktopBridge(), settings.set('discordPresence', !!value));
-      return;
-    }
+    // The shell-mirrored settings (src/game/desktop_shell_settings.ts).
+    if (applyDesktopShellSetting(key, value, settings, desktopBridge())) return;
     if (key === 'showDevBadges') {
       renderer.showDevBadges = settings.set('showDevBadges', !!value);
       return;

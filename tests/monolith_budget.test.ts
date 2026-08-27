@@ -259,7 +259,7 @@ const MONOLITHS: MonolithRow[] = [
     // first-spawn intro's seen-marker persistence moved out into
     // src/game/spawn_intro_seen.ts (the establishing-shot entry wait needed
     // one line here, and the ratchet pays for it by extraction).
-    ceiling: 11563,
+    ceiling: 11553,
     seam: 'a src/game/ or src/ui/ sibling module; main.ts is a firewall, not a home',
   },
   {

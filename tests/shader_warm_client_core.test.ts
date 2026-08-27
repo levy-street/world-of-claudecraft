@@ -10,15 +10,17 @@ import {
   createShaderWarmPauseState,
   createShaderWarmRequests,
   noteShaderWarmFrame,
-  readShaderWarmMode,
+  readShaderWarmSetting,
   SHADER_WARM_FRAME_PERIOD_MS,
   SHADER_WARM_PAUSE_ABOVE_MS,
   SHADER_WARM_RESUME_BELOW_MS,
+  SHADER_WARM_SETTINGS,
   SHADER_WARM_TIMEOUT_BREAKER,
   type ShaderWarmBypass,
   type ShaderWarmPolicyInputs,
   type ShaderWarmRequestSource,
   shaderWarmDecision,
+  shaderWarmModeFor,
 } from '../src/render/shader_warm_client_core';
 
 /** The queue's floors, as the host hands them in (GPU_WORK_PRIORITY
@@ -112,28 +114,52 @@ describe('shaderWarmDecision', () => {
   });
 });
 
-describe('readShaderWarmMode', () => {
-  it('reads the two opt-in modes and the explicit off off the query string', () => {
-    expect(readShaderWarmMode('?shaderwarm=off')).toBe('off');
-    expect(readShaderWarmMode('?shaderwarm=reveal')).toBe('reveal');
-    expect(readShaderWarmMode('?shaderwarm=all')).toBe('all');
-    expect(readShaderWarmMode('?perf&shaderwarm=all')).toBe('all');
-    expect(readShaderWarmMode('?shaderwarm=off&perf')).toBe('off');
-    expect(readShaderWarmMode('?shaderwarm=%6fff')).toBe('off');
+describe('readShaderWarmSetting', () => {
+  it('reads the four settings off the query string, which wins over the stored option', () => {
+    expect(readShaderWarmSetting('?shaderwarm=off', 'reveal')).toBe('off');
+    expect(readShaderWarmSetting('?shaderwarm=reveal', 'off')).toBe('reveal');
+    expect(readShaderWarmSetting('?shaderwarm=all')).toBe('all');
+    expect(readShaderWarmSetting('?shaderwarm=auto', 'all')).toBe('auto');
+    expect(readShaderWarmSetting('?perf&shaderwarm=all')).toBe('all');
+    expect(readShaderWarmSetting('?shaderwarm=off&perf')).toBe('off');
+    expect(readShaderWarmSetting('?shaderwarm=%6fff')).toBe('off');
   });
 
-  it('falls back to OFF on anything else, so the worker ships opt-in', () => {
-    // The first measured cell had every held piece warm and no frame gain
-    // while the catalogs and the zone prepares still linked cold: until every
-    // producer is a requester, a player who names no mode gets the
-    // pre-worker path, and a probe typo measures the baseline, never a half
-    // arm it would read as the shipping one.
-    expect(readShaderWarmMode('')).toBe('off');
-    expect(readShaderWarmMode('?perf')).toBe('off');
-    expect(readShaderWarmMode('?shaderwarm=')).toBe('off');
-    expect(readShaderWarmMode('?shaderwarm=ALL')).toBe('off');
-    expect(readShaderWarmMode('?shaderwarmish=reveal')).toBe('off');
-    expect(readShaderWarmMode('shaderwarm=reveal')).toBe('off');
+  it('takes the stored graphics option when the query names nothing, else OFF', () => {
+    // A probe typo measures the stored arm, never a half arm it would read
+    // as the baseline; an entry with no stored option at all (the editor,
+    // the guide viewer) gets OFF, never a worker context it never asked for.
+    expect(readShaderWarmSetting('', 'off')).toBe('off');
+    expect(readShaderWarmSetting('', 'auto')).toBe('auto');
+    expect(readShaderWarmSetting('?perf', 'all')).toBe('all');
+    expect(readShaderWarmSetting('?shaderwarm=', 'reveal')).toBe('reveal');
+    expect(readShaderWarmSetting('?shaderwarm=ALL', 'auto')).toBe('auto');
+    expect(readShaderWarmSetting('?shaderwarmish=reveal')).toBe('off');
+    expect(readShaderWarmSetting('shaderwarm=reveal')).toBe('off');
+    expect(readShaderWarmSetting('', 'bogus')).toBe('off');
+    expect(readShaderWarmSetting('', null)).toBe('off');
+    expect(SHADER_WARM_SETTINGS).toEqual(['auto', 'off', 'reveal', 'all']);
+  });
+});
+
+describe('shaderWarmModeFor', () => {
+  it('resolves auto by the backend: reveal where the compile runs off the presenting thread', () => {
+    // Measured 2026-08-28: D3D11 passed, Vulkan had nothing left to warm,
+    // every OpenGL cell (Linux NVIDIA, Linux Intel, Android Mali) only
+    // relocated the stall into the GPU process.
+    expect(shaderWarmModeFor('auto', 'd3d11')).toBe('reveal');
+    expect(shaderWarmModeFor('auto', 'vulkan')).toBe('reveal');
+    expect(shaderWarmModeFor('auto', 'metal')).toBe('reveal');
+    expect(shaderWarmModeFor('auto', 'opengl')).toBe('off');
+    expect(shaderWarmModeFor('auto', 'software')).toBe('off');
+    expect(shaderWarmModeFor('auto', 'unknown')).toBe('off');
+    expect(shaderWarmModeFor('auto', null)).toBe('off');
+  });
+
+  it('keeps an explicit setting whatever the backend', () => {
+    expect(shaderWarmModeFor('off', 'd3d11')).toBe('off');
+    expect(shaderWarmModeFor('reveal', 'opengl')).toBe('reveal');
+    expect(shaderWarmModeFor('all', null)).toBe('all');
   });
 });
 

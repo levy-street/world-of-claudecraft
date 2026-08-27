@@ -23,6 +23,7 @@ import { syncAppViewport } from '../game/app_viewport';
 import { audio } from '../game/audio';
 import { CROSS_HOTBAR_TRIGGERS, isCrossHotbarButton } from '../game/cross_hotbar';
 import { desktopDisplayModeSupported } from '../game/desktop_display_mode_sync';
+import { desktopGpuBackendSupported } from '../game/desktop_gpu_backend_sync';
 import { desktopGpuPrefSupported } from '../game/desktop_gpu_pref_sync';
 import { desktopDiscordPresenceSupported } from '../game/discord_presence';
 import {
@@ -1409,6 +1410,7 @@ export class OptionsWindow {
       touch: useTouchInterface(),
       nativeShell: isNativeAppShell(),
       desktopGpuPref: desktopGpuPrefSupported(desktopBridge()),
+      desktopGpuBackend: desktopGpuBackendSupported(desktopBridge()),
       desktopDiscordPresence: desktopDiscordPresenceSupported(desktopBridge()),
     };
     const controls = hooks ? buildInterfaceControls(this.settingsSource(hooks), env) : [];

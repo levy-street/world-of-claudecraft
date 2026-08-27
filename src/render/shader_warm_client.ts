@@ -20,12 +20,13 @@
 // worker on pagehide itself.
 
 import { GPU_WORK_PRIORITY } from './background_gpu_queue';
+import { type GpuBackendClass, readGpuBackend } from './gpu_backend_class_core';
 import { enableRendererExtensions } from './renderer_extensions';
 import {
   createShaderWarmPauseState,
   createShaderWarmRequests,
   noteShaderWarmFrame,
-  readShaderWarmMode,
+  readShaderWarmSetting,
   SHADER_WARM_TIMEOUT_BREAKER,
   type ShaderWarmBypass,
   type ShaderWarmDecision,
@@ -34,7 +35,9 @@ import {
   type ShaderWarmRequestSource,
   type ShaderWarmRequestStats,
   type ShaderWarmRequests,
+  type ShaderWarmSetting,
   shaderWarmDecision,
+  shaderWarmModeFor,
 } from './shader_warm_client_core';
 import type { ShaderWarmSource, ShaderWarmWorkerMessage } from './shader_warm_protocol';
 import {
@@ -48,12 +51,19 @@ import {
 export interface ShaderWarmContextSource {
   getContextAttributes(): object | null;
   getExtension(name: string): unknown;
+  /** The renderer string read (the backend class); absent reads as unknown. */
+  getParameter?(name: number): unknown;
 }
 
 export type ShaderWarmWorkerState = 'idle' | 'starting' | 'ready' | 'refused' | 'dead';
 
 export interface ShaderWarmSnapshot extends ShaderWarmRequestStats {
+  /** The player's setting (or the probe's query pin). */
+  setting: ShaderWarmSetting;
+  /** The mode in force: the setting, or what `auto` resolved to. */
   mode: ShaderWarmMode;
+  /** The backend class `auto` follows; null until a context was seen. */
+  backend: GpuBackendClass | null;
   armed: boolean;
   worker: ShaderWarmWorkerState;
   refusal: string | null;
@@ -82,6 +92,8 @@ interface WorkerLike {
 export interface ShaderWarmClientDeps {
   spawn?: () => WorkerLike | null;
   search?: string;
+  /** The stored graphics option; the page default reads the registered source. */
+  stored?: string | null;
   mobile?: boolean;
   /** Injectable timer for the ready deadline; returns the cancel. */
   schedule?: (callback: () => void, ms: number) => () => void;
@@ -93,7 +105,9 @@ export interface ShaderWarmClientDeps {
 export const SHADER_WARM_READY_DEADLINE_MS = 3_000;
 
 const state = {
+  setting: 'auto' as ShaderWarmSetting,
   mode: 'off' as ShaderWarmMode,
+  backend: null as GpuBackendClass | null,
   armed: false,
   worker: null as WorkerLike | null,
   workerState: 'idle' as ShaderWarmWorkerState,
@@ -142,9 +156,24 @@ function currentSearch(): string {
   return (globalThis as { location?: { search?: string } }).location?.search ?? '';
 }
 
-/** Read once, so a probe can pin an arm; the defaults are the page's. */
+/** Where the stored graphics option comes from; registered by the settings
+ *  module at boot, so this module never reaches into persistence itself. */
+let storedSettingSource: () => string | null = () => null;
+
+export function setShaderWarmStoredSettingSource(source: () => string | null): void {
+  storedSettingSource = source;
+}
+
+/** Read once, so a probe can pin an arm; the defaults are the page's. `auto`
+ *  stays OFF until the first policy call brings a context whose backend
+ *  decides it. */
 export function configureShaderWarm(deps: ShaderWarmClientDeps = {}): void {
-  state.mode = readShaderWarmMode(deps.search ?? currentSearch());
+  state.setting = readShaderWarmSetting(
+    deps.search ?? currentSearch(),
+    deps.stored !== undefined ? deps.stored : storedSettingSource(),
+  );
+  state.backend = null;
+  state.mode = shaderWarmModeFor(state.setting, null);
   state.spawn = deps.spawn ?? defaultSpawn;
   state.schedule = deps.schedule ?? defaultSchedule;
   state.mobile = deps.mobile ?? defaultMobile();
@@ -284,6 +313,12 @@ export function shaderWarmDecide(
   imminent: boolean,
 ): ShaderWarmDecision {
   if (!state.spawn) configureShaderWarm();
+  if (state.backend === null || state.backend === 'unknown') {
+    // Only a definite class is kept: a lost context or a masked string reads
+    // as unknown (OFF) and is read again at the next policy call.
+    state.backend = readGpuBackend(context).backend;
+    state.mode = shaderWarmModeFor(state.setting, state.backend);
+  }
   if (state.mode !== 'off' && state.workerState === 'idle') startWorker(context);
   const decision = shaderWarmDecision({
     mode: state.mode,
@@ -365,6 +400,10 @@ export function noteShaderWarmFrameMs(frameMs: number): void {
  *  and so were the programs it warmed (their context goes with the worker),
  *  so the request book starts over with the next renderer. */
 export function disposeShaderWarm(): void {
+  // The next renderer's context decides the backend again (a rebuild can
+  // land on another backend, software included).
+  state.backend = null;
+  state.mode = shaderWarmModeFor(state.setting, null);
   retireWorker();
   state.workerState = 'idle';
   state.refusal = null;
@@ -379,7 +418,9 @@ export function disposeShaderWarm(): void {
 export function shaderWarmSnapshot(): ShaderWarmSnapshot {
   return {
     ...state.requests.stats(),
+    setting: state.setting,
     mode: state.mode,
+    backend: state.backend,
     armed: state.armed,
     worker: state.workerState,
     refusal: state.refusal,

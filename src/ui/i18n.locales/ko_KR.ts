@@ -1422,6 +1422,18 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.options.forceHighPerfGpu': '전용 게이밍 GPU 사용',
   'hudChrome.options.forceHighPerfGpuNote':
     '기본값 켜짐: 데스크톱 앱이 이 컴퓨터의 전용 게이밍 GPU를 요청합니다. 게임이 시작되지 않거나, 시작 후 검은 화면만 보이거나, 노트북 화면이 나오지 않으면 끄세요. 이 설정은 다음에 게임을 시작할 때 적용됩니다.',
+  'hudChrome.options.shaderWarm': '셰이더 사전 워밍업 워커',
+  'hudChrome.options.shaderWarmAuto': '자동',
+  'hudChrome.options.shaderWarmOff': '끄기',
+  'hudChrome.options.shaderWarmOn': '켜기',
+  'hudChrome.options.shaderWarmNote':
+    '자동: 그래픽 백엔드가 지원하는 경우(Direct3D 11, Vulkan) 백그라운드 워커에서 셰이더를 미리 링크합니다. 도움이 되지 않는 OpenGL에서는 꺼진 상태로 유지됩니다. 켜기는 프레임이 나빠지는 환경을 포함해 모든 곳에서 워커를 강제하고, 끄기는 워커를 전혀 사용하지 않습니다. 다음에 게임을 시작할 때 적용됩니다.',
+  'hudChrome.options.gpuBackend': '그래픽 백엔드(Linux)',
+  'hudChrome.options.gpuBackendAuto': '자동(Vulkan 한 번 시도)',
+  'hudChrome.options.gpuBackendVulkan': 'Vulkan',
+  'hudChrome.options.gpuBackendOpenGL': 'OpenGL',
+  'hudChrome.options.gpuBackendNote':
+    '자동: 시작할 때 Vulkan을 한 번 시도하고 정상 동작하면 계속 사용합니다. 그 경우 셰이더 로딩으로 인한 끊김이 크게 줄어듭니다. 드라이버가 지원하지 않으면 OpenGL로 돌아갑니다. 다음에 게임을 시작할 때 적용됩니다.',
   'hudChrome.options.discordPresence': 'Discord 리치 프레즌스',
   'hudChrome.options.discordPresenceNote':
     '플레이하는 동안 현재 있는 지역과 이번 세션의 플레이 시간을 Discord 활동으로 표시하며, 당신의 Discord 프로필을 볼 수 있는 사람은 누구나 둘 다 볼 수 있습니다. 공유되는 것은 지역 이름, 이번 세션의 플레이 시간, 게임뿐이며, 캐릭터나 계정, 함께 플레이하는 사람은 절대 공유되지 않습니다. 이 컴퓨터에서 Discord 앱이 실행 중이어야 합니다.',
