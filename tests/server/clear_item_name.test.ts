@@ -190,7 +190,7 @@ describe('runClearItemName (the endpoint body over injected deps)', () => {
     const saveCharacterState = vi.fn(async () => true);
     const deps: ClearItemNameDeps = {
       characterOnline: () => false,
-      loadCharacter: async () => ({ level: 20, state }),
+      loadCharacter: vi.fn(async () => ({ level: 20, state })),
       saveCharacterState,
       recordAudit,
       ...overrides,
@@ -306,7 +306,7 @@ describe('runClearItemName (the endpoint body over injected deps)', () => {
     // saveOfflineCharacterState) found a live lease and touched nothing, so the
     // strip did NOT land and the endpoint must say so rather than report the
     // stripped count as success. The audit row honestly records the request.
-    const { deps, state, recordAudit, saveCharacterState } = makeDeps({
+    const { deps, state, recordAudit } = makeDeps({
       saveCharacterState: vi.fn(async () => false),
     });
     const outcome = await runClearItemName(deps, {
@@ -320,7 +320,32 @@ describe('runClearItemName (the endpoint body over injected deps)', () => {
     // refusal is the statement's own 0-row answer, never a skipped call.
     expect(deps.saveCharacterState).toHaveBeenCalledTimes(1);
     expect(deps.saveCharacterState).toHaveBeenCalledWith(5, 20, state);
-    expect(saveCharacterState).not.toHaveBeenCalled();
+    // The refusal re-loaded once to tell a lease from a vanished row.
+    expect(deps.loadCharacter).toHaveBeenCalledTimes(2);
+  });
+
+  it('a row that vanished between the load and the fenced write answers not found, not the lease line', async () => {
+    // The fenced UPDATE's 0-row answer has two causes; a deleted character is
+    // the one no retry can cure, so the endpoint distinguishes it with one
+    // extra load on the refusal path only (the fresh reader's finding on the
+    // first QA fix, which read every 0-row answer as a lease).
+    const state = stateWith({ equipmentInstances: { neck: namedCopy() } });
+    const { deps, recordAudit } = makeDeps({
+      loadCharacter: vi
+        .fn<ClearItemNameDeps['loadCharacter']>()
+        .mockResolvedValueOnce({ level: 20, state })
+        .mockResolvedValueOnce(null),
+      saveCharacterState: vi.fn(async () => false),
+    });
+    const outcome = await runClearItemName(deps, {
+      characterId: 5,
+      adminAccountId: 7,
+      body: { all: true, reason: 'slur' },
+    });
+    expect(outcome).toEqual({ ok: false, error: 'character not found' });
+    expect(recordAudit).toHaveBeenCalledTimes(1);
+    expect(deps.saveCharacterState).toHaveBeenCalledTimes(1);
+    expect(deps.loadCharacter).toHaveBeenCalledTimes(2);
   });
 });
 

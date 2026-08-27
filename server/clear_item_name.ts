@@ -53,7 +53,14 @@
 // session releases its lease after its leave flush lands (server/game.ts
 // leave), so the decided kick-then-clear flow lands on the first retry; a
 // crashed process's orphan lease expires (LEASE_TTL_SECONDS) and the retry
-// lands after it.
+// lands after it. What the fence leaves (recorded, not closed): the UPDATE
+// evaluates NOT EXISTS in its own READ COMMITTED snapshot, so a lease
+// committed DURING the fenced statement whose blob read lands before this
+// commit still holds the pre-strip state (a millisecond window); and the
+// live save's own nonce fence carries no expiry term, so a session whose
+// lease lapsed (ninety seconds of missed heartbeats) and was never reclaimed
+// can autosave over a landed strip. An operator handling a contested name
+// suspends the account first (DEPLOY.md).
 
 import { ITEMS } from '../src/sim/data';
 import type { CharacterState } from '../src/sim/sim';
@@ -268,6 +275,13 @@ export async function runClearItemName(
     };
   }
   const landed = await deps.saveCharacterState(input.characterId, row.level, row.state);
-  if (!landed) return { ok: false, error: CHARACTER_SAVE_LEASED_LINE };
+  if (!landed) {
+    // The fenced UPDATE's 0-row answer has two causes: a live lease (the
+    // retry line), or the character row vanishing between the load and the
+    // write (a deleted character, which no retry can cure). One extra load on
+    // the refusal path only, so the operator reads the true cause.
+    const still = await deps.loadCharacter(input.characterId);
+    return { ok: false, error: still ? CHARACTER_SAVE_LEASED_LINE : 'character not found' };
+  }
   return { ok: true, cleared };
 }
