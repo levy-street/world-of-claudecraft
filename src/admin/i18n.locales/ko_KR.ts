@@ -83,9 +83,9 @@ export const ko_KR: Record<string, string> = {
   'moderationHistory.actionClearItemName': '아이템 이름 삭제',
   'error.clearItemNameTargetForms': '대상을 정확히 하나만 지정하세요. 착용 슬롯, 가방 칸, 또는 all: true',
   'error.clearItemNameUnknownSlot': '알 수 없는 장비 슬롯입니다',
-  'error.clearItemNameAllLiteral': 'all 은 리터럴 true 여야 합니다',
+  'error.clearItemNameAllLiteral': 'all은 리터럴 true여야 합니다',
   'error.clearItemNameBagPair': '가방 대상에는 칸 번호와 아이템 ID가 모두 필요합니다',
-  'error.clearItemNameBagIndex': 'bag 은 0 이상의 정수여야 합니다',
+  'error.clearItemNameBagIndex': 'bag은 0 이상의 정수여야 합니다',
   'error.clearItemNameOnline': '캐릭터가 이 렐름에서 온라인 상태입니다. 먼저 접속을 끊으세요',
   'error.clearItemNameNoMatch': '해당 대상과 일치하는 이름 붙은 사본이 없습니다',
   'error.clearItemNameCameOnline':
