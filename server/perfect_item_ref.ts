@@ -38,3 +38,21 @@ export function parsePerfectItemRef(msg: {
   if ((slot === undefined) === (bag === undefined)) return null;
   return slot !== undefined ? { slot } : { bag: bag as number, itemId: item as string };
 }
+
+// The optional legendary name riding a perfect_item frame (Masterwrought
+// phase 13): accepted only as a non-empty string under the payload string
+// ceiling, and ANYTHING else drops the FIELD, never the frame, so a malformed
+// name degrades to an unnamed attempt the sim's own deny ladder answers
+// ('That work needs a name to become a legend.' at the final rank) instead of
+// a silent drop the player cannot read. The sim owns the tighter live shape
+// (src/sim/professions/legendary_name.ts: trim, collapse, alphabet, max 32);
+// this bound only keeps a flood-sized or non-string token from crossing the
+// dispatch boundary. The server-side CONTENT screen (offensiveName) runs in
+// the game.ts arm on what this returns, the pet_rename split.
+export function parsePerfectItemName(msg: { name?: unknown }): string | undefined {
+  return typeof msg.name === 'string' &&
+    msg.name.length > 0 &&
+    msg.name.length <= MAX_INSTANCE_STRING_LENGTH
+    ? msg.name
+    : undefined;
+}

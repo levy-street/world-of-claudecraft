@@ -168,6 +168,7 @@ import {
   consumeCosmeticOpToken,
   createCosmeticOpGuard,
 } from './cosmetic_op_guard';
+import { emitCraftActivityCard } from './craft_activity';
 import { dailyRewardService } from './daily_rewards';
 import type { AccountChatMuteStatus, AccountCosmetics, RequestMetadata } from './db';
 import {
@@ -206,7 +207,7 @@ import {
   reconcileCharacterDeeds,
   recordDeedUnlocks,
 } from './deeds_records';
-import { claimDedupeKey, enqueueActivity, releaseDedupeKey } from './discord_activity';
+import { enqueueActivity } from './discord_activity';
 import { discordFlairForAccount, grantRewardPoints } from './discord_db';
 import { enqueueLinkChange } from './discord_link_changes';
 import { enqueueRelay } from './discord_relay';
@@ -330,7 +331,7 @@ import {
 } from './parse';
 import { PartyFrameProjectionCache } from './party_frame_projection';
 import { applyBoostKitToPlayer, pbeBoostEnabled } from './pbe_boost';
-import { parsePerfectItemRef } from './perfect_item_ref';
+import { parsePerfectItemName, parsePerfectItemRef } from './perfect_item_ref';
 import { recordFtueDeath, recordFtueQuest, recordLevelUp } from './progress_events';
 import { eventLeadDayKey, nextRaidResetMs, resetDayKey } from './raid_reset';
 import { REALM, REALM_PUBLIC_ORIGIN, REALM_RESET_TIME_ZONE } from './realm';
@@ -1188,11 +1189,13 @@ function identityFields(e: Entity): Record<string, unknown> {
     // payload, riding the identity record (wireCacheFor diffs the identity
     // JSON, so an equip/unequip of an instanced piece re-emits automatically).
     // Data minimization: only the cosmetic inspect fields (signer, enchant,
-    // rolled) leave the server; boundTo, charges, and the bindOnTrade
+    // rolled, name) leave the server; boundTo, charges, and the bindOnTrade
     // arm are gameplay state no inspecting client needs and never ride this key.
-    // The pub allowlist below (signer/enchant/rolled ONLY) is what enforces this,
-    // so a new non-cosmetic ItemInstancePayload field is excluded by construction;
-    // the owner still sees their own payload in full via the self `inv` mirror.
+    // The pub allowlist below is what enforces this, so a new non-cosmetic
+    // ItemInstancePayload field is excluded by construction; the owner still
+    // sees their own payload in full via the self `inv` mirror. 2026-08-27:
+    // `name` (the player-chosen legendary name, Masterwrought phase 13) is
+    // the FIRST cosmetic JOIN since the rule was written.
     let eqi: Record<string, unknown> | undefined;
     for (const [slot, inst] of Object.entries(e.equippedInstances)) {
       if (!inst) continue;
@@ -1200,6 +1203,7 @@ function identityFields(e: Entity): Record<string, unknown> {
       if (inst.signer !== undefined) pub.signer = inst.signer;
       if (inst.enchant !== undefined) pub.enchant = inst.enchant;
       if (inst.rolled !== undefined) pub.rolled = inst.rolled;
+      if (inst.name !== undefined) pub.name = inst.name;
       for (const _ in pub) {
         if (eqi === undefined) eqi = {};
         eqi[slot] = pub;
@@ -6817,8 +6821,19 @@ export class GameServer {
         // the outcome reaches this client as the sim's own error/log lines
         // plus the heavy self re-diff (perfect_item is a HEAVY_SELF_CMDS
         // member: an attempt spends materials and mutates a payload in place).
+        // Phase 13: an optional legendary name rides the frame (a bad name
+        // drops the FIELD, never the frame); the server owns the CONTENT
+        // screen (the pet_rename split), the sim the SHAPE screen.
         const ref = parsePerfectItemRef(msg);
-        if (ref) sim.perfectItem(ref, pid);
+        if (ref) {
+          const name = parsePerfectItemName(msg);
+          if (name !== undefined && offensiveName(name))
+            this.send(session, {
+              t: 'events',
+              list: [{ type: 'error', text: 'That name is not allowed.' }],
+            });
+          else sim.perfectItem(ref, pid, name);
+        }
         break;
       }
       // Commission order board (Professions 2.0, issue #1298): the sim
@@ -9500,51 +9515,35 @@ export class GameServer {
         );
       } else if (ev.type === 'masterwork' && ev.pid !== undefined) {
         // A masterwork proc: the professions moment the rareloot arm above
-        // cannot see (a craft fires no loot roll). The ACCOUNT-scoped dedupe
-        // key (unlike rareloot's per-drop rollId) collapses a crafting
-        // session to at most one card per dedupe TTL, and the card rides the
-        // same deed_broadcasts opt-out as the deed fan-out below: masterwork
-        // procs REPEAT (3 to 15 percent of crafts), so unlike the once-ever
-        // levelup/rareloot arms, publishing them to a third-party channel
-        // needs the player-controllable gate. Fire-and-forget off the loop
-        // (the fanOutDeedUnlock shape); identity captured before the await.
-        // Bots have no session, so this.clients.get filters them naturally.
+        // cannot see (a craft fires no loot roll). The dedupe/opt-out/release
+        // body lives in server/craft_activity.ts (shared with the legendary
+        // arm below). Bots have no session, so this.clients.get filters them.
         const s = this.clients.get(ev.pid);
         if (!s) continue;
-        // The dedupe key is claimed SYNCHRONOUSLY, ahead of the opt-out read:
-        // procs repeat, and a check inside the enqueue would fire one db read
-        // per proc while all but one card is provably discarded (a same-tick
-        // burst would even pass a plain pre-check together). Claimed = this
-        // proc owns the TTL window; the enqueue then carries a null key.
-        const { accountId, name } = s;
-        if (!claimDedupeKey(`masterwork:${accountId}`, now)) continue;
-        const profileUrl = this.profileUrlFor(name);
-        const itemName = ITEMS[ev.itemId]?.name ?? ev.itemId;
-        void getDeedBroadcasts(accountId)
-          .then((enabled) => {
-            if (!enabled) return;
-            enqueueActivity(
-              {
-                kind: 'masterwork',
-                accountIds: [accountId],
-                names: [name],
-                realm: REALM,
-                profileUrl,
-                itemName,
-              },
-              null,
-              now,
-            );
-          })
-          .catch((err) => {
-            // The claim gated work that FAILED: release it, or one db blip
-            // silently drops this account's cards for the whole TTL. The
-            // claim stamp rides along so a LATE rejection cannot delete a
-            // window a newer claimant owns, and the release re-stamps with
-            // a short retry backoff rather than deleting outright (R60).
-            releaseDedupeKey(`masterwork:${accountId}`, now);
-            console.error('masterwork activity failed:', err);
-          });
+        emitCraftActivityCard({
+          kind: 'masterwork',
+          accountId: s.accountId,
+          name: s.name,
+          itemName: ITEMS[ev.itemId]?.name ?? ev.itemId,
+          realm: REALM,
+          now,
+          profileUrlFor: (n) => this.profileUrlFor(n),
+        });
+      } else if (ev.type === 'legendaryForged' && ev.pid !== undefined) {
+        // The orange promotion (Masterwrought phase 13), at masterwork parity:
+        // the PERSONAL event only (legendaryForgedZone copies never card, the
+        // masterworkZone rule). itemName is the PLAYER-CHOSEN name: data only.
+        const s = this.clients.get(ev.pid);
+        if (!s) continue;
+        emitCraftActivityCard({
+          kind: 'legendary',
+          accountId: s.accountId,
+          name: s.name,
+          itemName: ev.name,
+          realm: REALM,
+          now,
+          profileUrlFor: (n) => this.profileUrlFor(n),
+        });
       } else if (ev.type === 'duelEnd') {
         const w = this.sessionByName(ev.winnerName);
         const l = this.sessionByName(ev.loserName);

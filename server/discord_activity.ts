@@ -9,7 +9,14 @@
 // outbox drain resolves accountIds to Discord identities; this layer is just the
 // in-memory hand-off, mirroring discord_relay.ts.
 
-export type ActivityKind = 'levelup' | 'rareloot' | 'duel' | 'arena' | 'masterwork' | 'deed';
+export type ActivityKind =
+  | 'levelup'
+  | 'rareloot'
+  | 'duel'
+  | 'arena'
+  | 'masterwork'
+  | 'legendary'
+  | 'deed';
 
 export interface QueuedActivity {
   kind: ActivityKind;
@@ -23,7 +30,11 @@ export interface QueuedActivity {
   profileUrl: string | null;
   // Type-specific payload (only the relevant fields are set):
   level?: number; // levelup
-  itemName?: string; // rareloot; masterwork; the first-koi deed's catch name
+  // rareloot; masterwork; the first-koi deed's catch name. For 'legendary'
+  // (Masterwrought phase 13) this is the PLAYER-CHOSEN legendary name:
+  // player-authored text carried as data; the bot renders it as plain embed
+  // text at masterwork parity (bot/logic.ts buildActivityMessage).
+  itemName?: string;
   quality?: string; // rareloot ('epic' | 'legendary')
   winnerName?: string; // duel
   loserName?: string; // duel

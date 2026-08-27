@@ -4440,14 +4440,14 @@ export class ClientWorld implements IWorld {
     this.cmd({ cmd: 'unbind_item', item: itemId });
   }
   // The Perfecting stage (Masterwrought phase 12): command only, never
-  // predicted. Exactly one of `slot` (worn) or `bag` plus `item` (the bagged
-  // cell and the id seen there) rides, the absent arm omitted; the
-  // server re-validates the shape and the sim resolves every gate and the one
-  // roll. Feedback is the sim's own error/log lines plus the self inv/einst
-  // mirrors re-diffing (perfect_item is a HEAVY_SELF_CMDS member).
-  perfectItem(ref: PerfectItemRef): void {
-    if ('slot' in ref) this.cmd({ cmd: 'perfect_item', slot: ref.slot });
-    else this.cmd({ cmd: 'perfect_item', bag: ref.bag, item: ref.itemId });
+  // predicted. Exactly one of `slot` (worn) or `bag` plus `item` rides, the
+  // absent arm omitted; the server re-validates the shape and the sim every
+  // gate and the one roll. Feedback is the sim's error/log lines plus the
+  // self inv/einst re-diff (a HEAVY_SELF_CMDS member). Phase 13: the optional
+  // legendary name rides the same frame; undefined drops in JSON.stringify.
+  perfectItem(ref: PerfectItemRef, name?: string): void {
+    if ('slot' in ref) this.cmd({ cmd: 'perfect_item', slot: ref.slot, name });
+    else this.cmd({ cmd: 'perfect_item', bag: ref.bag, item: ref.itemId, name });
   }
   // The one shared view builder the offline Sim also answers through
   // (perfectingInfoFrom), fed the self mirrors: the whole `inv` array, the

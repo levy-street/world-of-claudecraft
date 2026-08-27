@@ -576,11 +576,14 @@ export interface ActivityParticipant {
 }
 
 export interface ActivityItem {
-  kind: 'levelup' | 'rareloot' | 'duel' | 'arena' | 'masterwork' | 'deed';
+  kind: 'levelup' | 'rareloot' | 'duel' | 'arena' | 'masterwork' | 'legendary' | 'deed';
   realm: string;
   profileUrl: string | null;
   level?: number;
-  itemName?: string; // rareloot; masterwork; the first-koi deed's catch
+  // rareloot; masterwork; the first-koi deed's catch. For 'legendary' this is
+  // the PLAYER-CHOSEN legendary name: render it as plain embed text (data,
+  // never our own markdown), exactly the way the masterwork card treats it.
+  itemName?: string;
   quality?: string;
   winnerName?: string;
   loserName?: string;
@@ -674,6 +677,18 @@ export function buildActivityMessage(item: ActivityItem): Record<string, unknown
         `A **masterwork** ${item.itemName || 'piece'} from the hands of ` +
         `${mentionFor(subjectName, item.participants)} on ${item.realm}!`;
       color = 0xd9a334;
+      break;
+    case 'legendary':
+      // The orange promotion (Masterwrought phase 13). itemName is the
+      // PLAYER-CHOSEN legendary name: interpolated as plain text at
+      // masterwork parity (no markdown of our own around it), with the ||
+      // fallback so an empty name degrades to the generic title.
+      author = ':fire: Legend Forged';
+      title = item.itemName || 'A legend';
+      description =
+        `${item.itemName || 'A legend'} was forged by ` +
+        `${mentionFor(subjectName, item.participants)} on ${item.realm}!`;
+      color = 0xff8000;
       break;
     case 'deed':
       if (item.deedId === FIRST_KOI_DEED_ID) {
