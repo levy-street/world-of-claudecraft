@@ -7,7 +7,7 @@
 // malformed-frame matrix dropping before any sim call; the sim's own denial
 // drawing nothing; and the shared-builder parity claim, ClientWorld's
 // perfectingInfo over the mirrored state against the server sim's own.
-import { afterAll, beforeAll, describe, expect, it, vi } from 'vitest';
+import { afterAll, afterEach, beforeAll, describe, expect, it, vi } from 'vitest';
 
 vi.mock('../server/db', () => ({
   pool: { query: vi.fn(async () => ({ rows: [] })) },
@@ -100,7 +100,7 @@ function cmd(server: GameServer, session: ClientSession, body: Record<string, un
 
 /** A Date.now spy that steps the wall clock a whole second per tick(), so a
  *  run of NAMED perfect_item frames refills the name-screen lane between
- *  frames (server/msg_lanes.ts: burst 5, one token per second) instead of
+ *  frames (server/msg_lanes.ts: burst 5, two tokens per second) instead of
  *  tripping it: the dispatch tests here are about the halves after the lane. */
 function namedFrameClock(): { tick(): void; restore(): void } {
   let now = Date.now();
@@ -202,6 +202,11 @@ beforeAll(() => {
 });
 afterAll(() => {
   (globalThis as { WebSocket?: unknown }).WebSocket = oldWebSocket;
+});
+// A namedFrameClock left un-restored by a failing assertion would freeze
+// Date.now for every later test in the file; restore every spy per test.
+afterEach(() => {
+  vi.restoreAllMocks();
 });
 
 describe('ClientWorld emits the perfect_item frames the protocol declares', () => {
@@ -371,7 +376,7 @@ describe('perfect_item over the real online dispatch path', () => {
     const pid = session.pid as number;
     seedPerfecter(server, pid);
     const spy = vi.spyOn(server.sim, 'perfectItemAs');
-    // Every NAMED frame rides the name-screen lane (burst 5, one per second),
+    // Every NAMED frame rides the name-screen lane (burst 5, two per second),
     // so the clock advances a second per frame here: this test is about the
     // dispatch halves, and the lane's own refusal is pinned separately below.
     const clock = namedFrameClock();
@@ -381,12 +386,13 @@ describe('perfect_item over the real online dispatch path', () => {
       cmd(server, session, { cmd: 'perfect_item', slot: 'neck', name });
       expect(spy).toHaveBeenLastCalledWith(pid, { slot: 'neck' }, undefined);
     }
-    // An OVERSIZED string is cut to the payload ceiling and rides RAW (still
-    // past the live shape, so the sim's inscription arm answers it; the
-    // host-parity pin below drives that line on both hosts).
+    // An OVERSIZED string rides RAW and UNCUT (the fresh-reader finding on the
+    // first QA fix: a cut could turn a shape-invalid wire spelling into a
+    // valid short name online only; now the sim's inscription arm answers the
+    // same raw value on both hosts, and the host-parity pin below drives it).
     clock.tick();
     cmd(server, session, { cmd: 'perfect_item', slot: 'neck', name: 'x'.repeat(65) });
-    expect(spy).toHaveBeenLastCalledWith(pid, { slot: 'neck' }, 'x'.repeat(64));
+    expect(spy).toHaveBeenLastCalledWith(pid, { slot: 'neck' }, 'x'.repeat(65));
     // A well-formed name rides through to the sim, which owns the SHAPE rule.
     clock.tick();
     cmd(server, session, { cmd: 'perfect_item', slot: 'neck', name: 'Dawnbreaker' });

@@ -83,19 +83,19 @@ describe('parsePerfectItemName (Masterwrought phase 13)', () => {
     expect(parsePerfectItemName({ name: '!!' })).toBe('!!');
   });
 
-  it('an OVERSIZED string is cut to the ceiling, never dropped (the host-parity rule)', () => {
+  it('an OVERSIZED string rides RAW and UNCUT, never dropped (the host-parity rule)', () => {
     // The offline host hands the raw string to the sim, whose shape arm
     // refuses anything past MAX_LEGENDARY_NAME_LENGTH with the inscription
     // line; dropping the field here would make the online host answer the
-    // needs-a-name line instead for the same input. Cutting keeps the token
-    // bounded AND the two hosts on one line (pinned end to end in
-    // tests/perfecting_wire.test.ts).
-    const cut = parsePerfectItemName({ name: 'x'.repeat(MAX_INSTANCE_STRING_LENGTH + 1) });
-    expect(cut).toBe('x'.repeat(MAX_INSTANCE_STRING_LENGTH));
-    expect(parsePerfectItemName({ name: 'y'.repeat(4096) })).toHaveLength(
-      MAX_INSTANCE_STRING_LENGTH,
+    // needs-a-name line instead for the same input, and CUTTING it (the first
+    // QA fix, refuted by its fresh reader) could turn a shape-invalid wire
+    // spelling into a valid short name online only. The frame is already
+    // bounded by the socket's 16 KiB maxPayload, so the raw value rides.
+    expect(parsePerfectItemName({ name: 'x'.repeat(MAX_INSTANCE_STRING_LENGTH + 1) })).toBe(
+      'x'.repeat(MAX_INSTANCE_STRING_LENGTH + 1),
     );
-    // Any cut is still past the live shape, so the sim's shape arm owns it.
+    expect(parsePerfectItemName({ name: 'y'.repeat(4096) })).toBe('y'.repeat(4096));
+    // Both are past the live shape, so the sim's shape arm owns them.
     expect(MAX_INSTANCE_STRING_LENGTH).toBeGreaterThan(MAX_LEGENDARY_NAME_LENGTH);
   });
 
@@ -133,6 +133,21 @@ describe('resolvePerfectItemName: the whole naming decision (the phase 13 QA K17
     });
     expect(screen).toHaveBeenCalledTimes(1);
     expect(screen).toHaveBeenCalledWith('Oath of Vale');
+  });
+
+  it('a whitespace-run spelling past the raw ceiling normalizes to a live name on BOTH hosts', () => {
+    // The parity case that killed the cut: raw 'Oath' + sixty spaces + 'Z' is
+    // 65 characters, past the old cut, yet its NORMALIZED value 'Oath Z' is a
+    // valid live name. A cut would have handed the sim 'Oath' + 60 spaces (a
+    // shape refusal online, a promotion named 'Oath Z' offline); raw
+    // pass-through lets the same normalizer answer 'Oath Z' on both hosts.
+    const screen = vi.fn((_name: string) => false);
+    expect(resolvePerfectItemName({ name: `Oath${' '.repeat(60)}Z` }, screen)).toEqual({
+      refused: false,
+      name: 'Oath Z',
+    });
+    expect(screen).toHaveBeenCalledWith('Oath Z');
+    expect(`Oath${' '.repeat(60)}Z`.length).toBeGreaterThan(MAX_INSTANCE_STRING_LENGTH);
   });
 
   it('refuses the frame on a match, with no name passed on', () => {

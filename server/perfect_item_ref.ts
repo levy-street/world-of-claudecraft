@@ -41,24 +41,25 @@ export function parsePerfectItemRef(msg: {
 }
 
 // The optional legendary name riding a perfect_item frame (Masterwrought
-// phase 13): accepted only as a non-empty string; a non-string drops the
-// FIELD, never the frame, so a malformed name degrades to an unnamed attempt
-// the sim's own deny ladder answers ('That work needs a name to become a
-// legend.' at the final rank) instead of a silent drop the player cannot
-// read. An OVERSIZED string is CUT to the payload string ceiling rather than
-// dropped (the phase 13 QA parity finding): the offline host hands the raw
-// string to the same sim, whose shape arm refuses anything past 32 with its
-// inscription line, so cutting keeps both hosts answering the identical
-// line while still keeping a flood-sized token from crossing the dispatch
-// boundary. The sim owns the tighter live shape
-// (src/sim/professions/legendary_name.ts: trim, collapse, alphabet, max 32).
-// The server-side CONTENT screen (offensiveName) runs in
-// resolvePerfectItemName below, the pet_rename split.
+// phase 13): accepted as ANY non-empty string, exactly the string the offline
+// host hands the sim; a non-string drops the FIELD, never the frame, so a
+// malformed name degrades to an unnamed attempt the sim's own deny ladder
+// answers ('That work needs a name to become a legend.' at the final rank)
+// instead of a silent drop the player cannot read. No length cut and no
+// length drop here (the phase 13 QA, two rounds): the sim's normalizer
+// (src/sim/professions/legendary_name.ts: trim, collapse, alphabet, max 32)
+// is the ONE authority on both hosts, and any server-side edit of the raw
+// string before it breaks host parity in one direction or the other (a drop
+// answered "needs a name" where offline says "cannot be inscribed"; a cut
+// landing on a whitespace run normalized to a short VALID name the player
+// never typed, stamped online and refused offline). The flood ceiling is the
+// frame itself (WS maxPayload); a raw token is priced once by the normalizer
+// (linear) and never stored, since a shape-invalid one is refused and a
+// shape-valid one is stamped only as its normalized form. The server-side
+// CONTENT screen (offensiveName) runs in resolvePerfectItemName below on the
+// normalized value, the pet_rename split.
 export function parsePerfectItemName(msg: { name?: unknown }): string | undefined {
-  if (typeof msg.name !== 'string' || msg.name.length === 0) return undefined;
-  return msg.name.length <= MAX_INSTANCE_STRING_LENGTH
-    ? msg.name
-    : msg.name.slice(0, MAX_INSTANCE_STRING_LENGTH);
+  return typeof msg.name === 'string' && msg.name.length > 0 ? msg.name : undefined;
 }
 
 /**

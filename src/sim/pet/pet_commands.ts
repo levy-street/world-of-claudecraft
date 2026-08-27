@@ -300,7 +300,14 @@ export function syncPetLevel(ctx: SimContext, owner: Entity): void {
   applyPetOwnerScaling(ctx, pet);
 }
 
-function cleanPetName(raw: string): string | null {
+/** The pet-name SHAPE (trim, collapse inner whitespace, 2 to 16 letters,
+ *  spaces, hyphens, apostrophes, leading letter), the sim's one authority.
+ *  Exported for the online server's content screen (the phase 13 QA hot-path
+ *  review): the obscenity matcher prices THIS normalized value, never the raw
+ *  wire token, which could be a whole 16 KiB frame (three milliseconds per
+ *  screen) and could hide a slur behind a run of whitespace that this very
+ *  normalization collapses away. Pure, draw-free, host-agnostic. */
+export function cleanPetName(raw: string): string | null {
   const name = raw.trim().replace(/\s+/g, ' ');
   return PET_NAME_RE.test(name) ? name : null;
 }

@@ -197,8 +197,9 @@ server) verdict every inbound frame; `game.ts` is a thin consumer. The design re
 - **Order and placement are load-bearing.** The pre-parse gate (frame ceiling + byte
   budget, sized against the real client cadence model in `src/net/input_send_cadence.ts`)
   verdicts ABOVE `JSON.parse`, so a flooder buys token math, never parse CPU. The
-  per-class lanes (movement / command / chat) are post-parse at the dispatch switch, so
-  one class can never starve another. Every verdict is allow-or-DROP, never queue or
+  per-class lanes (movement / command / chat / name-screen, the last for the two
+  commands that run the obscenity matcher on player text ahead of any sim gate) are
+  post-parse at the dispatch switch, so one class can never starve another. Every verdict is allow-or-DROP, never queue or
   defer: deferred delivery shifts receive time and poisons the bot detector's timing
   strategies.
 - **Detector placement contract:** movement drops before `observeInput` (a dropped frame

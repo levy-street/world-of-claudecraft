@@ -131,6 +131,15 @@ R5. Per-class post-parse lanes (the reserved-lane requirement), with detector-sa
       throttle and messaging and is untouched; the lane only bounds what a chat flood
       can burn, and because the lane is more generous than the ladder, the ladder's
       error messaging still fires on the passed subset.
+    - name-screen lane (added at the Masterwrought phase 13 QA hot-path review),
+      cmd 'pet_rename' and cmd 'perfect_item' carrying a `name` field: refill 2/s,
+      burst 5. The two handlers that run the obscenity matcher on player text BEFORE
+      any sim gate; an ALLOWED under-ceiling frame books no drop, so on the command
+      lane a hostile client could spend the matcher's cost per frame indefinitely
+      while naming an empty slot. Both are dialog actions at single digits per
+      minute for a real player; both handlers are shape-first (the matcher prices
+      the sim's normalized value, never the raw token). Drops tally like every other
+      lane drop. An unnamed perfect_item frame stays on the command lane.
     - parsed frames of any OTHER shape (unknown t, non-object JSON, unknown cmd)
       also draw a command-lane token, after their protocol-anomaly observation:
       that bounds sub-ceiling garbage to the lane rate and makes anything above it
@@ -204,7 +213,8 @@ R8. Observability lands in the game-signals seam, and wsMessage('in') keeps its
     meaning is KEPT, and the existing pin stays green unedited. The loss becomes
     visible through NEW methods on the GameMetricsCounters interface
     (server/http/game_signals.ts): wsMessageDropped(cause) with cause one of 'rate' |
-    'bytes' | 'lane_movement' | 'lane_command' | 'lane_chat', wsRateKick(), and
+    'bytes' | 'lane_movement' | 'lane_command' | 'lane_chat' | 'lane_name_screen',
+    wsRateKick(), and
     wsInputSeqGap(missed). Exporter side (registerGameStateMetrics in
     server/http/game_metrics.ts, each inc wrapped in the seam's never-throw contract):
     woc_ws_messages_dropped_total{cause}, woc_ws_rate_kicks_total,

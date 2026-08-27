@@ -60,6 +60,7 @@ import {
   partyFrameIncomingHeals,
   partyFrameRole,
 } from '../src/sim/party_frame_info';
+import { cleanPetName } from '../src/sim/pet/pet_commands';
 import { livePlaytimeSeconds } from '../src/sim/playtime';
 import { effectiveFishingBand } from '../src/sim/professions/fishing';
 import { RESPEC_TIER_CONFIG, type RespecPaymentTier } from '../src/sim/professions/focus';
@@ -6811,11 +6812,7 @@ export class GameServer {
         const ref = parsePerfectItemRef(msg);
         if (ref) {
           const named = resolvePerfectItemName(msg, offensiveName);
-          if (named.refused)
-            this.send(session, {
-              t: 'events',
-              list: [{ type: 'error', text: 'That name is not allowed.' }],
-            });
+          if (named.refused) this.sendChatNotice(session, 'That name is not allowed.');
           else sim.perfectItemAs(pid, ref, named.name);
         }
         break;
@@ -7263,11 +7260,12 @@ export class GameServer {
         break;
       case 'pet_rename':
         if (typeof msg.name === 'string') {
-          if (offensiveName(msg.name))
-            this.send(session, {
-              t: 'events',
-              list: [{ type: 'error', text: 'Pet name is not allowed.' }],
-            });
+          // Shape-first like perfect_item: the matcher prices the sim's own
+          // 16-character normalized value (cleanPetName), never the raw token,
+          // so a 16 KiB frame costs the screen nothing (the phase 13 QA
+          // hot-path review); a name the sim would refuse anyway skips it.
+          if (offensiveName(cleanPetName(msg.name) ?? ''))
+            this.sendChatNotice(session, 'Pet name is not allowed.');
           else sim.renamePet(msg.name, pid);
         }
         break;

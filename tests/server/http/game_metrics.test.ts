@@ -433,7 +433,7 @@ describe('registerGameStateMetrics: throughput counters via the returned sink', 
     expect(sampleValue(text, /^woc_input_frames_missed_total (\d+)$/m)).toBe('9');
   });
 
-  it('keeps the cause label bounded to the fixed six values', async () => {
+  it('keeps the cause label bounded to the closed WS_DROP_CAUSES set', async () => {
     const registry = new Registry();
     const counters = registerGameStateMetrics(registry, stubSource());
     counters.wsMessageDropped('rate');

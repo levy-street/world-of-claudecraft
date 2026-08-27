@@ -63,9 +63,11 @@ describe('lane constants hold the R5 budget literals', () => {
     expect(MSG_LANE_CHAT_REFILL_PER_SECOND).toBe(4);
     expect(MSG_LANE_CHAT_BURST).toBe(8);
     // The name-screen lane (the phase 13 QA hot-path review): far above a
-    // human's dialog cadence, far below the command lane the obscenity
-    // matcher used to ride.
-    expect(MSG_LANE_NAME_SCREEN_REFILL_PER_SECOND).toBe(1);
+    // human's dialog cadence (two per second sustained, the chat lane's
+    // human-dialog sizing halved: a retype after a refusal is a second of
+    // human time), far below the command lane the obscenity matcher used to
+    // ride.
+    expect(MSG_LANE_NAME_SCREEN_REFILL_PER_SECOND).toBe(2);
     expect(MSG_LANE_NAME_SCREEN_BURST).toBe(5);
     expect(MSG_LANE_NAME_SCREEN_REFILL_PER_SECOND).toBeLessThan(MSG_LANE_COMMAND_REFILL_PER_SECOND);
   });

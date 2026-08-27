@@ -680,11 +680,16 @@ describe('inbound drop, kick, and seq-gap counters at their emission sites', () 
     const session = join(server, fakeWs(), 100, 1, 'Ayla');
 
     const renameFrame = JSON.stringify({ t: 'cmd', cmd: 'pet_rename', name: 'Rex' });
+    const renamed = vi.spyOn(server.sim, 'renamePet');
     for (let i = 0; i < MSG_LANE_NAME_SCREEN_BURST + 1; i++) {
       server.handleMessage(session, renameFrame);
     }
     expect(rec.dropped).toEqual(['lane_name_screen']);
+    // The burst's worth reached the handler (the lane shed the last frame
+    // only, not the whole run), so the drop is the lane's, not a refusal.
+    expect(renamed).toHaveBeenCalledTimes(MSG_LANE_NAME_SCREEN_BURST);
     expect(rec.rateKicks()).toBe(0);
+    renamed.mockRestore();
     server.stop();
   });
 

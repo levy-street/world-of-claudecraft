@@ -927,7 +927,10 @@ const MONOLITHS: MonolithRow[] = [
     // named (the unused bgOriginAt import and the never-called private
     // replaceLiveAccountCosmetics member). Extraction first, then the line;
     // the ceiling follows the file down. Exact count, zero slack.
-    ceiling: 10475,
+    // LOWERED 10475 -> 10473 at the phase 13 QA second fix round: the two
+    // name-screen refusal frames ride the existing sendChatNotice helper,
+    // paying for the cleanPetName import and the shape-first pet_rename arm.
+    ceiling: 10473,
     seam: 'a sibling server module; see the hot-path seams in server/CLAUDE.md',
   },
   {

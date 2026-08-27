@@ -38,7 +38,7 @@ import { TURN_SPEED } from '../src/sim/types';
 // of real traffic (input frames land in the measured 74 to 106 byte range).
 // ---------------------------------------------------------------------------
 
-type FrameKind = 'input' | 'cast' | 'chat' | 'telemetry' | 'challenge' | 'logout';
+type FrameKind = 'input' | 'cast' | 'chat' | 'telemetry' | 'challenge' | 'rename' | 'logout';
 
 interface SendEvent {
   atMs: number; // receive time; equals send time except in the stall arm
@@ -67,6 +67,9 @@ function chatRaw(line: number): string {
 }
 
 const TELEMETRY_RAW = JSON.stringify({ t: 'cmd', cmd: 'telemetry', apm: 42 });
+// A pet rename: the name-screen lane's tenant (R5), a dialog action at a
+// human cadence of single digits per minute.
+const RENAME_RAW = JSON.stringify({ t: 'cmd', cmd: 'pet_rename', name: 'Rex' });
 const CHALLENGE_RAW = JSON.stringify({
   t: 'cmd',
   cmd: 'challengeResponse',
@@ -183,7 +186,7 @@ interface ChainOutcome {
 }
 
 function zeroKindCounts(): Record<FrameKind, number> {
-  return { input: 0, cast: 0, chat: 0, telemetry: 0, challenge: 0, logout: 0 };
+  return { input: 0, cast: 0, chat: 0, telemetry: 0, challenge: 0, rename: 0, logout: 0 };
 }
 
 // Receive-time epoch: an arbitrary real-world second, so the abuse window's
@@ -280,8 +283,11 @@ function buildMix(mix: MixName, hz: number, offsetMs: number): SendEvent[] {
         () => TELEMETRY_RAW,
       );
       const challenge: SendEvent[] = [{ atMs: 13_700, kind: 'challenge', raw: CHALLENGE_RAW }];
+      // Pet renames at a mashing human's dialog cadence (one per 4 s, far
+      // above real use), on the name-screen lane: never a drop.
+      const rename = everyMs(4000, 4000, MATRIX_DURATION_MS - 1, 'rename', () => RENAME_RAW);
       const logout: SendEvent[] = [{ atMs: MATRIX_DURATION_MS, kind: 'logout', raw: LOGOUT_RAW }];
-      return mergeStreams(input, gcd, mash, chat, telemetry, challenge, logout);
+      return mergeStreams(input, gcd, mash, chat, telemetry, challenge, rename, logout);
     }
   }
 }

@@ -62,10 +62,16 @@ export const MSG_LANE_CHAT_BURST = 8;
 // books no drop, so on the 30/s command lane a hostile client could spend
 // 0.8 ms/s per session on screens for frames naming an empty slot. Both are
 // dialog actions at single digits per minute for a real player, so the lane
-// is sized far above human rate and far below the command lane; refusals
-// drop and tally like every other lane drop. An UNNAMED perfect_item frame
-// stays on the command lane: it runs no screen.
-export const MSG_LANE_NAME_SCREEN_REFILL_PER_SECOND = 1;
+// is sized far above human rate (the chat lane's human-dialog sizing: a
+// retype after a refusal is a second of human time, and five rapid submits
+// fit the burst) and far below the command lane; refusals drop and tally
+// like every other lane drop, and a dropped frame sends NOTHING back, so the
+// phase 14 window disables its submit for a beat after each submit rather
+// than letting a mash read as a dead button. Both tenants are shape-first:
+// the matcher prices the sim's normalized value (32 or 16 characters), never
+// the raw token. An UNNAMED perfect_item frame stays on the command lane: it
+// runs no screen.
+export const MSG_LANE_NAME_SCREEN_REFILL_PER_SECOND = 2;
 export const MSG_LANE_NAME_SCREEN_BURST = 5;
 
 /** The four metered lanes. */
