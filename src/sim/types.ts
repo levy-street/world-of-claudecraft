@@ -1480,6 +1480,22 @@ export interface ItemInstancePayload {
    *  the OWNER sees it via the wholesale `inv` mirror and the whole `einst`
    *  self mirror. */
   perfected?: true;
+  /** Player-chosen legendary name (Masterwrought phase 13, R3): stamped by the
+   *  orange promotion (professions/perfecting.ts resolveLegendaryPromotion)
+   *  alongside rolled.quality = 'legendary', on an already-Perfected copy only.
+   *  Player-authored TEXT, always a VALUE and never an i18n key: standalone it
+   *  renders raw through the entity-name path (esc, untranslated); composed
+   *  lines interpolate it into a t() template (the feast/makers-mark
+   *  precedent). Unlike `perfected` above this field is COSMETIC PRESTIGE and
+   *  deliberately JOINS the server's `eqi` peer wire allowlist and
+   *  publicInstanceView (the phase 13 decision: an inspecting viewer seeing
+   *  the name is the point of the promotion), beside signer/enchant/rolled.
+   *  Live shape is validated in the sim (legendary_name.ts); the load bound
+   *  keeps a printable-ASCII string within its own byte ceiling
+   *  (item_instance_load.ts, a dedicated drop-only arm on the signer
+   *  doctrine: deliberately looser than the live shape so persisted values
+   *  outlive an alphabet widening). */
+  name?: string;
   /** Player-toggled safety mark (issue 3042, item_lock.ts isItemLocked): while
    *  true this specific copy refuses salvage, profession-craft reagent
    *  consumption, and vendor sell (single and bulk) until the player unlocks
@@ -6501,6 +6517,28 @@ export type SimEvent = { pid?: number } & (
       recipeId: string;
       zoneId: string;
     }
+  // Orange promotion (Masterwrought phase 13, R3): a Perfected copy consumed a
+  // Deed of Making and became legendary presentation. Personal (emitted with
+  // pid = the owner's entity id, which `owner` repeats as payload). Ids plus
+  // the player-chosen name only, no other text: the client renders its own
+  // localized line with the name interpolated as a VALUE
+  // (hudChrome.crafting.legendaryLine).
+  | { type: 'legendaryForged'; itemId: string; name: string; owner: number }
+  // The soft zone-wide copy, one per overworld player currently in the owner's
+  // zone INCLUDING the owner, `pid` being the RECIPIENT (the masterworkZone
+  // idiom above; a SEPARATE type for the same own-mirror reason). itemName is
+  // the player-chosen legendary name; the FIRST event type carrying TWO pieces
+  // of player-authored text (ownerName and itemName), both VALUES the client
+  // interpolates, never keys.
+  | {
+      type: 'legendaryForgedZone';
+      pid: number;
+      ownerPid: number;
+      ownerName: string;
+      itemId: string;
+      itemName: string;
+      zoneId: string;
+    }
   // Riding lesson (src/sim/mounts_training.ts). Both personal (pid-scoped).
   // mountTrainSession announces a fresh attempt or a phase change: `phase` is
   // 'mount' at begin (the client toasts the Mount/Dismount hint) and re-emitted
@@ -7602,7 +7640,11 @@ export type DeedStatKey =
   | 'riftSRankClears'
   // Rides home rung on the island ferry bell AFTER the Proving Shore rail is
   // fully handed in (interactions/ferry_bell.ts): the graduation moment.
-  | 'tutorialGraduations';
+  | 'tutorialGraduations'
+  // Orange promotions performed (Masterwrought phase 13): bumped once per
+  // legendary promotion at the resolveLegendaryPromotion stamp site
+  // (professions/perfecting.ts), feeding prog_legendmaker.
+  | 'legendariesForged';
 
 // The canonical counter key list (init/serialize iterate it in this fixed
 // order so equal states always serialize byte-equal).
@@ -7634,6 +7676,7 @@ export const DEED_STAT_KEYS: readonly DeedStatKey[] = [
   'riftClears',
   'riftSRankClears',
   'tutorialGraduations',
+  'legendariesForged',
 ];
 
 // Numeric readings computed from already-persisted PlayerMeta state (never new

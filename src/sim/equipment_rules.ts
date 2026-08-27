@@ -84,9 +84,13 @@ export function slotAcceptsItem(item: ItemDef, slot: EquipSlot): boolean {
 
 // Every legendary item is unique-equipped: a character wears at most one copy
 // of a given legendary at a time. Derived from quality rather than a per-item
-// flag so a new legendary can never forget to opt in.
-export function isUniqueEquipped(item: ItemDef): boolean {
-  return item.quality === 'legendary';
+// flag so a new legendary can never forget to opt in. Since 2026-08-27
+// (phase 13) the read is EFFECTIVE quality: a caller holding the specific
+// copy passes its instance and a legendary-ROLLED copy (the orange
+// promotion's mint) counts too; a def-only caller passes nothing and keeps
+// the def-quality answer unchanged.
+export function isUniqueEquipped(item: ItemDef, instance?: ItemInstancePayload): boolean {
+  return effectiveQuality(item, instance) === 'legendary';
 }
 
 // The uniqueness KEY. A heroic upgrade variant (content/heroic_variants.ts,
@@ -103,20 +107,27 @@ export function uniqueEquipFamily(item: ItemDef): string {
 // swap displaces, e.g. the offhand a two-hander benches), which therefore
 // cannot conflict with the incoming copy. `lookup` resolves a worn id to its
 // def (the sim passes ITEMS; injected so this leaf stays data-free).
+// `instances` are the worn per-copy payloads and `incomingInstance` the exact
+// copy about to be worn (phase 13, the masterwroughtConflictSlot params'
+// shape): with them the rule counts a promoted legendary-rolled copy on
+// either side; a caller with no instance context omits both and keeps the
+// def-only behavior.
 export function uniqueEquipConflictSlot(
   item: ItemDef,
   equipment: Partial<Record<EquipSlot, string>>,
   lookup: (id: string) => ItemDef | undefined,
   ignoreSlots: readonly EquipSlot[],
+  instances?: Partial<Record<EquipSlot, ItemInstancePayload>>,
+  incomingInstance?: ItemInstancePayload,
 ): EquipSlot | null {
-  if (!isUniqueEquipped(item)) return null;
+  if (!isUniqueEquipped(item, incomingInstance)) return null;
   const family = uniqueEquipFamily(item);
   for (const slot of ALL_EQUIP_SLOTS) {
     if (ignoreSlots.includes(slot)) continue;
     const wornId = equipment[slot];
     if (!wornId) continue;
     const worn = lookup(wornId);
-    if (!worn || !isUniqueEquipped(worn)) continue;
+    if (!worn || !isUniqueEquipped(worn, instances?.[slot])) continue;
     if (uniqueEquipFamily(worn) === family) return slot;
   }
   return null;
@@ -140,7 +151,9 @@ export function equipCandidateIndex(inventory: readonly InvSlot[], itemId: strin
 // THE effective-quality precedence rule, shared by the worn side and the
 // incoming side below: a copy's own rolled quality wins over its def's when
 // present, the same precedence professions/battlefield_xp.ts reads rarity with.
-function effectiveQuality(
+// Exported since phase 13: the promotion mints legendary-ROLLED copies, so
+// presentation consumers (the instance tooltip) read the same one rule.
+export function effectiveQuality(
   def: ItemDef,
   instance: ItemInstancePayload | undefined,
 ): string | undefined {
@@ -155,9 +168,21 @@ export function equipCandidateQuality(
   itemId: string,
   def: ItemDef,
 ): string | undefined {
+  return effectiveQuality(def, equipCandidateInstance(inventory, itemId));
+}
+
+// The per-copy payload of the unit an id-only equip of `itemId` would consume
+// now (the same highest-index selection equipCandidateIndex makes), or
+// undefined for no carried copy or a plain one. The unique-equipped rule
+// peeks it (phase 13) the way the Masterwrought sub-cap peeks
+// equipCandidateQuality above, so the copy judged and the copy worn cannot
+// differ.
+export function equipCandidateInstance(
+  inventory: readonly InvSlot[],
+  itemId: string,
+): ItemInstancePayload | undefined {
   const index = equipCandidateIndex(inventory, itemId);
-  const instance = index < 0 ? undefined : inventory[index].instance;
-  return effectiveQuality(def, instance);
+  return index < 0 ? undefined : inventory[index].instance;
 }
 
 // How many Masterwrought pieces a character may wear at once, and how many of
@@ -180,10 +205,13 @@ export type MasterwroughtConflict = { slot: EquipSlot; reason: 'cap' | 'legendar
 // is already worn. Duplicates of one flagged item are deliberately legal inside
 // the cap, so nothing here compares ids or families.
 //
-// The sub-cap reads INSTANCE-effective quality while isUniqueEquipped above
-// reads def quality only, so the two rules deliberately disagree about one
-// copy: a legendary-ROLLED copy of an epic def counts against this sub-cap and
-// is NOT unique-equipped.
+// The sub-cap reads INSTANCE-effective quality. Until 2026-08-27 that made
+// the two rules deliberately disagree about one copy (isUniqueEquipped read
+// def quality only, so a legendary-ROLLED copy of an epic def counted here
+// and was NOT unique-equipped). 2026-08-27, phase 13: the orange promotion
+// mints the first legal legendary-rolled instance and the phase file's
+// acceptance requires BOTH rules to count it, so isUniqueEquipped is
+// instance-aware too and the recorded disagreement is retired.
 //
 // `ignoreSlots` names the slots this equip empties or overwrites (the target
 // slot itself, plus a slot the swap displaces, e.g. the offhand a two-hander

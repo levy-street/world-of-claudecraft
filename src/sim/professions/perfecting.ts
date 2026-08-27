@@ -9,6 +9,15 @@
 // track field, stamps `perfected`, and merges the R5-safe bonus-stat delta
 // into rolled.stats (the pre-existing generic recalc channel).
 //
+// The ORANGE PROMOTION (Masterwrought phase 13, R3) is a SEPARATE,
+// DETERMINISTIC act on an already-Perfected copy, reached through the same
+// perfect_item command: a valid player-chosen name (legendary_name.ts, the
+// shape half; the server screens content) plus one Deed of Making promotes
+// the copy to legendary PRESENTATION (rolled.quality = 'legendary',
+// payload.name = the normalized name; stats BYTE-IDENTICAL, the R5 bonus
+// already landed at Perfected, so no recalc runs). Never folded into the
+// rank-4 stamp, and never a roll: resolveLegendaryPromotion below.
+//
 // Behind the SimContext seam (src/sim/professions/CLAUDE.md): functions taking
 // (ctx, ...) plus pure leaves; never a Sim import (PlayerMeta arrives
 // type-only, the crafting.ts/commission.ts idiom). `src/sim`-pure: no
@@ -22,11 +31,14 @@
 //                               first-attempt boundTo stamp; the ONLY draw in
 //                               the whole system
 //   attempt, every deny arm ... 0 (the whole ladder below, dead gate included)
+//   the promotion, WHOLE ...... 0 (deny and success alike: deterministic by
+//                               design, R3; no arm of
+//                               resolveLegendaryPromotion may ever draw)
 //   the craft-time head start . 0 here (crafting.ts's single unconditional
 //                               proc draw decides it; this module only names
 //                               the rank it stamps)
 //   info reads / save+load .... 0
-import { ALL_RECIPES, ITEMS } from '../data';
+import { ALL_RECIPES, DUNGEON_X_THRESHOLD, ITEMS, zoneAt } from '../data';
 import { recalcPlayerStats } from '../entity';
 import {
   normalizePrimaryStats,
@@ -41,6 +53,8 @@ import { countRawInSlots, countUnlockedInSlots, removeUnlockedFromSlots } from '
 import type { PlayerMeta } from '../sim';
 import type { SimContext } from '../sim_context';
 import type { CoreStats, EquipSlot, InvSlot, ItemDef, ItemInstancePayload } from '../types';
+import { emitToZonePlayers } from './gather_events';
+import { normalizeLegendaryName } from './legendary_name';
 import type { ProfessionRecipeRecord } from './types';
 import type { CraftSkills } from './wheel';
 
@@ -70,6 +84,14 @@ export const PERFECTING_ATTEMPT_COST: readonly Readonly<{ itemId: string; count:
   { itemId: 'makers_ember', count: 1 },
   { itemId: 'sundered_essence', count: 1 },
   { itemId: 'prismglass_setting', count: 1 },
+];
+
+// Consumed once by the orange promotion (phase 13, R3): exactly one Deed of
+// Making, inscription's first 125-rung output (content/recipes.ts
+// recipe_deed_of_making), tradable so an inscriptionist scribes it FOR the
+// promoter. Deterministic: no roll rides this bill.
+export const LEGENDARY_PROMOTION_COST: readonly Readonly<{ itemId: string; count: number }>[] = [
+  { itemId: 'deed_of_making', count: 1 },
 ];
 
 /** The target piece: a passed selection, never id-only (the item_copy_ref
@@ -102,12 +124,21 @@ export interface PerfectingInfoView {
   rank: number;
   ranks: number;
   perfected: boolean;
+  /** The copy is already legendary (rolled.quality === 'legendary'): the
+   *  phase 13 promotion has happened. Independent of `perfected` so a
+   *  legacy legendary-rolled payload reads honestly too. */
+  promoted: boolean;
   /** The craft that made this apex piece (craftForApexItem), null off-track. */
   craftId: string | null;
   skillReq: number;
   skillMet: boolean;
   /** boundTo present on the copy (the R2 bind has happened). */
   bound: boolean;
+  /** The NEXT act's bill, lock-aware: the three attempt materials while the
+   *  copy is unperfected, and the promotion's Deed of Making once
+   *  `perfected && !promoted` (the phase 14 window renders whichever rows
+   *  arrive; a promoted copy keeps the deed row at have-counts, its
+   *  requirement moot). Minimal on purpose: one field, one row shape. */
   materials: PerfectingMaterialView[];
 }
 
@@ -177,6 +208,31 @@ function baggedSlotAt(inventory: InvSlot[], bag: number, itemId: string): InvSlo
   return selectedInventorySlot(inventory, itemId, bag) ?? null;
 }
 
+/** The ONE ref-to-copy resolution both command entries share (the attempt and
+ *  the phase 13 promotion), so their noItem behavior cannot drift. A worn ref
+ *  reads the equipment maps; a bagged ref walks baggedSlotAt above. */
+function resolvePerfectTarget(
+  meta: PlayerMeta,
+  ref: PerfectItemRef,
+): {
+  itemId: string | undefined;
+  payload: ItemInstancePayload | undefined;
+  wornSlot: EquipSlot | null;
+  bagged: InvSlot | null;
+} {
+  if ('slot' in ref) {
+    const itemId = meta.equipment[ref.slot];
+    return {
+      itemId,
+      payload: meta.equipmentInstance[ref.slot],
+      wornSlot: itemId ? ref.slot : null,
+      bagged: null,
+    };
+  }
+  const bagged = baggedSlotAt(meta.inventory, ref.bag, ref.itemId);
+  return { itemId: bagged?.itemId, payload: bagged?.instance, wornSlot: null, bagged };
+}
+
 export interface PerfectingInfoInputs {
   ref: PerfectItemRef;
   inventory: InvSlot[];
@@ -202,16 +258,18 @@ export function perfectingInfoFrom(inputs: PerfectingInfoInputs): PerfectingInfo
   }
   if (!itemId) return null;
   const craftId = craftForApexItem(itemId);
+  const perfected = payload?.perfected === true;
   return {
     itemId,
     rank: payload?.perfecting ?? 0,
     ranks: PERFECTING_RANKS,
-    perfected: payload?.perfected === true,
+    perfected,
+    promoted: payload?.rolled?.quality === 'legendary',
     craftId,
     skillReq: PERFECTING_SKILL_REQ,
     skillMet: craftId !== null && (inputs.craftSkills[craftId] ?? 0) >= PERFECTING_SKILL_REQ,
     bound: payload?.boundTo !== undefined,
-    materials: PERFECTING_ATTEMPT_COST.map((c) => ({
+    materials: (perfected ? LEGENDARY_PROMOTION_COST : PERFECTING_ATTEMPT_COST).map((c) => ({
       itemId: c.itemId,
       required: c.count,
       have: countUnlockedInSlots(inputs.inventory, c.itemId),
@@ -220,14 +278,18 @@ export function perfectingInfoFrom(inputs: PerfectingInfoInputs): PerfectingInfo
 }
 
 /**
- * Resolve one Perfecting attempt. The dead gate rides the Sim wrapper
- * (dead_gate.ts, like every profession-action wrapper); everything below is
- * this module's own ladder. DENY LADDER, in order, first match wins, every
- * denial draws ZERO rng and consumes nothing:
+ * Resolve one Perfecting attempt, or route an already-Perfected copy to the
+ * phase 13 promotion (resolveLegendaryPromotion below). The dead gate rides
+ * the Sim wrapper (dead_gate.ts, like every profession-action wrapper);
+ * everything below is this module's own ladder. DENY LADDER, in order, first
+ * match wins, every denial draws ZERO rng and consumes nothing:
  *   2. invalid ref / no item at ref
  *   3. not apex (def.masterwrought !== true)
- *   4. already Perfected
- *   5. skill under PERFECTING_SKILL_REQ in the craft that made it
+ *   4. skill under PERFECTING_SKILL_REQ in the craft that made it (one gate
+ *      guards BOTH acts; phase 13 moved it above the perfected split so the
+ *      promotion reuses the line verbatim)
+ *   5. already Perfected: route to the promotion ladder (its own arms are
+ *      documented on resolveLegendaryPromotion)
  *   6. lock-only material shortfall (raw counts meet the need, unlocked do
  *      not): the DEDICATED locked line, never the missing-materials one
  *   7. genuine material shortfall
@@ -253,23 +315,14 @@ export function resolvePerfectingAttempt(
   ctx: SimContext,
   pid: number | undefined,
   ref: PerfectItemRef,
+  name?: string,
 ): void {
   const r = ctx.resolve(pid);
   if (!r) return;
   const meta: PlayerMeta = r.meta;
-  let itemId: string | undefined;
-  let payload: ItemInstancePayload | undefined;
-  let wornSlot: EquipSlot | null = null;
-  let bagged: InvSlot | null = null;
-  if ('slot' in ref) {
-    itemId = meta.equipment[ref.slot];
-    payload = meta.equipmentInstance[ref.slot];
-    wornSlot = itemId ? ref.slot : null;
-  } else {
-    bagged = baggedSlotAt(meta.inventory, ref.bag, ref.itemId);
-    itemId = bagged?.itemId;
-    payload = bagged?.instance;
-  }
+  const target = resolvePerfectTarget(meta, ref);
+  let { payload } = target;
+  const { itemId, wornSlot, bagged } = target;
   // Presence-only ownership (see the header): holding the copy IS the
   // credential, so the only noItem arm is an unresolvable ref. boundTo is
   // never compared here.
@@ -282,16 +335,18 @@ export function resolvePerfectingAttempt(
     ctx.error(meta.entityId, 'Only Masterwrought items can be perfected.');
     return;
   }
-  if (payload?.perfected === true) {
-    ctx.error(meta.entityId, 'That item is already Perfected.');
-    return;
-  }
   // masterwrought R13. A null craftId cannot happen for a shipped apex def
   // (every masterwrought item is a recipe output); it fails the skill gate
-  // rather than minting a skill-free path.
+  // rather than minting a skill-free path. One gate for BOTH acts: the
+  // promotion answers this same line (phase 13 moved the gate above the
+  // perfected split; the retired perfectAlready line went with it).
   const craftId = craftForApexItem(itemId);
   if (craftId === null || (meta.craftSkills[craftId] ?? 0) < PERFECTING_SKILL_REQ) {
     ctx.error(meta.entityId, 'Perfecting that requires 125 skill in the craft that made it.');
+    return;
+  }
+  if (payload?.perfected === true) {
+    promotePerfectedCopy(ctx, meta, itemId, payload, name);
     return;
   }
   // Sufficiency counted lock-aware (issue 3042 doctrine, the crafting.ts
@@ -379,5 +434,130 @@ export function resolvePerfectingAttempt(
   // The rift forge ops' wire bump on an in-place payload mutation: the owner's
   // heavy self mirrors (inv, einst) re-diff on the next snapshot. Every
   // resolved attempt mutated the bags (materials), so bump on both outcomes.
+  meta.wireRev++;
+}
+
+/**
+ * The orange promotion's own command entry (Masterwrought phase 13, R3),
+ * mirroring resolvePerfectingAttempt's shape so tests and the deeds suite
+ * drive it directly. Runs the SAME resolution head (resolvePerfectTarget) and
+ * the same noItem / not-masterwrought / skill arms with the same lines, then
+ * the promotion ladder (promotePerfectedCopy below). PRECONDITION arm rather
+ * than a fifth deny line: a copy that is NOT Perfected is unreachable here
+ * through the real command (resolvePerfectingAttempt owns that routing and
+ * sends an unperfected copy down the attempt ladder instead), so a direct
+ * call on one is a caller bug and no-ops: nothing consumed, nothing drawn,
+ * no invented player line.
+ */
+export function resolveLegendaryPromotion(
+  ctx: SimContext,
+  pid: number | undefined,
+  ref: PerfectItemRef,
+  name: string | undefined,
+): void {
+  const r = ctx.resolve(pid);
+  if (!r) return;
+  const meta: PlayerMeta = r.meta;
+  const { itemId, payload } = resolvePerfectTarget(meta, ref);
+  if (!itemId) {
+    ctx.error(meta.entityId, "You don't have that item.");
+    return;
+  }
+  const def = ITEMS[itemId];
+  if (def?.masterwrought !== true) {
+    ctx.error(meta.entityId, 'Only Masterwrought items can be perfected.');
+    return;
+  }
+  const craftId = craftForApexItem(itemId);
+  if (craftId === null || (meta.craftSkills[craftId] ?? 0) < PERFECTING_SKILL_REQ) {
+    ctx.error(meta.entityId, 'Perfecting that requires 125 skill in the craft that made it.');
+    return;
+  }
+  if (payload?.perfected !== true) return;
+  promotePerfectedCopy(ctx, meta, itemId, payload, name);
+}
+
+/**
+ * The promotion ladder body: the branch resolvePerfectingAttempt routes to
+ * when the resolved copy is already Perfected (payload.perfected === true;
+ * the dead gate, noItem, not-masterwrought, and skill arms have all answered
+ * upstream). DENY LADDER, first match wins, ZERO rng on EVERY arm (deny and
+ * success alike, the header's draw contract), nothing consumed on any deny:
+ *   1. already legendary (rolled.quality === 'legendary')
+ *   2. no name given (undefined / empty)
+ *   3. name given but not a legal shape (legendary_name.ts; the server
+ *      screens CONTENT before the command reaches the sim)
+ *   4. lock-only deed shortfall: the shared locked-material line
+ *   5. genuine deed shortfall
+ * Success: consume the one Deed of Making (lock-aware, the attempt's consume
+ * idiom, one quest resync), stamp rolled.quality = 'legendary' (presentation
+ * only: stats BYTE-IDENTICAL, the R5 bonus landed at Perfected, so no recalc
+ * runs even on a worn copy) and payload.name = the normalized name (signer
+ * untouched), bump the legendariesForged deed stat, emit the personal
+ * legendaryForged event then the legendaryForgedZone fanout (the masterwork
+ * order; the same instanced-owner skip), and bump wireRev. NO ctx.notice
+ * success line: the two events drive the client copy (recorded design).
+ */
+function promotePerfectedCopy(
+  ctx: SimContext,
+  meta: PlayerMeta,
+  itemId: string,
+  payload: ItemInstancePayload,
+  name: string | undefined,
+): void {
+  if (payload.rolled?.quality === 'legendary') {
+    ctx.error(meta.entityId, 'That work is already legendary.');
+    return;
+  }
+  if (name === undefined || name === '') {
+    ctx.error(meta.entityId, 'That work needs a name to become a legend.');
+    return;
+  }
+  const normalized = normalizeLegendaryName(name);
+  if (normalized === null) {
+    ctx.error(meta.entityId, 'That name cannot be inscribed on the work.');
+    return;
+  }
+  if (
+    LEGENDARY_PROMOTION_COST.some((c) => countUnlockedInSlots(meta.inventory, c.itemId) < c.count)
+  ) {
+    const lockOnly = LEGENDARY_PROMOTION_COST.every(
+      (c) => countRawInSlots(meta.inventory, c.itemId) >= c.count,
+    );
+    // Two single-line emits, never one wrapped ternary: the S3 drift guard
+    // scans one call per line (the attempt's materials arm above says why).
+    if (lockOnly) ctx.error(meta.entityId, 'A material needed for perfecting is locked.');
+    else ctx.error(meta.entityId, 'You need a Deed of Making to make that work a legend.');
+    return;
+  }
+  for (const c of LEGENDARY_PROMOTION_COST) {
+    removeUnlockedFromSlots(meta.inventory, c.itemId, c.count);
+  }
+  ctx.onInventoryChangedForQuests?.(meta);
+  // Presentation only (R3): the quality override rides the same rolled record
+  // the R5 stats live on; the stats themselves are untouched by construction.
+  payload.rolled = { ...payload.rolled, quality: 'legendary' };
+  payload.name = normalized;
+  ctx.bumpDeedStat(meta, 'legendariesForged', 1);
+  const owner = meta.entityId;
+  ctx.emit({ type: 'legendaryForged', itemId, name: normalized, owner, pid: owner });
+  // The zone celebration, the announceMasterworkZone recipe: one pid-scoped
+  // copy per overworld player in the owner's zone, the owner included;
+  // skipped entirely for an instanced owner (the personal event alone fires).
+  const ownerE = ctx.entities.get(owner);
+  if (ownerE && ownerE.pos.x <= DUNGEON_X_THRESHOLD) {
+    const zoneId = zoneAt(ownerE.pos.x, ownerE.pos.z).id;
+    emitToZonePlayers(ctx, zoneId, (recipientPid) => ({
+      type: 'legendaryForgedZone',
+      pid: recipientPid,
+      ownerPid: owner,
+      ownerName: meta.name,
+      itemId,
+      itemName: normalized,
+      zoneId,
+    }));
+  }
+  // The same in-place payload-mutation bump the attempt ends on: the owner's
+  // heavy self mirrors (inv, einst) re-diff on the next snapshot.
   meta.wireRev++;
 }

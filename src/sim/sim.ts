@@ -9207,17 +9207,17 @@ export class Sim {
     });
   }
 
-  // The Perfecting stage (Masterwrought phase 12): two thin delegates onto
-  // professions/perfecting.ts. perfectItem rides the shared profession-action
-  // dead gate (dead_gate.ts) like craftItem/trainRecipe/unbindItem above;
-  // every other denial is the module's own draw-free ladder (its header owns
-  // the draw contract: exactly one draw per resolved attempt, zero on every
-  // denial). perfectingInfo is a pure read built by the SAME shared view
-  // builder ClientWorld consumes (perfectingInfoFrom), so the hosts cannot
-  // drift.
-  perfectItem(ref: PerfectItemRef, pid?: number): void {
-    if (refusedWhileDead(this.ctx, pid)) return;
-    resolvePerfectingAttempt(this.ctx, pid, ref);
+  // Perfecting plus the phase 13 promotion: thin delegates onto
+  // professions/perfecting.ts, behind the shared profession-action dead gate
+  // (dead_gate.ts). The second param is the IWorld facet's optional NAME when
+  // a host calls the (ref, name?) shape and the pid when the server calls
+  // (ref, pid, name?): a pid is always a number, so one string check routes
+  // both. perfectingInfo is the SAME shared view builder ClientWorld
+  // consumes (perfectingInfoFrom), so the hosts cannot drift.
+  perfectItem(ref: PerfectItemRef, pid?: number | string, name?: string): void {
+    const byName = typeof pid === 'string';
+    if (refusedWhileDead(this.ctx, byName ? undefined : pid)) return;
+    resolvePerfectingAttempt(this.ctx, byName ? undefined : pid, ref, byName ? pid : name);
   }
 
   perfectingInfo(ref: PerfectItemRef, pid?: number): PerfectingInfoView | null {

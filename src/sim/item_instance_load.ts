@@ -53,6 +53,16 @@ export const MAX_INSTANCE_STRING_LENGTH = 64;
  */
 export const MAX_INSTANCE_PAYLOAD_KEYS = 24;
 
+/**
+ * The load ceiling for the player-chosen legendary `name` (phase 13). The
+ * signer doctrine: a byte bound DELIBERATELY looser than the live shape
+ * (legendary_name.ts holds a fresh promotion to 32 letters/spaces/
+ * apostrophes/hyphens), so a persisted name outlives a later widening of the
+ * live alphabet or length; what drops is only what NO writer of either shape
+ * could store (non-strings, empties, non-printable-ASCII, or past this).
+ */
+export const MAX_LEGENDARY_NAME_LOAD_LENGTH = 48;
+
 /** The sub-objects whose own keys are scanned one level down. Both are
  *  deep-copied by `cloneItemInstancePayload`, which is what makes it safe to
  *  delete keys inside them (see the ownership contract below); `rift` is
@@ -147,6 +157,9 @@ export function warnDroppedInstanceKeys(owner: string, dropped: readonly string[
  *    count arm alone would let one megabyte-long key through);
  *  - `signer`: kept only when it is a name a legal mint could have stamped
  *    (`isLegalCrafterName`), else dropped;
+ *  - `name`: the legendary name (phase 13), kept only as a non-empty
+ *    printable-ASCII string within MAX_LEGENDARY_NAME_LOAD_LENGTH (the
+ *    deliberately-looser-than-live signer doctrine, see the constant);
  *  - any other own string value past MAX_INSTANCE_STRING_LENGTH: dropped;
  *  - the same key and string rules one level into `rolled` and `charges`,
  *    each of which also takes the own-key COUNT ceiling (a flat ten-thousand
@@ -229,6 +242,32 @@ export function sanitizeItemInstancePayloadOnLoad(payload: unknown): SanitizedIt
       // Kept only as the literal `true`, the one value any legal writer mints
       // (types.ts declares `perfected?: true`); anything else drops alone.
       if (value !== true) {
+        delete record[key];
+        dropped.push(key);
+      }
+      continue;
+    }
+    if (key === 'name') {
+      // The player-chosen legendary name (phase 13; legendary_name.ts owns
+      // the LIVE shape). Held to the deliberately looser load bound above:
+      // a non-empty printable-ASCII string (char codes 32..126, the
+      // isLegalCrafterName alphabet) within its own byte ceiling; anything
+      // else drops alone, the same drop-only doctrine as every arm here.
+      let legal =
+        typeof value === 'string' &&
+        value.length >= 1 &&
+        value.length <= MAX_LEGENDARY_NAME_LOAD_LENGTH;
+      if (legal) {
+        const text = value as string;
+        for (let i = 0; i < text.length; i++) {
+          const code = text.charCodeAt(i);
+          if (code < 32 || code > 126) {
+            legal = false;
+            break;
+          }
+        }
+      }
+      if (!legal) {
         delete record[key];
         dropped.push(key);
       }

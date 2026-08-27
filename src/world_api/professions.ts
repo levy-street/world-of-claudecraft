@@ -485,10 +485,17 @@ export interface IWorldProfessions {
   // ClientWorld sends the perfect_item command and never decides the outcome.
   // Feedback is the sim's own error/log lines plus the self inv/einst mirrors
   // re-diffing (the command is a HEAVY_SELF_CMDS member), no result event.
-  perfectItem(ref: PerfectItemRef): void;
+  // `name` (Masterwrought phase 13): on an ALREADY-Perfected copy this same
+  // command is the orange promotion, and the optional player-chosen name is
+  // its input (sim-side shape check in legendary_name.ts; the online server
+  // screens content). Without a name a promotion-eligible copy refuses with
+  // the needs-a-name line; an unperfected copy never reads the field.
+  perfectItem(ref: PerfectItemRef, name?: string): void;
   // The piece's Perfecting state as ONE shared view (rank, ranks, perfected,
-  // the gating craft and skill verdict, the bind, and the lock-aware material
-  // counts), or null when the ref resolves to no item. Both hosts build it
+  // the phase 13 `promoted` flag, the gating craft and skill verdict, the
+  // bind, and the lock-aware bill for the NEXT act: the attempt materials, or
+  // the promotion's Deed of Making once Perfected), or null when the ref
+  // resolves to no item. Both hosts build it
   // through the same pure function (perfectingInfoFrom): offline over live
   // PlayerMeta, online over the inventory/equipment/equipmentInstances/
   // craftingIdentity mirrors, so the two cannot drift. A pure read: no wire

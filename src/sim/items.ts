@@ -35,6 +35,7 @@ import {
   canEquipItem,
   canEquipItemInSlot,
   displacedSlotForEquip,
+  equipCandidateInstance,
   equipCandidateQuality,
   isUniqueEquipped,
   masterwroughtConflictSlot,
@@ -520,8 +521,19 @@ export function equipItem(
   // same item). The target slot and a displaced slot are exempt: both are
   // emptied by this swap, so the copy they hold never coexists with the
   // incoming one (the Titan Grip same-id NON-legendary pair stays legal).
+  // Instance-aware since phase 13: the worn payloads and the candidate copy's
+  // own payload ride along, so a promoted legendary-rolled copy counts on
+  // either side (the same candidate peek the sub-cap below makes).
   const ignoreSlots = displacedSlot ? [slot, displacedSlot] : [slot];
-  if (uniqueEquipConflictSlot(def, meta.equipment, (id) => ITEMS[id], ignoreSlots)) {
+  const uniqueConflict = uniqueEquipConflictSlot(
+    def,
+    meta.equipment,
+    (id) => ITEMS[id],
+    ignoreSlots,
+    meta.equipmentInstance,
+    equipCandidateInstance(meta.inventory, itemId),
+  );
+  if (uniqueConflict) {
     ctx.error(meta.entityId, 'You can only equip one of those.');
     return;
   }
@@ -672,7 +684,8 @@ export function benchDuplicateUniqueEquipped(meta: PlayerMeta): string[] {
     const itemId = meta.equipment[slot];
     if (!itemId) continue;
     const def = ITEMS[itemId];
-    if (!def || !isUniqueEquipped(def)) continue;
+    // Instance-aware (phase 13): a promoted legendary-rolled copy counts too.
+    if (!def || !isUniqueEquipped(def, meta.equipmentInstance?.[slot])) continue;
     const family = uniqueEquipFamily(def);
     if (!worn.has(family)) {
       worn.add(family);
