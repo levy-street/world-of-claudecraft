@@ -6644,7 +6644,7 @@ function supportedElevationLineOfSight(): Scenario {
 }
 
 // The Perfecting stage (Masterwrought phase 12): the apex rank walk through
-// the REAL Sim.perfectItem delegate (src/sim/professions/perfecting.ts
+// the REAL Sim.perfectItemAs delegate (src/sim/professions/perfecting.ts
 // resolvePerfectingAttempt) in BOTH target shapes the ref discriminates: a
 // BAGGED apex neck walked all the way to the Perfected stamp, and a WORN apex
 // ring attempted twice in place. Exists because perfecting.ts is a NEW draw
@@ -6722,7 +6722,7 @@ function perfectingWalk(seed = 1): Scenario {
       // is the denial's no-op baseline.
       meta.craftSkills.jewelcrafting = PERFECTING_SKILL_REQ - 1;
       rec.snapshot('perfect-staged');
-      sim.perfectItem(bagRef, pid);
+      sim.perfectItemAs(pid, bagRef);
       rec.snapshot('perfect-denied-skill');
 
       // Step 2: the BAGGED walk to Perfected. Each resolved attempt is one
@@ -6734,14 +6734,14 @@ function perfectingWalk(seed = 1): Scenario {
         baggedAttempts < PERFECTING_WALK_ATTEMPT_CAP &&
         meta.inventory[bagRef.bag]?.instance?.perfected !== true
       ) {
-        sim.perfectItem(bagRef, pid);
+        sim.perfectItemAs(pid, bagRef);
         baggedAttempts++;
       }
       rec.notes.baggedAttempts = baggedAttempts;
       rec.snapshot('perfect-bagged-walked');
 
       // Step 3: the post-stamp DENIAL, zero draws, nothing consumed.
-      sim.perfectItem(bagRef, pid);
+      sim.perfectItemAs(pid, bagRef);
       rec.snapshot('perfect-denied-perfected');
 
       // Step 4: the WORN shape. The ring equips through the ordinary resolver
@@ -6749,8 +6749,8 @@ function perfectingWalk(seed = 1): Scenario {
       // equipmentInstance copy in place: two draws, whatever they roll (four
       // successes are needed, so the ring can never stamp here).
       sim.equipItem(PERFECTING_WORN_APEX, pid);
-      sim.perfectItem({ slot: 'ring1' }, pid);
-      sim.perfectItem({ slot: 'ring1' }, pid);
+      sim.perfectItemAs(pid, { slot: 'ring1' });
+      sim.perfectItemAs(pid, { slot: 'ring1' });
       rec.snapshot('perfect-worn-attempted');
 
       // Step 5: the materials DENIAL. Removing the whole ember stack (a
@@ -6761,7 +6761,7 @@ function perfectingWalk(seed = 1): Scenario {
       rec.notes.emberBeforeStrip = sim.countItem('makers_ember', pid);
       sim.removeItem('makers_ember', sim.countItem('makers_ember', pid), pid);
       rec.snapshot('perfect-embers-stripped');
-      sim.perfectItem({ slot: 'ring1' }, pid);
+      sim.perfectItemAs(pid, { slot: 'ring1' });
       rec.snapshot('perfect-denied-materials');
     },
   };

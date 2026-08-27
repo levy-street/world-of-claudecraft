@@ -117,9 +117,29 @@ export function announceGatherRareEvent(
   noteReliquaryMark(ctx, finder, visitMark);
 }
 
+/** The ONE zone-celebration prologue every zone-wide celebration producer
+ *  runs (extracted 2026-08-27, rule of three: masterworkZone here,
+ *  attunedZone in attunement_events.ts, legendaryForgedZone in
+ *  perfecting.ts): resolve the celebrant entity, skip instance space
+ *  entirely (x past DUNGEON_X_THRESHOLD: an instanced celebrant keeps only
+ *  its personal event, deliberately), resolve the overworld zone, and fan
+ *  one pid-scoped copy per player in it through emitToZonePlayers above.
+ *  Draws NO rng, so a producer's position in its path cannot fork the
+ *  deterministic draw order. */
+export function announceZoneCelebration(
+  ctx: SimContext,
+  ownerPid: number,
+  build: (recipientPid: number, zoneId: string) => SimEvent,
+): void {
+  const ownerE = ctx.entities.get(ownerPid);
+  if (!ownerE || ownerE.pos.x > DUNGEON_X_THRESHOLD) return;
+  const zoneId = zoneAt(ownerE.pos.x, ownerE.pos.z).id;
+  emitToZonePlayers(ctx, zoneId, (recipientPid) => build(recipientPid, zoneId));
+}
+
 /** The zone-wide masterwork celebration copy. One pid-scoped
  *  masterworkZone event per overworld player in the crafter's zone, the
- *  crafter included, via the shared fanout above. Skipped entirely when the
+ *  crafter included, via the shared prologue above. Skipped entirely when the
  *  crafter is in instance space (instanced masterworks stay a personal toast,
  *  deliberately). Draws NO rng and must run AFTER the personal masterwork
  *  emit in Sim.craftItem, keeping the craft path's pinned single-draw
@@ -130,10 +150,7 @@ export function announceMasterworkZone(
   crafterName: string,
   proc: MasterworkProc,
 ): void {
-  const crafterE = ctx.entities.get(crafterPid);
-  if (!crafterE || crafterE.pos.x > DUNGEON_X_THRESHOLD) return;
-  const zoneId = zoneAt(crafterE.pos.x, crafterE.pos.z).id;
-  emitToZonePlayers(ctx, zoneId, (recipientPid) => ({
+  announceZoneCelebration(ctx, crafterPid, (recipientPid, zoneId) => ({
     type: 'masterworkZone',
     pid: recipientPid,
     crafterPid,

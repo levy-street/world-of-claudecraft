@@ -27,6 +27,7 @@ import { EMPTY_TEST_WORLD } from './sim_shared';
 
 const APEX_NECK = 'wyrmfall_pendant'; // apex jewelry, no class gate (jewelcrafting)
 const APEX_RING = 'warhewn_signet';
+const APEX_RING2 = 'prismglass_loop'; // second apex ring def (the sub-cap pair)
 const DEED = 'deed_of_making';
 const NAME = 'Sunrise Vow';
 const ALREADY_LINE = 'That work is already legendary.';
@@ -86,7 +87,7 @@ function walkToPerfected(
   ref: { bag: number; itemId: string } | { slot: 'neck' | 'ring1' },
 ): () => number {
   const draws = forceRoll(w.sim, 0);
-  for (let i = 0; i < PERFECTING_RANKS; i++) w.sim.perfectItem(ref, w.pid);
+  for (let i = 0; i < PERFECTING_RANKS; i++) w.sim.perfectItemAs(w.pid, ref);
   expect(draws(), 'the walk really resolved four attempts').toBe(PERFECTING_RANKS);
   const payload =
     'slot' in ref ? w.meta.equipmentInstance[ref.slot] : w.meta.inventory[ref.bag]?.instance;
@@ -157,7 +158,7 @@ describe('the promotion success path (the real producer end to end)', () => {
     const revBefore = meta.wireRev;
     sim.drainEvents();
 
-    sim.perfectItem(ref, pid, `  Sunrise   Vow `); // normalization runs end to end
+    sim.perfectItemAs(pid, ref, `  Sunrise   Vow `); // normalization runs end to end
     const events = sim.drainEvents() as SimEvent[];
 
     // ZERO draws across the whole promotion (the shared counter idiom).
@@ -207,7 +208,7 @@ describe('the promotion success path (the real producer end to end)', () => {
     sim.addItemInstance(APEX_NECK, { signer: 'Crafter' }, pid, 1);
     const ref = bagRefOf(meta, APEX_NECK);
     walkToPerfected(w, ref);
-    sim.perfectItem(ref, pid, NAME);
+    sim.perfectItemAs(pid, ref, NAME);
     expect(meta.inventory[ref.bag].instance?.rolled?.quality).toBe('legendary');
     const state = sim.serializeCharacter(pid);
     expect(state).toBeTruthy();
@@ -222,10 +223,10 @@ describe('the promotion success path (the real producer end to end)', () => {
     expect(loaded?.instance?.signer).toBe('Crafter');
   });
 
-  it('routes the IWorld (ref, name) call shape: a string second param is the name', () => {
-    // The facet is perfectItem(ref, name?) while the server entry is
-    // (ref, pid, name?): the Sim wrapper routes a string second param to the
-    // name and resolves the PRIMARY player, the offline-host shape.
+  it('routes the IWorld (ref, name) call shape onto the primary player', () => {
+    // The facet arm is perfectItem(ref, name?) resolving the PRIMARY player
+    // (the offline-host shape); the server's pid-explicit arm is
+    // perfectItemAs(pid, ref, name?), which every other case here drives.
     const w = promoter(73);
     const { sim, pid, meta } = w;
     sim.addItemInstance(APEX_NECK, {}, pid, 1);
@@ -236,7 +237,7 @@ describe('the promotion success path (the real producer end to end)', () => {
     expect(meta.inventory[ref.bag].instance?.name).toBe('Blade of Dawn');
   });
 
-  it('promotes a WORN Perfected copy in place, stats unmoved (no recalc needed)', () => {
+  it('promotes a WORN Perfected copy in place: stats unmoved, peer mirror rebuilt', () => {
     const w = promoter(74);
     const { sim, pid, meta, e } = w;
     sim.setPlayerLevel(20);
@@ -245,11 +246,57 @@ describe('the promotion success path (the real producer end to end)', () => {
     expect(meta.equipment.neck).toBe(APEX_NECK);
     walkToPerfected(w, { slot: 'neck' });
     const statsBefore = { int: e.stats.int, maxHp: e.maxHp, attackPower: e.attackPower };
-    sim.perfectItem({ slot: 'neck' }, pid, NAME);
+    sim.perfectItemAs(pid, { slot: 'neck' }, NAME);
     expect(meta.equipmentInstance.neck?.rolled?.quality).toBe('legendary');
     expect(meta.equipmentInstance.neck?.name).toBe(NAME);
     // Presentation only (R3): the wearer's derived stats never move.
     expect({ int: e.stats.int, maxHp: e.maxHp, attackPower: e.attackPower }).toEqual(statsBefore);
+    // But the worn promotion DOES rerun recalcPlayerStats: it is the ONE
+    // site the peer eqi mirror (Entity.equippedInstances) is rebuilt, so
+    // peers see the promoted name and quality at the moment, not at the
+    // next unrelated recalc (the 2026-08-27 review finding).
+    expect(e.equippedInstances.neck?.name).toBe(NAME);
+    expect(e.equippedInstances.neck?.rolled?.quality).toBe('legendary');
+  });
+
+  it('marks the legendary discovery at the stamp, and the deed lands the same tick', () => {
+    // The 2026-08-27 review: without a markItemDiscovered at the stamp site
+    // the quality:legendary mark (a real deed trigger, col_first_legendary)
+    // only landed at the NEXT LOGIN's retro seed pass.
+    const w = promoter(75);
+    const { sim, pid, meta } = w;
+    sim.addItemInstance(APEX_NECK, {}, pid, 1);
+    const ref = bagRefOf(meta, APEX_NECK);
+    const draws = walkToPerfected(w, ref);
+    const base = draws();
+    expect(meta.deedStats.visited.has('quality:legendary'), 'no mark before').toBe(false);
+    sim.perfectItemAs(pid, ref, NAME);
+    expect(meta.deedStats.visited.has('quality:legendary'), 'marked at the stamp').toBe(true);
+    expect(draws(), 'the mark costs zero draws').toBe(base);
+    // The dirty-key evaluator grants at the tick tail, not only after reload.
+    sim.tick();
+    expect(meta.deedsEarned.has('col_first_legendary')).toBe(true);
+  });
+
+  it('promotes a Perfected copy with NO rolled record: a stats-free { quality } mints', () => {
+    // The attempt only mints rolled when the R5 bonus is non-empty, so a
+    // Perfected payload with no rolled record is a legal input; the
+    // promotion must mint { quality: 'legendary' } cleanly, with no stats
+    // key, and readers must tolerate the stats-free record.
+    const w = promoter(76);
+    const { sim, pid, meta } = w;
+    sim.addItemInstance(APEX_NECK, { perfected: true, boundTo: pid }, pid, 1);
+    const ref = bagRefOf(meta, APEX_NECK);
+    const draws = forceRoll(sim, 0);
+    sim.perfectItemAs(pid, ref, NAME);
+    expect(draws(), 'zero draws across the promotion').toBe(0);
+    const after = meta.inventory[ref.bag].instance;
+    expect(after?.rolled, 'exactly the quality override, no stats key').toEqual({
+      quality: 'legendary',
+    });
+    expect(after?.name).toBe(NAME);
+    // A reader over the stats-free record: the unique rule counts the copy.
+    expect(isUniqueEquipped(ITEMS[APEX_NECK], after)).toBe(true);
   });
 });
 
@@ -279,16 +326,16 @@ describe('the promotion deny ladder: each arm red-direction, zero draws, nothing
 
   it('a missing name (undefined and empty) refuses with the needs-a-name line', () => {
     const w = walked(81);
-    w.sim.perfectItem(w.ref, w.pid);
+    w.sim.perfectItemAs(w.pid, w.ref);
     expectDenied(w, NEEDS_NAME_LINE, 2);
-    w.sim.perfectItem(w.ref, w.pid, '');
+    w.sim.perfectItemAs(w.pid, w.ref, '');
     expectDenied(w, NEEDS_NAME_LINE, 2);
   });
 
   it('a bad-shape name refuses with the inscription line', () => {
     const w = walked(82);
     for (const bad of ['1Blade', 'A', 'A'.repeat(MAX_LEGENDARY_NAME_LENGTH + 1), 'Bad_Name']) {
-      w.sim.perfectItem(w.ref, w.pid, bad);
+      w.sim.perfectItemAs(w.pid, w.ref, bad);
       expectDenied(w, BAD_NAME_LINE, 2);
     }
   });
@@ -301,7 +348,7 @@ describe('the promotion deny ladder: each arm red-direction, zero draws, nothing
     w.sim.removeItem(DEED, 2, w.pid);
     w.ref = bagRefOf(w.meta, APEX_NECK);
     w.sim.drainEvents();
-    w.sim.perfectItem(w.ref, w.pid, NAME);
+    w.sim.perfectItemAs(w.pid, w.ref, NAME);
     expectDenied(w, NEEDS_DEED_LINE, 0);
   });
 
@@ -311,7 +358,7 @@ describe('the promotion deny ladder: each arm red-direction, zero draws, nothing
     expect(deedSlot).toBeTruthy();
     if (deedSlot) deedSlot.instance = { locked: true };
     w.sim.drainEvents();
-    w.sim.perfectItem(w.ref, w.pid, NAME);
+    w.sim.perfectItemAs(w.pid, w.ref, NAME);
     expect(errorsOf(w.sim)).toEqual([LOCKED_LINE]);
     expect(w.draws()).toBe(w.base);
     expect(deedSlot?.instance?.locked, 'the locked stack is never spent').toBe(true);
@@ -320,10 +367,10 @@ describe('the promotion deny ladder: each arm red-direction, zero draws, nothing
 
   it('an already-legendary copy refuses with the already line, deed intact', () => {
     const w = walked(85);
-    w.sim.perfectItem(w.ref, w.pid, NAME);
+    w.sim.perfectItemAs(w.pid, w.ref, NAME);
     expect(w.sim.countItem(DEED, w.pid), 'the promotion itself spent one').toBe(1);
     w.sim.drainEvents();
-    w.sim.perfectItem(w.ref, w.pid, 'Second Name');
+    w.sim.perfectItemAs(w.pid, w.ref, 'Second Name');
     expect(errorsOf(w.sim)).toEqual([ALREADY_LINE]);
     expect(w.draws()).toBe(w.base);
     expect(w.sim.countItem(DEED, w.pid)).toBe(1);
@@ -334,7 +381,7 @@ describe('the promotion deny ladder: each arm red-direction, zero draws, nothing
     const w = walked(86);
     w.meta.craftSkills.jewelcrafting = PERFECTING_SKILL_REQ - 1;
     w.sim.drainEvents();
-    w.sim.perfectItem(w.ref, w.pid, NAME);
+    w.sim.perfectItemAs(w.pid, w.ref, NAME);
     expect(errorsOf(w.sim)).toEqual([
       'Perfecting that requires 125 skill in the craft that made it.',
     ]);
@@ -345,52 +392,132 @@ describe('the promotion deny ladder: each arm red-direction, zero draws, nothing
   it('a denial never bumps wireRev; the success pair is pinned above', () => {
     const w = walked(87);
     const revBefore = w.meta.wireRev;
-    w.sim.perfectItem(w.ref, w.pid); // needs-a-name
-    w.sim.perfectItem(w.ref, w.pid, '1Blade'); // bad shape
+    w.sim.perfectItemAs(w.pid, w.ref); // needs-a-name
+    w.sim.perfectItemAs(w.pid, w.ref, '1Blade'); // bad shape
     expect(w.meta.wireRev).toBe(revBefore);
   });
 });
 
 describe('the equip interplay: a promoted copy counts on BOTH rules', () => {
-  it('isUniqueEquipped is instance-aware; a def-legendary still counts with no instance', () => {
+  it('isUniqueEquipped is instance-aware but PROMOTION-SCOPED and add-only', () => {
     const ring = ITEMS[APEX_RING];
     expect(ring.quality).toBe('epic');
     expect(isUniqueEquipped(ring)).toBe(false);
-    expect(isUniqueEquipped(ring, { rolled: { quality: 'legendary' } })).toBe(true);
-    expect(isUniqueEquipped(ring, { rolled: { quality: 'epic' } })).toBe(false);
-    // A def-level legendary keeps its answer with no instance at all.
+    // A promoted copy (the promotion always stamps perfected first) counts.
+    expect(isUniqueEquipped(ring, { perfected: true, rolled: { quality: 'legendary' } })).toBe(
+      true,
+    );
+    // A LEGACY legendary-rolled payload (old masterwork bumps wrote
+    // rolled.quality; no perfected flag) does NOT: retroactively capturing
+    // it would bench live characters at their next login (the 2026-08-27
+    // scoping correction).
+    expect(isUniqueEquipped(ring, { rolled: { quality: 'legendary' } })).toBe(false);
+    expect(isUniqueEquipped(ring, { perfected: true, rolled: { quality: 'epic' } })).toBe(false);
+    // A def-level legendary keeps its answer with no instance at all, and a
+    // BELOW-def rolled quality can never remove def-level uniqueness
+    // (add-only, the sync reviewer's two-way-read finding).
     const defLegendary = { ...ring, id: 'qa_p13_def_legendary', quality: 'legendary' } as ItemDef;
     expect(isUniqueEquipped(defLegendary)).toBe(true);
+    expect(isUniqueEquipped(defLegendary, { rolled: { quality: 'epic' } })).toBe(true);
   });
 
-  it('a worn promoted copy refuses a second promoted copy of the SAME def (unique-equipped)', () => {
+  it('a BAGGED promotion of a duplicate-worn promoted id refuses per the unique rule', () => {
+    // The 2026-08-27 review: the promotion re-runs equip legality, so a
+    // second promoted copy of a worn promoted def is refused AT THE MINT
+    // (burning the deed and the name on a copy that could never be worn
+    // beside its twin would be the alternative). Zero draws, deed intact.
     const w = promoter(91);
     const { sim, pid, meta } = w;
     sim.setPlayerLevel(20);
     // First copy: the REAL walk, promoted, worn on ring1.
     sim.addItemInstance(APEX_RING, {}, pid, 1);
     const ref = bagRefOf(meta, APEX_RING);
-    walkToPerfected(w, ref);
-    sim.perfectItem(ref, pid, NAME);
+    const draws = walkToPerfected(w, ref);
+    sim.perfectItemAs(pid, ref, NAME);
     sim.equipItem(APEX_RING, pid);
     expect(meta.equipment.ring1).toBe(APEX_RING);
     expect(meta.equipmentInstance.ring1?.rolled?.quality).toBe('legendary');
+    const base = draws();
     // Second copy: hand-stamped Perfected (the one sanctioned shortcut, the
-    // suite's real-path fixture is the first copy), promoted through the REAL
-    // entry, then equipped toward the free finger.
+    // suite's real-path fixture is the first copy), promoted through the
+    // REAL entry while its promoted twin is worn.
     sim.addItemInstance(APEX_RING, { perfected: true, boundTo: pid }, pid, 1);
-    const ref2 = bagRefOf(meta, APEX_RING);
-    sim.perfectItem(ref2, pid, 'Second Oath');
-    // The consumed deed stack emptied and spliced out, shifting cells: find
-    // the promoted copy by payload rather than by the stale index.
-    const promoted = meta.inventory.find(
+    const idx2 = meta.inventory.findIndex(
+      (s) => s.itemId === APEX_RING && s.instance?.perfected === true,
+    );
+    expect(idx2).toBeGreaterThanOrEqual(0);
+    sim.drainEvents();
+    sim.perfectItemAs(pid, { bag: idx2, itemId: APEX_RING }, 'Second Oath');
+    expect(errorsOf(sim)).toEqual(['You can only equip one of those.']);
+    expect(draws(), 'zero draws on the deny arm').toBe(base);
+    expect(sim.countItem(DEED, pid), 'only the first promotion spent a deed').toBe(1);
+    const second = meta.inventory[idx2].instance;
+    expect(second?.rolled?.quality, 'the second copy stays unpromoted').toBeUndefined();
+    expect(second?.name).toBeUndefined();
+  });
+
+  it('two promoted copies minted apart (neither worn) still cannot be WORN together', () => {
+    // The unique rule scans WORN slots, so promoting two bagged copies of
+    // one def is legal while neither is worn; the equip path then refuses
+    // the second copy, judging the incoming unit's own payload.
+    const w = promoter(94);
+    const { sim, pid, meta } = w;
+    sim.setPlayerLevel(20);
+    sim.addItemInstance(APEX_RING, {}, pid, 1);
+    const ref = bagRefOf(meta, APEX_RING);
+    walkToPerfected(w, ref);
+    sim.perfectItemAs(pid, ref, NAME);
+    sim.addItemInstance(APEX_RING, { perfected: true, boundTo: pid }, pid, 1);
+    // Copy 1 stays bagged and promoted, so pick the still-unpromoted twin.
+    const idx2 = meta.inventory.findIndex(
+      (s) =>
+        s.itemId === APEX_RING &&
+        s.instance?.perfected === true &&
+        s.instance?.rolled?.quality !== 'legendary',
+    );
+    expect(idx2).toBeGreaterThanOrEqual(0);
+    sim.perfectItemAs(pid, { bag: idx2, itemId: APEX_RING }, 'Second Oath');
+    const promoted = meta.inventory.filter(
       (s) => s.itemId === APEX_RING && s.instance?.rolled?.quality === 'legendary',
     );
-    expect(promoted, 'the second copy really promoted').toBeTruthy();
+    expect(promoted.length, 'both copies really promoted').toBe(2);
+    sim.equipItem(APEX_RING, pid);
+    expect(meta.equipment.ring1).toBe(APEX_RING);
     sim.drainEvents();
     sim.equipItem(APEX_RING, pid);
     expect(errorsOf(sim)).toEqual(['You can only equip one of those.']);
     expect(meta.equipment.ring2, 'the free finger stays empty').toBeUndefined();
+  });
+
+  it('a WORN promotion refuses when another worn piece is already legendary (the sub-cap)', () => {
+    // The review probe: two worn apex rings, both Perfected; promoting both
+    // in place minted two worn legendaries past MASTERWROUGHT_LEGENDARY_CAP
+    // (and next login benchDuplicateUniqueEquipped... no, distinct defs:
+    // just an illegal worn set). The worn arm now answers the equip path's
+    // sub-cap with the copy's own slot excluded: the second promotion
+    // refuses with the equip path's exact literal, zero draws, deed intact.
+    const w = promoter(95);
+    const { sim, pid, meta } = w;
+    sim.setPlayerLevel(20);
+    sim.addItem(APEX_RING, 1, pid);
+    sim.addItem(APEX_RING2, 1, pid);
+    sim.equipItem(APEX_RING, pid);
+    sim.equipItem(APEX_RING2, pid);
+    expect(meta.equipment.ring1).toBe(APEX_RING);
+    expect(meta.equipment.ring2).toBe(APEX_RING2);
+    const draws = walkToPerfected(w, { slot: 'ring1' });
+    for (let i = 0; i < PERFECTING_RANKS; i++) w.sim.perfectItemAs(pid, { slot: 'ring2' });
+    expect(meta.equipmentInstance.ring2?.perfected).toBe(true);
+    sim.perfectItemAs(pid, { slot: 'ring1' }, NAME);
+    expect(meta.equipmentInstance.ring1?.rolled?.quality).toBe('legendary');
+    const base = draws();
+    sim.drainEvents();
+    sim.perfectItemAs(pid, { slot: 'ring2' }, 'Second Oath');
+    expect(errorsOf(sim)).toEqual(['You can only equip one legendary Masterwrought item.']);
+    expect(draws(), 'zero draws on the deny arm').toBe(base);
+    expect(sim.countItem(DEED, pid), 'only the first promotion spent a deed').toBe(1);
+    expect(meta.equipmentInstance.ring2?.rolled?.quality).toBeUndefined();
+    expect(meta.equipmentInstance.ring2?.name).toBeUndefined();
   });
 
   it('a worn promoted piece plus an ORDINARY Masterwrought piece stays legal inside cap 2', () => {
@@ -400,7 +527,7 @@ describe('the equip interplay: a promoted copy counts on BOTH rules', () => {
     sim.addItemInstance(APEX_NECK, {}, pid, 1);
     const ref = bagRefOf(meta, APEX_NECK);
     walkToPerfected(w, ref);
-    sim.perfectItem(ref, pid, NAME);
+    sim.perfectItemAs(pid, ref, NAME);
     sim.equipItem(APEX_NECK, pid);
     expect(meta.equipment.neck).toBe(APEX_NECK);
     sim.addItem(APEX_RING, 1, pid);
@@ -417,7 +544,7 @@ describe('the equip interplay: a promoted copy counts on BOTH rules', () => {
     sim.addItemInstance(APEX_NECK, {}, pid, 1);
     const ref = bagRefOf(meta, APEX_NECK);
     walkToPerfected(w, ref);
-    sim.perfectItem(ref, pid, NAME);
+    sim.perfectItemAs(pid, ref, NAME);
     sim.equipItem(APEX_NECK, pid);
     expect(meta.equipmentInstance.neck?.rolled?.quality).toBe('legendary');
     // A different apex def, hand-stamped Perfected and promoted for real:
@@ -425,7 +552,7 @@ describe('the equip interplay: a promoted copy counts on BOTH rules', () => {
     // the rule that answers.
     sim.addItemInstance(APEX_RING, { perfected: true, boundTo: pid }, pid, 1);
     const ref2 = bagRefOf(meta, APEX_RING);
-    sim.perfectItem(ref2, pid, 'Second Oath');
+    sim.perfectItemAs(pid, ref2, 'Second Oath');
     sim.drainEvents();
     sim.equipItem(APEX_RING, pid);
     expect(errorsOf(sim)).toEqual(['You can only equip one legendary Masterwrought item.']);

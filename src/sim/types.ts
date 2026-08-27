@@ -1481,8 +1481,10 @@ export interface ItemInstancePayload {
    *  self mirror. */
   perfected?: true;
   /** Player-chosen legendary name (Masterwrought phase 13, R3): stamped by the
-   *  orange promotion (professions/perfecting.ts resolveLegendaryPromotion)
-   *  alongside rolled.quality = 'legendary', on an already-Perfected copy only.
+   *  orange promotion (professions/perfecting.ts, the chain
+   *  resolvePerfectingAttempt -> resolveLegendaryPromotion ->
+   *  promotePerfectedCopy, the last being the stamp site) alongside
+   *  rolled.quality = 'legendary', on an already-Perfected copy only.
    *  Player-authored TEXT, always a VALUE and never an i18n key: standalone it
    *  renders raw through the entity-name path (esc, untranslated); composed
    *  lines interpolate it into a t() template (the feast/makers-mark
@@ -7642,8 +7644,9 @@ export type DeedStatKey =
   // fully handed in (interactions/ferry_bell.ts): the graduation moment.
   | 'tutorialGraduations'
   // Orange promotions performed (Masterwrought phase 13): bumped once per
-  // legendary promotion at the resolveLegendaryPromotion stamp site
-  // (professions/perfecting.ts), feeding prog_legendmaker.
+  // legendary promotion at the promotePerfectedCopy stamp site
+  // (professions/perfecting.ts, reached via resolvePerfectingAttempt ->
+  // resolveLegendaryPromotion), feeding prog_legendmaker.
   | 'legendariesForged';
 
 // The canonical counter key list (init/serialize iterate it in this fixed

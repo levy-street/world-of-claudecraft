@@ -1426,8 +1426,9 @@ export const PROFESSION_ITEMS: Record<string, ItemDef> = {
   // perfecting-bill family it takes the TRADABLE arm (the wyrmfall_core
   // shape: 'junk' reuse, quality above poor so sellAllJunk never touches it),
   // not the soulbound token arm, because an inscriptionist scribes it FOR the
-  // promoter; soulbound would dead-end the design. Price basis: input 313 vs
-  // output 50 (the recipe row spells the arithmetic).
+  // promoter; soulbound would dead-end the design. Price basis: input 553 on
+  // the sibling recipes' buyValue basis (buyValue where one exists, else
+  // sellValue) vs output 50 (the recipe row spells the arithmetic).
   deed_of_making: {
     id: 'deed_of_making',
     name: 'Deed of Making',

@@ -158,7 +158,7 @@ describe('the deny ladder: order, zero draws, zero consumption', () => {
     e.dead = true;
     const before = materialCounts(sim, pid);
     sim.drainEvents();
-    const draws = drawsDuring(sim, () => sim.perfectItem(bagRefOf(meta, APEX_NECK), pid));
+    const draws = drawsDuring(sim, () => sim.perfectItemAs(pid, bagRefOf(meta, APEX_NECK)));
     expect(errorsOf(sim)).toContain("You can't do that while dead.");
     expect(draws).toBe(0);
     expect(materialCounts(sim, pid)).toEqual(before);
@@ -179,7 +179,7 @@ describe('the deny ladder: order, zero draws, zero consumption', () => {
       { bag: staleCell, itemId: APEX_NECK },
       { slot: 'neck' as const },
     ]) {
-      const draws = drawsDuring(sim, () => sim.perfectItem(ref, pid));
+      const draws = drawsDuring(sim, () => sim.perfectItemAs(pid, ref));
       expect(draws, JSON.stringify(ref)).toBe(0);
       expect(errorsOf(sim), JSON.stringify(ref)).toEqual(["You don't have that item."]);
     }
@@ -197,7 +197,7 @@ describe('the deny ladder: order, zero draws, zero consumption', () => {
     const ref = bagRefOf(meta, APEX_NECK);
     sim.drainEvents();
     const draws = forceRoll(sim, 0);
-    sim.perfectItem(ref, pid);
+    sim.perfectItemAs(pid, ref);
     expect(draws(), 'the attempt resolved').toBe(1);
     // ONE drain for both assertions (draining for errors would eat the logs).
     const events = sim.drainEvents() as SimEvent[];
@@ -219,7 +219,7 @@ describe('the deny ladder: order, zero draws, zero consumption', () => {
     const { sim, pid, meta } = perfecter(14);
     sim.addItemInstance(NON_APEX, { perfected: true }, pid, 1);
     sim.drainEvents();
-    const draws = drawsDuring(sim, () => sim.perfectItem(bagRefOf(meta, NON_APEX), pid));
+    const draws = drawsDuring(sim, () => sim.perfectItemAs(pid, bagRefOf(meta, NON_APEX)));
     expect(draws).toBe(0);
     expect(errorsOf(sim)).toEqual(['Only Masterwrought items can be perfected.']);
   });
@@ -234,7 +234,7 @@ describe('the deny ladder: order, zero draws, zero consumption', () => {
     sim.addItemInstance(APEX_NECK, { perfected: true, boundTo: pid }, pid, 1);
     const before = materialCounts(sim, pid);
     sim.drainEvents();
-    const draws = drawsDuring(sim, () => sim.perfectItem(bagRefOf(meta, APEX_NECK), pid));
+    const draws = drawsDuring(sim, () => sim.perfectItemAs(pid, bagRefOf(meta, APEX_NECK)));
     expect(draws).toBe(0);
     expect(errorsOf(sim)).toEqual([
       'Perfecting that requires 125 skill in the craft that made it.',
@@ -250,7 +250,7 @@ describe('the deny ladder: order, zero draws, zero consumption', () => {
     sim.removeItem(EMBER, 8, pid);
     sim.addItem(APEX_NECK, 1, pid);
     sim.drainEvents();
-    const draws = drawsDuring(sim, () => sim.perfectItem(bagRefOf(meta, APEX_NECK), pid));
+    const draws = drawsDuring(sim, () => sim.perfectItemAs(pid, bagRefOf(meta, APEX_NECK)));
     expect(draws).toBe(0);
     const errs = errorsOf(sim);
     expect(errs).toEqual(['Perfecting that requires 125 skill in the craft that made it.']);
@@ -270,7 +270,7 @@ describe('the deny ladder: order, zero draws, zero consumption', () => {
     if (emberSlot) emberSlot.instance = { locked: true };
     const before = materialCounts(sim, pid);
     sim.drainEvents();
-    const draws = drawsDuring(sim, () => sim.perfectItem(bagRefOf(meta, APEX_NECK), pid));
+    const draws = drawsDuring(sim, () => sim.perfectItemAs(pid, bagRefOf(meta, APEX_NECK)));
     expect(draws).toBe(0);
     expect(errorsOf(sim)).toEqual(['A material needed for perfecting is locked.']);
     expect(materialCounts(sim, pid)).toEqual(before);
@@ -283,7 +283,7 @@ describe('the deny ladder: order, zero draws, zero consumption', () => {
     sim.addItem(APEX_NECK, 1, pid);
     sim.removeItem(SETTING, 8, pid);
     sim.drainEvents();
-    const draws = drawsDuring(sim, () => sim.perfectItem(bagRefOf(meta, APEX_NECK), pid));
+    const draws = drawsDuring(sim, () => sim.perfectItemAs(pid, bagRefOf(meta, APEX_NECK)));
     expect(draws).toBe(0);
     expect(errorsOf(sim)).toEqual(['You lack the materials to perfect that item.']);
   });
@@ -292,7 +292,7 @@ describe('the deny ladder: order, zero draws, zero consumption', () => {
     const { sim, pid, meta } = perfecter(19);
     sim.addItem(APEX_NECK, 1, pid);
     sim.drainEvents();
-    const draws = drawsDuring(sim, () => sim.perfectItem(bagRefOf(meta, APEX_NECK), pid));
+    const draws = drawsDuring(sim, () => sim.perfectItemAs(pid, bagRefOf(meta, APEX_NECK)));
     expect(draws, 'one draw per resolved attempt, the whole system').toBe(1);
     // ...and it really resolved: the bill was spent, whatever the outcome.
     expect(materialCounts(sim, pid)).toEqual([7, 7, 7]);
@@ -307,9 +307,9 @@ describe('the deny ladder: order, zero draws, zero consumption', () => {
     sim.addItem(APEX_NECK, 1, pid);
     const ref = bagRefOf(meta, APEX_NECK);
     const revBefore = meta.wireRev;
-    sim.perfectItem({ bag: 999, itemId: APEX_NECK }, pid);
+    sim.perfectItemAs(pid, { bag: 999, itemId: APEX_NECK });
     expect(meta.wireRev, 'a denial re-diffs nothing').toBe(revBefore);
-    sim.perfectItem(ref, pid);
+    sim.perfectItemAs(pid, ref);
     // Exactly TWO: the quest-resync hook's own bump (quest_credit.ts) plus
     // the module's payload-mutation bump. Deleting either fails this.
     expect(meta.wireRev, 'a resolved attempt re-diffs the self mirrors').toBe(revBefore + 2);
@@ -334,7 +334,7 @@ describe('the deny ladder: order, zero draws, zero consumption', () => {
       });
       sim.addItem(EMBER, 1, pid); // the add-side recompute credits 9 of 9
       expect(meta.questLog.get('__perfect_resync')?.counts).toEqual([9]);
-      sim.perfectItem(bagRefOf(meta, APEX_NECK), pid);
+      sim.perfectItemAs(pid, bagRefOf(meta, APEX_NECK));
       expect(
         meta.questLog.get('__perfect_resync')?.counts,
         'the spent ember un-credits through the consume hook',
@@ -354,7 +354,7 @@ describe('R2: the piece binds on the FIRST attempt, success and failure alike', 
     expect(meta.inventory[ref.bag].instance?.boundTo).toBeUndefined();
     sim.drainEvents();
     const draws = forceRoll(sim, 0.99); // at/over the chance: the fail arm
-    sim.perfectItem(ref, pid);
+    sim.perfectItemAs(pid, ref);
     expect(draws()).toBe(1);
     const slot = meta.inventory[ref.bag];
     expect(slot.instance?.boundTo, 'bound the moment Perfecting begins').toBe(meta.entityId);
@@ -372,9 +372,9 @@ describe('R2: the piece binds on the FIRST attempt, success and failure alike', 
     sim.addItem(APEX_NECK, 1, pid);
     const ref = bagRefOf(meta, APEX_NECK);
     forceRoll(sim, 0.99);
-    sim.perfectItem(ref, pid);
+    sim.perfectItemAs(pid, ref);
     sim.drainEvents();
-    sim.perfectItem(ref, pid);
+    sim.perfectItemAs(pid, ref);
     expect(noticesOf(sim)).toEqual(['The perfecting attempt fails; the materials are spent.']);
   });
 
@@ -384,7 +384,7 @@ describe('R2: the piece binds on the FIRST attempt, success and failure alike', 
     const ref = bagRefOf(meta, APEX_NECK);
     sim.drainEvents();
     const draws = forceRoll(sim, 0); // under the chance: the success arm
-    sim.perfectItem(ref, pid);
+    sim.perfectItemAs(pid, ref);
     expect(draws()).toBe(1);
     const slot = meta.inventory[ref.bag];
     expect(slot.instance?.boundTo).toBe(meta.entityId);
@@ -404,7 +404,7 @@ describe('R2: the piece binds on the FIRST attempt, success and failure alike', 
     const ref = bagRefOf(meta, APEX_NECK);
     sim.drainEvents();
     const draws = forceRoll(sim, PERFECTING_SUCCESS_CHANCE);
-    sim.perfectItem(ref, pid);
+    sim.perfectItemAs(pid, ref);
     expect(draws()).toBe(1);
     expect(meta.inventory[ref.bag].instance?.perfecting, 'no rank advanced').toBeUndefined();
     expect(noticesOf(sim)).toEqual([
@@ -421,7 +421,7 @@ describe('R2: the piece binds on the FIRST attempt, success and failure alike', 
     const ref = bagRefOf(meta, APEX_NECK);
     sim.drainEvents();
     forceRoll(sim, 0.99);
-    sim.perfectItem(ref, pid);
+    sim.perfectItemAs(pid, ref);
     const slot = meta.inventory[ref.bag];
     expect(slot.instance?.perfecting, 'the piece is never harmed').toBe(2);
     expect(slot.instance?.perfected).toBeUndefined();
@@ -437,7 +437,7 @@ describe('the rank walk to Perfected', () => {
     const ref = bagRefOf(meta, APEX_NECK);
     sim.drainEvents();
     const draws = forceRoll(sim, 0);
-    for (let i = 0; i < PERFECTING_RANKS; i++) sim.perfectItem(ref, pid);
+    for (let i = 0; i < PERFECTING_RANKS; i++) sim.perfectItemAs(pid, ref);
     expect(draws(), 'one draw per attempt').toBe(PERFECTING_RANKS);
     const slot = meta.inventory[ref.bag];
     expect(slot.instance?.perfecting, 'the track field is deleted at the top').toBeUndefined();
@@ -461,7 +461,7 @@ describe('the rank walk to Perfected', () => {
     // ladder (phase 13), which refuses for the missing name and spends
     // nothing; tests/orange_promotion.test.ts owns that ladder in full.
     sim.drainEvents();
-    sim.perfectItem(ref, pid);
+    sim.perfectItemAs(pid, ref);
     expect(errorsOf(sim)).toEqual(['That work needs a name to become a legend.']);
     expect(materialCounts(sim, pid)).toEqual([4, 4, 4]);
   });
@@ -472,7 +472,7 @@ describe('the rank walk to Perfected', () => {
     const ref = bagRefOf(meta, APEX_NECK);
     forceRoll(sim, 0);
     for (let i = 0; i < PERFECTING_RANKS - PERFECTING_HEADSTART_RANK; i++) {
-      sim.perfectItem(ref, pid);
+      sim.perfectItemAs(pid, ref);
     }
     const slot = meta.inventory[ref.bag];
     expect(slot.instance?.perfected).toBe(true);
@@ -487,7 +487,7 @@ describe('the rank walk to Perfected', () => {
     expect(meta.equipment.neck).toBe(APEX_NECK);
     const intBefore = e.stats.int;
     forceRoll(sim, 0);
-    for (let i = 0; i < PERFECTING_RANKS; i++) sim.perfectItem({ slot: 'neck' }, pid);
+    for (let i = 0; i < PERFECTING_RANKS; i++) sim.perfectItemAs(pid, { slot: 'neck' });
     expect(meta.equipmentInstance.neck?.perfected).toBe(true);
     expect(meta.equipmentInstance.neck?.rolled?.stats).toEqual({ int: 1 });
     expect(e.stats.int, 'the +1 int delta is live on the wearer').toBe(intBefore + 1);
@@ -688,8 +688,8 @@ describe('persistence: round-trips, pre-phase saves, and the load bound', () => 
     sim.addItem(APEX_NECK, 1, pid);
     const ref = bagRefOf(meta, APEX_NECK);
     forceRoll(sim, 0);
-    sim.perfectItem(ref, pid);
-    sim.perfectItem(ref, pid);
+    sim.perfectItemAs(pid, ref);
+    sim.perfectItemAs(pid, ref);
     expect(meta.inventory[ref.bag].instance?.perfecting).toBe(2);
     const state = sim.serializeCharacter(pid);
     expect(state).toBeTruthy();
@@ -711,7 +711,7 @@ describe('persistence: round-trips, pre-phase saves, and the load bound', () => 
     sim.addItem(APEX_NECK, 1, pid);
     sim.equipItem(APEX_NECK, pid);
     forceRoll(sim, 0);
-    for (let i = 0; i < PERFECTING_RANKS; i++) sim.perfectItem({ slot: 'neck' }, pid);
+    for (let i = 0; i < PERFECTING_RANKS; i++) sim.perfectItemAs(pid, { slot: 'neck' });
     expect(meta.equipmentInstance.neck?.perfected).toBe(true);
     const liveInt = (sim.entities.get(pid) as Entity).stats.int;
     const state = sim.serializeCharacter(pid);
@@ -801,7 +801,7 @@ describe('the phase 01 cap interlock: a Perfected piece still counts', () => {
     // Perfect the worn neck outright (forced successes): the cap counts
     // def-level masterwrought, so the Perfected piece must still count.
     forceRoll(sim, 0);
-    for (let i = 0; i < PERFECTING_RANKS; i++) sim.perfectItem({ slot: 'neck' }, pid);
+    for (let i = 0; i < PERFECTING_RANKS; i++) sim.perfectItemAs(pid, { slot: 'neck' });
     expect(meta.equipmentInstance.neck?.perfected).toBe(true);
     sim.drainEvents();
     sim.equipItem(APEX_RING2, pid);
@@ -960,7 +960,7 @@ describe('the R5 merge is ADDITIVE, the two-hand line is priced, and failure lea
     );
     const ref = bagRefOf(meta, APEX_NECK);
     forceRoll(sim, 0);
-    for (let i = 0; i < PERFECTING_RANKS; i++) sim.perfectItem(ref, pid);
+    for (let i = 0; i < PERFECTING_RANKS; i++) sim.perfectItemAs(pid, ref);
     const copy = meta.inventory[ref.bag];
     expect(copy.instance?.perfected).toBe(true);
     // The neck's R5 record is { int: 1 } (the shipped literal pinned above):
@@ -1000,7 +1000,7 @@ describe('the R5 merge is ADDITIVE, the two-hand line is priced, and failure lea
     const beforeInstance = JSON.stringify(meta.equipmentInstance.ring1);
     const beforeStats = { maxHp: e.maxHp, attackPower: e.attackPower };
     forceRoll(sim, 0.99);
-    sim.perfectItem({ slot: 'ring1' }, pid);
+    sim.perfectItemAs(pid, { slot: 'ring1' });
     expect(noticesOf(sim)).toContain('The perfecting attempt fails; the materials are spent.');
     expect(JSON.stringify(meta.equipmentInstance.ring1), 'the payload is untouched').toBe(
       beforeInstance,
@@ -1034,7 +1034,7 @@ describe('perfectedBonusStats null arms and the mixed shortfall', () => {
     sim.removeItem(ESSENCE, sim.countItem(ESSENCE, pid), pid);
     sim.drainEvents();
     const before = materialCounts(sim, pid);
-    const draws = drawsDuring(sim, () => sim.perfectItem(bagRefOf(meta, APEX_NECK), pid));
+    const draws = drawsDuring(sim, () => sim.perfectItemAs(pid, bagRefOf(meta, APEX_NECK)));
     expect(draws).toBe(0);
     // The locked line is reserved for the case where UNLOCKING alone would
     // satisfy the bill; with the essence genuinely gone it would mislead.

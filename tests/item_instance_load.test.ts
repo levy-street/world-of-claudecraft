@@ -71,6 +71,19 @@ describe('sanitizeItemInstancePayloadOnLoad: identity on legal data', () => {
     expect(out.payload).toEqual(legalPayload());
   });
 
+  it('keeps a STATS-FREE rolled record byte-identical (the promotion mint shape)', () => {
+    // The orange promotion of a Perfected copy whose attempt never minted
+    // rolled (the R5 bonus can be empty) writes exactly
+    // { quality: 'legendary' }: no stats key at all. The load bound must
+    // pass it untouched (phase 13, 2026-08-27 review).
+    const payload = { perfected: true, rolled: { quality: 'legendary' }, name: 'Sunrise Vow' };
+    const before = JSON.stringify(payload);
+    const out = sanitizeItemInstancePayloadOnLoad(payload);
+    expect(out.dropped).toEqual([]);
+    expect(out.payload).toBe(payload);
+    expect(JSON.stringify(out.payload)).toBe(before);
+  });
+
   it('keeps unknown keys inside the bounds (the forward-compatibility arm)', () => {
     // Payload fields accrete over releases and the merge predicate compares
     // every present key, so silently dropping a field this binary does not

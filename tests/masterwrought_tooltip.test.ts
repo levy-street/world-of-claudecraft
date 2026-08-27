@@ -64,12 +64,17 @@ describe('masterwrought tag on the item tooltip', () => {
   });
 
   it('a promoted (legendary-rolled) copy of an EPIC def earns the unique tag from its instance', () => {
-    // Masterwrought phase 13: isUniqueEquipped reads EFFECTIVE quality, so
-    // the tooltip tag follows the copy, not just the def. The def-only render
-    // of the same epic piece stays tag-free, which is what makes this arm
-    // instance-driven rather than a restatement of the case above.
-    const html = harness().itemTooltip(FLAGGED_RING, false, { rolled: { quality: 'legendary' } });
+    // Masterwrought phase 13: isUniqueEquipped is instance-aware, so the
+    // tooltip tag follows the copy, not just the def. 2026-08-27 scoping
+    // correction: the widening is PROMOTION-SCOPED (perfected + legendary
+    // rolled, the orange promotion's own mint), so a LEGACY rolled-only
+    // payload stays tag-free like the def-only render, which is what makes
+    // this arm instance-driven rather than a restatement of the case above.
+    const promoted: ItemInstancePayload = { perfected: true, rolled: { quality: 'legendary' } };
+    const html = harness().itemTooltip(FLAGGED_RING, false, promoted);
     expect(html).toContain('tt-unique');
     expect(harness().itemTooltip(FLAGGED_RING, false)).not.toContain('tt-unique');
+    const legacy = harness().itemTooltip(FLAGGED_RING, false, { rolled: { quality: 'legendary' } });
+    expect(legacy).not.toContain('tt-unique');
   });
 });

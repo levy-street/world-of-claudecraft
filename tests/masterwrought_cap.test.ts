@@ -3,6 +3,7 @@ import { bagCapacity } from '../src/sim/bags';
 import { ITEMS } from '../src/sim/data';
 import {
   equipCandidateIndex,
+  equipCandidateInstance,
   equipCandidateQuality,
   MASTERWROUGHT_EQUIP_CAP,
   MASTERWROUGHT_LEGENDARY_CAP,
@@ -288,6 +289,36 @@ describe('equip unit selection (pure equipment_rules)', () => {
       { itemId: 'pure_selection_ring', count: 1, instance: { rolled: { quality: 'legendary' } } },
     ];
     expect(equipCandidateQuality(rolled, 'pure_selection_ring', def)).toBe('legendary');
+  });
+
+  it('an explicit slotIndex naming a valid cell judges exactly that copy', () => {
+    // The 2026-08-27 review: the consume honors slotIndex, so the peek must
+    // judge the SAME cell, in both directions (a promoted copy under a
+    // plain one, and a plain copy under a promoted one).
+    const inventory = [
+      { itemId: 'pure_selection_ring', count: 1, instance: { rolled: { quality: 'legendary' } } },
+      { itemId: 'other', count: 1 },
+      { itemId: 'pure_selection_ring', count: 1 },
+    ];
+    expect(equipCandidateIndex(inventory, 'pure_selection_ring', 0)).toBe(0);
+    expect(equipCandidateQuality(inventory, 'pure_selection_ring', def, 0)).toBe('legendary');
+    expect(equipCandidateInstance(inventory, 'pure_selection_ring', 0)).toBe(inventory[0].instance);
+    expect(equipCandidateQuality(inventory, 'pure_selection_ring', def, 2)).toBe('epic');
+    expect(equipCandidateInstance(inventory, 'pure_selection_ring', 2)).toBeUndefined();
+  });
+
+  it('an invalid slotIndex falls back to the highest-index rule, never another cell', () => {
+    const inventory = [
+      { itemId: 'pure_selection_ring', count: 1, instance: { rolled: { quality: 'legendary' } } },
+      { itemId: 'other', count: 1 },
+      { itemId: 'pure_selection_ring', count: 1 },
+    ];
+    // Wrong id at the named cell, out of range, negative, fractional: each
+    // answers the id-only walk (index 2, the plain copy).
+    for (const bad of [1, 99, -1, 0.5]) {
+      expect(equipCandidateIndex(inventory, 'pure_selection_ring', bad), String(bad)).toBe(2);
+      expect(equipCandidateQuality(inventory, 'pure_selection_ring', def, bad)).toBe('epic');
+    }
   });
 });
 
@@ -809,15 +840,16 @@ describe('masterwrought sub-cap reads the copy being worn', () => {
     // This block used to document the deliberate disagreement recorded in
     // equipment_rules.ts (the unique-equipped rule read DEF quality only, so
     // a legendary-ROLLED copy of an epic def was never unique-equipped).
-    // 2026-08-27, phase 13: the orange promotion mints the first legal
-    // legendary-rolled instance and the phase file's acceptance requires
-    // BOTH rules to count it, so isUniqueEquipped is instance-aware now and
-    // the disagreement is retired. The BEHAVIOR here still holds: the rolled
-    // copy equips BESIDE A PLAIN COPY of its own id (the worn plain copy is
-    // not legendary-effective, so no family conflict exists; a second ROLLED
-    // copy is what the unique rule now refuses, pinned in
-    // tests/orange_promotion.test.ts), and once worn its live payload is
-    // what the sub-cap counts.
+    // 2026-08-27, phase 13: the orange promotion mints legendary-rolled
+    // instances (NOT the first legal ones, as this comment first claimed:
+    // legacy masterwork bumps wrote rolled.quality too, crafting.ts says
+    // so; corrected 2026-08-27), and isUniqueEquipped is instance-aware for
+    // PROMOTION-STAMPED (`perfected`) copies only, so a legacy rolled-only
+    // payload like this fixture's stays outside the unique rule (a second
+    // PROMOTED copy is what it refuses, pinned in
+    // tests/orange_promotion.test.ts). The BEHAVIOR here still holds: the
+    // rolled copy equips BESIDE A PLAIN COPY of its own id, and once worn
+    // its live payload is what the sub-cap counts.
     const sim = makeWarrior(7112);
     grant(sim, RING_ID);
     sim.equipItemToSlot(RING_ID, 'ring1');
@@ -838,6 +870,65 @@ describe('masterwrought sub-cap reads the copy being worn', () => {
     sim.equipItemToSlot(EMBER_ID, 'ring1');
     expect(tickErrors(sim)).toContain(LEGENDARY_ERROR);
     expect({ ...sim.equipment }).toEqual(before);
+  });
+
+  it('a slotIndex naming a LOWER-index promoted copy is judged as that copy (refused)', () => {
+    // The 2026-08-27 review probe: the consume honors slotIndex while the
+    // peek judged the highest-index copy, so naming a promoted copy sitting
+    // UNDER a plain one equipped the promoted unit past the sub-cap (a
+    // second worn legendary). The peek now judges the named cell.
+    const sim = makeWarrior(7119);
+    const meta = sim.meta(sim.playerId)!;
+    meta.autoEquip = false;
+    grant(sim, EMBER_ID);
+    sim.equipItem(EMBER_ID);
+    sim.tick();
+    expect(sim.equipment.ring1).toBe(EMBER_ID);
+
+    // The promoted copy first (lower index), a plain copy on top.
+    sim.addItemInstance(AMULET_ID, { perfected: true, rolled: { quality: 'legendary' } });
+    grant(sim, AMULET_ID);
+    const promotedIdx = meta.inventory.findIndex(
+      (s) => s.itemId === AMULET_ID && s.instance?.rolled?.quality === 'legendary',
+    );
+    expect(promotedIdx).toBeGreaterThanOrEqual(0);
+    sim.tick();
+
+    sim.equipItem(AMULET_ID, { slotIndex: promotedIdx });
+    expect(tickErrors(sim)).toContain(LEGENDARY_ERROR);
+    expect(sim.equipment.neck).toBeUndefined();
+    expect(sim.countItem(AMULET_ID), 'nothing consumed on the refusal').toBe(2);
+  });
+
+  it('a slotIndex naming a PLAIN copy equips even when a promoted copy sits highest', () => {
+    // The mirror direction: the id-only peek judged the highest-index
+    // (promoted) copy and falsely refused the plain unit the player named.
+    const sim = makeWarrior(7120);
+    const meta = sim.meta(sim.playerId)!;
+    meta.autoEquip = false;
+    grant(sim, EMBER_ID);
+    sim.equipItem(EMBER_ID);
+    sim.tick();
+    expect(sim.equipment.ring1).toBe(EMBER_ID);
+
+    // The plain copy first (lower index), the promoted copy on top.
+    grant(sim, AMULET_ID);
+    const plainIdx = meta.inventory.findIndex(
+      (s) => s.itemId === AMULET_ID && s.instance === undefined,
+    );
+    expect(plainIdx).toBeGreaterThanOrEqual(0);
+    sim.addItemInstance(AMULET_ID, { perfected: true, rolled: { quality: 'legendary' } });
+    sim.tick();
+
+    sim.equipItem(AMULET_ID, { slotIndex: plainIdx });
+    expect(tickErrors(sim)).toHaveLength(0);
+    expect(sim.equipment.neck).toBe(AMULET_ID);
+    expect(sim.equipmentInstances.neck?.rolled?.quality).toBeUndefined();
+    // The promoted copy stays in the bags, untouched.
+    const promoted = meta.inventory.find(
+      (s) => s.itemId === AMULET_ID && s.instance?.rolled?.quality === 'legendary',
+    );
+    expect(promoted).toBeDefined();
   });
 });
 

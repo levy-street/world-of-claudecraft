@@ -9208,16 +9208,16 @@ export class Sim {
   }
 
   // Perfecting plus the phase 13 promotion: thin delegates onto
-  // professions/perfecting.ts, behind the shared profession-action dead gate
-  // (dead_gate.ts). The second param is the IWorld facet's optional NAME when
-  // a host calls the (ref, name?) shape and the pid when the server calls
-  // (ref, pid, name?): a pid is always a number, so one string check routes
-  // both. perfectingInfo is the SAME shared view builder ClientWorld
-  // consumes (perfectingInfoFrom), so the hosts cannot drift.
-  perfectItem(ref: PerfectItemRef, pid?: number | string, name?: string): void {
-    const byName = typeof pid === 'string';
-    if (refusedWhileDead(this.ctx, byName ? undefined : pid)) return;
-    resolvePerfectingAttempt(this.ctx, byName ? undefined : pid, ref, byName ? pid : name);
+  // professions/perfecting.ts behind the shared dead gate (dead_gate.ts); the
+  // IWorld (ref, name?) arm, then the server's pid-explicit perfectItemAs.
+  perfectItem(ref: PerfectItemRef, name?: string): void {
+    if (refusedWhileDead(this.ctx, undefined)) return;
+    resolvePerfectingAttempt(this.ctx, undefined, ref, name);
+  }
+
+  perfectItemAs(pid: number, ref: PerfectItemRef, name?: string): void {
+    if (refusedWhileDead(this.ctx, pid)) return;
+    resolvePerfectingAttempt(this.ctx, pid, ref, name);
   }
 
   perfectingInfo(ref: PerfectItemRef, pid?: number): PerfectingInfoView | null {

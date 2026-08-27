@@ -3178,16 +3178,22 @@ export const DEEDS: Record<string, DeedDef> = {
     trigger: { kind: 'stat', stat: 'tutorialGraduations', count: 1 },
   },
   // THE PACKET'S CAPSTONE (masterwrought Phase 13): the first legendary. The
-  // stat is bumped once per orange promotion at the resolveLegendaryPromotion
-  // site (professions/perfecting.ts): a Perfected apex copy plus one Deed of
-  // Making plus a valid player-chosen name, raised to legendary presentation.
+  // stat is bumped once per orange promotion at the promotePerfectedCopy
+  // stamp site (professions/perfecting.ts, reached via
+  // resolvePerfectingAttempt -> resolveLegendaryPromotion): a Perfected apex
+  // copy plus one Deed of Making plus a valid player-chosen name, raised to
+  // legendary presentation.
   //
   // Renown 50 is the deliberate-prestige band (deeds.md rule 7: sub-1%
   // unlocks are deliberate prestige only), and positive Renown is legitimate
   // under rule 2 because the earn is EFFORT-gated, not luck-gated: the
   // fail-forward Perfecting rank track paces the road here (roughly five
   // weeks at one Maker's Ember per week), and the promotion act itself never
-  // rolls, the prog_masterwright precedent.
+  // rolls, the prog_masterwright precedent. Double prog_masterwright's 25
+  // deliberately: this is the packet's capstone, a roughly five-week paced
+  // chain stacked ON TOP of the masterwork moment that deed already rewards,
+  // so it sits in rule 7's top prestige band while staying zero-rng on the
+  // act itself.
   //
   // NO title and no border, deliberately: R3 gives the prestige to the ITEM
   // (the named legendary IS the trophy), and a title deed would also force

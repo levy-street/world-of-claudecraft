@@ -2057,9 +2057,11 @@ export const INSCRIPTION_RECIPES: ProfessionRecipeRecord[] = [
   // teachable service any 125 inscriptionist sells. The bill is the consumed-
   // capstone idiom (the apex feast shape): 3 of the craft's own intermediate,
   // ONE Wyrmfall Core because the output is spent, plus the craft's gathered
-  // family (the voidbound grimoire's own lines). Input 313 (vellum 3x45, core
-  // 50, sunpetal 2x40, essence 2x18, vial 12) vs output 50. NOT oncePerDay:
-  // promotion pacing lives in the Perfected walk, never in a craft gate.
+  // family (the voidbound grimoire's own lines). Input 553 on the sibling
+  // recipes' buyValue basis (buyValue where one exists, else sellValue:
+  // vellum 3x45=135, core 50, sunpetal 2x160=320, essence 2x18=36, vial 12)
+  // vs output 50. NOT oncePerDay: promotion pacing lives in the Perfected
+  // walk, never in a craft gate.
   {
     id: 'recipe_deed_of_making',
     professionId: 'inscription',

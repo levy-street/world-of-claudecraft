@@ -138,13 +138,15 @@ const build = await buildItemArtAudit({
     // ip-16-ICON declaration, taking it to 80; and masterwrought Phase 13's
     // Deed of Making parks its one id under the same declaration, taking it
     // to 81 (one def minted, the same one parked, so liveItemCount holds at
-    // 928 and catalogCount at 913 by the cancellation below).
+    // 928, the Phase 13-era value, and catalogCount at 913 by the
+    // cancellation below).
     // liveItemCount is unmoved by any of that, which is the point of the
     // split, and the 11k arithmetic is worth spelling out because "net plus
     // four" appears on BOTH terms and they are different sums. Live ITEMS defs
     // went up four (six minted, two deleted). The debt went up four (the same
     // six parked, the same two unparked). liveItemCount is defs MINUS debt, so
-    // it holds at 922: an artless def joining the park moves the debt term and
+    // it held at 922, the 11k-era value (later phases moved it to the 928
+    // above): an artless def joining the park moves the debt term and
     // the def count together and cancels out of this one.
     pendingArtCount: 81,
     generatedHeroicDefinitions: 64,

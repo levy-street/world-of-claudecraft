@@ -523,7 +523,9 @@ export function equipItem(
   // incoming one (the Titan Grip same-id NON-legendary pair stays legal).
   // Instance-aware since phase 13: the worn payloads and the candidate copy's
   // own payload ride along, so a promoted legendary-rolled copy counts on
-  // either side (the same candidate peek the sub-cap below makes).
+  // either side (the same candidate peek the sub-cap below makes). The peek
+  // carries the caller's slotIndex so it judges EXACTLY the copy the consume
+  // below will lift, never the highest-index one when they differ.
   const ignoreSlots = displacedSlot ? [slot, displacedSlot] : [slot];
   const uniqueConflict = uniqueEquipConflictSlot(
     def,
@@ -531,7 +533,7 @@ export function equipItem(
     (id) => ITEMS[id],
     ignoreSlots,
     meta.equipmentInstance,
-    equipCandidateInstance(meta.inventory, itemId),
+    equipCandidateInstance(meta.inventory, itemId, slotIndex),
   );
   if (uniqueConflict) {
     ctx.error(meta.entityId, 'You can only equip one of those.');
@@ -539,17 +541,18 @@ export function equipItem(
   }
   // Masterwrought is a COUNTED family rather than a per-item one: at most two
   // flagged pieces worn and at most one of those legendary. The incoming
-  // quality is peeked off the exact copy the consume below will lift, so a
-  // legendary copy sitting under a plain one in the bags cannot slip past the
-  // sub-cap. Same ignoreSlots as the unique rule: a swap that empties a slot
-  // cannot conflict with what it puts there.
+  // quality is peeked off the exact copy the consume below will lift (the
+  // caller's slotIndex threads through, so a named lower-index promoted copy
+  // is judged as itself), so a legendary copy sitting under a plain one in
+  // the bags cannot slip past the sub-cap. Same ignoreSlots as the unique
+  // rule: a swap that empties a slot cannot conflict with what it puts there.
   const masterwroughtConflict = masterwroughtConflictSlot(
     def,
     meta.equipment,
     (id) => ITEMS[id],
     ignoreSlots,
     meta.equipmentInstance,
-    def.masterwrought ? equipCandidateQuality(meta.inventory, itemId, def) : undefined,
+    def.masterwrought ? equipCandidateQuality(meta.inventory, itemId, def, slotIndex) : undefined,
   );
   if (masterwroughtConflict) {
     // Two plain calls, each on ONE physical line: once biome wraps a call it
