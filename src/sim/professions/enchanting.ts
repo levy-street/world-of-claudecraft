@@ -60,7 +60,7 @@ import { ENCHANTS, type EnchantDef } from '../content/enchants';
 import { ENCHANT_FAMILY_CAST_DURATION_SEC } from '../content/professions';
 import { ITEMS } from '../data';
 import { recalcPlayerStats } from '../entity';
-import { consumeSelectedInventorySlot, itemCopyPin, newestMatchingSlot } from '../item_copy_ref';
+import { consumeSelectedInventorySlot, itemCopyPin } from '../item_copy_ref';
 import { requiredLevelFor } from '../item_level_req';
 import { forceDismount } from '../mounts';
 import type { Rng } from '../rng';
@@ -737,7 +737,10 @@ export interface ApplyEnchantResult {
  *  removeEnchantableItem's victim, modeled by consumeOneScratch with the
  *  isEnchantedInstance exclusion over a scratch copy, the SAME mirror the
  *  #2350 capacity gate trusts (#2139: a model must match the remover it
- *  stands in for). A plain fungible victim reads as undefined. Shared by the
+ *  stands in for). A plain fungible victim reads as undefined. The peek is
+ *  non-consuming for QUANTITIES only (the walk runs on a scratch copy of the
+ *  slots); the returned payload is the slot's LIVE object by reference, so
+ *  callers treat it as read-only. Shared by the
  *  Perfected guard below and the Apply Enchant picker's bagged candidate scan
  *  (src/ui/enchant_apply_view.ts), so the row a player sees and the copy the
  *  sim judges are one selection by construction. */

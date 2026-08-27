@@ -4,7 +4,8 @@
 // Sim.addPlayer), the bank inventory (bank.ts sanitizeBankState), the guild
 // bank store (guild_bank.ts sanitizeGuildBankState), and the two persisted
 // escrow books (item_instance_transfer.ts sanitizeEscrowSlot for mail
-// attachments and market collections, plus market.ts's listing arm). Phase 16's first cut clamped only `signer`, and only on two of the
+// attachments and market collections, plus market.ts's listing arm).
+// Phase 16's first cut clamped only `signer`, and only on two of the
 // character containers, so a signed copy loaded through the bank or the
 // buyback list kept an unbounded name, and every OTHER payload string
 // stayed unbounded everywhere. A
