@@ -4,7 +4,10 @@
 // module's injectable seams, so the parts that decide anything are exercised in
 // plain Node. What is pinned: the gzip round trip a corpus survives between
 // sessions, the skip reasons (a warm-up must cost nothing when it cannot apply),
-// the pacing (one program per frame, never a block), and the three wiring points
+// the pacing (one program per frame, never a block), the two calls that decide
+// whether the browser's cache is filled with the keys the game will ask for
+// (the location-0 attribute bind, replayed from the record, and the LINK_STATUS
+// read that resolves a completed parallel link), and the three wiring points
 // in src/main.ts, which is where the whole feature is either armed or dead.
 import { readFileSync } from 'node:fs';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
@@ -53,44 +56,68 @@ interface FakeGl {
   FRAGMENT_SHADER: number;
   RENDERER: number;
   SHADER_TYPE: number;
-  linked: { vertex: string; fragment: string }[];
+  LINK_STATUS: number;
+  ACTIVE_ATTRIBUTES: number;
+  linked: { vertex: string; fragment: string; index0Attribute: string }[];
+  linkStatusReads: number;
   deletedPrograms: number;
   deletedShaders: number;
   lost: boolean;
   parallelCompile: boolean;
+  missingExtensions: string[];
+  attributes: string[];
   attached: FakeShader[];
 }
 
-function fakeGl(options: { parallelCompile?: boolean } = {}): FakeGl & WarmupGl {
+function fakeGl(
+  options: { parallelCompile?: boolean; missingExtensions?: string[] } = {},
+): FakeGl & WarmupGl {
   const gl = {
     VERTEX_SHADER: 1,
     FRAGMENT_SHADER: 2,
     RENDERER: 3,
     SHADER_TYPE: 4,
-    linked: [] as { vertex: string; fragment: string }[],
+    LINK_STATUS: 5,
+    ACTIVE_ATTRIBUTES: 6,
+    linked: [] as { vertex: string; fragment: string; index0Attribute: string }[],
+    linkStatusReads: 0,
     deletedPrograms: 0,
     deletedShaders: 0,
     lost: false,
     parallelCompile: options.parallelCompile ?? true,
+    missingExtensions: options.missingExtensions ?? [],
+    // The active attributes of every recorded program, `position` at index 0.
+    attributes: ['position', 'uv'],
     attached: [] as FakeShader[],
     createShader: (type: number) => ({ type, source: '' }),
     shaderSource: (shader: FakeShader, source: string) => {
       shader.source = source;
     },
     compileShader: () => {},
-    createProgram: () => ({ shaders: [] as FakeShader[] }),
+    createProgram: () => ({ shaders: [] as FakeShader[], bound: '' }),
     attachShader: (program: { shaders: FakeShader[] }, shader: FakeShader) => {
       program.shaders.push(shader);
     },
-    getProgramParameter: (program: { polls?: number }, _pname: number) => {
+    bindAttribLocation: (program: { bound: string }, index: number, name: string) => {
+      if (index === 0) program.bound = name;
+    },
+    getProgramParameter: (program: { polls?: number }, pname: number) => {
+      if (pname === gl.ACTIVE_ATTRIBUTES) return gl.attributes.length;
+      if (pname === gl.LINK_STATUS) {
+        gl.linkStatusReads += 1;
+        return true;
+      }
       // Complete on the second poll, so a test can see a pending link survive one frame.
       program.polls = (program.polls ?? 0) + 1;
       return program.polls >= 2;
     },
-    linkProgram: (program: { shaders: FakeShader[] }) => {
+    getActiveAttrib: (_program: unknown, index: number) =>
+      index < gl.attributes.length ? { name: gl.attributes[index] } : null,
+    getAttribLocation: (_program: unknown, name: string) => gl.attributes.indexOf(name),
+    linkProgram: (program: { shaders: FakeShader[]; bound: string }) => {
       const vertex = program.shaders.find((s) => s.type === 1)?.source ?? '';
       const fragment = program.shaders.find((s) => s.type === 2)?.source ?? '';
-      gl.linked.push({ vertex, fragment });
+      gl.linked.push({ vertex, fragment, index0Attribute: program.bound });
     },
     deleteShader: () => {
       gl.deletedShaders += 1;
@@ -99,6 +126,7 @@ function fakeGl(options: { parallelCompile?: boolean } = {}): FakeGl & WarmupGl 
       gl.deletedPrograms += 1;
     },
     getExtension: (name: string) => {
+      if (gl.missingExtensions.includes(name)) return null;
       if (name === 'KHR_parallel_shader_compile') return gl.parallelCompile ? {} : null;
       if (name === 'WEBGL_debug_renderer_info') return { UNMASKED_RENDERER_WEBGL };
       if (name === 'EXT_color_buffer_float') return {};
@@ -121,7 +149,7 @@ function fakeGl(options: { parallelCompile?: boolean } = {}): FakeGl & WarmupGl 
 }
 
 function corpusRecord(
-  programs: { vertex: string; fragment: string }[],
+  programs: { vertex: string; fragment: string; index0Attribute: string }[],
   extensions: string[] = ENABLED,
 ): ShaderCorpusRecord {
   return createShaderCorpusRecord({
@@ -131,13 +159,18 @@ function corpusRecord(
       adapter: ADAPTER,
       extensions,
     }),
+    extensions,
     savedAt: 1_700_000_000_000,
     contextAttributes: { antialias: false },
     sources: programs,
   });
 }
 
-const program = (n: number) => ({ vertex: `void vertex${n}(){}`, fragment: `void frag${n}(){}` });
+const program = (n: number) => ({
+  vertex: `void vertex${n}(){}`,
+  fragment: `void frag${n}(){}`,
+  index0Attribute: 'position',
+});
 
 async function storeWith(
   record: ShaderCorpusRecord | null,
@@ -173,6 +206,7 @@ describe('the corpus round trip', () => {
       Array.from({ length: 50 }, (_, i) => ({
         vertex: `#version 300 es\n${'precision highp float;\n'.repeat(40)}// ${i}`,
         fragment: `#version 300 es\n${'precision highp float;\n'.repeat(40)}// f${i}`,
+        index0Attribute: 'position',
       })),
     );
     const raw = new TextEncoder().encode(JSON.stringify(bulky)).byteLength;
@@ -210,8 +244,12 @@ describe('startShaderWarmup', () => {
     search?: string;
     tier?: string;
     parallelCompile?: boolean;
+    missingExtensions?: string[];
   }) => {
-    const gl = fakeGl({ parallelCompile: options.parallelCompile });
+    const gl = fakeGl({
+      parallelCompile: options.parallelCompile,
+      missingExtensions: options.missingExtensions,
+    });
     const frames: (() => void)[] = [];
     const cancelled: number[] = [];
     let contexts = 0;
@@ -290,6 +328,60 @@ describe('startShaderWarmup', () => {
     ctx.runFrames(1);
     expect(shaderWarmupStats().resolved).toBe(3);
     expect(ctx.frames).toHaveLength(0);
+  });
+
+  it('replays the attribute bind the game linked its own programs with', async () => {
+    // three binds location 0 to `position` on every program that has it, and
+    // that bind is part of the browser's program cache key: a warm-up that
+    // links the same GLSL without it fills the cache with keys the world entry
+    // never asks for (measured on an RTX 3090: 143 programs linked at the
+    // reveal, the count of a cold entry, against 157 to 164 with the bind).
+    const ctx = await run({ record: corpusRecord([program(1), program(2)]) });
+    ctx.runFrames(2);
+    expect(ctx.gl.linked.map((entry) => entry.index0Attribute)).toEqual(['position', 'position']);
+  });
+
+  it('binds nothing for a program recorded without an attribute at location 0', async () => {
+    const unbound = { vertex: 'void v(){}', fragment: 'void f(){}', index0Attribute: '' };
+    const ctx = await run({ record: corpusRecord([unbound]) });
+    ctx.runFrames(1);
+    expect(ctx.gl.linked).toEqual([unbound]);
+  });
+
+  it('resolves a completed link with a LINK_STATUS read, and not before', async () => {
+    // The completion query answers without resolving the link, and an
+    // unresolved link never reaches the browser's cache.
+    const ctx = await run({ record: corpusRecord([program(1), program(2)]) });
+    ctx.runFrames(2);
+    expect(ctx.gl.linkStatusReads).toBe(0);
+    // The fake completes on the second poll: one round leaves both pending.
+    ctx.runFrames(1);
+    expect(ctx.gl.linkStatusReads).toBe(0);
+    ctx.runFrames(1);
+    expect(shaderWarmupStats().resolved).toBe(2);
+    expect(ctx.gl.linkStatusReads).toBe(2);
+  });
+
+  it('skips a corpus whose extension set the warm-up context cannot reproduce', async () => {
+    // The world context enabled one name this context refuses: every shader
+    // would translate differently, so the corpus describes keys this session
+    // will not ask for. The reason names the extensions, not the identity the
+    // same list is folded into.
+    const ctx = await run({
+      record: corpusRecord([program(1)], [...ENABLED, 'WEBGL_multisampled_render_to_texture']),
+    });
+    expect(shaderWarmupStats().skipped).toBe('extension-mismatch');
+    expect(ctx.gl.linked).toHaveLength(0);
+    expect(ctx.disposed()).toBe(1);
+  });
+
+  it('skips when the warm-up context refuses an extension the corpus recorded', async () => {
+    const ctx = await run({
+      record: corpusRecord([program(1)]),
+      missingExtensions: ['EXT_color_buffer_float'],
+    });
+    expect(shaderWarmupStats().skipped).toBe('extension-mismatch');
+    expect(ctx.gl.linked).toHaveLength(0);
   });
 
   it('skips with no corpus stored, and creates no context at all', async () => {
@@ -402,12 +494,32 @@ describe('recordShaderCorpus', () => {
     // Both entries carry the same sources: the corpus keeps one.
     expect(count).toBe(1);
     const decoded = await decodeCorpus(values.get(shaderWarmupInternalsForTest.corpusKey));
+    // Including the attribute the linked program carries at location 0, which
+    // the replay has to bind again for the program key to match.
     expect(decoded?.programs).toEqual([program(1)]);
+    expect(decoded?.extensions).toEqual(ENABLED);
     expect(decoded?.savedAt).toBe(42);
     expect(decoded?.contextAttributes).toEqual({ antialias: false, alpha: true });
     expect(decoded?.identity).toBe(
       shaderCorpusIdentity({ buildId: BUILD, tier: TIER, adapter: ADAPTER, extensions: ENABLED }),
     );
+  });
+
+  it('records an empty bind when the program has no attribute at location 0', async () => {
+    const gl = fakeGl();
+    gl.attributes = ['uv', 'position'];
+    gl.attached = [
+      { type: gl.VERTEX_SHADER, source: 'void vertex1(){}' },
+      { type: gl.FRAGMENT_SHADER, source: 'void frag1(){}' },
+    ];
+    const values = new Map<string, unknown>();
+    await recordShaderCorpus(renderer(gl, [{ program: {} }]), {
+      store: createMemoryStore(values),
+      buildId: BUILD,
+      tier: TIER,
+    });
+    const decoded = await decodeCorpus(values.get(shaderWarmupInternalsForTest.corpusKey));
+    expect(decoded?.programs[0]?.index0Attribute).toBe('uv');
   });
 
   it('never throws at its caller when the context refuses', async () => {

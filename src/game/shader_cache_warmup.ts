@@ -43,6 +43,7 @@ import {
   type WarmupPlan,
   type WarmupSkipReason,
   warmupApplies,
+  warmupExtensionsMatch,
 } from '../render/shader_warmup_core';
 
 declare const __APP_BUILD_ID__: string;
@@ -67,11 +68,13 @@ export interface WarmupGl {
   VERTEX_SHADER: number;
   FRAGMENT_SHADER: number;
   RENDERER: number;
+  LINK_STATUS: number;
   createShader(type: number): WebGLShader | null;
   shaderSource(shader: WebGLShader, source: string): void;
   compileShader(shader: WebGLShader): void;
   createProgram(): WebGLProgram | null;
   attachShader(program: WebGLProgram, shader: WebGLShader): void;
+  bindAttribLocation(program: WebGLProgram, index: number, name: string): void;
   linkProgram(program: WebGLProgram): void;
   deleteShader(shader: WebGLShader): void;
   deleteProgram(program: WebGLProgram): void;
@@ -83,6 +86,9 @@ export interface WarmupGl {
 /** The extra surface the RECORDING side reads off the world context. */
 export interface CorpusGl extends WarmupGl {
   SHADER_TYPE: number;
+  ACTIVE_ATTRIBUTES: number;
+  getActiveAttrib(program: WebGLProgram, index: number): { name: string } | null;
+  getAttribLocation(program: WebGLProgram, name: string): number;
   getAttachedShaders(program: WebGLProgram): WebGLShader[] | null;
   getShaderParameter(shader: WebGLShader, pname: number): unknown;
   getShaderSource(shader: WebGLShader): string | null;
@@ -373,9 +379,14 @@ function submitProgram(gl: WarmupGl, sources: ShaderProgramSources): void {
   gl.compileShader(fragment);
   gl.attachShader(program, vertex);
   gl.attachShader(program, fragment);
-  // No LINK_STATUS query here: it would make the off-thread link synchronous.
-  // The completion poll in the frame loop resolves each link once it is done,
-  // which is what puts the program into the browser's cache (measured
+  // The bind three made before ITS link, replayed here: the program cache key
+  // carries the explicit attribute-location bindings, so the same GLSL linked
+  // without this bind lands under a key the game never asks for (see the WHY
+  // THE ATTRIBUTE BIND note in ../render/shader_warmup_core).
+  if (sources.index0Attribute) gl.bindAttribLocation(program, 0, sources.index0Attribute);
+  // No LINK_STATUS query at submission: it would make the off-thread link
+  // synchronous. The frame loop reads it only once the completion query says
+  // the link is done, and a resolved link is what the browser caches (measured
   // 2026-08-28: an unresolved parallel link never reaches the cache).
   gl.linkProgram(program);
   session.programs.push(program);
@@ -394,6 +405,12 @@ function resolveCompletedLinks(gl: WarmupGl): void {
     let done = false;
     try {
       done = gl.getProgramParameter(program, COMPLETION_STATUS_KHR) === true;
+      // The completion query answers WITHOUT resolving the link; the first
+      // LINK_STATUS read is what resolves it, and a resolved link is what the
+      // browser caches. It costs nothing here because the link is already done
+      // (measured on the 3090 rig: 164 programs linked at the reveal with this
+      // read against 157 without it).
+      if (done) gl.getProgramParameter(program, gl.LINK_STATUS);
     } catch {
       done = true;
     }
@@ -430,6 +447,8 @@ async function runWarmup(options: StartShaderWarmupOptions): Promise<void> {
     enabled: query.enabled,
     parallelCompile: sweep?.parallelCompile ?? false,
     hasCorpus,
+    extensionsMatch:
+      record !== null && sweep !== null && warmupExtensionsMatch(record.extensions, sweep.enabled),
     identityMatches: record !== null && record.identity === identity,
   });
   if (!decision.applies || !record || !context) {
@@ -532,6 +551,18 @@ export interface RecordShaderCorpusOptions {
   now?: () => number;
 }
 
+/** The attribute the linked program carries at location 0. three binds
+ *  `position` there on every program that has it, and that bind is part of the
+ *  program cache key, so the replay has to make the same one. */
+function index0AttributeOf(gl: CorpusGl, program: WebGLProgram): string {
+  const count = Number(gl.getProgramParameter(program, gl.ACTIVE_ATTRIBUTES) ?? 0);
+  for (let i = 0; i < count; i++) {
+    const attribute = gl.getActiveAttrib(program, i);
+    if (attribute && gl.getAttribLocation(program, attribute.name) === 0) return attribute.name;
+  }
+  return '';
+}
+
 function programSourcesOf(gl: CorpusGl, entries: readonly unknown[]): ShaderProgramSources[] {
   const sources: ShaderProgramSources[] = [];
   for (const entry of entries) {
@@ -546,7 +577,13 @@ function programSourcesOf(gl: CorpusGl, entries: readonly unknown[]): ShaderProg
       if (gl.getShaderParameter(shader, gl.SHADER_TYPE) === gl.VERTEX_SHADER) vertex = source;
       else fragment = source;
     }
-    if (vertex && fragment) sources.push({ vertex, fragment });
+    if (vertex && fragment) {
+      sources.push({
+        vertex,
+        fragment,
+        index0Attribute: index0AttributeOf(gl, program as WebGLProgram),
+      });
+    }
   }
   return sources;
 }
@@ -568,6 +605,7 @@ export async function recordShaderCorpus(
         adapter: adapterStringOf(gl),
         extensions: sweep.enabled,
       }),
+      extensions: sweep.enabled,
       savedAt: (options.now ?? (() => Date.now()))(),
       contextAttributes: gl.getContextAttributes(),
       sources: programSourcesOf(gl, entries),
