@@ -335,6 +335,97 @@ describe('shell startup polish pins (electron/main.cjs)', () => {
     ).toBe(1);
   });
 
+  it('decides and applies the Linux GPU backend after the GPU force, before app ready', () => {
+    // The backend switches are read at app 'ready' like the discrete-GPU
+    // switches, so the block has to sit at module scope between the force call
+    // and whenReady; it also reads the prefs and the env, so the prefs load and
+    // the escape-hatch derivation must precede it. One call site each, so a
+    // second decision cannot silently override this one.
+    const decideAt = code.indexOf('const gpuBackendLaunch = decideGpuBackendLaunch({');
+    const applyAt = code.indexOf('applyGpuBackendSwitches(app, gpuBackendLaunch);');
+    const forceAt = code.indexOf('forceHighPerformanceGpu({ app, log });');
+    const loadAt = code.indexOf('loadDesktopPrefs(desktopPrefsPath)');
+    const ready = code.indexOf('app.whenReady()');
+    expect(decideAt, 'the backend launch decision is gone').toBeGreaterThan(-1);
+    expect(applyAt, 'the backend switches are no longer applied').toBeGreaterThan(-1);
+    expect(loadAt).toBeLessThan(decideAt);
+    expect(forceAt).toBeLessThan(decideAt);
+    expect(decideAt).toBeLessThan(applyAt);
+    expect(applyAt).toBeLessThan(ready);
+    expect(count(code, 'decideGpuBackendLaunch({')).toBe(1);
+    expect(count(code, 'applyGpuBackendSwitches(')).toBe(1);
+    // The decision is fed the real process facts and the live prefs object.
+    const decision = code.slice(decideAt, code.indexOf('});', decideAt)).replace(/\s+/g, ' ');
+    expect(decision).toContain('platform: process.platform,');
+    expect(decision).toContain('env: process.env,');
+    expect(decision).toContain('prefs: desktopPrefs,');
+    // And the one log line a support ticket greps for.
+    expect(code).toMatch(
+      /`\[gpu\] backend launch: \$\{gpuBackendLaunch\.backend\} \(\$\{gpuBackendLaunch\.reason\}\)`/,
+    );
+  });
+
+  it('settles the Vulkan trial once, through one function fed by both evidence sources', () => {
+    // The verdict handling has ONE shape (settleVulkanTrial): it runs once per
+    // process (a crash-recovery reload lands on the post-crash fallback, not
+    // the trial), stores before it commits, logs the evidence, and a failed
+    // trial relaunches then exits. Both evidence sources call it: the
+    // getGPUInfo reading in logGpuStatus and the game's renderer report.
+    const defAt = code.indexOf('function settleVulkanTrial(glRenderer, softwareRendering) {');
+    expect(defAt, 'settleVulkanTrial is gone').toBeGreaterThan(-1);
+    expect(count(code, 'function settleVulkanTrial(')).toBe(1);
+    const settleEnd = code.indexOf('\n}', defAt);
+    const settle = code.slice(defAt, settleEnd).replace(/\s+/g, ' ');
+    expect(settle).toContain('if (gpuBackendLaunch.trial !== true || vulkanTrialJudged) return;');
+    expect(settle).toContain('vulkanTrialJudged = true;');
+    expect(count(code, 'vulkanTrialJudged = true;')).toBe(1);
+    expect(code.indexOf('let vulkanTrialJudged = false;')).toBeLessThan(defAt);
+    expect(settle).toContain(
+      'const vulkanVerdict = judgeVulkanLaunch({ glRenderer, softwareRendering });',
+    );
+    expect(settle).toContain(
+      'if (saveDesktopPrefs(desktopPrefsPath, { ...desktopPrefs, vulkanVerdict })) { desktopPrefs.vulkanVerdict = vulkanVerdict; }',
+    );
+    expect(settle).toMatch(
+      /`\[gpu\] vulkan trial verdict: \$\{vulkanVerdict\}`, \{ glRenderer, softwareRendering \}/,
+    );
+    expect(settle).toContain("if (vulkanVerdict === 'failed') { log.warn(");
+    expect(settle).toContain('if (relaunchAfterFailedTrial({ log })) { app.exit(0); return; }');
+    // The relaunch lives in the settle function and nowhere else.
+    expect(count(code, 'relaunchAfterFailedTrial(')).toBe(1);
+    expect(code.indexOf('relaunchAfterFailedTrial(')).toBeGreaterThan(defAt);
+    expect(code.indexOf('relaunchAfterFailedTrial(')).toBeLessThan(settleEnd);
+
+    // Caller one: logGpuStatus, after the desktop-gpu-status push, and ONLY when
+    // the getGPUInfo reading carries evidence. An empty renderer string with no
+    // software flag (the healthy Linux Vulkan reading) must not judge, so it
+    // cannot relaunch: it logs the waiting line and leaves the trial pending.
+    const start = code.indexOf('function logGpuStatus()');
+    const body = code.slice(start, code.indexOf('\n}', start));
+    const sendAt = body.indexOf("webContents.send('desktop-gpu-status'");
+    const flat = body.replace(/\s+/g, ' ');
+    expect(sendAt).toBeGreaterThan(-1);
+    expect(flat).toContain(
+      'if (hasGetGpuInfoEvidence(aux)) { settleVulkanTrial(aux.glRenderer, aux.softwareRendering); } else if (gpuBackendLaunch.trial === true && !vulkanTrialJudged) { log.info(',
+    );
+    expect(body.indexOf('hasGetGpuInfoEvidence(aux)')).toBeGreaterThan(sendAt);
+    expect(body).toContain(
+      "[gpu] vulkan trial: waiting for the renderer's report (no renderer string from getGPUInfo)",
+    );
+    expect(count(body, 'settleVulkanTrial(')).toBe(1);
+    expect(body).not.toContain('relaunchAfterFailedTrial(');
+    expect(body).not.toContain('judgeVulkanLaunch(');
+
+    // Caller two: the renderer's own report (body pinned in
+    // tests/electron_ipc_channels.test.ts). The definition plus exactly two
+    // call sites in all.
+    const reportAt = code.indexOf("ipcMain.on('desktop-report-gpu-renderer'");
+    expect(reportAt).toBeGreaterThan(-1);
+    const report = code.slice(reportAt, code.indexOf('\n});', reportAt));
+    expect(report).toContain('settleVulkanTrial(renderer.slice(0, 256), false);');
+    expect(count(code, 'settleVulkanTrial(')).toBe(3);
+  });
+
   it('constructs the window at the restored geometry rather than resizing it after', () => {
     // Applying saved bounds after construction would create the window at the
     // default size first, so the reveal on 'ready-to-show' could catch a resize

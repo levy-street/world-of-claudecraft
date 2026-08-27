@@ -40,12 +40,14 @@ describe('electron IPC channel contract (preload <-> main)', () => {
         'desktop-app-quit',
         'desktop-gamepad-activity',
         'desktop-get-display-mode',
+        'desktop-get-gpu-backend',
         'desktop-get-gpu-force-opt-out',
         'desktop-login-open-browser',
         'desktop-login-take-code',
         'desktop-set-discord-activity',
         'desktop-set-discord-presence-enabled',
         'desktop-set-display-mode',
+        'desktop-set-gpu-backend',
         'desktop-set-gpu-force-opt-out',
         'desktop-set-strings',
         'desktop-show-notification',
@@ -67,6 +69,7 @@ describe('electron IPC channel contract (preload <-> main)', () => {
     const sent = matches(preload, /ipcRenderer\.send\('([^']+)'/g);
     const listened = matches(mainSide, /ipcMain\.on\('([^']+)'/g);
     expect([...sent]).toContain('desktop-renderer-error');
+    expect([...sent]).toContain('desktop-report-gpu-renderer');
     for (const channel of sent) {
       expect(listened, `no ipcMain.on for sent channel ${channel}`).toContain(channel);
     }
@@ -168,6 +171,45 @@ describe('electron IPC channel contract (preload <-> main)', () => {
     const getter = main.slice(getterAt, main.indexOf('\n});', getterAt));
     expect(getter, 'the getter must report the STORED value, not a live GPU reading').toContain(
       'return desktopPrefs.gpuForceOptOut === true;',
+    );
+  });
+
+  it('the gpu-backend setter takes only a listed setting, persists, then commits', () => {
+    // The stored setting decides which GL backend the next launch forces on
+    // Linux, and 'auto' re-arms one Vulkan trial by resetting the verdict, so
+    // a junk value must not reach the file and the mirror must follow the
+    // write, never lead it.
+    const main = read('electron/main.cjs');
+    const start = main.indexOf("ipcMain.handle('desktop-set-gpu-backend'");
+    expect(start).toBeGreaterThan(-1);
+    const body = main.slice(start, main.indexOf('\n});', start));
+    expect(body).toContain('if (!GPU_BACKEND_SETTINGS.includes(value)) return false;');
+    // The WHOLE record, spread from the live module-scope object (the
+    // anti-clobber contract with the other savers), the setting, and the
+    // verdict reset that only a real switch back to 'auto' triggers (the game
+    // re-pushes its stored value at every boot; a same-value write must not
+    // re-arm the trial, or every launch would trial anew).
+    const save = body.replace(/\s+/g, ' ');
+    expect(save).toContain(
+      "const rearmTrial = value === 'auto' && desktopPrefs.gpuBackend !== 'auto';",
+    );
+    expect(save).toContain(
+      "if ( !saveDesktopPrefs(desktopPrefsPath, { ...desktopPrefs, gpuBackend: value, vulkanVerdict: rearmTrial ? 'untested' : desktopPrefs.vulkanVerdict, }) ) {",
+    );
+    const saveAt = body.indexOf('saveDesktopPrefs(desktopPrefsPath,');
+    const commitAt = body.indexOf('desktopPrefs.gpuBackend = value;');
+    const verdictAt = body.indexOf(
+      "desktopPrefs.vulkanVerdict = rearmTrial ? 'untested' : desktopPrefs.vulkanVerdict;",
+    );
+    expect(commitAt).toBeGreaterThan(saveAt);
+    expect(verdictAt).toBeGreaterThan(saveAt);
+    expect(body.slice(commitAt)).toContain('return true;');
+
+    const getterAt = main.indexOf("ipcMain.handle('desktop-get-gpu-backend'");
+    expect(getterAt).toBeGreaterThan(-1);
+    const getter = main.slice(getterAt, main.indexOf('\n});', getterAt)).replace(/\s+/g, ' ');
+    expect(getter, 'the getter must report the STORED values plus platform support').toContain(
+      "return { setting: desktopPrefs.gpuBackend, verdict: desktopPrefs.vulkanVerdict, supported: process.platform === 'linux', };",
     );
   });
 
@@ -582,6 +624,10 @@ describe('electron IPC channel contract (preload <-> main)', () => {
       'onDisplayChanged',
       'getGpuForceOptOut',
       'setGpuForceOptOut',
+      'getGpuBackend',
+      'setGpuBackend',
+      'hasGpuBackendChoice',
+      'reportGpuRenderer',
       'getDisplayMode',
       'setDisplayMode',
       'notifyGamepadActivity',
@@ -601,6 +647,44 @@ describe('electron IPC channel contract (preload <-> main)', () => {
     ]) {
       expect(preload, `preload is missing bridge method ${method}`).toContain(`${method}:`);
     }
+  });
+
+  it('the gpu-renderer report is a gated, string-only feed into the trial settle', () => {
+    // A send, not an invoke: nothing is answered. The body is pinned because the
+    // trusted-sender gate scan above covers ipcMain.handle registrations only,
+    // and a report from a stray frame could otherwise write a trial verdict.
+    const main = read('electron/main.cjs');
+    const start = main.indexOf("ipcMain.on('desktop-report-gpu-renderer'");
+    expect(start).toBeGreaterThan(-1);
+    const body = main.slice(start, main.indexOf('\n});', start)).replace(/\s+/g, ' ');
+    expect(body).toContain('if (!trustedSender(event)) return;');
+    expect(body.indexOf('trustedSender(event)')).toBeLessThan(body.indexOf('settleVulkanTrial('));
+    // Strings only, never empty (no evidence, like an empty getGPUInfo reading),
+    // and the game's own report is by definition not Chromium's software flag.
+    expect(body).toContain("if (typeof renderer !== 'string' || renderer === '') return;");
+    expect(body).toContain('settleVulkanTrial(renderer.slice(0, 256), false);');
+    expect(body).not.toContain('event.reply');
+    expect(body).not.toContain('return true');
+  });
+
+  it('the preload exposes the gpu-backend pair with the shapes the client calls', () => {
+    // The game side calls exactly these two names on window.wocDesktop; the
+    // setter stringifies so a non-string never crosses the bridge, and main
+    // does the whitelist check.
+    expect(preload).toContain(
+      "getGpuBackend: () => ipcRenderer.invoke('desktop-get-gpu-backend'),",
+    );
+    expect(preload).toContain(
+      "setGpuBackend: (value) => ipcRenderer.invoke('desktop-set-gpu-backend', String(value)),",
+    );
+    // The renderer report: a capped string over a send, so a hostile page can
+    // neither ship an unbounded payload nor learn anything back.
+    expect(preload.replace(/\s+/g, ' ')).toContain(
+      "reportGpuRenderer: (renderer) => ipcRenderer.send('desktop-report-gpu-renderer', String(renderer).slice(0, 256)),",
+    );
+    // The platform answer is a synchronous VALUE, not a round trip: the
+    // options row is gated on it when the window opens.
+    expect(preload).toContain("hasGpuBackendChoice: process.platform === 'linux',");
   });
 
   it('exposes app quit as an argument-free capability', () => {

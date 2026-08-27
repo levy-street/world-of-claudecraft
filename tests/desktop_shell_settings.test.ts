@@ -38,6 +38,9 @@ function bridgeRecorder() {
       calls.push(`set:discordPresence=${enabled}`);
       return Promise.resolve(true);
     },
+    reportGpuRenderer: (renderer: string) => {
+      calls.push(`report:${renderer.slice(0, 5)}`);
+    },
   } as unknown as DesktopBridge;
   return { bridge, calls };
 }
@@ -61,8 +64,13 @@ describe('syncDesktopShellSettings', () => {
       constructed.push(1);
       return { set: () => 0 } as never;
     });
-    // Every getter was called synchronously in the same tick.
-    expect(calls).toEqual(['get:gpuForceOptOut', 'get:gpuBackend', 'get:displayMode']);
+    // The renderer report first (when the boot probe has a string; none in
+    // this Node run), then every getter, all synchronously in the same tick.
+    expect(calls.filter((call) => !call.startsWith('report:'))).toEqual([
+      'get:gpuForceOptOut',
+      'get:gpuBackend',
+      'get:displayMode',
+    ]);
     await new Promise((r) => setTimeout(r, 0));
     expect(constructed.length).toBeGreaterThan(0);
   });

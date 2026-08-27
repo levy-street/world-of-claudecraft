@@ -87,6 +87,98 @@ and runs in every CI test pass.
 Build each OS on its own runner (mac artifacts on macOS, Windows artifacts on Windows,
 Linux artifacts on Linux). Cross-building is not part of this runbook.
 
+## Running the desktop app locally
+
+`npm run electron:dev` (`scripts/electron-dev.mjs`) is the whole dev loop: it starts
+Vite with the desktop env baked in (`VITE_DESKTOP_APP`, the API origin, relative API
+paths), builds the gitignored `electron/vendor` bundles the main process requires, then
+launches Electron against the dev server. No `npm run build` is needed; the shell loads
+the live Vite page and reloads with it. Env vars that matter on that command line:
+
+- `VITE_DESKTOP_API_ORIGIN`: the API origin the shell talks to (default: production).
+  `VITE_DESKTOP_API_ORIGIN=http://localhost:8787 npm run electron:dev` runs against a
+  local `npm run server`.
+- `WOC_DISTRIBUTION=website|steam|epic`: try a channel unpacked (see above).
+- `WOC_DISABLE_GPU_FORCE=1`: skip every GPU lever for this launch (the discrete-GPU
+  force on all platforms, the Linux PRIME relaunch, and the Linux GPU backend switches).
+- `WOC_GPU_BACKEND=vulkan|opengl`: force the Linux GL backend for this launch, no trial
+  and no relaunch (see "GPU backend on Linux" below).
+
+Where the shell writes: `main.log` (the rotating shell log, `electron/logging.cjs`)
+and `desktop-prefs.json` (the shell's own prefs store, `electron/desktop_prefs.cjs`)
+both live under the per-user profile directory; the exact paths per OS are listed in
+"Error logging, crash dumps, privacy" below. An unpackaged dev run uses the same
+profile directory as an installed build of the same package name, so a verdict or a
+preference recorded in dev is what the installed app reads next, and the other way
+round; delete `desktop-prefs.json` to start from defaults.
+
+## GPU backend on Linux
+
+On Linux, Chromium's default WebGL backend is ANGLE over OpenGL, where every shader
+program link resolves on the single GPU-process thread that presents frames: each link
+is a 100 to 320 ms hitch the game cannot schedule around. ANGLE's Vulkan backend links
+in about 10 ms and the hitches disappear (measured on an RTX 3090 and an Intel iGPU).
+Windows already runs D3D11 and macOS Metal, so only Linux needs the lever.
+
+The shell forces Vulkan with the Chromium switches (`VULKAN_BACKEND_SWITCHES` in
+`electron/gpu_backend.cjs`: `--use-gl=angle`, `--use-angle=vulkan`, and the
+`Vulkan,DefaultANGLEVulkan,VulkanFromANGLE` feature set) and nothing wider: no
+`--ignore-gpu-blocklist`, no `--disable-gpu-driver-bug-workarounds`, and never
+`--disable-vulkan-surface` (headless only). The risk is that a forced Vulkan backend
+has no OpenGL fallback: a machine without a working Vulkan driver lands on SwiftShader
+(software rendering). So the lever is "try Vulkan once, verify, remember":
+
+- The player's setting is `gpuBackend` in `desktop-prefs.json` (`auto` by default,
+  or an explicit `vulkan` / `opengl`), exposed to the game over the preload bridge
+  (`getGpuBackend` / `setGpuBackend`, channels `desktop-get-gpu-backend` /
+  `desktop-set-gpu-backend`). It is stored, not applied live: the switches land before
+  Electron's own startup, so a change takes effect at the next launch.
+- With `auto`, the stored `vulkanVerdict` decides (`decideGpuBackendLaunch`). While it
+  is `untested` the launch is a TRIAL: the switches go on, and the shell judges the
+  renderer the game actually got (`judgeVulkanLaunch`: not software rendering, a
+  renderer string naming Vulkan, and not the SwiftShader device) and stores the
+  verdict (`settleVulkanTrial` in `electron/main.cjs`). The evidence is the WebGL
+  renderer string the game reports itself over the preload bridge
+  (`reportGpuRenderer`, channel `desktop-report-gpu-renderer`): on Linux
+  `app.getGPUInfo('complete')` can leave `glRenderer` EMPTY on a perfectly healthy
+  ANGLE Vulkan session (seen on Electron 43 / Chrome 150 with an RTX 3090), so the
+  getGPUInfo reading only settles the trial when it carries evidence of its own
+  (`hasGetGpuInfoEvidence`: Chromium's `softwareRendering` flag, or a non-empty
+  renderer string); an empty reading logs `[gpu] vulkan trial: waiting for the
+  renderer's report` and leaves the verdict pending. A trial the renderer never
+  reports on (WebGL creation failed entirely) stays `untested` and simply trials
+  again next launch; there is no timer. A passed trial (`ok`) keeps Vulkan on every later launch; a
+  failed one (`failed`) is logged with a warning, then the shell relaunches itself on
+  the default backend (`relaunchAfterFailedTrial`, same binary or the outer AppImage,
+  same argv, detached) and exits. The relaunched process reads the stored verdict and
+  also carries `WOC_VULKAN_TRIAL_RELAUNCHED=1` in its environment, and a marked process
+  never trials or relaunches again, so no loop is possible even when the verdict could
+  not be written. Switching back to `auto` from `vulkan` or `opengl` resets the verdict and re-arms
+  exactly one trial.
+- An explicit setting (`vulkan` or `opengl`) is never verified or relaunched: that is
+  the player's choice, including a Vulkan that lands on software rendering.
+- `WOC_GPU_BACKEND=vulkan|opengl` in the environment overrides the setting for that
+  launch, also without a trial; `WOC_DISABLE_GPU_FORCE=1` disables the lever with the
+  others.
+
+`main.log` records `[gpu] backend launch: vulkan (auto, Vulkan trial)` (or the
+`default` backend and the reason it was chosen) at startup, and `[gpu] vulkan trial
+verdict: ok|failed` with the renderer string it was judged on once the trial is
+settled. Rescue for a machine stuck on the wrong
+backend: start the game with `WOC_GPU_BACKEND=opengl` in the environment, or quit and
+delete `desktop-prefs.json` (defaults are `auto` + `untested`, which is one fresh trial
+that self-corrects). In the dev loop (`npm run electron:dev`) a FAILED trial takes the
+loop down once: the orchestrator tears Vite down when its Electron child exits, and the
+relaunched process is left against a dead dev server; the next `npm run electron:dev`
+reads the stored `failed` verdict and runs on the default backend without a relaunch.
+Known misfire in the dev loop: the Linux PRIME hybrid detection (`isLinuxHybridGpu`,
+two `/sys/class/drm` cards) also fires on a DESKTOP with two GPUs, so on the
+maintainer's RTX 3090 desktop the dev loop pre-applies the PRIME offload env it does
+not need; until that is fixed separately, run the dev loop with
+`WOC_DISABLE_GPU_FORCE=1` there (it skips the PRIME config in
+`scripts/electron-dev.mjs` and every GPU lever in the shell) and pick the backend
+with `WOC_GPU_BACKEND=vulkan`, which wins over the rescue env.
+
 ## What the maintainer must provision (one-time)
 
 | Item | Used for | Where it goes |
@@ -536,7 +628,8 @@ product exist. Coding and merge stay dark-safe without those credentials.
   (`app.getPath('userData')`: macOS
   `~/Library/Application Support/world-of-claudecraft/`; Windows
   `%APPDATA%\world-of-claudecraft\`; Linux `~/.config/world-of-claudecraft/`),
-  holding window memory plus `gpuForceOptOut` (see `electron/desktop_prefs.cjs`).
+  holding window memory plus `gpuForceOptOut`, the Linux `gpuBackend` setting, and
+  its `vulkanVerdict` (see `electron/desktop_prefs.cjs` and "GPU backend on Linux").
   The in-game toggle (Options, Interface, "Use the Dedicated Gaming GPU")
   writes it, but a machine the GPU force prevents from booting can never reach
   that toggle. The supported rescue for "the game will not start at all on a
@@ -546,9 +639,9 @@ product exist. Coding and merge stay dark-safe without those credentials.
   tolerates hand-edits, including a Windows editor's UTF-8 BOM; a corrupt or
   deleted file resolves to defaults, which is force ON. Faster one-launch
   variant needing no file edit: start the game with `WOC_DISABLE_GPU_FORCE=1`
-  in the environment (strict `1`), which skips both levers for that launch
-  without touching the stored preference; use it to boot far enough to flip
-  the in-game toggle off for good.
+  in the environment (strict `1`), which skips both levers (and the Linux GPU
+  backend switches) for that launch without touching the stored preference;
+  use it to boot far enough to flip the in-game toggle off for good.
 - V8 code cache: the app:// scheme registers `codeCache: true` (electron/main.cjs,
   pinned key by key in `tests/electron_scheme_privileges.test.ts`), so Chromium
   persists compiled bytecode for the bundled scripts under the per-user profile
@@ -637,6 +730,13 @@ product exist. Coding and merge stay dark-safe without those credentials.
    name) showing the relaunched PID's parent already exited, and `[gpu] running as
    PRIME-relaunched child` in `main.log` (the child writes it; the parent exits
    before file logging exists).
+   Then the GL backend: `[gpu] backend launch: vulkan (auto, Vulkan trial)` on a
+   first launch followed by `[gpu] vulkan trial verdict: ok`, and on every later
+   launch `[gpu] backend launch: vulkan (auto, Vulkan trial passed)` with the
+   active renderer line naming Vulkan and the real adapter (see "GPU backend on
+   Linux"). On a machine without a Vulkan driver, `verdict: failed` followed by a
+   relaunch whose banner says `backend launch: default`, and never a second
+   relaunch.
    Known follow-ups, not yet addressed: the relaunch's interaction with the
    second-instance deep-link path (`worldofclaudecraft://` login handoff) has not
    been verified against a login link that arrives during the brief relaunch

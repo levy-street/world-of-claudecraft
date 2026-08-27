@@ -19,18 +19,21 @@ import {
   pushDesktopGpuPref,
   syncDesktopGpuPrefSetting,
 } from './desktop_gpu_pref_sync';
+import { reportDesktopGpuRenderer } from './desktop_gpu_report';
 import { pushDiscordPresenceEnabled } from './discord_presence';
 
 export type DesktopShellSettings = DesktopGpuPrefSettings &
   DesktopGpuBackendSettings &
   DesktopDisplayModeSettings;
 
-/** Reflect every shell-stored value at boot. Each reflection is its own
+/** Reflect every shell-stored value at boot, and report the page's renderer
+ *  string the shell judges its Vulkan trial on. Each reflection is its own
  *  fire-and-forget round trip; none blocks the others or the boot. */
 export function syncDesktopShellSettings(
   bridge: DesktopBridge | null | undefined,
   createSettings: () => DesktopShellSettings,
 ): void {
+  reportDesktopGpuRenderer(bridge);
   void syncDesktopGpuPrefSetting(bridge, createSettings);
   void syncDesktopGpuBackendSetting(bridge, createSettings);
   void syncDesktopDisplayModeSetting(bridge, createSettings);

@@ -174,6 +174,20 @@ contextBridge.exposeInMainWorld('wocDesktop', {
   getGpuForceOptOut: () => ipcRenderer.invoke('desktop-get-gpu-force-opt-out'),
   setGpuForceOptOut: (optOut) =>
     ipcRenderer.invoke('desktop-set-gpu-force-opt-out', optOut === true),
+  // The Linux GPU backend setting ('auto' | 'vulkan' | 'opengl'), the last Vulkan trial
+  // verdict, and whether the lever exists on this platform. Both about the NEXT launch:
+  // the switches land before Electron's own startup. The setter answers whether the value
+  // reached disk; main refuses anything outside its setting list.
+  getGpuBackend: () => ipcRenderer.invoke('desktop-get-gpu-backend'),
+  setGpuBackend: (value) => ipcRenderer.invoke('desktop-set-gpu-backend', String(value)),
+  // The game's own WebGL renderer string, reported once its context exists: the evidence
+  // the shell's Vulkan trial verdict is judged on (getGPUInfo can leave the renderer
+  // string empty on Linux). Fire-and-forget, capped here so no unbounded string crosses.
+  reportGpuRenderer: (renderer) =>
+    ipcRenderer.send('desktop-report-gpu-renderer', String(renderer).slice(0, 256)),
+  // Whether this platform has a backend choice at all (Linux only), answered
+  // synchronously so the options row can be gated the moment the window opens.
+  hasGpuBackendChoice: process.platform === 'linux',
   // How the shell presents its window: 'borderless' (full screen) or 'windowed'.
   // The setter applies live AND stores for the next launch, and answers whether
   // the choice actually reached disk. An unknown mode is refused here rather

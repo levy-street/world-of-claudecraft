@@ -34,6 +34,7 @@ const {
   MIN_WINDOW_POSITION,
   MIN_WINDOW_WIDTH,
 } = require('./window_memory.cjs');
+const { GPU_BACKEND_SETTINGS, VULKAN_VERDICTS } = require('./gpu_backend.cjs');
 
 // Bumped only when a field's MEANING changes. A file stamped with any other
 // version is discarded wholesale rather than field-matched: a future build may
@@ -67,6 +68,17 @@ const DISPLAY_MODES = ['borderless', 'windowed'];
 const readDisplayMode = (value, fallback) => (DISPLAY_MODES.includes(value) ? value : fallback);
 
 /**
+ * The player's Linux GPU backend setting and the last Vulkan trial verdict off
+ * disk. Exact literals only, same reasoning as the display mode: both feed the
+ * launch decision in electron/gpu_backend.cjs before Electron starts, and a
+ * near-miss must land on the default (one trial) rather than on whichever arm a
+ * loose comparison would pick.
+ */
+const readGpuBackend = (value, fallback) =>
+  GPU_BACKEND_SETTINGS.includes(value) ? value : fallback;
+const readVulkanVerdict = (value, fallback) => (VULKAN_VERDICTS.includes(value) ? value : fallback);
+
+/**
  * A window rect off disk, or null. Partial bounds are dropped whole: three of
  * four fields cannot place a window, and pairing a saved x with a default width
  * would restore a geometry no session ever had.
@@ -91,6 +103,8 @@ function defaultDesktopPrefs() {
     gpuForceOptOut: false,
     displayMode: 'borderless',
     discordPresenceEnabled: true,
+    gpuBackend: 'auto',
+    vulkanVerdict: 'untested',
   };
 }
 
@@ -125,6 +139,12 @@ function sanitizeDesktopPrefs(input) {
   // one: it resolves to the default like any other unusable value, which is why
   // the schema version does not move for it.
   prefs.discordPresenceEnabled = readBoolean(input.discordPresenceEnabled, true);
+  // Additive as well (same absent-is-default reading, schema version unchanged):
+  // the Linux GPU backend setting and the verdict of the last Vulkan trial. An
+  // unusable verdict resolves to 'untested', which arms one trial: the safe
+  // direction, since a trial that fails records itself and relaunches.
+  prefs.gpuBackend = readGpuBackend(input.gpuBackend, 'auto');
+  prefs.vulkanVerdict = readVulkanVerdict(input.vulkanVerdict, 'untested');
   return prefs;
 }
 

@@ -325,18 +325,52 @@ function isLinuxHybridGpu(readdir = nodeReaddirSync) {
 }
 
 /**
+ * The binary a self-relaunch must spawn. In an AppImage, execPath points inside the
+ * runtime's FUSE mount, which dies the moment this process exits; the outer AppImage file
+ * (env.APPIMAGE, the same source electron-updater restarts from) survives and brings up a
+ * fresh runtime + mount. A non-absolute APPIMAGE value is ignored: the variable is not
+ * ours to trust blindly, and a relative path would resolve against whatever cwd the
+ * launcher happened to have.
+ */
+function resolveSelfSpawnTarget(env, execPath) {
+  const appImage =
+    typeof env?.APPIMAGE === 'string' && nodePath.isAbsolute(env.APPIMAGE) ? env.APPIMAGE : null;
+  return appImage ?? execPath;
+}
+
+/**
+ * Spawn this program again with the given argv and environment: detached + unref'd so
+ * the parent can exit without waiting on the child, stdio inherited so the player's
+ * console output is uninterrupted. Shared by the two self-relaunch levers (the Linux
+ * PRIME re-exec below and the failed-Vulkan-trial relaunch in electron/gpu_backend.cjs),
+ * which is also why the process spawn stays in THIS file: the malware scan sanctions
+ * exactly one shipped shell module for process execution. Returns the spawn target for
+ * the caller's log line; throws when the spawn itself fails (the caller decides what a
+ * failed relaunch means).
+ */
+function spawnDetachedSelf({ env, argv, execPath = process.execPath, spawn = nodeSpawn }) {
+  const spawnTarget = resolveSelfSpawnTarget(env, execPath);
+  const child = spawn(spawnTarget, argv, {
+    env,
+    stdio: 'inherit',
+    detached: true,
+  });
+  child.unref?.();
+  return spawnTarget;
+}
+
+/**
  * Re-exec the current process (same argv, PRIME env baked into the child's environment from
  * birth). See lever 3 in the file header for why an in-process process.env mutation cannot
  * work here: only an environment present before Electron's own startup (before the zygote's
  * exec) ever reaches the GPU process. Hybrid-gated (lever 3 (a)); the spawn source is
  * env.APPIMAGE when set, because in an AppImage process.execPath dies with the parent's
- * FUSE mount (lever 3 (b)). Detached + unref'd so the parent can exit without waiting on
- * the child; stdio inherited so the player's console output is uninterrupted. Returns true
- * when a relaunch was spawned, in which case the CALLER must exit immediately via
- * process.exit(0), which stops the main script before any further statement runs (app.exit
- * also works but only after the app module is usable; process.exit needs nothing). Returns
- * false (nothing to do) on any other platform, on a non-hybrid machine, when this process
- * is already correctly configured, or if the spawn itself fails.
+ * FUSE mount (lever 3 (b), resolveSelfSpawnTarget). Returns true when a relaunch was
+ * spawned, in which case the CALLER must exit immediately via process.exit(0), which stops
+ * the main script before any further statement runs (app.exit also works but only after
+ * the app module is usable; process.exit needs nothing). Returns false (nothing to do) on
+ * any other platform, on a non-hybrid machine, when this process is already correctly
+ * configured, or if the spawn itself fails.
  */
 function relaunchForLinuxPrime(deps = {}) {
   const platform = deps.platform ?? process.platform;
@@ -350,14 +384,6 @@ function relaunchForLinuxPrime(deps = {}) {
   const baseArgv = deps.argv ?? process.argv.slice(1);
   if (!shouldRelaunchForLinuxPrime(env, baseArgv, fileExists)) return false;
 
-  const spawnFn = deps.spawn ?? nodeSpawn;
-  // In an AppImage, execPath points inside the runtime's FUSE mount, which dies the moment
-  // this process exits; the outer AppImage file (env.APPIMAGE, the same source
-  // electron-updater restarts from) survives and brings up a fresh runtime + mount.
-  const execPath = deps.execPath ?? process.execPath;
-  const appImage =
-    typeof env.APPIMAGE === 'string' && nodePath.isAbsolute(env.APPIMAGE) ? env.APPIMAGE : null;
-  const spawnTarget = appImage ?? execPath;
   // A Wayland session's GPU process crash-loops once PRIME offload is requested unless
   // Chromium is forced onto the X11 Ozone backend (see LINUX_OZONE_X11_ARG above); never
   // added when the player's own argv already makes an explicit --ozone-platform choice.
@@ -368,12 +394,12 @@ function relaunchForLinuxPrime(deps = {}) {
   const childEnv = { ...env, ...additions, [PRIME_RELAUNCH_MARKER]: '1' };
 
   try {
-    const child = spawnFn(spawnTarget, argv, {
+    const spawnTarget = spawnDetachedSelf({
       env: childEnv,
-      stdio: 'inherit',
-      detached: true,
+      argv,
+      execPath: deps.execPath ?? process.execPath,
+      spawn: deps.spawn ?? nodeSpawn,
     });
-    child.unref?.();
     log?.info?.('[gpu] relaunching for Linux PRIME render offload', {
       spawnTarget,
       added: Object.keys(additions),
@@ -504,6 +530,8 @@ module.exports = {
   hasExplicitOzonePlatformArg,
   isLinuxHybridGpu,
   shouldRelaunchForLinuxPrime,
+  resolveSelfSpawnTarget,
+  spawnDetachedSelf,
   relaunchForLinuxPrime,
   buildRegQueryArgs,
   buildRegWriteArgs,

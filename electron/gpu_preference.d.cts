@@ -21,10 +21,25 @@ export function shouldRelaunchForLinuxPrime(
   fileExists?: (path: string) => boolean,
 ): boolean;
 
+export type SelfSpawn = (command: string, args: string[], options?: unknown) => { unref?(): void };
+
+export function resolveSelfSpawnTarget(
+  env: Record<string, string | undefined> | undefined,
+  execPath: string,
+): string;
+
+export interface SpawnDetachedSelfDeps {
+  env: Record<string, string | undefined>;
+  argv: string[];
+  execPath?: string;
+  spawn?: SelfSpawn;
+}
+export function spawnDetachedSelf(deps: SpawnDetachedSelfDeps): string;
+
 export interface RelaunchForLinuxPrimeDeps {
   platform?: string;
   env?: Record<string, string | undefined>;
-  spawn?: (command: string, args: string[], options?: unknown) => { unref?(): void };
+  spawn?: SelfSpawn;
   execPath?: string;
   argv?: string[];
   isHybridGpu?: () => boolean;

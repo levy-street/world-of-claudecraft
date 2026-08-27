@@ -53,6 +53,8 @@ describe('desktop prefs schema', () => {
       gpuForceOptOut: false,
       displayMode: 'borderless',
       discordPresenceEnabled: true,
+      gpuBackend: 'auto',
+      vulkanVerdict: 'untested',
     });
   });
 
@@ -65,6 +67,8 @@ describe('desktop prefs schema', () => {
       gpuForceOptOut: true,
       displayMode: 'windowed',
       discordPresenceEnabled: false,
+      gpuBackend: 'opengl',
+      vulkanVerdict: 'failed',
       // Junk a hand-edited file could carry; none of it may survive.
       apiOrigin: 'https://evil.example',
       extra: 'nope',
@@ -77,14 +81,18 @@ describe('desktop prefs schema', () => {
       gpuForceOptOut: true,
       displayMode: 'windowed',
       discordPresenceEnabled: false,
+      gpuBackend: 'opengl',
+      vulkanVerdict: 'failed',
     });
     expect(Object.keys(prefs).sort()).toEqual([
       'discordPresenceEnabled',
       'displayId',
       'displayMode',
+      'gpuBackend',
       'gpuForceOptOut',
       'maximized',
       'version',
+      'vulkanVerdict',
       'windowBounds',
     ]);
   });
@@ -164,6 +172,37 @@ describe('desktop prefs schema', () => {
     expect(sanitizeDesktopPrefs({ version: 1, maximized: true }).discordPresenceEnabled).toBe(true);
   });
 
+  it('takes the GPU backend setting and the Vulkan verdict as exact literals', () => {
+    // Both feed the Linux backend launch decision before Electron starts. A
+    // near-miss on the setting must land on 'auto' (one trial, self-correcting)
+    // and a near-miss on the verdict on 'untested' (re-arm the trial), never on
+    // an explicit backend a loose comparison happened to pick.
+    for (const junk of ['Auto', 'VULKAN', 'gl', '', 1, true, null, {}, ['vulkan']]) {
+      const prefs = sanitizeDesktopPrefs({ version: 1, gpuBackend: junk, vulkanVerdict: junk });
+      expect(prefs.gpuBackend, `gpuBackend ${JSON.stringify(junk)}`).toBe('auto');
+      expect(prefs.vulkanVerdict, `vulkanVerdict ${JSON.stringify(junk)}`).toBe('untested');
+    }
+    // The two lists are distinct: a verdict literal is junk as a setting and
+    // the other way round, so a shared reader could not pass both arms.
+    expect(sanitizeDesktopPrefs({ version: 1, gpuBackend: 'ok' }).gpuBackend).toBe('auto');
+    expect(sanitizeDesktopPrefs({ version: 1, vulkanVerdict: 'vulkan' }).vulkanVerdict).toBe(
+      'untested',
+    );
+    for (const setting of ['auto', 'vulkan', 'opengl']) {
+      expect(sanitizeDesktopPrefs({ version: 1, gpuBackend: setting }).gpuBackend).toBe(setting);
+    }
+    for (const verdict of ['untested', 'ok', 'failed']) {
+      expect(sanitizeDesktopPrefs({ version: 1, vulkanVerdict: verdict }).vulkanVerdict).toBe(
+        verdict,
+      );
+    }
+    // Absent is the normal reading of a file written before the fields existed,
+    // which is why the schema version did not move for them.
+    const older = sanitizeDesktopPrefs({ version: 1, maximized: true });
+    expect(older.gpuBackend).toBe('auto');
+    expect(older.vulkanVerdict).toBe('untested');
+  });
+
   it('takes the display mode as an exact literal, defaulting to borderless', () => {
     // The stored mode is fed straight to setFullScreen at the reveal, so a
     // near-miss has to land on the default rather than on whichever branch a
@@ -240,6 +279,8 @@ describe('loadDesktopPrefs', () => {
       gpuForceOptOut: true,
       displayMode: 'windowed',
       discordPresenceEnabled: false,
+      gpuBackend: 'vulkan',
+      vulkanVerdict: 'failed',
     };
     expect(saveDesktopPrefs(filePath, saved)).toBe(true);
     // mkdir recursive: the userData subdirectory may not exist on a first run.
@@ -255,6 +296,10 @@ describe('loadDesktopPrefs', () => {
       // An OFF toggle survives the file: the default is ON, so a field that
       // failed to persist would read back as the value the player rejected.
       discordPresenceEnabled: false,
+      // Non-default on both: a field that failed to persist would read back as
+      // 'auto' / 'untested' and silently re-arm a Vulkan trial.
+      gpuBackend: 'vulkan',
+      vulkanVerdict: 'failed',
     });
   });
 
@@ -412,6 +457,8 @@ describe('loadDesktopPrefs', () => {
       gpuForceOptOut: false,
       displayMode: 'borderless',
       discordPresenceEnabled: true,
+      gpuBackend: 'auto',
+      vulkanVerdict: 'untested',
     });
     expect(Object.prototype).not.toHaveProperty('polluted');
     expect(({} as Record<string, unknown>).polluted).toBeUndefined();
@@ -454,7 +501,7 @@ describe('saveDesktopPrefs', () => {
     expect(calls).toEqual([
       'mkdir:/userdata:true',
       'open:<staged>:wx',
-      'write:41:{"version":1,"maximized":false,"gpuForceOptOut":true,"displayMode":"borderless","discordPresenceEnabled":true}:utf8',
+      'write:41:{"version":1,"maximized":false,"gpuForceOptOut":true,"displayMode":"borderless","discordPresenceEnabled":true,"gpuBackend":"auto","vulkanVerdict":"untested"}:utf8',
       'fsync:41',
       'close:41',
       'rename:<staged>:/userdata/desktop-prefs.json',
@@ -588,6 +635,8 @@ describe('saveDesktopPrefs', () => {
       gpuForceOptOut: true,
       displayMode: 'borderless',
       discordPresenceEnabled: true,
+      gpuBackend: 'auto',
+      vulkanVerdict: 'untested',
     });
   });
 

@@ -2,6 +2,7 @@
 // (tests/electron_desktop_prefs.test.ts) type-checks its imports. Keep in sync
 // with the .cjs exports (same convention as shell_guards.d.cts).
 
+import type { GpuBackendSetting, VulkanVerdict } from './gpu_backend.cjs';
 import type { WindowRect } from './window_memory.cjs';
 
 export type DesktopDisplayMode = 'borderless' | 'windowed';
@@ -12,6 +13,8 @@ export interface DesktopPrefs {
   gpuForceOptOut: boolean;
   displayMode: DesktopDisplayMode;
   discordPresenceEnabled: boolean;
+  gpuBackend: GpuBackendSetting;
+  vulkanVerdict: VulkanVerdict;
   windowBounds?: WindowRect;
   displayId?: number;
 }
