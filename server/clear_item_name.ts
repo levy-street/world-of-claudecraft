@@ -82,6 +82,9 @@ export function clearItemNameBodyError(body: {
     return 'bag must be a non-negative whole number';
   }
   if (typeof body.itemId !== 'string' || !Object.hasOwn(ITEMS, body.itemId)) {
+    // Accepted consequence of the allowlist: a bagged copy of an id RETIRED
+    // from the content tables can no longer be targeted per-cell; all: true
+    // still reaches it (the sweep matches payloads, never ids).
     return 'unknown item id';
   }
   return null;

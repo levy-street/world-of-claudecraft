@@ -1265,9 +1265,10 @@ export async function forceCharacterRename(input: {
 }): Promise<{ accountId: number }> {
   const reason = cleanText(input.reason, ACTION_REASON_MAX);
   if (!reason) throw new Error('moderation reason is required');
-  const character = await pool.query('SELECT account_id FROM characters WHERE id = $1', [
-    input.characterId,
-  ]);
+  const character = await pool.query(
+    'SELECT account_id FROM characters WHERE id = $1 AND realm = $2',
+    [input.characterId, REALM],
+  );
   const accountId = character.rows[0]?.account_id;
   if (!accountId) throw new Error('character not found');
   // Pin a single pooled client so the whole transaction is atomic; see the note
@@ -1329,9 +1330,10 @@ export async function recordProfessionsRestore(input: {
   // future caller's validation: today's two callers pass allowlisted ids, and
   // this cap keeps that an invariant rather than a convention.
   const detail = cleanText(input.detail, 128);
-  const character = await pool.query('SELECT account_id FROM characters WHERE id = $1', [
-    input.characterId,
-  ]);
+  const character = await pool.query(
+    'SELECT account_id FROM characters WHERE id = $1 AND realm = $2',
+    [input.characterId, REALM],
+  );
   const accountId = character.rows[0]?.account_id;
   if (!accountId) throw new Error('character not found');
   await recordModerationAction(pool, input.action, {
