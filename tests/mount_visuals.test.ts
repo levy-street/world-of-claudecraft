@@ -33,11 +33,33 @@ describe('mount visual specs cover the sim catalog', () => {
   });
 
   it('seats sit inside the mount body (above ground, below the crown)', () => {
+    // A rider SITS on every mount here but one, so the saddle lands inside
+    // the body and below its crown. The Solana Seeker is a board the rider
+    // STANDS on, and def.height is a height: normScale is def.height over the
+    // model Y extent, so a 0.19-tall deck has to ask for a small height or it
+    // scales to a 21-yard surfboard. Its seat therefore sits ABOVE the deck by
+    // construction, and the meaningful bound is that it rests just on top of
+    // the board rather than floating clear of it.
+    // Pinned per key rather than as a set membership: `not.toBe('sit')` would
+    // accept a mount silently switching between 'stand' and 'channel'.
+    const RIDE_POSE: Partial<Record<string, 'stand' | 'channel'>> = { seeker_board: 'channel' };
     for (const key of MOUNT_KEYS) {
       const spec = MOUNT_VISUAL_SPECS[key];
       const def = VISUALS[spec.visualKey];
       expect(spec.seat, `${key} seat`).toBeGreaterThan(0.5);
-      expect(spec.seat, `${key} seat above its own crown`).toBeLessThan(def.height);
+      const stands = RIDE_POSE[key];
+      if (stands) {
+        // A standing rider is lifted by their FEET, so the seat has to land ON
+        // the deck crown: above it and they hover, below and they sink through
+        // the board. The band is tight enough to catch a wrong number rather
+        // than merely a wrong magnitude (0.02 on a 0.74 crown).
+        const crown = (def.hover ?? 0) + def.height;
+        expect(spec.ridePose, `${key} ride pose`).toBe(stands);
+        expect(Math.abs(spec.seat - crown), `${key} feet off its deck`).toBeLessThan(0.02);
+      } else {
+        expect(spec.ridePose, `${key} must stay a seated mount`).toBe('sit');
+        expect(spec.seat, `${key} seat above its own crown`).toBeLessThan(def.height);
+      }
     }
   });
 

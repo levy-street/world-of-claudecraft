@@ -168,6 +168,10 @@ describe('i18n whole-catalog completeness', () => {
       'hudChrome.discord.open', // "Discord" - brand
       'hudChrome.steam.title', // "Steam" - brand
       'hudChrome.epic.title', // "Epic" - brand
+      // "Solana Seeker" is the Solana Mobile product wordmark, carried verbatim
+      // the same way Discord/Steam/Epic are. The mount DESCRIPTION and the
+      // "Genesis Key: ..." item name are real prose and are translated.
+      'hudChrome.mounts.name_seeker_board',
       'hudChrome.discord.panelTitle', // "World of ClaudeCraft" - brand
       'hudChrome.discord.linkedTitle', // "Discord: {name}" - brand + player name
       'hudChrome.keybinds.discord', // "Discord" - brand (Key Bindings action label)

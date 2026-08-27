@@ -235,6 +235,11 @@ const MOUNT_RIGGED: ClipMap = {
   death: 'Death',
 };
 
+// The Solana Seeker board ships an authored Jump alongside the usual four,
+// so it spreads the shared map and adds only that. Editing MOUNT_RIGGED
+// itself would hand a jump clip to every other mount, none of which has one.
+const MOUNT_SEEKER: ClipMap = { ...MOUNT_RIGGED, jump: 'Jump' };
+
 // The Drakelands dragonkin brood (tmp/dragonkin_build.mjs bakes): artist
 // clips on the 25-bone mixamorig core. Run reuses the walk cycle (the rigs
 // ship no separate sprint; visual timeScale matching covers the chase). The
@@ -1649,6 +1654,26 @@ export const VISUALS: Record<string, VisualDef> = {
     url: `${MOUNTS_DIR}/stalkglider_snail.glb`,
     height: 3.1,
     clips: MOUNT_RIGGED,
+    lazyPreload: true,
+  },
+  // The Solana Seeker: a Seeker handset ridden as a hover board (issue
+  // #3628). `height` looks tiny beside the other mounts because it IS a
+  // height: normScale is def.height / the model's Y extent, and this rig is
+  // a 1.75-long deck only 0.19 tall. Asking for 2.3 like the hover cycle
+  // would scale it 12x and ship a 21-yard surfboard; 0.39 puts the deck at a
+  // rideable 3.6 yards long. `hover` floats it off the ground, since a board
+  // resting in the dirt is not hovering.
+  mount_seeker_board: {
+    url: `${MOUNTS_DIR}/seeker_board.glb`,
+    height: 0.39,
+    hover: 0.35,
+    // The board points down +X (its deck bones run x -0.45 to +0.45 with the
+    // trail behind at -1.1) while visuals face +Z at world facing 0, so it
+    // needs the quarter turn the Tripo rigs take. Every other mount was
+    // authored facing +Z already and sets no yaw; without this one the rider
+    // travels sideways on a board pointing across the direction of travel.
+    yaw: -Math.PI / 2,
+    clips: MOUNT_SEEKER,
     lazyPreload: true,
   },
   mount_aether_hover_cycle: {

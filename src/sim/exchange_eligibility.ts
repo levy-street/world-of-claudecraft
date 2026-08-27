@@ -139,6 +139,13 @@ export function exchangeBrowseSubcategory(def: ItemDef): string | null {
  *   The tolerance is kept rather than removed: it is what guarantees the stated
  *   product rule that EVERY mount trades regardless of tier, whichever ones
  *   content decides to bind in future.
+ *
+ *   ONE mount is carved out of that rule, and it is carved out with
+ *   `noMarketList` rather than by narrowing the tolerance: reins_seeker_board
+ *   is a promotional reward whose terms (issue #3628) are one per Genesis
+ *   Token, permanently bound, never sold or transferred. Binding alone would
+ *   NOT have held it here, which is the trap this note exists to flag: the
+ *   mount tolerance means a soulbound reins still reaches the cash rail.
  * - A MECH CHROMA plate is flagged noMarketList, which keeps it off the in-game
  *   gold market for the same reason. Tolerated here for the same scope.
  *

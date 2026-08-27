@@ -211,8 +211,27 @@ describe('the REAL catalog clears every mount and every chroma plate', () => {
     // One tradable handle per catalog mount: a mount with no item behind it
     // would be untradable no matter what the policy said.
     expect(mountItems.length).toBe(Object.keys(MOUNTS).length);
+    // Exactly ONE mount is hard-locked, named rather than counted so a second
+    // one cannot appear quietly. reins_seeker_board is the promotional reward
+    // from issue #3628: one per Genesis Token, permanently bound, never sold
+    // or transferred, which the product rule above does not otherwise allow.
+    // It is locked by `noMarketList`, NOT by being soulbound: the mount
+    // tolerance means a soulbound reins still clears this rail.
+    const NEVER_TRANSFERABLE = ['reins_seeker_board'];
     const blocked = mountItems.filter((i) => exchangeHardLock(i, undefined) !== null);
-    expect(blocked.map((i) => i.id)).toEqual([]);
+    expect(blocked.map((i) => i.id).sort()).toEqual([...NEVER_TRANSFERABLE].sort());
+    // And it is locked for the RIGHT reason: flipping only the bind would
+    // leave it sellable for cash, so the lock has to name no_market_list.
+    for (const id of NEVER_TRANSFERABLE) {
+      const item = ITEMS[id];
+      expect(exchangeHardLock(item, undefined), id).toBe('no_market_list');
+      expect(item.soulbound, `${id} stays bound as well`).toBe(true);
+    }
+    // Every OTHER mount still trades, which is the rule the tolerance exists
+    // for; without this the carve-out could silently swallow the catalog.
+    const rest = mountItems.filter((i) => !NEVER_TRANSFERABLE.includes(i.id));
+    expect(rest.length).toBeGreaterThan(0);
+    expect(rest.filter((i) => exchangeHardLock(i, undefined) !== null)).toEqual([]);
     // Non-vacuity, weakened deliberately in v0.35.0. It used to assert that EVERY
     // mount item is soulbound, which held when the tolerance was written: back then
     // the flag was what kept mounts out of the gold economy. v0.35.0 un-soulbound

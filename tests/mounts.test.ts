@@ -103,8 +103,8 @@ function ride(sim: Sim, pid: number, key: string): void {
 }
 
 describe('mount catalog', () => {
-  it('has exactly nine mounts with the horse first and the developer tank last', () => {
-    expect(MOUNT_KEYS).toHaveLength(9);
+  it('has exactly ten mounts with the horse first and the developer tank last', () => {
+    expect(MOUNT_KEYS).toHaveLength(10);
     expect(MOUNT_KEYS[0]).toBe('valorsteed');
     expect(MOUNT_KEYS.at(-1)).toBe('terrorspark_groundshaker');
     expect(DEFAULT_MOUNT).toBe('valorsteed');
@@ -176,9 +176,15 @@ describe('mount reins items (the collection: owning the item is owning the mount
       expect(items).toHaveLength(1);
       const item = items[0];
       expect(mountItemId(key)).toBe(item.id);
-      if (key === 'terrorspark_groundshaker') {
+      if (key === 'terrorspark_groundshaker' || key === 'seeker_board') {
         // The developer-only tank stays soulbound: it has no player acquisition
         // path, and tradability would turn a dev grant into a leak vector.
+        //
+        // The Solana Seeker is bound for a different reason, and a stated one:
+        // issue #3628 requires one mount per Seeker Genesis Token, permanently
+        // bound to the claiming account, never sold, traded or transferred, so
+        // the promotional reward cannot become a secondary-market asset.
+        // soulbound IS that guarantee at the item layer.
         expect(item.soulbound).toBe(true);
       } else {
         // Player reins are NOT soulbound: they trade, mail, list, and store in
@@ -243,7 +249,11 @@ describe('mount reins items (the collection: owning the item is owning the mount
     // acquisition path at all. Listed EXPLICITLY so a sourceless mount is a
     // decision and never an accident: when the world boss lands, delete the entry
     // and the rarity-derived rule below takes back over.
-    const NO_SOURCE_YET: readonly string[] = ['reins_drakemaw_raptor'];
+    // reins_seeker_board is sourceless for a different reason than the
+    // raptor: it is claimed against a Solana Mobile Seeker Genesis Token
+    // (issue #3628), so its route is an external claim flow rather than any
+    // in-game table. Until that flow lands it must appear on NO table at all.
+    const NO_SOURCE_YET: readonly string[] = ['reins_drakemaw_raptor', 'reins_seeker_board'];
     const FIVE_MAN_SOURCES: Record<string, readonly string[]> = {
       reins_stormfeather_griffin: ['morthen'],
       reins_shadowjump_toad: ['vael_the_mistcaller'],
@@ -317,14 +327,18 @@ describe('mount reins items (the collection: owning the item is owning the mount
     }
   });
 
-  it('keeps the tank developer-only and absent from every normal acquisition table', () => {
-    const itemId = 'reins_terrorspark_groundshaker';
+  // Every reins that content awards through NO table has to be absent from all
+  // of them, not just the tank: items.ts makes that claim for each one, and
+  // before this the vendor / delve / market / quest half only ran for the tank.
+  const SOURCELESS = [
+    'reins_terrorspark_groundshaker',
+    'reins_drakemaw_raptor',
+    'reins_seeker_board',
+  ];
+  it.each(SOURCELESS)('keeps %s absent from every normal acquisition table', (itemId) => {
     const item = ITEMS[itemId] as MountItemDef;
     expect(item).toMatchObject({
       kind: 'mount',
-      mount: 'terrorspark_groundshaker',
-      quality: 'epic',
-      soulbound: true,
       noDiscard: true,
       sellValue: 0,
     });

@@ -12,6 +12,7 @@ import { guildBankPipeRefusal } from '../src/sim/guild_bank';
 import type { InvSlot } from '../src/sim/types';
 import { type BagMode, bagItemAction } from '../src/ui/bags_view';
 import { BagsWindow, type BagsWindowDeps } from '../src/ui/bags_window';
+import { itemDisplayName } from '../src/ui/entity_i18n';
 import { t } from '../src/ui/i18n';
 import { ItemDragState } from '../src/ui/item_drag_state';
 import { tSim } from '../src/ui/sim_i18n';
@@ -160,7 +161,12 @@ function harness(
 
 function clickCellFor(root: HTMLElement, itemId: string, shift = false): void {
   const cells = Array.from(root.querySelectorAll<HTMLElement>('button.bag-item'));
-  const cell = cells.find((c) => c.getAttribute('aria-label')?.includes(ITEMS[itemId].name));
+  // Match on the DISPLAYED name, not the raw def name: an item whose brand
+  // lives in the i18n catalog rather than the sim renders a different string,
+  // and this fixture silently found no cell rather than failing usefully.
+  const cell = cells.find((c) =>
+    c.getAttribute('aria-label')?.includes(itemDisplayName(ITEMS[itemId])),
+  );
   expect(cell, `no bag cell for ${itemId}`).toBeTruthy();
   cell?.dispatchEvent(new MouseEvent('click', { bubbles: true, shiftKey: shift }));
 }

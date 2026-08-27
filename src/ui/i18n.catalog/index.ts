@@ -1691,6 +1691,10 @@ export const en = {
       reins_shadowjump_toad: { name: 'Reins of Kama-Kage the Shadow-Jump Toad' },
       reins_stormfeather_griffin: { name: 'Reins of the Sky-Reach Stormfeather' },
       reins_thunderstrut_gobbler: { name: 'Reins of Thunderstrut the Grand Gobbler' },
+      // The promotional board. The sim carries a neutral fallback because
+      // tests/architecture.test.ts forbids the word in every src/sim file;
+      // the brand belongs here, where players actually read it.
+      reins_seeker_board: { name: 'Genesis Key: Solana Seeker' },
     },
     itemSets: itemSetEntityText,
     mobs: {

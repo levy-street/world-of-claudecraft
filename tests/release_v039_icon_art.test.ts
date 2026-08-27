@@ -427,7 +427,7 @@ describe('release v0.39 icon-art second-pass lineage', () => {
     expect(new Set(liveHotbarItemIds).size, 'live hotbar item ids remain unique').toBe(
       liveHotbarItemIds.length,
     );
-    expect(liveHotbarItemIds, 'production isHotbarItemId inventory').toHaveLength(72);
+    expect(liveHotbarItemIds, 'production isHotbarItemId inventory').toHaveLength(73);
     expect(
       liveHotbarItemIds.filter((id) => !paintedHotbarItemIds.has(id)),
       'every production-eligible hotbar item resolves to committed painted art',

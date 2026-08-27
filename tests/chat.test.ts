@@ -1240,7 +1240,7 @@ describe('chat module (direct, no Sim)', () => {
     // proves ownership against the catalog, so deriving this one too would let a
     // catalog that silently lost a mount pass both.
     expect(
-      events.some((e: any) => e.type === 'log' && /^\[dev\] Granted 9 mount reins/.test(e.text)),
+      events.some((e: any) => e.type === 'log' && /^\[dev\] Granted 10 mount reins/.test(e.text)),
     ).toBe(true);
     // A second run is idempotent: everything already owned, nothing granted twice.
     sim.chat('/dev mounts', pid);

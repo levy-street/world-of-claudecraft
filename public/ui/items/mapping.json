@@ -244,6 +244,14 @@
       "license": "World of ClaudeCraft original art (project-owned, created for this game)"
     },
     {
+      "itemId": "reins_seeker_board",
+      "name": "Genesis Key: Solana Seeker",
+      "sourcePack": "in-repo render",
+      "sourceFile": "public/models/mounts/seeker_board.glb via scripts/render_mount_icons.mjs",
+      "confidence": "high",
+      "license": "Rendered from the project-supplied Seeker board model; the deck carries the Solana Mobile / Seeker wordmark, whose branding permission is UNRESOLVED (see CREDITS.md and issue #3628)"
+    },
+    {
       "itemId": "resonant_hide",
       "name": "Resonant Hide",
       "sourcePack": "woc_professions_art",

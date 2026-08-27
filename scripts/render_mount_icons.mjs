@@ -32,6 +32,15 @@ if (debugDir) mkdirSync(debugDir, { recursive: true });
 // only set where a model deviates.
 const JOBS = [
   {
+    // The board has no head to anchor on and is nearly flat, so the framing
+    // rules the animal rigs use do not apply: look DOWN at the deck (a large
+    // pitch) so the icon reads as the Seeker face rather than a dark edge, and
+    // fill hard because the silhouette is a thin slab.
+    file: 'seeker_board.glb',
+    id: 'reins_seeker_board',
+    cfg: { headFwd: 0.0, headUp: 0.0, fill: 5.6, yaw: 0.62, pitch: 0.8 },
+  },
+  {
     file: 'valorsteed.glb',
     id: 'reins_valorsteed',
     cfg: { headFwd: 0.9, headUp: 0.72, fill: 0.5, yaw: 0.5, pitch: 0.18 },
@@ -97,6 +106,11 @@ const built = await esbuild.build({
   platform: 'browser',
   write: false,
   logLevel: 'silent',
+  // three's loaders read import.meta.url, and esbuild rewrites import.meta to
+  // an empty object inside an IIFE, so without a define the page dies at boot
+  // on new URL(undefined) and the harness can only report it as a timeout.
+  // Same trap scripts/wiki/render_model_stills.mjs guards against by assertion.
+  define: { 'import.meta.url': JSON.stringify('https://icons.local/entry.js') },
 });
 const bundleJs = built.outputFiles[0].text;
 const ktx2Tag = ktx2TranscoderScriptTag(
