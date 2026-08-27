@@ -4,7 +4,7 @@ import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { ITEMS } from '../src/sim/data';
-import type { PlayerClass } from '../src/sim/types';
+import type { EquipSlot, ItemInstancePayload, PlayerClass } from '../src/sim/types';
 import { borderAccent, borderMotifPrimitives } from '../src/ui/deed_border_view';
 import { deedName, deedTitleText } from '../src/ui/deed_i18n';
 import { QUALITY_COLOR } from '../src/ui/icons';
@@ -207,8 +207,12 @@ describe('inspect_window: the Curator standing surfaces', () => {
       .replace(/(^|[^:])\/\/.*$/gm, '$1');
     const at = hud.indexOf('openInspect(pid: number): void {');
     expect(at, 'Hud.openInspect is missing').toBeGreaterThan(-1);
-    const body = hud.slice(at, at + 520);
-    expect(body).toContain('pid === this.sim.playerId ? selfCuratorStanding(this.sim) : null');
+    const body = hud.slice(at, at + 640);
+    expect(body).toContain('const self = pid === this.sim.playerId;');
+    expect(body).toContain('self ? selfCuratorStanding(this.sim) : null');
+    // The 2026-08-27 host-parity ruling rides the same gate: only SELF hands
+    // the full worn mirror; a peer's card stays on the eqi-shaped entity.
+    expect(body).toContain('self ? this.sim.equipmentInstances : undefined');
     // And the standing itself still comes from the character sheet's own model,
     // so the card and the sheet cannot print different numbers for the same
     // player. The three-line adapter moved out of Hud at Phase 20 QA (it needed
@@ -339,11 +343,18 @@ describe('inspect_window: the real painter over a Sim-shaped and a ranked entity
 
   afterEach(() => vi.restoreAllMocks());
 
+  // Captured per openWith call: the tooltip payload each socket row hands the
+  // Hud dep, so the SELF-override pin below can see exactly what a hover reads.
+  const tooltipCalls: Array<{ itemId: string; instance: ItemInstancePayload | undefined }> = [];
+  const attachedTooltips: Array<{ el: HTMLElement; build: () => string }> = [];
   const openWith = (
     e: InspectEntity,
     selfStanding?: { curatorRank: number; owned: number; total: number } | null,
     showDevBadges = false,
+    selfEquippedInstances?: Partial<Record<EquipSlot, ItemInstancePayload>>,
   ): HTMLElement => {
+    tooltipCalls.length = 0;
+    attachedTooltips.length = 0;
     const realCreate = document.createElement.bind(document);
     vi.spyOn(document, 'createElement').mockImplementation((tag: string) => {
       const el = realCreate(tag);
@@ -372,10 +383,15 @@ describe('inspect_window: the real painter over a Sim-shaped and a ranked entity
       // recorded hygiene follow-up, not this line.
       itemIcon: () => STUB_DATA_URL,
       moneyHtml: () => '',
-      itemTooltip: () => '',
-      attachTooltip: vi.fn(),
+      itemTooltip: (item, instance) => {
+        tooltipCalls.push({ itemId: item.id, instance });
+        return '';
+      },
+      attachTooltip: (el, build) => {
+        attachedTooltips.push({ el, build });
+      },
     });
-    win.openInspect(e, 1_700_000_000_000, selfStanding);
+    win.openInspect(e, 1_700_000_000_000, selfStanding, selfEquippedInstances);
     return root;
   };
 
@@ -614,5 +630,42 @@ describe('inspect_window: the real painter over a Sim-shaped and a ranked entity
     expect(label?.textContent).toBe(ITEMS.worn_sword.name);
     expect(label?.getAttribute('style')).toContain(QUALITY_COLOR.common);
     expect(row.querySelector<HTMLElement>('.item-icon')?.className).toContain('q-common');
+  });
+
+  // The 2026-08-27 host-parity ruling: the ONLINE self entity's worn mirror is
+  // eqi-shaped (no perfected), so self-inspect takes the viewer's own full
+  // mirror through openInspect's fourth parameter. These pin the override in
+  // BOTH directions on what the hover actually reads.
+  it('the SELF override hands the tooltip the full worn payload: perfected rides', () => {
+    openWith(
+      {
+        ...baseEntity,
+        equippedItems: { mainhand: 'worn_sword' },
+        equippedInstances: { mainhand: { name: 'Oathkeeper', rolled: { quality: 'legendary' } } },
+      },
+      null,
+      false,
+      {
+        mainhand: { name: 'Oathkeeper', rolled: { quality: 'legendary' }, perfected: true },
+      },
+    );
+    for (const attached of attachedTooltips) attached.build();
+    const call = tooltipCalls.find((c) => c.itemId === 'worn_sword');
+    expect(call, 'the mainhand row must attach a tooltip').toBeDefined();
+    expect(call?.instance?.perfected, 'the self override must reach the hover').toBe(true);
+    expect(call?.instance?.name).toBe('Oathkeeper');
+  });
+
+  it('a peer row keeps the eqi shape: no perfected reaches the tooltip', () => {
+    openWith({
+      ...baseEntity,
+      equippedItems: { mainhand: 'worn_sword' },
+      equippedInstances: { mainhand: { name: 'Oathkeeper', rolled: { quality: 'legendary' } } },
+    });
+    for (const attached of attachedTooltips) attached.build();
+    const call = tooltipCalls.find((c) => c.itemId === 'worn_sword');
+    expect(call).toBeDefined();
+    expect(call?.instance?.perfected, 'a peer payload never grows perfected').toBeUndefined();
+    expect(call?.instance?.name).toBe('Oathkeeper');
   });
 });

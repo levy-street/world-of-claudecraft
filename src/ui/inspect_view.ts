@@ -175,11 +175,13 @@ export interface InspectInput {
    */
   selfStanding?: { curatorRank: number; owned: number; total: number } | null;
   equippedItems: Partial<Record<EquipSlot, string>>;
-  /** The worn per-copy payloads keyed by slot (the entity's eqi mirror for a
-   *  peer, the full self mirror for the viewer). Threaded into
-   *  buildPaperdollView, which projects each through wornTooltipInstance, so
-   *  the equipment row describes the worn COPY (a promoted legendary's chosen
-   *  name and color) on the inspect card exactly as on the character sheet. */
+  /** The worn per-copy payloads keyed by slot: the entity's eqi mirror for a
+   *  peer; for the VIEWER, Hud.openInspect hands IWorld.equipmentInstances
+   *  (the full self mirror) so both hosts agree, since the ONLINE self
+   *  entity's mirror is eqi-shaped and would drop the Unique-Equipped tag.
+   *  Threaded into buildPaperdollView, which projects each through
+   *  wornTooltipInstance, so the equipment row describes the worn COPY (a
+   *  promoted legendary's chosen name and color) exactly as on the sheet. */
   equippedInstances?: Partial<Record<EquipSlot, ItemInstancePayload>>;
   holderTier: number;
   holderBalance: number | null;

@@ -17526,17 +17526,17 @@ export class Hud {
   openInspect(pid: number): void {
     const e = this.sim.entities.get(pid);
     if (e?.kind !== 'player') return;
-    // Inspecting YOURSELF reads the live standing instead of the mirrored wire
-    // fields, through the exact model the character sheet's Reliquary line is
-    // built from, so the card and the sheet can never print different numbers
-    // for the same player. For anyone else there is nothing local to read and
-    // the wire fields are the only (and the right) answer. This is also what
-    // makes self-inspect work OFFLINE at all: no server ever stamps crk/cro/crt
-    // in a single-player world, so the card used to show no standing there.
+    // Inspecting YOURSELF reads live self state instead of the mirrored wire
+    // fields (standing via the character sheet's exact model, worn payloads
+    // via IWorld.equipmentInstances), so the card, the sheet, and both hosts
+    // agree; offline it also makes self-inspect work at all (no server stamps
+    // crk/cro/crt there). For anyone else the wire fields are the answer.
+    const self = pid === this.sim.playerId;
     this.inspectWindow.openInspect(
       e,
       Date.now(),
-      pid === this.sim.playerId ? selfCuratorStanding(this.sim) : null,
+      self ? selfCuratorStanding(this.sim) : null,
+      self ? this.sim.equipmentInstances : undefined,
     );
   }
 

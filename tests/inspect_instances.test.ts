@@ -245,7 +245,9 @@ describe('inspect_window painter instance threading (source pins)', () => {
     // painter hands equippedInstances to buildInspectView, and the core
     // threads them into buildPaperdollView (third argument), whose cells carry
     // each slot's eqi-projected instance for the row AND the tooltip.
-    expect(painter).toContain('equippedInstances: e.equippedInstances');
+    // The 2026-08-27 host-parity ruling: SELF hands the full worn mirror via
+    // openInspect's fourth parameter; a peer stays on the eqi-shaped entity.
+    expect(painter).toContain('equippedInstances: selfEquippedInstances ?? e.equippedInstances');
     const view = readFileSync(new URL('../src/ui/inspect_view.ts', import.meta.url), 'utf8');
     expect(view).toContain(
       'buildPaperdollView(input.equippedItems, items, input.equippedInstances)',

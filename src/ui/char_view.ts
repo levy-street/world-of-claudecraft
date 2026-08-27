@@ -22,11 +22,11 @@ import { wornTooltipInstance } from './item_instance_tooltip';
  *  none, e.g. inspect). The payload rides the cell so the row's name and
  *  quality color can describe the COPY (a promoted legendary), the same
  *  instance-effective rule the tooltip reads. PROJECTED through
- *  wornTooltipInstance (signer/enchant/rolled/name, the eqi worn-identity
- *  trim), so the one worn-copy handle the view hands out carries only the
- *  cosmetic projection: a future reader of a non-cosmetic field (bindOnTrade,
- *  boundTo) cannot reintroduce the offline-vs-online host divergence the trim
- *  exists to prevent. */
+ *  wornTooltipInstance (signer/enchant/rolled/name plus the self-only
+ *  perfected, the eqi worn-identity trim), so the one worn-copy handle the
+ *  view hands out carries only the cosmetic projection: a future reader of a
+ *  non-cosmetic field (bindOnTrade, boundTo) cannot reintroduce the
+ *  offline-vs-online host divergence the trim exists to prevent. */
 export interface PaperdollSlot {
   slot: EquipSlot;
   item: ItemDef | null;
@@ -79,8 +79,8 @@ export function buildPaperdollView(
     slots.map((slot) => {
       const itemId = equipment[slot];
       const item = itemId ? (items[itemId] ?? null) : null;
-      // The worn-identity projection (see PaperdollSlot): the cell never
-      // carries more of the payload than the eqi wire would show a peer.
+      // The worn-identity projection (see PaperdollSlot): the eqi cosmetic
+      // set plus the self-only perfected, never a gameplay field.
       const instance = item ? wornTooltipInstance(instances?.[slot]) : undefined;
       return { slot, item, instance: instance ?? null };
     });

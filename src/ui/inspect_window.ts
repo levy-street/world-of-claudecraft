@@ -167,6 +167,11 @@ export class InspectWindow {
     e: InspectEntity,
     now: number,
     selfStanding?: { curatorRank: number; owned: number; total: number } | null,
+    // The viewer's own LIVE worn payloads (IWorld.equipmentInstances), passed
+    // only for self-inspect, same doctrine as selfStanding: the entity mirror
+    // is eqi-shaped ONLINE (no perfected), so without this the self card's
+    // Unique-Equipped tag would diverge between hosts (2026-08-27 ruling).
+    selfEquippedInstances?: Partial<Record<EquipSlot, ItemInstancePayload>>,
   ): void {
     const cls = e.templateId as PlayerClass;
     const el = this.deps.root();
@@ -187,7 +192,7 @@ export class InspectWindow {
         relicsTotal: typeof e.relicsTotal === 'number' ? e.relicsTotal : null,
         selfStanding: selfStanding ?? null,
         equippedItems: e.equippedItems,
-        equippedInstances: e.equippedInstances,
+        equippedInstances: selfEquippedInstances ?? e.equippedInstances,
         holderTier: e.holderTier ?? 0,
         holderBalance: e.holderBalance ?? null,
         discordTier: e.discordTier ?? 0,
