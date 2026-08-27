@@ -217,6 +217,7 @@ const UI_PURE_CORES = [
   'src/ui/banner_queue.ts',
   'src/ui/item_kind_label.ts',
   'src/ui/proc_overlay_view.ts',
+  'src/ui/recipe_learn_lines_view.ts',
   'src/ui/chat_ignore_core.ts',
   'src/ui/daily_rewards_launcher_core.ts',
   'src/ui/char_bags_pairing_core.ts',

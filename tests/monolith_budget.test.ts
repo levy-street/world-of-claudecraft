@@ -130,7 +130,12 @@ const MONOLITHS: MonolithRow[] = [
     // AbilityScaling literals with the extracted abilityScalingOf constructor
     // (src/ui/ability_damage.ts), so the coordinator shrank and the ratchet
     // follows it down. Exact count, zero slack.
-    ceiling: 18379,
+    // Lowered 18379 -> 18352: the recipe-scroll learn arm paid for its new
+    // recipeScrollResult case by extracting the trainResult line building
+    // into the shared src/ui/recipe_learn_lines.ts pure core, so both learn
+    // paths render through one module and the coordinator shrank. Exact
+    // count, zero slack.
+    ceiling: 18352,
     seam: 'pure view core + thin painter on PainterHost (src/ui/CLAUDE.md)',
   },
   {

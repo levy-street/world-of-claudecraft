@@ -54,7 +54,6 @@ import { HEROIC_MARK_ITEM_ID } from '../sim/content/dungeon_difficulty';
 import { HEROIC_VENDOR_STOCK } from '../sim/content/heroic_vendor';
 import { isOnMountRaceStartPlatform, MOUNTS } from '../sim/content/mounts';
 import { PROVING_SHORE_ARRIVAL } from '../sim/content/proving_shore';
-import { recipeById } from '../sim/content/recipes';
 import { RELIQUARY_PAGES, RELIQUARY_PAGES_BY_ID } from '../sim/content/reliquary';
 import { FIRST_TALENT_LEVEL, type TalentAllocation, talentsFor } from '../sim/content/talents';
 import { resolveActiveWeaponSkin } from '../sim/content/weapon_skin_rules';
@@ -92,7 +91,6 @@ import {
   type RespecPaymentTier,
 } from '../sim/professions/focus';
 import { inRangeStationTypes, stationTypesSignature } from '../sim/professions/stations';
-import { TIER_SKILL_STEP, tierForSkill } from '../sim/professions/wheel';
 import { questObjectivesForMob } from '../sim/quest_targets';
 import type { ResolvedAbility } from '../sim/sim';
 import type {
@@ -690,6 +688,7 @@ import {
 import { questProgressEventText } from './quest_progress_text';
 import { lockoutParts, lockoutShape } from './raid_lockout';
 import { type RaidLockoutI18n, raidLockoutPanelHtml } from './raid_lockout_view';
+import { recipeScrollResultLine, trainResultLine } from './recipe_learn_lines_view';
 import {
   reliquaryIlluminationBroadcastLine,
   reliquaryIlluminationBroadcastRendered,
@@ -11415,53 +11414,27 @@ export class Hud {
           break;
         }
         case 'trainResult': {
-          // Recipe training outcome (Professions 2.0). The event is
-          // text-free: the recipe name, craft, and tier threshold all derive
-          // from recipeId plus static content, identical in both worlds. ONE
-          // chat line either way: no toast and no sound cue on success (the
-          // grant-hub double-log trap; the fee/grant surfaces stay single).
-          // The result closes the row's learn flight; an ok joins the
-          // confirmed overlay so the repaint below reads Known even when the
-          // cprof mirror has not caught up yet (issue #2342).
+          // Recipe training outcome (Professions 2.0). Text-free event; the
+          // line builds in the recipe_learn_lines pure core (null = the
+          // silent-deny probe arm). The result closes the row's learn
+          // flight; an ok joins the confirmed overlay so the repaint below
+          // reads Known even when the cprof mirror lags (issue #2342).
           this.trainLearns.resolve(ev.recipeId, ev.ok);
-          const trainedRecipe = recipeById(ev.recipeId);
-          if (ev.ok) {
-            const item = trainedRecipe ? ITEMS[trainedRecipe.resultItemId] : undefined;
-            this.log(
-              t('hudChrome.training.learned', {
-                recipe: item ? itemDisplayName(item) : ev.recipeId,
-              }),
-              '#7fdc4f',
-            );
-          } else if (ev.reason) {
-            // A reason-less deny is the malformed-recipe-id probe arm
-            // (resolveTrain's silent arm): nothing legible to tell the player,
-            // so render nothing (the event still lands for probes).
-            this.log(
-              ev.reason === 'train_tier_unmet'
-                ? t('hudChrome.training.tierUnmet', {
-                    craft: craftNameText(trainedRecipe?.professionId ?? null),
-                    skill: formatNumber(
-                      tierForSkill(trainedRecipe?.skillReq ?? 0) * TIER_SKILL_STEP,
-                      { maximumFractionDigits: 0 },
-                    ),
-                  })
-                : t(
-                    ev.reason === 'train_cannot_afford'
-                      ? 'hudChrome.training.cannotAfford'
-                      : ev.reason === 'train_not_taught_here'
-                        ? 'hudChrome.training.notTaughtHere'
-                        : ev.reason === 'train_already_known'
-                          ? 'hudChrome.training.alreadyKnown'
-                          : 'hudChrome.training.outOfRange',
-                  ),
-              '#ff6b6b',
-            );
-          }
+          const trainLine = trainResultLine(ev);
+          if (trainLine) this.log(trainLine.text, trainLine.color);
           // Flip the trained row (and the crafting list, which filters to
           // known recipes) without waiting for a manual reopen.
           if (this.openTrainNpcId !== null && $('#train-window').style.display === 'block')
             this.renderTrain();
+          if ($('#crafting-window').style.display === 'flex') this.renderCrafting();
+          break;
+        }
+        case 'recipeScrollResult': {
+          // Recipe-scroll learn outcome (raid professions): same text-free
+          // shape and pure line core as trainResult above; no train window
+          // involved, but the crafting list filters to known recipes.
+          const scrollLine = recipeScrollResultLine(ev);
+          if (scrollLine) this.log(scrollLine.text, scrollLine.color);
           if ($('#crafting-window').style.display === 'flex') this.renderCrafting();
           break;
         }

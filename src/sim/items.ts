@@ -58,6 +58,7 @@ import { mountOwned, summonMountItem } from './mounts';
 import { learnRiding } from './mounts_training';
 import { battlefieldExperienceTrickle } from './professions/battlefield_xp';
 import { useGatherToolItem } from './professions/gathering';
+import { useRecipeScroll } from './professions/recipe_scrolls';
 import type { ItemUseResult, PlayerMeta } from './sim';
 import type { SimContext } from './sim_context';
 import { usePassingStone } from './tutorial/death_lesson';
@@ -799,6 +800,13 @@ export function useItem(
   }
   if (def.use?.type === 'passingStone') {
     usePassingStone(ctx, p, meta);
+    return;
+  }
+  if (def.use?.type === 'teachRecipe') {
+    // Consumes on the success arm only (the leaf owns the decision); every
+    // deny leaves the scroll in the bags. Sits below the busy and dead gates
+    // like the other instant non-combat uses.
+    useRecipeScroll(ctx, meta, def.use.recipeId, () => void consumeOneUnit());
     return;
   }
   if (def.kind === 'food' || def.kind === 'drink') {

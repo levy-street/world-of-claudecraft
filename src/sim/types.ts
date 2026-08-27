@@ -881,7 +881,14 @@ export type ItemUse =
   // single source of the effect-to-item mapping; a guard derives the craftable
   // set from these defs against the R9 slot policy so no item can exist for an
   // effect the policy refuses everywhere.
-  | { type: 'toolEffect'; effectId: ToolEffectId };
+  | { type: 'toolEffect'; effectId: ToolEffectId }
+  // A raid recipe scroll (docs/prd/ignivar-raid-professions.md): using it
+  // teaches THIS character the named recipe through the 'drop' acquisition
+  // source (src/sim/professions/recipe_scrolls.ts). The scroll is consumed
+  // on a successful teach only; every deny (already known, below the tier
+  // floor) leaves it in the bags, so a misclick or an unqualified winner
+  // never wastes the drop.
+  | { type: 'teachRecipe'; recipeId: string };
 
 // Rarity ranks for the cosmetic skin-select event, ordered low → high. A rolled
 // rank unlocks its own tier and every tier below it (epic unlocks rare+uncommon).
@@ -6406,6 +6413,20 @@ export type SimEvent = { pid?: number } & (
         | 'train_out_of_range'
         | 'train_tier_unmet'
         | 'train_cannot_afford';
+    }
+  // Recipe-scroll outcome (raid professions): mirrors
+  // professions/recipe_scrolls.ts so the online client can reflect the local
+  // result of a teachRecipe scroll use without deciding it itself. Personal
+  // (emitted with pid = the learner's entity id). Text-free on purpose (like
+  // trainResult above): the client derives the recipe name, craft, and tier
+  // threshold from recipeId plus static content. `reason` is absent on
+  // success AND on a malformed/unknown recipe id (the silent-deny arm,
+  // exactly the trainResult convention).
+  | {
+      type: 'recipeScrollResult';
+      ok: boolean;
+      recipeId: string;
+      reason?: 'scroll_already_known' | 'scroll_tier_unmet' | 'scroll_wrong_source';
     }
   // Maker's Bond unbind outcome (Professions 2.0): mirrors
   // professions/commission.ts UnbindResult so the online client can reflect
