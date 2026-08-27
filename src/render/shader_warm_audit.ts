@@ -154,12 +154,13 @@ export function expectRootProgramSources(
   host: CompileArmHost,
   root: THREE.Object3D,
   atMs: number = now(),
+  includeOffscreenVariant = false,
 ): number {
   if (!state.enabled) return 0;
   const started = now();
   let sources: ProgramSourceEntry[] = [];
   try {
-    sources = collectRootProgramSources(host, root);
+    sources = collectRootProgramSources(host, root, includeOffscreenVariant);
   } catch {
     state.failures++;
   }

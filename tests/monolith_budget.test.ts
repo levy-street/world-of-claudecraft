@@ -186,7 +186,7 @@ const MONOLITHS: MonolithRow[] = [
     // Lowered after extracting the colour and shadow compile arms into
     // src/render/compile_arms.ts (the dry compile of the shader warm audit rides
     // the same arms), net of the announcement-arm wiring.
-    ceiling: 13273,
+    ceiling: 13236,
     seam: 'a new src/render/<thing>.ts module the renderer calls (src/render/CLAUDE.md)',
   },
   {

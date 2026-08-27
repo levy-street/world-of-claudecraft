@@ -10,6 +10,9 @@ export interface PrewarmResumeUnitPiece {
   /** `${unit.id}:${index}`: the same kind prefix as the unit, so the budget
    *  prices it under the unit's family. */
   id: string;
+  /** The one root this piece links, for a lane that warms it ahead of the
+   *  link (shader_warm_lane.ts). */
+  root?: object;
   run: () => Promise<void>;
 }
 
@@ -294,6 +297,7 @@ export function buildPrewarmCompileUnits<T extends object>(
         },
         pieces: roots.map((root, index) => ({
           id: `${id}:${index}`,
+          root,
           run: async () => {
             await compile(root);
           },

@@ -579,18 +579,35 @@ describe('resumeDroppedPrewarmEntries', () => {
     // PIECES one root per queue unit (PrewarmResumeUnit.pieces): the world is
     // live here, the together arm's second-arm continuations fired as one
     // 3 s task, and a batch-held unit starved the reveal gates behind it.
-    expect(source).toContain('const run = () => {');
-    expect(source).toContain(
-      'if (debt && unit.pieces) {\n                  return runPrewarmPiecesSerially(unit.pieces, (piece) =>\n                    this.backgroundGpuWork.run(piece.run, priority, piece.id, {\n                      releaseTail: true,\n                    }),\n                  );\n                }',
+    // The per-unit policy moved to src/render/prewarm_resume_runner.ts (the
+    // renderer keeps the binding); the same contract is pinned there, plus the
+    // warm ahead of each root's link (shader_warm_lane.ts).
+    const runner = readFileSync(
+      new URL('../src/render/prewarm_resume_runner.ts', import.meta.url),
+      'utf8',
+    );
+    expect(source).toContain('runResumeUnit(unit, entry, {');
+    expect(source).toContain('queue: this.backgroundGpuWork,');
+    expect(source).toContain('arms: this.compileArms,');
+    expect(runner).toContain('const pieces = debt ? unit.pieces : undefined;');
+    expect(runner).toContain('return runPrewarmPiecesSerially(pieces, (piece) =>');
+    expect(runner).toContain(
+      'deps.queue.run(piece.run, priority, piece.id, { releaseTail: true }),',
     );
     // A debt ROOT piece is one link: released under the tail cap, never a
     // held queue head (batch 18). The batch fallback and the cosmetic resume
     // keep the class-driven tail.
-    expect(source).toContain(
-      'return this.backgroundGpuWork.run(unit.run, priority, unit.id, {\n                  releaseTail: !debt,\n                });',
+    expect(runner).toContain(
+      'return deps.queue.run(unit.run, priority, unit.id, { releaseTail: !debt });',
     );
-    expect(source).toContain("return entry.id.startsWith('programs.compile')");
-    expect(source).toContain("'programs.compile-resume'");
+    expect(runner).toContain("if (entry.id.startsWith('programs.compile')) {");
+    expect(runner).toContain("'programs.compile-resume'");
+    // Every root asks the warm worker first, between units, never inside
+    // one, and before the compile lifecycle window opens.
+    expect(runner).toContain('await warmRootsBeforeLink(deps.arms, roots, {');
+    expect(runner.indexOf('await warmRootsBeforeLink(')).toBeLessThan(
+      runner.indexOf('await runPrewarmCompileResumeUnit('),
+    );
     // The old bare `releaseTail: true,` pin drifted: after the debt-class
     // split the only remaining literal `true` belongs to the preview lane,
     // an unrelated call site. The resume lane's contract is the class-driven

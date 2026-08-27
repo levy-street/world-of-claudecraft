@@ -330,7 +330,7 @@ interface AttributionTargetFixture {
 // moved, and the lockfile is a hashed leaf of the town fingerprint), so the
 // seals follow the swept evidence bytes. No capture was retaken.
 const PINNED_POLISH_COMPOSITE_FINGERPRINT =
-  'f354e38ea0097ab5d8e8d6a1a50c0fdeb70510e36b50636de1c3aae9b7859d0f';
+  '37cad5a9c8a85e51197e85b5247e7c9e0caa34c82650c1e3502ed5debb503ef9';
 
 function validPolishAttributionTargets(): AttributionTargetFixture[] {
   return [

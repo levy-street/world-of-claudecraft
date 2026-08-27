@@ -539,13 +539,12 @@ import {
   type PrewarmResumeEntry,
   type PrewarmResumeUnit,
   resumeDroppedPrewarmEntries,
-  runPrewarmCompileResumeUnit,
-  runPrewarmPiecesSerially,
   settlePrewarmBeforePublish,
   trackPrefetch,
   waitForPrefetch,
 } from './prewarm_resume';
 import { createPrewarmResumeLedger } from './prewarm_resume_ledger_core';
+import { runResumeUnit } from './prewarm_resume_runner';
 import { type PriestMarkersVisual, syncPriestMarkersVisual } from './priest_markers_visual';
 import { pieceProgramSettle } from './program_variant_settle';
 import { buildPropMaterialPrewarmGroup, buildProps, propResidencySources } from './props';
@@ -605,9 +604,11 @@ import { downscaleDims } from './screenshot';
 import { drapeRingLocalY } from './selection_ring';
 import { type SelfMotionFrame, SelfMotionPredictor, updateSelfRenderFallback } from './self_motion';
 import { SelfSpiritPrewarmer } from './self_spirit_prewarm';
+import { warmSelfSpiritPrograms } from './self_spirit_warm';
 import { SentenceVfx } from './sentence_vfx';
 import { sentenceImpactPlan } from './sentence_vfx_core';
 import { runPiecesWarmed } from './shader_warm_gate';
+import { warmRootBeforeLink } from './shader_warm_lane';
 import {
   createShadowCadenceState,
   resetShadowCadence,
@@ -1726,13 +1727,17 @@ export class Renderer {
   // each spends its own idle slot instead of stacking into one combat frame.
   private spiritBuildLane: Promise<unknown> = Promise.resolve();
   private selfSpirit = new SelfSpiritPrewarmer({
+    // Two queue units with the warm worker's hold between them
+    // (self_spirit_warm.ts); the player's state is re-read at every step.
     warm: () =>
-      this.backgroundGpuWork.run(
-        () => this.warmSelfSpirit(),
-        GPU_WORK_PRIORITY.VISIBLE_PREWARM,
-        'self-spirit',
-        { releaseTail: true },
-      ),
+      warmSelfSpiritPrograms({
+        blocked: () => !this.asyncCompileSupported || this.sim.player.ghost,
+        visual: () => this.views.get(this.sim.player.id)?.visual ?? null,
+        arms: this.compileArms,
+        run: (work, priority, label, options) =>
+          this.backgroundGpuWork.run(work, priority, label, options),
+        link: (root) => linkColorPrograms(this.compileArms, root, false),
+      }),
     idle: () => idleSlot(IDLE_PREWARM_TIMEOUT_MS),
   });
   // Static terrain/water/features just beyond the current zone are built in a
@@ -3665,6 +3670,12 @@ export class Renderer {
             if (this.asyncCompileSupported) {
               for (const obj of [...waterMeshes, ...featureGroups]) {
                 await idleSlot(IDLE_PREWARM_TIMEOUT_MS, { maxTimeoutDeferrals: 2 });
+                // The warm worker first (shader_warm_lane.ts), between units.
+                await warmRootBeforeLink(this.compileArms, obj, {
+                  priority: GPU_WORK_PRIORITY.VISIBLE_PREWARM,
+                  label: `zone-prepare-warm:${obj.name || obj.type}`,
+                  run: (work, priority, label) => this.backgroundGpuWork.run(work, priority, label),
+                });
                 // Await the linker before revealing the object or advancing to
                 // another unit. Submit one object at a time so live work can
                 // jump queued visible-zone prewarm without overlapping it.
@@ -3758,6 +3769,12 @@ export class Renderer {
               }),
             compileChild: async (child) => {
               const childRoot = child as THREE.Object3D;
+              await warmRootBeforeLink(this.compileArms, childRoot, {
+                priority: GPU_WORK_PRIORITY.VISIBLE_PREWARM,
+                label: `zone-prewarm-warm:${childRoot.name || childRoot.type}`,
+                run: (work, priority, label) => this.backgroundGpuWork.run(work, priority, label),
+                includeOffscreenVariant: true,
+              });
               await this.backgroundGpuWork.run(
                 () => this.compilePrewarmColorPrograms(childRoot, true),
                 GPU_WORK_PRIORITY.VISIBLE_PREWARM,
@@ -5389,33 +5406,6 @@ export class Renderer {
     return linkShadowPrograms(this.compileArms, root);
   }
 
-  // Link the local player's own body spirit (ghost) transparent variants
-  // off-thread so a later spirit release reuses cached programs instead of
-  // linking ~20 inline on the ungated self view (the ~2.2 s death stall).
-  // Applies the ghost materials to the REAL skinned meshes (so the variant
-  // matches the flip's skinning/morph), runs compileAsync's synchronous
-  // prologue, then restores the opaque originals BEFORE awaiting the linker
-  // (the compileShadowPrograms restore-early pattern): no frame draws the ghost,
-  // and the clones the flip reuses stay cached on the visual.
-  private async warmSelfSpirit(): Promise<boolean> {
-    if (!this.asyncCompileSupported || this.sim.player.ghost) return false;
-    const visual = this.views.get(this.sim.player.id)?.visual;
-    if (!visual) return false;
-    const previousTarget = this.webgl.getRenderTarget();
-    // Composer tiers link the ghost variant against their offscreen colour space.
-    if (this.post) this.prewarmRenderTarget ??= new THREE.WebGLRenderTarget(8, 8);
-    let compilePromise: Promise<THREE.Object3D>;
-    visual.setGhost(true);
-    try {
-      this.webgl.setRenderTarget(this.post ? this.prewarmRenderTarget : null);
-      compilePromise = this.webgl.compileAsync(visual.root, this.camera, this.scene);
-    } finally {
-      this.webgl.setRenderTarget(previousTarget);
-      visual.setGhost(false);
-    }
-    await compilePromise;
-    return true;
-  }
   // A tiny throwaway target for background child uploads, so a prewarm root
   // that is briefly visible during its bounded call is never presented on
   // the canvas. Lazily built once and kept: 8x8 RGBA plus depth is negligible.
@@ -7151,42 +7141,15 @@ export class Renderer {
           await Promise.allSettled(submittedCompileUnits.map((unit) => unit.done));
           return resumeDroppedPrewarmEntries(resume, {
             idleSlot: () => idleSlot(IDLE_PREWARM_TIMEOUT_MS, { maxTimeoutDeferrals: 2 }),
-            runUnit: (unit, entry) => {
-              // Link/upload debt runs at BOOT_DEBT so the cosmetic BACKGROUND
-              // warmers (the preview lane) cannot starve it (hitch-hunt P1:
-              // minutes of unpaid link debt behind the previews). A debt
-              // BATCH (no pieces) keeps its tail HELD: released, its 16 to 32
-              // links piled into the driver at once (sub-1-fps for a minute
-              // with a dropped manifest). A debt ROOT piece releases its tail:
-              // ONE link under the released-tail cap, whereas a held root
-              // blocked the queue head for its whole link wait behind the
-              // driver's queue (batch 18: 4.0 s on the iGPU, reveals starved).
-              const debt = prewarmResumeIsDebt(entry.id);
-              resumeLedger.noteStart(entry.id);
-              const priority = debt ? GPU_WORK_PRIORITY.BOOT_DEBT : GPU_WORK_PRIORITY.BOOT_RESUME;
-              const run = () => {
-                if (debt && unit.pieces) {
-                  return runPrewarmPiecesSerially(unit.pieces, (piece) =>
-                    this.backgroundGpuWork.run(piece.run, priority, piece.id, {
-                      releaseTail: true,
-                    }),
-                  );
-                }
-                // Cosmetic resume keeps the released tail (held, a 16-root unit
-                // blocked live compile gates for seconds: travel hitches).
-                return this.backgroundGpuWork.run(unit.run, priority, unit.id, {
-                  releaseTail: !debt,
-                });
-              };
-              return entry.id.startsWith('programs.compile')
-                ? runPrewarmCompileResumeUnit(
-                    unit,
-                    compileLifecycle,
-                    'programs.compile-resume',
-                    run,
-                  )
-                : run();
-            },
+            // Priority, tail and the warm ahead of each root's link:
+            // prewarm_resume_runner.ts owns the policy and its why.
+            runUnit: (unit, entry) =>
+              runResumeUnit(unit, entry, {
+                queue: this.backgroundGpuWork,
+                ledger: resumeLedger,
+                lifecycle: compileLifecycle,
+                arms: this.compileArms,
+              }),
             afterEntry: hidePrewarmArtifacts,
             onUnitError: (entry, unit, error) => {
               resumeLedger.noteFailure(entry.id, unit.id);

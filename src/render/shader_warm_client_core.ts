@@ -17,8 +17,10 @@
 // so the readout says how often the worker was NOT the path.
 //
 // The modes exist so the policy can be measured rather than believed:
-// `?shaderwarm=off` (the default) never asks the worker, `reveal` holds the
-// reveal lane only, `all` holds every gate below the actionable floor.
+// `?shaderwarm=off` (the default) never asks the worker, `reveal` holds every
+// requester below the live view (the reveal gates and, since every producer
+// became a requester, the zone, resume and self-spirit lanes), `all` holds
+// every gate below the actionable floor.
 
 import { programSourceHash } from './shader_warm_audit_core';
 import type { ShaderWarmSource } from './shader_warm_protocol';

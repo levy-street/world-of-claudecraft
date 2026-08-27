@@ -182,6 +182,17 @@ describe('shader warm audit flag', () => {
 });
 
 describe('expectRootProgramSources', () => {
+  it('announces the offscreen colour variant too when the lane would link it', () => {
+    // A bypassed zone prewarm links both colour targets; announcing one of
+    // them would leave the other counted as unexpected in the off arm only.
+    const rig = armRig([dry('k', 'v', 'f')]);
+    resetShaderWarmAuditForTest('?perf');
+    expectRootProgramSources(rig.host, root(), 1, true);
+    expect(rig.collectCalls()).toBe(2);
+    expectRootProgramSources(rig.host, root(), 2);
+    expect(rig.collectCalls()).toBe(3);
+  });
+
   it('announces every dry source under the root name, once per key', () => {
     resetShaderWarmAuditForTest('?perf');
     const host = armHost([dry('a', 'va', 'fa'), dry('b', 'vb', 'fb')]);

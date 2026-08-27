@@ -1587,7 +1587,7 @@ describe('mandatory interaction-landmark prewarm', () => {
 });
 
 describe('self-spirit prewarm queue wiring', () => {
-  it('preserves the idle delay and runs the compile through the shared GPU queue', () => {
+  it('preserves the idle delay and runs the warm and link units through the shared GPU queue', () => {
     const renderer = readFileSync(
       new URL('../src/render/renderer.ts', import.meta.url),
       'utf8',
@@ -1597,14 +1597,13 @@ describe('self-spirit prewarm queue wiring', () => {
     expect(start).toBeGreaterThan(-1);
     expect(end).toBeGreaterThan(start);
     const wiring = renderer.slice(start, end);
-    const idleAt = wiring.indexOf('idle: () => idleSlot(IDLE_PREWARM_TIMEOUT_MS)');
-    const queueAt = wiring.indexOf('this.backgroundGpuWork.run(');
-    expect(idleAt).toBeGreaterThan(-1);
-    expect(queueAt).toBeGreaterThan(-1);
-    expect(wiring).toContain('() => this.warmSelfSpirit()');
-    expect(wiring).toContain('GPU_WORK_PRIORITY.VISIBLE_PREWARM');
-    expect(wiring).toContain("'self-spirit'");
-    expect(wiring).toContain('{ releaseTail: true }');
+    expect(wiring).toContain('idle: () => idleSlot(IDLE_PREWARM_TIMEOUT_MS)');
+    // The units themselves (priority, labels, released tail, the hold
+    // between them) are pinned on the module, tests/self_spirit_warm.test.ts.
+    expect(wiring).toContain('warmSelfSpiritPrograms({');
+    expect(wiring).toContain('this.backgroundGpuWork.run(work, priority, label, options)');
+    expect(wiring).toContain('linkColorPrograms(this.compileArms, root, false)');
+    expect(wiring).toContain('!this.asyncCompileSupported || this.sim.player.ghost');
   });
 });
 
