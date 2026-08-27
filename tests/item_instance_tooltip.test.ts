@@ -335,9 +335,10 @@ describe('wornTooltipInstance (the eqi-mirror worn projection)', () => {
   it('char_window routes the paperdoll tooltip through the projection (source pin)', () => {
     const charWindow = readFileSync(new URL('../src/ui/char_window.ts', import.meta.url), 'utf8');
     expect(charWindow).toContain('wornTooltipInstance(');
-    // The raw equippedInstances read feeds ONLY the projection, never the
+    // The raw IWorld.equipmentInstances read (the owner's FULL worn map on
+    // both hosts, the phase 13 QA) feeds ONLY the projection, never the
     // tooltip directly.
-    const site = charWindow.indexOf('equippedInstances?.[slot]');
+    const site = charWindow.indexOf('world.equipmentInstances?.[slot]');
     expect(site).toBeGreaterThan(-1);
     const before = charWindow.slice(Math.max(0, site - 220), site);
     expect(before).toContain('wornTooltipInstance(');

@@ -108,7 +108,10 @@ function rig(marketHooks: WocMarketHooks | null = null): Rig {
   return { controller: new WocTradeController(deps), host };
 }
 
-function openTrade(r: Rig, myItems: { itemId: string; count: number }[] = []): void {
+function openTrade(
+  r: Rig,
+  myItems: { itemId: string; count: number; instance?: Record<string, unknown> }[] = [],
+): void {
   r.host.tradeInfo = {
     otherName: 'Bree',
     myOffer: { items: myItems, copper: 0 },
@@ -473,6 +476,23 @@ describe('a staged item renders its name in the quality colour', () => {
     // And the frame class is NOT what carries it: a rung class on the text span
     // would paint the halo again.
     expect(row?.innerHTML).not.toContain('class="q-');
+  });
+
+  it('colours a legacy legendary-rolled COPY legendary, never its def tier', () => {
+    // The phase 13 QA frontend finding: the row read the def alone while the
+    // staged InvSlot carried its instance. A promoted copy is bound and never
+    // reaches the table, but a legacy legendary-rolled copy (an old
+    // masterwork bump) is tradable and must read as itself here, the
+    // all-surfaces item-cell rule.
+    const epic = Object.entries(ITEMS).find(([, def]) => bagQualityKey(def) === 'epic');
+    const [epicId] = epic ?? ['', null];
+    const r = rig();
+    openTrade(r, [{ itemId: epicId, count: 1, instance: { rolled: { quality: 'legendary' } } }]);
+    r.controller.updateTradeWindow();
+    const span =
+      document.querySelector<HTMLElement>('#trade-window .trade-item span[style*="color"]') ?? null;
+    expect(span, 'the name span carries an inline colour').not.toBeNull();
+    expect(span?.style.color.replace(/\s/g, '')).toBe(QUALITY_COLOR.legendary);
   });
 });
 

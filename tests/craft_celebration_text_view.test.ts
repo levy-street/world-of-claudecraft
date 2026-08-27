@@ -9,8 +9,10 @@ import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 import { ITEMS } from '../src/sim/data';
 import {
+  CRAFT_TOAST_LOG_COLOR,
   craftBannerIcon,
   craftBannerText,
+  craftToastLogLines,
   legendaryForgedLine,
   legendaryZoneLine,
   masterworkToastText,
@@ -91,14 +93,37 @@ describe('legendary lines (Masterwrought phase 13)', () => {
   });
 });
 
+describe('craftToastLogLines: the toast lines carry their own color', () => {
+  it('lists the masterwork toast first, then every tier-up, all in the toast gold', () => {
+    const lines = craftToastLogLines({
+      masterworkLogItemId: 'eastbrook_arming_sword',
+      tierUpLogs: [
+        { craftId: 'blacksmithing', toTier: 2 } as never,
+        { craftId: 'blacksmithing', toTier: 3 } as never,
+      ],
+    });
+    expect(lines).toHaveLength(3);
+    expect(lines[0].text).toBe(masterworkToastText('eastbrook_arming_sword'));
+    expect(lines[1].text).toBe(tierUpToastText({ craftId: 'blacksmithing', toTier: 2 } as never));
+    expect(lines.map((l) => l.color)).toEqual(['#ffd100', '#ffd100', '#ffd100']);
+    expect(CRAFT_TOAST_LOG_COLOR).toBe('#ffd100');
+  });
+
+  it('an empty plan yields no lines (no phantom toast)', () => {
+    expect(craftToastLogLines({ masterworkLogItemId: null, tierUpLogs: [] })).toEqual([]);
+  });
+});
+
 describe('the hud switch consumes the bundle decisions (source pins)', () => {
   // The consumer half: string interpolation in the event switch that no
   // behavioral suite drives (the celebration arms need a full Hud world), so
   // the wiring is pinned at source with comments stripped.
-  const hud = readFileSync(new URL('../src/ui/hud.ts', import.meta.url), 'utf8').replace(
-    /^\s*\/\/.*$/gm,
-    '',
-  );
+  // Block AND line comments stripped (the enchant_apply_view idiom): a JSDoc
+  // block spelling the call could otherwise hold the count while a real call
+  // lost the flag (the phase 13 QA test-coverage audit).
+  const hud = readFileSync(new URL('../src/ui/hud.ts', import.meta.url), 'utf8')
+    .replace(/\/\*[\s\S]*?\*\//g, '')
+    .replace(/^\s*\/\/.*$/gm, '');
 
   it('both legendary arms gate the achievement cue on playCue, never inline', () => {
     const arms = hud.match(/if \(l\.playCue\) audio\.achievement\(\);/g);

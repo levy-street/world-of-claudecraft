@@ -217,6 +217,11 @@ const UI_PURE_CORES = [
   'src/ui/aura_overlay_view.ts',
   'src/ui/banner_queue.ts',
   'src/ui/item_kind_label.ts',
+  // The shared item-tooltip authority (the phase 13 QA): a bare-named pure
+  // core three registered cores import, so its import bans are enforced here
+  // rather than only by the residual no-host rule.
+  'src/ui/item_instance_tooltip.ts',
+  'src/ui/worn_item_cell_view.ts',
   'src/ui/proc_overlay_view.ts',
   'src/ui/chat_ignore_core.ts',
   'src/ui/daily_rewards_launcher_core.ts',
@@ -688,6 +693,7 @@ const BARE_NAMED = [
   'src/ui/entity_display_name.ts',
   'src/ui/banner_queue.ts',
   'src/ui/item_instance_glyph_mark.ts',
+  'src/ui/item_instance_tooltip.ts',
   'src/ui/item_kind_label.ts',
   'src/ui/item_name_color.ts',
   'src/ui/market_name_color.ts',
@@ -1794,6 +1800,7 @@ const EXPECTED_BARE_NAMED = [
   'src/ui/hud/quest/quest_tracker.ts',
   'src/ui/hud_frames.ts',
   'src/ui/item_instance_glyph_mark.ts',
+  'src/ui/item_instance_tooltip.ts',
   'src/ui/item_kind_label.ts',
   'src/ui/item_name_color.ts',
   'src/ui/item_slot_labels.ts',

@@ -48,8 +48,12 @@ import type { ItemDef, ItemInstancePayload } from '../sim/types';
  * hands it to every window that renders items, so the helpers live in one place.
  */
 export interface PainterHostPresentation {
-  /** `<img>` markup for an item's procedural icon. */
-  itemIcon(item: ItemDef): string;
+  /** `<img>` markup for an item's procedural icon. The optional `quality` is
+   *  the cell's INSTANCE-effective quality (worn_item_cell_view.ts): a
+   *  promoted legendary copy gets its orange rim here rather than its def
+   *  tier's, and every item cell routes through this one dep so the icon
+   *  seam stays injected (the phase 13 QA). */
+  itemIcon(item: ItemDef, quality?: ItemDef['quality']): string;
   /** Localized coin markup (gold/silver/copper) for a copper amount. */
   moneyHtml(copper: number): string;
   /** Full item tooltip markup (name, stats, compare). The optional per-copy

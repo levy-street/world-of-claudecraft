@@ -11,6 +11,7 @@ import { QUALITY_COLOR } from '../src/ui/icons';
 import { classColorCss } from '../src/ui/inspect_view';
 import { type InspectEntity, InspectWindow } from '../src/ui/inspect_window';
 import { qualityGlowShadow } from '../src/ui/quality_glow';
+import { knownItemIconHtml } from '../src/ui/unknown_item_icon';
 
 // The inspect ("Profile") window painter is a DOM module. Most guards below are
 // source scans, the char_window suite's shape: they pin the WCAG focus-trap the
@@ -375,13 +376,13 @@ describe('inspect_window: the real painter over a Sim-shaped and a ranked entity
       slotName: (slot) => slot,
       showDevBadges: () => showDevBadges,
       mountPreview: vi.fn(),
-      // A real data URL, not '': an empty-string src resolves against the
-      // document URL in happy-dom and fetches. NOTE the honest scope: this
-      // stub is the FILLED-slot resolver and these fixtures equip nothing, so
-      // it guards future filled-slot fixtures; the suite's residual
-      // localhost fetch noise comes from other asset-path srcs and is a
-      // recorded hygiene follow-up, not this line.
-      itemIcon: () => STUB_DATA_URL,
+      // The real icon resolver (what Hud.itemIcon binds), so the filled-slot
+      // rows carry the `.item-icon q-<quality>` markup the row pins read; its
+      // src is a data URL off the stubbed canvas (an empty-string src would
+      // resolve against the document URL in happy-dom and fetch). The
+      // suite's residual localhost fetch noise comes from other asset-path
+      // srcs and is a recorded hygiene follow-up, not this line.
+      itemIcon: (item, quality) => knownItemIconHtml(item, quality),
       moneyHtml: () => '',
       itemTooltip: (item, instance) => {
         tooltipCalls.push({ itemId: item.id, instance });

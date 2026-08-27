@@ -44,7 +44,7 @@ import {
   holderTierDisplayName,
 } from './holder_tier';
 import { formatNumber, t } from './i18n';
-import { iconDataUrl, QUALITY_COLOR } from './icons';
+import { iconDataUrl } from './icons';
 import {
   buildInspectRemoteView,
   buildInspectView,
@@ -56,13 +56,12 @@ import {
   type InspectHeaderModel,
   type InspectHolderModel,
 } from './inspect_view';
-import { tooltipEffectiveQuality } from './item_instance_tooltip';
 import type { PainterHostPresentation } from './painter_host';
 import { hydratePortraits, portraitChipHtml } from './portrait_chip';
 import { qualityGlowShadow } from './quality_glow';
 import { curatorRankNameKey } from './reliquary_view';
 import { svgIcon } from './ui_icons';
-import { knownItemIconHtml } from './unknown_item_icon';
+import { wornItemCellParts } from './worn_item_cell_view';
 
 /** The inspected entity fields the painter reads (a structural subset of the
  *  live EntityView / ClientWorld mirror; all already client-side). */
@@ -314,11 +313,11 @@ export class InspectWindow {
     const { slot, item, instance } = cell;
     const row = document.createElement('div');
     row.className = 'equip-slot';
-    const wornName = item ? (instance?.name ?? itemDisplayName(item)) : null;
-    const effQuality = item ? tooltipEffectiveQuality(item, instance ?? undefined) : undefined;
-    const qColor = item ? (QUALITY_COLOR[effQuality ?? 'common'] ?? '') : '';
+    const parts = item ? wornItemCellParts(item, instance) : null;
+    const wornName = parts ? parts.name : null;
+    const qColor = parts ? parts.color : '';
     const icon = item
-      ? knownItemIconHtml(item, effQuality)
+      ? this.deps.itemIcon(item, parts?.quality)
       : `<img class="item-icon" src="${iconDataUrl('item', 'slot_empty')}" alt="" draggable="false">`;
     row.innerHTML = `${icon}<div><div class="slot-name">${esc(this.deps.slotName(slot))}</div><div class="slot-item"${item ? ` style="color:${qColor}"` : ''}>${wornName !== null ? esc(wornName) : esc(t('itemUi.equipment.empty'))}</div></div>`;
     if (item) {

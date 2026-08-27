@@ -35,7 +35,14 @@ describe('char_window: no magic values', () => {
   });
 
   it('routes the quality + empty-slot colors through CSS tokens', () => {
-    expect(painter).toContain("const QUALITY_DEFAULT_COLOR = 'var(--color-quality-default)'");
+    // The unranked-item token moved with the cell color into the shared cell
+    // authority (worn_item_cell_view.ts, the phase 13 QA); the empty-slot
+    // pair stays here.
+    const cellView = readFileSync(join(__dirname, '../src/ui/worn_item_cell_view.ts'), 'utf8');
+    expect(cellView).toContain(
+      "export const QUALITY_DEFAULT_COLOR = 'var(--color-quality-default)'",
+    );
+    expect(painter).not.toContain('QUALITY_DEFAULT_COLOR');
     expect(painter).toContain("const SLOT_EMPTY_TEXT_COLOR = 'var(--color-slot-empty-text)'");
     expect(painter).toContain("const SLOT_EMPTY_BORDER_COLOR = 'var(--color-slot-empty-border)'");
   });
@@ -456,7 +463,10 @@ describe('char_window: focus carried across the 2 Hz rebuild', () => {
     );
   }
 
-  function makeWin(root: HTMLElement): CharWindow {
+  function makeWin(
+    root: HTMLElement,
+    extra: { world?: Record<string, unknown>; deps?: Record<string, unknown> } = {},
+  ): CharWindow {
     const world = {
       cfg: { playerClass: 'warrior' },
       player: { name: 'Aurelia', level: 60, skin: 0 },
@@ -468,6 +478,7 @@ describe('char_window: focus carried across the 2 Hz rebuild', () => {
       ownedMounts: () => [],
       selectMount: () => {},
       professionsState: { skills: [] },
+      ...extra.world,
     };
     return new CharWindow({
       root: () => root,
@@ -502,8 +513,75 @@ describe('char_window: focus carried across the 2 Hz rebuild', () => {
       moneyHtml: () => '',
       itemTooltip: () => '',
       attachTooltip: vi.fn(),
+      // A test's own recording deps win over the stubs above.
+      ...(extra.deps as object),
     });
   }
+
+  it('the own worn row, tooltip, and unequip aria all read the FULL worn copy (both hosts)', () => {
+    // The phase 13 QA parity finding, pinned behaviorally: the paperdoll
+    // tooltip closure must read IWorld.equipmentInstances (full on both
+    // hosts, `perfected` included) rather than the self entity mirror, which
+    // online is the eqi-trimmed peer projection and dropped the Unique-Equipped
+    // tag on one host only. The rig's world carries NO entity mirror at all,
+    // so a painter that reached for it would build a def-only tooltip here.
+    canvasStub();
+    const root = document.createElement('div');
+    document.body.appendChild(root);
+    const tooltips: unknown[] = [];
+    const attached: { el: HTMLElement; build: () => string }[] = [];
+    try {
+      const win = makeWin(root, {
+        world: {
+          equipment: { neck: 'wyrmfall_pendant' },
+          equipmentInstances: {
+            neck: {
+              perfected: true,
+              rolled: { quality: 'legendary', stats: { int: 2 } },
+              name: 'Dawn Oath',
+              boundTo: 1,
+              signer: 'Forger',
+            },
+          },
+        },
+        deps: {
+          itemTooltip: (_item: unknown, instance: unknown) => {
+            tooltips.push(instance);
+            return '';
+          },
+          attachTooltip: (el: HTMLElement, build: () => string) => {
+            attached.push({ el, build });
+          },
+        },
+      });
+      win.render();
+      const row = root.querySelector<HTMLElement>('#equip-slot-neck');
+      expect(row, 'the neck socket rendered').not.toBeNull();
+      // The row label is the chosen name in legendary orange (the cell authority).
+      const label = row?.querySelector<HTMLElement>('.slot-item') ?? null;
+      expect(label?.textContent).toBe('Dawn Oath');
+      expect(label?.style.color.replace(/\s/g, '')).toBe('#ff8000');
+      // The unequip control hears the chosen name (a t() VALUE), never only the def.
+      const unequip = row?.querySelector<HTMLElement>('.equip-unequip-btn') ?? null;
+      expect(unequip?.getAttribute('aria-label')).toContain('Dawn Oath');
+      // The tooltip closure hands the widened dep the wornTooltipInstance
+      // projection of the FULL copy: name and the self-only `perfected` stamp
+      // kept (the unique tag's input), the bond dropped.
+      const hover = attached.find((a) => a.el === row);
+      expect(hover, 'the row attached a tooltip').toBeDefined();
+      hover?.build();
+      expect(tooltips).toEqual([
+        {
+          signer: 'Forger',
+          rolled: { quality: 'legendary', stats: { int: 2 } },
+          name: 'Dawn Oath',
+          perfected: true,
+        },
+      ]);
+    } finally {
+      document.body.removeChild(root);
+    }
+  });
 
   it('keeps focus on the same control when a signature repaint rebuilds the sheet', () => {
     // The behavioral arm for the latch's new trigger rate: refreshCharSheetIfChanged
@@ -875,16 +953,21 @@ describe('char_window: the socket row consumes the worn payload (source pins)', 
   // the unequip aria hears the same worn name.
   const src = painter.replace(/^\s*\/\/.*$/gm, '');
 
-  it('threads instances into the view build and the row reads them', () => {
-    expect(src).toContain('tooltipEffectiveQuality(item, instance ?? undefined)');
-    expect(src).toContain('instance?.name ?? itemDisplayName(item)');
+  it('threads instances into the view build and the row reads them through the one cell authority', () => {
+    // The triple (name, quality, color) comes from worn_item_cell_view.ts, the
+    // shared authority the inspect row and the player card read too (the
+    // phase 13 QA rule-of-three extraction); the row never re-derives it.
+    expect(src).toContain('const parts = item ? wornItemCellParts(item, instance) : null;');
+    expect(src).toContain('const wornName = parts ? parts.name : null;');
+    expect(src).not.toContain('tooltipEffectiveQuality(');
   });
 
-  it('drives the socket icon rim off the same instance-effective quality', () => {
-    // The orange-glow-purple-rim fix: the icon paints through
-    // knownItemIconHtml with the row's own effective quality, never the
-    // def-only deps.itemIcon.
-    expect(src).toContain('knownItemIconHtml(item, effQuality)');
+  it('drives the socket icon rim off the same instance-effective quality, through the icon dep', () => {
+    // The orange-glow-purple-rim fix: the icon paints through the widened
+    // PainterHost itemIcon dep with the cell's own effective quality (the
+    // injected seam, never a direct import that bypasses it).
+    expect(src).toContain('this.deps.itemIcon(item, parts?.quality)');
+    expect(src).not.toContain('knownItemIconHtml');
   });
 
   it('the unequip aria interpolates the worn-copy name as a t() value', () => {
@@ -900,14 +983,17 @@ describe('char_window: the socket row consumes the worn payload (source pins)', 
 });
 
 describe('char_window: own-paperdoll per-copy tooltip threading', () => {
-  it('resolves the worn instance from the self entity mirror inside the tooltip closure', () => {
-    // Both worlds mirror the own worn set on the self entity
-    // (equippedInstances), so the paperdoll tooltip must read it per slot at
-    // hover time (a closure over deps.world(), never a stale capture) and
-    // forward it into the widened itemTooltip dep. Dropping either line
-    // reverts the own paperdoll to def-only tooltips while every pure-core
-    // suite stays green.
-    expect(painter).toContain('world.entities.get(world.playerId)?.equippedInstances?.[slot]');
+  it('resolves the worn instance from IWorld.equipmentInstances inside the tooltip closure', () => {
+    // The owner's FULL worn map on both hosts (offline the live meta, online
+    // the einst self mirror), read per slot at hover time (a closure over
+    // deps.world(), never a stale capture) and forwarded into the widened
+    // itemTooltip dep. NOT the self ENTITY mirror: online that is the
+    // eqi-trimmed peer projection, which drops `perfected`, so a promoted
+    // copy's own Unique-Equipped tag vanished on one host only (the phase 13
+    // QA parity finding). Dropping either line reverts the own paperdoll to
+    // def-only tooltips while every pure-core suite stays green.
+    expect(painter).toContain('wornTooltipInstance(world.equipmentInstances?.[slot])');
     expect(painter).toContain('this.deps.itemTooltip(item, instance)');
+    expect(painter).not.toContain('world.entities.get(world.playerId)?.equippedInstances');
   });
 });

@@ -159,6 +159,22 @@ describe('mailbox_window: parcel quantity stepper (#1444, PR #1695 review)', () 
   });
 });
 
+describe('mailbox_window: the attachment and parcel chips describe the COPY', () => {
+  // The phase 13 QA frontend finding: both chips colored the name off the def
+  // alone while the copy was in hand one line down. They read the shared cell
+  // authority now (worn_item_cell_view.ts), so a legacy legendary-rolled copy
+  // reads legendary here like every other item cell. Source pins with
+  // comments stripped (a commented-out arm cannot satisfy them).
+  const code = painter.replace(/\/\*[\s\S]*?\*\//g, '').replace(/(^|[^:])\/\/.*$/gm, '$1');
+
+  it('both chips build their name, quality, and color from the cell authority', () => {
+    expect(code.match(/wornItemCellParts\(item, slot\.instance\)/g)).toHaveLength(2);
+    expect(code.match(/this\.deps\.itemIcon\(item, cell\.quality\)/g)).toHaveLength(2);
+    expect(code.match(/style="color:\$\{cell\.color\}"/g)).toHaveLength(2);
+    expect(code).not.toContain('QUALITY_COLOR[item.quality');
+  });
+});
+
 describe('mailbox_window: house style', () => {
   it('uses no em or en dashes (ASCII separators only)', () => {
     expect(painter.includes('\u2014'), 'em dash found').toBe(false);

@@ -294,7 +294,12 @@ const MONOLITHS: MonolithRow[] = [
     // own additions (the log plainText opt-out, the celebration playCue
     // consumption, the compare-card wiring) land inside that extraction.
     // Exact count, zero slack.
-    ceiling: 18245,
+    // LOWERED 18245 -> 18242 at the Masterwrought Phase 13 QA (2026-08-27):
+    // the masterwork and tier-up toast lines' color moved into the
+    // craft_celebration_text_view bundle (craftToastLogLines: the pure core
+    // decides the color, the hud case cannot recolor a shared moment), and
+    // the itemIcon dep widened in place. Exact count, zero slack.
+    ceiling: 18242,
     seam: 'pure view core + thin painter on PainterHost (src/ui/CLAUDE.md)',
   },
   {

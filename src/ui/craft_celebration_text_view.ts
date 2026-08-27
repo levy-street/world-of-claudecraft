@@ -57,6 +57,31 @@ export function tierUpToastText(up: CraftTierUp): string {
   });
 }
 
+/** The chat-log color of the masterwork and tier-up toast lines (the classic
+ *  gold the hud arm carried as a bare literal before the phase 13 QA). */
+export const CRAFT_TOAST_LOG_COLOR = '#ffd100';
+
+/** The plan's chat-log lines, in log order: the masterwork toast when the
+ *  plan carries one, then every tier-up. The bundle decides the color, so the
+ *  hud case cannot recolor one surface's copy of a shared moment (the
+ *  CraftLogLine rule, carried onto the two toast lines). */
+export function craftToastLogLines(plan: {
+  masterworkLogItemId: string | null;
+  tierUpLogs: readonly CraftTierUp[];
+}): { text: string; color: string }[] {
+  const lines: { text: string; color: string }[] = [];
+  if (plan.masterworkLogItemId !== null) {
+    lines.push({
+      text: masterworkToastText(plan.masterworkLogItemId),
+      color: CRAFT_TOAST_LOG_COLOR,
+    });
+  }
+  for (const up of plan.tierUpLogs) {
+    lines.push({ text: tierUpToastText(up), color: CRAFT_TOAST_LOG_COLOR });
+  }
+  return lines;
+}
+
 /** The one banner slot's text: masterwork outranks tier-up upstream
  *  (buildCraftCelebrationPlan); this only spells the winner. */
 export function craftBannerText(banner: CraftCelebrationBanner): string {

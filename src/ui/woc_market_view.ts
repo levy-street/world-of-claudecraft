@@ -16,6 +16,7 @@ import {
   exchangeItemCategory,
 } from '../sim/exchange_eligibility';
 import type { InvSlot, ItemInstancePayload } from '../sim/types';
+import { tooltipEffectiveQuality } from './item_instance_tooltip';
 
 // Structural twins of the src/net/woc_market_sdk.ts payload shapes. The
 // pure-core sweep (tests/architecture.test.ts) forbids net imports here even
@@ -367,7 +368,9 @@ function rowsPassing(
     if (category === 'other') return;
     if (category === 'mount' && !categories.mounts) return;
     if (category === 'mech_chroma' && !categories.mechChromas) return;
-    const quality = slot.instance?.rolled?.quality ?? def.quality ?? 'common';
+    // The one precedence rule (tooltipEffectiveQuality: the rolled override
+    // narrowed to a known tier, else the def's), never a fourth hand-rolled copy.
+    const quality = tooltipEffectiveQuality(def, slot.instance) ?? 'common';
     if (exchangeCategoryUsesQualityFloor(category) && (QUALITY_RANK[quality] ?? 0) < floor) return;
     rows.push({ index, itemId: slot.itemId, quality, instance: slot.instance });
   });

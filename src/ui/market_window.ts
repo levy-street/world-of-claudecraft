@@ -72,7 +72,6 @@ import {
 } from './market_view';
 import type { PainterHostPresentation } from './painter_host';
 import { svgIcon } from './ui_icons';
-import { knownItemIconHtml } from './unknown_item_icon';
 
 // The filter dropdown's natural size (mirrors .mkt-select-menu's max-height/gap in
 // components.css). #market-window clips with overflow: hidden on mobile, and a menu
@@ -780,7 +779,7 @@ export class MarketWindow {
         esc(formatLocalizedMoney(l.price, 'long')),
       );
       row.innerHTML =
-        `<span class="mkt-ico">${knownItemIconHtml(item, effQuality)}${badge}${heroicStar}</span>` +
+        `<span class="mkt-ico">${this.deps.itemIcon(item, effQuality)}${badge}${heroicStar}</span>` +
         `<span class="mkt-name"><span class="nm" style="color:${qColor}">${esc(itemName)}${stack}</span>` +
         `<span class="seller${l.house ? ' house' : ''}">${esc(l.house ? t('itemUi.market.merchantStock') : l.sellerName)}</span></span>` +
         `<span class="mkt-price">${priceHtml}${each}</span>`;
@@ -927,7 +926,7 @@ export class MarketWindow {
     const qColor = marketNameColor(stagedQuality);
     const pick = document.createElement('div');
     pick.className = 'mkt-sell-pick';
-    pick.innerHTML = `${knownItemIconHtml(item, stagedQuality)}<span class="ps-name" style="color:${qColor}">${esc(itemDisplayName(item))}</span>`;
+    pick.innerHTML = `${this.deps.itemIcon(item, stagedQuality)}<span class="ps-name" style="color:${qColor}">${esc(itemDisplayName(item))}</span>`;
     // The staged copy's tooltip carries its payload, so a player holding plain
     // AND special copies can see WHICH one is staged (the mail chip precedent).
     this.deps.attachTooltip(pick, () => this.deps.itemTooltip(item, view.form.instance));
@@ -1037,7 +1036,7 @@ export class MarketWindow {
         count > 1
           ? ` ${t('itemUi.market.stackCount', { count: formatNumber(count, { maximumFractionDigits: 0 }) })}`
           : '';
-      row.innerHTML = `<span class="mkt-collect-item">${knownItemIconHtml(item, returnedQuality)}<span class="mkt-collect-name" style="color:${qColor}">${esc(itemDisplayName(item))}${esc(stack)}</span></span>`;
+      row.innerHTML = `<span class="mkt-collect-item">${this.deps.itemIcon(item, returnedQuality)}<span class="mkt-collect-name" style="color:${qColor}">${esc(itemDisplayName(item))}${esc(stack)}</span></span>`;
       this.deps.attachTooltip(row, () => this.deps.itemTooltip(item, instance));
       body.appendChild(row);
     }

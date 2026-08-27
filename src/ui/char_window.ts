@@ -33,9 +33,9 @@ import { focusedWithin, restoreFirstEnabled } from './focus_restore';
 import { gatheringProfessionNameKey } from './gathering_profession_name';
 import { buildGatheringProficiencyRows } from './gathering_view';
 import { formatNumber, type TranslationKey, t, tPlural } from './i18n';
-import { iconDataUrl, professionIconUrl, QUALITY_COLOR } from './icons';
+import { iconDataUrl, professionIconUrl } from './icons';
 import type { ItemDragState } from './item_drag_state';
-import { tooltipEffectiveQuality, wornTooltipInstance } from './item_instance_tooltip';
+import { wornTooltipInstance } from './item_instance_tooltip';
 import type { PainterHostPresentation } from './painter_host';
 import { playtimeParts, playtimeShape } from './playtime_view';
 import {
@@ -50,13 +50,12 @@ import { qualityGlowShadow } from './quality_glow';
 import { tSim } from './sim_i18n';
 import type { StatId } from './stat_tooltip';
 import { svgIcon } from './ui_icons';
-import { knownItemIconHtml } from './unknown_item_icon';
+import { wornItemCellParts } from './worn_item_cell_view';
 
-// Quality / empty-slot colors as CSS custom properties: the shared
-// QUALITY_COLOR map carries the per-quality hex, and these tokens cover the
-// unranked item plus the empty-slot label and icon border, so no raw hex lives
-// in this painter.
-const QUALITY_DEFAULT_COLOR = 'var(--color-quality-default)';
+// Empty-slot colors as CSS custom properties (the worn cell's own color comes
+// from worn_item_cell_view.ts, which carries the unranked-item token): these
+// cover the empty-slot label and icon border, so no raw hex lives in this
+// painter.
 const SLOT_EMPTY_TEXT_COLOR = 'var(--color-slot-empty-text)';
 const SLOT_EMPTY_BORDER_COLOR = 'var(--color-slot-empty-border)';
 
@@ -427,18 +426,16 @@ export class CharWindow {
     row.dataset.equipSlot = slot;
     this.bindEquipDropTarget(row, slot);
     // The row describes the worn COPY, not just its def (the all-surfaces
-    // item-cell rule): instance-effective quality colors the line, drives the
-    // icon's q-<quality> rim (so a promoted copy's orange glow never sits on
-    // a purple def rim), and a promoted copy's player-chosen name replaces
-    // the def name. The chosen name is player-authored text, so it is esc'd
-    // raw, never through t().
-    const wornName = item ? (instance?.name ?? itemDisplayName(item)) : null;
-    const effQuality = item ? tooltipEffectiveQuality(item, instance ?? undefined) : undefined;
-    const qColor = !item
-      ? SLOT_EMPTY_TEXT_COLOR
-      : (QUALITY_COLOR[effQuality ?? 'common'] ?? QUALITY_DEFAULT_COLOR);
+    // item-cell rule, one authority: worn_item_cell_view.ts): instance-effective
+    // quality colors the line and drives the icon's q-<quality> rim (so a
+    // promoted copy's orange glow never sits on a purple def rim), and a
+    // promoted copy's player-chosen name replaces the def name. The chosen
+    // name is player-authored text, so it is esc'd raw, never through t().
+    const parts = item ? wornItemCellParts(item, instance) : null;
+    const wornName = parts ? parts.name : null;
+    const qColor = parts ? parts.color : SLOT_EMPTY_TEXT_COLOR;
     const icon = item
-      ? knownItemIconHtml(item, effQuality)
+      ? this.deps.itemIcon(item, parts?.quality)
       : `<img class="item-icon" style="border-color:${SLOT_EMPTY_BORDER_COLOR}" src="${iconDataUrl('item', 'slot_empty')}" alt="" draggable="false">`;
     row.innerHTML = `${icon}
         <div><div class="slot-name">${esc(this.deps.slotName(slot))}</div><div class="slot-item" style="color:${qColor}">${wornName !== null ? esc(wornName) : esc(t('itemUi.equipment.empty'))}</div></div>`;
@@ -474,15 +471,16 @@ export class CharWindow {
       const iconEl = row.querySelector<HTMLImageElement>('.item-icon');
       if (iconEl) iconEl.style.boxShadow = qualityGlowShadow(qColor);
       this.deps.attachTooltip(row, () => {
-        // Own worn copy's per-copy lines (seal, enchanted marker, maker's mark):
-        // the self entity mirror carries equippedInstances in both worlds.
-        // Projected through wornTooltipInstance so the offline
-        // full payload renders exactly what the online eqi-trimmed mirror
-        // does: worn identity is signer/enchant/rolled, never the bond.
+        // Own worn copy's per-copy lines (seal, enchanted marker, maker's mark,
+        // the phase 13 unique tag): read from IWorld.equipmentInstances, the
+        // owner's FULL worn map on both hosts (offline the live meta, online
+        // the einst self mirror), never the self ENTITY mirror, which online
+        // is the eqi-trimmed peer projection and drops `perfected` (the phase
+        // 13 QA parity finding: the tag vanished on one host only). Projected
+        // through wornTooltipInstance so the tooltip renders the worn
+        // identity plus the self-only Perfected stamp, never the bond.
         const world = this.deps.world();
-        const instance = wornTooltipInstance(
-          world.entities.get(world.playerId)?.equippedInstances?.[slot],
-        );
+        const instance = wornTooltipInstance(world.equipmentInstances?.[slot]);
         return `${this.deps.itemTooltip(item, instance)}<div class="tt-sub">${esc(t('hudChrome.paperdoll.unequipHint'))}</div>`;
       });
       // Corner x: a styled glyph control (not an in-game icon), revealed on

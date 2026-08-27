@@ -11,6 +11,14 @@ import { MarketWindow } from '../src/ui/market_window';
 // the pure core (no duplicated market_filters logic).
 const painter = readFileSync(new URL('../src/ui/market_window.ts', import.meta.url), 'utf8');
 const core = readFileSync(new URL('../src/ui/market_view.ts', import.meta.url), 'utf8');
+// The instance-effective cell pins match CODE only: block and line comments
+// are stripped first, so a commented-out arm cannot satisfy a pin by keeping
+// its text around (the phase 13 QA test-coverage audit; the source-text-pin
+// trap). The raw `painter` above stays for the slice-anchored method reads.
+function codeOnly(source: string): string {
+  return source.replace(/\/\*[\s\S]*?\*\//g, '').replace(/(^|[^:])\/\/.*$/gm, '$1');
+}
+const painterCode = codeOnly(painter);
 const componentsCss = readFileSync(
   new URL('../src/styles/components.css', import.meta.url),
   'utf8',
@@ -42,15 +50,17 @@ describe('market_window: no magic values', () => {
     // publicInstanceView payload, the staged sell pick and the returned-goods
     // rows their own copies, so a promoted legendary reads legendary. The
     // sale ledger's rows carry no payload in their model and stay def-only.
-    expect(painter).toContain('const effQuality = tooltipEffectiveQuality(item, l.instance);');
-    expect(painter).toContain('marketNameColor(effQuality)');
-    expect(painter).toContain(
+    expect(painterCode).toContain('const effQuality = tooltipEffectiveQuality(item, l.instance);');
+    expect(painterCode).toContain('marketNameColor(effQuality)');
+    expect(painterCode).toContain(
       'const stagedQuality = tooltipEffectiveQuality(item, view.form.instance);',
     );
-    expect(painter).toContain('marketNameColor(stagedQuality)');
-    expect(painter).toContain('const returnedQuality = tooltipEffectiveQuality(item, instance);');
-    expect(painter).toContain('marketNameColor(returnedQuality)');
-    expect(painter).toContain('const qColor = marketNameColor(item.quality);');
+    expect(painterCode).toContain('marketNameColor(stagedQuality)');
+    expect(painterCode).toContain(
+      'const returnedQuality = tooltipEffectiveQuality(item, instance);',
+    );
+    expect(painterCode).toContain('marketNameColor(returnedQuality)');
+    expect(painterCode).toContain('const qColor = marketNameColor(item.quality);');
     const core = readFileSync(new URL('../src/ui/market_name_color.ts', import.meta.url), 'utf8');
     expect(core).toContain('var(--mkt-name-');
     // The CODE must carry no color literal (tokens only); the header comment may
@@ -78,9 +88,13 @@ describe('market_window: instance-effective icon rims (phase 13 fix round)', () 
     // per-copy payload, so their icons paint through knownItemIconHtml with
     // the SAME effective quality that colors the name: a promoted legendary
     // shows the orange rim, never its def tier's purple.
-    expect(painter).toContain('knownItemIconHtml(item, effQuality)');
-    expect(painter).toContain('knownItemIconHtml(item, stagedQuality)');
-    expect(painter).toContain('knownItemIconHtml(item, returnedQuality)');
+    // Through the injected icon dep with the cell's quality (the widened
+    // PainterHost itemIcon seam, the phase 13 QA), never a direct import that
+    // would bypass the seam.
+    expect(painterCode).toContain('this.deps.itemIcon(item, effQuality)');
+    expect(painterCode).toContain('this.deps.itemIcon(item, stagedQuality)');
+    expect(painterCode).toContain('this.deps.itemIcon(item, returnedQuality)');
+    expect(painterCode).not.toContain('knownItemIconHtml');
   });
 
   it('the def-only negative: the sale LEDGER row has no payload and keeps the def icon', () => {

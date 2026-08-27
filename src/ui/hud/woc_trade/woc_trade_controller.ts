@@ -1422,8 +1422,11 @@ export class WocTradeController {
         // family: it carries border-color plus an epic and legendary glow and
         // never a text colour, so on a bare span it painted a stray halo and
         // left the name the inherited grey.
+        // The staged COPY's own quality (a legacy legendary-rolled copy is
+        // tradable and reads legendary here, the all-surfaces item-cell rule;
+        // a promoted copy is bound and never reaches the table).
         const qColor = item
-          ? itemNameColor({ kind: item.kind, quality: bagQualityKey(item) })
+          ? itemNameColor({ kind: item.kind, quality: bagQualityKey(item, s.instance) })
           : QUALITY_DEFAULT_COLOR;
         const inner = `${item ? this.itemIcon(item) : unknownItemIconHtml(s.itemId)}<span style="color:${qColor}">${esc(label)}</span>`;
         return mine

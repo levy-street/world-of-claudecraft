@@ -244,11 +244,10 @@ import {
 import {
   craftBannerIcon,
   craftBannerText,
+  craftToastLogLines,
   legendaryForgedLine,
   legendaryZoneLine,
-  masterworkToastText,
   masterworkZoneLine,
-  tierUpToastText,
 } from './craft_celebration_text_view';
 import {
   buildCraftCelebrationPlan,
@@ -5449,8 +5448,8 @@ export class Hud {
     if (pet) this.sim.targetEntity(pet.id);
   }
 
-  private itemIcon(item: ItemDef): string {
-    return knownItemIconHtml(item);
+  private itemIcon(item: ItemDef, quality?: ItemDef['quality']): string {
+    return knownItemIconHtml(item, quality);
   }
 
   moneyHtml(copper: number): string {
@@ -13375,9 +13374,7 @@ export class Hud {
       tierUps,
       reducedMotion,
     });
-    if (plan.masterworkLogItemId !== null)
-      this.log(masterworkToastText(plan.masterworkLogItemId), '#ffd100');
-    for (const up of plan.tierUpLogs) this.log(tierUpToastText(up), '#ffd100');
+    for (const l of craftToastLogLines(plan)) this.log(l.text, l.color);
     if (plan.banner !== null) {
       const text = craftBannerText(plan.banner);
       // plan.motion trims the banner fade only; the announcer push below is
