@@ -10,6 +10,11 @@
 import type { ReliquaryLocaleTable } from '../reliquary_i18n';
 
 export const table: ReliquaryLocaleTable = {
+  // Crucible raid professions: the crafted-tier page
+  // (docs/prd/ignivar-raid-professions.md).
+  professions_crucible_craft: {
+    name: "Forgiato dall'Ultima Sorgente",
+  },
   conquerors_hollow_crypt: {
     name: 'La Cripta Vuota',
     desc: 'Bottini distintivi strappati a Morthen e alla Cripta Vuota.',

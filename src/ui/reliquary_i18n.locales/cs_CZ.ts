@@ -10,6 +10,11 @@
 import type { ReliquaryLocaleTable } from '../reliquary_i18n';
 
 export const table: ReliquaryLocaleTable = {
+  // Crucible raid professions: the crafted-tier page
+  // (docs/prd/ignivar-raid-professions.md).
+  professions_crucible_craft: {
+    name: 'Vykováno z Posledního pramene',
+  },
   conquerors_hollow_crypt: {
     name: 'Dutá krypta',
     desc: 'Příznačná kořist vyrvaná Morthenovi a Duté kryptě.',

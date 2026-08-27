@@ -10,6 +10,11 @@
 import type { ReliquaryLocaleTable } from '../reliquary_i18n';
 
 export const table: ReliquaryLocaleTable = {
+  // Crucible raid professions: the crafted-tier page
+  // (docs/prd/ignivar-raid-professions.md).
+  professions_crucible_craft: {
+    name: 'Forjado da Última Fonte',
+  },
   conquerors_hollow_crypt: {
     name: 'A Cripta Vazia',
     desc: 'Espólios marcantes arrancados de Morthen e da Cripta Vazia.',

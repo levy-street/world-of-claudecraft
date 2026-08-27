@@ -834,6 +834,15 @@ describe('ENCHANTS table integrity', () => {
     for (const [key, e] of Object.entries(ENCHANTS)) {
       expect(e.id).toBe(key);
       expect(VALID_ITEM_SLOTS.has(e.itemSlot)).toBe(true);
+      // Proc enchants (the raid formulas) carry NO flat bonus: the proc IS
+      // the payload (statBonus stays empty by the exclusivity the magnitude
+      // suite pins), so this sweep checks the proc shape instead.
+      if (e.proc) {
+        expect(Object.keys(e.statBonus)).toHaveLength(0);
+        expect(e.proc.chance).toBeGreaterThan(0);
+        expect(e.proc.effects.length).toBeGreaterThan(0);
+        continue;
+      }
       // A real, non-empty stat bonus using only categories recalcPlayerStats reads.
       const bonusKeys = Object.keys(e.statBonus);
       expect(bonusKeys.length).toBeGreaterThan(0);

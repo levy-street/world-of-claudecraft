@@ -2047,8 +2047,8 @@ export const ru_RU: EnTranslations = {
       "attackSlow": "и снижает скорость атаки цели на {pct}% на {duration} сек",
       "dot": "вызывает «{name}», периодический урон ({school}), нанося {total} за {duration} сек",
       "hot": "распускает «{name}», периодическое исцеление, восполняя {total} за {duration} сек",
-      "selfBuff": "grants you {name} ({value}) for {duration} sec",
-      "selfHeal": "and restores {total} health to you"
+      "selfBuff": "дарует вам {name} ({value}) на {duration} сек",
+      "selfHeal": "и восстанавливает вам {total} здоровья"
     },
     "questShare": {
       "notShareable": "Этим заданием нельзя поделиться.",
@@ -3361,7 +3361,7 @@ export const ru_RU: EnTranslations = {
       "enchant_chest_runeweave": "Зачарование нагрудника - Рунное плетение",
       "enchant_legs_runed_hide": "Зачарование поножей - Рунная шкура",
       "enchant_helmet_runed_links": "Зачарование шлема - Рунные звенья",
-      "enchant_weapon_lastflame_zeal": "Enchant Weapon - Last Flame's Zeal"
+      "enchant_weapon_lastflame_zeal": "Чары оружия - рвение Последнего Пламени"
     },
     "professions": {
       "title": "Профессии",
@@ -3613,7 +3613,7 @@ export const ru_RU: EnTranslations = {
       "yieldLineRange": "{item}: {min}-{max}",
       "alreadyEnchanted": "Этот предмет уже зачарован.",
       "sameEnchant": "На этом предмете уже есть эти чары.",
-      "formulaNotLearned": "You have not learned that formula.",
+      "formulaNotLearned": "Вы еще не выучили эту формулу.",
       "replaceTag": "Заменяет «{enchant}»",
       "sameEnchantTag": "Уже наложено",
       "plainTag": "Без чар",
@@ -9396,7 +9396,7 @@ export const ru_RU: EnTranslations = {
       "material": "Материал",
       "food": "Еда",
       "drink": "Напиток",
-      "recipe": "Recipe",
+      "recipe": "Рецепт",
       "tool": "Инструмент",
       "potion": "Зелье",
       "elixir": "Эликсир",
@@ -12898,34 +12898,34 @@ export const ru_RU: EnTranslations = {
         "name": "Камень Ухода"
       },
       "lastflame_core": {
-        "name": "Core of the Last Flame"
+        "name": "Ядро Последнего Пламени"
       },
       "forgefathers_ember": {
-        "name": "Forgefather's Ember"
+        "name": "Уголек отца ковки"
       },
       "cruciblewrought_warhelm": {
-        "name": "Crucible-Wrought Warhelm"
+        "name": "Боевой шлем горнильной ковки"
       },
       "emberveil_legguards": {
-        "name": "Emberveil Legguards"
+        "name": "Поножи угольной вуали"
       },
       "vestment_of_the_last_spring": {
-        "name": "Vestment of the Last Spring"
+        "name": "Облачение Последнего Источника"
       },
       "forgefathers_requiem": {
-        "name": "Forgefather's Requiem"
+        "name": "Реквием отца ковки"
       },
       "plans_cruciblewrought_warhelm": {
-        "name": "Plans: Crucible-Wrought Warhelm"
+        "name": "Чертеж: боевой шлем горнильной ковки"
       },
       "pattern_emberveil_legguards": {
-        "name": "Pattern: Emberveil Legguards"
+        "name": "Выкройка: поножи угольной вуали"
       },
       "pattern_vestment_of_the_last_spring": {
-        "name": "Pattern: Vestment of the Last Spring"
+        "name": "Выкройка: облачение Последнего Источника"
       },
       "formula_lastflame_zeal": {
-        "name": "Formula: Last Flame's Zeal"
+        "name": "Формула: рвение Последнего Пламени"
       },
       "conjured_water4": {
         "name": "Сотворённая родниковая вода"
@@ -15774,22 +15774,22 @@ export const ru_RU: EnTranslations = {
         }
       },
       "q_forgefathers_requiem": {
-        "title": "The Forgefather's Requiem",
-        "text": "Varkhul's own hammer answered to something he kept at his heart: an ember of the Last Spring itself, still burning. Bring me that ember. A smith at the height of the craft could shape what he never dared.",
-        "completion": "It still sings. This is no reagent, smith: it is the voice of the spring he chained. I will show you the shaping, and your hands will do what his never could.",
+        "title": "Реквием отца ковки",
+        "text": "Молот Варкхула отзывался на то, что он хранил у самого сердца: на уголек самого Последнего Источника, все еще горящий. Принесите мне этот уголек. Кузнец на вершине мастерства сможет выковать то, на что он так и не осмелился.",
+        "completion": "Он все еще поет. Это не реагент, кузнец: это голос источника, который он заковал в цепи. Я покажу вам, как вести ковку, и ваши руки совершат то, что его рукам было не дано.",
         "objectives": {
           "0": {
-            "label": "Forgefather's Ember recovered"
+            "label": "Уголек отца ковки добыт"
           }
         }
       },
       "q_requiem_at_the_forge": {
-        "title": "Requiem at the Forge",
-        "text": "The shaping is yours alone: fifteen cores of the last flame, the finest thorium and elderwood, and the ember at the heart of it. Forge the Requiem at a forge worthy of the name, and let the spring answer its jailer.",
-        "completion": "So the requiem is sung in iron. Carry it well, smith: no other hands will ever shape its equal.",
+        "title": "Реквием у горна",
+        "text": "Ковка целиком ваша: пятнадцать ядер последнего пламени, лучший торий и древо старейшин, и уголек в самом сердце. Выкуйте Реквием у горна, достойного этого имени, и пусть источник ответит своему тюремщику.",
+        "completion": "Так реквием был спет в железе. Носите его с честью, кузнец: ничьи другие руки не выкуют ему равного.",
         "objectives": {
           "0": {
-            "label": "Forgefather's Requiem forged"
+            "label": "Реквием отца ковки выкован"
           }
         }
       },

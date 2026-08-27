@@ -10,6 +10,11 @@
 import type { ReliquaryLocaleTable } from '../reliquary_i18n';
 
 export const table: ReliquaryLocaleTable = {
+  // Crucible raid professions: the crafted-tier page
+  // (docs/prd/ignivar-raid-professions.md).
+  professions_crucible_craft: {
+    name: 'Tempaan Mata Air Terakhir',
+  },
   conquerors_hollow_crypt: {
     name: 'Kripta Berongga',
     desc: 'Rampasan khas yang direbut dari Morthen dan Kripta Berongga.',

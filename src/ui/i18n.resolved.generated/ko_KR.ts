@@ -2047,8 +2047,8 @@ export const ko_KR: EnTranslations = {
       "attackSlow": "대상의 공격 속도를 {duration}초 동안 {pct}% 감소시킵니다",
       "dot": "{name}을 유발하여 {duration}초 동안 {total}의 {school} 지속 피해를 입힙니다",
       "hot": "{name}을 피워 {duration}초 동안 {total}의 생명력을 회복시킵니다",
-      "selfBuff": "grants you {name} ({value}) for {duration} sec",
-      "selfHeal": "and restores {total} health to you"
+      "selfBuff": "{duration}초 동안 {name}({value})을 부여합니다",
+      "selfHeal": "또한 생명력을 {total} 회복합니다"
     },
     "questShare": {
       "notShareable": "이 퀘스트는 공유할 수 없습니다.",
@@ -3361,7 +3361,7 @@ export const ko_KR: EnTranslations = {
       "enchant_chest_runeweave": "갑옷 마법부여 - 룬 직조",
       "enchant_legs_runed_hide": "다리 마법부여 - 룬 가죽",
       "enchant_helmet_runed_links": "투구 마법부여 - 룬 사슬",
-      "enchant_weapon_lastflame_zeal": "Enchant Weapon - Last Flame's Zeal"
+      "enchant_weapon_lastflame_zeal": "무기 마법부여 - 마지막 불꽃의 열의"
     },
     "professions": {
       "title": "전문 기술",
@@ -3613,7 +3613,7 @@ export const ko_KR: EnTranslations = {
       "yieldLineRange": "{item} {min}~{max}개",
       "alreadyEnchanted": "해당 아이템에는 이미 마법부여가 되어 있습니다.",
       "sameEnchant": "해당 아이템에는 이미 같은 마법부여가 되어 있습니다.",
-      "formulaNotLearned": "You have not learned that formula.",
+      "formulaNotLearned": "아직 그 공식을 배우지 못했습니다.",
       "replaceTag": "{enchant} 대체",
       "sameEnchantTag": "이미 적용됨",
       "plainTag": "마법부여 없음",
@@ -9396,7 +9396,7 @@ export const ko_KR: EnTranslations = {
       "material": "재료",
       "food": "음식",
       "drink": "음료",
-      "recipe": "Recipe",
+      "recipe": "제조법",
       "tool": "도구",
       "potion": "물약",
       "elixir": "비약",
@@ -12898,34 +12898,34 @@ export const ko_KR: EnTranslations = {
         "name": "안식의 돌"
       },
       "lastflame_core": {
-        "name": "Core of the Last Flame"
+        "name": "마지막 불꽃의 핵"
       },
       "forgefathers_ember": {
-        "name": "Forgefather's Ember"
+        "name": "대장장이의 불씨"
       },
       "cruciblewrought_warhelm": {
-        "name": "Crucible-Wrought Warhelm"
+        "name": "도가니 단조 전투투구"
       },
       "emberveil_legguards": {
-        "name": "Emberveil Legguards"
+        "name": "불씨 장막 다리보호구"
       },
       "vestment_of_the_last_spring": {
-        "name": "Vestment of the Last Spring"
+        "name": "마지막 샘의 예복"
       },
       "forgefathers_requiem": {
-        "name": "Forgefather's Requiem"
+        "name": "대장장이의 진혼곡"
       },
       "plans_cruciblewrought_warhelm": {
-        "name": "Plans: Crucible-Wrought Warhelm"
+        "name": "설계도: 도가니 단조 전투투구"
       },
       "pattern_emberveil_legguards": {
-        "name": "Pattern: Emberveil Legguards"
+        "name": "도안: 불씨 장막 다리보호구"
       },
       "pattern_vestment_of_the_last_spring": {
-        "name": "Pattern: Vestment of the Last Spring"
+        "name": "도안: 마지막 샘의 예복"
       },
       "formula_lastflame_zeal": {
-        "name": "Formula: Last Flame's Zeal"
+        "name": "공식: 마지막 불꽃의 열의"
       },
       "conjured_water4": {
         "name": "창조된 샘물"
@@ -15774,22 +15774,22 @@ export const ko_KR: EnTranslations = {
         }
       },
       "q_forgefathers_requiem": {
-        "title": "The Forgefather's Requiem",
-        "text": "Varkhul's own hammer answered to something he kept at his heart: an ember of the Last Spring itself, still burning. Bring me that ember. A smith at the height of the craft could shape what he never dared.",
-        "completion": "It still sings. This is no reagent, smith: it is the voice of the spring he chained. I will show you the shaping, and your hands will do what his never could.",
+        "title": "대장장이의 진혼곡",
+        "text": "발쿨의 망치는 그가 가슴에 품어 지키던 것에 응답했습니다. 아직도 타오르는 마지막 샘의 불씨에 말입니다. 그 불씨를 제게 가져다주십시오. 기예의 정점에 오른 대장장이라면, 그가 감히 빚지 못한 것을 빚어낼 수 있을 것입니다.",
+        "completion": "아직도 노래하고 있군요. 대장장이여, 이것은 재료가 아닙니다. 그가 사슬로 묶은 샘의 목소리 그 자체입니다. 벼리는 법은 제가 보여드리지요. 그의 손이 끝내 이루지 못한 일을, 당신의 손이 이룰 것입니다.",
         "objectives": {
           "0": {
-            "label": "Forgefather's Ember recovered"
+            "label": "대장장이의 불씨 회수"
           }
         }
       },
       "q_requiem_at_the_forge": {
-        "title": "Requiem at the Forge",
-        "text": "The shaping is yours alone: fifteen cores of the last flame, the finest thorium and elderwood, and the ember at the heart of it. Forge the Requiem at a forge worthy of the name, and let the spring answer its jailer.",
-        "completion": "So the requiem is sung in iron. Carry it well, smith: no other hands will ever shape its equal.",
+        "title": "화로 앞의 진혼곡",
+        "text": "벼리는 일은 오롯이 당신의 몫입니다. 마지막 불꽃의 핵 열다섯, 최상급 토륨과 엘더우드, 그리고 그 중심에 놓일 불씨. 그 이름에 걸맞은 화로에서 진혼곡을 벼려내어, 샘이 간수에게 답하게 하십시오.",
+        "completion": "이렇게 진혼곡이 쇠로 불려졌습니다. 잘 지니십시오, 대장장이여. 이것에 비견할 것을 벼려낼 손은 다시는 없을 것입니다.",
         "objectives": {
           "0": {
-            "label": "Forgefather's Requiem forged"
+            "label": "대장장이의 진혼곡 단조"
           }
         }
       },

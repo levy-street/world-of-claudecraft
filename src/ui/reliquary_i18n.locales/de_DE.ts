@@ -10,6 +10,11 @@
 import type { ReliquaryLocaleTable } from '../reliquary_i18n';
 
 export const table: ReliquaryLocaleTable = {
+  // Crucible raid professions: the crafted-tier page
+  // (docs/prd/ignivar-raid-professions.md).
+  professions_crucible_craft: {
+    name: 'Geschmiedet aus der Letzten Quelle',
+  },
   conquerors_hollow_crypt: {
     name: 'Die Hohle Gruft',
     desc: 'Bezeichnende Beute, Morthen und der Hohlen Gruft abgerungen.',

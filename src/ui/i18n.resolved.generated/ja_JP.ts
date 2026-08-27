@@ -2047,8 +2047,8 @@ export const ja_JP: EnTranslations = {
       "attackSlow": "対象の攻撃速度を{pct}%低下させる（{duration}秒）",
       "dot": "{name}を植え付け、{school}の継続ダメージで{duration}秒かけて{total}を与える",
       "hot": "{name}を咲かせ、継続回復で{duration}秒かけて{total}を回復する",
-      "selfBuff": "grants you {name} ({value}) for {duration} sec",
-      "selfHeal": "and restores {total} health to you"
+      "selfBuff": "{name}（{value}）を{duration}秒間得る",
+      "selfHeal": "さらに体力を{total}回復する"
     },
     "questShare": {
       "notShareable": "このクエストは共有できません。",
@@ -3361,7 +3361,7 @@ export const ja_JP: EnTranslations = {
       "enchant_chest_runeweave": "胸エンチャント - ルーン織り",
       "enchant_legs_runed_hide": "脚エンチャント - ルーンの獣皮",
       "enchant_helmet_runed_links": "頭エンチャント - ルーンの鎖",
-      "enchant_weapon_lastflame_zeal": "Enchant Weapon - Last Flame's Zeal"
+      "enchant_weapon_lastflame_zeal": "武器への付与 - 最後の炎の熱意"
     },
     "professions": {
       "title": "専門技能",
@@ -3613,7 +3613,7 @@ export const ja_JP: EnTranslations = {
       "yieldLineRange": "{item} {min}から{max}個",
       "alreadyEnchanted": "そのアイテムにはすでにエンチャントが付与されています。",
       "sameEnchant": "そのアイテムにはすでに同じエンチャントが付与されています。",
-      "formulaNotLearned": "You have not learned that formula.",
+      "formulaNotLearned": "その公式はまだ習得していません。",
       "replaceTag": "{enchant}を置き換え",
       "sameEnchantTag": "付与済み",
       "plainTag": "エンチャントなし",
@@ -9396,7 +9396,7 @@ export const ja_JP: EnTranslations = {
       "material": "素材",
       "food": "食べ物",
       "drink": "飲み物",
-      "recipe": "Recipe",
+      "recipe": "レシピ",
       "tool": "道具",
       "potion": "ポーション",
       "elixir": "エリクサー",
@@ -12898,34 +12898,34 @@ export const ja_JP: EnTranslations = {
         "name": "たましいの石"
       },
       "lastflame_core": {
-        "name": "Core of the Last Flame"
+        "name": "最後の炎の核"
       },
       "forgefathers_ember": {
-        "name": "Forgefather's Ember"
+        "name": "鍛造の父の燠火"
       },
       "cruciblewrought_warhelm": {
-        "name": "Crucible-Wrought Warhelm"
+        "name": "るつぼ鍛造の戦兜"
       },
       "emberveil_legguards": {
-        "name": "Emberveil Legguards"
+        "name": "燠火纏いのレッグガード"
       },
       "vestment_of_the_last_spring": {
-        "name": "Vestment of the Last Spring"
+        "name": "最後の泉のローブ"
       },
       "forgefathers_requiem": {
-        "name": "Forgefather's Requiem"
+        "name": "鍛造の父のレクイエム"
       },
       "plans_cruciblewrought_warhelm": {
-        "name": "Plans: Crucible-Wrought Warhelm"
+        "name": "設計図：るつぼ鍛造の戦兜"
       },
       "pattern_emberveil_legguards": {
-        "name": "Pattern: Emberveil Legguards"
+        "name": "型紙：燠火纏いのレッグガード"
       },
       "pattern_vestment_of_the_last_spring": {
-        "name": "Pattern: Vestment of the Last Spring"
+        "name": "型紙：最後の泉のローブ"
       },
       "formula_lastflame_zeal": {
-        "name": "Formula: Last Flame's Zeal"
+        "name": "公式：最後の炎の熱意"
       },
       "conjured_water4": {
         "name": "魔法の湧き水"
@@ -15774,22 +15774,22 @@ export const ja_JP: EnTranslations = {
         }
       },
       "q_forgefathers_requiem": {
-        "title": "The Forgefather's Requiem",
-        "text": "Varkhul's own hammer answered to something he kept at his heart: an ember of the Last Spring itself, still burning. Bring me that ember. A smith at the height of the craft could shape what he never dared.",
-        "completion": "It still sings. This is no reagent, smith: it is the voice of the spring he chained. I will show you the shaping, and your hands will do what his never could.",
+        "title": "鍛造の父のレクイエム",
+        "text": "ヴァルクルの鎚は、彼が胸元に守っていたものに応えていた。今なお燃え続ける、最後の泉の燠火に。その燠火を私のもとへ。技を極めた鍛冶師なら、彼が決して踏み込めなかったものを鍛えられるはずだ。",
+        "completion": "まだ歌っている。鍛冶師よ、これはただの素材ではない。彼が鎖につないだ泉の声そのものだ。鍛え方は私が示そう。彼の手が決して成し得なかったことを、あなたの手が成すのだ。",
         "objectives": {
           "0": {
-            "label": "Forgefather's Ember recovered"
+            "label": "鍛造の父の燠火を回収する"
           }
         }
       },
       "q_requiem_at_the_forge": {
-        "title": "Requiem at the Forge",
-        "text": "The shaping is yours alone: fifteen cores of the last flame, the finest thorium and elderwood, and the ember at the heart of it. Forge the Requiem at a forge worthy of the name, and let the spring answer its jailer.",
-        "completion": "So the requiem is sung in iron. Carry it well, smith: no other hands will ever shape its equal.",
+        "title": "炉前のレクイエム",
+        "text": "鍛えるのはあなた一人の仕事だ。最後の炎の核を十五、最上のトリウムとエルダーウッド、そして中心にあの燠火を。その名にふさわしい炉でレクイエムを鍛え上げ、泉に看守への答えを歌わせよ。",
+        "completion": "かくしてレクイエムは鉄で歌われた。大切に携えよ、鍛冶師よ。これに並ぶものを鍛えられる手は、二度と現れない。",
         "objectives": {
           "0": {
-            "label": "Forgefather's Requiem forged"
+            "label": "鍛造の父のレクイエムを鍛え上げる"
           }
         }
       },

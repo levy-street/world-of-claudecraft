@@ -10,6 +10,11 @@
 import type { ReliquaryLocaleTable } from '../reliquary_i18n';
 
 export const table: ReliquaryLocaleTable = {
+  // Crucible raid professions: the crafted-tier page
+  // (docs/prd/ignivar-raid-professions.md).
+  professions_crucible_craft: {
+    name: 'Wykute z Ostatniego Źródła',
+  },
   conquerors_hollow_crypt: {
     name: 'Wydrążona Krypta',
     desc: 'Charakterystyczne łupy wyrwane Morthenowi i Wydrążonej Krypcie.',

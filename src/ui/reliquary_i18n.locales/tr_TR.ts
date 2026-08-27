@@ -10,6 +10,11 @@
 import type { ReliquaryLocaleTable } from '../reliquary_i18n';
 
 export const table: ReliquaryLocaleTable = {
+  // Crucible raid professions: the crafted-tier page
+  // (docs/prd/ignivar-raid-professions.md).
+  professions_crucible_craft: {
+    name: 'Son Pınardan Dövülmüş',
+  },
   conquerors_hollow_crypt: {
     name: 'Oyuk Mezar',
     desc: "Mezarçağıran Morthen'den ve Oyuk Mezar'dan sökülüp alınan simge ganimetler.",

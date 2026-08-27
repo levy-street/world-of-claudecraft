@@ -43,7 +43,8 @@ function metaOf(sim: Sim) {
 describe('enchant formula gate: isEnchantKnown', () => {
   it('grandfathers every enchant without an acquisition list', () => {
     for (const enchant of Object.values(ENCHANTS)) {
-      if (enchant.id === GATED_ID) continue;
+      // The shipped raid formula is acquisition-gated like the synthetic.
+      if (enchant.acquisition?.length) continue;
       expect(isEnchantKnown(undefined, enchant)).toBe(true);
     }
   });

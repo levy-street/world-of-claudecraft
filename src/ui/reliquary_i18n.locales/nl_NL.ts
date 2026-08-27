@@ -10,6 +10,11 @@
 import type { ReliquaryLocaleTable } from '../reliquary_i18n';
 
 export const table: ReliquaryLocaleTable = {
+  // Crucible raid professions: the crafted-tier page
+  // (docs/prd/ignivar-raid-professions.md).
+  professions_crucible_craft: {
+    name: 'Gesmeed uit de Laatste Bron',
+  },
   conquerors_hollow_crypt: {
     name: 'De Holle Crypte',
     desc: 'Kenmerkende buit ontworsteld aan Morthen en de Holle Crypte.',

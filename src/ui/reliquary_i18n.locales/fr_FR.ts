@@ -10,6 +10,11 @@
 import type { ReliquaryLocaleTable } from '../reliquary_i18n';
 
 export const table: ReliquaryLocaleTable = {
+  // Crucible raid professions: the crafted-tier page
+  // (docs/prd/ignivar-raid-professions.md).
+  professions_crucible_craft: {
+    name: 'Forgé de la Dernière Source',
+  },
   conquerors_hollow_crypt: {
     name: 'La Crypte creuse',
     desc: 'Butins emblématiques arrachés à Morthen et à la Crypte creuse.',

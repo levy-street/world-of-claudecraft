@@ -10,6 +10,11 @@
 import type { ReliquaryLocaleTable } from '../reliquary_i18n';
 
 export const table: ReliquaryLocaleTable = {
+  // Crucible raid professions: the crafted-tier page
+  // (docs/prd/ignivar-raid-professions.md).
+  professions_crucible_craft: {
+    name: 'Rèn từ Suối Nguồn Cuối Cùng',
+  },
   conquerors_hollow_crypt: {
     name: 'Hầm Mộ Rỗng',
     desc: 'Chiến lợi phẩm tiêu biểu giành từ Morthen và Hầm Mộ Rỗng.',

@@ -200,8 +200,10 @@ describe('v0.36 release-audit Reliquary deed art', () => {
       'exp_the_last_keep',
       'exp_dawnhold_castle',
       'prog_ready_for_an_adventure',
+      'col_crucible_wrought',
+      'chr_forgefathers_requiem',
     ]);
-    expect(DEED_ORDER).toHaveLength(274);
+    expect(DEED_ORDER).toHaveLength(276);
     expect(DEED_IMAGE_IDS.size).toBe(271);
     expect(DEED_ORDER.filter((id) => !DEED_IMAGE_IDS.has(id))).toEqual([...DEED_ART_PENDING]);
     expect(sorted(DEED_IMAGE_IDS)).toEqual(

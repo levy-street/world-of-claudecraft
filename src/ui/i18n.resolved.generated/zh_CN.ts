@@ -2047,8 +2047,8 @@ export const zh_CN: EnTranslations = {
       "attackSlow": "并使目标攻击速度降低{pct}%，持续{duration}秒",
       "dot": "引发{name}，一种{school}持续伤害效果，在{duration}秒内造成{total}点伤害",
       "hot": "绽放{name}，一种持续治疗效果，在{duration}秒内恢复{total}点生命",
-      "selfBuff": "grants you {name} ({value}) for {duration} sec",
-      "selfHeal": "and restores {total} health to you"
+      "selfBuff": "为你附上{name}（{value}），持续{duration}秒",
+      "selfHeal": "并为你恢复{total}点生命值"
     },
     "questShare": {
       "notShareable": "该任务无法分享。",
@@ -3361,7 +3361,7 @@ export const zh_CN: EnTranslations = {
       "enchant_chest_runeweave": "胸甲附魔 - 符文织纹",
       "enchant_legs_runed_hide": "腿甲附魔 - 符文兽皮",
       "enchant_helmet_runed_links": "头盔附魔 - 符文锁环",
-      "enchant_weapon_lastflame_zeal": "Enchant Weapon - Last Flame's Zeal"
+      "enchant_weapon_lastflame_zeal": "附魔武器 - 末焰狂热"
     },
     "professions": {
       "title": "专业",
@@ -3613,7 +3613,7 @@ export const zh_CN: EnTranslations = {
       "yieldLineRange": "{item} {min} 至 {max} 个",
       "alreadyEnchanted": "那件物品已经附魔。",
       "sameEnchant": "那件物品已经拥有该附魔。",
-      "formulaNotLearned": "You have not learned that formula.",
+      "formulaNotLearned": "你尚未学会该公式。",
       "replaceTag": "替换{enchant}",
       "sameEnchantTag": "已施加",
       "plainTag": "未附魔",
@@ -9396,7 +9396,7 @@ export const zh_CN: EnTranslations = {
       "material": "材料",
       "food": "食物",
       "drink": "饮料",
-      "recipe": "Recipe",
+      "recipe": "配方",
       "tool": "工具",
       "potion": "药水",
       "elixir": "药剂",
@@ -12898,34 +12898,34 @@ export const zh_CN: EnTranslations = {
         "name": "往生石"
       },
       "lastflame_core": {
-        "name": "Core of the Last Flame"
+        "name": "末焰之核"
       },
       "forgefathers_ember": {
-        "name": "Forgefather's Ember"
+        "name": "锻父的余烬"
       },
       "cruciblewrought_warhelm": {
-        "name": "Crucible-Wrought Warhelm"
+        "name": "熔炉铸造战盔"
       },
       "emberveil_legguards": {
-        "name": "Emberveil Legguards"
+        "name": "烬幕护腿"
       },
       "vestment_of_the_last_spring": {
-        "name": "Vestment of the Last Spring"
+        "name": "最后泉源法袍"
       },
       "forgefathers_requiem": {
-        "name": "Forgefather's Requiem"
+        "name": "锻父的安魂曲"
       },
       "plans_cruciblewrought_warhelm": {
-        "name": "Plans: Crucible-Wrought Warhelm"
+        "name": "设计图：熔炉铸造战盔"
       },
       "pattern_emberveil_legguards": {
-        "name": "Pattern: Emberveil Legguards"
+        "name": "图样：烬幕护腿"
       },
       "pattern_vestment_of_the_last_spring": {
-        "name": "Pattern: Vestment of the Last Spring"
+        "name": "图样：最后泉源法袍"
       },
       "formula_lastflame_zeal": {
-        "name": "Formula: Last Flame's Zeal"
+        "name": "公式：末焰狂热"
       },
       "conjured_water4": {
         "name": "魔法泉水"
@@ -15774,22 +15774,22 @@ export const zh_CN: EnTranslations = {
         }
       },
       "q_forgefathers_requiem": {
-        "title": "The Forgefather's Requiem",
-        "text": "Varkhul's own hammer answered to something he kept at his heart: an ember of the Last Spring itself, still burning. Bring me that ember. A smith at the height of the craft could shape what he never dared.",
-        "completion": "It still sings. This is no reagent, smith: it is the voice of the spring he chained. I will show you the shaping, and your hands will do what his never could.",
+        "title": "锻父的安魂曲",
+        "text": "瓦尔库尔的锻锤听命于他心口守着的东西：一块仍在燃烧的最后泉源余烬。把那块余烬带给我。技艺登峰造极的铁匠，能锻出他从不敢锻造之物。",
+        "completion": "它仍在歌唱。铁匠，这不是寻常材料：这是他所囚禁的泉源之声。我会教你锻造之法，你的双手将完成他永远无法完成之事。",
         "objectives": {
           "0": {
-            "label": "Forgefather's Ember recovered"
+            "label": "取回锻父的余烬"
           }
         }
       },
       "q_requiem_at_the_forge": {
-        "title": "Requiem at the Forge",
-        "text": "The shaping is yours alone: fifteen cores of the last flame, the finest thorium and elderwood, and the ember at the heart of it. Forge the Requiem at a forge worthy of the name, and let the spring answer its jailer.",
-        "completion": "So the requiem is sung in iron. Carry it well, smith: no other hands will ever shape its equal.",
+        "title": "炉边安魂曲",
+        "text": "锻造由你独自完成：十五颗末焰之核，最上等的瑟银与古木，再以那块余烬为心。在名副其实的熔炉旁锻出安魂曲，让泉源回应它的狱卒。",
+        "completion": "安魂曲就此以铁铸成。好好携带它，铁匠：再无他人之手能锻出与之比肩之物。",
         "objectives": {
           "0": {
-            "label": "Forgefather's Requiem forged"
+            "label": "锻造锻父的安魂曲"
           }
         }
       },

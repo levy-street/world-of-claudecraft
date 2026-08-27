@@ -10,6 +10,11 @@
 import type { ReliquaryLocaleTable } from '../reliquary_i18n';
 
 export const table: ReliquaryLocaleTable = {
+  // Crucible raid professions: the crafted-tier page
+  // (docs/prd/ignivar-raid-professions.md).
+  professions_crucible_craft: {
+    name: 'Smitt ur Den Sista Källan',
+  },
   conquerors_hollow_crypt: {
     name: 'Den ihåliga kryptan',
     desc: 'Utmärkande byte taget från Morthen och Den ihåliga kryptan.',
