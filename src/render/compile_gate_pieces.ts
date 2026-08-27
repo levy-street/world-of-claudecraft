@@ -95,6 +95,13 @@ export function linkPiecesOf(target: THREE.Object3D): THREE.Object3D[][] {
  *  (program_variant_settle.ts). */
 export type PieceSettle = (node: THREE.Object3D, deadline: PieceDeadline) => Promise<unknown>;
 
+/** The announcement arm: told each piece's representative when the gate is
+ *  CREATED, before the queue admits any piece, so what it reads is the state
+ *  the link will run in later (the shader warm audit dry-assembles the
+ *  piece's programs there, shader_warm_audit.ts). Synchronous, and never
+ *  awaited by the piece. */
+export type PieceExpect = (node: THREE.Object3D) => void;
+
 /** One work function per piece: the representative's colour compile, then its
  *  shadow compile, then the settle over its variants, through the host's own
  *  per-object arms. The other nodes of the group share its programs (same
@@ -105,18 +112,20 @@ export type PieceSettle = (node: THREE.Object3D, deadline: PieceDeadline) => Pro
  *  piece's compile prologue, as it saw the whole root's before. The settle
  *  gets the piece's own deadline, so its poll ends where the gate's timeout
  *  fires (the compiles themselves are never cut: a driver link is not
- *  cancellable), and a piece that settled proved every variant it carries. */
+ *  cancellable), and a piece that settled proved every variant it carries.
+ *  The optional announcement arm runs once per piece, here, at creation. */
 export function linkPieceWork(
   target: THREE.Object3D,
   compileColor: (node: THREE.Object3D) => Promise<unknown>,
   compileShadow: (node: THREE.Object3D) => Promise<unknown>,
   settle: PieceSettle,
+  expect?: PieceExpect,
 ): CompileGatePiece[] {
-  return linkPiecesOf(target).map(
-    ([representative]) =>
-      (deadline) =>
-        compileColor(representative)
-          .then(() => compileShadow(representative))
-          .then(() => settle(representative, deadline)),
-  );
+  return linkPiecesOf(target).map(([representative]) => {
+    expect?.(representative);
+    return (deadline) =>
+      compileColor(representative)
+        .then(() => compileShadow(representative))
+        .then(() => settle(representative, deadline));
+  });
 }

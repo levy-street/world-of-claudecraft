@@ -263,3 +263,47 @@ describe('linkPieceWork', () => {
     expect(linkPieceWork(new THREE.Group(), vi.fn(), vi.fn(), noSettle)).toEqual([]);
   });
 });
+
+describe('linkPieceWork announcement arm', () => {
+  it('tells the arm each piece representative at creation, before any compile runs', async () => {
+    const root = new THREE.Group();
+    const skin = new THREE.MeshStandardMaterial();
+    const torso = mesh(skin, 'torso');
+    const legs = mesh(skin, 'legs');
+    const eyes = mesh(new THREE.MeshBasicMaterial(), 'eyes');
+    root.add(torso, legs, eyes);
+    const order: string[] = [];
+    const arm = (node: THREE.Object3D) => {
+      order.push(`expect:${node.name}`);
+      return Promise.resolve();
+    };
+    const pieces = linkPieceWork(
+      root,
+      (node) => arm(node).then(() => order.push(`color:${node.name}`)),
+      (node) => arm(node).then(() => order.push(`shadow:${node.name}`)),
+      (node) => arm(node).then(() => order.push(`settle:${node.name}`)),
+      (node) => order.push(`announce:${node.name}`),
+    );
+    expect(pieces).toHaveLength(2);
+    expect(order).toEqual(['announce:torso', 'announce:eyes']);
+    const deadline: PieceDeadline = { fired: false };
+    await Promise.all(pieces.map((piece) => piece(deadline)));
+    expect(order.filter((step) => step.startsWith('announce:'))).toEqual([
+      'announce:torso',
+      'announce:eyes',
+    ]);
+  });
+
+  it('runs without an announcement arm, as before', async () => {
+    const root = new THREE.Group();
+    root.add(mesh(new THREE.MeshStandardMaterial(), 'lone'));
+    const pieces = linkPieceWork(
+      root,
+      () => Promise.resolve(),
+      () => Promise.resolve(),
+      () => Promise.resolve(),
+    );
+    expect(pieces).toHaveLength(1);
+    await pieces[0]?.({ fired: false });
+  });
+});

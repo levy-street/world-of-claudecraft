@@ -8,6 +8,7 @@ import {
   type HitchSummary,
   type SceneCensusReport,
 } from '../render/scene_census_core';
+import { type ShaderWarmAuditSnapshot, shaderWarmAuditSnapshot } from '../render/shader_warm_audit';
 import {
   createHeapSawtooth,
   type HeapFloorTrend,
@@ -61,6 +62,14 @@ export interface PerfSnapshot {
   // how much three's program list grew in the first seconds after the reveal,
   // the live-frame half of the prewarm's programsDelta. Null before the reveal.
   postRevealLinks: PostRevealLinksSnapshot | null;
+  // The shader warm audit (src/render/shader_warm_audit.ts, `?perf` only): do
+  // the sources a gate dry-assembles at creation match what three links later.
+  // Local-only, never in the beacon payload (perf_reporter.ts builds it field
+  // by field). Under the flags the audit adds its own work to the frames and
+  // to the compile units the budget learns from; its `selfCostMs` says how
+  // much, so a capture taken with it on is read net of it, never compared
+  // raw to one taken without.
+  shaderWarmAudit: ShaderWarmAuditSnapshot;
   input: {
     intents: number;
     lastKind: string;
@@ -1048,6 +1057,7 @@ export class PerfMonitor {
       heapSawtooth: this.heapSawtooth.summary(),
       hitchForensics: this.hitchForensics.records(),
       postRevealLinks: postRevealLinksSnapshot(),
+      shaderWarmAudit: shaderWarmAuditSnapshot(),
       input: {
         intents: this.inputIntents,
         lastKind: this.lastInputKind,

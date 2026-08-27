@@ -1,5 +1,5 @@
 diff --git a/build/three.module.js b/build/three.module.js
-index ad13abf7d128bee607a7672646ca543327e258d3..207a0071e346263aaf28113a1316d5f9e6e3a1f7 100644
+index ad13abf7d128bee607a7672646ca543327e258d3..2842074c0095beffa8f5f3e953ee4e933c68a614 100644
 --- a/build/three.module.js
 +++ b/build/three.module.js
 @@ -438,7 +438,7 @@ var morphtarget_pars_vertex = "#ifdef USE_MORPHTARGETS\n\t#ifndef USE_INSTANCING
@@ -11,7 +11,58 @@ index ad13abf7d128bee607a7672646ca543327e258d3..207a0071e346263aaf28113a1316d5f9
  
  var normal_fragment_maps = "#ifdef USE_NORMALMAP_OBJECTSPACE\n\tnormal = texture2D( normalMap, vNormalMapUv ).xyz * 2.0 - 1.0;\n\t#ifdef FLIP_SIDED\n\t\tnormal = - normal;\n\t#endif\n\t#ifdef DOUBLE_SIDED\n\t\tnormal = normal * faceDirection;\n\t#endif\n\tnormal = normalize( normalMatrix * normal );\n#elif defined( USE_NORMALMAP_TANGENTSPACE )\n\tvec3 mapN = texture2D( normalMap, vNormalMapUv ).xyz * 2.0 - 1.0;\n\t#if defined( USE_PACKED_NORMALMAP )\n\t\tmapN = vec3( mapN.xy, sqrt( saturate( 1.0 - dot( mapN.xy, mapN.xy ) ) ) );\n\t#endif\n\tmapN.xy *= normalScale;\n\tnormal = normalize( tbn * mapN );\n#elif defined( USE_BUMPMAP )\n\tnormal = perturbNormalArb( - vViewPosition, normal, dHdxy_fwd(), faceDirection );\n#endif";
  
-@@ -7990,12 +7990,30 @@ function WebGLPrograms( renderer, environments, extensions, capabilities, bindin
+@@ -6643,12 +6643,13 @@ function generateCubeUVSize( parameters ) {
+ 
+ }
+ 
+-function WebGLProgram( renderer, cacheKey, parameters, bindingStates ) {
+-
+-	// TODO Send this event to Three.js DevTools
+-	// log( 'WebGLProgram', cacheKey );
+-
+-	const gl = renderer.getContext();
++// World of ClaudeCraft: the final GLSL, assembled without compiling it. three
++// builds a program's vertex and fragment sources inside the WebGLProgram
++// constructor and links them in the same breath, yet the browser keys its
++// program cache on those exact bytes, so warming a program elsewhere (a worker
++// GL context) needs the sources BEFORE the link. The assembly below is the
++// constructor's own, moved verbatim so both paths cannot drift.
++function assembleProgramGlsl( parameters ) {
+ 
+ 	const defines = parameters.defines;
+ 
+@@ -6665,8 +6666,6 @@ function WebGLProgram( renderer, cacheKey, parameters, bindingStates ) {
+ 
+ 	const customDefines = generateDefines( defines );
+ 
+-	const program = gl.createProgram();
+-
+ 	let prefixVertex, prefixFragment;
+ 	let versionString = parameters.glslVersion ? '#version ' + parameters.glslVersion + '\n' : '';
+ 
+@@ -7066,6 +7065,21 @@ function WebGLProgram( renderer, cacheKey, parameters, bindingStates ) {
+ 	const vertexGlsl = versionString + prefixVertex + vertexShader;
+ 	const fragmentGlsl = versionString + prefixFragment + fragmentShader;
+ 
++	return { vertexGlsl: vertexGlsl, fragmentGlsl: fragmentGlsl };
++
++}
++
++function WebGLProgram( renderer, cacheKey, parameters, bindingStates ) {
++
++	// TODO Send this event to Three.js DevTools
++	// log( 'WebGLProgram', cacheKey );
++
++	const gl = renderer.getContext();
++
++	const program = gl.createProgram();
++
++	const { vertexGlsl, fragmentGlsl } = assembleProgramGlsl( parameters );
++
+ 	// log( '*VERTEX*', vertexGlsl );
+ 	// log( '*FRAGMENT*', fragmentGlsl );
+ 
+@@ -7990,12 +8004,30 @@ function WebGLPrograms( renderer, environments, extensions, capabilities, bindin
  
  	}
  
@@ -42,10 +93,18 @@ index ad13abf7d128bee607a7672646ca543327e258d3..207a0071e346263aaf28113a1316d5f9
  			++ program.usedTimes;
  
  		} else {
-@@ -8011,20 +8029,28 @@ function WebGLPrograms( renderer, environments, extensions, capabilities, bindin
+@@ -8011,20 +8043,36 @@ function WebGLPrograms( renderer, environments, extensions, capabilities, bindin
  
  	}
  
++	// World of ClaudeCraft: cache-key probe. The off-thread shader warm-up must
++	// skip a program this cache has already linked; there is nothing left to warm.
++	function hasProgram( cacheKey ) {
++
++		return programsMap.has( cacheKey );
++
++	}
++
 +	function destroyProgram( program ) {
 +
 +		// Remove from unordered set
@@ -69,18 +128,23 @@ index ad13abf7d128bee607a7672646ca543327e258d3..207a0071e346263aaf28113a1316d5f9
 -			const i = programs.indexOf( program );
 -			programs[ i ] = programs[ programs.length - 1 ];
 -			programs.pop();
--
--			// Remove from map
--			programsMap.delete( program.cacheKey );
 +			retainedPrograms.push( program );
  
+-			// Remove from map
+-			programsMap.delete( program.cacheKey );
+-
 -			// Free WebGL resources
 -			program.destroy();
 +			if ( retainedPrograms.length > RETAINED_PROGRAM_LIMIT ) destroyProgram( retainedPrograms.shift() );
  
  		}
  
-@@ -8051,6 +8077,8 @@ function WebGLPrograms( renderer, environments, extensions, capabilities, bindin
+@@ -8047,10 +8095,13 @@ function WebGLPrograms( renderer, environments, extensions, capabilities, bindin
+ 		getProgramCacheKey: getProgramCacheKey,
+ 		getUniforms: getUniforms,
+ 		acquireProgram: acquireProgram,
++		hasProgram: hasProgram,
+ 		releaseProgram: releaseProgram,
  		releaseShaderCache: releaseShaderCache,
  		// Exposed for resource monitoring & error feedback via renderer.info:
  		programs: programs,
@@ -89,7 +153,7 @@ index ad13abf7d128bee607a7672646ca543327e258d3..207a0071e346263aaf28113a1316d5f9
  		dispose: dispose
  	};
  
-@@ -16462,6 +16490,7 @@ class WebGLRenderer {
+@@ -16462,6 +16513,7 @@ class WebGLRenderer {
  			indexedBufferRenderer = new WebGLIndexedBufferRenderer( _gl, extensions, info );
  
  			info.programs = programCache.programs;
@@ -97,7 +161,196 @@ index ad13abf7d128bee607a7672646ca543327e258d3..207a0071e346263aaf28113a1316d5f9
  
  			/**
  			 * Holds details about the capabilities of the current rendering context.
-@@ -17487,21 +17516,81 @@ class WebGLRenderer {
+@@ -17464,6 +17516,188 @@ class WebGLRenderer {
+ 
+ 		};
+ 
++		// World of ClaudeCraft: the exact GLSL compile() would link, collected
++		// without linking anything. The browser keys its program cache on the
++		// final source bytes, so an off-thread warm-up has to know them first.
++		// This mirrors compile() step for step and shares its caller contract:
++		// the renderer state the real link will see (bound render target, scene
++		// fog) is the caller's responsibility here exactly as it is there.
++		/**
++		 * Collects the final vertex and fragment GLSL of every program {@link WebGLRenderer#compile}
++		 * would acquire for the given scene, without compiling or linking any of them. Programs this
++		 * renderer has already linked are skipped.
++		 *
++		 * @param {Object3D} scene - The scene or another type of 3D object to collect from.
++		 * @param {Camera} camera - The camera.
++		 * @param {?Scene} [targetScene=null] - The target scene.
++		 * @return {Array<Object>} One entry per distinct unlinked program, in traversal order.
++		 */
++		this.collectProgramSources = function ( scene, camera, targetScene = null ) {
++
++			const collected = [];
++			const collectedKeys = new Set();
++
++			function collectMaterialSources( material, scene, object ) {
++
++				if ( scene.isScene !== true ) scene = _emptyScene; // scene could be a Mesh, Line, Points, ...
++
++				const lights = currentRenderState.state.lights;
++				const shadowsArray = currentRenderState.state.shadowsArray;
++
++				const parameters = programCache.getParameters( material, lights.state, shadowsArray, scene, object, currentRenderState.state.lightProbeGridArray );
++				const cacheKey = programCache.getProgramCacheKey( parameters );
++
++				if ( collectedKeys.has( cacheKey ) ) return;
++				if ( programCache.hasProgram( cacheKey ) ) return;
++
++				collectedKeys.add( cacheKey );
++
++				// The dispose listener getProgram registers on a new material, so a
++				// material only ever collected here releases its shader cache entry too.
++				material.addEventListener( 'dispose', onMaterialDispose );
++
++				parameters.uniforms = programCache.getUniforms( material );
++
++				// getProgram builds node materials here first; this renderer has none, so
++				// the mirror does not carry that branch (a node material would assemble wrong).
++				material.onBeforeCompile( parameters, _this );
++
++				const glsl = assembleProgramGlsl( parameters );
++
++				collected.push( {
++					material: material,
++					object: object,
++					cacheKey: cacheKey,
++					name: parameters.shaderName,
++					vertexGlsl: glsl.vertexGlsl,
++					fragmentGlsl: glsl.fragmentGlsl,
++					index0Attribute: parameters.index0AttributeName !== undefined ? parameters.index0AttributeName : ( parameters.hasPositionAttribute === true ? 'position' : '' )
++				} );
++
++			}
++
++			// The side branch of prepareMaterial(), mirrored: a transparent
++			// double-sided material without forceSinglePass links a BackSide and a
++			// FrontSide program (the side feeds the cache key), so the collection
++			// reads both. The side is only borrowed; nothing here marks the material
++			// for an update.
++			function collectPreparedMaterial( material, scene, object ) {
++
++				if ( material.transparent === true && material.side === DoubleSide && material.forceSinglePass === false ) {
++
++					try {
++
++						material.side = BackSide;
++						collectMaterialSources( material, scene, object );
++
++						material.side = FrontSide;
++						collectMaterialSources( material, scene, object );
++
++					} finally {
++
++						material.side = DoubleSide;
++
++					}
++
++				} else {
++
++					collectMaterialSources( material, scene, object );
++
++				}
++
++			}
++
++			if ( targetScene === null ) targetScene = scene;
++
++			currentRenderState = renderStates.get( targetScene );
++			currentRenderState.init( camera );
++
++			renderStateStack.push( currentRenderState );
++
++			try {
++
++				// gather lights from both the target scene and the new object that will be added to the scene.
++
++				targetScene.traverseVisible( function ( object ) {
++
++					if ( object.isLight && object.layers.test( camera.layers ) ) {
++
++						currentRenderState.pushLight( object );
++
++						if ( object.castShadow ) {
++
++							currentRenderState.pushShadow( object );
++
++						}
++
++					}
++
++				} );
++
++				if ( scene !== targetScene ) {
++
++					scene.traverseVisible( function ( object ) {
++
++						if ( object.isLight && object.layers.test( camera.layers ) ) {
++
++							currentRenderState.pushLight( object );
++
++							if ( object.castShadow ) {
++
++								currentRenderState.pushShadow( object );
++
++							}
++
++						}
++
++					} );
++
++				}
++
++				currentRenderState.setupLights();
++
++				// Only collect from the new scene, not the targetScene.
++
++				scene.traverse( function ( object ) {
++
++					if ( ! ( object.isMesh || object.isPoints || object.isLine || object.isSprite ) ) {
++
++						return;
++
++					}
++
++					const material = object.material;
++
++					if ( material ) {
++
++						if ( Array.isArray( material ) ) {
++
++							for ( let i = 0; i < material.length; i ++ ) {
++
++								collectPreparedMaterial( material[ i ], targetScene, object );
++
++							}
++
++						} else {
++
++							collectPreparedMaterial( material, targetScene, object );
++
++						}
++
++					}
++
++				} );
++
++			} finally {
++
++				currentRenderState = renderStateStack.pop();
++
++			}
++
++			return collected;
++
++		};
++
+ 		// compileAsync
+ 
+ 		/**
+@@ -17487,21 +17721,81 @@ class WebGLRenderer {
  
  			return new Promise( ( resolve ) => {
  
@@ -183,7 +436,7 @@ index ad13abf7d128bee607a7672646ca543327e258d3..207a0071e346263aaf28113a1316d5f9
  
  					// once the list of compiling materials is empty, call the callback
  
-@@ -17512,9 +17601,19 @@ class WebGLRenderer {
+@@ -17512,9 +17806,19 @@ class WebGLRenderer {
  
  					}
  
@@ -205,7 +458,7 @@ index ad13abf7d128bee607a7672646ca543327e258d3..207a0071e346263aaf28113a1316d5f9
  
  				}
  
-@@ -17876,7 +17975,11 @@ class WebGLRenderer {
+@@ -17876,7 +18180,11 @@ class WebGLRenderer {
  
  				} else if ( object.isMesh || object.isLine || object.isPoints ) {
  

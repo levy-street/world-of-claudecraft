@@ -3,6 +3,7 @@ import { resolve } from 'node:path';
 import { describe, expect, it } from 'vitest';
 import type { PerfSnapshot } from '../src/game/perf';
 import { diagnosePerfSnapshot, formatPerfDiagnosisMarkdown } from '../src/game/perf_diagnosis_core';
+import { shaderWarmAuditSnapshot } from '../src/render/shader_warm_audit';
 
 function digest(value = 0) {
   return { count: 600, avg: value, p95: value, max: value };
@@ -226,6 +227,7 @@ function baseSnapshot(): PerfSnapshot {
     heapSawtooth: null,
     hitchForensics: [],
     postRevealLinks: null,
+    shaderWarmAudit: shaderWarmAuditSnapshot(),
     input: {
       intents: 20,
       lastKind: 'move',

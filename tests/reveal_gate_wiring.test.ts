@@ -72,9 +72,16 @@ describe('reveal gate wiring (source pins)', () => {
     // (compile_gate_pieces.ts), each running the colour arm, the shadow arm,
     // then the variant settle on that group's representative node, each under
     // its own deadline.
+    // The announcement arm (deps.expect) rides the same cut, told at creation.
     const colourAt = anchor(
       host,
-      'const pieces = linkPieceWork(target, deps.compileColor, deps.compileShadow, deps.settle);',
+      `const pieces = linkPieceWork(
+        target,
+        deps.compileColor,
+        deps.compileShadow,
+        deps.settle,
+        deps.expect,
+      );`,
     );
     // Uploads sit BETWEEN the link and the touch: the touch's driver round trip
     // flushes behind everything already queued, so an upload paid after it is

@@ -169,8 +169,11 @@ API, while `@typescript/native` provides the `tsc` binary. Things to know:
   further without measuring. The repo also carries a vendored three patch under
   `patches/` (regenerated with `pnpm patch three@0.185.1`); a three version
   bump must re-verify every hunk it carries, the compileAsync disposal race, the
-  degenerate-normal shader guard, the released-program retention and the count 0
-  instanced-mesh render-list skip alike (`tests/three_compile_async_patch.test.ts`
+  degenerate-normal shader guard, the released-program retention, the count 0
+  instanced-mesh render-list skip and the GLSL assembly seam (the lifted
+  `assembleProgramGlsl`, `WebGLPrograms.hasProgram` and
+  `renderer.collectProgramSources`, which hand an off-thread warm-up the exact
+  sources three would link) alike (`tests/three_compile_async_patch.test.ts`
   pins them all), before dropping or re-rolling it.
 - **When to revisit.** Collapse the dual alias back to a single `typescript`
   dependency once BOTH hold: the TypeScript 7.1 stable JS API has shipped

@@ -17,7 +17,8 @@
 //
 // Every readout here also sweeps the program-key ledger (program_key_ledger.ts,
 // off without `?perf`), which is how the ledger sees every program without the
-// renderer gaining a call site.
+// renderer gaining a call site; the per-frame readouts and the arm sweep the
+// shader warm audit (shader_warm_audit.ts, same flag) the same way.
 
 import { recordGpuPrepEvent } from './gpu_prep_events';
 import {
@@ -37,15 +38,19 @@ import {
   postRevealLinksSnapshot as snapshotLinkWindow,
 } from './post_reveal_links_core';
 import { sweepProgramKeyLedger } from './program_key_ledger';
+import { armShaderWarmAudit, sweepShaderWarmAudit } from './shader_warm_audit';
 
 interface ProgramInfoHost {
   info: { programs?: LiveProgramEntry[] | null; memory: { textures: number } };
+  /** The GL context, for the shader warm audit's source read-back. */
+  getContext?(): unknown;
 }
 
 /** The slice the per-draw watch reads: three's program list, when the host
  *  exposes one at all (a test's stub renderer need not). */
 export interface ProgramListHost {
   info?: { programs?: LiveProgramEntry[] | null } | null;
+  getContext?(): unknown;
 }
 
 const watch = createLiveProgramWatch();
@@ -79,6 +84,7 @@ export function programCounts(webgl: ProgramInfoHost): { programs: number; textu
 /** Curtain-fade boundary: everything linked so far is prep, not an escape. */
 export function armLiveProgramWatch(webgl: ProgramInfoHost): void {
   sweepProgramKeyLedger(webgl, performance.now());
+  armShaderWarmAudit(webgl);
   armWatch(watch, webgl.info.programs ?? undefined);
   // The escape watch re-baselines on EVERY arm (an arrival's prep is prep);
   // the link window is anchored to the FIRST arm on purpose, the world entry,
@@ -94,6 +100,7 @@ export function armLiveProgramWatch(webgl: ProgramInfoHost): void {
  *  reported. */
 export function absorbLivePrograms(webgl: ProgramListHost): void {
   sweepProgramKeyLedger(webgl, performance.now());
+  sweepShaderWarmAudit(webgl);
   absorbPrograms(watch, webgl.info?.programs ?? undefined);
 }
 
@@ -105,6 +112,7 @@ export function absorbLivePrograms(webgl: ProgramListHost): void {
  */
 export function recordNewLivePrograms(webgl: ProgramListHost): void {
   sweepProgramKeyLedger(webgl, performance.now());
+  sweepShaderWarmAudit(webgl);
   const found = collectNewLivePrograms(watch, webgl.info?.programs ?? undefined, labels);
   for (let i = 0; i < found; i++) {
     recordGpuPrepEvent({ kind: 'live-program', key: labels[i], ageMs: 0 });

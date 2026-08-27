@@ -5,6 +5,7 @@ import { jitteredPerfReportDelay } from '../src/game/perf_report_schedule';
 import { perfReporterInternalsForTest, startPerfReporter } from '../src/game/perf_reporter';
 import { Settings } from '../src/game/settings';
 import { POST_REVEAL_LINK_WINDOW_MS } from '../src/render/post_reveal_links_core';
+import { shaderWarmAuditSnapshot } from '../src/render/shader_warm_audit';
 
 function installBrowserGlobals(): void {
   const map = new Map<string, string>();
@@ -320,6 +321,7 @@ function snapshot(): PerfSnapshot {
     hiddenPresentSkips: 0,
     hitchForensics: [],
     postRevealLinks: null,
+    shaderWarmAudit: shaderWarmAuditSnapshot(),
     frameMs: { avg: 16.6, p50: 16, p95: 19, p99: 28, max: 52, long50: 1 },
     windows: {
       last10s: {
@@ -1871,6 +1873,40 @@ describe('perf reporter world-entry blocks', () => {
       phases,
     )!;
     expect((body.rawSummary as { bootPhases?: unknown }).bootPhases).toEqual(phases);
+  });
+
+  it('never ships the shader warm audit, which is local evidence only', () => {
+    // The audit is read by the probes on the machine: it carries whole GLSL
+    // cache keys and gate labels, and the payload is built field by field so
+    // a new PerfSnapshot block cannot ride the beacon by simply existing.
+    const snap = snapshot();
+    snap.shaderWarmAudit = {
+      ...shaderWarmAuditSnapshot(),
+      enabled: true,
+      dryCompile: true,
+      armed: true,
+      expected: 12,
+      pending: 3,
+      matched: 9,
+      unexpected: 4,
+      failures: 2,
+      backlog: 5,
+      linkedLabels: ['shader-warm-audit-sentinel'],
+      pendingSamples: [
+        { cacheKey: 'shader-warm-audit-sentinel-key', name: 'physical', label: 'cull:2' },
+      ],
+    };
+    const body = perfReporterInternalsForTest.payloadFromSnapshot(snap, new Settings(), 's', 1)!;
+    expect(Object.keys(body)).not.toContain('shaderWarmAudit');
+    expect(Object.keys(body.rawSummary as Record<string, unknown>)).not.toContain(
+      'shaderWarmAudit',
+    );
+    // Nor under any other name, at any depth: the sentinel values are what a
+    // renamed passthrough would carry.
+    const serialized = JSON.stringify(body);
+    expect(serialized).not.toContain('shaderWarmAudit');
+    expect(serialized).not.toContain('shader-warm-audit-sentinel');
+    expect(serialized).not.toContain('shader-warm-audit-sentinel-key');
   });
 
   describe('over a real send', () => {

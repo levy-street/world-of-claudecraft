@@ -191,6 +191,7 @@ import { attackAbilityId, isSpinAttackAbility } from './characters/weapon_attack
 import { fogFarForBuiltGround, groundViewConeHalfAngle } from './chunk_residency_core';
 import { CLICK_MARKER_LIFETIME, clickMarkerAnim, clickMarkerColor } from './click_marker';
 import { buildCliffScree, type CliffScreeView } from './cliff_scree';
+import { type CompileArmHost, linkColorPrograms, linkShadowPrograms } from './compile_arms';
 import type { CompileGateResult } from './compile_gate';
 import { CompileGateQueue, SerialGateLane, settlePendingSwap } from './compile_gate';
 import { linkPieceWork } from './compile_gate_pieces';
@@ -505,7 +506,6 @@ import {
   runPrewarmCompileSubmission,
   submitPrewarmCompileUnit,
 } from './prewarm_compile_submission_core';
-import { prewarmDepthMaterial } from './prewarm_depth_material';
 import {
   boundedPrewarmVisibility,
   runBackgroundPrewarm,
@@ -549,7 +549,6 @@ import { createPrewarmResumeLedger } from './prewarm_resume_ledger_core';
 import { type PriestMarkersVisual, syncPriestMarkersVisual } from './priest_markers_visual';
 import { pieceProgramSettle } from './program_variant_settle';
 import { buildPropMaterialPrewarmGroup, buildProps, propResidencySources } from './props';
-
 import { makeQuestObjectGate, type QuestObjectGateOptions } from './quest_object_gate_core';
 import { buildGroundQuestObject } from './quest_objects';
 import { RaceLine } from './race_line';
@@ -608,6 +607,7 @@ import { type SelfMotionFrame, SelfMotionPredictor, updateSelfRenderFallback } f
 import { SelfSpiritPrewarmer } from './self_spirit_prewarm';
 import { SentenceVfx } from './sentence_vfx';
 import { sentenceImpactPlan } from './sentence_vfx_core';
+import { expectRootProgramSources } from './shader_warm_audit';
 import {
   createShadowCadenceState,
   resetShadowCadence,
@@ -2531,6 +2531,7 @@ export class Renderer {
         compileColor: (target) => this.compilePrewarmColorPrograms(target, false),
         compileShadow: (target) => this.compileShadowPrograms(target),
         settle: pieceProgramSettle(this.webgl.properties, this.prewarmDepthMaterials),
+        expect: (target) => expectRootProgramSources(this.compileArms, target),
         upload: (target, priority) => this.uploadGateTexturesGated(target, priority),
         touch: (target, priority, gate) => this.touchLinkedProgramsGated(target, priority, gate),
         predictRevealMs: () => this.gpuPrepBudget.predictMs(REVEAL_GATE_PREP_KIND),
@@ -5348,102 +5349,42 @@ export class Renderer {
     return sweepObjectTextures(this.textureSweepHost, obj);
   }
 
-  /**
-   * Link a root's exact live colour-program variant before a bounded upload.
-   * Three chooses output colour space from the current render target in
-   * compileAsync's synchronous prologue (authored on r165; the r185 prewarm
-   * re-audit kept this restore). Restore that global before awaiting
-   * the parallel linker so live frames never inherit the prewarm target.
-   */
-  private async compilePrewarmColorPrograms(
+  private compileArmHost: CompileArmHost | null = null;
+
+  /** The two compile arms, bound to this renderer (compile_arms.ts owns the
+   *  state each arm sets and the why). Read-through: the post pipeline, the
+   *  offscreen target and the depth cache all move during a session. Built
+   *  on first use, so a harness over the prototype gets one too. */
+  private get compileArms(): CompileArmHost {
+    if (this.compileArmHost) return this.compileArmHost;
+    this.compileArmHost = {
+      webgl: () => this.webgl,
+      camera: () => this.camera,
+      scene: () => this.scene,
+      shadowCamera: () => this.sun.shadow.camera,
+      offscreen: () => !!this.post,
+      offscreenTarget: () => {
+        this.prewarmRenderTarget ??= new THREE.WebGLRenderTarget(8, 8);
+        return this.prewarmRenderTarget;
+      },
+      depthMaterials: () => this.prewarmDepthMaterials,
+      shadowArm: () => GFX.dynamicShadows && this.asyncCompileSupported,
+    };
+    return this.compileArmHost;
+  }
+
+  /** Link a root's exact live colour-program variant before a bounded upload. */
+  private compilePrewarmColorPrograms(
     root: THREE.Object3D,
     includeOffscreenVariant: boolean,
   ): Promise<void> {
-    const compileAtTarget = async (target: THREE.WebGLRenderTarget | null): Promise<void> => {
-      const previousTarget = this.webgl.getRenderTarget();
-      let compilePromise: Promise<THREE.Object3D>;
-      try {
-        this.webgl.setRenderTarget(target);
-        compilePromise = this.webgl.compileAsync(root, this.camera, this.scene);
-      } finally {
-        this.webgl.setRenderTarget(previousTarget);
-      }
-      await compilePromise;
-    };
-
-    // Direct tiers draw to the canvas in gameplay, so retain that variant.
-    if (!this.post) await compileAtTarget(null);
-
-    // Composer tiers draw the scene into a render target. Direct tiers also
-    // need this second variant before their bounded offscreen geometry upload,
-    // otherwise that upload itself can synchronously link a new program.
-    if (this.post || includeOffscreenVariant) {
-      this.prewarmRenderTarget ??= new THREE.WebGLRenderTarget(8, 8);
-      await compileAtTarget(this.prewarmRenderTarget);
-    }
+    return linkColorPrograms(this.compileArms, root, includeOffscreenVariant);
   }
 
-  /**
-   * compileAsync(scene, camera) does not enumerate Three's renderer-owned
-   * shadow materials. Temporarily put equivalent MeshDepthMaterials on EVERY
-   * mesh under the root, skinned or not, so KHR_parallel_shader_compile links
-   * those variants before the shadow pass asks getUniforms for them: static
-   * and instanced casters (12 of the initial frame's 64 residual synchronous
-   * links), and meshes NOT casting at gate time, because castShadow is toggled
-   * at runtime by distance (entity shadow band, zone shadow volume, gather
-   * nodes) frames after this arm ran, so a rig created beyond the band linked
-   * cold at its first shadow draw (eleven depth programs of 20 to 41 ms in
-   * 0.3 s on the 3090 ride, ten through Eastbrook in production). Depth twins
-   * are few, cached per (material inputs x mesh shape): a cache hit, no link.
-   */
-  private async compileShadowPrograms(root: THREE.Object3D): Promise<void> {
-    if (!GFX.dynamicShadows || !this.asyncCompileSupported) return;
-    const swaps: { mesh: THREE.Mesh; material: THREE.Material | THREE.Material[] }[] = [];
-    // Walked inside the try below so a throw mid-walk still restores every swap.
-    const swapMaterials = (): void => {
-      root.traverse((obj) => {
-        const mesh = obj as THREE.Mesh;
-        if (!mesh.isMesh || !mesh.material) return;
-        const material = mesh.material;
-        swaps.push({ mesh, material });
-        mesh.material = Array.isArray(material)
-          ? material.map((item) => prewarmDepthMaterial(this.prewarmDepthMaterials, item, mesh))
-          : prewarmDepthMaterial(this.prewarmDepthMaterials, material, mesh);
-      });
-    };
-    // Match the real shadow pass's program key exactly. A bare
-    // compileAsync(root, shadowCamera) uses the canvas output colour space
-    // and sees no scene lights, producing a skinned depth program that still
-    // misses both the render-target and shadow-map bits. Conversely, passing
-    // the world scene verbatim would add fog bits that WebGLShadowMap omits
-    // (its renderBufferDirect call uses a null scene). Keep the world only as
-    // the light source, briefly suppress its fog, and compile while any
-    // offscreen target is current so outputColorSpace is the linear working
-    // space. compileAsync runs its compile() prologue synchronously; restore
-    // the globals AND the swapped materials before awaiting the parallel
-    // linker: the boot-resume lane runs these units on VISIBLE post-reveal
-    // scene meshes, and a swap held across the awaited link (10 ms+ of real
-    // frames) would draw them as depth noise. The link tracks the depth
-    // material object, not the mesh, so restoring early is safe.
-    this.prewarmRenderTarget ??= new THREE.WebGLRenderTarget(8, 8);
-    const previousTarget = this.webgl.getRenderTarget();
-    const previousFog = this.scene.fog;
-    let compilePromise: Promise<THREE.Object3D> | null = null;
-    try {
-      swapMaterials();
-      if (swaps.length > 0) {
-        this.scene.fog = null;
-        this.webgl.setRenderTarget(this.prewarmRenderTarget);
-        compilePromise = this.webgl.compileAsync(root, this.sun.shadow.camera, this.scene);
-      }
-    } finally {
-      this.webgl.setRenderTarget(previousTarget);
-      this.scene.fog = previousFog;
-      for (const swap of swaps) swap.mesh.material = swap.material;
-    }
-    // Do not race a timer here. The underlying linker cannot be cancelled,
-    // so a timeout only lets it overlap the next child and gameplay.
-    if (compilePromise) await compilePromise;
+  /** Link the depth twins of every mesh under the root, under the shadow
+   *  pass's own state. */
+  private compileShadowPrograms(root: THREE.Object3D): Promise<void> {
+    return linkShadowPrograms(this.compileArms, root);
   }
 
   // Link the local player's own body spirit (ghost) transparent variants
@@ -8616,9 +8557,10 @@ export class Renderer {
     const color = (node: THREE.Object3D) => this.compilePrewarmColorPrograms(node, false);
     const shadow = (node: THREE.Object3D) => this.compileShadowPrograms(node);
     const settle = pieceProgramSettle(this.webgl.properties, this.prewarmDepthMaterials);
+    const expect = (node: THREE.Object3D) => expectRootProgramSources(this.compileArms, node);
     const submit = () =>
       this.liveCompileGates.runPieces(
-        linkPieceWork(target, color, shadow, settle),
+        linkPieceWork(target, color, shadow, settle, expect),
         VIEW_COMPILE_GATE_MAX_MS,
         { priority, label: `live-gate:${target.name || target.type}` },
       );

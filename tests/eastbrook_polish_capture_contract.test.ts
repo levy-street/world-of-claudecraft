@@ -326,8 +326,11 @@ interface AttributionTargetFixture {
 // Re-minted for the entry-horizon scenery cull (renderer.ts hands the four
 // reveal-gated painters the horizon-capped cull far at both frame sites): the
 // renderer integration leaf moved. No capture was retaken.
+// Re-minted for the three GLSL assembly seam patch (the pnpm-lock patch hash
+// moved, and the lockfile is a hashed leaf of the town fingerprint), so the
+// seals follow the swept evidence bytes. No capture was retaken.
 const PINNED_POLISH_COMPOSITE_FINGERPRINT =
-  'dc514c77d7538c212b8b0f69fff9ce0704f5bbbb0337bf1ab93d5d8ee42761c9';
+  'f354e38ea0097ab5d8e8d6a1a50c0fdeb70510e36b50636de1c3aae9b7859d0f';
 
 function validPolishAttributionTargets(): AttributionTargetFixture[] {
   return [

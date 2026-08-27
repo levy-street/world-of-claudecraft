@@ -23,7 +23,12 @@
 import type * as THREE from 'three';
 import { GPU_WORK_PRIORITY } from './background_gpu_queue';
 import type { CompileGatePiece, CompileGateResult } from './compile_gate';
-import { linkPiecesOf, linkPieceWork, type PieceSettle } from './compile_gate_pieces';
+import {
+  linkPiecesOf,
+  linkPieceWork,
+  type PieceExpect,
+  type PieceSettle,
+} from './compile_gate_pieces';
 import { type RevealCompileHost, revealSoftDeadlineMs } from './reveal_gate';
 
 /** The gpu-prep label prefix, and therefore the budget's cost KIND, of every
@@ -47,6 +52,9 @@ export interface RevealCompileHostDeps {
    *  (program_variant_settle.ts): what makes a settled gate mean "every
    *  variant ready", not "the one slot compileAsync polled". */
   settle: PieceSettle;
+  /** The announcement arm (compile_gate_pieces.ts), when the host has one:
+   *  told each piece's representative at gate creation. */
+  expect?: PieceExpect;
   /** Every cold texture under the root, one budgeted queue unit each. Between
    *  the link and the touch: the touch's driver round trip flushes behind
    *  everything already queued, so uploads paid after it are measured by it. */
@@ -85,7 +93,13 @@ export function createRevealCompileHost(deps: RevealCompileHostDeps): RevealComp
       const priority =
         namedPriority ??
         (imminent ? GPU_WORK_PRIORITY.LIVE_VIEW : GPU_WORK_PRIORITY.VISIBLE_PREWARM);
-      const pieces = linkPieceWork(target, deps.compileColor, deps.compileShadow, deps.settle);
+      const pieces = linkPieceWork(
+        target,
+        deps.compileColor,
+        deps.compileShadow,
+        deps.settle,
+        deps.expect,
+      );
       submittedPieces.set(target, pieces.length);
       const linked = deps.gate(pieces, {
         priority,

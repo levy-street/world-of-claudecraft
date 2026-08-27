@@ -912,37 +912,47 @@ describe('resolvePrewarmPolicy: unconstrained desktop', () => {
     // three 0.165 became a dead variant under 0.185 (its shadow pass draws the
     // default packing), and every character shadow program relinked cold at its
     // first draw (production: 1196 / 662 / 211 / 129 ms frames).
-    expect(renderer).toContain("import { prewarmDepthMaterial } from './prewarm_depth_material';");
+    // The shadow arm itself lives in src/render/compile_arms.ts (the renderer
+    // keeps a thin binding to it, so the dry compile of the shader warm audit
+    // rides the same state); the factory import moved with it.
+    const arms = codeWithoutLineComments(
+      readFileSync(new URL('../src/render/compile_arms.ts', import.meta.url), 'utf8').replace(
+        /\r\n/g,
+        '\n',
+      ),
+    );
+    expect(arms).toContain("import { prewarmDepthMaterial } from './prewarm_depth_material';");
+    expect(renderer).toContain('return linkShadowPrograms(this.compileArms, root);');
+    expect(renderer).not.toContain('prewarmDepthMaterial(');
     // The shadow arm covers EVERY mesh with a material, not just skinned rigs
     // (static and instanced casters' depth programs were 12 of the frame's 64
     // residual links) and not just the casters of the moment: castShadow is a
     // runtime distance toggle, so a rig gated beyond the shadow band must
     // still get its depth twin or it links cold at its first shadow draw.
     // Neither a `castShadow` branch nor a null-material swap belongs here.
-    const shadowStart = renderer.indexOf('private async compileShadowPrograms(');
-    // Comments are stripped above, so the slice ends on the next declaration.
-    const shadowEnd = renderer.indexOf('private prewarmRenderTarget', shadowStart);
+    const shadowStart = arms.indexOf('export function runShadowArm<T>(');
+    // Line comments are stripped above and the doc block of the next export
+    // carries none of the forbidden spellings, so the slice ends there.
+    const shadowEnd = arms.indexOf('export async function linkShadowPrograms(', shadowStart);
     expect(shadowStart).toBeGreaterThan(-1);
     expect(shadowEnd).toBeGreaterThan(shadowStart);
-    const shadowMethod = renderer.slice(shadowStart, shadowEnd);
+    const shadowMethod = arms.slice(shadowStart, shadowEnd);
     expect(shadowMethod).toContain('if (!mesh.isMesh || !mesh.material) return;');
     expect(shadowMethod).not.toContain('castShadow');
     expect(shadowMethod).not.toContain('isSkinnedMesh');
     expect(shadowMethod).not.toContain('mesh.material = null');
     expect(shadowMethod).toContain('for (const swap of swaps) swap.mesh.material = swap.material;');
-    // Scoped to the shadow arm: the renderer must not hand-build a depth
-    // material there (a `new THREE.MeshDepthMaterial(` or a `depthPacking` write
-    // in that block would be the override coming back by another door). The
-    // factory is fed the caster mesh too: one awaited depth material per
-    // (skinning x morph count x instancing) shape, not one shared instance whose
-    // single currentProgram slot leaves the sibling programs unpolled.
+    // Scoped to the shadow arm: it must not hand-build a depth material there
+    // (a `new THREE.MeshDepthMaterial(` or a `depthPacking` write in that block
+    // would be the override coming back by another door). The factory is fed
+    // the caster mesh too: one awaited depth material per (skinning x morph
+    // count x instancing) shape, not one shared instance whose single
+    // currentProgram slot leaves the sibling programs unpolled.
     // (tests/renderer_shadow_prewarm.test.ts proves the same behaviorally.)
     expect(shadowMethod).not.toContain('depthPacking');
     expect(shadowMethod).not.toContain('new THREE.MeshDepthMaterial(');
-    expect(shadowMethod).toContain('prewarmDepthMaterial(this.prewarmDepthMaterials, item, mesh)');
-    expect(shadowMethod).toContain(
-      'prewarmDepthMaterial(this.prewarmDepthMaterials, material, mesh)',
-    );
+    expect(shadowMethod).toContain('prewarmDepthMaterial(depthMaterials, item, mesh)');
+    expect(shadowMethod).toContain('prewarmDepthMaterial(depthMaterials, material, mesh)');
   });
 
   it('keeps the required desktop compiler behind the loading cover after a slow first frame', () => {
@@ -1545,7 +1555,7 @@ describe('mandatory interaction-landmark prewarm', () => {
     // ...each piece the colour arm, the shadow arm, then the settle over every
     // program variant its materials carry (program_variant_settle.ts), bound to
     // this renderer's material properties and depth-twin cache.
-    expect(compileGate).toContain('linkPieceWork(target, color, shadow, settle)');
+    expect(compileGate).toContain('linkPieceWork(target, color, shadow, settle, expect)');
     expect(compileGate).toContain(
       'const settle = pieceProgramSettle(this.webgl.properties, this.prewarmDepthMaterials);',
     );
