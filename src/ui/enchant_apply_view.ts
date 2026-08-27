@@ -348,33 +348,6 @@ function copyMeetsPerfectedGate(
   return !enchant.requiresPerfected || instance?.perfected === true;
 }
 
-/** The sim's BAGGED Perfected gate, exactly (professions/enchanting.ts
- *  holdsPerfectedTarget): an id-only apply names no cell, so the sim peeks the
- *  exact copy the apply would SPEND (baggedEnchantVictim: a plain copy before
- *  any instanced one, then the newest unenchanted instanced copy, the
- *  removeEnchantableItem order) and refuses unless THAT copy carries the
- *  marker. A Perfected copy shadowed by a plain one, or behind a newer
- *  ordinary one, is therefore no candidate at all, whatever
- *  copyMeetsPerfectedGate says of it alone: offering it would promise an apply
- *  the sim denies not_perfected. Both arms the picker can lead into are
- *  modeled, each through the victim the sim's guard peeks for it: the plain
- *  apply (no confirm) and the confirmed replace (the already-enchanted copy
- *  replaceVictimIndex pins, which step two lists as a replace row), so a
- *  Perfected copy carrying a live enchant still clears the row. Trivially
- *  true for every enchant that requires nothing. The worn family needs no
- *  twin: a worn ref names its slot, so the per-copy gate IS the sim's gate
- *  there. */
-function baggedIdMeetsPerfectedGate(
-  enchant: EnchantDef,
-  inventory: readonly InvSlot[],
-  itemId: string,
-): boolean {
-  return (
-    baggedArmMeetsPerfectedGate(enchant, inventory, itemId, false) ||
-    baggedArmMeetsPerfectedGate(enchant, inventory, itemId, true)
-  );
-}
-
 /** ONE arm of the sim's bagged Perfected gate: the copy the plain apply would
  *  spend (`replace` false) or the copy a confirmed replace pins (`replace`
  *  true), each peeked through baggedEnchantVictim exactly as
