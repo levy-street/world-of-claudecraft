@@ -1153,7 +1153,8 @@ export class BagsWindow {
           else if (target.kind === 'actionSlot') this.deps.dropOnActionSlot(s.itemId, target.slot);
           else if (target.kind === 'actionRingSlot')
             this.deps.dropOnActionRingSlot(s.itemId, target.ringIndex);
-          else if (target.kind === 'world') this.dropOnWorldToDestroy(s.itemId, count);
+          else if (target.kind === 'world')
+            this.dropOnWorldToDestroy(s.itemId, count, index >= 0 ? index : null);
         },
         onEnd: () => {
           this.deps.markEquipDropTargets(null);
@@ -1434,8 +1435,13 @@ export class BagsWindow {
   /** Open the destroy prompt for a stack dropped on the world. Public so the HUD's
    *  world-canvas drop target (the desktop arm of the same gesture) shares this one
    *  entry point with the touch arm above. */
-  promptDestroy(itemId: string, count: number): void {
-    this.showDiscardItemPrompt(itemId, Math.max(1, Math.floor(count)));
+  promptDestroy(itemId: string, count: number, index: number | null = null): void {
+    // The prompt names the COPY at the dragged index when that cell still
+    // holds this item id (the bags can shift under a snapshot mid-drag);
+    // otherwise it names the def, never a different copy's chosen name.
+    const slot = index === null ? undefined : this.deps.world().inventory[index];
+    const instance = slot?.itemId === itemId ? slot.instance : undefined;
+    this.showDiscardItemPrompt(itemId, Math.max(1, Math.floor(count)), instance);
   }
 
   /** What dropping `itemId` on the world does right now (pure decision, shared with
@@ -1451,15 +1457,16 @@ export class BagsWindow {
     this.deps.showError(t('hudChrome.bags.cannotDestroy'));
   }
 
-  private dropOnWorldToDestroy(itemId: string, count: number): void {
+  private dropOnWorldToDestroy(itemId: string, count: number, index: number | null): void {
     dropOnWorld(
       {
         destroyAction: (id) => this.destroyAction(id),
-        promptDestroy: (id, n) => this.promptDestroy(id, n),
+        promptDestroy: (id, n, at) => this.promptDestroy(id, n, at),
         showBlocked: () => this.showDestroyBlocked(),
       },
       itemId,
       count,
+      index,
     );
   }
 
@@ -1574,7 +1581,7 @@ export class BagsWindow {
         this.render();
         break;
       case 'discardQuest':
-        this.showDiscardItemPrompt(s.itemId, Math.max(1, Math.floor(s.count)));
+        this.showDiscardItemPrompt(s.itemId, Math.max(1, Math.floor(s.count)), s.instance);
         break;
       case 'equipBag':
         this.deps.world().equipBag(s.itemId, undefined, this.copyRefFor(s));
@@ -1834,7 +1841,11 @@ export class BagsWindow {
     });
   }
 
-  private showDiscardItemPrompt(itemId: string, maxCount: number): void {
+  private showDiscardItemPrompt(
+    itemId: string,
+    maxCount: number,
+    instance?: ItemInstancePayload,
+  ): void {
     document.querySelectorAll('.discard-item-prompt').forEach((el) => {
       el.remove();
     });
@@ -1844,7 +1855,8 @@ export class BagsWindow {
     if (!stack) return;
     const prompt = document.createElement('div');
     prompt.className = 'prompt panel discard-item-prompt';
-    const itemName = item ? itemDisplayName(item) : itemId;
+    // The destroy prompt names the COPY being destroyed (the cell authority).
+    const itemName = item ? wornItemCellParts(item, instance).name : itemId;
     prompt.innerHTML = `<div class="prompt-text">${esc(t('itemUi.bags.destroyTitle', { item: itemName }))}</div>`;
     let input: HTMLInputElement | null = null;
     if (maxCount > 1) {
@@ -1974,7 +1986,10 @@ export class BagsWindow {
     if (!stack) return;
     const prompt = document.createElement('div');
     prompt.className = 'prompt panel sell-confirm-prompt';
-    const itemName = itemDisplayName(item);
+    // The sale confirm names the COPY being sold: a promoted copy carries an
+    // instance and always lands here, and the buyback row lists it back
+    // under the same chosen name (the cell authority).
+    const itemName = wornItemCellParts(item, slot.instance).name;
     prompt.innerHTML = `<div class="prompt-text">${esc(t('itemUi.vendor.sellQuantityTitle', { item: itemName }))}</div>`;
     const confirm = document.createElement('button');
     confirm.className = 'btn';

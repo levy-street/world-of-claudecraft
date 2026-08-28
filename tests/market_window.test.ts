@@ -50,15 +50,14 @@ describe('market_window: no magic values', () => {
     // publicInstanceView payload, the staged sell pick and the returned-goods
     // rows their own copies, so a promoted legendary reads legendary. The
     // sale ledger's rows carry no payload in their model and stay def-only.
-    expect(painterCode).toContain('const effQuality = tooltipEffectiveQuality(item, l.instance);');
+    expect(painterCode).toContain('const parts = wornItemCellParts(item, l.instance);');
+    expect(painterCode).toContain('const effQuality = parts.quality;');
     expect(painterCode).toContain('marketNameColor(effQuality)');
-    expect(painterCode).toContain(
-      'const stagedQuality = tooltipEffectiveQuality(item, view.form.instance);',
-    );
+    expect(painterCode).toContain('const staged = wornItemCellParts(item, view.form.instance);');
+    expect(painterCode).toContain('const stagedQuality = staged.quality;');
     expect(painterCode).toContain('marketNameColor(stagedQuality)');
-    expect(painterCode).toContain(
-      'const returnedQuality = tooltipEffectiveQuality(item, instance);',
-    );
+    expect(painterCode).toContain('const returned = wornItemCellParts(item, instance);');
+    expect(painterCode).toContain('const returnedQuality = returned.quality;');
     expect(painterCode).toContain('marketNameColor(returnedQuality)');
     expect(painterCode).toContain('const qColor = marketNameColor(item.quality);');
     const core = readFileSync(new URL('../src/ui/market_name_color.ts', import.meta.url), 'utf8');
@@ -100,12 +99,12 @@ describe('market_window: instance-effective icon rims (phase 13 fix round)', () 
   it('the def-only negative: the sale LEDGER row has no payload and keeps the def icon', () => {
     // renderCollectSales rows are historical records whose model carries no
     // instance, so the rim is the def's, stated rather than defaulted.
-    const ledger = painter.slice(
-      painter.indexOf('private renderCollectSales('),
-      painter.indexOf('private fungibleBagCount('),
+    const ledger = painterCode.slice(
+      painterCode.indexOf('private renderCollectSales('),
+      painterCode.indexOf('private fungibleBagCount('),
     );
     expect(ledger).toContain('this.deps.itemIcon(item, item.quality)');
-    expect(ledger).not.toContain('this.deps.itemIcon(item)}');
+    expect(ledger).not.toContain('this.deps.itemIcon(item)');
     expect(ledger).not.toContain('knownItemIconHtml(');
   });
 });

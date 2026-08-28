@@ -180,8 +180,12 @@ export class BagItemActionMenu {
     const def = ITEMS[itemId];
     const selected = slotIndex === undefined ? undefined : world.inventory[slotIndex];
     // A destroy prompt names the COPY it destroys (its chosen name when the
-    // selected cell carries one), never only the def.
-    const name = def ? wornItemCellParts(def, selected?.instance).name : itemId;
+    // selected cell carries one), never only the def; the cell index was
+    // captured at menu-open and the bags can shift under a snapshot before
+    // the confirm, so the cell must still hold this item id or the prompt
+    // would title a destroy with a DIFFERENT copy's chosen name.
+    const target = selected?.itemId === itemId ? selected : undefined;
+    const name = def ? wornItemCellParts(def, target?.instance).name : itemId;
     const copies =
       (action === 'disenchant' || action === 'sunder') && selected?.itemId === itemId
         ? [selected]
@@ -576,7 +580,7 @@ export class BagItemActionMenu {
     ): string => `${nameOf(target.itemId, instance)}${target.heroic ? heroicMeta() : ''}`;
     const rows = [
       ...worn.map((target) => {
-        const html = `${identityOf(target, this.deps.world().equipmentInstances?.[target.slot])}${wornMeta(target)}${
+        const html = `${identityOf(target, world.equipmentInstances?.[target.slot])}${wornMeta(target)}${
           target.replace ? replaceMeta(target.replace) : ''
         }`;
         return target.replace?.sameEnchant

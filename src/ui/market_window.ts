@@ -741,11 +741,12 @@ export class MarketWindow {
       // all-surfaces item-cell rule): the listing's publicInstanceView
       // carries rolled, so a promoted legendary listing reads legendary on
       // both the name and the icon rim, not its def tier.
-      const effQuality = tooltipEffectiveQuality(item, l.instance);
+      const parts = wornItemCellParts(item, l.instance);
+      const effQuality = parts.quality;
       const qColor = marketNameColor(effQuality);
       const row = document.createElement('div');
       row.className = 'mkt-row';
-      const itemName = wornItemCellParts(item, l.instance).name;
+      const itemName = parts.name;
       const each =
         l.count > 1
           ? `<br><span class="seller">${esc(t('itemUi.market.each', { money: formatLocalizedMoney(Math.ceil(l.price / l.count)) }))}</span>`
@@ -923,11 +924,12 @@ export class MarketWindow {
     // The staged copy's own payload decides the name color AND the icon's
     // q-<quality> rim (an instanced staging is single-copy, so the color,
     // the rim, and the tooltip all describe one unit).
-    const stagedQuality = tooltipEffectiveQuality(item, view.form.instance);
+    const staged = wornItemCellParts(item, view.form.instance);
+    const stagedQuality = staged.quality;
     const qColor = marketNameColor(stagedQuality);
     const pick = document.createElement('div');
     pick.className = 'mkt-sell-pick';
-    pick.innerHTML = `${this.deps.itemIcon(item, stagedQuality)}<span class="ps-name" style="color:${qColor}">${esc(wornItemCellParts(item, view.form.instance).name)}</span>`;
+    pick.innerHTML = `${this.deps.itemIcon(item, stagedQuality)}<span class="ps-name" style="color:${qColor}">${esc(staged.name)}</span>`;
     // The staged copy's tooltip carries its payload, so a player holding plain
     // AND special copies can see WHICH one is staged (the mail chip precedent).
     this.deps.attachTooltip(pick, () => this.deps.itemTooltip(item, view.form.instance));
@@ -1029,7 +1031,8 @@ export class MarketWindow {
     for (const { item, count, instance } of view.rows) {
       // Returned goods keep their copy identity: the name color and the icon
       // rim both read the instance-effective quality (the all-surfaces rule).
-      const returnedQuality = tooltipEffectiveQuality(item, instance);
+      const returned = wornItemCellParts(item, instance);
+      const returnedQuality = returned.quality;
       const qColor = marketNameColor(returnedQuality);
       const row = document.createElement('div');
       row.className = 'mkt-collect';
@@ -1037,7 +1040,7 @@ export class MarketWindow {
         count > 1
           ? ` ${t('itemUi.market.stackCount', { count: formatNumber(count, { maximumFractionDigits: 0 }) })}`
           : '';
-      row.innerHTML = `<span class="mkt-collect-item">${this.deps.itemIcon(item, returnedQuality)}<span class="mkt-collect-name" style="color:${qColor}">${esc(wornItemCellParts(item, instance).name)}${esc(stack)}</span></span>`;
+      row.innerHTML = `<span class="mkt-collect-item">${this.deps.itemIcon(item, returnedQuality)}<span class="mkt-collect-name" style="color:${qColor}">${esc(returned.name)}${esc(stack)}</span></span>`;
       this.deps.attachTooltip(row, () => this.deps.itemTooltip(item, instance));
       body.appendChild(row);
     }

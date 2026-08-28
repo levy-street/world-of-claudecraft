@@ -1186,7 +1186,7 @@ export class BankWindow {
     // knownItemDef, not a raw ITEMS index: the release's stale-client sweep
     // made every bank item read tolerate an id this client does not know.
     const item = knownItemDef(ITEMS, slot.itemId);
-    const itemName = item ? itemDisplayName(item) : slot.itemId;
+    const itemName = item ? wornItemCellParts(item, slot.instance).name : slot.itemId;
     showQuantityPrompt(
       {
         installPromptDialog: (prompt, opener, close) =>

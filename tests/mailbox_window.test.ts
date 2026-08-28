@@ -168,7 +168,9 @@ describe('mailbox_window: the attachment and parcel chips describe the COPY', ()
   const code = painter.replace(/\/\*[\s\S]*?\*\//g, '').replace(/(^|[^:])\/\/.*$/gm, '$1');
 
   it('both chips build their name, quality, and color from the cell authority', () => {
-    expect(code.match(/wornItemCellParts\(item, slot\.instance\)/g)).toHaveLength(2);
+    // Two chips, plus the four parcel quantity-stepper arias beside the
+    // parcel chip that name the same copy (the phase 13 QA round 3).
+    expect(code.match(/wornItemCellParts\(item, slot\.instance\)/g)).toHaveLength(6);
     expect(code.match(/this\.deps\.itemIcon\(item, cell\.quality\)/g)).toHaveLength(2);
     expect(code.match(/style="color:\$\{cell\.color\}"/g)).toHaveLength(2);
     expect(code).not.toContain('QUALITY_COLOR[item.quality');

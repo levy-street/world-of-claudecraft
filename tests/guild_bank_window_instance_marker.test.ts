@@ -130,6 +130,10 @@ describe('guild bank grid instanced-slot marker', () => {
     expect(cells[0].getAttribute('aria-label')).toContain('Dawn Oath');
     expect(cells[0].getAttribute('aria-label')).not.toContain(plainName);
     expect(cells[1].getAttribute('aria-label')).toBe(`${plainName}, quantity 1`);
+    // The plain control reads the def's own tier from the same table the code
+    // reads; it is meaningful because that def has a DEFINED quality, so a
+    // 1-ary regression (undefined) still fails it.
+    expect(ITEMS[plainId].quality).toBeDefined();
     expect(iconCalls.map((c) => c.quality)).toEqual(['legendary', ITEMS[plainId].quality]);
   });
 

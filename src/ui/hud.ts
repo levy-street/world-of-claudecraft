@@ -2935,7 +2935,7 @@ export class Hud {
       root: () => $('#game-canvas'),
       state: this.itemDragState,
       destroyAction: (itemId) => this.bagsWindow.destroyAction(itemId),
-      promptDestroy: (itemId, count) => this.bagsWindow.promptDestroy(itemId, count),
+      promptDestroy: (itemId, count, index) => this.bagsWindow.promptDestroy(itemId, count, index),
       showBlocked: () => this.bagsWindow.showDestroyBlocked(),
     });
     $('#mm-social').addEventListener('click', () => this.toggleSocial());

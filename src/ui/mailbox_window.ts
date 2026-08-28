@@ -797,7 +797,9 @@ export class MailboxWindow {
         minus.dataset.focusKey = `${slot.itemId}:minus`;
         minus.setAttribute(
           'aria-label',
-          t('hudChrome.mailbox.parcelQtyDecreaseAria', { item: itemDisplayName(item) }),
+          t('hudChrome.mailbox.parcelQtyDecreaseAria', {
+            item: wornItemCellParts(item, slot.instance).name,
+          }),
         );
         minus.addEventListener('click', () => this.adjustParcelQty(slot.itemId, -1));
         // Typeable quantity (was a read-only span): validated on change/blur,
@@ -818,7 +820,9 @@ export class MailboxWindow {
         qty.setAttribute('aria-live', 'polite');
         qty.setAttribute(
           'aria-label',
-          t('hudChrome.mailbox.parcelQtyAria', { item: itemDisplayName(item) }),
+          t('hudChrome.mailbox.parcelQtyAria', {
+            item: wornItemCellParts(item, slot.instance).name,
+          }),
         );
         // The coin-input focus contract: select the value so typing replaces it
         // (clicking into "2" and typing 5 must mean 5, not 25); the once-only
@@ -842,7 +846,9 @@ export class MailboxWindow {
         plus.dataset.focusKey = `${slot.itemId}:plus`;
         plus.setAttribute(
           'aria-label',
-          t('hudChrome.mailbox.parcelQtyIncreaseAria', { item: itemDisplayName(item) }),
+          t('hudChrome.mailbox.parcelQtyIncreaseAria', {
+            item: wornItemCellParts(item, slot.instance).name,
+          }),
         );
         plus.addEventListener('click', () => this.adjustParcelQty(slot.itemId, 1));
         step.append(minus, qty, plus);
@@ -858,7 +864,9 @@ export class MailboxWindow {
       remove.dataset.focusKey = `${chipKey}:remove`;
       remove.setAttribute(
         'aria-label',
-        t('hudChrome.mailbox.removeParcelAria', { item: itemDisplayName(item) }),
+        t('hudChrome.mailbox.removeParcelAria', {
+          item: wornItemCellParts(item, slot.instance).name,
+        }),
       );
       remove.addEventListener('click', () => {
         // Reference identity, not item id: with a plain stack AND an instanced

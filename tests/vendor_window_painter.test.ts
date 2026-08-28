@@ -251,7 +251,7 @@ describe('renderVendorWindow: goods/buyback grid wrapping', () => {
         count: 1,
         price: 100,
         index: 0,
-        instance: { rolled: { quality: 'legendary' }, name: 'Dawn Oath' },
+        instance: { rolled: { quality: 'legendary' }, name: '<b>Oath</b> of "Vel\'tara"' },
       },
     ];
     const view: VendorView = {
@@ -275,8 +275,13 @@ describe('renderVendorWindow: goods/buyback grid wrapping', () => {
       }),
     );
     const row = el.querySelector('.vendor-item');
-    expect(row?.getAttribute('aria-label')).toContain('Dawn Oath');
-    expect(row?.querySelector('.vi-name')?.textContent).toContain('Dawn Oath');
+    // The hostile spelling from the tooltip suite: raw into the aria (an
+    // attribute value), escaped at the innerHTML sink, never parsed as markup.
+    expect(row?.getAttribute('aria-label')).toContain('<b>Oath</b> of "Vel\'tara"');
+    const name = row?.querySelector('.vi-name');
+    expect(name?.textContent).toContain('<b>Oath</b> of "Vel\'tara"');
+    expect(name?.innerHTML).toContain('&lt;b&gt;');
+    expect(name?.querySelector('b')).toBeNull();
     expect(qualities).toEqual(['legendary']);
   });
 

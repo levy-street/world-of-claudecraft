@@ -175,12 +175,13 @@ describe('bindTouchItemDrag', () => {
 
 describe('dropOnWorld', () => {
   function deps(action: 'discard' | 'discardBlocked' | 'none') {
-    const calls = { prompts: [] as Array<[string, number]>, blocked: 0 };
+    const calls = { prompts: [] as Array<[string, number, number | null]>, blocked: 0 };
     return {
       calls,
       deps: {
         destroyAction: () => action,
-        promptDestroy: (id: string, n: number) => calls.prompts.push([id, n]),
+        promptDestroy: (id: string, n: number, at: number | null) =>
+          calls.prompts.push([id, n, at]),
         showBlocked: () => {
           calls.blocked++;
         },
@@ -188,23 +189,30 @@ describe('dropOnWorld', () => {
     };
   }
 
-  it('opens the destroy PROMPT, never destroying the stack outright', () => {
+  it('opens the destroy PROMPT, never destroying the stack outright, naming the dragged cell', () => {
+    // The stack's pick-up index rides to the prompt so it can name the exact
+    // COPY being destroyed (the cell authority, the phase 13 QA round 3);
+    // null when the grid was not showing.
     const { calls, deps: d } = deps('discard');
-    dropOnWorld(d, 'linen_cloth', 4);
-    expect(calls.prompts).toEqual([['linen_cloth', 4]]);
+    dropOnWorld(d, 'linen_cloth', 4, 2);
+    dropOnWorld(d, 'linen_cloth', 4, null);
+    expect(calls.prompts).toEqual([
+      ['linen_cloth', 4, 2],
+      ['linen_cloth', 4, null],
+    ]);
     expect(calls.blocked).toBe(0);
   });
 
   it('refuses a protected (noDiscard) item with feedback and no prompt', () => {
     const { calls, deps: d } = deps('discardBlocked');
-    dropOnWorld(d, 'quest_key', 1);
+    dropOnWorld(d, 'quest_key', 1, 0);
     expect(calls.prompts).toEqual([]);
     expect(calls.blocked).toBe(1);
   });
 
   it('is inert while a transactional window owns the item (vendor / trade / bank)', () => {
     const { calls, deps: d } = deps('none');
-    dropOnWorld(d, 'linen_cloth', 4);
+    dropOnWorld(d, 'linen_cloth', 4, 0);
     expect(calls.prompts).toEqual([]);
     expect(calls.blocked).toBe(0);
   });

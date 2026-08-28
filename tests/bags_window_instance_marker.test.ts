@@ -186,7 +186,12 @@ describe('bags grid instanced-slot marker', () => {
     // The icon rim asks the dep for the SAME instance-effective quality (the
     // round-2 frontend finding: the grid's 1-ary call swallowed it, so a
     // promoted copy painted a def-tier glow inside a legendary cell rim).
-    expect(iconCalls.map((c) => c.quality)).toEqual(['legendary', 'common']);
+    // Scoped to the fixture's cells: the window build also paints the bag
+    // socket bar through the same dep (empty in this rig, but not by contract).
+    expect(iconCalls.filter((c) => c.id === 'copper_ore').map((c) => c.quality)).toEqual([
+      'legendary',
+      'common',
+    ]);
   });
 
   it('a promoted copy announces its chosen name in the cell aria, never only the def', () => {

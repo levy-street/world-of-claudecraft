@@ -6,6 +6,7 @@ import { itemDisplayName } from '../../entity_i18n';
 import { esc } from '../../esc';
 import { formatNumber, t } from '../../i18n';
 import { knownItemDef } from '../../known_item';
+import type { PainterHostPresentation } from '../../painter_host';
 import { svgIcon } from '../../ui_icons';
 import { unknownItemIconHtml } from '../../unknown_item_icon';
 import { corpseHarvestView } from './corpse_harvest_view';
@@ -26,10 +27,10 @@ export interface LootWindowControllerDeps {
   entityName(entity: Entity): string;
   money(copper: number): string;
   coinIconUrl(): string;
-  /** The PainterHostPresentation.itemIcon shape; the quality parameter is
-   *  shape uniformity only here, since no copy payload reaches this surface
-   *  (the rim is the def's), and it is never passed. */
-  itemIcon(item: ItemDef, quality?: ItemDef['quality']): string;
+  /** The PainterHostPresentation.itemIcon signature, named from the seam
+   *  rather than re-typed; the quality parameter is shape uniformity only
+   *  here, since no copy payload reaches this surface, and is never passed. */
+  itemIcon: PainterHostPresentation['itemIcon'];
   itemTooltip(item: ItemDef): string;
   attachTooltip(element: HTMLElement, html: () => string): void;
   centerPopup(element: HTMLElement): void;

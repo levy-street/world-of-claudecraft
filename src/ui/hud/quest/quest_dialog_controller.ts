@@ -16,6 +16,7 @@ import type { FocusTrapHandle } from '../../focus_manager';
 import { t } from '../../i18n';
 import { QUALITY_COLOR } from '../../icons';
 import { NPC_WINDOW_CLOSE_RANGE } from '../../npc_service_range';
+import type { PainterHostPresentation } from '../../painter_host';
 import { archetypeImageUrl } from '../../profession_art';
 import { buildAttunementPreview } from '../../profession_identity_view';
 import { svgIcon } from '../../ui_icons';
@@ -54,10 +55,10 @@ export interface QuestDialogControllerDeps {
   openFocusTrap(root: () => HTMLElement | null): FocusTrapHandle;
   closeTransient(): void;
   hideTooltip(): void;
-  /** The PainterHostPresentation.itemIcon shape; the quality parameter is
-   *  shape uniformity only here, since no copy payload reaches this surface
-   *  (the rim is the def's), and it is never passed. */
-  itemIcon(item: ItemDef, quality?: ItemDef['quality']): string;
+  /** The PainterHostPresentation.itemIcon signature, named from the seam
+   *  rather than re-typed; the quality parameter is shape uniformity only
+   *  here, since no copy payload reaches this surface, and is never passed. */
+  itemIcon: PainterHostPresentation['itemIcon'];
   itemTooltip(item: ItemDef): string;
   attachTooltip(element: HTMLElement, html: () => string): void;
   openChronicles(): void;

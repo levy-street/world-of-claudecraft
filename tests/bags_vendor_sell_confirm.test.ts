@@ -32,6 +32,7 @@ interface Harness {
   root: HTMLElement;
   calls: string[];
   errors: string[];
+  window: BagsWindow;
 }
 
 function harness(inventory: InvSlot[]): Harness {
@@ -114,7 +115,7 @@ function harness(inventory: InvSlot[]): Harness {
   };
   const window_ = new BagsWindow(deps);
   window_.render();
-  return { root, calls, errors };
+  return { root, calls, errors, window: window_ };
 }
 
 function clickCellFor(root: HTMLElement, itemId: string, opts?: { ctrl?: boolean }): void {
@@ -205,6 +206,52 @@ describe('vendor plain click on a non-junk item opens a confirm prompt instead o
 });
 
 describe('vendor ctrl/meta click on a non-junk item still confirms', () => {
+  it('the sale confirm names the COPY being sold, escaped, never only the def', () => {
+    // The cell authority on the sell confirm (the round-3 frontend finding):
+    // a promoted copy always lands here, and the prompt must carry its chosen
+    // name, esc()'d at the innerHTML sink like every player-authored name.
+    const h = harness([
+      {
+        itemId: valuableId,
+        count: 1,
+        instance: { rolled: { quality: 'legendary' }, name: '<b>Oath</b> of "Vel\'tara"' },
+      },
+    ]);
+    // The cell's accessible name now carries the chosen name, not the def's,
+    // so the one cell is clicked directly rather than found by def name.
+    const cell = h.root.querySelector<HTMLElement>('button.bag-item');
+    expect(cell?.getAttribute('aria-label')).toContain('<b>Oath</b> of "Vel\'tara"');
+    cell?.dispatchEvent(
+      new MouseEvent('click', { bubbles: true, ctrlKey: true, cancelable: true }),
+    );
+    const text = confirmPrompt()?.querySelector('.prompt-text');
+    expect(text?.textContent).toContain('<b>Oath</b> of "Vel\'tara"');
+    expect(text?.innerHTML).toContain('&lt;b&gt;');
+    expect(text?.querySelector('b')).toBeNull();
+  });
+
+  it('the world-drop destroy prompt names the copy at the dragged index, never a shifted cell', () => {
+    // The prompt reads the copy at the pick-up index only while that cell
+    // still holds the dragged item id (the bags can shift under a snapshot
+    // mid-drag); otherwise the def name, never another copy's chosen name.
+    const named = { rolled: { quality: 'legendary' as const }, name: 'Dawn Oath' };
+    const h = harness([
+      { itemId: valuableId, count: 1, instance: named },
+      { itemId: junkId, count: 1 },
+    ]);
+    h.window.promptDestroy(valuableId, 1, 0);
+    const first = document.querySelector('.discard-item-prompt .prompt-text');
+    expect(first?.textContent).toContain('Dawn Oath');
+    document.querySelectorAll('.discard-item-prompt').forEach((el) => {
+      el.remove();
+    });
+    // The dragged cell now holds a different id: the def name, not the copy's.
+    h.window.promptDestroy(junkId, 1, 0);
+    const shifted = document.querySelector('.discard-item-prompt .prompt-text');
+    expect(shifted?.textContent).not.toContain('Dawn Oath');
+    expect(shifted?.textContent).toContain(ITEMS[junkId].name);
+  });
+
   it('a single-count copy opens the same per-slot confirm prompt as a plain click', () => {
     const h = harness([{ itemId: valuableId, count: 1 }]);
     clickCellFor(h.root, valuableId, { ctrl: true });

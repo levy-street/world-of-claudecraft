@@ -430,7 +430,9 @@ describe('bags_window: right-click uses, dragging destroys/equips', () => {
   });
 
   it('the world drop opens the destroy prompt and honors the noDiscard refusal', () => {
-    expect(painter).toContain('promptDestroy(itemId: string, count: number): void');
+    expect(painter).toContain(
+      'promptDestroy(itemId: string, count: number, index: number | null = null): void',
+    );
     expect(painter).toContain('destroyAction(itemId: string): BagDestroyAction');
     expect(painter).toContain("t('hudChrome.bags.cannotDestroy')");
     // The HUD installs the canvas as the world drop target with exactly those seams.
@@ -475,9 +477,11 @@ describe('bags_window: a vendor click confirms before selling anything but true 
   });
 
   it('the confirm prompt re-resolves the live slot at submit and refuses on a mismatch', () => {
+    // The window is sized to hold the whole method (the round-3 cell-authority
+    // comment and name read grew it past the old 2200).
     const body = painter.slice(
       painter.indexOf('private showSellConfirmPrompt('),
-      painter.indexOf('private showSellConfirmPrompt(') + 2200,
+      painter.indexOf('private showSellConfirmPrompt(') + 2800,
     );
     // Re-resolved by reference identity at SUBMIT time, not the index captured
     // when the dialog opened: the whole point of this fix is that a stale

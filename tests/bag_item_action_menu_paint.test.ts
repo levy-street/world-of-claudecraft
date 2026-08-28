@@ -273,6 +273,28 @@ describe('BagItemActionMenu.paint placement reserves', () => {
 });
 
 describe('BagItemActionMenu disenchant dispatch', () => {
+  it("the destroy confirm names the selected COPY, and never a shifted cell's copy", () => {
+    // The cell authority on a destructive prompt: the selected cell's chosen
+    // legendary name titles the confirm (a t() VALUE, D13-2). The index was
+    // captured at menu-open, so when the bags shift under a snapshot and the
+    // cell now holds a DIFFERENT item, the prompt falls back to the def name
+    // rather than titling the destroy with that other copy's chosen name
+    // (the round-3 frontend finding).
+    const itemId = defFor('common').id;
+    const named = { rolled: { quality: 'legendary' as const }, name: 'Dawn Oath' };
+    const h = harness(768, [{ itemId, count: 1, instance: named }]);
+    h.openFor(itemId, 0);
+    h.click('disenchant');
+    expect(h.confirms).toHaveLength(1);
+    expect(h.confirms[0].title).toContain('Dawn Oath');
+    const other = defFor('uncommon').id;
+    const shifted = harness(768, [{ itemId: other, count: 1, instance: named }]);
+    shifted.openFor(itemId, 0);
+    shifted.click('disenchant');
+    expect(shifted.confirms).toHaveLength(1);
+    expect(shifted.confirms[0].title).not.toContain('Dawn Oath');
+  });
+
   it('sends the clicked inventory slot index through the confirm action', () => {
     const itemId = defFor('common').id;
     const h = harness(768, [
