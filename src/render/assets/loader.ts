@@ -15,6 +15,7 @@ import { ktx2Loader } from './ktx2_support';
 import { MAX_LOAD_ATTEMPTS, retryDelayMs } from './load_retry';
 import { assetUrl } from './media';
 import { assetLoadStarted, recordAssetLoad } from './stats';
+import { neutralizeGltfTransmission } from './transmission_neutralize';
 
 let gltfLoader: GLTFLoader | null = null;
 const gltfCache = new Map<string, Promise<GLTF>>();
@@ -193,6 +194,8 @@ export function loadGltf(url: string): Promise<GLTF> {
     }).then(
       (gltf) => {
         polishGltfTextures(gltf);
+        // Transmissive materials become translucent (transmission_neutralize.ts).
+        neutralizeGltfTransmission(gltf);
         // Classify every KTX2 texture for post-upload mip release (world-only
         // categories) or source dismissal (everything a preview/portrait/armory
         // renderer can also upload). Runs here, in the parse's own resolve
