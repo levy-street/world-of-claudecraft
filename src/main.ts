@@ -114,6 +114,7 @@ import {
   shouldApproachPickedEntity,
   shouldDeferPickedCorpseToGatherNode,
 } from './game/interactions';
+import { applyInterfaceSetting } from './game/interface_settings_application';
 import { createIntroLogoOverlay } from './game/intro_logo_overlay';
 import { Keybinds } from './game/keybinds';
 import {
@@ -2502,6 +2503,13 @@ async function startGame(
   // snapshots the live WebGL canvas) out of an already memory-tight scene.
   applyBrowserEffects(settings.get('browserEffects'));
 
+  const interfaceSettingsHost = {
+    rootStyle: document.documentElement.style,
+    bodyClassList: document.body.classList,
+    getElementById: (id: string) => document.getElementById(id),
+    setLockPlayerFrameToActionBar: (locked: boolean) => hud.setLockPlayerFrameToActionBar(locked),
+  };
+
   function applySetting(key: keyof GameSettings, value: number | boolean): void {
     if (key === 'mouseCamera') {
       const v = settings.set('mouseCamera', !!value);
@@ -2725,6 +2733,7 @@ async function startGame(
       return;
     }
     const v = settings.set(key as keyof typeof SETTING_RANGES, value as number);
+    if (applyInterfaceSetting(key, v, interfaceSettingsHost)) return;
     switch (key) {
       case 'cameraSpeed':
         input.setCameraSpeed(v);
@@ -2816,39 +2825,6 @@ async function startGame(
         document.documentElement.style.setProperty('--ui-scale', String(v));
         hud.reapplySavedGeometry();
         break;
-      case 'playerFrameScale':
-        document.documentElement.style.setProperty('--player-frame-scale', String(v));
-        break;
-      case 'targetFrameScale':
-        document.documentElement.style.setProperty('--target-frame-scale', String(v));
-        break;
-      case 'playerFrameWidth':
-        document.documentElement.style.setProperty('--player-frame-width', `${v}px`);
-        break;
-      case 'playerFrameHeight':
-        document.documentElement.style.setProperty('--player-frame-height', `${v}px`);
-        break;
-      case 'targetFrameWidth':
-        document.documentElement.style.setProperty('--target-frame-width', `${v}px`);
-        break;
-      case 'targetFrameHeight':
-        document.documentElement.style.setProperty('--target-frame-height', `${v}px`);
-        break;
-      case 'partyFrameScale':
-        document.documentElement.style.setProperty('--party-frame-scale', String(v));
-        break;
-      case 'partyFrameWidth':
-        document.documentElement.style.setProperty('--party-frame-width', `${v}px`);
-        break;
-      case 'partyFrameHeight':
-        document.documentElement.style.setProperty('--party-frame-height', `${v}px`);
-        break;
-      case 'partyFrameSpacing':
-        document.documentElement.style.setProperty('--party-frame-spacing', `${v}px`);
-        break;
-      case 'partyFrameColumns':
-        document.documentElement.style.setProperty('--party-frame-columns', String(Math.round(v)));
-        break;
       case 'partyFrameHealthText':
       case 'partyFrameSort':
       case 'partyFrameStyle':
@@ -2857,43 +2833,6 @@ async function startGame(
         break;
       case 'aurasOnPlayerFrame':
         hud.setAurasOnPlayerFrame(!!v);
-        break;
-      // Icon flow of the standalone buff/debuff rows (Frames Settings menu):
-      // the stock layout grows right-to-left from its anchor beside the
-      // minimap; 'row' flips a row to read left to right. Vars rather than
-      // classes so the stylesheet's aurasOnPlayerFrame override (a docked
-      // buff row always reads left to right) keeps winning by specificity.
-      case 'buffsLeftToRight':
-        document.documentElement.style.setProperty(
-          '--buff-bar-direction',
-          v ? 'row' : 'row-reverse',
-        );
-        break;
-      case 'debuffsLeftToRight':
-        document.documentElement.style.setProperty(
-          '--debuff-bar-direction',
-          v ? 'row' : 'row-reverse',
-        );
-        break;
-      case 'lockPlayerFrameToActionBar':
-        hud.setLockPlayerFrameToActionBar(!!v);
-        break;
-      // Orientation flips (Frames Settings menu): pure CSS off element and
-      // body classes. Per-bar vertical stamps the bar's own element; bar 1
-      // additionally stamps the body class the COMBINED block's direction
-      // keys off (the block follows the primary bar's orientation).
-      case 'actionBar1Vertical':
-        document.getElementById('actionbar')?.classList.toggle('bar-vertical', !!v);
-        document.body.classList.toggle('combined-bars-vertical', !!v);
-        break;
-      case 'actionBar2Vertical':
-        document.getElementById('actionbar2')?.classList.toggle('bar-vertical', !!v);
-        break;
-      case 'actionBar3Vertical':
-        document.getElementById('actionbar3')?.classList.toggle('bar-vertical', !!v);
-        break;
-      case 'menuRailHorizontal':
-        document.body.classList.toggle('menu-rail-horizontal', !!v);
         break;
       // Graphics-tier HUD effects follow the STATIC preset + the advanced
       // effectsQuality slider. The 3D renderer tier is resolved at renderer

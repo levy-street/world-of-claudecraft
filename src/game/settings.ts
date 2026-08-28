@@ -198,7 +198,7 @@ export const BOOL_SETTINGS = {
   // Icon flow of the standalone buff/debuff rows (the Frames Settings menu in
   // edit mode). Off = the stock right-to-left growth (the rows anchor beside
   // the minimap and fill toward the screen centre); on = left to right, via
-  // --buff-bar-direction / --debuff-bar-direction in main.ts.
+  // --buff-bar-direction / --debuff-bar-direction in interface_settings_application.ts.
   buffsLeftToRight: { def: false },
   debuffsLeftToRight: { def: false },
   // Orientation flips (the Frames Settings menu): lay a desktop action bar
@@ -206,7 +206,7 @@ export const BOOL_SETTINGS = {
   // (owner request); the combined block follows bar 1's orientation and the
   // menu shows one toggle that drives all three while combined. The corner
   // menu rail flips to a ROW instead of its stock two stacked columns. Pure
-  // CSS via element/body classes in main.ts.
+  // CSS via element/body classes in interface_settings_application.ts.
   actionBar1Vertical: { def: false },
   actionBar2Vertical: { def: false },
   actionBar3Vertical: { def: false },

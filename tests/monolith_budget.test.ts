@@ -271,12 +271,10 @@ const MONOLITHS: MonolithRow[] = [
     // availability probe and browser authorizer moved to
     // src/net/desktop_wallet_handoff.ts (thin hoisted delegators remain),
     // paying for the Exchange desktop-signer wiring at the attach site.
-    // Raised at the PR #3284 v0.41.0 sync merge: the applySetting arms for
-    // the interface-editor settings (frame dimensions, aura direction vars,
-    // the player-frame bar lock) predate this ratchet; folding them behind a
-    // src/game/ settings-application seam is flagged follow-up work. Exact
-    // merged count.
-    ceiling: 11629,
+    // Down 11629 -> 11568 after the interface-editor applySetting arms moved
+    // behind src/game/interface_settings_application.ts. Exact count, zero
+    // headroom.
+    ceiling: 11568,
     seam: 'a src/game/ or src/ui/ sibling module; main.ts is a firewall, not a home',
   },
   {
