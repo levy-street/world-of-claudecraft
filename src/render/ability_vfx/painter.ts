@@ -897,7 +897,13 @@ export class AbilityVfx {
     if (ev.fx !== 'nova' && ev.fx !== 'burst' && ev.fx !== 'tick') return false;
     const spec = abilityVfxSpec(ev.ability);
     if (!spec) return false;
-    if (!this.admitted()) return true;
+    if (!this.admitted()) {
+      // The terrain-draped area ring is an actionable telegraph (the blast
+      // AREA the player steps out of): its pool is linked at boot and never
+      // waits on the cast programs, so it draws even while the rest is held.
+      if (ev.radius) this.deps.spawnAoeRing(ev.x, ev.z, ev.radius, ev.school);
+      return true;
+    }
     const casterId = ev.sourceId ?? -1;
     const fx = this.deps.fx;
     const gy = fx.groundYAt(ev.x, ev.z);

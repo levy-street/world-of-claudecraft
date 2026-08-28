@@ -4,6 +4,7 @@
 
 import { readdirSync, readFileSync } from 'node:fs';
 import { join, relative } from 'node:path';
+import { fileURLToPath } from 'node:url';
 import * as THREE from 'three';
 import { describe, expect, it } from 'vitest';
 import {
@@ -101,7 +102,7 @@ function* walkGlbs(dir: string): Generator<string> {
 }
 
 describe('no material buys a second scene pass (src/render/CLAUDE.md)', () => {
-  const root = new URL('..', import.meta.url).pathname;
+  const root = fileURLToPath(new URL('..', import.meta.url));
 
   /** Shipped models whose materials carry KHR_materials_transmission or
    *  KHR_materials_volume, each neutralized at load. A new entry is a

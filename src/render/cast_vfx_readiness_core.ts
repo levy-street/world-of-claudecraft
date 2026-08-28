@@ -13,7 +13,10 @@
 // one is linked.
 
 export interface CastVfxReadinessDeps<M> {
-  /** Every material a cast may draw with, as the host holds them now. */
+  /** Every material a cast may draw with. Read ONCE, at the first consult
+   *  after the stand-ins are staged: the pools and stand-ins are never
+   *  disposed or replaced, and the per-frame consult must not walk the scene
+   *  during the very seconds the programs are still linking. */
   materials: () => readonly M[];
   /** The lazy stand-ins were staged at least once: until then their set is
    *  unknown, so nothing is admitted. */
@@ -43,14 +46,16 @@ export function createCastVfxReadiness<M>(deps: CastVfxReadinessDeps<M>): CastVf
   let ready = false;
   let refused = 0;
   let pending: number | null = null;
+  let materials: readonly M[] | null = null;
   const check = (): boolean => {
     if (ready) return true;
     if (!deps.staged()) {
       pending = null;
       return false;
     }
+    if (materials === null) materials = deps.materials();
     let unlinked = 0;
-    for (const material of deps.materials()) if (!deps.linked(material)) unlinked++;
+    for (const material of materials) if (!deps.linked(material)) unlinked++;
     pending = unlinked;
     ready = unlinked === 0;
     return ready;

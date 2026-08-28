@@ -99,17 +99,27 @@ export function readShaderWarmSetting(
   return query ?? asShaderWarmSetting(stored) ?? 'off';
 }
 
+/** The platform class the mode resolver refuses on: phone-class WebKit,
+ *  where a second WebGL2 context is a per-process memory ceiling risk
+ *  (src/render/CLAUDE.md, the preload lanes' iPhone kill), not a frame cost. */
+export type ShaderWarmPlatform = 'ios' | 'android' | 'other';
+
 /** `auto` resolves once the backend is known: the worker holds links (the
  *  live view included) only where the backend compiles off the presenting
  *  thread (D3D11, Vulkan, Metal; measured 2026-08-28,
  *  tmp/REPORT_worker-step3_2026-08-28.md). On ANGLE's OpenGL backends (Linux
  *  and Android Chrome) the worker only relocates the stall into the GPU
  *  process, so `auto` is OFF there, and OFF while the backend is still
- *  unknown. */
+ *  unknown. iOS is OFF whatever the setting: the explicit arm exists to
+ *  measure a backend, never to mint a second context on a phone-class
+ *  WebKit; Android keeps the explicit arm (its GLES class already reads
+ *  OFF under auto). */
 export function shaderWarmModeFor(
   setting: ShaderWarmSetting,
   backend: GpuBackendClass | null,
+  platform: ShaderWarmPlatform = 'other',
 ): ShaderWarmMode {
+  if (platform === 'ios') return 'off';
   if (setting !== 'auto') return setting;
   return backend !== null && compilesOffThread(backend) ? 'all' : 'off';
 }

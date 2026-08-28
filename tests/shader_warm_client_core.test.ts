@@ -162,6 +162,14 @@ describe('shaderWarmModeFor', () => {
     expect(shaderWarmModeFor('off', 'd3d11')).toBe('off');
     expect(shaderWarmModeFor('reveal', 'opengl')).toBe('reveal');
     expect(shaderWarmModeFor('all', null)).toBe('all');
+    expect(shaderWarmModeFor('all', 'opengl', 'android')).toBe('all');
+  });
+
+  it('is off on iOS whatever the setting: a second context is a process-ceiling risk there', () => {
+    expect(shaderWarmModeFor('all', 'metal', 'ios')).toBe('off');
+    expect(shaderWarmModeFor('reveal', 'metal', 'ios')).toBe('off');
+    expect(shaderWarmModeFor('auto', 'metal', 'ios')).toBe('off');
+    expect(shaderWarmModeFor('auto', 'metal', 'other')).toBe('all');
   });
 });
 

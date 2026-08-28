@@ -636,6 +636,40 @@ GPU work signs. Each rule names its seam and its guard.
   procedural `new THREE.MeshPhysicalMaterial(` that sets `transmission`, `thickness` or
   `attenuationColor` is a defect. Guard: `render-performance-reviewer` (its second-pass
   check).
+- **The shader warm-up worker rides the gates, never beside them.** A Web Worker
+  owns a second WebGL2 context (`shader_warm_worker.ts`) that links the same GLSL the
+  game context is about to link, so the game's link is a driver program-cache hit
+  (the cache key is the translated source plus the context's enabled extension set,
+  which is why `renderer_extensions.ts` enables one pinned set on every context
+  before its first link). The client (`shader_warm_client.ts`, pure policy in
+  `shader_warm_client_core.ts`) resolves a MODE from the player's option and the
+  backend class (`gpu_backend_class_core.ts`, read off the renderer string): `auto`
+  is `all` where the compile runs off the presenting thread (D3D11, Vulkan, Metal)
+  and `off` on every OpenGL and GLES class, where the worker only relocates the
+  stall into the GPU process (measured 2026-08-28 on Linux NVIDIA, Linux Intel and
+  Android Mali); iOS is `off` whatever the setting (a second context is a
+  per-process ceiling risk there); `?shaderwarm=off|reveal|all` overrides.
+  The worker is a client of the EXISTING gates: `shader_warm_gate.ts` assembles a
+  root's program sources through the three patch's dry-compile hook
+  (`program_sources.ts`; the hook calls each live material's `onBeforeCompile`
+  once more against a throwaway shader object, so a hook must stay idempotent and
+  must never keep the shader object it was handed), posts them to the worker, and
+  holds the gate's link piece until the worker answers or `SHADER_WARM_LANE_HOLD_CAP_MS`
+  passes (`shader_warm_lane.ts`; `SHADER_WARM_TIMEOUT_BREAKER` timeouts retire the
+  worker for the session). No new queue, no new lane: the hold is one more piece on
+  the caller's queue at the caller's priority, and the actionable floor and
+  imminent consults bypass it (`shaderWarmDecision`). The worker never draws, so it
+  is the one secondary context exempt from the `checkShaderErrors` rule, and it
+  goes with the renderer through `renderer_resource_lifecycle.ts` (`disposeShaderWarm`)
+  and on `pagehide`. The audit (`shader_warm_audit.ts`) names every program the game
+  context linked without a warm request (`unexpected`), so a new producer that
+  bypasses the gates shows up by key; `perfStats().shaderWarm` and
+  `perfStats().shaderWarmAudit` are the readout, local only (nothing of it rides the
+  perf beacon). The cast-VFX gate (`cast_vfx_readiness_core.ts`,
+  `cast_vfx_prewarm.ts`) is the same idea one level up: the ability-VFX painter
+  draws no cast until every cast program is linked, with the terrain-draped area
+  ring as the one exception (an actionable telegraph on a pool that is not a cast
+  program).
 - **Verify, do not assert.** `?perf`, then `__game.renderer.perfStats().gpuPrep`: the
   budget snapshot, the event ring (`live-program`, `gate-timeout`, `reveal-watchdog`,
   `reveal-soft-deadline`, `submit-stop`, `attach-watchdog`, `touch-unproven` (programs a

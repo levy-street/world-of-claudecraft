@@ -1814,8 +1814,8 @@ export const hudChromeStrings = {
     forceHighPerfGpu: 'Use the Dedicated Gaming GPU',
     forceHighPerfGpuNote:
       'On by default: the desktop app asks this computer for its dedicated gaming GPU. Turn this off if the game will not start, opens to a black screen, or the laptop display goes blank. Takes effect the next time the game starts.',
-    // Graphics System card: the shader warm-up worker (auto follows the GPU
-    // backend). Interface General tab: the Linux graphics backend row
+    // Graphics System card, two rows: the shader warm-up worker (auto follows
+    // the GPU backend) and, right under it, the Linux graphics backend row
     // (desktop app, Linux only; the shell applies it at the next launch).
     // Wordy values, M16: the five non-Latin fills land in this same change.
     shaderWarm: 'Shader Warm-up Worker',

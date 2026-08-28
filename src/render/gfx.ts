@@ -1406,7 +1406,9 @@ function probeGpuRenderer(): string | undefined {
   return probedGpuRenderer;
 }
 
-function readGpuRendererString(): { renderer: string; parallelCompile: boolean } | undefined {
+function readGpuRendererString():
+  | { renderer: string; parallelCompile: boolean | undefined }
+  | undefined {
   if (typeof document === 'undefined') return undefined;
   let gl: WebGLRenderingContext | WebGL2RenderingContext | null = null;
   try {
@@ -1417,14 +1419,26 @@ function readGpuRendererString(): { renderer: string; parallelCompile: boolean }
     const renderer = String(
       dbg ? gl.getParameter(dbg.UNMASKED_RENDERER_WEBGL) : gl.getParameter(gl.RENDERER),
     );
-    const parallelCompile = (gl.getSupportedExtensions() ?? []).includes(
-      'KHR_parallel_shader_compile',
-    );
-    return { renderer, parallelCompile };
+    return { renderer, parallelCompile: listsParallelShaderCompile(gl) };
   } catch {
     return undefined;
   } finally {
     gl?.getExtension('WEBGL_lose_context')?.loseContext();
+  }
+}
+
+/** The extension-list read on its own: a context that cannot list its
+ *  extensions leaves the answer UNKNOWN (the shell keeps its trial rung on
+ *  undefined) and never costs the renderer string read beside it. */
+function listsParallelShaderCompile(
+  gl: WebGLRenderingContext | WebGL2RenderingContext,
+): boolean | undefined {
+  if (typeof gl.getSupportedExtensions !== 'function') return undefined;
+  try {
+    const listed = gl.getSupportedExtensions();
+    return listed ? listed.includes('KHR_parallel_shader_compile') : undefined;
+  } catch {
+    return undefined;
   }
 }
 
@@ -1499,7 +1513,7 @@ function runtimeHints(): GfxRuntimeHints {
   };
 }
 
-function mobilePlatformFromNavigator(
+export function mobilePlatformFromNavigator(
   nav: Pick<Navigator, 'userAgent' | 'platform' | 'maxTouchPoints'> | null,
 ): 'ios' | 'android' | 'other' {
   if (!nav) return 'other';

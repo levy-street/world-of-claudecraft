@@ -2,7 +2,7 @@
 // painter draws nothing until every cast program is linked, counts what it
 // refused, and latches once ready.
 
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 import { createCastVfxReadiness } from '../src/render/cast_vfx_readiness_core';
 
 interface Mat {
@@ -61,6 +61,27 @@ describe('createCastVfxReadiness', () => {
     expect(readiness.snapshot().refused).toBe(0);
     state.materials[0].linked = true;
     expect(readiness.ready()).toBe(true);
+  });
+
+  it('reads the material set once, at the first consult after staging', () => {
+    // The per-frame consult runs once per entity while the programs are still
+    // linking; the set behind it is a scene walk, so it is collected once
+    // (the pools and stand-ins are never disposed or replaced).
+    const state = { staged: false, materials: [{ id: 'ring', linked: false }] };
+    const reads = vi.fn(() => state.materials);
+    const readiness = createCastVfxReadiness<Mat>({
+      materials: reads,
+      staged: () => state.staged,
+      linked: (material) => material.linked,
+    });
+    expect(readiness.ready()).toBe(false);
+    expect(reads).not.toHaveBeenCalled();
+    state.staged = true;
+    for (let i = 0; i < 5; i++) expect(readiness.ready()).toBe(false);
+    expect(reads).toHaveBeenCalledTimes(1);
+    state.materials[0].linked = true;
+    expect(readiness.ready()).toBe(true);
+    expect(reads).toHaveBeenCalledTimes(1);
   });
 
   it('is ready with nothing to link once staged', () => {

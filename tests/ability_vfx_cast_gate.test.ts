@@ -1,6 +1,9 @@
 // The painter's cast gate (src/render/ability_vfx/painter.ts, castVfxAdmit):
 // while a cast program is still unlinked the painter claims the event and
 // draws nothing, so a first cast never links a program cold on a live frame.
+// The one exception is the terrain-draped area ring: an actionable telegraph
+// (the blast area the player steps out of) whose pool is not a cast program,
+// so it draws even while the gate is closed.
 
 import { describe, expect, it, vi } from 'vitest';
 import type { AbilityVfxFx } from '../src/render/ability_vfx/fx';
@@ -30,12 +33,13 @@ function painterWith(admit: () => boolean, ready: () => boolean = admit) {
     buffSwirl: vi.fn(),
     beam: vi.fn(),
   };
+  const spawnAoeRing = vi.fn();
   const painter = new AbilityVfx(
     {
       fx,
       vfx,
       anchor: () => ({ x: 0, y: 1, z: 0 }),
-      spawnAoeRing: vi.fn(),
+      spawnAoeRing,
       triggerAttack: vi.fn(),
       localPlayerId: () => 1,
       castVfxAdmit: admit,
@@ -45,7 +49,7 @@ function painterWith(admit: () => boolean, ready: () => boolean = admit) {
   );
   // The constructor's delegate wiring is the one touch a closed gate allows.
   touched.clear();
-  return { painter, touched, vfx };
+  return { painter, touched, vfx, spawnAoeRing };
 }
 
 const frostbolt = {
@@ -72,6 +76,20 @@ describe('the cast gate', () => {
       crit: true,
       amount: 40,
     });
+    expect(touched).toEqual(new Set());
+    for (const spawn of Object.values(vfx)) expect(spawn).not.toHaveBeenCalled();
+  });
+
+  it('still draws the area ring while closed: the telegraph is not a cast program', () => {
+    const { painter, touched, vfx, spawnAoeRing } = painterWith(() => false);
+    const aimed = { x: 3, z: -4, school: 'frost', fx: 'nova', ability: 'frost_nova' };
+    // No radius, no ring: nothing to telegraph.
+    expect(painter.handleSpellfxAt(aimed)).toBe(true);
+    expect(spawnAoeRing).not.toHaveBeenCalled();
+    // A radius-carrying landing flashes the blast area at once, and only that.
+    expect(painter.handleSpellfxAt({ ...aimed, radius: 8 })).toBe(true);
+    expect(spawnAoeRing).toHaveBeenCalledTimes(1);
+    expect(spawnAoeRing).toHaveBeenCalledWith(3, -4, 8, 'frost');
     expect(touched).toEqual(new Set());
     for (const spawn of Object.values(vfx)) expect(spawn).not.toHaveBeenCalled();
   });

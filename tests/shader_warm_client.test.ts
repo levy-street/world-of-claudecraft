@@ -109,6 +109,7 @@ interface FakeTimer {
 interface StartOptions {
   search?: string;
   mobile?: boolean;
+  platform?: 'ios' | 'android' | 'other';
   granted?: string[];
   priority?: number;
   imminent?: boolean;
@@ -123,6 +124,7 @@ function start(options: StartOptions = {}) {
   resetShaderWarmForTest({
     search: options.search ?? '?shaderwarm=reveal',
     mobile: options.mobile ?? false,
+    platform: options.platform ?? 'other',
     spawn: () => {
       const worker = fakeWorker();
       workers.push(worker);
@@ -207,6 +209,21 @@ describe('starting the shader warm worker', () => {
     // fewer programs held after their resolve.
     const { worker } = start({ mobile: true });
     expect(worker().ofKind('init')[0]).toMatchObject({ maxWindow: 2, retain: 0 });
+  });
+
+  it('never spawns on iOS, whatever the setting, and names the refusal', () => {
+    // A second WebGL2 context on a phone-class WebKit is a per-process memory
+    // ceiling risk, not a frame cost: the explicit arm is for measuring a
+    // backend, and Android keeps it.
+    const ios = start({ search: '?shaderwarm=all', platform: 'ios', mobile: true });
+    expect(ios.workers).toHaveLength(0);
+    expect(shaderWarmSnapshot()).toMatchObject({
+      mode: 'off',
+      worker: 'idle',
+      refusal: 'ios-webkit',
+    });
+    const android = start({ search: '?shaderwarm=all', platform: 'android', mobile: true });
+    expect(android.workers).toHaveLength(1);
   });
 
   it('reads the mobile class off the page when the caller names no platform', () => {

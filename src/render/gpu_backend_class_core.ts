@@ -5,6 +5,9 @@
 // frame waits for; D3D11, Vulkan and Metal compile on their own thread
 // pools. Measured 2026-08-28 (tmp/REPORT_worker-step3_2026-08-28.md): every
 // OpenGL cell blocked, D3D11 passed, Vulkan had nothing left to warm.
+// Safari masks the renderer string (no WEBGL_debug_renderer_info), so its
+// Metal backend reads as unknown here and auto stays off on it: the 'metal'
+// arm is reachable only where the string is unmasked.
 
 import { isSoftwareRendererName } from './software_renderer';
 

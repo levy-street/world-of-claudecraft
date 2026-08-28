@@ -20,6 +20,7 @@
 // worker on pagehide itself.
 
 import { GPU_WORK_PRIORITY } from './background_gpu_queue';
+import { mobilePlatformFromNavigator } from './gfx';
 import { type GpuBackendClass, readGpuBackend } from './gpu_backend_class_core';
 import { enableRendererExtensions } from './renderer_extensions';
 import {
@@ -32,6 +33,7 @@ import {
   type ShaderWarmDecision,
   type ShaderWarmMode,
   type ShaderWarmOutcome,
+  type ShaderWarmPlatform,
   type ShaderWarmRequestSource,
   type ShaderWarmRequestStats,
   type ShaderWarmRequests,
@@ -95,6 +97,8 @@ export interface ShaderWarmClientDeps {
   /** The stored graphics option; the page default reads the registered source. */
   stored?: string | null;
   mobile?: boolean;
+  /** The platform class (iOS refuses the worker whatever the setting). */
+  platform?: ShaderWarmPlatform;
   /** Injectable timer for the ready deadline; returns the cancel. */
   schedule?: (callback: () => void, ms: number) => () => void;
 }
@@ -121,6 +125,7 @@ const state = {
   spawn: null as (() => WorkerLike | null) | null,
   schedule: null as ShaderWarmClientDeps['schedule'] | null,
   mobile: false,
+  platform: 'other' as ShaderWarmPlatform,
   /** Sources handed in before the worker answered ready, sent on ready. */
   queuedUntilReady: [] as ShaderWarmSource[],
   cancelReadyDeadline: null as (() => void) | null,
@@ -173,10 +178,18 @@ export function configureShaderWarm(deps: ShaderWarmClientDeps = {}): void {
     deps.stored !== undefined ? deps.stored : storedSettingSource(),
   );
   state.backend = null;
-  state.mode = shaderWarmModeFor(state.setting, null);
+  state.platform = deps.platform ?? defaultPlatform();
+  state.mode = shaderWarmModeFor(state.setting, null, state.platform);
+  // The one refusal decided before any context: named so the readout says
+  // why an explicit setting did nothing on a phone.
+  if (state.platform === 'ios' && state.setting !== 'off') state.refusal = 'ios-webkit';
   state.spawn = deps.spawn ?? defaultSpawn;
   state.schedule = deps.schedule ?? defaultSchedule;
   state.mobile = deps.mobile ?? defaultMobile();
+}
+
+function defaultPlatform(): ShaderWarmPlatform {
+  return mobilePlatformFromNavigator(typeof navigator === 'undefined' ? null : navigator);
 }
 
 function onWorkerMessage(event: MessageEvent<ShaderWarmWorkerMessage>): void {
@@ -313,7 +326,7 @@ export function shaderWarmDecide(
     // Only a definite class is kept: a lost context or a masked string reads
     // as unknown (OFF) and is read again at the next policy call.
     state.backend = readGpuBackend(context).backend;
-    state.mode = shaderWarmModeFor(state.setting, state.backend);
+    state.mode = shaderWarmModeFor(state.setting, state.backend, state.platform);
   }
   if (state.mode !== 'off' && state.workerState === 'idle') startWorker(context);
   const decision = shaderWarmDecision({
@@ -399,7 +412,7 @@ export function disposeShaderWarm(): void {
   // The next renderer's context decides the backend again (a rebuild can
   // land on another backend, software included).
   state.backend = null;
-  state.mode = shaderWarmModeFor(state.setting, null);
+  state.mode = shaderWarmModeFor(state.setting, null, state.platform);
   retireWorker();
   state.workerState = 'idle';
   state.refusal = null;
@@ -433,5 +446,5 @@ export function resetShaderWarmForTest(deps: ShaderWarmClientDeps = {}): void {
   state.spawn = null;
   state.schedule = null;
   state.pagehideHooked = false;
-  configureShaderWarm({ search: '', mobile: false, ...deps });
+  configureShaderWarm({ search: '', mobile: false, platform: 'other', ...deps });
 }
