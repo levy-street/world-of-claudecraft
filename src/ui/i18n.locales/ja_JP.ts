@@ -12225,7 +12225,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.materialHint.growthTonic':
     '農業用品。作付け時に消費され、収穫がやや増えることがある。作物が枯れるとトニックも失われる。',
   'hudChrome.materialHint.wyrmfallCore':
-    '名匠鍛造の製作触媒。レイドの最終ボスは難易度ごとに1日1回、各プレイヤーに1から3個をドロップする。ヒロイックダンジョンの最終ボスはそれぞれ1日1回、各プレイヤーに1から3個をドロップする。その日最初のリフトレース勝利で、Aランクなら1個、Sランクなら2個を獲得できる。英雄補給係が英雄の証と引き換えに販売している。',
+    '名匠鍛造の製作触媒。レイドの最終ボスは難易度ごとに1日1回、各プレイヤーに1から3個をドロップする。ヒロイックダンジョンの最終ボスはそれぞれ1日1回、各プレイヤーに1から3個をドロップする。その日最初のAまたはSランクのリフトレース勝利で、Aランクなら1個、Sランクなら2個を獲得できる。英雄補給係が英雄の証と引き換えに販売している。',
   'hudChrome.enchanting.tier.base': '基本エンチャント',
   'hudChrome.enchanting.tier.runed': 'ルーンエンチャント',
   'hudChrome.enchanting.tier.greater': '上級エンチャント',

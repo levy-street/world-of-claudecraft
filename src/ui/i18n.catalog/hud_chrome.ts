@@ -3791,9 +3791,9 @@ export const hudChromeStrings = {
     wyrmfallCore:
       'Masterwrought crafting catalyst. The raid final boss drops 1 to 3 to ' +
       'each player once per day on each difficulty. Heroic dungeon final ' +
-      'bosses each drop 1 to 3 to each player once per day. Your first Rift ' +
-      'race win of the day grants 1 at A rank or 2 at S rank. The Heroic ' +
-      'Quartermaster sells one for Heroic Marks.',
+      'bosses each drop 1 to 3 to each player once per day. Your first A or S ' +
+      'rank Rift race win of the day grants 1 at A rank or 2 at S rank. The ' +
+      'Heroic Quartermaster sells one for Heroic Marks.',
   },
   discord: {
     title: 'Discord',

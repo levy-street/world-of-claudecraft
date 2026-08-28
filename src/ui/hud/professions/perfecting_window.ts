@@ -205,6 +205,12 @@ export class PerfectingWindow {
     this.lastSelectedSig = null;
     this.prevSelected = null;
     this.paintedView = null;
+    // The selection survives a close only where its exact cell still holds
+    // the copy; the anchor does not, so the closed span never becomes the
+    // ordinal's blind window (a same-id copy sold and another picked up
+    // while closed would reopen on the other copy). The safe direction: a
+    // shifted bagged pick falls back to the first candidate on reopen.
+    this.selectedAnchor = null;
     this.deps.restoreFocus(this.openerFocus);
     this.openerFocus = null;
   }

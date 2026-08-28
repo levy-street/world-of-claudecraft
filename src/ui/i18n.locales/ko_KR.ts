@@ -12203,7 +12203,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.materialHint.growthTonic':
     '농사 용품. 심을 때 소모되며 수확이 조금 늘어날 수 있습니다. 작물이 시들면 토닉도 함께 사라집니다.',
   'hudChrome.materialHint.wyrmfallCore':
-    '명장 제작용 촉매. 공격대 최종 우두머리는 난이도마다 하루 한 번 각 플레이어에게 1~3개를 떨어뜨립니다. 영웅 던전 최종 우두머리는 각각 하루 한 번 각 플레이어에게 1~3개를 떨어뜨립니다. 그날 첫 균열 경주 승리 시 A 등급이면 1개, S 등급이면 2개를 얻습니다. 영웅 병참장교가 영웅의 징표를 받고 판매합니다.',
+    '명장 제작용 촉매. 공격대 최종 우두머리는 난이도마다 하루 한 번 각 플레이어에게 1~3개를 떨어뜨립니다. 영웅 던전 최종 우두머리는 각각 하루 한 번 각 플레이어에게 1~3개를 떨어뜨립니다. 그날 첫 A 또는 S 등급 균열 경주 승리 시 A 등급이면 1개, S 등급이면 2개를 얻습니다. 영웅 병참장교가 영웅의 징표를 받고 판매합니다.',
   'hudChrome.enchanting.tier.base': '기본 마법부여',
   'hudChrome.enchanting.tier.runed': '룬 마법부여',
   'hudChrome.enchanting.tier.greater': '상급 마법부여',

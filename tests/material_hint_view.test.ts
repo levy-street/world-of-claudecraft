@@ -194,8 +194,11 @@ describe('material_hint_view', () => {
     expect(line).toContain(
       `Heroic dungeon final bosses each drop ${WYRMFALL_BOSS_MIN} to ${WYRMFALL_BOSS_MAX} to each player once per day.`,
     );
+    // "A or S rank" is the trigger (a B or C rank win neither pays nor
+    // consumes the daily source, so the day's first B win leaves the later
+    // A or S win paying); dropping it reads as if any first win were the one.
     expect(line).toContain(
-      `Your first Rift race win of the day grants ${WYRMFALL_RIFT_COUNT.A} at A rank or ${WYRMFALL_RIFT_COUNT.S} at S rank.`,
+      `Your first A or S rank Rift race win of the day grants ${WYRMFALL_RIFT_COUNT.A} at A rank or ${WYRMFALL_RIFT_COUNT.S} at S rank.`,
     );
     expect(line).toContain('Heroic Quartermaster');
     expect(line).toContain('Heroic Marks');

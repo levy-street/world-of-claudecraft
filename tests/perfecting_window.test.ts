@@ -268,10 +268,12 @@ describe('the aria-busy send-once lifecycle', () => {
     // selection to the worn piece and the next click would spend an ember on
     // a copy the player never picked.
     world.equipmentInstances = { mainhand: { boundTo: 1, perfecting: 1 } };
-    // The sim's consume walks from the HIGHEST index (item_lock.ts), so the
-    // stack it exhausts here is the single essence at cell 0 (the only
-    // essence), while the embers and settings survive with a unit spent:
-    // the bill stays met and the follow-up click below is a real send.
+    // The post-state below is a HAND-MODELED shift (the window is agnostic
+    // to which stack vanished): the sim's consume walks from the highest
+    // index and with a one-unit bill can never exhaust a stack BELOW the
+    // copy while leaving the bill met, so the trailing essence exists only
+    // to keep the follow-up click a real send. The mid-bag arm models the
+    // walk's own exhausted stack faithfully.
     world.inventory = [
       { itemId: 'sundered_essence', count: 1 },
       { itemId: 'makers_ember', count: 2 },
@@ -287,10 +289,8 @@ describe('the aria-busy send-once lifecycle', () => {
     radios[1].click(); // the bagged copy
     (root().querySelector('[data-action]') as HTMLButtonElement).click();
     expect(world.perfectItem).toHaveBeenLastCalledWith({ bag: 3, itemId: APEX });
-    // The answer as the walk produces it: the highest essence stack (cell 4)
-    // is spent first... except a 1-count stack it reaches goes whole; model
-    // the exhausted lower stack the test is about: cell 0 spliced, one ember
-    // and one setting spent, the copy lands rank 2 one cell lower.
+    // The modeled answer: cell 0 spliced, one ember and one setting spent,
+    // the copy lands rank 2 one cell lower.
     world.inventory.splice(0, 1);
     world.inventory[0].count -= 1;
     world.inventory[1].count -= 1;
@@ -379,7 +379,7 @@ describe('the aria-busy send-once lifecycle', () => {
     ];
     const win = makeWindow();
     win.open();
-    expect(checkedRef()).not.toBeNull();
+    expect(checkedRef()).toContain('Rank 1 of 4');
     (root().querySelector('[data-action]') as HTMLButtonElement).click();
     expect(world.perfectItem).toHaveBeenLastCalledWith({ bag: 3, itemId: APEX });
     world.inventory.splice(3, 1);
@@ -387,7 +387,9 @@ describe('the aria-busy send-once lifecycle', () => {
     vi.advanceTimersByTime(1000);
     expect(successCues()).toBe(0);
     expect((root().querySelector('.pf-live-status') as HTMLElement).textContent).toBe('');
-    expect(root().textContent).toContain('Rank 3 of 4');
+    // The fallback selected the surviving sibling (the CHECKED row, not
+    // merely a row somewhere in the list).
+    expect(checkedRef()).toContain('Rank 3 of 4');
   });
 
   it('a radio click never cues: moving from a low-rank copy to a high-rank same-id copy', () => {
@@ -404,8 +406,9 @@ describe('the aria-busy send-once lifecycle', () => {
     ];
     const win = makeWindow();
     win.open();
+    expect(checkedRef()).toContain('Rank 1 of 4');
     ([...root().querySelectorAll('[role="radio"]')][1] as HTMLButtonElement).click();
-    expect(root().textContent).toContain('Rank 3 of 4');
+    expect(checkedRef()).toContain('Rank 3 of 4');
     expect(successCues()).toBe(0);
     expect((root().querySelector('.pf-live-status') as HTMLElement).textContent).toBe('');
   });
@@ -434,9 +437,36 @@ describe('the aria-busy send-once lifecycle', () => {
     world.inventory.splice(0, 1);
     const radios = [...root().querySelectorAll('[role="radio"]')] as HTMLButtonElement[];
     radios[1].click(); // the painted second copy, ref {bag: 3} pre-shift
-    expect(root().textContent).toContain('Rank 3 of 4');
+    expect(checkedRef()).toContain('Rank 3 of 4');
+    // A click is a selection move (prev anchor {0, 2} vs {1, 2}): never a
+    // success cue.
+    expect(successCues()).toBe(0);
     (root().querySelector('[data-action]') as HTMLButtonElement).click();
     expect(world.perfectItem).toHaveBeenLastCalledWith({ bag: 2, itemId: APEX });
+  });
+
+  it('the anchor never spans a close: a shifted bagged pick falls back on reopen', () => {
+    // The selection survives a close only where its exact cell still holds
+    // the copy; the closed span must not become the ordinal's blind window
+    // (a same-id copy sold and another picked up while closed would reopen
+    // on the other copy), so the anchor is dropped at close and a shift
+    // while closed falls back to the first candidate.
+    world.equipment = {};
+    world.equipmentInstances = {};
+    world.inventory = [
+      { itemId: 'linen_cloth', count: 1 },
+      { itemId: APEX, count: 1, instance: { boundTo: 1, perfecting: 3 } },
+      { itemId: APEX, count: 1, instance: { boundTo: 1, perfecting: 1 } },
+    ];
+    const win = makeWindow();
+    win.open();
+    ([...root().querySelectorAll('[role="radio"]')][1] as HTMLButtonElement).click();
+    expect(checkedRef()).toContain('Rank 1 of 4');
+    win.close();
+    world.inventory.splice(0, 1);
+    win.open();
+    expect(checkedRef()).toContain('Rank 3 of 4');
+    expect(successCues()).toBe(0);
   });
 
   it('a different-id bagged candidate taking the vacated selection cues nothing', () => {
