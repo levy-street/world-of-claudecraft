@@ -280,7 +280,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 999,
-      "state": "14bbe5c8",
+      "state": "e5b04c1d",
       "events": "b7c8624c",
       "rng": {
         "draws": 0,
@@ -379,8 +379,7 @@
               "apprentice_robe",
               "baked_bread",
               "gnarled_staff",
-              "spring_water",
-              "wolf_fang"
+              "spring_water"
             ]
           },
           "delveClears": {},
@@ -539,7 +538,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 999,
-      "state": "14bbe5c8",
+      "state": "e5b04c1d",
       "events": "ba75c60e",
       "rng": {
         "draws": 0,
@@ -638,8 +637,7 @@
               "apprentice_robe",
               "baked_bread",
               "gnarled_staff",
-              "spring_water",
-              "wolf_fang"
+              "spring_water"
             ]
           },
           "delveClears": {},
@@ -798,7 +796,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 999,
-      "state": "14bbe5c8",
+      "state": "e5b04c1d",
       "events": "32886bcd",
       "rng": {
         "draws": 0,
@@ -897,8 +895,7 @@
               "apprentice_robe",
               "baked_bread",
               "gnarled_staff",
-              "spring_water",
-              "wolf_fang"
+              "spring_water"
             ]
           },
           "delveClears": {},
@@ -1057,7 +1054,7 @@
       "tick": 1,
       "time": 0.05,
       "nextId": 999,
-      "state": "9e53e878",
+      "state": "4df831b5",
       "events": "60e6a031",
       "rng": {
         "draws": 0,
@@ -1163,8 +1160,7 @@
               "apprentice_robe",
               "baked_bread",
               "gnarled_staff",
-              "spring_water",
-              "wolf_fang"
+              "spring_water"
             ]
           },
           "deedsEarned": [
@@ -1330,7 +1326,7 @@
       "tick": 1,
       "time": 0.05,
       "nextId": 999,
-      "state": "9e53e878",
+      "state": "4df831b5",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -1436,8 +1432,7 @@
               "apprentice_robe",
               "baked_bread",
               "gnarled_staff",
-              "spring_water",
-              "wolf_fang"
+              "spring_water"
             ]
           },
           "deedsEarned": [
