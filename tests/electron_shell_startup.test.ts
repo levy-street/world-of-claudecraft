@@ -371,7 +371,9 @@ describe('shell startup polish pins (electron/main.cjs)', () => {
     // the trial), stores before it commits, logs the evidence, and a failed
     // trial relaunches then exits. Both evidence sources call it: the
     // getGPUInfo reading in logGpuStatus and the game's renderer report.
-    const defAt = code.indexOf('function settleVulkanTrial(glRenderer, softwareRendering) {');
+    const defAt = code.indexOf(
+      'function settleVulkanTrial(glRenderer, softwareRendering, parallelCompile) {',
+    );
     expect(defAt, 'settleVulkanTrial is gone').toBeGreaterThan(-1);
     expect(count(code, 'function settleVulkanTrial(')).toBe(1);
     const settleEnd = code.indexOf('\n}', defAt);
@@ -380,17 +382,26 @@ describe('shell startup polish pins (electron/main.cjs)', () => {
     expect(settle).toContain('vulkanTrialJudged = true;');
     expect(count(code, 'vulkanTrialJudged = true;')).toBe(1);
     expect(code.indexOf('let vulkanTrialJudged = false;')).toBeLessThan(defAt);
+    // The rung (the launch's parallel flag) and the page's extension report
+    // feed the verdict beside the two evidence fields.
     expect(settle).toContain(
-      'const vulkanVerdict = judgeVulkanLaunch({ glRenderer, softwareRendering });',
+      'const vulkanVerdict = judgeVulkanLaunch({ glRenderer, softwareRendering, parallel: gpuBackendLaunch.parallel, parallelCompile, });',
     );
     expect(settle).toContain(
       'if (saveDesktopPrefs(desktopPrefsPath, { ...desktopPrefs, vulkanVerdict })) { desktopPrefs.vulkanVerdict = vulkanVerdict; }',
     );
     expect(settle).toMatch(
-      /`\[gpu\] vulkan trial verdict: \$\{vulkanVerdict\}`, \{ glRenderer, softwareRendering \}/,
+      /`\[gpu\] vulkan trial verdict: \$\{vulkanVerdict\}`, \{ glRenderer, softwareRendering, parallel: gpuBackendLaunch\.parallel, parallelCompile, \}/,
     );
-    expect(settle).toContain("if (vulkanVerdict === 'failed') { log.warn(");
-    expect(settle).toContain('if (relaunchAfterFailedTrial({ log })) { app.exit(0); return; }');
+    // A failed rung relaunches the NEXT rung: plain Vulkan after the parallel
+    // one, the default GL after the plain one (the child reads the marker).
+    expect(settle).toContain("if (vulkanVerdict === 'failed') {");
+    expect(settle).toContain(
+      "const nextRung = gpuBackendLaunch.parallel ? VULKAN_TRIAL_RELAUNCH_PLAIN : '1';",
+    );
+    expect(settle).toContain(
+      'if (relaunchAfterFailedTrial({ log }, nextRung)) { app.exit(0); return; }',
+    );
     // The relaunch lives in the settle function and nowhere else.
     expect(count(code, 'relaunchAfterFailedTrial(')).toBe(1);
     expect(code.indexOf('relaunchAfterFailedTrial(')).toBeGreaterThan(defAt);
@@ -422,8 +433,14 @@ describe('shell startup polish pins (electron/main.cjs)', () => {
     const reportAt = code.indexOf("ipcMain.on('desktop-report-gpu-renderer'");
     expect(reportAt).toBeGreaterThan(-1);
     const report = code.slice(reportAt, code.indexOf('\n});', reportAt));
-    expect(report).toContain('settleVulkanTrial(renderer.slice(0, 256), false);');
-    expect(count(code, 'settleVulkanTrial(')).toBe(3);
+    expect(report).toContain('settleVulkanTrial(renderer.slice(0, 256), false, parallel);');
+    // Caller three: the GPU process dying under an unjudged trial IS the verdict.
+    const goneAt = code.indexOf("app.on('child-process-gone'");
+    expect(goneAt).toBeGreaterThan(-1);
+    expect(code.slice(goneAt, code.indexOf('\n});', goneAt))).toContain(
+      "settleVulkanTrial('', true, undefined);",
+    );
+    expect(count(code, 'settleVulkanTrial(')).toBe(4);
   });
 
   it('constructs the window at the restored geometry rather than resizing it after', () => {

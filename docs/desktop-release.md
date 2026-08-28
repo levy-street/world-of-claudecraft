@@ -122,9 +122,23 @@ Windows already runs D3D11 and macOS Metal, so only Linux needs the lever.
 
 The shell forces Vulkan with the Chromium switches (`VULKAN_BACKEND_SWITCHES` in
 `electron/gpu_backend.cjs`: `--use-gl=angle`, `--use-angle=vulkan`, and the
-`Vulkan,DefaultANGLEVulkan,VulkanFromANGLE` feature set) and nothing wider: no
-`--ignore-gpu-blocklist`, no `--disable-gpu-driver-bug-workarounds`, and never
-`--disable-vulkan-surface` (headless only). The risk is that a forced Vulkan backend
+`Vulkan,DefaultANGLEVulkan,VulkanFromANGLE` feature set) plus, on the first rung, the
+ANGLE feature switch `--enable-angle-features=enableParallelCompileAndLink`
+(`VULKAN_PARALLEL_COMPILE_SWITCH`), and nothing wider: no `--ignore-gpu-blocklist`, no
+`--disable-gpu-driver-bug-workarounds`, and never `--disable-vulkan-surface` (headless
+only). The ANGLE feature matters: ANGLE's Vulkan backend exposes
+`KHR_parallel_shader_compile` only when it is on (an opt-in feature since 2023, never
+defaulted), and without that extension the renderer runs its no-async-compile policy
+(every program links synchronously on the GPU-process thread, every compile gate is
+inert). `chrome://gpu` lists it under ANGLE Features as
+`enableParallelCompileAndLink: Enabled` when the switch took. The feature is still opt-in
+upstream and one rare late GPU-process crash was seen with it on Intel/Mesa, so the trial
+is a LADDER: Vulkan with the feature (verdict `ok`), then plain Vulkan (`ok-plain`, also
+the verdict when the page reports the extension absent, i.e. the switch did not take),
+then the default GL (`failed`); two relaunches at most (marker `plain`, then `1`). After a
+passed trial, a GPU process that dies under a Vulkan session steps the stored verdict one
+rung down for the next launch (`child-process-gone` in `electron/main.cjs`), the only guard
+that reaches a late crash. The risk is that a forced Vulkan backend
 has no OpenGL fallback: a machine without a working Vulkan driver lands on SwiftShader
 (software rendering). So the lever is "try Vulkan once, verify, remember":
 

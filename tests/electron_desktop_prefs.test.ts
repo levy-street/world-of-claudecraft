@@ -191,7 +191,7 @@ describe('desktop prefs schema', () => {
     for (const setting of ['auto', 'vulkan', 'opengl']) {
       expect(sanitizeDesktopPrefs({ version: 1, gpuBackend: setting }).gpuBackend).toBe(setting);
     }
-    for (const verdict of ['untested', 'ok', 'failed']) {
+    for (const verdict of ['untested', 'ok', 'ok-plain', 'failed']) {
       expect(sanitizeDesktopPrefs({ version: 1, vulkanVerdict: verdict }).vulkanVerdict).toBe(
         verdict,
       );

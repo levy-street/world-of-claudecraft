@@ -80,6 +80,8 @@ const {
   hasGetGpuInfoEvidence,
   judgeVulkanLaunch,
   relaunchAfterFailedTrial,
+  VULKAN_TRIAL_RELAUNCH_PLAIN,
+  vulkanVerdictAfterGpuCrash,
 } = require('./gpu_backend.cjs');
 const { gpuStatusPayload } = require('./gpu_status_events.cjs');
 const { presentationStatePayload } = require('./presentation_events.cjs');
@@ -1244,10 +1246,13 @@ let rendererErrorsLogged = 0;
 // a healthy Linux Vulkan session, so this is the usual verdict source. Strings only, and
 // never an empty one (no evidence, same as an empty getGPUInfo reading); a SwiftShader
 // string still judges failed through judgeVulkanLaunch. Nothing is answered.
-ipcMain.on('desktop-report-gpu-renderer', (event, renderer) => {
+ipcMain.on('desktop-report-gpu-renderer', (event, renderer, parallelCompile) => {
   if (!trustedSender(event)) return;
   if (typeof renderer !== 'string' || renderer === '') return;
-  settleVulkanTrial(renderer.slice(0, 256), false);
+  // The extension flag rides along as a strict boolean, or not at all (an
+  // older game build reports the string alone: unknown, never false).
+  const parallel = parallelCompile === true ? true : parallelCompile === false ? false : undefined;
+  settleVulkanTrial(renderer.slice(0, 256), false, parallel);
 });
 
 ipcMain.on('desktop-renderer-error', (event, payload) => {
@@ -1317,27 +1322,65 @@ let vulkanTrialJudged = false;
 // (the renderer never reports, e.g. WebGL creation failed entirely) leaves the stored
 // verdict at 'untested', so the next launch simply trials again: acceptable, since one
 // more trial costs nothing and there is no timer to get wrong.
-function settleVulkanTrial(glRenderer, softwareRendering) {
+function settleVulkanTrial(glRenderer, softwareRendering, parallelCompile) {
   if (gpuBackendLaunch.trial !== true || vulkanTrialJudged) return;
   vulkanTrialJudged = true;
-  const vulkanVerdict = judgeVulkanLaunch({ glRenderer, softwareRendering });
+  const vulkanVerdict = judgeVulkanLaunch({
+    glRenderer,
+    softwareRendering,
+    parallel: gpuBackendLaunch.parallel,
+    parallelCompile,
+  });
   if (saveDesktopPrefs(desktopPrefsPath, { ...desktopPrefs, vulkanVerdict })) {
     desktopPrefs.vulkanVerdict = vulkanVerdict;
   } else {
     log.warn('[gpu] could not persist the Vulkan trial verdict');
   }
-  log.info(`[gpu] vulkan trial verdict: ${vulkanVerdict}`, { glRenderer, softwareRendering });
+  log.info(`[gpu] vulkan trial verdict: ${vulkanVerdict}`, {
+    glRenderer,
+    softwareRendering,
+    parallel: gpuBackendLaunch.parallel,
+    parallelCompile,
+  });
   if (vulkanVerdict === 'failed') {
+    // The next rung: plain Vulkan after a failed parallel-compile rung, the
+    // default GL after a failed plain one (the child reads the marker).
+    const nextRung = gpuBackendLaunch.parallel ? VULKAN_TRIAL_RELAUNCH_PLAIN : '1';
     log.warn(
       '[gpu] the forced Vulkan backend did not bind a hardware Vulkan renderer; ' +
-        'relaunching on the default GL backend',
+        `relaunching on the next rung (${nextRung === '1' ? 'default GL' : 'plain Vulkan'})`,
     );
-    if (relaunchAfterFailedTrial({ log })) {
+    if (relaunchAfterFailedTrial({ log }, nextRung)) {
       app.exit(0);
       return;
     }
   }
 }
+
+// The GPU process dying under a Vulkan session: during a trial not yet judged it IS the
+// verdict (the page will never report a renderer string; Chromium falls back to
+// SwiftShader), so it settles as failed and the ladder relaunches the next rung. After a
+// passed trial it steps the stored verdict one rung down for the NEXT launch ('ok' loses
+// the parallel-compile feature, 'ok-plain' falls back to GL), the only guard that reaches
+// the rare late crash the feature is known for; this session keeps whatever Chromium
+// recovers on. Explicit settings are never touched: explicit means unverified.
+app.on('child-process-gone', (_event, details) => {
+  if (details?.type !== 'GPU' || gpuBackendLaunch.backend !== 'vulkan') return;
+  if (gpuBackendLaunch.trial === true) {
+    settleVulkanTrial('', true, undefined);
+    return;
+  }
+  if (desktopPrefs.gpuBackend !== 'auto') return;
+  const vulkanVerdict = vulkanVerdictAfterGpuCrash(desktopPrefs.vulkanVerdict);
+  if (vulkanVerdict === desktopPrefs.vulkanVerdict) return;
+  if (saveDesktopPrefs(desktopPrefsPath, { ...desktopPrefs, vulkanVerdict })) {
+    desktopPrefs.vulkanVerdict = vulkanVerdict;
+  }
+  log.warn(`[gpu] GPU process gone under Vulkan; next launch steps down to ${vulkanVerdict}`, {
+    reason: details?.reason,
+    exitCode: details?.exitCode,
+  });
+});
 
 function logGpuStatus() {
   let softwareVerdict = false;

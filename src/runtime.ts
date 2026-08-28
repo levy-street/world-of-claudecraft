@@ -201,7 +201,7 @@ export interface DesktopBridge {
   // The page's WebGL renderer string, the evidence the shell judges its Linux
   // Vulkan trial on (getGPUInfo carries no renderer string there). A send, no
   // answer. Absent on older shells: feature-check before use.
-  reportGpuRenderer?(renderer: string): void;
+  reportGpuRenderer?(renderer: string, parallelCompile?: boolean): void;
   // The persisted display mode. The shell prefs store is the source of truth;
   // the setter persists AND applies it to the live window (unlike the GPU
   // pref, which only takes effect next launch), the getter returns the stored

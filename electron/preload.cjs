@@ -183,8 +183,11 @@ contextBridge.exposeInMainWorld('wocDesktop', {
   // The game's own WebGL renderer string, reported once its context exists: the evidence
   // the shell's Vulkan trial verdict is judged on (getGPUInfo can leave the renderer
   // string empty on Linux). Fire-and-forget, capped here so no unbounded string crosses.
-  reportGpuRenderer: (renderer) =>
-    ipcRenderer.send('desktop-report-gpu-renderer', String(renderer).slice(0, 256)),
+  reportGpuRenderer: (renderer, parallelCompile) => {
+    // The extension flag crosses as a strict boolean or not at all.
+    const flag = parallelCompile === true ? true : parallelCompile === false ? false : undefined;
+    ipcRenderer.send('desktop-report-gpu-renderer', String(renderer).slice(0, 256), flag);
+  },
   // Whether this platform has a backend choice at all (Linux only), answered
   // synchronously so the options row can be gated the moment the window opens.
   hasGpuBackendChoice: process.platform === 'linux',

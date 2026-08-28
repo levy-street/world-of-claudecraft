@@ -8,8 +8,11 @@ import {
   judgeVulkanLaunch,
   relaunchAfterFailedTrial,
   VULKAN_BACKEND_SWITCHES,
+  VULKAN_PARALLEL_COMPILE_SWITCH,
   VULKAN_TRIAL_RELAUNCH_MARKER,
+  VULKAN_TRIAL_RELAUNCH_PLAIN,
   VULKAN_VERDICTS,
+  vulkanVerdictAfterGpuCrash,
 } from '../electron/gpu_backend.cjs';
 import { spawnDetachedSelf } from '../electron/gpu_preference.cjs';
 
@@ -25,19 +28,27 @@ const auto = (vulkanVerdict: string) => ({ gpuBackend: 'auto', vulkanVerdict });
 describe('GPU backend constants (load-bearing literals)', () => {
   it('pins the setting and verdict lists', () => {
     expect(GPU_BACKEND_SETTINGS).toEqual(['auto', 'vulkan', 'opengl']);
-    expect(VULKAN_VERDICTS).toEqual(['untested', 'ok', 'failed']);
+    expect(VULKAN_VERDICTS).toEqual(['untested', 'ok', 'ok-plain', 'failed']);
     expect(GPU_BACKEND_ENV).toBe('WOC_GPU_BACKEND');
     expect(VULKAN_TRIAL_RELAUNCH_MARKER).toBe('WOC_VULKAN_TRIAL_RELAUNCHED');
+    expect(VULKAN_TRIAL_RELAUNCH_PLAIN).toBe('plain');
   });
 
-  it('pins the three Vulkan switches and nothing wider', () => {
+  it('pins the three Vulkan switches, the parallel-compile feature apart, and nothing wider', () => {
     // The verified minimal set. --ignore-gpu-blocklist and
     // --disable-gpu-driver-bug-workarounds widen the blast radius on drivers the
-    // blocklist exists for, and --disable-vulkan-surface is headless-only.
+    // blocklist exists for, and --disable-vulkan-surface is headless-only. The
+    // ANGLE feature is the one that exposes KHR_parallel_shader_compile on the
+    // Vulkan backend (opt-in in ANGLE); without it every gate is inert there. It
+    // is its own switch because the trial ladder drops it on the second rung.
     expect(VULKAN_BACKEND_SWITCHES).toEqual([
       ['use-gl', 'angle'],
       ['use-angle', 'vulkan'],
       ['enable-features', 'Vulkan,DefaultANGLEVulkan,VulkanFromANGLE'],
+    ]);
+    expect(VULKAN_PARALLEL_COMPILE_SWITCH).toEqual([
+      'enable-angle-features',
+      'enableParallelCompileAndLink',
     ]);
     const names = VULKAN_BACKEND_SWITCHES.map(([name]) => name);
     expect(names).not.toContain('ignore-gpu-blocklist');
@@ -54,7 +65,12 @@ describe('decideGpuBackendLaunch', () => {
         env: { [GPU_BACKEND_ENV]: 'vulkan' },
         prefs: { gpuBackend: 'vulkan', vulkanVerdict: 'ok' },
       });
-      expect(launch).toEqual({ backend: 'default', trial: false, reason: 'platform default' });
+      expect(launch).toEqual({
+        backend: 'default',
+        parallel: false,
+        trial: false,
+        reason: 'platform default',
+      });
     }
   });
 
@@ -66,6 +82,7 @@ describe('decideGpuBackendLaunch', () => {
     });
     expect(launch).toEqual({
       backend: 'default',
+      parallel: false,
       trial: false,
       reason: 'WOC_DISABLE_GPU_FORCE=1',
     });
@@ -77,7 +94,12 @@ describe('decideGpuBackendLaunch', () => {
         env: { WOC_DISABLE_GPU_FORCE: '1', [GPU_BACKEND_ENV]: 'vulkan' },
         prefs: auto('failed'),
       }),
-    ).toEqual({ backend: 'vulkan', trial: false, reason: `${GPU_BACKEND_ENV}=vulkan` });
+    ).toEqual({
+      backend: 'vulkan',
+      parallel: true,
+      trial: false,
+      reason: `${GPU_BACKEND_ENV}=vulkan`,
+    });
     // Strict '1': a stray value cannot half-arm the rescue.
     expect(
       decideGpuBackendLaunch({
@@ -95,14 +117,24 @@ describe('decideGpuBackendLaunch', () => {
         env: { [GPU_BACKEND_ENV]: 'opengl' },
         prefs: { gpuBackend: 'vulkan', vulkanVerdict: 'ok' },
       }),
-    ).toEqual({ backend: 'default', trial: false, reason: 'WOC_GPU_BACKEND=opengl' });
+    ).toEqual({
+      backend: 'default',
+      parallel: false,
+      trial: false,
+      reason: 'WOC_GPU_BACKEND=opengl',
+    });
     expect(
       decideGpuBackendLaunch({
         platform: 'linux',
         env: { [GPU_BACKEND_ENV]: 'vulkan' },
         prefs: { gpuBackend: 'opengl', vulkanVerdict: 'failed' },
       }),
-    ).toEqual({ backend: 'vulkan', trial: false, reason: 'WOC_GPU_BACKEND=vulkan' });
+    ).toEqual({
+      backend: 'vulkan',
+      parallel: true,
+      trial: false,
+      reason: 'WOC_GPU_BACKEND=vulkan',
+    });
   });
 
   it('ignores an unknown env override value and falls through to the setting', () => {
@@ -130,25 +162,27 @@ describe('decideGpuBackendLaunch', () => {
           env: {},
           prefs: { gpuBackend: 'opengl', vulkanVerdict },
         }),
-      ).toEqual({ backend: 'default', trial: false, reason: 'setting opengl' });
+      ).toEqual({ backend: 'default', parallel: false, trial: false, reason: 'setting opengl' });
       expect(
         decideGpuBackendLaunch({
           platform: 'linux',
           env: {},
           prefs: { gpuBackend: 'vulkan', vulkanVerdict },
         }),
-      ).toEqual({ backend: 'vulkan', trial: false, reason: 'setting vulkan' });
+      ).toEqual({ backend: 'vulkan', parallel: true, trial: false, reason: 'setting vulkan' });
     }
   });
 
   it('auto: a failed trial stays on the default, a passed one forces Vulkan without a trial', () => {
     expect(decideGpuBackendLaunch({ platform: 'linux', env: {}, prefs: auto('failed') })).toEqual({
       backend: 'default',
+      parallel: false,
       trial: false,
       reason: 'auto, last Vulkan trial failed',
     });
     expect(decideGpuBackendLaunch({ platform: 'linux', env: {}, prefs: auto('ok') })).toEqual({
       backend: 'vulkan',
+      parallel: true,
       trial: false,
       reason: 'auto, Vulkan trial passed',
     });
@@ -156,10 +190,36 @@ describe('decideGpuBackendLaunch', () => {
 
   it('auto + untested is the one and only trial launch', () => {
     expect(decideGpuBackendLaunch({ platform: 'linux', env: {}, prefs: auto('untested') })).toEqual(
-      { backend: 'vulkan', trial: true, reason: 'auto, Vulkan trial' },
+      { backend: 'vulkan', parallel: true, trial: true, reason: 'auto, Vulkan trial' },
     );
     // Missing env or prefs reads as the fresh-install state, not as a crash.
     expect(decideGpuBackendLaunch({ platform: 'linux' }).trial).toBe(true);
+  });
+
+  it('auto + ok-plain forces plain Vulkan, without the feature and without a trial', () => {
+    expect(decideGpuBackendLaunch({ platform: 'linux', env: {}, prefs: auto('ok-plain') })).toEqual(
+      {
+        backend: 'vulkan',
+        parallel: false,
+        trial: false,
+        reason: 'auto, Vulkan trial passed without parallel compile',
+      },
+    );
+  });
+
+  it('auto + untested in the child of a failed parallel rung trials plain Vulkan once', () => {
+    expect(
+      decideGpuBackendLaunch({
+        platform: 'linux',
+        env: { [VULKAN_TRIAL_RELAUNCH_MARKER]: VULKAN_TRIAL_RELAUNCH_PLAIN },
+        prefs: auto('untested'),
+      }),
+    ).toEqual({
+      backend: 'vulkan',
+      parallel: false,
+      trial: true,
+      reason: 'auto, plain Vulkan trial after a failed parallel one',
+    });
   });
 
   it('auto + untested in a relaunched child never trials (the loop lock)', () => {
@@ -173,6 +233,7 @@ describe('decideGpuBackendLaunch', () => {
     });
     expect(launch).toEqual({
       backend: 'default',
+      parallel: false,
       trial: false,
       reason: 'auto, relaunched after a failed Vulkan trial',
     });
@@ -208,10 +269,28 @@ describe('applyGpuBackendSwitches', () => {
     };
   }
 
-  it('appends the three Vulkan switches, with values, for a vulkan launch', () => {
+  it('appends the three Vulkan switches plus the feature for a parallel launch, three alone for a plain one', () => {
     const { app, switches } = fakeApp();
-    applyGpuBackendSwitches(app, { backend: 'vulkan', trial: true, reason: 'auto, Vulkan trial' });
+    applyGpuBackendSwitches(app, {
+      backend: 'vulkan',
+      parallel: true,
+      trial: true,
+      reason: 'auto, Vulkan trial',
+    });
     expect(switches).toEqual([
+      ['use-gl', 'angle'],
+      ['use-angle', 'vulkan'],
+      ['enable-features', 'Vulkan,DefaultANGLEVulkan,VulkanFromANGLE'],
+      ['enable-angle-features', 'enableParallelCompileAndLink'],
+    ]);
+    const plain = fakeApp();
+    applyGpuBackendSwitches(plain.app, {
+      backend: 'vulkan',
+      parallel: false,
+      trial: false,
+      reason: 'auto, Vulkan trial passed without parallel compile',
+    });
+    expect(plain.switches).toEqual([
       ['use-gl', 'angle'],
       ['use-angle', 'vulkan'],
       ['enable-features', 'Vulkan,DefaultANGLEVulkan,VulkanFromANGLE'],
@@ -220,7 +299,12 @@ describe('applyGpuBackendSwitches', () => {
 
   it('appends nothing for a default launch, or for no launch at all', () => {
     const { app, switches } = fakeApp();
-    applyGpuBackendSwitches(app, { backend: 'default', trial: false, reason: 'platform default' });
+    applyGpuBackendSwitches(app, {
+      backend: 'default',
+      parallel: false,
+      trial: false,
+      reason: 'platform default',
+    });
     applyGpuBackendSwitches(app, null);
     applyGpuBackendSwitches(app, undefined);
     expect(switches).toEqual([]);
@@ -228,10 +312,27 @@ describe('applyGpuBackendSwitches', () => {
 });
 
 describe('judgeVulkanLaunch', () => {
+  it('reads the rung and the reported extension: ok, ok-plain, or the rung kept when unknown', () => {
+    const base = { glRenderer: VULKAN_OK, softwareRendering: false };
+    expect(judgeVulkanLaunch({ ...base, parallel: true, parallelCompile: true })).toBe('ok');
+    // The switch did not take: plain Vulkan from now on.
+    expect(judgeVulkanLaunch({ ...base, parallel: true, parallelCompile: false })).toBe('ok-plain');
+    // An older game build reports the string alone: the rung is kept.
+    expect(judgeVulkanLaunch({ ...base, parallel: true })).toBe('ok');
+    expect(judgeVulkanLaunch({ ...base, parallel: false, parallelCompile: true })).toBe('ok-plain');
+    expect(judgeVulkanLaunch({ ...base, parallel: false })).toBe('ok-plain');
+    // Failure ignores the rung entirely.
+    expect(
+      judgeVulkanLaunch({ glRenderer: OPENGL, softwareRendering: false, parallel: true }),
+    ).toBe('failed');
+  });
+
   it('passes a hardware Vulkan renderer', () => {
-    expect(judgeVulkanLaunch({ glRenderer: VULKAN_OK, softwareRendering: false })).toBe('ok');
+    expect(
+      judgeVulkanLaunch({ glRenderer: VULKAN_OK, softwareRendering: false, parallel: true }),
+    ).toBe('ok');
     // softwareRendering absent (an older reading shape) is not a failure by itself.
-    expect(judgeVulkanLaunch({ glRenderer: VULKAN_OK })).toBe('ok');
+    expect(judgeVulkanLaunch({ glRenderer: VULKAN_OK, parallel: true })).toBe('ok');
   });
 
   it('fails the SwiftShader device even though its renderer string says Vulkan', () => {
@@ -260,12 +361,25 @@ describe('judgeVulkanLaunch', () => {
   });
 
   it('matches the Vulkan and SwiftShader tokens case-insensitively', () => {
-    expect(judgeVulkanLaunch({ glRenderer: 'ANGLE (AMD, VULKAN 1.3 (RADV NAVI31), AMD)' })).toBe(
-      'ok',
-    );
+    expect(
+      judgeVulkanLaunch({
+        glRenderer: 'ANGLE (AMD, VULKAN 1.3 (RADV NAVI31), AMD)',
+        parallel: true,
+      }),
+    ).toBe('ok');
     expect(judgeVulkanLaunch({ glRenderer: 'ANGLE (Google, vulkan (swiftshader device))' })).toBe(
       'failed',
     );
+  });
+});
+
+describe('vulkanVerdictAfterGpuCrash', () => {
+  it('steps one rung down, never up, and leaves the rest alone', () => {
+    expect(vulkanVerdictAfterGpuCrash('ok')).toBe('ok-plain');
+    expect(vulkanVerdictAfterGpuCrash('ok-plain')).toBe('failed');
+    expect(vulkanVerdictAfterGpuCrash('failed')).toBe('failed');
+    expect(vulkanVerdictAfterGpuCrash('untested')).toBe('untested');
+    expect(vulkanVerdictAfterGpuCrash(undefined)).toBe(undefined);
   });
 });
 
@@ -355,6 +469,27 @@ describe('relaunchAfterFailedTrial', () => {
       argv: [],
     });
     expect(calls[0].command).toBe('/usr/bin/woc');
+  });
+
+  it('marks the child with the rung it relaunches to, and never repeats a rung', () => {
+    const { spawn, calls } = fakeSpawn();
+    const base = { env: { HOME: '/h' }, argv: ['--x'], execPath: '/bin/app', spawn };
+    expect(relaunchAfterFailedTrial(base, VULKAN_TRIAL_RELAUNCH_PLAIN)).toBe(true);
+    expect((calls[0].options.env as Record<string, string>)[VULKAN_TRIAL_RELAUNCH_MARKER]).toBe(
+      'plain',
+    );
+    // The plain child may relaunch once more, to the default (marker '1')...
+    const plainChild = { ...base, env: { [VULKAN_TRIAL_RELAUNCH_MARKER]: 'plain' } };
+    expect(relaunchAfterFailedTrial(plainChild, '1')).toBe(true);
+    expect((calls[1].options.env as Record<string, string>)[VULKAN_TRIAL_RELAUNCH_MARKER]).toBe(
+      '1',
+    );
+    // ... but never to plain again, and a '1' child never relaunches at all.
+    expect(relaunchAfterFailedTrial(plainChild, VULKAN_TRIAL_RELAUNCH_PLAIN)).toBe(false);
+    const lastChild = { ...base, env: { [VULKAN_TRIAL_RELAUNCH_MARKER]: '1' } };
+    expect(relaunchAfterFailedTrial(lastChild, VULKAN_TRIAL_RELAUNCH_PLAIN)).toBe(false);
+    expect(relaunchAfterFailedTrial(lastChild, '1')).toBe(false);
+    expect(calls).toHaveLength(2);
   });
 
   it('never relaunches a process that already carries the marker', () => {

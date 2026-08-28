@@ -662,7 +662,11 @@ describe('electron IPC channel contract (preload <-> main)', () => {
     // Strings only, never empty (no evidence, like an empty getGPUInfo reading),
     // and the game's own report is by definition not Chromium's software flag.
     expect(body).toContain("if (typeof renderer !== 'string' || renderer === '') return;");
-    expect(body).toContain('settleVulkanTrial(renderer.slice(0, 256), false);');
+    // The extension flag is a strict boolean or unknown, never a truthy payload.
+    expect(body).toContain(
+      'const parallel = parallelCompile === true ? true : parallelCompile === false ? false : undefined;',
+    );
+    expect(body).toContain('settleVulkanTrial(renderer.slice(0, 256), false, parallel);');
     expect(body).not.toContain('event.reply');
     expect(body).not.toContain('return true');
   });
@@ -679,8 +683,12 @@ describe('electron IPC channel contract (preload <-> main)', () => {
     );
     // The renderer report: a capped string over a send, so a hostile page can
     // neither ship an unbounded payload nor learn anything back.
-    expect(preload.replace(/\s+/g, ' ')).toContain(
-      "reportGpuRenderer: (renderer) => ipcRenderer.send('desktop-report-gpu-renderer', String(renderer).slice(0, 256)),",
+    expect(preload).toContain('reportGpuRenderer: (renderer, parallelCompile) => {');
+    expect(preload).toContain(
+      'const flag = parallelCompile === true ? true : parallelCompile === false ? false : undefined;',
+    );
+    expect(preload).toContain(
+      "ipcRenderer.send('desktop-report-gpu-renderer', String(renderer).slice(0, 256), flag);",
     );
     // The platform answer is a synchronous VALUE, not a round trip: the
     // options row is gated on it when the window opens.
