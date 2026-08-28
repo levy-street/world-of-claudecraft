@@ -7849,7 +7849,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.masterwrought.slotsLabel': '名匠鍛造スロット：',
   'hudChrome.masterwrought.pieceMark': '名匠鍛造',
   'hudChrome.masterwrought.tooltipWorn': '名匠鍛造スロットを1つ使用（{used}/{cap}使用中）。',
-  'hudChrome.masterwrought.tooltipAtCap': '名匠鍛造スロット{cap}枠はすべて使用中です。',
+  'hudChrome.masterwrought.tooltipAtCap': 'あなたの名匠鍛造スロット{cap}枠はすべて使用中です。',
   'hudChrome.itemSet.header': '{name} ({have}/{total})',
   'hudChrome.itemProc.onMeleeHit': '命中時に確率（{chance}%）：{effect}',
   'hudChrome.itemProc.onSpellDamage': 'ダメージ呪文で確率（{chance}%）：{effect}',
@@ -12225,7 +12225,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.materialHint.growthTonic':
     '農業用品。作付け時に消費され、収穫がやや増えることがある。作物が枯れるとトニックも失われる。',
   'hudChrome.materialHint.wyrmfallCore':
-    '名匠鍛造の製作触媒。レイドと英雄ダンジョンの最終ボスがそれぞれ1日1回、1から3個をドロップする。その日最初のAまたはSランクのリフト踏破で1個か2個を獲得でき、英雄補給係が英雄の証と引き換えに販売している。',
+    '名匠鍛造の製作触媒。レイドと英雄ダンジョンの最終ボスが難易度ごとに1日1回、それぞれ1から3個をドロップする。その日最初のAまたはSランクのリフト競争に勝利すると1個か2個を獲得でき、英雄補給係が英雄の証と引き換えに販売している。',
   'hudChrome.enchanting.tier.base': '基本エンチャント',
   'hudChrome.enchanting.tier.runed': 'ルーンエンチャント',
   'hudChrome.enchanting.tier.greater': '上級エンチャント',
@@ -14334,10 +14334,10 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.perfecting.skillMet': '条件を満たしています。',
   'hudChrome.perfecting.skillUnmet': '不足しています。',
   'hudChrome.perfecting.skillSyncing': '製作スキルを確認しています。',
-  'hudChrome.perfecting.bindWarn': '最初の完全化の挑戦で、{name}はあなたに永久に束縛されます。',
+  'hudChrome.perfecting.bindWarn': '最初の完全化の挑戦で、{name}はあなたに束縛されます。',
   'hudChrome.perfecting.bindWarnDetail':
-    '完全化でランクが下がることはありません。失敗しても素材を消費するだけです。束縛は解除できず、昇格も取り消せません。',
-  'hudChrome.perfecting.bindConfirmText': '最初の挑戦で{name}はあなたに永久に束縛されます。挑戦しますか？',
+    '完全化でランクが下がることはありません。失敗しても素材を消費するだけです。完全化の進行がある品は束縛を解除できず、昇格も取り消せません。',
+  'hudChrome.perfecting.bindConfirmText': '最初の挑戦で{name}はあなたに束縛されます。挑戦しますか？',
   'hudChrome.perfecting.bindConfirmAccept': '束縛して挑戦',
   'hudChrome.perfecting.bindConfirmCancel': 'キャンセル',
   'hudChrome.perfecting.attempt': '完全化に挑戦',

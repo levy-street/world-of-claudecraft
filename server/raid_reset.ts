@@ -197,6 +197,13 @@ export function eventLeadDayKey(
 const NEXT_RESET_MEMO_MAX = 16;
 const nextResetMemo = new Map<string, number>();
 
+/** Test-only observable for the memo's size bound (the ForTest seam idiom):
+ *  the map is module-private, so without this the clear-on-overflow line has
+ *  no behavioral witness (an unbounded map answers every probe correctly). */
+export function nextResetMemoSizeForTest(): number {
+  return nextResetMemo.size;
+}
+
 export function dailyResetRemainingSec(
   nowMs: number,
   zone: string = DEFAULT_RAID_RESET_TIME_ZONE,

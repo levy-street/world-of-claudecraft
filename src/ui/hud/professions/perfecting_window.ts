@@ -223,6 +223,24 @@ export class PerfectingWindow {
     this.namingDialog?.notifyAnswered();
   }
 
+  /** The answer-edge gate matches the COPY, not only the cell. A resolved
+   *  attempt consumes materials through the sim's slot walk, which SPLICES an
+   *  exhausted stack, so a bagged candidate above it re-enters the answering
+   *  poll one cell lower: its cell ref no longer matches while the copy is
+   *  the same. Re-match a bagged ref by item id when its old cell has moved
+   *  on (the copy was not consumed by any Perfecting act, so a vacated cell
+   *  means a shift, never a loss); otherwise the landed rank's cue and
+   *  announcement, and the promotion's dialog dismissal, would be skipped
+   *  exactly once for that copy. Two same-id apex copies shifting together
+   *  stay the recorded index-collision class (the mid-dialog retarget note),
+   *  not something this re-match can distinguish. */
+  private sameSelectedCopy(prevRef: PerfectItemRef, ref: PerfectItemRef): boolean {
+    if (samePerfectRef(prevRef, ref)) return true;
+    if ('slot' in prevRef || 'slot' in ref || prevRef.itemId !== ref.itemId) return false;
+    const oldCell = this.deps.world().inventory[prevRef.bag];
+    return oldCell === undefined || oldCell.itemId !== prevRef.itemId;
+  }
+
   private buildView(): BuiltView {
     const world = this.deps.world();
     const syncing = !world.craftingIdentity.synced;
@@ -268,7 +286,7 @@ export class PerfectingWindow {
       this.namingDialog?.notifyAnswered();
     }
     const prev = this.prevSelected;
-    if (detail && prev && samePerfectRef(prev.ref, detail.ref)) {
+    if (detail && prev && this.sameSelectedCopy(prev.ref, detail.ref)) {
       // The edge latches through prevSelected below, so whichever forced
       // repaint observes it first (the 1 Hz tick, or a relocalize that beat
       // it) plays the cue exactly once; a later repaint can never replay it.
@@ -440,7 +458,10 @@ export class PerfectingWindow {
     actions.className = 'pf-name-actions';
     const cancel = document.createElement('button');
     cancel.type = 'button';
-    cancel.className = 'btn';
+    // Named class so the mobile touch floor can reach it: a ~29px bare-.btn
+    // cancel beside the 44px confirm biased mis-taps toward the permanent
+    // bind (the QA round's mobile finding).
+    cancel.className = 'btn pf-bind-cancel';
     cancel.textContent = t('hudChrome.perfecting.bindConfirmCancel');
     const confirm = document.createElement('button');
     confirm.type = 'button';

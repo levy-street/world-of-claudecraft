@@ -21,10 +21,19 @@ let dayRefreshAtMs = 0;
 let cachedResetDay = '';
 let resetRefreshAtMs = 0;
 
+/** Every 1-second cache below refreshes when its deadline passes AND when the
+ *  wall clock steps BACKWARD out of its window (an NTP correction, a manual
+ *  change): a deadline-only check would serve the stale value until the old
+ *  deadline came round, which after a large step is effectively forever (the
+ *  server memo's recorded case, server/raid_reset.ts). */
+function cacheStale(now: number, refreshAtMs: number): boolean {
+  return now >= refreshAtMs || now < refreshAtMs - 1000;
+}
+
 /** Current UTC day as `YYYY-MM-DD`, recomputed at most once per second. */
 export function currentUtcDay(): string {
   const now = Date.now();
-  if (now >= dayRefreshAtMs) {
+  if (cacheStale(now, dayRefreshAtMs)) {
     cachedDay = new Date(now).toISOString().slice(0, 10);
     dayRefreshAtMs = now + 1000;
   }
@@ -54,7 +63,7 @@ export function resetDayOf(at: Date): string {
 /** The current daily-reset window, recomputed at most once per second. */
 export function currentResetDay(): string {
   const now = Date.now();
-  if (now >= resetRefreshAtMs) {
+  if (cacheStale(now, resetRefreshAtMs)) {
     cachedResetDay = resetDayOf(new Date(now));
     resetRefreshAtMs = now + 1000;
   }
@@ -79,7 +88,7 @@ let eventLeadRefreshAtMs = 0;
 /** The current early-open probe key, recomputed at most once per second. */
 export function currentEventLeadDay(): string {
   const now = Date.now();
-  if (now >= eventLeadRefreshAtMs) {
+  if (cacheStale(now, eventLeadRefreshAtMs)) {
     cachedEventLeadDay = eventLeadDayOf(new Date(now));
     eventLeadRefreshAtMs = now + 1000;
   }
@@ -116,12 +125,15 @@ let resetRemainingRefreshAtMs = 0;
  *  moves by whole seconds, and the frame loop asks at 60 Hz). */
 export function currentResetRemainingSec(): number {
   const now = Date.now();
-  if (now >= resetRemainingRefreshAtMs) {
+  if (cacheStale(now, resetRemainingRefreshAtMs)) {
     cachedResetRemainingSec = resetRemainingSecOf(new Date(now));
     resetRemainingRefreshAtMs = now + 1000;
   }
   return cachedResetRemainingSec;
 }
+
+let calendarRefreshAtMs = 0;
+const calendarCache = { utcDay: '', resetDay: '', eventLeadDay: '', dailyResetRemainingSec: 0 };
 
 /**
  * Feed the offline sim its whole host calendar in one call: the frame loop's
@@ -135,8 +147,25 @@ export function feedSimCalendar(sim: {
   eventLeadDay: string;
   dailyResetRemainingSec: number;
 }): void {
-  sim.utcDay = currentUtcDay();
-  sim.resetDay = currentResetDay();
-  sim.eventLeadDay = currentEventLeadDay();
-  sim.dailyResetRemainingSec = currentResetRemainingSec();
+  // ONE instant for all four values (the server twin's shape,
+  // server/sim_calendar_feed.ts): the per-key caches above each carry their
+  // own 1-second deadline, so fed through them the four could straddle the
+  // local reset boundary by up to a second (a refreshed ~24h countdown beside
+  // a stale old-window resetDay, so a refusal fired in that sub-second window
+  // would name a full day at the instant the gate actually reopens). One
+  // shared deadline keeps the 1 Hz cadence and makes the set coherent by
+  // construction (and step-safe like every cache here, cacheStale above).
+  const now = Date.now();
+  if (cacheStale(now, calendarRefreshAtMs)) {
+    const at = new Date(now);
+    calendarCache.utcDay = at.toISOString().slice(0, 10);
+    calendarCache.resetDay = resetDayOf(at);
+    calendarCache.eventLeadDay = eventLeadDayOf(at);
+    calendarCache.dailyResetRemainingSec = resetRemainingSecOf(at);
+    calendarRefreshAtMs = now + 1000;
+  }
+  sim.utcDay = calendarCache.utcDay;
+  sim.resetDay = calendarCache.resetDay;
+  sim.eventLeadDay = calendarCache.eventLeadDay;
+  sim.dailyResetRemainingSec = calendarCache.dailyResetRemainingSec;
 }

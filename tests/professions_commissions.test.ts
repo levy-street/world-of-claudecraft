@@ -696,6 +696,27 @@ describe('unbind service deny order and mutation', () => {
     expect(copperOf(plain, pp)).toBe(47500);
   });
 
+  it('a FAILED first attempt leaves a bound rank-0 copy the unbind service still clears (the recorded shape)', () => {
+    // The R2 bind stamps boundTo BEFORE the roll and the fail arm writes no
+    // marker, so a failed-first-attempt copy carries boundTo with neither
+    // perfecting nor perfected: byte-identical to a fee-reversible Maker's
+    // Bond, and the service clears it. This pins the LIVE behavior the
+    // Phase 14 QA reworded the bind copy to match ("binds", not
+    // "permanently binds"); whether the sim should close the rank-0 hole is
+    // the ledger's maintainer read, and closing it must flip this arm.
+    const sim = makeSim();
+    const pid = sim.playerId;
+    sim.ctx.addItemInstance(SWORD, { boundTo: pid }, pid);
+    standAtStation(sim, pid);
+    setCopper(sim, pid, 50000);
+    const cleared = unbindItemMod(sim.ctx, SWORD, pid);
+    expect(cleared.ok).toBe(true);
+    expect(copperOf(sim, pid)).toBe(47500);
+    expect(slotsOf(sim, pid, SWORD).filter((s) => s.instance?.boundTo !== undefined)).toHaveLength(
+      0,
+    );
+  });
+
   it('away from every static station: unbind_out_of_range, no charge, no clear', () => {
     const sim = makeSim();
     const pid = sim.playerId;

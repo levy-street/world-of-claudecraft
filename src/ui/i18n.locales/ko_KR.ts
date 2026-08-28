@@ -7841,7 +7841,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.masterwrought.slotsLabel': '명장 제작 슬롯:',
   'hudChrome.masterwrought.pieceMark': '명장 제작',
   'hudChrome.masterwrought.tooltipWorn': '명장 제작 슬롯 1개를 차지합니다 ({cap}개 중 {used}개 사용 중).',
-  'hudChrome.masterwrought.tooltipAtCap': '명장 제작 슬롯 {cap}개가 모두 사용 중입니다.',
+  'hudChrome.masterwrought.tooltipAtCap': '당신의 명장 제작 슬롯 {cap}개가 모두 사용 중입니다.',
   'hudChrome.itemSet.header': '{name} ({have}/{total})',
   'hudChrome.itemProc.onMeleeHit': '적중 시 확률 ({chance}%): {effect}',
   'hudChrome.itemProc.onSpellDamage': '피해 주문 시 확률 ({chance}%): {effect}',
@@ -12203,7 +12203,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.materialHint.growthTonic':
     '농사 용품. 심을 때 소모되며 수확이 조금 늘어날 수 있습니다. 작물이 시들면 토닉도 함께 사라집니다.',
   'hudChrome.materialHint.wyrmfallCore':
-    '명장 제작용 촉매. 공격대와 영웅 던전의 최종 우두머리가 하루 한 번씩 1~3개를 떨어뜨립니다. 그날 첫 A 또는 S 등급 균열 공략으로 1~2개를 얻으며, 영웅 병참장교가 영웅의 징표를 받고 판매합니다.',
+    '명장 제작용 촉매. 공격대와 영웅 던전의 최종 우두머리가 난이도마다 하루 한 번씩 1~3개를 떨어뜨립니다. 그날 첫 A 또는 S 등급 균열 경주에서 승리하면 1~2개를 얻으며, 영웅 병참장교가 영웅의 징표를 받고 판매합니다.',
   'hudChrome.enchanting.tier.base': '기본 마법부여',
   'hudChrome.enchanting.tier.runed': '룬 마법부여',
   'hudChrome.enchanting.tier.greater': '상급 마법부여',
@@ -14339,12 +14339,11 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.perfecting.skillMet': '충족했습니다.',
   'hudChrome.perfecting.skillUnmet': '부족합니다.',
   'hudChrome.perfecting.skillSyncing': '제작 기술을 확인하는 중입니다.',
-  'hudChrome.perfecting.bindWarn':
-    '첫 완전화 시도에서 {name}이(가) 당신에게 영구히 귀속됩니다.',
+  'hudChrome.perfecting.bindWarn': '첫 완전화 시도에서 {name}이(가) 당신에게 귀속됩니다.',
   'hudChrome.perfecting.bindWarnDetail':
-    '완전화는 결코 단계를 낮추지 않습니다. 실패한 시도는 재료만 소모합니다. 귀속은 해제할 수 없으며, 승급도 되돌릴 수 없습니다.',
+    '완전화는 결코 단계를 낮추지 않습니다. 실패한 시도는 재료만 소모합니다. 완전화 진행이 있는 장비는 귀속을 해제할 수 없으며, 승급도 되돌릴 수 없습니다.',
   'hudChrome.perfecting.bindConfirmText':
-    '첫 시도에서 {name}이(가) 당신에게 영구히 귀속됩니다. 그래도 시도하시겠습니까?',
+    '첫 시도에서 {name}이(가) 당신에게 귀속됩니다. 그래도 시도하시겠습니까?',
   'hudChrome.perfecting.bindConfirmAccept': '귀속하고 시도',
   'hudChrome.perfecting.bindConfirmCancel': '취소',
   'hudChrome.perfecting.attempt': '완전화 시도',

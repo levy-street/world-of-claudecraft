@@ -5904,7 +5904,9 @@
   body.mobile-touch .pf-cand,
   body.mobile-touch .pf-action,
   body.mobile-touch .pf-name-submit,
-  body.mobile-touch .pf-bind-confirm {
+  body.mobile-touch .pf-name-cancel,
+  body.mobile-touch .pf-bind-confirm,
+  body.mobile-touch .pf-bind-cancel {
     min-height: 44px;
   }
   /* The tool-effect controls' touch floors, the body.mobile-touch twin of the

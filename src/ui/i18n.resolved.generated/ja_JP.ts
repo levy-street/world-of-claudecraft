@@ -2053,7 +2053,7 @@ export const ja_JP: EnTranslations = {
       "slotsValue": "{used} / {cap}",
       "pieceMark": "名匠鍛造",
       "tooltipWorn": "名匠鍛造スロットを1つ使用（{used}/{cap}使用中）。",
-      "tooltipAtCap": "名匠鍛造スロット{cap}枠はすべて使用中です。"
+      "tooltipAtCap": "あなたの名匠鍛造スロット{cap}枠はすべて使用中です。"
     },
     "itemSet": {
       "header": "{name} ({have}/{total})",
@@ -2834,7 +2834,7 @@ export const ja_JP: EnTranslations = {
       "quickeningCatalyst": "製作用の触媒。錬金術師は1日に1個しか作れません。",
       "growthTonic": "農業用品。作付け時に消費され、収穫がやや増えることがある。作物が枯れるとトニックも失われる。",
       "deedOfMaking": "銘刻の証書。消費すると、完全化された名匠鍛造の作品を伝説へと昇格させ、名前を与えます。",
-      "wyrmfallCore": "名匠鍛造の製作触媒。レイドと英雄ダンジョンの最終ボスがそれぞれ1日1回、1から3個をドロップする。その日最初のAまたはSランクのリフト踏破で1個か2個を獲得でき、英雄補給係が英雄の証と引き換えに販売している。"
+      "wyrmfallCore": "名匠鍛造の製作触媒。レイドと英雄ダンジョンの最終ボスが難易度ごとに1日1回、それぞれ1から3個をドロップする。その日最初のAまたはSランクのリフト競争に勝利すると1個か2個を獲得でき、英雄補給係が英雄の証と引き換えに販売している。"
     },
     "discord": {
       "title": "Discord",
@@ -3893,9 +3893,9 @@ export const ja_JP: EnTranslations = {
       "skillMet": "条件を満たしています。",
       "skillUnmet": "不足しています。",
       "skillSyncing": "製作スキルを確認しています。",
-      "bindWarn": "最初の完全化の挑戦で、{name}はあなたに永久に束縛されます。",
-      "bindWarnDetail": "完全化でランクが下がることはありません。失敗しても素材を消費するだけです。束縛は解除できず、昇格も取り消せません。",
-      "bindConfirmText": "最初の挑戦で{name}はあなたに永久に束縛されます。挑戦しますか？",
+      "bindWarn": "最初の完全化の挑戦で、{name}はあなたに束縛されます。",
+      "bindWarnDetail": "完全化でランクが下がることはありません。失敗しても素材を消費するだけです。完全化の進行がある品は束縛を解除できず、昇格も取り消せません。",
+      "bindConfirmText": "最初の挑戦で{name}はあなたに束縛されます。挑戦しますか？",
       "bindConfirmAccept": "束縛して挑戦",
       "bindConfirmCancel": "キャンセル",
       "attempt": "完全化に挑戦",

@@ -2549,7 +2549,12 @@ export const hudChromeStrings = {
     slotsValue: '{used} / {cap}',
     pieceMark: 'Masterwrought',
     tooltipWorn: 'Occupies a Masterwrought slot ({used} of {cap} in use).',
-    tooltipAtCap: 'All {cap} Masterwrought slots are in use.',
+    // "your": this line renders on bag/vendor/market hovers AND on the
+    // inspect window's peer items, where an unowned reading ("all 2 slots"
+    // = the inspected character's) was the natural parse. The count is
+    // always the VIEWER's (masterwroughtTooltipLines reads this.sim
+    // .equipment), so the copy says so.
+    tooltipAtCap: 'All {cap} of your Masterwrought slots are in use.',
   },
   itemSet: {
     header: '{name} ({have}/{total})',
@@ -3774,11 +3779,16 @@ export const hudChromeStrings = {
     // and content/heroic_vendor.ts). The numbers are pinned against the
     // module's own constants in tests/material_hint_view.test.ts, so a
     // faucet retune fails there instead of shipping a stale sentence.
+    // Trigger wording is part of the pin (tests/material_hint_view.test.ts):
+    // the rift arm pays only on a WINNING first clear of the shared race (a
+    // losing A or S clear forfeits the cores, masterwrought_materials.ts),
+    // and the boss gate is per (dungeon, difficulty), so the raid pays once
+    // per difficulty per day.
     wyrmfallCore:
       'Masterwrought crafting catalyst. Raid and heroic dungeon final bosses ' +
-      'each drop 1 to 3 once per day, your first A or S rank rift clear of ' +
-      'the day grants 1 or 2, and the Heroic Quartermaster sells one for ' +
-      'Heroic Marks.',
+      'each drop 1 to 3 once per day for each difficulty, winning your ' +
+      'first A or S rank rift race of the day grants 1 or 2, and the Heroic ' +
+      'Quartermaster sells one for Heroic Marks.',
   },
   discord: {
     title: 'Discord',
@@ -5599,9 +5609,14 @@ export const hudChromeStrings = {
   // VALUE (the D13-2 ruling), rendered esc'd standalone and only ever
   // interpolated as a {name} param, never composed into a catalog value.
   // The bind copy states the live mechanic exactly: fail-forward (a failed
-  // attempt spends materials, never lowers rank), the first attempt's bind is
-  // permanent (the unbind service refuses tracked and Perfected pieces), and
-  // a promotion is permanent.
+  // attempt spends materials, never lowers rank), and a promotion is
+  // permanent. The bind's OWN permanence is conditional and the copy says
+  // only what holds: the unbind service refuses pieces with Perfecting
+  // progress and Perfected pieces, so any bind with progress holds for
+  // good, but a FAILED first attempt leaves a bound rank-0 copy with no
+  // marker, which the Maker's Bond unbind can still clear for its fee (the
+  // recorded rank-0 shape; whether the sim should close that hole is a
+  // maintainer read in the Phase 14 QA ledger).
   perfecting: {
     title: 'Perfecting',
     close: 'Close the Perfecting window',
@@ -5627,10 +5642,10 @@ export const hudChromeStrings = {
     skillMet: 'Met.',
     skillUnmet: 'Not met.',
     skillSyncing: 'Checking your craft skill.',
-    bindWarn: 'Your first perfecting attempt permanently binds {name} to you.',
+    bindWarn: 'Your first perfecting attempt binds {name} to you.',
     bindWarnDetail:
-      'Perfecting never lowers a rank: a failed attempt only spends its materials. A bound piece cannot be unbound, and a promotion is permanent.',
-    bindConfirmText: 'Your first attempt permanently binds {name} to you. Attempt anyway?',
+      'Perfecting never lowers a rank: a failed attempt only spends its materials. A piece with Perfecting progress cannot be unbound, and a promotion is permanent.',
+    bindConfirmText: 'Your first attempt binds {name} to you. Attempt anyway?',
     bindConfirmAccept: 'Bind and Attempt',
     bindConfirmCancel: 'Cancel',
     attempt: 'Attempt Perfecting',

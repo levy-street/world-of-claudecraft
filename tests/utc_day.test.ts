@@ -175,4 +175,63 @@ describe('feedSimCalendar', () => {
     // clock.
     expect(sim.dailyResetRemainingSec).toBe(7 * 3600);
   });
+
+  it('feeds all four values from ONE instant across the local reset boundary', () => {
+    // The per-key caches each carry their own 1-second deadline, so a feed
+    // routed through them could pair a stale old-window resetDay with a
+    // freshly refreshed ~24h countdown for up to a second at the boundary
+    // (the QA round's coherence finding). Prime ONE per-key cache before the
+    // boundary, then feed after it: the sim must read a coherent set, every
+    // value derived from the feed's own instant.
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date(2026, 7, 7, 2, 59, 59, 600));
+    expect(currentResetDay()).toBe('2026-08-06'); // the per-key cache, primed
+    const after = new Date(2026, 7, 7, 3, 0, 0, 200);
+    vi.setSystemTime(after);
+    const sim = { utcDay: '', resetDay: '', eventLeadDay: '', dailyResetRemainingSec: 0 };
+    feedSimCalendar(sim);
+    expect(sim.resetDay).toBe(resetDayOf(after));
+    expect(sim.resetDay).toBe('2026-08-07');
+    expect(sim.dailyResetRemainingSec).toBe(resetRemainingSecOf(after));
+    expect(sim.eventLeadDay).toBe(eventLeadDayOf(after));
+    expect(sim.utcDay).toBe(after.toISOString().slice(0, 10));
+  });
+
+  it('holds one coherent set for its 1 Hz window, then refreshes every value together', () => {
+    vi.useFakeTimers();
+    const first = new Date(2026, 7, 7, 2, 59, 59, 700);
+    vi.setSystemTime(first);
+    const sim = { utcDay: '', resetDay: '', eventLeadDay: '', dailyResetRemainingSec: 0 };
+    feedSimCalendar(sim);
+    expect(sim.resetDay).toBe('2026-08-06');
+    expect(sim.dailyResetRemainingSec).toBe(1);
+    // Inside the window, past the boundary: the whole set is served as-is
+    // (stale together, never half-flipped).
+    vi.setSystemTime(new Date(2026, 7, 7, 3, 0, 0, 100));
+    feedSimCalendar(sim);
+    expect(sim.resetDay).toBe('2026-08-06');
+    expect(sim.dailyResetRemainingSec).toBe(1);
+    // Past the window: every value flips in the same feed.
+    vi.setSystemTime(new Date(2026, 7, 7, 3, 0, 0, 800));
+    feedSimCalendar(sim);
+    expect(sim.resetDay).toBe('2026-08-07');
+    expect(sim.dailyResetRemainingSec).toBe(24 * 3600);
+  });
+
+  it('a backward wall-clock step refreshes rather than serving the old set to its deadline', () => {
+    // A deadline-only cache serves stale values after the clock steps back
+    // (an NTP correction, a manual change) until the OLD deadline arrives,
+    // which after a large step is effectively forever. The server memo
+    // documents the same case; the offline feed refreshes on it too.
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date(2026, 7, 21, 20, 0, 0, 0));
+    const sim = { utcDay: '', resetDay: '', eventLeadDay: '', dailyResetRemainingSec: 0 };
+    feedSimCalendar(sim);
+    expect(sim.resetDay).toBe('2026-08-21');
+    const stepped = new Date(2026, 7, 7, 12, 0, 0, 0);
+    vi.setSystemTime(stepped);
+    feedSimCalendar(sim);
+    expect(sim.resetDay).toBe('2026-08-07');
+    expect(sim.dailyResetRemainingSec).toBe(resetRemainingSecOf(stepped));
+  });
 });

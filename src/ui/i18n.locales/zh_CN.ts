@@ -7548,7 +7548,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.masterwrought.slotsLabel': '大师锻造栏位：',
   'hudChrome.masterwrought.pieceMark': '大师锻造',
   'hudChrome.masterwrought.tooltipWorn': '占用一个大师锻造栏位（已用{used}/{cap}）。',
-  'hudChrome.masterwrought.tooltipAtCap': '全部{cap}个大师锻造栏位均已占用。',
+  'hudChrome.masterwrought.tooltipAtCap': '你的全部{cap}个大师锻造栏位均已占用。',
   'hudChrome.itemSet.header': '{name} ({have}/{total})',
   'hudChrome.itemProc.onMeleeHit': '命中时几率（{chance}%）：{effect}',
   'hudChrome.itemProc.onSpellDamage': '造成伤害的法术几率（{chance}%）：{effect}',
@@ -11676,7 +11676,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.materialHint.growthTonic':
     '农用品。种植时消耗，有机会获得略多的收成。若作物枯萎，滋补剂也会随之失去。',
   'hudChrome.materialHint.wyrmfallCore':
-    '大师锻造制作催化剂。团队副本与英雄地下城的最终首领每日各掉落一次，每次1到3个；每日首次通关A级或S级裂隙可获得1或2个；英雄军需官以英雄徽记出售。',
+    '大师锻造制作催化剂。团队副本与英雄地下城的最终首领每个难度每日各掉落一次，每次1到3个；每日首次在A级或S级裂隙竞速中获胜可获得1或2个；英雄军需官以英雄徽记出售。',
   'hudChrome.enchanting.tier.base': '基础附魔',
   'hudChrome.enchanting.tier.runed': '符文附魔',
   'hudChrome.enchanting.tier.greater': '强效附魔',
@@ -14036,10 +14036,10 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.perfecting.skillMet': '已满足。',
   'hudChrome.perfecting.skillUnmet': '未满足。',
   'hudChrome.perfecting.skillSyncing': '正在核对你的工艺技能。',
-  'hudChrome.perfecting.bindWarn': '你的第一次完美化尝试会将{name}永久绑定给你。',
+  'hudChrome.perfecting.bindWarn': '你的第一次完美化尝试会将{name}绑定给你。',
   'hudChrome.perfecting.bindWarnDetail':
-    '完美化永不降阶：失败的尝试只会消耗材料。绑定后无法解绑，晋升亦不可撤销。',
-  'hudChrome.perfecting.bindConfirmText': '第一次尝试会将{name}永久绑定给你。仍要尝试吗？',
+    '完美化永不降阶：失败的尝试只会消耗材料。已有完美化进度的装备无法解绑，晋升亦不可撤销。',
+  'hudChrome.perfecting.bindConfirmText': '第一次尝试会将{name}绑定给你。仍要尝试吗？',
   'hudChrome.perfecting.bindConfirmAccept': '绑定并尝试',
   'hudChrome.perfecting.bindConfirmCancel': '取消',
   'hudChrome.perfecting.attempt': '尝试完美化',

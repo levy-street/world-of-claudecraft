@@ -9642,7 +9642,10 @@
      unit-circle viewBox. Semantic colours come from tokens; the showcase
      hairline is the shared --color-border-showcase token and the card fills
      its --color-card-inset companion (phase 14); the ring stage haze stays a
-     deliberate literal shared with the char-window showcase family. */
+     deliberate literal shared with the char-window showcase family, and so
+     does the .prof-track-step.filled inset bevel (the house 0.28 white
+     bevel the reliquary rail already spells; both await the DESIGN.md
+     foundation-phase token pass with the recorded wash/scrim literals). */
   #professions-window {
     width: 720px;
     max-height: calc(var(--app-vh, 100vh) * 0.85 / var(--window-scale) - 24px);
@@ -10454,9 +10457,12 @@
     white-space: nowrap;
     font-weight: 600;
   }
-  /* The promoted legend's name tint: the shipped legendary quality color,
-     aliased once in tokens.css (--mkt-name-legendary mirrors icons.ts
-     QUALITY_COLOR.legendary); the adjacent state TEXT stays the signal. */
+  /* The promoted legend's name tint: the WCAG-lifted legendary quality-name
+     token in tokens.css (--mkt-name-legendary is #ffab5e, NOT the icon
+     palette's QUALITY_COLOR.legendary #ff8000, which fails AA on the panel
+     ground; the token block documents the lift and this window is its
+     second consumer family beside the market name); the adjacent state TEXT
+     stays the signal. */
   .pf-name.q-legendary,
   .pf-detail-name.q-legendary {
     border: none;

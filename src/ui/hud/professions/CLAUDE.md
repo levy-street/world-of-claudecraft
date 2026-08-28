@@ -20,6 +20,13 @@ painter, a11y, i18n, and performance contracts.
 - Modules never import `Hud`; they take narrow dependency bags
   (`... extends PainterHostPresentation`) plus callbacks, wired in
   `src/ui/hud.ts`.
+- `index.ts` re-exports the whole family (every module, the two family-wide
+  seams below included). Production consumers (`hud.ts`, `main.ts`) DEEP-IMPORT
+  the module they need (`./hud/professions/<module>`), the accepted style this
+  domain shares with `action_bar/` and `chat/` (the battleground barrel is the
+  consumed-barrel style); the barrel exists for the domain's public-surface
+  contract and for tests, not as a required import path. A new module joins
+  the barrel in the same change.
 - Every window joins the mobile window-open body-class family: an
   `onVisibilityChange?()` dep called on BOTH display flips, wired by Hud to
   `syncAnyWindowOpenState` (pinned by `tests/farming_windows_body_class.test.ts`).

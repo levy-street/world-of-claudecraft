@@ -404,6 +404,34 @@ describe('mobile target-size: in-game touch controls are >=40x40 in landscape', 
       expect(node, `${sel} must render`).not.toBeNull();
       expectAtLeastFloor(node as HTMLElement, sel);
     }
+    // The bind-confirm prompt: BOTH actions carry the floor. The cancel
+    // shipped bare-.btn (~29px) beside a 44px confirm guarding a permanent
+    // bind, which is exactly the mis-tap bias the floor exists to prevent;
+    // unmeasured controls are how it escaped (the QA round's finding).
+    let stack = document.getElementById('prompt-stack');
+    if (!stack) {
+      stack = el('div', { id: 'prompt-stack' });
+      document.body.appendChild(stack);
+    }
+    (root.querySelector('.pf-action') as HTMLElement).click();
+    for (const sel of ['.pf-bind-confirm', '.pf-bind-cancel']) {
+      const node = stack.querySelector<HTMLElement>(sel);
+      expect(node, `${sel} must render in the bind prompt`).not.toBeNull();
+      expectAtLeastFloor(node as HTMLElement, sel);
+    }
+    (stack.querySelector('.pf-bind-cancel') as HTMLElement).click();
+    win.close();
+    // The naming dialog: reopen over a Perfected copy so the action opens it.
+    world.equipmentInstances = { mainhand: { perfected: true, boundTo: 1 } } as never;
+    world.inventory.push({ itemId: 'deed_of_making', count: 1 });
+    win.open();
+    (root.querySelector('.pf-action') as HTMLElement).click();
+    for (const sel of ['.pf-name-submit', '.pf-name-cancel']) {
+      const node = stack.querySelector<HTMLElement>(sel);
+      expect(node, `${sel} must render in the naming dialog`).not.toBeNull();
+      expectAtLeastFloor(node as HTMLElement, sel);
+    }
+    (stack.querySelector('.pf-name-cancel') as HTMLElement).click();
     win.close();
     root.remove();
   });

@@ -2053,7 +2053,7 @@ export const id_ID: EnTranslations = {
       "slotsValue": "{used} / {cap}",
       "pieceMark": "Masterwrought",
       "tooltipWorn": "Occupies a Masterwrought slot ({used} of {cap} in use).",
-      "tooltipAtCap": "All {cap} Masterwrought slots are in use."
+      "tooltipAtCap": "All {cap} of your Masterwrought slots are in use."
     },
     "itemSet": {
       "header": "{name} ({have}/{total})",
@@ -2834,7 +2834,7 @@ export const id_ID: EnTranslations = {
       "quickeningCatalyst": "Crafting catalyst. An alchemist can craft only one each day.",
       "growthTonic": "Farming supply. Spent when you plant a crop for a chance of a slightly larger harvest. If the crop withers, the tonic is lost with it.",
       "deedOfMaking": "Inscription writ. Consumed to raise a Perfected Masterwrought work to legendary and give it a name.",
-      "wyrmfallCore": "Masterwrought crafting catalyst. Raid and heroic dungeon final bosses each drop 1 to 3 once per day, your first A or S rank rift clear of the day grants 1 or 2, and the Heroic Quartermaster sells one for Heroic Marks."
+      "wyrmfallCore": "Masterwrought crafting catalyst. Raid and heroic dungeon final bosses each drop 1 to 3 once per day for each difficulty, winning your first A or S rank rift race of the day grants 1 or 2, and the Heroic Quartermaster sells one for Heroic Marks."
     },
     "discord": {
       "title": "Discord",
@@ -3893,9 +3893,9 @@ export const id_ID: EnTranslations = {
       "skillMet": "Met.",
       "skillUnmet": "Not met.",
       "skillSyncing": "Checking your craft skill.",
-      "bindWarn": "Your first perfecting attempt permanently binds {name} to you.",
-      "bindWarnDetail": "Perfecting never lowers a rank: a failed attempt only spends its materials. A bound piece cannot be unbound, and a promotion is permanent.",
-      "bindConfirmText": "Your first attempt permanently binds {name} to you. Attempt anyway?",
+      "bindWarn": "Your first perfecting attempt binds {name} to you.",
+      "bindWarnDetail": "Perfecting never lowers a rank: a failed attempt only spends its materials. A piece with Perfecting progress cannot be unbound, and a promotion is permanent.",
+      "bindConfirmText": "Your first attempt binds {name} to you. Attempt anyway?",
       "bindConfirmAccept": "Bind and Attempt",
       "bindConfirmCancel": "Cancel",
       "attempt": "Attempt Perfecting",

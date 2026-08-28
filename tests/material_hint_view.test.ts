@@ -179,7 +179,13 @@ describe('material_hint_view', () => {
     expect(line).toContain('class="tt-desc"');
     expect(line).toContain(`drop ${WYRMFALL_BOSS_MIN} to ${WYRMFALL_BOSS_MAX} once per day`);
     expect(line).toContain(`grants ${WYRMFALL_RIFT_COUNT.A} or ${WYRMFALL_RIFT_COUNT.S}`);
-    expect(line).toContain('A or S rank rift');
+    // The TRIGGER wording is part of the pin (the tooltip standard's
+    // trigger/limit rule): the boss gate is per (dungeon, difficulty), and
+    // the rift arm pays only on a WINNING first clear of the shared race (a
+    // losing A or S clear forfeits the cores, masterwrought_materials.ts),
+    // so the sentence must not promise a core for merely clearing.
+    expect(line).toContain('once per day for each difficulty');
+    expect(line).toContain('winning your first A or S rank rift race');
     expect(line).toContain('Heroic Quartermaster');
     expect(line).toContain('Heroic Marks');
     // Craft-free lead scoping (the intermediates rule): the lead must not

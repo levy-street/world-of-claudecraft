@@ -5,6 +5,7 @@ import {
   eventLeadDayKey,
   isSupportedTimeZone,
   nextRaidResetMs,
+  nextResetMemoSizeForTest,
   RAID_RESET_HOUR,
   resetDayKey,
 } from '../server/raid_reset';
@@ -334,5 +335,47 @@ describe('dailyResetRemainingSec', () => {
     // Sanity: an hour after the second 03:00 the countdown is a large number
     // (the next day's reset), not the 1-second lie.
     expect(dailyResetRemainingSec(secondThree + 3600 * 1000, zone)).toBeGreaterThan(20 * 3600);
+  });
+
+  it('the memo stays bounded across many zones and still answers correctly after the sweep', () => {
+    // NEXT_RESET_MEMO_MAX clears the map at 16 entries; deleting that line
+    // grows it unbounded across (window, zone) keys. Behavioral pin: drive
+    // well past the bound with distinct zones, then re-probe an early zone;
+    // a correct clear-on-overflow re-resolves and agrees with
+    // nextRaidResetMs (an unbounded map would too, so the agreement half is
+    // the correctness control while the count half below is the bound).
+    const now = Date.UTC(2025, 5, 29, 16, 0, 0);
+    const zones = [
+      'America/New_York',
+      'Europe/Paris',
+      'Europe/Athens',
+      'Asia/Tokyo',
+      'Asia/Seoul',
+      'Asia/Shanghai',
+      'Australia/Sydney',
+      'Pacific/Auckland',
+      'Pacific/Chatham',
+      'America/Santiago',
+      'America/Sao_Paulo',
+      'Africa/Cairo',
+      'Asia/Kolkata',
+      'Asia/Dubai',
+      'Europe/London',
+      'Europe/Berlin',
+      'Europe/Madrid',
+      'America/Chicago',
+      'America/Denver',
+      'America/Los_Angeles',
+    ];
+    for (const zone of zones) dailyResetRemainingSec(now, zone);
+    // The bound itself: 20 distinct keys were driven, so an unbounded map
+    // would hold at least 20; the clear-on-overflow keeps it at or under the
+    // 16-entry cap (plus the entries re-added since the last sweep).
+    expect(nextResetMemoSizeForTest()).toBeLessThanOrEqual(16);
+    for (const zone of [zones[0], zones[1]]) {
+      expect(dailyResetRemainingSec(now, zone)).toBe(
+        Math.max(1, Math.ceil((nextRaidResetMs(now, zone) - now) / 1000)),
+      );
+    }
   });
 });
