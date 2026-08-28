@@ -329,8 +329,13 @@ interface AttributionTargetFixture {
 // Re-minted for the three GLSL assembly seam patch (the pnpm-lock patch hash
 // moved, and the lockfile is a hashed leaf of the town fingerprint), so the
 // seals follow the swept evidence bytes. No capture was retaken.
+// Re-minted for the cast-VFX warm-up (the vfx.ability-primitives entry links
+// its programs through the compile arms, the dropped programs resume as debt
+// under programs.<id>, the painter gates on the cast readiness): renderer.ts
+// and prewarm_policy.ts both moved, the seals follow the swept evidence bytes.
+// No capture was retaken.
 const PINNED_POLISH_COMPOSITE_FINGERPRINT =
-  '262d0ca3a96010914195135a80cd01b2333065764df146fb4b47c107b0fee16f';
+  'af5c6b0b6d1342fb311006fb77380dc907ec82a0b452b6ad922c7bce737b221e';
 
 function validPolishAttributionTargets(): AttributionTargetFixture[] {
   return [

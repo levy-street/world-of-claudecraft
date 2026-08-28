@@ -614,7 +614,7 @@ describe('resumeDroppedPrewarmEntries', () => {
     // flag, and the kickoff must order debt ahead of the serial lane's
     // cosmetic entries (queue priority cannot reorder within the lane).
     expect(source).toContain('const resume = orderPrewarmResumeEntries(droppedEntries);');
-    expect(source).toContain('const units = entry.resumeUnits?.() ?? [];');
+    expect(source).toContain('dropEntry(entry, entry.resumeUnits?.() ?? []);');
     expect(source).toContain('droppedEntries.push({ id: entry.id, units })');
     expect(source).toContain("if (status === 'partial' || status === 'failed') {");
     expect(source).toContain('const partialUnits = entry.resumePartialUnits?.() ?? [];');

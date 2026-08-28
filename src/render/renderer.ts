@@ -45,7 +45,10 @@ import { groundHeight, waterLevelAt, zoneBiomeAt } from '../sim/world';
 import type { ChatBubbleStyle } from '../ui/chat_bubble_style';
 import { tEntity } from '../ui/entity_i18n';
 import type { IWorld } from '../world_api';
-import { buildAbilityMaterialPrewarmGroup } from './ability_material_prewarm';
+import {
+  abilityMaterialPrewarmMaterials,
+  buildAbilityMaterialPrewarmGroup,
+} from './ability_material_prewarm';
 import {
   AbilityVfx,
   AbilityVfxFx,
@@ -106,6 +109,8 @@ import {
 import { buildCampBraziers, type CampBraziersView } from './camp_braziers';
 import { canopyDetailPrewarmTextures } from './canopy_detail';
 import { canvasDataUrlAsync } from './canvas_data_url';
+import { castVfxProgramUnits, createSceneCastVfxReadiness } from './cast_vfx_prewarm';
+import type { CastVfxReadiness } from './cast_vfx_readiness_core';
 import { buildCastleFeatures, type CastleFeaturesView } from './castle_features';
 import { buildCelestialSprites, type CelestialSprites } from './celestial_sprites';
 import { buildCharacterEffectPrewarmGroup } from './character_effect_prewarm';
@@ -202,6 +207,7 @@ import {
 } from './compile_priority_core';
 import { preflightWebGL2ContextRecycle, type RecycledRendererContext } from './context_recycle';
 import { trackWebGLContext } from './context_release';
+import { type CorpseBeacon, createCorpseBeacon } from './corpse_beacon';
 import {
   animatesEveryFrame,
   animCadenceFrames,
@@ -668,6 +674,7 @@ import {
 import { createPrewarmGroupSlot, createVariantPrewarmSlot } from './variant_prewarm_slot';
 import { SCHOOL_COLORS, Vfx } from './vfx';
 import { createOffsetVfxAnchor, createVfxAnchor, type VfxAnchorPose } from './vfx_anchor';
+import { buildCastVfxBasicStandIns } from './vfx_basic_materials';
 import {
   finishViewCandidates,
   sampleCreatedViewType,
@@ -1227,7 +1234,9 @@ export class Renderer {
   scene = new THREE.Scene();
   // A soft light pillar marking the local player's corpse during the ghost run.
   // Built lazily on first death, then just repositioned/toggled (no per-frame alloc).
-  private corpseBeacon: THREE.Mesh | null = null;
+  private corpseBeacon: CorpseBeacon | null = null;
+  private abilityMaterialStandIns: THREE.Material[] | null = null;
+  private castVfxReadiness: CastVfxReadiness;
   camera: THREE.PerspectiveCamera;
   webgl: THREE.WebGLRenderer;
   views = new Map<number, EntityView>();
@@ -2972,9 +2981,15 @@ export class Renderer {
     this.abilityVfxFx.setSpiritCompileGate(
       this.asyncCompileSupported ? (root: THREE.Object3D) => this.compileGate(root) : null,
     );
+    // The painter draws no cast until every cast program is linked (cast_vfx_prewarm.ts).
+    this.scene.add(buildCastVfxBasicStandIns());
+    const standIns = (): THREE.Material[] | null => this.abilityMaterialStandIns;
+    this.castVfxReadiness = createSceneCastVfxReadiness(this.scene, this.webgl, standIns);
     this.abilityVfx = new AbilityVfx({
       vfx: this.vfx,
       fx: this.abilityVfxFx,
+      castVfxAdmit: () => this.castVfxReadiness.admit(),
+      castVfxReady: () => this.castVfxReadiness.ready(),
       anchor: vfxAnchor,
       spawnAoeRing: (x, z, radius, school, colorHex) =>
         this.spawnAoeRing(x, z, radius, school, colorHex),
@@ -4392,6 +4407,7 @@ export class Renderer {
       renderDiagnostics: this.lastFrameStats.renderDiagnostics,
       lastFrame: snapshotRendererFrameStats(this.lastFrameStats),
       prewarm: this.lastPrewarmStats,
+      castVfx: this.castVfxReadiness.snapshot(),
       entryDetailHorizon: this.entryDetailHorizon.snapshot(),
       gpuQueue: this.backgroundGpuWork.stats(),
       gpuPrep: { budget: this.gpuPrepBudget.snapshot(), events: gpuPrepEventsSnapshot() },
@@ -5689,8 +5705,16 @@ export class Renderer {
     const abilityMaterialSlot = createVariantPrewarmSlot(
       variantSlotHost,
       'ability-materials',
-      buildAbilityMaterialPrewarmGroup,
+      () => {
+        const group = buildAbilityMaterialPrewarmGroup();
+        this.abilityMaterialStandIns = abilityMaterialPrewarmMaterials(group);
+        return group;
+      },
     );
+    const castVfxUnits = (): PrewarmResumeUnit[] =>
+      castVfxProgramUnits(this.scene, abilityMaterialSlot.group, (root) =>
+        this.compilePrewarmColorPrograms(root, false),
+      );
     let mountPrewarmGroup: THREE.Group | null = null;
     const mountPrewarmPlannedKeys = mountPrewarmKeys(this.sim.ownedMounts());
     const mountPrewarmPendingKeys = new Set(mountPrewarmPlannedKeys);
@@ -5776,6 +5800,9 @@ export class Renderer {
       resumeUnits?: () => readonly PrewarmResumeUnit[];
       /** Optional remainder for a started entry that reports partial progress. */
       resumePartialUnits?: () => readonly PrewarmResumeUnit[];
+      /** The entry's program links, resumed as DEBT under `programs.<id>` when
+       * the entry never ran (a cast VFX has no stand-in). */
+      resumeProgramUnits?: () => readonly PrewarmResumeUnit[];
       run: () => void | Promise<void>;
       /** Read after run(): how much of the planned work actually happened. A
        * trimmed report downgrades the entry to 'partial' (prewarm_policy.ts),
@@ -5788,6 +5815,14 @@ export class Renderer {
     // Explicitly bounded units captured when their manifest entry misses the
     // loading deadline. Whole entry callbacks are never resumed live.
     const droppedEntries: PrewarmResumeEntry[] = [];
+    const droppedProgramEntries: PrewarmResumeEntry[] = [];
+    const dropEntry = (entry: PrewarmManifestEntry, units: readonly PrewarmResumeUnit[]): void => {
+      if (units.length > 0) droppedEntries.push({ id: entry.id, units });
+      const programs = entry.resumeProgramUnits?.() ?? [];
+      if (programs.length > 0) {
+        droppedProgramEntries.push({ id: `programs.${entry.id}`, units: programs });
+      }
+    };
     const resumeLedger = createPrewarmResumeLedger();
 
     // One shared dedupe store across EVERY compile collection in this entry
@@ -5978,8 +6013,7 @@ export class Renderer {
           textureDelta: 0,
           detail: entry.detail?.(),
         });
-        const units = entry.resumeUnits?.() ?? [];
-        if (units.length > 0) droppedEntries.push({ id: entry.id, units });
+        dropEntry(entry, entry.resumeUnits?.() ?? []);
         return;
       }
       let status: RendererPrewarmManifestEntryStats['status'] = 'completed';
@@ -6618,51 +6652,35 @@ export class Renderer {
         detail: () => `objects=${weaponVfxPrewarmGroup?.children.length ?? 0}`,
       },
       {
-        // Spawn one of every pooled ability-VFX primitive (rings, decals,
-        // pillar, shell, slash ribbon, overlay sprite). The pools build their
-        // meshes visible=false, so no render pass ever draws them: their
-        // textures and geometry stay un-uploaded, and the first spec'd cast in
-        // the open world used to pay for both synchronously. The spawns bind
-        // the per-style decal textures and the six impact sheets, so the
-        // texture re-walk below uploads the whole canvas set now.
-        // abilityVfxFx.clear() in the finally block hides everything again.
-        //
-        // resumeUnits deliberately does NOT replay the spawn: run live it
-        // would pop a white ring/decal/flipbook burst at the player's feet
-        // (the same reason vfx.atlas retains nothing). It carries the
-        // invisible half instead, one impact sheet per unit plus one program
-        // link per distinct pooled material. That is also the MINIMAL variant
-        // constrained devices get in place of this entry
-        // (CONSTRAINED_PREWARM_RESUME): there the whole entry is skipped, so
-        // each 512px sheet is otherwise drawn on the first impact of its
-        // school, i.e. mid-combat.
+        // The cast VFX (cast_vfx_prewarm.ts): stage the lazy stand-ins, link
+        // every cast program through the compile arms; the spawn only binds
+        // textures for the walk (no frame draws it, so it links nothing:
+        // measured 2026-08-28). Dropped by the 3 s budget on the OpenGL
+        // desktops: the programs resume as debt right after the compile
+        // remainder, the textures stay cosmetic, and the painter draws no
+        // cast until every program is linked. resumeUnits never replays the
+        // spawn: live, it would pop a white burst at the player's feet.
         id: 'vfx.ability-primitives',
         category: 'vfx',
         priority: 62,
         required: false,
-        resumeUnits: () => [
-          ...abilityVfxTexturePrewarmSteps().map((step) => ({
+        resumeUnits: () =>
+          abilityVfxTexturePrewarmSteps().map((step) => ({
             id: `texture:${step.id}`,
             run: () => {
               for (const texture of step.build()) this.prewarmTexture(texture);
             },
           })),
-          ...abilityMaterialSlot.resumeUnits(),
-          ...collectAbilityVfxCompileTargets(this.scene).map((target) => ({
-            id: `program:${target.id}`,
-            run: () => this.compilePrewarmColorPrograms(target.object, false),
-          })),
-        ],
-        run: () => {
+        resumeProgramUnits: () => [...abilityMaterialSlot.resumeUnits(), ...castVfxUnits()],
+        run: async () => {
           this.abilityVfxFx.prewarmSpawn(p.pos.x, p.pos.y, p.pos.z - 5, p.id);
-          // The lazily-minted spell materials (ability_material_prewarm.ts):
-          // staged hidden here, linked by the compile lane with the rest.
           abilityMaterialSlot.run();
           this.scene.traverse((child) => {
             const renderable = child as RenderableDiagnosticObject;
             if (renderable.userData.renderCategory !== 'vfx' || !renderable.material) return;
             this.prewarmMaterialTextures(renderable.material);
           });
+          await Promise.all(castVfxUnits().map((unit) => unit.run()));
         },
       },
       {
@@ -7044,10 +7062,9 @@ export class Renderer {
         // units, which run after entry instead of never.
         if (!prewarmEntryRuns(entry.id, policy)) {
           const counts = liveProgramWatch.programCounts(this.webgl);
-          const skipUnits = prewarmEntryResumesAfterSkip(entry.id, policy)
-            ? (entry.resumeUnits?.() ?? [])
-            : [];
-          if (skipUnits.length > 0) droppedEntries.push({ id: entry.id, units: skipUnits });
+          const resumes = prewarmEntryResumesAfterSkip(entry.id, policy);
+          const skipUnits = resumes ? (entry.resumeUnits?.() ?? []) : [];
+          if (resumes) dropEntry(entry, skipUnits);
           manifestEntries.push({
             id: entry.id,
             category: entry.category,
@@ -7101,6 +7118,7 @@ export class Renderer {
         units: deferredSubmitUnits.splice(0, deferredSubmitUnits.length),
       });
     }
+    droppedEntries.push(...droppedProgramEntries);
     if (postPaintCompileUnits.length > 0) {
       droppedEntries.push({
         id: 'programs.compile-post-paint',
@@ -11852,32 +11870,14 @@ export class Renderer {
     }
     phaseStart = this.markRendererPhase(framePhaseMs, 'entities', phaseStart);
 
-    // Corpse beacon: a soft light pillar over the local player's body while their
-    // spirit runs back to it (the ghost run). Built once, then just repositioned.
+    // Corpse beacon (corpse_beacon.ts), built on the first ghost run.
     {
       const self = this.sim.player;
       const corpse = self?.dead && self.ghost ? self.corpsePos : null;
       if (corpse) {
-        if (!this.corpseBeacon) {
-          const geo = new THREE.CylinderGeometry(0.25, 0.25, 14, 8, 1, true);
-          const mat = new THREE.MeshBasicMaterial({
-            color: 0xbfe6ff,
-            transparent: true,
-            opacity: 0.3,
-            depthWrite: false,
-            side: THREE.DoubleSide,
-            blending: THREE.AdditiveBlending,
-          });
-          this.corpseBeacon = new THREE.Mesh(geo, mat);
-          this.corpseBeacon.renderOrder = 2;
-          setRenderCategory(this.corpseBeacon, 'ui3d');
-          this.scene.add(this.corpseBeacon);
-        }
-        this.corpseBeacon.visible = true;
-        this.corpseBeacon.position.set(corpse.x, corpse.y + 7, corpse.z);
-      } else if (this.corpseBeacon) {
-        this.corpseBeacon.visible = false;
-      }
+        this.corpseBeacon ??= createCorpseBeacon(this.scene);
+        this.corpseBeacon.sync(corpse);
+      } else this.corpseBeacon?.sync(null);
     }
 
     let worldStart = performance.now();

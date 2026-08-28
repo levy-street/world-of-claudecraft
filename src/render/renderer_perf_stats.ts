@@ -7,6 +7,7 @@
 import type { BiomeId } from '../sim/types';
 import type { BackgroundGpuQueueStats } from './background_gpu_queue';
 import type { BuildLedgerSnapshot } from './build_ledger_core';
+import type { CastVfxReadinessSnapshot } from './cast_vfx_readiness_core';
 import type { LookPiecesStats } from './characters/look_pieces';
 import type { EntryDetailHorizonSnapshot } from './entry_detail_horizon';
 import type { FoliagePerfStats } from './foliage';
@@ -111,6 +112,7 @@ export interface RendererPerfStats {
   renderDiagnostics: RenderDiagnosticsSnapshot;
   lastFrame?: RendererFrameStats;
   prewarm: RendererPrewarmStats | null;
+  castVfx: CastVfxReadinessSnapshot;
   entryDetailHorizon: EntryDetailHorizonSnapshot;
   gpuQueue: BackgroundGpuQueueStats;
   gpuPrep: RendererGpuPrepStats;

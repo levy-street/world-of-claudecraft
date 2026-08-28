@@ -320,7 +320,7 @@ describe('the manifest wiring (source pins)', () => {
 
   it('is a staged compile group, so the boot compile lane links it', () => {
     expect(renderer).toContain(
-      "const abilityMaterialSlot = createVariantPrewarmSlot(\n      variantSlotHost,\n      'ability-materials',\n      buildAbilityMaterialPrewarmGroup,\n    );",
+      "const abilityMaterialSlot = createVariantPrewarmSlot(\n      variantSlotHost,\n      'ability-materials',\n      () => {\n        const group = buildAbilityMaterialPrewarmGroup();\n        this.abilityMaterialStandIns = abilityMaterialPrewarmMaterials(group);\n        return group;\n      },\n    );",
     );
     expect(renderer).toContain('abilityMaterialSlot.staged(),');
   });

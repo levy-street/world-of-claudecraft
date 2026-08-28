@@ -96,6 +96,15 @@ export interface AbilityVfxDeps {
   // gesture below: without an authored clip, triggerAttack would fall back to
   // a weapon swing, which a blessing must never read as. Optional for tests.
   hasGestureClip?: (entityId: number, abilityId: string) => boolean;
+  // Whether a cast may draw at all: false while a program the pooled
+  // primitives or the lazy spell stand-ins need is still unlinked (the boot
+  // manifest missed them and the resume lane has not reached them yet), so a
+  // first cast never links a program cold on a live frame. The renderer's
+  // cast_vfx_readiness_core decides; optional for tests (always admitted).
+  castVfxAdmit?: () => boolean;
+  // The same answer for the per-frame syncEntity consult, uncounted (a
+  // refusal is a cast, not a frame). Defaults to castVfxAdmit.
+  castVfxReady?: () => boolean;
   // True when the ability resolves with no cast bar (no cast time, channel, or
   // empower hold). Only these get the synthetic pre-release windup phase: a
   // real cast already performed its ceremony through the live castingAbility
@@ -497,10 +506,20 @@ export class AbilityVfx {
 
   // Returns true when this painter fully handled the event (the renderer skips
   // its generic school-colored arm), false to fall through unchanged.
+  private admitted(): boolean {
+    return this.deps.castVfxAdmit?.() ?? true;
+  }
+
+  private ready(): boolean {
+    return (this.deps.castVfxReady ?? this.deps.castVfxAdmit)?.() ?? true;
+  }
+
   handleSpellfx(ev: AbilityVfxSpellfxEvent): boolean {
     if (!ev.ability || !CAST_FX.has(ev.fx)) return false;
     const spec = abilityVfxSpec(ev.ability);
     if (!spec) return false;
+    // Claimed and drawn as nothing: the generic arm would link cold too.
+    if (!this.admitted()) return true;
     const full = abilityVfxFullSpec(ev.ability);
     // Beam-archetype channels (mind rays, drains) never fly a projectile:
     // every tick's cast-fx event feeds the channel tracker, which draws the
@@ -878,6 +897,7 @@ export class AbilityVfx {
     if (ev.fx !== 'nova' && ev.fx !== 'burst' && ev.fx !== 'tick') return false;
     const spec = abilityVfxSpec(ev.ability);
     if (!spec) return false;
+    if (!this.admitted()) return true;
     const casterId = ev.sourceId ?? -1;
     const fx = this.deps.fx;
     const gy = fx.groundYAt(ev.x, ev.z);
@@ -1035,7 +1055,7 @@ export class AbilityVfx {
   // special whose ONLY event is its hit - that contact IS its cast, so it
   // charges the cast budget (deduped) and runs the full sequence.
   onDamage(ev: AbilityVfxDamageEvent): void {
-    if (ev.kind !== 'hit' || ev.amount <= 0) return;
+    if (ev.kind !== 'hit' || ev.amount <= 0 || !this.admitted()) return;
     const nowSec = this.now();
     const local = this.deps.localPlayerId?.() === ev.sourceId;
     if (!ev.ability) {
@@ -1147,6 +1167,8 @@ export class AbilityVfx {
   // anything not refreshed this frame, so there is no teardown bookkeeping.
   // Allocation-free per call.
   syncEntity(e: AbilityVfxEntityState, renderEffects = true): void {
+    // The held state below is kept either way; only the draws wait.
+    if (renderEffects && !this.ready()) renderEffects = false;
     const fx = this.deps.fx;
     let held = this.heldSemantic.get(e.id);
     if (!held) {

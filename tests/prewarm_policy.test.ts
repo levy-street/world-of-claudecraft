@@ -341,6 +341,11 @@ describe('resolvePrewarmPolicy: unconstrained desktop', () => {
     expect(prewarmResumeIsDebt('programs.compile')).toBe(true);
     expect(prewarmResumeIsDebt('programs.compile-submit')).toBe(true);
     expect(prewarmResumeIsDebt('programs.compile-post-paint')).toBe(true);
+    // A dropped entry's program links resume under `programs.<entry id>`: a
+    // cast VFX has no stand-in, so its links are debt while its textures keep
+    // the entry's cosmetic class.
+    expect(prewarmResumeIsDebt('programs.vfx.ability-primitives')).toBe(true);
+    expect(prewarmResumeIsDebt('vfx.ability-primitives')).toBe(false);
     expect(prewarmResumeIsDebt('textures.scene')).toBe(true);
     expect(prewarmResumeIsDebt('surface-detail.textures')).toBe(true);
     // The foliage species stream in with travel (ambient scene, not an
@@ -388,17 +393,25 @@ describe('resolvePrewarmPolicy: unconstrained desktop', () => {
       { id: 'props.ghost-fade-variants' },
       { id: 'textures.scene' },
       { id: 'vfx.weapon-skins' },
+      { id: 'vfx.ability-primitives' },
       { id: 'programs.compile' },
       { id: 'programs.compile-submit' },
+      { id: 'programs.vfx.ability-primitives' },
+      { id: 'programs.compile-post-paint' },
     ]);
     // Program links lead the debt class (a met unlinked program blocks the
     // frame; a texture upload is paced), then the upload debt, then cosmetic.
+    // The renderer pushes a dropped entry's program debt between the compile
+    // remainder and the hidden catalogs, and the order keeps it there.
     expect(ordered.map((entry) => entry.id)).toEqual([
       'programs.compile',
       'programs.compile-submit',
+      'programs.vfx.ability-primitives',
+      'programs.compile-post-paint',
       'textures.scene',
       'props.ghost-fade-variants',
       'vfx.weapon-skins',
+      'vfx.ability-primitives',
     ]);
     // All-cosmetic and all-debt lists come back untouched.
     expect(orderPrewarmResumeEntries([{ id: 'vfx.weapon-skins' }])).toEqual([

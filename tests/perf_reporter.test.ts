@@ -600,6 +600,7 @@ function snapshot(): PerfSnapshot {
       },
       renderDiagnostics: renderDiagnostics(),
       prewarm: prewarmStats(),
+      castVfx: { ready: true, refused: 0, pending: 0 },
       entryDetailHorizon: {
         active: false,
         cap: 700,

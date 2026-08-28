@@ -662,6 +662,7 @@ const RENDER_PURE_CORES = [
   'src/render/zone_feature_visibility_core.ts',
   'src/render/zone_eviction_core.ts',
   'src/render/zone_prewarm_templates_core.ts',
+  'src/render/cast_vfx_readiness_core.ts',
   'src/render/characters/skeleton_update_core.ts',
   'src/render/characters/material_program_shape_core.ts',
   'src/render/characters/tinted_material_cache_core.ts',

@@ -120,6 +120,7 @@ function baseSnapshot(): PerfSnapshot {
       renderDiagnostics: {} as never,
       nightAmount: 0,
       prewarm: null,
+      castVfx: { ready: true, refused: 0, pending: 0 },
       entryDetailHorizon: {
         active: false,
         cap: 700,
