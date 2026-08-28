@@ -188,6 +188,7 @@ describe('WOC Store window contract', () => {
       hud.indexOf("$('#pf-name').textContent"),
     );
     expect(walletUiSubscription).toContain('this.claudiumWindow.onWalletChanged();');
+    expect(walletUiSubscription).toContain('this.wocMarketWindow.onWalletChanged();');
     // No conditional GPU promotion on the store windows: the old
     // body.store-stack-open will-change rule dropped the promotion in the same
     // frame a window's inline display flipped, racing Chromium's layer

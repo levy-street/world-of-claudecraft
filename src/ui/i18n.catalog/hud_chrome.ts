@@ -520,6 +520,7 @@ export const hudChromeStrings = {
     reset: 'Reset',
     presets: {
       classic: 'Classic Gold',
+      fancyGold: 'Fancy Gold (WIP)',
       midnight: 'Midnight',
       parchment: 'Parchment',
       highContrast: 'High Contrast',
@@ -1484,6 +1485,18 @@ export const hudChromeStrings = {
     reset: 'Reset',
     done: 'Done',
     cancel: 'Cancel',
+    // The small plus/minus buttons at the end of the primary bar: plus reveals
+    // the next optional row (secondary, then third), minus hides the topmost
+    // visible one. Same settings as the Interface options checkboxes.
+    showExtraBar: 'Show Another Action Bar',
+    hideExtraBar: 'Hide an Action Bar',
+    // The are-you-sure prompt shown when a captured key is already bound
+    // elsewhere: a key lives on one action at a time, so accepting UNBINDS the
+    // other one. {key} is the key label, {other} the action losing it, and
+    // {action} the one gaining it.
+    conflictTitle: 'Key Already Bound',
+    conflictBody: '{key} is already bound to {other}. Binding it to {action} will unbind {other}.',
+    conflictAccept: 'Rebind Anyway',
     resetConfirmTitle: 'Reset action bar keys?',
     resetConfirmBody:
       'The first bar returns to its default keys. The second and third bars become unbound. This cannot be undone.',
@@ -1862,6 +1875,7 @@ export const hudChromeStrings = {
     // Enabled only while the secondary row is visible. Slots remain reachable
     // through keybinds and the mobile action-ring pages while this row is hidden.
     showThirdActionBar: 'Show Third Action Bar',
+    combineActionBars: 'Combine Action Bars',
     // Interface panel toggle (off by default): strips the black background,
     // border, and keybind label from action-bar slots with no ability or item
     // bound, so an unlearned class's bar reads clean instead of a wall of empty
@@ -3481,6 +3495,10 @@ export const hudChromeStrings = {
   },
   partyFrames: {
     section: 'Party and Raid Frames',
+    // The Frames tab's one labelled subsection (options window): every
+    // declarative row there tunes the party frames now. Wordy (M16):
+    // non-Latin fills land in this change.
+    optionsSection: 'Party Frame Options',
     unlock: 'Move party and raid frames',
     lock: 'Lock party and raid frames',
     style: 'Frame Style',
@@ -3521,6 +3539,108 @@ export const hudChromeStrings = {
   // non-Latin fills land in this same change.
   frameReset: {
     label: 'Reset Frame Positions',
+  },
+  // Interface panel (Combat tab) row above Auto-Attack on Ability Use: one press
+  // loosens every movable HUD frame (action bars, cast bar, menu rail, minimap,
+  // unit and pet frames) so they can be dragged and scaled, and the button
+  // relabels itself to the lock action while they are loose. `unlockFrame` /
+  // `lockFrame` name each frame's own corner button, `resizeFrame` its SE grip.
+  // `resizeFrame` names an action rather than a gesture because the grip is a
+  // real button driven by pointer drag AND arrow keys, so a screen reader must
+  // not be told to drag something a keyboard player operates with arrows.
+  // All wordy (M16), so the five non-Latin fills land in this same change.
+  interfaceUnlock: {
+    label: 'Edit Frames',
+    unlock: 'Unlock interface',
+    lock: 'Lock interface',
+    // The floating button that appears while the interface is unlocked, so
+    // finishing an arrangement does not mean reopening the options menu.
+    lockAll: 'Lock Interface',
+    // The two guidance notes under the Unlock Interface option row: what shows
+    // while editing (and where extra bars come from), and that the game is
+    // deliberately inert for the duration.
+    barsNote:
+      'Only the action bars you have turned on appear while editing. To place more bars, add them with the plus and minus buttons on the main action bar first.',
+    frozenNote:
+      'While editing, the interface and camera are frozen: buttons and frames are still pictures to arrange, and clicks will not reach the game world.',
+    unlockFrame: 'Unlock this frame',
+    lockFrame: 'Lock this frame',
+    resizeFrame: 'Resize this frame',
+    // Name chips shown on each unlocked frame. Only the frames with no existing
+    // name key mint one here (the unit frames reuse their aria labels, the
+    // buff/debuff rows the target-aura tab names, the cast bar its own aria).
+    // Action Bar / Minimap / Stance Bar are wordy (M16), so their five
+    // non-Latin fills land in this same change; Menu / XP Bar / Chat are not.
+    frameNames: {
+      actionBar1: 'Action Bar',
+      actionBar2: 'Action Bar 2',
+      actionBar3: 'Action Bar 3',
+      steamWishlist: 'Wishlist Reminder',
+      menu: 'Menu',
+      minimap: 'Minimap',
+      stanceBar: 'Stance Bar',
+      xpBar: 'XP Bar',
+      chat: 'Chat',
+      actionBarGroup: 'Action Bars',
+      // The unit frames chip plain functional names rather than their lore
+      // aria labels (Your Hero / Your Mark / Your Band), which read as riddles
+      // in an arrangement mode.
+      playerFrame: 'Player',
+      targetFrame: 'Target',
+      partyFrames: 'Party',
+      // The auto-attack swing timer (#swingbar), hidden outside combat like
+      // the cast bar, so its chip is what names the placeholder.
+      swingBar: 'Auto Attack',
+    },
+    // The frames settings dropdown beside the floating Lock Interface button:
+    // a show/hide sub-menu plus the frame-behavior toggles that used to live
+    // in the options window. All wordy (M16): the five non-Latin fills land in
+    // this same change.
+    framesMenu: 'Frames Settings',
+    framesMenuTitle:
+      'Show or hide individual frames. An unticked frame stays hidden until you tick it again or reset to defaults.',
+    showHideFrames: 'Show or Hide Frames',
+    // The aura-row direction toggles in that dropdown (buffsLeftToRight /
+    // debuffsLeftToRight): ticked reads left to right, unticked keeps the
+    // stock right-to-left growth. Wordy (M16): non-Latin fills in this change.
+    buffsLeftToRight: 'Buffs left to right',
+    debuffsLeftToRight: 'Debuffs left to right',
+    // lockPlayerFrameToActionBar: the frame glues to the top of the action
+    // bars and stops being individually movable. Wordy (M16): non-Latin
+    // fills land in this change.
+    lockPlayerFrameToBar: 'Lock Player Frame to Action Bar',
+    // Orientation flips + the per-frame size reset (all wordy, M16:
+    // non-Latin fills land in this change). actionBarsVertical is the ONE
+    // combined-shape toggle; the numbered three are the per-bar rows shown
+    // while the bars are split.
+    actionBarsVertical: 'Vertical Action Bars',
+    actionBar1Vertical: 'Vertical Action Bar',
+    actionBar2Vertical: 'Vertical Action Bar 2',
+    actionBar3Vertical: 'Vertical Action Bar 3',
+    menuRailHorizontal: 'Horizontal Menu',
+    snapToGrid: 'Snap to Grid',
+    previewMemberName: '{className} {number}',
+    resetFrameSize: 'Reset size',
+    // The per-frame accessible name for that button ({name} is the frame name).
+    resetFrameSizeFor: 'Reset size for {name}',
+    // The sample spell name on the edit mode's filled cast-bar preview.
+    previewSpell: 'Example Spell',
+  },
+  // The export/import rows (Frames tab: the frame layout; General tab: every
+  // setting family). All wordy (M16): the five non-Latin fills land in this
+  // same change.
+  transfer: {
+    frameLayout: 'Frame Layout',
+    allSettings: 'All Settings',
+    exportAction: 'Export',
+    importAction: 'Import',
+    copy: 'Copy',
+    copied: 'Copied to clipboard.',
+    copyFailed: 'Copy failed. Select the code and copy it yourself.',
+    applyReload: 'Apply and Reload',
+    pastePlaceholder: 'Paste an exported code here.',
+    invalid: 'That is not a valid export code.',
+    wrongKind: 'That code is a different export type.',
   },
   // Item tooltip: the minimum character level needed to equip a piece (classic
   // "Requires Level N"). Shown red when the viewer is below it. {level} runs
@@ -3781,6 +3901,17 @@ export const hudChromeStrings = {
     benefits:
       'Link your Steam account from the desktop app to mirror the deeds you earn into Steam achievements.',
     noTicket: 'Steam did not provide a link ticket. Start Steam, then try again.',
+    // The always-on wishlist reminder (src/ui/steam_wishlist.ts), a plain
+    // outbound store link with none of the account-link plumbing above it.
+    // `wishlist` is the chip label; `wishlistAria` is its accessible name and
+    // tooltip. It OPENS WITH the visible label on purpose: an accessible name
+    // that does not contain the visible text fails WCAG 2.5.3 (Label in Name)
+    // for speech input, and the mobile pill's short caption is inside it too.
+    wishlist: 'Wishlist on Steam',
+    wishlistAria: 'Wishlist on Steam: open the World of ClaudeCraft store page',
+    // The mobile More-tray caption: a 4-column 40px pill cannot hold the full
+    // label, so the pill shows this and carries `wishlistAria` as its name.
+    wishlistShort: 'Wishlist',
   },
   // Epic account link (the deeds achievement mirror), the stacked card beside
   // the Steam one on character select. Renders only when the server's
@@ -5565,7 +5696,8 @@ export const hudChromeStrings = {
     minLevelNote: 'Requires level {level}',
   },
   // The $WOC Exchange window (docs/prd/woc/marketplace.md): USD-denominated
-  // auctions settled in $WOC, browser-web only, config-gated server-side.
+  // auctions settled in $WOC, browser web + website desktop only,
+  // config-gated server-side.
   // Every USD amount renders through formatNumber currency options and every
   // timestamp through formatDateTime (UTC plus local, per the PRD); the
   // window never composes numbers into these strings by concatenation.
@@ -5603,11 +5735,11 @@ export const hudChromeStrings = {
     // already sent is not health-gated and still settles.
     pausedBanner:
       'Trading is paused. Auctions keep counting down; new listings, bids, offers, and payments wait until trading resumes, and a payment already sent still settles.',
-    walletBanner: 'Link and verify a wallet to bid, buy, or sell on the Exchange.',
-    // The banner's own shortcut into the shared wallet connect flow (the
-    // woc:wallet-verify event the store and daily rewards buttons dispatch),
-    // so an unlinked player is never told to link with nowhere to do it.
-    walletBannerCta: 'Connect wallet',
+    walletLinkedDisconnected:
+      'Your public address is linked. Reconnect that wallet app when you want to pay with $WOC.',
+    walletLinkedConnected: 'Your linked wallet app is connected and ready for $WOC purchases.',
+    walletUsdBalance: '{amount} USD',
+    walletUsdUnknown: 'Unknown',
     // The rate is per ONE dollar, said outright: 'per USD' read as a unit
     // label and players asked per how many.
     rateNote: 'Rate: about {tokens} $WOC per $1.00 USD as of {time}.',

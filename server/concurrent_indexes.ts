@@ -59,6 +59,11 @@ import {
   PLAYER_REPORTS_RETENTION_INVALID_INDEX_DROP_SQL,
 } from './player_reports_retention_index';
 import {
+  WOC_MARKET_OPS_CLOSED_INDEX_SQL,
+  WOC_MARKET_OPS_CLOSED_INVALID_INDEX_CHECK_SQL,
+  WOC_MARKET_OPS_CLOSED_INVALID_INDEX_DROP_SQL,
+} from './woc_market_ops_listings_index';
+import {
   WOC_MARKET_SALES_SELLER_INDEX_SQL,
   WOC_MARKET_SALES_SELLER_INVALID_INDEX_CHECK_SQL,
   WOC_MARKET_SALES_SELLER_INVALID_INDEX_DROP_SQL,
@@ -155,5 +160,13 @@ export const CONCURRENT_INDEX_MIGRATIONS: readonly ConcurrentIndexMigration[] = 
     createSql: WOC_MARKET_SALES_SELLER_INDEX_SQL,
     checkSql: WOC_MARKET_SALES_SELLER_INVALID_INDEX_CHECK_SQL,
     dropSql: WOC_MARKET_SALES_SELLER_INVALID_INDEX_DROP_SQL,
+  },
+  // The internal dashboard's Sold and Cancelled listing filters. Appended,
+  // never inserted: the migration order is load-bearing and pinned.
+  {
+    name: 'woc_market_ops_closed_created',
+    createSql: WOC_MARKET_OPS_CLOSED_INDEX_SQL,
+    checkSql: WOC_MARKET_OPS_CLOSED_INVALID_INDEX_CHECK_SQL,
+    dropSql: WOC_MARKET_OPS_CLOSED_INVALID_INDEX_DROP_SQL,
   },
 ];

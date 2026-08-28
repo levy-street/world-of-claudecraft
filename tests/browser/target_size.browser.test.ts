@@ -237,6 +237,22 @@ describe('mobile target-size: in-game touch controls are >=40x40 in landscape', 
     expectAtLeastFloor(donate, '#mobile-donate');
   });
 
+  it('the Wishlist link in the mobile More tray', () => {
+    document.body.className = 'mobile-touch game-active mobile-more-open';
+    const tray = el('div', { id: 'mobile-extra-controls', class: 'window panel' });
+    const grid = el('div', { id: 'mobile-extra-grid' });
+    const wishlist = el('a', {
+      id: 'mobile-steam-wishlist',
+      class: 'mobile-btn steam-wishlist',
+      href: 'https://store.steampowered.com/',
+    });
+    wishlist.textContent = 'Wishlist';
+    grid.appendChild(wishlist);
+    tray.appendChild(grid);
+    document.body.appendChild(tray);
+    expectAtLeastFloor(wishlist, '#mobile-steam-wishlist');
+  });
+
   it('the Crafting button in the mobile More tray', () => {
     document.body.className = 'mobile-touch game-active mobile-more-open';
     const tray = el('div', { id: 'mobile-extra-controls', class: 'window panel' });

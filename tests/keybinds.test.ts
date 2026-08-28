@@ -885,3 +885,61 @@ describe('every bind action has a localized label key', () => {
     expect(new RegExp(`^\\s+${id}:\\s+'`, 'm').test(mapBody)).toBe(true);
   });
 });
+
+// findBindConflict is the rebind UI's LOOK-AHEAD: it reports exactly what
+// bind() would silently unbind, so the options window can ask before stealing a
+// key. It must mirror bind()'s rules and mutate nothing.
+describe('Keybinds.findBindConflict', () => {
+  it('reports nothing for a key no other action holds', () => {
+    const kb = new Keybinds();
+    expect(kb.findBindConflict('interact', 0, 'F9')).toBeNull();
+  });
+
+  it('names the action a rebind would steal the key from, and its slot', () => {
+    const kb = new Keybinds();
+    expect(kb.bind('interact', 0, 'KeyP')).toBe(true);
+    const conflict = kb.findBindConflict('map', 0, 'KeyP');
+    expect(conflict).toEqual({ id: 'interact', index: 0, code: 'KeyP' });
+    // and it is exactly what bind() then evicts
+    expect(kb.bind('map', 0, 'KeyP')).toBe(true);
+    expect(kb.codeAt('interact', 0)).toBeNull();
+  });
+
+  it('mutates nothing: asking twice gives the same answer and the binding survives', () => {
+    const kb = new Keybinds();
+    kb.bind('interact', 0, 'KeyP');
+    expect(kb.findBindConflict('map', 0, 'KeyP')).toEqual(kb.findBindConflict('map', 0, 'KeyP'));
+    expect(kb.codeAt('interact', 0)).toBe('KeyP');
+  });
+
+  it('is not its own conflict when a slot is rebound to the key it already holds', () => {
+    const kb = new Keybinds();
+    kb.bind('interact', 0, 'KeyP');
+    expect(kb.findBindConflict('interact', 0, 'KeyP')).toBeNull();
+  });
+
+  it('reports a reserved code as no conflict (bind refuses it before evicting)', () => {
+    const kb = new Keybinds();
+    kb.bind('interact', 0, 'KeyP');
+    expect(kb.findBindConflict('map', 0, 'Escape')).toBeNull();
+    expect(kb.bind('map', 0, 'Escape')).toBe(false);
+    expect(kb.codeAt('interact', 0)).toBe('KeyP');
+  });
+
+  it('compares the stored form for held actions, so a modifier chord is not a false miss', () => {
+    const kb = new Keybinds();
+    // Held actions store the modifier-stripped code, which is what bind()
+    // compares, so capturing Shift+KeyJ over a bare KeyJ IS a conflict.
+    expect(kb.bind('forward', 0, 'KeyJ')).toBe(true);
+    const conflict = kb.findBindConflict('back', 0, 'Shift+KeyJ');
+    expect(conflict?.id).toBe('forward');
+    expect(conflict?.code).toBe('KeyJ');
+  });
+
+  it('reports an unknown action or an out-of-range slot as no conflict', () => {
+    const kb = new Keybinds();
+    kb.bind('interact', 0, 'KeyP');
+    expect(kb.findBindConflict('nosuchaction', 0, 'KeyP')).toBeNull();
+    expect(kb.findBindConflict('map', 9, 'KeyP')).toBeNull();
+  });
+});

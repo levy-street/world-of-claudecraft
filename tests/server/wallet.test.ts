@@ -34,8 +34,10 @@ import { withErrors } from '../../server/http/middleware/with_errors';
 import type { Ctx, Method, Middleware } from '../../server/http/types';
 import {
   resetRateLimitClock,
+  resetWalletHandoffResultRateLimits,
   resetWalletLinkRateLimits,
   setRateLimitClock,
+  WALLET_HANDOFF_RESULT_MAX_PER_MINUTE,
   WALLET_LINK_MAX_PER_MINUTE,
 } from '../../server/ratelimit';
 import {
@@ -193,6 +195,7 @@ afterEach(() => {
   resetWalletDbForTests();
   resetWalletRuntimeForTests();
   resetWalletLinkRateLimits();
+  resetWalletHandoffResultRateLimits();
   desktopWalletHandoffs.clear();
   resetRateLimitClock();
   vi.restoreAllMocks();
@@ -338,7 +341,7 @@ describe('desktop browser wallet handoff routes', () => {
 
     expect(response.status).toBe(400);
     expect(response.body).toEqual({
-      error: 'transaction wallet does not match the linked account wallet',
+      error: 'wallet does not match the linked account wallet',
       code: 'wallet.handoff_invalid',
     });
   });
@@ -363,6 +366,143 @@ describe('desktop browser wallet handoff routes', () => {
     expect(response.status).toBe(400);
     expect(response.body).toEqual({
       error: 'invalid desktop wallet operation',
+      code: 'wallet.handoff_invalid',
+    });
+  });
+
+  it('rejects an unknown completion kind and screens the create shape legs', async () => {
+    authedDb();
+    vi.mocked(walletForAccount).mockResolvedValue({
+      account_id: 7,
+      pubkey: address,
+      linked_at: '2026-07-01T00:00:00.000Z',
+    });
+    // Complete: an unknown kind is refused by the route's own screen, before
+    // the store's action-mismatch check can even run.
+    const badKind = await runRoute('POST', '/api/desktop-wallet/complete', {
+      body: { code: 'x'.repeat(43), kind: 'mystery', address, signature: 'sig' },
+    });
+    expect(badKind.status).toBe(400);
+    expect(badKind.body).toEqual({
+      error: 'invalid wallet authorization result',
+      code: 'wallet.handoff_invalid',
+    });
+    // Create: a non-Solana expectedAddress and an over-long reference are
+    // each refused at the shape screen (the validShape legs, per dimension).
+    const badAddress = await runRoute('POST', '/api/desktop-wallet/create', {
+      headers: { authorization: BEARER },
+      body: { kind: 'transaction', expectedAddress: 'not-an-address!', reference: 'CLM_x' },
+    });
+    expect(badAddress.status).toBe(400);
+    expect(badAddress.body).toEqual({
+      error: 'invalid desktop wallet operation',
+      code: 'wallet.handoff_invalid',
+    });
+    const longReference = await runRoute('POST', '/api/desktop-wallet/create', {
+      headers: { authorization: BEARER },
+      body: { kind: 'transaction', expectedAddress: address, reference: 'r'.repeat(257) },
+    });
+    expect(longReference.status).toBe(400);
+    expect(longReference.body).toEqual({
+      error: 'invalid desktop wallet operation',
+      code: 'wallet.handoff_invalid',
+    });
+  });
+
+  it('relays a step-up signature for the authenticated desktop account', async () => {
+    authedDb();
+    vi.mocked(walletForAccount).mockResolvedValue({
+      account_id: 7,
+      pubkey: address,
+      linked_at: '2026-07-01T00:00:00.000Z',
+    });
+    const nonce = 'ab'.repeat(16);
+    desktopWalletHandoffs.authorizeStepUp(7, {
+      nonce,
+      message: 'World of ClaudeCraft $WOC Exchange: authorize moving an item into escrow.',
+      expectedAddress: address,
+      expiresAtMs: Date.now() + 60_000,
+    });
+    const created = await runRoute('POST', '/api/desktop-wallet/create', {
+      headers: { authorization: BEARER },
+      body: { kind: 'stepup', expectedAddress: address, nonce },
+    });
+    expect(created.status).toBe(200);
+    const code = String(bodyRecord(created.body).code);
+
+    // The claim serves the SERVER-stored challenge message, never renderer text.
+    const claimed = await runRoute('POST', '/api/desktop-wallet/claim', { body: { code } });
+    // The nonce stays server-side: the page signs only the message (which
+    // embeds the nonce line), so the claim wire carries nothing else.
+    expect(claimed.body).toEqual({
+      kind: 'stepup',
+      message: 'World of ClaudeCraft $WOC Exchange: authorize moving an item into escrow.',
+      expectedAddress: address,
+    });
+
+    const completed = await runRoute('POST', '/api/desktop-wallet/complete', {
+      body: { code, kind: 'stepup', address, signature: 'msg-signature' },
+    });
+    expect(completed.body).toEqual({ completed: true });
+
+    const result = await runRoute('POST', '/api/desktop-wallet/result', {
+      headers: { authorization: BEARER },
+      body: { code },
+    });
+    expect(result.body).toEqual({
+      status: 'complete',
+      result: { kind: 'stepup', address, signature: 'msg-signature' },
+    });
+  });
+
+  it('rejects a step-up handoff for a wallet other than the account link', async () => {
+    authedDb();
+    vi.mocked(walletForAccount).mockResolvedValue({
+      account_id: 7,
+      pubkey: address,
+      linked_at: '2026-07-01T00:00:00.000Z',
+    });
+    const response = await runRoute('POST', '/api/desktop-wallet/create', {
+      headers: { authorization: BEARER },
+      body: {
+        kind: 'stepup',
+        expectedAddress: '11111111111111111111111111111111',
+        nonce: 'cd'.repeat(16),
+      },
+    });
+    expect(response.status).toBe(400);
+    expect(response.body).toEqual({
+      error: 'wallet does not match the linked account wallet',
+      code: 'wallet.handoff_invalid',
+    });
+  });
+
+  it('rejects a step-up handoff with a malformed nonce or no issued challenge', async () => {
+    authedDb();
+    vi.mocked(walletForAccount).mockResolvedValue({
+      account_id: 7,
+      pubkey: address,
+      linked_at: '2026-07-01T00:00:00.000Z',
+    });
+    // Malformed nonce: refused at shape screening (renderer-supplied message
+    // text has no field to ride at all).
+    const malformed = await runRoute('POST', '/api/desktop-wallet/create', {
+      headers: { authorization: BEARER },
+      body: { kind: 'stepup', expectedAddress: address, nonce: 'nope' },
+    });
+    expect(malformed.status).toBe(400);
+    expect(malformed.body).toEqual({
+      error: 'invalid desktop wallet operation',
+      code: 'wallet.handoff_invalid',
+    });
+    // Well-formed but never issued: refused by the store.
+    const unissued = await runRoute('POST', '/api/desktop-wallet/create', {
+      headers: { authorization: BEARER },
+      body: { kind: 'stepup', expectedAddress: address, nonce: 'ef'.repeat(16) },
+    });
+    expect(unissued.status).toBe(400);
+    expect(unissued.body).toEqual({
+      error: 'step-up is not backed by an issued Exchange challenge',
       code: 'wallet.handoff_invalid',
     });
   });
@@ -539,6 +679,18 @@ describe('coded 429 (rateLimitedBodyToCode deviation)', () => {
       expect(r.status).toBe(400); // an allowed attempt still runs the db-free core
     }
     expectLimited(await runRoute('POST', '/api/wallet/link/challenge', opts));
+  });
+
+  it('POST /api/desktop-wallet/result limits the (max + 1)th poll', async () => {
+    // The 1 Hz handoff poll was the one unmetered arm of the quartet; the cap
+    // sits far above two concurrent handoffs so an honest poll never trips.
+    authedDb();
+    const opts = { headers: { authorization: BEARER }, body: { code: 'x' } };
+    for (let i = 0; i < WALLET_HANDOFF_RESULT_MAX_PER_MINUTE; i++) {
+      const r = await runRoute('POST', '/api/desktop-wallet/result', opts);
+      expect(r.status).toBe(200); // an unknown code still answers { status: 'missing' }
+    }
+    expectLimited(await runRoute('POST', '/api/desktop-wallet/result', opts));
   });
 
   it('POST /api/wallet/link limits the (max + 1)th attempt', async () => {

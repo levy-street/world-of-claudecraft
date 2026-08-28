@@ -189,7 +189,15 @@ async function shootSpecific(targets) {
           // Anything that has to be in place BEFORE the document loads (a request
           // stub via evaluateOnNewDocument, a storage seed).
           await variant.beforeLoad?.(page);
-          await page.goto(URL, { waitUntil: 'networkidle0', timeout: NAV_TIMEOUT });
+          await page.goto(URL, {
+            // Landing-shell captures need the deferred module graph complete,
+            // which DOMContentLoaded guarantees. They intentionally do not
+            // wait for network idleness: the marketing shell polls presence
+            // and project-stat endpoints, so an absent local API otherwise
+            // burns the full navigation timeout before every static UI frame.
+            waitUntil: variant.landing ? 'domcontentloaded' : 'networkidle0',
+            timeout: NAV_TIMEOUT,
+          });
           if (variant.mobile)
             await page.evaluate(() => document.body.classList.add('mobile-touch'));
           // A `landing: true` variant shoots the pre-game marketing shell (the home

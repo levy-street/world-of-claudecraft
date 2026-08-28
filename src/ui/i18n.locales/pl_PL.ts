@@ -496,8 +496,6 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'hudChrome.wocMarket.termsLink': 'Wyświetl regulamin Giełdy (otwiera się w nowej karcie)',
   'hudChrome.wocMarket.title': 'Giełda $WOC',
   'hudChrome.wocMarket.variableTokenWarning': 'Zobowiązujesz się zapłacić równowartość w USD w tokenach $WOC. Dokładna ilość tokenów jest ustalana przez nową wycenę w momencie żądania płatności i może różnić się od szacunku.',
-  'hudChrome.wocMarket.walletBanner': 'Podłącz i zweryfikuj portfel, aby licytować, kupować lub sprzedawać na Giełdzie.',
-  'hudChrome.wocMarket.walletBannerCta': 'Podłącz portfel',
   'hudChrome.wocMarket.yourListing': 'Twoje wystawienie',
   'hudChrome.wocMarket.yourListingTip': 'Wystawiłeś ten przedmiot. Nie możesz licytować własnego wystawienia; dopóki nie ma ono żadnych ofert, możesz je anulować tutaj lub w zakładce Moja aktywność.',
   'apiError.guilds.invalid_roster_name': 'Nieprawidłowa nazwa gildii.',

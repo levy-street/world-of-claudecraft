@@ -801,6 +801,115 @@ describe('the operator reads behind the internal dashboard', () => {
     expect(text).not.toContain('status = $4');
   });
 
+  it('pages before joining sale provenance and filters sold or cancelled by resolution', async () => {
+    for (const status of ['sold', 'cancelled'] as const) {
+      const { pool, sql, params } = recordingPool();
+      await new PgWocMarketDb(pool).opsListings({
+        realm: REALM,
+        status,
+        fromMs: 1_000,
+        toMs: 2_000,
+        page: 3,
+        pageSize: 50,
+      });
+      const [text] = sql();
+      expect(text).toContain('WITH listing_page AS MATERIALIZED');
+      expect(text).toContain("status = 'closed'");
+      expect(text).toContain('resolution = $4');
+      expect(params()[0]?.[3]).toBe(status);
+      expect(text).toContain('LIMIT $5 OFFSET $6');
+      expect(text).toContain('LEFT JOIN LATERAL');
+      expect(text).toContain('FROM woc_market_sales sale');
+      expect(text).toContain("p.status = 'closed' AND p.resolution = 'sold'");
+      expect(text).toContain('sale.excluded = false');
+      expect(text).toContain('LIMIT 1');
+      expect(text.indexOf('LIMIT $5 OFFSET $6')).toBeLessThan(text.indexOf('LEFT JOIN LATERAL'));
+      expect(sql()).toHaveLength(1);
+    }
+  });
+
+  it('maps buyer provenance onto sold listings and leaves non-sold rows unavailable', async () => {
+    const rows = [
+      {
+        id: 7,
+        realm: REALM,
+        seller_account: 1,
+        seller_character: 2,
+        seller_name: 'Seller',
+        seller_wallet: 'seller-wallet',
+        item: { itemId: 'ember_blade', count: 1 },
+        item_id: 'ember_blade',
+        quality: 'epic',
+        format: 'buy_now',
+        start_cents: 100,
+        reserve_cents: null,
+        buy_now_cents: 500,
+        offer_next: false,
+        status: 'closed',
+        resolution: 'sold',
+        item_disposed: true,
+        current_bid_cents: null,
+        current_bid_id: null,
+        ends_at: new Date(1_000),
+        base_ends_at: new Date(1_000),
+        buy_now_lock_account: null,
+        buy_now_lock_expires: null,
+        created_at: new Date(500),
+        directed_buyer_account: null,
+        cancel_requested_at: null,
+        sale_buyer_account: 44,
+        sale_buyer_name: 'Buyer',
+        sold_at: new Date(900),
+      },
+      {
+        id: 6,
+        realm: REALM,
+        seller_account: 1,
+        seller_character: 2,
+        seller_name: 'Seller',
+        seller_wallet: 'seller-wallet',
+        item: { itemId: 'ash_totem', count: 1 },
+        item_id: 'ash_totem',
+        quality: 'epic',
+        format: 'auction',
+        start_cents: 100,
+        reserve_cents: null,
+        buy_now_cents: null,
+        offer_next: false,
+        status: 'closed',
+        resolution: 'cancelled',
+        item_disposed: true,
+        current_bid_cents: null,
+        current_bid_id: null,
+        ends_at: new Date(1_000),
+        base_ends_at: new Date(1_000),
+        buy_now_lock_account: null,
+        buy_now_lock_expires: null,
+        created_at: new Date(400),
+        directed_buyer_account: null,
+        cancel_requested_at: null,
+        sale_buyer_account: null,
+        sale_buyer_name: null,
+        sold_at: null,
+      },
+    ];
+    const query = vi.fn(async () => ({ rows, rowCount: rows.length }));
+    const result = await new PgWocMarketDb({ query } as unknown as Pool).opsListings({
+      realm: REALM,
+      status: 'all',
+      fromMs: 0,
+      toMs: 1_000,
+      page: 0,
+      pageSize: 50,
+    });
+    expect(
+      result.rows.map((row) => [row.id, row.buyerAccount, row.buyerName, row.soldAtMs]),
+    ).toEqual([
+      [7, 44, 'Buyer', 900],
+      [6, null, null, null],
+    ]);
+  });
+
   it('reads p2p trades from OFFERS, so failed attempts are visible', async () => {
     // Sourcing from sales would show the successes and silently omit every
     // declined, withdrawn, expired or unpaid attempt, which is usually the half

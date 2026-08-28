@@ -1,6 +1,7 @@
 export class FakeStyle {
   display = '';
   color = '';
+  cursor = '';
   left = '';
   top = '';
   right = '';

@@ -178,6 +178,8 @@ export const vi_VN: AdminTranslations = {
   "usage.cacheColEvictions": "Lần loại bỏ",
   "usage.cacheEntriesOfMax": "{entries} / {max}",
   "usage.notAvailable": "không có",
+  "usage.metric.walletHandoffAuthorizationEvicted": "Desktop wallet handoff evictions",
+  "usage.metric.walletHandoffCreateRejected": "Desktop wallet handoff rejections",
   "usage.metric.wocBalanceApi": "Yêu cầu API số dư $WOC",
   "usage.metric.wocBalanceRateLimited": "Yêu cầu số dư $WOC bị giới hạn",
   "usage.metric.wocBalanceRpc": "Lần đọc số dư Solana RPC",

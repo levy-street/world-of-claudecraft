@@ -213,6 +213,7 @@ import {
   handleDesktopLoginExchange,
   issueDesktopLoginCode,
 } from './desktop_login';
+import { desktopWalletHandoffs } from './desktop_wallet_handoff';
 import {
   configureDiscordRuntime,
   handleDiscordCallback,
@@ -245,6 +246,7 @@ import { createAccessLogSink } from './http/access_log';
 import { setAttackSignalSink } from './http/attack_signals';
 import { registerBusinessMetrics } from './http/business_metrics';
 import { handleClientError } from './http/client_error';
+import { registerClientPerfMetrics, setClientPerfMetricsSink } from './http/client_perf_metrics';
 import { type Config, DEFAULT_DISPATCH, type DispatchMode, loadConfig } from './http/config';
 import { registerDiscordBotMetrics } from './http/discord_bot_metrics';
 import {
@@ -346,6 +348,7 @@ import {
   recordAuthFailure,
   requestIp,
   setRateLimitTier2Store,
+  walletHandoffResultRateLimited,
   walletLinkRateLimited,
   wocBalanceRateLimited,
 } from './ratelimit';
@@ -2494,6 +2497,9 @@ async function handleApi(req: http.IncomingMessage, res: http.ServerResponse): P
     if (req.method === 'POST' && url === '/api/desktop-wallet/result') {
       const accountId = await bearerActiveAccount(req, res);
       if (accountId === null) return;
+      if (!walletHandoffResultRateLimited(req, accountId).allowed) {
+        return json(res, 429, { error: 'rate limited' });
+      }
       return handleDesktopWalletHandoffResult(req, res, accountId);
     }
     if (req.method === 'POST' && url === '/api/wallet/link/challenge') {
@@ -2889,6 +2895,9 @@ const wocMarketService = new WocMarketService({
   // The step-up devsig arm rides the SAME double-gated switch as the dev
   // economy: impossible to reach in production, and one truth for "dev".
   stepUpDevSig: wocMarketDevService,
+  // Desktop browser-signing: quotes and step-up challenges pre-register in
+  // the process handoff store so /api/desktop-wallet/create can mint them.
+  desktopHandoff: desktopWalletHandoffs,
   custody: createWocMarketCustody(
     {
       get sim() {
@@ -3600,6 +3609,9 @@ export async function startServer(): Promise<http.Server> {
     guildBankLogCache: () => guildBankLogCacheStats(),
   };
   setGameMetricsCounters(registerGameStateMetrics(httpMetrics.registry, gameStateSource));
+  // The client-perf beacon series (server/http/client_perf_metrics.ts): the
+  // perf-report ingest emits through this slot after each stored row.
+  setClientPerfMetricsSink(registerClientPerfMetrics(httpMetrics.registry));
   registerParseMetrics(httpMetrics.registry, game.parseCapture.counters);
   // Hand the same live source to /livez, so a wedged loop answers 503 from outside
   // the process. Registered HERE rather than read from the route arm: the /livez arm
