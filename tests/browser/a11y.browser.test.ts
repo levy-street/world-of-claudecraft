@@ -22,7 +22,6 @@ import { ArenaWindow } from '../../src/ui/arena_window';
 import { BagsWindow } from '../../src/ui/bags_window';
 import { CharWindow } from '../../src/ui/char_window';
 import { FOCUSABLE_SELECTOR } from '../../src/ui/focus_manager';
-import { resolveActionBarVisibility } from '../../src/ui/hud/action_bar/action_bar_visibility_core';
 import { PlantSheetWindow } from '../../src/ui/hud/professions/farming_plant_sheet_window';
 import { HarvestJournalWindow } from '../../src/ui/hud/professions/harvest_journal_window';
 import { PerfectingWindow } from '../../src/ui/hud/professions/perfecting_window';
