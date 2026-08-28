@@ -527,9 +527,24 @@ export class WaterSimulation {
     this.targets = { read, write };
   }
 
+  // Link both height-field programs at construction, under the curtain,
+  // against the SAME state a live pass renders with. three keys a program on
+  // the bound render target's colour space (a null target reads the canvas's
+  // output space, a float target the working space), so a compile with no
+  // target bound was a guaranteed miss and the first wake, a splash in a
+  // live frame arbitrarily long after the reveal, linked both cold (the
+  // 2026-08-28 combat audit). The scroll material is only ever mounted inside
+  // scroll(), so the quad wears it here for its own pass.
   private prewarm(): void {
-    this.renderer.compile(this.scene, this.camera);
     this.ensureTargets();
+    if (!this.targets) return;
+    const previousTarget = this.renderer.getRenderTarget();
+    this.renderer.setRenderTarget(this.targets.write);
+    this.renderer.compile(this.scene, this.camera);
+    this.quad.material = this.scrollMaterial;
+    this.renderer.compile(this.scene, this.camera);
+    this.quad.material = this.stepMaterial;
+    this.renderer.setRenderTarget(previousTarget);
     this.clearState();
   }
 
