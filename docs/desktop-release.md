@@ -189,13 +189,12 @@ that self-corrects). In the dev loop (`npm run electron:dev`) a FAILED trial tak
 loop down once: the orchestrator tears Vite down when its Electron child exits, and the
 relaunched process is left against a dead dev server; the next `npm run electron:dev`
 reads the stored `failed` verdict and runs on the default backend without a relaunch.
-Known misfire in the dev loop: the Linux PRIME hybrid detection (`isLinuxHybridGpu`,
-two `/sys/class/drm` cards) also fires on a DESKTOP with two GPUs, so on the
-maintainer's RTX 3090 desktop the dev loop pre-applies the PRIME offload env it does
-not need; until that is fixed separately, run the dev loop with
-`WOC_DISABLE_GPU_FORCE=1` there (it skips the PRIME config in
-`scripts/electron-dev.mjs` and every GPU lever in the shell) and pick the backend
-with `WOC_GPU_BACKEND=vulkan`, which wins over the rescue env.
+On a desktop whose NVIDIA card drives the screen next to an integrated GPU left
+enabled, the Linux PRIME hybrid detection (`isLinuxHybridGpu`) reads `boot_vga` and
+skips the offload; should any GPU lever still misfire in the dev loop, run it with
+`WOC_DISABLE_GPU_FORCE=1` (it skips the PRIME config in `scripts/electron-dev.mjs`
+and every GPU lever in the shell) and pick the backend with
+`WOC_GPU_BACKEND=vulkan`, which wins over the rescue env.
 
 ## What the maintainer must provision (one-time)
 
