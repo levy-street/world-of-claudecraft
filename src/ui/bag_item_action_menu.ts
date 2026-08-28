@@ -232,21 +232,23 @@ export class BagItemActionMenu {
         // captured cell can shift between open and OK, so the NAMED copy is
         // re-resolved by reference identity and destroyed at its live index
         // (a same-id swap follows the copy the dialog named). A vanished
-        // copy targets one past the end, a shape-valid index the sim's own
-        // range check refuses with its noItem line: this menu has no error
-        // surface of its own, and an untargeted fallback could consume an
-        // id-mate the dialog never named.
+        // copy, and a cell that no longer held this id at OPEN, both refuse
+        // via the length-INDEPENDENT token -1 (bagStackIndex's own miss
+        // value, proven on this path by openItemMenuFor): the sim refuses a
+        // negative index unconditionally (src/sim/item_copy_ref.ts), whereas
+        // an index derived from the CLIENT mirror's length could name a real
+        // server slot one snapshot later, and a raw stale index could too.
+        // The refusal surfaces as each verb's own not-held answer (sunder's
+        // "You are not holding that item." line; the disenchant and salvage
+        // results' not_held reason rendered by enchanting_view), offline and
+        // online alike; this menu has no error surface of its own, and an
+        // untargeted fallback could consume an id-mate the dialog never named.
         const live = this.deps.world();
         const at = target
-          ? {
-              slotIndex: (() => {
-                const liveIndex = bagStackIndex(live.inventory, target);
-                return liveIndex >= 0 ? liveIndex : live.inventory.length;
-              })(),
-            }
+          ? { slotIndex: bagStackIndex(live.inventory, target) }
           : slotIndex === undefined
             ? undefined
-            : { slotIndex };
+            : { slotIndex: -1 };
         if (action === 'disenchant') {
           if (at === undefined) live.disenchantItem(itemId);
           else live.disenchantItem(itemId, at);

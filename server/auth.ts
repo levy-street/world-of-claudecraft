@@ -255,6 +255,9 @@ function readBanlistBounded(file: string): string {
   // O_NONBLOCK: a no-op for a regular file, and what keeps a writer-less
   // FIFO at this path from hanging the open forever (a plain 'r' open of a
   // FIFO blocks until a writer appears, before isFile() could refuse it).
+  // On a Windows dev checkout the constant is absent and the bitwise-or
+  // degrades to a plain blocking O_RDONLY, acceptable where FIFOs are not a
+  // thing; the deployed server is POSIX.
   const fd = openSync(file, fsConstants.O_RDONLY | fsConstants.O_NONBLOCK);
   try {
     const stat = fstatSync(fd);

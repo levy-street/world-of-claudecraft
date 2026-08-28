@@ -857,10 +857,12 @@ describe('username censorship', () => {
   });
 
   it('the read hardening is present in code: isFile, non-blocking open, short-read, monotonic clock', () => {
-    // The arms a test cannot deterministically induce (a truncating rewrite
-    // between fstat and pread; a writer-less FIFO; a backward clock step)
-    // are pinned as comment-stripped source, so deleting one is red even
-    // though no behavior case can reach it (the round-4 audit).
+    // Arms pinned as comment-stripped source rather than behavior: the
+    // truncating rewrite between fstat and pread and the backward clock step
+    // cannot be deterministically induced, and the writer-less FIFO CAN be
+    // (mkfifo on the POSIX platforms CI runs) but its failure mode without
+    // the flag is a suite HANG, a worse signal than a red assertion, so the
+    // source pin is the deliberate choice (the round-4 and round-5 reads).
     const auth = readFileSync(join(__dirname, '../server/auth.ts'), 'utf8')
       .replace(/\/\*[\s\S]*?\*\//g, '')
       .replace(/(^|[^:'"`])\/\/.*$/gm, '$1');

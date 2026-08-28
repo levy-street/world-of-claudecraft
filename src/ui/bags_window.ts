@@ -1892,7 +1892,12 @@ export class BagsWindow {
         // Re-resolve by reference identity at SUBMIT (the sell-confirm
         // precedent): the named copy is destroyed at whatever index it now
         // occupies, and a vanished copy REFUSES rather than letting the
-        // untargeted walk consume an id-mate the prompt never named.
+        // untargeted walk consume an id-mate the prompt never named. Known
+        // online behavior, deliberate: ClientWorld replaces the whole
+        // inventory array on an inventory-carrying snapshot, so ANY change
+        // landing while the prompt is open makes this refuse ("You don't
+        // have that item.") even though the copy still sits in the bags;
+        // safe by construction, retry-once UX, the sell confirm's precedent.
         const liveIndex = bagStackIndex(this.deps.world().inventory, named);
         if (liveIndex < 0) this.deps.showError(tSim('error.noItem'));
         else this.deps.world().discardItem(itemId, 1, { slotIndex: liveIndex });

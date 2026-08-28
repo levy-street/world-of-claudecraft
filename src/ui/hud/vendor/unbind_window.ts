@@ -38,10 +38,6 @@ function rowParts(row: UnbindRow): { name: string; quality: ItemDef['quality'] }
     : { name: row.itemId, quality: undefined };
 }
 
-function rowName(row: UnbindRow): string {
-  return rowParts(row).name;
-}
-
 /** Paint the unbind panel from a prepared view. */
 export function renderUnbindWindow(
   el: HTMLElement,

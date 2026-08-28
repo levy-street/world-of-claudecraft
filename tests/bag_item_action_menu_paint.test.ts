@@ -296,14 +296,20 @@ describe('BagItemActionMenu disenchant dispatch', () => {
     shifted.click('disenchant');
     expect(shifted.confirms).toHaveLength(1);
     expect(shifted.confirms[0].title).not.toContain('Dawn Oath');
+    // ...and its OK refuses with the length-independent token, never the
+    // known-stale captured index (which could hold a right-id copy by now).
+    shifted.confirms[0].onOk();
+    expect(shifted.disenchanted).toEqual([{ itemId, target: { slotIndex: -1 } }]);
   });
 
-  it('the destroy OK follows its copy after a same-id swap and range-refuses a vanished one', () => {
+  it('the destroy OK follows its copy after a same-id swap and refuses a vanished one with -1', () => {
     // The stale-prompt doctrine at the OK: reference identity re-resolves
     // the named copy, so a same-id swap destroys the copy the dialog NAMED
-    // at its new index; a vanished copy targets one past the end, which the
-    // sim's own range check refuses (no untargeted fallback that could
-    // consume an id-mate).
+    // at its new index; a vanished copy sends the length-INDEPENDENT -1,
+    // which the sim refuses unconditionally whatever the server's inventory
+    // grew to (a client-length token could name a real slot one RTT later;
+    // the round-5 read). The -1 is also decisive against the pre-fix code,
+    // whose captured index here was 0.
     const itemId = defFor('common').id;
     const named = { rolled: { quality: 'legendary' as const }, name: 'Dawn Oath' };
     const inv: InvSlot[] = [
@@ -324,7 +330,16 @@ describe('BagItemActionMenu disenchant dispatch', () => {
     gone.click('disenchant');
     inv2.length = 0;
     gone.confirms[0].onOk();
-    expect(gone.disenchanted).toEqual([{ itemId, target: { slotIndex: 0 } }]);
+    expect(gone.disenchanted).toEqual([{ itemId, target: { slotIndex: -1 } }]);
+    // The stale mirror can also be LONGER than at capture; the token must
+    // not depend on its length either way.
+    inv2.push({ itemId, count: 1 }, { itemId, count: 1 }, { itemId, count: 1 });
+    gone.openFor(itemId, 2);
+    gone.click('disenchant');
+    inv2.length = 0;
+    inv2.push({ itemId, count: 1 });
+    gone.confirms[1].onOk();
+    expect(gone.disenchanted[1]).toEqual({ itemId, target: { slotIndex: -1 } });
   });
 
   it('sends the clicked inventory slot index through the confirm action', () => {
