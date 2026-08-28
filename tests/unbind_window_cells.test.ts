@@ -38,6 +38,11 @@ function render(view: UnbindView): { el: HTMLElement; qualities: (string | undef
 
 describe('unbind window rows read the cell authority for the copy they unbind', () => {
   it('a named legendary-rolled bound copy reads as itself: name, rim, and glow', () => {
+    // Production-shaped rows (the round-4 audit): one row per DISTINCT item
+    // id, every row carrying a bound instance (buildUnbindView only rows a
+    // slot whose instance.boundTo is set), so the control is a producible
+    // bound-but-plain copy rather than an unreachable instance-less row.
+    const controlDef: ItemDef = ITEMS.copper_ore;
     const { el, qualities } = render({
       rows: [
         {
@@ -52,7 +57,14 @@ describe('unbind window rows read the cell authority for the copy they unbind', 
           feeCopper: 500,
           affordable: true,
         },
-        { itemId: plainId, item: plainDef, boundCount: 1, feeCopper: 500, affordable: true },
+        {
+          itemId: 'copper_ore',
+          item: controlDef,
+          boundCount: 1,
+          instance: { boundTo: 7 },
+          feeCopper: 500,
+          affordable: true,
+        },
       ],
     });
     const rows = el.querySelectorAll<HTMLElement>('.vendor-item');
@@ -68,10 +80,10 @@ describe('unbind window rows read the cell authority for the copy they unbind', 
     // qualityGlowShadow spells the tier's hex as rgba: #ff8000 is 255, 128, 0.
     expect(QUALITY_COLOR.legendary).toBe('#ff8000');
     expect(socket?.getAttribute('style') ?? '').toContain('rgba(255, 128, 0');
-    expect(rows[1].getAttribute('aria-label')).toContain(plainDef.name);
+    expect(rows[1].getAttribute('aria-label')).toContain(controlDef.name);
     expect(rows[1].getAttribute('aria-label')).not.toContain('Oath');
     // The icon dep was asked for each row's OWN effective quality.
-    expect(qualities).toEqual(['legendary', plainDef.quality]);
-    expect(plainDef.quality).toBeDefined();
+    expect(qualities).toEqual(['legendary', controlDef.quality]);
+    expect(controlDef.quality).toBeDefined();
   });
 });

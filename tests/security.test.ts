@@ -825,9 +825,12 @@ describe('username censorship', () => {
     expect(deploy).toContain(`over-${USERNAME_BANLIST_FILE_MAX_BYTES / 1024}-KiB`);
     expect(deploy).toContain('`USERNAME_BANLIST_STAT_HOLD_MS`');
     expect(USERNAME_BANLIST_STAT_HOLD_MS).toBe(1000);
-    expect(deploy).toContain('within one second');
-    expect(deploy).toContain("a name screen's cost does\n  not grow with the list");
-    expect(deploy).not.toContain('scans every term');
+    // The honest cadence claim: the edit lands at the next SCREEN, not on a
+    // poll (nothing polls; the round-4 security read).
+    expect(deploy).toContain('at the next name screen');
+    expect(deploy).not.toContain('within one second');
+    // Whitespace-tolerant: a doc reflow must not red a true claim.
+    expect(deploy).toMatch(/a name screen's cost does\s+not grow with the list/);
     // The boot-line promise the doc makes is the literal the helper prints.
     expect(deploy).toContain('`name banlist:`');
     expect(
@@ -838,14 +841,33 @@ describe('username censorship', () => {
   it('the matcher second pass is skipped exactly when normalization changed only the case', () => {
     // The round-3 hot-path note: the second obscenity pass exists for
     // spellings only the confusable fold or the non-letter strip expose; a
-    // spelling that folds to itself is screened once. Both spellings of the
-    // built-in term still refuse, and a confusable spelling still refuses.
+    // spelling that folds to itself is screened once. Decisive both ways
+    // (the round-4 audit): the spaced spelling is caught by the SECOND pass
+    // alone (raw hasMatch false, no banlist term), so deleting the pass or
+    // breaking the skip predicate reds it; the all-caps spelling pins the
+    // matcher case-insensitivity the skip depends on.
     withUsernameBanlist({}, () => {
+      expect(offensiveName('S h i t l o r d')).toBe(true);
+      expect(offensiveName('SHITLORD')).toBe(true);
       expect(offensiveName('Hitler')).toBe(true);
       expect(offensiveName('H1tler')).toBe(true);
       expect(offensiveName('H i t l e r')).toBe(true);
       expect(offensiveName('Aurelia')).toBe(false);
     });
+  });
+
+  it('the read hardening is present in code: isFile, non-blocking open, short-read, monotonic clock', () => {
+    // The arms a test cannot deterministically induce (a truncating rewrite
+    // between fstat and pread; a writer-less FIFO; a backward clock step)
+    // are pinned as comment-stripped source, so deleting one is red even
+    // though no behavior case can reach it (the round-4 audit).
+    const auth = readFileSync(join(__dirname, '../server/auth.ts'), 'utf8')
+      .replace(/\/\*[\s\S]*?\*\//g, '')
+      .replace(/(^|[^:'"`])\/\/.*$/gm, '$1');
+    expect(auth).toContain('if (!stat.isFile())');
+    expect(auth).toContain('if (read !== size)');
+    expect(auth).toContain('fsConstants.O_RDONLY | fsConstants.O_NONBLOCK');
+    expect(auth).toContain('const nowMs = performance.now();');
   });
 
   it('hasBannedTerm answers exactly terms.some(includes), by a walk bounded by the longest term', () => {
@@ -859,6 +881,9 @@ describe('username censorship', () => {
     // The term COUNT does not price a screen: a nine-thousand-term list
     // answers a miss by the same substring walk (name length x longest term).
     const many = indexBannedTerms(Array.from({ length: 9000 }, (_, i) => `t${i.toString(36)}z`));
+    // Nine thousand terms span exactly three distinct lengths (one to three
+    // base36 digits), which is what a screen probes: the cost claim itself.
+    expect(many.lengths).toEqual([3, 4, 5]);
     expect(hasBannedTerm('a'.repeat(32), many)).toBe(false);
     expect(hasBannedTerm('xxt1zxx', many)).toBe(true);
     // The one input class where the walk and `includes` would part ways, an
@@ -890,7 +915,9 @@ describe('username censorship', () => {
       withUsernameBanlist({ file: '/dev/null' }, () => {
         expect(warmUsernameBanlist()).toEqual({ file: '/dev/null', loaded: false, fileTerms: 0 });
         expect(warn).toHaveBeenCalledOnce();
-        expect(String(warn.mock.calls[0][1])).toContain('not a regular file');
+        // /dev/null exists on the POSIX platforms CI runs; a Windows checkout
+        // reaches the same warn arm through ENOENT instead.
+        expect(String(warn.mock.calls[0][1])).toMatch(/not a regular file|ENOENT/);
         // The other path's last-good terms are NOT served under this path.
         expect(offensiveName('goodterm')).toBe(false);
       });

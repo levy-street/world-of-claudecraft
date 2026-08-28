@@ -434,8 +434,12 @@ describe('bags_window: right-click uses, dragging destroys/equips', () => {
       'promptDestroy(itemId: string, count: number, index: number | null = null): void',
     );
     // The touch drag ghost carries the copy's rim too (never exercised by the
-    // marker rig, whose render does not start a drag, so pinned here).
-    expect(painter).toMatch(
+    // marker rig, whose render does not start a drag, so pinned here over
+    // COMMENT-STRIPPED source: it is the only coverage of that read, and a
+    // commented-out arrow must not satisfy it). The destroy prompt's TARGETED
+    // single-copy arm is behavioral (tests/bags_vendor_sell_confirm.test.ts).
+    const ghostCode = painter.replace(/\/\*[\s\S]*?\*\//g, '').replace(/\/\/[^\n]*/g, '');
+    expect(ghostCode).toMatch(
       /ghostHtml: \(\) =>\s*this\.deps\.itemIcon\(item, wornItemCellParts\(item, s\.instance\)\.quality\),/,
     );
     expect(painter).toContain('destroyAction(itemId: string): BagDestroyAction');
@@ -482,12 +486,11 @@ describe('bags_window: a vendor click confirms before selling anything but true 
   });
 
   it('the confirm prompt re-resolves the live slot at submit and refuses on a mismatch', () => {
-    // The window is sized to hold the whole method (the round-3 cell-authority
-    // comment and name read grew it past the old 2200).
-    const body = painter.slice(
-      painter.indexOf('private showSellConfirmPrompt('),
-      painter.indexOf('private showSellConfirmPrompt(') + 2800,
-    );
+    // Comment-stripped source (the source-text pin trap), sliced to the next
+    // method boundary rather than a magic length that rots on every edit.
+    const stripped = painter.replace(/\/\*[\s\S]*?\*\//g, '').replace(/\/\/[^\n]*/g, '');
+    const start = stripped.indexOf('private showSellConfirmPrompt(');
+    const body = stripped.slice(start, stripped.indexOf('\n  private ', start + 1));
     // Re-resolved by reference identity at SUBMIT time, not the index captured
     // when the dialog opened: the whole point of this fix is that a stale
     // selection must REFUSE rather than fall back to an itemId-only sellItem

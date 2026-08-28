@@ -242,6 +242,12 @@ describe('vendor ctrl/meta click on a non-junk item still confirms', () => {
     h.window.promptDestroy(valuableId, 1, 0);
     const first = document.querySelector('.discard-item-prompt .prompt-text');
     expect(first?.textContent).toContain('Dawn Oath');
+    // Confirming destroys the copy the prompt NAMED, by target (the round-4
+    // blocker: the untargeted walk prefers fungible copies and could spare
+    // the named one while consuming an id-mate).
+    (document.querySelector('.discard-item-prompt button.btn') as HTMLElement).click();
+    expect(h.calls).toEqual([`discardItem:${valuableId},1,{"slotIndex":0}`]);
+    h.calls.length = 0;
     document.querySelectorAll('.discard-item-prompt').forEach((el) => {
       el.remove();
     });
@@ -250,6 +256,42 @@ describe('vendor ctrl/meta click on a non-junk item still confirms', () => {
     const shifted = document.querySelector('.discard-item-prompt .prompt-text');
     expect(shifted?.textContent).not.toContain('Dawn Oath');
     expect(shifted?.textContent).toContain(ITEMS[junkId].name);
+  });
+
+  it('the destroy confirm follows its named copy to its live index and refuses when it is gone', () => {
+    // Reference identity at submit (the sell-confirm precedent): a same-id
+    // swap under the open prompt destroys the copy the prompt NAMED at its
+    // new index; a vanished copy refuses, destroying nothing.
+    const inventory: InvSlot[] = [
+      {
+        itemId: valuableId,
+        count: 1,
+        instance: { rolled: { quality: 'legendary' }, name: 'Dawn Oath' },
+      },
+      {
+        itemId: valuableId,
+        count: 1,
+        instance: { rolled: { quality: 'legendary' }, name: 'Veltara' },
+      },
+    ];
+    const h = harness(inventory);
+    h.window.promptDestroy(valuableId, 1, 0);
+    expect(document.querySelector('.discard-item-prompt .prompt-text')?.textContent).toContain(
+      'Dawn Oath',
+    );
+    inventory.reverse();
+    (document.querySelector('.discard-item-prompt button.btn') as HTMLElement).click();
+    expect(h.calls).toEqual([`discardItem:${valuableId},1,{"slotIndex":1}`]);
+    expect(h.errors).toEqual([]);
+    h.calls.length = 0;
+    h.window.promptDestroy(valuableId, 1, 1);
+    expect(document.querySelector('.discard-item-prompt .prompt-text')?.textContent).toContain(
+      'Dawn Oath',
+    );
+    inventory.length = 0;
+    (document.querySelector('.discard-item-prompt button.btn') as HTMLElement).click();
+    expect(h.calls).toEqual([]);
+    expect(h.errors).toHaveLength(1);
   });
 
   it('a single-count copy opens the same per-slot confirm prompt as a plain click', () => {

@@ -287,12 +287,44 @@ describe('BagItemActionMenu disenchant dispatch', () => {
     h.click('disenchant');
     expect(h.confirms).toHaveLength(1);
     expect(h.confirms[0].title).toContain('Dawn Oath');
+    // ...and OK destroys exactly that copy, by target.
+    h.confirms[0].onOk();
+    expect(h.disenchanted).toEqual([{ itemId, target: { slotIndex: 0 } }]);
     const other = defFor('uncommon').id;
     const shifted = harness(768, [{ itemId: other, count: 1, instance: named }]);
     shifted.openFor(itemId, 0);
     shifted.click('disenchant');
     expect(shifted.confirms).toHaveLength(1);
     expect(shifted.confirms[0].title).not.toContain('Dawn Oath');
+  });
+
+  it('the destroy OK follows its copy after a same-id swap and range-refuses a vanished one', () => {
+    // The stale-prompt doctrine at the OK: reference identity re-resolves
+    // the named copy, so a same-id swap destroys the copy the dialog NAMED
+    // at its new index; a vanished copy targets one past the end, which the
+    // sim's own range check refuses (no untargeted fallback that could
+    // consume an id-mate).
+    const itemId = defFor('common').id;
+    const named = { rolled: { quality: 'legendary' as const }, name: 'Dawn Oath' };
+    const inv: InvSlot[] = [
+      { itemId, count: 1, instance: named },
+      { itemId, count: 1, instance: { signer: 'Plain' } },
+    ];
+    const h = harness(768, inv);
+    h.openFor(itemId, 0);
+    h.click('disenchant');
+    expect(h.confirms[0].title).toContain('Dawn Oath');
+    inv.reverse();
+    h.confirms[0].onOk();
+    expect(h.disenchanted).toEqual([{ itemId, target: { slotIndex: 1 } }]);
+
+    const inv2: InvSlot[] = [{ itemId, count: 1, instance: named }];
+    const gone = harness(768, inv2);
+    gone.openFor(itemId, 0);
+    gone.click('disenchant');
+    inv2.length = 0;
+    gone.confirms[0].onOk();
+    expect(gone.disenchanted).toEqual([{ itemId, target: { slotIndex: 0 } }]);
   });
 
   it('sends the clicked inventory slot index through the confirm action', () => {
@@ -492,7 +524,14 @@ describe('BagItemActionMenu target step: worn rows', () => {
     const h = harness(768, {
       inventory: [
         { itemId: DUST, count: 99 },
-        { itemId: SWORD, count: 1 },
+        // The bagged twin CARRIES a chosen name of its own, so the negative
+        // below is honest: the bagged arm groups by item id and must never
+        // read per-copy identity (the round-4 audit's positive control).
+        {
+          itemId: SWORD,
+          count: 1,
+          instance: { rolled: { quality: 'legendary' }, name: 'Bag Oath' },
+        },
       ],
       equipment: { mainhand: SWORD },
       equippedInstances: {
@@ -503,6 +542,7 @@ describe('BagItemActionMenu target step: worn rows', () => {
     expect(h.rows()[0].text).toContain('Dawn Oath');
     expect(h.rows()[0].text).toContain('Worn (Main Hand)');
     expect(h.rows()[1].text).not.toContain('Dawn Oath');
+    expect(h.rows()[1].text).not.toContain('Bag Oath');
   });
 
   it('the replace confirm names the worn victim by its chosen name', () => {
