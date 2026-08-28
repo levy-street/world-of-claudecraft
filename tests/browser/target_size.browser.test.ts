@@ -373,7 +373,14 @@ describe('mobile target-size: in-game touch controls are >=40x40 in landscape', 
     const world = {
       equipment: { mainhand: 'duskforged_warblade' },
       equipmentInstances: {},
-      inventory: [{ itemId: 'makers_ember', count: 1 }],
+      // The full attempt bill: with a material missing the action button
+      // renders DISABLED and its click opens nothing, so the bind-prompt
+      // rows below would find no prompt (the first browser run's red).
+      inventory: [
+        { itemId: 'makers_ember', count: 2 },
+        { itemId: 'sundered_essence', count: 1 },
+        { itemId: 'prismglass_setting', count: 3 },
+      ],
       craftingIdentity: { synced: true },
       craftSkills: { weaponcrafting: PERFECTING_SKILL_REQ },
       perfectItem: () => {},
