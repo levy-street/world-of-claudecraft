@@ -30,9 +30,9 @@ import type { Aura, Entity, SimEvent } from '../src/sim/types';
 import { terrainHeight } from '../src/sim/world';
 import { EMPTY_TEST_WORLD } from './sim_shared';
 
-const IRONHUSK = 'ironhusk_flask'; // buff_sta 15 / 1200
-const WARBOAR = 'warboar_flask'; // buff_ap 15 / 1200
-const RUNEWATER = 'runewater_flask'; // buff_int 15 / 1200
+const IRONHUSK = 'ironhusk_flask'; // buff_sta 13 / 1200
+const WARBOAR = 'warboar_flask'; // buff_ap 13 / 1200
+const RUNEWATER = 'runewater_flask'; // buff_int 13 / 1200
 const SERPENT = 'elixir_of_the_serpent'; // buff_sta 12 / 900, the top shipped rung
 const BOAR = 'elixir_of_the_boar'; // buff_sta 6 / 600, the bottom rung
 const SUNPETAL_SCROLL = 'sunpetal_scroll'; // the serpent band's scroll twin
@@ -142,7 +142,7 @@ describe('flasks: one at a time, refuse downward, survive death', () => {
     const flasks = flaskAuras(p);
     expect(flasks, 'exactly one flask-marked aura').toHaveLength(1);
     expect(flasks[0].id).toBe(INT_FAMILY);
-    expect(flasks[0].value).toBe(15);
+    expect(flasks[0].value).toBe(13);
     // The stripped aura left the WHOLE list, not merely the flask filter, and
     // nothing else appeared beside it.
     expect(aurasById(p, STA_FAMILY), 'the shed flask is gone entirely').toHaveLength(0);
@@ -157,9 +157,9 @@ describe('flasks: one at a time, refuse downward, survive death', () => {
     const baseSta = p.stats.sta;
     const baseInt = p.stats.int;
     use(sim, pid, IRONHUSK);
-    expect(p.stats.sta, 'the sta flask reaches derived stats').toBe(baseSta + 15);
+    expect(p.stats.sta, 'the sta flask reaches derived stats').toBe(baseSta + 13);
     use(sim, pid, RUNEWATER);
-    expect(p.stats.int, 'the int flask reaches derived stats').toBe(baseInt + 15);
+    expect(p.stats.int, 'the int flask reaches derived stats').toBe(baseInt + 13);
     expect(p.stats.sta, 'the shed flask left the stat book').toBe(baseSta);
   });
 
@@ -213,7 +213,7 @@ describe('flasks: one at a time, refuse downward, survive death', () => {
       const flasks = flaskAuras(p);
       expect(flasks).toHaveLength(1);
       expect(flasks[0].id).toBe(STA_FAMILY);
-      expect(flasks[0].value, 'the flask still rides at full strength').toBe(15);
+      expect(flasks[0].value, 'the flask still rides at full strength').toBe(13);
       expect(flasks[0].flask).toBe(true);
       expect(p.auras.length, 'no aura was added or removed').toBe(totalBefore);
     },
@@ -242,7 +242,7 @@ describe('flasks: one at a time, refuse downward, survive death', () => {
       ).toHaveLength(0);
       const after = aurasById(p, STA_FAMILY);
       expect(after, 'never a stack').toHaveLength(1);
-      expect(after[0].value, 'the flask took the slot').toBe(15);
+      expect(after[0].value, 'the flask took the slot').toBe(13);
       expect(after[0].flask).toBe(true);
     },
   );
@@ -259,7 +259,7 @@ describe('flasks: one at a time, refuse downward, survive death', () => {
 
     const after = aurasById(p, STA_FAMILY);
     expect(after, 'never a stack').toHaveLength(1);
-    expect(after[0].value, 'the flask owns the slot').toBe(15);
+    expect(after[0].value, 'the flask owns the slot').toBe(13);
     expect(after[0].flask).toBe(true);
     expect(sim.countItem(IRONHUSK, pid), 'the flask really was drunk').toBe(0);
   });
@@ -277,7 +277,7 @@ describe('flasks: one at a time, refuse downward, survive death', () => {
     expect(errors, 'a different family is never refused').toHaveLength(0);
     const ap = aurasById(p, AP_FAMILY);
     expect(ap).toHaveLength(1);
-    expect(ap[0].value).toBe(15);
+    expect(ap[0].value).toBe(13);
     expect(ap[0].flask).toBe(true);
     const sta = aurasById(p, STA_FAMILY);
     expect(sta).toHaveLength(1);
@@ -389,7 +389,7 @@ describe('flasks: one at a time, refuse downward, survive death', () => {
     const survivors = aurasById(p, STA_FAMILY);
     expect(survivors, 'only the marked one survived its own id').toHaveLength(1);
     expect(survivors[0].flask).toBe(true);
-    expect(survivors[0].value).toBe(15);
+    expect(survivors[0].value).toBe(13);
     expect(
       p.auras.some((a) => a.name === 'Decoy Vigor'),
       'the marker-less twin died',
@@ -400,7 +400,7 @@ describe('flasks: one at a time, refuse downward, survive death', () => {
     const revived = flaskAuras(p);
     expect(revived, 'the flask is still there after the revive').toHaveLength(1);
     expect(revived[0].id).toBe(STA_FAMILY);
-    expect(revived[0].value).toBe(15);
+    expect(revived[0].value).toBe(13);
   });
 });
 
@@ -434,7 +434,7 @@ describe('the flask marker at the OTHER site that reuses the death filter', () =
     const flasks = flaskAuras(p);
     expect(flasks, 'the flask rode through the eject').toHaveLength(1);
     expect(flasks[0].id).toBe(STA_FAMILY);
-    expect(flasks[0].value).toBe(15);
+    expect(flasks[0].value).toBe(13);
     expect(
       p.auras.some((a) => a.id === 'probe_mortal_ward'),
       'and the filter really ran: the marker-less aura is gone',
@@ -483,7 +483,7 @@ describe('the flask marker at the OTHER site that reuses the death filter', () =
     const flasks = flaskAuras(p);
     expect(flasks, 'the flask rode through the delve respawn').toHaveLength(1);
     expect(flasks[0].id).toBe(STA_FAMILY);
-    expect(flasks[0].value).toBe(15);
+    expect(flasks[0].value).toBe(13);
     expect(
       p.auras.some((a) => a.id === 'probe_delve_ward'),
       'and the filter really ran here: the marker-less aura is gone',
@@ -594,7 +594,7 @@ describe('role foods: Well Fed lands only on a finished meal, and is mortal', ()
     expect(aurasById(p, WELL_FED), 'Well Fed is mortal').toHaveLength(0);
     const flasks = flaskAuras(p);
     expect(flasks, 'the flask is not').toHaveLength(1);
-    expect(flasks[0].value).toBe(15);
+    expect(flasks[0].value).toBe(13);
   });
 });
 

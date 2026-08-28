@@ -1121,8 +1121,20 @@ export const PROFESSION_ITEMS: Record<string, ItemDef> = {
   // many flasks you stack.
   //
   // The band deliberately BREAKS the elixir ceiling documented above (buff_sta
-  // <= 12 for <= 900s), which is the point of an apex rung: value 15 is the
-  // rare elixir's 12 plus the ladder's own +3 step (6 / 9 / 12), and duration
+  // <= 12 for <= 900s), which is the point of an apex rung. VALUE 13, and
+  // Phase 15 brought it there from 15. The 15 was the rare elixir's 12 plus
+  // the elixir ladder's own +3 step (6 / 9 / 12), which is internally sound
+  // and is also the single largest term in the R5 envelope: the flask is the
+  // one always-on consumable, it is the first offensive consumable the game
+  // has ever had (every pre-packet elixir and scroll is stamina), and its
+  // whole magnitude lands as new throughput with nothing to net it off. The
+  // measured pass (docs/prd/masterwrought/power-verification.md) put the full
+  // kit outside the 5 percent envelope on the highest-throughput physical
+  // spec with the flask at 15, and inside it at 13, so the value is
+  // ENVELOPE-DERIVED rather than ladder-derived: R5 is the contract and the
+  // packet's own record names flask 15 as the first tune-down knob. 13 is
+  // still strictly above the elixir ceiling of 12, which is what keeps the
+  // apex rung a rung. DURATION is untouched:
   // 1200 is the serpent's 900 plus the ladder's ONE non-zero duration step
   // (600 / 900 / 900: +300, then flat; a strictly-flat reading would give 900,
   // rejected in the phase 10 ledger, and the classic 2x-elixir ratio would give
@@ -1135,7 +1147,7 @@ export const PROFESSION_ITEMS: Record<string, ItemDef> = {
     name: 'Ironhusk Flask',
     kind: 'flask',
     quality: 'epic',
-    elixir: { aura: 'Ironhusk Vigor', kind: 'buff_sta', value: 15, duration: 1200 },
+    elixir: { aura: 'Ironhusk Vigor', kind: 'buff_sta', value: 13, duration: 1200 },
     sellValue: 25,
   },
   warboar_flask: {
@@ -1143,7 +1155,7 @@ export const PROFESSION_ITEMS: Record<string, ItemDef> = {
     name: 'Warboar Flask',
     kind: 'flask',
     quality: 'epic',
-    elixir: { aura: 'Warboar Might', kind: 'buff_ap', value: 15, duration: 1200 },
+    elixir: { aura: 'Warboar Might', kind: 'buff_ap', value: 13, duration: 1200 },
     sellValue: 25,
   },
   runewater_flask: {
@@ -1151,7 +1163,7 @@ export const PROFESSION_ITEMS: Record<string, ItemDef> = {
     name: 'Runewater Flask',
     kind: 'flask',
     quality: 'epic',
-    elixir: { aura: 'Runewater Clarity', kind: 'buff_int', value: 15, duration: 1200 },
+    elixir: { aura: 'Runewater Clarity', kind: 'buff_int', value: 13, duration: 1200 },
     sellValue: 25,
   },
 

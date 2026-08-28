@@ -527,7 +527,7 @@ const APEX_CONSUMABLES: Record<
     resultCount: 2,
     stationType: 'apothecary',
     sellValue: 25,
-    effect: { aura: 'Ironhusk Vigor', kind: 'buff_sta', value: 15, duration: 1200 },
+    effect: { aura: 'Ironhusk Vigor', kind: 'buff_sta', value: 13, duration: 1200 },
     reagents: FLASK_BILL,
   },
   warboar_flask: {
@@ -536,7 +536,7 @@ const APEX_CONSUMABLES: Record<
     resultCount: 2,
     stationType: 'apothecary',
     sellValue: 25,
-    effect: { aura: 'Warboar Might', kind: 'buff_ap', value: 15, duration: 1200 },
+    effect: { aura: 'Warboar Might', kind: 'buff_ap', value: 13, duration: 1200 },
     reagents: FLASK_BILL,
   },
   runewater_flask: {
@@ -545,7 +545,7 @@ const APEX_CONSUMABLES: Record<
     resultCount: 2,
     stationType: 'apothecary',
     sellValue: 25,
-    effect: { aura: 'Runewater Clarity', kind: 'buff_int', value: 15, duration: 1200 },
+    effect: { aura: 'Runewater Clarity', kind: 'buff_int', value: 13, duration: 1200 },
     reagents: FLASK_BILL,
   },
   stonepot_stew: {
@@ -675,6 +675,14 @@ const ALLOWED_ROLE_FOOD_KEYS = new Set([
   'wellFed',
   'sellValue',
 ]);
+// The two remaining apex-output families' whitelists, added at Phase 15 because
+// the power audit found them the only apex outputs with no power pin of any
+// kind: a rating or a stat line planted on an angler dish or an apex feast
+// survived the FULL suite. An angler dish is a plain sit-down restore with NO
+// wellFed payload (R14: the fish line adds no rung to the food curve), and an
+// apex feast is a delivery vehicle whose only payload is another dish's id.
+const ALLOWED_ANGLER_DISH_KEYS = new Set(['id', 'name', 'kind', 'quality', 'foodHp', 'sellValue']);
+const ALLOWED_APEX_FEAST_KEYS = new Set(['id', 'name', 'kind', 'quality', 'sellValue', 'feast']);
 
 // Shared per-family pins. Helpers rather than one mega it.each so each family
 // block keeps its own band constants and shape laws readable in place.
@@ -1335,6 +1343,70 @@ describe('masterwrought apex budget sweep', () => {
     expect(new Set(roleFoodIds.map((id) => wellFedOf(id).aura))).toEqual(new Set(['Well Fed']));
   });
 
+  it.each([...ANGLER_OUTPUTS, ...APEX_FEAST_OUTPUTS])(
+    '%s: an apex output with NO power of its own, whole-def pinned',
+    (id) => {
+      // ADDED AT PHASE 15. These five were the only apex outputs in the census
+      // with no power pin at all: they appeared solely as census membership
+      // plus a length check on their own local list, which is a constant
+      // comparing to itself. Measured at the audit: critRating 40 planted on
+      // peppered_deepbarb_catfish survived the whole 47,677-test suite, and
+      // hitRating 40 on stonepot_feast survived ten targeted suites. The
+      // masterwrought FLAG was already covered transitively (the census arm
+      // reds); it is ratings and stats specifically that were open, which is
+      // exactly the throttle-proof surface R14 and the Power placement name.
+      const def = ITEMS[id] as ItemDef & Record<string, unknown>;
+      expect(def, `${id} must exist in the merged table`).toBeTruthy();
+      // Never flagged: neither a dish nor a feast is worn power, so neither
+      // may ever compete for the two-piece family cap.
+      expect(def.masterwrought).toBeUndefined();
+      expect(def.stats).toBeUndefined();
+      for (const field of RATING_FIELDS) expect(def[field]).toBeUndefined();
+      expect(def.spellPower).toBeUndefined();
+      expect(def.pvpOffenseRating).toBeUndefined();
+      expect(def.pvpDefenseRating).toBeUndefined();
+      // Not item-level eligible: no slot, non-combat kind.
+      expect(itemLevel(def)).toBeUndefined();
+      const isFeast = (APEX_FEAST_OUTPUTS as readonly string[]).includes(id);
+      if (isFeast) {
+        expect(def.kind).toBe('junk');
+        expect(def.quality).toBe('epic');
+        // A feast's ONLY payload is another dish's id: it grants nothing of
+        // its own, so its power is whatever that dish already carries and is
+        // pinned in the dish's own arm.
+        const feast = def.feast as Record<string, unknown>;
+        expect(feast, `${id} carries a feast payload`).toBeTruthy();
+        expect(Object.keys(feast).sort()).toEqual([
+          'charges',
+          'dishItemId',
+          'durationTicks',
+          'templateId',
+        ]);
+        expect(feast.charges).toBe(10);
+        expect(feast.durationTicks).toBe(3600);
+        expect(APEX_FOOD_IDS as readonly string[]).toContain(feast.dishItemId as string);
+        expect(def.foodHp).toBeUndefined();
+        expect(def.wellFed).toBeUndefined();
+        expect(def.elixir).toBeUndefined();
+      } else {
+        expect(def.kind).toBe('food');
+        expect(def.quality).toBe('rare');
+        // R14 in one assertion: the angler dishes reuse a shipped foodHp rung
+        // and carry NO Well Fed payload, so the fish line adds no rung to the
+        // food curve and no buff to the R5 kit.
+        expect(def.wellFed).toBeUndefined();
+        expect(def.elixir).toBeUndefined();
+        expect(def.feast).toBeUndefined();
+        expect(typeof def.foodHp).toBe('number');
+      }
+      const allowed = isFeast ? ALLOWED_APEX_FEAST_KEYS : ALLOWED_ANGLER_DISH_KEYS;
+      for (const key of Object.keys(def)) {
+        expect(allowed.has(key), `${id} carries unexpected field ${key}`).toBe(true);
+      }
+      expectTradableTexture(def, def.sellValue as number);
+    },
+  );
+
   it('economy: every apex output vendors strictly below its reagent input value', () => {
     // recipe_economy.test.ts owns the invariant repo-wide; this arm keeps the
     // apex slice self-contained so a phase 09/10 row appended to the table
@@ -1439,7 +1511,7 @@ describe('the phase 10 apex rungs step exactly one rung off the shipped ladders'
     }
   });
 
-  it("the flask band is the top elixir rung plus the elixir ladder's own step", () => {
+  it('the flask band clears the elixir ceiling on an ENVELOPE-derived value', () => {
     const boar = elixirPayload('elixir_of_the_boar');
     const vipersear = elixirPayload('venomfire_elixir');
     const serpent = elixirPayload('elixir_of_the_serpent');
@@ -1457,10 +1529,27 @@ describe('the phase 10 apex rungs step exactly one rung off the shipped ladders'
     expect(valueStep).toBe(3);
     expect(durationStep).toBe(300);
 
+    // THE VALUE IS ENVELOPE-DERIVED, NOT LADDER-DERIVED, AND PHASE 15 MADE IT
+    // SO (15 to 13). The ladder's own step would put the flask at 15, and that
+    // is where it shipped. The measured R5 pass
+    // (docs/prd/masterwrought/power-verification.md) found the full kit outside
+    // the 5 percent envelope on the highest-throughput physical spec at 15 and
+    // inside it at 13: the flask is the single largest term in the envelope,
+    // because it is the first offensive consumable the game has ever had (every
+    // pre-packet elixir and scroll is stamina) and its whole magnitude lands as
+    // new throughput with nothing to net it off. R5 is the contract and the
+    // packet's own record names flask 15 as the first tune-down knob, so the
+    // value answers to the envelope. What the ladder still owns: the flask must
+    // stand STRICTLY above the elixir ceiling (that is what makes it a rung),
+    // and the DURATION is untouched at the ladder's own step.
     for (const id of ['ironhusk_flask', 'warboar_flask', 'runewater_flask']) {
       const flask = elixirPayload(id);
-      expect(flask.value, `${id} value`).toBe(serpent.value + valueStep);
-      expect(flask.value, `${id} value literal`).toBe(15);
+      expect(flask.value, `${id} value literal`).toBe(13);
+      expect(flask.value, `${id} clears the elixir ceiling`).toBeGreaterThan(serpent.value);
+      expect(
+        flask.value,
+        `${id} sits BELOW the ladder step, the Phase 15 envelope trim`,
+      ).toBeLessThan(serpent.value + valueStep);
       expect(flask.duration, `${id} duration`).toBe(serpent.duration + durationStep);
       expect(flask.duration, `${id} duration literal`).toBe(1200);
     }
@@ -1541,9 +1630,9 @@ describe('the phase 10 apex rungs step exactly one rung off the shipped ladders'
     expect(topRung, 'the farming ladder tops out one below the apex').toBe(apexValue - 1);
   });
 
-  it('each apex enchant continues its OWN slot ladder by that ladder step', () => {
-    // Weapon strength: 2 base, 3 runed, 5 Greater. The apex takes the same +2
-    // step Greater took over Runed.
+  it('each apex enchant continues its OWN slot ladder, the weapon rung at HALF its step', () => {
+    // Weapon strength: 2 base, 3 runed, 5 Greater, so the ladder's own step is
+    // +2 and the apex rung would read 7 on it.
     expect([
       statBonus('enchant_weapon_might', 'str'),
       statBonus('enchant_weapon_runed_edge', 'str'),
@@ -1553,26 +1642,48 @@ describe('the phase 10 apex rungs step exactly one rung off the shipped ladders'
       statBonus('enchant_weapon_greater_might', 'str') -
       statBonus('enchant_weapon_runed_edge', 'str');
     expect(weaponStep).toBe(2);
+    // THE WEAPON RUNG IS THE ONE EXCEPTION, AND PHASE 15 MADE IT ONE (7 to 6).
+    // The weapon slot is the only enchant slot that lands TWICE on a character:
+    // a one-hand weapon declares slot 'mainhand' and is legal in the offhand,
+    // and the enchant slot gate compares itemDef.slot, so a fury warrior, an
+    // enhancement shaman and a rogue all wear the weapon enchant on both
+    // hands. At the ladder's own +2 the per-character step over Greater was 4
+    // for a dual-wielder, twice what the ratified R5 arithmetic counted; at
+    // half the step it is the 2 the envelope was measured on. Every other apex
+    // rung below still takes its own full ladder step, because no other slot
+    // doubles.
     expect(statBonus('enchant_weapon_lucent_might', 'str')).toBe(
-      statBonus('enchant_weapon_greater_might', 'str') + weaponStep,
+      statBonus('enchant_weapon_greater_might', 'str') + weaponStep / 2,
     );
-    expect(statBonus('enchant_weapon_lucent_might', 'str')).toBe(7);
+    expect(statBonus('enchant_weapon_lucent_might', 'str')).toBe(6);
+    expect(
+      statBonus('enchant_weapon_lucent_might', 'str'),
+      'still strictly above Greater',
+    ).toBeGreaterThan(statBonus('enchant_weapon_greater_might', 'str'));
 
     // The weapon INT twin (phase 10 QA D10-D1 ruling) mirrors the str ladder
-    // exactly: Spellpower 2, Runed Sigil 3, Greater Spellpower 5, apex 7 on
-    // the same +2 step, with the bill byte-identical to Lucent Might.
+    // exactly: Spellpower 2, Runed Sigil 3, Greater Spellpower 5, apex 6 on
+    // the same halved step, with the bill byte-identical to Lucent Might.
     expect([
       statBonus('enchant_weapon_intellect', 'int'),
       statBonus('enchant_weapon_runed_focus', 'int'),
       statBonus('enchant_weapon_greater_spellpower', 'int'),
     ]).toEqual([2, 3, 5]);
     expect(statBonus('enchant_weapon_lucent_spellpower', 'int')).toBe(
-      statBonus('enchant_weapon_greater_spellpower', 'int') + weaponStep,
+      statBonus('enchant_weapon_greater_spellpower', 'int') + weaponStep / 2,
     );
-    expect(statBonus('enchant_weapon_lucent_spellpower', 'int')).toBe(7);
+    expect(statBonus('enchant_weapon_lucent_spellpower', 'int')).toBe(6);
+    // The twins share a bill. Both sides are live, so the LITERAL below is
+    // what makes the equality mean something: emptying or retuning both bills
+    // together would otherwise pass.
     expect(ENCHANTS.enchant_weapon_lucent_spellpower.reagents).toEqual(
       ENCHANTS.enchant_weapon_lucent_might.reagents,
     );
+    expect(ENCHANTS.enchant_weapon_lucent_might.reagents).toEqual([
+      { itemId: 'lucent_reagent', count: 1 },
+      { itemId: 'arcane_shard', count: 1 },
+      { itemId: 'arcane_essence', count: 2 },
+    ]);
 
     // Chest stamina: 4 base, 7 Greater, so its own step is +3 and the apex
     // takes it again.
