@@ -5,8 +5,8 @@
     "baselineCommit": "aee195551b5aef628eb7a72192117d7e3079818e",
     "branch": "feature/placeholder-art-completion-v036",
     "shippingDirectory": "public/ui/items",
-    "itemArtFilesReviewed": 829,
-    "liveItemDefinitions": 844,
+    "itemArtFilesReviewed": 830,
+    "liveItemDefinitions": 845,
     "generatedHeroicDefinitions": 64,
     "heroicDefinitionsWithOwnWebp": 48,
     "heroicWeaponArtAliases": 16,
@@ -304,7 +304,7 @@
       "food": 21,
       "held_offhand": 9,
       "junk": 82,
-      "mount": 9,
+      "mount": 10,
       "potion": 13,
       "quest": 102,
       "tool": 45,
@@ -384,7 +384,7 @@
   },
   "visualVerdict": {
     "status": "pass",
-    "passCount": 829,
+    "passCount": 830,
     "passIds": [
       "abyssal_loop",
       "abysswrought_band",
@@ -946,6 +946,7 @@
       "reins_aether_hover_cycle",
       "reins_drakemaw_raptor",
       "reins_grag_bear",
+      "reins_seeker_board",
       "reins_shadowjump_toad",
       "reins_stalkglider_snail",
       "reins_stormfeather_griffin",
@@ -1220,7 +1221,7 @@
     "watch": [],
     "rejectCount": 0,
     "reject": [],
-    "summary": "All 829 shipping item-art files pass the visual contract: 817 reviewed in the 2026-08-09 campaign (documented retries included), plus the five class-overhaul integration additions owner-reviewed and passed on 2026-08-10, plus the Dawnhold posy addition (project-authored vector illustration) owner-reviewed and passed on 2026-08-12, plus the two Proving Shore prop renders (rendered from their own shipped world models) owner-reviewed and passed on 2026-08-17, plus the three pearl-detour icons (generated via the OpenAI proving-shore-mother-of-pearl-2026-08-20 batch) owner-reviewed and passed on 2026-08-20, plus the Proving Shore Passing Stone render (rendered from its own shipped world model by the same deterministic pipeline as the 2026-08-17 pair) added on 2026-08-22, machine-checked and awaiting owner visual review."
+    "summary": "All 830 shipping item-art files pass the visual contract: 817 reviewed in the 2026-08-09 campaign (documented retries included), plus the five class-overhaul integration additions owner-reviewed and passed on 2026-08-10, plus the Dawnhold posy addition (project-authored vector illustration) owner-reviewed and passed on 2026-08-12, plus the two Proving Shore prop renders (rendered from their own shipped world models) owner-reviewed and passed on 2026-08-17, plus the three pearl-detour icons (generated via the OpenAI proving-shore-mother-of-pearl-2026-08-20 batch) owner-reviewed and passed on 2026-08-20, plus the Proving Shore Passing Stone render (rendered from its own shipped world model by the same deterministic pipeline as the 2026-08-17 pair) added on 2026-08-22, machine-checked and awaiting owner visual review. Plus the Solana Seeker reins render (rendered from its own shipped mount model by scripts/render_mount_icons.mjs over the item-icon ground) added on 2026-08-28, machine-checked and awaiting owner visual review."
   },
   "nonVisualContentWatch": [
     {
@@ -1377,8 +1378,8 @@
   "evidence": {
     "catalog": {
       "path": "tmp/imagegen/item-art-consistency/final-audit/catalog.json",
-      "sha256": "ec47b8140b2f19caeddd869ee6a2bcb51f6965294b0fa93a1eeddf06d9c4c914",
-      "bytes": 454802
+      "sha256": "75a5414470f83745e196877aa2795bb04c6fe866efa4e8b8fbc08acd65b97ea6",
+      "bytes": 455328
     },
     "rendererFingerprint": "fd92c41a206cd55b05a1de94c4789f6eb6ca4200d063f4bbd284c21ae03b6082",
     "sheetCount": 208,
@@ -1392,7 +1393,7 @@
       "small-multiview": 26,
       "identity": 26
     },
-    "sheetSetSha256": "1ffdd0b938eee93919babb4d929efe33972d65b36b27243bc1a268a4eab81ae4",
+    "sheetSetSha256": "8dc5c3e96104f1d7f120b74030d08d3c81251d03f259c670bd8fd9ee1b1dc22e",
     "sheets": [
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/armor-chest--p01--128-color.png",
@@ -2548,64 +2549,64 @@
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/mount--p01--128-color.png",
-        "sha256": "31f74ade6951362722f51cc85c98c1d4705d1b2adfe7414ce7989688e9f1ea4d",
-        "bytes": 324975,
+        "sha256": "50cbc5d39a36df154d92f62e0c4afce3cd12d53bda2dab2a2eb7efd76f59d9f9",
+        "bytes": 344605,
         "width": 1600,
         "height": 210,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/mount--p01--40-color.png",
-        "sha256": "e7d83e7409f03de58024266dd7aa8cd9da4fe7136f092b1c2c8ef78cc6957694",
-        "bytes": 61084,
+        "sha256": "1cef80c39bee556987fa9a3ef6804d7d38d6e8a4baa2115d60a4b66a573d2b28",
+        "bytes": 64954,
         "width": 1600,
         "height": 166,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/mount--p01--28-color.png",
-        "sha256": "237e10d12c6246022ad5bf5ab8439ff4d2f75df48b9211968048f029662e4bfb",
-        "bytes": 42755,
+        "sha256": "efee108bec06a24e2853ff7d82700d58ff60b139b7633fa825e39701ef251e62",
+        "bytes": 45466,
         "width": 1600,
         "height": 210,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/mount--p01--22-color.png",
-        "sha256": "d2a3cc6a0bfc8a7843fd56b59fc1922dc8e5b3fe638c68212d3d41a9a9da5f73",
-        "bytes": 33828,
+        "sha256": "e8c878b4f63eb7dabcf17cf296d027d05bac87fa4e87d815072af3c726a7e3a8",
+        "bytes": 36128,
         "width": 1600,
         "height": 210,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/mount--p01--28-grayscale.png",
-        "sha256": "0fded7fbd7173e32d7b7d8a9c08e099b5865f1c8d6e99eac4bcf1f13b3c89229",
-        "bytes": 32248,
+        "sha256": "07c4e75cec6b53cb6f336209030e0cb819c43638220e6cb3688f2c010a6b203c",
+        "bytes": 34045,
         "width": 1600,
         "height": 210,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/mount--p01--64-circle.png",
-        "sha256": "f2d3f9ebf7f761042a0f67a9f915bb3847fce05782684e3a7f99f51ed8f7c311",
-        "bytes": 100934,
+        "sha256": "b42a2aee34f1789e66f2eee5421da59b13d1926b9ae1cdff1767b5beb83c3165",
+        "bytes": 108653,
         "width": 1600,
         "height": 210,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/mount--p01--small-multiview.png",
-        "sha256": "e4bdd337ad3df5a849ecee8acf24ab9af1d7d4fbed3541b0729d36a2df0e038e",
-        "bytes": 183714,
+        "sha256": "bc5ca90e3939b7794836425808c42dd6e50aa69f9818338335deea0a13fb6da5",
+        "bytes": 197471,
         "width": 1800,
         "height": 262,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/mount--p01--identity.png",
-        "sha256": "e817d99475d5599a05b2164e3367b85b9148f16e8acd2b46ed170ef868cfce58",
-        "bytes": 342039,
+        "sha256": "adf54c5a012a19fc80377ca49657257075d65dcf1b2d812f43beb1f72ab19a0f",
+        "bytes": 363109,
         "width": 1800,
         "height": 248,
         "format": "png"
@@ -3059,6 +3060,6 @@
         "format": "png"
       }
     ],
-    "shippingCatalogSha256": "92015c29b0abcb6f1fbb4cdeba01917e7fe4ae641df8bcd3076974a19ce56c97"
+    "shippingCatalogSha256": "61e160e4dd87ea3b4e7565135d73d02b1edfbfea5c237d8cc28a93b74fb28d06"
   }
 }

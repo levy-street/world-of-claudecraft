@@ -2381,6 +2381,39 @@
       }
     ]
   },
+  "mount_run_seeker_board": {
+    "ceilingDb": 5.6,
+    "tracks": [
+      {
+        "filename": "mount_run_seeker_board.mp3",
+        "sha256": "053d62fbd65e06dfbc7d6ecd548f213e3f13d32183070a52cd366f51ad40d530",
+        "size": 58976,
+        "peakDb": -6.6
+      }
+    ]
+  },
+  "mount_run_seeker_board_start": {
+    "ceilingDb": 5.8,
+    "tracks": [
+      {
+        "filename": "mount_run_seeker_board_start.mp3",
+        "sha256": "356c60d2803fb740131545529348e75379689f30bf694d0f7b8a964ea4b0f889",
+        "size": 25748,
+        "peakDb": -6.8
+      }
+    ]
+  },
+  "mount_run_seeker_board_stop": {
+    "ceilingDb": 5.3,
+    "tracks": [
+      {
+        "filename": "mount_run_seeker_board_stop.mp3",
+        "sha256": "e289b006a27deb584cc5c8c45c2f046eee0bfcb265ac1c552fe4c8dce549320e",
+        "size": 24494,
+        "peakDb": -6.3
+      }
+    ]
+  },
   "mount_run_shadowjump_toad": {
     "ceilingDb": 5.3,
     "tracks": [

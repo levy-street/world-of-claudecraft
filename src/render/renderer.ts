@@ -409,7 +409,7 @@ import {
   stageMountPrewarmVisual,
   stageResidentMountPrewarmVisual,
 } from './mount_prewarm';
-import { mountBobY, mountVisualSpec } from './mount_visuals';
+import { mountBobY, mountVisualSpec, riderPoseFlags } from './mount_visuals';
 import { NameplatePainter } from './nameplate_painter';
 import {
   isProjectedNameplateAnchorVisible,
@@ -11303,7 +11303,10 @@ export class Renderer {
       st.backwards = loco.backwards;
       st.reverseBackpedal = ghostWolf;
       st.dead = visuallyDead;
+      // `casting` stays the CAST FACT: VFX and metamorph wings read it.
+      const ridePose = riderPoseFlags(e.mountKey, v.mountLift > 0);
       st.casting = characterCasting;
+      st.poseHoldCast = ridePose.holdCast;
       // Which ability, so the pose layer can tell a drawn shot from a pet
       // utility cast (tame_beast is a 6s cast; a bow must not sit aimed for it).
       st.castingAbility = characterCasting ? (e.castingAbility ?? null) : null;
@@ -11316,12 +11319,11 @@ export class Renderer {
       st.swimPitch = v.swimPitch;
       st.wading = wading;
       if (isSelf) this.selfSubmerged = submerged && !visuallyDead;
-      // A mounted rider holds the seated pose (the sit loop reads as riding);
-      // swim/cast still outrank it in desiredBaseState, so mounted casting
-      // and swimming animate normally.
+      // Rider pose holds come from the mount (riderPoseFlags); swim still
+      // outranks them in desiredBaseState.
       st.sitting =
         e.kind === 'player' &&
-        (e.sitting || e.eating !== null || e.drinking !== null || riderMounted);
+        (e.sitting || e.eating !== null || e.drinking !== null || ridePose.holdSit);
       // Ice slide: the sim glides the player at speed but they should read as
       // FROZEN (gliding stiff on the ice), not sprinting. Suppress locomotion +
       // airborne so the state machine holds the static idle pose while they slide.

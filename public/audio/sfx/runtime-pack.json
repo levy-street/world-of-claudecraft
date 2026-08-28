@@ -1,8 +1,8 @@
 {
   "format": "woc-sfx-runtime-pack",
   "version": 1,
-  "bundleId": "75161a3d97b57b528d1f944c8dc76785862414b34f39fc57458bd20d92839943",
-  "catalogHash": "9a31e1e35398a332b675f1ecf36e40f0dc1ba69f58328d4f34e5d094bec9c93f",
+  "bundleId": "10d6117027d930c699ec4e1d1ef2f1311ea642701c8582cc80b1d6cab98c62f1",
+  "catalogHash": "245f3e259bf632854992b39a10b524c8532ef0324ed6a627cf8d6c5260e3ede2",
   "clips": {
     "amb_birds": {
       "variants": [
@@ -2885,6 +2885,42 @@
           "url": "/audio/sfx/mount_run_grag_bear.mp3?v=eba127f1f821",
           "bytes": 18224,
           "sha256": "eba127f1f8219e5d6a7512c4797735399e154e9f129bfc8c67a187941cb59fe7"
+        }
+      ],
+      "gain": 1,
+      "playbackRate": 1
+    },
+    "mount_run_seeker_board": {
+      "variants": [
+        {
+          "id": "main",
+          "url": "/audio/sfx/mount_run_seeker_board.mp3?v=053d62fbd65e",
+          "bytes": 58976,
+          "sha256": "053d62fbd65e06dfbc7d6ecd548f213e3f13d32183070a52cd366f51ad40d530"
+        }
+      ],
+      "gain": 1,
+      "playbackRate": 1
+    },
+    "mount_run_seeker_board_start": {
+      "variants": [
+        {
+          "id": "main",
+          "url": "/audio/sfx/mount_run_seeker_board_start.mp3?v=356c60d2803f",
+          "bytes": 25748,
+          "sha256": "356c60d2803fb740131545529348e75379689f30bf694d0f7b8a964ea4b0f889"
+        }
+      ],
+      "gain": 1,
+      "playbackRate": 1
+    },
+    "mount_run_seeker_board_stop": {
+      "variants": [
+        {
+          "id": "main",
+          "url": "/audio/sfx/mount_run_seeker_board_stop.mp3?v=e289b006a27d",
+          "bytes": 24494,
+          "sha256": "e289b006a27deb584cc5c8c45c2f046eee0bfcb265ac1c552fe4c8dce549320e"
         }
       ],
       "gain": 1,

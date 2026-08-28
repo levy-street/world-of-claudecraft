@@ -854,6 +854,7 @@ export const MEDIA_ASSETS: Record<string, string> =
   "models/mounts/aether_hover_cycle.glb": "/media/models/mounts/aether_hover_cycle.10935b02e1d8.glb",
   "models/mounts/drakemaw_raptor.glb": "/media/models/mounts/drakemaw_raptor.44d00a10e348.glb",
   "models/mounts/grag_bear.glb": "/media/models/mounts/grag_bear.767ddb38445d.glb",
+  "models/mounts/seeker_board.glb": "/media/models/mounts/seeker_board.b5bbaefaa622.glb",
   "models/mounts/shadowjump_toad.glb": "/media/models/mounts/shadowjump_toad.2811f4fadfda.glb",
   "models/mounts/stalkglider_snail.glb": "/media/models/mounts/stalkglider_snail.418aa794d44f.glb",
   "models/mounts/stormfeather_griffin.glb": "/media/models/mounts/stormfeather_griffin.32a487152ca2.glb",

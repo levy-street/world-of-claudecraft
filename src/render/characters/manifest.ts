@@ -95,6 +95,11 @@ export interface VisualDef {
   /** KayKit chars ship every accessory visible: non-skinned mesh nodes to KEEP.
    *  undefined = keep everything (creature GLBs have no accessories). */
   show?: string[];
+  /** Mesh nodes (by name) kept OUT of the shadow pass: authored FX shells such
+   *  as an additive exhaust cloud or a light trail, which the depth material
+   *  would otherwise draw as a solid blob under the rig. Everything else on a
+   *  rig casts. */
+  noShadowNodes?: readonly string[];
   attach?: AttachDef[];
   /** Indices into `attach` whose model is replaced by the entity's equipped mainhand
    *  weapon (mapped via ITEM_WEAPON_VARIANTS). undefined/empty = the held weapon never
@@ -234,6 +239,11 @@ const MOUNT_RIGGED: ClipMap = {
   attack: [],
   death: 'Death',
 };
+
+// The Solana Seeker board ships an authored Jump alongside the usual four,
+// so it spreads the shared map and adds only that. Editing MOUNT_RIGGED
+// itself would hand a jump clip to every other mount, none of which has one.
+const MOUNT_SEEKER: ClipMap = { ...MOUNT_RIGGED, jump: 'Jump' };
 
 // The Drakelands dragonkin brood (tmp/dragonkin_build.mjs bakes): artist
 // clips on the 25-bone mixamorig core. Run reuses the walk cycle (the rigs
@@ -1649,6 +1659,30 @@ export const VISUALS: Record<string, VisualDef> = {
     url: `${MOUNTS_DIR}/stalkglider_snail.glb`,
     height: 3.1,
     clips: MOUNT_RIGGED,
+    lazyPreload: true,
+  },
+  // The Solana Seeker: a Seeker handset ridden as a hover board (issue
+  // #3628). `height` looks tiny beside the other mounts because it IS a
+  // height: normScale is def.height / the model's Y extent, and this rig is
+  // a 1.75-long deck only 0.19 tall. Asking for 2.3 like the hover cycle
+  // would scale it 12x and ship a 21-yard surfboard; 0.39 puts the deck at a
+  // rideable 3.6 yards long. `hover` floats it off the ground, since a board
+  // resting in the dirt is not hovering.
+  mount_seeker_board: {
+    url: `${MOUNTS_DIR}/seeker_board.glb`,
+    height: 0.39,
+    hover: 0.35,
+    // The board points down +X (its deck bones run x -0.45 to +0.45 with the
+    // trail behind at -1.1) while visuals face +Z at world facing 0, so it
+    // needs the quarter turn the Tripo rigs take. Every other mount was
+    // authored facing +Z already and sets no yaw; without this one the rider
+    // travels sideways on a board pointing across the direction of travel.
+    yaw: -Math.PI / 2,
+    clips: MOUNT_SEEKER,
+    // The exhaust cloud and the light trail are alpha-blended emissive shells
+    // baked into the rig (six of its seven materials); in the shadow pass they
+    // would read as solid blobs beneath a hovering board.
+    noShadowNodes: ['Cloud_FX', 'Trail_FX'],
     lazyPreload: true,
   },
   mount_aether_hover_cycle: {

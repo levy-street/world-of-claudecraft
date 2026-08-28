@@ -8232,6 +8232,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'entities.items.reins_stormfeather_griffin.name': '凌天風暴之羽的韁繩',
   'entities.items.reins_drakemaw_raptor.name': '龍喉迅猛龍的韁繩',
   'entities.items.reins_thunderstrut_gobbler.name': '雷霆闊步大火雞的韁繩',
+  'entities.items.reins_seeker_board.name': '創世鑰匙：Solana Seeker',
   'entities.mobs.drowned_cantor.name': '溺亡誦經者',
   'entities.mobs.reedbound_acolyte.name': '蘆葦縛信徒',
   'entities.mobs.deepfen_spearjaw.name': '深沼槍顎獸',
@@ -9534,6 +9535,9 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.mounts.name_shadowjump_toad': '影躍蟾蜍卡瑪影',
   'hudChrome.mounts.name_stormfeather_griffin': '凌天風暴之羽',
   'hudChrome.mounts.name_drakemaw_raptor': '龍喉迅猛龍',
+  'hudChrome.mounts.name_seeker_board': 'Solana Seeker',
+  'hudChrome.mounts.desc_seeker_board':
+    '一部改裝成懸浮滑板的 Seeker 手機，乘著自身尾焰的氣墊，拖出一道光帶。',
   'hudChrome.mounts.desc_drakemaw_raptor':
     '來自龍喉火山口的馴服巢生迅猛龍，渾身筋肉、疾若奔雷，身上仍帶著淡淡的灰燼氣味。',
   'hudChrome.mounts.name_thunderstrut_gobbler': '雷霆闊步大火雞',
@@ -10580,6 +10584,8 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.reliquary.sourceActivityCorpseHarvest': '採集生物屍體時獲得',
   'hudChrome.reliquary.sourceActivityMasterworkCraft': '製作傑作時獲得',
   'hudChrome.reliquary.sourceActivityRiftFirstClear': '授予率先通關分級裂隙的隊伍全體成員',
+  'hudChrome.reliquary.sourceActivitySeekerGenesisClaim':
+    '在Solana Seeker手機上憑已驗證的Seeker Genesis Token領取',
   'hudChrome.reliquary.cellMissingSourceAria': '{name}，尚未獲得，{source}',
   'hudChrome.reliquary.cellOwnedClearsAria': '{name}，已收錄，首次獲得於第 {count} 次通關',
   'hudChrome.reliquary.searchPlaceholder': '搜尋聖物',

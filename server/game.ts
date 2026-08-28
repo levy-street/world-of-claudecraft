@@ -317,7 +317,7 @@ import {
   readBuildVersion,
 } from './parse';
 import { PartyFrameProjectionCache } from './party_frame_projection';
-import { applyBoostKitToPlayer, pbeBoostEnabled } from './pbe_boost';
+import { applyBoostKitAtJoin } from './pbe_boost';
 import { recordFtueDeath, recordFtueQuest, recordLevelUp } from './progress_events';
 import { eventLeadDayKey, nextRaidResetMs, resetDayKey } from './raid_reset';
 import { REALM, REALM_PUBLIC_ORIGIN, REALM_RESET_TIME_ZONE } from './realm';
@@ -325,6 +325,7 @@ import { createRealmReadoutMemo, realmReadoutJson, realmReadoutObject } from './
 import { RiftAssetCoordinator, riftAssetConfigFromEnv } from './rift_assets';
 import { refusedRiftForgeCommand } from './rift_forge_gate';
 import { RiftUpgradeCoordinator, riftUpgraderConfigFromEnv } from './rift_upgrader';
+import { applySeekerMountAtJoin } from './seeker_mount_grant';
 import {
   createDepthWarnedSerialWriter,
   createKeyedSerialWriter,
@@ -3616,6 +3617,11 @@ export class GameServer {
         // this is the account's first character. Absent (-> sim default true)
         // for callers that pass no meta (tests, the bot-detector overlay).
         firstCharacter?: boolean;
+        // Server-recomputed account fact (ws_auth.ts, fresh-join arm): the account
+        // holds a Seeker Genesis Token claim, so the join hands this character the
+        // Seeker board reins unless it owns them (server/seeker_mount_grant.ts).
+        // Absent on a resume and for meta-less callers, which grant nothing.
+        seekerEntitled?: boolean;
         // The character's stored action-bar layout (characters.hotbar_layout),
         // passed through from the join handler's DB read. Untrusted at rest, so
         // it is re-validated here before it reaches the client.
@@ -3681,21 +3687,11 @@ export class GameServer {
       const e = this.sim.entities.get(pid);
       if (e && e.level < 20) this.sim.setPlayerLevel(20, pid);
     }
-    // PBE only (PBE_BOOST_ACCOUNTS=1): top the character up to the current
-    // boost kit once per BOOST_KIT_VERSION (true-BiS gear for every spec, BiS
-    // bags, riding, attunement), so a roster created before the boost existed,
-    // or before a kit revision, re-kits at its next login. The stamp rides the
-    // character state and persists through the normal save path. Never
-    // allowed to fail the join.
-    if (pbeBoostEnabled()) {
-      try {
-        if (applyBoostKitToPlayer(this.sim, pid)) {
-          console.log(`pbe boost kit topped up: ${name} (character ${characterId})`);
-        }
-      } catch (err) {
-        console.error('pbe boost kit top-up failed:', err);
-      }
-    }
+    // Join-time grants, each best-effort and never allowed to fail the join:
+    // the PBE boost kit top-up (PBE_BOOST_ACCOUNTS=1) and the Seeker Genesis
+    // Token promotional mount for an entitled account.
+    applyBoostKitAtJoin(this.sim, pid, name, characterId);
+    applySeekerMountAtJoin(this.sim, pid, meta.seekerEntitled, name, characterId);
     const accountCosmetics = reconcileWornMechChromaForJoin({
       accountCosmetics: meta.accountCosmetics ?? EMPTY_ACCOUNT_COSMETICS,
       catalog: player?.skinCatalog,

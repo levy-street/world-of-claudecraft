@@ -564,6 +564,30 @@ export function applyBoostKitToPlayer(sim: Sim, pid: number): boolean {
   return true;
 }
 
+/**
+ * The world-join arm of the top-up (server/game.ts join). PBE only
+ * (PBE_BOOST_ACCOUNTS=1): top the character up to the current boost kit once
+ * per BOOST_KIT_VERSION, so a roster created before the boost existed, or
+ * before a kit revision, re-kits at its next login. The stamp rides the
+ * character state and persists through the normal save path. Never allowed
+ * to fail the join.
+ */
+export function applyBoostKitAtJoin(
+  sim: Sim,
+  pid: number,
+  name: string,
+  characterId: number,
+): void {
+  if (!pbeBoostEnabled()) return;
+  try {
+    if (applyBoostKitToPlayer(sim, pid)) {
+      console.log(`pbe boost kit topped up: ${name} (character ${characterId})`);
+    }
+  } catch (err) {
+    console.error('pbe boost kit top-up failed:', err);
+  }
+}
+
 export function buildBoostedCharacterState(
   cls: PlayerClass,
   name: string,

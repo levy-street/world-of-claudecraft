@@ -14,6 +14,7 @@ import esbuild from 'esbuild';
 import puppeteer from 'puppeteer-core';
 import sharp from 'sharp';
 import { BROWSER_PATH } from './browser_path.mjs';
+import { itemIconGroundSvg } from './lib/item_icon_ground.mjs';
 import { PORTRAIT_RENDER_DEFINES } from './lib/mob_portrait_jobs.mjs';
 
 const root = process.cwd();
@@ -86,9 +87,8 @@ const server = http.createServer(async (req, res) => {
 await new Promise((resolve) => server.listen(0, '127.0.0.1', resolve));
 const { port } = server.address();
 
-// The item-icon vignette: a soft radial glow over near-black, the shipped
-// icon family's ground.
-const backgroundSvg = `<svg xmlns="http://www.w3.org/2000/svg" width="${OUT_PX}" height="${OUT_PX}"><defs><radialGradient id="g" cx="50%" cy="42%" r="62%"><stop offset="0%" stop-color="#3a3527"/><stop offset="55%" stop-color="#211d15"/><stop offset="100%" stop-color="#0d0b08"/></radialGradient></defs><rect width="100%" height="100%" fill="url(#g)"/></svg>`;
+// The item-icon vignette, shared with every icon renderer.
+const backgroundSvg = itemIconGroundSvg(OUT_PX);
 
 const browser = await puppeteer.launch({
   executablePath: BROWSER_PATH,

@@ -204,6 +204,9 @@ until that loop stops.
 | `mount_run_stormfeather_griffin` | 0.51 | large wing rush and hard talon contact |
 | `mount_run_thunderstrut_gobbler` | 0.40 | higher feather rush and quick claw contact |
 | `mount_run_terrorspark_groundshaker` | 0.55 | compact tread clatter with a low mechanical drive pulse |
+| `mount_run_seeker_board_start` | 1.00 | ion drive windup: capacitor whine rising, plasma catching, a sub thump as the drive takes the weight |
+| `mount_run_seeker_board` | 2.40 | sustained ion hover: 55 Hz drive, plasma hiss breathing, quiet telemetry blips (the Sfx.loop() sustain take) |
+| `mount_run_seeker_board_stop` | 0.95 | winddown: power cut, field bleeding off, a last descending chirp |
 | `move_jump` | 0.5 | quick light gear/leather exertion and fabric rustle, a person leaping up |
 | `move_land` | 0.6 | a person landing from a jump, boots thud with armor and gear settle |
 | `move_splash` | 0.8 | a body plunging into water, big splash |

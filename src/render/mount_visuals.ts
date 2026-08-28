@@ -31,6 +31,17 @@ export interface MountVisualSpec {
   /** Ambient particle effect the renderer emits for this mount: the snail's
    *  slime path while moving, the hover cycle's aether exhaust. */
   fx: 'slime' | 'exhaust' | null;
+  /** How the rider is posed while mounted.
+   *
+   *  Every animal and vehicle here is sat on, so `sit` is the default and the
+   *  renderer holds a mounted rider in the seated loop. A board is ridden
+   *  upright: `stand` leaves the rider in their ordinary states, and
+   *  `channel` locks them into the cast loop, which outranks locomotion in
+   *  desiredBaseState and so holds for the whole ride.
+   *
+   *  For anything other than `sit`, `seat` is the DECK TOP rather than a
+   *  saddle height, because the lift has to land the feet, not the hips. */
+  ridePose: 'sit' | 'stand' | 'channel';
 }
 
 const spec = (
@@ -40,6 +51,7 @@ const spec = (
   bob?: { amp: number; hz: number; idle?: boolean; shape?: 'hover' | 'hop' },
   seatFwd = 0,
   fx: 'slime' | 'exhaust' | null = null,
+  ridePose: 'sit' | 'stand' | 'channel' = 'sit',
 ): MountVisualSpec => ({
   visualKey,
   seat,
@@ -50,6 +62,7 @@ const spec = (
   bobIdle: bob?.idle ?? false,
   bobShape: bob?.shape ?? 'hop',
   fx,
+  ridePose,
 });
 
 export const MOUNT_VISUAL_SPECS: Record<MountKey, MountVisualSpec> = {
@@ -59,6 +72,12 @@ export const MOUNT_VISUAL_SPECS: Record<MountKey, MountVisualSpec> = {
   valorsteed: spec('mount_valorsteed', 2.4, true, undefined, 0.15),
   grag_bear: spec('mount_grag_bear', 3.35, true, undefined, -0.8),
   stalkglider_snail: spec('mount_stalkglider_snail', 2.65, false, undefined, -0.3, 'slime'),
+  // Ridden STANDING, so `seat` is the deck top rather than a saddle height:
+  // hover (0.35) plus the deck itself (0.39), which is where the feet land.
+  // No procedural bob and no exhaust fx: unlike the clipless hover cycle this
+  // rig is animated, and it ships its own trail and exhaust-cloud meshes, so
+  // both would double up.
+  seeker_board: spec('mount_seeker_board', 0.74, true, undefined, 0, null, 'channel'),
   aether_hover_cycle: spec(
     'mount_aether_hover_cycle',
     2.1,
@@ -86,6 +105,30 @@ export const MOUNT_VISUAL_SPECS: Record<MountKey, MountVisualSpec> = {
 /** Spec for an entity's active mountKey, or null when dismounted/unknown. */
 export function mountVisualSpec(mountKey: string): MountVisualSpec | null {
   return mountKey in MOUNTS ? MOUNT_VISUAL_SPECS[mountKey as MountKey] : null;
+}
+
+/** The two pose holds a mount imposes on its rider, decided from the mount
+ *  alone.
+ *
+ *  Pure on purpose: the renderer needs none of its own state to answer this
+ *  (the lift is already resolved), and keeping it here means the headline
+ *  behaviour has a test that does not have to drive a renderer.
+ *
+ *  `holdCast` is deliberately NOT the same thing as casting: see
+ *  AnimState.poseHoldCast for what reusing that flag costs. */
+export function riderPoseFlags(
+  mountKey: string,
+  riderMounted: boolean,
+): { holdCast: boolean; holdSit: boolean } {
+  if (!riderMounted) return { holdCast: false, holdSit: false };
+  const pose = mountRidePose(mountKey);
+  return { holdCast: pose === 'channel', holdSit: pose === 'sit' };
+}
+
+/** How a rider is posed on this mount. Unknown or dismounted reads as `sit`,
+ *  which is what every mount but the board does. */
+export function mountRidePose(mountKey: string): 'sit' | 'stand' | 'channel' {
+  return mountVisualSpec(mountKey)?.ridePose ?? 'sit';
 }
 
 /** World-unit rider lift for the active mountKey ('' or unknown: 0). */

@@ -103,8 +103,8 @@ function ride(sim: Sim, pid: number, key: string): void {
 }
 
 describe('mount catalog', () => {
-  it('has exactly nine mounts with the horse first and the developer tank last', () => {
-    expect(MOUNT_KEYS).toHaveLength(9);
+  it('has exactly ten mounts with the horse first and the developer tank last', () => {
+    expect(MOUNT_KEYS).toHaveLength(10);
     expect(MOUNT_KEYS[0]).toBe('valorsteed');
     expect(MOUNT_KEYS.at(-1)).toBe('terrorspark_groundshaker');
     expect(DEFAULT_MOUNT).toBe('valorsteed');
@@ -171,15 +171,29 @@ describe('mount reins items (the collection: owning the item is owning the mount
     Object.values(ITEMS).filter((d) => d.kind === 'mount' && d.mount === key) as MountItemDef[];
 
   it('every mount has exactly one reins item; player reins are unbound, the dev tank stays bound', () => {
+    // A renamed mount key would skip the seeker arm below silently; make it red.
+    let seekerChecked = false;
     for (const key of MOUNT_KEYS) {
       const items = reinsFor(key);
       expect(items).toHaveLength(1);
       const item = items[0];
       expect(mountItemId(key)).toBe(item.id);
-      if (key === 'terrorspark_groundshaker') {
+      if (key === 'seeker_board') seekerChecked = true;
+      if (key === 'terrorspark_groundshaker' || key === 'seeker_board') {
         // The developer-only tank stays soulbound: it has no player acquisition
         // path, and tradability would turn a dev grant into a leak vector.
+        //
+        // The Solana Seeker is bound for a different reason, and a stated one:
+        // issue #3628 requires one mount per Seeker Genesis Token, permanently
+        // bound to the claiming account, never sold, traded or transferred.
+        // Binding alone is NOT that guarantee: the $WOC Exchange tolerates a
+        // soulbound mount on purpose, so the cash and vendor rails are closed
+        // by their own flags (policy pinned in tests/exchange_eligibility.test.ts).
         expect(item.soulbound).toBe(true);
+        if (key === 'seeker_board') {
+          expect(item.noMarketList).toBe(true);
+          expect(item.noVendorSell).toBe(true);
+        }
       } else {
         // Player reins are NOT soulbound: they trade, mail, list, and store in
         // the guild bank like any other item (the transfer describe below).
@@ -193,6 +207,7 @@ describe('mount reins items (the collection: owning the item is owning the mount
       // The item's name color matches the card's rarity tier.
       expect(item.quality).toBe(MOUNTS[key].rarity);
     }
+    expect(seekerChecked, 'the seeker arm ran').toBe(true);
   });
 
   // scripts/mounts_shot.mjs grants the reins by a hardcoded list, and a mount
@@ -243,7 +258,11 @@ describe('mount reins items (the collection: owning the item is owning the mount
     // acquisition path at all. Listed EXPLICITLY so a sourceless mount is a
     // decision and never an accident: when the world boss lands, delete the entry
     // and the rarity-derived rule below takes back over.
-    const NO_SOURCE_YET: readonly string[] = ['reins_drakemaw_raptor'];
+    // reins_seeker_board is table-less for a different reason than the
+    // raptor: its one route is the server-side grant off the Seeker Genesis
+    // Token claim ledger (server/seeker_mount_grant.ts, issue #3628), which no
+    // in-game table can express, so it must appear on NO table at all.
+    const NO_SOURCE_YET: readonly string[] = ['reins_drakemaw_raptor', 'reins_seeker_board'];
     const FIVE_MAN_SOURCES: Record<string, readonly string[]> = {
       reins_stormfeather_griffin: ['morthen'],
       reins_shadowjump_toad: ['vael_the_mistcaller'],
@@ -317,14 +336,18 @@ describe('mount reins items (the collection: owning the item is owning the mount
     }
   });
 
-  it('keeps the tank developer-only and absent from every normal acquisition table', () => {
-    const itemId = 'reins_terrorspark_groundshaker';
+  // Every reins that content awards through NO table has to be absent from all
+  // of them, not just the tank: items.ts makes that claim for each one, and
+  // before this the vendor / delve / market / quest half only ran for the tank.
+  const SOURCELESS = [
+    'reins_terrorspark_groundshaker',
+    'reins_drakemaw_raptor',
+    'reins_seeker_board',
+  ];
+  it.each(SOURCELESS)('keeps %s absent from every normal acquisition table', (itemId) => {
     const item = ITEMS[itemId] as MountItemDef;
     expect(item).toMatchObject({
       kind: 'mount',
-      mount: 'terrorspark_groundshaker',
-      quality: 'epic',
-      soulbound: true,
       noDiscard: true,
       sellValue: 0,
     });
@@ -744,6 +767,18 @@ describe('mount reins transfer (not soulbound: the collection trades hands)', ()
     expect(guildBankPipeRefusal({ itemId: 'reins_terrorspark_groundshaker', count: 1 })).not.toBe(
       null,
     );
+  });
+
+  it('the Seeker reins are refused by the guild bank pipes too (bags or bank only)', () => {
+    // The promotional grant's idempotence rests on the reins never leaving the
+    // character (server/seeker_mount_grant.ts reads mountOwned, bags or bank),
+    // so every pipe out of a character is pinned per item, not inferred.
+    for (const direction of [undefined, 'withdraw'] as const) {
+      expect(
+        guildBankPipeRefusal({ itemId: 'reins_seeker_board', count: 1 }, direction),
+        String(direction),
+      ).not.toBeNull();
+    }
   });
 
   it('vendor sell still refuses reins (noVendorSell: sellValue 0 protects the collection)', () => {

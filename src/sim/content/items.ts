@@ -404,6 +404,37 @@ export const BASE_ITEMS: Record<string, ItemDef> = {
   // /dev give reins_terrorspark_groundshaker while the feature remains under development.
   // Unlike the player reins it STAYS soulbound: it has no acquisition path, so
   // tradability would turn a dev grant into an economy leak.
+  // Promotional mount for Seeker Genesis Token holders (issue #3628), which
+  // requires one mount per Genesis Token, permanently bound, never sold,
+  // traded or transferred.
+  //
+  // That takes THREE flags, not one. `soulbound` closes trade, mail, the
+  // guild bank and the gold market, but NOT the $WOC Exchange: the Exchange
+  // deliberately tolerates soulbound for the mount category so that every
+  // mount trades regardless of tier (see the doc block in
+  // src/sim/exchange_eligibility.ts), which would have left this one sellable
+  // for real money. `noMarketList` is the flag that category does honour.
+  // `noVendorSell` closes the vendor rail, which today is blocked only by the
+  // soulbound arm; v0.35.0 already un-soulbound the player reins once, and
+  // with sellValue 0 a future un-bind would turn vendoring into a silent
+  // destroy.
+  //
+  // It has NO in-game acquisition path: absent from vendors, quests, creature
+  // loot, heroic loot and rift pools. The one route is server-side, off the
+  // Seeker Genesis Token claim ledger (server/seeker_mount_grant.ts), which
+  // the offline world cannot hold; /dev give covers dev testing.
+  reins_seeker_board: {
+    id: 'reins_seeker_board',
+    name: 'Genesis Key: Seeker Board',
+    kind: 'mount',
+    mount: 'seeker_board',
+    quality: 'epic',
+    soulbound: true,
+    noDiscard: true,
+    noMarketList: true,
+    noVendorSell: true,
+    sellValue: 0,
+  },
   reins_terrorspark_groundshaker: {
     id: 'reins_terrorspark_groundshaker',
     name: 'Ignition Key: Terrorspark Groundshaker',

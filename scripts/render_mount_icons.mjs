@@ -16,12 +16,15 @@ import * as esbuild from 'esbuild';
 import puppeteer from 'puppeteer-core';
 import sharp from 'sharp';
 import { BROWSER_PATH } from './browser_path.mjs';
+import { itemIconGroundSvg } from './lib/item_icon_ground.mjs';
 import { ktx2TranscoderScriptTag } from './lib/ktx2_assets.mjs';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const mountsDir = path.join(root, 'public/models/mounts');
 const outDir = path.join(root, 'public/ui/items');
 const OUT_PX = 128; // matches the existing public/ui/items icon size (mapping.json iconSize)
+// Shipped item icons are opaque: renders composite over the shared ground.
+const ITEM_ICON_GROUND_SVG = itemIconGroundSvg(OUT_PX);
 const debugDir = process.env.DEBUG_DIR || null;
 mkdirSync(outDir, { recursive: true });
 if (debugDir) mkdirSync(debugDir, { recursive: true });
@@ -31,6 +34,15 @@ if (debugDir) mkdirSync(debugDir, { recursive: true });
 // each mount's face fills the frame. All mounts face +Z (the model convention), so `fwd` is
 // only set where a model deviates.
 const JOBS = [
+  {
+    // The board has no head to anchor on and is nearly flat, so the framing
+    // rules the animal rigs use do not apply: look DOWN at the deck (a large
+    // pitch) so the icon reads as the Seeker face rather than a dark edge, and
+    // fill hard because the silhouette is a thin slab.
+    file: 'seeker_board.glb',
+    id: 'reins_seeker_board',
+    cfg: { headFwd: 0.0, headUp: 0.0, fill: 5.6, yaw: 0.62, pitch: 0.8 },
+  },
   {
     file: 'valorsteed.glb',
     id: 'reins_valorsteed',
@@ -97,6 +109,11 @@ const built = await esbuild.build({
   platform: 'browser',
   write: false,
   logLevel: 'silent',
+  // three's loaders read import.meta.url, and esbuild rewrites import.meta to
+  // an empty object inside an IIFE, so without a define the page dies at boot
+  // on new URL(undefined) and the harness can only report it as a timeout.
+  // Same trap scripts/wiki/render_model_stills.mjs guards against by assertion.
+  define: { 'import.meta.url': JSON.stringify('https://icons.local/entry.js') },
 });
 const bundleJs = built.outputFiles[0].text;
 const ktx2Tag = ktx2TranscoderScriptTag(
@@ -145,8 +162,12 @@ for (const job of JOBS) {
     if (!alpha || alpha.max < 8) {
       throw new Error(`blank render (alpha max ${alpha ? alpha.max : 'none'})`);
     }
-    const webp = await sharp(png)
+    const subject = await sharp(png)
       .resize(OUT_PX, OUT_PX, { fit: 'contain', background: { r: 0, g: 0, b: 0, alpha: 0 } })
+      .png()
+      .toBuffer();
+    const webp = await sharp(Buffer.from(ITEM_ICON_GROUND_SVG))
+      .composite([{ input: subject }])
       .webp({ quality: 90, alphaQuality: 100, effort: 6 })
       .toBuffer();
     writeFileSync(path.join(outDir, `${job.id}.webp`), webp);

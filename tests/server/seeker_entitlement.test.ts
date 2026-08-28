@@ -1,5 +1,5 @@
 import type * as http from 'node:http';
-import { afterEach, describe, expect, it, vi } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { FakeRes, makeReq } from './helpers';
 
 vi.mock('../../server/db', () => ({
@@ -10,8 +10,10 @@ vi.mock('../../server/db', () => ({
 }));
 
 import {
+  configureSeekerEntitlementRuntime,
   handleSeekerEntitlementClaim,
   handleSeekerEntitlementStatus,
+  resetSeekerEntitlementGameHooksForTests,
   resetSeekerEntitlementRuntimeForTests,
   setSeekerEntitlementRuntimeForTests,
   verifyCurrentSeekerEntitlement,
@@ -22,7 +24,18 @@ const nativeHeaders = {
   'content-type': 'application/json',
 };
 
-afterEach(() => resetSeekerEntitlementRuntimeForTests());
+// The boot-injected game hook (main.ts configureSeekerEntitlementRuntime): the
+// live promotional-mount grant. Installed fresh per test so every claim path
+// below can assert whether it fired.
+const grantMount = vi.fn();
+beforeEach(() => {
+  grantMount.mockClear();
+  configureSeekerEntitlementRuntime({ grantMount });
+});
+afterEach(() => {
+  resetSeekerEntitlementRuntimeForTests();
+  resetSeekerEntitlementGameHooksForTests();
+});
 
 describe('Seeker entitlement claim', () => {
   it('verifies native attestation, linked wallet, SGT ownership, and permanent claim', async () => {
@@ -59,6 +72,9 @@ describe('Seeker entitlement claim', () => {
       { challengeId: 'id', token: 'token' },
       'seeker-claim',
     );
+    // A FRESH claim delivers the promotional mount to the account now, once.
+    expect(grantMount).toHaveBeenCalledTimes(1);
+    expect(grantMount).toHaveBeenCalledWith(42);
     expect(claim).toHaveBeenCalledWith({
       candidates: [
         { mint: 'unique-mint', verificationSlot: 123 },
@@ -127,6 +143,96 @@ describe('Seeker entitlement claim', () => {
       'fixed-mint',
     );
     expect(claim).not.toHaveBeenCalled();
+  });
+
+  it('delivers the mount only on a fresh claim: never on existing_same, conflict, a re-claim, a throwing hook, or a missing hook', async () => {
+    const wallet = { pubkey: 'wallet', linked_at: '2026-01-01T00:00:00Z' };
+    const claimReq = () =>
+      makeReq({
+        method: 'POST',
+        url: '/api/seeker/entitlement',
+        headers: nativeHeaders,
+        body: { nativeAttestation: { challengeId: 'id', token: 'token' } },
+      });
+    const arm = (
+      result:
+        | { status: 'claimed' | 'existing_same'; mint: string }
+        | { status: 'conflict'; mint: null },
+      existing: { mint: string; claimantWallet: string } | null = null,
+    ) =>
+      setSeekerEntitlementRuntimeForTests({
+        verifySeekerSolanaArtifactAttestation: vi.fn().mockResolvedValue({ nonce: 'nonce' }),
+        walletForAccount: vi.fn().mockResolvedValue(wallet),
+        seekerEntitlementForAccount: vi.fn().mockResolvedValue(existing),
+        findSeekerGenesisTokens: vi.fn().mockResolvedValue([{ mint: 'mint-a', slot: 1 }]),
+        claimAvailableSeekerEntitlement: vi.fn().mockResolvedValue(result),
+      });
+
+    // existing_same: the insert lost a race to this account's own earlier row.
+    arm({ status: 'existing_same', mint: 'mint-a' });
+    const sameRes = new FakeRes();
+    await handleSeekerEntitlementClaim(claimReq(), sameRes as unknown as http.ServerResponse, 42);
+    expect(sameRes.statusCode).toBe(200);
+    expect(grantMount).not.toHaveBeenCalled();
+
+    // conflict: the token belongs to someone else.
+    arm({ status: 'conflict', mint: null });
+    const conflictRes = new FakeRes();
+    await handleSeekerEntitlementClaim(
+      claimReq(),
+      conflictRes as unknown as http.ServerResponse,
+      42,
+    );
+    expect(conflictRes.statusCode).toBe(409);
+    expect(grantMount).not.toHaveBeenCalled();
+
+    // A re-claim by an already-entitled account short-circuits before the
+    // ledger and grants nothing (its join arm already handled the mount).
+    arm({ status: 'claimed', mint: 'mint-a' }, { mint: 'mint-a', claimantWallet: 'wallet' });
+    const reclaimRes = new FakeRes();
+    await handleSeekerEntitlementClaim(
+      claimReq(),
+      reclaimRes as unknown as http.ServerResponse,
+      42,
+    );
+    expect(reclaimRes.statusCode).toBe(200);
+    expect(grantMount).not.toHaveBeenCalled();
+
+    // The grant is delivery, not the entitlement: a throwing hook or a boot
+    // wiring gap is logged and the landed claim still answers 200.
+    const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+    try {
+      arm({ status: 'claimed', mint: 'mint-a' });
+      grantMount.mockImplementationOnce(() => {
+        throw new Error('sim exploded');
+      });
+      const throwRes = new FakeRes();
+      await handleSeekerEntitlementClaim(
+        claimReq(),
+        throwRes as unknown as http.ServerResponse,
+        42,
+      );
+      expect(throwRes.statusCode).toBe(200);
+      expect(grantMount).toHaveBeenCalledTimes(1);
+      expect(errorSpy).toHaveBeenCalledTimes(1);
+
+      resetSeekerEntitlementGameHooksForTests();
+      const unwiredRes = new FakeRes();
+      await handleSeekerEntitlementClaim(
+        claimReq(),
+        unwiredRes as unknown as http.ServerResponse,
+        42,
+      );
+      expect(unwiredRes.statusCode).toBe(200);
+      expect(JSON.parse(unwiredRes.body)).toEqual({ entitled: true, mint: 'mint-a' });
+      expect(grantMount).toHaveBeenCalledTimes(1);
+      expect(errorSpy).toHaveBeenCalledTimes(2);
+      // The null guard, not the catch: a deleted guard would still log once
+      // (a TypeError into the catch) and this line is what tells them apart.
+      expect(String(errorSpy.mock.calls[1][0])).toContain('runtime is not configured');
+    } finally {
+      errorSpy.mockRestore();
+    }
   });
 
   it('rejects a claim when the linked wallet changes during SGT verification', async () => {

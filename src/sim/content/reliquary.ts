@@ -108,11 +108,18 @@ export const RELIQUARY_STORE_SOURCE_ID = 'woc_store' as const;
  *   gates the call on claim.won AND claim.event, so a dev portal never mints).
  *   The hint is rank-agnostic on purpose: every ranked tier, C included, mints
  *   the rings on its event's first clear.
+ * - seeker_genesis_claim: server/seeker_mount_grant.ts hands the Seeker board
+ *   reins to a character whose account holds a Seeker Genesis Token claim
+ *   (server/seeker_entitlement_db.ts), at fresh join and on claim success.
+ *   The write site is the server rather than the sim on purpose: the
+ *   entitlement is an account fact the offline world cannot hold, so no
+ *   in-game table awards the reins and the claim itself is the door.
  */
 export const RELIQUARY_ACTIVITY_SOURCE_IDS = [
   'corpse_harvest',
   'masterwork_craft',
   'rift_first_clear',
+  'seeker_genesis_claim',
 ] as const;
 export type ReliquaryActivitySourceId = (typeof RELIQUARY_ACTIVITY_SOURCE_IDS)[number];
 
@@ -267,6 +274,7 @@ export const RELIQUARY_HORIZON_MOUNTS = [
   'thunderstrut_gobbler',
   'drakemaw_raptor',
   'terrorspark_groundshaker',
+  'seeker_board',
 ] as const;
 
 // Per-mount sources. A mount is owned through its reins ItemDef (kind 'mount',
@@ -287,6 +295,10 @@ export const RELIQUARY_HORIZON_MOUNTS = [
 // path, terrorspark_groundshaker is dev-grant only). They are the catalog's
 // two SOURCE_PENDING_RULING mounts; masterwork:engineering on the professions
 // shelf is the third pending slot (QA ruling 2026-08-07).
+//
+// seeker_board is awarded by no in-game table either, but it is NOT pending:
+// its door is the Seeker Genesis Token claim, a server-side grant hinted as
+// the seeker_genesis_claim activity (RELIQUARY_ACTIVITY_SOURCE_IDS).
 //
 // Keys are typed against the live mount ladder so a misspelled or renamed key
 // fails tsc at the authoring site instead of falling through to the pending
@@ -322,6 +334,7 @@ const MOUNT_SOURCES: Readonly<
   ],
   aether_hover_cycle: fromRift('S'),
   thunderstrut_gobbler: fromRift('S'),
+  seeker_board: fromActivity('seeker_genesis_claim'),
 };
 
 /** Mount slots carrying their MOUNT_SOURCES hints, with RELIQUARY_HORIZON_MOUNTS
@@ -1304,13 +1317,15 @@ export const RELIQUARY_PAGES: readonly ReliquaryPageDef[] = freezePageTable([
     name: 'Mounts',
     desc: 'Rideable mounts from the stable, heroic reins, Rift epics, and rarer saddles. Ownership follows the live reins seam (bags and bank).',
     clearSource: { kind: 'none' },
-    // Seven of the nine mounts name every door that awards their reins (see
+    // All but the two pending mounts name every door that awards their reins (see
     // MOUNT_SOURCES above): the four heroic reins each drop from two or three
     // HEROIC_BOSS_LOOT bosses AND from their Rift rank's ladder, the two epic
-    // reins are Rift-only, and valorsteed is Marla's counter. The page-wide
-    // pending ruling that used to cover all nine is executed; the two that
-    // remain (drakemaw_raptor, terrorspark_groundshaker) are content gaps, not
-    // vocabulary gaps, and stay hand-listed in SOURCE_PENDING_RULING.
+    // reins are Rift-only, valorsteed is Marla's counter, and seeker_board
+    // names the Seeker Genesis Token claim (its server-side grant is the
+    // seeker_genesis_claim activity). The page-wide pending ruling that used
+    // to cover all of them is executed; the two that remain (drakemaw_raptor,
+    // terrorspark_groundshaker) are content gaps, not vocabulary gaps, and
+    // stay hand-listed in SOURCE_PENDING_RULING.
     relics: mounts(...mountEntries(RELIQUARY_HORIZON_MOUNTS)),
   },
   {

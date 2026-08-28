@@ -319,7 +319,12 @@ const MONOLITHS: MonolithRow[] = [
     // routeEvents into the guild board window's live REST read (the
     // noticeboard_guilds event transform is deleted). Exact count, zero
     // slack.
-    ceiling: 10645,
+    // Lowered 10645 -> 10639 by the Seeker mount grant: the PBE join-time
+    // top-up block moved into pbe_boost.ts (applyBoostKitAtJoin) and the
+    // Seeker grant landed as a sibling module (seeker_mount_grant.ts), so
+    // join is two one-line calls plus the seekerEntitled meta field. Exact
+    // merged count, zero headroom.
+    ceiling: 10639,
     seam: 'a sibling server module; see the hot-path seams in server/CLAUDE.md',
   },
   {

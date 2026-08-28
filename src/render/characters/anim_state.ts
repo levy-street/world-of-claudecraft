@@ -18,6 +18,15 @@ export interface AnimState {
   reverseBackpedal?: boolean;
   dead: boolean;
   casting: boolean;
+  /** Hold the CAST POSE without claiming a cast is happening.
+   *
+   *  A board rider channels for the whole ride, but they are not casting:
+   *  reusing `casting` for that streams arcane cast sparkle off every rider
+   *  in view (shouldDrawLegacyCastSparkle returns true for a null ability and
+   *  the school falls through to arcane) and pins a metamorph warlock's wings
+   *  in the casting attitude. Presentation that means "a spell is being cast"
+   *  must read `casting`; only the base-state machine reads this. */
+  poseHoldCast?: boolean;
   /** The ability id driving `casting`, or null. Presentation that must tell a
    *  drawn SHOT apart from any other cast-time ability needs this: `casting`
    *  alone is true for a hunter's tame_beast (6s) and revive_pet (3s) as well
@@ -356,7 +365,7 @@ export function desiredBaseState(
   }
   if (s.airborne) return s.falling ? 'fall' : 'jump';
   if (s.spinning) return 'spin';
-  if (s.casting) return 'cast';
+  if (s.casting || s.poseHoldCast) return 'cast';
   if (s.sitting) return 'sit';
   if (s.moving) {
     // Shallow water is still walking, just against resistance: one cycle covers

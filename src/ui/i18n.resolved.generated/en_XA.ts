@@ -1356,6 +1356,7 @@ export const en_XA: EnTranslations = {
       "name_thunderstrut_gobbler": "[Ţĥúñðéŕšţŕúţ ţĥé Ĝŕáñð Ĝóƀƀļéŕ]",
       "name_terrorspark_groundshaker": "[Ţéŕŕóŕšþáŕķ Ĝŕóúñðšĥáķéŕ]",
       "name_drakemaw_raptor": "[Ðŕáķéɱáŵ Ŕáþţóŕ]",
+      "name_seeker_board": "[Šóļáñá Šééķéŕ]",
       "desc_valorsteed": "[Á ĥáŕðý, šúŕé-ƒóóţéð šţééð ţĥáţ þŕóʋíðéš éñĥáñçéð ţŕáʋéļ šþééð.]",
       "desc_grag_bear": "[Á ĥáŕðý, šúŕé-ƒóóţéð ƀéáŕ ţĥáţ þŕóʋíðéš éñĥáñçéð ţŕáʋéļ šþééð.]",
       "desc_stalkglider_snail": "[Á ĥéáŕţý, šļóŵ-ƀúŕñíñĝ šñáíļ ţĥáţ þŕóʋíðéš éñĥáñçéð ţŕáʋéļ šþééð.]",
@@ -1364,7 +1365,8 @@ export const en_XA: EnTranslations = {
       "desc_stormfeather_griffin": "[Á ŕéĝáļ šţóŕɱ ĝŕíƒƒíñ ţĥáţ šţáļķš ţĥé ĝŕóúñð óñ ŕúñé-šĥóð ţáļóñš, ŵíñĝš ƒúŕļéð.]",
       "desc_thunderstrut_gobbler": "[Á çóļóššáļ šţóŕɱ-ĥáţçĥéð ĝóƀƀļéŕ ţĥáţ šţŕúţš ðóŵñ ƒŕóɱ ţĥé Ŵáķíñĝ Þéáķ, ţáíļ ƒáññéð ļíķé á ţĥúñðéŕĥéáð.]",
       "desc_terrorspark_groundshaker": "[Á çóɱþáçţ áŕɱóŕéð éñĝíñé ŵíţĥ ĥéáʋý ţŕáçķš, á ðééþ-ƀóŕé çáññóñ, áñð á šáððļé ƀúíļţ ƒóŕ ƒéáŕļéšš þíļóţš.]",
-      "desc_drakemaw_raptor": "[Á šáððļé-ƀŕóķéñ ƀŕóóð ŕáþţóŕ ƒŕóɱ ţĥé Ðŕáķéɱáŵ Çáļðéŕá, áļļ šíñéŵ áñð šþŕíñţ, šţíļļ šɱéļļíñĝ ƒáíñţļý óƒ ášĥ.]"
+      "desc_drakemaw_raptor": "[Á šáððļé-ƀŕóķéñ ƀŕóóð ŕáþţóŕ ƒŕóɱ ţĥé Ðŕáķéɱáŵ Çáļðéŕá, áļļ šíñéŵ áñð šþŕíñţ, šţíļļ šɱéļļíñĝ ƒáíñţļý óƒ ášĥ.]",
+      "desc_seeker_board": "[Á Šééķéŕ ĥáñðšéţ ŕéƀúíļţ áš á ĥóʋéŕ ƀóáŕð, ŕíðíñĝ á çúšĥíóñ óƒ íţš óŵñ éẋĥáúšţ óñ á ŕíƀƀóñ óƒ ļíĝĥţ.]"
     },
     "mountTraining": {
       "mountPrompt": "[Þŕéšš {key} ţó ɱóúñţ ţĥé ţŕáíñíñĝ Ʋáļóŕšţééð.]",
@@ -3968,6 +3970,7 @@ export const en_XA: EnTranslations = {
       "sourceActivityCorpseHarvest": "[Ŕéçóʋéŕéð ŵĥíļé ĥáŕʋéšţíñĝ çŕéáţúŕé çóŕþšéš]",
       "sourceActivityMasterworkCraft": "[Éáŕñéð ƀý çŕáƒţíñĝ á ɱášţéŕŵóŕķ]",
       "sourceActivityRiftFirstClear": "[Áŵáŕðéð ţó éʋéŕý ɱéɱƀéŕ óƒ ţĥé þáŕţý ţĥáţ ŵíñš á ŕáñķéð Ŕíƒţ'š ƒíŕšţ çļéáŕ]",
+      "sourceActivitySeekerGenesisClaim": "[Çļáíɱéð óñ á Šóļáñá Šééķéŕ ŵíţĥ íţš ʋéŕíƒíéð Šééķéŕ Ĝéñéšíš Ţóķéñ]",
       "cellMissingSourceAria": "[{name}, ñóţ ýéţ ƒóúñð, {source}]",
       "cellOwnedClearsAria": "[{name}, çáţáļóĝúéð, ƒíŕšţ ƒóúñð óñ çļéáŕ {count}]",
       "searchPlaceholder": "[Šéáŕçĥ ŕéļíçš]",
@@ -13717,6 +13720,9 @@ export const en_XA: EnTranslations = {
       },
       "reins_thunderstrut_gobbler": {
         "name": "[Ŕéíñš óƒ Ţĥúñðéŕšţŕúţ ţĥé Ĝŕáñð Ĝóƀƀļéŕ]"
+      },
+      "reins_seeker_board": {
+        "name": "[Ĝéñéšíš Ķéý: Šóļáñá Šééķéŕ]"
       }
     },
     "mobs": {

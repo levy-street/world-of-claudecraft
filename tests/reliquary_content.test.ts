@@ -362,7 +362,7 @@ describe('Reliquary Conqueror catalog structure', () => {
     // and the flag keeps each whole page out of owned AND total (the dedicated
     // vault and riftbound pins in this file and tests/reliquary_state.test.ts
     // hold both sides), so neither page moves these two literals.
-    expect(full).toEqual({ owned: 340, total: 340 });
+    expect(full).toEqual({ owned: 341, total: 341 });
     const character = catalogCharacterCompletion({
       itemsDiscovered: allOwned,
       marks: allOwned,
@@ -373,7 +373,7 @@ describe('Reliquary Conqueror catalog structure', () => {
     // pair above, including the three release-merged daggers; marks are
     // character-scoped, so this trails the overview by the 29 account-scoped
     // weapon skins).
-    expect(character).toEqual({ owned: 311, total: 311 });
+    expect(character).toEqual({ owned: 312, total: 312 });
   });
 
   it('pins the final measured catalog shape: total slots and distinct marks', () => {
@@ -394,7 +394,7 @@ describe('Reliquary Conqueror catalog structure', () => {
     expect(
       slots,
       `slot total moved; per page: ${RELIQUARY_PAGES.map((p) => `${p.id}=${p.relics.length}`).join(', ')}`,
-    ).toBe(375);
+    ).toBe(376);
     // Distinct mark ids: the 10 shipped before Phase 21 plus the 19
     // rare-slain proofs of conquerors_rares_of_the_realm.
     expect(
@@ -2153,6 +2153,11 @@ const ACTIVITY_AWARDS: Readonly<Record<string, readonly string[]>> = {
   // mint literals live in shellForClass); the mint-site arm in the Rift page
   // describe pins it over every class.
   rift_first_clear: RIFT_GEAR_ITEM_IDS,
+  // server/seeker_mount_grant.ts hands the Seeker board reins to a character
+  // whose account holds a Seeker Genesis Token claim, at fresh join and on
+  // claim success. The slot is the MOUNT (a mount resolves its routes through
+  // its reins item, and the grant mints exactly that reins).
+  seeker_genesis_claim: ['seeker_board'],
 };
 
 /**
@@ -2373,6 +2378,15 @@ const SOURCE_PENDING_RULING: Readonly<Record<string, readonly string[]>> = {
   // slot stays listed and sourceless until the mount gets a route.
   // terrorspark_groundshaker: dev-grant only, deliberately absent from vendors,
   // quests, mob loot, heroic loot, and the rift reins pools.
+  // seeker_board is NOT here: no in-game table awards it either, but its door
+  // is real (the Seeker Genesis Token claim, granted server-side and hinted as
+  // the seeker_genesis_claim activity), so it is hinted rather than pended.
+  //
+  // CURATOR NOTE: the two rows above are permanently unearnable slots on the
+  // horizons_mounts shelf, so the pinned "full" pair below sits two above what
+  // any player can actually reach. Not a defect (Curator ranks are thresholds,
+  // not completion), but the gap is deliberate and worth stating before a
+  // third one makes it look like drift.
   horizons_mounts: ['drakemaw_raptor', 'terrorspark_groundshaker'],
   // masterwork:engineering: unearnable, QA ruling 2026-08-07. Every live
   // engineering recipe produces a slotless, statless tool, masterworkBonusStats
@@ -2474,7 +2488,9 @@ const EXPECTED_DISTINCT_SOURCES: Record<string, number> = {
   // (mining, logging, herbalism, fishing) + the rods' engineering craft and
   // their Litany board keeper (Phase 21).
   professions_specimens: 7,
-  horizons_mounts: 10,
+  // 11 = the ten in-game doors (Marla, the five heroic bosses, the raid, the
+  // three rift ranks) plus the Seeker claim activity.
+  horizons_mounts: 11,
   horizons_weapon_skins: 1,
   // Every title relic's source is its own deed, so the count tracks the page
   // rows: 36 + the four Phase 18 completion-ladder titles.
@@ -3017,6 +3033,7 @@ describe('Reliquary source hints resolve against live content', () => {
       'corpse_harvest',
       'masterwork_craft',
       'rift_first_clear',
+      'seeker_genesis_claim',
     ]);
   });
 
@@ -3121,8 +3138,11 @@ describe('Reliquary source hints resolve against live content', () => {
     expect([...(bySlotKind.get('rift_first_clear:item') ?? [])].sort()).toEqual(
       [...RIFT_GEAR_ITEM_IDS].sort(),
     );
-    // Vacuity floor: five specimens, the two marks, and the three bands.
-    expect(checked).toBeGreaterThanOrEqual(10);
+    // The Seeker claim awards exactly the one MOUNT slot, literal like the
+    // marks: the grant site (server/seeker_mount_grant.ts) spells the reins id.
+    expect(bySlotKind.get('seeker_genesis_claim:mount')).toEqual(['seeker_board']);
+    // Vacuity floor: five specimens, the two marks, the three bands, the board.
+    expect(checked).toBeGreaterThanOrEqual(11);
   });
 
   it('every zone hint names the zone where its credited rare really camps', () => {
@@ -3325,7 +3345,7 @@ describe('Reliquary source hint coverage', () => {
     ).toBe(true);
   });
 
-  it('the surviving pending rows are the three slots content awards no route at all', () => {
+  it('the surviving pending rows are the four slots content awards no route at all', () => {
     // The page-wide Horizons rulings are EXECUTED: mounts and skins are no
     // longer derived from the catalog lists (the derivation era ended when the
     // rulings landed), so the identity pins to RELIQUARY_HORIZON_MOUNTS and
@@ -3806,10 +3826,12 @@ describe('Reliquary source hint coverage', () => {
         'mark x activity',
         'mark x boss',
         'mark x zone',
-        // mount: heroic tables, Marla's counter, the rift reins ladder.
+        // mount: heroic tables, Marla's counter, the rift reins ladder, and
+        // the Seeker Genesis Token claim (the activity truth arm's mount side).
         'mount x boss',
         'mount x vendor',
         'mount x rift',
+        'mount x activity',
         // weapon_skin: the account storefront, page-wide.
         'weapon_skin x store',
         // title: the deed that grants it, always.

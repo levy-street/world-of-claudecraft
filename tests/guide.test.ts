@@ -115,6 +115,7 @@ import type { DeedDef } from '../src/sim/types';
 import { DEED_IMAGE_IDS } from '../src/ui/deed_image_ids';
 import { ensureLocaleLoaded, type SupportedLanguage, setLanguage, t } from '../src/ui/i18n';
 import { guideStrings } from '../src/ui/i18n.catalog/guide';
+import { MOUNT_NAME_KEYS } from '../src/ui/mount_labels';
 
 const repoRoot = fileURLToPath(new URL('..', import.meta.url));
 const publicPath = (url: string): string => resolve(repoRoot, 'public', url.replace(/^\//, ''));
@@ -928,6 +929,36 @@ describe('Guide Reliquary spoiler-safe catalog', () => {
     // are checked too, so a generator edit scoped to one family cannot hide.
     expect(nonSlain.some((id) => id.startsWith('masterwork:'))).toBe(true);
     expect(nonSlain.some((id) => id.startsWith('gather_event:'))).toBe(true);
+  });
+
+  it('every generated mount name equals the shipped English the game resolves', () => {
+    // The generator used to bake MOUNTS[key].name, the raw sim name, which
+    // matched the catalog English byte for byte for nine mounts and then
+    // diverged on the tenth: the sim may not carry the Solana brand word
+    // (tests/architecture.test.ts bans it under src/sim), so seeker_board is
+    // "Seeker Board" there and "Solana Seeker" on every in-game surface. The
+    // wiki is a player surface, so it resolves through the same key the HUD
+    // does (MOUNT_NAME_KEYS -> hudChrome.mounts.name_<key>).
+    let checked = 0;
+    for (const guidePage of GUIDE_RELIQUARY) {
+      const live = RELIQUARY_PAGES.find((p) => p.id === guidePage.id);
+      expect(live, `live page for ${guidePage.id}`).toBeDefined();
+      if (!live) continue;
+      for (let i = 0; i < live.relics.length; i++) {
+        const relic = live.relics[i];
+        if (relic.kind !== 'mount') continue;
+        const key = MOUNT_NAME_KEYS[relic.mountId];
+        expect(key, `${relic.mountId} has a HUD name key`).toBeDefined();
+        expect(guidePage.relics[i]?.name, `${guidePage.id}:${relic.mountId}`).toBe(t(key));
+        checked += 1;
+      }
+    }
+    // Floor at the live ladder so a page that stopped emitting mounts cannot
+    // make the loop vacuous; and the one divergent name is asserted by value.
+    expect(checked).toBe(Object.keys(MOUNT_NAME_KEYS).length);
+    const mounts = GUIDE_RELIQUARY.find((p) => p.id === 'horizons_mounts');
+    expect(mounts?.relics.map((r) => r.name)).toContain('Solana Seeker');
+    expect(mounts?.relics.map((r) => r.name)).not.toContain('Seeker Board');
   });
 
   it('pins the reliquary route wiring to literals', () => {

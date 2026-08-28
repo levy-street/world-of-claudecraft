@@ -16,6 +16,7 @@ import { beforeEach, describe, expect, it } from 'vitest';
 import { ITEMS } from '../src/sim/data';
 import type { InvSlot, ItemInstancePayload } from '../src/sim/types';
 import { BankWindow, type BankWindowDeps } from '../src/ui/bank_window';
+import { itemDisplayName } from '../src/ui/entity_i18n';
 import type { BankInfo, GuildBankInfo, GuildBankLogView, IWorld } from '../src/world_api';
 
 // Real merged-table ids, derived so a content rename cannot rot this suite
@@ -30,8 +31,12 @@ const plainId = Object.keys(ITEMS).find((id) => {
 const soulboundId = Object.keys(ITEMS).find(
   (id) => ITEMS[id].soulbound && ITEMS[id].kind !== 'quest',
 ) as string;
-const plainName = ITEMS[plainId].name;
-const soulboundName = ITEMS[soulboundId].name;
+// Resolve through the SAME helper the window uses. Reading def.name assumed
+// the raw sim name is what renders, which only held while no fixture item had
+// a localized override; the first item that did (a promotional reins whose
+// brand lives in the catalog, not the sim) turned that assumption red.
+const plainName = itemDisplayName(ITEMS[plainId]);
+const soulboundName = itemDisplayName(ITEMS[soulboundId]);
 
 const MASTERWORK: ItemInstancePayload = { rolled: { masterwork: true, stats: { sta: 1 } } };
 
