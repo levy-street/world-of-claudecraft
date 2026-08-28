@@ -2382,7 +2382,7 @@ describe('Eastbrook polish performance and contact evidence', () => {
       // 5bae1eef; the release literal stood in as a placeholder until the
       // re-mint below, computed LAST per REMINT_COMMAND on the merged working
       // tree. No capture was retaken.
-      // Re-pinned for the Masterwrought phase 14 farm-visuals prewarm guard:
+      // Re-pinned 2026-08-28 for the Masterwrought phase 14 farm-visuals prewarm guard:
       // the first-order composite follows renderer.ts, then this second-order
       // performance seal follows the swept evidence bytes. No capture was
       // retaken.

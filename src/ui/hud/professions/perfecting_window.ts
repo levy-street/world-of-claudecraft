@@ -133,10 +133,9 @@ export class PerfectingWindow {
    *  nothing and announces nothing; the journal's readyAnnounce shape). */
   private announce(text: string): void {
     if (!this.liveEl) return;
-    this.liveEl.textContent = '';
     const line = document.createElement('span');
     line.textContent = text;
-    this.liveEl.appendChild(line);
+    this.liveEl.replaceChildren(line);
   }
 
   private setPendingSend(value: boolean): void {
@@ -283,12 +282,27 @@ export class PerfectingWindow {
           detail.info.perfected && !prev.perfected
             ? t('hudChrome.perfecting.perfectedAnnounce', { name })
             : t('hudChrome.perfecting.rankAnnounce', {
+                name,
                 rank: wholeNumber(detail.info.rank),
                 ranks: wholeNumber(detail.info.ranks),
               }),
         );
       }
-      if (detail.info.promoted && !prev.promoted) this.namingDialog?.dismiss();
+      if (detail.info.promoted && !prev.promoted) {
+        this.namingDialog?.dismiss();
+        // The landed promotion is the window's biggest flip and the dialog
+        // auto-dismisses on it, so the region carries the confirmation the
+        // reader would otherwise never hear (the fix-round review); the
+        // chosen name is a raw VALUE (textContent, D13-2).
+        const def = ITEMS[detail.itemId];
+        const name = def ? itemDisplayName(def) : detail.itemId;
+        this.announce(
+          t('hudChrome.perfecting.promotedAnnounce', {
+            name,
+            chosen: detail.chosenName ?? name,
+          }),
+        );
+      }
     }
     this.selectedRef = detail?.ref ?? null;
     this.paintedView = view;

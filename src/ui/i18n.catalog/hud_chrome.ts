@@ -5481,10 +5481,13 @@ export const hudChromeStrings = {
     rowRank: 'Rank {rank} of {ranks}',
     rowPerfected: 'Perfected',
     // The status-region announcements (role=status beside the repaint shell):
-    // a landed rank and the Perfected stamp, for assistive tech; the track
-    // and lead lines carry the visible state.
-    rankAnnounce: 'Perfecting rank {rank} of {ranks} reached.',
+    // a landed rank, the Perfected stamp, and the landed promotion, for
+    // assistive tech; the track and lead lines carry the visible state. Each
+    // names the item: the window is aria-modal, so the chat notice outside
+    // it is not in the reader's tree and this line stands alone.
+    rankAnnounce: '{name} reaches Perfecting rank {rank} of {ranks}.',
     perfectedAnnounce: '{name} is now Perfected.',
+    promotedAnnounce: '{name} is forged as {chosen}.',
     rowPromoted: 'Legendary',
     attemptCost: 'Attempt cost',
     promoteCost: 'Promotion cost',

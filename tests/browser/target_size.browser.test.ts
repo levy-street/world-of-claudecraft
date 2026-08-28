@@ -8,7 +8,7 @@
 
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import { page } from 'vitest/browser';
-import { perfectingInfoFrom } from '../../src/sim/professions/perfecting';
+import { PERFECTING_SKILL_REQ, perfectingInfoFrom } from '../../src/sim/professions/perfecting';
 import { PlantSheetWindow } from '../../src/ui/hud/professions/farming_plant_sheet_window';
 import { PerfectingWindow } from '../../src/ui/hud/professions/perfecting_window';
 import { cleanup } from './_harness';
@@ -359,7 +359,7 @@ describe('mobile target-size: in-game touch controls are >=40x40 in landscape', 
       equipmentInstances: {},
       inventory: [{ itemId: 'makers_ember', count: 1 }],
       craftingIdentity: { synced: true },
-      craftSkills: { weaponcrafting: 125 },
+      craftSkills: { weaponcrafting: PERFECTING_SKILL_REQ },
       perfectItem: () => {},
       perfectingInfo(ref: unknown) {
         return perfectingInfoFrom({

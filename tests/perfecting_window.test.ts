@@ -186,19 +186,40 @@ describe('the aria-busy send-once lifecycle', () => {
     world.equipmentInstances = { mainhand: { boundTo: 1, perfecting: 2 } };
     vi.advanceTimersByTime(1000);
     // The SAME node persists across the repaint (a region that re-enters the
-    // tree drops or repeats its announcements) and carries a fresh span.
+    // tree drops or repeats its announcements) and carries a fresh span
+    // naming the item.
     expect(root().querySelector('.pf-live-status')).toBe(live);
     expect(live.textContent).toContain('rank 2 of 4');
+    expect(live.textContent).toContain('Duskforged Warblade');
     expect(live.children.length).toBe(1);
+    // A byte-identical repeat still lands a FRESH span (the discipline's
+    // whole point): drop back and re-land the same rank text.
+    const firstSpan = live.firstElementChild;
+    world.equipmentInstances = { mainhand: { boundTo: 1, perfecting: 1 } };
+    vi.advanceTimersByTime(1000);
+    world.equipmentInstances = { mainhand: { boundTo: 1, perfecting: 2 } };
+    vi.advanceTimersByTime(1000);
+    expect(live.textContent).toContain('rank 2 of 4');
+    expect(live.firstElementChild).not.toBe(firstSpan);
     // The Perfected flip outranks a same-frame rank line.
     world.equipmentInstances = { mainhand: { boundTo: 1, perfected: true } };
     vi.advanceTimersByTime(1000);
     expect(live.textContent).toContain('is now Perfected');
+    // The landed promotion announces with the chosen name (the dialog
+    // auto-dismisses on it, so this line is the reader's confirmation).
+    world.equipmentInstances = {
+      mainhand: { boundTo: 1, perfected: true, rolled: { quality: 'legendary' }, name: 'Oath' },
+    };
+    vi.advanceTimersByTime(1000);
+    expect(live.textContent).toContain('forged as Oath');
     // A language switch clears the standing announcement (old-locale text).
     win.relocalize();
     expect(live.textContent).toBe('');
-    // Close clears it too, with the other latches.
+    // Close clears a FRESH announcement (decisive: land one first, then
+    // close; without the clock advance this arm was vacuous).
     world.equipmentInstances = { mainhand: { boundTo: 1, perfecting: 3 } };
+    vi.advanceTimersByTime(1000);
+    expect(live.textContent).not.toBe('');
     win.close();
     expect(live.textContent).toBe('');
   });

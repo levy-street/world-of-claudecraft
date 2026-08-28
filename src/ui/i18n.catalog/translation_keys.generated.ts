@@ -10070,6 +10070,7 @@ export type TranslationKeyFlat =
   | 'hudChrome.perfecting.perfectedLead'
   | 'hudChrome.perfecting.promote'
   | 'hudChrome.perfecting.promoteCost'
+  | 'hudChrome.perfecting.promotedAnnounce'
   | 'hudChrome.perfecting.promotedLine'
   | 'hudChrome.perfecting.rankAnnounce'
   | 'hudChrome.perfecting.rowPerfected'

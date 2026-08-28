@@ -1311,8 +1311,9 @@ describe('axe: perfecting window candidates, bind warning, and status region', (
   it('the radiogroup, busy tree, and announcing tree all axe clean with real names', async () => {
     // CAUTION: `as never` handover, same trap as the plant sheet stub: the
     // stub must carry every member buildView reads (equipment,
-    // equipmentInstances, inventory, craftSkills, craftingIdentity,
-    // perfectingInfo, perfectItem) or the miss is a runtime throw here only.
+    // equipmentInstances, inventory, craftingIdentity, perfectingInfo,
+    // perfectItem; craftSkills feeds the stub's own perfectingInfo) or the
+    // miss is a runtime throw here only.
     const world = {
       equipment: { mainhand: 'duskforged_warblade' },
       equipmentInstances: {} as Record<string, unknown>,
@@ -1357,6 +1358,13 @@ describe('axe: perfecting window candidates, bind warning, and status region', (
     expect(root.querySelector('.pf-warning')).not.toBeNull();
     const live = root.querySelector<HTMLElement>('.pf-live-status');
     expect(live?.getAttribute('role')).toBe('status');
+    // The structural halves only a browser can judge (the happy-dom unit
+    // suite has no CSS): the shell is display:contents so .pf-body is the
+    // ONE scroller and the root is not (the one-scroller rule).
+    const shell = root.querySelector<HTMLElement>('.pf-shell') as HTMLElement;
+    expect(getComputedStyle(shell).display).toBe('contents');
+    const body = root.querySelector<HTMLElement>('.pf-body') as HTMLElement;
+    expect(getComputedStyle(body).overflowY).toBe('auto');
     await expectClean(root);
     // The armed send reports aria-busy on the dialog; the busy tree still
     // axes clean. (The bind confirm's prompt path needs #prompt-stack, which
@@ -1365,6 +1373,14 @@ describe('axe: perfecting window candidates, bind warning, and status region', (
     win.relocalize();
     (root.querySelector('[data-action]') as HTMLButtonElement).click();
     expect(root.getAttribute('aria-busy')).toBe('true');
+    await expectClean(root);
+    // A landed rank ANNOUNCES through the SAME node (the journal's two
+    // assertions: identity across the repaint, non-empty content), and the
+    // announcing tree axes clean.
+    world.equipmentInstances = { mainhand: { boundTo: 1, perfecting: 2 } };
+    win.relocalize();
+    expect(root.querySelector('.pf-live-status')).toBe(live);
+    expect(live?.textContent ?? '').not.toBe('');
     await expectClean(root);
     win.close();
     root.remove();

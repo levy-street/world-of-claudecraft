@@ -467,7 +467,7 @@ interface AttributionTargetFixture {
 // the fully resolved tree, with renderer.ts, eastbrook_town.ts and
 // eastbrook_layout.ts as the drifted inputs), committed with exactly the
 // bytes it read. No capture was retaken.
-// Re-minted for the Masterwrought phase 14 farm-visuals prewarm guard: the
+// Re-minted 2026-08-28 for the Masterwrought phase 14 farm-visuals prewarm guard: the
 // one-line renderer.ts change (prewarmWorldFrame gates the farm sync on the
 // world holding its own player) moved the runtimeRender renderer leaf; the
 // evidence seals were swept by the one-step re-mint. No capture was retaken.
