@@ -818,7 +818,7 @@ export class CharacterVisual {
         if (!mesh.isMesh || mesh.name === 'class_halo') return;
         // Authored FX shells the manifest names (VisualDef.noShadowNodes) stay
         // out of the shadow pass and the caster list; everything else casts.
-        const shadowless = this.def.noShadowNodes?.includes(mesh.name) === true;
+        const shadowless = this.isShadowlessNode(mesh);
         mesh.castShadow = !shadowless;
         mesh.receiveShadow = false;
         // skinned bounds drift outside bind-pose spheres; entity-level culling
@@ -2864,6 +2864,22 @@ export class CharacterVisual {
     this.finishWeaponAttach(payloads);
   }
 
+  /** Whether a mesh sits under a node the manifest keeps out of the shadow
+   *  pass (VisualDef.noShadowNodes). Ancestry-aware on purpose: the loader
+   *  turns a multi-primitive glTF mesh into a Group carrying the NODE name
+   *  with one Mesh child per primitive, named after the mesh plus a
+   *  uniqueness suffix that a re-bake renumbers, so the authored node name is
+   *  the only stable handle and it lives on the parent, not the mesh. Both
+   *  caster sweeps (build and rebuildCasters) read this one predicate. */
+  private isShadowlessNode(mesh: THREE.Object3D): boolean {
+    const names = this.def.noShadowNodes;
+    if (!names || names.length === 0) return false;
+    for (let o: THREE.Object3D | null = mesh; o && o !== this.model; o = o.parent) {
+      if (names.includes(o.name)) return true;
+    }
+    return false;
+  }
+
   /** Rebuild the shadow-caster list and original-material snapshot after the model
    *  graph changes (a weapon swap adds/removes bone-child meshes). */
   private rebuildCasters(): void {
@@ -2886,11 +2902,15 @@ export class CharacterVisual {
         this.originalMaterials.set(mesh, this.haloBaseMaterial ?? mesh.material);
         return;
       }
-      mesh.castShadow = this.shadowOn;
+      // Same exclusion as the build sweep: a re-list after a graph change must
+      // not re-arm an authored FX shell (its material still joins the snapshot
+      // so effect swaps restore it).
+      const shadowless = this.isShadowlessNode(mesh);
+      mesh.castShadow = this.shadowOn && !shadowless;
       mesh.receiveShadow = false;
       if ((mesh as unknown as THREE.SkinnedMesh).isSkinnedMesh) mesh.frustumCulled = false;
       this.originalMaterials.set(mesh, mesh.material);
-      this.casters.push(mesh);
+      if (!shadowless) this.casters.push(mesh);
     });
   }
 

@@ -16,18 +16,15 @@ import * as esbuild from 'esbuild';
 import puppeteer from 'puppeteer-core';
 import sharp from 'sharp';
 import { BROWSER_PATH } from './browser_path.mjs';
+import { itemIconGroundSvg } from './lib/item_icon_ground.mjs';
 import { ktx2TranscoderScriptTag } from './lib/ktx2_assets.mjs';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const mountsDir = path.join(root, 'public/models/mounts');
 const outDir = path.join(root, 'public/ui/items');
 const OUT_PX = 128; // matches the existing public/ui/items icon size (mapping.json iconSize)
-// The item-icon vignette (a soft radial glow over near-black), the shipped icon
-// family's ground. Every shipped item icon is fully OPAQUE
-// (docs/design/item-icon-art-style.md, machine-checked by
-// tests/item_art_consistency.test.ts), so a render is composited over this
-// rather than shipped on transparency. Same ground as render_island_item_icons.
-const ITEM_ICON_GROUND_SVG = `<svg xmlns="http://www.w3.org/2000/svg" width="${OUT_PX}" height="${OUT_PX}"><defs><radialGradient id="g" cx="50%" cy="42%" r="62%"><stop offset="0%" stop-color="#3a3527"/><stop offset="55%" stop-color="#211d15"/><stop offset="100%" stop-color="#0d0b08"/></radialGradient></defs><rect width="100%" height="100%" fill="url(#g)"/></svg>`;
+// Shipped item icons are opaque: renders composite over the shared ground.
+const ITEM_ICON_GROUND_SVG = itemIconGroundSvg(OUT_PX);
 const debugDir = process.env.DEBUG_DIR || null;
 mkdirSync(outDir, { recursive: true });
 if (debugDir) mkdirSync(debugDir, { recursive: true });
