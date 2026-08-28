@@ -1735,7 +1735,7 @@ export function onBloatDetonatedForDeeds(
  *  the 'Falling' label so the shared pure kernel stays untouched). */
 export function onFallDeathForDeeds(ctx: SimContext, e: Entity): void {
   const meta = ctx.players.get(e.id);
-  if (meta) grantDeed(ctx, meta, 'hid_fall_death');
+  if (meta && !e.ghost) grantDeed(ctx, meta, 'hid_fall_death');
 }
 
 // ---------------------------------------------------------------------------

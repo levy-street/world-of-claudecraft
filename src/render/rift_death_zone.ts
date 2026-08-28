@@ -31,7 +31,7 @@ const BASE_COLOR = 0xff2200;
 const SWEEP_COLOR = 0xff5500;
 /** Rim band inner edge as a fraction of the zone radius (mage_ground_fx's
  * terrain-ring proportions, which read clearly at gameplay camera range). */
-const RIM_INNER_FRACTION = 0.85;
+const RIM_INNER_FRACTION = 0.7;
 /** Lift over the sampled ground so the decal never z-fights the floor. */
 const GROUND_LIFT = 0.08;
 /** The sweep disc rides slightly higher so it always draws over the wash. */
