@@ -1386,13 +1386,13 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.options.shaderWarmOff': '关闭',
   'hudChrome.options.shaderWarmOn': '开启',
   'hudChrome.options.shaderWarmNote':
-    '自动：在图形后端支持时（Direct3D 11、Vulkan）由后台工作线程提前链接着色器；在无法起作用的 OpenGL 上保持关闭。开启会在所有环境中强制使用工作线程，包括会让帧率变差的环境；关闭则完全不使用。下次启动游戏时生效。',
-  'hudChrome.options.gpuBackend': '图形后端（Linux）',
-  'hudChrome.options.gpuBackendAuto': '自动（尝试一次 Vulkan）',
+    '在后台预热着色器缓存，以避免游戏中出现卡顿。自动：仅在你的图形系统支持时启用（推荐）。开启：在所有环境中强制启用，在部分配置上可能会让性能变差。关闭：不启用。',
+  'hudChrome.options.gpuBackend': '图形后端',
+  'hudChrome.options.gpuBackendAuto': '自动',
   'hudChrome.options.gpuBackendVulkan': 'Vulkan',
-  'hudChrome.options.gpuBackendOpenGL': 'OpenGL',
+  'hudChrome.options.gpuBackendOpenGL': 'OpenGL（较慢）',
   'hudChrome.options.gpuBackendNote':
-    '自动：启动时尝试一次 Vulkan，可用则保留，此时着色器加载造成的卡顿会大幅减少。驱动不支持时回退到 OpenGL。选过 Vulkan 或 OpenGL 之后再选回“自动”，会重新尝试一次。下次启动游戏时生效。',
+    '自动会为你选择最合适的选项。Vulkan 更快，推荐大多数玩家使用。OpenGL 较慢，但在 Vulkan 无法正常工作时可能会有帮助。',
   'hudChrome.options.discordPresence': 'Discord 游戏状态',
   'hudChrome.options.discordPresenceNote':
     '游戏时将你当前所在的区域以及本次游戏时长显示为你的 Discord 活动状态，任何能看到你 Discord 个人资料的人都能看到这两项。只会分享区域名称、本次游戏时长和游戏名称，绝不会分享你的角色、账号或与你同行的人。需要本机正在运行 Discord 应用。',

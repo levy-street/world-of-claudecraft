@@ -1431,13 +1431,13 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.options.shaderWarmOff': 'オフ',
   'hudChrome.options.shaderWarmOn': 'オン',
   'hudChrome.options.shaderWarmNote':
-    '自動：グラフィックスバックエンドが対応している場合（Direct3D 11、Vulkan）、バックグラウンドワーカーでシェーダーを事前にリンクします。効果のないOpenGLではオフのままです。オンはフレームが悪化する環境も含めてすべてでワーカーを強制し、オフは一切使いません。次回ゲームを起動したときに反映されます。',
-  'hudChrome.options.gpuBackend': 'グラフィックスバックエンド（Linux）',
-  'hudChrome.options.gpuBackendAuto': '自動（Vulkanを一度試す）',
+    'ゲーム中のカクつきを防ぐため、バックグラウンドでシェーダーキャッシュを事前に温めます。自動：グラフィックス環境が対応している場合のみ有効になります（推奨）。オン：どの環境でも強制的に有効にします。環境によっては動作が重くなることがあります。オフ：無効にします。',
+  'hudChrome.options.gpuBackend': 'グラフィックスバックエンド',
+  'hudChrome.options.gpuBackendAuto': '自動',
   'hudChrome.options.gpuBackendVulkan': 'Vulkan',
-  'hudChrome.options.gpuBackendOpenGL': 'OpenGL',
+  'hudChrome.options.gpuBackendOpenGL': 'OpenGL（低速）',
   'hudChrome.options.gpuBackendNote':
-    '自動：起動時にVulkanを一度試し、動作すればそのまま使います。そこではシェーダー読み込みによるカクつきが大きく減ります。ドライバーが対応していない場合はOpenGLに戻ります。VulkanまたはOpenGLを選んだあとで再び自動を選ぶと、もう一度試します。次回ゲームを起動したときに反映されます。',
+    '自動はあなたに最適な選択肢を選びます。Vulkanのほうが高速で、ほとんどのプレイヤーにおすすめです。OpenGLは低速ですが、Vulkanが正しく動作しない場合に役立つことがあります。',
   'hudChrome.options.discordPresence': 'Discord リッチプレゼンス',
   'hudChrome.options.discordPresenceNote':
     'プレイ中、現在いるゾーンとこのセッションのプレイ時間をDiscordのアクティビティとして表示します。あなたのDiscordプロフィールを見られる人は誰でもその両方を見られます。共有されるのはゾーン名、このセッションのプレイ時間、ゲーム名だけで、キャラクターやアカウント、一緒に遊んでいる相手が共有されることはありません。このコンピューターでDiscordアプリが起動している必要があります。',
