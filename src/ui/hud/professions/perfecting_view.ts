@@ -55,6 +55,11 @@ export interface PerfectingCandidate {
   ref: PerfectItemRef;
   itemId: string;
   worn: boolean;
+  /** A stable copy identity for the painter's focus carry: a worn slot, or
+   *  the item id plus the copy's ordinal among same-id bagged candidates,
+   *  which survives the bag shift the cell index does not (the same identity
+   *  the selection anchor follows). */
+  identity: string;
   selected: boolean;
   state: PerfectingTrackState;
   /** Mid-track rank in [0, ranks - 1]; meaningful only for state 'track'. */
@@ -161,6 +166,24 @@ export interface PerfectingSelectionAnchor {
   count: number;
 }
 
+/** Whether the copy selected at the previous paint (its ref plus the anchor
+ *  latched with it) is the copy resolved now. The ONE spelling of the
+ *  re-target rule the view and the window's answer-edge gate share: two
+ *  bagged refs of one item id with anchors are the same copy exactly when
+ *  the anchors agree (same-id count unchanged, same ordinal), the cell being
+ *  no witness (the adjacent sibling can sit on the old cell after a splice);
+ *  everything else (worn refs, a ref without an anchor) is cell identity. */
+export function sameSelectedCopy(
+  prev: { ref: PerfectItemRef; anchor: PerfectingSelectionAnchor | null },
+  ref: PerfectItemRef,
+  anchor: PerfectingSelectionAnchor | null,
+): boolean {
+  if ('slot' in prev.ref || 'slot' in ref) return samePerfectRef(prev.ref, ref);
+  if (prev.ref.itemId !== ref.itemId) return false;
+  if (prev.anchor === null || anchor === null) return samePerfectRef(prev.ref, ref);
+  return prev.anchor.count === anchor.count && prev.anchor.ordinal === anchor.ordinal;
+}
+
 export function baggedCopyOrdinal(
   candidates: ReadonlyArray<{ ref: PerfectItemRef; worn: boolean }>,
   ref: PerfectItemRef | null,
@@ -186,11 +209,13 @@ export function baggedCopyOrdinal(
  * candidate, so a copy that left the bags mid-session never strands the detail
  * pane on a ghost. Every array mutation the sim performs on the bag is a
  * splice or a push at the end (a drag rewrites cell HINTS, never the array,
- * inventory_order.ts), so same-id siblings keep their order; the one shape the
- * anchor cannot see is a same-id copy LEAVING and another ARRIVING inside one
- * poll window (a sale plus a pickup, or equipping a bagged copy while a
- * same-id worn copy is benched), where the count holds and the ordinal names
- * a different copy: the recorded same-id class.
+ * inventory_order.ts), so same-id siblings keep their order, and a resolving
+ * anchor outranks the exact cell match (the adjacent sibling slides onto the
+ * old cell after a splice). The one shape the anchor cannot see is a same-id
+ * copy LEAVING and another ARRIVING inside one poll window (a sale plus a
+ * pickup, or equipping a bagged copy while a same-id worn copy is benched),
+ * where the count holds and the ordinal names a different copy: the recorded
+ * same-id class.
  */
 export function buildPerfectingView(
   reads: PerfectingWorldReads,
@@ -204,9 +229,13 @@ export function buildPerfectingView(
     if (info) infos.set(entry, info);
   }
   const live = [...infos.keys()];
-  const exact = live.find((entry) => samePerfectRef(entry.ref, requested)) ?? null;
+  // A RESOLVING anchor outranks the exact cell match: after a splice the
+  // adjacent same-id sibling can slide onto the selected copy's old cell, so
+  // the cell would name the sibling while the ordinal still names the copy.
+  // When a same-id copy departed or arrived the count moves, the anchor
+  // stands down by itself, and the exact match takes over.
   const followed =
-    exact === null && requested !== null && 'bag' in requested && anchor !== null
+    requested !== null && 'bag' in requested && anchor !== null
       ? (() => {
           const siblings = live.filter(
             (entry) => !entry.worn && 'bag' in entry.ref && entry.ref.itemId === requested.itemId,
@@ -214,13 +243,19 @@ export function buildPerfectingView(
           return siblings.length === anchor.count ? (siblings[anchor.ordinal] ?? null) : null;
         })()
       : null;
-  const selectedEntry = exact ?? followed ?? live[0] ?? null;
+  const exact = live.find((entry) => samePerfectRef(entry.ref, requested)) ?? null;
+  const selectedEntry = followed ?? exact ?? live[0] ?? null;
   const candidates: PerfectingCandidate[] = live.map((entry) => {
     const info = infos.get(entry) as PerfectingInfoView;
+    const ordinal = baggedCopyOrdinal(live, entry.ref);
     return {
       ref: entry.ref,
       itemId: info.itemId,
       worn: entry.worn,
+      identity:
+        'slot' in entry.ref
+          ? `s:${entry.ref.slot}`
+          : `b:${entry.ref.itemId}:${ordinal ? ordinal.ordinal : entry.ref.bag}`,
       selected: entry === selectedEntry,
       state: trackState(info),
       rank: info.rank,

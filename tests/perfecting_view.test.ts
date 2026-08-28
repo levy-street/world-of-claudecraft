@@ -23,6 +23,7 @@ import {
   perfectingInfoSignature,
   perfectingViewSignature,
   samePerfectRef,
+  sameSelectedCopy,
 } from '../src/ui/hud/professions/perfecting_view';
 
 // Two real apex ids (content-derived; craftForApexItem resolves both).
@@ -319,7 +320,9 @@ describe('the value signatures (the 1 Hz clock and the send-answer edge)', () =>
   // (skillMet: a skill-up never re-enables the action; equipBlocked: the
   // promote button stuck in the wrong state; bound: the bind warning
   // outliving the bind) survived the suite.
-  const SIG_BASE = {
+  // Typed Required<> so every field of the view, optional ones included, must
+  // be spelled here and classified by the key-set diff below.
+  const SIG_BASE: Required<PerfectingInfoView> = {
     itemId: 'duskforged_warblade',
     rank: 1,
     ranks: 4,
@@ -383,21 +386,24 @@ describe('the selection anchor (a bagged selection follows its copy across a bag
     return state;
   }
 
-  it('baggedCopyOrdinal names the copy by (ordinal, count) among same-id bagged candidates', () => {
-    const view = buildPerfectingView(simShapedReads(twoCopies()), { bag: 4, itemId: APEX_BAGGED });
-    expect(baggedCopyOrdinal(view.candidates, { bag: 2, itemId: APEX_BAGGED })).toEqual({
-      ordinal: 0,
-      count: 2,
-    });
-    expect(baggedCopyOrdinal(view.candidates, { bag: 4, itemId: APEX_BAGGED })).toEqual({
-      ordinal: 1,
-      count: 2,
-    });
-    // Worn refs and refs naming no candidate carry no anchor.
-    expect(baggedCopyOrdinal(view.candidates, { slot: 'mainhand' })).toBeNull();
-    expect(baggedCopyOrdinal(view.candidates, { bag: 0, itemId: APEX_BAGGED })).toBeNull();
-    expect(baggedCopyOrdinal(view.candidates, null)).toBeNull();
-  });
+  it.each(BOTH_HOSTS)(
+    '%s: baggedCopyOrdinal names the copy by (ordinal, count) among same-id bagged candidates',
+    (_n, make) => {
+      const view = buildPerfectingView(make(twoCopies()), { bag: 4, itemId: APEX_BAGGED });
+      expect(baggedCopyOrdinal(view.candidates, { bag: 2, itemId: APEX_BAGGED })).toEqual({
+        ordinal: 0,
+        count: 2,
+      });
+      expect(baggedCopyOrdinal(view.candidates, { bag: 4, itemId: APEX_BAGGED })).toEqual({
+        ordinal: 1,
+        count: 2,
+      });
+      // Worn refs and refs naming no candidate carry no anchor.
+      expect(baggedCopyOrdinal(view.candidates, { slot: 'mainhand' })).toBeNull();
+      expect(baggedCopyOrdinal(view.candidates, { bag: 0, itemId: APEX_BAGGED })).toBeNull();
+      expect(baggedCopyOrdinal(view.candidates, null)).toBeNull();
+    },
+  );
 
   it.each(BOTH_HOSTS)(
     '%s: an exhausted lower stack shifts the copy and the anchored selection follows it',
@@ -420,48 +426,107 @@ describe('the selection anchor (a bagged selection follows its copy across a bag
     },
   );
 
-  it('with no anchor the vanished request falls back to the first candidate (the worn piece)', () => {
-    const state = twoCopies();
-    state.inventory.splice(0, 1);
-    const view = buildPerfectingView(simShapedReads(state), { bag: 4, itemId: APEX_BAGGED });
-    expect(view.detail?.ref).toEqual({ slot: 'mainhand' });
-  });
+  it.each(BOTH_HOSTS)(
+    '%s: with no anchor the vanished request falls back to the first candidate (the worn piece)',
+    (_n, make) => {
+      const state = twoCopies();
+      state.inventory.splice(0, 1);
+      const view = buildPerfectingView(make(state), { bag: 4, itemId: APEX_BAGGED });
+      expect(view.detail?.ref).toEqual({ slot: 'mainhand' });
+    },
+  );
 
-  it('refuses to guess when the same-id count moved (a copy sold or deposited)', () => {
-    // The FIRST of the two copies is selected (ordinal 0), then sold while
-    // the ember stack is spent: count 2 -> 1. The surviving sibling now sits
-    // at ordinal 0, so an ordinal-only re-target (the count guard deleted)
-    // would adopt it; the guard refuses and the request falls back to the
-    // worn piece instead. (Selecting the LAST copy would let the
-    // out-of-bounds arm pass this test with the guard deleted.)
-    // Only the sale here (no lower splice): a splice as well would land the
-    // sibling on the requested cell and the exact match would take it, the
-    // recorded same-id index-collision class, not the count guard.
-    const state = twoCopies();
-    const before = buildPerfectingView(simShapedReads(state), { bag: 2, itemId: APEX_BAGGED });
-    const anchor = baggedCopyOrdinal(before.candidates, before.detail!.ref);
-    expect(anchor).toEqual({ ordinal: 0, count: 2 });
-    state.inventory.splice(2, 1);
-    const after = buildPerfectingView(
-      simShapedReads(state),
-      { bag: 2, itemId: APEX_BAGGED },
-      anchor,
-    );
-    expect(after.detail?.ref).toEqual({ slot: 'mainhand' });
-    expect(after.candidates.filter((c) => !c.worn)).toHaveLength(1);
-  });
+  it.each(BOTH_HOSTS)(
+    '%s: refuses to guess when the same-id count moved (a copy sold or deposited)',
+    (_n, make) => {
+      // The FIRST of the two copies is selected (ordinal 0), then sold while
+      // the ember stack is spent: count 2 -> 1. The surviving sibling now sits
+      // at ordinal 0, so an ordinal-only re-target (the count guard deleted)
+      // would adopt it; the guard refuses and the request falls back to the
+      // worn piece instead. (Selecting the LAST copy would let the
+      // out-of-bounds arm pass this test with the guard deleted.)
+      // Only the sale here (no lower splice): a splice as well would land the
+      // sibling on the requested cell and the exact match would take it, the
+      // recorded same-id index-collision class, not the count guard.
+      const state = twoCopies();
+      const before = buildPerfectingView(make(state), { bag: 2, itemId: APEX_BAGGED });
+      const anchor = baggedCopyOrdinal(before.candidates, before.detail!.ref);
+      expect(anchor).toEqual({ ordinal: 0, count: 2 });
+      state.inventory.splice(2, 1);
+      const after = buildPerfectingView(make(state), { bag: 2, itemId: APEX_BAGGED }, anchor);
+      expect(after.detail?.ref).toEqual({ slot: 'mainhand' });
+      expect(after.candidates.filter((c) => !c.worn)).toHaveLength(1);
+    },
+  );
 
-  it('an anchor never overrides an exact match, and a worn request ignores it', () => {
-    const state = twoCopies();
-    const stale = { ordinal: 0, count: 2 };
-    const exact = buildPerfectingView(
-      simShapedReads(state),
-      { bag: 4, itemId: APEX_BAGGED },
-      stale,
+  it.each(BOTH_HOSTS)(
+    '%s: a resolving anchor outranks the exact cell match (the adjacent sibling slid onto the old cell)',
+    (_n, make) => {
+      // [ember, A rank 1, B rank 3, essence, setting]: A is selected at cell
+      // 1; the ember stack below both copies splices, so A sits at cell 0 and
+      // B at cell 1. The exact match on the requested cell 1 would name B
+      // (same id, same cell); the anchor {0, 2} names A, and it wins.
+      const state = twoCopies();
+      state.equipment = {};
+      state.inventory = [
+        { itemId: 'makers_ember', count: 1 },
+        { itemId: APEX_BAGGED, count: 1, instance: { boundTo: 1, perfecting: 1 } },
+        { itemId: APEX_BAGGED, count: 1, instance: { boundTo: 1, perfecting: 3 } },
+        { itemId: 'sundered_essence', count: 2 },
+        { itemId: 'prismglass_setting', count: 3 },
+      ];
+      const before = buildPerfectingView(make(state), { bag: 1, itemId: APEX_BAGGED });
+      const anchor = baggedCopyOrdinal(before.candidates, before.detail!.ref);
+      expect(anchor).toEqual({ ordinal: 0, count: 2 });
+      state.inventory.splice(0, 1);
+      const after = buildPerfectingView(make(state), { bag: 1, itemId: APEX_BAGGED }, anchor);
+      expect(after.detail?.ref).toEqual({ bag: 0, itemId: APEX_BAGGED });
+      expect(after.detail?.info.rank).toBe(1);
+      // The copy identity the painter keys focus by follows the same copy.
+      expect(before.candidates.find((c) => c.selected)?.identity).toBe(
+        after.candidates.find((c) => c.selected)?.identity,
+      );
+    },
+  );
+
+  it.each(BOTH_HOSTS)(
+    '%s: a worn request ignores the anchor, and a consistent pair agrees with the exact match',
+    (_n, make) => {
+      const state = twoCopies();
+      const view = buildPerfectingView(make(state), { bag: 4, itemId: APEX_BAGGED });
+      const anchor = baggedCopyOrdinal(view.candidates, view.detail!.ref);
+      const again = buildPerfectingView(make(state), { bag: 4, itemId: APEX_BAGGED }, anchor);
+      expect(again.detail?.ref).toEqual({ bag: 4, itemId: APEX_BAGGED });
+      const worn = buildPerfectingView(make(state), { slot: 'offhand' }, anchor);
+      expect(worn.detail?.ref).toEqual({ slot: 'mainhand' });
+    },
+  );
+
+  it('sameSelectedCopy: anchors decide for bagged pairs, cells for everything else', () => {
+    const a = { bag: 1, itemId: APEX_BAGGED };
+    const prevA = { ref: a, anchor: { ordinal: 0, count: 2 } };
+    // The hijack pair: same cell, different ordinal (the sibling slid on).
+    expect(sameSelectedCopy(prevA, a, { ordinal: 1, count: 2 })).toBe(false);
+    // The followed copy: different cell, same anchor.
+    expect(sameSelectedCopy(prevA, { bag: 0, itemId: APEX_BAGGED }, { ordinal: 0, count: 2 })).toBe(
+      true,
     );
-    expect(exact.detail?.ref).toEqual({ bag: 4, itemId: APEX_BAGGED });
-    const worn = buildPerfectingView(simShapedReads(state), { slot: 'offhand' }, stale);
-    expect(worn.detail?.ref).toEqual({ slot: 'mainhand' });
+    // A moved count refuses even at the same ordinal (a lost sibling).
+    expect(sameSelectedCopy(prevA, { bag: 0, itemId: APEX_BAGGED }, { ordinal: 0, count: 1 })).toBe(
+      false,
+    );
+    // Different ids never match; worn refs compare by slot; a bagged pair
+    // without anchors compares by cell.
+    expect(sameSelectedCopy({ ref: a, anchor: null }, { bag: 1, itemId: APEX_WORN }, null)).toBe(
+      false,
+    );
+    const worn = { ref: { slot: 'mainhand' as const }, anchor: null };
+    expect(sameSelectedCopy(worn, { slot: 'mainhand' }, null)).toBe(true);
+    expect(sameSelectedCopy(worn, a, null)).toBe(false);
+    expect(sameSelectedCopy({ ref: a, anchor: null }, a, null)).toBe(true);
+    expect(sameSelectedCopy({ ref: a, anchor: null }, { bag: 0, itemId: APEX_BAGGED }, null)).toBe(
+      false,
+    );
   });
 });
 

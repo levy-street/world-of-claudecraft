@@ -12,8 +12,9 @@ The numbers are not interpreted the same way:
   anchor.** It counts the hot-DOM writes that bypassed the write-elision cache (boot plus the
   occasional state-change write). A longer run adds only skips, never new bypass writes once the
   world is steady, so the count does not move with frame count, CPU or GPU speed, or machine
-  load. The establishing-write floor DOES differ by viewport (the touch HUD builds more
-  per-frame elements than the desktop layout) and can jitter by a write or two run to run, so
+  load. The establishing-write floor DOES differ by viewport (which viewport is worse has
+  flipped across captures: mobile at the 2026-07-24 and 2026-08-08 rows, desktop since
+  2026-08-28; the canonical row names the current worst) and can jitter by a write or two run to run, so
   the committed anchor is a single canonical row covering the WORST viewport with that jitter
   as headroom. A collapse of write-elision makes the count balloon toward the frame count
   (thousands, far past any viewport delta), so the standing gate (ARM 3) asserts the count
@@ -60,10 +61,11 @@ PERF_GPU=1 PERF_VIEWPORT=both node scripts/perf_tour.mjs
 ```
 
 Run the headed tour TWICE and read the second capture: the first headed launch after a cold
-start (a fresh Chrome profile, cold shader and Vite transform caches) over-reports long
-frames (a 13-long-frame first launch against warm runs of 1 to 2 on 2026-08-28), which is a
-capture artifact, not a HUD regression, and must not be absorbed into the `frameLong50`
-anchor.
+start over-reports long frames (a 13-long-frame first launch against warm runs of 1 to 2 on
+2026-08-28), which is a capture artifact, not a HUD regression, and must not be absorbed
+into the `frameLong50` anchor. Chrome's own profile is fresh on EVERY launch (perf_tour
+passes no userDataDir), so the state a second run warms is the Vite transform cache and the
+OS and driver caches (binary page-in, the Metal shader cache), not the browser profile.
 
 `PERF_VIEWPORT` selects the profile: `desktop`, `mobile`, or `both` (default). Other relevant
 defaults: `GAME_URL=http://localhost:5173`, `PERF_SCENARIO=bench_perf_tour`,
@@ -117,7 +119,7 @@ per-frame anchor is the elision-bypass count: its canonical row lives in the rea
 gates section below (a single anchor covering the worst viewport), and the gate keys on it,
 not on the frame-count-dependent ratio.
 
-### real-GPU tour gates (PERF_GPU=1, headed, captured 2026-07-23, reconfirmed 2026-07-24)
+### real-GPU tour gates (PERF_GPU=1, headed, captured 2026-07-23, reconfirmed 2026-07-24; hudHotDomWrites re-captured 2026-08-08 and 2026-08-28)
 
 The ARM 3 frame gates plus the elision-bypass anchor. Captured with
 `PERF_GPU=1 PERF_VIEWPORT=both` over two back-to-back runs on the capture machine above
@@ -137,7 +139,7 @@ packet-close captures sit comfortably inside both rows, so per R13 the rows were
 The elision-bypass anchor was re-derived at the packet close: the healthy captures measured
 desktop 538 and 539 bypass writes and mobile 632 and 632 (the v0.30 HUD growth, with the
 deed tracker, yumi strip, party-below-target, tab strip, and mobile action ring all
-establishing writes at boot; the touch HUD explains the viewport delta). The committed
+establishing writes at boot; the touch HUD explained the viewport delta then). The committed
 anchor covers the worst viewport plus run-jitter headroom (the canonical row below carries
 the live value and its dated re-derivations; 632 was the packet-close worst); a
 write-elision collapse balloons the count toward the frame count (thousands), so the
@@ -147,7 +149,7 @@ headroom costs no detection.
 |---|---|---|
 | frameLong50 | 12 | ARM 3 anchor: frames at or over 50 ms in the tour window (worst healthy capture 7) |
 | tourMinFrames | 500 | ARM 3 floor: minimum real frames the tour must render (worst healthy capture 873) |
-| hudHotDomWrites | 1014 | ARM 3 anchor: elision-bypass writes, every viewport (worst healthy capture 1006, DESKTOP). Re-captured 2026-08-28 (the Masterwrought Phase 14 QA, same capture machine): release-side growth, branch-neutral by a three-way same-machine A/B (the pre-phase base 6bf465acab, synced to release cb10309ba6, measures 987; the clean release tip 8592df3866 measures 1006; the branch after the 8592df3866 sync 981 to 986; mobile 547 to 569 on all three). Desktop was already the worst viewport at the pre-phase base, so the flip from mobile happened in the release span between the 2026-08-08 capture and cb10309ba6, cause unmeasured (no per-PR capture was taken; the cb10309ba6-to-8592df3866 span, PR #3284 included, adds about nothing on the branch). The 2026-08-08 row (706, worst 698 mobile) is superseded. Same 8-write headroom discipline. frameLong50 on the same captures: 1 to 2 on every warm run (a first cold headed launch measured 13 once, the cold-start artifact, not a regression); the 12 anchor is KEPT. |
+| hudHotDomWrites | 1014 | ARM 3 anchor: elision-bypass writes, every viewport (worst healthy capture 1006, DESKTOP). Re-captured 2026-08-28 (the Masterwrought Phase 14 QA, same capture machine): release-side growth, branch-neutral by a three-way same-machine A/B (the pre-phase base 6bf465acab, release cb10309ba6 plus Phases 1 to 13, measures 987; the release tip at the sync, 8592df3866, measures 1006; the branch after that sync and the Phase 14 commits together 981 to 986; mobile 547 to 569 on all three). Desktop was already the worst viewport at the pre-phase base, so the flip from mobile happened between the 2026-08-08 capture and cb10309ba6, cause unmeasured (inferred: no clean cb10309ba6 capture exists; the A/B shows the branch's own commits add no desktop writes, since the branch measures below the release tip and equal on mobile), and the cb10309ba6-to-8592df3866 span adds nothing measurable on the branch. Frame counts on the 08-28 warm captures: desktop 1418 to 1438, mobile 1564 to 1569, all clearing the 500 floor. The 2026-08-08 row (706, worst 698 mobile) is superseded. Same 8-write headroom discipline. frameLong50 on the same captures: 1 to 2 on every warm run (a first cold headed launch measured 13 once, the cold-start artifact, not a regression); the 12 anchor and the 500 floor are KEPT. |
 
 All rows are single canonical rows valid for every viewport: each committed anchor covers
 the worst viewport, the committed floor the slowest one. `frameLong50` is windowed by the

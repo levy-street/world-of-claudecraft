@@ -469,6 +469,67 @@ describe('the aria-busy send-once lifecycle', () => {
     expect(successCues()).toBe(0);
   });
 
+  it('the adjacent same-id sibling sliding onto the old cell never hijacks the selection', () => {
+    // [ember x1, A rank 1, B rank 3, essence, setting, ember x2]: A selected
+    // at cell 1; a FAILED attempt exhausts the ember stack below both, so A
+    // sits at cell 0 and B at cell 1. The exact cell match would name B and
+    // the gate would then pair prev A with B: a success cue for a failed
+    // attempt, the checked row moved to B, and the next click spending an
+    // ember on B. The resolving anchor outranks the cell, on both sides.
+    world.equipment = {};
+    world.equipmentInstances = {};
+    world.inventory = [
+      { itemId: 'makers_ember', count: 1 },
+      { itemId: APEX, count: 1, instance: { boundTo: 1, perfecting: 1 } },
+      { itemId: APEX, count: 1, instance: { boundTo: 1, perfecting: 3 } },
+      { itemId: 'sundered_essence', count: 2 },
+      { itemId: 'prismglass_setting', count: 3 },
+      { itemId: 'makers_ember', count: 2 },
+    ];
+    const win = makeWindow();
+    win.open();
+    expect(checkedRef()).toContain('Rank 1 of 4');
+    (root().querySelector('[data-action]') as HTMLButtonElement).click();
+    expect(world.perfectItem).toHaveBeenLastCalledWith({ bag: 1, itemId: APEX });
+    world.inventory.splice(0, 1);
+    world.inventory[2].count -= 1;
+    world.inventory[3].count -= 1;
+    vi.advanceTimersByTime(1000);
+    expect(successCues()).toBe(0);
+    expect((root().querySelector('.pf-live-status') as HTMLElement).textContent).toBe('');
+    expect(checkedRef()).toContain('Rank 1 of 4');
+    expect(root().getAttribute('aria-busy')).toBe('false');
+    (root().querySelector('[data-action]') as HTMLButtonElement).click();
+    expect(world.perfectItem).toHaveBeenLastCalledWith({ bag: 0, itemId: APEX });
+  });
+
+  it('keyboard focus on the selected row follows the copy across the shift', () => {
+    // The candidate rows are keyed by copy identity (item id plus ordinal),
+    // so the focus carry lands on the followed copy's rebuilt row, never on
+    // Close and never on the sibling that took the old cell.
+    world.equipment = {};
+    world.equipmentInstances = {};
+    world.inventory = [
+      { itemId: 'linen_cloth', count: 1 },
+      { itemId: APEX, count: 1, instance: { boundTo: 1, perfecting: 1 } },
+      { itemId: APEX, count: 1, instance: { boundTo: 1, perfecting: 3 } },
+      { itemId: 'makers_ember', count: 2 },
+      { itemId: 'sundered_essence', count: 2 },
+      { itemId: 'prismglass_setting', count: 3 },
+    ];
+    const win = makeWindow();
+    win.open();
+    const selectedRow = root().querySelector('.pf-cand[aria-checked="true"]') as HTMLElement;
+    selectedRow.focus();
+    expect(document.activeElement).toBe(selectedRow);
+    world.inventory.splice(0, 1);
+    vi.advanceTimersByTime(1000);
+    const rebuilt = root().querySelector('.pf-cand[aria-checked="true"]') as HTMLElement;
+    expect(rebuilt).not.toBe(selectedRow);
+    expect(rebuilt.textContent).toContain('Rank 1 of 4');
+    expect(document.activeElement).toBe(rebuilt);
+  });
+
   it('a bagged pick survives a close when its exact cell still holds the copy', () => {
     // The other half of close(): only the anchor is dropped, never the
     // selection itself, so an unchanged bag reopens on the picked copy (a
@@ -490,6 +551,7 @@ describe('the aria-busy send-once lifecycle', () => {
     win.close();
     win.open();
     expect(checkedRef()).toContain('Rank 1 of 4');
+    expect(successCues()).toBe(0);
     (root().querySelector('[data-action]') as HTMLButtonElement).click();
     expect(world.perfectItem).toHaveBeenLastCalledWith({ bag: 2, itemId: APEX });
   });

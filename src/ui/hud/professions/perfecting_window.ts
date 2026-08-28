@@ -50,6 +50,7 @@ import {
   perfectingInfoSignature,
   perfectingViewSignature,
   samePerfectRef,
+  sameSelectedCopy,
 } from './perfecting_view';
 
 // The convergence poll while open (the harvest journal's cadence): the tick
@@ -247,17 +248,6 @@ export class PerfectingWindow {
    *  cues nothing; without the gate the landed rank's cue and announcement,
    *  and the promotion's dialog dismissal, would be skipped exactly once for
    *  every shifted copy. */
-  private sameSelectedCopy(
-    prev: { ref: PerfectItemRef; anchor: PerfectingSelectionAnchor | null },
-    ref: PerfectItemRef,
-    anchor: PerfectingSelectionAnchor | null,
-  ): boolean {
-    if (samePerfectRef(prev.ref, ref)) return true;
-    if ('slot' in prev.ref || 'slot' in ref || prev.ref.itemId !== ref.itemId) return false;
-    if (prev.anchor === null || anchor === null) return false;
-    return prev.anchor.count === anchor.count && prev.anchor.ordinal === anchor.ordinal;
-  }
-
   private buildView(): BuiltView {
     const world = this.deps.world();
     const syncing = !world.craftingIdentity.synced;
@@ -305,7 +295,7 @@ export class PerfectingWindow {
     }
     const prev = this.prevSelected;
     const anchor = detail ? baggedCopyOrdinal(view.candidates, detail.ref) : null;
-    if (detail && prev && this.sameSelectedCopy(prev, detail.ref, anchor)) {
+    if (detail && prev && sameSelectedCopy(prev, detail.ref, anchor)) {
       // The edge latches through prevSelected below, so whichever forced
       // repaint observes it first (the 1 Hz tick, or a relocalize that beat
       // it) plays the cue exactly once; a later repaint can never replay it.
@@ -359,8 +349,13 @@ export class PerfectingWindow {
     const newScroller = root.querySelector<HTMLElement>('.pf-body');
     if (newScroller) newScroller.scrollTop = scrollTop;
     if (focusKey !== null) {
+      // The ladder: the same keyed control (candidate rows are keyed by copy
+      // identity, so a followed copy keeps its key across a shift), then the
+      // checked row (a keyed control that left the tree, say a vanished
+      // copy's row, lands on the selection rather than on Close), then Close.
       restoreFirstEnabled([
         root.querySelector<HTMLElement>(`[data-focus-key="${focusKey}"]`),
+        root.querySelector<HTMLElement>('.pf-cand[aria-checked="true"]'),
         root.querySelector<HTMLElement>('[data-close]'),
       ]);
     }
@@ -580,7 +575,9 @@ export class PerfectingWindow {
     const icon = def
       ? this.deps.itemIcon(def, c.state === 'promoted' ? 'legendary' : undefined)
       : '';
-    const focusKey = 'slot' in c.ref ? `cand:s:${c.ref.slot}` : `cand:b:${c.ref.bag}`;
+    // Keyed by the copy's identity, not its cell, so the focus carry follows
+    // the same copy the selection anchor follows across a bag shift.
+    const focusKey = `cand:${c.identity}`;
     const worn = c.worn
       ? `<span class="pf-chip">${esc(t('hudChrome.perfecting.wornChip'))}</span>`
       : '';
